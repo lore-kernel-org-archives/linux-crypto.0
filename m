@@ -1,51 +1,52 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A72208A7
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 02:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D00208A7
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 02:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742524427; cv=none; b=FvKgPv+RpIPCrUKpdcqGWVcatR9bZeK85ubFe59PXLNjQuUIqb2N3dZ+V8YASXDizMtL5neyH6SR+r8qL5DGpNq2s/LPsQbPR+CVOrXz/7rMpVIOas6lKI+/kSi2/XafJtHO3So58YCYpgQ8tvkv1ilL+ayxZx5DtMowrIBi8t0=
+	t=1742524615; cv=none; b=J3oJkbcOczOKPFc0eBoFdrZUiM7G9kO8NoTA4qafNbOLuGY9hFB9h/eyt5VsrZCITGX5mw67jX2/6j2J+QHogneVUAj50JJ6zZhn0aIjKKb6/+1CFmhx3r0nNrNmdCvUqcgnb0I5oIm/ljHg4KAYoge+5wZmEZcOtA3wzvQ3MiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742524427; c=relaxed/simple;
-	bh=UmSIPkDBFwGnfk3qQd5yOufURIc3017FXWVRGciFAQw=;
+	s=arc-20240116; t=1742524615; c=relaxed/simple;
+	bh=YGtwEKTJqU1JIujquaCQdWU+CB+5Q/Y9dgFFkMF2/14=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AmK0f+rcLSM2PK2X+DI+d53PA+BtZq7HNYwnCRRdbuM7+rLP3FXR+t3ONGRbtY5Irz6aLuGuS1mM9/RaSJJXBfO54MlBPjSYAsMN0UTpHC3BSjbJabRmK2QHrQO9OAm8Wit34Ch+3yQKxAc01mCCtO+uD3y1GqF7dmgIUOm3TOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EjRGJh+e; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=qSt9m94mAs24iyHe6BUFe0/aZt4j4fCgPstn15iwj/5znRhScwIstjTelKbMzdg7LP9zhIqNZnglt7Mj2QQ149cyjhY9OwgTr90HUfzmiE/jfKv07/RDytu5qOuVK/iXnXqouZZzFHoYxNI0GhLK5IUUS4fxpi5pniYHJebMj5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=oAIeOVy4; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EjRGJh+e"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="oAIeOVy4"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=A5W/lkXgSqfh3K8Y8Beh9JxGkAWJpefOcj+GakFjxc8=; b=EjRGJh+eGJUFnK7s7AHNP5g/qP
-	UxH+vkhqnUYH5w845D2xzWrrIv/SedLdJTHzTUrSkD0+d8kynz6pUpiGJjDp/yeOHzNBDBLU2VJuo
-	GQGmiWwd3vk0VR7uYGGkU6nVdqyH38fAhkexFt90LnDkie5GibRLmGqoSc8L5BkUqPFnM9pcFGHM/
-	O4KHvnsEvKaUAdcAIMVz7fohYC16j7RB8nbbgIAZJG3yTL2KP2p2dOQOFurPxuQPUgVcXWbfe1OPN
-	sSGuNxA6IkjC5d/m9KCkbbBdNozAFKelxsWvqGQlbKiNhJV/pNLp2VspNMC/ibDnQ0TaW+M9C26EN
-	t9OGhlOw==;
+	bh=5EsWK4dvcDBJZFey1wRWPC/pWTcodP9QhI4Nh92kyxA=; b=oAIeOVy43pxP7FIWcaavCE2kF3
+	C6aco/lxSVdaf8T9r5bTf5VaxIbV3LuzOFr/9K9PlgjyEOxQU68MuAW3f7eeoF3bJqwNvXCwMX4ID
+	aj+E+V8hJeF95kPnNG9sxcq+fBpPnv7c1AXTo/FNYBJWHxR6ZQ21uh0EabLQ+t5+yA8XyDEzsK42V
+	H8fiVVr3bC+8WMfiuo2bvQyqtxx3bksHouO+rkijsyNIlvCTzVKYjv9oLdZtAiq7/GWnp2/5VW/oS
+	zRLJD2Yh/C60gDpRGTyavIXaR3a3JhcXP+X3WnppJ5jdHhvF9isW6UMk8NItT54GaOqCuCFXto3ba
+	zm1K+tgA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tvSCW-008uar-2G;
-	Fri, 21 Mar 2025 10:33:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 10:33:36 +0800
-Date: Fri, 21 Mar 2025 10:33:36 +0800
+	id 1tvSFb-008ufM-0C;
+	Fri, 21 Mar 2025 10:36:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 10:36:47 +0800
+Date: Fri, 21 Mar 2025 10:36:47 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [v3 PATCH 5/8] crypto: acomp - Add request chaining and virtual
- addresses
-Message-ID: <Z9zQALjYg7F_ZXUs@gondor.apana.org.au>
-References: <cover.1741488107.git.herbert@gondor.apana.org.au>
- <e9da3237a4b9ca0a9c8aad8f182997ad14320b5a.1741488107.git.herbert@gondor.apana.org.au>
- <Z9xPaQNIyFi9fiYe@gcabiddu-mobl.ger.corp.intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	YOSHIFUJI =?utf-8?B?SGlkZWFraS/lkInol6Toi7HmmI4=?= <hideaki.yoshifuji@miraclelinux.com>
+Subject: Re: [PATCH 0/3] crypto: Add SG support to deflate
+Message-ID: <Z9zQv16-Wq3Ojgyi@gondor.apana.org.au>
+References: <cover.1742364215.git.herbert@gondor.apana.org.au>
+ <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
+ <Z9vOUut7CWJK0kVJ@gondor.apana.org.au>
+ <CAMj1kXHXZoaf3H4brxm2O+mvw0iebEUkO2euNj4CeDVn4dz40w@mail.gmail.com>
+ <20250320173450.GA697647@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,29 +55,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9xPaQNIyFi9fiYe@gcabiddu-mobl.ger.corp.intel.com>
+In-Reply-To: <20250320173450.GA697647@google.com>
 
-On Thu, Mar 20, 2025 at 05:24:57PM +0000, Cabiddu, Giovanni wrote:
+On Thu, Mar 20, 2025 at 05:34:50PM +0000, Eric Biggers wrote:
 >
-> > +static int acomp_reqchain_finish(struct acomp_req_chain *state,
-> > +				 int err, u32 mask)
-> > +{
-> > +	struct acomp_req *req0 = state->req0;
-> > +	struct acomp_req *req = state->cur;
-> > +	struct acomp_req *n;
-> > +
-> > +	acomp_reqchain_virt(state, err);
-> > +
-> > +	if (req != req0)
-> I'm hitting a NULL pointer dereference at this point as req0 is NULL.
+> Then again this patchset doesn't apply, so it's unreviewable anyway.
 
-Yes sorry, my testing was screwed up.  When I thought I was testing
-the chaining fallback path I was actually testing the shash
-fall-through path.
+You can test it at
 
-I will resend these patches.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git acomp2
+ 
+> The kernel's zlib was forked from upstream zlib in the 90s and hasn't been
+> re-synced since then.
 
-Thanks,
+It was updated in 2006, three years after the USAGI workaround:
+
+commit 4f3865fb57a04db7cca068fed1c15badc064a302
+Author: Richard Purdie <rpurdie@rpsys.net>
+Date:   Thu Jun 22 14:47:34 2006 -0700
+
+    [PATCH] zlib_inflate: Upgrade library code to a recent version
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
