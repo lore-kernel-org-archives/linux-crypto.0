@@ -1,130 +1,132 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029812AE68
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Mar 2025 02:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D451F237C;
+	Sat, 22 Mar 2025 11:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742608815; cv=none; b=qBUwm3HprE6t18W5tpwEc9NPThBItTQLEht5PjB99i3UGmy8UvCr76igllnavYIzKPIvLz7W6BiRpWb5QzCDmf9llNoxt2vO27k3yi3EqPqnKEk1JY9kkgGayuAHyzrIWnMwZ8F7op6tJiAtlu+X41/nE35lrabvipdUtpT4j6Y=
+	t=1742644219; cv=none; b=OmPfjLO7edpQ7SWVBCmP/MOzVqU39sFwyE4Vcp3pIqjpDXy7J1lQHKPOHVD///9To1G2Ex7G4PUQyUFFRrm26mHSHx3x9MUl70ogL1Dg4GZjpWYtkx5+4B03puyHcvRhbu38sMlnjhibZaaRfp13q0ShE+w10R7pZ4DDIKrs2hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742608815; c=relaxed/simple;
-	bh=8IqTk4BKS73rbztsZ8s4OStuLs1QlK86pI5xopXqGqg=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=kkimaTzhTk3RA95O82fG5JaORqxTOz7SSF90F1IpPaMvMJR6u/mnOVj/VUZE16wxv1gp2oMnNY8BeWeyOFkHlPups4nD3Dgx+yX/5Ac32XBsSEF12M8ifN7VpanePn0IjKZ9ZJpjXzLpw+0nkaHVql9+eKnmFkPb5XXCBKjYRCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=OIiq/tKk; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1742644219; c=relaxed/simple;
+	bh=dlb2c5+73X9T17Ga2GDXTcwT6vGIJCUSgIzW59AQZWg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=rNu/UdTsJ1c5pdO2yRzhP45iGJGLb6WzIYPtw0M5oFFy3wcgFisFPOYlutfZE/oHwYCEnXBiXmd48mCJKFbC0lKX6u1dQxSe6SoWFLvWzDAFHwwzMrTb4gu5ewn9ETXTXhvFoOBukzapP4an6O01Jq2dt12/zbui0So78zMC6aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSPi173G; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="OIiq/tKk"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-47677b77725so23255421cf.3
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 19:00:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSPi173G"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac2902f7c2aso483215066b.1;
+        Sat, 22 Mar 2025 04:50:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1742608813; x=1743213613; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aeTkf0HU2gV+J9uhRCrFRQXj1avZrvZhAtEkCp/R+W0=;
-        b=OIiq/tKk+8b6q6okI4e8/WsII58/A52u7Qe8FxIfDHAaZ4fZiDfbhj22ARZcmYOSon
-         pP9WSCnsNKN5DdHTKVaOsaYio/CCy8bQPW5AWkxK9eDjuTkC7h+/xbHseFzAn9AbwX8t
-         4a4cVByMj6FjBMFNSa+K2+I+ALLx225jELdDW9KmTik9xaeiTXY46GZPb5ocUat3KLdJ
-         Ei+o7qj2lGCSwlh6htOw8Fx2U8BXCUzo4QMxHXkJMjqzXPawwlp0G/tWJytMD3bV1Bbe
-         W2OsuR2van4AkPe319vkOBYSVNoV4dxotKRpHQ9Vr/AkYFE26G8wsQ6lRSeeCn3ZwMiN
-         ojIg==
+        d=gmail.com; s=20230601; t=1742644216; x=1743249016; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JeCMKd6FN5Dtrxtkveh1+h24l/CzYAUf5GBYjF0Tj9I=;
+        b=JSPi173Gy9EisqpIuqxLAdt39Xzhxyi86yrBYhtu3gQ9Bsl+F68pXBXzEdYSsTnd7l
+         WSQNuJW6GLAFDTN8LRqAbhofx8u//QbbbI/KThok4rxMwo1e1YokPhXhb47TFqx+W+qF
+         jUF0gbKlsrw915WMfmz5dgZExnnXV2qsvlQH9dXDnfbLzjnxGyCpBt79eg/YSd6c+YaQ
+         nCegTCjWUDdI93OBACZ4LxfmfKgjPoPse7KZ30a+BdninHvI/iV8C5ALMX0R7r/DoqFn
+         icdZxEK7irobWx9TB+2bsZMg/53brsOdo2GOJb+iU0WqDHnFQqm+Xr4krAM5mIxYAyom
+         V62A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742608813; x=1743213613;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aeTkf0HU2gV+J9uhRCrFRQXj1avZrvZhAtEkCp/R+W0=;
-        b=TBi+5N2kB0vnHGwf23IekHubMPjKYJkwOTfWrUra/oBYn02jCnHknCqH+rnOGzq7oi
-         xz8XRi9vKRTWSER/pTyrQXLjuXFDAhdzo34mRJcom+40mP6FyO+FD/uE8t+/TT5XV6Hk
-         YJbfOe6u+mNPzC9XsVPkmrJGf1+LGybWpemxGgJgrjKxznc+docircaM5VSJEHsLOJvR
-         I0VQ52ZSqcw/hMzLprWhw0PbSZsljfQhdko3e9zMsi1yXzwd/ycnoWM7A1oXHp1rbpxr
-         lUId+LXWPxrfRn2R3Y3rM4awbrHWDN4bEi2xmNLvRqctnZMX9lhztQjKib9MfxCOki9T
-         6gcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEeVpzkA8kfs0ZDTdku0zHvjdG7a/Wiys/E0d1F8IOSio217+nh+QMU1vHRS4t/AtVy4Ey/Um/RT1fP9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzil9jwS7Bs6u9+Oy5tOHqb/yr5dlDF2esHpHrG1ECLDP68sOEz
-	mnpHVeJLDOiDii6L15exij5H41RtQn8ma1yhr5qgQSGZ24/F/jgcD+ijm5N/XA==
-X-Gm-Gg: ASbGnctJ+rACHpn8hJBLONUH9DtGHvDsRQWvfGqg+OUCAibf3B1T+n3aREuqwQhuahb
-	r6/veOaq4xEo1Y7amy2cY4arIY4aqnwf74C8qbTU6Zrzm5BwJcGJe4abqbN/rYqcGG16fSr7QV/
-	miblZnCCjWfN6rrgb73NQ3WE9mTmcmC9Sdf2JZ3ZyAMqhpAPRCBx5Ykp7oKSKVO5kWNXQ7wIc9U
-	ran6MqNyy6LLJ1qGPxJFaS7NgkhlXKRUTOZG9SMoFuk8hkresEynZ1YqTRSxFtDvWzApsR/ufi3
-	06z2MBbIyOD30AzaR5IjddfKJG9ADsuXPgfgWo1cKFDtJiA11QrkbgYkN4lr39j/u08a5AjcFom
-	Dc8W2jsb6RzV9qXP3piLnfp2NAHzLFw==
-X-Google-Smtp-Source: AGHT+IHzlySTB1FiLSeLQACkKxr5JgVdqK7Me2MGxcPq3zmWtz2HlzgUUzb9hZF9TIbpp4ZVYFmCfQ==
-X-Received: by 2002:ac8:4418:0:b0:477:1f2f:1717 with SMTP id d75a77b69052e-4771f2f4477mr66553491cf.20.1742608812678;
-        Fri, 21 Mar 2025 19:00:12 -0700 (PDT)
-Received: from [192.168.7.16] (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d17afbfsm18987491cf.26.2025.03.21.19.00.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 19:00:12 -0700 (PDT)
-From: Paul Moore <paul@paul-moore.com>
-To: Eric Snowberg <eric.snowberg@oracle.com>
-CC: Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>, "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>, <herbert@gondor.apana.org.au>, <davem@davemloft.net>, Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, open list <linux-kernel@vger.kernel.org>, <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>, <linux-efi@vger.kernel.org>, <linux-integrity@vger.kernel.org>
-Date: Fri, 21 Mar 2025 22:00:07 -0400
-Message-ID: <195bb943458.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
-In-Reply-To: <E8FD1D0D-4A71-45C3-B74C-5224ACD7CED1@oracle.com>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
- <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
- <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com>
- <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
- <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
- <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
- <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
- <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
- <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
- <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
- <FD501FB8-72D2-4B10-A03A-F52FC5B67646@oracle.com>
- <CAHC9VhR961uTFueovLXXaOf-3ZAnvQCWOTfw-wCRuAKOKPAOKw@mail.gmail.com>
- <73B78CE7-1BB8-4065-9EBA-FB69E327725E@oracle.com>
- <CAHC9VhRMUkzLVT5GT5c5hgpfaaKubzcPOTWFDpOmhNne0sswPA@mail.gmail.com>
- <1A222B45-FCC4-4BBD-8E17-D92697FE467D@oracle.com>
- <CAHC9VhTObTee95SwZ+C4EwPotovE9R3vy0gVXf+kATtP3vfXrg@mail.gmail.com>
- <EB757F96-E152-4EAB-B3F7-75C1DBE3A03B@oracle.com>
- <1956e7f9d60.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
- <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com>
- <CAHC9VhQMN6cgWbxdAgBNffpCAo=ogGdm4qBGS_kKdDmiT8b3cw@mail.gmail.com>
- <B89ED288-1A01-41D2-8ECF-285669139553@oracle.com>
- <CAHC9VhQb55+SmwmrsVpyw5X2Ys0oo6gJ_dbDf64mS5c008230A@mail.gmail.com>
- <4F901DC6-51DC-47A1-8D2A-D84DCD9D0C2D@oracle.com>
- <CAHC9VhT0y5AO0Yjy649PbsYnN+Xf3_pTJCegW1kPW7=GM9RypQ@mail.gmail.com>
- <E8FD1D0D-4A71-45C3-B74C-5224ACD7CED1@oracle.com>
-User-Agent: AquaMail/1.54.1 (build: 105401536)
-Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+        d=1e100.net; s=20230601; t=1742644216; x=1743249016;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JeCMKd6FN5Dtrxtkveh1+h24l/CzYAUf5GBYjF0Tj9I=;
+        b=U+UgbvZ9dVbLTg4Q6gCTbe2jZE6v1HP4ev+gGg+GKVZpaANIIHT5mA4U/23AoAdzjN
+         3via79vm48Z1VCsTn1Qr970LKV6eJhoNOOSTxrypWaBEFpI/XIizdxADnZVi37BmHrhS
+         oPzRf9zGUPEgd+uDtg0UY7/8ocQuYKOee1eyEP4cKaWAZ6MHxO3faZRvDWsBthMfaWG1
+         oMNBlJ8NeXiWyG5Y0klEnRTbko53wf3yrh7Fh1ZaZKrcxky2PwVN4w4VXxTefyArLDVs
+         uVpirV00M6/NVeyQFwJ4qp4mUjep+c3i2Aa483QLzR5VC4JKFJpDoaswDKDRiNfaOnJb
+         YCdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUthLpHEKjq9kGU3PlowSene2JsY2dAIeE7jaSCeCcruLo2ZyoFRFWnw2ApPUuDrdKzffyfKfN9TxXXwA==@vger.kernel.org, AJvYcCWCjhZU/rhMFSTkM1ClSNdEq3LrM2GOg+iyHBAJAdEReusXE8lRpgXBU42k+KjXWTxdA2sbgekBmGpy@vger.kernel.org, AJvYcCWuMU6e8Wl5rrm48hXee7iaxWOSa7I/8vO904BnrPFFpjFm4u8u52fOONNxJm2pAqkC0Xs=@vger.kernel.org, AJvYcCWzcfwm8d5a4o+dPUMM9boHmg442qy6VzNcnHQfRJK+eS0KAabpY9rJfU1BH0xLpdhb7XbST5ZLWtNs3MBc@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUfzkeoghv+3UP9DpHrvrIisU0YENgnHrOzHrrhmNA7iItopuR
+	1sVX5KsILBs6NyPOflZkZ7oAu/1FNzBumSMmVvW76tXyyiYJpANv
+X-Gm-Gg: ASbGncu++nUuEKwWdvUvOKgVDG3MxX27HCZ3beBkDgHk6RSvnCAph1m2SF9cSLfwsCb
+	DJYe0xPO9JDgOcpD6n/n4axqI659vDcI5w6oMs662oyX3DN+TAXG9932U4yOQT1tF9Eq9YPAo1p
+	yyRnd9aNYm7CB+1ItIzC0kwMJgofD+Ej8eKjlfWmaLTYES8kEk7+c6Ho322cze0Q6irPFThekWq
+	HjQhVILrpfY5Pyxici++gLSOlPjaQqreQovGxWi3aqRS/Ggh4pM5HNAlbIUdGERsuPQkeLzHyE3
+	TIWSYvlsYCf9Vsna5aPR+v/L8kXZVEq9I1P1B2DtjysetYzjO6gn0CBafbpkDCAE1cb1lojTERL
+	MijCTeV/tCSN8m7wcwXeHXUo=
+X-Google-Smtp-Source: AGHT+IEphkVCVCfxAVXmQkZdk1aaFCEcND/QMO8xPKoiUSmAYimS0LjW+bLOcrDDhpSGnYro5fRwfQ==
+X-Received: by 2002:a17:907:ec81:b0:ac4:2b0:216f with SMTP id a640c23a62f3a-ac402b024c3mr372266766b.43.1742644215830;
+        Sat, 22 Mar 2025 04:50:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:5d29:f42d:82af:f891:3144:66d? ([2001:b07:5d29:f42d:82af:f891:3144:66d])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efd4798dsm326399066b.161.2025.03.22.04.50.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Mar 2025 04:50:15 -0700 (PDT)
+Message-ID: <7177c7ae24b9f7ebbfc001166e09beadb81305ae.camel@gmail.com>
+Subject: Re: [RFC PATCH v2 05/22] crypto: ccp: Enable SEV-TIO feature in the
+ PSP when supported
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: aik@amd.com
+Cc: Jonathan.Cameron@huawei.com, aneesh.kumar@kernel.org,
+ ashish.kalra@amd.com,  baolu.lu@linux.intel.com, bhelgaas@google.com,
+ dan.j.williams@intel.com,  dionnaglaze@google.com, hch@lst.de,
+ iommu@lists.linux.dev, jgg@ziepe.ca,  joao.m.martins@oracle.com,
+ joro@8bytes.org, kevin.tian@intel.com,  kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-coco@lists.linux.dev, 
+ linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org, lukas@wunner.de, 
+ michael.roth@amd.com, nicolinc@nvidia.com, nikunj@amd.com,
+ pbonzini@redhat.com,  robin.murphy@arm.com, seanjc@google.com,
+ steven.sistare@oracle.com,  suravee.suthikulpanit@amd.com,
+ suzuki.poulose@arm.com, thomas.lendacky@amd.com,  vasant.hegde@amd.com,
+ x86@kernel.org, yi.l.liu@intel.com, yilun.xu@linux.intel.com, 
+ zhiw@nvidia.com
+Date: Sat, 22 Mar 2025 12:50:12 +0100
+In-Reply-To: <20250218111017.491719-6-aik@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
 
-On March 21, 2025 6:56:53 PM Eric Snowberg <eric.snowberg@oracle.com> wrote:
->> On Mar 21, 2025, at 4:13 PM, Paul Moore <paul@paul-moore.com> wrote:
->>
->> On Fri, Mar 21, 2025 at 5:21 PM Eric Snowberg <eric.snowberg@oracle.com> wrote:
->>>> On Mar 21, 2025, at 12:57 PM, Paul Moore <paul@paul-moore.com> wrote:
->>> ...
->>>> , but I will note that I don't recall you offering to step
->>>> up and maintain Lockdown anywhere in this thread.
->>>
->>> I didn't realize that trying to contribute a new LSM and being willing to
->>> be the maintainer of it also involved stepping up to maintain lockdown.
->>
->> It doesn't, but your criticism of how Lockdown is being handled
->> definitely falls a bit flat.
->
-> I merely pointed out the inaccuracy of your assertion that people are 
-> freeloading
-> off it and not contributing anything substantial by providing an example.
+On 2025-02-18 at 11:09, Alexey Kardashevskiy wrote:
+> @@ -601,6 +603,25 @@ struct sev_data_snp_addr {
+>  	u64 address;				/* In/Out */
+>  } __packed;
+> =20
+> +/**
+> + * struct sev_data_snp_feature_info - SEV_CMD_SNP_FEATURE_INFO
+> command params
+> + *
+> + * @len: length of this struct
+> + * @ecx_in: subfunction index of CPUID Fn8000_0024
+> + * @feature_info_paddr: physical address of a page with
+> sev_snp_feature_info
+> + */
+> +#define SNP_FEATURE_FN8000_0024_EBX_X00_SEVTIO	1
 
-In my opinion the example you provided did not demonstrate that at all for 
-reasons already mentioned.  As for the issue of freeloading on Lockdown, I 
-believe I've already made myself clear on that point.
+According to the SNP firmware ABI spec, support for SEV TIO commands is
+indicated by bit 1 (bit 0 is for SEV legacy commands).
 
---
-paul-moore.com
+> +static int snp_get_feature_info(struct sev_device *sev, u32 ecx,
+> struct sev_snp_feature_info *fi)
+> +{
+> +	struct sev_user_data_snp_status status =3D { 0 };
+> +	int psp_ret =3D 0, ret;
+> +
+> +	ret =3D snp_platform_status_locked(sev, &status, &psp_ret);
+> +	if (ret)
+> +		return ret;
+> +	if (ret !=3D SEV_RET_SUCCESS)
 
+s/ret/psp_ret/
 
+> +		return -EFAULT;
+> +	if (!status.feature_info)
+> +		return -ENOENT;
+> +
+> +	ret =3D snp_feature_info_locked(sev, ecx, fi, &psp_ret);
+> +	if (ret)
+> +		return ret;
+> +	if (ret !=3D SEV_RET_SUCCESS)
 
+Same here
