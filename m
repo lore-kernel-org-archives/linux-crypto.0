@@ -1,123 +1,192 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3EB1E5B6B;
-	Sun, 23 Mar 2025 10:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6288D1D95B4;
+	Sun, 23 Mar 2025 11:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742725263; cv=none; b=pz5YB9NiZKdAS4EYLG7pfB4q07KMV6/AnJpwCdkuQi0a49BHSeIkBucsbcb1r50wvI7xlAlmbxSlh/RLHJytcSJuDYPeOZkhyRWOP+EW27cnxPRawQ4NGpzVVDkVw6UOEUsqkKvgLyroARU9euzHy0WHPIys1I+ZLfg18yZFXo0=
+	t=1742729762; cv=none; b=M/MxJY/epr6b//wzONZdUc1jm/kdrY+hTxiINOFaTqTmBctg8LTuWO7j4pFGpGPJVpi9Gez2ySadYX0xMTMnt9e8gWUvyZCYoWvjKpSNsDOI6uVJidTtRvxNMIMxNg1PsxIRWgBPyGKqKnUgl8PwhDKwfV/IAbhNqQL1Suw6HM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742725263; c=relaxed/simple;
-	bh=mhlcwCiOJk1OYGNmsrJQoGnSWAYfCzhWAm+lenx4tR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FN1dmIlL1B2bBAQJr1Gq5YyX8ppWCx3j2aWXFvWCXw3vPXDr+yL/sd6T7DNOYxZKO0HGVBZ9RynVPaTGKT+IVjTwP8vjYL0QMjWa/t+bw3ROOnJcfaeMpiOPQn4cgF7HfSMYxTsXlS0qQ48xRep/CHaWQnZR7nvta2IzkwlXGrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQzNBeDn; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1742729762; c=relaxed/simple;
+	bh=vxqD9fQ0riCAby3fUhv76PYUNSKXaRoQ4ZVMDVN1oec=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=Fz/9E+PGyHddJQnAFSFNbmwJwI5H5Tm+gJewJ5OTXfGDG69VAvz9CEADLSY+rD+C1iReKFx2AHLXLD1LSJXLQh4i7QUv5vetH5W3151JcWx6WZtckQ7V6Klh7Lvi7jl7/cr+B6SfcZCXdTR22nrBop1LKXUEdsZn/zx+nLm6h9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bUg/qc3e; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQzNBeDn"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3913b539aabso1834116f8f.2;
-        Sun, 23 Mar 2025 03:21:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bUg/qc3e"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ac29af3382dso580881666b.2;
+        Sun, 23 Mar 2025 04:36:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742725259; x=1743330059; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qeJQl4E3xKZmL5KbVn4fJK5YhYvsJTclIdlv1fujUX8=;
-        b=mQzNBeDnrFJIdquMYUIk8vPgBm88DQtxwt4AAqKC+ZTD/95QXnBXovEm10vb6YJnTh
-         823FGulYLsKfrk6bCWR7wnFR44Wo3UrC1MxWVjb5o0KVb96jB8lEXwD5GUJjNFYJyTbe
-         wtNXaz0Sz81c0mwQBaINCLOmuza4CDOqwH3CwZPmoAHlXOI0uxnEzhJQ6Kc6CW1ZmLrw
-         PELZWeXRDNv16f8/8MIYWkk5CuOZNmV4jaQh9n4sVM4g8jEa3d3WZblLhSmETIjq+1MF
-         JqeLA8DufFf4485VAGiNfXin3vYZkuEAaZGUVnKFnYylHp0+Vx/MO1E2V11j9MvpU8Rz
-         /7Uw==
+        d=gmail.com; s=20230601; t=1742729758; x=1743334558; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ulYi+eY/hFy7Rpw8ZWtw9DJBvuhlwhkseKvZOaTPlmo=;
+        b=bUg/qc3eiFvzcMMgWig91fpQdtBHbvkmZRaTcIn1M6lkMWYChKXlkYdpKs82Guq/o9
+         lFzy6sKUg2DG+9alRCvxibDYHCcZHVdz6+H/gsARrfqf7R8fpMLW8oWIfh4B2+uzGpS0
+         LAHStrem3WFQkQ88Q6NJ0RORQlAqwkhSJBP5OR7oY08JElJJ3aYJjg0urvJPRgrepLTp
+         vnlABZJ5QOpdHTEtdKwkTRqFAzFhFJba9Q70F8sh3JQRDET8wuOpxOqeJvDrLWpsUZeK
+         qN0+vBoM1bI0fSceUrgaPnDuYRy8pmKlYmKcVV5mmrk18YPONGrDYAiTr7IRrLwDCsYF
+         W2qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742725259; x=1743330059;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qeJQl4E3xKZmL5KbVn4fJK5YhYvsJTclIdlv1fujUX8=;
-        b=cHar1Zri0Q+/T9XPtgxsPVRAncWkfGMA81rO6hqz/E8as6DOX0txQ6KwIdlvGgOKWE
-         vLPFLOJapDoLA8CfGLPLQ4YJ7CKzXAEGNyUy9ZI5FUPXS2PlkInM+4qsAVMExId09Akm
-         hDQGRJiT+62QbivhQKUYmeviTPYZdO/RJXjkdinP6oqSc6x84rzObwQ5Go3xhSjwwUTf
-         g/YO2uwllmEI6cIULQ+7AXy4hEahlJkeO6FkH0/H/uzAQukEtNeKse5mEz15a/3gVFCR
-         UxYoLzH4CfMaUAGXSMalcxlRnmLURLaHEd95PUEjJGei7Q4GBnAv0+Tl14Au/cx1RW65
-         UsXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKhDYJO51+EUgAyAGlQbWxcmFwhmgKCyE+UetYAVtUyaTjmB7SXG3pZoRpCPQ8yPx76b3GWi4ad2lbAIs=@vger.kernel.org, AJvYcCXs7IJW33UvblHuxl4nw3gTmM4Uj0ZdQKdOmmw4l0KkEEL1Rb5qVF3o0JqO6jn6V36LFfAZsJAQTGISmqmQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoeEatG5/GZRsmnb7yiS5MpG7k4hyOfMXnnZs2BClQI0MNIpCk
-	kzjBBaUQHtiFF6BNuKHX11rL1U4Pg/S0aFK/65UuCrD+XIMrB4d3
-X-Gm-Gg: ASbGncvonm2o3suUMBH0UiIGw5pN3YKgz4RJsmiB0TOlQAzFNmEmMkELSTQblcMYyEn
-	MdZaB2kgLdS+0HBJEboD1wb0O756v9xE5LA53Xoho2ugfd5iLcMsG9sp/vCP1FYpf1TDkgFfLbP
-	7S8ssKNR/5Adw26SN5jBfdLf7/+ivh4ikAr1YLDLkcEtXxulXH2/VXqb0Zz0Ul553dfvL3xx1h3
-	NuOfaxJ2UBYctMwLf8aZJdCJY8V+eTbypnHP+rPuosYZsPP2Ay7HSQxKE4Z23TNU7TFIkhzWoTT
-	20cr9rrkpsxAS5m3LeobgghEVvv32KnIMvRC3jhLTGiZImzKrE4jhPZ34pVsnnWmDY/mPE2EfGy
-	iMLLB5TgkDPYbjLoF+Q==
-X-Google-Smtp-Source: AGHT+IFtspyb7aGU8PqUeHK5tVMGTazHsDMgEYaDtmM86O0LQ5fMac9P3KCTGj2Vs5NlkiCnMpgWhA==
-X-Received: by 2002:a5d:6d81:0:b0:391:29c0:83f5 with SMTP id ffacd0b85a97d-3997f94da3bmr8008850f8f.44.1742725259346;
-        Sun, 23 Mar 2025 03:20:59 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9a3c90sm7575305f8f.36.2025.03.23.03.20.58
+        d=1e100.net; s=20230601; t=1742729758; x=1743334558;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ulYi+eY/hFy7Rpw8ZWtw9DJBvuhlwhkseKvZOaTPlmo=;
+        b=vYjWqramYJy5LE6lFhiZiMD868xGFuA5LDS8s8/SZPnLPHjeTZ6mauYMgDbMV9RERF
+         S4ByY27Q6bH4m3SCJcFah/pE5k/u9B0oB4kW0i4FslE5K6m8AzNM94aF3Yv6iN8Y0mLt
+         FNA/wNQlV1i4Q2+hAJ4AXAs5cdwSUHy/yV2HdnQrnA2PGRQzt58+rY5K3o0KCtQLlhc4
+         F3BfX5seLiTLY7+iOy+2RPar+OrZ909jvGSdJkwgFK6lkEriB/gzGIBKINmnFXdN2a4r
+         OaCAKambHLhUSyn8707NvX/0WFfiUJV6V0Pjh10x/AgiVrEjWK3MTbOyfiVWUM8aH7A+
+         199g==
+X-Forwarded-Encrypted: i=1; AJvYcCUCL0mFynLSYM9+EfHZuCAfVqifrdYWBvR0NlbS3jp9+bsfJBQOgtoW3+F/34LX2/8o+ks=@vger.kernel.org, AJvYcCUqq5h84kZJTYVpbWKY2EIN1XiSCDhUj/35VS1zIXARXyuo8ERchWWSdm881IO159Z397KOENLcNd7Afg==@vger.kernel.org, AJvYcCXVCywQlGb381tciDA6iXHJaIiK7miCx66vcAMgKFc24of8y424bjeHOSSzz4Uc/Iy91AMRRRMKBVyFghR4@vger.kernel.org, AJvYcCXyxnMAmMvQ2WR6VXxFmg4EUoGjYGiqOeUCbNtC5xQtF4U2YZegR4rZakCQ0KuA7NZba9Zf1GgbCshS@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyXOuZIQr7HpDstx/diEomcl7pYZ1viAp11e4gDR4vpuowlU7p
+	cFHyGkV0daNM7SEGXKxcHI2hxHJ9FNk2Y1+MB2w9aFL4XI2+fLHv
+X-Gm-Gg: ASbGncuA1AKGQzg3md6EyLo9/i5/DBuGMh7kxQe+2rzfDvnYoQDZZUbVeQRjTHWFfx/
+	H++wCYsT1cfMhsbMPylW4Z952NekN2Jq2e9pwunPWUJ8thitKAt0yjxcyolItWkTSMMXIIFNAPz
+	oMbJSYW6CeXvnHaZ2YJL2fcpCdPsTKC7RRJFeYviiQb7w7gE+cUuYZA1nlEB6Kxi6F1W339QGMf
+	9an6nFrWBYDwNK06TwCLS4SolXA5AWQ/029OejlLPRv78Z50ghwAeBPJOJ4+cpzkrSgKQhQ8DdA
+	u3Wwqa7M3MrBszOdVFpgx+u4PFSmtwlA3hKG7XeNB6YIBfT/4lBFHgMAHXa3dYKOFxckf3oDPs9
+	uqkCdMml31+FSQEgu8DYSNx1PpA==
+X-Google-Smtp-Source: AGHT+IEzF59fM+1sXKTJnQXrcFoM0BGGjWdJktjtNJk+BRvhUOw/UEJ7hRrjg6HizFkpkJVBQreUZw==
+X-Received: by 2002:a17:907:ec0d:b0:ac3:d9db:14bc with SMTP id a640c23a62f3a-ac3f1dfcc58mr968370866b.0.1742729758185;
+        Sun, 23 Mar 2025 04:35:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:5d29:f42d:400c:7196:fafe:b8ec? ([2001:b07:5d29:f42d:400c:7196:fafe:b8ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efd4800esm493940666b.164.2025.03.23.04.35.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Mar 2025 03:20:58 -0700 (PDT)
-Date: Sun, 23 Mar 2025 10:20:57 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: essiv - Replace memcpy() + NUL-termination with
- strscpy()
-Message-ID: <20250323102057.79c810f1@pumpkin>
-In-Reply-To: <20250316211504.39327-2-thorsten.blum@linux.dev>
-References: <20250316211504.39327-2-thorsten.blum@linux.dev>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Sun, 23 Mar 2025 04:35:57 -0700 (PDT)
+Message-ID: <545cc6485e2c4043d222cb762833fd9bc33feb1a.camel@gmail.com>
+Subject: Re: [RFC PATCH v2 09/22] crypto/ccp: Implement SEV TIO firmware
+ interface
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: aik@amd.com
+Cc: Jonathan.Cameron@huawei.com, aneesh.kumar@kernel.org,
+ ashish.kalra@amd.com,  baolu.lu@linux.intel.com, bhelgaas@google.com,
+ dan.j.williams@intel.com,  dionnaglaze@google.com, hch@lst.de,
+ iommu@lists.linux.dev, jgg@ziepe.ca,  joao.m.martins@oracle.com,
+ joro@8bytes.org, kevin.tian@intel.com,  kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-coco@lists.linux.dev, 
+ linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org, lukas@wunner.de, 
+ michael.roth@amd.com, nicolinc@nvidia.com, nikunj@amd.com,
+ pbonzini@redhat.com,  robin.murphy@arm.com, seanjc@google.com,
+ steven.sistare@oracle.com,  suravee.suthikulpanit@amd.com,
+ suzuki.poulose@arm.com, thomas.lendacky@amd.com,  vasant.hegde@amd.com,
+ x86@kernel.org, yi.l.liu@intel.com, yilun.xu@linux.intel.com, 
+ zhiw@nvidia.com
+Date: Sun, 23 Mar 2025 12:35:55 +0100
+In-Reply-To: <20250218111017.491719-10-aik@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Sun, 16 Mar 2025 22:15:04 +0100
-Thorsten Blum <thorsten.blum@linux.dev> wrote:
+On 2025-02-18 at 11:09, Alexey Kardashevskiy wrote:
+> diff --git a/drivers/crypto/ccp/sev-dev-tio.c
+> b/drivers/crypto/ccp/sev-dev-tio.c
+> new file mode 100644
+> index 000000000000..bd55ad6c5fb3
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sev-dev-tio.c
+> @@ -0,0 +1,1664 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +// Interface to PSP for CCP/SEV-TIO/SNP-VM
+> +
+> +#include <linux/pci.h>
+> +#include <linux/tsm.h>
+> +#include <linux/psp.h>
+> +#include <linux/file.h>
+> +#include <linux/vmalloc.h>
+> +
+> +#include <asm/sev-common.h>
+> +#include <asm/sev.h>
+> +#include <asm/page.h>
+> +
+> +#include "psp-dev.h"
+> +#include "sev-dev.h"
+> +#include "sev-dev-tio.h"
+> +
+> +static void *__prep_data_pg(struct tsm_dev_tio *dev_data, size_t
+> len)
+> +{
+> +	void *r =3D dev_data->data_pg;
+> +
+> +	if (snp_reclaim_pages(virt_to_phys(r), 1, false))
+> +		return NULL;
+> +
+> +	memset(r, 0, len);
+> +
+> +	if (rmp_make_private(page_to_pfn(virt_to_page(r)), 0,
+> PG_LEVEL_4K, 0, true))
 
-> Use strscpy() to copy the NUL-terminated string 'p' to the destination
-> buffer instead of using memcpy() followed by a manual NUL-termination.
-> 
-> No functional changes intended.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  crypto/essiv.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/crypto/essiv.c b/crypto/essiv.c
-> index 1c00c3324058..ec0ec8992c2d 100644
-> --- a/crypto/essiv.c
-> +++ b/crypto/essiv.c
-> @@ -405,8 +405,7 @@ static bool parse_cipher_name(char *essiv_cipher_name, const char *cra_name)
->  	if (len >= CRYPTO_MAX_ALG_NAME)
->  		return false;
->  
-> -	memcpy(essiv_cipher_name, p, len);
-> -	essiv_cipher_name[len] = '\0';
-> +	strscpy(essiv_cipher_name, p, len + 1);
+We have virt_to_pfn().
 
-That is just 'so wrong'.
-The 'len' argument to strscpy() is supposed to be the length of the
-buffer (in order to avoid overflow) not the number of characters.
+> +static struct sla_addr_t sla_alloc(size_t len, bool firmware_state)
+> +{
+> +	unsigned long i, npages =3D PAGE_ALIGN(len) >> PAGE_SHIFT;
+> +	struct sla_addr_t *scatter =3D NULL;
+> +	struct sla_addr_t ret =3D SLA_NULL;
+> +	struct sla_buffer_hdr *buf;
+> +	struct page *pg;
+> +
+> +	if (npages =3D=3D 0)
+> +		return ret;
+> +
+> +	if (WARN_ON_ONCE(npages > ((PAGE_SIZE / sizeof(struct
+> sla_addr_t)) + 1)))
 
-In this case the bound check is before the copy (and the buffer assumed
-to be the right size!)
-So memcpy() + terminate is exactly correct.
+This should be (npages + 1 > (...)), because we need to fit `npages`
+SLAs plus the final SLA_EOL.
 
-The warning gcc emits for strncpy() when the length depends on the source
-string is equally applicable to strscpy().
+> +/* Expands a buffer, only firmware owned buffers allowed for now */
+> +static int sla_expand(struct sla_addr_t *sla, size_t *len)
+> +{
+> +	struct sla_buffer_hdr *oldbuf =3D sla_buffer_map(*sla),
+> *newbuf;
+> +	struct sla_addr_t oldsla =3D *sla, newsla;
+> +	size_t oldlen =3D *len, newlen;
+> +
+> +	if (!oldbuf)
+> +		return -EFAULT;
+> +
+> +	newlen =3D oldbuf->capacity_sz;
+> +	if (oldbuf->capacity_sz =3D=3D oldlen) {
+> +		/* This buffer does not require expansion, must be
+> another buffer */
+> +		sla_buffer_unmap(oldsla, oldbuf);
+> +		return 1;
+> +	}
+> +
+> +	pr_notice("Expanding BUFFER from %ld to %ld bytes\n",
+> oldlen, newlen);
+> +
+> +	newsla =3D sla_alloc(newlen, true);
+> +	if (IS_SLA_NULL(newsla))
+> +		return -ENOMEM;
+> +
+> +	newbuf =3D sla_buffer_map(newsla);
+> +	if (!newbuf) {
+> +		sla_free(newsla, newlen, true);
+> +		return -EFAULT;
+> +	}
+> +
+> +	memcpy(newbuf, oldbuf, oldlen);
+> +
+> +	sla_buffer_unmap(newsla, newbuf);
+> +	sla_free(oldsla, oldlen, true);
+> +	*sla =3D newsla;
+> +	*len =3D newlen;
+> +
+> +	return 0;
 
-	David
-
->  	return true;
->  }
->  
-
+Return values are inconsistent with how this function is used in
+sev_tio_do_cmd(): a zero value should indicate that expansion is not
+required.
