@@ -1,187 +1,266 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656C9469D;
-	Sun, 23 Mar 2025 18:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB9524B29;
+	Sun, 23 Mar 2025 22:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742753848; cv=none; b=KjXr7TLaUDjq1vEFVEhtP01HivSlVlY7b83nAIjwLido7lPclkez0wAK7EEl5QPTCBGX0K7BzObp8yMZ+LCydPcogO0x7nlTw+DrBzZgjBjmn6Xfi2vEtEXhLjk38F/vRp5IEfhDKw+LwvDe2v2bkjXvtw0TmzVmkBpNdXA7puA=
+	t=1742768657; cv=none; b=ahzgE5oAI80AaHi3eQgp2O9DvM8i1YeH35wgJvOWdNaBXaRz+yllKYmN5S1n6rZ5GBcI3XqBEgnmMaA0R+OZOs6CiWr4aMpE8IYMrqkMNwxEDqjTEqnsE0poGeK2mxsgriMdhF78tuwMrl2YPNvVN2Yecchf9Uxq85DZCknfoe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742753848; c=relaxed/simple;
-	bh=DnwlcnrmTvJn4x6Jhu4lPS5Jhc5VMN4fOZX67Zowe28=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A9VuviQ5XN4OKp0La0lAAssbEW8jt9lhFniTPT6KPsbIhZ4WKLjHeQoDnJOIi5pJrVa+rC3bw3vXVsGjOxXn7qrQ7Uek1pHTD+D9M1K8RgzbCJg1Mh5h8MpdFNUnYnl/4GjRekZsWpNRmiCxjK/nsrMiEoHB+jHOGJUa2RXRdYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOA/7Nht; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742768657; c=relaxed/simple;
+	bh=pSuPLgb3YUS81mURBOzGRLLehj+iUHT29QAhz8DJIGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mTtWcHpsXxUN01+d+fz+dTHKBQCJf0NzHRnA/m1VK3B0oGsjnS7hRSSl+N6EJsNM66auUFhBy2BZXdR/NYmW8ZZNEhNiJXGBwaS0+nnQzpM9mdSZo22Dm0MdT4r2MmsBGRwxy01Q1318wRnar5Bvz3FqiNT86zU7EBEx2UUmL0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qYrCNWGb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOA/7Nht"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0274C4CEE2;
-	Sun, 23 Mar 2025 18:17:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qYrCNWGb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B934C4CEE2;
+	Sun, 23 Mar 2025 22:24:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742753847;
-	bh=DnwlcnrmTvJn4x6Jhu4lPS5Jhc5VMN4fOZX67Zowe28=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=aOA/7NhtL5afDUxB+Zhh+QBnY+LwpQJbqtjSH6/f0XKI9u9yHS8Fy6dZOGSGOBDNF
-	 Yo7o8R4WnRz3l9p/NdlRFPj5rCCzvDr7BSyHE2zABYhWGBbsYGCg3fFo3QgFJxIptJ
-	 qGtyvOPq+jpo8Za7Ta5jL8YhzOt+K0JyPYIICFlTcmq/Wpj09RtsURrtf5atD7v9Gs
-	 SBeOElN9wucBbLZI2M2JpI2QYkbM4EUeFPaE3LBQm54IPWgvKnLJ1jSVoWX+aMelBf
-	 g/YJzRe3VkQ9c+cbty53T19yVHaBjH61CmhXB+p0Wf9DE7+gClaACxKKt0cwGXIX2p
-	 lE9e5dA4IxG/Q==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-549b116321aso3853042e87.3;
-        Sun, 23 Mar 2025 11:17:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV5L//ZSu3Lx0ETkPEVner35g3akM0O3RU7es3Qdwz7fOS7h8eJNe9FuIyiOOo4EKQJycHc5d6zIaVi@vger.kernel.org, AJvYcCVg7x5jQegATEqVRA496PMLxqj2PHKnwN1kEzyBWI8TCuaCmIjBaIerFVfd5qM4RpUBihKcvE9IakJ5pIBv@vger.kernel.org, AJvYcCXZF5l9O0MjHXpUqZxP+0WQxzL/fRxZg+rdW5mUK1SxRo/GL9Y3ERJWDdAR10vYfhbeIkvK6c7r6q1UGJ41@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTgYlLYeOC8pRyLgLD/Mgt2tZ5eRIyz80YdxbN/gbw9UlSBh1g
-	z8H0gJBP5VAgec3R05amK0D/FzNdsGob0XgCXyvtLHJeDls8IOuL/SGFyH0nf9gIhycMXLUJLxB
-	nXzxofNp1rGJEWy2RF4oJ3HDs2BY=
-X-Google-Smtp-Source: AGHT+IETHfg8ib2tQB5DP02LtHyjTXmPdsydvih0XDlfjgyQtoziDZQMtCctILBs1DwoARqUA+qqI6epKDqy+wlyiFE=
-X-Received: by 2002:a05:6512:1598:b0:549:5769:6ad8 with SMTP id
- 2adb3069b0e04-54ad6470a7dmr3513782e87.4.1742753846190; Sun, 23 Mar 2025
- 11:17:26 -0700 (PDT)
+	s=k20201202; t=1742768657;
+	bh=pSuPLgb3YUS81mURBOzGRLLehj+iUHT29QAhz8DJIGc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=qYrCNWGbkDBb/JDwwf394RfwE0N8Wv7N1D3ccFYVIZkXiCzZpRYrTywKtc87gonn2
+	 yKkl1XTxMov6pgMjn6cdaKclE6unWWdrslUb8djX8wlsBJvTQIMpXAdCFCSk6yFh+o
+	 MXyRHjC+5RJtaLd7fTj6GQw376vJnvD23Gw1DfSd0RvKZT8UfqiKtakuhKG3YqrgwS
+	 FlVraDPyAHdJ+X78El44JtVbzMSLTlrEGXaLR41rih0y9suGV45wtalwkzthLZu+Ez
+	 Jn+pZDxxE5+FssVmyWR+qx0lX4g5nd4K5GZwK0pzLhsOR6zD/dUvCLR+McpKV5AwNe
+	 8i+i9ayDMVhWw==
+Date: Sun, 23 Mar 2025 15:24:15 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	x86@kernel.org, linux-crypto@vger.kernel.org,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Uros Bizjak <ubizjak@gmail.com>
+Subject: [GIT PULL] CRC updates for 6.15
+Message-ID: <20250323222415.GC9584@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241202012056.209768-1-ebiggers@kernel.org> <20241202012056.209768-9-ebiggers@kernel.org>
- <389b899f-893c-4855-9e30-d8920a5d6f91@roeck-us.net> <CAMj1kXHAktbQ-605wfqXCWtn8bP-yEv8sYKWAykajeAX2m1hEA@mail.gmail.com>
- <20250323171243.GA852@quark.localdomain>
-In-Reply-To: <20250323171243.GA852@quark.localdomain>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 23 Mar 2025 19:17:14 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGMtpMuiJqwWVuWDhRrb-dXC30Fj0vu0vU=O6-gGR0FWg@mail.gmail.com>
-X-Gm-Features: AQ5f1Jq9h71nypQ2vOBZhli703EaGsNLFv7huy-pmiN-c5U6P8ctOyu2HMEj9rU
-Message-ID: <CAMj1kXGMtpMuiJqwWVuWDhRrb-dXC30Fj0vu0vU=O6-gGR0FWg@mail.gmail.com>
-Subject: Re: [PATCH v2 08/12] lib/crc_kunit.c: add KUnit test suite for CRC
- library functions
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, 
-	Zhihang Shao <zhihang.shao.iscas@gmail.com>, Vinicius Peixoto <vpeixoto@lkcamp.dev>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sun, 23 Mar 2025 at 18:12, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Sun, Mar 23, 2025 at 04:35:29PM +0100, Ard Biesheuvel wrote:
-> > On Sat, 22 Mar 2025 at 15:33, Guenter Roeck <linux@roeck-us.net> wrote:
-> > >
-> > > Hi,
-> > >
-> > > On Sun, Dec 01, 2024 at 05:20:52PM -0800, Eric Biggers wrote:
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > >
-> > > > Add a KUnit test suite for the crc16, crc_t10dif, crc32_le, crc32_be,
-> > > > crc32c, and crc64_be library functions.  It avoids code duplication by
-> > > > sharing most logic among all CRC variants.  The test suite includes:
-> > > >
-> > > > - Differential fuzz test of each CRC function against a simple
-> > > >   bit-at-a-time reference implementation.
-> > > > - Test for CRC combination, when implemented by a CRC variant.
-> > > > - Optional benchmark of each CRC function with various data lengths.
-> > > >
-> > > > This is intended as a replacement for crc32test and crc16_kunit, as well
-> > > > as a new test for CRC variants which didn't previously have a test.
-> > > >
-> > > > Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> > > > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > > > Cc: Vinicius Peixoto <vpeixoto@lkcamp.dev>
-> > > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > > > ---
-> > > ...
-> > > > +
-> > > > +             nosimd = rand32() % 8 == 0;
-> > > > +
-> > > > +             /*
-> > > > +              * Compute the CRC, and verify that it equals the CRC computed
-> > > > +              * by a simple bit-at-a-time reference implementation.
-> > > > +              */
-> > > > +             expected_crc = crc_ref(v, init_crc, &test_buffer[offset], len);
-> > > > +             if (nosimd)
-> > > > +                     local_irq_disable();
-> > > > +             actual_crc = v->func(init_crc, &test_buffer[offset], len);
-> > > > +             if (nosimd)
-> > > > +                     local_irq_enable();
-> > >
-> > > This triggers a traceback on some arm systems.
-> > >
-> > > [    7.810000]     ok 2 crc16_benchmark # SKIP not enabled
-> > > [    7.810000] ------------[ cut here ]------------
-> > > [    7.810000] WARNING: CPU: 0 PID: 1145 at kernel/softirq.c:369 __local_bh_enable_ip+0x118/0x194
-> > > [    7.810000] Modules linked in:
-> > > [    7.810000] CPU: 0 UID: 0 PID: 1145 Comm: kunit_try_catch Tainted: G                 N 6.14.0-rc7-00196-g88d324e69ea9 #1
-> > > [    7.810000] Tainted: [N]=TEST
-> > > [    7.810000] Hardware name: NPCM7XX Chip family
-> > > [    7.810000] Call trace:
-> > > [    7.810000]  unwind_backtrace from show_stack+0x10/0x14
-> > > [    7.810000]  show_stack from dump_stack_lvl+0x7c/0xac
-> > > [    7.810000]  dump_stack_lvl from __warn+0x7c/0x1b8
-> > > [    7.810000]  __warn from warn_slowpath_fmt+0x19c/0x1a4
-> > > [    7.810000]  warn_slowpath_fmt from __local_bh_enable_ip+0x118/0x194
-> > > [    7.810000]  __local_bh_enable_ip from crc_t10dif_arch+0xd4/0xe8
-> > > [    7.810000]  crc_t10dif_arch from crc_t10dif_wrapper+0x14/0x1c
-> > > [    7.810000]  crc_t10dif_wrapper from crc_main_test+0x178/0x360
-> > > [    7.810000]  crc_main_test from kunit_try_run_case+0x78/0x1e0
-> > > [    7.810000]  kunit_try_run_case from kunit_generic_run_threadfn_adapter+0x1c/0x34
-> > > [    7.810000]  kunit_generic_run_threadfn_adapter from kthread+0x118/0x254
-> > > [    7.810000]  kthread from ret_from_fork+0x14/0x28
-> > > [    7.810000] Exception stack(0xe3651fb0 to 0xe3651ff8)
-> > > [    7.810000] 1fa0:                                     00000000 00000000 00000000 00000000
-> > > [    7.810000] 1fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > > [    7.810000] 1fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> > > [    7.810000] irq event stamp: 29
-> > > [    7.810000] hardirqs last  enabled at (27): [<c037875c>] __local_bh_enable_ip+0xb4/0x194
-> > > [    7.810000] hardirqs last disabled at (28): [<c0b09684>] crc_main_test+0x2e4/0x360
-> > > [    7.810000] softirqs last  enabled at (26): [<c032a3ac>] kernel_neon_end+0x0/0x1c
-> > > [    7.810000] softirqs last disabled at (29): [<c032a3c8>] kernel_neon_begin+0x0/0x70
-> > > [    7.810000] ---[ end trace 0000000000000000 ]---
-> > > [    8.050000]     # crc_t10dif_test: pass:1 fail:0 skip:0 total:1
-> > >
-> > > kernel_neon_end() calls local_bh_enable() which apparently conflicts with
-> > > the local_irq_disable() in above code.
-> > >
-> >
-> > This seems to be an oversight on my part. Can you try the below please?
-> >
-> > diff --git a/arch/arm/include/asm/simd.h b/arch/arm/include/asm/simd.h
-> > index 82191dbd7e78..56ddbd3c4997 100644
-> > --- a/arch/arm/include/asm/simd.h
-> > +++ b/arch/arm/include/asm/simd.h
-> > @@ -4,5 +4,6 @@
-> >
-> >  static __must_check inline bool may_use_simd(void)
-> >  {
-> > -       return IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && !in_hardirq();
-> > +       return IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
-> > +              !in_hardirq() && !irqs_disabled();
-> >  }
->
-> Thanks Ard, you beat me to it.  Yes, may_use_simd() needs to be consistent with
-> kernel_neon_begin().  On x86 there is a case where the equivalent function is
-> expected to work when irqs_disabled(), but if there is no such case on arm this
-> fix looks good.  Can you send it out as a formal patch?  Presumably for the arm
-> maintainer to pick up.
->
+The following changes since commit 2014c95afecee3e76ca4a56956a936e23283f05b:
 
-Sure.
+  Linux 6.14-rc1 (2025-02-02 15:39:26 -0800)
 
-On other architectures, we might just turn this logic around, and only
-disable softirqs when IRQs are enabled, as otherwise, there is no
-need: we don't care about whether or not IRQs are disabled, only the
-softirq plumbing that we need to call into does, and no softirqs can
-be delivered over the back of a hard IRQ when those are disabled to
-begin with.
+are available in the Git repository at:
 
-> > However, this test code also appears to assume that SIMD is forbidden
-> > on any architecture when IRQs are disabled, but this not guaranteed.
->
-> Yes, to reliably test the no-SIMD code paths, I need to finish refactoring the
-> crypto_simd_disabled_for_test stuff to be disentangled from the crypto subsystem
-> so that crc_kunit.c can use it.  It's on my list of things to do, and I'm
-> planning to get it done in 6.16.  Disabling hardirqs is just a trick to get
-> there more easily on some architectures.  But as this shows it's a useful test
-> to have anyway, so we'll want to keep that too.  The CRC functions need to work
-> in any context, and any context that we can easily test we should do so.
->
+  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/crc-for-linus
 
-Sounds good.
+for you to fetch changes up to acf9f8da5e19fc1cbf26f2ecb749369e13e7cd85:
+
+  x86/crc: drop the avx10_256 functions and rename avx10_512 to avx512 (2025-03-19 12:22:00 -0700)
+
+----------------------------------------------------------------
+
+Another set of improvements to the kernel's CRC (cyclic redundancy
+check) code:
+
+- Rework the CRC64 library functions to be directly optimized, like what
+  I did last cycle for the CRC32 and CRC-T10DIF library functions.
+
+- Rewrite the x86 PCLMULQDQ-optimized CRC code, and add VPCLMULQDQ
+  support and acceleration for crc64_be and crc64_nvme.
+
+- Rewrite the riscv Zbc-optimized CRC code, and add acceleration for
+  crc_t10dif, crc64_be, and crc64_nvme.
+
+- Remove crc_t10dif and crc64_rocksoft from the crypto API, since they
+  are no longer needed there.
+
+- Rename crc64_rocksoft to crc64_nvme, as the old name was incorrect.
+
+- Add kunit test cases for crc64_nvme and crc7.
+
+- Eliminate redundant functions for calculating the Castagnoli CRC32,
+  settling on just crc32c().
+
+- Remove unnecessary prompts from some of the CRC kconfig options.
+
+- Further optimize the x86 crc32c code.
+
+----------------------------------------------------------------
+Eric Biggers (36):
+      lib/crc64-rocksoft: stop wrapping the crypto API
+      crypto: crc64-rocksoft - remove from crypto API
+      lib/crc64: rename CRC64-Rocksoft to CRC64-NVME
+      lib/crc_kunit.c: add test and benchmark for CRC64-NVME
+      lib/crc64: add support for arch-optimized implementations
+      lib/crc32: remove obsolete CRC32 options from defconfig files
+      mips/crc32: remove unused enums
+      lib/crc32: use void pointer for data
+      lib/crc32: don't bother with pure and const function attributes
+      lib/crc32: standardize on crc32c() name for Castagnoli CRC32
+      lib/crc32: rename __crc32c_le_combine() to crc32c_combine()
+      lib/crc32: remove "_le" from crc32c base and arch functions
+      crypto: crct10dif - remove from crypto API
+      lib/crc-t10dif: remove crc_t10dif_is_optimized()
+      x86: move ZMM exclusion list into CPU feature flag
+      scripts/gen-crc-consts: add gen-crc-consts.py
+      x86/crc: add "template" for [V]PCLMULQDQ based CRC functions
+      x86/crc32: implement crc32_le using new template
+      x86/crc-t10dif: implement crc_t10dif using new template
+      x86/crc64: implement crc64_be and crc64_nvme using new template
+      x86/crc32: improve crc32c_arch() code generation with clang
+      x86/crc: add ANNOTATE_NOENDBR to suppress objtool warnings
+      riscv/crc: add "template" for Zbc optimized CRC functions
+      riscv/crc32: reimplement the CRC32 functions using new template
+      riscv/crc-t10dif: add Zbc optimized CRC-T10DIF function
+      riscv/crc64: add Zbc optimized CRC64 functions
+      x86/crc32: optimize tail handling for crc32c short inputs
+      lib/crc_kunit.c: add test and benchmark for crc7_be()
+      lib/crc_kunit.c: update comment in crc_benchmark()
+      lib/crc7: unexport crc7_be_syndrome_table
+      lib/crc: remove unnecessary prompt for CONFIG_CRC4
+      lib/crc: remove unnecessary prompt for CONFIG_CRC7
+      lib/crc: remove unnecessary prompt for CONFIG_CRC8
+      lib/crc: remove unnecessary prompt for CONFIG_LIBCRC32C
+      lib/crc: remove unnecessary prompt for CONFIG_CRC64
+      x86/crc: drop the avx10_256 functions and rename avx10_512 to avx512
+
+ MAINTAINERS                                    |   1 +
+ arch/arm/configs/dove_defconfig                |   1 -
+ arch/arm/configs/ep93xx_defconfig              |   1 -
+ arch/arm/configs/imx_v6_v7_defconfig           |   2 -
+ arch/arm/configs/lpc18xx_defconfig             |   1 -
+ arch/arm/configs/moxart_defconfig              |   1 -
+ arch/arm/configs/multi_v5_defconfig            |   1 -
+ arch/arm/configs/mvebu_v5_defconfig            |   1 -
+ arch/arm/configs/mxs_defconfig                 |   1 -
+ arch/arm/configs/omap1_defconfig               |   1 -
+ arch/arm/configs/omap2plus_defconfig           |   2 -
+ arch/arm/configs/spitz_defconfig               |   1 -
+ arch/arm/configs/stm32_defconfig               |   1 -
+ arch/arm/configs/wpcm450_defconfig             |   1 -
+ arch/arm/lib/crc-t10dif-glue.c                 |   6 -
+ arch/arm/lib/crc32-glue.c                      |  12 +-
+ arch/arm64/lib/crc-t10dif-glue.c               |   6 -
+ arch/arm64/lib/crc32-glue.c                    |  10 +-
+ arch/hexagon/configs/comet_defconfig           |   1 -
+ arch/loongarch/lib/crc32-loongarch.c           |   6 +-
+ arch/mips/configs/bcm47xx_defconfig            |   1 -
+ arch/mips/configs/bigsur_defconfig             |   1 -
+ arch/mips/configs/cobalt_defconfig             |   1 -
+ arch/mips/configs/db1xxx_defconfig             |   1 -
+ arch/mips/configs/decstation_64_defconfig      |   1 -
+ arch/mips/configs/decstation_defconfig         |   1 -
+ arch/mips/configs/decstation_r4k_defconfig     |   1 -
+ arch/mips/configs/fuloong2e_defconfig          |   1 -
+ arch/mips/configs/ip32_defconfig               |   1 -
+ arch/mips/configs/rt305x_defconfig             |   1 -
+ arch/mips/configs/xway_defconfig               |   1 -
+ arch/mips/lib/crc32-mips.c                     |  15 +-
+ arch/parisc/configs/generic-64bit_defconfig    |   1 -
+ arch/powerpc/configs/85xx/ge_imp3a_defconfig   |   1 -
+ arch/powerpc/configs/adder875_defconfig        |   1 -
+ arch/powerpc/configs/ep88xc_defconfig          |   1 -
+ arch/powerpc/configs/mpc866_ads_defconfig      |   1 -
+ arch/powerpc/configs/mpc885_ads_defconfig      |   1 -
+ arch/powerpc/configs/skiroot_defconfig         |   1 -
+ arch/powerpc/configs/tqm8xx_defconfig          |   1 -
+ arch/powerpc/lib/crc-t10dif-glue.c             |   6 -
+ arch/powerpc/lib/crc32-glue.c                  |  10 +-
+ arch/riscv/Kconfig                             |   2 +
+ arch/riscv/lib/Makefile                        |   5 +
+ arch/riscv/lib/crc-clmul-consts.h              | 122 ++++++
+ arch/riscv/lib/crc-clmul-template.h            | 265 +++++++++++
+ arch/riscv/lib/crc-clmul.h                     |  23 +
+ arch/riscv/lib/crc-t10dif.c                    |  24 +
+ arch/riscv/lib/crc16_msb.c                     |  18 +
+ arch/riscv/lib/crc32-riscv.c                   | 311 -------------
+ arch/riscv/lib/crc32.c                         |  53 +++
+ arch/riscv/lib/crc32_lsb.c                     |  18 +
+ arch/riscv/lib/crc32_msb.c                     |  18 +
+ arch/riscv/lib/crc64.c                         |  34 ++
+ arch/riscv/lib/crc64_lsb.c                     |  18 +
+ arch/riscv/lib/crc64_msb.c                     |  18 +
+ arch/s390/configs/debug_defconfig              |   3 -
+ arch/s390/configs/defconfig                    |   3 -
+ arch/s390/lib/crc32-glue.c                     |   2 +-
+ arch/sh/configs/se7206_defconfig               |   2 -
+ arch/sh/configs/sh2007_defconfig               |   1 -
+ arch/sh/configs/titan_defconfig                |   1 -
+ arch/sparc/configs/sparc32_defconfig           |   1 -
+ arch/sparc/configs/sparc64_defconfig           |   1 -
+ arch/sparc/lib/crc32_glue.c                    |  10 +-
+ arch/x86/Kconfig                               |   3 +-
+ arch/x86/crypto/aesni-intel_glue.c             |  22 +-
+ arch/x86/include/asm/cpufeatures.h             |   1 +
+ arch/x86/kernel/cpu/intel.c                    |  22 +
+ arch/x86/lib/Makefile                          |   5 +-
+ arch/x86/lib/crc-pclmul-consts.h               | 195 +++++++++
+ arch/x86/lib/crc-pclmul-template.S             | 582 +++++++++++++++++++++++++
+ arch/x86/lib/crc-pclmul-template.h             |  76 ++++
+ arch/x86/lib/crc-t10dif-glue.c                 |  29 +-
+ arch/x86/lib/crc16-msb-pclmul.S                |   6 +
+ arch/x86/lib/crc32-glue.c                      |  57 +--
+ arch/x86/lib/crc32-pclmul.S                    | 219 +---------
+ arch/x86/lib/crc64-glue.c                      |  50 +++
+ arch/x86/lib/crc64-pclmul.S                    |   7 +
+ arch/x86/lib/crct10dif-pcl-asm_64.S            | 332 --------------
+ block/Kconfig                                  |   2 +-
+ block/t10-pi.c                                 |   2 +-
+ crypto/Kconfig                                 |  20 -
+ crypto/Makefile                                |   3 -
+ crypto/crc32c_generic.c                        |   8 +-
+ crypto/crc64_rocksoft_generic.c                |  89 ----
+ crypto/crct10dif_generic.c                     | 168 -------
+ crypto/tcrypt.c                                |   8 -
+ crypto/testmgr.c                               |  14 -
+ crypto/testmgr.h                               | 303 -------------
+ drivers/crypto/stm32/stm32-crc32.c             |   2 +-
+ drivers/infiniband/sw/siw/siw.h                |   4 +-
+ drivers/md/raid5-cache.c                       |  31 +-
+ drivers/md/raid5-ppl.c                         |  16 +-
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c |   2 +-
+ drivers/thunderbolt/ctl.c                      |   2 +-
+ drivers/thunderbolt/eeprom.c                   |   2 +-
+ include/linux/crc-t10dif.h                     |  12 -
+ include/linux/crc32.h                          |  55 ++-
+ include/linux/crc32c.h                         |   8 -
+ include/linux/crc64.h                          |  38 +-
+ include/linux/crc7.h                           |   7 -
+ include/net/sctp/checksum.h                    |   7 +-
+ lib/Kconfig                                    |  45 +-
+ lib/Kconfig.debug                              |   1 +
+ lib/Makefile                                   |   1 -
+ lib/crc32.c                                    |  21 +-
+ lib/crc64-rocksoft.c                           | 126 ------
+ lib/crc64.c                                    |  49 +--
+ lib/crc7.c                                     |   6 +-
+ lib/crc_kunit.c                                |  68 ++-
+ lib/gen_crc64table.c                           |  10 +-
+ scripts/gen-crc-consts.py                      | 291 +++++++++++++
+ sound/soc/codecs/aw88395/aw88395_device.c      |   2 +-
+ tools/testing/selftests/arm64/fp/kernel-test.c |   1 -
+ 115 files changed, 2121 insertions(+), 1969 deletions(-)
+ create mode 100644 arch/riscv/lib/crc-clmul-consts.h
+ create mode 100644 arch/riscv/lib/crc-clmul-template.h
+ create mode 100644 arch/riscv/lib/crc-clmul.h
+ create mode 100644 arch/riscv/lib/crc-t10dif.c
+ create mode 100644 arch/riscv/lib/crc16_msb.c
+ delete mode 100644 arch/riscv/lib/crc32-riscv.c
+ create mode 100644 arch/riscv/lib/crc32.c
+ create mode 100644 arch/riscv/lib/crc32_lsb.c
+ create mode 100644 arch/riscv/lib/crc32_msb.c
+ create mode 100644 arch/riscv/lib/crc64.c
+ create mode 100644 arch/riscv/lib/crc64_lsb.c
+ create mode 100644 arch/riscv/lib/crc64_msb.c
+ create mode 100644 arch/x86/lib/crc-pclmul-consts.h
+ create mode 100644 arch/x86/lib/crc-pclmul-template.S
+ create mode 100644 arch/x86/lib/crc-pclmul-template.h
+ create mode 100644 arch/x86/lib/crc16-msb-pclmul.S
+ create mode 100644 arch/x86/lib/crc64-glue.c
+ create mode 100644 arch/x86/lib/crc64-pclmul.S
+ delete mode 100644 arch/x86/lib/crct10dif-pcl-asm_64.S
+ delete mode 100644 crypto/crc64_rocksoft_generic.c
+ delete mode 100644 crypto/crct10dif_generic.c
+ delete mode 100644 lib/crc64-rocksoft.c
+ create mode 100755 scripts/gen-crc-consts.py
