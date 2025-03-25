@@ -1,60 +1,72 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AA225EF90;
-	Tue, 25 Mar 2025 18:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBF71F4174
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Mar 2025 18:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742926243; cv=none; b=XiArqvVi+98FNV7v2z2+slCgtxu++NQPXqCnL2hJm55UkuAOt0WhD5wEeFazRPG5Bh3N2e5cazLWm6uiA3Fg2y/iEVV8n5kDAP+z2zwb0n9SZhLiSaJ/kUzAvBR4RE04qp0ujlg8O5vjmBWHArTo6KgAt8dEI+k0J8/m8ggecX8=
+	t=1742928717; cv=none; b=AWTGUvC1sFt0XpBiYGcl4WEKIOqiD3Gi3BfT1QqWCuA+r1rKz9sCQZueDadvYmDxZ1MSHbi4tnZBCC92YM4ht3NNTZdBKk9BoCSebUtHBiley3pvi5WYxulgprm8SFd1isptTRg+Z3o5aJkBIVAsBt4BH7jU73BWMHhMgAsRF9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742926243; c=relaxed/simple;
-	bh=3meA6QebgpcfGe2Vp3GUcuOU34OuRrsssJ+h7QcYQtA=;
+	s=arc-20240116; t=1742928717; c=relaxed/simple;
+	bh=2xXGFLVwkInmobcJUBE5/1UQyq/cvN0CxyPECWhZDZM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nm1zbL7oiXQpJRGCWYZcvF11olEfGq9fnqYC9szl/lD1H2mb7jcM9JS25dPXe29fbWVeeqJ4UTac8z1k4262xAn7aKnv4BJyttSE+vdnwf2zm3EMSgT9aFlQV/eM95JSRzZLY4qKHt7HkDhLcFQbyoPlJmcACs22WIWjSgQ+v50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cu6tabK8; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=ISwhFp2DNpPUjhzCm+j1pRPv9S62ne2A7DXQ4wpvMuKD8JU34lBwr6H/iTQqfnX5gr37vVXT4kqDAb5azO4ifmzp5o5mnJ0eHeXNaaSMkMRCtxcVu2sAnijqYRMmoxFVyEkRARouZmP4pD47RpL8ql+BuICwHnTwuX9Ow9vxzg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IfOPRDuI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cu6tabK8"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52PEOhVN027698;
-	Tue, 25 Mar 2025 18:10:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=m8bPoE
-	EzwxicbIZ0HqZaTaWDkzQ7EBXE5jY3xeVaYLo=; b=Cu6tabK8/ayehedRkGbZ8l
-	rHaVHMgsE3KOaaGGqw1MWlmj4UH9le8TagVcoBkwCJx+163PKyUtu4DDfmvQyEMe
-	H19uJ2HZHo4SSkS2G4HEgtGgM9UlB2stk0Y7geiuocFPNBqX8mVgRofuC6EG20pV
-	6pJS660O32CJPSbUY3sbJkiT6wYkalxOXUV7uDkelLOSpxZR+udlthY2Zgw09wH1
-	64bSbAyL/SJVWZ+2vBjHfssOWJpRRjv/AREe/sFnlWGvr6ZSLwSjzcfQzUzF9C/2
-	V7pMQvndLlC6H6XgIx83rzwDa494vh33PNdzPKmzUC7Vzhlnl7U5zfFwKHEAN8dg
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45kbjwxeke-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Mar 2025 18:10:38 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52PFuFDI030325;
-	Tue, 25 Mar 2025 18:10:38 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45j7htcw29-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Mar 2025 18:10:37 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52PIAauu30999142
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Mar 2025 18:10:36 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 360B020040;
-	Tue, 25 Mar 2025 18:10:36 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A280F20043;
-	Tue, 25 Mar 2025 18:10:35 +0000 (GMT)
-Received: from [9.171.41.98] (unknown [9.171.41.98])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Mar 2025 18:10:35 +0000 (GMT)
-Message-ID: <bcaa276c-3c26-44da-b06b-4935bc1384f0@linux.ibm.com>
-Date: Tue, 25 Mar 2025 19:10:34 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IfOPRDuI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742928713;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
+	b=IfOPRDuIJb6mcD26eVv03HxOHVXjlqMmW0qdvja63G+EVtDAVTS+71vN8WxEgkUXbDe99M
+	F67N3MqKl7LwUKqlMCtKh+lQlo/4gADy46882U41Z5/rvMgl+tWjJ2qPpXZZMw7G37rYlA
+	IDue9AQ4G+f8s20KPbZEqVHW7WgO2E8=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-523-dHQSjCX9NGSTG3oH07SVcA-1; Tue, 25 Mar 2025 14:51:51 -0400
+X-MC-Unique: dHQSjCX9NGSTG3oH07SVcA-1
+X-Mimecast-MFC-AGG-ID: dHQSjCX9NGSTG3oH07SVcA_1742928711
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6e8feea216aso2613026d6.0
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Mar 2025 11:51:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742928711; x=1743533511;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=t8j8FcQOo2vXT0+x/EC8FM0KhlfrmjmrMAU0Mg5SiOs=;
+        b=v91v+PMZqIXGx11EeCWFKAI0xwTOh3aZCAoILVBPZvzbVI//5+jv5n8oTyFs0y7sQt
+         Y7g33vpPm4qVlsSgjeqhjsma/3Ai6IIa6dQtuxq3z9cYCSAs+k4SBoNFY3zOWm2Dx3fW
+         GFMa3wLTpm2/WYt/9+udVRoIkUYleApHLA08zeZm/xy5ja3vgBWHT+Q1I3IUisCOWJJo
+         Kd92Ld/oimO6gK4NJ6j4zta98EBmT20kzsZLJ+D5l24jEkJlhkw/t56Kxi1qV2+hrHDg
+         C9DiND+p5TcidbI1trUYzluRrcxXzvWGBJCwyYsILeQTyUHFly7/SrOBSTzyu6cp2xSJ
+         owmw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgdsYcAPZ/8m2ULI+fQLe7IaEZMQAtbJqxBoCTEWs5shbUdi9ovlrlLwcIE7jBjAMqQpHQpPhN3HA4vRM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXaOjMy+mvhiGTcRM3rG2qeUG9uqhm9APW7OXzznhDm+7IvWYt
+	DQimxL/V6tNtXVQBwbQKnqBTktRlMDunnt1NEPinRFDtrRLgAJYqpI2SqafolXQcWbDS8hfJ8FU
+	+diAsEnRHI31osXwJ1wTJhHo6QlL6r6/5aWxeqF/RYBvGgiRMXUXxElQq+2MVtA==
+X-Gm-Gg: ASbGncuzxI7/s49fNBq7ZJhHbkbRGbApVhZALacHKl4LPx7JF2xPku6oR9SrUDMuUXO
+	7hotuCjzaRYuhOWDB+JTmIJtxFz7BRWpXjUZfn4OVGHUFlMxbDK2rzC0cB62cPr2ui749+m9akw
+	bUQPDM84TfrvdwwppKsezxqpKjLSGbUSCjUHvmmqeoS3grg5lLGQfeHqia9lbUhkMdxfuMDuccl
+	7xyfTNjfoxUz+/b1upqxlD2wq6QJBR3I4wQyV80cJen5ZtwGBoVfWGNUD6qX19+vhnNFJ7x+G7U
+	eN4TV7FpqTeh
+X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12230566d6.19.1742928711427;
+        Tue, 25 Mar 2025 11:51:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFqYQjFn4K1j4fuehDL2vDnCV4xeKoEsPSC3k3g7nw2h2mfdx1DkNTmzNbOxS9v9bBBC08uag==
+X-Received: by 2002:a0c:eb46:0:b0:6ea:d503:6cfd with SMTP id 6a1803df08f44-6ed16cde3f6mr12229966d6.19.1742928710955;
+        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
+Received: from [172.20.3.205] ([99.209.85.25])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3efc5952sm58924306d6.83.2025.03.25.11.51.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Mar 2025 11:51:50 -0700 (PDT)
+Message-ID: <0e1d8823-620f-420c-86a5-35495ccbd10f@redhat.com>
+Date: Tue, 25 Mar 2025 19:51:47 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,57 +74,110 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: s390 hmac
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Harald Freudenberger <freude@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <Z-AJFwndherQBH2W@gondor.apana.org.au>
- <1aa33386ca1c39438fd17ea651a21903@linux.ibm.com>
- <Z-JntzkWQqc-Atlc@gondor.apana.org.au>
+Subject: Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT
+ kernel-self with ILP32 ABI
+To: Peter Zijlstra <peterz@infradead.org>, guoren@kernel.org
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org,
+ atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
+ will@kernel.org, mark.rutland@arm.com, brauner@kernel.org,
+ akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com,
+ unicorn_wang@outlook.com, inochiama@outlook.com, gaohan@iscas.ac.cn,
+ shihua@iscas.ac.cn, jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn,
+ drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ ctsai390@andestech.com, wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com,
+ josef@toxicpanda.com, dsterba@suse.com, mingo@redhat.com,
+ boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
+ leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com,
+ samuel.holland@sifive.com, yongxuan.wang@sifive.com,
+ luxu.kernel@bytedance.com, ruanjinjie@huawei.com, cuiyunhui@bytedance.com,
+ wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, ardb@kernel.org,
+ ast@kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, maple-tree@lists.infradead.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+References: <20250325121624.523258-1-guoren@kernel.org>
+ <20250325122640.GK36322@noisy.programming.kicks-ass.net>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Holger Dengler <dengler@linux.ibm.com>
-In-Reply-To: <Z-JntzkWQqc-Atlc@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YIVtMlbX8pTz9RvoOmFNpNjYOYoAkKMc
-X-Proofpoint-ORIG-GUID: YIVtMlbX8pTz9RvoOmFNpNjYOYoAkKMc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-25_07,2025-03-25_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
- clxscore=1015 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
- mlxlogscore=934 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503250119
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250325122640.GK36322@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 25/03/2025 09:22, Herbert Xu wrote:
-> On Mon, Mar 24, 2025 at 11:04:56AM +0100, Harald Freudenberger wrote:
+On 25.03.25 13:26, Peter Zijlstra wrote:
+> On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
+>> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 >>
->> that is the ikp bit in the s390_kmac_gr0 struct:
+>> Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+>> but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
 > 
-> Thank you Harald!
+> I'm thinking you're going to be finding a metric ton of assumptions
+> about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
 > 
->> union s390_kmac_gr0 {
->> 	unsigned long reg;
->> 	struct {
->> 		unsigned long		: 48;
->> 		unsigned long ikp	:  1;
->> 		unsigned long iimp	:  1;
->> 		unsigned long ccup	:  1;
+> I know of a couple of places where 64BIT will result in different math
+> such that a 32bit 'unsigned long' will trivially overflow.
 > 
-> I hope I don't have to worry about ccup and can just leave it
-> as zero during import, right?
+> Please, don't do this. This adds a significant maintenance burden on all
+> of us.
+> 
 
-I've to do some further test to be 100% sure. This bit is an indicator, if the instruction has updated the hardware crypto counter for hmac or not. Normally, it should be initialized with 0 before the first instruction call and after the instruction call the flag indicates, if the counter has been updated or not. If the flag is 1, it should be 1 for the following calls, otherwise the hardware crypto counters show wrong statistics.
-
-I've no idea how to set the bit on import correctly, if parts of the hmac operation has been processed by another cipher implementation. Setting it to 0 means, the partial hmac operation is counters as a full operation. setting it to 1 would mean, that the operation after an import is not reflected in the statistics.
+Fully agreed.
 
 -- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
---
-IBM Systems, Linux on IBM Z Development
-dengler@linux.ibm.com
+Cheers,
+
+David / dhildenb
 
