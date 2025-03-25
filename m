@@ -1,25 +1,60 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1896313633F;
-	Tue, 25 Mar 2025 17:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AA225EF90;
+	Tue, 25 Mar 2025 18:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742923195; cv=none; b=JVnlwqVX6P2mPQEyZ+/VCGqJ4P18sGpLohEiLA42NvMdcuwFnvm6Gts6MotbeIPjngeCkr7IXavTEdHtxZ54NYjKzjnieHJbw52OYu20xq+NTnzQV8+qEdFr9x29mvagLSgEdt93kTrsER3utBA5TBu0NaZouBObCpg2MWJ/vlo=
+	t=1742926243; cv=none; b=XiArqvVi+98FNV7v2z2+slCgtxu++NQPXqCnL2hJm55UkuAOt0WhD5wEeFazRPG5Bh3N2e5cazLWm6uiA3Fg2y/iEVV8n5kDAP+z2zwb0n9SZhLiSaJ/kUzAvBR4RE04qp0ujlg8O5vjmBWHArTo6KgAt8dEI+k0J8/m8ggecX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742923195; c=relaxed/simple;
-	bh=XhmLROfnnL3FtaOH27gIOe9sbljr3QNEJt4khOaoGEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=thXfkLpcysvlslOLNwAsjXCeCS6JfK6KctSbO2VGPV3RuKnyk0b5C13uS18qMml/OaXFTQll1YJumJb0xtEBlz6OVXMzXwT+u0OP1YIXmFUMXF7N6mj6jdKsM0A+dPbTQIyLF0c2blFZmvdsLhtgQIwwYgh2AD86/cle9R4yFAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.136.199) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 25 Mar
- 2025 20:19:41 +0300
-Message-ID: <05fec753-cdaa-45a5-a029-b6435c30eb07@omp.ru>
-Date: Tue, 25 Mar 2025 20:19:39 +0300
+	s=arc-20240116; t=1742926243; c=relaxed/simple;
+	bh=3meA6QebgpcfGe2Vp3GUcuOU34OuRrsssJ+h7QcYQtA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nm1zbL7oiXQpJRGCWYZcvF11olEfGq9fnqYC9szl/lD1H2mb7jcM9JS25dPXe29fbWVeeqJ4UTac8z1k4262xAn7aKnv4BJyttSE+vdnwf2zm3EMSgT9aFlQV/eM95JSRzZLY4qKHt7HkDhLcFQbyoPlJmcACs22WIWjSgQ+v50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cu6tabK8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cu6tabK8"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52PEOhVN027698;
+	Tue, 25 Mar 2025 18:10:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=m8bPoE
+	EzwxicbIZ0HqZaTaWDkzQ7EBXE5jY3xeVaYLo=; b=Cu6tabK8/ayehedRkGbZ8l
+	rHaVHMgsE3KOaaGGqw1MWlmj4UH9le8TagVcoBkwCJx+163PKyUtu4DDfmvQyEMe
+	H19uJ2HZHo4SSkS2G4HEgtGgM9UlB2stk0Y7geiuocFPNBqX8mVgRofuC6EG20pV
+	6pJS660O32CJPSbUY3sbJkiT6wYkalxOXUV7uDkelLOSpxZR+udlthY2Zgw09wH1
+	64bSbAyL/SJVWZ+2vBjHfssOWJpRRjv/AREe/sFnlWGvr6ZSLwSjzcfQzUzF9C/2
+	V7pMQvndLlC6H6XgIx83rzwDa494vh33PNdzPKmzUC7Vzhlnl7U5zfFwKHEAN8dg
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45kbjwxeke-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Mar 2025 18:10:38 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52PFuFDI030325;
+	Tue, 25 Mar 2025 18:10:38 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 45j7htcw29-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Mar 2025 18:10:37 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52PIAauu30999142
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Mar 2025 18:10:36 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 360B020040;
+	Tue, 25 Mar 2025 18:10:36 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A280F20043;
+	Tue, 25 Mar 2025 18:10:35 +0000 (GMT)
+Received: from [9.171.41.98] (unknown [9.171.41.98])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 25 Mar 2025 18:10:35 +0000 (GMT)
+Message-ID: <bcaa276c-3c26-44da-b06b-4935bc1384f0@linux.ibm.com>
+Date: Tue, 25 Mar 2025 19:10:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -27,110 +62,57 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH V3 25/43] rv64ilp32_abi: exec: Adapt 64lp64 env and
- argv
-To: <guoren@kernel.org>, <arnd@arndb.de>, <gregkh@linuxfoundation.org>,
-	<torvalds@linux-foundation.org>, <paul.walmsley@sifive.com>,
-	<palmer@dabbelt.com>, <anup@brainfault.org>, <atishp@atishpatra.org>,
-	<oleg@redhat.com>, <kees@kernel.org>, <tglx@linutronix.de>,
-	<will@kernel.org>, <mark.rutland@arm.com>, <brauner@kernel.org>,
-	<akpm@linux-foundation.org>, <rostedt@goodmis.org>, <edumazet@google.com>,
-	<unicorn_wang@outlook.com>, <inochiama@outlook.com>, <gaohan@iscas.ac.cn>,
-	<shihua@iscas.ac.cn>, <jiawei@iscas.ac.cn>, <wuwei2016@iscas.ac.cn>,
-	<drew@pdp7.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<ctsai390@andestech.com>, <wefu@redhat.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <josef@toxicpanda.com>, <dsterba@suse.com>,
-	<mingo@redhat.com>, <peterz@infradead.org>, <boqun.feng@gmail.com>,
-	<xiao.w.wang@intel.com>, <qingfang.deng@siflower.com.cn>,
-	<leobras@redhat.com>, <jszhang@kernel.org>, <conor.dooley@microchip.com>,
-	<samuel.holland@sifive.com>, <yongxuan.wang@sifive.com>,
-	<luxu.kernel@bytedance.com>, <david@redhat.com>, <ruanjinjie@huawei.com>,
-	<cuiyunhui@bytedance.com>, <wangkefeng.wang@huawei.com>,
-	<qiaozhe@iscas.ac.cn>
-CC: <ardb@kernel.org>, <ast@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-input@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
-	<linux-serial@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <maple-tree@lists.infradead.org>,
-	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-atm-general@lists.sourceforge.net>, <linux-btrfs@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<linux-nfs@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <linux-media@vger.kernel.org>
-References: <20250325121624.523258-1-guoren@kernel.org>
- <20250325121624.523258-26-guoren@kernel.org>
+Subject: Re: s390 hmac
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <Z-AJFwndherQBH2W@gondor.apana.org.au>
+ <1aa33386ca1c39438fd17ea651a21903@linux.ibm.com>
+ <Z-JntzkWQqc-Atlc@gondor.apana.org.au>
 Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <20250325121624.523258-26-guoren@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/25/2025 16:50:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 192097 [Mar 25 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
- 68896fb0083a027476849bf400a331a2d5d94398
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.136.199
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/25/2025 16:52:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/25/2025 3:18:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: Holger Dengler <dengler@linux.ibm.com>
+In-Reply-To: <Z-JntzkWQqc-Atlc@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YIVtMlbX8pTz9RvoOmFNpNjYOYoAkKMc
+X-Proofpoint-ORIG-GUID: YIVtMlbX8pTz9RvoOmFNpNjYOYoAkKMc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-25_07,2025-03-25_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
+ mlxlogscore=934 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503250119
 
-On 3/25/25 3:16 PM, guoren@kernel.org wrote:
-
-> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+On 25/03/2025 09:22, Herbert Xu wrote:
+> On Mon, Mar 24, 2025 at 11:04:56AM +0100, Harald Freudenberger wrote:
+>>
+>> that is the ikp bit in the s390_kmac_gr0 struct:
 > 
-> The rv64ilp32 abi reuses the env and argv memory layout of the
-> lp64 abi, so leave the space to fit the lp64 struct layout.
+> Thank you Harald!
 > 
-> Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
-> ---
->  fs/exec.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>> union s390_kmac_gr0 {
+>> 	unsigned long reg;
+>> 	struct {
+>> 		unsigned long		: 48;
+>> 		unsigned long ikp	:  1;
+>> 		unsigned long iimp	:  1;
+>> 		unsigned long ccup	:  1;
 > 
-> diff --git a/fs/exec.c b/fs/exec.c
-> index 506cd411f4ac..548d18b7ae92 100644
-> --- a/fs/exec.c
-> +++ b/fs/exec.c
-> @@ -424,6 +424,10 @@ static const char __user *get_user_arg_ptr(struct user_arg_ptr argv, int nr)
->  	}
->  #endif
->  
-> +#if defined(CONFIG_64BIT) && (BITS_PER_LONG == 32)
+> I hope I don't have to worry about ccup and can just leave it
+> as zero during import, right?
 
-   Parens don't seem necessary...
+I've to do some further test to be 100% sure. This bit is an indicator, if the instruction has updated the hardware crypto counter for hmac or not. Normally, it should be initialized with 0 before the first instruction call and after the instruction call the flag indicates, if the counter has been updated or not. If the flag is 1, it should be 1 for the following calls, otherwise the hardware crypto counters show wrong statistics.
 
-> +	nr = nr * 2;
+I've no idea how to set the bit on import correctly, if parts of the hmac operation has been processed by another cipher implementation. Setting it to 0 means, the partial hmac operation is counters as a full operation. setting it to 1 would mean, that the operation after an import is not reflected in the statistics.
 
-   Why not nr *= 2?
-
-[...]
-
-MBR, Sergey
+-- 
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
 
