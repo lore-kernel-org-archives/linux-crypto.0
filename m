@@ -1,126 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691881547C3;
-	Tue, 25 Mar 2025 16:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1896313633F;
+	Tue, 25 Mar 2025 17:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742921992; cv=none; b=GHkESm8EBuFD7QZe9ErBKuafS3XOsjayCRlItog4KmwE44ITkhEjvPD0r5wVvDkuITuv+udb1Vw7Uy+Gkk/uDjxOL2JikLfAs32th4PJeOLiSVEgyl8DfFUXIDbTJmuh0g7X4lJyyIMteADJZ4qkqvnWbkUyyE/1ZUEuY3PfETc=
+	t=1742923195; cv=none; b=JVnlwqVX6P2mPQEyZ+/VCGqJ4P18sGpLohEiLA42NvMdcuwFnvm6Gts6MotbeIPjngeCkr7IXavTEdHtxZ54NYjKzjnieHJbw52OYu20xq+NTnzQV8+qEdFr9x29mvagLSgEdt93kTrsER3utBA5TBu0NaZouBObCpg2MWJ/vlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742921992; c=relaxed/simple;
-	bh=TvuNV6wKnM0OfxGqgTXqnI3weghrkbXm3vheYinYnSo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g9h5FjpcXtrkoyLJICC5l2NhDXz4x2RnFAswk6bVca0rTChMbDtFm8J2+8Z4pG1NIv+EZfD4wlP56vGoHif+yA1xanvXucznUuC6NUQ9XqX+L8bezKtyzp5qhi35QBWoy8w9Z4+J9OMfsQSEamdm6nOSUg2Grw9CbXDgbsLKcXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YFVVbQyw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YFVVbQyw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF3D7C4CEEE;
-	Tue, 25 Mar 2025 16:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742921991;
-	bh=TvuNV6wKnM0OfxGqgTXqnI3weghrkbXm3vheYinYnSo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=YFVVbQywsW5HNlyalHgO9qClrVkGoea6T0cK2kb5qUUVpe4UtcD9OyNQn6GwOgc5w
-	 KZ8BMeg0b7/tvTrwSDzjfI1Ed032SMtEnzc9fOLAPFdop7qmCP8sSyNwaKMGOc4vLo
-	 oSkxiOYuOWTWfokEJSKFO8iwmMySncVMfoAelcg0P2dwbDfGY4KiXxl5iHBFc6s4s2
-	 Y7EDJ2VQCiOLAqsTOB/o8OZDXetwGLr81fylaTLzkmS00VnhDSUVmDYEfAQO5MmCBG
-	 5EPXANUu1uwCWXhtjtqO0kvPsAz79cXMlwIl5/DkF90xU+fPzau807rfYYw9AUqj8m
-	 tdMTQsVpdgHgQ==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30beedb99c9so56167421fa.3;
-        Tue, 25 Mar 2025 09:59:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVK41/zb3BtwsltTb13N6+RBpi2+3vv6ru4Em3O3/o04+6E9H3IjlQiNP+OE8EtC6Q3fYLvON41BVAEkGdf@vger.kernel.org, AJvYcCWgNsrgeKWiFyyWZE1Z8YFBtP+X7vKOHuMVTJP6cId1Ybhjv2ZGrJoN/TaZulqsBlcu2b3cGQZN82N0Vv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcWUTjdnPY2HVQ1jz2uvtkZ7YH8gffaQUF6Q98tMV0HPs0OoG6
-	qk16bblvmQ2Umd3p2JSSHS4mDVtvPpm2biwmjeMHJSzpNH4Gzqn0EPweqc81p7pVrDu/pSPCG7Q
-	/Zf2yPchrL8uMm4GkiJ7tuqGL5LA=
-X-Google-Smtp-Source: AGHT+IF0mLfYg906NjEtDJUBzhsSCFQvlfBVJeusa824a/YnxCdYXhYU64I5Kq9m2fk2SN5sjC3u2ZaN/0XMxdCr5QM=
-X-Received: by 2002:a05:651c:19a7:b0:30b:b00f:9507 with SMTP id
- 38308e7fff4ca-30d7e2aaca1mr70115571fa.24.1742921990190; Tue, 25 Mar 2025
- 09:59:50 -0700 (PDT)
+	s=arc-20240116; t=1742923195; c=relaxed/simple;
+	bh=XhmLROfnnL3FtaOH27gIOe9sbljr3QNEJt4khOaoGEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=thXfkLpcysvlslOLNwAsjXCeCS6JfK6KctSbO2VGPV3RuKnyk0b5C13uS18qMml/OaXFTQll1YJumJb0xtEBlz6OVXMzXwT+u0OP1YIXmFUMXF7N6mj6jdKsM0A+dPbTQIyLF0c2blFZmvdsLhtgQIwwYgh2AD86/cle9R4yFAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.136.199) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 25 Mar
+ 2025 20:19:41 +0300
+Message-ID: <05fec753-cdaa-45a5-a029-b6435c30eb07@omp.ru>
+Date: Tue, 25 Mar 2025 20:19:39 +0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZOxnTFhchkTvKpZV@gondor.apana.org.au> <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
- <ZkGN64ulwzPVvn6-@gondor.apana.org.au> <ZpkdZopjF9/9/Njx@gondor.apana.org.au>
- <ZuetBbpfq5X8BAwn@gondor.apana.org.au> <ZzqyAW2HKeIjGnKa@gondor.apana.org.au>
- <Z5Ijqi4uSDU9noZm@gondor.apana.org.au> <Z-JE2HNY-Tj8qwQw@gondor.apana.org.au> <20250325152541.GA1661@sol.localdomain>
-In-Reply-To: <20250325152541.GA1661@sol.localdomain>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 25 Mar 2025 17:59:39 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFM29ZM5ncyZLrAbX35V7y8=C-n8KT0y1SZhafK_+5aHg@mail.gmail.com>
-X-Gm-Features: AQ5f1JqtBqIc34Ji6-nObeR0Ug-BwTZ3CpgACCZqe_azCWAm-c_PGc92djp7YpQ
-Message-ID: <CAMj1kXFM29ZM5ncyZLrAbX35V7y8=C-n8KT0y1SZhafK_+5aHg@mail.gmail.com>
-Subject: Re: [GIT PULL] Crypto Update for 6.15
-To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH V3 25/43] rv64ilp32_abi: exec: Adapt 64lp64 env and
+ argv
+To: <guoren@kernel.org>, <arnd@arndb.de>, <gregkh@linuxfoundation.org>,
+	<torvalds@linux-foundation.org>, <paul.walmsley@sifive.com>,
+	<palmer@dabbelt.com>, <anup@brainfault.org>, <atishp@atishpatra.org>,
+	<oleg@redhat.com>, <kees@kernel.org>, <tglx@linutronix.de>,
+	<will@kernel.org>, <mark.rutland@arm.com>, <brauner@kernel.org>,
+	<akpm@linux-foundation.org>, <rostedt@goodmis.org>, <edumazet@google.com>,
+	<unicorn_wang@outlook.com>, <inochiama@outlook.com>, <gaohan@iscas.ac.cn>,
+	<shihua@iscas.ac.cn>, <jiawei@iscas.ac.cn>, <wuwei2016@iscas.ac.cn>,
+	<drew@pdp7.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<ctsai390@andestech.com>, <wefu@redhat.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <josef@toxicpanda.com>, <dsterba@suse.com>,
+	<mingo@redhat.com>, <peterz@infradead.org>, <boqun.feng@gmail.com>,
+	<xiao.w.wang@intel.com>, <qingfang.deng@siflower.com.cn>,
+	<leobras@redhat.com>, <jszhang@kernel.org>, <conor.dooley@microchip.com>,
+	<samuel.holland@sifive.com>, <yongxuan.wang@sifive.com>,
+	<luxu.kernel@bytedance.com>, <david@redhat.com>, <ruanjinjie@huawei.com>,
+	<cuiyunhui@bytedance.com>, <wangkefeng.wang@huawei.com>,
+	<qiaozhe@iscas.ac.cn>
+CC: <ardb@kernel.org>, <ast@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <maple-tree@lists.infradead.org>,
+	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-atm-general@lists.sourceforge.net>, <linux-btrfs@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<linux-nfs@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <linux-media@vger.kernel.org>
+References: <20250325121624.523258-1-guoren@kernel.org>
+ <20250325121624.523258-26-guoren@kernel.org>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20250325121624.523258-26-guoren@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/25/2025 16:50:54
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 192097 [Mar 25 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
+ 68896fb0083a027476849bf400a331a2d5d94398
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.136.199
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/25/2025 16:52:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/25/2025 3:18:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Tue, 25 Mar 2025 at 16:25, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Mar 25, 2025 at 01:53:28PM +0800, Herbert Xu wrote:
-> >
-> >       crypto: hash - Add request chaining API
->
-> Herbert didn't mention that I have nacked this patch, which he is insisting on
-> pushing for some reason instead of my original version that is much better.
->
-> Let me reiterate why "request chaining" is a bad idea and is going to cause
-> problems.
->
-> It makes it so that now a single hash request can now actually be a list of hash
-> requests.  It makes some of the crypto code operate on the whole list.  However,
-> most code still operates only on the first request in the list.  It's
-> undocumented and inconsistent which code is doing which, which is going to cause
-> bugs.  The first request in the list is also being treated specially in
-> undocumented ways, so submitting a list of requests is not necessarily
-> equivalent to submitting them all individually.  Another recipe for bugs.
->
-> Each hash request can also contain an entire scatterlist.  It's overkill for
-> what is actually needed for multibuffer hashing, which is a simple API that
-> hashes two buffers specified by virtual address.  Herbert's API creates lots of
-> unnecessary edge cases, most of which lack any testing.  It continues many of
-> the worst practices of the crypto API that we *know* are not working, like
-> requiring per-request memory allocations and optimizing for legacy hardware
-> offload rather than the CPU-based crypto that almost everyone actually uses.
->
-> In contrast, my patchset
-> https://lore.kernel.org/r/20250212154718.44255-1-ebiggers@kernel.org/ supports
-> multibuffer hashing in a much better way and has been ready for a year already.
-> It actually works; it has a smaller diffstat; it is faster; it has a much
-> simpler API; and it actually includes all needed pieces including x86 and arm64
-> support, dm-verity and fs-verity support, and full documentation and tests.
->
-> I've been spending a lot of time fixing the kernel's crypto code over the years.
-> I'm not looking forward to having another set of major issues to fix.
->
-> And this latest set of issues will be totally unnecessary.
->
-> We can do better than this, especially for cryptography code.
->
-> Nacked-by: Eric Biggers <ebiggers@kernel.org>
->
+On 3/25/25 3:16 PM, guoren@kernel.org wrote:
 
-It's sad that it is coming to this, but I have to second Eric here:
-for CPU based crypto, the flexibility of Herbert's approach has no
-added value. SHA CPU instructions can be interleaved at the
-instruction level to get almost 2x speedup in some cases, and this
-works very well when operating on equal sized inputs. However,
-generalizing this to arbitrary request chains to accommodate async h/w
-offload introduces a lot of complexity for use cases that are only
-imaginary.
+> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+> 
+> The rv64ilp32 abi reuses the env and argv memory layout of the
+> lp64 abi, so leave the space to fit the lp64 struct layout.
+> 
+> Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
+> ---
+>  fs/exec.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/fs/exec.c b/fs/exec.c
+> index 506cd411f4ac..548d18b7ae92 100644
+> --- a/fs/exec.c
+> +++ b/fs/exec.c
+> @@ -424,6 +424,10 @@ static const char __user *get_user_arg_ptr(struct user_arg_ptr argv, int nr)
+>  	}
+>  #endif
+>  
+> +#if defined(CONFIG_64BIT) && (BITS_PER_LONG == 32)
 
-Given Eric's track record as a contributor to the crypto subsystem and
-as a maintainer of subsystems that are closely tied to it, I would
-expect Herbert to take his opinion more seriously, but it is just
-being ignored. Instead, a lightly tested alternative with no
-integration into existing users has been merged in its place, with
-very little input from the community.
+   Parens don't seem necessary...
 
-So Herbert, please withdraw this pull request, and work with Eric and
-the rest of us to converge on something that we can all get behind.
+> +	nr = nr * 2;
+
+   Why not nr *= 2?
+
+[...]
+
+MBR, Sergey
+
