@@ -1,58 +1,60 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CEC1F55FF
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Mar 2025 16:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B641F4E49;
+	Wed, 26 Mar 2025 16:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743004913; cv=none; b=Xpuewlh5v7yHwIXLghAgPErVYO0kFY102U3iUuuo9v7axeGC5dsYghNmCPPaQCt+x9VjCOY/VFVp7KO7Th6kkqfLr9cAuQVGhyreg139bhpPsMGrHScfL2t9Lqi5JJ28yiDNUK0VbqvJagI7e+mcxDrOQ9ka+Q6hYEVHeIyZwRk=
+	t=1743004915; cv=none; b=r6WFIZGaEblfnMtY3l84W+QrlkqOJKdEiuF7/gSBvYIg0s4a5gupGm2KQQGJg/3KDQY0Thb3KO3/VYDgpjfldaxUoUmqweu8T1n3PkADKfZeKRkX5D9CEq2Fwumbwb/ikLELKPcOFtGGDpg7ZYcMt2Wm9KnOLwi15USQwofYJ4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743004913; c=relaxed/simple;
-	bh=44zmwuI8YQm/iXiTLWjgJElktkIiKu8XNi6wl2TdTF0=;
+	s=arc-20240116; t=1743004915; c=relaxed/simple;
+	bh=Mj/VTbe66eASpSeZ3Hz/jkyeHZMhBS+kttR++8h91Lo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lkTMV4PMi4829dgkIIKMKbbmHVGPH/OATKPCZHOi1vzNZRKw93ZpfB2MCX0ZftH+2O4/IW7npOXOFbwz50He7BguwMBhqGufrFtL6HsjaWpoGMEKFOJk+yukEHAW/KYAVjJalKEa04CgsrZvFFZR+7hvGyCVef31vjHDbUvKI3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JwNbib7F; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=D9gGM6NvcNk67Yv6EfjR78yJ4EJ3uvJW5udSklkjVc3GjFlpor1I9n14udIOcXXTPC3dWC+MZ3npUih7jpIA1/CTNneIR1giQJZy+7kqccOtn+On77fnQJ9zpJeTy+qcrseVg8QuYsx6top9rpjs9awplLM6xSzV4HofZaEvGAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXqm6kFa; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JwNbib7F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXqm6kFa"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743004912; x=1774540912;
+  t=1743004914; x=1774540914;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=44zmwuI8YQm/iXiTLWjgJElktkIiKu8XNi6wl2TdTF0=;
-  b=JwNbib7FNcqZbXjdwbHFIFNZOAoLhlBglEVousz3CuQVXiy6EP7LnlCj
-   QgwzmJmBZ5FurEO1So4k4BWF2FF9gqtD892gZu2QOBK40/Vv6heXeOnOu
-   pRffyPpRLqn7ejI8/2HzwdG6sdp0gJe6KOUBZqzmj8R79XEMDUlU/3/mF
-   ctMjSa2MuaGn5KahoNAme/q6nyS4MYC2lsw+JdPz3tYtKjDA7aivWGrzQ
-   equPfsfCclp2NGpQIg4ZUtHBKw6iBi+GmKAdo0okuYvuF0FgxLKk/TAPG
-   K1+8lKx8eo7v6FtAbhQ2w758cvSjAa8PMZU+0CAhKjwnxie/Rg3EumpI4
-   Q==;
-X-CSE-ConnectionGUID: T1OjyjkcSgGv7f7p67ucHg==
-X-CSE-MsgGUID: 3vcN5TNOS1OrK+CqsU35Sg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="61823900"
+  bh=Mj/VTbe66eASpSeZ3Hz/jkyeHZMhBS+kttR++8h91Lo=;
+  b=HXqm6kFab8GoNbEK5XgYgnbS5ZktV5kE7NdCnWPzX2JIuaJSglTWqCPX
+   CfbghuWtt6WK5ZTYvVfpH8Wt4+T7kDBCE3K7JpC64TKEuZiJf11QzI6Xk
+   bUPO14izgGpg0mhyAilzg6xh30nAGNOIVZIpmsUFgI6kc+mdWuzUwMJsG
+   2KJxKEt+ifyxEHMK/a96Y1TosfKDLA+WVxskviE0mOIIxR9RRmQqofXEs
+   LePjHMzfSP12uyIklJgTmww7Kilmr9wPh9g2mvLbYP0S8nzcogmiLTi9q
+   fHtUn9ate0SicO5WyVt111AEAdLxpXV+68ths0lIQyvB8q4urML3qLueO
+   w==;
+X-CSE-ConnectionGUID: Zx0fzYMPTKeYPsAGMqmThA==
+X-CSE-MsgGUID: YqNDcqN8QJ2Mde0J+aHoWw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="61823906"
 X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="61823900"
+   d="scan'208";a="61823906"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 09:01:52 -0700
-X-CSE-ConnectionGUID: 86s4DZIhQGC1nR0MhjdQ4Q==
-X-CSE-MsgGUID: oujgEghNRFKqzs5Rn/VrEw==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 09:01:53 -0700
+X-CSE-ConnectionGUID: 81M9C0C8TuqBMEk2MJvAQA==
+X-CSE-MsgGUID: bdaozIS7Q2GE7NoqU+M/fw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="129928582"
+   d="scan'208";a="129928591"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.204])
-  by fmviesa004.fm.intel.com with ESMTP; 26 Mar 2025 09:01:50 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 26 Mar 2025 09:01:51 -0700
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	andriy.shevchenko@intel.com,
 	qat-linux@intel.com,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	stable@vger.kernel.org,
+	Ahsan Atta <ahsan.atta@intel.com>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH 5/8] crypto: qat - remove redundant prototypes in qat_c62x
-Date: Wed, 26 Mar 2025 15:59:50 +0000
-Message-ID: <20250326160116.102699-7-giovanni.cabiddu@intel.com>
+Subject: [PATCH 6/8] crypto: qat - add shutdown handler to qat_c62x
+Date: Wed, 26 Mar 2025 15:59:51 +0000
+Message-ID: <20250326160116.102699-8-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250326160116.102699-2-giovanni.cabiddu@intel.com>
 References: <20250326160116.102699-2-giovanni.cabiddu@intel.com>
@@ -65,72 +67,60 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-Move the definition of the adf_driver structure and remove the redundant
-prototypes for the functions adf_probe() and adf_remove() in the
-qat_c62x driver.
+During a warm reset via kexec, the system bypasses the driver removal
+sequence, meaning that the remove() callback is not invoked.
+If a QAT device is not shutdown properly, the device driver will fail to
+load in a newly rebooted kernel.
 
-Also move the pci_device_id table close to where it is used and drop the
-inner comma as it is not required.
+This might result in output like the following after the kexec reboot:
 
-This does not introduce any functional change.
+    QAT: AE0 is inactive!!
+    QAT: failed to get device out of reset
+    c6xx 0000:3f:00.0: qat_hal_clr_reset error
+    c6xx 0000:3f:00.0: Failed to init the AEs
+    c6xx 0000:3f:00.0: Failed to initialise Acceleration Engine
+    c6xx 0000:3f:00.0: Resetting device qat_dev0
+    c6xx 0000:3f:00.0: probe with driver c6xx failed with error -14
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Implement the shutdown() handler that hooks into the reboot notifier
+list. This brings down the QAT device and ensures it is shut down
+properly.
+
+Cc: <stable@vger.kernel.org>
+Fixes: a6dabee6c8ba ("crypto: qat - add support for c62x accel type")
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_c62x/adf_drv.c | 33 ++++++++++-----------
- 1 file changed, 15 insertions(+), 18 deletions(-)
+ drivers/crypto/intel/qat/qat_c62x/adf_drv.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
-index 8a7bdec358d6..0bac717e88d9 100644
+index 0bac717e88d9..23ccb72b6ea2 100644
 --- a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
 +++ b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
-@@ -19,24 +19,6 @@
- #include <adf_dbgfs.h>
- #include "adf_c62x_hw_data.h"
- 
--static const struct pci_device_id adf_pci_tbl[] = {
--	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X), },
--	{ }
--};
--MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
--
--static int adf_probe(struct pci_dev *dev, const struct pci_device_id *ent);
--static void adf_remove(struct pci_dev *dev);
--
--static struct pci_driver adf_driver = {
--	.id_table = adf_pci_tbl,
--	.name = ADF_C62X_DEVICE_NAME,
--	.probe = adf_probe,
--	.remove = adf_remove,
--	.sriov_configure = adf_sriov_configure,
--	.err_handler = &adf_err_handler,
--};
--
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
- {
- 	pci_release_regions(accel_dev->accel_pci_dev.pci_dev);
-@@ -227,6 +209,21 @@ static void adf_remove(struct pci_dev *pdev)
+@@ -209,6 +209,13 @@ static void adf_remove(struct pci_dev *pdev)
  	kfree(accel_dev);
  }
  
-+static const struct pci_device_id adf_pci_tbl[] = {
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X) },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
++static void adf_shutdown(struct pci_dev *pdev)
++{
++	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
 +
-+static struct pci_driver adf_driver = {
-+	.id_table = adf_pci_tbl,
-+	.name = ADF_C62X_DEVICE_NAME,
-+	.probe = adf_probe,
-+	.remove = adf_remove,
-+	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
-+};
++	adf_dev_down(accel_dev);
++}
 +
- static int __init adfdrv_init(void)
- {
- 	request_module("intel_qat");
+ static const struct pci_device_id adf_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X) },
+ 	{ }
+@@ -220,6 +227,7 @@ static struct pci_driver adf_driver = {
+ 	.name = ADF_C62X_DEVICE_NAME,
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
++	.shutdown = adf_shutdown,
+ 	.sriov_configure = adf_sriov_configure,
+ 	.err_handler = &adf_err_handler,
+ };
 -- 
 2.48.1
 
