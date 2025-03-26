@@ -1,253 +1,225 @@
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE713185920
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Mar 2025 09:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0671A5BA2
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Mar 2025 09:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742979650; cv=none; b=g56NEgfneVZMouRTYSJaX4H1eWEaiF3o4YXOFzPJwFEuWsaWRo3jrc8e9E4SZzFA6r5umFiVfCKd2YiDSmVMnEpUnkgE00xLKLKDZpfn/3XC6ZpjN6QA32tBqAi2X1zGI9GularIp9PUJ40W/VQpztyWgHHcrlK/DRftkotxgq4=
+	t=1742980642; cv=none; b=gkFSz0Wgc0x/dU5uE/yB0iXu3wjTshRyr6OQlDMGPB3uKFfwPQpisNKl896wDwduAqdKXBDJG6AUraiSMR5irxqNIH5hpBv8B15haQ5MIbNMN1TgL1HR/eDOmGHslT2E+K+AIEeW5DbaRl/g9AMqYusHw74pyLWcKjSIRcBzPEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742979650; c=relaxed/simple;
-	bh=Wbjl+HnF0XEMIlBc93hm55bhxMZ/rxuHrKFl7IR1lHI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PRO/aMdyhcm60EVh2OXAPKRIDTM21jzl59oq0cgQdMKwD4Wrgjn5Sf1FFTSiU38NWBq7TLxxZDhZe81Juadonxdq7vHpBMzjzpwcb9qfY1oQFUaDcqvudfWtE4vIcQXXICW0ECVlz+JXT0mVrtDMUH4oceo9i/nGGBg4vpbBbDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Z3l1aCHM; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1742980642; c=relaxed/simple;
+	bh=2YiNDN2k4e28Wnew2YTaNir8Wum5rxTwpgelD7ATmFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DuLtwXZaYAn3DaSMdGs7rAdsYrFCAXWQ3U+jaw/GiAuGH5EtWqanezLbPKJTyFvofhZwy2AfQzTkaUZsBVHw48LQUEI6Sxnx/cwNIA6t063vCvD7t/Hdnxok5imJ9lgNSHn7KMk4Ty3loQStJsji/tB7TfyjBS/0ZwWArEnTCWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MoUddKtP; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Z3l1aCHM"
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52Q90bs71493767
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Mar 2025 04:00:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1742979637;
-	bh=Ad5N6obHNF1uiVUyO6aHmgLxajoXuvbvtjnJy6mC8P8=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=Z3l1aCHMQXJH1U819iQ+sz6ElIKjMJjeNy/GSeEV3a3R6q3Okwa8xjBbmSHDMqcbF
-	 VJkbkMBDVCn3jJ4Y76ZKcUNgJ+9BCorPm3wdubl8kknBfTc3Ecgr4bYj2H531RIC5z
-	 jhgdPEYCBzpuHKhDDzg79uLRa9SKGjFbTViS4bjQ=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52Q90bAd045803
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 26 Mar 2025 04:00:37 -0500
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 26
- Mar 2025 04:00:36 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 26 Mar 2025 04:00:36 -0500
-Received: from localhost (uda0497581-hp.dhcp.ti.com [172.24.227.253])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52Q90ad8020194;
-	Wed, 26 Mar 2025 04:00:36 -0500
-Date: Wed, 26 Mar 2025 14:30:35 +0530
-From: Manorit Chawdhry <m-chawdhry@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers
-	<ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Megha Dey
-	<megha.dey@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Manorit
- Chawdhry <m-chawdhry@ti.com>,
-        Kamlesh Gurudasani <kamlesh@ti.com>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>, Udit Kumar <u-kumar1@ti.com>,
-        Pratham T
-	<t-pratham@ti.com>
-Subject: Re: [v2 PATCH 03/11] crypto: hash - Add request chaining API
-Message-ID: <20250326090035.izxxf3sboom7hvcv@uda0497581-HP>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MoUddKtP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=o/VsaC/pS8kkDovMrg5xr0SCoMHiahOxD9pWS31qoJc=; b=MoUddKtPtNhMsW0sbsMni77kFo
+	VwMmAWvinVb2y5KJM/NHNot079dDnIcbYBOHwaLL58JMVDneFZYcc8dxXxYGVJQT0W5cvsuuBs1os
+	1MHVjR5V5Tqtuhu6ObAH0wP2ewz5jPKUQZR8fLih3YVvZz75fCYPEzS8YESvO352ShsJ2DbhdeWGB
+	XU4X5esLIe278BXUdjSbfcNqT/OGC9GLJeOiLHxEKqiJB46ulAUe6kPOjmzJ2rC5e6J3G+oei93JM
+	GVFcGvc4iBdIPpuqoX/XHw/E71o+ALKPAaG4pO4brpu3uoRKnImcZFT0aypnpPrj2lJPccHTZYHr1
+	/kGECLlA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1txMsk-00AEjL-2L;
+	Wed, 26 Mar 2025 17:17:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Mar 2025 17:17:06 +0800
+Date: Wed, 26 Mar 2025 17:17:06 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Manorit Chawdhry <m-chawdhry@ti.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Megha Dey <megha.dey@linux.intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>, Udit Kumar <u-kumar1@ti.com>,
+	Pratham T <t-pratham@ti.com>
+Subject: [PATCH] crypto: sa2ul - Use proper helpers to setup request
+Message-ID: <Z-PGEtO8JmyC5xU_@gondor.apana.org.au>
 References: <cover.1739674648.git.herbert@gondor.apana.org.au>
  <2620cdada3777a66d3600cd1887cd34245d1e26a.1739674648.git.herbert@gondor.apana.org.au>
+ <20250326090035.izxxf3sboom7hvcv@uda0497581-HP>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2620cdada3777a66d3600cd1887cd34245d1e26a.1739674648.git.herbert@gondor.apana.org.au>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+In-Reply-To: <20250326090035.izxxf3sboom7hvcv@uda0497581-HP>
 
-Hi Herbert,
+On Wed, Mar 26, 2025 at 02:30:35PM +0530, Manorit Chawdhry wrote:
+>
+> The following patch seems to be breaking selftests in SA2UL driver.
 
-On 11:07-20250216, Herbert Xu wrote:
-> This adds request chaining to the ahash interface.  Request chaining
-> allows multiple requests to be submitted in one shot.  An algorithm
-> can elect to receive chained requests by setting the flag
-> CRYPTO_ALG_REQ_CHAIN.  If this bit is not set, the API will break
-> up chained requests and submit them one-by-one.
-> 
-> A new err field is added to struct crypto_async_request to record
-> the return value for each individual request.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  crypto/ahash.c                 | 261 +++++++++++++++++++++++++++++----
->  crypto/algapi.c                |   2 +-
->  include/crypto/algapi.h        |  11 ++
->  include/crypto/hash.h          |  28 ++--
->  include/crypto/internal/hash.h |  10 ++
->  include/linux/crypto.h         |  24 +++
->  6 files changed, 299 insertions(+), 37 deletions(-)
+Thanks for the report.
 
-The following patch seems to be breaking selftests in SA2UL driver.
+This patch should fix the problem:
 
-The failure signature:
+---8<---
+Rather than setting up a request by hand, use the correct API helpers
+to setup the new request.  This is because the API helpers will setup
+chaining.
 
-root@j721e-evm:~# modprobe sa2ul
-[   32.254126] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
-root@j721e-evm:~# [   32.374996] Unable to handle kernel paging request at virtual address fefefefefefeff46
-[   32.401815] Unable to handle kernel paging request at virtual address fefefefefefeff46
-[   32.449576] Unable to handle kernel paging request at virtual address fefefefefefeff46
-[   32.459025] Mem abort info:
-[   32.461812]   ESR = 0x0000000096000044
-[   32.480762] Mem abort info:
-[   32.503389]   ESR = 0x0000000096000044
-[   32.512483]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   32.519478] Mem abort info:
-[   32.534472]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   32.542380]   ESR = 0x0000000096000044
-[   32.546123]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   32.554977]   SET = 0, FnV = 0
-[   32.572112]   SET = 0, FnV = 0
-[   32.579134]   EA = 0, S1PTW = 0
-[   32.597889]   EA = 0, S1PTW = 0
-[   32.603045]   FSC = 0x04: level 0 translation fault
-[   32.615500]   SET = 0, FnV = 0
-[   32.628186]   FSC = 0x04: level 0 translation fault
-[   32.645274]   EA = 0, S1PTW = 0
-[   32.651268] Data abort info:
-[   32.654145]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-[   32.675265] Data abort info:
-[   32.678614]   FSC = 0x04: level 0 translation fault
-[   32.701391]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-[   32.721251] Data abort info:
-[   32.725864]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[   32.742907]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-[   32.751647]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[   32.770854]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[   32.790381]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[   32.795591]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[   32.807232] [fefefefefefeff46] address between user and kernel address ranges
-[   32.826504]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[   32.832211] [fefefefefefeff46] address between user and kernel address ranges
-[   32.854007] Internal error: Oops: 0000000096000044 [#1]  SMP
-[   32.859661] Modules linked in: des_generic libdes cbc sa2ul authenc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 pinctrl_tps6594 tps6594_esm tps6594_regulator gpio_regmap tps6594_pfsm ti_am335x_adc kfifo_buf pru_rproc cdns3 irq_pruss_intc cdns_pltfrm cdns_usb_common snd_soc_j721e_evm display_connector phy_can_transceiver phy_j721e_wiz omap_mailbox ti_k3_r5_remoteproc tidss tps6594_i2c drm_client_lib cdns_mhdp8546 drm_dma_helper tps6594_core at24 drm_display_helper k3_j72xx_bandgap drm_kms_helper m_can_platform m_can ti_am335x_tscadc pruss snd_soc_davinci_mcasp snd_soc_ti_udma ti_j721e_ufs can_dev snd_soc_ti_edma ti_k3_dsp_remoteproc snd_soc_ti_sdma cdns3_ti snd_soc_pcm3168a_i2c snd_soc_pcm3168a rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6
-[   32.929820] CPU: 0 UID: 0 PID: 1253 Comm: cryptomgr_test Not tainted 6.14.0-rc7-next-20250324-build-configs-dirty #2 PREEMPT
-[   32.941098] Hardware name: Texas Instruments J721e EVM (DT)
-[   32.946653] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   32.953598] pc : crypto_ahash_init+0x6c/0xf0
-[   32.957866] lr : crypto_ahash_init+0x50/0xf0
-[   32.962124] sp : ffff8000851cb590
-[   32.965425] x29: ffff8000851cb590 x28: 0000000000000000 x27: ffff8000851cb788
-[   32.972546] x26: ffff000802dace00 x25: 0000000000000000 x24: ffff000804294010
-[   32.979667] x23: ffff80007be3fb30 x22: 0000000000000000 x21: ffff0008095c1250
-[   32.986787] x20: ffff000802dace90 x19: fefefefefefefefe x18: 00000000ffffffff
-[   32.993908] x17: 0000000000373931 x16: 2d3732322d34322d x15: ffff8000851cb740
-[   33.001028] x14: ffff8001051cbaa7 x13: 0000000000000000 x12: 0000000000000000
-[   33.008148] x11: 0000000000000100 x10: 0000000000000001 x9 : ffff80007be3fadc
-[   33.015268] x8 : ffff8000851cb668 x7 : 0000000000000000 x6 : 0010000000000000
-[   33.022388] x5 : efcdab8967452301 x4 : 1032547698badcfe x3 : 00000000c3d2e1f0
-[   33.029509] x2 : 0000000000000000 x1 : ffff0008095c1280 x0 : 0000000000000000
-[   33.036629] Call trace:
-[   33.039065]  crypto_ahash_init+0x6c/0xf0 (P)
-[   33.043325]  sa_sha_init+0x4c/0xa0 [sa2ul]
-[   33.047419]  ahash_do_req_chain+0x144/0x280
-[   33.051591]  crypto_ahash_init+0xc8/0xf0
-[   33.055502]  do_ahash_op+0x34/0xb8
-[   33.058895]  test_ahash_vec_cfg+0x3e4/0x800
-[   33.063068]  test_hash_vec+0xbc/0x230
-[   33.066719]  __alg_test_hash+0x288/0x3d8
-[   33.070629]  alg_test_hash+0x108/0x1a0
-[   33.074367]  alg_test+0x148/0x658
-[   33.077672]  cryptomgr_test+0x2c/0x50
-[   33.081322]  kthread+0x134/0x218
-[   33.084542]  ret_from_fork+0x10/0x20
-[   33.088109] Code: eb13029f 540001e0 d503201f f94012a1 (f9002661)
-[   33.094185] ---[ end trace 0000000000000000 ]---
-[   33.100497] [fefefefefefeff46] address between user and kernel address ranges
-[   33.114241] Internal error: Oops: 0000000096000044 [#2]  SMP
-[   33.119887] Modules linked in: des_generic libdes cbc sa2ul authenc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 pinctrl_tps6594 tps6594_esm tps6594_regulator gpio_regmap tps6594_pfsm ti_am335x_adc kfifo_buf pru_rproc cdns3 irq_pruss_intc cdns_pltfrm cdns_usb_common snd_soc_j721e_evm display_connector phy_can_transceiver phy_j721e_wiz omap_mailbox ti_k3_r5_remoteproc tidss tps6594_i2c drm_client_lib cdns_mhdp8546 drm_dma_helper tps6594_core at24 drm_display_helper k3_j72xx_bandgap drm_kms_helper m_can_platform m_can ti_am335x_tscadc pruss snd_soc_davinci_mcasp snd_soc_ti_udma ti_j721e_ufs can_dev snd_soc_ti_edma ti_k3_dsp_remoteproc snd_soc_ti_sdma cdns3_ti snd_soc_pcm3168a_i2c snd_soc_pcm3168a rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6
-[   33.190029] CPU: 0 UID: 0 PID: 1256 Comm: cryptomgr_test Tainted: G      D             6.14.0-rc7-next-20250324-build-configs-dirty #2 PREEMPT
-[   33.202868] Tainted: [D]=DIE
-[   33.205737] Hardware name: Texas Instruments J721e EVM (DT)
-[   33.211293] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   33.218236] pc : crypto_ahash_init+0x6c/0xf0
-[   33.222498] lr : crypto_ahash_init+0x50/0xf0
-[   33.226756] sp : ffff8000852ab590
-[   33.230057] x29: ffff8000852ab590 x28: 0000000000000000 x27: ffff8000852ab788
-[   33.237178] x26: ffff000807d69a00 x25: 0000000000000000 x24: ffff000804204810
-[   33.244298] x23: ffff80007be3fb30 x22: 0000000000000000 x21: ffff0008095c1890
-[   33.251419] x20: ffff000807d69a90 x19: fefefefefefefefe x18: 00000000ffffffff
-[   33.258539] x17: 0000000000000000 x16: 0000000000000000 x15: ffff8000852ab740
-[   33.265659] x14: ffff8001052abaa7 x13: 0000000000000000 x12: 0000000000000000
-[   33.272779] x11: 0000000000000000 x10: ffff00087f7c8308 x9 : ffff80007be3fadc
-[   33.279899] x8 : bb67ae8584caa73b x7 : 3c6ef372fe94f82b x6 : a54ff53a5f1d36f1
-[   33.287019] x5 : 510e527fade682d1 x4 : 9b05688c2b3e6c1f x3 : 1f83d9abfb41bd6b
-[   33.294139] x2 : 5be0cd19137e2179 x1 : ffff0008095c1100 x0 : 0000000000000000
-[   33.301259] Call trace:
-[   33.303695]  crypto_ahash_init+0x6c/0xf0 (P)
-[   33.307954]  sa_sha_init+0x4c/0xa0 [sa2ul]
-[   33.312045]  ahash_do_req_chain+0x144/0x280
-[   33.316217]  crypto_ahash_init+0xc8/0xf0
-[   33.320129]  do_ahash_op+0x34/0xb8
-[   33.323520]  test_ahash_vec_cfg+0x3e4/0x800
-[   33.327691]  test_hash_vec+0xbc/0x230
-[   33.331341]  __alg_test_hash+0x288/0x3d8
-[   33.335252]  alg_test_hash+0x108/0x1a0
-[   33.338990]  alg_test+0x148/0x658
-[   33.342294]  cryptomgr_test+0x2c/0x50
-[   33.345944]  kthread+0x134/0x218
-[   33.349161]  ret_from_fork+0x10/0x20
-[   33.352727] Code: eb13029f 540001e0 d503201f f94012a1 (f9002661)
-[   33.358803] ---[ end trace 0000000000000000 ]---
-[   33.363437] Internal error: Oops: 0000000096000044 [#3]  SMP
-[   33.369081] Modules linked in: des_generic libdes cbc sa2ul authenc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 pinctrl_tps6594 tps6594_esm tps6594_regulator gpio_regmap tps6594_pfsm ti_am335x_adc kfifo_buf pru_rproc cdns3 irq_pruss_intc cdns_pltfrm cdns_usb_common snd_soc_j721e_evm display_connector phy_can_transceiver phy_j721e_wiz omap_mailbox ti_k3_r5_remoteproc tidss tps6594_i2c drm_client_lib cdns_mhdp8546 drm_dma_helper tps6594_core at24 drm_display_helper k3_j72xx_bandgap drm_kms_helper m_can_platform m_can ti_am335x_tscadc pruss snd_soc_davinci_mcasp snd_soc_ti_udma ti_j721e_ufs can_dev snd_soc_ti_edma ti_k3_dsp_remoteproc snd_soc_ti_sdma cdns3_ti snd_soc_pcm3168a_i2c snd_soc_pcm3168a rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6
-[   33.439214] CPU: 0 UID: 0 PID: 1255 Comm: cryptomgr_test Tainted: G      D             6.14.0-rc7-next-20250324-build-configs-dirty #2 PREEMPT
-[   33.452052] Tainted: [D]=DIE
-[   33.454921] Hardware name: Texas Instruments J721e EVM (DT)
-[   33.460476] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   33.467419] pc : crypto_ahash_init+0x6c/0xf0
-[   33.471678] lr : crypto_ahash_init+0x50/0xf0
-[   33.475935] sp : ffff8000851fb590
-[   33.479236] x29: ffff8000851fb590 x28: 0000000000000000 x27: ffff8000851fb788
-[   33.486357] x26: ffff000808b0da00 x25: 0000000000000000 x24: ffff000801270c10
-[   33.493477] x23: ffff80007be3fb30 x22: 0000000000000000 x21: ffff0008095c1490
-[   33.500596] x20: ffff000808b0da90 x19: fefefefefefefefe x18: 00000000ffffffff
-[   33.507717] x17: 0000000000000000 x16: 0000000000000000 x15: ffff8000851fb740
-[   33.514837] x14: ffff8001051fbaa7 x13: 0000000000000000 x12: 0000000000000000
-[   33.521956] x11: 0000000000000000 x10: ffff00087f7c8308 x9 : ffff80007be3fadc
-[   33.529077] x8 : ffff8000851fb668 x7 : 0000000000000000 x6 : 0010000000000000
-[   33.536197] x5 : bb67ae856a09e667 x4 : a54ff53a3c6ef372 x3 : 9b05688c510e527f
-[   33.543316] x2 : 5be0cd191f83d9ab x1 : ffff0008095c1680 x0 : 0000000000000000
-[   33.550437] Call trace:
-[   33.552871]  crypto_ahash_init+0x6c/0xf0 (P)
-[   33.557130]  sa_sha_init+0x4c/0xa0 [sa2ul]
-[   33.561217]  ahash_do_req_chain+0x144/0x280
-[   33.565388]  crypto_ahash_init+0xc8/0xf0
-[   33.569299]  do_ahash_op+0x34/0xb8
-[   33.572691]  test_ahash_vec_cfg+0x3e4/0x800
-[   33.576861]  test_hash_vec+0xbc/0x230
-[   33.580512]  __alg_test_hash+0x288/0x3d8
-[   33.584423]  alg_test_hash+0x108/0x1a0
-[   33.588161]  alg_test+0x148/0x658
-[   33.591465]  cryptomgr_test+0x2c/0x50
-[   33.595115]  kthread+0x134/0x218
-[   33.598334]  ret_from_fork+0x10/0x20
-[   33.601898] Code: eb13029f 540001e0 d503201f f94012a1 (f9002661)
-[   33.607973] ---[ end trace 0000000000000000 ]---
-[   47.186729] kauditd_printk_skb: 5 callbacks suppressed
-[   47.186738] audit: type=1334 audit(1742976993.333:24): prog-id=20 op=UNLOAD
-[   47.200991] audit: type=1334 audit(1742976993.345:25): prog-id=19 op=UNLOAD
-[   47.208310] audit: type=1334 audit(1742976993.345:26): prog-id=18 op=UNLOAD
+Also change the fallback allocation to explicitly request for a
+sync algorithm as this driver will crash if given an async one.
 
-Don't have sufficient knowledge to understand what is going wrong with
-this change, could you help out?
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Regards,
-Manorit
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 091612b066f1..8fae14043262 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -1415,22 +1415,13 @@ static int sa_sha_run(struct ahash_request *req)
+ 	    (auth_len >= SA_UNSAFE_DATA_SZ_MIN &&
+ 	     auth_len <= SA_UNSAFE_DATA_SZ_MAX)) {
+ 		struct ahash_request *subreq = &rctx->fallback_req;
+-		int ret = 0;
++		int ret;
+ 
+ 		ahash_request_set_tfm(subreq, ctx->fallback.ahash);
+-		subreq->base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
++		ahash_request_set_callback(subreq, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++		ahash_request_set_crypt(subreq, req->src, req->result, auth_len);
+ 
+-		crypto_ahash_init(subreq);
+-
+-		subreq->nbytes = auth_len;
+-		subreq->src = req->src;
+-		subreq->result = req->result;
+-
+-		ret |= crypto_ahash_update(subreq);
+-
+-		subreq->nbytes = 0;
+-
+-		ret |= crypto_ahash_final(subreq);
++		ret = crypto_ahash_digest(subreq);
+ 
+ 		return ret;
+ 	}
+@@ -1502,8 +1493,7 @@ static int sa_sha_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
+ 		return ret;
+ 
+ 	if (alg_base) {
+-		ctx->shash = crypto_alloc_shash(alg_base, 0,
+-						CRYPTO_ALG_NEED_FALLBACK);
++		ctx->shash = crypto_alloc_shash(alg_base, 0, 0);
+ 		if (IS_ERR(ctx->shash)) {
+ 			dev_err(sa_k3_dev, "base driver %s couldn't be loaded\n",
+ 				alg_base);
+@@ -1511,8 +1501,7 @@ static int sa_sha_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
+ 		}
+ 		/* for fallback */
+ 		ctx->fallback.ahash =
+-			crypto_alloc_ahash(alg_base, 0,
+-					   CRYPTO_ALG_NEED_FALLBACK);
++			crypto_alloc_ahash(alg_base, 0, CRYPTO_ALG_ASYNC);
+ 		if (IS_ERR(ctx->fallback.ahash)) {
+ 			dev_err(ctx->dev_data->dev,
+ 				"Could not load fallback driver\n");
+@@ -1546,54 +1535,38 @@ static int sa_sha_init(struct ahash_request *req)
+ 		crypto_ahash_digestsize(tfm), rctx);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+-	rctx->fallback_req.base.flags =
+-		req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(&rctx->fallback_req, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++	ahash_request_set_crypt(&rctx->fallback_req, NULL, NULL, 0);
+ 
+ 	return crypto_ahash_init(&rctx->fallback_req);
+ }
+ 
+ static int sa_sha_update(struct ahash_request *req)
+ {
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+-	rctx->fallback_req.base.flags =
+-		req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
++	ahash_request_set_callback(&rctx->fallback_req, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++	ahash_request_set_crypt(&rctx->fallback_req, req->src, NULL, req->nbytes);
+ 
+ 	return crypto_ahash_update(&rctx->fallback_req);
+ }
+ 
+ static int sa_sha_final(struct ahash_request *req)
+ {
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+-	rctx->fallback_req.base.flags =
+-		req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.result = req->result;
++	ahash_request_set_callback(&rctx->fallback_req, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++	ahash_request_set_crypt(&rctx->fallback_req, NULL, req->result, 0);
+ 
+ 	return crypto_ahash_final(&rctx->fallback_req);
+ }
+ 
+ static int sa_sha_finup(struct ahash_request *req)
+ {
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+-	rctx->fallback_req.base.flags =
+-		req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
+-	rctx->fallback_req.result = req->result;
++	ahash_request_set_callback(&rctx->fallback_req, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++	ahash_request_set_crypt(&rctx->fallback_req, req->src, req->result, req->nbytes);
+ 
+ 	return crypto_ahash_finup(&rctx->fallback_req);
+ }
+@@ -1601,12 +1574,8 @@ static int sa_sha_finup(struct ahash_request *req)
+ static int sa_sha_import(struct ahash_request *req, const void *in)
+ {
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+-	rctx->fallback_req.base.flags = req->base.flags &
+-		CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(&rctx->fallback_req, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 
+ 	return crypto_ahash_import(&rctx->fallback_req, in);
+ }
+@@ -1614,12 +1583,9 @@ static int sa_sha_import(struct ahash_request *req, const void *in)
+ static int sa_sha_export(struct ahash_request *req, void *out)
+ {
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct ahash_request *subreq = &rctx->fallback_req;
+ 
+-	ahash_request_set_tfm(subreq, ctx->fallback.ahash);
+-	subreq->base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(subreq, req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 
+ 	return crypto_ahash_export(subreq, out);
+ }
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
