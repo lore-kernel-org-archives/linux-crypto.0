@@ -1,82 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03FF215780;
-	Thu, 27 Mar 2025 13:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64296192B66
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2025 16:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743082277; cv=none; b=QfO5tPVbSh5wkYY4HfSeBQTnQwvmmE5mvFC0ef5se/R6yRNsYfDaWWQMBM5k3Gz+9u/8u8M6ym0GxHnSmsn+g9+r3ZynHStXzLtNbwG8lwVXRQ2G8lg98bpwhE45d7Up0YBsFceqBo0nba7qMlZgLKZRWL8yN6eeSJkCIPErX1A=
+	t=1743092414; cv=none; b=Cscvr9QFIn2F2WlRUBhc2vtNn/tJQbew1a3IK22PeMJYtU9GtuX2bvRSWE4huUHidbjr0MdOHsk3HtzAFC687PUJQGTCqRK/mEDlSj3e1ihhkrYh1WI70/vs5EXps0XLB36sT4FAscEwtzf2Lb+14aAq2Fweb32vS6VxYl6I76M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743082277; c=relaxed/simple;
-	bh=GHulqPHKw3iqVeCcCtvnxCaVG2mRKgrixEqdo1y6Vqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OzJYUuJX4oPY/fLORaDTh3KFBPYcxj5Wqwowf8ngTJ4nKJcgEVxEcYLhRnOKzLC3kn51Egb4fxnre1nuokccldux5DmdxUecPik3EcRPSBPtJL1H2z1FH9Yn5pwqCrVhcVIApNibIyfz9/l5Wk3WP3cZw76SVZ/Ld4JTHOAMO3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG2URvM4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743092414; c=relaxed/simple;
+	bh=d7ElXG12q67ts9hPo9D4cCi81eQhC4QyN/csAlxbkk8=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=DA99Nw5NNFKroq+bZq/9dQfffZBBhtg/uVfvxkzRW7lf99C2RBwV5guYj38Xu802JHhKeoEA8yuVXntpIxncze++yxtlyBBpoE8b4ud2U7ZbY8Ulfy6Q7KMLhYGfa16gaSUnZBsUGBZ+UsMEoKloH8u4Nwk1o+Mu7JuySpX4Cac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=kOYAPj8Z; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG2URvM4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE94C4CEDD;
-	Thu, 27 Mar 2025 13:31:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743082276;
-	bh=GHulqPHKw3iqVeCcCtvnxCaVG2mRKgrixEqdo1y6Vqw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FG2URvM4RGjGxLrlpC4w1CKL3hED6OjErz/e7ZLPt9CwAgzwgRACn0DHPndSUzBO9
-	 mpbVq6P7miWNE54yRHIZRal/rtzI5KdrcPskMY6ZYIEJW8aGzYIQdft/Re5uLcY/iH
-	 Xd4/uEkdtIOZeoVr8MxY5wV+4KtoC5/YyRsV5zc6q/4OtQpOeVZeLq0FjnbDRLkUaH
-	 LpWDYB1BcrwlUk8sBkaA3BSiXB1jIdAQL32DIowfbZWrzYVyXkme7wYXXTvZL3uiza
-	 AP0KLNNHMwctwoWGWG8hVV3uXImxcvHktIIaHt4pLJd7Uft+P1wojiinswwKj3sJe1
-	 tSvmzndKykmpQ==
-Date: Thu, 27 Mar 2025 15:31:12 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
-	peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
-	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	pmenzel@molgen.mpg.de
-Subject: Re: [PATCH v6 6/6] MAINTAINERS: Add tpm_loongson.c to LOONGSON
- CRYPTO DRIVER entry
-Message-ID: <Z-VTIFNZjCkX4eYC@kernel.org>
-References: <20250327021940.29969-1-zhaoqunqin@loongson.cn>
- <20250327021940.29969-2-zhaoqunqin@loongson.cn>
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="kOYAPj8Z"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-225477548e1so25295295ad.0
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2025 09:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1743092410; x=1743697210; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hQcfqS6ONRy4v+VAuw1r1bUFP3B6ufIgzXQvK3yZp0M=;
+        b=kOYAPj8ZAlZLOFNhrs9mchTgodx5+USr5guYG8Kx5M0JP8ixbwK1esti7rpswrGb06
+         rZ8bzKVq45I+F4VCYLj8Uyzv45ccDb4WFH942uFTDyknzHTy0czdcynotfuRLD2wg5js
+         9s1l+cPdq9QnkCuoEXgL6Mm+Oiy+oFZf5Yo4i+Q7RKiBePhd2E17Wv2UbwxAi5DtKxTB
+         JsVtgXqlomwNDp5h8fp8aMZdPPnYqZCWtkFo/vCEykJ/kRXGKYKXo+g3PrjhCX/nSS1t
+         FI5ZCmh2PQ14BKCflq1wX58jeyx9oUNg0aEAG1kI4tifINMvDnXCesxjzWtQG7O/35PI
+         ZZxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743092410; x=1743697210;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hQcfqS6ONRy4v+VAuw1r1bUFP3B6ufIgzXQvK3yZp0M=;
+        b=JG3O5dgMjcDkWxjCchhZw85o5QN9pyjAnBp3+Ut824PkhV+pjsAjBGnq5LcXROBkCc
+         Vs3qCm5U+5s3mt4NV8DoBfkcOvuPzdAnuHnCMSYAQPNo1D8A5uQuuwQCUCCTP0e8ne/G
+         jmn67O4CqyufrYQyimz7xwYSOEfBbzLPB5eZGy5h3TMHuvJXxMcH9CMe7CJgnS01w3jD
+         TBl1VbWX+SaZfJhVxaSSN6t1nyY1GRri506wmH91l1sGZ8XMSWSHKbnYKrUKWFcKO01P
+         BFBJ8aJbMeDSgklSesvLJGyYg5ZjBnq/Fo5K0KROu/nklymFe4hZ8Y2WhHJrxEG/Ijz7
+         4y6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWCv6jNVY1QRoHj3Kv9hSkXfUuWdIH1Rr2ZEpgh0sMnPnyd+DUtCgZd9Pj2yEdQzVdTvD6T/BuBP9l0PMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxthGvbv+Z77cU85z/qIFh7VfcD6GM+hXrKc6X0hnAmJqsKGKx0
+	ffRvz4jqpBw5PL6hl6/SW18A5dexZC7eC1XIH5QR6z/z07zS3kGnIyxF+QXpnTc=
+X-Gm-Gg: ASbGnct74R2RxC/nsY4Ti8esdyW6nbMiImrbZtM1VXmER2AUmxL8KjLGZnmVIqSxOuT
+	lrOmIM3vBV/v8jlvEHmaOpG98Ze3HbeT9o/RflGQyU+9aBQw80RSokp0K22gWfK7EXuB0G+4Be0
+	o+1nNVdvTv2aHxW++9y2w0MS/TjJzIi14fRJbdKr9gck6jnsvqNSd7DnP4w8+KH+x5EOjchsJ25
+	HTPhwj7MknwDxAZI2F9l+LloadEHOCrsjh8Vr3gnCFWuMncQD8HqQCtd8lyLi70LSVVSjt+a/aD
+	AaVQ1cN9IfqbcyJfU2C8oYktcV8lng5jiR33ww==
+X-Google-Smtp-Source: AGHT+IGhXmi8JOjZOP3Ikj3wo/1uBU9qt49Ql5SLHckRbeVG8HWYg9iWFYIxA94kzN1K7mL9F21TaQ==
+X-Received: by 2002:a17:903:22d2:b0:223:4816:3e9e with SMTP id d9443c01a7336-22804857854mr57168615ad.13.1743092410377;
+        Thu, 27 Mar 2025 09:20:10 -0700 (PDT)
+Received: from localhost ([50.145.13.30])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390618e4b6sm14534202b3a.180.2025.03.27.09.20.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 09:20:09 -0700 (PDT)
+Date: Thu, 27 Mar 2025 09:20:09 -0700 (PDT)
+X-Google-Original-Date: Thu, 27 Mar 2025 09:20:00 PDT (-0700)
+Subject:     Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT kernel-self with ILP32 ABI
+In-Reply-To: <svu4xdeo7a7ve3vorvgbkjxzrqmqk5oztgtfpbg556wjw4x7vc@yg4esoipmt7g>
+CC: david@redhat.com, peterz@infradead.org, guoren@kernel.org,
+  Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>,
+  Linus Torvalds <torvalds@linux-foundation.org>, Paul Walmsley <paul.walmsley@sifive.com>, anup@brainfault.org,
+  atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
+  Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, brauner@kernel.org,
+  akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com,
+  inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn,
+  wuwei2016@iscas.ac.cn, drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com,
+  wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, dsterba@suse.com,
+  mingo@redhat.com, boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
+  leobras@redhat.com, jszhang@kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+  samuel.holland@sifive.com, yongxuan.wang@sifive.com, luxu.kernel@bytedance.com, ruanjinjie@huawei.com,
+  cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn,
+  Ard Biesheuvel <ardb@kernel.org>, ast@kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+  kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+  linux-crypto@vger.kernel.org, bpf@vger.kernel.org, linux-input@vger.kernel.org,
+  linux-perf-users@vger.kernel.org, linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+  linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+  netdev@vger.kernel.org, linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+  netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+  linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: Liam.Howlett@oracle.com
+Message-ID: <mhng-e8248074-b79c-42f6-986f-9993851b6be2@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250327021940.29969-2-zhaoqunqin@loongson.cn>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 27, 2025 at 10:19:40AM +0800, Qunqin Zhao wrote:
-> Changes to Loongson TPM driver would be best reviewed by the Loongson
-> crypto driver maintainers.
-> 
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
-> v6: "tpm_lsse.c" -> "tpm_loongson"
-> v4-v5: None
-> 
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 814205642..16fcd35ff 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13606,6 +13606,7 @@ LOONGSON CRYPTO DRIVER
->  M:	Qunqin Zhao <zhaoqunqin@loongson.com>
->  L:	linux-crypto@vger.kernel.org
->  S:	Maintained
-> +F:	drivers/char/tpm/tpm_loongson.c
->  F:	drivers/crypto/loongson/
->  
->  LOONGSON-2 APB DMA DRIVER
-> -- 
-> 2.45.2
-> 
+On Tue, 25 Mar 2025 12:23:39 PDT (-0700), Liam.Howlett@oracle.com wrote:
+> * David Hildenbrand <david@redhat.com> [250325 14:52]:
+>> On 25.03.25 13:26, Peter Zijlstra wrote:
+>> > On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
+>> > > From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+>> > >
+>> > > Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+>> > > but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
+>> >
+>> > I'm thinking you're going to be finding a metric ton of assumptions
+>> > about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
+>> >
+>> > I know of a couple of places where 64BIT will result in different math
+>> > such that a 32bit 'unsigned long' will trivially overflow.
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Ya, I write code that assumes "unsigned long" is the size of a register 
+pretty regularly.
 
-BR, Jarkko
+>> >
+>> > Please, don't do this. This adds a significant maintenance burden on all
+>> > of us.
+>> >
+>>
+>> Fully agreed.
+>
+> I would go further and say I do not want this to go in.
+
+Seems reasonable to me, and I think it's also been the general sentiment 
+when this stuff comes up.  This specific implementation seems 
+particularly clunky, but I agree that it's going to be painful to do 
+this sort of thing.
+
+> The open ended maintenance burden is not worth extending hardware life
+> of a board with 16mb of ram (If I understand your 2023 LPC slides
+> correctly).
+
+We can already run full 32-bit kernels on 64-bit hardware.  The hardware 
+needs to support configurable XLEN, but there's systems out there that 
+do already.
+
+It's not like any of the existing RISC-V stuff ships in meaningful 
+volumes.  So I think it's fine to just say that vendors who want tiny 
+memories should build hardware that plays nice with those constraints, 
+and vendors who build hardware that doesn't make any sense get to pick 
+up the pieces.
+
+I get RISC-V is where people go to have crazy ideas, but there's got to 
+be a line somewhere...
+
+>
+> Thank you,
+> Liam
