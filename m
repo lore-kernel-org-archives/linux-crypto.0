@@ -1,144 +1,189 @@
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18C7286A9
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2025 09:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7023B4C96;
+	Thu, 27 Mar 2025 12:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743066614; cv=none; b=D3kej1XmaAxRLqX8wO9D7KcsX9OC5wmtPqKD1VtAIDf3j+UA3TMZcdqlUDNO6vUeG4XGObOIqcBSjJQoVvi4eBtOyUXiSm9s+BvQrff/QhdmZd/NCG1vOtoumzh0Y+Lgn/V51qmEiN5Rge0QRX/+TVfilLiaybQEAiS+UHyhnnc=
+	t=1743079651; cv=none; b=EvAQMG5VESu7WGFcANCMq8XWSQ2ypSObJdG/8OQivYqTeVgXP5HzTziTSfSvJvtE6aRRLtqKFSiOFasws7eHyo1ZD+k90BQ/Df+zYjHLVpZFQMsqWTGXY434u1C9jksHTrCR9jzi/jmZygMgejsKlUaO4Vb8kp6qhT7q6N/e1/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743066614; c=relaxed/simple;
-	bh=xDpITVy0In+Q2Lu8Y86IsZ9lDVbUxrToEYZgzqQXMbE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rFmQt2rOC07nl1k/SfBwrYJfBCDMDjztw+MlW/cjpsVC58OhwUYzyYLiYqOSO3r1hHGoAfrmKLB5C4pPzK2/OEJKNnvpRf8TsnBGvq/nEVyxcPMZ5oYXOcfAw6cXCPSRLPXf17oB7i1Ptc7ZHeZ7clNW/t/9xyalFOKvIgRB874=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=xgX1Wjg4; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1743079651; c=relaxed/simple;
+	bh=tWRtgxQFfYLGIe+M3bP4npfrIUeWm1/2DsIIszdvZ1Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=k4S+jnDoUCWuvrSHqjDtgq+sqlvtRW/6KtExIwqX7DNH2wgZF2T25JuLZL4BJ+S3D77oX9pgflFDjXTpJS+i0f0kmBsSbhIzTdwX6YMKnAKJo9jEBl2pLn0ItHPJmkKzK3eApkIEqFphg4iD84nXNJgt5aGXasmbTRs6aOxaKuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ry+3lJ4j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="xgX1Wjg4"
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52R99uKc1810127
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Mar 2025 04:09:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1743066596;
-	bh=SRUYY8+cRgz8SGioHerTsRFBMetF8iuq9h6W617b87Q=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=xgX1Wjg4oLLs9BLlrsV/A5d/QBe44iGbPTkJBjgp8k50kInqY/Rs95yXYfXksfcGR
-	 DgJYBtoJlYAVn64IQfADYZ+7PRwmP6l4/FS2Qodls2HZKiAkZmCRvK/LIdFChqL39O
-	 sdtAbI9PamrUebYVEYW3dV7bRB5WrLmwBh3W4opM=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52R99ufW051904
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 27 Mar 2025 04:09:56 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 27
- Mar 2025 04:09:56 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 27 Mar 2025 04:09:56 -0500
-Received: from localhost (uda0497581-hp.dhcp.ti.com [172.24.227.253])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52R99tuX029359;
-	Thu, 27 Mar 2025 04:09:55 -0500
-Date: Thu, 27 Mar 2025 14:39:55 +0530
-From: Manorit Chawdhry <m-chawdhry@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers
-	<ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Megha Dey
-	<megha.dey@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Kamlesh
- Gurudasani <kamlesh@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Udit
- Kumar <u-kumar1@ti.com>,
-        Pratham T <t-pratham@ti.com>
-Subject: Re: [PATCH] crypto: testmgr - Initialise full_sgl properly
-Message-ID: <20250327090955.6hgrpfe7cl2f5twm@uda0497581-HP>
-References: <20250326090035.izxxf3sboom7hvcv@uda0497581-HP>
- <Z-PGEtO8JmyC5xU_@gondor.apana.org.au>
- <20250326100027.trel4le7mpadtaft@uda0497581-HP>
- <Z-PRckWg9Yw1hOVj@gondor.apana.org.au>
- <20250326123120.wjsldcblqhs5e2ta@uda0497581-HP>
- <Z-P78_9NKGMBFs3s@gondor.apana.org.au>
- <20250327073427.amcyd4t6qvs7kw35@uda0497581-HP>
- <20250327081555.nhcggnqxetwbnidx@uda0497581-HP>
- <Z-ULBwaDsgWpYzmU@gondor.apana.org.au>
- <20250327084014.t5x5rfk3yzwiehgo@uda0497581-HP>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ry+3lJ4j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA731C4CEF5;
+	Thu, 27 Mar 2025 12:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743079650;
+	bh=tWRtgxQFfYLGIe+M3bP4npfrIUeWm1/2DsIIszdvZ1Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:From;
+	b=ry+3lJ4jOXxi94y5mI1NbXnalzo+G/pnZhSjrID66dTcLVpvSN5jxYLjoTFSpm8t2
+	 RVmKewcN7zdZNd9LKSrvUmI7Bitb6RSvE7xtBxsyaXOJotG+IzA+4cSiX8s5XJcd4a
+	 Gflk19wroRN6hPkMWa+MtGfvaJAZL2ppLItlCErXCvjy0HVn2BGenZE8FkLMdyZJYX
+	 btnwncSVrJy5++ND3g+6x3gmSehP4lsafQ7UigXG8+8I+Idsw/U+sgz5n2nwr8zWSp
+	 H++QkUGRCbXL4b+bUxPVKQyPP9wfeJA4D52pvQD5Qmb8PrgNvDFT5Gco7rpxg0Rv5D
+	 +Xv0BqRwjjbZg==
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3913d129c1aso661635f8f.0;
+        Thu, 27 Mar 2025 05:47:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU5hcNep0PjlWuCjj4NMUHFm818rHYcrYyQ+DkL6NGKfFUJ4v/BcyFUrkel3sqzxPC+7UF4Gw0g7dKhWw==@vger.kernel.org, AJvYcCUpRF0LMC3Q/GxxnFl/SikHq8Eg1luCylG1nbvLCJPcP1H53E4fn+LAE7K8vpNsMPpG/fJCB/D7+PaJPcWB@vger.kernel.org, AJvYcCVsX2WU+aFIb+EtrTeOVhAhki8Xl8hnQccFte3jiXy7c+SoP336Isp5FOeu28FBGIlB2ROIeI3963eLc8op175jdLwY@vger.kernel.org, AJvYcCVsk9ryKBUmTtDTK3JMNACZZtZh3qUdTXBK9AUM7MpPooozj33rGfhHocYseLf3Hdvnbmv5iThAw60eV2s=@vger.kernel.org, AJvYcCW47Pl062oNYCMWE8maqYFeRsEBRX/OxIBtYxI+7yUwLObmkUp5z0ZRT6ORYTgwSsjyqPGDyRK1@vger.kernel.org, AJvYcCWMFNhPKyVBg8HzwapRAVSxnRnVozy30gmOACtgCyfhUIQf8mrsaEm6Sr0iSgGBOwVXrSe4RcIX6ekyUeg=@vger.kernel.org, AJvYcCWfBcnAb8xTLS1kbS+egemf7Ox6oWbJw8R88CXPeQ0Glbkxo3FEAp9vMhTnXT5oEvMPFPp8IajlFhVU@vger.kernel.org, AJvYcCWiTPAJ35xrAthksX8h3zgALJzAxpvYYIzj4lBvCXKn6jSapgtIYpu8ec64/MPLpAN6Lk/O4smDXiCYNlWYHlZrng==@vger.kernel.org, AJvYcCXAaymzApg5BY0elxAd++hiveDmgW/TXCPDnh29ZmDTNqH2o51O7w2VXjIPXhfRsvNGxrY=@vger.kernel.org, AJvYcCXHDwYP6ZaCTiL9My6z7yC6suW8qxpYc6dfkuhtoE/tOzDutoWCp0ns7baqRFBrVHzAXoQZ0151LFwp1WvP@vger.kernel.org, AJvYcCXL7YZFQf+f7P0qMC6EyEWiFbU79B0NU19DRu6ijcezGqQaBzbRmZ5mucWTZSA6w/8E70sTbVqSWZUdpnw=@vger.kernel.org, AJvYcCXbhSiKRWI9uyLNQQIsOEaFgZ/HxBAa7FVwybOlYAZASlseozeXHHaatK5zgAC488cNoZTwVseTG0h4VovH@vger.kernel.org, AJvYcCXc6FX30ucCj0pToZvuhkKqueU0sQe1vh6WfGO6OeFMjQYGCKQ709smTtbZe+9HllwgggFsuYuz695hqA==@vger.kernel.org, AJvYcCXd8kfvoPg1KTWlkTs6C90VCMZcmZaq9dnCLd/cBTgsqBFc5W0Cbbsci/9CyNUK3B65G5+bbV3X0RKSJF8U4ACe@vger.kernel.org, AJvYcCXgDYubmSZhvljBWKbJvpmcObj9oe/3BqtnZEQzuGIRwSlPUW2zpRQConp7qmzVn5I3i6VYXSB9+8ITYsFDTA==@vger.kernel.org, AJvYcCXjVLv+hm+wtOOo17m+XfrZWp3wVaANCLv+x+sHaEYWHFOqWt6rWdfRrUC8LpXl+CWVf08r@vger.kernel.org, AJvYcCXmUOIyGgfZKIULNMQLTqLSv8rJGp/ez2BeSn9pjUHExJDst1Bcq5xifH/YedVQF4xWXsxckkx1bYzA@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJoiSfrI8TdhC5XKmUGK85XKg9Y46zYQOWy/j6Hv+i2J0vqjyE
+	eSR/rKOCuNSh8OsxjIXx1kSpDAAggC3xYT7ED8pCXthmRDFmY4F1Whz1DfDNzZMcDuRKcQa6C4W
+	p0wmuvj1AH6Wi7z+BkqbF/M8p9Ss=
+X-Google-Smtp-Source: AGHT+IHmUYVhD/X+fFCk9mo6iUY3GGy6zSlwPlvt9V5E3bXgq4+AzDcNpwzxGBSsif+BeffRslEST7FtUwPlgXmmxiQ=
+X-Received: by 2002:a5d:5f43:0:b0:391:65c:1b05 with SMTP id
+ ffacd0b85a97d-39c099cd2bbmr115764f8f.11.1743079648810; Thu, 27 Mar 2025
+ 05:47:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250327084014.t5x5rfk3yzwiehgo@uda0497581-HP>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250325121624.523258-1-guoren@kernel.org> <20250325121624.523258-32-guoren@kernel.org>
+ <4gph4xikdbg6loy2id72uyxgldsldecc7gquhymusl3vreiw3a@ephk5ahhrdw7>
+In-Reply-To: <4gph4xikdbg6loy2id72uyxgldsldecc7gquhymusl3vreiw3a@ephk5ahhrdw7>
+From: Guo Ren <guoren@kernel.org>
+Date: Thu, 27 Mar 2025 20:47:15 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTSR+jh04BT7rCjALL6eWek=VWm7nFTW57vzwshkTbrtVg@mail.gmail.com>
+X-Gm-Features: AQ5f1JoN57xvarY3Pp887PY64wPP4HS8fDT1YiKKfNiabWlzF5M2aRc4_YpAz7M
+Message-ID: <CAJF2gTSR+jh04BT7rCjALL6eWek=VWm7nFTW57vzwshkTbrtVg@mail.gmail.com>
+Subject: Re: [RFC PATCH V3 31/43] rv64ilp32_abi: maple_tree: Use BITS_PER_LONG
+ instead of CONFIG_64BIT
+To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, guoren@kernel.org, arnd@arndb.de, 
+	gregkh@linuxfoundation.org, torvalds@linux-foundation.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org, 
+	atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, 
+	will@kernel.org, mark.rutland@arm.com, brauner@kernel.org, 
+	akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com, 
+	unicorn_wang@outlook.com, inochiama@outlook.com, gaohan@iscas.ac.cn, 
+	shihua@iscas.ac.cn, jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn, drew@pdp7.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com, 
+	wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, 
+	dsterba@suse.com, mingo@redhat.com, peterz@infradead.org, 
+	boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, 
+	leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com, 
+	samuel.holland@sifive.com, yongxuan.wang@sifive.com, 
+	luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com, 
+	cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, 
+	ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Herbert,
+On Wed, Mar 26, 2025 at 3:10=E2=80=AFAM Liam R. Howlett <Liam.Howlett@oracl=
+e.com> wrote:
+>
+> * guoren@kernel.org <guoren@kernel.org> [250325 08:24]:
+> > From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+> >
+> > The Maple tree algorithm uses ulong type for each element. The
+> > number of slots is based on BITS_PER_LONG for RV64ILP32 ABI, so
+> > use BITS_PER_LONG instead of CONFIG_64BIT.
+> >
+> > Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
+> > ---
+> >  include/linux/maple_tree.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/include/linux/maple_tree.h b/include/linux/maple_tree.h
+> > index cbbcd18d4186..ff6265b6468b 100644
+> > --- a/include/linux/maple_tree.h
+> > +++ b/include/linux/maple_tree.h
+> > @@ -24,7 +24,7 @@
+> >   *
+> >   * Nodes in the tree point to their parent unless bit 0 is set.
+> >   */
+> > -#if defined(CONFIG_64BIT) || defined(BUILD_VDSO32_64)
+> > +#if (BITS_PER_LONG =3D=3D 64) || defined(BUILD_VDSO32_64)
+>
+> This will break my userspace testing, if you do not update the testing as
+> well.  This can be found in tools/testing/radix-tree.  Please also look
+> at the Makefile as well since it will generate a build flag for the
+> userspace.
+I think you are talking about the following:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+../shared/shared.mk:
+ifndef LONG_BIT
+LONG_BIT :=3D $(shell getconf LONG_BIT)
+endif
 
-On 14:10-20250327, Manorit Chawdhry wrote:
-> Hi Herbert,
-> 
-> On 16:23-20250327, Herbert Xu wrote:
-> > On Thu, Mar 27, 2025 at 01:45:55PM +0530, Manorit Chawdhry wrote:
-> > >
-> > > [   33.040345] sa_run: 1182: req->size: 40187, src: 00000000f1859ae0
-> > > [   33.046426] sa_run: 1183: sgl: 00000000f1859ae0, orig_nents: -22
-> > 
-> > Thanks for the info! The filler SG initialisation was broken:
-> > 
-> > ---8<---
-> > Initialise the whole full_sgl array rather than the first entry.
-> > 
-> > Fixes: 8b54e6a8f415 ("crypto: testmgr - Add multibuffer hash testing")
-> > Reported-by: Manorit Chawdhry <m-chawdhry@ti.com>
-> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > 
-> 
-> Thanks, this fixes it.
+generated/bit-length.h: FORCE
+        @mkdir -p generated
+        @if ! grep -qws CONFIG_$(LONG_BIT)BIT generated/bit-length.h; then =
+  \
+                echo "Generating $@";                                      =
+  \
+                echo "#define CONFIG_$(LONG_BIT)BIT 1" > $@;               =
+  \
+                echo "#define CONFIG_PHYS_ADDR_T_$(LONG_BIT)BIT 1" >> $@;  =
+  \
+        fi
 
-Though it really makes me wonder.. I was actually thinking that it was
-our driver problem and not something core as when I fell back to the
-software fallbacks everything was fine... How is it possible, do you
-have any insights on that? Is something missing?
+$ grep CONFIG_64BIT * -r -A 2
+generated/bit-length.h:#define CONFIG_64BIT 1
+generated/bit-length.h-#define CONFIG_PHYS_ADDR_T_64BIT 1
+--
+maple.c:#if defined(CONFIG_64BIT)
+maple.c-static noinline void __init check_erase2_testset(struct maple_tree =
+*mt,
+maple.c-                const unsigned long *set, unsigned long size)
+--
+maple.c:#if CONFIG_64BIT
+maple.c-        MT_BUG_ON(mt, data_end !=3D mas_data_end(&mas));
+maple.c-#endif
+--
+maple.c:#if CONFIG_64BIT
+maple.c-        MT_BUG_ON(mt, data_end - 2 !=3D mas_data_end(&mas));
+maple.c-#endif
+--
+maple.c:#if CONFIG_64BIT
+maple.c-        MT_BUG_ON(mt, data_end - 4 !=3D mas_data_end(&mas));
+maple.c-#endif
+--
+maple.c:#if defined(CONFIG_64BIT)
+maple.c-        /* Captures from VMs that found previous errors */
+maple.c-        mt_init_flags(&tree, 0);
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-[ Without this patch + the patch mentioned below ]
+First, we don't introduce rv64ilp32-abi user space, which means these
+testing codes can't run on rv64ilp32-abi userspace currently. So, the
+problem you mentioned doesn't exist.
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 35570c06eb3c..90d754bbea9b 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1417,9 +1417,9 @@ static int sa_sha_run(struct ahash_request *req)
-        if (!auth_len)
-                return zero_message_process(req);
+Second, CONFIG_32BIT is determined by LONG_BIT, so there's no issue in
+maple.c with future rv64ilp32-abi userspace.
+That means rv64ilp32-abi userspace would use CONFIG_32BIT to test
+radix-tree. It's okay.
 
--       if (auth_len > SA_MAX_DATA_SZ ||
-+       if (1 || (auth_len > SA_MAX_DATA_SZ ||
-            (auth_len >= SA_UNSAFE_DATA_SZ_MIN &&
--            auth_len <= SA_UNSAFE_DATA_SZ_MAX)) {
-+            auth_len <= SA_UNSAFE_DATA_SZ_MAX))) {
-                struct ahash_request *subreq = &rctx->fallback_req;
-                int ret;
+>
+> This raises other concerns as the code is found with a grep command, so
+> I'm not sure why it was missed and if anything else is missed?
+>
+> If you consider this email to be the (unasked) question about what to do
+> here, then please CC me, the maintainer of the files including the one
+> you are updating here.
+>
+> Thank you,
+> Liam
+>
 
 
-This passes the tests.
-
-root@j721e-evm:~# modprobe sa2ul
-[   53.380168] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
-
-Regards,
-Manorit
-
-> 
-> root@j721e-evm:~# modprobe sa2ul
-> [   35.293140] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
-> 
-> Tested-by: Manorit Chawdhry <m-chawdhry@ti.com>
-> 
-> Regards,
-> Manorit
+--=20
+Best Regards
+ Guo Ren
