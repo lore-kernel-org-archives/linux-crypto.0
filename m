@@ -1,48 +1,48 @@
 Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337FC1FF60B
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2025 07:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DC91957FC
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2025 08:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743060888; cv=none; b=Sf5C6acEIWHZHu6Hx2F7DEGAFniDIGAg0DCpSPrhi6qOKeSC0BvWLwYNhMWOUpI60ExJ0iHDNtHT0JnkjzqixhNnNz1ow1y7TNTt965N2b7GocOYmQqPs6CEX+TU8Ii8L2vUOjwjPFMJK4qrxoN89WxyLutG9pRoP6/BRDpPVX8=
+	t=1743063368; cv=none; b=o/ccI7QlfbZAnA7IONUFGLTLQZWNgCZ+tyrsAoEXtf9ATQvndAyMnDSOjdNHGFjPCeB3NG1KPFPCG4xMlLG/rt751T304pJsDDryGtDb3+qBTLBG6Mrw5aOihp2fwcwE4eGniwDx65OqBMPc0L2obqr+pJGvm/jKLtCUGMo2rF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743060888; c=relaxed/simple;
-	bh=grtuwomLnm/MzT12jjV5K5Kc8WfZdyDRdZs9DHMVb7s=;
+	s=arc-20240116; t=1743063368; c=relaxed/simple;
+	bh=VgC0/YLysb8HZ1h09PRRyYlQv3TXvVg+c9AXKcyGSKE=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CPPWRUph95AHA/N2BU1hJMxKXnNlXb7W195tafSqp27O14IsVPF3+/dNaLidr6iPEA67R6B89rK1loKGht21pD3tobUbQzNwHhXfV8L/1qik7CdzSOl9yljxCo9RLYO0O0tt63r7npDG/QSpegyCfEJUpw1fwSEWEny6iWz+GrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=szR+/Ur2; arc=none smtp.client-ip=198.47.23.234
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZB4LJUFVwUY33OUSnQLPrKP2oCqnnuWflzL1E314ogSibXp/3Ac6Pph49OGyG8I3kcSsOxXCKAEjyYdmAgIIvkSo11Cwu+v3FvjSM4EWOJgJzj5n20FHINZnUSj7tKOr1KlRD8j7bdTdykdA+3JmkhCu+s8C9ehcKH3yOKcL5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yEbYfGXK; arc=none smtp.client-ip=198.47.23.234
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="szR+/Ur2"
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52R7YTRv1787121
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yEbYfGXK"
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52R8FuDi1797468
 	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Mar 2025 02:34:29 -0500
+	Thu, 27 Mar 2025 03:15:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1743060869;
-	bh=9pE7B0aGpxxYqQApalXqmK7THOj0jxfA0KyrmIKkWHE=;
+	s=ti-com-17Q1; t=1743063357;
+	bh=yuazkzinHyqha3/to2se2VsUozde/3zJTVb1jmPueyA=;
 	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=szR+/Ur2cNcUIYtVC129aepYYRH6kuoiA/cfDp95UXub+rZhNaen2FVgcvgOQjMbX
-	 a64vAdCGT4/X3vpffERTurXCCovw3vNjVtLqY7vaa+o41WaPBSIlu+m4namI9csH1k
-	 Ust2steaG669izdAt8X009L9kVylNoOAOW3EOXDg=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52R7YTc8120437
+	b=yEbYfGXKf0gOkY0ZGhZv8TCk+DOsMAgnx+vGn5L8QwS1M29pSrOuJR84aUp6eEmMl
+	 x5lWT5XUlds/4vM698Fui/LjzsQuFjvGtKH+Fhc2Gef633Q+v5Jsslrjea8zMNzQIL
+	 uHSDHw5l3KWJyuTXraCfmu83vd3mxr6U/7yMUXc4=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52R8FuQt018068
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 27 Mar 2025 02:34:29 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+	Thu, 27 Mar 2025 03:15:56 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 27
- Mar 2025 02:34:29 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ Mar 2025 03:15:56 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 27 Mar 2025 02:34:29 -0500
+ Frontend Transport; Thu, 27 Mar 2025 03:15:56 -0500
 Received: from localhost (uda0497581-hp.dhcp.ti.com [172.24.227.253])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52R7YSbU029797;
-	Thu, 27 Mar 2025 02:34:28 -0500
-Date: Thu, 27 Mar 2025 13:04:27 +0530
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52R8Ftkq092407;
+	Thu, 27 Mar 2025 03:15:56 -0500
+Date: Thu, 27 Mar 2025 13:45:55 +0530
 From: Manorit Chawdhry <m-chawdhry@ti.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -57,7 +57,7 @@ CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
  Kumar <u-kumar1@ti.com>,
         Pratham T <t-pratham@ti.com>
 Subject: Re: [v2 PATCH] crypto: sa2ul - Use proper helpers to setup request
-Message-ID: <20250327073427.amcyd4t6qvs7kw35@uda0497581-HP>
+Message-ID: <20250327081555.nhcggnqxetwbnidx@uda0497581-HP>
 References: <cover.1739674648.git.herbert@gondor.apana.org.au>
  <2620cdada3777a66d3600cd1887cd34245d1e26a.1739674648.git.herbert@gondor.apana.org.au>
  <20250326090035.izxxf3sboom7hvcv@uda0497581-HP>
@@ -66,6 +66,7 @@ References: <cover.1739674648.git.herbert@gondor.apana.org.au>
  <Z-PRckWg9Yw1hOVj@gondor.apana.org.au>
  <20250326123120.wjsldcblqhs5e2ta@uda0497581-HP>
  <Z-P78_9NKGMBFs3s@gondor.apana.org.au>
+ <20250327073427.amcyd4t6qvs7kw35@uda0497581-HP>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,135 +75,121 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Z-P78_9NKGMBFs3s@gondor.apana.org.au>
+In-Reply-To: <20250327073427.amcyd4t6qvs7kw35@uda0497581-HP>
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
 Hi Herbert,
 
-On 21:06-20250326, Herbert Xu wrote:
-> On Wed, Mar 26, 2025 at 06:01:20PM +0530, Manorit Chawdhry wrote:
-> >
-> > Thanks for the fix! Although, it still fails probably due to the
-> > introduction of multibuffer hash testing in "crypto: testmgr - Add
-> > multibuffer hash testing" but that we will have to fix for our driver I
-> > assume.
-> > 
-> > [   32.408283] alg: ahash: sha1-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: inplace_two_sglists may_sleep use_digest multibuffer(9/13/uneven) src_divs=[100.0%@+860] key_offset=17"
-> > [...]
-> > [   32.885927] alg: ahash: sha512-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: use_digest multibuffer(6/9/uneven) nosimd src_divs=[93.34%@+3634, 6.66%@+16] iv_offset=9 key_offset=70"
-> > [...]
-> > [   33.135286] alg: ahash: sha256-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: inplace_two_sglists may_sleep use_digest multibuffer(15/16/uneven) src_divs=[100.0%@alignmask+26] key_offset=1"
+On 13:04-20250327, Manorit Chawdhry wrote:
+> Hi Herbert,
 > 
-> There are no other messages?
+> On 21:06-20250326, Herbert Xu wrote:
+> > On Wed, Mar 26, 2025 at 06:01:20PM +0530, Manorit Chawdhry wrote:
+> > >
+> > > Thanks for the fix! Although, it still fails probably due to the
+> > > introduction of multibuffer hash testing in "crypto: testmgr - Add
+> > > multibuffer hash testing" but that we will have to fix for our driver I
+> > > assume.
+> > > 
+> > > [   32.408283] alg: ahash: sha1-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: inplace_two_sglists may_sleep use_digest multibuffer(9/13/uneven) src_divs=[100.0%@+860] key_offset=17"
+> > > [...]
+> > > [   32.885927] alg: ahash: sha512-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: use_digest multibuffer(6/9/uneven) nosimd src_divs=[93.34%@+3634, 6.66%@+16] iv_offset=9 key_offset=70"
+> > > [...]
+> > > [   33.135286] alg: ahash: sha256-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: inplace_two_sglists may_sleep use_digest multibuffer(15/16/uneven) src_divs=[100.0%@alignmask+26] key_offset=1"
 
-This is the full failure log:
+[..]
+
+> > 
+> > This means that one of the filler test requests triggered an EINVAL
+> > from your driver.  A filler request in an uneven test can range from
+> > 0 to 2 * PAGE_SIZE bytes long.
+> > 
+> 
+> I tracked it down and see [0] returning -EINVAL. Do you have any
+> insights as to what changed that it's not working anymore...
+> 
+> [0]: https://github.com/torvalds/linux/blob/38fec10eb60d687e30c8c6b5420d86e8149f7557/drivers/crypto/sa2ul.c#L1177
+
+Added some more prints.
+
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 091612b066f1..0e7692ae60e5 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -1176,7 +1176,13 @@ static int sa_run(struct sa_req *req)
+                mapped_sg->sgt.orig_nents = sg_nents;
+                ret = dma_map_sgtable(ddev, &mapped_sg->sgt, dir_src, 0);
+                if (ret) {
++                       for (struct scatterlist *temp = src; temp; temp = sg_next(temp)) {
++                               pr_info("%s: %d: temp->length: %d, temp->offset: %d\n", __func__, __LINE__, temp->length, temp->offset);
++                       }
++                       pr_info("%s: %d: req->size: %d, src: %p\n", __func__, __LINE__, req->size, req->src);
++                       pr_info("%s: %d: sgl: %p, orig_nents: %d\n", __func__, __LINE__, mapped_sg->sgt.sgl, mapped_sg->sgt.orig_nents);
+                        kfree(rxd);
++                       pr_info("%s: %d: ret=%d\n", __func__, __LINE__, ret);
+                        return ret;
+                }
+
 
 root@j721e-evm:~# modprobe sa2ul
-[59910.170612] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
-root@j721e-evm:~# [59910.331792] alg: ahash: sha1-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: may_sleep use_digest multibuffer(0/10/uneven) src_divs=[53.50%@+816, 14.50%@+2101, 32.0%@+1281] key_offset=114"
-[59910.354517] alg: ahash: sha512-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: may_sleep use_digest multibuffer(0/6/uneven) src_divs=[3.96%@+26, 88.54%@+3968, 7.50%@+20] dst_divs=[100.0%@alignmask+2] key_offset=33"
-[59910.454646] alg: ahash: sha256-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: use_digest multibuffer(4/14/uneven) nosimd src_divs=[50.0%@+29, 25.0%@+28, 25.0%@+4] key_offset=65"
-[59910.494415] alg: self-tests for sha1 using sha1-sa2ul failed (rc=-22)
-[59910.494424] ------------[ cut here ]------------
-[59910.505522] alg: self-tests for sha1 using sha1-sa2ul failed (rc=-22)
-[59910.512463] alg: self-tests for sha512 using sha512-sa2ul failed (rc=-22)
-[59910.548673] ------------[ cut here ]------------
-[59910.560115] alg: self-tests for sha512 using sha512-sa2ul failed (rc=-22)
-[59910.577041] WARNING: CPU: 0 PID: 1959 at crypto/testmgr.c:5997 alg_test+0x5d0/0x658
-[59910.591470] Modules linked in: sa2ul authenc des_generic libdes cbc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 tps6594_pfsm tps6594_esm pinctrl_tps6594 tps6594_regulator gpio_regmap ti_am335x_adc kfifo_buf pru_rproc irq_pruss_intc cdns3 cdns_usb_common cdns_pltfrm snd_soc_j721e_evm display_connector phy_j721e_wiz phy_can_transceiver omap_mailbox ti_k3_r5_remoteproc at24 tps6594_i2c tps6594_core tidss drm_client_lib k3_j72xx_bandgap drm_dma_helper cdns_mhdp8546 m_can_platform drm_display_helper m_can ti_am335x_tscadc pruss drm_kms_helper snd_soc_pcm3168a_i2c snd_soc_davinci_mcasp can_dev snd_soc_pcm3168a snd_soc_ti_udma snd_soc_ti_edma ti_j721e_ufs ti_k3_dsp_remoteproc cdns3_ti snd_soc_ti_sdma rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6 [last unloaded: authenc]
-[59910.663794] CPU: 0 UID: 0 PID: 1959 Comm: cryptomgr_test Tainted: G        W          6.14.0-rc1-build-configs-00186-g8b54e6a8f415-dirty #1
-[59910.676286] Tainted: [W]=WARN
-[59910.679241] Hardware name: Texas Instruments J721e EVM (DT)
-[59910.684797] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[59910.691740] pc : alg_test+0x5d0/0x658
-[59910.695392] lr : alg_test+0x5d0/0x658
-[59910.699042] sp : ffff80008515bd40
-[59910.702343] x29: ffff80008515bde0 x28: 0000000000000000 x27: 0000000000000000
-[59910.709464] x26: 00000000ffffffea x25: 00000000ffffffff x24: 000000000000017b
-[59910.716585] x23: ffff80008384be88 x22: 000000000000118f x21: ffff0008032c5a80
-[59910.723705] x20: ffff0008032c5a00 x19: ffff8000814bf320 x18: 0000000002004c00
-[59910.730825] x17: 0000000002004400 x16: 00000000000000ee x15: cb299d3b567fbd0e
-[59910.737945] x14: 6cc9dff4249846de x13: 0000000000000000 x12: 0000000000020005
-[59910.745066] x11: 000000e200000016 x10: 0000000000000af0 x9 : ffff8000800f8ba0
-[59910.752186] x8 : ffff000809b10b50 x7 : 00000000005285f6 x6 : 000000000000001e
-[59910.759305] x5 : 0000000000000000 x4 : 0000000000000002 x3 : 0000000000000208
-[59910.766425] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000809b10000
-[59910.773545] Call trace:
-[59910.775981]  alg_test+0x5d0/0x658 (P)
-[59910.779634]  cryptomgr_test+0x2c/0x50
-[59910.783286]  kthread+0x134/0x218
-[59910.786504]  ret_from_fork+0x10/0x20
-[59910.790070] ---[ end trace 0000000000000000 ]---
-[59910.799050] alg: self-tests for sha256 using sha256-sa2ul failed (rc=-22)
-[59910.799057] ------------[ cut here ]------------
-[59910.810440] alg: self-tests for sha256 using sha256-sa2ul failed (rc=-22)
-[59910.810468] WARNING: CPU: 0 PID: 1962 at crypto/testmgr.c:5997 alg_test+0x5d0/0x658
-[59910.824882] Modules linked in: sa2ul authenc des_generic libdes cbc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 tps6594_pfsm tps6594_esm pinctrl_tps6594 tps6594_regulator gpio_regmap ti_am335x_adc kfifo_buf pru_rproc irq_pruss_intc cdns3 cdns_usb_common cdns_pltfrm snd_soc_j721e_evm display_connector phy_j721e_wiz phy_can_transceiver omap_mailbox ti_k3_r5_remoteproc at24 tps6594_i2c tps6594_core tidss drm_client_lib k3_j72xx_bandgap drm_dma_helper cdns_mhdp8546 m_can_platform drm_display_helper m_can ti_am335x_tscadc pruss drm_kms_helper snd_soc_pcm3168a_i2c snd_soc_davinci_mcasp can_dev snd_soc_pcm3168a snd_soc_ti_udma snd_soc_ti_edma ti_j721e_ufs ti_k3_dsp_remoteproc cdns3_ti snd_soc_ti_sdma rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6 [last unloaded: authenc]
-[59910.897196] CPU: 0 UID: 0 PID: 1962 Comm: cryptomgr_test Tainted: G        W          6.14.0-rc1-build-configs-00186-g8b54e6a8f415-dirty #1
-[59910.909688] Tainted: [W]=WARN
-[59910.912642] Hardware name: Texas Instruments J721e EVM (DT)
-[59910.918198] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[59910.925141] pc : alg_test+0x5d0/0x658
-[59910.928792] lr : alg_test+0x5d0/0x658
-[59910.932443] sp : ffff800085313d40
-[59910.935744] x29: ffff800085313de0 x28: 0000000000000000 x27: 0000000000000000
-[59910.942865] x26: 00000000ffffffea x25: 00000000ffffffff x24: 000000000000018d
-[59910.949986] x23: ffff80008384be88 x22: 000000000000118f x21: ffff000808b03e80
-[59910.957106] x20: ffff000808b03e00 x19: ffff8000814bf320 x18: 00000000fffffffe
-[59910.964226] x17: ffff8007fd27e000 x16: ffff800080000000 x15: ffff8000852bb8e0
-[59910.971346] x14: 0000000000000000 x13: ffff800083814452 x12: 0000000000000000
-[59910.978465] x11: ffff00087f7a4d80 x10: 0000000000000af0 x9 : ffff8000800f8ba0
-[59910.985586] x8 : ffff0008052e8b50 x7 : 0000000000019aff x6 : 000000000000000d
-[59910.992705] x5 : 0000000000000000 x4 : 0000000000000002 x3 : 0000000000000208
-[59910.999825] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0008052e8000
-[59911.006946] Call trace:
-[59911.009382]  alg_test+0x5d0/0x658 (P)
-[59911.013034]  cryptomgr_test+0x2c/0x50
-[59911.016685]  kthread+0x134/0x218
-[59911.019905]  ret_from_fork+0x10/0x20
-[59911.023469] ---[ end trace 0000000000000000 ]---
-[59911.028107] WARNING: CPU: 0 PID: 1961 at crypto/testmgr.c:5997 alg_test+0x5d0/0x658
-[59911.035749] Modules linked in: sa2ul authenc des_generic libdes cbc onboard_usb_dev rpmsg_ctrl rpmsg_char phy_cadence_torrent phy_cadence_sierra rtc_tps6594 tps6594_pfsm tps6594_esm pinctrl_tps6594 tps6594_regulator gpio_regmap ti_am335x_adc kfifo_buf pru_rproc irq_pruss_intc cdns3 cdns_usb_common cdns_pltfrm snd_soc_j721e_evm display_connector phy_j721e_wiz phy_can_transceiver omap_mailbox ti_k3_r5_remoteproc at24 tps6594_i2c tps6594_core tidss drm_client_lib k3_j72xx_bandgap drm_dma_helper cdns_mhdp8546 m_can_platform drm_display_helper m_can ti_am335x_tscadc pruss drm_kms_helper snd_soc_pcm3168a_i2c snd_soc_davinci_mcasp can_dev snd_soc_pcm3168a snd_soc_ti_udma snd_soc_ti_edma ti_j721e_ufs ti_k3_dsp_remoteproc cdns3_ti snd_soc_ti_sdma rti_wdt overlay cfg80211 rfkill fuse drm backlight ipv6 [last unloaded: authenc]
-[59911.108050] CPU: 0 UID: 0 PID: 1961 Comm: cryptomgr_test Tainted: G        W          6.14.0-rc1-build-configs-00186-g8b54e6a8f415-dirty #1
-[59911.120541] Tainted: [W]=WARN
-[59911.123495] Hardware name: Texas Instruments J721e EVM (DT)
-[59911.129049] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[59911.135992] pc : alg_test+0x5d0/0x658
-[59911.139643] lr : alg_test+0x5d0/0x658
-[59911.143293] sp : ffff8000852bbd40
-[59911.146594] x29: ffff8000852bbde0 x28: 0000000000000000 x27: 0000000000000000
-[59911.153714] x26: 00000000ffffffea x25: 00000000ffffffff x24: 000000000000017f
-[59911.160835] x23: ffff80008384be88 x22: 000000000000118f x21: ffff000803f5aa80
-[59911.167954] x20: ffff000803f5aa00 x19: ffff8000814bf320 x18: 00000000fffffffe
-[59911.175074] x17: ffff8007fd27e000 x16: ffff800080000000 x15: 0000000000000000
-[59911.182194] x14: 00003d0971c5fa00 x13: ffffffff919fcffd x12: 0000000000000000
-[59911.189313] x11: ffff00087f7a4d80 x10: 0000000000000af0 x9 : ffff8000800f8ba0
-[59911.196433] x8 : ffff000809a37450 x7 : 0000000000026a7c x6 : 000000000000000f
-[59911.203553] x5 : 0000000000000000 x4 : 0000000000000002 x3 : 0000000000000208
-[59911.210672] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000809a36900
-[59911.217793] Call trace:
-[59911.220227]  alg_test+0x5d0/0x658 (P)
-[59911.223879]  cryptomgr_test+0x2c/0x50
-[59911.227529]  kthread+0x134/0x218
-[59911.230746]  ret_from_fork+0x10/0x20
-[59911.234310] ---[ end trace 0000000000000000 ]---
-
-> 
-> This means that one of the filler test requests triggered an EINVAL
-> from your driver.  A filler request in an uneven test can range from
-> 0 to 2 * PAGE_SIZE bytes long.
-> 
-
-I tracked it down and see [0] returning -EINVAL. Do you have any
-insights as to what changed that it's not working anymore...
-
-[0]: https://github.com/torvalds/linux/blob/38fec10eb60d687e30c8c6b5420d86e8149f7557/drivers/crypto/sa2ul.c#L1177
+[   32.890801] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
+root@j721e-evm:~# [   32.981093] sa_run: 1180: temp->length: 8192, temp->offset: 0
+[   32.996268] sa_run: 1180: temp->length: 8192, temp->offset: 0
+[   33.002029] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.007512] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.012986] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.018458] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.023930] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.029402] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.034874] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.040345] sa_run: 1182: req->size: 40187, src: 00000000f1859ae0
+[   33.046426] sa_run: 1183: sgl: 00000000f1859ae0, orig_nents: -22
+[   33.052419] sa_run: 1185: ret=-22
+[   33.055852] sa_run: 1180: temp->length: 8192, temp->offset: 0
+[   33.061589] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.067061] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.072532] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.078004] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.083475] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.088947] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.094419] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.099890] sa_run: 1182: req->size: 32768, src: 00000000f1859ae0
+[   33.105969] sa_run: 1183: sgl: 00000000f1859ae0, orig_nents: -22
+[   33.111962] sa_run: 1185: ret=-22
+[   33.115268] sa_run: 1180: temp->length: 8192, temp->offset: 0
+[   33.121001] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.126472] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.131944] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.137416] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.142888] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.148360] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.153832] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.159304] sa_run: 1182: req->size: 34117, src: 00000000f1859ae0
+[   33.165382] sa_run: 1183: sgl: 00000000f1859ae0, orig_nents: -22
+[   33.171375] sa_run: 1185: ret=-22
+[   33.174725] sa_run: 1180: temp->length: 8192, temp->offset: 0
+[   33.180459] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.185936] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.191408] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.196879] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.202351] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.207822] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.213294] sa_run: 1180: temp->length: 0, temp->offset: 0
+[   33.218765] sa_run: 1182: req->size: 31875, src: 00000000f1859ae0
+[   33.224845] sa_run: 1183: sgl: 00000000f1859ae0, orig_nents: -22
+[   33.230838] sa_run: 1185: ret=-22
+[   33.234204] alg: ahash: sha1-sa2ul digest() failed on test vector 0; expected_error=0, actual_error=-22, cfg="random: may_sleep use_digest multibuffer(8/14/uneven) src_divs=[100.0%@alignmask+3110] dst_divs=[100.0%@+2132] key_offset=63"
+[
 
 Regards,
 Manorit
 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
+> Regards,
+> Manorit
+> 
+> > Cheers,
+> > -- 
+> > Email: Herbert Xu <herbert@gondor.apana.org.au>
+> > Home Page: http://gondor.apana.org.au/~herbert/
+> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
