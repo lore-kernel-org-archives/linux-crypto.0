@@ -1,165 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A142156230
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 10:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12A41E833C
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 10:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743158019; cv=none; b=LkuJCDwV5TXgXGalJRWos/GiOnkHvtTjEoC3liIZEHd/JdJBsCIj0/y8uWqPswyobr1maKsSqVseFoNNMrVzJ8nGYyjkouF9w24x0TGyge8ie3SxYMMzwV9lW9ezZj2cL/3THFns/b8g2H29dImz/0JmKHqYrRwb1ZdJG0K0mh4=
+	t=1743159385; cv=none; b=oiYssg9nufnKt2/o7YrSehjhJ3NPK13O/wfWlh+12L87Rdkyh8SCXhvaGVoVx4T6ezFErC8YP4/JNJi/J+KEKpi9GR/c0/CthTy74Q85Gvhzy+F+gaaAQTzDruB8VEfDUzPZU7JUb4YsXFvb1vJLr0yPWdTh/s2TY/2Wx+QLUwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743158019; c=relaxed/simple;
-	bh=8POpZWBDsFjprsc5DYQcIQcgtLY10EsL6TnyPCwzLPI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dUi+0SGG5L2TPK2PX7rFVBCSRnoVYavuDcbKQjmB6WXxrGBOet1ZxQd3wwc2UjK6iH4B70oLJCqYaGuslVEvfQI4yMNTUE1zikfTbMdyCEnaTBa6Yoz9Mec1jXlVdtgZtsf90alnyAloZm0z5qBS0VPi8/soLyNUaKU2iTy727Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lATo+wSm; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1743159385; c=relaxed/simple;
+	bh=uMI0AbkJYWx6k9EPEVYiA3DOrPTbKHoMPRjf3QRXAbk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bzpPwNrVsCf3RaSHHiiY3JBcfyUXLvCC2JeZAubMk+NG0C/NO/0YDuLRjpsXufqliH/Sg86S4SvPKebm8Jll+FF/OB728AHBvCPIkvHJSUkbwYx82t24yih253el6qRPxtVCB7oQZOGkjvIcBHnQMLyR12J285YGh7mznDKSDss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Vu2eBr39; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lATo+wSm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743158018; x=1774694018;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8POpZWBDsFjprsc5DYQcIQcgtLY10EsL6TnyPCwzLPI=;
-  b=lATo+wSmRKfBGuj+ITfLllTgAJSa7tUAUDqnLbOtAnSvj7RcIR3A32Cg
-   tiCEU2cOA7dxPhHHN3y86KH4dT8W81+MH+cNUyB0YUp0BEVcdS34WVYEV
-   6qoeQ2mg9iZObWEcwRPSz8mBiyonOY0sExHQntMy55bjYHbALtHn52Zja
-   vaEg9ndoCR6ouaMZDQYArNeMOtfHS2Bvx7SVc+RPQm+3VJbCLmw0fd202
-   Xi/BHCstPwUYehZSTH73NGhN/Khjdi509ZAIxDrrM/3wSlhgQW5orpX32
-   S53iFFOPVp0rbMIlVvUU7g9IByUipZC75fDyETfxmUpUDOmNl66wa7GGY
-   Q==;
-X-CSE-ConnectionGUID: uqlSWDmRRGOWQLa97fdE4A==
-X-CSE-MsgGUID: SABkJ7ixSx+LcVJZzGSwMg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="66988219"
-X-IronPort-AV: E=Sophos;i="6.14,283,1736841600"; 
-   d="scan'208";a="66988219"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2025 03:33:38 -0700
-X-CSE-ConnectionGUID: 0a5pUoFuQj+wlkZ8WTs9GQ==
-X-CSE-MsgGUID: oU+3kVwURIikZ3rZgA1Leg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,283,1736841600"; 
-   d="scan'208";a="129556022"
-Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by fmviesa003.fm.intel.com with ESMTP; 28 Mar 2025 03:33:35 -0700
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - remove BITS_IN_DWORD()
-Date: Fri, 28 Mar 2025 10:33:02 +0000
-Message-Id: <20250328103302.571774-1-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Vu2eBr39"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54298ec925bso3033265e87.3
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 03:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1743159382; x=1743764182; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=olAaZIH94fzyjQz1l87PqHBxlGfOGj7K9uZAhtIX1OA=;
+        b=Vu2eBr39qL9BMshmdiNmmS/mwhGUz/y7RmgcPl7Uzi32jX/9oJxhZOthKpzByy41r9
+         Vi6/B2U1MGHnk2SiD0QCFaQJwgdTjEBss8XKtS5S1DF0pRTZ7tbRruFM6d78pxjS0zBu
+         UnWBPgFv8GGDfuLgDO/gAQN6RJOyOo/NsyeVXeBv2SLruvSynYBohnCCac35XchCfmTA
+         aL/LFH/7FvrxfgI8Dazws0iYu8ZzOazp2qIor0DuzldVMeGaD66DM8ZOAzyXGDCH3HKL
+         Ptfh463M6V2ipLKO9g4d9tOI6B0Oz9K12iZZWaHCp82t7Mrr4GNN8Ih0G3vB0cp40bS7
+         ckMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743159382; x=1743764182;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=olAaZIH94fzyjQz1l87PqHBxlGfOGj7K9uZAhtIX1OA=;
+        b=n9BTumNqkoonrLh8XIFpV5nO1XUgKdxc6T/tdNBJDFQ9DzUjFtz9f0eE6/iqKHvpi2
+         Hb8HE/6R9mdlqmtk4UZY7eV9JIvVc72DPe+Ba4h80pPyOYoy+RMt6NtOfMHwKJBVr9L3
+         kbAnLjXoB4pCM9CoA/7i14WcsKhfhIqJMdAQv6Sgb4S2SDeP54k2r2RjrH+X9D/Y4lcb
+         N9Qa+ocKzE17ZMsGwtcT3uoJgunKHvQhykaDVPGJBbvOKRbu8ltNChcva+HZMYKrhTEJ
+         Z9rzXmtSKnMb71u96qhrdiE+/UBEnhsGPMoDJlL/3QpxNrtttQhFMzLR9/JExW+ybppc
+         tLeA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6BIJKpGgflaQwCDklQP99wc6nkIOyXglqG30pWHDq6GVMrqAJPxzIntfpvMK80xQaRtdFCt1WzJaoS+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzszXT+n6XizGTmqgEtgus4Jujd3R4cOyJ2caOklacYFHfZ2suH
+	uJHRCHkp7RtWAglSAglIgl+0DBXAZ0FK8f27kGZ+CflmxeJnJuGX6WJe6GFAWpFM70lzCa8yj6D
+	9X8AX1FsndcxtfGyM55ObXI/qphGniQwMaVAE9A==
+X-Gm-Gg: ASbGnctPZou1p6NfkYJQVnzRllvXasP4VB0RhHCZ5evBPJtobOEnbeowLUmK/aw/u/3
+	nuCykE+jOnvtclCWcZTAkkiJqcoYMNO+hoJ/gWOMaZA0mYC8e7FtQSWeAnMfb609nZ1SMC0m9Hs
+	LXdsgFM5wB3R1FilV0n56caGfUDdaxnl9Rpi2EzirK/n4+vNert+PyATisTg==
+X-Google-Smtp-Source: AGHT+IG6qEMn4qg6ENDbUAQbjwJMxqKnwp8APlPJPAz0/cgb1CSsy8tzKsGCpNTUBhVUaoe/8Dw3udJ1/fjM116S5qg=
+X-Received: by 2002:a05:6512:ba8:b0:545:f1d:6f2c with SMTP id
+ 2adb3069b0e04-54b011d5675mr2814281e87.18.1743159381664; Fri, 28 Mar 2025
+ 03:56:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAMRc=MdO=vPrvvonJPJ=1Lp0vFTRBtsEBUS5aqWp4yMqUtgfzw@mail.gmail.com>
+ <20250326165907.GC1243@sol.localdomain>
+In-Reply-To: <20250326165907.GC1243@sol.localdomain>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 28 Mar 2025 11:56:09 +0100
+X-Gm-Features: AQ5f1JrrVuMT4qoT68KP0RJ1gGvhtPtOME7bP16opGo20S2NgsR2FHybwv0v3Bw
+Message-ID: <CAMRc=Mfse2N-X9CNnpct211nfDNu4FewQ9qqnNQeqK=eQXoZGw@mail.gmail.com>
+Subject: Re: Extending the kernel crypto uAPI to support decryption into
+ secure buffers
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Kees Cook <kees@kernel.org>, 
+	Jens Wiklander <jens.wiklander@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, 
+	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, Daniel Perez-Zoghbi <dperezzo@quicinc.com>, 
+	Gaurav Kashyap <gaurkash@qti.qualcomm.com>, Udit Tiwari <utiwari@qti.qualcomm.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Amirreza Zarrabi <quic_azarrabi@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The BITS_IN_DWORD() macro, which represents the number of bits in the
-registers accessed by the firmware loader, is currently defined as 32.
+On Wed, Mar 26, 2025 at 5:59=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> On Tue, Mar 25, 2025 at 09:23:09PM +0100, Bartosz Golaszewski wrote:
+> >
+> > There are many out-of-tree implementations of DRM stacks (Widevine or
+> > otherwise) by several vendors out there but so far there's none using
+> > mainline kernel exclusively.
+> >
+> > Now that Jens' work[1] on restricted DMA buffers is pretty far along
+> > as is the QTEE implementation from Amirreza, most pieces seem to be
+> > close to falling into place and I'd like to tackl
+> > e the task of implementing Widevine for Qualcomm platforms on linux.
+> >
+> > I know that talk is cheap but before I show any actual code, I'd like
+> > to first discuss the potential extensions to the kernel crypto uAPI
+> > that this work would require.
+> >
+>
+> What would you get out of building this on top of AF_ALG, vs. building a =
+new
+> UAPI from scratch?  There seem to be an awful lot of differences between =
+what
+> this needs and what AF_ALG does.
+>
 
-For consistency and readability, replace this macro with the existing
-BITS_PER_TYPE() macro, which serves the same purpose.
+I don't have much against building it from scratch. If anything, I
+would love me a green-field kernel development instead of tweaking
+existing code, it would probably make the work much more enjoyable.
 
-This does not introduce any functional change.
+But if I'm being honest, it's hard to tell whether there are more
+differences than similarities. A big part of the existing crypto code
+- especially the driver boiler-plate - could potentially be reused as
+could the existing netlink infrastructure for setsockopt() and
+write().
 
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- .../crypto/intel/qat/qat_common/qat_uclo.c    | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+That being said: if I were to design a new interface for this, I would
+probably not go with netlink and instead provide a regular character
+device (let's say: /dev/secure_crypto) with a set of ioctls() for key,
+cipher and general management and support for write() for data
+decryption. IMO socket() interface is so much more clunky than
+chardev.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-index 7678a93c6853..87e247ac1c9a 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- /* Copyright(c) 2014 - 2020 Intel Corporation */
- #include <linux/align.h>
-+#include <linux/bitops.h>
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/kernel.h>
-@@ -1205,7 +1206,6 @@ static int qat_uclo_map_suof(struct icp_qat_fw_loader_handle *handle,
- }
- 
- #define ADD_ADDR(high, low)  ((((u64)high) << 32) + low)
--#define BITS_IN_DWORD 32
- 
- static int qat_uclo_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 			    struct icp_qat_fw_auth_desc *desc)
-@@ -1223,7 +1223,7 @@ static int qat_uclo_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 	fcu_dram_hi_csr = handle->chip_info->fcu_dram_addr_hi;
- 	fcu_dram_lo_csr = handle->chip_info->fcu_dram_addr_lo;
- 
--	SET_CAP_CSR(handle, fcu_dram_hi_csr, (bus_addr >> BITS_IN_DWORD));
-+	SET_CAP_CSR(handle, fcu_dram_hi_csr, bus_addr >> BITS_PER_TYPE(u32));
- 	SET_CAP_CSR(handle, fcu_dram_lo_csr, bus_addr);
- 	SET_CAP_CSR(handle, fcu_ctl_csr, FCU_CTRL_CMD_AUTH);
- 
-@@ -1438,7 +1438,7 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 	virt_base = (uintptr_t)img_desc.dram_base_addr_v + simg_offset;
- 	bus_addr  = img_desc.dram_bus_addr + simg_offset;
- 	auth_desc = img_desc.dram_base_addr_v;
--	auth_desc->css_hdr_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->css_hdr_high = (unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 	auth_desc->css_hdr_low = (unsigned int)bus_addr;
- 	virt_addr = virt_base;
- 
-@@ -1448,7 +1448,7 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 			   sizeof(*css_hdr);
- 	virt_addr = virt_addr + sizeof(*css_hdr);
- 
--	auth_desc->fwsk_pub_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->fwsk_pub_high = (unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 	auth_desc->fwsk_pub_low = (unsigned int)bus_addr;
- 
- 	memcpy((void *)(uintptr_t)virt_addr,
-@@ -1470,7 +1470,7 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 			    auth_desc->fwsk_pub_low) +
- 		   ICP_QAT_CSS_FWSK_PUB_LEN(handle);
- 	virt_addr = virt_addr + ICP_QAT_CSS_FWSK_PUB_LEN(handle);
--	auth_desc->signature_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->signature_high = (unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 	auth_desc->signature_low = (unsigned int)bus_addr;
- 
- 	memcpy((void *)(uintptr_t)virt_addr,
-@@ -1484,7 +1484,7 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 		   ICP_QAT_CSS_SIGNATURE_LEN(handle);
- 	virt_addr += ICP_QAT_CSS_SIGNATURE_LEN(handle);
- 
--	auth_desc->img_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->img_high = (unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 	auth_desc->img_low = (unsigned int)bus_addr;
- 	auth_desc->img_len = size - ICP_QAT_AE_IMG_OFFSET(handle);
- 	if (bus_addr + auth_desc->img_len > img_desc.dram_bus_addr +
-@@ -1507,12 +1507,12 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 				    auth_desc->img_ae_mode_data_low) +
- 			   sizeof(struct icp_qat_simg_ae_mode);
- 
--		auth_desc->img_ae_init_data_high = (unsigned int)
--						 (bus_addr >> BITS_IN_DWORD);
-+		auth_desc->img_ae_init_data_high =
-+			(unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 		auth_desc->img_ae_init_data_low = (unsigned int)bus_addr;
- 		bus_addr += ICP_QAT_SIMG_AE_INIT_SEQ_LEN;
--		auth_desc->img_ae_insts_high = (unsigned int)
--					     (bus_addr >> BITS_IN_DWORD);
-+		auth_desc->img_ae_insts_high =
-+			(unsigned int)(bus_addr >> BITS_PER_TYPE(u32));
- 		auth_desc->img_ae_insts_low = (unsigned int)bus_addr;
- 		virt_addr += sizeof(struct icp_qat_css_hdr);
- 		virt_addr += ICP_QAT_CSS_FWSK_PUB_LEN(handle);
-
-base-commit: ee4196b649445942c9a05b388ee9f02f73feeb86
--- 
-2.40.1
-
+Bartosz
