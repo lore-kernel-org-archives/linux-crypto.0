@@ -1,65 +1,65 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB28211A05
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 07:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608BC211A2B
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 07:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743147854; cv=none; b=ZsZ2B2vIuxIYKcdH//aPv7hHS+IMMqb0D5MzOYN1FuY5jSA5vuz0hVxtYTDiSkCzH/QGKk1e+0J54MllyjaDwE1kjJVk6OijEGnwHnyb9IbcfDLWhbj++PXxMJwQS1EqtV2ALLMtJxsT3v48rOPjLUa5ngLSvjq2hWHRarAvHSM=
+	t=1743147855; cv=none; b=JVUw4SXs7yOmQSS+WLsp/YoDQ0NcbYIYC2UH7at9qWOu6lPtCb7cqBfEBGzFEUPDbWR/Ooty8t7qTFsjvuog2tcKD/RPvyb0VK2z3dY7+lhkIqS/oLiVzteH/RLqpqUHUk+wAjBOFbvuLK9ZHnnI49a2K0o0kOdQF+V8A1Si8mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743147854; c=relaxed/simple;
-	bh=p+SiVxlSEGnOTHSwRGX7HFpd0rYneKTYoUHd4aSRoZk=;
+	s=arc-20240116; t=1743147855; c=relaxed/simple;
+	bh=Q7IIwB5olksBdU4VpclQbY+F88U3b856uYZBkOJVhIE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dAw2KNeOmvAtMRUTS4Cz6eHPqQRl4kxx3jNghvA5aQKPl1q2GQxek0mXYeWvgE2GCeT5av52BeISpiWy3Q5C5Q7xnHl26h3XYtk0uJfgumjMozw95FFuGitjllzqKycACMx39L3k4sUdPG0Y6QICsp+tX8txUEtThcdqbXkEMos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nYI5wPAo; arc=none smtp.client-ip=209.85.167.44
+	 In-Reply-To:To:Cc; b=AaLPEIaqhsKL98RpD+BrzPcGbAnRFy1aflEnWBV7Qob3/tn6Qs0iu/OUD3nBwEaV+5hygJuAiFsHm0hd6jlSQUSV6yJWxV2hiv8KpZeIIl9Nb12CHxSA85jdHMjzU7Vwlb2NIw+TJ8+smGT/I1TAeQjGcf/kDq7pEJUmHcDokQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gRb6mhw1; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nYI5wPAo"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54acc0cd458so2010154e87.0
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 00:44:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gRb6mhw1"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54addb5a139so2098098e87.0
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 00:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1743147850; x=1743752650; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1743147851; x=1743752651; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YR4tw573chI/SmSNQiSCUnriSXeZaFDLdhuvK4Xv12c=;
-        b=nYI5wPAoprusJMgXsctvOChjl06gOLzQ/q3SDdhMZ+/OPDw92dKJ0K3L2VMaScgwKD
-         xIZW5+AdbDFLcxoDzlX0/czV/OidOvaUryg3HgCFBc/EYBdialkP3e5/6h/pm1+Si1LV
-         TlBHnUTXrPbLcvZAZRpibuKaPagWqdbdYZN0l1wBagmuH6lO6NVGgQjXvxKt+bYOfHKe
-         dv28GZnGppNxNIWqtWGJx8RnmerQ8QpDSxnuG4F+zKEaMCpk0+AtgeGNXw4TAZ1mCL8N
-         yhnAQgEJ+mPutvBY1X6dek+xzUfD+yRNjpk5wV30vfiJuYYJ2ZVlIMw9cR3H43Mov5EV
-         pTAA==
+        bh=G+/3tbeqcbFmamPw/dqh2HIcfIwHxXrx1N8SMpql6C8=;
+        b=gRb6mhw1Z/zUn9JcSYhN0fFTrmjRCZbfevBFXiyU9+7376RM1O2hGHVcUhgSbIs1sI
+         v3kQCwn2xzVjM/B0pB6ntk9w9QTtxZ48dEsuwz94CwnS/rXKjhbRi6fSWZEa42OD6cD3
+         FiGPfgAqxhVz6QeVkj9Y4fHVEQOeL6jwyH0L0L3gMx0ORkcFrUufRlB/gWDLGMAS7qio
+         ye4z3mpo+VrOLCjtI6T5NjzlBxRQwmj4xFpwV4LrsABvPjC3Sy7ZSKhpQl8IboXupLqH
+         5SElM0ZS1pH8rIUjG71fRo2qz6j6OYkL9w5JBZHR6+Yy1MERYSmW6A2J2eEPOZJR+PB8
+         7Ujg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743147850; x=1743752650;
+        d=1e100.net; s=20230601; t=1743147851; x=1743752651;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YR4tw573chI/SmSNQiSCUnriSXeZaFDLdhuvK4Xv12c=;
-        b=Wupd3Bvdtc7tq3C6RORSEiv0F6CKJqk8bDt4uf5KTeAsxbYwxh/dGAuHeyySwGsNqM
-         oFXJiC9XZVeT60n39qvNOPWMcrez0Q+J5JKau4vKsg152Da4yXhmvsgqB5/Cnf52Jqav
-         KyxkcfRparkCYSSuC/2VI42Sm7Wy/1k9TQ5bk+CtJ2kFmy2VfTYSRx+LRnq6Vkw0+Bur
-         YiXyPI7ZUruDX8cATvr7YxUXC7ZFYh8DiTj5uNNaH7BL+jXnSTIn/HVoc1Z4PW92qQRA
-         2Ls0SuY/9hCS0kG7Q5lOVvIPncuY3pw2ouUuwv6xwsCbFYY3Bbv9lrBq628Saij49AtK
-         /czw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+iTOLqGatq17q2yQ22xqJo+9N539bJqeQsPNt9zhlLTcDBleieu0YLm2F/zlKfsDtp+z2gWnJDzmKnOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEkJMXVNpxpQI6unLE5uVVbhRMlIB7k7tWnvLYp2zVBLkLSpR6
-	lIPygNkpPg0NPNtEa9EXnq3e1VgrbXB+ROUoqVzPLTV+s3psKb8efxkIbKjx78s=
-X-Gm-Gg: ASbGncsi+8ffjth74bKERSU93Vnh4GdMj2hDUuM40lHXmCUCddZlfkABXqRfMYIrHiz
-	JJuzNRVWdHZxHuo1biTC3Uh3YMWdwRC92NYzgpT1WG3GW928hqHba5t+mVWOgi+jPzY5fmeCSPJ
-	vIEodF96rr0Y+WEaxkE0zpzt4SkyElumIAbyPFZvUCuKRvWRvyxu6vj+KVwWpsqhZjiw355vVeX
-	R0AQNWYVCjZab2jsNhJ7sPyVy4QOk+YuvNTmtWZfwvCz+haNgLGUkNeju76vqM0Aw9z35fvUyPS
-	hslsBR5L0oBeRMhFWJdqJeUDg2f55d8emO48Zdg2R2i7qKDhJOBQ3Fs=
-X-Google-Smtp-Source: AGHT+IF/ArmOEOXgXQfLBNjjj8sVYQ+qLLQU2T2u/X0I6BLM6MCN9j17POGFH6OdY6C2kgn4C8GWFQ==
-X-Received: by 2002:a05:6512:3b9d:b0:54a:fa5a:e9b1 with SMTP id 2adb3069b0e04-54b011cd656mr2461814e87.10.1743147850260;
-        Fri, 28 Mar 2025 00:44:10 -0700 (PDT)
+        bh=G+/3tbeqcbFmamPw/dqh2HIcfIwHxXrx1N8SMpql6C8=;
+        b=v9iMEiFVeq2TvY8b4OnD67vVEsvrWvEb4gipUDb+MgHzL/03uG4vvwS4wWc3aWPAtz
+         GKRVj2+N1RF688N39Vq5vOD4j8sWG83vWSFh0QopjFLIm3lbtHnPTi086xvrCxRGpX0C
+         +fDtvsckDWO+bIxkti1AqHPAF3qTNZIIYZ9EIHn7riKINr668F4iPO/fZ3ftlgGJxU8Y
+         6wMTHcODewbCGDVxVz+rEampN7lXBCSIFnms+V3tGxdq0yXWdru+BDA1b90J22tLYuYH
+         TsBC2YDa0ncdC6SHUssGI2zNEQzVfxUKWk/E2ZoGiBHPSEENYi/gh8nBx8oIu9PcfPO+
+         eczA==
+X-Forwarded-Encrypted: i=1; AJvYcCXz2Z3ifDL7r+53I4xb2HPd6tGci+F/eo54Ohj8nSHDYXTrIx8DDIMWaL8/snX64b7FUvPDurKr9Fd5wJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIXGrWrqggO5KH7KydrNG5nRoVkHWYdjUtYOf+nGglMdvb36sZ
+	ktHORRjpTFuJU6t4R1yWaWVclxkWqc/qtKW3+ahRKRL2MTxF8VxBYhkjDDXlCtc=
+X-Gm-Gg: ASbGncsLyMnHlDlqOnMKxtoieZ9p9txidGfa2REuBRBJ8fh78y4A5rMNy9wfc2SkB9K
+	68a7cyi3yOkpMUHb5YUSfjSQhVtCYAlqtp3l61N6VRAnnacWPioYHGjJGYyK+yCN46JUh9nYc8T
+	2cP06AXZUPodoo3S4Rdw6d0oVJrMcdj99D+yCVIRBaq5ArlWZL9DBRKy4dzXLVSVHdaJnyqxCTT
+	CobpqsXSrk49pDu8nPWvuWJWM/E+Oum3KBI6O2em6KmAaaiJYI+0ItVT/uavhuVyvyVbrmsXAOr
+	nl2JCVIdePInXj4yWtlyOaO0Sia5/Uj+GYcd55FI3RNMHPIVbXY/Nug=
+X-Google-Smtp-Source: AGHT+IHeRT5PX7p82HtHwGrF6oShAjlRHSmV+Ax3yGf3Yi7h0e++JC8XWjlv/I2B1dbasVvvi7Z+DQ==
+X-Received: by 2002:a05:6512:4010:b0:549:4df0:76 with SMTP id 2adb3069b0e04-54b011ce4f0mr2397769e87.4.1743147851345;
+        Fri, 28 Mar 2025 00:44:11 -0700 (PDT)
 Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54b094bb32esm215589e87.26.2025.03.28.00.44.08
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54b094bb32esm215589e87.26.2025.03.28.00.44.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 00:44:08 -0700 (PDT)
+        Fri, 28 Mar 2025 00:44:10 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 28 Mar 2025 08:43:54 +0100
-Subject: [PATCH 04/12] ARM: dts: bcm6855: Add BCMBCA peripherals
+Date: Fri, 28 Mar 2025 08:43:55 +0100
+Subject: [PATCH 05/12] ARM: dts: bcm6878: Add BCMBCA peripherals
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250328-bcmbca-peripherals-arm-v1-4-e4e515dc9b8c@linaro.org>
+Message-Id: <20250328-bcmbca-peripherals-arm-v1-5-e4e515dc9b8c@linaro.org>
 References: <20250328-bcmbca-peripherals-arm-v1-0-e4e515dc9b8c@linaro.org>
 In-Reply-To: <20250328-bcmbca-peripherals-arm-v1-0-e4e515dc9b8c@linaro.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -90,24 +90,24 @@ All the BCMBCA SoCs share a set of peripherals at 0xff800000,
 albeit at slightly varying memory locations on the bus and
 with varying IRQ assignments.
 
-Add the first and second watchdog, GPIO, RNG, LED, DMA and
-second PL011 UART blocks for the BCM6855 based on the vendor
-files 6855_map_part.h and 6855_intr.h from the
-"bcmopen-consumer" code drop.
+Add the first and second watchdog, GPIO, RNG, LED and
+DMA blocks for the BCM6878 based on the vendor files
+6878_map_part.h and 6878_intr.h from the "bcmopen-consumer"
+code drop.
 
 This SoC has up to 256 possible GPIOs due to having 8
 registers with 32 GPIOs in each available.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm/boot/dts/broadcom/bcm6855.dtsi | 127 ++++++++++++++++++++++++++++++++
- 1 file changed, 127 insertions(+)
+ arch/arm/boot/dts/broadcom/bcm6878.dtsi | 118 ++++++++++++++++++++++++++++++++
+ 1 file changed, 118 insertions(+)
 
-diff --git a/arch/arm/boot/dts/broadcom/bcm6855.dtsi b/arch/arm/boot/dts/broadcom/bcm6855.dtsi
-index 52915ec6f339335d87b4e50e1c03625fffb9a45d..a88c3f0fbcb037ee5c6b31933415f90cb51ded2a 100644
---- a/arch/arm/boot/dts/broadcom/bcm6855.dtsi
-+++ b/arch/arm/boot/dts/broadcom/bcm6855.dtsi
-@@ -116,6 +116,103 @@ bus@ff800000 {
+diff --git a/arch/arm/boot/dts/broadcom/bcm6878.dtsi b/arch/arm/boot/dts/broadcom/bcm6878.dtsi
+index cf378970db08c05c40564a38931417a7be759532..f317fc888da0ef449d9b5153677e6dadd869a7db 100644
+--- a/arch/arm/boot/dts/broadcom/bcm6878.dtsi
++++ b/arch/arm/boot/dts/broadcom/bcm6878.dtsi
+@@ -108,6 +108,111 @@ bus@ff800000 {
  		#size-cells = <1>;
  		ranges = <0 0xff800000 0x800000>;
  
@@ -205,30 +205,30 @@ index 52915ec6f339335d87b4e50e1c03625fffb9a45d..a88c3f0fbcb037ee5c6b31933415f90c
 +		rng@b80 {
 +			compatible = "brcm,iproc-rng200";
 +			reg = <0xb80 0x28>;
-+			interrupts = <GIC_SPI 81 IRQ_TYPE_LEVEL_HIGH>;
++			interrupts = <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>;
++		};
++
++		leds: led-controller@700 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "brcm,bcm63138-leds";
++			reg = <0x700 0xdc>;
++			status = "disabled";
 +		};
 +
  		hsspi: spi@1000 {
  			#address-cells = <1>;
  			#size-cells = <0>;
-@@ -143,6 +240,27 @@ nandcs: nand@0 {
+@@ -134,6 +239,19 @@ nandcs: nand@0 {
  			};
  		};
  
-+		leds: led-controller@3000 {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			compatible = "brcm,bcm63138-leds";
-+			reg = <0x3000 0xdc>;
-+			status = "disabled";
-+		};
-+
 +		pl081_dma: dma-controller@11000 {
 +			compatible = "arm,pl081", "arm,primecell";
 +			// The magic B105F00D info is missing
 +			arm,primecell-periphid = <0x00041081>;
 +			reg = <0x11000 0x1000>;
-+			interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
++			interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
 +			memcpy-burst-size = <256>;
 +			memcpy-bus-width = <32>;
 +			clocks = <&periph_clk>;
@@ -239,21 +239,6 @@ index 52915ec6f339335d87b4e50e1c03625fffb9a45d..a88c3f0fbcb037ee5c6b31933415f90c
  		uart0: serial@12000 {
  			compatible = "arm,pl011", "arm,primecell";
  			reg = <0x12000 0x1000>;
-@@ -151,5 +269,14 @@ uart0: serial@12000 {
- 			clock-names = "uartclk", "apb_pclk";
- 			status = "disabled";
- 		};
-+
-+		uart1: serial@13000 {
-+			compatible = "arm,pl011", "arm,primecell";
-+			reg = <0x13000 0x1000>;
-+			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&uart_clk>, <&uart_clk>;
-+			clock-names = "uartclk", "apb_pclk";
-+			status = "disabled";
-+		};
- 	};
- };
 
 -- 
 2.48.1
