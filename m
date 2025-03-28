@@ -1,144 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EAE28373;
-	Fri, 28 Mar 2025 05:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2335421146D
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 07:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743139652; cv=none; b=ImVjVPWgZVUwVksdDzjmuu+Z6z+CWuwllkoiYaqslIEI5M1/kqOqninu3ZDm3swvHTL5134FTVXzfBcemMl5NBg6z6ndBZS5EYKNRp9Y8nrnDlKlMwLFL4sQoksAwf48mCTDt4RuUTrkpSkwoJVAJsYa4jXOXfYtMUcHP4rJahM=
+	t=1743147847; cv=none; b=qHrqnNhGLDVt6aRIpvHQ++nlIio2AE721ufyRGFINF1FSQ7xYm19B5r8LSBLSbEOv4ig13sgFFvLuSkvbykpD1F4FrgUCxp55P0OrspA61Md5Cisq9NidWG+mByrBm45s//jwiVyb1G0eLjxdpHXXCvPeMDDpXqvhfHkdKgTPQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743139652; c=relaxed/simple;
-	bh=/9CFKDl82EzxqmY+0eTCnlyT5HwDG+k1q37M983nkv0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lbaX6wFqnp1Kyi2awkfzcZIhfrtwmZclBNH9Iia0ZAsdlSXb0a+0B+yHFvXEaiHxm7RfhVQyzNs1h7RkSIKSwyM85KRWojOFbaP57ydTzRcxPPVSF7aM5Fvg9NzySfanuH4QfT+rnx20KOTO6bvBRvkkcimc/93sOtkNGmiyVnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ko7P85Wj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743147847; c=relaxed/simple;
+	bh=bQNAOLncjZ55StGnNbbul6w593t1Q3Ii5iuZ14D5Tzw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UhU/q8liw46ROq6gcjGXQ6U9v49OJQz/PdE4/xU3H/p1W6VOZvry65+R6oiW+DMj9Au0PoVrLHO+egJZwnDl0dgX9vfNNWDZEH/flBrQ9IQEAdOpeit2VRYX/A6RykrJ0E8ncavsRD+baLtaOCrbJyP09M3LMTOUd9DxvVI935k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oKSqu4/E; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ko7P85Wj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D39CC4CEE4;
-	Fri, 28 Mar 2025 05:27:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743139652;
-	bh=/9CFKDl82EzxqmY+0eTCnlyT5HwDG+k1q37M983nkv0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Ko7P85WjkjfQMEAqtP1kzs8nHDBITIf5T45w3FZqKEmEZdRXku1tsxkW/Z7BJXEqO
-	 iELw7LVttx8jxmToZxpl53rzOipavPZHmVrnjQgouwVU+OGgFkV5r0IQ4Mevw7dUXG
-	 YM7v3sqSXdP0/C5teDZ8oa8m/ciErxnFuyRAyXM0+eDn8ADlawSnE+auzyTFAhLm1j
-	 wK1yG1o86aTVhJv74gdGSZ+7dx0UwEWo0A0JUWOuH7Z3ODGRqqM+YcbRFrShJJLH6g
-	 uS6D+1sc05VH+gOOo19ED5dldgJwUJSCUHcu17Zv8mnT29TMNaS5xMNb4mbUfrb13C
-	 KwDiHe7mEKdCg==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org
-Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>,
-	Yi Liu <yi.l.liu@intel.com>, iommu@lists.linux.dev,
-	linux-coco@lists.linux.dev, Zhi Wang <zhiw@nvidia.com>,
-	AXu Yilun <yilun.xu@linux.intel.com>,
-	Alexey Kardashevskiy <aik@amd.com>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-In-Reply-To: <20250218111017.491719-15-aik@amd.com>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-15-aik@amd.com>
-Date: Fri, 28 Mar 2025 10:57:18 +0530
-Message-ID: <yq5av7rt7mix.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oKSqu4/E"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54991d85f99so3040951e87.1
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Mar 2025 00:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1743147843; x=1743752643; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F8x/z/Nkqrr7H/Lu9hfS6HH6GDSoLC2Q3m41soDjtO8=;
+        b=oKSqu4/EtFnKHXtodJnTVBsxJd1H4NT5MLESrtFU14jgXZQ5yBGNqaxcRAGqlvC3/d
+         ReHzaheYAh1qKgj9wsAJwEHSOPq8OHjUPXhS/hnTjQUZoB+X7FDzB5ksR5qc3ywObcNb
+         dX6MEebxMC5q+vyyneqr+wwlscTCqI7psYCiHySSII7r+YDrE/nC2YP2Z3vhIQkhj1dg
+         QFzvuilafj7TZ2Oa6AbHuiKNQkiq0sb+SxUOnjhoD4pSGR1NKN5JGEaMhsn4BVXYFMcb
+         0k/bOcHBI54k2e4UKe62rLquFaaFTvK3tqSK321+4RdSkkoZNJ8697YIt3sLi6Ua6t2G
+         ScAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743147843; x=1743752643;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F8x/z/Nkqrr7H/Lu9hfS6HH6GDSoLC2Q3m41soDjtO8=;
+        b=rai2Rg/8fH3g09l7A3NSxDcuejRQg8PRBWNxfMyPf9Pn6x0R9ZbjXDxesk/q++Quk4
+         izDzmEwLdPYRyPDbFus1mRag4sviEPS1W7YJmlVtFwGtPqHz71NoDEcfbdiblzgsipZ1
+         THNuqmewjHyew3AFpWOZnc28D8HZvrG8jJDvDiFqLaEwN/a0ZSLPAt5AR6UPg2gthEAY
+         VWisjcsmEnrIs2xr1HxHH8B2FP8CzCc4gfz/vekzr3hajFiZpj7hKpYbEf46BNhVUQp8
+         P59f1WNdaXKvGoNMHAKhsGdIuXQvG4yFJZ4uMxkplsb2Un13pMCFWEFVOmqMOmUKm4OW
+         PoBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWK48ybH+eZuiSswEYprBwzH4GwBUL3GarB5zk0jsADGMrQUkCgQccLwFobOJTyTNCPwZsdeIqooY8pOzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLDQmZv+AT4b7oYFvQhF4KBvR04G9x74NpP5+yj6GqYWdC3HuJ
+	UDMnYrg1vHIebtJzTciGw33J+DxGo9cigYkvdpX5EmWGOYvzRarlwQVU2Pws0VI=
+X-Gm-Gg: ASbGncvpeIb6OAPI1ma/A/icpzUDWmVU1PtmTkf40B57+wVzxRcNaZ7lgHpIOwINeS8
+	Niji1KMlg/8fnCtLvSjh3zq3eCo6GS79trVqsO9SNZBVAqy3gFXgEhEXjGdD9p4DR0gFswj3JbQ
+	g3Y+1CbmB7x1+iaUqMdF4Yuu/L1ydd8/v/U1KWqAoXkQIMPZ+3IAjZZiBNofWSca2QV2XcttW5D
+	qJC9ePxsGOjqKJn4hjqnHFxJTX+1xbt866B4ZPOXANa1wHY+2srhgpvkhwbLv0m0VX33SYSQYGL
+	xIIjBr3XBdJHLu4fli65I8gFouMZ2a763Q2dSy7DPM/24WvmJ2pHb3g=
+X-Google-Smtp-Source: AGHT+IGwOpwq5nTctC/xlT0Ki4waUjHwgO55lfPawCG5kxZPMW8PL2t6IaqM0EloVwWDIeWXGrpXDw==
+X-Received: by 2002:ac2:51c7:0:b0:549:9813:3e6b with SMTP id 2adb3069b0e04-54b0ad08976mr814131e87.0.1743147843127;
+        Fri, 28 Mar 2025 00:44:03 -0700 (PDT)
+Received: from [192.168.1.140] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54b094bb32esm215589e87.26.2025.03.28.00.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 00:44:02 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 00/12] ARM: bcm: Add some BCMBCA peripherals
+Date: Fri, 28 Mar 2025 08:43:50 +0100
+Message-Id: <20250328-bcmbca-peripherals-arm-v1-0-e4e515dc9b8c@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADdT5mcC/x3MSwqAMAwA0atI1gZqigpeRVy0NWrAT0lBhOLdL
+ S5n8SZDYhVOMFQZlG9Jcp0lmrqCsLlzZZS5NJCh1ljq0YfDB4exsLixuj2h0wPnxduGTEu2s1B
+ wVF7k+cfj9L4fFwvIjGgAAAA=
+X-Change-ID: 20250327-bcmbca-peripherals-arm-dfb312052363
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ William Zhang <william.zhang@broadcom.com>, 
+ Anand Gore <anand.gore@broadcom.com>, 
+ Kursad Oney <kursad.oney@broadcom.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ =?utf-8?q?Rafa=C5=82_Mi=C5=82ecki?= <rafal@milecki.pl>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Olivia Mackall <olivia@selenic.com>, Ray Jui <rjui@broadcom.com>, 
+ Scott Branden <sbranden@broadcom.com>, 
+ Florian Fainelli <f.fainelli@gmail.com>
+Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-crypto@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.14.2
 
-Alexey Kardashevskiy <aik@amd.com> writes:
+This adds a bunch peripherals to the Broadcom BRCMBCA
+SoC:s that I happened to find documentation for in some
+vendor header files.
 
-....
+It started when I added a bunch of peripherals for the
+BCM6846, and this included really helpful peripherals
+such as the PL081 DMA, for which I think the most common
+usecase is to be used as a memcpy engine to offload
+transfer of blocks from NAND flash to/from the NAND
+flash controller (at least this is how the STMicro
+FSMC controller was using it).
 
-> +int iommufd_vdevice_tsm_bind_ioctl(struct iommufd_ucmd *ucmd)
-> +{
-> +	struct iommu_vdevice_tsm_bind *cmd = ucmd->cmd;
-> +	struct iommufd_viommu *viommu;
-> +	struct iommufd_vdevice *vdev;
-> +	struct iommufd_device *idev;
-> +	struct tsm_tdi *tdi;
-> +	int rc = 0;
-> +
-> +	viommu = iommufd_get_viommu(ucmd, cmd->viommu_id);
-> +	if (IS_ERR(viommu))
-> +		return PTR_ERR(viommu);
->
+So I took a sweep and added all the stuff that has
+bindings to:
 
-Would this require an IOMMU_HWPT_ALLOC_NEST_PARENT page table
-allocation? How would this work in cases where there's no need to set up
-Stage 1 IOMMU tables?
+ARM:
+- BCM6846
+- BCM6855
+- BCM6878
+- BCM63138
+- BCM63148
+- BCM63178
 
-Alternatively, should we allocate an IOMMU_HWPT_ALLOC_NEST_PARENT with a
-Stage 1 disabled translation config? (In the ARM case, this could mean
-marking STE entries as Stage 1 bypass and Stage 2 translate.)
+ARM64:
+- BCM4908
+- BCM6856
+- BCM6858
+- BCM63158
 
-Also, if a particular setup doesn't require creating IOMMU
-entries because the entire guest RAM is identity-mapped in the IOMMU, do
-we still need to make tsm_tdi_bind use this abstraction in iommufd?
+There are several "holes" in this SoC list, I simply
+just fixed those that I happened to run into documentation
+for.
 
+Unfortunately while very similar, some IP blocks vary
+slightly in version, the GPIO block is differently
+integrated on different systems, and the interrupt assignments
+are completely different, so it's safest to add these to each
+DTSI individually.
 
-> +
-> +	idev = iommufd_get_device(ucmd, cmd->dev_id);
-> +	if (IS_ERR(idev)) {
-> +		rc = PTR_ERR(idev);
-> +		goto out_put_viommu;
-> +	}
-> +
-> +	vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
-> +					       IOMMUFD_OBJ_VDEVICE),
-> +			    struct iommufd_vdevice, obj);
-> +	if (IS_ERR(idev)) {
-> +		rc = PTR_ERR(idev);
-> +		goto out_put_dev;
-> +	}
-> +
-> +	tdi = tsm_tdi_get(idev->dev);
-> +	if (!tdi) {
-> +		rc = -ENODEV;
-> +		goto out_put_vdev;
-> +	}
-> +
-> +	rc = tsm_tdi_bind(tdi, vdev->id, cmd->kvmfd);
-> +	if (rc)
-> +		goto out_put_tdi;
-> +
-> +	vdev->tsm_bound = true;
-> +
-> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
-> +out_put_tdi:
-> +	tsm_tdi_put(tdi);
-> +out_put_vdev:
-> +	iommufd_put_object(ucmd->ictx, &vdev->obj);
-> +out_put_dev:
-> +	iommufd_put_object(ucmd->ictx, &idev->obj);
-> +out_put_viommu:
-> +	iommufd_put_object(ucmd->ictx, &viommu->obj);
-> +	return rc;
-> +}
+I add the interrupt binding for the RNG block in the
+process as this exists even if Linux isn't using the
+IRQ, and I put the RNG and DMA engines as default-enabled
+because they are not routed to the outside and should
+"just work" so why not.
 
--aneesh
+I did a rogue patch adding some stuff to BCM6756 based
+on guessed but eventually dropped it. If someone has
+docs for this SoC I can add it.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+Linus Walleij (12):
+      ARM: dts: bcm6878: Correct UART0 IRQ number
+      dt-bindings: rng: r200: Add interrupt property
+      ARM: dts: bcm6846: Add interrupt to RNG
+      ARM: dts: bcm6855: Add BCMBCA peripherals
+      ARM: dts: bcm6878: Add BCMBCA peripherals
+      ARM: dts: bcm63138: Add BCMBCA peripherals
+      ARM: dts: bcm63148: Add BCMBCA peripherals
+      ARM: dts: bcm63178: Add BCMBCA peripherals
+      ARM64: dts: bcm4908: Add BCMBCA peripherals
+      ARM64: dts: bcm6856: Add BCMBCA peripherals
+      ARM64: dts: bcm6858: Add BCMBCA peripherals
+      ARM64: dts: bcm63158: Add BCMBCA peripherals
+
+ .../devicetree/bindings/rng/brcm,iproc-rng200.yaml |   6 +
+ arch/arm/boot/dts/broadcom/bcm63138.dtsi           |  79 ++++++++++-
+ arch/arm/boot/dts/broadcom/bcm63148.dtsi           |  64 +++++++++
+ arch/arm/boot/dts/broadcom/bcm63178.dtsi           | 112 +++++++++++++++
+ arch/arm/boot/dts/broadcom/bcm6846.dtsi            |   1 +
+ arch/arm/boot/dts/broadcom/bcm6855.dtsi            | 127 +++++++++++++++++
+ arch/arm/boot/dts/broadcom/bcm6878.dtsi            | 120 ++++++++++++++++-
+ arch/arm64/boot/dts/broadcom/bcmbca/bcm4908.dtsi   | 122 ++++++++++++++++-
+ arch/arm64/boot/dts/broadcom/bcmbca/bcm63158.dtsi  | 150 ++++++++++++++++++++-
+ arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi   | 138 ++++++++++++++++++-
+ arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi   | 120 ++++++++++++++++-
+ 11 files changed, 1030 insertions(+), 9 deletions(-)
+---
+base-commit: 8359b1e7edc722d4b1be26aa515041a79e4224a3
+change-id: 20250327-bcmbca-peripherals-arm-dfb312052363
+
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
+
