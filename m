@@ -1,135 +1,136 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7254073477;
-	Sat, 29 Mar 2025 18:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2307414D70E;
+	Sat, 29 Mar 2025 18:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743271323; cv=none; b=CKQGNkunYx2GpIVv8xY5qa8a2BRvmYo8wcb64tVDL4ScIxiy1C+PQI/PMfvHuB73qIExpHtZ8qa0FEXK1yGlaoFYqSUlVuZmqXDZ+YT66pVgzMTajwqhBdnSbSP5wzyF4ElLlSH/soEjv2y2ULD1AlLsIFgLijDbp2Ijvc15QBk=
+	t=1743271594; cv=none; b=Dhnph7yczORFyvy1PV9wKypq+FzClEJ9bHfSsXDs/UsxXQt7G1h7Qq7EH6JjkRB6cbQYdVpZpYk5dGWRGqAXsxwoKuxeaZl+qYx6e1EMArlAeqio612DZmqsVa52XZ67aVL8oWltTgCHpyAap9it/uY/uLE88z7fEFTfv/8ewWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743271323; c=relaxed/simple;
-	bh=f1Wm717vdHLW7sXfY/IqnfflabVOZp5cdMkquU4WcMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GoJrMgzLUeZDlSf+qVZQEYBeQRUB38Gi9vVZQD5EIF4qvCen+Nmf+Hm/b2juf3peZ7IEdie6hy0V8urs6EvjQQViSB1HEyq742P9Laix1Y28RI+SY8HEyJzV4HTWrdD89o69/0D1tsqAs7URt+j2WqnpikAQcsZXHhBeAnk6Wac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSRhx6Me; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743271594; c=relaxed/simple;
+	bh=uVQvWprRtPEkAQPUHJ1Hfq5TQOedk5eyybTAvGR+WoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mj6WMbJ9JdsR6sJFmJlyOeebqhajorqV7T4TlQWjjdv7+tDpJtQ5GJoavUtvvxCAUUMBHrjfKh39D4uEBGhKSm+nqQCyEkARS6s9lf4wXvN5UoUgqs579KJ5sdyMijhyGaxZH2j5rYkT0+mLiH1g2K2rG5fcS5QLRXJEyi1Edvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rTEtvZfr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSRhx6Me"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so29575555e9.0;
-        Sat, 29 Mar 2025 11:02:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743271320; x=1743876120; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+c6l8/en3e1iOe3sQU56Phlf9Czvj3y3xt6gawWr3wA=;
-        b=JSRhx6MedsqPI3Gxi1ip7myTNRK8Ii5LhhraJ7Rkvz+CyVCumk6ruNkbuk8VtTH3Cd
-         IFRYh6RXkHl0DkkCsJ8FLAn8WPo/OLLDbjVbsqNom22GUungIPAFf/Vvw4hbYppL4WQN
-         wZvaGeliMBILAZMfJ8+n3bp8d1y6R8nMz/+inkNiG7FL1y1e69tVwxT8gVdFZL0TkqYN
-         2jLNYD7WTyEVhyzHCPBmyIrMaUEmiAaxb/lG1Walob1JXQPl2sLZgtLm4KkHkDCAG56t
-         Y33yuKuxYMWi0RzrcEgzhGNxqACbgn0KKQJoPEmdEfbqrCOeW5mYkl6of3AstIQb341g
-         lCog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743271320; x=1743876120;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+c6l8/en3e1iOe3sQU56Phlf9Czvj3y3xt6gawWr3wA=;
-        b=kCIJMIL5nUmMRXwJC7MmouKR+U8zlTpUU6GIrTE0Q7vSWkaidpGZkG9lHwfgEem+q1
-         TgTUWfDdIIB/0tsZxGEtThGDoNRbT9qTC8u+RZhSm11L1PPmIG+vFOc/7UAZ4zeS25Dl
-         cMCTBoMmkmC+Llbmr1N0nzTzGqwI5RHNJRToIDmfqTnSBnrTt6Tl1Kw4pinUYc/W0dQa
-         8RCUxCM1MqGswKZxH92uVLfcx8ohy6E1TJpeRXifja4eWTP9qLY/GxGe+gT+1b0Su5oa
-         CHagSNMVWcv7nkjJ1EMMyxCP5sMWQVK5vUfqHS1ke2y07qRq+8WhLZusPlTRZvNK4y2x
-         ggLg==
-X-Gm-Message-State: AOJu0Yw4io/lTis777hJPfTw4kHqTqUv7yPF6mV/wRLU1zJvCShPQ0/A
-	EPH1+p5Pb4hXoQLQRmvWJfXAejCXlkfqsLezYnDp+hPeSk2YWz8X5kAswg==
-X-Gm-Gg: ASbGncsn8r3sMIDoEmYRSaj4/NZPg1Hkt5CV40zwsKhBy+C8E+SBjoezYoH7nY5eHyv
-	eizKroMc4rYFX9xeA49t3GVWbe0m/93NdzaUccQaNgz6Z06xzcGhUCBt15XrW1ergw0Myf2wp89
-	ie/z6IYXXAXLYpi+V++ZY75ePm4av/pvfU8G0/SGjv8tLFC9W9C6dAwZTyn0SwCFInle0ek6jx4
-	sKgMJzh414EWPDGM/GpGao1bjYjph705cFn1DXu+cws1vyhT+cy7YzvbXGxo/ewMQlQB2u29ewx
-	oy26bMI6A14d159l5lLnFKRstJJKsiI15ukmavxL8Ckm3RIRKfEd2WnC5vkuH1PuVpsq9Yah
-X-Google-Smtp-Source: AGHT+IHFhzxqMYT2rcFVec7BdBAxrFYql/4UfC6v8E1BPxuxzFfvi+igj6nfOntdF+6oFd76u9pv4g==
-X-Received: by 2002:a05:600c:16c4:b0:43d:300f:fa4a with SMTP id 5b1f17b1804b1-43ddccbfe45mr24227055e9.12.1743271319347;
-        Sat, 29 Mar 2025 11:01:59 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8ff02f84sm67703535e9.25.2025.03.29.11.01.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Mar 2025 11:01:59 -0700 (PDT)
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 2/2] crypto: omap-sham - use dev_groups to register attribute groups
-Date: Sat, 29 Mar 2025 20:01:22 +0200
-Message-ID: <20250329180122.3668989-2-ovidiu.panait.oss@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250329180122.3668989-1-ovidiu.panait.oss@gmail.com>
-References: <20250329180122.3668989-1-ovidiu.panait.oss@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTEtvZfr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71D3CC4CEE2;
+	Sat, 29 Mar 2025 18:06:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743271593;
+	bh=uVQvWprRtPEkAQPUHJ1Hfq5TQOedk5eyybTAvGR+WoY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rTEtvZfr03cTRKMG8KHVmJFL1ZeMe92FaYKQC0F9piqqwn9wBrbrQd3lIKOdKSrU+
+	 bXYVxt8HobBH5XxZy/+oydVLRmb7oAJ3FzR2KmiJH7GzxPbYUe4gYrTx6tGOxnFTe4
+	 e6kkq5cLhmii484c+/in5DZmGrZrU1eKazph8A9mm2th4fNKmjrEiTJ7moznfxxWZy
+	 pbik8ziChCbE55r9E0cr8SiMQrkJU3PJGbLzD+eBrTMUJ50d06a3mjZFahtz4Z5lRs
+	 VuQvHzj3E/2+r4HepVsxVAG0xSNAsIoFRyjLMV+Zmde0syV6JU+u/iK2bTf/wG41bp
+	 cZb3XG1Ckbg7g==
+Date: Sat, 29 Mar 2025 11:06:31 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [GIT PULL] Crypto Update for 6.15
+Message-ID: <20250329180631.GA4018@sol.localdomain>
+References: <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
+ <ZkGN64ulwzPVvn6-@gondor.apana.org.au>
+ <ZpkdZopjF9/9/Njx@gondor.apana.org.au>
+ <ZuetBbpfq5X8BAwn@gondor.apana.org.au>
+ <ZzqyAW2HKeIjGnKa@gondor.apana.org.au>
+ <Z5Ijqi4uSDU9noZm@gondor.apana.org.au>
+ <Z-JE2HNY-Tj8qwQw@gondor.apana.org.au>
+ <20250325152541.GA1661@sol.localdomain>
+ <CAHk-=whoeJQqyn73_CQVVhMXjb7-C_atv2m6s_Ssw7Ln9KfpTg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whoeJQqyn73_CQVVhMXjb7-C_atv2m6s_Ssw7Ln9KfpTg@mail.gmail.com>
 
-Instead of manually adding attribute groups, set dev_groups pointer to
-have the driver core do it.
+On Sat, Mar 29, 2025 at 10:40:23AM -0700, Linus Torvalds wrote:
+> On Tue, 25 Mar 2025 at 08:25, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Each hash request can also contain an entire scatterlist.  It's overkill for
+> > what is actually needed for multibuffer hashing, which is a simple API that
+> > hashes two buffers specified by virtual address.  Herbert's API creates lots of
+> > unnecessary edge cases, most of which lack any testing.
+> 
+> Isn't that the whole *point* of the generic crypto layer?
+> 
+> Honestly, I think anybody who cares about modern CPU-based crypto
+> should do what wireguard did: stop using the generic crypto layer,
+> because it's fundamentally designed for odd async hardware in strange
+> *legacy* models, and the whole basic design is around the indirection
+> that allows different crypto engines.
+> 
+> Because that's the *point* of that code. I mean, a large part of the
+> *design* of it is centered around having external crypto engines. And
+> the thing you worry about is pretty much the opposite of that.
+> 
+> So if what you want is just fast modern crypto on the CPU, the generic
+> interfaces are just odd and complicated.
+> 
+> Yes, they get less complicated if you limit yourself to the
+> synchronous interfaces - which is, as you point out - why most people
+> do exactly that.
+> 
+> Put another way: I don't disagree with you, but at the same time my
+> reaction is that the generic crypto layer does what it has always
+> done.
+> 
+> I get the feeling that you are arguing for avoiding the overheads and
+> abstractions, and I'm not disagreeing. But overheads and abstractions
+> is what that crypto layer is *for*.
+> 
+> I mean, you can do
+> 
+>         tfm = crypto_alloc_shash("crc32c", 0, 0);
+> 
+> and jump through the crazy hoops with the indirection of going through
+> that tfm ("transformation object") that allocates a lot of extra info
+> and works with other things. And it's designed to work with various
+> non-CPU addresses etc.
+> 
+> Or you can just do
+> 
+>         crc = crc32c(crc, virt, cur_len);
+> 
+> and you're done - at the cost of only working with regular virtually
+> mapped addresses. Your choice.
+> 
+> So I think you want to do the wireguard thing, and use the fixed and
+> simple cases.
+> 
+> Yes, those interfaces only exist for a subset of things, but I think
+> that subset of things is (a) the relevant subset and (b) the ones
+> you'd do the whole parallel execution for anyway (afaik you did
+> sha256).
 
-Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
----
- drivers/crypto/omap-sham.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+The crypto_shash API is synchronous and operates on virtual addresses.  So it
+just provides a simple way to support multiple hash algorithms, and none of the
+legacy asynchronous hardware offload stuff.  It's crypto_ahash that has that.
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 7021481bf027..56f192cb976d 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -2039,10 +2039,7 @@ static struct attribute *omap_sham_attrs[] = {
- 	&dev_attr_fallback.attr,
- 	NULL,
- };
--
--static const struct attribute_group omap_sham_attr_group = {
--	.attrs = omap_sham_attrs,
--};
-+ATTRIBUTE_GROUPS(omap_sham);
- 
- static int omap_sham_probe(struct platform_device *pdev)
- {
-@@ -2158,12 +2155,6 @@ static int omap_sham_probe(struct platform_device *pdev)
- 		}
- 	}
- 
--	err = sysfs_create_group(&dev->kobj, &omap_sham_attr_group);
--	if (err) {
--		dev_err(dev, "could not create sysfs device attrs\n");
--		goto err_algs;
--	}
--
- 	return 0;
- 
- err_algs:
-@@ -2210,8 +2201,6 @@ static void omap_sham_remove(struct platform_device *pdev)
- 
- 	if (!dd->polling_mode)
- 		dma_release_channel(dd->dma_lch);
--
--	sysfs_remove_group(&dd->dev->kobj, &omap_sham_attr_group);
- }
- 
- static struct platform_driver omap_sham_driver = {
-@@ -2220,6 +2209,7 @@ static struct platform_driver omap_sham_driver = {
- 	.driver	= {
- 		.name	= "omap-sham",
- 		.of_match_table	= omap_sham_of_match,
-+		.dev_groups = omap_sham_groups,
- 	},
- };
- 
--- 
-2.48.1
+Multibuffer hashing (interleaving multiple hashes) is CPU-based, and it requires
+that all the lengths be synced up for it to work, which makes it very difficult
+to support scatterlists.  So considering just crypto_shash and crypto_ahash, it
+really belongs in crypto_shash (whereas Herbert wants it to go in crypto_ahash).
 
+You're correct that it could go in a SHA-256 library function instead of either
+crypto_shash or crypto_ahash.  I think it would be slightly more convenient to
+have it in crypto_shash, since the users that want this (dm-verity and
+fs-verity) do support multiple hash algorithms and appreciate having the
+*simple* abstraction layer of crypto_shash.
+
+But I'd be okay with having a separate code path for SHA-256 too, and maybe this
+is the best way out of this...  No need to use the "Crypto API" at all if it's
+not going to provide what is needed.
+
+- Eric
