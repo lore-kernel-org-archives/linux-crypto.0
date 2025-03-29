@@ -1,67 +1,67 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73360B676
-	for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 18:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1594F8F49
+	for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 18:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743272259; cv=none; b=IuPnmY5pcJwgCWc3frjtqAqBQ1WufpL4x9zCdMq0+Bf/wgW/4AreWfrXcl7nJgV1Th3/6YANf7yhIAHnvrsIAnsVa1prlulBzL1qB+aqqabsu1ufsJRgCXJm3TC2tFbr8lsmAg55OBqvKtZeqQyt+e/D7n3ggW/mq41OJWpaRA8=
+	t=1743272380; cv=none; b=QZKUmdqmUuWsO9EiNVHSdqgxzNuarimXPja4C/hLYJlK6uFN01VWs7VcGRWeQuQ+xKZIqMF+oBnSXOBSMjpzZwjNSJNGXT5qNaQRne39iZXHf+iDPwxhRlWUMCJcquQfo4KtD2aIrHzSDHulkdoZG5DVYhabaz4q1rfSsCNbE/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743272259; c=relaxed/simple;
-	bh=tlR+eGGp/o8RP6u86aV4Y1yq1UkeI7Du9iPI4TwgoyQ=;
+	s=arc-20240116; t=1743272380; c=relaxed/simple;
+	bh=sFdOZX1pb/yqN0Jss7k63caIvwp9BeCbNz+hWl1QYDo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NGnlwNgSo+U+w055V+ze/mv/amMD/dQWKpnyWHagOvuhUMkJEo1t6c0B0ZzDVdFNrS4ClNdOLGTVrGf4Ao7Vxc/5Apd7MqqBtCtdT73FVnKC9NKIXfq8DuR4FpxvS0MaThmWgnBrn5M+SpH09nNvOth0hW77/guyD2ux4FGj1Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=euH1KCJy; arc=none smtp.client-ip=209.85.218.49
+	 To:Cc:Content-Type; b=jVGZSHbd6KaySBvOKCeP7r6ta3C1YXEscJuDhxlk8B5l0G5S744WBdFn8W1RY3yjj1G8kmEHubAIU4IoP99ijxBOW/0VqLoYjKZbOSTo688FXDIoRELeKTjWmKpGLxgG1soSHrPhSK/lmvL+F3FN8T0F/WgjGZgOybqiFRprT9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=B2nOg2GO; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="euH1KCJy"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso646165966b.0
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 11:17:36 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="B2nOg2GO"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5e6f4b3ebe5so5962597a12.0
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 11:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1743272255; x=1743877055; darn=vger.kernel.org;
+        d=linux-foundation.org; s=google; t=1743272376; x=1743877176; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=n9yPHJORL4pBLeVppY/n0tJvcTCeRkdiSHd3Zz7N/+w=;
-        b=euH1KCJyu0zdFojas8ELJ5/+YHAdDL5Eb/JRaniQ65zEPyEmlnZK+1II3q8EYAKDRB
-         6MBkuRl+8XD8/N3Kraxyt4uxpoNSG61zBWICnVhW0iQIvHfTFolrqcNanL4FIuFshLK3
-         tlKx6OU22aYj/YZ/SwzOwDV5UoAp87sNjrkzo=
+        bh=yCy7w6bxMCSPIFn2dLOuLyXOfcR7syri8fVJ0KwW6ZA=;
+        b=B2nOg2GOy9fNkhxOqV9CwS1xtOI6dlc84WCJPH310rxp7jOzd+RtoCxyRuhUYcNvnd
+         vre+asSm5jI2dWTgbHOKseGdEeEYqJdMp81i+sKlJFdQkAEKMILL0X1K2+W+NyU9LOkT
+         p0QGcyNGSEOTwFaOAlFD14CO+skYNH8dkVaBc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743272255; x=1743877055;
+        d=1e100.net; s=20230601; t=1743272376; x=1743877176;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=n9yPHJORL4pBLeVppY/n0tJvcTCeRkdiSHd3Zz7N/+w=;
-        b=WcJ9N70jNxYP9nzs64xRA/XXAg7ydKjrpWAylAnb+qJOnVFAhN0+m/DF+UefWLT8n9
-         zNpNMcFwt626R/EW+MLWy89N9X5gUWL80fzAP46oTCZS7YI9d0tylNay18MRp450c4t7
-         S/dHa4Gzj1GWoxyOkb6RCbegPrBTZqQvwNJk9ioP/0QeEFXMn5Kb8YgQrMAZHNmOwuP2
-         1/QwsdDKdP2TQiR78rnBRew7oYSLNj9ddKqG1tfZ2IpG9PHgXnK7+0xw1DF/vR0JNi2u
-         wBeVGAXU5JtfXpiNym42yYAinXM2z5hlVawlrtRvjOFFef2ElZpLDltVi7NLpho7VFhf
-         lf8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXtDFPWYJYriVTY830S6MEiGt19vN5ADyH5OBPz+P0LcY7GZQnICTlmVymPveWES9XEG19f7I6JzareupU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCvCvhcfF4oijvF2yK7qA0K+pzqIGvNqIIl8uKGTrz1TyCep1x
-	5MFZblmU90AP9zDnKUY06emQiF356QXVWX67J0KNivaix4ws6szYZ6idKbLr4A3dEjn4Vp8/9Iv
-	Ac28=
-X-Gm-Gg: ASbGnctXu1I+xMbDWbOY9m7Cfrd9DS0GDn+7RCO1eZt5r+DRr2vVJcYi51E9ot24h4+
-	jW4g6cEWqLdpxIhXtgeamfJN5N7Zt782TiSmCr3QWPoPqYr6SKIIQ0cBu4ORavuvTmGQC6364vA
-	67s1yA6tDQZpBXiTGwnlzwum2Qb3FD8y++rawIx57yJLYzvrVNpkRu2ofVLuhMRhLBSYRZoHWWm
-	dbHmWP+0McDg3ZTJL9p5e7u/+yGT7LU1JuZk5VTJbVqGeLYL4GzIAIP6WWbiJAc0rh+LEBYBPOf
-	AWj81CXe7Zr8cfu/c8ttTwRi8S29/7rhsx583DhqqFdF9DqW374zO+Yt7MEiWn55qdEwa1GLJRb
-	i4X+cNihr02+zkWrFn5s=
-X-Google-Smtp-Source: AGHT+IHyLsWnTTjpExqhALWAxRZC20Ow5JEWMGPn/+2igv0+4UcNR8k390c4XDCq8Ic6NLdc2tl44w==
-X-Received: by 2002:a17:906:5908:b0:ac7:3a23:569c with SMTP id a640c23a62f3a-ac73a235730mr255961466b.1.1743272255399;
-        Sat, 29 Mar 2025 11:17:35 -0700 (PDT)
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com. [209.85.218.45])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7196dd435sm360742166b.161.2025.03.29.11.17.34
+        bh=yCy7w6bxMCSPIFn2dLOuLyXOfcR7syri8fVJ0KwW6ZA=;
+        b=Xc8nJy+LvXxk47lYoLodBVG4nMEeTOu28x8RCCf2yosoSp+fqGw0zbCgmTErrKQTy3
+         zal1G7E5F/sfu4a7eQtJY88lhwPJU6NdYL4ADEmrrdtM2ayA4P4WLaEJKhPKeofBpQAl
+         12FfIpqNN4wQkMN/CHbeib4mb6B6s5LJJWW7Z8RzDAXS0hY8HGofg0oBONo/FmLhusQJ
+         dUaygdC8ipwkEF5VXBf1Id4R26FTIggBqnYHHH0Wh9sMa3cf4AIMoHkU6+yAriwkd4Xk
+         jAGJdz9394Iol9waIYjPE6TtZFtNibHNtEnBU/Q+u4WYpxdp999vWfgXQcU4BH+WJiTv
+         zuAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpQ59saENsMlPIAKYvraX/KHR+XM/NApfmV6yEdUrQap3yrnkSbmzpBR2qqEajx+/otgHxJPBOJds7PmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjMrrK/EWZ+2JO6qpmHVbunqBOyMYeLi5Le9sgAfrqrV301ubg
+	nu9QK0liIXfFJ/BSWB4NTH6i/76PLZTEqHL4bt99xVgUYwxUG6e093JQc330LcKMkhARKQfOWlW
+	4DHg=
+X-Gm-Gg: ASbGncuTiQh3XY610Y7JWE5S8AXSNooyzhHIW4/nqRKdAZNuvN4Ryg8aMsf3tNwZJIq
+	8BR0qXNk4evBhuH9H5/U6hjW0YRnLgFfbs1zenEs7ZXSGGaAlWznlf+GM3CYCYxy2E3GD272pjF
+	hZgKlCjQkVD9DF2b1eMG3G9WMbLOMu1pWrIEoak7QIqtr/kF2hRLPQeT1u+f0qqs3ImPudKi0cO
+	MFRfRItHyVMb2oRcpbIKSfLBGAAd4BERcSPKXg9TIDq36/GGt92IPPULqRmhAjMZ30afnw753+p
+	jbKyiTYlNK0WJ37GncyWM2efCHQsTxeAD58z4kxKV/Jh300l1PsryoM8JgYTuRtgYWC3QwJ0004
+	OhVtIqRyhuBdtABt9zlk=
+X-Google-Smtp-Source: AGHT+IEo+7UfRx0o8aUpjckBXybH/6g1M800sZeIxJ2FyqafptyGJallL23vk9g4l98cNyQLM6HdyQ==
+X-Received: by 2002:a17:907:97c9:b0:ac3:3fdf:d46f with SMTP id a640c23a62f3a-ac738975de7mr296235566b.8.1743272376130;
+        Sat, 29 Mar 2025 11:19:36 -0700 (PDT)
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71922b9b7sm372964266b.17.2025.03.29.11.19.35
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Mar 2025 11:17:34 -0700 (PDT)
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso646163666b.0
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 11:17:34 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVtNnxlWbwmWuI2He2hKNorjJ38N+RRt7bYIJecHkGzhwkIIJd7Ckg92HK2tyfnpTATjQldOFVytRo/9WU=@vger.kernel.org
-X-Received: by 2002:a17:907:6eaa:b0:ac4:2b0:216f with SMTP id
- a640c23a62f3a-ac738bad2cemr293239266b.43.1743272254023; Sat, 29 Mar 2025
- 11:17:34 -0700 (PDT)
+        Sat, 29 Mar 2025 11:19:35 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-abbd96bef64so508273366b.3
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Mar 2025 11:19:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUmXe0nwcn5z+2nnpEklivesplNttvtNGGy6jsGT87gZ3NpM76Sx83Pb5rt9djCo1tKoJXkfdHkt+svfoA=@vger.kernel.org
+X-Received: by 2002:a17:906:c14e:b0:ac4:76d:6d2c with SMTP id
+ a640c23a62f3a-ac738bae46fmr268991066b.40.1743272375207; Sat, 29 Mar 2025
+ 11:19:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -73,13 +73,13 @@ References: <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZfO6zKtvp2jSO4vF@gondor.apan
  <ZuetBbpfq5X8BAwn@gondor.apana.org.au> <ZzqyAW2HKeIjGnKa@gondor.apana.org.au>
  <Z5Ijqi4uSDU9noZm@gondor.apana.org.au> <Z-JE2HNY-Tj8qwQw@gondor.apana.org.au>
  <20250325152541.GA1661@sol.localdomain> <CAHk-=whoeJQqyn73_CQVVhMXjb7-C_atv2m6s_Ssw7Ln9KfpTg@mail.gmail.com>
- <20250329180631.GA4018@sol.localdomain>
-In-Reply-To: <20250329180631.GA4018@sol.localdomain>
+ <20250329180631.GA4018@sol.localdomain> <CAHk-=wi5Ebhdt=au6ymV--B24Vt95Y3hhBUG941SAZ-bQB7-zA@mail.gmail.com>
+In-Reply-To: <CAHk-=wi5Ebhdt=au6ymV--B24Vt95Y3hhBUG941SAZ-bQB7-zA@mail.gmail.com>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 29 Mar 2025 11:17:17 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi5Ebhdt=au6ymV--B24Vt95Y3hhBUG941SAZ-bQB7-zA@mail.gmail.com>
-X-Gm-Features: AQ5f1Jrj02nuuU3jVC6wxLZbrb8UO2ZPR4XngM0ocq2feDDCLoOzwqBb1MawlUM
-Message-ID: <CAHk-=wi5Ebhdt=au6ymV--B24Vt95Y3hhBUG941SAZ-bQB7-zA@mail.gmail.com>
+Date: Sat, 29 Mar 2025 11:19:19 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiA0ioL0fonntfEXtxZ7BQuodAUsxaJ_VKdxPrnKx+DAg@mail.gmail.com>
+X-Gm-Features: AQ5f1JpE91a6ThtQF6-oBNe9LzuODVuNbOWM5dekqqynxRKsAhb6YqLAueICYfA
+Message-ID: <CAHk-=wiA0ioL0fonntfEXtxZ7BQuodAUsxaJ_VKdxPrnKx+DAg@mail.gmail.com>
 Subject: Re: [GIT PULL] Crypto Update for 6.15
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
@@ -87,19 +87,14 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 29 Mar 2025 at 11:06, Eric Biggers <ebiggers@kernel.org> wrote:
+On Sat, 29 Mar 2025 at 11:17, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> The crypto_shash API is synchronous and operates on virtual addresses.  So it
-> just provides a simple way to support multiple hash algorithms, and none of the
-> legacy asynchronous hardware offload stuff.  It's crypto_ahash that has that.
+> I happened to just merge the rdma updates a couple of minutes ago, and
+> they actually removed the example I was using (ie the whole "use
+> crypto layer for crc32c" insanity).
 
-Well, it's "simple" only compared to ahash.
+Heh. Looking closer, the "they" was actually you who did the patch and
+Leon who applied it.
 
-It's still a complete nightmare compared to just doing the obvious
-thing directly when that is an option.
-
-I happened to just merge the rdma updates a couple of minutes ago, and
-they actually removed the example I was using (ie the whole "use
-crypto layer for crc32c" insanity).
-
-             Linus
+            Linus
