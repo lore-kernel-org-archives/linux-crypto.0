@@ -1,275 +1,124 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F83111A8;
-	Sun, 30 Mar 2025 02:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C4815A858;
+	Sun, 30 Mar 2025 08:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743302018; cv=none; b=n6sv9ib/g3DVE7W7Er0cDj8vO//qB4mZju76fAaCBMaw7mHUJEaFLWaNqkpj6mRfQ4KydKVQBgt6yBcPwdMwg02NQ6y+uLavxr8zZzVdOQg1vXZl+yBYtEaf01vjggerdIEo6c5CS4eLpOlH3wNurxBPjn/G+y/QrKscv9Kg2pU=
+	t=1743324061; cv=none; b=n8pkgsegX38Iz9pRTPVPmvOIYn3BkVzI0PP/gQKUdov4I9dLq5l5erMAlQA82h6XbtdkePsFTWRqdc/dRmXKhKYJQAJJ2zVyHYs2360KUsIzqtJFkUDRCprbv6Fq/nLKRtrpYazw3TtPb2H//R5ozb1OX0mx2WM+CiEVmubsYOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743302018; c=relaxed/simple;
-	bh=OG8Yi0SRKxYev1nne9MYL4tm0CrSp5Oyh/QSP/vQLMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6bQe3Dijw4r20eI+LrUV4ukObOaoA5By7B4NXQ79BO8IbegF/DObhKV3Ybs5kpvdAWSWyJqVZtuB7YiFrgJEc9hhQ15jPT83q6d4EqGgCcDKjpvOE7vLM+A3VjMumfZlOF/oOhYQRt9MhNM9pxwQhYVrPxQDR8luLzBmPYfick=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kzqVuQf5; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kzqVuQf5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=HiZuM37wp6Xjo8xbzUiIRld2m8B+pGa49B34abe81/8=; b=kzqVuQf56hvvvPjS4jHY57JoA+
-	lMcbU91Dd2xnKqIRjmPIbGylJCzawK3omiPaBmTZV336wGWYc5Wwq6FEARmIG4rRlkPkFJD6pQsmS
-	leo5BnaChb2Sxuew6R7xQ2NPDI/0h1UWbh2dkXU+DjMfQnTM0d/ocdFR70lnGYFVyuRHwbzxOG2DW
-	+jhVTgdeQoQUxsd25F+UY2/O11uq9I1PGXh6rIoT+nt/GoRngWYfi4+DxNJ81w0j36y5ZKZyOsgv2
-	TVH1RnOGfTwcX4gjT8koOEd6s9X16M8YsaujHfgizoBg3Yf1AjWntIb4uIF+sOP2AhdR9x26E8T9O
-	DR2aICRw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tyiUF-00BHnJ-1z;
-	Sun, 30 Mar 2025 10:33:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 30 Mar 2025 10:33:23 +0800
-Date: Sun, 30 Mar 2025 10:33:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Chaining is dead
-Message-ID: <Z-itc_Qd5LLn19pH@gondor.apana.org.au>
-References: <ZpkdZopjF9/9/Njx@gondor.apana.org.au>
- <ZuetBbpfq5X8BAwn@gondor.apana.org.au>
- <ZzqyAW2HKeIjGnKa@gondor.apana.org.au>
- <Z5Ijqi4uSDU9noZm@gondor.apana.org.au>
- <Z-JE2HNY-Tj8qwQw@gondor.apana.org.au>
- <20250325152541.GA1661@sol.localdomain>
- <Z-NdGvErMGS5OT7X@gondor.apana.org.au>
- <Z-NjarWmWSmQ97K0@gondor.apana.org.au>
- <20250326033404.GD1661@sol.localdomain>
- <Z-N55Yjve6wTnPqm@gondor.apana.org.au>
+	s=arc-20240116; t=1743324061; c=relaxed/simple;
+	bh=jo+fUY9KjPyIY0nrwSxzp+BoGwLTb2tLqe+pxfvkNlk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QGoJptZkj0Y+DRojToEzmU4RQsENND6i0gpNz9Z4XzIcrYxzUDBxWBiiI6ReEs43dR2ANs6YVSfzUPkwkmHe4ZPHeUeYiKk6ONZaFowxms97pqCnoWwPuQEwh9w7DWbJddM20Z8zQjA+8Fy7sbvHq+N6ZNvJ9twN8WLVaUBawL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-520847ad493so3499405e0c.1;
+        Sun, 30 Mar 2025 01:40:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743324058; x=1743928858;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZoQHXpkA0HF8Mt8XDc2rN36k5LR7d1tDjvQ8h8PozaY=;
+        b=mocfEpqgqP4bnD+hCM5E+m+qseSJsc4ItXXgpfLfTyPUoyemWJ63/yGK8vaHc6RoKq
+         PQ5RAN5sPqqynIfFQ+3OPbIbsTeHdTvd0VQMONPgsJRN08UfRxc6pq7sYFvqKQaZPag7
+         waY9sC4DdSglf9U9yIUz0yJ7Pkt64GwHeTPhkirUe9xY/5XMR5XoO0Mk43kewU2wIcVX
+         W7lEii4/JsbZLKwG52LqVIlqw+IezDzBqgmCmVgCU5ohsXWQ0/ZB2lMQbCyd2qpGP2gu
+         nG7OyqdBt9dIfHDjf7+dTtc3OjkT5bBN75isp1N+SnK635RRAt7dr9cv/4k/09JktUqU
+         uJ+g==
+X-Forwarded-Encrypted: i=1; AJvYcCU6i9bflgLZc2VjjCZDvnUKo1RvdNnwBdZKreYXVn7vs3J6aDhqI89ogzlCWeleI3nE8p6kvzwJfw==@vger.kernel.org, AJvYcCVSGCKB6QWLRpF0v28g2/CzQnAOl8AXjqd+NTcGfA2UrF7Y6T1lakk6Gg+5KP60jk+QaGKQjomtx9Tu3nKf@vger.kernel.org, AJvYcCVzoppZQrC8Ek5Mcj9xD47JbDQ3vyYs5FZLKBUN8XdEp/9lVujeH0M5Legjog0vrSGYej5WNa9BbSNcqqGGMoxC0by04FCi@vger.kernel.org, AJvYcCXCD0GIs6zOkDs5WjR+1U/mgoNn2AhQtJK3zz0aTbPDsyqNh+eWBjdA38XDMkF5blPydrY1hBCMPqxg+BYR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBFfciJeT/uGqtGJvkulendmAHJZ+QeWOxLbpF2cCSGpjXBTT2
+	j5gXKlwIwU7csJi1DwBr00FpY6e/7PmOC9yzjCRCtsSzZFIJDwp+OZbXMOtI
+X-Gm-Gg: ASbGnctDmYgJl3rNG3ezv3fObsaI7sSR6/j/yQND6jLl7VfE/ityYUNS6cLpxCtELQy
+	MCZvC0R3dAiNWpwOHJK6ChDEmmBH7kx9C/8zgJaJk/13F0jZyUn2OV6PwDWDnCKhRToKcZltUsS
+	Q/BK2kefkFrgmkzwawrFcpLgnD3UgCrEElPNrU9mcZOL5pe3rxOdyMOxxr6u+mZkhcHOc9kf9GH
+	rApsU2qaFjU+rDDExn1epYFK3TzF6tz92ki/7SikPmm2PavFviPxX0esCXi04/3rMxDKdPIr8uL
+	DKVGaDqra4PhEoUOWcLtdT59qPfxRk8iMLaYtMhJ4B8n5NuDNX3pqh+zf6n/QehPnBz4jNECW10
+	5efU17JJX+D4=
+X-Google-Smtp-Source: AGHT+IErjvIbcTuJxAq6mh/8rbjw67uY0ViOSP6eInFj77h33Zq0HidJ+dL38gtlD2aa2pZvQixC3Q==
+X-Received: by 2002:a05:6102:3ca4:b0:4bb:e511:15a6 with SMTP id ada2fe7eead31-4c6d38d34fcmr3532115137.11.1743324057951;
+        Sun, 30 Mar 2025 01:40:57 -0700 (PDT)
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com. [209.85.221.174])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c6bfce96f4sm1136438137.14.2025.03.30.01.40.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Mar 2025 01:40:57 -0700 (PDT)
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-520847ad493so3499403e0c.1;
+        Sun, 30 Mar 2025 01:40:57 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU6qxxH9jYlhC3jEyKl65ES6l77XLOZuB5VGcy59p0X3E5iXOVhp+jkoY1lOF59xukB2ffWng7ABFgbexAn@vger.kernel.org, AJvYcCV5JI0hxLK2jqy9gcG5qDtxNuqnwej4Nd/Kqsv0GcbyPgAGZuFw6DaVQdJlmJi4y6PfluMI5odSq7bGCtpM@vger.kernel.org, AJvYcCWo0v/HkZBaRkrgB4tF3ieCILAGggtcBQ702jH8cPNlRcqcWms2RJ3TqaC372Zdv4mEGR0VCrtkgw==@vger.kernel.org, AJvYcCXfj0UroMn3WWJjHYxNZJ6iYOHv6D2YJRGZ7wLGeWhLxDpFR3+32FRylnCm2JIWgVna92Z88WO+iZ5hAFMZ9HjpCoYMOKG5@vger.kernel.org
+X-Received: by 2002:a05:6102:510c:b0:4c1:869b:7db4 with SMTP id
+ ada2fe7eead31-4c6d3886c27mr3306697137.9.1743323690025; Sun, 30 Mar 2025
+ 01:34:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-N55Yjve6wTnPqm@gondor.apana.org.au>
+References: <20250314160543.605055-1-arnd@kernel.org>
+In-Reply-To: <20250314160543.605055-1-arnd@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Sun, 30 Mar 2025 10:34:38 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdViGZRQL7toi7Arvm5L=OTK1mGmODbckE+427bx4KyWdw@mail.gmail.com>
+X-Gm-Features: AQ5f1JpsRk8bUwx1w_Bo7lsmXMYQpvMMe33_LKw24q3KhkiO1G7u-hb7ENrQgYE
+Message-ID: <CAMuHMdViGZRQL7toi7Arvm5L=OTK1mGmODbckE+427bx4KyWdw@mail.gmail.com>
+Subject: Re: [PATCH] [v2] crypto: lib/Kconfig: hide library options
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Boris Brezillon <bbrezillon@kernel.org>, Arnaud Ebalard <arno@natisbad.org>, 
+	Srujana Challa <schalla@marvell.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	"Justin M. Forbes" <jforbes@fedoraproject.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Rosen Penev <rosenp@gmail.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 26, 2025 at 11:52:05AM +0800, Herbert Xu wrote:
+Hi Arnd,
+
+On Fri, 14 Mar 2025 at 17:05, Arnd Bergmann <arnd@kernel.org> wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> they don't need it.  Take ext4 as an example:
-> 
-> 	ext4 calls verity
-> 	schedule_work(verity_work);
-> 	return asynchronously!
-> 
-> verity_work:
-> 	do the crypto work
-> 	__read_end_io(bio);
+> Any driver that needs these library functions should already be selecting
+> the corresponding Kconfig symbols, so there is no real point in making
+> these visible.
+>
+> The original patch that made these user selectable described problems
+> with drivers failing to select the code they use, but for consistency
+> it's better to always use 'select' on a symbol than to mix it with
+> 'depends on'.
+>
+> Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-I went ahead and removed the work queue for fsverity and fscrypt
-(except for the reading of the Merkle tree which is still done in
-a work queue because I'm too lazy to make that async), and it
-actually turned out to be slower than using a work queue.
+Thanks for your patch, which is now commit edc8e80bf862a728 ("crypto:
+lib/Kconfig - hide library options").
 
-I was testing with an encrypted 8GB file over ext4 mounted over a
-loopback device in tmpfs.  The encryption is with xts-vaes.  It turns
-out that not using a work queue actually made reading the entire file
-go from 2.4s to 2.5s.
+> --- a/security/keys/Kconfig
+> +++ b/security/keys/Kconfig
+> @@ -60,7 +60,7 @@ config BIG_KEYS
+>         bool "Large payload keys"
+>         depends on KEYS
+>         depends on TMPFS
+> -       depends on CRYPTO_LIB_CHACHA20POLY1305 = y
+> +       select CRYPTO_LIB_CHACHA20POLY1305
+>         help
+>           This option provides support for holding large keys within the kernel
+>           (for example Kerberos ticket caches).  The data may be stored out to
 
-I then tried passing the whole bio (256KB per crypto request in my
-test as opposed to the data unit size of 4KB per crypto request)
-through using chaining to skcipher, with xts-vaes doing the requests
-one-by-one.  Against my expectations, this didn't speed things up at
-all (but at least it didn't slow things down either).  All the
-benefits of aggregating the data were offset by the extra setup cost
-of creating the chained requests.
+Due to dropping the dependency, this appeared on my radar.
+Should this be selected by one or some of the Kerberos Kconfig symbols?
 
-So chaining is clearly not the way to go because it involves cutting
-up into data units at the start of the process, rather than the end.
+Gr{oetje,eeting}s,
 
-Finally I hacked up a patch (this goes on top of the skcipher branch
-in cryptodev) to pass the whole bio through the Crypto API all the
-way to xts-vaes which then unbundled it.  This turned out to be a
-winner, taking the read time for 8GB from 2.4s down to 2.1s.
+                        Geert
 
-In view of this result, I'm going to throw away chaining, and instead
-work on an interface that can take a whole bio (or folio), then cut
-it up into the specified data unit size before processing.
-
-The bottom-end of the interface should be able to feed two (or whatever
-number you fancy) data units to the actual algorithm.
-
-This should work just as well for compression, since their batching
-input is simply a order-N folio.  The compression output is a bit
-harder because the data unit size is not constant, but I think I
-have a way of making it work by adding a bit to the scatterlist data
-structure to indicate the end of each data unit.
-
-PS For fsverity a 256KB bio size equates to 64 units of hash input.
-My strategy is to allocate the whole thing if we can (2KB or 4KB
-depending on your digest size), and if that fails, fall back to
-a stack buffer of 512 bytes (or whatever number that keeps the
-compiler quiet regarding stack usage).  Even if we're on the stack,
-it should still give more than enough to data to satiate your
-multibuffer hash code.
-
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 4f721760ebf1..57d149c223bd 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -17,6 +17,7 @@
-  * Copyright 2024 Google LLC
-  */
- 
-+#include <linux/bio.h>
- #include <linux/hardirq.h>
- #include <linux/types.h>
- #include <linux/module.h>
-@@ -480,7 +481,7 @@ xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
- 
- /* __always_inline to avoid indirect call in fastpath */
- static __always_inline int
--xts_crypt(struct skcipher_request *req, xts_encrypt_iv_func encrypt_iv,
-+xts_crypt_one(struct skcipher_request *req, xts_encrypt_iv_func encrypt_iv,
- 	  xts_crypt_func crypt_func)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -511,6 +512,42 @@ xts_crypt(struct skcipher_request *req, xts_encrypt_iv_func encrypt_iv,
- 	return xts_crypt_slowpath(req, crypt_func);
- }
- 
-+static __always_inline int
-+xts_crypt(struct skcipher_request *req, xts_encrypt_iv_func encrypt_iv,
-+	  xts_crypt_func crypt_func)
-+{
-+	unsigned int du_bits = req->cryptlen;
-+	unsigned int du_size = 1U << du_bits;
-+	__le64 *iv = (void *)req->iv;
-+	struct folio_iter fi;
-+	struct bio *bio;
-+	int err;
-+
-+	if (!(req->base.flags & CRYPTO_SKCIPHER_REQ_BIO))
-+		return xts_crypt_one(req, encrypt_iv, crypt_func);
-+
-+	bio = (void *)req->src;
-+
-+	for (bio_first_folio(&fi, bio, 0); fi.folio; bio_next_folio(&fi, bio)) {
-+		size_t i = fi.offset;
-+
-+		for (; i < fi.offset + fi.length; i += du_size) {
-+			skcipher_request_set_folio(req, fi.folio, i, fi.folio, i, du_size, iv);
-+			err = xts_crypt_one(req, encrypt_iv, crypt_func);
-+			if (err)
-+				goto out;
-+
-+			*iv = cpu_to_le64(le64_to_cpu(*iv) + 1);
-+		}
-+	}
-+
-+out:
-+	req->src = (void *)bio;
-+	req->dst = (void *)bio;
-+	req->cryptlen = du_bits;
-+	return err;
-+}
-+
- static void aesni_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
- 				 u8 iv[AES_BLOCK_SIZE])
- {
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index 0ad8c30b8fa5..9f52dc7f7889 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -7,6 +7,7 @@
-  * Copyright (C) 2015, Motorola Mobility
-  */
- 
-+#include <crypto/skcipher.h>
- #include <linux/pagemap.h>
- #include <linux/module.h>
- #include <linux/bio.h>
-@@ -30,16 +31,49 @@
-  */
- bool fscrypt_decrypt_bio(struct bio *bio)
- {
-+	struct folio *folio = bio_first_folio_all(bio);
-+	const struct inode *inode = folio->mapping->host;
-+	const struct fscrypt_inode_info *ci = inode->i_crypt_info;
-+	const unsigned int du_bits = ci->ci_data_unit_bits;
-+	struct crypto_skcipher *tfm = ci->ci_enc_key.tfm;
-+	SKCIPHER_REQUEST_ON_STACK(req, tfm, sizeof(bio));
-+	struct bio **ctx = skcipher_request_extra(req);
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct folio_iter fi;
-+	union fscrypt_iv iv;
-+	u64 index;
-+	int err;
- 
--	bio_for_each_folio_all(fi, bio) {
--		int err = fscrypt_decrypt_pagecache_blocks(fi.folio, fi.length,
--							   fi.offset);
-+	*ctx = bio;
- 
--		if (err) {
--			bio->bi_status = errno_to_blk_status(err);
--			return false;
--		}
-+	bio_first_folio(&fi, bio, 0);
-+	if (!fi.folio)
-+		return true;
-+
-+	index = fi.offset;
-+	index = ((u64)fi.folio->index << (PAGE_SHIFT - du_bits)) +
-+		(index >> du_bits);
-+	fscrypt_generate_iv(&iv, index, ci);
-+
-+	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+					   CRYPTO_SKCIPHER_REQ_BIO,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(req, (struct scatterlist *)bio,
-+				   (struct scatterlist *)bio, du_bits, &iv);
-+
-+	err = crypto_skcipher_decrypt(req);
-+	if (err == -EAGAIN) {
-+		req = SKCIPHER_REQUEST_CLONE(req, GFP_ATOMIC);
-+		skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+						   CRYPTO_SKCIPHER_REQ_BIO,
-+					      crypto_req_done, &wait);
-+		err = crypto_skcipher_decrypt(req);
-+	}
-+	err = crypto_wait_req(err, &wait);
-+	skcipher_request_free(req);
-+	if (err) {
-+		bio->bi_status = errno_to_blk_status(err);
-+		return false;
- 	}
- 	return true;
- }
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index e159ea68124e..931585f864d1 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -26,6 +26,8 @@
- #define CRYPTO_SKCIPHER_REQ_CONT	0x00000001
- /* Set this bit if the skcipher operation is not final. */
- #define CRYPTO_SKCIPHER_REQ_NOTFINAL	0x00000002
-+/* Set this bit if the skcipher is made of bio. */
-+#define CRYPTO_SKCIPHER_REQ_BIO		0x00000004
- 
- /**
-  *	struct skcipher_request - Symmetric key cipher request
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
