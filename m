@@ -1,62 +1,49 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9FA38F80;
-	Sun, 30 Mar 2025 09:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29421AF0B4;
+	Sun, 30 Mar 2025 16:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743325680; cv=none; b=RRtYYXwleSf3OJwo4VdBp9cjtZI00ugGKiTVsgR1W+2bm7DNY+M+JHz/XPyYq07HFBxXYTmTPRJmK4H8ilMzzuExbJXgytKY8N2CbFEXGBRvQqTXgR/3I56Inh1hFrrFAm6Yzdph70WOaEoM2XaSfBDVunAq8xFtjq9OqTJuUUM=
+	t=1743351656; cv=none; b=KqxfdARv7L/Q9vFsOlAzN/cdMBb+sJnSDBCzTuSJkt3PP6u9ca258PI9hUbtOhPYJacIvOuCwD5r8Qj8BWRureNu8hSsPFq1vHqrDJnD1BhHvpLtDkKZlSvJYisR64kKHG2ENpBYRgCI3NWNkX050IxypabpYY3sTMavTXiqDSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743325680; c=relaxed/simple;
-	bh=YEh9mjjNKFWS/tS9b/mJHTuWX4G6dvJ7J7sBxd+aJIw=;
+	s=arc-20240116; t=1743351656; c=relaxed/simple;
+	bh=nJ4BsCB5loZ/jaKzK1GG9ETMqwHE6FkYOJGC0QZJWTo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GjBQe1wdR1+lv3zPe/BCaI2FgoAspTtZYucnQg3ijzW5q6gqa/Z8ImjeoDWmQhF9zUkgqMO8+rZ5IhOM7xg2S6tO+EQ9RUPpXQ89PM0SVIeY0I3e5xdvUR89ZxcV8rdPXw1dP0QD9+UgmWnKV/DqxRCwikA49t/pUhLmuA/46+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=K6qKzCY4; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=k5lkJhWjbkXGRxjaNndSTB/nXiflBjvj7Rjnuf9cdpqOmGTQzzTfx+nHEC0cNXmSlZVKJAgiNE/nKAOOtrBGMXyCpNLiNBF4qyt8mkcnxFYXYSiGsufwXKzDJL2eE5fXQ9kwdvFKLbZKKh9NBLwVz70sgGOuOgBEw9AeNDQkuSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZKoBOjTS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="K6qKzCY4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=cI2tNxonByOej+EcriXZjpqoIKnB0phbC0J6w9FUT8A=; b=K6qKzCY4g8+ht+eSwW/r4kMSxd
-	pr/fGBeZppw+qOlxrRe9P/W56iyTTmKxhfzCbfDt740d8n+UToDOUTCZjZBn/AsnsaZ9sHVJWys8E
-	0bVpk1JoFZYcttwP17TuZXxkcI6UFVY6ElroHOB9/dmemq/3ZzU+2sIeMRxee9MNwxF7kcVI9RLne
-	5bd3fzbj8oyApTBogAqrFYWJ4N/mMUwdmyKuPXt9F04+ytEdR7eqqOMtEtSUoXdmKkEbG1cwsvChw
-	RcQgmAxEkocPm2Qy9CaFbHZiG5u3xOcgRn/6j/KPQShyvE0BzhI7UIH4acp3VT7ScrTEfTs3YRv58
-	WIkS70SQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tyodK-00BJyz-2q;
-	Sun, 30 Mar 2025 17:07:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 30 Mar 2025 17:07:10 +0800
-Date: Sun, 30 Mar 2025 17:07:10 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
-	"bbrezillon@kernel.org" <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"Justin M. Forbes" <jforbes@fedoraproject.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Rosen Penev <rosenp@gmail.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH] [v2] crypto: lib/Kconfig: hide library options
-Message-ID: <Z-kJvk5t-ea0yizK@gondor.apana.org.au>
-References: <20250314160543.605055-1-arnd@kernel.org>
- <CAMuHMdViGZRQL7toi7Arvm5L=OTK1mGmODbckE+427bx4KyWdw@mail.gmail.com>
- <4a1e3e4d-a568-4f5f-a6cc-502b9642d0eb@app.fastmail.com>
- <CAMuHMdU2k8Bmnpw88s=zA_a2m8ez=exo7OA53MkzkG=evyC+PQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZKoBOjTS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82EA9C4CEDD;
+	Sun, 30 Mar 2025 16:20:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743351655;
+	bh=nJ4BsCB5loZ/jaKzK1GG9ETMqwHE6FkYOJGC0QZJWTo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZKoBOjTS/SdkIlRXx+NsTBg9T3T3qP2qktPlamnRKqA1WHeACxR7iGCfEGIT+ujeN
+	 msVHaAmXaZd5254jazcOeaeNY0y8zVLY3M2tc5xd6G27Cp5ijB7Mfq9O2moHYIdGpA
+	 6i4sVZPdJNkh+WoT+sgNAFGd14+OuiMwpDLXdW0ghx6ZtUdQU+9Lby+eWJnXZ7yXnh
+	 22YW9475ysIUqawV2tPAGnl0Gr5LTws9IWNd0E1dfVDKXt3Rz5hgsHc+RNJsbKALP/
+	 AFAlDTT3hfgCVsmguSR3nIDYs9mhpTvjMuzpeeaPB0wWG9SdtHQZetBlIVMdx5ZMjA
+	 Oz0jLOIvM93UA==
+Date: Sun, 30 Mar 2025 21:50:49 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Md Sadre Alam <quic_mdalam@quicinc.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v7 1/8] dmaengine: add DMA_PREP_LOCK and DMA_PREP_UNLOCK
+ flag
+Message-ID: <Z+lvYUeAElcW5uNl@vaman>
+References: <20250311-qce-cmd-descr-v7-0-db613f5d9c9f@linaro.org>
+ <20250311-qce-cmd-descr-v7-1-db613f5d9c9f@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,18 +52,53 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdU2k8Bmnpw88s=zA_a2m8ez=exo7OA53MkzkG=evyC+PQ@mail.gmail.com>
+In-Reply-To: <20250311-qce-cmd-descr-v7-1-db613f5d9c9f@linaro.org>
 
-On Sun, Mar 30, 2025 at 10:54:12AM +0200, Geert Uytterhoeven wrote:
->
-> Sure, I mean from a functional point of view.  Let me rephrase:
-> When do you want to store Kerberos ticket caches within the kernel?
-> Is that pure user-space, or is that done by the kernel?
+On 11-03-25, 10:25, Bartosz Golaszewski wrote:
+> From: Md Sadre Alam <quic_mdalam@quicinc.com>
+> 
+> Add lock and unlock flags for the command descriptor. With the former set
+> in the requester pipe, the bam controller will lock all other pipes and
+> process the request only from requester pipe. Unlocking can only be
+> performed from the same pipe.
+> 
+> Setting the DMA_PREP_LOCK/DMA_PREP_UNLOCK flags in the command
+> descriptor means, the caller requests the BAM controller to be locked
+> for the duration of the transaction. In this case the BAM driver must
+> set the LOCK/UNLOCK bits in the HW descriptor respectively.
+> 
+> Only BAM IPs version 1.4.0 and above support the LOCK/UNLOCK feature.
+> 
+> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+> [Bartosz: reworked the commit message]
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  Documentation/driver-api/dmaengine/provider.rst | 15 +++++++++++++++
+>  include/linux/dmaengine.h                       |  6 ++++++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
+> index 3085f8b460fa..a032e55d0a4f 100644
+> --- a/Documentation/driver-api/dmaengine/provider.rst
+> +++ b/Documentation/driver-api/dmaengine/provider.rst
+> @@ -628,6 +628,21 @@ DMA_CTRL_REUSE
+>    - This flag is only supported if the channel reports the DMA_LOAD_EOT
+>      capability.
+>  
+> +- DMA_PREP_LOCK
+> +
+> +  - If set, the DMA will lock all other pipes not related to the current
+> +    pipe group, and keep handling the current pipe only.
+> +
+> +  - All pipes not within this group will be locked by this pipe upon lock
+> +    event.
+> +
+> +  - only pipes which are in the same group and relate to the same Environment
+> +    Execution(EE) will not be locked by a certain pipe.
 
-I think it's purely user-space.
+This does not make sense for me in generic context... Pipes and EEs are
+implementation details... Please generalise the description for a
+dma controller...
 
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
