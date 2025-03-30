@@ -1,231 +1,90 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397ED2F24;
-	Sun, 30 Mar 2025 01:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCB123DE
+	for <linux-crypto@vger.kernel.org>; Sun, 30 Mar 2025 01:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743297266; cv=none; b=Ud1J5SrfNeqwZWt8O5b2daDeHGXj9PjdevvrCdqlNJgP+zzro63o4tUGmyLRRO/cOzSCkCRXaprsHPOeHu6LdHa7D1QIPON5m+AG/WdSC/z7vfXO6Ep6TDfDalvzCYTUePec77ImJGPQP/povr+Fd2A9Usoyclc55RA3+wHIRpA=
+	t=1743298306; cv=none; b=jE05nygvPp7jiFJ5Lw9PrjU1fef27pVGyi+uWjabZ5dYzcez5dwYj/k96/Tgz5AyJW1+jiyl/G+2AJKfQ8YJMCDD1fVxHKM0+93ZjoZdQwxdk3q1+yiynN63USNY7H0NpvQ42IgNPNRCGAhLiNVIVSBF1UrtnTg04UQ4z7Tg9ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743297266; c=relaxed/simple;
-	bh=NJjk4aEzjPTotmsuuOjOnYRwqn1RcnR0XuMkiPEmO2c=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Hj3APXv1HBc0Z38FbxZCCc1yNoibQHAHl7r0p+JLjBbASsc1z5zPZui+5Nt+fiMGLvNQpmBFKN4t+b1CPOEDF5lWtsdGZOfX7I7MkLNyTVMPbPOZEqd4wPCF+N1NRVjSvQubGIkXGiL7h7PpwOmvOXllH/tRtUpfY00ioTVvSi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=dRG80hsW; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1743298306; c=relaxed/simple;
+	bh=ftJioRbUGY/1qDA9dJJf2tUJnNHruHSDyM2tQH5ozxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rck8c+cFCofovRk80Fu8Qr92SufvHXn+i6Rdz1vIXWaVrTmP1GJRYvlJ4vzvhTbNbqjeqtD7BgONEPKYT9n/I6Q02xhcirkAgYZyH49BBw9BUwh7l1j5vu48iwbyi4hOklH8TP9asyCa27w7rENrT68sHV5iml2ByqNchjxdR04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=abr5W57i; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="dRG80hsW"
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52U1DHVh2615696
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sat, 29 Mar 2025 18:13:18 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52U1DHVh2615696
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025032001; t=1743297205;
-	bh=Yuf/0dPL8EDYIt8LEmDAzk7tX/UHLbJMePeCjp2/s9E=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=dRG80hsWRZPqYaHLspQwvAhajiyygRXgM5oM1moistjtcLvP99FwFeCcuWxQsqp78
-	 9T+sJ1PV56vwPReVUFwF83zO2bXNQzdA/dNvdEICHX+q8mtkhpBIOOCdvg86k60ull
-	 4wrPMV//HewvTULNssMWyjWFlpY+30CFjWyhaYq0c45CgR7chzDulYSOwEoKZamTvg
-	 rqgtTUM2p3ao/sj9COgajivzgHH1x6wAC5WuvS0K9WxIkgSnhxNi1/57/LQ2rRQO5U
-	 mfHeqtDL6XZ2i9rhHSdCQFo3cblzedkxTzCplnl3NiaebFEeURzo5v1oloD1rdXqNm
-	 DXcgS91FdpHyA==
-Date: Sat, 29 Mar 2025 18:13:15 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-integrity@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        iommu@lists.linux.dev
-CC: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-        jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-        nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
-        dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-        trenchboot-devel@googlegroups.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v13_19/19=5D_x86/efi=3A_EFI_stu?=
- =?US-ASCII?Q?b_DRTM_launch_support_for_Secure_Launch?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250328230814.2210230-20-ross.philipson@oracle.com>
-References: <20250328230814.2210230-1-ross.philipson@oracle.com> <20250328230814.2210230-20-ross.philipson@oracle.com>
-Message-ID: <B41D3199-8054-4B2C-94D6-508D1DE4C8B3@zytor.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="abr5W57i"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=7o8lHktJKzyUERxHMeokcR/hdPIEo/uJydzMYIYl1bU=; b=abr5W57ie2aKkU+y7P7cLok0Mw
+	bgnizUrQ4IaHqIoSbGm5trxlH+Cc6s66rmDtAs6L8xeJyaVFMldc56BjujN18C6x0a9KcYG/24E2G
+	rJQ3f43KfGm/vPut7tArixWD8+O79jc+9gDbjXY/yV6XUbRYLUz9sdPyI3uHoTapytUSNBjgRZ+eR
+	QZlRo395mLhZsJOGu69MRBCdzB0tdm9AcMYp62hUdQCEQMzD0cGzPrtI4eNC8nrNDOyYVs8NnlqIE
+	SW24wMAcvJYw6o/B8o5IZUJc43sj/1Q/zwS+hyNq6FnrnEAtCmzFQYxdk9E6jvVVI3CpVF8ojWtoh
+	fOK9r6fg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tyhWK-00BHWd-1M;
+	Sun, 30 Mar 2025 09:31:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 30 Mar 2025 09:31:28 +0800
+Date: Sun, 30 Mar 2025 09:31:28 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Boris Brezillon <boris.brezillon@collabora.com>
+Cc: EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Srujana Challa <schalla@marvell.com>
+Subject: [v2 PATCH] MAINTAINERS: Update maintainers for crypto/marvell
+Message-ID: <Z-ie8LWRsoGb4qIP@gondor.apana.org.au>
+References: <Z91Ld28V6L2ek-JV@gondor.apana.org.au>
+ <20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr>
+ <Z-JnegwRrihCos3z@gondor.apana.org.au>
+ <20250325094829.586fb525@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325094829.586fb525@collabora.com>
 
-On March 28, 2025 4:08:14 PM PDT, Ross Philipson <ross=2Ephilipson@oracle=
-=2Ecom> wrote:
->This support allows the DRTM launch to be initiated after an EFI stub
->launch of the Linux kernel is done=2E This is accomplished by providing
->a handler to jump to when a Secure Launch is in progress=2E This has to b=
-e
->called after the EFI stub does Exit Boot Services=2E
+On Tue, Mar 25, 2025 at 09:48:29AM +0100, Boris Brezillon wrote:
 >
->Signed-off-by: Ross Philipson <ross=2Ephilipson@oracle=2Ecom>
->Reviewed-by: Ard Biesheuvel <ardb@kernel=2Eorg>
->---
-> drivers/firmware/efi/libstub/efistub=2Eh  |  8 +++
-> drivers/firmware/efi/libstub/x86-stub=2Ec | 94 +++++++++++++++++++++++++
-> 2 files changed, 102 insertions(+)
->
->diff --git a/drivers/firmware/efi/libstub/efistub=2Eh b/drivers/firmware/=
-efi/libstub/efistub=2Eh
->index d96d4494070d=2E=2Ebbbc4b327ce1 100644
->--- a/drivers/firmware/efi/libstub/efistub=2Eh
->+++ b/drivers/firmware/efi/libstub/efistub=2Eh
->@@ -135,6 +135,14 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
-> 	*hi =3D upper_32_bits(data);
-> }
->=20
->+static inline
->+void efi_set_u64_form(u32 lo, u32 hi, u64 *data)
->+{
->+	u64 upper =3D hi;
->+
->+	*data =3D lo | upper << 32;
->+}
->+
-> /*
->  * Allocation types for calls to boottime->allocate_pages=2E
->  */
->diff --git a/drivers/firmware/efi/libstub/x86-stub=2Ec b/drivers/firmware=
-/efi/libstub/x86-stub=2Ec
->index 863910e9eefc=2E=2E033133e7d953 100644
->--- a/drivers/firmware/efi/libstub/x86-stub=2Ec
->+++ b/drivers/firmware/efi/libstub/x86-stub=2Ec
->@@ -9,6 +9,8 @@
-> #include <linux/efi=2Eh>
-> #include <linux/pci=2Eh>
-> #include <linux/stddef=2Eh>
->+#include <linux/slr_table=2Eh>
->+#include <linux/slaunch=2Eh>
->=20
-> #include <asm/efi=2Eh>
-> #include <asm/e820/types=2Eh>
->@@ -798,6 +800,93 @@ static efi_status_t efi_decompress_kernel(unsigned l=
-ong *kernel_entry)
-> 	return efi_adjust_memory_range_protection(addr, kernel_text_size);
-> }
->=20
->+#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
->+static bool efi_secure_launch_update_boot_params(struct slr_table *slrt,
->+						 struct boot_params *boot_params)
->+{
->+	struct slr_entry_intel_info *txt_info;
->+	struct slr_entry_policy *policy;
->+	bool updated =3D false;
->+	int i;
->+
->+	txt_info =3D slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_INTEL_INFO);
->+	if (!txt_info)
->+		return false;
->+
->+	txt_info->boot_params_addr =3D (u64)boot_params;
->+
->+	policy =3D slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_ENTRY_POLICY);
->+	if (!policy)
->+		return false;
->+
->+	for (i =3D 0; i < policy->nr_entries; i++) {
->+		if (policy->policy_entries[i]=2Eentity_type =3D=3D SLR_ET_BOOT_PARAMS)=
- {
->+			policy->policy_entries[i]=2Eentity =3D (u64)boot_params;
->+			updated =3D true;
->+			break;
->+		}
->+	}
->+
->+	/*
->+	 * If this is a PE entry into EFI stub the mocked up boot params will
->+	 * be missing some of the setup header data needed for the second stage
->+	 * of the Secure Launch boot=2E
->+	 */
->+	if (image) {
->+		struct setup_header *hdr =3D (struct setup_header *)((u8 *)image->imag=
-e_base +
->+					    offsetof(struct boot_params, hdr));
->+		u64 cmdline_ptr;
->+
->+		boot_params->hdr=2Esetup_sects =3D hdr->setup_sects;
->+		boot_params->hdr=2Esyssize =3D hdr->syssize;
->+		boot_params->hdr=2Eversion =3D hdr->version;
->+		boot_params->hdr=2Eloadflags =3D hdr->loadflags;
->+		boot_params->hdr=2Ekernel_alignment =3D hdr->kernel_alignment;
->+		boot_params->hdr=2Emin_alignment =3D hdr->min_alignment;
->+		boot_params->hdr=2Exloadflags =3D hdr->xloadflags;
->+		boot_params->hdr=2Einit_size =3D hdr->init_size;
->+		boot_params->hdr=2Ekernel_info_offset =3D hdr->kernel_info_offset;
->+		efi_set_u64_form(boot_params->hdr=2Ecmd_line_ptr, boot_params->ext_cmd=
-_line_ptr,
->+				 &cmdline_ptr);
->+		boot_params->hdr=2Ecmdline_size =3D strlen((const char *)cmdline_ptr);
->+	}
->+
->+	return updated;
->+}
->+
->+static void efi_secure_launch(struct boot_params *boot_params)
->+{
->+	struct slr_entry_dl_info *dlinfo;
->+	efi_guid_t guid =3D SLR_TABLE_GUID;
->+	dl_handler_func handler_callback;
->+	struct slr_table *slrt;
->+
->+	/*
->+	 * The presence of this table indicated a Secure Launch
->+	 * is being requested=2E
->+	 */
->+	slrt =3D (struct slr_table *)get_efi_config_table(guid);
->+	if (!slrt || slrt->magic !=3D SLR_TABLE_MAGIC)
->+		return;
->+
->+	/*
->+	 * Since the EFI stub library creates its own boot_params on entry, the
->+	 * SLRT and TXT heap have to be updated with this version=2E
->+	 */
->+	if (!efi_secure_launch_update_boot_params(slrt, boot_params))
->+		return;
->+
->+	/* Jump through DL stub to initiate Secure Launch */
->+	dlinfo =3D slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
->+
->+	handler_callback =3D (dl_handler_func)dlinfo->dl_handler;
->+
->+	handler_callback(&dlinfo->bl_context);
->+
->+	unreachable();
->+}
->+#endif
->+
-> static void __noreturn enter_kernel(unsigned long kernel_addr,
-> 				    struct boot_params *boot_params)
-> {
->@@ -925,6 +1014,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
-> 		goto fail;
-> 	}
->=20
->+#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
->+	/* If a Secure Launch is in progress, this never returns */
->+	efi_secure_launch(boot_params);
->+#endif
->+
-> 	/*
-> 	 * Call the SEV init code while still running with the firmware's
-> 	 * GDT/IDT, so #VC exceptions will be handled by EFI=2E
+> I haven't reviewed contributions or contributed myself to this driver
+> for while. Could you remove me as well?
 
-efi_set_u64_form()?
+Thanks for your contributions Boris.  I'll add you to the patch
+as well:
 
-What the heck is that? If it actually involves two u32 packed into a 64 fi=
-eld, why not simply do two stores?
+---8<---
+Remove the entries for Arnaud Ebalard and Boris Brezillon as
+requested.
+
+Link: https://lore.kernel.org/linux-crypto/20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f8fb396e6b37..8eda257ffdc9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14009,8 +14009,6 @@ F:	drivers/gpu/drm/armada/
+ F:	include/uapi/drm/armada_drm.h
+ 
+ MARVELL CRYPTO DRIVER
+-M:	Boris Brezillon <bbrezillon@kernel.org>
+-M:	Arnaud Ebalard <arno@natisbad.org>
+ M:	Srujana Challa <schalla@marvell.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
