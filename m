@@ -1,68 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527C919D8A7;
-	Mon, 31 Mar 2025 08:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF3B86338
+	for <linux-crypto@vger.kernel.org>; Mon, 31 Mar 2025 10:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743408034; cv=none; b=gdOKv52f007vOB7CH/x4OoqbHkHnWANZM+shgw46w9eNz/f5Gmvn3uGKiAvV5BnrbNEwk6Pm2orgcKvhvVkcjYDWX5vDfFisrMdJeunJZmvWITAy7pT7+tFYFG1jMtGSy1jlrNvtvQ7cWRgcidDZ4xm8dh3M1TAzRFday0J5nI8=
+	t=1743415344; cv=none; b=BDq3rqmHpjHRdLU4EOWBk1HD8O5A0uhah6s9KTjl2SJJEjbKdF1z/tKvQ9EDZR1lxwkKCFnhfiUWkFwBEQuWRxwEjBXncCTRlKmZwbuvUGCtYAUaFGuLRhF+XmRhcA9R7DWZDnwYC8Ot34aFQV1+QqIWtHcdggjnkSh9o6wFnsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743408034; c=relaxed/simple;
-	bh=9lhSfPox4E2eux54Gtxkrw5LjnGqrUCdXCq0YD5C+1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0j7EhoILkVs1NSs828NbHLpSgq9sFWTeo3TMRMB3GRfAEW1TokC38q1bPzHLTtNsR6V7Tzsv8MttLzfMh3s+b1mEO3yRu0X1JS9aom/hK7RYf5XVqDFCGMtuA6RQ4yYSAHIMD5bhVMXY3h+1/4ymeA1uPDkS1AFf77r0z1zrX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXQM5M0t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743415344; c=relaxed/simple;
+	bh=DBuOXv5lnH0/JT1OzyoZmwKYGWScqSBPV4CQbsmVxDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V+zeGM7VnrE1bF0mKConetVpZgbiXZN37AUUABj9JX49xC7YI9F9jhUA3SCMsF2aiGgbXSqgM7ulSKkcbCAPqLFqJ/qHWXkajrxZv+48+qhMJ/e5wsdKPK8ZaxAdeMD97b4lKtwFkHD2U2Oj7f+vDJcJsS7b/HYUW8LvcC76ovU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JQtPHEkA; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXQM5M0t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCB81C4CEE3;
-	Mon, 31 Mar 2025 08:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743408033;
-	bh=9lhSfPox4E2eux54Gtxkrw5LjnGqrUCdXCq0YD5C+1U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nXQM5M0t0uFbQ/BP15/z10c6ah0f32+Sul8vazqTQ0dzfih1yE6XX9jLQ/bUVmeUZ
-	 pIzdPNI4MBmw8/Ak3P8ynzn73W3qTf2LdCcWd1RZoOx27jR3vaMvqIFpcNSMYBFKRz
-	 dGxgvTX25wH+lRYRnWx5hx2HdKqKH2LmfAJOZUjMzRfgebUyclR3fRiFMP6ZbeVgXu
-	 sKos25JUz+y9KXcjJZTaNeGsg+6TjBuTgjGUcl6Y2x8GJMEOyHDm0crWDPdF7jAIbj
-	 faz+A9R3Oeizldd49VR49QnW5eGnRYvvj/vxwBYBijQXRcXjkklHhQfh+T8ITaJVlb
-	 nC72FfYxEeZCg==
-Date: Mon, 31 Mar 2025 10:00:30 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	William Zhang <william.zhang@broadcom.com>, Anand Gore <anand.gore@broadcom.com>, 
-	Kursad Oney <kursad.oney@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Olivia Mackall <olivia@selenic.com>, Ray Jui <rjui@broadcom.com>, 
-	Scott Branden <sbranden@broadcom.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 02/12] dt-bindings: rng: r200: Add interrupt property
-Message-ID: <20250331-hulking-orthodox-moth-e7d47e@krzk-bin>
-References: <20250328-bcmbca-peripherals-arm-v1-0-e4e515dc9b8c@linaro.org>
- <20250328-bcmbca-peripherals-arm-v1-2-e4e515dc9b8c@linaro.org>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JQtPHEkA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1743415340;
+	bh=DBuOXv5lnH0/JT1OzyoZmwKYGWScqSBPV4CQbsmVxDM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JQtPHEkAVq8HHcH3AhLIEJ2wHYd6dssTVwegDGUMiq9U+nLe/2gG23voxHWPPXPfn
+	 O5MCj1ilevsj7ZeSlEHitzoGaoeE4dhMQ1LwmNx12HZpKlBOcOtCztfrgZbRanw5nd
+	 o/AU+iQXbDfl0c/QZE02vSjVXi1P5Q+89x5kb6Tko3zllsfmqERSTgRKbpla3dC2ei
+	 S/wu3miJDkVSd6bRV8JYqyXnz1vZaAYsjarhftEla68hsMFYyTXD2Ey8HDmRJxTWrI
+	 uIN3FrrppqgdaAyUdCdYYjkL5JBZ+MnrPN9iMDo64kmA94rCy467HIpTc+iMKFjSfH
+	 L0V3nQu3fl6Hg==
+Received: from localhost (unknown [IPv6:2a01:e0a:2c:6930:5cf4:84a1:2763:fe0d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bbrezillon)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id B95A017E0808;
+	Mon, 31 Mar 2025 12:02:19 +0200 (CEST)
+Date: Mon, 31 Mar 2025 12:02:14 +0200
+From: Boris Brezillon <boris.brezillon@collabora.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>, Linux Crypto Mailing List
+ <linux-crypto@vger.kernel.org>, Boris Brezillon <bbrezillon@kernel.org>,
+ Srujana Challa <schalla@marvell.com>
+Subject: Re: [v2 PATCH] MAINTAINERS: Update maintainers for crypto/marvell
+Message-ID: <20250331120214.0fc41ed6@collabora.com>
+In-Reply-To: <Z-ie8LWRsoGb4qIP@gondor.apana.org.au>
+References: <Z91Ld28V6L2ek-JV@gondor.apana.org.au>
+	<20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr>
+	<Z-JnegwRrihCos3z@gondor.apana.org.au>
+	<20250325094829.586fb525@collabora.com>
+	<Z-ie8LWRsoGb4qIP@gondor.apana.org.au>
+Organization: Collabora
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250328-bcmbca-peripherals-arm-v1-2-e4e515dc9b8c@linaro.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 28, 2025 at 08:43:52AM +0100, Linus Walleij wrote:
-> This IP block has an interrupt. Add it and add it to the
-> example as well.
+On Sun, 30 Mar 2025 09:31:28 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
+
+> On Tue, Mar 25, 2025 at 09:48:29AM +0100, Boris Brezillon wrote:
+> >
+> > I haven't reviewed contributions or contributed myself to this driver
+> > for while. Could you remove me as well?  
 > 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
+> Thanks for your contributions Boris.  I'll add you to the patch
+> as well:
+> 
+> ---8<---
+> Remove the entries for Arnaud Ebalard and Boris Brezillon as
+> requested.
+> 
+> Link: https://lore.kernel.org/linux-crypto/20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr/
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Boris Brezillon <boris.brezillon@collabora.com>
 
-Best regards,
-Krzysztof
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f8fb396e6b37..8eda257ffdc9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14009,8 +14009,6 @@ F:	drivers/gpu/drm/armada/
+>  F:	include/uapi/drm/armada_drm.h
+>  
+>  MARVELL CRYPTO DRIVER
+> -M:	Boris Brezillon <bbrezillon@kernel.org>
+> -M:	Arnaud Ebalard <arno@natisbad.org>
+>  M:	Srujana Challa <schalla@marvell.com>
+>  L:	linux-crypto@vger.kernel.org
+>  S:	Maintained
 
