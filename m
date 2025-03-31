@@ -1,374 +1,566 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8301E8353;
-	Mon, 31 Mar 2025 18:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743445815; cv=fail; b=sAonNQ1NL8A7ma6CQXqjiravqnw9DwKC6wo74Rz3+tvyItEVjJbLFZ53sVinrm5yZwBhB3l2LIQ9yCM0ixvEjtkFRtd3yBY55ceSiAIYKD10Z93ytgt2BYol+iuNd+NeKpmW1t47Z9Vj4+qPfFAoSnJxFGLP4R9fsnRT31+Uzyo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743445815; c=relaxed/simple;
-	bh=7nWec/52Ah1KdW4gRGVz2zdGnN9vLMA9XrSLihTwApY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mfR8+0+0VkFXZqsCvBjVMMhnKCvppTGuHGCaJdolbh19yo4/BQBGUAIKct4qD+eLZH/Yjas3AaIbi58JvyOBcrCZ3/rv4syThkzCdzzVEj+fmDn9NhO4QIJyjGGRu2KeYEopYRvHDlFf9iiPtdcW93ffN3b+QsVI0Nua6L9qfLs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DedVKYzk; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=VC9NuhQl; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8317C8472;
+	Mon, 31 Mar 2025 20:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743451244; cv=none; b=Y8qoghvhNhr9o7gV+l4myNhfMLzaThtvycjbJGJpvPECfbDINVSRjw1NG+QG4KQJfFFSCfyGsIaqGHxuVsXuMO6ESCctF4NDdUjLyD8tAQ5ojB9PVyMPdAXgz1pUGukkBG+6IwidfPlAeaDunoACpBzuzZHygWUqpj8gk0LD8D0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743451244; c=relaxed/simple;
+	bh=LJ2pLNX9/A/YnCNJEv8/2x5aDNTiy3gQMHFL8Gu0AKc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DTn256bNxmoMUudwCAtchZT8b9yAbMSkDsEJTe3lKn1LQQwZA9mm9D2/M4hU2t6Kf5QuwPJCKm1KgjKz87ik7fkXT8GmcnGdEmXB//zr/LOXEXekVQzusSQ+6o6sEUmg/C7VZd6A+8d2Dt7UffNk6VYeE1rU0OgORRWw44bB2SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=FmQiax15; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DedVKYzk";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="VC9NuhQl"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52VIPaYk024783;
-	Mon, 31 Mar 2025 18:29:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=DJYnoqlJb+PRh2pC8d+eYwqBkqxYTUT1uc2MrG5KgU4=; b=
-	DedVKYzk2q89i7/MPOnq8NDAAoJhd13u1qY+tLAwsYd6tM+onKPau/Jtj1HcSree
-	PRkcunrBdXO2gMiWsBf3FDyn7SE2R+hBNhmiwcvJnos+kslUadNlGIkZjVm4Y5mp
-	rE3LDog1zMoqueZuibsdSKomLl4bx7RnzcIo4QbRxL8llbnSkTPLM41IyWWvSp9L
-	/Gme0wUnOnRG5yTESSOGaEtjoBPJYJgyGEOYRA9NQxk8PWlVjJ6H7gAsBn5Li/YD
-	HMmzNHMLm0HNYzwslmaEC/Vy+bnGtWOyulGSPHvf129XhsczsL2LO4sBUyPbj6ud
-	gMlkCGAoBxyIgGnCnqAwcw==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45p8wcbwfu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Mar 2025 18:29:18 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52VH4vST010832;
-	Mon, 31 Mar 2025 18:29:18 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2174.outbound.protection.outlook.com [104.47.59.174])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 45p7ae8uh5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Mar 2025 18:29:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VsZhzo8HROByCqD8aJXzW8WM3cwjUzWyxebL0gZJHPB4PJKPsUIEj4+A7d2+u5zlYv5XlL4nPRcjkSQR0Q6gYenMXFRCkENgRCnTgv0GgXYJjCLfsO+hyLsanL2mFs57ng2Py9CeYQWy4PXDg2qUfqyPx6pnUEeKS+jVYMEPeiqNoK2EBoFTciGkGGaEQfEjpEH2ucYJyoWprTTOrdzEKw1yIns2QLO9t7vgrhqUQoGah3tu7NwMx5gyl/n06x6dwgfH2BEttFac3BeP005pw743IGNcbT+hXKyOPb3ztOf2qK2gx0a5mcVyM87M7CBRLiVZbB0E4gC0IEukCNBW6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DJYnoqlJb+PRh2pC8d+eYwqBkqxYTUT1uc2MrG5KgU4=;
- b=QdcOZLB3n63LCA4IHn5jJbMeBA9HOBwKDhrJnzmVukgEW170ydY0TE1BueoXsVj8DlESO/nd2ylrYKdyRG8KJ5DO0YZGL6i5GZyf9FiW7xlzYm9yN1YlB3+AvwCByJiblyPLKasPJVCIfg9fO7q3EgeBEo2f59+pOFeDeY7HVluxN9YAx3AWKFHRbGikazQfOImqOOluiqXLWvHJ5nR0BZJ5noV2VvCc8RXVIzd2H7wlyRRHpMYVpZZ8G02W6tT+c3wS4QQmke4FuyxI6EApewXD96nfYj9xRA30bppMrvQlv+biOrQT7HHfGuTjXIouH3ZhbVv9b7JFT0I6cZhtYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DJYnoqlJb+PRh2pC8d+eYwqBkqxYTUT1uc2MrG5KgU4=;
- b=VC9NuhQlPReTWQKgEOwFPph5bPvya4W+iUkpGLf04OrlAWlUIAZGtTEA3cxhqYupyin/Il8ZyOE6nfZG1cek/pwYkexF+NzFiqb7p61xBy8w8HL9Xa3Gv6VM0D7AfVNZhT1x4OuAulfQfz5sK2yy2REqovCi3XT3QwTundYTx8M=
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) by
- CY8PR10MB6444.namprd10.prod.outlook.com (2603:10b6:930:60::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8583.31; Mon, 31 Mar 2025 18:29:15 +0000
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8]) by DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8%4]) with mapi id 15.20.8583.038; Mon, 31 Mar 2025
- 18:29:15 +0000
-Message-ID: <886145d3-a9f2-41f3-a754-253decdb1b4f@oracle.com>
-Date: Mon, 31 Mar 2025 11:29:08 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 19/19] x86/efi: EFI stub DRTM launch support for
- Secure Launch
-To: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-integrity@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        iommu@lists.linux.dev
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, ardb@kernel.org,
-        mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
-        peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-        luto@amacapital.net, nivedita@alum.mit.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-        ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-        trenchboot-devel@googlegroups.com
-References: <20250328230814.2210230-1-ross.philipson@oracle.com>
- <20250328230814.2210230-20-ross.philipson@oracle.com>
- <B41D3199-8054-4B2C-94D6-508D1DE4C8B3@zytor.com>
-Content-Language: en-US
-From: ross.philipson@oracle.com
-In-Reply-To: <B41D3199-8054-4B2C-94D6-508D1DE4C8B3@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BN0PR03CA0043.namprd03.prod.outlook.com
- (2603:10b6:408:e7::18) To DS0PR10MB7224.namprd10.prod.outlook.com
- (2603:10b6:8:f5::14)
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FmQiax15"
+Received: from narnia (unknown [167.220.2.28])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 522DD210237E;
+	Mon, 31 Mar 2025 13:00:31 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 522DD210237E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1743451241;
+	bh=fIovqkBitXFZRQ//g6BuZpszSPejDeke8e/+BQorTCk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=FmQiax15Emr+HO7GFbg654Oa6oexdb9pXvdUjsUZpIuu42L0xy5p8WDzlIIDrG/5j
+	 ySOAeVcw/6yTfRgtP2xHcP8ETiFgVFrNvK7H7oHiVccAXOOgoXWtE+mxyv6C9E+s0s
+	 hnuUi9mndmMldFbdQMO+EDIff98hHWYURD2ixY18=
+From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James Morris
+ <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada
+ <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas
+ Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, =?utf-8?Q?Mick?=
+ =?utf-8?Q?a=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Nick
+ Desaulniers
+ <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>,
+ Justin Stitt <justinstitt@google.com>, Jan Stancek <jstancek@redhat.com>,
+ Neal Gompa <neal@gompa.dev>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, llvm@lists.linux.dev, nkapron@google.com,
+ teknoraver@meta.com, roberto.sassu@huawei.com, xiyou.wangcong@gmail.com
+Subject: Re: [RFC PATCH security-next 2/4] hornet: Introduce sign-ebpf
+In-Reply-To: <Z97y578XhzkTt0mK@kernel.org>
+References: <20250321164537.16719-1-bboscaccy@linux.microsoft.com>
+ <20250321164537.16719-3-bboscaccy@linux.microsoft.com>
+ <Z97y578XhzkTt0mK@kernel.org>
+Date: Mon, 31 Mar 2025 13:00:29 -0700
+Message-ID: <87cydx6kde.fsf@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7224:EE_|CY8PR10MB6444:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64a57db0-6256-491d-2a5d-08dd7081f0bd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QWpmbzJlZVhlcHVva0w4OG9aNEJuTzBjVTEyM01nZzhRQ2hrNzg2czdiUUpS?=
- =?utf-8?B?OU5OeDNRMnM0U0w5ckc5L0pocWZQeDl6aVZoU1VoMUEvYlc3TjFXeWJFWndB?=
- =?utf-8?B?d0plYWpiRmUzaHJGSlROcmYzT1FnRzY4bnVXdDRmZFFleXZVYWQ2SFZzdWlG?=
- =?utf-8?B?Q2MwVWlsSG9yU3NKOEhtdmpTRHd5U3hsK014ejdSMTdtUVNRQW9DQmRwSEJF?=
- =?utf-8?B?NlgyWUR4Wk1rRkNrM2ZFRGd2a3NlVEQzMWdyem5iQ2tuYy9tVjZiRi9IVmZp?=
- =?utf-8?B?L05KblZFVXlySFZNKzVrYXd5Vm9yb3dROHQwcE1rQTVDU29YVStHREFpTmZC?=
- =?utf-8?B?YmlnRWZiOWZiRmV4K1EvQ1R3TXVGTk1PNUlJczVrRmFEZk5BNDBwUldNcUds?=
- =?utf-8?B?cUNJRjE4eGU2TGtjbmd1U3E2UzZleHVTK1VIWXd0MW85bEJyeWRWL1MxU0dv?=
- =?utf-8?B?aElyRTRFb1JkdHhmbW1qd0dwbEdnK05WbGRjYjV3T1MrMmFqYmhBajIxeEhR?=
- =?utf-8?B?K1czbWlneXlNUnJXSkhxVm1QZEZJWGVzSTdWYzNVU3IwTVYzTWJib0VzQlVv?=
- =?utf-8?B?eTBZRHQyajVEb0EyeWlXMjR1UUxXSW03ZFAwQVBBZ1NBL0ZYSjB2Rk9hcjZC?=
- =?utf-8?B?cE9XdG9GdFJpSFVxWUNTY0NiUUZuNUJwaDlaY1pkeU41QzhmcVVUTHlHUVBC?=
- =?utf-8?B?SDVxemVJMFNtUjd2RlNrNmR4aEtNaTYveUxhRVJyUG9jWGdDN1JtaWE4dTZF?=
- =?utf-8?B?eHMvS25ZdEtBbFBwYmwzUDBVZHFGVmw3c2kyOUUrWnVtcGtCNVBTWmUxZVVn?=
- =?utf-8?B?ZTdWMGROZmp6TEpiZWpjMEx3SUs2Uy8zVThGWFZJSHlWUWhkQTBLU1JCcHgz?=
- =?utf-8?B?cW8wTk9vKy9lQ1RCRGlVb2RLcWpETlBZL0o1dmpkdmlYa0hJamNIRUd1WjE5?=
- =?utf-8?B?SWluVTRQTHA4SDIxZ09IamhNRmw4ZHZ5NUttLzhZdUk2YktmWkVtWUxabndL?=
- =?utf-8?B?ekNaZms3K0V2WHNCQnl1UEh5L05adHRCVUQxOTNMa1piWGhvdHhIUytHUXNk?=
- =?utf-8?B?R2lEb2dXUkhXRVJSamxSOUZiTHkwWG8vd2ZKSFEzTTc1d25ubGRpV0wvOHNw?=
- =?utf-8?B?RzdvdXhWdjZqUHZrN1ZTM0YvVEdTY3FnQjZlejZ6YzNnb2J4YnQ0eXgrbEpQ?=
- =?utf-8?B?UVVJSlhvZnhhQmxXNEduWm1zS2NuSzBIWFJiTi9GUzRHV2hydVNyZk9CU1l2?=
- =?utf-8?B?MlBtUW1IKzhhM2xsRzA3cWFDaExORVdhUm1pQlF0U2VCQUdCOGdlTWowdzNQ?=
- =?utf-8?B?M2xLYStRdFdlMGtDVFhKU3hBQ1ZacjNlQ1laeVZxM2JudnNZWk9EZU55bC9N?=
- =?utf-8?B?cDN6eVlHZmR6SVhkM1FqYnlWdVR2U3psZ2FGakNLcGFISGRpdW5jUkcraUtu?=
- =?utf-8?B?L2FWbXZDMHdKNDNPQmVBL1VCSS9YeGN2eWZBeUZBVzBhWlRXRTBTU3VvclZi?=
- =?utf-8?B?dUtxNGRVNVVFQUN0WUtiYnN6QTQwR3N5N2owaXhmK1gwc2pFMW9EbU5BbkRD?=
- =?utf-8?B?MXAvTHhqZ25TYzRFSXRKY2t3U0dQQWREcWVvVlI1SlZEK04reFg0LzRSZXZq?=
- =?utf-8?B?ZWlKbjZjUjVKVDBFV2tnSmhUZ212WDNjTWFoRXFaSVEvRE43TFV6NklMam5D?=
- =?utf-8?B?TkZpNlN0YkNLVzJQMEgyRXpPaFl5bkJaVTlmbFVoS1RhWUpOdnRRMmNHK2xP?=
- =?utf-8?B?R094TmpEWkpvQzd4Ukh4Sjk0RDBRU1BpSlBGck1HYkh2cGJjUEd0eTNabjBk?=
- =?utf-8?B?SkF5Sjdob28vMy84b3Z0a3hVZEF1K002bHVnTDRxcDRaM21LblBCVjQralor?=
- =?utf-8?Q?x1jqUTOElF2aF?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7224.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dU5xMUJqd3NxUklBdnRoZWNteE0zQXVwV1RqS3hBZE5YNC9sVStmV202UkU1?=
- =?utf-8?B?ODYxS05UYUl0OHovSm56VXpIZ3ZTY0RhWVpOMEwxc2c0RmtYREYxNGlWK0Ew?=
- =?utf-8?B?OVlaT3NEVEg4VmxhQ1JoN05kTGp1dzN3SHM5MW1HeW0xZDZwNXhqODhsTVF2?=
- =?utf-8?B?aFgzS2M3VkV5eFZLelltQXJVYUNxNk5XR083SnBhUGs0U3k1ZGdET1dKdEVR?=
- =?utf-8?B?c3VDcDZnVGVzWFRDalBGQmhxZUVlc2paN0h4UmlUMWkxazdRSUtNVjBmVUNx?=
- =?utf-8?B?ZVBuQmszTm9hOEZhVHBvVlltS3ZjaWxWZHNMMUdYVVNoU01WRDAyR1krM21q?=
- =?utf-8?B?RTA3S0FYSVhrNVRkT3VQQThyNTNGYldYckd1c3RCMU1CVk5Wd1pReHlXejJF?=
- =?utf-8?B?UHAzMWJCOUp3dGZmbmhVdXVMSEhmaFFwRCtZcFNPTXlvcDVjTEtjQWo1c2VU?=
- =?utf-8?B?eUNZd1lpSkNjdnB6RkFYVndDZzNJRk1vdkZ6eUs1bi9zV0FYS3VyZndiUGVi?=
- =?utf-8?B?YjNZMnFJeGw1TkZhdDJpaEVGdStzRGsvNWtjSmlqcXY3VldwUXgxc2RISC9N?=
- =?utf-8?B?VkxsNXdGeDVZRjVXL0k4N2x0Tjc2blBvOXh0OXp6MFZwQ3h2eEZ5UXJVV0ZI?=
- =?utf-8?B?a0tFcDJDWDNCQkNDTkRMQkFwZnZVWHFPRmV0N0VyMUE1d3NZM2JFRFdWTjVh?=
- =?utf-8?B?aVNKMlpzUk83MzlpaGRWMEVrRG9zSDEveXdnanpwWFRpek9IZkQ3MER4T0FS?=
- =?utf-8?B?eGZZcHRhckQ1VWlHWlpaT2w3TFhROEdjeFN6V3lYUVd5cW0vS2cyQUVDMzZR?=
- =?utf-8?B?eWhCUHhiNFBWcU93Yklva1gyRUN4ZUlTMXZhazM0RzkwVWFic1lkMzFmbzBZ?=
- =?utf-8?B?ZkttNE1raUJKaDBZTGdZRHQ3eTJoV011cXpPL2tWa3BPQ2NyVjZTaGRId1pD?=
- =?utf-8?B?amtGa3hXNnRUbURCR1ZtWWxwQnJWODhEbGxJb3ZlSUhtUU9Dd2RmVkx2STB5?=
- =?utf-8?B?dVY3Rzg4S21wVGExdlRaSGpWcjBqVEpadTB4UWJVdzFTVjhRTHFqT2RvVFBL?=
- =?utf-8?B?NzVKakxWZktESTQyb3JSSTNVM08zdllkN1JsWkFVUzBFczljb1hDRjQ1MGlS?=
- =?utf-8?B?VzgxaG0vRmt2UFdQaEhGSWc0WE9yeUJaRkdVSXZTVVpLcTZ5TTUzYWdwOU44?=
- =?utf-8?B?dmtadytSSE9GODNxYWxhaHdYdW9wRE51NXFHZ3ZuWGZtc0h1RWpDQVZKbE4w?=
- =?utf-8?B?T0pwblR4QzRUdlkvSWV0UEtaTHM2UHFQK0xtU05jazJKK01KcWhJa1I2aHow?=
- =?utf-8?B?L3pBSXdLVEVia0d5UTNPcG16R1dXSGxlRVBUWFA0bC83ZmNWdmE0NE85R0NW?=
- =?utf-8?B?VDJGVlpJRngraEw2TVNjVmJsaUIrTy8xOHUvYm82Y1M2d0F1bWpFbWkwaWU4?=
- =?utf-8?B?TkpVWXh6Tm1xQ0xjbnkxeWt0c2dxZmtQSy9WQ2dReTNlN2ZoUW9md0xsM1Ix?=
- =?utf-8?B?dFg2NUFESUJ0czBwL1RYME40MkxKcERCdWdxRVFPVlRkRFZqckVtUEJhelAx?=
- =?utf-8?B?eTg4d1JLRjRiOUROTjJVSnVSbmgvSEdSTno3ekdqbHE0a25lM04xMVRQT1hD?=
- =?utf-8?B?dEpTNFNGMkRvRGc1cEtrYWtwTkNBckt0Sk0vTEowMGtxa0lHZURhTjkyWFpu?=
- =?utf-8?B?dzFzVGdGQkRqQS9kdFI4SlRlVmtPKzZ0RHNWYTUxVE0xTXFuTW9nMjJKYXl0?=
- =?utf-8?B?azVwZU9vNUp1QSthUmZCWDBwUlFTa3k2Qk1HM0xycmkrRDVKMzRHZTJ5WXpk?=
- =?utf-8?B?dWJvem9rbWw0YjF0WGJSYTF0SUMzaVFRTnJHelltVTc1RldxeS9TSFk1eC9P?=
- =?utf-8?B?YzcxN3diZjhMUUtqQ1FtbzR5blNCRVFFcjlEd0dKL2ZNc2s1QVdlMTJ1VGQ4?=
- =?utf-8?B?T1pCVkpTdXRaMmw5U2hCSmpoUGxRSW1TMFlEUTFsK0k2ME1SekRiRlJ6c3ZK?=
- =?utf-8?B?NFBpOUpUcm5IZkZVc3dOeFZHVTRMWHd2SzdrOGNPcUZVNUNRWElFWFkxUXdX?=
- =?utf-8?B?czZ4MWorSVFKYlR3Nk9XQTR3K3NyamthblJiSm5FVUVMSk5Bc2NZNFlOU1E4?=
- =?utf-8?B?SW5uUlBseHZVZjFFa1RFQXQ1d0h0S1RXcmkrd3dyUy9jbFFLZ1dqSUF3eGdS?=
- =?utf-8?B?VkE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	9n8hyU/2CgQnZEwWKQSKu1p/qrYwMVUF0lADnnottdZUW1b7N2OaSuD2FM5MYBrqZWYs2y/w0KrTH6yl2covsS+1NNHBmDwQVRLOSZjxnd/up2wEWST1WVLzkw2NO8ThMOZHRm+ozyslzHdR6ZeN0ga4wujxmFKMlOakNQ2jKq2w+JfHnDrU49PAQufVMyoRa0fa6qmcC7S5TCB6bmUN5nXF14KXo8VPOYJlvIQSbKxgPFc/7snoUsZwFfwx4kAcORk5whluq5W57eOnY0ocxWEA+dgcx7odtZeEzWJ1MQoA7WfNteW24unpxtOtnuXuEWsJ3YddCz17fMc8QnlzMcAMOpXZ0VCBaQpLbnINuSXG+CY2ZxV3+AQKqqU/ONfKUGHHYfysVEvmyN0dZTgQ5KRpelYuxhrQdmkmdsW7WDDWdufbfg4emAw0QRSvcIHdPLy7dnAPaEPKVepCZptJCrwcegYBE8b176vI+e65mT6Cg/P9WjWPAgswuv9JWZ/ajtecM2JmoDBowZH2WiD63GsW+L8IrauoDmf7LbcmyYq5lm91wPkxyiPJu7aJBVqpOSA36ziYXQmb1+c1rnkCWXcIO78WDTrVcR7ZLqp2r48=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64a57db0-6256-491d-2a5d-08dd7081f0bd
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7224.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2025 18:29:15.0968
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yn9+le2PKehOWyruvV9ICC0yMEcYgPqGbvv3mu6bbZ6TP7tQDLKlM+Z2c7X7OWF0BWsCPlVZjIeUXVlZcaZS6xz+OTvDVAUUOaH5XGEZ+iI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6444
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-31_08,2025-03-27_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 suspectscore=0
- adultscore=0 malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
- definitions=main-2503310130
-X-Proofpoint-GUID: yGpyYJ3ONZJ-WkXWOY8dMaPiWqoUlJy3
-X-Proofpoint-ORIG-GUID: yGpyYJ3ONZJ-WkXWOY8dMaPiWqoUlJy3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/29/25 6:13 PM, H. Peter Anvin wrote:
-> On March 28, 2025 4:08:14 PM PDT, Ross Philipson <ross.philipson@oracle.com> wrote:
->> This support allows the DRTM launch to be initiated after an EFI stub
->> launch of the Linux kernel is done. This is accomplished by providing
->> a handler to jump to when a Secure Launch is in progress. This has to be
->> called after the EFI stub does Exit Boot Services.
->>
->> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
->> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Jarkko Sakkinen <jarkko@kernel.org> writes:
+
+> On Fri, Mar 21, 2025 at 09:45:04AM -0700, Blaise Boscaccy wrote:
+>> This introduces the sign-ebpf tool. It is very similar to the existing
+>> sign-file script, with one key difference, it will sign a file with
+>> with a signature computed off of arbitrary input data. This can used
+>> to sign an ebpf light skeleton loader program for verification via
+>> hornet.
+>>=20
+>> Typical usage is to provide a payload containing the lskel ebpf
+>> syscall program binary and it's associated maps, which can be
+>> extracted from the auto-generated skel header.
+>>=20
+>> Signed-off-by: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
 >> ---
->> drivers/firmware/efi/libstub/efistub.h  |  8 +++
->> drivers/firmware/efi/libstub/x86-stub.c | 94 +++++++++++++++++++++++++
->> 2 files changed, 102 insertions(+)
->>
->> diff --git a/drivers/firmware/efi/libstub/efistub.h b/drivers/firmware/efi/libstub/efistub.h
->> index d96d4494070d..bbbc4b327ce1 100644
->> --- a/drivers/firmware/efi/libstub/efistub.h
->> +++ b/drivers/firmware/efi/libstub/efistub.h
->> @@ -135,6 +135,14 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
->> 	*hi = upper_32_bits(data);
->> }
->>
->> +static inline
->> +void efi_set_u64_form(u32 lo, u32 hi, u64 *data)
->> +{
->> +	u64 upper = hi;
+>>  scripts/Makefile           |   1 +
+>>  scripts/hornet/Makefile    |   5 +
+>>  scripts/hornet/sign-ebpf.c | 420 +++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 426 insertions(+)
+>>  create mode 100644 scripts/hornet/Makefile
+>>  create mode 100644 scripts/hornet/sign-ebpf.c
+>>=20
+>> diff --git a/scripts/Makefile b/scripts/Makefile
+>> index 46f860529df5e..a2cace05d7342 100644
+>> --- a/scripts/Makefile
+>> +++ b/scripts/Makefile
+>> @@ -57,6 +57,7 @@ subdir-$(CONFIG_GENKSYMS) +=3D genksyms
+>>  subdir-$(CONFIG_GENDWARFKSYMS) +=3D gendwarfksyms
+>>  subdir-$(CONFIG_SECURITY_SELINUX) +=3D selinux
+>>  subdir-$(CONFIG_SECURITY_IPE) +=3D ipe
+>> +subdir-$(CONFIG_SECURITY_HORNET) +=3D hornet
+>>=20=20
+>>  # Let clean descend into subdirs
+>>  subdir-	+=3D basic dtc gdb kconfig mod
+>> diff --git a/scripts/hornet/Makefile b/scripts/hornet/Makefile
+>> new file mode 100644
+>> index 0000000000000..ab71dbb8688e4
+>> --- /dev/null
+>> +++ b/scripts/hornet/Makefile
+>> @@ -0,0 +1,5 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +hostprogs-always-y	:=3D sign-ebpf
 >> +
->> +	*data = lo | upper << 32;
+>> +HOSTCFLAGS_sign-ebpf.o =3D $(shell $(HOSTPKG_CONFIG) --cflags libcrypto=
+ 2> /dev/null)
+>> +HOSTLDLIBS_sign-ebpf =3D $(shell $(HOSTPKG_CONFIG) --libs libcrypto 2> =
+/dev/null || echo -lcrypto)
+>> diff --git a/scripts/hornet/sign-ebpf.c b/scripts/hornet/sign-ebpf.c
+>> new file mode 100644
+>> index 0000000000000..ff98fddb79a15
+>> --- /dev/null
+>> +++ b/scripts/hornet/sign-ebpf.c
+>> @@ -0,0 +1,420 @@
+>> +/* Sign ebpf programs and skeletons using the given key.
+>> + *
+>> + * This program is heavily based on the kernel's sign-file tool
+>> + * with some minor additions to support the signing of eBPF lskels.
+>> + *
+>> + * Copyright =C2=A9 2014-2016 Red Hat, Inc. All Rights Reserved.
+>> + * Copyright =C2=A9 2015      Intel Corporation.
+>> + * Copyright =C2=A9 2016      Hewlett Packard Enterprise Development LP
+>> + * Copyright =C2=A9 2025      Microsoft Corporation.
+>> + *
+>> + * Authors: David Howells <dhowells@redhat.com>
+>> + *          David Woodhouse <dwmw2@infradead.org>
+>> + *          Juerg Haefliger <juerg.haefliger@hpe.com>
+>> + *          Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+>
+> I don't think that for new code ad-hoc authors lists in source code
+> make any sense.
+>
+>
+
+I'll remove that. This script is mostly copy-paste of sign-file with
+some new args and usage. I'll leave the copywrite and nuke the author
+list.=20
+
+>> + *
+>> + * This program is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public License
+>> + * as published by the Free Software Foundation; either version 2.1
+>> + * of the licence, or (at your option) any later version.
+>
+> Redundant given SPDX.
+>
+
+Sounds good.=20
+
+>> + */
+>> +#define _GNU_SOURCE
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +#include <stdint.h>
+>> +#include <stdbool.h>
+>> +#include <string.h>
+>> +#include <getopt.h>
+>> +#include <err.h>
+>> +#include <arpa/inet.h>
+>> +#include <openssl/opensslv.h>
+>> +#include <openssl/bio.h>
+>> +#include <openssl/evp.h>
+>> +#include <openssl/pem.h>
+>> +#include <openssl/err.h>
+>> +#if OPENSSL_VERSION_MAJOR >=3D 3
+>> +# define USE_PKCS11_PROVIDER
+>> +# include <openssl/provider.h>
+>> +# include <openssl/store.h>
+>> +#else
+>> +# if !defined(OPENSSL_NO_ENGINE) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+>> +#  define USE_PKCS11_ENGINE
+>> +#  include <openssl/engine.h>
+>> +# endif
+>> +#endif
+>> +#include "../ssl-common.h"
+>> +
+>> +/*
+>> + * Use CMS if we have openssl-1.0.0 or newer available - otherwise we h=
+ave to
+>> + * assume that it's not available and its header file is missing and th=
+at we
+>> + * should use PKCS#7 instead.  Switching to the older PKCS#7 format res=
+tricts
+>> + * the options we have on specifying the X.509 certificate we want.
+>> + *
+>> + * Further, older versions of OpenSSL don't support manually adding sig=
+ners to
+>> + * the PKCS#7 message so have to accept that we get a certificate inclu=
+ded in
+>> + * the signature message.  Nor do such older versions of OpenSSL support
+>> + * signing with anything other than SHA1 - so we're stuck with that if =
+such is
+>> + * the case.
+>> + */
+>> +#if defined(LIBRESSL_VERSION_NUMBER) || \
+>> +	OPENSSL_VERSION_NUMBER < 0x10000000L || \
+>> +	defined(OPENSSL_NO_CMS)
+>> +#define USE_PKCS7
+>> +#endif
+>> +#ifndef USE_PKCS7
+>> +#include <openssl/cms.h>
+>> +#else
+>> +#include <openssl/pkcs7.h>
+>> +#endif
+>> +
+>> +struct module_signature {
+>> +	uint8_t		algo;		/* Public-key crypto algorithm [0] */
+>> +	uint8_t		hash;		/* Digest algorithm [0] */
+>> +	uint8_t		id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+>> +	uint8_t		signer_len;	/* Length of signer's name [0] */
+>> +	uint8_t		key_id_len;	/* Length of key identifier [0] */
+>> +	uint8_t		__pad[3];
+>> +	uint32_t	sig_len;	/* Length of signature data */
+>> +};
+>> +
+>> +#define PKEY_ID_PKCS7 2
+>> +
+>> +static char magic_number[] =3D "~eBPF signature appended~\n";
+>> +
+>> +static __attribute__((noreturn))
+>> +void format(void)
+>> +{
+>> +	fprintf(stderr,
+>> +		"Usage: scripts/sign-ebpf [-dp] <hash algo> <key> <x509> <bin> <loade=
+r> [<dest>]\n");
+>> +	exit(2);
 >> +}
 >> +
->> /*
->>   * Allocation types for calls to boottime->allocate_pages.
->>   */
->> diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmware/efi/libstub/x86-stub.c
->> index 863910e9eefc..033133e7d953 100644
->> --- a/drivers/firmware/efi/libstub/x86-stub.c
->> +++ b/drivers/firmware/efi/libstub/x86-stub.c
->> @@ -9,6 +9,8 @@
->> #include <linux/efi.h>
->> #include <linux/pci.h>
->> #include <linux/stddef.h>
->> +#include <linux/slr_table.h>
->> +#include <linux/slaunch.h>
->>
->> #include <asm/efi.h>
->> #include <asm/e820/types.h>
->> @@ -798,6 +800,93 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry)
->> 	return efi_adjust_memory_range_protection(addr, kernel_text_size);
->> }
->>
->> +#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
->> +static bool efi_secure_launch_update_boot_params(struct slr_table *slrt,
->> +						 struct boot_params *boot_params)
+>> +static const char *key_pass;
+>> +
+>> +static int pem_pw_cb(char *buf, int len, int w, void *v)
 >> +{
->> +	struct slr_entry_intel_info *txt_info;
->> +	struct slr_entry_policy *policy;
->> +	bool updated = false;
->> +	int i;
+>> +	int pwlen;
 >> +
->> +	txt_info = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_INTEL_INFO);
->> +	if (!txt_info)
->> +		return false;
+>> +	if (!key_pass)
+>> +		return -1;
 >> +
->> +	txt_info->boot_params_addr = (u64)boot_params;
+>> +	pwlen =3D strlen(key_pass);
+>> +	if (pwlen >=3D len)
+>> +		return -1;
 >> +
->> +	policy = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_ENTRY_POLICY);
->> +	if (!policy)
->> +		return false;
+>> +	strcpy(buf, key_pass);
 >> +
->> +	for (i = 0; i < policy->nr_entries; i++) {
->> +		if (policy->policy_entries[i].entity_type == SLR_ET_BOOT_PARAMS) {
->> +			policy->policy_entries[i].entity = (u64)boot_params;
->> +			updated = true;
+>> +	/* If it's wrong, don't keep trying it. */
+>> +	key_pass =3D NULL;
+>> +
+>> +	return pwlen;
+>> +}
+>> +
+>> +static EVP_PKEY *read_private_key_pkcs11(const char *private_key_name)
+>> +{
+>> +	EVP_PKEY *private_key =3D NULL;
+>> +#ifdef USE_PKCS11_PROVIDER
+>> +	OSSL_STORE_CTX *store;
+>> +
+>> +	if (!OSSL_PROVIDER_try_load(NULL, "pkcs11", true))
+>> +		ERR(1, "OSSL_PROVIDER_try_load(pkcs11)");
+>> +	if (!OSSL_PROVIDER_try_load(NULL, "default", true))
+>> +		ERR(1, "OSSL_PROVIDER_try_load(default)");
+>> +
+>> +	store =3D OSSL_STORE_open(private_key_name, NULL, NULL, NULL, NULL);
+>> +	ERR(!store, "OSSL_STORE_open");
+>> +
+>> +	while (!OSSL_STORE_eof(store)) {
+>> +		OSSL_STORE_INFO *info =3D OSSL_STORE_load(store);
+>> +
+>> +		if (!info) {
+>> +			drain_openssl_errors(__LINE__, 0);
+>> +			continue;
+>> +		}
+>> +		if (OSSL_STORE_INFO_get_type(info) =3D=3D OSSL_STORE_INFO_PKEY) {
+>> +			private_key =3D OSSL_STORE_INFO_get1_PKEY(info);
+>> +			ERR(!private_key, "OSSL_STORE_INFO_get1_PKEY");
+>> +		}
+>> +		OSSL_STORE_INFO_free(info);
+>> +		if (private_key)
 >> +			break;
+>> +	}
+>> +	OSSL_STORE_close(store);
+>> +#elif defined(USE_PKCS11_ENGINE)
+>> +	ENGINE *e;
+>> +
+>> +	ENGINE_load_builtin_engines();
+>> +	drain_openssl_errors(__LINE__, 1);
+>> +	e =3D ENGINE_by_id("pkcs11");
+>> +	ERR(!e, "Load PKCS#11 ENGINE");
+>> +	if (ENGINE_init(e))
+>> +		drain_openssl_errors(__LINE__, 1);
+>> +	else
+>> +		ERR(1, "ENGINE_init");
+>> +	if (key_pass)
+>> +		ERR(!ENGINE_ctrl_cmd_string(e, "PIN", key_pass, 0), "Set PKCS#11 PIN"=
+);
+>> +	private_key =3D ENGINE_load_private_key(e, private_key_name, NULL, NUL=
+L);
+>> +	ERR(!private_key, "%s", private_key_name);
+>> +#else
+>> +	fprintf(stderr, "no pkcs11 engine/provider available\n");
+>> +	exit(1);
+>> +#endif
+>> +	return private_key;
+>> +}
+>> +
+>> +static EVP_PKEY *read_private_key(const char *private_key_name)
+>> +{
+>> +	if (!strncmp(private_key_name, "pkcs11:", 7)) {
+>> +		return read_private_key_pkcs11(private_key_name);
+>> +	} else {
+>> +		EVP_PKEY *private_key;
+>> +		BIO *b;
+>> +
+>> +		b =3D BIO_new_file(private_key_name, "rb");
+>> +		ERR(!b, "%s", private_key_name);
+>> +		private_key =3D PEM_read_bio_PrivateKey(b, NULL, pem_pw_cb,
+>> +						      NULL);
+>> +		ERR(!private_key, "%s", private_key_name);
+>> +		BIO_free(b);
+>> +
+>> +		return private_key;
+>> +	}
+>> +}
+>> +
+>> +static X509 *read_x509(const char *x509_name)
+>> +{
+>> +	unsigned char buf[2];
+>> +	X509 *x509;
+>> +	BIO *b;
+>> +	int n;
+>> +
+>> +	b =3D BIO_new_file(x509_name, "rb");
+>> +	ERR(!b, "%s", x509_name);
+>> +
+>> +	/* Look at the first two bytes of the file to determine the encoding */
+>> +	n =3D BIO_read(b, buf, 2);
+>> +	if (n !=3D 2) {
+>> +		if (BIO_should_retry(b)) {
+>> +			fprintf(stderr, "%s: Read wanted retry\n", x509_name);
+>> +			exit(1);
+>> +		}
+>> +		if (n >=3D 0) {
+>> +			fprintf(stderr, "%s: Short read\n", x509_name);
+>> +			exit(1);
+>> +		}
+>> +		ERR(1, "%s", x509_name);
+>> +	}
+>> +
+>> +	ERR(BIO_reset(b) !=3D 0, "%s", x509_name);
+>> +
+>> +	if (buf[0] =3D=3D 0x30 && buf[1] >=3D 0x81 && buf[1] <=3D 0x84)
+>> +		/* Assume raw DER encoded X.509 */
+>> +		x509 =3D d2i_X509_bio(b, NULL);
+>> +	else
+>> +		/* Assume PEM encoded X.509 */
+>> +		x509 =3D PEM_read_bio_X509(b, NULL, NULL, NULL);
+>> +
+>> +	BIO_free(b);
+>> +	ERR(!x509, "%s", x509_name);
+>> +
+>> +	return x509;
+>> +}
+>> +
+>> +int main(int argc, char **argv)
+>> +{
+>> +	struct module_signature sig_info =3D { .id_type =3D PKEY_ID_PKCS7 };
+>> +	char *hash_algo =3D NULL;
+>> +	char *private_key_name =3D NULL, *raw_sig_name =3D NULL;
+>> +	char *x509_name, *bin_name, *loader_name, *dest_name;
+>> +	bool save_sig =3D false, replace_orig;
+>> +	bool sign_only =3D false;
+>> +	bool raw_sig =3D false;
+>> +	unsigned char buf[4096];
+>> +	unsigned long loader_size, sig_size;
+>> +	unsigned int use_signed_attrs;
+>> +	const EVP_MD *digest_algo;
+>> +	EVP_PKEY *private_key;
+>> +#ifndef USE_PKCS7
+>> +	CMS_ContentInfo *cms =3D NULL;
+>> +	unsigned int use_keyid =3D 0;
+>> +#else
+>> +	PKCS7 *pkcs7 =3D NULL;
+>> +#endif
+>> +	X509 *x509;
+>> +	BIO *bd, *bm, *bl;
+>> +	int opt, n;
+>> +	OpenSSL_add_all_algorithms();
+>> +	ERR_load_crypto_strings();
+>> +	ERR_clear_error();
+>> +
+>> +	key_pass =3D getenv("KBUILD_SIGN_PIN");
+>> +
+>> +#ifndef USE_PKCS7
+>> +	use_signed_attrs =3D CMS_NOATTR;
+>> +#else
+>> +	use_signed_attrs =3D PKCS7_NOATTR;
+>> +#endif
+>> +
+>> +	do {
+>> +		opt =3D getopt(argc, argv, "sdpk");
+>> +		switch (opt) {
+>> +		case 's': raw_sig =3D true; break;
+>> +		case 'p': save_sig =3D true; break;
+>> +		case 'd': sign_only =3D true; save_sig =3D true; break;
+>> +#ifndef USE_PKCS7
+>> +		case 'k': use_keyid =3D CMS_USE_KEYID; break;
+>> +#endif
+>> +		case -1: break;
+>> +		default: format();
+>> +		}
+>> +	} while (opt !=3D -1);
+>> +
+>> +	argc -=3D optind;
+>> +	argv +=3D optind;
+>> +	if (argc < 5 || argc > 6)
+>> +		format();
+>> +
+>> +	if (raw_sig) {
+>> +		raw_sig_name =3D argv[0];
+>> +		hash_algo =3D argv[1];
+>> +	} else {
+>> +		hash_algo =3D argv[0];
+>> +		private_key_name =3D argv[1];
+>> +	}
+>> +	x509_name =3D argv[2];
+>> +	bin_name =3D argv[3];
+>> +	loader_name =3D argv[4];
+>> +	if (argc =3D=3D 6 && strcmp(argv[4], argv[5]) !=3D 0) {
+>> +		dest_name =3D argv[5];
+>> +		replace_orig =3D false;
+>> +	} else {
+>> +		ERR(asprintf(&dest_name, "%s.~signed~", loader_name) < 0,
+>> +		    "asprintf");
+>> +		replace_orig =3D true;
+>> +	}
+>> +
+>> +#ifdef USE_PKCS7
+>> +	if (strcmp(hash_algo, "sha1") !=3D 0) {
+>> +		fprintf(stderr, "sign-file: %s only supports SHA1 signing\n",
+>> +			OPENSSL_VERSION_TEXT);
+>> +		exit(3);
+>> +	}
+>> +#endif
+>> +
+>> +	/* Open the bin file */
+>> +	bm =3D BIO_new_file(bin_name, "rb");
+>> +	ERR(!bm, "%s", bin_name);
+>> +
+>> +	if (!raw_sig) {
+>> +		/* Read the private key and the X.509 cert the PKCS#7 message
+>> +		 * will point to.
+>> +		 */
+>> +		private_key =3D read_private_key(private_key_name);
+>> +		x509 =3D read_x509(x509_name);
+>> +
+>> +		/* Digest the module data. */
+>> +		OpenSSL_add_all_digests();
+>> +		drain_openssl_errors(__LINE__, 0);
+>> +		digest_algo =3D EVP_get_digestbyname(hash_algo);
+>> +		ERR(!digest_algo, "EVP_get_digestbyname");
+>> +
+>> +#ifndef USE_PKCS7
+>> +		/* Load the signature message from the digest buffer. */
+>> +		cms =3D CMS_sign(NULL, NULL, NULL, NULL,
+>> +			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
+>> +			       CMS_DETACHED | CMS_STREAM);
+>> +		ERR(!cms, "CMS_sign");
+>> +
+>> +		ERR(!CMS_add1_signer(cms, x509, private_key, digest_algo,
+>> +				     CMS_NOCERTS | CMS_BINARY |
+>> +				     CMS_NOSMIMECAP | use_keyid |
+>> +				     use_signed_attrs),
+>> +		    "CMS_add1_signer");
+>> +		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) !=3D 1,
+>> +		    "CMS_final");
+>> +
+>> +#else
+>> +		pkcs7 =3D PKCS7_sign(x509, private_key, NULL, bm,
+>> +				   PKCS7_NOCERTS | PKCS7_BINARY |
+>> +				   PKCS7_DETACHED | use_signed_attrs);
+>> +		ERR(!pkcs7, "PKCS7_sign");
+>> +#endif
+>> +
+>> +		if (save_sig) {
+>> +			char *sig_file_name;
+>> +			BIO *b;
+>> +
+>> +			ERR(asprintf(&sig_file_name, "%s.p7s", bin_name) < 0,
+>> +			    "asprintf");
+>> +			b =3D BIO_new_file(sig_file_name, "wb");
+>> +			ERR(!b, "%s", sig_file_name);
+>> +#ifndef USE_PKCS7
+>> +			ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) !=3D 1,
+>> +			    "%s", sig_file_name);
+>> +#else
+>> +			ERR(i2d_PKCS7_bio(b, pkcs7) !=3D 1,
+>> +			    "%s", sig_file_name);
+>> +#endif
+>> +			BIO_free(b);
+>> +		}
+>> +
+>> +		if (sign_only) {
+>> +			BIO_free(bm);
+>> +			return 0;
 >> +		}
 >> +	}
 >> +
->> +	/*
->> +	 * If this is a PE entry into EFI stub the mocked up boot params will
->> +	 * be missing some of the setup header data needed for the second stage
->> +	 * of the Secure Launch boot.
+>> +	/* Open the destination file now so that we can shovel the loader data
+>> +	 * across as we read it.
 >> +	 */
->> +	if (image) {
->> +		struct setup_header *hdr = (struct setup_header *)((u8 *)image->image_base +
->> +					    offsetof(struct boot_params, hdr));
->> +		u64 cmdline_ptr;
+>> +	bd =3D BIO_new_file(dest_name, "wb");
+>> +	ERR(!bd, "%s", dest_name);
 >> +
->> +		boot_params->hdr.setup_sects = hdr->setup_sects;
->> +		boot_params->hdr.syssize = hdr->syssize;
->> +		boot_params->hdr.version = hdr->version;
->> +		boot_params->hdr.loadflags = hdr->loadflags;
->> +		boot_params->hdr.kernel_alignment = hdr->kernel_alignment;
->> +		boot_params->hdr.min_alignment = hdr->min_alignment;
->> +		boot_params->hdr.xloadflags = hdr->xloadflags;
->> +		boot_params->hdr.init_size = hdr->init_size;
->> +		boot_params->hdr.kernel_info_offset = hdr->kernel_info_offset;
->> +		efi_set_u64_form(boot_params->hdr.cmd_line_ptr, boot_params->ext_cmd_line_ptr,
->> +				 &cmdline_ptr);
->> +		boot_params->hdr.cmdline_size = strlen((const char *)cmdline_ptr);
+>> +	bl =3D BIO_new_file(loader_name, "rb");
+>> +	ERR(!bl, "%s", loader_name);
+>> +
+>> +
+>> +	/* Append the marker and the PKCS#7 message to the destination file */
+>> +	ERR(BIO_reset(bm) < 0, "%s", bin_name);
+>> +	ERR(BIO_reset(bl) < 0, "%s", loader_name);
+>> +	while ((n =3D BIO_read(bl, buf, sizeof(buf))),
+>> +	       n > 0) {
+>> +		ERR(BIO_write(bd, buf, n) < 0, "%s", dest_name);
+>> +	}
+>> +	BIO_free(bl);
+>> +	BIO_free(bm);
+>> +	ERR(n < 0, "%s", loader_name);
+>> +	loader_size =3D BIO_number_written(bd);
+>> +
+>> +	if (!raw_sig) {
+>> +#ifndef USE_PKCS7
+>> +		ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) !=3D 1, "%s", dest_name);
+>> +#else
+>> +		ERR(i2d_PKCS7_bio(bd, pkcs7) !=3D 1, "%s", dest_name);
+>> +#endif
+>> +	} else {
+>> +		BIO *b;
+>> +
+>> +		/* Read the raw signature file and write the data to the
+>> +		 * destination file
+>> +		 */
+>> +		b =3D BIO_new_file(raw_sig_name, "rb");
+>> +		ERR(!b, "%s", raw_sig_name);
+>> +		while ((n =3D BIO_read(b, buf, sizeof(buf))), n > 0)
+>> +			ERR(BIO_write(bd, buf, n) < 0, "%s", dest_name);
+>> +		BIO_free(b);
 >> +	}
 >> +
->> +	return updated;
+>> +	sig_size =3D BIO_number_written(bd) - loader_size;
+>> +	sig_info.sig_len =3D htonl(sig_size);
+>> +	ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s", dest_name);
+>> +	ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0, "%s", d=
+est_name);
+>> +
+>> +	ERR(BIO_free(bd) !=3D 1, "%s", dest_name);
+>> +
+>> +	/* Finally, if we're signing in place, replace the original. */
+>> +	if (replace_orig)
+>> +		ERR(rename(dest_name, loader_name) < 0, "%s", dest_name);
+>> +
+>> +	return 0;
 >> +}
->> +
->> +static void efi_secure_launch(struct boot_params *boot_params)
->> +{
->> +	struct slr_entry_dl_info *dlinfo;
->> +	efi_guid_t guid = SLR_TABLE_GUID;
->> +	dl_handler_func handler_callback;
->> +	struct slr_table *slrt;
->> +
->> +	/*
->> +	 * The presence of this table indicated a Secure Launch
->> +	 * is being requested.
->> +	 */
->> +	slrt = (struct slr_table *)get_efi_config_table(guid);
->> +	if (!slrt || slrt->magic != SLR_TABLE_MAGIC)
->> +		return;
->> +
->> +	/*
->> +	 * Since the EFI stub library creates its own boot_params on entry, the
->> +	 * SLRT and TXT heap have to be updated with this version.
->> +	 */
->> +	if (!efi_secure_launch_update_boot_params(slrt, boot_params))
->> +		return;
->> +
->> +	/* Jump through DL stub to initiate Secure Launch */
->> +	dlinfo = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
->> +
->> +	handler_callback = (dl_handler_func)dlinfo->dl_handler;
->> +
->> +	handler_callback(&dlinfo->bl_context);
->> +
->> +	unreachable();
->> +}
->> +#endif
->> +
->> static void __noreturn enter_kernel(unsigned long kernel_addr,
->> 				    struct boot_params *boot_params)
->> {
->> @@ -925,6 +1014,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
->> 		goto fail;
->> 	}
->>
->> +#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
->> +	/* If a Secure Launch is in progress, this never returns */
->> +	efi_secure_launch(boot_params);
->> +#endif
->> +
->> 	/*
->> 	 * Call the SEV init code while still running with the firmware's
->> 	 * GDT/IDT, so #VC exceptions will be handled by EFI.
-> 
-> efi_set_u64_form()?
-> 
-> What the heck is that? If it actually involves two u32 packed into a 64 field, why not simply do two stores?
-> 
-
-Well the story is this. The EFI maintainers asked me to use the 
-efi_set_u64_split() type functions (this one splits a u64 into 2 u32). I 
-went to look and there was no function that did the opposite action so I 
-added it. The original function was called efi_set_u64_split() so 
-efi_set_u64_form() was what I came up with. I can name it anything that 
-is desired.
-
-Thanks
-Ross
-
+>> --=20
+>> 2.48.1
+>>=20
+>
+> BR, Jarkko
