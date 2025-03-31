@@ -1,95 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF3B86338
-	for <linux-crypto@vger.kernel.org>; Mon, 31 Mar 2025 10:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8881DF247;
+	Mon, 31 Mar 2025 10:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743415344; cv=none; b=BDq3rqmHpjHRdLU4EOWBk1HD8O5A0uhah6s9KTjl2SJJEjbKdF1z/tKvQ9EDZR1lxwkKCFnhfiUWkFwBEQuWRxwEjBXncCTRlKmZwbuvUGCtYAUaFGuLRhF+XmRhcA9R7DWZDnwYC8Ot34aFQV1+QqIWtHcdggjnkSh9o6wFnsc=
+	t=1743415941; cv=none; b=QgiBwL+ZBiKC8lDSeo1yGN724aRuEkpw7OchVMhMRogFsmNoCUxxlTlR+/mUCa6cup2meDBHK+TPb3o9fTpBOpacTaVBF45YOe/IxDbBevieiiVxvBxZU8gUMNdMEG6gCDwDzbStkqylE52TsfbKFgIJCm/+/BKvO8i2ylSIZcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743415344; c=relaxed/simple;
-	bh=DBuOXv5lnH0/JT1OzyoZmwKYGWScqSBPV4CQbsmVxDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V+zeGM7VnrE1bF0mKConetVpZgbiXZN37AUUABj9JX49xC7YI9F9jhUA3SCMsF2aiGgbXSqgM7ulSKkcbCAPqLFqJ/qHWXkajrxZv+48+qhMJ/e5wsdKPK8ZaxAdeMD97b4lKtwFkHD2U2Oj7f+vDJcJsS7b/HYUW8LvcC76ovU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JQtPHEkA; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1743415941; c=relaxed/simple;
+	bh=mBG+3dp3Dhvh1FHdtXraI/p3TThcHNlTbeuo2+pmhnU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mvv4t5PZQm9r6dZUq3K8WvGH3dJo44CrxpB3g0f0y9YK/CFnheOy3OyhM1tEX8QZgi4D8s46CvFF3mSMarrKwuFV+91KfuTU0ah6cGM1qq1qIOGdSMEkqWZccVj46jVOsXzNE94XuMSMeuQDWfQrZMelpC+IO/Xaxd3+VWQOHYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTFRAHzx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JQtPHEkA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1743415340;
-	bh=DBuOXv5lnH0/JT1OzyoZmwKYGWScqSBPV4CQbsmVxDM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JQtPHEkAVq8HHcH3AhLIEJ2wHYd6dssTVwegDGUMiq9U+nLe/2gG23voxHWPPXPfn
-	 O5MCj1ilevsj7ZeSlEHitzoGaoeE4dhMQ1LwmNx12HZpKlBOcOtCztfrgZbRanw5nd
-	 o/AU+iQXbDfl0c/QZE02vSjVXi1P5Q+89x5kb6Tko3zllsfmqERSTgRKbpla3dC2ei
-	 S/wu3miJDkVSd6bRV8JYqyXnz1vZaAYsjarhftEla68hsMFYyTXD2Ey8HDmRJxTWrI
-	 uIN3FrrppqgdaAyUdCdYYjkL5JBZ+MnrPN9iMDo64kmA94rCy467HIpTc+iMKFjSfH
-	 L0V3nQu3fl6Hg==
-Received: from localhost (unknown [IPv6:2a01:e0a:2c:6930:5cf4:84a1:2763:fe0d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bbrezillon)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id B95A017E0808;
-	Mon, 31 Mar 2025 12:02:19 +0200 (CEST)
-Date: Mon, 31 Mar 2025 12:02:14 +0200
-From: Boris Brezillon <boris.brezillon@collabora.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>, Linux Crypto Mailing List
- <linux-crypto@vger.kernel.org>, Boris Brezillon <bbrezillon@kernel.org>,
- Srujana Challa <schalla@marvell.com>
-Subject: Re: [v2 PATCH] MAINTAINERS: Update maintainers for crypto/marvell
-Message-ID: <20250331120214.0fc41ed6@collabora.com>
-In-Reply-To: <Z-ie8LWRsoGb4qIP@gondor.apana.org.au>
-References: <Z91Ld28V6L2ek-JV@gondor.apana.org.au>
-	<20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr>
-	<Z-JnegwRrihCos3z@gondor.apana.org.au>
-	<20250325094829.586fb525@collabora.com>
-	<Z-ie8LWRsoGb4qIP@gondor.apana.org.au>
-Organization: Collabora
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTFRAHzx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458CEC4CEEB;
+	Mon, 31 Mar 2025 10:12:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743415941;
+	bh=mBG+3dp3Dhvh1FHdtXraI/p3TThcHNlTbeuo2+pmhnU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=PTFRAHzxfJdHtKIG6GiPgME2z+eM7Nv3WiKZq7PQrlDl72hF4JtbkZVhdrFkbCLRS
+	 2AyP2PdKpBHj0zhv9Qgnjd2yMzQEWG1D4so3Ae9XaJPXCm/znZhf4s5t+ZJ8lF5hv9
+	 75Y+8/23Jxtgn5KL29pFEToDlQ8XuB3jxJK6decXrEPhqsMWb7og5A6RgAK+nC+ENN
+	 xAIPIMyrzBtrGZ3lLoVTua3uVGOz7JR9RlC055TNSL3vQNhSV0aXdDA2wSnUnECYP+
+	 me9ch5d7AWmcvZ/fzsnH/XmJpTQtcs5TZA2OLxsUSeifNsdKjiFkIRqiVmtBHXJtuN
+	 af+mUuYsFxuZQ==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac2963dc379so680726866b.2;
+        Mon, 31 Mar 2025 03:12:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU8kt0iBPywy15wYo28agYSNgIUK1MzhdClwq1AzGjtsv7NnpqSPtDnxAotOcGvtAjkANZ1Jhal60L9RD1Y@vger.kernel.org, AJvYcCUhHsaieHJ+YbLk0JcbgLtJbhklW3FfzC70lhkiKj4H201wsqi7prjhli75MATDmfEm8rdi4CAl6Pa2pWOfrWeF@vger.kernel.org, AJvYcCWmuM5Mmv8vO57s7Fx3PuO/nZfLkLzf/GjFslphGNe/l3YK0H3+OVifMwxWYCfpiuP1+uFE/yxBfj0teTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA+KRtph8EHizN/KJc2eTlkpeUldX+s9rz3j74JpyTiX7CzQze
+	NMUy+Puklm7dLj+PLTdDzGOGNocbSSCDGX8BctxpDThlztgJwbMwRx3JtNdJoEb8Z70Q3ZNxKnN
+	VnJ4NKeQMo7wApnILmt3PchO56KI=
+X-Google-Smtp-Source: AGHT+IH1xftVfCSsq7SDWRuCGUlw+i7g12tBDDd8Gl+VRn6g4RehR9k69ESR3Y50BYnFfgeO9fa9qRZIF4wgDwmZc84=
+X-Received: by 2002:a17:906:e28a:b0:ac7:391b:e687 with SMTP id
+ a640c23a62f3a-ac7391be985mr625947266b.61.1743415939855; Mon, 31 Mar 2025
+ 03:12:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250327021809.29954-1-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250327021809.29954-1-zhaoqunqin@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 31 Mar 2025 18:12:14 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6xxhM4r19iCrtpmASR68YYzarbK2yFqMGhoZt80vLg5w@mail.gmail.com>
+X-Gm-Features: AQ5f1Jqkj-f6mhuAnXtMLAXdFdnUCbefkEVIaPXBiQF5CE_HTMdaQLR8_qXJ8_E
+Message-ID: <CAAhV-H6xxhM4r19iCrtpmASR68YYzarbK2yFqMGhoZt80vLg5w@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] Drivers for Loongson security engine
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca, 
+	linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 30 Mar 2025 09:31:28 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi, Qunqin,
 
-> On Tue, Mar 25, 2025 at 09:48:29AM +0100, Boris Brezillon wrote:
-> >
-> > I haven't reviewed contributions or contributed myself to this driver
-> > for while. Could you remove me as well?  
-> 
-> Thanks for your contributions Boris.  I'll add you to the patch
-> as well:
-> 
-> ---8<---
-> Remove the entries for Arnaud Ebalard and Boris Brezillon as
-> requested.
-> 
-> Link: https://lore.kernel.org/linux-crypto/20f0162643f94509b0928e17afb7efbd@ssi.gouv.fr/
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Thu, Mar 27, 2025 at 10:17=E2=80=AFAM Qunqin Zhao <zhaoqunqin@loongson.c=
+n> wrote:
+>
+> Loongson security engine supports random number generation, hash,
+> symmetric encryption and asymmetric encryption. Based on these
+> encryption functions, TPM2 have been implemented in it.
+>
+> mfd is the baser driver, crypto and tpm are users.
+I have some small comments, if you make changes then you can add
+"Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>" for all patches.
 
-Acked-by: Boris Brezillon <boris.brezillon@collabora.com>
 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f8fb396e6b37..8eda257ffdc9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14009,8 +14009,6 @@ F:	drivers/gpu/drm/armada/
->  F:	include/uapi/drm/armada_drm.h
->  
->  MARVELL CRYPTO DRIVER
-> -M:	Boris Brezillon <bbrezillon@kernel.org>
-> -M:	Arnaud Ebalard <arno@natisbad.org>
->  M:	Srujana Challa <schalla@marvell.com>
->  L:	linux-crypto@vger.kernel.org
->  S:	Maintained
+Huacai
 
+>
+> v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
+>
+>     crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+>     ls6000se-rng.c ->loongson-rng.c
+>
+>     tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+>
+> v5: Registered "ls6000se-rng" device in mfd driver.
+> v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
+>     and crypto.
+> v3: Put the updates to the MAINTAINERS in a separate patch.
+> v2: Removed misc driver. Added tpm driver.
+>
+> Qunqin Zhao (6):
+>   mfd: Add support for Loongson Security Module
+>   MAINTAINERS: Add entry for Loongson Security Module driver
+>   crypto: loongson - add Loongson RNG driver support
+>   MAINTAINERS: Add entry for Loongson RNG driver
+>   tpm: Add a driver for Loongson TPM device
+>   MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
+>
+>  MAINTAINERS                            |  14 +
+>  drivers/char/tpm/Kconfig               |   9 +
+>  drivers/char/tpm/Makefile              |   1 +
+>  drivers/char/tpm/tpm_loongson.c        | 103 +++++++
+>  drivers/crypto/Kconfig                 |   1 +
+>  drivers/crypto/Makefile                |   1 +
+>  drivers/crypto/loongson/Kconfig        |   6 +
+>  drivers/crypto/loongson/Makefile       |   2 +
+>  drivers/crypto/loongson/loongson-rng.c | 190 +++++++++++++
+>  drivers/mfd/Kconfig                    |  10 +
+>  drivers/mfd/Makefile                   |   2 +
+>  drivers/mfd/loongson-se.c              | 374 +++++++++++++++++++++++++
+>  include/linux/mfd/loongson-se.h        |  75 +++++
+>  13 files changed, 788 insertions(+)
+>  create mode 100644 drivers/char/tpm/tpm_loongson.c
+>  create mode 100644 drivers/crypto/loongson/Kconfig
+>  create mode 100644 drivers/crypto/loongson/Makefile
+>  create mode 100644 drivers/crypto/loongson/loongson-rng.c
+>  create mode 100644 drivers/mfd/loongson-se.c
+>  create mode 100644 include/linux/mfd/loongson-se.h
+>
+>
+> base-commit: b904243247d1acb0ebbd4978feb639441dc51fc1
+> --
+> 2.45.2
+>
+>
