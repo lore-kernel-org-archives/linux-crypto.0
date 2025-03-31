@@ -1,49 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062061AF0B4;
-	Sun, 30 Mar 2025 16:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86B8A92E;
+	Mon, 31 Mar 2025 04:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743351742; cv=none; b=fp6r9AXRS9R07tjs/T4hiMuBauVJDR8qwHLC2a+1YXxnCwS7poNLSTCWAtGOqnRrO67G9dnFT8j0LYyXf2vbw7yEDuXK3qYOdnrXU36sAFPz6BbJQwUFPaWuY7fWky33SLz5iFK4n2sXi5Gr7lbCbyIXFBaQXUoqK7RCMa/W+0E=
+	t=1743396627; cv=none; b=TVA4p+62GAJ7ZnDN/l/jGKzwnvhsG5uYOAPrjlbxdRN+ivdz5DVwRZG7by4LZmSn+DM39ax4b3jBIUbkFWgZF6u/MTUuIPOyM4l04nG1ytcpzsE92WzfU5T5LCc+14opfE0mTu2jJL7RO0YumjnVihaxgRHgrpDs/USb/1dRyUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743351742; c=relaxed/simple;
-	bh=qUBag9B5StRidN5HLkgVvfa2PUN1Q7Fm4vRmNvVYu78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U+D6YDIF8y63Kk0dX10T3VMuRECXeDt7vg63goFleVA+sYb7JqV5qy/dfeZfSvx/Df9mXP3yXMO8PS6fn2eI7jrsA9HCbvK81JsNu3UL01MVINO8C2c3B9xmpsRK3RMygF88eC98Fi2ZSRzhrL1YOSx2D1vTt6Y8W3STiRAAUXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Swg103uf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743396627; c=relaxed/simple;
+	bh=ry5gJkS7iEIufVKl5ogsvvf+80cxgFsbRQeo9flAVCI=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CzNLxqlfX3Khfk/ESYjXbH3CaLfcuIxtTM35/UMdH7+AK5S5yB0t/xfMurrIR+DBnHNBwqbU91pxIev1+4HCAlX/YIzjsBQXc3HS0Hcrf5ZlVWtKzE1oWPDFxFYTFH1emJ7X36u3G/K8gwsd9hSQWiaGzk2kQBomFajVy5Oo7Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CtWb2iib; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Swg103uf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC4ADC4CEDD;
-	Sun, 30 Mar 2025 16:22:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743351741;
-	bh=qUBag9B5StRidN5HLkgVvfa2PUN1Q7Fm4vRmNvVYu78=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Swg103ufzfdPCm0qK6fpdXzqL0eoAqqwc1GbXfJNE32jXajDTjHIXVQ8VxGMTmtPj
-	 yZh+pWwHkrPkhkYx7U8Njltg6QeVNN2CmuDArWrehsjMal475gix0nUsefXfOmJ3K2
-	 9Hi5YpvxsyfTTj3NikIYeGUfkDzo+dBcCmTDfIfwXwlZiCax5CdgLmDp2g5DKEjEUO
-	 UojgJELNaeucLLWM2TElgeJqjUFRuc53+swGckBzukjb+HvXpPcxuGmFflKXJXpmO/
-	 OY13+QM6sHChzTGFHa+7NjHpyR7vwJ6rRTiWARRrTl2fCKjIx3o6SEwzgeDFHF1Cn3
-	 62k73MgbQXYQg==
-Date: Sun, 30 Mar 2025 21:52:17 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CtWb2iib"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=p2sOsRmcwft9JJsO6ockWj6I8aOHNij3gdh9D514i5w=; b=CtWb2iibP7K12fcSuJq3YQYmCF
+	V1p8DeoNqOWhUpNHwntdX2Fvbftd/ZKVEe7QDmXU5nrmaV/eWdOkXnjUkhflSqLZQfrqJPUhh8oob
+	EyrXReplJMF35DaGZ5DtKPSTyodIhsgaXmhyf2j91nM9rAlRLrJf7X+hBpBag1lekthiF3dXu1GaT
+	mGubUTlhAuAW2SxDtj892TFAFV8iwJdzI6QuuV2oasoeJRxMs9nVPI0ulsJZl8ljgrz+ec/gVNE1N
+	kE8437z5qkxs0xTbZbAbuXGBplOHGFmlGBHR3MT8SE9jJnULjwBFHBHdId9LeD5NDQQrV2jdHUL2r
+	uLVdHORA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tz768-00BTCI-05;
+	Mon, 31 Mar 2025 12:50:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 31 Mar 2025 12:50:08 +0800
+Date: Mon, 31 Mar 2025 12:50:08 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Md Sadre Alam <quic_mdalam@quicinc.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v7 3/8] dmaengine: qcom: bam_dma: add bam_pipe_lock flag
- support
-Message-ID: <Z+lvuVaV8DXQuAR3@vaman>
-References: <20250311-qce-cmd-descr-v7-0-db613f5d9c9f@linaro.org>
- <20250311-qce-cmd-descr-v7-3-db613f5d9c9f@linaro.org>
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.15
+Message-ID: <Z-ofAGzvFfuGucld@gondor.apana.org.au>
+References: <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
+ <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+ <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
+ <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,76 +59,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250311-qce-cmd-descr-v7-3-db613f5d9c9f@linaro.org>
+In-Reply-To: <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
 
-On 11-03-25, 10:25, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Extend the device match data with a flag indicating whether the IP
-> supports the BAM lock/unlock feature. Set it to true on BAM IP versions
-> 1.4.0 and above.
-> 
-> Co-developed-by: Md Sadre Alam <quic_mdalam@quicinc.com>
-> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/dma/qcom/bam_dma.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index 8861245314b1..737fce396c2e 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -58,6 +58,8 @@ struct bam_desc_hw {
->  #define DESC_FLAG_EOB BIT(13)
->  #define DESC_FLAG_NWD BIT(12)
->  #define DESC_FLAG_CMD BIT(11)
-> +#define DESC_FLAG_LOCK BIT(10)
-> +#define DESC_FLAG_UNLOCK BIT(9)
->  
->  struct bam_async_desc {
->  	struct virt_dma_desc vd;
-> @@ -113,6 +115,7 @@ struct reg_offset_data {
->  
->  struct bam_device_data {
->  	const struct reg_offset_data *reg_info;
-> +	bool bam_pipe_lock;
->  };
->  
->  static const struct reg_offset_data bam_v1_3_reg_info[] = {
-> @@ -179,6 +182,7 @@ static const struct reg_offset_data bam_v1_4_reg_info[] = {
->  
->  static const struct bam_device_data bam_v1_4_data = {
->  	.reg_info = bam_v1_4_reg_info,
-> +	.bam_pipe_lock = true,
->  };
->  
->  static const struct reg_offset_data bam_v1_7_reg_info[] = {
-> @@ -212,6 +216,7 @@ static const struct reg_offset_data bam_v1_7_reg_info[] = {
->  
->  static const struct bam_device_data bam_v1_7_data = {
->  	.reg_info = bam_v1_7_reg_info,
-> +	.bam_pipe_lock = true,
->  };
->  
->  /* BAM CTRL */
-> @@ -707,8 +712,15 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
->  		unsigned int curr_offset = 0;
->  
->  		do {
-> -			if (flags & DMA_PREP_CMD)
-> +			if (flags & DMA_PREP_CMD) {
->  				desc->flags |= cpu_to_le16(DESC_FLAG_CMD);
-> +				if (bdev->dev_data->bam_pipe_lock) {
-> +					if (flags & DMA_PREP_LOCK)
-> +						desc->flags |= cpu_to_le16(DESC_FLAG_LOCK);
-> +					else if (flags & DMA_PREP_UNLOCK)
-> +						desc->flags |= cpu_to_le16(DESC_FLAG_UNLOCK);
-> +				}
+Hi Linus:
 
-No else case? you are ignoring the flags passed by user...? This should
-return an error...
+The following changes since commit 99585c2192cb1ce212876e82ef01d1c98c7f4699:
 
+  crypto: testmgr - Add multibuffer acomp testing (2025-03-22 07:25:19 +0800)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.15-p2 v6.15-p2
+
+for you to fetch changes up to 9764d5b0cd0ea4846fd46c7d0b4238ea122075a9:
+
+  Revert "crypto: testmgr - Add multibuffer hash testing" (2025-03-30 09:39:57 +0800)
+
+----------------------------------------------------------------
+This push fixes reverts the multibuffer hash testing as it is buggy.
+----------------------------------------------------------------
+
+Herbert Xu (1):
+      Revert "crypto: testmgr - Add multibuffer hash testing"
+
+ crypto/testmgr.c | 157 +++++++++----------------------------------------------
+ 1 file changed, 24 insertions(+), 133 deletions(-)
+
+Thanks,
 -- 
-~Vinod
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
