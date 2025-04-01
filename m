@@ -1,60 +1,63 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814D39461;
-	Tue,  1 Apr 2025 19:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9404A1E51E7;
+	Tue,  1 Apr 2025 19:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743535440; cv=none; b=cLi212o/0K7+M9fhwsdtcJJ53Rcusf1h7B/xqMOqFVBmZOOx7zeFwDpsoKTneRvU8WKEBJdJNgc4ESeBqUX58nBMPGWlBUZSJEZsnxUimADJ2gEZkTyc/L4bWHqr+rMk0fn9k7qMLOMZ8z99UY1WfNUn6Dnp/IM71qqOK9g0VV4=
+	t=1743535441; cv=none; b=LWCwf2nmFKekHvxjsuD1cV2CbLgTTlRe0mZUIk40bJ2WGwNIx54QVBlb27NJ6Mb3ioxJRbXhpBNcY7F8asRD7SO+6yO4RFGwCx/knOOz0kzbgMDar9Q/ih1msbxtMFlncOE/4qL4P2QWmSy3MKbxZRzP4ozey6lho8ZbUCOa5Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743535440; c=relaxed/simple;
-	bh=/4EojNlyd9dMoLRzf5Mm/q8bty3ZBw5BXSWBsU/clpE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EjPTIaDbfXs9I+h4GoANZS/A8yjY4Y1t+fccMmFP5DHqMFvTEWm1gNeP43Yw4MyIgLazRlGhPUws3O6aVAoukuZcCusXQz14xUOinzGHr7uaHl1eQ10I4sSi/phymQ5s6BBeGyeuJH8Zrg+t5Vipt1FHAOI/EVUtu9kmmrS6z74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPyZlSXQ; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1743535441; c=relaxed/simple;
+	bh=C4U1jwV2UTE3RqFfFsVaxqmVcfNk30K3AoLQSuFxdSo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ra3+JFpKlRP/YeIwYGCOwMPekgfjIpqoqiZqCmNgKi4nLca5+Eq6C84gzu/lTXnhGROIoSdY3xiCpxkJ713JGLa6YSXNOQlT8DVJSll2XzYaYqUqxjfYPf9Ffop4otc62LXLG0OSw07bvuzad6QpOLNggRmY2MZxFHjUSPvhGSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y5Tkqe4L; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPyZlSXQ"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso1526126f8f.0;
-        Tue, 01 Apr 2025 12:23:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5Tkqe4L"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3914a5def6bso3391734f8f.1;
+        Tue, 01 Apr 2025 12:23:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743535437; x=1744140237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nierB4LEgce+4kZQOSa3FNbylwS0gDWPVPBM7TYut2U=;
-        b=kPyZlSXQySqPe1HXt8TcwuvhImhTQXkbyb2RbRs5BhKaABFU1Ov7iScWpgwFYe5uOU
-         EZaP0QSahsbD533kxLHVdoSGpcl+Hio1VwOlh+vN9Is31GImUKvnfzxIr60ryEwgIrQX
-         cTd7DRvltGdPceD5vSkF05Has+lBhdW4yjR1QaIFemnfVEFy7dmAV9pMP3j99m8qCISL
-         ua6wbHpgTLrYkiScr1Xnfb/dwGMdP//9S1w5mb9WK2sPeHXivYjcSZZTVOq+S8+nXLGu
-         o8oGuy96Tlz0oOKWXFdzWCLhUX966PzUp8vckSAnog1XnrrtGc3JasUqm8bLetfOeTN4
-         x09w==
+        d=gmail.com; s=20230601; t=1743535438; x=1744140238; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bH5VLtP+seSAMs8ZXZEEtVjeNgw0O+SRzuS1o+Cett4=;
+        b=Y5Tkqe4LskI2G6HaXGp6C6DSViqitcSv5WTIB9umKTN97oy0qa3RF5P9bwCevC68kB
+         2ZSDeoaw1NHJ7XcBHrgB/3z7aHbDETmh5rhTgBUgxpMUq8GCpylsXbcQTmxDYGUhSopP
+         JG9Z6+Z7I2sPatYxEOPGDdP6dfCqC1z9foeLmW9S0POYUR7XT951/Qp8e1UuhgF0lI/2
+         pBkTZdWkdC5sNzcD8/rUO96qkIROFy4ItrtFWfhDZns6gy8LvpNYUCHqgeodD3myACh1
+         q2UsnTPxfhILrZoC8uVJzanzo6MXkHa3ALx/MKFXrgWyt+JPxchQKwIVKxZxerV3dz48
+         Vs5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743535437; x=1744140237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nierB4LEgce+4kZQOSa3FNbylwS0gDWPVPBM7TYut2U=;
-        b=Uo6pfKbM462hr6oO4f4CSCEybQHA0hD9GmGfQj0CiOvSKTDyROISkNrpYtilmIGd0e
-         qkknPDYNdgoZIEIL9M2tP3lXT1pg9WMXNGGVYbAY1wH1Y3VswgdRUaNklR7uEk7xsh7w
-         Sy1wQOBknSnqFaR6QH55u7dOkS/vDMsXtBvQ8cIPJjPfl3csMdITjVb9XQ+y/kX8tqkO
-         XWdBNJnl9kmGHeCogk4LPe3fdn02Lh12w/bVda4D939OTkt3dGx8MIm1RvijRWLyGJFn
-         SHoamJIZtd2e2y7wrZaxzKSlZYGWFTjcVuj3iDe86zyHrVeonz2+CjHJwhrJNmw+Ghyz
-         pLWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVYAF1JxRyRXf/rzkPyCfSrvAcG12OaBVmbW6uhHkkAsat76o5MKEE6Y+8dW4as8b8WttotB2XIZcMK/s=@vger.kernel.org, AJvYcCXg10/koam8ude2oZi+lSy2XGfviqQj0DvXpBplerqlzg5a2jfZKbdJEgtu/1mZxfIpBwm0Yky92ViJFr9F@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym6Tsi3VnwB3MQx+YiAkzO/SuU6w3Ye3UwPItACwgFqTrud0p2
-	RGFGNPp5lDx6THuNUsxttowSDglN5N8I1t0K9gOIASHaiywZ6GCu
-X-Gm-Gg: ASbGncuGDzMwuQDcPw4BSdqFisstPviHD2QA/1UJZ+bYgIa/9ZxRgN7jGlaYCGCWqxd
-	Sv/kf66tiU4RGI5BWarlyBIqDRhy/yHTTHcxsnPo6u8e/ZxdgQsmzSMzuicwGYM0D1zYXxBmeiQ
-	LuQD4VQB3Q6+YhwNTTv6nFJfePAkoJvgzqWErCEbAbQcuTtn82Z2NhZuNDBKOqagW/thUAVcwlE
-	fGWy79QGBQLhHsP8KLKEto9z9gAHP0Jea0UcFtjy6NgGL9SfCRj3Zfm8CwwGFHUsxY9dMBX4LAu
-	mj4olnr52NM5TVodwbUHwjD2y17Oqq7+BFDi2i1FGJgpPgM/icGQtOvCLVoN0XfvL9l+VI1G
-X-Google-Smtp-Source: AGHT+IGHyzi31e3692ONFiGCVRk0AOakCuPS3Q8lpPUYekXyBseRhASvcdujfWAcxWGfSdab5h7ydg==
-X-Received: by 2002:a5d:64c7:0:b0:391:4bfd:6d5 with SMTP id ffacd0b85a97d-39c1211d5c8mr11428784f8f.52.1743535436607;
-        Tue, 01 Apr 2025 12:23:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743535438; x=1744140238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bH5VLtP+seSAMs8ZXZEEtVjeNgw0O+SRzuS1o+Cett4=;
+        b=mKvb8v+d+mt6oaRF3y7KEEXAoZCjJ5xuiro88vI1VtOX/9b/UN3GIPwfRpLDoS4KV/
+         JirUoAH7qy3BHPeFCknp998+PnC1fc6qJaumngWNDDjj2vO92q9t7rKYXw8+9UEa+7AS
+         6ky11dFqU1BVOEB0mpxzbpvzuqC7pqjMyt/xSaB+F6LtkTYvE+VH6m2TcrI6IvyrYIUj
+         rtz6wYKWYwig0aOhdxJxiNUz2Bl54L00pXszSaGHZ2hENVNUZyzoC83sTY+HjUvtRsRH
+         on6B4cK2aZGajgPcoSPZ6NWKXjiwvOf0UYsL6WBwWCDcPFqpe4w5LByxENFhGQGvP56z
+         JmTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUlxTAXiDzzb6cXk8lebTpbOePW619RRKK5SaxYB3KvpXusNJOGQC+z+yWdw2+RJDMJtV5wjZw1MyavXsKr@vger.kernel.org, AJvYcCX0SEhyFsrkMo2wEiS5rFR5itEbyPxPNh57mtMxXyZOaXMsm0DDv+nvE1Szr+4ebO/g2R8ikbrUYBAkqhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1NtydY5+4ZnNjGwfPfUHcOqEBn3QPCyOdppsj+d+EAr9RFvWH
+	PGfy/vEWvbBD4cDxuVgmPmDmZxrcgDI8eOho+DP3USMePIW3PWTe
+X-Gm-Gg: ASbGncviEgzAMC8Ru3zP6ULWl6tz4K/Fo5jziuei/9+IjqTX6eF4Ztc/RItD4weeMTi
+	9asYnCwJAhZdjJJVC8vkIJ9wqAgmRUY7nbrW3YhS4SfIr728dxRAZcovt66DPhSJ9g+0aWtknWo
+	NudvhfbuRgMZpZN2gr6yp6ntKacXhC1u3Ik5yWH9/6qVQwrA+1jkJsrqOpRSLSpHPCvRk4SvO2R
+	PJxzDayvcG23t7Vtoqtt5+EsfMJ8PJ9A6wq+9pal8OlIBV4/OEVO2dAChnqX/rR1ROhCrSVnwqQ
+	ke1ieycjGv3q3ey2Nyg2a1565BmKIP6C5URQZnuYBIkmhApau/A9UZ9GcwzA20+mbbMA5nB1FsR
+	JYzfPHe8=
+X-Google-Smtp-Source: AGHT+IEeNatuio+GXvnz6jtis2Ifu8CXZWb0U2xpbF/9zUj/YkR/FHukm5fxlTJZb1XZQEdPrISlBQ==
+X-Received: by 2002:a05:6000:40cf:b0:391:2e6a:30fe with SMTP id ffacd0b85a97d-39c121188b9mr9767506f8f.39.1743535437739;
+        Tue, 01 Apr 2025 12:23:57 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66aa32sm15353438f8f.50.2025.04.01.12.23.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66aa32sm15353438f8f.50.2025.04.01.12.23.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 12:23:56 -0700 (PDT)
+        Tue, 01 Apr 2025 12:23:57 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -67,10 +70,12 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 1/6] crypto: sun8i-ce-hash - fix error handling in sun8i_ce_hash_run()
-Date: Tue,  1 Apr 2025 22:23:16 +0300
-Message-ID: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 2/6] crypto: sun8i-ce-hash - remove duplicated fallback checks
+Date: Tue,  1 Apr 2025 22:23:17 +0300
+Message-ID: <20250401192321.3370188-2-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
+References: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,123 +84,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rework error handling in sun8i_ce_hash_run() to unmap the dma buffers in
-case of failure. Currently, the dma unmap functions are not called if the
-function errors out at various points.
+Remove duplicated fallback checks in sun8i_ce_hash_digest(). The same
+checks are already done previously in sun8i_ce_hash_need_fallback().
 
-Fixes: 56f6d5aee88d1 ("crypto: sun8i-ce - support hash algorithms")
 Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 ---
- .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 34 ++++++++++++-------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index 6072dd9f390b..3f9d79ea01aa 100644
+index 3f9d79ea01aa..2c2d285de154 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -343,9 +343,8 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	u32 common;
- 	u64 byte_count;
- 	__le32 *bf;
--	void *buf = NULL;
-+	void *buf, *result;
- 	int j, i, todo;
--	void *result = NULL;
- 	u64 bs;
- 	int digestsize;
- 	dma_addr_t addr_res, addr_pad;
-@@ -365,14 +364,14 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	buf = kcalloc(2, bs, GFP_KERNEL | GFP_DMA);
- 	if (!buf) {
- 		err = -ENOMEM;
--		goto theend;
-+		goto err_out;
- 	}
- 	bf = (__le32 *)buf;
+@@ -244,21 +244,11 @@ int sun8i_ce_hash_digest(struct ahash_request *areq)
+ 	struct sun8i_ce_alg_template *algt;
+ 	struct sun8i_ce_dev *ce;
+ 	struct crypto_engine *engine;
+-	struct scatterlist *sg;
+-	int nr_sgs, e, i;
++	int e;
  
- 	result = kzalloc(digestsize, GFP_KERNEL | GFP_DMA);
- 	if (!result) {
- 		err = -ENOMEM;
--		goto theend;
-+		goto err_free_buf;
- 	}
+ 	if (sun8i_ce_hash_need_fallback(areq))
+ 		return sun8i_ce_hash_digest_fb(areq);
  
- 	flow = rctx->flow;
-@@ -398,7 +397,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
- 		dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
- 		err = -EINVAL;
--		goto theend;
-+		goto err_free_result;
- 	}
+-	nr_sgs = sg_nents_for_len(areq->src, areq->nbytes);
+-	if (nr_sgs > MAX_SG - 1)
+-		return sun8i_ce_hash_digest_fb(areq);
+-
+-	for_each_sg(areq->src, sg, nr_sgs, i) {
+-		if (sg->length % 4 || !IS_ALIGNED(sg->offset, sizeof(u32)))
+-			return sun8i_ce_hash_digest_fb(areq);
+-	}
+-
+ 	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
+ 	ce = algt->ce;
  
- 	len = areq->nbytes;
-@@ -411,7 +410,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	if (len > 0) {
- 		dev_err(ce->dev, "remaining len %d\n", len);
- 		err = -EINVAL;
--		goto theend;
-+		goto err_unmap_src;
- 	}
- 	addr_res = dma_map_single(ce->dev, result, digestsize, DMA_FROM_DEVICE);
- 	cet->t_dst[0].addr = desc_addr_val_le32(ce, addr_res);
-@@ -419,7 +418,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	if (dma_mapping_error(ce->dev, addr_res)) {
- 		dev_err(ce->dev, "DMA map dest\n");
- 		err = -EINVAL;
--		goto theend;
-+		goto err_unmap_src;
- 	}
- 
- 	byte_count = areq->nbytes;
-@@ -441,7 +440,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	}
- 	if (!j) {
- 		err = -EINVAL;
--		goto theend;
-+		goto err_unmap_result;
- 	}
- 
- 	addr_pad = dma_map_single(ce->dev, buf, j * 4, DMA_TO_DEVICE);
-@@ -450,7 +449,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	if (dma_mapping_error(ce->dev, addr_pad)) {
- 		dev_err(ce->dev, "DMA error on padding SG\n");
- 		err = -EINVAL;
--		goto theend;
-+		goto err_unmap_result;
- 	}
- 
- 	if (ce->variant->hash_t_dlen_in_bits)
-@@ -463,16 +462,25 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	err = sun8i_ce_run_task(ce, flow, crypto_ahash_alg_name(tfm));
- 
- 	dma_unmap_single(ce->dev, addr_pad, j * 4, DMA_TO_DEVICE);
--	dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
-+
-+err_unmap_result:
- 	dma_unmap_single(ce->dev, addr_res, digestsize, DMA_FROM_DEVICE);
-+	if (!err)
-+		memcpy(areq->result, result, algt->alg.hash.base.halg.digestsize);
- 
-+err_unmap_src:
-+	dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
- 
--	memcpy(areq->result, result, algt->alg.hash.base.halg.digestsize);
--theend:
--	kfree(buf);
-+err_free_result:
- 	kfree(result);
-+
-+err_free_buf:
-+	kfree(buf);
-+
-+err_out:
- 	local_bh_disable();
- 	crypto_finalize_hash_request(engine, breq, err);
- 	local_bh_enable();
-+
- 	return 0;
- }
 -- 
 2.48.1
 
