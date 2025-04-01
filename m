@@ -1,63 +1,62 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9404A1E51E7;
-	Tue,  1 Apr 2025 19:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E948C2C6;
+	Tue,  1 Apr 2025 19:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743535441; cv=none; b=LWCwf2nmFKekHvxjsuD1cV2CbLgTTlRe0mZUIk40bJ2WGwNIx54QVBlb27NJ6Mb3ioxJRbXhpBNcY7F8asRD7SO+6yO4RFGwCx/knOOz0kzbgMDar9Q/ih1msbxtMFlncOE/4qL4P2QWmSy3MKbxZRzP4ozey6lho8ZbUCOa5Ck=
+	t=1743535442; cv=none; b=MJnUsCeL9/GGBbzdr+GlvOxUHI4LMgxvj3Cte2Cz4gcDC5SlxZ+gyJSxEKRDC0D5mPqV5IheM0Yzi9d+jJVg5b3VE/rWJSrtAO9yDyARVFoU61kRyZi85FNEhvYC+/ewg6z7lrBzrHxr6G7HsxfEAPuUBNR24SBMfVLwX9XaK40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743535441; c=relaxed/simple;
-	bh=C4U1jwV2UTE3RqFfFsVaxqmVcfNk30K3AoLQSuFxdSo=;
+	s=arc-20240116; t=1743535442; c=relaxed/simple;
+	bh=ijYhgMFPW0GwZbvTlvUWZO6qB0iZ1PV0+yjxL+ZbDOw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ra3+JFpKlRP/YeIwYGCOwMPekgfjIpqoqiZqCmNgKi4nLca5+Eq6C84gzu/lTXnhGROIoSdY3xiCpxkJ713JGLa6YSXNOQlT8DVJSll2XzYaYqUqxjfYPf9Ffop4otc62LXLG0OSw07bvuzad6QpOLNggRmY2MZxFHjUSPvhGSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y5Tkqe4L; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=WvOpf6/8C1uNMitnoAg25YdFznSicuqBVwFMS8hkJxjCO8V1WVvq46ARJIJ6rswHhVHjtwiNTb2WhBJUkNrkXzYerPUfPK//Qoyqv2ITPoNWzBN2UV9cb2/B1ri/VKKGH6NqHc4Pov48Ydg67PCs0tbFZDmZTMSqTeTePiqg3KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yxd0jHH8; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5Tkqe4L"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3914a5def6bso3391734f8f.1;
-        Tue, 01 Apr 2025 12:23:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yxd0jHH8"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3913b539aabso3487540f8f.2;
+        Tue, 01 Apr 2025 12:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743535438; x=1744140238; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743535439; x=1744140239; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bH5VLtP+seSAMs8ZXZEEtVjeNgw0O+SRzuS1o+Cett4=;
-        b=Y5Tkqe4LskI2G6HaXGp6C6DSViqitcSv5WTIB9umKTN97oy0qa3RF5P9bwCevC68kB
-         2ZSDeoaw1NHJ7XcBHrgB/3z7aHbDETmh5rhTgBUgxpMUq8GCpylsXbcQTmxDYGUhSopP
-         JG9Z6+Z7I2sPatYxEOPGDdP6dfCqC1z9foeLmW9S0POYUR7XT951/Qp8e1UuhgF0lI/2
-         pBkTZdWkdC5sNzcD8/rUO96qkIROFy4ItrtFWfhDZns6gy8LvpNYUCHqgeodD3myACh1
-         q2UsnTPxfhILrZoC8uVJzanzo6MXkHa3ALx/MKFXrgWyt+JPxchQKwIVKxZxerV3dz48
-         Vs5w==
+        bh=ZzBkugdw4gdptdF8hF2WvHzloU2qygLTygvgXH5F5js=;
+        b=Yxd0jHH8O+aA5NKjLNG3TMdSfko2KdGFqtwgGc6HlWQsuw3Ju0kMy2qB+1pz8qb/CI
+         jMbqmowt0lYq881KEUzWGG5VMeXMgvr7boqAkxjluojQdoR5rKFD/4R91u4+L69V+7s/
+         rCe1f+TjPJzgBOmP7T87z+h7arf6mmen+cWSBsvDd0WQM3cyGNkb6z8HdlWQQ79WM2N4
+         twjjKMYD8JUBPgwKUSo1K0q5mi1Jv08LIalU6gTaTYTzu35nfnV/DwAsRmSQc2ZQUSfR
+         jZmf80X2bxxJNt9k4/UoTeNBwD1K0HUfWfwdYxSGabU3qQI6d1DvJ0fsqGWitMuBICY1
+         4YJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743535438; x=1744140238;
+        d=1e100.net; s=20230601; t=1743535439; x=1744140239;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bH5VLtP+seSAMs8ZXZEEtVjeNgw0O+SRzuS1o+Cett4=;
-        b=mKvb8v+d+mt6oaRF3y7KEEXAoZCjJ5xuiro88vI1VtOX/9b/UN3GIPwfRpLDoS4KV/
-         JirUoAH7qy3BHPeFCknp998+PnC1fc6qJaumngWNDDjj2vO92q9t7rKYXw8+9UEa+7AS
-         6ky11dFqU1BVOEB0mpxzbpvzuqC7pqjMyt/xSaB+F6LtkTYvE+VH6m2TcrI6IvyrYIUj
-         rtz6wYKWYwig0aOhdxJxiNUz2Bl54L00pXszSaGHZ2hENVNUZyzoC83sTY+HjUvtRsRH
-         on6B4cK2aZGajgPcoSPZ6NWKXjiwvOf0UYsL6WBwWCDcPFqpe4w5LByxENFhGQGvP56z
-         JmTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlxTAXiDzzb6cXk8lebTpbOePW619RRKK5SaxYB3KvpXusNJOGQC+z+yWdw2+RJDMJtV5wjZw1MyavXsKr@vger.kernel.org, AJvYcCX0SEhyFsrkMo2wEiS5rFR5itEbyPxPNh57mtMxXyZOaXMsm0DDv+nvE1Szr+4ebO/g2R8ikbrUYBAkqhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1NtydY5+4ZnNjGwfPfUHcOqEBn3QPCyOdppsj+d+EAr9RFvWH
-	PGfy/vEWvbBD4cDxuVgmPmDmZxrcgDI8eOho+DP3USMePIW3PWTe
-X-Gm-Gg: ASbGncviEgzAMC8Ru3zP6ULWl6tz4K/Fo5jziuei/9+IjqTX6eF4Ztc/RItD4weeMTi
-	9asYnCwJAhZdjJJVC8vkIJ9wqAgmRUY7nbrW3YhS4SfIr728dxRAZcovt66DPhSJ9g+0aWtknWo
-	NudvhfbuRgMZpZN2gr6yp6ntKacXhC1u3Ik5yWH9/6qVQwrA+1jkJsrqOpRSLSpHPCvRk4SvO2R
-	PJxzDayvcG23t7Vtoqtt5+EsfMJ8PJ9A6wq+9pal8OlIBV4/OEVO2dAChnqX/rR1ROhCrSVnwqQ
-	ke1ieycjGv3q3ey2Nyg2a1565BmKIP6C5URQZnuYBIkmhApau/A9UZ9GcwzA20+mbbMA5nB1FsR
-	JYzfPHe8=
-X-Google-Smtp-Source: AGHT+IEeNatuio+GXvnz6jtis2Ifu8CXZWb0U2xpbF/9zUj/YkR/FHukm5fxlTJZb1XZQEdPrISlBQ==
-X-Received: by 2002:a05:6000:40cf:b0:391:2e6a:30fe with SMTP id ffacd0b85a97d-39c121188b9mr9767506f8f.39.1743535437739;
-        Tue, 01 Apr 2025 12:23:57 -0700 (PDT)
+        bh=ZzBkugdw4gdptdF8hF2WvHzloU2qygLTygvgXH5F5js=;
+        b=B1MtJvm3w/fMxAtnk83tjaIKDZli0mQcrcS0X1V1L5Ga0QG1vNj1XFoDCnDXzhM2S5
+         CTHSyZfCVtFUWYTxPh0RDChijULgpsEfpBFhA104JGvgoh54ZYZMdnFu4sFn1KkN4VAZ
+         2MYdbh1eCPXBhqJT+OzzEZ9Ia2hT5IvZ3aQLV043sCg11zLOIrXD3fBuzRnkL8oJsu4L
+         uF2B+H19ld8YLcNKBQsaHPXIebI7uURtoV3lc4QS/njdLxs2REt8Mmu1xN1pb416p9fM
+         K7vQvozBKLpby/TuAle7RmqhwHHHoTtfFZtR62+MjfMcPKWoUQyltaR8amB9P79CZFSs
+         fwLw==
+X-Forwarded-Encrypted: i=1; AJvYcCWe4F43MhFwVPV/raMAXlEEU24BKBCrAUKLn87191paG0TMEh8RfzKbw0WPJreBJrpcfFOJhDfbir7W0Bk=@vger.kernel.org, AJvYcCXZMVNZz5qGh6eOJ6sFSY2l6KMISRVvV//JJvahHsLwYEXvYK9dgAZ58LJGZhiA3XAbU9c3zj+9Ujcqd1f0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvTf4oZnkpnp7xy+atIVlJ5hg83cB+UX4OCZTHBLerrobcI9uX
+	mt9Izt8oWSwxEuY2TfYGscN82QSMWyMXQOG/yThIEcrhlChz5xKW
+X-Gm-Gg: ASbGncueY1GUOj7SwNd1zHa4ubL3EucVexGmH7EFVlSnB/OcUxt51OZZcXf0aC6/LIL
+	JDJ0fIXWC7HGkleuq01Z+aM5vA48i3YdjIa5ZkanhaZiPpmi+x3MOjzcMMHIah3Kl75jcp46NAa
+	V/ASesfHpXITvr19TBM36S3f2pJ8b+gzt8VrIU2hhMLVp/mT751z3B93jI5917IalPfYW1srTDh
+	BLPKWbHJoGjKfJ/a+i8WOxbA8/Ikk4quHTUmCvxGwP8HU4M2OvZkFOUMiYBATMWirN8oRDe7NpC
+	r0Kg5x+TlxIKfKsKvlBSRNydrKjmOc4Vx8xxQriPYxLQfZTdetvDEJL/m2V56IEskSyHQ0O/
+X-Google-Smtp-Source: AGHT+IHdVEsoyIGdrpYCryCmSoxbMMM8oYYvuj+OQEED1lz5k318eW2R/hcBuIk9AkMR8eZjNXUkHQ==
+X-Received: by 2002:a05:6000:381:b0:39c:1f0a:ee0 with SMTP id ffacd0b85a97d-39c1f0a0f69mr5763858f8f.2.1743535438907;
+        Tue, 01 Apr 2025 12:23:58 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66aa32sm15353438f8f.50.2025.04.01.12.23.56
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66aa32sm15353438f8f.50.2025.04.01.12.23.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 12:23:57 -0700 (PDT)
+        Tue, 01 Apr 2025 12:23:58 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -70,9 +69,9 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 2/6] crypto: sun8i-ce-hash - remove duplicated fallback checks
-Date: Tue,  1 Apr 2025 22:23:17 +0300
-Message-ID: <20250401192321.3370188-2-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 3/6] crypto: sun8i-ce-hash - factor out debugfs fallback statistics
+Date: Tue,  1 Apr 2025 22:23:18 +0300
+Message-ID: <20250401192321.3370188-3-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
 References: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
@@ -84,40 +83,117 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove duplicated fallback checks in sun8i_ce_hash_digest(). The same
-checks are already done previously in sun8i_ce_hash_need_fallback().
+In order to reduce code duplication, factor out to a separate function
+the codepath that increments debugfs fallback stats.
 
 Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 53 +++++++------------
+ 1 file changed, 20 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index 3f9d79ea01aa..2c2d285de154 100644
+index 2c2d285de154..b0959d8218cb 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -244,21 +244,11 @@ int sun8i_ce_hash_digest(struct ahash_request *areq)
- 	struct sun8i_ce_alg_template *algt;
- 	struct sun8i_ce_dev *ce;
- 	struct crypto_engine *engine;
--	struct scatterlist *sg;
--	int nr_sgs, e, i;
-+	int e;
+@@ -23,6 +23,20 @@
+ #include <linux/string.h>
+ #include "sun8i-ce.h"
  
- 	if (sun8i_ce_hash_need_fallback(areq))
- 		return sun8i_ce_hash_digest_fb(areq);
++static void sun8i_ce_hash_stat_fb_inc(struct crypto_ahash *tfm)
++{
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct sun8i_ce_alg_template *algt __maybe_unused;
++		struct ahash_alg *alg = crypto_ahash_alg(tfm);
++
++		algt = container_of(alg, struct sun8i_ce_alg_template,
++				    alg.hash.base);
++#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
++		algt->stat_fb++;
++#endif
++	}
++}
++
+ int sun8i_ce_hash_init_tfm(struct crypto_ahash *tfm)
+ {
+ 	struct sun8i_ce_hash_tfm_ctx *op = crypto_ahash_ctx(tfm);
+@@ -113,22 +127,13 @@ int sun8i_ce_hash_final(struct ahash_request *areq)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
  
--	nr_sgs = sg_nents_for_len(areq->src, areq->nbytes);
--	if (nr_sgs > MAX_SG - 1)
--		return sun8i_ce_hash_digest_fb(areq);
++	sun8i_ce_hash_stat_fb_inc(tfm);
++
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+ 					CRYPTO_TFM_REQ_MAY_SLEEP;
+ 	rctx->fallback_req.result = areq->result;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
+-		struct sun8i_ce_alg_template *algt __maybe_unused;
+-		struct ahash_alg *alg = crypto_ahash_alg(tfm);
 -
--	for_each_sg(areq->src, sg, nr_sgs, i) {
--		if (sg->length % 4 || !IS_ALIGNED(sg->offset, sizeof(u32)))
--			return sun8i_ce_hash_digest_fb(areq);
+-		algt = container_of(alg, struct sun8i_ce_alg_template,
+-				    alg.hash.base);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-		algt->stat_fb++;
+-#endif
 -	}
 -
- 	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
- 	ce = algt->ce;
+ 	return crypto_ahash_final(&rctx->fallback_req);
+ }
+ 
+@@ -153,6 +158,8 @@ int sun8i_ce_hash_finup(struct ahash_request *areq)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+ 
++	sun8i_ce_hash_stat_fb_inc(tfm);
++
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+ 					CRYPTO_TFM_REQ_MAY_SLEEP;
+@@ -161,17 +168,6 @@ int sun8i_ce_hash_finup(struct ahash_request *areq)
+ 	rctx->fallback_req.src = areq->src;
+ 	rctx->fallback_req.result = areq->result;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
+-		struct sun8i_ce_alg_template *algt __maybe_unused;
+-		struct ahash_alg *alg = crypto_ahash_alg(tfm);
+-
+-		algt = container_of(alg, struct sun8i_ce_alg_template,
+-				    alg.hash.base);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-		algt->stat_fb++;
+-#endif
+-	}
+-
+ 	return crypto_ahash_finup(&rctx->fallback_req);
+ }
+ 
+@@ -181,6 +177,8 @@ static int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+ 
++	sun8i_ce_hash_stat_fb_inc(tfm);
++
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+ 					CRYPTO_TFM_REQ_MAY_SLEEP;
+@@ -189,17 +187,6 @@ static int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
+ 	rctx->fallback_req.src = areq->src;
+ 	rctx->fallback_req.result = areq->result;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
+-		struct sun8i_ce_alg_template *algt __maybe_unused;
+-		struct ahash_alg *alg = crypto_ahash_alg(tfm);
+-
+-		algt = container_of(alg, struct sun8i_ce_alg_template,
+-				    alg.hash.base);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-		algt->stat_fb++;
+-#endif
+-	}
+-
+ 	return crypto_ahash_digest(&rctx->fallback_req);
+ }
  
 -- 
 2.48.1
