@@ -1,167 +1,131 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D832216E24;
-	Mon, 31 Mar 2025 20:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29C920ED;
+	Tue,  1 Apr 2025 02:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743454647; cv=none; b=ACPIdPR4fhGFOqtrFlSbyvgegUTlA8G63EVCFYDmc348cMS1wnl/CeH17XZiRMOVPhCuwKekWyfDksahv8hpMBmkXm/QmShL2AKNr1eAbuztvVuJL4daef4NvHOEiIhdm7GhBK7KB2D8QKekk49R8IdqGrqgNgNlEGnz5zvLiXQ=
+	t=1743475489; cv=none; b=ILCdeQZrAUJhx5Ih316RUujdtt80cS4GDHXlV8CLzJOetf/6h6fIrhATSNyca1e6nyPNZKl3lbioF7sdo/qfd6eAZij/ehKo680LwMa4wXTiVVV6TTHJ8cgdwEQWdxtPibkhPM98LYayKBZ9dn2mG96Y2NusE3n1Gbpsa9A572U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743454647; c=relaxed/simple;
-	bh=10bv2ci8Gq6q+ywpbgUZb11BTLKgedTDu+zcEPWmeN0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=msjov1frB92gd2WoBbWubIY9zHA29Y3AZ5refKJgx2KaoN3zFXv4dxBuScXXWY/Iw6iRq4nwxnUALtvKmgSDDOck1LEN/V5kdMjc/7ge0U4BYpGP9inMjGeQ+Yidl/PjW5eJn482MvwizzHNoR9h4ovsvVrIzA1FcNja57z7JbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=d28vV6/y; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1743475489; c=relaxed/simple;
+	bh=MaU432fM0ph/cWFPCSRNrrfCcdEmQ32AimHMm1XlUMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uVo/RBLl9w1jRqceVygG+rXrwwxSZ1yu01Hi0A6jVQYhVkFR6bq0DZWwM6it2YL4xd8FgckVYZl2OmfaGFEpJyfoB4kGYLQNAdO46OfgRmdgt8Z4mbEnJfHMgHpMnIKNUcF1GzNHs0r1H9YaAyOh+nF1GUTGTVeMkeXRrfW6Yko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=K1L2huJc; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="d28vV6/y"
-Received: from narnia (unknown [167.220.2.28])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4D2A1210237A;
-	Mon, 31 Mar 2025 13:57:18 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4D2A1210237A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1743454645;
-	bh=5XsgAWUoFJ8EmLqO+z62iuJCHz41nTI4m6vFV/nAFDg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=d28vV6/yHuGZDGRY+KhqOML58EhHOZvrywvgHDZb0obC9gbdEWtd1vkSN7MEHX4P2
-	 e9a2D4VWMXQWHWQ2FoVJfkcWg1HevVpml0wySPWlEGN/IQiIxN2AtXipKVvyu9vvC9
-	 c0uwH1dLc9NLCkUNPgqOf5hVIXGc82dBCH4f5l54=
-From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James Morris
- <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada
- <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas
- Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, =?utf-8?Q?Mick?=
- =?utf-8?Q?a=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Nick
- Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>,
- Justin Stitt <justinstitt@google.com>, Jan Stancek <jstancek@redhat.com>,
- Neal Gompa <neal@gompa.dev>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, llvm@lists.linux.dev, nkapron@google.com,
- teknoraver@meta.com, roberto.sassu@huawei.com, xiyou.wangcong@gmail.com
-Subject: Re: [RFC PATCH security-next 0/4] Introducing Hornet LSM
-In-Reply-To: <Z97xvUul1ObkmulE@kernel.org>
-References: <20250321164537.16719-1-bboscaccy@linux.microsoft.com>
- <Z97xvUul1ObkmulE@kernel.org>
-Date: Mon, 31 Mar 2025 13:57:15 -0700
-Message-ID: <871puc7wb8.fsf@microsoft.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="K1L2huJc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=kQOTTlqQ8wKvVI2WKoxwQW4K7c7RwcYzE8Add8oeXm4=; b=K1L2huJcsalalbzxMf4uvPRjjq
+	mA6up6wC29ex1Vmln8/qvtAtrMZOC3ytxFY8P2Q3Zaa6ICmNos4mdEYVNsVRFAwSNSh9irJFzCnzh
+	X8DbR0/Fv2OFECT8oUqTGFXZKADJWaHXMlO7dQtwOlvKw5N9fpaLk62TTq0oWngNsIo2Jx1vtfeqE
+	b0TrFb5VcwFekZREkYy6YzmLrRgOw8epnX8vlZu3MmlWWhzsLvOHI12PI5WKpkdPP0MoSxSH238kZ
+	d9IFf1mtQsn5bUZcAg9rwAqc7sAxhEb8bgEwoB4IWx2IAYPDG20r6lGgBVj+q8QGUtEsM7p24l8la
+	ThgA4KNQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tzRcA-00BjNC-1z;
+	Tue, 01 Apr 2025 10:44:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 01 Apr 2025 10:44:34 +0800
+Date: Tue, 1 Apr 2025 10:44:34 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: Chaining is dead
+Message-ID: <Z-tTEjCzpgDr9a-3@gondor.apana.org.au>
+References: <ZzqyAW2HKeIjGnKa@gondor.apana.org.au>
+ <Z5Ijqi4uSDU9noZm@gondor.apana.org.au>
+ <Z-JE2HNY-Tj8qwQw@gondor.apana.org.au>
+ <20250325152541.GA1661@sol.localdomain>
+ <Z-NdGvErMGS5OT7X@gondor.apana.org.au>
+ <Z-NjarWmWSmQ97K0@gondor.apana.org.au>
+ <20250326033404.GD1661@sol.localdomain>
+ <Z-N55Yjve6wTnPqm@gondor.apana.org.au>
+ <Z-itc_Qd5LLn19pH@gondor.apana.org.au>
+ <20250331165630.GA3893920@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331165630.GA3893920@google.com>
 
-Jarkko Sakkinen <jarkko@kernel.org> writes:
-
-Hi Jarkko,
-
-Thanks for the comments. Paul did a very nice job providing some
-background info, allow me to provide some additional data.
-
-> On Fri, Mar 21, 2025 at 09:45:02AM -0700, Blaise Boscaccy wrote:
->> This patch series introduces the Hornet LSM.
->> 
->> Hornet takes a simple approach to light-skeleton-based eBPF signature
+On Mon, Mar 31, 2025 at 04:56:30PM +0000, Eric Biggers wrote:
 >
-> Can you define "light-skeleton-based" before using the term.
->
-> This is the first time in my life when I hear about it.
->
+> With the bio and folio support in the generic crypto infrastructure, there would
+> be lots of work to do with adding support in all the underlying algorithms, and
+> adding tests for all the new APIs.
 
-Sure. Here is the patchset where this stuff got introduced if you are
-curious.
-https://lore.kernel.org/bpf/20220209054315.73833-1-alexei.starovoitov@gmail.com/
+It doesn't need to be all that complex.  My plan is to add a fallback
+template at the top, which could then be implemented by strategic
+algorithms at the bottom through an extension of the skcipher walk
+mechanism.
 
-eBPF has similar requirements to that of modules when it comes to
-loading: find kallysym addresses, fix up elf relocations, some
-struct field offset handing stuff called CO-RE (compile-one
-run-anywhere), and some other miscellaneous bookkeeping.  During eBPF
-program compilation, pseudo-values get written to the immedate operands
-of instructions.  During loading, those pseudo-values get rewritten with
-concrete addresses or data applicable to the currently running system,
-e.g. a kallsym address or a fd for a map. This needs to happen before
-the instructions for a bpf program are loaded into the kernel via the
-bpf() syscall.
+So you'd allocate "fscrypt(xts(aes))" instead of "xts(aes)", and
+the xts-vaes code could simply use the normal skcipher walker with
+zero changes.  The only changes needed in the aesni module is to
+hook up the xts code to the new "fscrypt(xts(aes))" algorithm.
 
-Unlike modules, an in-kernel loader unfortunately doesn't
-exist. Typically, the instruction rewriting is done dynamically in
-userspace via libbpf (or the rust/go/python loader). What skeletons do
-is generate a script of required instruction-rewriting operations which
-then gets played back at load-time against a hard-coded blob of raw
-instruction data. This removes the need to distribute source-code or
-object files.
+The real reason why I think this is the way to go is that the same
+speed-up would apply everywhere.  So just as I could gain a 15%
+speed-up with xts in fscrypt without any actual multibuffer code,
+a similar speed-up is expected with gcm in networking.  In fact
+if anything the speed-up could be greater there because the data
+unit size is smaller at under 1500 bytes.
 
-There are two flavors of skeletons, normal skeletons, and light
-skeletons. Normal skeletons utilize relocation logic that lives in
-libbpf, and the relocations/instruction rewriting happen in userspace.
-The second flavor, light skeletons, uses a small eBPF program that
-contains the relocation lookup logic. As it's running in in the kernel,
-it unpacks the target program, peforms the instruction rewriting, and
-loads the target program. Light skeletons are currently utilized for
-some drivers, and BPF_PRELOAD functionionality since they can operate
-without userspace.
+You see the Crypto API as the problem here, but for me the problem
+is the legacy data unit size.  It's 2025 and there is no reason why
+anyone should be dealing with units of 1500 or 4096 bytes.
 
-Light skeletons were recommended on various mailing list discussions as
-the preffered path to performing signature verification. There are some
-PoCs floating around that used light-skeletons in concert with
-fs-verity/IMA and eBPF LSMs. We took a slightly different approach to
-Hornet, by utilizing the existing PCKS#7 signing scheme that is used for
-kernel modules.
+> For hashing, users would need to allocate an array to hold the digest for every
+> block in the bio or folio.  That would add an additional memory allocation to
+> every I/O.  You said you'd like to fall back to a smaller buffer if the memory
+> allocation fails.  But that's silly; if we have to support that anyway, we might
+> as well do it that way only.  In which case the bio interface is pointless.
 
->> verification. Signature data can be easily generated for the binary
->
-> s/easily//
->
-> Useless word having no measure.
->
+Sure if you decide to go down the lib/crypto route then there is
+no gain.  All it means is that you can't support hardware offload,
+but neither of us really care about that.
 
-Ack, thanks.
+> Also note that the kernel also *already* has an abstraction layer that allows
+> doing en/decryption on bios.  It's called blk-crypto, and it makes it possible
+> to do the en/decryption using either inline encryption hardware (i.e., the newer
+> style of crypto accelerator that is actually commonly used and doesn't use the
+> Crypto API at all) or the Crypto API.  I have plans to remove the fs-layer bio
+> en/decryption code from fscrypt and always use blk-crypto instead.
 
+Thanks for the pointer, I wasn't aware of its existence.  Yes
+there should definitely be only one code path for this.  So
+what's stopping you from removing fscrypt right now? IOW what's
+missing from blk-crypto?
 
->> data that is generated via bpftool gen -L. This signature can be
->
-> I have no idea what that command does.
->
-> "Signature data can be generated for the binary data as follows:
->
-> bpftool gen -L
->
-> <explanation>"
->
-> Here you'd need to answer to couple of unknowns:
->
-> 1. What is in exact terms "signature data"?
+> Adding bio support to the Crypto API feels duplicative of blk-crypto, and we'd
+> end up with too many abstraction layers.  I think my preferred approach is that
+> blk-crypto-fallback would directly call the library functions.  The legacy
+> Crypto API really has no useful role to play anymore.
 
-That is a PKCS#7 signature of a data buffer containing the raw
-instructions of an eBPF program, followed by the initial values of any
-maps used by the program. 
+I'd certainly like to see that :)
 
-> 2. What does "bpftool gen -L" do?
->
+> FWIW, there are also people thinking about developing inline hashing hardware,
+> in which case something similar would apply to blk-integrity.
 
-eBPF programs often have 2 parts. An orchestrator/loader program that
-provides load -> attach/run -> i/o -> teardown logic and the in-kernel
-program.
+Offloading a whole bio rather than a page or two is definitely
+the way to go.
 
-That command is used to generate a skeleton which can be used by the
-orchestrator prgoram. Skeletons get generated as a C header file, that
-contains various autogenerated functions that open and load bpf programs
-as decribed above. That header file ends up being included in a
-userspace orchestrator program or possibly a kernel module.
-
-> This feedback maps to other examples too in the cover letter.
->
-> BR, Jarkko
-
-
-I'll rework this with some definitions of the eBPF subsystem jargon
-along with your suggestions.
-
--blaise
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
