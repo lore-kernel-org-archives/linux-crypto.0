@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF39CBA4A;
-	Wed,  2 Apr 2025 00:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0794DDDDC;
+	Wed,  2 Apr 2025 00:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743553484; cv=none; b=kmM3RjgAg4S7YIDjapstsptru3HZkwIcpYeTjkhcMLyQYTz3U7dyAYbjn6jB3VZFGGLvV8XoSApxobIDWuWFBcuzHI8VpCmA7+RK+lt0dTl+13UtpsSZLgtwmJhx1szGru4+lfsYJFKuIAWDDqbEuosg1ZOVvyKCfhOfktEv8BI=
+	t=1743553485; cv=none; b=kOlfdWdb8K5Qs2ZU+li8UV0VMeqthHf1yfV0G80Qh34Oehf/wW/46C9lM7JW1yHw18ynJN1jFaNmkRL1gYs70oQMnChs6aqF6bvyA5cLjPj3u68av7R/nU3rNxSQQBFg+bq8Mtzwt+duNQukPxGMoabGKyRtE2/+RjL00B1nrps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743553484; c=relaxed/simple;
-	bh=ZuNv+a/c1q4UM2OWiRA6sn/cDZSxjti9yEaGhk8OnRA=;
+	s=arc-20240116; t=1743553485; c=relaxed/simple;
+	bh=s3LVwFRmxTtaDF+Sq5wSnDzWCovB3mBA5G3HmPzTJsU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RoTCDeXZ+IhPWhaHkbC9WjLP57UpWicuFCJvGRe2IBOXqqO5PxKyiFa6znTS3YfJWnBbunGMe3i7kc3CmzneATMJGX5r13y5imhPF8qfydtEp+kRRKgIPQVeypuISuc9zvwG2VTzBM5jZ8ITX7/6CmK4h3H7X268rhVZuy14SK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpsKoEff; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Y+hkON2LTfTFVKU8HQmeTpgwBLMmVM4iN+QLbDFFdyGNxYdyzI0nn8PY3aE5dw4uKvGOG10HG5EmZED5AkVA7gzJs8nQoHPEy4S2YLluEF9WjZZF49FzaI/mkYLEWpTRT+3hVN9HmVTC93fyHSPIcyf3JaGawnspNyDvVCRTNCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XjmLIJI7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpsKoEff"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44C6AC4CEE9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XjmLIJI7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2593C4CEF5;
 	Wed,  2 Apr 2025 00:24:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1743553484;
-	bh=ZuNv+a/c1q4UM2OWiRA6sn/cDZSxjti9yEaGhk8OnRA=;
+	bh=s3LVwFRmxTtaDF+Sq5wSnDzWCovB3mBA5G3HmPzTJsU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CpsKoEffiZHN8FQn9os8k5ylRDn5m1mfbKMExE+gHZbFKo6mSIUoRd59i4AROAbIX
-	 d0v8XbvJX77072XqUyPF4yr7+2lpJN7Lb8ngKB9ckXjQX5nU3dDKXfo1orDDMbrWkS
-	 UhjPyQu2whuGcXs9+WIOs0Gb7U839kJfQ5KGz78pMZD4tgSqs0cLjyPjlhYxC9PG+b
-	 7Yfep+JIUWwrDADusjkP8EFhbDS9VCJvt0+8blSdCEjfXRgBaMz5bOtTvjcZPVIGIq
-	 3M2wztJVEZPjgpcYYYDCm32cVexVmprS/PLcmRGCQsxr6IoiZ4jtV8Fft46Lfr/F5y
-	 Mqabx/8CEDtpw==
+	b=XjmLIJI7R/gUH6YjDXZHIt9p3ao1fCWGhOnxBwFuxL3uY3VHw0OHYMw/XWD9zQf5+
+	 McNAdLpA9O/icbOkTZf1mfjb+rD+b3oKqwtWJ60lj8MXeRd1OjPPlaUxdV6unCCIAY
+	 Jt1aJzhoSYc4Y4D4cMRUNsPiMM3zMpLMqEteoDvpf5r0h5Xyga0HeeJQ70ID5kiOMr
+	 mxqxxHt3d+niehRlClbr7P21AFGVsTu8GY8gpeEq9FMMFexiDFr7+/sDdBbZKqufNH
+	 JuhMNzhy2hRRCsNdTceXhkWTxFwrFS8q+EGhW64R6CBz3UBawkaUSK8QaDOA6T0zat
+	 NneAv0tjfTM5Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org
-Subject: [PATCH v2 4/9] crypto: x86/aria - stop using the SIMD helper
-Date: Tue,  1 Apr 2025 17:24:04 -0700
-Message-ID: <20250402002420.89233-5-ebiggers@kernel.org>
+Subject: [PATCH v2 6/9] crypto: x86/cast - stop using the SIMD helper
+Date: Tue,  1 Apr 2025 17:24:06 -0700
+Message-ID: <20250402002420.89233-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250402002420.89233-1-ebiggers@kernel.org>
 References: <20250402002420.89233-1-ebiggers@kernel.org>
@@ -59,304 +59,203 @@ This simplifies the code and improves performance.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/Kconfig                 |  3 ---
- arch/x86/crypto/aria_aesni_avx2_glue.c  | 22 +++++++---------------
- arch/x86/crypto/aria_aesni_avx_glue.c   | 20 ++++++--------------
- arch/x86/crypto/aria_gfni_avx512_glue.c | 22 +++++++---------------
- 4 files changed, 20 insertions(+), 47 deletions(-)
+ arch/x86/crypto/Kconfig          |  2 --
+ arch/x86/crypto/cast5_avx_glue.c | 21 +++++++--------------
+ arch/x86/crypto/cast6_avx_glue.c | 20 ++++++--------------
+ 3 files changed, 13 insertions(+), 30 deletions(-)
 
 diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index d8f9d6279cb26..ad00d53ab83d8 100644
+index de927df89ccf1..55800d1ce668e 100644
 --- a/arch/x86/crypto/Kconfig
 +++ b/arch/x86/crypto/Kconfig
-@@ -294,11 +294,10 @@ config CRYPTO_TWOFISH_AVX_X86_64
- 
- config CRYPTO_ARIA_AESNI_AVX_X86_64
- 	tristate "Ciphers: ARIA with modes: ECB, CTR (AES-NI/AVX/GFNI)"
+@@ -86,11 +86,10 @@ config CRYPTO_CAST5_AVX_X86_64
+ 	tristate "Ciphers: CAST5 with modes: ECB, CBC (AVX)"
  	depends on X86 && 64BIT
  	select CRYPTO_SKCIPHER
+ 	select CRYPTO_CAST5
+ 	select CRYPTO_CAST_COMMON
 -	select CRYPTO_SIMD
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_ARIA
+ 	imply CRYPTO_CTR
  	help
- 	  Length-preserving cipher: ARIA cipher algorithms
- 	  (RFC 5794) with ECB and CTR modes
-@@ -312,11 +311,10 @@ config CRYPTO_ARIA_AESNI_AVX_X86_64
+ 	  Length-preserving ciphers: CAST5 (CAST-128) cipher algorithm
+ 	  (RFC2144) with ECB and CBC modes
  
- config CRYPTO_ARIA_AESNI_AVX2_X86_64
- 	tristate "Ciphers: ARIA with modes: ECB, CTR (AES-NI/AVX2/GFNI)"
+@@ -103,11 +102,10 @@ config CRYPTO_CAST6_AVX_X86_64
+ 	tristate "Ciphers: CAST6 with modes: ECB, CBC (AVX)"
  	depends on X86 && 64BIT
  	select CRYPTO_SKCIPHER
+ 	select CRYPTO_CAST6
+ 	select CRYPTO_CAST_COMMON
 -	select CRYPTO_SIMD
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_ARIA
- 	select CRYPTO_ARIA_AESNI_AVX_X86_64
+ 	imply CRYPTO_XTS
+ 	imply CRYPTO_CTR
  	help
- 	  Length-preserving cipher: ARIA cipher algorithms
-@@ -331,11 +329,10 @@ config CRYPTO_ARIA_AESNI_AVX2_X86_64
- 
- config CRYPTO_ARIA_GFNI_AVX512_X86_64
- 	tristate "Ciphers: ARIA with modes: ECB, CTR (AVX512/GFNI)"
- 	depends on X86 && 64BIT && AS_AVX512 && AS_GFNI
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_SIMD
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_ARIA
- 	select CRYPTO_ARIA_AESNI_AVX_X86_64
- 	select CRYPTO_ARIA_AESNI_AVX2_X86_64
- 	help
-diff --git a/arch/x86/crypto/aria_aesni_avx2_glue.c b/arch/x86/crypto/aria_aesni_avx2_glue.c
-index 87a11804fc77f..b4bddcd584577 100644
---- a/arch/x86/crypto/aria_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/aria_aesni_avx2_glue.c
-@@ -4,11 +4,10 @@
-  *
-  * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
+ 	  Length-preserving ciphers: CAST6 (CAST-256) cipher algorithm
+ 	  (RFC2612) with ECB and CBC modes
+diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+index 3976a87f92ad5..3aca04d43b34a 100644
+--- a/arch/x86/crypto/cast5_avx_glue.c
++++ b/arch/x86/crypto/cast5_avx_glue.c
+@@ -6,11 +6,10 @@
+  *     <Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
   */
  
  #include <crypto/algapi.h>
+ #include <crypto/cast5.h>
 -#include <crypto/internal/simd.h>
- #include <crypto/aria.h>
  #include <linux/crypto.h>
  #include <linux/err.h>
  #include <linux/module.h>
  #include <linux/types.h>
-@@ -163,28 +162,26 @@ static int aria_avx2_init_tfm(struct crypto_skcipher *tfm)
- 	return 0;
+ 
+@@ -62,27 +61,25 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	CBC_WALK_END();
  }
  
- static struct skcipher_alg aria_algs[] = {
+ static struct skcipher_alg cast5_algs[] = {
  	{
--		.base.cra_name		= "__ecb(aria)",
--		.base.cra_driver_name	= "__ecb-aria-avx2",
-+		.base.cra_name		= "ecb(aria)",
-+		.base.cra_driver_name	= "ecb-aria-avx2",
- 		.base.cra_priority	= 500,
+-		.base.cra_name		= "__ecb(cast5)",
+-		.base.cra_driver_name	= "__ecb-cast5-avx",
++		.base.cra_name		= "ecb(cast5)",
++		.base.cra_driver_name	= "ecb-cast5-avx",
+ 		.base.cra_priority	= 200,
 -		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
+ 		.base.cra_blocksize	= CAST5_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct cast5_ctx),
  		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
- 		.setkey			= aria_avx2_set_key,
- 		.encrypt		= aria_avx2_ecb_encrypt,
- 		.decrypt		= aria_avx2_ecb_decrypt,
+ 		.min_keysize		= CAST5_MIN_KEY_SIZE,
+ 		.max_keysize		= CAST5_MAX_KEY_SIZE,
+ 		.setkey			= cast5_setkey_skcipher,
+ 		.encrypt		= ecb_encrypt,
+ 		.decrypt		= ecb_decrypt,
  	}, {
--		.base.cra_name		= "__ctr(aria)",
--		.base.cra_driver_name	= "__ctr-aria-avx2",
-+		.base.cra_name		= "ctr(aria)",
-+		.base.cra_driver_name	= "ctr-aria-avx2",
- 		.base.cra_priority	= 500,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL |
--					  CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE,
-+		.base.cra_flags		= CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE,
- 		.base.cra_blocksize	= 1,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
+-		.base.cra_name		= "__cbc(cast5)",
+-		.base.cra_driver_name	= "__cbc-cast5-avx",
++		.base.cra_name		= "cbc(cast5)",
++		.base.cra_driver_name	= "cbc-cast5-avx",
+ 		.base.cra_priority	= 200,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.base.cra_blocksize	= CAST5_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct cast5_ctx),
  		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
-@@ -195,12 +192,10 @@ static struct skcipher_alg aria_algs[] = {
- 		.decrypt		= aria_avx2_ctr_encrypt,
- 		.init                   = aria_avx2_init_tfm,
+ 		.min_keysize		= CAST5_MIN_KEY_SIZE,
+ 		.max_keysize		= CAST5_MAX_KEY_SIZE,
+@@ -91,31 +88,27 @@ static struct skcipher_alg cast5_algs[] = {
+ 		.encrypt		= cbc_encrypt,
+ 		.decrypt		= cbc_decrypt,
  	}
  };
  
--static struct simd_skcipher_alg *aria_simd_algs[ARRAY_SIZE(aria_algs)];
+-static struct simd_skcipher_alg *cast5_simd_algs[ARRAY_SIZE(cast5_algs)];
 -
- static int __init aria_avx2_init(void)
+ static int __init cast5_init(void)
  {
  	const char *feature_name;
  
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
-@@ -231,19 +226,16 @@ static int __init aria_avx2_init(void)
- 		aria_ops.aria_encrypt_32way = aria_aesni_avx2_encrypt_32way;
- 		aria_ops.aria_decrypt_32way = aria_aesni_avx2_decrypt_32way;
- 		aria_ops.aria_ctr_crypt_32way = aria_aesni_avx2_ctr_crypt_32way;
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+ 		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+ 		return -ENODEV;
  	}
  
--	return simd_register_skciphers_compat(aria_algs,
--					      ARRAY_SIZE(aria_algs),
--					      aria_simd_algs);
-+	return crypto_register_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
+-	return simd_register_skciphers_compat(cast5_algs,
+-					      ARRAY_SIZE(cast5_algs),
+-					      cast5_simd_algs);
++	return crypto_register_skciphers(cast5_algs,
++					 ARRAY_SIZE(cast5_algs));
  }
  
- static void __exit aria_avx2_exit(void)
+ static void __exit cast5_exit(void)
  {
--	simd_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs),
--				  aria_simd_algs);
-+	crypto_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
+-	simd_unregister_skciphers(cast5_algs, ARRAY_SIZE(cast5_algs),
+-				  cast5_simd_algs);
++	crypto_unregister_skciphers(cast5_algs, ARRAY_SIZE(cast5_algs));
  }
  
- module_init(aria_avx2_init);
- module_exit(aria_avx2_exit);
+ module_init(cast5_init);
+ module_exit(cast5_exit);
  
-diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
-index 4e1516b76669e..ab9b38d05332a 100644
---- a/arch/x86/crypto/aria_aesni_avx_glue.c
-+++ b/arch/x86/crypto/aria_aesni_avx_glue.c
-@@ -4,11 +4,10 @@
-  *
-  * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
-  */
- 
- #include <crypto/algapi.h>
--#include <crypto/internal/simd.h>
- #include <crypto/aria.h>
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 7e2aea3723490..c4dd28c303036 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -12,11 +12,10 @@
+ #include <linux/types.h>
  #include <linux/crypto.h>
  #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/types.h>
-@@ -150,27 +149,25 @@ static int aria_avx_init_tfm(struct crypto_skcipher *tfm)
- 	return 0;
- }
- 
- static struct skcipher_alg aria_algs[] = {
- 	{
--		.base.cra_name		= "__ecb(aria)",
--		.base.cra_driver_name	= "__ecb-aria-avx",
-+		.base.cra_name		= "ecb(aria)",
-+		.base.cra_driver_name	= "ecb-aria-avx",
- 		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
- 		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
- 		.setkey			= aria_avx_set_key,
- 		.encrypt		= aria_avx_ecb_encrypt,
- 		.decrypt		= aria_avx_ecb_decrypt,
- 	}, {
--		.base.cra_name		= "__ctr(aria)",
--		.base.cra_driver_name	= "__ctr-aria-avx",
-+		.base.cra_name		= "ctr(aria)",
-+		.base.cra_driver_name	= "ctr-aria-avx",
- 		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= 1,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
- 		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
-@@ -182,12 +179,10 @@ static struct skcipher_alg aria_algs[] = {
- 		.decrypt		= aria_avx_ctr_encrypt,
- 		.init			= aria_avx_init_tfm,
- 	}
- };
- 
--static struct simd_skcipher_alg *aria_simd_algs[ARRAY_SIZE(aria_algs)];
--
- static int __init aria_avx_init(void)
- {
- 	const char *feature_name;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
-@@ -211,19 +206,16 @@ static int __init aria_avx_init(void)
- 		aria_ops.aria_encrypt_16way = aria_aesni_avx_encrypt_16way;
- 		aria_ops.aria_decrypt_16way = aria_aesni_avx_decrypt_16way;
- 		aria_ops.aria_ctr_crypt_16way = aria_aesni_avx_ctr_crypt_16way;
- 	}
- 
--	return simd_register_skciphers_compat(aria_algs,
--					      ARRAY_SIZE(aria_algs),
--					      aria_simd_algs);
-+	return crypto_register_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
- }
- 
- static void __exit aria_avx_exit(void)
- {
--	simd_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs),
--				  aria_simd_algs);
-+	crypto_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
- }
- 
- module_init(aria_avx_init);
- module_exit(aria_avx_exit);
- 
-diff --git a/arch/x86/crypto/aria_gfni_avx512_glue.c b/arch/x86/crypto/aria_gfni_avx512_glue.c
-index f4a2208d26383..363cbf4399cca 100644
---- a/arch/x86/crypto/aria_gfni_avx512_glue.c
-+++ b/arch/x86/crypto/aria_gfni_avx512_glue.c
-@@ -4,11 +4,10 @@
-  *
-  * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
-  */
- 
  #include <crypto/algapi.h>
+ #include <crypto/cast6.h>
 -#include <crypto/internal/simd.h>
- #include <crypto/aria.h>
- #include <linux/crypto.h>
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/types.h>
-@@ -163,28 +162,26 @@ static int aria_avx512_init_tfm(struct crypto_skcipher *tfm)
- 	return 0;
+ 
+ #include "ecb_cbc_helpers.h"
+ 
+ #define CAST6_PARALLEL_BLOCKS 8
+ 
+@@ -62,27 +61,25 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	CBC_WALK_END();
  }
  
- static struct skcipher_alg aria_algs[] = {
+ static struct skcipher_alg cast6_algs[] = {
  	{
--		.base.cra_name		= "__ecb(aria)",
--		.base.cra_driver_name	= "__ecb-aria-avx512",
-+		.base.cra_name		= "ecb(aria)",
-+		.base.cra_driver_name	= "ecb-aria-avx512",
- 		.base.cra_priority	= 600,
+-		.base.cra_name		= "__ecb(cast6)",
+-		.base.cra_driver_name	= "__ecb-cast6-avx",
++		.base.cra_name		= "ecb(cast6)",
++		.base.cra_driver_name	= "ecb-cast6-avx",
+ 		.base.cra_priority	= 200,
 -		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
+ 		.base.cra_blocksize	= CAST6_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct cast6_ctx),
  		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
- 		.setkey			= aria_avx512_set_key,
- 		.encrypt		= aria_avx512_ecb_encrypt,
- 		.decrypt		= aria_avx512_ecb_decrypt,
+ 		.min_keysize		= CAST6_MIN_KEY_SIZE,
+ 		.max_keysize		= CAST6_MAX_KEY_SIZE,
+ 		.setkey			= cast6_setkey_skcipher,
+ 		.encrypt		= ecb_encrypt,
+ 		.decrypt		= ecb_decrypt,
  	}, {
--		.base.cra_name		= "__ctr(aria)",
--		.base.cra_driver_name	= "__ctr-aria-avx512",
-+		.base.cra_name		= "ctr(aria)",
-+		.base.cra_driver_name	= "ctr-aria-avx512",
- 		.base.cra_priority	= 600,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL |
--					  CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE,
-+		.base.cra_flags		= CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE,
- 		.base.cra_blocksize	= 1,
- 		.base.cra_ctxsize	= sizeof(struct aria_ctx),
+-		.base.cra_name		= "__cbc(cast6)",
+-		.base.cra_driver_name	= "__cbc-cast6-avx",
++		.base.cra_name		= "cbc(cast6)",
++		.base.cra_driver_name	= "cbc-cast6-avx",
+ 		.base.cra_priority	= 200,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.base.cra_blocksize	= CAST6_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct cast6_ctx),
  		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= ARIA_MIN_KEY_SIZE,
- 		.max_keysize		= ARIA_MAX_KEY_SIZE,
-@@ -195,12 +192,10 @@ static struct skcipher_alg aria_algs[] = {
- 		.decrypt		= aria_avx512_ctr_encrypt,
- 		.init                   = aria_avx512_init_tfm,
- 	}
+ 		.min_keysize		= CAST6_MIN_KEY_SIZE,
+ 		.max_keysize		= CAST6_MAX_KEY_SIZE,
+@@ -91,31 +88,26 @@ static struct skcipher_alg cast6_algs[] = {
+ 		.encrypt		= cbc_encrypt,
+ 		.decrypt		= cbc_decrypt,
+ 	},
  };
  
--static struct simd_skcipher_alg *aria_simd_algs[ARRAY_SIZE(aria_algs)];
+-static struct simd_skcipher_alg *cast6_simd_algs[ARRAY_SIZE(cast6_algs)];
 -
- static int __init aria_avx512_init(void)
+ static int __init cast6_init(void)
  {
  	const char *feature_name;
  
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
-@@ -227,19 +222,16 @@ static int __init aria_avx512_init(void)
- 	aria_ops.aria_ctr_crypt_32way = aria_aesni_avx2_gfni_ctr_crypt_32way;
- 	aria_ops.aria_encrypt_64way = aria_gfni_avx512_encrypt_64way;
- 	aria_ops.aria_decrypt_64way = aria_gfni_avx512_decrypt_64way;
- 	aria_ops.aria_ctr_crypt_64way = aria_gfni_avx512_ctr_crypt_64way;
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+ 		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+ 		return -ENODEV;
+ 	}
  
--	return simd_register_skciphers_compat(aria_algs,
--					      ARRAY_SIZE(aria_algs),
--					      aria_simd_algs);
-+	return crypto_register_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
+-	return simd_register_skciphers_compat(cast6_algs,
+-					      ARRAY_SIZE(cast6_algs),
+-					      cast6_simd_algs);
++	return crypto_register_skciphers(cast6_algs, ARRAY_SIZE(cast6_algs));
  }
  
- static void __exit aria_avx512_exit(void)
+ static void __exit cast6_exit(void)
  {
--	simd_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs),
--				  aria_simd_algs);
-+	crypto_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs));
+-	simd_unregister_skciphers(cast6_algs, ARRAY_SIZE(cast6_algs),
+-				  cast6_simd_algs);
++	crypto_unregister_skciphers(cast6_algs, ARRAY_SIZE(cast6_algs));
  }
  
- module_init(aria_avx512_init);
- module_exit(aria_avx512_exit);
+ module_init(cast6_init);
+ module_exit(cast6_exit);
  
 -- 
 2.49.0
