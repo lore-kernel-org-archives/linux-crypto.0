@@ -1,89 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D900367;
-	Wed,  2 Apr 2025 06:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AFA1519A6;
+	Wed,  2 Apr 2025 06:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743575685; cv=none; b=BQ5iGFeq54Q07irIJQwnZgb4aHPYDKaj1ry/FmAUZhIKY+QeTyBuPWziV5rPnscBHc4DvAGeQ9OjHnTKB5QeYzu4PY0eJRLCOnKeDn/OdiMt0Q50wWdLL7wvOkiXvX36zudg3tvEAkv9mzvX0y1FS39WTwl5uzcEh49aIljlYII=
+	t=1743576487; cv=none; b=L5tVEF/wsXN5IAzr0b3B0h/HIbzLi9Oc6QD76ojWyinn1/hlHNoBsjJyIcg1mOqS1wVByN2nOF70Dvlkw67VZMGCN3/7gLH4oRhR1XckGEFeg30Skqm5ourhNy1uuHOwylLFSX/QThtbKWYEhNcJWqW2w4ezmSTwtXKfK9M7DhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743575685; c=relaxed/simple;
-	bh=QJWKrUTLhpdBk1gTJUAvvDChPHHcCG2u7wUtYBcC138=;
+	s=arc-20240116; t=1743576487; c=relaxed/simple;
+	bh=iVNySqzI/ywgVujwNPF6s7qzEAhRY/BGq1Z1JGoxe+E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LQxL6c6CozTTfpkz8cCvL06j/DFhwJozp7d6y2JeEQ7f/T9mfWB2KR7NmYx1+PSFGHPiaKy8o+112U+zcAgq3ESTZUf+zJwcG2Bdfxw8qJ86lFU5GfFjrOWxUTaQSL6Cfr4Rmqc4zd4ZVqqh7Ov2RI4tgfGFJLLXeNlOh9i09y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Spb4dcG6; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=MKcRkBGkDbjgucukd/ZY0FxLiaoOk2c5e6MQg9lAtZg2nYmOKjKRyPlhJHU6scjIteoiFN3PFHujxvMrIkdHVL6NThqm6USXh99PUIGpGxQAw9kMBlDtqEmFHASw8ryA2bKJYTf+aaPR7XCkIlUONs9KJVBwMZzOgJR3TQTRKkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWG8sByZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Spb4dcG6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6ABFC4CEDD;
-	Wed,  2 Apr 2025 06:34:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWG8sByZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96124C4CEDD;
+	Wed,  2 Apr 2025 06:48:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743575683;
-	bh=QJWKrUTLhpdBk1gTJUAvvDChPHHcCG2u7wUtYBcC138=;
+	s=k20201202; t=1743576487;
+	bh=iVNySqzI/ywgVujwNPF6s7qzEAhRY/BGq1Z1JGoxe+E=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Spb4dcG6QHtIDLgY5Q4rz7CDLxj84umylUdOi0Z93YwuqY64zXeVhnTb2fnYR6aJr
-	 izyl69jG6aY+SVJJOusYPqT7WwssH4IqF4GcCQQ6FP8M5MQkD11hNnLstT1Fe7xCnU
-	 aiyGTQ07vcqV98E1KQk68m/53UsHY0o5/PW0pecrHJzWJrUKdQA4+FJJ6IO9hnTipM
-	 46TmaJPcL3XevUa0+gJxNUlk2eagkSFSIdLrbnLb0RknEyemJgBaQxM8Nfc8HLnu3N
-	 V2Sws6iqG51JRu9eKALWAi8uA3/2zSxLMzJk3nDx1JIg51M0LsuN7zEamusBIcc/7/
-	 gES1k6CgiQF1Q==
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30c44a87b9cso48109681fa.3;
-        Tue, 01 Apr 2025 23:34:43 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV6OGO1RT3LJniwEE/BwaFBxHo15L3Yy2mHj+UlJblFiyLTzQXYAy1amLCnD9jlkS8Hyz7NCk9umL6CU91m@vger.kernel.org, AJvYcCW+FxQGV++tGUkNj1/cmBBVg8OSaXNaqhrGtQmZxgn8JuMlzOeQfNYoFme/cYKFCjYLJ+02DhhJ/1+KdoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWLdkDCqhxOdNOj9BLraENjlP7fiz16ffeOiTpNrna9GMaF01x
-	Ivodc0RpOa2GFvjXQ2v1mu5j0CMuvpslxlXrlFtO3lcmi2e990sMGzvRnmLOJWukWCr/Gpt8IOz
-	iaJqc0HWJrTBZg8sTHogY9sfiTTs=
-X-Google-Smtp-Source: AGHT+IGeaFkBlwbxppv/Ms1A+TfuX7smxLpSQ5LVPfoCe1K+hSX+PDl+fZ2soQf0baCRYVw5iYe9xXVK1leT7vSJkEs=
-X-Received: by 2002:a2e:bea2:0:b0:30c:2e21:9958 with SMTP id
- 38308e7fff4ca-30de032f0b1mr50297471fa.32.1743575682261; Tue, 01 Apr 2025
- 23:34:42 -0700 (PDT)
+	b=cWG8sByZ9t/Eo9M7i7c+lQhHMsp7vCQ11v0UFyioEKWCEKKDMyVc7uTKWphqwO8rq
+	 KtwKHdrZrJEg2zq2d2PPAWfsSK10pd4XfkooOrVsx9XSkYm2/5/nkTBjv4x0AV/r9e
+	 8bpPotwmRiNM28nk1I0wEkeLAOPyCiaCwtpINYtCDWyJf0p4bjUwYCLx57ZwmIlLd3
+	 i1ax3un5Y9JXJTxlrp7euYnHVeXaPKA0rpTgey+Zz8JCGVM9OUtSr41sQJ5FbQclaJ
+	 S3K3nt2h1Wme+Z6xg1tWO7Ij+aLrI+SUoBI4kU7scldG5GQ4u1NLXG6GF7xjeiow/S
+	 2jqv1EtGAjT5g==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5499614d3d2so7174775e87.3;
+        Tue, 01 Apr 2025 23:48:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUfyr8pK55148zJKgBOgQ2cmCjxSFCdYQnI4OHFnD8mCLpMpw2W14G3K1CwB3lYYmoY2iT+2x+CbbPC@vger.kernel.org, AJvYcCV69yVf1/bAhKiNmgiHTAAwgYVLli8dreBk1emX2nXGCLKQRlIRCR+fVkYKWGKGIUEmirxu/D6b8gmSOEMw@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcmyo+KWP4ncVszxRADGX7BXS30i6VIrOymt0yxCWYba259/PV
+	JZMOw8G7XegcF1vUuYiFqCZ0UjY0tBkgZeUhZni1OnJF8DhvGNhq1G8g7SPlF3gEt/7924QfJFq
+	BV8liA7Njdg+2qeES3hG3GLX9M1w=
+X-Google-Smtp-Source: AGHT+IHxviuonsU0zEvEJ+Udb3/Dy+1c6pqnxL3k+SX3TxRyk/NjZhQgUEtXYtRfDvPjXFW/EDAEq7EGYqjTuuKc4zY=
+X-Received: by 2002:a05:6512:2c99:b0:54b:117c:118c with SMTP id
+ 2adb3069b0e04-54b117c11f5mr3947880e87.57.1743576485964; Tue, 01 Apr 2025
+ 23:48:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250402002420.89233-1-ebiggers@kernel.org> <Z-yrf_9D2rV1Q136@gondor.apana.org.au>
- <CAMj1kXEx__RLBriW0kVPrKnx6+DCpq8=6F-7Tmj2Us61gvGGaw@mail.gmail.com>
-In-Reply-To: <CAMj1kXEx__RLBriW0kVPrKnx6+DCpq8=6F-7Tmj2Us61gvGGaw@mail.gmail.com>
+References: <20250401221600.24878-1-ebiggers@kernel.org>
+In-Reply-To: <20250401221600.24878-1-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 2 Apr 2025 09:34:30 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
-X-Gm-Features: AQ5f1JqzmAudo-CcmfpasbkkOWp_Bsl3uaQehcYB86N21t-Epvr3g_pGrYpaMDE
-Message-ID: <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] crypto: x86 - stop using the SIMD helper
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org
+Date: Wed, 2 Apr 2025 09:47:53 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXFQE5B=B=Ptj=8zxNU=Xiu+NdympxfSUcvYbHVyNsNGFw@mail.gmail.com>
+X-Gm-Features: AQ5f1JoAivqiRF6ZW_-JWRUhAevLivGhDUBPRKvbGoRyBb3736u6IzcEZAjTes0
+Message-ID: <CAMj1kXFQE5B=B=Ptj=8zxNU=Xiu+NdympxfSUcvYbHVyNsNGFw@mail.gmail.com>
+Subject: Re: [PATCH 0/7] More CRC kconfig option cleanups
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arch@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2 Apr 2025 at 09:31, Ard Biesheuvel <ardb@kernel.org> wrote:
+On Wed, 2 Apr 2025 at 01:16, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Wed, 2 Apr 2025 at 06:14, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > Stop wrapping skcipher and aead algorithms with the crypto simd helper
-> > > (crypto/simd.c).  The only purpose of doing so was to work around x86
-> > > not always supporting kernel-mode FPU in softirqs.  Specifically, if a
-> > > hardirq interrupted a task context kernel-mode FPU section and then a
-> > > softirqs were run at the end of that hardirq, those softirqs could not
-> > > use kernel-mode FPU.  This has now been fixed.  In combination with the
-> > > fact that the skcipher and aead APIs only support task and softirq
-> > > contexts, these can now just use kernel-mode FPU unconditionally on x86.
-> >
-> > Nice work!
-> >
+> This series finishes cleaning up the CRC kconfig options by removing the
+> remaining unnecessary prompts and an unnecessary 'default y', removing
+> CONFIG_LIBCRC32C, and documenting all the options.
 >
-> Yeah good riddance.
+> I'm planning to take this series through the CRC tree.
 >
-> > So which platform still needs the simd wrapper? I believe arm/arm64
-> > have both been fixed but we haven't finished removing the legacy
-> > simd code yet? Ard, would you be able to spare some cycles and
-> > finish the removal of simd on arm?
-> >
+> Eric Biggers (7):
+>   lib/crc: remove unnecessary prompt for CONFIG_CRC32 and drop 'default
+>     y'
+>   lib/crc: remove unnecessary prompt for CONFIG_CRC_CCITT
+>   lib/crc: remove unnecessary prompt for CONFIG_CRC16
+>   lib/crc: remove unnecessary prompt for CONFIG_CRC_T10DIF
+>   lib/crc: remove unnecessary prompt for CONFIG_CRC_ITU_T
+>   lib/crc: document all the CRC library kconfig options
+>   lib/crc: remove CONFIG_LIBCRC32C
 >
-> Removal of what, exactly?
 
-Ah, never mind - I see some calls on 32-bit ARM to
-simd_skcipher_create_compat(), which have become redundant now that
-SIMD is guaranteed to be available in softirq context.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
