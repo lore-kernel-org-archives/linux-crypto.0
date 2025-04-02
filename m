@@ -1,42 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A8315D1;
-	Wed,  2 Apr 2025 03:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FED22BD1B;
+	Wed,  2 Apr 2025 04:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743565869; cv=none; b=AiM/J7+mGy1W4GBhiebhCKYJTurj2g5mPu3Qw02sVqfqIgryaJQ8De60tnsUMRvhjRiA5lRQoYy51lmvemxH19wAjxQmexWDBcjomDbHkw7xln0vY5sQqH2i71xWGJmu8ctf1GJXGOqsqDQ7GeV63oFQqrf2tVJ4LLN+9Q1wzkY=
+	t=1743566690; cv=none; b=rgKxSEhL4I5KsYBc8JdN/12eeb984QHbrAetq51BJkYa2QE/seXcVWYDzgKDFYM3PmLBPSmYhc7rLrnONmp0tbFZx6VDoRKEsdMcNOpwYLEpJv9SidtLdx9KCAm7RnVOwRHHe/lFPu5qaCppbY0be/bcwZaA9Im2ksUGg+/vIT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743565869; c=relaxed/simple;
-	bh=QUiuMuIQDzD0JO+0s6YlUtgXJWr0xnlvEdN09u2jWUA=;
+	s=arc-20240116; t=1743566690; c=relaxed/simple;
+	bh=1s0swUoTlOS+9aTYKFHvEJREuZrIOqXyvwNB1Dz/R2Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/gUJPEIXgcsh/Jyt7vi/5bz8uaSicoaCPptVNzls0zi7BBPtwcrPsu1bVEYobsaZ64yxIkzqahcBLF+tMDPKQ0dZ9QT+Z5iliDGSKS93sWUgB8M4wmDJG0g/7x2e0wmufFLk6iz9aXXqnbn7tAdbLDOFRfF8Wkop/9GAYwI6lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hn71NVSV; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=eF6hB71uNJ2a2iNg6Fyqyr1VK2rA8qUc5uzjv4Pk0VKjfrC1P068l4Y4oOZcXCmk6YMe913hw88Xe2Hd28S82ZzxPiJaMcD41tlXgVdPJYGd3wc48C03CS2PKw2bSpMBLB35my8m35IxgYnsM3oaByq/k4ceTT2mnvxmCFzAC2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WyBFZQtr; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hn71NVSV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57ED7C4CEDD;
-	Wed,  2 Apr 2025 03:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743565869;
-	bh=QUiuMuIQDzD0JO+0s6YlUtgXJWr0xnlvEdN09u2jWUA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hn71NVSVXjRtESLJmkKiuV2gEVYRuJfmD0oD5/OuRrZUso0U35Abpmo82b0RPMiNt
-	 eaxQWWzVeMVr97zVZtTsXM4rP1VNWe4dxgYcItpdCFh/ZfGwVHgNgCLwqtjI/tW4MD
-	 UTaDk0SEMWwH78l60mNxBIFhMV7TqW9oAKba0t2ljT+CZ2uyoflZvcFE//ugv7ShJI
-	 CYqDBcf7HRdY71TNxxwGwoPJCd06nSxDv+4jwhl+l6wA/MQULr1PM+yjeOFV2VQrjl
-	 jeGj7jwL61Muj8lchs98OflKPKtIQm7/OFZ5zRW52oNhy98mgNakxDCnmq2dNNrEnK
-	 fLd769xOYch4Q==
-Date: Tue, 1 Apr 2025 20:51:07 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [PATCH 1/7] lib/crc: remove unnecessary prompt for CONFIG_CRC32
- and drop 'default y'
-Message-ID: <20250402035107.GA317606@sol.localdomain>
-References: <20250401221600.24878-1-ebiggers@kernel.org>
- <20250401221600.24878-2-ebiggers@kernel.org>
- <2c1cbb51-cc16-4292-ad30-482d93935d91@infradead.org>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WyBFZQtr"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Vn4Fw6iH7tQfF6tNfZanVr7yGgz0Th49fEBqTPe7cJA=; b=WyBFZQtry+nFJ8oTLdaS6JM+Ax
+	dsj8w/RGv5/kTnhx+2OUvsx4EendvT7qzu2c32HwMzZxraRLQ63p1Wfo4OJQrlYNYhO7qGSoDpLho
+	EVGZEVAV6RiwmTIW8ooUhQyWftyL2Myty0Q7YZdKnxeb1hgSUmr2FX4P2B2rtM1PiCDG2so8xymGA
+	y35OTS0rc3+kvCSRxGz1Fv85RWjXga3No72qKtBDcuWpYuYS8zvnyQmk9qhEhvTVNTD3Tfd104FJB
+	aI7S5QCCQOAjEEqmf3RDPtT2F/K5SYaLfmgc52Sf8ouB7NhXVT8/7tMjjCoSILB6DyyVmzPlqzrig
+	6m5FICwg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tzpLH-00C1Se-0Y;
+	Wed, 02 Apr 2025 12:04:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Apr 2025 12:04:43 +0800
+Date: Wed, 2 Apr 2025 12:04:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: dengler@linux.ibm.com, ifranzki@linux.ibm.com, fcallies@linux.ibm.com,
+	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] s390/crypto: Rework protected key AES for true
+ asynch support
+Message-ID: <Z-y3W4o5nz9qfijs@gondor.apana.org.au>
+References: <20250401145048.52564-1-freude@linux.ibm.com>
+ <20250401145048.52564-3-freude@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,23 +51,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2c1cbb51-cc16-4292-ad30-482d93935d91@infradead.org>
+In-Reply-To: <20250401145048.52564-3-freude@linux.ibm.com>
 
-On Tue, Apr 01, 2025 at 08:42:41PM -0700, Randy Dunlap wrote:
-> Hi 
-> 
-> On 4/1/25 3:15 PM, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > All modules that need CONFIG_CRC32 already select it, so there is no
-> > need to bother users about the option, nor to default it to y.
-> > 
-> 
-> My memory from 10-20 years ago could be foggy, but ISTR that someone made at least
-> CRC16 and CRC32 user-selectable in order to support out-of-tree modules...
-> FWIW.
-> But they would not need to be default y.
+On Tue, Apr 01, 2025 at 04:50:47PM +0200, Harald Freudenberger wrote:
+>
+> +static int ecb_paes_do_crypt(struct s390_paes_ctx *ctx,
+> +			     struct s390_pecb_req_ctx *req_ctx,
+> +			     bool maysleep)
 
-That's not supported by upstream, though.
+...
 
-- Eric
+> +	/* always walk on the ... */
+> +	while ((nbytes = walk->nbytes) != 0) {
+> +		/* only use complete blocks */
+> +		n = nbytes & ~(AES_BLOCK_SIZE - 1);
+> +		k = cpacf_km(ctx->fc | req_ctx->modifier, param,
+> +			     walk->dst.virt.addr, walk->src.virt.addr, n);
+> +		if (k)
+> +			rc = skcipher_walk_done(walk, nbytes - k);
+> +		if (k < n) {
+> +			if (!maysleep) {
+> +				rc = -EKEYEXPIRED;
+> +				goto out;
+> +			}
+
+So this leaves the skcipher walk in a mapped state, to be resumed in
+a work queue later.  Now I don't believe you guys have the horror of
+HIGHMEM so it's not fatal, but it's still a bit of a hack and worthy
+of a comment to at least stop people from other architectures copying
+this.
+
+> +			rc = paes_convert_key(ctx);
+
+At first I thought this was racy, but then I realised that it is not
+because only the crypto_engine thread gets called with maysleep ==
+true.  Since there is only one crypto_engine thread this is safe.
+
+I think this is not really obvious though and worthy of a comment to
+explain the reliance on the single crypto engine thread.
+
+There is one more subtle issue to do with request ordering.  Because
+networking requires packets to not be reordered, we enforce this in
+the Crypto API.  An algorithm must not reorder the requests sent to
+the same tfm.
+
+To do that here, once a ctx goes into the crypto_engine, all future
+requests to the same ctx must also go through the crypto_engine, as
+long as at the time of the request being submitted prior work is still
+outstanding.
+
+The easiest way would be to have a counter in the ctx that keeps
+track of how many requests are currently outstanding in the engine.
+Then in paes_do_crypt you'd simply check the counter, and if it is
+non-zero you always put the request into the engine.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
