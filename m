@@ -1,120 +1,124 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FFB23957D;
-	Wed,  2 Apr 2025 11:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F161523E34C;
+	Wed,  2 Apr 2025 13:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743592433; cv=none; b=ieSH1iL9p4H3ag+eIy1Y4x7z5Wg6fG/tWCflKTfk3kWqwzJQYMtveEl3H/uBoFay2riRYKYAAotXuxEQ995rYBGK1cvL1Ns3g9KPaqXqdDt+dV44wkbmVEub5NwjZg0mbdOm0FZy9kgGa545pGho8Rs5aQUfJ6pjYLWSJo8FqEI=
+	t=1743600697; cv=none; b=nwCz6+mlDFSmRTeqqmZWaxr26vwboX8MM2Rk1+sbh7N9nlTapmRRfX4zOiNhPGg6Vc6jgKa3ee3sYNGoibmEmwRCyIdHmo4VBxhqAnM+cBNCF6buWWI54Jz1ybrX8K0kdTfJz8pkJgrlVgVG4IlWjDpNYe5CncGaAzWnszRIjfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743592433; c=relaxed/simple;
-	bh=cvXqM0ZQA/SF5d06nBpidPXazZn2wTHw/rrXERReFoE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Uikc4tkJx38cF5wfcTrfY+DQ2We0+w5Xv5DrCq239AnctMPggvveBIPgj/stYONfy/rCw6JCuejrCG5+AWmTKPyizAX3r9F/tPxYGlFZ4kqcPfsMjNjqQWTUHLrXp6NM/L57WKqHQ80lfqKeUcz7L+gOhr+JNo6ySSP4DAUSnQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ECW8CUKv; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743600697; c=relaxed/simple;
+	bh=xpGMji0YZmUXXHAPeUj9m6SFNLOshUfsUcIsr8DGjDw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iZEWUZnp8XapQJEiVvdCnw+vGNu+hAZ/lXUJmTtbzeoMH8DWIb4+qjABdu6ZxICRj/sbNE2XPN9J0mVkkGw3u7m5/nbI8w4bliK2H4TXGhRQjixfpQDc6vqRsqAJtDVzO3xUB8rrX2gU/3xhZ9SmN8ifzyT+uzDs7cixh8mhAaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=X8d7ecwP; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECW8CUKv"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cf0d787eeso62790185e9.3;
-        Wed, 02 Apr 2025 04:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743592429; x=1744197229; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WxbAHoRPWMHISvbcRp+L5Pi9IuQda2X07kyg6gEi27s=;
-        b=ECW8CUKvcqJVHQAiUtFxjBHkwyrQhVxVeYpzsNDAeIvDbTmJmYkQb5wwaf1kAiTVOe
-         w8nu6BwmlQwGn+MfqrGkKMhwYuxCSgKeFT/H27rdmx7MD5v1k0OP6YIPJEJganrDxgGx
-         j5nRaT/41Jfv/+tYAJkt56Sdm0i931WLmUcSQLMTSLfaBSY8d2GefvNtN9yqT4hzTZHI
-         EKiNjv4+zG1OrOuwp5mmAaRARSMdYesC9WXz/kYq4NHG4T470RhFD14HtU+mQxVXIML1
-         40TwM2drsT0CPdvdVUDElZa/VFYSWye1tNk2fIfs5EsjrzHpuKBhapD95KNOIpwX6f9a
-         du+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743592429; x=1744197229;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WxbAHoRPWMHISvbcRp+L5Pi9IuQda2X07kyg6gEi27s=;
-        b=IUmZrnCmlIoT7EVZsjdGvAyoC0zVNOomlhDCsPo5ZFOWlgEkOXuY742F/ZdeFTHHgO
-         ZZ/+vklTlfoi8omE+MUZZIweL6G+PvZZ92USbS0m87q8mHlz4G4InY96AkTZk7XWKAnS
-         r8zLOjw+LQx1N87qQUEdU7TUgtHE1kzbOwr86RgUwPHgDLhZTpGOemX+t87kuTC/fjyI
-         sUcC7NIeK99pbWdSIf9yUq1uVpGnSSuoGUNViXvgCadyEorSZJi+hk3SnDxO1bWfEylf
-         5fZ2MKqBPlTKYRRCyvmiB9qNN3SfJNE93za0Q8qUtNsUz4EQ/vlTrTxJmLud2KzeE1tH
-         TJtw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8YWYFcdzU7rmLWIRhXMr6Zhx8TWnJTkBuRfPkOi98gdynjFDPMrN+MFvzkNcs/9YuQIQGPq1pCwosh30=@vger.kernel.org, AJvYcCUwh71gYK711+8MTzEo+JuunyK3M7MC595JhBiT4vZwPvvjDVsPIay7dbL3VHmky8Vas3MT3vhlWcu5s2EC@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVvPcEbK34gU05tjZi5CIFAoanT0sgyM2nou5JITvSJ/DKHDLf
-	EWmQdLlX9Rd3Zi+ZPmbN4trHQcTYxtNsHERvpyuX08CTFndgunx3
-X-Gm-Gg: ASbGncsDAqVRGpOovliEtKJdLR/MeRnaw8DB1cfCLQd+7Kg++qIFr/er9+0s4NynyZ3
-	PTOd9joLHSVd4uFHWB+3xcUtaBEAYLRgSMa95Dg5tnNx17HvKLc3dWnnGV+HgPDRBmmDa9OpvoC
-	uTbUi8uJNGjJmZLTB4q9a8fNa9DSAJWJOkOI08vusXnzKN8Pm9ePDOvjZPgWmLmrRdZlUyzMlqG
-	LpKyaFAMQtHwY2dso3XvaCBhud8DOoBCj1B+kgoz/AEUROGL+hXjGSryoLaR+y0/bXi68av31dM
-	4Ejk1g9toSkex5IyKpOIFCl9W3x0ay07xu8xaN/81h260g==
-X-Google-Smtp-Source: AGHT+IG8DjSotHCrsDLuuunlwFAcflox5He58nr411E9AWlWpXQ0JWgp9n1qos67GnisIzgeoT6EDg==
-X-Received: by 2002:a05:600c:4fd1:b0:43c:f6b0:e807 with SMTP id 5b1f17b1804b1-43db8527142mr168905395e9.31.1743592429245;
-        Wed, 02 Apr 2025 04:13:49 -0700 (PDT)
-Received: from localhost ([194.120.133.58])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39c0b7a433bsm16858788f8f.97.2025.04.02.04.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 04:13:48 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: eip93: Make read-only arrays static const
-Date: Wed,  2 Apr 2025 12:13:47 +0100
-Message-ID: <20250402111347.409795-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="X8d7ecwP"
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 532DVT4D3970940
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 2 Apr 2025 08:31:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1743600689;
+	bh=1Sbk3WYt97BLD57wNauxaWmXUwdOVCVaTQXaTrqR47I=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=X8d7ecwPSlAJazla41Z2AAm/SUqFX4/DEhZd+RDXMxnzyM9fz+vsrUyM+5HPafsv+
+	 B/3rBFL6eypylGDWL1sH/FJFhHrJVf1fqoTikD45R/V+7SPdMHqYEKmcBQBmk8a2fR
+	 Vv831rCo0X3GM27UfMx1bLtRXygaCp+YIXoS3m2g=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 532DVTwR091719;
+	Wed, 2 Apr 2025 08:31:29 -0500
+Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 2
+ Apr 2025 08:31:29 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 2 Apr 2025 08:31:29 -0500
+Received: from [172.24.227.40] (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 532DVQIE059761;
+	Wed, 2 Apr 2025 08:31:27 -0500
+Message-ID: <f7105c10-7e36-4914-a9e8-e83eb61f0189@ti.com>
+Date: Wed, 2 Apr 2025 19:01:25 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/2] crypto: ti: Add support for SHA224/256/384/512 in
+ DTHE V2 driver
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>,
+        Kamlesh Gurudasani <kamlesh@ti.com>,
+        Manorit Chawdhry <m-chawdhry@ti.com>
+References: <20250218104943.2304730-1-t-pratham@ti.com>
+ <20250218104943.2304730-2-t-pratham@ti.com>
+ <Z8QSVLoucZxG1xlc@gondor.apana.org.au>
+Content-Language: en-US
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <Z8QSVLoucZxG1xlc@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Don't populate the read-only arrays sha256_init, sha224_init, sha1_init
-and md5_init on the stack at run time, instead make them static.
+Hi Herbert
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- .../crypto/inside-secure/eip93/eip93-hash.c   | 20 +++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+On 02/03/25 13:39, Herbert Xu wrote:
+> On Tue, Feb 18, 2025 at 04:19:42PM +0530, T Pratham wrote:
+>> +struct dthe_hash_ctx {
+>> +	enum dthe_hash_algSel mode;
+>> +	u16 block_size;
+>> +	u8 digest_size;
+>> +	u8 phash_available;
+>> +	u32 phash[SHA512_DIGEST_SIZE / sizeof(u32)];
+> Is this format identical to the software sha512 hash? If so please
+> make the export/import functions translate to and from struct
+> sha512_state.
+>
+> That way we can export and resume using the software sha512 in case
+> something goes wrong (e.g., memory allocation failure).
+>
+> Ditto with all the other hash algorithms.
+>
+> Thanks,
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-index 5e9627467a42..528d5bd864c9 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-@@ -97,12 +97,20 @@ void eip93_hash_handle_result(struct crypto_async_request *async, int err)
- 
- static void eip93_hash_init_sa_state_digest(u32 hash, u8 *digest)
- {
--	u32 sha256_init[] = { SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
--			      SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7 };
--	u32 sha224_init[] = { SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
--			      SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7 };
--	u32 sha1_init[] = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 };
--	u32 md5_init[] = { MD5_H0, MD5_H1, MD5_H2, MD5_H3 };
-+	static const u32 sha256_init[] = {
-+		SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
-+		SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7
-+	};
-+	static const u32 sha224_init[] = {
-+		SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
-+		SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7
-+	};
-+	static const u32 sha1_init[] = {
-+		SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4
-+	};
-+	static const u32 md5_init[] = {
-+		MD5_H0, MD5_H1, MD5_H2, MD5_H3
-+	};
- 
- 	/* Init HASH constant */
- 	switch (hash) {
--- 
-2.49.0
+I noticed that you are making changes to the export format of hash
+algorithms (s390 hmac
+<https://lore.kernel.org/linux-crypto/Z-AJFwndherQBH2W@gondor.apana.org.au/#r>,
+caam hashing
+<https://lore.kernel.org/linux-crypto/Z-AJx1oPRE2_X1GE@gondor.apana.org.au/#r>).
+I was in process of finalizing my driver for a v2 and had some queries
+about the above feedback from you.
+
+In my dthe_hash_ctx struct below:
+
++struct dthe_hash_ctx { + enum dthe_hash_algSel mode; + u16 block_size;
++ u8 digest_size; + u8 phash_available; + u32 phash[SHA512_DIGEST_SIZE /
+sizeof(u32)]; + u32 phash_size; + u32 digestcnt; + u8
+data_buf[SHA512_BLOCK_SIZE]; + u8 buflen; + struct completion
+hash_compl; +};
+
+You are correct in the sense that the format is /mostly/ identical to
+struct sha512_state. phash[], data_buf[] and digestcnt are same as in
+sha512_state. Rest of the members I can reinitialize at import. The only
+one which stores some kind of state is *buflen*, which requires its
+value to be restored while importing. The current driver implementation
+processes input in multiples of block size and stores the remainder data
+in data_buf[] if the input is not a multiple of block size. buflen has
+the length of data in data_buf[].
+
+How are you planning to restore such states in import if the export is
+to be made compatible with sha512_state? Do you have any pointers for me
+on how to change the import/export before sending the next revision of
+my driver?
+
+Regards
+T Pratham <t-pratham@ti.com>
 
