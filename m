@@ -1,41 +1,46 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A40199FC9
-	for <linux-crypto@vger.kernel.org>; Wed,  2 Apr 2025 16:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5118C936;
+	Wed,  2 Apr 2025 16:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743611651; cv=none; b=pBrNAiKhsCJdonqdfALmAQ3NHXa3LkZgqnj4l0B5ainDvDThEq0p41DxULQLVu6knk4qxB9c6pqgLIr8dry9e9MgIKfOtFc0BzP5SyjkfpOaJPHYpFlY25x9/o0qtVjKJP5caoyblbQ8QKhYvHmaXAAVjLleA9TO1q4J5Z5GYKw=
+	t=1743612064; cv=none; b=EQTw1EJlqv6z545S0tJ8zEjTQWMuwd96MUrx4MRe/cD/TFtSZAkq8TBzFR4x6/KBTeAbDxjXAC8VAmAErcXymVyieHuvIcUEtj1sUqXyg5ZXr389+A007MLgvOlKhFx2ihiGbmG59UM/FIyp+a2aK9xRJWRJJ0yWNq5KVK+6lLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743611651; c=relaxed/simple;
-	bh=pPx3LZdR2OtL3rUaftLBV2+csTwjO27dhe8FV4+OB7g=;
+	s=arc-20240116; t=1743612064; c=relaxed/simple;
+	bh=JL3Fc6Tx+Y7KKkGF51EOD/8yZESEW5Hbu4AYBc2UUrI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LISAMwGSAkZWea92IoMDWlggDBUJGYx+4K8FkwH1WvBfYF85k/MTgiTh6rwnS31eT4oVueS1riDPmG9TOQfkDgwIW969DUeD8gTMacdTXlTcxUCDuDG6cY0/AwLJbNPJIpA5ptRucmzthJ09yCyX2oqhQhR1ndLkxh6aYsY2kgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jslPh3jj; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJuLUIgHZ5uDCweDuKyAefuDOfL4JyPalIlTltWr7GoKN0VEHbpRAWI13OSAqmmvEPp2oIREa3l37iBqCHHOys00fzy2JjokWiBMPkghHU1sADq36iKmAIlFcA+k/BkDUzwa6FxZTGwGBs3i/TFnWdyBO0mfWwY+rjxGbrjSafw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZ9/WGpi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jslPh3jj"
-Date: Wed, 2 Apr 2025 12:33:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743611637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FyToY08AKANnt6USgoODFI0s6amZeeoly5G60f+SEqU=;
-	b=jslPh3jjG9r+MrvJg8kPnGS6lg8vDVcAVbycrytymprDc4UDYlRpuKAPMemwK9puHh5cOc
-	enzySaZ+Pqu+CACSuX8Dzap2ChIMqNSyqghSf9GL6l1eHxjgaZX4fBd9jgWvvQSNr3yDyN
-	kAJoXfJZEiT2XS1ptPmZi7EQM3xbrQE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH] bcachefs: use library APIs for ChaCha20 and Poly1305
-Message-ID: <264qspa55jt3rzkpfx6g2zx7dpcihsqolkui2ljr5zukpyr6xp@4eds66ahp543>
-References: <20250402043333.352723-1-ebiggers@kernel.org>
- <icwysnfc3v7b2hpwvm6ay6567sb5zcmcctmlt44cag6gblaylv@ubrzwcmphci2>
- <20250402162847.GA1235@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZ9/WGpi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14142C4CEDD;
+	Wed,  2 Apr 2025 16:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743612063;
+	bh=JL3Fc6Tx+Y7KKkGF51EOD/8yZESEW5Hbu4AYBc2UUrI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JZ9/WGpiBdApatkU/d5aXIEl+WX0smTkXKrSB3ldd+SYl+KKwiJfRxS3Ffosk/QIE
+	 A870YcJT/MKSH0geGokVXHyBKxhEKl1t0PSQ3m9qS+S+0lKlTK/PIZGvwzlGIQRB+l
+	 5QEm0Een/ahWUEQpOxsWE83ohXUbfW86/OPkRrGjtLmUejFzt14QHVHVFqtcWsHjMl
+	 loy/psVrs21p1kTL0YmeuH06KfbmZJdWlZJyQnzRhiVjfM2mIXmAXplt7qZgUOazFv
+	 jsaeCLzl7m1UFch4Whr5CPBrxwEUTL9BO35nPnQ8R8vq/PPhNbLOOTlgoUUKvEZuak
+	 m/O6nScePRV5g==
+Date: Wed, 2 Apr 2025 09:41:01 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [PATCH 1/7] lib/crc: remove unnecessary prompt for CONFIG_CRC32
+ and drop 'default y'
+Message-ID: <20250402164101.GC1235@sol.localdomain>
+References: <20250401221600.24878-1-ebiggers@kernel.org>
+ <20250401221600.24878-2-ebiggers@kernel.org>
+ <2c1cbb51-cc16-4292-ad30-482d93935d91@infradead.org>
+ <20250402035107.GA317606@sol.localdomain>
+ <81aac5ff-8698-4059-92a2-bccb998eb000@infradead.org>
+ <20250402050234.GB317606@sol.localdomain>
+ <b5589b7d-d4a1-4b12-a845-afdbb26ed845@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,36 +49,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250402162847.GA1235@sol.localdomain>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <b5589b7d-d4a1-4b12-a845-afdbb26ed845@infradead.org>
 
-On Wed, Apr 02, 2025 at 09:28:47AM -0700, Eric Biggers wrote:
-> On Wed, Apr 02, 2025 at 10:01:07AM -0400, Kent Overstreet wrote:
-> > On Tue, Apr 01, 2025 at 09:33:33PM -0700, Eric Biggers wrote:
-> > > From: Eric Biggers <ebiggers@google.com>
-> > > 
-> > > Just use the ChaCha20 and Poly1305 libraries instead of the clunky
-> > > crypto API.  This is much simpler.  It is also slightly faster, since
-> > > the libraries provide more direct access to the same
-> > > architecture-optimized ChaCha20 and Poly1305 code.
-> > > 
-> > > I've tested that existing encrypted bcachefs filesystems can be continue
-> > > to be accessed with this patch applied.
-> > > 
-> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > 
-> > Fantastic!
-> > 
-> > Applied, and this should go into 6.15 - this should get the strange bugs
-> > in the poly1305 path that I wasn't able to reproduce off the dashboard
-> > (and if they're still there, they'll be much easier to debug.)
+On Tue, Apr 01, 2025 at 10:56:32PM -0700, Randy Dunlap wrote:
 > 
-> Thanks!
 > 
-> If you're referring to
-> https://lore.kernel.org/r/CAHOo4gLWAbArwg+w+AqqkxGmOFX6cm8Tvy85tb4igN6V7Z9BZQ@mail.gmail.com/,
-> I think bcachefs passed invalid memory to Poly1305 as a result of mounting a
-> fuzzed filesystem image.  So it should be unaffected by this patch.
+> On 4/1/25 10:02 PM, Eric Biggers wrote:
+> > On Tue, Apr 01, 2025 at 09:50:57PM -0700, Randy Dunlap wrote:
+> >>
+> >>
+> >> On 4/1/25 8:51 PM, Eric Biggers wrote:
+> >>> On Tue, Apr 01, 2025 at 08:42:41PM -0700, Randy Dunlap wrote:
+> >>>> Hi 
+> >>>>
+> >>>> On 4/1/25 3:15 PM, Eric Biggers wrote:
+> >>>>> From: Eric Biggers <ebiggers@google.com>
+> >>>>>
+> >>>>> All modules that need CONFIG_CRC32 already select it, so there is no
+> >>>>> need to bother users about the option, nor to default it to y.
+> >>>>>
+> >>>>
+> >>>> My memory from 10-20 years ago could be foggy, but ISTR that someone made at least
+> >>>> CRC16 and CRC32 user-selectable in order to support out-of-tree modules...
+> >>>> FWIW.
+> >>>> But they would not need to be default y.
+> >>>
+> >>> That's not supported by upstream, though.
+> >>
+> >> Which part is not supported by upstream?
+> > 
+> > Having prompts for library kconfig options solely because out-of-tree modules
+> > might need them.
+> 
+> Well, I think that is was supported for many years. I don't see how it would become
+> unsupported all of a sudden. IMHO.
 
-Well, in that case your patch should still get us a backtrace that I can
-actually debug :)
+Most kernel-internal options aren't user-selectable, though.  It's mainly just
+some older ones that were made user-selectable for some reason, and that is a
+mistake that has been getting cleaned up over time.
+
+Consider that the upstream community has no visibility into out-of-tree modules
+in general, so there is no reasonable policy that could be applied in deciding
+which options should be user-selectable purely for the benefit of out-of-tree
+modules.  The only reasonable policy is to consider in-tree users only.  Just
+like we don't add EXPORT_SYMBOL() just because an out-of-tree module wants it.
+
+And of course downstreams always can, and do, just add a new kconfig option that
+selects any non-visible options they want.
+
+- Eric
