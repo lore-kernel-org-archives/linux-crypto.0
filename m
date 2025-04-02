@@ -1,77 +1,271 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AFA1519A6;
-	Wed,  2 Apr 2025 06:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34CB3C17
+	for <linux-crypto@vger.kernel.org>; Wed,  2 Apr 2025 07:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743576487; cv=none; b=L5tVEF/wsXN5IAzr0b3B0h/HIbzLi9Oc6QD76ojWyinn1/hlHNoBsjJyIcg1mOqS1wVByN2nOF70Dvlkw67VZMGCN3/7gLH4oRhR1XckGEFeg30Skqm5ourhNy1uuHOwylLFSX/QThtbKWYEhNcJWqW2w4ezmSTwtXKfK9M7DhY=
+	t=1743577392; cv=none; b=ZoQSJP/YflRYx+ylDYaduAInjcDKbrfF8jCBr+sxV06DWgjRiM5k26A+pGLjL4MrlwsGDl/ECrIhEdwwRXGUZW3494xYRHTfC2N5uGgPyUYZKD2dzAuSc8JQ0U5lYd9OLcgX2L6KuikkrKOoGU9/TrPH6HuapaYM2pbpqIC3LpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743576487; c=relaxed/simple;
-	bh=iVNySqzI/ywgVujwNPF6s7qzEAhRY/BGq1Z1JGoxe+E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MKcRkBGkDbjgucukd/ZY0FxLiaoOk2c5e6MQg9lAtZg2nYmOKjKRyPlhJHU6scjIteoiFN3PFHujxvMrIkdHVL6NThqm6USXh99PUIGpGxQAw9kMBlDtqEmFHASw8ryA2bKJYTf+aaPR7XCkIlUONs9KJVBwMZzOgJR3TQTRKkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWG8sByZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743577392; c=relaxed/simple;
+	bh=tF6whJezEEc3TL25s7l2ut3QgCCoxd4fvKzQ6fikzFo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fKQGbHGQOhTqxZnGj8lEhzN27jgolc73Mv9cc5eKLQN68s51Hr4ist21GFvyjknGbT6gs2ELUHZCeyMj4j7+q67/lXOQb2PXycqbHzDV0T2+V1PEoxoy7dBIYMvDpjpo14LrwkEupNJyJhGbZmNyRtMU9R4W2uvC7RkzpaW/eyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Iuk2g80A; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWG8sByZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96124C4CEDD;
-	Wed,  2 Apr 2025 06:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743576487;
-	bh=iVNySqzI/ywgVujwNPF6s7qzEAhRY/BGq1Z1JGoxe+E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cWG8sByZ9t/Eo9M7i7c+lQhHMsp7vCQ11v0UFyioEKWCEKKDMyVc7uTKWphqwO8rq
-	 KtwKHdrZrJEg2zq2d2PPAWfsSK10pd4XfkooOrVsx9XSkYm2/5/nkTBjv4x0AV/r9e
-	 8bpPotwmRiNM28nk1I0wEkeLAOPyCiaCwtpINYtCDWyJf0p4bjUwYCLx57ZwmIlLd3
-	 i1ax3un5Y9JXJTxlrp7euYnHVeXaPKA0rpTgey+Zz8JCGVM9OUtSr41sQJ5FbQclaJ
-	 S3K3nt2h1Wme+Z6xg1tWO7Ij+aLrI+SUoBI4kU7scldG5GQ4u1NLXG6GF7xjeiow/S
-	 2jqv1EtGAjT5g==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5499614d3d2so7174775e87.3;
-        Tue, 01 Apr 2025 23:48:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUfyr8pK55148zJKgBOgQ2cmCjxSFCdYQnI4OHFnD8mCLpMpw2W14G3K1CwB3lYYmoY2iT+2x+CbbPC@vger.kernel.org, AJvYcCV69yVf1/bAhKiNmgiHTAAwgYVLli8dreBk1emX2nXGCLKQRlIRCR+fVkYKWGKGIUEmirxu/D6b8gmSOEMw@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxcmyo+KWP4ncVszxRADGX7BXS30i6VIrOymt0yxCWYba259/PV
-	JZMOw8G7XegcF1vUuYiFqCZ0UjY0tBkgZeUhZni1OnJF8DhvGNhq1G8g7SPlF3gEt/7924QfJFq
-	BV8liA7Njdg+2qeES3hG3GLX9M1w=
-X-Google-Smtp-Source: AGHT+IHxviuonsU0zEvEJ+Udb3/Dy+1c6pqnxL3k+SX3TxRyk/NjZhQgUEtXYtRfDvPjXFW/EDAEq7EGYqjTuuKc4zY=
-X-Received: by 2002:a05:6512:2c99:b0:54b:117c:118c with SMTP id
- 2adb3069b0e04-54b117c11f5mr3947880e87.57.1743576485964; Tue, 01 Apr 2025
- 23:48:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Iuk2g80A"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-39c142d4909so2206303f8f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Apr 2025 00:03:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743577389; x=1744182189; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0mGb3opwhhZJQd4PF+IUTJMwu9jA7SEufHNbpsIO17s=;
+        b=Iuk2g80AWSRkUFErZkF0vPlqxVK82uXwHsD6J5/pKrT/CoO7RAApi+GdF0VAmdfQcB
+         K2WwvdfdnovNsU0riJ5yTWYpvRZ7hUNIdtlhwiQS7WSEeR74eApUU7zd/y/8Connpvv+
+         0rZwpxvKdpasET6J1zoAPiq/Mh3ONInNvh6O25vJoCmRrJ+tubrljVmdtzyplG/NrlDt
+         t8k/VrYyw9kjRhpkWVGFfqVASjaWj6oDnh2RmGJZgmEG6lYzvO7hv/lKkNxHrDHNqyn0
+         yGZ11XsRyiNJ4HLgs61JK6S/NwU5oF4JcOGZk2AcrmyDijzTUDH0EDRDkEgLZbPMvqod
+         dPpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743577389; x=1744182189;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0mGb3opwhhZJQd4PF+IUTJMwu9jA7SEufHNbpsIO17s=;
+        b=p8glj1jlaGZ3HWxAGVg14FRv/pWjhc+ECS/lq4Q7rlAOImwvEuGhGR+yRhje20uGD4
+         aOGq+S5/wGDDSuaAFOdKY3XvvzsnFNKtiGPMJzNB1WXGbsZxuP1bS3ZBCIvevn4edvbh
+         wuLLPPCOc/CfZfc5mIyH1VbwpiZMmSkVn0tYuW4p6QdD1xmnE4cqLLHewuIebP50YCNP
+         Y2DdTILhAjA3C2jzTqORITpuW8Sy6s8C/XNsBagAx6yGD9TJ2VdO8HD8beiIOYKBHZzY
+         9byocKDW3gAOP2aQdOwKrz9d4Gq2PwBwCiPvmOAfpFQ/BIfLUHJC6okya6AoOH05iWpr
+         LylQ==
+X-Gm-Message-State: AOJu0YwbgHnikWVFF/vVBPvIIGNc/KjWYEak4Rj/+qUOP+447BvvMqft
+	LgpdKaqiSZJUNLUFxlMS43FZcbR1hUuVIJJcAMct3tDCuMphq9UbqMMI6FM49aImitco5BjAQK6
+	8uFJpP6JJwVADmo3WvV/9SF4v1kTjQPk7SA8oL9Z62QonfXB3Sf2LjpVlP84LyJpCgMujx8hCX+
+	/w0tpONMvFrPdRFRv1dt1ep3p+/zqtOg==
+X-Google-Smtp-Source: AGHT+IFmAWS2GrdB0Yu8U27qZ5tPEaQxVLmiIK9XJfRe3GgNAOZOlsLj8EqQAxVljCRCfvCUYutyEUzc
+X-Received: from wrpy3.prod.google.com ([2002:adf:f6c3:0:b0:39a:c9a1:ca5d])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1ace:b0:391:47d8:de23
+ with SMTP id ffacd0b85a97d-39c120e3ce1mr12840819f8f.31.1743577389102; Wed, 02
+ Apr 2025 00:03:09 -0700 (PDT)
+Date: Wed,  2 Apr 2025 09:02:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250401221600.24878-1-ebiggers@kernel.org>
-In-Reply-To: <20250401221600.24878-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 2 Apr 2025 09:47:53 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXFQE5B=B=Ptj=8zxNU=Xiu+NdympxfSUcvYbHVyNsNGFw@mail.gmail.com>
-X-Gm-Features: AQ5f1JoAivqiRF6ZW_-JWRUhAevLivGhDUBPRKvbGoRyBb3736u6IzcEZAjTes0
-Message-ID: <CAMj1kXFQE5B=B=Ptj=8zxNU=Xiu+NdympxfSUcvYbHVyNsNGFw@mail.gmail.com>
-Subject: Re: [PATCH 0/7] More CRC kconfig option cleanups
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arch@vger.kernel.org
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6346; i=ardb@kernel.org;
+ h=from:subject; bh=OlkWsGOIIIBk8gLUx7h9D7s2W3yDh9dpKLgQtWRpnpo=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIf3NQ+kn9dLq4k/zX4c82348butyxvwtjhMbnh66fb53z
+ fGLu2uqOkpZGMQ4GGTFFFkEZv99t/P0RKla51myMHNYmUCGMHBxCsBE5JsYGf4/9Eqz6uR3bo2x
+ 2rNm9Uklg7LD7k6F9tb2ic2rJq7z1gWqEJrueYP1+OFd2zjWveHzya1gcyqdnTnH6vTFfZMk5y5 gBQA=
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250402070251.1762692-3-ardb+git@google.com>
+Subject: [PATCH 1/2] crypto: arm/aes-ce - stop using the SIMD helper
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au, 
+	ebiggers@kernel.org, Ard Biesheuvel <ardb@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2 Apr 2025 at 01:16, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> This series finishes cleaning up the CRC kconfig options by removing the
-> remaining unnecessary prompts and an unnecessary 'default y', removing
-> CONFIG_LIBCRC32C, and documenting all the options.
->
-> I'm planning to take this series through the CRC tree.
->
-> Eric Biggers (7):
->   lib/crc: remove unnecessary prompt for CONFIG_CRC32 and drop 'default
->     y'
->   lib/crc: remove unnecessary prompt for CONFIG_CRC_CCITT
->   lib/crc: remove unnecessary prompt for CONFIG_CRC16
->   lib/crc: remove unnecessary prompt for CONFIG_CRC_T10DIF
->   lib/crc: remove unnecessary prompt for CONFIG_CRC_ITU_T
->   lib/crc: document all the CRC library kconfig options
->   lib/crc: remove CONFIG_LIBCRC32C
->
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Now that ARM permits use of the NEON unit in softirq context as well as
+task context, there is no longer a need to rely on the SIMD helper
+module to construct async skciphers wrapping the sync ones, as the
+latter can always be called directly.
+
+So remove these wrappers and the dependency on the SIMD helper. This
+permits the use of these algorithms by callers that only support
+synchronous use.
+
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm/crypto/Kconfig       |   1 -
+ arch/arm/crypto/aes-ce-glue.c | 102 ++++------------------------------
+ 2 files changed, 11 insertions(+), 92 deletions(-)
+
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 32650c8431d9..2fa8aba8dc12 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -197,7 +197,6 @@ config CRYPTO_AES_ARM_CE
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_LIB_AES
+-	select CRYPTO_SIMD
+ 	help
+ 	  Length-preserving ciphers: AES cipher algorithms (FIPS-197)
+ 	   with block cipher modes:
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 21df5e7f51f9..c17d9e4ad8e6 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -418,29 +418,6 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 	return err;
+ }
+ 
+-static void ctr_encrypt_one(struct crypto_skcipher *tfm, const u8 *src, u8 *dst)
+-{
+-	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	unsigned long flags;
+-
+-	/*
+-	 * Temporarily disable interrupts to avoid races where
+-	 * cachelines are evicted when the CPU is interrupted
+-	 * to do something else.
+-	 */
+-	local_irq_save(flags);
+-	aes_encrypt(ctx, dst, src);
+-	local_irq_restore(flags);
+-}
+-
+-static int ctr_encrypt_sync(struct skcipher_request *req)
+-{
+-	if (!crypto_simd_usable())
+-		return crypto_ctr_encrypt_walk(req, ctr_encrypt_one);
+-
+-	return ctr_encrypt(req);
+-}
+-
+ static int xts_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+@@ -586,10 +563,9 @@ static int xts_decrypt(struct skcipher_request *req)
+ }
+ 
+ static struct skcipher_alg aes_algs[] = { {
+-	.base.cra_name		= "__ecb(aes)",
+-	.base.cra_driver_name	= "__ecb-aes-ce",
++	.base.cra_name		= "ecb(aes)",
++	.base.cra_driver_name	= "ecb-aes-ce",
+ 	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -600,10 +576,9 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= ecb_encrypt,
+ 	.decrypt		= ecb_decrypt,
+ }, {
+-	.base.cra_name		= "__cbc(aes)",
+-	.base.cra_driver_name	= "__cbc-aes-ce",
++	.base.cra_name		= "cbc(aes)",
++	.base.cra_driver_name	= "cbc-aes-ce",
+ 	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -615,10 +590,9 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= cbc_encrypt,
+ 	.decrypt		= cbc_decrypt,
+ }, {
+-	.base.cra_name		= "__cts(cbc(aes))",
+-	.base.cra_driver_name	= "__cts-cbc-aes-ce",
++	.base.cra_name		= "cts(cbc(aes))",
++	.base.cra_driver_name	= "cts-cbc-aes-ce",
+ 	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -631,10 +605,9 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= cts_cbc_encrypt,
+ 	.decrypt		= cts_cbc_decrypt,
+ }, {
+-	.base.cra_name		= "__ctr(aes)",
+-	.base.cra_driver_name	= "__ctr-aes-ce",
++	.base.cra_name		= "ctr(aes)",
++	.base.cra_driver_name	= "ctr-aes-ce",
+ 	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 	.base.cra_blocksize	= 1,
+ 	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -647,25 +620,9 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= ctr_encrypt,
+ 	.decrypt		= ctr_encrypt,
+ }, {
+-	.base.cra_name		= "ctr(aes)",
+-	.base.cra_driver_name	= "ctr-aes-ce-sync",
+-	.base.cra_priority	= 300 - 1,
+-	.base.cra_blocksize	= 1,
+-	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
+-	.base.cra_module	= THIS_MODULE,
+-
+-	.min_keysize		= AES_MIN_KEY_SIZE,
+-	.max_keysize		= AES_MAX_KEY_SIZE,
+-	.ivsize			= AES_BLOCK_SIZE,
+-	.chunksize		= AES_BLOCK_SIZE,
+-	.setkey			= ce_aes_setkey,
+-	.encrypt		= ctr_encrypt_sync,
+-	.decrypt		= ctr_encrypt_sync,
+-}, {
+-	.base.cra_name		= "__xts(aes)",
+-	.base.cra_driver_name	= "__xts-aes-ce",
++	.base.cra_name		= "xts(aes)",
++	.base.cra_driver_name	= "xts-aes-ce",
+ 	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct crypto_aes_xts_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -679,51 +636,14 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.decrypt		= xts_decrypt,
+ } };
+ 
+-static struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
+-
+ static void aes_exit(void)
+ {
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(aes_simd_algs) && aes_simd_algs[i]; i++)
+-		simd_skcipher_free(aes_simd_algs[i]);
+-
+ 	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+ static int __init aes_init(void)
+ {
+-	struct simd_skcipher_alg *simd;
+-	const char *basename;
+-	const char *algname;
+-	const char *drvname;
+-	int err;
+-	int i;
+-
+-	err = crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+-	if (err)
+-		return err;
+-
+-	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+-		if (!(aes_algs[i].base.cra_flags & CRYPTO_ALG_INTERNAL))
+-			continue;
+-
+-		algname = aes_algs[i].base.cra_name + 2;
+-		drvname = aes_algs[i].base.cra_driver_name + 2;
+-		basename = aes_algs[i].base.cra_driver_name;
+-		simd = simd_skcipher_create_compat(aes_algs + i, algname, drvname, basename);
+-		err = PTR_ERR(simd);
+-		if (IS_ERR(simd))
+-			goto unregister_simds;
+-
+-		aes_simd_algs[i] = simd;
+-	}
+-
+-	return 0;
+-
+-unregister_simds:
+-	aes_exit();
+-	return err;
++	return crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+ module_cpu_feature_match(AES, aes_init);
+-- 
+2.49.0.472.ge94155a9ec-goog
+
