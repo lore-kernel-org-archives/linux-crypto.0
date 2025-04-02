@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CBCEC2;
-	Wed,  2 Apr 2025 00:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5871373;
+	Wed,  2 Apr 2025 00:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743553484; cv=none; b=X88K2QSd/k21yxIr4T6S93aniuzwK6O2Q2BUnBKKMAwra73P/l/fNuNSJroogazMltORCD5fsS9djBRuxmXZDLBfpFOGYhnXl6RCfFtLuzfX9uArhmdIQRxBs1RLy0ibGW3yXsd6mPlQJZySQH3DwKpyoXEIZVw7RYMtYAWXBHM=
+	t=1743553484; cv=none; b=EBouLEtbxuqSSPb8+jSWhoxCKnLavTH3wE0zus6xEs4JW7DT8+HTS8EBXEtNtJVqyMJQmcBHTldjyPE3MV7aoJu0BWEQ83cp8A0t0KNktcAJmXSBeZTWHuGVK5SRHdWBpKmoy5DFLD3x5QONwKJYa4BCNlT2vJMn2/wK28rukjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743553484; c=relaxed/simple;
-	bh=Cc+qHXQ6bqmpZcojUxjBLDOt5+qOsnJo+Y2Y8deReE0=;
+	bh=ETpb9VgZiZRwoLdTu/XcIdbIz5Fmm4oaTk3q9AJA4F8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mmuE1pwSEFWQBXnEV2Z4zjMLV3KLTnUdif5Qc8mWJnAEkm8APKy/myMEx+wXzwuUKFCZm5TaJGOfxRVIKw4NpR+hrwjsPaacHZub4lHJXQgie85ppRgSKJn2xhE8nM9ndwMK+U4uKb+soR9r0+uRd9v/0OHLJea0jcMmtjlR+ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fa4IsDsD; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BnSd3IyvgKkD/tAochdFf6C7Wcmyksw/o6iTDvewShpytU17XrMz5tFk/lfcS6Yi7W+rZ494k/uouS+DDxTnNpWuzj8xIkekJ45oIre00+xLHa2ZwePp8Xg+QrWcWDUaZXU4fa2emMznD7GSJ2g9HqBYi1Af/+CNBHJt4BBt3yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/wTC+nY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fa4IsDsD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A92EC4CEEB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/wTC+nY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06087C4CEEF;
 	Wed,  2 Apr 2025 00:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743553483;
-	bh=Cc+qHXQ6bqmpZcojUxjBLDOt5+qOsnJo+Y2Y8deReE0=;
+	s=k20201202; t=1743553484;
+	bh=ETpb9VgZiZRwoLdTu/XcIdbIz5Fmm4oaTk3q9AJA4F8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fa4IsDsDsaMm6Y4p0NzVVcm5FobTD6y/K00qTu2+VFA3mzThDDOo4kkLnGn4g6of7
-	 d4kyoQCk0ofJKjLql4fTC384SuVjiFsNUuQ9/RZF/UsPzIlrB+e6iXpWyh9/90/PXj
-	 oi6joQ0ykkRPs7RZ5zbaAck/wzGQHvVe4uI2sRGv9ZgCh3nA7PPmIZ+evBkIIoThaW
-	 5SuE5tuLJY52tGgM2OM2NLnpBf8Jn4yzNAOClZEMwQrlBzxtaY9RctjuQq3ZHyhG9V
-	 RuG1Ii0H3jwgH65GgreFppYhzBOsgtAHp2TM6XlxSEx1vKYY5NgKhXnHENfGy4RJ+K
-	 x+wLM81rNWtwQ==
+	b=R/wTC+nYgsFi3kyZ9swfs7sIwzx+av9PqQTvPamoSnjSgvaDnYOAwMftWDdjftvoL
+	 nTd+128blTdCgIJJCwZiRk5v8lxfVX5By9TKHX5WD4iTVXJldddYk4Vqzvy3pC+uqK
+	 kqr8NAXgUURxak2JijpnSmbHluC4Fhi9hLLC+VgWoQImlsqd3gIeC4FitsbR97n333
+	 RBgGw3C9UgwPQ6f7sAsP4RnHuay1UjxGse7+t36Ee8MkvdeKjCseOHITU5EL8cOKY1
+	 Tlx89sHyI+nA9RQPy4GJJHSq4BX7C/Yxgde1Zwa5J4wr17tvC7+mMU7TIdpl3ZYonv
+	 j+PuFvoejOwVw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org
-Subject: [PATCH v2 1/9] crypto: x86/aes - drop the avx10_256 AES-XTS and AES-CTR code
-Date: Tue,  1 Apr 2025 17:24:01 -0700
-Message-ID: <20250402002420.89233-2-ebiggers@kernel.org>
+Subject: [PATCH v2 3/9] crypto: x86/aes - stop using the SIMD helper
+Date: Tue,  1 Apr 2025 17:24:03 -0700
+Message-ID: <20250402002420.89233-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250402002420.89233-1-ebiggers@kernel.org>
 References: <20250402002420.89233-1-ebiggers@kernel.org>
@@ -46,638 +46,439 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Intel made a late change to the AVX10 specification that removes support
-for a 256-bit maximum vector length and enumeration of the maximum
-vector length.  AVX10 will imply a maximum vector length of 512 bits.
-I.e. there won't be any such thing as AVX10/256 or AVX10/512; there will
-just be AVX10, and it will essentially just consolidate AVX512 features.
+Stop wrapping skcipher and aead algorithms with the crypto SIMD helper
+(crypto/simd.c).  The only purpose of doing so was to work around x86
+not always supporting kernel-mode FPU in softirqs.  Specifically, if a
+hardirq interrupted a task context kernel-mode FPU section and then a
+softirqs were run at the end of that hardirq, those softirqs could not
+use kernel-mode FPU.  This has now been fixed.  In combination with the
+fact that the skcipher and aead APIs only support task and softirq
+contexts, these can now just use kernel-mode FPU unconditionally on x86.
 
-As a result of this new development, my strategy of providing both
-*_avx10_256 and *_avx10_512 functions didn't turn out to be that useful.
-The only remaining motivation for the 256-bit AVX512 / AVX10 functions
-is to avoid downclocking on older Intel CPUs.  But in the case of
-AES-XTS and AES-CTR, I already wrote *_avx2 code too (primarily to
-support CPUs without AVX512), which performs almost as well as
-*_avx10_256.  So we should just use that.
-
-Therefore, remove the *_avx10_256 AES-XTS and AES-CTR functions and
-algorithms, and rename the *_avx10_512 AES-XTS and AES-CTR functions and
-algorithms to *_avx512.  Make Ice Lake and Tiger Lake use *_avx2 instead
-of *_avx10_256 which they previously used.
-
-I've left AES-GCM unchanged for now.  There is no VAES+AVX2 optimized
-AES-GCM in the kernel yet, so the path forward for that is not as clear.
-However, I did write a VAES+AVX2 optimized AES-GCM for BoringSSL.  So
-one option is to port that to the kernel and then do the same cleanup.
+This simplifies the code and improves performance.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aes-ctr-avx-x86_64.S |  47 ++++-------
- arch/x86/crypto/aes-xts-avx-x86_64.S | 118 ++++++++++++---------------
- arch/x86/crypto/aesni-intel_glue.c   |  30 +++----
- 3 files changed, 74 insertions(+), 121 deletions(-)
+ arch/x86/crypto/Kconfig            |   1 -
+ arch/x86/crypto/aesni-intel_glue.c | 158 +++++++++++------------------
+ 2 files changed, 59 insertions(+), 100 deletions(-)
 
-diff --git a/arch/x86/crypto/aes-ctr-avx-x86_64.S b/arch/x86/crypto/aes-ctr-avx-x86_64.S
-index 1685d8b24b2ca..bbbfd80f5a502 100644
---- a/arch/x86/crypto/aes-ctr-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-ctr-avx-x86_64.S
-@@ -46,12 +46,11 @@
- //
- // This file contains x86_64 assembly implementations of AES-CTR and AES-XCTR
- // using the following sets of CPU features:
- //	- AES-NI && AVX
- //	- VAES && AVX2
--//	- VAES && (AVX10/256 || (AVX512BW && AVX512VL)) && BMI2
--//	- VAES && (AVX10/512 || (AVX512BW && AVX512VL)) && BMI2
-+//	- VAES && AVX512BW && AVX512VL && BMI2
- //
- // See the function definitions at the bottom of the file for more information.
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index c15400efac075..d8f9d6279cb26 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -21,11 +21,10 @@ config CRYPTO_AES_NI_INTEL
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_GF128MUL
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_SKCIPHER
+-	select CRYPTO_SIMD
+ 	help
+ 	  Block cipher: AES cipher algorithms
+ 	  AEAD cipher: AES with GCM
+ 	  Length-preserving ciphers: AES with ECB, CBC, CTS, CTR, XCTR, XTS
  
- #include <linux/linkage.h>
- #include <linux/cfi_types.h>
-@@ -74,31 +73,29 @@
- 	.quad	4, 0
- 
- .text
- 
- // Move a vector between memory and a register.
--// The register operand must be in the first 16 vector registers.
- .macro	_vmovdqu	src, dst
- .if VL < 64
- 	vmovdqu		\src, \dst
- .else
- 	vmovdqu8	\src, \dst
- .endif
- .endm
- 
- // Move a vector between registers.
--// The registers must be in the first 16 vector registers.
- .macro	_vmovdqa	src, dst
- .if VL < 64
- 	vmovdqa		\src, \dst
- .else
- 	vmovdqa64	\src, \dst
- .endif
- .endm
- 
- // Broadcast a 128-bit value from memory to all 128-bit lanes of a vector
--// register.  The register operand must be in the first 16 vector registers.
-+// register.
- .macro	_vbroadcast128	src, dst
- .if VL == 16
- 	vmovdqu		\src, \dst
- .elseif VL == 32
- 	vbroadcasti128	\src, \dst
-@@ -106,11 +103,10 @@
- 	vbroadcasti32x4	\src, \dst
- .endif
- .endm
- 
- // XOR two vectors together.
--// Any register operands must be in the first 16 vector registers.
- .macro	_vpxor	src1, src2, dst
- .if VL < 64
- 	vpxor		\src1, \src2, \dst
- .else
- 	vpxord		\src1, \src2, \dst
-@@ -197,20 +193,20 @@
- 
- // Prepare the next two vectors of AES inputs in AESDATA\i0 and AESDATA\i1, and
- // XOR each with the zero-th round key.  Also update LE_CTR if !\final.
- .macro	_prepare_2_ctr_vecs	is_xctr, i0, i1, final=0
- .if \is_xctr
--  .if USE_AVX10
--	_vmovdqa	LE_CTR, AESDATA\i0
-+  .if USE_AVX512
-+	vmovdqa64	LE_CTR, AESDATA\i0
- 	vpternlogd	$0x96, XCTR_IV, RNDKEY0, AESDATA\i0
-   .else
- 	vpxor		XCTR_IV, LE_CTR, AESDATA\i0
- 	vpxor		RNDKEY0, AESDATA\i0, AESDATA\i0
-   .endif
- 	vpaddq		LE_CTR_INC1, LE_CTR, AESDATA\i1
- 
--  .if USE_AVX10
-+  .if USE_AVX512
- 	vpternlogd	$0x96, XCTR_IV, RNDKEY0, AESDATA\i1
-   .else
- 	vpxor		XCTR_IV, AESDATA\i1, AESDATA\i1
- 	vpxor		RNDKEY0, AESDATA\i1, AESDATA\i1
-   .endif
-@@ -479,22 +475,16 @@
- 	_vmovdqa	AESDATA3, AESDATA0
- 
- .Lxor_tail_partial_vec_0\@:
- 	// XOR the remaining 1 <= LEN < VL bytes.  It's easy if masked
- 	// loads/stores are available; otherwise it's a bit harder...
--.if USE_AVX10
--  .if VL <= 32
--	mov		$-1, %eax
--	bzhi		LEN, %eax, %eax
--	kmovd		%eax, %k1
--  .else
-+.if USE_AVX512
- 	mov		$-1, %rax
- 	bzhi		LEN64, %rax, %rax
- 	kmovq		%rax, %k1
--  .endif
- 	vmovdqu8	(SRC), AESDATA1{%k1}{z}
--	_vpxor		AESDATA1, AESDATA0, AESDATA0
-+	vpxord		AESDATA1, AESDATA0, AESDATA0
- 	vmovdqu8	AESDATA0, (DST){%k1}
- .else
-   .if VL == 32
- 	cmp		$16, LEN
- 	jl		1f
-@@ -552,41 +542,32 @@
- // with HCTR2" (https://eprint.iacr.org/2021/1441.pdf).  XCTR is an
- // easier-to-implement variant of CTR that uses little endian byte order and
- // eliminates carries.  |ctr| is the per-message block counter starting at 1.
- 
- .set	VL, 16
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_ctr64_crypt_aesni_avx)
- 	_aes_ctr_crypt	0
- SYM_FUNC_END(aes_ctr64_crypt_aesni_avx)
- SYM_TYPED_FUNC_START(aes_xctr_crypt_aesni_avx)
- 	_aes_ctr_crypt	1
- SYM_FUNC_END(aes_xctr_crypt_aesni_avx)
- 
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- .set	VL, 32
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx2)
- 	_aes_ctr_crypt	0
- SYM_FUNC_END(aes_ctr64_crypt_vaes_avx2)
- SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx2)
- 	_aes_ctr_crypt	1
- SYM_FUNC_END(aes_xctr_crypt_vaes_avx2)
- 
--.set	VL, 32
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx10_256)
--	_aes_ctr_crypt	0
--SYM_FUNC_END(aes_ctr64_crypt_vaes_avx10_256)
--SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx10_256)
--	_aes_ctr_crypt	1
--SYM_FUNC_END(aes_xctr_crypt_vaes_avx10_256)
--
- .set	VL, 64
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx10_512)
-+.set	USE_AVX512, 1
-+SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx512)
- 	_aes_ctr_crypt	0
--SYM_FUNC_END(aes_ctr64_crypt_vaes_avx10_512)
--SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_ctr64_crypt_vaes_avx512)
-+SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx512)
- 	_aes_ctr_crypt	1
--SYM_FUNC_END(aes_xctr_crypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xctr_crypt_vaes_avx512)
- #endif // CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ
-diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
-index 93ba0ddbe0092..bbeaccbd1c51f 100644
---- a/arch/x86/crypto/aes-xts-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
-@@ -50,36 +50,29 @@
-  * This file implements AES-XTS for modern x86_64 CPUs.  To handle the
-  * complexities of coding for x86 SIMD, e.g. where every vector length needs
-  * different code, it uses a macro to generate several implementations that
-  * share similar source code but are targeted at different CPUs, listed below:
-  *
-- * AES-NI + AVX
-+ * AES-NI && AVX
-  *    - 128-bit vectors (1 AES block per vector)
-  *    - VEX-coded instructions
-  *    - xmm0-xmm15
-  *    - This is for older CPUs that lack VAES but do have AVX.
-  *
-- * VAES + VPCLMULQDQ + AVX2
-+ * VAES && VPCLMULQDQ && AVX2
-  *    - 256-bit vectors (2 AES blocks per vector)
-  *    - VEX-coded instructions
-  *    - ymm0-ymm15
-- *    - This is for CPUs that have VAES but lack AVX512 or AVX10,
-- *      e.g. Intel's Alder Lake and AMD's Zen 3.
-+ *    - This is for CPUs that have VAES but either lack AVX512 (e.g. Intel's
-+ *      Alder Lake and AMD's Zen 3) or downclock too eagerly when using zmm
-+ *      registers (e.g. Intel's Ice Lake).
-  *
-- * VAES + VPCLMULQDQ + AVX10/256 + BMI2
-- *    - 256-bit vectors (2 AES blocks per vector)
-+ * VAES && VPCLMULQDQ && AVX512BW && AVX512VL && BMI2
-+ *    - 512-bit vectors (4 AES blocks per vector)
-  *    - EVEX-coded instructions
-- *    - ymm0-ymm31
-- *    - This is for CPUs that have AVX512 but where using zmm registers causes
-- *      downclocking, and for CPUs that have AVX10/256 but not AVX10/512.
-- *    - By "AVX10/256" we really mean (AVX512BW + AVX512VL) || AVX10/256.
-- *      To avoid confusion with 512-bit, we just write AVX10/256.
-- *
-- * VAES + VPCLMULQDQ + AVX10/512 + BMI2
-- *    - Same as the previous one, but upgrades to 512-bit vectors
-- *      (4 AES blocks per vector) in zmm0-zmm31.
-- *    - This is for CPUs that have good AVX512 or AVX10/512 support.
-+ *    - zmm0-zmm31
-+ *    - This is for CPUs that have good AVX512 support.
-  *
-  * This file doesn't have an implementation for AES-NI alone (without AVX), as
-  * the lack of VEX would make all the assembly code different.
-  *
-  * When we use VAES, we also use VPCLMULQDQ to parallelize the computation of
-@@ -107,11 +100,11 @@
- 	// exists when there's a carry out of the low 64 bits of the tweak.
- 	.quad	0x87, 1
- 
- 	// This table contains constants for vpshufb and vpblendvb, used to
- 	// handle variable byte shifts and blending during ciphertext stealing
--	// on CPUs that don't support AVX10-style masking.
-+	// on CPUs that don't support AVX512-style masking.
- .Lcts_permute_table:
- 	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
- 	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
- 	.byte	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
- 	.byte	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-@@ -136,11 +129,11 @@
- 	// are available, that map to the xmm, ymm, or zmm registers according
- 	// to the selected Vector Length (VL).
- .irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
- 	_define_Vi	\i
- .endr
--.if USE_AVX10
-+.if USE_AVX512
- .irp i, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
- 	_define_Vi	\i
- .endr
- .endif
- 
-@@ -191,11 +184,11 @@
- 	// AES-128, AES-192, and AES-256 use different numbers of round keys.
- 	// To allow handling all three variants efficiently, we align the round
- 	// keys to the *end* of this register range.  I.e., AES-128 uses
- 	// KEY5-KEY14, AES-192 uses KEY3-KEY14, and AES-256 uses KEY1-KEY14.
- 	// (All also use KEY0 for the XOR-only "round" at the beginning.)
--.if USE_AVX10
-+.if USE_AVX512
- 	.set	KEY1_XMM,	%xmm16
- 	.set	KEY1,		V16
- 	.set	KEY2_XMM,	%xmm17
- 	.set	KEY2,		V17
- 	.set	KEY3_XMM,	%xmm18
-@@ -225,43 +218,41 @@
- .endif
- 	// V30-V31 are currently unused.
- .endm
- 
- // Move a vector between memory and a register.
--// The register operand must be in the first 16 vector registers.
- .macro	_vmovdqu	src, dst
- .if VL < 64
- 	vmovdqu		\src, \dst
- .else
- 	vmovdqu8	\src, \dst
- .endif
- .endm
- 
- // Broadcast a 128-bit value into a vector.
- .macro	_vbroadcast128	src, dst
--.if VL == 16 && !USE_AVX10
-+.if VL == 16
- 	vmovdqu		\src, \dst
--.elseif VL == 32 && !USE_AVX10
-+.elseif VL == 32
- 	vbroadcasti128	\src, \dst
- .else
- 	vbroadcasti32x4	\src, \dst
- .endif
- .endm
- 
- // XOR two vectors together.
--// Any register operands must be in the first 16 vector registers.
- .macro	_vpxor	src1, src2, dst
- .if VL < 64
- 	vpxor		\src1, \src2, \dst
- .else
- 	vpxord		\src1, \src2, \dst
- .endif
- .endm
- 
- // XOR three vectors together.
- .macro	_xor3	src1, src2, src3_and_dst
--.if USE_AVX10
-+.if USE_AVX512
- 	// vpternlogd with immediate 0x96 is a three-argument XOR.
- 	vpternlogd	$0x96, \src1, \src2, \src3_and_dst
- .else
- 	vpxor		\src1, \src3_and_dst, \src3_and_dst
- 	vpxor		\src2, \src3_and_dst, \src3_and_dst
-@@ -272,11 +263,11 @@
- // (by multiplying by the polynomial 'x') and write it to \dst.
- .macro	_next_tweak	src, tmp, dst
- 	vpshufd		$0x13, \src, \tmp
- 	vpaddq		\src, \src, \dst
- 	vpsrad		$31, \tmp, \tmp
--.if USE_AVX10
-+.if USE_AVX512
- 	vpternlogd	$0x78, GF_POLY_XMM, \tmp, \dst
- .else
- 	vpand		GF_POLY_XMM, \tmp, \tmp
- 	vpxor		\tmp, \dst, \dst
- .endif
-@@ -335,11 +326,11 @@
- 	vpslldq		$8, V2, V2
- 	vpslldq		$8, V4, V4
- 	vpsllq		$1*VL/16, TWEAK0, TWEAK1
- 	vpsllq		$2*VL/16, TWEAK0, TWEAK2
- 	vpsllq		$3*VL/16, TWEAK0, TWEAK3
--.if USE_AVX10
-+.if USE_AVX512
- 	vpternlogd	$0x96, V0, V1, TWEAK1
- 	vpternlogd	$0x96, V2, V3, TWEAK2
- 	vpternlogd	$0x96, V4, V5, TWEAK3
- .else
- 	vpxor		V0, TWEAK1, TWEAK1
-@@ -472,30 +463,30 @@
- 	// interleave the AES rounds with the XTS tweak computation, and (c) it
- 	// seems unwise to rely *too* heavily on the CPU's branch predictor.
- 	lea		OFFS-16(KEY, KEYLEN64, 4), KEY
- 
- 	// If all 32 SIMD registers are available, cache all the round keys.
--.if USE_AVX10
-+.if USE_AVX512
- 	cmp		$24, KEYLEN
- 	jl		.Laes128\@
- 	je		.Laes192\@
--	_vbroadcast128	-6*16(KEY), KEY1
--	_vbroadcast128	-5*16(KEY), KEY2
-+	vbroadcasti32x4	-6*16(KEY), KEY1
-+	vbroadcasti32x4	-5*16(KEY), KEY2
- .Laes192\@:
--	_vbroadcast128	-4*16(KEY), KEY3
--	_vbroadcast128	-3*16(KEY), KEY4
-+	vbroadcasti32x4	-4*16(KEY), KEY3
-+	vbroadcasti32x4	-3*16(KEY), KEY4
- .Laes128\@:
--	_vbroadcast128	-2*16(KEY), KEY5
--	_vbroadcast128	-1*16(KEY), KEY6
--	_vbroadcast128	0*16(KEY), KEY7
--	_vbroadcast128	1*16(KEY), KEY8
--	_vbroadcast128	2*16(KEY), KEY9
--	_vbroadcast128	3*16(KEY), KEY10
--	_vbroadcast128	4*16(KEY), KEY11
--	_vbroadcast128	5*16(KEY), KEY12
--	_vbroadcast128	6*16(KEY), KEY13
--	_vbroadcast128	7*16(KEY), KEY14
-+	vbroadcasti32x4	-2*16(KEY), KEY5
-+	vbroadcasti32x4	-1*16(KEY), KEY6
-+	vbroadcasti32x4	0*16(KEY), KEY7
-+	vbroadcasti32x4	1*16(KEY), KEY8
-+	vbroadcasti32x4	2*16(KEY), KEY9
-+	vbroadcasti32x4	3*16(KEY), KEY10
-+	vbroadcasti32x4	4*16(KEY), KEY11
-+	vbroadcasti32x4	5*16(KEY), KEY12
-+	vbroadcasti32x4	6*16(KEY), KEY13
-+	vbroadcasti32x4	7*16(KEY), KEY14
- .endif
- .endm
- 
- // Do a single non-last round of AES encryption (if \enc==1) or decryption (if
- // \enc==0) on the block(s) in \data using the round key(s) in \key.  The
-@@ -519,11 +510,11 @@
- 
- // Do a single non-last round of AES en/decryption on the block(s) in \data,
- // using the same key for all block(s).  The round key is loaded from the
- // appropriate register or memory location for round \i.  May clobber \tmp.
- .macro _vaes_1x		enc, i, xmm_suffix, data, tmp
--.if USE_AVX10
-+.if USE_AVX512
- 	_vaes		\enc, KEY\i\xmm_suffix, \data
- .else
- .ifnb \xmm_suffix
- 	_vaes		\enc, (\i-7)*16(KEY), \data
- .else
-@@ -536,11 +527,11 @@
- // Do a single non-last round of AES en/decryption on the blocks in registers
- // V0-V3, using the same key for all blocks.  The round key is loaded from the
- // appropriate register or memory location for round \i.  In addition, does two
- // steps of the computation of the next set of tweaks.  May clobber V4 and V5.
- .macro	_vaes_4x	enc, i
--.if USE_AVX10
-+.if USE_AVX512
- 	_tweak_step	(2*(\i-5))
- 	_vaes		\enc, KEY\i, V0
- 	_vaes		\enc, KEY\i, V1
- 	_tweak_step	(2*(\i-5) + 1)
- 	_vaes		\enc, KEY\i, V2
-@@ -572,11 +563,11 @@
- 	_vaes_1x	\enc, 4, \xmm_suffix, \data, tmp=\tmp
- .Laes128\@:
- .irp i, 5,6,7,8,9,10,11,12,13
- 	_vaes_1x	\enc, \i, \xmm_suffix, \data, tmp=\tmp
- .endr
--.if USE_AVX10
-+.if USE_AVX512
- 	vpxord		KEY14\xmm_suffix, \tweak, \tmp
- .else
- .ifnb \xmm_suffix
- 	vpxor		7*16(KEY), \tweak, \tmp
- .else
-@@ -615,15 +606,15 @@
- 
- .Lmain_loop\@:
- 	// This is the main loop, en/decrypting 4*VL bytes per iteration.
- 
- 	// XOR each source block with its tweak and the zero-th round key.
--.if USE_AVX10
--	_vmovdqu	0*VL(SRC), V0
--	_vmovdqu	1*VL(SRC), V1
--	_vmovdqu	2*VL(SRC), V2
--	_vmovdqu	3*VL(SRC), V3
-+.if USE_AVX512
-+	vmovdqu8	0*VL(SRC), V0
-+	vmovdqu8	1*VL(SRC), V1
-+	vmovdqu8	2*VL(SRC), V2
-+	vmovdqu8	3*VL(SRC), V3
- 	vpternlogd	$0x96, TWEAK0, KEY0, V0
- 	vpternlogd	$0x96, TWEAK1, KEY0, V1
- 	vpternlogd	$0x96, TWEAK2, KEY0, V2
- 	vpternlogd	$0x96, TWEAK3, KEY0, V3
- .else
-@@ -652,11 +643,11 @@
- .endr
- 	// Do the last AES round, then XOR the results with the tweaks again.
- 	// Reduce latency by doing the XOR before the vaesenclast, utilizing the
- 	// property vaesenclast(key, a) ^ b == vaesenclast(key ^ b, a)
- 	// (and likewise for vaesdeclast).
--.if USE_AVX10
-+.if USE_AVX512
- 	_tweak_step	18
- 	_tweak_step	19
- 	vpxord		TWEAK0, KEY14, V4
- 	vpxord		TWEAK1, KEY14, V5
- 	_vaeslast	\enc, V4, V0
-@@ -760,11 +751,11 @@
- 	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
- 	vmovdqu		(SRC), %xmm0
- 	_aes_crypt	\enc, _XMM, TWEAK1_XMM, %xmm0, tmp=%xmm1
- .endif
- 
--.if USE_AVX10
-+.if USE_AVX512
- 	// Create a mask that has the first LEN bits set.
- 	mov		$-1, %r9d
- 	bzhi		LEN, %r9d, %r9d
- 	kmovd		%r9d, %k1
- 
-@@ -809,11 +800,11 @@
- 
- // void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
- //			   u8 iv[AES_BLOCK_SIZE]);
- //
- // Encrypt |iv| using the AES key |tweak_key| to get the first tweak.  Assumes
--// that the CPU supports AES-NI and AVX, but not necessarily VAES or AVX10.
-+// that the CPU supports AES-NI and AVX, but not necessarily VAES or AVX512.
- SYM_TYPED_FUNC_START(aes_xts_encrypt_iv)
- 	.set	TWEAK_KEY,	%rdi
- 	.set	IV,		%rsi
- 	.set	KEYLEN,		%eax
- 	.set	KEYLEN64,	%rax
-@@ -851,41 +842,32 @@ SYM_FUNC_END(aes_xts_encrypt_iv)
- // incremental computation, but |len| must always be >= 16 (AES_BLOCK_SIZE), and
- // |len| must be a multiple of 16 except on the last call.  If |len| is a
- // multiple of 16, then this function updates |tweak| to contain the next tweak.
- 
- .set	VL, 16
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_xts_encrypt_aesni_avx)
- 	_aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_aesni_avx)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_aesni_avx)
- 	_aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_aesni_avx)
- 
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- .set	VL, 32
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx2)
- 	_aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_vaes_avx2)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx2)
- 	_aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_vaes_avx2)
- 
--.set	VL, 32
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_256)
--	_aes_xts_crypt	1
--SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_256)
--SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_256)
--	_aes_xts_crypt	0
--SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_256)
--
- .set	VL, 64
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_512)
-+.set	USE_AVX512, 1
-+SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx512)
- 	_aes_xts_crypt	1
--SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_512)
--SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xts_encrypt_vaes_avx512)
-+SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx512)
- 	_aes_xts_crypt	0
--SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xts_decrypt_vaes_avx512)
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index bc655d794a95c..5bdeda39cef65 100644
+index 5bdeda39cef65..061b1ced93c51 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -842,12 +842,11 @@ static struct simd_skcipher_alg *					       \
- simd_skcipher_algs_##suffix[ARRAY_SIZE(skcipher_algs_##suffix)]
+@@ -564,14 +564,13 @@ static struct crypto_alg aesni_cipher_alg = {
+ };
+ 
+ static struct skcipher_alg aesni_skciphers[] = {
+ 	{
+ 		.base = {
+-			.cra_name		= "__ecb(aes)",
+-			.cra_driver_name	= "__ecb-aes-aesni",
++			.cra_name		= "ecb(aes)",
++			.cra_driver_name	= "ecb-aes-aesni",
+ 			.cra_priority		= 400,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
+ 			.cra_module		= THIS_MODULE,
+ 		},
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -579,14 +578,13 @@ static struct skcipher_alg aesni_skciphers[] = {
+ 		.setkey		= aesni_skcipher_setkey,
+ 		.encrypt	= ecb_encrypt,
+ 		.decrypt	= ecb_decrypt,
+ 	}, {
+ 		.base = {
+-			.cra_name		= "__cbc(aes)",
+-			.cra_driver_name	= "__cbc-aes-aesni",
++			.cra_name		= "cbc(aes)",
++			.cra_driver_name	= "cbc-aes-aesni",
+ 			.cra_priority		= 400,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
+ 			.cra_module		= THIS_MODULE,
+ 		},
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -595,14 +593,13 @@ static struct skcipher_alg aesni_skciphers[] = {
+ 		.setkey		= aesni_skcipher_setkey,
+ 		.encrypt	= cbc_encrypt,
+ 		.decrypt	= cbc_decrypt,
+ 	}, {
+ 		.base = {
+-			.cra_name		= "__cts(cbc(aes))",
+-			.cra_driver_name	= "__cts-cbc-aes-aesni",
++			.cra_name		= "cts(cbc(aes))",
++			.cra_driver_name	= "cts-cbc-aes-aesni",
+ 			.cra_priority		= 400,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
+ 			.cra_module		= THIS_MODULE,
+ 		},
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -613,14 +610,13 @@ static struct skcipher_alg aesni_skciphers[] = {
+ 		.encrypt	= cts_cbc_encrypt,
+ 		.decrypt	= cts_cbc_decrypt,
+ #ifdef CONFIG_X86_64
+ 	}, {
+ 		.base = {
+-			.cra_name		= "__ctr(aes)",
+-			.cra_driver_name	= "__ctr-aes-aesni",
++			.cra_name		= "ctr(aes)",
++			.cra_driver_name	= "ctr-aes-aesni",
+ 			.cra_priority		= 400,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 			.cra_blocksize		= 1,
+ 			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
+ 			.cra_module		= THIS_MODULE,
+ 		},
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -631,14 +627,13 @@ static struct skcipher_alg aesni_skciphers[] = {
+ 		.encrypt	= ctr_crypt_aesni,
+ 		.decrypt	= ctr_crypt_aesni,
+ #endif
+ 	}, {
+ 		.base = {
+-			.cra_name		= "__xts(aes)",
+-			.cra_driver_name	= "__xts-aes-aesni",
++			.cra_name		= "xts(aes)",
++			.cra_driver_name	= "xts-aes-aesni",
+ 			.cra_priority		= 401,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= XTS_AES_CTX_SIZE,
+ 			.cra_module		= THIS_MODULE,
+ 		},
+ 		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
+@@ -649,13 +644,10 @@ static struct skcipher_alg aesni_skciphers[] = {
+ 		.encrypt	= xts_encrypt_aesni,
+ 		.decrypt	= xts_decrypt_aesni,
+ 	}
+ };
+ 
+-static
+-struct simd_skcipher_alg *aesni_simd_skciphers[ARRAY_SIZE(aesni_skciphers)];
+-
+ #ifdef CONFIG_X86_64
+ asmlinkage void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
+ 				   u8 iv[AES_BLOCK_SIZE]);
+ 
+ /* __always_inline to avoid indirect call */
+@@ -790,14 +782,13 @@ static int xctr_crypt_##suffix(struct skcipher_request *req)		       \
+ {									       \
+ 	return xctr_crypt(req, aes_xctr_crypt_##suffix);		       \
+ }									       \
+ 									       \
+ static struct skcipher_alg skcipher_algs_##suffix[] = {{		       \
+-	.base.cra_name		= "__xts(aes)",				       \
+-	.base.cra_driver_name	= "__xts-aes-" driver_name_suffix,	       \
++	.base.cra_name		= "xts(aes)",				       \
++	.base.cra_driver_name	= "xts-aes-" driver_name_suffix,	       \
+ 	.base.cra_priority	= priority,				       \
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,			       \
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,			       \
+ 	.base.cra_ctxsize	= XTS_AES_CTX_SIZE,			       \
+ 	.base.cra_module	= THIS_MODULE,				       \
+ 	.min_keysize		= 2 * AES_MIN_KEY_SIZE,			       \
+ 	.max_keysize		= 2 * AES_MAX_KEY_SIZE,			       \
+@@ -805,14 +796,13 @@ static struct skcipher_alg skcipher_algs_##suffix[] = {{		       \
+ 	.walksize		= 2 * AES_BLOCK_SIZE,			       \
+ 	.setkey			= xts_setkey_aesni,			       \
+ 	.encrypt		= xts_encrypt_##suffix,			       \
+ 	.decrypt		= xts_decrypt_##suffix,			       \
+ }, {									       \
+-	.base.cra_name		= "__ctr(aes)",				       \
+-	.base.cra_driver_name	= "__ctr-aes-" driver_name_suffix,	       \
++	.base.cra_name		= "ctr(aes)",				       \
++	.base.cra_driver_name	= "ctr-aes-" driver_name_suffix,	       \
+ 	.base.cra_priority	= priority,				       \
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,			       \
+ 	.base.cra_blocksize	= 1,					       \
+ 	.base.cra_ctxsize	= CRYPTO_AES_CTX_SIZE,			       \
+ 	.base.cra_module	= THIS_MODULE,				       \
+ 	.min_keysize		= AES_MIN_KEY_SIZE,			       \
+ 	.max_keysize		= AES_MAX_KEY_SIZE,			       \
+@@ -820,28 +810,24 @@ static struct skcipher_alg skcipher_algs_##suffix[] = {{		       \
+ 	.chunksize		= AES_BLOCK_SIZE,			       \
+ 	.setkey			= aesni_skcipher_setkey,		       \
+ 	.encrypt		= ctr_crypt_##suffix,			       \
+ 	.decrypt		= ctr_crypt_##suffix,			       \
+ }, {									       \
+-	.base.cra_name		= "__xctr(aes)",			       \
+-	.base.cra_driver_name	= "__xctr-aes-" driver_name_suffix,	       \
++	.base.cra_name		= "xctr(aes)",				       \
++	.base.cra_driver_name	= "xctr-aes-" driver_name_suffix,	       \
+ 	.base.cra_priority	= priority,				       \
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,			       \
+ 	.base.cra_blocksize	= 1,					       \
+ 	.base.cra_ctxsize	= CRYPTO_AES_CTX_SIZE,			       \
+ 	.base.cra_module	= THIS_MODULE,				       \
+ 	.min_keysize		= AES_MIN_KEY_SIZE,			       \
+ 	.max_keysize		= AES_MAX_KEY_SIZE,			       \
+ 	.ivsize			= AES_BLOCK_SIZE,			       \
+ 	.chunksize		= AES_BLOCK_SIZE,			       \
+ 	.setkey			= aesni_skcipher_setkey,		       \
+ 	.encrypt		= xctr_crypt_##suffix,			       \
+ 	.decrypt		= xctr_crypt_##suffix,			       \
+-}};									       \
+-									       \
+-static struct simd_skcipher_alg *					       \
+-simd_skcipher_algs_##suffix[ARRAY_SIZE(skcipher_algs_##suffix)]
++}}
  
  DEFINE_AVX_SKCIPHER_ALGS(aesni_avx, "aesni-avx", 500);
  #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
  DEFINE_AVX_SKCIPHER_ALGS(vaes_avx2, "vaes-avx2", 600);
--DEFINE_AVX_SKCIPHER_ALGS(vaes_avx10_256, "vaes-avx10_256", 700);
--DEFINE_AVX_SKCIPHER_ALGS(vaes_avx10_512, "vaes-avx10_512", 800);
-+DEFINE_AVX_SKCIPHER_ALGS(vaes_avx512, "vaes-avx512", 800);
- #endif
+ DEFINE_AVX_SKCIPHER_ALGS(vaes_avx512, "vaes-avx512", 800);
+@@ -1496,14 +1482,13 @@ static struct aead_alg aes_gcm_algs_##suffix[] = { {			       \
+ 	.decrypt		= gcm_decrypt_##suffix,			       \
+ 	.ivsize			= GCM_AES_IV_SIZE,			       \
+ 	.chunksize		= AES_BLOCK_SIZE,			       \
+ 	.maxauthsize		= 16,					       \
+ 	.base = {							       \
+-		.cra_name		= "__gcm(aes)",			       \
+-		.cra_driver_name	= "__" generic_driver_name,	       \
++		.cra_name		= "gcm(aes)",			       \
++		.cra_driver_name	= generic_driver_name,		       \
+ 		.cra_priority		= (priority),			       \
+-		.cra_flags		= CRYPTO_ALG_INTERNAL,		       \
+ 		.cra_blocksize		= 1,				       \
+ 		.cra_ctxsize		= (ctxsize),			       \
+ 		.cra_module		= THIS_MODULE,			       \
+ 	},								       \
+ }, {									       \
+@@ -1513,21 +1498,18 @@ static struct aead_alg aes_gcm_algs_##suffix[] = { {			       \
+ 	.decrypt		= rfc4106_decrypt_##suffix,		       \
+ 	.ivsize			= GCM_RFC4106_IV_SIZE,			       \
+ 	.chunksize		= AES_BLOCK_SIZE,			       \
+ 	.maxauthsize		= 16,					       \
+ 	.base = {							       \
+-		.cra_name		= "__rfc4106(gcm(aes))",	       \
+-		.cra_driver_name	= "__" rfc_driver_name,		       \
++		.cra_name		= "rfc4106(gcm(aes))",		       \
++		.cra_driver_name	= rfc_driver_name,		       \
+ 		.cra_priority		= (priority),			       \
+-		.cra_flags		= CRYPTO_ALG_INTERNAL,		       \
+ 		.cra_blocksize		= 1,				       \
+ 		.cra_ctxsize		= (ctxsize),			       \
+ 		.cra_module		= THIS_MODULE,			       \
+ 	},								       \
+-} };									       \
+-									       \
+-static struct simd_aead_alg *aes_gcm_simdalgs_##suffix[2]		       \
++} }
  
- /* The common part of the x86_64 AES-GCM key struct */
- struct aes_gcm_key {
- 	/* Expanded AES key and the AES key length in bytes */
-@@ -1590,33 +1589,28 @@ static int __init register_avx_algs(void)
+ /* aes_gcm_algs_aesni */
+ DEFINE_GCM_ALGS(aesni, /* no flags */ 0,
+ 		"generic-gcm-aesni", "rfc4106-gcm-aesni",
+ 		AES_GCM_KEY_AESNI_SIZE, 400);
+@@ -1553,18 +1535,16 @@ static int __init register_avx_algs(void)
+ {
+ 	int err;
+ 
+ 	if (!boot_cpu_has(X86_FEATURE_AVX))
+ 		return 0;
+-	err = simd_register_skciphers_compat(skcipher_algs_aesni_avx,
+-					     ARRAY_SIZE(skcipher_algs_aesni_avx),
+-					     simd_skcipher_algs_aesni_avx);
++	err = crypto_register_skciphers(skcipher_algs_aesni_avx,
++					ARRAY_SIZE(skcipher_algs_aesni_avx));
+ 	if (err)
+ 		return err;
+-	err = simd_register_aeads_compat(aes_gcm_algs_aesni_avx,
+-					 ARRAY_SIZE(aes_gcm_algs_aesni_avx),
+-					 aes_gcm_simdalgs_aesni_avx);
++	err = crypto_register_aeads(aes_gcm_algs_aesni_avx,
++				    ARRAY_SIZE(aes_gcm_algs_aesni_avx));
+ 	if (err)
+ 		return err;
+ 	/*
+ 	 * Note: not all the algorithms registered below actually require
+ 	 * VPCLMULQDQ.  But in practice every CPU with VAES also has VPCLMULQDQ.
+@@ -1576,26 +1556,24 @@ static int __init register_avx_algs(void)
+ 	    !boot_cpu_has(X86_FEATURE_VAES) ||
+ 	    !boot_cpu_has(X86_FEATURE_VPCLMULQDQ) ||
+ 	    !boot_cpu_has(X86_FEATURE_PCLMULQDQ) ||
+ 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
+ 		return 0;
+-	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx2,
+-					     ARRAY_SIZE(skcipher_algs_vaes_avx2),
+-					     simd_skcipher_algs_vaes_avx2);
++	err = crypto_register_skciphers(skcipher_algs_vaes_avx2,
++					ARRAY_SIZE(skcipher_algs_vaes_avx2));
+ 	if (err)
+ 		return err;
+ 
+ 	if (!boot_cpu_has(X86_FEATURE_AVX512BW) ||
+ 	    !boot_cpu_has(X86_FEATURE_AVX512VL) ||
  	    !boot_cpu_has(X86_FEATURE_BMI2) ||
  	    !cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
  			       XFEATURE_MASK_AVX512, NULL))
  		return 0;
  
--	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx10_256,
--					     ARRAY_SIZE(skcipher_algs_vaes_avx10_256),
--					     simd_skcipher_algs_vaes_avx10_256);
--	if (err)
--		return err;
- 	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_256,
- 					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
- 					 aes_gcm_simdalgs_vaes_avx10_256);
+-	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_256,
+-					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
+-					 aes_gcm_simdalgs_vaes_avx10_256);
++	err = crypto_register_aeads(aes_gcm_algs_vaes_avx10_256,
++				    ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256));
  	if (err)
  		return err;
  
  	if (boot_cpu_has(X86_FEATURE_PREFER_YMM)) {
  		int i;
- 
--		for (i = 0; i < ARRAY_SIZE(skcipher_algs_vaes_avx10_512); i++)
--			skcipher_algs_vaes_avx10_512[i].base.cra_priority = 1;
-+		for (i = 0; i < ARRAY_SIZE(skcipher_algs_vaes_avx512); i++)
-+			skcipher_algs_vaes_avx512[i].base.cra_priority = 1;
+@@ -1604,56 +1582,42 @@ static int __init register_avx_algs(void)
+ 			skcipher_algs_vaes_avx512[i].base.cra_priority = 1;
  		for (i = 0; i < ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512); i++)
  			aes_gcm_algs_vaes_avx10_512[i].base.cra_priority = 1;
  	}
  
--	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx10_512,
--					     ARRAY_SIZE(skcipher_algs_vaes_avx10_512),
--					     simd_skcipher_algs_vaes_avx10_512);
-+	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx512,
-+					     ARRAY_SIZE(skcipher_algs_vaes_avx512),
-+					     simd_skcipher_algs_vaes_avx512);
+-	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx512,
+-					     ARRAY_SIZE(skcipher_algs_vaes_avx512),
+-					     simd_skcipher_algs_vaes_avx512);
++	err = crypto_register_skciphers(skcipher_algs_vaes_avx512,
++					ARRAY_SIZE(skcipher_algs_vaes_avx512));
  	if (err)
  		return err;
- 	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_512,
- 					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
- 					 aes_gcm_simdalgs_vaes_avx10_512);
-@@ -1639,22 +1633,18 @@ static void unregister_avx_algs(void)
+-	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_512,
+-					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
+-					 aes_gcm_simdalgs_vaes_avx10_512);
++	err = crypto_register_aeads(aes_gcm_algs_vaes_avx10_512,
++				    ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512));
+ 	if (err)
+ 		return err;
+ #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
+ 	return 0;
+ }
+ 
++#define unregister_skciphers(A) \
++	if (refcount_read(&(A)[0].base.cra_refcnt) != 0) \
++		crypto_unregister_skciphers((A), ARRAY_SIZE(A))
++#define unregister_aeads(A) \
++	if (refcount_read(&(A)[0].base.cra_refcnt) != 0) \
++		crypto_unregister_aeads((A), ARRAY_SIZE(A))
++
+ static void unregister_avx_algs(void)
+ {
+-	if (simd_skcipher_algs_aesni_avx[0])
+-		simd_unregister_skciphers(skcipher_algs_aesni_avx,
+-					  ARRAY_SIZE(skcipher_algs_aesni_avx),
+-					  simd_skcipher_algs_aesni_avx);
+-	if (aes_gcm_simdalgs_aesni_avx[0])
+-		simd_unregister_aeads(aes_gcm_algs_aesni_avx,
+-				      ARRAY_SIZE(aes_gcm_algs_aesni_avx),
+-				      aes_gcm_simdalgs_aesni_avx);
++	unregister_skciphers(skcipher_algs_aesni_avx);
++	unregister_aeads(aes_gcm_algs_aesni_avx);
  #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- 	if (simd_skcipher_algs_vaes_avx2[0])
- 		simd_unregister_skciphers(skcipher_algs_vaes_avx2,
- 					  ARRAY_SIZE(skcipher_algs_vaes_avx2),
- 					  simd_skcipher_algs_vaes_avx2);
--	if (simd_skcipher_algs_vaes_avx10_256[0])
--		simd_unregister_skciphers(skcipher_algs_vaes_avx10_256,
--					  ARRAY_SIZE(skcipher_algs_vaes_avx10_256),
--					  simd_skcipher_algs_vaes_avx10_256);
- 	if (aes_gcm_simdalgs_vaes_avx10_256[0])
- 		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_256,
- 				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
- 				      aes_gcm_simdalgs_vaes_avx10_256);
--	if (simd_skcipher_algs_vaes_avx10_512[0])
--		simd_unregister_skciphers(skcipher_algs_vaes_avx10_512,
--					  ARRAY_SIZE(skcipher_algs_vaes_avx10_512),
--					  simd_skcipher_algs_vaes_avx10_512);
-+	if (simd_skcipher_algs_vaes_avx512[0])
-+		simd_unregister_skciphers(skcipher_algs_vaes_avx512,
-+					  ARRAY_SIZE(skcipher_algs_vaes_avx512),
-+					  simd_skcipher_algs_vaes_avx512);
- 	if (aes_gcm_simdalgs_vaes_avx10_512[0])
- 		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_512,
- 				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
- 				      aes_gcm_simdalgs_vaes_avx10_512);
+-	if (simd_skcipher_algs_vaes_avx2[0])
+-		simd_unregister_skciphers(skcipher_algs_vaes_avx2,
+-					  ARRAY_SIZE(skcipher_algs_vaes_avx2),
+-					  simd_skcipher_algs_vaes_avx2);
+-	if (aes_gcm_simdalgs_vaes_avx10_256[0])
+-		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_256,
+-				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
+-				      aes_gcm_simdalgs_vaes_avx10_256);
+-	if (simd_skcipher_algs_vaes_avx512[0])
+-		simd_unregister_skciphers(skcipher_algs_vaes_avx512,
+-					  ARRAY_SIZE(skcipher_algs_vaes_avx512),
+-					  simd_skcipher_algs_vaes_avx512);
+-	if (aes_gcm_simdalgs_vaes_avx10_512[0])
+-		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_512,
+-				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
+-				      aes_gcm_simdalgs_vaes_avx10_512);
++	unregister_skciphers(skcipher_algs_vaes_avx2);
++	unregister_skciphers(skcipher_algs_vaes_avx512);
++	unregister_aeads(aes_gcm_algs_vaes_avx10_256);
++	unregister_aeads(aes_gcm_algs_vaes_avx10_512);
  #endif
+ }
+ #else /* CONFIG_X86_64 */
+ static struct aead_alg aes_gcm_algs_aesni[0];
+-static struct simd_aead_alg *aes_gcm_simdalgs_aesni[0];
+ 
+ static int __init register_avx_algs(void)
+ {
+ 	return 0;
+ }
+@@ -1678,19 +1642,17 @@ static int __init aesni_init(void)
+ 
+ 	err = crypto_register_alg(&aesni_cipher_alg);
+ 	if (err)
+ 		return err;
+ 
+-	err = simd_register_skciphers_compat(aesni_skciphers,
+-					     ARRAY_SIZE(aesni_skciphers),
+-					     aesni_simd_skciphers);
++	err = crypto_register_skciphers(aesni_skciphers,
++					ARRAY_SIZE(aesni_skciphers));
+ 	if (err)
+ 		goto unregister_cipher;
+ 
+-	err = simd_register_aeads_compat(aes_gcm_algs_aesni,
+-					 ARRAY_SIZE(aes_gcm_algs_aesni),
+-					 aes_gcm_simdalgs_aesni);
++	err = crypto_register_aeads(aes_gcm_algs_aesni,
++				    ARRAY_SIZE(aes_gcm_algs_aesni));
+ 	if (err)
+ 		goto unregister_skciphers;
+ 
+ 	err = register_avx_algs();
+ 	if (err)
+@@ -1698,28 +1660,26 @@ static int __init aesni_init(void)
+ 
+ 	return 0;
+ 
+ unregister_avx:
+ 	unregister_avx_algs();
+-	simd_unregister_aeads(aes_gcm_algs_aesni,
+-			      ARRAY_SIZE(aes_gcm_algs_aesni),
+-			      aes_gcm_simdalgs_aesni);
++	crypto_unregister_aeads(aes_gcm_algs_aesni,
++				ARRAY_SIZE(aes_gcm_algs_aesni));
+ unregister_skciphers:
+-	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
+-				  aesni_simd_skciphers);
++	crypto_unregister_skciphers(aesni_skciphers,
++				    ARRAY_SIZE(aesni_skciphers));
+ unregister_cipher:
+ 	crypto_unregister_alg(&aesni_cipher_alg);
+ 	return err;
+ }
+ 
+ static void __exit aesni_exit(void)
+ {
+-	simd_unregister_aeads(aes_gcm_algs_aesni,
+-			      ARRAY_SIZE(aes_gcm_algs_aesni),
+-			      aes_gcm_simdalgs_aesni);
+-	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
+-				  aesni_simd_skciphers);
++	crypto_unregister_aeads(aes_gcm_algs_aesni,
++				ARRAY_SIZE(aes_gcm_algs_aesni));
++	crypto_unregister_skciphers(aesni_skciphers,
++				    ARRAY_SIZE(aesni_skciphers));
+ 	crypto_unregister_alg(&aesni_cipher_alg);
+ 	unregister_avx_algs();
+ }
+ 
+ module_init(aesni_init);
 -- 
 2.49.0
 
