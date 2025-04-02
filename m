@@ -1,84 +1,82 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75E32E337B;
-	Wed,  2 Apr 2025 03:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019A7F4E2;
+	Wed,  2 Apr 2025 03:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743563655; cv=none; b=bkWKnapH7UHpz6d4Zeobl8nCkLGG2PEZ/HzaSOjMBjKpfMNQAGz49/4Bxwhs1DHio6erh+RmF6RQEXy5VVxPGUjbkKibJPA8IKjaIqmKQwJ7vdtBp5OijFsxOvNYXsz8/6SNJcxX+lBBzPuot7xhNI539FkkavHcwjV/PplqDXA=
+	t=1743565370; cv=none; b=aUZt7MoaGBGwk8NGq1JzYYlfUtJ96guGUjFZObFYpCPI1Tsx1+6RJTjGoYBHgyhDENjPHu9b/KQ7vbvD4tUcJMkOeJ/0tWQ83muErXDPCGN/vo6Wz5oLuuG9DX2TE2lFAueuqTCF5W5/vUwBLcv+QfYA0d5cc3+jS6YsgHIYxmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743563655; c=relaxed/simple;
-	bh=dW/9AqOkv7nqUOT8PURcNrY3ZuOQUO4Mo8Yspr0Lij0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=TfQ4+5pp5zLmTTpPF5kkuAY5CKciIFaYDS0VUJEvP+VrkK5rHqS+x2xOMKMvkTv1R3XNWoEu0H9bzCtELmmN6q0q5XA/z7waLVUrb8adBCkmt7z3geTHEdlPPDKt9f+4zbddF4O9aavZn5o1xAg/CoDjUDTjcCZaaTarYx4Vbdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qr8YFjVR; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1743565370; c=relaxed/simple;
+	bh=V2e2nwSbZeY0394xlWvihWRW0KwuglxPVjbYt+qSt5g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LW8FbG3fkJLMgLb8iEBHvZANnxlRnQ0Piqqu4Smpr2WospfMV7wf7QC/1ImkDUZ/NCpaZlCkZah3JSv4m8FcFGv9v4KNy1LlFIalwsPcwea4hVef1giF9/xmJim8z20DmCCiS1n1+CnPb23l038Qns9IGjATmaD9l9UgL6prr1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XDBAg03k; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qr8YFjVR"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gNeEL0d+lyYAxNXEQO5+lZpHvir6kaPuY8AoPuxw5AE=; b=qr8YFjVRwRtRMro2FOQlZdjgpe
-	dEat6wbg8/jQCTStGmetA8ls1tFjyE1nG+/I8hO4GKb6F4j48DEQKEZH9Ju4kxmcNYyV4hTALon+t
-	O7mFvp3PEneVRKptEaAO5AUNiuBn6eaoUxHetti8ylXA1a9gX/K+R77+9vIY+OG3l8KXXM+7F+ata
-	Vuz8/MGB7E9XYbGiu4I36UgRZ6VH57NDhZ392nBIHZzVwtoaNllF56aE3tYybbF5zQHMw93LxylWO
-	z3nUv2Om71fi5wNuPncpwkAl74AYV7lDE8vteqs7fmx6N514hYtFInpqqSsPUvPADp5N0yOramnQd
-	zTJ7HUGg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tzoYJ-00C16f-0p;
-	Wed, 02 Apr 2025 11:14:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Apr 2025 11:14:07 +0800
-Date: Wed, 2 Apr 2025 11:14:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Danny Tsen <dtsen@linux.ibm.com>
-Subject: Re: [PATCH v2 0/9] crypto: x86 - stop using the SIMD helper
-Message-ID: <Z-yrf_9D2rV1Q136@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XDBAg03k"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=CfNMzRI2XDl7ZbVtkTrjOHHTHVANpEi1cK2v4Rcq0rE=; b=XDBAg03ked4nw0XHPZ98s4MHCr
+	Ngz2X2G0KIo+tVsx3cIPzSXYRGF7UAsIAhPSbWFW7whz1EHcIGCEUSiqzrHipcuK2MzsEBxm9ibCD
+	1oPbYB60JlPeYk32G62MstD4ZaF5SgPWbKWf57Skmm2Em2Ugu86zZ6k9a5mJumWe/6EtyiFl+KnnB
+	4+BRuiXis6eEZtIlzwNNBYc0ciGHpqRukQybsokVYyrmf90atCAXtfkbn5ZDc81C7+m8tO++2paV4
+	OU0wJbeiq47WbpnvfvBEc4vsOohzMCS3BY2+LXJlzJ7DmnuNghrl3E7MXmZaT8aFC+klWYC4JA+uT
+	+hSuWttA==;
+Received: from [50.53.2.24] (helo=[192.168.254.17])
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1tzp00-00000006xAn-3emH;
+	Wed, 02 Apr 2025 03:42:45 +0000
+Message-ID: <2c1cbb51-cc16-4292-ad30-482d93935d91@infradead.org>
+Date: Tue, 1 Apr 2025 20:42:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250402002420.89233-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] lib/crc: remove unnecessary prompt for CONFIG_CRC32
+ and drop 'default y'
+To: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-arch@vger.kernel.org
+References: <20250401221600.24878-1-ebiggers@kernel.org>
+ <20250401221600.24878-2-ebiggers@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250401221600.24878-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Stop wrapping skcipher and aead algorithms with the crypto simd helper
-> (crypto/simd.c).  The only purpose of doing so was to work around x86
-> not always supporting kernel-mode FPU in softirqs.  Specifically, if a
-> hardirq interrupted a task context kernel-mode FPU section and then a
-> softirqs were run at the end of that hardirq, those softirqs could not
-> use kernel-mode FPU.  This has now been fixed.  In combination with the
-> fact that the skcipher and aead APIs only support task and softirq
-> contexts, these can now just use kernel-mode FPU unconditionally on x86.
+Hi 
 
-Nice work!
+On 4/1/25 3:15 PM, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> All modules that need CONFIG_CRC32 already select it, so there is no
+> need to bother users about the option, nor to default it to y.
+> 
 
-So which platform still needs the simd wrapper? I believe arm/arm64
-have both been fixed but we haven't finished removing the legacy
-simd code yet? Ard, would you be able to spare some cycles and
-finish the removal of simd on arm?
+My memory from 10-20 years ago could be foggy, but ISTR that someone made at least
+CRC16 and CRC32 user-selectable in order to support out-of-tree modules...
+FWIW.
+But they would not need to be default y.
 
-Darn, it looks like powerpc has just started using the simd wrapper
-so we need to fix it first before we can completely eliminate simd.
 
-Michael/Danny, any chance you guys could implement something similar
-to what's been done on arm/x86 and make simd usable in softirqs?
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/sh/configs/edosk7705_defconfig        | 1 -
+>  arch/sh/configs/kfr2r09-romimage_defconfig | 1 -
+>  arch/sh/configs/sh7724_generic_defconfig   | 1 -
+>  arch/sh/configs/sh7770_generic_defconfig   | 1 -
+>  lib/Kconfig                                | 8 +-------
+>  5 files changed, 1 insertion(+), 11 deletions(-)
+> 
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Randy
+
