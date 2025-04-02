@@ -1,46 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5118C936;
-	Wed,  2 Apr 2025 16:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C1D33993;
+	Wed,  2 Apr 2025 17:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743612064; cv=none; b=EQTw1EJlqv6z545S0tJ8zEjTQWMuwd96MUrx4MRe/cD/TFtSZAkq8TBzFR4x6/KBTeAbDxjXAC8VAmAErcXymVyieHuvIcUEtj1sUqXyg5ZXr389+A007MLgvOlKhFx2ihiGbmG59UM/FIyp+a2aK9xRJWRJJ0yWNq5KVK+6lLg=
+	t=1743614372; cv=none; b=cslhdlc5xQx8Shwa1Ry67ZMBZAqpkteSeR1+CmEM48yYXj16xSZbj/vzgPTh+IaYH2P2iqn36Rrk6Bc4FmP18+Dl+3LtidJ9Mg/q7RMOjtPeFwI1D+Ea/YiYRwkMJ/beJzcacyCQuwBxnTmUL9zy6e+x93D5fVSs+qXKf81iXMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743612064; c=relaxed/simple;
-	bh=JL3Fc6Tx+Y7KKkGF51EOD/8yZESEW5Hbu4AYBc2UUrI=;
+	s=arc-20240116; t=1743614372; c=relaxed/simple;
+	bh=6ZAuJe7VpvzN0yn03t+NJJYfd2x2rZOrxKuVdjVr/c4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJuLUIgHZ5uDCweDuKyAefuDOfL4JyPalIlTltWr7GoKN0VEHbpRAWI13OSAqmmvEPp2oIREa3l37iBqCHHOys00fzy2JjokWiBMPkghHU1sADq36iKmAIlFcA+k/BkDUzwa6FxZTGwGBs3i/TFnWdyBO0mfWwY+rjxGbrjSafw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZ9/WGpi; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=AdnqHnJlDlPgOoq1CTB1yp6TfkimqixZSPOjt319ffUObt1nv58SWYg20v5VAPxB7WRX995g8OUy6G9GkedsX9l6gBfIz1PDQUpbzoFICK55Qq6LtgeMnQU3G6wDNUAprLnfLdGLPlnrRyqgnADawmY6IXcQuwe7xzRVHDU/PHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qcp7NY/U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZ9/WGpi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14142C4CEDD;
-	Wed,  2 Apr 2025 16:41:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qcp7NY/U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13449C4CEDD;
+	Wed,  2 Apr 2025 17:19:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743612063;
-	bh=JL3Fc6Tx+Y7KKkGF51EOD/8yZESEW5Hbu4AYBc2UUrI=;
+	s=k20201202; t=1743614372;
+	bh=6ZAuJe7VpvzN0yn03t+NJJYfd2x2rZOrxKuVdjVr/c4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JZ9/WGpiBdApatkU/d5aXIEl+WX0smTkXKrSB3ldd+SYl+KKwiJfRxS3Ffosk/QIE
-	 A870YcJT/MKSH0geGokVXHyBKxhEKl1t0PSQ3m9qS+S+0lKlTK/PIZGvwzlGIQRB+l
-	 5QEm0Een/ahWUEQpOxsWE83ohXUbfW86/OPkRrGjtLmUejFzt14QHVHVFqtcWsHjMl
-	 loy/psVrs21p1kTL0YmeuH06KfbmZJdWlZJyQnzRhiVjfM2mIXmAXplt7qZgUOazFv
-	 jsaeCLzl7m1UFch4Whr5CPBrxwEUTL9BO35nPnQ8R8vq/PPhNbLOOTlgoUUKvEZuak
-	 m/O6nScePRV5g==
-Date: Wed, 2 Apr 2025 09:41:01 -0700
+	b=Qcp7NY/UEHczn/meGifvCOmH+kqRAT/EYrl6oHSOaRWQbPRG6985J8GQDYLfLcAk+
+	 VmkvzUYsBk3LgHWllXQ/uSib6UCpcjpP46ruHZK7MV+is/my/H6mPeAAnQH865uNCd
+	 cqhZU6kHkeYtt9Z4ACIanKNGZlEDRdh2x9trTgObutVHvV5YahIfaSYz9DLBHOSqKT
+	 zliJKhg+RR8kHn5xGWYghQC6Tp5CEZe55kX/f7udjbCcLMD60i33li9YYeZJO2lXeW
+	 HXddhF9l3bBdeSVALT/ZeY5e0HrwLkMGdpVCWuMeZghkOeERvUrEbCyihF7U6bQkeM
+	 cjpthLU77Ot9w==
+Date: Wed, 2 Apr 2025 10:19:30 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [PATCH 1/7] lib/crc: remove unnecessary prompt for CONFIG_CRC32
- and drop 'default y'
-Message-ID: <20250402164101.GC1235@sol.localdomain>
-References: <20250401221600.24878-1-ebiggers@kernel.org>
- <20250401221600.24878-2-ebiggers@kernel.org>
- <2c1cbb51-cc16-4292-ad30-482d93935d91@infradead.org>
- <20250402035107.GA317606@sol.localdomain>
- <81aac5ff-8698-4059-92a2-bccb998eb000@infradead.org>
- <20250402050234.GB317606@sol.localdomain>
- <b5589b7d-d4a1-4b12-a845-afdbb26ed845@infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2 0/9] crypto: x86 - stop using the SIMD helper
+Message-ID: <20250402171930.GD1235@sol.localdomain>
+References: <20250402002420.89233-1-ebiggers@kernel.org>
+ <Z-yrf_9D2rV1Q136@gondor.apana.org.au>
+ <CAMj1kXEx__RLBriW0kVPrKnx6+DCpq8=6F-7Tmj2Us61gvGGaw@mail.gmail.com>
+ <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
+ <Z-zzvXbjt3xzquXb@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,52 +47,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b5589b7d-d4a1-4b12-a845-afdbb26ed845@infradead.org>
+In-Reply-To: <Z-zzvXbjt3xzquXb@gondor.apana.org.au>
 
-On Tue, Apr 01, 2025 at 10:56:32PM -0700, Randy Dunlap wrote:
+On Wed, Apr 02, 2025 at 04:22:21PM +0800, Herbert Xu wrote:
+> On Wed, Apr 02, 2025 at 09:34:30AM +0300, Ard Biesheuvel wrote:
+> >
+> > Ah, never mind - I see some calls on 32-bit ARM to
+> > simd_skcipher_create_compat(), which have become redundant now that
+> > SIMD is guaranteed to be available in softirq context.
 > 
+> Thanks!
 > 
-> On 4/1/25 10:02 PM, Eric Biggers wrote:
-> > On Tue, Apr 01, 2025 at 09:50:57PM -0700, Randy Dunlap wrote:
-> >>
-> >>
-> >> On 4/1/25 8:51 PM, Eric Biggers wrote:
-> >>> On Tue, Apr 01, 2025 at 08:42:41PM -0700, Randy Dunlap wrote:
-> >>>> Hi 
-> >>>>
-> >>>> On 4/1/25 3:15 PM, Eric Biggers wrote:
-> >>>>> From: Eric Biggers <ebiggers@google.com>
-> >>>>>
-> >>>>> All modules that need CONFIG_CRC32 already select it, so there is no
-> >>>>> need to bother users about the option, nor to default it to y.
-> >>>>>
-> >>>>
-> >>>> My memory from 10-20 years ago could be foggy, but ISTR that someone made at least
-> >>>> CRC16 and CRC32 user-selectable in order to support out-of-tree modules...
-> >>>> FWIW.
-> >>>> But they would not need to be default y.
-> >>>
-> >>> That's not supported by upstream, though.
-> >>
-> >> Which part is not supported by upstream?
-> > 
-> > Having prompts for library kconfig options solely because out-of-tree modules
-> > might need them.
+> We could also remove all the calls to crypto_simd_usable in the
+> Crypto API hashing code, e.g., arch/arm64/crypto/sha1-ce-glue.c.
 > 
-> Well, I think that is was supported for many years. I don't see how it would become
-> unsupported all of a sudden. IMHO.
+> For the lib/crypto code I think we should make it a rule to
+> not allow any hardirq usage just like the Crypto API.  Does
+> anyone know of any uses of lib/crypto in a hardirq?
 
-Most kernel-internal options aren't user-selectable, though.  It's mainly just
-some older ones that were made user-selectable for some reason, and that is a
-mistake that has been getting cleaned up over time.
+This seems premature.  crypto_shash is documented to be usable in any context.
+See the "Context:" comments in include/crypto/hash.h.  Similarly, developers
+expect lib/ functions to be available in any context unless otherwise
+documented.
 
-Consider that the upstream community has no visibility into out-of-tree modules
-in general, so there is no reasonable policy that could be applied in deciding
-which options should be user-selectable purely for the benefit of out-of-tree
-modules.  The only reasonable policy is to consider in-tree users only.  Just
-like we don't add EXPORT_SYMBOL() just because an out-of-tree module wants it.
+For skcipher and aead, there are more reasons why it makes sense to limit the
+contexts:
 
-And of course downstreams always can, and do, just add a new kconfig option that
-selects any non-visible options they want.
+- skcipher_walk_first() already explicitly errors out if in_hardirq(), which
+  already prevents them from working in hardirq context in most cases
+- Even if it was allowed, the skcipher and aead APIs are already difficult to
+  use correctly in a hardirq
+- Because of how the crypto API is designed, it's not straightforward to fall
+  back to generic skcipher and aead code in no-SIMD contexts
+
+I could see the limitation being brought into crypto_shash too, though the
+crypto_shash documentation will need to be updated.  The crypto API also really
+needs to be explicitly checking all its requirements.  (It's probably finally
+time to add a kconfig option like CONFIG_DEBUG_CRYPTO to lib/Kconfig.debug, and
+put the extra assertions under there.  Then they could be added without
+impacting performance for normal users.)
+
+IMO, doing it for lib/ too would be going too far though.  The lib/ functions
+should be easy to use and not have random requirements on the calling context.
+And since they're just functions, it's easy for them to fall back to the generic
+functions when needed.  Also note that for very short inputs it can actually be
+faster to use no-SIMD code, as that avoids the overhead of a kernel-mode SIMD
+section.  So the fallback sometimes exists anyway for that.
 
 - Eric
