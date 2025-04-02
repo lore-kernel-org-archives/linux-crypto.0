@@ -1,166 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B111D540;
-	Wed,  2 Apr 2025 00:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC402E3380
+	for <linux-crypto@vger.kernel.org>; Wed,  2 Apr 2025 02:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743553485; cv=none; b=GcZkH2dvebO+gfO+6OokxEaL/3ypbkUuH/3bDU5laakf+VLR4QqLRFlcYjNj6yWwQ8EXZyoBIXSYt3PigJI6JXRt27qvb9h/eEJI3WKFhwsaTBPPs8TCl5MCuxV4S3XYXjSKSzzm/kf2krdiVVr6bD/byv3YjmEm2VkyAhhbP/U=
+	t=1743562701; cv=none; b=G1zXDKfVGUaowvn0I62auPm4WD5MhJI/SD+KvuwWBRsUxKnzpLu63x4ZB07vB7LCj/Jd6gcnpRxACspE/Pb6jJ8P6jzCm4qnfx8fnloZ5zcuCc8raHg7qm6BOd27rjfzeKr8tLE01C5/0/7qdI1ANz9jhmM/X4KCylzbMhRgvYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743553485; c=relaxed/simple;
-	bh=jxfrg4Acxbf7rgK+nlySQZwUCd6hpAuZTygmvCK15tA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uTQ/toQGeV+Mk2eYxTx5NKZizrZfXBYkjs2FY+my97rOCQ1nlb4qyjsVU1FHHYm6MxoYsy6/LVoRjoMevcyuJcqJWFuM4++hsh0eyy/dz3HZQEJC4lTrSFpFieEnXdrKZOA2+NBW3b3gBsY/n7L3iCYrqlIht5L7FR90DjaxbHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7SL84ac; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743562701; c=relaxed/simple;
+	bh=9GQUBkY9ToTHSY9yB7f0qnlw5DZXeVLMlCCy3VIb48I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lc3IkIpntbb8jqCx62M2TygIxibRTFP+aSNZLgRnXR5AKfvLVL4s3ApPblKqIki0IdNphHKADJxuBQFWAwb7l/VnilBYtYfY3qvhTGyL55o9kCsP4wVO4JO3E5+U/DIY9rqIMUcAU0hAydVOLipq6Kz0dymxlyRIclrQsGdfC6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=RSyt7sqL; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7SL84ac"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D636C4CEED;
-	Wed,  2 Apr 2025 00:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743553485;
-	bh=jxfrg4Acxbf7rgK+nlySQZwUCd6hpAuZTygmvCK15tA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g7SL84acA54mErkpBWG+FvmQ5ctbbW9IGPxG8X6xhCcZ1To0OFmnPtS6uB1722UPW
-	 g+85uyqvxL7OTPIHe99yDO07QOO3l7EckyDg9xGdNi3ZCSbTQ8g/gJP2v/jq38r5Ub
-	 JaZ0r72e37CIeF+cherf9J7khABeVqq0QUHLCSlF04KJDC1nuMFCcDWhzFYKfC3anb
-	 9G5ugrKlbn4jQEaSTnHkoNQ2zHc7JqnkunT4TFrzpaJtC/rr09bikpMiMPYSsHz4l2
-	 Vgtqt6XrMWRkBnTV+tFX5JdkqZnQVZRaTIqUXySnixKoYRIZam5R1YNqcHWvspLX1z
-	 meVtWIglTXf8A==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	x86@kernel.org
-Subject: [PATCH v2 9/9] crypto: x86/twofish - stop using the SIMD helper
-Date: Tue,  1 Apr 2025 17:24:09 -0700
-Message-ID: <20250402002420.89233-10-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250402002420.89233-1-ebiggers@kernel.org>
-References: <20250402002420.89233-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="RSyt7sqL"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=yhXQ2xoN3PD9VRPVqKkYTXXx07jPA7mPUP6RQVjrVCY=; b=RSyt7sqLIcpx6iJSgmPqA8iixY
+	q3FxH8JhxGhHJqvVfHnxfAN8+hGDht0CHVMB0LFck7+etJM0Pq2fRqiHG2AKw/zmYW6J0RG5MiH0n
+	gH/yThPrRLGNvz/8TQnseqwNgagghCo+XfrocOFTympgDAmISngyuqvhABFnuP21R0N7cn64YUkP7
+	IdgVTxUwgDtyW4kFSxXz7aa7l0+DKu9RoYn43Ij3pFkZxiFtjvaZdHo2rmWqGSlD1ePDHBx4JzhNL
+	JE/OqrYW/TCWXTYzi/UpNeOLlQ1+IC5RUrm8I40uiYoVpNbgNqAR4+ENcZmABoA2pIYR6xgEn3mjh
+	f0Dd+TkA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tzoIv-00C10R-0E;
+	Wed, 02 Apr 2025 10:58:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Apr 2025 10:58:13 +0800
+Date: Wed, 2 Apr 2025 10:58:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, andriy.shevchenko@intel.com,
+	qat-linux@intel.com
+Subject: Re: [PATCH 0/8] crypto: qat - fix warm reboot
+Message-ID: <Z-ynxYw7OYHjfSaF@gondor.apana.org.au>
+References: <20250326160116.102699-2-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250326160116.102699-2-giovanni.cabiddu@intel.com>
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, Mar 26, 2025 at 03:59:45PM +0000, Giovanni Cabiddu wrote:
+> This series of patches addresses the warm reboot problem that affects
+> all QAT devices. When a reset is performed using kexec, QAT devices
+> fail to recover due to improper shutdown.
 
-Stop wrapping skcipher and aead algorithms with the crypto SIMD helper
-(crypto/simd.c).  The only purpose of doing so was to work around x86
-not always supporting kernel-mode FPU in softirqs.  Specifically, if a
-hardirq interrupted a task context kernel-mode FPU section and then a
-softirqs were run at the end of that hardirq, those softirqs could not
-use kernel-mode FPU.  This has now been fixed.  In combination with the
-fact that the skcipher and aead APIs only support task and softirq
-contexts, these can now just use kernel-mode FPU unconditionally on x86.
+Thanks for the quick fixes Giovanni!
 
-This simplifies the code and improves performance.
+As this is not a new regression, I think they should go through
+the usual release cycle.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/Kconfig            |  1 -
- arch/x86/crypto/twofish_avx_glue.c | 21 +++++++--------------
- 2 files changed, 7 insertions(+), 15 deletions(-)
+Just one comment on a possible improvement though, while it's good
+to shut down the device properly, the initialisation side should
+also do as much as is possible to reset a device that is in an
+unknown state.
 
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index afc1a05e663dd..f9e46e83440f1 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -268,11 +268,10 @@ config CRYPTO_TWOFISH_X86_64_3WAY
- 
- config CRYPTO_TWOFISH_AVX_X86_64
- 	tristate "Ciphers: Twofish with modes: ECB, CBC (AVX)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_SIMD
- 	select CRYPTO_TWOFISH_COMMON
- 	select CRYPTO_TWOFISH_X86_64
- 	select CRYPTO_TWOFISH_X86_64_3WAY
- 	imply CRYPTO_XTS
- 	help
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index 3eb3440b477a8..9e20db0137501 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -11,11 +11,10 @@
- #include <linux/module.h>
- #include <linux/types.h>
- #include <linux/crypto.h>
- #include <linux/err.h>
- #include <crypto/algapi.h>
--#include <crypto/internal/simd.h>
- #include <crypto/twofish.h>
- 
- #include "twofish.h"
- #include "ecb_cbc_helpers.h"
- 
-@@ -72,27 +71,25 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	CBC_WALK_END();
- }
- 
- static struct skcipher_alg twofish_algs[] = {
- 	{
--		.base.cra_name		= "__ecb(twofish)",
--		.base.cra_driver_name	= "__ecb-twofish-avx",
-+		.base.cra_name		= "ecb(twofish)",
-+		.base.cra_driver_name	= "ecb-twofish-avx",
- 		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= TF_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
- 		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= TF_MIN_KEY_SIZE,
- 		.max_keysize		= TF_MAX_KEY_SIZE,
- 		.setkey			= twofish_setkey_skcipher,
- 		.encrypt		= ecb_encrypt,
- 		.decrypt		= ecb_decrypt,
- 	}, {
--		.base.cra_name		= "__cbc(twofish)",
--		.base.cra_driver_name	= "__cbc-twofish-avx",
-+		.base.cra_name		= "cbc(twofish)",
-+		.base.cra_driver_name	= "cbc-twofish-avx",
- 		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.base.cra_blocksize	= TF_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
- 		.base.cra_module	= THIS_MODULE,
- 		.min_keysize		= TF_MIN_KEY_SIZE,
- 		.max_keysize		= TF_MAX_KEY_SIZE,
-@@ -101,30 +98,26 @@ static struct skcipher_alg twofish_algs[] = {
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
- 	},
- };
- 
--static struct simd_skcipher_alg *twofish_simd_algs[ARRAY_SIZE(twofish_algs)];
--
- static int __init twofish_init(void)
- {
- 	const char *feature_name;
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, &feature_name)) {
- 		pr_info("CPU feature '%s' is not supported.\n", feature_name);
- 		return -ENODEV;
- 	}
- 
--	return simd_register_skciphers_compat(twofish_algs,
--					      ARRAY_SIZE(twofish_algs),
--					      twofish_simd_algs);
-+	return crypto_register_skciphers(twofish_algs,
-+					 ARRAY_SIZE(twofish_algs));
- }
- 
- static void __exit twofish_exit(void)
- {
--	simd_unregister_skciphers(twofish_algs, ARRAY_SIZE(twofish_algs),
--				  twofish_simd_algs);
-+	crypto_unregister_skciphers(twofish_algs, ARRAY_SIZE(twofish_algs));
- }
- 
- module_init(twofish_init);
- module_exit(twofish_exit);
- 
+This is because the previous kernel might have had a hard crash,
+in which case there is no chance for the correct shutdown sequence
+to be carried out.
+
+Of course it's not always physically possible to reset something
+that is in an unknown state, but we should design the driver to be
+as resilient as possible.
+
+Cheers,
 -- 
-2.49.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
