@@ -1,169 +1,104 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C424C8828;
-	Thu,  3 Apr 2025 02:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C82D24B29;
+	Thu,  3 Apr 2025 02:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743647620; cv=none; b=dS0e2gCmXIa1D9ZKNZGU508Jb/8l8lXtvcMXo4L3NSNCl+IBca2i/ypuhje3AAukbX1In0CLPCcLCXvyvP2Ky74akdRfgAQOL9RZ8WM0NmFA/UH4eLYgX+pYVbYhLADNrGMGoOT9wITNz2exXbI6R6CrXnj68TWdfbBwjnsL7jw=
+	t=1743648364; cv=none; b=o6E69L9YoGdxQSgwWCw5AMlz77qgN0o7fzaikgUFvFMKqko3meK+SihO6RPKEEPEF+jFie61gkQ1oRtTv2NfUvyKBcwwLfJQs6uXoQFpkV0Xe6kV0Nvldi9q3N+D5cDmjRXX/CcZmG3t/NrSmKhrUW6uify76u+lmXIVxCJ7NUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743647620; c=relaxed/simple;
-	bh=mZEH9KP0rG4OJgz7xRS+8Enm0WcKmn8TTdTEu7MCrrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GcKxKn385dir9OyuFpntU8YeKvPLK7ae02+pXedMtmR9iOftHDbmmfMGFY+ypCBt0UhJKS3qQ5sbSu3oygA2pGVjqU+fxSQS8cBFU53E4uo+yoEnnu8PPI8AbQHAVLnFi4BLAboVJkOtF/ZPsqTENBtYiArmzuVa5jr2aaewF+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=AKZC5Y+S; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="AKZC5Y+S"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=qfn0RHsgPDoPqoC1r7+j/kf0VdcV4uMNStpbKM8IwAg=; b=AKZC5Y+SClnmFFLkweM4OMgI7K
-	HFk3lR2DT3eHmAGjXiQkqsPTRFl8IIa2K+zdHV/u2CFhWM9C3qAC6h1DF5VZZ09OjqLmQm6HUMRlp
-	s73wgoTECsRocTd1n3lqIk1F1efFLj8XSUCbdHCN4fltV+56zmdoOiZtWGmnAg4uSHL9AaTvzKlhl
-	2/gal++M30IbdBzOoTOzvXRrSHZ4XyrWi/z5htDI8Px7MB21nGV48951WdBnYl/9TlKHW0NOGnU6i
-	fFk9bkeywPvhlJGjyW2P6cDlsyXP16+niO4gSW9kWzIn/Agjl4x0QcLbrZ11Pg586w2avpg3R0rk3
-	i+mUHy0Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u0AOa-00CL1E-0C;
-	Thu, 03 Apr 2025 10:33:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Apr 2025 10:33:32 +0800
-Date: Thu, 3 Apr 2025 10:33:32 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] crypto: hash - Do not use shash in hard IRQs
-Message-ID: <Z-3zfJ5hRl3_tZxJ@gondor.apana.org.au>
-References: <20250402002420.89233-1-ebiggers@kernel.org>
- <Z-yrf_9D2rV1Q136@gondor.apana.org.au>
- <CAMj1kXEx__RLBriW0kVPrKnx6+DCpq8=6F-7Tmj2Us61gvGGaw@mail.gmail.com>
- <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
- <Z-zzvXbjt3xzquXb@gondor.apana.org.au>
- <20250402171930.GD1235@sol.localdomain>
- <Z-3jkYNtZpTDtKGf@gondor.apana.org.au>
- <20250403021453.GA2872965@google.com>
+	s=arc-20240116; t=1743648364; c=relaxed/simple;
+	bh=d8J4Yo+YNaI+HBcojp3i+Q4OH9DvvQ0WqocwzhvQkjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=S3EQKQ8a67Zet9VR3cwCjlJ/wpCRw0aKt5Ky+1rjsN4ZPHEmgvgIwwJ57Fpvq9QOv0CPn4TG733ADjdO7IakcOZ+Kmt63fsP7fQDv5hyFWvXIxADyLqWGOeNFmsRhb2L+UDmtidX192ddPRcAXTiTcbHpqCMWcy+eMwgsLrbrfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.180])
+	by gateway (Coremail) with SMTP id _____8Cxqmpn9u1n1cavAA--.32373S3;
+	Thu, 03 Apr 2025 10:45:59 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.180])
+	by front1 (Coremail) with SMTP id qMiowMBx3MRY9u1n8SFtAA--.62246S4;
+	Thu, 03 Apr 2025 10:45:57 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	peterhuewe@gmx.de,
+	jarkko@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [PATCH v7 2/6] MAINTAINERS: Add entry for Loongson Security Module driver
+Date: Thu,  3 Apr 2025 10:46:41 +0800
+Message-ID: <20250403024645.4427-3-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250403024645.4427-1-zhaoqunqin@loongson.cn>
+References: <20250403024645.4427-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250403021453.GA2872965@google.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBx3MRY9u1n8SFtAA--.62246S4
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7Xw18uryDZr4fAr1rWw1xWFX_yoWDuwb_Ca
+	yxK3yxJr48JFn2k3y8uF1fJrWSg3yxXF1Uu3Z2yw1fZ34DtFy5ArykA3s7C3W3CrW5CFsx
+	XayxGrs7Cr4xZosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Cr1j6rxdM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
+	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
 
-On Thu, Apr 03, 2025 at 02:14:53AM +0000, Eric Biggers wrote:
->
-> The thing I actually have more of a problem with is that you tend to start
-> making random API changes without any of the necessary prerequisites like
-> updating documentation, or adding debug assertions to catch violations of new
-> requirements.  You've already started removing the fallbacks from shash (commit
-> 3846c01d42526bc31), but neither of those things have been done.  So we're
-> currently in a weird state where the shash API is explicitly documented to work
-> in all contexts, but you've broken that.
+This patch adds an entry for Loongson Security Module driver in the list
+of maintainers.
 
-The documentation is easy enough to fix.
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+v7: Added Huacai's tag
+v6: "ls6000se.c" --> "loongson_se.c"
+    "ls6000se.h" --> "loongson_se.h"
+v5: None
+v4: Changed tile to "Add entry for ....".
+    Lowcased "Maintainers" in commit message.
 
----8<---
-Update the documentation to be consistent with the fact that shash
-may not be used in hard IRQs.
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Reported-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 58f9d3c9d006..5fde27039a06 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -847,7 +847,7 @@ static inline void *shash_desc_ctx(struct shash_desc *desc)
-  * cipher handle must point to a keyed message digest cipher in order for this
-  * function to succeed.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the setting of the key was successful; < 0 if an error occurred
-  */
- int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
-@@ -864,7 +864,7 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
-  * crypto_shash_update and crypto_shash_final. The parameters have the same
-  * meaning as discussed for those separate three functions.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the message digest creation was successful; < 0 if an error
-  *	   occurred
-  */
-@@ -884,7 +884,7 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
-  * directly, and it allocates a hash descriptor on the stack internally.
-  * Note that this stack allocation may be fairly large.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 on success; < 0 if an error occurred.
-  */
- int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
-@@ -902,7 +902,7 @@ int crypto_hash_digest(struct crypto_ahash *tfm, const u8 *data,
-  * caller-allocated output buffer out which must have sufficient size (e.g. by
-  * calling crypto_shash_descsize).
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the export creation was successful; < 0 if an error occurred
-  */
- int crypto_shash_export(struct shash_desc *desc, void *out);
-@@ -916,7 +916,7 @@ int crypto_shash_export(struct shash_desc *desc, void *out);
-  * the input buffer. That buffer should have been generated with the
-  * crypto_ahash_export function.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the import was successful; < 0 if an error occurred
-  */
- int crypto_shash_import(struct shash_desc *desc, const void *in);
-@@ -929,7 +929,7 @@ int crypto_shash_import(struct shash_desc *desc, const void *in);
-  * operational state handle. Any potentially existing state created by
-  * previous operations is discarded.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the message digest initialization was successful; < 0 if an
-  *	   error occurred
-  */
-@@ -951,7 +951,7 @@ static inline int crypto_shash_init(struct shash_desc *desc)
-  *
-  * Updates the message digest state of the operational state handle.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the message digest update was successful; < 0 if an error
-  *	   occurred
-  */
-@@ -968,7 +968,7 @@ int crypto_shash_update(struct shash_desc *desc, const u8 *data,
-  * into the output buffer. The caller must ensure that the output buffer is
-  * large enough by using crypto_shash_digestsize.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the message digest creation was successful; < 0 if an error
-  *	   occurred
-  */
-@@ -985,7 +985,7 @@ int crypto_shash_final(struct shash_desc *desc, u8 *out);
-  * crypto_shash_update and crypto_shash_final. The parameters have the same
-  * meaning as discussed for those separate functions.
-  *
-- * Context: Any context.
-+ * Context: Softirq or process context.
-  * Return: 0 if the message digest creation was successful; < 0 if an error
-  *	   occurred
-  */
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e46b60ccf..d2d8ae6a6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13616,6 +13616,13 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/i2c/loongson,ls2x-i2c.yaml
+ F:	drivers/i2c/busses/i2c-ls2x.c
+ 
++LOONGSON SECURITY MODULE DRIVER
++M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
++L:	loongarch@lists.linux.dev
++S:	Maintained
++F:	drivers/mfd/loongson-se.c
++F:	include/linux/mfd/loongson-se.h
++
+ LOONGSON-2 SOC SERIES CLOCK DRIVER
+ M:	Yinbo Zhu <zhuyinbo@loongson.cn>
+ L:	linux-clk@vger.kernel.org
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.45.2
+
