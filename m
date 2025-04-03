@@ -1,137 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DD9230BC0;
-	Thu,  3 Apr 2025 07:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D1F240604
+	for <linux-crypto@vger.kernel.org>; Thu,  3 Apr 2025 07:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743663795; cv=none; b=Wa3GblY2gUWe0JSH5oNAaVNOfVXbPcQf/lnQACaUxS2iL5TXjDu0lS8vM43NuSiYe/NdHb6T3QXCd+GdSWk5GhKKowwak1y6ey8eeJojeCH+6uUDWM9zSI6NyANwBQ1AezLHRDHBhgOifhWTqfxzJ8etddO6MWH8knWygOxjlTU=
+	t=1743664809; cv=none; b=pkOHu5kA/RXw0jEOUCT/4ImAE8KgHyUXKoz/6V/o+nbVVAzOOKkfefLuppzoXfZk6RiCDYdqQa9s5c7XpRmwGqz7poFNfrlF6WPxv8e/J/uZYnyL6rTQK82xxvUhpSu7QS5bEV5c7PYdZYqcFL25p4MneUTh1RRy8LA6zCiV5L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743663795; c=relaxed/simple;
-	bh=l0MLC3LjSRdSlGxzQJUnA2o45FMnz5uriKWfGAhpZ1M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gh1vI2CSO+Pzc/r8oLCMJmQyGPQiYNZBmfUms3npJcjlKhcRwxq1SEoTQQx20g77qoJmqd5my8r9zILnsRJ3PZ+cszSjGps/2H2sXdR4CrWkuYdptSh/HY0bSup+XD3Wsb8AL1mQEJIW84XlF8TVeHJZQFHEzwI9Bmp3IhqodKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KLXVwCO+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743664809; c=relaxed/simple;
+	bh=v9xfDl6HCuFxDC7wtBfyNa6+UiSEMtiQrXpS6Tf0cew=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AFVuP1nWvw7TMSwTk/nJ8pAwfubTykSaCAHMRuNrc/NDdzvCXHNqHem2loKPD+KdMc8nL7fnCOkTw/Rkmcj8rS3q1qWzFtyky5+Lv+1LHFENMlG7XoRv2yM03Cf8+7Y7R3KHBN7AHvz/r+ayYv0XgZgCu9+CWtXKEYLQ0digcLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zLc8Fqgh; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KLXVwCO+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BBE8C4CEE3;
-	Thu,  3 Apr 2025 07:03:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743663795;
-	bh=l0MLC3LjSRdSlGxzQJUnA2o45FMnz5uriKWfGAhpZ1M=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=KLXVwCO+bVMklE7kYusSUnLK7+vPPkVA2GBEf23bDXUMvGs1jnLEgwEV0v4a1oqCV
-	 NxWekVzemIsXpTbwULg9TwbZAhiLw8UaaHRhhzJhB4AyiJ6aPRovCsPc1WHETfIG4N
-	 pUKrUHkrJ66ZC2LTD5qd97O+hHjlH2sud0lmHlkl17XR6qlsH/ZJGOxwi0pPDPzaw1
-	 ZRWeJ+8Ss7DOKM3AVV71s37gfaivRUDbjUZzOUNvrzKWtwwkJSNofgttbvXzNmphC9
-	 P3vIBpEc3rWq+aW5ciJVshEXpUGK3xAQLYvrLK1fsXWrhjF+tcj8RO8ax04EzkjImO
-	 drpT3bih3xx+A==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30db3f3c907so4452041fa.1;
-        Thu, 03 Apr 2025 00:03:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWo8hYqzpXajUbk+L94avbyzIttVSSyJpqWQwnNqj/RzPUHr1JEd7FD0nR215ipXu7NP0BMtEPM6rGTwzs=@vger.kernel.org, AJvYcCX9HafK3+paFuESd9b9eqnoDoR75634NVESY7lt4YG0nr8lKmDYBzQ7rDOSJN+ShoN1rChpwVlkHigw8er3@vger.kernel.org
-X-Gm-Message-State: AOJu0YygXU4gJdQAP9zNgjMfoa6bH6pUdwCS5bQYdGhP50+D3TCuTtCu
-	7q3O7jdxwwvO6hNfa9YYsrjncmWuqJyFYbdR3sDfyeTkRGinv4o+suaf1LJLcQIA8aAoS3UdmnR
-	QVJ5NSDdU9g7kMu8yLlGS9WcbRMU=
-X-Google-Smtp-Source: AGHT+IGG4ssKCRoG5dC97++m90adCNhEWJun+PLvmZ3Ya1OJJn752p8/HHSPqTqIThDqF5RoLpoT/qHIxeRbwSImqfw=
-X-Received: by 2002:a05:651c:997:b0:30b:a20b:eccc with SMTP id
- 38308e7fff4ca-30f021163fbmr4141991fa.11.1743663793438; Thu, 03 Apr 2025
- 00:03:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zLc8Fqgh"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-438e180821aso2065955e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 03 Apr 2025 00:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743664806; x=1744269606; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LOHlOpw+rL9bZwLX0L5IiavSSvBSY8N55kRnztDci4c=;
+        b=zLc8FqghOCEBpa5bQe+0/7iHFaW1kn/kxwwoB6Eb9MNu8pZF7orQjfZyzB5tHrD3On
+         J4iqLyEEP6jebDHAlZEL+XCBR+KCJexhkzKM59qgs24RkWqrb6zYXw/3hAaPnpVt1Mr+
+         8Wxr3l4eeV+x8YHou4zgaN+gxa0xlbbOA2ckZJJU6jydYen1mdp0RKMtcc0n8Tfcb4+R
+         KohjaPCzG7r0yBV7tnXEzRbDm+4AzMtOlfWfBMkLxgWvtkaAs7jn/SmVS0A73HJKH1/Z
+         Vkk4Q9ERxTUqeRXho9r/ZkUyhaZq46w6W4kkf5Gcy02vJtDStxURStyoCqZtmQLznFwl
+         REPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743664806; x=1744269606;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LOHlOpw+rL9bZwLX0L5IiavSSvBSY8N55kRnztDci4c=;
+        b=N3G6cD4D0TlGQpMfioaly3GSZEff/W3UqVLmX2d5GsIoZ4LSyErEbV8D3Vp1Cc/Kxt
+         5zihgzsBW+z47uaGuyhoIbDZ6IJcD+rC480nLx6O/kCt6xYvsjfEgnDNvROgw+PtwpQ1
+         pPwKNBFY1UyoCDAz9uFLshYr/HyzB7g6gcTbWHP3Eguek/3JSfdCftSBHI6rGIfKHxST
+         oCB5NNUXP2VTbjvFXnq70MdteghiT07HpnhqYhXdYZ2CAS7pb6VL+rB1ZZAT1USehSUk
+         i5QVGaLAldjsWxAeIRxyCkVFqatNeH/0YNJsP6/SxNYY/fbS7H4OQjubEczUx9O/lW/l
+         fQ9Q==
+X-Gm-Message-State: AOJu0YxitYc2KkrbxpyWJqy3Sk/DPYhbMOUQgVOEKyiLk3+ATqxWagL/
+	Fm0n5PRrdP0ImGISzDEvuaEJ8yZL/njA70MVANQwOky8kNNGE5UqdBd318Q0GUqNAHa0Nar9Lj2
+	njCKot1gC8+rlUXxiL5VzpQy7EpEfyzl9/1YB0Gk1goUb6UwsenLhYCJ4HPXmFiuqCO+5uPngSu
+	zJ97AizW0HDH8VnA4Z2BtL3JWJVnX2Ug==
+X-Google-Smtp-Source: AGHT+IGgQHKv5K3Neyjj9hSorIlAQ3SrWqYgb4Kq33sUT6FbB41Tm3x9PIBtlBI/d/0+J99BsWG2qUg1
+X-Received: from wmbfl12.prod.google.com ([2002:a05:600c:b8c:b0:43d:9035:df36])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:458b:b0:43c:efed:732c
+ with SMTP id 5b1f17b1804b1-43ec1531fe6mr9872975e9.28.1743664806328; Thu, 03
+ Apr 2025 00:20:06 -0700 (PDT)
+Date: Thu,  3 Apr 2025 09:19:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <Z-yrf_9D2rV1Q136@gondor.apana.org.au> <CAMj1kXEx__RLBriW0kVPrKnx6+DCpq8=6F-7Tmj2Us61gvGGaw@mail.gmail.com>
- <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
- <Z-zzvXbjt3xzquXb@gondor.apana.org.au> <20250402171930.GD1235@sol.localdomain>
- <Z-3jkYNtZpTDtKGf@gondor.apana.org.au> <20250403021453.GA2872965@google.com>
- <Z-344xAsx1uTE9OK@gondor.apana.org.au> <20250403032008.GA129577@sol.localdomain>
- <Z-4DqsRApwQi6Xju@gondor.apana.org.au> <20250403035934.GB129577@sol.localdomain>
-In-Reply-To: <20250403035934.GB129577@sol.localdomain>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 3 Apr 2025 10:03:02 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXHB5-ZFbi5TfuU_pfNJRdxH5-ZUY+k4azpvYgv1Py_Ocw@mail.gmail.com>
-X-Gm-Features: AQ5f1JooGG0PId6nG39bmLVotgubW1omncONlNucYGzQmxvf8Fro6Z3QmYKqbPk
-Message-ID: <CAMj1kXHB5-ZFbi5TfuU_pfNJRdxH5-ZUY+k4azpvYgv1Py_Ocw@mail.gmail.com>
-Subject: Re: Banning crypto in hardirq context (was: [PATCH v2 0/9] crypto:
- x86 - stop using the SIMD helper)
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Linus Torvalds <torvalds@linux-foundation.org>
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=879; i=ardb@kernel.org;
+ h=from:subject; bh=3QDcI3nC/0x8BzLQP6lJAcdrRaI58t4VCtI8q2lKKtk=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIf2d2SwufV7PP5z1d3scvE4eYTZvWt3xeMXTh2vXn+e6s
+ eLsB5fVHaUsDGIcDLJiiiwCs/++23l6olSt8yxZmDmsTCBDGLg4BWAikSsYGS7XfFo9eRX7Nu5H
+ KrzXJ8+K6QiaOzln6XSN5lvtJr9cbnMz/A9ImqfB4Z6syPQl1vGQzJbKWcvW537MOJx45sSujX/ 3LOUBAA==
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250403071953.2296514-5-ardb+git@google.com>
+Subject: [PATCH v2 0/3] crypto: arm - drop dependency on SIMD helper
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au, 
+	ebiggers@kernel.org, Ard Biesheuvel <ardb@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 3 Apr 2025 at 06:59, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Thu, Apr 03, 2025 at 11:42:34AM +0800, Herbert Xu wrote:
-> > On Wed, Apr 02, 2025 at 08:20:08PM -0700, Eric Biggers wrote:
-> > >
-> > > Also, riscv has scalar AES instructions.  (They aren't used by the kernel yet,
-> > > but they could be.  The CRC code already uses scalar carryless multiplication.)
-> >
-> > It still doesn't mean that it's a good idea to use AES in a
-> > hard IRQ handler, especially if the code is meant to be portable.
-> >
-> > > Also, as I said already, x86 does support SIMD instructions in hardirq context
-> > > in some cases.  Whether anyone actually uses that, I don't know, but it is
-> > > explicitly supported.  Check out irq_fpu_usable().
-> >
-> > This is more of an accident than some deliberate strategy of
-> > supporting FPU usage in hard IRQs.  This test was initially
-> > added for aesni:
-> >
-> > commit 54b6a1bd5364aca95cd6ffae00f2b64c6511122c
-> > Author: Ying Huang <huang.ying.caritas@gmail.com>
-> > Date:   Sun Jan 18 16:28:34 2009 +1100
-> >
-> >     crypto: aes-ni - Add support to Intel AES-NI instructions for x86_64 platform
-> >
-> > It was then improved by:
-> >
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Mon Feb 13 13:56:14 2012 -0800
-> >
-> >     i387: make irq_fpu_usable() tests more robust
-> >
-> >     Some code - especially the crypto layer - wants to use the x86
-> >     FP/MMX/AVX register set in what may be interrupt (typically softirq)
-> >     context.
-> >
-> > At no point was there any intention of using this in a hardirq
-> > context.
-> >
-> > Until such a time when you have a valid application for using
-> > lib/crypto code in a hardirq context, I don't think we should
-> > be supporting that at the expense of real users who are in
-> > process/softirq context only.
->
-> Whatever.  We agree that "crypto in hardirq" is not a good idea in general.  I'm
-> just pointing out that there are certain cases, like SipHash used in a hash
-> table, where it easily could happen and would be fine.  And all the shash and
-> crypto library functions currently work in any context, unlike e.g. skcipher and
-> aead which do not.  You seem to be trying to claim that it was never supported,
-> but that is incorrect.  Making it unsupported would be a change that needs to be
-> properly documented (the functions would no longer be simply "Any context")
-> *and* have proper debug assertions added to enforce it and prevent usage errors.
-> But in a lot of cases there is also no reason to even add that restriction.  I'm
-> not sure why you're so eager to make the library functions harder to use.
->
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Agree with Eric.
+The non-SIMD fallbacks in the ARM skcipher implementations have become
+dead code now that SIMD is always allowed in the contexts where
+skciphers may be used. So remove them.
 
-There may be cases where some error condition (machine check etc) is
-hit while running in hard IRQ context or with IRQs disabled, and the
-code that produces the diagnostic, writes to pstore, generates the QR
-code for  etc etc may actually be where the library calls to crc32 etc
-originate from. So pedantically disallowing that rather than falling
-back to a non-SIMD code path make things worse, because now, the
-original diagnostic may get lost while the only information left to
-debug the issue is an OOPS complaining about a library call in hard
-IRQ context.
+While at it, remove the sync CTR helper function now that its last
+users have been dropped.
 
-So while I agree that knowingly invoking library interfaces with IRQs
-disabled should be avoided, that is just a variation on the general
-adage that IRQs should only be disabled when absolutely necessary. But
-that necessity may derive from a condition that exists one or several
-layers up.
+v2:
+- drop unnecessary includes
+- add patch #3
+
+Ard Biesheuvel (3):
+  crypto: arm/aes-ce - stop using the SIMD helper
+  crypto: arm/aes-neonbs - stop using the SIMD helper
+  crypto: ctr - remove unused crypto_ctr_encrypt_walk()
+
+ arch/arm/crypto/Kconfig           |   2 -
+ arch/arm/crypto/aes-ce-glue.c     | 104 ++----------------
+ arch/arm/crypto/aes-neonbs-glue.c | 116 ++------------------
+ include/crypto/ctr.h              |  47 --------
+ 4 files changed, 20 insertions(+), 249 deletions(-)
+
+
+base-commit: 99585c2192cb1ce212876e82ef01d1c98c7f4699
+-- 
+2.49.0.472.ge94155a9ec-goog
+
