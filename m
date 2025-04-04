@@ -1,55 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309D71F758F;
-	Fri,  4 Apr 2025 00:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03181F791A;
+	Fri,  4 Apr 2025 00:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743725157; cv=none; b=B19m4gqu34e9gt1rR5cgV+B5Ax7FaZqY1BFfudWu8Z3HUyOvSTmeIJ3VtfuVIBGpAa2oZvDE+B8Pjdr09dzpr4DIFoU56bCvzkG08QMk4fboFD/s+2o1FC2Igh7v2O8Bgkvh+NJRjUEFTtZPq4iNqd8iUQ5u6Tx3KCFYSEwOsBQ=
+	t=1743725158; cv=none; b=MRrHbTVLxmt+oQAJfjXgyoEhv7MdLv2gQwfxnIl6ykohH5n0/1/Qc7jtLnPQ3uwRR1GULkUPFIpHok5hS2h060ZFxiXFTCnG17NW6B88asmc0jzGHgotTS/nmy3WEKwivd5ftWGINsRaUiRtIcKeAuZXwdpnmXA5hR8Ke0oKdoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743725157; c=relaxed/simple;
-	bh=MoxHxLpMQ/cPzCeMsJWesuSPEGcl5oWPfXJxOh0zs2g=;
+	s=arc-20240116; t=1743725158; c=relaxed/simple;
+	bh=T2lrDZMpW5FzWg6jAjAkGYig6WQSR9D3iLhX1va/tdM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cTlQiW3/Qi/eBId/Zyt4cC//fucH/YcKezpfyb1hBvDIumOfVb0H0hLo28E7p88yAFDDIucrr3l0sYCVPSH/3jGSfmQ+Gy6KrW9guGWDoIV2f8Udb4XMunYw3QyBkm6t3OHuc6+IIC7vRqCcLv0VFS0YrXRHGzHw0bPhwOPNNNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkm9bpH4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ah25JfOh30UWjE+lNIvEEziTvV0CzHAPBMRYu05DLRWufDN6CktlX+goXVJ1HucEe0QzH2nfx9Ch/BVvQknqMenxHRlgzx2RET+7vhUFIY+Xjn5D9+8RULT7sgJutSfCK7OqVqsLqU2HUW64KzCh8ZAptxVLiygQhs+A+d3jr5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WmVi9yOc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkm9bpH4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1723FC4CEE3;
-	Fri,  4 Apr 2025 00:05:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WmVi9yOc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0F8C4CEE3;
+	Fri,  4 Apr 2025 00:05:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743725157;
-	bh=MoxHxLpMQ/cPzCeMsJWesuSPEGcl5oWPfXJxOh0zs2g=;
+	s=k20201202; t=1743725158;
+	bh=T2lrDZMpW5FzWg6jAjAkGYig6WQSR9D3iLhX1va/tdM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mkm9bpH4ZaxYo0ou5/1nca2csS9HLIl9mGHriPBE4vgAm0keW9kcW/3MBSyvaHcAo
-	 rJhH4/b9flzhRQ7UiSHtD5cGW5VphraKelzsqQkTKXeKMxU8d8GKIzmenBRsZMcqN3
-	 FkcXzRHDZg7R3JLY+7RNR6la/xmR+1bQ18m2EBDwdolPqK/ifaY9+nhVXajH6bb9xW
-	 XveQ97xxyUGsM/3ZS3VCFCLAyLTz4TXDO9FF6JM1JgffDL2Cczx3D94RwXwTPyrrE+
-	 1dUijjjWKVG9Zm+P4IBMnpEK6Il3qzwQeVfDep1BuYxLtxniZU/boMHqVXf001tF79
-	 raoEOJeXQZu3w==
+	b=WmVi9yOcX/v1wh9eXtal3gyzWqvLDHCbEHLqQgKbrG+Yx/p31tyyergVsxtEf+vta
+	 2Ns4E1kEUDIl8Fsmi0whmV8dvGN+w9YJZQract7wjx9ZcCIlmRcL4FZyQCpVqLaQfi
+	 Hw/vqXS7sbL2wHDN3oIW8542PrfCZTiBvoFSDAi58pA/UVOiOO/rca0w/UJAdElTp7
+	 MJCCJR1abvtLoRG48TKy58smCNuAyQktHxsL0a/JGPr5QoK9rdROEOuNw6D8YrUI9b
+	 poGu9PL418QsZwI8oYunJmjHKVbLfjeAARbklQoXJSg331QdGDqgrvPyDPg0k3aMJm
+	 AV3UxpTSDyEIw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	kernel test robot <lkp@intel.com>,
+	syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	linux@armlinux.org.uk,
-	leitao@debian.org,
-	nayna@linux.ibm.com,
-	pfsmorigo@gmail.com,
-	maddy@linux.ibm.com,
-	mpe@ellerman.id.au,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 6.12 06/20] crypto: lib/Kconfig - Fix lib built-in failure when arch is modular
-Date: Thu,  3 Apr 2025 20:05:26 -0400
-Message-Id: <20250404000541.2688670-6-sashal@kernel.org>
+	linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 07/20] crypto: null - Use spin lock instead of mutex
+Date: Thu,  3 Apr 2025 20:05:27 -0400
+Message-Id: <20250404000541.2688670-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250404000541.2688670-1-sashal@kernel.org>
 References: <20250404000541.2688670-1-sashal@kernel.org>
@@ -66,205 +53,97 @@ Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit 1047e21aecdf17c8a9ab9fd4bd24c6647453f93d ]
+[ Upstream commit dcc47a028c24e793ce6d6efebfef1a1e92f80297 ]
 
-The HAVE_ARCH Kconfig options in lib/crypto try to solve the
-modular versus built-in problem, but it still fails when the
-the LIB option (e.g., CRYPTO_LIB_CURVE25519) is selected externally.
+As the null algorithm may be freed in softirq context through
+af_alg, use spin locks instead of mutexes to protect the default
+null algorithm.
 
-Fix this by introducing a level of indirection with ARCH_MAY_HAVE
-Kconfig options, these then go on to select the ARCH_HAVE options
-if the ARCH Kconfig options matches that of the LIB option.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202501230223.ikroNDr1-lkp@intel.com/
+Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/arm/crypto/Kconfig     |  6 +++---
- arch/powerpc/crypto/Kconfig |  4 ++--
- arch/x86/crypto/Kconfig     |  6 +++---
- lib/crypto/Kconfig          | 26 ++++++++++++++++++--------
- 4 files changed, 26 insertions(+), 16 deletions(-)
+ crypto/crypto_null.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 5ff49a5e9afc9..8af59c1735ea4 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_NEON
- 	tristate "Public key crypto: Curve25519 (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index 5b84b0f7cc178..3378670286535 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -17,10 +17,10 @@
+ #include <crypto/internal/skcipher.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+-#include <linux/mm.h>
++#include <linux/spinlock.h>
+ #include <linux/string.h>
  
-@@ -47,7 +47,7 @@ config CRYPTO_NHPOLY1305_NEON
- config CRYPTO_POLY1305_ARM
- 	tristate "Hash functions: Poly1305 (NEON)"
- 	select CRYPTO_HASH
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
+-static DEFINE_MUTEX(crypto_default_null_skcipher_lock);
++static DEFINE_SPINLOCK(crypto_default_null_skcipher_lock);
+ static struct crypto_sync_skcipher *crypto_default_null_skcipher;
+ static int crypto_default_null_skcipher_refcnt;
  
-@@ -214,7 +214,7 @@ config CRYPTO_AES_ARM_CE
- config CRYPTO_CHACHA20_NEON
- 	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (NEON)"
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index 46a4c85e85e24..2a2615e35fdb5 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_PPC64
- 	tristate "Public key crypto: Curve25519 (PowerPC64)"
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
+@@ -152,23 +152,32 @@ MODULE_ALIAS_CRYPTO("cipher_null");
  
-@@ -128,7 +128,7 @@ config CRYPTO_CHACHA20_P10
- 	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 7b1bebed879df..d87b268d17d39 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_X86
- 	tristate "Public key crypto: Curve25519 (ADX)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
+ struct crypto_sync_skcipher *crypto_get_default_null_skcipher(void)
+ {
++	struct crypto_sync_skcipher *ntfm = NULL;
+ 	struct crypto_sync_skcipher *tfm;
  
-@@ -352,7 +352,7 @@ config CRYPTO_CHACHA20_X86_64
- 	depends on X86 && 64BIT
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-@@ -420,7 +420,7 @@ config CRYPTO_POLY1305_X86_64
- 	tristate "Hash functions: Poly1305 (SSE2/AVX2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_LIB_POLY1305_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
+-	mutex_lock(&crypto_default_null_skcipher_lock);
++	spin_lock_bh(&crypto_default_null_skcipher_lock);
+ 	tfm = crypto_default_null_skcipher;
  
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index b01253cac70a7..c542ef1d64d03 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -42,12 +42,17 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
- 	  of CRYPTO_LIB_BLAKE2S.
- 
- config CRYPTO_ARCH_HAVE_LIB_CHACHA
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the ChaCha library interface,
- 	  either builtin or as a module.
- 
-+config CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_LIB_CHACHA=m
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA=y
+ 	if (!tfm) {
+-		tfm = crypto_alloc_sync_skcipher("ecb(cipher_null)", 0, 0);
+-		if (IS_ERR(tfm))
+-			goto unlock;
+-
+-		crypto_default_null_skcipher = tfm;
++		spin_unlock_bh(&crypto_default_null_skcipher_lock);
 +
- config CRYPTO_LIB_CHACHA_GENERIC
- 	tristate
- 	select CRYPTO_LIB_UTILS
-@@ -60,7 +65,6 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 
- config CRYPTO_LIB_CHACHA
- 	tristate "ChaCha library interface"
--	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
- 	help
- 	  Enable the ChaCha library interface. This interface may be fulfilled
-@@ -68,12 +72,17 @@ config CRYPTO_LIB_CHACHA
- 	  is available and enabled.
- 
- config CRYPTO_ARCH_HAVE_LIB_CURVE25519
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the Curve25519 library interface,
- 	  either builtin or as a module.
- 
-+config CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_LIB_CURVE25519=m
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519=y
++		ntfm = crypto_alloc_sync_skcipher("ecb(cipher_null)", 0, 0);
++		if (IS_ERR(ntfm))
++			return ntfm;
 +
- config CRYPTO_LIB_CURVE25519_GENERIC
- 	tristate
- 	help
-@@ -85,7 +94,6 @@ config CRYPTO_LIB_CURVE25519_GENERIC
++		spin_lock_bh(&crypto_default_null_skcipher_lock);
++		tfm = crypto_default_null_skcipher;
++		if (!tfm) {
++			tfm = ntfm;
++			ntfm = NULL;
++			crypto_default_null_skcipher = tfm;
++		}
+ 	}
  
- config CRYPTO_LIB_CURVE25519
- 	tristate "Curve25519 scalar multiplication library"
--	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
- 	select CRYPTO_LIB_UTILS
- 	help
-@@ -104,12 +112,17 @@ config CRYPTO_LIB_POLY1305_RSIZE
- 	default 1
+ 	crypto_default_null_skcipher_refcnt++;
++	spin_unlock_bh(&crypto_default_null_skcipher_lock);
  
- config CRYPTO_ARCH_HAVE_LIB_POLY1305
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the Poly1305 library interface,
- 	  either builtin or as a module.
+-unlock:
+-	mutex_unlock(&crypto_default_null_skcipher_lock);
++	crypto_free_sync_skcipher(ntfm);
  
-+config CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_LIB_POLY1305=m
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305=y
+ 	return tfm;
+ }
+@@ -176,12 +185,16 @@ EXPORT_SYMBOL_GPL(crypto_get_default_null_skcipher);
+ 
+ void crypto_put_default_null_skcipher(void)
+ {
+-	mutex_lock(&crypto_default_null_skcipher_lock);
++	struct crypto_sync_skcipher *tfm = NULL;
 +
- config CRYPTO_LIB_POLY1305_GENERIC
- 	tristate
- 	help
-@@ -121,7 +134,6 @@ config CRYPTO_LIB_POLY1305_GENERIC
++	spin_lock_bh(&crypto_default_null_skcipher_lock);
+ 	if (!--crypto_default_null_skcipher_refcnt) {
+-		crypto_free_sync_skcipher(crypto_default_null_skcipher);
++		tfm = crypto_default_null_skcipher;
+ 		crypto_default_null_skcipher = NULL;
+ 	}
+-	mutex_unlock(&crypto_default_null_skcipher_lock);
++	spin_unlock_bh(&crypto_default_null_skcipher_lock);
++
++	crypto_free_sync_skcipher(tfm);
+ }
+ EXPORT_SYMBOL_GPL(crypto_put_default_null_skcipher);
  
- config CRYPTO_LIB_POLY1305
- 	tristate "Poly1305 library interface"
--	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
- 	help
- 	  Enable the Poly1305 library interface. This interface may be fulfilled
-@@ -130,8 +142,6 @@ config CRYPTO_LIB_POLY1305
- 
- config CRYPTO_LIB_CHACHA20POLY1305
- 	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
--	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
--	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	depends on CRYPTO
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
 -- 
 2.39.5
 
