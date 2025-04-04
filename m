@@ -1,46 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5EF42A9D;
-	Fri,  4 Apr 2025 00:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7271C861B;
+	Fri,  4 Apr 2025 00:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743725098; cv=none; b=UOyeSlgxmLPmqQA/C3ufDvH8sHG3A8iyTtF0S5ECi+WCI8Dm7/gV4CM4vzXp37O/Z/83PE85aIc0nhjaoun09rBS4wTAlmsiYpkuwAGCd9x6HNihh0Itg0vDPo2fQNRC9+Vfn7QzNXHztGlCcAgw4MkzpYraKS5j6ekm+EzWqe4=
+	t=1743725108; cv=none; b=c/O2aTWFNYu0B0H/vKbGJSGHCKEBhlwxJ5MZKXUsftQ5LogBcnoVKGObW0jiWbfxsGZe2aipMsmkR9IgPRvuo53NvZjVfjJIXMRRYyMk/sn1NOmJd7R7PQnx9AjrtPlS5ujnDcaoX6eTz+++2siV6Z4AeJH0wBkO+w/52FprrrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743725098; c=relaxed/simple;
-	bh=N1rx+buJgba+EBFZDjpuHz7VBrsBZQiPgC9nHkyWe28=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P8WrQYndYDN95J5UOX0wsVBRDR6ss/VTVUHuZo955HuXpIIHY951utEluICzgx2NF1pr2TDYnKJFY1KAZRTNaSH7KNe57sMJKHABZEUE2Iq1nbfma/ys3v4DCH1SL872ForarCa3bUPG2MtVO0rBnDIl8akf2UY7JkEk4lW4+BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSGeLuF5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743725108; c=relaxed/simple;
+	bh=aep08IrwiSVHj/7y75RHNSWliiuJjR4JlNafaQnqHiM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=UFFNB5/q00oDLrVscTwYDjFj/sUzxU65eO/bz5dhe0ROYufvAD54UB5YJEz/OS3tgejxi8y+3wJ3SrRi6eV+laQ3J/XnD4nnskygqbd2biXaQlugw29lZZL6OPSYQHbdC9aojJ4eHbGEILAj0peVf0npdsEnBtpQpyNMmtd+7NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgJMGAr1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSGeLuF5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD13C4CEE3;
-	Fri,  4 Apr 2025 00:04:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgJMGAr1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4260DC4CEE3;
+	Fri,  4 Apr 2025 00:05:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743725098;
-	bh=N1rx+buJgba+EBFZDjpuHz7VBrsBZQiPgC9nHkyWe28=;
-	h=From:To:Cc:Subject:Date:From;
-	b=TSGeLuF5UFrlKHC2eOqil2d10bJ6K8dhzivsCGi1BL0yPdUsnABVM2FL/s45mWznq
-	 cpb6eP9hvlwjGhXzIiYprnjsBzqVg+b+MZ5dZYYvn1bGpIa6C1VtrQdfCK7t9P8lNA
-	 OrQzozpQnsBWYHLVgmVTxBdFYqGXHtG3n+S93WOwKAnuRaeYgxm1CfxfPBllYsY/UU
-	 KbtvYjKGuZETLJj+R3izfkUaJTgZgASeuPtc8Pu7a6Uf/mPDAwsEvwuOD9HXgZ50Be
-	 t5cjrafq0UQxGXN+2lS7HC3vepPZQNNIb1Ed5o40tcMbzhtjBKFlZhrWXpYQetBfEK
-	 t/yO5j0WL4TJQ==
+	s=k20201202; t=1743725108;
+	bh=aep08IrwiSVHj/7y75RHNSWliiuJjR4JlNafaQnqHiM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZgJMGAr1odXwZnWNHQvI6braRejwDPmsHrM0S39GN6H02/cYgrkxwikfJTuMXM6a+
+	 iL+VAoZgMpix3vzhcLQZL1Yk5nBvdJGbnrdq03c1qZlQAcdKaLDYAswRJ9taWAzNBl
+	 0jskg/K0+p0Ce5Ia5VFVz3Hlwo0fYmqwY2WmUD27LseShr59f/e/H3Wr9rDKZcU6Lv
+	 uHe0AVBqdMsa3HgJL7ocjt+CUmn49YJMljqgn92douHulJqwJQg9cwbcJgZwE0XUNT
+	 TERvolTKmrfCa/l6iC5OBnhbRVhsv4iYxG28wrgE/IRlAFL9L/U+pTk7jtCUq2DF3c
+	 e1Hk0gMVRmaaw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Lukas Wunner <lukas@wunner.de>,
+Cc: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	ignat@cloudflare.com,
+	john.allen@amd.com,
 	davem@davemloft.net,
-	angelogioacchino.delregno@collabora.com,
-	andy@kernel.org,
-	Jonathan.Cameron@huawei.com,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 01/22] crypto: ecdsa - Harden against integer overflows in DIV_ROUND_UP()
-Date: Thu,  3 Apr 2025 20:04:30 -0400
-Message-Id: <20250404000453.2688371-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.13 06/22] crypto: ccp - Add support for PCI device 0x1134
+Date: Thu,  3 Apr 2025 20:04:35 -0400
+Message-Id: <20250404000453.2688371-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250404000453.2688371-1-sashal@kernel.org>
+References: <20250404000453.2688371-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,99 +54,34 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.13.9
 Content-Transfer-Encoding: 8bit
 
-From: Lukas Wunner <lukas@wunner.de>
+From: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 
-[ Upstream commit b16510a530d1e6ab9683f04f8fb34f2e0f538275 ]
+[ Upstream commit 6cb345939b8cc4be79909875276aa9dc87d16757 ]
 
-Herbert notes that DIV_ROUND_UP() may overflow unnecessarily if an ecdsa
-implementation's ->key_size() callback returns an unusually large value.
-Herbert instead suggests (for a division by 8):
+PCI device 0x1134 shares same register features as PCI device 0x17E0.
+Hence reuse same data for the new PCI device ID 0x1134.
 
-  X / 8 + !!(X & 7)
-
-Based on this formula, introduce a generic DIV_ROUND_UP_POW2() macro and
-use it in lieu of DIV_ROUND_UP() for ->key_size() return values.
-
-Additionally, use the macro in ecc_digits_from_bytes(), whose "nbytes"
-parameter is a ->key_size() return value in some instances, or a
-user-specified ASN.1 length in the case of ecdsa_get_signature_rs().
-
-Link: https://lore.kernel.org/r/Z3iElsILmoSu6FuC@gondor.apana.org.au/
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/ecc.c         |  2 +-
- crypto/ecdsa-p1363.c |  2 +-
- crypto/ecdsa-x962.c  |  4 ++--
- include/linux/math.h | 12 ++++++++++++
- 4 files changed, 16 insertions(+), 4 deletions(-)
+ drivers/crypto/ccp/sp-pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 50ad2d4ed672c..6cf9a945fc6c2 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -71,7 +71,7 @@ EXPORT_SYMBOL(ecc_get_curve);
- void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
- 			   u64 *out, unsigned int ndigits)
- {
--	int diff = ndigits - DIV_ROUND_UP(nbytes, sizeof(u64));
-+	int diff = ndigits - DIV_ROUND_UP_POW2(nbytes, sizeof(u64));
- 	unsigned int o = nbytes & 7;
- 	__be64 msd = 0;
- 
-diff --git a/crypto/ecdsa-p1363.c b/crypto/ecdsa-p1363.c
-index eaae7214d69bc..4454f1f8f33f5 100644
---- a/crypto/ecdsa-p1363.c
-+++ b/crypto/ecdsa-p1363.c
-@@ -22,7 +22,7 @@ static int ecdsa_p1363_verify(struct crypto_sig *tfm,
- {
- 	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
- 	unsigned int keylen = crypto_sig_keysize(ctx->child);
--	unsigned int ndigits = DIV_ROUND_UP(keylen, sizeof(u64));
-+	unsigned int ndigits = DIV_ROUND_UP_POW2(keylen, sizeof(u64));
- 	struct ecdsa_raw_sig sig;
- 
- 	if (slen != 2 * keylen)
-diff --git a/crypto/ecdsa-x962.c b/crypto/ecdsa-x962.c
-index 6a77c13e192b1..90a04f4b9a2f5 100644
---- a/crypto/ecdsa-x962.c
-+++ b/crypto/ecdsa-x962.c
-@@ -81,8 +81,8 @@ static int ecdsa_x962_verify(struct crypto_sig *tfm,
- 	struct ecdsa_x962_signature_ctx sig_ctx;
- 	int err;
- 
--	sig_ctx.ndigits = DIV_ROUND_UP(crypto_sig_keysize(ctx->child),
--				       sizeof(u64));
-+	sig_ctx.ndigits = DIV_ROUND_UP_POW2(crypto_sig_keysize(ctx->child),
-+					    sizeof(u64));
- 
- 	err = asn1_ber_decoder(&ecdsasignature_decoder, &sig_ctx, src, slen);
- 	if (err < 0)
-diff --git a/include/linux/math.h b/include/linux/math.h
-index f5f18dc3616b0..0198c92cbe3ef 100644
---- a/include/linux/math.h
-+++ b/include/linux/math.h
-@@ -34,6 +34,18 @@
-  */
- #define round_down(x, y) ((x) & ~__round_mask(x, y))
- 
-+/**
-+ * DIV_ROUND_UP_POW2 - divide and round up
-+ * @n: numerator
-+ * @d: denominator (must be a power of 2)
-+ *
-+ * Divides @n by @d and rounds up to next multiple of @d (which must be a power
-+ * of 2). Avoids integer overflows that may occur with __KERNEL_DIV_ROUND_UP().
-+ * Performance is roughly equivalent to __KERNEL_DIV_ROUND_UP().
-+ */
-+#define DIV_ROUND_UP_POW2(n, d) \
-+	((n) / (d) + !!((n) & ((d) - 1)))
-+
- #define DIV_ROUND_UP __KERNEL_DIV_ROUND_UP
- 
- #define DIV_ROUND_DOWN_ULL(ll, d) \
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 248d98fd8c48d..5357c4308da06 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -529,6 +529,7 @@ static const struct pci_device_id sp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x14CA), (kernel_ulong_t)&dev_vdata[5] },
+ 	{ PCI_VDEVICE(AMD, 0x15C7), (kernel_ulong_t)&dev_vdata[6] },
+ 	{ PCI_VDEVICE(AMD, 0x1649), (kernel_ulong_t)&dev_vdata[6] },
++	{ PCI_VDEVICE(AMD, 0x1134), (kernel_ulong_t)&dev_vdata[7] },
+ 	{ PCI_VDEVICE(AMD, 0x17E0), (kernel_ulong_t)&dev_vdata[7] },
+ 	{ PCI_VDEVICE(AMD, 0x156E), (kernel_ulong_t)&dev_vdata[8] },
+ 	/* Last entry must be zero */
 -- 
 2.39.5
 
