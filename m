@@ -1,146 +1,179 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA4033FD;
-	Fri,  4 Apr 2025 05:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465572E62B4;
+	Fri,  4 Apr 2025 07:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743746155; cv=none; b=SD8L5L2g/p4ADS27x3TUkeGthzjXROXyyni+KCSv1lp9VLqPTw2SHsC6X9HKsXwyQNRgG6rF7X2OVtOrDXuGyP7FTaS6ZpPf6woPUmIza/uQmtMcCz9pSWbgbd0UWPcyj2zmFOfjH2JxEUrVGbAry+MxG7oHtanNE9Ktyiw/Qdg=
+	t=1743752505; cv=none; b=nyXoA02L6z4Lmgz4xtOk5neAztT4o8wFS7yCSlcLihXQEEVxj3MwMr8U31Yxxi4FiyV7cHJSBAtJdIh/OmJFqwseeYeYXvFodWRnJfC20C6n6LZ5S5mady7wc33+KU8mi27XMXWCx5Yz+mw/onAy7AbpAH85N+DTeUlO+nEg3LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743746155; c=relaxed/simple;
-	bh=m3Wf1exXRQJ0ctdB9DJLeYyEFT0zavPZvNni4xpRWm0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZQvbB4Qa/pjVfifZ8T6VCMbDHJa4z8gKb3c8GmNXZXqjPVPh/EdzaN+W7Eo/rv2fmKYXHb7bjYePwGcLJVUxPlouvXM///e5tpudFBgpgb3CxJ/t3OOB6p36P+W/NoTf8liyyqLicOI4uEYn16AtktHfpxUdrXlssgJltQaoa5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMnkIA6A; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1743752505; c=relaxed/simple;
+	bh=QtI5mAhCQ4oBglBAqTcS+F8Kx0lQtqASZjb2lyjSxiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GK10w0IssqdEjU2sFEJkYKqhJEv+mBUzxuQXPLGKOgxy845u4I4LmOqhEAlmiOWzPHYiXSdjWN8/96MpVoYK05WXjPysB1/HQ0d8C5hCT4fIJ+N/Yy1fsOy9dF2G6NMY4t5ZkMOKiRwyZs1KabkT9SssAlExz1wtxc9wA2xi67k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IjOZdj9i; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMnkIA6A"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-307325f2436so16886161fa.0;
-        Thu, 03 Apr 2025 22:55:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjOZdj9i"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac298c8fa50so289361066b.1;
+        Fri, 04 Apr 2025 00:41:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743746152; x=1744350952; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T4m4Lgv/G0HSWsRrxvRHFcyOI0AOUZXlAU03wGqymqg=;
-        b=HMnkIA6AEZaCdSoe+bo2VKoCAI14RgK7eore8JvxQVz26DcKwNF85hxrKAkTrbcvDO
-         KH1fYI9JG9iL1eDOuZEltAzuyVDhB23Gua64LnWJjAUdQDng62pqq/131t42OD2q2SqV
-         fvY9FhsLs9RsCjFUghEWX5O+CUrNSOMyPn5fPL14ygg86mLOy/CCDbl3FlaprmfsVoGd
-         6q+Ld54No6v1YZNK3L+H+NI9PAsfX2z3dRIUBzI4gFewXwm4Osj7rOkwgn6Vblb1bCk1
-         crQIRXu2weBU2I5+xqeyMgCYhdgLplmGcfsnJ3ASBgBG32H0+q5Ckb3dP6/h2uFejG2Y
-         K6mg==
+        d=gmail.com; s=20230601; t=1743752500; x=1744357300; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lly+kjhQe3HfD5fcXZQKDpjf1ygVZ2JZkJ3aEDIZba0=;
+        b=IjOZdj9i9HK31yrnKvsj7AyK+H1gsE1LYEphHouhhRmoa1Vd/ReNkNlq1XwA6Evomb
+         ECybeLwAi0EL7mbepeycV1ai2nx/29CAQE5C0W/Z3EnYbCWc+Ddybb46fP6ZBqt1rimv
+         K35xI00YSIMHifiVovjBOYtCSB0MYLlTeyTqHWcVDn7yaRv7h76hFQlu6eSh5LZ3ds0l
+         Gewh5bHjc0s0MKydQoUIBQllse+2A3h8zQM8acNmYnjusPBhgbj1cqJ6guxxXCRrWnRr
+         bDwBrEYBDeENsTS5seeFq7fXJMIHSHc40M1IsLiXmC8oo+W15sC3Y/1mJPT+iU/svnYi
+         CgQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743746152; x=1744350952;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T4m4Lgv/G0HSWsRrxvRHFcyOI0AOUZXlAU03wGqymqg=;
-        b=jmUZRgwbOG/E3cwmxi+vpJ1reorwQFelHmlT8fekEAgpBnXNA2D6U6yu2zMfBigNt2
-         q3vUtDduY3Ar0zsaWoYxf8NBla3Y9Fk5HN8sz37sxVHYnPuaomUMyOAeJg/4e9joyhOL
-         0oVSLdXdmIFbh1Y5lUj7mTo9VtMijQM5MFTnR6jlKuNzWfOK9MaSB7u9kaDofN0sk+98
-         qbMrWxSWw3fllUBsY6miguKJsr3q7FMqRsFMZojKIFx9AQUAVi5LEdZGqJc74zM5OywK
-         tYZgR2e4F0XuoF8SeoEBr/bSPHNDAyfIUf33fGO3taXEjtxbq9oXJ2iOmunbnb4UCvuF
-         N30g==
-X-Forwarded-Encrypted: i=1; AJvYcCUI7aCfLrHo/qzrX1KtPqalWrSYu6OQfXO3ynJB2EMZiGaDdzFtikFcDn9qBeOy+j0M63Yzr73JcMg5UMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEXr97snYU6Yyq9l4wKc1GCNkbUyW9SKJhbGcljCFjV+uMOUqy
-	rBimD3m8Uc0wY+c0psAU3a4r6EQNc0lTJ5KuuXNEpt6WfipK9L9FY/5RnlltjrBEMQnRUsqMUDS
-	CIbl+4AY3dM2yC9NpdDaflbXWkCw=
-X-Gm-Gg: ASbGncvBtoStisP5dkheU+tUPactRBeR/ln1uRznyTME4fQ7zNJv/kX1u94wIPN9hAm
-	v6ZQfauvygrFwJBlS358VNmL77MPkq0SYmcMKf5nFARy5q1LPp+prC/2bAkDOAijfQYt5OMMJyI
-	lPKWeSE5EpARJcVljRVy5fNl6ykg==
-X-Google-Smtp-Source: AGHT+IGTy1lG5z/lKToJqLPpKeMMyAygaCW/W5NO8s5KV8h/yzeNHSQV1ViJFpeSbZCYHzC1pamHt+ktBZwIl25G9jM=
-X-Received: by 2002:a2e:ad92:0:b0:30d:e104:cd58 with SMTP id
- 38308e7fff4ca-30f0c08d73cmr3440681fa.41.1743746151616; Thu, 03 Apr 2025
- 22:55:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743752500; x=1744357300;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lly+kjhQe3HfD5fcXZQKDpjf1ygVZ2JZkJ3aEDIZba0=;
+        b=hFYmyf9VQcuMUUDx4YvdAH5Qd1EvmANSXwIxigDz6tTTstq0e1pDBYMwBisZGdm2wS
+         hVdasBECXRBtdEh1+ks1rC/m6Qstg/vKf8Lvsrs1R2f3BUp3Ta8G49Et+vZbhJv5G7Dy
+         39l5iBurph0W3IlGhV9FFREDNQCqflr1o3HCJ9XzX2xemjLtps5ZCakU/ATjxrsmYfPi
+         rEh7QIyGdNhnrlNZ1fy4sSwsNARSe4alIFsFb8ItU3k6N2cpeB9k/dYqQRGMlsoFHr7O
+         5AKzaOPQKh63Zx0KzW+phxhppMuwOFkVwF0gzvz/O059syTMfTJufTko5I7Hxfwh1JB6
+         w6uw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFL0JQLii/vNqdx0NbgNkmNTLa59boE6+/wJANnqkASP6y//GHvskyMDDhcYI+RrTG/8tFqrIF46X52Dk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEw2z561/Hha9JS9rMWeYXdwGbf6AtLPE8F7V7NRZ7xDrxSy33
+	MoPRLvGIv92dWH7S1COCRWnvXv+v2/wpHSgr5V6fVycBgRmHXpibOLPIcIlO
+X-Gm-Gg: ASbGncsYIGIP1/mSIu3jOilbVfWmoNAmOoFStmqM0KYRNE6llQgx8tVMrjxxKUudMst
+	7i2BIBAHFuiXaqw1xmIoZFjAhguKI2iKo2hF3Jna+0ilxJfpf7c0OdwMiGkGatUgZ45W2Se2+ps
+	5TW5IkKI9JUDS3wPuWqhzg7Vy+c1gTybeVXjgBz5YzRm7kJpFuhLuaVSeODviUD9CH/VWAsCclQ
+	/ha0+t8022UU6F6Pjyar+KTtVjf+q/TY9tAi2Kxw829O+Da7CzRGxKDLTi3YQ+RBLHfdmiUavDN
+	Ikfn21KL4RirDYchuAx9Mnj6Bcj9K8Nhkf1d
+X-Google-Smtp-Source: AGHT+IFT10eQ2xVHj2yD9WYDa3kzYBAICk4Ygr72KUmPcjmv4S0OnHvrF3EA3ZG5EYlkf8mnMBlaTg==
+X-Received: by 2002:a17:907:608d:b0:ac7:82b3:7ad with SMTP id a640c23a62f3a-ac7d198fe5fmr183967166b.46.1743752500118;
+        Fri, 04 Apr 2025 00:41:40 -0700 (PDT)
+Received: from fedora.. ([193.77.86.199])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7bfe9aa4esm211739266b.54.2025.04.04.00.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Apr 2025 00:41:39 -0700 (PDT)
+From: Uros Bizjak <ubizjak@gmail.com>
+To: linux-crypto@vger.kernel.org,
+	x86@kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 1/3] crypto: x86 - Remove CONFIG_AS_SHA1_NI
+Date: Fri,  4 Apr 2025 09:41:00 +0200
+Message-ID: <20250404074135.520812-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403094527.349526-3-ubizjak@gmail.com> <202504040855.mr885Pz1-lkp@intel.com>
- <20250404015112.GA96368@sol.localdomain>
-In-Reply-To: <20250404015112.GA96368@sol.localdomain>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Fri, 4 Apr 2025 07:55:40 +0200
-X-Gm-Features: ATxdqUHvxKjaAuNJAyKxretVYKicCee6aHgEDOIqcSNJgt7UxehAOrZAXyC0sC4
-Message-ID: <CAFULd4YrG-7DCXabke+uuLwLw2azciogG1nPGeAkMxLACw+0og@mail.gmail.com>
-Subject: Re: [PATCH 3/3] crypto: x86 - Remove CONFIG_AS_AVX512
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, oe-kbuild-all@lists.linux.dev, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 4, 2025 at 3:51=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
-rote:
->
-> On Fri, Apr 04, 2025 at 09:13:40AM +0800, kernel test robot wrote:
-> > Hi Uros,
-> >
-> > kernel test robot noticed the following build warnings:
-> >
-> > [auto build test WARNING on herbert-cryptodev-2.6/master]
-> > [also build test WARNING on herbert-crypto-2.6/master tip/x86/core linu=
-s/master v6.14]
-> > [cannot apply to next-20250403]
-> > [If your patch is applied to the wrong git tree, kindly drop us a note.
-> > And when submitting patch, we suggest to use '--base' as documented in
-> > https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> >
-> > url:    https://github.com/intel-lab-lkp/linux/commits/Uros-Bizjak/cryp=
-to-x86-Remove-CONFIG_AS_SHA256_NI/20250403-174814
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptod=
-ev-2.6.git master
-> > patch link:    https://lore.kernel.org/r/20250403094527.349526-3-ubizja=
-k%40gmail.com
-> > patch subject: [PATCH 3/3] crypto: x86 - Remove CONFIG_AS_AVX512
-> > config: i386-buildonly-randconfig-001-20250404 (https://download.01.org=
-/0day-ci/archive/20250404/202504040855.mr885Pz1-lkp@intel.com/config)
-> > compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> > reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/arc=
-hive/20250404/202504040855.mr885Pz1-lkp@intel.com/reproduce)
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new ve=
-rsion of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Closes: https://lore.kernel.org/oe-kbuild-all/202504040855.mr885Pz1-l=
-kp@intel.com/
-> >
-> > All warnings (new ones prefixed by >>):
-> >
-> > >> lib/raid6/recov_avx512.c:382:2: warning: #warning "your version of b=
-inutils lacks AVX512 support" [-Wcpp]
-> >      382 | #warning "your version of binutils lacks AVX512 support"
-> >          |  ^~~~~~~
-> >
-> >
-> > vim +382 lib/raid6/recov_avx512.c
-> >
-> > 13c520b2993c9fa Gayatri Kammela 2016-08-12  380
-> > 13c520b2993c9fa Gayatri Kammela 2016-08-12  381  #else
-> > 13c520b2993c9fa Gayatri Kammela 2016-08-12 @382  #warning "your version=
- of binutils lacks AVX512 support"
->
-> Yeah, CONFIG_AS_AVX512 needs to be removed from lib/raid6/ too.  It looke=
-d like
-> that directory was rolling its own CONFIG_AS_AVX512 in lib/raid6/test/Mak=
-efile,
-> but that's a makefile for a test program and not the actual kernel makefi=
-le.
+Current minimum required version of binutils is 2.25,
+which supports SHA-1 instruction mnemonics.
 
-I think the best approach to avoid patch dependencies is not to remove
-the test for AS_AVX512 from Kconfig.assembler in this patch, but in a
-separate patch that will be eventually committed late in the merge
-cycle (or for the next version), after all other users are removed
-from the tree. I have patches for other parts ready.
+Remove check for assembler support of SHA-1 instructions
+and all relevant macros for conditional compilation.
 
-I'll post v2 of this series with the above adjustment.
+No functional change intended.
 
-Thanks,
-Uros.
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+---
+ arch/x86/Kconfig.assembler        |  5 -----
+ arch/x86/crypto/Makefile          |  3 +--
+ arch/x86/crypto/sha1_ssse3_glue.c | 10 ----------
+ 3 files changed, 1 insertion(+), 17 deletions(-)
+
+diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
+index 6d20a6ce0507..70fe87bb1055 100644
+--- a/arch/x86/Kconfig.assembler
++++ b/arch/x86/Kconfig.assembler
+@@ -6,11 +6,6 @@ config AS_AVX512
+ 	help
+ 	  Supported by binutils >= 2.25 and LLVM integrated assembler
+ 
+-config AS_SHA1_NI
+-	def_bool $(as-instr,sha1msg1 %xmm0$(comma)%xmm1)
+-	help
+-	  Supported by binutils >= 2.24 and LLVM integrated assembler
+-
+ config AS_SHA256_NI
+ 	def_bool $(as-instr,sha256msg1 %xmm0$(comma)%xmm1)
+ 	help
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 5d19f41bde58..97c1dbc3b7d6 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -56,8 +56,7 @@ aesni-intel-$(CONFIG_64BIT) += aes-gcm-avx10-x86_64.o
+ endif
+ 
+ obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
+-sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ssse3_glue.o
+-sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
++sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ni_asm.o sha1_ssse3_glue.o
+ 
+ obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index ab8bc54f254d..abb793cbad01 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -28,9 +28,7 @@
+ #include <asm/simd.h>
+ 
+ static const struct x86_cpu_id module_cpu_ids[] = {
+-#ifdef CONFIG_AS_SHA1_NI
+ 	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
+-#endif
+ 	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
+ 	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
+ 	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
+@@ -256,7 +254,6 @@ static void unregister_sha1_avx2(void)
+ 		crypto_unregister_shash(&sha1_avx2_alg);
+ }
+ 
+-#ifdef CONFIG_AS_SHA1_NI
+ asmlinkage void sha1_ni_transform(struct sha1_state *digest, const u8 *data,
+ 				  int rounds);
+ 
+@@ -306,11 +303,6 @@ static void unregister_sha1_ni(void)
+ 		crypto_unregister_shash(&sha1_ni_alg);
+ }
+ 
+-#else
+-static inline int register_sha1_ni(void) { return 0; }
+-static inline void unregister_sha1_ni(void) { }
+-#endif
+-
+ static int __init sha1_ssse3_mod_init(void)
+ {
+ 	if (!x86_match_cpu(module_cpu_ids))
+@@ -360,6 +352,4 @@ MODULE_ALIAS_CRYPTO("sha1");
+ MODULE_ALIAS_CRYPTO("sha1-ssse3");
+ MODULE_ALIAS_CRYPTO("sha1-avx");
+ MODULE_ALIAS_CRYPTO("sha1-avx2");
+-#ifdef CONFIG_AS_SHA1_NI
+ MODULE_ALIAS_CRYPTO("sha1-ni");
+-#endif
+-- 
+2.49.0
+
