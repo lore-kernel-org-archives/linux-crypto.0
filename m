@@ -1,120 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2D5BE4A;
-	Fri,  4 Apr 2025 19:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7407619DF4F;
+	Fri,  4 Apr 2025 21:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743793766; cv=none; b=r8sqnYkd6iDX1xw2gyalVvdcTLsze1Y5BmdO77Lu9jLJk69VoM7ipmAjzrEx1JwtSLJKAZU3Sq2037UN9tQcA12glsPNClkgsAboev0+kJ3nBZ7uqcNYXl16b/IMtXD2eRHM8OQH/Eoj020l/sFQZlJIkjc/XsERL8j2zoYVcjA=
+	t=1743803747; cv=none; b=BuFj7e6pKqH/sETRAsdm3lhBoS8BGJgpXWhUfU2w/yAEe01qB1Z0KxF/PDXYGdMo/yVvo2RK7slGM0vlyIud3geiA3VxSyxeAgouHA8r04G0JnKDjLAPBANucNUaPYufpq/j9XhmgZ9FGXi8Yx69EzqpYAFiacRKQCBVJP28TZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743793766; c=relaxed/simple;
-	bh=032yjO8dSwAuQhzpJz59oORh4HEjWv5bo8lpsJmPAZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T78TJTHE6TpJppgErBA8XZDsTFscWDkJ19gyw6Gm7DVjXZTd2KL9dfFVnhi6O0UfR7/4/joFlM9pv12fz46j6aHmeQbyLhcNLR5ZCyqLETYkxnFZTHtkhvwJd95Hheqiy/MSLtjbCZzVPw+kkYrKA22yP+tigq1Ea9xAynUgUss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neMIbc0a; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743803747; c=relaxed/simple;
+	bh=J78We6J2HcLadsfXet7EQXvV5nbB4sqDTC5iteeMCc8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gyV2eTLOPbzFRpkJsiRdSMZJ/XF7I357AF9+57mWObHMDJlRYFj512r5NhSfK+DKMhaR3oDUc2BpapGhS5OJn/0hXz3mc9y5d1WX3lG7Jd4NHuyUrwIUrvchjzH+j3f0aMropiSQkFcy2lAdYt7krpn6ODs+2R4ywCyPJ9hj5w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=djoVFmCJ; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neMIbc0a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA3E2C4CEDD;
-	Fri,  4 Apr 2025 19:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743793765;
-	bh=032yjO8dSwAuQhzpJz59oORh4HEjWv5bo8lpsJmPAZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=neMIbc0aiULHw5c32mnthK7FTy9wzCAFma7oIJg1grNl5U5ezrisPfTsG7cKLX6+p
-	 UtIJn8/SL437DhtW41izeU6TvhWc/6MVzfByhbM7b+V8CoakCkoUITJlLMo4HjjpX7
-	 kUgWe8ZWSezgDWoaxrEy4X0IVgZxyjpFKYMknyQsWj4a4kz2FT/soVsgSbHJ95EAlJ
-	 +u2IoV821YblNCpcVtiUSN+TDegAP5U2lp51XhRLZVvmbDxEsGRgw15HoIGU0ph/wv
-	 ewOaksxth4sUIL05aSR58bDiGNNnclyPWmiIYEeHr75q83Db10VeljxCrlb1nnOz/R
-	 vJBwWtskYh2lA==
-Date: Fri, 4 Apr 2025 12:09:23 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
-	x86@kernel.org, linux-kernel@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev,
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="djoVFmCJ"
+Received: from narnia.corp.microsoft.com (unknown [167.220.2.28])
+	by linux.microsoft.com (Postfix) with ESMTPSA id F10C32025659;
+	Fri,  4 Apr 2025 14:55:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F10C32025659
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1743803744;
+	bh=FeA9Cf0c1PZ+ws0Z5CDTTAR7q+ny173QHBHM7KBUgtI=;
+	h=From:To:Subject:Date:From;
+	b=djoVFmCJ6IiEUFCgcnHVMYL2uhJrxONZOMEeqCPPJZ29Mlkcp78CX0ZSdnxS/9o9l
+	 /fEb2VwO218boC8jjcffL5aTL62YId6BQ+gtUABHGlFJVKoARLb7cmHkfO5z3oAVzy
+	 cYOkLZolxJNlLg45S5YOiA9ok749zp8yA2qASojw=
+From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+To: Jonathan Corbet <corbet@lwn.net>,
+	David Howells <dhowells@redhat.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 3/3] crypto: x86 - Remove CONFIG_AS_AVX512
-Message-ID: <20250404190923.GB1622@sol.localdomain>
-References: <20250403094527.349526-3-ubizjak@gmail.com>
- <202504040855.mr885Pz1-lkp@intel.com>
- <20250404015112.GA96368@sol.localdomain>
- <CAFULd4YrG-7DCXabke+uuLwLw2azciogG1nPGeAkMxLACw+0og@mail.gmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Shuah Khan <shuah@kernel.org>,
+	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	Neal Gompa <neal@gompa.dev>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org,
+	llvm@lists.linux.dev,
+	nkapron@google.com,
+	teknoraver@meta.com,
+	roberto.sassu@huawei.com,
+	xiyou.wangcong@gmail.com
+Subject: [PATCH v2 security-next 0/4] Introducing Hornet LSM
+Date: Fri,  4 Apr 2025 14:54:49 -0700
+Message-ID: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFULd4YrG-7DCXabke+uuLwLw2azciogG1nPGeAkMxLACw+0og@mail.gmail.com>
 
-On Fri, Apr 04, 2025 at 07:55:40AM +0200, Uros Bizjak wrote:
-> On Fri, Apr 4, 2025 at 3:51 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > On Fri, Apr 04, 2025 at 09:13:40AM +0800, kernel test robot wrote:
-> > > Hi Uros,
-> > >
-> > > kernel test robot noticed the following build warnings:
-> > >
-> > > [auto build test WARNING on herbert-cryptodev-2.6/master]
-> > > [also build test WARNING on herbert-crypto-2.6/master tip/x86/core linus/master v6.14]
-> > > [cannot apply to next-20250403]
-> > > [If your patch is applied to the wrong git tree, kindly drop us a note.
-> > > And when submitting patch, we suggest to use '--base' as documented in
-> > > https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> > >
-> > > url:    https://github.com/intel-lab-lkp/linux/commits/Uros-Bizjak/crypto-x86-Remove-CONFIG_AS_SHA256_NI/20250403-174814
-> > > base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> > > patch link:    https://lore.kernel.org/r/20250403094527.349526-3-ubizjak%40gmail.com
-> > > patch subject: [PATCH 3/3] crypto: x86 - Remove CONFIG_AS_AVX512
-> > > config: i386-buildonly-randconfig-001-20250404 (https://download.01.org/0day-ci/archive/20250404/202504040855.mr885Pz1-lkp@intel.com/config)
-> > > compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> > > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250404/202504040855.mr885Pz1-lkp@intel.com/reproduce)
-> > >
-> > > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > > the same patch/commit), kindly add following tags
-> > > | Reported-by: kernel test robot <lkp@intel.com>
-> > > | Closes: https://lore.kernel.org/oe-kbuild-all/202504040855.mr885Pz1-lkp@intel.com/
-> > >
-> > > All warnings (new ones prefixed by >>):
-> > >
-> > > >> lib/raid6/recov_avx512.c:382:2: warning: #warning "your version of binutils lacks AVX512 support" [-Wcpp]
-> > >      382 | #warning "your version of binutils lacks AVX512 support"
-> > >          |  ^~~~~~~
-> > >
-> > >
-> > > vim +382 lib/raid6/recov_avx512.c
-> > >
-> > > 13c520b2993c9fa Gayatri Kammela 2016-08-12  380
-> > > 13c520b2993c9fa Gayatri Kammela 2016-08-12  381  #else
-> > > 13c520b2993c9fa Gayatri Kammela 2016-08-12 @382  #warning "your version of binutils lacks AVX512 support"
-> >
-> > Yeah, CONFIG_AS_AVX512 needs to be removed from lib/raid6/ too.  It looked like
-> > that directory was rolling its own CONFIG_AS_AVX512 in lib/raid6/test/Makefile,
-> > but that's a makefile for a test program and not the actual kernel makefile.
-> 
-> I think the best approach to avoid patch dependencies is not to remove
-> the test for AS_AVX512 from Kconfig.assembler in this patch, but in a
-> separate patch that will be eventually committed late in the merge
-> cycle (or for the next version), after all other users are removed
-> from the tree. I have patches for other parts ready.
-> 
-> I'll post v2 of this series with the above adjustment.
-> 
+This patch series introduces the Hornet LSM. The goal of Hornet is to
+provide a signature verification mechanism for eBPF programs.
 
-$ ./scripts/get_maintainer.pl lib/raid6/avx512.c
-linux-kernel@vger.kernel.org (open list)
+eBPF has similar requirements to that of modules when it comes to
+loading: find symbol addresses, fix up ELF relocations, some struct
+field offset handling stuff called CO-RE (compile-once run-anywhere),
+and some other miscellaneous bookkeeping. During eBPF program
+compilation, pseudo-values get written to the immediate operands of
+instructions. During loading, those pseudo-values get rewritten with
+concrete addresses or data applicable to the currently running system,
+e.g., a kallsyms address or an fd for a map. This needs to happen
+before the instructions for a bpf program are loaded into the kernel
+via the bpf() syscall. Unlike modules, an in-kernel loader
+unfortunately doesn't exist. Typically, the instruction rewriting is
+done dynamically in userspace via libbpf. Since the relocations and
+instruction modifications are happening in userspace, and their values
+may change depending upon the running system, this breaks known
+signature verification mechanisms.
 
-Whee, more unmaintained code...
+Light skeleton programs were introduced in order to support early
+loading of eBPF programs along with user-mode drivers. They utilize a
+separate eBPF program that can load a target eBPF program and perform
+all necessary relocations in-kernel without needing a working
+userspace. Light skeletons were mentioned as a possible path forward
+for signature verification.
 
-I think it would be okay to just update lib/raid6/ in the same patch.
+Hornet takes a simple approach to light-skeleton-based eBPF signature
+verification. A PKCS#7 signature of a data buffer containing the raw
+instructions of an eBPF program, followed by the initial values of any
+maps used by the program is used. A utility script is provided to
+parse and extract the contents of autogenerated header files created
+via bpftool. That payload can then be signed and appended to the light
+skeleton executable.
 
-But if you want to wait for the next cycle that's fine too.
+Maps are frozen to prevent TOCTOU bugs where a sufficiently privileged
+user could rewrite map data between the calls to BPF_PROG_LOAD and
+BPF_PROG_RUN. Additionally, both sparse-array-based and
+fd_array_cnt-based map fd arrays are supported for signature
+verification.
 
-- Eric
+
+References:
+  [1] https://lore.kernel.org/bpf/20220209054315.73833-1-alexei.starovoitov@gmail.com/
+  [2] https://lore.kernel.org/bpf/CAADnVQ+wPK1KKZhCgb-Nnf0Xfjk8M1UpX5fnXC=cBzdEYbv_kg@mail.gmail.com/
+
+Change list:
+- v1 -> v2
+  - Jargon clarification, maintainer entry and a few cosmetic fixes
+
+Revisions:
+- v1
+  https://lore.kernel.org/bpf/20250321164537.16719-1-bboscaccy@linux.microsoft.com
+
+
+Blaise Boscaccy (4):
+  security: Hornet LSM
+  hornet: Introduce sign-ebpf
+  hornet: Add a light-skeleton data extactor script
+  selftests/hornet: Add a selftest for the Hornet LSM
+
+ Documentation/admin-guide/LSM/Hornet.rst     |  53 +++
+ Documentation/admin-guide/LSM/index.rst      |   1 +
+ MAINTAINERS                                  |   9 +
+ crypto/asymmetric_keys/pkcs7_verify.c        |  10 +
+ include/linux/kernel_read_file.h             |   1 +
+ include/linux/verification.h                 |   1 +
+ include/uapi/linux/lsm.h                     |   1 +
+ scripts/Makefile                             |   1 +
+ scripts/hornet/Makefile                      |   5 +
+ scripts/hornet/extract-skel.sh               |  29 ++
+ scripts/hornet/sign-ebpf.c                   | 411 +++++++++++++++++++
+ security/Kconfig                             |   3 +-
+ security/Makefile                            |   1 +
+ security/hornet/Kconfig                      |  11 +
+ security/hornet/Makefile                     |   4 +
+ security/hornet/hornet_lsm.c                 | 239 +++++++++++
+ tools/testing/selftests/Makefile             |   1 +
+ tools/testing/selftests/hornet/Makefile      |  51 +++
+ tools/testing/selftests/hornet/loader.c      |  21 +
+ tools/testing/selftests/hornet/trivial.bpf.c |  33 ++
+ 20 files changed, 885 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/admin-guide/LSM/Hornet.rst
+ create mode 100644 scripts/hornet/Makefile
+ create mode 100755 scripts/hornet/extract-skel.sh
+ create mode 100644 scripts/hornet/sign-ebpf.c
+ create mode 100644 security/hornet/Kconfig
+ create mode 100644 security/hornet/Makefile
+ create mode 100644 security/hornet/hornet_lsm.c
+ create mode 100644 tools/testing/selftests/hornet/Makefile
+ create mode 100644 tools/testing/selftests/hornet/loader.c
+ create mode 100644 tools/testing/selftests/hornet/trivial.bpf.c
+
+-- 
+2.48.1
+
