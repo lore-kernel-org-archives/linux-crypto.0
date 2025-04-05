@@ -1,49 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B1F1E835F;
-	Sat,  5 Apr 2025 18:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBE61B6CEF;
+	Sat,  5 Apr 2025 18:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743877857; cv=none; b=ksM6ATDfW2vU4dAYiGKplE2wQMcdAi/SZRokbzkSN2vjF6cIBctkK3f49Ejy8rNnYE7m9282yqMGc5nDrDVhYWMbvSERN7o4lUzicJMuJibePv+rFIj4HEW/IIeBWVDAwSbTg3ZmZQjP7b4v2+ToJpghVBApTK0AjdwEqL+icSE=
+	t=1743878022; cv=none; b=YxhNKaDAKG7R7WYQLJsJyJE+RTVhf7qJqln9jGySP3bmFIpeClo1VKsUeKoToqfQSZqIdAZyOwYZCz4JJYpHkTp5RarbNp7BUvdWyGr263xLpxaSyu/rEZlLnG8C74feBIMt2q6hCX76M4KdUpOFDblaGP/HHmhFrSSC73Pffko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743877857; c=relaxed/simple;
-	bh=xm9pQBjynxcvCeIRTBV15aMlBzjyI8/pKv+7T2s3kQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bM2CEbJRGiLpco+bSSM99UKsi4iT/33fkTA9A2QFji+1aiw0R3I9oVT07m13wtOGuVkOv7np8SRzouYhCT8TDDp8Wnsj9IgixVYUyRJ3+VVqdFqW+64Tj+SxkHulxEAw8+xbBbAVOoAk70pvnY0H8a+2k7GaA61KBxh6MM/Q5Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ju1cg6yr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743878022; c=relaxed/simple;
+	bh=teDk8TeNfqt2r9k4vRhENAbqbxGaLsP4BGLh3eFVikA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rVjybRWs6LxK5fOyjFN9VZvX0wejmJbSV7wmptoikFLTLLDGTp7/i6x5pVpTlCPUn/Zs1zfeEYBdrwGl+ZUAlXvQNUBPn2BgnBU1XBKCg+3U47i7FFRYd50iXYD0jbrxt75IwdMFt5w5zq5x21AWcd3PzAsJcSYFl12ricKBVuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNd2N8bZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ju1cg6yr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B91BCC4CEEE;
-	Sat,  5 Apr 2025 18:30:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNd2N8bZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 234C6C4CEE7;
+	Sat,  5 Apr 2025 18:33:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743877857;
-	bh=xm9pQBjynxcvCeIRTBV15aMlBzjyI8/pKv+7T2s3kQY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ju1cg6yronHNVCwqCj3RXAUddHMdeVnV37A1BlKl8lKfGjcLZ1O5Jr47JPwtgEb8w
-	 kBtjrQz3oQTK0rF2GIxt9Jca1cQ2ovIovsG6x4ozwgzI/GbWA8lRcEtmfqMDHrTqpT
-	 GkdEJQJ46F2Rn2YbfgjD6ZNJWzdg9KZ4ECZmXWRKimG527EO6mCfbyhULimX30AAin
-	 iZ+x9yi8figCx1FLSGpxDTsI1oClBdWm+rRR1K6l7HqAHfcbGiEQ2Yy0vRh9G1DEDV
-	 Fz64+CRHAlOrMoZ3dqTecWbhgJP5bMpDNyYjfK3/ZQdfcw+7ZrPkaN6Q+fqq/Aktxg
-	 VZhaClah8z4gQ==
+	s=k20201202; t=1743878022;
+	bh=teDk8TeNfqt2r9k4vRhENAbqbxGaLsP4BGLh3eFVikA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SNd2N8bZEvC7Zp5Wpnqf2texr+3zJ2Xt2wHL7x45wI07f2WU1Mu0WJpAaP5QM71vT
+	 lMDD9xrezlzkDfNGDmNgfc7sQkqBNU/9pMz1gqyi2eXhJW/FU3kWo/k/Q7S2cP33wt
+	 EPAO4gooO2/KKdLspYf8jX0VwQYql3yM5mxy9zSg/ukrE3iTpsyUrnHWj3GK6aWv6L
+	 wI4ZNkB0FETJXN2D4+muXosKt4nEPiSl/No+Z8P6FN2PiEzWTyCpKmqBIogKjXclwc
+	 Mnl+Plsoicf0ulSrI9GGz3tBzxQEnTJqUy9POJRS+C8HdbHy7fWiOQuLW1Xar931wS
+	 LEebPdVefDIAQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	x86@kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld " <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: [PATCH 9/9] crypto: chacha - remove <crypto/internal/chacha.h>
-Date: Sat,  5 Apr 2025 11:26:09 -0700
-Message-ID: <20250405182609.404216-10-ebiggers@kernel.org>
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: crc32 - remove "_generic" from filenames
+Date: Sat,  5 Apr 2025 11:33:24 -0700
+Message-ID: <20250405183324.441383-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250405182609.404216-1-ebiggers@kernel.org>
-References: <20250405182609.404216-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,118 +43,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-<crypto/internal/chacha.h> is now included only by crypto/chacha.c, so
-fold it into there.
+Since crc32_generic.c and crc32c_generic.c now expose both the generic
+and architecture-optimized implementations via the crypto_shash API,
+rather than just the generic implementations as they originally did,
+remove the "_generic" part of the filenames.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/chacha.c                  | 35 +++++++++++++++++++++++++-
- include/crypto/internal/chacha.h | 43 --------------------------------
- 2 files changed, 34 insertions(+), 44 deletions(-)
- delete mode 100644 include/crypto/internal/chacha.h
+ crypto/Makefile                       | 8 ++++----
+ crypto/{crc32_generic.c => crc32.c}   | 0
+ crypto/{crc32c_generic.c => crc32c.c} | 0
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+ rename crypto/{crc32_generic.c => crc32.c} (100%)
+ rename crypto/{crc32c_generic.c => crc32c.c} (100%)
 
-diff --git a/crypto/chacha.c b/crypto/chacha.c
-index 2009038c5e56c..5103bc0b2881f 100644
---- a/crypto/chacha.c
-+++ b/crypto/chacha.c
-@@ -6,14 +6,47 @@
-  * Copyright (C) 2018 Google LLC
-  */
- 
- #include <linux/unaligned.h>
- #include <crypto/algapi.h>
--#include <crypto/internal/chacha.h>
-+#include <crypto/chacha.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/module.h>
- 
-+struct chacha_ctx {
-+	u32 key[8];
-+	int nrounds;
-+};
-+
-+static int chacha_setkey(struct crypto_skcipher *tfm,
-+			 const u8 *key, unsigned int keysize, int nrounds)
-+{
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int i;
-+
-+	if (keysize != CHACHA_KEY_SIZE)
-+		return -EINVAL;
-+
-+	for (i = 0; i < ARRAY_SIZE(ctx->key); i++)
-+		ctx->key[i] = get_unaligned_le32(key + i * sizeof(u32));
-+
-+	ctx->nrounds = nrounds;
-+	return 0;
-+}
-+
-+static int chacha20_setkey(struct crypto_skcipher *tfm,
-+			   const u8 *key, unsigned int keysize)
-+{
-+	return chacha_setkey(tfm, key, keysize, 20);
-+}
-+
-+static int chacha12_setkey(struct crypto_skcipher *tfm,
-+			   const u8 *key, unsigned int keysize)
-+{
-+	return chacha_setkey(tfm, key, keysize, 12);
-+}
-+
- static int chacha_stream_xor(struct skcipher_request *req,
- 			     const struct chacha_ctx *ctx, const u8 *iv,
- 			     bool arch)
- {
- 	struct skcipher_walk walk;
-diff --git a/include/crypto/internal/chacha.h b/include/crypto/internal/chacha.h
-deleted file mode 100644
-index b085dc1ac1516..0000000000000
---- a/include/crypto/internal/chacha.h
-+++ /dev/null
-@@ -1,43 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--
--#ifndef _CRYPTO_INTERNAL_CHACHA_H
--#define _CRYPTO_INTERNAL_CHACHA_H
--
--#include <crypto/chacha.h>
--#include <crypto/internal/skcipher.h>
--#include <linux/crypto.h>
--
--struct chacha_ctx {
--	u32 key[8];
--	int nrounds;
--};
--
--static inline int chacha_setkey(struct crypto_skcipher *tfm, const u8 *key,
--				unsigned int keysize, int nrounds)
--{
--	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int i;
--
--	if (keysize != CHACHA_KEY_SIZE)
--		return -EINVAL;
--
--	for (i = 0; i < ARRAY_SIZE(ctx->key); i++)
--		ctx->key[i] = get_unaligned_le32(key + i * sizeof(u32));
--
--	ctx->nrounds = nrounds;
--	return 0;
--}
--
--static inline int chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
--				  unsigned int keysize)
--{
--	return chacha_setkey(tfm, key, keysize, 20);
--}
--
--static inline int chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
--				  unsigned int keysize)
--{
--	return chacha_setkey(tfm, key, keysize, 12);
--}
--
--#endif /* _CRYPTO_CHACHA_H */
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 0e6ab5ffd3f77..c073a4967dc2a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -150,14 +150,14 @@ obj-$(CONFIG_CRYPTO_SEED) += seed.o
+ obj-$(CONFIG_CRYPTO_ARIA) += aria_generic.o
+ obj-$(CONFIG_CRYPTO_CHACHA20) += chacha_generic.o
+ obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
+ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+-obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
+-obj-$(CONFIG_CRYPTO_CRC32) += crc32_generic.o
+-CFLAGS_crc32c_generic.o += -DARCH=$(ARCH)
+-CFLAGS_crc32_generic.o += -DARCH=$(ARCH)
++obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
++obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
++CFLAGS_crc32c.o += -DARCH=$(ARCH)
++CFLAGS_crc32.o += -DARCH=$(ARCH)
+ obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+ obj-$(CONFIG_CRYPTO_KRB5ENC) += krb5enc.o
+ obj-$(CONFIG_CRYPTO_LZO) += lzo.o lzo-rle.o
+ obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
+ obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
+diff --git a/crypto/crc32_generic.c b/crypto/crc32.c
+similarity index 100%
+rename from crypto/crc32_generic.c
+rename to crypto/crc32.c
+diff --git a/crypto/crc32c_generic.c b/crypto/crc32c.c
+similarity index 100%
+rename from crypto/crc32c_generic.c
+rename to crypto/crc32c.c
+
+base-commit: 56f944529ec2292cbe63377a76df3759d702dd39
 -- 
 2.49.0
 
