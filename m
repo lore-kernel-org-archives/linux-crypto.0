@@ -1,130 +1,135 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBFF13B7A3;
-	Sat,  5 Apr 2025 18:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546BCEAE7;
+	Sat,  5 Apr 2025 18:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743877193; cv=none; b=FioF5VsDluUDeymd63SFpl6O79wxT8iug0CXAIhaR/sSW+zzpEj3mjCHIZ92Ll4TpVbBcjpUSHBd/z+QP2aubXiAmWfVvogemORP3+nQTJaz8Ncw5NrjDmqxvU02XmqFNLToX7GwJIe1qA7SoiLQ2Y+Ivj8ah6UUDtAR/wn39FY=
+	t=1743877853; cv=none; b=IsUJUOhY2wuGqVeahrReauCaLclnmnKtw3TRo2czQgrt0nZt7BMbm+ck6Nx9kOO85zBEw/THK4mgCIYoUhwsYrnpyjL/oibmOS0hv8eXlsFQ+UZ0rjGPLtgmj9rWB2q7wD4Rq+yYG4zOpBDHiWueaXYwYDR6g1lre7r4SnGN6IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743877193; c=relaxed/simple;
-	bh=UuKpmCc29izBRMeN6jegH6OMMWvy55AsNWWT5DJwIi4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
-	 MIME-Version; b=B04w/h5EKjR2kSzOgI6SPyWMSoFDAZb4sKBiqMQPugNDOvuiAiIzZbI3NBxOoq1UvC6cIetmb2l/GUVzXfKxti8+3jvKNGmO/tdmsMNLiaMH/6r+ODLRCSZU1pawQUGu/wCpljbeddyjpVxFMjRdxpY3yjZh46lpi5jgGGI7Iao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lcz8Hts1; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743877853; c=relaxed/simple;
+	bh=NUeI4U0WXhSt3zBtNRQTMMK3/MdfX1g2dDF6Z2qmcBk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nn1cxXV1o53a8jwDsUQbf6Uzz2EVvewGG37Ao9G/kA44sFaXcnF69rmJ+ShJAzDfh3m2z1hpnAUREhsBUBmvJkaV53hnvi/B3dKRbdTylgA5SL3zc0Ts7UbELQBNHyNkJp1TyCdeB7psKhW65i43YvKhfuaHS2qs6vKkrV+zndc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZADTKA2X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lcz8Hts1"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e5e8274a74so4985207a12.1;
-        Sat, 05 Apr 2025 11:19:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743877189; x=1744481989; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JzDPIcjxpueJWPt8ubJyJmHV+G2m+1GMdqn6UOzKG/Q=;
-        b=Lcz8Hts1D3VXAZrwJ6Mcql8kdtpe8YqDwOfvXWrhHGGrJJuVPovK18z8sMr6+oLxG2
-         2VAoLAcpKSjU+ml6awi1ZYIcUxdTX+2WbS/bHvSwJxny5Wj+p7/U44BhmTDVbn8Nq8xo
-         Ks9AehO069Ch5ghr4UBp8Z3GISKyGW2/BMOSCW+IQvejfk8fW+q2LDtMP531ovg/TQzt
-         9J8iUCz7KWrH8ffHBAL0Qv0TK7scPmNTsFXSKUHeAlSGcB1UH0mz4euoSNHZS5RKrkk7
-         T46XthobGgPqLzdbXCHu0zuu99WGlyZVBC94RQYDBvprteYwVf4vQuYdmZM7huLTA1Ty
-         h6Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743877189; x=1744481989;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JzDPIcjxpueJWPt8ubJyJmHV+G2m+1GMdqn6UOzKG/Q=;
-        b=ORCQCWeKtThrO8YvU9E8HFYft3/vEWg6iGUECjuVecNU5KtlwgFZtz1H/qaVGlwTy4
-         HG25ax9MCmJ2GvvV5IU0O+yeiwv5vPFJWwGfzO3+CsKlzMyTG9hOtmRIbpL8tSpldxsg
-         wxfMEY05NctrLQjzaN53jfXsXPX11xvuaMxTbqS6RmU0v1HRJBlvi6sa7ALKSb8ETFno
-         t5EFP8pUVVgfthplPXWh4yRp9jRlViLgA21mcigAaH78XX+Kg/yGa+squVhpHwlY3OfC
-         Tnse9bwZCUQ1KuzrajnLn+qGgXX1/Ez9YN7afSEsEUh1U9GuT3GTQMMOzylZzaqeWaIa
-         I0vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVorgDpegevhbGXH6zh/Vq4dBgZLjpl8UEhTCb/W3l94KllTjlya36snrcrhZxUM4RLCKc=@vger.kernel.org, AJvYcCW3bwHRARCbH4G/Y6sLGYBCpfaHRGqj1337SFNjQ/svM20WU2LFdhfMrNmwgphrbPqvYu3DXkLcd3r0@vger.kernel.org, AJvYcCXIhSfcixVsJGbllkYRyAZNA2LxdWeDMX+z30OQvdRl1+zqC11KHC1w/hU8UqTbUPMohfQAcv0Vyqkobg==@vger.kernel.org, AJvYcCXrupm0XRKVFQLP2mRuObvat2/dc9jjQ0A73YwnroMef/YyJlf6acJJyiWqEWcInNdlgWZabLX6l5nftgP6@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGC2dTusYCgfHBavBR95v2by0hbXFAWxVtu/a6iw1aKHxZuz9m
-	/hShSTfb6BPo1pV2Po7mb0Npj88+Xvfd4w+FVE7hUOfnNu3sclWM
-X-Gm-Gg: ASbGnctDG9knLqqGF974/wY4tYZWUgoFtytavt8dlST5TZYuryDRvUWpXAKS5aPOkP/
-	PN4rvik8oMirR49NsH+apD2Zit/N0R7+MBn+D60esUhXUfp2sc68G6qILF7/G4ilGVCLzkTXXst
-	7bN30acY+hLgudod5U1e2w9dmAKJ0ABZkH5VV3ZQDOZ9qzTqiWBdNeiyKJKt8lh4noaynUEImMx
-	/SiWJxXRptjagrnkTBeCYc9HGMqYmXer0KYKWSSw4P2vHiLWCZjXLrTrXRSr9dDmebwuDvQKvkX
-	SOWsV6ZB2RMLtXY4uuVn17aau0B1rXbk0HEPc55iofjVOC/Gs9Nu/QUdcLjgIHD08Mqrt6ObTr8
-	o07jXNimcI3KFqg7Kf4aUleFH9A==
-X-Google-Smtp-Source: AGHT+IHjWd15bJFnLvYIPJuTi7FnhI2p3c/aAJQJSPYd5K7f8WVJvfxyJpynzpZjmDExmCZGqw22yQ==
-X-Received: by 2002:a05:6402:2350:b0:5de:dfde:c8b1 with SMTP id 4fb4d7f45d1cf-5f0b3b62b55mr5957465a12.4.1743877189229;
-        Sat, 05 Apr 2025 11:19:49 -0700 (PDT)
-Received: from ?IPv6:2001:b07:5d29:f42d:f4b6:62bc:3e10:c9d4? ([2001:b07:5d29:f42d:f4b6:62bc:3e10:c9d4])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f088084eddsm4160377a12.62.2025.04.05.11.19.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Apr 2025 11:19:48 -0700 (PDT)
-Message-ID: <3f450f215435d39b5376a83c42fd1da186d774c3.camel@gmail.com>
-Subject: Re: [RFC PATCH v2 17/22] resource: Mark encrypted MMIO resource on
- validation
-From: Francesco Lavra <francescolavra.fl@gmail.com>
-To: aik@amd.com
-Cc: Jonathan.Cameron@huawei.com, aneesh.kumar@kernel.org,
- ashish.kalra@amd.com,  baolu.lu@linux.intel.com, bhelgaas@google.com,
- dan.j.williams@intel.com,  dionnaglaze@google.com, hch@lst.de,
- iommu@lists.linux.dev, jgg@ziepe.ca,  joao.m.martins@oracle.com,
- joro@8bytes.org, kevin.tian@intel.com,  kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-coco@lists.linux.dev, 
- linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org, lukas@wunner.de, 
- michael.roth@amd.com, nicolinc@nvidia.com, nikunj@amd.com,
- pbonzini@redhat.com,  robin.murphy@arm.com, seanjc@google.com,
- steven.sistare@oracle.com,  suravee.suthikulpanit@amd.com,
- suzuki.poulose@arm.com, thomas.lendacky@amd.com,  vasant.hegde@amd.com,
- x86@kernel.org, yi.l.liu@intel.com, yilun.xu@linux.intel.com, 
- zhiw@nvidia.com
-Date: Sat, 05 Apr 2025 20:19:46 +0200
-In-Reply-To: <20250218111017.491719-18-aik@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZADTKA2X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 571E2C4CEE4;
+	Sat,  5 Apr 2025 18:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743877852;
+	bh=NUeI4U0WXhSt3zBtNRQTMMK3/MdfX1g2dDF6Z2qmcBk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZADTKA2XpWmUoC1UvEdiBW5vfd7VpA7EcazTAeFqV6IYRAcTwJj32Vg1Wq5fCGLgs
+	 7JyOAjRuSsqqgqYWs71EQVJOb9Z2n5pA17nrPeJlhMKCA/eAK9NXkFZR3p91Y8caSt
+	 jinR8neVOTsIM05C1MclF0w8iWixTieJ05Msm7l1WKlKmf9VdzyhgwbvbhsJ497vsg
+	 XywIxp8b7zKgwiB5AvFpxMRMingbmpZEm6NwEgL/uIHCSdA3oOaTUTX2dXfFwk4hjZ
+	 yqf7tRidgJduOJ/eghplQ3/3xFBzLYQ40Eu7Y4R9D9qCW1JAc/ukkE3kpFwTEyuN6k
+	 35/hTz+afw7oA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld " <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH 0/9] Remove per-architecture ChaCha skcipher glue code
+Date: Sat,  5 Apr 2025 11:26:00 -0700
+Message-ID: <20250405182609.404216-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On 2025-02-18 at 11:10, Alexey Kardashevskiy wrote:
-> diff --git a/include/linux/ioport.h b/include/linux/ioport.h
-> index 5385349f0b8a..f2e0b9f02373 100644
-> --- a/include/linux/ioport.h
-> +++ b/include/linux/ioport.h
-> @@ -55,6 +55,7 @@ struct resource {
->  #define IORESOURCE_MEM_64	0x00100000
->  #define IORESOURCE_WINDOW	0x00200000	/* forwarded by
-> bridge */
->  #define IORESOURCE_MUXED	0x00400000	/* Resource is
-> software muxed */
-> +#define IORESOURCE_VALIDATED	0x00800000	/* TDISP validated
-> */
+Currently each architecture exposes ChaCha not only through the library
+API, but also through the crypto_skcipher API.  That requires each
+architecture to implement essentially the same skcipher glue code.
 
-You may want to remove the reference to TDISP, as this flag could be
-reused for non-PCI devices in the future.
+Following the example of what's been done for crc32 and crc32c,
+eliminate this redundancy by making crypto/chacha.c register both the
+generic and architecture-optimized skcipher algorithms, implemented on
+top of the appropriate library functions.  This removes almost 800 lines
+of code and disentangles the library code from the skcipher API.
 
-> @@ -1085,6 +1092,47 @@ int adjust_resource(struct resource *res,
-> resource_size_t start,
->  }
->  EXPORT_SYMBOL(adjust_resource);
-> =20
-> +int encrypt_resource(struct resource *res, unsigned int flags)
-> +{
-> +	struct resource *p;
-> +	int result =3D 0;
-> +
-> +	if (!res)
-> +		return -EINVAL;
-> +
-> +	write_lock(&resource_lock);
-> +
-> +	for_each_resource(&iomem_resource, p, false) {
+From what I remember, the following are the reasons why it wasn't just
+done this way originally.  But none of these really hold water:
 
-I don't think this function should walk the iomem_resource list, it can
-simply modify res->flags, which is consistent with what is done by the
-other *_resource() functions that take a pointer to a resource that is
-expected to be in the list.
-Also, the name of this function is unrelated to the name of the
-affected flag, you may want to make these names more consistent.
+- The skcipher code was there first, so it may have seemed more natural
+  to add onto it rather than replace it.
+
+- Architectures could register multiple skcipher algorithms using
+  different CPU features and have them all be tested in a single boot.
+  This was convenient in theory, but it never really worked properly.
+  It didn't apply to the library code, the x86 ChaCha code wasn't
+  actually doing this (it used static keys instead), and this cannot
+  catch bugs like accidentally using an AVX instruction in SSE code.
+  Instead, a correct solution, which also doesn't require any special
+  kernel support, is to just boot the kernel in QEMU using different
+  -cpu arguments as needed to test all the code.
+
+- There was a concern about changing cra_driver_names potentially
+  breaking users.  But in practice users rely on cra_name, not
+  cra_driver_name.  We already change, add, and remove cra_driver_names
+  occasionally for various reasons.  And even if someone was relying on
+  a specific cra_driver_name, there are some more lightweight
+  compatibility tricks that could be used.
+
+- There was a desire for users to be able to override the kernel's
+  choice of ChaCha implementation by blacklisting the arch-optimized
+  ChaCha module.  But that already became mostly impossible when the
+  library functions were added to the same module.  And in practice
+  users don't do this anyway.  Even if, hypothetically, someone really
+  needed to do this and for some reason the kernel couldn't be fixed to
+  make the right choice in their case automatically, there are other
+  ways this could be implemented such as a module parameter.
+
+Eric Biggers (9):
+  crypto: riscv/chacha - implement library instead of skcipher
+  crypto: chacha - centralize the skcipher wrappers for arch code
+  crypto: arm/chacha - remove the redundant skcipher algorithms
+  crypto: arm64/chacha - remove the skcipher algorithms
+  crypto: mips/chacha - remove the skcipher algorithms
+  crypto: powerpc/chacha - remove the skcipher algorithms
+  crypto: s390/chacha - remove the skcipher algorithms
+  crypto: x86/chacha - remove the skcipher algorithms
+  crypto: chacha - remove <crypto/internal/chacha.h>
+
+ arch/arm/crypto/Kconfig                 |   7 -
+ arch/arm/crypto/chacha-glue.c           | 243 +---------------------
+ arch/arm/crypto/chacha-neon-core.S      |   2 +-
+ arch/arm64/crypto/Kconfig               |   7 -
+ arch/arm64/crypto/chacha-neon-core.S    |   2 +-
+ arch/arm64/crypto/chacha-neon-glue.c    | 146 +------------
+ arch/mips/crypto/Kconfig                |   6 -
+ arch/mips/crypto/chacha-glue.c          | 131 +-----------
+ arch/powerpc/crypto/Kconfig             |   8 -
+ arch/powerpc/crypto/chacha-p10-glue.c   | 147 +-------------
+ arch/riscv/crypto/Kconfig               |  11 +-
+ arch/riscv/crypto/chacha-riscv64-glue.c | 112 ++++------
+ arch/riscv/crypto/chacha-riscv64-zvkb.S |  71 +++----
+ arch/s390/crypto/Kconfig                |   7 -
+ arch/s390/crypto/chacha-glue.c          |  99 ++-------
+ arch/x86/crypto/Kconfig                 |   9 -
+ arch/x86/crypto/chacha_glue.c           | 144 +------------
+ crypto/Makefile                         |   3 +-
+ crypto/chacha.c                         | 260 ++++++++++++++++++++++++
+ crypto/chacha_generic.c                 | 139 -------------
+ include/crypto/chacha.h                 |   9 +
+ include/crypto/internal/chacha.h        |  43 ----
+ 22 files changed, 413 insertions(+), 1193 deletions(-)
+ create mode 100644 crypto/chacha.c
+ delete mode 100644 crypto/chacha_generic.c
+ delete mode 100644 include/crypto/internal/chacha.h
+
+base-commit: 56f944529ec2292cbe63377a76df3759d702dd39
+-- 
+2.49.0
+
