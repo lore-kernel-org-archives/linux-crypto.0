@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7881A230996
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Apr 2025 10:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ECC22FE1F
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Apr 2025 10:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744020188; cv=none; b=pzNpjRX6ezFQECFSYIqrJxa6qq1nMk6X9tfa6CX/xCsK1FiLuFmi8zfizUudiTSCVm8zCeuEpP1AV/P/LZVX8Ri6FmgLLaBBzWZkSVf3nKzJViJZj5pqB6gatkgI5nu2ldcNFEpIFqCIvbuJ/Vc+8dqL4qIWNMv1u2xne5kxye0=
+	t=1744020190; cv=none; b=bDm1te8zE+2DIxyYDBZ/oYvwrAQ4beOuhMuL5Kk9385tLGQ7ky0fm639kM0ySfTaxvb56C4kGcWi8zB59pt5AFeOJauQln7MSVuhygxOy9M6YYBbKW7H/NbqWGTcQh9G0P5WuWg3Kmxz1K9kSj68L272gNNviBPsgFsM3Mvz9CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744020188; c=relaxed/simple;
-	bh=pf9eosETxgTLmxl2cLGHXPnJnLdb4XVsMMY+TJhVUdo=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=SitCzkR49LDYVx6+jD1YVBI5xvS0vTSp6m1uFquHZNNY4/5duIvzfa7fTbulBRdtPwAHqqavg9dbSdpiEH9S64ifinUwk2IgxRtUJEQALS62eKNEGjXQ36edEdQ8LHe5vO+e0aZIJdfCDs62EXZkEerouaSqWBDV9/zm8zT6lCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HB2LLti7; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744020190; c=relaxed/simple;
+	bh=Pykj9h6Tt2E5OuwDw3zOYT5CYEfrFx2Q27tJTW3JzYk=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=cQ0SoOg1l5ZE2jAs74sWPyThj38X4RAOGxYdMej0aXt+skdNZnc4Tqwmn3/URH5FUfmfTcXuXOQfn9td+jVlbekfzpJ8Xew4ZOIO00MZ+rl+qc/mNNu9CLZdst0UAh9IRKK9jdqEO/3nP+jrMiUbGCAXx4k2Mvr2wUjPl5M1Ulo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=me+FtLn9; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HB2LLti7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="me+FtLn9"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iVbg3InwgPsUdiqSEdT5qyK2RoZdUYzHNxc8ehG58I8=; b=HB2LLti7xrnqJoJNNO3Egc4IEj
-	HHww9xIuE4KRg83TTGb4+ypOB3BktcvsR45RUjOPUe+OIuzFIDsNZGmiLyW4sKgT3djUBSZMPFAq+
-	KvyOWoRX1/w+20ghylstRwRZBbdDqwYPkDMn5zRPIpqH//tKzYE5yja2a4wSu18x5ytksDXGKRNSE
-	yH2fiM/L3PaU+/2pRYdVvmWSquroFx7OzWJT6KhyNGwC09DLcOnPEjAp993bLV0YoJ0MwogKcHp99
-	WuMJ2RonvSpbwOMYVRe7PuxfV9dKuwZogZPKWEYk8EM2jwka8D6dtKBt8WvqmDGSjVqXm2HPEw0Fe
-	bWJ70TVw==;
+	bh=RmqAi0FnR081KEUwLh7HrYLW0oIEOru0MTzQ3KJf5O4=; b=me+FtLn9b06FFkn0J0njGSX85L
+	S0kMUIZN+uf32JaiIjFKYgRkZ0rVM+kd8ii5M3JgEatzwhBPsvkcb9RHPcUq/I/bKngyCj3fFSCTj
+	5HeVYcMC57cUziT0V1Hszd1qM8VkAN9+UzlTFbvN6N77a9H2LUBHMjvkMh+Nu86K3RTmAw7KPPfH2
+	Dc7dz35YA6LV+1nnmiInr0fn1JSSKhBI6/ZF3HTJz6jdhpeg4fDrSWLlcgUtm7riB6kSU8lx/sjZq
+	UW9mRjvKZfce1mGJD4lwzCA+iBmhuHL+OlXweuv7fur4irIA5SwFn6mDmfjlZOW9y8eUaBaNEn2GS
+	QaMWAimg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u1jJm-00DTIF-2L;
-	Mon, 07 Apr 2025 18:03:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 18:03:02 +0800
-Date: Mon, 07 Apr 2025 18:03:02 +0800
-Message-Id: <d6befca46855e7c4a7a47b58f23e39ecfee7f13d.1744019630.git.herbert@gondor.apana.org.au>
+	id 1u1jJp-00DTIS-06;
+	Mon, 07 Apr 2025 18:03:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 18:03:05 +0800
+Date: Mon, 07 Apr 2025 18:03:05 +0800
+Message-Id: <92b18f60721e79d1f51da2a80abe3827b0115781.1744019630.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744019630.git.herbert@gondor.apana.org.au>
 References: <cover.1744019630.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/7] ubifs: Use ACOMP_REQUEST_CLONE
+Subject: [PATCH 7/7] crypto: acomp - Remove ACOMP_REQUEST_ALLOC
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org
 Precedence: bulk
@@ -46,328 +46,53 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Switch to the new acomp API where stacks requests are used by
-default and a dynamic request is only allocted when necessary.
+Remove ACOMP_REQUEST_ALLOC in favour of ACOMP_REQUEST_ON_STACK
+with ACOMP_REQUEST_CLONE.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- fs/ubifs/compress.c | 251 ++++++++++++++++++++------------------------
- 1 file changed, 116 insertions(+), 135 deletions(-)
+ include/crypto/acompress.h | 21 ---------------------
+ 1 file changed, 21 deletions(-)
 
-diff --git a/fs/ubifs/compress.c b/fs/ubifs/compress.c
-index ea6f06adcd43..059a02691edd 100644
---- a/fs/ubifs/compress.c
-+++ b/fs/ubifs/compress.c
-@@ -19,6 +19,11 @@
- #include <linux/highmem.h>
- #include "ubifs.h"
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index 93cee67c27c0..96ec0090a855 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -48,12 +48,6 @@
  
-+union ubifs_in_ptr {
-+	const void *buf;
-+	struct folio *folio;
-+};
-+
- /* Fake description object for the "none" compressor */
- static struct ubifs_compressor none_compr = {
- 	.compr_type = UBIFS_COMPR_NONE,
-@@ -68,28 +73,61 @@ static struct ubifs_compressor zstd_compr = {
- /* All UBIFS compressors */
- struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
+ #define	MAX_SYNC_COMP_REQSIZE		0
  
--static int ubifs_compress_req(const struct ubifs_info *c,
--			      struct acomp_req *req,
--			      void *out_buf, int *out_len,
--			      const char *compr_name)
-+static void ubifs_compress_common(int *compr_type, union ubifs_in_ptr in_ptr,
-+				  size_t in_offset, int in_len, bool in_folio,
-+				  void *out_buf, int *out_len)
+-#define ACOMP_REQUEST_ALLOC(name, tfm, gfp) \
+-        char __##name##_req[sizeof(struct acomp_req) + \
+-                            MAX_SYNC_COMP_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+-        struct acomp_req *name = acomp_request_alloc_init( \
+-                __##name##_req, (tfm), (gfp))
+-
+ #define ACOMP_REQUEST_ON_STACK(name, tfm) \
+         char __##name##_req[sizeof(struct acomp_req) + \
+                             MAX_SYNC_COMP_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+@@ -580,21 +574,6 @@ int crypto_acomp_compress(struct acomp_req *req);
+  */
+ int crypto_acomp_decompress(struct acomp_req *req);
+ 
+-static inline struct acomp_req *acomp_request_alloc_init(
+-	char *buf, struct crypto_acomp *tfm, gfp_t gfp)
+-{
+-	struct acomp_req *req;
+-
+-	if ((req = acomp_request_alloc(tfm, gfp)))
+-		return req;
+-
+-	req = (void *)buf;
+-	acomp_request_set_tfm(req, tfm->fb);
+-	req->base.flags = CRYPTO_TFM_REQ_ON_STACK;
+-
+-	return req;
+-}
+-
+ static inline struct acomp_req *acomp_request_on_stack_init(
+ 	char *buf, struct crypto_acomp *tfm)
  {
--	struct crypto_wait wait;
--	int in_len = req->slen;
-+	struct ubifs_compressor *compr = ubifs_compressors[*compr_type];
- 	int dlen = *out_len;
- 	int err;
- 
-+	if (*compr_type == UBIFS_COMPR_NONE)
-+		goto no_compr;
-+
-+	/* If the input data is small, do not even try to compress it */
-+	if (in_len < UBIFS_MIN_COMPR_LEN)
-+		goto no_compr;
-+
- 	dlen = min(dlen, in_len - UBIFS_MIN_COMPRESS_DIFF);
- 
--	crypto_init_wait(&wait);
--	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   crypto_req_done, &wait);
--	acomp_request_set_dst_dma(req, out_buf, dlen);
--	err = crypto_acomp_compress(req);
--	err = crypto_wait_req(err, &wait);
--	*out_len = req->dlen;
--	acomp_request_free(req);
-+	do {
-+		ACOMP_REQUEST_ON_STACK(req, compr->cc);
-+		DECLARE_CRYPTO_WAIT(wait);
- 
--	return err;
-+		acomp_request_set_callback(req, 0, NULL, NULL);
-+		if (in_folio)
-+			acomp_request_set_src_folio(req, in_ptr.folio,
-+						    in_offset, in_len);
-+		else
-+			acomp_request_set_src_dma(req, in_ptr.buf, in_len);
-+		acomp_request_set_dst_dma(req, out_buf, dlen);
-+		err = crypto_acomp_compress(req);
-+		dlen = req->dlen;
-+		if (err != -EAGAIN)
-+			break;
-+
-+		req = ACOMP_REQUEST_CLONE(req, GFP_NOFS | __GFP_NOWARN);
-+		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					   crypto_req_done, &wait);
-+		err = crypto_acomp_compress(req);
-+		err = crypto_wait_req(err, &wait);
-+		dlen = req->dlen;
-+		acomp_request_free(req);
-+	} while (0);
-+
-+	*out_len = dlen;
-+	if (err)
-+		goto no_compr;
-+
-+	return;
-+
-+no_compr:
-+	if (in_folio)
-+		memcpy_from_folio(out_buf, in_ptr.folio, in_offset, in_len);
-+	else
-+		memcpy(out_buf, in_ptr.buf, in_len);
-+	*out_len = in_len;
-+	*compr_type = UBIFS_COMPR_NONE;
- }
- 
- /**
-@@ -114,32 +152,10 @@ static int ubifs_compress_req(const struct ubifs_info *c,
- void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
- 		    int in_len, void *out_buf, int *out_len, int *compr_type)
- {
--	int err;
--	struct ubifs_compressor *compr = ubifs_compressors[*compr_type];
-+	union ubifs_in_ptr in_ptr = { .buf = in_buf };
- 
--	if (*compr_type == UBIFS_COMPR_NONE)
--		goto no_compr;
--
--	/* If the input data is small, do not even try to compress it */
--	if (in_len < UBIFS_MIN_COMPR_LEN)
--		goto no_compr;
--
--	{
--		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
--
--		acomp_request_set_src_dma(req, in_buf, in_len);
--		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
--	}
--
--	if (err)
--		goto no_compr;
--
--	return;
--
--no_compr:
--	memcpy(out_buf, in_buf, in_len);
--	*out_len = in_len;
--	*compr_type = UBIFS_COMPR_NONE;
-+	ubifs_compress_common(compr_type, in_ptr, 0, in_len, false,
-+			      out_buf, out_len);
- }
- 
- /**
-@@ -166,55 +182,71 @@ void ubifs_compress_folio(const struct ubifs_info *c, struct folio *in_folio,
- 			  size_t in_offset, int in_len, void *out_buf,
- 			  int *out_len, int *compr_type)
- {
--	int err;
--	struct ubifs_compressor *compr = ubifs_compressors[*compr_type];
-+	union ubifs_in_ptr in_ptr = { .folio = in_folio };
- 
--	if (*compr_type == UBIFS_COMPR_NONE)
--		goto no_compr;
--
--	/* If the input data is small, do not even try to compress it */
--	if (in_len < UBIFS_MIN_COMPR_LEN)
--		goto no_compr;
--
--	{
--		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
--
--		acomp_request_set_src_folio(req, in_folio, in_offset, in_len);
--		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
--	}
--
--	if (err)
--		goto no_compr;
--
--	return;
--
--no_compr:
--	memcpy_from_folio(out_buf, in_folio, in_offset, in_len);
--	*out_len = in_len;
--	*compr_type = UBIFS_COMPR_NONE;
-+	ubifs_compress_common(compr_type, in_ptr, in_offset, in_len, true,
-+			      out_buf, out_len);
- }
- 
--static int ubifs_decompress_req(const struct ubifs_info *c,
--				struct acomp_req *req,
--				const void *in_buf, int in_len, int *out_len,
--				const char *compr_name)
-+static int ubifs_decompress_common(const struct ubifs_info *c,
-+				   const void *in_buf, int in_len,
-+				   void *out_ptr, size_t out_offset,
-+				   int *out_len, bool out_folio,
-+				   int compr_type)
- {
--	struct crypto_wait wait;
-+	struct ubifs_compressor *compr;
-+	int dlen = *out_len;
- 	int err;
- 
--	crypto_init_wait(&wait);
--	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   crypto_req_done, &wait);
--	acomp_request_set_src_dma(req, in_buf, in_len);
--	err = crypto_acomp_decompress(req);
--	err = crypto_wait_req(err, &wait);
--	*out_len = req->dlen;
-+	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
-+		ubifs_err(c, "invalid compression type %d", compr_type);
-+		return -EINVAL;
-+	}
- 
-+	compr = ubifs_compressors[compr_type];
-+
-+	if (unlikely(!compr->capi_name)) {
-+		ubifs_err(c, "%s compression is not compiled in", compr->name);
-+		return -EINVAL;
-+	}
-+
-+	if (compr_type == UBIFS_COMPR_NONE) {
-+		if (out_folio)
-+			memcpy_to_folio(out_ptr, out_offset, in_buf, in_len);
-+		else
-+			memcpy(out_ptr, in_buf, in_len);
-+		*out_len = in_len;
-+		return 0;
-+	}
-+
-+	do {
-+		ACOMP_REQUEST_ON_STACK(req, compr->cc);
-+		DECLARE_CRYPTO_WAIT(wait);
-+
-+		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					   crypto_req_done, &wait);
-+		acomp_request_set_src_dma(req, in_buf, in_len);
-+		if (out_folio)
-+			acomp_request_set_dst_folio(req, out_ptr, out_offset,
-+						    dlen);
-+		else
-+			acomp_request_set_dst_dma(req, out_ptr, dlen);
-+		err = crypto_acomp_decompress(req);
-+		dlen = req->dlen;
-+		if (err != -EAGAIN)
-+			break;
-+
-+		req = ACOMP_REQUEST_CLONE(req, GFP_NOFS | __GFP_NOWARN);
-+		err = crypto_acomp_decompress(req);
-+		err = crypto_wait_req(err, &wait);
-+		dlen = req->dlen;
-+		acomp_request_free(req);
-+	} while (0);
-+
-+	*out_len = dlen;
- 	if (err)
- 		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
--			  in_len, compr_name, err);
--
--	acomp_request_free(req);
-+			  in_len, compr->name, err);
- 
- 	return err;
- }
-@@ -235,33 +267,8 @@ static int ubifs_decompress_req(const struct ubifs_info *c,
- int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
- 		     int in_len, void *out_buf, int *out_len, int compr_type)
- {
--	struct ubifs_compressor *compr;
--
--	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
--		ubifs_err(c, "invalid compression type %d", compr_type);
--		return -EINVAL;
--	}
--
--	compr = ubifs_compressors[compr_type];
--
--	if (unlikely(!compr->capi_name)) {
--		ubifs_err(c, "%s compression is not compiled in", compr->name);
--		return -EINVAL;
--	}
--
--	if (compr_type == UBIFS_COMPR_NONE) {
--		memcpy(out_buf, in_buf, in_len);
--		*out_len = in_len;
--		return 0;
--	}
--
--	{
--		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
--
--		acomp_request_set_dst_dma(req, out_buf, *out_len);
--		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
--					    compr->name);
--	}
-+	return ubifs_decompress_common(c, in_buf, in_len, out_buf, 0, out_len,
-+				       false, compr_type);
- }
- 
- /**
-@@ -283,34 +290,8 @@ int ubifs_decompress_folio(const struct ubifs_info *c, const void *in_buf,
- 			   int in_len, struct folio *out_folio,
- 			   size_t out_offset, int *out_len, int compr_type)
- {
--	struct ubifs_compressor *compr;
--
--	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
--		ubifs_err(c, "invalid compression type %d", compr_type);
--		return -EINVAL;
--	}
--
--	compr = ubifs_compressors[compr_type];
--
--	if (unlikely(!compr->capi_name)) {
--		ubifs_err(c, "%s compression is not compiled in", compr->name);
--		return -EINVAL;
--	}
--
--	if (compr_type == UBIFS_COMPR_NONE) {
--		memcpy_to_folio(out_folio, out_offset, in_buf, in_len);
--		*out_len = in_len;
--		return 0;
--	}
--
--	{
--		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
--
--		acomp_request_set_dst_folio(req, out_folio, out_offset,
--					    *out_len);
--		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
--					    compr->name);
--	}
-+	return ubifs_decompress_common(c, in_buf, in_len, out_folio,
-+				       out_offset, out_len, true, compr_type);
- }
- 
- /**
 -- 
 2.39.5
 
