@@ -1,53 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0236620E30C;
-	Mon,  7 Apr 2025 16:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B457211704;
+	Mon,  7 Apr 2025 16:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744044115; cv=none; b=m2kblExlD3511+FZdWrCc/DcW/Rf6pcLlvyucxe/Av5QcHaf9bM6bL2b9uHShgRwRly1fWbzqHjEqxFjY9Iy13WsFY8FLQHlnBpt/tAN5BGDLt22kdFFN1vkARrRroRrDFxnjjnojaV4baKfJZpH7kTmNyGLCFCHIxkWfFiOG+4=
+	t=1744044524; cv=none; b=ionsBwo64AuUJctps8AsHGm4MS0Gazhk4TdnaZ8mEl5hyj0EXqJkr5bqOy64dw3y9bbuygwbH36reOosQ2c/HBx+O2FajGKIyBZDbBovNw8e3kFuexvmAxfco9tpy2Rewj1TgIyniz17fSAffz8kEoSypQMKDzWhZpDJaKz17As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744044115; c=relaxed/simple;
-	bh=2DZaBdiIWfRi2cZXVupSLX8P1kQDQE1JN+1+Y8S2N2Q=;
+	s=arc-20240116; t=1744044524; c=relaxed/simple;
+	bh=bmjI2mo1WVbWDZeX2Qfbgg6QuEIqWPvfMO/E2wzuVoY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJ0N0By+HDGtINQcAFHco8ma/ct3oSB61NIN27FTXpX81VWuMJrMRPFVzfNej1cXOiddKYTYsmm9ua6xjjkfBEkzFFa/JnDSJCxSvnX8WVxZz2z0KZK9G8K0rGSUPA5KA5Jjzz4IAlvV2GFTVrysg8MBPv0v7mc9/6JLE7mXJxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jx56oOeJ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=P5GuFmVo/dW3JJmYGTPkPQ82QU9VeTbPppZt13/iJ+mV2SGBLY66En+DOqQKK9Hu1mEmaUKNYSisPOKuwYINdK9ZEsFeq4qw5rBJhr5POmD8vdADUpqHeKDWUneH97yQMFcW+zNZ/tfV/xwk3ymjLxRvaillw2lmPoBrKD+18Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0XOd+2y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jx56oOeJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B715DC4CEDD;
-	Mon,  7 Apr 2025 16:41:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0XOd+2y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090B7C4CEDD;
+	Mon,  7 Apr 2025 16:48:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744044113;
-	bh=2DZaBdiIWfRi2cZXVupSLX8P1kQDQE1JN+1+Y8S2N2Q=;
+	s=k20201202; t=1744044524;
+	bh=bmjI2mo1WVbWDZeX2Qfbgg6QuEIqWPvfMO/E2wzuVoY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jx56oOeJKQbuRt2tp4+Xt6FIXUoZzIU/0LeM+CA9psDCzTxiRu73kTHMT8QNjQzxj
-	 NeJABgeGL2rOuTieaPWkit/Ti5qv6ZStUTbHWHH3sGmNBPrWvZZ5jFTC5/Y5G/Q5io
-	 csCPtwRcv7BVxCHj9xNP8nZc9ibQFOSwLZNMC44ARnPnjs2YZRo9CNfe5XgXv4ts97
-	 bOV/tzzCrGy41yMfhpifKnNcb9JXzPXg+YKSZZjjpPNJIrfhpHY8d5IZ8b8K+ND4sX
-	 OwjRJYyUZVeLpVEwwNRlqVAYJWUxvA00mDxRjqHnFU1wv5uh8MEYjIdA1XX5fWDld1
-	 X+TPrxdxwu2Aw==
-Date: Mon, 7 Apr 2025 09:41:51 -0700
+	b=X0XOd+2yo1YmafQv5UKRqkKILylyFSgn3Iz4xMRW+j1EKQW9ycTJEh32M2mW7hgem
+	 zlcNS1fNF2EbOMESsE8UXs+DnHYN87ZwI3oo2q76ugoXNSuzIgw4UyAB67LhQfpPb6
+	 uU91fR/fLX7P25na3pCXCaG5l6fpHgH9PkiujMlHb6ywGAxcyGIPV+kqNbMM87ZOTC
+	 X/fu8nxWevwkXZnKeMrsQENqEoSrapThGfd6o8Ke/uQeTGpu3gO5nvnx5Uxn60NNY3
+	 11d2pBYMao5tJ1RQTeTiKbkbfqyDNfhUoa2WJuXxHf7w01xKypRW3qwb9MccO3Xi60
+	 0fBpFZrKfGooA==
+Date: Mon, 7 Apr 2025 09:48:42 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Borislav Petkov <bp@alien8.de>, Brian Gerst <brgerst@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uros Bizjak <ubizjak@gmail.com>, Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 0/4] Make gcc-8.1 and binutils-2.30 the minimum version
-Message-ID: <20250407164151.GB2536@sol.localdomain>
-References: <20250407094116.1339199-1-arnd@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] crypto: x86/chacha - Remove SIMD fallback path
+Message-ID: <20250407164842.GC2536@sol.localdomain>
+References: <CAMj1kXE-vo7E1U++4mAqDH2SXfc=sRZs8KganedJk5z0QF49NA@mail.gmail.com>
+ <Z-zzvXbjt3xzquXb@gondor.apana.org.au>
+ <20250402171930.GD1235@sol.localdomain>
+ <Z-3jkYNtZpTDtKGf@gondor.apana.org.au>
+ <20250403021453.GA2872965@google.com>
+ <Z-344xAsx1uTE9OK@gondor.apana.org.au>
+ <20250403032008.GA129577@sol.localdomain>
+ <Z-4DqsRApwQi6Xju@gondor.apana.org.au>
+ <20250403035934.GB129577@sol.localdomain>
+ <Z-4LOoynbEz3ZLuQ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,45 +53,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407094116.1339199-1-arnd@kernel.org>
+In-Reply-To: <Z-4LOoynbEz3ZLuQ@gondor.apana.org.au>
 
-On Mon, Apr 07, 2025 at 11:41:12AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Thu, Apr 03, 2025 at 12:14:50PM +0800, Herbert Xu wrote:
+> On Wed, Apr 02, 2025 at 08:59:34PM -0700, Eric Biggers wrote:
+> >
+> > But in a lot of cases there is also no reason to even add that restriction.  I'm
+> > not sure why you're so eager to make the library functions harder to use.
 > 
-> x86 already requires gcc-8.1 since linux-6.15-rc1, which led me to
-> actually go through all  version checks and make this is the minimum
-> for all architectures.
+> I have no intention of making any changes to siphash.  It doesn't
+> even use SIMD.
 > 
-> Most of the actual resulting changes are actually for raising the
-> binutils version, which eliminates version checks on x86 and arm64.
+> All I want to do is get rid of the crypto_simd_usable() fallback
+> paths that we currently have in arch/x86/crypto.  This code is
+> never used in hardirq context (and should never be).
 > 
-> Arnd Bergmann (4):
->   kbuild: require gcc-8 and binutils-2.30
->   raid6: skip avx512 checks
->   x86: remove checks for binutils-2.30 and earlier
->   arm64: drop binutils version checks
+> For example:
+> 
+> ---8<---
+> Get rid of the fallback path as SIMD is now always usable in softirq
+> context.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
 
-This is intended to supersede the patches from Uros that removed checks for
-binutils < 2.25, right?  See:
+It looks like this broken patch already got applied for some reason.
 
-* https://lore.kernel.org/linux-crypto/20250404074135.520812-1-ubizjak@gmail.com/
-* https://lore.kernel.org/linux-crypto/20250404074135.520812-2-ubizjak@gmail.com
-* https://lore.kernel.org/linux-crypto/20250404074135.520812-3-ubizjak@gmail.com/
+First, there doesn't seem to be agreement yet that the library functions should
+have requirements on the calling context.
 
-If we can indeed bump up the requirement to 2.30, that would be great.
-
-Just a note though: I recently added VAES and VPCLMULQDQ instructions to
-BoringSSL, which increased the binutils requirement of building BoringSSL to
-2.30, and this caused issues in a downstream project; e.g. see
-https://github.com/briansmith/ring/issues/2463.  Specifically people complained
-about being unable to build on Amazon Linux 2 and CentOS/RHEL/Oracle Linux 7.
-
-So I just thought I'd mention that, based on past experience with this sort of
-thing, those are the specific cases where it seems people are most likely to be
-trying to use binutils < 2.30.
-
-But if those distros are not going to be supported any longer (without
-installing newer tools on them), or even are already unsupported due to the gcc
-requirement, bumping up the binutils requirement to 2.30 sounds good to me.
+Second, your patch made unrelated changes that deleted the checks for SSSE3
+support.  Thus dropping support for CPUs that don't support SSSE3.
 
 - Eric
