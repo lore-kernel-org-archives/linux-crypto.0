@@ -1,144 +1,134 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F4A222597;
-	Mon,  7 Apr 2025 05:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EA72A8C1;
+	Mon,  7 Apr 2025 06:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744003747; cv=none; b=QuaOzgnxoJX1xfF/1E1PpUpRSz+i2Zr0QQWuAUy3NxU9VbwOc5Tpoll8pub6k+IyBRm5SjqMAp0X/9LZdvKqa1KTcFpsxjWQgm9KV0Zt1AuVZVanHsI/cqRxf6mr/rZ/JgrogBWgAQMONb6iMropzfHAEwW4m6h4MFWJFn9tcyU=
+	t=1744007182; cv=none; b=W2NdnKVT+3C5H38jgVH3G76j16O7/wHPJm85XcS2uFJvK/cq5X+bAQbiBGM/g5ahdX/2DiAVpMvOreE4gVVDOTMFd6jfX+8LpTd2Q/Iu5N6DxqoKcMFzCQRdBABW074mO28Mlwqg4+5AfvjdVsWI3F5Ti8dZospKZpSBaNV+k2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744003747; c=relaxed/simple;
-	bh=TMWo6TilJBKfo3LYo71Znhv2YGopbCDAEw2cpZxuRnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=M0RaSnWvjB/LrP9JjnZ1P+s3yjROmwHY4Cd/g6ioeoSVpNhEZaJwGOsQJTTt4J71iI7CCs6DvGmW8+e5gzbg6ai6YthwK2SnZFdhp28h0AMXCmHzIIXhcQp7/SfBvee3NpGqE07uZGTWtEVu360OA/ver/sBRcZwvg7kYbcOaRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=UHwODn/V; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1744007182; c=relaxed/simple;
+	bh=k8YYOPh/3JkuLOMn/Hj98STqPu3UvcIJ1IzVOh1TAOA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jsJ92awq78QcSgGJb1zhxISzzBfx80LoxCKpmu/SqcKPj7eKsA88atrBbbDU2MoVYVw98qI/AJKLblajWn00uWW0fYDk2k60AwwNqsIYlnLYtcbwXemYdlQqQmuQxXWmU0hM7wdP93NlMOXjxzNoBk+HxmAuGAoRKuKQsm3SMOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V//rwAjW; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="UHwODn/V"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dB9keRMOwVIcNoNRSHHCD2QKgPNuoGWRXYd2uwzW990=; b=UHwODn/VjKqS1kbYWo32znTwIw
-	MpG+JrhQnruzYLJX7YQgJWvbKzQEVRLBvy+UtAHi+prcy5LeUWFzHeyu50iWv7ZK2ZXKEI411HdBa
-	INdLSkaiUMFA7St1XvHZCW6gpjZ/2fBNspqrUn4sydcldmLTQK3JipGLUX6JBpyhtaGFyUko+gNb9
-	ahhkIXuXKtsuWfFxIr07DIWSvlFWv9XCC35yW/hlTv6DR0CyIboNnoXiPAZlcUDhopzdffRNRbUsV
-	bbEO4jeMKg2+Ye/30S7ktszHbEo4g+SHTyevuL6IO8GGowfjSH7PNtJ1Mzj5vhPd3xQZHT7RapLsr
-	wT/2Mn5g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u1f2Y-00DNNS-2U;
-	Mon, 07 Apr 2025 13:28:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 13:28:58 +0800
-Date: Mon, 7 Apr 2025 13:28:58 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
-	Jason@zx2c4.com, torvalds@linux-foundation.org
-Subject: Re: [PATCH 0/9] Remove per-architecture ChaCha skcipher glue code
-Message-ID: <Z_Nimiv1Wkfo3gBd@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V//rwAjW"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso42704085e9.3;
+        Sun, 06 Apr 2025 23:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744007179; x=1744611979; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7vcZaHtT0Bdp7jhNpBVwgeNyTw0QbyKnO+4kb1PkgZw=;
+        b=V//rwAjWBfRLbFdQ4NmYutnEKNJP6XdGcRTo5ckph0Kcqf2qHslEQsNNJI67WTG6KA
+         AlzPIYC5PZLUwyo772JtYFzXFq4iyLobzjEzmp1XSwmQnSdZRzaHzU7g2wSIoG9BNrNg
+         6ysZs0COspIFREZksUvaOK2pOvjjN1XFcxCwzk0YhOOl4OYQsRPAlg10sjwPWbzY6/xG
+         vuAbSbKSHwctG30f9KNuTZsr1/apAHUijw++0BNZLVNa8L5dOdwz+STgKjFi/fne6BKc
+         Mgj5gr3TfTLlvkmjSHf9+HgmozuZAqcolWtyXspg95OEZS9NV9Hh2mP3k05ExzKWdsXx
+         04Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744007179; x=1744611979;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7vcZaHtT0Bdp7jhNpBVwgeNyTw0QbyKnO+4kb1PkgZw=;
+        b=AgjXRlwuGKW6xauMtU/d0iv9V+U2jtXJxBHg6dYCW8LbvnXj8e3pvT8O+jVpogpb4p
+         9+re4Dh2pEWycWLMUIni05g2PO4MdL7IFrnjyCkMxEiaIioFiZcHH2t3HUv0/CTxKLwP
+         SriQC57jrt8rwUxM9sUAtV9qx0OOq2Z6wjyut+aK9bh2btx0lfhhc/11wwKVhD80Hprm
+         BiOv935f9+o1cPOkLzI9hBrtBA8bUoI7et9qsQ3IbDnkePZPni361bzuG8bQaXbB5tsw
+         WD6dfC59Xw1eS902TqUwAa3vbao1tidEMpqB0qc79ZKJiSna9bD4i/cc6zrmRFUNNs6o
+         i94A==
+X-Forwarded-Encrypted: i=1; AJvYcCWxjy5WjyNvibQHaF3lNSOTHTLWmfUgA21yTT/Vv1xrI1EcjPwKoGlPaCvWC/cg7B5vS2Ut4eWowNg4rClu@vger.kernel.org, AJvYcCWxvCf1sOLIE+ccTVk1UmX6hd5MjvnZzOTNBe+JTX+1E5X5DzSNd4LxcX/cen48tg/7GJUOtAijdmokAdE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ6U1/TA8IIKGH7cuBnkY+nBLhMvUnP/GviF+RRmefCS4Lg+Cd
+	+qk5MbVf9EldIG3fI5ste0NtvOmBQf47XNPoEAgQNsMSIkG88aGLWLCaHQ==
+X-Gm-Gg: ASbGncuQrfWblU6YUdPpMvs6zcMyCiCPbfUSzOS550GKcPKDFKQs2ioGinxnMWeLFya
+	V1WDF29wFNXrmIkqAAZ3SQ4k/XD/47gOQltfQceaW2eqG3I66f+XIo1873QhzcBL+Rjk8EjkKcy
+	7vKznBHMduKNw6peQ2yw74tLcCp9m+7LxBEKN55wBjpKsBbFct8/bpDASk+qq4VuAY08WsbKs7R
+	eqBUqi+apHVNNExASvL5XWkj3l/u4h2B2//LGjOp0cU0QFUy9vyruv7iLT/KRYWYcj6H2r/s3L5
+	pX/laSvRIyAFih19CZrdaKxRROzPkAoHSPt9SRErrMv5T0svn/CUtosi/3KgU1pbRn7Qt6SNVgB
+	srRiC+3ewRqobrfib0XHvGjhBo71lgg==
+X-Google-Smtp-Source: AGHT+IGNAbuqm5FmxluF5wtjWawmF2WQ5tcvDHorTjnjuiAauWPbvFZ5uA5beNY4uy00YPPjFwGD/g==
+X-Received: by 2002:a05:600c:a04:b0:43c:efed:733e with SMTP id 5b1f17b1804b1-43ee06401a7mr54753425e9.14.1744007178599;
+        Sun, 06 Apr 2025 23:26:18 -0700 (PDT)
+Received: from ?IPV6:2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6? ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a9da1sm10916991f8f.22.2025.04.06.23.26.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 06 Apr 2025 23:26:18 -0700 (PDT)
+Message-ID: <115a9838-faf0-4607-87f9-c952b43bca78@gmail.com>
+Date: Mon, 7 Apr 2025 09:26:17 +0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250405182609.404216-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/6] crypto: sun8i-ce-hash - drop
+ CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG ifdefs
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: clabbe.montjoie@gmail.com, davem@davemloft.net,
+ linux-crypto@vger.kernel.org, wens@csie.org, jernej.skrabec@gmail.com,
+ samuel@sholland.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
+ <20250401192321.3370188-4-ovidiu.panait.oss@gmail.com>
+ <Z_NM9LnUF6Gpv_iz@gondor.apana.org.au>
+Content-Language: en-US
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+In-Reply-To: <Z_NM9LnUF6Gpv_iz@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> Currently each architecture exposes ChaCha not only through the library
-> API, but also through the crypto_skcipher API.  That requires each
-> architecture to implement essentially the same skcipher glue code.
-> 
-> Following the example of what's been done for crc32 and crc32c,
-> eliminate this redundancy by making crypto/chacha.c register both the
-> generic and architecture-optimized skcipher algorithms, implemented on
-> top of the appropriate library functions.  This removes almost 800 lines
-> of code and disentangles the library code from the skcipher API.
-> 
-> From what I remember, the following are the reasons why it wasn't just
-> done this way originally.  But none of these really hold water:
-> 
-> - The skcipher code was there first, so it may have seemed more natural
->  to add onto it rather than replace it.
-> 
-> - Architectures could register multiple skcipher algorithms using
->  different CPU features and have them all be tested in a single boot.
->  This was convenient in theory, but it never really worked properly.
->  It didn't apply to the library code, the x86 ChaCha code wasn't
->  actually doing this (it used static keys instead), and this cannot
->  catch bugs like accidentally using an AVX instruction in SSE code.
->  Instead, a correct solution, which also doesn't require any special
->  kernel support, is to just boot the kernel in QEMU using different
->  -cpu arguments as needed to test all the code.
-> 
-> - There was a concern about changing cra_driver_names potentially
->  breaking users.  But in practice users rely on cra_name, not
->  cra_driver_name.  We already change, add, and remove cra_driver_names
->  occasionally for various reasons.  And even if someone was relying on
->  a specific cra_driver_name, there are some more lightweight
->  compatibility tricks that could be used.
-> 
-> - There was a desire for users to be able to override the kernel's
->  choice of ChaCha implementation by blacklisting the arch-optimized
->  ChaCha module.  But that already became mostly impossible when the
->  library functions were added to the same module.  And in practice
->  users don't do this anyway.  Even if, hypothetically, someone really
->  needed to do this and for some reason the kernel couldn't be fixed to
->  make the right choice in their case automatically, there are other
->  ways this could be implemented such as a module parameter.
-> 
-> Eric Biggers (9):
->  crypto: riscv/chacha - implement library instead of skcipher
->  crypto: chacha - centralize the skcipher wrappers for arch code
->  crypto: arm/chacha - remove the redundant skcipher algorithms
->  crypto: arm64/chacha - remove the skcipher algorithms
->  crypto: mips/chacha - remove the skcipher algorithms
->  crypto: powerpc/chacha - remove the skcipher algorithms
->  crypto: s390/chacha - remove the skcipher algorithms
->  crypto: x86/chacha - remove the skcipher algorithms
->  crypto: chacha - remove <crypto/internal/chacha.h>
-> 
-> arch/arm/crypto/Kconfig                 |   7 -
-> arch/arm/crypto/chacha-glue.c           | 243 +---------------------
-> arch/arm/crypto/chacha-neon-core.S      |   2 +-
-> arch/arm64/crypto/Kconfig               |   7 -
-> arch/arm64/crypto/chacha-neon-core.S    |   2 +-
-> arch/arm64/crypto/chacha-neon-glue.c    | 146 +------------
-> arch/mips/crypto/Kconfig                |   6 -
-> arch/mips/crypto/chacha-glue.c          | 131 +-----------
-> arch/powerpc/crypto/Kconfig             |   8 -
-> arch/powerpc/crypto/chacha-p10-glue.c   | 147 +-------------
-> arch/riscv/crypto/Kconfig               |  11 +-
-> arch/riscv/crypto/chacha-riscv64-glue.c | 112 ++++------
-> arch/riscv/crypto/chacha-riscv64-zvkb.S |  71 +++----
-> arch/s390/crypto/Kconfig                |   7 -
-> arch/s390/crypto/chacha-glue.c          |  99 ++-------
-> arch/x86/crypto/Kconfig                 |   9 -
-> arch/x86/crypto/chacha_glue.c           | 144 +------------
-> crypto/Makefile                         |   3 +-
-> crypto/chacha.c                         | 260 ++++++++++++++++++++++++
-> crypto/chacha_generic.c                 | 139 -------------
-> include/crypto/chacha.h                 |   9 +
-> include/crypto/internal/chacha.h        |  43 ----
-> 22 files changed, 413 insertions(+), 1193 deletions(-)
-> create mode 100644 crypto/chacha.c
-> delete mode 100644 crypto/chacha_generic.c
-> delete mode 100644 include/crypto/internal/chacha.h
-> 
-> base-commit: 56f944529ec2292cbe63377a76df3759d702dd39
+Hi,
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 4/7/25 6:56 AM, Herbert Xu wrote:
+> On Tue, Apr 01, 2025 at 10:23:19PM +0300, Ovidiu Panait wrote:
+>> 'struct sun8i_ce_alg_template' is always defined, even with
+>> CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG disabled, so the ifdef guards
+>> are not needed.
+>>
+>> Make sure the statistics have IS_ENABLED() checks instead.
+>>
+>> Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+>> ---
+>>   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 8 +++-----
+>>   1 file changed, 3 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+>> index b0959d8218cb..530c5181d73c 100644
+>> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+>> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+>> @@ -31,9 +31,7 @@ static void sun8i_ce_hash_stat_fb_inc(struct crypto_ahash *tfm)
+>>   
+>>   		algt = container_of(alg, struct sun8i_ce_alg_template,
+>>   				    alg.hash.base);
+>> -#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+>>   		algt->stat_fb++;
+>> -#endif
+> 
+> Should this go under IS_ENABLED as well?
+> 
+
+This is already part of an IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG) 
+block, so no need to add an extra IS_ENABLED() check here. Just the 
+ifdef was dropped:
+
+	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
+		struct sun8i_ce_alg_template *algt __maybe_unused;
+		struct ahash_alg *alg = crypto_ahash_alg(tfm);
+
+		algt = container_of(alg, struct sun8i_ce_alg_template,
+				    alg.hash.base);
+#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+		algt->stat_fb++;
+#endif
+	}
+
+Thanks,
+
+> Thanks,
+
