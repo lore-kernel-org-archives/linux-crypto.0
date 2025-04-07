@@ -1,143 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826302376E2;
-	Mon,  7 Apr 2025 11:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5263623E35D;
+	Mon,  7 Apr 2025 11:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744025410; cv=none; b=PwtV84XX+YHQhVKN2YmuIzhQtf7gf/+EojBPs9EPpjAo8993Jdwh4PcN/OZyqz10BI4fWmTL6UTCkFh8jUSeagYB5cpcNU7qtgmPj4ji+Fi2FsbDk1pdsEXIkD0p9DN1dHwmxcWO6BftA1Pc9Uym9LjsksEnKtnHlroZ3fjbjO8=
+	t=1744026045; cv=none; b=EqLPa82x9t2EdOYNeKHwmdXmJUwwzakSDYNT8J232Kr3pqr4gOCcs2mRchAMstW3cwkgBuxzBXsgntG3dxDU/eQhY/8QsXmL6MpLLHY6R9XbBUokY42g4USdfvwp6YFWlux64z+SbkPIDeRNfHDTt/66bEAFYGqHJCdETYuql54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744025410; c=relaxed/simple;
-	bh=u90GVaNUUo76YLN6SKbqib+18pDw2l0zRWHHUjFm3as=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubIYfqCmvvfKVC2HuKOqw9ft5OH0rUUZvH5tr/KYtDqAtsGvpxEhRKukUTmiDEvkPcGiHVsC9DIAGGhIBVu+cfV0HkTyqW5BcWvtYoJvE227c6+0hjkSOIDFXuqqaL/2I3T7DroDgBM8OOraH2iKR4VWbPpomQMoZnHIcPdWD78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llN8+xbS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744026045; c=relaxed/simple;
+	bh=vzyAKLHqu3gRIT3XigIACxVJDWJCCNJWkRCnR4vlrpU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iZRrNJQBAXLycI7EFiJyPDwDnDnbAXRvK2I/ah6YjlDh77Jml0hgKRFstpySu9aB+5gb2RyBoDGAYsGNs0jPsoj5AHda+HRt7F9IfXHSEknKbbIr3zPWtyVt6IOr5snXJvvlwKIQs8gVwYPANuAX5CF3tmh7XjduVrXEQL6eSek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ihfvx7i3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llN8+xbS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BEDC4CEDD;
-	Mon,  7 Apr 2025 11:30:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ihfvx7i3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4031CC4CEDD;
+	Mon,  7 Apr 2025 11:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744025410;
-	bh=u90GVaNUUo76YLN6SKbqib+18pDw2l0zRWHHUjFm3as=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=llN8+xbS7zazGfzUGA1WFZphuPkSIBLxMdii7M0vqEbEp38Ifvz9TfkFMp1BvsZ3d
-	 xV/EvfVLdIBjh+Gi7m84ZRajTEngrnXkdwHfcxgI6s9zMOtYFRcNQX4mLhdLnF9goV
-	 6S+JUklyeoXGK36lUhD314sgiSKGmSAx5SHu8AAwJE5WEaaBxpB3k+3WG3SFcMb+vI
-	 li08zR6BSkj/XAYX/BOh0S7ClxD5q0T4scHihZBvirPJtrSM1Bj9c1OuYyGKV+90jl
-	 FgHcYjbLf7VW3kxNTGgpxeCEUR9kr0+qiABOTIvCin6/RNq5zAyHh3NHBzLC+1UZWr
-	 YJ0ApstZK5a7A==
-Date: Mon, 7 Apr 2025 14:30:05 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: keyrings@vger.kernel.org, stable@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v3] tpm: Mask TPM RC in tpm2_start_auth_session()
-Message-ID: <Z_O3PU5XDbDirlUO@kernel.org>
-References: <20250407071731.78915-1-jarkko@kernel.org>
- <20250407072057.81062-1-jarkko@kernel.org>
- <2mjtwprr3dujf4wbu5licb3jtzxujimcz5iahrgqymu6znwbbq@cslxwt7ejva3>
+	s=k20201202; t=1744026044;
+	bh=vzyAKLHqu3gRIT3XigIACxVJDWJCCNJWkRCnR4vlrpU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ihfvx7i3hTmS/r04UM0uF1arK6LEBDn5fWytpW7+ZiJsnRDfmKLwJBtzh7PN1XNSI
+	 u+znc1IeLnyjRrgKMkjD94YLwDy+wtZLg1H+uqMpTGNke8HlUc2cDCa5sLVuT2YSQg
+	 g2RqmcKfRwUpKnWGiNhh9HBrxMujr3oxWEnU1xxJ3WN8RqoFq5oCjQ7Kz+AprXY7CM
+	 q9vc4EozkL2+taALxeW3EFGp4AdYg9TZ1OSfRLODymwNydsqrEAhbszSLVr6fWRChT
+	 X8u1VlbYEIbqkl82fa1NwmOLeASjXl7YSgiLzOUMPlbythNvreSWcHUrQFYnXsDe+m
+	 g9XQKpYvS2tig==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>,
+	Yi Liu <yi.l.liu@intel.com>, iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev, Zhi Wang <zhiw@nvidia.com>,
+	AXu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+In-Reply-To: <20250401160340.GK186258@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com> <yq5av7rt7mix.fsf@kernel.org>
+ <20250401160340.GK186258@ziepe.ca>
+Date: Mon, 07 Apr 2025 17:10:29 +0530
+Message-ID: <yq5a4iz019oy.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2mjtwprr3dujf4wbu5licb3jtzxujimcz5iahrgqymu6znwbbq@cslxwt7ejva3>
+Content-Type: text/plain
 
-On Mon, Apr 07, 2025 at 10:04:09AM +0200, Stefano Garzarella wrote:
-> On Mon, Apr 07, 2025 at 10:20:57AM +0300, Jarkko Sakkinen wrote:
-> > tpm2_start_auth_session() does not mask TPM RC correctly from the callers:
-> > 
-> > [   28.766528] tpm tpm0: A TPM error (2307) occurred start auth session
-> > 
-> > Process TPM RCs inside tpm2_start_auth_session(), and map them to POSIX
-> > error codes.
-> > 
-> > Cc: stable@vger.kernel.org # v6.10+
-> > Fixes: 699e3efd6c64 ("tpm: Add HMAC session start and end functions")
-> > Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > Closes: https://lore.kernel.org/linux-integrity/Z_NgdRHuTKP6JK--@gondor.apana.org.au/
-> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > ---
-> > v3:
-> > - rc > 0
-> > v2:
-> > - Investigate TPM rc only after destroying tpm_buf.
-> > ---
-> > drivers/char/tpm/tpm2-sessions.c | 31 +++++++++++++++++--------------
-> > include/linux/tpm.h              |  1 +
-> > 2 files changed, 18 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-> > index 3f89635ba5e8..abd54fb0a45a 100644
-> > --- a/drivers/char/tpm/tpm2-sessions.c
-> > +++ b/drivers/char/tpm/tpm2-sessions.c
-> > @@ -40,11 +40,6 @@
-> >  *
-> >  * These are the usage functions:
-> >  *
-> > - * tpm2_start_auth_session() which allocates the opaque auth structure
-> > - *	and gets a session from the TPM.  This must be called before
-> > - *	any of the following functions.  The session is protected by a
-> > - *	session_key which is derived from a random salt value
-> > - *	encrypted to the NULL seed.
-> >  * tpm2_end_auth_session() kills the session and frees the resources.
-> >  *	Under normal operation this function is done by
-> >  *	tpm_buf_check_hmac_response(), so this is only to be used on
-> > @@ -963,16 +958,13 @@ static int tpm2_load_null(struct tpm_chip *chip, u32 *null_key)
-> > }
-> > 
-> > /**
-> > - * tpm2_start_auth_session() - create a HMAC authentication session with the TPM
-> > - * @chip: the TPM chip structure to create the session with
-> > + * tpm2_start_auth_session() - Create an a HMAC authentication session
-> > + * @chip:	A TPM chip
-> >  *
-> > - * This function loads the NULL seed from its saved context and starts
-> > - * an authentication session on the null seed, fills in the
-> > - * @chip->auth structure to contain all the session details necessary
-> > - * for performing the HMAC, encrypt and decrypt operations and
-> > - * returns.  The NULL seed is flushed before this function returns.
-> > + * Loads the ephemeral key (null seed), and starts an HMAC authenticated
-> > + * session. The null seed is flushed before the return.
-> >  *
-> > - * Return: zero on success or actual error encountered.
-> > + * Returns zero on success, or a POSIX error code.
-> >  */
-> > int tpm2_start_auth_session(struct tpm_chip *chip)
-> > {
-> > @@ -1024,7 +1016,7 @@ int tpm2_start_auth_session(struct tpm_chip *chip)
-> > 	/* hash algorithm for session */
-> > 	tpm_buf_append_u16(&buf, TPM_ALG_SHA256);
-> > 
-> > -	rc = tpm_transmit_cmd(chip, &buf, 0, "start auth session");
-> > +	rc = tpm_transmit_cmd(chip, &buf, 0, "StartAuthSession");
-> > 	tpm2_flush_context(chip, null_key);
-> > 
-> > 	if (rc == TPM2_RC_SUCCESS)
-> > @@ -1032,6 +1024,17 @@ int tpm2_start_auth_session(struct tpm_chip *chip)
-> > 
-> > 	tpm_buf_destroy(&buf);
-> > 
-> > +	if (rc > 0) {
-> 
-> To avoid the nesting blocks, can we include `TPM2_RC_SUCCESS` case in the
-> switch or move the `if (rc == TPM2_RC_SUCCESS)` before it?
+Jason Gunthorpe <jgg@ziepe.ca> writes:
 
-What do you mean by "avoiding nesting blocks"?
+> On Fri, Mar 28, 2025 at 10:57:18AM +0530, Aneesh Kumar K.V wrote:
+>> > +int iommufd_vdevice_tsm_bind_ioctl(struct iommufd_ucmd *ucmd)
+>> > +{
+>> > +	struct iommu_vdevice_tsm_bind *cmd = ucmd->cmd;
+>> > +	struct iommufd_viommu *viommu;
+>> > +	struct iommufd_vdevice *vdev;
+>> > +	struct iommufd_device *idev;
+>> > +	struct tsm_tdi *tdi;
+>> > +	int rc = 0;
+>> > +
+>> > +	viommu = iommufd_get_viommu(ucmd, cmd->viommu_id);
+>> > +	if (IS_ERR(viommu))
+>> > +		return PTR_ERR(viommu);
+>> >
+>> 
+>> Would this require an IOMMU_HWPT_ALLOC_NEST_PARENT page table
+>> allocation?
+>
+> Probably. That flag is what forces a S2 page table.
+>
+>> How would this work in cases where there's no need to set up Stage 1
+>> IOMMU tables?
+>
+> Either attach the raw HWPT of the IOMMU_HWPT_ALLOC_NEST_PARENT or:
+>
+>> Alternatively, should we allocate an IOMMU_HWPT_ALLOC_NEST_PARENT with a
+>> Stage 1 disabled translation config? (In the ARM case, this could mean
+>> marking STE entries as Stage 1 bypass and Stage 2 translate.)
+>
+> For arm you mean IOMMU_HWPT_DATA_ARM_SMMUV3.. But yes, this can work
+> too and is mandatory if you want the various viommu linked features to
+> work.
+>
 
-> 
-> Thanks,
-> Stefano
+I was trying to prototype this using kvmtool and I have run into some
+issues. First i needed the below change for vIOMMU alloc to work
 
-BR, Jarkko
+modified   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -4405,6 +4405,8 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
+ 	if (FIELD_GET(IDR3_RIL, reg))
+ 		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
++	if (FIELD_GET(IDR3_FWB, reg))
++		smmu->features |= ARM_SMMU_FEAT_S2FWB;
+ 
+ 	/* IDR5 */
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR5);
+
+
+
+Also current code don't allow a Stage 1 bypass, Stage2 translation when
+allocating HWPT.
+
+arm_vsmmu_alloc_domain_nested -> arm_smmu_validate_vste -> 
+
+	cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(arg->ste[0]));
+	if (cfg != STRTAB_STE_0_CFG_ABORT && cfg != STRTAB_STE_0_CFG_BYPASS &&
+	    cfg != STRTAB_STE_0_CFG_S1_TRANS)
+		return -EIO;
+
+
+This only allow a abort or bypass or stage1 translate/stage2 bypass config
+
+Also if we don't need stage1 table, what will
+iommufd_viommu_alloc_hwpt_nested() return?
+
+>
+>> Also, if a particular setup doesn't require creating IOMMU
+>> entries because the entire guest RAM is identity-mapped in the IOMMU, do
+>> we still need to make tsm_tdi_bind use this abstraction in iommufd?
+>
+> Even if the viommu will not be exposed to the guest I'm expecting that
+> iommufd will have a viommu object, just not use various features. We
+> are using viommu as the handle for the KVM, vmid and other things that
+> are likely important here.
+>
+> Jason
+
+-aneesh
