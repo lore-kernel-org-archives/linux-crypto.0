@@ -1,103 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ECF1EE032;
-	Mon,  7 Apr 2025 18:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58A81FC7D2;
+	Mon,  7 Apr 2025 19:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744050624; cv=none; b=UQhEXxx4fMnk0gMEGfYvwFSoj0cRAB0U4rARMEoPe6qnFkybsAa9IL80h9pFxn4POqPWlG33ZchZ+G8zFHHViv83pWWd7Lql1SIAUV7NlO7TC8EGlrLOOv7qUJHkSzEC8KtS8yl4I2mrqrGPM4tVj7wA5omDzt6QHG0dtgirCL4=
+	t=1744054568; cv=none; b=nAaMmlCnEk+ZNd4hRqIyr1idbf3kSTBAyHgfnf/YViDr7JeNY2FtqomYf4Jc4uSeJyG40BxUviT8SRktAjwdes7fnRwT7nmYqcPo55PE4Ne1nnPYRNyi3KKprzwmHAOxPxe4qXywlgGrPnayr8kZT+SmuRKG4y4NbxEmM33TI4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744050624; c=relaxed/simple;
-	bh=FQMfGLh5C6n7JuybfDzu2iuG/1Pw/ID6KqOpxvzKSf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozC/uJIQ9M1dTTg8Q5PLahdXS6hJYHO6L7B5P7J/IqGQz0/t7dYIGtRo5XSGLbv1NYzHlTjnTl6rjGNLLyb/3jA69btfziE79n1Yx3UXB06nwj3olPMecCQqJ5/WaWigVl6wb2lm7w6jaBd6sqqbdeeqfTEexB00wgkLkAV7tmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qhr8f8gZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qhr8f8gZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D8DFC4CEDD;
-	Mon,  7 Apr 2025 18:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744050624;
-	bh=FQMfGLh5C6n7JuybfDzu2iuG/1Pw/ID6KqOpxvzKSf0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qhr8f8gZiL0WRr46kStn2vSZUbAYQXAuO0aN9Q++95HNF7FaI8kzwZSbly1LsBypL
-	 /MdsuXsMr+wp2Pjy8kXUAqkw5XZqGFteMbwpbvxr8Daj+eDx63tVuOgCzLkrgoFW9K
-	 O7yUUZJSQ/RJHzcpPP4yliEQTYEVcmEjK2mx+nDQU2+Ab1HJ1pR9RlUjD3m2o1j2b6
-	 iyU4WfBchLKbUk4sjkdCjSDahIan+K2xDP3sK0Lg34NFdEt8wEiBpS6EN36kmySjRl
-	 5NvqLJyvpIJbfe3cCeJIcv2Smi4XWmBXtRP5YBIa5HO7wjSWuG2hkFAnzHl2/Cz0Pf
-	 4LgmFHUyS9Mjg==
-Date: Mon, 7 Apr 2025 20:30:15 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Arnd Bergmann <arnd@kernel.org>, linux-kbuild@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uros Bizjak <ubizjak@gmail.com>, Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 0/4] Make gcc-8.1 and binutils-2.30 the minimum version
-Message-ID: <Z_QZt8mPEf-dlvcZ@gmail.com>
-References: <20250407094116.1339199-1-arnd@kernel.org>
- <20250407164151.GB2536@sol.localdomain>
+	s=arc-20240116; t=1744054568; c=relaxed/simple;
+	bh=KxWHy3JgTWzGoPPKad6LBed8Ji/zR+U0rvQ32UER9f4=;
+	h=Message-Id:From:Date:Subject:To:Cc; b=YQjFq6emdnUMzEAlwIUzk9vU1Fhn367pMDxph/BVjo6SrrhnEkWw7voUS+EjLEkjeuvc7rjXW4GZoW+WeIYsTx/38i9kiPpL2230A1lusmf+rmXXDdH9G/YXL3/J9US0ke5c3RMk4UumukZvEl7VqzLFQcC6ok3LxLLSk6x6/Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id E64242C4C0F1;
+	Mon,  7 Apr 2025 21:35:34 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id F0AEA32756; Mon,  7 Apr 2025 21:35:55 +0200 (CEST)
+Message-Id: <cover.1744052920.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Mon, 7 Apr 2025 21:32:40 +0200
+Subject: [PATCH RESEND v2 0/2] ecdsa KEYCTL_PKEY_QUERY fixes
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
+Cc: David Howells <dhowells@redhat.com>, Ignat Korchagin <ignat@cloudflare.com>, Stefan Berger <stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407164151.GB2536@sol.localdomain>
+
+Here are two patches for ecdsa to avoid reporting nonsensical values
+for enc/dec size and -- for P521 keys -- also the key size in response
+to KEYCTL_PKEY_QUERY system calls.
+
+Resending as requested by Herbert:
+
+  https://lore.kernel.org/r/Z9fuCTAAOphOvEeH@gondor.apana.org.au/
+
+Link to the original submission:
+
+  https://lore.kernel.org/r/cover.1738521533.git.lukas@wunner.de/
+
+Although these are technically fixes, the issues they address are
+not critical, so I recommend not applying as fixes for v6.15,
+but rather let the patches soak in linux-next for v6.16.
 
 
-* Eric Biggers <ebiggers@kernel.org> wrote:
+Lukas Wunner (2):
+  crypto: ecdsa - Fix enc/dec size reported by KEYCTL_PKEY_QUERY
+  crypto: ecdsa - Fix NIST P521 key size reported by KEYCTL_PKEY_QUERY
 
-> On Mon, Apr 07, 2025 at 11:41:12AM +0200, Arnd Bergmann wrote:
-> > From: Arnd Bergmann <arnd@arndb.de>
-> > 
-> > x86 already requires gcc-8.1 since linux-6.15-rc1, which led me to
-> > actually go through all  version checks and make this is the minimum
-> > for all architectures.
-> > 
-> > Most of the actual resulting changes are actually for raising the
-> > binutils version, which eliminates version checks on x86 and arm64.
-> > 
-> > Arnd Bergmann (4):
-> >   kbuild: require gcc-8 and binutils-2.30
-> >   raid6: skip avx512 checks
-> >   x86: remove checks for binutils-2.30 and earlier
-> >   arm64: drop binutils version checks
-> 
-> This is intended to supersede the patches from Uros that removed checks for
-> binutils < 2.25, right?  See:
-> 
-> * https://lore.kernel.org/linux-crypto/20250404074135.520812-1-ubizjak@gmail.com/
-> * https://lore.kernel.org/linux-crypto/20250404074135.520812-2-ubizjak@gmail.com
-> * https://lore.kernel.org/linux-crypto/20250404074135.520812-3-ubizjak@gmail.com/
+ crypto/asymmetric_keys/public_key.c | 13 +++++++++----
+ crypto/ecdsa-p1363.c                |  6 ++++--
+ crypto/ecdsa-x962.c                 |  5 +++--
+ crypto/ecdsa.c                      |  2 +-
+ crypto/ecrdsa.c                     |  2 +-
+ crypto/rsassa-pkcs1.c               |  2 +-
+ crypto/sig.c                        |  9 +++++++--
+ include/crypto/sig.h                |  2 +-
+ 8 files changed, 27 insertions(+), 14 deletions(-)
 
-Yeah, so these commits (now pending in the x86 tree) should nicely 
-complement each other, there shouldn't be much friction other than:
+-- 
+2.43.0
 
-  a72d55dc3bd6 x86/idle: Remove CONFIG_AS_TPAUSE
-
-... which will have a conflict in arch/x86/Kconfig.assembler but is 
-straightforward to resolve.
-
-> If we can indeed bump up the requirement to 2.30, that would be great.
-
-Agreed.
-
-Thanks,
-
-	Ingo
