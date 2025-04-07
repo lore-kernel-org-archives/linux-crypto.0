@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D662122FE08
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Apr 2025 09:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F1F19DF9A
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Apr 2025 09:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744018423; cv=none; b=h0lpvMwPOa/adia7EHls2bhxWJK2iati1poNnzt+OfE/BTmA1dXogT3iOzFkOhRSyV7w4fcWWz2mlIrSLt7Cmj+rG5GOyNnSG6UBAs9Oq2/3FHMn4LomcLPmhifhJHsj/c8Eq0zyJpKFgUkOEXRR+/b1J+31MstLkm6N5T8vBnA=
+	t=1744018426; cv=none; b=UTCI+C4PKBPaE5MI2HwyOuqOMDC6ou+lADCnv8yLKJBsP3Zdy/YLN/azOrQNCNAC3KSSpkRdCp4e0oeskVLTQcLPfA92I/Y6iVnWqAmszr3gn7F7iUm+0ErfIL/5c4MCV9THBGvdr+ubYJiOccO+KdB3jQKo/e9zVaVuDPHWWqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744018423; c=relaxed/simple;
-	bh=j/w6l3G++EwIOk1v9FiDf3WwPdLnk3iHe3hiSobUlZ4=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=J+WWLE0xKlUv2cdmulVYqRyXDun9mCTTeS6C7HpG0/DbXKjBpo9tFvr71toOMLPA7Ew4llJk6j0yca7qhvG5FITt/MAjN0sINVCHv1dCVxPojPUfiVxa/VOQxWlSgw903Pl20sVNrezG4FeRrT+281kTo3IQ3jd1u+mL5bd1wGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=E5DbPtK7; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744018426; c=relaxed/simple;
+	bh=odyL3C9wA8E7qINZ/+vO7tziBqUYQqHnS98RDlWKI8E=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=HXyV9+nvBsP8On15EJpglgW4VPUxSUTA4AYYXAX95JB0cK3It+NXKyQF7Wapoxy4SQ3D5BqOpYsYk+aQjWzeHOb2Qmh8aF8Swlxolux60L/tSjbhPId1s8ohtyGApHc8gCI7hMIu0xEyi4Xetfbw1E0SeC7meMm5MWVIEQ8X08k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VIyE4ijK; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="E5DbPtK7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VIyE4ijK"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=yZhJgE03Sch2msb9rK+bkOW1fyFR4wxITfMdC55IZMU=; b=E5DbPtK7Nmn+U+P9yAQU+jcUn1
-	38wMrZqZ0ounYrsu/HhZgsZWP7RQIN8VUsxUpBHN6MgruwnNuzbKevr1B+OUBLUCcVrWL2fCJhIop
-	Ed+y2QSacHIyUHTKWuzxbvZNwQPpIHyZzNhFlmcpyhcVb397jYhHbcgmW3Qw14EcRCruPDT8mtF2S
-	grKw6Vlj2TfwDthSRnDfubPLwPnzkV9XQA93pOO5TEeOAtyP+KHZ3SJ7EMNHVb1j5oPNEb8BrGU9u
-	9QRPIZtwpza/074+e/skAWt7NV0E8mm0xQOT7q5dXiWRydJiQypnHTXyueUkyBYt6v+NJuKSSo7xk
-	UYYy0tnQ==;
+	bh=MzP1LkTIkZkgNnHmfXNWcFmbYwe9XiGvcvszdgkt2Sc=; b=VIyE4ijKpWn+FEvLzB/0GV5kzs
+	MyeToAaT7Eq0wGGJEjiRX3piwXphWp3dA7MJbquEBdooScsy/0zqPc0xNOCmD0i94G6S5mp/c0Vny
+	OlrWPKzqXWYsXauFxETi6njJ71cNLZPAfYSqod/qF6helewF5zebbBpSuwqrjbjG6dxaeFG7PpoCz
+	vfqTYJqkNBQ1Q5KHehWkXZmwU5VaPRdKhncjtUT+IQiz9NJsX2ATSZaHXuLnhiNwP8LASuQAKieGs
+	lqYZWlDE0YjnaTRCbk41aCey6ytGaGSP/KBezf38XYVMfMxLFSOkGs52sbfQefiZqXhPpfpvjx0MS
+	2mZ501Rw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u1irI-00DR0l-2F;
-	Mon, 07 Apr 2025 17:33:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 17:33:36 +0800
-Date: Mon, 07 Apr 2025 17:33:36 +0800
-Message-Id: <2e4c1d19d572bd0f7ff3c9b0784edbe18a175a3b.1744018301.git.herbert@gondor.apana.org.au>
+	id 1u1irK-00DR0w-3D;
+	Mon, 07 Apr 2025 17:33:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 17:33:38 +0800
+Date: Mon, 07 Apr 2025 17:33:38 +0800
+Message-Id: <06daa1eefa3db0c992dbbd532df9bf82b5c1b508.1744018301.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744018301.git.herbert@gondor.apana.org.au>
 References: <cover.1744018301.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/5] Revert "crypto: tcrypt - Restore multibuffer ahash tests"
+Subject: [PATCH 5/5] crypto: ahash - Remove request chaining
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,264 +45,525 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-This reverts commit c664f034172705a75f3f8a0c409b9bf95b633093.
-
-Remove the multibuffer ahash speed tests again.
+Request chaining requires the user to do too much book keeping.
+Remove it from ahash.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/tcrypt.c | 231 ------------------------------------------------
- 1 file changed, 231 deletions(-)
+ crypto/ahash.c                 | 234 +++++----------------------------
+ include/crypto/algapi.h        |   5 -
+ include/crypto/hash.h          |  12 --
+ include/crypto/internal/hash.h |   5 -
+ include/linux/crypto.h         |  15 ---
+ 5 files changed, 32 insertions(+), 239 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 96f4a66be14c..879fc21dcc16 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -716,207 +716,6 @@ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
- 	return crypto_wait_req(ret, wait);
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 9f57b925b116..079216180ad1 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -43,10 +43,7 @@ struct crypto_hash_walk {
+ };
+ 
+ struct ahash_save_req_state {
+-	struct list_head head;
+ 	struct ahash_request *req0;
+-	struct ahash_request *cur;
+-	int (*op)(struct ahash_request *req);
+ 	crypto_completion_t compl;
+ 	void *data;
+ 	struct scatterlist sg;
+@@ -54,9 +51,9 @@ struct ahash_save_req_state {
+ 	u8 *page;
+ 	unsigned int offset;
+ 	unsigned int nbytes;
++	bool update;
+ };
+ 
+-static void ahash_reqchain_done(void *data, int err);
+ static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt);
+ static void ahash_restore_req(struct ahash_request *req);
+ static void ahash_def_finup_done1(void *data, int err);
+@@ -313,30 +310,17 @@ int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_setkey);
+ 
+-static bool ahash_request_hasvirt(struct ahash_request *req)
+-{
+-	struct ahash_request *r2;
+-
+-	if (ahash_request_isvirt(req))
+-		return true;
+-
+-	list_for_each_entry(r2, &req->base.list, base.list)
+-		if (ahash_request_isvirt(r2))
+-			return true;
+-
+-	return false;
+-}
+-
+ static int ahash_reqchain_virt(struct ahash_save_req_state *state,
+ 			       int err, u32 mask)
+ {
+-	struct ahash_request *req = state->cur;
++	struct ahash_request *req = state->req0;
++	struct crypto_ahash *tfm;
++
++	tfm = crypto_ahash_reqtfm(req);
+ 
+ 	for (;;) {
+ 		unsigned len = state->nbytes;
+ 
+-		req->base.err = err;
+-
+ 		if (!state->offset)
+ 			break;
+ 
+@@ -355,10 +339,9 @@ static int ahash_reqchain_virt(struct ahash_save_req_state *state,
+ 		state->offset += len;
+ 		req->nbytes = len;
+ 
+-		err = state->op(req);
++		err = crypto_ahash_alg(tfm)->update(req);
+ 		if (err == -EINPROGRESS) {
+-			if (!list_empty(&state->head) ||
+-			    state->offset < state->nbytes)
++			if (state->offset < state->nbytes)
+ 				err = -EBUSY;
+ 			break;
+ 		}
+@@ -374,64 +357,12 @@ static int ahash_reqchain_finish(struct ahash_request *req0,
+ 				 struct ahash_save_req_state *state,
+ 				 int err, u32 mask)
+ {
+-	struct ahash_request *req = state->cur;
+-	struct crypto_ahash *tfm;
+-	struct ahash_request *n;
+-	bool update;
+ 	u8 *page;
+ 
+ 	err = ahash_reqchain_virt(state, err, mask);
+ 	if (err == -EINPROGRESS || err == -EBUSY)
+ 		goto out;
+ 
+-	if (req != req0)
+-		list_add_tail(&req->base.list, &req0->base.list);
+-
+-	tfm = crypto_ahash_reqtfm(req);
+-	update = state->op == crypto_ahash_alg(tfm)->update;
+-
+-	list_for_each_entry_safe(req, n, &state->head, base.list) {
+-		list_del_init(&req->base.list);
+-
+-		req->base.flags &= mask;
+-		req->base.complete = ahash_reqchain_done;
+-		req->base.data = state;
+-		state->cur = req;
+-
+-		if (update && ahash_request_isvirt(req) && req->nbytes) {
+-			unsigned len = req->nbytes;
+-			u8 *result = req->result;
+-
+-			state->src = req->svirt;
+-			state->nbytes = len;
+-
+-			len = min(PAGE_SIZE, len);
+-
+-			memcpy(state->page, req->svirt, len);
+-			state->offset = len;
+-
+-			ahash_request_set_crypt(req, &state->sg, result, len);
+-		}
+-
+-		err = state->op(req);
+-
+-		if (err == -EINPROGRESS) {
+-			if (!list_empty(&state->head) ||
+-			    state->offset < state->nbytes)
+-				err = -EBUSY;
+-			goto out;
+-		}
+-
+-		if (err == -EBUSY)
+-			goto out;
+-
+-		err = ahash_reqchain_virt(state, err, mask);
+-		if (err == -EINPROGRESS || err == -EBUSY)
+-			goto out;
+-
+-		list_add_tail(&req->base.list, &req0->base.list);
+-	}
+-
+ 	page = state->page;
+ 	if (page) {
+ 		memset(page, 0, PAGE_SIZE);
+@@ -451,7 +382,7 @@ static void ahash_reqchain_done(void *data, int err)
+ 	data = state->data;
+ 
+ 	if (err == -EINPROGRESS) {
+-		if (!list_empty(&state->head) || state->offset < state->nbytes)
++		if (state->offset < state->nbytes)
+ 			return;
+ 		goto notify;
+ 	}
+@@ -472,26 +403,18 @@ static int ahash_do_req_chain(struct ahash_request *req,
+ 	bool update = op == crypto_ahash_alg(tfm)->update;
+ 	struct ahash_save_req_state *state;
+ 	struct ahash_save_req_state state0;
+-	struct ahash_request *r2;
+ 	u8 *page = NULL;
+ 	int err;
+ 
+ 	if (crypto_ahash_req_chain(tfm) ||
+-	    (!ahash_request_chained(req) &&
+-	     (!update || !ahash_request_isvirt(req))))
++	    !update || !ahash_request_isvirt(req))
+ 		return op(req);
+ 
+-	if (update && ahash_request_hasvirt(req)) {
+-		gfp_t gfp;
+-		u32 flags;
+-
+-		flags = ahash_request_flags(req);
+-		gfp = (flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-		      GFP_KERNEL : GFP_ATOMIC;
+-		page = (void *)__get_free_page(gfp);
++	if (update && ahash_request_isvirt(req)) {
++		page = (void *)__get_free_page(GFP_ATOMIC);
+ 		err = -ENOMEM;
+ 		if (!page)
+-			goto out_set_chain;
++			goto out;
+ 	}
+ 
+ 	state = &state0;
+@@ -503,13 +426,10 @@ static int ahash_do_req_chain(struct ahash_request *req,
+ 		state = req->base.data;
+ 	}
+ 
+-	state->op = op;
+-	state->cur = req;
++	state->update = update;
+ 	state->page = page;
+ 	state->offset = 0;
+ 	state->nbytes = 0;
+-	INIT_LIST_HEAD(&state->head);
+-	list_splice_init(&req->base.list, &state->head);
+ 
+ 	if (page)
+ 		sg_init_one(&state->sg, page, PAGE_SIZE);
+@@ -530,19 +450,18 @@ static int ahash_do_req_chain(struct ahash_request *req,
+ 	}
+ 
+ 	err = op(req);
+-	if (err == -EBUSY || err == -EINPROGRESS)
+-		return -EBUSY;
++	if (err == -EINPROGRESS || err == -EBUSY) {
++		if (state->offset < state->nbytes)
++			err = -EBUSY;
++		return err;
++	}
+ 
+ 	return ahash_reqchain_finish(req, state, err, ~0);
+ 
+ out_free_page:
+ 	free_page((unsigned long)page);
+ 
+-out_set_chain:
+-	req->base.err = err;
+-	list_for_each_entry(r2, &req->base.list, base.list)
+-		r2->base.err = err;
+-
++out:
+ 	return err;
  }
  
--struct test_mb_ahash_data {
--	struct scatterlist sg[XBUFSIZE];
--	char result[64];
--	struct ahash_request *req;
--	struct crypto_wait wait;
--	char *xbuf[XBUFSIZE];
--};
--
--static inline int do_mult_ahash_op(struct test_mb_ahash_data *data, u32 num_mb,
--				   int *rc)
--{
--	int i, err;
--
--	/* Fire up a bunch of concurrent requests */
--	err = crypto_ahash_digest(data[0].req);
--
--	/* Wait for all requests to finish */
--	err = crypto_wait_req(err, &data[0].wait);
--	if (num_mb < 2)
--		return err;
--
--	for (i = 0; i < num_mb; i++) {
--		rc[i] = ahash_request_err(data[i].req);
--		if (rc[i]) {
--			pr_info("concurrent request %d error %d\n", i, rc[i]);
--			err = rc[i];
--		}
--	}
--
--	return err;
--}
--
--static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
--				 int secs, u32 num_mb)
--{
--	unsigned long start, end;
--	int bcount;
--	int ret = 0;
--	int *rc;
--
--	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
--	if (!rc)
--		return -ENOMEM;
--
--	for (start = jiffies, end = start + secs * HZ, bcount = 0;
--	     time_before(jiffies, end); bcount++) {
--		ret = do_mult_ahash_op(data, num_mb, rc);
--		if (ret)
--			goto out;
--	}
--
--	pr_cont("%d operations in %d seconds (%llu bytes)\n",
--		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
--
--out:
--	kfree(rc);
--	return ret;
--}
--
--static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
--				u32 num_mb)
--{
--	unsigned long cycles = 0;
--	int ret = 0;
--	int i;
--	int *rc;
--
--	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
--	if (!rc)
--		return -ENOMEM;
--
--	/* Warm-up run. */
--	for (i = 0; i < 4; i++) {
--		ret = do_mult_ahash_op(data, num_mb, rc);
--		if (ret)
--			goto out;
--	}
--
--	/* The real thing. */
--	for (i = 0; i < 8; i++) {
--		cycles_t start, end;
--
--		start = get_cycles();
--		ret = do_mult_ahash_op(data, num_mb, rc);
--		end = get_cycles();
--
--		if (ret)
--			goto out;
--
--		cycles += end - start;
--	}
--
--	pr_cont("1 operation in %lu cycles (%d bytes)\n",
--		(cycles + 4) / (8 * num_mb), blen);
--
--out:
--	kfree(rc);
--	return ret;
--}
--
--static void test_mb_ahash_speed(const char *algo, unsigned int secs,
--				struct hash_speed *speed, u32 num_mb)
--{
--	struct test_mb_ahash_data *data;
--	struct crypto_ahash *tfm;
--	unsigned int i, j, k;
--	int ret;
--
--	data = kcalloc(num_mb, sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return;
--
--	tfm = crypto_alloc_ahash(algo, 0, 0);
--	if (IS_ERR(tfm)) {
--		pr_err("failed to load transform for %s: %ld\n",
--			algo, PTR_ERR(tfm));
--		goto free_data;
--	}
--
--	for (i = 0; i < num_mb; ++i) {
--		if (testmgr_alloc_buf(data[i].xbuf))
--			goto out;
--
--		crypto_init_wait(&data[i].wait);
--
--		data[i].req = ahash_request_alloc(tfm, GFP_KERNEL);
--		if (!data[i].req) {
--			pr_err("alg: hash: Failed to allocate request for %s\n",
--			       algo);
--			goto out;
--		}
--
--
--		if (i) {
--			ahash_request_set_callback(data[i].req, 0, NULL, NULL);
--			ahash_request_chain(data[i].req, data[0].req);
--		} else
--			ahash_request_set_callback(data[0].req, 0,
--						   crypto_req_done,
--						   &data[0].wait);
--
--		sg_init_table(data[i].sg, XBUFSIZE);
--		for (j = 0; j < XBUFSIZE; j++) {
--			sg_set_buf(data[i].sg + j, data[i].xbuf[j], PAGE_SIZE);
--			memset(data[i].xbuf[j], 0xff, PAGE_SIZE);
--		}
--	}
--
--	pr_info("\ntesting speed of multibuffer %s (%s)\n", algo,
--		get_driver_name(crypto_ahash, tfm));
--
--	for (i = 0; speed[i].blen != 0; i++) {
--		/* For some reason this only tests digests. */
--		if (speed[i].blen != speed[i].plen)
--			continue;
--
--		if (speed[i].blen > XBUFSIZE * PAGE_SIZE) {
--			pr_err("template (%u) too big for tvmem (%lu)\n",
--			       speed[i].blen, XBUFSIZE * PAGE_SIZE);
--			goto out;
--		}
--
--		if (klen)
--			crypto_ahash_setkey(tfm, tvmem[0], klen);
--
--		for (k = 0; k < num_mb; k++)
--			ahash_request_set_crypt(data[k].req, data[k].sg,
--						data[k].result, speed[i].blen);
--
--		pr_info("test%3u "
--			"(%5u byte blocks,%5u bytes per update,%4u updates): ",
--			i, speed[i].blen, speed[i].plen,
--			speed[i].blen / speed[i].plen);
--
--		if (secs) {
--			ret = test_mb_ahash_jiffies(data, speed[i].blen, secs,
--						    num_mb);
--			cond_resched();
--		} else {
--			ret = test_mb_ahash_cycles(data, speed[i].blen, num_mb);
--		}
--
--
--		if (ret) {
--			pr_err("At least one hashing failed ret=%d\n", ret);
--			break;
--		}
--	}
--
--out:
--	ahash_request_free(data[0].req);
--
--	for (k = 0; k < num_mb; ++k)
--		testmgr_free_buf(data[k].xbuf);
--
--	crypto_free_ahash(tfm);
--
--free_data:
--	kfree(data);
--}
--
- static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
- 				     char *out, int secs)
+@@ -550,26 +469,10 @@ int crypto_ahash_init(struct ahash_request *req)
  {
-@@ -2584,36 +2383,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		test_ahash_speed("sm3", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
- 		fallthrough;
--	case 450:
--		test_mb_ahash_speed("sha1", sec, generic_hash_speed_template,
--				    num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 451:
--		test_mb_ahash_speed("sha256", sec, generic_hash_speed_template,
--				    num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 452:
--		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template,
--				    num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 453:
--		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template,
--				    num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 454:
--		test_mb_ahash_speed("streebog256", sec,
--				    generic_hash_speed_template, num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 455:
--		test_mb_ahash_speed("streebog512", sec,
--				    generic_hash_speed_template, num_mb);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
- 	case 499:
- 		break;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
  
+-	if (likely(tfm->using_shash)) {
+-		struct ahash_request *r2;
+-		int err;
+-
+-		err = crypto_shash_init(prepare_shash_desc(req, tfm));
+-		req->base.err = err;
+-
+-		list_for_each_entry(r2, &req->base.list, base.list) {
+-			struct shash_desc *desc;
+-
+-			desc = prepare_shash_desc(r2, tfm);
+-			r2->base.err = crypto_shash_init(desc);
+-		}
+-
+-		return err;
+-	}
+-
++	if (likely(tfm->using_shash))
++		return crypto_shash_init(prepare_shash_desc(req, tfm));
+ 	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		return -ENOKEY;
+-
+ 	return ahash_do_req_chain(req, crypto_ahash_alg(tfm)->init);
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_init);
+@@ -578,15 +481,11 @@ static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct ahash_save_req_state *state;
+-	gfp_t gfp;
+-	u32 flags;
+ 
+ 	if (!ahash_is_async(tfm))
+ 		return 0;
+ 
+-	flags = ahash_request_flags(req);
+-	gfp = (flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?  GFP_KERNEL : GFP_ATOMIC;
+-	state = kmalloc(sizeof(*state), gfp);
++	state = kmalloc(sizeof(*state), GFP_ATOMIC);
+ 	if (!state)
+ 		return -ENOMEM;
+ 
+@@ -619,23 +518,8 @@ int crypto_ahash_update(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 
+-	if (likely(tfm->using_shash)) {
+-		struct ahash_request *r2;
+-		int err;
+-
+-		err = shash_ahash_update(req, ahash_request_ctx(req));
+-		req->base.err = err;
+-
+-		list_for_each_entry(r2, &req->base.list, base.list) {
+-			struct shash_desc *desc;
+-
+-			desc = ahash_request_ctx(r2);
+-			r2->base.err = shash_ahash_update(r2, desc);
+-		}
+-
+-		return err;
+-	}
+-
++	if (likely(tfm->using_shash))
++		return shash_ahash_update(req, ahash_request_ctx(req));
+ 	return ahash_do_req_chain(req, crypto_ahash_alg(tfm)->update);
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_update);
+@@ -644,23 +528,8 @@ int crypto_ahash_final(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 
+-	if (likely(tfm->using_shash)) {
+-		struct ahash_request *r2;
+-		int err;
+-
+-		err = crypto_shash_final(ahash_request_ctx(req), req->result);
+-		req->base.err = err;
+-
+-		list_for_each_entry(r2, &req->base.list, base.list) {
+-			struct shash_desc *desc;
+-
+-			desc = ahash_request_ctx(r2);
+-			r2->base.err = crypto_shash_final(desc, r2->result);
+-		}
+-
+-		return err;
+-	}
+-
++	if (likely(tfm->using_shash))
++		return crypto_shash_final(ahash_request_ctx(req), req->result);
+ 	return ahash_do_req_chain(req, crypto_ahash_alg(tfm)->final);
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_final);
+@@ -669,27 +538,11 @@ int crypto_ahash_finup(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 
+-	if (likely(tfm->using_shash)) {
+-		struct ahash_request *r2;
+-		int err;
+-
+-		err = shash_ahash_finup(req, ahash_request_ctx(req));
+-		req->base.err = err;
+-
+-		list_for_each_entry(r2, &req->base.list, base.list) {
+-			struct shash_desc *desc;
+-
+-			desc = ahash_request_ctx(r2);
+-			r2->base.err = shash_ahash_finup(r2, desc);
+-		}
+-
+-		return err;
+-	}
+-
++	if (likely(tfm->using_shash))
++		return shash_ahash_finup(req, ahash_request_ctx(req));
+ 	if (!crypto_ahash_alg(tfm)->finup ||
+-	    (!crypto_ahash_req_chain(tfm) && ahash_request_hasvirt(req)))
++	    (!crypto_ahash_req_chain(tfm) && ahash_request_isvirt(req)))
+ 		return ahash_def_finup(req);
+-
+ 	return ahash_do_req_chain(req, crypto_ahash_alg(tfm)->finup);
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_finup);
+@@ -756,29 +609,12 @@ int crypto_ahash_digest(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 
+-	if (likely(tfm->using_shash)) {
+-		struct ahash_request *r2;
+-		int err;
+-
+-		err = shash_ahash_digest(req, prepare_shash_desc(req, tfm));
+-		req->base.err = err;
+-
+-		list_for_each_entry(r2, &req->base.list, base.list) {
+-			struct shash_desc *desc;
+-
+-			desc = prepare_shash_desc(r2, tfm);
+-			r2->base.err = shash_ahash_digest(r2, desc);
+-		}
+-
+-		return err;
+-	}
+-
+-	if (!crypto_ahash_req_chain(tfm) && ahash_request_hasvirt(req))
++	if (likely(tfm->using_shash))
++		return shash_ahash_digest(req, prepare_shash_desc(req, tfm));
++	if (!crypto_ahash_req_chain(tfm) && ahash_request_isvirt(req))
+ 		return ahash_def_digest(req);
+-
+ 	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		return -ENOKEY;
+-
+ 	return ahash_do_req_chain(req, crypto_ahash_alg(tfm)->digest);
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_digest);
+@@ -1135,15 +971,9 @@ EXPORT_SYMBOL_GPL(ahash_register_instance);
+ 
+ void ahash_request_free(struct ahash_request *req)
+ {
+-	struct ahash_request *tmp;
+-	struct ahash_request *r2;
+-
+ 	if (unlikely(!req))
+ 		return;
+ 
+-	list_for_each_entry_safe(r2, tmp, &req->base.list, base.list)
+-		kfree_sensitive(r2);
+-
+ 	kfree_sensitive(req);
+ }
+ EXPORT_SYMBOL_GPL(ahash_request_free);
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 03b7eca8af9a..ede622ecefa8 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -267,11 +267,6 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+ }
+ 
+-static inline bool crypto_request_chained(struct crypto_async_request *req)
+-{
+-	return !list_empty(&req->list);
+-}
+-
+ static inline bool crypto_tfm_req_chain(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_CHAIN;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index b987904afdba..c14a3a90613f 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -626,7 +626,6 @@ static inline void ahash_request_set_callback(struct ahash_request *req,
+ 	flags &= ~keep;
+ 	req->base.flags &= keep;
+ 	req->base.flags |= flags;
+-	crypto_reqchain_init(&req->base);
+ }
+ 
+ /**
+@@ -675,12 +674,6 @@ static inline void ahash_request_set_virt(struct ahash_request *req,
+ 	req->base.flags |= CRYPTO_AHASH_REQ_VIRT;
+ }
+ 
+-static inline void ahash_request_chain(struct ahash_request *req,
+-				       struct ahash_request *head)
+-{
+-	crypto_request_chain(&req->base, &head->base);
+-}
+-
+ /**
+  * DOC: Synchronous Message Digest API
+  *
+@@ -982,11 +975,6 @@ static inline void shash_desc_zero(struct shash_desc *desc)
+ 			 sizeof(*desc) + crypto_shash_descsize(desc->tfm));
+ }
+ 
+-static inline int ahash_request_err(struct ahash_request *req)
+-{
+-	return req->base.err;
+-}
+-
+ static inline bool ahash_is_async(struct crypto_ahash *tfm)
+ {
+ 	return crypto_tfm_is_async(&tfm->base);
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 485e22cf517e..e2a1fac38610 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -247,11 +247,6 @@ static inline struct crypto_shash *__crypto_shash_cast(struct crypto_tfm *tfm)
+ 	return container_of(tfm, struct crypto_shash, base);
+ }
+ 
+-static inline bool ahash_request_chained(struct ahash_request *req)
+-{
+-	return crypto_request_chained(&req->base);
+-}
+-
+ static inline bool ahash_request_isvirt(struct ahash_request *req)
+ {
+ 	return req->base.flags & CRYPTO_AHASH_REQ_VIRT;
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 1e3809d28abd..dd817f56ff0c 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -14,7 +14,6 @@
+ 
+ #include <linux/completion.h>
+ #include <linux/errno.h>
+-#include <linux/list.h>
+ #include <linux/refcount.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+@@ -179,7 +178,6 @@ struct crypto_async_request {
+ 	struct crypto_tfm *tfm;
+ 
+ 	u32 flags;
+-	int err;
+ };
+ 
+ /**
+@@ -473,19 +471,6 @@ static inline unsigned int crypto_tfm_ctx_alignment(void)
+ 	return __alignof__(tfm->__crt_ctx);
+ }
+ 
+-static inline void crypto_reqchain_init(struct crypto_async_request *req)
+-{
+-	req->err = -EINPROGRESS;
+-	INIT_LIST_HEAD(&req->list);
+-}
+-
+-static inline void crypto_request_chain(struct crypto_async_request *req,
+-					struct crypto_async_request *head)
+-{
+-	req->err = -EINPROGRESS;
+-	list_add_tail(&req->list, &head->list);
+-}
+-
+ static inline bool crypto_tfm_is_async(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_ASYNC;
 -- 
 2.39.5
 
