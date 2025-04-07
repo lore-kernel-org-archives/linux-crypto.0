@@ -1,109 +1,75 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3760CC2EF
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Apr 2025 04:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D791938FA3;
+	Mon,  7 Apr 2025 05:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744001882; cv=none; b=c92TkUvhMjX3Xr1dha+PwwhbyTcfkrwU9N17tiiRHT8mmkSIrcJ0sz/z5y7OK8kGVtqHq5zWx6FjzxpcLxqU8fX4qoBLmBPmS7KIErRFSjM2PUHWv8cYuroWqpiWivc1rJE0F72y1o+PeXVyfvU7D4qZva+sPrwpJyaNI0ckuzg=
+	t=1744002307; cv=none; b=TtOBONmLDvAyh4f3ZZQs4eCy7ihkre25KNnBLuVomSFSC1YI1Gqe/4z72YJI5e6HUzZC0TEOaYm3WlOWbM+vXHNp127xUwm9rBjUBZtomm/A0+7FNUkiqGIsLL4QfRLVqzmLA0LQni86vSDUY9Q4MiRi5lXtcFLnnva71aD4t/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744001882; c=relaxed/simple;
-	bh=WBJqzB2NmNV9oHhh89FyjUf4XzjAjJAPnDM02eOitfg=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=VXBR3dSCvj6tOBSUQP0gEkfiq9VowIRFgZl/pn7XT3hqV6XfZ7tygt1KE9uLLD2SgQY2Mt/IzRF0NgSn92nkyEQEoEBxA/hL3fA+mz0ZaWw4IJU7YCZQLGWOwL5QgV3ygDrbx+CWrliBjuPRDLDrZrcr4WkreieyRkG2Ln/MjJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dAtXOppo; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744002307; c=relaxed/simple;
+	bh=3RlbR2XuJsv6PPLY9Jiu+JdacViJXQTWrxhlQzUEjb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AcQG7UOw/6h5JyLIQuz4SVLug0m9ELYRHTgV6OTnMWPYTkcJc9E+HmowWHzabnFyRQOB8pPYGeY/4CZKoOTo79ijyP1QO464rhVjg97cdIGzqdUZruKFrUwog9Rs+RqBpdgPa66Go7Ww95H+uWqfbzj07UlfYxmbaVhMimbkiNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Z0Wn13sP; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dAtXOppo"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Z0Wn13sP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:
-	Subject:To:From:Date:Sender:Reply-To:Cc:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=FTSumES0UaQSPDs9sh2NLCCoE3NjL2Fe1FRL3PQhBx0=; b=dAtXOppoHasFdGCNyOwljrzYow
-	P6wD/gSG8QU6PfSYDMV8d8dnjEOp1vMZIbc/WJyklryTBK9Zhir82pZ3cm4I1v/HBZD01WzHxNoXE
-	1cs6I1vjSJ8SzXh5twAfXHBL4fHZb66UeQFCbI/QcQMA8c07cMWMm+RCKbamn/xsd++AuY0FNHDPP
-	UykIr6vlg3BCRozMDU3ccy3Vz2OrycAollMX2/8J6BUoze82EmpNA4zVADiLhFT3X7yAwNXQDzVh0
-	FOUvKS5swYcIVETruzdrLhGyO+cvzB05evhjQ7tbhtJZ2eOlfU1fqQQWOBW7q7piekB5Qefz71/fp
-	v+kih4rg==;
+	bh=4UiTwlP4t/xW5NGvvkumJqkirVU2BhoXZx2+6zulc8w=; b=Z0Wn13sPJS328uueenHJus6O9W
+	DC8gW2avavlR9J2hnC6rX2dVzkC9p6FHg/yJUHIAdTq2xCeYaunbytrAwr4wM6yES7H3Uaztekh4a
+	x0CnhwCExjKf5YIk+XIUIqaYmQRnBB7YFfBYVA3VreiBCIMKUh1P4F2sxjvv5kpuwiac6TO7I3rVi
+	nzL6S0zKQp0xm4dxvjxdJhMaeEdodTgLKWGy8TMz1l04qNodMpvAzYbWjhSTq4TEDZ5iw+mDAj1j7
+	1Zt3zE6EwPxFBQx/dI5fgEJI0aath/9N/8laXG0lc4OF7oNuj8o2/Kr/vefbBHPDMxUy4PtXJ0lbe
+	5bzp9fag==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u1eYU-00DN4K-0j;
-	Mon, 07 Apr 2025 12:57:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 12:57:54 +0800
-Date: Mon, 7 Apr 2025 12:57:54 +0800
+	id 1u1efD-00DN7z-0O;
+	Mon, 07 Apr 2025 13:04:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Apr 2025 13:04:51 +0800
+Date: Mon, 7 Apr 2025 13:04:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>
-Subject: [PATCH] crypto: ccp - Silence may-be-uninitialized warning in
- sev_ioctl_do_pdh_export
-Message-ID: <Z_NbUk4BkRLmdY5p@gondor.apana.org.au>
+To: Abhinaba Rakshit <quic_arakshit@quicinc.com>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: crypto: qcom-qce: document QCS615
+ crypto engine
+Message-ID: <Z_Nc83JRS7YuZ8S4@gondor.apana.org.au>
+References: <20250318-enable-qce-for-qcs615-v2-0-c5e05fe22572@quicinc.com>
+ <20250318-enable-qce-for-qcs615-v2-1-c5e05fe22572@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250318-enable-qce-for-qcs615-v2-1-c5e05fe22572@quicinc.com>
 
-The recent reordering of code in sev_ioctl_do_pdh_export triggered
-a false-positive may-be-uninitialized warning from gcc:
+On Tue, Mar 18, 2025 at 03:13:23PM +0530, Abhinaba Rakshit wrote:
+> Document the crypto engine on the QCS615 platform.
+> 
+> Acked-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
-In file included from ../include/linux/sched/task.h:13,
-                 from ../include/linux/sched/signal.h:9,
-                 from ../include/linux/rcuwait.h:6,
-                 from ../include/linux/percpu-rwsem.h:7,
-                 from ../include/linux/fs.h:34,
-                 from ../include/linux/compat.h:17,
-                 from ../arch/x86/include/asm/ia32.h:7,
-                 from ../arch/x86/include/asm/elf.h:10,
-                 from ../include/linux/elf.h:6,
-                 from ../include/linux/module.h:19,
-                 from ../drivers/crypto/ccp/sev-dev.c:11:
-In function ‘copy_to_user’,
-    inlined from ‘sev_ioctl_do_pdh_export’ at ../drivers/crypto/ccp/sev-dev.c:2036:7,
-    inlined from ‘sev_ioctl’ at ../drivers/crypto/ccp/sev-dev.c:2249:9:
-../include/linux/uaccess.h:225:16: warning: ‘input_cert_chain_address’ may be used uninitialized [-Wmaybe-uninitialized]
-  225 |         return _copy_to_user(to, from, n);
-      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
-../drivers/crypto/ccp/sev-dev.c: In function ‘sev_ioctl’:
-../drivers/crypto/ccp/sev-dev.c:1961:22: note: ‘input_cert_chain_address’ was declared here
- 1961 |         void __user *input_cert_chain_address;
-      |                      ^~~~~~~~~~~~~~~~~~~~~~~~
-
-Silence it by moving the initialisation of the variables in question
-prior to the NULL check.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 671347702ae7..c9ab4bd38d68 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1968,15 +1968,15 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 
- 	memset(&data, 0, sizeof(data));
- 
-+	input_pdh_cert_address = (void __user *)input.pdh_cert_address;
-+	input_cert_chain_address = (void __user *)input.cert_chain_address;
-+
- 	/* Userspace wants to query the certificate length. */
- 	if (!input.pdh_cert_address ||
- 	    !input.pdh_cert_len ||
- 	    !input.cert_chain_address)
- 		goto cmd;
- 
--	input_pdh_cert_address = (void __user *)input.pdh_cert_address;
--	input_cert_chain_address = (void __user *)input.cert_chain_address;
--
- 	/* Allocate a physically contiguous buffer to store the PDH blob. */
- 	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
- 		return -EFAULT;
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
