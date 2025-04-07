@@ -1,174 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6784D15382E;
-	Mon,  7 Apr 2025 12:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A77248879;
+	Mon,  7 Apr 2025 12:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744029160; cv=none; b=KWAxGg0/+SCMfZ7GazLxmEKZ0LJlW8ewtfscGSTTz23OlnqwgORboDYEBYQFPU9UuyJ2jjo0SeZFHptlhiNsCYz+sr8TRz9M2xyEUqXbWSgLSZrn99rSc5+fC7VOwK0EXODvtnTDJP9tHbTWCgpusdCqDxs4hSnrorQdDN2BBRg=
+	t=1744029441; cv=none; b=S2NrzNKUPZyqEJ0Ej/3MgtOU5Q5ZACw8drKneIs3Yhlavf+1Zgg3kqTROB3AChXsBvccN0Ix6FKWAVSgxMoudExaVi+EVeDS7wk5PBX101qvdajcpYRqpxX/OpOuQ9fRMBY2xgjLR8gGxHBl/65mF1ujhmHeqsStpeAk1WBERf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744029160; c=relaxed/simple;
-	bh=C2hUbIPOqtG04WpoGSHIQr7eWr+HJM7/fdl8jvapedc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hAwHJt7DuMxCIyon5asSR7fueBeJowd4tBmk3V45yHUogkwPPEYr1LsuGtJz8qkdXqkRW8aQRa42B7UewWuDEE8FIVaKLN5S9ZVDBrrtXLKW4Rd0qnSUCpjbj3g+uFKgtsOnOtUJ2dIQHwQd+UHHDvtEe3gFrc9mUS3NsM7Dikw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1D0ZHtp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744029441; c=relaxed/simple;
+	bh=HOibTiVBe6urW/I8l/bkB3d+bGhjt3ehDkrMVTY5jTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GrK7URVDHUWI5e2Te5IQhT7N5Iu4vX+H5/z6zQ10RVmkOS4KPfvTx19CHedWnepnn5bKX2XPHl5FN74ZOBK4JMQSZe7KLug6VcsFz2gnVgUvhc9cRm/oI3rS1pZd/ZqKGFa1HD7+9grXwE+PmMKPyb7JJdjrg9YyaII7pOAxXtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFbE6NgE; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1D0ZHtp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADA7AC4CEDD;
-	Mon,  7 Apr 2025 12:32:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744029160;
-	bh=C2hUbIPOqtG04WpoGSHIQr7eWr+HJM7/fdl8jvapedc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z1D0ZHtpGqv8mh9PT3FG56iuyZCJrHW+vIA1JLwYTMxNIl/9ukZGy7iUTaa7C8XZi
-	 r1lxOy7yq2FhMlgElHelPdp5xLQ0oQNiHQBmlXOYj03YicfmI7SQA0zdzR+vmDuswF
-	 bzwl6Fs+jmQbpagDmdYBaUPU74Yzd6sc7l4eXYeCSKjvyCLGDfMXa5a3z0xofLWkVw
-	 W7+QC3ZIgXkInE6tvLjVD9jjEjNp9mTOZuEc6GGXqUOzdPzBQvOWluntdwHqKbDPdC
-	 iPtVgXPDg7BB9t7Hnf/wUR3MNAMVvXRCcOu+si2mU+7qeEHhjTJmAFFT+6a6l/aqnK
-	 c5vmdKD19Jcgw==
-Date: Mon, 7 Apr 2025 15:32:35 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: keyrings@vger.kernel.org
-Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4] tpm: Mask TPM RC in tpm2_start_auth_session()
-Message-ID: <Z_PF4-W2q8OdywN5@kernel.org>
-References: <20250407072057.81062-1-jarkko@kernel.org>
- <20250407122806.15400-1-jarkko@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFbE6NgE"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-39ac8e7688aso3202037f8f.2;
+        Mon, 07 Apr 2025 05:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744029437; x=1744634237; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lh/I3yXpOsBj/QaJBup8gnrC62Y5DCOS4SYvr7caIAA=;
+        b=bFbE6NgEjJ29ZUze30WNurTKDjAwAAhPunxQGlgRXVzefqVJ5Rh126Kyl9zCsF8pJr
+         udbkcJz3HauzvyRv4RSGxueEN+eAzYKj2XDioD/E2EyCI4cyJKINiLeMc4PNf7LfRZSX
+         /iV6oH7qFzK7NAAtJVE/NEoMxrdwTlQLh/b6+Z6CHYuSYjKcOp71pmPXyCOJxDYNblb4
+         mHbYGd8wjGr3o9DIpjPlsUijqL9zNsk6uaGCLOb+eGeHrSMl0pYxYYRzIT3IwFQa8F24
+         F0zVxYd5U6WmEdJlrTn3ziaMZUOEXm5IxJUsmVW4h41Sub4OpqBcZY8Y888e08MsTmQP
+         EmFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744029437; x=1744634237;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lh/I3yXpOsBj/QaJBup8gnrC62Y5DCOS4SYvr7caIAA=;
+        b=rpblIYqCZOBOj0WPV6OPF3Xc9cYjWHwfqMR5LOQ6pj1jYTsKpl0dO8sTO2v7sglGZv
+         TlOdBqqd4Bi4xvUxHZ1QgLw3djWAfTyNMCh4LWdZSxgGto6QOItWsby8UGpOPM60qq+7
+         KpmjU7n4cu4Kq/KfxHd0QU76wcksZ0jFwXauOw8sPhi8lldCI2UAjzL1/43rkhvVs87a
+         ixS/SO1F32sKMALYWM9lr5b/9SOG3H6gf7w6xg7MrUteaPg9Cw2BWfX9wvJSimbHtPrj
+         BrekyZ69y4vPfDpPkMrpluMPmHRMdqmOcL4dt4fwmbv/qjftf4+1JHe6wudnNJ8pZnSR
+         04UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaTz+iYjasCC7MPUTmPMMKW/mFTgobh1nQIplUoAfba3phGULVowFX2Jx8Y2V11OE1o3pJvdsQrFtV+ao=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7o41NqeZUPHVz0pWygh6jtr5PqdaYCmKO7xkxS4UUWMXrfo5H
+	NWOTZftSBBxR2/4x0eTdVEHXUsucuTiViwIaRqrew/C3MpZS0DgG6wQ7QQ==
+X-Gm-Gg: ASbGncvEp/kyUOJ5i3qpuP8fzGhwPZhyvwVxHgKHcivJrvC8mh5CATitaefTEwuDbQn
+	dmJW+opExsu9/9tYoCc/xk3+bIsiuAWwL0VhOXaguF68MurUei9IwfzoO3qTRoX+aDlfZ8Bc7db
+	Q8aLV72xo1MGzbmW8wzr0YHZvo/a5fofOpL6VcNqybYJxZiPKESeB0xTpjFtYaMB308mhJ9OqVY
+	ANIVM4eaMvQfeX6I1jcopmEP5xxG7DH6Lm18DKrmYEfH3xOY7muLfCRZQyXIxMxLeFGIlZL836h
+	qS5hMAmBRfJK9xKlKSJ049gsf+y+b+O/DtoZI5IvucZ6tf5DIiTVbb3FLSE0OrMfet1YqXi4
+X-Google-Smtp-Source: AGHT+IGHpxPIDtpchXInrsm1R02zHSRqOeOW0Uyj1nK5Y5FXV8oqwFqAV3X3meNPTj66oB5UmyG3Hg==
+X-Received: by 2002:a05:6000:4212:b0:39c:1efb:ec8e with SMTP id ffacd0b85a97d-39d6fc00a75mr6536810f8f.6.1744029436707;
+        Mon, 07 Apr 2025 05:37:16 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b76f2sm12065198f8f.53.2025.04.07.05.37.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 05:37:16 -0700 (PDT)
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+To: linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+Cc: davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 1/4] crypto: img-hash - use API helpers to setup fallback request
+Date: Mon,  7 Apr 2025 15:36:01 +0300
+Message-ID: <20250407123604.2109561-1-ovidiu.panait.oss@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407122806.15400-1-jarkko@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 07, 2025 at 03:28:05PM +0300, Jarkko Sakkinen wrote:
-> tpm2_start_auth_session() does not mask TPM RC correctly from the callers:
-> 
-> [   28.766528] tpm tpm0: A TPM error (2307) occurred start auth session
-> 
-> Process TPM RCs inside tpm2_start_auth_session(), and map them to POSIX
-> error codes.
-> 
-> Cc: stable@vger.kernel.org # v6.10+
-> Fixes: 699e3efd6c64 ("tpm: Add HMAC session start and end functions")
-> Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Closes: https://lore.kernel.org/linux-integrity/Z_NgdRHuTKP6JK--@gondor.apana.org.au/
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> ---
-> v4:
-> - tpm_to_ret()
-> v3:
-> - rc > 0
-> v2:
-> - Investigate TPM rc only after destroying tpm_buf.
-> ---
->  drivers/char/tpm/tpm2-sessions.c | 20 ++++++--------------
->  include/linux/tpm.h              | 21 +++++++++++++++++++++
->  2 files changed, 27 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-> index 3f89635ba5e8..102e099f22c1 100644
-> --- a/drivers/char/tpm/tpm2-sessions.c
-> +++ b/drivers/char/tpm/tpm2-sessions.c
-> @@ -40,11 +40,6 @@
->   *
->   * These are the usage functions:
->   *
-> - * tpm2_start_auth_session() which allocates the opaque auth structure
-> - *	and gets a session from the TPM.  This must be called before
-> - *	any of the following functions.  The session is protected by a
-> - *	session_key which is derived from a random salt value
-> - *	encrypted to the NULL seed.
->   * tpm2_end_auth_session() kills the session and frees the resources.
->   *	Under normal operation this function is done by
->   *	tpm_buf_check_hmac_response(), so this is only to be used on
-> @@ -963,16 +958,13 @@ static int tpm2_load_null(struct tpm_chip *chip, u32 *null_key)
->  }
->  
->  /**
-> - * tpm2_start_auth_session() - create a HMAC authentication session with the TPM
-> - * @chip: the TPM chip structure to create the session with
-> + * tpm2_start_auth_session() - Create an a HMAC authentication session
-> + * @chip:	A TPM chip
->   *
-> - * This function loads the NULL seed from its saved context and starts
-> - * an authentication session on the null seed, fills in the
-> - * @chip->auth structure to contain all the session details necessary
-> - * for performing the HMAC, encrypt and decrypt operations and
-> - * returns.  The NULL seed is flushed before this function returns.
-> + * Loads the ephemeral key (null seed), and starts an HMAC authenticated
-> + * session. The null seed is flushed before the return.
->   *
-> - * Return: zero on success or actual error encountered.
-> + * Returns zero on success, or a POSIX error code.
->   */
->  int tpm2_start_auth_session(struct tpm_chip *chip)
->  {
-> @@ -1024,7 +1016,7 @@ int tpm2_start_auth_session(struct tpm_chip *chip)
->  	/* hash algorithm for session */
->  	tpm_buf_append_u16(&buf, TPM_ALG_SHA256);
->  
-> -	rc = tpm_transmit_cmd(chip, &buf, 0, "start auth session");
-> +	rc = tpm_to_ret(tpm_transmit_cmd(chip, &buf, 0, "StartAuthSession"));
+Rather than setting up the fallback request by hand, use
+ahash_request_set_callback() and ahash_request_set_crypt() API helpers
+to properly setup the new request.
 
-The cool thing here is that e.g., in the case of
-tpm2_start_auth_session, there is two implementation options:
+This also ensures that the completion callback is properly passed down
+to the fallback algorithm, which avoids a crash with async fallbacks.
 
-1. tpm_to_ret(tpm2_start_auth_session)
-2. tpm_to_ret(tpm_transmit_cmd)
+Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+---
+ drivers/crypto/img-hash.c | 41 ++++++++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
 
-Just want to expose this choice..
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index 1dc2378aa88b..e050f5ff5efb 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -491,8 +491,9 @@ static int img_hash_init(struct ahash_request *req)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags =	req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
+ 
+ 	return crypto_ahash_init(&rctx->fallback_req);
+ }
+@@ -555,10 +556,10 @@ static int img_hash_update(struct ahash_request *req)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags = req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
++	ahash_request_set_crypt(&rctx->fallback_req, req->src, NULL, req->nbytes);
+ 
+ 	return crypto_ahash_update(&rctx->fallback_req);
+ }
+@@ -570,9 +571,10 @@ static int img_hash_final(struct ahash_request *req)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags = req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.result = req->result;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
++	ahash_request_set_crypt(&rctx->fallback_req, NULL, req->result, 0);
+ 
+ 	return crypto_ahash_final(&rctx->fallback_req);
+ }
+@@ -584,11 +586,12 @@ static int img_hash_finup(struct ahash_request *req)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags = req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
+-	rctx->fallback_req.result = req->result;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
++	ahash_request_set_crypt(&rctx->fallback_req, req->src, req->result,
++				req->nbytes);
++
+ 
+ 	return crypto_ahash_finup(&rctx->fallback_req);
+ }
+@@ -600,8 +603,9 @@ static int img_hash_import(struct ahash_request *req, const void *in)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags = req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
+ 
+ 	return crypto_ahash_import(&rctx->fallback_req, in);
+ }
+@@ -613,8 +617,9 @@ static int img_hash_export(struct ahash_request *req, void *out)
+ 	struct img_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+-	rctx->fallback_req.base.flags = req->base.flags
+-		& CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_callback(&rctx->fallback_req,
++				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete, req->base.data);
+ 
+ 	return crypto_ahash_export(&rctx->fallback_req, out);
+ }
+-- 
+2.48.1
 
-
->  	tpm2_flush_context(chip, null_key);
->  
->  	if (rc == TPM2_RC_SUCCESS)
-> diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-> index 6c3125300c00..c826d5a9d894 100644
-> --- a/include/linux/tpm.h
-> +++ b/include/linux/tpm.h
-> @@ -257,8 +257,29 @@ enum tpm2_return_codes {
->  	TPM2_RC_TESTING		= 0x090A, /* RC_WARN */
->  	TPM2_RC_REFERENCE_H0	= 0x0910,
->  	TPM2_RC_RETRY		= 0x0922,
-> +	TPM2_RC_SESSION_MEMORY	= 0x0903,
->  };
->  
-> +/*
-> + * Convert a return value from tpm_transmit_cmd() to a POSIX return value. The
-> + * fallback return value is -EFAULT.
-> + */
-> +static inline ssize_t tpm_to_ret(ssize_t ret)
-> +{
-> +	/* Already a POSIX error: */
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	switch (ret) {
-> +	case TPM2_RC_SUCCESS:
-> +		return 0;
-> +	case TPM2_RC_SESSION_MEMORY:
-> +		return -ENOMEM;
-> +	default:
-> +		return -EFAULT;
-> +	}
-> +}
-> +
->  enum tpm2_command_codes {
->  	TPM2_CC_FIRST		        = 0x011F,
->  	TPM2_CC_HIERARCHY_CONTROL       = 0x0121,
-> -- 
-> 2.39.5
-> 
-
-BR, Jarkko
