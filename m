@@ -1,187 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803EC2528EF;
-	Mon,  7 Apr 2025 12:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B3724110D;
+	Mon,  7 Apr 2025 12:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744030079; cv=none; b=DdzSaqnM7WGfsoaoPic04ZfOEULmWjWJb4iErsIZBXp4WQkOP8UjSOxhZEje5/ZdrgY4D9we+yuXYUP33rgAT7aAAu+RJ3uZR/KwLdS6s1lVs7WPXeT91A629cuHZhdcrRXv+1Qx+d+XhpK+z2LbRI0HCWorfpHDB8J3lvqGwJI=
+	t=1744030152; cv=none; b=RmZv2oF3gwrMxDu7PCLxH8ohc39Lq8R6nic98tOJEmo/wdXp/hJcQ4R/q5sCMY5dFM+oz/Lu1LmfII4zBsxI1J/Pxyb+SpTGuOCAzYvL3NACN0QcLfOROUdTB9V1Uh4h/PLlp10ScHjy80AoYL38//fUGcKR9wlnQ/knTp5he9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744030079; c=relaxed/simple;
-	bh=KEDPVE33uQKjxzGqy3bcfJL5Q/mx4ddBU49uxTRs+Rk=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=f1mWipTQD0I3ouldDSJfruw89LVAQF+MJMrPdUemlFMt5UZ6yMfG5uJd65/2S+31aAhYblSPiY5bjPRhQbAaPGi3jV/WYr1/B+g4GtK8tyU5xanU3dyXhPqyql+L2ldbvoS76ZZ5QXbPqo942uToPl5tec8uEKqNmIoFIvbHwIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/HzPV+0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744030152; c=relaxed/simple;
+	bh=JpHK2GInyOvQWJPGhVG/ljGWZfTBL47D2/o2U5mHtRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gEj9zoMkYogfPzcm+jZmvqfbeIuT0Y+h1ASF5OIUdXI2h3na4bUeN8ZWPzFUMEa3M0DKajTUNueC/EKtFqaPan6swvhrvBlCuY7wsBny/AvdzEdopuWgrHfWgEoSeIs08IpoDDHkIbH6OIXQOk16yFt8wvE4xgjcXWi6SQWJXII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lmUvKk7g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/HzPV+0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD1D1C4CEE7;
-	Mon,  7 Apr 2025 12:47:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lmUvKk7g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8329C4CEDD;
+	Mon,  7 Apr 2025 12:49:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744030079;
-	bh=KEDPVE33uQKjxzGqy3bcfJL5Q/mx4ddBU49uxTRs+Rk=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=C/HzPV+0IWPNdEnGyAEliW8SgzV6uzSCnQfPsNEC8XhWhr6AbCwbTOHoKNvjmg5Jn
-	 DeW1wI71Wh+5+RXPBO55pRCv9rlQtHmOotWufjr55PgBLHBMBNsNa8ljvA7Msx4Gf+
-	 W1U2OWnBGMW0VueP3gxHMp8EK1tSXWQKoYLZhzL4ueHEIzSIvwse+mSenjPsNLQCk8
-	 JAzWjSnQepfYSgSIg6Krn23ke9vQNuOIzG5Z9pyQT6h7DreRup/CE4E3VzzkTnC7DV
-	 gD+9N2tbebyd83SvarpzjbDtIbLngWbXR4ArcdVAm41zGc5ECGAeLlrd/tjwNMSZ7u
-	 HQPFoFOi5h5kg==
-Date: Mon, 07 Apr 2025 07:47:57 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1744030151;
+	bh=JpHK2GInyOvQWJPGhVG/ljGWZfTBL47D2/o2U5mHtRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lmUvKk7gNwvEGxyJTkq6yyYizO5LpuX0UhRDPtkpOl0KsG/EiFppVqw8D6uxs3dqP
+	 ruk0I8YegfsiFOrqTLmp6tTjqkvmct2P3EDx6WJ6Nc2eI7CSorJss/A9I+K6ABugla
+	 G2WUZAFeLDscvtXzL3I8O4oRXWRAjqLjFaaQQVFV0oI7fz8SNS8AkFp2ycvubfCMtV
+	 +pbApiXT1t2GMqZ50bhejLtJ9QofDB4OnGqJWdGG20MdlKumbjU3uuUNlTSx0Ot50e
+	 MT9Xu0vRXjvscVdfYo7uDPFdI8fzRwlsfDO/6b025zwVfC3SlvsiFdrRSNJMYop55k
+	 T66ywoYl2hNjA==
+Date: Mon, 7 Apr 2025 15:49:06 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko.sakkinen@opinsys.com>,
+	stable@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v7] KEYS: Add a list for unreferenced keys
+Message-ID: <Z_PJwt_d9ISuZJBr@kernel.org>
+References: <20250407023918.29956-1-jarkko@kernel.org>
+ <CGME20250407102514eucas1p1b297b7b6012a5ece4ccdca8e0e2c7956@eucas1p1.samsung.com>
+ <32c1e996-ac34-496f-933e-a266b487da1a@samsung.com>
+ <Z_O1v8awuTeJ9qfS@kernel.org>
+ <Z_PATvNUE-qBDEEV@kernel.org>
+ <377bfc52-db94-4d76-ab47-8076933bc7e7@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Anand Gore <anand.gore@broadcom.com>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, 
- linux-crypto@vger.kernel.org, Olivia Mackall <olivia@selenic.com>, 
- William Zhang <william.zhang@broadcom.com>, 
- Kursad Oney <kursad.oney@broadcom.com>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>, 
- =?utf-8?q?Rafa=C5=82_Mi=C5=82ecki?= <rafal@milecki.pl>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Scott Branden <sbranden@broadcom.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-In-Reply-To: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org>
-References: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org>
-Message-Id: <174402971847.1782936.5442564444780183051.robh@kernel.org>
-Subject: Re: [PATCH v2 00/12] ARM: bcm: Add some BCMBCA peripherals
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <377bfc52-db94-4d76-ab47-8076933bc7e7@samsung.com>
 
+On Mon, Apr 07, 2025 at 02:42:34PM +0200, Marek Szyprowski wrote:
+> On 07.04.2025 14:08, Jarkko Sakkinen wrote:
+> > On Mon, Apr 07, 2025 at 02:23:49PM +0300, Jarkko Sakkinen wrote:
+> >> On Mon, Apr 07, 2025 at 12:25:11PM +0200, Marek Szyprowski wrote:
+> >>> On 07.04.2025 04:39, Jarkko Sakkinen wrote:
+> >>>> From: Jarkko Sakkinen <jarkko.sakkinen@opinsys.com>
+> >>>>
+> >>>> Add an isolated list of unreferenced keys to be queued for deletion, and
+> >>>> try to pin the keys in the garbage collector before processing anything.
+> >>>> Skip unpinnable keys.
+> >>>>
+> >>>> Use this list for blocking the reaping process during the teardown:
+> >>>>
+> >>>> 1. First off, the keys added to `keys_graveyard` are snapshotted, and the
+> >>>>      list is flushed. This the very last step in `key_put()`.
+> >>>> 2. `key_put()` reaches zero. This will mark key as busy for the garbage
+> >>>>      collector.
+> >>>> 3. `key_garbage_collector()` will try to increase refcount, which won't go
+> >>>>      above zero. Whenever this happens, the key will be skipped.
+> >>>>
+> >>>> Cc: stable@vger.kernel.org # v6.1+ Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@opinsys.com>
+> >>> This patch landed in today's linux-next as commit b0d023797e3e ("keys:
+> >>> Add a list for unreferenced keys"). In my tests I found that it triggers
+> >>> the following lockdep issue:
+> >>>
+> >>> ================================
+> >>> WARNING: inconsistent lock state
+> >>> 6.15.0-rc1-next-20250407 #15630 Not tainted
+> >>> --------------------------------
+> >>> inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+> >>> ksoftirqd/3/32 [HC0[0]:SC1[1]:HE1:SE0] takes:
+> >>> c13fdd68 (key_serial_lock){+.?.}-{2:2}, at: key_put+0x74/0x128
+> >>> {SOFTIRQ-ON-W} state was registered at:
+> >>>     lock_acquire+0x134/0x384
+> >>>     _raw_spin_lock+0x38/0x48
+> >>>     key_alloc+0x2fc/0x4d8
+> >>>     keyring_alloc+0x40/0x90
+> >>>     system_trusted_keyring_init+0x50/0x7c
+> >>>     do_one_initcall+0x68/0x314
+> >>>     kernel_init_freeable+0x1c0/0x224
+> >>>     kernel_init+0x1c/0x12c
+> >>>     ret_from_fork+0x14/0x28
+> >>> irq event stamp: 234
+> >>> hardirqs last  enabled at (234): [<c0cb7060>]
+> >>> _raw_spin_unlock_irqrestore+0x5c/0x60
+> >>> hardirqs last disabled at (233): [<c0cb6dd0>]
+> >>> _raw_spin_lock_irqsave+0x64/0x68
+> >>> softirqs last  enabled at (42): [<c013bcd8>] handle_softirqs+0x328/0x520
+> >>> softirqs last disabled at (47): [<c013bf10>] run_ksoftirqd+0x40/0x68
+> >> OK what went to -next went there by accident and has been removed,
+> >> sorry. I think it was like the very first version of this patch.
+> >>
+> >> Thanks for informing anyhow!
+> >
+> > Testing branch: https://web.git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/?h=keys-graveyard
+> >
+> > I updated my next this morning so should be fixed soon...
+> 
+> I've just checked that branch and it still triggers lockdep issue. The 
+> following change is needed to get it fixed:
+> 
+> diff --git a/security/keys/gc.c b/security/keys/gc.c
+> index 0a3beb68633c..b22dc93eb4b4 100644
+> --- a/security/keys/gc.c
+> +++ b/security/keys/gc.c
+> @@ -302,9 +302,9 @@ static void key_garbage_collector(struct work_struct 
+> *work)
+>                  key_schedule_gc(new_timer);
+>          }
+> 
+> -       spin_lock(&key_graveyard_lock);
+> +       spin_lock_irqsave(&key_graveyard_lock, flags);
+>          list_splice_init(&key_graveyard, &graveyard);
+> -       spin_unlock(&key_graveyard_lock);
+> +       spin_unlock_irqrestore(&key_graveyard_lock, flags);
+> 
+>          if (unlikely(gc_state & KEY_GC_REAPING_DEAD_2) ||
+>              !list_empty(&graveyard)) {
 
-On Sun, 06 Apr 2025 17:32:40 +0200, Linus Walleij wrote:
-> This adds a bunch peripherals to the Broadcom BRCMBCA
-> SoC:s that I happened to find documentation for in some
-> vendor header files.
+Oh, it used to be liked this. I managed to mess things up during rebase:
+
+https://lore.kernel.org/keyrings/Z-682XjIjxjAZ9j-@kernel.org/T/#m4a0db2526abb549df3871dec23056350556d4556
+
+Thanks for spotting this, I'll revert it how it used to be in v4.
+
 > 
-> It started when I added a bunch of peripherals for the
-> BCM6846, and this included really helpful peripherals
-> such as the PL081 DMA, for which I think the most common
-> usecase is to be used as a memcpy engine to offload
-> transfer of blocks from NAND flash to/from the NAND
-> flash controller (at least this is how the STMicro
-> FSMC controller was using it).
-> 
-> So I took a sweep and added all the stuff that has
-> bindings to:
-> 
-> ARM:
-> - BCM6846
-> - BCM6855
-> - BCM6878
-> - BCM63138
-> - BCM63148
-> - BCM63178
-> 
-> ARM64:
-> - BCM4908
-> - BCM6856
-> - BCM6858
-> - BCM63158
-> 
-> There are several "holes" in this SoC list, I simply
-> just fixed those that I happened to run into documentation
-> for.
-> 
-> Unfortunately while very similar, some IP blocks vary
-> slightly in version, the GPIO block is differently
-> integrated on different systems, and the interrupt assignments
-> are completely different, so it's safest to add these to each
-> DTSI individually.
-> 
-> I add the interrupt binding for the RNG block in the
-> process as this exists even if Linux isn't using the
-> IRQ, and I put the RNG and DMA engines as default-enabled
-> because they are not routed to the outside and should
-> "just work" so why not.
-> 
-> I did a rogue patch adding some stuff to BCM6756 based
-> on guessed but eventually dropped it. If someone has
-> docs for this SoC I can add it.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> Changes in v2:
-> - Pick up Krzysztof's ACK
-> - Push the BCM6858 DMA block into its own simple bus.
-> - Fix GPIO node names and registers on BCM63138.
-> - Fix GPIO node names and registers on BCM63148.
-> - Link to v1: https://lore.kernel.org/r/20250328-bcmbca-peripherals-arm-v1-0-e4e515dc9b8c@linaro.org
-> 
-> ---
-> Linus Walleij (12):
->       ARM: dts: bcm6878: Correct UART0 IRQ number
->       dt-bindings: rng: r200: Add interrupt property
->       ARM: dts: bcm6846: Add interrupt to RNG
->       ARM: dts: bcm6855: Add BCMBCA peripherals
->       ARM: dts: bcm6878: Add BCMBCA peripherals
->       ARM: dts: bcm63138: Add BCMBCA peripherals
->       ARM: dts: bcm63148: Add BCMBCA peripherals
->       ARM: dts: bcm63178: Add BCMBCA peripherals
->       ARM64: dts: bcm4908: Add BCMBCA peripherals
->       ARM64: dts: bcm6856: Add BCMBCA peripherals
->       ARM64: dts: bcm6858: Add BCMBCA peripherals
->       ARM64: dts: bcm63158: Add BCMBCA peripherals
-> 
->  .../devicetree/bindings/rng/brcm,iproc-rng200.yaml |   6 +
->  arch/arm/boot/dts/broadcom/bcm63138.dtsi           |  79 ++++++++++-
->  arch/arm/boot/dts/broadcom/bcm63148.dtsi           |  64 +++++++++
->  arch/arm/boot/dts/broadcom/bcm63178.dtsi           | 112 +++++++++++++++
->  arch/arm/boot/dts/broadcom/bcm6846.dtsi            |   1 +
->  arch/arm/boot/dts/broadcom/bcm6855.dtsi            | 127 +++++++++++++++++
->  arch/arm/boot/dts/broadcom/bcm6878.dtsi            | 120 ++++++++++++++++-
->  arch/arm64/boot/dts/broadcom/bcmbca/bcm4908.dtsi   | 122 ++++++++++++++++-
->  arch/arm64/boot/dts/broadcom/bcmbca/bcm63158.dtsi  | 150 ++++++++++++++++++++-
->  arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi   | 138 ++++++++++++++++++-
->  arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi   | 127 ++++++++++++++++-
->  11 files changed, 1037 insertions(+), 9 deletions(-)
-> ---
-> base-commit: 8359b1e7edc722d4b1be26aa515041a79e4224a3
-> change-id: 20250327-bcmbca-peripherals-arm-dfb312052363
-> 
-> Best regards,
-> --
-> Linus Walleij <linus.walleij@linaro.org>
+> Best regards
+> -- 
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
 > 
 > 
-> 
-
-
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-This patch series was applied (using b4) to base:
- Base: base-commit 8359b1e7edc722d4b1be26aa515041a79e4224a3 not known, ignoring
- Base: attempting to guess base-commit...
- Base: tags/v6.14-rc6-274-gf4e35e5f940c (exact match)
-
-If this is not the correct base, please add 'base-commit' tag
-(or use b4 which does this automatically)
-
-New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/broadcom/' for 20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org:
-
-arch/arm/boot/dts/broadcom/bcm4709-asus-rt-ac87u.dtb: pcie@12000: 'device_type' is a required property
-	from schema $id: http://devicetree.org/schemas/pci/pci-bus-common.yaml#
-
-
-
-
-
+BR, Jarkko
