@@ -1,174 +1,172 @@
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2049.outbound.protection.outlook.com [40.107.104.49])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03F025FA26;
-	Tue,  8 Apr 2025 08:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744099205; cv=fail; b=Q9CveZne56SarNsmI/YUhb/gNdgrNI1q0291JB7lfucbh+3SaE0U61MI1QOOOiYZsDxBQ0lWHtE4CcMLXbEQrEGQdH78i5/vs2bHwwP6oSSfrBgH+FXOjfl+MimDjkYp9ViiR50AI+ieAWH4B5yj58SXPtfdR3LhLhIdmZKiS4o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744099205; c=relaxed/simple;
-	bh=+pnucCEilWu6gZ0fWxSJj2QQMT7ziiDj4aQgKPHkMAI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Qef4AWtsVi6aNWSmJ+GodMD3WYoV4eiBD3VYFIUKwSQiueusaYZEJj3oLlrS7Fkf6/CMTTq4LUObA6TQBfIVwXPT6tZy+LpeSoe2/3CT8p9QB4EtRBOMUslkOmxLt5k86AwiR4F+N4+fcoUZOsUto9ae8YJwewOY86ffaoRM7yA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IB8L9ZAV; arc=fail smtp.client-ip=40.107.104.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51982638B0;
+	Tue,  8 Apr 2025 08:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744099886; cv=none; b=L991J1/oANK8GSLpgy5OG1ugO7TMSvs2eLDany/q8vDbakxxTLZT8ilc2yQEU1uPP8Thf7/HuOTmEhcDnLG+eyKtQnswa91qK2iwE/F0PSQMVP03qMZST1clG/lB944sl2t2uxI5EUv77dT2HqIe3GSm3AmD+obLz4Hr3+rSIIY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744099886; c=relaxed/simple;
+	bh=0NFejXXQ5C/Irc7QVCHJxI7ymX8Um1SmC/6y0Sf6bps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhLrXevYIy/4Ac6cdLcVTNOgBOnoO1jcUaN5nRzW1fJlxMFFgtCQweCWTDrLWrOeaRu7x9VuQFA9wclLu6eSCXx6/0OnT7D4iqzsRbNQrHlWhYI4xMviTMB5U2RrTmNYl+3snc5C9xUWt6JKkOKa6zwASnR2NPfqo66N8lqVrus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qF9Znl9v; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IB8L9ZAV"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UnBy7oQ16H0zTne9EQqsA3zuxQGH0OUO/8cuynqd2Z9LFfyqg1N5OXi8oo2h2HWM4AbAKFJGl/TIG9QFSJgn/kfxZF0AqC4HNWh8k2Xzv4OywUTEqY8WghpX6bz8udXvrnmLxiMfCWwDiCtAWesNIv0/UkDwJfjmGfGwOvQyw+b3kXn9uesqPdbTDp7ONkmI+tDk7+ean5fiXgIn3mhdyVpeOJIEZ6K7kedicbDdjwk2YOyNGofNb+WEDPY4tGOVpd6vHil5DQDM1ZGfWQsXFdjXYc+u00G6ctKvJtepM2hRDaAJ7zixKwYneQ0pZusCNqWn52xZEwsP7FIPcOHeJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+pnucCEilWu6gZ0fWxSJj2QQMT7ziiDj4aQgKPHkMAI=;
- b=XHbU1W7PcCjRU3lVTdJ8fVTSbkhz4ISAmbm0XIHiRogpQZ22g5SAdvIUoAL/fDgpjTan8iM9XWgFgWm4IY/k2G9evr8B3sRYmSfeJ5vg/hTRwhQNNejbJa00OGC2q+hRaCjzUEHpoXFyVzjPKXoqmOMT3VR0Isc544o8Kh38ZA5QrcbywGnag2auwcF3/9xK61ZaKDDjjVGN4EjIgWKIWoBDGubD5lKGu1z+VRyXrWgBZlUZ8eulSKi/WOSYHGqNluc/TXMpUroBXSn9QpEuBlNrLHUXKhFNsIiaGho3Y+OkErfOY20XEz3JUGLUETT5n3wgxtN4g90IFUGzt3XQ+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+pnucCEilWu6gZ0fWxSJj2QQMT7ziiDj4aQgKPHkMAI=;
- b=IB8L9ZAVuvm07vpohomRvtyXs3z+96gjVzD7FAdZYgD9TIyKdUnrU61aHsf63fVIypLhkbIsRBDSuCsjgEf8n8O6e2WnRW4NkfAa0vrUObZ1YDRJ5S5m0yBuy1OdVYJ+zqOXgDybD44Np5DVaVVTS0veDh7dorTLJgGAXbCwmH0PuJTdLigrbLLyW57a9w3eFSOFO/Q2p9WcoHCpPOntIxQZti6nwKBGbxntHUsdDCmfQnaB9+XyKkR/obnnTb/MbnKXPGFvE6I5WQ+wEDF+ygdZ/d+mpnA6i1sejbbi/TZQ/pGdtPgSm6uBZ8qvQsw5AlLWiUvknizWoD6xs8sgUw==
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com (2603:10a6:102:26b::10)
- by AS8PR04MB9191.eurprd04.prod.outlook.com (2603:10a6:20b:44e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Tue, 8 Apr
- 2025 07:59:58 +0000
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::1009:ebb:d7ae:4628]) by PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::1009:ebb:d7ae:4628%4]) with mapi id 15.20.8606.033; Tue, 8 Apr 2025
- 07:59:58 +0000
-From: Horia Geanta <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Sean Anderson
-	<sean.anderson@linux.dev>
-CC: Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Valentin Ciocoi Radulescu
-	<valentin.ciocoi@nxp.com>
-Subject: Re: [PATCH] crypto: caam/qi - Fix drv_ctx refcount bug
-Thread-Topic: [PATCH] crypto: caam/qi - Fix drv_ctx refcount bug
-Thread-Index: AQHbqEWM1wAalL/+m0qX1HwzWxzSq7OZZ+WA
-Date: Tue, 8 Apr 2025 07:59:58 +0000
-Message-ID: <a14929ce-047f-485a-b70f-2b2c8f99b8d5@nxp.com>
-References: <17f9af67-de10-4b96-99ef-3c5cd78124c0@linux.dev>
- <Z_SxYFdyBJTYe_7G@gondor.apana.org.au>
-In-Reply-To: <Z_SxYFdyBJTYe_7G@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PA4PR04MB9709:EE_|AS8PR04MB9191:EE_
-x-ms-office365-filtering-correlation-id: 245f414e-6641-4e02-e2d6-08dd76735b71
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?YzZVazk0NVFKY2pibWthOVRwYWVtUnZVVUdseUhNc0tQZm4yYWpRaWFCTFY2?=
- =?utf-8?B?OWZ6elpISmtnOWtNRDRUeG1DRkNQM0tTL2tjblBDMFVxWEZvSzY2YlVSMEJh?=
- =?utf-8?B?WU0ya3BDT2pmUkJyVFBuYmgyekpLRUptSnMzS29TT0RpY0plbFZISUtvSnlF?=
- =?utf-8?B?M1d5UzF1VHdWajkzSXVTNXlYVHl6T1hGRGNjTEhiRnV0WmZza29KbHJLWXUr?=
- =?utf-8?B?bGpGWGdHSFdOMEE4T3k2MmNsVTRjYm1kdnd5UWpsQW5pT0NOelJLN1AwMVJt?=
- =?utf-8?B?Zm9UZmtzUEdVc084M0tkWHRtZUpkM1pBVVJJTjd1c3dleWU5SG1wb3U4ZnlZ?=
- =?utf-8?B?eDFLL0MzREphc0R4Yzc5TTI1QXlZL2thelZtM1JmdmhFbGM5M0R4YTU2VU5Z?=
- =?utf-8?B?dlR2TmRlSHpQcDcrV085S0szWGx2WTlTWWg5d2dvMXR1c1BJbWdWbHYzSVpk?=
- =?utf-8?B?alVXNVAxOTcyV09RdHlZSk9MaFhmaUY5bFBkTGhVc2dic1J5WUtrLzVva0hn?=
- =?utf-8?B?ejYyNXNiN1gzUnhaRFNyb3lIQkV2RXE4WEtHZDRHalp1QzlaMVluVWRkVExU?=
- =?utf-8?B?NVlVcWc5VXF1ZU1OMW1BajVvbHF3YkNaclhyUlllRys0ejUzTjZLU2VoUUIv?=
- =?utf-8?B?UFJBeHJKUGZhbEtpMVFieStoQ2R4L0JkZlJpVkQ4UndZd2FweFZzcFFYNkNB?=
- =?utf-8?B?MVozTldLaGR2L1FMY2ZMbWFLdkFYQ2tFUEtDUnJyMXVjWE1wL0RlNXY0VnRq?=
- =?utf-8?B?d0NGMk9acGN6RDBrUUlUaUExM2NadkcvMnd6V2kzb1UxU0Vad2hKL2N4N1k1?=
- =?utf-8?B?Ny9BaWYrTTRIa1oxY0h1TWVzWmhMUXA2YSs2d1RCRWp4KzV3WnUySEo4aUs1?=
- =?utf-8?B?UzJSOVg3YVhWaE93bnFPR2JDeFdkK1lmeWQzT0JqdW4zZEJvN1A4MzU2em0x?=
- =?utf-8?B?R1cyVVZDSEliSUs4Y3J6Wi9KZ1h2TGpzdWpJR0JvWVFRYjJDWnlnVDVtYUNU?=
- =?utf-8?B?OThqYTJqVStiN1BvUTNhQlFyODZIVWF6WEpCTGFYc3BKbE9DVG1hUlpZK3d3?=
- =?utf-8?B?Mm5jN0xjRjF4bGNFYUdibXA3SnBVbWk4UGJ0L001dWpGWFNjRkdNb3NEN2tH?=
- =?utf-8?B?ZldXUmJvOWNiTDNVYXkzVnNwNG56SG16RmYxRm1FNmU0NkZDYldvNWJnUEZl?=
- =?utf-8?B?RmxySFloOWVMQWJqNzgzY3JVa1R6Kzl5S1hnZHJWUmlQL3ByeGtGQVltWE11?=
- =?utf-8?B?MzFPSXdVVWdmS1pBaTRydEZxK3NxeGo3UVVtVFdrZWI4M3RPMnhMcSs5V1dL?=
- =?utf-8?B?REFSeWpyazdWcVR4N3hPc0RpYld2UWVKaVJwNHI4NTlQOXRLNlo3YzkxRGpt?=
- =?utf-8?B?RTkrNHZlNmM1SUJORklGMWkzaDRwWUllZ1FYY3hJOUZxRGptMnE3R3pqbUJM?=
- =?utf-8?B?YVVCYnhYTDRlT0ZaamxmR1BxUTM2Z29lZTFmSmRoWWpzSVZZNFFmdFdNT3Ev?=
- =?utf-8?B?K1dsS1FPQ3lEQTZKYkxVc1pRcHRRUmtIV0l4a2dhcTlDS2ZMY1d0K1lMMUEy?=
- =?utf-8?B?cXZ5S2JTcmF3V0xqalBXZWRqSDllMkEvQ0hpN0wxcUNsY2dWUGI0MklYT2gr?=
- =?utf-8?B?OEVTM20yNXZiSFR4ekNRR2p3TzVBLy9xLzdNV2MxamxXL2tkT2NZYXg4TUlG?=
- =?utf-8?B?YngrMW5TV1JxMkpua0xnVlZLUW5pR25QMGV3akI5SG1NTXQ0MW1xMjZXa1No?=
- =?utf-8?B?ZXp2c2xGSnZNUGpsczFSZWtITEV4TmxSUytpQytiMFBiTWhxNUJpckl1UHJ5?=
- =?utf-8?B?OUI3dTRIS2JQRlNWYy8yRVBvU3YwYXhYT0VnM3F1SGxVamlMd3BlekkyeURo?=
- =?utf-8?B?TGVJY2RDWFhYMGxFWUxLOWxHUkprTTJRKzczMXBEYnIrdVljbllnWEFocHN4?=
- =?utf-8?Q?/yXd+XEOQudd5zUctiWfNrgu6/FIJ8fj?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9709.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WHhrQTYvT3dKeEl5cllaMXNoNGxOSUE5a2tONzNHRmlUNTJVVGYyQXBlUkZ5?=
- =?utf-8?B?M1h3NElnT3FVUkI2ZWVqK0RsTmpkUUZzNnpnZlNYcXE5dUlUSWhFOGtXbnlB?=
- =?utf-8?B?N0ZMUjA2enJJcmJ0UmpLRVM1dUFVTEplRmNFanlvRGtwUHJSWmFyZFRVRTlF?=
- =?utf-8?B?dHpTdFZuTGtWeWs3WjZ4RStHdC9ocDJLZlZKWkJUcXJCV2ZzUGxIUEJXR21y?=
- =?utf-8?B?K2hqajhLVm9uZDdhcGVub3RvVWV4YUtyU3pSTUVBQXNTK3pwMkZaWVhNdVFI?=
- =?utf-8?B?TWVMMnBuR0xNUml1bzZpenNJcTRHRTFIQTFteHlXbTM2MjJ4RXY0aSs2Snpt?=
- =?utf-8?B?L2VEQ3FTTXBhb0p1NHI4T0NlblhYcnNKSXdobEQ4YjNKMzVQR0xLRmhGTVdh?=
- =?utf-8?B?ZVNLT3o3bkZIWGhiL1hMU3I2N1VsNjlMZ01TUmhVeTZMNHhzbVpqY1BjbU0r?=
- =?utf-8?B?WHU5ZU9vb1pkeXFJMGNiQjFFei95SEFaTHZwRGRqUlZ5YlJieExmaVBhbk9z?=
- =?utf-8?B?TXhTSExrRHdZRU92bzJMRkZuc1ZBNWN3ZzRhdW5wLzB6aHA3VkcwTHFlbzE5?=
- =?utf-8?B?QXc5SHA4THlDbnhTUE9XNlVjWUQ0OVA5WWhOalhKTTU1UExvTjRLWnRXeHZ1?=
- =?utf-8?B?bzE5TEhZWWhzalhCL080M3BVcUEzcWpnSk1hdVZubWtGVmZCeWR0KzF3STBm?=
- =?utf-8?B?RVhyNXNpb2loNndzdzMva1dKaFY1WU8yaHp2QmVIMGNydGw4ZzdoQmxqOXpn?=
- =?utf-8?B?QTNsblFza0NLR2pTbGpiSFRXdTJsZExibWdCZlkxY3Mvc1lpTUdTck5Eemlz?=
- =?utf-8?B?MjN0eW5keEMwbDZLQ2E2UHJEaGMvVEhzTWVxL0VIZTA2YUlrcVlscTFZQ3Ux?=
- =?utf-8?B?L1kvbHlxOStZQ1dwcUdIYVVjYlNLNVRieEJSVUk0b1hXbDNFa0Y2WE5NNTgw?=
- =?utf-8?B?RFhVSDc2ejE1ckJNVlVtRjh4RFRxVVU2ZXQ2NW5OajZkbkFMTjQ3MXpXaWxH?=
- =?utf-8?B?OWIyeEVCd1V0NTJyTnRwU0ZuL3F2OGVTcHFFMzdYMGhzT2k2eFFqMmlDOE1Z?=
- =?utf-8?B?cUNIWjZZcm1TZVRDUFBVUXc1dUdLcnBFT0liTFpGYkMzSW1pR2szUFE0c04y?=
- =?utf-8?B?M0EzNTFqYUQ5QnVXcWQxRGlZcjRYOCtXSTB0eWs4WjBOc2M3L0pTcXhxdUw5?=
- =?utf-8?B?TDdLYjhwK1hUOTUvUWFsZUNIZXlyZmNUakc2cGZFeFNXRDFSY2FKSnZEK0ly?=
- =?utf-8?B?NytMNnFCcTdOMjF2RkxBd0ZTeXk5aDE0U3JQb1JVS0xmRlYwUUVmQVRtdUZh?=
- =?utf-8?B?WTJWVkZ4ZE9WZnZJanFHa1dlMDZwem5kdnRxQXhVMWhIZENOa0x0TXk4dVJs?=
- =?utf-8?B?Qm9La1RFNUF3YUhYaTc3bnVnRkR6OWZiRjhMUzhGeHU4aHJSWVZ0NTE1TTBJ?=
- =?utf-8?B?TjVCajdKSG14ajFzeFhBWTRKZ3FURmVrUDh5UllPd3N1UzdjQjVWenZRaGdh?=
- =?utf-8?B?N1B2ZGcva3hUbFVhYVlFNnkxOVdBOGd6bkE4TEZRK29NSWR5RDVVcHZWVnhv?=
- =?utf-8?B?TWFsWjJ4MEh5RG9VNkl2V3FXL0g3Qzk4MnJjUlh1cE9KKzM0OXI2b0ttWktL?=
- =?utf-8?B?WmQvL3VkTlQyMzBDUjRoNE5iZjJHbGgrOVkrQURYNzNPeEZxRzlQZk5CalFJ?=
- =?utf-8?B?V3JuVldqSEpRRUUwbVYvMlorQkNsSnZFRWtMKzg4eEFmaTE4L1RPb3VtN0xw?=
- =?utf-8?B?cnkyMnNJaVZBZUQvd2xudkJaVWJDczNsSzhRWGhkNXNrdko2TTdzVVQwcGlo?=
- =?utf-8?B?M1czVFhKblVuNnZ1ZXJTV2FKM1gzTWdQd3FpSDdxTzdTM0FzekI2TXhwQXJH?=
- =?utf-8?B?R0ZscWFQQk81L21teEw4MmN5WVBSR1dZczRFR0NGNFN0N1FjK0V3NllqUzlN?=
- =?utf-8?B?MFZSeGVVYUpLVzhLZUtLTXFscmJUa1kxdHVTajVYR21UcnArWFlUV0w0Qitk?=
- =?utf-8?B?U21FOWh0eCsybmJ3NHIvY0wzUFpkbndGUGVXVHR3WVFtSkw1TGVPbjlYNVJh?=
- =?utf-8?B?MHBMMnprbjJpRHZ2ZDhwaE9jeGM3VFdpYzlrSjZQYWI1TVFBR1JCK3F4TnMz?=
- =?utf-8?B?WDl1bzU3UmF1MzZ2dkZ0Uk5LTFpmUEdVWjQ5c1c4b2N6eGxEZ0oyQVl6TlBx?=
- =?utf-8?B?ZVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D273987704D4994A9BF4F153F7FCC6ED@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qF9Znl9v"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=BJqa6CzCTAkaDv71FdSxwPL/T5p0WkVuqJBIvve0EHU=; b=qF9Znl9vlveOLcfy/Lf7p749Wn
+	Ad2WcxwsLLrlScrw70HmNPgSwlIyALU09S/SKeVKLW3Jbv80V8NWledW+PbIakXukYDD/JN2fz6kk
+	75Yl2Jd2xiNFF6275NJj6SJq6qMIW3dqZn1Dgg1Wn2IohcDN+E/L4uSJRHTzULexp1d6dxn9nf21t
+	hXJ/sACLCgSQPZ/wuaqC+Uhm+QRQLg7ewJqWZOhdlGXbDNe9FoItJRgXBUMnBSKYe6r7AWc+hY7uy
+	ti535Pu3O0WZBvEplyNZBD/+ui7rL2HSiSg7o5ntXiCGEBb3+Wh2ltvxdmsA+RstHn78rWHGIFJml
+	/bbK1P1Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u242r-00DonW-0E;
+	Tue, 08 Apr 2025 16:10:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Apr 2025 16:10:57 +0800
+Date: Tue, 8 Apr 2025 16:10:57 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, thomas.lendacky@amd.com,
+	john.allen@amd.com, michael.roth@amd.com, dionnaglaze@google.com,
+	nikunj@amd.com, ardb@kernel.org, kevinloughlin@google.com,
+	Neeraj.Upadhyay@amd.com, aik@amd.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: Re: [PATCH v7 0/8] Move initializing SEV/SNP functionality to KVM
+Message-ID: <Z_TaEXCXpDM6wa-m@gondor.apana.org.au>
+References: <cover.1742850400.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB9709.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 245f414e-6641-4e02-e2d6-08dd76735b71
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2025 07:59:58.3390
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: m9fPOTF7yuG0WCvbHGf73aV+2OiA06wKSgQ56re/4uFResX3XjyTru8VutmH2pP83hiAmWbdlKoirXvjib/xRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9191
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1742850400.git.ashish.kalra@amd.com>
 
-T24gNC84LzIwMjUgODoxNyBBTSwgSGVyYmVydCBYdSB3cm90ZToNCj4gRW5zdXJlIHJlZmNvdW50
-IGlzIHJhaXNlZCBiZWZvcmUgcmVxdWVzdCBpcyBlbnF1ZXVlZCBzaW5jZSBpdCBjb3VsZA0KPiBi
-ZSBkZXF1ZXVlZCBiZWZvcmUgdGhlIGNhbGwgcmV0dXJucy4NCj4gDQo+IFJlcG9ydGVkLWJ5OiBT
-ZWFuIEFuZGVyc29uIDxzZWFuLmFuZGVyc29uQGxpbnV4LmRldj4NCj4gQ2M6IDxzdGFibGVAdmdl
-ci5rZXJuZWwub3JnPg0KPiBGaXhlczogMTExNDQ0MTZhNzU1ICgiY3J5cHRvOiBjYWFtL3FpIC0g
-b3B0aW1pemUgZnJhbWUgcXVldWUgY2xlYW51cCIpDQo+IFNpZ25lZC1vZmYtYnk6IEhlcmJlcnQg
-WHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4NClJldmlld2VkLWJ5OiBIb3JpYSBHZWFu
-dMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCg0KVGhhbmtzIQ0KSG9yaWENCg0K
+On Mon, Mar 24, 2025 at 09:13:41PM +0000, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Remove initializing SEV/SNP functionality from PSP driver and instead add
+> support to KVM to explicitly initialize the PSP if KVM wants to use
+> SEV/SNP functionality.
+> 
+> This removes SEV/SNP initialization at PSP module probe time and does
+> on-demand SEV/SNP initialization when KVM really wants to use 
+> SEV/SNP functionality. This will allow running legacy non-confidential
+> VMs without initializating SEV functionality. 
+> 
+> The patch-set includes the fix to not continue with SEV INIT if SNP
+> INIT fails as RMP table must be initialized before calling SEV INIT
+> if host SNP support is enabled.
+> 
+> This will assist in adding SNP CipherTextHiding support and SEV firmware
+> hotloading support in KVM without sharing SEV ASID management and SNP
+> guest context support between PSP driver and KVM and keeping all that
+> support only in KVM.
+> 
+> To support SEV firmware hotloading, SEV Shutdown will be done explicitly
+> prior to DOWNLOAD_FIRMWARE_EX and SEV INIT post it to work with the
+> requirement of SEV to be in UNINIT state for DOWNLOAD_FIRMWARE_EX.
+> NOTE: SEV firmware hotloading will only be supported if there are no
+> active SEV/SEV-ES guests. 
+> 
+> v7:
+> -  Drop the Fixes: tag for patch 01, as continuing with SEV INIT
+> after SNP INIT(_EX) failure will still cause SEV INIT to fail,
+> we are simply aborting here after SNP INIT(_EX) failure.
+> - Fix commit logs.
+> - Add additional reviewed-by's.
+> 
+> v6:
+> - Add fix to not continue with SEV INIT if SNP INIT fails as RMP table 
+> must be initialized before calling SEV INIT if host SNP support is enabled.
+> - Ensure that for SEV IOCTLs requiring SEV to be initialized, 
+> _sev_platform_init_locked() is called instead of __sev_platform_init_locked()
+> to ensure that both implicit SNP and SEV INIT is done for these ioctls and
+> followed by __sev_firmware_shutdown() to do both SEV and SNP shutdown.
+> - Refactor doing SEV and SNP INIT implicitly for specific SEV and SNP
+> ioctls into sev_move_to_init_state() and snp_move_to_init_state(). 
+> - Ensure correct error code is returned from sev_ioctl_do_pdh_export() 
+> if platform is not in INIT state.
+> - Remove dev_info() from sev_pci_init() because this would have printed
+> a duplicate message.
+> 
+> v5:
+> - To maintain 1-to-1 mapping between the ioctl commands and the SEV/SNP commands, 
+> handle the implicit INIT in the same way as SHUTDOWN, which is to use a local error
+> for INIT and in case of implicit INIT failures, let the error logs from 
+> __sev_platform_init_locked() OR __sev_snp_init_locked() be printed and always return
+> INVALID_PLATFORM_STATE as error back to the caller.
+> - Add better error logging for SEV/SNP INIT and SHUTDOWN commands.
+> - Fix commit logs.
+> - Add more acked-by's, reviewed-by's, suggested-by's.
+> 
+> v4:
+> - Rebase on linux-next which has the fix for SNP broken with kvm_amd
+> module built-in.
+> - Fix commit logs.
+> - Add explicit SEV/SNP initialization and shutdown error logs instead
+> of using a common exit point.
+> - Move SEV/SNP shutdown error logs from callers into __sev_platform_shutdown_locked()
+> and __sev_snp_shutdown_locked().
+> - Make sure that we continue to support both the probe field and psp_init_on_probe
+> module parameter for PSP module to support SEV INIT_EX.
+> - Add reviewed-by's.
+> 
+> v3:
+> - Move back to do both SNP and SEV platform initialization at KVM module
+> load time instead of SEV initialization on demand at SEV/SEV-ES VM launch
+> to prevent breaking QEMU which has a check for SEV to be initialized 
+> prior to launching SEV/SEV-ES VMs. 
+> - As both SNP and SEV platform initialization and shutdown is now done at
+> KVM module load and unload time remove patches for separate SEV and SNP
+> platform initialization and shutdown.
+> 
+> v2:
+> - Added support for separate SEV and SNP platform initalization, while
+> SNP platform initialization is done at KVM module load time, SEV 
+> platform initialization is done on demand at SEV/SEV-ES VM launch.
+> - Added support for separate SEV and SNP platform shutdown, both 
+> SEV and SNP shutdown done at KVM module unload time, only SEV
+> shutdown down when all SEV/SEV-ES VMs have been destroyed, this
+> allows SEV firmware hotloading support anytime during system lifetime.
+> - Updated commit messages for couple of patches in the series with
+> reference to the feedback received on v1 patches.
+> 
+> Ashish Kalra (8):
+>   crypto: ccp: Abort doing SEV INIT if SNP INIT fails
+>   crypto: ccp: Move dev_info/err messages for SEV/SNP init and shutdown
+>   crypto: ccp: Ensure implicit SEV/SNP init and shutdown in ioctls
+>   crypto: ccp: Reset TMR size at SNP Shutdown
+>   crypto: ccp: Register SNP panic notifier only if SNP is enabled
+>   crypto: ccp: Add new SEV/SNP platform shutdown API
+>   KVM: SVM: Add support to initialize SEV/SNP functionality in KVM
+>   crypto: ccp: Move SEV/SNP Platform initialization to KVM
+> 
+>  arch/x86/kvm/svm/sev.c       |  12 ++
+>  drivers/crypto/ccp/sev-dev.c | 245 +++++++++++++++++++++++++----------
+>  include/linux/psp-sev.h      |   3 +
+>  3 files changed, 194 insertions(+), 66 deletions(-)
+> 
+> -- 
+> 2.34.1
+
+Patches 7-8 applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
