@@ -1,84 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A90263C7D;
-	Tue,  8 Apr 2025 08:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E388C265CDD
+	for <linux-crypto@vger.kernel.org>; Tue,  8 Apr 2025 11:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744102011; cv=none; b=O1kjBTAoc6/RrJ/v8ahGpBNmRF5Tr4emTr+T8aXY6NWvls64qxIcu58kKH5GgTWTDI9afczwEDR/7BTqOEWPVPm78I/3FTV672yO4qlRHYYRMqBTiCsCnd8wxs0LECkWGYD09CNMfyno41CAD1//iP4f2v5WZMQFI9w/a1F2OOg=
+	t=1744111437; cv=none; b=L6KhLDrg389X98FiQspGFajjexB+CKkGLwE4LKCDVtOScbeCuC0Ax5wMCm/G5Dao7mYOwLgRGs6tsnFJjsVwZrBtQiZWKJKMXLpUM8LOEIf/eG28+pul7S98Q+yNtYgywjP0G1wpgmRfiMgeDwFVF41vgRJ8uIp6nLSrTi8WcjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744102011; c=relaxed/simple;
-	bh=ReDfcUfMOpsNbvyyw5CHCguPoy2XwOLWpjwrd1QNJZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NCrvmAZGtb5QeyIIJinYJATWTq78RahhNs88ISMQuKCBeL+BhCHeaYDsL3gZbrtgJot2QO6GVg71wU5Xbf9WufphmAY4eAzy/ntiSEP8KpllZV8rJS6cRwwhg2odIq3SUv/++HU9i3pGT+cIAEAkzA+C1okC8jk3T7cWscEVnJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XzcOI0qF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744111437; c=relaxed/simple;
+	bh=f+Wuv/IwJUOYYGcMReN8qC3U1oqN3II4e7Hi+wV2rsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c126KEhIGsUYrh7OWo579uc6mZSOpchtK7bFO2QYWS5PD/ZcYMZvk48dJ1N+qY58la6jYB7PUs0qEyVCwSINaf4vNNrLQ3uDvCiIcugxTqenIEVHYiRKXhgM9jiOrZItP2rQt3yesyzE6UEjMowLlKgXKNeWNK+cAXcWrE5WRvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OQ1TN8Y7; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XzcOI0qF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4147C4CEEA;
-	Tue,  8 Apr 2025 08:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744102010;
-	bh=ReDfcUfMOpsNbvyyw5CHCguPoy2XwOLWpjwrd1QNJZk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XzcOI0qFCRIiNeziun3omyXC4XT2tra1CSZRP4RLHcpwmJc5k0zr7FiBaeKTQpnZc
-	 tMww2dQje85Jt9gIZ84V6ZvLGWpmBBMzNeCpKYyAWMKlURarbsdTUT8aBy2gJ/hnmi
-	 Dzc2Z1ArI6iXAySInGqzXVrXwbQDm5R0UQmARlDe2uT4Z1UFRvbhoczk/q80qKRNtV
-	 JOhScnrfGkF30ICvX8sMhocw6O2xoPbrZJ7ypocmjF83eS96ls/1jkOx9dOv4UDLuo
-	 rOvGzaC6LpvUSGHgiOa8/uOvomLisuh+fRm87M9PD/TuMAkcvce3kxajWn35ChCnXX
-	 2EMLXS+kq3xYg==
-Date: Tue, 8 Apr 2025 09:46:43 +0100
-From: Will Deacon <will@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Borislav Petkov <bp@alien8.de>, Brian Gerst <brgerst@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uros Bizjak <ubizjak@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 4/4] arm64: drop binutils version checks
-Message-ID: <20250408084642.GA1768@willie-the-truck>
-References: <20250407094116.1339199-1-arnd@kernel.org>
- <20250407094116.1339199-5-arnd@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OQ1TN8Y7"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744111423;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3O7NNoX7C+wG3R/LFiqLgebTwHeyNEVO4BPSbjqxGi8=;
+	b=OQ1TN8Y7fM3J6VZgBPcx6xjdY9yBurmU2lwzLpnbzhahXrMExiV5ZDwv7AVdfmcVl+1cxe
+	bftQgOIjDuou+HaWjkNNYrXLnY5rSuanwa6KA1BExRke46pltoitsGkB/FB0hUB6WT3qbK
+	UQCYCqD0cVQSx6u7Y6mDr7L8yVzc7fA=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: essiv - Remove unnecessary strscpy() size argument
+Date: Tue,  8 Apr 2025 13:22:59 +0200
+Message-ID: <20250408112300.804656-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407094116.1339199-5-arnd@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Arnd,
+If the destination buffer has a fixed length, strscpy() automatically
+determines its size using sizeof() when the argument is omitted. This
+makes the explicit size argument unnecessary - remove it.
 
-On Mon, Apr 07, 2025 at 11:41:16AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Now that gcc-8 and binutils-2.30 are the minimum versions, a lot of
-> the individual feature checks can go away for simplification.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  arch/arm64/Kconfig              | 37 ++-------------------------------
->  arch/arm64/Makefile             | 21 ++-----------------
->  arch/arm64/include/asm/rwonce.h |  4 ----
->  arch/arm64/kvm/Kconfig          |  1 -
->  arch/arm64/lib/xor-neon.c       |  2 +-
->  5 files changed, 5 insertions(+), 60 deletions(-)
+No functional changes intended.
 
-Since some of these checks are dynamic (i.e. they try passing various
-options to the tools to see if they barf), have you checked that the
-minimum supported version of clang implements them all?
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/essiv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Will
+diff --git a/crypto/essiv.c b/crypto/essiv.c
+index 1c00c3324058..9d6e72a2d2ae 100644
+--- a/crypto/essiv.c
++++ b/crypto/essiv.c
+@@ -549,8 +549,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	}
+ 
+ 	/* record the driver name so we can instantiate this exact algo later */
+-	strscpy(ictx->shash_driver_name, hash_alg->base.cra_driver_name,
+-		CRYPTO_MAX_ALG_NAME);
++	strscpy(ictx->shash_driver_name, hash_alg->base.cra_driver_name);
+ 
+ 	/* Instance fields */
+ 
