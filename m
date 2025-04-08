@@ -1,54 +1,45 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348D525F7B8;
-	Tue,  8 Apr 2025 06:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2961CD15;
+	Tue,  8 Apr 2025 06:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744092548; cv=none; b=f73B2r2gfcAe8xSZq2ypf+8g3QpNaZqVoObi/8fyLwVTyXXmWQiMsvsiINWUc1mAdzd9g+EBV48OHaA6tG8opSTjm0QI4cFS0S7Xus7dsHez28HBwv2rNg+IRYZ08fj9+qx3whB5hnugY9q//YwZIS9yVeRXhbn2iL20PWPrsg8=
+	t=1744094151; cv=none; b=N2KynkgxQGgIMjcDoYe3ci1BTauSXBWqyTnDE00ZxntFGmPyHtGhG6+Szwotk7n4Cr+b5pvSlFdQGOuBou84B0jbBPvDX2UyTIQPa2AryDv2WbpXXiyMjrUGqn6Psi8QbnIed/wl2YfiHVgpiql3mAMgXbazL4cMnFLOJpyjTU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744092548; c=relaxed/simple;
-	bh=g0dTaV+ONBTXwDj87Xb1/HxT2I2apNuWX/IGCJLFQKc=;
+	s=arc-20240116; t=1744094151; c=relaxed/simple;
+	bh=Csqgrzyk+uBAewDCXxAVP30No7fss9Z45XpijiikhNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8Ezg017ZIzCVSPpflWSFKipqOUNEJxPwcp46ze8//JKex5f6pBPS8MtVbjzqckqCpfBjxZ7F19Z+dhtDpxlGOb82tJ7hyfxIKZDtcMU+stan3xRpoMCD+wcG5G8uVoNvOEDzcDv4D/m6/WUO29EbiLTmlnWECBBTJzs6Cp0pME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mskJcags; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=NCMlukhFbsXZQ3A0Ao9PYoHGHnXR3A5T/Wq1i1V+v30XqHRZ+UN/1xAaNXgbqYgLWAp/Rcs5DFYJ2qud+qL3SEjm1jMKEEYZhICT19NR9j4JEPm8SkGdu9xM1EW2PW6WzO/+10GyeDq204oFIj7iOqMCuzlNo7c7owFymz0p7+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CyxrQgFA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mskJcags"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=e7Kb4SNn/EgtB4bJKa5yE6xoPLXUqY2wROH++Khm8QE=; b=mskJcagsqWEPW11SwOyLFrYJuL
-	bzxsclsnbBnBZ9NYk90EVw/XJ8L3y5OmCQ/79S+J3OZsNbgR4bq6jbCwM8HMHERCIZCbRht/NSc/z
-	k9K+ijeL3/T+BQMxahAtXae6OgTpW1Z78FY59RhOtI1tqd31Fpc42W6/sDaSPEpaTQ40lW+TXQ3zg
-	SlZHrZ7t9lCxs1YThOhrx/QC6UMw3g4elt/5D5Q1ixU9e1Z/086D/RKAWywwjN/eDili1t6TvYs0d
-	WaaSMQ09seVeY6XtUFjd+sOdLJuDMsiiwACkcVwdbVri5mZUREqPHTMiZqeJxR9ljtNyGdFg4cZSh
-	AdzmeBEw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u228F-00Dn1L-30;
-	Tue, 08 Apr 2025 14:08:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Apr 2025 14:08:23 +0800
-Date: Tue, 8 Apr 2025 14:08:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	thomas.lendacky@amd.com, john.allen@amd.com, michael.roth@amd.com,
-	dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org,
-	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, aik@amd.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v7 0/8] Move initializing SEV/SNP functionality to KVM
-Message-ID: <Z_S9VwUgN-zcWv1e@gondor.apana.org.au>
-References: <cover.1742850400.git.ashish.kalra@amd.com>
- <Z_NdKF3PllghT2XC@gondor.apana.org.au>
- <CABgObfa=7DMCz99268Lamgn5g5h_sgDqkDoOSUAd5rG+seCe-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CyxrQgFA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF770C4CEE5;
+	Tue,  8 Apr 2025 06:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744094151;
+	bh=Csqgrzyk+uBAewDCXxAVP30No7fss9Z45XpijiikhNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CyxrQgFAql85niNS0g6S67Ta4AYHuTXDHML/VqxfetcqFYjm0PiEl9Lz0dutT3qcH
+	 9nKubvNkkgpYQSKV5mje4Qj2kzWsI8H5BvjgyN2L8GNptItE9smEChP4ZMaOTX+MJL
+	 wbhn/Yj17G+9Cwwl0fU25LnD1V1z/0HlxGSN06iY5XT+eggIDljSsCkwYnnAPlxcBT
+	 O7saJ3Dhz/KP7RFQs15xx9glGC3sMoxgPR3yYUKwMzSQDnThfWqJGw85vscNHtuJSx
+	 oR/3z0xiAw9Kdt0hkHsPUE0jBueVBv4skrIA6FgYZNCEUn2nE5BSjXHaAO05HsA5FM
+	 FLbtkafhsPsKg==
+Date: Tue, 8 Apr 2025 08:35:46 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Uros Bizjak <ubizjak@gmail.com>
+Subject: Re: linux-next: manual merge of the tip tree with the crypto tree
+Message-ID: <Z_TDwj7cxauy0gQu@gmail.com>
+References: <20250408112830.4769244e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,15 +48,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CABgObfa=7DMCz99268Lamgn5g5h_sgDqkDoOSUAd5rG+seCe-g@mail.gmail.com>
+In-Reply-To: <20250408112830.4769244e@canb.auug.org.au>
 
-On Mon, Apr 07, 2025 at 09:53:19AM +0200, Paolo Bonzini wrote:
->
-> Thanks, go ahead and apply 7-8 as well (or if you don't want to,
-> please provide a topic branch).
 
-Thanks, I'll take those two as well.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+* Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+
+> Hi all,
+> 
+> Today's linux-next merge of the tip tree got a conflict in:
+> 
+>   arch/x86/Kconfig.assembler
+> 
+> between commits:
+> 
+>   984f835009d6 ("crypto: x86 - Remove CONFIG_AS_SHA1_NI")
+>   d032a27e8fe9 ("crypto: x86 - Remove CONFIG_AS_SHA256_NI")
+> 
+> from the crypto tree and commit:
+> 
+>   a72d55dc3bd6 ("x86/idle: Remove CONFIG_AS_TPAUSE")
+> 
+> from the tip tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+
+The resolution looks good to me, thank you!
+
+	Ingo
