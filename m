@@ -1,50 +1,56 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9BF263C7D;
-	Tue,  8 Apr 2025 08:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9FE263F2C;
+	Tue,  8 Apr 2025 08:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744099895; cv=none; b=E9gdUMdZC+pWv7vHVvSteIW56rYYA/EXFDO6zEFVIJcKyHCK5sjOIrxxKDKTJUCwaBVopkezFfgZvK2mC4hh33wpnsD7hp8yAXf5BaRWpj7IV1BIviM9TtL83LvziRcFGJg76d4+2FGZRFNEorMBckasExxYW/sWBiHkpE1GbHY=
+	t=1744100173; cv=none; b=L7cZZknYNveORG+iJucD6Uqp2wWzUF+j1JUh4ygad3ouykpiKj4NqpJGt9wwNNQfI4HRYiMx4QY/ziq7oLLDeu4YqVTq+6u7QpGTcd0SgtGL+ak7kHG/fKLcZNfWEEMIt4CsH9ogPU85VclZM+bDwgptEKEcIqSR5HLjOVDXd2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744099895; c=relaxed/simple;
-	bh=Eai45pg+sFAqPWgfVpeDnsOdZDsijq3rROuqaPIFgK0=;
+	s=arc-20240116; t=1744100173; c=relaxed/simple;
+	bh=a0cHsypMDGBoj1KQFM5mwYajqEJrx4jAOqxJNpZ+kzU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fm3+NHLmQo+grxItC2UgfsaoJyHEAi3DvTDcgcPeZw+JzwyjQIQmzPQLpp8LUoD1uI3ALcar//eH1dsedPjmGzuuduu7wN1lXFGdWYixCa620+qJso/DabOBYqglgBINXuSFxc2sOMjnEjxyXwv0/sCejD+oCKkdj/Z0MUyqSZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LQjnvWYu; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=pnBDIA0zWGDA2LWw462ZZEkp4tXLgKL20UFew2y92LT1UbhThKLv3sgC9I3by2wlCDjGeioMcTrxF1085IeeHoIGg0Huifr1ALZCSbABWPBdIXqRgKQpWXOQ2Q+nOKfW4pUg5kWyyy/NYXK/BDYLZiLJAw4Jpx/N7ZRioStpaKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTbuCqJe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LQjnvWYu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=nj/7fcsf30Nl8qf2AjASDTaU9/a5G4x2NM42ScBp3WU=; b=LQjnvWYu3WOigFeuvNGsLhVyeA
-	LSBftwv1jH5BbNLCieyXiqFYEX3BE8h4ymP8FdQ1TXE8KEoTgCBKOBsMdINAIf7mZ9sFBGSyVHx97
-	bj8nOzMPWgRRGd/CEPxvEqyub6YJeRhc866hMUlCIlha1QDfz1R5r0hK9gTNH0tpb7QC8DvPhYgcs
-	GxG81Vp9C61eONYw7rE6F937r9GgLov71RcD4mQZJ9k86q/hlquMkMBDlY6Msh5dS3ld/zSKDr5IZ
-	zlnZizKi8GCOrR4jWnVOPPQV7OftOMeUJ+Zvd4iEoRHbnCFZu00+lNexG2ZP7p4Tk/PomzZcIgu+i
-	dEl7TZwA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u243C-00Donk-01;
-	Tue, 08 Apr 2025 16:11:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Apr 2025 16:11:18 +0800
-Date: Tue, 8 Apr 2025 16:11:17 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Cc: clabbe.montjoie@gmail.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, wens@csie.org,
-	jernej.skrabec@gmail.com, samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/6] crypto: sun8i-ce-hash - fix error handling in
- sun8i_ce_hash_run()
-Message-ID: <Z_TaJWOFdAGNAOyh@gondor.apana.org.au>
-References: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTbuCqJe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1ED2C4CEEB;
+	Tue,  8 Apr 2025 08:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744100173;
+	bh=a0cHsypMDGBoj1KQFM5mwYajqEJrx4jAOqxJNpZ+kzU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mTbuCqJetua5Pl89eRSq+KlSTASP0RslqlF95iKaZ1238IoDHob5PfyjcI9b1TjzW
+	 oRS9ccNNBVgaFxO6Xn0/xrrYjvwRF67tgr2Q/lVjc52IBDfXbp9/+bS1RZ1DsbfIOr
+	 M3XEap2gKGIDF8vSkJU3YvnVVWMMlKpuA6S7jBu1K6Md7TQJ7y6UKAny/rt8JYyxdx
+	 IFdTX4ONhmFkxnvg+N5Kx+cNhc4Bjv9jVsoXS/WZuoZfo5uzB+bSpRnInEiXNEiMqo
+	 Dq4QZuYjQq/kE4ajtkQ+kbMFU1g5rKcVGLFsuMFtWZLCTz2qJdF2fxoi/fLxxkUgoL
+	 zB+LZD52kI6nQ==
+Date: Tue, 8 Apr 2025 10:16:04 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@kernel.org>,
+	linux-kbuild@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>, Takashi Iwai <tiwai@suse.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Uros Bizjak <ubizjak@gmail.com>, Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 0/4] Make gcc-8.1 and binutils-2.30 the minimum version
+Message-ID: <Z_TbRGgRTDvyQyfs@gmail.com>
+References: <20250407094116.1339199-1-arnd@kernel.org>
+ <20250407164151.GB2536@sol.localdomain>
+ <0d087503-88d5-4d66-aa52-161ca6e0df06@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,21 +59,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250401192321.3370188-1-ovidiu.panait.oss@gmail.com>
+In-Reply-To: <0d087503-88d5-4d66-aa52-161ca6e0df06@app.fastmail.com>
 
-On Tue, Apr 01, 2025 at 10:23:16PM +0300, Ovidiu Panait wrote:
-> Rework error handling in sun8i_ce_hash_run() to unmap the dma buffers in
-> case of failure. Currently, the dma unmap functions are not called if the
-> function errors out at various points.
+
+* Arnd Bergmann <arnd@arndb.de> wrote:
+
+> On Mon, Apr 7, 2025, at 18:41, Eric Biggers wrote:
+> > On Mon, Apr 07, 2025 at 11:41:12AM +0200, Arnd Bergmann wrote:
+> >
+> > This is intended to supersede the patches from Uros that removed checks for
+> > binutils < 2.25, right?  See:
+> >
+> > * 
+> > https://lore.kernel.org/linux-crypto/20250404074135.520812-1-ubizjak@gmail.com/
+> > * 
+> > https://lore.kernel.org/linux-crypto/20250404074135.520812-2-ubizjak@gmail.com
+> > * 
+> > https://lore.kernel.org/linux-crypto/20250404074135.520812-3-ubizjak@gmail.com/
 > 
-> Fixes: 56f6d5aee88d1 ("crypto: sun8i-ce - support hash algorithms")
-> Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-> ---
->  .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 34 ++++++++++++-------
->  1 file changed, 21 insertions(+), 13 deletions(-)
+> I missed these, but it does sounds we easy to work out, either
+> by rebasing my patch or dropping Uros' version.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+It's a trivial conflict resolution AFAICS, already done in today's 
+-next.
+
+Thanks,
+
+	Ingo
