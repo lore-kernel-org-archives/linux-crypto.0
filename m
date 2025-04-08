@@ -1,150 +1,204 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640891D8DF6;
-	Tue,  8 Apr 2025 14:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96531288CC
+	for <linux-crypto@vger.kernel.org>; Tue,  8 Apr 2025 15:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744122065; cv=none; b=TVQL2eMG8s+5u8S9lpmyTlRyi0nAnH3NZWlAUEEPIxrBv1wEF0JIDFy7VgGzzHZ1PQhLasOnc+NEdS8vGEd4B54VyeNe7koBmxrnIItr+nUtMtFNxayp33nMXHkq8IxGw2on4Mz68iYrCn/d3oVk+Dh9LjpSkNzYnx8GTqoIrrY=
+	t=1744127076; cv=none; b=J9z382vFWmZFcJinuOd3Kd/+PCI0Tc02eHRAq93D99xzSQBTw8/i7VUZnmPU/gxLkKxshKdPKTs/JeiLuVz2f0iyDtESajiit1S6+u0kBCOdIbIYQrtN7abEkZcBS7Xl0hKT8bWzMNfQCcXPvaitZ53urdIiiZuGLxChZImO/AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744122065; c=relaxed/simple;
-	bh=cAQI760n7YkqAtzL4hcAIR55fHa1dxos0epYJ6MikR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XHDN0cRCYCGWhorIv14ZcAgyyg01pdHl8i+5zECAqQqp/d7nXcNh9Slh4ief1IhEP04a5gN6DNNIg0WZSBhcRUEM0rLXV0camw0BPR1vRtR2by4kvOoW5ENuT0yPQC9sFQ2mDk/CCAk/LpSL7DKtokQpDcQQ2XKDd0fDLwiyh4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B5431688;
-	Tue,  8 Apr 2025 07:21:01 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3508A3F6A8;
-	Tue,  8 Apr 2025 07:20:56 -0700 (PDT)
-Date: Tue, 8 Apr 2025 15:20:53 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Borislav Petkov <bp@alien8.de>, Brian Gerst <brgerst@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uros Bizjak <ubizjak@gmail.com>, Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 0/4] Make gcc-8.1 and binutils-2.30 the minimum version
-Message-ID: <Z_Uwxe46_o5nYkMB@J2N7QTR9R3.cambridge.arm.com>
-References: <20250407094116.1339199-1-arnd@kernel.org>
+	s=arc-20240116; t=1744127076; c=relaxed/simple;
+	bh=QfGk+St/BZffAHCW4HDfe5HEDvaTBOAzxOV4lsHRr0U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rN7yJmgGERmHUrEQmPOsIAybWkWhShpaHXU4HF3oa7b4RX7sfentEEsFopeHNXGTPVwkKVIdhs/kPM9bBu5Axfd46iiL2Z0N7ofE0ZNMStCzFDXqkzbvvq31lji4BP8a8NeLj6A3DQ7x2oYV110eUZOjM6E+V97AK0OwO/zI56I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hzOZ+kir; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hzOZ+kir"
+Message-ID: <e3dd2f83-8451-47b0-a774-a697b861ceb3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744127071;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CXIB70x15AbBHta+hdOaQKeCOzWFxSv/4pSccU8QyVI=;
+	b=hzOZ+kirYJdW7t5lmthYieBgPmWxykReVBb9M2SclS56LGDgRzbEdXLEtM19BNKqvdoXK6
+	5nJCh1NEmw4j17SDwUS6PU34cMtZgpeHaSStE9cceXlkMcPSUaLTI6tptkWNnWFf+S3Nd6
+	iuHS4bF47J4lVDGiHWuidOFaL2HWpxs=
+Date: Tue, 8 Apr 2025 11:44:27 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407094116.1339199-1-arnd@kernel.org>
+Subject: Re: [PATCH] crypto: caam/qi - Fix drv_ctx refcount bug
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
+ linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org,
+ Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
+References: <17f9af67-de10-4b96-99ef-3c5cd78124c0@linux.dev>
+ <Z_SxYFdyBJTYe_7G@gondor.apana.org.au>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <Z_SxYFdyBJTYe_7G@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 07, 2025 at 11:41:12AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On 4/8/25 01:17, Herbert Xu wrote:
+> On Mon, Apr 07, 2025 at 07:16:38PM -0400, Sean Anderson wrote:
+>>
+>> [    2.731344] refcount_t: decrement hit 0; leaking memory.
 > 
-> x86 already requires gcc-8.1 since linux-6.15-rc1, which led me to
-> actually go through all  version checks and make this is the minimum
-> for all architectures.
+> ...
+> 
+>> [    2.731496] caam_rsp_fq_dqrr_cb (include/linux/refcount.h:336 include/linux/refcount.h:351 drivers/crypto/caam/qi.c:593) 
+>> [    2.731502] qman_p_poll_dqrr (drivers/soc/fsl/qbman/qman.c:1652 drivers/soc/fsl/qbman/qman.c:1759) 
+>> [    2.731510] caam_qi_poll (drivers/crypto/caam/qi.c:491) 
+>> [    2.731514] __napi_poll (net/core/dev.c:7328) 
+>> [    2.731520] net_rx_action (net/core/dev.c:7394 net/core/dev.c:7514) 
+>> [    2.731524] handle_softirqs (arch/arm64/include/asm/jump_label.h:36 include/trace/events/irq.h:142 kernel/softirq.c:562) 
+>> [    2.731530] __do_softirq (kernel/softirq.c:596) 
+>> [    2.731533] ____do_softirq (arch/arm64/kernel/irq.c:82) 
+>> [    2.731538] call_on_irq_stack (arch/arm64/kernel/entry.S:897) 
+>> [    2.731542] do_softirq_own_stack (arch/arm64/kernel/irq.c:87) 
+>> [    2.731547] __irq_exit_rcu (kernel/softirq.c:442 kernel/softirq.c:662) 
+>> [    2.731550] irq_exit_rcu (kernel/softirq.c:681) 
+>> [    2.731554] el1_interrupt (arch/arm64/kernel/entry-common.c:565 arch/arm64/kernel/entry-common.c:575) 
+>> [    2.731561] el1h_64_irq_handler (arch/arm64/kernel/entry-common.c:581) 
+>> [    2.731567] el1h_64_irq (arch/arm64/kernel/entry.S:596) 
+>> [    2.731570] qman_enqueue (drivers/soc/fsl/qbman/qman.c:2354) (P)
+>> [    2.731576] caam_qi_enqueue (drivers/crypto/caam/qi.c:125) 
+> 
+> So caam_qi_enqueue hasn't had a chance to increment the refcount
+> and the IRQ already came in to decrement it.  Lesson is that you
+> should always increment your refcount before you give it away.
+> 
+> ---8<---
+> Ensure refcount is raised before request is enqueued since it could
+> be dequeued before the call returns.
+> 
+> Reported-by: Sean Anderson <sean.anderson@linux.dev>
+> Cc: <stable@vger.kernel.org>
+> Fixes: 11144416a755 ("crypto: caam/qi - optimize frame queue cleanup")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+> index 7701d00bcb3a..b6e7c0b29d4e 100644
+> --- a/drivers/crypto/caam/qi.c
+> +++ b/drivers/crypto/caam/qi.c
+> @@ -122,12 +122,12 @@ int caam_qi_enqueue(struct device *qidev, struct caam_drv_req *req)
+>  	qm_fd_addr_set64(&fd, addr);
+>  
+>  	do {
+> +		refcount_inc(&req->drv_ctx->refcnt);
+>  		ret = qman_enqueue(req->drv_ctx->req_fq, &fd);
+> -		if (likely(!ret)) {
+> -			refcount_inc(&req->drv_ctx->refcnt);
+> +		if (likely(!ret))
+>  			return 0;
+> -		}
+>  
+> +		refcount_dec(&req->drv_ctx->refcnt);
+>  		if (ret != -EBUSY)
+>  			break;
+>  		num_retries++;
 
-I am very much in favour of this, so for the series:
+Tested-by: Sean Anderson <sean.anderson@linux.dev>
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+However, note that the following error is still present:
 
-Is the aim to get this in for v6.15?
+[    3.294978] alg: sig: sign test failed: invalid output
+[    3.300128] 00000000: 68 e4 b7 d5 2e 12 d4 9b ca a5 a7 fc 50 2f d2 f6
+[    3.306573] 00000010: 6b 01 58 1e b7 72 2c 0f 66 a4 c9 1e b9 49 21 a7
+[    3.313016] 00000020: 53 62 26 6d bb 69 62 a2 7e 3b 8d 80 6f 2d 21 9d
+[    3.319458] 00000030: cd 6f 92 e5 a9 03 e4 b3 b0 fc e7 4f ec a7 23 5c
+[    3.325902] 00000040: 1d dc 08 13 c3 2e 8b d9 fa ab e0 6f 2b a0 9d 2b
+[    3.332345] 00000050: 32 47 d5 ad ec 65 5a ce b3 13 35 95 37 0e f1 b0
+[    3.338788] 00000060: c3 8e 22 0d c9 a2 b3 31 58 ea 74 18 18 d2 9f 7e
+[    3.345230] 00000070: 04 fe 3b f1 5e 40 6c 39 3f 38 a2 71 58 fa da 1a
+[    3.351672] 00000080: ed 02 70 7c 9e 72 93 a3 66 25 f2 35 e9 82 00 49
+[    3.358114] 00000090: 8e 09 b9 f0 52 76 b2 9e b4 06 b0 60 f2 15 a1 78
+[    3.364556] 000000a0: 74 3c 9b 87 17 f6 e8 ff ca fe 41 ed 73 c8 28 70
+[    3.370999] 000000b0: 33 cc a2 de d6 04 7a b5 85 81 a3 46 16 46 66 af
+[    3.377442] 000000c0: 26 84 bc 9e 70 68 7c b3 68 44 73 4c c2 a4 70 45
+[    3.383887] 000000d0: a5 af a3 b3 9c cb b5 c8 bf 7d 8a 17 97 f6 33 0c
+[    3.390329] 000000e0: 94 cc d3 fd ee e7 ba 8b dc 6f c7 3b 3b 67 14 ae
+[    3.396771] 000000f0: 6a 00 33 90 df c5 f9 a2 6c b8 93 f7 cf 6b 0d 0d
+[    3.403214] alg: sig: test 1 failed for pkcs1(rsa-caam,sha256): err -22
+[    3.409833] alg: self-tests for pkcs1(rsa,sha256) using pkcs1(rsa-caam,sha256) failed (rc=-22)
+[    3.409836] ------------[ cut here ]------------
+[    3.423067] alg: self-tests for pkcs1(rsa,sha256) using pkcs1(rsa-caam,sha256) failed (rc=-22)
+[    3.423094] WARNING: CPU: 3 PID: 337 at crypto/testmgr.c:6012 alg_test (crypto/testmgr.c:6012 (discriminator 1)) 
+[    3.439282] Modules linked in:
+[    3.442334] CPU: 3 UID: 0 PID: 337 Comm: cryptomgr_test Not tainted 6.14.0-seco+ #163 NONE
+[    3.450687] Hardware name: LS1046A RDB Board (DT)
+[    3.455387] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[    3.462349] pc : alg_test (crypto/testmgr.c:6012 (discriminator 1)) 
+[    3.466008] lr : alg_test (crypto/testmgr.c:6012 (discriminator 1)) 
+[    3.469667] sp : ffffffc086ebbd40
+[    3.472974] x29: ffffffc086ebbd40 x28: 0000000000000000 x27: 0000000000000000
+[    3.480114] x26: 00000000ffffffea x25: 00000000ffffffff x24: ffffffc082066470
+[    3.487253] x23: 0000000000000159 x22: 0000000000000807 x21: ffffff8801ce2a80
+[    3.494392] x20: ffffff8801ce2a00 x19: ffffffc081290df0 x18: 0000000000000000
+[    3.501531] x17: 35326168732c6d61 x16: 61632d6173722831 x15: 000000000000002d
+[    3.508670] x14: 0000000000000000 x13: 00000000fffffffe x12: 65742d666c657320
+[    3.515808] x11: 656820747563205b x10: ffffffc081dc0640 x9 : ffffffc081d91ef8
+[    3.522946] x8 : ffffffc086ebbb28 x7 : ffffffc081d91ef8 x6 : 00000000fffff7ff
+[    3.530085] x5 : 00000000000001a4 x4 : 0000000000000000 x3 : 0000000000000000
+[    3.537224] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffffff88023fc200
+[    3.544362] Call trace:
+[    3.546801] alg_test (crypto/testmgr.c:6012 (discriminator 1)) (P)
+[    3.550461] cryptomgr_test (crypto/algboss.c:181) 
+[    3.554122] kthread (kernel/kthread.c:464) 
+[    3.557261] ret_from_fork (arch/arm64/kernel/entry.S:863) 
+[    3.560833] ---[ end trace 0000000000000000 ]---
 
-I believe this will permit a number of further cleanups for arm64, and
-if it's possible to get this in for v6.15, it'd be a bit easier to start
-preparing those for v6.16. No big problem if that's not the case.
+as well as another error on reboot (present before but I forgot to post it):
 
-Mark.
+[   98.514208] ------------[ cut here ]------------
+[   98.518823] WARNING: CPU: 3 PID: 1 at crypto/algapi.c:464 crypto_unregister_alg (crypto/algapi.c:464 (discriminator 1)) 
+[   98.527100] Modules linked in:
+[   98.530153] CPU: 3 UID: 0 PID: 1 Comm: systemd-shutdow Tainted: G        W          6.14.0-seco+ #163 NONE
+[   98.539899] Tainted: [W]=WARN
+[   98.542859] Hardware name: LS1046A RDB Board (DT)
+[   98.547559] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   98.554520] pc : crypto_unregister_alg (crypto/algapi.c:464 (discriminator 1)) 
+[   98.559224] lr : crypto_unregister_alg (include/linux/atomic/atomic-arch-fallback.h:457 include/linux/atomic/atomic-instrumented.h:33 include/linux/refcount.h:136 crypto/algapi.c:464) 
+[   98.563926] sp : ffffffc0820dbb80
+[   98.567234] x29: ffffffc0820dbb80 x28: ffffff8800160000 x27: ffffff8801787090
+[   98.574374] x26: 0000000000000000 x25: ffffffc082022030 x24: 0000000000000000
+[   98.581513] x23: 0000000000000001 x22: ffffffc081efa4e0 x21: ffffffc0820dbbb8
+[   98.588652] x20: ffffffc081e80cc8 x19: ffffffc081f095c0 x18: 0000000000000000
+[   98.595791] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000001
+[   98.602929] x14: ffffff8800160080 x13: 00000000000001b6 x12: 0000000000000001
+[   98.610069] x11: 0000000000000000 x10: 000000000000042c x9 : 0000000000000001
+[   98.617207] x8 : ffffffc0820dbb68 x7 : ffffffc081f095d0 x6 : ffffffc0820dbb58
+[   98.624346] x5 : ffffffc081f095c0 x4 : 0000000000000000 x3 : 0000000000000000
+[   98.631484] x2 : ffffffffffffffff x1 : 0000000000000001 x0 : 0000000000000002
+[   98.638623] Call trace:
+[   98.641062] crypto_unregister_alg (crypto/algapi.c:464 (discriminator 1)) (P)
+[   98.645765] crypto_unregister_rng (crypto/rng.c:188) 
+[   98.650035] caam_prng_unregister (drivers/crypto/caam/caamprng.c:207) 
+[   98.654216] caam_jr_remove (drivers/crypto/caam/jr.c:59 drivers/crypto/caam/jr.c:207) 
+[   98.657963] platform_shutdown (drivers/base/platform.c:1439) 
+[   98.661883] device_shutdown (include/linux/device.h:937 drivers/base/core.c:4823) 
+[   98.665804] kernel_restart (kernel/reboot.c:271 kernel/reboot.c:285) 
+[   98.669465] __do_sys_reboot (kernel/reboot.c:725) 
+[   98.673384] __arm64_sys_reboot (kernel/reboot.c:723) 
+[   98.677390] invoke_syscall (arch/arm64/include/asm/current.h:19 arch/arm64/kernel/syscall.c:54) 
+[   98.681137] el0_svc_common.constprop.0 (include/linux/thread_info.h:135 (discriminator 2) arch/arm64/kernel/syscall.c:140 (discriminator 2)) 
+[   98.685841] do_el0_svc (arch/arm64/kernel/syscall.c:152) 
+[   98.689152] el0_svc (arch/arm64/include/asm/irqflags.h:55 arch/arm64/include/asm/irqflags.h:76 arch/arm64/kernel/entry-common.c:165 arch/arm64/kernel/entry-common.c:178 arch/arm64/kernel/entry-common.c:745) 
+[   98.692204] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:763) 
+[   98.696559] el0t_64_sync (arch/arm64/kernel/entry.S:600) 
+[   98.700217] ---[ end trace 0000000000000000 ]---
 
-> 
-> Most of the actual resulting changes are actually for raising the
-> binutils version, which eliminates version checks on x86 and arm64.
-> 
-> Arnd Bergmann (4):
->   kbuild: require gcc-8 and binutils-2.30
->   raid6: skip avx512 checks
->   x86: remove checks for binutils-2.30 and earlier
->   arm64: drop binutils version checks
-> 
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Brian Gerst <brgerst@gmail.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Cc: Nicolas Schier <nicolas@fjasle.eu>
-> Cc: Takashi Iwai <tiwai@suse.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Uros Bizjak <ubizjak@gmail.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-raid@vger.kernel.org
-> Cc: x86@kernel.org
-> 
->  Documentation/admin-guide/README.rst          |  2 +-
->  Documentation/kbuild/makefiles.rst            |  4 +-
->  Documentation/process/changes.rst             |  4 +-
->  .../translations/it_IT/process/changes.rst    |  4 +-
->  .../translations/zh_CN/admin-guide/README.rst |  2 +-
->  arch/arm64/Kconfig                            | 37 +--------------
->  arch/arm64/Makefile                           | 21 +--------
->  arch/arm64/include/asm/rwonce.h               |  4 --
->  arch/arm64/kvm/Kconfig                        |  1 -
->  arch/arm64/lib/xor-neon.c                     |  2 +-
->  arch/um/Makefile                              |  4 +-
->  arch/x86/Kconfig.assembler                    | 29 ------------
->  arch/x86/crypto/Kconfig                       |  2 +-
->  arch/x86/crypto/Makefile                      | 12 +++--
->  arch/x86/crypto/aes-ctr-avx-x86_64.S          |  2 -
->  arch/x86/crypto/aes-xts-avx-x86_64.S          |  2 -
->  arch/x86/crypto/aesni-intel_glue.c            | 21 +--------
->  arch/x86/crypto/aria-aesni-avx-asm_64.S       | 10 -----
->  arch/x86/crypto/aria-aesni-avx2-asm_64.S      | 10 +----
->  arch/x86/crypto/aria_aesni_avx2_glue.c        |  4 +-
->  arch/x86/crypto/aria_aesni_avx_glue.c         |  4 +-
->  arch/x86/crypto/blake2s-core.S                |  4 --
->  arch/x86/crypto/blake2s-glue.c                |  6 +--
->  arch/x86/crypto/chacha_glue.c                 |  6 +--
->  arch/x86/crypto/poly1305-x86_64-cryptogams.pl |  8 ----
->  arch/x86/crypto/poly1305_glue.c               |  4 +-
->  arch/x86/crypto/sha1_ssse3_glue.c             | 10 -----
->  arch/x86/crypto/sha256_ssse3_glue.c           | 10 -----
->  include/linux/unroll.h                        |  4 +-
->  kernel/gcov/gcc_4_7.c                         |  4 --
->  lib/raid6/algos.c                             |  6 ---
->  lib/raid6/avx512.c                            |  4 --
->  lib/raid6/recov_avx512.c                      |  6 ---
->  lib/raid6/test/Makefile                       |  3 --
->  lib/test_fortify/Makefile                     |  5 +--
->  scripts/Makefile.compiler                     |  2 +-
->  scripts/gcc-plugins/gcc-common.h              | 45 -------------------
->  scripts/min-tool-version.sh                   |  6 +--
->  38 files changed, 36 insertions(+), 278 deletions(-)
-> 
-> -- 
-> 2.39.5
-> 
+--Sean
+
