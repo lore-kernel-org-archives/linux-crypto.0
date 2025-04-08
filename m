@@ -1,202 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A6C1DD526;
-	Tue,  8 Apr 2025 16:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425D3234979;
+	Tue,  8 Apr 2025 17:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744128233; cv=none; b=dV8JdGpVJO14Y2izRnpTGo0Hh3+JMbcqMXcNVGC9OM1S1vXysREKpsewhjdv6cWBCk+2ErUgEOMWASALDPg5WmrGY2QvxkO6BfAocp99EekQWtwssOQQcwd2so9YoIvusXzJSa248jsXHLmHOAu0BvHnTeKS3GR5MgeCZlFXLUw=
+	t=1744132593; cv=none; b=MjYBv+ugPVFMWcr257dOl8baMPpdxBZ9M1P0D2a/Podb2X9GoF480u3V0GUoEjc83dK4cYKOvVQXeFflHkA802TJsZjy4f3vIhNQrs2mUngVFfONJNlAFMdQMKdaU9HFYhMW7ucNtVefeaI0txuKCJIgK5Yim3MJow8iEhlcsE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744128233; c=relaxed/simple;
-	bh=sYBQZuJxt5zTSvoYOaRmcgpLbpD2sLbz+LfcVceYw+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OQcAM/BQ1dTeQXpJrm62hG8GAlMi96SQW71/KvdW/1wKg3ARtWhE4/mdMYDgPpVi9XrGI1cQ54ruQkOGbAt0qF/ulnJncRpzN0B4sZxcvpiKakGjmAjrSlY2s11c7BiTXl+xHvuNeN7qq0Jl43IBjuxi+CG1RznAgZxxWuyjRK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=esdUv9vA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744132593; c=relaxed/simple;
+	bh=5sVm7Ccq5DFzle8yTbs1g/hLQHzfJVombqZ3QUUwX+Y=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=pCcwJa2akv2wmtCd0ACoCc6CdVNsrBmOzFEhNpSnyLU2MA13DNaNPy/Xz7mDJCuHdJksHRYu8Pcr/MNmcw1BmAoyTPK5vqXFKcVIuG4R0IZ/gOdakYspLA3LgLom1aNC8xE3NuwOXc4YCf/Xm4Bn8L1IzUbSDhyG/C3JZBnB+Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=kAKER9WG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kxASuWul; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="esdUv9vA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71498C4CEE5;
-	Tue,  8 Apr 2025 16:03:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744128232;
-	bh=sYBQZuJxt5zTSvoYOaRmcgpLbpD2sLbz+LfcVceYw+k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=esdUv9vAPoKScFn2Aa2AEAXqWNxnf79HjKfftZgcA2I2+jsIwiYbaLUUgA1/Xh1vT
-	 /xGzNV9NliTzLT7bQNCYP4AkDqPK2VyTcOiZa0/Ga50XuRHGyQcXePD3FcWum9LrKq
-	 ud0CvYhMDp8JXnjwFZ7Hl49uXEfyO7Q+3fo0JimXG9Zeu148NbDNvX0BvP/kyqQhW9
-	 FYPx+RTPNJi+PD9F4PBslKqdjBlTdZ9l9aQXljdcQMieYjAGJERaL8Hawy3K1ehvKA
-	 dfKKKvtqLf8G0MDmXbVu1gRvhhG6y3nGU1duNZQUROfyFq5KsecqX20mD9xkpHnjoj
-	 VfM82fY43DVZw==
-Date: Tue, 8 Apr 2025 19:03:49 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: keyrings@vger.kernel.org, stable@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4] tpm: Mask TPM RC in tpm2_start_auth_session()
-Message-ID: <Z_VI5ZgavgLrgicA@kernel.org>
-References: <20250407072057.81062-1-jarkko@kernel.org>
- <20250407122806.15400-1-jarkko@kernel.org>
- <e7ul3n3rwvv3xiyiaf4dv5x7kbtcgb6zpcf33k6dobxf5ctdyp@z5iwi4pofj7h>
- <Z_QV0ejAdciCO_Ma@kernel.org>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="kAKER9WG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kxASuWul"
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 301A611400B6;
+	Tue,  8 Apr 2025 13:16:28 -0400 (EDT)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-12.internal (MEProxy); Tue, 08 Apr 2025 13:16:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1744132588;
+	 x=1744218988; bh=ZusC4j88iZDe7cKmTzZPwEEcBckZyU9z5JAnaD7npYo=; b=
+	kAKER9WG8clrJgdPv5KjhGSlW0MTMk5KT4ZUk7Kw0BFGACZ5jol0penH71/1gQAN
+	5qjpXbVzNbMs9sqso3a55c0mhxatEOgnBlPFswaXbqQVXVuL2b5qa602yQCMJ9Tg
+	C/VVYD9yetDD4NvMjEZRNne8hAFU+Dl7BqDOCFuyobL44dg6iyb60EKsZnC+fm7A
+	u0Ik2rTGasA0fSEjYMnN8h5f0Tbt9X/0Ikpuy4r+fJd3WolKh736R69sUkxgNcQv
+	GvCPiGiFWVaxQXUnxdnQNxTA90CCMynLszA2i7jkuVjgDkgGEtVAEq+b/vqBMwZ0
+	LzXKhjxzgHF6qODoQUzlQA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1744132588; x=
+	1744218988; bh=ZusC4j88iZDe7cKmTzZPwEEcBckZyU9z5JAnaD7npYo=; b=k
+	xASuWulBPJTSShQgUfSKwnoLD8ec+A277BzKDuxEnJzp8ZzNq4MdXk/KoUVv6jvB
+	GMb+Llj/jrPu2WhV16RwgIFBSTChgTX14A3Y/Y7dEVGL6qoCYjUlDpPA0851RWje
+	gw0idm5agye/vmHe/LSXchEkPiyoHcCSsDWA7lyl6hN6U76nBVxIM9HcNaXQqPPR
+	2e3y+Rtwa4q+qm50bpWXvaxipmdCC2wcTQgdy1aLlSpt23iaDnPdo+CI4IdUfHLb
+	ZR5w/enAAEe1T96W8TFXkKb+rzLSz16dQr29S287m9i7ftHNci8O3roNlTk9gL3T
+	TOZPxW5NWjLteT6xc52ww==
+X-ME-Sender: <xms:6Vn1ZzgSipKPFrG6IuVoqX5aC0B3zsJ03TwguC7t67ub6IzI064pWg>
+    <xme:6Vn1ZwAuvhR3fDsZ5YZ1Y1k607MrfdkQysMrhL0JsIj5HLd9Ng1ogrHZkwqRYKAbs
+    llOE7mlyo4sQ9Q2Jgw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdefieeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
+    gsrdguvgeqnecuggftrfgrthhtvghrnhepteeutddtheffkedttdduiefgffefkefhgfeu
+    ieetjeehteeludefleffieevffdtnecuffhomhgrihhnpeduiedrnhhonecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggs
+    rdguvgdpnhgspghrtghpthhtohepvdeipdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopegsphesrghlihgvnhekrdguvgdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhn
+    rghssegrrhhmrdgtohhmpdhrtghpthhtohepmhgrrhhkrdhruhhtlhgrnhgusegrrhhmrd
+    gtohhmpdhrtghpthhtohepnhhitgholhgrshesfhhjrghslhgvrdgvuhdprhgtphhtthho
+    pegsrhhgvghrshhtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuhgsihiijhgrkhesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghn
+    rgdrohhrghdrrghupdhrtghpthhtoheprghruggssehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegrrhhnugeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:6Vn1ZzHurRHuHgzee5gnc6zzuDyC99eqxxcG0Rd-a83_k91ZjMjq6g>
+    <xmx:6Vn1ZwTdHSNtQ4IwxNAhwiTCO_unZ12OFl0sjgDX-1QoynU850u4GQ>
+    <xmx:6Vn1Zwx3PDyMl3hQZQb01ThSkhjNY3lKUTI6KycfntiEaYR15s-G7A>
+    <xmx:6Vn1Z24UqqDehkMC3wjyPDDqgGzgMI5XFgUZNLhnHBQDEILM7AC05Q>
+    <xmx:7Fn1Z3TC_xAheqDni-VD8_gghQnO4lzwgRrKNmcct4VKq6wG0MRxZT47>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 0A5352220073; Tue,  8 Apr 2025 13:16:24 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_QV0ejAdciCO_Ma@kernel.org>
+X-ThreadId: T46c1ceb211c7c949
+Date: Tue, 08 Apr 2025 19:16:04 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Mark Rutland" <mark.rutland@arm.com>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ "Ard Biesheuvel" <ardb@kernel.org>, "Borislav Petkov" <bp@alien8.de>,
+ "Brian Gerst" <brgerst@gmail.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, "Ingo Molnar" <mingo@redhat.com>,
+ "Jonathan Corbet" <corbet@lwn.net>, "Marc Zyngier" <maz@kernel.org>,
+ "Masahiro Yamada" <masahiroy@kernel.org>,
+ "Nathan Chancellor" <nathan@kernel.org>,
+ "Nicolas Schier" <nicolas@fjasle.eu>, "Takashi Iwai" <tiwai@suse.com>,
+ "Thomas Gleixner" <tglx@linutronix.de>, "Uros Bizjak" <ubizjak@gmail.com>,
+ "Will Deacon" <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, x86@kernel.org
+Message-Id: <37ac1bd5-580c-4980-98fa-653dfe3eb768@app.fastmail.com>
+In-Reply-To: <Z_Uwxe46_o5nYkMB@J2N7QTR9R3.cambridge.arm.com>
+References: <20250407094116.1339199-1-arnd@kernel.org>
+ <Z_Uwxe46_o5nYkMB@J2N7QTR9R3.cambridge.arm.com>
+Subject: Re: [PATCH 0/4] Make gcc-8.1 and binutils-2.30 the minimum version
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 07, 2025 at 09:13:37PM +0300, Jarkko Sakkinen wrote:
-> On Mon, Apr 07, 2025 at 03:51:21PM +0200, Stefano Garzarella wrote:
-> > On Mon, Apr 07, 2025 at 03:28:05PM +0300, Jarkko Sakkinen wrote:
-> > > tpm2_start_auth_session() does not mask TPM RC correctly from the callers:
-> > > 
-> > > [   28.766528] tpm tpm0: A TPM error (2307) occurred start auth session
-> > > 
-> > > Process TPM RCs inside tpm2_start_auth_session(), and map them to POSIX
-> > > error codes.
-> > > 
-> > > Cc: stable@vger.kernel.org # v6.10+
-> > > Fixes: 699e3efd6c64 ("tpm: Add HMAC session start and end functions")
-> > > Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Closes: https://lore.kernel.org/linux-integrity/Z_NgdRHuTKP6JK--@gondor.apana.org.au/
-> > > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > ---
-> > > v4:
-> > > - tpm_to_ret()
-> > > v3:
-> > > - rc > 0
-> > > v2:
-> > > - Investigate TPM rc only after destroying tpm_buf.
-> > > ---
-> > > drivers/char/tpm/tpm2-sessions.c | 20 ++++++--------------
-> > > include/linux/tpm.h              | 21 +++++++++++++++++++++
-> > > 2 files changed, 27 insertions(+), 14 deletions(-)
-> > > 
-> > > diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-> > > index 3f89635ba5e8..102e099f22c1 100644
-> > > --- a/drivers/char/tpm/tpm2-sessions.c
-> > > +++ b/drivers/char/tpm/tpm2-sessions.c
-> > > @@ -40,11 +40,6 @@
-> > >  *
-> > >  * These are the usage functions:
-> > >  *
-> > > - * tpm2_start_auth_session() which allocates the opaque auth structure
-> > > - *	and gets a session from the TPM.  This must be called before
-> > > - *	any of the following functions.  The session is protected by a
-> > > - *	session_key which is derived from a random salt value
-> > > - *	encrypted to the NULL seed.
-> > >  * tpm2_end_auth_session() kills the session and frees the resources.
-> > >  *	Under normal operation this function is done by
-> > >  *	tpm_buf_check_hmac_response(), so this is only to be used on
-> > > @@ -963,16 +958,13 @@ static int tpm2_load_null(struct tpm_chip *chip, u32 *null_key)
-> > > }
-> > > 
-> > > /**
-> > > - * tpm2_start_auth_session() - create a HMAC authentication session with the TPM
-> > > - * @chip: the TPM chip structure to create the session with
-> > > + * tpm2_start_auth_session() - Create an a HMAC authentication session
-> > > + * @chip:	A TPM chip
-> > >  *
-> > > - * This function loads the NULL seed from its saved context and starts
-> > > - * an authentication session on the null seed, fills in the
-> > > - * @chip->auth structure to contain all the session details necessary
-> > > - * for performing the HMAC, encrypt and decrypt operations and
-> > > - * returns.  The NULL seed is flushed before this function returns.
-> > > + * Loads the ephemeral key (null seed), and starts an HMAC authenticated
-> > > + * session. The null seed is flushed before the return.
-> > >  *
-> > > - * Return: zero on success or actual error encountered.
-> > > + * Returns zero on success, or a POSIX error code.
-> > >  */
-> > > int tpm2_start_auth_session(struct tpm_chip *chip)
-> > > {
-> > > @@ -1024,7 +1016,7 @@ int tpm2_start_auth_session(struct tpm_chip *chip)
-> > > 	/* hash algorithm for session */
-> > > 	tpm_buf_append_u16(&buf, TPM_ALG_SHA256);
-> > > 
-> > > -	rc = tpm_transmit_cmd(chip, &buf, 0, "start auth session");
-> > > +	rc = tpm_to_ret(tpm_transmit_cmd(chip, &buf, 0, "StartAuthSession"));
-> > > 	tpm2_flush_context(chip, null_key);
-> > > 
-> > > 	if (rc == TPM2_RC_SUCCESS)
-> > > diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-> > > index 6c3125300c00..c826d5a9d894 100644
-> > > --- a/include/linux/tpm.h
-> > > +++ b/include/linux/tpm.h
-> > > @@ -257,8 +257,29 @@ enum tpm2_return_codes {
-> > > 	TPM2_RC_TESTING		= 0x090A, /* RC_WARN */
-> > > 	TPM2_RC_REFERENCE_H0	= 0x0910,
-> > > 	TPM2_RC_RETRY		= 0x0922,
-> > > +	TPM2_RC_SESSION_MEMORY	= 0x0903,
-> > 
-> > nit: the other values are in ascending order, should we keep it or is it not
-> > important?
-> > 
-> > (more a question for me than for the patch)
-> 
-> nope
-> 
-> > 
-> > > };
-> > > 
-> > > +/*
-> > > + * Convert a return value from tpm_transmit_cmd() to a POSIX return value. The
-> > > + * fallback return value is -EFAULT.
-> > > + */
-> > > +static inline ssize_t tpm_to_ret(ssize_t ret)
-> > > +{
-> > > +	/* Already a POSIX error: */
-> > > +	if (ret < 0)
-> > > +		return ret;
-> > > +
-> > > +	switch (ret) {
-> > > +	case TPM2_RC_SUCCESS:
-> > > +		return 0;
-> > > +	case TPM2_RC_SESSION_MEMORY:
-> > > +		return -ENOMEM;
-> > > +	default:
-> > > +		return -EFAULT;
-> > > +	}
-> > > +}
-> > 
-> > I like this and in the future we could reuse it in different places like
-> > tpm2_load_context() and tpm2_save_context().
-> > 
-> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> > 
-> > 
-> > BTW for my understading, looking at that code (sorry if the answer is
-> > obvious, but I'm learning) I'm confused about the use of tpm2_rc_value().
-> > 
-> > For example in tpm2_load_context() we have:
-> > 
-> >     	rc = tpm_transmit_cmd(chip, &tbuf, 4, NULL);
-> >     	...
-> > 	} else if (tpm2_rc_value(rc) == TPM2_RC_HANDLE ||
-> > 		   rc == TPM2_RC_REFERENCE_H0) {
-> > 
-> > While in tpm2_save_context(), we have:
-> > 
-> > 	rc = tpm_transmit_cmd(chip, &tbuf, 0, NULL);
-> > 	...
-> > 	} else if (tpm2_rc_value(rc) == TPM2_RC_REFERENCE_H0) {
-> > 
-> > So to check TPM2_RC_REFERENCE_H0 we are using tpm2_rc_value() only
-> > sometimes, what's the reason?
-> 
-> Good catch, I'll update...
-> 
-> TPM RC is a struct or bitfield.
+On Tue, Apr 8, 2025, at 16:20, Mark Rutland wrote:
+> On Mon, Apr 07, 2025 at 11:41:12AM +0200, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> x86 already requires gcc-8.1 since linux-6.15-rc1, which led me to
+>> actually go through all  version checks and make this is the minimum
+>> for all architectures.
+>
+> I am very much in favour of this, so for the series:
+>
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
+>
+> Is the aim to get this in for v6.15?
+>
+> I believe this will permit a number of further cleanups for arm64, and
+> if it's possible to get this in for v6.15, it'd be a bit easier to start
+> preparing those for v6.16. No big problem if that's not the case.
 
-Applied to my -next: https://web.git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/?h=next
+I wasn't planning to push it for 6.15, as we've discussed this change
+for a long time already, I don't think there is any rush now, though
+I agree it would have helped to have it earlier.
 
-BR, Jarkko
+I already found another follow-up, removing support for the sancov
+gcc plugin that is no longer needed, I'm sure there is more.
+
+     Arnd
