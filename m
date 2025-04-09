@@ -1,107 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476902B9CD;
-	Wed,  9 Apr 2025 09:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6238325DAE3
+	for <linux-crypto@vger.kernel.org>; Wed,  9 Apr 2025 10:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744190147; cv=none; b=tEbTe0wBRZsTVOySwZICVh9k/JZyBTqKqKN60zVcjfzsYSEcrulKnSoqeWE/0VSXaSdnuFwklXNyef/4iGGgIdz7IEIDVLR7QjrSaVW0U/skM6v4gDOs9zEDKHYQsE4V5yQUJhsnQX1fRqTs+o6QaMwHOC+duw+XC3KB0gD3PDc=
+	t=1744196349; cv=none; b=VKDudvAjcgMxND4I2bGosnOU8KU9KfumGWTe8QIoCfZCkIjQ4wGeC60tVCNQ8+YGB2Yz6OcB+seibF6HGcjacIUISYjETQd3VIqr65kFIeODX7KOyL4e3AlVLYklB8YrWaFSD0Atqj0LkKVwKT9idp763mU7PL38QxuTLzybXNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744190147; c=relaxed/simple;
-	bh=Ty1pwqrmShrkkSXMYJB/5FbS4/B1OSXP3/4mT9aAsdM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ka6/6ViYIYGJL4nprcB029WYYBqdlDIh7+3A6uXlIZaxOKNs0tD/EjKru/lPL9x9ITiG1eIwZ+GLoF6NRR0lZPmuzDvLA7ARRPjxzlqV0vP+uH6Me0gsdjmCmPJ0RYT+xc1SojNVUMqnDy0VLNRAt+4Up+mQ9j4uOsetXE5Dr60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+JWoiGn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744196349; c=relaxed/simple;
+	bh=yZVgJyKOyVxMf18P43WCJzG5o9H/sxGUpm/YaLSPafg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ilf/oIXp8EZJhzPuW4JK2qLYe2yrqdAlu8HN7Fu+BTZlO7KQ5ff8ob51Hfr1cr86t6qgIgJjAGVqyfpoiuS2jTcRxSUIutso6hpAYQjE5Bc9gg1l3lofC4KiQttnqAEDbbddy3e7vYdSg2xMh+3K8hylyc6clqBXl1ctVvBpsYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SbJFv+V6; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+JWoiGn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3ACBC4CEEE;
-	Wed,  9 Apr 2025 09:15:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744190146;
-	bh=Ty1pwqrmShrkkSXMYJB/5FbS4/B1OSXP3/4mT9aAsdM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=U+JWoiGnB3Ltj1oq2Lf12BbJStduvwmmIbUpPwE46zLzraulDbpUgoHkBVVxSd8dR
-	 xOjYR3O0gjN793iX6J5SWUKGfn+DlCd+uaXBa+XFVfRJqxVnHQLRo7nKYLq9iVeXzp
-	 A/XArWDVpftzIr3pQVPG/eHPWRm3RpI0SJr9XSe0gl9SKO/KANIGVe8EcU5X7aFWTa
-	 RGiQ2+2WTb/xFNL+o/t7/fYw5Du7FdwDxlEPGS/tMcK8pzaxCTKqVFYH8LIx3xs4J/
-	 ErqqLr1eYv8y+gb3UwC3FHhHjttrF/dppMtlQcx4TZpLLNii5sUvwGx1x4OAmCwuw6
-	 uOEeyj0DSftjA==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-549b159c84cso4589821e87.3;
-        Wed, 09 Apr 2025 02:15:46 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUgSzhF7Y3/gyKzFLL0DIAPu946Tfhx9pgySOUcWKcp6r9meUdZ8Vp7zd25RZWW/toXZmzRv5QMTbaN@vger.kernel.org, AJvYcCVCUlaSgUmr2jrTmLM+kEATKVQ/WbsNRiAuR85WbGmmQbBtk7mQYnJevWfqXBAMbN5Kc8MWY28yp3jjGsLjvWxh@vger.kernel.org, AJvYcCVLuk0NjYvcXlSNV/aOHWYRF3tXKOcCA2K8FfCWt4d0rlbaTJaTOuMHLCIStvd1XUp8kVpvoY8tcj5IG5l9@vger.kernel.org, AJvYcCVyzk5eztTdtqq6WdCgwGERRM1zD6Ka4JowOP8UR1oNx2MHnWRDqri2xoN9N8M2R6jfYFq1qVD1r+oVI5k=@vger.kernel.org, AJvYcCW7GIpvuMbbX7bmeLkv8aheWSGNVviCFWOunLp1RXDF19I2yyWp6rR2WWYwxR++Dqk5/sjYlg2gKlG6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgYdVILBznhKsRZwTE0CVRjC2r9439bosqfwgJ6UiU78jr6/KY
-	/1t5TX95wzDcKQJpdtaW2VMvizyS5GggiSCFGJY/1AFMoJFs2uQRETKopT1F/GGxvgiCTGmC6j+
-	jb1PeeuCERB0ingq8YeaS6Ug4fHo=
-X-Google-Smtp-Source: AGHT+IGr6pJEooPeND2WPKwmKzqEYbai9tqpsiAki3uL4C9w+bT2D4fnGON4jq0ew7tRiFB4rDjlDOhGc1mfiwwy2OM=
-X-Received: by 2002:a05:6512:3981:b0:545:8a1:5379 with SMTP id
- 2adb3069b0e04-54c44561c19mr593775e87.43.1744190145154; Wed, 09 Apr 2025
- 02:15:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SbJFv+V6"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39149bccb69so6209276f8f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 09 Apr 2025 03:59:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1744196346; x=1744801146; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rp0QpgiUoyf8iyuqXo4YUnWomQqWX1wfBy0iYncrzTY=;
+        b=SbJFv+V6dwK+0LxJvwNOrcZBOsJof+cBBzhlNcMw6p1GZskrdAEdk/x3e/3NwTM6AA
+         BUXeZX6ihGSDvmiXuwmNaVuxrAp3HL5xbUGD6/CmHeS958SuYY9LMfEQUJe0BTLTwlQn
+         2wi+niglVFW02c/Z2st5+fCV0mJj8XBpm9H/R4MoC3uV7TlwEYlwkMA2duWHIcGhJznr
+         hqFFt42mJ23Gfw+A2QPpXvFqjsBdlk7Btv3dv02s8Q5IC4ew4Dj9cJe6B9U0kDin9mEs
+         Rqs+NdXPdqWfRNZ/mmMDalLP4xQKianlrIvq3lYRL13F9OR6bgwAKgpq1ZufN8LYEP+e
+         r8+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744196346; x=1744801146;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rp0QpgiUoyf8iyuqXo4YUnWomQqWX1wfBy0iYncrzTY=;
+        b=TPP3Hxi+Ooo3ikddrqs9BV7Y7pk1AGafvW1MWJsps82dMKTEDENfednuhgTsD5RmeS
+         fVTXWOz+Zq6iXZrq0pFjiq8tgLB9yncSTiN3+U0AvvmWM+SR5w7WB9iJVA5jAHQlIbhx
+         yVtLZ1OLxmhMsMeg64xz9cbKTPO6N3CjZP45X28fPfmQSz8igdWgESQFpRRbYskUWfNI
+         wRTZguCQQ+0jC2t1Xs2o2ofCFSKGqtgSj5nMOUMgXnit4rSyPNoXZNkRuHWND94gLI24
+         N/yy0hqE/F/aucnHmTWGfPCx9DRnASJt+1Q7W5Alanpy74gpq987z24/LnynNGKmLzYu
+         84kw==
+X-Gm-Message-State: AOJu0YzwTO0b+yyEUg/dise15IGbCnyNNbdrvKsk3ZjAV3Ll36PX99tk
+	Fxkk1527oFLcOw9Pa6fMbN6LIwdLfgh+1v5vbt024hxlrbe8n2E8J4sX4CDsbvK92JO+8aW3R5U
+	l
+X-Gm-Gg: ASbGnctajKG4wm6gT/oXbyOYst6NbbBvG8tZeE7QhjSXZHcBdCxDQvKD3yPCtddfD4q
+	BPpS4kL8DDzINhevxXL6ADmdeSeZKC4oyJJb0psyoG0ng1IaboxsJC212WR7yGelRSmx0Vfsl8X
+	IL0A2DgcjTJBjgFm1qTYodhqXkzSoBtGhBUZgn4oYcLJJidZlG571pgIOycrLY6asWAKevId/8k
+	VNFDloAfo5+pFxWqbvXwaeHajhfjVj2A5OQfnAzfEVgcDi9kIxOrTT4mY1gHO+5UMQRglXpVhG2
+	VawpZnsfPdb50cGHr2JbRzXmepJUp+UlBkkxew+MFARPLg==
+X-Google-Smtp-Source: AGHT+IFm3aRn4XSKJ6DwXLZtIJ5f2qVTrnkTsKDf1Ox3VffGFNnCdgfG+2SXN2xkf8YHh8eog8+T+g==
+X-Received: by 2002:a05:6000:1a8a:b0:391:48d4:bd02 with SMTP id ffacd0b85a97d-39d87ab60e9mr2086456f8f.29.1744196345553;
+        Wed, 09 Apr 2025 03:59:05 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39d8936129dsm1327340f8f.18.2025.04.09.03.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 03:59:05 -0700 (PDT)
+Date: Wed, 9 Apr 2025 13:59:01 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Subject: [bug report] crypto: ccp - Move dev_info/err messages for SEV/SNP
+ init and shutdown
+Message-ID: <d9c2e79c-e26e-47b7-8243-ff6e7b101ec3@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250328230814.2210230-1-ross.philipson@oracle.com>
- <20250328230814.2210230-20-ross.philipson@oracle.com> <B41D3199-8054-4B2C-94D6-508D1DE4C8B3@zytor.com>
- <886145d3-a9f2-41f3-a754-253decdb1b4f@oracle.com> <Z_WkaJhel-BYxHeW@char.us.oracle.com>
-In-Reply-To: <Z_WkaJhel-BYxHeW@char.us.oracle.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 9 Apr 2025 11:15:34 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEAZS+839zmpW3WfwvTRMZmRbPYGpEoY=Xj9qFch9J7BA@mail.gmail.com>
-X-Gm-Features: ATxdqUF80H-sehwytd1k_ZBdeFEl5wo_O_6zq2xvDwvr3fvlWsrlNSPU8VOuvPk
-Message-ID: <CAMj1kXEAZS+839zmpW3WfwvTRMZmRbPYGpEoY=Xj9qFch9J7BA@mail.gmail.com>
-Subject: Re: [PATCH v13 19/19] x86/efi: EFI stub DRTM launch support for
- Secure Launch
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: ross.philipson@oracle.com, hpa@zytor.com, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-efi@vger.kernel.org, iommu@lists.linux.dev, 
-	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org, 
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org, 
-	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net, 
-	ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com, 
-	trenchboot-devel@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, 9 Apr 2025 at 00:35, Konrad Rzeszutek Wilk
-<konrad.wilk@oracle.com> wrote:
->
-> ..snip..
-> > > > @@ -925,6 +1014,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
-> > > >           goto fail;
-> > > >   }
-> > > >
-> > > > +#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
-> > > > + /* If a Secure Launch is in progress, this never returns */
-> > > > + efi_secure_launch(boot_params);
-> > > > +#endif
-> > > > +
-> > > >   /*
-> > > >    * Call the SEV init code while still running with the firmware's
-> > > >    * GDT/IDT, so #VC exceptions will be handled by EFI.
-> > >
-> > > efi_set_u64_form()?
-> > >
-> > > What the heck is that? If it actually involves two u32 packed into a 64 field, why not simply do two stores?
-> > >
-> >
-> > Well the story is this. The EFI maintainers asked me to use the
-> > efi_set_u64_split() type functions (this one splits a u64 into 2 u32). I
-> > went to look and there was no function that did the opposite action so I
-> > added it. The original function was called efi_set_u64_split() so
-> > efi_set_u64_form() was what I came up with. I can name it anything that is
-> > desired.
->
-> Hey Peter,
->
-> Is there anything in particular that needs to be done to this patch?
->
+Hello Ashish Kalra,
 
-If anyone feels strongly enough about this, we can fix it in a
-follow-up patch. The code works as expected, so no need to derail this
-series even further.
+Commit 9770b428b1a2 ("crypto: ccp - Move dev_info/err messages for
+SEV/SNP init and shutdown") from Mar 24, 2025 (linux-next), leads to
+the following Smatch static checker warning:
+
+	drivers/crypto/ccp/sev-dev.c:1755 __sev_snp_shutdown_locked()
+	error: uninitialized symbol 'dfflush_error'.
+
+drivers/crypto/ccp/sev-dev.c
+    1718 static int __sev_snp_shutdown_locked(int *error, bool panic)
+    1719 {
+    1720         struct psp_device *psp = psp_master;
+    1721         struct sev_device *sev;
+    1722         struct sev_data_snp_shutdown_ex data;
+    1723         int ret;
+    1724 
+    1725         if (!psp || !psp->sev_data)
+    1726                 return 0;
+    1727 
+    1728         sev = psp->sev_data;
+    1729 
+    1730         if (!sev->snp_initialized)
+    1731                 return 0;
+    1732 
+    1733         memset(&data, 0, sizeof(data));
+    1734         data.len = sizeof(data);
+    1735         data.iommu_snp_shutdown = 1;
+    1736 
+    1737         /*
+    1738          * If invoked during panic handling, local interrupts are disabled
+    1739          * and all CPUs are stopped, so wbinvd_on_all_cpus() can't be called.
+    1740          * In that case, a wbinvd() is done on remote CPUs via the NMI
+    1741          * callback, so only a local wbinvd() is needed here.
+    1742          */
+    1743         if (!panic)
+    1744                 wbinvd_on_all_cpus();
+    1745         else
+    1746                 wbinvd();
+    1747 
+    1748         ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
+    1749         /* SHUTDOWN may require DF_FLUSH */
+    1750         if (*error == SEV_RET_DFFLUSH_REQUIRED) {
+    1751                 int dfflush_error;
+    1752 
+    1753                 ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &dfflush_error);
+    1754                 if (ret) {
+--> 1755                         dev_err(sev->dev, "SEV-SNP DF_FLUSH failed, ret = %d, error = %#x\n",
+    1756                                 ret, dfflush_error);
+                                              ^^^^^^^^^^^^^
+dfflush_error isn't necessarily initialized on error in
+__sev_do_cmd_locked().
+
+regards,
+dan carpenter
+
+    1757                         return ret;
+    1758                 }
+    1759                 /* reissue the shutdown command */
+    1760                 ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data,
+    1761                                           error);
+
