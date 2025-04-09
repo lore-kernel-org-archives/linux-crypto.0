@@ -1,98 +1,107 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FC11C8FB5;
-	Wed,  9 Apr 2025 03:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476902B9CD;
+	Wed,  9 Apr 2025 09:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744170072; cv=none; b=e7lQjnzK9cONN5hB2X0dtUpO39Tr+r9dJM3CI0xrsxBjXsQGeFlHSLh0DJlIAbHq6Twta+VMV3mgeCCUR/I9oq60wr47a6LsXXJ8IUeyemEF9omEAA2ZJp8NoBO1vzirMGpvuWhQJeA3n3FTkngnV47a1XnUcqnSeyozpHaIBPw=
+	t=1744190147; cv=none; b=tEbTe0wBRZsTVOySwZICVh9k/JZyBTqKqKN60zVcjfzsYSEcrulKnSoqeWE/0VSXaSdnuFwklXNyef/4iGGgIdz7IEIDVLR7QjrSaVW0U/skM6v4gDOs9zEDKHYQsE4V5yQUJhsnQX1fRqTs+o6QaMwHOC+duw+XC3KB0gD3PDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744170072; c=relaxed/simple;
-	bh=8GRNmupPyo69Uqcd2hKvAZBLAkhcD42GjfJJe1HVIU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NlWQfmBQb03gkj0mT0X1HY2Rtb4fIRzLTTY5+xBaAx2GszB9Vr2dlsdAx+7tB2HIY/2Tos17jOclXeg+63D4nUowsVEYfn74cFDqYQCanMU8Srjc8BG5tQ29QOcxo5RAn4unWVvf8ylSovyZ6WC97mfx1fYcz9vHwiDPBGeVZHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=bQOfrYaH; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1744190147; c=relaxed/simple;
+	bh=Ty1pwqrmShrkkSXMYJB/5FbS4/B1OSXP3/4mT9aAsdM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ka6/6ViYIYGJL4nprcB029WYYBqdlDIh7+3A6uXlIZaxOKNs0tD/EjKru/lPL9x9ITiG1eIwZ+GLoF6NRR0lZPmuzDvLA7ARRPjxzlqV0vP+uH6Me0gsdjmCmPJ0RYT+xc1SojNVUMqnDy0VLNRAt+4Up+mQ9j4uOsetXE5Dr60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+JWoiGn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="bQOfrYaH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=T/H6Sk21vQXGzJuFjA5o2HA0xkd8qQUuh9KY1MVmLDo=; b=bQOfrYaHNanQEkfat5Mr3yobss
-	Ush9P4xezBgp3VctfArgnn7RtGyCFmAtBi4XvUkgG2rwvQAYV7B7zgW/cV5vc7IDxCxUblFQE3tr+
-	bs1n6+/WxZvi9MNqyjA5L6k18kd2AAw2MDQIMpZRTIT5xOSCIF9ylDERn1ALs6+Ciy4PKWH1lLpUT
-	B7gZ5H0hn5VzVUe1lUs5atT7Mm/i2uQqoF8QLgV3HK00PepVsA88g+uMEUZHJ1WFXgPtKXeWRXtna
-	EWBMD6SKxGX4FCyth4M6CFf+TVrFIgQkPwqzLS1xelp93S44ms/niEmiV/vT8vQdepnL6UwDvWd9Q
-	bL5ZbWVw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u2Ldc-00E69P-2F;
-	Wed, 09 Apr 2025 10:58:05 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Apr 2025 10:58:04 +0800
-Date: Wed, 9 Apr 2025 10:58:04 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
-Subject: Re: [PATCH] crypto: caam/qi - Fix drv_ctx refcount bug
-Message-ID: <Z_XiPLmSVs8PGTZD@gondor.apana.org.au>
-References: <17f9af67-de10-4b96-99ef-3c5cd78124c0@linux.dev>
- <Z_SxYFdyBJTYe_7G@gondor.apana.org.au>
- <e3dd2f83-8451-47b0-a774-a697b861ceb3@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+JWoiGn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3ACBC4CEEE;
+	Wed,  9 Apr 2025 09:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744190146;
+	bh=Ty1pwqrmShrkkSXMYJB/5FbS4/B1OSXP3/4mT9aAsdM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=U+JWoiGnB3Ltj1oq2Lf12BbJStduvwmmIbUpPwE46zLzraulDbpUgoHkBVVxSd8dR
+	 xOjYR3O0gjN793iX6J5SWUKGfn+DlCd+uaXBa+XFVfRJqxVnHQLRo7nKYLq9iVeXzp
+	 A/XArWDVpftzIr3pQVPG/eHPWRm3RpI0SJr9XSe0gl9SKO/KANIGVe8EcU5X7aFWTa
+	 RGiQ2+2WTb/xFNL+o/t7/fYw5Du7FdwDxlEPGS/tMcK8pzaxCTKqVFYH8LIx3xs4J/
+	 ErqqLr1eYv8y+gb3UwC3FHhHjttrF/dppMtlQcx4TZpLLNii5sUvwGx1x4OAmCwuw6
+	 uOEeyj0DSftjA==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-549b159c84cso4589821e87.3;
+        Wed, 09 Apr 2025 02:15:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUgSzhF7Y3/gyKzFLL0DIAPu946Tfhx9pgySOUcWKcp6r9meUdZ8Vp7zd25RZWW/toXZmzRv5QMTbaN@vger.kernel.org, AJvYcCVCUlaSgUmr2jrTmLM+kEATKVQ/WbsNRiAuR85WbGmmQbBtk7mQYnJevWfqXBAMbN5Kc8MWY28yp3jjGsLjvWxh@vger.kernel.org, AJvYcCVLuk0NjYvcXlSNV/aOHWYRF3tXKOcCA2K8FfCWt4d0rlbaTJaTOuMHLCIStvd1XUp8kVpvoY8tcj5IG5l9@vger.kernel.org, AJvYcCVyzk5eztTdtqq6WdCgwGERRM1zD6Ka4JowOP8UR1oNx2MHnWRDqri2xoN9N8M2R6jfYFq1qVD1r+oVI5k=@vger.kernel.org, AJvYcCW7GIpvuMbbX7bmeLkv8aheWSGNVviCFWOunLp1RXDF19I2yyWp6rR2WWYwxR++Dqk5/sjYlg2gKlG6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgYdVILBznhKsRZwTE0CVRjC2r9439bosqfwgJ6UiU78jr6/KY
+	/1t5TX95wzDcKQJpdtaW2VMvizyS5GggiSCFGJY/1AFMoJFs2uQRETKopT1F/GGxvgiCTGmC6j+
+	jb1PeeuCERB0ingq8YeaS6Ug4fHo=
+X-Google-Smtp-Source: AGHT+IGr6pJEooPeND2WPKwmKzqEYbai9tqpsiAki3uL4C9w+bT2D4fnGON4jq0ew7tRiFB4rDjlDOhGc1mfiwwy2OM=
+X-Received: by 2002:a05:6512:3981:b0:545:8a1:5379 with SMTP id
+ 2adb3069b0e04-54c44561c19mr593775e87.43.1744190145154; Wed, 09 Apr 2025
+ 02:15:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e3dd2f83-8451-47b0-a774-a697b861ceb3@linux.dev>
+References: <20250328230814.2210230-1-ross.philipson@oracle.com>
+ <20250328230814.2210230-20-ross.philipson@oracle.com> <B41D3199-8054-4B2C-94D6-508D1DE4C8B3@zytor.com>
+ <886145d3-a9f2-41f3-a754-253decdb1b4f@oracle.com> <Z_WkaJhel-BYxHeW@char.us.oracle.com>
+In-Reply-To: <Z_WkaJhel-BYxHeW@char.us.oracle.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 9 Apr 2025 11:15:34 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEAZS+839zmpW3WfwvTRMZmRbPYGpEoY=Xj9qFch9J7BA@mail.gmail.com>
+X-Gm-Features: ATxdqUF80H-sehwytd1k_ZBdeFEl5wo_O_6zq2xvDwvr3fvlWsrlNSPU8VOuvPk
+Message-ID: <CAMj1kXEAZS+839zmpW3WfwvTRMZmRbPYGpEoY=Xj9qFch9J7BA@mail.gmail.com>
+Subject: Re: [PATCH v13 19/19] x86/efi: EFI stub DRTM launch support for
+ Secure Launch
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: ross.philipson@oracle.com, hpa@zytor.com, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, iommu@lists.linux.dev, 
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org, 
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org, 
+	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net, 
+	ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com, 
+	trenchboot-devel@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 08, 2025 at 11:44:27AM -0400, Sean Anderson wrote:
+On Wed, 9 Apr 2025 at 00:35, Konrad Rzeszutek Wilk
+<konrad.wilk@oracle.com> wrote:
 >
-> However, note that the following error is still present:
-> 
-> [    3.294978] alg: sig: sign test failed: invalid output
+> ..snip..
+> > > > @@ -925,6 +1014,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
+> > > >           goto fail;
+> > > >   }
+> > > >
+> > > > +#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
+> > > > + /* If a Secure Launch is in progress, this never returns */
+> > > > + efi_secure_launch(boot_params);
+> > > > +#endif
+> > > > +
+> > > >   /*
+> > > >    * Call the SEV init code while still running with the firmware's
+> > > >    * GDT/IDT, so #VC exceptions will be handled by EFI.
+> > >
+> > > efi_set_u64_form()?
+> > >
+> > > What the heck is that? If it actually involves two u32 packed into a 64 field, why not simply do two stores?
+> > >
+> >
+> > Well the story is this. The EFI maintainers asked me to use the
+> > efi_set_u64_split() type functions (this one splits a u64 into 2 u32). I
+> > went to look and there was no function that did the opposite action so I
+> > added it. The original function was called efi_set_u64_split() so
+> > efi_set_u64_form() was what I came up with. I can name it anything that is
+> > desired.
+>
+> Hey Peter,
+>
+> Is there anything in particular that needs to be done to this patch?
+>
 
-That just looks like a bug in the driver.  I'll leave it in the
-caam maintainers' capable hands :)
- 
-> as well as another error on reboot (present before but I forgot to post it):
-> 
-> [   98.514208] ------------[ cut here ]------------
-> [   98.518823] WARNING: CPU: 3 PID: 1 at crypto/algapi.c:464 crypto_unregister_alg (crypto/algapi.c:464 (discriminator 1)) 
-> [   98.527100] Modules linked in:
-> [   98.530153] CPU: 3 UID: 0 PID: 1 Comm: systemd-shutdow Tainted: G        W          6.14.0-seco+ #163 NONE
-> [   98.539899] Tainted: [W]=WARN
-> [   98.542859] Hardware name: LS1046A RDB Board (DT)
-> [   98.547559] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [   98.554520] pc : crypto_unregister_alg (crypto/algapi.c:464 (discriminator 1)) 
-> [   98.559224] lr : crypto_unregister_alg (include/linux/atomic/atomic-arch-fallback.h:457 include/linux/atomic/atomic-instrumented.h:33 include/linux/refcount.h:136 crypto/algapi.c:464) 
-
-Yes that's a long-standing design fault in the crypto_unregister
-mechanism for drivers.
-
-The unregister mechanism was designed for software crypto, so it
-relied on module refcounts to prevent unregistering something
-that's still in use.  For hardware that follows the device model
-where things get unplugged at random, this obviously doesn't work.
-
-What I'll do is make the crypto_unregister call wait for the users
-to go away.  That matches how the network device unregistration works
-and hopefully should solve this problem.  But keep your eyes for
-dead locks that used to plague netdev unregistration :)
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If anyone feels strongly enough about this, we can fix it in a
+follow-up patch. The code works as expected, so no need to derail this
+series even further.
