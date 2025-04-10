@@ -1,154 +1,201 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F1E1EB5CB
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Apr 2025 15:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F154728F93B
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Apr 2025 18:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744300599; cv=none; b=hSMGTPEzPC0bpnv8GDox1l9/ByzjvcdtnDkgMvOyeydjaAp4UPj0fgMONG09UtxBs1q2FmkVto1hYPWfkikqJ6SwiwxXi2dHSedCNPDQI/TfP8kTpMEM7+xKy5e4TlQt36rKzYdHeYbBgmpu/CQKTzWkORmBX9rVI5rwtiwgCdQ=
+	t=1744310049; cv=none; b=kWfNvMOYp1+yYVkvYGnshWhLgu0S6d3SsCt2QYXivGsmwW5mECWCIxpVYWYtDu3vvvmG5SWUxcydWxEelcfGhzcCJlMUIg7lS4NyXYxsvu3uJyveMDormnwb55p1m5HSaA/lq4ps+NdJ2b6CjuSo+wCx9M5ZjWSJ/F8TkVcYq2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744300599; c=relaxed/simple;
-	bh=kQXYAVIwetUyVwvHQAZ8MBfV2JpMeqQiDyjEkLidttY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wz2PKKpfbkXny/lOWNtAQOuZqPmn+EqHrjtv5y72PPH8wDpYPRlY3FTMNCAIzGAO51zp4J318gnda3viAu3q0KV6o7GWpaN1+7pu4rXoSHm89F09HKhsSIJKgOWIwWD8KkrbM8HyDa7b2nOF1jzoVFce97F6iBaPS47O7FLsyPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=anm+iImp; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1744310049; c=relaxed/simple;
+	bh=qUQkVCaT5LwTAKPjNitSCqujLbD7jQ6Sq7zNCCAxGdI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UDTuEdL5mkjcXNle6cs6PpB8hquEAN1piknJHv0n8a08fdfqoNHSSKH49w5Rg7JSFwQ1uum0CivaGyyGTgohsH1AB5iELSk7jnaOxyFqwODODGkebImTE+UgRK0jbt4JHQr+OvGYMFjd7Bigcf5D3Xd44QpROY0ozlAgfdi57YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=T0nhs2IL; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anm+iImp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744300596; x=1775836596;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kQXYAVIwetUyVwvHQAZ8MBfV2JpMeqQiDyjEkLidttY=;
-  b=anm+iImpKq7xk/5wnOYCQtoqmOQnj1pTyPBt81H8QDJqNPjdNX9RSUkl
-   +pyeyHx2Gn5RD7jdfGqdz7nPbE++LAliFg9pi4S8ZK8BOrVFwk6KnOJIF
-   18GECcG/FhI0n3k1LcQ/dKli+B9FhuKPO1hLkx+UBr/BGpsvr4rFbHKQD
-   T4q3SfIn3WGXt6OUVbOlmGktXcClXmPVK64df61LEu+2FFmAlJ0vgWi/D
-   zsCV85ovBsXXt+98sslHlbTwU+kmjRn1J0/FtpM5FiCAW94PWnnxTrx17
-   oASdI+TumTE74e3bB61Ibtto1kdwnouXYMPYNWw3q29crZawrokJQN8WX
-   Q==;
-X-CSE-ConnectionGUID: 6Q7rm39MSMiY34+AH8LOwQ==
-X-CSE-MsgGUID: GX0XdfEwRwS5rQmRBGqXrg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="56010831"
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="56010831"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 08:56:36 -0700
-X-CSE-ConnectionGUID: cYuTcStpSoexM0h44TRRmg==
-X-CSE-MsgGUID: GXm97F4OR8+Hd6GdEbBnOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="133671636"
-Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 10 Apr 2025 08:56:31 -0700
-Received: from kbuild by b207828170a5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u2uGT-000AFT-27;
-	Thu, 10 Apr 2025 15:56:29 +0000
-Date: Thu, 10 Apr 2025 23:55:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sakari Ailus <sakari.ailus@linux.intel.com>,
-	linux-crypto@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Avi Fishman <avifishman70@gmail.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Tali Perry <tali.perry1@gmail.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, openbmc@lists.ozlabs.org
-Subject: Re: [PATCH 3/3] hwrng: npcm - Add a local variable for struct device
- pointer
-Message-ID: <202504102028.H0evWtkl-lkp@intel.com>
-References: <20250410070623.3676647-4-sakari.ailus@linux.intel.com>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="T0nhs2IL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744310047; x=1775846047;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6r4Spd0PKn5b4K7o9QUgjSGdM4FPJXmF1LMDYSWZtvM=;
+  b=T0nhs2ILKog1VtrzCsSvZbJYBumOFEBDQ06t99YhOfPTplV8QuCxFIhr
+   Qsv0ZC5A7D3hdzqsietrDM+/RsI0Rt+L9dS+NuPRz28BzVZI+5whC7qxO
+   LsNLE/Pl1U64COQ4Dj6PrYU5PS8/5AFuT57CWzFDLu1IvywFVagydPQy1
+   4=;
+X-IronPort-AV: E=Sophos;i="6.15,202,1739836800"; 
+   d="scan'208";a="82651615"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 18:34:04 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:39722]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.120:2525] with esmtp (Farcaster)
+ id dde2529f-fe83-4906-9817-da9e43601c90; Thu, 10 Apr 2025 18:34:03 +0000 (UTC)
+X-Farcaster-Flow-ID: dde2529f-fe83-4906-9817-da9e43601c90
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 18:34:01 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.21) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 18:33:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <linux-crypto@vger.kernel.org>, syzkaller
+	<syzkaller@googlegroups.com>
+Subject: [PATCH] crypto: scomp - Fix wild memory accesses in scomp_free_streams().
+Date: Thu, 10 Apr 2025 11:33:45 -0700
+Message-ID: <20250410183347.87669-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250410070623.3676647-4-sakari.ailus@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Sakari,
+syzkaller reported the splat below [0].
 
-kernel test robot noticed the following build errors:
+When alg->alloc_ctx() fails, alg is passed to scomp_free_streams(),
+but alg->stream is still NULL there.
 
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.15-rc1 next-20250410]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Also, ps->ctx has ERR_PTR(), which would bypass the NULL check and
+could be passed to alg->free_ctx(ps->ctx).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sakari-Ailus/hwrng-atmel-Add-a-local-variable-for-struct-device-pointer/20250410-151223
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20250410070623.3676647-4-sakari.ailus%40linux.intel.com
-patch subject: [PATCH 3/3] hwrng: npcm - Add a local variable for struct device pointer
-config: arm-randconfig-001-20250410 (https://download.01.org/0day-ci/archive/20250410/202504102028.H0evWtkl-lkp@intel.com/config)
-compiler: clang version 19.1.1 (https://github.com/llvm/llvm-project d401987fe349a87c53fe25829215b080b70c0c1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250410/202504102028.H0evWtkl-lkp@intel.com/reproduce)
+Let's fix the two wild memory accesses.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504102028.H0evWtkl-lkp@intel.com/
+[0]:
+BUG: unable to handle page fault for address: ffe21c0032422608
+ PF: supervisor read access in kernel mode
+ PF: error_code(0x0000) - not-present page
+PGD 13fef4067 P4D 13fef3067 PUD 13fef2067 PMD 0
+Oops: Oops: 0000 [#1] SMP KASAN
+CPU: 0 UID: 0 PID: 316 Comm: syz-executor483 Not tainted 6.14.0-13344-ga9843689e2de #28 PREEMPT(voluntary)  167b7ecb8f281ed56016416cdf1d8bb342db88fc
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+RIP: 0010:scomp_free_streams crypto/scompress.c:117 [inline]
+RIP: 0010:scomp_alloc_streams crypto/scompress.c:140 [inline]
+RIP: 0010:crypto_scomp_init_tfm+0x5b0/0x7e0 crypto/scompress.c:158
+Code: 74 08 48 89 df e8 90 74 8a ff 48 8b 03 48 8b 0c 24 48 8d 1c 08 48 83 c3 40 48 89 d8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 df e8 62 74 8a ff 48 8b 1b 48 85 db 0f 84
+RSP: 0018:ffa000000154f028 EFLAGS: 00010a02
+RAX: 1fe2200032422608 RBX: ff11000192113040 RCX: dffffc0000000000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 1ffffffff0c0463f R08: ffffffff872f7bb7 R09: 1ffffffff0e5ef76
+R10: dffffc0000000000 R11: fffffbfff0e5ef77 R12: 0000000000000000
+R13: ffffffff86c93028 R14: ffd1ffffffc0ebf8 R15: 1ffa3ffffff81d7f
+FS:  00007f35c192a740(0000) GS:ff11000192113000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffe21c0032422608 CR3: 00000001062f0003 CR4: 0000000000771ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ crypto_create_tfm_node+0x163/0x3b0 crypto/api.c:532
+ crypto_create_tfm crypto/internal.h:136 [inline]
+ crypto_init_scomp_ops_async+0x59/0x120 crypto/scompress.c:338
+ crypto_create_tfm_node+0x163/0x3b0 crypto/api.c:532
+ crypto_alloc_tfm_node+0x172/0x3e0 crypto/api.c:633
+ ipcomp_init_state+0x14d/0x2a0 net/xfrm/xfrm_ipcomp.c:345
+ ipcomp4_init_state+0xcc/0x9f0 net/ipv4/ipcomp.c:137
+ __xfrm_init_state+0xa74/0x13d0 net/xfrm/xfrm_state.c:3178
+ xfrm_state_construct net/xfrm/xfrm_user.c:922 [inline]
+ xfrm_add_sa+0x2f11/0x4000 net/xfrm/xfrm_user.c:986
+ xfrm_user_rcv_msg+0x61d/0x890 net/xfrm/xfrm_user.c:3459
+ netlink_rcv_skb+0x204/0x470 net/netlink/af_netlink.c:2534
+ xfrm_netlink_rcv+0x79/0x90 net/xfrm/xfrm_user.c:3481
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x754/0x8c0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x800/0xb20 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg net/socket.c:727 [inline]
+ ____sys_sendmsg+0x5ee/0x960 net/socket.c:2566
+ ___sys_sendmsg+0x1e6/0x260 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x18a/0x250 net/socket.c:2655
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xe4/0x1c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+RIP: 0033:0x7f35c196be5d
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
+RSP: 002b:00007fffd68e23a8 EFLAGS: 00000206 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f35c196be5d
+RDX: 0000000000000800 RSI: 0000200000000000 RDI: 0000000000000003
+RBP: 0000000000000004 R08: 00007fffd68e2146 R09: 0000004000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: 431bde82d7b634db
+R13: 00007fffd68e23d0 R14: 0000000000403df0 R15: 00007f35c1b76000
+ </TASK>
+Modules linked in:
+CR2: ffe21c0032422608
 
-All errors (new ones prefixed by >>):
+Fixes: 3d72ad46a23a ("crypto: acomp - Move stream management into scomp layer")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ crypto/scompress.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
->> drivers/char/hw_random/npcm-rng.c:57:54: error: expected ';' at end of declaration
-      57 |         struct device *dev = (struct device *)priv->rng.priv
-         |                                                             ^
-         |                                                             ;
-   1 error generated.
-
-
-vim +57 drivers/char/hw_random/npcm-rng.c
-
-    53	
-    54	static int npcm_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-    55	{
-    56		struct npcm_rng *priv = to_npcm_rng(rng);
-  > 57		struct device *dev = (struct device *)priv->rng.priv
-    58		int retval = 0;
-    59		int ready;
-    60	
-    61		pm_runtime_get_sync(dev);
-    62	
-    63		while (max) {
-    64			if (wait) {
-    65				if (readb_poll_timeout(priv->base + NPCM_RNGCS_REG,
-    66						       ready,
-    67						       ready & NPCM_RNG_DATA_VALID,
-    68						       NPCM_RNG_POLL_USEC,
-    69						       NPCM_RNG_TIMEOUT_USEC))
-    70					break;
-    71			} else {
-    72				if ((readb(priv->base + NPCM_RNGCS_REG) &
-    73				    NPCM_RNG_DATA_VALID) == 0)
-    74					break;
-    75			}
-    76	
-    77			*(u8 *)buf = readb(priv->base + NPCM_RNGD_REG);
-    78			retval++;
-    79			buf++;
-    80			max--;
-    81		}
-    82	
-    83		pm_runtime_mark_last_busy(dev);
-    84		pm_runtime_put_sync_autosuspend(dev);
-    85	
-    86		return retval || !wait ? retval : -EIO;
-    87	}
-    88	
-
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index f67ce38d203d..f00ab9720454 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -106,14 +106,11 @@ static int crypto_scomp_alloc_scratches(void)
+ 	return -ENOMEM;
+ }
+ 
+-static void scomp_free_streams(struct scomp_alg *alg)
++static void __scomp_free_streams(struct scomp_alg *alg,
++				 struct crypto_acomp_stream __percpu *stream)
+ {
+-	struct crypto_acomp_stream __percpu *stream = alg->stream;
+ 	int i;
+ 
+-	if (!stream)
+-		return;
+-
+ 	for_each_possible_cpu(i) {
+ 		struct crypto_acomp_stream *ps = per_cpu_ptr(stream, i);
+ 
+@@ -126,6 +123,16 @@ static void scomp_free_streams(struct scomp_alg *alg)
+ 	free_percpu(stream);
+ }
+ 
++static void scomp_free_streams(struct scomp_alg *alg)
++{
++	struct crypto_acomp_stream __percpu *stream = alg->stream;
++
++	if (!stream)
++		return;
++
++	__scomp_free_streams(alg, stream);
++}
++
+ static int scomp_alloc_streams(struct scomp_alg *alg)
+ {
+ 	struct crypto_acomp_stream __percpu *stream;
+@@ -140,8 +147,11 @@ static int scomp_alloc_streams(struct scomp_alg *alg)
+ 
+ 		ps->ctx = alg->alloc_ctx();
+ 		if (IS_ERR(ps->ctx)) {
+-			scomp_free_streams(alg);
+-			return PTR_ERR(ps->ctx);
++			int err = PTR_ERR(ps->ctx);
++
++			ps->ctx = NULL;
++			__scomp_free_streams(alg, stream);
++			return err;
+ 		}
+ 
+ 		spin_lock_init(&ps->lock);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.49.0
+
