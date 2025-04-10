@@ -1,54 +1,53 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFDB202C26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F61C204C03
 	for <linux-crypto@vger.kernel.org>; Thu, 10 Apr 2025 07:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744268803; cv=none; b=mvCtaOlDpuvaw9Vyz/jbgsuMYFUxKd1N67o+fBgqqwQJnjVEy62ycRd5HUY7efnNaRyfD/ozs4poKBb9A/5pyUXinw6aS8rpEtPGX45U67G2Xc6Q5wbIxl7h2s/5bLhMnZ8niHgD/iVwibz9ff3r0HTUo8MvEcbhFmKkbFWmQs0=
+	t=1744268804; cv=none; b=ZJR1m5xK9aMvq8xLJkqPLIpXIYxus0ruBVPQKKgom3wWOhBip+YvoNhwFhVC0OCTFr1EEeq4m5vQEFYeVNXNnXB3Q3C2ozaglfwhvhzUsgG9En+YjbJhk/FyhxJbI/iEUvMwfyqvsrWLMx6f7PykZa6+hiPuV3UeXVLK8CAhZk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744268803; c=relaxed/simple;
-	bh=TE7iAMTJLA59sZpWYVqvYbWng+qFOuV9FpYpZVf3SEg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lZDp1y3kaZayXyQX5q2ylVdqOy7nrcDvGhqfNe/IsEdBo//o99ID7Abs1ixPXCzRoJACToYUkNahTbe1yScexKAjjMz2OhFhYN8QmWjv+8GJwCKlPjt7sG08jzAfC6i4W/buUF3/5tCsTwik2/J/hUxjRlao3jh9EYXMMSj25Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n0I/C6tg; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1744268804; c=relaxed/simple;
+	bh=BwgGI6MZYv2vNydtUJb8sY2UgwkVT1/xfezAVPOvL2k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HQoso7LrqzKPLtKCy1UftYjaI2xdncv0zsphX5KNgaG3AebZsYBggJWWm6OqF+pAo155bRWqp100IVqWQinlK2UwE2e22T5ard0pdL0qln8S8b7NzUmznn5T/vkvxwA8oTq/1Fne9pPg3wvDiG1U1AgUSt4BgUFqnJjcGUZ1LDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IBo2V+wm; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n0I/C6tg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IBo2V+wm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744268802; x=1775804802;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TE7iAMTJLA59sZpWYVqvYbWng+qFOuV9FpYpZVf3SEg=;
-  b=n0I/C6tgLWS7kpL9mYduKa7xm7k4/uYtzXjMvIa9hu+kM0fA5mYSatg8
-   hU76vhlJGvjaJUNwm6hTAXE/NSaM4l3M2y32OZKsc2f1CDVGeVOIan+ff
-   7QAjZQSpO1OYtCgI4bwFojJ3umdiJVr+zrsdvWujBi7bgazB+kVl8umrb
-   K23UaTcvjwPsIaivFwd4fPOsL1k0rSfFZHXV08+M7m2jhPAPGJ4W3rzPf
-   uMwc06/OX1M7+C88I+5waESEZhi2Abq1CwDHfd8QZb4vO1qNat9pb4tpm
-   AdZNnp0EFT/OxnVvbc4E+zQOpy1zrIodt8NcP/ScZLHo9zbF5Kjdasvw7
+  t=1744268803; x=1775804803;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BwgGI6MZYv2vNydtUJb8sY2UgwkVT1/xfezAVPOvL2k=;
+  b=IBo2V+wm9LHaoN9+ycvhGi2Hu3NIC9QKIr6i86CcpO9xHQMmcqIiX5pt
+   eqJmSDSCCRvmnPAb3WizVgVY7KVU388T+JFeFtgWo0Zg1a8+YvU3nTQc2
+   z4GRzy8bVtxfalpbmwCMlrDjRpj1SqHVws2yiwZ6SRU0MbnWrMBq9Vg1P
+   xDS2MO3/5yBqcR2yN+d/Cmo7T9FFF53KE/Gc16uR5MGF2/4SZTwZfUifI
+   l8Q8wtJ1QAqRgVeOkc0Jzorx0p5kMm/CBqMQbaahuJnO8KaFIvA0WmsfN
+   5mJxcbmbI08T3Z63Nsb8QrTMXr9olD533gc2fOTkvbNlXWM55qeDbgrBC
    g==;
-X-CSE-ConnectionGUID: ia9BVW9nR7aRO5VL609+RQ==
-X-CSE-MsgGUID: bP2mnaoMQ7+AGcy9trXslg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="45484800"
+X-CSE-ConnectionGUID: j+vZTDSVQr2vrUvTVv7dxQ==
+X-CSE-MsgGUID: NIXVziBAS4GbS5qbvM19pA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="45484810"
 X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="45484800"
+   d="scan'208";a="45484810"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 00:06:39 -0700
-X-CSE-ConnectionGUID: jcRV1cD5T0GwUaoEVA8YeA==
-X-CSE-MsgGUID: RLnB8c7VT5SfdPnsXZyizA==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 00:06:40 -0700
+X-CSE-ConnectionGUID: dc0X+vL2S5ioxsxxRhI0SA==
+X-CSE-MsgGUID: 4vsCeVDXRH+kGFuW1sc24A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="128791502"
+   d="scan'208";a="128791503"
 Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
   by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 00:06:36 -0700
 Received: from punajuuri.localdomain (punajuuri.localdomain [192.168.240.130])
-	by kekkonen.fi.intel.com (Postfix) with ESMTP id ACEFF11FB1F;
+	by kekkonen.fi.intel.com (Postfix) with ESMTP id A9DBE11FA2C;
 	Thu, 10 Apr 2025 10:06:33 +0300 (EEST)
 Received: from sailus by punajuuri.localdomain with local (Exim 4.96)
 	(envelope-from <sakari.ailus@linux.intel.com>)
-	id 1u2lzd-00FQTB-2E;
+	id 1u2lzd-00FQT3-20;
 	Thu, 10 Apr 2025 10:06:33 +0300
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 From: Sakari Ailus <sakari.ailus@linux.intel.com>
@@ -66,12 +65,10 @@ Cc: Olivia Mackall <olivia@selenic.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	openbmc@lists.ozlabs.org
-Subject: [PATCH 2/3] hwrng: mtk - Add a local variable for struct device pointer
-Date: Thu, 10 Apr 2025 10:06:22 +0300
-Message-Id: <20250410070623.3676647-3-sakari.ailus@linux.intel.com>
+Subject: [PATCH 0/3] Use a local device pointer for hwrng drivers instead of casting constantly
+Date: Thu, 10 Apr 2025 10:06:20 +0300
+Message-Id: <20250410070623.3676647-1-sakari.ailus@linux.intel.com>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250410070623.3676647-1-sakari.ailus@linux.intel.com>
-References: <20250410070623.3676647-1-sakari.ailus@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,42 +77,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a local variable for a struct device pointer instead of obtaining the
-hwrng priv field and casting it as a struct device pointer whenever it's
-needed.
+Hi folks,
 
-Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
----
- drivers/char/hw_random/mtk-rng.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Clean up random number reading by adding a local shorthand variable for a
+struct device pointer used on multiple Runtime PM functions. The changes
+are very similar in all three drivers.
 
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
-index 1e3048f2bb38..38e57900080a 100644
---- a/drivers/char/hw_random/mtk-rng.c
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -83,9 +83,10 @@ static bool mtk_rng_wait_ready(struct hwrng *rng, bool wait)
- static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- {
- 	struct mtk_rng *priv = to_mtk_rng(rng);
-+	struct device *dev = (struct device *)priv->rng.priv;
- 	int retval = 0;
- 
--	pm_runtime_get_sync((struct device *)priv->rng.priv);
-+	pm_runtime_get_sync(dev);
- 
- 	while (max >= sizeof(u32)) {
- 		if (!mtk_rng_wait_ready(rng, wait))
-@@ -97,8 +98,8 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 		max -= sizeof(u32);
- 	}
- 
--	pm_runtime_mark_last_busy((struct device *)priv->rng.priv);
--	pm_runtime_put_sync_autosuspend((struct device *)priv->rng.priv);
-+	pm_runtime_mark_last_busy(dev);
-+	pm_runtime_put_sync_autosuspend(dev);
- 
- 	return retval || !wait ? retval : -EIO;
- }
+Sakari Ailus (3):
+  hwrng: atmel - Add a local variable for struct device pointer
+  hwrng: mtk - Add a local variable for struct device pointer
+  hwrng: npcm - Add a local variable for struct device pointer
+
+ drivers/char/hw_random/atmel-rng.c | 9 +++++----
+ drivers/char/hw_random/mtk-rng.c   | 7 ++++---
+ drivers/char/hw_random/npcm-rng.c  | 7 ++++---
+ 3 files changed, 13 insertions(+), 10 deletions(-)
+
 -- 
 2.39.5
 
