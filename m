@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7E928C5CD
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2025 07:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5ED293479
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2025 07:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744357134; cv=none; b=ltWYhUSTIr2DrPuFNW5SgkSCo9Q+vMI9sE0MsXh5cijpJ8HEtCc8yh2sVA+W/EbrSsKCo4eFi6+v3zVHafr+Ut5x1WN/Kg96SJ8CAiWmhuu76MHUu9pU4sHqUukZ1f/KNpbKFxPSTwfX4BwVykYhIiDoxeDh8UE4s6pCU56Qq6M=
+	t=1744357136; cv=none; b=YKuj5qIP2k6eKXEbXe0GApkcDjdHTDQ34dcgWrdkXa/oPuD9ZuSjfOEcg1TcqIa0iQlrB92dBypD/g/WYZgxoyLBfrzqUBrjxC8MwYKObrd4zq8jkM93/KzPJ75hdv32mIvtQQTvJ65PV7S8eaokzT85vRINXurkIcfBEHhETAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744357134; c=relaxed/simple;
-	bh=BTSVAM+rJGYEbUzJ/aXStyTodyDO5+zFpOgIMlyLNw0=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=Z2/iqf6cIXUWbwxfaCytZoR/6/NAN9/jKa0pMFowCFdh+P0bOsF24/SPGt3+sc1RBD156MObuyg7q4iOzDbnNP8KGIPH4iScM0MK0PvGtkyfLER9UKpf5ks/UKPm+slLfEWC9bYdNWZJ0qb7Mog7DJrBIEl0bs3YBdK2cR+SBdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qiPLFgBi; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744357136; c=relaxed/simple;
+	bh=oK7kQtES5jCLWD5OsCQJpKxBvLQUmA9fhCbRdSsVXCE=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=cStcmb7gHzVDmRd+j6RO/FbXpoRGcvwDxZUMHv1a/ZsYgu226Cel//CCHGUhuSj9xdVneZgSYf4QV3BH32QZL8Y6V6Rr20JErgNfeHf3uJZOJGobLd8hy6zMeCdFrnmuBS8oxLWk3kPrcvNEfra8WSd9ypFcaRpp2mzZFat7qsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ShhfuHbU; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qiPLFgBi"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ShhfuHbU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=f4+AHjfTP0gbpqzoaJLkNMzhjOJ1KjVIMG4FuMTNhLM=; b=qiPLFgBiibYhVUyHiBDqcQ6Ynx
-	xogbZjP0Gpp7cCkD2jNZtKtXjo7WONiscHeIG2Jns6j9YKe1iHEEhIJ+mqZ237Dh/IvPhnuzacdbF
-	vzRa8wKPplUxfBqmiHeGmW2ObQtqiyRUaZLO++YEJ+P9bdv4+DZ2NJq1tex8as+d8oIKJvNTmWjJY
-	LS3TdzTU5IYRIHPugZOjAGjhsS0pTSGLVgDDxYP7matsyMcViOMEynrSEZI/IcwD6Hr1JOr0BjIjX
-	dYmvvZql5KCLZg71Y5EGnPE3kOdG0facqqnOz4dKfU77cMa73j0hQJ4KTJfW1JV5Of2r2x9hJajPa
-	5SScvm2Q==;
+	bh=IWMfSqCPHZcF5cG0myN0JM1HrJburuNplKT9o3/xpyQ=; b=ShhfuHbUE/KnJ/6Md110WWk4he
+	0lBz8BrfXUadmA9x+dvQPsUsqorGvR8NCDQncLIb1vf0AHiQ6ZG/4umMwL5SB1mQhxWnQW0ynCi8I
+	CHrTPDzk/QaiQTqyt3+1vM+gxmVZL6M3fTXIbWUa5cqJPqroEgsZvYp6iCElgSv8CWqhCRTrnN1p+
+	ma5ZYoThieGUCP1JQPeAN9R9ZK8cQk9G1otLBcnCXFyzHLtVluzgxJkGnKPYxW4tlMID2L6FdJJoP
+	Cnhtq6WKn8t1kHK+wEzRdb3AOr5tTtdrPLI6QTJCnlVvsx5hvL9u51OUqyX34IsOOFIhWuzSrdfNe
+	acgc/KGQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u38yN-00ElpJ-2Y;
-	Fri, 11 Apr 2025 15:38:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Apr 2025 15:38:47 +0800
-Date: Fri, 11 Apr 2025 15:38:47 +0800
-Message-Id: <774f7e64100f817230ab29da6dbaefa70223e95a.1744356724.git.herbert@gondor.apana.org.au>
+	id 1u38yQ-00ElpU-0I;
+	Fri, 11 Apr 2025 15:38:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Apr 2025 15:38:50 +0800
+Date: Fri, 11 Apr 2025 15:38:50 +0800
+Message-Id: <d5ff0b1692cd91a155855fe3aac1b0e8a8f70633.1744356724.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744356724.git.herbert@gondor.apana.org.au>
 References: <cover.1744356724.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/4] x86: Make simd.h more resilient
+Subject: [PATCH 4/4] crypto: simd - Include asm/simd.h in internal/simd.h
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,34 +45,36 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Add missing header inclusions and protect against double inclusion.
+Now that the asm/simd.h files have been made safe against double
+inclusion, include it directly in internal/simd.h.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/x86/include/asm/simd.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/crypto/internal/simd.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/simd.h b/arch/x86/include/asm/simd.h
-index a341c878e977..b8027b63cd7a 100644
---- a/arch/x86/include/asm/simd.h
-+++ b/arch/x86/include/asm/simd.h
-@@ -1,6 +1,10 @@
- /* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_SIMD_H
-+#define _ASM_SIMD_H
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+index be97b97a75dd..f56049bd1660 100644
+--- a/include/crypto/internal/simd.h
++++ b/include/crypto/internal/simd.h
+@@ -6,6 +6,7 @@
+ #ifndef _CRYPTO_INTERNAL_SIMD_H
+ #define _CRYPTO_INTERNAL_SIMD_H
  
- #include <asm/fpu/api.h>
-+#include <linux/compiler_attributes.h>
-+#include <linux/types.h>
++#include <asm/simd.h>
+ #include <linux/percpu.h>
+ #include <linux/types.h>
  
- /*
-  * may_use_simd - whether it is allowable at this time to issue SIMD
-@@ -10,3 +14,5 @@ static __must_check inline bool may_use_simd(void)
- {
- 	return irq_fpu_usable();
- }
-+
-+#endif	/* _ASM_SIMD_H */
+@@ -46,9 +47,6 @@ void simd_unregister_aeads(struct aead_alg *algs, int count,
+  * self-tests, in order to test the no-SIMD fallback code.  This override is
+  * currently limited to configurations where the extra self-tests are enabled,
+  * because it might be a bit too invasive to be part of the regular self-tests.
+- *
+- * This is a macro so that <asm/simd.h>, which some architectures don't have,
+- * doesn't have to be included directly here.
+  */
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ DECLARE_PER_CPU(bool, crypto_simd_disabled_for_test);
 -- 
 2.39.5
 
