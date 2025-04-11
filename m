@@ -1,66 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248A72036FD
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2025 07:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5FF1E7C0E
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2025 07:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744357608; cv=none; b=f7BvtpMmEdYqto2I8W1W8xbT2oXMPtWEEdTNg6vg1zXj3rO5yJP3m7wVAuXP4iOW0b+A/FFkMTpiWAb9oDo1SOGHH+Q+c3fzG0fBKSsmiR2a3KBKIahSdU+YmeukUMXTD3jL5UaQdeAZDi37KW8HvjA/yWmSuGd4b2ghibVEYrU=
+	t=1744358317; cv=none; b=JWOnnWGWD+ApcapcIVuHeDSsYjWbH9rXeSjW24k5ZfPAqVFpD4SEUa1X1kfvIxI4gklsdgrxLu0Ne1Z8v3SpmXrEO/5lTjONH8EBbEsexSTmgFt34uz1czUtcZvnhAyGjmxY9uU+caPtdcuIsh2uDceMDW+y93CqwGsFdUFwNmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744357608; c=relaxed/simple;
-	bh=G4RjzkyNZnUpOccB2xpI6l0l5VfYV/D/abt4SSB02zc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=g6Nx0RAlk0EEhxToCnG7qIGp50a03GQx9+aGlWhipFiMUcaHP9fRrT/qfpsu0zv3HvtXhBSDv+kdIlpDqglRlJ2Ef/lraPN/1lHO+gw7ghKp0oy/b+VZ9zXCrNACOipjWw2OgFwpt6jwShwktH5uHEMX2AIqNZu5eWhZSXxUMaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfgQV8G+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1744358317; c=relaxed/simple;
+	bh=Cyz638jl3+AmMrLdy+tMNMQe+lyEkxU0b6Qce5ecno4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gtqeLo+4vFTiKpdUXDJ28UAZo5D4OZePn+mw3PF1hBcBX+mTOs6Z1I1sqiKMewnZ9DsP4RzbQp0Gta88KgYaSlywG+Z79LMAw6fk8Qk2ztfAPpfw+/NAx7Z74vwlzQVDmikJDCbxY5RQhr5rK2TF2ayF8aaHBjb4lTOZwA+R4uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=DalTzKk1; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfgQV8G+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744357606;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=16/lvzu2DyIa/AEpNIH9/VI98I48LJB90EPEiuPKhu4=;
-	b=BfgQV8G+6jGu3NXqRo0Y9iDbcXUyeObZk/+ScWRL5StAlkbOsmupYqHLl6Kf00Dz28HezZ
-	nA0gogue7MvxG8xHQVtfMNNUU3wT96YiT2Erp1BThE4GP6rW6r780sRPgMSvpt49GTue6n
-	wiaLECA2/phd0i3sV+ItgMrHGeOhccI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-244-8Ll0UaXQPhOe7WG0xA9cMg-1; Fri,
- 11 Apr 2025 03:46:42 -0400
-X-MC-Unique: 8Ll0UaXQPhOe7WG0xA9cMg-1
-X-Mimecast-MFC-AGG-ID: 8Ll0UaXQPhOe7WG0xA9cMg_1744357601
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4EF1B1800EC5;
-	Fri, 11 Apr 2025 07:46:40 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.40])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A4C871808882;
-	Fri, 11 Apr 2025 07:46:36 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250410163121.04d56770@kernel.org>
-References: <20250410163121.04d56770@kernel.org> <20250409190335.3858426f@kernel.org> <20250407161130.1349147-1-dhowells@redhat.com> <20250407161130.1349147-7-dhowells@redhat.com> <2099212.1744268049@warthog.procyon.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    Marc Dionne <marc.dionne@auristor.com>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-    linux-kernel@vger.kernel.org,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    linux-crypto@vger.kernel.org
-Subject: Re: [PATCH net-next v2 06/13] rxrpc: rxgk: Provide infrastructure and key derivation
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DalTzKk1"
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53B7wNxZ2055924
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Apr 2025 02:58:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1744358303;
+	bh=iFid11ZYXxMf/Wch5gZbVEu+JFBg1Tf7jvh2yjWnLu8=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=DalTzKk1rMulK8ytPOi3OoHk9Y5eOftUJhYwSOHmLu3Tvsq2FwyxVN0VFXekZjVgp
+	 t721Wh3z1W9dtbKix6kZAAMqzGnuF+POTrYgp/xw5aKJDuEEcTcomNMy7iAKgCcYJd
+	 iEZBxSsZivbzjYnqoEqyUcHEvgMzniSEkdz4qnpk=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53B7wNWU116929
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 11 Apr 2025 02:58:23 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
+ Apr 2025 02:58:22 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 11 Apr 2025 02:58:22 -0500
+Received: from localhost (uda0497581-hp.dhcp.ti.com [172.24.227.253])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53B7wLEh062361;
+	Fri, 11 Apr 2025 02:58:22 -0500
+Date: Fri, 11 Apr 2025 13:28:21 +0530
+From: Manorit Chawdhry <m-chawdhry@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers
+	<ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Megha Dey
+	<megha.dey@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Kamlesh
+ Gurudasani <kamlesh@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, Udit
+ Kumar <u-kumar1@ti.com>,
+        Pratham T <t-pratham@ti.com>
+Subject: Re: [PATCH] crypto: ahash - Disable request chaining
+Message-ID: <20250411075821.tdle3l3n2zpk5nmy@uda0497581-HP>
+References: <Z-PGEtO8JmyC5xU_@gondor.apana.org.au>
+ <20250326100027.trel4le7mpadtaft@uda0497581-HP>
+ <Z-PRckWg9Yw1hOVj@gondor.apana.org.au>
+ <20250326123120.wjsldcblqhs5e2ta@uda0497581-HP>
+ <20250411053426.5vmvji5nthajphzo@uda0497581-HP>
+ <Z_iqg1oxdPecgzlK@gondor.apana.org.au>
+ <20250411054458.enlz5be2julr6zlx@uda0497581-HP>
+ <Z_isukjVYANljETv@gondor.apana.org.au>
+ <20250411061417.nxi56rto53fl5cnx@uda0497581-HP>
+ <Z_jBSnzQ-B-IVghn@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,20 +75,39 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2132930.1744357595.1@warthog.procyon.org.uk>
-Date: Fri, 11 Apr 2025 08:46:35 +0100
-Message-ID: <2132931.1744357595@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Disposition: inline
+In-Reply-To: <Z_jBSnzQ-B-IVghn@gondor.apana.org.au>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hi Herbert,
 
-> Sorry for the delay. I was hoping you could respin and maybe fix/give
-> up on the annotation in patch 3? Right now patch 3 gets flagged as 
-> a build warning which terminates the CI processing before we get to
-> make htmldocs. And it would be nice to get that run given patch 1.
+On 15:14-20250411, Herbert Xu wrote:
+> On Fri, Apr 11, 2025 at 11:44:17AM +0530, Manorit Chawdhry wrote:
+> > 
+> > Maybe it's not the chaining but the way chaining was implemented that
+> > requires us to start using these correct API helpers otherwise we crash
+> > so I think we would require the following patch.
+> 
+> You're right.  This needs to be disabled more thoroughly for 6.15.
+> Please try this patch:
+> 
+> ---8<---
+> Disable hash request chaining in case a driver that copies an
+> ahash_request object by hand accidentally triggers chaining.
+> 
+> Reported-by: Manorit Chawdhry <m-chawdhry@ti.com>
+> Fixes: f2ffe5a9183d ("crypto: hash - Add request chaining API")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
 
-I can remove the annotation, but it may just move the warning to a different
-place.
+This fixes it, thanks!
 
-David
+root@j721e-evm:~# uname -a
+Linux j721e-evm 6.15.0-rc1-00001-gdcd7f62f8e5e-dirty #4 SMP PREEMPT Fri Apr 11 13:18:03 IST 2025 aarch64 GNU/Linux
+root@j721e-evm:~# modprobe sa2ul
+[  414.110972] omap_rng 4e10000.rng: Random Number Generator ver. 241b34c
 
+Tested-by: Manorit Chawdhry <m-chawdhry@ti.com>
+
+Regards,
+Manorit
