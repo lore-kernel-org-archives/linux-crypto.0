@@ -1,93 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2AB278E51;
-	Fri, 11 Apr 2025 10:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CFC221FAF
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2025 15:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744367021; cv=none; b=fyLSdbLmy5uRm2rLpdp48FFIrYKk2VuS159l3ENAEQzD08E1R29szLUvVFVbu0eANRPwLrg206SS+6f5Lx0os3ssVH1MDdwlLqlqXp/K5JiesLZJgNii9cylby/5UDUU98E7Eg98oPg8RhAnhykNR2dBTSBQ2FfwAIBdtItiXAI=
+	t=1744387171; cv=none; b=cR6FcHbpCRMDMbL+QBuU5s1Bzu9P3AQ9gvOblrmxpUrKMH+wWlHIWILWZlWwQTlsawJPncxOVC4Thi4o+rT+DHAtwsH2SMSWMZMXkMU/Pltv5y9odkuk1tBylnZ4gWjZkTjl3rgPn+YMR21IiLs78ymW7dzSRK/BQOgNY2TBDbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744367021; c=relaxed/simple;
-	bh=nNnGjXRPBz3YI4SaNY8a/CQRpAOQ1B60ZYfwjDXFrKY=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=RKv+parpZBw1Bhk5xE5YOM4v3O0v849QwELWSOZFXIlL5xNYrR/GdbmGigKr7+Ju+HuFYWIvc3Lynql/ivxy0ssVveW+UelQ7mRJ/aZiyjroUDCquEFkrgEL3lIFWOUK3O597Xx8/cIZ+nQ8v037Hmj07LR0J8MotC0ePDpuweI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XyuP/H1G; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744387171; c=relaxed/simple;
+	bh=fZlIPKzYCfS3JWZkzUhx6xvi3UjrSnLayoxpbPfvozY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=plbF4ycXZG9XmOgwwW7L9NFtZM4tFloWK1msCXigLMYK/oxGZGhfS8hr89Xmdqiv2tW9yOVaVXbjt1MKb7eMfnrTlvB+5GE383fN/ksqT53qK9ijYxv+V9f1zrVLIl5YWBhWH/OlTOq41hnqCy07j94XY5XcMv5biilZ8ktgP2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAfL9Itd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XyuP/H1G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952FCC4CEE2;
-	Fri, 11 Apr 2025 10:23:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744367020;
-	bh=nNnGjXRPBz3YI4SaNY8a/CQRpAOQ1B60ZYfwjDXFrKY=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=XyuP/H1Gp/7DQAflyk4VGPWDyysyouA9qc5HJ51r/8AM0Ud98Zw7XFi2ejPohS2p0
-	 XFq8/ZPqkkFYVDOcu9AaPo2S14PcsIxBNOFBCpAwzdv/Aw6l2x/vKKV/kunnvB0WzF
-	 QF8Ra6n2R/bWcrT3KGlYnepg7gwXdW0GpwI02xd+BlqlbXme63NtKjEm8+2agVaAEe
-	 8yzy03kLjfA1b15SaWQdyZUPrCR9oKww497PdDKZT2QicsjRMGn2rE6btPbj0sUkJG
-	 mGxW/DK3JYu2FDz1MLFU2IfpGyAFRRROIg+hZGLQfU9ldKQT7vsz8gv0XFIEnpiZvm
-	 fLNZnHX/OIkMg==
-Date: Fri, 11 Apr 2025 05:23:39 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAfL9Itd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744387168;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1YGwsbANdm5+UipwPPrI05eTBmxw+TZxLni/YQ7Hx4Q=;
+	b=gAfL9Itd+sYQsLVZLz6rR2vsOPpTWBbUPpDFa5y0Yna2AkbPJ9IIt8VaoQ/pJlh9X/3pPb
+	Pv/jGrvbTwT+dXRiI1UpaJGf9w2puQ5Eh4k2QGlHUU4m5nakSRwxkqSUJJWn1DxsctU+br
+	IqWn5zro9sWtq6rRCqZ1ixooTqyTJs4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-1LNp5UCTODWVVEnUWP054A-1; Fri,
+ 11 Apr 2025 11:59:23 -0400
+X-MC-Unique: 1LNp5UCTODWVVEnUWP054A-1
+X-Mimecast-MFC-AGG-ID: 1LNp5UCTODWVVEnUWP054A_1744387160
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 743D21801A00;
+	Fri, 11 Apr 2025 15:59:19 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.40])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 62EF11808882;
+	Fri, 11 Apr 2025 15:59:13 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250407125801.40194-1-jarkko@kernel.org>
+References: <20250407125801.40194-1-jarkko@kernel.org>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: dhowells@redhat.com, keyrings@vger.kernel.org,
+    Jarkko Sakkinen <jarkko.sakkinen@opinsys.com>,
+    stable@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
+    Ignat Korchagin <ignat@cloudflare.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "David S. Miller" <davem@davemloft.net>,
+    Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+    Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+    "Serge E.
+ Hallyn" <serge@hallyn.com>,
+    James Bottomley <James.Bottomley@HansenPartnership.com>,
+    Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+    linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v8] KEYS: Add a list for unreferenced keys
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
- Praneeth Bajjuri <praneeth@ti.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Vignesh Raghavendra <vigneshr@ti.com>, 
- "David S. Miller" <davem@davemloft.net>, Conor Dooley <conor+dt@kernel.org>, 
- Manorit Chawdhry <m-chawdhry@ti.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org, 
- Kamlesh Gurudasani <kamlesh@ti.com>
-To: T Pratham <t-pratham@ti.com>
-In-Reply-To: <20250411091321.2925308-2-t-pratham@ti.com>
-References: <20250411091321.2925308-1-t-pratham@ti.com>
- <20250411091321.2925308-2-t-pratham@ti.com>
-Message-Id: <174436701744.2577578.5675041796960889580.robh@kernel.org>
-Subject: Re: [PATCH v2 1/2] dt-bindings: crypto: Add binding for TI DTHE V2
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2426185.1744387151.1@warthog.procyon.org.uk>
+Date: Fri, 11 Apr 2025 16:59:11 +0100
+Message-ID: <2426186.1744387151@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
+Jarkko Sakkinen <jarkko@kernel.org> wrote:
 
-On Fri, 11 Apr 2025 14:43:21 +0530, T Pratham wrote:
-> Add DT binding for Texas Instruments DTHE V2 crypto accelerator.
-> 
-> DTHE V2 is introduced as a part of TI AM62L SoC and can currently be
-> only found in it.
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
-> ---
->  .../devicetree/bindings/crypto/ti,dthev2.yaml | 50 +++++++++++++++++++
->  MAINTAINERS                                   |  6 +++
->  2 files changed, 56 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
-> 
+> +	spin_lock_irqsave(&key_graveyard_lock, flags);
+> +	list_splice_init(&key_graveyard, &graveyard);
+> +	spin_unlock_irqrestore(&key_graveyard_lock, flags);
 
-My bot found errors running 'make dt_binding_check' on your patch:
+I would wrap this bit in a check to see if key_graveyard is empty so that we
+can avoid disabling irqs and taking the lock if the graveyard is empty.
 
-yamllint warnings/errors:
+> +		if (!refcount_inc_not_zero(&key->usage)) {
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/ti,dthev2.example.dtb: crypto@40800000 (ti,am62l-dthev2): reg: [[0, 1082130432], [0, 65536]] is too long
-	from schema $id: http://devicetree.org/schemas/crypto/ti,dthev2.yaml#
+Sorry, but eww.  You're going to wangle the refcount twice on every key on the
+system every time the gc does a pass.  Further, in some cases inc_not_zero is
+not the fastest op in the world.
 
-doc reference errors (make refcheckdocs):
+> +			spin_lock_irqsave(&key_graveyard_lock, flags);
+> +			list_add_tail(&key->graveyard_link, &key_graveyard);
+> +			spin_unlock_irqrestore(&key_graveyard_lock, flags);
+>  			schedule_work(&key_gc_work);
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250411091321.2925308-2-t-pratham@ti.com
+This is going to enable and disable interrupts twice and that can be
+expensive, depending on the arch.  I wonder if it would be better to do:
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+			local_irq_save(flags);
+			spin_lock(&key_graveyard_lock);
+			list_add_tail(&key->graveyard_link, &key_graveyard);
+			spin_unlock(&key_graveyard_lock);
+			schedule_work(&key_gc_work);
+			local_irq_restore(flags);
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+David
 
