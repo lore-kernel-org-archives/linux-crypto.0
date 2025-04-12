@@ -1,44 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDF7175D39
-	for <linux-crypto@vger.kernel.org>; Sat, 12 Apr 2025 05:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D63176AB5
+	for <linux-crypto@vger.kernel.org>; Sat, 12 Apr 2025 05:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744436223; cv=none; b=hmYrLepJBuJXtJyN7swe/RJu/GsCa61asIVm9+PzMdMAPEOhw7JSvUh4a84QskWqA/VVtxukTb1cjmZf3W10R26pbGRTgJdUCDAxnOA3ZfQSoN6bwSfTYQuX8fPoOwHhbmcBdFliq0HOotUcvNyjGxIVMIUcNs8DqWVmAlIFzO8=
+	t=1744436224; cv=none; b=IXbML0Ge+L/uYOofxTmETRpq5Cyr8vaEwzoPBz29pa+K1Hvj7cVA9hoitQINRRjASKaUxJ/svOUUIPUHAQ60HvSJ8pQuxKdIh79vOm0GzEgrPxCtMbAbPs6sP0vn/L5Ve4Z/DFXp6qN1WC/MQNkse764ADQM2/FrjD1gI+FREDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744436223; c=relaxed/simple;
-	bh=DKdMVPsqsq08VGzJ9kwLCavo3Acfjiax6KLtF5waozg=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=h0/8KSHa7snvJwWey4tqIjB05wL+QBerCJhuFsNKhyHtV9QETTmQd+L3ZkXwUepjOrJluKF63CIBpK8hczOmYyUYV1FBT9QT1jTzUtV1EbKsKBGPm3oTJv6v2p+uwvQlwLrFsTlv360euU1dwoP9O0vLledSoWF9zw7vQ4ehDmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=srLC3d7f; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744436224; c=relaxed/simple;
+	bh=j/w6l3G++EwIOk1v9FiDf3WwPdLnk3iHe3hiSobUlZ4=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=pFBIqfeJ0YzDs0wQp6HVoX0m86F/qxL3m15JZqh118ob9ze7891D5Ms7cavguW2AiVL8UqhcAy/fdxSIjt2MYLzziwcSBZM1/HDIdgx96uhYJ1PnGx0eNaJ8sfhCZz4fw66JLlmMarG0zO5ysEBTcrverR/kqLJGbkGUC/W1C5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=SVlAdl9h; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="srLC3d7f"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="SVlAdl9h"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=O+ziDs32lMHl9CITBC9D6jQcooAc+hVOMtWbW4QWCL8=; b=srLC3d7fgJhcgtHGXQr93RsjRH
-	BMnR1MQ1G/uy2iSf76yIxrxU9kdUt+xT1957lZWH3ThL04VU+BuAktPzlCMHouW5VYfEIt/xg1gse
-	WS1OkF9tmwd0LO0XY8AUNK3uFrVT3QDxO46iIV5rw/Op1Q8bqw+HNHY8289AYeJ3QNGxmandsv+HW
-	6gGPA4UwiWqKN8wjBBlagpcAtMXumrtaXosNvnGOi21sBDkMEq1vuH8o5K+cKpQgN+wLvhRMRNFOV
-	1h8p2btsDyjF5eu1IfCeO4EROYVg2c18ytpLgPYqGQt69cEXEZn8ZCp0purm4RBVVPmseNSeAJ4d1
-	OT+/l1Uw==;
+	bh=yZhJgE03Sch2msb9rK+bkOW1fyFR4wxITfMdC55IZMU=; b=SVlAdl9hO3mpJcZ33jYGA+evBN
+	ahc0RSPFIGO49GkFuDBTc2+kGU6mJYptPejymA9B84nAGvkkUQut57yBG7XSZrz7zF2uc1WldtXH6
+	A0Prx9nL09qUktYapZ/h3YSzqJ+37hJWeenFTMa8bXYZXXGKyWzCwJ94r6wgSuQT1nznhlhpAMdm0
+	PCT2fXEBRZQqg9t8LcBTUy0n++fklW7BbRu+apCj/I3eJzhvZlNez7Xot5ctgEz/IvkuAIwB9dl0i
+	v+KLfg251wp5e0VWV1zVcqwgiMxm/p8gcyUEvpKSaHvC9GyHURhTiaI3CKZbK/WM022ggSvBl5Y2k
+	SyT9PdrA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u3TXv-00F2sL-0Q;
-	Sat, 12 Apr 2025 13:36:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 12 Apr 2025 13:36:51 +0800
-Date: Sat, 12 Apr 2025 13:36:51 +0800
-Message-Id: <cbcaa7d1daee8a9dd518d56da4d424e7631868b0.1744436095.git.herbert@gondor.apana.org.au>
+	id 1u3TY1-00F2sr-3C;
+	Sat, 12 Apr 2025 13:36:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 12 Apr 2025 13:36:57 +0800
+Date: Sat, 12 Apr 2025 13:36:57 +0800
+Message-Id: <dc20c329dc3d061331b3dd6ee3ed722f70cbc099.1744436095.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744436095.git.herbert@gondor.apana.org.au>
 References: <cover.1744436095.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 1/5] Revert "crypto: testmgr - Add multibuffer acomp
- testing"
+Subject: [v2 PATCH 4/5] Revert "crypto: tcrypt - Restore multibuffer ahash
+ tests"
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -46,246 +46,263 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-This reverts commit 99585c2192cb1ce212876e82ef01d1c98c7f4699.
+This reverts commit c664f034172705a75f3f8a0c409b9bf95b633093.
 
-Remove the acomp multibuffer tests so that the interface can be
-redesigned.
+Remove the multibuffer ahash speed tests again.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/testmgr.c | 145 ++++++++++++++++++++---------------------------
- 1 file changed, 63 insertions(+), 82 deletions(-)
+ crypto/tcrypt.c | 231 ------------------------------------------------
+ 1 file changed, 231 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index abd609d4c8ef..82977ea25db3 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -58,9 +58,6 @@ module_param(fuzz_iterations, uint, 0644);
- MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
- #endif
- 
--/* Multibuffer is unlimited.  Set arbitrary limit for testing. */
--#define MAX_MB_MSGS	16
--
- #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
- 
- /* a perfect nop */
-@@ -3329,48 +3326,27 @@ static int test_acomp(struct crypto_acomp *tfm,
- 		      int ctcount, int dtcount)
- {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
--	struct scatterlist *src = NULL, *dst = NULL;
--	struct acomp_req *reqs[MAX_MB_MSGS] = {};
--	char *decomp_out[MAX_MB_MSGS] = {};
--	char *output[MAX_MB_MSGS] = {};
--	struct crypto_wait wait;
--	struct acomp_req *req;
--	int ret = -ENOMEM;
- 	unsigned int i;
-+	char *output, *decomp_out;
-+	int ret;
-+	struct scatterlist src, dst;
-+	struct acomp_req *req;
-+	struct crypto_wait wait;
- 
--	src = kmalloc_array(MAX_MB_MSGS, sizeof(*src), GFP_KERNEL);
--	if (!src)
--		goto out;
--	dst = kmalloc_array(MAX_MB_MSGS, sizeof(*dst), GFP_KERNEL);
--	if (!dst)
--		goto out;
-+	output = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
-+	if (!output)
-+		return -ENOMEM;
- 
--	for (i = 0; i < MAX_MB_MSGS; i++) {
--		reqs[i] = acomp_request_alloc(tfm);
--		if (!reqs[i])
--			goto out;
--
--		acomp_request_set_callback(reqs[i],
--					   CRYPTO_TFM_REQ_MAY_SLEEP |
--					   CRYPTO_TFM_REQ_MAY_BACKLOG,
--					   crypto_req_done, &wait);
--		if (i)
--			acomp_request_chain(reqs[i], reqs[0]);
--
--		output[i] = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
--		if (!output[i])
--			goto out;
--
--		decomp_out[i] = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
--		if (!decomp_out[i])
--			goto out;
-+	decomp_out = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
-+	if (!decomp_out) {
-+		kfree(output);
-+		return -ENOMEM;
- 	}
- 
- 	for (i = 0; i < ctcount; i++) {
- 		unsigned int dlen = COMP_BUF_SIZE;
- 		int ilen = ctemplate[i].inlen;
- 		void *input_vec;
--		int j;
- 
- 		input_vec = kmemdup(ctemplate[i].input, ilen, GFP_KERNEL);
- 		if (!input_vec) {
-@@ -3378,61 +3354,70 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
- 
-+		memset(output, 0, dlen);
- 		crypto_init_wait(&wait);
--		sg_init_one(src, input_vec, ilen);
-+		sg_init_one(&src, input_vec, ilen);
-+		sg_init_one(&dst, output, dlen);
- 
--		for (j = 0; j < MAX_MB_MSGS; j++) {
--			sg_init_one(dst + j, output[j], dlen);
--			acomp_request_set_params(reqs[j], src, dst + j, ilen, dlen);
-+		req = acomp_request_alloc(tfm);
-+		if (!req) {
-+			pr_err("alg: acomp: request alloc failed for %s\n",
-+			       algo);
-+			kfree(input_vec);
-+			ret = -ENOMEM;
-+			goto out;
- 		}
- 
--		req = reqs[0];
-+		acomp_request_set_params(req, &src, &dst, ilen, dlen);
-+		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					   crypto_req_done, &wait);
-+
- 		ret = crypto_wait_req(crypto_acomp_compress(req), &wait);
- 		if (ret) {
- 			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
- 			       i + 1, algo, -ret);
- 			kfree(input_vec);
-+			acomp_request_free(req);
- 			goto out;
- 		}
- 
- 		ilen = req->dlen;
- 		dlen = COMP_BUF_SIZE;
-+		sg_init_one(&src, output, ilen);
-+		sg_init_one(&dst, decomp_out, dlen);
- 		crypto_init_wait(&wait);
--		for (j = 0; j < MAX_MB_MSGS; j++) {
--			sg_init_one(src + j, output[j], ilen);
--			sg_init_one(dst + j, decomp_out[j], dlen);
--			acomp_request_set_params(reqs[j], src + j, dst + j, ilen, dlen);
-+		acomp_request_set_params(req, &src, &dst, ilen, dlen);
-+
-+		ret = crypto_wait_req(crypto_acomp_decompress(req), &wait);
-+		if (ret) {
-+			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
-+			       i + 1, algo, -ret);
-+			kfree(input_vec);
-+			acomp_request_free(req);
-+			goto out;
- 		}
- 
--		crypto_wait_req(crypto_acomp_decompress(req), &wait);
--		for (j = 0; j < MAX_MB_MSGS; j++) {
--			ret = reqs[j]->base.err;
--			if (ret) {
--				pr_err("alg: acomp: compression failed on test %d (%d) for %s: ret=%d\n",
--				       i + 1, j, algo, -ret);
--				kfree(input_vec);
--				goto out;
--			}
-+		if (req->dlen != ctemplate[i].inlen) {
-+			pr_err("alg: acomp: Compression test %d failed for %s: output len = %d\n",
-+			       i + 1, algo, req->dlen);
-+			ret = -EINVAL;
-+			kfree(input_vec);
-+			acomp_request_free(req);
-+			goto out;
-+		}
- 
--			if (reqs[j]->dlen != ctemplate[i].inlen) {
--				pr_err("alg: acomp: Compression test %d (%d) failed for %s: output len = %d\n",
--				       i + 1, j, algo, reqs[j]->dlen);
--				ret = -EINVAL;
--				kfree(input_vec);
--				goto out;
--			}
--
--			if (memcmp(input_vec, decomp_out[j], reqs[j]->dlen)) {
--				pr_err("alg: acomp: Compression test %d (%d) failed for %s\n",
--				       i + 1, j, algo);
--				hexdump(output[j], reqs[j]->dlen);
--				ret = -EINVAL;
--				kfree(input_vec);
--				goto out;
--			}
-+		if (memcmp(input_vec, decomp_out, req->dlen)) {
-+			pr_err("alg: acomp: Compression test %d failed for %s\n",
-+			       i + 1, algo);
-+			hexdump(output, req->dlen);
-+			ret = -EINVAL;
-+			kfree(input_vec);
-+			acomp_request_free(req);
-+			goto out;
- 		}
- 
- 		kfree(input_vec);
-+		acomp_request_free(req);
- 	}
- 
- 	for (i = 0; i < dtcount; i++) {
-@@ -3446,9 +3431,10 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
- 
-+		memset(output, 0, dlen);
- 		crypto_init_wait(&wait);
--		sg_init_one(src, input_vec, ilen);
--		sg_init_one(dst, output[0], dlen);
-+		sg_init_one(&src, input_vec, ilen);
-+		sg_init_one(&dst, output, dlen);
- 
- 		req = acomp_request_alloc(tfm);
- 		if (!req) {
-@@ -3459,7 +3445,7 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
- 
--		acomp_request_set_params(req, src, dst, ilen, dlen);
-+		acomp_request_set_params(req, &src, &dst, ilen, dlen);
- 		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 					   crypto_req_done, &wait);
- 
-@@ -3481,10 +3467,10 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
- 
--		if (memcmp(output[0], dtemplate[i].output, req->dlen)) {
-+		if (memcmp(output, dtemplate[i].output, req->dlen)) {
- 			pr_err("alg: acomp: Decompression test %d failed for %s\n",
- 			       i + 1, algo);
--			hexdump(output[0], req->dlen);
-+			hexdump(output, req->dlen);
- 			ret = -EINVAL;
- 			kfree(input_vec);
- 			acomp_request_free(req);
-@@ -3498,13 +3484,8 @@ static int test_acomp(struct crypto_acomp *tfm,
- 	ret = 0;
- 
- out:
--	acomp_request_free(reqs[0]);
--	for (i = 0; i < MAX_MB_MSGS; i++) {
--		kfree(output[i]);
--		kfree(decomp_out[i]);
--	}
--	kfree(dst);
--	kfree(src);
-+	kfree(decomp_out);
-+	kfree(output);
- 	return ret;
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 96f4a66be14c..879fc21dcc16 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -716,207 +716,6 @@ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
+ 	return crypto_wait_req(ret, wait);
  }
+ 
+-struct test_mb_ahash_data {
+-	struct scatterlist sg[XBUFSIZE];
+-	char result[64];
+-	struct ahash_request *req;
+-	struct crypto_wait wait;
+-	char *xbuf[XBUFSIZE];
+-};
+-
+-static inline int do_mult_ahash_op(struct test_mb_ahash_data *data, u32 num_mb,
+-				   int *rc)
+-{
+-	int i, err;
+-
+-	/* Fire up a bunch of concurrent requests */
+-	err = crypto_ahash_digest(data[0].req);
+-
+-	/* Wait for all requests to finish */
+-	err = crypto_wait_req(err, &data[0].wait);
+-	if (num_mb < 2)
+-		return err;
+-
+-	for (i = 0; i < num_mb; i++) {
+-		rc[i] = ahash_request_err(data[i].req);
+-		if (rc[i]) {
+-			pr_info("concurrent request %d error %d\n", i, rc[i]);
+-			err = rc[i];
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+-				 int secs, u32 num_mb)
+-{
+-	unsigned long start, end;
+-	int bcount;
+-	int ret = 0;
+-	int *rc;
+-
+-	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+-	if (!rc)
+-		return -ENOMEM;
+-
+-	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+-	     time_before(jiffies, end); bcount++) {
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+-		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+-
+-out:
+-	kfree(rc);
+-	return ret;
+-}
+-
+-static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
+-				u32 num_mb)
+-{
+-	unsigned long cycles = 0;
+-	int ret = 0;
+-	int i;
+-	int *rc;
+-
+-	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+-	if (!rc)
+-		return -ENOMEM;
+-
+-	/* Warm-up run. */
+-	for (i = 0; i < 4; i++) {
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	/* The real thing. */
+-	for (i = 0; i < 8; i++) {
+-		cycles_t start, end;
+-
+-		start = get_cycles();
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		end = get_cycles();
+-
+-		if (ret)
+-			goto out;
+-
+-		cycles += end - start;
+-	}
+-
+-	pr_cont("1 operation in %lu cycles (%d bytes)\n",
+-		(cycles + 4) / (8 * num_mb), blen);
+-
+-out:
+-	kfree(rc);
+-	return ret;
+-}
+-
+-static void test_mb_ahash_speed(const char *algo, unsigned int secs,
+-				struct hash_speed *speed, u32 num_mb)
+-{
+-	struct test_mb_ahash_data *data;
+-	struct crypto_ahash *tfm;
+-	unsigned int i, j, k;
+-	int ret;
+-
+-	data = kcalloc(num_mb, sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return;
+-
+-	tfm = crypto_alloc_ahash(algo, 0, 0);
+-	if (IS_ERR(tfm)) {
+-		pr_err("failed to load transform for %s: %ld\n",
+-			algo, PTR_ERR(tfm));
+-		goto free_data;
+-	}
+-
+-	for (i = 0; i < num_mb; ++i) {
+-		if (testmgr_alloc_buf(data[i].xbuf))
+-			goto out;
+-
+-		crypto_init_wait(&data[i].wait);
+-
+-		data[i].req = ahash_request_alloc(tfm, GFP_KERNEL);
+-		if (!data[i].req) {
+-			pr_err("alg: hash: Failed to allocate request for %s\n",
+-			       algo);
+-			goto out;
+-		}
+-
+-
+-		if (i) {
+-			ahash_request_set_callback(data[i].req, 0, NULL, NULL);
+-			ahash_request_chain(data[i].req, data[0].req);
+-		} else
+-			ahash_request_set_callback(data[0].req, 0,
+-						   crypto_req_done,
+-						   &data[0].wait);
+-
+-		sg_init_table(data[i].sg, XBUFSIZE);
+-		for (j = 0; j < XBUFSIZE; j++) {
+-			sg_set_buf(data[i].sg + j, data[i].xbuf[j], PAGE_SIZE);
+-			memset(data[i].xbuf[j], 0xff, PAGE_SIZE);
+-		}
+-	}
+-
+-	pr_info("\ntesting speed of multibuffer %s (%s)\n", algo,
+-		get_driver_name(crypto_ahash, tfm));
+-
+-	for (i = 0; speed[i].blen != 0; i++) {
+-		/* For some reason this only tests digests. */
+-		if (speed[i].blen != speed[i].plen)
+-			continue;
+-
+-		if (speed[i].blen > XBUFSIZE * PAGE_SIZE) {
+-			pr_err("template (%u) too big for tvmem (%lu)\n",
+-			       speed[i].blen, XBUFSIZE * PAGE_SIZE);
+-			goto out;
+-		}
+-
+-		if (klen)
+-			crypto_ahash_setkey(tfm, tvmem[0], klen);
+-
+-		for (k = 0; k < num_mb; k++)
+-			ahash_request_set_crypt(data[k].req, data[k].sg,
+-						data[k].result, speed[i].blen);
+-
+-		pr_info("test%3u "
+-			"(%5u byte blocks,%5u bytes per update,%4u updates): ",
+-			i, speed[i].blen, speed[i].plen,
+-			speed[i].blen / speed[i].plen);
+-
+-		if (secs) {
+-			ret = test_mb_ahash_jiffies(data, speed[i].blen, secs,
+-						    num_mb);
+-			cond_resched();
+-		} else {
+-			ret = test_mb_ahash_cycles(data, speed[i].blen, num_mb);
+-		}
+-
+-
+-		if (ret) {
+-			pr_err("At least one hashing failed ret=%d\n", ret);
+-			break;
+-		}
+-	}
+-
+-out:
+-	ahash_request_free(data[0].req);
+-
+-	for (k = 0; k < num_mb; ++k)
+-		testmgr_free_buf(data[k].xbuf);
+-
+-	crypto_free_ahash(tfm);
+-
+-free_data:
+-	kfree(data);
+-}
+-
+ static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
+ 				     char *out, int secs)
+ {
+@@ -2584,36 +2383,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		test_ahash_speed("sm3", sec, generic_hash_speed_template);
+ 		if (mode > 400 && mode < 500) break;
+ 		fallthrough;
+-	case 450:
+-		test_mb_ahash_speed("sha1", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 451:
+-		test_mb_ahash_speed("sha256", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 452:
+-		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 453:
+-		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 454:
+-		test_mb_ahash_speed("streebog256", sec,
+-				    generic_hash_speed_template, num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 455:
+-		test_mb_ahash_speed("streebog512", sec,
+-				    generic_hash_speed_template, num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+ 	case 499:
+ 		break;
  
 -- 
 2.39.5
