@@ -1,108 +1,292 @@
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CC7AD51;
-	Sun, 13 Apr 2025 08:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774121DF97C;
+	Sun, 13 Apr 2025 15:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744532445; cv=none; b=TT9IQhwG/Bpw4w4lI1mFE3LsjPfwySQCy9mHhu/HAX/KHVm86emz5NbbzEwamq/EABiCCLG6+dIfJVWB9tp61IpawGWfnunXsbe4GslsCwMLjC164xFAiKSA5uH7kdldE6ZPz4dO9trYBUND/bWXSlNOJvtjISrQBbwBcBM0Wic=
+	t=1744559079; cv=none; b=ZRHkEvJ5Fqo+aLiqgfOF+0c/Ay0QM2A+xIsZpJBroRJQPphaWoQWMrwQzn+oCLw2EO3gqAjCcoSPMy92TK5iPJqj6pg4GH4VwuK5avbch8HqhksKU80KuRjsgM6pIzpEXJQuFyWHmCRM4NbHUev8EtdN4lRzLFIYecN1vMWXXxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744532445; c=relaxed/simple;
-	bh=DcWshjfTC1lMC6YXHeeUL4bjuPWPxBzwpr8Rq5Zmfnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bcjQdvYc23kNnmOczl/QVTQhHLt7uqJiZCWeE4WrqcYSo0SsG5yImThplvBK7HX2QkRp8bEWVQRaSJ7XkKZbrQA8S03F0ckF8vQlJ/TAYmIsomkfLLWkW1Pgsgl+7tuMBO8QK1k21xRELrraJegfHHI43LMymVUHyOtv7oRHK8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=exzryWU/; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1744559079; c=relaxed/simple;
+	bh=Q3pbBZfq4LkSSwii8rxYHn7G8WTtl1ZlV3cJjcDN4u0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hpMcQyCFIoYNs3O/0BCz3V4/+R+03stiEcuZiqf+mZFNo2isvB7cl5ERMEkPueSYGB2eQ7NDKPDwLuMP6UFiCNzXd+yy3IHtG4QuN8yxv1OkrBgTjeB2sEdIHsDD/uwLbW8CcXCSpTLfeZ6AQkgCeBSZnfiZ2u32oQGbE+4IhyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDwna0zr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="exzryWU/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1744532439; x=1745137239; i=markus.elfring@web.de;
-	bh=DcWshjfTC1lMC6YXHeeUL4bjuPWPxBzwpr8Rq5Zmfnw=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=exzryWU/R0uk0fdqTP5OPLHzIJm4fdYAX0IolxCopzBwWYsoo+5Pnz8Z07oaUtlO
-	 ZJOMwHt+XJzDA9rUjSkKjdWp1TBEEEjiEowI6o4EyVwQ1PDtuBXNzZ0MhhgCothyh
-	 HGKRBTPDSfiFfUR9lz6ZZxoSasgRd8V7ZCg1YT7xPabWYQL9YmHt69s4enkwUROtS
-	 G9VH4cYchnpEYydNLz5jwMCBeDgGbtb6EuC7Wki1sBL3FtjO1UxaCfmYKh+gtpL8j
-	 FX/jverm+icguogZ+pAqDu8HbICHVonIi4ox9qgbzWioLxgLQVKlQf9dtfaIILEhJ
-	 QgC1KztyMwYYC31jlg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.70.67]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MPrPT-1tgxyG33UR-00SVpJ; Sun, 13
- Apr 2025 10:20:39 +0200
-Message-ID: <18573488-ca37-48b8-adae-1728712aec0e@web.de>
-Date: Sun, 13 Apr 2025 10:20:27 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDwna0zr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 456E3C4CEDD;
+	Sun, 13 Apr 2025 15:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744559078;
+	bh=Q3pbBZfq4LkSSwii8rxYHn7G8WTtl1ZlV3cJjcDN4u0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JDwna0zrYAOhK3tZ5qTXnsHj/m8//yZi2GG7Fa6yOacOJ0ovfC4bF041jHOIMhzi6
+	 q8IBg0tS0KLospth+KMpSYYsSiD3Yesq+l41uOziyt35gzzvp5khseW2PrfK0JL7ja
+	 Kh44y7nSfCyUyog0VEPuaZsz2ZF0r/vZ/EJTgnaZy0GLfAROktSsA0Z72rsRnUVqsz
+	 0BH0FPfNETMbZlqPdWVsZR7zhLSZlrmFKV/AjfrkrBhNOeNVDlQ2ldUVu89fclbgJg
+	 rP9UoeH3mYoSVowF843cl6KeIDS46c3kl9N9IXHkGwU6ETRDxAbdzBrUcVfK23/M8k
+	 nwhkgGKJ5HVeg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	sparclinux@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	x86@kernel.org
+Subject: [PATCH] lib/crc: make the CPU feature static keys __ro_after_init
+Date: Sun, 13 Apr 2025 08:43:50 -0700
+Message-ID: <20250413154350.10819-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: crypto: sun8i-ce-hash - Refine exception handling in
- sun8i_ce_hash_run()
-To: Julian Calaby <julian.calaby@gmail.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Ovidiu Panait <ovidiu.panait.oss@gmail.com>, linux-sunxi@lists.linux.dev,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Chen-Yu Tsai <wens@csie.org>, Corentin Labbe <clabbe.montjoie@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, LKML <linux-kernel@vger.kernel.org>,
- Julia Lawall <julia.lawall@inria.fr>
-References: <3727de04-7993-4b81-80c0-adb40b847307@web.de>
- <20250409133610.59d42bec@donnerap.manchester.arm.com>
- <e10ecbe1-d8c3-444d-92cb-647a1c54675f@web.de>
- <CAGRGNgUV6Dq6ZR9bcgomzj1PMQj4vLq9qJCy0dxVd0vQoPWYXA@mail.gmail.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CAGRGNgUV6Dq6ZR9bcgomzj1PMQj4vLq9qJCy0dxVd0vQoPWYXA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:oVb/K4rokwXrOqYsrdIDmqG4XKpI3nnVM8seiRqbzdcw0cNOV+a
- tYO6eLyzCj6OLXXbZMczd3yXVNlYRA6sf6kr5LSDhn3BPJbQiAD2KlXT78QnSyXWnKwwYeU
- gSQ5jAeoUy3PMT/+dp7P3eR+URUZfBNidvEQAQo0PQHhv1Lje+ktvIdd+qFJogodywkwrkA
- 8u1H/eG5FM+Yk1KnkhQzA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DWeY799sZOI=;JbD2Tgww7jyD7iXyT4Kkb+3BuGr
- Os8Bfuzy0I/sbD/raQrPtbMnrxgEsx0ZtqHe7sdNeeEVxxiI4gWeJJMXvE/Zpn2Hw3KjXRACa
- YyIad+snIp9m4yq66JLptCd4Hapi/K0vJcrHIEmYaZHpMDq1kYfGy6vDHtfPqJomNvyZ4H1Ky
- 8NCb+nklxF62ydIvesPtZR7wsdsIUcaKJcwUHikcXC4RCR7qmN9Pf2mbBGy/mjvsX/A0t6FCz
- mTlDHeoFonNKEH4BMFkNtB7lY/kpt21dglyRP/8c5onwQv/dx0o/ge4f3JG9Tzay04BQfHA7V
- FVS5pnvdbBGFRW7sx2IADGOdzL6Bzvoc4NSRaWYJSfLbNJcFNV3OqJOHRKV7N9Wt7SnP7KN2p
- 3elYK+78v1KjT0474hKuX9iec2S6AILBYtBj6ZWo9uUpAJtYm7fbGqwN/ORc2KAUm/Hb3YbYN
- E9E29MI2sqS/daBcubIyEWyeN+AmZQ4AGgCvSq4/M3TuCmzYkvUCqI4oWnKdxvf8cyH/R4bpc
- xrqRthH9RPVJtIsCdG2aR5hvnC9UfVexc50tl/azRzGJOjcX6PkFMHkZWL6NyHp6dreMHoXpv
- iRVLPDHHpQ2cFce9o5lZ+8eNn1sX2RqS91khwtOEC9pmcoVpEQZeu9jIAK9/qvCqR+0kBkV+d
- rAbqXkiwmuvejYV5Zyp99IHa743UVWwLLcbvo15soJddp5CveU74m8caymlB7jK2ECyqHR46d
- ogcB6efDvvUN32HzjeIrIzvV5RNJ5tu6JsJHJISrNcf3KskYqrYwEnyPtHLFYaHnn0ljCw3kT
- KpT/w8QCYyV2o5PjLQx2NFKvJxaGIxM9Yi/yK7JI+UMkCeLxuGn0DfPzdnnBMaWuXBasyIJCo
- oEVBeGxWj3PXExnJsESjt1tlXh5uIvAbxjuJBoTdZIwod7nwTcw9w4Y5JU29AAjSQ/BbAxShT
- FuK2YyYCDkBu7xi+5C6iI2V+o0CpGLuT8MyHkRkgZ9Jq7BMWroUCSra3f/4jg5kVCXxvEGHyd
- sT5jvKLRyn5z9PaS73Q9I+TCQWuKvoHtMZ0dWzll0YVbM3hS0hrDc81ir0Eigt//neSSmwkx7
- MnZSJ14QReP/QfxJAQjvuNR09i63GFYi9cvNgtZKgCkkapts4srR/6yezSZJoiWvrSzIgW69P
- F3DyRXSu6nL47uI+muhUy7oPhhjv+TtlMzrT472hIDbAYQcgS74r3dJRowDN3ekiCt+AB7ais
- lrJQA6OzBUB3hnsw+x9m7hKACHpINg9d2KUiC+ETJ9k9o7DBSbD6a5WOfi7L4/jHEO5vuI9Uj
- 77DIvPwnPMkEdGpkryg/JohEQIZvJ2b9tqmEEYK1xtYSX7Qbu5Fccgb1GpKrnTiCzZx54WBnZ
- kuNGrvpifM3pm2yGcxe5m5BY0FdBsd/vPHhI0RZSw7MprH640e0W0shALykpy+wV9TOaBO0GI
- vO3b+TUAEEmOut5RW8UJOiz+TnklbF17EUGmZo/qR7RJBrux0
+Content-Transfer-Encoding: 8bit
 
-> I note that you said you did this using the Coccinelle software. Is
-> the semantic patch something you're trying to get upstream at part of
-> coccicheck?
+From: Eric Biggers <ebiggers@google.com>
 
-Not yet.
+All of the CRC library's CPU feature static_keys are initialized by
+initcalls and never change afterwards, so there's no need for them to be
+in the regular .data section.  Put them in .data..ro_after_init instead.
 
-It might become more interesting to achieve wider applications of similar
-source code analyses and transformations.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
 
-Several SmPL script variants were published which are also still waiting
-on constructive review for coccicheck extensions.
+I'm planning to take this via the crc tree.
 
-Regards,
-Markus
+ arch/arm/lib/crc-t10dif-glue.c       | 4 ++--
+ arch/arm/lib/crc32-glue.c            | 4 ++--
+ arch/arm64/lib/crc-t10dif-glue.c     | 4 ++--
+ arch/loongarch/lib/crc32-loongarch.c | 2 +-
+ arch/mips/lib/crc32-mips.c           | 2 +-
+ arch/powerpc/lib/crc-t10dif-glue.c   | 2 +-
+ arch/powerpc/lib/crc32-glue.c        | 2 +-
+ arch/s390/lib/crc32-glue.c           | 2 +-
+ arch/sparc/lib/crc32_glue.c          | 2 +-
+ arch/x86/lib/crc-t10dif-glue.c       | 2 +-
+ arch/x86/lib/crc32-glue.c            | 4 ++--
+ arch/x86/lib/crc64-glue.c            | 2 +-
+ 12 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm/lib/crc-t10dif-glue.c b/arch/arm/lib/crc-t10dif-glue.c
+index 6efad3d78284..382437094bdd 100644
+--- a/arch/arm/lib/crc-t10dif-glue.c
++++ b/arch/arm/lib/crc-t10dif-glue.c
+@@ -14,12 +14,12 @@
+ #include <crypto/internal/simd.h>
+ 
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_neon);
+-static DEFINE_STATIC_KEY_FALSE(have_pmull);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
+ 
+ #define CRC_T10DIF_PMULL_CHUNK_SIZE	16U
+ 
+ asmlinkage u16 crc_t10dif_pmull64(u16 init_crc, const u8 *buf, size_t len);
+ asmlinkage void crc_t10dif_pmull8(u16 init_crc, const u8 *buf, size_t len,
+diff --git a/arch/arm/lib/crc32-glue.c b/arch/arm/lib/crc32-glue.c
+index 4340351dbde8..7ef7db9c0de7 100644
+--- a/arch/arm/lib/crc32-glue.c
++++ b/arch/arm/lib/crc32-glue.c
+@@ -16,12 +16,12 @@
+ 
+ #include <asm/hwcap.h>
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_crc32);
+-static DEFINE_STATIC_KEY_FALSE(have_pmull);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
+ 
+ #define PMULL_MIN_LEN	64	/* min size of buffer for pmull functions */
+ 
+ asmlinkage u32 crc32_pmull_le(const u8 buf[], u32 len, u32 init_crc);
+ asmlinkage u32 crc32_armv8_le(u32 init_crc, const u8 buf[], u32 len);
+diff --git a/arch/arm64/lib/crc-t10dif-glue.c b/arch/arm64/lib/crc-t10dif-glue.c
+index bacd18f23168..99d0b5668a28 100644
+--- a/arch/arm64/lib/crc-t10dif-glue.c
++++ b/arch/arm64/lib/crc-t10dif-glue.c
+@@ -15,12 +15,12 @@
+ #include <crypto/internal/simd.h>
+ 
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_asimd);
+-static DEFINE_STATIC_KEY_FALSE(have_pmull);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_asimd);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
+ 
+ #define CRC_T10DIF_PMULL_CHUNK_SIZE	16U
+ 
+ asmlinkage void crc_t10dif_pmull_p8(u16 init_crc, const u8 *buf, size_t len,
+ 				    u8 out[16]);
+diff --git a/arch/loongarch/lib/crc32-loongarch.c b/arch/loongarch/lib/crc32-loongarch.c
+index c44ee4f32557..8e6d1f517e73 100644
+--- a/arch/loongarch/lib/crc32-loongarch.c
++++ b/arch/loongarch/lib/crc32-loongarch.c
+@@ -24,11 +24,11 @@ do {							\
+ } while (0)
+ 
+ #define CRC32(crc, value, size)		_CRC32(crc, value, size, crc)
+ #define CRC32C(crc, value, size)	_CRC32(crc, value, size, crcc)
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_crc32);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+ 	if (!static_branch_likely(&have_crc32))
+ 		return crc32_le_base(crc, p, len);
+diff --git a/arch/mips/lib/crc32-mips.c b/arch/mips/lib/crc32-mips.c
+index 676a4b3e290b..84df361e7181 100644
+--- a/arch/mips/lib/crc32-mips.c
++++ b/arch/mips/lib/crc32-mips.c
+@@ -60,11 +60,11 @@ do {							\
+ 	_CRC32(crc, value, size, crc32)
+ 
+ #define CRC32C(crc, value, size) \
+ 	_CRC32(crc, value, size, crc32c)
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_crc32);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+ 	if (!static_branch_likely(&have_crc32))
+ 		return crc32_le_base(crc, p, len);
+diff --git a/arch/powerpc/lib/crc-t10dif-glue.c b/arch/powerpc/lib/crc-t10dif-glue.c
+index f411b0120cc5..ddd5c4088f50 100644
+--- a/arch/powerpc/lib/crc-t10dif-glue.c
++++ b/arch/powerpc/lib/crc-t10dif-glue.c
+@@ -19,11 +19,11 @@
+ #define VMX_ALIGN		16
+ #define VMX_ALIGN_MASK		(VMX_ALIGN-1)
+ 
+ #define VECTOR_BREAKPOINT	64
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_vec_crypto);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vec_crypto);
+ 
+ u32 __crct10dif_vpmsum(u32 crc, unsigned char const *p, size_t len);
+ 
+ u16 crc_t10dif_arch(u16 crci, const u8 *p, size_t len)
+ {
+diff --git a/arch/powerpc/lib/crc32-glue.c b/arch/powerpc/lib/crc32-glue.c
+index dbd10f339183..42f2dd3c85dd 100644
+--- a/arch/powerpc/lib/crc32-glue.c
++++ b/arch/powerpc/lib/crc32-glue.c
+@@ -11,11 +11,11 @@
+ #define VMX_ALIGN		16
+ #define VMX_ALIGN_MASK		(VMX_ALIGN-1)
+ 
+ #define VECTOR_BREAKPOINT	512
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_vec_crypto);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vec_crypto);
+ 
+ u32 __crc32c_vpmsum(u32 crc, const u8 *p, size_t len);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+diff --git a/arch/s390/lib/crc32-glue.c b/arch/s390/lib/crc32-glue.c
+index 124214a27340..8f20a8e595c3 100644
+--- a/arch/s390/lib/crc32-glue.c
++++ b/arch/s390/lib/crc32-glue.c
+@@ -16,11 +16,11 @@
+ 
+ #define VX_MIN_LEN		64
+ #define VX_ALIGNMENT		16L
+ #define VX_ALIGN_MASK		(VX_ALIGNMENT - 1)
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_vxrs);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vxrs);
+ 
+ /*
+  * DEFINE_CRC32_VX() - Define a CRC-32 function using the vector extension
+  *
+  * Creates a function to perform a particular CRC-32 computation. Depending
+diff --git a/arch/sparc/lib/crc32_glue.c b/arch/sparc/lib/crc32_glue.c
+index a70752c729cf..d34e7cc7e1a1 100644
+--- a/arch/sparc/lib/crc32_glue.c
++++ b/arch/sparc/lib/crc32_glue.c
+@@ -15,11 +15,11 @@
+ #include <linux/kernel.h>
+ #include <linux/crc32.h>
+ #include <asm/pstate.h>
+ #include <asm/elf.h>
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_crc32c_opcode);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32c_opcode);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *data, size_t len)
+ {
+ 	return crc32_le_base(crc, data, len);
+ }
+diff --git a/arch/x86/lib/crc-t10dif-glue.c b/arch/x86/lib/crc-t10dif-glue.c
+index f89c335cde3c..d073b3678edc 100644
+--- a/arch/x86/lib/crc-t10dif-glue.c
++++ b/arch/x86/lib/crc-t10dif-glue.c
+@@ -7,11 +7,11 @@
+ 
+ #include <linux/crc-t10dif.h>
+ #include <linux/module.h>
+ #include "crc-pclmul-template.h"
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
+ 
+ DECLARE_CRC_PCLMUL_FUNCS(crc16_msb, u16);
+ 
+ u16 crc_t10dif_arch(u16 crc, const u8 *p, size_t len)
+ {
+diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32-glue.c
+index e3f93b17ac3f..e6a6285cfca8 100644
+--- a/arch/x86/lib/crc32-glue.c
++++ b/arch/x86/lib/crc32-glue.c
+@@ -9,12 +9,12 @@
+ 
+ #include <linux/crc32.h>
+ #include <linux/module.h>
+ #include "crc-pclmul-template.h"
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_crc32);
+-static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
+ 
+ DECLARE_CRC_PCLMUL_FUNCS(crc32_lsb, u32);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+diff --git a/arch/x86/lib/crc64-glue.c b/arch/x86/lib/crc64-glue.c
+index b0e1b719ecbf..1214ee726c16 100644
+--- a/arch/x86/lib/crc64-glue.c
++++ b/arch/x86/lib/crc64-glue.c
+@@ -7,11 +7,11 @@
+ 
+ #include <linux/crc64.h>
+ #include <linux/module.h>
+ #include "crc-pclmul-template.h"
+ 
+-static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
+ 
+ DECLARE_CRC_PCLMUL_FUNCS(crc64_msb, u64);
+ DECLARE_CRC_PCLMUL_FUNCS(crc64_lsb, u64);
+ 
+ u64 crc64_be_arch(u64 crc, const u8 *p, size_t len)
+
+base-commit: e8c24520a1338f938774268a9bafb679ace93b76
+-- 
+2.49.0
+
