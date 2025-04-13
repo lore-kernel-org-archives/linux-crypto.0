@@ -1,98 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4461946AA;
-	Sun, 13 Apr 2025 04:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9A52367A8;
+	Sun, 13 Apr 2025 07:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744520145; cv=none; b=lY3dP33zWyCmFsUDDL/BqHyCKiXM+jg7foTu//2rScFWUo3kqowJiuwlRbTAXkK2GMWtW+8OMINDISEF46NVG2ulJ5FkDtGsvh26UfAcu3SQpcWc0kPEvUgaCVbLU8LV4SeP/QhXsZCDAcTiO44+NyKbhLlttmd7ecloG0k2AF4=
+	t=1744530370; cv=none; b=jaYm0WnSNO6RITnkcCrHQTOut+gBjHAtb1f7Yzg/JCW920mPX/L/T3Gqi/KrltGcgQqwPqY9gRmiVT7JdpXg8VMxZX1EsiJj0XeitaGGh7ROCa8JX9lolwj7tve2KuZmY1DmpEw6KzRVdp+wSa9N2AOfKNxxPQ66G/tiWzU8g7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744520145; c=relaxed/simple;
-	bh=2gVkbo9MzVz9VvdMrst8TjWJgNjWQ5w/TelaNMUEtGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BNaD/sNHm27WxwtnQpo1/qTpO0iaeK0pAZpe5oPIxFiHsqAImPpT6tUssaEeUBu/Nqj862bEGBCZRJvvOAPNTBAUyTY8lkrUm04uy6as5WyHQXZoqf6YEMGna+m7ftSRbOamlvc8T1QQff2rW3XdVR+0kasEOmT1lPEL2J0q52E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dQ3TQJtk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744530370; c=relaxed/simple;
+	bh=bDSu5/EVHFrCNsSIo9MPis9K1+uBYhIFfq4Okm82ftE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sy72Eb6uEBnihFbaH7hFz+dd/YIbHJaDLBOJiRc0FuhA0n6NV1jojKstF1yoWodSRb1Yzfdu/277ActiDIVTxjJjiSNl+yp/7JXahZCdpBTm9nwNrf97fSDjmvPp7fJXyGjffTt+hNH3OjsbXgRhck9ORCW+th8722uGTX27zZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=knVzK4+6; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQ3TQJtk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8414CC4CEEC;
-	Sun, 13 Apr 2025 04:55:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744520144;
-	bh=2gVkbo9MzVz9VvdMrst8TjWJgNjWQ5w/TelaNMUEtGU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dQ3TQJtkQRNwLXjjSV+ZirK4F2x5Ki3Bhv5FTKS0TwurPeEsyoDqm/+11jsc6KW/a
-	 sS/UqHVfUu/IOzxUpNwkD1ovfmDwFhEzVnWxOWHFD05K5ZscmwjZU2oMjAfRLzRawn
-	 30yLpt4R8qhT7ec13PW04vyT4DaMPls82NRUZ1euqmDGxs8CSb9p5bWhuXdCviGCUc
-	 1zRw8fPcXC/Zdg2Lmqm7zA1a+dhQrtO9RiXimZ4QHwMHLCsaPR3Bnik+Zq35FnHVcq
-	 lQ9gEU05caDHcf1lX0cxLWbGZOh7IM7YG2I8Vl/U07faajdBK8X4wf5HybE8IpkIAd
-	 uhuSffzv6mTwg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	x86@kernel.org
-Subject: [PATCH 9/9] crypto: poly1305 - remove rset and sset fields of poly1305_desc_ctx
-Date: Sat, 12 Apr 2025 21:54:21 -0700
-Message-ID: <20250413045421.55100-10-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250413045421.55100-1-ebiggers@kernel.org>
-References: <20250413045421.55100-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="knVzK4+6"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e8ec399427so28062186d6.2;
+        Sun, 13 Apr 2025 00:46:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744530368; x=1745135168; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bDSu5/EVHFrCNsSIo9MPis9K1+uBYhIFfq4Okm82ftE=;
+        b=knVzK4+64xTpzl7x3svHgfHYOV3i8wEeQO5x8ElkngyB9RBYkmEohkJpxEBbhHTDQc
+         Q8lX8ghS1tjMHKvR257Ndq6QUnrGjB+Wy34JswDBS584ydn8sR5Kjfan+PNMEzvDYAlq
+         /yv2BlzY99TrPBq9Fet7BN+2By/zv+K5Wv6AK6ACHB35joIYPRyMTvfcTHaYViDrEPTg
+         Y2VZcFSX3XN8oD1qrvfufnujQI3SqzQkUb4Rv2IrR+KI82fiFFhRibeXdDQff4jnxSP3
+         /IZnoaL/slf2E4zUe8/FEyGpgbvagM01rTgyo0rUScn4M3Ji1+Y+5/R68HExVmgcWypI
+         UsXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744530368; x=1745135168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bDSu5/EVHFrCNsSIo9MPis9K1+uBYhIFfq4Okm82ftE=;
+        b=Wbimv13B1fuuSwXa3dQeTXfERAIur12dDxcKDh/xeufcdH/0Am5bYF7XIW9MJUEq4q
+         s8EyQ0Z90/kOs4xwE6UW3596PHR/cHjm5sSQuyWpGftE5tTJnWsgVvs1CMG28UjcPLKN
+         BiRh4U5aosflrfBmTRpmxpxyc70IkX1VRjagUoeRT6OxFm/d00qSkqRfxEwxy5qrWG3T
+         fpsxNHCQ6uj9YrzjFFnSLX8e8GaUZolyiFAYDRa0xRIbL5/Kenk35mHfIUtZFCBR6NUS
+         TJr+sj/q0Jq0HJbYuEcjI06pqK6VSh8MBUbV4JJ0Ao1rIO6LctmXbaKwj8QYBHaQDUpr
+         jXSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3k/Cngi/uzSdd6bCHgnOWi48DDER3gnUsbmtFIRKiwnP73R8J86Qq8sIOvoON+xNryIYumr+CfvCZNPQ=@vger.kernel.org, AJvYcCUPVJvZl5tEs1soN4tziwWpkXp+FYMIXMt7FRsEB+djQFLy7qD53jln10fL3jHw6SUzZqJQxYph8BIqWKMI@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFWdrHsZA2peXnFZ5rnQGqKoyG+sfZzHdGLoZEpwp2dD/JgG0E
+	yBfTtLnsFRL3yRaSckO7nYwaHPpT9gIbq1ZNeKw+XprolTCMnCnOAkck9MfY0KhursHPXsAXf2K
+	LbHHZMFa6txSEEglK5lGcDSeONJA=
+X-Gm-Gg: ASbGncts3s/MwR/+/DyUgke3vhZ+sYvHkaGQM3BVbRUAQJ0vd1Epj2FLrsP2bLPgRtA
+	v8wZBgm26D7o4ctYxM43kE6yHG0BE9dhYthYcuoYGze5hdRqzPjkCnLIz5dqE3G2AIjVxMlObAL
+	WnYEXqyi2NuSYC/hLhyiMU47VSC7t2FErQ3iAIXZ4Yx0nkNn6J
+X-Google-Smtp-Source: AGHT+IE2ltyuOxfGOryXdaLo+W43seZVcMMz3+9+li7smTXP3KjLa9lJvabIEPh7RW1u+VRnSNyF0yWPYUQYYsnOyvY=
+X-Received: by 2002:a05:6214:496:b0:6ea:d604:9e59 with SMTP id
+ 6a1803df08f44-6f230caf43fmr148715986d6.9.1744530367915; Sun, 13 Apr 2025
+ 00:46:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <3727de04-7993-4b81-80c0-adb40b847307@web.de> <20250409133610.59d42bec@donnerap.manchester.arm.com>
+ <e10ecbe1-d8c3-444d-92cb-647a1c54675f@web.de>
+In-Reply-To: <e10ecbe1-d8c3-444d-92cb-647a1c54675f@web.de>
+From: Julian Calaby <julian.calaby@gmail.com>
+Date: Sun, 13 Apr 2025 17:45:56 +1000
+X-Gm-Features: ATxdqUGCfzpcdhEUWjj5b9x98mojrheGEprGdWhLMUFri6RCu-8lKdWby7ULwLo
+Message-ID: <CAGRGNgUV6Dq6ZR9bcgomzj1PMQj4vLq9qJCy0dxVd0vQoPWYXA@mail.gmail.com>
+Subject: Re: crypto: sun8i-ce-hash - Refine exception handling in sun8i_ce_hash_run()
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Andre Przywara <andre.przywara@arm.com>, Ovidiu Panait <ovidiu.panait.oss@gmail.com>, 
+	linux-sunxi@lists.linux.dev, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Chen-Yu Tsai <wens@csie.org>, 
+	Corentin Labbe <clabbe.montjoie@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Julia Lawall <julia.lawall@inria.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Markus,
 
-These fields are no longer needed, so remove them.
+On Wed, Apr 9, 2025 at 10:47=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
+de> wrote:
+>
+> >> Two if branches contained duplicate source code.
+> >> Thus avoid the specification of repeated error code assignments by usi=
+ng
+> >> additional labels instead.
+> =E2=80=A6
+> > Now there is one rather opaque label it goes to, so a reader doesn't se=
+e
+> > the error code immediately. And it really just saves one line per case
+> > here. =E2=80=A6
+> I imagine that such a code refinement can occasionally matter.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- include/crypto/poly1305.h | 4 ----
- lib/crypto/poly1305.c     | 2 --
- 2 files changed, 6 deletions(-)
+Just because you imagine that such a code refinement might matter,
+doesn't mean it's actually useful.
 
-diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-index 91444965772a..6e21ec2d1dc2 100644
---- a/include/crypto/poly1305.h
-+++ b/include/crypto/poly1305.h
-@@ -41,14 +41,10 @@ struct poly1305_state {
- struct poly1305_desc_ctx {
- 	/* partial buffer */
- 	u8 buf[POLY1305_BLOCK_SIZE];
- 	/* bytes used in partial buffer */
- 	unsigned int buflen;
--	/* how many keys have been set in r[] */
--	unsigned short rset;
--	/* whether s[] has been set */
--	bool sset;
- 	/* finalize key */
- 	u32 s[4];
- 	/* accumulator */
- 	struct poly1305_state h;
- 	/* key */
-diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
-index 6e80214ebad8..b633b043f0f6 100644
---- a/lib/crypto/poly1305.c
-+++ b/lib/crypto/poly1305.c
-@@ -20,12 +20,10 @@ void poly1305_init_generic(struct poly1305_desc_ctx *desc,
- 	desc->s[1] = get_unaligned_le32(key + 20);
- 	desc->s[2] = get_unaligned_le32(key + 24);
- 	desc->s[3] = get_unaligned_le32(key + 28);
- 	poly1305_core_init(&desc->h);
- 	desc->buflen = 0;
--	desc->sset = true;
--	desc->rset = 2;
- }
- EXPORT_SYMBOL_GPL(poly1305_init_generic);
- 
- void poly1305_update_generic(struct poly1305_desc_ctx *desc, const u8 *src,
- 			     unsigned int nbytes)
--- 
-2.49.0
+1. this is making the code significantly less readable to save 1 line.
+2. gotos into control blocks are weird at best and problematic and
+confusing at worst. There's a reason why nobody writes code like this.
+3. this sort of tail merging is something a compiler would apply
+automatically when optimising for size and it can do a much better job
+of this than you can.
 
+I note that you said you did this using the Coccinelle software. Is
+the semantic patch something you're trying to get upstream at part of
+coccicheck? If so, could you please get that semantic patch merged
+before posting these patches?
+
+Thanks,
+
+--=20
+Julian Calaby
+
+Email: julian.calaby@gmail.com
+Profile: http://www.google.com/profiles/julian.calaby/
