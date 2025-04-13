@@ -1,38 +1,50 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24D442A8B
-	for <linux-crypto@vger.kernel.org>; Sun, 13 Apr 2025 16:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A91E9B28;
+	Sun, 13 Apr 2025 18:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744561776; cv=none; b=LqiRS+4AWYXesY1Pz3Cn+ndD8ZDCRWP1y5BYi553aOgaOPKJxZzxN/cKX+Jnuy0fb5CxwjGvLcSLKT9aPi/gKF7T5rbtmhKt1xOGe8+rodg6MmvRFA4KtyG7k/G7alNUnPYdLhdq2nD5roi2Feo4GFVuNdWJCxij8xkCpeg+RHY=
+	t=1744570377; cv=none; b=RcJkCfr2ryGLuen+/cDmOoOac6G4+nuUFAJD3sgZzms8YQRWhqcMQAyDxlA8bF+/cBqJBKfFOcVjCMo6b4uzbY6df6GwUi9+r2UdgJ8F94CxNsk8YNvKErDFyAHB3/4gkIyDenzk8r4lE7ev7l8h0NDSr/7/sm6iVry872S+UQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744561776; c=relaxed/simple;
-	bh=xKMPAW9NMa7syf7Idg/oFNgkOHXxjJcIP5GmTEAmjz0=;
+	s=arc-20240116; t=1744570377; c=relaxed/simple;
+	bh=s/+mRWdw9tTO792IvfwClf62fm5f6rXE+fkX7LgWjBQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uqMaOUCfayDCl82Yw/aGZbpy9yKb5hvYbwc0tL9Gg2r57gqpkq3w+atncDa03bAvTsEVOg+tyWaeWsOz8yEIFk+L57EwQ8CPfwdJ0z2nrQcu5bCFERzNlN1e5UeWYkiIsr3cRI1dQe5849G4kQvFU2mGLz997T0s0Sgn9w1PIWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CMoOzICf; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CMoOzICf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37679C4CEDD;
-	Sun, 13 Apr 2025 16:29:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744561775;
-	bh=xKMPAW9NMa7syf7Idg/oFNgkOHXxjJcIP5GmTEAmjz0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CMoOzICfAFF3EVI5JeEUO8qsSnQsnJQlayHw5NkEkqjPGoiY45j2GZ1rZw9OVGeb8
-	 BJe07EW5eaLEE+kySJzZhq7jv/JdbUG0N1EFGnjSWo6+rm5g6GkX/J38gyYl+hVePx
-	 daaahNUla+gGbICzaLUPeoJLijxM9XkfJ04aAu70GFmcZohyt9FCAaV+t861Yz4A9H
-	 ZULNdXgN3ydvebr227SXS+pxBU1f1sS9KbM7Od9woearkxlpBYtWsQ0T5qU3gSjEnf
-	 ecDA1Qz3SrZfZOD8cnupNSdRzLh4V2ZC3xtEXObtkPJ5c9x6oB2r+d+BEFKG6PtrY/
-	 7LSLkZl1QICgA==
-Date: Sun, 13 Apr 2025 09:29:33 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 0/8] crypto: hash - Preparation for block-only shash
-Message-ID: <20250413162933.GB16145@quark.localdomain>
-References: <cover.1744455146.git.herbert@gondor.apana.org.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l2Un99IqvULE/JGBHgqSSTwR6h/3QxlkxLSqMDXnYQqaLc53XTlL7o05gFPJ6rrMnIi7eAfmCMaruoB3xy6rCJOCws6rbzCl4ZBg1bkPYl+33Fq4okwRbuGKbKIlBpxPJuHhwe02GNKldeEQbd8e7ogsMe3An2ol83SlANQtbs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 637F32C06E2F;
+	Sun, 13 Apr 2025 20:52:10 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 307474555F; Sun, 13 Apr 2025 20:52:46 +0200 (CEST)
+Date: Sun, 13 Apr 2025 20:52:46 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: "Gupta, Nipun" <nipun.gupta@amd.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, herbert@gondor.apana.org.au,
+	davem@davemloft.net, dri-devel@lists.freedesktop.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	krzk+dt@kernel.org, gregkh@linuxfoundation.org, robh@kernel.org,
+	conor+dt@kernel.org, ogabbay@kernel.org,
+	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+	derek.kiernan@amd.com, dragan.cvetic@amd.com, arnd@arndb.de,
+	praveen.jain@amd.com, harpreet.anand@amd.com,
+	nikhil.agarwal@amd.com, srivatsa@csail.mit.edu, code@tyhicks.com,
+	ptsm@linux.microsoft.com, linux-crypto@vger.kernel.org,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2 2/3] accel/amdpk: add driver for AMD PKI accelerator
+Message-ID: <Z_wH_uCx558T0__c@wunner.de>
+References: <20250409173033.2261755-1-nipun.gupta@amd.com>
+ <20250409173033.2261755-2-nipun.gupta@amd.com>
+ <20250410-sly-inventive-squirrel-ddecbc@shite>
+ <bf851be7-74a5-8f9d-375b-b617691b6765@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,45 +53,83 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1744455146.git.herbert@gondor.apana.org.au>
+In-Reply-To: <bf851be7-74a5-8f9d-375b-b617691b6765@amd.com>
 
-On Sat, Apr 12, 2025 at 06:57:17PM +0800, Herbert Xu wrote:
-> This series is based on
+On Fri, Apr 11, 2025 at 10:21:03AM +0530, Gupta, Nipun wrote:
+> On 10-04-2025 13:06, Krzysztof Kozlowski wrote:
+> > On Wed, Apr 09, 2025 at 11:00:32PM GMT, Nipun Gupta wrote:
+> > > The AMD PKI accelerator driver provides a accel interface to interact
+> > > with the device for offloading and accelerating asymmetric crypto
+> > > operations.
+> > > 
+> > 
+> > For me this is clearly a crypto driver and you are supposed to:
+> > 1. Cc crypto maintaners,
+> > 2. Put it actually into crypto and use crypto API.
 > 
-> 	https://lore.kernel.org/linux-crypto/cover.1744454589.git.herbert@gondor.apana.org.au
-> 
-> Add helpers to use stack requests with any ahash algorithm, with
-> optional dynamic allocation when required for async.
-> 
-> THe rest of the series are miscellaneous fixes in preparation for
-> the next series which will introduce block-only shash.
+> added crypto maintainers for comments.
+> IMO, as accel framework is designed to support any type of compute
+> accelerators, the PKI crypto accelerator in accel framework is not
+> completely out of place here, as also suggested at:
+> https://lore.kernel.org/all/2025031352-gyration-deceit-5563@gregkh/
 
-What is a "block-only shash" and why does it make sense?
+To be fair, Greg did suggest drivers/crypto/ as an alternative... :)
 
-Based on the name, the fact that patch 8 is fiddling with cra_blocksize for one
-of the algorithms, and your general preference for trying to make the "Crypto
-API" solve problems even when it's not the right solution, I'm assuming that
-you're planning to make crypto/shash.c do the block buffering for all shash
-algorithms "automatically" using cra_blocksize.
+  "Great, then why isn't this in drivers/accel/ or drivers/crypto/ ?"
+  https://lore.kernel.org/r/2025031236-siamese-graffiti-5b98@gregkh/
 
-That doesn't actually make sense, though.  The more logical way to organize the
-code, as I think my patchsets converting crc32, crc32c, and poly1305 make very
-clear, is to have the shash API be implemented using the library API.  The
-library API has to handle arbitrary length inputs anyway, so it has to implement
-the block buffering anyway.  Thus, there's no need for shash to do it at all.
+There are already six drivers for crypto accelerators in drivers/crypto/,
+so that would seem to be a natural fit for your driver:
 
-shash merely needs to know the block size and declare it in cra_blocksize for
-users who want it for some reason (e.g. for padding salts to the block size).
-shash should not care about the block size in any other way.
+  aspeed/aspeed-acry.c
+  caam/caampkc.c
+  ccp/ccp-crypto-rsa.c                 <-- from AMD no less!
+  hisilicon/hpre/hpre_crypto.c
+  intel/qat/qat_common/qat_asym_algs.c
+  starfive/jh7110-rsa.c
 
-It's true that e.g. in the case of poly1305, each arch's library code implements
-the block buffering.  So the redundancy that I think you're trying to solve does
-exist in the library too.  But, the solution to that is to move the block
-buffering up one level, to poly1305_update(), so that it's shared by all the
-arches, just like what blake2s already does.  I am going to consider doing this,
-especially as I get around to fixing the other hash algorithms.  (If we do this
-for Poly1305, it would be an additional cleanup on top of my patch series
-https://lore.kernel.org/linux-crypto/20250413045421.55100-1-ebiggers@kernel.org/)
-But, this has nothing to do with shash; shash plays no role in the solution.
+You can find these in the tree with:
 
-- Eric
+  git grep 'cra_name = "rsa"'
+
+So far there are only drivers to accelerate RSA encryption/decryption.
+The kernel supports a single padding scheme, PKCS1, which is implemented
+by crypto/rsa-pkcs1pad.c.  There is no support yet for OAEP.
+
+So the padding of the hash (which is cheap) happens in software and then
+crypto/rsa-pkcs1pad.c performs an RSA encrypt/decrypt operation which is
+either performed in software by crypto/rsa.c, or in hardware if a crypto
+accelerator is present.  Drivers for crypto accelerators register the
+"rsa" algorithm with a higher cra_priority than the software
+implementation, hence are generally preferred.
+
+One benefit that you get from implementing a proper akcipher_alg in your
+driver is that virtual machines may take advantage of the hardware
+accelerator through the virtio support implemented by:
+drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+
+Note that the crypto subsystem currently does not support hardware
+acceleration of signature generation/verification (crypto_sig),
+but only encryption/decryption (crypto_akcipher).  One reason is
+that signature generation/verification is generally a synchronous
+operation and doesn't benefit as much from hardware acceleration
+due to the overhead of interacting with the hardware.
+
+So there's no support e.g. for generating or verifying ECDSA signatures
+in hardware.  I think that would only really make sense if private keys
+are kept in hardware and cannot be retrieved.  So the use case wouldn't
+be acceleration, but security of private keys.
+
+That said, for RSA specifically, signature generation/verification does
+involve an encrypt/decrypt operation internally.  The padding is once
+again done in software (by crypto/rsassa-pkcs1.c -- no PSS support yet).
+But the actual encrypt/decrypt operation will be performed in
+hardware if a crypto accelerator is present.
+
+The user space interface Herbert referred to is a set of system calls
+which are usable e.g. via the keyutils library and command line utility:
+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/
+
+HTH,
+
+Lukas
