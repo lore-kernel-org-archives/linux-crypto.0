@@ -1,193 +1,189 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2064.outbound.protection.outlook.com [40.107.236.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E289C28B4E3
-	for <linux-crypto@vger.kernel.org>; Mon, 14 Apr 2025 16:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744646903; cv=none; b=X/zZYItYhiMm7agLDg0nDawuJoo341nZRZVhV9mMQoCAK2KZ0pLTG0ziKqZkTlnJdb1dzelsptaAboRIkn5EP6RMiz1ncYwI1upwGYV8XLqBbiLk3t4dl/e44fhgmz/D47PIbsP4wtmE/rkBPznHJ1TTQnerrg3wPfB7D0fcsUU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744646903; c=relaxed/simple;
-	bh=UM2X1MMDXZM7fTOBoaVl4irheKjkJEoFW6yGloSDkIU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HToY/QT4S/KL7rGsX45glm0yWLxSWA78saduVrrfBpSdfGMb/BsQ3aB090fVMuFUff7umhxsBE7+xzaAES0w8MrKI8QHQmDpQkkx9czX9xSR0qzfxOZB/ErgywA2vDha67pWSxuGdzFbukbDqBL0TsyKkE9WSUO01FvssW+cOhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Mumwvm/8; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CCE1A29A;
+	Mon, 14 Apr 2025 17:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744650302; cv=fail; b=G6JxbMJ59pxsasA0a2cNGTbFo/EdgMOGg0+IEh74eRgbrUlHfe9JHYoz4k9AdBHh/x838QBjzt3YwUP5QTKW39YCKA07tm+gFnhANC2x9O0NkKPBIl6si2SAkoPAkyvtro2q0xhinUKPnulQHzRt2TTse9F+acop8VUOV3aMcNI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744650302; c=relaxed/simple;
+	bh=rekw+DDwB1K9JmFKLcLp9tXy9FjQ5545i4vThlzCeWI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KA/Qi4qr+5528k+I9jhlfJTpTDRfI9xKb3eftykrhKaXqrLLaoaSuft/4mWCszEQS+pe8Y2zBX8eCcpIahvrjmI8lNPC6KDEcHqtkDtBeMaYN15KAix9xrVXpF3CjfAMDdqJ05bIr8iXCpsqVvBsY7afGA98dMQ0AptnC+MakLA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PWvDz2Ej; arc=fail smtp.client-ip=40.107.236.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Mumwvm/8"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e6e50418da6so4175196276.3
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Apr 2025 09:08:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1744646900; x=1745251700; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CL3vhJ/AOwi9smEiZpaLEqVlOaMdXAZ9MQuarYjoWe8=;
-        b=Mumwvm/8Y5rtsz0IvKUFkpE8ruDsmgBOjoUBw6i35+BbgBlhTboR4WV1z9gUU1ywLH
-         If2Yai0i6Q6qV8vm/ZQQZL0v9dYK03JXD0IhGFtp9mbK19ZLCDLnhXw/Uf/vH2kQ+taV
-         z3gj/9kyjkXNnsJWvBnbscoWFRL03Ll5QTZUTC2l+vzaVamEWnHzXlRUPZ/Nr5Bu7ppt
-         P307C8L/eQjyp29jdZkkMH6TcWCd6a8kcUjlFLyfvoFFuv0+9y0c+K0ho2d945G7mDRV
-         TST1aqnUXcHWpERl3ZCxsaVHdRAEe7WupgH9tpJDTMG1CJbCaOFvsU20YqAQ3wwsSnh1
-         TXnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744646900; x=1745251700;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CL3vhJ/AOwi9smEiZpaLEqVlOaMdXAZ9MQuarYjoWe8=;
-        b=fVmbpx+kWwswSg7Uj+qDGyoJq3ht1imCS+57zFbad4KiJ8qtM/HRT/Jd5l+axxyF3Y
-         94d8s4+2q6CBqG/xWZT1GS5RncWE5RvIArGkS+JUqvbpf/+XIWxFQDpaOhU5Ym0mhZZ0
-         J2PFgHHMvIeVtBmUHWdZFC4ILG0Wgaj9BcugexmjhQakArtakuzhCEHyVV3z0qek/ptO
-         NyjPDLQuebRlWN/xmRYf+6X6AwM76bauf1DZgB2LGzt85xqjmAnwNAIBQJNKhK+FuRBy
-         bA9LWERq30PDkXJY1mITviYtRsTzKSpwCpgP3YHJ0JHB9Pcx86iLXixI3Rd3jWsY+Ake
-         6FtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIH0rO/VRZnHljPCiT9j6VAM+Xx8jqRxDcwHiCfvXDSV7/9SHzmRdfMiKCLqE6Qq7tBkiRwn465hUAjKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv/AVNiiTW/mkpnP1hbKYnf7uY/oMlUtWVFi3WmW7bZETWPZS5
-	X0bZKO3amY+llvrZcpMr4j8E8qgHXTQG6gT9h24cTYBWyX81bHMmTzUik4AzjFjbTCGExsr4ztN
-	hZ+MvUOalQUlrCbw3xoYZkDxDGS4cxKrR4LdS
-X-Gm-Gg: ASbGncuMFbcI7RzL5S6wP55QsTD1sfdDNrgfJjOf4rtL3EwbuB+xHfehO1HniXajSkg
-	/hPhd45ysBnGy586UONx60EpAQJQ/o+YL5IJi5qM0gpue3uhJemE9Oossk65WMn6gn0XoIeEiOU
-	rCf+4r8eXbTmIFmEXnzBegaA==
-X-Google-Smtp-Source: AGHT+IEIR0Yjon2HOlR6cN2sFBuht845hyAi0y0g8G/WBIBmJsXWf+CNllSW2DnKB64zYskb2VqpvQmI+s8gSsNUMNs=
-X-Received: by 2002:a05:6902:2086:b0:e6d:e3f8:5167 with SMTP id
- 3f1490d57ef6-e704e00541cmr21022948276.39.1744646899625; Mon, 14 Apr 2025
- 09:08:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PWvDz2Ej"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JuWzgqGYIQdF4uBGYJOQL55Fh/F7H/mgMw5DYOyGHsE74FGxmToQMLyMke/r+D/mw69MbzvNqGSR1T6hkpFPIDlCCXsc8tMTMXULz6UPwftU6JUdiF7IHBzk5aASyz1SIcKrSizlGOpym2lraRRwYwMEeJKqs88xnv8EmvbG8Et+8kUDIM9jkPqE8/A9mei/uF5YqEW2ISw3HqSEujDr8Pxduo6i1sbSSqibC+DLr4Ghfd532GP3yIcGXyO3zvYsCyMdfmXbmvuYiRufJgXLSyQwmnOkgQJt15OiOzBwxEW/IuV4dxWTiAmtqVyVoZ2SH99oy9IjtfsWeH5L6b9w4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VzedopDebu8ArhrRpTNm2FQElnn85NvLxDIo2y8VpZc=;
+ b=a0jzDgaJhBbZSvfMbTd/BPFyDfaT16M3MzWZCyKzSWVmk+M9boHmxI7MDB2UhhjkykBDE++jYilsAkO0u7SuRPlX1TZDVibitPnuHFASPQl2hzXOCfBUIs+T5BSLBVNPW9yMpu9OkKjR/oPqwcp0t51m4NJiYPD8QObBdepQs/JNN8M4ol7Sb0+0UZaQqq97X+TWl+gEi6D33anU80XAqpA0+iFmTRx90oliUdZn+IcXHjCJhtHs1hWmcflaeD02hIEueW7FCupgSD9CTdDuGEySfW6Mr6fkCNaqt/Mlj1/hGc1njiGPNWsjjyv1RCoYxmFKwwPNsHYvOkdAvWIUPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VzedopDebu8ArhrRpTNm2FQElnn85NvLxDIo2y8VpZc=;
+ b=PWvDz2EjO+N68QwrOOtAn8Gow6jay79fpQxt6+rL9207FXFPgPO+tmgtSfaL4fjh6I+RUKwzhimcs20S+qTUJPr30k0H50ktmMo4hAMubheJ03MFijpdqAP8mhBGeQy8ab/RQeSXEhvejbqcopW/EUJR+/JGIovmP7Xqls1r0ok=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by IA0PR12MB8862.namprd12.prod.outlook.com (2603:10b6:208:48e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Mon, 14 Apr
+ 2025 17:04:58 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8632.030; Mon, 14 Apr 2025
+ 17:04:58 +0000
+Message-ID: <edc4c309-6936-c7b5-9050-106220fb3fcb@amd.com>
+Date: Mon, 14 Apr 2025 12:04:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] crypto: ccp: Fix __sev_snp_shutdown_locked()
+Content-Language: en-US
+To: Ashish Kalra <Ashish.Kalra@amd.com>, dan.carpenter@linaro.org,
+ john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250409193429.346501-1-Ashish.Kalra@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250409193429.346501-1-Ashish.Kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7PR04CA0014.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::19) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
- <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
- <87semdjxcp.fsf@microsoft.com>
-In-Reply-To: <87semdjxcp.fsf@microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 14 Apr 2025 12:08:08 -0400
-X-Gm-Features: ATxdqUE4xsXRFht60hSZa09A9jxdssSnYGr-dDs5eKOQiFPM4gPTEA6FMREhjdE
-Message-ID: <CAHC9VhQ-Zs56LG9D-9Xs14Au-ub8aR4W+THDJfEsza_54CJf-Q@mail.gmail.com>
-Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
-To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	keyrings@vger.kernel.org, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, 
-	Matteo Croce <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|IA0PR12MB8862:EE_
+X-MS-Office365-Filtering-Correlation-Id: f4c34e0e-2eef-4199-a014-08dd7b767c85
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cUVUd1FVZTdhQlpMa0MvVFFrWW81L1A1dTBoZFdRaDZDcjE3c2NNd25MY2RV?=
+ =?utf-8?B?QWh6eVJaM1hMd0hwbFZUTXhRanNYNjhldVBJVHNnblZRNTd2MlRaR2F5TlFQ?=
+ =?utf-8?B?a3FRMk1TaEVYUGRwckpkNjdqa0YxdmxpNmZ5dUV4V0MrQ0JHSlN3cThZRlJY?=
+ =?utf-8?B?VUdRRk8vK3NtTGZaOHpaMXcvU3dZM0hCWU4xVkV6NzlyZ0RpYW9EWVg0N2kw?=
+ =?utf-8?B?UW5iaE81Z1Mzc1pvbUwyaGNkRVV6bTJtc3Z4WEZuN0l2YkRKbkRMOWREV1JY?=
+ =?utf-8?B?Q1Q5M0dBWVNEQlcvM0c2SStjUGN6MDRSTzF4Kzc0bHRMb2RlQ3NDUXptRlRS?=
+ =?utf-8?B?Mk9SWDNadENrbzBPN1Q3NHRSeW1wdmNndFNrRHZjOENTV2xzUGpTcFc5NXps?=
+ =?utf-8?B?czVDWjJvWEVjcW1yOC83ZE8rbWs2cWlHSXBVemJ4aFdFTUlxQ3ZEN2lkOW8x?=
+ =?utf-8?B?TzVEbkJtczR0Z2NjNXRvUzYzdlhId3cremVSUlZ6WUNSY3BRQ0EyU0JNUFor?=
+ =?utf-8?B?Nkx2eUpKeE9IR1JkVFlLa1RLRFNvWmZVWTNWanlLTnNEb1ltb0J3bndrRGdX?=
+ =?utf-8?B?TTd3U25EdDBMeVVYUEgxOWw2MnQyMmtSeXNLaXB5TFdPUnh1MFFHTHBqdEdX?=
+ =?utf-8?B?M2NlSkNIdGFVMllwSHZQNWlldjNIZTNpZWRsR0FxdEttaWpZdlZpUHc3RnU2?=
+ =?utf-8?B?VnMrRlpQRXNzT0MrazRqc3ZxckIrSURNanBQcFR1QTZBS3Y0MWN4c25PL0Vx?=
+ =?utf-8?B?WWJOWDlmZTM5SnV0Z2dJbDR6b3dJeC81RlRsdTMvWWNUb1VUb3VMeXM3Ukc2?=
+ =?utf-8?B?RXRtdk9zVm5ReVNZeVdXeklveU83N2JvTXZWZFBOK3VFajhRSDcxMlI3UUpL?=
+ =?utf-8?B?MmovSlhSY1RjZ0MxczA2STNHMDN6UUNkMmhVVjZENHdBQXBsMk9TdDVCZU0v?=
+ =?utf-8?B?eWxXYndZUUcvaExxb0RHdHZ3SWFGMTljTWlNM2xyR3lmTHlIWXR2WUFqTi95?=
+ =?utf-8?B?bzlqNU5PRkRCdFFWZ3d4Q3l2YXRKR3BLSjN3TjVCL3owd1lDM0U0enBlVE9T?=
+ =?utf-8?B?N0hEVVk3VUxrM0dKYXVldnpMZjhnbmNVaVlKNTVTM3Fzay91N01OWVo5ejZ6?=
+ =?utf-8?B?WEtIN243U3Mva0VkTjNuSXphTGZhN1hrRUllOVdlT3o2UlNlckx1YTl4UUVW?=
+ =?utf-8?B?dytFS2xPWUlTNzZUQzJqdjNpT0xOSzcxY0xGbFdFZkZ4UmdrRklSUmtLU3FI?=
+ =?utf-8?B?bFR3bEV0bUpxOGZHc0cvcXNlZENmMUdJY3dMbkZkUXEvN2NxSFRJYVZvRU1C?=
+ =?utf-8?B?UGVOQ09OeGl2MHp1YVZRdDlzT3M4ZlFvcFREdWY5RG1QdUdlaVZZTmxtTWNH?=
+ =?utf-8?B?WmgzU203bXhna0NuSlNpYk5zNm9FeWJMVFJwbnBKcEtUWXRjSVlRbFhwSW42?=
+ =?utf-8?B?WDlpendsMFlsQVVlMkFubUlZU256QVllZVZ0cE1wenAweC9jS2hIT0wwUzhm?=
+ =?utf-8?B?Z2E1dTdERTZVWml4NWFKckNzUmtYT2FIdURzdTBMZGdBV0NSaXdZMDg4V1d5?=
+ =?utf-8?B?ZUZxNEFUN2dGMkJlNXdKb092dGFQdGJjNXZGYXl0WUZEdWNoZVlManVMRFly?=
+ =?utf-8?B?ZHoxUHBrVSs5WmRERVVyc0hGS2F2OEwra3AzN1hDb1pMZE4yR09WVUtXM0Vq?=
+ =?utf-8?B?aW9QcEd1TGRZek9FZHc4cWF5eUExV25Da2ZycmlzTFhJc1gvQjRMdHJ1T3lE?=
+ =?utf-8?B?Nk1MN3E2WWdiVndVYyt2OUtoMlBmQWdhYkZzYXJaRVgwcFVWOHpWOWw5enZY?=
+ =?utf-8?B?UnhSc2grc2cvTHdoeGJDa3pxV0hTNmVpOUE5ZjlHMmVDN3J4Zk13Y2MweXMy?=
+ =?utf-8?B?akFaV3pCTmt5aXd6ZkJDSVpQT0dxQ0ZzLzh6WjZyRjFLcTYxVjE4SEVZYkJl?=
+ =?utf-8?Q?ENZq7QHMWRc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dkZtQWc2Z0RmNU16ejE0RDBlN2FTMUFzK3hiN0tHSnZ1VlR3a0s4T2lWeVk2?=
+ =?utf-8?B?MVJBVDJ3QW1pdWpVMTZBZ0RURFBDYTNGU3ExbHJmREZjM3JYd0kwb09ucXV0?=
+ =?utf-8?B?QWlXSzMydEdBdEpLOW5pOU1qQUJ5UUJTZlgzQm02UGJGZUNyZ1RoYWxQOWpY?=
+ =?utf-8?B?UDl0M1ROZWNqNWprQVd5cjRZU08rL1hXcjFYNkZDMVNYeDhtRmQ1Tmc3S2ZC?=
+ =?utf-8?B?S2UrZHVtczlVSWoxdGphbnZCRTVHSGNhaVV2aHZINkhTQmtXOHJJWmd5eDI1?=
+ =?utf-8?B?dHNESFJkWE9MdlUzTDRIVmJpODRNV2gvS0svRlNGVUhuK2UrNHBrTHNTVU5p?=
+ =?utf-8?B?RnpObDE0dTg1WDVmeWtuQ2hFbzFvZWNrVitCS004SjY2THpxYUlYWUlnVzVO?=
+ =?utf-8?B?ZVpsUHdYYjM3RFFMbllZTGlvTWcwa1lxcDRna3o1bnRHMGQ3Qkc4NHpmcnBh?=
+ =?utf-8?B?M2tvVWEyb3phVUprRThYalo4ZDllVkdhS1BZVEwzVUpLNGFMQUFJN0JPQmhF?=
+ =?utf-8?B?U3o4U0ZLV3E2ZWY1Wmx2bG9ISkh3Nkw4aEc4c00zYXRKdnQxNXBIQlp2TE1G?=
+ =?utf-8?B?S0pPZzhqY0xmTXpZdkExUUxjSXJUL3RWTWhod2FhRXpXaWdkMGgxSGoxVUl0?=
+ =?utf-8?B?NkxLS3pXYktIQVJyK1NvZCtIeGNGNW1jeUg3ejFtR2MxaFVVMTRrd1NXMU5q?=
+ =?utf-8?B?cjhveVdpK0haRDRpL2RGSTF5R21sSFJsbWFZUWdqYi9NekdLakxUc0cwRXZs?=
+ =?utf-8?B?YThUUjhJS25DTnB2MUpMYisrNVpxUnpkbXd0ZC9JY0pwWHYyU0FuL2p3cHlB?=
+ =?utf-8?B?SFBHTWZtdmR4OXVqNUZkMUJDT2g1NFdwdVVJcko3aFVHVVlEZzlVZWdtK1Y3?=
+ =?utf-8?B?TGtUMmR3a3R5djdybzlFL2J1ZDJGQnl5QnVJSzJsZVdVNHA5cWJnRFEzQ1pB?=
+ =?utf-8?B?dDhBbkpYUng1azFiY3IzWmttTmNSNEdESCtYaXY2N00ybWNSR3RuUk0ycVpE?=
+ =?utf-8?B?RzIwN2FvVUt4YXE5c3FSNDlrQTVLWFhyRkJZak96eG0xWHNkUjdxb2tpUzg0?=
+ =?utf-8?B?eWxOckt6SXZGaE5MRUVnell1bnFBS3RidEJmWGQzdlJtRmlxMld4bHZNbnlv?=
+ =?utf-8?B?djhSb0VOYUtNeUppdXk2aGJlRWNlRGFWcm5PeE1oN0x1bE1UbUx5dDYzVWRo?=
+ =?utf-8?B?cUJJeTVGcnhDbk11WGd4MVZoSGJ2QkdETEMzaXlXelgxTUhFU3g1VG9mVUlU?=
+ =?utf-8?B?NkpyNTZOMFhqUGx1cEpYNXVkV3gyZGMzQTFJSUJkRDZtMXF5RnlrTGV0aVpT?=
+ =?utf-8?B?T1VsVFYyVUpmU1lObmxDNXBiRkY5bUs0UmRraFo5eEtaMnNKNjdVWEd4RWdw?=
+ =?utf-8?B?ckdaWmxFQ3V5ZUlkZWYzWVh5ZXdDWWtoek1pYzhqWFlmRFoxRjI5dDFlT3E2?=
+ =?utf-8?B?UnZzNjFCOWxUbVErdVVxZkJOTGh3eFNvSXNNK1hLbGRyK3VQc3JZODdKZjVz?=
+ =?utf-8?B?QWlNUkcxcEpTS0pRVHdFeFMwcG1mRWw4b3IyckpEVzRuM0VzcDlUTEFRSTVX?=
+ =?utf-8?B?b2tqVURqSUlPdG9Rbk56cXVFa1NLU25Ta1NOUnc4aG5pdnkrWEJUR2pkWHZp?=
+ =?utf-8?B?dGNpbjJWNkZ6K2tZelJwV0hxK1YzMTd3OWtNV0VwL1NzUGRCTnRISXlZUU00?=
+ =?utf-8?B?aDBFUVE2eWRlTmttUlJjTng0L0w3MHRlSWd6LzBHWk1TZnBPbXVGU3F2bTMv?=
+ =?utf-8?B?VWl4SUZnTVpHMEdHVkk0SU5UWE54YjArZTNYSnFsZmZPRkdJZmNaTmg3ZVU2?=
+ =?utf-8?B?TXdxV2I0THAxNmY0RlJJNElFellGZGxOU0xkMnNvZVJQZXk1T0JFT0J6bCsr?=
+ =?utf-8?B?Q3lCZk8yeFltUERBVlZDYmF1V2RUL1pFTTgzR1hPWGRscWp1WGVySmNxajNQ?=
+ =?utf-8?B?L0swek1hUmlURUNFcEVwSkVRUW96aWVmejF3Wk8zYitsVXVvZE5lcEYra294?=
+ =?utf-8?B?T09rSmdvQXRWcDFUOFVIMFdrUEt6ZkVDdU1KbThOMDBOMFdRQ2J5bktCUzh3?=
+ =?utf-8?B?eGhSQys5aFlHS3dyY1dHSE1zLzg0UjVFblRMWXRNeGVYUm50TWtEeFVUVXZ6?=
+ =?utf-8?Q?fB756S/piqBdstm9E5MW0N/EL?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4c34e0e-2eef-4199-a014-08dd7b767c85
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 17:04:58.4053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VAyIIKUQtIKKJjliMzgvl1142svDd6vj7/vpVKcnWBtgZ9aLQAy+cqbU7VvkNw6J7w/WL/BfdC/pzduuw1pVXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8862
 
-On Sat, Apr 12, 2025 at 9:58=E2=80=AFAM Blaise Boscaccy
-<bboscaccy@linux.microsoft.com> wrote:
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> > On Fri, Apr 4, 2025 at 2:56=E2=80=AFPM Blaise Boscaccy
-> > <bboscaccy@linux.microsoft.com> wrote:
+On 4/9/25 14:34, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Fix smatch warning:
+> 	drivers/crypto/ccp/sev-dev.c:1755 __sev_snp_shutdown_locked()
+> 	error: uninitialized symbol 'dfflush_error'.
+> 
+> Fixes: 9770b428b1a2 ("crypto: ccp - Move dev_info/err messages for SEV/SNP init and shutdown")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/linux-crypto/d9c2e79c-e26e-47b7-8243-ff6e7b101ec3@stanley.mountain/
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 
-...
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-> > Above are serious layering violations.
-> > LSMs should not be looking that deep into bpf instructions.
->
-> These aren't BPF internals; this is data passed in from
-> userspace. Inspecting userspace function inputs is definitely within the
-> purview of an LSM.
->
-> Lskel signature verification doesn't actually need a full disassembly,
-> but it does need all the maps used by the lskel. Due to API design
-> choices, this unfortunately requires disassembling the program to see
-> which array indexes are being used.
->
-> > Calling into sys_bpf from LSM is plain nack.
-> >
->
-> kern_sys_bpf is an EXPORT_SYMBOL, which means that it should be callable
-> from a module. Lskels without frozen maps are vulnerable to a TOCTOU
-> attack from a sufficiently privileged user. Lskels currently pass
-> unfrozen maps into the kernel, and there is nothing stopping someone
-> from modifying them between BPF_PROG_LOAD and BPF_PROG_RUN.
-
-I agree with Blaise on both the issue of iterating through the eBPF
-program as well as calling into EXPORT_SYMBOL'd functions; I see no
-reason why these things couldn't be used in a LSM.  These are both
-"public" interfaces; reading/iterating through the eBPF instructions
-falls under a "don't break userspace" API, and EXPORT_SYMBOL is
-essentially public by definition.
-
-It is a bit odd that the eBPF code is creating an exported symbol and
-not providing a declaration in a kernel wide header file, but that's a
-different issue.
-
-> > The verification of module signatures is a job of the module loading pr=
-ocess.
-> > The same thing should be done by the bpf system.
-> > The signature needs to be passed into sys_bpf syscall
-> > as a part of BPF_PROG_LOAD command.
-> > It probably should be two new fields in union bpf_attr
-> > (signature and length),
-> > and the whole thing should be processed as part of the loading
-> > with human readable error reported back through the verifier log
-> > in case of signature mismatch, etc.
-> >
->
-> I don't necessarily disagree, but my main concern with this is that
-> previous code signing patchsets seem to get gaslit or have the goalposts
-> moved until they die or are abandoned.
-
-My understanding from the previous threads is that the recommendation
-from the BPF devs was that anyone wanting to implement BPF program
-signature validation at load time should implement a LSM that
-leverages a light skeleton based loading mechanism and implement a
-gatekeeper which would authorize BPF program loading based on
-signatures.  From what I can see that is exactly what Blaise has done
-with Hornet.  While Hornet is implemented in C, that alone should not
-be reason for rejection; from the perspective of the overall LSM
-framework, we don't accept or reject individual LSMs based on their
-source language, we have both BPF and C based LSMs today, and we've
-been working with the Rust folks to ensure we have the right things in
-place to support Rust in the future.  If your response to Hornet is
-that it isn't acceptable because it is written in C and not BPF, you
-need to know that such a response isn't an acceptable objection.
-
-> Are you saying that at this point, you would be amenable to an in-tree
-> set of patches that enforce signature verification of lskels during
-> BPF_PROG_LOAD that live in syscall.c, without adding extra non-code
-> signing requirements like attachment point verification, completely
-> eBPF-based solutions, or rich eBPF-based program run-time policy
-> enforcement?
-
-I worry that we are now circling back to the original idea of doing
-BPF program signature validation in the BPF subsystem itself.  To be
-clear, I think that would be okay, if not ultimately preferable, but I
-think we've all seen this attempted numerous times in the past and it
-has been delayed, dismissed in favor of alternatives, or simply
-rejected for one reason or another.  If there is a clearly defined
-path forward for validation of signatures on BPF programs within the
-context of the BPF subsystem that doesn't require a trusted userspace
-loader/library/etc. that is one thing, but I don't believe we
-currently have that, despite user/dev requests for such a feature
-stretching out over several years.
-
-I believe there are a few questions/issues that have been identified
-in Hornet's latest round of reviews which may take Blaise a few days
-(week?) to address; if the BPF devs haven't provided a proposal in
-which one could acceptably implement in-kernel BPF signature
-validation by that time, I see no reason why development and review of
-Hornet shouldn't continue into a v3 revision.
-
---=20
-paul-moore.com
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 19fb51558a7d..1ccff5e3f4bc 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1744,7 +1744,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
+>  	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
+>  	/* SHUTDOWN may require DF_FLUSH */
+>  	if (*error == SEV_RET_DFFLUSH_REQUIRED) {
+> -		int dfflush_error;
+> +		int dfflush_error = SEV_RET_NO_FW_CALL;
+>  
+>  		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &dfflush_error);
+>  		if (ret) {
