@@ -1,249 +1,249 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4643719E7FA;
-	Tue, 15 Apr 2025 01:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744681109; cv=none; b=ghVtBe/DndQ39bckxOLOEZBVJrRXsecQHtK1Vxkp/al+kb5HQmYXgi3FziBz9bf9NP8LaxrIgOrHhuTPqJSffKmZ7ORbJIo0HKT7zoEF9hf4n5dUiWquGtUiZ+KBNvB9QpV6sVGK9f7bCdfJJw/dpcaS9CDpgpXnLEVCMe3E864=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744681109; c=relaxed/simple;
-	bh=D9/copwN8Vi93hcXVQLwm6TV1oCBKCuDxgsjassI+4c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PRi+IMK8erC2fD5IW/wm7Rq9wDBY9vexJ2xqWzgt5ioyyryRi1owQRFcBJ5HGJtoeh6ilrNBrQj+r369N668pBqaiR5hYDhyBIezVgYx3bvURsBZXxebRSve7u60lgWEyysw4X9WT9/JzgzwDL8zTA368VOi5bXq7RTvjuVt1yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msD5sJlj; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B80718D65E
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Apr 2025 08:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744706647; cv=fail; b=tDxd5XjkwvObghyY+hb8p9jWSrx5DCz7znNwWL0wAxf2bq5gY9Wn5mhObg0ukW3UnMM2AFOTzjR8tkVpVqLA06zT3gGkHJDju060aOg1wnlHQ78UFQbMm7RQDND99cHs2LL5Fdjgod3AQSLkNMiBI612IDNJSwqU0KG+pEnwbig=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744706647; c=relaxed/simple;
+	bh=4kby0UlWeohDz+iqe8FjsXSDsABQEH7k5SpndTk26YM=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=WWfkP6A9ppe4b4NCmefpSeqDV8hEW/IdrDKkuVi/hzXVnbifAVtTw5ETPVxcnqtwrrsavC4dcKkgGbyKniE3+OPE616O2YL/WXdrfUSFlAbLotc2rjLi0Z1SliTyF9zxUsw0PLjoMFXCF0UU9UEeD0BmJ1sd3JxxXmoQfnVsZ2E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JgNG7buu; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msD5sJlj"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-39c0e0bc733so4290509f8f.1;
-        Mon, 14 Apr 2025 18:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744681105; x=1745285905; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hstID7d8ycIqCdy0S2HoM/NmlIdP9WL4OFhfgrftQOQ=;
-        b=msD5sJljC6I/EtHN9goTu0a7djeRR60OSMmISChLeHmJTw9Y0KJnL8AvVLHalqfarI
-         PKkGy2Ij9fCBteFprt4IEfWqMDZ4lQN2489qO9ZuGUVHCG4A2wkmCdMc0TQojZQ3VRvd
-         BEZc7W6BA3/peO+QG9ysnmYwY8cG+wc5GF9IPSCG6UP3j9MdVercRYLr1UtShV/EVKrE
-         IHaIWG6Ic3J/I6MqvQyQu5u5oxgoNOQh2yYaDI6kkfiYyvzRv4PYs+eWwWmkGLC00qvE
-         sS/ny6qOgQVzKVqnngjCHjtZ7+jK8dZ71TXU6rwhFJw3qxSv4WizCnArvI/AJA2CBvnY
-         e+uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744681105; x=1745285905;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hstID7d8ycIqCdy0S2HoM/NmlIdP9WL4OFhfgrftQOQ=;
-        b=CcfEqANc3tbTf0O2c+jpsFJv0yPAeopSm/clItGdyo8A9BYzqAVJDCJ9Yc7QorPmT7
-         0nh+2GybxBQc/W6fHuTJ3yazJinM4dbTm8n+x87MoeVoyb/hBS5xIM19qKH/02ChvHLj
-         Cuh5aDNZC29jknrwYHVNupnmqN7rhlaBTsQZHXbyF1zHgCtfpW42kEPeDxU3oNdD4MP7
-         OCNR3oXMovsSYD+6cgjG7IORcqiOi+Ngen1E5E6DM62bx3ma6cxX3658bU+z17wgJKTI
-         Guho1p0/sxCUz/absYke+ksnhO1kOMNSOuwXmE/DTwkY0LfoFGv9uKErMFCogIIZM2+V
-         PlYw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5AV1GI4Ha+rltlJgm9CX5//Up2x1MJvNNcYJQ6//lCCSURacegyg6QLw8FpnLbU21xUNKRhLQ4+X0@vger.kernel.org, AJvYcCUxEByZ9/VYp44U44XcxjIr2kMyW12uZVj7vOY491FMAk2rtDCfGH7Z3/7YTm4bWk+i2RtPvstErKC8/nWg@vger.kernel.org, AJvYcCV7E/Rvf0ttQnmtVIiA97ckfEW58Ehtg/jIWDstE0LrFzMo2nPQPAR7KepP8rM1KfLAjvQhI3B6gsko+YkU@vger.kernel.org, AJvYcCVLswzPF+nqt8yuJrX3DRc1Jr5qP+iunQPhr6F+P3gXuimi89eh3gorfztzzTK6PRUlDqo=@vger.kernel.org, AJvYcCVrpRMjxs5cSqz6owxfuN3Ke2I5zk7BzqZxwKR5m52ejECbqBPlukf/vDyUC/abv4h0Aq0kPxSONSw=@vger.kernel.org, AJvYcCW07wT5BBwKwYqQy3PhydDxgXwf8Wym78+GaKiyM+0bMlkqhKQv1pq0NA5hAdnqzoD6CcAzcUnoaQu6CV6mvTOv@vger.kernel.org, AJvYcCWJbNpMghIoHTDImjc1eDIw8LdaE3IJZek/MDNUBvuQiFCMAgyW6N7Mx4+i4azrajflI6hixx4Yp0N4K/k+@vger.kernel.org, AJvYcCXIOom3JmViMNY4HFNymzxGKCo0X+uB57m+daOgmkFqZPU1XNat680+mzEN2VVbjki+akn5QPvAcrzabFHx0w+9t07tIAY+@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0goiS4OKwq3dtorXP3jIamJMVdB2nabBFilStG4elw3uzExq3
-	5TPsRbS+JNm39YZHMxy8y4MNO3/1O5YlLCpJHzOzz7j2+VHDIjbZCHfjSHn3Lblal8OhBbsb2LS
-	JLKToUgX7iMhg90yh3vosu63Cn2s=
-X-Gm-Gg: ASbGncuOL7upgNNj/NwoGGubh/LqkfEqRBZDOkGuBYnR4Yc9rBe9f2iwNAQDtohPtSq
-	Hg+Iwe28qY5Nr6AtSlYheItSXhJf/i3kbAlGpwTOs4rVCWnu9ZP7S86G2jH4h8o8YsedoBhfxKa
-	FK6S6bB8kadjlZMHOTlLSBtoKwpnv6NCKG63uZvg==
-X-Google-Smtp-Source: AGHT+IE13LNRwKepLhiR5HgiMZISHCOnuS/exoyNGmTnGn08SGCoosF3MkOhQ4I61FeJBNHAP0KCBKG0KSg/y+VQIDA=
-X-Received: by 2002:a5d:5c84:0:b0:391:2e7:67ff with SMTP id
- ffacd0b85a97d-39ea51f47e0mr10937877f8f.10.1744681105142; Mon, 14 Apr 2025
- 18:38:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JgNG7buu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744706646; x=1776242646;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=4kby0UlWeohDz+iqe8FjsXSDsABQEH7k5SpndTk26YM=;
+  b=JgNG7buuIAxznH/o94VNZvm6h+Txe72ny82lZLuCDN2q7Ihj8RMyjjzk
+   L0tBO84er6rddpPTeLLceD8oxQlcfAkTUkfCmJGU3ZUs1gqWxNdl3dQMo
+   k0eMiiDyJMvXgxvuPSlvV7LZx5I0Ap/Vo5GZIWGQ/ZiYV6O59Be5yQ3J+
+   BQ/GnoE5M3ujEk2sxzzF9MYqhKi1ymkcOq+C/anUjAcKPp2Id6YIti7Ru
+   ricq7jp+jeWvIt45DXxSPMusKFwhHyQMJKHQQ7k07Ms0LAHYU+1LRDbEn
+   Gsr18/Abqjc8MOWem/0Nc46RQOIJhJmXgYm9CEmMofCFttIqK2Cw1L7Ai
+   w==;
+X-CSE-ConnectionGUID: RJQAodnTTVO9P8QabVhRog==
+X-CSE-MsgGUID: bMlKRAZCSJO2yqbdm3ySJg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11403"; a="48902862"
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="48902862"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 01:44:05 -0700
+X-CSE-ConnectionGUID: HQVqnBFcQuqLXx6ldSwvfA==
+X-CSE-MsgGUID: XJCFT/3yRqu5foYwlPXlsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="153255363"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 01:44:05 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 15 Apr 2025 01:44:04 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 15 Apr 2025 01:44:04 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 15 Apr 2025 01:44:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XfO4bMvfoDDbjo8J1wYBhX4llQd6wIoPwobt6a7TccRF+MoNFLr+HXI8fPwjSZZs657i+q6WUn96Z2yfSmPeJutt0Fu8yNiQhiGBntdnqGsKQ57+3pceoclg/HHytZVQGCNHDIbyIr4qDekZUGkr356oVBabVLrVNxSxA+s2hpPYrcksCozW1YEj4IA5Im1Ci9HTRtMPGgd5GHFxPGImeyDrpGfSugQUcwimccgJK5vu3MqKcZqRRK3ifpjjgU5BdnbI23zXRTW6rZ6HkladQvRAw5jdxsvQLQ6BdwsUIiCUXf0z/yjorybgz69QDwjsHcK1dH48eqirtdRyoGIWbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sjx5OZdhlPVNEBxWzuTaUyCRVH5z4a0OoYbP5oF2B7M=;
+ b=jC4JTrZCybxyj0HFsrlxEB6oEG/c5/ADHOg3pat1a6J1Oyd908ZNoYJxc2vRt6gJ/WbJppCBDvFyf4Ybpml+R/QBn2J34SJV2Ibh7Chsz5k4ZrMVTJnerGxOCwro2LaRdaa4Snwdl1aq9WgxLY0/tdIeaER2K3wBuEQZCr0R8B3IQW+foOI8/sa1VSJ1wlrWyvgXYH/cDxyWqFc//wANm0KTFhzOMUSpPsyfCSvx67x0R760A4Ykxn0ZYncLF7+97XXB6n3odUquw5nQ25ZqKNOiOMF1NMq9JXXI1dYu/Vtxslxq32IcWb/bXWBHthGQPd0vyrt6fYqcUkptQZnSQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by PH0PR11MB5925.namprd11.prod.outlook.com (2603:10b6:510:143::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Tue, 15 Apr
+ 2025 08:43:59 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%4]) with mapi id 15.20.8632.035; Tue, 15 Apr 2025
+ 08:43:59 +0000
+Date: Tue, 15 Apr 2025 16:43:51 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-crypto@vger.kernel.org>,
+	<oliver.sang@intel.com>
+Subject: [linux-next:master] [crypto]  08cabc7d3c:
+ BUG:sleeping_function_called_from_invalid_context_at_crypto/acompress.c
+Message-ID: <202504151654.4c3b6393-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: SI2P153CA0002.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::16) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
- <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
- <87semdjxcp.fsf@microsoft.com> <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
- <87friajmd5.fsf@microsoft.com>
-In-Reply-To: <87friajmd5.fsf@microsoft.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 14 Apr 2025 18:38:13 -0700
-X-Gm-Features: ATxdqUHye6neCty12upWdoIVJgMpLkd6THftJdEFKQdyUAliYMBWVcY1MoiFP1Q
-Message-ID: <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
-Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
-To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	keyrings@vger.kernel.org, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, 
-	Matteo Croce <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|PH0PR11MB5925:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24b80975-cbfa-41e1-60bc-08dd7bf9aa95
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?tcc32EH3DlwzronGtFmbhXz0Q20yB+8AplOIbbrRRw3boJBuEkI+kBEmiH1A?=
+ =?us-ascii?Q?5SvLb9w2SeVyByVwYXiWP8G4vt6YymJvMmQpeYzi5WzQPztlr5d68NOV5RJt?=
+ =?us-ascii?Q?nWnpV9I6/knzeLUqxj2ovVuNbIQco6XY/yhUlOI7weSs0CjxI/O19zSAdRyY?=
+ =?us-ascii?Q?pKx4JHDcE4fLYC+137EUnWuqceHrXReR2EvbwMCpjutBSXjO2aamCbTxu4uX?=
+ =?us-ascii?Q?wtJYNpEkGQ/5x3LL2F4ze2vNM6xRxXDQXQ0gfiAokF6QvQsuksW2CRE/VfLO?=
+ =?us-ascii?Q?dmGMHHWu/IwWRk/bHICI82pZIJARe5pKmZ8AwP5YgdHZomrmahEUTc+Ex1I1?=
+ =?us-ascii?Q?KDDtyypBrtyhIRRzNX6fXiZMZB1JxpO1YKKSPsWJyvhFix856sSy+BQ6u22F?=
+ =?us-ascii?Q?YdluYCdzF4nzaiHRfWI1JcUbBSsqqhODh58tz2Yp6RSXnl0WV6U0SJr/fMW5?=
+ =?us-ascii?Q?M1wK9rCgvQs08VRCJWGtbbBifdEiRT79wZphRdgPH+QnjyY0UC0NHoqT8htT?=
+ =?us-ascii?Q?/FgsbdjJsZRlxKHVPNmc/fbhia9xdwaLu8AS7mvHY9qQEiXaqXYVzAq9UoQo?=
+ =?us-ascii?Q?94s9cxiygDLzpgs6dO6snZRBfqemVOcQ40iNCuODFS+FXvimxeKsOZZqlICs?=
+ =?us-ascii?Q?Avq94dZKb8dWIZfd3hgyxZfs+v7QKkvH+0TjGZHOlRZWZNUAGJpiLdSW1VyN?=
+ =?us-ascii?Q?v8v7f0xSRYKG6Vw8ap1fi09BAMHpY1XL4hnP7S5lROHbKyeA1lesr3C+RNRz?=
+ =?us-ascii?Q?ZaSY8UwH/3OvGaC9ThUmxWHdR6hGBR9d+bawbex/f3jvOrArWmHBR+JzadiX?=
+ =?us-ascii?Q?yuDNEwD3y7Db+JWlF0aPR5dJCeOr4Fyf6xKZnT5h9vG03kp1gZsnmeFlHPht?=
+ =?us-ascii?Q?nvKdoLALJPNZBmHco4nyOgfv3TWckJpRGLaBiFypPJAJjbdCcSARl9X42lDF?=
+ =?us-ascii?Q?j6Skl4l8vUSJD2mVlvJK7tbFnJCVLEW+93AfbLj3Tbe7Ubr9GLrHIZENkoxx?=
+ =?us-ascii?Q?W77vwm2XjWqgqRO1ccg1EJZyhw88hlgs35F1MYoCaUl4KcRrLZ39U33fpKzT?=
+ =?us-ascii?Q?wVUnFn1tXdob9gYMzNugT6f0yZj4ral4CNpsVmePU73MeGfNU32cr5EX7VeN?=
+ =?us-ascii?Q?rqfZc3Zjhm7IdwblZpGDZS/VviyK1uyHDZeFLRtplndzcWszqLm8qtESGnLR?=
+ =?us-ascii?Q?mbeJ2G5Mrc1gAo7EcUvbM4GcP08TzDHr+/TB5qSvwd0bYHsORzyqsIapQxFQ?=
+ =?us-ascii?Q?kPM8RGK/tqKXjWnN0coR7ssa3PWpglVSoXorT9a33LOEndhAC/k+SWta+c3V?=
+ =?us-ascii?Q?WN84WrBV8MFCG08+TFSVoP7gkWNkUaOXl6DjaZTzey4J4igF5SwKs9C/Ajl3?=
+ =?us-ascii?Q?ErOMl632cdXVm/Ddr1b2ZO+vG18f?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?w+brNbr+NKdimcTNIIN3Sts8BVeVWHds28esDGZX1PEZyY5LcFpEHVi0r/kC?=
+ =?us-ascii?Q?GvDJfO3yZSBmSOIRCndiHIBvpYrl9/Ipli0fCDQLUFWfEzrR4JRGkuULaucw?=
+ =?us-ascii?Q?IZH/Q0YEG46ZV3LgDy+oHuPqmUaIxAdvDY5Jtng7MqVoupk44IhYD80fI6f/?=
+ =?us-ascii?Q?HtnFs90LYCtnOGnmI1iVjpq7akr7zxspMgtgf5pGX1zpcZfIsRofwA7sAd2H?=
+ =?us-ascii?Q?Pwft4A+jdacL9GFZBPWQZlD0nh+5/gk4HfQfA35uF6zP8TJtQEGxoIamJTSl?=
+ =?us-ascii?Q?1RK3DRL4FCY/WmhT/hHhsdokPx2rMSBzhoTe9RbnAlhZPkjwuwZL+APK2wL6?=
+ =?us-ascii?Q?lVxoiYFlvquzAFdrDcSxjLzGwdPl2uSKajeJfsySgqTpF0EDUarohjWIVCRU?=
+ =?us-ascii?Q?qClgZwpw3059HDQrXTJPVJU4IobmB+ixGs4G2TIhWko20SNXGbjsgi+p+ysi?=
+ =?us-ascii?Q?7gLTovuh2aqpc0KKQujPMSe4KsbvTwYepvkzBcOTeCozg/euxDGVjedev0B7?=
+ =?us-ascii?Q?G05BTyAnKbNGdBZaY7FsDqV+U1roHCmaA1MbzkNUZfqcDfRwZwfqORhPUXAn?=
+ =?us-ascii?Q?zEUVrSN15NAaGyF0DJUAW0NO568B4Zdr/XIhmDf10EHBGdB+3tU+BLLU9KNf?=
+ =?us-ascii?Q?AJ26Oig5E4r9luEksLKLtMD5vKBd18qVpxp1I6/tcLxmPhJNgY7NyJV6e9mt?=
+ =?us-ascii?Q?obr5EcecTmpbMTzS6JG//UNmojnj+gRq54iAtKVjlVgZgF7jBgph8WJNlcue?=
+ =?us-ascii?Q?LnqKQfSxYcnK3pkr7sDPaacs7UhKIVWuADQKk8yOx2nS+b6HWEEeA2aKhvW/?=
+ =?us-ascii?Q?DdM/ojTq1bu13YYsmX6iZKbMSvNav9kKTeke9xyqi87F5e6Y/chqjmIrTILB?=
+ =?us-ascii?Q?t38R6FuAHSZMpG1Iai9icCCJc+uBgN21W5+IYUdccdp3kvp2HWTbCxE+rv98?=
+ =?us-ascii?Q?za50deBaFs14CkAz4s9RzeOTZahy1VONTeoeoQNK75TUjzVwDJEscUoC0wS1?=
+ =?us-ascii?Q?f/a7JFVFtOJHEAWro4MdjWMCBa+SxK3O46aJlalGqkCQADS8R4i/gyX5DG4Y?=
+ =?us-ascii?Q?8v4e6G/wG5aeg1wc+9wb6wf7ZDgQO+x9uKuyHXsEbXRsxkHAZLsCoErgU5uK?=
+ =?us-ascii?Q?wWdI3wejwath1BZ0OBZHZ1wj1UDnS1nc5LMcSdsDVK1Ef613FSPJ1tFJ9h5L?=
+ =?us-ascii?Q?sKcUZiqsjK4xorqBE7w6eWNSmtvvENV1NH2LRMRctug/ifQlAeyeCBUkUUpg?=
+ =?us-ascii?Q?2s6GhdUuQMcm4fdnb14VbsCiWJdlKEqtf2CThjP/caUQZarhqmJD0lQqkHkv?=
+ =?us-ascii?Q?5/6bqfBWU9HTT42WdvYC0YILK5vs/Fs3tBRZdGlDtKpxlLi6nvs0NuCCg5fP?=
+ =?us-ascii?Q?dtirM0EfOBKlThJvlr66xAsPBxQqwJ3DfJekequZYoK0jsvPnqGGur0dOda7?=
+ =?us-ascii?Q?knm1hBDZbxJxqW5CNpg0m+/9Kp9+2huN1VjDEaWO82jxsYiILumQCNTmYpIc?=
+ =?us-ascii?Q?mp+ijy/G35RKtAJIFGRzZjDx9L0gVfqyZuaTKTLh5aTzCvr8WZdy2N0XqsFp?=
+ =?us-ascii?Q?LvAwNDxI7LFYAsySxHLRh0FkdO8QgNykC3YCWX+ZPouecUx9Jz+PMq+0mZ3y?=
+ =?us-ascii?Q?WA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24b80975-cbfa-41e1-60bc-08dd7bf9aa95
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 08:43:59.7048
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QL39AZI9Nm1czZUR+5yOtpZ4f0gs6mnm++dhBcrm5tOryPGfQa6Vq7nHUCawVlbgJhsjisVzMxejue/7duHNhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5925
+X-OriginatorOrg: intel.com
 
-On Mon, Apr 14, 2025 at 5:32=E2=80=AFPM Blaise Boscaccy
-<bboscaccy@linux.microsoft.com> wrote:
->
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
->
-> > On Sat, Apr 12, 2025 at 6:58=E2=80=AFAM Blaise Boscaccy
-> > <bboscaccy@linux.microsoft.com> wrote:
-> >>
-> >> TAlexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> >>
-> >> > On Fri, Apr 4, 2025 at 2:56=E2=80=AFPM Blaise Boscaccy
-> >> > <bboscaccy@linux.microsoft.com> wrote:
-> >> >> +
-> >> >> +static int hornet_find_maps(struct bpf_prog *prog, struct hornet_m=
-aps *maps)
-> >> >> +{
-> >> >> +       struct bpf_insn *insn =3D prog->insnsi;
-> >> >> +       int insn_cnt =3D prog->len;
-> >> >> +       int i;
-> >> >> +       int err;
-> >> >> +
-> >> >> +       for (i =3D 0; i < insn_cnt; i++, insn++) {
-> >> >> +               if (insn[0].code =3D=3D (BPF_LD | BPF_IMM | BPF_DW)=
-) {
-> >> >> +                       switch (insn[0].src_reg) {
-> >> >> +                       case BPF_PSEUDO_MAP_IDX_VALUE:
-> >> >> +                       case BPF_PSEUDO_MAP_IDX:
-> >> >> +                               err =3D add_used_map(maps, insn[0].=
-imm);
-> >> >> +                               if (err < 0)
-> >> >> +                                       return err;
-> >> >> +                               break;
-> >> >> +                       default:
-> >> >> +                               break;
-> >> >> +                       }
-> >> >> +               }
-> >> >> +       }
-> >> >
-> >> > ...
-> >> >
-> >> >> +               if (!map->frozen) {
-> >> >> +                       attr.map_fd =3D fd;
-> >> >> +                       err =3D kern_sys_bpf(BPF_MAP_FREEZE, &attr,=
- sizeof(attr));
-> >> >
-> >> > Sorry for the delay. Still swamped after conferences and the merge w=
-indow.
-> >> >
-> >>
-> >> No worries.
-> >>
-> >> > Above are serious layering violations.
-> >> > LSMs should not be looking that deep into bpf instructions.
-> >>
-> >> These aren't BPF internals; this is data passed in from
-> >> userspace. Inspecting userspace function inputs is definitely within t=
-he
-> >> purview of an LSM.
-> >>
-> >> Lskel signature verification doesn't actually need a full disassembly,
-> >> but it does need all the maps used by the lskel. Due to API design
-> >> choices, this unfortunately requires disassembling the program to see
-> >> which array indexes are being used.
-> >>
-> >> > Calling into sys_bpf from LSM is plain nack.
-> >> >
-> >>
-> >> kern_sys_bpf is an EXPORT_SYMBOL, which means that it should be callab=
-le
-> >> from a module.
-> >
-> > It's a leftover.
-> > kern_sys_bpf() is not something that arbitrary kernel
-> > modules should call.
-> > It was added to work for cases where kernel modules
-> > carry their own lskels.
-> > That use case is gone, so EXPORT_SYMBOL will be removed.
-> >
->
-> I'm not following that at all. You recommended using module-based lskels
-> to get around code signing requirements at lsfmmbpf and now you want to
-> nuke that entire feature? And further, skel_internal will no longer be
-> usable from within the kernel and bpf_preload is no longer going to be
-> supported?
 
-It was exported to modules to run lskel-s from modules.
-It's bpf internal api, but seeing how you want to abuse it
-the feature has to go. Sadly.
 
-> >> Lskels without frozen maps are vulnerable to a TOCTOU
-> >> attack from a sufficiently privileged user. Lskels currently pass
-> >> unfrozen maps into the kernel, and there is nothing stopping someone
-> >> from modifying them between BPF_PROG_LOAD and BPF_PROG_RUN.
-> >>
-> >> > The verification of module signatures is a job of the module loading=
- process.
-> >> > The same thing should be done by the bpf system.
-> >> > The signature needs to be passed into sys_bpf syscall
-> >> > as a part of BPF_PROG_LOAD command.
-> >> > It probably should be two new fields in union bpf_attr
-> >> > (signature and length),
-> >> > and the whole thing should be processed as part of the loading
-> >> > with human readable error reported back through the verifier log
-> >> > in case of signature mismatch, etc.
-> >> >
-> >>
-> >> I don't necessarily disagree, but my main concern with this is that
-> >> previous code signing patchsets seem to get gaslit or have the goalpos=
-ts
-> >> moved until they die or are abandoned.
-> >
-> > Previous attempts to add signing failed because
-> > 1. It's a difficult problem to solve
-> > 2. people only cared about their own narrow use case and not
-> > considering the needs of bpf ecosystem as a whole.
-> >
-> >> Are you saying that at this point, you would be amenable to an in-tree
-> >> set of patches that enforce signature verification of lskels during
-> >> BPF_PROG_LOAD that live in syscall.c,
-> >
-> > that's the only way to do it.
-> >
->
-> So the notion of forcing people into writing bpf-based gatekeeper program=
-s
-> is being abandoned? e.g.
->
-> https://lore.kernel.org/bpf/bqxgv2tqk3hp3q3lcdqsw27btmlwqfkhyg6kohsw7lwdg=
-beol7@nkbxnrhpn7qr/#t
-> https://lore.kernel.org/bpf/61aae2da8c7b0_68de0208dd@john.notmuch/
+Hello,
 
-Not abandoned.
-bpf-based tuning of load conditions is still necessary.
-The bpf_prog_load command will check the signature only.
-It won't start rejecting progs that don't have a signature.
-For that a one liner bpf-lsm or C-based lsm would be needed
-to address your dont-trust-root use case.
+kernel test robot noticed "BUG:sleeping_function_called_from_invalid_context_at_crypto/acompress.c" on:
 
->
-> >> without adding extra non-code
-> >> signing requirements like attachment point verification, completely
-> >> eBPF-based solutions, or rich eBPF-based program run-time policy
-> >> enforcement?
-> >
-> > Those are secondary considerations that should also be discussed.
-> > Not necessarily a blocker.
->
-> Again, I'm confused here since you recently stated this whole thing
-> was "questionable" without attachment point verification.
+commit: 08cabc7d3c8638b078e0ac2f755cead1defafe91 ("crypto: deflate - Convert to acomp")
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
 
-Correct.
-For fentry prog type the attachment point is checked during the load,
-but for tracepoints it's not, and anyone who is claiming that
-their system is secure because the tracepoint prog was signed
-is simply clueless in how bpf works.
+[test failed on linux-next/master 01c6df60d5d4ae00cd5c1648818744838bba7763]
+
+in testcase: boot
+
+config: x86_64-rhel-9.4-kunit
+compiler: gcc-12
+test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
++-------------------------------------------------------------------------+------------+------------+
+|                                                                         | 9c8cf58262 | 08cabc7d3c |
++-------------------------------------------------------------------------+------------+------------+
+| BUG:sleeping_function_called_from_invalid_context_at_crypto/acompress.c | 0          | 18         |
++-------------------------------------------------------------------------+------------+------------+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202504151654.4c3b6393-lkp@intel.com
+
+
+[   58.372824][ T2699] BUG: sleeping function called from invalid context at crypto/acompress.c:569
+[   58.373859][ T2699] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 2699, name: cryptomgr_test
+[   58.374847][ T2699] preempt_count: 201, expected: 0
+[   58.375398][ T2699] RCU nest depth: 0, expected: 0
+[   58.375942][ T2699] CPU: 0 UID: 0 PID: 2699 Comm: cryptomgr_test Not tainted 6.15.0-rc1-00008-g08cabc7d3c86 #1 PREEMPT(voluntary)
+[   58.375948][ T2699] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+[   58.375951][ T2699] Call Trace:
+[   58.375953][ T2699]  <TASK>
+[ 58.375956][ T2699] dump_stack_lvl (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/lib/dump_stack.c:123 (discriminator 1)) 
+[ 58.375965][ T2699] __might_resched (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/sched/core.c:8819) 
+[ 58.375972][ T2699] acomp_walk_done_src (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/acompress.c:570) 
+[ 58.375978][ T2699] deflate_compress_one (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/deflate.c:98) 
+[ 58.375985][ T2699] ? __pfx_deflate_compress_one (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/deflate.c:58) 
+[ 58.375990][ T2699] ? __asan_memset (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/mm/kasan/shadow.c:84) 
+[ 58.375996][ T2699] deflate_compress (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/deflate.c:129) 
+[ 58.376001][ T2699] test_acomp (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/testmgr.c:3390) 
+[ 58.376007][ T2699] ? __pfx_test_acomp (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/testmgr.c:3330) 
+[ 58.376011][ T2699] ? ___kmalloc_large_node (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/include/asm/irqflags.h:158 (discriminator 1) kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/vmstat.h:546 (discriminator 1) kbuild/obj/consumer/x86_64-rhel-9.4-kunit/mm/slub.c:4278 (discriminator 1)) 
+[ 58.376022][ T2699] ? crypto_alloc_tfm_node (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/api.c:634) 
+[ 58.376027][ T2699] alg_test_comp (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/crypto/acompress.h:182 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/crypto/acompress.h:233 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/testmgr.c:3615) 
+[ 58.376030][ T2699] ? __switch_to (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/include/asm/bitops.h:55 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/asm-generic/bitops/instrumented-atomic.h:29 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/thread_info.h:97 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/sched.h:2036 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/include/asm/fpu/sched.h:68 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/kernel/process_64.c:674) 
+[ 58.376035][ T2699] alg_test (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/testmgr.c:5876) 
+[ 58.376040][ T2699] ? __pfx_alg_test (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/testmgr.c:5829) 
+[ 58.376043][ T2699] ? __pfx___schedule (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/sched/core.c:6646) 
+[ 58.376047][ T2699] ? try_to_wake_up (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/sched/core.c:4332) 
+[ 58.376052][ T2699] ? _raw_spin_lock_irqsave (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/include/asm/atomic.h:107 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/atomic/atomic-arch-fallback.h:2170 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/atomic/atomic-instrumented.h:1302 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/asm-generic/qspinlock.h:111 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/spinlock.h:187 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/include/linux/spinlock_api_smp.h:111 kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/locking/spinlock.c:162) 
+[ 58.376056][ T2699] ? __pfx__raw_spin_lock_irqsave (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/locking/spinlock.c:161) 
+[ 58.376060][ T2699] ? __pfx_cryptomgr_test (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/algboss.c:174) 
+[ 58.376065][ T2699] cryptomgr_test (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/crypto/algboss.c:181) 
+[ 58.376069][ T2699] kthread (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/kthread.c:464) 
+[ 58.376074][ T2699] ? __pfx_kthread (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/kthread.c:413) 
+[ 58.376078][ T2699] ? __pfx__raw_spin_lock_irq (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/locking/spinlock.c:169) 
+[ 58.376082][ T2699] ? __pfx_kthread (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/kthread.c:413) 
+[ 58.376086][ T2699] ret_from_fork (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/kernel/process.c:159) 
+[ 58.376092][ T2699] ? __pfx_kthread (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/kernel/kthread.c:413) 
+[ 58.376096][ T2699] ret_from_fork_asm (kbuild/obj/consumer/x86_64-rhel-9.4-kunit/arch/x86/entry/entry_64.S:258) 
+[   58.376103][ T2699]  </TASK>
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250415/202504151654.4c3b6393-lkp@intel.com
+
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
