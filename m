@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03531230BD9
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B2522DFBF
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744785800; cv=none; b=TloIq2kTHCqQtYLGeJcRcipXg1jxkwClYEwzF7sP0yu+UICllfwfsj/f96J6FsE5eR8sPufRoQ79tQ+uGX0W3jTmlipRr+UXeoMZDB8MvCyV+I4uLXpQ8lgHh8Gcke9DbCldDMnAvmRzeQMdDBnZGqHnDY/G8Eqk1O9OEb/+3Ss=
+	t=1744785803; cv=none; b=TEH5rLJBQB434oW90WH3bmpUXCMWgU8zZek12P07jYkQV23S3eu6x3YKEnFvDQHhuVD6U4fO3AKMAyGVcB+dokVuTHhmPOey68wkY6SqJYGK7ClmCfdW2HvuR6L8wzuGeH91/GZPbkxjBH3ItxlB3R3ZtIFjctRzzFsG6N+MRls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744785800; c=relaxed/simple;
-	bh=Cy7fC47cEuIs7KRgTcp01SVwQ8Lb7hWDBOauaUxM5hY=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=Xgyt2ySHMU3RcKERoEDwLC07i3ff2Rwq+6SPjQo1LUBvaRMmmVi81XZ1AfoJzWAVURbVObOzIEbfXD1KX8FUe7wgrmQ5WNGZrHIrLAM23VwZqedg4GD4Xh9r5VcmA+Q6cg1mgJKCaFGfxT0MKGvRvbNzJeafdhYnMc0eliT/KMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qb02u/vO; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785803; c=relaxed/simple;
+	bh=xZnqTSGcKc243BuF8jz0ehYSPYwl7oAqr2c2I0KIaA8=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=mvyPDLEO5I60JjC3lGwazJKG4Sj1HbrViz5mViSkbY+yALdB6tz07LWA0KAA3J3MDc1RMPaa4tG3ZjTlL7HXbfjPKCkqM0loJ35/8cpBCCb9VvmFtKJzB/r8XsU0/qKRvdp+fqieC3MSVqPoU7NJEo3XFo56Fa2BBSB3Ut1N29g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LRdtmXk5; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qb02u/vO"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LRdtmXk5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=0LnuIPY/2WNGVJBnBlN/URT9vWJAi5us80zTkozX0vg=; b=qb02u/vOSdMjcQlYlBZdqafe5t
-	RBZaEgnjW/iqB1mNNmwyyKA0siI8A3jp6C+A5WQN9t/YeBjYRXFOuwQQL73oL2fhVrOQ3ZzUJjQIl
-	VdrZXk+UOBOApBhSYs7rm+qXZG6hJriIXKwuyzl8EXCvkjSzggFUAzKFdNlwWwAwvaeSK+8pV+QjL
-	F4BP6fBS5C5dfLk9qCq5ivuz6KVbtNSvbbyIWAvav4o2260ZThYk0x7flVNWbZU8FjM1/1du6K/M/
-	gPfbJhkKIghoaZ9wursu0+vxkuomqWZkRIDOrU/lv9UZ18YvdgVahv25zNmWUvkzdqJgguvJoVdrm
-	Ldn8u7uQ==;
+	bh=BaUVNUOM3mLvCAqnUWLDH9aIa7jYpo91YL/EUuaQCxc=; b=LRdtmXk5WOT+/DcBeoybeT9ZBi
+	bhiZot+NiSSx5zGIabyQQCOZovO5svUPvFNZMZ11mlE0zyzGJzG5cZtuKMa4sgsxITLfFmb9Ae2mk
+	wlPtztfGKJfiaQEyAxUi3dnuU1LkTe5SNNcUvUdqVWTvZZAKLddnVQNdgX8ErAKZuiI/6wmSBWoWo
+	x3ECqldoQ3KJek1vcimbRGkcjEcacUFcNufoSv8rGw7LNdx/tKyvJnWXIyL2zf4NmMSN9N6akUVfy
+	C+09ybDgUiNwiHWcmoYcHf2ocl/osyMJCKX7PQMaZoZsrOJg3d+kYC71p8RJMK2luKHrgP65g7Q4d
+	PHJADtqg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4wUN-00G6In-0Z;
-	Wed, 16 Apr 2025 14:43:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:43:15 +0800
-Date: Wed, 16 Apr 2025 14:43:15 +0800
-Message-Id: <fd6b7530a23f1944eaebc1d363ecad0fd43b8479.1744784515.git.herbert@gondor.apana.org.au>
+	id 1u4wUP-00G6Iy-1U;
+	Wed, 16 Apr 2025 14:43:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:43:17 +0800
+Date: Wed, 16 Apr 2025 14:43:17 +0800
+Message-Id: <3c8ed32814c08bc6ececcaeb76b08d103bc001e9.1744784515.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744784515.git.herbert@gondor.apana.org.au>
 References: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 14/67] crypto: sparc/md5 - Use API partial block handling
+Subject: [PATCH 15/67] crypto: x86/sha1 - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,218 +47,288 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-Also switch to the generic export format.
+Also remove the unnecessary SIMD fallback path.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/sparc/crypto/md5_glue.c | 141 ++++++++++++++++-------------------
- 1 file changed, 63 insertions(+), 78 deletions(-)
+ arch/x86/crypto/sha1_ssse3_glue.c | 81 ++++++++++---------------------
+ include/crypto/sha1.h             |  1 +
+ include/crypto/sha1_base.h        | 42 ++++++++++++++--
+ 3 files changed, 64 insertions(+), 60 deletions(-)
 
-diff --git a/arch/sparc/crypto/md5_glue.c b/arch/sparc/crypto/md5_glue.c
-index 511db98d590a..5b018c6a376c 100644
---- a/arch/sparc/crypto/md5_glue.c
-+++ b/arch/sparc/crypto/md5_glue.c
-@@ -14,121 +14,105 @@
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index abb793cbad01..0a912bfc86c5 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -16,16 +16,14 @@
  
  #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
  
 -#include <crypto/internal/hash.h>
+-#include <crypto/internal/simd.h>
 -#include <linux/init.h>
 -#include <linux/module.h>
 -#include <linux/mm.h>
 -#include <linux/types.h>
--#include <crypto/md5.h>
--
--#include <asm/pstate.h>
- #include <asm/elf.h>
-+#include <asm/pstate.h>
+-#include <crypto/sha1.h>
+-#include <crypto/sha1_base.h>
+ #include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
 +#include <crypto/internal/hash.h>
-+#include <crypto/md5.h>
++#include <crypto/sha1.h>
++#include <crypto/sha1_base.h>
 +#include <linux/errno.h>
 +#include <linux/kernel.h>
 +#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
  
- #include "opcodes.h"
+ static const struct x86_cpu_id module_cpu_ids[] = {
+ 	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
+@@ -36,14 +34,10 @@ static const struct x86_cpu_id module_cpu_ids[] = {
+ };
+ MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
  
--asmlinkage void md5_sparc64_transform(u32 *digest, const char *data,
-+struct sparc_md5_state {
-+	__le32 hash[MD5_HASH_WORDS];
-+	u64 byte_count;
-+};
-+
-+asmlinkage void md5_sparc64_transform(__le32 *digest, const char *data,
- 				      unsigned int rounds);
- 
- static int md5_sparc64_init(struct shash_desc *desc)
+-static int sha1_update(struct shash_desc *desc, const u8 *data,
+-			     unsigned int len, sha1_block_fn *sha1_xform)
++static inline int sha1_update(struct shash_desc *desc, const u8 *data,
++			      unsigned int len, sha1_block_fn *sha1_xform)
  {
--	struct md5_state *mctx = shash_desc_ctx(desc);
-+	struct sparc_md5_state *mctx = shash_desc_ctx(desc);
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-
+-	if (!crypto_simd_usable() ||
+-	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+-		return crypto_sha1_update(desc, data, len);
++	int remain;
  
--	mctx->hash[0] = MD5_H0;
--	mctx->hash[1] = MD5_H1;
--	mctx->hash[2] = MD5_H2;
--	mctx->hash[3] = MD5_H3;
--	le32_to_cpu_array(mctx->hash, 4);
-+	mctx->hash[0] = cpu_to_le32(MD5_H0);
-+	mctx->hash[1] = cpu_to_le32(MD5_H1);
-+	mctx->hash[2] = cpu_to_le32(MD5_H2);
-+	mctx->hash[3] = cpu_to_le32(MD5_H3);
- 	mctx->byte_count = 0;
+ 	/*
+ 	 * Make sure struct sha1_state begins directly with the SHA1
+@@ -52,22 +46,18 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
  
- 	return 0;
+ 	kernel_fpu_begin();
+-	sha1_base_do_update(desc, data, len, sha1_xform);
++	remain = sha1_base_do_update_blocks(desc, data, len, sha1_xform);
+ 	kernel_fpu_end();
+ 
+-	return 0;
++	return remain;
  }
  
--static void __md5_sparc64_update(struct md5_state *sctx, const u8 *data,
--				 unsigned int len, unsigned int partial)
+-static int sha1_finup(struct shash_desc *desc, const u8 *data,
+-		      unsigned int len, u8 *out, sha1_block_fn *sha1_xform)
++static inline int sha1_finup(struct shash_desc *desc, const u8 *data,
++			     unsigned int len, u8 *out,
++			     sha1_block_fn *sha1_xform)
+ {
+-	if (!crypto_simd_usable())
+-		return crypto_sha1_finup(desc, data, len, out);
+-
+ 	kernel_fpu_begin();
+-	if (len)
+-		sha1_base_do_update(desc, data, len, sha1_xform);
+-	sha1_base_do_finalize(desc, sha1_xform);
++	sha1_base_do_finup(desc, data, len, sha1_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha1_base_finish(desc, out);
+@@ -88,23 +78,17 @@ static int sha1_ssse3_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha1_finup(desc, data, len, out, sha1_transform_ssse3);
+ }
+ 
+-/* Add padding and return the message digest. */
+-static int sha1_ssse3_final(struct shash_desc *desc, u8 *out)
 -{
--	unsigned int done = 0;
--
--	sctx->byte_count += len;
--	if (partial) {
--		done = MD5_HMAC_BLOCK_SIZE - partial;
--		memcpy((u8 *)sctx->block + partial, data, done);
--		md5_sparc64_transform(sctx->hash, (u8 *)sctx->block, 1);
--	}
--	if (len - done >= MD5_HMAC_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / MD5_HMAC_BLOCK_SIZE;
--
--		md5_sparc64_transform(sctx->hash, data + done, rounds);
--		done += rounds * MD5_HMAC_BLOCK_SIZE;
--	}
--
--	memcpy(sctx->block, data + done, len - done);
+-	return sha1_ssse3_finup(desc, NULL, 0, out);
 -}
 -
- static int md5_sparc64_update(struct shash_desc *desc, const u8 *data,
- 			      unsigned int len)
- {
--	struct md5_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->byte_count % MD5_HMAC_BLOCK_SIZE;
-+	struct sparc_md5_state *sctx = shash_desc_ctx(desc);
- 
--	/* Handle the fast case right here */
--	if (partial + len < MD5_HMAC_BLOCK_SIZE) {
--		sctx->byte_count += len;
--		memcpy((u8 *)sctx->block + partial, data, len);
--	} else
--		__md5_sparc64_update(sctx, data, len, partial);
--
--	return 0;
-+	sctx->byte_count += round_down(len, MD5_HMAC_BLOCK_SIZE);
-+	md5_sparc64_transform(sctx->hash, data, len / MD5_HMAC_BLOCK_SIZE);
-+	return len - round_down(len, MD5_HMAC_BLOCK_SIZE);
- }
- 
- /* Add padding and return the message digest. */
--static int md5_sparc64_final(struct shash_desc *desc, u8 *out)
-+static int md5_sparc64_finup(struct shash_desc *desc, const u8 *src,
-+			     unsigned int offset, u8 *out)
- {
--	struct md5_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, padlen;
--	u32 *dst = (u32 *)out;
--	__le64 bits;
--	static const u8 padding[MD5_HMAC_BLOCK_SIZE] = { 0x80, };
-+	struct sparc_md5_state *sctx = shash_desc_ctx(desc);
-+	__le64 block[MD5_BLOCK_WORDS] = {};
-+	u8 *p = memcpy(block, src, offset);
-+	__le32 *dst = (__le32 *)out;
-+	__le64 *pbits;
-+	int i;
- 
--	bits = cpu_to_le64(sctx->byte_count << 3);
--
--	/* Pad out to 56 mod 64 and append length */
--	index = sctx->byte_count % MD5_HMAC_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((MD5_HMAC_BLOCK_SIZE+56) - index);
--
--	/* We need to fill a whole block for __md5_sparc64_update() */
--	if (padlen <= 56) {
--		sctx->byte_count += padlen;
--		memcpy((u8 *)sctx->block + index, padding, padlen);
--	} else {
--		__md5_sparc64_update(sctx, padding, padlen, index);
--	}
--	__md5_sparc64_update(sctx, (const u8 *)&bits, sizeof(bits), 56);
-+	src = p;
-+	p += offset;
-+	*p++ = 0x80;
-+	sctx->byte_count += offset;
-+	pbits = &block[(MD5_BLOCK_WORDS / (offset > 55 ? 1 : 2)) - 1];
-+	*pbits = cpu_to_le64(sctx->byte_count << 3);
-+	md5_sparc64_transform(sctx->hash, src, (pbits - block + 1) / 8);
-+	memzero_explicit(block, sizeof(block));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < MD5_HASH_WORDS; i++)
- 		dst[i] = sctx->hash[i];
- 
--	/* Wipe context */
--	memset(sctx, 0, sizeof(*sctx));
--
- 	return 0;
- }
- 
- static int md5_sparc64_export(struct shash_desc *desc, void *out)
- {
--	struct md5_state *sctx = shash_desc_ctx(desc);
--
--	memcpy(out, sctx, sizeof(*sctx));
-+	struct sparc_md5_state *sctx = shash_desc_ctx(desc);
-+	union {
-+		u8 *u8;
-+		u32 *u32;
-+		u64 *u64;
-+	} p = { .u8 = out };
-+	int i;
- 
-+	for (i = 0; i < MD5_HASH_WORDS; i++)
-+		put_unaligned(le32_to_cpu(sctx->hash[i]), p.u32++);
-+	put_unaligned(sctx->byte_count, p.u64);
- 	return 0;
- }
- 
- static int md5_sparc64_import(struct shash_desc *desc, const void *in)
- {
--	struct md5_state *sctx = shash_desc_ctx(desc);
--
--	memcpy(sctx, in, sizeof(*sctx));
-+	struct sparc_md5_state *sctx = shash_desc_ctx(desc);
-+	union {
-+		const u8 *u8;
-+		const u32 *u32;
-+		const u64 *u64;
-+	} p = { .u8 = in };
-+	int i;
- 
-+	for (i = 0; i < MD5_HASH_WORDS; i++)
-+		sctx->hash[i] = cpu_to_le32(get_unaligned(p.u32++));
-+	sctx->byte_count = get_unaligned(p.u64);
- 	return 0;
- }
- 
-@@ -136,15 +120,16 @@ static struct shash_alg alg = {
- 	.digestsize	=	MD5_DIGEST_SIZE,
- 	.init		=	md5_sparc64_init,
- 	.update		=	md5_sparc64_update,
--	.final		=	md5_sparc64_final,
-+	.finup		=	md5_sparc64_finup,
- 	.export		=	md5_sparc64_export,
- 	.import		=	md5_sparc64_import,
--	.descsize	=	sizeof(struct md5_state),
--	.statesize	=	sizeof(struct md5_state),
-+	.descsize	=	sizeof(struct sparc_md5_state),
-+	.statesize	=	sizeof(struct sparc_md5_state),
+ static struct shash_alg sha1_ssse3_alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_base_init,
+ 	.update		=	sha1_ssse3_update,
+-	.final		=	sha1_ssse3_final,
+ 	.finup		=	sha1_ssse3_finup,
+-	.descsize	=	sizeof(struct sha1_state),
++	.descsize	=	SHA1_STATE_SIZE,
  	.base		=	{
- 		.cra_name	=	"md5",
- 		.cra_driver_name=	"md5-sparc64",
- 		.cra_priority	=	SPARC_CR_OPCODE_PRIORITY,
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name =	"sha1-ssse3",
+ 		.cra_priority	=	150,
 +		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 		.cra_blocksize	=	MD5_HMAC_BLOCK_SIZE,
+ 		.cra_blocksize	=	SHA1_BLOCK_SIZE,
  		.cra_module	=	THIS_MODULE,
  	}
+@@ -138,22 +122,17 @@ static int sha1_avx_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha1_finup(desc, data, len, out, sha1_transform_avx);
+ }
+ 
+-static int sha1_avx_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha1_avx_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha1_avx_alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_base_init,
+ 	.update		=	sha1_avx_update,
+-	.final		=	sha1_avx_final,
+ 	.finup		=	sha1_avx_finup,
+-	.descsize	=	sizeof(struct sha1_state),
++	.descsize	=	SHA1_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name =	"sha1-avx",
+ 		.cra_priority	=	160,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 		.cra_blocksize	=	SHA1_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -198,8 +177,8 @@ static bool avx2_usable(void)
+ 	return false;
+ }
+ 
+-static void sha1_apply_transform_avx2(struct sha1_state *state,
+-				      const u8 *data, int blocks)
++static inline void sha1_apply_transform_avx2(struct sha1_state *state,
++					     const u8 *data, int blocks)
+ {
+ 	/* Select the optimal transform based on data block size */
+ 	if (blocks >= SHA1_AVX2_BLOCK_OPTSIZE)
+@@ -220,22 +199,17 @@ static int sha1_avx2_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha1_finup(desc, data, len, out, sha1_apply_transform_avx2);
+ }
+ 
+-static int sha1_avx2_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha1_avx2_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha1_avx2_alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_base_init,
+ 	.update		=	sha1_avx2_update,
+-	.final		=	sha1_avx2_final,
+ 	.finup		=	sha1_avx2_finup,
+-	.descsize	=	sizeof(struct sha1_state),
++	.descsize	=	SHA1_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name =	"sha1-avx2",
+ 		.cra_priority	=	170,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 		.cra_blocksize	=	SHA1_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -269,22 +243,17 @@ static int sha1_ni_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha1_finup(desc, data, len, out, sha1_ni_transform);
+ }
+ 
+-static int sha1_ni_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha1_ni_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha1_ni_alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_base_init,
+ 	.update		=	sha1_ni_update,
+-	.final		=	sha1_ni_final,
+ 	.finup		=	sha1_ni_finup,
+-	.descsize	=	sizeof(struct sha1_state),
++	.descsize	=	SHA1_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name =	"sha1-ni",
+ 		.cra_priority	=	250,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 		.cra_blocksize	=	SHA1_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+diff --git a/include/crypto/sha1.h b/include/crypto/sha1.h
+index 044ecea60ac8..dd6de4a4d6e6 100644
+--- a/include/crypto/sha1.h
++++ b/include/crypto/sha1.h
+@@ -10,6 +10,7 @@
+ 
+ #define SHA1_DIGEST_SIZE        20
+ #define SHA1_BLOCK_SIZE         64
++#define SHA1_STATE_SIZE         offsetof(struct sha1_state, buffer)
+ 
+ #define SHA1_H0		0x67452301UL
+ #define SHA1_H1		0xefcdab89UL
+diff --git a/include/crypto/sha1_base.h b/include/crypto/sha1_base.h
+index 0c342ed0d038..b23cfad18ce2 100644
+--- a/include/crypto/sha1_base.h
++++ b/include/crypto/sha1_base.h
+@@ -10,10 +10,9 @@
+ 
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha1.h>
+-#include <linux/crypto.h>
+-#include <linux/module.h>
++#include <linux/math.h>
+ #include <linux/string.h>
+-
++#include <linux/types.h>
+ #include <linux/unaligned.h>
+ 
+ typedef void (sha1_block_fn)(struct sha1_state *sst, u8 const *src, int blocks);
+@@ -70,6 +69,19 @@ static inline int sha1_base_do_update(struct shash_desc *desc,
+ 	return 0;
+ }
+ 
++static inline int sha1_base_do_update_blocks(struct shash_desc *desc,
++					     const u8 *data,
++					     unsigned int len,
++					     sha1_block_fn *block_fn)
++{
++	unsigned int remain = len - round_down(len, SHA1_BLOCK_SIZE);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++
++	sctx->count += len - remain;
++	block_fn(sctx, data, len / SHA1_BLOCK_SIZE);
++	return remain;
++}
++
+ static inline int sha1_base_do_finalize(struct shash_desc *desc,
+ 					sha1_block_fn *block_fn)
+ {
+@@ -93,6 +105,29 @@ static inline int sha1_base_do_finalize(struct shash_desc *desc,
+ 	return 0;
+ }
+ 
++static inline int sha1_base_do_finup(struct shash_desc *desc,
++				     const u8 *src, unsigned int len,
++				     sha1_block_fn *block_fn)
++{
++	unsigned int bit_offset = SHA1_BLOCK_SIZE / 8 - 1;
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	union {
++		__be64 b64[SHA1_BLOCK_SIZE / 4];
++		u8 u8[SHA1_BLOCK_SIZE * 2];
++	} block = {};
++
++	if (len >= bit_offset * 8)
++		bit_offset += SHA1_BLOCK_SIZE / 8;
++	memcpy(&block, src, len);
++	block.u8[len] = 0x80;
++	sctx->count += len;
++	block.b64[bit_offset] = cpu_to_be64(sctx->count << 3);
++	block_fn(sctx, block.u8, (bit_offset + 1) * 8 / SHA1_BLOCK_SIZE);
++	memzero_explicit(&block, sizeof(block));
++
++	return 0;
++}
++
+ static inline int sha1_base_finish(struct shash_desc *desc, u8 *out)
+ {
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+@@ -102,7 +137,6 @@ static inline int sha1_base_finish(struct shash_desc *desc, u8 *out)
+ 	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
+ 		put_unaligned_be32(sctx->state[i], digest++);
+ 
+-	memzero_explicit(sctx, sizeof(*sctx));
+ 	return 0;
+ }
+ 
 -- 
 2.39.5
 
