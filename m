@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442E22FF39
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096EE1DC9A8
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744785923; cv=none; b=p+6ZHwNE7QwlKSCQyLmZCYko1Zwn7NGnC9Fbmagoz0pApe2Xiubd2FaSaOaj+73kaed1CVilLDUKEhw9Wu6Nw1uJe/NzLMOF9k2WrXK6FByMaFASOaRPMhI+C8PMC323nZlUcd2oUSVb+HVTHNIJ5Fa0GBnF4aPHYzPBBql5h9M=
+	t=1744785925; cv=none; b=QKUij/goNPcorqJOOdGzXmbVVJMUr76RsuEtgXv/EE5Ef+uD+dytHC89MDO/rSZ/9RDzfKXSj+Cbu4LkY2zt+qxv9gZLsOS/WtjKhnYp4St8aRnm0jlJrHfwPUJN3XgH1Xz5c4hlkgWiWjbMYf9LSKZIMAQTxDV30oXcR0HHyDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744785923; c=relaxed/simple;
-	bh=cpkeOZqQXw28VPMShYvmfWmO6+Etmelgc0EFDxpkTeQ=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=enuyRCvdoIDUUTdRKd+KeA6glYZwRx+K45jpDaGkWETUii6xXGAlH1ZGKQQQQHlnqXrSL+V4+bCLA86g/8U2vUdJMQ84jl9HJVo+Sq4SYX8X9kRS7oi3j5vHqEpvL2I3vJa7VReq/pMmIAHaCfAeckrpYydYYeFb1EtmSYZ6bbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PVH1U2fG; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785925; c=relaxed/simple;
+	bh=KhmpsruxnlHp+Fg1BlYuPjZ7qgNhkkibctNbkxSZlfs=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=BaBYfnYlIwm1ekogD3n1tjbGRgdATDynWqJxE2PI232UVIev82QJF6Yt1Rv8RJPnwsvR0ksEzrLPdy8wSIxf87tLLyk5gX1k3CcTjfh+krPJ9OyKaOzvyDfRTWSYTm2baUycqAjYObADwb39VtHO3pVpNkUIrlYhorQhKmrNwS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=X/3gZ30v; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PVH1U2fG"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="X/3gZ30v"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=46cBG9CxAlz0AslgzxhTDWL5S99886idVQ7ORj8X7qI=; b=PVH1U2fG15dVa5falj4vXhB4NP
-	6Kq/maJQd9plQBrvXgX+c3Z/19P3Mm3GL7U3by3Irvw2Oqljmj1hweneW0u/PZnkUPiRqi2ABYA1v
-	8R2SGzcTi10PNHhn9VZkaInYw8jqH3ILvNcCtq2bVbrG/9Zz5P4mSskN6DWR3FIHlT7mh5oWuj28Y
-	j4AHzNYwa4oiAvkGHc25BTTQ5JnFAWXIh4ZGahBG6v13jAOrhfwlM/OaYJvvSVMU/UPIiEcG2e26A
-	Sury2FzSx3wQwJi1uTCeLwfSEqJq0w9RQVZSpF55/dh+9J92ApUTcJl0sT1bg+Bv6HCJj4ahiMnKU
-	dFP4ApMg==;
+	bh=Wg5g2WJqoY7ca4qBdSssffKEBxlfKR4Xdj+2+d9Dp5w=; b=X/3gZ30vmYvbSs6LwVuzonSlDW
+	6FHl20sXQY5touzIBER/YzVxk4L1OwD/0ygzM3pYGOSRd/GNPkpsGrTj4cmJo0p6M3V1pd2Plkgnw
+	l0uc2CzIlMDo/7nLagGkRC+tQLkGJEOtqOtbuSqBr1ftYI2rBd8iU964Ezs9t28BnuBfFX/xSVAIO
+	ZlHxeMuMWx+bqI01XwXd/h0LJVahz1+pVHNVW4QebZcB+aLJv5BSyMLK7Ei6sNdgicQIGJUBsluD2
+	c+w9KXam8xm7KK+fHPutnH6tAcwUMsve/hF4SZh+GfrbDnJC4l5n5n0mT/5/JD4qdJDpl41vcFxJk
+	GKs2bHmw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4wWK-00G6WJ-2C;
-	Wed, 16 Apr 2025 14:45:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:45:16 +0800
-Date: Wed, 16 Apr 2025 14:45:16 +0800
-Message-Id: <aa0d45219c8ee0a8fae10ba6279df304492baca4.1744784515.git.herbert@gondor.apana.org.au>
+	id 1u4wWN-00G6WX-0F;
+	Wed, 16 Apr 2025 14:45:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:45:19 +0800
+Date: Wed, 16 Apr 2025 14:45:19 +0800
+Message-Id: <17a7b74a3e83c67f1f8ce587ee5acfb4ee754ec5.1744784515.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744784515.git.herbert@gondor.apana.org.au>
 References: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 66/67] crypto: nx - Use API partial block handling
+Subject: [PATCH 67/67] crypto: padlock-sha - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,886 +47,636 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-Also switch to the generic export format.
-
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/nx/nx-aes-xcbc.c | 128 +++++++++-------------------
- drivers/crypto/nx/nx-sha256.c   | 130 ++++++++++++-----------------
- drivers/crypto/nx/nx-sha512.c   | 143 +++++++++++++-------------------
- drivers/crypto/nx/nx.c          |  15 ++--
- drivers/crypto/nx/nx.h          |   6 +-
- 5 files changed, 161 insertions(+), 261 deletions(-)
+ drivers/crypto/padlock-sha.c | 464 +++++++++++------------------------
+ 1 file changed, 138 insertions(+), 326 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-xcbc.c b/drivers/crypto/nx/nx-aes-xcbc.c
-index eb5c8f689360..bf465d824e2c 100644
---- a/drivers/crypto/nx/nx-aes-xcbc.c
-+++ b/drivers/crypto/nx/nx-aes-xcbc.c
-@@ -7,13 +7,14 @@
-  * Author: Kent Yoder <yoder1@us.ibm.com>
+diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
+index 466493907d48..c89b9c6b5f4c 100644
+--- a/drivers/crypto/padlock-sha.c
++++ b/drivers/crypto/padlock-sha.c
+@@ -7,59 +7,83 @@
+  * Copyright (c) 2006  Michal Ludvig <michal@logix.cz>
   */
  
--#include <crypto/internal/hash.h>
- #include <crypto/aes.h>
--#include <crypto/algapi.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/atomic.h>
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/types.h>
--#include <linux/crypto.h>
--#include <asm/vio.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
- 
- #include "nx_csbcpb.h"
- #include "nx.h"
-@@ -21,8 +22,6 @@
- 
- struct xcbc_state {
- 	u8 state[AES_BLOCK_SIZE];
--	unsigned int count;
--	u8 buffer[AES_BLOCK_SIZE];
- };
- 
- static int nx_xcbc_set_key(struct crypto_shash *desc,
-@@ -58,7 +57,7 @@ static int nx_xcbc_set_key(struct crypto_shash *desc,
-  */
- static int nx_xcbc_empty(struct shash_desc *desc, u8 *out)
- {
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	struct nx_sg *in_sg, *out_sg;
- 	u8 keys[2][AES_BLOCK_SIZE];
-@@ -135,9 +134,9 @@ static int nx_xcbc_empty(struct shash_desc *desc, u8 *out)
- 	return rc;
- }
- 
--static int nx_crypto_ctx_aes_xcbc_init2(struct crypto_tfm *tfm)
-+static int nx_crypto_ctx_aes_xcbc_init2(struct crypto_shash *tfm)
- {
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(tfm);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	int err;
- 
-@@ -166,31 +165,24 @@ static int nx_xcbc_update(struct shash_desc *desc,
- 			  const u8          *data,
- 			  unsigned int       len)
- {
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct xcbc_state *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	struct nx_sg *in_sg;
- 	struct nx_sg *out_sg;
--	u32 to_process = 0, leftover, total;
- 	unsigned int max_sg_len;
- 	unsigned long irq_flags;
-+	u32 to_process, total;
- 	int rc = 0;
- 	int data_len;
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
-+	memcpy(csbcpb->cpb.aes_xcbc.out_cv_mac, sctx->state, AES_BLOCK_SIZE);
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
--	total = sctx->count + len;
--
--	/* 2 cases for total data len:
--	 *  1: <= AES_BLOCK_SIZE: copy into state, return 0
--	 *  2: > AES_BLOCK_SIZE: process X blocks, copy in leftover
--	 */
--	if (total <= AES_BLOCK_SIZE) {
--		memcpy(sctx->buffer + sctx->count, data, len);
--		sctx->count += len;
--		goto out;
--	}
-+	total = len;
- 
- 	in_sg = nx_ctx->in_sg;
- 	max_sg_len = min_t(u64, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
-@@ -200,7 +192,7 @@ static int nx_xcbc_update(struct shash_desc *desc,
- 
- 	data_len = AES_BLOCK_SIZE;
- 	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
--				  &len, nx_ctx->ap->sglen);
-+				  &data_len, nx_ctx->ap->sglen);
- 
- 	if (data_len != AES_BLOCK_SIZE) {
- 		rc = -EINVAL;
-@@ -210,56 +202,21 @@ static int nx_xcbc_update(struct shash_desc *desc,
- 	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
- 
- 	do {
--		to_process = total - to_process;
--		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
-+		to_process = total & ~(AES_BLOCK_SIZE - 1);
- 
--		leftover = total - to_process;
--
--		/* the hardware will not accept a 0 byte operation for this
--		 * algorithm and the operation MUST be finalized to be correct.
--		 * So if we happen to get an update that falls on a block sized
--		 * boundary, we must save off the last block to finalize with
--		 * later. */
--		if (!leftover) {
--			to_process -= AES_BLOCK_SIZE;
--			leftover = AES_BLOCK_SIZE;
--		}
--
--		if (sctx->count) {
--			data_len = sctx->count;
--			in_sg = nx_build_sg_list(nx_ctx->in_sg,
--						(u8 *) sctx->buffer,
--						&data_len,
--						max_sg_len);
--			if (data_len != sctx->count) {
--				rc = -EINVAL;
--				goto out;
--			}
--		}
--
--		data_len = to_process - sctx->count;
- 		in_sg = nx_build_sg_list(in_sg,
- 					(u8 *) data,
--					&data_len,
-+					&to_process,
- 					max_sg_len);
- 
--		if (data_len != to_process - sctx->count) {
--			rc = -EINVAL;
--			goto out;
--		}
--
- 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
- 					sizeof(struct nx_sg);
- 
- 		/* we've hit the nx chip previously and we're updating again,
- 		 * so copy over the partial digest */
--		if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
--			memcpy(csbcpb->cpb.aes_xcbc.cv,
--				csbcpb->cpb.aes_xcbc.out_cv_mac,
--				AES_BLOCK_SIZE);
--		}
-+		memcpy(csbcpb->cpb.aes_xcbc.cv,
-+		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
- 
--		NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 		if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
- 			rc = -EINVAL;
- 			goto out;
-@@ -271,28 +228,24 @@ static int nx_xcbc_update(struct shash_desc *desc,
- 
- 		atomic_inc(&(nx_ctx->stats->aes_ops));
- 
--		/* everything after the first update is continuation */
--		NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
--
- 		total -= to_process;
--		data += to_process - sctx->count;
--		sctx->count = 0;
-+		data += to_process;
- 		in_sg = nx_ctx->in_sg;
--	} while (leftover > AES_BLOCK_SIZE);
-+	} while (total >= AES_BLOCK_SIZE);
- 
--	/* copy the leftover back into the state struct */
--	memcpy(sctx->buffer, data, leftover);
--	sctx->count = leftover;
-+	rc = total;
-+	memcpy(sctx->state, csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
- 
- out:
- 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
- 	return rc;
- }
- 
--static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
-+static int nx_xcbc_finup(struct shash_desc *desc, const u8 *src,
-+			 unsigned int nbytes, u8 *out)
- {
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct xcbc_state *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	struct nx_sg *in_sg, *out_sg;
- 	unsigned long irq_flags;
-@@ -301,12 +254,10 @@ static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
--	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
--		/* we've hit the nx chip previously, now we're finalizing,
--		 * so copy over the partial digest */
--		memcpy(csbcpb->cpb.aes_xcbc.cv,
--		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
--	} else if (sctx->count == 0) {
-+	if (nbytes) {
-+		/* non-zero final, so copy over the partial digest */
-+		memcpy(csbcpb->cpb.aes_xcbc.cv, sctx->state, AES_BLOCK_SIZE);
-+	} else {
- 		/*
- 		 * we've never seen an update, so this is a 0 byte op. The
- 		 * hardware cannot handle a 0 byte op, so just ECB to
-@@ -320,11 +271,11 @@ static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
- 	 * this is not an intermediate operation */
- 	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
- 
--	len = sctx->count;
--	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)sctx->buffer,
--				 &len, nx_ctx->ap->sglen);
-+	len = nbytes;
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)src, &len,
-+				 nx_ctx->ap->sglen);
- 
--	if (len != sctx->count) {
-+	if (len != nbytes) {
- 		rc = -EINVAL;
- 		goto out;
- 	}
-@@ -362,18 +313,19 @@ struct shash_alg nx_shash_aes_xcbc_alg = {
- 	.digestsize = AES_BLOCK_SIZE,
- 	.init       = nx_xcbc_init,
- 	.update     = nx_xcbc_update,
--	.final      = nx_xcbc_final,
-+	.finup      = nx_xcbc_finup,
- 	.setkey     = nx_xcbc_set_key,
- 	.descsize   = sizeof(struct xcbc_state),
--	.statesize  = sizeof(struct xcbc_state),
-+	.init_tfm   = nx_crypto_ctx_aes_xcbc_init2,
-+	.exit_tfm   = nx_crypto_ctx_shash_exit,
- 	.base       = {
- 		.cra_name        = "xcbc(aes)",
- 		.cra_driver_name = "xcbc-aes-nx",
- 		.cra_priority    = 300,
-+		.cra_flags	 = CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+				   CRYPTO_AHASH_ALG_FINAL_NONZERO,
- 		.cra_blocksize   = AES_BLOCK_SIZE,
- 		.cra_module      = THIS_MODULE,
- 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
--		.cra_init        = nx_crypto_ctx_aes_xcbc_init2,
--		.cra_exit        = nx_crypto_ctx_exit,
- 	}
- };
-diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
-index c3bebf0feabe..5b29dd026df2 100644
---- a/drivers/crypto/nx/nx-sha256.c
-+++ b/drivers/crypto/nx/nx-sha256.c
-@@ -9,9 +9,12 @@
- 
++#include <asm/cpu_device_id.h>
  #include <crypto/internal/hash.h>
+ #include <crypto/padlock.h>
+ #include <crypto/sha1.h>
  #include <crypto/sha2.h>
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
--#include <asm/vio.h>
--#include <asm/byteorder.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
++#include <linux/cpufeature.h>
+ #include <linux/err.h>
+-#include <linux/module.h>
+-#include <linux/init.h>
+-#include <linux/errno.h>
+-#include <linux/interrupt.h>
+ #include <linux/kernel.h>
+-#include <linux/scatterlist.h>
+-#include <asm/cpu_device_id.h>
+-#include <asm/fpu/api.h>
++#include <linux/module.h>
  
- #include "nx_csbcpb.h"
- #include "nx.h"
-@@ -19,12 +22,11 @@
- struct sha256_state_be {
- 	__be32 state[SHA256_DIGEST_SIZE / 4];
- 	u64 count;
--	u8 buf[SHA256_BLOCK_SIZE];
+-struct padlock_sha_desc {
+-	struct shash_desc fallback;
+-};
++#define PADLOCK_SHA_DESCSIZE (128 + ((PADLOCK_ALIGNMENT - 1) & \
++				     ~(CRYPTO_MINALIGN - 1)))
+ 
+ struct padlock_sha_ctx {
+-	struct crypto_shash *fallback;
++	struct crypto_ahash *fallback;
  };
  
--static int nx_crypto_ctx_sha256_init(struct crypto_tfm *tfm)
-+static int nx_crypto_ctx_sha256_init(struct crypto_shash *tfm)
+-static int padlock_sha_init(struct shash_desc *desc)
++static inline void *padlock_shash_desc_ctx(struct shash_desc *desc)
  {
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(tfm);
- 	int err;
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
+-	struct padlock_sha_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	return PTR_ALIGN(shash_desc_ctx(desc), PADLOCK_ALIGNMENT);
++}
  
- 	err = nx_crypto_ctx_sha_init(tfm);
-@@ -40,11 +42,10 @@ static int nx_crypto_ctx_sha256_init(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
--static int nx_sha256_init(struct shash_desc *desc) {
-+static int nx_sha256_init(struct shash_desc *desc)
+-	dctx->fallback.tfm = ctx->fallback;
+-	return crypto_shash_init(&dctx->fallback);
++static int padlock_sha1_init(struct shash_desc *desc)
 +{
- 	struct sha256_state_be *sctx = shash_desc_ctx(desc);
- 
--	memset(sctx, 0, sizeof *sctx);
--
- 	sctx->state[0] = __cpu_to_be32(SHA256_H0);
- 	sctx->state[1] = __cpu_to_be32(SHA256_H1);
- 	sctx->state[2] = __cpu_to_be32(SHA256_H2);
-@@ -61,30 +62,18 @@ static int nx_sha256_init(struct shash_desc *desc) {
- static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 			    unsigned int len)
- {
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct sha256_state_be *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	u64 to_process, leftover, total = len;
- 	struct nx_sg *out_sg;
--	u64 to_process = 0, leftover, total;
- 	unsigned long irq_flags;
- 	int rc = 0;
- 	int data_len;
- 	u32 max_sg_len;
--	u64 buf_len = (sctx->count % SHA256_BLOCK_SIZE);
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
--	/* 2 cases for total data len:
--	 *  1: < SHA256_BLOCK_SIZE: copy into state, return 0
--	 *  2: >= SHA256_BLOCK_SIZE: process X blocks, copy in leftover
--	 */
--	total = (sctx->count % SHA256_BLOCK_SIZE) + len;
--	if (total < SHA256_BLOCK_SIZE) {
--		memcpy(sctx->buf + buf_len, data, len);
--		sctx->count += len;
--		goto out;
--	}
--
- 	memcpy(csbcpb->cpb.sha256.message_digest, sctx->state, SHA256_DIGEST_SIZE);
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
-@@ -105,41 +94,17 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	}
- 
- 	do {
--		int used_sgs = 0;
- 		struct nx_sg *in_sg = nx_ctx->in_sg;
- 
--		if (buf_len) {
--			data_len = buf_len;
--			in_sg = nx_build_sg_list(in_sg,
--						 (u8 *) sctx->buf,
--						 &data_len,
--						 max_sg_len);
-+		to_process = total & ~(SHA256_BLOCK_SIZE - 1);
- 
--			if (data_len != buf_len) {
--				rc = -EINVAL;
--				goto out;
--			}
--			used_sgs = in_sg - nx_ctx->in_sg;
--		}
--
--		/* to_process: SHA256_BLOCK_SIZE aligned chunk to be
--		 * processed in this iteration. This value is restricted
--		 * by sg list limits and number of sgs we already used
--		 * for leftover data. (see above)
--		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
--		 * but because data may not be aligned, we need to account
--		 * for that too. */
--		to_process = min_t(u64, total,
--			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
--		to_process = to_process & ~(SHA256_BLOCK_SIZE - 1);
--
--		data_len = to_process - buf_len;
-+		data_len = to_process;
- 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
- 					 &data_len, max_sg_len);
- 
- 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
- 
--		to_process = data_len + buf_len;
-+		to_process = data_len;
- 		leftover = total - to_process;
- 
- 		/*
-@@ -162,26 +127,22 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 		atomic_inc(&(nx_ctx->stats->sha256_ops));
- 
- 		total -= to_process;
--		data += to_process - buf_len;
--		buf_len = 0;
--
-+		data += to_process;
-+		sctx->count += to_process;
- 	} while (leftover >= SHA256_BLOCK_SIZE);
- 
--	/* copy the leftover back into the state struct */
--	if (leftover)
--		memcpy(sctx->buf, data, leftover);
--
--	sctx->count += len;
-+	rc = leftover;
- 	memcpy(sctx->state, csbcpb->cpb.sha256.message_digest, SHA256_DIGEST_SIZE);
- out:
- 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
- 	return rc;
- }
- 
--static int nx_sha256_final(struct shash_desc *desc, u8 *out)
-+static int nx_sha256_finup(struct shash_desc *desc, const u8 *src,
-+			   unsigned int nbytes, u8 *out)
- {
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct sha256_state_be *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
- 	struct nx_sg *in_sg, *out_sg;
- 	unsigned long irq_flags;
-@@ -197,25 +158,19 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
- 			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
- 
- 	/* final is represented by continuing the operation and indicating that
--	 * this is not an intermediate operation */
--	if (sctx->count >= SHA256_BLOCK_SIZE) {
--		/* we've hit the nx chip previously, now we're finalizing,
--		 * so copy over the partial digest */
--		memcpy(csbcpb->cpb.sha256.input_partial_digest, sctx->state, SHA256_DIGEST_SIZE);
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
--		NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
--	} else {
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_CONTINUATION;
--	}
-+	 * this is not an intermediate operation
-+	 * copy over the partial digest */
-+	memcpy(csbcpb->cpb.sha256.input_partial_digest, sctx->state, SHA256_DIGEST_SIZE);
-+	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
-+	sctx->count += nbytes;
- 	csbcpb->cpb.sha256.message_bit_length = (u64) (sctx->count * 8);
- 
--	len = sctx->count & (SHA256_BLOCK_SIZE - 1);
--	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *) sctx->buf,
--				 &len, max_sg_len);
-+	len = nbytes;
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)src, &len, max_sg_len);
- 
--	if (len != (sctx->count & (SHA256_BLOCK_SIZE - 1))) {
-+	if (len != nbytes) {
- 		rc = -EINVAL;
- 		goto out;
- 	}
-@@ -251,18 +206,34 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
- static int nx_sha256_export(struct shash_desc *desc, void *out)
- {
- 	struct sha256_state_be *sctx = shash_desc_ctx(desc);
-+	union {
-+		u8 *u8;
-+		u32 *u32;
-+		u64 *u64;
-+	} p = { .u8 = out };
-+	int i;
- 
--	memcpy(out, sctx, sizeof(*sctx));
-+	for (i = 0; i < SHA256_DIGEST_SIZE / sizeof(*p.u32); i++)
-+		put_unaligned(be32_to_cpu(sctx->state[i]), p.u32++);
- 
-+	put_unaligned(sctx->count, p.u64++);
- 	return 0;
- }
- 
- static int nx_sha256_import(struct shash_desc *desc, const void *in)
- {
- 	struct sha256_state_be *sctx = shash_desc_ctx(desc);
-+	union {
-+		const u8 *u8;
-+		const u32 *u32;
-+		const u64 *u64;
-+	} p = { .u8 = in };
-+	int i;
- 
--	memcpy(sctx, in, sizeof(*sctx));
-+	for (i = 0; i < SHA256_DIGEST_SIZE / sizeof(*p.u32); i++)
-+		sctx->state[i] = cpu_to_be32(get_unaligned(p.u32++));
- 
-+	sctx->count = get_unaligned(p.u64++);
- 	return 0;
- }
- 
-@@ -270,19 +241,20 @@ struct shash_alg nx_shash_sha256_alg = {
- 	.digestsize = SHA256_DIGEST_SIZE,
- 	.init       = nx_sha256_init,
- 	.update     = nx_sha256_update,
--	.final      = nx_sha256_final,
-+	.finup      = nx_sha256_finup,
- 	.export     = nx_sha256_export,
- 	.import     = nx_sha256_import,
-+	.init_tfm   = nx_crypto_ctx_sha256_init,
-+	.exit_tfm   = nx_crypto_ctx_shash_exit,
- 	.descsize   = sizeof(struct sha256_state_be),
- 	.statesize  = sizeof(struct sha256_state_be),
- 	.base       = {
- 		.cra_name        = "sha256",
- 		.cra_driver_name = "sha256-nx",
- 		.cra_priority    = 300,
-+		.cra_flags	 = CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 		.cra_blocksize   = SHA256_BLOCK_SIZE,
- 		.cra_module      = THIS_MODULE,
- 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
--		.cra_init        = nx_crypto_ctx_sha256_init,
--		.cra_exit        = nx_crypto_ctx_exit,
- 	}
- };
-diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
-index 1ffb40d2c324..f74776b7d7d7 100644
---- a/drivers/crypto/nx/nx-sha512.c
-+++ b/drivers/crypto/nx/nx-sha512.c
-@@ -9,8 +9,12 @@
- 
- #include <crypto/internal/hash.h>
- #include <crypto/sha2.h>
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
--#include <asm/vio.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
- 
- #include "nx_csbcpb.h"
- #include "nx.h"
-@@ -18,12 +22,11 @@
- struct sha512_state_be {
- 	__be64 state[SHA512_DIGEST_SIZE / 8];
- 	u64 count[2];
--	u8 buf[SHA512_BLOCK_SIZE];
- };
- 
--static int nx_crypto_ctx_sha512_init(struct crypto_tfm *tfm)
-+static int nx_crypto_ctx_sha512_init(struct crypto_shash *tfm)
- {
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(tfm);
- 	int err;
- 
- 	err = nx_crypto_ctx_sha_init(tfm);
-@@ -43,8 +46,6 @@ static int nx_sha512_init(struct shash_desc *desc)
- {
- 	struct sha512_state_be *sctx = shash_desc_ctx(desc);
- 
--	memset(sctx, 0, sizeof *sctx);
--
- 	sctx->state[0] = __cpu_to_be64(SHA512_H0);
- 	sctx->state[1] = __cpu_to_be64(SHA512_H1);
- 	sctx->state[2] = __cpu_to_be64(SHA512_H2);
-@@ -54,6 +55,7 @@ static int nx_sha512_init(struct shash_desc *desc)
- 	sctx->state[6] = __cpu_to_be64(SHA512_H6);
- 	sctx->state[7] = __cpu_to_be64(SHA512_H7);
- 	sctx->count[0] = 0;
-+	sctx->count[1] = 0;
- 
- 	return 0;
- }
-@@ -61,30 +63,18 @@ static int nx_sha512_init(struct shash_desc *desc)
- static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 			    unsigned int len)
- {
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct sha512_state_be *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	u64 to_process, leftover, total = len;
- 	struct nx_sg *out_sg;
--	u64 to_process, leftover = 0, total;
- 	unsigned long irq_flags;
- 	int rc = 0;
- 	int data_len;
- 	u32 max_sg_len;
--	u64 buf_len = (sctx->count[0] % SHA512_BLOCK_SIZE);
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
--	/* 2 cases for total data len:
--	 *  1: < SHA512_BLOCK_SIZE: copy into state, return 0
--	 *  2: >= SHA512_BLOCK_SIZE: process X blocks, copy in leftover
--	 */
--	total = (sctx->count[0] % SHA512_BLOCK_SIZE) + len;
--	if (total < SHA512_BLOCK_SIZE) {
--		memcpy(sctx->buf + buf_len, data, len);
--		sctx->count[0] += len;
--		goto out;
--	}
--
- 	memcpy(csbcpb->cpb.sha512.message_digest, sctx->state, SHA512_DIGEST_SIZE);
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
-@@ -105,45 +95,17 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	}
- 
- 	do {
--		int used_sgs = 0;
- 		struct nx_sg *in_sg = nx_ctx->in_sg;
- 
--		if (buf_len) {
--			data_len = buf_len;
--			in_sg = nx_build_sg_list(in_sg,
--						 (u8 *) sctx->buf,
--						 &data_len, max_sg_len);
-+		to_process = total & ~(SHA512_BLOCK_SIZE - 1);
- 
--			if (data_len != buf_len) {
--				rc = -EINVAL;
--				goto out;
--			}
--			used_sgs = in_sg - nx_ctx->in_sg;
--		}
--
--		/* to_process: SHA512_BLOCK_SIZE aligned chunk to be
--		 * processed in this iteration. This value is restricted
--		 * by sg list limits and number of sgs we already used
--		 * for leftover data. (see above)
--		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
--		 * but because data may not be aligned, we need to account
--		 * for that too. */
--		to_process = min_t(u64, total,
--			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
--		to_process = to_process & ~(SHA512_BLOCK_SIZE - 1);
--
--		data_len = to_process - buf_len;
-+		data_len = to_process;
- 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
- 					 &data_len, max_sg_len);
- 
- 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
- 
--		if (data_len != (to_process - buf_len)) {
--			rc = -EINVAL;
--			goto out;
--		}
--
--		to_process = data_len + buf_len;
-+		to_process = data_len;
- 		leftover = total - to_process;
- 
- 		/*
-@@ -166,30 +128,29 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 		atomic_inc(&(nx_ctx->stats->sha512_ops));
- 
- 		total -= to_process;
--		data += to_process - buf_len;
--		buf_len = 0;
--
-+		data += to_process;
-+		sctx->count[0] += to_process;
-+		if (sctx->count[0] < to_process)
-+			sctx->count[1]++;
- 	} while (leftover >= SHA512_BLOCK_SIZE);
- 
--	/* copy the leftover back into the state struct */
--	if (leftover)
--		memcpy(sctx->buf, data, leftover);
--	sctx->count[0] += len;
-+	rc = leftover;
- 	memcpy(sctx->state, csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
- out:
- 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
- 	return rc;
- }
- 
--static int nx_sha512_final(struct shash_desc *desc, u8 *out)
-+static int nx_sha512_finup(struct shash_desc *desc, const u8 *src,
-+			   unsigned int nbytes, u8 *out)
- {
- 	struct sha512_state_be *sctx = shash_desc_ctx(desc);
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc->tfm);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
- 	struct nx_sg *in_sg, *out_sg;
- 	u32 max_sg_len;
--	u64 count0;
- 	unsigned long irq_flags;
-+	u64 count0, count1;
- 	int rc = 0;
- 	int len;
- 
-@@ -201,30 +162,23 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
- 			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
- 
- 	/* final is represented by continuing the operation and indicating that
--	 * this is not an intermediate operation */
--	if (sctx->count[0] >= SHA512_BLOCK_SIZE) {
--		/* we've hit the nx chip previously, now we're finalizing,
--		 * so copy over the partial digest */
--		memcpy(csbcpb->cpb.sha512.input_partial_digest, sctx->state,
--							SHA512_DIGEST_SIZE);
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
--		NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
--	} else {
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
--		NX_CPB_FDM(csbcpb) &= ~NX_FDM_CONTINUATION;
--	}
--
-+	 * this is not an intermediate operation
-+	 * copy over the partial digest */
-+	memcpy(csbcpb->cpb.sha512.input_partial_digest, sctx->state, SHA512_DIGEST_SIZE);
- 	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
--	count0 = sctx->count[0] * 8;
-+	count0 = sctx->count[0] + nbytes;
-+	count1 = sctx->count[1];
- 
--	csbcpb->cpb.sha512.message_bit_length_lo = count0;
-+	csbcpb->cpb.sha512.message_bit_length_lo = count0 << 3;
-+	csbcpb->cpb.sha512.message_bit_length_hi = (count1 << 3) |
-+						   (count0 >> 61);
- 
--	len = sctx->count[0] & (SHA512_BLOCK_SIZE - 1);
--	in_sg = nx_build_sg_list(nx_ctx->in_sg, sctx->buf, &len,
--				 max_sg_len);
-+	len = nbytes;
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)src, &len, max_sg_len);
- 
--	if (len != (sctx->count[0] & (SHA512_BLOCK_SIZE - 1))) {
-+	if (len != nbytes) {
- 		rc = -EINVAL;
- 		goto out;
- 	}
-@@ -246,7 +200,7 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
- 		goto out;
- 
- 	atomic_inc(&(nx_ctx->stats->sha512_ops));
--	atomic64_add(sctx->count[0], &(nx_ctx->stats->sha512_bytes));
-+	atomic64_add(count0, &(nx_ctx->stats->sha512_bytes));
- 
- 	memcpy(out, csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
- out:
-@@ -257,18 +211,34 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
- static int nx_sha512_export(struct shash_desc *desc, void *out)
- {
- 	struct sha512_state_be *sctx = shash_desc_ctx(desc);
-+	union {
-+		u8 *u8;
-+		u64 *u64;
-+	} p = { .u8 = out };
-+	int i;
- 
--	memcpy(out, sctx, sizeof(*sctx));
-+	for (i = 0; i < SHA512_DIGEST_SIZE / sizeof(*p.u64); i++)
-+		put_unaligned(be64_to_cpu(sctx->state[i]), p.u64++);
- 
-+	put_unaligned(sctx->count[0], p.u64++);
-+	put_unaligned(sctx->count[1], p.u64++);
- 	return 0;
- }
- 
- static int nx_sha512_import(struct shash_desc *desc, const void *in)
- {
- 	struct sha512_state_be *sctx = shash_desc_ctx(desc);
-+	union {
-+		const u8 *u8;
-+		const u64 *u64;
-+	} p = { .u8 = in };
-+	int i;
- 
--	memcpy(sctx, in, sizeof(*sctx));
-+	for (i = 0; i < SHA512_DIGEST_SIZE / sizeof(*p.u64); i++)
-+		sctx->state[i] = cpu_to_be64(get_unaligned(p.u64++));
- 
-+	sctx->count[0] = get_unaligned(p.u64++);
-+	sctx->count[1] = get_unaligned(p.u64++);
- 	return 0;
- }
- 
-@@ -276,19 +246,20 @@ struct shash_alg nx_shash_sha512_alg = {
- 	.digestsize = SHA512_DIGEST_SIZE,
- 	.init       = nx_sha512_init,
- 	.update     = nx_sha512_update,
--	.final      = nx_sha512_final,
-+	.finup      = nx_sha512_finup,
- 	.export     = nx_sha512_export,
- 	.import     = nx_sha512_import,
-+	.init_tfm   = nx_crypto_ctx_sha512_init,
-+	.exit_tfm   = nx_crypto_ctx_shash_exit,
- 	.descsize   = sizeof(struct sha512_state_be),
- 	.statesize  = sizeof(struct sha512_state_be),
- 	.base       = {
- 		.cra_name        = "sha512",
- 		.cra_driver_name = "sha512-nx",
- 		.cra_priority    = 300,
-+		.cra_flags	 = CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 		.cra_blocksize   = SHA512_BLOCK_SIZE,
- 		.cra_module      = THIS_MODULE,
- 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
--		.cra_init        = nx_crypto_ctx_sha512_init,
--		.cra_exit        = nx_crypto_ctx_exit,
- 	}
- };
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 4e4a371ba390..78135fb13f5c 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -124,8 +124,6 @@ struct nx_sg *nx_build_sg_list(struct nx_sg *sg_head,
- 		}
- 
- 		if ((sg - sg_head) == sgmax) {
--			pr_err("nx: scatter/gather list overflow, pid: %d\n",
--			       current->pid);
- 			sg++;
- 			break;
- 		}
-@@ -702,14 +700,14 @@ int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm)
- 				  NX_MODE_AES_ECB);
- }
- 
--int nx_crypto_ctx_sha_init(struct crypto_tfm *tfm)
-+int nx_crypto_ctx_sha_init(struct crypto_shash *tfm)
- {
--	return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_SHA, NX_MODE_SHA);
-+	return nx_crypto_ctx_init(crypto_shash_ctx(tfm), NX_FC_SHA, NX_MODE_SHA);
- }
- 
--int nx_crypto_ctx_aes_xcbc_init(struct crypto_tfm *tfm)
-+int nx_crypto_ctx_aes_xcbc_init(struct crypto_shash *tfm)
- {
--	return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_AES,
-+	return nx_crypto_ctx_init(crypto_shash_ctx(tfm), NX_FC_AES,
- 				  NX_MODE_AES_XCBC_MAC);
- }
- 
-@@ -744,6 +742,11 @@ void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm)
- 	kfree_sensitive(nx_ctx->kmem);
- }
- 
-+void nx_crypto_ctx_shash_exit(struct crypto_shash *tfm)
-+{
-+	nx_crypto_ctx_exit(crypto_shash_ctx(tfm));
++	struct sha1_state *sctx = padlock_shash_desc_ctx(desc);
++
++	*sctx = (struct sha1_state){
++		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
++	};
++
++	return 0;
 +}
 +
- static int nx_probe(struct vio_dev *viodev, const struct vio_device_id *id)
- {
- 	dev_dbg(&viodev->dev, "driver probed: %s resource id: 0x%x\n",
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index b1f6634a1644..36974f08490a 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -3,6 +3,7 @@
- #ifndef __NX_H__
- #define __NX_H__
++static int padlock_sha256_init(struct shash_desc *desc)
++{
++	struct sha256_state *sctx = padlock_shash_desc_ctx(desc);
++
++	sha256_init(sctx);
++	return 0;
+ }
  
-+#include <asm/vio.h>
- #include <crypto/ctr.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/hash.h>
-@@ -147,14 +148,15 @@ struct scatterlist;
- /* prototypes */
- int nx_crypto_ctx_aes_ccm_init(struct crypto_aead *tfm);
- int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm);
--int nx_crypto_ctx_aes_xcbc_init(struct crypto_tfm *tfm);
-+int nx_crypto_ctx_aes_xcbc_init(struct crypto_shash *tfm);
- int nx_crypto_ctx_aes_ctr_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_aes_cbc_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm);
--int nx_crypto_ctx_sha_init(struct crypto_tfm *tfm);
-+int nx_crypto_ctx_sha_init(struct crypto_shash *tfm);
- void nx_crypto_ctx_exit(struct crypto_tfm *tfm);
- void nx_crypto_ctx_skcipher_exit(struct crypto_skcipher *tfm);
- void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm);
-+void nx_crypto_ctx_shash_exit(struct crypto_shash *tfm);
- void nx_ctx_init(struct nx_crypto_ctx *nx_ctx, unsigned int function);
- int nx_hcall_sync(struct nx_crypto_ctx *ctx, struct vio_pfo_op *op,
- 		  u32 may_sleep);
+ static int padlock_sha_update(struct shash_desc *desc,
+ 			      const u8 *data, unsigned int length)
+ {
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
++	struct padlock_sha_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	u8 *state = padlock_shash_desc_ctx(desc);
++	HASH_REQUEST_ON_STACK(req, ctx->fallback);
++	int remain;
+ 
+-	return crypto_shash_update(&dctx->fallback, data, length);
++	ahash_request_set_callback(req, 0, NULL, NULL);
++	ahash_request_set_virt(req, data, NULL, length);
++	remain = crypto_ahash_import(req, state) ?:
++		 crypto_ahash_update(req);
++	if (remain < 0)
++		return remain;
++	return crypto_ahash_export(req, state) ?: remain;
+ }
+ 
+ static int padlock_sha_export(struct shash_desc *desc, void *out)
+ {
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
+-
+-	return crypto_shash_export(&dctx->fallback, out);
++	memcpy(out, padlock_shash_desc_ctx(desc),
++	       crypto_shash_coresize(desc->tfm));
++	return 0;
+ }
+ 
+ static int padlock_sha_import(struct shash_desc *desc, const void *in)
+ {
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
+-	struct padlock_sha_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	unsigned int bs = crypto_shash_blocksize(desc->tfm);
++	unsigned int ss = crypto_shash_coresize(desc->tfm);
++	u64 *state = padlock_shash_desc_ctx(desc);
+ 
+-	dctx->fallback.tfm = ctx->fallback;
+-	return crypto_shash_import(&dctx->fallback, in);
++	memcpy(state, in, ss);
++
++	/* Stop evil imports from generating a fault. */
++	state[ss / 8 - 1] &= ~(bs - 1);
++
++	return 0;
+ }
+ 
+ static inline void padlock_output_block(uint32_t *src,
+@@ -69,65 +93,38 @@ static inline void padlock_output_block(uint32_t *src,
+ 		*dst++ = swab32(*src++);
+ }
+ 
++static int padlock_sha_finup(struct shash_desc *desc, const u8 *in,
++			     unsigned int count, u8 *out)
++{
++	struct padlock_sha_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	HASH_REQUEST_ON_STACK(req, ctx->fallback);
++
++	ahash_request_set_callback(req, 0, NULL, NULL);
++	ahash_request_set_virt(req, in, out, count);
++	return crypto_ahash_import(req, padlock_shash_desc_ctx(desc)) ?:
++	       crypto_ahash_finup(req);
++}
++
+ static int padlock_sha1_finup(struct shash_desc *desc, const u8 *in,
+ 			      unsigned int count, u8 *out)
+ {
+ 	/* We can't store directly to *out as it may be unaligned. */
+ 	/* BTW Don't reduce the buffer size below 128 Bytes!
+ 	 *     PadLock microcode needs it that big. */
+-	char buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
+-		((aligned(STACK_ALIGN)));
+-	char *result = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
+-	struct sha1_state state;
+-	unsigned int space;
+-	unsigned int leftover;
+-	int err;
++	struct sha1_state *state = padlock_shash_desc_ctx(desc);
++	u64 start = state->count;
+ 
+-	err = crypto_shash_export(&dctx->fallback, &state);
+-	if (err)
+-		goto out;
+-
+-	if (state.count + count > ULONG_MAX)
+-		return crypto_shash_finup(&dctx->fallback, in, count, out);
+-
+-	leftover = ((state.count - 1) & (SHA1_BLOCK_SIZE - 1)) + 1;
+-	space =  SHA1_BLOCK_SIZE - leftover;
+-	if (space) {
+-		if (count > space) {
+-			err = crypto_shash_update(&dctx->fallback, in, space) ?:
+-			      crypto_shash_export(&dctx->fallback, &state);
+-			if (err)
+-				goto out;
+-			count -= space;
+-			in += space;
+-		} else {
+-			memcpy(state.buffer + leftover, in, count);
+-			in = state.buffer;
+-			count += leftover;
+-			state.count &= ~(SHA1_BLOCK_SIZE - 1);
+-		}
+-	}
+-
+-	memcpy(result, &state.state, SHA1_DIGEST_SIZE);
++	if (start + count > ULONG_MAX)
++		return padlock_sha_finup(desc, in, count, out);
+ 
+ 	asm volatile (".byte 0xf3,0x0f,0xa6,0xc8" /* rep xsha1 */
+ 		      : \
+-		      : "c"((unsigned long)state.count + count), \
+-			"a"((unsigned long)state.count), \
+-			"S"(in), "D"(result));
++		      : "c"((unsigned long)start + count), \
++			"a"((unsigned long)start), \
++			"S"(in), "D"(state));
+ 
+-	padlock_output_block((uint32_t *)result, (uint32_t *)out, 5);
+-
+-out:
+-	return err;
+-}
+-
+-static int padlock_sha1_final(struct shash_desc *desc, u8 *out)
+-{
+-	const u8 *buf = (void *)desc;
+-
+-	return padlock_sha1_finup(desc, buf, 0, out);
++	padlock_output_block(state->state, (uint32_t *)out, 5);
++	return 0;
+ }
+ 
+ static int padlock_sha256_finup(struct shash_desc *desc, const u8 *in,
+@@ -136,79 +133,41 @@ static int padlock_sha256_finup(struct shash_desc *desc, const u8 *in,
+ 	/* We can't store directly to *out as it may be unaligned. */
+ 	/* BTW Don't reduce the buffer size below 128 Bytes!
+ 	 *     PadLock microcode needs it that big. */
+-	char buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
+-		((aligned(STACK_ALIGN)));
+-	char *result = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
+-	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
+-	struct sha256_state state;
+-	unsigned int space;
+-	unsigned int leftover;
+-	int err;
++	struct sha256_state *state = padlock_shash_desc_ctx(desc);
++	u64 start = state->count;
+ 
+-	err = crypto_shash_export(&dctx->fallback, &state);
+-	if (err)
+-		goto out;
+-
+-	if (state.count + count > ULONG_MAX)
+-		return crypto_shash_finup(&dctx->fallback, in, count, out);
+-
+-	leftover = ((state.count - 1) & (SHA256_BLOCK_SIZE - 1)) + 1;
+-	space =  SHA256_BLOCK_SIZE - leftover;
+-	if (space) {
+-		if (count > space) {
+-			err = crypto_shash_update(&dctx->fallback, in, space) ?:
+-			      crypto_shash_export(&dctx->fallback, &state);
+-			if (err)
+-				goto out;
+-			count -= space;
+-			in += space;
+-		} else {
+-			memcpy(state.buf + leftover, in, count);
+-			in = state.buf;
+-			count += leftover;
+-			state.count &= ~(SHA1_BLOCK_SIZE - 1);
+-		}
+-	}
+-
+-	memcpy(result, &state.state, SHA256_DIGEST_SIZE);
++	if (start + count > ULONG_MAX)
++		return padlock_sha_finup(desc, in, count, out);
+ 
+ 	asm volatile (".byte 0xf3,0x0f,0xa6,0xd0" /* rep xsha256 */
+ 		      : \
+-		      : "c"((unsigned long)state.count + count), \
+-			"a"((unsigned long)state.count), \
+-			"S"(in), "D"(result));
++		      : "c"((unsigned long)start + count), \
++			"a"((unsigned long)start), \
++			"S"(in), "D"(state));
+ 
+-	padlock_output_block((uint32_t *)result, (uint32_t *)out, 8);
+-
+-out:
+-	return err;
+-}
+-
+-static int padlock_sha256_final(struct shash_desc *desc, u8 *out)
+-{
+-	const u8 *buf = (void *)desc;
+-
+-	return padlock_sha256_finup(desc, buf, 0, out);
++	padlock_output_block(state->state, (uint32_t *)out, 8);
++	return 0;
+ }
+ 
+ static int padlock_init_tfm(struct crypto_shash *hash)
+ {
+ 	const char *fallback_driver_name = crypto_shash_alg_name(hash);
+ 	struct padlock_sha_ctx *ctx = crypto_shash_ctx(hash);
+-	struct crypto_shash *fallback_tfm;
++	struct crypto_ahash *fallback_tfm;
+ 
+ 	/* Allocate a fallback and abort if it failed. */
+-	fallback_tfm = crypto_alloc_shash(fallback_driver_name, 0,
+-					  CRYPTO_ALG_NEED_FALLBACK);
++	fallback_tfm = crypto_alloc_ahash(fallback_driver_name, 0,
++					  CRYPTO_ALG_NEED_FALLBACK |
++					  CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(fallback_tfm)) {
+ 		printk(KERN_WARNING PFX "Fallback driver '%s' could not be loaded!\n",
+ 		       fallback_driver_name);
+ 		return PTR_ERR(fallback_tfm);
+ 	}
+ 
+-	if (crypto_shash_descsize(hash) < sizeof(struct padlock_sha_desc) +
+-					  crypto_shash_descsize(fallback_tfm)) {
+-		crypto_free_shash(fallback_tfm);
++	if (crypto_shash_statesize(hash) <
++	    crypto_ahash_statesize(fallback_tfm)) {
++		crypto_free_ahash(fallback_tfm);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -221,27 +180,27 @@ static void padlock_exit_tfm(struct crypto_shash *hash)
+ {
+ 	struct padlock_sha_ctx *ctx = crypto_shash_ctx(hash);
+ 
+-	crypto_free_shash(ctx->fallback);
++	crypto_free_ahash(ctx->fallback);
+ }
+ 
+ static struct shash_alg sha1_alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+-	.init   	= 	padlock_sha_init,
++	.init   	= 	padlock_sha1_init,
+ 	.update 	=	padlock_sha_update,
+ 	.finup  	=	padlock_sha1_finup,
+-	.final  	=	padlock_sha1_final,
+ 	.export		=	padlock_sha_export,
+ 	.import		=	padlock_sha_import,
+ 	.init_tfm	=	padlock_init_tfm,
+ 	.exit_tfm	=	padlock_exit_tfm,
+-	.descsize	=	sizeof(struct padlock_sha_desc) +
+-				sizeof(struct sha1_state),
+-	.statesize	=	sizeof(struct sha1_state),
++	.descsize	=	PADLOCK_SHA_DESCSIZE,
++	.statesize	=	SHA1_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name		=	"sha1",
+ 		.cra_driver_name	=	"sha1-padlock",
+ 		.cra_priority		=	PADLOCK_CRA_PRIORITY,
+-		.cra_flags		=	CRYPTO_ALG_NEED_FALLBACK,
++		.cra_flags		=	CRYPTO_ALG_NEED_FALLBACK |
++						CRYPTO_AHASH_ALG_BLOCK_ONLY |
++						CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize		=	SHA1_BLOCK_SIZE,
+ 		.cra_ctxsize		=	sizeof(struct padlock_sha_ctx),
+ 		.cra_module		=	THIS_MODULE,
+@@ -250,22 +209,22 @@ static struct shash_alg sha1_alg = {
+ 
+ static struct shash_alg sha256_alg = {
+ 	.digestsize	=	SHA256_DIGEST_SIZE,
+-	.init   	= 	padlock_sha_init,
++	.init   	= 	padlock_sha256_init,
+ 	.update 	=	padlock_sha_update,
+ 	.finup  	=	padlock_sha256_finup,
+-	.final  	=	padlock_sha256_final,
++	.init_tfm	=	padlock_init_tfm,
+ 	.export		=	padlock_sha_export,
+ 	.import		=	padlock_sha_import,
+-	.init_tfm	=	padlock_init_tfm,
+ 	.exit_tfm	=	padlock_exit_tfm,
+-	.descsize	=	sizeof(struct padlock_sha_desc) +
+-				sizeof(struct sha256_state),
+-	.statesize	=	sizeof(struct sha256_state),
++	.descsize	=	PADLOCK_SHA_DESCSIZE,
++	.statesize	=	sizeof(struct crypto_sha256_state),
+ 	.base		=	{
+ 		.cra_name		=	"sha256",
+ 		.cra_driver_name	=	"sha256-padlock",
+ 		.cra_priority		=	PADLOCK_CRA_PRIORITY,
+-		.cra_flags		=	CRYPTO_ALG_NEED_FALLBACK,
++		.cra_flags		=	CRYPTO_ALG_NEED_FALLBACK |
++						CRYPTO_AHASH_ALG_BLOCK_ONLY |
++						CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize		=	SHA256_BLOCK_SIZE,
+ 		.cra_ctxsize		=	sizeof(struct padlock_sha_ctx),
+ 		.cra_module		=	THIS_MODULE,
+@@ -274,207 +233,58 @@ static struct shash_alg sha256_alg = {
+ 
+ /* Add two shash_alg instance for hardware-implemented *
+ * multiple-parts hash supported by VIA Nano Processor.*/
+-static int padlock_sha1_init_nano(struct shash_desc *desc)
+-{
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-
+-	*sctx = (struct sha1_state){
+-		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+-	};
+-
+-	return 0;
+-}
+ 
+ static int padlock_sha1_update_nano(struct shash_desc *desc,
+-			const u8 *data,	unsigned int len)
++				    const u8 *src, unsigned int len)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
+ 	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
+-	u8 buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
+-		((aligned(STACK_ALIGN)));
+-	u8 *dst = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
++	struct sha1_state *state = padlock_shash_desc_ctx(desc);
++	int blocks = len / SHA1_BLOCK_SIZE;
+ 
+-	partial = sctx->count & 0x3f;
+-	sctx->count += len;
+-	done = 0;
+-	src = data;
+-	memcpy(dst, (u8 *)(sctx->state), SHA1_DIGEST_SIZE);
++	len -= blocks * SHA1_BLOCK_SIZE;
++	state->count += blocks * SHA1_BLOCK_SIZE;
+ 
+-	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+-
+-		/* Append the bytes in state's buffer to a block to handle */
+-		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buffer + partial, data,
+-				done + SHA1_BLOCK_SIZE);
+-			src = sctx->buffer;
+-			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
+-			: "+S"(src), "+D"(dst) \
+-			: "a"((long)-1), "c"((unsigned long)1));
+-			done += SHA1_BLOCK_SIZE;
+-			src = data + done;
+-		}
+-
+-		/* Process the left bytes from the input data */
+-		if (len - done >= SHA1_BLOCK_SIZE) {
+-			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
+-			: "+S"(src), "+D"(dst)
+-			: "a"((long)-1),
+-			"c"((unsigned long)((len - done) / SHA1_BLOCK_SIZE)));
+-			done += ((len - done) - (len - done) % SHA1_BLOCK_SIZE);
+-			src = data + done;
+-		}
+-		partial = 0;
+-	}
+-	memcpy((u8 *)(sctx->state), dst, SHA1_DIGEST_SIZE);
+-	memcpy(sctx->buffer + partial, src, len - done);
+-
+-	return 0;
++	/* Process the left bytes from the input data */
++	asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
++		      : "+S"(src), "+D"(state)
++		      : "a"((long)-1),
++			"c"((unsigned long)blocks));
++	return len;
+ }
+ 
+-static int padlock_sha1_final_nano(struct shash_desc *desc, u8 *out)
+-{
+-	struct sha1_state *state = (struct sha1_state *)shash_desc_ctx(desc);
+-	unsigned int partial, padlen;
+-	__be64 bits;
+-	static const u8 padding[64] = { 0x80, };
+-
+-	bits = cpu_to_be64(state->count << 3);
+-
+-	/* Pad out to 56 mod 64 */
+-	partial = state->count & 0x3f;
+-	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
+-	padlock_sha1_update_nano(desc, padding, padlen);
+-
+-	/* Append length field bytes */
+-	padlock_sha1_update_nano(desc, (const u8 *)&bits, sizeof(bits));
+-
+-	/* Swap to output */
+-	padlock_output_block((uint32_t *)(state->state), (uint32_t *)out, 5);
+-
+-	return 0;
+-}
+-
+-static int padlock_sha256_init_nano(struct shash_desc *desc)
+-{
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
+-
+-	*sctx = (struct sha256_state){
+-		.state = { SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3, \
+-				SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7},
+-	};
+-
+-	return 0;
+-}
+-
+-static int padlock_sha256_update_nano(struct shash_desc *desc, const u8 *data,
++static int padlock_sha256_update_nano(struct shash_desc *desc, const u8 *src,
+ 			  unsigned int len)
+ {
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
+ 	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
+-	u8 buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
+-		((aligned(STACK_ALIGN)));
+-	u8 *dst = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
++	struct crypto_sha256_state *state = padlock_shash_desc_ctx(desc);
++	int blocks = len / SHA256_BLOCK_SIZE;
+ 
+-	partial = sctx->count & 0x3f;
+-	sctx->count += len;
+-	done = 0;
+-	src = data;
+-	memcpy(dst, (u8 *)(sctx->state), SHA256_DIGEST_SIZE);
++	len -= blocks * SHA256_BLOCK_SIZE;
++	state->count += blocks * SHA256_BLOCK_SIZE;
+ 
+-	if ((partial + len) >= SHA256_BLOCK_SIZE) {
+-
+-		/* Append the bytes in state's buffer to a block to handle */
+-		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buf + partial, data,
+-				done + SHA256_BLOCK_SIZE);
+-			src = sctx->buf;
+-			asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
+-			: "+S"(src), "+D"(dst)
+-			: "a"((long)-1), "c"((unsigned long)1));
+-			done += SHA256_BLOCK_SIZE;
+-			src = data + done;
+-		}
+-
+-		/* Process the left bytes from input data*/
+-		if (len - done >= SHA256_BLOCK_SIZE) {
+-			asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
+-			: "+S"(src), "+D"(dst)
+-			: "a"((long)-1),
+-			"c"((unsigned long)((len - done) / 64)));
+-			done += ((len - done) - (len - done) % 64);
+-			src = data + done;
+-		}
+-		partial = 0;
+-	}
+-	memcpy((u8 *)(sctx->state), dst, SHA256_DIGEST_SIZE);
+-	memcpy(sctx->buf + partial, src, len - done);
+-
+-	return 0;
+-}
+-
+-static int padlock_sha256_final_nano(struct shash_desc *desc, u8 *out)
+-{
+-	struct sha256_state *state =
+-		(struct sha256_state *)shash_desc_ctx(desc);
+-	unsigned int partial, padlen;
+-	__be64 bits;
+-	static const u8 padding[64] = { 0x80, };
+-
+-	bits = cpu_to_be64(state->count << 3);
+-
+-	/* Pad out to 56 mod 64 */
+-	partial = state->count & 0x3f;
+-	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
+-	padlock_sha256_update_nano(desc, padding, padlen);
+-
+-	/* Append length field bytes */
+-	padlock_sha256_update_nano(desc, (const u8 *)&bits, sizeof(bits));
+-
+-	/* Swap to output */
+-	padlock_output_block((uint32_t *)(state->state), (uint32_t *)out, 8);
+-
+-	return 0;
+-}
+-
+-static int padlock_sha_export_nano(struct shash_desc *desc,
+-				void *out)
+-{
+-	int statesize = crypto_shash_statesize(desc->tfm);
+-	void *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, statesize);
+-	return 0;
+-}
+-
+-static int padlock_sha_import_nano(struct shash_desc *desc,
+-				const void *in)
+-{
+-	int statesize = crypto_shash_statesize(desc->tfm);
+-	void *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, statesize);
+-	return 0;
++	/* Process the left bytes from input data*/
++	asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
++		      : "+S"(src), "+D"(state)
++		      : "a"((long)-1),
++		      "c"((unsigned long)blocks));
++	return len;
+ }
+ 
+ static struct shash_alg sha1_alg_nano = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+-	.init		=	padlock_sha1_init_nano,
++	.init		=	padlock_sha1_init,
+ 	.update		=	padlock_sha1_update_nano,
+-	.final		=	padlock_sha1_final_nano,
+-	.export		=	padlock_sha_export_nano,
+-	.import		=	padlock_sha_import_nano,
+-	.descsize	=	sizeof(struct sha1_state),
+-	.statesize	=	sizeof(struct sha1_state),
++	.finup  	=	padlock_sha1_finup,
++	.export		=	padlock_sha_export,
++	.import		=	padlock_sha_import,
++	.descsize	=	PADLOCK_SHA_DESCSIZE,
++	.statesize	=	SHA1_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name		=	"sha1",
+ 		.cra_driver_name	=	"sha1-padlock-nano",
+ 		.cra_priority		=	PADLOCK_CRA_PRIORITY,
++		.cra_flags		=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++						CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize		=	SHA1_BLOCK_SIZE,
+ 		.cra_module		=	THIS_MODULE,
+ 	}
+@@ -482,17 +292,19 @@ static struct shash_alg sha1_alg_nano = {
+ 
+ static struct shash_alg sha256_alg_nano = {
+ 	.digestsize	=	SHA256_DIGEST_SIZE,
+-	.init		=	padlock_sha256_init_nano,
++	.init		=	padlock_sha256_init,
+ 	.update		=	padlock_sha256_update_nano,
+-	.final		=	padlock_sha256_final_nano,
+-	.export		=	padlock_sha_export_nano,
+-	.import		=	padlock_sha_import_nano,
+-	.descsize	=	sizeof(struct sha256_state),
+-	.statesize	=	sizeof(struct sha256_state),
++	.finup		=	padlock_sha256_finup,
++	.export		=	padlock_sha_export,
++	.import		=	padlock_sha_import,
++	.descsize	=	PADLOCK_SHA_DESCSIZE,
++	.statesize	=	sizeof(struct crypto_sha256_state),
+ 	.base		=	{
+ 		.cra_name		=	"sha256",
+ 		.cra_driver_name	=	"sha256-padlock-nano",
+ 		.cra_priority		=	PADLOCK_CRA_PRIORITY,
++		.cra_flags		=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++						CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize		=	SHA256_BLOCK_SIZE,
+ 		.cra_module		=	THIS_MODULE,
+ 	}
 -- 
 2.39.5
 
