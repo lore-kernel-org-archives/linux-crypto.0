@@ -1,43 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A40422CBF7
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D81522E406
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744785870; cv=none; b=aKsuIzwOwbv7fIgNlt0tZ3/J4Kmt22wOBVHJz5rqyzYLoEEirYWECHQpanS5EQDXojP/SJmFtKJO231JFiUCk52swGLidRyb/edhvaEdeuyqmivnjhUi2uApCr1urZuTQe4PkdKc24zznGb+TIq7VpwVB5/clUp8D1EDVrktlqU=
+	t=1744785872; cv=none; b=epfmWqaHK+3T8+7AgiYUPgMHhU44rdmzi0ttWZjD13mB2LIR1gRSEwIbETuq4sYy2/kDBQodV2JOyzPlhy1F9vCz6BfmEA6cvvvU3bnUDupIQKwCIp0z3AJO0WwzAGdjqk5JnLG/eMUQupX/4jPsoiJfA51mpZiDFDgYS6fEkII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744785870; c=relaxed/simple;
-	bh=PGPXyoRkh+P/KyHpgJxeayybp+DWdUZpptPRS7QEKuI=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=NHy5TcDHLMZ9yFjkzxmKk1duUki0rTrsIKYpflngI7N47Mb6XjR24mRnCh9qH/VJL4iK1OmfG642HSuuD0VlAer70+s/mLu1xrHwFJ8sFR7Pa2sqCevaXO7Q6EdD0NmHlDeymX1JMkvMtzMYw6O30dYfyh9tifgb9y1no1hRsqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Yab83KyK; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785872; c=relaxed/simple;
+	bh=aKizr4QM85eegn9lwWqWK93PIqAlICCda+52LGRMlWo=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=LUqsjduY39A+AmzRu0msiJ1SBm0H+6fukeZF0MrJyEOeoHjg+Zzj06XXEiVM2WbEpZIx0JX/FNHtZ7aUWMB+8xcvqyXEsKuPjgRBLiPLfMVdPk3GRcc+mrT38lAc1bLxOWUhqmiRGIVzFXuM0CK6EK4mV2C4iFroMdvsRVDBwyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=tAbdo7ZM; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Yab83KyK"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="tAbdo7ZM"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=b94ooEKlqlYjFWw6S6vLac/TUl6o8Q6QLEq1tvu/81Y=; b=Yab83KyKltaihL30f1mndytTUb
-	leb47SxspS7yXvbcl8xMXwKuc43IkExvjyD2uFmUoNkiJLIt2zrHNi/KeF4+exfNxMAOo5G5Og91w
-	ZR54LvoJ11ZHo2yV8mOGLTC26wfo9NPJfNOyQmorNcfdhTkY44tiz8NnrFL9Q2aBPpcrTdqS4gSlq
-	UYMBKFl2UWV4njhDq4T46q87tQg3D1EGHlGqaGgwYYIU/0VhokqOPq1guic+Ph+s9vAXA7T97/Jo9
-	S0zWomGocBo9U4gyzue4ATN8nPHGXjgOPm92ivrUhz0DWNF6aEdzgzghkHVd4zQridnlnPE0v8bOV
-	hmjHl07g==;
+	bh=/AnSWJWJLYN2EoqnshU0N4/bzL4fmyQmcG+XoLTEv2M=; b=tAbdo7ZMt3GJiy7LgtYgTqcNqa
+	jYp7M3ongvlHZ+cZhekA66nAeAywOoFjqingI2ZNrlYGi6lcGhhhcYAraiuhgfT5St/1gtbtAep8p
+	DaxS0nu828VsT1wWln1o5gHJkuVBbvEt/prP/22Sp0j8W1VxZynCKg419mjOrprGgRRnMK2jNPb8L
+	nbFwTn1Cw7Knh+VPRqIFCYZ24vLEhMMSL6W/VFu3Hyd0NXj5rNvdFaVSDcC5eXjzUU92Mv0F2HHDH
+	bbUQlXMFr3BWeI07mHMjrKuOl7qecbpujZCbX/cs74a5d/fNOPl9WzBBO0rVSnTSAog5we5Qfh/X9
+	0CeypHsw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4wVU-00G6P6-17;
-	Wed, 16 Apr 2025 14:44:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:44:24 +0800
-Date: Wed, 16 Apr 2025 14:44:24 +0800
-Message-Id: <d2406e9ad5e7f7c6405e5655e86527179e05ab51.1744784515.git.herbert@gondor.apana.org.au>
+	id 1u4wVW-00G6PI-23;
+	Wed, 16 Apr 2025 14:44:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:44:26 +0800
+Date: Wed, 16 Apr 2025 14:44:26 +0800
+Message-Id: <0ade915886d08eefe49a839ca694bec04d218890.1744784515.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744784515.git.herbert@gondor.apana.org.au>
 References: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 44/67] crypto: x86/sha512 - Use API partial block handling
+Subject: [PATCH 45/67] crypto: mips/octeon-sha512 - Use API partial block
+ handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,305 +48,237 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-Also remove the unnecessary SIMD fallback path.
-
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/x86/crypto/sha512_ssse3_glue.c | 79 ++++++++++-------------------
- include/crypto/sha2.h               |  1 +
- include/crypto/sha512_base.h        | 54 ++++++++++++++++++--
- 3 files changed, 77 insertions(+), 57 deletions(-)
+ .../mips/cavium-octeon/crypto/octeon-sha512.c | 155 +++++-------------
+ 1 file changed, 42 insertions(+), 113 deletions(-)
 
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 6d3b85e53d0e..067684c54395 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -27,17 +27,13 @@
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-sha512.c b/arch/mips/cavium-octeon/crypto/octeon-sha512.c
+index 2dee9354e33f..215311053db3 100644
+--- a/arch/mips/cavium-octeon/crypto/octeon-sha512.c
++++ b/arch/mips/cavium-octeon/crypto/octeon-sha512.c
+@@ -13,15 +13,12 @@
+  * Copyright (c) 2003 Kyle McMartin <kyle@debian.org>
+  */
  
- #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
- 
--#include <crypto/internal/hash.h>
--#include <crypto/internal/simd.h>
--#include <linux/init.h>
--#include <linux/module.h>
 -#include <linux/mm.h>
--#include <linux/string.h>
--#include <linux/types.h>
 -#include <crypto/sha2.h>
 -#include <crypto/sha512_base.h>
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
+-#include <linux/init.h>
+-#include <linux/types.h>
+-#include <linux/module.h>
+-#include <asm/byteorder.h>
+ #include <asm/octeon/octeon.h>
+ #include <crypto/internal/hash.h>
 +#include <crypto/sha2.h>
 +#include <crypto/sha512_base.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
  
- asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
- 				       const u8 *data, int blocks);
-@@ -45,11 +41,7 @@ asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
- static int sha512_update(struct shash_desc *desc, const u8 *data,
- 		       unsigned int len, sha512_block_fn *sha512_xform)
+ #include "octeon-crypto.h"
+ 
+@@ -53,60 +50,31 @@ static void octeon_sha512_read_hash(struct sha512_state *sctx)
+ 	sctx->state[7] = read_octeon_64bit_hash_sha512(7);
+ }
+ 
+-static void octeon_sha512_transform(const void *_block)
++static void octeon_sha512_transform(struct sha512_state *sctx,
++				    const u8 *src, int blocks)
  {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	const u64 *block = _block;
++	do {
++		const u64 *block = (const u64 *)src;
+ 
+-	write_octeon_64bit_block_sha512(block[0], 0);
+-	write_octeon_64bit_block_sha512(block[1], 1);
+-	write_octeon_64bit_block_sha512(block[2], 2);
+-	write_octeon_64bit_block_sha512(block[3], 3);
+-	write_octeon_64bit_block_sha512(block[4], 4);
+-	write_octeon_64bit_block_sha512(block[5], 5);
+-	write_octeon_64bit_block_sha512(block[6], 6);
+-	write_octeon_64bit_block_sha512(block[7], 7);
+-	write_octeon_64bit_block_sha512(block[8], 8);
+-	write_octeon_64bit_block_sha512(block[9], 9);
+-	write_octeon_64bit_block_sha512(block[10], 10);
+-	write_octeon_64bit_block_sha512(block[11], 11);
+-	write_octeon_64bit_block_sha512(block[12], 12);
+-	write_octeon_64bit_block_sha512(block[13], 13);
+-	write_octeon_64bit_block_sha512(block[14], 14);
+-	octeon_sha512_start(block[15]);
+-}
++		write_octeon_64bit_block_sha512(block[0], 0);
++		write_octeon_64bit_block_sha512(block[1], 1);
++		write_octeon_64bit_block_sha512(block[2], 2);
++		write_octeon_64bit_block_sha512(block[3], 3);
++		write_octeon_64bit_block_sha512(block[4], 4);
++		write_octeon_64bit_block_sha512(block[5], 5);
++		write_octeon_64bit_block_sha512(block[6], 6);
++		write_octeon_64bit_block_sha512(block[7], 7);
++		write_octeon_64bit_block_sha512(block[8], 8);
++		write_octeon_64bit_block_sha512(block[9], 9);
++		write_octeon_64bit_block_sha512(block[10], 10);
++		write_octeon_64bit_block_sha512(block[11], 11);
++		write_octeon_64bit_block_sha512(block[12], 12);
++		write_octeon_64bit_block_sha512(block[13], 13);
++		write_octeon_64bit_block_sha512(block[14], 14);
++		octeon_sha512_start(block[15]);
+ 
+-static void __octeon_sha512_update(struct sha512_state *sctx, const u8 *data,
+-				   unsigned int len)
+-{
+-	unsigned int part_len;
+-	unsigned int index;
+-	unsigned int i;
 -
--	if (!crypto_simd_usable() ||
--	    (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
+-	/* Compute number of bytes mod 128. */
+-	index = sctx->count[0] % SHA512_BLOCK_SIZE;
+-
+-	/* Update number of bytes. */
+-	if ((sctx->count[0] += len) < len)
+-		sctx->count[1]++;
+-
+-	part_len = SHA512_BLOCK_SIZE - index;
+-
+-	/* Transform as many times as possible. */
+-	if (len >= part_len) {
+-		memcpy(&sctx->buf[index], data, part_len);
+-		octeon_sha512_transform(sctx->buf);
+-
+-		for (i = part_len; i + SHA512_BLOCK_SIZE <= len;
+-			i += SHA512_BLOCK_SIZE)
+-			octeon_sha512_transform(&data[i]);
+-
+-		index = 0;
+-	} else {
+-		i = 0;
+-	}
+-
+-	/* Buffer remaining input. */
+-	memcpy(&sctx->buf[index], &data[i], len - i);
++		src += SHA512_BLOCK_SIZE;
++	} while (--blocks);
+ }
+ 
+ static int octeon_sha512_update(struct shash_desc *desc, const u8 *data,
+@@ -115,89 +83,48 @@ static int octeon_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	struct sha512_state *sctx = shash_desc_ctx(desc);
+ 	struct octeon_cop2_state state;
+ 	unsigned long flags;
+-
+-	/*
+-	 * Small updates never reach the crypto engine, so the generic sha512 is
+-	 * faster because of the heavyweight octeon_crypto_enable() /
+-	 * octeon_crypto_disable().
+-	 */
+-	if ((sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
 -		return crypto_sha512_update(desc, data, len);
 +	int remain;
  
- 	/*
- 	 * Make sure struct sha512_state begins directly with the SHA512
-@@ -58,22 +50,17 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
- 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
+ 	flags = octeon_crypto_enable(&state);
+ 	octeon_sha512_store_hash(sctx);
  
- 	kernel_fpu_begin();
--	sha512_base_do_update(desc, data, len, sha512_xform);
-+	remain = sha512_base_do_update_blocks(desc, data, len, sha512_xform);
- 	kernel_fpu_end();
+-	__octeon_sha512_update(sctx, data, len);
++	remain = sha512_base_do_update_blocks(desc, data, len,
++					      octeon_sha512_transform);
  
+ 	octeon_sha512_read_hash(sctx);
+ 	octeon_crypto_disable(&state, flags);
+-
 -	return 0;
 +	return remain;
  }
  
- static int sha512_finup(struct shash_desc *desc, const u8 *data,
- 	      unsigned int len, u8 *out, sha512_block_fn *sha512_xform)
+-static int octeon_sha512_final(struct shash_desc *desc, u8 *hash)
++static int octeon_sha512_finup(struct shash_desc *desc, const u8 *src,
++			       unsigned int len, u8 *hash)
  {
--	if (!crypto_simd_usable())
--		return crypto_sha512_finup(desc, data, len, out);
+ 	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	static u8 padding[128] = { 0x80, };
+ 	struct octeon_cop2_state state;
+-	__be64 *dst = (__be64 *)hash;
+-	unsigned int pad_len;
+ 	unsigned long flags;
+-	unsigned int index;
+-	__be64 bits[2];
+-	int i;
 -
- 	kernel_fpu_begin();
--	if (len)
--		sha512_base_do_update(desc, data, len, sha512_xform);
--	sha512_base_do_finalize(desc, sha512_xform);
-+	sha512_base_do_finup(desc, data, len, sha512_xform);
- 	kernel_fpu_end();
+-	/* Save number of bits. */
+-	bits[1] = cpu_to_be64(sctx->count[0] << 3);
+-	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
+-
+-	/* Pad out to 112 mod 128. */
+-	index = sctx->count[0] & 0x7f;
+-	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
  
- 	return sha512_base_finish(desc, out);
-@@ -91,23 +78,18 @@ static int sha512_ssse3_finup(struct shash_desc *desc, const u8 *data,
- 	return sha512_finup(desc, data, len, out, sha512_transform_ssse3);
- }
+ 	flags = octeon_crypto_enable(&state);
+ 	octeon_sha512_store_hash(sctx);
  
--/* Add padding and return the message digest. */
--static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
--{
--	return sha512_ssse3_finup(desc, NULL, 0, out);
+-	__octeon_sha512_update(sctx, padding, pad_len);
+-
+-	/* Append length (before padding). */
+-	__octeon_sha512_update(sctx, (const u8 *)bits, sizeof(bits));
++	sha512_base_do_finup(desc, src, len, octeon_sha512_transform);
+ 
+ 	octeon_sha512_read_hash(sctx);
+ 	octeon_crypto_disable(&state, flags);
+-
+-	/* Store state in digest. */
+-	for (i = 0; i < 8; i++)
+-		dst[i] = cpu_to_be64(sctx->state[i]);
+-
+-	/* Zeroize sensitive information. */
+-	memset(sctx, 0, sizeof(struct sha512_state));
+-
+-	return 0;
 -}
 -
- static struct shash_alg sha512_ssse3_algs[] = { {
+-static int octeon_sha384_final(struct shash_desc *desc, u8 *hash)
+-{
+-	u8 D[64];
+-
+-	octeon_sha512_final(desc, D);
+-
+-	memcpy(hash, D, 48);
+-	memzero_explicit(D, 64);
+-
+-	return 0;
++	return sha512_base_finish(desc, hash);
+ }
+ 
+ static struct shash_alg octeon_sha512_algs[2] = { {
  	.digestsize	=	SHA512_DIGEST_SIZE,
  	.init		=	sha512_base_init,
- 	.update		=	sha512_ssse3_update,
--	.final		=	sha512_ssse3_final,
- 	.finup		=	sha512_ssse3_finup,
+ 	.update		=	octeon_sha512_update,
+-	.final		=	octeon_sha512_final,
 -	.descsize	=	sizeof(struct sha512_state),
++	.finup		=	octeon_sha512_finup,
 +	.descsize	=	SHA512_STATE_SIZE,
  	.base		=	{
  		.cra_name	=	"sha512",
- 		.cra_driver_name =	"sha512-ssse3",
- 		.cra_priority	=	150,
+ 		.cra_driver_name=	"octeon-sha512",
+ 		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
 +		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
 +					CRYPTO_AHASH_ALG_FINUP_MAX,
  		.cra_blocksize	=	SHA512_BLOCK_SIZE,
  		.cra_module	=	THIS_MODULE,
  	}
-@@ -115,13 +97,14 @@ static struct shash_alg sha512_ssse3_algs[] = { {
+@@ -205,12 +132,14 @@ static struct shash_alg octeon_sha512_algs[2] = { {
  	.digestsize	=	SHA384_DIGEST_SIZE,
  	.init		=	sha384_base_init,
- 	.update		=	sha512_ssse3_update,
--	.final		=	sha512_ssse3_final,
- 	.finup		=	sha512_ssse3_finup,
+ 	.update		=	octeon_sha512_update,
+-	.final		=	octeon_sha384_final,
 -	.descsize	=	sizeof(struct sha512_state),
++	.finup		=	octeon_sha512_finup,
 +	.descsize	=	SHA512_STATE_SIZE,
  	.base		=	{
  		.cra_name	=	"sha384",
- 		.cra_driver_name =	"sha384-ssse3",
- 		.cra_priority	=	150,
+ 		.cra_driver_name=	"octeon-sha384",
+ 		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
 +		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
 +					CRYPTO_AHASH_ALG_FINUP_MAX,
  		.cra_blocksize	=	SHA384_BLOCK_SIZE,
  		.cra_module	=	THIS_MODULE,
  	}
-@@ -167,23 +150,18 @@ static int sha512_avx_finup(struct shash_desc *desc, const u8 *data,
- 	return sha512_finup(desc, data, len, out, sha512_transform_avx);
- }
- 
--/* Add padding and return the message digest. */
--static int sha512_avx_final(struct shash_desc *desc, u8 *out)
--{
--	return sha512_avx_finup(desc, NULL, 0, out);
--}
--
- static struct shash_alg sha512_avx_algs[] = { {
- 	.digestsize	=	SHA512_DIGEST_SIZE,
- 	.init		=	sha512_base_init,
- 	.update		=	sha512_avx_update,
--	.final		=	sha512_avx_final,
- 	.finup		=	sha512_avx_finup,
--	.descsize	=	sizeof(struct sha512_state),
-+	.descsize	=	SHA512_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	=	"sha512",
- 		.cra_driver_name =	"sha512-avx",
- 		.cra_priority	=	160,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
-@@ -191,13 +169,14 @@ static struct shash_alg sha512_avx_algs[] = { {
- 	.digestsize	=	SHA384_DIGEST_SIZE,
- 	.init		=	sha384_base_init,
- 	.update		=	sha512_avx_update,
--	.final		=	sha512_avx_final,
- 	.finup		=	sha512_avx_finup,
--	.descsize	=	sizeof(struct sha512_state),
-+	.descsize	=	SHA512_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	=	"sha384",
- 		.cra_driver_name =	"sha384-avx",
- 		.cra_priority	=	160,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
-@@ -233,23 +212,18 @@ static int sha512_avx2_finup(struct shash_desc *desc, const u8 *data,
- 	return sha512_finup(desc, data, len, out, sha512_transform_rorx);
- }
- 
--/* Add padding and return the message digest. */
--static int sha512_avx2_final(struct shash_desc *desc, u8 *out)
--{
--	return sha512_avx2_finup(desc, NULL, 0, out);
--}
--
- static struct shash_alg sha512_avx2_algs[] = { {
- 	.digestsize	=	SHA512_DIGEST_SIZE,
- 	.init		=	sha512_base_init,
- 	.update		=	sha512_avx2_update,
--	.final		=	sha512_avx2_final,
- 	.finup		=	sha512_avx2_finup,
--	.descsize	=	sizeof(struct sha512_state),
-+	.descsize	=	SHA512_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	=	"sha512",
- 		.cra_driver_name =	"sha512-avx2",
- 		.cra_priority	=	170,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
-@@ -257,13 +231,14 @@ static struct shash_alg sha512_avx2_algs[] = { {
- 	.digestsize	=	SHA384_DIGEST_SIZE,
- 	.init		=	sha384_base_init,
- 	.update		=	sha512_avx2_update,
--	.final		=	sha512_avx2_final,
- 	.finup		=	sha512_avx2_finup,
--	.descsize	=	sizeof(struct sha512_state),
-+	.descsize	=	SHA512_STATE_SIZE,
- 	.base		=	{
- 		.cra_name	=	"sha384",
- 		.cra_driver_name =	"sha384-avx2",
- 		.cra_priority	=	170,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
-diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
-index a913bad5dd3b..e9ad7ab955aa 100644
---- a/include/crypto/sha2.h
-+++ b/include/crypto/sha2.h
-@@ -19,6 +19,7 @@
- 
- #define SHA512_DIGEST_SIZE      64
- #define SHA512_BLOCK_SIZE       128
-+#define SHA512_STATE_SIZE       80
- 
- #define SHA224_H0	0xc1059ed8UL
- #define SHA224_H1	0x367cd507UL
-diff --git a/include/crypto/sha512_base.h b/include/crypto/sha512_base.h
-index 679916a84cb2..8cb172e52dc0 100644
---- a/include/crypto/sha512_base.h
-+++ b/include/crypto/sha512_base.h
-@@ -10,10 +10,7 @@
- 
- #include <crypto/internal/hash.h>
- #include <crypto/sha2.h>
--#include <linux/crypto.h>
--#include <linux/module.h>
- #include <linux/string.h>
--
- #include <linux/unaligned.h>
- 
- typedef void (sha512_block_fn)(struct sha512_state *sst, u8 const *src,
-@@ -93,6 +90,55 @@ static inline int sha512_base_do_update(struct shash_desc *desc,
- 	return 0;
- }
- 
-+static inline int sha512_base_do_update_blocks(struct shash_desc *desc,
-+					       const u8 *data,
-+					       unsigned int len,
-+					       sha512_block_fn *block_fn)
-+{
-+	unsigned int remain = len - round_down(len, SHA512_BLOCK_SIZE);
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
-+
-+	len -= remain;
-+	sctx->count[0] += len;
-+	if (sctx->count[0] < len)
-+		sctx->count[1]++;
-+	block_fn(sctx, data, len / SHA512_BLOCK_SIZE);
-+	return remain;
-+}
-+
-+static inline int sha512_base_do_finup(struct shash_desc *desc, const u8 *src,
-+				       unsigned int len,
-+				       sha512_block_fn *block_fn)
-+{
-+	unsigned int bit_offset = SHA512_BLOCK_SIZE / 8 - 2;
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
-+	union {
-+		__be64 b64[SHA512_BLOCK_SIZE / 4];
-+		u8 u8[SHA512_BLOCK_SIZE * 2];
-+	} block = {};
-+
-+	if (len >= SHA512_BLOCK_SIZE) {
-+		int remain;
-+
-+		remain = sha512_base_do_update_blocks(desc, src, len, block_fn);
-+		src += len - remain;
-+		len = remain;
-+	}
-+
-+	if (len >= bit_offset * 8)
-+		bit_offset += SHA512_BLOCK_SIZE / 8;
-+	memcpy(&block, src, len);
-+	block.u8[len] = 0x80;
-+	sctx->count[0] += len;
-+	block.b64[bit_offset] = cpu_to_be64(sctx->count[1] << 3 |
-+					    sctx->count[0] >> 61);
-+	block.b64[bit_offset + 1] = cpu_to_be64(sctx->count[0] << 3);
-+	block_fn(sctx, block.u8, (bit_offset + 2) * 8 / SHA512_BLOCK_SIZE);
-+	memzero_explicit(&block, sizeof(block));
-+
-+	return 0;
-+}
-+
- static inline int sha512_base_do_finalize(struct shash_desc *desc,
- 					  sha512_block_fn *block_fn)
- {
-@@ -126,8 +172,6 @@ static inline int sha512_base_finish(struct shash_desc *desc, u8 *out)
- 
- 	for (i = 0; digest_size > 0; i++, digest_size -= sizeof(__be64))
- 		put_unaligned_be64(sctx->state[i], digest++);
--
--	memzero_explicit(sctx, sizeof(*sctx));
- 	return 0;
- }
- 
 -- 
 2.39.5
 
