@@ -1,102 +1,270 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2067.outbound.protection.outlook.com [40.107.94.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A91123AE79;
-	Wed, 16 Apr 2025 09:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744797357; cv=none; b=H52uFpG8+qbibzWRENYC+lwqnroaKTq22oI/wCEP7huVBY4gz77hEpOiWqzSaB6tWR2n+VBmwUfTI5dZJwScwQIPT5kJqx4sJISfvzOMn8L1W/mupTY+gIfgAYiswAsZe3B30urg3u3aJb9veJwGeQeafS6jOHMbTWoKOZXGZJQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744797357; c=relaxed/simple;
-	bh=eDDs43dEmiFVlnLk6aV1gwYevt0KcicPW6D8DnobW7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HlUU4HfLIzp6IFHbtlDmXVAHLz5ZVVgodbAqXZREHKZc2/xPm2NzNgoMAyoIobew7DFW/N3c7nbdMIODIWiqllVb7YFDQ3b21jfHlZR7pZiR2KIP99RdgHNhlzKdgG0MN0bw9ms0ZfKfw71GxhKzLBe+aNohdOdv6SP5GM2mPBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m9QDIN57; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3387201113;
+	Wed, 16 Apr 2025 15:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744816330; cv=fail; b=ZIZ3+/a9+l29kUZSkfX8+49ousQWXwcclxyLCiw6OaKMGmPkO61+3eo531wu+UNyxwc31keVvhKLo53Y5oZjoovj7jlIvd0V5CQmRVatFBKWrfUXEQlKDfpxL7A835Y0X4nRYB23FnFAGCRSkK8Oa9KVwuuCFtrmiTuSqIMUuQ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744816330; c=relaxed/simple;
+	bh=6MspGUhvhfaqUhAnUQye//YzrAudd8iyBrIOd4gpIRo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bnLc3O3Yb5Nu8IR0p4V7cQvZIdkumyEeQXNucNND70tJMYRhEIr30fVwxUQQtcwjpSblyWCCs+uuW3gGuCx5TGf5vSFSh+CllpjZXPgtFL5k9ZLSJf/X65prRMHCQXXnb1HOzsn4mzm+qGyaG3WZ0khresFUXvEBA9b3AXeQ9zk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s13wtH4/; arc=fail smtp.client-ip=40.107.94.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m9QDIN57"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43cf0d787eeso75377495e9.3;
-        Wed, 16 Apr 2025 02:55:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744797354; x=1745402154; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CFOCTI/pVmuX8N5R8+4QyY9BGqjF4fNy/dpUPF7Hk3w=;
-        b=m9QDIN57NI/RJsXogHV97ps0sZc9p/bN3lBVaJFDVLP+MZp8q78XD2gfrAdpPtN01I
-         kAQ/93uYtU8TMCtYjl8B99fLMJPFwCiYZ+kYfbNlUXCnVMz9nTI20SgyEh2j2v1kAOno
-         payQtDhkpHtVRIsKLJGSGOz+tu7DuTDz6Owoj/fiZs8aRg5cMEXY8LVBKkjk86UqkEuH
-         eDP2L73RLMh/EyjpL0P0yhf9gv8lLasMyU0iQmsdv8J0JPnuGCKV2bWyO98dT+297ASO
-         Y+QDGy2GH2SqWbpaG5qsHpphrzxdfFIzm5KnH4yy+1QMyIBBZSrV/fTnppzZ0eMXTfFG
-         md3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744797354; x=1745402154;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CFOCTI/pVmuX8N5R8+4QyY9BGqjF4fNy/dpUPF7Hk3w=;
-        b=YaR5nKUsvvjeE8iH9aTPP0RATWvtEPKBj/5D0aVU9b2/TawDNrZ7Ruz8hupubls9WS
-         CMML6iYuDVcK54OUUgVrHM4VDd4GRdU0ZojwV+JzeB1y48XcrQiI2EpdDA0hd8qU3Zfk
-         WCXYqT/idilYnmT/u2mB1N1yf2IXrCCRhH9qemgCAcOQCuSQQz2TJznsKSZQVr0tlfNl
-         +EDIKgKE9J/S0v8pOE8ioxBVWeR4ACEnfwIKevdzCtzM0AkCBAbZH41YFtBPvETYgPxR
-         3fuTj6wTo2lHuqzBG5OYwO6tZXidzSVc42qfdRZJZoE7/kwbQnOcPfc6cYfNHjokSQHt
-         fVwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7eOJiZiG973eZTpLiByZpYlISjwxAOXNcNbjos5rh+KJ/mvAuAGL4H+Rh0S/IAeVMaNKpV7vwnTpkqfM=@vger.kernel.org, AJvYcCXyvOfUoJsM2MWKmEEtry5G+kGmPC7Uef5CJ/mVCJa+Fw84IqgMpJTwfbGjS1iymCVHeLGjlp9+YoTg7sCm@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM9IuAy7WKGswnmimTctAxoOyGdE7OVMd022Xp2MPOcA9pFg3I
-	vFaW+pnw6tAuOvDMmKWkkNVqqommXMJVCWODwmk69PB0OGGweuZr
-X-Gm-Gg: ASbGncv+XeKiiD5Erymuye8RmZFdmJNQYcJ+kqpqe0jWxMDhwlCmYS/KECTOwnoYqDG
-	BqndpWMQ3NlzUNsEgUXnJ1QHdYXYwWFuZABXRGJQLEgMDCtR2NCWfp338d/YWrM+zCmHrWXgQR8
-	b/vsVYee1gljE39QU0enb6YxOA6lGlkeKQr63hQNts8PELcg8wwlRe7vND2EgVTaRR2BCA3saZR
-	7PApykEBUlb2kc0HWGk3yUEeY8XUzDqKqenzmxzAaIGPro5AZKIicOXnfglT1XUicFjGxubei2M
-	aKvGMt9HbnUzGrPMR/XrcpGMHfZuPqOCjPHt3P+uBoMsmr8ylvzA
-X-Google-Smtp-Source: AGHT+IFakZCLJe9/p0oIcP9EVvp0XPStGbEzGdVK/8A3vzfhtwwJ3pEkUIOAa93Xu3jpLcKogUzb/g==
-X-Received: by 2002:a05:600c:1994:b0:439:6118:c188 with SMTP id 5b1f17b1804b1-4405d638b04mr9926565e9.19.1744797353330;
-        Wed, 16 Apr 2025 02:55:53 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4405b4f3227sm16102365e9.20.2025.04.16.02.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 02:55:51 -0700 (PDT)
-Date: Wed, 16 Apr 2025 11:55:48 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] crypto: img-hash - use API helpers to setup fallback
- request
-Message-ID: <Z_9-pJ_lXA3AzjGC@Red>
-References: <20250407123604.2109561-1-ovidiu.panait.oss@gmail.com>
- <Z_9ie2KwYhCaK_mB@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s13wtH4/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GaN0CrTPWSi2d4C2ZGQKUjHMnh6VjKXTEq7Jfgs/TbifFScUwcxnFUwFBPiM5ML8CcqGEbMZqctKEY4LMrZz2lmbAOYcOBbpDdp+rPpSb+VpnZ3VuSKF+uAqAnqLLDkdLGmphp0WHrWFnK9uF4P3hMwXUiYUKNM5zpCYZmW1nDxxJzXOb3qP8h+TJ9P9J4fDTMxA6Gw0c/7qAIJgTH+4UELgk3h+c62JBzOPOV+6Y9ATXpwriUFdY4PPlS18KJ+4/slGH7FWb15LJDrG00Y0LiPTjc8usJKzr+tIxLHG7hxW8kknwRFJ3KuWUfijhHfVr4FebDAYD/C+VNKIxQWMvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=99K4pJelFCdWNnht9cJFR+tbi3R38NsH3m38VJ+mAYs=;
+ b=JcxWvn+JAV6ZjC6RX0ifflwCEZqKpx0vgKKLxUiuR7CNfTmjBld9ENPs1fg5vhDu/VjjroBK7BWtCUm8CzG2zLDvVRjRI9ZHpeXHaHeQwDEmMBfsdqBuaGjtE7dwZJ8bhVlx129G8lo7Q7iZ6UrIq63qogh+8LbV9QEdjxzWQ07LG5rtlNpjIqyAxwnkZgZzFBCGxli804GPpNcoJ7QEJgfcpqc+fD9PBVjm3Poz4bEGbGNmbY81m6R4yldaoU+pgYBHxzsanWm1J1Dv/zMZ7FFZ5fGK0XG4YoaUDXdLdoPkk4Yr14LLCm4rQqSp4N5sKqZNpw7pwBvjZGMiujEbMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=99K4pJelFCdWNnht9cJFR+tbi3R38NsH3m38VJ+mAYs=;
+ b=s13wtH4/1cmHHUPI2Wg5XMjjHt7pZK2YTzbuxb2SiO0hdeHEJqMvKmvqnfFeIq2gjZ81aqZIFbniUzgEBAtJPXbVnpNhm0QbJBWVavvIrLbhhvW/WndPyV7v4JIAsdf7YRt7G+tTHNH+vUqyvDCWz2IM2A8NJANwuI2QVukGS40=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9193.namprd12.prod.outlook.com (2603:10b6:610:195::14)
+ by SJ2PR12MB8650.namprd12.prod.outlook.com (2603:10b6:a03:544::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.36; Wed, 16 Apr
+ 2025 15:12:05 +0000
+Received: from CH3PR12MB9193.namprd12.prod.outlook.com
+ ([fe80::7818:d337:2640:e6c7]) by CH3PR12MB9193.namprd12.prod.outlook.com
+ ([fe80::7818:d337:2640:e6c7%5]) with mapi id 15.20.8632.025; Wed, 16 Apr 2025
+ 15:12:05 +0000
+Message-ID: <deaefc59-f6e4-2d4d-b91d-0ba7db9dfbf4@amd.com>
+Date: Wed, 16 Apr 2025 20:41:50 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 2/3] accel/amdpk: add driver for AMD PKI accelerator
+Content-Language: en-US
+To: Lukas Wunner <lukas@wunner.de>, herbert@gondor.apana.org.au
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, davem@davemloft.net,
+ dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, krzk+dt@kernel.org,
+ gregkh@linuxfoundation.org, robh@kernel.org, conor+dt@kernel.org,
+ ogabbay@kernel.org, maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+ tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+ derek.kiernan@amd.com, dragan.cvetic@amd.com, arnd@arndb.de,
+ praveen.jain@amd.com, harpreet.anand@amd.com, nikhil.agarwal@amd.com,
+ srivatsa@csail.mit.edu, code@tyhicks.com, ptsm@linux.microsoft.com,
+ linux-crypto@vger.kernel.org, Ignat Korchagin <ignat@cloudflare.com>,
+ David Howells <dhowells@redhat.com>
+References: <20250409173033.2261755-1-nipun.gupta@amd.com>
+ <20250409173033.2261755-2-nipun.gupta@amd.com>
+ <20250410-sly-inventive-squirrel-ddecbc@shite>
+ <bf851be7-74a5-8f9d-375b-b617691b6765@amd.com> <Z_wH_uCx558T0__c@wunner.de>
+From: "Gupta, Nipun" <nipun.gupta@amd.com>
+In-Reply-To: <Z_wH_uCx558T0__c@wunner.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN4P287CA0111.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:2ad::8) To CH3PR12MB9193.namprd12.prod.outlook.com
+ (2603:10b6:610:195::14)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z_9ie2KwYhCaK_mB@gondor.apana.org.au>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9193:EE_|SJ2PR12MB8650:EE_
+X-MS-Office365-Filtering-Correlation-Id: b5711897-09a7-4694-ad67-08dd7cf90bd0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RTRkTDZLNzRIT0NqN3hlazZ0d2x4KzRPQTBqL2R6L3JrVjYzVk8zSUN4ZnJp?=
+ =?utf-8?B?L0J4VzJ0S1YzSUh3ZzZ3QWZVbnVabG1Yc0tZWE04VUd6L0pNRHpBNEExOG52?=
+ =?utf-8?B?emVTTjM3clNVZVRyMnlCTkJDaE5mRmFlWlBEbVIxWnh6TU9SZHQ1QTg2M0tP?=
+ =?utf-8?B?WGFoTTV3MTl5dlQ4Y0RmK2tSaVA1L0NnSm9zWHhxbW5vaHpZL2c1djNKcll2?=
+ =?utf-8?B?aUNnVlVLQXhNb2thRWhlZXpJMkdqbUc5VW9xU0w2YVMvWUw4cGI5RVBnb3lx?=
+ =?utf-8?B?RjdTcGlINW1TMVJPeEZOa0hKOFkySEcrQ0k3Q09pbk9CWjBiaWkzWHNLdUpt?=
+ =?utf-8?B?VE1MUElZVXBKaVJJb3pMaHNibm9YWXJEazZzVkNyZ3F3VmVPRlh5ZmkrcjB2?=
+ =?utf-8?B?MldISE4wcUZieEJOOVNMdWxVOXVDcHNyQUU0SG5EZmQ2MldnZzZKcldua2l1?=
+ =?utf-8?B?N2l6eU1hc2FuUXBOZi9QaVlncGVYbVEvUytVelN4ZmlGcE9RMklFNlV3Yjg3?=
+ =?utf-8?B?N0liRm5nMHowK1VwcWZuUm5vdmQyemxNc0pzbHk2ODA1TEVualJtUElkNERQ?=
+ =?utf-8?B?MkpRbC9tekVVcTU5bTdxZkFIVG5kaG95UEZYS0VkVFdES1orbHYvdTdPaWVu?=
+ =?utf-8?B?Mzk4d1ZNc0NwNmt5WEJFRWdlTTNKck52WWdnZ2R0aHFYMFZQZmI3NUpGdjBo?=
+ =?utf-8?B?djc1K3g1aGI3UmpybDJHOGY5VFpPZXh4OS9aeWs0VUlnbkIxZkgzU3ZQMVZm?=
+ =?utf-8?B?TjgvcDBqUG5veHpyb2lra0tRS1N3WkEyNmpPY0ZqOE40T2d1N0h2MW9UTHNX?=
+ =?utf-8?B?WHVoWlR5UDVaS3lML05LY29TcnRhbkk0Uk5zRDQ5NUcxcFFDckQ5azlMbStn?=
+ =?utf-8?B?dmpxQ0R0eENtRTFvc2FCUUozczc1V1d0aTlLQW5FNTBWNVNDOTZEVmZYK3ZU?=
+ =?utf-8?B?SFlrYWVDSjJKWkZod1NwODhrNFlkcmZ3bG16RWx3L1NDNkYvbEt1YmVNSjJR?=
+ =?utf-8?B?eDFMVnlLL3FyVW1VU05tNUNnUTBPdEdBcWh1VFNTYmxQdVJEQVRudjNhQjVz?=
+ =?utf-8?B?RGlRbTJhSnpiNHliUXpheWVOZEFJS2RrSW5nU05GdnJkdVlHSmxGaVRUTFZE?=
+ =?utf-8?B?Mm12RWhOWWRhSTg0WVdqeDlHZmcvZWRjcWtnTEl2dVBWdEtDbEVLYlM3N0ov?=
+ =?utf-8?B?Yk9tZ2dyWkQ2U213eWNGYzBIbGNmdGl0T1g2TVU3UEhEOTdmQ2hRK21MdUdV?=
+ =?utf-8?B?Y29sVWxMU01aRzJPNWlnaFVmSUdEVG90eUJ0ak8rVU9EZEZHQjhYenVzd2do?=
+ =?utf-8?B?dXByTDI4QXdqdW9HVE0rUFRQcG1Qd1BwNmcrTi9rcDNhU21uS0RFTjJ2ZWc3?=
+ =?utf-8?B?YzhBUnhOTGhOUVMxMWhQdmo4ZlhLcElFdURqdVJRM1loVEJhQW5td1c2Rk42?=
+ =?utf-8?B?UHp3Yk5lNWZFVlA5NXNwNGZvS1BlTitQNTZSTGl3QTBpOCsySG02K3kwaXQ1?=
+ =?utf-8?B?MnhaY0w4K01wRkdwbjJYZXQ5N0VQSVJQOEtUQTNRZ0pHS2NwOFZzQ1lvM2VU?=
+ =?utf-8?B?cTNyaVJrbUo5VUxseXdZOGhZNThBNnVyM1pDcDFweHRtODhWOERqaE1MSDlS?=
+ =?utf-8?B?TWFOUFFUS0cvYW5la0czdUkvSVdhVkJ3MVh4SUFMeTFEWXF1VDkrS2RkZzIr?=
+ =?utf-8?B?ZlFENXdESVJ1WWlRVW5RRFNCa2g5VTNCcmZqQXcxNERJbmhkSlJEUktMQVR1?=
+ =?utf-8?B?cnRudDV0M1BVbFFlbC9qM0x0eng2aHp4VDlPQkUxSCttVnpadUJzOXNtVUFu?=
+ =?utf-8?B?MEFJbFVlb1pxR1Vac3ZHdWpqdURjMU1ZRDRUeG41NlM3clZsdlJDNXlpVHZ4?=
+ =?utf-8?B?cXVNcU1EWmJiVU9udk1WNDFMMFpMeEhiMnoxTDhsQm1GUDZnM1RYVDhQQTRB?=
+ =?utf-8?Q?onMzXLpajlM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9193.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Z0F6SGNmZXNGUEFXK0lCd0pNYWg0U2lhOFNwMTlNNHlYbFcvRUR1NHArYnJZ?=
+ =?utf-8?B?R0ljeXgzK1RWNVBVT2lTMG9FYm1xTkloME8vOGtmb3Q2Vlo3SkJ3WkxBMVdW?=
+ =?utf-8?B?eTRpZVpsUzNCTlY4UnhBdEhKODVTRnFDTHB4Y1UycW5sanZ2ZCtBeGc1SG5H?=
+ =?utf-8?B?T3FnRXlTRHFWWGh6Q3lpY3RKRG16UmlRdFV3RXR4bVpvcEFpbGJUME1jdjls?=
+ =?utf-8?B?UDBQb2lROUlqVmJiREZqT2phVEhGR0tacEdFMG5QVHMwYWEybzRCSUFIbWEv?=
+ =?utf-8?B?VGJYZkg5TEFZUUJzQ2FXSkY0aUkzWisxQVpxUURzS3NVYlNNZE8xMGRNc2pz?=
+ =?utf-8?B?U1Q5N0RwMnVMRzdOclVCeHZnTFVnQ0liZzZUVzdhdTVya3NZaENBZklGVUll?=
+ =?utf-8?B?LzlpTFlXdHdDd2F1dWFoWFIxdlp5TnM3SzUxb2VMemJlQ1lIdUo4N1I0ajFE?=
+ =?utf-8?B?RDcyazhlNG1KUjFDdUlsNVZNZEowUVlFSnNSaHR6ZHBFR0pnU0dYaTNWbkRp?=
+ =?utf-8?B?VUlxWXB4ZXRldVdGTVRSRi9TaC9NMkhaYklzNHpyTmRpM2Y2WktDZExyTWJm?=
+ =?utf-8?B?YWVTZm5kSjhNdTJ5elVNWDVpNDRBTW1KOGtpY3VDWDhpSjNZSUx0bjIzcXB3?=
+ =?utf-8?B?NTh1TEN2UHFJZ01qMnFibGs3eWMyQ212M2xXcDRRTkt4RzgwaEEwN3FoTjBO?=
+ =?utf-8?B?ZnpmQWJ6U0V4QytCaGpGQUhhT0V2WEowK3BoVjZhbm8zTXFDakJITzRQUEhI?=
+ =?utf-8?B?OEhvb1hJa3p5MXBBaHRJTzRLaTR4TDh2YlJERzl3UU50eFdhb1Rha2pFVnI0?=
+ =?utf-8?B?RmJUUnB6WTJmV3FJYlhpQStRMVhDOHpyK1hUeUhFY2RIcU9DL0xTUFd5S0dv?=
+ =?utf-8?B?N2V6SkU3YTh0WDJkbHdRQ3gzclJ6a2srVE9wVW1Na0ZSMlN6TGVTaDZvUTFG?=
+ =?utf-8?B?SDlydGNNNkJRa3pIemVqQkNsbzNXZ2txRzZJd0hmemhwa2trekxTWHR4Unda?=
+ =?utf-8?B?TnNndzltKzNOWWo2b1hsRnpNMStITkFYMkNHQWxocUI1ZzFlSW9wcVpuWW1U?=
+ =?utf-8?B?MTRlK0V6dk5PR2MvWi9lK1duWkdwMmNRUEp1REVmOVpncVIvN1J2WlJIT1VW?=
+ =?utf-8?B?NmxjN0VlQjJlVGpPWWl0RUtSc2NqZW5mUms3SG9IeHFmZHdqS2VwNlU2YUlh?=
+ =?utf-8?B?Z2RqalZRdmpSSG85aEpEV3V5VTBqUTd6ZkFteUNVZmtWeVdwWTlGVHNqV1ha?=
+ =?utf-8?B?MEtzQjg0L0VoYXl2MzBnNHo5V0UxVXdhRnRCMkdnTlZycEI3eDAzTWFMVWFx?=
+ =?utf-8?B?RytNVWRVVGszek1qOE9DckpmeXJiVnFPVnNKR0JtQ00yVWw0N0J5RlN5ZW5B?=
+ =?utf-8?B?Zm5pQlJ4Uk15QWVBSHZUSUdXMjB5K0dybG5pcUFMWmtxb2JwTGZqMkdGbEly?=
+ =?utf-8?B?VzcvRTVMRFRLRG9IZzlFZHZ2R0xkcVdpK0h5d2FBWHhGa1hHbGIvczh4NFRu?=
+ =?utf-8?B?NTcyc0l5ajk2YmI4WnVtZmlZUWEvMDBjemdzSW5PUWxuMUxrQnlzbEZ1VGlV?=
+ =?utf-8?B?MDd0WWxCMWd1dkhhQnNDeUdHd1c1MG4xWkplVDJpM212TXdDYWUyMXRhdEpq?=
+ =?utf-8?B?K1RzQ0doUytFVWxJN2ppVWMxODZOb2thOEpNUHhqQTRQdG9kRVRXbXdSNU1V?=
+ =?utf-8?B?NExqQ3dRcVlCSUwza1E0eWhHd0h6VmU3NnB1cVRBa09HTW1nbVgwY2ZzZ0xx?=
+ =?utf-8?B?VUtBNUhsd042Yk5Tb25lT0ZYM3dLWUZ0ZDFZa2duUUJiNndLYXF5NzFLblJm?=
+ =?utf-8?B?ek9vQ1A3SnVyc3hDeUJPa012aVpqQzM5LzBjSUgyYzFqSFp5aUVaY25aelN3?=
+ =?utf-8?B?Zml6eWkwL3pIL2FabFV0b240cTM5ME8vdWZhNW1CRFBubENlblU4VmRTdHBD?=
+ =?utf-8?B?V3lQOWJ1VHZqYndwZnhDUk81RnVEdE4rQWlPWkdSRmw5dVhMRHZCeW92ai9U?=
+ =?utf-8?B?U2RYL2t5SnZKZzlMY1NsRE42Q0RFMFppclFUUFlFUERNTTZKZEdKOEFsSjVW?=
+ =?utf-8?B?YUFzU21pSkVQNElGYmV6NTdsbDFyMHdKSHFSQW4za3hHU1JrL2FhVEQzemcz?=
+ =?utf-8?Q?FteR2awOiWm4ZwqWCkc6A5aAa?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5711897-09a7-4694-ad67-08dd7cf90bd0
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9193.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2025 15:12:04.8491
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eW063GKidzpYiGp56KCER6JxpyB9uaq10P/GRtj/2dhYT3SRVj7KHxogVx9l6JBW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8650
 
-Le Wed, Apr 16, 2025 at 03:55:39PM +0800, Herbert Xu a écrit :
-> On Mon, Apr 07, 2025 at 03:36:01PM +0300, Ovidiu Panait wrote:
-> > Rather than setting up the fallback request by hand, use
-> > ahash_request_set_callback() and ahash_request_set_crypt() API helpers
-> > to properly setup the new request.
-> > 
-> > This also ensures that the completion callback is properly passed down
-> > to the fallback algorithm, which avoids a crash with async fallbacks.
-> > 
-> > Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-> > ---
-> >  drivers/crypto/img-hash.c | 41 ++++++++++++++++++++++-----------------
-> >  1 file changed, 23 insertions(+), 18 deletions(-)
+
+
+On 14-04-2025 00:22, Lukas Wunner wrote:
+> On Fri, Apr 11, 2025 at 10:21:03AM +0530, Gupta, Nipun wrote:
+>> On 10-04-2025 13:06, Krzysztof Kozlowski wrote:
+>>> On Wed, Apr 09, 2025 at 11:00:32PM GMT, Nipun Gupta wrote:
+>>>> The AMD PKI accelerator driver provides a accel interface to interact
+>>>> with the device for offloading and accelerating asymmetric crypto
+>>>> operations.
+>>>>
+>>>
+>>> For me this is clearly a crypto driver and you are supposed to:
+>>> 1. Cc crypto maintaners,
+>>> 2. Put it actually into crypto and use crypto API.
+>>
+>> added crypto maintainers for comments.
+>> IMO, as accel framework is designed to support any type of compute
+>> accelerators, the PKI crypto accelerator in accel framework is not
+>> completely out of place here, as also suggested at:
+>> https://lore.kernel.org/all/2025031352-gyration-deceit-5563@gregkh/
 > 
-> Patches 1-2,4 applied.  Thanks.
+> To be fair, Greg did suggest drivers/crypto/ as an alternative... :)
+> 
+>    "Great, then why isn't this in drivers/accel/ or drivers/crypto/ ?"
+>    https://lore.kernel.org/r/2025031236-siamese-graffiti-5b98@gregkh/
+> 
+> There are already six drivers for crypto accelerators in drivers/crypto/,
+> so that would seem to be a natural fit for your driver:
+> 
+>    aspeed/aspeed-acry.c
+>    caam/caampkc.c
+>    ccp/ccp-crypto-rsa.c                 <-- from AMD no less!
+>    hisilicon/hpre/hpre_crypto.c
+>    intel/qat/qat_common/qat_asym_algs.c
+>    starfive/jh7110-rsa.c
+> 
+> You can find these in the tree with:
+> 
+>    git grep 'cra_name = "rsa"'
+> 
+> So far there are only drivers to accelerate RSA encryption/decryption.
+> The kernel supports a single padding scheme, PKCS1, which is implemented
+> by crypto/rsa-pkcs1pad.c.  There is no support yet for OAEP.
+> 
+> So the padding of the hash (which is cheap) happens in software and then
+> crypto/rsa-pkcs1pad.c performs an RSA encrypt/decrypt operation which is
+> either performed in software by crypto/rsa.c, or in hardware if a crypto
+> accelerator is present.  Drivers for crypto accelerators register the
+> "rsa" algorithm with a higher cra_priority than the software
+> implementation, hence are generally preferred.
+> 
+> One benefit that you get from implementing a proper akcipher_alg in your
+> driver is that virtual machines may take advantage of the hardware
+> accelerator through the virtio support implemented by:
+> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> 
+> Note that the crypto subsystem currently does not support hardware
+> acceleration of signature generation/verification (crypto_sig),
+> but only encryption/decryption (crypto_akcipher).  One reason is
+> that signature generation/verification is generally a synchronous
+> operation and doesn't benefit as much from hardware acceleration
+> due to the overhead of interacting with the hardware.
 
-You can merge sun8i-ss patch, it is ok.
+Thank you for the feedback.
 
-Could you add my tested-by on rk3328 patch also ?
+When establishing TLS connections, OpenSSL requires signature 
+generation/verification. In scenarios where multiple connections occur 
+simultaneously, asynchronous operations are beneficial as they lead to 
+much improved CPU utilization. OpenSSL ASYNC support can very well 
+utilizes the asynchronous operations while establishing multiple TLS 
+connections.
 
-Thanks
+> 
+> So there's no support e.g. for generating or verifying ECDSA signatures
+> in hardware.  I think that would only really make sense if private keys
+> are kept in hardware and cannot be retrieved.  So the use case wouldn't
+> be acceleration, but security of private keys.
+
+While ECDSA signature generation and verification enhance the security 
+of private keys when stored in hardware, they also play important role 
+in the establishment of TLS connections. Offloading these operations to 
+hardware frees up CPU, enhancing performance during TLS handshakes.
+
+> 
+> That said, for RSA specifically, signature generation/verification does
+> involve an encrypt/decrypt operation internally.  The padding is once
+> again done in software (by crypto/rsassa-pkcs1.c -- no PSS support yet).
+> But the actual encrypt/decrypt operation will be performed in
+> hardware if a crypto accelerator is present.
+> 
+> The user space interface Herbert referred to is a set of system calls
+> which are usable e.g. via the keyutils library and command line utility:
+> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/
+
+These system calls can support only synchronous operations, which 
+precludes their use for asynchronous operations. This limitation 
+prevents the use of keyutils here.
+
+Thanks,
+Nipun
