@@ -1,102 +1,106 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008061F94C;
-	Wed, 16 Apr 2025 08:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF32222D4F9;
+	Wed, 16 Apr 2025 08:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744790444; cv=none; b=QMT5cZy+Gvk5p4voLBwErTze+z0Lm/5vZCb7ZWe3Q4ilFDMe5KGbT+4YyX2Y4xKq/8q13k1nwFgkMTQuHRFNk6CDYqAzztl6ULqNrg9Jr3gmtko07ZXatDoiwy2po+Es6FgovOFfiwh8bnT8tTSYh1vzp62294QnlxMKF/89nio=
+	t=1744792073; cv=none; b=tjPt3AJ1KE9CqM87iLd5Yskt72zFkFE05mbnzlsTv4L1RSeloByN5p4PP2LE4Fyg+vGY5UA9zT8K3lHmcaWTR7wu3gy2zISTj+Z9LJ4xJKeaNZH7VO8vlLyMP0XRyPedpVxt/2IB7y7THcKLgCSnHnzZVzZ+qqs1WUUfAoP/Jyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744790444; c=relaxed/simple;
-	bh=f+0G+mfCas1lJBR/6RHW1V+Gavmz5DoO4HGg92lelWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=m6d+xmFHEQCTQ2l2gjCG1GUEqKZS00hayy6+M6h9902M2x1o8fVNKDTGm6/uv1uQe9n/1Do/dq/KfmGDby5znA9S61RzdLBHsImYjn+05gBvLcY1kRbwqcQNfiuvXCuFQnsNuKUHqZgh27QzIGGW7MfmKOTmNOX45lNE3LlTL/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=p6rOFRuB; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1744792073; c=relaxed/simple;
+	bh=rGLO5eSKzY7pnjLJQrXDr/atFNjayDU/ws12KMgdQ58=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cW5VN04sOwwZkpEcnkZo16AasBtbmurlD1S1/Ql7DYJMq0IaC+m1lDyjiVEQ4ndcx1qEpaQhe2r+8IVzN96CsL4xOI6vfz0ENS0AdRx1X2kdbpDNZDs3nvcr0pF+jbD07VEo0ZF4ejp8pQ7+dYaVp0/ZkdS3lTiB1cc2uHHEENI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=UJKp/Xx+; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="p6rOFRuB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CxllXsS7oZKhmgl74o8BLeNmMQKxBZycllNwlO7QoVM=; b=p6rOFRuBNqBL9Vs+KMLwfIwpaW
-	yz/TUWI06KiYLjDOWRkW1thUO1NCa0FsczE1IdP8yWQJuNPoj7zLoeTV/bcNnNzwnrrQZxCAF6hWN
-	rR3nya2bEWTJ06hsRLUYISaUNvMGmmJL2xQjFg9UXnzbuNs+F3O8tZDTNTPjcwkWcdfZbNyJ4y44h
-	MNkHBN0Q6sxrv8XtbZop2V1nmDZtMJY4YBCj2ZV5ufdu+NQuPvRjnUCx6msKVoK7FpDyGaHfZtkeJ
-	fVmHWHaHPram2mO/vEo3QW8W7xM+RzwRRrwC4Eq7LpM/nK/62FTZQlA3nyOmTRNvV4g+dWKgbKTzE
-	D7ct5GZA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4xhH-00G7yK-1U;
-	Wed, 16 Apr 2025 16:00:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 16:00:39 +0800
-Date: Wed, 16 Apr 2025 16:00:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, x86@kernel.org
-Subject: Re: [PATCH 0/9] Remove per-architecture poly1305 shash glue code
-Message-ID: <Z_9jp6J6YKImbzyg@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="UJKp/Xx+"
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53G8RhEp277893
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Apr 2025 03:27:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1744792063;
+	bh=LxIK6NSu3y/xf/BzWSlA1Pf9YKlHf1cDT0+hN9cvPFg=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=UJKp/Xx+1vpSv+EUwTVmBh6X/lfT2hCzjh1hDubjiyx1NL4LQXheDnCWYvD6hBMaJ
+	 DKBjvCnoYizfxDVpKiLdiyN8OLkLxmRDhTw4Z5LXSaDV1t3i/bTiyxi+3wKQiwTmJz
+	 o9thBXUuaZ4oswKhU0ZAAB2JLKJ5cvHNNrLxfG0s=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53G8RhZf030220
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 16 Apr 2025 03:27:43 -0500
+Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 16
+ Apr 2025 03:27:43 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 16 Apr 2025 03:27:43 -0500
+Received: from [172.24.227.40] (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53G8ReMO003541;
+	Wed, 16 Apr 2025 03:27:40 -0500
+Message-ID: <860d48a5-b61f-495f-86e1-ae56187a8dc8@ti.com>
+Date: Wed, 16 Apr 2025 13:57:39 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250413045421.55100-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
+ (ECB, CBC)
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Kamlesh Gurudasani
+	<kamlesh@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Manorit Chawdhry <m-chawdhry@ti.com>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+References: <20250411091321.2925308-1-t-pratham@ti.com>
+ <20250411091321.2925308-3-t-pratham@ti.com>
+ <Z_9WPwz-xVdVDMMw@gondor.apana.org.au>
+Content-Language: en-US
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <Z_9WPwz-xVdVDMMw@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> This series removes the per-architecture poly1305 shash glue code and
-> re-implements the poly1305 shashes on top of the Poly1305 library
-> functions.  This ends up being much simpler, and it is how it should
-> have been done originally.  This follows similar changes to crc32,
-> crc32c, and chacha20.
-> 
-> This series also makes the Poly1305 library be optimized on PowerPC.
-> Previously the PowerPC-optimized Poly1305 code only supported shash.
-> 
-> Eric Biggers (9):
->  crypto: powerpc/poly1305 - implement library instead of shash
->  crypto: poly1305 - centralize the shash wrappers for arch code
->  crypto: arm/poly1305 - remove redundant shash algorithm
->  crypto: arm64/poly1305 - remove redundant shash algorithm
->  crypto: mips/poly1305 - drop redundant dependency on CONFIG_MIPS
->  crypto: mips/poly1305 - remove redundant shash algorithm
->  crypto: x86/poly1305 - remove redundant shash algorithm
->  crypto: x86/poly1305 - don't select CRYPTO_LIB_POLY1305_GENERIC
->  crypto: poly1305 - remove rset and sset fields of poly1305_desc_ctx
-> 
-> arch/arm/crypto/Kconfig                 |   6 -
-> arch/arm/crypto/poly1305-glue.c         | 170 ++----------------------
-> arch/arm64/crypto/Kconfig               |   6 -
-> arch/arm64/crypto/poly1305-glue.c       | 143 ++------------------
-> arch/mips/crypto/Kconfig                |   6 -
-> arch/mips/crypto/poly1305-glue.c        | 120 +----------------
-> arch/powerpc/crypto/Kconfig             |  11 +-
-> arch/powerpc/crypto/poly1305-p10-glue.c | 134 ++++++-------------
-> arch/x86/crypto/Kconfig                 |   8 --
-> arch/x86/crypto/poly1305_glue.c         |  99 ++------------
-> crypto/Makefile                         |   3 +-
-> crypto/poly1305.c                       | 153 +++++++++++++++++++++
-> crypto/poly1305_generic.c               | 149 ---------------------
-> include/crypto/poly1305.h               |  13 +-
-> lib/crypto/poly1305.c                   |   2 -
-> 15 files changed, 242 insertions(+), 781 deletions(-)
-> create mode 100644 crypto/poly1305.c
-> delete mode 100644 crypto/poly1305_generic.c
-> 
-> 
-> base-commit: 3be3f70ee95da03a87d94c4a714ee679a5c7b34d
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 16/04/25 12:33, Herbert Xu wrote:
+> On Fri, Apr 11, 2025 at 02:43:22PM +0530, T Pratham wrote:
+>> +	// Need to do a timeout to ensure mutex gets unlocked if DMA callback fails for any reason
+>> +	ret = wait_for_completion_timeout(&actx->aes_compl, msecs_to_jiffies(DTHE_DMA_TIMEOUT_MS));
+> You cannot wait here.  The preferred method of indicating completion
+> is through an interrupt.  If you hardware can't do that, then you need
+> to use crypto_engine and poll in that thread.
+Sure, will change the strategy and update this.
+>> +static int dthe_aes_crypt(struct skcipher_request *req, int enc)
+>> +{
+>> +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
+>> +
+>> +	/*
+>> +	 * If data is not a multiple of AES_BLOCK_SIZE, need to return -EINVAL
+>> +	 * If data length input is zero, no need to do any operation.
+>> +	 */
+>> +	if (req->cryptlen % AES_BLOCK_SIZE) {
+>> +		skcipher_request_complete(req, -EINVAL);
+> The completion function must not be called unless you first
+> returned EINPROGRESS.
+>
+> PS Please set the bit KERN_DRIVER_ONLY in cra_flags.
+KERN_DRIVER_ONLY bit is set.
+>
+> Cheers,
+
+Thanks.
+
+Regards
+T Pratham <t-pratham@ti.com>
+
