@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D414158520
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99985158520
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744785915; cv=none; b=sijGjbcCib7ioQxe0Z06RyafSNexHy/ZjACzo+USTG3bGlHzZi7xI/2V9f4N7eKX3XAJxueaK5gByZQTomzqOERImcb+1grEDrNtHP2FLKBf8HhcsFSjjtbYHGW+ga2RrbcFiXzrhLPyDRorLqUGgL6RNl6j01SpbIpfAAb/BcU=
+	t=1744785917; cv=none; b=buW2lCcQEczutG0Bj9tc/Bvjuz7asLHgW0QuwuSJy1MiRKJngFwEJolYkGl+hO3tOTs5gqyw6wopss/pV160POY8eE2IDxdEysL6G3SnsprrWu6hUK1mmmVp6Ex0z+7doVHaDHjXU7fAuEiyn8MnVkOm6OcDdgZRvOtjZkVpdtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744785915; c=relaxed/simple;
-	bh=7DBsfMZ4HhwgvpJsX4ZNrax8Hol+AYqZEln7+abfDC8=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=DuYrk6yVzIJN3ll7Ujtz+YpBiipSAfnnq7PJgNIqDmj55kZ5H3tyW/D8k4PGVCoApZLTCjrhU49kd3y5nlVJHxQ3rXI8hESvbFhsLL0mIuXpmMUfxQxNyaY7npGtamTUH5rIeQXwB01zjU22ZH3sFl36RZ67EczsMMt/sjGJmiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=tOIpQrMV; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785917; c=relaxed/simple;
+	bh=HfqqVtN7ALkr6leMASfH62frilF1xF/Rg3Og2YXYg7M=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=VM6Xt8EsZ+Qz27Zjox0XJqwRXaxRW+jvwGIy+GCce2jo+9e59HG7055L7Q/suSygZfAIG8DoZ3m/3t+6TQ6IusgprQdQMJU0J9RkqtvlQgF6mIjFtA16ycZNamgqXQhUo0wUw13Pp3Mz1JvKyo0Rg/GyP8aDyciReehLSitv7KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HJdOV1hI; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="tOIpQrMV"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HJdOV1hI"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=68gBAjJk4aYEPDuAYEToMTZSPqsEOkzKBUjKhw22PRE=; b=tOIpQrMV3XmJGCMaM4zBoVyd2J
-	geQURFhXKItQ8kb+nbowguNUHwSl8BkMcHE2W291mo0PyYJONcSAoOZqpdH75kBLdfgHLMZ/mC4mH
-	LxNiDBK04IwkOzPjDltnLCUsO/ZvEL6yb9y81xh1ZzTF97uS0yYCM8/dIk542Dcim0GOiLjPYSSoB
-	/331rUgfMl2bHAlHEpzPlL/MuekjyVASlZ73eQA28j1UUok2S+9Vzxk525RmihAUPA7DvAOPLlhyU
-	w1LWQpWXUSt89rVQcOCSG5VS5JGrZYMeAFhfEU2IoUxozbTmeds4oGxck+6elf6tKwFKanHAfsXLG
-	ELcECYmQ==;
+	bh=i3VhU+8lbuf4q8n2wSSl2qo0ToRnnviqh/r11Tz525A=; b=HJdOV1hI7ow+fZVSj/HAg/2rbc
+	m7nnZ4kDNKa7XjJCoZPUHia96btEYBcCApnDt6TrmTr2s+r9PqhR7UjoWBLtjQ7uwDI5oC0KWaCUC
+	3C7L5NUJS+sfxtyG+uq1kheJU0lfOhFoH6bX4PonVsaiZbiu5bZ1MtS/5hCN4tWR8wAuDMQ9+1uCm
+	URxlW4ssCyh7BY8RkiaG9b4q1xV0SjHQMxpbxdef2mWA7OlYguBpg9xWyPsBUtZXPEBXRXXNCfAMS
+	w1OXz7t4i21kyuLhad2xLhh2e+j+fZ1sTBObflI2XlSNxOESQF+Sfnh8L8PTdN3ezqKaRb0OUIiCt
+	dZEvWLtg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4wWD-00G6UW-04;
-	Wed, 16 Apr 2025 14:45:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:45:09 +0800
-Date: Wed, 16 Apr 2025 14:45:09 +0800
-Message-Id: <4100764a0e2879064d0265989a391f52d4813dd7.1744784515.git.herbert@gondor.apana.org.au>
+	id 1u4wWF-00G6VU-16;
+	Wed, 16 Apr 2025 14:45:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:45:11 +0800
+Date: Wed, 16 Apr 2025 14:45:11 +0800
+Message-Id: <f2b19334fab589c6b5b8e2a8176e29c50953f013.1744784515.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744784515.git.herbert@gondor.apana.org.au>
 References: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 63/67] crypto: xcbc - Use API partial block handling
+Subject: [PATCH 64/67] crypto: arm64/aes - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,176 +47,239 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
+Also remove the unnecessary SIMD fallback path.
+
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/xcbc.c | 92 ++++++++++-----------------------------------------
- 1 file changed, 18 insertions(+), 74 deletions(-)
+ arch/arm64/crypto/aes-glue.c | 122 ++++++++++++-----------------------
+ 1 file changed, 41 insertions(+), 81 deletions(-)
 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index fc785667b134..970ff581dc58 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -8,9 +8,12 @@
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 5ca3b5661749..81560f722b9d 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -5,19 +5,20 @@
+  * Copyright (C) 2013 - 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
+  */
  
- #include <crypto/internal/cipher.h>
+-#include <asm/neon.h>
+ #include <asm/hwcap.h>
+-#include <asm/simd.h>
++#include <asm/neon.h>
+ #include <crypto/aes.h>
+ #include <crypto/ctr.h>
+-#include <crypto/sha2.h>
  #include <crypto/internal/hash.h>
+-#include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+-#include <linux/module.h>
+-#include <linux/cpufeature.h>
++#include <crypto/sha2.h>
 +#include <crypto/utils.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/slab.h>
+ #include <crypto/xts.h>
++#include <linux/cpufeature.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
 +#include <linux/string.h>
  
- static u_int32_t ks[12] = {0x01010101, 0x01010101, 0x01010101, 0x01010101,
- 			   0x02020202, 0x02020202, 0x02020202, 0x02020202,
-@@ -30,22 +33,6 @@ struct xcbc_tfm_ctx {
- 	u8 consts[];
+ #include "aes-ce-setkey.h"
+ 
+@@ -130,7 +131,6 @@ struct mac_tfm_ctx {
  };
  
--/*
-- * +------------------------
-- * | <shash desc>
-- * +------------------------
-- * | xcbc_desc_ctx
-- * +------------------------
-- * | odds (block size)
-- * +------------------------
-- * | prev (block size)
-- * +------------------------
-- */
--struct xcbc_desc_ctx {
+ struct mac_desc_ctx {
 -	unsigned int len;
--	u8 odds[];
--};
--
- #define XCBC_BLOCKSIZE	16
+ 	u8 dg[AES_BLOCK_SIZE];
+ };
  
- static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
-@@ -70,13 +57,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+@@ -869,109 +869,64 @@ static int mac_init(struct shash_desc *desc)
+ 	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
  
- static int crypto_xcbc_digest_init(struct shash_desc *pdesc)
- {
--	struct xcbc_desc_ctx *ctx = shash_desc_ctx(pdesc);
- 	int bs = crypto_shash_blocksize(pdesc->tfm);
--	u8 *prev = &ctx->odds[bs];
-+	u8 *prev = shash_desc_ctx(pdesc);
- 
+ 	memset(ctx->dg, 0, AES_BLOCK_SIZE);
 -	ctx->len = 0;
- 	memset(prev, 0, bs);
 -
  	return 0;
  }
  
-@@ -85,77 +69,36 @@ static int crypto_xcbc_digest_update(struct shash_desc *pdesc, const u8 *p,
+ static void mac_do_update(struct crypto_aes_ctx *ctx, u8 const in[], int blocks,
+-			  u8 dg[], int enc_before, int enc_after)
++			  u8 dg[], int enc_before)
  {
- 	struct crypto_shash *parent = pdesc->tfm;
- 	struct xcbc_tfm_ctx *tctx = crypto_shash_ctx(parent);
--	struct xcbc_desc_ctx *ctx = shash_desc_ctx(pdesc);
- 	struct crypto_cipher *tfm = tctx->child;
- 	int bs = crypto_shash_blocksize(parent);
--	u8 *odds = ctx->odds;
--	u8 *prev = odds + bs;
-+	u8 *prev = shash_desc_ctx(pdesc);
+ 	int rounds = 6 + ctx->key_length / 4;
++	int rem;
  
--	/* checking the data can fill the block */
--	if ((ctx->len + len) <= bs) {
--		memcpy(odds + ctx->len, p, len);
--		ctx->len += len;
--		return 0;
+-	if (crypto_simd_usable()) {
+-		int rem;
+-
+-		do {
+-			kernel_neon_begin();
+-			rem = aes_mac_update(in, ctx->key_enc, rounds, blocks,
+-					     dg, enc_before, enc_after);
+-			kernel_neon_end();
+-			in += (blocks - rem) * AES_BLOCK_SIZE;
+-			blocks = rem;
+-			enc_before = 0;
+-		} while (blocks);
+-	} else {
+-		if (enc_before)
+-			aes_encrypt(ctx, dg, dg);
+-
+-		while (blocks--) {
+-			crypto_xor(dg, in, AES_BLOCK_SIZE);
+-			in += AES_BLOCK_SIZE;
+-
+-			if (blocks || enc_after)
+-				aes_encrypt(ctx, dg, dg);
+-		}
 -	}
--
--	/* filling odds with new data and encrypting it */
--	memcpy(odds + ctx->len, p, bs - ctx->len);
--	len -= bs - ctx->len;
--	p += bs - ctx->len;
--
--	crypto_xor(prev, odds, bs);
--	crypto_cipher_encrypt_one(tfm, prev, prev);
--
--	/* clearing the length */
--	ctx->len = 0;
--
--	/* encrypting the rest of data */
--	while (len > bs) {
 +	do {
- 		crypto_xor(prev, p, bs);
- 		crypto_cipher_encrypt_one(tfm, prev, prev);
- 		p += bs;
- 		len -= bs;
--	}
++		kernel_neon_begin();
++		rem = aes_mac_update(in, ctx->key_enc, rounds, blocks,
++				     dg, enc_before, !enc_before);
++		kernel_neon_end();
++		in += (blocks - rem) * AES_BLOCK_SIZE;
++		blocks = rem;
++	} while (blocks);
+ }
+ 
+ static int mac_update(struct shash_desc *desc, const u8 *p, unsigned int len)
+ {
+ 	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+ 	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
++	int blocks = len / AES_BLOCK_SIZE;
+ 
+-	while (len > 0) {
+-		unsigned int l;
 -
--	/* keeping the surplus of blocksize */
--	if (len) {
--		memcpy(odds, p, len);
--		ctx->len = len;
+-		if ((ctx->len % AES_BLOCK_SIZE) == 0 &&
+-		    (ctx->len + len) > AES_BLOCK_SIZE) {
+-
+-			int blocks = len / AES_BLOCK_SIZE;
+-
+-			len %= AES_BLOCK_SIZE;
+-
+-			mac_do_update(&tctx->key, p, blocks, ctx->dg,
+-				      (ctx->len != 0), (len != 0));
+-
+-			p += blocks * AES_BLOCK_SIZE;
+-
+-			if (!len) {
+-				ctx->len = AES_BLOCK_SIZE;
+-				break;
+-			}
+-			ctx->len = 0;
+-		}
+-
+-		l = min(len, AES_BLOCK_SIZE - ctx->len);
+-
+-		if (l <= AES_BLOCK_SIZE) {
+-			crypto_xor(ctx->dg + ctx->len, p, l);
+-			ctx->len += l;
+-			len -= l;
+-			p += l;
+-		}
 -	}
 -
 -	return 0;
-+	} while (len >= bs);
++	len %= AES_BLOCK_SIZE;
++	mac_do_update(&tctx->key, p, blocks, ctx->dg, 0);
 +	return len;
  }
  
--static int crypto_xcbc_digest_final(struct shash_desc *pdesc, u8 *out)
-+static int crypto_xcbc_digest_finup(struct shash_desc *pdesc, const u8 *src,
-+				    unsigned int len, u8 *out)
+-static int cbcmac_final(struct shash_desc *desc, u8 *out)
++static int cbcmac_finup(struct shash_desc *desc, const u8 *src,
++			unsigned int len, u8 *out)
  {
- 	struct crypto_shash *parent = pdesc->tfm;
- 	struct xcbc_tfm_ctx *tctx = crypto_shash_ctx(parent);
--	struct xcbc_desc_ctx *ctx = shash_desc_ctx(pdesc);
- 	struct crypto_cipher *tfm = tctx->child;
- 	int bs = crypto_shash_blocksize(parent);
--	u8 *odds = ctx->odds;
--	u8 *prev = odds + bs;
-+	u8 *prev = shash_desc_ctx(pdesc);
- 	unsigned int offset = 0;
+ 	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+ 	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
  
--	if (ctx->len != bs) {
--		unsigned int rlen;
--		u8 *p = odds + ctx->len;
+-	mac_do_update(&tctx->key, NULL, 0, ctx->dg, (ctx->len != 0), 0);
 -
--		*p = 0x80;
--		p++;
--
--		rlen = bs - ctx->len -1;
--		if (rlen)
--			memset(p, 0, rlen);
--
-+	crypto_xor(prev, src, len);
-+	if (len != bs) {
-+		prev[len] ^= 0x80;
- 		offset += bs;
- 	}
--
--	crypto_xor(prev, odds, bs);
- 	crypto_xor(prev, &tctx->consts[offset], bs);
--
- 	crypto_cipher_encrypt_one(tfm, out, prev);
++	if (len) {
++		crypto_xor(ctx->dg, src, len);
++		mac_do_update(&tctx->key, NULL, 0, ctx->dg, 1);
++	}
+ 	memcpy(out, ctx->dg, AES_BLOCK_SIZE);
 -
  	return 0;
  }
  
-@@ -216,17 +159,18 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.base.cra_ctxsize = sizeof(struct xcbc_tfm_ctx) +
- 				     alg->cra_blocksize * 2;
-+	inst->alg.base.cra_flags = CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+				   CRYPTO_AHASH_ALG_FINAL_NONZERO;
+-static int cmac_final(struct shash_desc *desc, u8 *out)
++static int cmac_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
++		      u8 *out)
+ {
+ 	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+ 	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
+ 	u8 *consts = tctx->consts;
  
- 	inst->alg.digestsize = alg->cra_blocksize;
--	inst->alg.descsize = sizeof(struct xcbc_desc_ctx) +
--			     alg->cra_blocksize * 2;
-+	inst->alg.descsize = alg->cra_blocksize;
+-	if (ctx->len != AES_BLOCK_SIZE) {
+-		ctx->dg[ctx->len] ^= 0x80;
++	crypto_xor(ctx->dg, src, len);
++	if (len != AES_BLOCK_SIZE) {
++		ctx->dg[len] ^= 0x80;
+ 		consts += AES_BLOCK_SIZE;
+ 	}
+-
+-	mac_do_update(&tctx->key, consts, 1, ctx->dg, 0, 1);
+-
++	mac_do_update(&tctx->key, consts, 1, ctx->dg, 0);
+ 	memcpy(out, ctx->dg, AES_BLOCK_SIZE);
+-
+ 	return 0;
+ }
  
- 	inst->alg.base.cra_init = xcbc_init_tfm;
- 	inst->alg.base.cra_exit = xcbc_exit_tfm;
- 
- 	inst->alg.init = crypto_xcbc_digest_init;
- 	inst->alg.update = crypto_xcbc_digest_update;
--	inst->alg.final = crypto_xcbc_digest_final;
-+	inst->alg.finup = crypto_xcbc_digest_finup;
- 	inst->alg.setkey = crypto_xcbc_digest_setkey;
- 
- 	inst->free = shash_free_singlespawn_instance;
+@@ -979,6 +934,8 @@ static struct shash_alg mac_algs[] = { {
+ 	.base.cra_name		= "cmac(aes)",
+ 	.base.cra_driver_name	= "cmac-aes-" MODE,
+ 	.base.cra_priority	= PRIO,
++	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY |
++				  CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx) +
+ 				  2 * AES_BLOCK_SIZE,
+@@ -987,13 +944,15 @@ static struct shash_alg mac_algs[] = { {
+ 	.digestsize		= AES_BLOCK_SIZE,
+ 	.init			= mac_init,
+ 	.update			= mac_update,
+-	.final			= cmac_final,
++	.finup			= cmac_finup,
+ 	.setkey			= cmac_setkey,
+ 	.descsize		= sizeof(struct mac_desc_ctx),
+ }, {
+ 	.base.cra_name		= "xcbc(aes)",
+ 	.base.cra_driver_name	= "xcbc-aes-" MODE,
+ 	.base.cra_priority	= PRIO,
++	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY |
++				  CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx) +
+ 				  2 * AES_BLOCK_SIZE,
+@@ -1002,13 +961,14 @@ static struct shash_alg mac_algs[] = { {
+ 	.digestsize		= AES_BLOCK_SIZE,
+ 	.init			= mac_init,
+ 	.update			= mac_update,
+-	.final			= cmac_final,
++	.finup			= cmac_finup,
+ 	.setkey			= xcbc_setkey,
+ 	.descsize		= sizeof(struct mac_desc_ctx),
+ }, {
+ 	.base.cra_name		= "cbcmac(aes)",
+ 	.base.cra_driver_name	= "cbcmac-aes-" MODE,
+ 	.base.cra_priority	= PRIO,
++	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -1016,7 +976,7 @@ static struct shash_alg mac_algs[] = { {
+ 	.digestsize		= AES_BLOCK_SIZE,
+ 	.init			= mac_init,
+ 	.update			= mac_update,
+-	.final			= cbcmac_final,
++	.finup			= cbcmac_finup,
+ 	.setkey			= cbcmac_setkey,
+ 	.descsize		= sizeof(struct mac_desc_ctx),
+ } };
 -- 
 2.39.5
 
