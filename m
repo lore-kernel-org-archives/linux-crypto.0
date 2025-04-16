@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052E623A564
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A40422CBF7
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744785867; cv=none; b=jDduUoQ9SR2R4tDbzQo6gpK8F0iea6YvZNHJr2vaDxm67KHVJ4K2B1Bi768rGIEgkpCgCvMllhmDLfy01T1OjWCBq/KA/1n6UP5UD0M6WlTbigzkVoq+yLlryVWcKTf8UtNQFRUHMhXWPqalESzjaqOZJFylii8eFrLeT14il6Y=
+	t=1744785870; cv=none; b=aKsuIzwOwbv7fIgNlt0tZ3/J4Kmt22wOBVHJz5rqyzYLoEEirYWECHQpanS5EQDXojP/SJmFtKJO231JFiUCk52swGLidRyb/edhvaEdeuyqmivnjhUi2uApCr1urZuTQe4PkdKc24zznGb+TIq7VpwVB5/clUp8D1EDVrktlqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744785867; c=relaxed/simple;
-	bh=LIXd7XtcjRaZHVTen5JoRDFeDdiCtjOX2Tl4JxGRoJ4=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=czvrpfHanuOiT8BbESfnQ2TnHva7XI9FDTvNCOIWtcrNaWaCraaIg2rheQgA/TC4ucHCNqYTxs4g/d+AXWDObJ7DzZ22daji4wUDlLtxc20U2YYyxPYc58RY85yrwpeZWualMjO5qhMVMKHVBw3dK9iHfuiKZTl9nvr1UGlMGps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YruZ3jhc; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785870; c=relaxed/simple;
+	bh=PGPXyoRkh+P/KyHpgJxeayybp+DWdUZpptPRS7QEKuI=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=NHy5TcDHLMZ9yFjkzxmKk1duUki0rTrsIKYpflngI7N47Mb6XjR24mRnCh9qH/VJL4iK1OmfG642HSuuD0VlAer70+s/mLu1xrHwFJ8sFR7Pa2sqCevaXO7Q6EdD0NmHlDeymX1JMkvMtzMYw6O30dYfyh9tifgb9y1no1hRsqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Yab83KyK; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YruZ3jhc"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Yab83KyK"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=I2uAmTfPKTJbQyjSFsroBV+qS+nJPQFJ/XME/5jqo9s=; b=YruZ3jhccshb8HRXFp6j4Afp75
-	BfKH4Dyzoz2lUjZvGX77AFDPJdDGiVlQo30+ASAMlY0ItUPcjj8tG8pfJCHdBRS6xVJX6ZJ6U6nBn
-	q9EoALCnjmENkL762kZ/684LvZmB8InmRDbwRANOzEfMNL1dIeJhwsgxgTOkUdu4vNXHBBAFJGQyL
-	6mXo6ALw30Ojc/P+/bxqV3h/se3fGPFFS9A8MMvobL75jZ4RtDh2D4Ni5JH90HsrcQhXr/5hZ+a0y
-	BtC7VeXK+olXiRKl7S9t8g7Ue4iOG3PWzMRv8Rrc1Q4vng7ORm2caV/GVtPbESvVitL+P2j3liR/m
-	D55MjOuQ==;
+	bh=b94ooEKlqlYjFWw6S6vLac/TUl6o8Q6QLEq1tvu/81Y=; b=Yab83KyKltaihL30f1mndytTUb
+	leb47SxspS7yXvbcl8xMXwKuc43IkExvjyD2uFmUoNkiJLIt2zrHNi/KeF4+exfNxMAOo5G5Og91w
+	ZR54LvoJ11ZHo2yV8mOGLTC26wfo9NPJfNOyQmorNcfdhTkY44tiz8NnrFL9Q2aBPpcrTdqS4gSlq
+	UYMBKFl2UWV4njhDq4T46q87tQg3D1EGHlGqaGgwYYIU/0VhokqOPq1guic+Ph+s9vAXA7T97/Jo9
+	S0zWomGocBo9U4gyzue4ATN8nPHGXjgOPm92ivrUhz0DWNF6aEdzgzghkHVd4zQridnlnPE0v8bOV
+	hmjHl07g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4wVS-00G6Ot-08;
-	Wed, 16 Apr 2025 14:44:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:44:22 +0800
-Date: Wed, 16 Apr 2025 14:44:22 +0800
-Message-Id: <8cbeaab2473afa3153f3c3f592be4d5eb6c0e92f.1744784515.git.herbert@gondor.apana.org.au>
+	id 1u4wVU-00G6P6-17;
+	Wed, 16 Apr 2025 14:44:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:44:24 +0800
+Date: Wed, 16 Apr 2025 14:44:24 +0800
+Message-Id: <d2406e9ad5e7f7c6405e5655e86527179e05ab51.1744784515.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744784515.git.herbert@gondor.apana.org.au>
 References: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 43/67] crypto: zynqmp-sha - Use API partial block handling
+Subject: [PATCH 44/67] crypto: x86/sha512 - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,168 +47,305 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-As this was the last user of the extra fields in struct sha3_state,
-remove them.
+Also remove the unnecessary SIMD fallback path.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/xilinx/zynqmp-sha.c | 71 +++++++++---------------------
- include/crypto/sha3.h              |  5 ---
- 2 files changed, 22 insertions(+), 54 deletions(-)
+ arch/x86/crypto/sha512_ssse3_glue.c | 79 ++++++++++-------------------
+ include/crypto/sha2.h               |  1 +
+ include/crypto/sha512_base.h        | 54 ++++++++++++++++++--
+ 3 files changed, 77 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/zynqmp-sha.c
-index 4db8c717906f..67cf8d990a1d 100644
---- a/drivers/crypto/xilinx/zynqmp-sha.c
-+++ b/drivers/crypto/xilinx/zynqmp-sha.c
-@@ -3,7 +3,6 @@
-  * Xilinx ZynqMP SHA Driver.
-  * Copyright (c) 2022 Xilinx Inc.
-  */
--#include <crypto/hash.h>
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index 6d3b85e53d0e..067684c54395 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -27,17 +27,13 @@
+ 
+ #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
+ 
+-#include <crypto/internal/hash.h>
+-#include <crypto/internal/simd.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <linux/mm.h>
+-#include <linux/string.h>
+-#include <linux/types.h>
+-#include <crypto/sha2.h>
+-#include <crypto/sha512_base.h>
+ #include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
++#include <crypto/internal/hash.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <crypto/sha2.h>
++#include <crypto/sha512_base.h>
+ 
+ asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
+ 				       const u8 *data, int blocks);
+@@ -45,11 +41,7 @@ asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
+ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len, sha512_block_fn *sha512_xform)
+ {
+-	struct sha512_state *sctx = shash_desc_ctx(desc);
+-
+-	if (!crypto_simd_usable() ||
+-	    (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
+-		return crypto_sha512_update(desc, data, len);
++	int remain;
+ 
+ 	/*
+ 	 * Make sure struct sha512_state begins directly with the SHA512
+@@ -58,22 +50,17 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha512_base_do_update(desc, data, len, sha512_xform);
++	remain = sha512_base_do_update_blocks(desc, data, len, sha512_xform);
+ 	kernel_fpu_end();
+ 
+-	return 0;
++	return remain;
+ }
+ 
+ static int sha512_finup(struct shash_desc *desc, const u8 *data,
+ 	      unsigned int len, u8 *out, sha512_block_fn *sha512_xform)
+ {
+-	if (!crypto_simd_usable())
+-		return crypto_sha512_finup(desc, data, len, out);
+-
+ 	kernel_fpu_begin();
+-	if (len)
+-		sha512_base_do_update(desc, data, len, sha512_xform);
+-	sha512_base_do_finalize(desc, sha512_xform);
++	sha512_base_do_finup(desc, data, len, sha512_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha512_base_finish(desc, out);
+@@ -91,23 +78,18 @@ static int sha512_ssse3_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha512_finup(desc, data, len, out, sha512_transform_ssse3);
+ }
+ 
+-/* Add padding and return the message digest. */
+-static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha512_ssse3_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha512_ssse3_algs[] = { {
+ 	.digestsize	=	SHA512_DIGEST_SIZE,
+ 	.init		=	sha512_base_init,
+ 	.update		=	sha512_ssse3_update,
+-	.final		=	sha512_ssse3_final,
+ 	.finup		=	sha512_ssse3_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha512",
+ 		.cra_driver_name =	"sha512-ssse3",
+ 		.cra_priority	=	150,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -115,13 +97,14 @@ static struct shash_alg sha512_ssse3_algs[] = { {
+ 	.digestsize	=	SHA384_DIGEST_SIZE,
+ 	.init		=	sha384_base_init,
+ 	.update		=	sha512_ssse3_update,
+-	.final		=	sha512_ssse3_final,
+ 	.finup		=	sha512_ssse3_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha384",
+ 		.cra_driver_name =	"sha384-ssse3",
+ 		.cra_priority	=	150,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -167,23 +150,18 @@ static int sha512_avx_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha512_finup(desc, data, len, out, sha512_transform_avx);
+ }
+ 
+-/* Add padding and return the message digest. */
+-static int sha512_avx_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha512_avx_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha512_avx_algs[] = { {
+ 	.digestsize	=	SHA512_DIGEST_SIZE,
+ 	.init		=	sha512_base_init,
+ 	.update		=	sha512_avx_update,
+-	.final		=	sha512_avx_final,
+ 	.finup		=	sha512_avx_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha512",
+ 		.cra_driver_name =	"sha512-avx",
+ 		.cra_priority	=	160,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -191,13 +169,14 @@ static struct shash_alg sha512_avx_algs[] = { {
+ 	.digestsize	=	SHA384_DIGEST_SIZE,
+ 	.init		=	sha384_base_init,
+ 	.update		=	sha512_avx_update,
+-	.final		=	sha512_avx_final,
+ 	.finup		=	sha512_avx_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha384",
+ 		.cra_driver_name =	"sha384-avx",
+ 		.cra_priority	=	160,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -233,23 +212,18 @@ static int sha512_avx2_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha512_finup(desc, data, len, out, sha512_transform_rorx);
+ }
+ 
+-/* Add padding and return the message digest. */
+-static int sha512_avx2_final(struct shash_desc *desc, u8 *out)
+-{
+-	return sha512_avx2_finup(desc, NULL, 0, out);
+-}
+-
+ static struct shash_alg sha512_avx2_algs[] = { {
+ 	.digestsize	=	SHA512_DIGEST_SIZE,
+ 	.init		=	sha512_base_init,
+ 	.update		=	sha512_avx2_update,
+-	.final		=	sha512_avx2_final,
+ 	.finup		=	sha512_avx2_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha512",
+ 		.cra_driver_name =	"sha512-avx2",
+ 		.cra_priority	=	170,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+@@ -257,13 +231,14 @@ static struct shash_alg sha512_avx2_algs[] = { {
+ 	.digestsize	=	SHA384_DIGEST_SIZE,
+ 	.init		=	sha384_base_init,
+ 	.update		=	sha512_avx2_update,
+-	.final		=	sha512_avx2_final,
+ 	.finup		=	sha512_avx2_finup,
+-	.descsize	=	sizeof(struct sha512_state),
++	.descsize	=	SHA512_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	=	"sha384",
+ 		.cra_driver_name =	"sha384-avx2",
+ 		.cra_priority	=	170,
++		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
+index a913bad5dd3b..e9ad7ab955aa 100644
+--- a/include/crypto/sha2.h
++++ b/include/crypto/sha2.h
+@@ -19,6 +19,7 @@
+ 
+ #define SHA512_DIGEST_SIZE      64
+ #define SHA512_BLOCK_SIZE       128
++#define SHA512_STATE_SIZE       80
+ 
+ #define SHA224_H0	0xc1059ed8UL
+ #define SHA224_H1	0x367cd507UL
+diff --git a/include/crypto/sha512_base.h b/include/crypto/sha512_base.h
+index 679916a84cb2..8cb172e52dc0 100644
+--- a/include/crypto/sha512_base.h
++++ b/include/crypto/sha512_base.h
+@@ -10,10 +10,7 @@
+ 
  #include <crypto/internal/hash.h>
- #include <crypto/sha3.h>
- #include <linux/cacheflush.h>
-@@ -37,10 +36,6 @@ struct zynqmp_sha_tfm_ctx {
- 	struct crypto_shash *fbk_tfm;
- };
- 
--struct zynqmp_sha_desc_ctx {
--	struct shash_desc fbk_req;
--};
+ #include <crypto/sha2.h>
+-#include <linux/crypto.h>
+-#include <linux/module.h>
+ #include <linux/string.h>
 -
- static dma_addr_t update_dma_addr, final_dma_addr;
- static char *ubuf, *fbuf;
+ #include <linux/unaligned.h>
  
-@@ -64,7 +59,6 @@ static int zynqmp_sha_init_tfm(struct crypto_shash *hash)
- 		return PTR_ERR(fallback_tfm);
- 
- 	if (crypto_shash_descsize(hash) <
--	    sizeof(struct zynqmp_sha_desc_ctx) +
- 	    crypto_shash_descsize(tfm_ctx->fbk_tfm)) {
- 		crypto_free_shash(fallback_tfm);
- 		return -EINVAL;
-@@ -79,58 +73,41 @@ static void zynqmp_sha_exit_tfm(struct crypto_shash *hash)
- {
- 	struct zynqmp_sha_tfm_ctx *tfm_ctx = crypto_shash_ctx(hash);
- 
--	if (tfm_ctx->fbk_tfm) {
--		crypto_free_shash(tfm_ctx->fbk_tfm);
--		tfm_ctx->fbk_tfm = NULL;
--	}
--
--	memzero_explicit(tfm_ctx, sizeof(struct zynqmp_sha_tfm_ctx));
-+	crypto_free_shash(tfm_ctx->fbk_tfm);
+ typedef void (sha512_block_fn)(struct sha512_state *sst, u8 const *src,
+@@ -93,6 +90,55 @@ static inline int sha512_base_do_update(struct shash_desc *desc,
+ 	return 0;
  }
  
- static int zynqmp_sha_init(struct shash_desc *desc)
++static inline int sha512_base_do_update_blocks(struct shash_desc *desc,
++					       const u8 *data,
++					       unsigned int len,
++					       sha512_block_fn *block_fn)
++{
++	unsigned int remain = len - round_down(len, SHA512_BLOCK_SIZE);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++
++	len -= remain;
++	sctx->count[0] += len;
++	if (sctx->count[0] < len)
++		sctx->count[1]++;
++	block_fn(sctx, data, len / SHA512_BLOCK_SIZE);
++	return remain;
++}
++
++static inline int sha512_base_do_finup(struct shash_desc *desc, const u8 *src,
++				       unsigned int len,
++				       sha512_block_fn *block_fn)
++{
++	unsigned int bit_offset = SHA512_BLOCK_SIZE / 8 - 2;
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	union {
++		__be64 b64[SHA512_BLOCK_SIZE / 4];
++		u8 u8[SHA512_BLOCK_SIZE * 2];
++	} block = {};
++
++	if (len >= SHA512_BLOCK_SIZE) {
++		int remain;
++
++		remain = sha512_base_do_update_blocks(desc, src, len, block_fn);
++		src += len - remain;
++		len = remain;
++	}
++
++	if (len >= bit_offset * 8)
++		bit_offset += SHA512_BLOCK_SIZE / 8;
++	memcpy(&block, src, len);
++	block.u8[len] = 0x80;
++	sctx->count[0] += len;
++	block.b64[bit_offset] = cpu_to_be64(sctx->count[1] << 3 |
++					    sctx->count[0] >> 61);
++	block.b64[bit_offset + 1] = cpu_to_be64(sctx->count[0] << 3);
++	block_fn(sctx, block.u8, (bit_offset + 2) * 8 / SHA512_BLOCK_SIZE);
++	memzero_explicit(&block, sizeof(block));
++
++	return 0;
++}
++
+ static inline int sha512_base_do_finalize(struct shash_desc *desc,
+ 					  sha512_block_fn *block_fn)
  {
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
- 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct crypto_shash *fbtfm = tctx->fbk_tfm;
-+	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
+@@ -126,8 +172,6 @@ static inline int sha512_base_finish(struct shash_desc *desc, u8 *out)
  
--	dctx->fbk_req.tfm = tctx->fbk_tfm;
--	return crypto_shash_init(&dctx->fbk_req);
-+	fbdesc->tfm = fbtfm;
-+	return crypto_shash_init(fbdesc) ?:
-+	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
+ 	for (i = 0; digest_size > 0; i++, digest_size -= sizeof(__be64))
+ 		put_unaligned_be64(sctx->state[i], digest++);
+-
+-	memzero_explicit(sctx, sizeof(*sctx));
+ 	return 0;
  }
  
- static int zynqmp_sha_update(struct shash_desc *desc, const u8 *data, unsigned int length)
- {
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
-+	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct crypto_shash *fbtfm = tctx->fbk_tfm;
-+	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
- 
--	return crypto_shash_update(&dctx->fbk_req, data, length);
--}
--
--static int zynqmp_sha_final(struct shash_desc *desc, u8 *out)
--{
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
--
--	return crypto_shash_final(&dctx->fbk_req, out);
-+	fbdesc->tfm = fbtfm;
-+	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
-+	       crypto_shash_update(fbdesc, data, length) ?:
-+	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
- }
- 
- static int zynqmp_sha_finup(struct shash_desc *desc, const u8 *data, unsigned int length, u8 *out)
- {
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
--
--	return crypto_shash_finup(&dctx->fbk_req, data, length, out);
--}
--
--static int zynqmp_sha_import(struct shash_desc *desc, const void *in)
--{
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
- 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct crypto_shash *fbtfm = tctx->fbk_tfm;
-+	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
- 
--	dctx->fbk_req.tfm = tctx->fbk_tfm;
--	return crypto_shash_import(&dctx->fbk_req, in);
--}
--
--static int zynqmp_sha_export(struct shash_desc *desc, void *out)
--{
--	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
--
--	return crypto_shash_export(&dctx->fbk_req, out);
-+	fbdesc->tfm = fbtfm;
-+	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
-+	       crypto_shash_finup(fbdesc, data, length, out);
- }
- 
- static int __zynqmp_sha_digest(struct shash_desc *desc, const u8 *data,
-@@ -179,24 +156,20 @@ static struct zynqmp_sha_drv_ctx sha3_drv_ctx = {
- 	.sha3_384 = {
- 		.init = zynqmp_sha_init,
- 		.update = zynqmp_sha_update,
--		.final = zynqmp_sha_final,
- 		.finup = zynqmp_sha_finup,
- 		.digest = zynqmp_sha_digest,
--		.export = zynqmp_sha_export,
--		.import = zynqmp_sha_import,
- 		.init_tfm = zynqmp_sha_init_tfm,
- 		.exit_tfm = zynqmp_sha_exit_tfm,
--		.descsize = sizeof(struct zynqmp_sha_desc_ctx) +
--			    sizeof(struct sha3_state),
--		.statesize = sizeof(struct sha3_state),
-+		.descsize = sizeof(struct sha3_state),
- 		.digestsize = SHA3_384_DIGEST_SIZE,
- 		.base = {
- 			.cra_name = "sha3-384",
- 			.cra_driver_name = "zynqmp-sha3-384",
- 			.cra_priority = 300,
- 			.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
--				     CRYPTO_ALG_ALLOCATES_MEMORY |
--				     CRYPTO_ALG_NEED_FALLBACK,
-+				     CRYPTO_ALG_NEED_FALLBACK |
-+				     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+				     CRYPTO_AHASH_ALG_FINUP_MAX,
- 			.cra_blocksize = SHA3_384_BLOCK_SIZE,
- 			.cra_ctxsize = sizeof(struct zynqmp_sha_tfm_ctx),
- 			.cra_module = THIS_MODULE,
-diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-index 420b90c5f08a..3c2559f51ada 100644
---- a/include/crypto/sha3.h
-+++ b/include/crypto/sha3.h
-@@ -25,11 +25,6 @@ struct shash_desc;
- 
- struct sha3_state {
- 	u64		st[SHA3_STATE_SIZE / 8];
--	unsigned int	rsiz;
--	unsigned int	rsizw;
--
--	unsigned int	partial;
--	u8		buf[SHA3_224_BLOCK_SIZE];
- };
- 
- int crypto_sha3_init(struct shash_desc *desc);
 -- 
 2.39.5
 
