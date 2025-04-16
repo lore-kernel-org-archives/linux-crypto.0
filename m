@@ -1,72 +1,239 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5B8E571
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 05:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E799C229B13
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 06:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744781011; cv=none; b=XAjasLneY5NKyt8HNvUHWnGAskHy78trH50HlyrzAQDYevs2x43UHxi+68A/vS+zyRiU6YIMuUruzniO+SKaJkWFvEj7Phc97jixWCmxtzV66fGjgpuAXCQHufMiwWonHSKUSEpWNs0hkTwcXAvVJeIbCZsSPu5YQRE637aUt5I=
+	t=1744785770; cv=none; b=peTn1duT6/28Oq95CvDzWZagvCgTsTvnzgwYYJf9DPB2gpi0MSX6PnAoLfEfAz5yijrlcLQtdsabxABvwH6iOe2nqq69D/dvjTHgdCyMw3wAoRWkdBHHmFO5sXJ78+O1qtvkCxoKs5COaC47W0VDWruB8SCj1S0OsSLIGabWtGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744781011; c=relaxed/simple;
-	bh=i8y0PD5CZWo0MjZxtefVNWdoLkMb4cnHp1/+yli4WUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dHOXCdwxM4KQgDio3kWtYQ6PlIbrY1z0TbKeEHIbaMUXuqFHUAatE6/EgyI6XWk7r2qy8DENHo98izQFPJEOegafrxsbAfmL5AxK08P04pEYnWN+UdMldQ4upOb8yGXgImHhyGXl9xWQWXXIQZj+4Tduodij4zTsd5I0sIeEiyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qWhC8qZb; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744785770; c=relaxed/simple;
+	bh=9p0jO0lL3ZRRgZ1Ib472vFi6Ud/Dk8kiqk1Y/gilKh0=;
+	h=Date:Message-Id:From:Subject:To; b=uEDxpwuNuTVahCBNiakWBJ6ewAt6CsCmDiSDo6ivLcSoT46QEAQTkQ1UpuMR9XwN1Oejk2nqZR9LESAkXeYNkEnaVFF8zrYD959P5coyWZltEv3bAQwZswy+Yc1/Mv6GXy9eVPACRQws8uAwgk+hvSjRQUzk/IL3J7XmydxduL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=lXUdJ2N7; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qWhC8qZb"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="lXUdJ2N7"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=To:Subject:From:Message-Id:Date:Sender:Reply-To:Cc:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=Cfp8lWToO+zGme3lJa7dHsbqJADHhqOxzh2Ikedzztg=; b=qWhC8qZbpMoW2VipUEU1Peu3lP
-	Apc8dYJ70PsI0Whzv8BAFZse4VcbZQDavzCtsGeXjxMKqw6LOdRn2tSz0l28yG/2hqYUOuo1O5sUA
-	H9JADRg8Sx2FxQKDHnrdJL4nGdFH5M29oYeJR8N/DQj2iuBeBSucIBDzKcVW5qARU7H78JQd3yMld
-	/8/AkPTxTKEpZdu6+mrO5eeS/W+LyTh95Jgld4KYzTtGzICz0PBA8iLe37SwKB3cCgFkNZoknTt5g
-	bHqbIRX+FzuLat72/0oo02DTs3ELaPhu8R7tgCtVnh92vmNKEAcmL8oPQhvKhPrC+Amn7clCLVxQ0
-	QRGEuyBQ==;
+	bh=bUHoLM5S49jqK173cipecYFR6poeJWADTK8XTftqbMs=; b=lXUdJ2N7xBnurHaO4DKhE6PZ55
+	pGnmgdly6VGNETmfdv9/eb8fOXXVynNycOSHvE2kr0ydJPDEvrosf3Ke6bGdqqGoB2Ab0qkFYg375
+	Zg9Ey9QAXlfOhseQB/pew8hCX32ahpudjKeIYVz+BGWdSPz/IdidsVtsDSBGbLgt0nLmNrytq0Tj6
+	jQpoKDch46Cduy4li4ovLBQt/nTXABc0PGin9dA6hHGeOx5M8VFS92wYRshxcF2BpZLVMc75EMCgw
+	JBH5BpulWjrbZQhl8A897sWjSP5iezQ/vbzp38ExfNlLjCJXoi/AunhXvISEABTaGzUyN0445OqjG
+	C+6Awn5g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u4vF5-00G5ZN-2L;
-	Wed, 16 Apr 2025 13:23:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 13:23:23 +0800
-Date: Wed, 16 Apr 2025 13:23:23 +0800
+	id 1u4wTq-00G6GN-2v;
+	Wed, 16 Apr 2025 14:42:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Apr 2025 14:42:42 +0800
+Date: Wed, 16 Apr 2025 14:42:42 +0800
+Message-Id: <cover.1744784515.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 0/8] crypto: hash - Preparation for block-only shash
-Message-ID: <Z_8-y1NkOSm7HY8C@gondor.apana.org.au>
-References: <cover.1744455146.git.herbert@gondor.apana.org.au>
- <20250413162933.GB16145@quark.localdomain>
+Subject: [PATCH 00/67] crypto: shash - Handle partial blocks in API
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250413162933.GB16145@quark.localdomain>
 
-On Sun, Apr 13, 2025 at 09:29:33AM -0700, Eric Biggers wrote:
->
-> What is a "block-only shash" and why does it make sense?
+This series is based on
 
-It's not such a big deal with shash, especially if you use the library
-plus block function model like sha256.
+	https://lore.kernel.org/linux-crypto/Z_8-y1NkOSm7HY8C@gondor.apana.org.au
 
-However, where it does make a big difference is with the drivers.
+Most hash algorithms are block-based and data is held back until
+a whole block can be fed into the algorithm.  Currently, this
+retention is entirely handled in the low-level algorithm code,
+with the API and the user oblivious to it.
 
-I'm only doing shash because I want to ensure that the export
-format is identical between shash and ahash for a given algorithm,
-so that you can fallback to shash even if you've already done an
-export.
+As a comparison, the block ciphers defer this retention entirely
+to the user and the API, who is expected to provide input with
+no partial data until the very end.
 
-Cheers,
+The result of this is that every shash algorithm has to implement
+partial block handling, and it gets many times worse when you look
+at ahash drivers.
+
+This patch series adds optional handling of partial blocks to the
+shash API and converts some of the shash algorithms to it.  In
+particular, all the algorithms used by ahash drivers have been
+converted.  This ensures that when the ahash drivers themselves
+are converted the export format will be consistent.
+
+As this touches so many shash algorithms, two extra changes have
+been made at the same time: removal of SIMD fallback paths on
+arm/arm64/x86 and exporting in the same format as that of the
+generic algorithm.
+
+Herbert Xu (67):
+  crypto: shash - Handle partial blocks in API
+  crypto: blake2b-generic - Use API partial block handling
+  crypto: arm/blake2b - Use API partial block handling
+  crypto: ghash-generic - Use API partial block handling
+  crypto: powerpc/ghash - Use API partial block handling
+  crypto: arm/ghash - Use API partial block handling
+  crypto: arm64/ghash - Use API partial block handling
+  crypto: riscv/ghash - Use API partial block handling
+  crypto: s390/ghash - Use API partial block handling
+  crypto: x86/ghash - Use API partial block handling
+  crypto: md5-generic - Use API partial block handling
+  crypto: mips/octeon-md5 - Use API partial block handling
+  crypto: powerpc/md5 - Use API partial block handling
+  crypto: sparc/md5 - Use API partial block handling
+  crypto: x86/sha1 - Use API partial block handling
+  crypto: arm64/sha1 - Use API partial block handling
+  crypto: mips/octeon-sha1 - Use API partial block handling
+  crypto: sha1-generic - Use API partial block handling
+  crypto: arm/sha1-ce - Use API partial block handling
+  crypto: arm/sha1-neon - Use API partial block handling
+  crypto: arm/sha1-asm - Use API partial block handling
+  crypto: powerpc/sha1 - Use API partial block handling
+  crypto: powerpc/sha1-spe - Use API partial block handling
+  crypto: s390/sha1 - Use API partial block handling
+  crypto: sparc/sha1 - Use API partial block handling
+  crypto: sha1_base - Remove partial block helpers
+  crypto: x86/sha256 - Use API partial block handling
+  crypto: mips/octeon-sha256 - Use API partial block handling
+  crypto: riscv/sha256 - Use API partial block handling
+  crypto: sha256-generic - Use API partial block handling
+  crypto: arm/sha256-ce - Use API partial block handling
+  crypto: arm/sha256-neon - Use API partial block handling
+  crypto: arm/sha256-asm - Use API partial block handling
+  crypto: arm64/sha256-ce - Use API partial block handling
+  crypto: arm64/sha256 - Use API partial block handling
+  crypto: powerpc/sha256-spe - Use API partial block handling
+  crypto: s390/sha256 - Use API partial block handling
+  crypto: sparc/sha256 - Use API partial block handling
+  crypto: sha256_base - Remove partial block helpers
+  crypto: arm64/sha3-ce - Use API partial block handling
+  crypto: s390/sha3 - Use API partial block handling
+  crypto: sha3-generic - Use API partial block handling
+  crypto: zynqmp-sha - Use API partial block handling
+  crypto: x86/sha512 - Use API partial block handling
+  crypto: mips/octeon-sha512 - Use API partial block handling
+  crypto: riscv/sha512 - Use API partial block handling
+  crypto: sha512-generic - Use API partial block handling
+  crypto: arm/sha512-neon - Use API partial block handling
+  crypto: arm/sha512-asm - Use API partial block handling
+  crypto: arm64/sha512-ce - Use API partial block handling
+  crypto: arm/sha512 - Use API partial block handling
+  crypto: s390/sha512 - Use API partial block handling
+  crypto: sparc/sha512 - Use API partial block handling
+  crypto: sha512_base - Remove partial block helpers
+  crypto: sm3-generic - Use API partial block handling
+  crypto: arm64/sm3-ce - Use API partial block handling
+  crypto: arm64/sm3-neon - Use API partial block handling
+  crypto: riscv/sm3 - Use API partial block handling
+  crypto: x86/sm3 - Use API partial block handling
+  crypto: lib/sm3 - Remove partial block helpers
+  crypto: cbcmac - Use API partial block handling
+  crypto: cmac - Use API partial block handling
+  crypto: xcbc - Use API partial block handling
+  crypto: arm64/aes - Use API partial block handling
+  crypto: arm64/sm4 - Use API partial block handling
+  crypto: nx - Use API partial block handling
+  crypto: padlock-sha - Use API partial block handling
+
+ arch/arm/crypto/blake2b-neon-glue.c           |  20 +-
+ arch/arm/crypto/ghash-ce-glue.c               | 110 ++---
+ arch/arm/crypto/sha1-ce-glue.c                |  36 +-
+ arch/arm/crypto/sha1.h                        |  14 -
+ arch/arm/crypto/sha1_glue.c                   |  33 +-
+ arch/arm/crypto/sha1_neon_glue.c              |  39 +-
+ arch/arm/crypto/sha2-ce-glue.c                |  52 +-
+ arch/arm/crypto/sha256_glue.c                 |  46 +-
+ arch/arm/crypto/sha256_glue.h                 |   8 +-
+ arch/arm/crypto/sha256_neon_glue.c            |  49 +-
+ arch/arm/crypto/sha512-glue.c                 |  36 +-
+ arch/arm/crypto/sha512-neon-glue.c            |  43 +-
+ arch/arm/crypto/sha512.h                      |   6 -
+ arch/arm64/crypto/aes-glue.c                  | 122 ++---
+ arch/arm64/crypto/ghash-ce-glue.c             | 151 +++---
+ arch/arm64/crypto/sha1-ce-glue.c              |  66 +--
+ arch/arm64/crypto/sha2-ce-glue.c              |  90 +---
+ arch/arm64/crypto/sha256-glue.c               |  97 ++--
+ arch/arm64/crypto/sha3-ce-glue.c              | 107 ++--
+ arch/arm64/crypto/sha512-ce-glue.c            |  49 +-
+ arch/arm64/crypto/sha512-glue.c               |  28 +-
+ arch/arm64/crypto/sm3-ce-glue.c               |  48 +-
+ arch/arm64/crypto/sm3-neon-glue.c             |  48 +-
+ arch/arm64/crypto/sm4-ce-glue.c               |  98 ++--
+ arch/mips/cavium-octeon/crypto/octeon-md5.c   | 119 ++---
+ arch/mips/cavium-octeon/crypto/octeon-sha1.c  | 136 ++---
+ .../mips/cavium-octeon/crypto/octeon-sha256.c | 161 ++----
+ .../mips/cavium-octeon/crypto/octeon-sha512.c | 155 ++----
+ arch/powerpc/crypto/ghash.c                   |  87 ++--
+ arch/powerpc/crypto/md5-glue.c                |  99 +---
+ arch/powerpc/crypto/sha1-spe-glue.c           | 132 +----
+ arch/powerpc/crypto/sha1.c                    | 101 +---
+ arch/powerpc/crypto/sha256-spe-glue.c         | 167 ++-----
+ arch/riscv/crypto/ghash-riscv64-glue.c        |  58 +--
+ arch/riscv/crypto/sha256-riscv64-glue.c       |  68 ++-
+ arch/riscv/crypto/sha512-riscv64-glue.c       |  47 +-
+ arch/riscv/crypto/sm3-riscv64-glue.c          |  49 +-
+ arch/s390/crypto/ghash_s390.c                 | 110 ++---
+ arch/s390/crypto/sha.h                        |  22 +-
+ arch/s390/crypto/sha1_s390.c                  |  22 +-
+ arch/s390/crypto/sha256_s390.c                |  35 +-
+ arch/s390/crypto/sha3_256_s390.c              |  60 +--
+ arch/s390/crypto/sha3_512_s390.c              |  67 +--
+ arch/s390/crypto/sha512_s390.c                |  45 +-
+ arch/s390/crypto/sha_common.c                 |  84 ++--
+ arch/sparc/crypto/md5_glue.c                  | 141 +++---
+ arch/sparc/crypto/sha1_glue.c                 | 109 +---
+ arch/sparc/crypto/sha256_glue.c               | 121 +----
+ arch/sparc/crypto/sha512_glue.c               | 102 +---
+ arch/x86/crypto/ghash-clmulni-intel_asm.S     |   5 +-
+ arch/x86/crypto/ghash-clmulni-intel_glue.c    | 301 ++----------
+ arch/x86/crypto/sha1_ssse3_glue.c             |  81 +--
+ arch/x86/crypto/sha256_ssse3_glue.c           | 104 ++--
+ arch/x86/crypto/sha512_ssse3_glue.c           |  79 +--
+ arch/x86/crypto/sm3_avx_glue.c                |  54 +-
+ crypto/blake2b_generic.c                      |  31 +-
+ crypto/ccm.c                                  |  59 +--
+ crypto/cmac.c                                 |  92 +---
+ crypto/ghash-generic.c                        |  56 +--
+ crypto/md5.c                                  | 102 ++--
+ crypto/sha1_generic.c                         |  33 +-
+ crypto/sha256_generic.c                       |  50 +-
+ crypto/sha3_generic.c                         | 101 ++--
+ crypto/sha512_generic.c                       |  56 +--
+ crypto/shash.c                                | 229 +++++++--
+ crypto/sm3_generic.c                          |  31 +-
+ crypto/xcbc.c                                 |  92 +---
+ drivers/crypto/nx/nx-aes-xcbc.c               | 128 ++---
+ drivers/crypto/nx/nx-sha256.c                 | 130 ++---
+ drivers/crypto/nx/nx-sha512.c                 | 143 +++---
+ drivers/crypto/nx/nx.c                        |  15 +-
+ drivers/crypto/nx/nx.h                        |   6 +-
+ drivers/crypto/padlock-sha.c                  | 464 ++++++------------
+ drivers/crypto/xilinx/zynqmp-sha.c            |  71 +--
+ include/crypto/blake2b.h                      |  31 +-
+ include/crypto/ghash.h                        |   4 +-
+ include/crypto/hash.h                         | 104 ++--
+ include/crypto/internal/blake2b.h             |  94 ++--
+ include/crypto/internal/hash.h                |  15 +
+ include/crypto/md5.h                          |   3 +-
+ include/crypto/sha1.h                         |   9 +-
+ include/crypto/sha1_base.h                    |  79 +--
+ include/crypto/sha2.h                         |  20 +-
+ include/crypto/sha256_base.h                  | 111 +++--
+ include/crypto/sha3.h                         |  16 +-
+ include/crypto/sha512_base.h                  |  88 ++--
+ include/crypto/sm3.h                          |   3 +-
+ include/crypto/sm3_base.h                     |  79 ++-
+ include/linux/crypto.h                        |   2 +
+ lib/crypto/sha256.c                           |   7 +-
+ lib/crypto/sm3.c                              |  68 +--
+ 91 files changed, 2375 insertions(+), 4564 deletions(-)
+ delete mode 100644 arch/arm/crypto/sha1.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
