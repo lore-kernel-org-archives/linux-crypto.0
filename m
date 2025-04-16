@@ -1,97 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170C21FB3
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Apr 2025 17:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1053C202C42;
+	Wed, 16 Apr 2025 17:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744823386; cv=none; b=aaqpp1ru86sB3NzBJtzTsB8v8KOapw1knp26gKWoBNJBX/ZVjqZ8PvFHlEwQGF/Dm/dEQCx1BJ6O5oFnE4oDaKDgq+wCYa+JoUOIyr8bkY239t88jyYDRDjwdZXBWrVbHTGxswEu5EpcxoohNtN9IUSLPKj+TCG/0d+AMQ9Yajg=
+	t=1744823720; cv=none; b=ITRnwPoyQdFo3lHx4Int74Z99qZUWoyik6YX1XsoM5a8UzUHpssuiA3P8dnKpa5NdtrPkeEhT6Tdl7K1cg/ydpn2lWxTPTgMKUmFcqTJm9NgNyXKRceDuvd4G0P/qPegq40E+Ald10KW4T2tPaMbs3UDEHRNmF2AVjOch9fML0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744823386; c=relaxed/simple;
-	bh=71bXe7/JGCogsQ7ibc+guzQ5c9x3kLnVtoCxcOYQayg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CuqpvF7UtAwwLTtbg1uLwYs1sshz9HrSnFhuX6rR5foh5YbCGtVaHfo55NYsS5qDNR7GKFVDDgJFv4y77xc6IHgx35wheBi2JiLK8CclkrFwYO307ftGOXh7oUSt0cSRLydvC5VMMWRWE5YkBg6TQpUgcUtk1DgOIEu5MmAskVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0HPiwW5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744823720; c=relaxed/simple;
+	bh=PtS50I1JEx78saTBfrIr2/aVCZOH4dhGGysijRowgC0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NsmV80yDRMp+S41O9NLwPwV14RHKD4tegtDpG1fqhojav37K5pC2FGxwp9mNXLoWMvrlf34I3g8fwNXeAzpbuyu5yKz6rnwknjh40jbfHloMad6IdefdyWpu3mgeVntx66ipMli5H9nrp+8ZsehrkpQk/cNm/P+mc4Lsr5sTJEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2e8LiJd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0HPiwW5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CF7BC4CEE2;
-	Wed, 16 Apr 2025 17:09:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2e8LiJd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A4AC4CEE2;
+	Wed, 16 Apr 2025 17:15:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744823385;
-	bh=71bXe7/JGCogsQ7ibc+guzQ5c9x3kLnVtoCxcOYQayg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d0HPiwW5KIvl/Le9iDjcgAKhbskjl6UoqgGSvCxRvegI+EhuQj6lapdmDnXYDpXHe
-	 610+CSXaYTPb9SBxmoFSJN2XQMNBWc0oiH8If7qCdUR4H4f1GupS+LK9u8ec5Gq7aO
-	 82s1l5mrk4X1oFJt5K5qA9N1YxP5AZNnYeqFr9fJxIDf93VgrNy4HLkSPW7fTMPWXa
-	 fK2zblArTDjXWY/HfKp4POXjwe8LDw7So2s9q1yENa9My0lKNgBWNhVg7ET0YPUJPu
-	 PmTI9sDouB2AraYGVrV2nCn/p9EqYa7K25q5Ax9w7nC3A+2Ddxjt2T5riD8hfo2uiM
-	 Xf3nVA6oTyh0w==
-Date: Wed, 16 Apr 2025 10:09:43 -0700
+	s=k20201202; t=1744823719;
+	bh=PtS50I1JEx78saTBfrIr2/aVCZOH4dhGGysijRowgC0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n2e8LiJdxP35mPYrF33YC5NWI2GA+R0A0NF6IRn0hMETQmeIcY5FFKS3l3Pix3PdO
+	 69prvrhfe8abkQ1K2+OlkHPXSW1Fr0fwi7gbZ4s8RXkD3Tz8ldD7QJv/C5tov6JQhN
+	 jxXo8hrW5kUdv1jmXLqu4GZ1guwGgx2cxoEFgyoIoGJp0PvhkIKBwRPWV08D5Nm1Ag
+	 1hzez+mN7o/2o/9XMYNztpaox4toV76lfYFvc3ppOnJpSU99ucndmkn6fL5Sz1FwVN
+	 nLeNWyIzxMc//AEA+yU8Go2QDi8bttOejLpDK0/07/eKo+9rSotdY6cNIoBe0fauhi
+	 DRAYJ4ru+k83Q==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 1/4] asm-generic: Make simd.h more resilient
-Message-ID: <20250416170943.GB189808@quark.localdomain>
-References: <cover.1744356724.git.herbert@gondor.apana.org.au>
- <c2a0a6a3467c6ff404e524d564f777fad31c9ebc.1744356724.git.herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] powerpc/crc: include <linux/uaccess.h>
+Date: Wed, 16 Apr 2025 10:14:39 -0700
+Message-ID: <20250416171439.226938-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c2a0a6a3467c6ff404e524d564f777fad31c9ebc.1744356724.git.herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 11, 2025 at 03:38:43PM +0800, Herbert Xu wrote:
-> Add missing header inclusions and protect against double inclusion.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  include/asm-generic/simd.h | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/asm-generic/simd.h b/include/asm-generic/simd.h
-> index d0343d58a74a..ac29a22eb7cf 100644
-> --- a/include/asm-generic/simd.h
-> +++ b/include/asm-generic/simd.h
-> @@ -1,6 +1,10 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_GENERIC_SIMD_H
-> +#define _ASM_GENERIC_SIMD_H
->  
-> -#include <linux/hardirq.h>
-> +#include <linux/compiler_attributes.h>
-> +#include <linux/preempt.h>
-> +#include <linux/types.h>
->  
->  /*
->   * may_use_simd - whether it is allowable at this time to issue SIMD
-> @@ -13,3 +17,5 @@ static __must_check inline bool may_use_simd(void)
->  {
->  	return !in_interrupt();
->  }
-> +
-> +#endif	/* _ASM_GENERIC_SIMD_H */
+From: Eric Biggers <ebiggers@google.com>
 
-This patch broke the powerpc build:
+Since <asm/simd.h> no longer transitively includes <linux/uaccess.h>
+which provides pagefault_disable() and pagefault_enable(),
+<linux/uaccess.h> now needs to be included directly.
 
-../arch/powerpc/lib/crc32-glue.c: In function 'crc32c_arch':
-../arch/powerpc/lib/crc32-glue.c:44:17: error: implicit declaration of function 'pagefault_disable'; did you mean 'preempt_disable'? [-Wimplicit-function-declaration]
-   44 |                 pagefault_disable();
-      |                 ^~~~~~~~~~~~~~~~~
-      |                 preempt_disable
-../arch/powerpc/lib/crc-t10dif-glue.c: In function 'crc_t10dif_arch':
-../arch/powerpc/lib/crc-t10dif-glue.c:48:17: error: implicit declaration of function 'pagefault_disable'; did you mean 'preempt_disable'? [-Wimplicit-function-declaration]
-   48 |                 pagefault_disable();
-      |                 ^~~~~~~~~~~~~~~~~
-      |                 preempt_disable
-../arch/powerpc/lib/crc32-glue.c:48:17: error: implicit declaration of function 'pagefault_enable'; did you mean 'preempt_enable'? [-Wimplicit-function-declaration]
-   48 |                 pagefault_enable();
-      |                 ^~~~~~~~~~~~~~~~
-      |                 preempt_enable
-../arch/powerpc/lib/crc-t10dif-glue.c:52:17: error: implicit declaration of function 'pagefault_enable'; did you mean 'preempt_enable'? [-Wimplicit-function-declaration]
-   52 |                 pagefault_enable();
-      |                 ^~~~~~~~~~~~~~~~
-      |                 preempt_enable
+Fixes: 7ba8df47810f ("asm-generic: Make simd.h more resilient")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+
+I can take this via the crc tree, but it really should go via crypto
+since the patch that broke this is in there...
+
+ arch/powerpc/lib/crc-t10dif-glue.c | 1 +
+ arch/powerpc/lib/crc32-glue.c      | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/arch/powerpc/lib/crc-t10dif-glue.c b/arch/powerpc/lib/crc-t10dif-glue.c
+index ddd5c4088f50..c48284f7b582 100644
+--- a/arch/powerpc/lib/crc-t10dif-glue.c
++++ b/arch/powerpc/lib/crc-t10dif-glue.c
+@@ -11,10 +11,11 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+ #include <linux/cpufeature.h>
++#include <linux/uaccess.h>
+ #include <asm/simd.h>
+ #include <asm/switch_to.h>
+ 
+ #define VMX_ALIGN		16
+ #define VMX_ALIGN_MASK		(VMX_ALIGN-1)
+diff --git a/arch/powerpc/lib/crc32-glue.c b/arch/powerpc/lib/crc32-glue.c
+index 42f2dd3c85dd..d7f57576c74e 100644
+--- a/arch/powerpc/lib/crc32-glue.c
++++ b/arch/powerpc/lib/crc32-glue.c
+@@ -3,10 +3,11 @@
+ #include <crypto/internal/simd.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/cpufeature.h>
++#include <linux/uaccess.h>
+ #include <asm/simd.h>
+ #include <asm/switch_to.h>
+ 
+ #define VMX_ALIGN		16
+ #define VMX_ALIGN_MASK		(VMX_ALIGN-1)
+
+base-commit: 5f7325fbb3d416ba66f163a9272e17d70f1d9bf4
+-- 
+2.49.0
+
