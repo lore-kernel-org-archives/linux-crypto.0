@@ -1,95 +1,113 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E32884E1C;
-	Wed, 16 Apr 2025 17:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08BF74BED;
+	Thu, 17 Apr 2025 01:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744824691; cv=none; b=D112bay0m7XE+Vj/hkzkE9hZPnuUGUwfGZ2xTZipyOp3LYwMVcpZRUH+pnjEbJfZva1suW8uQj6sB94tv2xyZmdnzK711dqhzkNFbLIRmnjhKP/O2uuvv7+r8A20fBHAVw+7S0tUQDUzY4DsfFhN5NLW8VVqp8vKkR6ZAoaOZMI=
+	t=1744854732; cv=none; b=Zi1BYo56hSGNGPt3UJgzCAmWasjgWbeWzslE8m2IWObj19VnWUQkwYWMolfMghcu0U8wEgJ+A3TxVkBLtKT/n8bAa5pvc7eKCCPxcBubEZC8Uv/seB65bzMMKsduwgly533YXc7IQfk6l97lzp9HCMUOgCrfvmIGHVWSbiKs6gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744824691; c=relaxed/simple;
-	bh=5Pv3Hc0R8ZXL+oH8n2b7z3OtCOacHKIR1ANqXH+K9c0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Z6xAiaGvNQheyQ613Gf8n2WutwhQB4Ggf/OdQ9ZWAejineJRBApQhgWc3kPaOzvAb9+pl5V+zXfDL33JkEkj+Ub/Kwc6kz9o+vEh27VTA5OxVJPRTGd+i46sezK5If3i7vEs8J4bohK+yf8Jje/gFqSX/zb20N+OYJniVzMq8dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=TJVRAyam; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1744854732; c=relaxed/simple;
+	bh=8P33tZx+FG4uxbrNDNGiIx42lfZjyKNz1e0q+MTU00Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Kv4gEu8BL+WSpgI53s1Xy81momNNoF/j6WGe9IoEoCJvh+gPdAbe1y39Q/wBPrBsu9BiQPFPC/cLPGHfJ5rzPT4p4dPTwc05n0CFGVGprEoqveHJJrD5rsUQEfIFPx4kTE3dpYNzf4w5m2KZ057VN960K3inDxq5i8eNhUZO9T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=M/R8b8I/; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="TJVRAyam"
-Received: from narnia (unknown [167.220.2.28])
-	by linux.microsoft.com (Postfix) with ESMTPSA id CA0032052508;
-	Wed, 16 Apr 2025 10:31:20 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CA0032052508
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1744824689;
-	bh=b7cZx62sBqiNAK+Z5g1uUfPSpgmxvu8T11NIoXrTY/o=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=TJVRAyamNt8PTaChjPR4KaTuMaecAOHx9O2mwAnlkPR9lulk07gjnRGoxXT/5rHwB
-	 ZlrItUV1NU7JpKbyzk/UEEXb1e+ROAv34a6ZYR5OoptpDpkfF+e1fJEz/jPiDVMnTN
-	 ekQqoaiXnzkMd9ip4K/kRhdBVUggBCaWt16+ZVoo=
-From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James Morris
- <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada
- <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas
- Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, =?utf-8?Q?Mick?=
- =?utf-8?Q?a=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Nick
- Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>,
- Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen
- <jarkko@kernel.org>, Jan Stancek <jstancek@redhat.com>, Neal Gompa
- <neal@gompa.dev>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, keyrings@vger.kernel.org, Linux
- Crypto Mailing List <linux-crypto@vger.kernel.org>, LSM List
- <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list
- <linux-kbuild@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, Matteo Croce
- <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, Cong Wang
- <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
-In-Reply-To: <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
-References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
- <20250404215527.1563146-2-bboscaccy@linux.microsoft.com>
- <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
- <87semdjxcp.fsf@microsoft.com>
- <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
- <87friajmd5.fsf@microsoft.com>
- <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
- <87a58hjune.fsf@microsoft.com>
- <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
-Date: Wed, 16 Apr 2025 10:31:18 -0700
-Message-ID: <87y0w0hv2x.fsf@microsoft.com>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="M/R8b8I/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1744854723;
+	bh=NL+ho5AbXUYunSuWKJArnY56fdGu/V6TOvKjJ6or/Sk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=M/R8b8I/dlDbjY2Dip7yYTIT29huJr7KfafedW6/5qIbT2XjCe9RQMX8csv52e1yo
+	 +nGX+pLbplvaCMBLJEHYlSbvA//FbV6f0XDxztvUINreoPIMHtSr/yAt/U6UH5c1Ti
+	 E1P2ckl4Y0s7+VQH1m+nNFKpR7x/oybeZ/3EmB68iVPlbcHfMkVkYJ9QKBe2JqGSOd
+	 cSYFm3GmKpD92dhodp/DyknKb1QpyVQcWSh+hsK2XWXL2WYCxbFvR1IKK+NO520rpf
+	 Pem0iqaWomkO0b97oXvYa0TyaGohhqPVeyg+zeppbgqg/bMaKfhWvSUIQXNbYgZIPZ
+	 3ypZJNW/zI2tg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZdLVW07K8z4xRB;
+	Thu, 17 Apr 2025 11:52:02 +1000 (AEST)
+Date: Thu, 17 Apr 2025 11:52:01 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20250417115201.05de8b5c@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; boundary="Sig_/dQDpTbzmc7/cDLg=1IeyOPF";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+--Sig_/dQDpTbzmc7/cDLg=1IeyOPF
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> History repeats itself.
-> 1. the problem is hard.
-> 2. you're only interested in addressing your own use case.
-> There is no end-to-end design here and no attempt to
-> think it through how it will work for others.
->
+Hi all,
 
-Well, I suppose anything worth doing is going to be hard :)
+After merging the crypto tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
 
-The end-to-end design for this is the same end-to-end design that exists
-for signing kernel modules today. We envisioned it working for others
-the same way module signing works for others. 
+arch/powerpc/lib/crc32-glue.c: In function 'crc32c_arch':
+arch/powerpc/lib/crc32-glue.c:44:17: error: implicit declaration of functio=
+n 'pagefault_disable'; did you mean 'preempt_disable'? [-Wimplicit-function=
+-declaration]
+   44 |                 pagefault_disable();
+      |                 ^~~~~~~~~~~~~~~~~
+      |                 preempt_disable
+arch/powerpc/lib/crc32-glue.c:48:17: error: implicit declaration of functio=
+n 'pagefault_enable'; did you mean 'preempt_enable'? [-Wimplicit-function-d=
+eclaration]
+   48 |                 pagefault_enable();
+      |                 ^~~~~~~~~~~~~~~~
+      |                 preempt_enable
+arch/powerpc/lib/crc-t10dif-glue.c: In function 'crc_t10dif_arch':
+arch/powerpc/lib/crc-t10dif-glue.c:48:17: error: implicit declaration of fu=
+nction 'pagefault_disable'; did you mean 'preempt_disable'? [-Wimplicit-fun=
+ction-declaration]
+   48 |                 pagefault_disable();
+      |                 ^~~~~~~~~~~~~~~~~
+      |                 preempt_disable
+arch/powerpc/lib/crc-t10dif-glue.c:52:17: error: implicit declaration of fu=
+nction 'pagefault_enable'; did you mean 'preempt_enable'? [-Wimplicit-funct=
+ion-declaration]
+   52 |                 pagefault_enable();
+      |                 ^~~~~~~~~~~~~~~~
+      |                 preempt_enable
 
-> Hacking into bpf internal objects like maps is not acceptable.
+Presumably caused by commit
 
-We've heard your concerns about kern_sys_bpf and we agree that the LSM
-should not be calling it. The proposal in this email should meet both of
-our needs
-https://lore.kernel.org/bpf/874iypjl8t.fsf@microsoft.com/
+  fcfbdddc6f02 ("crypto: ctr - Remove unnecessary header inclusions")
 
+I have used the crypto tree from next-20250416 for today.
 
--blaise
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/dQDpTbzmc7/cDLg=1IeyOPF
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgAXsEACgkQAVBC80lX
+0GxrTwf/cRkXDexTV415rtU80TLkkFReh0SqQUZpeFJ+HTUiEywKjy2USV+iH26R
+1cV/kY0+ug42BQIUrwinNWewQgzCmZYySnjMhLo5ksyoG/vmJ9ygu+Wp55UMO6Hf
+jhNmXj9EM4atj8VrgoHXqDRTmXUDBRtiry7A5m+PQookN4tOI3av97PO/757lPRD
+/XtX1AMetacfoSBCznsSQjRyrxff6bFLNh2RzuM1tp5IEk1aSd5xlDs893i35xpo
+SB5GzoeM6Zpx61vHfCbXCG0oYMhv8gWbpNiFPzpmAwIqcW0lV8n7H9mJNfSJvnoH
+w7td0b72gNYHAdAlWW25/NUZ7mPkOw==
+=MaM0
+-----END PGP SIGNATURE-----
+
+--Sig_/dQDpTbzmc7/cDLg=1IeyOPF--
