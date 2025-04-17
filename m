@@ -1,182 +1,149 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A5A199384;
-	Thu, 17 Apr 2025 12:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B926C2512E6;
+	Thu, 17 Apr 2025 14:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744894418; cv=none; b=parxpM/elZfycX38zvjFPXkoD3aqj39w0KfxsJlbPi7zPhYg+5pJommLyx5D8hOCTYShsjoHRKZz2ihiem/k1fCHrqHm86cFESwUprNpv3L5MYc8Io/Tji5+PEzVvIziBm+vwaGwQ+J2f/VmkhBpPxHWPpC0L2bqsm12fBs9VDo=
+	t=1744899328; cv=none; b=SXnBCJuVFpRM8ajpJtQ4Sy2WP4Sho0Gq1hqFwPpL4VHiBmgbDUHX/GpfDnPDKwXmC6VftR9p+jxY1ugtCAXCHdQPHlvfDoPPh6SHuGj2I6u4Dq6v43deZbiiLAJWu+Kf1YFaSMys4lYE4/9x1T1xpMRHM+AcJJi3BtNTj5Q3A8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744894418; c=relaxed/simple;
-	bh=/H1MitLHmc2IfhQSw0i74/aezvU0Kk8Juplt2SWiPzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G6YRa+v+u1mxa9PIvdbHY7NarBAIuVvoGVYMFS1X37lAaYEDJ+5JlHdbx9hDr6afCkPfTCEjO+QlT9Ye2uhHZS2vOOIxeoH1F8ktMHQKp+XJCAg5Eu0uEJJmyMZzKsksZEj0ZPRl7CJc0f0lAX3zhmQaUWUy2j1c7H3T6bUqrFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PWxMTYAZ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1744899328; c=relaxed/simple;
+	bh=OwOkjFVgfqnhtYMoB2n+/2LjSN54EJEx3cnulauDKdo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IO/aWFJaZbuVcPAEPDjd3yRL+0tJoG5tiWhPfYgJxeRFj3jaoHHQt0HlhwWNpAy9E76ktfWCuqp0sZ5bLnQ0kRhpUWqQdfCIEhuE/3JrpUBAoQicRcDSxyqiixXM3sRfpFsILnndOGwfFRZC1lEc+cK1EDh03goo9TQersfjsLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkPcu2I9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PWxMTYAZ"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53HArisF018556;
-	Thu, 17 Apr 2025 12:53:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=sxLU9duCgf8SfMyLYupstJbj0NSNm6
-	H3ZBa2n7luzGc=; b=PWxMTYAZ4jnrtqWzXSaZS0fkAjAfJEXKUK/86EdoDIpOLK
-	Mi497z2LA4c5kb5ba7ec2eQVjOzk/U3pYoNyZ3x/Xa64hRZEmweEClWVDQR/KXdf
-	HPCzXWTM7hxoszv8Rgmt1+J6WifRVXZaCOf7oinw+eHq4BpuZOOGkdLxvUICR0An
-	BYd0qbFuIsHPb5vsphRj20fxQMNtsCW7eM12dalLCns/dLLDVIILJ1cxJC3l+M5l
-	R+7302WjXk2EPc6LPIADZYTdknfcB1TaDL6hNDABJ7SUQrTXaRUfdcB3CcqdVsMU
-	8gRwk2dzZ/ZL1FtsQs9WMz04oP12qVgg+3xzK4EQ==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 462ph0b11r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Apr 2025 12:53:23 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53HA0HLn030943;
-	Thu, 17 Apr 2025 12:53:22 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4603gnwr4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Apr 2025 12:53:22 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53HCrKoc35651856
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 17 Apr 2025 12:53:21 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D500B20043;
-	Thu, 17 Apr 2025 12:53:20 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 469F420040;
-	Thu, 17 Apr 2025 12:53:20 +0000 (GMT)
-Received: from osiris (unknown [9.87.137.75])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 17 Apr 2025 12:53:20 +0000 (GMT)
-Date: Thu, 17 Apr 2025 14:53:18 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-s390@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] lib/crc: make the CPU feature static keys __ro_after_init
-Message-ID: <20250417125318.12521F12-hca@linux.ibm.com>
-References: <20250413154350.10819-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkPcu2I9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32058C4CEED;
+	Thu, 17 Apr 2025 14:15:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744899328;
+	bh=OwOkjFVgfqnhtYMoB2n+/2LjSN54EJEx3cnulauDKdo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=rkPcu2I9/wcJSEB9hys4gh2n7O1us0r2kkmLcoI3BHSWby4kg6PpnZiNYwA8xAsv2
+	 qdNxNE5+pvCPVLL/Yg4eQ8v6PWOO7yFGCwLrbZz0PQm7FhrlLXMRnF8JDr5pFbJ3tz
+	 Gtig0ZzIYazvHpcs5VKrktD54KbjXccWV1YGXKUgCwvwbg35BpxskWyoYVAyJ+3LO4
+	 Jn0LnkZsTT853+vAqZw+33d6WLX7Hle9MMmSYhTQ5hZkcTX98WjS7l/DY6o4uUZc94
+	 gWsgAil/6uekgh3x3aB/eH0R7cxBYKhkVRJ04JMRNnrJFbwO2GRxatlx88fZs6PrHs
+	 bJm8ag2D0nnBQ==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30bfe0d2b6dso7927651fa.3;
+        Thu, 17 Apr 2025 07:15:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUu6qk5bPczgY3Bqgbiff7Wzym3yH9DQVA40CkBQ6jXfmqL5ejhaUbraB4xTg5ND+eGpM7K5+nkOT3j8QHA@vger.kernel.org, AJvYcCXiBLMqY0RfR3iSS6N1pBPoDlZlWGUEbVd7kVlM+INdCbdaa3ibCfPtSyyBmTTbvivBbO2oLLnJRSbHYfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu9mvhnU+y63UFMJ/a8EGxsk5r6AgOchR1p4rKnAqTwKZDPJXM
+	2m72ciHeHdYTJJGP9vRILbVzS2M/gEKs1RuPOmI3vRHhZkcbeHiXymZqCBHvIQw/bwjEo9rjxCx
+	9QFtJjiwR/7qnQfOK5sUAdxuQ8/Y=
+X-Google-Smtp-Source: AGHT+IGKDLvGQdTgpdJ7/j9wkID94NCC8FnydWqifd12MlpxWqVVofyUjcJtA/8XvkknzSU9uf03za/MH7AVddjqFIU=
+X-Received: by 2002:a2e:ad93:0:b0:30b:b204:6b80 with SMTP id
+ 38308e7fff4ca-3107f695046mr25939941fa.8.1744899326442; Thu, 17 Apr 2025
+ 07:15:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250413154350.10819-1-ebiggers@kernel.org>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=QJdoRhLL c=1 sm=1 tr=0 ts=6800f9c3 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=D0vrx1nMhUQuyXyLR1kA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: CiZgrlgThAo1hPOeoX6oy1totgLBfc2n
-X-Proofpoint-ORIG-GUID: CiZgrlgThAo1hPOeoX6oy1totgLBfc2n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-17_03,2025-04-17_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- adultscore=0 mlxlogscore=942 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1011 malwarescore=0
- impostorscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2502280000 definitions=main-2504170090
+References: <20250417064940.68469-1-dqfext@gmail.com> <CAMj1kXFPAVXOtPoETKvHB49kjZUPYrsAqsJwdL7p5Cu4xk75Rg@mail.gmail.com>
+ <CALW65jY=LnVBYoKPOQnSKgGSA0brKzmo0vqoRDcqF_=jofLAng@mail.gmail.com>
+ <CAMj1kXH-u7hiKGQfgYHj_16V4ATN_aHmA_wkvMSyLh+E3+QaAA@mail.gmail.com> <CALW65jZVYUZoka7Gbjcoh43qbkD7rGpw8gTZjjOYpZD-BhLyBQ@mail.gmail.com>
+In-Reply-To: <CALW65jZVYUZoka7Gbjcoh43qbkD7rGpw8gTZjjOYpZD-BhLyBQ@mail.gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 17 Apr 2025 16:15:15 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXE8nY0rasb04qbZGtkuL5_b8so7L7NH61zLv9G3nm5vcg@mail.gmail.com>
+X-Gm-Features: ATxdqUGHOdKzra412vt6IXHNye7okVyhB80J7RfKjih5eOcYv_TSJ39O50e8lAk
+Message-ID: <CAMj1kXE8nY0rasb04qbZGtkuL5_b8so7L7NH61zLv9G3nm5vcg@mail.gmail.com>
+Subject: Re: [RFC PATCH] crypto: riscv: scalar accelerated GHASH
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, linux-crypto@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	=?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>, 
+	Heiko Stuebner <heiko.stuebner@vrull.eu>, Qingfang Deng <qingfang.deng@siflower.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 13, 2025 at 08:43:50AM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> All of the CRC library's CPU feature static_keys are initialized by
-> initcalls and never change afterwards, so there's no need for them to be
-> in the regular .data section.  Put them in .data..ro_after_init instead.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> 
-> I'm planning to take this via the crc tree.
-> 
->  arch/arm/lib/crc-t10dif-glue.c       | 4 ++--
->  arch/arm/lib/crc32-glue.c            | 4 ++--
->  arch/arm64/lib/crc-t10dif-glue.c     | 4 ++--
->  arch/loongarch/lib/crc32-loongarch.c | 2 +-
->  arch/mips/lib/crc32-mips.c           | 2 +-
->  arch/powerpc/lib/crc-t10dif-glue.c   | 2 +-
->  arch/powerpc/lib/crc32-glue.c        | 2 +-
->  arch/s390/lib/crc32-glue.c           | 2 +-
+On Thu, 17 Apr 2025 at 10:42, Qingfang Deng <dqfext@gmail.com> wrote:
+>
+> On Thu, Apr 17, 2025 at 3:58=E2=80=AFPM Ard Biesheuvel <ardb@kernel.org> =
+wrote:
+> > > >
+> > > > What is the use case for this? AIUI, the scalar AES instructions we=
+re
+> > > > never implemented by anyone, so how do you expect this to be used i=
+n
+> > > > practice?
+> > >
+> > > The use case _is_ AES-GCM, as you mentioned. Without this, computing
+> > > GHASH can take a considerable amount of CPU time (monitored by perf).
+> > >
+> >
+> > I see. But do you have a particular configuration in mind? Does it
+> > have scalar AES too? I looked into that a while ago but I was told
+> > that nobody actually incorporates that. So what about these
+> > extensions? Are they commonly implemented?
+>
+> It's aes-generic.c (LUT-based) with accelerated GHASH.
+>
+> >
+> > [0] https://web.git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/=
+log/?h=3Driscv-scalar-aes
+> >
+> > > > ...
+> > > > > +static __always_inline __uint128_t get_unaligned_be128(const u8 =
+*p)
+> > > > > +{
+> > > > > +       __uint128_t val;
+> > > > > +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> > > >
+> > > > CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS means that get_unaligned_xxx=
+()
+> > > > helpers are cheap. Casting a void* to an aligned type is still UB a=
+s
+> > > > per the C standard.
+> > >
+> > > Technically an unaligned access is UB but this pattern is widely used
+> > > in networking code.
+> > >
+> >
+> > Of course. But that is no reason to keep doing it.
+> >
+> > > >
+> > > > So better to drop the #ifdef entirely, and just use the
+> > > > get_unaligned_be64() helpers for both cases.
+> > >
+> > > Currently those helpers won't generate rev8 instructions, even if
+> > > HAVE_EFFICIENT_UNALIGNED_ACCESS and RISCV_ISA_ZBB is set, so I have t=
+o
+> > > implement my own version of this to reduce the number of instructions=
+,
+> > > and to align with the original OpenSSL implementation.
+> > >
+> >
+> > So fix the helpers.
+>
+> The issue is that RISC-V GCC doesn=E2=80=99t emit efficient unaligned loa=
+ds by default:
+> - Not all RISC-V CPUs support unaligned access efficiently, so GCC
+> falls back to conservative byte-wise code.
 
+That makes sense.
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com> # s390
+> - There=E2=80=99s no clean way to force the optimized path - GCC only emi=
+ts
+> fast unaligned loads if tuned for a specific CPU (e.g., -mtune=3Dsize or
+> -mtune=3Dthead-c906), which the kernel doesn't typically do, even with
+> HAVE_EFFICIENT_UNALIGNED_ACCESS.
+>
+> Maybe we should raise this with the GCC maintainers. An explicit
+> option to enable optimized unaligned access could help.
+>
 
-I just realized that we can get rid of the static key in the s390
-piece and end up with slightly better code. Could you add the patch
-below to your tree, please? If this would go via the s390 tree this
-would result in a merge conflict, which is unnecessary.
+HAVE_EFFICIENT_UNALIGNED_ACCESS is a build time setting, so the
+resulting kernel only runs correctly on hardware that implements
+unaligned accesses in hardware.
 
-From 6c4c0ca6fe87e43acf6192f1afc0a6346db994f4 Mon Sep 17 00:00:00 2001
-From: Heiko Carstens <hca@linux.ibm.com>
-Date: Thu, 17 Apr 2025 14:30:56 +0200
-Subject: [PATCH] s390/crc32: Remove have_vxrs static key
-
-Replace the have_vxrs static key with a cpu_has_vx() call.  cpu_has_vx()
-resolves into a compile time constant (true) if the kernel is compiled for
-z13 or newer. Otherwise it generates an unconditional one instruction
-branch, which is patched based on CPU alternatives.
-
-In any case the generated code is at least as good as before and avoids
-static key handling.
-
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
----
- arch/s390/lib/crc32-glue.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/arch/s390/lib/crc32-glue.c b/arch/s390/lib/crc32-glue.c
-index 8f20a8e595c3..649ed7e8b99c 100644
---- a/arch/s390/lib/crc32-glue.c
-+++ b/arch/s390/lib/crc32-glue.c
-@@ -18,8 +18,6 @@
- #define VX_ALIGNMENT		16L
- #define VX_ALIGN_MASK		(VX_ALIGNMENT - 1)
- 
--static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vxrs);
--
- /*
-  * DEFINE_CRC32_VX() - Define a CRC-32 function using the vector extension
-  *
-@@ -34,8 +32,7 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vxrs);
- 		unsigned long prealign, aligned, remaining;		    \
- 		DECLARE_KERNEL_FPU_ONSTACK16(vxstate);			    \
- 									    \
--		if (datalen < VX_MIN_LEN + VX_ALIGN_MASK ||		    \
--		    !static_branch_likely(&have_vxrs))			    \
-+		if (datalen < VX_MIN_LEN + VX_ALIGN_MASK || !cpu_has_vx())  \
- 			return ___crc32_sw(crc, data, datalen);		    \
- 									    \
- 		if ((unsigned long)data & VX_ALIGN_MASK) {		    \
-@@ -66,8 +63,6 @@ DEFINE_CRC32_VX(crc32c_arch, crc32c_le_vgfm_16, crc32c_base)
- 
- static int __init crc32_s390_init(void)
- {
--	if (cpu_have_feature(S390_CPU_FEATURE_VXRS))
--		static_branch_enable(&have_vxrs);
- 	return 0;
- }
- arch_initcall(crc32_s390_init);
-@@ -79,10 +74,11 @@ module_exit(crc32_s390_exit);
- 
- u32 crc32_optimizations(void)
- {
--	if (static_key_enabled(&have_vxrs))
-+	if (cpu_has_vx()) {
- 		return CRC32_LE_OPTIMIZATION |
- 		       CRC32_BE_OPTIMIZATION |
- 		       CRC32C_OPTIMIZATION;
-+	}
- 	return 0;
- }
- EXPORT_SYMBOL(crc32_optimizations);
--- 
-2.45.2
-
+So that means you could pass this -mtune=3D option too in that case, no?
+Then, you can just use a packed struct or an __aligned(1) annotation
+and the compiler will emit the correct code for you, depending on
+whether unaligned accesses are permitted.
