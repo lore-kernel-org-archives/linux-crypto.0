@@ -1,23 +1,22 @@
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C892741C9;
-	Fri, 18 Apr 2025 09:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28382270EA2;
+	Fri, 18 Apr 2025 09:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744968773; cv=none; b=VsUn2PXhZ4r0Xs5vsUfQMYuULbnr+17pK4XOtojDj7oJUIJnsUHXtoumlWmCFctmQkLJwL+I5DvKs0/V6cq9sC+fJ/uth2lbpI0a41n9BcyFeYBkwxpnFngmnHV/bAFbzVYmqHGBbS6xVLzDIhYoZfsiyO5wwCLK3IMQsd+Uers=
+	t=1744968805; cv=none; b=d/n6puKPyy+AukmFbrSyZ/3RqtpkNB/4y5TVvQqEOF+12pR5UtQEi8OTkHlhnHrAMJ0rw4vJRJAnB1u28wuveR6iwfAfpFJuFNWe1L33XplnydsI+MY0tnL1DwRfEXbqFzGcLFncmS/3NZOJjs3HZ2cUkFfX0WQPhNwxfo7iFdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744968773; c=relaxed/simple;
-	bh=noH75sxi+2I9Xnc6LUTaRGiOzVsG1ODIu9XdqaU4uFg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SnAEJgSaeep6tKUkrCK/ToIrdriG32s7ldgR5MVC9OzSiHsWDYx4J7jPy5Oj5W4X69II0eKWSRuRx4XSBcFRD7FI38yajPaxga5/NxGta4MjEq1EXTQ0+zKsbD3/+lj8Ob00l1weY96uLVyOWeylduyY2evuS2LXHEU5rBPFhHA=
+	s=arc-20240116; t=1744968805; c=relaxed/simple;
+	bh=xlGgPVpqt2TPjugDY3fL3HsKO/7Xllow9Gh8xKfsZjo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MFRMt85sbffcJVlXKFEFUMH+KsnmVmqapy7x3Yk3HN/HoAP4Ya8S01LxU1cZIPhNMDXXUJR2DbD1H2X+SO14gudUFS3AZYKWysugIbp05+jiPcJsNZ7K/1jzx5UvG636cNBHm75DqcemZ/udcWwpoGgAnO6aI8wQXFX8chBuouI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.40.54.180])
-	by gateway (Coremail) with SMTP id _____8AxCGo0HAJoM6LBAA--.58718S3;
-	Fri, 18 Apr 2025 17:32:36 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8CxLGthHAJom6LBAA--.58470S3;
+	Fri, 18 Apr 2025 17:33:21 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.40.54.180])
-	by front1 (Coremail) with SMTP id qMiowMCx_cYsHAJoGUKJAA--.15831S4;
-	Fri, 18 Apr 2025 17:32:34 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowMCxPsdeHAJogkKJAA--.14975S2;
+	Fri, 18 Apr 2025 17:33:18 +0800 (CST)
 From: Qunqin Zhao <zhaoqunqin@loongson.cn>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
@@ -29,15 +28,11 @@ Cc: linux-kernel@vger.kernel.org,
 	jgg@ziepe.ca,
 	linux-integrity@vger.kernel.org,
 	pmenzel@molgen.mpg.de,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH v8 2/5] crypto: loongson - add Loongson RNG driver support
-Date: Fri, 18 Apr 2025 17:34:04 +0800
-Message-ID: <20250418093407.1335-3-zhaoqunqin@loongson.cn>
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v8 0/5] Add Loongson Security Engine chip driver
+Date: Fri, 18 Apr 2025 17:35:05 +0800
+Message-ID: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250418093407.1335-1-zhaoqunqin@loongson.cn>
-References: <20250418093407.1335-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,271 +40,86 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCx_cYsHAJoGUKJAA--.15831S4
+X-CM-TRANSID:qMiowMCxPsdeHAJogkKJAA--.14975S2
 X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Jr15Cw18Kr48Xr48WFW5CFX_yoWxur4xpF
-	4Sya4Uur45GFsrC395trW5CrW5Z3s8Z3srWa9rX3W5Kr97Aw1kXryxJFyUArW7ArZxWry7
-	XFZ5GF40ka1UG3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoWxCr43XFy5WrW7trW7KFWxuFX_yoW5XryDpF
+	45C3yfCr4UJr47Gr93try8GFyfZas3Xr9IganrXw15Wr9xAa48XrW3CFyUCF47AF95Xry2
+	vFZYkF4UGF1UJacCm3ZEXasCq-sJn29KB7ZKAUJUUUjU529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r126r13M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5
-	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
-	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4eMKDUUUU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWrXVW3
+	AwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26F1j6w1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAF
+	wI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07b1UUUUUUUU=
 
-Loongson's Random Number Generator is found inside Loongson Security
-Engine chip.
+The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
+accelerator engines. Each engine have its own DMA buffer provided
+by the controller. The kernel cannot directly send commands to the
+engine and must first send them to the controller, which will
+forward them to the corresponding engine. Based on these engines,
+TPM2 have been implemented in the chip, then let's treat TPM2 itself
+as an engine.
 
-Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
-Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
----
-v8: Added reseed callbak. "lsrng" --> "loongson_rng".
-v7: Change the lsrng_ prefix to loongson_rng_
-v6: Replace all "ls6000se" with "loongson"
-v2-v5: None
+v8: Like Lee said, the base driver goes beyond MFD scope. Since these
+    are all encryption related drivers and SM2, SM3, and SM4 drivers
+    will be added to the crypto subsystem in the future, the base driver
+    need to be changed when adding these drivers. Therefore, it may be
+    more appropriate to place the base driver within the crypto subsystem.
 
- drivers/crypto/loongson/Kconfig        |   6 +
- drivers/crypto/loongson/Makefile       |   1 +
- drivers/crypto/loongson/loongson-rng.c | 198 +++++++++++++++++++++++++
- 3 files changed, 205 insertions(+)
+    Removed complete callback in all drivers. Removed the concepts of
+    "channel", "msg" and "request" as they may be confusing. Used the
+    concepts of "egnine" and "command" may be better.
+
+v7: Addressed Huacai's comments.
+
+v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
+
+    crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+    ls6000se-rng.c ->loongson-rng.c
+
+    tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+
+v5: Registered "ls6000se-rng" device in mfd driver.
+v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
+    and crypto.
+v3: Put the updates to the MAINTAINERS in a separate patch.
+
+Qunqin Zhao (5):
+  crypto: loongson - Add Loongson Security Engine chip controller driver
+  crypto: loongson - add Loongson RNG driver support
+  MAINTAINERS: Add entry for Loongson crypto driver
+  tpm: Add a driver for Loongson TPM device
+  MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
+
+ MAINTAINERS                            |   7 +
+ drivers/char/tpm/Kconfig               |   9 +
+ drivers/char/tpm/Makefile              |   1 +
+ drivers/char/tpm/tpm_loongson.c        |  78 ++++++++
+ drivers/crypto/Kconfig                 |   1 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/loongson/Kconfig        |  17 ++
+ drivers/crypto/loongson/Makefile       |   3 +
+ drivers/crypto/loongson/loongson-rng.c | 198 ++++++++++++++++++++
+ drivers/crypto/loongson/loongson-se.c  | 239 +++++++++++++++++++++++++
+ drivers/crypto/loongson/loongson-se.h  |  52 ++++++
+ 11 files changed, 606 insertions(+)
+ create mode 100644 drivers/char/tpm/tpm_loongson.c
+ create mode 100644 drivers/crypto/loongson/Kconfig
+ create mode 100644 drivers/crypto/loongson/Makefile
  create mode 100644 drivers/crypto/loongson/loongson-rng.c
+ create mode 100644 drivers/crypto/loongson/loongson-se.c
+ create mode 100644 drivers/crypto/loongson/loongson-se.h
 
-diff --git a/drivers/crypto/loongson/Kconfig b/drivers/crypto/loongson/Kconfig
-index 9fdcc73bc..2a5ac65ea 100644
---- a/drivers/crypto/loongson/Kconfig
-+++ b/drivers/crypto/loongson/Kconfig
-@@ -9,3 +9,9 @@ config CRYPTO_DEV_LOONGSON_SE
- 	  provided by the controller. The kernel cannot directly send
- 	  commands to the engine and must first send them to the controller,
- 	  which will forward them to the corresponding engine.
-+
-+config CRYPTO_DEV_LOONGSON_RNG
-+	tristate "Support for Loongson RNG Driver"
-+	depends on CRYPTO_DEV_LOONGSON_SE
-+	help
-+	  Support for Loongson RNG Driver.
-diff --git a/drivers/crypto/loongson/Makefile b/drivers/crypto/loongson/Makefile
-index 5ebcd9ff8..1a614b28c 100644
---- a/drivers/crypto/loongson/Makefile
-+++ b/drivers/crypto/loongson/Makefile
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_LOONGSON_SE)	+= loongson-se.o
-+obj-$(CONFIG_CRYPTO_DEV_LOONGSON_RNG)	+= loongson-rng.o
-diff --git a/drivers/crypto/loongson/loongson-rng.c b/drivers/crypto/loongson/loongson-rng.c
-new file mode 100644
-index 000000000..2fb989811
---- /dev/null
-+++ b/drivers/crypto/loongson/loongson-rng.c
-@@ -0,0 +1,198 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2019 HiSilicon Limited. */
-+/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
-+
-+#include <linux/crypto.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/list.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/platform_device.h>
-+#include <linux/random.h>
-+#include <crypto/internal/rng.h>
-+
-+#include "loongson-se.h"
-+
-+#define SE_SEED_SIZE 32
-+
-+struct loongson_rng_list {
-+	struct mutex lock;
-+	struct list_head list;
-+	int is_init;
-+};
-+
-+struct loongson_rng {
-+	bool is_used;
-+	struct loongson_se_engine *engine;
-+	struct list_head list;
-+};
-+
-+struct loongson_rng_ctx {
-+	struct loongson_rng *rng;
-+};
-+
-+struct loongson_rng_cmd {
-+	u32 cmd_id;
-+	union {
-+		u32 len;
-+		u32 ret;
-+	} u;
-+	u32 seed_off;
-+	u32 out_off;
-+	u32 pad[4];
-+};
-+
-+static atomic_t rng_active_devs;
-+static struct loongson_rng_list rng_devices;
-+
-+static int loongson_rng_generate(struct crypto_rng *tfm, const u8 *src,
-+			  unsigned int slen, u8 *dstn, unsigned int dlen)
-+{
-+	struct loongson_rng_ctx *ctx = crypto_rng_ctx(tfm);
-+	struct loongson_rng *rng = ctx->rng;
-+	struct loongson_rng_cmd *cmd = rng->engine->command;
-+	int err, len;
-+
-+	cmd->seed_off = 0;
-+	do {
-+		len = min(dlen, rng->engine->buffer_size);
-+		cmd = rng->engine->command;
-+		cmd->u.len = len;
-+		err = loongson_se_send_engine_cmd(rng->engine);
-+		if (err)
-+			return err;
-+
-+		cmd = rng->engine->command_ret;
-+		if (cmd->u.ret)
-+			return -EFAULT;
-+
-+		memcpy(dstn, rng->engine->data_buffer, len);
-+		dlen -= len;
-+		dstn += len;
-+	} while (dlen > 0);
-+
-+	return 0;
-+}
-+
-+static int loongson_rng_init(struct crypto_tfm *tfm)
-+{
-+	struct loongson_rng_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct loongson_rng *rng;
-+	int ret = -EBUSY;
-+
-+	mutex_lock(&rng_devices.lock);
-+	list_for_each_entry(rng, &rng_devices.list, list) {
-+		if (!rng->is_used) {
-+			rng->is_used = true;
-+			ctx->rng = rng;
-+			ret = 0;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&rng_devices.lock);
-+
-+	return ret;
-+}
-+
-+static void loongson_rng_exit(struct crypto_tfm *tfm)
-+{
-+	struct loongson_rng_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	mutex_lock(&rng_devices.lock);
-+	ctx->rng->is_used = false;
-+	mutex_unlock(&rng_devices.lock);
-+}
-+
-+static int loongson_rng_seed(struct crypto_rng *tfm, const u8 *seed,
-+			     unsigned int slen)
-+{
-+	struct loongson_rng_ctx *ctx = crypto_rng_ctx(tfm);
-+	struct loongson_rng *rng = ctx->rng;
-+	struct loongson_rng_cmd *cmd;
-+	int err;
-+
-+	cmd = rng->engine->command;
-+	cmd->u.len = slen;
-+	cmd->seed_off = rng->engine->buffer_off;
-+	memcpy(rng->engine->data_buffer, seed, slen);
-+	err = loongson_se_send_engine_cmd(rng->engine);
-+	cmd = rng->engine->command_ret;
-+	if (err || cmd->u.ret)
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static struct rng_alg loongson_rng_alg = {
-+	.generate = loongson_rng_generate,
-+	.seed =	loongson_rng_seed,
-+	.seedsize = SE_SEED_SIZE,
-+	.base = {
-+		.cra_name = "stdrng",
-+		.cra_driver_name = "loongson_stdrng",
-+		.cra_priority = 300,
-+		.cra_ctxsize = sizeof(struct loongson_rng_ctx),
-+		.cra_module = THIS_MODULE,
-+		.cra_init = loongson_rng_init,
-+		.cra_exit = loongson_rng_exit,
-+	},
-+};
-+
-+static void loongson_rng_add_to_list(struct loongson_rng *rng)
-+{
-+	mutex_lock(&rng_devices.lock);
-+	list_add_tail(&rng->list, &rng_devices.list);
-+	mutex_unlock(&rng_devices.lock);
-+}
-+
-+static int loongson_rng_probe(struct platform_device *pdev)
-+{
-+	struct loongson_rng_cmd *cmd;
-+	struct loongson_rng *rng;
-+	int ret;
-+
-+	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-+	if (!rng)
-+		return -ENOMEM;
-+
-+	rng->engine = loongson_se_init_engine(pdev->dev.parent, SE_ENGINE_RNG);
-+	if (!rng->engine)
-+		return -ENODEV;
-+	cmd = rng->engine->command;
-+	cmd->cmd_id = SE_CMD_RNG;
-+	cmd->out_off = rng->engine->buffer_off;
-+
-+	if (!rng_devices.is_init) {
-+		ret = crypto_register_rng(&loongson_rng_alg);
-+		if (ret) {
-+			dev_err(&pdev->dev, "failed to register crypto(%d)\n", ret);
-+			return ret;
-+		}
-+		INIT_LIST_HEAD(&rng_devices.list);
-+		mutex_init(&rng_devices.lock);
-+		rng_devices.is_init = true;
-+	}
-+
-+	loongson_rng_add_to_list(rng);
-+	atomic_inc(&rng_active_devs);
-+
-+	return 0;
-+}
-+
-+static struct platform_driver loongson_rng_driver = {
-+	.probe		= loongson_rng_probe,
-+	.driver		= {
-+		.name	= "loongson-rng",
-+	},
-+};
-+module_platform_driver(loongson_rng_driver);
-+
-+MODULE_ALIAS("platform:loongson-rng");
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
-+MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
-+MODULE_DESCRIPTION("Loongson random number generator driver");
+
+base-commit: 8ffd015db85fea3e15a77027fda6c02ced4d2444
 -- 
 2.45.2
 
