@@ -1,118 +1,139 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20146213E9E;
-	Fri, 18 Apr 2025 01:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECEE219ED;
+	Fri, 18 Apr 2025 02:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744940955; cv=none; b=Y+rYeyiy7rb5lKye57ksgqwdWGfRcePYuO0D7vZ74Rco4RlKR/o7lxv/rju9cvtUdt/2cFFZR+CA1osg4W8lUkAsJjY/57bnYSWSh1EQqfVIVlUubX7wpsww2ROMIDGrDPA4V2eaAlbc078pNqShJiAYTa+cr0lf+/J0FEcRqho=
+	t=1744944569; cv=none; b=TIbjsJrHWGElnC8wuzmMmszWukfScx4ZFUwYFDzrSM7N1Y7vcLRpMM/d5YvLHTm11H4/Wuau6Jrq4KuiodIDL+oRgdI7syd/sl3hddxcUCgGryec99Wd4RbMzrfdTWEQY9XyhVZVlW6Wv10cONAv5Cni0dOw6RlsvRXFqGcR+WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744940955; c=relaxed/simple;
-	bh=T5YSTaPq/cYz27PUavSqTEdEuOQrc6qcfRPknuXgv58=;
+	s=arc-20240116; t=1744944569; c=relaxed/simple;
+	bh=lEbPmZPHeuEvxspsAVAjSCIqu9XEP/Q8eqr+/w0V9tA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H08ZA4/AUENrq3flSjBrxngDWfr5qFgyI3j8lAbEGkLjsQDJYr32cBonTf2ubPY5p6QrBxmDul7fAvUYIl3E+himQyJeLJk1HVsaqyK3GIfoAPz/aq5R4DVdV9y2aI6GJqFHdEBjzYTsMZSRVwVoiF666AZjddaFvXz17GgXb8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjdYTi3H; arc=none smtp.client-ip=209.85.219.180
+	 To:Cc:Content-Type; b=WnOCkHN+8veTexgYlqfqVK0CqrqF0e4mZjzzCGI3W34AMyQdg+AM/SEuQ2RZzW19fVoFoEos4Oo6xgQVELcRBAwq1u30e6tEjg8JiKxPF4eTVLbe9qcY375ujBctin4sJaGJtLvsZZcpCb6dA5fsfILmt3/6fNUh8BL4H9BztfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7N+edrb; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjdYTi3H"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e6deb3eb7dbso1261202276.0;
-        Thu, 17 Apr 2025 18:49:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7N+edrb"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e6df1419f94so1193186276.0;
+        Thu, 17 Apr 2025 19:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744940953; x=1745545753; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744944566; x=1745549366; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WmglLRoVsuPHltsr1TwX2csib2NZ7x5pIBHoukxn5Ak=;
-        b=HjdYTi3HddjFUolq+aYWh8A1m29QnvdRDFia3EQzOOyP6n8EsuS7JoRzNMqPBgZYg+
-         2ZE3KzSTOvcpZsGOSYRFd6NYwHo/LdQOwA6geC/PJmeCF3I4tLLXwbc0dSJ+mIHFcuDs
-         8OE/Fpr5Bkqh3un4c0LMoh9qGpHrM0+tswqJMTzfh4wlekd2I4A/RY/nWuyVC7Zwc7F8
-         Dbxw9TatTc1+UPycY7Xir2KNOdc1HEpfkz4wIawupvLP7mUOUM1XDQJoq4iyJk5ZYCnS
-         OUyYxzI1Fs3c0JnZDG4I0ly05olaIYq2vwfcwKQKuf9SRMmxujT970iLJj9NKsFXMWCi
-         0OOA==
+        bh=3Dj8GhW50UrAUMkoalDHqFuyFbqo3nnRECKX4Bf5Ge4=;
+        b=X7N+edrb/Nans/aDQP6+qe1YhJHext92N/wqZV5SzUW8fUcrdNgjbjZmKTlDS33oXj
+         TZglZ7dPilBSRwziouZgIbGkpxOnTYaAydD0svLBMpxC6BfD+eOklqX0QtdycTKPvBcg
+         TW69PZOtLbP1hTNZ3yxRQBxLDkpBS+nMGsTSWnJ9s4m3q9DEyARsujm7bA18ylUnevqC
+         FvSA7EcczDdFO9xAZGX7261Wb4DLeZxJz7D+zjJ5M7o08O4IbVdGd2sDSUsRiwhQd5WD
+         aQPEQ7iAPJLY/i6VelCrFsKhf3EABv5m9Zxdif+6HY4h8/+1Wa75v8wPRVzaqR0g3K+i
+         DEfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744940953; x=1745545753;
+        d=1e100.net; s=20230601; t=1744944566; x=1745549366;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WmglLRoVsuPHltsr1TwX2csib2NZ7x5pIBHoukxn5Ak=;
-        b=J//+1LFgfQ22UU9ZnPPf44fMZPVsLZz9lHCtpRnjZ/FZLRh5Nxhg5d5c68o5anLkMr
-         2AXgLQ0wlJcUasODctrMfsyhfW/5wL5vE8r+FVNLEBvtrUS7LPPMTHLCu76cVoxNWpHJ
-         zDaMVdSYR6BMS2w2t+gI3jZavrFv9dtgWMVkTCdMkqVhS+d8V7UOHCdRYLBBYz29u4cS
-         cbfc7U0ZSPXdoMbreB6kmX+NBlX0AvPUBuNvBmx1M5sQDO2MNzrV7AZMcR31sJ8bC/8k
-         5Tk1FojCt0tGUqTBjvlbtJDYEo2j/7EJqxckRs2vTf+VgFoeqXRj/bgjvbq7TF1fMfOi
-         U6pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnHde7F4zxnOHHPaIimqT1EgD5YzVnwrdpycWfxycOjo56hLk1cRGgCyUpf2aOG49OmEsYhX4vgrSbZsXc@vger.kernel.org, AJvYcCVdhjvxariMC/xQFNbzx8PaerxUodQzq8AoEC5ZuwnOIinEwZAqGrRiN74oGXG4LrHngKDkV9icV2ZnJ8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvrBwQNPwsbMY2rIFi9aHL5pQItKikTsI+QRjR7U6Wmqxecigu
-	t6kZKPkwtisLUTv9g+p6zbF3zfYlm8bHCK+U5jwX8fq8y1K6rEF5vOEVir+q3O5ivjMk4gxfhns
-	yEniJ2ZaSbaguJHk971KI2wepE4s=
-X-Gm-Gg: ASbGnctInX4YSeXdW4gsVftzXeOhZJZfPEgh92riCgXW+4Hn6epcGwS3YB0W8qd/JAP
-	j71wDOwDqgzI71gQ00MjvoCbX/ivUDMs7oz1Kzpo3P5fqbYPU8mQBafTgcnefTFoTfJ0FnP/1Gu
-	EiBGo7vYGYYOJB21r5OA/s8753Z5zF7NX7zn5pCw==
-X-Google-Smtp-Source: AGHT+IGUJoDzahqgdqLndIsmYoX2akOdFbgKB06u7VmDFKJltr6uEQVcZZQMdCy9WoqoFlbvS6cd7gUnAw1TFwGFUck=
-X-Received: by 2002:a05:6902:2510:b0:e72:8658:5839 with SMTP id
- 3f1490d57ef6-e7297eae575mr1455987276.32.1744940952774; Thu, 17 Apr 2025
- 18:49:12 -0700 (PDT)
+        bh=3Dj8GhW50UrAUMkoalDHqFuyFbqo3nnRECKX4Bf5Ge4=;
+        b=TTFNte7F+Xc+CisHddROh3TGKJiVftk3eUn/2daRZvqX+UEobbQDssvdoLvys8KAfZ
+         WuQA6Ojl6U2v0mqUZDR+fsvI+7U7XVPCr0vJjANVY6326bvnc5mQ6KYQVGsSzfXKB82G
+         YAgCi/Fp3XgG7JKFTkHFDgqFpLdFPA5oevd3t6DfeGYD+WO9QYOoAd4tjywj2IR8qgHY
+         BEZj42tEX15GlPAQb+SZ8ZVoVi1vsYOlyOlUsOX/C8wgtRz9zVHVNcFBHpVn4umfOPJ2
+         1wHBJcAAHnkLHiOEBjvLZl9l4wCuvv7NJdRX2PE1TeUYgrMsGWy1YcV0PKMnWa8pVHnD
+         UIZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTkimbm/XAHIaljon4AtVMuwccOwRhJA2Gev9aw5/l5B+Oeuq7jma+dDit8sEVFNrYvzLM7BrKzicglXA=@vger.kernel.org, AJvYcCV/yai+te26pknfh95hQFPtukmSDMatE6jnHc01lKmZW2NJNMkz8ZI4y8tGbynwP3jig5kNMqJ0dztwYRTU@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsFRkTnGevZcBBqcFjRJdOB4LaEpXXuLqCkfOblCFYfUhPsK6Y
+	CaY56PD2j3GSHQSB0bZZy+g/rHiIxN3rW63JtSDTEntf8rsNgu1by8VkG6hxfJHUQ8NADMZfjKj
+	Yz0RDxIoK+rbzzNg04O4k0huLylA=
+X-Gm-Gg: ASbGncvOVtSzGg+vEVmZ1/L6Y2ezKqBtGr716G3npc/IQYno71+kEzCLmAUG3SKNPBX
+	rBtV2dH4PGxMV6869DQPnajVSJoOhs6LBi2IztHuqNekpdgrNsfbZqw4fs7aEDsYzA0N1rZKeIA
+	ygD+x7+LeOIby9pxyHmwBOam5lBJag/OiegRLUmg==
+X-Google-Smtp-Source: AGHT+IFOw2jiDXl3bt6tyk3aoTpA5w5vhRYg4GCxEMlUgP7Q+jQU34k6Rpv4Sr8sgqmg+aVZeAJ5xQLgahHc75hZMLE=
+X-Received: by 2002:a05:6902:2290:b0:e72:871e:fc3e with SMTP id
+ 3f1490d57ef6-e7297db6e4emr1580309276.12.1744944566311; Thu, 17 Apr 2025
+ 19:49:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417064940.68469-1-dqfext@gmail.com> <CAMj1kXFPAVXOtPoETKvHB49kjZUPYrsAqsJwdL7p5Cu4xk75Rg@mail.gmail.com>
- <CALW65jY=LnVBYoKPOQnSKgGSA0brKzmo0vqoRDcqF_=jofLAng@mail.gmail.com>
- <CAMj1kXH-u7hiKGQfgYHj_16V4ATN_aHmA_wkvMSyLh+E3+QaAA@mail.gmail.com>
- <CALW65jZVYUZoka7Gbjcoh43qbkD7rGpw8gTZjjOYpZD-BhLyBQ@mail.gmail.com> <20250417165856.GB800@quark.localdomain>
-In-Reply-To: <20250417165856.GB800@quark.localdomain>
+References: <20250417064940.68469-1-dqfext@gmail.com> <20250417170902.GC800@quark.localdomain>
+In-Reply-To: <20250417170902.GC800@quark.localdomain>
 From: Qingfang Deng <dqfext@gmail.com>
-Date: Fri, 18 Apr 2025 09:48:56 +0800
-X-Gm-Features: ATxdqUHBrp0rUxHu64YX4mBWqOm5CVQgF2oCMN8KPRYqB9bzHHQfTOroaVo3v4I
-Message-ID: <CALW65jZGUQ9HsNi3QQQ-A9AAL31zcmqhVGLhKBQPfPM-CB67gg@mail.gmail.com>
+Date: Fri, 18 Apr 2025 10:49:11 +0800
+X-Gm-Features: ATxdqUHy7zDRa-eA71VWFff5HhwdMV8ZyAjRDc9UL_LnWdHSkCoRmm8Tv5GBb9Y
+Message-ID: <CALW65jZmLx+dh+cYpsynXnZnzmNwA9QFA-q77zHWT=fNKEbW5g@mail.gmail.com>
 Subject: Re: [RFC PATCH] crypto: riscv: scalar accelerated GHASH
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, linux-crypto@vger.kernel.org, 
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, linux-crypto@vger.kernel.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	=?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>, 
-	Qingfang Deng <qingfang.deng@siflower.com.cn>, Guo Ren <guoren@kernel.org>
+	Qingfang Deng <qingfang.deng@siflower.com.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Eric,
 
-On Fri, Apr 18, 2025 at 12:59=E2=80=AFAM Eric Biggers <ebiggers@kernel.org>=
- wrote:
+On Fri, Apr 18, 2025 at 1:09=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 >
-> On Thu, Apr 17, 2025 at 04:42:46PM +0800, Qingfang Deng wrote:
-> > > I see. But do you have a particular configuration in mind? Does it
-> > > have scalar AES too? I looked into that a while ago but I was told
-> > > that nobody actually incorporates that. So what about these
-> > > extensions? Are they commonly implemented?
-> >
-> > It's aes-generic.c (LUT-based) with accelerated GHASH.
+> Please help properly optimize swab*() and {get,put}_unaligned_* for RISC-=
+V
+> first, before considering random hacks like this.
 >
-> That's an odd combination.  Normally accelerated AES and GHASH go togethe=
-r.
-> Presumably you're targeting some specific RISC-V CPU.  Is this going to b=
-e a
-> one-off thing for that specific CPU?  Or can we expect many RISC-V CPUs t=
-o have
-> GHASH acceleration without AES?  And if so, why?
+> https://lore.kernel.org/r/20250403-riscv-swab-v3-0-3bf705d80e33@iencinas.=
+com
+> is working on swab*().
 
-There are a few RISC-V CPUs that support the B extensions
-(Zba+Zbb+Zbc+Zbs) but lack both scalar and vector crypto extensions.
-One such CPU already upstreamed in the kernel is the SpacemiT K1.
-Another example and the one I'm currently running this code on is the
-XuanTie C908, as found in the CanMV K230.
+Indeed =E2=80=94 in fact, our downstream NONPORTABLE version currently uses
+{get,put}_unaligned_be64, as we've modified the Makefile to ensure the
+compiler optimizes for both unaligned access and efficient swab*()
+handling.
 
-(+Cc Guo Ren)
-Guo, do you know if future XuanTie CPUs will support the RISC-V
-scalar/vector crypto extensions?
+>
+> > +             /* Multiplication (without Karatsuba) */
+> > +             t0 =3D clmul128(p_lo, k_lo);
+> > +             t1 =3D clmul128(p_lo, k_hi);
+> > +             t2 =3D clmul128(p_hi, k_lo);
+> > +             t3 =3D clmul128(p_hi, k_hi);
+> > +             mid =3D t1 ^ t2;
+> > +             lo =3D t0 ^ (mid << 64);
+> > +             hi =3D t3 ^ (mid >> 64);
+>
+> There is no need to explicitly XOR 'mid << 64' into lo and 'mid >> 64' in=
+to hi.
+> Take a look at how arch/x86/crypto/aes-gcm-*.S do it.
 
-[1] https://www.xrvm.com/product/xuantie/C908
-[2] https://www.xrvm.com/product/xuantie/C907
-[3] https://docs.banana-pi.org/en/BPI-F3/SpacemiT_K1_datasheet
+Thanks, I saw your comments in aes-gcm-avx10-x86_64.S and now
+understand what you meant.
+
+However, since we're working with 64-bit scalar registers on RISC-V
+(as opposed to 128-bit SIMD registers on x86), there's no reduction in
+the number of XOR instructions. Regardless of whether we explicitly
+compute mid and shift it, or directly XOR the intermediate results, we
+still end up with 8 individual 64-bit XORs to combine t0, t1, t2, and
+t3.
+
+So while the optimization helps on x86 due to wider registers and
+vector instructions, it doesn't offer a benefit in our scalar RISC-V
+implementation.
+
+>
+> Also, since this is only doing one block at a time and does not use Karat=
+suba
+> multiplication, the single-step reduction would work well here.  See
+> aes-gcm-aesni-x86_64.S.
+
+I saw the pre-compute key step. Is it the same as the step mentioned
+on page 12 of this PDF?
+
+[1] https://builders.intel.com/docs/networkbuilders/advanced-encryption-sta=
+ndard-galois-counter-mode-optimized-ghash-function-technology-guide-1693300=
+747.pdf
+
 >
 > - Eric
