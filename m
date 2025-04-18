@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC5F267F51
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98777267F5C
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744945221; cv=none; b=Xv/C7yWN3lCuTq/FQbpdozO7xLaU91Z6AzNn/MZ7qgrhkMO2k3Fj90Mszm8gCgmN7te/yLpf0c336+acGSTj7A4i4PXyuSCc3FZb7mxH8ueoZLMRHDOo9BWfEXUzEfSaGApZ5QH5Y0Sn/f4X5l9/ofM/ttZCNFnej6R8mdK9eL8=
+	t=1744945223; cv=none; b=FuiQeBCNcsMvWRovte4qj1GLR1l7MSR083CgqJJBZmjNSlwN91aNykn4x3PPTrQcV5o7fV7Mk9rpndsySYfxsCMyPiBayP+h6s9klYd/xRLDLTKt+Cz+ri3gMH2PZYbxjtOY1Dh9pUZGbULRRz/aLKUKMDWs4IR4USzEbvYtJC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744945221; c=relaxed/simple;
-	bh=nuPhh7eQ5XW4GwUj+End0MtFEcON+VVTbRv82bsrVVk=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=tZ/fec97Al0uliaD/PXfP50mDqh2NUO4GuFglQwcCA4vV2ToU93WwjuTthsY/7Xl5bTDnBEh3jxHZgCW99HFYKHvS76NYRZYHoRbYhIDRE00x4qOX0bqXGb1UyBOb7tY8+1yXKlfaRFC9B/WU63YwKHD19IU2D7ituyH0KJZCb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=QydVAIYe; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744945223; c=relaxed/simple;
+	bh=LIXd7XtcjRaZHVTen5JoRDFeDdiCtjOX2Tl4JxGRoJ4=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=tB+rmQUahG+fmudY1WyOu+3Jzr1vtJluq9V90GCdYJAqHqmn4rIYm4QIhdS3JOFdiKBdtdB/Fr1aelO/WqofQBJdPdowriUMZGURGhpR+US3HFUt6Qw+9l2VGRT3iE5BvG4EgWVGSIH51/km2vo4uSmMoRvVdTI6ugW0G+/udIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Rmy1J/MV; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="QydVAIYe"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Rmy1J/MV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=9yFqIiMvCsKvvzpu6cwAs+/+cq2XCDzg1Y4o9KGxuqk=; b=QydVAIYeJNJYUWeGNZ/xum0Yoc
-	h6Xxi3BtFAigRYhIp7JsupFi7Pl3lSyKmkrJjW0K5Lqu7wF2JTSjWefIZCQo/XW0KR5iRLUCjl2Z7
-	iAZpXkppW11PXRv0dJN6/jx+amioACM6wqywi6xVpDBpl/RqlC3A2XYZy25N/q6yd2mg41s0HhjiA
-	5oMfYg3kxE+MtZFImC5W9UNke/qloDnFm0ZAJFTMAuBtzwHNM3bKThMi5vpTJBRdsnDrAUQT1Umob
-	jhDGsI1fWOYUP9XnW73FCPnTrKMDYeE0NbDY1dYOsNS/FYU1xSKzj5EUvy1/J2TTV+4TZmLj3hA1Q
-	NIQ6fkXw==;
+	bh=I2uAmTfPKTJbQyjSFsroBV+qS+nJPQFJ/XME/5jqo9s=; b=Rmy1J/MV4/jSS0aF+8H5xB73DF
+	QA4r85Z9D0HqiNQPeetswP7nnDo9iKJ1ygo8MqoaeR6SbY0GCkNs5F1ha4KmsvaGR1sKMMwU9Ej89
+	BnomOZFO9Ee21plQ6/xLNlDNdmKq+ddLZPoQUZrSw8LOf30jWc9dATCJwSxiWzHFec2TIZknvelEi
+	5B/jq0UhOibmwJDdEeUIZSkFo1Tfsh19cyj7Qr524awCJiyTxEnJm9v4iGwfgLPSehOv5lkedqraZ
+	8Z8l/HOI2TuiA6NxQ+kHSv/RT8pVcLwT1uZ9ftGmNmF3BtpHOmxBXBWJ0KTsSKQ4zJSVLZjnfkeEX
+	qmwD7syw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5bxf-00GeBk-2M;
-	Fri, 18 Apr 2025 11:00:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:15 +0800
-Date: Fri, 18 Apr 2025 11:00:15 +0800
-Message-Id: <c65612c532b5947416ae216332d79c6dc142ca88.1744945025.git.herbert@gondor.apana.org.au>
+	id 1u5bxi-00GeBv-0L;
+	Fri, 18 Apr 2025 11:00:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:18 +0800
+Date: Fri, 18 Apr 2025 11:00:18 +0800
+Message-Id: <792c47012301a12045f70d3b2730a9f857a483af.1744945025.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744945025.git.herbert@gondor.apana.org.au>
 References: <cover.1744945025.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 42/67] crypto: sha3-generic - Use API partial block
- handling
+Subject: [v2 PATCH 43/67] crypto: zynqmp-sha - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -48,228 +47,168 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
+As this was the last user of the extra fields in struct sha3_state,
+remove them.
+
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/sha3_generic.c | 101 ++++++++++++++++++------------------------
- include/crypto/sha3.h |   7 +--
- 2 files changed, 47 insertions(+), 61 deletions(-)
+ drivers/crypto/xilinx/zynqmp-sha.c | 71 +++++++++---------------------
+ include/crypto/sha3.h              |  5 ---
+ 2 files changed, 22 insertions(+), 54 deletions(-)
 
-diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-index b103642b56ea..41d1e506e6de 100644
---- a/crypto/sha3_generic.c
-+++ b/crypto/sha3_generic.c
-@@ -9,10 +9,10 @@
-  *               Ard Biesheuvel <ard.biesheuvel@linaro.org>
+diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/zynqmp-sha.c
+index 4db8c717906f..67cf8d990a1d 100644
+--- a/drivers/crypto/xilinx/zynqmp-sha.c
++++ b/drivers/crypto/xilinx/zynqmp-sha.c
+@@ -3,7 +3,6 @@
+  * Xilinx ZynqMP SHA Driver.
+  * Copyright (c) 2022 Xilinx Inc.
   */
+-#include <crypto/hash.h>
  #include <crypto/internal/hash.h>
--#include <linux/init.h>
--#include <linux/module.h>
--#include <linux/types.h>
  #include <crypto/sha3.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
- #include <linux/unaligned.h>
+ #include <linux/cacheflush.h>
+@@ -37,10 +36,6 @@ struct zynqmp_sha_tfm_ctx {
+ 	struct crypto_shash *fbk_tfm;
+ };
  
- /*
-@@ -161,68 +161,51 @@ static void keccakf(u64 st[25])
- int crypto_sha3_init(struct shash_desc *desc)
+-struct zynqmp_sha_desc_ctx {
+-	struct shash_desc fbk_req;
+-};
+-
+ static dma_addr_t update_dma_addr, final_dma_addr;
+ static char *ubuf, *fbuf;
+ 
+@@ -64,7 +59,6 @@ static int zynqmp_sha_init_tfm(struct crypto_shash *hash)
+ 		return PTR_ERR(fallback_tfm);
+ 
+ 	if (crypto_shash_descsize(hash) <
+-	    sizeof(struct zynqmp_sha_desc_ctx) +
+ 	    crypto_shash_descsize(tfm_ctx->fbk_tfm)) {
+ 		crypto_free_shash(fallback_tfm);
+ 		return -EINVAL;
+@@ -79,58 +73,41 @@ static void zynqmp_sha_exit_tfm(struct crypto_shash *hash)
  {
- 	struct sha3_state *sctx = shash_desc_ctx(desc);
--	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
--
--	sctx->rsiz = 200 - 2 * digest_size;
--	sctx->rsizw = sctx->rsiz / 8;
--	sctx->partial = 0;
+ 	struct zynqmp_sha_tfm_ctx *tfm_ctx = crypto_shash_ctx(hash);
  
- 	memset(sctx->st, 0, sizeof(sctx->st));
- 	return 0;
- }
- EXPORT_SYMBOL(crypto_sha3_init);
- 
--int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
--		       unsigned int len)
-+static int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
-+			      unsigned int len)
- {
-+	unsigned int rsiz = crypto_shash_blocksize(desc->tfm);
- 	struct sha3_state *sctx = shash_desc_ctx(desc);
--	unsigned int done;
--	const u8 *src;
-+	unsigned int rsizw = rsiz / 8;
- 
--	done = 0;
--	src = data;
-+	do {
-+		int i;
- 
--	if ((sctx->partial + len) > (sctx->rsiz - 1)) {
--		if (sctx->partial) {
--			done = -sctx->partial;
--			memcpy(sctx->buf + sctx->partial, data,
--			       done + sctx->rsiz);
--			src = sctx->buf;
--		}
-+		for (i = 0; i < rsizw; i++)
-+			sctx->st[i] ^= get_unaligned_le64(data + 8 * i);
-+		keccakf(sctx->st);
- 
--		do {
--			unsigned int i;
--
--			for (i = 0; i < sctx->rsizw; i++)
--				sctx->st[i] ^= get_unaligned_le64(src + 8 * i);
--			keccakf(sctx->st);
--
--			done += sctx->rsiz;
--			src = data + done;
--		} while (done + (sctx->rsiz - 1) < len);
--
--		sctx->partial = 0;
+-	if (tfm_ctx->fbk_tfm) {
+-		crypto_free_shash(tfm_ctx->fbk_tfm);
+-		tfm_ctx->fbk_tfm = NULL;
 -	}
--	memcpy(sctx->buf + sctx->partial, src, len - done);
--	sctx->partial += (len - done);
 -
--	return 0;
-+		data += rsiz;
-+		len -= rsiz;
-+	} while (len >= rsiz);
-+	return len;
+-	memzero_explicit(tfm_ctx, sizeof(struct zynqmp_sha_tfm_ctx));
++	crypto_free_shash(tfm_ctx->fbk_tfm);
  }
--EXPORT_SYMBOL(crypto_sha3_update);
  
--int crypto_sha3_final(struct shash_desc *desc, u8 *out)
-+static int crypto_sha3_finup(struct shash_desc *desc, const u8 *src,
-+			     unsigned int len, u8 *out)
+ static int zynqmp_sha_init(struct shash_desc *desc)
  {
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, inlen = sctx->partial;
- 	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
-+	unsigned int rsiz = crypto_shash_blocksize(desc->tfm);
-+	struct sha3_state *sctx = shash_desc_ctx(desc);
-+	__le64 block[SHA3_224_BLOCK_SIZE / 8] = {};
- 	__le64 *digest = (__le64 *)out;
-+	unsigned int rsizw = rsiz / 8;
-+	u8 *p;
-+	int i;
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
+ 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct crypto_shash *fbtfm = tctx->fbk_tfm;
++	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
  
--	sctx->buf[inlen++] = 0x06;
--	memset(sctx->buf + inlen, 0, sctx->rsiz - inlen);
--	sctx->buf[sctx->rsiz - 1] |= 0x80;
-+	p = memcpy(block, src, len);
-+	p[len++] = 0x06;
-+	p[rsiz - 1] |= 0x80;
- 
--	for (i = 0; i < sctx->rsizw; i++)
--		sctx->st[i] ^= get_unaligned_le64(sctx->buf + 8 * i);
-+	for (i = 0; i < rsizw; i++)
-+		sctx->st[i] ^= le64_to_cpu(block[i]);
-+	memzero_explicit(block, sizeof(block));
- 
- 	keccakf(sctx->st);
- 
-@@ -232,49 +215,51 @@ int crypto_sha3_final(struct shash_desc *desc, u8 *out)
- 	if (digest_size & 4)
- 		put_unaligned_le32(sctx->st[i], (__le32 *)digest);
- 
--	memset(sctx, 0, sizeof(*sctx));
- 	return 0;
- }
--EXPORT_SYMBOL(crypto_sha3_final);
- 
- static struct shash_alg algs[] = { {
- 	.digestsize		= SHA3_224_DIGEST_SIZE,
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
--	.final			= crypto_sha3_final,
--	.descsize		= sizeof(struct sha3_state),
-+	.finup			= crypto_sha3_finup,
-+	.descsize		= SHA3_STATE_SIZE,
- 	.base.cra_name		= "sha3-224",
- 	.base.cra_driver_name	= "sha3-224-generic",
-+	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 	.base.cra_blocksize	= SHA3_224_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
- }, {
- 	.digestsize		= SHA3_256_DIGEST_SIZE,
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
--	.final			= crypto_sha3_final,
--	.descsize		= sizeof(struct sha3_state),
-+	.finup			= crypto_sha3_finup,
-+	.descsize		= SHA3_STATE_SIZE,
- 	.base.cra_name		= "sha3-256",
- 	.base.cra_driver_name	= "sha3-256-generic",
-+	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 	.base.cra_blocksize	= SHA3_256_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
- }, {
- 	.digestsize		= SHA3_384_DIGEST_SIZE,
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
--	.final			= crypto_sha3_final,
--	.descsize		= sizeof(struct sha3_state),
-+	.finup			= crypto_sha3_finup,
-+	.descsize		= SHA3_STATE_SIZE,
- 	.base.cra_name		= "sha3-384",
- 	.base.cra_driver_name	= "sha3-384-generic",
-+	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 	.base.cra_blocksize	= SHA3_384_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
- }, {
- 	.digestsize		= SHA3_512_DIGEST_SIZE,
- 	.init			= crypto_sha3_init,
- 	.update			= crypto_sha3_update,
--	.final			= crypto_sha3_final,
--	.descsize		= sizeof(struct sha3_state),
-+	.finup			= crypto_sha3_finup,
-+	.descsize		= SHA3_STATE_SIZE,
- 	.base.cra_name		= "sha3-512",
- 	.base.cra_driver_name	= "sha3-512-generic",
-+	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 	.base.cra_blocksize	= SHA3_512_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
- } };
-@@ -289,7 +274,7 @@ static void __exit sha3_generic_mod_fini(void)
- 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+-	dctx->fbk_req.tfm = tctx->fbk_tfm;
+-	return crypto_shash_init(&dctx->fbk_req);
++	fbdesc->tfm = fbtfm;
++	return crypto_shash_init(fbdesc) ?:
++	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
  }
  
--subsys_initcall(sha3_generic_mod_init);
-+module_init(sha3_generic_mod_init);
- module_exit(sha3_generic_mod_fini);
+ static int zynqmp_sha_update(struct shash_desc *desc, const u8 *data, unsigned int length)
+ {
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
++	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct crypto_shash *fbtfm = tctx->fbk_tfm;
++	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
  
- MODULE_LICENSE("GPL");
+-	return crypto_shash_update(&dctx->fbk_req, data, length);
+-}
+-
+-static int zynqmp_sha_final(struct shash_desc *desc, u8 *out)
+-{
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
+-
+-	return crypto_shash_final(&dctx->fbk_req, out);
++	fbdesc->tfm = fbtfm;
++	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
++	       crypto_shash_update(fbdesc, data, length) ?:
++	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
+ }
+ 
+ static int zynqmp_sha_finup(struct shash_desc *desc, const u8 *data, unsigned int length, u8 *out)
+ {
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
+-
+-	return crypto_shash_finup(&dctx->fbk_req, data, length, out);
+-}
+-
+-static int zynqmp_sha_import(struct shash_desc *desc, const void *in)
+-{
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
+ 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct crypto_shash *fbtfm = tctx->fbk_tfm;
++	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
+ 
+-	dctx->fbk_req.tfm = tctx->fbk_tfm;
+-	return crypto_shash_import(&dctx->fbk_req, in);
+-}
+-
+-static int zynqmp_sha_export(struct shash_desc *desc, void *out)
+-{
+-	struct zynqmp_sha_desc_ctx *dctx = shash_desc_ctx(desc);
+-
+-	return crypto_shash_export(&dctx->fbk_req, out);
++	fbdesc->tfm = fbtfm;
++	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
++	       crypto_shash_finup(fbdesc, data, length, out);
+ }
+ 
+ static int __zynqmp_sha_digest(struct shash_desc *desc, const u8 *data,
+@@ -179,24 +156,20 @@ static struct zynqmp_sha_drv_ctx sha3_drv_ctx = {
+ 	.sha3_384 = {
+ 		.init = zynqmp_sha_init,
+ 		.update = zynqmp_sha_update,
+-		.final = zynqmp_sha_final,
+ 		.finup = zynqmp_sha_finup,
+ 		.digest = zynqmp_sha_digest,
+-		.export = zynqmp_sha_export,
+-		.import = zynqmp_sha_import,
+ 		.init_tfm = zynqmp_sha_init_tfm,
+ 		.exit_tfm = zynqmp_sha_exit_tfm,
+-		.descsize = sizeof(struct zynqmp_sha_desc_ctx) +
+-			    sizeof(struct sha3_state),
+-		.statesize = sizeof(struct sha3_state),
++		.descsize = sizeof(struct sha3_state),
+ 		.digestsize = SHA3_384_DIGEST_SIZE,
+ 		.base = {
+ 			.cra_name = "sha3-384",
+ 			.cra_driver_name = "zynqmp-sha3-384",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				     CRYPTO_ALG_ALLOCATES_MEMORY |
+-				     CRYPTO_ALG_NEED_FALLBACK,
++				     CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++				     CRYPTO_AHASH_ALG_FINUP_MAX,
+ 			.cra_blocksize = SHA3_384_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct zynqmp_sha_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
 diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-index 661f196193cf..420b90c5f08a 100644
+index 420b90c5f08a..3c2559f51ada 100644
 --- a/include/crypto/sha3.h
 +++ b/include/crypto/sha3.h
-@@ -5,6 +5,8 @@
- #ifndef __CRYPTO_SHA3_H__
- #define __CRYPTO_SHA3_H__
+@@ -25,11 +25,6 @@ struct shash_desc;
  
-+#include <linux/types.h>
-+
- #define SHA3_224_DIGEST_SIZE	(224 / 8)
- #define SHA3_224_BLOCK_SIZE	(200 - 2 * SHA3_224_DIGEST_SIZE)
- 
-@@ -19,6 +21,8 @@
- 
- #define SHA3_STATE_SIZE		200
- 
-+struct shash_desc;
-+
  struct sha3_state {
  	u64		st[SHA3_STATE_SIZE / 8];
- 	unsigned int	rsiz;
-@@ -29,8 +33,5 @@ struct sha3_state {
+-	unsigned int	rsiz;
+-	unsigned int	rsizw;
+-
+-	unsigned int	partial;
+-	u8		buf[SHA3_224_BLOCK_SIZE];
  };
  
  int crypto_sha3_init(struct shash_desc *desc);
--int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
--		       unsigned int len);
--int crypto_sha3_final(struct shash_desc *desc, u8 *out);
- 
- #endif
 -- 
 2.39.5
 
