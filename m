@@ -1,107 +1,109 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6688213259
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 12:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58C926B95E;
+	Fri, 18 Apr 2025 13:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744977745; cv=none; b=t82YzCkC5rU/5Aq9Bfa0xtchb0Y/X8KxG4XkLHHvhTO/YUNhTXC7CwRnKoRCq2OqBr44Cy8spCag93m8Nza/QegR7Hw7kM5WfWw6NBTksG1Um6Gl8KbUV+0oOsU2kOhvuArticnXIKX4Lzp+Uyv0dHBBg5GUvGGmkN7P4Nsldoc=
+	t=1744982686; cv=none; b=EkgD2CpeWb3WS5s7gP/8piyxbL3/071ubwHNR7dlO5O7dPRPAO/Dw0COoVsMHWm5W+vZX+O1bsiCjxyqhlb507Y5JZ7JMrgvSupsyB6iM4eo/n+0YaaSagkqPL7+SFfisieP18AkP7GQI4eaTN/R7Ix/ES9ZsEk2ITW8C0vOI1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744977745; c=relaxed/simple;
-	bh=okIH6WbPZVZPbyGI/bgYthp0N4LC7Kg0Jr4TKc+EL+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fA9HSlP28340tlYpKu3hbyIp7y1k1JdkujA0ePUgHbMAOICSAOB0LvSfVRYjXyh/WSE8QJCxtGcoWlck5By+4fu0VVQ8AA9WsuxGIVuFtXXb5fHNvLosic2o5pV4wZ0Kd4TaB4xdN0JTsKDQQ1a5XPDRGHwIUDzZA5QAqpe67LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=A1nb2Mcd; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
+	s=arc-20240116; t=1744982686; c=relaxed/simple;
+	bh=Zpq0zvnXdVEbaBwzWK6PMJI0n8R2FyiSy5j5Qz5uRSE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uQ8dtuittzN9wwy2FWDEjEF4JwhmSzDX4yAd21b3SCOy2odChZGmnotYFutzt3kSloVsLwVDovuBKvNuPN0qvSF+4Lpa1rhwK846Lhsh3umPKjbZayEu96eFoGwMkgvM0/QN7BWE7dWZAF44ju96R2xB6OewVv6ABGOE+N+yVU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cionJg7L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="A1nb2Mcd"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-73bb647eb23so1534744b3a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 05:02:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0x0f.com; s=google; t=1744977742; x=1745582542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w3kDTMjlwG5mlvODlNU3Vuna7nwkZQjPuFA/SSJxKpw=;
-        b=A1nb2McdJMQv3fkm7dUNhUfglrWS5OwIJkLCEf6GkE5rFPQvgzBiIJ3JtQJTem1eMb
-         61Bxw8UIYLYXvLBX2RN/+A/fUhL3lo1erBsDLaYfB7mLWNwcumvxraKiLImVvzEzD9fy
-         ylQgMMG8DPcDudgfd2Km8pDwgbaMh5HXPhaqU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744977742; x=1745582542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w3kDTMjlwG5mlvODlNU3Vuna7nwkZQjPuFA/SSJxKpw=;
-        b=DCjIncYMePSNJVgHad9DvIMGncRhMmXRBHzt5bw2brvMuI73Z9NfSpF261aeghU2yl
-         N1sqTKauRytswnaf15sWpEfWw7gJHMZq5j6l3j1aVyjv7wtcNcyjRgY5GBrcfSxwbYkE
-         1V4ikyRuepAeE2nriIgKprxFMq/6a1HBds5akdjvAYbzcQjeF0FeDBRiZsHFk5T8oNiT
-         AH5GzupjN9N0DgTfbtjB+AjpRpsew4nsdP4xTOXVNdXiZwpdQGoGGACYFVQsQb7pT7RC
-         82xMr+aKtMZMoiDAn6Iki71KvR3wcDUZKykmmwb1K6wyWNLQzmCgI2juNHUyVW0hW44v
-         7i1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUxBr6iCH1klTnEEqpbwkaIcLgcIkd7vXfMfx5CvNbog6KYMdnw6MCCkYYDYw7GX+5KpkdTHuTpdYjkyNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtD3WQ1ptFMgz6eXA6YAc5zpzSP7AtNbT/Qmka7dGa+doH3eoz
-	A4z6Vqtf+jXiAqRRniseMjWls0k+uS9DUgN5eQ9TwDzyJkS49xLNaNSui9YoKTE=
-X-Gm-Gg: ASbGncub/xfpTIxWpoXi4urJK3f+gEvQqgQzyrJTaNIJaMvw8REH16Gz1atLp5Ca/1J
-	2VwLC/hpgtkFgn9IF9Nh8txVixr3Qz0IZol0j+ZmU3eKVAWWLXbglrII9vZPlz8Rv9iEYPY1hy0
-	cl5FzR80FpHs8CVQZepY9TdiL1o06qpMvcDfBMHJ8CyQVGGXX3xkM74kMQ3F/1BQezx++h/fG3r
-	vKWm8HUBAvnFwGdRLuGUMAhKZvB4M+GAtagGS+OnugQyKQkOJIgK2o34TPlXP+1ZDfXcHLfZT0P
-	E2SwfuVSp3cgcJw3C2mPuNHi/9XWb3cSbbt0mz3EnXOosUXsK1DhWQ==
-X-Google-Smtp-Source: AGHT+IHMVfvcx7X/GlwdgGieimVGcGQRA/rOeqM8mfDwONUl8FjNrAWRK7izWxkk+tE3wNtHelkKcw==
-X-Received: by 2002:a05:6a00:279f:b0:736:5438:ccc with SMTP id d2e1a72fcca58-73dc149d9ddmr2988086b3a.9.1744977741984;
-        Fri, 18 Apr 2025 05:02:21 -0700 (PDT)
-Received: from shiro.work.home.arpa. ([2400:4162:2428:2ffe:8f9a:ceb1:54c8:1717])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-73dbfa595e4sm1432887b3a.88.2025.04.18.05.02.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 05:02:21 -0700 (PDT)
-From: Daniel Palmer <daniel@0x0f.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	Jason@zx2c4.com,
-	linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Daniel Palmer <daniel@thingy.jp>
-Subject: [PATCH] lib/crypto: blake2s: Disable self test if CONFIG_CRYPTO isn't enabled
-Date: Fri, 18 Apr 2025 21:02:16 +0900
-Message-ID: <20250418120216.2968994-1-daniel@0x0f.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cionJg7L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AAA3C4AF09;
+	Fri, 18 Apr 2025 13:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744982686;
+	bh=Zpq0zvnXdVEbaBwzWK6PMJI0n8R2FyiSy5j5Qz5uRSE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cionJg7L3TmwTFeVS5XuXObcMV/a/qYo6bkBGi7ZmSSxgsmsTHt4a1c0nRpCSi23a
+	 8zsy9Xff+wHznJXzWUzsHnGTSGng1tbF7tOfIrWaFOiitIV4LmH+WpnCKIevKApxd4
+	 oOmfepaqqrIkagMXTXRZn6rXqFLreXRPNYSeUAt1df9Tg4ZcoiouQ3DiWfc4mXTPwn
+	 DpiQM8RU/lNNO2ksMV1wu1expaMSjYlJDfSLEEcDIrNU6ugKC08TmO9DHQKCu0dP8o
+	 SgReWFMf7hidWL+yLXuXBWChsbmfkEIdEhholLRGVhH6mE7HOpVzgHffHhFqMY6bat
+	 4wKQxfFzabizQ==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30db1bc464dso18401281fa.0;
+        Fri, 18 Apr 2025 06:24:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVGYt5swpCG8+/ADb+d4n2U1jr1sWxyevZGqNxe3sptElG43Pg+I+mbt4oPmxLgZfhBjsmWBLCM/EHSjEQ=@vger.kernel.org, AJvYcCWYdKrZH5tAZFauup3R/XubdsWqinRHvbhBm74VTCvA6hDz72hSYwCjANlzDPxBg/M7iEgS6xr5scwcAWsS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp4dxA9Elj03pjHvBfryg1TqdJJnHjJs4U1dMOLCykPLDB3tKX
+	B5cZZKooFW9yVvCmuf97Ikw9pTQRfjwefDW9HfCUcjVLKlad9MSAwJzphapAuUrtoczDMcLag5K
+	TtKeRPcZk6AyfOJeBej2+TnF9vfg=
+X-Google-Smtp-Source: AGHT+IErep3WGm4BtwQbtUM21QyEnX4Yv4tOQqENF1MhIsvxiD9bDt1+g2ar+vyD71wyvGU9V+mWf5jvr1lqOC2Tljk=
+X-Received: by 2002:a05:651c:881:b0:30b:b7c3:949a with SMTP id
+ 38308e7fff4ca-310905008cfmr7971221fa.18.1744982684428; Fri, 18 Apr 2025
+ 06:24:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250414174018.6359-1-ebiggers@kernel.org>
+In-Reply-To: <20250414174018.6359-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 18 Apr 2025 15:24:32 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGtQ=beo5Yvh38Sr-G3qyb7hYFpJsubUvkQuM4_451CGw@mail.gmail.com>
+X-Gm-Features: ATxdqUElMc5hlF675lGEFJTV3nML3Kc9OVzWiwsASn1paK0_oCsLyQuqTnCSjCw
+Message-ID: <CAMj1kXGtQ=beo5Yvh38Sr-G3qyb7hYFpJsubUvkQuM4_451CGw@mail.gmail.com>
+Subject: Re: [PATCH] arm64: Kconfig: remove unnecessary selection of CRC32
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Daniel Palmer <daniel@thingy.jp>
+On Mon, 14 Apr 2025 at 19:41, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> The selection of CRC32 by ARM64 was added by commit 7481cddf29ed
+> ("arm64/lib: add accelerated crc32 routines") as a workaround for the
+> fact that, at the time, the CRC32 library functions used weak symbols to
+> allow architecture-specific overrides.  That only worked when CRC32 was
+> built-in, and thus ARM64 was made to just force CRC32 to built-in.
+>
+> Now that the CRC32 library no longer uses weak symbols, that no longer
+> applies.  And the selection does not fulfill a user dependency either;
+> those all have their own selections from other options.  Therefore, the
+> selection of CRC32 by ARM64 is no longer necessary.  Remove it.
+>
+> Note that this does not necessarily result in CRC32 no longer being set
+> to y, as it still tends to get selected by something else anyway.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>
+> Please consider taking this through the arm64 tree.  But if it doesn't
+> get picked up there, I'll take it through the crc tree.
+>
+>  arch/arm64/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+>
 
-Currently CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is used to remove
-the self test code. CONFIG_CRYPTO_MANAGER_DISABLE_TESTS depends on
-CONFIG_CRYPTO so its impossible to disable the self test without
-enabling CONFIG_CRYPTO.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-If you don't want CONFIG_CRYPTO you probably don't want self tests
-so remove the self tests in that case too.
-
-Fixes: 66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
-
-Signed-off-by: Daniel Palmer <daniel@thingy.jp>
----
- lib/crypto/blake2s.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
-index 71a316552cc5..89d54e462fb5 100644
---- a/lib/crypto/blake2s.c
-+++ b/lib/crypto/blake2s.c
-@@ -60,7 +60,8 @@ EXPORT_SYMBOL(blake2s_final);
- 
- static int __init blake2s_mod_init(void)
- {
--	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
-+	if (IS_ENABLED(CONFIG_CRYPTO) &&
-+	    !IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
- 	    WARN_ON(!blake2s_selftest()))
- 		return -ENODEV;
- 	return 0;
--- 
-2.47.2
-
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index a182295e6f08..14073b0094c1 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -132,11 +132,10 @@ config ARM64
+>         select BUILDTIME_TABLE_SORT
+>         select CLONE_BACKWARDS
+>         select COMMON_CLK
+>         select CPU_PM if (SUSPEND || CPU_IDLE)
+>         select CPUMASK_OFFSTACK if NR_CPUS > 256
+> -       select CRC32
+>         select DCACHE_WORD_ACCESS
+>         select DYNAMIC_FTRACE if FUNCTION_TRACER
+>         select DMA_BOUNCE_UNALIGNED_KMALLOC
+>         select DMA_DIRECT_REMAP
+>         select EDAC_SUPPORT
+>
+> base-commit: 8ffd015db85fea3e15a77027fda6c02ced4d2444
+> --
+> 2.49.0
+>
