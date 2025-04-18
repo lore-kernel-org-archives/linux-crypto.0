@@ -1,76 +1,156 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF4A1E4AB;
-	Fri, 18 Apr 2025 03:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F39770E2;
+	Fri, 18 Apr 2025 03:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744947689; cv=none; b=b07z/2bkTgnE1nbxq4SEvrQ+o3qxxCP0r05awAzo0NzH0IRPgrIHxeNVTZLb9xdb3Fw8fN5He80nxKUsiZ2fm+giYSY5NA047NR2LD9ha3pEBrvBQ8ndBsqewrwYIGhxpqtN71VNXNRqPTHBIXzSh8lb1w3FzIqPkefUF3/nKuo=
+	t=1744948767; cv=none; b=Gnq2eLCC6E02LhpWUNoOBoLc/VZBgOEn5cBsvHniIKymY0ljuvSaIasXGKLwr3zM63o4xKsG2ZyUn4+p5NG2EqxKqmSiiW4TWgbmLaTbtR60aR31VyqUb/2oCdmDk9WE5c9EghJeAWDx6Jetw4KbQphr+uEajL3pu6AB7qve3Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744947689; c=relaxed/simple;
-	bh=ttUvWPDxm515yLqjg2yqyoobvQBv22N3uj4nNc/ZZ7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UArYrrhO3RXQI9ktkzOGZOA+DTBFHxSDosnNaMUI3qbUPDcvgeHTxu1r1EgeDkVNg6B7CIov6jDAQCJlXxJxS4vqYHKxWXImI9Q6RynVYInOY9nR8MQtdwoC8WgTDAz99XIW3ghGWe8VtJFb9sY6fqy7KMBz4cuSnP+A0bUmtS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VXq5/xSO; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1744948767; c=relaxed/simple;
+	bh=zTLpLtCFatq0BP/bO1sVaapNcptTnUAKdd6tFb0ull0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QYhjYXF0WLY3W1UZorW7+X/GQWYRH9TYt5Xoaaur42t20fg7e69PgaOFQBn9jsROGdck3TvNwR0w739rEdjS4awP9aLCabPzT3VkXohSRK+lKymyiDl08zKudvdU8XEByZIetmpNc6Wi5zsalePfNDO9enHdMC9xEAQbcYVLvog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iz4qsG5b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VXq5/xSO"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=DeLdxRY2vHoEKdWJ6sFRDUQGcMLf7d+q/0pRxlVp8JU=; b=VXq5/xSOluY3RsxfcvuVGjWtZR
-	7jvkDa6bj3M1EaAcxKxQY1WDgoWtxg/rm+6XAbBrtL/22i8+WyfgIn92PWApVLEpoDfegP0QpPOHV
-	j49Y4XDyIw1sIIkoEwstoQy941i447cYR8qbCXF/sECr1WK62m3qCFnYJ70WAowk7ZhpqPurKZXYy
-	QmRJZLHzlF1wf0IN5hkkxnn1hHHtG0hLnxes0shefNdMuya+B9FXC2X7iO7mGssssJqcNQsVxqf5u
-	e6j7zakwSXnJ9DlD7H7sHRU6fBUhGHklvmSKWQIcNMVdPm4+5+iJiZ2Hqul+k2BQgzx4AOyJ+YYD8
-	8L9xBumA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5cbR-00Gek0-2H;
-	Fri, 18 Apr 2025 11:41:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:41:21 +0800
-Date: Fri, 18 Apr 2025 11:41:21 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
-	Jason@zx2c4.com, torvalds@linux-foundation.org
-Subject: Re: [PATCH 8/9] crypto: x86/chacha - remove the skcipher algorithms
-Message-ID: <aAHJ4X95vIujLPpu@gondor.apana.org.au>
-References: <20250405182609.404216-9-ebiggers@kernel.org>
- <aAHF0X2I5ydEJK1p@gondor.apana.org.au>
- <20250418033829.GC38960@quark.localdomain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iz4qsG5b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49951C4CEE2;
+	Fri, 18 Apr 2025 03:59:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744948766;
+	bh=zTLpLtCFatq0BP/bO1sVaapNcptTnUAKdd6tFb0ull0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Iz4qsG5bpDo45A4SVkWv5wqji4qG8oQMkZmupV6uvvHZoGGUayBdl7zYHJ4IvNuSt
+	 ewk5l3qCozIVLGpWHpBFqFLv3KcdSZy1YAvk/OxrKJXleT33sRRpxkvKdXbYc5dnwt
+	 YCLbn0TRWjILOz3bPlW8jVSxjrbybUcD38gKlUGBJpBeUir0Y7MavdikSULt6A2EKb
+	 +dZax1QG0RsrJWHmj27/jlwEuwcFJftA+bTMQD+3+PR2ffMWtZyttQy4lJZGnP7ryo
+	 /WoMN+L4gH+XMOyYlZogn5DbuZAWN4+PRCzuCjzGVddfUKpAbuay+HHvKB7BWieaCz
+	 PqRFyfg6o7sCg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: lib/chacha - restore ability to remove modules
+Date: Thu, 17 Apr 2025 20:59:09 -0700
+Message-ID: <20250418035909.64902-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418033829.GC38960@quark.localdomain>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 17, 2025 at 08:38:29PM -0700, Eric Biggers wrote:
->
-> Well, I forgot that an empty module_exit needs to be kept around for the module
-> to be removable.  I'll send a patch that adds these back in, though I'm doubtful
-> that anyone ever removes these modules in practice.
+From: Eric Biggers <ebiggers@google.com>
 
-I just tried to remove chacha_x86_64 in order to make sure that I
-was actually using the arch-optimised version of chacha and that's
-how I noticed.
+Though the module_exit functions are now no-ops, they should still be
+defined, since otherwise the modules become unremovable.
 
-I remove the algorithm modules all the time because it's much easier
-to rebuild one module rather than the whole kernel.
+Fixes: 08820553f33a ("crypto: arm/chacha - remove the redundant skcipher algorithms")
+Fixes: 8c28abede16c ("crypto: arm64/chacha - remove the skcipher algorithms")
+Fixes: f7915484c020 ("crypto: powerpc/chacha - remove the skcipher algorithms")
+Fixes: ceba0eda8313 ("crypto: riscv/chacha - implement library instead of skcipher")
+Fixes: 632ab0978f08 ("crypto: x86/chacha - remove the skcipher algorithms")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm/crypto/chacha-glue.c           | 5 +++++
+ arch/arm64/crypto/chacha-neon-glue.c    | 5 +++++
+ arch/powerpc/crypto/chacha-p10-glue.c   | 5 +++++
+ arch/riscv/crypto/chacha-riscv64-glue.c | 5 +++++
+ arch/x86/crypto/chacha_glue.c           | 5 +++++
+ 5 files changed, 25 insertions(+)
 
-Cheers,
+diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
+index 3a5c75c95d43b..12afb40cf1ff4 100644
+--- a/arch/arm/crypto/chacha-glue.c
++++ b/arch/arm/crypto/chacha-glue.c
+@@ -122,8 +122,13 @@ static int __init chacha_arm_mod_init(void)
+ 	}
+ 	return 0;
+ }
+ arch_initcall(chacha_arm_mod_init);
+ 
++static void __exit chacha_arm_mod_exit(void)
++{
++}
++module_exit(chacha_arm_mod_exit);
++
+ MODULE_DESCRIPTION("ChaCha and HChaCha functions (ARM optimized)");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index a0c336b284027..14a2836eff611 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -104,8 +104,13 @@ static int __init chacha_simd_mod_init(void)
+ 		static_branch_enable(&have_neon);
+ 	return 0;
+ }
+ arch_initcall(chacha_simd_mod_init);
+ 
++static void __exit chacha_simd_mod_exit(void)
++{
++}
++module_exit(chacha_simd_mod_exit);
++
+ MODULE_DESCRIPTION("ChaCha and HChaCha functions (ARM64 optimized)");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+diff --git a/arch/powerpc/crypto/chacha-p10-glue.c b/arch/powerpc/crypto/chacha-p10-glue.c
+index 9982929573add..351ed409f9b21 100644
+--- a/arch/powerpc/crypto/chacha-p10-glue.c
++++ b/arch/powerpc/crypto/chacha-p10-glue.c
+@@ -87,8 +87,13 @@ static int __init chacha_p10_init(void)
+ 		static_branch_enable(&have_p10);
+ 	return 0;
+ }
+ arch_initcall(chacha_p10_init);
+ 
++static void __exit chacha_p10_exit(void)
++{
++}
++module_exit(chacha_p10_exit);
++
+ MODULE_DESCRIPTION("ChaCha stream cipher (P10 accelerated)");
+ MODULE_AUTHOR("Danny Tsen <dtsen@linux.ibm.com>");
+ MODULE_LICENSE("GPL v2");
+diff --git a/arch/riscv/crypto/chacha-riscv64-glue.c b/arch/riscv/crypto/chacha-riscv64-glue.c
+index ccaab0dea383f..afc4e3be3cac2 100644
+--- a/arch/riscv/crypto/chacha-riscv64-glue.c
++++ b/arch/riscv/crypto/chacha-riscv64-glue.c
+@@ -62,8 +62,13 @@ static int __init riscv64_chacha_mod_init(void)
+ 		static_branch_enable(&use_zvkb);
+ 	return 0;
+ }
+ arch_initcall(riscv64_chacha_mod_init);
+ 
++static void __exit riscv64_chacha_mod_exit(void)
++{
++}
++module_exit(riscv64_chacha_mod_exit);
++
+ MODULE_DESCRIPTION("ChaCha stream cipher (RISC-V optimized)");
+ MODULE_AUTHOR("Jerry Shih <jerry.shih@sifive.com>");
+ MODULE_LICENSE("GPL");
+diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
+index fcc14c006bdeb..59bf63c000726 100644
+--- a/arch/x86/crypto/chacha_glue.c
++++ b/arch/x86/crypto/chacha_glue.c
+@@ -174,8 +174,13 @@ static int __init chacha_simd_mod_init(void)
+ 	}
+ 	return 0;
+ }
+ arch_initcall(chacha_simd_mod_init);
+ 
++static void __exit chacha_simd_mod_exit(void)
++{
++}
++module_exit(chacha_simd_mod_exit);
++
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+ MODULE_DESCRIPTION("ChaCha and HChaCha functions (x86_64 optimized)");
+
+base-commit: da4cb617bc7d827946cbb368034940b379a1de90
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.49.0
+
