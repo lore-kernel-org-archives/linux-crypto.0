@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FD01C831A
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549AF268698
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744945212; cv=none; b=enamjJtlObCtBRmEZppl+iFmpFNGO5bbASohgJHLMH47Oyeko/zWjB7+gRr1JO9DKEoEdnbW9L1y0em34VBUrAxtKWjJbZ0G+trgPMJIHeFlgYsNJGLROP5BpFIuXqtvI+XssMV/2D1AplkGszCDFkQKTNdVvcNWlrg7MW0CHAI=
+	t=1744945214; cv=none; b=ejj50Snqyu733fKu/9E1u5AWqhGLzgcs0+95K/jhdVNNsdnIkcifo7vxvT9oqfQrq6JcOI2p1Ak7ykAQV3E/fMAl5uNvG6GcPnJkL9hB4gEUYrG1vE4UJaqYKs0FpByLY9rr1D+apnw2V5W3z9cGvx3mEHSDi+0XagGkYhD/J+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744945212; c=relaxed/simple;
-	bh=+d4CoQDdBddGoGLXVzH0k2ufKuE8P4zaCAzm4e5pQAg=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=OMbpFipANPqUWPTufFz7QSwfTYwE5BNVGYmsNtd9/u+KpbdU+apIZ7qdb0MGZZEwZ7VaoRACl++yZGPZ39AQoyfqOzmg2C87PlM1Ltkg0oHfkFEG5wx7UyswL4u/DghlzsaFH8Omeq2W9Gwta6++VgcfsfyHvcfuV2ApTJQVfbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BczdVOL3; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744945214; c=relaxed/simple;
+	bh=5wVrGI2gS5+HB3UdHS+8ZtgttZQhMVEM0MAswMETZJ8=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=s2V9vSM+Fry3FunLMUQ+P0K7BDmMZCGYZUH93zTsCdR6/rfNW+hBb+zYVosPl1oY1eIy7I7G9XkZYEXj9EfyRkCOJzXXcR2ygQX2Paf13V98NeiQy4ulhZcbRAruUKhACrox7gxL2oKz1lh3dCkZPZcTMXtQVEvFM0qGLRd9Mlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gq4uAl31; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BczdVOL3"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gq4uAl31"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=VHnIoj5CKuxux0RXlMUTGZNZu5IkIpJmAwU+AzNvvYg=; b=BczdVOL3qmMxqqEPjy2Z7CLvol
-	vgLR4MyDvmTQDjPgu4wE+S/5atI7UMEwcopWsFhS4vpozN299fXxK37A55bqzBRTMRKcO6var3qZC
-	zU28FikLC6uOcqZLqQSaB6WVsKLuGIqrNTw353ZidHQ3PWKgPbCD5wHq7NpunHHkwrglpPJ3l4gLO
-	MQ+njH8qViMH4cRv3UTgQBswJlJ+yyALLM5VImjjjSQgjEbKE2MfQIk/IWOioAhcF5KmVbWHt29/L
-	nenJ8dUWJzrBZOapIuWs5fIVw0QsKS8MZZU9lMtRK8xNbS+SCZZsJugSVrEZhTq93p3xw/+1xCTPE
-	UXKYfyuw==;
+	bh=u/WXOO9pOHoqBv0bRLHcxi+DCIn+o/GeLwYlPL3aJEM=; b=gq4uAl31cZ77dIqGNl1uElmMpe
+	GCZsZgRo6CrVDTFDHQwLtDpEw4Q278K7IePFPUoRppX+SiVre6xmtfLH4OVCcPYitqL2M95/eiCC2
+	buZFsrzPrzjXGdUNABF7+kpH28z0vjfESD72g0EuEOu3dXtwsX5J7PvC/noD0pArFFBnFTiZlOUkT
+	8wo6IQHYmG62VzP7NvE7Tk5O5JI/AfGOYxsyrLvaEddyMYaXcq5rS623juAVDX1PPXYIifwIFBbj8
+	AEl8Rv3+ishqb4kHfrptv7TYT55kSFKhxsU8FQA4oh1K9aPiT8ApWInz2QQS7G2gGj0s8E+hAmuWg
+	CWFtK9gg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5bxW-00GeAf-1c;
-	Fri, 18 Apr 2025 11:00:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:06 +0800
-Date: Fri, 18 Apr 2025 11:00:06 +0800
-Message-Id: <67c78d4cde7f82fc2a1bbb9c1bb6864877a31388.1744945025.git.herbert@gondor.apana.org.au>
+	id 1u5bxY-00GeBD-2d;
+	Fri, 18 Apr 2025 11:00:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:08 +0800
+Date: Fri, 18 Apr 2025 11:00:08 +0800
+Message-Id: <81e0b146c9b6ca135bee16c89572c3234bb19d59.1744945025.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744945025.git.herbert@gondor.apana.org.au>
 References: <cover.1744945025.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 38/67] crypto: sparc/sha256 - Use API partial block
- handling
+Subject: [v2 PATCH 39/67] crypto: sha256_base - Remove partial block helpers
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -46,184 +45,198 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Use the Crypto API partial block handling.
+Now that all sha256_base users have been converted to use the API
+partial block handling, remove the partial block helpers.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/sparc/crypto/sha256_glue.c | 121 ++++++--------------------------
- 1 file changed, 20 insertions(+), 101 deletions(-)
+ arch/x86/crypto/sha256_ssse3_glue.c |  4 +--
+ include/crypto/sha256_base.h        | 50 ++++++++---------------------
+ lib/crypto/sha256.c                 | 11 ++-----
+ 3 files changed, 17 insertions(+), 48 deletions(-)
 
-diff --git a/arch/sparc/crypto/sha256_glue.c b/arch/sparc/crypto/sha256_glue.c
-index 285561a1cde5..ddb250242faf 100644
---- a/arch/sparc/crypto/sha256_glue.c
-+++ b/arch/sparc/crypto/sha256_glue.c
-@@ -11,133 +11,50 @@
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 7c5b498c1a85..b3115e207a9f 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -50,7 +50,7 @@ MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
  
- #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
- 
-+#include <asm/elf.h>
-+#include <asm/pstate.h>
- #include <crypto/internal/hash.h>
--#include <linux/init.h>
--#include <linux/module.h>
--#include <linux/mm.h>
--#include <linux/types.h>
- #include <crypto/sha2.h>
- #include <crypto/sha256_base.h>
--
--#include <asm/pstate.h>
--#include <asm/elf.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
- 
- #include "opcodes.h"
- 
- asmlinkage void sha256_sparc64_transform(u32 *digest, const char *data,
- 					 unsigned int rounds);
- 
--static void __sha256_sparc64_update(struct sha256_state *sctx, const u8 *data,
--				    unsigned int len, unsigned int partial)
-+static void sha256_block(struct crypto_sha256_state *sctx, const u8 *src,
-+			 int blocks)
+ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len,
+-			  crypto_sha256_block_fn *sha256_xform)
++			  sha256_block_fn *sha256_xform)
  {
--	unsigned int done = 0;
--
--	sctx->count += len;
--	if (partial) {
--		done = SHA256_BLOCK_SIZE - partial;
--		memcpy(sctx->buf + partial, data, done);
--		sha256_sparc64_transform(sctx->state, sctx->buf, 1);
--	}
--	if (len - done >= SHA256_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA256_BLOCK_SIZE;
--
--		sha256_sparc64_transform(sctx->state, data + done, rounds);
--		done += rounds * SHA256_BLOCK_SIZE;
--	}
--
--	memcpy(sctx->buf, data + done, len - done);
-+	sha256_sparc64_transform(sctx->state, src, blocks);
+ 	int remain;
+ 
+@@ -68,7 +68,7 @@ static int _sha256_update(struct shash_desc *desc, const u8 *data,
  }
  
- static int sha256_sparc64_update(struct shash_desc *desc, const u8 *data,
- 				 unsigned int len)
+ static int sha256_finup(struct shash_desc *desc, const u8 *data,
+-	      unsigned int len, u8 *out, crypto_sha256_block_fn *sha256_xform)
++	      unsigned int len, u8 *out, sha256_block_fn *sha256_xform)
  {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
--
--	/* Handle the fast case right here */
--	if (partial + len < SHA256_BLOCK_SIZE) {
--		sctx->count += len;
--		memcpy(sctx->buf + partial, data, len);
--	} else
--		__sha256_sparc64_update(sctx, data, len, partial);
--
--	return 0;
-+	return sha256_base_do_update_blocks(desc, data, len, sha256_block);
+ 	kernel_fpu_begin();
+ 	sha256_base_do_finup(desc, data, len, sha256_xform);
+diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+index b9d3583b6256..08cd5e41d4fd 100644
+--- a/include/crypto/sha256_base.h
++++ b/include/crypto/sha256_base.h
+@@ -15,10 +15,8 @@
+ #include <linux/types.h>
+ #include <linux/unaligned.h>
+ 
+-typedef void (sha256_block_fn)(struct sha256_state *sst, u8 const *src,
++typedef void (sha256_block_fn)(struct crypto_sha256_state *sst, u8 const *src,
+ 			       int blocks);
+-typedef void (crypto_sha256_block_fn)(struct crypto_sha256_state *sst,
+-				      u8 const *src, int blocks);
+ 
+ static inline int sha224_base_init(struct shash_desc *desc)
+ {
+@@ -42,6 +40,7 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
+ 					    sha256_block_fn *block_fn)
+ {
+ 	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
++	struct crypto_sha256_state *state = (void *)sctx;
+ 
+ 	sctx->count += len;
+ 
+@@ -55,14 +54,14 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
+ 			data += p;
+ 			len -= p;
+ 
+-			block_fn(sctx, sctx->buf, 1);
++			block_fn(state, sctx->buf, 1);
+ 		}
+ 
+ 		blocks = len / SHA256_BLOCK_SIZE;
+ 		len %= SHA256_BLOCK_SIZE;
+ 
+ 		if (blocks) {
+-			block_fn(sctx, data, blocks);
++			block_fn(state, data, blocks);
+ 			data += blocks * SHA256_BLOCK_SIZE;
+ 		}
+ 		partial = 0;
+@@ -73,19 +72,9 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
+ 	return 0;
  }
  
--static int sha256_sparc64_final(struct shash_desc *desc, u8 *out)
-+static int sha256_sparc64_finup(struct shash_desc *desc, const u8 *src,
-+				unsigned int len, u8 *out)
- {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, padlen;
--	__be32 *dst = (__be32 *)out;
--	__be64 bits;
--	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
--
--	bits = cpu_to_be64(sctx->count << 3);
--
--	/* Pad out to 56 mod 64 and append length */
--	index = sctx->count % SHA256_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((SHA256_BLOCK_SIZE+56) - index);
--
--	/* We need to fill a whole block for __sha256_sparc64_update() */
--	if (padlen <= 56) {
--		sctx->count += padlen;
--		memcpy(sctx->buf + index, padding, padlen);
--	} else {
--		__sha256_sparc64_update(sctx, padding, padlen, index);
--	}
--	__sha256_sparc64_update(sctx, (const u8 *)&bits, sizeof(bits), 56);
--
--	/* Store state in digest */
--	for (i = 0; i < 8; i++)
--		dst[i] = cpu_to_be32(sctx->state[i]);
--
--	/* Wipe context */
--	memset(sctx, 0, sizeof(*sctx));
--
--	return 0;
--}
--
--static int sha224_sparc64_final(struct shash_desc *desc, u8 *hash)
--{
--	u8 D[SHA256_DIGEST_SIZE];
--
--	sha256_sparc64_final(desc, D);
--
--	memcpy(hash, D, SHA224_DIGEST_SIZE);
--	memzero_explicit(D, SHA256_DIGEST_SIZE);
--
--	return 0;
--}
--
--static int sha256_sparc64_export(struct shash_desc *desc, void *out)
+-static inline int sha256_base_do_update(struct shash_desc *desc,
+-					const u8 *data,
+-					unsigned int len,
+-					sha256_block_fn *block_fn)
 -{
 -	struct sha256_state *sctx = shash_desc_ctx(desc);
 -
--	memcpy(out, sctx, sizeof(*sctx));
--	return 0;
+-	return lib_sha256_base_do_update(sctx, data, len, block_fn);
 -}
 -
--static int sha256_sparc64_import(struct shash_desc *desc, const void *in)
--{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
+ static inline int lib_sha256_base_do_update_blocks(
+ 	struct crypto_sha256_state *sctx, const u8 *data, unsigned int len,
+-	crypto_sha256_block_fn *block_fn)
++	sha256_block_fn *block_fn)
+ {
+ 	unsigned int remain = len - round_down(len, SHA256_BLOCK_SIZE);
+ 
+@@ -96,7 +85,7 @@ static inline int lib_sha256_base_do_update_blocks(
+ 
+ static inline int sha256_base_do_update_blocks(
+ 	struct shash_desc *desc, const u8 *data, unsigned int len,
+-	crypto_sha256_block_fn *block_fn)
++	sha256_block_fn *block_fn)
+ {
+ 	return lib_sha256_base_do_update_blocks(shash_desc_ctx(desc), data,
+ 						len, block_fn);
+@@ -104,7 +93,7 @@ static inline int sha256_base_do_update_blocks(
+ 
+ static inline int lib_sha256_base_do_finup(struct crypto_sha256_state *sctx,
+ 					   const u8 *src, unsigned int len,
+-					   crypto_sha256_block_fn *block_fn)
++					   sha256_block_fn *block_fn)
+ {
+ 	unsigned int bit_offset = SHA256_BLOCK_SIZE / 8 - 1;
+ 	union {
+@@ -126,7 +115,7 @@ static inline int lib_sha256_base_do_finup(struct crypto_sha256_state *sctx,
+ 
+ static inline int sha256_base_do_finup(struct shash_desc *desc,
+ 				       const u8 *src, unsigned int len,
+-				       crypto_sha256_block_fn *block_fn)
++				       sha256_block_fn *block_fn)
+ {
+ 	struct crypto_sha256_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -144,23 +133,11 @@ static inline int sha256_base_do_finup(struct shash_desc *desc,
+ static inline int lib_sha256_base_do_finalize(struct sha256_state *sctx,
+ 					      sha256_block_fn *block_fn)
+ {
+-	const int bit_offset = SHA256_BLOCK_SIZE - sizeof(__be64);
+-	__be64 *bits = (__be64 *)(sctx->buf + bit_offset);
+ 	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
++	struct crypto_sha256_state *state = (void *)sctx;
+ 
+-	sctx->buf[partial++] = 0x80;
+-	if (partial > bit_offset) {
+-		memset(sctx->buf + partial, 0x0, SHA256_BLOCK_SIZE - partial);
+-		partial = 0;
 -
--	memcpy(sctx, in, sizeof(*sctx));
+-		block_fn(sctx, sctx->buf, 1);
+-	}
+-
+-	memset(sctx->buf + partial, 0x0, bit_offset - partial);
+-	*bits = cpu_to_be64(sctx->count << 3);
+-	block_fn(sctx, sctx->buf, 1);
+-
 -	return 0;
-+	sha256_base_do_finup(desc, src, len, sha256_block);
-+	return sha256_base_finish(desc, out);
++	sctx->count -= partial;
++	return lib_sha256_base_do_finup(state, sctx->buf, partial, block_fn);
  }
  
- static struct shash_alg sha256_alg = {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
- 	.init		=	sha256_base_init,
- 	.update		=	sha256_sparc64_update,
--	.final		=	sha256_sparc64_final,
--	.export		=	sha256_sparc64_export,
--	.import		=	sha256_sparc64_import,
--	.descsize	=	sizeof(struct sha256_state),
--	.statesize	=	sizeof(struct sha256_state),
-+	.finup		=	sha256_sparc64_finup,
-+	.descsize	=	sizeof(struct crypto_sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha256",
- 		.cra_driver_name=	"sha256-sparc64",
- 		.cra_priority	=	SPARC_CR_OPCODE_PRIORITY,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA256_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
-@@ -147,12 +64,14 @@ static struct shash_alg sha224_alg = {
- 	.digestsize	=	SHA224_DIGEST_SIZE,
- 	.init		=	sha224_base_init,
- 	.update		=	sha256_sparc64_update,
--	.final		=	sha224_sparc64_final,
--	.descsize	=	sizeof(struct sha256_state),
-+	.finup		=	sha256_sparc64_finup,
-+	.descsize	=	sizeof(struct crypto_sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha224",
- 		.cra_driver_name=	"sha224-sparc64",
- 		.cra_priority	=	SPARC_CR_OPCODE_PRIORITY,
-+		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					CRYPTO_AHASH_ALG_FINUP_MAX,
- 		.cra_blocksize	=	SHA224_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
+ static inline int sha256_base_do_finalize(struct shash_desc *desc,
+@@ -182,12 +159,11 @@ static inline int __sha256_base_finish(u32 state[SHA256_DIGEST_SIZE / 4],
+ 	return 0;
+ }
+ 
+-static inline int lib_sha256_base_finish(struct sha256_state *sctx, u8 *out,
+-					 unsigned int digest_size)
++static inline void lib_sha256_base_finish(struct sha256_state *sctx, u8 *out,
++					  unsigned int digest_size)
+ {
+ 	__sha256_base_finish(sctx->state, out, digest_size);
+ 	memzero_explicit(sctx, sizeof(*sctx));
+-	return 0;
+ }
+ 
+ static inline int sha256_base_finish(struct shash_desc *desc, u8 *out)
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 39ead0222937..a89bab377de1 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -132,22 +132,15 @@ void sha256_transform_blocks(struct crypto_sha256_state *sst,
+ }
+ EXPORT_SYMBOL_GPL(sha256_transform_blocks);
+ 
+-static void lib_sha256_transform_blocks(struct sha256_state *sctx,
+-					const u8 *input, int blocks)
+-{
+-	sha256_transform_blocks((struct crypto_sha256_state *)sctx, input,
+-				blocks);
+-}
+-
+ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+-	lib_sha256_base_do_update(sctx, data, len, lib_sha256_transform_blocks);
++	lib_sha256_base_do_update(sctx, data, len, sha256_transform_blocks);
+ }
+ EXPORT_SYMBOL(sha256_update);
+ 
+ static void __sha256_final(struct sha256_state *sctx, u8 *out, int digest_size)
+ {
+-	lib_sha256_base_do_finalize(sctx, lib_sha256_transform_blocks);
++	lib_sha256_base_do_finalize(sctx, sha256_transform_blocks);
+ 	lib_sha256_base_finish(sctx, out, digest_size);
+ }
+ 
 -- 
 2.39.5
 
