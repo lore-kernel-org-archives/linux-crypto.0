@@ -1,39 +1,42 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78E2204F78;
-	Fri, 18 Apr 2025 09:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [178.154.239.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6141C5485
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 10:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744968862; cv=none; b=uMlYRNHy4dnk+hdBO/t25eWvwH9+K63PVBjZkk3mev0mcCF1oHqSmVogCq65mTY7FjS4BB2TUwKuCoiTr3oPDGmqGb8iPNijDGM8/HVv3gkvH8Sy8Ce1qlCeMxkpcnq2scOQVtv1qveHf8VwRbzw/UayicqmKAEV1BlCAXdRyUQ=
+	t=1744970601; cv=none; b=ZPTCEG9aGWxXmzoBcYBssmVz+8URYEJa1jdlokG+sDjkEGXKkXPgjzomKJ8OuZxy0TNjUZWKl/A+h8/7vLp9HyZKJ3Q+QPypS+5ILplZil8npEJvQlwTgb8XgQYfOQ/MOgAAsLuBLVW4zIR/+UaO2Byq0zEwmh1HJ3543ojExbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744968862; c=relaxed/simple;
-	bh=hrpcTytiLAurxxX1yrL4qNQ146cijwzFSzKIOnUFEqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t1J5CZH6fb3rmxmafGuSfYkgKfg3btuZlt/MbHrV32rER4NclT5KBIGU20YBfJwhMx6yxzsm5iRnygBam2iYO5qCKwZ/9Kc3y7oN9uF7zUJXzRjIrrDoepX1KOmPQ/OgCrEv3ZqTCdUpnb6HI058PmqjE6onMIpHdbw9dtCdgLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.40.54.180])
-	by gateway (Coremail) with SMTP id _____8CxieCZHAJo2KLBAA--.14626S3;
-	Fri, 18 Apr 2025 17:34:17 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.40.54.180])
-	by front1 (Coremail) with SMTP id qMiowMDxPcWUHAJoyUKJAA--.11173S2;
-	Fri, 18 Apr 2025 17:34:14 +0800 (CST)
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	peterhuewe@gmx.de,
-	jarkko@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	jgg@ziepe.ca,
-	linux-integrity@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH v8 5/5] MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
-Date: Fri, 18 Apr 2025 17:36:00 +0800
-Message-ID: <20250418093600.1363-1-zhaoqunqin@loongson.cn>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1744970601; c=relaxed/simple;
+	bh=JE9mJJIrnNI4PqURikbFnd//W/A2WpDYEbwa99vBCT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IOXRA7AanHm+3Xe8eY3yFC7ulZpbU+9fDFmqtiqbwJxX9q1XHdZE7UhtUWj/th8ve8lv8BU8g8Qz0JUASuHwUv7lnzrQRPAkvP2Jv0WHbp11TukjT6+eLkZ/+T9A7yqV5akqVHUJKfwoMNOKdklqhRU9pXuTBRnbN9XkPj8Lbxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=UonzzgAR; arc=none smtp.client-ip=178.154.239.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="UonzzgAR"
+Received: from mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1e:3990:0:640:808c:0])
+	by forward100b.mail.yandex.net (Yandex) with ESMTPS id 7B8F460D1E;
+	Fri, 18 Apr 2025 13:03:09 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 73H724qLgqM0-l7FR3Fkl;
+	Fri, 18 Apr 2025 13:03:09 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1744970589; bh=jgn7k3K4UWAHxu94tiegkEH+T7uHzPfDRJlEWr2a6NU=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=UonzzgAR+1QjUvJZ7kgctxyeNT0g69284m3Gy+2Jc1G8yce9jJyXuAE2nmn5zD9cC
+	 nmfSq84i9J5MbK2SM54foGZ1/5lTIlJZZ27ZhOgLNnxD+Gly3SMktD/sbH7+kBbiW9
+	 5tr68r6pAKoVSdyHLAU/bkt03cGwHCzbU//Ge04Y=
+Authentication-Results: mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] crypto: acomp: fix memory leaks caused by chained requests
+Date: Fri, 18 Apr 2025 13:02:29 +0300
+Message-ID: <20250418100229.9868-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,53 +44,107 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxPcWUHAJoyUKJAA--.11173S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7GFyftFyrAF48Jr1rCw1xJFc_yoW3ZFc_Ca
-	y2g397Xr1kGr1I9asYvFZ3Zw4YvFWrJ3Wfu3Wqqw1fX34jyr9IyrnrAF4vk3W3urW5CFZx
-	ua97GFs5Cr13ZosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26rWY6Fy7
-	McIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26F1j6w1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUI0eHUUUUU
 
-Changes to Loongson TPM driver would be best reviewed by the Loongson
-crypto driver maintainers.
+Running 6.15.0-rc2 with kmemleak enabled, I've noticed 45
+memory leaks looks like the following:
 
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+unreferenced object 0xffff888114032a00 (size 256):
+  comm "cryptomgr_test", pid 246, jiffies 4294668840
+  hex dump (first 32 bytes):
+    00 20 03 14 81 88 ff ff 00 da 02 14 81 88 ff ff  . ..............
+    90 ca 54 9b ff ff ff ff c8 fb a6 00 00 c9 ff ff  ..T.............
+  backtrace (crc cd58738d):
+    __kmalloc_noprof+0x272/0x520
+    alg_test_comp+0x74e/0x1b60
+    alg_test+0x3f0/0xc40
+    cryptomgr_test+0x47/0x80
+    kthread+0x4e1/0x620
+    ret_from_fork+0x37/0x70
+    ret_from_fork_asm+0x1a/0x30
+
+These leaks comes from 'test_acomp()' where an extra requests chained to
+the head one (e.g. 'reqs[0]') are never freed. Fix this by unchaining
+and freeing such an extra requests in 'acomp_request_free()'.
+
+(I'm new to this subsystem and not sure about Fixes: tag BTW).
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-v8: None
-v7: Added tag from Jarkko and Huacai
-v6: "tpm_lsse.c" -> "tpm_loongson"
-v4-v5: None
+ include/crypto/acompress.h | 28 ++++++++++++++++++++++------
+ include/linux/crypto.h     |  5 +++++
+ 2 files changed, 27 insertions(+), 6 deletions(-)
 
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a4726df8f..eb99b7a66 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13916,6 +13916,7 @@ LOONGSON CRYPTO DRIVER
- M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
-+F:	drivers/char/tpm/tpm_loongson.c
- F:	drivers/crypto/loongson/
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index c497c73baf13..d7de4cbccd60 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -310,6 +310,20 @@ static inline void *acomp_request_extra(struct acomp_req *req)
+ 	return (void *)((char *)req + len);
+ }
  
- LOONGSON-2 SOC SERIES CLOCK DRIVER
++static inline void acomp_request_chain(struct acomp_req *req,
++				       struct acomp_req *head)
++{
++	crypto_request_chain(&req->base, &head->base);
++}
++
++static inline void acomp_request_unchain(struct acomp_req *req)
++{
++	crypto_request_unchain(&req->base);
++}
++
++#define acomp_request_for_each(this, tmp, head) \
++	list_for_each_entry_safe((this), (tmp), &(head)->base.list, base.list)
++
+ /**
+  * acomp_request_free() -- zeroize and free asynchronous (de)compression
+  *			   request as well as the output buffer if allocated
+@@ -319,8 +333,16 @@ static inline void *acomp_request_extra(struct acomp_req *req)
+  */
+ static inline void acomp_request_free(struct acomp_req *req)
+ {
++	struct acomp_req *this, *tmp;
++
+ 	if (!req || (req->base.flags & CRYPTO_TFM_REQ_ON_STACK))
+ 		return;
++
++	acomp_request_for_each(this, tmp, req) {
++		acomp_request_unchain(this);
++		kfree_sensitive(this);
++	}
++
+ 	kfree_sensitive(req);
+ }
+ 
+@@ -558,12 +580,6 @@ static inline void acomp_request_set_dst_folio(struct acomp_req *req,
+ 	req->base.flags |= CRYPTO_ACOMP_REQ_DST_FOLIO;
+ }
+ 
+-static inline void acomp_request_chain(struct acomp_req *req,
+-				       struct acomp_req *head)
+-{
+-	crypto_request_chain(&req->base, &head->base);
+-}
+-
+ /**
+  * crypto_acomp_compress() -- Invoke asynchronous compress operation
+  *
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 1e3809d28abd..3e12bcee1497 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -486,6 +486,11 @@ static inline void crypto_request_chain(struct crypto_async_request *req,
+ 	list_add_tail(&req->list, &head->list);
+ }
+ 
++static inline void crypto_request_unchain(struct crypto_async_request *req)
++{
++	list_del(&req->list);
++}
++
+ static inline bool crypto_tfm_is_async(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_ASYNC;
 -- 
-2.45.2
+2.49.0
 
