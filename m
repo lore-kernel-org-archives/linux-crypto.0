@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA7D267F47
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 02:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE89267F73
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 02:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744945138; cv=none; b=cT3pMPCcptrh7p4sA/fBrZH2VQCy5m93sYjlvPeZ483+GevpBdwBILn+S3wPCkXlXB5152XNtOGbJxdAxxmd5JiPyyI3dKZH2taOiey5x6wOAl4oH6N9YCH/eYb9UFYo3YI+rqXe2LZPvfoLyNI/gyyqr45MtS8I4L5q76uoed0=
+	t=1744945140; cv=none; b=ULQBt+FRegQR+3aQC7ZwdhxrSSjpOpL+duX19DsJouevO5ntN766ZGOEiZVuYc+kYMvlaWU3k9HMXTnKkxz/XH5Fnr6A1/LoNwf76QegtPb8EiiiBNypwbQoMXA4hZ3hY1MwsCsbzSDwq5bxn2Jl4npffQZ2wgD9MCnreqYdwMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744945138; c=relaxed/simple;
-	bh=MssqPNwPuP4uwwROVlnz8fNcqY2lsGr88+65AXGrfEc=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=jpKeoF6u/4u5rypi8KU6jyOcmjg7acJuUaLg5TihWGAvH9Q7bExOgu5bvvaQ2i8nsOcpHTtfpl5m2owQ0SyxjjOJ2oHqeqbruVOct0qr5wEPU95ZZ0xeI0Z1qED5Oq0g1Kd1nAAG9ZtoOi2c6OQ2s5dCNYFkc4igA4Fu2LHKcdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YDZc43Bt; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744945140; c=relaxed/simple;
+	bh=FeQsdAWrIpcSwSWfi4E59f28zXxwpUGm2Ls5AZQi1g0=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=d9HmgSal79LDMyn0KNvc6ZjviMa6UeraEuqfxQdj6N2DlQfAFm4FHl6tz1yl9khLPafiymboJGq6aC2ZoPlySksXNonMN0DcM5R/QqUxsCV9jG6VfOM0p5Mq7dNTAsr9jz/Br4375Mp3Bk4u/m31K4jpzzY3uHUYyrZuCvNMZPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aW4a9rfl; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YDZc43Bt"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aW4a9rfl"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=ZP9qz8OoCYC8GYuInRsCY56h0mbHwRWTL7dGJCBX2W0=; b=YDZc43BtmeW/1zYCO302ChyYBC
-	kHXX9pfBWN2Frgr1h/FLOERT7E+v7YyUMvjr6qI9lINTnYNw4TfTFo3xiP5w/DEeR6hItDUyCIcNa
-	/sd2Xzd5u1RKGZFtkU5Ttz1f5531PaIGQHr5moXZ8JfK8zN24d175mMtzNh2BaRM98X/IGI0ghN3I
-	Emi3EfA4pFLhjsuhFbiWrb8Dc1zWK8ZhMs/b577ebqPoEUPVj5+wZLKD64NrufC6f0WyRG6RhUFtO
-	uDv9KmivVM2ngi77uIqKUcmlOTLvFP8tl8KXFGbjy8mnJadREPVJSJDDHMyr5CVHbyRhM6RfEqooB
-	3FfulBgA==;
+	bh=Squ27ojLQ7hZiAyvY4dmDP1YXLyCVYhjNaQRuY7+eB8=; b=aW4a9rflET6bwd0++w1KiQAYJM
+	e6jQOU0VEqDUMVdph7tLkRH+Xn6xClyizcuXAVmxzHcU0pBBRYjYOFMan94cyQ7BOnbtuUeoLFNRV
+	sbUn0ROOlYjBdArxTjlWtd/ypvTZnGGW3rmvqq0SsTzTc5iQdZGsKWUnUE9r4mXpZknpm+OBGSKA9
+	eqko+zBzN5mOiKsT8UJ86CnYgi6lnxMLUyJZzDZcICAcxEQnsrL668W9RgV3q72XqMVlYOco7tXO3
+	r3z1kad+wPN1QP8TCBM0WzcPhxjKlV5g5a7RFp0MdQ1oMtODmdbPUzPfHk3r3+3p3Hyp2jxy6sIZi
+	PWQxyDrA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5bwK-00Ge31-1z;
-	Fri, 18 Apr 2025 10:58:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 10:58:52 +0800
-Date: Fri, 18 Apr 2025 10:58:52 +0800
-Message-Id: <b05df579e39c9b12bfe0de2fa965b366c4331383.1744945025.git.herbert@gondor.apana.org.au>
+	id 1u5bwM-00Ge3L-30;
+	Fri, 18 Apr 2025 10:58:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 10:58:54 +0800
+Date: Fri, 18 Apr 2025 10:58:54 +0800
+Message-Id: <e939b41a6aaa2ac08f6f1a6cafd2a80479f9239b.1744945025.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744945025.git.herbert@gondor.apana.org.au>
 References: <cover.1744945025.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 06/67] crypto: arm/ghash - Use API partial block handling
+Subject: [v2 PATCH 07/67] crypto: arm64/ghash - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,52 +47,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-Also switch to the generic export format.
-
-Finally remove a couple of stray may_use_simd() calls in gcm.
+Also remove the unnecessary SIMD fallback path.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm/crypto/ghash-ce-glue.c | 110 +++++++++++++++-----------------
- 1 file changed, 50 insertions(+), 60 deletions(-)
+ arch/arm64/crypto/ghash-ce-glue.c | 151 ++++++++++++------------------
+ 1 file changed, 60 insertions(+), 91 deletions(-)
 
-diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
-index aabfcf522a2c..a52dcc8c1e33 100644
---- a/arch/arm/crypto/ghash-ce-glue.c
-+++ b/arch/arm/crypto/ghash-ce-glue.c
-@@ -8,22 +8,22 @@
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 071e122f9c37..4995b6e22335 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -6,30 +6,27 @@
+  */
  
- #include <asm/hwcap.h>
  #include <asm/neon.h>
 -#include <asm/simd.h>
 -#include <linux/unaligned.h>
  #include <crypto/aes.h>
 -#include <crypto/gcm.h>
+-#include <crypto/algapi.h>
  #include <crypto/b128ops.h>
--#include <crypto/cryptd.h>
 +#include <crypto/gcm.h>
-+#include <crypto/gf128mul.h>
 +#include <crypto/ghash.h>
+ #include <crypto/gf128mul.h>
  #include <crypto/internal/aead.h>
  #include <crypto/internal/hash.h>
 -#include <crypto/internal/simd.h>
  #include <crypto/internal/skcipher.h>
--#include <crypto/gf128mul.h>
  #include <crypto/scatterwalk.h>
  #include <linux/cpufeature.h>
 -#include <linux/crypto.h>
 +#include <linux/errno.h>
- #include <linux/jump_label.h>
 +#include <linux/kernel.h>
  #include <linux/module.h>
 +#include <linux/string.h>
 +#include <linux/unaligned.h>
  
- MODULE_DESCRIPTION("GHASH hash function using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
-@@ -32,9 +32,6 @@ MODULE_ALIAS_CRYPTO("ghash");
- MODULE_ALIAS_CRYPTO("gcm(aes)");
- MODULE_ALIAS_CRYPTO("rfc4106(gcm(aes))");
+ MODULE_DESCRIPTION("GHASH and AES-GCM using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_CRYPTO("ghash");
  
 -#define GHASH_BLOCK_SIZE	16
 -#define GHASH_DIGEST_SIZE	16
@@ -100,8 +95,8 @@ index aabfcf522a2c..a52dcc8c1e33 100644
  #define RFC4106_NONCE_SIZE	4
  
  struct ghash_key {
-@@ -49,10 +46,8 @@ struct gcm_key {
- 	u8	nonce[];	// for RFC4106 nonce
+@@ -37,10 +34,8 @@ struct ghash_key {
+ 	u64			h[][2];
  };
  
 -struct ghash_desc_ctx {
@@ -111,8 +106,8 @@ index aabfcf522a2c..a52dcc8c1e33 100644
 -	u32 count;
  };
  
- asmlinkage void pmull_ghash_update_p64(int blocks, u64 dg[], const char *src,
-@@ -65,9 +60,9 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(use_p64);
+ struct gcm_aes_ctx {
+@@ -65,36 +60,12 @@ asmlinkage int pmull_gcm_decrypt(int bytes, u8 dst[], const u8 src[],
  
  static int ghash_init(struct shash_desc *desc)
  {
@@ -124,45 +119,103 @@ index aabfcf522a2c..a52dcc8c1e33 100644
  	return 0;
  }
  
-@@ -85,54 +80,51 @@ static void ghash_do_update(int blocks, u64 dg[], const char *src,
+-static void ghash_do_update(int blocks, u64 dg[], const char *src,
+-			    struct ghash_key *key, const char *head)
+-{
+-	be128 dst = { cpu_to_be64(dg[1]), cpu_to_be64(dg[0]) };
+-
+-	do {
+-		const u8 *in = src;
+-
+-		if (head) {
+-			in = head;
+-			blocks++;
+-			head = NULL;
+-		} else {
+-			src += GHASH_BLOCK_SIZE;
+-		}
+-
+-		crypto_xor((u8 *)&dst, in, GHASH_BLOCK_SIZE);
+-		gf128mul_lle(&dst, &key->k);
+-	} while (--blocks);
+-
+-	dg[0] = be64_to_cpu(dst.b);
+-	dg[1] = be64_to_cpu(dst.a);
+-}
+-
+ static __always_inline
+ void ghash_do_simd_update(int blocks, u64 dg[], const char *src,
+ 			  struct ghash_key *key, const char *head,
+@@ -103,13 +74,9 @@ void ghash_do_simd_update(int blocks, u64 dg[], const char *src,
+ 					      u64 const h[][2],
+ 					      const char *head))
+ {
+-	if (likely(crypto_simd_usable())) {
+-		kernel_neon_begin();
+-		simd_update(blocks, dg, src, key->h, head);
+-		kernel_neon_end();
+-	} else {
+-		ghash_do_update(blocks, dg, src, key, head);
+-	}
++	kernel_neon_begin();
++	simd_update(blocks, dg, src, key->h, head);
++	kernel_neon_end();
+ }
+ 
+ /* avoid hogging the CPU for too long */
+@@ -118,63 +85,61 @@ void ghash_do_simd_update(int blocks, u64 dg[], const char *src,
  static int ghash_update(struct shash_desc *desc, const u8 *src,
  			unsigned int len)
  {
 -	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
 -	unsigned int partial = ctx->count % GHASH_BLOCK_SIZE;
-+	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
++	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +	int blocks;
  
 -	ctx->count += len;
 +	blocks = len / GHASH_BLOCK_SIZE;
-+	ghash_do_update(blocks, ctx->digest, src, key, NULL);
-+	return len - blocks * GHASH_BLOCK_SIZE;
-+}
++	len -= blocks * GHASH_BLOCK_SIZE;
  
 -	if ((partial + len) >= GHASH_BLOCK_SIZE) {
 -		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 -		int blocks;
++	do {
++		int chunk = min(blocks, MAX_BLOCKS);
+ 
+-		if (partial) {
+-			int p = GHASH_BLOCK_SIZE - partial;
++		ghash_do_simd_update(chunk, ctx->digest, src, key, NULL,
++				     pmull_ghash_update_p8);
++		blocks -= chunk;
++		src += chunk * GHASH_BLOCK_SIZE;
++	} while (unlikely(blocks > 0));
++	return len;
++}
+ 
+-			memcpy(ctx->buf + partial, src, p);
+-			src += p;
+-			len -= p;
+-		}
 +static int ghash_export(struct shash_desc *desc, void *out)
 +{
 +	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
 +	u8 *dst = out;
  
--		if (partial) {
--			int p = GHASH_BLOCK_SIZE - partial;
--
--			memcpy(ctx->buf + partial, src, p);
--			src += p;
--			len -= p;
--		}
--
 -		blocks = len / GHASH_BLOCK_SIZE;
 -		len %= GHASH_BLOCK_SIZE;
 -
--		ghash_do_update(blocks, ctx->digest, src, key,
--				partial ? ctx->buf : NULL);
--		src += blocks * GHASH_BLOCK_SIZE;
--		partial = 0;
+-		do {
+-			int chunk = min(blocks, MAX_BLOCKS);
+-
+-			ghash_do_simd_update(chunk, ctx->digest, src, key,
+-					     partial ? ctx->buf : NULL,
+-					     pmull_ghash_update_p8);
+-
+-			blocks -= chunk;
+-			src += chunk * GHASH_BLOCK_SIZE;
+-			partial = 0;
+-		} while (unlikely(blocks > 0));
 -	}
 -	if (len)
 -		memcpy(ctx->buf + partial, src, len);
@@ -183,12 +236,14 @@ index aabfcf522a2c..a52dcc8c1e33 100644
 -		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 -
 -		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
--		ghash_do_update(1, ctx->digest, ctx->buf, key, NULL);
+-
+-		ghash_do_simd_update(1, ctx->digest, ctx->buf, key, NULL,
+-				     pmull_ghash_update_p8);
 -	}
 -	put_unaligned_be64(ctx->digest[1], dst);
 -	put_unaligned_be64(ctx->digest[0], dst + 8);
 -
--	*ctx = (struct ghash_desc_ctx){};
+-	memzero_explicit(ctx, sizeof(*ctx));
 +	ctx->digest[1] = get_unaligned_be64(src);
 +	ctx->digest[0] = get_unaligned_be64(src + 8);
  	return 0;
@@ -197,14 +252,15 @@ index aabfcf522a2c..a52dcc8c1e33 100644
 +static int ghash_finup(struct shash_desc *desc, const u8 *src,
 +		       unsigned int len, u8 *dst)
 +{
-+	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
++	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +
 +	if (len) {
 +		u8 buf[GHASH_BLOCK_SIZE] = {};
 +
 +		memcpy(buf, src, len);
-+		ghash_do_update(1, ctx->digest, buf, key, NULL);
++		ghash_do_simd_update(1, ctx->digest, src, key, NULL,
++				     pmull_ghash_update_p8);
 +		memzero_explicit(buf, sizeof(buf));
 +	}
 +	return ghash_export(desc, dst);
@@ -212,8 +268,16 @@ index aabfcf522a2c..a52dcc8c1e33 100644
 +
  static void ghash_reflect(u64 h[], const be128 *k)
  {
- 	u64 carry = be64_to_cpu(k->a) >> 63;
-@@ -175,13 +167,17 @@ static struct shash_alg ghash_alg = {
+ 	u64 carry = be64_to_cpu(k->a) & BIT(63) ? 1 : 0;
+@@ -205,6 +170,7 @@ static struct shash_alg ghash_alg = {
+ 	.base.cra_name		= "ghash",
+ 	.base.cra_driver_name	= "ghash-neon",
+ 	.base.cra_priority	= 150,
++	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= GHASH_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct ghash_key) + sizeof(u64[2]),
+ 	.base.cra_module	= THIS_MODULE,
+@@ -212,9 +178,12 @@ static struct shash_alg ghash_alg = {
  	.digestsize		= GHASH_DIGEST_SIZE,
  	.init			= ghash_init,
  	.update			= ghash_update,
@@ -225,34 +289,9 @@ index aabfcf522a2c..a52dcc8c1e33 100644
 +	.import			= ghash_import,
 +	.descsize		= sizeof(struct arm_ghash_desc_ctx),
 +	.statesize		= sizeof(struct ghash_desc_ctx),
+ };
  
- 	.base.cra_name		= "ghash",
- 	.base.cra_driver_name	= "ghash-ce",
- 	.base.cra_priority	= 300,
-+	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
- 	.base.cra_blocksize	= GHASH_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct ghash_key) + sizeof(u64[2]),
- 	.base.cra_module	= THIS_MODULE,
-@@ -317,9 +313,6 @@ static int gcm_encrypt(struct aead_request *req, const u8 *iv, u32 assoclen)
- 	u8 *tag, *dst;
- 	int tail, err;
- 
--	if (WARN_ON_ONCE(!may_use_simd()))
--		return -EBUSY;
--
- 	err = skcipher_walk_aead_encrypt(&walk, req, false);
- 
- 	kernel_neon_begin();
-@@ -409,9 +402,6 @@ static int gcm_decrypt(struct aead_request *req, const u8 *iv, u32 assoclen)
- 	u8 *tag, *dst;
- 	int tail, err, ret;
- 
--	if (WARN_ON_ONCE(!may_use_simd()))
--		return -EBUSY;
--
- 	scatterwalk_map_and_copy(otag, req->src,
- 				 req->assoclen + req->cryptlen - authsize,
- 				 authsize, 0);
+ static int num_rounds(struct crypto_aes_ctx *ctx)
 -- 
 2.39.5
 
