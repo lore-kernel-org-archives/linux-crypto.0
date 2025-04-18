@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAB9268C41
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B77268C5D
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 03:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744945248; cv=none; b=bZEFZGnEx3uZoKtD5h03WGEe+OB2tvMjRK3nkHG1bnIi1VrjgfSP9OWnXS0uRW8u6JQEXs2XgXXSGTrB6WHG8A10IwKxb/Sf4oMct8POSjQImcYM2OQTlglx5+aRNFOsGkk0PFsXuWIUx4yaPclF4/fq8Z0a+zbC9rIqWR6ifz4=
+	t=1744945251; cv=none; b=bGm2BOZxYp+S+V3h8pu7ioVzlTVzW0ApmRAbjbTuUYPMHGogQAmEn0pmlLlu65qdVDjUQyf6E5s/oAdenz25S9jZ2UimxSVZIOf3fJl5hveB0DCIE4T5CgZpS9h1DrG6qjTjqYD/aejkKV+bgn/iQSEc8N2RlUg1gN5zuYsIakE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744945248; c=relaxed/simple;
-	bh=MbniKo4qDbSZiHPQhoSku+RYWmJsHOR03V1RBXttMjU=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=h7hY2rtUA9Jsy2B/ZDcYK5oZd3C2d8z9xmz/Un3qBXT85BAgs1RlqOFCwI9YgnYahx0vDmZBjIgZkidjulCe6myGMbAcQ9SUiPVnFjxrWELl48sKrwwS94dR3AUP/qMuWAiQ1qQbngB1fvBHm8Y9Epz5w18uQr+LQ+sXGphJrNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Qaeb/9nS; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1744945251; c=relaxed/simple;
+	bh=z6+c2uy5p5MDVNl2dtt8a5GCIMvg0pqU3d4n9oY8GNk=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=XT4NXqTqkFIC192Mm9nxkLG1CGRMwWTg52Nf9pWeQFoxNLCN1q2+7O/6FtfSli90nhD4sm3tRKBlDlo58jsoclfc3Pc+gdPYLTzbjWJysjbhU6VtaSqy5y7fVrDaxCjqJFroA21Fiz8puu5nNowojrY1p1OV6b+hLY8ZN4wYfEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OhSHYUii; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Qaeb/9nS"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OhSHYUii"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=Jr0PdFGN3moQZRt/K8WjIWb1E7OqeV5e/K+iB/Tp00I=; b=Qaeb/9nSKzSotz9s76h9BDIk3L
-	Aq4T0zM5MeUdPG044EknDXC2tzuYh5MnxghOp53xxyJE6oHMnSOefb72i0NpeVi7AF2Qnr7AjFSgi
-	XB/9PvBbiDMZ3ewh5W0gfkTQcJyV7Ta/V/QvbW76j6o1QBNk4cz4RHkIZWgazGMc7nr9W3V3PhKCL
-	EduG9E1uWUtws/u0TiyZJ5bRs+n1uhQZGWggSE4Ef7Z4+GIc7L7EP+TBLvUzBblpgSW6GM2FT1hKY
-	Cz+RiZQG6gpd5sdI79/fOgD/8mukSZa6xpDDzrPpY7P4Yw0TqVy2uOD2SYJpzNgdh44DFkgFCtesh
-	Nk/76d6Q==;
+	bh=/QZyI2wHRGLI6WGF8lIk6OwjeyN1UVWvba1YY9U3iOc=; b=OhSHYUiiEiboAVqTd4IaaxGkbX
+	b23FV+jMnLWjpOu7tT7tFBPtb73/+ri9Z9MkO9a1qTQpcxoK7NxebJlnPhNysOWA1xr4oZbOZo+Zh
+	4bX6r6dyiDxt4knVdtQbmiOHhJE1M6+zl+FVXpHcQOykGIsJW/B9uUml1f9/LPjBM1afWTUr7y+Je
+	Rpi6De8l7xpmz0qYuni3Fjj6Y6bgzdD8bYXyn/67Px2A2v6Tz70H08fA8n1lxCUUy7DM1HEjaV+ue
+	1MrBp1mN4CQLq+c6YkaW5FUWpRgRitIppznGELiho80ZRHnY40psgox2El6NMmUYL3eBC5ZzD5pja
+	kNFeLxqw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5by7-00GeGc-1Z;
-	Fri, 18 Apr 2025 11:00:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:43 +0800
-Date: Fri, 18 Apr 2025 11:00:43 +0800
-Message-Id: <b8fdec7eca5c4ada285ad9a743a34d1d891a14e3.1744945025.git.herbert@gondor.apana.org.au>
+	id 1u5by9-00GeHA-2g;
+	Fri, 18 Apr 2025 11:00:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 11:00:45 +0800
+Date: Fri, 18 Apr 2025 11:00:45 +0800
+Message-Id: <a274ebcf5ab4a85e4afbfdd8a18e2458011159f9.1744945025.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1744945025.git.herbert@gondor.apana.org.au>
 References: <cover.1744945025.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 54/67] crypto: sha512_base - Remove partial block helpers
+Subject: [v2 PATCH 55/67] crypto: sm3-generic - Use API partial block handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,96 +45,157 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Now that all sha256_base users have been converted to use the API
-partial block handling, remove the partial block helpers.
+Use the Crypto API partial block handling.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/sha512_base.h | 64 ------------------------------------
- 1 file changed, 64 deletions(-)
+ crypto/sm3_generic.c      | 31 +++++++--------------------
+ include/crypto/sm3.h      |  1 +
+ include/crypto/sm3_base.h | 45 +++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 52 insertions(+), 25 deletions(-)
 
-diff --git a/include/crypto/sha512_base.h b/include/crypto/sha512_base.h
-index e9f302ec3ede..aa814bab442d 100644
---- a/include/crypto/sha512_base.h
-+++ b/include/crypto/sha512_base.h
-@@ -53,46 +53,6 @@ static inline int sha512_base_init(struct shash_desc *desc)
- 	return 0;
- }
+diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
+index a2d23a46924e..4fb6957c2f0c 100644
+--- a/crypto/sm3_generic.c
++++ b/crypto/sm3_generic.c
+@@ -9,15 +9,10 @@
+  */
  
--static inline int sha512_base_do_update(struct shash_desc *desc,
--					const u8 *data,
--					unsigned int len,
--					sha512_block_fn *block_fn)
--{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count[0] % SHA512_BLOCK_SIZE;
--
--	sctx->count[0] += len;
--	if (sctx->count[0] < len)
--		sctx->count[1]++;
--
--	if (unlikely((partial + len) >= SHA512_BLOCK_SIZE)) {
--		int blocks;
--
--		if (partial) {
--			int p = SHA512_BLOCK_SIZE - partial;
--
--			memcpy(sctx->buf + partial, data, p);
--			data += p;
--			len -= p;
--
--			block_fn(sctx, sctx->buf, 1);
--		}
--
--		blocks = len / SHA512_BLOCK_SIZE;
--		len %= SHA512_BLOCK_SIZE;
--
--		if (blocks) {
--			block_fn(sctx, data, blocks);
--			data += blocks * SHA512_BLOCK_SIZE;
--		}
--		partial = 0;
--	}
--	if (len)
--		memcpy(sctx->buf + partial, data, len);
--
--	return 0;
--}
--
- static inline int sha512_base_do_update_blocks(struct shash_desc *desc,
- 					       const u8 *data,
- 					       unsigned int len,
-@@ -142,30 +102,6 @@ static inline int sha512_base_do_finup(struct shash_desc *desc, const u8 *src,
- 	return 0;
- }
+ #include <crypto/internal/hash.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <linux/mm.h>
+-#include <linux/types.h>
+ #include <crypto/sm3.h>
+ #include <crypto/sm3_base.h>
+-#include <linux/bitops.h>
+-#include <asm/byteorder.h>
+-#include <linux/unaligned.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
  
--static inline int sha512_base_do_finalize(struct shash_desc *desc,
--					  sha512_block_fn *block_fn)
--{
--	const int bit_offset = SHA512_BLOCK_SIZE - sizeof(__be64[2]);
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--	__be64 *bits = (__be64 *)(sctx->buf + bit_offset);
--	unsigned int partial = sctx->count[0] % SHA512_BLOCK_SIZE;
--
--	sctx->buf[partial++] = 0x80;
--	if (partial > bit_offset) {
--		memset(sctx->buf + partial, 0x0, SHA512_BLOCK_SIZE - partial);
--		partial = 0;
--
--		block_fn(sctx, sctx->buf, 1);
--	}
--
--	memset(sctx->buf + partial, 0x0, bit_offset - partial);
--	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
--	bits[1] = cpu_to_be64(sctx->count[0] << 3);
--	block_fn(sctx, sctx->buf, 1);
--
--	return 0;
--}
--
- static inline int sha512_base_finish(struct shash_desc *desc, u8 *out)
+ const u8 sm3_zero_message_hash[SM3_DIGEST_SIZE] = {
+ 	0x1A, 0xB2, 0x1D, 0x83, 0x55, 0xCF, 0xA1, 0x7F,
+@@ -30,38 +25,28 @@ EXPORT_SYMBOL_GPL(sm3_zero_message_hash);
+ static int crypto_sm3_update(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len)
  {
- 	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
+-	sm3_update(shash_desc_ctx(desc), data, len);
+-	return 0;
+-}
+-
+-static int crypto_sm3_final(struct shash_desc *desc, u8 *out)
+-{
+-	sm3_final(shash_desc_ctx(desc), out);
+-	return 0;
++	return sm3_base_do_update_blocks(desc, data, len, sm3_block_generic);
+ }
+ 
+ static int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *hash)
+ {
+-	struct sm3_state *sctx = shash_desc_ctx(desc);
+-
+-	if (len)
+-		sm3_update(sctx, data, len);
+-	sm3_final(sctx, hash);
+-	return 0;
++	sm3_base_do_finup(desc, data, len, sm3_block_generic);
++	return sm3_base_finish(desc, hash);
+ }
+ 
+ static struct shash_alg sm3_alg = {
+ 	.digestsize	=	SM3_DIGEST_SIZE,
+ 	.init		=	sm3_base_init,
+ 	.update		=	crypto_sm3_update,
+-	.final		=	crypto_sm3_final,
+ 	.finup		=	crypto_sm3_finup,
+-	.descsize	=	sizeof(struct sm3_state),
++	.descsize	=	SM3_STATE_SIZE,
+ 	.base		=	{
+ 		.cra_name	 =	"sm3",
+ 		.cra_driver_name =	"sm3-generic",
+ 		.cra_priority	=	100,
++		.cra_flags	 =	CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					CRYPTO_AHASH_ALG_FINUP_MAX,
+ 		.cra_blocksize	 =	SM3_BLOCK_SIZE,
+ 		.cra_module	 =	THIS_MODULE,
+ 	}
+diff --git a/include/crypto/sm3.h b/include/crypto/sm3.h
+index d49211ba9a20..6dc95264a836 100644
+--- a/include/crypto/sm3.h
++++ b/include/crypto/sm3.h
+@@ -14,6 +14,7 @@
+ 
+ #define SM3_DIGEST_SIZE	32
+ #define SM3_BLOCK_SIZE	64
++#define SM3_STATE_SIZE	40
+ 
+ #define SM3_T1		0x79CC4519
+ #define SM3_T2		0x7A879D8A
+diff --git a/include/crypto/sm3_base.h b/include/crypto/sm3_base.h
+index 835896228e8e..9460589c8cb8 100644
+--- a/include/crypto/sm3_base.h
++++ b/include/crypto/sm3_base.h
+@@ -62,6 +62,49 @@ static inline int sm3_base_do_update(struct shash_desc *desc,
+ 	return 0;
+ }
+ 
++static inline int sm3_base_do_update_blocks(struct shash_desc *desc,
++					    const u8 *data, unsigned int len,
++					    sm3_block_fn *block_fn)
++{
++	unsigned int remain = len - round_down(len, SM3_BLOCK_SIZE);
++	struct sm3_state *sctx = shash_desc_ctx(desc);
++
++	sctx->count += len - remain;
++	block_fn(sctx, data, len / SM3_BLOCK_SIZE);
++	return remain;
++}
++
++static inline int sm3_base_do_finup(struct shash_desc *desc,
++				    const u8 *src, unsigned int len,
++				    sm3_block_fn *block_fn)
++{
++	unsigned int bit_offset = SM3_BLOCK_SIZE / 8 - 1;
++	struct sm3_state *sctx = shash_desc_ctx(desc);
++	union {
++		__be64 b64[SM3_BLOCK_SIZE / 4];
++		u8 u8[SM3_BLOCK_SIZE * 2];
++	} block = {};
++
++	if (len >= SM3_BLOCK_SIZE) {
++		int remain;
++
++		remain = sm3_base_do_update_blocks(desc, src, len, block_fn);
++		src += len - remain;
++		len = remain;
++	}
++
++	if (len >= bit_offset * 8)
++		bit_offset += SM3_BLOCK_SIZE / 8;
++	memcpy(&block, src, len);
++	block.u8[len] = 0x80;
++	sctx->count += len;
++	block.b64[bit_offset] = cpu_to_be64(sctx->count << 3);
++	block_fn(sctx, block.u8, (bit_offset + 1) * 8 / SM3_BLOCK_SIZE);
++	memzero_explicit(&block, sizeof(block));
++
++	return 0;
++}
++
+ static inline int sm3_base_do_finalize(struct shash_desc *desc,
+ 					sm3_block_fn *block_fn)
+ {
+@@ -93,8 +136,6 @@ static inline int sm3_base_finish(struct shash_desc *desc, u8 *out)
+ 
+ 	for (i = 0; i < SM3_DIGEST_SIZE / sizeof(__be32); i++)
+ 		put_unaligned_be32(sctx->state[i], digest++);
+-
+-	memzero_explicit(sctx, sizeof(*sctx));
+ 	return 0;
+ }
+ 
 -- 
 2.39.5
 
