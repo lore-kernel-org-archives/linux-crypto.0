@@ -1,139 +1,119 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECEE219ED;
-	Fri, 18 Apr 2025 02:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B1F267B02
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Apr 2025 02:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744944569; cv=none; b=TIbjsJrHWGElnC8wuzmMmszWukfScx4ZFUwYFDzrSM7N1Y7vcLRpMM/d5YvLHTm11H4/Wuau6Jrq4KuiodIDL+oRgdI7syd/sl3hddxcUCgGryec99Wd4RbMzrfdTWEQY9XyhVZVlW6Wv10cONAv5Cni0dOw6RlsvRXFqGcR+WE=
+	t=1744944770; cv=none; b=oPynTURravL3KfG+wxIiBqVn945u+ccg1vAtWPSeP1+KLx0A0XvQH0BBUfh6RozvC3gcBUQtv21f+JBHlpcfQ1fAvecRpYDTR/Ft0KZsTFi+zl84fIzhbIMpezpCqLELkofIw1szkvKqScK+ugdpYkvMR/wvic7kfEyRzPXNSqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744944569; c=relaxed/simple;
-	bh=lEbPmZPHeuEvxspsAVAjSCIqu9XEP/Q8eqr+/w0V9tA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WnOCkHN+8veTexgYlqfqVK0CqrqF0e4mZjzzCGI3W34AMyQdg+AM/SEuQ2RZzW19fVoFoEos4Oo6xgQVELcRBAwq1u30e6tEjg8JiKxPF4eTVLbe9qcY375ujBctin4sJaGJtLvsZZcpCb6dA5fsfILmt3/6fNUh8BL4H9BztfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7N+edrb; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744944770; c=relaxed/simple;
+	bh=6G26RflteXalx7xXlLLC55zcu7ziLBa+FPO8vZwLyS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fPgpfmlhTiABLlS13D32BWtCZgGn1vWDJCI2ugfLFeVNOq3WE5g2EdltUhnNXUMqMfIHi9MxI5q13spPMeL39TT3UGJ5NDNMBSns5PliYbV0Ns0hok6z1ZbZlT+D3rJMX4g+ysWFT0n0p93X9HcLPSM7z5ok44lA3s0WxNYQ870=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=i4bHQWdE; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7N+edrb"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e6df1419f94so1193186276.0;
-        Thu, 17 Apr 2025 19:49:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744944566; x=1745549366; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Dj8GhW50UrAUMkoalDHqFuyFbqo3nnRECKX4Bf5Ge4=;
-        b=X7N+edrb/Nans/aDQP6+qe1YhJHext92N/wqZV5SzUW8fUcrdNgjbjZmKTlDS33oXj
-         TZglZ7dPilBSRwziouZgIbGkpxOnTYaAydD0svLBMpxC6BfD+eOklqX0QtdycTKPvBcg
-         TW69PZOtLbP1hTNZ3yxRQBxLDkpBS+nMGsTSWnJ9s4m3q9DEyARsujm7bA18ylUnevqC
-         FvSA7EcczDdFO9xAZGX7261Wb4DLeZxJz7D+zjJ5M7o08O4IbVdGd2sDSUsRiwhQd5WD
-         aQPEQ7iAPJLY/i6VelCrFsKhf3EABv5m9Zxdif+6HY4h8/+1Wa75v8wPRVzaqR0g3K+i
-         DEfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744944566; x=1745549366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3Dj8GhW50UrAUMkoalDHqFuyFbqo3nnRECKX4Bf5Ge4=;
-        b=TTFNte7F+Xc+CisHddROh3TGKJiVftk3eUn/2daRZvqX+UEobbQDssvdoLvys8KAfZ
-         WuQA6Ojl6U2v0mqUZDR+fsvI+7U7XVPCr0vJjANVY6326bvnc5mQ6KYQVGsSzfXKB82G
-         YAgCi/Fp3XgG7JKFTkHFDgqFpLdFPA5oevd3t6DfeGYD+WO9QYOoAd4tjywj2IR8qgHY
-         BEZj42tEX15GlPAQb+SZ8ZVoVi1vsYOlyOlUsOX/C8wgtRz9zVHVNcFBHpVn4umfOPJ2
-         1wHBJcAAHnkLHiOEBjvLZl9l4wCuvv7NJdRX2PE1TeUYgrMsGWy1YcV0PKMnWa8pVHnD
-         UIZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTkimbm/XAHIaljon4AtVMuwccOwRhJA2Gev9aw5/l5B+Oeuq7jma+dDit8sEVFNrYvzLM7BrKzicglXA=@vger.kernel.org, AJvYcCV/yai+te26pknfh95hQFPtukmSDMatE6jnHc01lKmZW2NJNMkz8ZI4y8tGbynwP3jig5kNMqJ0dztwYRTU@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsFRkTnGevZcBBqcFjRJdOB4LaEpXXuLqCkfOblCFYfUhPsK6Y
-	CaY56PD2j3GSHQSB0bZZy+g/rHiIxN3rW63JtSDTEntf8rsNgu1by8VkG6hxfJHUQ8NADMZfjKj
-	Yz0RDxIoK+rbzzNg04O4k0huLylA=
-X-Gm-Gg: ASbGncvOVtSzGg+vEVmZ1/L6Y2ezKqBtGr716G3npc/IQYno71+kEzCLmAUG3SKNPBX
-	rBtV2dH4PGxMV6869DQPnajVSJoOhs6LBi2IztHuqNekpdgrNsfbZqw4fs7aEDsYzA0N1rZKeIA
-	ygD+x7+LeOIby9pxyHmwBOam5lBJag/OiegRLUmg==
-X-Google-Smtp-Source: AGHT+IFOw2jiDXl3bt6tyk3aoTpA5w5vhRYg4GCxEMlUgP7Q+jQU34k6Rpv4Sr8sgqmg+aVZeAJ5xQLgahHc75hZMLE=
-X-Received: by 2002:a05:6902:2290:b0:e72:871e:fc3e with SMTP id
- 3f1490d57ef6-e7297db6e4emr1580309276.12.1744944566311; Thu, 17 Apr 2025
- 19:49:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="i4bHQWdE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1SNH5jgjESfJPsYcOrnx8xkgg3W2onLsVhFpUuSZTE0=; b=i4bHQWdEzVGURolUJ8zVUruLeo
+	nXGP9v5wI9PjQn9kBKWT0fyhq94uFqxKxNHULhForisYymcqXDkqrBZsnmu1FyatOuh55CKeOesB2
+	wXw0EQ2+XxSXbLMZC2VZWaV3M4+6YPuvv5jCtNndk393S7daW9CPrjZScXlnAbX8BVpW/0wpCG5dR
+	WIam/1LAk9WN6AFly7VXGirXPd3zLjHnZbN0BKSN38QKXPCUsoV3hKfXp7+kv+09cIhfGf/vo5+HK
+	HjbfqWhHdtjXbNi15dLVgGu+te4OI6QPoJI7+5re50/XOqqfv34j9PXLzLxFNqItK6/3OkZmUZTNM
+	vLgNCarg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u5bqE-00Gdts-1j;
+	Fri, 18 Apr 2025 10:52:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Apr 2025 10:52:34 +0800
+Date: Fri, 18 Apr 2025 10:52:34 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: acomp - Add missing return statements in
+ compress/decompress
+Message-ID: <aAG-chUuldQisBIA@gondor.apana.org.au>
+References: <cover.1744784515.git.herbert@gondor.apana.org.au>
+ <20250417183927.GD800@quark.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417064940.68469-1-dqfext@gmail.com> <20250417170902.GC800@quark.localdomain>
-In-Reply-To: <20250417170902.GC800@quark.localdomain>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Fri, 18 Apr 2025 10:49:11 +0800
-X-Gm-Features: ATxdqUHy7zDRa-eA71VWFff5HhwdMV8ZyAjRDc9UL_LnWdHSkCoRmm8Tv5GBb9Y
-Message-ID: <CALW65jZmLx+dh+cYpsynXnZnzmNwA9QFA-q77zHWT=fNKEbW5g@mail.gmail.com>
-Subject: Re: [RFC PATCH] crypto: riscv: scalar accelerated GHASH
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, linux-crypto@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>, 
-	Qingfang Deng <qingfang.deng@siflower.com.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417183927.GD800@quark.localdomain>
 
-Hi Eric,
-
-On Fri, Apr 18, 2025 at 1:09=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
+On Thu, Apr 17, 2025 at 11:39:27AM -0700, Eric Biggers wrote:
 >
-> Please help properly optimize swab*() and {get,put}_unaligned_* for RISC-=
-V
-> first, before considering random hacks like this.
->
-> https://lore.kernel.org/r/20250403-riscv-swab-v3-0-3bf705d80e33@iencinas.=
-com
-> is working on swab*().
+> And this series does not apply to current cryptodev/master.
+> 
+> So there's no way to apply this series to review it.
 
-Indeed =E2=80=94 in fact, our downstream NONPORTABLE version currently uses
-{get,put}_unaligned_be64, as we've modified the Makefile to ensure the
-compiler optimizes for both unaligned access and efficient swab*()
-handling.
+Yes it's conflicting with the powerpc uaccess patch.  I'll repost.
 
->
-> > +             /* Multiplication (without Karatsuba) */
-> > +             t0 =3D clmul128(p_lo, k_lo);
-> > +             t1 =3D clmul128(p_lo, k_hi);
-> > +             t2 =3D clmul128(p_hi, k_lo);
-> > +             t3 =3D clmul128(p_hi, k_hi);
-> > +             mid =3D t1 ^ t2;
-> > +             lo =3D t0 ^ (mid << 64);
-> > +             hi =3D t3 ^ (mid >> 64);
->
-> There is no need to explicitly XOR 'mid << 64' into lo and 'mid >> 64' in=
-to hi.
-> Take a look at how arch/x86/crypto/aes-gcm-*.S do it.
+> I think the high-level idea is still suspect, as I said before.  Especially for
+> sha256 and sha512 which I will be fixing to have proper library APIs.  I don't
+> think it's particularly helpful to be futzing around with how those are
+> integrated into shash when I'll be fixing it properly soon.
 
-Thanks, I saw your comments in aes-gcm-avx10-x86_64.S and now
-understand what you meant.
+As I said it's not that big a deal for shash, but the reason I'm
+doing it for shash as well as ahash is to maintain a consistent
+export format so that ahash can fallback to shash at any time.
 
-However, since we're working with 64-bit scalar registers on RISC-V
-(as opposed to 128-bit SIMD registers on x86), there's no reduction in
-the number of XOR instructions. Regardless of whether we explicitly
-compute mid and shift it, or directly XOR the intermediate results, we
-still end up with 8 individual 64-bit XORs to combine t0, t1, t2, and
-t3.
+I did try to keep the sha256 library interface working so as not to
+impede your work on that.
 
-So while the optimization helps on x86 due to wider registers and
-vector instructions, it doesn't offer a benefit in our scalar RISC-V
-implementation.
+> But whatever, as usual for your submissions this will get pushed out anyway,
+> likely without running the tests (FYI the compression tests are already failing
+> on cryptodev/master due to your recent changes).
 
->
-> Also, since this is only doing one block at a time and does not use Karat=
-suba
-> multiplication, the single-step reduction would work well here.  See
-> aes-gcm-aesni-x86_64.S.
+The shash algorithm has gone through all the usual tests.
 
-I saw the pre-compute key step. Is it the same as the step mentioned
-on page 12 of this PDF?
+Thanks for reporting the deflate breakage.  I wasn't expecting that as
+the change in question didn't actually touch deflate.
 
-[1] https://builders.intel.com/docs/networkbuilders/advanced-encryption-sta=
-ndard-galois-counter-mode-optimized-ghash-function-technology-guide-1693300=
-747.pdf
+Cheers,
 
->
-> - Eric
+---8<---
+The return statements were missing which causes REQ_CHAIN algorithms
+to execute twice for every request.
+
+Reported-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 64929fe8c0a4 ("crypto: acomp - Remove request chaining")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index b0f9192f6b2e..4c665c6fb5d6 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -292,7 +292,7 @@ int crypto_acomp_compress(struct acomp_req *req)
+ 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
+ 		return -EAGAIN;
+ 	if (crypto_acomp_req_chain(tfm) || acomp_request_issg(req))
+-		crypto_acomp_reqtfm(req)->compress(req);
++		return crypto_acomp_reqtfm(req)->compress(req);
+ 	return acomp_do_req_chain(req, true);
+ }
+ EXPORT_SYMBOL_GPL(crypto_acomp_compress);
+@@ -304,7 +304,7 @@ int crypto_acomp_decompress(struct acomp_req *req)
+ 	if (acomp_req_on_stack(req) && acomp_is_async(tfm))
+ 		return -EAGAIN;
+ 	if (crypto_acomp_req_chain(tfm) || acomp_request_issg(req))
+-		crypto_acomp_reqtfm(req)->decompress(req);
++		return crypto_acomp_reqtfm(req)->decompress(req);
+ 	return acomp_do_req_chain(req, false);
+ }
+ EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
