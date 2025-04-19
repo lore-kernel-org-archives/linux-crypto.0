@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EBC1DF98B;
-	Sat, 19 Apr 2025 16:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472271DFE20;
+	Sat, 19 Apr 2025 16:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745079454; cv=none; b=Rz4uHjA+G53KUkfM/vstXN3lD5inmayKH/PMqTa0XYsI+L1bEiJIQhfRGo6pkP3HCk0T1bABuZUZvs+TD+H1UtyCJHiNmltk+TGPybyEtXl8NTWWCgigcro02IfeEeRp+mgxwFFwfVNQaHf4W2cZdoNQ4mqQJfgzpZNRv5r6bgw=
+	t=1745079454; cv=none; b=GmkrRjXKcV1IPVTJ+L9+0+hSZF5B6Wq3kShnpNfaGoZlUFgDyZ6ySx48yuXVDDoGJm0SZu2GcEL9+94wByx6TO4nW8MFoQQK7N2sZULqWtjJH0FxPE/ChsMrgCdDyRr2USi/c/sFGdz2qDlZJ9LUriJqPGAq1/mKfvTDd1g2Zkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745079454; c=relaxed/simple;
-	bh=eh6O/hdgGD2DcNLDPvPzeJto8tvC5SK9NG51iJCe9i4=;
+	bh=I3PlMZtGBwQ0VoD5S3H7Kd+Kw85TXV6dUPiiZk7OQX4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jzo2MJwsJ76LBHRdLl27y5RdOE1KSUW/CVDB/3hzjF2ABxEDSYu8lD9ijaAdcNBMX67RLPtjKp8x9BeFW4yrNaey5lQ1qDi3T+ofmvrvAOIVzC/h9ybOSeldlJ6GzyC2ptEbFAm7wSykpwIMWIV3ze/kPiRiZXwoGZmkQ93HcFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D60gXZz1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=WV5oOna8Arpvq/xmfnelO4YDrg6oxkHS7M9GkQFiQMw6cLqP67eI2+2/vTVNQrF63EQU7/YLWgmkbKwO2Zy0jaEt+IwdRmncyI4yVIoX9+vSqu7aMBsX4uN0xnYR9Uz+upSGq97jmbFF8sycNvXfR7RuD+ZrMdJujkf6MLAqU5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KrPT0/Cy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D60gXZz1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 017F9C4CEE9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KrPT0/Cy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF7EDC4CEEC;
 	Sat, 19 Apr 2025 16:17:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745079454;
-	bh=eh6O/hdgGD2DcNLDPvPzeJto8tvC5SK9NG51iJCe9i4=;
+	s=k20201202; t=1745079453;
+	bh=I3PlMZtGBwQ0VoD5S3H7Kd+Kw85TXV6dUPiiZk7OQX4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D60gXZz1gX0xPs5bbAP49UfmWdBgWU0jlBMR9/pgoSJ2igOZhEkVBzAwch9mJyh9W
-	 N2cDDFHvM+JWOwOtPV3F0A+L/Hn97wVaxypSLhtogck2K1JGulzS3nbHIvFRQuTzts
-	 JgmDePP8ycwbOuMvkM9MqjVrz5/4suq8tR681XJ9qFsZl/AZFOeqFcmLyIi2jBQSTo
-	 EXJCBWKkhF69F/gmWcbXLEmsR37Icn3rteIbHY7zAbvhasmhMGYFmWM24W5kNmR/Ys
-	 MeW6Ln7+3IMJoIFQYCl1A4nwI+UEqLyu7MhUOnX6gYEZqvy+p5PS+D4tPW2qgg6iph
-	 rFRdSpOUNMTOg==
+	b=KrPT0/CyV9tNE+ezX4SRJWhwPpdDcFfZ4GPvWro0UbKDt5Xs6zN/cmpfuRe3sL1x/
+	 xq/a9JKC8WmKYHIyPMbZ8nQpBOtbYMb7zXy1UCCwFD2WbtbIFfDMzn3HyDzqGNctrp
+	 EKsnIw0otcQbm+mbPnP+lCWfYuN7VwKNNXObaVc1VyVsnfeiEZ57+DqmsWUhpVggnI
+	 Pvh7wxAIC/aQgOLOJvHd1ZmhvpuSP7b5ZhoaDvEgxktpsDBqJGY6FzST+1mnfSJICu
+	 tG3pP6dTQqZ+xr6iuku8Uu3q8mFO3pDCmPfTFD4bYmGEjfilGQlb1zYsRoZyXiyONK
+	 9W08EAc9tUfiA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 6/9] crypto: testmgr - make it easier to enable the full set of tests
-Date: Sat, 19 Apr 2025 09:15:40 -0700
-Message-ID: <20250419161543.139344-7-ebiggers@kernel.org>
+Subject: [PATCH 5/9] crypto: testmgr - replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS
+Date: Sat, 19 Apr 2025 09:15:39 -0700
+Message-ID: <20250419161543.139344-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250419161543.139344-1-ebiggers@kernel.org>
 References: <20250419161543.139344-1-ebiggers@kernel.org>
@@ -45,329 +45,381 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Currently the full set of crypto self-tests requires
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.  This is problematic in two ways.
-First, developers regularly overlook this option.  Second, the
-description of the tests as "extra" sometimes gives the impression that
-it is not required that all algorithms pass these tests.
+The negative-sense of CRYPTO_MANAGER_DISABLE_TESTS is a longstanding
+mistake that regularly causes confusion.  Especially bad is that you can
+have CRYPTO=n && CRYPTO_MANAGER_DISABLE_TESTS=n, which is ambiguous.
 
-Given that the main use case for the crypto self-tests is for
-developers, make enabling CONFIG_CRYPTO_SELFTESTS=y just enable the full
-set of crypto self-tests by default.
+Replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS which has the
+expected behavior.
 
-The slow tests can still be disabled by adding the command-line
-parameter cryptomgr.noextratests=1, soon to be renamed to
-cryptomgr.noslowtests=1.  The only known use case for doing this is for
-people trying to use the crypto self-tests to satisfy the FIPS 140-3
-pre-operational self-testing requirements when the kernel is being
-validated as a FIPS 140-3 cryptographic module.
+The tests continue to be disabled by default.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig                 | 10 ------
- crypto/testmgr.c               | 62 +++-------------------------------
- include/crypto/internal/simd.h |  6 ++--
- lib/crypto/Makefile            |  2 +-
- 4 files changed, 8 insertions(+), 72 deletions(-)
+ crypto/Kconfig                | 23 ++++++++++++++---------
+ crypto/algapi.c               |  4 ++--
+ crypto/algboss.c              |  2 +-
+ crypto/api.c                  |  3 +--
+ crypto/hkdf.c                 |  2 +-
+ crypto/internal.h             |  5 ++---
+ crypto/kdf_sp800108.c         |  2 +-
+ crypto/testmgr.c              | 12 ++++++------
+ lib/crypto/Makefile           |  8 +++-----
+ lib/crypto/aescfb.c           |  2 +-
+ lib/crypto/aesgcm.c           |  2 +-
+ lib/crypto/blake2s.c          |  2 +-
+ lib/crypto/chacha20poly1305.c |  2 +-
+ lib/crypto/curve25519.c       |  2 +-
+ 14 files changed, 36 insertions(+), 35 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8bac10e4c1cc..538a874262fc 100644
+index 48283975fb2b..8bac10e4c1cc 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -183,20 +183,10 @@ config CRYPTO_SELFTESTS
+@@ -23,11 +23,11 @@ if CRYPTO
  
- 	  This is primarily intended for developer use.  It should not be
- 	  enabled in production kernels, unless you are trying to use these
- 	  tests to fulfill a FIPS testing requirement.
+ menu "Crypto core or helper"
  
--config CRYPTO_MANAGER_EXTRA_TESTS
--	bool "Enable extra run-time crypto self tests"
--	depends on DEBUG_KERNEL && CRYPTO_SELFTESTS && CRYPTO_MANAGER
--	help
--	  Enable extra run-time self tests of registered crypto algorithms,
--	  including randomized fuzz tests.
--
--	  This is intended for developer use only, as these tests take much
--	  longer to run than the normal self tests.
--
- config CRYPTO_NULL
- 	tristate "Null algorithms"
- 	select CRYPTO_NULL2
+ config CRYPTO_FIPS
+ 	bool "FIPS 200 compliance"
+-	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
++	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && CRYPTO_SELFTESTS
+ 	depends on (MODULE_SIG || !MODULES)
  	help
- 	  These are 'Null' algorithms, used by IPsec, which do nothing.
+ 	  This option enables the fips boot option which is
+ 	  required if you want the system to operate in a FIPS 200
+ 	  certification.  You should say no unless you know what
+@@ -141,12 +141,12 @@ config CRYPTO_ACOMP
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_ACOMP2
+ 
+ config CRYPTO_HKDF
+ 	tristate
+-	select CRYPTO_SHA256 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+-	select CRYPTO_SHA512 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++	select CRYPTO_SHA256 if CRYPTO_SELFTESTS
++	select CRYPTO_SHA512 if CRYPTO_SELFTESTS
+ 	select CRYPTO_HASH2
+ 
+ config CRYPTO_MANAGER
+ 	tristate "Cryptographic algorithm manager"
+ 	select CRYPTO_MANAGER2
+@@ -171,20 +171,25 @@ config CRYPTO_USER
+ 	select CRYPTO_MANAGER
+ 	help
+ 	  Userspace configuration for cryptographic instantiations such as
+ 	  cbc(aes).
+ 
+-config CRYPTO_MANAGER_DISABLE_TESTS
+-	bool "Disable run-time self tests"
+-	default y
++config CRYPTO_SELFTESTS
++	bool "Enable crypto self-tests"
+ 	help
+-	  Disable run-time self tests that normally take place at
+-	  algorithm registration.
++	  Enable the cryptographic self-tests.
++
++	  The cryptographic self-tests run at boot time, or at algorithm
++	  registration time if algorithms are dynamically loaded later.
++
++	  This is primarily intended for developer use.  It should not be
++	  enabled in production kernels, unless you are trying to use these
++	  tests to fulfill a FIPS testing requirement.
+ 
+ config CRYPTO_MANAGER_EXTRA_TESTS
+ 	bool "Enable extra run-time crypto self tests"
+-	depends on DEBUG_KERNEL && !CRYPTO_MANAGER_DISABLE_TESTS && CRYPTO_MANAGER
++	depends on DEBUG_KERNEL && CRYPTO_SELFTESTS && CRYPTO_MANAGER
+ 	help
+ 	  Enable extra run-time self tests of registered crypto algorithms,
+ 	  including randomized fuzz tests.
+ 
+ 	  This is intended for developer use only, as these tests take much
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 532d3efc3c7d..9030a30c89e8 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -273,11 +273,11 @@ static void crypto_alg_finish_registration(struct crypto_alg *alg,
+ static struct crypto_larval *crypto_alloc_test_larval(struct crypto_alg *alg)
+ {
+ 	struct crypto_larval *larval;
+ 
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER) ||
+-	    IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) ||
++	    !IS_ENABLED(CONFIG_CRYPTO_SELFTESTS) ||
+ 	    (alg->cra_flags & CRYPTO_ALG_INTERNAL))
+ 		return NULL; /* No self-test needed */
+ 
+ 	larval = crypto_larval_alloc(alg->cra_name,
+ 				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
+@@ -1057,11 +1057,11 @@ EXPORT_SYMBOL_GPL(crypto_type_has_alg);
+ static void __init crypto_start_tests(void)
+ {
+ 	if (!IS_BUILTIN(CONFIG_CRYPTO_ALGAPI))
+ 		return;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
++	if (!IS_ENABLED(CONFIG_CRYPTO_SELFTESTS))
+ 		return;
+ 
+ 	set_crypto_boot_test_finished();
+ 
+ 	for (;;) {
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index a20926bfd34e..14b131c5d86a 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -187,11 +187,11 @@ static int cryptomgr_test(void *data)
+ static int cryptomgr_schedule_test(struct crypto_alg *alg)
+ {
+ 	struct task_struct *thread;
+ 	struct crypto_test_param *param;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
++	if (!IS_ENABLED(CONFIG_CRYPTO_SELFTESTS))
+ 		return NOTIFY_DONE;
+ 
+ 	if (!try_module_get(THIS_MODULE))
+ 		goto err;
+ 
+diff --git a/crypto/api.c b/crypto/api.c
+index e427cc5662b5..038db19e375f 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -29,12 +29,11 @@ DECLARE_RWSEM(crypto_alg_sem);
+ EXPORT_SYMBOL_GPL(crypto_alg_sem);
+ 
+ BLOCKING_NOTIFIER_HEAD(crypto_chain);
+ EXPORT_SYMBOL_GPL(crypto_chain);
+ 
+-#if IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) && \
+-    !IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
++#if IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) && IS_ENABLED(CONFIG_CRYPTO_SELFTESTS)
+ DEFINE_STATIC_KEY_FALSE(__crypto_boot_test_finished);
+ #endif
+ 
+ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg,
+ 					     u32 type, u32 mask);
+diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+index 2434c5c42545..f24c2a8d4df9 100644
+--- a/crypto/hkdf.c
++++ b/crypto/hkdf.c
+@@ -541,11 +541,11 @@ static int hkdf_test(const char *shash, const struct hkdf_testvec *tv)
+ 
+ static int __init crypto_hkdf_module_init(void)
+ {
+ 	int ret = 0, i;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
++	if (!IS_ENABLED(CONFIG_CRYPTO_SELFTESTS))
+ 		return 0;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(hkdf_sha256_tv); i++) {
+ 		ret = hkdf_test("hmac(sha256)", &hkdf_sha256_tv[i]);
+ 		if (ret)
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 2ed79bf208ca..b9afd68767c1 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -65,12 +65,11 @@ extern struct list_head crypto_alg_list;
+ extern struct rw_semaphore crypto_alg_sem;
+ extern struct blocking_notifier_head crypto_chain;
+ 
+ int alg_test(const char *driver, const char *alg, u32 type, u32 mask);
+ 
+-#if !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) || \
+-    IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
++#if !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) || !IS_ENABLED(CONFIG_CRYPTO_SELFTESTS)
+ static inline bool crypto_boot_test_finished(void)
+ {
+ 	return true;
+ }
+ static inline void set_crypto_boot_test_finished(void)
+@@ -85,11 +84,11 @@ static inline bool crypto_boot_test_finished(void)
+ static inline void set_crypto_boot_test_finished(void)
+ {
+ 	static_branch_enable(&__crypto_boot_test_finished);
+ }
+ #endif /* !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) ||
+-	* IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
++	* !IS_ENABLED(CONFIG_CRYPTO_SELFTESTS)
+ 	*/
+ 
+ #ifdef CONFIG_PROC_FS
+ void __init crypto_init_proc(void);
+ void __exit crypto_exit_proc(void);
+diff --git a/crypto/kdf_sp800108.c b/crypto/kdf_sp800108.c
+index c3f9938e1ad2..b7a6bf9da773 100644
+--- a/crypto/kdf_sp800108.c
++++ b/crypto/kdf_sp800108.c
+@@ -125,11 +125,11 @@ static const struct kdf_testvec kdf_ctr_hmac_sha256_tv_template[] = {
+ 
+ static int __init crypto_kdf108_init(void)
+ {
+ 	int ret;
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
++	if (!IS_ENABLED(CONFIG_CRYPTO_SELFTESTS))
+ 		return 0;
+ 
+ 	ret = kdf_test(&kdf_ctr_hmac_sha256_tv_template[0], "hmac(sha256)",
+ 		       crypto_kdf108_setkey, crypto_kdf108_ctr_generate);
+ 	if (ret) {
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 1b2f7a4724d8..a02cb7f82867 100644
+index d075c48ff1a2..1b2f7a4724d8 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -43,19 +43,17 @@ MODULE_IMPORT_NS("CRYPTO_INTERNAL");
- 
- static bool notests;
- module_param(notests, bool, 0644);
- MODULE_PARM_DESC(notests, "disable crypto self-tests");
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- static bool noextratests;
- module_param(noextratests, bool, 0644);
- MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
- 
+@@ -53,11 +53,11 @@ MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
  static unsigned int fuzz_iterations = 100;
  module_param(fuzz_iterations, uint, 0644);
  MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
--#endif
+ #endif
  
- #ifndef CONFIG_CRYPTO_SELFTESTS
+-#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++#ifndef CONFIG_CRYPTO_SELFTESTS
  
  /* a perfect nop */
  int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
-@@ -319,14 +317,13 @@ struct testvec_config {
+ {
+ 	return 0;
+@@ -319,14 +319,14 @@ struct testvec_config {
  
  #define TESTVEC_CONFIG_NAMELEN	192
  
  /*
   * The following are the lists of testvec_configs to test for each algorithm
-- * type when the basic crypto self-tests are enabled.  They aim to provide good
-- * test coverage, while keeping the test time much shorter than the full fuzz
-- * tests so that the basic tests can be enabled in a wider range of
-- * circumstances.
-+ * type when the fast crypto self-tests are enabled.  They aim to provide good
-+ * test coverage, while keeping the test time much shorter than the full tests
-+ * so that the fast tests can be used to fulfill FIPS 140 testing requirements.
+- * type when the basic crypto self-tests are enabled, i.e. when
+- * CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is unset.  They aim to provide good test
+- * coverage, while keeping the test time much shorter than the full fuzz tests
+- * so that the basic tests can be enabled in a wider range of circumstances.
++ * type when the basic crypto self-tests are enabled.  They aim to provide good
++ * test coverage, while keeping the test time much shorter than the full fuzz
++ * tests so that the basic tests can be enabled in a wider range of
++ * circumstances.
   */
  
  /* Configs for skciphers and aeads */
  static const struct testvec_config default_cipher_testvec_configs[] = {
  	{
-@@ -871,12 +868,10 @@ static int prepare_keybuf(const u8 *key, unsigned int ksize,
- 		kfree(keybuf);						\
- 	}								\
- 	err;								\
- })
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
--
- /*
-  * The fuzz tests use prandom instead of the normal Linux RNG since they don't
-  * need cryptographically secure random numbers.  This greatly improves the
-  * performance of these tests, especially if they are run before the Linux RNG
-  * has been initialized or if they are run on a lockdep-enabled kernel.
-@@ -1237,19 +1232,10 @@ static int build_generic_driver_name(const char *algname,
- too_long:
- 	pr_err("alg: generic driver name for \"%s\" would be too long\n",
- 	       algname);
- 	return -ENAMETOOLONG;
- }
--#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
--static void crypto_disable_simd_for_test(void)
--{
--}
--
--static void crypto_reenable_simd_for_test(void)
--{
--}
--#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
- 
- static int build_hash_sglist(struct test_sglist *tsgl,
- 			     const struct hash_testvec *vec,
- 			     const struct testvec_config *cfg,
- 			     unsigned int alignmask,
-@@ -1686,11 +1672,10 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
- 					req, desc, tsgl, hashstate);
- 		if (err)
- 			return err;
- 	}
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
- 		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-@@ -1704,15 +1689,13 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
- 			if (err)
- 				return err;
- 			cond_resched();
- 		}
- 	}
--#endif
+@@ -5903,8 +5903,8 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
  	return 0;
+ non_fips_alg:
+ 	return alg_fips_disabled(driver, alg);
  }
  
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- /*
-  * Generate a hash test vector from the given implementation.
-  * Assumes the buffers in 'vec' were already allocated.
-  */
- static void generate_random_hash_testvec(struct rnd_state *rng,
-@@ -1874,21 +1857,10 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- 	kfree(vec.digest);
- 	crypto_free_shash(generic_tfm);
- 	kfree_sensitive(generic_desc);
- 	return err;
- }
--#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
--static int test_hash_vs_generic_impl(const char *generic_driver,
--				     unsigned int maxkeysize,
--				     struct ahash_request *req,
--				     struct shash_desc *desc,
--				     struct test_sglist *tsgl,
--				     u8 *hashstate)
--{
--	return 0;
--}
--#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
+-#endif /* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
++#endif /* CONFIG_CRYPTO_SELFTESTS */
  
- static int alloc_shash(const char *driver, u32 type, u32 mask,
- 		       struct crypto_shash **tfm_ret,
- 		       struct shash_desc **desc_ret)
- {
-@@ -2258,11 +2230,10 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
- 					req, tsgls);
- 		if (err)
- 			return err;
- 	}
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
- 		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-@@ -2276,16 +2247,13 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
- 			if (err)
- 				return err;
- 			cond_resched();
- 		}
- 	}
--#endif
- 	return 0;
- }
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
--
- struct aead_extra_tests_ctx {
- 	struct rnd_state rng;
- 	struct aead_request *req;
- 	struct crypto_aead *tfm;
- 	const struct alg_test_desc *test_desc;
-@@ -2666,18 +2634,10 @@ static int test_aead_extra(const struct alg_test_desc *test_desc,
- 	kfree(ctx->vec.ptext);
- 	kfree(ctx->vec.ctext);
- 	kfree(ctx);
- 	return err;
- }
--#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
--static int test_aead_extra(const struct alg_test_desc *test_desc,
--			   struct aead_request *req,
--			   struct cipher_test_sglists *tsgls)
--{
--	return 0;
--}
--#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
- 
- static int test_aead(int enc, const struct aead_test_suite *suite,
- 		     struct aead_request *req,
- 		     struct cipher_test_sglists *tsgls)
- {
-@@ -3013,11 +2973,10 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
- 					    req, tsgls);
- 		if (err)
- 			return err;
- 	}
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
- 		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-@@ -3031,15 +2990,13 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
- 			if (err)
- 				return err;
- 			cond_resched();
- 		}
- 	}
--#endif
- 	return 0;
- }
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- /*
-  * Generate a symmetric cipher test vector from the given implementation.
-  * Assumes the buffers in 'vec' were already allocated.
-  */
- static void generate_random_cipher_testvec(struct rnd_state *rng,
-@@ -3234,18 +3191,10 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
- 	kfree(vec.ctext);
- 	crypto_free_skcipher(generic_tfm);
- 	skcipher_request_free(generic_req);
- 	return err;
- }
--#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
--static int test_skcipher_vs_generic_impl(const char *generic_driver,
--					 struct skcipher_request *req,
--					 struct cipher_test_sglists *tsgls)
--{
--	return 0;
--}
--#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
- 
- static int test_skcipher(int enc, const struct cipher_test_suite *suite,
- 			 struct skcipher_request *req,
- 			 struct cipher_test_sglists *tsgls)
- {
-@@ -5764,13 +5713,12 @@ static void alg_check_testvec_configs(void)
- static void testmgr_onetime_init(void)
- {
- 	alg_check_test_descs_order();
- 	alg_check_testvec_configs();
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
--	pr_warn("alg: extra crypto tests enabled.  This is intended for developer use only.\n");
--#endif
-+	if (!noextratests)
-+		pr_warn("alg: full crypto tests enabled.  This is intended for developer use only.\n");
- }
- 
- static int alg_find_test(const char *alg)
- {
- 	int start = 0;
-diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
-index f56049bd1660..7e7f1ac3b7fd 100644
---- a/include/crypto/internal/simd.h
-+++ b/include/crypto/internal/simd.h
-@@ -42,15 +42,13 @@ void simd_unregister_aeads(struct aead_alg *algs, int count,
-  * crypto_simd_usable() - is it allowed at this time to use SIMD instructions or
-  *			  access the SIMD register file?
-  *
-  * This delegates to may_use_simd(), except that this also returns false if SIMD
-  * in crypto code has been temporarily disabled on this CPU by the crypto
-- * self-tests, in order to test the no-SIMD fallback code.  This override is
-- * currently limited to configurations where the extra self-tests are enabled,
-- * because it might be a bit too invasive to be part of the regular self-tests.
-+ * self-tests, in order to test the no-SIMD fallback code.
-  */
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+#ifdef CONFIG_CRYPTO_SELFTESTS
- DECLARE_PER_CPU(bool, crypto_simd_disabled_for_test);
- #define crypto_simd_usable() \
- 	(may_use_simd() && !this_cpu_read(crypto_simd_disabled_for_test))
- #else
- #define crypto_simd_usable() may_use_simd()
+ EXPORT_SYMBOL_GPL(alg_test);
 diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 5a41bf5bf819..8beda506b9b7 100644
+index 4dd62bc5bee3..5a41bf5bf819 100644
 --- a/lib/crypto/Makefile
 +++ b/lib/crypto/Makefile
-@@ -55,9 +55,9 @@ libblake2s-$(CONFIG_CRYPTO_SELFTESTS)		+= blake2s-selftest.o
- libchacha20poly1305-$(CONFIG_CRYPTO_SELFTESTS)	+= chacha20poly1305-selftest.o
- libcurve25519-$(CONFIG_CRYPTO_SELFTESTS)	+= curve25519-selftest.o
+@@ -49,15 +49,13 @@ obj-$(CONFIG_CRYPTO_LIB_SHA1)			+= libsha1.o
+ libsha1-y					:= sha1.o
+ 
+ obj-$(CONFIG_CRYPTO_LIB_SHA256)			+= libsha256.o
+ libsha256-y					:= sha256.o
+ 
+-ifneq ($(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS),y)
+-libblake2s-y					+= blake2s-selftest.o
+-libchacha20poly1305-y				+= chacha20poly1305-selftest.o
+-libcurve25519-y					+= curve25519-selftest.o
+-endif
++libblake2s-$(CONFIG_CRYPTO_SELFTESTS)		+= blake2s-selftest.o
++libchacha20poly1305-$(CONFIG_CRYPTO_SELFTESTS)	+= chacha20poly1305-selftest.o
++libcurve25519-$(CONFIG_CRYPTO_SELFTESTS)	+= curve25519-selftest.o
  
  obj-$(CONFIG_MPILIB) += mpi/
  
--obj-$(CONFIG_CRYPTO_MANAGER_EXTRA_TESTS)	+= simd.o
-+obj-$(CONFIG_CRYPTO_SELFTESTS)			+= simd.o
+ obj-$(CONFIG_CRYPTO_MANAGER_EXTRA_TESTS)	+= simd.o
  
- obj-$(CONFIG_CRYPTO_LIB_SM3)			+= libsm3.o
- libsm3-y					:= sm3.o
+diff --git a/lib/crypto/aescfb.c b/lib/crypto/aescfb.c
+index 749dc1258a44..437613265e14 100644
+--- a/lib/crypto/aescfb.c
++++ b/lib/crypto/aescfb.c
+@@ -97,11 +97,11 @@ EXPORT_SYMBOL(aescfb_decrypt);
+ 
+ MODULE_DESCRIPTION("Generic AES-CFB library");
+ MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
+ MODULE_LICENSE("GPL");
+ 
+-#ifndef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++#ifdef CONFIG_CRYPTO_SELFTESTS
+ 
+ /*
+  * Test code below. Vectors taken from crypto/testmgr.h
+  */
+ 
+diff --git a/lib/crypto/aesgcm.c b/lib/crypto/aesgcm.c
+index 902e49410aaf..277824d6b4af 100644
+--- a/lib/crypto/aesgcm.c
++++ b/lib/crypto/aesgcm.c
+@@ -197,11 +197,11 @@ EXPORT_SYMBOL(aesgcm_decrypt);
+ 
+ MODULE_DESCRIPTION("Generic AES-GCM library");
+ MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
+ MODULE_LICENSE("GPL");
+ 
+-#ifndef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++#ifdef CONFIG_CRYPTO_SELFTESTS
+ 
+ /*
+  * Test code below. Vectors taken from crypto/testmgr.h
+  */
+ 
+diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+index 71a316552cc5..b0f9a678300b 100644
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -58,11 +58,11 @@ void blake2s_final(struct blake2s_state *state, u8 *out)
+ }
+ EXPORT_SYMBOL(blake2s_final);
+ 
+ static int __init blake2s_mod_init(void)
+ {
+-	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
++	if (IS_ENABLED(CONFIG_CRYPTO_SELFTESTS) &&
+ 	    WARN_ON(!blake2s_selftest()))
+ 		return -ENODEV;
+ 	return 0;
+ }
+ 
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index 9cfa886f1f89..57a84fee179e 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -353,11 +353,11 @@ bool chacha20poly1305_decrypt_sg_inplace(struct scatterlist *src, size_t src_len
+ }
+ EXPORT_SYMBOL(chacha20poly1305_decrypt_sg_inplace);
+ 
+ static int __init chacha20poly1305_init(void)
+ {
+-	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
++	if (IS_ENABLED(CONFIG_CRYPTO_SELFTESTS) &&
+ 	    WARN_ON(!chacha20poly1305_selftest()))
+ 		return -ENODEV;
+ 	return 0;
+ }
+ 
+diff --git a/lib/crypto/curve25519.c b/lib/crypto/curve25519.c
+index 064b352c6907..6850b76a80c9 100644
+--- a/lib/crypto/curve25519.c
++++ b/lib/crypto/curve25519.c
+@@ -13,11 +13,11 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
+ 
+ static int __init curve25519_init(void)
+ {
+-	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
++	if (IS_ENABLED(CONFIG_CRYPTO_SELFTESTS) &&
+ 	    WARN_ON(!curve25519_selftest()))
+ 		return -ENODEV;
+ 	return 0;
+ }
+ 
 -- 
 2.49.0
 
