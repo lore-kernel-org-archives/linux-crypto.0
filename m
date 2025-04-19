@@ -1,71 +1,86 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198EE442C;
-	Sat, 19 Apr 2025 04:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA4918C06
+	for <linux-crypto@vger.kernel.org>; Sat, 19 Apr 2025 09:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745035653; cv=none; b=FxnVOaDhcP+3/XY8jFXCFWuMje1urGoKfELTMZd8gpgHlfqnSyy1OpIoKMluGwM1IGu+NyQqnruBiFsLchf4jB+1YXRn+KpjQi6Ua1O402ngJLSWiz5c/IDI+lKRUrq9UsfPAa2rafiVsJ7KXn7Um75C8xK5VTtWwPWOlf8nYq8=
+	t=1745056153; cv=none; b=Q+TNf8eSddBKfXcI3LA7cpQnMeOaBhe5y498U/DRQoBskxTjsUXqQjQB+jf7W5T6avKE5AinGGrFha8v5D/lQ3PpdVUkcC42HKtQpRRA9ReylL9ATA23CsRd1bV+Nb/B3r44Cv4FKeiHSkYFaTswYgtxshlLhzNgEASgqCdB82Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745035653; c=relaxed/simple;
-	bh=MeNpYcii+z/9qvY4laMUGSacOn2mzr2peaP6b1KTfjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pLUNIY9mVZdJ5qdp9Tan7X9Pr8yTyWuP70ZnFczLfzicwaZvU/ecy6AHc0lkFRS/0Jrxu/k5tsjSZ5mboLczDs3A/tMonccnw0098NPJoodV2M4wix8PcPqW7z4EhMG3RJQCMON2CsOBixH/XCy74cPS7mgxVlRG0EWM9QbO0G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fpEMYrW4; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745056153; c=relaxed/simple;
+	bh=zklzViCR78rtGWWpSQ+SH1wiYY08pHKOOyED16FNUtY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=VDI4yzfc1cahGQB0BUm2/3+WPDNMOvA2YEDzlOgO1zItToG52JMrragSAjpBUkV7Q8WDFcOpUAScTD8+aNATMkp6HLlaUNOS1i3CLAd5SZ1WNt6Q1FCCggTaCdkqpMbczAEqSEA0rGY2eobntUkG4fVWjUEpZmoL/lHCg4sFRB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=XKnDJwgw; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fpEMYrW4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=mGOL1PpCjzxYDOyt68iLzxOF7neGzcJzaEFed48nI64=; b=fpEMYrW4F3s5PLFL/Ef9G1NbgQ
-	QQyoMzDUPfQuWxEFTTf6xkxvAW7+Vh98b5rCfmot6EC24KjxAzsgN5qJiRSPxMcFTTf6EEPTh5hk0
-	R1l9nY2TeLw4TAqfvF1juHCWtYI7As6qp88q7FIV0xZBKKHNzcVZSlkUJcgWT5aPbe80JxIj4sbvQ
-	8CEDqH/I6mSZUb6WHaZ/M+/wnquNzEJ0zEBbRluNbjhhu42Ybyzm/DaRSHWWjZXiafojk034Zcuf2
-	TzKdOtuahJkcbECreTpBBHQ3OCvl30fhVInYzjS6gSPubNgHjjl/Yl3Ky0PCSrd/vndzaaU9ryjJL
-	VQKzWDeQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u5zTl-00Guwx-2S;
-	Sat, 19 Apr 2025 12:06:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Apr 2025 12:06:57 +0800
-Date: Sat, 19 Apr 2025 12:06:57 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Diederik de Haas <didi.debian@cknow.org>
-Cc: Akhil R <akhilrajeev@nvidia.com>, davem@davemloft.net,
-	thierry.reding@gmail.com, jonathanh@nvidia.com,
-	linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
-	Dragan Simic <dsimic@manjaro.org>,
-	Corentin Labbe <clabbe@baylibre.com>,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/10] Tegra Security Engine driver improvements
-Message-ID: <aAMhYaq0Ze-z6E8q@gondor.apana.org.au>
-References: <20250224091610.49683-1-akhilrajeev@nvidia.com>
- <D99QMGBHHYJO.1D7D0ZXJLBG9Y@cknow.org>
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="XKnDJwgw"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D99QMGBHHYJO.1D7D0ZXJLBG9Y@cknow.org>
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1745056135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WYcIiX7im0SwEgUBjW9RpMKMf9b+aamLPfpMOC5NliI=;
+	b=XKnDJwgwVh+2AJkayQ0NeH2Kvg8qAbd1tnYvcMl+DKXHqiczpSpLHXSIzPBsxU/16t7iF4
+	hlYG9UTJWjXQNnUnkl64Qgc/oFfw/T8qtw6j0f9K6IvZmc7UEmQIKrmtpBHirzgLvOQPh0
+	J3ZWdIczd+6ufV4zdSA/E+qA1OtlNVgCdyNgn29IB8XuTI5EEc9vqkSezr7poIUqsoBwmV
+	MxMirsfelUlnq6h9recCZVOrPLxjseiwhEtSocWqQ96RR6A5TKgXHBsJoiTs3TwP6IiEf0
+	CejUseD8cefGgezfsiE2cTsZxrvlhitP1egzdsgPVf3AdOdTHVAn/I5JnviHXA==
+Content-Type: multipart/signed;
+ boundary=787e13d5ada3b08197d931c1726e36235e1092534fb802965a37df9b17c0;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Sat, 19 Apr 2025 11:48:46 +0200
+Message-Id: <D9AIRPBIHXAO.3SDHEJW99DP4X@cknow.org>
+Subject: Re: [PATCH v3 00/10] Tegra Security Engine driver improvements
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <didi.debian@cknow.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Akhil R" <akhilrajeev@nvidia.com>, <davem@davemloft.net>,
+ <thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
+ <linux-crypto@vger.kernel.org>, <linux-tegra@vger.kernel.org>, "Dragan
+ Simic" <dsimic@manjaro.org>, "Corentin Labbe" <clabbe@baylibre.com>,
+ <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250224091610.49683-1-akhilrajeev@nvidia.com>
+ <D99QMGBHHYJO.1D7D0ZXJLBG9Y@cknow.org>
+ <aAMhYaq0Ze-z6E8q@gondor.apana.org.au>
+In-Reply-To: <aAMhYaq0Ze-z6E8q@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Apr 18, 2025 at 01:45:23PM +0200, Diederik de Haas wrote:
-> 
-> Earlier today I tried to boot my 6.15-rc1 kernel on my RockPro64
-> (rk3399) and that didn't go too well:
+--787e13d5ada3b08197d931c1726e36235e1092534fb802965a37df9b17c0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-This should be fixed in the latest mainline kernel where hash
-request chaining has been disabled.
+On Sat Apr 19, 2025 at 6:06 AM CEST, Herbert Xu wrote:
+> On Fri, Apr 18, 2025 at 01:45:23PM +0200, Diederik de Haas wrote:
+>>=20
+>> Earlier today I tried to boot my 6.15-rc1 kernel on my RockPro64
+>> (rk3399) and that didn't go too well:
+>
+> This should be fixed in the latest mainline kernel where hash
+> request chaining has been disabled.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Excellent, thanks for letting me know.
+b2e689baf220 ("crypto: ahash - Disable request chaining")
+
+Cheers,
+  Diederik
+
+--787e13d5ada3b08197d931c1726e36235e1092534fb802965a37df9b17c0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaANxgAAKCRDXblvOeH7b
+blJ4AP4v0v8uHn92ZBD/ipPt+rGobZitRKp0xpoUesLYwz/VOQD+ObBSY+Fau99D
+uvbyarhPlqm3RUyDXRzJnNuy1XXOEwY=
+=82VX
+-----END PGP SIGNATURE-----
+
+--787e13d5ada3b08197d931c1726e36235e1092534fb802965a37df9b17c0--
