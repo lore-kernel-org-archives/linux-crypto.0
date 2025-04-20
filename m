@@ -1,137 +1,214 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085C778F3E;
-	Sun, 20 Apr 2025 07:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B705A6DCE1;
+	Sun, 20 Apr 2025 19:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745133458; cv=none; b=Q1sjTgqrsK4BGSM3oCGg9Kjyxf1KpdVNS+M/jPhIhkJqUFXRe+JuIs3hmh5j6+pTarMBYMKNeSybVkUto9VNmLG0z+Mlb9e750O9PqPhBHBI8lerkumvvTy1c4zXku0oRxhJEn+mMxAfl/olxUC0quGDEnjPqBE1BwVaqc3wLRk=
+	t=1745177257; cv=none; b=ABe3PpAPjoHoEpbDZRhx5KWmJ19o8VwG0AmaZiYzRdk2aUx0Cq7mETyEyF8gNwoYZ5JGCGtavs7Er2wq+rJ4eyDI0aJ3cvBRyFQw91pphYSB7BgfC2se55NGy9tqCzxjWFjRt+EHL37BYvQUg9LW352lTj1ANKrzq21aqLpX4po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745133458; c=relaxed/simple;
-	bh=kAbt2L4kg671pYS37gU/fZtxIXbvKl2K/RxKTomXmT8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WPVLWQ0OuV4AR+Wjxt9EppJqlWTU/qssA1/jxFPm3ycDRk6H2tNn+a0eMX916rYpB69Mo4J4snczAXFsLsHTGlZ4cYjBffxJ7nX2hCFpy8ebg/iJrrPBeZ9+x2AK0izkRweGIM2aNYMksb5ab46bHvtWdAfj/uRDh3XO2VSRVC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nzeff6/y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745177257; c=relaxed/simple;
+	bh=G2+3guS80Z7+Fi1lTQSy/MYrzhZPPyiZuKBsiQq1cFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k9ZyvTNtXJBGmBE2FdzbNMwKJfyd5HyVddvU7ilXuLgDNeFc6XHdXJ56D6Cef8mcaCCxPThsbIjERRsXdV4oEBVqZNCiIkz1k3VLHhS+rHTn+kt8QJRHQWcKJiEGjxWJV6CoNMs7RG4TOK4cZdYqmpZajpalFjR1l4F5mzsDZ0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FbZpkEBW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nzeff6/y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C07C4AF09;
-	Sun, 20 Apr 2025 07:17:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FbZpkEBW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8694C4CEE9;
+	Sun, 20 Apr 2025 19:27:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745133457;
-	bh=kAbt2L4kg671pYS37gU/fZtxIXbvKl2K/RxKTomXmT8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Nzeff6/yynvStEnBnW35r39G49OQu2MTljTONZkQieNcZu3kPYn+FWKKIWC8yINQr
-	 Djq3eXpij4bDEhrg4Uno68L14b9SdWuKGFPuemZEvIpIePvODTaxwRUXzCldwwm7AO
-	 jKSXJBrafY59LbaFu6aOkW2IyCbqHKqlw47DYOqc8BNg4R5lpqaM/XyJW+ICqLTY8b
-	 61RRSATkXLuns755feYrs50Hx8NC7fXRZcLJOVC/jIfod3kIWv2BvFan6XFjr8rYJN
-	 qorGd8x03AwlQjNYyO6QGy37M46EC/iGpoqKKdlAmIF9RyqCNfBnYWRhxWhqnpYl15
-	 0S2Z6UTAahA0g==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb12so2205750a12.1;
-        Sun, 20 Apr 2025 00:17:37 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU/FlsEIzzSlIe5peNoLndX1hsPsjuAWGMAO5ydQoU1iFE2dCJIZFKUpwTf4f6WILtVThESdfQn7b7uiaLSlUeF@vger.kernel.org, AJvYcCVfZVdbcoMPLGF+A5d0pqZCh3lNrgxjkMzx7RRvN8I793Hs4ZLfAX0NFMUqea+AorWWen7uo9y2UZQbDMI=@vger.kernel.org, AJvYcCWG5HLaTkaaeL5/GtYI3+Bz603oHVIrlg5RTGHmRw1+CXBOQ81tGERectQFx3jdq2zleFEp+r+GYiayeI0t@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKo8I2t70HIlzO86AS19Ir5Ksp77tX5VXKuofANi6HYtGoG/dv
-	e2v/cKPT90QczVzv1EC+FTKx4FjHqvu91/dwdnUD/I00UtCB1FsUvLEuPbENFmTYfCM6f6wQLEK
-	4rIy+vAzadRVuaeeA2seZgVUzDWE=
-X-Google-Smtp-Source: AGHT+IFipSDphqQejDTjEHb6w0t3D9Mrp3gh/Gk2d+8YbuuQI2ckZv0Gh3jPFkzypUkadOvfGgfov6bhfBarLFeSYpA=
-X-Received: by 2002:a17:907:7d90:b0:aca:c864:369a with SMTP id
- a640c23a62f3a-acb74b36c86mr707209566b.18.1745133455991; Sun, 20 Apr 2025
- 00:17:35 -0700 (PDT)
+	s=k20201202; t=1745177257;
+	bh=G2+3guS80Z7+Fi1lTQSy/MYrzhZPPyiZuKBsiQq1cFw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FbZpkEBWNhZUAR4S/NO1XoeH4u34SC1lefokMqnGudEWBxqui2vKtymu/fD1cyNRi
+	 hLiDpP0PlpvZvzNJR+916yiazGnDSV1m2YybRBCnIUcfMQ2EqTmxZYJXLbwsmNwtk/
+	 /N4Zo8jNTcREjehEzjCCccCojpVmkcwHT/8o3zBx0CNWyj7MdXsI/SXXef8PuGC1x/
+	 7LMxQ7czZNsOysEpEhKcaaXSJ79WfpajzfVEgmUhRQpWIi2Y1y3NOB0wRIEOSQ8cdD
+	 7SLiRWaXXW9kb3MA5oc+kVrQ/QpIwXGHeprC9+xIWfFBX32PAj1CGSGv0QVoeGE7F/
+	 BboR7QHPWHDow==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	x86@kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH v2 00/13] Finish disentangling ChaCha, Poly1305, and BLAKE2s from CRYPTO
+Date: Sun, 20 Apr 2025 12:25:56 -0700
+Message-ID: <20250420192609.295075-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
-In-Reply-To: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 20 Apr 2025 15:17:23 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
-X-Gm-Features: ATxdqUHeiIpaROzGe_pe_P3wq4_tDyoL2Q2Sk3RB0jlyT4bmdmtQNL857Drp9PY
-Message-ID: <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
-Subject: Re: [PATCH v8 0/5] Add Loongson Security Engine chip driver
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, peterhuewe@gmx.de, 
-	jarkko@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, jgg@ziepe.ca, linux-integrity@vger.kernel.org, 
-	pmenzel@molgen.mpg.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi, Qunqin,
+This series removes the unnecessary dependency of the ChaCha, Poly1305,
+and BLAKE2s library functions on the generic crypto infrastructure, i.e.
+CONFIG_CRYPTO.  To do this, it moves the architecture-optimized
+implementations of these functions into new directories
+arch/*/lib/crypto/ which do not depend on CRYPTO.  This mirrors the
+existing distinction between crypto/ and lib/crypto/.
 
-On Fri, Apr 18, 2025 at 5:33=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
-> wrote:
->
-> The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
-> accelerator engines. Each engine have its own DMA buffer provided
-> by the controller. The kernel cannot directly send commands to the
-> engine and must first send them to the controller, which will
-> forward them to the corresponding engine. Based on these engines,
-> TPM2 have been implemented in the chip, then let's treat TPM2 itself
-> as an engine.
->
-> v8: Like Lee said, the base driver goes beyond MFD scope. Since these
->     are all encryption related drivers and SM2, SM3, and SM4 drivers
->     will be added to the crypto subsystem in the future, the base driver
->     need to be changed when adding these drivers. Therefore, it may be
->     more appropriate to place the base driver within the crypto subsystem=
-.
-I don't know what Lee Jones exactly means. But I don't think this
-version is what he wants. You move the SE driver from drivers/mfd to
-drivers/crypto, but it is still a mfd driver because of "struct
-mfd_cell engines".
+The last two patches remove the selection of CRYPTO by CRYPTO_LIB_CHACHA
+and CRYPTO_LIB_POLY1305, and they remove the corresponding *_INTERNAL
+symbols which were needed only because of the entanglement with CRYPTO.
 
-Huacai
+Note that Curve25519 is still entangled.  Later patches will fix that.
 
->
->     Removed complete callback in all drivers. Removed the concepts of
->     "channel", "msg" and "request" as they may be confusing. Used the
->     concepts of "egnine" and "command" may be better.
->
-> v7: Addressed Huacai's comments.
->
-> v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
->
->     crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
->     ls6000se-rng.c ->loongson-rng.c
->
->     tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
->
-> v5: Registered "ls6000se-rng" device in mfd driver.
-> v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
->     and crypto.
-> v3: Put the updates to the MAINTAINERS in a separate patch.
->
-> Qunqin Zhao (5):
->   crypto: loongson - Add Loongson Security Engine chip controller driver
->   crypto: loongson - add Loongson RNG driver support
->   MAINTAINERS: Add entry for Loongson crypto driver
->   tpm: Add a driver for Loongson TPM device
->   MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
->
->  MAINTAINERS                            |   7 +
->  drivers/char/tpm/Kconfig               |   9 +
->  drivers/char/tpm/Makefile              |   1 +
->  drivers/char/tpm/tpm_loongson.c        |  78 ++++++++
->  drivers/crypto/Kconfig                 |   1 +
->  drivers/crypto/Makefile                |   1 +
->  drivers/crypto/loongson/Kconfig        |  17 ++
->  drivers/crypto/loongson/Makefile       |   3 +
->  drivers/crypto/loongson/loongson-rng.c | 198 ++++++++++++++++++++
->  drivers/crypto/loongson/loongson-se.c  | 239 +++++++++++++++++++++++++
->  drivers/crypto/loongson/loongson-se.h  |  52 ++++++
->  11 files changed, 606 insertions(+)
->  create mode 100644 drivers/char/tpm/tpm_loongson.c
->  create mode 100644 drivers/crypto/loongson/Kconfig
->  create mode 100644 drivers/crypto/loongson/Makefile
->  create mode 100644 drivers/crypto/loongson/loongson-rng.c
->  create mode 100644 drivers/crypto/loongson/loongson-se.c
->  create mode 100644 drivers/crypto/loongson/loongson-se.h
->
->
-> base-commit: 8ffd015db85fea3e15a77027fda6c02ced4d2444
-> --
-> 2.45.2
->
->
+Changed in v2:
+   - Introduced new directories arch/*/lib/crypto/ instead of keeping
+     the library functions in arch/*/crypto/.
+
+Eric Biggers (13):
+  crypto: arm64 - drop redundant dependencies on ARM64
+  crypto: powerpc - drop redundant dependencies on PPC
+  crypto: s390 - drop redundant dependencies on S390
+  crypto: x86 - drop redundant dependencies on X86
+  crypto: arm - move library functions to arch/arm/lib/crypto/
+  crypto: arm64 - move library functions to arch/arm64/lib/crypto/
+  crypto: mips - move library functions to arch/mips/lib/crypto/
+  crypto: powerpc - move library functions to arch/powerpc/lib/crypto/
+  crypto: riscv - move library functions to arch/riscv/lib/crypto/
+  crypto: s390 - move library functions to arch/s390/lib/crypto/
+  crypto: x86 - move library functions to arch/x86/lib/crypto/
+  crypto: lib/chacha - remove INTERNAL symbol and selection of CRYPTO
+  crypto: lib/poly1305 - remove INTERNAL symbol and selection of CRYPTO
+
+ MAINTAINERS                                   |  1 +
+ arch/arm/crypto/Kconfig                       | 23 -----
+ arch/arm/crypto/Makefile                      | 14 +--
+ arch/arm/lib/Makefile                         |  2 +
+ arch/arm/lib/crypto/.gitignore                |  2 +
+ arch/arm/lib/crypto/Kconfig                   | 24 ++++++
+ arch/arm/lib/crypto/Makefile                  | 24 ++++++
+ arch/arm/{ => lib}/crypto/blake2s-core.S      |  0
+ arch/arm/{ => lib}/crypto/blake2s-glue.c      |  0
+ arch/arm/{ => lib}/crypto/chacha-glue.c       |  0
+ arch/arm/{ => lib}/crypto/chacha-neon-core.S  |  0
+ .../arm/{ => lib}/crypto/chacha-scalar-core.S |  0
+ arch/arm/{ => lib}/crypto/poly1305-armv4.pl   |  0
+ arch/arm/{ => lib}/crypto/poly1305-glue.c     |  0
+ arch/arm64/crypto/Kconfig                     | 17 +---
+ arch/arm64/crypto/Makefile                    |  9 +-
+ arch/arm64/lib/Makefile                       |  3 +
+ arch/arm64/lib/crypto/.gitignore              |  2 +
+ arch/arm64/lib/crypto/Kconfig                 | 14 +++
+ arch/arm64/lib/crypto/Makefile                | 16 ++++
+ .../arm64/{ => lib}/crypto/chacha-neon-core.S |  0
+ .../arm64/{ => lib}/crypto/chacha-neon-glue.c |  0
+ arch/arm64/{ => lib}/crypto/poly1305-armv8.pl |  0
+ arch/arm64/{ => lib}/crypto/poly1305-glue.c   |  0
+ arch/mips/crypto/Kconfig                      | 11 ---
+ arch/mips/crypto/Makefile                     | 17 ----
+ arch/mips/lib/Makefile                        |  2 +
+ arch/mips/lib/crypto/.gitignore               |  2 +
+ arch/mips/lib/crypto/Kconfig                  | 12 +++
+ arch/mips/lib/crypto/Makefile                 | 19 ++++
+ arch/mips/{ => lib}/crypto/chacha-core.S      |  0
+ arch/mips/{ => lib}/crypto/chacha-glue.c      |  0
+ arch/mips/{ => lib}/crypto/poly1305-glue.c    |  0
+ arch/mips/{ => lib}/crypto/poly1305-mips.pl   |  0
+ arch/powerpc/crypto/Kconfig                   | 22 +----
+ arch/powerpc/crypto/Makefile                  |  4 -
+ arch/powerpc/lib/Makefile                     |  2 +
+ arch/powerpc/lib/crypto/Kconfig               | 15 ++++
+ arch/powerpc/lib/crypto/Makefile              |  7 ++
+ .../{ => lib}/crypto/chacha-p10-glue.c        |  0
+ .../{ => lib}/crypto/chacha-p10le-8x.S        |  0
+ .../{ => lib}/crypto/poly1305-p10-glue.c      |  0
+ .../{ => lib}/crypto/poly1305-p10le_64.S      |  0
+ arch/riscv/crypto/Kconfig                     |  7 --
+ arch/riscv/crypto/Makefile                    |  3 -
+ arch/riscv/lib/Makefile                       |  1 +
+ arch/riscv/lib/crypto/Kconfig                 |  8 ++
+ arch/riscv/lib/crypto/Makefile                |  4 +
+ .../{ => lib}/crypto/chacha-riscv64-glue.c    |  0
+ .../{ => lib}/crypto/chacha-riscv64-zvkb.S    |  0
+ arch/s390/crypto/Kconfig                      | 16 ----
+ arch/s390/crypto/Makefile                     |  3 -
+ arch/s390/lib/Makefile                        |  1 +
+ arch/s390/lib/crypto/Kconfig                  |  7 ++
+ arch/s390/lib/crypto/Makefile                 |  4 +
+ arch/s390/{ => lib}/crypto/chacha-glue.c      |  0
+ arch/s390/{ => lib}/crypto/chacha-s390.S      |  0
+ arch/s390/{ => lib}/crypto/chacha-s390.h      |  0
+ arch/x86/crypto/Kconfig                       | 86 +++++++------------
+ arch/x86/crypto/Makefile                      | 15 ----
+ arch/x86/lib/Makefile                         |  2 +
+ arch/x86/lib/crypto/.gitignore                |  2 +
+ arch/x86/lib/crypto/Kconfig                   | 26 ++++++
+ arch/x86/lib/crypto/Makefile                  | 17 ++++
+ arch/x86/{ => lib}/crypto/blake2s-core.S      |  0
+ arch/x86/{ => lib}/crypto/blake2s-glue.c      |  0
+ .../x86/{ => lib}/crypto/chacha-avx2-x86_64.S |  0
+ .../{ => lib}/crypto/chacha-avx512vl-x86_64.S |  0
+ .../{ => lib}/crypto/chacha-ssse3-x86_64.S    |  0
+ arch/x86/{ => lib}/crypto/chacha_glue.c       |  0
+ .../crypto/poly1305-x86_64-cryptogams.pl      |  0
+ arch/x86/{ => lib}/crypto/poly1305_glue.c     |  0
+ crypto/Kconfig                                |  4 +-
+ lib/crypto/Kconfig                            | 56 +++++++-----
+ 74 files changed, 292 insertions(+), 234 deletions(-)
+ create mode 100644 arch/arm/lib/crypto/.gitignore
+ create mode 100644 arch/arm/lib/crypto/Kconfig
+ create mode 100644 arch/arm/lib/crypto/Makefile
+ rename arch/arm/{ => lib}/crypto/blake2s-core.S (100%)
+ rename arch/arm/{ => lib}/crypto/blake2s-glue.c (100%)
+ rename arch/arm/{ => lib}/crypto/chacha-glue.c (100%)
+ rename arch/arm/{ => lib}/crypto/chacha-neon-core.S (100%)
+ rename arch/arm/{ => lib}/crypto/chacha-scalar-core.S (100%)
+ rename arch/arm/{ => lib}/crypto/poly1305-armv4.pl (100%)
+ rename arch/arm/{ => lib}/crypto/poly1305-glue.c (100%)
+ create mode 100644 arch/arm64/lib/crypto/.gitignore
+ create mode 100644 arch/arm64/lib/crypto/Kconfig
+ create mode 100644 arch/arm64/lib/crypto/Makefile
+ rename arch/arm64/{ => lib}/crypto/chacha-neon-core.S (100%)
+ rename arch/arm64/{ => lib}/crypto/chacha-neon-glue.c (100%)
+ rename arch/arm64/{ => lib}/crypto/poly1305-armv8.pl (100%)
+ rename arch/arm64/{ => lib}/crypto/poly1305-glue.c (100%)
+ create mode 100644 arch/mips/lib/crypto/.gitignore
+ create mode 100644 arch/mips/lib/crypto/Kconfig
+ create mode 100644 arch/mips/lib/crypto/Makefile
+ rename arch/mips/{ => lib}/crypto/chacha-core.S (100%)
+ rename arch/mips/{ => lib}/crypto/chacha-glue.c (100%)
+ rename arch/mips/{ => lib}/crypto/poly1305-glue.c (100%)
+ rename arch/mips/{ => lib}/crypto/poly1305-mips.pl (100%)
+ create mode 100644 arch/powerpc/lib/crypto/Kconfig
+ create mode 100644 arch/powerpc/lib/crypto/Makefile
+ rename arch/powerpc/{ => lib}/crypto/chacha-p10-glue.c (100%)
+ rename arch/powerpc/{ => lib}/crypto/chacha-p10le-8x.S (100%)
+ rename arch/powerpc/{ => lib}/crypto/poly1305-p10-glue.c (100%)
+ rename arch/powerpc/{ => lib}/crypto/poly1305-p10le_64.S (100%)
+ create mode 100644 arch/riscv/lib/crypto/Kconfig
+ create mode 100644 arch/riscv/lib/crypto/Makefile
+ rename arch/riscv/{ => lib}/crypto/chacha-riscv64-glue.c (100%)
+ rename arch/riscv/{ => lib}/crypto/chacha-riscv64-zvkb.S (100%)
+ create mode 100644 arch/s390/lib/crypto/Kconfig
+ create mode 100644 arch/s390/lib/crypto/Makefile
+ rename arch/s390/{ => lib}/crypto/chacha-glue.c (100%)
+ rename arch/s390/{ => lib}/crypto/chacha-s390.S (100%)
+ rename arch/s390/{ => lib}/crypto/chacha-s390.h (100%)
+ create mode 100644 arch/x86/lib/crypto/.gitignore
+ create mode 100644 arch/x86/lib/crypto/Kconfig
+ create mode 100644 arch/x86/lib/crypto/Makefile
+ rename arch/x86/{ => lib}/crypto/blake2s-core.S (100%)
+ rename arch/x86/{ => lib}/crypto/blake2s-glue.c (100%)
+ rename arch/x86/{ => lib}/crypto/chacha-avx2-x86_64.S (100%)
+ rename arch/x86/{ => lib}/crypto/chacha-avx512vl-x86_64.S (100%)
+ rename arch/x86/{ => lib}/crypto/chacha-ssse3-x86_64.S (100%)
+ rename arch/x86/{ => lib}/crypto/chacha_glue.c (100%)
+ rename arch/x86/{ => lib}/crypto/poly1305-x86_64-cryptogams.pl (100%)
+ rename arch/x86/{ => lib}/crypto/poly1305_glue.c (100%)
+
+
+base-commit: bb9c648b334be581a791c7669abaa594e4b5ebb7
+-- 
+2.49.0
+
