@@ -1,81 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F9B13C3CD;
-	Sun, 20 Apr 2025 19:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636CE43ABC;
+	Sun, 20 Apr 2025 21:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745179019; cv=none; b=k+RZQbHGFOrsfWSNMio/qbNqNaQfcVer4cyKNQfXh6frYreDqnFzI02XkddFvjka0tdXsgOUjmzHyxzIzhFeaGsxio3u0BiMHyU7SCbuZqzvNAyGh8tnWZylug7WkgEZQTpn/22E3mXoTolQ4LWwhcjU9xAO1FZT6wxjMFyCSfA=
+	t=1745182878; cv=none; b=dBGu61+J7QFbi9zgWR2nrCXmeUS+1GHQRh9JiXvnmAQ8rP6lCfy+aWLk06RrswewsIVynnJ+j0gC0808gjuZJwXkSb+OYSEudLyn6eCdPxXl2aZaKSZsHxepCg9C5+y3wp48nhQnsliovinB/kyxyyAb2owUNB6b8r5H+oYe6D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745179019; c=relaxed/simple;
-	bh=lmo+efipKD7P7WTcZCfEySlix+rDvcjgEr0L+hnC9E4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HdH8SD9nO9GnADR4BfIwm8oht7Enx/GmVSe3tGDzA1TiTWNRq+Z8tIzM/G8q0EbJYT+6CFm2BZgoH9z2J0DPSTAJT4krZbGPnZNDOzGjh6LT3zWWSUybgsIxi+GAvjB1qj+QWh5L3yu2rgEAmZ2QFrf8LR/kSnKS4UBLnbAnzHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrz2J44A; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745182878; c=relaxed/simple;
+	bh=i2lmUQG4IX7kqrr+nlEk+trjZPEWk3zVScNtA68XaRg=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BbRNjwo2uwWIfgBpHFs03wyV9oDIjwiPP6c+l6+yRReQe0kSlmr+6+hpgn1J1JOpsrBeNOugM2qe5brBhOBC0uIhlZMRmwBhgCj823vSCmGxhs3v2DX/foEYKw7qDFa3k8W5xHY/DJ7boffnQwj6LqKHl8Rkf+HUs7BTnKD6G68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=lSGRZMjF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrz2J44A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AA08C4CEE2;
-	Sun, 20 Apr 2025 19:56:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745179019;
-	bh=lmo+efipKD7P7WTcZCfEySlix+rDvcjgEr0L+hnC9E4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mrz2J44ASIX5ZV7hjArrCxW5gL1gxy++ocYi9SWPiMpypuiKkAqs4aunVh7xmoCPb
-	 sHBDSNbYeMDRuYacE/foTPevFv1qC8v2Phn+bjqTuhN5+sGe2xzR6aYUbJDYou/PF/
-	 svOJ1sdTfM4/CQrfLQS5qLyfA3DXB3SGYsPENpHvjQqJisplGz4tMLuYAYRf3/LelU
-	 W9p9QfoBoNTxm7FKQ2Wr8IbIgddMHiGU5fLJXmZPR+0zmvY7c5Cjx0t/EZ4gDv9ys4
-	 +ixL8feXKDde+x9zEUSXfcM6FsVcaJn/aID9g1PY5prRZps5UWMEmhn9KMmeVHmDPN
-	 E545RaoZVlxpg==
-Date: Sun, 20 Apr 2025 12:56:57 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Daniel Palmer <daniel@0x0f.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, Jason@zx2c4.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Daniel Palmer <daniel@thingy.jp>
-Subject: Re: [PATCH] lib/crypto: blake2s: Disable self test if CONFIG_CRYPTO
- isn't enabled
-Message-ID: <20250420195657.GA291714@sol.localdomain>
-References: <20250418120216.2968994-1-daniel@0x0f.com>
- <20250418145945.GA1890@quark.localdomain>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="lSGRZMjF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4563C4CEE2;
+	Sun, 20 Apr 2025 21:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1745182877;
+	bh=i2lmUQG4IX7kqrr+nlEk+trjZPEWk3zVScNtA68XaRg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lSGRZMjFTFur/+Fv7REyIweICaS3qy69eGMzre/0Q4YS1pa41xuxpFIcmCbT3+jrW
+	 es+BmXFqFsHsTw7wK7aoOA5sNdnzYdNYN7SWXh0CQ9gmwipNZeysbUbNaWUMxT8Y6s
+	 pmC6q+E5xu4i49rAeStULtlZujAw/ea/MyKEUD+o=
+Date: Sun, 20 Apr 2025 14:01:16 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com"
+ <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+ "usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
+ <ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
+ "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ "davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
+ <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
+ "ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
+ <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+ "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
+ <vinodh.gopal@intel.com>, m95d@psihoexpert.ro
+Subject: Re: [PATCH v8 12/14] mm: zswap: Simplify acomp_ctx resource
+ allocation/deletion and mutex lock usage.
+Message-Id: <20250420140116.b6db3aafcc2f99569190c97e@linux-foundation.org>
+In-Reply-To: <SA3PR11MB81202E35C1CAF0409711A1B0C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
+References: <Z8n5CCmELvpUwi3B@google.com>
+	<PH8SPRMB004414B5E1E0765C18F9A89DC9D52@PH8SPRMB0044.namprd11.prod.outlook.com>
+	<Z8tJOi5G_3dpK31v@google.com>
+	<PH8SPRMB00447B066A769C76F57F8800C9D42@PH8SPRMB0044.namprd11.prod.outlook.com>
+	<Z88h1mPkYNM6yOGE@google.com>
+	<SA3PR11MB812082535F1E6D63BC0F1412C9DF2@SA3PR11MB8120.namprd11.prod.outlook.com>
+	<Z9mB5IbNEdNdtmUp@google.com>
+	<SA3PR11MB81206531E9B3C7F13F5740A2C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
+	<Z9nECMZW67F8XYoV@google.com>
+	<SA3PR11MB8120A474C20104FF22CCE396C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
+	<Z9n-OnGPK7BOdGxR@google.com>
+	<SA3PR11MB81202E35C1CAF0409711A1B0C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418145945.GA1890@quark.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 18, 2025 at 07:59:45AM -0700, Eric Biggers wrote:
-> On Fri, Apr 18, 2025 at 09:02:16PM +0900, Daniel Palmer wrote:
-> > From: Daniel Palmer <daniel@thingy.jp>
-> > 
-> > Currently CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is used to remove
-> > the self test code. CONFIG_CRYPTO_MANAGER_DISABLE_TESTS depends on
-> > CONFIG_CRYPTO so its impossible to disable the self test without
-> > enabling CONFIG_CRYPTO.
-> > 
-> > If you don't want CONFIG_CRYPTO you probably don't want self tests
-> > so remove the self tests in that case too.
-> > 
-> > Fixes: 66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
-> > 
-> > Signed-off-by: Daniel Palmer <daniel@thingy.jp>
-> > ---
-> >  lib/crypto/blake2s.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> Acked-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> This is okay as a quick fix, but really the lib/crypto/ tests should be
-> refactored into KUnit tests that aren't dependent on CRYPTO.  FWIW, I recently
-> fixed this for the CRC functions: lib/tests/crc_kunit.c.
-> 
 
-My series "[PATCH 0/9] Clean up the crypto testing options"
-(https://lore.kernel.org/r/20250419161543.139344-1-ebiggers@kernel.org/) also
-fixes this by replacing CRYPTO_MANAGER_DISABLE_TESTS with a non-negated option.
-(But we should still disentangle the library tests from CRYPTO at some point.)
-
-- Eric
+https://bugzilla.kernel.org/show_bug.cgi?id=220035 might be related to
+this patchset?
