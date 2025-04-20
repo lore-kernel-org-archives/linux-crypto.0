@@ -1,72 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636CE43ABC;
-	Sun, 20 Apr 2025 21:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81862111;
+	Sun, 20 Apr 2025 21:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745182878; cv=none; b=dBGu61+J7QFbi9zgWR2nrCXmeUS+1GHQRh9JiXvnmAQ8rP6lCfy+aWLk06RrswewsIVynnJ+j0gC0808gjuZJwXkSb+OYSEudLyn6eCdPxXl2aZaKSZsHxepCg9C5+y3wp48nhQnsliovinB/kyxyyAb2owUNB6b8r5H+oYe6D8=
+	t=1745185349; cv=none; b=LZ/z+cMt1mArgO52Ncwm6fYV6n/rS4MCBkVyetWXnaIxVZ5i/jCaWJwSKL6XcsncCSXkKSomRk8keTKKIel+veTArpFzIkLT20fTj6Vea2niF0xIaoL2twTPzhxcG5+CzjJstAxgmxTDrpfHDtEji1fBrZ+QYiBj+DGat2IbPMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745182878; c=relaxed/simple;
-	bh=i2lmUQG4IX7kqrr+nlEk+trjZPEWk3zVScNtA68XaRg=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=BbRNjwo2uwWIfgBpHFs03wyV9oDIjwiPP6c+l6+yRReQe0kSlmr+6+hpgn1J1JOpsrBeNOugM2qe5brBhOBC0uIhlZMRmwBhgCj823vSCmGxhs3v2DX/foEYKw7qDFa3k8W5xHY/DJ7boffnQwj6LqKHl8Rkf+HUs7BTnKD6G68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=lSGRZMjF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745185349; c=relaxed/simple;
+	bh=o3lK09+otg6DgvlTkRd0uEq2A+YS26/sGwIIKbHBcag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lrp8cGu1xqtyphUvMQu2kkbWT9wTYfmang4Pk/1xJaSzBuYD/T9yxWNfUJzIFXueC6HvFg5G8Ab6DkRfrUlTindzZhYcDN2Xh6IMtpzkP0vSus0HflLk+B7YCGOjk+oGnM+JzJCWF807ZfHrNCGp2qYCMFwJ18uH2qE8Jx8B9MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V14kX5gV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="lSGRZMjF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4563C4CEE2;
-	Sun, 20 Apr 2025 21:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1745182877;
-	bh=i2lmUQG4IX7kqrr+nlEk+trjZPEWk3zVScNtA68XaRg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lSGRZMjFTFur/+Fv7REyIweICaS3qy69eGMzre/0Q4YS1pa41xuxpFIcmCbT3+jrW
-	 es+BmXFqFsHsTw7wK7aoOA5sNdnzYdNYN7SWXh0CQ9gmwipNZeysbUbNaWUMxT8Y6s
-	 pmC6q+E5xu4i49rAeStULtlZujAw/ea/MyKEUD+o=
-Date: Sun, 20 Apr 2025 14:01:16 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com"
- <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
- "usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
- <ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
- "ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
- <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
- "ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
- <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
- "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
- <vinodh.gopal@intel.com>, m95d@psihoexpert.ro
-Subject: Re: [PATCH v8 12/14] mm: zswap: Simplify acomp_ctx resource
- allocation/deletion and mutex lock usage.
-Message-Id: <20250420140116.b6db3aafcc2f99569190c97e@linux-foundation.org>
-In-Reply-To: <SA3PR11MB81202E35C1CAF0409711A1B0C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
-References: <Z8n5CCmELvpUwi3B@google.com>
-	<PH8SPRMB004414B5E1E0765C18F9A89DC9D52@PH8SPRMB0044.namprd11.prod.outlook.com>
-	<Z8tJOi5G_3dpK31v@google.com>
-	<PH8SPRMB00447B066A769C76F57F8800C9D42@PH8SPRMB0044.namprd11.prod.outlook.com>
-	<Z88h1mPkYNM6yOGE@google.com>
-	<SA3PR11MB812082535F1E6D63BC0F1412C9DF2@SA3PR11MB8120.namprd11.prod.outlook.com>
-	<Z9mB5IbNEdNdtmUp@google.com>
-	<SA3PR11MB81206531E9B3C7F13F5740A2C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
-	<Z9nECMZW67F8XYoV@google.com>
-	<SA3PR11MB8120A474C20104FF22CCE396C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
-	<Z9n-OnGPK7BOdGxR@google.com>
-	<SA3PR11MB81202E35C1CAF0409711A1B0C9DE2@SA3PR11MB8120.namprd11.prod.outlook.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V14kX5gV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E842BC4CEE2;
+	Sun, 20 Apr 2025 21:42:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745185348;
+	bh=o3lK09+otg6DgvlTkRd0uEq2A+YS26/sGwIIKbHBcag=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V14kX5gVKJQ4TKr1kjqcj4uB/vdwkcoBtAzqAd6oYHr/0UFPi5Xb4XNt2bgobpadx
+	 fHLW4TYVRN58fg+nvS5iX8RxLw4WD2uHHLtRHXM8Fdzq0zf/m9Jea3Dw9SN4//RZic
+	 ATxeSy8c398InEkzqu0EoYWWLNR9+5n7gOY+jzhg+foAWNabfgvGsLuAiv1wAU1p5q
+	 gEJO9Hc83boZUsPd9mdUX74gegIaxXpsyScNdEd5NPpa5d0+pAveQwe+GXHrNRv35O
+	 JZfCuQ5QtXX/qaeCAd7eOiMQFvnuGssZ557aDkUuMoDftndQ6sqUI8SdS8WUi74F4v
+	 27V1otuThl43w==
+Date: Sun, 20 Apr 2025 14:42:26 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, x86@kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v2 05/13] crypto: arm - move library functions to
+ arch/arm/lib/crypto/
+Message-ID: <20250420214226.GA14633@sol.localdomain>
+References: <20250420192609.295075-1-ebiggers@kernel.org>
+ <20250420192609.295075-6-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250420192609.295075-6-ebiggers@kernel.org>
 
+On Sun, Apr 20, 2025 at 12:26:01PM -0700, Eric Biggers wrote:
+> diff --git a/arch/arm/lib/crypto/Makefile b/arch/arm/lib/crypto/Makefile
+> new file mode 100644
+> index 0000000000000..dbdf376e25336
+> --- /dev/null
+> +++ b/arch/arm/lib/crypto/Makefile
+> @@ -0,0 +1,24 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +obj-$(CONFIG_CRYPTO_BLAKE2S_ARM) += libblake2s-arm.o
+> +libblake2s-arm-y:= blake2s-core.o blake2s-glue.o
+> +
+> +obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+> +chacha-neon-y := chacha-scalar-core.o chacha-glue.o
+> +chacha-neon-$(CONFIG_KERNEL_MODE_NEON) += chacha-neon-core.o
+> +
+> +obj-$(CONFIG_CRYPTO_POLY1305_ARM) += poly1305-arm.o
+> +poly1305-arm-y := poly1305-core.o poly1305-glue.o
+> +
+> +quiet_cmd_perl = PERL    $@
+> +      cmd_perl = $(PERL) $(<) > $(@)
+> +
+> +$(obj)/%-core.S: $(src)/%-armv4.pl
+> +	$(call cmd,perl)
+> +
+> +clean-files += poly1305-core.S
+> +
+> +# massage the perlasm code a bit so we only get the NEON routine if we need it
+> +poly1305-aflags-$(CONFIG_CPU_V7) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=5
+> +poly1305-aflags-$(CONFIG_KERNEL_MODE_NEON) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=7
+> +AFLAGS_poly1305-core.o += $(poly1305-aflags-y) $(aflags-thumb2-y)
 
-https://bugzilla.kernel.org/show_bug.cgi?id=220035 might be related to
-this patchset?
+As noticed by kernel test robot
+(https://lore.kernel.org/oe-kbuild-all/202504210545.llc4JaKQ-lkp@intel.com), I
+forgot to include the following line here:
+
+    aflags-thumb2-$(CONFIG_THUMB2_KERNEL) := -U__thumb2__ -D__thumb2__=1
