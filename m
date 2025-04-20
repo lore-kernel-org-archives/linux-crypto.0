@@ -1,97 +1,137 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BC41373;
-	Sun, 20 Apr 2025 06:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085C778F3E;
+	Sun, 20 Apr 2025 07:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745131211; cv=none; b=hcI2UGYbqn4rbi+sWlTxUX6bRWI28/Djc77rdOVYM6HmPo79/DbhuLGX2c2+n79eBBWQkhLVTPPvqdTK324wrfU3qKWrfKTr0Vvol3iSsUxAa1+mRv68AssqNiU/F3mZDjXEzHlLRBlzeZUE3Ul6jt6seyYddjQpPzn2JzPBqKM=
+	t=1745133458; cv=none; b=Q1sjTgqrsK4BGSM3oCGg9Kjyxf1KpdVNS+M/jPhIhkJqUFXRe+JuIs3hmh5j6+pTarMBYMKNeSybVkUto9VNmLG0z+Mlb9e750O9PqPhBHBI8lerkumvvTy1c4zXku0oRxhJEn+mMxAfl/olxUC0quGDEnjPqBE1BwVaqc3wLRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745131211; c=relaxed/simple;
-	bh=TMKqFLJUPKsSq4QBQnnNnTSgXYg1nBK+QD4qSFt1mt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FwkGaGoFAsm3SLFinwpEroH/1Zh3LLAcN3DLo+wiin6qDlyF+hmnDfyyj7Z4E1Y/I83+YIZuPWyyMPrc4qcw5Z5I9ZWhZf0AY8fWS/z/KjAktq21F4BcypezakTT3QVpORNSlGkIh5WoN/eg7FD7stJ6jH9SB46UADILuAm4rOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=SfuMBaqC; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745133458; c=relaxed/simple;
+	bh=kAbt2L4kg671pYS37gU/fZtxIXbvKl2K/RxKTomXmT8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WPVLWQ0OuV4AR+Wjxt9EppJqlWTU/qssA1/jxFPm3ycDRk6H2tNn+a0eMX916rYpB69Mo4J4snczAXFsLsHTGlZ4cYjBffxJ7nX2hCFpy8ebg/iJrrPBeZ9+x2AK0izkRweGIM2aNYMksb5ab46bHvtWdAfj/uRDh3XO2VSRVC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nzeff6/y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="SfuMBaqC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=8yBRXEpl/zJ2DC6+BgwWilj/xw5IQ+a0xstsD+P+cM0=; b=SfuMBaqCsK502ZPFFK7FlC6u7N
-	9lKYLN7KvkrCS54daxBdS6M20Lk0jdHWpT2aYdDZFoAJ22FipPZCbbJq22aca4QORUBCpn5L5BD8b
-	7U70QCi3ZnWit1QzA+SKI9Zgof0Wza9Jl+8CjCwvBk794kVM7FBiJJmYWBWr/1+fjCoQXW0rpwkIy
-	NCAlpJYacjC+W/wOBefRSNw84iUsETtUKT5ZLQUukNLpI8BfqAZvl6uyBkofvWTIFZxJ25JhMEwcO
-	P3aI5xtOGGzQPuOc0xAMDJnmI/H0ForWRdtO5y7RcdYLbPARZr1WDlieT0Z+0Vwig2yulJSvW8TdD
-	hTSfO6Mg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u6OKa-00H6Gs-0J;
-	Sun, 20 Apr 2025 14:39:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 20 Apr 2025 14:39:08 +0800
-Date: Sun, 20 Apr 2025 14:39:08 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Gupta, Nipun" <nipun.gupta@amd.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, davem@davemloft.net,
-	dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, krzk+dt@kernel.org,
-	gregkh@linuxfoundation.org, robh@kernel.org, conor+dt@kernel.org,
-	ogabbay@kernel.org, maarten.lankhorst@linux.intel.com,
-	mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com,
-	simona@ffwll.ch, derek.kiernan@amd.com, dragan.cvetic@amd.com,
-	arnd@arndb.de, praveen.jain@amd.com, harpreet.anand@amd.com,
-	nikhil.agarwal@amd.com, srivatsa@csail.mit.edu, code@tyhicks.com,
-	ptsm@linux.microsoft.com, linux-crypto@vger.kernel.org,
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>, keyrings@vger.kernel.org,
-	Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v2 2/3] accel/amdpk: add driver for AMD PKI accelerator
-Message-ID: <aASWjGNpn1QZYgZb@gondor.apana.org.au>
-References: <20250409173033.2261755-1-nipun.gupta@amd.com>
- <20250409173033.2261755-2-nipun.gupta@amd.com>
- <20250410-sly-inventive-squirrel-ddecbc@shite>
- <bf851be7-74a5-8f9d-375b-b617691b6765@amd.com>
- <Z_imAnYu1hGRb8An@gondor.apana.org.au>
- <4f365fae-aae2-a0df-e8e9-268b536378b1@amd.com>
- <Z_nAo7UpzBqeXLbA@gondor.apana.org.au>
- <5f49d271-fdf3-3b52-664a-3f576bc3c61e@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nzeff6/y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C07C4AF09;
+	Sun, 20 Apr 2025 07:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745133457;
+	bh=kAbt2L4kg671pYS37gU/fZtxIXbvKl2K/RxKTomXmT8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Nzeff6/yynvStEnBnW35r39G49OQu2MTljTONZkQieNcZu3kPYn+FWKKIWC8yINQr
+	 Djq3eXpij4bDEhrg4Uno68L14b9SdWuKGFPuemZEvIpIePvODTaxwRUXzCldwwm7AO
+	 jKSXJBrafY59LbaFu6aOkW2IyCbqHKqlw47DYOqc8BNg4R5lpqaM/XyJW+ICqLTY8b
+	 61RRSATkXLuns755feYrs50Hx8NC7fXRZcLJOVC/jIfod3kIWv2BvFan6XFjr8rYJN
+	 qorGd8x03AwlQjNYyO6QGy37M46EC/iGpoqKKdlAmIF9RyqCNfBnYWRhxWhqnpYl15
+	 0S2Z6UTAahA0g==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb12so2205750a12.1;
+        Sun, 20 Apr 2025 00:17:37 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU/FlsEIzzSlIe5peNoLndX1hsPsjuAWGMAO5ydQoU1iFE2dCJIZFKUpwTf4f6WILtVThESdfQn7b7uiaLSlUeF@vger.kernel.org, AJvYcCVfZVdbcoMPLGF+A5d0pqZCh3lNrgxjkMzx7RRvN8I793Hs4ZLfAX0NFMUqea+AorWWen7uo9y2UZQbDMI=@vger.kernel.org, AJvYcCWG5HLaTkaaeL5/GtYI3+Bz603oHVIrlg5RTGHmRw1+CXBOQ81tGERectQFx3jdq2zleFEp+r+GYiayeI0t@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKo8I2t70HIlzO86AS19Ir5Ksp77tX5VXKuofANi6HYtGoG/dv
+	e2v/cKPT90QczVzv1EC+FTKx4FjHqvu91/dwdnUD/I00UtCB1FsUvLEuPbENFmTYfCM6f6wQLEK
+	4rIy+vAzadRVuaeeA2seZgVUzDWE=
+X-Google-Smtp-Source: AGHT+IFipSDphqQejDTjEHb6w0t3D9Mrp3gh/Gk2d+8YbuuQI2ckZv0Gh3jPFkzypUkadOvfGgfov6bhfBarLFeSYpA=
+X-Received: by 2002:a17:907:7d90:b0:aca:c864:369a with SMTP id
+ a640c23a62f3a-acb74b36c86mr707209566b.18.1745133455991; Sun, 20 Apr 2025
+ 00:17:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f49d271-fdf3-3b52-664a-3f576bc3c61e@amd.com>
+References: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 20 Apr 2025 15:17:23 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
+X-Gm-Features: ATxdqUHeiIpaROzGe_pe_P3wq4_tDyoL2Q2Sk3RB0jlyT4bmdmtQNL857Drp9PY
+Message-ID: <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
+Subject: Re: [PATCH v8 0/5] Add Loongson Security Engine chip driver
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, peterhuewe@gmx.de, 
+	jarkko@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, jgg@ziepe.ca, linux-integrity@vger.kernel.org, 
+	pmenzel@molgen.mpg.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 17, 2025 at 09:02:15PM +0530, Gupta, Nipun wrote:
+Hi, Qunqin,
+
+On Fri, Apr 18, 2025 at 5:33=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
+> wrote:
 >
-> Thanks for pointing out to the C file, but as these these system calls can
-> support only synchronous operations, precludes their use for asynchronous
-> operations. In the TLS handshakes, where multiple connections occur
-> simultaneously, asynchronous operations are beneficial. OpenSSL ASYNC
-> support can very well utilizes the asynchronous operations while
-> establishing multiple TLS connections.
+> The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
+> accelerator engines. Each engine have its own DMA buffer provided
+> by the controller. The kernel cannot directly send commands to the
+> engine and must first send them to the controller, which will
+> forward them to the corresponding engine. Based on these engines,
+> TPM2 have been implemented in the chip, then let's treat TPM2 itself
+> as an engine.
+>
+> v8: Like Lee said, the base driver goes beyond MFD scope. Since these
+>     are all encryption related drivers and SM2, SM3, and SM4 drivers
+>     will be added to the crypto subsystem in the future, the base driver
+>     need to be changed when adding these drivers. Therefore, it may be
+>     more appropriate to place the base driver within the crypto subsystem=
+.
+I don't know what Lee Jones exactly means. But I don't think this
+version is what he wants. You move the SE driver from drivers/mfd to
+drivers/crypto, but it is still a mfd driver because of "struct
+mfd_cell engines".
 
-In that case we should extend af_alg to support akcipher algorithms.
+Huacai
 
-Having every crypto driver make up its own user-space PKI interface
-is not scalable.
-
-I held back on adding akcipher to af_alg because it would lead to
-the freezing of our akcipher API.  But it's time to do this.
-
-Being the first user of such an interface, could you please post
-your OpenSSL patches as well so that we can look at what's actually
-needed?
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+>     Removed complete callback in all drivers. Removed the concepts of
+>     "channel", "msg" and "request" as they may be confusing. Used the
+>     concepts of "egnine" and "command" may be better.
+>
+> v7: Addressed Huacai's comments.
+>
+> v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
+>
+>     crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+>     ls6000se-rng.c ->loongson-rng.c
+>
+>     tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+>
+> v5: Registered "ls6000se-rng" device in mfd driver.
+> v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
+>     and crypto.
+> v3: Put the updates to the MAINTAINERS in a separate patch.
+>
+> Qunqin Zhao (5):
+>   crypto: loongson - Add Loongson Security Engine chip controller driver
+>   crypto: loongson - add Loongson RNG driver support
+>   MAINTAINERS: Add entry for Loongson crypto driver
+>   tpm: Add a driver for Loongson TPM device
+>   MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
+>
+>  MAINTAINERS                            |   7 +
+>  drivers/char/tpm/Kconfig               |   9 +
+>  drivers/char/tpm/Makefile              |   1 +
+>  drivers/char/tpm/tpm_loongson.c        |  78 ++++++++
+>  drivers/crypto/Kconfig                 |   1 +
+>  drivers/crypto/Makefile                |   1 +
+>  drivers/crypto/loongson/Kconfig        |  17 ++
+>  drivers/crypto/loongson/Makefile       |   3 +
+>  drivers/crypto/loongson/loongson-rng.c | 198 ++++++++++++++++++++
+>  drivers/crypto/loongson/loongson-se.c  | 239 +++++++++++++++++++++++++
+>  drivers/crypto/loongson/loongson-se.h  |  52 ++++++
+>  11 files changed, 606 insertions(+)
+>  create mode 100644 drivers/char/tpm/tpm_loongson.c
+>  create mode 100644 drivers/crypto/loongson/Kconfig
+>  create mode 100644 drivers/crypto/loongson/Makefile
+>  create mode 100644 drivers/crypto/loongson/loongson-rng.c
+>  create mode 100644 drivers/crypto/loongson/loongson-se.c
+>  create mode 100644 drivers/crypto/loongson/loongson-se.h
+>
+>
+> base-commit: 8ffd015db85fea3e15a77027fda6c02ced4d2444
+> --
+> 2.45.2
+>
+>
