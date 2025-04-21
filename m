@@ -1,92 +1,186 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA201D5ADC;
-	Mon, 21 Apr 2025 17:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910141EA7F1
+	for <linux-crypto@vger.kernel.org>; Mon, 21 Apr 2025 18:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745257309; cv=none; b=AO85TzuWMouOI/xG9VW5//AbOKV+Tiwq1FfD4huN9OsOVbkAFkh7J8JF7BNz9XQIooeTrvA0/z4FMRMieL9pfClRyfec+d0xNQ4D8oH0/54dJyUE3h62p8VQtl1ywMj1s6h/61FwmAeq0p9qbPR7indQO+OLRdApp/4CJO5EtlA=
+	t=1745261572; cv=none; b=AhyIWjvtuW+IglDmPSNbmS5UproAeO6lH2bSFiDBjWbGuq3w6r59pexGhGxF27VopsVB60Z49yDVy7ibmpVAQ7zjpDXtLbGXmkrbmCGW6l+/4TLWRTkD7m4W3L0le4HrKtxPtJNjso5Jx7WH5z6wnnDq0HD9lPHvB9EJ3mT+ZNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745257309; c=relaxed/simple;
-	bh=MInvo/TJqnPXzU3X5PwPYokDZsTAhzEEcwDju2P+M8o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N1K86ibY+agTRPaNAEN5dH0LDuaraWMessvAs+9lSMH5wFKeZYN5LKlSHMWt4VhvKUxNHe3980MA02JXAHTsH/RDX6dnLg4/QhO/0zd9xDcMnuHdyZDrsuRP4hg3tGxC5T8POvoWxzMUHjWf7WpSLxn6xt+zSi2vh78t37bfXMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ORG0Iapu; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1745261572; c=relaxed/simple;
+	bh=MAT6Ew2gJpdMJ8irAU8emiSANZdL6DjJHNFxnFPsi3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ipGBXwZYl2c9yjiFvv0F7HRncTsX4mOQcm0bhKgeK37kucrovlz6hLMgupQ47XVRJyDEKzv1odTXYr4vilo1BB/bkKo1RU8iTE0CVx+qVDtgLw4ZqeVFwHnnS6i9owkxlvYlf6t4T1tpqUbaCiWQAcv8m7ykMNX2hF/0ZAndrw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=QBgCCfBd; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ORG0Iapu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=Ff+h7YRAkELws4CRWM7YOB1YCS1xo5ywus2jMjXmZLo=; b=ORG0IapudPPt0kyVA64pyXTGLZ
-	2ozgqSwMiwrIoNUfzdXuzOgGfP16RJ+MkH+lgjykjY8nOmzW5/NkJ2DMvgGjKDk0z6wNysFJIgBuW
-	eQ+XYGrRi2LiWjjRcBFJl3+4TtqK8TqlR5M40OMEp71P/4+ZG8I6M8Wv9gNwdcts8y4lgfRgiy4J4
-	R4jpTc/Z0wW2DChYSHRG5jQxNZZcs17DWw7J8iCANSTwDCOCGVvTT2hkZwh5+AZNMOiAVAIUEGf+N
-	qORbtkQuyYEPCvSKOXk/2pk6sanGbLe+QCLnJLbDWUVNAgzwNXST9tHHRVyjKQUMMk49qS98WYQhD
-	VTpPUq1A==;
-Received: from [50.39.124.201] (helo=[192.168.254.17])
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u6v9F-0000000B5HO-0I13;
-	Mon, 21 Apr 2025 17:41:37 +0000
-Message-ID: <e1e3dc8f-ca16-4cce-a670-bb8ef566213d@infradead.org>
-Date: Mon, 21 Apr 2025 10:41:27 -0700
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="QBgCCfBd"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e6df1419f94so3248841276.0
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Apr 2025 11:52:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1745261569; x=1745866369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lz3xUPpEUe/pX3Hqv/1lT4GmPjs/7L4gms/heykjQds=;
+        b=QBgCCfBdZ+Y261pLXknquCzeKzGiOf6WfhHPt2eOubBqKoeSWNCbuZat5VWRZCmHlB
+         p2hdRfZ9LQz+qqYLKmUZnysoVo6VJm0QITXShrmVsSbBQlNpMSbNNDYIgqXTk/H3SeIY
+         zOJyFN9d8HNrYCjZCDNLCAfP+NjkuPDlV9j9qqlD/ajZT0Js+JT0H/Ks4qRmenSCErF5
+         xWnQrw9zxvS4qe0ZcMmmKhXs8m6D3fpToPJ1nW7T2WH8DSGv1hH0DDNyfsIXnemSobv2
+         gpMvWmjckK4tIFu8T38+ZUQMNq1L4dhqn2XHhUUFpzqtxP/PNx5QcfWoOswf6z8muSS6
+         YgMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745261569; x=1745866369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lz3xUPpEUe/pX3Hqv/1lT4GmPjs/7L4gms/heykjQds=;
+        b=CHHMI0NIcfs+nwoMNLZO9AQjUe1pi41iIUwaeueI8QVLcaBZmHh5nqhbdU6rIuXnxB
+         NPE2/yWWQlgDBGJtx0yJnde/T1cfTX829bgYRu/MBjtBKZX2aCj17FmNojsqta8ix0Me
+         r1haG75ZO9plPIsP2KrEAmoi4QTlI7588WuxBxC5WXG/q/w5781bSUDnpZyqyDG5Z1k4
+         09Ah1vPkpZz0UkTief6buC7NosCCIFB9KMX6IOaxVtbajaUA2SE6rG1a4kSKc7hQbnVa
+         noXvMkWjQh7RSsUgg3NSpr9P468QTZ/VAtpBeGCmpgltTx6GEklMpmJqd+4d6KCiRUpH
+         Xc2A==
+X-Forwarded-Encrypted: i=1; AJvYcCW7m12bXmFG7JaWKEllbbxRoFoVyf1k/y2KaOil/OsN8QUbO920MVK0krLd47AwU6shn7uR8+02MZusHgE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziuXZPjsSVd7nL5pXWepwIebHW6ehHrZ2Y3ZIcNMmKmR7bnyAA
+	gBs7JdpfIg5WlkJOcgVL/BVAitpA4WJIBc5Du6Y+xtUM20LW9Nk3ApDZ4ssqdJ0xTiiFPv1gAHO
+	nbv4VU5Ohk6NCgGpLqE7j7XKnQIiZWXwu70DF
+X-Gm-Gg: ASbGnctE2bAmQ94b0IUMYGH2ikCnv81l5qlYXn1SiegJxYtbw8m1fLDk3uGAANmMvez
+	VPwg0VRAuVpFrAOh82OYEKjLUdIqHpUi+ummn8RfCAhqKPZQy9FIAWPKfkYppm4RtiuRSkofERy
+	oOgNeuc8AyMP91RsG50cWUGA==
+X-Google-Smtp-Source: AGHT+IEuH9hzO8L5xENmqEA5+rCv5QU5f2RwWDzAiO15hUKUo3LnS3Mbacdqm494PthrNYTv96+oKoVST5i5x+eAlHw=
+X-Received: by 2002:a05:690c:648a:b0:6fe:abff:cb17 with SMTP id
+ 00721157ae682-706ccda15f4mr176888017b3.26.1745261569456; Mon, 21 Apr 2025
+ 11:52:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 02/19] x86: Secure Launch Kconfig
-To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
- baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-References: <20250421162712.77452-1-ross.philipson@oracle.com>
- <20250421162712.77452-3-ross.philipson@oracle.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250421162712.77452-3-ross.philipson@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
+ <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <64859c5c8fd969186c1997a340ed6307e2c70f06.camel@HansenPartnership.com>
+In-Reply-To: <64859c5c8fd969186c1997a340ed6307e2c70f06.camel@HansenPartnership.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 21 Apr 2025 14:52:38 -0400
+X-Gm-Features: ATxdqUEW2UYysWiho25YbREtPd_DwN7ErCdbG2Ug5RajPR5M9exUr19Bmcv_5Vs
+Message-ID: <CAHC9VhSu_tn6d2A4-CYQn_Kr4mdRKEBXLabbPkLZuwQcC2KhJA@mail.gmail.com>
+Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, Jonathan Corbet <corbet@lwn.net>, 
+	David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, llvm@lists.linux.dev, nkapron@google.com, 
+	teknoraver@meta.com, roberto.sassu@huawei.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Sat, Apr 19, 2025 at 2:43=E2=80=AFPM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+> On Fri, 2025-04-04 at 14:54 -0700, Blaise Boscaccy wrote:
+> [...]
+> > diff --git a/include/linux/kernel_read_file.h
+> > b/include/linux/kernel_read_file.h
+> > index 90451e2e12bd..7ed9337be542 100644
+> > --- a/include/linux/kernel_read_file.h
+> > +++ b/include/linux/kernel_read_file.h
+> > @@ -14,6 +14,7 @@
+> >       id(KEXEC_INITRAMFS, kexec-initramfs)    \
+> >       id(POLICY, security-policy)             \
+> >       id(X509_CERTIFICATE, x509-certificate)  \
+> > +     id(EBPF, ebpf)                          \
+>
+> This causes a BUILD_BUG_ON for me in security/selinux/hooks.c with
+> CONFIG_SECURITY_SELINUX=3Dy because READING_MAX_ID and LOADING_MAX_ID
+> become 8.
+>
+> Below is what I had to do to get the compile to work.
 
-On 4/21/25 9:26 AM, Ross Philipson wrote:
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 4b9f378e05f6..badde1e9742e 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -2001,6 +2001,17 @@ config EFI_RUNTIME_MAP
->  
->  	  See also Documentation/ABI/testing/sysfs-firmware-efi-runtime-map.
->  
-> +config SECURE_LAUNCH
-> +	bool "Secure Launch support"
-> +	depends on X86_64 && X86_X2APIC && TCG_TIS && TCG_CRB && CRYPTO_LIB_SHA1 && CRYPTO_LIB_SHA256
+That code was updated during the v6.15 merge window, depending on what
+kernel sources Blaise is using for development it's possible he didn't
+bump into this even if he was building with SELinux enabled.
 
-It's normal to select needed library symbols instead of depending on them.
-Nothing else in the kernel tree uses depends on for these 2 Kconfig symbols.
-(CRYPTO_LIB_SHAxxx)
+Otherwise the changes below look reasonable to me.
 
-> +	help
-> +	   The Secure Launch feature allows a kernel to be loaded
-> +	   directly through an Intel TXT measured launch. Intel TXT
-> +	   establishes a Dynamic Root of Trust for Measurement (DRTM)
-> +	   where the CPU measures the kernel image. This feature then
-> +	   continues the measurement chain over kernel configuration
-> +	   information and init images.
+> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> index e7a7dcab81db..9a7ed0b4b08d 100644
+> --- a/security/selinux/hooks.c
+> +++ b/security/selinux/hooks.c
+> @@ -4133,7 +4133,7 @@ static int selinux_kernel_read_file(struct file *fi=
+le,
+>  {
+>         int rc =3D 0;
+>
+> -       BUILD_BUG_ON_MSG(READING_MAX_ID > 7,
+> +       BUILD_BUG_ON_MSG(READING_MAX_ID > 8,
+>                          "New kernel_read_file_id introduced; update SELi=
+nux!");
+>
+>         switch (id) {
+> @@ -4158,6 +4158,10 @@ static int selinux_kernel_read_file(struct file *f=
+ile,
+>                 rc =3D selinux_kernel_load_from_file(file,
+>                                                 SYSTEM__X509_CERTIFICATE_=
+LOAD);
+>                 break;
+> +       case READING_EBPF:
+> +               rc =3D selinux_kernel_load_from_file(file,
+> +                                               SYSTEM__EBPF_LOAD);
+> +               break;
+>         default:
+>                 break;
+>         }
+> @@ -4169,7 +4173,7 @@ static int selinux_kernel_load_data(enum kernel_loa=
+d_data_id id, bool contents)
+>  {
+>         int rc =3D 0;
+>
+> -       BUILD_BUG_ON_MSG(LOADING_MAX_ID > 7,
+> +       BUILD_BUG_ON_MSG(LOADING_MAX_ID > 8,
+>                          "New kernel_load_data_id introduced; update SELi=
+nux!");
+>
+>         switch (id) {
+> @@ -4195,6 +4199,10 @@ static int selinux_kernel_load_data(enum kernel_lo=
+ad_data_id id, bool contents)
+>                 rc =3D selinux_kernel_load_from_file(NULL,
+>                                                 SYSTEM__X509_CERTIFICATE_=
+LOAD);
+>                 break;
+> +       case LOADING_EBPF:
+> +               rc =3D selinux_kernel_load_from_file(NULL,
+> +                                                  SYSTEM__EBPF_LOAD);
+> +               break;
+>         default:
+>                 break;
+>         }
+> diff --git a/security/selinux/include/classmap.h b/security/selinux/inclu=
+de/classmap.h
+> index 04a9b480885e..671db23451df 100644
+> --- a/security/selinux/include/classmap.h
+> +++ b/security/selinux/include/classmap.h
+> @@ -65,7 +65,7 @@ const struct security_class_mapping secclass_map[] =3D =
+{
+>           { "ipc_info", "syslog_read", "syslog_mod", "syslog_console",
+>             "module_request", "module_load", "firmware_load",
+>             "kexec_image_load", "kexec_initramfs_load", "policy_load",
+> -           "x509_certificate_load", NULL } },
+> +           "x509_certificate_load", "ebpf_load", NULL } },
+>         { "capability", { COMMON_CAP_PERMS, NULL } },
+>         { "filesystem",
+>           { "mount", "remount", "unmount", "getattr", "relabelfrom",
+>
 
--- 
-~Randy
-
+--=20
+paul-moore.com
