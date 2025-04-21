@@ -1,94 +1,101 @@
-Received: from mail.nfschina.com (unknown [42.101.60.213])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id AD6C219ABB6;
-	Mon, 21 Apr 2025 07:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.213
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D751172A;
+	Mon, 21 Apr 2025 07:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745221431; cv=none; b=oLnic7KTXyl8hM+HyCuEg7dY42ZL5v1lfm/2PkwILO23RI8xW+vVcODAzjm0Bh8J8eTYsMNlx2en+mWcBujPSzFwvQvYDtvoMCq2pRjlq4oQP0e4pNxIxKqDbd4NAU5Mct04MEvk6qGqBBFgBGjmgjUjF9IOV947zX6KR10fMP0=
+	t=1745221901; cv=none; b=BlGuwYqzd/c7ZLe9VhFDLwKyIVjnnvg8owwEv643pJqErRzkIMvJSAI0JiAjGXbqjPCHycmEb/exJMfjDSM4MCebha/Qx5arbXrTuxDzvZz7Pe8mAvL8SOMMakQIR3/cS7+9riIy3NDCYwUWGdW4yAsU//aQxQXo7QF8P6bW8O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745221431; c=relaxed/simple;
-	bh=9mr/4ygQi24ODHbaZeN0vo/LVPGCcnhTa5BHpr99sRM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type; b=dt1umVfZjN87aAtXiIbjY2RdNOkQkTv5abpXdvYZ2B88C5ziPFbL8i/g1mDAnbS3aHDQ9QfA+j+iBY+PVAX0Qe8S6DqmkrcoFa9p1gKAoF3UIKp7/KQyCeLYCnZMTGskFqWCEHQ7tJmlHQ2auO8xG7cjGpR0g+2y3/GdHDD/Skk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from [172.30.20.101] (unknown [180.167.10.98])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id C17DE60252AD4;
-	Mon, 21 Apr 2025 15:43:38 +0800 (CST)
-Message-ID: <bade4ad1-2be7-45a4-8232-0be5fe2e7ef7@nfschina.com>
-Date: Mon, 21 Apr 2025 15:43:37 +0800
+	s=arc-20240116; t=1745221901; c=relaxed/simple;
+	bh=3EkWytvG1FAq4wSiAgBGR+l+bJeIVa+qMUoJsIjq+G8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VidubEG719APNjAARjM3snHEiFjMU/xtLw3TRkjpQekd/hUUgkWU81l1QDcmZcgqSyRAEaFBIidf2IHa8JpuWpX+xNcQ517GbRGb3ciSot547sB0qLM4Sj7KKqGR2eUHKJXIt87lHMabtqlruW6oCQMwSbJoLEMhZJlpctvzRRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Imqomrpz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Imqomrpz"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53L6kP4p002241;
+	Mon, 21 Apr 2025 07:51:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=Zrxe4BNXmiX+JsfnkgMsSiUWHNsZF/
+	9cngeWX3ef/yQ=; b=ImqomrpzNxCgrQYaQmUIUOt4z7pdd9isSZeReR9twXUZva
+	D276bTRcOJm5yvzgrXe8dsvSmM7N+CNFUOM7jn11vLVteR5vAZsulrUhKkQmkqfD
+	ig6Uw2QBmfnr6oNnoIRqFnupf1AQW1AGfMoNJhmMYPgys5cr4yoSAKnIL149HJQ8
+	3abIbBQ27YUw1twEHj65jm1a2GUceIg22INtt4h7Zdd7T9yEL5PCQGUyWOeV8fBB
+	Luhi7syGPQWwefT0tJMhH2wkgBWUj9YELdeIRIjFzvG002cNtsHazE63jWsbBbr5
+	DYRO+hRtCEEqQ1wqVtn0IuKN736IlKiSa9r8OpLQ==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 464xuhud3t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Apr 2025 07:51:36 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53L6Hagx012493;
+	Mon, 21 Apr 2025 07:51:36 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 464p5swkds-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Apr 2025 07:51:35 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53L7pYCn34013524
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Apr 2025 07:51:34 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3733620043;
+	Mon, 21 Apr 2025 07:51:34 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DAE8420040;
+	Mon, 21 Apr 2025 07:51:33 +0000 (GMT)
+Received: from osiris (unknown [9.87.139.110])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 21 Apr 2025 07:51:33 +0000 (GMT)
+Date: Mon, 21 Apr 2025 09:51:32 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] s390/crc32: Remove no-op module init and exit functions
+Message-ID: <20250421075132.39860A95-hca@linux.ibm.com>
+References: <20250417163829.4599-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: using size_add() for kmalloc()
-Content-Language: en-US
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, davem@davemloft.net,
- herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-hardening@vger.kernel.org
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
-In-Reply-To: <c86fcb5b-73d0-4d55-833f-26a16713e325@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417163829.4599-1-ebiggers@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QS8RGRcVQCRxBNwMwTrXfFOHbArAlT7P
+X-Proofpoint-ORIG-GUID: QS8RGRcVQCRxBNwMwTrXfFOHbArAlT7P
+X-Authority-Analysis: v=2.4 cv=LbY86ifi c=1 sm=1 tr=0 ts=6805f908 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=Akb6hcwL4JXZyUYhJT8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-21_03,2025-04-21_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
+ mlxlogscore=695 phishscore=0 malwarescore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504210058
 
-On 2025/4/21 15:10, Christophe JAILLET wrote:
-> Le 21/04/2025 à 07:51, Su Hui a écrit :
->> It's safer to use size_add() to replace open-coded aithmetic in 
->> allocator
->> arguments, because size_add() can prevent possible overflow problem.
->>
->> Signed-off-by: Su Hui <suhui@nfschina.com>
->> ---
->>   include/crypto/aead.h     | 3 ++-
->>   include/crypto/akcipher.h | 4 +++-
->>   include/crypto/kpp.h      | 3 ++-
->>   3 files changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/crypto/aead.h b/include/crypto/aead.h
->> index 0e8a41638678..cf212d28fe18 100644
->> --- a/include/crypto/aead.h
->> +++ b/include/crypto/aead.h
->> @@ -10,6 +10,7 @@
->>     #include <linux/atomic.h>
->>   #include <linux/container_of.h>
->> +#include <linux/overflow.h>
->
-> You could move this 1 line below, to keep alphabetical order.
-> And why do you say that it is redundant in your follow-up mail?
-Thanks for your suggestion, I didn't notice this alphabetical order at 
-first :( .
-Because I found that  <linux/crypto.h> includes <linux/slab.h>, and
-<linux/slab.h> includes <linux/overflow.h>, so this overflow.h is 
-redundant.
->
->>   #include <linux/crypto.h>
->>   #include <linux/slab.h>
-And I also found these <linux/{atomic,container_of,slab,types,list}.h> 
-is included by
-<linux/crypto.h>, I am trying to remove these redundant headers in v2 patch.
+On Thu, Apr 17, 2025 at 09:38:29AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Now that the crc32-s390 module init function is a no-op, there is no
+> need to define it.  Remove it.  The removal of the init function also
+> makes the exit function unnecessary, so remove that too.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> 
+> I'll take this via the crc tree.
+> 
+>  arch/s390/lib/crc32-glue.c | 11 -----------
+>  1 file changed, 11 deletions(-)
 
-It's sad that remving these duplicate header files didn't save any 
-compilation time,
-only save some code space.
->>   #include <linux/types.h>
->> @@ -433,7 +434,7 @@ static inline struct aead_request 
->> *aead_request_alloc(struct crypto_aead *tfm,
->> --- a/include/crypto/kpp.h
->> +++ b/include/crypto/kpp.h
->> @@ -11,6 +11,7 @@
->>     #include <linux/atomic.h>
->>   #include <linux/container_of.h>
->> +#include <linux/overflow.h>
->
-> You could move this 1 line below, to keep alphabetical order.
-This overflow.h is redundant too.
->
->>   #include <linux/crypto.h>
->>
->
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
