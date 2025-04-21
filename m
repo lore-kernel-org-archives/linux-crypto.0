@@ -1,22 +1,40 @@
-Received: from mail.nfschina.com (unknown [42.101.60.213])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id E812B1BD01F;
-	Mon, 21 Apr 2025 06:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.213
+Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF791ADC98;
+	Mon, 21 Apr 2025 07:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745216842; cv=none; b=Hip3GT65kZcQZbnLuyoU6aNnKiqwj861LRLvmcaO5gMW8Y2Ngf6ZTsKXiOYlwTRWHw1fVwSVnJZGZrn8lZLzuiWKl336EZvLFowICdxhD0jrOF0gQOwaMTskKbbdVL7/VBWW8WWBth8Gs8ZoRQxOfvl5icY/0GIIU59oLkmG2w8=
+	t=1745220027; cv=none; b=Ge8G+//rHJYsvoe9HVOSGGk+rOT2wXHg6J18129okTpA5SZE8tO9YrHwcLHOipgW7KNJ6dGv3P1B+757PhUpq2/J2mQLIlhsfHSShfdO6ZzxTGj7+o/c7mX5UN27tlKLZ2WdCRakQUvdH1XHy3ktb5lzOG2ZRYSKUT7NEH2Hs2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745216842; c=relaxed/simple;
-	bh=+e4r3AuCco/3OGo78Ey5O3/fp5Jdixn0HRrqyS/fYl8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type; b=r+zJAIjG+/zPjQ/WhiCP0ZrlxXdD7h3RCJThrJyUt8dk1KkBT3LEmThPlikdJz42qbwQ+GOjbGNJDImkgLNVN9K9eJaxap0SjsZEtP+2spSoS+I4mxkRHPuwW32C13cgvRxOjqzdDWTXoJGnxEiIO8OnXwwlx0sP885YWzouviY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from [172.30.20.101] (unknown [180.167.10.98])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id 941C46025A056;
-	Mon, 21 Apr 2025 14:27:12 +0800 (CST)
-Message-ID: <1c680708-eaf0-43da-9714-78b6d7f4d993@nfschina.com>
-Date: Mon, 21 Apr 2025 14:27:11 +0800
+	s=arc-20240116; t=1745220027; c=relaxed/simple;
+	bh=EwMe8Wb43GFTTbyo+/7B+EnV27Zps6JzW0QCOWV6UWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hUZj4B8d60lYctjGf6uw/+y189mZyllLne+LzeonRBifjeZfTrCu0ZkbjWEv2wz0bDWWq2TblFzqwr1QAfJ83kv1IQuC1iOZdQbjhfhxdq5vT5TSnnXEVtyt8pH+dkMHtbDktHAHgiB34wp47s/sL83rz8RTA7YHT86C5sq3gcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ojsVQIy7; arc=none smtp.client-ip=80.12.242.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ojsVQIy7"
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id 6lIxuVOt8RaJG6lJ0uv8UZ; Mon, 21 Apr 2025 09:11:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1745219466;
+	bh=ALscRgfeA4eRVyU6WwVdv2LWYx7uE+ukJFayKniTnlI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=ojsVQIy7uyxsbWGyE+wNuT48wRwXO0Z2R2eOZsa+xek74otwbMbwqaiyBhEoUOogm
+	 JJ51o+qGB75Bohvx1+U3l/j7RBts4AplgcUOzB+f3xJXynOh7JsvE1EqDzI8UBZqG8
+	 i/Q5g6hmUxKwfzS4MGOZ0bLqUoncpy2ljk1HP0TPbdTWHSYohLTwUk37qlz89jt5L2
+	 TqRJXlWs+YcWGb9I2d8Ao+lxGGjh9rDyMjJAzMHw3Ix5YgqS+82GclDNw4Gcr1UBZc
+	 BpZZGiWasTD/cZ/NV+rwml6XUyCxn2EeiM2B+LidlFzEfuoBXzN9f5kiDKrEYlj6kF
+	 d6+N53/7cfSSg==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Mon, 21 Apr 2025 09:11:06 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <c86fcb5b-73d0-4d55-833f-26a16713e325@wanadoo.fr>
+Date: Mon, 21 Apr 2025 09:10:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -25,28 +43,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] crypto: using size_add() for kmalloc()
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+To: Su Hui <suhui@nfschina.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  kernel-janitors@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Language: en-US
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
+References: <20250421055104.663552-1-suhui@nfschina.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 In-Reply-To: <20250421055104.663552-1-suhui@nfschina.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2025/4/21 13:51, Su Hui wrote:
+Le 21/04/2025 à 07:51, Su Hui a écrit :
 > It's safer to use size_add() to replace open-coded aithmetic in allocator
 > arguments, because size_add() can prevent possible overflow problem.
->
+> 
 > Signed-off-by: Su Hui <suhui@nfschina.com>
 > ---
 >   include/crypto/aead.h     | 3 ++-
 >   include/crypto/akcipher.h | 4 +++-
 >   include/crypto/kpp.h      | 3 ++-
 >   3 files changed, 7 insertions(+), 3 deletions(-)
->
+> 
 > diff --git a/include/crypto/aead.h b/include/crypto/aead.h
 > index 0e8a41638678..cf212d28fe18 100644
 > --- a/include/crypto/aead.h
@@ -56,7 +74,10 @@ On 2025/4/21 13:51, Su Hui wrote:
 >   #include <linux/atomic.h>
 >   #include <linux/container_of.h>
 > +#include <linux/overflow.h>
-Sorry for this redundant <linux/overflow.h>, will remove in v2 patch.
+
+You could move this 1 line below, to keep alphabetical order.
+And why do you say that it is redundant in your follow-up mail?
+
 >   #include <linux/crypto.h>
 >   #include <linux/slab.h>
 >   #include <linux/types.h>
@@ -100,6 +121,9 @@ Sorry for this redundant <linux/overflow.h>, will remove in v2 patch.
 >   #include <linux/atomic.h>
 >   #include <linux/container_of.h>
 > +#include <linux/overflow.h>
+
+You could move this 1 line below, to keep alphabetical order.
+
 >   #include <linux/crypto.h>
 >   #include <linux/slab.h>
 >   
@@ -112,3 +136,4 @@ Sorry for this redundant <linux/overflow.h>, will remove in v2 patch.
 >   	if (likely(req))
 >   		kpp_request_set_tfm(req, tfm);
 >   
+
