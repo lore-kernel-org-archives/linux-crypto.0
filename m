@@ -1,88 +1,113 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BEA20E022;
-	Tue, 22 Apr 2025 06:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E26819AD70;
+	Tue, 22 Apr 2025 06:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745303259; cv=none; b=KRTM3b1BTKVZp3tMDPzT3wXeSRN3vOkw04pnKpOmAa0gWmZykZXco2QH5AP6jWgmUcDerTHJV522wpmpO1Ru7jD1IIxoMYw3KUL7xbO3faspD34df74hueehR1sQHAC89K/WHSx26aLv3K4jKijSi+7/xH9q/PLO4IdVhxKO/b8=
+	t=1745304429; cv=none; b=XQcIQ+u+sTu3cXkeQkQgWvE39p7uT+SJfD7wdokLEHkLUrM3HvNiyDCdCFHulRIg4FO67r3nrQSap7kRS+zjhNFNNKJaW91mRcsk3+pk4jKZO+eoFefvy5jLzZAwSKswH6Pm4mzXKCiWs7Wxf3uJw+umDUrhLZt3Ci5e7o2cJoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745303259; c=relaxed/simple;
-	bh=J971MFlMG8cE20fQ7mW9nWhheuVP2D/JqVjl1UKI23c=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pEnhixIgfW7SjvAPuOSOy4z+AaQmUL/A2zojDNDV/rQe9CdBSusYRPMR0jr80PcbqAk+ATBuG3O4/63UumCeKPPYFGa+Xehr9/L9ADDqJh3xG5Khin2FUDt9LWe2KHfgsgDXF82wyUqnN5eC/lOMR3aAG+Ra2flI7arD342fGX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Ht64uCXm; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1745304429; c=relaxed/simple;
+	bh=YVZluO1X3RBFmIJW0IpbWqo0OTOkQjv8Y327GQmpQS0=;
+	h=Message-ID:Date:MIME-Version:To:From:CC:Subject:Content-Type; b=tePCemb5bCTMbpG12jdjXbk+eczn1XZKD+R0qa799LK0P2c4Kw9TfNaJAOzBhUMVHgLZjQ6eFDeW4F1kPmVrnVA2bLIbvsA2qBZ7cuHn9NRkLWejukoD6tt06UngjxZ8q45uSP3pNk3dNjcAzwB8a7jaYJqxjfF2v5sHKHpxlso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=bfKSwHP7; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Ht64uCXm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1745303254;
-	bh=AeI6VNX6/tapPhXwbxOzLL+4Sz7nX6NAMD5Wvvgsuhk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Ht64uCXmXvN4o3N2wU80kS4rOgN3w7qO+CkGvyhCdMXseODsrroqUtf3CQu1T3DnX
-	 DEEtmHlg35oUzz69ejsgyj9w23zWhwpziMg54Iwi5ISjzjzC46pdllN6iWXlDUOCq4
-	 AJBewKOJ8vwRt3PTGKqJ0dLIQgegDkNBQ3y+RxwcWPvkDfycFpYkUdHi1WjRX60kPK
-	 XPVNJMuOOnQxD1ncQrZcpNQOyLGVc9EWmKK7S+tvm2WX/OO22uIhxZXkBqHLFOj8mt
-	 ZYQSRnCwOBt4V9edZ+C9zpPDYFGwe596tt073O9TQR94zvaS1/Mhs3canIUgLJyxEk
-	 /006dD26/m6fw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZhXN65T0Bz4wcy;
-	Tue, 22 Apr 2025 16:27:34 +1000 (AEST)
-Date: Tue, 22 Apr 2025 16:27:33 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
- List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the crypto tree
-Message-ID: <20250422162733.4793e537@canb.auug.org.au>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="bfKSwHP7"
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53M6kx6Z1141738
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Apr 2025 01:46:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1745304419;
+	bh=tq8l23R0jEoqSUhgWC0+5q6sVhIPkeqX4nI2eOWLTYg=;
+	h=Date:To:From:CC:Subject;
+	b=bfKSwHP7sQ6xW8FH9BIRMw9liA1CyRiuNHfh7oia/nQNjWvL8ugxiemPRm188sASv
+	 TwqPmoKtXUmNkNGi1IZcZwWIYeBrHXIZ9WPlZnoHtu6AJb+4ZrPuY+I/XRrQOE7q06
+	 G7kOAoOgVJK4eOXpglVCkcUweB3nQ/zyXGW54uJQ=
+Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53M6kxDO058966
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 22 Apr 2025 01:46:59 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 22
+ Apr 2025 01:46:58 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 22 Apr 2025 01:46:58 -0500
+Received: from [172.24.227.40] (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53M6ktRQ109701;
+	Tue, 22 Apr 2025 01:46:56 -0500
+Message-ID: <01aad6ee-3885-486d-b7b6-2f78b61373bf@ti.com>
+Date: Tue, 22 Apr 2025 12:16:55 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4oELhuUpE+i02aAvM9a+JK=";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>
+From: T Pratham <t-pratham@ti.com>
+CC: <linux-crypto@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        Kamlesh
+ Gurudasani <kamlesh@ti.com>,
+        Manorit Chawdhry <m-chawdhry@ti.com>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>
+Subject: Usage of crypto_engine APIs
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
---Sig_/4oELhuUpE+i02aAvM9a+JK=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-Hi all,
+I was reading into crypto engine APIs from the kernel documentation as well as other crypto drivers using them, for their proper usage. I found some seemingly contradictory stuff from both sources.
 
-The following commit is also in the crypto-current tree as a different
-commit (but the same patch):
+[1] says the following:
+> You must put, at the start of your transform context your_tfm_ctx, the structure crypto_engine:
 
-  5976fe19e240 ("Revert "crypto: testmgr - Add multibuffer acomp testing"")
+whereas, in already existing implementations inside the kernel I found them not using the same. Eg.:
+[2]> 
+> struct rk_crypto_info {
+> 	struct list_head		list;
+> 	struct device			*dev;
+> 	[...]
+> 	struct crypto_engine *engine;
+> 	[...]
+> };
 
-This is commit
+and [3]
+> struct starfive_cryp_dev {
+> 	struct list_head			list;
+> 	struct device				*dev;
+> 	[...]
+> 	struct crypto_engine			*engine;
+> 	[...]
+> };
 
-  aece1cf14674 ("Revert "crypto: testmgr - Add multibuffer acomp testing"")
+In both these drivers, this is the only struct where crypt_engine object is included.
 
-in the crypto-current tree.
+Another thing I found intriguing is that [1] specifies to put the crypto engine struct object in the tfm_ctx structure, which doesn't make sense to me as it is a per tfm object. Now, I have not explored the internal workings of the crypto_engine API completely, but it makes logical sense to me that the queue provided by the engine should be for across all the tfms. Which makes its inclusion in the device struct in [2] and [3] as above intuitive to me.
 
---=20
-Cheers,
-Stephen Rothwell
+I have looked for any recent changes in either the doc or crypto_engine API to see if any such scenario caused a mismatch here, found probable commit [4] after which the docs are probably not updated. [5] also seems to remove all prepare/unprepare functions but these are still in [1].
 
---Sig_/4oELhuUpE+i02aAvM9a+JK=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+I would be glad if I am guided for the correct usage of the crypto_engine API. And, probably, also if the documentation is corrected.
 
------BEGIN PGP SIGNATURE-----
+Thanks and regards
+T Pratham <t-pratham@ti.com>
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgHNtYACgkQAVBC80lX
-0GwT/wgAgB78RcY7M9lF7FJfHiDi+n4M3VRhTKiij0zxgLmGl7OeEXf12HZfmLoS
-U5omYDK2Bpfq/IvajGmhgmJ4b2OoAXoTo0I9xVwCd8duaULb4RNQvG7v+3JxzfE1
-tmuZSenVADbMdwn6GOFpVk92dtY8s2J0uumviwmlE760J5hiG0GInUiKSCKjroZY
-AEUcIAwez44VeDfMIDePuR1zDILuQs78R/aMtTnobqeISi/NMQGEiJyIaFP0OXwG
-bZi7hmcQPNmHOc8Q8T0jWNLtPW/Wlf1cd8vVvv/+uSpRkjXhWTpIY+mBoYE5GRXo
-VADOc0OjpPJAeBuTW6yRmfTZwqOdpQ==
-=UCGi
------END PGP SIGNATURE-----
-
---Sig_/4oELhuUpE+i02aAvM9a+JK=--
+---
+[1] Docs - Crypto Engine: https://github.com/torvalds/linux/blob/master/Documentation/crypto/crypto_engine.rst
+[2] Rockchip rk3288 crypto driver: https://github.com/torvalds/linux/blob/master/drivers/crypto/rockchip/rk3288_crypto.h
+[3] Starfive jh7110 crypto driver: https://github.com/torvalds/linux/blob/master/drivers/crypto/starfive/jh7110-cryp.h
+[4] https://github.com/torvalds/linux/commit/e5e7eb023f24653b07329162b6359283b3a03a20
+[5] https://lore.kernel.org/all/ZNh94a7YYnvx0l8C@gondor.apana.org.au/
