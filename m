@@ -1,140 +1,88 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0956833C9
-	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 02:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BEA20E022;
+	Tue, 22 Apr 2025 06:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745289712; cv=none; b=nexHQ+D64UdcyA7qj+gkiJJnFEZF2awJlQz4ORy/wb1PEPcdKLvpD87h32UQPvcbnAfvkauJEuQB4tw5vyfQIeumyUUHb8f3qJDDjMyD7RNBtn+wKbPemBz36PdUM2XMwznwmN4R2Zu2lVHFauEOEhamJ3AudOqZw2cBYEexSrk=
+	t=1745303259; cv=none; b=KRTM3b1BTKVZp3tMDPzT3wXeSRN3vOkw04pnKpOmAa0gWmZykZXco2QH5AP6jWgmUcDerTHJV522wpmpO1Ru7jD1IIxoMYw3KUL7xbO3faspD34df74hueehR1sQHAC89K/WHSx26aLv3K4jKijSi+7/xH9q/PLO4IdVhxKO/b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745289712; c=relaxed/simple;
-	bh=S5ZUK07EsukMBHfpg0440asIguDijC68crG+9cB3/rA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=VbdcxZyeBaXD7ww/JAojLJ9kloRFvn7wIwc86QUICStGLhQ6aW57oZkVS6EeOjvmLulJDLpBwWxT8IhBZdCNTWKVPL0vU1l/Lojo+xaZigFxPope8e/7A5OT6RjaaaHKe6HRGUyNuXApmFpGwZnTBRoATQgFbdJ34l+74w4mu1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 21 Apr 2025 22:41:33 -0400
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Ben Collins <bcollins@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Horia =?utf-8?Q?Geant=EF=BF=BD~C?= <horia.geanta@nxp.com>, 
-	Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] caamalg: Make use of dev_*() instead of pr_*()
-Message-ID: <2025042122-infrared-bumblebee-b2d3dc@boujee-and-buff>
-Mail-Followup-To: linux-crypto@vger.kernel.org, 
-	Horia =?utf-8?Q?Geant=EF=BF=BD~C?= <horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, 
-	Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1745303259; c=relaxed/simple;
+	bh=J971MFlMG8cE20fQ7mW9nWhheuVP2D/JqVjl1UKI23c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pEnhixIgfW7SjvAPuOSOy4z+AaQmUL/A2zojDNDV/rQe9CdBSusYRPMR0jr80PcbqAk+ATBuG3O4/63UumCeKPPYFGa+Xehr9/L9ADDqJh3xG5Khin2FUDt9LWe2KHfgsgDXF82wyUqnN5eC/lOMR3aAG+Ra2flI7arD342fGX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Ht64uCXm; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Ht64uCXm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1745303254;
+	bh=AeI6VNX6/tapPhXwbxOzLL+4Sz7nX6NAMD5Wvvgsuhk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Ht64uCXmXvN4o3N2wU80kS4rOgN3w7qO+CkGvyhCdMXseODsrroqUtf3CQu1T3DnX
+	 DEEtmHlg35oUzz69ejsgyj9w23zWhwpziMg54Iwi5ISjzjzC46pdllN6iWXlDUOCq4
+	 AJBewKOJ8vwRt3PTGKqJ0dLIQgegDkNBQ3y+RxwcWPvkDfycFpYkUdHi1WjRX60kPK
+	 XPVNJMuOOnQxD1ncQrZcpNQOyLGVc9EWmKK7S+tvm2WX/OO22uIhxZXkBqHLFOj8mt
+	 ZYQSRnCwOBt4V9edZ+C9zpPDYFGwe596tt073O9TQR94zvaS1/Mhs3canIUgLJyxEk
+	 /006dD26/m6fw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZhXN65T0Bz4wcy;
+	Tue, 22 Apr 2025 16:27:34 +1000 (AEST)
+Date: Tue, 22 Apr 2025 16:27:33 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the crypto tree
+Message-ID: <20250422162733.4793e537@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xah4jqu6xngy66gh"
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; boundary="Sig_/4oELhuUpE+i02aAvM9a+JK=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-
---xah4jqu6xngy66gh
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+--Sig_/4oELhuUpE+i02aAvM9a+JK=
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Subject: [PATCH] caamalg: Make use of dev_*() instead of pr_*()
-MIME-Version: 1.0
 
-It's nice when messages line up with the device, and easy to implement
-since it's already available in the functions.
+Hi all,
 
-Signed-off-by: Ben Collins <bcollins@kernel.org>
-Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc: Gaurav Jain <gaurav.jain@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/crypto/caam/caamalg.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+The following commit is also in the crypto-current tree as a different
+commit (but the same patch):
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 2cfb1b8d8c7cf..d964a62ef9668 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -3633,7 +3633,7 @@ static int caam_cra_init(struct crypto_skcipher *tfm)
- 		fallback =3D crypto_alloc_skcipher(tfm_name, 0,
- 						 CRYPTO_ALG_NEED_FALLBACK);
- 		if (IS_ERR(fallback)) {
--			pr_err("Failed to allocate %s fallback: %ld\n",
-+			dev_err(ctx->jrdev, "Failed to allocate %s fallback: %ld\n",
- 			       tfm_name, PTR_ERR(fallback));
- 			return PTR_ERR(fallback);
- 		}
-@@ -3814,8 +3814,8 @@ int caam_algapi_init(struct device *ctrldev)
-=20
- 		err =3D crypto_engine_register_skcipher(&t_alg->skcipher);
- 		if (err) {
--			pr_warn("%s alg registration failed\n",
--				t_alg->skcipher.base.base.cra_driver_name);
-+			dev_warn(ctrldev, "%s alg registration failed\n",
-+				 t_alg->skcipher.base.base.cra_driver_name);
- 			continue;
- 		}
-=20
-@@ -3866,8 +3866,8 @@ int caam_algapi_init(struct device *ctrldev)
-=20
- 		err =3D crypto_engine_register_aead(&t_alg->aead);
- 		if (err) {
--			pr_warn("%s alg registration failed\n",
--				t_alg->aead.base.base.cra_driver_name);
-+			dev_warn(ctrldev, "%s alg registration failed\n",
-+				 t_alg->aead.base.base.cra_driver_name);
- 			continue;
- 		}
-=20
-@@ -3876,7 +3876,7 @@ int caam_algapi_init(struct device *ctrldev)
- 	}
-=20
- 	if (registered)
--		pr_info("caam algorithms registered in /proc/crypto\n");
-+		dev_info(ctrldev, "caam algorithms registered in /proc/crypto\n");
-=20
- 	return err;
- }
---=20
-2.49.0
+  5976fe19e240 ("Revert "crypto: testmgr - Add multibuffer acomp testing"")
 
+This is commit
+
+  aece1cf14674 ("Revert "crypto: testmgr - Add multibuffer acomp testing"")
+
+in the crypto-current tree.
 
 --=20
- Ben Collins
- https://libjwt.io
- https://github.com/benmcollins
- --
- 3EC9 7598 1672 961A 1139  173A 5D5A 57C7 242B 22CF
+Cheers,
+Stephen Rothwell
 
---xah4jqu6xngy66gh
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/4oELhuUpE+i02aAvM9a+JK=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEPsl1mBZylhoRORc6XVpXxyQrIs8FAmgHAd0ACgkQXVpXxyQr
-Is+PHxAAkuVmbjiT6BXdT+UMBepVdhR/hu7gz6u/s/7FhvdH41O9qXLJNLDnT90q
-lN2Z/oWVFyi9l2dN+YNtfWOP0EJn2seq6oTjN/ngQEBv1WU0dUgPS5LoDnFmfIGo
-001Mh7h5YLZPApUfmE14z3FwV7tFCrbo+OJFaNNk1uCIkkA2jDugRmiCsNhFwEgQ
-kX0NCRTTUyVT0Pi2pB5BKGBdk403UwdSlOvEWQjBASdVG7TVtQ1XTvuUsjHavja5
-Hf6BWb8uvJFKp4MrsrQ5ms8DRa2edb8Q8kM5AkVC8T+nu/ulxml7rz3mvefpNExk
-B9ZxDsTvF4kJWyIiZjNSAyDjB8vllPdZZWEzb9UJxcS3u+NVwSOKbut/jFgfI8j8
-dJYQ1bCUj3NDOG9uywi3RGpS+Go+K9Bz9IMBrott8Ee7gIhQz1dpwwtZz7ej3Yoo
-ky1DQqL0vtppSyvO0nPm86Mq4woI61j/dnvQdJm9rn7N7UFUKuhw188V3xl8X8aY
-sWcos5aVMdMQyZsfR2IkZhFAhdOKfgvzeND/bMoR6ZhmPJpwp5sAj90QOp0ZQyJt
-63+5cGxv5M/VFAjvZTEqPwbsliRjh8tilgQHPByrrUqGIg0hM1A873IsAfPqAQLA
-hQLiO1vXpdnoG0JPgE+Jxpk3Xb8xCcbLLyPo0+ZotVzEB2UYwvw=
-=8BB9
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgHNtYACgkQAVBC80lX
+0GwT/wgAgB78RcY7M9lF7FJfHiDi+n4M3VRhTKiij0zxgLmGl7OeEXf12HZfmLoS
+U5omYDK2Bpfq/IvajGmhgmJ4b2OoAXoTo0I9xVwCd8duaULb4RNQvG7v+3JxzfE1
+tmuZSenVADbMdwn6GOFpVk92dtY8s2J0uumviwmlE760J5hiG0GInUiKSCKjroZY
+AEUcIAwez44VeDfMIDePuR1zDILuQs78R/aMtTnobqeISi/NMQGEiJyIaFP0OXwG
+bZi7hmcQPNmHOc8Q8T0jWNLtPW/Wlf1cd8vVvv/+uSpRkjXhWTpIY+mBoYE5GRXo
+VADOc0OjpPJAeBuTW6yRmfTZwqOdpQ==
+=UCGi
 -----END PGP SIGNATURE-----
 
---xah4jqu6xngy66gh--
+--Sig_/4oELhuUpE+i02aAvM9a+JK=--
