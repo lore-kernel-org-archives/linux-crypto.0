@@ -1,46 +1,46 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2063.outbound.protection.outlook.com [40.107.93.63])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2054.outbound.protection.outlook.com [40.107.223.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EED7BAEC;
-	Tue, 22 Apr 2025 00:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520F813AD1C;
+	Tue, 22 Apr 2025 00:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745281480; cv=fail; b=GEgKmzFlklGgNneXTNCL2UtrlZJhyGIY4QbzJLnfH0rjitro6FG+elUVEYjl9qC7K/C448ZmuzvH5e/KVoxJlq8zom8a+Ovh2tTtd5xG6ReW1TO79d8QUOXDOHF25q8+ikrcRzxDGdsT3/1HJNvKYc0xur/MQonbyoIre2gwdvU=
+	t=1745281499; cv=fail; b=r1FXPZxRNoFE/+UDYFoiyb/0tVlMjg0yLhg5A68Ye329m8AiZvYXiUAGqxnLhN3Bw1J6RYFcKYlcYQ+86uYbXtdRCEPIKs2AYkgNXumsmegTQWvd0xzV5QcFkCLbFA9nwbyxweE1t+QCVCQt18jkTo0QApWra7QNkYSJXGMJpjE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745281480; c=relaxed/simple;
-	bh=iuvp7QQTCzbzbu2ifNUJ1n7IhP2Pi92rStx7EM4kNoU=;
+	s=arc-20240116; t=1745281499; c=relaxed/simple;
+	bh=5EoKTo0bswkf0QNkEbOjZ6qCP+9qcKB1BrSctwhXDvI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tEGwlKmNQhKGNz4ODM1yybtjzzUrgL0jEb47IR0uvOs9+c60iWU7ySEU+ZilXee+OO1UD/j1ADoAPD8wZCc0BuTJPM0EDYkjDz/P3AJrBLfvTLtf4K6wGefo2EWQYw+DmuDubN4RNZVyzPpgndfCLbLEbEUKBPUhEHyDERb7OBI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Nou5/P7A; arc=fail smtp.client-ip=40.107.93.63
+	 MIME-Version:Content-Type; b=IOp+zkjR/uyq/R/FA4YlS6xzIuHDjgNm7mXFvx0h/dTAfkYGrhUrBwR9aaMn41FubuQ6C5ZlOYJbP71hpjCok1+yOqWTvFcMCUuvm5t/UYacWvyVjef/EdR+ulgKOskF/jrN+bKu2jrl34gueJecMgT2auSv7rfgAT3auG5NjZQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SWGUZw+0; arc=fail smtp.client-ip=40.107.223.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Nou5/P7A"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SWGUZw+0"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XHSJc7xJYlvNFMeVcJvrJR/EYyV7mnreWhXXo43DjHKorsUL/mxUMMKDe2+migf0TfjhM1iS3vo3/0CnX2uifUwnylR/AszUt6cWf905aD0n+aMEbtTzTGvIoAGM5vhcwMeyi7FzN+oHE+Zs5fYE4rViouWdtueyjWWfCRK11OSHUyx0a9WspmsTKr8OTmUqxnmScPe+YmWHNl1qWoEKsqPa4gCChJOoMIbgkE/3p7/pGR12bhMBaLdF6LETdmKlXwTyEb+ALMnQsxgwgErNd9At9d6lcXLOFGAg6KBeCv/tmJUb4g9+BSCMKmGrtK4/ekU3IGM/qh7RiMP/rT6r0w==
+ b=dRvR3k003QKe3OEUImQ6kA3ygerkQOCP+XGkvajwh4BBUoNlR+YW8+hFVKDO59GQesglozvj6p6jPpyXrizqAu9NzqFLS6T+Xu8dnsJt9pZjJMsrLW1VJnFs/vWyzV5LX6+ldThc2ley0dtXzJaDq8upyRK2E9sHGg82D65sdXMvbxBb4oiIpXFjQ++WrQslh/XX+6POM+NHM9+5k3tre2B2maLAqekkLJxE39/9PR2CJBeSIWmAH4SGM3UMug8D5Rfn8JQ0McMYep3EmzOkrn9y+1QXbXthG71mrkuAFcJrF6B+ST2rVJTR9kOlms90pUsRHhxCn84r6pWAuHUxag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NYvwT5PreAuiHG1s1zbDu9qyWoPPUxadVhJp/06e0Vg=;
- b=UFTmVhP70ILqoYBtrJCtqlmrN+LUnEDAmKvBpO5cY+39+VqfRrbKJcwbQo9uKWFvtj5+wG3X4ogFCYYZbLWkbx6FLcSpigGscEo52rTyGgXqmtcOlKiQuaEMyh6rFZabB/Af4anC8eEONtAQsoEVvX3n+WyOAp+dpAtwzXzwFmRefaLsdHFFmkZdqzBRmhaGrTL92kwE7GO/jUCpPdtbtItQq9MEQOOrttfLCB0B9k+SSZNj+3Y4i4XZa+bCZY9QfIKrXZnoMW9MPNPt3OUX2xCIsI0xoy0bf+e2VfooiXj5R+SgSq0du88UQA+uaAEtRMnX14xebYdHQn6WbqjHAA==
+ bh=W/4Tc99I0VjnL+qa3veHlnKtnZFrRVXjP2j0N61Wabc=;
+ b=cVzwrI2TeHlUkZoxnr4IZ5futa7NHdHzbgMe94Jafr7UNVuKVw8oyX44zryrN+g05ApU8dUO6077rMuZfa+zA7nSkw56OxDrhtDatQ3i3cBtb4r3bGLASlWMLBrRaedgB53OIfeGImVRMV/m4jPcQRR+ptKFu71pd83rW/naCuAT+3FvpzwAvF+iCF9helcTqSlk4/G2vDSDPNZKSFmWwiNFEZLSBcuFjSoJklI2r3dqALh8vo3wcV5kOz/nZFCSLkflJ0L0A/BbzxxxNPNjd/kq+DSlfytRCgOfv+GEEUZSmx7QagMnBgiI5GR7ZSQvShOT5EkJ4+a9TGx7/ZOmQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NYvwT5PreAuiHG1s1zbDu9qyWoPPUxadVhJp/06e0Vg=;
- b=Nou5/P7AUnsMHtvqCo/Fv9N/VW6ML9R+W8lsUKlsSG8NI2zEe8giy96f1irUgAD7dRjpj1KRPYg8QY8X9qiS/81qi6LVr+d2XdmGalSQ/CrxUmxeJ88uHQqDHu01uV2Cv1EoSFx61kiXTLM6RFQS8kKvFtyjtIL9inHt8to7S2Y=
-Received: from BN9PR03CA0183.namprd03.prod.outlook.com (2603:10b6:408:f9::8)
- by PH0PR12MB5648.namprd12.prod.outlook.com (2603:10b6:510:14b::7) with
+ bh=W/4Tc99I0VjnL+qa3veHlnKtnZFrRVXjP2j0N61Wabc=;
+ b=SWGUZw+071jwTQrY3p0y8GzUcgkhOPm+vT7/jqM7M0sZCSvDg0F0dcNuMxm34WL4fyzsDpYpH2sn8jwn+k+e0zt1BUhkmyY5Ss/wujG4Z5Aq+yrcdCIDpUFeqhSrxGgS0IK0rZUsQL4xtKJRaN5iYbkNpuR0e+ZsNoe5DU+WJak=
+Received: from BL0PR02CA0059.namprd02.prod.outlook.com (2603:10b6:207:3d::36)
+ by CH3PR12MB7572.namprd12.prod.outlook.com (2603:10b6:610:144::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.32; Tue, 22 Apr
- 2025 00:24:32 +0000
-Received: from BN3PEPF0000B06D.namprd21.prod.outlook.com
- (2603:10b6:408:f9:cafe::c5) by BN9PR03CA0183.outlook.office365.com
- (2603:10b6:408:f9::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.36 via Frontend Transport; Tue,
- 22 Apr 2025 00:24:32 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.31; Tue, 22 Apr
+ 2025 00:24:53 +0000
+Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
+ (2603:10b6:207:3d:cafe::9e) by BL0PR02CA0059.outlook.office365.com
+ (2603:10b6:207:3d::36) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.35 via Frontend Transport; Tue,
+ 22 Apr 2025 00:24:53 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B06D.mail.protection.outlook.com (10.167.243.72) with Microsoft
+ BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8699.1 via Frontend Transport; Tue, 22 Apr 2025 00:24:32 +0000
+ 15.20.8699.1 via Frontend Transport; Tue, 22 Apr 2025 00:24:52 +0000
 Received: from purico-ed09host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Apr
- 2025 19:24:30 -0500
+ 2025 19:24:51 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
@@ -62,9 +62,9 @@ To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 CC: <x86@kernel.org>, <john.allen@amd.com>, <davem@davemloft.net>,
 	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH v3 1/4] crypto: ccp: New bit-field definitions for SNP_PLATFORM_STATUS command
-Date: Tue, 22 Apr 2025 00:24:21 +0000
-Message-ID: <0e0bda59404ab36c6bd7067ea13b8020e62dab11.1745279916.git.ashish.kalra@amd.com>
+Subject: [PATCH v3 2/4] crypto: ccp: Add support for SNP_FEATURE_INFO command
+Date: Tue, 22 Apr 2025 00:24:41 +0000
+Message-ID: <0ec035a24116dce7c8b2a36a29cf5eed96e0eb52.1745279916.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1745279916.git.ashish.kalra@amd.com>
 References: <cover.1745279916.git.ashish.kalra@amd.com>
@@ -80,92 +80,213 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06D:EE_|PH0PR12MB5648:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b929943-1fab-43bf-fb75-08dd81340d9a
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|CH3PR12MB7572:EE_
+X-MS-Office365-Filtering-Correlation-Id: 132f3039-73ef-4b9a-d3a8-08dd813419e7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014;
+	BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?81ULuNjQ/PSeWGbkpdGOoo6ex0IwLkCX19MoF/rVdLb56kaEuD7hAU4tJGNV?=
- =?us-ascii?Q?Tse2gq0due1N9MW43Iynfb6308n8Tr2PzWDuXOOc7auzfgwSXsavC49RfsK1?=
- =?us-ascii?Q?zJSjIiuvuBDi09x02xUSpLH2u3JkVh2zxGc5hWczeRFSEiBPDs9TB8wqnOgL?=
- =?us-ascii?Q?L4NMVLiA7rF+EC61b4BUNbH02GJ9hFa3kEYNLAAGz+/vDao3ip16/H306xyw?=
- =?us-ascii?Q?RtWGKEhkSu6bjl1vbm6afFwONwDr0xPjjvk6URPcL9DC5fcf5raxY/tURHj9?=
- =?us-ascii?Q?rsDllq8LM3CUHGtjKKtSINfBd7J/RbbxsfpNraekLdQJnY0FPpha4yT2EVol?=
- =?us-ascii?Q?D9j2kMBt1GrlPiLlWlvvjRb4dZREUpTkmKaxFuAIG9m99KEaqsFgbbYW/geK?=
- =?us-ascii?Q?i4puO4bqAPptAseOjPgSDb5CsvH1KHu9XamuJYwFqLYS48zzmIkZd5OXisiI?=
- =?us-ascii?Q?yc7Rd1t891r00WU41CVjgd2UR44bTK4ZEFWFEAFD9I/97ahg1TrDRQuMCa4j?=
- =?us-ascii?Q?HiDi9JkyaxXa3Fls4dweX3cs9lrr9rxTv8ANpQJ3l0/WkgXIFSEPTNmgDdl8?=
- =?us-ascii?Q?jPg7aOfoMAwUM79I75Nn0+YuFZS871laC5g07v42sOnj+4I1dA6h/MATZ0hw?=
- =?us-ascii?Q?TWlzTGFRze9EGEN6CoHVxPzImX/W1YWF3pGIvMztyUC+cxiPVINamoAcZzH2?=
- =?us-ascii?Q?InLpRzmnq+luYYusMiaYMrpLUSveju7olGoi/DYZyofSKuu51ZYZeD0Czwxe?=
- =?us-ascii?Q?Ma+/u7nTqTOeo1dlv/SjmMVpIp/6IUqa4wYQW/AOpUuj3SvIZBAbmWc8icAd?=
- =?us-ascii?Q?04DFajbk5FGSeYI/f9NN/dwgsqZgJyVt71w2FixVN8HkU8fIOyy9o59g1+gj?=
- =?us-ascii?Q?I4qjklBKL6D298dsBY7MTBo0CkN9Apzjuv9E49SZNyShp0Us6cBHh2ZBtwUs?=
- =?us-ascii?Q?E/QIRm0Dk2X9Y5xhhaWiNJN8SuiNaQhOQ594SK4WVBSMX7clfryWS+j491So?=
- =?us-ascii?Q?6roYrfqzaxHj8m/T+Y7ammKZGOWJEqDCQuCSzz1nN8zJ7yalGbmmT7bm8K+l?=
- =?us-ascii?Q?rdBiapjgBpRZxFc76yunJAhNZt8547cfzjfiKIh5n3YSAnE+2+aKBLsnnQBC?=
- =?us-ascii?Q?+6Eg7HEjQriig7qp2/mT2dySnz4+uKiwAIpP9haJ43UpjfPaCdQ/1KZyUdHx?=
- =?us-ascii?Q?G9f139/AxxwUyLwIdUNG3VxuOYV1vtzWx1E72sfFiilDqu96mnY/J6ZS3FIn?=
- =?us-ascii?Q?PG8m6X4ylegAyMZ8cvbdVkXEfaTtlZGmdh1/aKdgYkDn5DkCP4mbnyF2GSoy?=
- =?us-ascii?Q?T7gEUTzSNABLyIODr1QySE9/LvcR+wK3F0IRvtavGZrlvExXsnbQ0cxeQBAA?=
- =?us-ascii?Q?o6ND0iO+GFGRIXVz9Ku7bmj4Obb7qK9djwz69dlvrzp8MVn6W2bdmrcS6VxJ?=
- =?us-ascii?Q?aNcv//vmsnRrkBXT4PQ9L0f25OPsnmYXMCHSO0/d9H190KWNn7hfsyhUT9KJ?=
- =?us-ascii?Q?pDp3XGhPnMeD71784n90LLwrTRURAhogOiee?=
+	=?us-ascii?Q?Mi5MtHFLRuYNYxfCs6A0IlkBZxx/bpS91B4NXiwxm3btL5fQfXOhS33j6HP2?=
+ =?us-ascii?Q?GPhghWTe5KHOxjnJn+1Av4dgMbam3t+RH+MnQ51/scZDilLwOIgqfdnLuPH5?=
+ =?us-ascii?Q?oawYvTBjgTkcjXPdgaEXOimpqmqaGZBnSlPvqEIkTSFllapXhBukjgTV06Gt?=
+ =?us-ascii?Q?SnFHYNBnZ9YPfi77z+/DqQ43l6eJEyHuiEEqhrv5jUocKIcjbJyov/1/1lrX?=
+ =?us-ascii?Q?AI4iN05tZpYMEq1B9df9AczyUG5hDaO1pvKf+MPsxLsKj6dUJrFNxQIXE2vl?=
+ =?us-ascii?Q?qOjZ3asVI6TodLeiQKL37afu3K9Ga9yNtsptdane6/RtjAkMl8Fn1apLCByK?=
+ =?us-ascii?Q?uzn4Vb66EjJzlNQ4jbUIYjohdB4K3ecieJkzvli2HY3QVzdCvFLF5jMvBgvA?=
+ =?us-ascii?Q?yVL3NqGBc/nrExlyBVur5CdTYEcr9cP+0n4wbdh68x6nosNFQHYKmbGmcwWX?=
+ =?us-ascii?Q?OXCfsGWiKc/5go8Qn7zQLIdLrfbiAv+9lws+E0Alw33adJQb7yNfbON0BAt7?=
+ =?us-ascii?Q?7f0eRuNY1PWpLmaqijD4NUARqZfdtoMbkDGm22iPyVSBi4f57zEqolUBnhOG?=
+ =?us-ascii?Q?s4lhQDq3dTX2RnQaTrqW8jcz43gTySbJM9fXBN/YFyvaeRhLCji38Nv3w5bW?=
+ =?us-ascii?Q?PJWsQX6g9Sve6sYN8psawuWr/XHM6okrniDrCYaqLCETds5Zmz4MVPtP18lK?=
+ =?us-ascii?Q?FxhV5DfSKt4FijiU40C2vg6BxxRHDBFbr/wUgpCrzViW5gmgnnCHeZi43fLP?=
+ =?us-ascii?Q?Wzio0GuM1Mk0EMKAI/hoZWFogTPlxH1Q5VSuacxm3Dzh4+WOuOAV0S2Mv+UX?=
+ =?us-ascii?Q?ZOI0MXq2w4nqBZCPXdKSM2zfj4ZGgwt60tfMnv+G+Y1VlxXNz9P978M7IQpT?=
+ =?us-ascii?Q?nG94VI32VyFVzJ7PFw49NlHW3rJ6ojgwl8NqQfdjjJnBjWxoBeaTXYtPeoq0?=
+ =?us-ascii?Q?2C44MN2RzLMLFEBmZzoFm+pKhi108AHfCskp31aZoE18WBGMVkCYgh9+LkMi?=
+ =?us-ascii?Q?/9DJlcKU412SUwJKULsrlfBn67qB9icPCv31XOOVPln/bzxid2w4s5k1GD74?=
+ =?us-ascii?Q?VUmr3nQbJyPWN3pjrO57G3FKlDVbOcMcacgK5LgJuvoIWfeOv5WdZCpeBfX8?=
+ =?us-ascii?Q?Vf763oRGxSqLYuuBRyGc2KxEYqt3vxNnac4tG870aA992o8WpBEC2niChRU5?=
+ =?us-ascii?Q?Um5fhgT0pnKiry5n9sSVRVjKTvMxNFtvurAvaFMNDWJURytqOp7Z4dVF9Mqc?=
+ =?us-ascii?Q?Tc+gKXR13qXivAiFbf5Y4BEe3FZlTA67tSdb4eZ5PH6zZ02Ow8UDPJBjapDg?=
+ =?us-ascii?Q?xHguzyc9+ULucfEsAORKnQct7PnyNsBAxlsqIVvjWBw+gxK8sN3AbN1fkVHe?=
+ =?us-ascii?Q?E9ypXGs+Jl82HfojB66B0zYNvk2YW09yMR/CCn9+HEXq8KbImp/xef6yssyF?=
+ =?us-ascii?Q?aZBvk5Z8SB3eJn2D0jRWQzSMyY5vhaCJruLkpuHDkwMAbcgPI9U3Zu3KOzZG?=
+ =?us-ascii?Q?O5z1wCE5n3JQeMa9i+myXWDBRIMUUyt13mDw?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2025 00:24:32.2582
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2025 00:24:52.8942
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b929943-1fab-43bf-fb75-08dd81340d9a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 132f3039-73ef-4b9a-d3a8-08dd813419e7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B06D.namprd21.prod.outlook.com
+	BN3PEPF0000B06B.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5648
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7572
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Define new bit-field definitions returned by SNP_PLATFORM_STATUS command
-such as new capabilities like SNP_FEATURE_INFO command availability,
-ciphertext hiding enabled and capability.
+The FEATURE_INFO command provides host and guests a programmatic means
+to learn about the supported features of the currently loaded firmware.
+FEATURE_INFO command leverages the same mechanism as the CPUID instruction.
+Instead of using the CPUID instruction to retrieve Fn8000_0024,
+software can use FEATURE_INFO.
+
+Host/Hypervisor would use the FEATURE_INFO command, while guests would
+actually issue the CPUID instruction.
+
+The hypervisor can provide Fn8000_0024 values to the guest via the CPUID
+page in SNP_LAUNCH_UPDATE. As with all CPUID output recorded in that page,
+the hypervisor can filter Fn8000_0024. The firmware will examine
+Fn8000_0024 and apply its CPUID policy.
+
+During CCP module initialization, after firmware update, the SNP
+platform status and feature information from CPUID 0x8000_0024,
+sub-function 0, are cached in the sev_device structure.
 
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- include/uapi/linux/psp-sev.h | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/crypto/ccp/sev-dev.c | 47 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h |  3 +++
+ include/linux/psp-sev.h      | 29 ++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
 
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index eeb20dfb1fda..c2fd324623c4 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -185,6 +185,10 @@ struct sev_user_data_get_id2 {
-  * @mask_chip_id: whether chip id is present in attestation reports or not
-  * @mask_chip_key: whether attestation reports are signed or not
-  * @vlek_en: VLEK (Version Loaded Endorsement Key) hashstick is loaded
-+ * @feature_info: whether SNP_FEATURE_INFO command is available
-+ * @rapl_dis: whether RAPL is disabled
-+ * @ciphertext_hiding_cap: whether platform has ciphertext hiding capability
-+ * @ciphertext_hiding_en: whether ciphertext hiding is enabled
-  * @rsvd1: reserved
-  * @guest_count: the number of guest currently managed by the firmware
-  * @current_tcb_version: current TCB version
-@@ -200,7 +204,11 @@ struct sev_user_data_snp_status {
- 	__u32 mask_chip_id:1;		/* Out */
- 	__u32 mask_chip_key:1;		/* Out */
- 	__u32 vlek_en:1;		/* Out */
--	__u32 rsvd1:29;
-+	__u32 feature_info:1;		/* Out */
-+	__u32 rapl_dis:1;		/* Out */
-+	__u32 ciphertext_hiding_cap:1;	/* Out */
-+	__u32 ciphertext_hiding_en:1;	/* Out */
-+	__u32 rsvd1:25;
- 	__u32 guest_count;		/* Out */
- 	__u64 current_tcb_version;	/* Out */
- 	__u64 reported_tcb_version;	/* Out */
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index b08db412f752..f4f8a8905115 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -232,6 +232,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
+ 	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
++	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct snp_feature_info);
+ 	default:				return 0;
+ 	}
+ 
+@@ -1072,6 +1073,50 @@ static void snp_set_hsave_pa(void *arg)
+ 	wrmsrq(MSR_VM_HSAVE_PA, 0);
+ }
+ 
++static void snp_get_platform_data(void)
++{
++	struct sev_device *sev = psp_master->sev_data;
++	struct sev_data_snp_feature_info snp_feat_info;
++	struct snp_feature_info *feat_info;
++	struct sev_data_snp_addr buf;
++	int error = 0, rc;
++
++	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
++		return;
++
++	/*
++	 * The output buffer must be firmware page if SEV-SNP is
++	 * initialized.
++	 */
++	if (sev->snp_initialized)
++		return;
++
++	buf.address = __psp_pa(&sev->snp_plat_status);
++	rc = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &error);
++
++	/*
++	 * Do feature discovery of the currently loaded firmware,
++	 * and cache feature information from CPUID 0x8000_0024,
++	 * sub-function 0.
++	 */
++	if (!rc && sev->snp_plat_status.feature_info) {
++		/*
++		 * Use dynamically allocated structure for the SNP_FEATURE_INFO
++		 * command to handle any alignment and page boundary check
++		 * requirements.
++		 */
++		feat_info = kzalloc(sizeof(*feat_info), GFP_KERNEL);
++		snp_feat_info.length = sizeof(snp_feat_info);
++		snp_feat_info.ecx_in = 0;
++		snp_feat_info.feature_info_paddr = __psp_pa(feat_info);
++
++		rc = __sev_do_cmd_locked(SEV_CMD_SNP_FEATURE_INFO, &snp_feat_info, &error);
++		if (!rc)
++			sev->feat_info = *feat_info;
++		kfree(feat_info);
++	}
++}
++
+ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ {
+ 	struct sev_data_range_list *range_list = arg;
+@@ -2543,6 +2588,8 @@ void sev_pci_init(void)
+ 			 api_major, api_minor, build,
+ 			 sev->api_major, sev->api_minor, sev->build);
+ 
++	snp_get_platform_data();
++
+ 	return;
+ 
+ err:
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index 3e4e5574e88a..1c1a51e52d2b 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -57,6 +57,9 @@ struct sev_device {
+ 	bool cmd_buf_backup_active;
+ 
+ 	bool snp_initialized;
++
++	struct sev_user_data_snp_status snp_plat_status;
++	struct snp_feature_info feat_info;
+ };
+ 
+ int sev_dev_init(struct psp_device *psp);
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 0b3a36bdaa90..0149d4a6aceb 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -107,6 +107,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
+ 	SEV_CMD_SNP_COMMIT		= 0x0CB,
+ 	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
++	SEV_CMD_SNP_FEATURE_INFO	= 0x0CE,
+ 
+ 	SEV_CMD_MAX,
+ };
+@@ -812,6 +813,34 @@ struct sev_data_snp_commit {
+ 	u32 len;
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_feature_info - SEV_SNP_FEATURE_INFO structure
++ *
++ * @length: len of the command buffer read by the PSP
++ * @ecx_in: subfunction index
++ * @feature_info_paddr : SPA of the FEATURE_INFO structure
++ */
++struct sev_data_snp_feature_info {
++	u32 length;
++	u32 ecx_in;
++	u64 feature_info_paddr;
++} __packed;
++
++/**
++ * struct feature_info - FEATURE_INFO structure
++ *
++ * @eax: output of SNP_FEATURE_INFO command
++ * @ebx: output of SNP_FEATURE_INFO command
++ * @ecx: output of SNP_FEATURE_INFO command
++ * #edx: output of SNP_FEATURE_INFO command
++ */
++struct snp_feature_info {
++	u32 eax;
++	u32 ebx;
++	u32 ecx;
++	u32 edx;
++} __packed;
++
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ 
+ /**
 -- 
 2.34.1
 
