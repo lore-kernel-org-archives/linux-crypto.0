@@ -1,175 +1,147 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AF529617E;
-	Tue, 22 Apr 2025 17:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0322980DF
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 18:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745344460; cv=none; b=fYU2nuNyGFEKWPdYmqfjUvXt3xQ2LAtr0878orVGyGHARI36/zv288o3EP21LipzTSHypAHZm3W4PRhFAtAdqkkE0yT0Ccb897zgPbAIL5fuWnSBhBlYeyP39F6kUNUmz7EAyy/051495sOSv+xaxz/tTDSj2jauzlnmRVc/n9A=
+	t=1745345868; cv=none; b=Dib5cVLGlL6VrNlsaljZR7k0DR0pxdUzH7+2kYNsczxFNMO5deYEaYfFbx0AcoyOR9cr9vObf2IU/u2LKnhddK/5DFEnqP3z/pBaNYIXL+qQ9gd0Ow+qxT2DQRVoOqbA3eqR4OwhBOuyL81VpUpKUW0kWkHlQO1jsfCLZqwX4C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745344460; c=relaxed/simple;
-	bh=sLldpzzdvvwv7PJBbM9VxqQ7TJcJ3hBY7P8Pi7kuoSM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dgj2w3vyD/1v7JlOmS4P+N/OwB781kaZoAQDq2UudQSjqo7XKTe0/890PblJJk1UdwCEMHkme8ktDZj79Ts5Yx/UtA7kD5q7w4UO8H5H+P23SAcfbLGYE//EwuSdgLTLXgXDTrJ9eL+xXOClr3ugcSad+L+JBHPBcLKiYaZs1SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=TUhigKMz; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+	s=arc-20240116; t=1745345868; c=relaxed/simple;
+	bh=IdFsdaUTDRdghsX8VxeZ/2CwFZKCgCoBXb6SP0DHe8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a+ZBLGm7rHCkk0pbajA0rNsI5v8IxY7Aq0HDaOZk3lB+odoK+JOtVk7sgSf+GDn0SFuQV5o7TCv0P5jzv1ODTpa1ee6WWk5LTZQPoM1AaO3fpQbR6ee4JZl1coyEM2pKlhGA3q4wt4Ej/ISWrQdBVc8f/IzJnR8UhT2E8lnmIOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=MR39QwKd; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="TUhigKMz"
-Received: from francesco-nb (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id B8D2C1F910;
-	Tue, 22 Apr 2025 19:54:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1745344454;
-	bh=PkgELOsXXHcP6A6fIVqU8X1w8GCmR28cJ50CK+2ZOPw=; h=From:To:Subject;
-	b=TUhigKMzpq4lxbTvqBu567flmEypELZRJ42uUl3VWbuP864x0RFBR/QiDLjXxXkIg
-	 w7O2LJQ3CmbFpRs3tehhvwOxqdGzwUoLLZwIdCKWfW6/VmVlb2DmAyTNyk4vqlepzF
-	 eL2jOGZWK0/w/PP0Rv6IwrtOZgt3p9oqED7Q9b/q40pZ2jqprTIYbot89NokuYy+mV
-	 bnOgfHRcRrXaGG4ltJUT96VT+yc8gRpHzfgiOkgrrXuYqjrewPEi9gHa7I1dIrGBQ7
-	 54DsZp6qOgmUeAIlEJ4yRUM2oIT7YLRJn5Xvr/J0c5cq24saTyPDLhZvC4MbLqKUvA
-	 kHRWeRWsaP2Tw==
-Date: Tue, 22 Apr 2025 19:54:09 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Richard Weinberger <richard@nod.at>
-Cc: linux-mtd <linux-mtd@lists.infradead.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Zhihao Cheng <chengzhihao1@huawei.com>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: Linux 6.15-rc1 regression, folio/ubifs Oops
-Message-ID: <20250422175409.GA877874@francesco-nb>
-References: <20250408082018.GA23886@francesco-nb>
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="MR39QwKd"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so55823345e9.3
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 11:17:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1745345865; x=1745950665; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IdFsdaUTDRdghsX8VxeZ/2CwFZKCgCoBXb6SP0DHe8w=;
+        b=MR39QwKdTZf97qUao1OOktR4IOOeezi9QcWxba8PDqj58jDSlESHAdFOIinEPlDxKb
+         64yGwcf4wcOdweJxyTsTaqU28ZWYhD3t0G9ruyz5wW7GuIkX8+3ia11Tsq9zGEx3lZmT
+         gnhXBQl/jsxKepnd5jpoGunwnTsZVt2aL8vvc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745345865; x=1745950665;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IdFsdaUTDRdghsX8VxeZ/2CwFZKCgCoBXb6SP0DHe8w=;
+        b=e8WRMIN8Gd+dqaXu1/vIyOzIjQp+wMvCtz49/N51fIDAfqy23/rTGYQELwP2YYub/G
+         G5cqcZTVlsWVxY4ILHwHO5Lm5eeGTm36W5r8ysgGqWVOF3GbteVxT5/TwyzBfIMM8FZ5
+         sAI5fMpKXJiVxgeA0W2B2PxB3G3KGpcvvM88Nd0ha9gU+4vMnWPyFSbXXK+wyXzMQs5I
+         PDD7BvWrKPU6n6btZDVSRnUzTT0DiG2WIM8d6N/4ExEHZ2oTCueAuEVZOewCBf0/FfGP
+         hv/1AG8LX2xYxWEMWuJOTFRYVD5bgDc0DdYHAcmz445oCC4m2VyBvSICZj5pOL8tHs+q
+         ZvVg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIlUPBLjUk5KAgHoxDCRzEcChnsNW51OnoumgIPltJZ6BTs7D6cp0mAPfnpG8invr4Fi8jor8oLlACUOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlWWYQ8GVEq2REzhvGPsxhUTV4TXUj420aQUIl78rbOZOhdhk1
+	iKUuyJRK4BCmBsgYANl9nJxrJhPINlbLekwMycof8VEzOi8nrve3Ogq48hZqxNU=
+X-Gm-Gg: ASbGncvIdEwMMZUXdz6KslbuP8L+zLBURN7oD0hTykC8VcPhhCk8sIjcSQMriQaKrjY
+	tvSq0J7R9uvtkr3vO9IYVEtnHKO+g5ZfKJBh+h01vZnMig/PtcuRNp3XecSB+Q1rO7J4AcMILOC
+	++Qx0/dan5xqamlO9+9l19QY7x5ydt1HaRBkLAho6rTKUjzt/edcO1Ywp4F52qAfZv2hT0/J+Tp
+	8ZP1Hzn+LdC9KGW5msJ/k8O5Guoo6saLYr8AumTGrq0BpOWujdO7oG2yOv/mgWgDABwz/Zg+hpl
+	yEuu9D1R9RuylS/5aCSAxeuNTZqgKs5EvIbvMNGv+5JqX2RVXbTWeQ==
+X-Google-Smtp-Source: AGHT+IGCIWX5BVPPocsuZVlCHJEPbcYq+xpC2dCnc+JUo1mNSZJLBXsvA5T5y7KuBkfqLGA1fxMXKA==
+X-Received: by 2002:a05:600c:4708:b0:43d:300f:fa4a with SMTP id 5b1f17b1804b1-4406ab97c6cmr143192845e9.12.1745345864518;
+        Tue, 22 Apr 2025 11:17:44 -0700 (PDT)
+Received: from [192.168.86.29] ([83.104.178.215])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d5bbcfesm186100505e9.23.2025.04.22.11.17.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Apr 2025 11:17:44 -0700 (PDT)
+Message-ID: <c05731ae-bcf1-4747-b64c-0f4b79f3587f@citrix.com>
+Date: Tue, 22 Apr 2025 19:17:42 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408082018.GA23886@francesco-nb>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 00/19] x86: Trenchboot secure dynamic launch Linux
+ kernel support
+To: Dave Hansen <dave.hansen@intel.com>,
+ Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux.dev
+Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
+ mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+ nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
+ corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
+ baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+ trenchboot-devel@googlegroups.com
+References: <20250421162712.77452-1-ross.philipson@oracle.com>
+ <d96f9c5e-64ed-4c28-a8ad-e22daea19742@intel.com>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <d96f9c5e-64ed-4c28-a8ad-e22daea19742@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-+ Herbert, Zhihao
+On 21/04/2025 9:52 pm, Dave Hansen wrote:
+> Purely from the amount of interest and review tags and the whole "v14"
+> thing, it doesn't look like this is very important to anyone. Not to be
+> to flippant about it, but if nobody else cares, why should I (or the
+> other x86 maintainers)?
 
-Hello all,
+There are several downstreams already using this as a part of their
+overall system security, one example being
+https://www.qubes-os.org/doc/anti-evil-maid/
 
-On Tue, Apr 08, 2025 at 10:20:18AM +0200, Francesco Dolcini wrote:
-> I do have the following regression on single core system using UBIFS,
-> dual core seems not affected, any idea?
-> 
-> [    1.003798] 8<--- cut here ---
-> [    1.003843] Unable to handle kernel paging request at virtual address d21af3b8 when read
-> [    1.003876] [d21af3b8] *pgd=00000000
-> [    1.003914] Internal error: Oops: 5 [#1] SMP ARM
-> [    1.023282] Modules linked in:
-> [    1.026371] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.15.0-rc1-0.0.0-devel #1 PREEMPT
-> [    1.035110] Hardware name: Freescale i.MX7 Dual (Device Tree)
-> [    1.040881] PC is at scomp_acomp_comp_decomp+0x138/0x390
-> [    1.046243] LR is at scomp_acomp_decompress+0x10/0x48
-> [    1.051336] pc : [<c050aa90>]    lr : [<c050b07c>]    psr: 20000013
-> [    1.057634] sp : d0825a98  ip : 00000024  fp : c221d780
-> [    1.062886] r10: 00000576  r9 : d0825af0  r8 : c204e030
-> [    1.068137] r7 : cfdaf3b8  r6 : cfdaf3b8  r5 : c27b2540  r4 : cfd5b1e8
-> [    1.074694] r3 : 02400000  r2 : 00001000  r1 : d0b01000  r0 : 00000000
-> [    1.081251] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> [    1.088419] Control: 10c5387d  Table: 8000406a  DAC: 00000051
-> [    1.094189] Register r0 information: NULL pointer
-> [    1.098929] Register r1 information: 16-page vmalloc region starting at 0xd0b01000 allocated at crypto_scomp_init_tfm+0x8c/0x180
-> [    1.110556] Register r2 information: non-paged memory
-> [    1.115641] Register r3 information: non-paged memory
-> [    1.120726] Register r4 information: non-slab/vmalloc memory
-> [    1.126421] Register r5 information: slab kmalloc-192 start c27b2540 pointer offset 0 size 192
-> [    1.135112] Register r6 information: non-slab/vmalloc memory
-> [    1.140806] Register r7 information: non-slab/vmalloc memory
-> [    1.146500] Register r8 information: slab kmalloc-8k start c204e000 pointer offset 48 size 8192
-> [    1.155280] Register r9 information: 2-page vmalloc region starting at 0xd0824000 allocated at kernel_clone+0xa4/0x33c
-> [    1.166043] Register r10 information: non-paged memory
-> [    1.171219] Register r11 information: slab kmalloc-64 start c221d780 pointer offset 0 size 64
-> [    1.179827] Register r12 information: non-paged memory
-> [    1.185003] Process swapper/0 (pid: 1, stack limit = 0x(ptrval))
-> [    1.191043] Stack: (0xd0825a98 to 0xd0826000)
-> [    1.195431] 5a80:                                                       00000004 c07edfcc
-> [    1.203650] 5aa0: 00000000 00000000 00001000 c7d16f8f 04070598 c27b2540 c27b2540 c28b0000
-> [    1.211870] 5ac0: d0825c94 c0dc7064 d0825af0 c204e030 d0825c94 c050b07c c27b2540 00000576
-> [    1.220089] 5ae0: c28b0000 c04d40b8 00000000 c07ebbd0 00000000 00000000 d0825af8 d0825af8
-> [    1.228308] 5b00: 00000000 c7d16f8f c28b0000 c117b6d0 00000000 c204e030 cfdaf3b8 c43f7080
-> [    1.236527] 5b20: d0825b40 c04d47e0 d0825c94 c0dc7064 00000576 c2213cc0 0000f598 000005a6
-> [    1.244745] 5b40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.252963] 5b60: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.261182] 5b80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.269400] 5ba0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.277618] 5bc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.285837] 5be0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.294056] 5c00: c28b0000 c04c5e54 00000001 00000000 00000001 c289eb00 000009e4 20000000
-> [    1.302275] 5c20: 00000000 000002b0 0000f598 000005a6 c204e000 c7d16f8f cfd5fec0 00000000
-> [    1.310494] 5c40: 00000000 cfdaf3b8 00000000 00000000 c43f7080 c204e000 00001000 c04b58b4
-> [    1.318713] 5c60: 00000000 d0825c94 00000001 c7d16f8f d0825d50 c7d16f8f 00040cc0 00000016
-> [    1.326932] 5c80: c28b0000 00000000 00015600 c2068000 cfdaf3b8 00001000 000009e4 20000000
-> [    1.335151] 5ca0: 00000001 c7d16f8f 0eced000 cfdaf3b8 c28b0000 00000000 c27fc0c0 c43f7080
-> [    1.343370] 5cc0: 00000000 c43f7180 c27fc0c0 c04b60e4 00000000 ffffffff 00000000 c02a0430
-> [    1.351590] 5ce0: 00000cc0 00000001 ffffc005 00000001 d0825d50 00000000 c2068000 c7d16f8f
-> [    1.359809] 5d00: c43f7184 cfdaf3b8 00000000 c2068000 c27fc0c0 c43f7180 c2068000 c43f7180
-> [    1.368028] 5d20: c27fc0c0 c029e91c 00000000 c02ae4d8 00000000 00000000 c2068000 c43f7180
-> [    1.376247] 5d40: c27fc0c0 c7d16f8f d0825d50 d0825ef0 00000000 d0825e14 cfdaf3b8 c43f7180
-> [    1.384466] 5d60: c2068000 c43f7180 c27fc0c0 c02a0c5c 0eced000 00000000 00000001 00000000
-> [    1.392685] 5d80: c43f7190 00000000 00000100 c2068000 00000001 c2014800 c27fc0c0 c43f7180
-> [    1.400904] 5da0: c27fc120 00000000 00000000 00000000 00000000 00000000 000001ff c7d16f8f
-> [    1.409123] 5dc0: c2952fb8 00000000 d0825ed8 c43f7080 00000000 00000000 ffffffff ffffffff
-> [    1.417342] 5de0: d0825ef0 c02a10f4 00000000 d0825ed8 c289f000 beffffd4 00050003 c43f7080
-> [    1.425561] 5e00: cfdaf3dc c02d4c24 c43f7180 c27fc0c0 cfde4694 00000000 00000000 00000000
-> [    1.433779] 5e20: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.441997] 5e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.450215] 5e60: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.458433] 5e80: 00000000 00000000 00000000 00000000 00000000 c7d16f8f 00000000 00000000
-> [    1.466653] 5ea0: c27fc0c0 d0825f48 00000100 00000000 00000000 00000006 c2864a58 c0329db8
-> [    1.474871] 5ec0: 00000100 00000001 00000000 00050001 c2864a58 00000100 00000003 00000000
-> [    1.483090] 5ee0: d0825ed0 00000100 00000001 00000000 c27fc0c0 00000000 00000000 00000000
-> [    1.491308] 5f00: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 c7d16f8f
-> [    1.499527] 5f20: 00000000 c2864a00 00000000 00000001 c2068000 c11ed360 00000000 c0332988
-> [    1.507745] 5f40: 00000000 00000001 00000000 00000000 c2068000 c7d16f8f 00000000 c2864a00
-> [    1.515964] 5f60: c20e0000 c1108094 00000000 00000000 00000000 00000000 00000000 c0333de0
-> [    1.524183] 5f80: c11bd000 c0d8c568 00000000 00000000 00000000 c0101364 c11bd000 c0b40a68
-> [    1.532401] 5fa0: 00000000 c0b40b4c 00000000 c010014c 00000000 00000000 00000000 00000000
-> [    1.540620] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.548838] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000 00000000 00000000
-> [    1.557050] Call trace:
-> [    1.557069]  scomp_acomp_comp_decomp from scomp_acomp_decompress+0x10/0x48
-> [    1.566549]  scomp_acomp_decompress from ubifs_decompress_req+0xa8/0x148
-> [    1.573313]  ubifs_decompress_req from ubifs_decompress_folio+0xdc/0x20c
-> [    1.580065]  ubifs_decompress_folio from do_readpage+0x1e0/0x4b0
-> [    1.586116]  do_readpage from ubifs_read_folio+0x4c/0x4d8
-> [    1.591557]  ubifs_read_folio from filemap_read_folio+0x30/0x1fc
-> [    1.597612]  filemap_read_folio from filemap_get_pages+0x534/0x8ac
-> [    1.603841]  filemap_get_pages from filemap_read+0x120/0x504
-> [    1.609546]  filemap_read from __kernel_read+0x164/0x2f4
-> [    1.614907]  __kernel_read from bprm_execve+0x194/0x3f4
-> [    1.620180]  bprm_execve from kernel_execve+0x114/0x19c
-> [    1.625450]  kernel_execve from try_to_run_init_process+0xc/0x38
-> [    1.631505]  try_to_run_init_process from kernel_init+0xe4/0x134
-> [    1.637565]  kernel_init from ret_from_fork+0x14/0x28
-> [    1.642663] Exception stack(0xd0825fb0 to 0xd0825ff8)
-> [    1.647747] 5fa0:                                     00000000 00000000 00000000 00000000
-> [    1.655966] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [    1.664183] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> [    1.670835] Code: e1a03623 e0833622 e026609c e003039c (e7963003)
-> [    1.676964] ---[ end trace 0000000000000000 ]---
-> [    1.681608] note: swapper/0[1] exited with irqs disabled
-> [    1.681787] random: crng init done
-> [    1.691090] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
-> [    1.698805] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
-> 
+It's all giant out-of-tree patch series (in multiple projects; Grub,
+Xen, iPXE too).  Ross and others are trying to be good open source
+citizen and put it upstream where yet-more downstreams can benefit too.
 
-The issue is still present on current master, I did bisect it, the
-regression is from commit 7e0969bae493 ("ubifs: Pass folios to acomp"),
-reverting it on top of current master solves the issue.
-
-How should we proceed?
-
-Unless someone is able to look into that I gonna send a revert patch,
-the regression is severe, the machine is not booting anymore.
-
-Francesco
-
+~Andrew
