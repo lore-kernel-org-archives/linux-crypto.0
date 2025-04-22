@@ -1,71 +1,71 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE2A2153D0
-	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 10:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB921DDA1B;
+	Tue, 22 Apr 2025 10:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745317469; cv=none; b=V2MX5trSKsMXTM5nwYYLghXoez88bqvsaYyxHev6n++ssguARB+w2uBczFb34AABxg4GBhmKkornj9GaTzIkRkUFfPoEX0Mf/9TFgYrn936Ohc0MlFYDB21pqFp/geUPa8g5hTBizQ+Cn6Gfa2gXYWu5tONfINscw4yrkYVR8VM=
+	t=1745318492; cv=none; b=oDPjkQX/VhZH+oFi5yoEFNCSK6lEBQUwt3H5jQnDrneCugD2CdmV7qPnn3pGavyo6HzhTYtmsgf4i9cgLvjQO+h9OFAWQbP9zDnh6Fp0ZYJxeREjruaUwcq7tf042uowhmvQ6jMyMIRzDhyiQWv6xdSLen3L61Ro0Y8jGeie9O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745317469; c=relaxed/simple;
-	bh=SgCvUZ2Dp0RNubBkgcpghs+gpJMLGKE0/0/7IcZzQyc=;
+	s=arc-20240116; t=1745318492; c=relaxed/simple;
+	bh=66x0UyQR8PMEZlG1qdPoXjmEHbGp53frDd9eEdz9UNI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YefIR3VgfhkCMR5jSsfjHwMPK364S6k1UfLrYBBLXJeaR6ZuQyVascNcV4ylx/CQqQ7yDSbcRF9PvKQcN2/3UTcKUJpDo5JEYsZIWNb+bXCWpYzteWaOMNioU9xPfRX5hReUC/AltNOrY0tBnxNKF7KVQPfNIaj4PlZaS98xtrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QpWEkbCG; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=c7ifpeoF3fZxsQZT9jd42A3CVwrlRnH2IuCvOj6TV0lMOUvepYlQccEnIzO7cg6l0IYemH53B04bjF3ZaloYPAKVt9Xww9hf484Ma3SrMrjDgy/QePsXJJj2jU36LN/Fy2KyIgJRYhDVIveMqvA+qDx+h7Q/BKTOnt7ecnRFX9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GFIYQD3j; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QpWEkbCG"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-39efc1365e4so1668190f8f.1
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 03:24:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745317466; x=1745922266; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rGpR7DHAu3crb15D4InspITnPezktxxxhM+Ewq44KWQ=;
-        b=QpWEkbCGp9JY5duWuwOyD42AjKuQA6fT9QrM03bAUHnjjVoiYU4PYVG1GjMKBd2Exy
-         pN99M/rhjZiVpTIhA7m6I8HlXU1J6fhOtPrNcU0VW0Jlqvjnic4+WE7IXsL8iiqgiL29
-         X35JdXg0HxAd1gQ9vZlXHH1y6dvGQmcrXye8VtJowOIaj/MBEUMwi8yrmUhfhOM+fLM1
-         1Og8a+ArJCxPmipkYE9GDAjUT3UkNMQKAuPRnc25wpF1nPWkLTUvIa4lwAOlytk9rl+B
-         1fy9JqNj7XiYzwQCa+i2wMxEKZA66p3MjAxgA6C+UsrWkXmeuynXictud6uwrAfXaZo1
-         oO1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745317466; x=1745922266;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rGpR7DHAu3crb15D4InspITnPezktxxxhM+Ewq44KWQ=;
-        b=IgfTKjFgkQgNP8ZJIKBH4LNwNpfE6jWnEEwVZlpeZ8E0sf5aZBEgjyQMeo6PgYYGPu
-         yKPE+V0cB61LLCurkZk2tgYBBXJ4tblVIdGzNk3lf9ogmyvE/zzL/ANmd302N5n31ldF
-         8U89WiJwIyePcTKypI5c5qKQZoKUosttWX/Tb9DRKkeSk5c6m51hQS4/YW4hHQkGbcw7
-         UzmR3hbEvP0gQ/e8K5Kt8ewlPN3QGBzxSB8eT0zlNuE7/tqwGxWZLt6Oc6/2N5LV0ryp
-         6urwzau+eGghV61uSvx1/CJj3rh2QgSyUrcHPp2GceHEFr/O+p5RWgNakWrrquO3mCJ8
-         v+XA==
-X-Forwarded-Encrypted: i=1; AJvYcCXN+ABV6aZWiJhnpTYhh9tQPA9ACmf1oM0hzyEUHe2sQTeneex0y1OLnp3Cu6E7mxSspUlS/gJ3APp8TRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweNolwiCj8QiwpJ+UosuniqDl2432+dhtCwbHObfzUzdOfJHuy
-	D1WAbTqq7PwZ9LxNCXIMCEussWZfKYJCjsT94jFz6LDaH/xU3F0Ivw85trYXCVM=
-X-Gm-Gg: ASbGncv8SUEsKKhlkgmV2gZ5WNkAkffRa2XKATRwjcEWJNYrRdiwT3PYmJCJIs3p9LM
-	PbrD4UqHwv4lzgnXm2TrUTHi77RdTgU86t0TNAC+ZOBcPsbgs5uXCBoJdctGoetOPDSC+u8RBka
-	wIKBuhYugc5FqIooWht39JiqhgVDqe3NuP1Z5Jsikzs03lwa+wVYCmeOcINwCD6JchSHWiFJEa/
-	bb16yrxlPmzus7y2fuppHs8fogvq+Zd5qbsRuZvQmRhBXcaYrfOepcnd04N8z7DNhEwszexNMcO
-	xffCpSY1Mb7BryUIFUanFtVHzuuNwpz6tAMw1CUBcfftAg==
-X-Google-Smtp-Source: AGHT+IHutLphGbGE1hCdZLvaGiMQTDK82f9s6pbuK+KpdDS9Fqw1DprMwHPrbtUhvJfTJXHudGQhPw==
-X-Received: by 2002:a05:6000:40df:b0:391:ab2:9e80 with SMTP id ffacd0b85a97d-39efba51048mr10695810f8f.24.1745317465705;
-        Tue, 22 Apr 2025 03:24:25 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39efa43330esm14497713f8f.21.2025.04.22.03.24.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 03:24:25 -0700 (PDT)
-Date: Tue, 22 Apr 2025 13:24:22 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Su Hui <suhui@nfschina.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: using size_add() for kmalloc()
-Message-ID: <2169828c-127c-4bf7-b953-2f1194b72830@stanley.mountain>
-References: <20250421055104.663552-1-suhui@nfschina.com>
- <aAY0lyWzsRVDge_f@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GFIYQD3j"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53MA3xUA026063;
+	Tue, 22 Apr 2025 10:41:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ro8c0oezTvm8771KKaPZnVmA3AEU40
+	jiYFOCFR9Jw/c=; b=GFIYQD3jNyV4b1ZIRFmL2QjAYDr4nWfOAo3Evk9/1z7zUw
+	i15krz6qP9UFEzaHuv5mkDLKYDpfsVhqBAMaQeieDZBeHJLF9KYEQJph1V1MUccT
+	eo8GGlJUxUGUSq77LDGRA9Yq7H1EP/Oe0PxjdugE7nTLqVyeDULRQQnB0yGxuIjC
+	AWMUpTFBsI5c3Kad9kOO12WT5GavL7G5d/aVFt+zPtYgmvs55rJwKljPoJErZv0i
+	1duIwLCevCnhkp6dqtAwYy+y/DmWvI4Ywr9xrwUmYUQamY7OG7S/OhekEf6q0FLv
+	uIKHKR0Jmkoecy6pwQNqH4IPvjE/q44ZSK4TctUA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46691hg5qd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Apr 2025 10:41:22 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53M7FejH015374;
+	Tue, 22 Apr 2025 10:41:20 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 464qnkjbfc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Apr 2025 10:41:20 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53MAfITR34407024
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Apr 2025 10:41:18 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C44E320043;
+	Tue, 22 Apr 2025 10:41:18 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4E75A20040;
+	Tue, 22 Apr 2025 10:41:18 +0000 (GMT)
+Received: from osiris (unknown [9.87.146.239])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 22 Apr 2025 10:41:18 +0000 (GMT)
+Date: Tue, 22 Apr 2025 12:41:16 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v2 03/13] crypto: s390 - drop redundant dependencies on
+ S390
+Message-ID: <20250422104116.24507A7b-hca@linux.ibm.com>
+References: <20250420192609.295075-1-ebiggers@kernel.org>
+ <20250420192609.295075-4-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,31 +74,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAY0lyWzsRVDge_f@gondor.apana.org.au>
+In-Reply-To: <20250420192609.295075-4-ebiggers@kernel.org>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=V7h90fni c=1 sm=1 tr=0 ts=68077252 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=i5JU4SdIdlksGHhJ9uQA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: XSQVzYNRWO4K8dSJKrHUF-rfa72ff6Wp
+X-Proofpoint-GUID: XSQVzYNRWO4K8dSJKrHUF-rfa72ff6Wp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-22_05,2025-04-21_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 clxscore=1015 mlxlogscore=535 bulkscore=0 phishscore=0
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ spamscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504220079
 
-On Mon, Apr 21, 2025 at 08:05:43PM +0800, Herbert Xu wrote:
-> On Mon, Apr 21, 2025 at 01:51:06PM +0800, Su Hui wrote:
-> >
-> > @@ -433,7 +434,7 @@ static inline struct aead_request *aead_request_alloc(struct crypto_aead *tfm,
-> >  {
-> >  	struct aead_request *req;
-> >  
-> > -	req = kmalloc(sizeof(*req) + crypto_aead_reqsize(tfm), gfp);
-> > +	req = kmalloc(size_add(sizeof(*req), crypto_aead_reqsize(tfm)), gfp);
+On Sun, Apr 20, 2025 at 12:25:59PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> This is just wrong.  You should fail the allocation altogether
-> rather than proceeding with a length that is insufficient.
+> arch/s390/crypto/Kconfig is sourced only when CONFIG_S390=y, so there is
+> no need for the symbols defined inside it to depend on S390.
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/s390/crypto/Kconfig | 10 ----------
+>  1 file changed, 10 deletions(-)
 
-When size_add() overflows then it returns SIZE_MAX.  None of the
-allocation functions can allocate SIZE_MAX bytes so kmalloc() will
-fail and that's already handled correctly.  Meanwhile if
-"sizeof(*req) + crypto_aead_reqsize(tfm)" overflows then the
-allocation will succeed and it results in memory corruption.
-
-This is exactly what Kees did with the mass conversion to
-struct_size().  I occasionally run across places where Kees's mass
-conversion patches did fix real integer overflow bugs.
-
-regards,
-dan carpenter
-
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
