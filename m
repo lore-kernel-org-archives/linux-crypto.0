@@ -1,62 +1,143 @@
-Received: from mail.nfschina.com (unknown [42.101.60.213])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 567E2E56F;
-	Tue, 22 Apr 2025 01:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.213
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713521A238F
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 02:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745285466; cv=none; b=FgHnx6Rfy3XGWu1lfpf294c/sZB3HwSdv0lURJbZFV+4BrnWuhUFtqN48ozQppO9nx4+Jt7ig7BTN0Lr7INx0D4wCkxrywXZ+QkppC0hylVMQUFbJ4wNzUnfxGNgQPmJkZKXi5/Mmh8a1Hm1LFDR3LSvwUR7C0LSpYiFyJcMciQ=
+	t=1745289503; cv=none; b=R99kiAo4RZe5tL1DW2/QtBWcKVbPJgKf934rp89gwqeCuqz/pLG/Rz3D77Z4E6frKcv5R8JqTEc0jfz2qUxbUVU9VjLcq+SHYgPyKEgyvmLpZ6PVpYZDcLUQ0pOOrtH54E4pOS3cZV+6l9LkGUjttaM/L6D4AhRDUQciVjd8umE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745285466; c=relaxed/simple;
-	bh=2tNz2kXv3jashg49t3WWsa6T2n5qO7jpbD0oOspi6CU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type; b=Q08W3SK9FamBg2fwyFHEufSvWajBPazR+tU54UC6AjJxuyRtrGEDKUfOouZgQ6atB6o/ihcBKbLX2SO6mZCfJn4E2ExlEloNteUBa4mIe8dzf3VI12Yz91GrL0XI28xOY0Z79JLtMTYe9gbR9d0YiDRCn9d7ykdNefAMJzn+p+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from [172.30.20.101] (unknown [180.167.10.98])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id B8DED60107F45;
-	Tue, 22 Apr 2025 09:30:55 +0800 (CST)
-Message-ID: <e7f3efae-3571-46c0-9035-2a763990527f@nfschina.com>
-Date: Tue, 22 Apr 2025 09:30:55 +0800
+	s=arc-20240116; t=1745289503; c=relaxed/simple;
+	bh=m1yMCm5BRURQkTkthO160wuOl1r+JBDJ8JKG9mL70Ps=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jDg/fRWnKLJtzIjgGLMxSWUfCwpRyy2FD4bhETCqDw7R3tKign6JqPn8v9Tjw0Wf66W/NevAhcm5scPpWeTxIDfP4EGIa1zGlwf7/DQ35380UzcpDQCWTfbre1DfbKW09gySAAd8wOBxOVGtCZf1fZgLu8I7JpO9Pexn8S1Qc/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Tor8XHRm; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Tor8XHRm"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e589c258663so3750583276.1
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Apr 2025 19:38:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1745289500; x=1745894300; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m7eAi0OH7b5xLzSVXwOwnWLVsbzyannU+ufJsFO8uuE=;
+        b=Tor8XHRmHO8OGMWZ1tYU9UXptIchkli1Ae/YISB0al4DpG0LpP/kjgdsNViQ1t9Ztw
+         sCK4KbAaZT7eP/t7zF6tXqinpqSBQ3BnatQTxJRfOoTs1hu5Rgg4WSm/1XA0OFk6usNc
+         zgxxbjZM9rLJjsY9NlVFSfVSqwrsCBvHBdMn0NpLeItEdyxVgoA2qo/nhwEAX7fNL4DE
+         ZTGCQtS1MZWdeYd5dfV6udH8EcuNjZCtzCzmCgTDGncF3UE+MpcHyCj9sRUVyjyE8NF4
+         JkZsUJ42yGLGuuQLJ9msb0lY9uJ0ynoViFZGne8rOikKoDKfeEjNd9IFzegsSxg+t8rc
+         gAlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745289500; x=1745894300;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m7eAi0OH7b5xLzSVXwOwnWLVsbzyannU+ufJsFO8uuE=;
+        b=m61XxafvFSM/605F6LXgWLjVpqHTgkNW2pFblGlS4UOZSG3LhF7gK+5ElT0G+L9nJf
+         h0MRtoGj87KUDhHLD7UWpsfVYWa+dZo0Ry/riNwEFNErBG7fzLsJTKTLB7wVC+FthE3k
+         Sd1seq1xe30xhVIuxpce9emThwVqsdJyU9NUZGBDgmHgaqVAnLAFBNgFU+q7i5gq/OX4
+         5Ih2tcczt3bSplEUJMQIxAWKQVXcnkb3zuOv9cH5gncBee3iCx8ZwQkeT/HYAVmKQsCH
+         IJhhevb2tdftITaWA/xHD0SQGd9OiduZlxbx4GPtyEdFHw+jgOZawBkZlGCp0bsGNo6W
+         QvVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXclaL73QIOZogLR5yzBND9n0GOCDQBa8m7CMtCLKhppCgKBZdYT2nJAoYXYaUrN1b4LlWdzEcifRKfsAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY4cAxzeJZmj7lMw83+f8AmYbj7ktZgBuX7RkOHDBp4fHv+Y0b
+	ybR/tTlQggI3Gf4Y59hZZvHZ4+JQkFb9hzNxi1FOEtLL3y3KSy6lVeTHJqBplEzVqv/kfF1bJbF
+	1XC7+WmSu5zL9HoixdMy9WfFVqXcruYRmumre
+X-Gm-Gg: ASbGnctUfa1Rng2V4cFMfS35QBQcvCI67f4nk2U3iudev+69YAHgDJTZ5romC5d0w0S
+	ja71ASzXgnlrlMlDTYo9nYTYoPsnQjVNL/CuZ7MDBkV3qMYLNMFqM5dp9azTeAs/Wvj9CXv1pba
+	AcjE94+4GZYQ085JEZuoBwX8RH7UTh2HYB
+X-Google-Smtp-Source: AGHT+IEBsF+GdUC/ycqCwWJCqQEPIgxnxovCs8VulAPF24hG16HtUyXji535ndx9u4H0Zeebq7vBj70AA6oUc8NrXEc=
+X-Received: by 2002:a05:6902:1588:b0:e72:9562:7638 with SMTP id
+ 3f1490d57ef6-e7297eae346mr19133785276.39.1745289500228; Mon, 21 Apr 2025
+ 19:38:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: using size_add() for kmalloc()
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-hardening@vger.kernel.org
-Content-Language: en-US
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
-In-Reply-To: <aAY0lyWzsRVDge_f@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
+ <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
+ <87semdjxcp.fsf@microsoft.com> <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
+ <87friajmd5.fsf@microsoft.com> <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
+ <87a58hjune.fsf@microsoft.com> <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
+ <87y0w0hv2x.fsf@microsoft.com> <CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGmRAjbusQ@mail.gmail.com>
+ <CAHC9VhS0kQf1mdrvdrs4F675ZbGh9Yw8r2noZqDUpOxRYoTL8Q@mail.gmail.com> <CAADnVQK7kyBso6bNEtNyC6zTBDuBv-K-c4a9KBVid+B405VX6Q@mail.gmail.com>
+In-Reply-To: <CAADnVQK7kyBso6bNEtNyC6zTBDuBv-K-c4a9KBVid+B405VX6Q@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 21 Apr 2025 22:38:09 -0400
+X-Gm-Features: ATxdqUG68qWAXIVdhOvLBjOhkCBCyDq8PvskWDE6YshFl7NEp_uX0oI69pZKXTU
+Message-ID: <CAHC9VhQE6xXQ1E1hmWzbrPNyVh_gKsp8U_GnPYr=0gS_RMATWQ@mail.gmail.com>
+Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, Jonathan Corbet <corbet@lwn.net>, 
+	David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, 
+	Matteo Croce <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/4/21 20:05, Herbert Xu wrote:
-> On Mon, Apr 21, 2025 at 01:51:06PM +0800, Su Hui wrote:
->> @@ -433,7 +434,7 @@ static inline struct aead_request *aead_request_alloc(struct crypto_aead *tfm,
->>   {
->>   	struct aead_request *req;
->>   
->> -	req = kmalloc(sizeof(*req) + crypto_aead_reqsize(tfm), gfp);
->> +	req = kmalloc(size_add(sizeof(*req), crypto_aead_reqsize(tfm)), gfp);
-> This is just wrong.  You should fail the allocation altogether
-> rather than proceeding with a length that is insufficient.
+On Mon, Apr 21, 2025 at 7:48=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+> On Mon, Apr 21, 2025 at 3:04=E2=80=AFPM Paul Moore <paul@paul-moore.com> =
+wrote:
+> > On Mon, Apr 21, 2025 at 4:13=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > > On Wed, Apr 16, 2025 at 10:31=E2=80=AFAM Blaise Boscaccy
+> > > <bboscaccy@linux.microsoft.com> wrote:
+> > > >
+> > > > > Hacking into bpf internal objects like maps is not acceptable.
+> > > >
+> > > > We've heard your concerns about kern_sys_bpf and we agree that the =
+LSM
+> > > > should not be calling it. The proposal in this email should meet bo=
+th of
+> > > > our needs
+> > > > https://lore.kernel.org/bpf/874iypjl8t.fsf@microsoft.com/
+> >
+> > ...
+> >
+> > > Calling bpf_map_get() and
+> > > map->ops->map_lookup_elem() from a module is not ok either.
+> >
+> > A quick look uncovers code living under net/ which calls into these API=
+s.
 >
-> However, reqsize shouldn't be anywhere near overflowing in the
-> first place.  If you're truly worried about this, you should
-> change the algorithm registration code to check whether reqsize
-> is sane.
->
-> And that needs to wait until the algorithms are fixed to not use
-> dynamic reqsizes.
-Got it, thanks for your explanation.
-This patch (v1 and v2) is wrong.  Sorry for the noise again.
+> and your point is ?
 
-Su Hui
+Simply the observation that the APIs you've mentioned are currently
+being used by code living under net/; you're free to take from that
+whatever you will.
 
+> Again, Nack to hacking into bpf internals from LSM,
+> module or kernel subsystem.
+
+I heard you the first time and rest assured I've noted your general
+objection regarding use of the BPF API.  I'm personally still
+interested in seeing a v3 before deciding on next steps as there were
+a number of other issues mentioned during the v2 review that need
+attention.  I would encourage you to continue to participate in future
+reviews of Hornet, but of course that is entirely up to you.  In the
+absence of any additional review feedback, I'll preserve your NACK if
+we ever get to a point that your comments are worth mentioning.
+
+--
+paul-moore.com
