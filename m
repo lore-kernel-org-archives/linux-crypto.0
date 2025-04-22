@@ -1,143 +1,140 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713521A238F
-	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 02:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0956833C9
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2025 02:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745289503; cv=none; b=R99kiAo4RZe5tL1DW2/QtBWcKVbPJgKf934rp89gwqeCuqz/pLG/Rz3D77Z4E6frKcv5R8JqTEc0jfz2qUxbUVU9VjLcq+SHYgPyKEgyvmLpZ6PVpYZDcLUQ0pOOrtH54E4pOS3cZV+6l9LkGUjttaM/L6D4AhRDUQciVjd8umE=
+	t=1745289712; cv=none; b=nexHQ+D64UdcyA7qj+gkiJJnFEZF2awJlQz4ORy/wb1PEPcdKLvpD87h32UQPvcbnAfvkauJEuQB4tw5vyfQIeumyUUHb8f3qJDDjMyD7RNBtn+wKbPemBz36PdUM2XMwznwmN4R2Zu2lVHFauEOEhamJ3AudOqZw2cBYEexSrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745289503; c=relaxed/simple;
-	bh=m1yMCm5BRURQkTkthO160wuOl1r+JBDJ8JKG9mL70Ps=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jDg/fRWnKLJtzIjgGLMxSWUfCwpRyy2FD4bhETCqDw7R3tKign6JqPn8v9Tjw0Wf66W/NevAhcm5scPpWeTxIDfP4EGIa1zGlwf7/DQ35380UzcpDQCWTfbre1DfbKW09gySAAd8wOBxOVGtCZf1fZgLu8I7JpO9Pexn8S1Qc/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Tor8XHRm; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Tor8XHRm"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e589c258663so3750583276.1
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Apr 2025 19:38:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1745289500; x=1745894300; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m7eAi0OH7b5xLzSVXwOwnWLVsbzyannU+ufJsFO8uuE=;
-        b=Tor8XHRmHO8OGMWZ1tYU9UXptIchkli1Ae/YISB0al4DpG0LpP/kjgdsNViQ1t9Ztw
-         sCK4KbAaZT7eP/t7zF6tXqinpqSBQ3BnatQTxJRfOoTs1hu5Rgg4WSm/1XA0OFk6usNc
-         zgxxbjZM9rLJjsY9NlVFSfVSqwrsCBvHBdMn0NpLeItEdyxVgoA2qo/nhwEAX7fNL4DE
-         ZTGCQtS1MZWdeYd5dfV6udH8EcuNjZCtzCzmCgTDGncF3UE+MpcHyCj9sRUVyjyE8NF4
-         JkZsUJ42yGLGuuQLJ9msb0lY9uJ0ynoViFZGne8rOikKoDKfeEjNd9IFzegsSxg+t8rc
-         gAlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745289500; x=1745894300;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m7eAi0OH7b5xLzSVXwOwnWLVsbzyannU+ufJsFO8uuE=;
-        b=m61XxafvFSM/605F6LXgWLjVpqHTgkNW2pFblGlS4UOZSG3LhF7gK+5ElT0G+L9nJf
-         h0MRtoGj87KUDhHLD7UWpsfVYWa+dZo0Ry/riNwEFNErBG7fzLsJTKTLB7wVC+FthE3k
-         Sd1seq1xe30xhVIuxpce9emThwVqsdJyU9NUZGBDgmHgaqVAnLAFBNgFU+q7i5gq/OX4
-         5Ih2tcczt3bSplEUJMQIxAWKQVXcnkb3zuOv9cH5gncBee3iCx8ZwQkeT/HYAVmKQsCH
-         IJhhevb2tdftITaWA/xHD0SQGd9OiduZlxbx4GPtyEdFHw+jgOZawBkZlGCp0bsGNo6W
-         QvVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXclaL73QIOZogLR5yzBND9n0GOCDQBa8m7CMtCLKhppCgKBZdYT2nJAoYXYaUrN1b4LlWdzEcifRKfsAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY4cAxzeJZmj7lMw83+f8AmYbj7ktZgBuX7RkOHDBp4fHv+Y0b
-	ybR/tTlQggI3Gf4Y59hZZvHZ4+JQkFb9hzNxi1FOEtLL3y3KSy6lVeTHJqBplEzVqv/kfF1bJbF
-	1XC7+WmSu5zL9HoixdMy9WfFVqXcruYRmumre
-X-Gm-Gg: ASbGnctUfa1Rng2V4cFMfS35QBQcvCI67f4nk2U3iudev+69YAHgDJTZ5romC5d0w0S
-	ja71ASzXgnlrlMlDTYo9nYTYoPsnQjVNL/CuZ7MDBkV3qMYLNMFqM5dp9azTeAs/Wvj9CXv1pba
-	AcjE94+4GZYQ085JEZuoBwX8RH7UTh2HYB
-X-Google-Smtp-Source: AGHT+IEBsF+GdUC/ycqCwWJCqQEPIgxnxovCs8VulAPF24hG16HtUyXji535ndx9u4H0Zeebq7vBj70AA6oUc8NrXEc=
-X-Received: by 2002:a05:6902:1588:b0:e72:9562:7638 with SMTP id
- 3f1490d57ef6-e7297eae346mr19133785276.39.1745289500228; Mon, 21 Apr 2025
- 19:38:20 -0700 (PDT)
+	s=arc-20240116; t=1745289712; c=relaxed/simple;
+	bh=S5ZUK07EsukMBHfpg0440asIguDijC68crG+9cB3/rA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VbdcxZyeBaXD7ww/JAojLJ9kloRFvn7wIwc86QUICStGLhQ6aW57oZkVS6EeOjvmLulJDLpBwWxT8IhBZdCNTWKVPL0vU1l/Lojo+xaZigFxPope8e/7A5OT6RjaaaHKe6HRGUyNuXApmFpGwZnTBRoATQgFbdJ34l+74w4mu1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 21 Apr 2025 22:41:33 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Ben Collins <bcollins@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Horia =?utf-8?Q?Geant=EF=BF=BD~C?= <horia.geanta@nxp.com>, 
+	Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] caamalg: Make use of dev_*() instead of pr_*()
+Message-ID: <2025042122-infrared-bumblebee-b2d3dc@boujee-and-buff>
+Mail-Followup-To: linux-crypto@vger.kernel.org, 
+	Horia =?utf-8?Q?Geant=EF=BF=BD~C?= <horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, 
+	Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
- <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
- <87semdjxcp.fsf@microsoft.com> <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
- <87friajmd5.fsf@microsoft.com> <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
- <87a58hjune.fsf@microsoft.com> <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
- <87y0w0hv2x.fsf@microsoft.com> <CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGmRAjbusQ@mail.gmail.com>
- <CAHC9VhS0kQf1mdrvdrs4F675ZbGh9Yw8r2noZqDUpOxRYoTL8Q@mail.gmail.com> <CAADnVQK7kyBso6bNEtNyC6zTBDuBv-K-c4a9KBVid+B405VX6Q@mail.gmail.com>
-In-Reply-To: <CAADnVQK7kyBso6bNEtNyC6zTBDuBv-K-c4a9KBVid+B405VX6Q@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 21 Apr 2025 22:38:09 -0400
-X-Gm-Features: ATxdqUG68qWAXIVdhOvLBjOhkCBCyDq8PvskWDE6YshFl7NEp_uX0oI69pZKXTU
-Message-ID: <CAHC9VhQE6xXQ1E1hmWzbrPNyVh_gKsp8U_GnPYr=0gS_RMATWQ@mail.gmail.com>
-Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, Jonathan Corbet <corbet@lwn.net>, 
-	David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	keyrings@vger.kernel.org, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, 
-	Matteo Croce <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xah4jqu6xngy66gh"
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
+
+
+--xah4jqu6xngy66gh
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH] caamalg: Make use of dev_*() instead of pr_*()
+MIME-Version: 1.0
 
-On Mon, Apr 21, 2025 at 7:48=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
-> On Mon, Apr 21, 2025 at 3:04=E2=80=AFPM Paul Moore <paul@paul-moore.com> =
-wrote:
-> > On Mon, Apr 21, 2025 at 4:13=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > > On Wed, Apr 16, 2025 at 10:31=E2=80=AFAM Blaise Boscaccy
-> > > <bboscaccy@linux.microsoft.com> wrote:
-> > > >
-> > > > > Hacking into bpf internal objects like maps is not acceptable.
-> > > >
-> > > > We've heard your concerns about kern_sys_bpf and we agree that the =
-LSM
-> > > > should not be calling it. The proposal in this email should meet bo=
-th of
-> > > > our needs
-> > > > https://lore.kernel.org/bpf/874iypjl8t.fsf@microsoft.com/
-> >
-> > ...
-> >
-> > > Calling bpf_map_get() and
-> > > map->ops->map_lookup_elem() from a module is not ok either.
-> >
-> > A quick look uncovers code living under net/ which calls into these API=
-s.
->
-> and your point is ?
+It's nice when messages line up with the device, and easy to implement
+since it's already available in the functions.
 
-Simply the observation that the APIs you've mentioned are currently
-being used by code living under net/; you're free to take from that
-whatever you will.
+Signed-off-by: Ben Collins <bcollins@kernel.org>
+Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
+Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc: Gaurav Jain <gaurav.jain@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ drivers/crypto/caam/caamalg.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-> Again, Nack to hacking into bpf internals from LSM,
-> module or kernel subsystem.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 2cfb1b8d8c7cf..d964a62ef9668 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -3633,7 +3633,7 @@ static int caam_cra_init(struct crypto_skcipher *tfm)
+ 		fallback =3D crypto_alloc_skcipher(tfm_name, 0,
+ 						 CRYPTO_ALG_NEED_FALLBACK);
+ 		if (IS_ERR(fallback)) {
+-			pr_err("Failed to allocate %s fallback: %ld\n",
++			dev_err(ctx->jrdev, "Failed to allocate %s fallback: %ld\n",
+ 			       tfm_name, PTR_ERR(fallback));
+ 			return PTR_ERR(fallback);
+ 		}
+@@ -3814,8 +3814,8 @@ int caam_algapi_init(struct device *ctrldev)
+=20
+ 		err =3D crypto_engine_register_skcipher(&t_alg->skcipher);
+ 		if (err) {
+-			pr_warn("%s alg registration failed\n",
+-				t_alg->skcipher.base.base.cra_driver_name);
++			dev_warn(ctrldev, "%s alg registration failed\n",
++				 t_alg->skcipher.base.base.cra_driver_name);
+ 			continue;
+ 		}
+=20
+@@ -3866,8 +3866,8 @@ int caam_algapi_init(struct device *ctrldev)
+=20
+ 		err =3D crypto_engine_register_aead(&t_alg->aead);
+ 		if (err) {
+-			pr_warn("%s alg registration failed\n",
+-				t_alg->aead.base.base.cra_driver_name);
++			dev_warn(ctrldev, "%s alg registration failed\n",
++				 t_alg->aead.base.base.cra_driver_name);
+ 			continue;
+ 		}
+=20
+@@ -3876,7 +3876,7 @@ int caam_algapi_init(struct device *ctrldev)
+ 	}
+=20
+ 	if (registered)
+-		pr_info("caam algorithms registered in /proc/crypto\n");
++		dev_info(ctrldev, "caam algorithms registered in /proc/crypto\n");
+=20
+ 	return err;
+ }
+--=20
+2.49.0
 
-I heard you the first time and rest assured I've noted your general
-objection regarding use of the BPF API.  I'm personally still
-interested in seeing a v3 before deciding on next steps as there were
-a number of other issues mentioned during the v2 review that need
-attention.  I would encourage you to continue to participate in future
-reviews of Hornet, but of course that is entirely up to you.  In the
-absence of any additional review feedback, I'll preserve your NACK if
-we ever get to a point that your comments are worth mentioning.
 
---
-paul-moore.com
+--=20
+ Ben Collins
+ https://libjwt.io
+ https://github.com/benmcollins
+ --
+ 3EC9 7598 1672 961A 1139  173A 5D5A 57C7 242B 22CF
+
+--xah4jqu6xngy66gh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEPsl1mBZylhoRORc6XVpXxyQrIs8FAmgHAd0ACgkQXVpXxyQr
+Is+PHxAAkuVmbjiT6BXdT+UMBepVdhR/hu7gz6u/s/7FhvdH41O9qXLJNLDnT90q
+lN2Z/oWVFyi9l2dN+YNtfWOP0EJn2seq6oTjN/ngQEBv1WU0dUgPS5LoDnFmfIGo
+001Mh7h5YLZPApUfmE14z3FwV7tFCrbo+OJFaNNk1uCIkkA2jDugRmiCsNhFwEgQ
+kX0NCRTTUyVT0Pi2pB5BKGBdk403UwdSlOvEWQjBASdVG7TVtQ1XTvuUsjHavja5
+Hf6BWb8uvJFKp4MrsrQ5ms8DRa2edb8Q8kM5AkVC8T+nu/ulxml7rz3mvefpNExk
+B9ZxDsTvF4kJWyIiZjNSAyDjB8vllPdZZWEzb9UJxcS3u+NVwSOKbut/jFgfI8j8
+dJYQ1bCUj3NDOG9uywi3RGpS+Go+K9Bz9IMBrott8Ee7gIhQz1dpwwtZz7ej3Yoo
+ky1DQqL0vtppSyvO0nPm86Mq4woI61j/dnvQdJm9rn7N7UFUKuhw188V3xl8X8aY
+sWcos5aVMdMQyZsfR2IkZhFAhdOKfgvzeND/bMoR6ZhmPJpwp5sAj90QOp0ZQyJt
+63+5cGxv5M/VFAjvZTEqPwbsliRjh8tilgQHPByrrUqGIg0hM1A873IsAfPqAQLA
+hQLiO1vXpdnoG0JPgE+Jxpk3Xb8xCcbLLyPo0+ZotVzEB2UYwvw=
+=8BB9
+-----END PGP SIGNATURE-----
+
+--xah4jqu6xngy66gh--
