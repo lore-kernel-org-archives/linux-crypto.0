@@ -1,70 +1,163 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF39F2F37;
-	Tue, 22 Apr 2025 14:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D012749CD;
+	Tue, 22 Apr 2025 15:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745331388; cv=none; b=c+FrRheOZIjE1CI1KEOSFhWGL18Oa61wGlBqs0Ohg7MoPs0hL4hzRKxNEUjqK5eMss60LLHbctxiJAULHYth3w5+XTfRR5DjnQGfjaPuQKyFp2/SzlhXwO1gIhEs63GOEzPZpc1vAfKilO6NCgS8sw1vW33ysAO3AX0+mWCpprw=
+	t=1745335335; cv=none; b=Ipy/8rUaNRcB37p8+dTdge8Q2C//8tji+vOj3Z0YmS8W2ARAE+uZ7nfQFzbnqui2DGzVXAT/7siOYrmokTodg1o1OzUSzaRNCGBDaE0B6mG7LXkdI6JSGhvkygbU3nGeL9DyrwoAoMH15kNk78vuJDaiE6qJWbhmCghKCuTdYhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745331388; c=relaxed/simple;
-	bh=fTQYKsQu+QIX6vKu1CNgck+u+htNJM8BuxeBg9H3Ncw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNmi6v7odRtIUnwV92g3RB6yvG8MhlzUGJ1k2ALQUP+yymYfVek/PhMMCVyET9DaJkMTagEuroDKkyOYkG9Pc8chBbWBTkTQnfyBhE1q/hV18eRoBFxx/adNTl5vLHQ853fbWUsM/KchT2UUsle3kk3XYq94gZZVF3C1carXXnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=O9B3eU/X; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745335335; c=relaxed/simple;
+	bh=VWdIHfp62FpQhsxJqqk7rsXa3ipyLUWLzEXRYrT1f/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=U0rV8JJKukncV/qdjHvDaVq604rS1qx+8BV2OJnxv2f9iaP9f0XnCcwEYYSD9PLfwdKfxRHOknqhCmn749prXBKZrHmtH9gFJxO/m58MArYojkbRmxhr9ecY8OOWty2p5zRdPgItKptfwZKF2BlZiXCzhOVsuxTbiWwB+kRLYWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hFnHCsvu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="O9B3eU/X"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=X1iB3P09c3OCc6TeaNE/sjxKLRzl4DmSZont3k5A34E=; b=O9B3eU/XO44sQ/COW2TsYSFVeC
-	8HaxsYfeE4ViRZXzyJVKR1GhXZUYEorsPPknJO1tVFEcumPvQvbFxbcv5x7MhALrOUAxaGcbpTiKI
-	Czg+jvzOISJm4elGJBAT1MVzhJx0s9833QCqJTXPKS85fGA8z+4oSNKGdkl6hUwPfc+1jhMu/22oB
-	KYxn9Ovd/56p062KKoVz14R0zo2Av2V3xI5HiPMqWIElRqyw9QKAbs2cE3HnLNPsnTizxfWL9wI3A
-	8ooW19keW8XR9u18v+nhbDGVDtSSR/sMtm0SOJdHIVkCWIjMHW1KINe76S6O8IZQwu7wyr7JBJrwV
-	OHUeVnkA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u7EPx-00063n-2B;
-	Tue, 22 Apr 2025 22:16:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 22 Apr 2025 22:16:09 +0800
-Date: Tue, 22 Apr 2025 22:16:09 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Su Hui <suhui@nfschina.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: using size_add() for kmalloc()
-Message-ID: <aAekqQH3yWk_GhMN@gondor.apana.org.au>
-References: <20250421055104.663552-1-suhui@nfschina.com>
- <aAY0lyWzsRVDge_f@gondor.apana.org.au>
- <2169828c-127c-4bf7-b953-2f1194b72830@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hFnHCsvu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853AEC4CEEE;
+	Tue, 22 Apr 2025 15:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745335335;
+	bh=VWdIHfp62FpQhsxJqqk7rsXa3ipyLUWLzEXRYrT1f/Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hFnHCsvuhC/wMzsAMqn1LrjxhKuVmxIJcc3M/o4owu4b6P+DFyCsOQvbLL8O9KMxk
+	 eUyBIHIFV+A/49vvlGsoK17nVykThYgHhF9MlpuC9I4KP4yJG8wA1JoK9YMkfkzR3Y
+	 9C/O9kZaYZ9tcs0b+YNfJeY1bxGFC09oDf9/+1ccXHWeYkX/Nl7sH4jYzSRjF8KAaF
+	 lj7VnhQSQ9I1i1MoRcPkKlNF65hVTQTPyPssdlNcbbGQOwRhnqSw0EPHwDGkenupr0
+	 coJjvu+kpVQGmzRSlx9F8gbdbcIfMwL/9xFredP7aDY1NyTejRxhSbxLcmZJNRS1+d
+	 f1vNILuC1WtDQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH v2 2/9] crypto: tcrypt - rename CRYPTO_TEST to CRYPTO_BENCHMARK
+Date: Tue, 22 Apr 2025 08:21:44 -0700
+Message-ID: <20250422152151.3691-3-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250422152151.3691-1-ebiggers@kernel.org>
+References: <20250422152151.3691-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2169828c-127c-4bf7-b953-2f1194b72830@stanley.mountain>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025 at 01:24:22PM +0300, Dan Carpenter wrote:
->
-> This is exactly what Kees did with the mass conversion to
-> struct_size().  I occasionally run across places where Kees's mass
-> conversion patches did fix real integer overflow bugs.
+From: Eric Biggers <ebiggers@google.com>
 
-The point is that the reqsize shouldn't even exceed a page in size,
-let alone be anywhere near 2^32.
+tcrypt is actually a benchmarking module and not the actual tests.  This
+regularly causes confusion.  Update the kconfig option name and help
+text accordingly.
 
-Cheers,
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/Kconfig  | 10 +++++++---
+ crypto/Makefile |  2 +-
+ crypto/tcrypt.c |  8 ++++----
+ crypto/tcrypt.h |  4 ++--
+ 4 files changed, 14 insertions(+), 10 deletions(-)
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 9322e42e562de..48283975fb2ba 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -244,16 +244,20 @@ config CRYPTO_KRB5ENC
+ 	help
+ 	  Combined hash and cipher support for Kerberos 5 RFC3961 simplified
+ 	  profile.  This is required for Kerberos 5-style encryption, used by
+ 	  sunrpc/NFS and rxrpc/AFS.
+ 
+-config CRYPTO_TEST
+-	tristate "Testing module"
++config CRYPTO_BENCHMARK
++	tristate "Crypto benchmarking module"
+ 	depends on m || EXPERT
+ 	select CRYPTO_MANAGER
+ 	help
+-	  Quick & dirty crypto test module.
++	  Quick & dirty crypto benchmarking module.
++
++	  This is mainly intended for use by people developing cryptographic
++	  algorithms in the kernel.  It should not be enabled in production
++	  kernels.
+ 
+ config CRYPTO_SIMD
+ 	tristate
+ 	select CRYPTO_CRYPTD
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 5d2f2a28d8a07..18b057a799b02 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -171,11 +171,11 @@ obj-$(CONFIG_CRYPTO_JITTERENTROPY) += jitterentropy_rng.o
+ CFLAGS_jitterentropy.o = -O0
+ KASAN_SANITIZE_jitterentropy.o = n
+ UBSAN_SANITIZE_jitterentropy.o = n
+ jitterentropy_rng-y := jitterentropy.o jitterentropy-kcapi.o
+ obj-$(CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE) += jitterentropy-testing.o
+-obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
++obj-$(CONFIG_CRYPTO_BENCHMARK) += tcrypt.o
+ obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
+ obj-$(CONFIG_CRYPTO_POLYVAL) += polyval-generic.o
+ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 879fc21dcc166..d1d88debbd71e 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1,10 +1,10 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+- * Quick & dirty crypto testing module.
++ * Quick & dirty crypto benchmarking module.
+  *
+- * This will only exist until we have a better testing mechanism
++ * This will only exist until we have a better benchmarking mechanism
+  * (e.g. a char device).
+  *
+  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+  * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
+  * Copyright (c) 2007 Nokia Siemens Networks
+@@ -37,11 +37,11 @@
+ 
+ #include "internal.h"
+ #include "tcrypt.h"
+ 
+ /*
+- * Need slab memory for testing (size in number of pages).
++ * Need slab memory for benchmarking (size in number of pages).
+  */
+ #define TVMEMSIZE	4
+ 
+ /*
+ * Used by test_cipher_speed()
+@@ -2866,7 +2866,7 @@ module_param(num_mb, uint, 0000);
+ MODULE_PARM_DESC(num_mb, "Number of concurrent requests to be used in mb speed tests (defaults to 8)");
+ module_param(klen, uint, 0);
+ MODULE_PARM_DESC(klen, "Key length (defaults to 0)");
+ 
+ MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Quick & dirty crypto testing module");
++MODULE_DESCRIPTION("Quick & dirty crypto benchmarking module");
+ MODULE_AUTHOR("James Morris <jmorris@intercode.com.au>");
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 96c843a246071..7f938ac93e583 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -1,10 +1,10 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+- * Quick & dirty crypto testing module.
++ * Quick & dirty crypto benchmarking module.
+  *
+- * This will only exist until we have a better testing mechanism
++ * This will only exist until we have a better benchmarking mechanism
+  * (e.g. a char device).
+  *
+  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+  * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
+  * Copyright (c) 2007 Nokia Siemens Networks
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.49.0
+
