@@ -1,143 +1,175 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3CA1F4CA6
-	for <linux-crypto@vger.kernel.org>; Wed, 23 Apr 2025 09:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79513234
+	for <linux-crypto@vger.kernel.org>; Wed, 23 Apr 2025 10:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745400158; cv=none; b=K49mhKpz6H/3Xkh1wwsgDCv3QIYdkPE1535T1hRSpAuE7k/aPlauQwDuwVsewkbE5g6k8el2l3NOd0snNGeJzeCqWCGmePEwZ0dRkAL8qeUsyGIpufWQQ5zmtPss2LSKBQC+U6BWHjxUqb1UdH/tf1bdVrRXwX3C1VdyvPshL8E=
+	t=1745403334; cv=none; b=LFZCHCISgjLEXX8NaS0dwaYi7Mvl96/KVqF+Yly5xkaWJ3YTQ5etN86MSQ8OFeF4FjxBF7uSiwk21Cf5ZLV2gWHc/qzpuV+he9q/W/0kZjLuPKiCROpUKCDeFYSYIexiYnb00Yw0vdy7n3Pj8SiCsVdUo+MLGKBZiKs57a0JuFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745400158; c=relaxed/simple;
-	bh=fHNDMRknqW0EpyB3T4l1+CVYOFbfyJ9eXO3yYoOX6ZA=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=VEWm4UcxkFd4hzRea2pyPIeUpLQC9Cp3UNqZkzU+u2HS1Aoc3jeYKUySBPhGR9wkztObgqdOv3LK3nXhKTnwcs2uaRE2ef4vaDFzky0dTGM+5OKQ0sVGUjBbFhBqmgIkK01K2bp5JNuBvvQ9bRzWD2/qdtIgOLaDcVMtSulLNWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=lIstfKsd; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745403334; c=relaxed/simple;
+	bh=JjhHXd84vxOcVqH5MHgid4VSL+UFqBPYvmGTFOuJbek=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kbA5iIL2BWbOtQ+Xqj8mR3nTFct/bZPrSWu2ogGFxlvJ453N2dY1cP1ygvzGPedlkT8JRvupZT5XTkcev8vh+/yBS96JS6cEfYWuk0O4LLTS2XVvQ4tdTCRM9m5K4g17FjBPD4cZCb1wkSMSdfeghkpwCPuYBHrTrggAIaPSRCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=o2HiuISs; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="lIstfKsd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
-	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=4+MErWx14BFF7rNkL+lpi9IvjGHhZ8Tp8bDiHnU2Wrg=; b=lIstfKsdKoQCnkuUDFsfhwIXvL
-	wA8DkD5Taf/Lzd7x3MvofZFzhEW9jQQ/WYEPZ4wMZxSsAM7JM6Z4+IgvubTUKqMF26HgSYpzGamuM
-	NvYR6jp5s73k9Cmj1gVNw3jlIR6o8hfIm+mwVh7bMJU+OCNUVxe7PLUA5eQL4kCoG4oaF9Il8pS7I
-	N/ks1xezWb38Taphqal4S4JjF9/jKRXCGlbMakMdLwAK5kWf457miLelw0Yf8+kNrBSeL3KF+X7pT
-	vw5hihrUtNrLE+UdZ8H3p7vDYITq4R799ruNSPV8Oj1b6Opa0vzqWiUATxzZwG58Kr1B9p0RhFnai
-	I0f4D9Xg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u7WJL-000LDx-0T;
-	Wed, 23 Apr 2025 17:22:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Apr 2025 17:22:31 +0800
-Date: Wed, 23 Apr 2025 17:22:31 +0800
-Message-Id: <83673b15be00df2917160c82d285a0c003d8a27d.1745399917.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1745399917.git.herbert@gondor.apana.org.au>
-References: <cover.1745399917.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/2] crypto: hash - Fix clone error handling
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="o2HiuISs"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-30572effb26so5612226a91.0
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Apr 2025 03:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1745403332; x=1746008132; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Maz8FDImtOQb/iZZCgqaREVgXkrX824uXQKthiCjCsY=;
+        b=o2HiuISsm5U8uX4AMp2a5fkP3D4nQ1vK0gMcVvFQWYOdeI0eEdFjinXUkZMewc0IlM
+         FZhMIuBonWnm6/e0KxwGlPL3P5VgqmuvRor8mjFtz3v30pDEtVBkVWHjGX4Qr4k4nAzE
+         +5JEwzGUAnARj3PE3s46lv5bTdc3V2d0aNkE8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745403332; x=1746008132;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Maz8FDImtOQb/iZZCgqaREVgXkrX824uXQKthiCjCsY=;
+        b=Teui85EhdE8G+iuoRjbUgmPaXW4L6zF7vLXlnYBB8Hv51n6GnqizJjK7gt0fGAV7NL
+         Rp7iicYAkq925ZkDj7tteA7Cm835pVGWa3sOEaV1qAH/MR/NJfJF6GkjtSQh0PqSkOdp
+         VVC7le0yByjReuyN7O9hWoBRIs7oyVklpSXK86bVpKWU7P6RmZ/mxLntddQMuO7yr0p5
+         VrZXC9fevGuuarTzYP46jAHqqsGXbB1k/8I6PIO4oC7qE2Bj7PRI3DbzP9CGYQWyEEeM
+         XQX6CweDV2UZzKBYwBmGPHDyFJd2SH3MkEjMpCAsSF3zems6ZU1o9wwEE/LVpqG/EMUt
+         ChVg==
+X-Gm-Message-State: AOJu0YxS3TXvCXZ99xYbIy8ychJSA33ukqZOJiTwfx2UeVDNqsFX29E7
+	u+R8KhUjBRJA9hAxbTUCUxJ200Ht+4mwUa28Dn0L97iGncK2lOeIULm405j6AZH+M9azeQu5Mxf
+	y
+X-Gm-Gg: ASbGncsk90A62idqsPMip7Mo9CWcr/bc6OtsOCfRw7js0p4KjI5Uzeqbwb/jxm1sWXg
+	ltJfCazGE4aGYpPQs0x+6Bl6G6MH5RQE0l5vPiWM0b1jJ/z3KsJ7oMq4DZ5hI26To+EVwSPGskW
+	3x33yyMb7ydF1BfGtAdWNviqjeBWUt8Rq1mBrPrlBO1NhxBTDWXt8EjJrGRJM36j8E2gv+iOyZv
+	FtQd6EMNxWNSvEbMIrxVnC/LYD4INoRCkjEJmG9BJ7QwUSopeFdJWaj+C+HUy/uUqw9FFWXBsJP
+	dczn5sH+XLVFRZh+5D7z5s/p7D/yQF4YVJT7Nrq6Jc4+FK9sV2UUTNwsh0y04eJ5
+X-Google-Smtp-Source: AGHT+IESSbSNjcCTDzlOdLYH5rfkzYY6H/NEnWm7A0o3H8wPMl6nNkuSAVfLJuO1MU1/dIBUolwhew==
+X-Received: by 2002:a17:90b:380b:b0:2fe:e9c6:689e with SMTP id 98e67ed59e1d1-3087bb47920mr25214281a91.8.1745403331832;
+        Wed, 23 Apr 2025 03:15:31 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309df9ef918sm1205765a91.7.2025.04.23.03.15.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 03:15:31 -0700 (PDT)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	herbert@gondor.apana.org.au
+Cc: Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com,
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v1 0/6] Add SPAcc Crypto Driver
+Date: Wed, 23 Apr 2025 15:45:12 +0530
+Message-Id: <20250423101518.1360552-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Do not copy the exit function in crypto_clone_tfm as it should
-only be set after init_tfm or clone_tfm has succeeded.
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 
-Move the setting into crypto_clone_ahash and crypto_clone_shash
-instead.
+Add the driver for SPAcc(Security Protocol Accelerator), which is a             
+crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,      
+hashes and AEAD algorithms with various modes. The driver currently supports    
+below                                                                           
+                                                                                
+AEAD:                                                                           
+- ccm(sm4)                                                                      
+- ccm(aes)                                                                      
+- gcm(sm4)                                                                      
+- gcm(aes)                                                                      
+- rfc7539(chacha20,poly1305)                                                    
+                                                                                
+cipher:                                                                         
+- cbc(sm4)                                                                      
+- ecb(sm4)                                                                      
+- ctr(sm4)                                                                      
+- xts(sm4)                                                                      
+- cts(cbc(sm4))                                                                 
+- cbc(aes)                                                                      
+- ecb(aes)                                                                      
+- xts(aes)                                                                      
+- cts(cbc(aes))                                                                 
+- ctr(aes)                                                                      
+- chacha20                                                                      
+- ecb(des)                                                                      
+- cbc(des)                                                                      
+- ecb(des3_ede)                                                                 
+- cbc(des3_ede)                                                                 
+                                                                                
+hash:                                                                           
+- cmac(aes)                                                                     
+- xcbc(aes)                                                                     
+- cmac(sm4)                                                                     
+- xcbc(sm4)                                                                     
+- hmac(md5)                                                                     
+- md5                                                                           
+- hmac(sha1)                                                                    
+- sha1                                                                          
+- sha224
+- sha256                                                                        
+- sha384                                                                        
+- sha512                                                                        
+- hmac(sha224)                                                                  
+- hmac(sha256)                                                                  
+- hmac(sha384)                                                                  
+- hmac(sha512)                                                                  
+- sha3-224                                                                      
+- sha3-256                                                                      
+- sha3-384                                                                      
+- sha3-512                                                                      
+- hmac(sm3)                                                                     
+- sm3                                                                           
+- michael_mic                                              
 
-Also clone the fb if necessary.
+Pavitrakumar Managutte (6):
+  dt-bindings: crypto: Document support for SPAcc
+  Add SPAcc Skcipher support
+  Add SPAcc AUTODETECT Support
+  Add SPAcc ahash support
+  Add SPAcc AEAD support
+  Add SPAcc Kconfig and Makefile
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/ahash.c | 19 +++++++++++++++++--
- crypto/api.c   |  2 +-
- crypto/shash.c |  3 +++
- 3 files changed, 21 insertions(+), 3 deletions(-)
+ .../bindings/crypto/snps,dwc-spacc.yaml       |   70 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   94 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1295 +++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        |  969 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2441 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  828 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  318 +++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  230 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  374 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  114 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  324 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  610 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  776 ++++++
+ 16 files changed, 8461 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 9b813f7b9177..cc9885d5cfd2 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -877,6 +877,7 @@ struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
- {
- 	struct hash_alg_common *halg = crypto_hash_alg_common(hash);
- 	struct crypto_tfm *tfm = crypto_ahash_tfm(hash);
-+	struct crypto_ahash *fb = NULL;
- 	struct crypto_ahash *nhash;
- 	struct ahash_alg *alg;
- 	int err;
-@@ -906,22 +907,36 @@ struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
- 			err = PTR_ERR(shash);
- 			goto out_free_nhash;
- 		}
-+		crypto_ahash_tfm(nhash)->exit = crypto_exit_ahash_using_shash;
- 		nhash->using_shash = true;
- 		*nctx = shash;
- 		return nhash;
- 	}
- 
-+	if (ahash_is_async(hash)) {
-+		fb = crypto_clone_ahash(crypto_ahash_fb(hash));
-+		err = PTR_ERR(fb);
-+		if (IS_ERR(fb))
-+			goto out_free_nhash;
-+
-+		crypto_ahash_tfm(nhash)->fb = crypto_ahash_tfm(fb);
-+	}
-+
- 	err = -ENOSYS;
- 	alg = crypto_ahash_alg(hash);
- 	if (!alg->clone_tfm)
--		goto out_free_nhash;
-+		goto out_free_fb;
- 
- 	err = alg->clone_tfm(nhash, hash);
- 	if (err)
--		goto out_free_nhash;
-+		goto out_free_fb;
-+
-+	crypto_ahash_tfm(nhash)->exit = crypto_ahash_exit_tfm;
- 
- 	return nhash;
- 
-+out_free_fb:
-+	crypto_free_ahash(fb);
- out_free_nhash:
- 	crypto_free_ahash(nhash);
- 	return ERR_PTR(err);
-diff --git a/crypto/api.c b/crypto/api.c
-index 172e82f79c69..5cd5ec105bb1 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -570,7 +570,7 @@ void *crypto_clone_tfm(const struct crypto_type *frontend,
- 
- 	tfm = (struct crypto_tfm *)(mem + frontend->tfmsize);
- 	tfm->crt_flags = otfm->crt_flags;
--	tfm->exit = otfm->exit;
-+	tfm->fb = tfm;
- 
- out:
- 	return mem;
-diff --git a/crypto/shash.c b/crypto/shash.c
-index b6c79a4a044a..c4a724e55d7a 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -413,6 +413,9 @@ struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
- 		}
- 	}
- 
-+	if (alg->exit_tfm)
-+		crypto_shash_tfm(nhash)->exit = crypto_shash_exit_tfm;
-+
- 	return nhash;
- }
- EXPORT_SYMBOL_GPL(crypto_clone_shash);
+
+base-commit: d23fce15abd480811098c0bca6d4edeb17824279
 -- 
-2.39.5
+2.25.1
 
