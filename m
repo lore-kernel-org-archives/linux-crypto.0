@@ -1,109 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BAF27FD76
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 16:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DF428C5DC;
+	Thu, 24 Apr 2025 16:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745511674; cv=none; b=IJ8ef7Wk25p+iGzKolH0FUkL+TRVN3cRHB0lAlLcO8sKaCA2qc1AIXhexpZyvF1DxkyfGSrRP0DbNmwvW1cWakK6gK9ykyiNtPKKngnsQJvl2Tpirj9fFxh67SgsIX/0pHqTJ+hAqlI0bqIne7Qv57FUSzvvC2B3OPVDD70HgL0=
+	t=1745512106; cv=none; b=nx8/AS/Lkdd18eFLIwGpDCTlaRtyTDnbip1RdqJ/uEJCAmfTkEXCJ/K0hADDVTfJ3WzRajRRfoRn0yT6PO3hlka7plbKVSouk3d1KJ8yelHE3E3xyqBt3crKNCgrUDDtCzzMPzGNsRG2TabrnZX6hBSZsF7aRt0F9STh+nIYB5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745511674; c=relaxed/simple;
-	bh=+NyEQ9EpowjiTCXvxrU9zcLh14LXEf6wKZSGPAtM3YA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V6Uq9bfrgnWDKF0qyO4s+h3VAeHyAzHbi+muhrkr7uy0i2rLGGkpWot7zvgPW8dJ9rYG7wcj3PjsZB0wWClnxANYHiB3ae3rezc6pw/lDmmoCS9kQgOp6iIsaI8e59qIURzSCq6vch9fAOULFs8scxPh5o5ffwHKzPXWBFpeZEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8vfhfWC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745512106; c=relaxed/simple;
+	bh=Wh4U3nBzrU2K1jT6zuyYDKJn0hR3cN2FV8zyY1+WwQs=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aGU7QNkgdszV9MyzdCkXJQ4qBtvm0wlVcu45r+X0ufNdhP2BP/mmC5qsJUoNsXLfvB4tP58Ouyb0Zxh8j/IbxH3tA7e6B+MG2bAU48c42h+V6hUXZo/dj34//5lx1VCIAkUaR8J05QEGOPJFqhE5SvlB+TnWyv8THEz5AXEEweE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7SMJQuT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8vfhfWC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C52C4CEE8;
-	Thu, 24 Apr 2025 16:21:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7SMJQuT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C841C4CEE3;
+	Thu, 24 Apr 2025 16:28:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745511674;
-	bh=+NyEQ9EpowjiTCXvxrU9zcLh14LXEf6wKZSGPAtM3YA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t8vfhfWCbA8nMTjDxdKBnzJW2ZjFc9ehf0ZeYOIXgvQ7GD9N3qxxkhBr2E5zG9Eq1
-	 TPUnRP90rcKWPXkzTkPjxemb7vLx8r7sHcK57Pne2wZz67ml099l3c8JORBKoo0nh4
-	 ZCWgwfdPa+pmypbXSMjAAlhnk5lAF65RmzVpVnJ3EMI3k8+yUlPMijnj4tPAVq3H+f
-	 Gs32I2sCcP0RzsFvH9/pn3+1kzr9w4PIomq6mzf78MaxOVM3edEtg9t4ppy7p1t62D
-	 rXPV4UScLriq8o3GpmQArdvjm/EleE03goO9V7Kirt2dcWr8feuC02KjAbEZeugvIX
-	 GWmCehT00zjsg==
-Date: Thu, 24 Apr 2025 09:21:12 -0700
-From: Eric Biggers <ebiggers@kernel.org>
+	s=k20201202; t=1745512106;
+	bh=Wh4U3nBzrU2K1jT6zuyYDKJn0hR3cN2FV8zyY1+WwQs=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=g7SMJQuT3jtdhOthNR48m7mFL2fTzMz98fwU/bZsEAf/QIdy6lBtGZO+h2Vr18fnS
+	 iE4yv9oStB7gBO+U/EoUhw2Hn4snau8b23zLJv5FY2iCL79FpXcx76C1c0BJN2mysd
+	 reIoPxYDWm++uEXvgqjtBtZWI9kilTC958/QPQmsU6qCT20fYRVBhOkmIW+okFEH5e
+	 6IIXll3ZmdIZwNB79frD+5ezm+zDH1cVMWPVDbMfLgNYaoa5dODDeDGVWXc8pMM6i8
+	 Pt8F4jHBl3FmJTcfvP9Iec2jGQBAWxzVFMXRaBacIzg5/8chHxB45Lbhr3QoQqhgf7
+	 Ktc9iyCf8hnmg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB011380CFD9;
+	Thu, 24 Apr 2025 16:29:05 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.15
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
+References: <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
+ <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+ <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
+ <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
+ <Z-ofAGzvFfuGucld@gondor.apana.org.au>
+ <Z_CUFE0pA3l6IwfC@gondor.apana.org.au>
+ <Z_89K7tSzQVKRqr6@gondor.apana.org.au> <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p5
+X-PR-Tracked-Commit-Id: 8006aff15516a170640239c5a8e6696c0ba18d8e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 288537d9c9364356a4b2f6bd947f2e89cdaa353e
+Message-Id: <174551214449.3411799.922824770184674490.pr-tracker-bot@kernel.org>
+Date: Thu, 24 Apr 2025 16:29:04 +0000
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 09/15] crypto: lib/poly1305 - Use block-only interface
-Message-ID: <20250424162112.GG2427@sol.localdomain>
-References: <cover.1745490652.git.herbert@gondor.apana.org.au>
- <6c08ba96e4cb6a6219e06bb77006cba91e6e84a2.1745490652.git.herbert@gondor.apana.org.au>
- <20250424154801.GC2427@sol.localdomain>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424154801.GC2427@sol.localdomain>
 
-On Thu, Apr 24, 2025 at 08:48:01AM -0700, Eric Biggers wrote:
-> On Thu, Apr 24, 2025 at 06:47:16PM +0800, Herbert Xu wrote:
-> > diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
-> > index ebdfccf378ee..a37b424ee84b 100644
-> > --- a/lib/crypto/poly1305.c
-> > +++ b/lib/crypto/poly1305.c
-> > @@ -22,47 +22,59 @@ void poly1305_block_init_generic(struct poly1305_block_state *desc,
-> >  }
-> >  EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
-> >  
-> > -void poly1305_init_generic(struct poly1305_desc_ctx *desc,
-> > -			   const u8 key[POLY1305_KEY_SIZE])
-> > +void poly1305_init(struct poly1305_desc_ctx *desc,
-> > +		   const u8 key[POLY1305_KEY_SIZE])
-> >  {
-> >  	desc->s[0] = get_unaligned_le32(key + 16);
-> >  	desc->s[1] = get_unaligned_le32(key + 20);
-> >  	desc->s[2] = get_unaligned_le32(key + 24);
-> >  	desc->s[3] = get_unaligned_le32(key + 28);
-> >  	desc->buflen = 0;
-> > -	poly1305_block_init_generic(&desc->state, key);
-> > +	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_POLY1305))
-> > +		poly1305_block_init_arch(&desc->state, key);
-> > +	else
-> > +		poly1305_block_init_generic(&desc->state, key);
-> >  }
-> > -EXPORT_SYMBOL_GPL(poly1305_init_generic);
-> > +EXPORT_SYMBOL(poly1305_init);
-> >  
-> > -static inline void poly1305_block(struct poly1305_block_state *state, const u8 *src,
-> > -				  unsigned int len)
-> > +static inline void poly1305_block(struct poly1305_block_state *state,
-> > +				  const u8 *src, unsigned int len)
-> >  {
-> > -	poly1305_blocks_generic(state, src, len, 1);
-> > +	if (!IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_POLY1305))
-> > +		poly1305_blocks_generic(state, src, len, 1);
-> > +	poly1305_blocks_arch(state, src, len, 1);
-> >  }
-> >  
-> > -void poly1305_update_generic(struct poly1305_desc_ctx *desc, const u8 *src,
-> > -			     unsigned int nbytes)
-> > +void poly1305_update(struct poly1305_desc_ctx *desc,
-> > +		     const u8 *src, unsigned int nbytes)
-> >  {
-> >  	desc->buflen = BLOCK_HASH_UPDATE(&poly1305_block, &desc->state,
-> >  					 src, nbytes, POLY1305_BLOCK_SIZE,
-> >  					 desc->buf, desc->buflen);
-> >  }
-> > -EXPORT_SYMBOL_GPL(poly1305_update_generic);
-> > +EXPORT_SYMBOL(poly1305_update);
-> 
-> This randomly changes it to only do 1 block at a time.
-> 
-> And it also changes it to call poly1305_blocks_arch() even if the arch doesn't
-> have it, causing build errors.
+The pull request you sent on Thu, 24 Apr 2025 17:07:01 +0800:
 
-Actually maybe it still does more than 1 block at a time, since the '1' is
-actually the padbit argument, and maybe poly1305_block() is missing an "s"
-accidentally.  Hard to tell because the code is obfuscated in the macro though.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p5
 
-- Eric
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/288537d9c9364356a4b2f6bd947f2e89cdaa353e
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
