@@ -1,72 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DF428C5DC;
-	Thu, 24 Apr 2025 16:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DD51E1C1A;
+	Thu, 24 Apr 2025 18:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745512106; cv=none; b=nx8/AS/Lkdd18eFLIwGpDCTlaRtyTDnbip1RdqJ/uEJCAmfTkEXCJ/K0hADDVTfJ3WzRajRRfoRn0yT6PO3hlka7plbKVSouk3d1KJ8yelHE3E3xyqBt3crKNCgrUDDtCzzMPzGNsRG2TabrnZX6hBSZsF7aRt0F9STh+nIYB5g=
+	t=1745520310; cv=none; b=g6Ku408Xuk6dBlhcxZkRG6fqYyeAF3r77QO5TvFxilXdlC9jGKLc5JUNFOh6ZM0yAN0407Xq92KHZckM+3FNWSii0kh+HyMLN+VecK6kNiz1t6i42e2ahGh6Is7VV6nnKyr0uTPYnTM3kgxXMel+YnypXlN4xKR+PAHsnndx0FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745512106; c=relaxed/simple;
-	bh=Wh4U3nBzrU2K1jT6zuyYDKJn0hR3cN2FV8zyY1+WwQs=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aGU7QNkgdszV9MyzdCkXJQ4qBtvm0wlVcu45r+X0ufNdhP2BP/mmC5qsJUoNsXLfvB4tP58Ouyb0Zxh8j/IbxH3tA7e6B+MG2bAU48c42h+V6hUXZo/dj34//5lx1VCIAkUaR8J05QEGOPJFqhE5SvlB+TnWyv8THEz5AXEEweE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7SMJQuT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745520310; c=relaxed/simple;
+	bh=MlnQDLDnvGsoMGowqZqyaa07li7qR0AeAyDQ0M7KEkQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fFWBTv2wfSvodC0J0Ov+gWyFyRK8VEp31SYb0aov1vymYsMtr5btcpeScgy6kSA5PMq+b8xndBfPIAjkG+/tVwHfG5bwaOf3glfqbBZn4ndlRl0gBp0PAAQbcyOcuLrMrbm0XEIXjr6QaDBGs4N81DufxTQeNYvibiRK1koLPRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a8C8otqs; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7SMJQuT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C841C4CEE3;
-	Thu, 24 Apr 2025 16:28:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745512106;
-	bh=Wh4U3nBzrU2K1jT6zuyYDKJn0hR3cN2FV8zyY1+WwQs=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=g7SMJQuT3jtdhOthNR48m7mFL2fTzMz98fwU/bZsEAf/QIdy6lBtGZO+h2Vr18fnS
-	 iE4yv9oStB7gBO+U/EoUhw2Hn4snau8b23zLJv5FY2iCL79FpXcx76C1c0BJN2mysd
-	 reIoPxYDWm++uEXvgqjtBtZWI9kilTC958/QPQmsU6qCT20fYRVBhOkmIW+okFEH5e
-	 6IIXll3ZmdIZwNB79frD+5ezm+zDH1cVMWPVDbMfLgNYaoa5dODDeDGVWXc8pMM6i8
-	 Pt8F4jHBl3FmJTcfvP9Iec2jGQBAWxzVFMXRaBacIzg5/8chHxB45Lbhr3QoQqhgf7
-	 Ktc9iyCf8hnmg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB011380CFD9;
-	Thu, 24 Apr 2025 16:29:05 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.15
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
-References: <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
- <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
- <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
- <Z-ofAGzvFfuGucld@gondor.apana.org.au>
- <Z_CUFE0pA3l6IwfC@gondor.apana.org.au>
- <Z_89K7tSzQVKRqr6@gondor.apana.org.au> <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p5
-X-PR-Tracked-Commit-Id: 8006aff15516a170640239c5a8e6696c0ba18d8e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 288537d9c9364356a4b2f6bd947f2e89cdaa353e
-Message-Id: <174551214449.3411799.922824770184674490.pr-tracker-bot@kernel.org>
-Date: Thu, 24 Apr 2025 16:29:04 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a8C8otqs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745520309; x=1777056309;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MlnQDLDnvGsoMGowqZqyaa07li7qR0AeAyDQ0M7KEkQ=;
+  b=a8C8otqsnzmxzttJR+72+HuzMKRZaLIkUEwmu7NjbG8fQsvscBsflsrc
+   998xl5ixb/4mDqEaR9H4eb2d/IA53WUv262ZcdQOXlP3bJkqnOiOv7Dtu
+   7tetWltAbLNsPZ+plBBMH/bST0hx4gRrA6KJu08h7VPQ35nmS9FKlAnmI
+   9B1Z20ylErqlz+wCboty6mI6tp1dov92yIJ3x1v+iPJkLkBr1Ic7Sa0IU
+   SVTchyiuwjmgZfBNsLF/kJ1pAaS7RTa8nL8lttw9ABOOhPNsPjcPtxXYm
+   FQULABBaWOjUtfGQBxQP7ls57EjIX0Ta7sKoPFY+X3pqDIcsbtLYmvIOM
+   g==;
+X-CSE-ConnectionGUID: /wme/mj5SPaH4nxuycpORA==
+X-CSE-MsgGUID: Xw4rK1h3ThepwnaMhCZzWg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="57819336"
+X-IronPort-AV: E=Sophos;i="6.15,236,1739865600"; 
+   d="scan'208";a="57819336"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 11:45:08 -0700
+X-CSE-ConnectionGUID: Cx1DU3/GQmSNl53dSmvHsw==
+X-CSE-MsgGUID: pAPaDeMxTamQ8RuGZ6jIlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,236,1739865600"; 
+   d="scan'208";a="133226238"
+Received: from bkammerd-mobl.amr.corp.intel.com (HELO [10.124.222.0]) ([10.124.222.0])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 11:45:05 -0700
+Message-ID: <3a193231-82cd-4b42-96fc-ea1859b5a8b9@intel.com>
+Date: Thu, 24 Apr 2025 11:45:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 00/19] x86: Trenchboot secure dynamic launch Linux
+ kernel support
+To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux.dev
+Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
+ mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+ nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
+ corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
+ baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+ andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+References: <20250421162712.77452-1-ross.philipson@oracle.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250421162712.77452-1-ross.philipson@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 24 Apr 2025 17:07:01 +0800:
+On 4/21/25 09:26, Ross Philipson wrote:
+> This patchset provides detailed documentation of DRTM, the approach used for
+> adding the capbility, and relevant API/ABI documentation. In addition to the
+> documentation the patch set introduces Intel TXT support as the first platform
+> for Linux Secure Launch.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p5
+So, I know some of the story here thanks to Andy Cooper. But the
+elephant in the room is:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/288537d9c9364356a4b2f6bd947f2e89cdaa353e
+> INTEL(R) TRUSTED EXECUTION TECHNOLOGY (TXT)
+> M:      Ning Sun <ning.sun@intel.com>
+> L:      tboot-devel@lists.sourceforge.net
+> S:      Supported
+> W:      http://tboot.sourceforge.net
+> T:      hg http://tboot.hg.sourceforge.net:8000/hgroot/tboot/tboot
+> F:      Documentation/arch/x86/intel_txt.rst
+> F:      arch/x86/kernel/tboot.c
+> F:      include/linux/tboot.h
 
-Thank you!
+Linux already supports TXT. Why do we need TrenchBoot?
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I think I know the answer, but it also needs to be a part of the
+documentation, changelogs and cover letter.
+
+Also, honestly, what do you think we should do with the Linux tboot
+code? Is everyone going to be moving over to Trenchboot so that Linux
+support for TXT/tboot can just go away?
