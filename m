@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D961433A8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AEA78F2D;
 	Thu, 24 Apr 2025 00:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745454179; cv=none; b=dDD4ETk/M0r8sXqd33yCm8JClLTMHmWxNXW+OwxonmrFjTnhxQpTxR9EN1dSUlcfXlfm+88JBf7VDGbZSOmDec6IPAxK2nghFyxlUEfaFPib8nVzSDDmRZcWi1+7/4yuZ2kYOXoua/yyFj8q+jyeH4pHgKzCIO6vJ91XPuXeT6Y=
+	t=1745454180; cv=none; b=G+t/1uogNJljhex/Z7gGdUhNPl6t182wjBXxUorUrnZ+HOb68wnDOtpz7gkYeJ0yOkac25CToRz5PcdFR07YJBrSj8CNGuSLl87AoAuWq+tuAqG2743R7usqW0nrelIYq8MwCQlHIOIo++AxzLRXWOBkwZwVookjyy0bOR1iZU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745454179; c=relaxed/simple;
-	bh=D5NU9FcmxKmWEA4XREu5in+DNWt9OzzrzEJU/bEgaCM=;
+	s=arc-20240116; t=1745454180; c=relaxed/simple;
+	bh=fLNBgB98VHmWsYsqCxuP82EHevhaDk2EjXMCqMw0UcU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mscfY0wLC13NOUil6K/U3aI7x+u40aT5hw30Atz498Z3+8nyNK30FHVU232keUCd/JnhCZ0rFLH1Yt2buEqJnDBkOUq/Bn9tFGB83/PEkWLbAdAOWzaAlZrm0Hu5VsdYRyDXzUdV3L+WHxk05NNQTfJnidjM1mZ7ahfmw428MDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0PKp1HX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=klhQCB1Ea9FR1DH0z/Tnz0B77EsK2Mu3FdZt1ouamklPJ1wsEN+fc50tmNq5KPvvsju9myZercirHVRuo4RLykY5vC/RROkYzWo+4kw8j1l8cCo17s1vuVM9mL9JYQ94kZdwgmzaaZuFDIPJ8oKHWosFQQpyD7aOjs7ahFuQDiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWvr/EPc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0PKp1HX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27EE9C4CEED;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWvr/EPc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8228FC4CEEA;
 	Thu, 24 Apr 2025 00:22:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745454179;
-	bh=D5NU9FcmxKmWEA4XREu5in+DNWt9OzzrzEJU/bEgaCM=;
+	bh=fLNBgB98VHmWsYsqCxuP82EHevhaDk2EjXMCqMw0UcU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N0PKp1HXIMY3OYdi0+QNxtbOKYvHDj+XNZMJxgb4MF3xoXe6ZeLHMKvvC4RZIH4qO
-	 i0tZYXuMUm/aKFnMCifDJ/wwpNleHgIV1Krt4I9CKcqPodLMBXpV3eP7n8pXsK/Mo5
-	 zOthyROTuyAqdflz4JtxNSzMN7JDq7D8AlG4vAUfudwlcthNpdpeWlaHLmDi33Kj4r
-	 esMpwv9MLcyTyaOA2tyQG/ZzJHP/O11zZQwSpzAmqU/eveXzTAv387y9MiAmXhGlmz
-	 LZ1FdafE124aAygI+K3XM7/X220w8EaFQiwxmQTWGBs/9WqQ4wO2h8UBUZkDSsLyrn
-	 kEpPI/AJpkbXQ==
+	b=aWvr/EPcncCLXclOTaLe63YVgnOiy+N9wim0CGWVLG5JPWdao8sIiUrgqjP211Og9
+	 jPYSkEqI/LubFLgHvX/Bs8rYkIWlBfokdgGAg1NEnskSiGSHt3Nm6+IstDdT6KUUvq
+	 fdgzd3OQesUexCmrJKlCoN1f3jVyfzH1CNy4mmnAHvwpQ8eDpRo/vD+7tBTlGf9Gc4
+	 RK+zxG9iJwmrLDceJAjix6paW6sEefqykYt7k4iVglMQp+Eo40VZan/De8XZf8qqM3
+	 LewXnECsVB/HbYP2Cod7GN060YdqJlgseAaFPHHRZF7MctsFoP+9elJbTKHFnqXqzI
+	 quzBIIJ3wXqLQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	linux-s390@vger.kernel.org,
 	sparclinux@vger.kernel.org,
 	x86@kernel.org
-Subject: [PATCH 6/7] sparc/crc: drop "glue" from filenames
-Date: Wed, 23 Apr 2025 17:20:37 -0700
-Message-ID: <20250424002038.179114-7-ebiggers@kernel.org>
+Subject: [PATCH 7/7] x86/crc: drop "glue" from filenames
+Date: Wed, 23 Apr 2025 17:20:38 -0700
+Message-ID: <20250424002038.179114-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250424002038.179114-1-ebiggers@kernel.org>
 References: <20250424002038.179114-1-ebiggers@kernel.org>
@@ -65,39 +65,53 @@ crc32.c instead of crc32-glue.c.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/sparc/lib/Makefile                  | 2 +-
- arch/sparc/lib/{crc32_glue.c => crc32.c} | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
- rename arch/sparc/lib/{crc32_glue.c => crc32.c} (97%)
+ arch/x86/lib/Makefile                            | 6 +++---
+ arch/x86/lib/{crc-t10dif-glue.c => crc-t10dif.c} | 0
+ arch/x86/lib/{crc32-glue.c => crc32.c}           | 0
+ arch/x86/lib/{crc64-glue.c => crc64.c}           | 0
+ 4 files changed, 3 insertions(+), 3 deletions(-)
+ rename arch/x86/lib/{crc-t10dif-glue.c => crc-t10dif.c} (100%)
+ rename arch/x86/lib/{crc32-glue.c => crc32.c} (100%)
+ rename arch/x86/lib/{crc64-glue.c => crc64.c} (100%)
 
-diff --git a/arch/sparc/lib/Makefile b/arch/sparc/lib/Makefile
-index 5724d0f356eb5..ef8860eb3f3d1 100644
---- a/arch/sparc/lib/Makefile
-+++ b/arch/sparc/lib/Makefile
-@@ -52,6 +52,6 @@ lib-$(CONFIG_SPARC64) += mcount.o ipcsum.o xor.o hweight.o ffs.o
+diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
+index 1c50352eb49f9..7cf8681cba0f2 100644
+--- a/arch/x86/lib/Makefile
++++ b/arch/x86/lib/Makefile
+@@ -37,18 +37,18 @@ lib-$(CONFIG_INSTRUCTION_DECODER) += insn.o inat.o insn-eval.o
+ lib-$(CONFIG_RANDOMIZE_BASE) += kaslr.o
+ lib-$(CONFIG_FUNCTION_ERROR_INJECTION)	+= error-inject.o
+ lib-$(CONFIG_MITIGATION_RETPOLINE) += retpoline.o
  
- obj-$(CONFIG_SPARC64) += iomap.o
- obj-$(CONFIG_SPARC32) += atomic32.o
- obj-$(CONFIG_SPARC64) += PeeCeeI.o
- obj-$(CONFIG_CRC32_ARCH) += crc32-sparc.o
--crc32-sparc-y := crc32_glue.o crc32c_asm.o
-+crc32-sparc-y := crc32.o crc32c_asm.o
-diff --git a/arch/sparc/lib/crc32_glue.c b/arch/sparc/lib/crc32.c
-similarity index 97%
-rename from arch/sparc/lib/crc32_glue.c
-rename to arch/sparc/lib/crc32.c
-index d34e7cc7e1a1e..428fd5588e936 100644
---- a/arch/sparc/lib/crc32_glue.c
-+++ b/arch/sparc/lib/crc32.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/* Glue code for CRC32C optimized for sparc64 crypto opcodes.
-+/* CRC32c (Castagnoli), sparc64 crc32c opcode accelerated
-  *
-  * This is based largely upon arch/x86/crypto/crc32c-intel.c
-  *
-  * Copyright (C) 2008 Intel Corporation
-  * Authors: Austin Zhang <austin_zhang@linux.intel.com>
+ obj-$(CONFIG_CRC32_ARCH) += crc32-x86.o
+-crc32-x86-y := crc32-glue.o crc32-pclmul.o
++crc32-x86-y := crc32.o crc32-pclmul.o
+ crc32-x86-$(CONFIG_64BIT) += crc32c-3way.o
+ 
+ obj-$(CONFIG_CRC64_ARCH) += crc64-x86.o
+-crc64-x86-y := crc64-glue.o crc64-pclmul.o
++crc64-x86-y := crc64.o crc64-pclmul.o
+ 
+ obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-x86.o
+-crc-t10dif-x86-y := crc-t10dif-glue.o crc16-msb-pclmul.o
++crc-t10dif-x86-y := crc-t10dif.o crc16-msb-pclmul.o
+ 
+ obj-y += msr.o msr-reg.o msr-reg-export.o hweight.o
+ obj-y += iomem.o
+ 
+ ifeq ($(CONFIG_X86_32),y)
+diff --git a/arch/x86/lib/crc-t10dif-glue.c b/arch/x86/lib/crc-t10dif.c
+similarity index 100%
+rename from arch/x86/lib/crc-t10dif-glue.c
+rename to arch/x86/lib/crc-t10dif.c
+diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32.c
+similarity index 100%
+rename from arch/x86/lib/crc32-glue.c
+rename to arch/x86/lib/crc32.c
+diff --git a/arch/x86/lib/crc64-glue.c b/arch/x86/lib/crc64.c
+similarity index 100%
+rename from arch/x86/lib/crc64-glue.c
+rename to arch/x86/lib/crc64.c
 -- 
 2.49.0
 
