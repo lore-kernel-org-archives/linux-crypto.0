@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9CC221FB6
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 10:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812411F0E47
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 10:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745491631; cv=none; b=s7YMGj02AXAgof54Ar9+EujrV+KHhLTkoOefEV6KXHhksu6I9OQ22p28qUX+0+PON9H5OyCH14tkcWb4eCvfikftNfiV+KDQ7sOVGQfGROuPQQnPXLAtzrFKiB7VbX+/P1E8eG/yEZG66/PuAw+6BXSu0j0nkKtE9Gq8B2rSRa8=
+	t=1745491633; cv=none; b=bKEvcjC3vRt/a0ItIC2HuraKcQ52hgXy/Z0TGF5Yq3G9i4j38yng+LqMHmsjYVpMjAXeguvz7HH8Yfnj83TvkSDdTSqOINffZuK1FseAPl88yheiKNib5xBGibMkSkHgNrILaPeOc0zEr7vzpad762am9yEz4nPjPOJsBi9EMbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745491631; c=relaxed/simple;
-	bh=BaCfW+bLJsO5ZKYVj0sQ+vUmt3GifjKrs0IICuPis1M=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=nGQ7afV8SAzebYu+7u9nxGaCKGQ7WwYRN2z+Wkwk/3EYkr9CJiMWxU6SIYj03+mQDILlGfquyzpoM4bAfm+baoBaI4dH9BOs5b+ur3BPfAEkWPJzwQtTVFiOq1i2GCJBmmiEUdgZ4LFj0NfkuclhMRWoehAWm3+REjEurSjSeq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OBh72/8b; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745491633; c=relaxed/simple;
+	bh=MppoNuwbKwzAWErSnM7IVUKSs/CGSDIGBmRVSuOaJ2M=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=dLu/WBBUSJzlBY00lznfvEd5XsrAZZSsuDTMLkhQTuGegAelAb5Iwb190s/nFn+mrp1htaYT8DIlehaRbxWJf/LrLjclIuBLVMmbVU++yFoyshlj/X5hA6xqNyhsNXUyTsRu+/PtjL5sM0qDhw9ykpfqBl3qY0SF10/29eRp6LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YMgstW5q; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OBh72/8b"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YMgstW5q"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=ieSeOkKrRePmvLl/Vf5KiVnnum3ZTbURLrgGG7d6kfM=; b=OBh72/8bISnZGdUQyoG4oaSNkS
-	Iv9CcoTQctp4NJuW8C9WaO+wuDpybdMB53Qwyjul59YLyZZBvEbsO066GdCLCl/a9lrmKQ39ADcu0
-	SduNZ/xJdBxBiD3BV+6HvV3+1fergPfxi7Ssp7EeONYlIDggBRXyDWBTvzgIHyTpTa6Of/J60WOdd
-	0qlCQgZdcHZhettTBNJeOMRsR7shkAsImYyDDshSepuIO+IJBDdT5cMXAuPQ7wPIO65nCDypRUwW0
-	fcQ7/Spg/k8BQ7yXBYrTE9SwGWAJZ2sijt2bwF511lcDeVJIQy8MGjScb23CNqYLKNDU2g3531DHU
-	ZytbPuXw==;
+	bh=iqtms7F7kkvqGAx6C7Vu9N/6a0sOPJJAEFz5Uc1UeJ0=; b=YMgstW5q3uvbKcIGQ1bc45EGbj
+	bMK3HdSLY0X0wam4bUKca87vllmkEaAEk69olSnyfhXuViOPJF+NTJJ/YVmP40m5MeVzKxkgqzpff
+	PX+rTXZejqOCAJuw4uij90NjQnjbXP6yxpNXjbgonxKgn6m7gMtlpWEdjgpHyRiC9v6Tx/uDCgJ3y
+	Ts0k2ap04VFJMGrf3TN13EI9mNaVFHNy6PNQwq7N1qz2L6c7449smG06pCHpO0BhTT+AhrxJmEqEx
+	cDgttmSwOdEpgTDLMgjcNpfTF7thaeqX+rQkVr+b2NcXPzEMqVSivDpKkm/ADdgs2XSWOrcomulIE
+	kwqWU92w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u7u6j-000fLw-1T;
-	Thu, 24 Apr 2025 18:47:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Apr 2025 18:47:05 +0800
-Date: Thu, 24 Apr 2025 18:47:05 +0800
-Message-Id: <759c8742fd61b7bca531b8cb20c05abcea8a9353.1745490652.git.herbert@gondor.apana.org.au>
+	id 1u7u6l-000fM7-2L;
+	Thu, 24 Apr 2025 18:47:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Apr 2025 18:47:07 +0800
+Date: Thu, 24 Apr 2025 18:47:07 +0800
+Message-Id: <c59424f3287cbbb7a124052554c2231a9c4f39cf.1745490652.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1745490652.git.herbert@gondor.apana.org.au>
 References: <cover.1745490652.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 04/15] crypto: arm64/poly1305 - Add block-only interface
+Subject: [PATCH 05/15] crypto: mips/poly1305 - Add block-only interface
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,68 +47,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Add block-only interface.
 
-Also remove the unnecessary SIMD fallback path.
-
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm64/lib/crypto/Makefile        |  3 +-
- arch/arm64/lib/crypto/poly1305-glue.c | 70 ++++++++++++++++-----------
- 2 files changed, 44 insertions(+), 29 deletions(-)
+ arch/mips/lib/crypto/poly1305-glue.c  | 28 ++++++++++++++++++---------
+ arch/mips/lib/crypto/poly1305-mips.pl | 12 ++++++------
+ 2 files changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/lib/crypto/Makefile b/arch/arm64/lib/crypto/Makefile
-index ac624c3effda..6207088397a7 100644
---- a/arch/arm64/lib/crypto/Makefile
-+++ b/arch/arm64/lib/crypto/Makefile
-@@ -5,7 +5,8 @@ chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
+diff --git a/arch/mips/lib/crypto/poly1305-glue.c b/arch/mips/lib/crypto/poly1305-glue.c
+index 576e7a58e0b1..fc00e96b2a5b 100644
+--- a/arch/mips/lib/crypto/poly1305-glue.c
++++ b/arch/mips/lib/crypto/poly1305-glue.c
+@@ -5,23 +5,32 @@
+  * Copyright (C) 2019 Linaro Ltd. <ard.biesheuvel@linaro.org>
+  */
  
- obj-$(CONFIG_CRYPTO_POLY1305_NEON) += poly1305-neon.o
- poly1305-neon-y := poly1305-core.o poly1305-glue.o
--AFLAGS_poly1305-core.o += -Dpoly1305_init=poly1305_init_arm64
-+AFLAGS_poly1305-core.o += -Dpoly1305_init=poly1305_block_init_arch
-+AFLAGS_poly1305-core.o += -Dpoly1305_emit=poly1305_emit_arch
- 
- quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $(<) void $(@)
-diff --git a/arch/arm64/lib/crypto/poly1305-glue.c b/arch/arm64/lib/crypto/poly1305-glue.c
-index 906970dd5373..9fdb5bd3dbb0 100644
---- a/arch/arm64/lib/crypto/poly1305-glue.c
-+++ b/arch/arm64/lib/crypto/poly1305-glue.c
-@@ -7,32 +7,59 @@
- 
- #include <asm/hwcap.h>
- #include <asm/neon.h>
--#include <asm/simd.h>
 -#include <crypto/poly1305.h>
--#include <crypto/internal/simd.h>
 +#include <crypto/internal/poly1305.h>
  #include <linux/cpufeature.h>
- #include <linux/jump_label.h>
 +#include <linux/kernel.h>
  #include <linux/module.h>
 +#include <linux/string.h>
  #include <linux/unaligned.h>
  
--asmlinkage void poly1305_init_arm64(void *state, const u8 *key);
--asmlinkage void poly1305_blocks(void *state, const u8 *src, u32 len, u32 hibit);
--asmlinkage void poly1305_blocks_neon(void *state, const u8 *src, u32 len, u32 hibit);
--asmlinkage void poly1305_emit(void *state, u8 *digest, const u32 *nonce);
+-asmlinkage void poly1305_init_mips(void *state, const u8 *key);
+-asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len, u32 hibit);
+-asmlinkage void poly1305_emit_mips(void *state, u8 *digest, const u32 *nonce);
 +asmlinkage void poly1305_block_init_arch(struct poly1305_block_state *state,
 +					 const u8 key[POLY1305_BLOCK_SIZE]);
 +EXPORT_SYMBOL_GPL(poly1305_block_init_arch);
-+asmlinkage void poly1305_blocks(struct poly1305_block_state *state,
-+				const u8 *src, u32 len, u32 hibit);
-+asmlinkage void poly1305_blocks_neon(struct poly1305_block_state *state,
++asmlinkage void poly1305_blocks_arch(struct poly1305_block_state *state,
 +				     const u8 *src, u32 len, u32 hibit);
++EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
 +asmlinkage void poly1305_emit_arch(const struct poly1305_state *state,
 +				   u8 digest[POLY1305_DIGEST_SIZE],
 +				   const u32 nonce[4]);
 +EXPORT_SYMBOL_GPL(poly1305_emit_arch);
  
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
- 
  void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
  {
--	poly1305_init_arm64(&dctx->h, key);
+-	poly1305_init_mips(&dctx->h, key);
  	dctx->s[0] = get_unaligned_le32(key + 16);
  	dctx->s[1] = get_unaligned_le32(key + 20);
  	dctx->s[2] = get_unaligned_le32(key + 24);
@@ -118,77 +95,68 @@ index 906970dd5373..9fdb5bd3dbb0 100644
  }
  EXPORT_SYMBOL(poly1305_init_arch);
  
-+void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
-+			  unsigned int len, u32 padbit)
-+{
-+	len = round_down(len, POLY1305_BLOCK_SIZE);
-+	if (static_branch_likely(&have_neon)) {
-+		do {
-+			unsigned int todo = min_t(unsigned int, len, SZ_4K);
-+
-+			kernel_neon_begin();
-+			poly1305_blocks_neon(state, src, todo, 1);
-+			kernel_neon_end();
-+
-+			len -= todo;
-+			src += todo;
-+		} while (len);
-+	} else
-+		poly1305_blocks(state, src, len, 1);
-+}
-+EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
-+
- void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
- 			  unsigned int nbytes)
- {
-@@ -45,29 +72,15 @@ void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
+@@ -37,7 +46,7 @@ void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
  		dctx->buflen += bytes;
  
  		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
--			poly1305_blocks(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 1);
+-			poly1305_blocks_mips(&dctx->h, dctx->buf,
 +			poly1305_blocks_arch(&dctx->state, dctx->buf,
-+					     POLY1305_BLOCK_SIZE, 1);
+ 					     POLY1305_BLOCK_SIZE, 1);
  			dctx->buflen = 0;
  		}
- 	}
- 
+@@ -46,7 +55,7 @@ void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
  	if (likely(nbytes >= POLY1305_BLOCK_SIZE)) {
--		unsigned int len = round_down(nbytes, POLY1305_BLOCK_SIZE);
--
--		if (static_branch_likely(&have_neon) && crypto_simd_usable()) {
--			do {
--				unsigned int todo = min_t(unsigned int, len, SZ_4K);
--
--				kernel_neon_begin();
--				poly1305_blocks_neon(&dctx->h, src, todo, 1);
--				kernel_neon_end();
--
--				len -= todo;
--				src += todo;
--			} while (len);
--		} else {
--			poly1305_blocks(&dctx->h, src, len, 1);
--			src += len;
--		}
-+		poly1305_blocks_arch(&dctx->state, src, nbytes, 1);
-+		src += round_down(nbytes, POLY1305_BLOCK_SIZE);
+ 		unsigned int len = round_down(nbytes, POLY1305_BLOCK_SIZE);
+ 
+-		poly1305_blocks_mips(&dctx->h, src, len, 1);
++		poly1305_blocks_arch(&dctx->state, src, len, 1);
+ 		src += len;
  		nbytes %= POLY1305_BLOCK_SIZE;
  	}
- 
-@@ -84,10 +97,11 @@ void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
+@@ -64,10 +73,11 @@ void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
  		dctx->buf[dctx->buflen++] = 1;
  		memset(dctx->buf + dctx->buflen, 0,
  		       POLY1305_BLOCK_SIZE - dctx->buflen);
--		poly1305_blocks(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 0);
+-		poly1305_blocks_mips(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 0);
 +		poly1305_blocks_arch(&dctx->state, dctx->buf,
 +				     POLY1305_BLOCK_SIZE, 0);
  	}
  
--	poly1305_emit(&dctx->h, dst, dctx->s);
+-	poly1305_emit_mips(&dctx->h, dst, dctx->s);
 +	poly1305_emit_arch(&dctx->h, dst, dctx->s);
- 	memzero_explicit(dctx, sizeof(*dctx));
+ 	*dctx = (struct poly1305_desc_ctx){};
  }
  EXPORT_SYMBOL(poly1305_final_arch);
+diff --git a/arch/mips/lib/crypto/poly1305-mips.pl b/arch/mips/lib/crypto/poly1305-mips.pl
+index b05bab884ed2..399f10c3e385 100644
+--- a/arch/mips/lib/crypto/poly1305-mips.pl
++++ b/arch/mips/lib/crypto/poly1305-mips.pl
+@@ -93,9 +93,9 @@ $code.=<<___;
+ #endif
+ 
+ #ifdef	__KERNEL__
+-# define poly1305_init   poly1305_init_mips
+-# define poly1305_blocks poly1305_blocks_mips
+-# define poly1305_emit   poly1305_emit_mips
++# define poly1305_init   poly1305_block_init_arch
++# define poly1305_blocks poly1305_blocks_arch
++# define poly1305_emit   poly1305_emit_arch
+ #endif
+ 
+ #if defined(__MIPSEB__) && !defined(MIPSEB)
+@@ -565,9 +565,9 @@ $code.=<<___;
+ #endif
+ 
+ #ifdef	__KERNEL__
+-# define poly1305_init   poly1305_init_mips
+-# define poly1305_blocks poly1305_blocks_mips
+-# define poly1305_emit   poly1305_emit_mips
++# define poly1305_init   poly1305_block_init_arch
++# define poly1305_blocks poly1305_blocks_arch
++# define poly1305_emit   poly1305_emit_arch
+ #endif
+ 
+ #if defined(__MIPSEB__) && !defined(MIPSEB)
 -- 
 2.39.5
 
