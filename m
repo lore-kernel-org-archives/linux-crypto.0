@@ -1,43 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75067224AFC
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 10:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4685C221FCC
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 10:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745491654; cv=none; b=IduXeP0nOJuxjuf5KBFp8d1zI91HxivoxW04NRqgWsNGmIZIfjGrOFhPxKsaqgyxkIFzAl1UrI2qOxnjWZ4xT8w7x5uD2gR7mzYe4IaRZsy27J7HefssFa618hWCnzSHzsTs2YhtgK4LWoC347kQAeCYKvOsb9qvEJLoNyHdYnM=
+	t=1745491656; cv=none; b=r2GV/j8OLGQ88w3EmZrT3mplZLYvBGwh4Kw9qbpCjHmpnuc7hwTAPZZ0GtOqzZ01uuNN6vrYwy+pcrTxruMYNoOxTI2fsYDV95HIwn7akpz1kDY1ELiBUVZ7ci53OJhv/VsHP9HlK+mfENXXKNlYpcNcWdNUnu1IDpFwbLim9PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745491654; c=relaxed/simple;
-	bh=ryUjz9WKwhuukJLUbM6rbeHaEEDl/i+4tBTdsfAsQkA=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=Vk/78zTO+z9lQN6zKgt7L6q4JDLFPEHFdnM4nZZpkiOZHp11SXjmnCPxdEEwkaVoJ0otR1cIhsKjMwOhi5gpBTZrKF8cxQGrPCVaHEjB3aekRwR04UAqOX9sKBlfmu+MXXGxWTvmCnFAEl592xZEnSA4MGh1AVxjRYf16czpxrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=A+gLkyLh; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745491656; c=relaxed/simple;
+	bh=1pfPyVZVRvHXTMzpTjLn7qatF+RMJ1aGTlpkru9PJk4=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=k8u1Fr7yzgYpqYU0VeZ0rQOjRwlYF7g3YsuQE5VwJevlzznzAydBAAqffFEgxzvjHYuQfJmsBPAYw2xXukeA/t5dnHXlyx67ju05gp9fVvWTkwfyWe2yg2RsGaXL8RXVONXIfD4YlaMYTO3+3O21pHGU3yE+LUaTgux9mMfFJ+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NPbnS3/y; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="A+gLkyLh"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NPbnS3/y"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=mKRM+eCX7VJCL/BRQ7tUyEwPfEIJ9SGQ2na/0ejFxHw=; b=A+gLkyLh8x5y7//dRXKzFqx3U+
-	ix6O+2kVN1y/Hq8T1h+R8BHUWdj5mRH1I0+1I4B1TrPbn6lDvem+xhNDztrD0vS4wjlIxJJbqqSQ0
-	yyfeJxJWoaasrvKAPb5p3hanL8bb1YT1JWJeTtgOKxsdVLKL+5AY2ZXHTeOL8qnr6MHxLhHhZDCZ2
-	88zpQsBKt9zXzFNbzj5uGcrmYlxEWx5/98rPfMYYQLvDQIQlwWbUudcklyo52Bv8FWuMSKb1dstGs
-	8lnLhWsm4AuLj5WIxadTDFfvt9vhf/iLR+f9a0bb9BdKOrjfdOSATljPn3Mc8ZE5kgxsqdll36TNj
-	uWjcm+QQ==;
+	bh=QcTf8gBn5TASfxlGhLjJaS9cqJZGrJ005HS2C+MIj9g=; b=NPbnS3/ymNfSiE46tx6hAHs3XQ
+	fMqqklWxMo5DwsaHkf3Bywv7dhMtbN+K5WkWhIz4hUusqWBP3p3Q/IzQX6vw8ei6Ad0hT9GiGl7TP
+	toDhYLwkq9KQCPlY9AhEZRshVCMDCc54n9MgEwmweC5ZvadoH88oXFv8GLw5B3Rg2MdlkYxTYq5qu
+	iMcDK7Ga54BXprINQL+2onxFaKFORA6ERYEHuWTF+br7CuYZTowzjGtmQKb8PrXx96Ur6RL0IL1oV
+	GiPj6tFQWyyjGnpEWxum1ueSOvfHBtNhKX1QVeRIEL0ML/Urba2DkiojwuqOBvTG8k57UmRNKFJVj
+	fvuKV6iw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u7u76-000fOV-1f;
-	Thu, 24 Apr 2025 18:47:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Apr 2025 18:47:28 +0800
-Date: Thu, 24 Apr 2025 18:47:28 +0800
-Message-Id: <9aa5864c62f4eefc73fb71c9c4acbd6171e3803c.1745490652.git.herbert@gondor.apana.org.au>
+	id 1u7u78-000fOg-2g;
+	Thu, 24 Apr 2025 18:47:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Apr 2025 18:47:30 +0800
+Date: Thu, 24 Apr 2025 18:47:30 +0800
+Message-Id: <18dd6ca13b6924cd28be515dc49d18edf8c85664.1745490652.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1745490652.git.herbert@gondor.apana.org.au>
 References: <cover.1745490652.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 14/15] crypto: x86/polyval - Use API partial block handling
+Subject: [PATCH 15/15] crypto: polyval-generic - Use API partial block
+ handling
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,152 +48,225 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 Use the Crypto API partial block handling.
 
-Also remove the unnecessary SIMD fallback path.
+The accelerated export format on x86/arm64 is easier to use so
+switch the generic polyval algorithm to use that format instead.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/x86/crypto/polyval-clmulni_glue.c | 72 +++++++-------------------
- 1 file changed, 20 insertions(+), 52 deletions(-)
+ crypto/polyval-generic.c | 120 +++++++++++++--------------------------
+ include/crypto/polyval.h |   8 ---
+ 2 files changed, 40 insertions(+), 88 deletions(-)
 
-diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
-index 8fa58b0f3cb3..6b466867f91a 100644
---- a/arch/x86/crypto/polyval-clmulni_glue.c
-+++ b/arch/x86/crypto/polyval-clmulni_glue.c
-@@ -16,16 +16,15 @@
-  * operations.
+diff --git a/crypto/polyval-generic.c b/crypto/polyval-generic.c
+index 4f98910bcdb5..ffd174e75420 100644
+--- a/crypto/polyval-generic.c
++++ b/crypto/polyval-generic.c
+@@ -44,15 +44,15 @@
+  *
   */
  
+-#include <linux/unaligned.h>
 -#include <crypto/algapi.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/fpu/api.h>
+ #include <crypto/gf128mul.h>
+-#include <crypto/polyval.h>
  #include <crypto/internal/hash.h>
--#include <crypto/internal/simd.h>
- #include <crypto/polyval.h>
 -#include <linux/crypto.h>
 -#include <linux/init.h>
++#include <crypto/polyval.h>
 +#include <crypto/utils.h>
 +#include <linux/errno.h>
  #include <linux/kernel.h>
  #include <linux/module.h>
--#include <asm/cpu_device_id.h>
--#include <asm/simd.h>
 +#include <linux/string.h>
++#include <linux/unaligned.h>
  
- #define POLYVAL_ALIGN	16
- #define POLYVAL_ALIGN_ATTR __aligned(POLYVAL_ALIGN)
-@@ -42,7 +41,6 @@ struct polyval_tfm_ctx {
- 
- struct polyval_desc_ctx {
- 	u8 buffer[POLYVAL_BLOCK_SIZE];
+ struct polyval_tfm_ctx {
+ 	struct gf128mul_4k *gf128;
+@@ -63,7 +63,6 @@ struct polyval_desc_ctx {
+ 		u8 buffer[POLYVAL_BLOCK_SIZE];
+ 		be128 buffer128;
+ 	};
 -	u32 bytes;
  };
  
- asmlinkage void clmul_polyval_update(const struct polyval_tfm_ctx *keys,
-@@ -57,25 +55,16 @@ static inline struct polyval_tfm_ctx *polyval_tfm_ctx(struct crypto_shash *tfm)
- static void internal_polyval_update(const struct polyval_tfm_ctx *keys,
- 	const u8 *in, size_t nblocks, u8 *accumulator)
- {
--	if (likely(crypto_simd_usable())) {
--		kernel_fpu_begin();
--		clmul_polyval_update(keys, in, nblocks, accumulator);
--		kernel_fpu_end();
--	} else {
--		polyval_update_non4k(keys->key_powers[NUM_KEY_POWERS-1], in,
--			nblocks, accumulator);
--	}
-+	kernel_fpu_begin();
-+	clmul_polyval_update(keys, in, nblocks, accumulator);
-+	kernel_fpu_end();
+ static void copy_and_reverse(u8 dst[POLYVAL_BLOCK_SIZE],
+@@ -76,46 +75,6 @@ static void copy_and_reverse(u8 dst[POLYVAL_BLOCK_SIZE],
+ 	put_unaligned(swab64(b), (u64 *)&dst[0]);
  }
  
- static void internal_polyval_mul(u8 *op1, const u8 *op2)
- {
--	if (likely(crypto_simd_usable())) {
--		kernel_fpu_begin();
--		clmul_polyval_mul(op1, op2);
--		kernel_fpu_end();
--	} else {
--		polyval_mul_non4k(op1, op2);
+-/*
+- * Performs multiplication in the POLYVAL field using the GHASH field as a
+- * subroutine.  This function is used as a fallback for hardware accelerated
+- * implementations when simd registers are unavailable.
+- *
+- * Note: This function is not used for polyval-generic, instead we use the 4k
+- * lookup table implementation for finite field multiplication.
+- */
+-void polyval_mul_non4k(u8 *op1, const u8 *op2)
+-{
+-	be128 a, b;
+-
+-	// Assume one argument is in Montgomery form and one is not.
+-	copy_and_reverse((u8 *)&a, op1);
+-	copy_and_reverse((u8 *)&b, op2);
+-	gf128mul_x_lle(&a, &a);
+-	gf128mul_lle(&a, &b);
+-	copy_and_reverse(op1, (u8 *)&a);
+-}
+-EXPORT_SYMBOL_GPL(polyval_mul_non4k);
+-
+-/*
+- * Perform a POLYVAL update using non4k multiplication.  This function is used
+- * as a fallback for hardware accelerated implementations when simd registers
+- * are unavailable.
+- *
+- * Note: This function is not used for polyval-generic, instead we use the 4k
+- * lookup table implementation of finite field multiplication.
+- */
+-void polyval_update_non4k(const u8 *key, const u8 *in,
+-			  size_t nblocks, u8 *accumulator)
+-{
+-	while (nblocks--) {
+-		crypto_xor(accumulator, in, POLYVAL_BLOCK_SIZE);
+-		polyval_mul_non4k(accumulator, key);
+-		in += POLYVAL_BLOCK_SIZE;
 -	}
-+	kernel_fpu_begin();
-+	clmul_polyval_mul(op1, op2);
-+	kernel_fpu_end();
- }
- 
- static int polyval_x86_setkey(struct crypto_shash *tfm,
-@@ -112,49 +101,27 @@ static int polyval_x86_update(struct shash_desc *desc,
+-}
+-EXPORT_SYMBOL_GPL(polyval_update_non4k);
+-
+ static int polyval_setkey(struct crypto_shash *tfm,
+ 			  const u8 *key, unsigned int keylen)
+ {
+@@ -154,56 +113,53 @@ static int polyval_update(struct shash_desc *desc,
  {
  	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
- 	const struct polyval_tfm_ctx *tctx = polyval_tfm_ctx(desc->tfm);
+ 	const struct polyval_tfm_ctx *ctx = crypto_shash_ctx(desc->tfm);
 -	u8 *pos;
- 	unsigned int nblocks;
--	unsigned int n;
+ 	u8 tmp[POLYVAL_BLOCK_SIZE];
+-	int n;
  
 -	if (dctx->bytes) {
 -		n = min(srclen, dctx->bytes);
--		pos = dctx->buffer + POLYVAL_BLOCK_SIZE - dctx->bytes;
+-		pos = dctx->buffer + dctx->bytes - 1;
 -
 -		dctx->bytes -= n;
 -		srclen -= n;
 -
 -		while (n--)
--			*pos++ ^= *src++;
+-			*pos-- ^= *src++;
 -
 -		if (!dctx->bytes)
--			internal_polyval_mul(dctx->buffer,
--					    tctx->key_powers[NUM_KEY_POWERS-1]);
+-			gf128mul_4k_lle(&dctx->buffer128, ctx->gf128);
 -	}
 -
 -	while (srclen >= POLYVAL_BLOCK_SIZE) {
 +	do {
- 		/* Allow rescheduling every 4K bytes. */
- 		nblocks = min(srclen, 4096U) / POLYVAL_BLOCK_SIZE;
- 		internal_polyval_update(tctx, src, nblocks, dctx->buffer);
- 		srclen -= nblocks * POLYVAL_BLOCK_SIZE;
- 		src += nblocks * POLYVAL_BLOCK_SIZE;
+ 		copy_and_reverse(tmp, src);
+ 		crypto_xor(dctx->buffer, tmp, POLYVAL_BLOCK_SIZE);
+ 		gf128mul_4k_lle(&dctx->buffer128, ctx->gf128);
+ 		src += POLYVAL_BLOCK_SIZE;
+ 		srclen -= POLYVAL_BLOCK_SIZE;
 -	}
 +	} while (srclen >= POLYVAL_BLOCK_SIZE);
  
 -	if (srclen) {
 -		dctx->bytes = POLYVAL_BLOCK_SIZE - srclen;
--		pos = dctx->buffer;
+-		pos = dctx->buffer + POLYVAL_BLOCK_SIZE - 1;
 -		while (srclen--)
--			*pos++ ^= *src++;
+-			*pos-- ^= *src++;
 -	}
 -
 -	return 0;
 +	return srclen;
  }
  
--static int polyval_x86_final(struct shash_desc *desc, u8 *dst)
-+static int polyval_x86_finup(struct shash_desc *desc, const u8 *src,
-+			     unsigned int len, u8 *dst)
+-static int polyval_final(struct shash_desc *desc, u8 *dst)
++static int polyval_finup(struct shash_desc *desc, const u8 *src,
++			 unsigned int len, u8 *dst)
  {
  	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
- 	const struct polyval_tfm_ctx *tctx = polyval_tfm_ctx(desc->tfm);
+-	const struct polyval_tfm_ctx *ctx = crypto_shash_ctx(desc->tfm);
  
--	if (dctx->bytes) {
+-	if (dctx->bytes)
+-		gf128mul_4k_lle(&dctx->buffer128, ctx->gf128);
 +	if (len) {
-+		crypto_xor(dctx->buffer, src, len);
- 		internal_polyval_mul(dctx->buffer,
- 				     tctx->key_powers[NUM_KEY_POWERS-1]);
- 	}
-@@ -168,13 +135,14 @@ static struct shash_alg polyval_alg = {
++		u8 tmp[POLYVAL_BLOCK_SIZE] = {};
++
++		memcpy(tmp, src, len);
++		polyval_update(desc, tmp, POLYVAL_BLOCK_SIZE);
++	}
+ 	copy_and_reverse(dst, dctx->buffer);
+ 	return 0;
+ }
+ 
+-static void polyval_exit_tfm(struct crypto_tfm *tfm)
++static int polyval_export(struct shash_desc *desc, void *out)
+ {
+-	struct polyval_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	copy_and_reverse(out, dctx->buffer);
++	return 0;
++}
++
++static int polyval_import(struct shash_desc *desc, const void *in)
++{
++	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	copy_and_reverse(dctx->buffer, in);
++	return 0;
++}
++
++static void polyval_exit_tfm(struct crypto_shash *tfm)
++{
++	struct polyval_tfm_ctx *ctx = crypto_shash_ctx(tfm);
+ 
+ 	gf128mul_free_4k(ctx->gf128);
+ }
+@@ -212,17 +168,21 @@ static struct shash_alg polyval_alg = {
  	.digestsize	= POLYVAL_DIGEST_SIZE,
- 	.init		= polyval_x86_init,
- 	.update		= polyval_x86_update,
--	.final		= polyval_x86_final,
-+	.finup		= polyval_x86_finup,
- 	.setkey		= polyval_x86_setkey,
+ 	.init		= polyval_init,
+ 	.update		= polyval_update,
+-	.final		= polyval_final,
++	.finup		= polyval_finup,
+ 	.setkey		= polyval_setkey,
++	.export		= polyval_export,
++	.import		= polyval_import,
++	.exit_tfm	= polyval_exit_tfm,
++	.statesize	= sizeof(struct polyval_desc_ctx),
  	.descsize	= sizeof(struct polyval_desc_ctx),
  	.base		= {
  		.cra_name		= "polyval",
- 		.cra_driver_name	= "polyval-clmulni",
- 		.cra_priority		= 200,
+ 		.cra_driver_name	= "polyval-generic",
+ 		.cra_priority		= 100,
 +		.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
  		.cra_blocksize		= POLYVAL_BLOCK_SIZE,
- 		.cra_ctxsize		= POLYVAL_CTX_SIZE,
+ 		.cra_ctxsize		= sizeof(struct polyval_tfm_ctx),
  		.cra_module		= THIS_MODULE,
+-		.cra_exit		= polyval_exit_tfm,
+ 	},
+ };
+ 
+diff --git a/include/crypto/polyval.h b/include/crypto/polyval.h
+index 1d630f371f77..d2e63743e592 100644
+--- a/include/crypto/polyval.h
++++ b/include/crypto/polyval.h
+@@ -8,15 +8,7 @@
+ #ifndef _CRYPTO_POLYVAL_H
+ #define _CRYPTO_POLYVAL_H
+ 
+-#include <linux/types.h>
+-#include <linux/crypto.h>
+-
+ #define POLYVAL_BLOCK_SIZE	16
+ #define POLYVAL_DIGEST_SIZE	16
+ 
+-void polyval_mul_non4k(u8 *op1, const u8 *op2);
+-
+-void polyval_update_non4k(const u8 *key, const u8 *in,
+-			  size_t nblocks, u8 *accumulator);
+-
+ #endif
 -- 
 2.39.5
 
