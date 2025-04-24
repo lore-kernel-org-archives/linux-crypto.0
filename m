@@ -1,38 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666D727F74A
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 16:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BAF27FD76
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Apr 2025 16:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745511461; cv=none; b=BlnjYjEqBh+g6GH6cfj+miYo21KwFN2U7/tOFeVmR0UTQ2p9JcXb7S7QvWqub9cuia1Lz7QZ2kVdgJq536pyNaY/UwjEa1kRpB4bwFSvWyCXs8fk7UJc+p8VT/bRVMZ2/Geezx0vSzNLjONVUceQuJFvISZFYGkiY7urzlkZDrs=
+	t=1745511674; cv=none; b=IJ8ef7Wk25p+iGzKolH0FUkL+TRVN3cRHB0lAlLcO8sKaCA2qc1AIXhexpZyvF1DxkyfGSrRP0DbNmwvW1cWakK6gK9ykyiNtPKKngnsQJvl2Tpirj9fFxh67SgsIX/0pHqTJ+hAqlI0bqIne7Qv57FUSzvvC2B3OPVDD70HgL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745511461; c=relaxed/simple;
-	bh=jB8JPU4OmOcyrZXpXeKhpwjBPvnEU5YZJrTTvpLMoto=;
+	s=arc-20240116; t=1745511674; c=relaxed/simple;
+	bh=+NyEQ9EpowjiTCXvxrU9zcLh14LXEf6wKZSGPAtM3YA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eV5RwqS05KPUALoy6pvabqZNUU+Dkk6M6tmZSBiVJjrOWnXmushvreEc0hWbK2B3jwO0OUEw803Jb+V3Kz3KChKaL6raAWqP2e7N/Z9mASuublSneQuQ/o/1tTgq31ASridajJB271xAVM15rT9G7WFqgoKxRSUn9SxOPg2vXxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N7NdmeHG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=V6Uq9bfrgnWDKF0qyO4s+h3VAeHyAzHbi+muhrkr7uy0i2rLGGkpWot7zvgPW8dJ9rYG7wcj3PjsZB0wWClnxANYHiB3ae3rezc6pw/lDmmoCS9kQgOp6iIsaI8e59qIURzSCq6vch9fAOULFs8scxPh5o5ffwHKzPXWBFpeZEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8vfhfWC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N7NdmeHG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27495C4CEE3;
-	Thu, 24 Apr 2025 16:17:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8vfhfWC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C52C4CEE8;
+	Thu, 24 Apr 2025 16:21:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745511461;
-	bh=jB8JPU4OmOcyrZXpXeKhpwjBPvnEU5YZJrTTvpLMoto=;
+	s=k20201202; t=1745511674;
+	bh=+NyEQ9EpowjiTCXvxrU9zcLh14LXEf6wKZSGPAtM3YA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N7NdmeHG3CtL6JKCppHnYyNKMNOslFR6W84Du0JvqOchhpBhDPZ0E8LyOhCEcugnO
-	 Lbg7VdsALSQaVa0eUfq5NwCZTT0wo8vxJuoraSkbdDXliOqUblXx8NW3P+HZtapxiZ
-	 9kAiPG5sEHFq7GMcpM34sscEi37C/rrg2Vlo+rEMXwQzXlZ231IhBDF22Rz1ZndKGM
-	 OgNUihHgd8yU9O92u6W1Ijpz+rqry29JVVWv3SYlhyT4kS/2gIcsL0TegKSUDFBOWg
-	 zbn+T5E4OWYRUJsvtkmsIOeXRJixs8v5cRyO5aeANTe+AqAFKckb1ZIzvGOMy7JpJi
-	 5IRTL6/cZqh8A==
-Date: Thu, 24 Apr 2025 09:17:39 -0700
+	b=t8vfhfWCbA8nMTjDxdKBnzJW2ZjFc9ehf0ZeYOIXgvQ7GD9N3qxxkhBr2E5zG9Eq1
+	 TPUnRP90rcKWPXkzTkPjxemb7vLx8r7sHcK57Pne2wZz67ml099l3c8JORBKoo0nh4
+	 ZCWgwfdPa+pmypbXSMjAAlhnk5lAF65RmzVpVnJ3EMI3k8+yUlPMijnj4tPAVq3H+f
+	 Gs32I2sCcP0RzsFvH9/pn3+1kzr9w4PIomq6mzf78MaxOVM3edEtg9t4ppy7p1t62D
+	 rXPV4UScLriq8o3GpmQArdvjm/EleE03goO9V7Kirt2dcWr8feuC02KjAbEZeugvIX
+	 GWmCehT00zjsg==
+Date: Thu, 24 Apr 2025 09:21:12 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 00/15] crypto: lib - Add partial block helper
-Message-ID: <20250424161739.GF2427@sol.localdomain>
+Subject: Re: [PATCH 09/15] crypto: lib/poly1305 - Use block-only interface
+Message-ID: <20250424162112.GG2427@sol.localdomain>
 References: <cover.1745490652.git.herbert@gondor.apana.org.au>
+ <6c08ba96e4cb6a6219e06bb77006cba91e6e84a2.1745490652.git.herbert@gondor.apana.org.au>
+ <20250424154801.GC2427@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,35 +43,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1745490652.git.herbert@gondor.apana.org.au>
+In-Reply-To: <20250424154801.GC2427@sol.localdomain>
 
-On Thu, Apr 24, 2025 at 06:46:56PM +0800, Herbert Xu wrote:
-> This is based on
+On Thu, Apr 24, 2025 at 08:48:01AM -0700, Eric Biggers wrote:
+> On Thu, Apr 24, 2025 at 06:47:16PM +0800, Herbert Xu wrote:
+> > diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
+> > index ebdfccf378ee..a37b424ee84b 100644
+> > --- a/lib/crypto/poly1305.c
+> > +++ b/lib/crypto/poly1305.c
+> > @@ -22,47 +22,59 @@ void poly1305_block_init_generic(struct poly1305_block_state *desc,
+> >  }
+> >  EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
+> >  
+> > -void poly1305_init_generic(struct poly1305_desc_ctx *desc,
+> > -			   const u8 key[POLY1305_KEY_SIZE])
+> > +void poly1305_init(struct poly1305_desc_ctx *desc,
+> > +		   const u8 key[POLY1305_KEY_SIZE])
+> >  {
+> >  	desc->s[0] = get_unaligned_le32(key + 16);
+> >  	desc->s[1] = get_unaligned_le32(key + 20);
+> >  	desc->s[2] = get_unaligned_le32(key + 24);
+> >  	desc->s[3] = get_unaligned_le32(key + 28);
+> >  	desc->buflen = 0;
+> > -	poly1305_block_init_generic(&desc->state, key);
+> > +	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_POLY1305))
+> > +		poly1305_block_init_arch(&desc->state, key);
+> > +	else
+> > +		poly1305_block_init_generic(&desc->state, key);
+> >  }
+> > -EXPORT_SYMBOL_GPL(poly1305_init_generic);
+> > +EXPORT_SYMBOL(poly1305_init);
+> >  
+> > -static inline void poly1305_block(struct poly1305_block_state *state, const u8 *src,
+> > -				  unsigned int len)
+> > +static inline void poly1305_block(struct poly1305_block_state *state,
+> > +				  const u8 *src, unsigned int len)
+> >  {
+> > -	poly1305_blocks_generic(state, src, len, 1);
+> > +	if (!IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_POLY1305))
+> > +		poly1305_blocks_generic(state, src, len, 1);
+> > +	poly1305_blocks_arch(state, src, len, 1);
+> >  }
+> >  
+> > -void poly1305_update_generic(struct poly1305_desc_ctx *desc, const u8 *src,
+> > -			     unsigned int nbytes)
+> > +void poly1305_update(struct poly1305_desc_ctx *desc,
+> > +		     const u8 *src, unsigned int nbytes)
+> >  {
+> >  	desc->buflen = BLOCK_HASH_UPDATE(&poly1305_block, &desc->state,
+> >  					 src, nbytes, POLY1305_BLOCK_SIZE,
+> >  					 desc->buf, desc->buflen);
+> >  }
+> > -EXPORT_SYMBOL_GPL(poly1305_update_generic);
+> > +EXPORT_SYMBOL(poly1305_update);
 > 
-> 	https://patchwork.kernel.org/project/linux-crypto/patch/20250422152151.3691-2-ebiggers@kernel.org/
-> 	https://patchwork.kernel.org/project/linux-crypto/patch/20250422152716.5923-2-ebiggers@kernel.org/
-> 	https://patchwork.kernel.org/project/linux-crypto/patch/2ea17454f213a54134340b25f70a33cd3f26be37.1745399917.git.herbert@gondor.apana.org.au/
+> This randomly changes it to only do 1 block at a time.
 > 
-> This series introduces a partial block helper for lib/crypto hash
-> algorithms based on the one from sha256_base.
-> 
-> It then uses it on poly1305 to eliminate duplication between
-> architectures.  In particular, instead of having complete update
-> functions for each architecture, reduce it to a block function
-> per architecture instead.  The partial block handling is handled
-> by the generic library layer.
-> 
-> The poly1305 implementation was anomalous due to the inability
-> to call setkey in softirq.  This has since been resolved with
-> the addition of cloning.  Add setkey to poly1305 and switch the
-> IPsec code (rfc7539) to use that.
-> 
-> Finally add a partial blocks conversion for polyval.
+> And it also changes it to call poly1305_blocks_arch() even if the arch doesn't
+> have it, causing build errors.
 
-Why aren't the POLYVAL changes in their own patch series?
-
-Touching SHA-256 (which again, I'm currently working on fixing properly, so I
-keep having to rebase on top of your random changes which will be superseded
-anyway) also seems to be unnecessary.
+Actually maybe it still does more than 1 block at a time, since the '1' is
+actually the padbit argument, and maybe poly1305_block() is missing an "s"
+accidentally.  Hard to tell because the code is obfuscated in the macro though.
 
 - Eric
