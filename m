@@ -1,128 +1,158 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1BC21858E;
-	Thu, 24 Apr 2025 20:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBD228D850;
+	Thu, 24 Apr 2025 23:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745527155; cv=none; b=lp5FFl3FVYyWqqsBu4OeTbUSNNmqDBujb6QiCASo+lnpfiYYRr0XC8ncypP4uwxTzMONJhoTj1FfjsrSGiIrWbb6KuHMDn6qtmc10xP4NGBELfYhRjt5wBZe9/toMk4EN4oA/C3RTX4CZuEIa5cHLOCWxbh7KrWEFF50NSIox8k=
+	t=1745538117; cv=none; b=AoOuz8vgA1DIqgT5gjM/SFbI6cU79TQFOmYBopY43wqTCNBGVlcnVWLx5uQk47QwraVoaBtW83sBn5loZGgUsaShm1zinWutUdG+Lh3LwGd9jJCDDHTS1YlzuZeOjAlC6HmCmX5WuPmZsRudoziYD2Bp3pnDW8sFrKdhgS7vCvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745527155; c=relaxed/simple;
-	bh=nQ3Mzb7NWRMTNOmlLbpDQ1R5Ala77p/VWpIAROQn9Sw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JEQmNInLCItlOJt6lGIJFdeOmqQFu8JjsA2r2k87n/epAk+4drUPsht5RaJ24xmJNKZolO9S+SxTPwEzvw9RnODffzHUR8RLpVWjEX/e24jhmRC9yyCrsrtk/rLghTNq24rZXBL3XAGcRcOG0rkqBmQAONAuN/JMFo3Czk/nx2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0+vlke7; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1745538117; c=relaxed/simple;
+	bh=RPTxBkbH9A8ifRnn+WjYkSgINVnGKcdTM3iQNtEfaRI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CtafjfOKS6jqbUfJxqHv0V1hSQSusdBI29N/JPmLw3rMF8FvaG/MMMlTFQ6/mMWyniIbRpflMx1rf7G2toWNeY8oBKbeQUIFXrzPYqn6ssaif8uFvarTOEpD/KwvEmHoF0YscRRL4XvxXRutyKRgz7BMUD4xt0ui7vJ1HyaHUA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YrZcRxo2; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0+vlke7"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso8818535e9.3;
-        Thu, 24 Apr 2025 13:39:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YrZcRxo2"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-391342fc0b5so1267498f8f.3;
+        Thu, 24 Apr 2025 16:41:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745527152; x=1746131952; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r/D/PH0rUFFrYhqeW74Gp1hY0bf9Umd1t66r00ZISm4=;
-        b=C0+vlke7qA3s0HTeg0S+XhFJr1UOSEeAsRDOtv4ca1+Vk4on6EzdvvrOO8R4WpNFRi
-         nuI5hoRVZI3hITPtRuVM073tmjezl13GnZtgPPGzSN1YrDcZ8cajt0RKDypapCWc5Zcz
-         53P+NCv6u4jlw54gPE958GA/BVcmDWNk6CnsTdI05G4EIDZhOvqYDu3n0hi4D5yWX7QV
-         ZlXe2CLmAwTlYIRuTVfNHscEpkV4rbQAsjs95pLo4tBgmlDfXM16EtLAm+Jrw/kqN4Jr
-         kXdChwR6SP3h25QBp+kJ75J64rAL7IqlUBg+/1sCsn3jkNI9R7VpL5beW2uwXQQyi/zJ
-         J0mQ==
+        d=gmail.com; s=20230601; t=1745538114; x=1746142914; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=++aXbzVblpKG8Wdpinq9Se3gJFCNKU+xCUDkz1Ba3PQ=;
+        b=YrZcRxo2yB5/e7W5vTJ4kJkDpC4kSD56+bgi2oGF1CGJf04Q6gsIRXLmj/29BiN02A
+         t8SbRu5MhAjhowvTIooH74ZPwqxGIqz94lCJo3aQUNLLazfqoqRcuoOIf/trSCmgmn8n
+         Q8eRVoP26qrnJAAvpjkOLLqNKexaRmbPkIPqhsLL8lpzynsQV1xFDj89snGZS/L773tb
+         rtBPTJ40PLRlP7GNMTodT9NrQgJv1OMIOjjzKjWdkOcVoUYjR7Mfy/sfj4VGV6GPua/S
+         c+9wO4BX96gcfVLXxdNEwQ54wBoFWZ7hlacsm0JhNh6v/3wpiv5RrrtAGcYKzxQslWSe
+         R6Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745527152; x=1746131952;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r/D/PH0rUFFrYhqeW74Gp1hY0bf9Umd1t66r00ZISm4=;
-        b=OTcl9PVAeIM1JF02AszpZl7rPCgpbPtJGjrdt9hWva5QtuaHf42c1xdkkKYizB1E8a
-         4BEwKieUiJZpquObz4zDbj6TLDudCFbfrriIOwGaP3bM+BQm8A5IA5lsJ3mNcMeuEqxF
-         oylxwZxZiVGsDAjch9YkRfrp/T6beELDeFmrPJ9lr2ZMFyndZO+y2tu0kQyBfqYaRRJU
-         AFkRCmY+mTS1zOq37erEeMqg3u3RotKiM4ItEXI5iWlS03Ot8SYr+NALqPpMH7FR3+Tr
-         qtjIFu+k1Xh4F0xL1c+/pGZAkenNCX0wrWub9kaV6BSS5HAFtJv4TkJ6pncf5EoyLJLf
-         x4EQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdSuZhBxUczXrwCEbjoDud/P5iFgfUDTAdfqBjCA98lk9j3xISfz2cr1cwx35ujaAY5SyZKmFgCD1wJn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTEieXTu4+mmzP8awylLARcjJPuN6MxddDYA+ng//1wd8+Lvdt
-	cEda4AVx0Zd2newmFH29/wv/6v44SYq2xfM3zi4ccQytNav9hrlj
-X-Gm-Gg: ASbGnctMD9unfC3+tMXP4lq45woyKh2n3qVnky7fhwyYCXIMQm2UiLsltCfvT8BKYE2
-	cS/n0RNAPCfyCyAC+p6K74iwHKV2ftUY/gnot4kkn1DtMrj0BCjAinRxL/U4RFgazXoH9XNOS08
-	C7jmUC7AMHEtmr8kJdgtSDOWMKGBfYJQiz/1DFzt62u13EVbCq3xdtX6gmgvMt1rnwuulVAB8/x
-	AgwtytSZvjKGlRW2573dizkjSehscPa/ez2jpv+ruEYe6KOI6SnLalxaM8B4qK9yPuKKIFTquXA
-	PGIrvVePwiqQ39ZzKrHhyBacodaZRUbie6/0KhavZA==
-X-Google-Smtp-Source: AGHT+IG+6KKZSu15xf0leSuksMynDxPCWVzAORsheH70mD8f61JVwVtDr0F6+30YIXrEJALffEigAw==
-X-Received: by 2002:a05:6000:1acb:b0:39c:1258:2dc9 with SMTP id ffacd0b85a97d-3a06cfc8283mr3557246f8f.58.1745527151654;
-        Thu, 24 Apr 2025 13:39:11 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a073cc4025sm320188f8f.56.2025.04.24.13.39.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 13:39:11 -0700 (PDT)
-Date: Thu, 24 Apr 2025 22:39:09 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: Remove CRYPTO_ALG_ENGINE bit
-Message-ID: <aAqhbdiLmkHV350S@Red>
-References: <aAop_uMhxVh2l5Fy@Red>
- <aApN64n7i15ArnX4@gondor.apana.org.au>
+        d=1e100.net; s=20230601; t=1745538114; x=1746142914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=++aXbzVblpKG8Wdpinq9Se3gJFCNKU+xCUDkz1Ba3PQ=;
+        b=C5lBZ8V2RKPFsI3lb2V9DJldA4smG+XUKuZsM6ZBl2Tcor4shNJXWwusPGgsz01Rx6
+         MOCOWKK/J3tqnkaRfA5gthhK1YvGN6YO3JIlJhVree8lv/iMFOsTM5heFlyp1cGAEx55
+         kxzYxOgjOWjELuwjG6Yj66ZMelIjopATCSi+hM9qu66lTdh/XlszikznXbbGTPGP+p7D
+         ajis4niqDSO3jqTVjhakYIgQWUYyEqzh+bIBccOgPqhchkVZ86GodPt9Y/5BShCK1e9a
+         6YwaO47c7Q/Z5t1hG5i67cvY2k6BDMgcN9Xyc/O2LONbiNXE96oNqCH0CsiJQi7GKn2/
+         dW2A==
+X-Forwarded-Encrypted: i=1; AJvYcCU+Tz+7zNB07sH9FYfR7BG+UdycbtPY3uF7cr9vJucFiZGTAysEJ/G8qTLBv7Dd+GAjfTX5phMLMzs=@vger.kernel.org, AJvYcCUa0RgGiWHfvFbd8rSO3PEG8+V/vp+eqkQ7ibyLTN2BNWXs1+Fgal/alU+0+57kGylzzQi1uV/cAE9NAR9rs1ODyibG/bBZ@vger.kernel.org, AJvYcCVCGRHsJ7CVUF7MpsJjKTjwbPLXrAQJe2xNUN4O+APhTJbMA8iILmb7vGVDtQMmD0acUGGjpnlxTXjzt1ex0IUM@vger.kernel.org, AJvYcCWOVBxX3Nf1KUs3okt7dVZ/2v1hU/2pS4k+YwxGHnbZDgE6g2yNPDcUrfcdvaYXXvyBRWy7EokDH6c7Y5LK@vger.kernel.org, AJvYcCWWTMoRuSnF6YfKNaUmAUSxHOaBvdtbAxTU0iPpSayc7fOutEmb3ZPGtlPyp25psg2wqX4toCGOJ4E2@vger.kernel.org, AJvYcCWbsmlHtxHPhBZv+FVeTaqEg5ZIeqxplt2trOCCchfm8CaKvHVKdm2ydyUMb0NmDN8IdlAReod1B0s5Wlpr@vger.kernel.org, AJvYcCXGsEeqyndDxwRFpNnal61pEMmIYqxw45/qre3XZ7NUa4JfNUf7OkAg8c6JWGQH41oO1HSAxRj05qytjlYh@vger.kernel.org, AJvYcCXQpqE5JF0tpwKwzh/ZlZ4wPfdIN6sNjhtl7GnGiocIlduBrfvLxgXERoHcETGHnzzBzy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJyBseOM+umWg9i+xinAjWKctveBmwXuwZUc+i07KFZ2wWxQ3w
+	3HKewaQ3MUK6mgoznXd5iQo11hANZonhRbvCSj2USt0qf+AcnrjWtjv7bQhHv69lhFEk+M3ApIK
+	H/lGOAIkqmdVARYxi5ODUIWX4uSA=
+X-Gm-Gg: ASbGncs8Tiqp3xwB+CXxc/R1YbTrKeQJm16RRyqAktY5fDOwVdDbcBzpbVeupUBjoP0
+	0nPi+jXVoYX76y49Nj/gpWZSQS9ttJVOtExgFySFDa8xCCRI11iNIWU/O6m8b6mNhZjEdAanAl8
+	wfEJQg5ZtB320W5kaRkdwYS4f7qvXiaFCohvUrjV7SauVir3Ta
+X-Google-Smtp-Source: AGHT+IHKHTPUeCJbp/2K9OpvypUGo3fHAzmM52oJ/sIEmUDEupOSZOiZupc2hYCRKYbQoWZlx5V2SSGQrb0bFiUjwSA=
+X-Received: by 2002:a05:6000:402c:b0:39e:f51d:9cf9 with SMTP id
+ ffacd0b85a97d-3a074f42e7amr28887f8f.48.1745538113966; Thu, 24 Apr 2025
+ 16:41:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aApN64n7i15ArnX4@gondor.apana.org.au>
+References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
+ <20250404215527.1563146-2-bboscaccy@linux.microsoft.com> <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
+ <87semdjxcp.fsf@microsoft.com> <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
+ <87friajmd5.fsf@microsoft.com> <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
+ <87a58hjune.fsf@microsoft.com> <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
+ <87y0w0hv2x.fsf@microsoft.com> <CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGmRAjbusQ@mail.gmail.com>
+ <2bd95ca78e836db0775da8237792e8448b8eec62.camel@HansenPartnership.com>
+In-Reply-To: <2bd95ca78e836db0775da8237792e8448b8eec62.camel@HansenPartnership.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 24 Apr 2025 16:41:42 -0700
+X-Gm-Features: ATxdqUH6sfn1n7O-XtBH84L_ffinqPSTcAgsLr1DgVXlhHPwzgkdSH_nw0dH5ao
+Message-ID: <CAADnVQJ6SRePz7yc5x3BAz7q-e8DVYq=vRdahxCZ4XzpWtnYpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, Jonathan Corbet <corbet@lwn.net>, 
+	David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, 
+	Matteo Croce <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le Thu, Apr 24, 2025 at 10:42:51PM +0800, Herbert Xu a écrit :
-> On Thu, Apr 24, 2025 at 02:09:34PM +0200, Corentin Labbe wrote:
-> > 
-> > Example on x86_64:
-> > [    4.637589] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > [    4.637822] #PF: supervisor instruction fetch in kernel mode
-> > [    4.637931] #PF: error_code(0x0010) - not-present page
-> > [    4.638166] PGD 0 P4D 0 
-> > [    4.638359] Oops: Oops: 0010 [#1] SMP NOPTI
-> > [    4.638808] CPU: 0 UID: 0 PID: 64 Comm: virtio1-engine Not tainted 6.15.0-rc1-g63dc06cd12f9 #1 PREEMPT(voluntary) 
-> 
-> This patch should fix the crypto_engine failures:
-> 
-> ---8<---
-> Remove the private and obsolete CRYPTO_ALG_ENGINE bit which is
-> conflicting with the new CRYPTO_ALG_DUP_FIRST bit.
-> 
-> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Fixes: f1440a90465b ("crypto: api - Add support for duplicating algorithms before registration")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
+On Wed, Apr 23, 2025 at 7:12=E2=80=AFAM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> On Mon, 2025-04-21 at 13:12 -0700, Alexei Starovoitov wrote:
+> [...]
+> > Calling bpf_map_get() and
+> > map->ops->map_lookup_elem() from a module is not ok either.
+>
+> I don't understand this objection.
 
-Thanks it fixes my crypto hw devices.
-So Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+Consider an LSM that hooks into security_bprm_*(bprm),
+parses something in linux_binprm, then
+struct file *file =3D fd_file(fdget(some_random_file_descriptor_in_current)=
+);
+file->f_op->read(..);
 
-But I still got some crash with blake2b:
-+[   54.348477] alg: shash: blake2b-256-neon test failed (wrong result) on test vector 1, cfg="init+update+final aligned buffer"
-+[   54.348525] alg: self-tests for blake2b-256 using blake2b-256-neon failed (rc=-22)
-+[   54.348536] ------------[ cut here ]------------
-+[   54.348545] WARNING: CPU: 1 PID: 909 at crypto/testmgr.c:5871 alg_test+0x644/0x654
-+[   54.348575] alg: self-tests for blake2b-256 using blake2b-256-neon failed (rc=-22)
-+[   54.348583] Modules linked in: blake2b_neon(+) blake2b_generic rmd160 xxhash_generic ccm gcm crypto_null ghash_generic ghash_arm_ce camellia_generic fcrypt pcbc anubis wp512 khazad tea michael_mic arc4 libarc4 cast6_generic cast5_generic cast_common xctr serpent_generic lrw gf128mul twofish_generic twofish_common blowfish_generic blowfish_common md4 md5 tcrypt(+) cfg80211 bluetooth ecdh_generic ecc ctr sun8i_drm_hdmi uas des_generic libdes sun4i_codec snd_soc_core ac97_bus snd_pcm_dmaengine snd_pcm snd_timer snd lima drm_shmem_helper dw_hdmi gpu_sched aes_arm_bs aes_arm soundcore sunxi musb_hdrc sun4i_drm sun4i_frontend sun4i_tcon sun8i_mixer sun8i_ce sun8i_tcon_top drm_dma_helper display_connector
-+[   54.348927] CPU: 1 UID: 0 PID: 909 Comm: cryptomgr_test Not tainted 6.15.0-rc1-g0ba1b8bdf183 #22 NONE 
-+[   54.348941] Hardware name: Allwinner sun8i Family
-+[   54.348947] Call trace: 
-+[   54.348961]  unwind_backtrace from show_stack+0x10/0x14
-+[   54.348989]  show_stack from dump_stack_lvl+0x54/0x68
-+[   54.349010]  dump_stack_lvl from __warn+0x7c/0x128
-+[   54.349035]  __warn from warn_slowpath_fmt+0x124/0x18c
-+[   54.349059]  warn_slowpath_fmt from alg_test+0x644/0x654
-+[   54.349081]  alg_test from cryptomgr_test+0x18/0x38
-+[   54.349097]  cryptomgr_test from kthread+0x10c/0x238
-+[   54.349121]  kthread from ret_from_fork+0x14/0x28
-+[   54.349140] Exception stack(0xf0aa9fb0 to 0xf0aa9ff8)
-+[   54.349151] 9fa0:                                     00000000 00000000 00000000 00000000
-+[   54.349162] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-+[   54.349171] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-+[   54.349177] ---[ end trace 0000000000000000 ]---
+Would VFS maintainers approve such usage ?
 
-Regards
+More so, your LSM does
+file =3D get_task_exe_file(current);
+kernel_read_file(file, ...);
+
+This is even worse.
+You've corrupted the ELF binary with extra garbage at the end.
+objdump/elfutils will choke on it and you're lucky that binfmt_elf
+still loads it.
+The whole approach is a non-starter.
+
+> The program just got passed in to
+> bpf_prog_load() as a set of attributes which, for a light skeleton,
+> directly contain the code as a blob and have the various BTF
+> relocations as a blob in a single element array map.  I think everyone
+> agrees that the integrity of the program would be compromised by
+> modifications to the relocations, so the security_bpf_prog_load() hook
+> can't make an integrity determination without examining both.  If the
+> hook can't use the bpf_maps.. APIs directly is there some other API it
+> should be using to get the relocations, or are you saying that the
+> security_bpf_prog_load() hook isn't fit for purpose and it should be
+> called after the bpf core has loaded the relocations so they can be
+> provided to the hook as an argument?
+
+No. As I said twice already the only place to verify program
+signature is a bpf subsystem itself.
+Hacking into bpf internals from LSM, BPF-LSM program,
+or any other kernel subsystem is a no go.
+
+> The above, by the way, is independent of signing, because it applies to
+> any determination that might be made in the security_bpf_prog_load()
+> hook regardless of purpose.
+
+security_bpf_prog_load() should not access bpf internals.
+That LSM hook sees the following:
+security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr,
+                       struct bpf_token *token, bool kernel);
+
+LSM can look into uapi things there.
+Like prog->sleepable, prog->tag, prog->aux->name,
+but things like prog->aux->jit_data or prog->aux->used_maps
+are not ok to access.
+If in doubt, ask on the mailing list.
