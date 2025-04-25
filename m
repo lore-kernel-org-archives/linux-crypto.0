@@ -1,62 +1,62 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4846924DFF1;
-	Fri, 25 Apr 2025 12:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD609242D73;
+	Fri, 25 Apr 2025 12:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745585152; cv=none; b=do4WPIx43NuGoaQNwUAoSRiRzJEAM8X6UTO3zkFafrcma7wqQR3dNmgg6+TxHV9Xsf6IkigR+RQUfSlEsdhF71MrLn41We30qQhgf1xxYgRliMkcLDlW5qEUO5a5Esp1bSFsNbyvhA3SK/pAyNSlAlZhYUeB7SwIO1JJVaCKhLs=
+	t=1745585153; cv=none; b=SGl2ySrt87yS+cjGaJ2vFzx6cQQAOn1nboh992Y4vY3GCOX16/3bKz7BoWAlJABQ8zOtwu0jkVLO1XLmNwOAXl7aZPITgDIUwHEVzlplPz6QCMMLbVRU8L2mylIYCNZROnYBBb2yotdgM/HVfDxjy1O9r77hkRXQMsySvgvU7Yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745585152; c=relaxed/simple;
-	bh=1u4Z29Anp5j72oBtUya4T+wvp68KB3fipULiInA7Juw=;
+	s=arc-20240116; t=1745585153; c=relaxed/simple;
+	bh=exRkwnVeS/Cdsai2sezNI/oSufx/K7jdx/8Kohn6yVw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rzl7RXeNYDDa51PE6GO5xrxMzYpQ+BsgQrEMnAKlP/umultzEdfBkEO+4UE0j1x8/5Hu3RzZGSppDkJeg8jlslhFFa1umpKd/0XIr4vOg4Gy1wJupEgrT8zS2Uq5kcbpG74s/vUbGLDaWQ/mJYtg6GSWrjX66dZ6pB/elyyqekw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWLXV+mf; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=cBj2xt2XWFl6o+UPNZ0rJT2ow6Mh6ZQk0EyeryZEGhP0uD4Tl5QxsXugVyEnqNsJeNd29pw6JM3tJDQoFIRNb9OKWUhNZNuWxT8oyXlFdOOUnzv87V/RHVDwSrZc4pqwfccxRoGy0n+d2f2cqSXruH3N5W5imRskQBx9FEleryk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUxWNf32; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWLXV+mf"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-acb615228a4so567166566b.0;
-        Fri, 25 Apr 2025 05:45:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUxWNf32"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5f6222c6c4cso3559674a12.1;
+        Fri, 25 Apr 2025 05:45:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745585148; x=1746189948; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745585150; x=1746189950; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QlIhz0JB5sRSfAD0HIOOevrgWFZ2yotgxE/TDOX4uAU=;
-        b=hWLXV+mfiPnMbxu1xTPFeBw8faMrTZvETR+xzStOKHP0h+3BjzWZKEMPLdG9GazQNI
-         A1wxCJ7Tv6nJZ4Whur2NXXZU236BxDNJWL3JK+Agnt1uQrSHQMGAxx7LzJ1UZ+oSVfU4
-         2U78xBChEXL+KFnsHTbqoBvQSUGuf81HTP+pX8aw8l0aIK2tI0GWJbHe9Z02f2XXl4o7
-         XYBtiX71C21c7mhol1vfNXqYj83Vh5SikicVJFV0SwqERmNT8EgH9yysGCLOPo5ixm8k
-         2PMQImLqSR63r9e2BBFeDRRDc1kk7JuKBmaxHqzrXqtLd6aT2AtQNSMiWoAuxfP9yQ0q
-         icyw==
+        bh=zJZkOqtqIFJNQlkOlUTiGoivFhrWHNceh/fOrvQbc9Q=;
+        b=YUxWNf32pUUClzCh/wDUZgyuAXc/Txxv9rYVmB7TQQ7Z/1vz4XtfX1GYX0oBm0MuK6
+         KSRpztQV5ts8T27BlUj7NrhB2aP/4gO350iuRK8brFf0BQXqFZ53CRls6ZktHMyRJ+bq
+         ZVG8IrL2mNn8g9SUb4OZrqBna1Y43k2sOo2QvRbmV9xpJS58umZI2wjMbdmeKBbA0Ovo
+         3QXGx3ltE0iSC0F1LzXBZirO5nhsR/T5DDwvB4NDj8pLXAL2FWERB1WawxEF5oMFnskz
+         XrwLEvZ+6szrWYB8AIdTnamR9UFUvNquF14aeTFaTWi9cybgn7ZVX//hMCfRg4GI0m+Z
+         WEOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745585148; x=1746189948;
+        d=1e100.net; s=20230601; t=1745585150; x=1746189950;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QlIhz0JB5sRSfAD0HIOOevrgWFZ2yotgxE/TDOX4uAU=;
-        b=F5eI0yyoEv1w7tOxLJXEZA79Ed34yRYSP2hWHSxdflIUrsHWul5LLh8qYa+7qvaSjk
-         8pa4eIPvri7RdKgjjMjr3QXZf9L/d3unwzOHHhWXI7NhAaXGFVRecsd8FKYe8kL3Nv2e
-         gV9Vo4QOy46eN6dyLqaI0fUjuPTyQ05h/v5rQTW/9jzUaoYbNDTeuCK96bt7BAkjb+P3
-         Ns0HuADDf0FIw6EUrRn76XZF4DqjKn9AAt6rDxSH6U/nzyXdnr+apg4cJzBEfb647jq7
-         WQxCyAfl+kKQpqCcrwoIg2nu3UWR6/2jhW4ylkira7c+wBBYyUXauvQlYw3PGUGQBUVU
-         Li8w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPq/nc45+Nj4Uzpw10qpcJ2mq6PUV719x8pvH3BIRjF3MLNyWanBSfoUrhSfV8yiZ+cPsCYwGaSGiR03Q=@vger.kernel.org, AJvYcCWQEiJ1HHsYtDCe5utF88FRja1v04QIuRtxfoL6K2plFWJKsZPB4zObs2HC6zmp+oZSP8m9qMKnQGlcq37k@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJii3QYQql+vdcDKEnXioIhCn4jIz8T27yt8AS9Bhc2WuDfl2a
-	CJkF9pIgt2Gx0Qc1xEVLpB0l1awrte3/ifNcP0vTUK8E6a6Vgxow
-X-Gm-Gg: ASbGncvE4V/vfpS0GnksxFV7l6LaiCvtBwa0l0I1yuZjZOPZcQXXCaDLtxTLOCu2DjH
-	e/WCzvy4sB8btk5xEqqt1bF/2JNn5DKeIUhJbPhMnenEfmW1AST9omvBPqcWMtek4R05phzrdax
-	O0a86SkxtiFY1K8wE8o+3UOOIEHziQ4/odjF3KeQStvYjHD0qElOtgOecr4XhGTTrKQ2TT/+mqK
-	yWVVG94PwTOkC6mwxilSKM5p8TNCuvKT3M81yIbzTfaWZehOWKbG7IU7bBZcMJxk36+XHB3jp3x
-	0XHxGCzbQdzkEYsptbjnpbvFc0Y77XFh3UhftPfkQiZlWotcPVtVn/YEaXG4QCCwH3CB
-X-Google-Smtp-Source: AGHT+IHsRkfW4z8AS9Sjh3HauYzSDV+j3U5Ovg8Y3HzMxW6/Vp1c2OsJ8tuja5lsWTGyHhQu5GJEEA==
-X-Received: by 2002:a17:907:cd0d:b0:ace:3291:751 with SMTP id a640c23a62f3a-ace5a2a87c2mr526981066b.14.1745585148502;
-        Fri, 25 Apr 2025 05:45:48 -0700 (PDT)
+        bh=zJZkOqtqIFJNQlkOlUTiGoivFhrWHNceh/fOrvQbc9Q=;
+        b=giSkTTgC4Ok4wcwu2OqQHoT4nRm1TYMBGwnpdhO4DDdo0NUdHLoPi87YJ/jlTKr1E9
+         8GicgrVS85WCjBMMZGpSahoMMK+d43FQK+JeuIdjm4jCxzqn23cZPDTD7H/RmUr7yAt+
+         S0POv0n1OfmKqEM1+GDbUVzeQVT+46bdg1rLHfv001p+RIEKZ4MvhknYd7qurciafQrD
+         q3lUT5nW0YuDUVAH43Wae5l1kFAXWhAvuVcXEIFcBqQ1bnj2HL8tIOfNboY8XozgeY0z
+         sZ1dULM0MGPsB9F2sBnwm31ZmOGLqQ+uiPBR7KXPh3EPMGm6tJZ1BhSf65qNhi07bjIp
+         cUBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPtfDtb1DeftDHa6CBJY2PF5j5tf/gsHJBe906MAAbW006IoP1q6CXk2PBrRnSocvB/mEjdVk/hF/EPoU=@vger.kernel.org, AJvYcCWmaubYYPHTaCarBCQ/CAOrdqDm70dTOc3oVJZmSGdKU2YCL7lt2QzRGSQcb0x6d3IcH0q/s1jlK9y0Wfnp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+ZMobTk3yriUrMxwC9ue3f0Q5IIFAtcCw3x6yEaO6orf5NDnG
+	8N5F4z8jQ9wjM3vNGLRx8oqtV402HuygN0y5w4u25NXrUvfWNT4x
+X-Gm-Gg: ASbGncuLxwysacMwZZhpbZ2e/bNDrvq7hMYc13165JflTmJU63BpUu5rWKWloCQM2ZU
+	QFD+x1pfQsMlpWHNsQnUURl4NaCPbUOEOivEsDVETyc1L6xWFUzirrQ7RAJrYz1SzfgqdOGA+qu
+	rXLR3trLH6PVRN1wRXc6cgLkQIv3nrhd/n/dGr9pROp7ueyxZt44h0wAbue+J4kpfPrhxHKNogb
+	3aeLSpI6Dwx7RTbZuYYQWMVRY0f4vD3fsJ/IrQ5F8SBn9VMhwbrL1Jb0YDvDusW3JLaKnLslJ75
+	k836G/yOZjHPggSMiGD/UKjg+zRc3NdsKfArzn73jJQ57EGEarm62e0EwmYP6U9/M9cC
+X-Google-Smtp-Source: AGHT+IHX1fUvg5R4L0dWk/e/ZPWlYj/hBTwXn2LGbh3X7N19EfXlUA+lvP4IWHRCaDEIAuZ5mEtnsQ==
+X-Received: by 2002:a17:907:7ba7:b0:ac7:cfcb:c3e3 with SMTP id a640c23a62f3a-ace7136ccadmr194648166b.45.1745585149643;
+        Fri, 25 Apr 2025 05:45:49 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e4e7094sm134641766b.56.2025.04.25.05.45.47
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e4e7094sm134641766b.56.2025.04.25.05.45.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 05:45:48 -0700 (PDT)
+        Fri, 25 Apr 2025 05:45:49 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -69,9 +69,9 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 3/4] crypto: sun8i-ce-cipher - use IS_ENABLED() checks for debugfs stats
-Date: Fri, 25 Apr 2025 15:45:16 +0300
-Message-ID: <20250425124517.2225963-3-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 4/4] crypto: sun8i-ce-cipher - use pm_runtime_resume_and_get()
+Date: Fri, 25 Apr 2025 15:45:17 +0300
+Message-ID: <20250425124517.2225963-4-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250425124517.2225963-1-ovidiu.panait.oss@gmail.com>
 References: <20250425124517.2225963-1-ovidiu.panait.oss@gmail.com>
@@ -83,131 +83,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG) checks before the
-fallback counter updates to make sure the code is not included when
-debugfs statistics support is not enabled.
+Replace pm_runtime_get_sync() usage with pm_runtime_resume_and_get() to
+simplify error handling.
 
-Also, drop the existing ifdef guards, since 'struct sun8i_ce_alg_template'
-is always defined, even with CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG disabled.
+This is recommended in the documentation of pm_runtime_get_sync():
+/**
+ * pm_runtime_get_sync - Bump up usage counter of a device and resume it.
+...
+ * Consider using pm_runtime_resume_and_get() instead of it, especially
+ * if its return value is checked by the caller, as this is likely to result
+ * in cleaner code.
+...
+ */
 
 Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 ---
- .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 46 ++++++++++++-------
- 1 file changed, 30 insertions(+), 16 deletions(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index f03a8fa7bfa2..433cd18f0b5b 100644
+index 433cd18f0b5b..471eec743f1c 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -34,22 +34,30 @@ static int sun8i_ce_cipher_need_fallback(struct skcipher_request *areq)
+@@ -456,13 +456,12 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 		       crypto_skcipher_driver_name(op->fallback_tfm),
+ 		       CRYPTO_MAX_ALG_NAME);
  
- 	if (sg_nents_for_len(areq->src, areq->cryptlen) > MAX_SG ||
- 	    sg_nents_for_len(areq->dst, areq->cryptlen) > MAX_SG) {
--		algt->stat_fb_maxsg++;
-+		if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+			algt->stat_fb_maxsg++;
-+
- 		return true;
- 	}
- 
- 	if (areq->cryptlen < crypto_skcipher_ivsize(tfm)) {
--		algt->stat_fb_leniv++;
-+		if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+			algt->stat_fb_leniv++;
-+
- 		return true;
- 	}
- 
- 	if (areq->cryptlen == 0) {
--		algt->stat_fb_len0++;
-+		if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+			algt->stat_fb_len0++;
-+
- 		return true;
- 	}
- 
- 	if (areq->cryptlen % 16) {
--		algt->stat_fb_mod16++;
-+		if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+			algt->stat_fb_mod16++;
-+
- 		return true;
- 	}
- 
-@@ -57,12 +65,16 @@ static int sun8i_ce_cipher_need_fallback(struct skcipher_request *areq)
- 	sg = areq->src;
- 	while (sg) {
- 		if (!IS_ALIGNED(sg->offset, sizeof(u32))) {
--			algt->stat_fb_srcali++;
-+			if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+				algt->stat_fb_srcali++;
-+
- 			return true;
- 		}
- 		todo = min(len, sg->length);
- 		if (todo % 4) {
--			algt->stat_fb_srclen++;
-+			if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+				algt->stat_fb_srclen++;
-+
- 			return true;
- 		}
- 		len -= todo;
-@@ -73,12 +85,16 @@ static int sun8i_ce_cipher_need_fallback(struct skcipher_request *areq)
- 	sg = areq->dst;
- 	while (sg) {
- 		if (!IS_ALIGNED(sg->offset, sizeof(u32))) {
--			algt->stat_fb_dstali++;
-+			if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+				algt->stat_fb_dstali++;
-+
- 			return true;
- 		}
- 		todo = min(len, sg->length);
- 		if (todo % 4) {
--			algt->stat_fb_dstlen++;
-+			if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+				algt->stat_fb_dstlen++;
-+
- 			return true;
- 		}
- 		len -= todo;
-@@ -101,9 +117,7 @@ static int sun8i_ce_cipher_fallback(struct skcipher_request *areq)
- 		algt = container_of(alg, struct sun8i_ce_alg_template,
- 				    alg.skcipher.base);
- 
--#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
- 		algt->stat_fb++;
--#endif
- 	}
- 
- 	skcipher_request_set_tfm(&rctx->fallback_req, op->fallback_tfm);
-@@ -147,9 +161,8 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 		rctx->op_dir, areq->iv, crypto_skcipher_ivsize(tfm),
- 		op->keylen);
- 
--#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
--	algt->stat_req++;
--#endif
-+	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+		algt->stat_req++;
- 
- 	flow = rctx->flow;
- 
-@@ -438,9 +451,10 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
- 	crypto_skcipher_set_reqsize(sktfm, sizeof(struct sun8i_cipher_req_ctx) +
- 				    crypto_skcipher_reqsize(op->fallback_tfm));
- 
--	memcpy(algt->fbname,
--	       crypto_skcipher_driver_name(op->fallback_tfm),
--	       CRYPTO_MAX_ALG_NAME);
-+	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
-+		memcpy(algt->fbname,
-+		       crypto_skcipher_driver_name(op->fallback_tfm),
-+		       CRYPTO_MAX_ALG_NAME);
- 
- 	err = pm_runtime_get_sync(op->ce->dev);
+-	err = pm_runtime_get_sync(op->ce->dev);
++	err = pm_runtime_resume_and_get(op->ce->dev);
  	if (err < 0)
+ 		goto error_pm;
+ 
+ 	return 0;
+ error_pm:
+-	pm_runtime_put_noidle(op->ce->dev);
+ 	crypto_free_skcipher(op->fallback_tfm);
+ 	return err;
+ }
 -- 
 2.48.1
 
