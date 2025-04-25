@@ -1,164 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B95F81E;
-	Fri, 25 Apr 2025 00:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745540613; cv=none; b=Cyf96yxtNAo8S5/tn1vyoZCzHDLsQfP+IlOtqg4axfBVCCGWRIR2udiYyfccHhBGXaf7mq8M6UqQw9wtPJbv8PmIxyPozm3XqdmGWCmNAGrn1kWtO2lNENPwH83BXObDktn70P2HIv3O7pYnH/17h/+9yRRlGzpuSyiu3CakF9w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745540613; c=relaxed/simple;
-	bh=UEkSo+BagKkIVRMMe9pgkrGMxtdYLmVfK4/QgaOoRvc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ex84vSnwWi0eXVM1WNg35JPUhIuCTWuU60oK1zPvYhEu0cALN9+d3Jd5a0fEBkGD9mvJHZ5JO+4giHIuNB/X34HJ9i3A9ePn0A7KGbyj+90lIItFZ7LN7+LH08/EfFqX3DHMN48FDj4Rx2IhTX42YX+DXXWSGzDv5HQk41w8R/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pUarwgPx; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03397483;
+	Fri, 25 Apr 2025 00:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745542288; cv=fail; b=ldHl2rHOH8LJElXVadoLYawO4RysC3szyD6HaUTiDaSl0gwLsVRCbliMwK0ee6BoivdhY/ijJpJ8XNCGyKSm0hlkZ9S/oXPMZEmx48QhVXVN9UXBaYatd/PzcxpmZbpTedk9y8EbgFCQPHRJjijhc89bPr/pxwSyh1JmlkN/JEw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745542288; c=relaxed/simple;
+	bh=ctdqXYaUJREsnyUIRvW3RR8C7Onx6ajkz/VS2o36XFQ=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=fLXuTWewTh6RQUzKUltRS77nT+swhBb3LCO/PoAaej3GmF1zrWDRpQka1Wpp7n65bWd+yLQuGT1JQVXEqABkmEVdYb7Cfw5I3UfKWGP2/cBThFQPh9JBLzw/fnVhE//9k7g3EdHoXbCOjP2NxXViL4SHyrHl2JbDrWYDNYvqIDg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gXue2xQF; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=crhyDK+e; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pUarwgPx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADC6CC4CEE3;
-	Fri, 25 Apr 2025 00:23:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745540612;
-	bh=UEkSo+BagKkIVRMMe9pgkrGMxtdYLmVfK4/QgaOoRvc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=pUarwgPxg10MK0UdQ+n5BCmMishwDRNdqKKtmZeSwy6yosN15zyV66BLSRDZi5A3c
-	 yVKMHZZzjcPoaTAJlS3aJBbN3RbJtDAlMxvqvthKXy3RD4ayvHKrha1/fo9OcfQHxq
-	 y7p3Ui7hk/Mm4qo9Aui0h5LGGGoYcAD3AX1BjZjgVC+bWmpXfVuc+PIbBPy645vLsk
-	 +KV3W7aTXxXHLe9iZPp+6GvbYbRheGZDd2kiLKlCP9S8dqK9184eXrNyta7wElhwM4
-	 FTPshbqWhVU5pc0It3lqahAGYR/TDUNf7wxEMMQkU0TwwNjZvcrEDK4Pblvz2ty7Yo
-	 WclNOcBljsHiQ==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Thu, 24 Apr 2025 17:23:22 -0700
-Subject: [PATCH] riscv: crypto - Use SYM_FUNC_START for functions only
- called directly
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gXue2xQF";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="crhyDK+e"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P0XYi8018023;
+	Fri, 25 Apr 2025 00:51:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=i7NfukhXAzTymU68yE
+	fpZpPfeHHWyKOAzDioaYt1Dig=; b=gXue2xQFEIvjD9susvVRFUSwr6y4btEld8
+	HrPWERyZRGiAQ9PlE2K5/VK7k0ASwEKyZk7hw706/s59EZ0+9m2rh8mbR85CS4ey
+	9FBbK1a0fj8otVo3GUS7wc3Y3bN+ktOVmaJH/Er0rBFNcPgBbVxB0b0THWN1Yuof
+	Yb6VQTjL2k/38AFTkZ914Bxnj09kU5hSFUm52GZf578Az9lTD1QE5Jlh6LdOUE2r
+	YSJcS08+P7IwC8P/op05iv+h5Yx2DXGYogcoU/PvXD93i2Th0QLf9yJ5ppOQzXl7
+	F1UtAHCsyZ9tHv4bIRYBvJdXHw80P9LMKf7kDGOAeKtzthzdLo0w==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467yy7015d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Apr 2025 00:51:09 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53P0VSbN025226;
+	Fri, 25 Apr 2025 00:51:09 GMT
+Received: from dm1pr04cu001.outbound.protection.outlook.com (mail-centralusazlp17010005.outbound.protection.outlook.com [40.93.13.5])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 466jbst9f7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Apr 2025 00:51:09 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RnxhaG1pl+Si1DJeyqsLUNVu+fj3P0RDxATcsvUfAlbfru6XX/ms5yUZxx+ysyHzXPCRwvlA0/GIb5isxxCev+aYZ2V1C7/edHY1axeJqLslEXFj0dTM+yT9rc+OuCaF455YKINVP4Lm2iXOK1pI3kHN4f8dCATmS0i4Rh9PgszhIAdW3WQOn+cPnxLx6YHAZA8v213wWEXcd4QBdal39E6vVAFBlkorsqOm1Od9eBN+bNLpw77jWU/6LEnA6I7/J5vD6pPdLJcegL7Rzxwib3syRG9cFUia+XnoUHjxtmujUForhXRSSh9Bt3wPWNzi4Qj/OwO/qpnYBe4eeyPmoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i7NfukhXAzTymU68yEfpZpPfeHHWyKOAzDioaYt1Dig=;
+ b=mrrzDBrxIc1ENT03cAVgl4tFPrK58LGyIKOK0bExluPkMFB7iNWnHTzitITLuK6BiJu23NF8Dg6VpcVoh4hxPz7eaIcO+3+4FguSsOenoAsFArRBCb7uXhcoOQHwVbZDVzilBvDBcuzExXsJa+V61HqhCseIQnXfdS8LTgBQzKWXMPYn4RSQ8vkDocMDPMcs8Fl9duagKxh2ksPX1RhoxPzj4ASfJZ/PnSXSpVXertn3OAHeUYMvhBcSuv5HJeXrkyAlQe2JK/RgMoquZOifBpYrGEDBZHULLs0YSyT9TSy7NBFkJjhaGMxeP7rtShCmWYcFIL3T3RWkynZdq0gDNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i7NfukhXAzTymU68yEfpZpPfeHHWyKOAzDioaYt1Dig=;
+ b=crhyDK+eG1ojkQyNB8wfiNyYIdH1quYydbDn86obF4c7fJMUZIrYiJRnqj4PzS3WK921wcz34RpYRGtRsOmrAfOmjABy3bLkmd0y9WKxeA7XyaB/CC6R59lVPTukl7jxwBiXTc2KiFfZFERFgylDG9SsHXkRtc/UY1yEwLmulE4=
+Received: from DS7PR10MB5344.namprd10.prod.outlook.com (2603:10b6:5:3ab::6) by
+ IA1PR10MB7167.namprd10.prod.outlook.com (2603:10b6:208:3f1::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.36; Fri, 25 Apr
+ 2025 00:51:05 +0000
+Received: from DS7PR10MB5344.namprd10.prod.outlook.com
+ ([fe80::b527:ca1f:1129:a680]) by DS7PR10MB5344.namprd10.prod.outlook.com
+ ([fe80::b527:ca1f:1129:a680%5]) with mapi id 15.20.8678.025; Fri, 25 Apr 2025
+ 00:51:05 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 0/7] lib/crc: drop "glue" from filenames
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20250424002038.179114-1-ebiggers@kernel.org> (Eric Biggers's
+	message of "Wed, 23 Apr 2025 17:20:31 -0700")
+Organization: Oracle Corporation
+Message-ID: <yq134dx6p3o.fsf@ca-mkp.ca.oracle.com>
+References: <20250424002038.179114-1-ebiggers@kernel.org>
+Date: Thu, 24 Apr 2025 20:51:03 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: BN0PR10CA0025.namprd10.prod.outlook.com
+ (2603:10b6:408:143::22) To DS7PR10MB5344.namprd10.prod.outlook.com
+ (2603:10b6:5:3ab::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250424-riscv-crypto-fix-cfi-build-v1-1-2d7516737379@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPnVCmgC/x3M0QpAQBBA0V/RPJtai8SvyIMds0wJzSKSf7d5P
- HW7DwRW4QBN8oDyKUHWJSJLE6CpX0ZGGaLBGluawhaoEuhE0nvbV/RyIXlBd8g8YF1WlSfnXW5
- 6iINNOQb/vO3e9wM6U9lmbAAAAA==
-X-Change-ID: 20250424-riscv-crypto-fix-cfi-build-9577fcbfb30a
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4387; i=nathan@kernel.org;
- h=from:subject:message-id; bh=UEkSo+BagKkIVRMMe9pgkrGMxtdYLmVfK4/QgaOoRvc=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBlc15gdXliefvD94bbcI7N/HPy2dd+jWCa5aMaq2Ts9a
- s1lVgb/7ChlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATsT3MyPCbPehTSr3+2ZsP
- Dqa6ymWJap1UdSs98Nj92LItsl/2GDsy/JXjmSl+buulJcuLYzcv6JwlNPsIf8TCyuOJttM9u2w
- 2GjECAA==
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5344:EE_|IA1PR10MB7167:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49c0370f-6c9d-4713-f6d3-08dd83934258
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?i90Fh97DN9/sChCA+NYfa9EY25oYoXWOyYYeT+ESS2hGWv3E80WShMY4RBc0?=
+ =?us-ascii?Q?q38yVNSfnQQRzIvgZ312lLi6iQFYdlKC35doN793EboBkIbgK+Lz3lBySNvk?=
+ =?us-ascii?Q?whHI5VJEfCiHaPUHLoLBrBa1VJ2GJRyQYiLIFiYuPaAFFZXihyLWHFP068A5?=
+ =?us-ascii?Q?o1CFBvxAjjTceeOkfV2o2I1D0I5DkHAKJ809jZCy3x2MBhUxQoHRPKhyXcIL?=
+ =?us-ascii?Q?wbowEXTUjKcqqk3wfQeS58Lx4v4UPg2jI9d0tAX/qfYoQGWiCwBVKNnZ26Hj?=
+ =?us-ascii?Q?k9X8+9IASRxI3IBw8EjsttxucXFh4Z1ZwpB6k/aocBBIqiyNuZBUrtEQNM+2?=
+ =?us-ascii?Q?CexFJdfdv0RKGXRuGKo0X2iPZCU1oa3WxBz3GA/iYad9IRUPhl/hm5bYRFMi?=
+ =?us-ascii?Q?FIIiaVAwzc+Gm+bI7WHM1Lbiw4+DGNsN+wnMRWaWY82/+ivNgVrsyEtOQDpJ?=
+ =?us-ascii?Q?8LNhNkTMXYh/JszfXKl9HO3m9Y1VpS/zlfX129OcVZ81EACTlrz31gpwu3Th?=
+ =?us-ascii?Q?ODX1toLxYIXRxBzAX+uh0T9O4e+XKidUgQysPI8PgX/LAPiIRFkEmdq5do/w?=
+ =?us-ascii?Q?9uDMlXZDAI+c8rHv5473Iam8IWoWz0zHcFhLsHEBpebjZmHhPryo0g0ljC1i?=
+ =?us-ascii?Q?z/dYo2OAHG6LWjVSbbpBTbaGNzKGHoRoc09qw4m2rirjn19Vfs3JtoK5i0Qu?=
+ =?us-ascii?Q?d4aj/G71M309XlrLpquUIwAoaQdLyqcwPU+UQ7/gTOtO1k20eaxm3mOeF8f0?=
+ =?us-ascii?Q?+qNL+00t+Dg0PGD/xa3ZrrtYRdexAnxGjBfQWN1oc/nNb+b6JPdTrpg7jPAi?=
+ =?us-ascii?Q?PyTYm3647inJK0fVBfNqQy36T50CI+D1qgNYsV2PQs+6MjcZX1+DNTdgE/ZU?=
+ =?us-ascii?Q?Tf97zaGsS13fqVq95T/ixR6PpLRIUdxFvdlRuTokvHyz+raAxntZ7XkkscHU?=
+ =?us-ascii?Q?iDmxubrtfyCb6RKA4gV9MagEnkf4WAvskcnz5aieGGuJEoUJqFprfCeE0n8H?=
+ =?us-ascii?Q?OlgZzHIEXR+U744wZ6OugW+tq7nZ+rWB9xcCIfqR0k6ZUkXtFC3e+NV/2Etw?=
+ =?us-ascii?Q?H3bodyt1rtbmgFG0WCS3EptzukFC9GKAoGK1JTyiY6zamFqY/Hts41nrn+6a?=
+ =?us-ascii?Q?8S9zskkhR/B6QddyA+s3gPqg6YIqAGAmdNbkw9M9uV+jLGZOEHjvXzJGHzKK?=
+ =?us-ascii?Q?s6C1W8R4cWz7Nz1WaezF9rehPAPYbEsR3eBZWkJVOfMAMrBHT1GI3dXWFiHr?=
+ =?us-ascii?Q?DMvJCKUVL71EucCLqeCeiWK+b2yXnuqBOPKp/XZ/FyUE/kxALhZdmIKj3kDb?=
+ =?us-ascii?Q?oT/l7phdCX/honpni0wG2L+0TuxxpfnHs3kN3vBMYoGL97nTTfsa+Z1TKP41?=
+ =?us-ascii?Q?hz7VN8tsPRk2yeBVOibPQFA2mheco7JH1+NbeKNF5/L7uRfZ7uoCnqDKmpMJ?=
+ =?us-ascii?Q?Ik/fb0wipWk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5344.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cm7SJtsz0QM3BylkOO/7tEpliHp2ZCP9svSBJ4qjsc2DobKfcyoT1lh9LX+t?=
+ =?us-ascii?Q?6waRKe7xX++2iDCFEy4zglMuY2Kne6hGiKEojjBlk/fHO/C5nyd9DVi8ctfl?=
+ =?us-ascii?Q?BJNmHzg+pjUU/vW+K+DnTit7O1jZL6EwNDygVcswrYT51f2PHTQd7uXtJw37?=
+ =?us-ascii?Q?LJZf/Cmnxip2eqJrnWJLaqQAWrjRdwNcJk9YnP7HHNQ2isRHulBtovorMmqG?=
+ =?us-ascii?Q?fyb6tAtIINMBIKjTkxZKK7HlXuTptjQSVxy2UlTi6OS2H4q5bQ3eutzZst1f?=
+ =?us-ascii?Q?BIe62fPvd2HvwM2uSh1FAx3xnrXgiwcpNQC9+Xw8HCDau1V3B75O0UOdrY9V?=
+ =?us-ascii?Q?28KCAc6uRmxml+ULkRhyLQEivam73XAVCo7I7yol4ZC5kWEnA3EvAiqQhiHv?=
+ =?us-ascii?Q?YTddRVnkhwpyK8RvJsKJna1jRGRTFNxMLimxS2ftSqwhakr9lLjh2WK6qjK0?=
+ =?us-ascii?Q?2pJj88C4w6K/xBGKLNTKL+iV11Cvjpu3oEIG7mVVQPjkpV/iRb4gKeiDbCVX?=
+ =?us-ascii?Q?eDLPclYWCANMH6+KTDQYx3wbpHRrFMQDFlaei4ium0kLurrRxRmiuQhtBCeQ?=
+ =?us-ascii?Q?wcLvLJXMvuYnMdmWNcs7hUD2E6cxOFqNaZpNGWzzmmajtjyPgfuWboTplT6V?=
+ =?us-ascii?Q?X0tvn1I/tzxb234VbcvQ01PzAymrXcdlahsi20Sy+scc403LWmzxDnRCuwkr?=
+ =?us-ascii?Q?SW9dVdbmk9mjhG9lR9oMqFjnfpl81FEUSIA8VE6P0jt2mChp+Id+A1IuZt5g?=
+ =?us-ascii?Q?h6nuJeL204a87g96BuTR8IHnN4L05h9qzIAA3MFO/VZlG25Va/Z0BLbllwXt?=
+ =?us-ascii?Q?X3a6Mnt2j8tY+PZFC4mIYfnap6vVdyiVJ94KKpj90mm6CbhUXhiHnb7uMXbW?=
+ =?us-ascii?Q?di2t5Y+px445gql7sJtfNRc3rsxU4fwjQqh/O58WmRjWffshq+fm87dkLG2T?=
+ =?us-ascii?Q?ybXCwYuhm7GHKTIwaJFZSrACtc5tKoedjI3Wpw506YhCJ6w6MBsLwHCZ9nRw?=
+ =?us-ascii?Q?LzblB3ca9LPqcDsaUZBj5zyamrJwEPUzDf9t/ssvwtdYVtpFYrLTWjMznUHe?=
+ =?us-ascii?Q?XQFEmA1IRlxomyVRkFvP4jFU0MOF3SLUDVsGmkywL2ND9anhti3+eKO8WaUG?=
+ =?us-ascii?Q?aHfgXWbc7DGidTymx++0rpY0EAmyofFk4zQCImYslQd9nQR3RdHGw0eVLED5?=
+ =?us-ascii?Q?0YXDbpUynAzJHZqZQGbI1yDHyi+n2zgJePA9Nh0pGJfn9SA75bISZ7PINlwC?=
+ =?us-ascii?Q?5uUGljKbcO19Ljj6PKUt9SBe9rvSpAAKApPKRt+gCFYos3+iUKGBZ7OpgYjw?=
+ =?us-ascii?Q?Bdfjz2i2cxnDEqIf6HDIIOxgnsMRlh3HSYoojxCAd5OA3Ln02S0YLNS9l1jz?=
+ =?us-ascii?Q?/jrbxgqJqECXBRSlOcCx+xy70g3nPtSynSIrBSz4S6jfJrD5/jh+yA3Vxx3B?=
+ =?us-ascii?Q?d/Kj0WB78HKJyty4XLxqxscbNwgSxAHUz+bZafGURhyMHPLPgaiussUCmtys?=
+ =?us-ascii?Q?ja+JFIr86eM7LBhvuuJAyX6VQbbQocmEkeZBjW1RMknu8+gUr4X214DpxMKp?=
+ =?us-ascii?Q?VJqrnLAKlHey1C5o1qJr13HQgs9CP/QsAa4JL4PoNnqtI9iip1tfQRLI5pDR?=
+ =?us-ascii?Q?3w=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	H8QztZBfSlW5NUfFQ+XZ/qdJJF6XpFmPCC18kXVVAnFUwUDTwMM4Ok54OnqgpEAHktyMUR+I6D+NXbwfB0bW8HVb73USbu/UvQCfaCc6ZpzbuNi+V2UUiz7Xk3nY5nOXzCbM/PL9i1cDd0rzis/JM/bG4AUmV1Jp8/hFDQPYgZzwCKo7j+u4ExK9EWKvfutWULvwyGiUd6zv3BfbtHfX8UaZ1a9Aun/o36xvS7a8JArdttDC7lqWbI9wQkf/L/SAdzuWVYC5osZI5FomxKnnilawWrDKPmXJyOP4DkCte5QsBLb/kHt3TrGS+Bf/l4gBGDRhbvPikARhaO0z6quvhXNooqrKdPlltXKu9HX/Tcn0P+C5CQIuj+tiVS68vdm1wBbY4VSvloxi7XlogwsuSGO+jbVCym0Ha3OAEFmkxBrRmnDwrSo+jl0FiQbvcX4QKNnOH9X9QicPCdgU8ZDY5ibj5Tkf+Nf6ifOe/WOfZNVU7pCRzRRXcczbDw33EPZwYZqKw3qzQ1vI7dpohv1Te6J9nF1hGDn/H8knotdZQgoP36Vh41OCbacBNoJ3gsRS4CS1xFeEMMMfEeQC9tf1Hg4FzJviY0uofc0/KQZtBH8=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49c0370f-6c9d-4713-f6d3-08dd83934258
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5344.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2025 00:51:05.4346
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: I4O4BanKku7sfReq3veirVOUv64YISSA3B5NjcKD4vL3Hco4I3l8DVv93ZsZkkUyo8P7fhPFy372zaZVQ2bhWbGxKYVPdDtZuqAW4EwiG/U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7167
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-24_09,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=664
+ suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2504070000 definitions=main-2504250004
+X-Proofpoint-GUID: jErg9ZTKxFx6sf4wdj9NJ4H2JyR-4NF2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDAwMyBTYWx0ZWRfXwaZam67S6REq 8qTgn0J+WvJY1+ivxhI3jPoxoq6PoS9HTewlPjmuXwTl4BpkwMjMk0CXe7MPvqMADDHxFzK3y+r ySzz2k42R5ZHz56/tFJU/BLjQcLBV19stH8H6NcaJQNQuFhkduXrkhENt1JmAFUFjP6jDH8hNj1
+ /o7je/97dvVG0FVwTKi4olkO26z4VSbh4etfiUpYglfOXqVI6Ye7vYYcLNOpIwZL6KMC1LfmK/F M2VBgdh7//Cj4WSVjF1hc7toLu0FkDYYei+Zr9YpJiwRWK1w3TKlxgbHKM6zLM5vOrg94Ndko1b /LGQcXN0zKrT0q+a02fsjTMgR5HPB9eeGnW5e862kBPChdW12x7EssNzaqwctsoMFwrMCjTJjQE XtF/K/bL
+X-Proofpoint-ORIG-GUID: jErg9ZTKxFx6sf4wdj9NJ4H2JyR-4NF2
 
-After some recent changes to the RISC-V crypto code that turned some
-indirect function calls into direct ones, builds with CONFIG_CFI_CLANG
-fail with:
 
-  ld.lld: error: undefined symbol: __kcfi_typeid_sm3_transform_zvksh_zvkb
-  >>> referenced by arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.o:(.text+0x2) in archive vmlinux.a
+Eric,
 
-  ld.lld: error: undefined symbol: __kcfi_typeid_sha512_transform_zvknhb_zvkb
-  >>> referenced by arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.o:(.text+0x2) in archive vmlinux.a
+> This series fixes an odd naming convention that was unnecessarily
+> carried over from the original Crypto API code.
 
-  ld.lld: error: undefined symbol: __kcfi_typeid_sha256_transform_zvknha_or_zvknhb_zvkb
-  >>> referenced by arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.o:(.text+0x2) in archive vmlinux.a
+LGTM.
 
-As these functions are no longer indirectly called (i.e., have their
-address taken), the compiler will not emit __kcfi_typeid symbols for
-them but SYM_TYPED_FUNC_START expects these to exist at link time.
 
-Switch the definitions of these functions to use SYM_FUNC_START, as they
-no longer need kCFI type information since they are only called
-directly.
 
-Fixes: 1523eaed0ac5 ("crypto: riscv/sm3 - Use API partial block handling")
-Fixes: 561aab1104d8 ("crypto: riscv/sha512 - Use API partial block handling")
-Fixes: e6c5597badf2 ("crypto: riscv/sha256 - Use API partial block handling")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S | 4 ++--
- arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S           | 4 ++--
- arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S               | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S b/arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
-index 8ebcc17de4dc..f1f5779e4732 100644
---- a/arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
-+++ b/arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
-@@ -43,7 +43,7 @@
- // - RISC-V Vector SHA-2 Secure Hash extension ('Zvknha' or 'Zvknhb')
- // - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
- 
--#include <linux/cfi_types.h>
-+#include <linux/linkage.h>
- 
- .text
- .option arch, +zvknha, +zvkb
-@@ -108,7 +108,7 @@
- 
- // void sha256_transform_zvknha_or_zvknhb_zvkb(u32 state[8], const u8 *data,
- //					       int num_blocks);
--SYM_TYPED_FUNC_START(sha256_transform_zvknha_or_zvknhb_zvkb)
-+SYM_FUNC_START(sha256_transform_zvknha_or_zvknhb_zvkb)
- 
- 	// Load the round constants into K0-K15.
- 	vsetivli	zero, 4, e32, m1, ta, ma
-diff --git a/arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S b/arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
-index 3a9ae210f915..89f4a10d12dd 100644
---- a/arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
-+++ b/arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
-@@ -43,7 +43,7 @@
- // - RISC-V Vector SHA-2 Secure Hash extension ('Zvknhb')
- // - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
- 
--#include <linux/cfi_types.h>
-+#include <linux/linkage.h>
- 
- .text
- .option arch, +zvknhb, +zvkb
-@@ -95,7 +95,7 @@
- 
- // void sha512_transform_zvknhb_zvkb(u64 state[8], const u8 *data,
- //				     int num_blocks);
--SYM_TYPED_FUNC_START(sha512_transform_zvknhb_zvkb)
-+SYM_FUNC_START(sha512_transform_zvknhb_zvkb)
- 
- 	// Setup mask for the vmerge to replace the first word (idx==0) in
- 	// message scheduling.  There are 4 words, so an 8-bit mask suffices.
-diff --git a/arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S b/arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
-index a2b65d961c04..4fe754846f65 100644
---- a/arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
-+++ b/arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
-@@ -43,7 +43,7 @@
- // - RISC-V Vector SM3 Secure Hash extension ('Zvksh')
- // - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
- 
--#include <linux/cfi_types.h>
-+#include <linux/linkage.h>
- 
- .text
- .option arch, +zvksh, +zvkb
-@@ -81,7 +81,7 @@
- .endm
- 
- // void sm3_transform_zvksh_zvkb(u32 state[8], const u8 *data, int num_blocks);
--SYM_TYPED_FUNC_START(sm3_transform_zvksh_zvkb)
-+SYM_FUNC_START(sm3_transform_zvksh_zvkb)
- 
- 	// Load the state and endian-swap each 32-bit word.
- 	vsetivli	zero, 8, e32, m2, ta, ma
-
----
-base-commit: 63dc06cd12f980e304158888485a26ae2be7f371
-change-id: 20250424-riscv-crypto-fix-cfi-build-9577fcbfb30a
-
-Best regards,
 -- 
-Nathan Chancellor <nathan@kernel.org>
-
+Martin K. Petersen
