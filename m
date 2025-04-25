@@ -1,232 +1,103 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D4D1ACEAC;
-	Fri, 25 Apr 2025 16:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2ED17A2EA;
+	Fri, 25 Apr 2025 19:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745600036; cv=none; b=U4FxPdjUy8X8eK5AuTkIej/kivdm3Te5NXrYx+kKY/uOKZuM62le8TyowUN1LtEmpROFk04BrPHzgkj77otWo0wK7FFZNdF+w+MhOHgp1T28+IXgmxowTie1znhWAvSteVvHtjwI2gfB1OZXbhk2wVoEYHVvuwSahus5qIfg3E8=
+	t=1745608588; cv=none; b=rT0YaKYomO9oH95mGA+MO/0laLstn/PzS4cfKgeK8ZuQisvbvLAkXVO/dJg61KZavcbvL33kZIMX2yIYL5JekSbRBPR6dpsx5jTrTgjSELCl9zEnGwukpJVIwxGY8VYjPPP/GXVWmEGW8Q4oE9g/Pw2J0Wv7wgpUYL75ESweUjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745600036; c=relaxed/simple;
-	bh=wDDWwNorEgyf1DK+t5UlrDqvwSyCk8iGBsGGEULzKAc=;
+	s=arc-20240116; t=1745608588; c=relaxed/simple;
+	bh=nEaUix3oPIX/PaONAjCuYq9Ttt6g0gRM4qf8bTjEmi0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AxV//1c7fThcQTD8jFLUccblBGtpFmBMsnLy2zHxjoYoqq+Unta8WvgTgJDAJQhxaoy570HlfXFcxQMA+yoIfrd5798GF4wTVlsw95CB+MJJLwouqixTGDwQnPvAVqrpNo++cjM56YEMvxRfsAd31SHy0JQV07uU6of6CSEA0V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqp3lTHb; arc=none smtp.client-ip=209.85.214.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=RtgI3o2W///JRPRf2WfdklxgGAx6B8wD+O0qu1E9/kTI1SepsW0KCDcSDkM4F1OS27oOyf5352DoqH7xOPXhcVteY0Ia4jMFI87RvIFmJQHKA597DT4kcmGnYe7TbIlHafTQN7AmOxzraKK0iwZJ6rcKXU/JiOL/mBChkexV/M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eekEHM0U; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqp3lTHb"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223f4c06e9fso23384265ad.1;
-        Fri, 25 Apr 2025 09:53:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eekEHM0U"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso17981265e9.2;
+        Fri, 25 Apr 2025 12:16:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745600034; x=1746204834; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tviy9TtMmPd+Bq9NvF3M6rtwnmthJ23vPw61LIOxPYQ=;
-        b=gqp3lTHbv6IpSSj8fAuwV5nfHzhhC71cF9nPRic1yaYr3NRne5i2DC3xLEGBiGORtn
-         CzDgSDgt3ndm8FBDzolap54OM0uaVA7jb+3YkWGM17kFdQSXXP7+pCgrM/dLn3ZGkJZ8
-         t/cMg20BdrBpWalXayctDpDsjKmOFO5cML1TIZLCtmJsEnxBk0kiw1XnDCwdtPXW4hxx
-         XLprWjGrcV5RH1gVtYuZCnui+UkQDSiq3aDolAsHzE6Chl9gk1QmpQb5vt6hpLDm+nSs
-         ong/2IQfOVmZXJiKjeRBVs/FWhpD6i8Cna7huIMwI7q/hr2Y7qUkQSdfFJxvYr8oHr5e
-         AyXQ==
+        d=gmail.com; s=20230601; t=1745608585; x=1746213385; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VO7oZHom40xEJAYPz0FOxbbQYoxBp4f3tcyurz8ypI0=;
+        b=eekEHM0UqtaLtsR1lhrc7UmjC5xx2K8eXK5KSV+sR0qGWjuf1gRujCuMjPCXIYfmlH
+         Fh8TCu29VAMyIqLmr7pUrxpQVJse/GtFxWNvvFdYje+XHyw6ru2EnG3BQuyK0FRijv1Z
+         FpBBmtKNLSgx2y3/zXiz5cM/PLxxElqYWL5+G8aIxyFQNNMBu6eL57XKeU0t73X1dE1+
+         6qYdbplt2gLNiBUjez4oXEQBOKTrlnupYgXJySx6Fsq9nJwzNAPqebq3DJa2yhm4Fcik
+         b/3b/1euNTeKMInbHLHX250+yA9FzumEvDzEc1CVgsBkI50iTkiXyxCJxKy3UEmFitrs
+         NRZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745600034; x=1746204834;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tviy9TtMmPd+Bq9NvF3M6rtwnmthJ23vPw61LIOxPYQ=;
-        b=GEwbgYE/FxQqcNrk5sCGI3lqjXmSIQf/SpkxOTZIGj0MwXaZS1CPn0ee/5eRVWYCfF
-         f3dPllqSSEdyWgIN4ZnppL816lmd/CU7S1qXJdZzmb6eH4jfLTI86DpJ1AGNZW2zmqfJ
-         Aajcc2rBQZ3kqiaDUg9mLMVzJjD86riQjcAMjU6MJ3w9QDOGjl2iuBQHD5lvPawR7/Ay
-         gGL5NFRX/Tqdm4ZLJ757VNk2k15DNLv8/m/lVS47CTdRSHZ2dSUcn/xH52XJRYGg6bF1
-         Hpg76y9eX1pOuIJZkbIumKjgqPxcZpLsfFrSSwDTTB/mwIE7CpHWHPDVQrg9wu03LgSr
-         vtNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGfyw6CT5PrbO22L2UtsNBk4Anb1wkGkkWpxzj83+SeKBKPlPRo+Y0Lp/YIzqQpA9kOBrilm/fpyWlSqbh@vger.kernel.org, AJvYcCWHVU1Frm7aoekfWLSzS8VDB0H1JdiO2RQ18DkAz06nLX53EiH9y9TMz94oJZ7YXhCToGBJ8Cnfwiq+61H8@vger.kernel.org, AJvYcCXAeTzGUcN/UlptOEANRKFmXYmmSOEjXeY/gGF/lnjAM2p1N2prlINhB0NIlZhVKUZQGSKCqhijSoo9sVEd3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsOVgUODAXortOWku1qQ0FjAoIUXP1s3QdWF9u7FgaIDIPhLTm
-	PQ1TxOhRePcWFXfrkJ4XviXaq/iY92kRUFAMhN9lgqE2UExq07rM
-X-Gm-Gg: ASbGncsk8oeBwf3xhcbVoNQuaEmiHxsNJaWlXbLfii6yJReQKbiIhPwQIB5Xmps2ND7
-	73MPNMolqKV0A7FUEY9lqSsoWskwQSaHiSedWJKAGHX8N6/6LqMcdK3M8vwvWJJ7n+irs6CUYPM
-	HhBE++1zs0stEh3nv6K/RpjC5LlVbjEzY0WwkdGuQ/6UfKTlzFV5cwaowrS7K3djqnLZsFN7Tc/
-	nUQcKcmVk0BrjbKJems94NzlT7fzB1kih0ubhNPA7uIn2Dmzfdw9mcHG1/KMst0cqYMq2LIBUXR
-	nc26b0EiHhklOK96Sr/2rGeRjK1p2F/lGixDWjEJKZFxxH0c8nVm8Nay/g==
-X-Google-Smtp-Source: AGHT+IFhCZVJG7BmsJj4QwIIMaru3w3J44H83XBqoGP5RuI4Eg0NRoO7u8y9l3uVOpUjRcEk/+KyXg==
-X-Received: by 2002:a17:903:1b70:b0:223:5187:a886 with SMTP id d9443c01a7336-22dbf981445mr50244645ad.22.1745600033939;
-        Fri, 25 Apr 2025 09:53:53 -0700 (PDT)
-Received: from vaxr-BM6660-BM6360 ([2001:288:7001:2703:f97d:cfa2:241e:84aa])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50ea7casm34586805ad.134.2025.04.25.09.53.51
+        d=1e100.net; s=20230601; t=1745608585; x=1746213385;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VO7oZHom40xEJAYPz0FOxbbQYoxBp4f3tcyurz8ypI0=;
+        b=gFYIpVhhr/AgbzGo9aB35WQHZTn+lZzsJvclXLS6y0fo6TQ6uxhWK4kiDZJuBEIWlt
+         I+cUVH065bLxAQv7CGogxKprlEl+O2avxfj1cseIoEmsTga2icblimt/jgxtcaFhkSSl
+         MknX5L922y1Rgt89DyUvn/or/EBVWBjcdyd8zSx/CPMsbeiz0CHVXwo2ZXr1z0AB1bYp
+         ygy0NmOgvHGGm+b2id9MbIXpcYguxTYiADBLegX5l01z6CH8r/H4EFx6trE3QAmmCq/9
+         bui+oFuhOi0vbJ8ivwwyHbfYMai7dYiqwUeUYB0KZwOAdxXtWIfc5dfdQ2zMuHoS8MN0
+         5Eyg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPeu3Qompexl4CWMRIHzQ0gyq0f+jxceC1wcIFAagfx5Jxyyrr/w8zIORxH0M7fZjiiWtv7sm21WUkG1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3OMGLmJhYnhbMGRVGbgHhq4Wm6tszhGTb3+Zm4NpOx/Xa/4Tp
+	1vVKwWc/LdLYEJTN5fDF4cf28PpycPLh6gHgREzTm5P+9pk45yRY
+X-Gm-Gg: ASbGncug4qR1wcG9RikNW5c0ze7mXT6n1K54DmuBsLPAGWohh7oX4eFTGOQyg6WBXU3
+	UvNJykV5RKUFb+3Hg7d6ReTG2WEnv4/qdE3YaqozkC8VoA4D42yMPyXD/VYjVe5pRyfTO1FIHz8
+	ui3G8P/txXmjiDiqippB92pFp5+TbRbRVTJovLO5Xtv4YtJjhDoudqMCdhW61XUAFcl9SrCL/7K
+	XqbuJvyZU/6kKkDkaIeiFWW07rSS3gsF6ilwoZxdqt1occ0IUxNdt82FPhFref85wibDfSQ3NaM
+	TYuQWXZRAHp9ME1/wtsGP8LZc4GVtuqEyFNkqE1y71F3zj/JhJU=
+X-Google-Smtp-Source: AGHT+IFX12NL7RP6Q90t5je39cjcLUJUZ9AAM9/NH+qVQigjZmAEq6h6vRch4MKKemikmmpkPRgpUQ==
+X-Received: by 2002:a05:600c:154b:b0:43c:f1b8:16ad with SMTP id 5b1f17b1804b1-440a66b07c5mr33378965e9.30.1745608584948;
+        Fri, 25 Apr 2025 12:16:24 -0700 (PDT)
+Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-440a52f8800sm34189695e9.3.2025.04.25.12.16.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 09:53:53 -0700 (PDT)
-Date: Sat, 26 Apr 2025 00:53:49 +0800
-From: I Hsin Cheng <richard120310@gmail.com>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com,
-	bfoster@redhat.com, linux-bcachefs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] bcachefs: Fix unit-value within btree_bounce_alloc()
-Message-ID: <aAu-Heqb3malYkjI@vaxr-BM6660-BM6360>
-References: <000000000000736bd406151001d7@google.com>
- <20250423163718.194316-1-richard120310@gmail.com>
- <ur4a24w2wb3euh3ej7ybeqnvmqyhzmqp2wwsjtilh6mfetv45l@qlxs3vggfq5h>
+        Fri, 25 Apr 2025 12:16:24 -0700 (PDT)
+Date: Fri, 25 Apr 2025 21:16:22 +0200
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: arm64/sha1 - Set finalize for short finup
+Message-ID: <aAvfhkjhgIH5FYoC@Red>
+References: <aAop_uMhxVh2l5Fy@Red>
+ <aApN64n7i15ArnX4@gondor.apana.org.au>
+ <aAqhbdiLmkHV350S@Red>
+ <aAsCk3jtbAE7dPpJ@gondor.apana.org.au>
+ <aAtnCR5jVAnjfR1i@Red>
+ <aAtqxbkGYWRGX-Yv@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ur4a24w2wb3euh3ej7ybeqnvmqyhzmqp2wwsjtilh6mfetv45l@qlxs3vggfq5h>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aAtqxbkGYWRGX-Yv@gondor.apana.org.au>
 
-On Wed, Apr 23, 2025 at 12:45:20PM -0400, Kent Overstreet wrote:
-> On Thu, Apr 24, 2025 at 12:37:18AM +0800, I Hsin Cheng wrote:
-> > Use "kvzalloc()" instead of "kvmalloc()" in btree_bounce_alloc() to
-> > prevent uninit-value issue.
-> > 
-> > Reported-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=549710bad9c798e25b15
-> > Fixes: cb6fc943b650 ("bcachefs: kill kvpmalloc()")
-> > Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
-> > ---
-> > syzbot reported an uninit-value issue. [1]
-> > 
-> > Though the uninit value was detected in the context of crc32_body(), the
-> > memory was actually allocated in "btree_bounce_alloc()". Use
-> > "kvzalloc()" to allocate the memory can solve the issue, and I've tested
-> > against syzbot. [2]
-> > 
-> > If there're any further tests needed to be performed, please let me
-> > know. I'll be more than happy to assist you with that, thanks !
+Le Fri, Apr 25, 2025 at 06:58:13PM +0800, Herbert Xu a écrit :
+> On Fri, Apr 25, 2025 at 12:42:17PM +0200, Corentin Labbe wrote:
+> >
+> > No they are still there:
+> > [    2.022921] alg: shash: sha1-ce test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
 > 
-> See Documentation/filesystems/bcachefs/SubmittingPatches.
->
-
-Sure ! Thanks for the info.
-
-> And this isn't the correct fix - the correct fix is already in Linus's
-> tree.
-
-Ahh ok, may I ask for the commit hash or title so I can learn from it ?
-
-Best regards,
-I Hsin Cheng
+> Thanks, I see the problem now.  The zero-length hash doesn't
+> set sctx->finalize correctly:
 > 
-> > 
-> > [1]:
-> > BUG: KMSAN: uninit-value in crc32_body lib/crc32.c:110 [inline]
-> > BUG: KMSAN: uninit-value in crc32_le_generic lib/crc32.c:179 [inline]
-> > BUG: KMSAN: uninit-value in __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
-> >  crc32_body lib/crc32.c:110 [inline]
-> >  crc32_le_generic lib/crc32.c:179 [inline]
-> >  __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
-> >  chksum_update+0x5b/0xd0 crypto/crc32c_generic.c:88
-> >  crypto_shash_update+0x79/0xa0 crypto/shash.c:52
-> >  crc32c+0xba/0x170 lib/libcrc32c.c:47
-> >  bch2_checksum_update+0x106/0x1d0 fs/bcachefs/checksum.c:83
-> >  bch2_checksum+0x3c5/0x7c0 fs/bcachefs/checksum.c:216
-> >  __bch2_btree_node_write+0x528c/0x67c0 fs/bcachefs/btree_io.c:2151
-> >  bch2_btree_node_write+0xa5/0x2e0 fs/bcachefs/btree_io.c:2288
-> >  btree_node_write_if_need fs/bcachefs/btree_io.h:153 [inline]
-> >  __btree_node_flush+0x4d0/0x640 fs/bcachefs/btree_trans_commit.c:229
-> >  bch2_btree_node_flush0+0x35/0x60 fs/bcachefs/btree_trans_commit.c:238
-> >  journal_flush_pins+0xce6/0x1780 fs/bcachefs/journal_reclaim.c:553
-> >  __bch2_journal_reclaim+0xd88/0x1610 fs/bcachefs/journal_reclaim.c:685
-> >  bch2_journal_reclaim_thread+0x18e/0x760 fs/bcachefs/journal_reclaim.c:727
-> >  kthread+0x3e2/0x540 kernel/kthread.c:389
-> >  ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-> > 
-> > Uninit was stored to memory at:
-> >  memcpy_u64s_small fs/bcachefs/util.h:511 [inline]
-> >  bkey_p_copy fs/bcachefs/bkey.h:46 [inline]
-> >  bch2_sort_keys+0x1b4d/0x2cb0 fs/bcachefs/bkey_sort.c:194
-> >  __bch2_btree_node_write+0x3acd/0x67c0 fs/bcachefs/btree_io.c:2100
-> >  bch2_btree_node_write+0xa5/0x2e0 fs/bcachefs/btree_io.c:2288
-> >  btree_node_write_if_need fs/bcachefs/btree_io.h:153 [inline]
-> >  __btree_node_flush+0x4d0/0x640 fs/bcachefs/btree_trans_commit.c:229
-> >  bch2_btree_node_flush0+0x35/0x60 fs/bcachefs/btree_trans_commit.c:238
-> >  journal_flush_pins+0xce6/0x1780 fs/bcachefs/journal_reclaim.c:553
-> >  __bch2_journal_reclaim+0xd88/0x1610 fs/bcachefs/journal_reclaim.c:685
-> >  bch2_journal_reclaim_thread+0x18e/0x760 fs/bcachefs/journal_reclaim.c:727
-> >  kthread+0x3e2/0x540 kernel/kthread.c:389
-> >  ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-> > 
-> > Uninit was created at:
-> >  __kmalloc_large_node+0x231/0x370 mm/slub.c:3994
-> >  __do_kmalloc_node mm/slub.c:4027 [inline]
-> >  __kmalloc_node+0xb10/0x10c0 mm/slub.c:4046
-> >  kmalloc_node include/linux/slab.h:648 [inline]
-> >  kvmalloc_node+0xc0/0x2d0 mm/util.c:634
-> >  kvmalloc include/linux/slab.h:766 [inline]
-> >  btree_bounce_alloc fs/bcachefs/btree_io.c:118 [inline]
-> >  bch2_btree_node_read_done+0x4e68/0x75e0 fs/bcachefs/btree_io.c:1185
-> >  btree_node_read_work+0x8a5/0x1eb0 fs/bcachefs/btree_io.c:1324
-> >  bch2_btree_node_read+0x3d42/0x4b50
-> >  __bch2_btree_root_read fs/bcachefs/btree_io.c:1748 [inline]
-> >  bch2_btree_root_read+0xa6c/0x13d0 fs/bcachefs/btree_io.c:1772
-> >  read_btree_roots+0x454/0xee0 fs/bcachefs/recovery.c:457
-> >  bch2_fs_recovery+0x7b6a/0x93e0 fs/bcachefs/recovery.c:785
-> >  bch2_fs_start+0x7b2/0xbd0 fs/bcachefs/super.c:1043
-> >  bch2_fs_open+0x152a/0x15f0 fs/bcachefs/super.c:2105
-> >  bch2_mount+0x90d/0x1d90 fs/bcachefs/fs.c:1906
-> >  legacy_get_tree+0x114/0x290 fs/fs_context.c:662
-> >  vfs_get_tree+0xa7/0x570 fs/super.c:1779
-> >  do_new_mount+0x71f/0x15e0 fs/namespace.c:3352
-> >  path_mount+0x742/0x1f20 fs/namespace.c:3679
-> >  do_mount fs/namespace.c:3692 [inline]
-> >  __do_sys_mount fs/namespace.c:3898 [inline]
-> >  __se_sys_mount+0x725/0x810 fs/namespace.c:3875
-> >  __x64_sys_mount+0xe4/0x150 fs/namespace.c:3875
-> >  x64_sys_call+0x2bf4/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:166
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > 
-> > [2]:
-> > https://lore.kernel.org/all/000000000000736bd406151001d7@google.com/T/#m748384a36239a7f66e63cfde949e3db6bf14d5c6
-> > 
-> > syzbot reply me with:
-> > Hello,
-> > 
-> > syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-> > 
-> > Reported-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
-> > Tested-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
-> > 
-> > Tested on:
-> > 
-> > commit:         614da38e Merge tag 'hid-for-linus-2024051401' of git:/..
-> > git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=10be763f980000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=49342144b6a907af
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=549710bad9c798e25b15
-> > compiler:       Debian clang version 15.0.6, Debian LLD 15.0.6
-> > patch:          https://syzkaller.appspot.com/x/patch.diff?x=15b99a6f980000
-> > 
-> > Note: testing is done by a robot and is best-effort only.
-> > 
-> > Best regards,
-> > I Hsin Cheng
-> > ---
-> >  fs/bcachefs/btree_io.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/fs/bcachefs/btree_io.c b/fs/bcachefs/btree_io.c
-> > index debb0edc3455..dc00c5273ffe 100644
-> > --- a/fs/bcachefs/btree_io.c
-> > +++ b/fs/bcachefs/btree_io.c
-> > @@ -115,7 +115,7 @@ static void *btree_bounce_alloc(struct bch_fs *c, size_t size,
-> >  	BUG_ON(size > c->opts.btree_node_size);
-> >  
-> >  	*used_mempool = false;
-> > -	p = kvmalloc(size, __GFP_NOWARN|GFP_NOWAIT);
-> > +	p = kvzalloc(size, __GFP_NOWARN|GFP_NOWAIT);
-> >  	if (!p) {
-> >  		*used_mempool = true;
-> >  		p = mempool_alloc(&c->btree_bounce_pool, GFP_NOFS);
-> > -- 
-> > 2.43.0
-> > 
+> ---8<---
+> Always set sctx->finalize before calling finup as it may not have
+> been set previously on a short final.
+> 
+> Reported-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+> Fixes: b97d31100e36 ("crypto: arm64/sha1 - Use API partial block handling")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+
+Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+
+Thanks
