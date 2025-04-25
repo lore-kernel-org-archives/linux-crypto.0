@@ -1,75 +1,156 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F08235C14
-	for <linux-crypto@vger.kernel.org>; Fri, 25 Apr 2025 11:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3646218EBA;
+	Fri, 25 Apr 2025 12:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745581947; cv=none; b=odptwwltOw4Wv1fU6AJs7sIHppeFLJpqrwSycTGiKSCdX9Ry/m2mZyMFbHWn0bVP6apAAciJOmvyyXrgHjScpesFbXgjkobExTRwE0dkj/JqLqM0QWnt8quAsg2ElLp86zUY6B3N/A2kwb+zbw0WX2cbWR+gh1STufW9D9CvQzE=
+	t=1745583113; cv=none; b=DOyLwrgCeUZxSPpxG3xefvL7cSsdO2U+HqAFhw5RlnonRIBrEz/H9HxsIm/9D6vhPBSm5BU+svCkElR9f+QxBGm9C7nTUQuIChSe6DwYkdDkdI0AaXK3snCcL1e+l/QiCZOdKyYURiTXdLsi+tgZtkP5vNuUXZVewcSKH/ammRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745581947; c=relaxed/simple;
-	bh=36i29YTk41IV6ul6cJykFukvYBNWx8s0ZZOlt45XEKU=;
+	s=arc-20240116; t=1745583113; c=relaxed/simple;
+	bh=WmmW0IHWclTounifNSUtemyR1nHUbhUOcjwZ5ZoBFVU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fzSHR4QzNN/fQTT2iLNbmpShMvhngr2EALAc/iMgc1qqNgIOt7UWa4IOXZrJbYwU7h6NDd0b2OVZwn1G6uBJAUPgZ/uOA8FLbC0G8g6qoGF7VBp1EHnv5L6U+cm9TA14Ch8kCfdEa6jZnXSVBZmLoLsgT6s7bkPVMN0jABG4aqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=rmo2Qb8N; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=OU5J9L1Oi81ZtTIStDEIFbXZVJLEquRzW+0BKKiL40EQG52JqONNLUomjV59/gqBQBTWptTMq78MwZ9PM2agPU+NqgfS8sOeug70k7aiDo2ohjVJPhBpxwwoFO4FkuD7/1llKE4MFrrEUxn+zy6zsIbh4okPt606SkL/07saA1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ZAkWblRT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KeQvJ6Pt; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="rmo2Qb8N"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=VvvRSKoAElj2ICWf9yoWNlbeSuY/7lTD1BHFmLbq6TA=; b=rmo2Qb8NTGS8098EEPNzBmN14f
-	T6n93WR1RLNLTo04xHEt5tmNyWRMQubRmIryF61xAe0L1Zpgctbo7mR8/b+7yb07t/jdnfJyctD+o
-	g6j/z5vJmGp/bc3k84MfHz3bFbhy56K3tG1JqbA4gBJ8anKLWttppzYcSZadhoNxbI2/Q/YEK4p9C
-	mkRa/Z+HrRW30I2PAB+TXv06VddaIg4wuKMmcI6kWaLuI4q32TMKSDWoRrbcvMNneV4EIS9gc8xm5
-	Qv8LTdGRv6gRpUc5m1/q5SMCQXT+oo6npI4olsiYYhqd2EZmd3AfE0A57SXmhcIuATjy9+t1C82zl
-	vhHWnpow==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8HbQ-000ydi-1W;
-	Fri, 25 Apr 2025 19:52:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Apr 2025 19:52:20 +0800
-Date: Fri, 25 Apr 2025 19:52:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 00/15] crypto: lib - Add partial block helper
-Message-ID: <aAt3dJDylNNOLDVs@gondor.apana.org.au>
-References: <cover.1745490652.git.herbert@gondor.apana.org.au>
- <20250424161739.GF2427@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ZAkWblRT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KeQvJ6Pt"
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8ED622540202;
+	Fri, 25 Apr 2025 08:11:48 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Fri, 25 Apr 2025 08:11:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1745583108; x=
+	1745669508; bh=EB/sg/VgUNtrfCqfzNTqoSG/O7x/uW7lya+Nhl3Jdqo=; b=Z
+	AkWblRTxeLrtZL4lsbHJBVc2FQyyO8F5wSZgMYj7q1amHSUMvgmdcyEvQ0C8zlUM
+	Ym2iGmY4NEHN2R5T5rEc+W2lcx4pRqZdX1yCYzHzUUIm4I9T82QGbt5w4DxggNZP
+	cm9deS7r22Pyf2xNG8dxMHeaTxSsYqb/ckRWHnxhe5U8MITEdkNKxJBXQgsOUBAx
+	GIqKFy0aDZudSiGM8qD8I+6kU0IPEdeeaY/fqN8zwfZca61ICLLkOX412w5I/aHA
+	hBTgM0zbg9zQl1ZrhYTiUn8lSNdvzEt/Dq44gceehCCi5r/Sdwf0eEZhgEjUnX8a
+	OD2zLt5UlctDAt0n/HTsQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1745583108; x=1745669508; bh=EB/sg/VgUNtrfCqfzNTqoSG/O7x/uW7lya+
+	Nhl3Jdqo=; b=KeQvJ6PtaInmK6r+lAsb2Uir6eNKSJP73Vcb92/tLIwqTvODuRh
+	bbgqcF4t0mm/TI8SMXls4mMrfbSJl6HqD8sQ7i5U1j7w5YFE+CRtS353uU1ByOyx
+	5v97UGKKpFPRLDmVSc65LTjuHv3qMOh+dMJmGt9EP8k6TTua90f1qkW0a8IOIbMe
+	lmPkQIUyI1v83xt2m9DUcmbiLxkJTD1180Kfs+Jmo7iN6KTPgZL2qqsW/DlCtHW9
+	f5ZYKr86GXjOo00LVb4I2q5AwAV7y7ihEIoDt8Tx0fUe3Fa2Dw06zVh4W4vB+qG/
+	zBikZxIi2t+Xm6bv3hDNNQkcKYeZW9dIueg==
+X-ME-Sender: <xms:A3wLaEialxA_l_fysmZHryF4fDebLkiMD8kaIQizLEXMKW6e_OiQow>
+    <xme:A3wLaNB8fzc0JBBamWUWL3tTnc4E5etbeFca-XxU1BKEx3KaArArirXuU7WR6gW-Y
+    q4QpZQDYjZgBn9amrk>
+X-ME-Received: <xmr:A3wLaMFci5J-y-AKyghueCGS3s05O47r8dxM9mV7vTtvYSk4MwKgOnzgfmxn>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvhedvfedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephhgvrh
+    gsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehlihhn
+    uhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehrih
+    gthhgrrhgusehnohgurdgrthdprhgtphhtthhopegthhgvnhhgiihhihhhrghoudeshhhu
+    rgifvghirdgtohhmpdhrtghpthhtoheplhhinhhugidqmhhtugeslhhishhtshdrihhnfh
+    hrrgguvggrugdrohhrghdprhgtphhtthhopehrrghfrggvlheskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepphgrvhgvlhesuhgtfidrtgiipdhrtghpthhtoheplhhinhhugidqph
+    hmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhl
+    rghsshgvrhhtsehsvggtuhhnvghtrdgtohhm
+X-ME-Proxy: <xmx:A3wLaFRQe7_guGjIwgkZymX2ZHd4S5z9BR4_hu7TXBEwNaOfcpPXZg>
+    <xmx:A3wLaBxwYHM1NMGFrVSv-o4fcyyChZVMb6OCsmZ4w9o7RHEv1Liv6g>
+    <xmx:A3wLaD6Af-espcLvZj-OjQF2WhxwdJNc1vJVrrzkS8tL_2O1onIcMw>
+    <xmx:A3wLaOzfRo6hNLYY4qWOotzFSj6yWMVw--gedv7_a0t8b3t07HW1nA>
+    <xmx:BHwLaP7eu4lWYrHeZg_N_X7zSzUkCuNnUJ_g2mKpOuSEqwSza19zu1Wd>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 25 Apr 2025 08:11:46 -0400 (EDT)
+Date: Fri, 25 Apr 2025 14:11:44 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	linux-mtd@lists.infradead.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+Subject: Re: [v5 PATCH 11/14] xfrm: ipcomp: Use crypto_acomp interface
+Message-ID: <aAt8AIiFWZZwgCyj@krikkit>
+References: <cover.1742034499.git.herbert@gondor.apana.org.au>
+ <d7bccafdf38259c2b820be79763f66bfaad1497e.1742034499.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250424161739.GF2427@sol.localdomain>
+In-Reply-To: <d7bccafdf38259c2b820be79763f66bfaad1497e.1742034499.git.herbert@gondor.apana.org.au>
 
-On Thu, Apr 24, 2025 at 09:17:39AM -0700, Eric Biggers wrote:
->
-> Why aren't the POLYVAL changes in their own patch series?
+Hi Herbert,
 
-Yes they really should have been part of the previous series
-since it's not lib/crypto code.  I'll split them out.
+2025-03-15, 18:30:43 +0800, Herbert Xu wrote:
+> +static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
+> +{
+> +	struct acomp_req *req = ipcomp_cb(skb)->req;
+> +	struct ipcomp_req_extra *extra;
+> +	const int plen = skb->data_len;
+> +	struct scatterlist *dsg;
+> +	int len, dlen;
+>  
+> -	len = dlen - plen;
+> -	if (len > skb_tailroom(skb))
+> -		len = skb_tailroom(skb);
+> +	if (unlikely(err))
+> +		goto out_free_req;
+>  
+> -	__skb_put(skb, len);
+> +	extra = acomp_request_extra(req);
+> +	dsg = extra->sg;
+> +	dlen = req->dlen;
+>  
+> -	len += plen;
+> -	skb_copy_to_linear_data(skb, scratch, len);
+> +	pskb_trim_unique(skb, 0);
+> +	__skb_put(skb, hlen);
+>  
+> -	while ((scratch += len, dlen -= len) > 0) {
+> +	/* Only update truesize on input. */
+> +	if (!hlen)
+> +		skb->truesize += dlen - plen;
 
-> Touching SHA-256 (which again, I'm currently working on fixing properly, so I
-> keep having to rebase on top of your random changes which will be superseded
-> anyway) also seems to be unnecessary.
+Are you sure we need to subtract plen here? When I run fragmented
+traffic with ipcomp, I'm hitting the WARN from skb_try_coalesce during
+reassembly, ie truesize is too small:
 
-Sorry about that.  But sha256 happens to be the only other lib/crypto
-hash algorithm that I could take the code from.  It also turns out
-to generate x86 code that's much better than poly1305 (I actually
-started out with poly1305, but switched over to sha256 after I saw
-how horrible sha256 looked with the poly1305 partial block handling).
+    delta = from->truesize - SKB_TRUESIZE(skb_end_offset(from));
+    WARN_ON_ONCE(delta < len);
 
-Cheers,
+The splat goes away with
+
+ 	/* Only update truesize on input. */
+ 	if (!hlen)
+-		skb->truesize += dlen - plen;
++		skb->truesize += dlen;
+ 	skb->data_len = dlen;
+ 	skb->len += dlen;
+
+pskb_trim_unique ends up calling skb_condense, which seems to adjust
+the truesize to account for all frags being dropped.
+
+Does that look like the right fix to you?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sabrina
