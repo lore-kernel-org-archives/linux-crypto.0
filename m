@@ -1,127 +1,147 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C728B248176;
-	Fri, 25 Apr 2025 12:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A10D24BC1D;
+	Fri, 25 Apr 2025 12:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745584138; cv=none; b=IQirjfiLjW5l8l1z+G/pJRsDJjDOvOMt0NWzjga1USjOHBdCLQ3H0c+Z/9e+gWDx/h+CHu/qs8KjUPnVvP4MxDhQtxVlPgjOMR7fE7mUgHidWgp8F+W13M9srFcgaK12VQtIb0DjdoRCLH09uQwO4FvW1W4vdIM4SeR4PIbX1l0=
+	t=1745585150; cv=none; b=ibvG0cGoHLQbeTcIhSgJ1EWRHEK1z7ouGXi33aAMs5RXtARxRA8bO8KORPgdf4dPtflOjKa5Ev6CVLu7JIrvXuDFRqpPwZmgnr+m4BQMOamfTZU06repzH9dNgtO+yOKVF+aB4w1Q7Q4LLOYM0raL/OY4meEH7AYEmgEsGppf8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745584138; c=relaxed/simple;
-	bh=5t7yNPr1CWOau0RMYcrRFsXe9MPaeyzZjGY5BgZV1o4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l75oOdqMA721OVWix1TkWWHc47L2zNT4uPyR/HV4P1KaMVd3IY+6ZAT48kUbyTZLRanpV/w+sSERzbi4dMClq3ZLd8GLE3sQAuF5uSIMF+9Mm9y4XUhVgfycJrSNIscdMUOhHWRFksnOsexiPykNT+SP7nZJVflCGd2oFNb/vQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dQLZS1vH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n9Yspg5x; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+	s=arc-20240116; t=1745585150; c=relaxed/simple;
+	bh=N1JqJa/Thtcgbai7AXn0UM396DEB6usJBO8fHeX8CeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TbU2Cyqvf6egm+YUVzXDJ7GlUYeoIXOK7vUMDkIA0uoxi/ikH+A9ENATeHtzAcZFdY8dQ6BhC1dxgh88tGeWBW4cp+AeA7jBUH11SYE1HqFO+M4Ll5dNFhxogDcGhwPZHovjIJAXeRiXFrl2eYmxbc5aWFrbLSvIAmD9NE+Kk0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rng4Q1ek; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dQLZS1vH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n9Yspg5x"
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 76B3D114021B;
-	Fri, 25 Apr 2025 08:28:53 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Fri, 25 Apr 2025 08:28:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1745584133; x=
-	1745670533; bh=oDNpPryBrsrLI6MNT652iy7u9ZryJF8wQVHOnmOUp+k=; b=d
-	QLZS1vHt7XLg7laxQNs3/RSjp2nYQx2mnXx61t4OGwllZ2Yk1qGJb2IrDw1LlhIN
-	nwzrGSD2LxB+pDkOxUKrppjFqtHvYzMWPN0VXHScOfh7L5VXWUAGa9nlNDoKm9uK
-	/xPjCvnNu9zwVwu268/FYsOdS/h1J/QOo7Gjw/JNAPmTX453++t21Hn+94mXZuNI
-	1fPywjoctp8apcCcNQ8pTAWepIrpit/LFpG9kR49XRdbSQpVgLa1ZngkxRYI07J3
-	Mmfqvowwz8LxXp2J06/Uoh9Drclbsn749kjx9OZgGnlgN0Ico0Wrl/j/tS2HJcyo
-	l6AJHuPvDnNihSt+U9vEw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1745584133; x=1745670533; bh=oDNpPryBrsrLI6MNT652iy7u9ZryJF8wQVH
-	OnmOUp+k=; b=n9Yspg5xZCHkbVLlFEM7+UfoJiUJLX6/+6E3pB6Xyfcxef89b4b
-	/19hzcDppt3Oh0582KczHBgO5sb8G+e4DP83k7KshsNZ51K9Tvg5O+gw8dRhvfrv
-	MCUOGeXa67ZlAp2oIuFXoQTsKdfAE6N/sYeVY6sruLfubmlWvEcGA0D4aLbIXTiN
-	Kzt72b8nrE9mwqemVsLD8ZZBQn8JeGjO+eYo0Et/Bo3ANzYgCqsXj+i7gpdUrv37
-	saRJ9fkIBSJ5lUdIi9Nm+Mxi5R2aBq1oupUQHrbNeau2HgEQgrGApGnciD/ZAyni
-	qkJ8IgcnxsEgV5vWvWaZQjAXYllHvH3JItA==
-X-ME-Sender: <xms:BIALaBwbI7RNIZkzSUkRqcF85j_JdkpB3AoGf95xIZEBHEukpWIPcg>
-    <xme:BIALaBTPE8uTm3KMrreJFpdrRGn1jwWnOftSVWsQBYSF52rrVmu0S5Sh255EoLm9_
-    QYYm-oFz4svhZpFaXU>
-X-ME-Received: <xmr:BIALaLV7S3lw3nKMDYt44ugtBzMjG8qkD8u6OfJNd7RGnR4icilx01iecleA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvhedvfeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtrodttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepjeekleevleekfefgueehveejueek
-    vdehvdeugedvkeelgefhleegieevffdtuedunecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephhgvrh
-    gsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehlihhn
-    uhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehrih
-    gthhgrrhgusehnohgurdgrthdprhgtphhtthhopegthhgvnhhgiihhihhhrghoudeshhhu
-    rgifvghirdgtohhmpdhrtghpthhtoheplhhinhhugidqmhhtugeslhhishhtshdrihhnfh
-    hrrgguvggrugdrohhrghdprhgtphhtthhopehrrghfrggvlheskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtohepphgrvhgvlhesuhgtfidrtgiipdhrtghpthhtoheplhhinhhugidqph
-    hmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhl
-    rghsshgvrhhtsehsvggtuhhnvghtrdgtohhm
-X-ME-Proxy: <xmx:BIALaDi2B7zCD1xIfS789Vp3Zl0ypkFSvqJIl-8By3nbbu5P5m-frg>
-    <xmx:BIALaDCq4sTkjFppwq-q_GGh3p_n4BYrxCYASJhM18McRJx-5UgMIA>
-    <xmx:BIALaMIykH5GVHTlYxktpiQyupiQobkz4UHdkomjPKwmTqsMpX1low>
-    <xmx:BIALaCB6deqlUAKFo3DHVX-0ixnnUqO6_mMpdkeaqJ8-2_pct678fw>
-    <xmx:BYALaJIvyXovcrkjbdwJKw4DsG-aXUoG53dlaE-zhb-I9gLORb42TQHu>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 25 Apr 2025 08:28:51 -0400 (EDT)
-Date: Fri, 25 Apr 2025 14:28:49 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Richard Weinberger <richard@nod.at>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org
-Subject: Re: [v5 PATCH 11/14] xfrm: ipcomp: Use crypto_acomp interface
-Message-ID: <aAuAAVOvfcTeZJbY@krikkit>
-References: <cover.1742034499.git.herbert@gondor.apana.org.au>
- <d7bccafdf38259c2b820be79763f66bfaad1497e.1742034499.git.herbert@gondor.apana.org.au>
- <aAt8AIiFWZZwgCyj@krikkit>
- <aAt-GiUloeLEfu7O@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rng4Q1ek"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac2bdea5a38so336511366b.0;
+        Fri, 25 Apr 2025 05:45:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745585146; x=1746189946; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l3BCALyVfXKt+WZYBHxbyWx+XxVRkGCfaI97XHpd+pY=;
+        b=Rng4Q1ekEgj4eHEgEGAHrrYJb35kVZmqmz2o0o51RVO9Zxd3Bse2ALlohNR6Vdwe0w
+         iIZ9iVJiL05MmOiukVkWbmAPrgFlD2U4TlXQjxPOBYGmhOAVN/hsQcLG+/PSZkRrnHs7
+         3mVu3jmo7k9MmrFYVUWyLo9SpIOiO/3sNm97xKPSzAwqhkp7bMWweqfunUn1vEEOIJ3w
+         AxROhPBeVAoUkbANVTE2Pk9tfPFRuugqRpa9epK0VqnjscVNb/BB8bu+bTKgJc5g683j
+         z0KVOzbldWuzd5B+PkyPsiokdsGRNuOzOvzmdA5qS1GcNaDqp6Vdiq+GU1Y8ACXzJjih
+         IvjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745585146; x=1746189946;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l3BCALyVfXKt+WZYBHxbyWx+XxVRkGCfaI97XHpd+pY=;
+        b=LNE0CyByBEhkNyErrxT++sk2M/A7lttQZMfB8RlGxP7Jbq8mAt7xgoxDEm/xZ1pq49
+         iGtm6LccScJPdUupOOeTNGDcfpjGzNnZg5RjovglLshrJzAJUiYKzryUFrTllihG0Ab4
+         5Y/BtR9VIUhEZHpz2GFIw+73bPPDBCb6xg4C+TAau8LPwwGos6VNcVHnUq4U/R7CYZEN
+         msyeVfNqpneUOC5O/amNrqXgmCcRXvvd43gjEq0yyrBLqtHCIK4TMaRkRbFHjKD8WhkX
+         ONJL5NNeKNXkQXzaNJWmsxjzCjtx9RcFM75+T3y+I0yPsMr2zjZMulejsx6UaQZ2rQU9
+         Fn5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNGi+rsXSnGybXk6yjZwHrizukJhALv/JzsJZmqrHFIIB2qKn+/deoWK3/OCj8ni7xwJihq7XkJraZ1e8=@vger.kernel.org, AJvYcCXU6qenmHErF4tyuhMwvySmbP/J3IqEDjYFJTywoq7wrjGl1xOkPt22nP0gecJ7EyNASoXPYoL+eZEwpSYy@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUnIuEq2lTc/uidojylZM87Z8b3q+0fw1A779axTcd2kV4LMy0
+	L9ZAOIjjqJeluJm/Qhw45tydhMJnbf6N16U3Fuh1pZpQr6SnIjQQ
+X-Gm-Gg: ASbGncsPNttTSSzJv3s0/e4hZvSdoeYLHWuPem95EvbY/16YFH3yCp0pbN93mWYd2w+
+	sNDXxoLdeKsBAFF5Pm2DZddsvGEGFeo6aVUdUlVx5gf0SFxR8wEsV6ofTFpJjwMdecfOSeY1j08
+	5X7UeE5xgD2OvBHD8VPusdYCAHYLdZpHhti4EypFm1LqNedB1PSBSlI2X6H1irm0vGPrVRDo9QY
+	iG/mYFfN20fUCzkNxZPIzQweeG7lhXfnST1xOfqkpmeDUGHXXKBBueBN+SUet8EeumPjhs2MhS5
+	GS7WjCzWI5mtiIPc7L5vmcoEbBjFJrqlPAO3Z44VFnlkmW3gdQSyDkzBHC4yr8fLY/PyQzEJFdE
+	0q+I=
+X-Google-Smtp-Source: AGHT+IF6lACxg5XQV9zx3XY5JZvnZc0emetlxi1pM+qXxla8Kdp3t0Y/dF93JbbLv9LE6OFyvzm8+A==
+X-Received: by 2002:a17:907:1c29:b0:aca:95e7:9977 with SMTP id a640c23a62f3a-ace7113336fmr191137166b.28.1745585146266;
+        Fri, 25 Apr 2025 05:45:46 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e4e7094sm134641766b.56.2025.04.25.05.45.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 05:45:45 -0700 (PDT)
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+To: clabbe.montjoie@gmail.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Cc: wens@csie.org,
+	jernej.skrabec@gmail.com,
+	samuel@sholland.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 1/4] crypto: sun8i-ce-cipher - fix error handling in sun8i_ce_cipher_prepare()
+Date: Fri, 25 Apr 2025 15:45:14 +0300
+Message-ID: <20250425124517.2225963-1-ovidiu.panait.oss@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aAt-GiUloeLEfu7O@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-2025-04-25, 20:20:42 +0800, Herbert Xu wrote:
-> On Fri, Apr 25, 2025 at 02:11:44PM +0200, Sabrina Dubroca wrote:
-> >
-> > The splat goes away with
-> > 
-> >  	/* Only update truesize on input. */
-> >  	if (!hlen)
-> > -		skb->truesize += dlen - plen;
-> > +		skb->truesize += dlen;
-> >  	skb->data_len = dlen;
-> >  	skb->len += dlen;
-> > 
-> > pskb_trim_unique ends up calling skb_condense, which seems to adjust
-> > the truesize to account for all frags being dropped.
-> > 
-> > Does that look like the right fix to you?
-> 
-> You're right.  I must've missed the truesize update in skb_condense
-> when writing this.
+Fix two DMA cleanup issues on the error path in sun8i_ce_cipher_prepare():
 
-Ok, I'll submit the patch in a bit. Thanks.
+1] If dma_map_sg() fails for areq->dst, the device driver would try to free
+   DMA memory it has not allocated in the first place. To fix this, on the
+   "theend_sgs" error path, call dma unmap only if the corresponding dma
+   map was successful.
 
+2] If the dma_map_single() call for the IV fails, the device driver would
+   try to free an invalid DMA memory address on the "theend_iv" path:
+   ------------[ cut here ]------------
+   DMA-API: sun8i-ce 1904000.crypto: device driver tries to free an invalid DMA memory address
+   WARNING: CPU: 2 PID: 69 at kernel/dma/debug.c:968 check_unmap+0x123c/0x1b90
+   Modules linked in: skcipher_example(O+)
+   CPU: 2 UID: 0 PID: 69 Comm: 1904000.crypto- Tainted: G           O        6.15.0-rc3+ #24 PREEMPT
+   Tainted: [O]=OOT_MODULE
+   Hardware name: OrangePi Zero2 (DT)
+   pc : check_unmap+0x123c/0x1b90
+   lr : check_unmap+0x123c/0x1b90
+   ...
+   Call trace:
+    check_unmap+0x123c/0x1b90 (P)
+    debug_dma_unmap_page+0xac/0xc0
+    dma_unmap_page_attrs+0x1f4/0x5fc
+    sun8i_ce_cipher_do_one+0x1bd4/0x1f40
+    crypto_pump_work+0x334/0x6e0
+    kthread_worker_fn+0x21c/0x438
+    kthread+0x374/0x664
+    ret_from_fork+0x10/0x20
+   ---[ end trace 0000000000000000 ]---
+
+To fix this, check for !dma_mapping_error() before calling
+dma_unmap_single() on the "theend_iv" path.
+
+Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
+Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 19b7fb4a93e8..05f67661553c 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -275,13 +275,16 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	} else {
+ 		if (nr_sgs > 0)
+ 			dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
+-		dma_unmap_sg(ce->dev, areq->dst, nd, DMA_FROM_DEVICE);
++
++		if (nr_sgd > 0)
++			dma_unmap_sg(ce->dev, areq->dst, nd, DMA_FROM_DEVICE);
+ 	}
+ 
+ theend_iv:
+ 	if (areq->iv && ivsize > 0) {
+-		if (rctx->addr_iv)
++		if (!dma_mapping_error(ce->dev, rctx->addr_iv))
+ 			dma_unmap_single(ce->dev, rctx->addr_iv, rctx->ivlen, DMA_TO_DEVICE);
++
+ 		offset = areq->cryptlen - ivsize;
+ 		if (rctx->op_dir & CE_DECRYPTION) {
+ 			memcpy(areq->iv, chan->backup_iv, ivsize);
 -- 
-Sabrina
+2.48.1
+
