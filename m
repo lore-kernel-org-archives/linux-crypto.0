@@ -1,86 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105FF17A2F0;
-	Sat, 26 Apr 2025 06:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6147D1A3163
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 06:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745647896; cv=none; b=tmvMkCdEw9BQDHmCjijY0ck10TvktOAbiQQp06Gqolf44JercL9IplKBzukyjzk50KiUQrCvPC3/y2a7kjtTTCiztzjLvIQcurHnwPeKGJkU1aBcsn1sc6eotMLumow4zUvSIwvpcpxRQ+G7Jd42qetxpyuOqasdn3vbEDB+g2o=
+	t=1745648200; cv=none; b=HLEOQe4ei8BEkoCWKKpvFPjDY0OKQSe0Q1EH3Z3hwwYowAKAnK7NgMRJfsEsRBUMvuBVbEE1yJq6cB4qY5+ZizHIOxJPe3GCI6jgnrAgdQmxxyTvTlejieUagZmEGoFkXY9FsQmr0mIQgv87zfA7u73/uoy4pa9falLTNlSW52A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745647896; c=relaxed/simple;
-	bh=bB98xDqQD5ADQCaHwG2kKcl9a/X9KNfvJtbGOtE3yiA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=il+AW6qdOWnTBiZocRxmMHQ0ggWNsYCeX1bwrXftd0+VB6jCo01RPaOPd6oJI6pGpb6e4YttvRiJBcqAjPpf2ipybcQJWLujmpfrL0WqkahBaWlpMSwn4d81UtqgPIUjxQn/5ukDs8cHeyt1EmgPihWvJSPaLon9gp9oJTcwTMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pH4bpXGK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745648200; c=relaxed/simple;
+	bh=dyodr5rNNQo+T19uRtFEKnYnQVGzoS+0FyJwruWw/2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUbLJTDyZThWWXeRfcieuUO9nppiA28WcSGNudLaXlOmoOJ6lC7Evwk7psTzr6HahnP+351CaQ5hC7b9f1DDdouITzGsOBS5I+fq+GmsZA9ZYykTKlJoujDrWQ0cfHP8LScca+DBbYKinrx9BAZnoEACPhCroJZnw9uxek7f4eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BZrL3GIm; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pH4bpXGK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 798BFC4CEE2;
-	Sat, 26 Apr 2025 06:11:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745647895;
-	bh=bB98xDqQD5ADQCaHwG2kKcl9a/X9KNfvJtbGOtE3yiA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pH4bpXGKD1UKWQa0Z7XdUM6IuYWlTLzNcAGBGvmdm6xwdhGRBa5P9n518vnWsoiMa
-	 ecgfkvrKkAfQCnXzB+Z0h/pTSFnhmXfgwnbfVav6x1aaEnxQBzFRmxv1Z76JSgh5ce
-	 2/w3C2tJZntt4egnpsEcbNxNcvg3dVffDuNPXLwHLMMQyaGgvg+u/VwnZd/TUQvvjE
-	 2wv31diLYT4V6sBgfnX5mTSjXqgIZjXk2pgKUuHbBykxkGjO1mjQt+fHkUUtHOOSal
-	 Ucn+iuGVwpK+HpeZU84yN0lt1Y+CQ84h8KyPh9SEWman7wr1P8XxZ9Lgw62RHd1vzO
-	 f47EHtwS6742w==
-From: Kees Cook <kees@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <kees@kernel.org>,
-	Kristen Accardi <kristen.c.accardi@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] crypto: iaa: Adjust workqueue allocation type
-Date: Fri, 25 Apr 2025 23:11:31 -0700
-Message-Id: <20250426061130.work.001-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BZrL3GIm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=weMigD7OC6kyWtGLCmWxkNmo06WycJrULE+/tMyBAnw=; b=BZrL3GImqFSA5vx0gkr2AIatVi
+	h0IfuOjbhyu7DMXzqp3kG64WMWPNBupUJyuH/v5SNNsiELCHQclYQ4eCNVwpM8a/0Bovn1FpTGKV0
+	21/ZQDTmnAWdwPZtE9lIlGHx8RwTRiE9E/n7CcAOLowaJVQ6gZcoiZXEZTMl0L4kcq1RLviAtgIHq
+	9+5vlF/1KxiHNvz7D6fKnP4YlSPQwexrdp+UhhJuRKz+wx8TN5mekVT3UNWC3vDNQ9QM4KX/570ct
+	WXvVykd940/jVc7ZBUPrrcjRcBpXH/NBMOGVoYkT8tUHyxRHNHsaB11VjElqrZ4T234j+ZphQ3Hob
+	DUbkeO6A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u8Ypv-001AKQ-2e;
+	Sat, 26 Apr 2025 14:16:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Apr 2025 14:16:27 +0800
+Date: Sat, 26 Apr 2025 14:16:27 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH 2/3] crypto: scatterwalk - Add memcpy_sglist
+Message-ID: <aAx6O0rrIm67WgJm@gondor.apana.org.au>
+References: <cover.1741318360.git.herbert@gondor.apana.org.au>
+ <18a6df64615a10be64c3c902f8b1f36e472548d7.1741318360.git.herbert@gondor.apana.org.au>
+ <20250311043651.GA1263@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1507; i=kees@kernel.org; h=from:subject:message-id; bh=bB98xDqQD5ADQCaHwG2kKcl9a/X9KNfvJtbGOtE3yiA=; b=owGbwMvMwCVmps19z/KJym7G02pJDBk8lcJt25lOv2nTrNwaEXGnUNGrgnHd4tKXTC8zdyiua Gxpvb2no5SFQYyLQVZMkSXIzj3OxeNte7j7XEWYOaxMIEMYuDgFYCITLjP8z7n/5k2Q5v+dMe++ uUcXuz63dXXkuyN2YZpcpDRTQLnbO0aGY18P+Z7qjPOtzcsRU5iYK7rtzc2i5f8NRSb279OLd1v LCwA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311043651.GA1263@sol.localdomain>
 
-In preparation for making the kmalloc family of allocators type aware,
-we need to make sure that the returned type from the allocation matches
-the type of the variable being assigned. (Before, the allocator would
-always return "void *", which can be implicitly cast to any pointer type.)
+On Mon, Mar 10, 2025 at 09:36:51PM -0700, Eric Biggers wrote:
+>
+> Actually this new function is useless as-is, since it invokes undefined behavior
+> when the source and destination coincide (which can happen even when src ==
+> dst), and all the potential callers need to handle that case.  I'm working on a
+> fixed version.
 
-The assigned type is "struct idxd_wq **", but the returned type will be
-"struct wq **". These are the same size allocation (pointer sized), but
-the types don't match. Adjust the allocation type to match the assignment.
+Yes I just tried using it in chacha20poly1305 and it was no good,
+as it can't deal with the partially identical SG lists that IPsec
+creates.
 
-Signed-off-by: Kees Cook <kees@kernel.org>
----
-Cc: Kristen Accardi <kristen.c.accardi@intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: <linux-crypto@vger.kernel.org>
----
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So I've fixed it by rewriting it based on skcipher_walk.  In order
+to do so I've moved the common bits of skcipher_walk out of skcipher
+and into scatterwalk.
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 09d9589f2d68..4aa503d6b15c 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -725,7 +725,7 @@ static int alloc_wq_table(int max_wqs)
- 
- 	for (cpu = 0; cpu < nr_cpus; cpu++) {
- 		entry = per_cpu_ptr(wq_table, cpu);
--		entry->wqs = kcalloc(max_wqs, sizeof(struct wq *), GFP_KERNEL);
-+		entry->wqs = kcalloc(max_wqs, sizeof(*entry->wqs), GFP_KERNEL);
- 		if (!entry->wqs) {
- 			free_wq_table();
- 			return -ENOMEM;
+This should be good enough to replace skcipher_null.
+
+Cheers,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
