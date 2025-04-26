@@ -1,168 +1,180 @@
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54B218870C;
-	Sat, 26 Apr 2025 07:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.255.230.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B78C1C84B1
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 08:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745652715; cv=none; b=oa6vuODdLW2uNFJzg/4LsjjBOZZR1hNizNpnMhfzdeCfS9U9xij78EgF3sO7calSkqblFRd7EXkODWzXuKCDciGn8cgRI5l3JgiQIplt25vEYDg+jKVVuoH+heTHLFfObjPyCWvjgUTr+tORh+rlyPP01pnQYq/uH639MyMbu3c=
+	t=1745657344; cv=none; b=GBeFF/2LSV+CkZ9CJNbQluGgFNtojXLZ2e3FAibuwnFx3flTpdplYEC8e7hDi6rWRu+CHi2pFs73KXxkhx1YNTylKV83AJwHFlBN5mBLGtzK3G0nixvxjNbaDrwdiysrmApGeIdUtcp7Ys2u/JlPDPm8sFrdwBa3cAjwQoS4l6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745652715; c=relaxed/simple;
-	bh=usn3UhhvWYxA5R1L1n51sRf0wY9ZS5AhL2O38+3iocI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TeOMtKpd/qKmZl6AUeQdcSYYS8fMIglG/h8qnRt4thy7VbmgIe2OaLwNmcjaIb/h5XiNcgr+GJP+H0bdoh2czNwH76e2bNxkuHOrKLAagLA71wHYfaACpwDu8Py42LyS2XR13tf9ygq+06MGPF6iPQZeV5vgXnwOrHcNAUCDJKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ucw.cz; spf=pass smtp.mailfrom=ucw.cz; dkim=pass (1024-bit key) header.d=ucw.cz header.i=@ucw.cz header.b=mfgQZGtZ; arc=none smtp.client-ip=46.255.230.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ucw.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucw.cz
+	s=arc-20240116; t=1745657344; c=relaxed/simple;
+	bh=VvhVJUxbujEt/82Oh7MWqz07P+csAPrSW3Yrsyxj8m4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fnzMIvYGzTBZLF3owhPfoUr5D4altygdZat7v/NhGm1ZFoTTxDRl7LTHM8D53feEXRGXWbQJiEUfdGcD1VCWGAliH0S9q+upFaNrPl60cE78A4IahzvFx/iNAf9M26G55JRTAXeQrK9svrVbhz3sUVLb5BZp4+BJCjl4KPyZouM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BVmrSyAg; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ucw.cz header.i=@ucw.cz header.b="mfgQZGtZ"
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-	id 2F1521C00B2; Sat, 26 Apr 2025 09:31:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
-	t=1745652703;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5exbCp8CDaKtwnGNmQNuQzYNnvlYj2r8BcoFxqyUHf8=;
-	b=mfgQZGtZWV3YKRvc11Fy2WjXUhClzecJUpk8uWFAvgSynbJ4YLRl0zJKFI2+KRYmEv/vIS
-	nEGu1k4V7qVSC93t6IBB0MyDqO93+03canDSdfmPtS49p32DXiQ8kU9ZO1dLYEU+Xf6umH
-	NN3bTS8FxIdGst1L8YhkuJUoLzvidEA=
-Date: Sat, 26 Apr 2025 09:31:42 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Danila Tikhonov <danila@jiaxyga.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Rajendra Nayak <quic_rjendra@quicinc.com>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Amit Kucheria <amitk@kernel.org>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Wesley Cheng <quic_wcheng@quicinc.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Elder <elder@kernel.org>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Andy Gross <agross@kernel.org>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Georgi Djakov <djakov@kernel.org>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Robert Foss <rfoss@kernel.org>, Andi Shyti <andi.shyti@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Taniya Das <quic_tdas@quicinc.com>,
-	Sibi Sankar <quic_sibis@quicinc.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Imran Shaik <quic_imrashai@quicinc.com>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Jessica Zhang <quic_jesszhan@quicinc.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	David Wronek <david@mainlining.org>,
-	Jens Reidel <adrian@mainlining.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-scsi@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-hardening@vger.kernel.org,
-	linux@mainlining.org, ~postmarketos/upstreaming@lists.sr.ht,
-	Connor Mitchell <c.dog29@hotmail.com>
-Subject: Re: [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and
- Google Pixel 4a
-Message-ID: <aAyL3vl9yKlJ+JOi@duo.ucw.cz>
-References: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BVmrSyAg"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so28721225e9.3
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 01:49:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1745657340; x=1746262140; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mdj+zoH4lFIbvlYYukY12hViRcNCFHIXiPCq2FExRIs=;
+        b=BVmrSyAgR8qBrBoAvoopYKLZPp6Mm4MnSjMIie9oW+6PUmb+3j168vIYOj57XwCqfb
+         B8AtkT8qfRLQsMRYp4TbDZxNXkkiVovfI3CP4x5purvPylTtKSjG0n2Xe7Zyo18J5UXO
+         kv8RS3f5lqII2JlEoQDu+qOwqYX/8yxDCNfXY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745657340; x=1746262140;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mdj+zoH4lFIbvlYYukY12hViRcNCFHIXiPCq2FExRIs=;
+        b=Ko8PWQ9driegJtngvcx1N0vz56yvNnb6SVEmeiEm2on+tPATKPRUzxyCEHFUutXNr/
+         VDxQDWDr9PwY97KPER+yWE0uEDxg0fTFklGsj4ovI/XXEFaQGLEE+UYaecVg9J9lDH2d
+         JJ1UYEBz/k2223lG2EPdRPn5Kpy+vSTFRSrXLLccR/kpDPpJWUGWXCaytN3dgEpAKE1+
+         GQ0aNi1CLBl8bpkmiBUfO2iXUOubnVWHGtx9yi2mO5Ii+R7LD74CXWdK21HUex7NBQ9b
+         FMQG9Kd5LTiM5kOf3clwdR+9plfUOAZy7JE/l4Twj+af5DqrcjodZWSooJEJXwjrYkp/
+         KFvw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6ftixQYVTwZbSdRSfmM5HCmRW71oRzl4sc8Y7Gq5z0g31tsz39yCGUwGeC1RuySORviHtMaHIK7QpU30=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXrOtWKBq94ljd50sCtPNlG/c8agIwjPHcdJr6bUX0ds8MePCc
+	S/vx6ni6YXFdPAa3A+szzp+R1lvadhjomd3FV7vLr4IKTGNvbJfxOBDtg83GKg==
+X-Gm-Gg: ASbGncujxUvymVTWkUfQtQqtlv1yD0YTzhh6+fx8MoXHsQ3M3ijabc7Tynl0rYNHFdl
+	lP5Xyo7eO2/wce32+YShcD/aY3EYFz71hETeEp7ik99EWFEfCV5ZJ9FjJk7VUrOUwqJ3mQgKKC8
+	pvn6KVxEo3tHVLnyFrZhCBCupeWOfEzGpBdKeYQVWIzp76mkLOgn1kJ3YOJ4O8qCANbjmgjNdxX
+	jxbqLu+SIDDm1snJEj4Amv1wCxjNmzW90/FqNXKa9OZZ6Tx6ICV5wWJIpa/0+j5CIsTUyDr1MW/
+	gI+5efPFOkN6t4Q5c+VH8wDCJZobKdOEbG3mpN+dHo3lotKgk87a6D4GBY8VT0gDv6sbOjJAwqz
+	++uFCLAIF0r5hm9USCGG3V5A=
+X-Google-Smtp-Source: AGHT+IHPZeKdxZvPYe2TepgSAn88bwYI7vcjTjP6rkOEVPWEl8fuLc+bJpWvPfDlNT6FlBQvkJudFg==
+X-Received: by 2002:a05:600c:46cf:b0:439:9424:1b70 with SMTP id 5b1f17b1804b1-440ab871770mr18150425e9.30.1745657340509;
+        Sat, 26 Apr 2025 01:49:00 -0700 (PDT)
+Received: from [192.168.1.105] (88-187-52-200.subs.proxad.net. [88.187.52.200])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-440a52f89b2sm53032105e9.8.2025.04.26.01.48.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Apr 2025 01:48:59 -0700 (PDT)
+Message-ID: <dc47e9ba-e23d-45d2-bae1-cac8bac2310b@broadcom.com>
+Date: Sat, 26 Apr 2025 10:49:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jXuQpBURuH9Sxi9Z"
-Content-Disposition: inline
-In-Reply-To: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/12] ARM: bcm: Add some BCMBCA peripherals
+To: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, William Zhang <william.zhang@broadcom.com>,
+ Anand Gore <anand.gore@broadcom.com>, Kursad Oney
+ <kursad.oney@broadcom.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
+ <rafal@milecki.pl>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Olivia Mackall
+ <olivia@selenic.com>, Ray Jui <rjui@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>
+Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---jXuQpBURuH9Sxi9Z
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi!
+On 4/6/2025 5:32 PM, Linus Walleij wrote:
+> This adds a bunch peripherals to the Broadcom BRCMBCA
+> SoC:s that I happened to find documentation for in some
+> vendor header files.
+> 
+> It started when I added a bunch of peripherals for the
+> BCM6846, and this included really helpful peripherals
+> such as the PL081 DMA, for which I think the most common
+> usecase is to be used as a memcpy engine to offload
+> transfer of blocks from NAND flash to/from the NAND
+> flash controller (at least this is how the STMicro
+> FSMC controller was using it).
+> 
+> So I took a sweep and added all the stuff that has
+> bindings to:
+> 
+> ARM:
+> - BCM6846
+> - BCM6855
+> - BCM6878
+> - BCM63138
+> - BCM63148
+> - BCM63178
+> 
+> ARM64:
+> - BCM4908
+> - BCM6856
+> - BCM6858
+> - BCM63158
+> 
+> There are several "holes" in this SoC list, I simply
+> just fixed those that I happened to run into documentation
+> for.
+> 
+> Unfortunately while very similar, some IP blocks vary
+> slightly in version, the GPIO block is differently
+> integrated on different systems, and the interrupt assignments
+> are completely different, so it's safest to add these to each
+> DTSI individually.
+> 
+> I add the interrupt binding for the RNG block in the
+> process as this exists even if Linux isn't using the
+> IRQ, and I put the RNG and DMA engines as default-enabled
+> because they are not routed to the outside and should
+> "just work" so why not.
+> 
+> I did a rogue patch adding some stuff to BCM6756 based
+> on guessed but eventually dropped it. If someone has
+> docs for this SoC I can add it.
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-> This patch series adds support for the Qualcomm Snapdragon 730/730G/732G
-> (SM7150) platform along with the Google Pixel=C2=A04a (sunfish) device. S=
-ince
-> the most critical drivers were submitted and applied in separate patch
-> series, this series is largely composed of DT bindings and device=E2=80=
-=91trees.
->=20
-> To date, we=E2=80=99ve tested SM7150 support on the following eleven devi=
-ces:
-> - Google Pixel=C2=A04a (sunfish)
-> - Samsung Galaxy=C2=A0A71 (a715f)
-> - Lenovo Tab=C2=A0P11=C2=A0Pro (j706f)
-> - Xiaomi POCO=C2=A0X2 (phoenix)
-> - Xiaomi POCO=C2=A0X3 (karna) / POCO=C2=A0X3=C2=A0NFC (surya)
-> - Xiaomi Redmi Note=C2=A010=C2=A0Pro (sweet)
-> - Xiaomi Redmi Note=C2=A012=C2=A0Pro (sweet_k6a)
-> - Xiaomi Mi=C2=A09T / Redmi K20 (davinci)
-> - Xiaomi Mi=C2=A0Note=C2=A010=C2=A0Lite (toco)
-> - Xiaomi Mi=C2=A0Note=C2=A010 (CC9=C2=A0Pro) & Mi=C2=A0Note=C2=A010=C2=A0=
-Pro (CC9=C2=A0Pro Premium) (tucana)
-> - Xiaomi Mi=C2=A011=C2=A0Lite=C2=A04G (courbet)
->=20
-> A huge thank=E2=80=91you to the SM7150 community for all the devices-port=
-ing
-> work, testing efforts, and bug reports.
+Linus can you resubmit a v3 addressing William's feedback? I will drop 
+your series for now. Thanks!
+-- 
+Florian
 
-Thank you, looking forward for well supported phones.
-
-Please cc phone-devel@vger.kernel.org with phone patches.
-
-Best regards,
-								Pavel
---=20
-I don't work for Nazis and criminals, and neither should you.
-Boycott Putin, Trump, and Musk!
-
---jXuQpBURuH9Sxi9Z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCaAyL3gAKCRAw5/Bqldv6
-8t6+AKCezW+X8tCRtch2mRMPqCnbTeMpmACgo7PqyT2Vhb5yFE9mqg8LMrPK+y8=
-=hK/X
------END PGP SIGNATURE-----
-
---jXuQpBURuH9Sxi9Z--
