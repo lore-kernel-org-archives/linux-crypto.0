@@ -1,57 +1,57 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5BD1DF759
-	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 00:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F32198A08
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 01:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745629042; cv=none; b=l/ZHZ5oSAYsq2SA0fIYVWGyklaQW0+AUg+J77dzQ++QsHlHFCdhaN0mjrbqa2uJ9fAAfmtgIa2DSogIeLEgmtMsQIn15Kvb7iJ3aoj+scP5SinaBVPoP2UVkgHpZwRZR8SoSrwYcZ5W/9dcNg4h0lMCvZrwziZN8R5JHIhYZP8o=
+	t=1745629224; cv=none; b=akAZkqpeRZ/vUyzPUNUHFJV2eGyiscWxusImv15WChxHdIEs/GVS6k9PhuJxffzDcnd3lq15iG3U3pXbUn+XXe/ryDZtNQTgmRjR6MERL7ETNHFc2On0RB+Est7GJMDVagPCO+VnRPLSiZbigQp96addL8QrkhU8LloEEJhL5Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745629042; c=relaxed/simple;
-	bh=ZUeglnEXo1kflbIsEyNlOARHWliNyZY9IUGoJyRd164=;
+	s=arc-20240116; t=1745629224; c=relaxed/simple;
+	bh=gC37CXUFrc978U7XLFVUKwfsog5R+Pi5EVdqcL3ZSQQ=;
 	h=From:References:In-Reply-To:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i+xw5T+DqDgsjtsCSBSWSrL58rwuPIrnYyQ25AvX9URNbWw4KpDeR+Ukv8ZM24HfuAnxDFs7233C0cM91byvncBzuWZ7BL/7lwJUPNoZCMyVHNcT/IQbpKhXGCaFTuv23JACAy+F3eHA+xVr3JNeXWtKtcpjo5HKKS+VuaY+tW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AeoQeWaW; arc=none smtp.client-ip=209.85.221.177
+	 To:Cc:Content-Type; b=tikRc94IWEJeRXJLx5x8Z26m4aSsZuwX2OsWk860ob6qHktEMB7FelR+DlOsQyuBvZbUrLyal3jQsHDLYkscAPB5h5UdkIrg9TWmh2WxDpD1LObJBGxH7kE/XQiJ9auQvqWHPS+sRr8Ci8gYSOHdte9TRlNBsNQrI04hNc1/h6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=HYM0TctT; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AeoQeWaW"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-523d8c024dfso1217560e0c.3
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Apr 2025 17:57:18 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HYM0TctT"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5259331b31eso1207273e0c.0
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Apr 2025 18:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745629037; x=1746233837; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1745629221; x=1746234021; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:thread-index:mime-version:in-reply-to
          :references:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/fNKkf744IEvwIgSUL1KjIg84YYfqUYXv4MDvVb/kJU=;
-        b=AeoQeWaWLekz9qcyJSSWgJdTVD21aOkKXdLEPLCYA1lNlxjlyW1mLMmFNsHtRzA6Qp
-         AOG1JXzCYhbGKzMpLF4GwsTXf+97pYtzcwdxO+5lsu4IXq2BTgav0ltLnz8QnKLf6YC4
-         BLOmVXMgSz8YzdqfmPFsU73M4m09hObDgnKGU=
+        bh=+F88yxtx+gseVoo1hoBLCqHNnn6OLi5xvp8mJGIQY6U=;
+        b=HYM0TctT3Zxq1SREpF2h9QpFP8zEtHE/ThBo5vVhm93XueG60m+yY2XuOsjJHqc8dq
+         Bh9be/KHfHmGXuKzURa/bvPSuIlqPTDKbBd1omV6Yb+TV1QDJV7At9dIegtgSBjGqSo6
+         ibIyxSCbYBzHAAQueCtj5mNiSrHYqvGQZhE1o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745629037; x=1746233837;
+        d=1e100.net; s=20230601; t=1745629221; x=1746234021;
         h=cc:to:subject:message-id:date:thread-index:mime-version:in-reply-to
          :references:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/fNKkf744IEvwIgSUL1KjIg84YYfqUYXv4MDvVb/kJU=;
-        b=OA720SwooRX5qDsx2Wl5oMntRyFXadLy8sccnTcbug/xFiNPtJz5n/WMq62NInQiAX
-         vYksB14FKxcsaGAWC5rBhdHDKrXSb+dLNmKWdp1OoEKkRVLU77mV1JyoNXsLz4qwkPLL
-         Mf69u1ssHLdOISHyi/mSqtwH/HOZE+UTC0oXKk2wPB6Y01u8o8f9+o9K1nv4svbfb9uR
-         S5bE2BlhPjxP8x5Ylt/mFd5750WWBmMz78vsUPL5kCKi1Tg66FWJWNy0546vbSdSEmlP
-         UQc0NCdG10JwtvQ1QXsREVRtymsNMUb+HgwAax4Wq49qgoTJUlhOGoicHJjnzp39Io6/
-         KqHA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/Xk+AcN3iALfGFjDouCAUMc508tPPneVsbiSpyNngUaJ7+wDauRuUcRKgKi+SLfQSVNtpxNnEej4gNI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTcV4VWhgftUFG3ZoK0s5kY8p/Fs5xFX5jx2H5S9HTKg/eMSwZ
-	wZaDdZPCZVAwA1SJ5+m8JHlxMs+lSSNAPfnB53E1IywD+w6SLU4Jq3NCyRzOVYVZIVv42bWnJoO
-	/t3w6HohR+NFN9tt3Baw4zQ5TrOpk9B9QQofd
-X-Gm-Gg: ASbGncsO0TxF51dEQOHxR//W2HMTr5JFnCLQaQWoi/5QhwoNU+kD5jkJwtb3eqJOZlU
-	9FqWsk0sqb9X9s0X1VzY41sS2zRmCmNyf/Xwc0dg/JF1f27kRFwMqaTXyUD/VsUXB0jRLLn9km6
-	ys5Olt6Xzx5yu6u8PfWTbi2sE=
-X-Google-Smtp-Source: AGHT+IGfCabDSxnkHcHNKEwo7ukTY2QxJwhElg9zsth4nwtYiGyTYnUjS0YzD2uAga5Y/GXxctTu+tXBRtbNswMd+f8=
-X-Received: by 2002:a05:6122:8c03:b0:52a:9178:d281 with SMTP id
- 71dfb90a1353d-52a96fabf9dmr1193362e0c.2.1745629037724; Fri, 25 Apr 2025
- 17:57:17 -0700 (PDT)
+        bh=+F88yxtx+gseVoo1hoBLCqHNnn6OLi5xvp8mJGIQY6U=;
+        b=BjBu/B7EeUPby+Vf/zpa/y7jah/fzyx9ygLYt7IZeqrc7Az4u1n830/Nae/cvEiQ5O
+         iJxOsyQOZ0IpMTHEbgN8+kFUdAXmUXrIQUQ6BDAZpAm+W3fMIfCCSO5UsiFJCO0vv6JH
+         LDMd2oXEboHBAWRyvzztuOMuzaa7nKfLYEFfgb4D2adxkBsDH6MkOKMRG9oCarIL6QD6
+         biYknXvggC/aTa9nqj5sd9B4sd6HdcKIIZq6foFMDZfNgIujduBTMTJLfV4r9enxZe99
+         3UfFEJgsMtTggeKq1LABYOVqkNoFOKDvDgoTnHXvahS5p73ymJD8qYGxMTI6xBjcIaqq
+         2odg==
+X-Forwarded-Encrypted: i=1; AJvYcCUx81vFRXoj73/3/hHJTo3D4C/gNzf2waIkr4XbiE4cxhGSsbD7Ca/nYtuTKHBBNppoRLaYzth8H6wCxPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3QE66UMjA/5CX7wN8x4VFQ3MN8wtXCmnPbZSRhgCK2EiRDkgZ
+	lv+YsnAhi3VvcEIWB7VaQJKteiFOggPAA1Xn4LboF8zsAIXj8wgBBTPMRQHFWRVkhDxsJcFslV9
+	JpqAFywaXjawY7TgL+RCeLnAXFMk+fniQqXzF
+X-Gm-Gg: ASbGncstJDa3akCLYqsOM75Undk5c6MBxOyxWDK/6QLNxQj8kptLwrfdhrFPJcX4kPW
+	oPfMml4jXsLsqFt8CGw4+iB1yuqWlFuUdEGWpsXQX3AVhzEcB8OpfMXd38wb+Z6zVeXjI0SS6wL
+	WBFsrHO457381LzSlT1uNHpgo=
+X-Google-Smtp-Source: AGHT+IGfuRIYRudtHShN7Qj32m0l4wF5E7B6kI9WmLd7OBkLUEHBqslac8Ueg1BcOn4Ps21vkwvsVqQpFaYbg/7Qq8s=
+X-Received: by 2002:a05:6122:1826:b0:520:5185:1c31 with SMTP id
+ 71dfb90a1353d-52a89f317d0mr3621236e0c.9.1745629221431; Fri, 25 Apr 2025
+ 18:00:21 -0700 (PDT)
 From: William Zhang <william.zhang@broadcom.com>
-References: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org> <20250406-bcmbca-peripherals-arm-v2-1-22130836c2ed@linaro.org>
-In-Reply-To: <20250406-bcmbca-peripherals-arm-v2-1-22130836c2ed@linaro.org>
+References: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org> <20250406-bcmbca-peripherals-arm-v2-3-22130836c2ed@linaro.org>
+In-Reply-To: <20250406-bcmbca-peripherals-arm-v2-3-22130836c2ed@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,11 +59,11 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQKk0Iba5S5vFfMGFNn0Sizjy9mbxwLhv52YsgvcC7A=
-Date: Fri, 25 Apr 2025 17:57:15 -0700
-X-Gm-Features: ATxdqUEfhXI-5rpHiSvV6Vo9vXGt-qTZ1UVBrGewfW78Ps-hs2CoXwbdTQeO1EM
-Message-ID: <763d0d72070b904af690d3e1f94c176c@mail.gmail.com>
-Subject: RE: [PATCH v2 01/12] ARM: dts: bcm6878: Correct UART0 IRQ number
+Thread-Index: AQKk0Iba5S5vFfMGFNn0Sizjy9mbxwFEQLbcshjJjRA=
+Date: Fri, 25 Apr 2025 18:00:18 -0700
+X-Gm-Features: ATxdqUG_KlDtLoooLEr6zW1rmm5dD2pYD-sILOEus3QkcmYKaI-2PvPqO3FiMWk
+Message-ID: <fcc2ee94c1ae4bf880b201cef082cc02@mail.gmail.com>
+Subject: RE: [PATCH v2 03/12] ARM: dts: bcm6846: Add interrupt to RNG
 To: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
 	Anand Gore <anand.gore@broadcom.com>, Kursad Oney <kursad.oney@broadcom.com>, 
@@ -74,15 +74,11 @@ To: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
 Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-crypto@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b7751c0633a3eee7"
+	boundary="000000000000aea1100633a3f980"
 
---000000000000b7751c0633a3eee7
+--000000000000aea1100633a3f980
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-
-Hi Linus,
-
-Sorry for the late reply.
 
 > -----Original Message-----
 > From: Linus Walleij <linus.walleij@linaro.org>
@@ -102,41 +98,39 @@ l>;
 > Cc: devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
 > linux-
 > crypto@vger.kernel.org; Linus Walleij <linus.walleij@linaro.org>
-> Subject: [PATCH v2 01/12] ARM: dts: bcm6878: Correct UART0 IRQ number
+> Subject: [PATCH v2 03/12] ARM: dts: bcm6846: Add interrupt to RNG
 >
-> According to the vendor file 6878_intr.h the UART0 has IRQ
-> 28, not 32.
->
-> Assuming this is a copy-and-paste error.
+> The r200 RNG has an interrupt so let's add it.
 >
 > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
->  arch/arm/boot/dts/broadcom/bcm6878.dtsi | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm/boot/dts/broadcom/bcm6846.dtsi | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/arch/arm/boot/dts/broadcom/bcm6878.dtsi
-> b/arch/arm/boot/dts/broadcom/bcm6878.dtsi
+> diff --git a/arch/arm/boot/dts/broadcom/bcm6846.dtsi
+> b/arch/arm/boot/dts/broadcom/bcm6846.dtsi
 > index
-> 70cf23a65fdb5ac7ed9eabc986f4ebb4df263c43..cf378970db08c05c40564a3893
-> 1417a7be759532 100644
-> --- a/arch/arm/boot/dts/broadcom/bcm6878.dtsi
-> +++ b/arch/arm/boot/dts/broadcom/bcm6878.dtsi
-> @@ -137,7 +137,7 @@ nandcs: nand@0 {
->  		uart0: serial@12000 {
->  			compatible =3D "arm,pl011", "arm,primecell";
->  			reg =3D <0x12000 0x1000>;
-> -			interrupts =3D <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
-> +			interrupts =3D <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
-It is copy/paste error but the correct value is 92
+> e0e06af3fe891df3c3d8c2005cf1980d33a7762b..d36d0a791dbf4ca34427976919
+> 57c3247c7187e7 100644
+> --- a/arch/arm/boot/dts/broadcom/bcm6846.dtsi
+> +++ b/arch/arm/boot/dts/broadcom/bcm6846.dtsi
+> @@ -196,6 +196,7 @@ uart0: serial@640 {
+>  		rng@b80 {
+>  			compatible =3D "brcm,iproc-rng200";
+>  			reg =3D <0xb80 0x28>;
+> +			interrupts =3D <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>;
+If you are getting the value from 6846_intr.h,  the interrupt for dtsi is
+actually
+((SPI_TABLE_OFFSET2 + 21) - 32) =3D 85
 
->  			clocks =3D <&uart_clk>, <&uart_clk>;
->  			clock-names =3D "uartclk", "apb_pclk";
->  			status =3D "disabled";
+>  		};
+>
+>  		leds: led-controller@800 {
 >
 > --
 > 2.49.0
 
---000000000000b7751c0633a3eee7
+--000000000000aea1100633a3f980
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -207,13 +201,13 @@ VhYAxZlzj7tSjUIM7G7IhyfqPC46GKJ/4x+Amz1Z6YxNGy71L68kYD6hIbBcA5AM42QBUufly6Oa
 urb/KlmDGfVrIRYDbL0ckhGQIP5c6L+kSQZ2sHnQK0e0WgIaZYxaPYeY5u0GLCOze+3vyRMxggJg
 MIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
 VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwxuh2XG3FXRL1W
-JOEwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIHDL6D5AnlwEmqR7NpnE6FyIO6s0
-SqrR3Yzfd0zEVf8vMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
-MDQyNjAwNTcxN1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+JOEwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIDpfgq8eZVddlT4szr0LKd2IcQs9
+q6/Aesu73sioWl2HMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
+MDQyNjAxMDAyMVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
 CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
-DQEBAQUABIIBABFcoa0MVVZ3v52ZDBbXnKMQK+FGDdDO6ONijKIj/ow24KQbFLcADcQdvO9/XaCN
-6STn+DTVgE8jSSvZ0HYakGKts4cEbAAlxbmcUvx3xmrHczjvxRb13JKk9aqqovO01KQSWG2qIFlv
-2j5/NLsIXS4VpzDsutTjAPNOghiIv9sVV69FLg1Lbqi6Jwt7CjeVZPvMuaDu6HEJZgzFjzFjtnA6
-34w5bJ+kIuW8mOZlr8dxgpBVD0ctkp0ytxNPOKq0IKSbriVHxUqgZKfRKVfEfpNiURH4Sdkhrdsw
-63P9I/3mG5Rv3m10AyfzUvRlXQRPezO/qTuywpZeUMeKc4eKIr0=
---000000000000b7751c0633a3eee7--
+DQEBAQUABIIBADcmm1fkinFO8ZrJT4vAPdenS0n08JySH7wFuQ6sPBUwzWw/vlc6FC5fxsyVP8Hz
+VVnqGxvHqb7cTwO0bTUPzsxqW6c6N08/ZR1VXEzimS1CRy0R9DEX1RL+dZ40TI4W0/jTxuSVCo/X
+tBHal7+GzZC36w+SQ/RoRWIW8ccnhOnzDRSmUPSVLRtGmDoh+ao0EYg4YjJhVakzrqdw6C8WtdJQ
+1pMY3Lot+YLcIc6CuEIDB0LiD2tAbj0wWO8HgwN9zBD/bZlWo/28/jGyAmkPwevqwxnQDkEoCNbq
+xOcfgywNbGvbXpOY680fHNpQTl2iznK9g+0eiAcutwUkUs9aBnM=
+--000000000000aea1100633a3f980--
