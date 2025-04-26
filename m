@@ -1,84 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344797E110;
-	Sat, 26 Apr 2025 18:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B176A1A256E;
+	Sat, 26 Apr 2025 20:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745690609; cv=none; b=saujoxRmjQ9XHEK6REVMA0X1opnRxC467toBl7nEtbWzQDCYLW5n5CJnH9WjNs6l+uO9knjKqO8O9ouOfkuTd0zX0I8G9B45E3MPUSp/KJDfIXmP6rm+BhU0Tfxs5ALekZ+ZbleeZdx5qqDLrhLZFOOzxC/i3aYoPr81Kzj/YcY=
+	t=1745699518; cv=none; b=NtjMudwsAKp7vg+LvNaQTSDMIgP4Ne8UXJpvdNZL4pExTJFVRyLbRlPVaE9SLuNp+nZOgIprIVfxtCqu1pT2EZaVVnNycB0hLIl09z+u4zy5x3v3WGgRSz8adeySBN3bjp23HKyW5JN3qwLob79c5auL3Gm8rAOIcU+IUt6d7dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745690609; c=relaxed/simple;
-	bh=thPYajZSkuIUqKSQ0PKrjdP700DcSK2zwAu2Gky2T80=;
+	s=arc-20240116; t=1745699518; c=relaxed/simple;
+	bh=/d7WgnJlhFDFOPT/pMzYke23MSyxRdwvNSrZRgypGGc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UsC0QOWAIu4XUqFxjJcTrGlll4PmDrzRsoPly9KFq4dgg3F4fGPbpZu2tjW9FhNE6WPzsKSHuGSJbsZKHNkc+Zxib8kyWf2qPh2cPWGjh9L6tG/p+zJclW2e8wCH8TOuAruQceVJirwdhqqof7IAQ4XvFRFK9mfBU28hAzrtv6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nAIxHEC/; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=JGFAhMDRTbo+Wbjl66utugSCC/OBVyuu2MeCKuMR/NpcDqykjY9hm475M+aXmcu3UQqlnWHv3vNhGVsn6rGcOvXeGwsFkkNvVNWW1jxS7Y1bvBQvbT5srM3nOs8pScIVIWlV7bkUKjhpZq9z4kGFoF2WAoeOqda8ItKRce/CSR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjNYLvvR; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nAIxHEC/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C994C4CEE2;
-	Sat, 26 Apr 2025 18:03:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745690608;
-	bh=thPYajZSkuIUqKSQ0PKrjdP700DcSK2zwAu2Gky2T80=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nAIxHEC/RBFXC7YAAr3+tsr8rzEcee3Oga1vMPOVdLEclJGRGGYsap6d40ssYdREa
-	 631y8iWvrWajenPInP5JKnMuJ2fzsFVn4xbQ/K+cHhgPVnyuchNRRoD0ozvKffZkS3
-	 MqUsr8paPOUnFmn+B8HDI8yKlJGh1TXUf3fq6tuJ1SIjPZir6nq73386jFGlYKnBTI
-	 uo2ZHr9L3pkwpshwb0rthNh+eao6mVOKjQYtoSDUrpgKEgzJXu+h6VzFzy4Z/K4auE
-	 MgMeah9RtM9RNppv7fmQMq0y8aXytAvAE0U5aitXE09LbzHtDgGADWAkJrVYOWn55s
-	 dQXkKhP5hQ5yw==
-Date: Sat, 26 Apr 2025 11:03:26 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
-	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
-	Jason@zx2c4.com, torvalds@linux-foundation.org
-Subject: Re: [PATCH 11/13] crypto: x86/sha256 - implement library instead of
- shash
-Message-ID: <20250426180326.GA1184@sol.localdomain>
-References: <20250426065041.1551914-12-ebiggers@kernel.org>
- <aAy6g3nblKtRj1l3@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjNYLvvR"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso2217079f8f.0;
+        Sat, 26 Apr 2025 13:31:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745699515; x=1746304315; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OlrCwyFIoqZ6mkArF2EMwtxWYwKdteVMOtJ71tqXtAY=;
+        b=HjNYLvvR5+TpU++bVJC4lEhITzfZpkGQROVlnmRxcC6LfS07xHYCvRA6qdNETSk+4B
+         8uZvfI+dOH3loPaWh27XGjxh/Y5nhJUFR4G+RsTRKZtnWGFpW3LVzpK/rYmOPUsz5mKV
+         NDqXKS5WgSNwKfFtee4gbrnjMBAFd17Q8bM0LrdmKz2n9ElLVIoCYFjhDAMasIEkzxAO
+         DC9FA6g68Ii3lktt+acQRy+H4wWZLpIR233AlSaKWcTfOPsvCKvlOWBdMxWrdx9n4sQW
+         c7BwuLMfPrm8pkc+oxXyHfB16dSl4+yFxG3b0bvZlcUK9j0AB3kRFo5fgNCHM+EhvkG9
+         Tjqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745699515; x=1746304315;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OlrCwyFIoqZ6mkArF2EMwtxWYwKdteVMOtJ71tqXtAY=;
+        b=LlqDN4kJKubTCgR/bWqQ2WcxXL5TgP1w5yxKZANX1HZn6u77w5V1aMlCgR2TzEiFOM
+         XjnlI5l1Bxbw/JWQsvdHIHt/B1FDJYru/5GaWiLMnlQDiQAJqjlJxesrQKn+YYvp+gSm
+         3yOVMqpuFkK18BxobPIdg/LeYUad/wLrQvlj+NnBTmbk7LpoZWFF0QTQxBhzB7kVOpEt
+         1IQhwyQODAW0StJsA0OmHSOwxt5mg0Gk79kd0pVGV/z0RDsAgPKA+9p4eSjrLvyVsnva
+         Aiq8KY32Mxbe4kPQo0CryBydYpJXbSiZut3FdeCPSXmmT5lrTZr4dyuVXHFfUZcQSqQT
+         StFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUfr0M5R1h7IfPmNr4k5l61vT/Xf8fLhCpxraP1TIUerWGFM8g3/jOw89C9qRzcos0EI6SHZySz/PqRo3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB0xJh/N+WTw7R5OtScYnYBrECZVvK0AJVbRI+tYgJi0GxKwW4
+	cA43niuL+LqQH4b035V76rpoYZ+sGfAQIVaNv2Y8NLpMZXt7JVRQ
+X-Gm-Gg: ASbGncvAh7zscwTW9B7XHbogpTeKrRuywMkq/xtzqYedqsq+ecBty04Ys+igzHAdgT3
+	kL3PT8D+fxqYCJ+E5sQj44ufj5Z9noQGvDoAp4atxE+3etvlXcPAN0TiKiU6xyyTCV5+1dF2KRe
+	FDP7xTvK18z+GYdTOG5zCYDlu/stHN771B2rbYoilYxNRj5EmNCc5u/qDjM+EMBEqjLtzDipvtV
+	aO1N6Svayxeqykc79yX75ixs7WpgKBqTjngJ1MP+aA0amuWtqUWpe6rrpAikib7PQ8RAwyE3xwj
+	3Bg0UxkQDIMCF3pPLCD+mKqIoTObxWHh/gDOojZEdQ==
+X-Google-Smtp-Source: AGHT+IFo9Zap7VRkBOdcGJybmP2OJOAo05CfEBwmnzTAL2vvIxeY33VY6vR+1R6pEs07a4Uy3ZySGg==
+X-Received: by 2002:a5d:4ac6:0:b0:392:c64:9aef with SMTP id ffacd0b85a97d-3a07aa6ea9dmr2626657f8f.20.1745699514803;
+        Sat, 26 Apr 2025 13:31:54 -0700 (PDT)
+Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a073e46869sm6534182f8f.72.2025.04.26.13.31.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Apr 2025 13:31:53 -0700 (PDT)
+Date: Sat, 26 Apr 2025 22:31:51 +0200
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/9] Clean up the crypto testing options
+Message-ID: <aA1Ct6rhGbZlkBKY@Red>
+References: <20250422152151.3691-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <aAy6g3nblKtRj1l3@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250422152151.3691-1-ebiggers@kernel.org>
 
-On Sat, Apr 26, 2025 at 06:50:43PM +0800, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > +void sha256_blocks_arch(u32 state[SHA256_STATE_WORDS],
-> > +                       const u8 *data, size_t nblocks)
-> > +{
-> > +       if (static_branch_likely(&have_sha256_x86) && crypto_simd_usable()) {
-> > +               kernel_fpu_begin();
-> > +               static_call(sha256_blocks_x86)(state, data, nblocks);
-> > +               kernel_fpu_end();
-> > +       } else {
-> > +               sha256_blocks_generic(state, data, nblocks);
-> > +       }
+Le Tue, Apr 22, 2025 at 08:21:42AM -0700, Eric Biggers a écrit :
+> This series reworks the crypto testing kconfig options to fix some
+> longstanding issues:
 > 
-> Why did you restore the SIMD fallback path? Please provide a real
-> use-case for doing SHA2 in a hardirq or I'll just remove it again.
+> - Replace the inverted option CONFIG_CRYPTO_MANAGER_DISABLE_TESTS with a
+>   regular option CONFIG_CRYPTO_SELFTESTS.
+> 
+> - Make CONFIG_CRYPTO_SELFTESTS enable the full set of tests by default,
+>   removing CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
+> 
+> - Automatically enable CONFIG_CRYPTO_MANAGER when needed for the tests.
+> 
+> - Rename cryptomgr.noextratests to cryptomgr.noslowtests.
+> 
+> - Remove cryptomgr.panic_on_fail, as panic_on_warn can be used instead.
+> 
+> - Rename CONFIG_CRYPTO_TEST to CONFIG_CRYPTO_BENCHMARK.
+> 
 
-The SHA-256 library functions currently work in any context, and this patch
-series preserves that behavior.  Changing that would be a separate change.
+Hello
 
-But also as I've explained before, for the library API the performance benefit
-of removing the crypto_simd_usable() doesn't seem to be worth the footgun that
-would be introduced.  Your position is, effectively, that if someone calls one
-of the sha256*() functions from a hardirq, we should sometimes corrupt a random
-task's FPU registers.  That's a really bad bug that is very difficult to
-root-cause.  My position is that we should make it just work as expected.
+I have ibuild/booted tested this against all my crypto hw, no problem.
 
-Yes, no one *should* be doing SHA-256 in a hardirq.  But I don't think that
-means we should corrupt a random task's FPU registers if someone doesn't follow
-best practices, when we can easily make the API just work as expected.
+Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
 
-- Eric
+Thanks
+Regards
