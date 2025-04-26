@@ -1,204 +1,115 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68EA21CC49;
-	Fri, 25 Apr 2025 21:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360573C0C
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 00:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745617494; cv=none; b=k2ztJtthrrQ3Yi64HfONB9zPZI93wrf6STc5TQeFMsmLVFGVc3oaeMnD49dx+anpzYyJ9+BRrOsCfG3NYJOL7P7YyokhjhKOXomdbEuQpc6RGTVMyQMEC1G6tzGcw0KEO8j0+au+azMErLBleISUnP+SDuje9dQrMuNXb+O0MU0=
+	t=1745625613; cv=none; b=R44cdVeQyZh3CK26v0gI5IEyjKbj7srUvq8t4jJ6ERvG+SZihMT5tYAX3AchG5tITcuv0PrdqdU496RtKn+A32P0yXO5EzywXw1u2sDSozEzPS6kvKrzhXHRCFrLjMPjgmVdm52hKnaIkmpMhwyysyB6fcg22VkEjvcCAfOEMTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745617494; c=relaxed/simple;
-	bh=1vYY0G6paJDxqTAFql3Fe/ZoYlYAWMsKFG17ZpHlpB4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=usXlNaPpU+GGl3BJAqPCxJek93fQharcQEjuc5B6y8OY6sujyw4qgEffhQiS0vXtI4FqWJ0V9pQWMvmDK1R3A0eAWBtgRQ9pB5mYhQtSn8Ewp4izbXJ54NygdB0nayp1QJIapjLrccSyMIIF8wI4plnRx3jrrhx6aqEVsWqIt4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VVfli0Z9; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1745625613; c=relaxed/simple;
+	bh=H4uJxKCF8X2YSXybFoa0pezBDVH59awZSGnN4OANeXA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EqvlIJMIEf2B3+ZGE8wjnj9HNjY4QC/cxd+gAJ/b2W4LoJwxw1Gg7I70S7+83U98UKY7JR6KKRVMKtMaK68OOCUvarQI2nASH7jJZy1J2EXlIRDawI1eSmJxk+V93Xas6bpslsAJWlPBb8oBa2xee52P0rcpNHmYmJZaRg0/4X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tXSGxQ5f; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VVfli0Z9"
-Received: from narnia (unknown [172.172.34.12])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 0FD7420BCAD1;
-	Fri, 25 Apr 2025 14:44:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0FD7420BCAD1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1745617492;
-	bh=RLcGrvY/Ji6RfwBGa0SDop5ZSdaFF8Vony2mUDrwhz8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=VVfli0Z9/uOSWmD2zYfgd/ELGgJQhQObtxaSQgX4AL7uZlqTSEwxa/QkcFRUrFG4L
-	 KJe067jmKGvAEhgwx3y2k+RRnXnuiRFkSXZNrkzp+VuQoskURv0DCiZeNXTaiElj12
-	 7XOVymm5fhm6nTTtITxxB973eE6OhvwrFoFeXnVA=
-From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>, Alexei
- Starovoitov <alexei.starovoitov@gmail.com>, KP Singh <kpsingh@google.com>,
- Paul Moore <paul@paul-moore.com>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James Morris
- <jmorris@namei.org>, "Serge
- E. Hallyn" <serge@hallyn.com>, Masahiro Yamada <masahiroy@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>,
- Shuah Khan <shuah@kernel.org>, =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther?=
- Noack <gnoack@google.com>, Nick Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>,
- Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen
- <jarkko@kernel.org>, Jan Stancek <jstancek@redhat.com>, Neal Gompa
- <neal@gompa.dev>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, keyrings@vger.kernel.org, Linux
- Crypto Mailing List <linux-crypto@vger.kernel.org>, LSM List
- <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list
- <linux-kbuild@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- clang-built-linux <llvm@lists.linux.dev>, nkapron@google.com, Matteo Croce
- <teknoraver@meta.com>, Roberto Sassu <roberto.sassu@huawei.com>, Cong Wang
- <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
-In-Reply-To: <6e086e29d258839e42ef7a83b38571d1882eb77d.camel@HansenPartnership.com>
-References: <20250404215527.1563146-1-bboscaccy@linux.microsoft.com>
- <20250404215527.1563146-2-bboscaccy@linux.microsoft.com>
- <CAADnVQJyNRZVLPj_nzegCyo+BzM1-whbnajotCXu+GW+5-=P6w@mail.gmail.com>
- <87semdjxcp.fsf@microsoft.com>
- <CAADnVQ+JGfwRgsoe2=EHkXdTyQ8ycn0D9nh1k49am++4oXUPHg@mail.gmail.com>
- <87friajmd5.fsf@microsoft.com>
- <CAADnVQKb3gPBFz+n+GoudxaTrugVegwMb8=kUfxOea5r2NNfUA@mail.gmail.com>
- <87a58hjune.fsf@microsoft.com>
- <CAADnVQ+LMAnyT4yV5iuJ=vswgtUu97cHKnvysipc6o7HZfEbUA@mail.gmail.com>
- <87y0w0hv2x.fsf@microsoft.com>
- <CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGmRAjbusQ@mail.gmail.com>
- <2bd95ca78e836db0775da8237792e8448b8eec62.camel@HansenPartnership.com>
- <CAADnVQJ6SRePz7yc5x3BAz7q-e8DVYq=vRdahxCZ4XzpWtnYpQ@mail.gmail.com>
- <6e086e29d258839e42ef7a83b38571d1882eb77d.camel@HansenPartnership.com>
-Date: Fri, 25 Apr 2025 14:44:10 -0700
-Message-ID: <87bjsjlxw5.fsf@microsoft.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tXSGxQ5f"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b078af4b07dso1570379a12.3
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Apr 2025 17:00:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745625611; x=1746230411; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GFetroiVqwabK1sZJi7Gssm6Y2r4VSG5IcyflglpQ4=;
+        b=tXSGxQ5f0DpFbNe5BgRC7VYcidi1J+gQTMQNc55S/R8Crf2pZ9cuRmqAJjDQ8uJM8y
+         cclJXDTIwpMJUVUq15Fxx2fJLoSUSbMfAUw8fU8Jh0jJQzXhvqJ2w4L200PZNpc8KMir
+         TWImCmZXe5Rkk8iALhoDl6pw4COMJkKuIdT7S4cdHtoHZogtDDQQ75jlCbLK7M2Frlb8
+         4lpuDJIuxL7kUhoH7tLP5So295K6m9c6yeuNRtFlTA1Gnqp5SzWSbx0dbvYIRGa7SNLv
+         pcJPpjy1VFcW1itBBYCkjwLWUzC8K71q6d8Cgz/ME1wg0IwFUd9RLES09+nhmZ1c9OUK
+         2OMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745625611; x=1746230411;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GFetroiVqwabK1sZJi7Gssm6Y2r4VSG5IcyflglpQ4=;
+        b=TlOVOVhTutKKgl14KJr41lf+WG8CBk5/j7pJNUtwzH5vWKR9T+aE0aiYXXDMeutGQb
+         tPBZdGhs2MnerxIHksSBA64zbjXPGuO/xfQS6nta1A27yoT0GcYaNQ2czk4arVjDne4Q
+         KMVF0oR0dVdsRtcKSQVPpRH/SEffSVuPrkQLnlHZrjQ5WepQ39K6dDA1dYcRr2jQ/Ti1
+         pLywPNRBF5SwHvco+JVB2o1U3ZfiJGQ3Wx46ZOLj4aCJISoo/VyueeWxj6pSE3SO4mKL
+         VMFXbb2VWWCfvpksDmpmToF8cHsmA8j83nF2O81rK+YlptNUqgR6LRUX2URDwjKCtOV/
+         uWuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWa+nnG08Wwvcdsswt2UAFpTSEX+ZYIe2eXSxu37v6FoKr0JpAjNP5ScTzL67FJj/VF3SQZ3NHYeMWZ04k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywaw9TNmzWqK33H5AfpUSBdARYE0XqXb97nLFKa09hQsZGJtcBP
+	Ex98xPShZQZ+J4FB1XaDLIh9lnX1u9m0jSmPvusGWo6M0lBjgeQDNgX6vFo65s1p7pFUidaJ8/u
+	lvQ==
+X-Google-Smtp-Source: AGHT+IFkMqUvzxmIb5DQHMQAnE51nLU+gQzqYa24MNOiSl84Fum6ZnRW7j2yLz/4lpczDu9ZcESx8vr5f2E=
+X-Received: from pjgg7.prod.google.com ([2002:a17:90b:57c7:b0:2fc:13d6:b4cb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c8b:b0:2f9:9ddd:689b
+ with SMTP id 98e67ed59e1d1-30a01398779mr1331415a91.22.1745625611465; Fri, 25
+ Apr 2025 17:00:11 -0700 (PDT)
+Date: Fri, 25 Apr 2025 17:00:09 -0700
+In-Reply-To: <ff8408bb-b110-4930-b914-98afe605c112@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <cover.1745279916.git.ashish.kalra@amd.com> <b64d61cc81611addb88ca410c9374e10fe5c293a.1745279916.git.ashish.kalra@amd.com>
+ <aAlYV-4q6ndhJAVe@google.com> <ff8408bb-b110-4930-b914-98afe605c112@amd.com>
+Message-ID: <aAwiCTNoQoV2nDfP@google.com>
+Subject: Re: [PATCH v3 4/4] KVM: SVM: Add SEV-SNP CipherTextHiding support
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au, 
+	x86@kernel.org, john.allen@amd.com, davem@davemloft.net, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-James Bottomley <James.Bottomley@HansenPartnership.com> writes:
+On Fri, Apr 25, 2025, Ashish Kalra wrote:
+> On 4/23/2025 4:15 PM, Sean Christopherson wrote:
+> 
+> > 
+> > 	if (boot_cpu_has(X86_FEATURE_SEV_ES)) {
+> > 		if (snp_max_snp_asid >= (min_sev_asid - 1))
+> > 			sev_es_supported = false;
+> 
+> SEV-ES is disabled if SNP is using all ASIDs upto min_sev_asid - 1.
+> 
+> > 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+> > 			str_enabled_disabled(sev_es_supported),
+> > 			min_sev_asid > 1 ? snp_max_snp_asid ? snp_max_snp_asid + 1 : 1 :
+> > 							      0, min_sev_asid - 1);
+> > 	}
+> > 
+> > A non-zero snp_max_snp_asid shouldn't break SEV-ES if CipherTextHiding isn't supported.
+> 
+> I don't see above where SEV-ES is broken if snp_max_snp_asid is non-zero and
+> CTH is enabled ?
 
-> On Thu, 2025-04-24 at 16:41 -0700, Alexei Starovoitov wrote:
->> On Wed, Apr 23, 2025 at 7:12=E2=80=AFAM James Bottomley
->> <James.Bottomley@hansenpartnership.com> wrote:
->> > On Mon, 2025-04-21 at 13:12 -0700, Alexei Starovoitov wrote:
->> > [...]
->> > > Calling bpf_map_get() and
->> > > map->ops->map_lookup_elem() from a module is not ok either.
->> >=20
->> > I don't understand this objection.
->>=20
->> Consider an LSM that hooks into security_bprm_*(bprm),
->> parses something in linux_binprm, then
->> struct file *file =3D
->> fd_file(fdget(some_random_file_descriptor_in_current));
->> file->f_op->read(..);
->>=20
->> Would VFS maintainers approve such usage ?
->
-> This is a bit off topic from the request for clarification but:
->
-> It's somewhat standard operating procedure for LSMs.  Some do make
-> decisions entirely within the data provided by the hook, but some need
-> to take external readings, like selinux or IMA consulting the policy in
-> the xattr or apparmor the one in the tree etc.
->
-> Incidentally, none of them directly does a file->f_op->read(); they all
-> use the kernel_read_file() API which is exported from the vfs for that
-> purpose.
->
->> More so, your LSM does
->> file =3D get_task_exe_file(current);
->> kernel_read_file(file, ...);
->>=20
->> This is even worse.
->> You've corrupted the ELF binary with extra garbage at the end.
->> objdump/elfutils will choke on it and you're lucky that binfmt_elf
->> still loads it.
->> The whole approach is a non-starter.
->
-> It's the same approach we use to create kernel modules: ELF with an
-> appended signature.  If you recall the kernel summit discussions about
-> it, the reason that was chosen for modules is because it's easy and the
-> ELF processor simply ignores any data in the file that's not described
-> by the header (which means the ELF tools you refer to above are fine
-> with this if you actually try them).
->
-> But it you really want the signature to be part of the ELF,  then the
-> patch set can do what David Howells first suggested for modules: it can
-> simply put the appended signature into an unloaded ELF section.
->
->> > The program just got passed in to bpf_prog_load() as a set of
->> > attributes which, for a light skeleton, directly contain the code
->> > as a blob and have the various BTF relocations as a blob in a
->> > single element array map.=C2=A0 I think everyone agrees that the
->> > integrity of the program would be compromised by modifications to
->> > the relocations, so the security_bpf_prog_load() hook can't make an
->> > integrity determination without examining both.=C2=A0 If the hook can't
->> > use the bpf_maps.. APIs directly is there some other API it should
->> > be using to get the relocations, or are you saying that the
->> > security_bpf_prog_load() hook isn't fit for purpose and it should
->> > be called after the bpf core has loaded the relocations so they can
->> > be provided to the hook as an argument?
->>=20
->> No. As I said twice already the only place to verify program
->> signature is a bpf subsystem itself.
->
-> The above argument is actually independent of signing.  However,
-> although we have plenty of subsystems that verify their own signatures,
-> it's perfectly valid for a LSM to do it as well: IMA is one of the
-> oldest LSMs and it's been verifying signatures over binaries and text
-> files since it was first created.
->
->> Hacking into bpf internals from LSM, BPF-LSM program,
->> or any other kernel subsystem is a no go.
->
-> All LSMs depend to some extent on the internals of the subsystem where
-> the hook is ... the very structures passed into them are often internal
-> to that subsystem.  The problem you didn't address was that some of the
-> information necessary to determine the integrity properties in the bpf
-> hook is in a map file descriptor.  Since the map merely wraps a single
-> blob of data, that could easily be passed in to the hook instead of
-> having the LSM extract it from the map.  How the hook gets the data is
-> an internal implementation detail of the kernel that can be updated
-> later.
->
->> > The above, by the way, is independent of signing, because it
->> > applies to any determination that might be made in the
->> > security_bpf_prog_load() hook regardless of purpose.
->>=20
->> security_bpf_prog_load() should not access bpf internals.
->> That LSM hook sees the following:
->> security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct bpf_tok=
-en *token, bool kernel);
->>=20
->> LSM can look into uapi things there.
->
-> Is that the misunderstanding? That's not how LSMs work: they are not
-> bound by only the UAPI, they are in kernel and have full access to the
-> kernel API so they can introspect stuff and make proper determinations.
->
->> Like prog->sleepable, prog->tag, prog->aux->name,
->> but things like prog->aux->jit_data or prog->aux->used_maps
->> are not ok to access.
->> If in doubt, ask on the mailing list.
->
-> I am aren't I? At least the bpf is one of the lists cc'd on this.
->
-> Regards,
->
-> James
+Please read what I wrote.  I did not say it's broken if CTH is enabled.  I said
+it's broken if CTH isn't supported, i.e. is disabled.
 
-I think we may be in the weeds here a bit and starting to get a little
-off-topic. Let's try to back up some and take a different tack. We are
-going to rework this effort into a set of patches that target the bpf
-subsystem and it's tooling directly, performing optional signature
-verification of the inputs to bpf_prog_load, using signature data
-passed in via bpf_attr, which should enough provide metadata so that it
-can be consumed by interested parties to enforce policy decisions around
-code signing and data integrity.
+snp_max_snp_asid isn't sanitized if CTH is unsupported or disabled by userspace,
+and so KVM will compute the wrong min_sev_asid if snp_max_snp_asid is non-zero,
+even though snp_max_snp_asid has no bearing on reality.
 
--blaise
+> >> +	 */
+> >> +	if (snp_cipher_text_hiding && sev->es_active) {
+> >> +		if (vm_type == KVM_X86_SNP_VM)
+> >> +			max_asid = snp_max_snp_asid;
+> >> +		else
+> >> +			min_asid = snp_max_snp_asid + 1;
+> >> +	}
+> > 
+> > Irrespective of the module params, I would much prefer to have a max_snp_asid
+> > param that is kept up-to-date regardless of whether or not CipherTextHiding is
+> > enabled. 
+> 
+> param ?
+
+Sorry, s/param/variable.  Doesn't need to be user visible.
