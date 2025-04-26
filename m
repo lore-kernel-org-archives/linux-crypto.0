@@ -1,104 +1,129 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B176A1A256E;
-	Sat, 26 Apr 2025 20:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F3E7494
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 22:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745699518; cv=none; b=NtjMudwsAKp7vg+LvNaQTSDMIgP4Ne8UXJpvdNZL4pExTJFVRyLbRlPVaE9SLuNp+nZOgIprIVfxtCqu1pT2EZaVVnNycB0hLIl09z+u4zy5x3v3WGgRSz8adeySBN3bjp23HKyW5JN3qwLob79c5auL3Gm8rAOIcU+IUt6d7dU=
+	t=1745706437; cv=none; b=M0plTiKnRKIUcg05W9Cn8+Hota1jQn8Cwk3p0jHebAkTxCITIQRXi78wseLoIXiBfvj2meETzpEOT7F5XPiHQzw13Iw5uFWJS+OWIBUAwIvYIKx1kzFe1tBQzKmJ5fOCKoa0zdz4zh3BSRzkM6f0UW5NfujBuF1NSSd+ac7Dopo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745699518; c=relaxed/simple;
-	bh=/d7WgnJlhFDFOPT/pMzYke23MSyxRdwvNSrZRgypGGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGFAhMDRTbo+Wbjl66utugSCC/OBVyuu2MeCKuMR/NpcDqykjY9hm475M+aXmcu3UQqlnWHv3vNhGVsn6rGcOvXeGwsFkkNvVNWW1jxS7Y1bvBQvbT5srM3nOs8pScIVIWlV7bkUKjhpZq9z4kGFoF2WAoeOqda8ItKRce/CSR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjNYLvvR; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745706437; c=relaxed/simple;
+	bh=y3wv2i7dz7Xe1WPxWtb+hFLK/z0p4b6qQp7XfLjl3Tg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rtzc/cLiYfBjR2sILy+lxopcVDhp86PCU7yzUfqJgnWb3Py3fbm/X4QWQPaZiA96WBp4u9Aa62EKo9c7MMuYknb1pTjlhX+Dz58bW9Z58TRsyGq7VNEY74Mk3+i3iKbxRMmSdWR7gAydl5b0Wtja8H94kKUpQ5ZwgwfPDe2cp10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vU4OvdYa; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjNYLvvR"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso2217079f8f.0;
-        Sat, 26 Apr 2025 13:31:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745699515; x=1746304315; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OlrCwyFIoqZ6mkArF2EMwtxWYwKdteVMOtJ71tqXtAY=;
-        b=HjNYLvvR5+TpU++bVJC4lEhITzfZpkGQROVlnmRxcC6LfS07xHYCvRA6qdNETSk+4B
-         8uZvfI+dOH3loPaWh27XGjxh/Y5nhJUFR4G+RsTRKZtnWGFpW3LVzpK/rYmOPUsz5mKV
-         NDqXKS5WgSNwKfFtee4gbrnjMBAFd17Q8bM0LrdmKz2n9ElLVIoCYFjhDAMasIEkzxAO
-         DC9FA6g68Ii3lktt+acQRy+H4wWZLpIR233AlSaKWcTfOPsvCKvlOWBdMxWrdx9n4sQW
-         c7BwuLMfPrm8pkc+oxXyHfB16dSl4+yFxG3b0bvZlcUK9j0AB3kRFo5fgNCHM+EhvkG9
-         Tjqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745699515; x=1746304315;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OlrCwyFIoqZ6mkArF2EMwtxWYwKdteVMOtJ71tqXtAY=;
-        b=LlqDN4kJKubTCgR/bWqQ2WcxXL5TgP1w5yxKZANX1HZn6u77w5V1aMlCgR2TzEiFOM
-         XjnlI5l1Bxbw/JWQsvdHIHt/B1FDJYru/5GaWiLMnlQDiQAJqjlJxesrQKn+YYvp+gSm
-         3yOVMqpuFkK18BxobPIdg/LeYUad/wLrQvlj+NnBTmbk7LpoZWFF0QTQxBhzB7kVOpEt
-         1IQhwyQODAW0StJsA0OmHSOwxt5mg0Gk79kd0pVGV/z0RDsAgPKA+9p4eSjrLvyVsnva
-         Aiq8KY32Mxbe4kPQo0CryBydYpJXbSiZut3FdeCPSXmmT5lrTZr4dyuVXHFfUZcQSqQT
-         StFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfr0M5R1h7IfPmNr4k5l61vT/Xf8fLhCpxraP1TIUerWGFM8g3/jOw89C9qRzcos0EI6SHZySz/PqRo3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB0xJh/N+WTw7R5OtScYnYBrECZVvK0AJVbRI+tYgJi0GxKwW4
-	cA43niuL+LqQH4b035V76rpoYZ+sGfAQIVaNv2Y8NLpMZXt7JVRQ
-X-Gm-Gg: ASbGncvAh7zscwTW9B7XHbogpTeKrRuywMkq/xtzqYedqsq+ecBty04Ys+igzHAdgT3
-	kL3PT8D+fxqYCJ+E5sQj44ufj5Z9noQGvDoAp4atxE+3etvlXcPAN0TiKiU6xyyTCV5+1dF2KRe
-	FDP7xTvK18z+GYdTOG5zCYDlu/stHN771B2rbYoilYxNRj5EmNCc5u/qDjM+EMBEqjLtzDipvtV
-	aO1N6Svayxeqykc79yX75ixs7WpgKBqTjngJ1MP+aA0amuWtqUWpe6rrpAikib7PQ8RAwyE3xwj
-	3Bg0UxkQDIMCF3pPLCD+mKqIoTObxWHh/gDOojZEdQ==
-X-Google-Smtp-Source: AGHT+IFo9Zap7VRkBOdcGJybmP2OJOAo05CfEBwmnzTAL2vvIxeY33VY6vR+1R6pEs07a4Uy3ZySGg==
-X-Received: by 2002:a5d:4ac6:0:b0:392:c64:9aef with SMTP id ffacd0b85a97d-3a07aa6ea9dmr2626657f8f.20.1745699514803;
-        Sat, 26 Apr 2025 13:31:54 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a073e46869sm6534182f8f.72.2025.04.26.13.31.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 13:31:53 -0700 (PDT)
-Date: Sat, 26 Apr 2025 22:31:51 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/9] Clean up the crypto testing options
-Message-ID: <aA1Ct6rhGbZlkBKY@Red>
-References: <20250422152151.3691-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vU4OvdYa"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745706433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dStqifmk7S+BpETVzABU1ARJ7nrE33RR05tHBW+iFOo=;
+	b=vU4OvdYabyV72CURL9pSiBs5PU6a8qwqXNK0pm4/HQBbjU/mXSnWunzOaAA/ePxvlp3Cjr
+	/BQTWltn9BxxWZD6fR4uw8lQQZBs7igED8hZOKTPRrSdwrmVZ31wqPKWYZaCKdWUdWQXcz
+	l1LAgfh1Odit+MGYwdJ8L+ps2nhn+Ss=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: octeontx2 - Simplify multiple return statements
+Date: Sun, 27 Apr 2025 00:26:19 +0200
+Message-ID: <20250426222621.2104-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250422152151.3691-1-ebiggers@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Le Tue, Apr 22, 2025 at 08:21:42AM -0700, Eric Biggers a écrit :
-> This series reworks the crypto testing kconfig options to fix some
-> longstanding issues:
-> 
-> - Replace the inverted option CONFIG_CRYPTO_MANAGER_DISABLE_TESTS with a
->   regular option CONFIG_CRYPTO_SELFTESTS.
-> 
-> - Make CONFIG_CRYPTO_SELFTESTS enable the full set of tests by default,
->   removing CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
-> 
-> - Automatically enable CONFIG_CRYPTO_MANAGER when needed for the tests.
-> 
-> - Rename cryptomgr.noextratests to cryptomgr.noslowtests.
-> 
-> - Remove cryptomgr.panic_on_fail, as panic_on_warn can be used instead.
-> 
-> - Rename CONFIG_CRYPTO_TEST to CONFIG_CRYPTO_BENCHMARK.
-> 
+Simplify multiple return statements by directly returning the boolean
+expressions.
 
-Hello
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ .../marvell/octeontx2/otx2_cpt_common.h       | 34 ++++++-------------
+ 1 file changed, 10 insertions(+), 24 deletions(-)
 
-I have ibuild/booted tested this against all my crypto hw, no problem.
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+index c5b7c57574ef..84f2bb0ca11c 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+@@ -145,11 +145,8 @@ static inline u64 otx2_cpt_read64(void __iomem *reg_base, u64 blk, u64 slot,
+ 
+ static inline bool is_dev_otx2(struct pci_dev *pdev)
+ {
+-	if (pdev->device == OTX2_CPT_PCI_PF_DEVICE_ID ||
+-	    pdev->device == OTX2_CPT_PCI_VF_DEVICE_ID)
+-		return true;
+-
+-	return false;
++	return pdev->device == OTX2_CPT_PCI_PF_DEVICE_ID ||
++	       pdev->device == OTX2_CPT_PCI_VF_DEVICE_ID;
+ }
+ 
+ static inline bool is_dev_cn10ka(struct pci_dev *pdev)
+@@ -159,12 +156,10 @@ static inline bool is_dev_cn10ka(struct pci_dev *pdev)
+ 
+ static inline bool is_dev_cn10ka_ax(struct pci_dev *pdev)
+ {
+-	if (pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
+-	    ((pdev->revision & 0xFF) == 4 || (pdev->revision & 0xFF) == 0x50 ||
+-	     (pdev->revision & 0xff) == 0x51))
+-		return true;
+-
+-	return false;
++	return pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
++	       ((pdev->revision & 0xFF) == 4 ||
++		(pdev->revision & 0xFF) == 0x50 ||
++		(pdev->revision & 0xFF) == 0x51);
+ }
+ 
+ static inline bool is_dev_cn10kb(struct pci_dev *pdev)
+@@ -174,11 +169,8 @@ static inline bool is_dev_cn10kb(struct pci_dev *pdev)
+ 
+ static inline bool is_dev_cn10ka_b0(struct pci_dev *pdev)
+ {
+-	if (pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
+-	    (pdev->revision & 0xFF) == 0x54)
+-		return true;
+-
+-	return false;
++	return pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
++	       (pdev->revision & 0xFF) == 0x54;
+ }
+ 
+ static inline void otx2_cpt_set_hw_caps(struct pci_dev *pdev,
+@@ -192,18 +184,12 @@ static inline void otx2_cpt_set_hw_caps(struct pci_dev *pdev,
+ 
+ static inline bool cpt_is_errata_38550_exists(struct pci_dev *pdev)
+ {
+-	if (is_dev_otx2(pdev) || is_dev_cn10ka_ax(pdev))
+-		return true;
+-
+-	return false;
++	return is_dev_otx2(pdev) || is_dev_cn10ka_ax(pdev);
+ }
+ 
+ static inline bool cpt_feature_sgv2(struct pci_dev *pdev)
+ {
+-	if (!is_dev_otx2(pdev) && !is_dev_cn10ka_ax(pdev))
+-		return true;
+-
+-	return false;
++	return !is_dev_otx2(pdev) && !is_dev_cn10ka_ax(pdev);
+ }
+ 
+ int otx2_cpt_send_ready_msg(struct otx2_mbox *mbox, struct pci_dev *pdev);
+-- 
+2.49.0
 
-Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
-
-Thanks
-Regards
