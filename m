@@ -1,84 +1,99 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E3A253F3D
-	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 15:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8F525C6FE
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 15:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745679807; cv=none; b=lFbwzL0srY1QUYfyozzTKh9xHltREkDhIgmuqIioWQSad1Vo/jzQggujsG9ur5Nh/3AkA4L7MEyYMYIfNq1uqmbN5svPxqu9FhUkFyyPmluQnnXMYtJd5441hCAFMETB2PdV8sOOSCL3CWuCFjk1+vwBEn6RY5vnfUBl1/TlTb0=
+	t=1745680676; cv=none; b=VSrJAe9WQaWI67EZ/vo3Ae/eDYC+otWAdKm5+JbaDzDgr9rnl75W1v9McVkuGQr9sBrFka1expR4UIJzBRsp8euBaIKKIop6Zu0vRTd+K7BsIuQOJeH2gg1bgQA84AbNdri/tyzKuRdfm7GwpwEgTkeh3eCnBEj1UiuEffn3hSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745679807; c=relaxed/simple;
-	bh=Vm8is0fZMA8KIAs1cGn6dnzN77suefz/64PXNNt+6pE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WwV5pnefqNuSDkrJSo7GTTPs3uJ/f3eVO52gvBWq8zqbzy0gyFniCIzs6u36TI2fuod9ssb01O5qacWOyLGQsdlGc6wm9Uj570BS+SUmeUS16kUh4UTcoYCBt5B9IXek+A1vChrHtowvoz0fzwvDLt7Fy6jGEGGWS05pfm98q70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bgBoFfuu; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745680676; c=relaxed/simple;
+	bh=lwUT3Iv8t9p6mwjxLMSSqUxpKJyupbTKnPyyqPO3ZNU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ca0fXqlqU05m/R15N613opIBTHG7YhgIqkZVT1Oz7Gq/ovByhvbLdDEgwVrbw+k9cSyYx+KDBMT07n037CSRRV4TZQ3LCluy7zL4M4ptING6EMIHih/tUkpTHiwMPj4iAaAK0ZfrECPEReHFKHEriG15yKtDobxc63Gsf9dwMws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=GFfa5EIf; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bgBoFfuu"
-Date: Sat, 26 Apr 2025 11:03:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745679792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nfBFNtrkXGpwEI1f8qxFcLLJ+djj3QoJA6M531zvfsg=;
-	b=bgBoFfuucV1MYv23Sx+JWqkW37ke3hwsYGwVnAywb7CCGdvWPBhkaOVe6kU9Ji/OrgPuZc
-	uGvUevBF2m4UPwGcFH4UmpGEcBGhSzOevfJ8QF+0V3v4p1nWfsLhK3c3f92fA3PXHCWFkM
-	HbfMBFjpPoVmBYELvhEhkq2coWXPCgY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: I Hsin Cheng <richard120310@gmail.com>
-Cc: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com, 
-	bfoster@redhat.com, linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	davem@davemloft.net, herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] bcachefs: Fix unit-value within btree_bounce_alloc()
-Message-ID: <c32cu4mrdeln3kovzgehwjccfx2qpfh7evsgiug6ckshfux76q@ms6mab54ivy5>
-References: <000000000000736bd406151001d7@google.com>
- <20250423163718.194316-1-richard120310@gmail.com>
- <ur4a24w2wb3euh3ej7ybeqnvmqyhzmqp2wwsjtilh6mfetv45l@qlxs3vggfq5h>
- <aAu-Heqb3malYkjI@vaxr-BM6660-BM6360>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="GFfa5EIf"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e61da95244so5851585a12.2
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 08:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1745680672; x=1746285472; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BNlY1Kyobnrt/7plmlszUhTRPyZa/aNAr5+UYAUEWpg=;
+        b=GFfa5EIf2St03hFCcTCErav4/8fHMSzg55cjpzu3/ZspmEy+9eVcq35NWPidR5F+Nr
+         VIsnUMp+Y4v1efVipXvyOyex6WrKfCgyN2QI9OpQegIjcVDtkfpi6M3ssHBKhYJNRMfi
+         SRZVMg7aXPANkyWImpE8OzEUYf64QvhEbdsIQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745680672; x=1746285472;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BNlY1Kyobnrt/7plmlszUhTRPyZa/aNAr5+UYAUEWpg=;
+        b=uVQL+2A+y8H7Cq2aYFquiTjnAEI1xYrjZykiR69Qln/3DMlM+37Z10QFX0uoRMghg2
+         nleluGz4UBfAjLMU0HKzFjgeioIchgzOn+7nBqEXrEoAthgSDEIfVhLuxKEoefyXSkm0
+         wYm7Fhb+OtpmL5wMEUkE34/bPxkzaTTBUcJp8DtO47LG15EMIUYOm9gxEjqrL3LbCS0Q
+         w0Pb5hBSj1dPze02XKDf8PkMVWzsLTu07cZiamxX4Sd0JH88xELdNwXzPRg4FBXlDKPz
+         ac3HPXMeSIZccTRShOqc8c3roPdmeKiEXiZDK9RC0WXZ8+IMDfxtRLXz4Z5vr1a/8UIi
+         Go6Q==
+X-Gm-Message-State: AOJu0Yzy7a93ZcK5T0aLL1Q2mE7pu6uCzIz1HWmNMd0mvI3DYjcQ1ZNr
+	fthjO4FlmFFWewpBkX5Tgv1cI77/VjYN3PkQ/J9JXr8AeEDy79uuU0rjg7cCxtMLBQQ7nC/HWTI
+	o0h4=
+X-Gm-Gg: ASbGncsVkQ5B8erXWlTlKPL2vMGGywJXaYu97N/aHIjtK8s9UTcLbdPu+bc5jKnX0op
+	YgwHkqWZmQZS57PXIssJZEewlQuqW12bicRBg99DXRkXKz7wT7aJ24li3nn1F4YDsFK3dzbDHKE
+	yWXgJcPcGdmWoXQEh//EccDBxQeOY4QRjqCv2OLUTPSJhWSlOrb13WIKlakoqhdrLbVcRvWzzHM
+	fdrmbE6AgmXX+U55OKAMo27V0NMpTOhNM+8SVBXt/qINTB1q6yj1/NG/N279tFQYhISkbOveAZO
+	36p8phKHUCvTKPIx1GBUvjKIOTAR+mMFjNGmXmqnB4T1pooFksqr912u41CxXI2IcSC8ewKbNQM
+	5MfeaaE+S2OzaNEE=
+X-Google-Smtp-Source: AGHT+IG6hm67oP834Xp3QItelUL7k0pWH6CWE5vlRoCGSxM85bzHRfurdlj/itD9FL86KQiibC/4kA==
+X-Received: by 2002:a17:907:7f22:b0:abf:6cc9:7ef2 with SMTP id a640c23a62f3a-ace84adc17dmr255093866b.42.1745680672488;
+        Sat, 26 Apr 2025 08:17:52 -0700 (PDT)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41cb35sm301988066b.31.2025.04.26.08.17.51
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Apr 2025 08:17:51 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5f435c9f2f9so4310886a12.1
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 08:17:51 -0700 (PDT)
+X-Received: by 2002:a17:907:7e95:b0:ac3:8895:2776 with SMTP id
+ a640c23a62f3a-ace848c0439mr259814066b.5.1745680670908; Sat, 26 Apr 2025
+ 08:17:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAu-Heqb3malYkjI@vaxr-BM6660-BM6360>
-X-Migadu-Flow: FLOW_OUT
+References: <20250426065041.1551914-1-ebiggers@kernel.org>
+In-Reply-To: <20250426065041.1551914-1-ebiggers@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 26 Apr 2025 08:17:34 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg_ArMFL9E9SehR2Z3pfV5QPut0XwbJs9mYWkRvcZcSRw@mail.gmail.com>
+X-Gm-Features: ATxdqUFbLPq86s-2TFMi3kWckNkp7TWtoBPlYGSlRtiuXxSXCOJQKui7bzYM-j0
+Message-ID: <CAHk-=wg_ArMFL9E9SehR2Z3pfV5QPut0XwbJs9mYWkRvcZcSRw@mail.gmail.com>
+Subject: Re: [PATCH 00/13] Architecture-optimized SHA-256 library API
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org, 
+	linux-s390@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Apr 26, 2025 at 12:53:49AM +0800, I Hsin Cheng wrote:
-> On Wed, Apr 23, 2025 at 12:45:20PM -0400, Kent Overstreet wrote:
-> > On Thu, Apr 24, 2025 at 12:37:18AM +0800, I Hsin Cheng wrote:
-> > > Use "kvzalloc()" instead of "kvmalloc()" in btree_bounce_alloc() to
-> > > prevent uninit-value issue.
-> > > 
-> > > Reported-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
-> > > Closes: https://syzkaller.appspot.com/bug?extid=549710bad9c798e25b15
-> > > Fixes: cb6fc943b650 ("bcachefs: kill kvpmalloc()")
-> > > Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
-> > > ---
-> > > syzbot reported an uninit-value issue. [1]
-> > > 
-> > > Though the uninit value was detected in the context of crc32_body(), the
-> > > memory was actually allocated in "btree_bounce_alloc()". Use
-> > > "kvzalloc()" to allocate the memory can solve the issue, and I've tested
-> > > against syzbot. [2]
-> > > 
-> > > If there're any further tests needed to be performed, please let me
-> > > know. I'll be more than happy to assist you with that, thanks !
-> > 
-> > See Documentation/filesystems/bcachefs/SubmittingPatches.
-> >
-> 
-> Sure ! Thanks for the info.
-> 
-> > And this isn't the correct fix - the correct fix is already in Linus's
-> > tree.
-> 
-> Ahh ok, may I ask for the commit hash or title so I can learn from it ?
+On Fri, 25 Apr 2025 at 23:51, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> Following the example of several other algorithms (e.g. CRC32, ChaCha,
+> Poly1305, BLAKE2s), this series refactors the kernel's existing
+> architecture-optimized SHA-256 code to be available via the library API,
+> instead of just via the crypto_shash API as it was before.  It also
+> reimplements the SHA-256 crypto_shash API on top of the library API.
 
-9c3a2c9b471a bcachefs: Disable asm memcpys when kmsan enabled
+Well, this certainly looks a lot simpler, and avoids the duplicated
+crypto glue setup for each architecture.
+
+So this very much seems to be the RightThing(tm) to do.
+
+               Linus
