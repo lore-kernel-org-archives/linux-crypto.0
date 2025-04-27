@@ -1,129 +1,94 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F3E7494
-	for <linux-crypto@vger.kernel.org>; Sat, 26 Apr 2025 22:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FB01E7C34;
+	Sun, 27 Apr 2025 00:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745706437; cv=none; b=M0plTiKnRKIUcg05W9Cn8+Hota1jQn8Cwk3p0jHebAkTxCITIQRXi78wseLoIXiBfvj2meETzpEOT7F5XPiHQzw13Iw5uFWJS+OWIBUAwIvYIKx1kzFe1tBQzKmJ5fOCKoa0zdz4zh3BSRzkM6f0UW5NfujBuF1NSSd+ac7Dopo=
+	t=1745713152; cv=none; b=epGwSS/irttZ4jE28UoCjVOOjJJGlGVw8iNH6S0UPh7uZONuqswcLsochfD0D6vEhlz3JSYcaeQngSAzINbEqlgxBIakeRy2LL4f2Vkvt7hwGqgVvtnXHCy8KpG7sxqv+KdbrNtfPBtTelcC8QFoLMhhNPHjRgnjkkrIyxW+rs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745706437; c=relaxed/simple;
-	bh=y3wv2i7dz7Xe1WPxWtb+hFLK/z0p4b6qQp7XfLjl3Tg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rtzc/cLiYfBjR2sILy+lxopcVDhp86PCU7yzUfqJgnWb3Py3fbm/X4QWQPaZiA96WBp4u9Aa62EKo9c7MMuYknb1pTjlhX+Dz58bW9Z58TRsyGq7VNEY74Mk3+i3iKbxRMmSdWR7gAydl5b0Wtja8H94kKUpQ5ZwgwfPDe2cp10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vU4OvdYa; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745713152; c=relaxed/simple;
+	bh=z2JnkUelGjwTsIo7Ko54jjxrEw1ldas4tF+vGGSGEUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ghqUM/F2/GO2USFPh8CVapnEJFnxA4UDql55yssEWsEK58h3muHOyBM+eOUiAKTDyqFoqgCYX5vc/74silqqra2H319uODOvKPTF2yx1/7kLj4KDqHBVZeJ2gRy7GaYenI7LOvvJBXbKaToyW3fxA7fJKSysKCFOjeKg9PVaRvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LsUBruIG; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vU4OvdYa"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745706433;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dStqifmk7S+BpETVzABU1ARJ7nrE33RR05tHBW+iFOo=;
-	b=vU4OvdYabyV72CURL9pSiBs5PU6a8qwqXNK0pm4/HQBbjU/mXSnWunzOaAA/ePxvlp3Cjr
-	/BQTWltn9BxxWZD6fR4uw8lQQZBs7igED8hZOKTPRrSdwrmVZ31wqPKWYZaCKdWUdWQXcz
-	l1LAgfh1Odit+MGYwdJ8L+ps2nhn+Ss=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - Simplify multiple return statements
-Date: Sun, 27 Apr 2025 00:26:19 +0200
-Message-ID: <20250426222621.2104-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LsUBruIG"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=qIc1CnqWjP+VDV+/eTU2C9hwQs+hAGsJroIHvnLDXc0=; b=LsUBruIGAs9uLBJRTk9h6fgdB0
+	2xisb0QqkU5+qP/eEYOH3uvK2DCnuZkERHnCECKmdbX85eZlMfmPqVki9sSxjYrxdWFAhjUUMsUD3
+	P2JtdRMdBzT9y1/R7BdqzGhm5+HW6Qeftz51Y5755VFfohf8/0ee7AMDCj9lJUk5Fsi5cY7ScWSiM
+	wAarhpfnk8TKu4CA4qEF5xdYMq88s0cnneBOdtKkePk/L0Ss41Ue/EHUkeraGj4GuqVbngWnxOuPy
+	zGJVAmP3Tblrt5KCk9xwxPfx3IMbexqk44KkQviPivswZwKydYQtt5WMVkj4AP4WS2Vj5Wn0x9m7M
+	CuGifb1w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u8pjU-001IyU-22;
+	Sun, 27 Apr 2025 08:18:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 08:18:56 +0800
+Date: Sun, 27 Apr 2025 08:18:56 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
+	Jason@zx2c4.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH 11/13] crypto: x86/sha256 - implement library instead of
+ shash
+Message-ID: <aA138IKjqyZeQLgB@gondor.apana.org.au>
+References: <20250426065041.1551914-12-ebiggers@kernel.org>
+ <aAy6g3nblKtRj1l3@gondor.apana.org.au>
+ <20250426180326.GA1184@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250426180326.GA1184@sol.localdomain>
 
-Simplify multiple return statements by directly returning the boolean
-expressions.
+On Sat, Apr 26, 2025 at 11:03:26AM -0700, Eric Biggers wrote:
+>
+> The SHA-256 library functions currently work in any context, and this patch
+> series preserves that behavior.  Changing that would be a separate change.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- .../marvell/octeontx2/otx2_cpt_common.h       | 34 ++++++-------------
- 1 file changed, 10 insertions(+), 24 deletions(-)
+I've already removed the SIMD fallback path and your patch is
+adding it back.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index c5b7c57574ef..84f2bb0ca11c 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -145,11 +145,8 @@ static inline u64 otx2_cpt_read64(void __iomem *reg_base, u64 blk, u64 slot,
- 
- static inline bool is_dev_otx2(struct pci_dev *pdev)
- {
--	if (pdev->device == OTX2_CPT_PCI_PF_DEVICE_ID ||
--	    pdev->device == OTX2_CPT_PCI_VF_DEVICE_ID)
--		return true;
--
--	return false;
-+	return pdev->device == OTX2_CPT_PCI_PF_DEVICE_ID ||
-+	       pdev->device == OTX2_CPT_PCI_VF_DEVICE_ID;
- }
- 
- static inline bool is_dev_cn10ka(struct pci_dev *pdev)
-@@ -159,12 +156,10 @@ static inline bool is_dev_cn10ka(struct pci_dev *pdev)
- 
- static inline bool is_dev_cn10ka_ax(struct pci_dev *pdev)
- {
--	if (pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
--	    ((pdev->revision & 0xFF) == 4 || (pdev->revision & 0xFF) == 0x50 ||
--	     (pdev->revision & 0xff) == 0x51))
--		return true;
--
--	return false;
-+	return pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
-+	       ((pdev->revision & 0xFF) == 4 ||
-+		(pdev->revision & 0xFF) == 0x50 ||
-+		(pdev->revision & 0xFF) == 0x51);
- }
- 
- static inline bool is_dev_cn10kb(struct pci_dev *pdev)
-@@ -174,11 +169,8 @@ static inline bool is_dev_cn10kb(struct pci_dev *pdev)
- 
- static inline bool is_dev_cn10ka_b0(struct pci_dev *pdev)
- {
--	if (pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
--	    (pdev->revision & 0xFF) == 0x54)
--		return true;
--
--	return false;
-+	return pdev->subsystem_device == CPT_PCI_SUBSYS_DEVID_CN10K_A &&
-+	       (pdev->revision & 0xFF) == 0x54;
- }
- 
- static inline void otx2_cpt_set_hw_caps(struct pci_dev *pdev,
-@@ -192,18 +184,12 @@ static inline void otx2_cpt_set_hw_caps(struct pci_dev *pdev,
- 
- static inline bool cpt_is_errata_38550_exists(struct pci_dev *pdev)
- {
--	if (is_dev_otx2(pdev) || is_dev_cn10ka_ax(pdev))
--		return true;
--
--	return false;
-+	return is_dev_otx2(pdev) || is_dev_cn10ka_ax(pdev);
- }
- 
- static inline bool cpt_feature_sgv2(struct pci_dev *pdev)
- {
--	if (!is_dev_otx2(pdev) && !is_dev_cn10ka_ax(pdev))
--		return true;
--
--	return false;
-+	return !is_dev_otx2(pdev) && !is_dev_cn10ka_ax(pdev);
- }
- 
- int otx2_cpt_send_ready_msg(struct otx2_mbox *mbox, struct pci_dev *pdev);
+> But also as I've explained before, for the library API the performance benefit
+> of removing the crypto_simd_usable() doesn't seem to be worth the footgun that
+> would be introduced.  Your position is, effectively, that if someone calls one
+> of the sha256*() functions from a hardirq, we should sometimes corrupt a random
+> task's FPU registers.  That's a really bad bug that is very difficult to
+> root-cause.  My position is that we should make it just work as expected.
+
+kernel_fpu_begin already does a WARN_ON when called in hardirq
+context and it can't safely use the FPU, there is no silent
+corruption.
+
+In fact if anything your patch is making the problem worse by
+making a hardirq stochastically slow with no visible warnings
+at all.
+
+> Yes, no one *should* be doing SHA-256 in a hardirq.  But I don't think that
+> means we should corrupt a random task's FPU registers if someone doesn't follow
+> best practices, when we can easily make the API just work as expected.
+
+If you really want to support this, do it in the FPU layer, not here.
+
+Thanks,
 -- 
-2.49.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
