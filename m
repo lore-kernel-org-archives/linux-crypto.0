@@ -1,49 +1,47 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663A22B9BC
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6901A2B9BC;
+	Sun, 27 Apr 2025 01:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745718434; cv=none; b=lAVf+TeDvn/cq5DktZIXh8MhsuUXxqhRFdk2h+pMHidEjRD8eIch9ltfHyLn5cGhMeLvVw6z6vQf9UKVeAck3qiUPABjvo3Mv/VQLImOysVAxgsA/tUR/PkZIUOmbpNfvWP2hOxPtLJoFcz0J48TVMa2etH3DUma6vRsr39gZy4=
+	t=1745718638; cv=none; b=DRDKL6fN6b5e6fdddT0TfYe366BTAWjo+BPTaK5XS5Fi+GlW9T7bcex1R23nYBLJ0vCe/2QQ5olrxPbRQG3Yn5gEhQaOP2UIqZww5lF3W9lJe+scBoLjOxjvx4H34DwcE6E5iLbpIHgwjv0uyhKpLKpJr2pj6PD7QXmG/bXvTNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745718434; c=relaxed/simple;
-	bh=5bWlirapCiDXg44V9FbSrkrLal4TjlmvbfhguUpc8tQ=;
+	s=arc-20240116; t=1745718638; c=relaxed/simple;
+	bh=e/U2hXsUieq0eplDUQMGjtnd+RdUdFnygdx2mCJfSjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tqbeDO0teqbuRIKbCeEM5dmWU7EJHKDoHOX1wJpe/93CYrGZ1kM1V7AbyC1UYjNHeM8tlL1ZLwCqvat/OifWjAr1EhNLFslcra7KGPnMKgNld2fLYdJpgfPK01y/nAx+sTweqxym1yrWUUrNegGlVB1p+F0HAv0aq5TSx3Et2hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Ui92wHy1; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLjkCFf4Do0kNC8vbBWtfQ90HgmJiyr9moJ3gPkJWFMyJ4TC4bu/JSXtLqGhWziHkUZNWtfmmJc+eUFSZeNFcuN9ZLW9pVDqLMq+iM7qA3fGZd1+rO36rZWNfQ2b9RZ2RurRh5ua3jSZioAxvc7BE4bgwDTm4rHTPYMGU3/qync=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3hPlaXq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Ui92wHy1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=eSrFnAV3Xd/3UYdeZM+PfGY6B8rC2IYArNbgCiMa6EE=; b=Ui92wHy1Twpvok60i7LL5TiUgW
-	uR97Ib2iyk/jUExjKk+WmYAYSqXS2uxmX3sbwtlPnT3eDrLph4+m1ZrUFCo05YYv4kk2JTIyPK1H5
-	oKKo7AkPdi5MAoysehz6lOFneW8ncwAxpVX1jMqlmW2xrRHNgA40qSJhux1Paqi2HB2EzbzhhVRIw
-	ofyX71xJ1AGCKOWIP1yzprXmqG2HkjKUBtb8YGiCcpndWco1lHeMbif5NHd9pXBNGR21AuI98pzR9
-	CULj4PKBBGqPGXNieG3v5fnCImiwR5fQedSTx2WocLNSql8ldT+umcqk633eMbZjMcNveSCqpXwvd
-	52MpuHTg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8r6p-001Jm2-1F;
-	Sun, 27 Apr 2025 09:47:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 09:47:07 +0800
-Date: Sun, 27 Apr 2025 09:47:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 02/15] crypto: lib/poly1305 - Add block-only interface
-Message-ID: <aA2Mm-eDnnnKzsAc@gondor.apana.org.au>
-References: <cover.1745490652.git.herbert@gondor.apana.org.au>
- <7c55da6f6310d4830360b088a5cc947e1da9b38f.1745490652.git.herbert@gondor.apana.org.au>
- <20250424161431.GE2427@sol.localdomain>
- <aAt21pphcto2Cjxa@gondor.apana.org.au>
- <20250427014108.GE68006@quark>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3hPlaXq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A863C4CEE2;
+	Sun, 27 Apr 2025 01:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745718637;
+	bh=e/U2hXsUieq0eplDUQMGjtnd+RdUdFnygdx2mCJfSjc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A3hPlaXqbKMOOByqg0xO9XDGFN1r/8wVmxH9kT35oxzYfPaLGXzTgbk9sGuMRtTvt
+	 44bXMlBlBZQMn8Ipp3JoqeVYAXxD538C1X82i3+WBwshE/qw9nPHmadZjz3sDag3pe
+	 JEMPB13QpuEDebnwb5LL7f1z8/SGor7fWyhIXtEz2xGDz/C8I7rNgHiUFkybydeuCe
+	 Ro3xou/0TbbO2aRPHU0DEuogQgtgdvMdA5WHna4/b4PQ7kTpgKpaJar1ue9GFDud7L
+	 58cp3jMvLW6iFrbLOFJHG9nwrGeuGyAlLwD3YpV4I/HWA3G9v2H3W2WGYZSzk4OmcU
+	 KiZ54jDdhgXpw==
+Date: Sat, 26 Apr 2025 18:50:41 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
+	Jason@zx2c4.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH 01/13] crypto: sha256 - support arch-optimized lib and
+ expose through shash
+Message-ID: <20250427015041.GF68006@quark>
+References: <20250426065041.1551914-2-ebiggers@kernel.org>
+ <aA2DKzOh8xhCYY8C@gondor.apana.org.au>
+ <20250427011228.GC68006@quark>
+ <aA2FqGSHWNO8cRLD@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,29 +50,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250427014108.GE68006@quark>
+In-Reply-To: <aA2FqGSHWNO8cRLD@gondor.apana.org.au>
 
-On Sat, Apr 26, 2025 at 06:41:08PM -0700, Eric Biggers wrote:
->
-> It doesn't seem to be worth abstracting out further.  Especially with the slight
-> variations in different algorithms and APIs which are hard to handle correctly
-> in a shared macro.
+On Sun, Apr 27, 2025 at 09:17:28AM +0800, Herbert Xu wrote:
+> On Sat, Apr 26, 2025 at 06:12:28PM -0700, Eric Biggers wrote:
+> >
+> > No, that would be silly.  I'm not doing that.  The full update including the
+> > partial block handling is already needed in the library.  There is no need to
+> > implement it again at the shash level.
+> 
+> shash implements a lot more algorithms than the lib/crypto interface.
+> If you won't do this then I'll just do it instead.
 
-The fact that using the sha256 partial block code reduced the
-poly1305_update function code size by half proves that it is
-worthwhile to have just one implementation.
+But this one does have a lib/crypto/ interface now.  There's no reason not to
+use it here.
 
-I've gone through every single shash algorithm already and I
-don't see any variations that would be an impediment.
-
-> You're assigning desc->buflen to itself.  Which presumably you missed since the
-> macro obfuscates what is going on.
-
-I still don't get it.  I'm assigning the new buflen as returned
-by the macro to desc->buflen, how is that a problem?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
