@@ -1,48 +1,45 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F52223716
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D501922DD;
+	Sun, 27 Apr 2025 01:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745716333; cv=none; b=Jg92XIOC+rQJD1VJArxMS3yLi7FDPpvDKOq3Bn4WtMUh6bJNiI4ag33BnSkjc/pSe+ON5UBMTkdur49k74ZCtGk/RrN+QEd0TWIq4Pi8x/kLTi9gegjrTfsKv6ocoIgUuKcCvdaBwB/iORtKooOoRDcaRGirjJkwzP1GBQiRQUw=
+	t=1745716346; cv=none; b=KJ/GztxdPpe4lhGBtdfyVRnF4kZcNA2OQyl5t11F14lVr1taE3WdheeiPAIbUdH23Trmcmuw0acy+/zF1XVvJZ+7uP+fc+h2xiCz4rKTX38y/7Ry2OH9duzJkcKh8+DFlNcyeBZ3/pcKhh9QfOlArfNOJoG6lGnYoc3k2P7/1yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745716333; c=relaxed/simple;
-	bh=TIk0jz9PykdFArCl0mJ/+Dz82xaMXLytP0vrdTvZujU=;
+	s=arc-20240116; t=1745716346; c=relaxed/simple;
+	bh=XtR2f2thGcnDYbhl0pb+41JAmRYzjJrz7p093kCXmZg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lPv1s54IlEMk1HhDRd6avQ1katy/2A6PTNMSF7fQBOJctHIFchP5EWr0OMjA7Qg8lCcjMoOjJgaKR/SFDr6c7G1JAU/Y1GQKD3N0VBDSXCfg5rMBA/GyFnBW/siT1H+56xkoH8zQBjGgkX+j3EhZpTCQvErI7kekwMMm8h4BtWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=V6tf6Irw; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=gxXIVvu4GT5SuFDTGcvzrRpz8PpXRMyFT1le+kb12ml4EmnjAAxALWkc3VbPMi1w8nCjXTrWMP1TSuMj2XVM1OYFtQd8hhYIpOA7HIJ9sBc0alWop2HlRzgWKgvmyN0Bc7tAs1NHZV4eOl2af9tKbrgXcGW21hQ7EzOSYyr27Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGr63U24; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="V6tf6Irw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ket0Pollt0sYL6uy29gMHsvqQTVdoVptvZgXOyZswKk=; b=V6tf6Irwt0hqki+gkm1fHNUzZ/
-	7JejiOZ6uwVLn8MXIFvfT7EQuCqKSulh9JlbMXXmFtvz2dG41i0ZU52ZwFIxy/MqGXopIrabfMNDW
-	JlKWsogdi++SMgb8yRGJrPquxe6fi4e1SSV7NqtBCkzVPk77GtdIgpNE+EyOT21SgqyOHpZ5hd4JH
-	L9oWrbK4XHDw/bn83jsZeBrWNKEM8KXjMUQHYiyuEwWOECHzgfeCI4QNUNRY5GWgpGsiuba56Z4Ww
-	kTAoapeAaYYwK8455l4pDdB0+fXdjA3/zSFaKTUsocT2g1ohyHS9COIAVrb/e9adsp0ayuWJJZ2xw
-	fksdoEWA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8qYx-001JSf-2B;
-	Sun, 27 Apr 2025 09:12:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 09:12:07 +0800
-Date: Sun, 27 Apr 2025 09:12:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 2/2] crypto: scatterwalk - Move skcipher walk and use it
- for memcpy_sglist
-Message-ID: <aA2EZ3q4qcFSKJxO@gondor.apana.org.au>
-References: <cover.1745714222.git.herbert@gondor.apana.org.au>
- <8a564443ba01b29418291a4e3045e2546cd9e3a8.1745714222.git.herbert@gondor.apana.org.au>
- <20250427010834.GB68006@quark>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGr63U24"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B15DFC4CEE2;
+	Sun, 27 Apr 2025 01:12:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745716345;
+	bh=XtR2f2thGcnDYbhl0pb+41JAmRYzjJrz7p093kCXmZg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tGr63U24Gm8hRXTQSMA4lzYe51LBc4e4LKosvkah6KUyAMJnYCNTl7qlYhU9meJPQ
+	 JXkGSHgyHAyGkABiWTxETPK9T9HG/YCslPrpz1C2Rd8U2nORRVXbC4q/iDWve+GK82
+	 tKfCzgcrJ9AoZEh29PMKmsJJndXIegAqGM6CXLVC0Jh29/H7Y2m/d6O+p5ZDEL/K1B
+	 BsxWASsxCYPCjwizywmWlK+UzpRcqKy6xOMgy1n/V4zXZhtyAWrSPPp7i+Xo/4/X0e
+	 Daye4QLiZSXNkXPQd/hQ2xs+4CCmLsIfbjf9n7+azNxdTbZM9lQ7Q5y3du8vu544X9
+	 Trq6TtAEEdGeA==
+Date: Sat, 26 Apr 2025 18:12:28 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+	linux-s390@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
+	Jason@zx2c4.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH 01/13] crypto: sha256 - support arch-optimized lib and
+ expose through shash
+Message-ID: <20250427011228.GC68006@quark>
+References: <20250426065041.1551914-2-ebiggers@kernel.org>
+ <aA2DKzOh8xhCYY8C@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,21 +48,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250427010834.GB68006@quark>
+In-Reply-To: <aA2DKzOh8xhCYY8C@gondor.apana.org.au>
 
-On Sat, Apr 26, 2025 at 06:08:34PM -0700, Eric Biggers wrote:
->
-> I think it would end up faster and simpler to just implement the copy from first
-> principles instead of trying to share the code with skcipher_walk.  There is way
-> too much stuff that skcipher_walk has to handle that isn't relevant for a simple
-> copy.
+On Sun, Apr 27, 2025 at 09:06:51AM +0800, Herbert Xu wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > +static int crypto_sha256_update_arch(struct shash_desc *desc, const u8 *data,
+> > +                                    unsigned int len)
+> > +{
+> > +       sha256_update(shash_desc_ctx(desc), data, len);
+> > +       return 0;
+> > +}
+> 
+> Please use the block functions directly in the shash implementation.
 
-Sure, please feel free to improve this function further.  I just
-needed something that works for chacha20poly1305 and this was the
-easiest way to get it done.
+No, that would be silly.  I'm not doing that.  The full update including the
+partial block handling is already needed in the library.  There is no need to
+implement it again at the shash level.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
