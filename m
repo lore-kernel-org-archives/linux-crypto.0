@@ -1,41 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384B38BE7
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663A22B9BC
+	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745718065; cv=none; b=F0eiH8rreNkjL0ubSZ9QXACjM1Dr9mDcMsUk8UNJ7pn9xmUvZDE3+PHbrb4erH8PCS3crC7PiVZB1IywnAfRLk7khIsKHDGncKFKq45IlEwxzRMH6fED90tqQolyFUVBBZAayARuvIJuJyXmkuLqaMXXqX/RBKvrqKg3h1MBkGY=
+	t=1745718434; cv=none; b=lAVf+TeDvn/cq5DktZIXh8MhsuUXxqhRFdk2h+pMHidEjRD8eIch9ltfHyLn5cGhMeLvVw6z6vQf9UKVeAck3qiUPABjvo3Mv/VQLImOysVAxgsA/tUR/PkZIUOmbpNfvWP2hOxPtLJoFcz0J48TVMa2etH3DUma6vRsr39gZy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745718065; c=relaxed/simple;
-	bh=B/NtxoCpLKtw/AnjS1zqa5N0a1B8kE/k8561EEarol4=;
+	s=arc-20240116; t=1745718434; c=relaxed/simple;
+	bh=5bWlirapCiDXg44V9FbSrkrLal4TjlmvbfhguUpc8tQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNGBLuzkB7dgVHOZXp/XDHB/hrrEaaBCKsBv6DkQLJamuxED18qtzZ/T+PZFRwt9tTMOlb0NK9568cxhryjs+SzR9N7DM+/mGT3gtPlx7yi9+QlSm2AnUy+OxINtQKR1HObrLUj44d3xzrcqAMCozU6p2LjcNuKz2A2KiZGSp48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFwGC3jl; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=tqbeDO0teqbuRIKbCeEM5dmWU7EJHKDoHOX1wJpe/93CYrGZ1kM1V7AbyC1UYjNHeM8tlL1ZLwCqvat/OifWjAr1EhNLFslcra7KGPnMKgNld2fLYdJpgfPK01y/nAx+sTweqxym1yrWUUrNegGlVB1p+F0HAv0aq5TSx3Et2hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Ui92wHy1; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFwGC3jl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842ECC4CEE2;
-	Sun, 27 Apr 2025 01:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745718064;
-	bh=B/NtxoCpLKtw/AnjS1zqa5N0a1B8kE/k8561EEarol4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UFwGC3jl3NMNHAIYo06nHOdHalb2VNtlJ6CzXl243f2NbMBQ2pLhzvZdmZqaDA30X
-	 PXuibMfwqwZmCv9AV5+PSduQKYH230U3dDHkWOpC5g/Ubj08J+z0BpR9+iIt3QDdl2
-	 76h3bRHzpp+XZEXfhAMT4Mlhxpk7W3YPC2C2WOs/7WQ5uxMD4//MXVvKNFXO72MQbm
-	 SpFWfP6pu/mKhw5zfXbQIx1cYwUikVRZy0CrpjDtVTPVdOKEC4sOUPgJUS6xII1bH2
-	 DuY51Dx3MivLMberJMpafg+SF7rkNK4x7lxB3W93AUDA8F/Iqi1hFuGWk3lDqpDeQ7
-	 uExlfuAj5ebPw==
-Date: Sat, 26 Apr 2025 18:41:08 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Ui92wHy1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=eSrFnAV3Xd/3UYdeZM+PfGY6B8rC2IYArNbgCiMa6EE=; b=Ui92wHy1Twpvok60i7LL5TiUgW
+	uR97Ib2iyk/jUExjKk+WmYAYSqXS2uxmX3sbwtlPnT3eDrLph4+m1ZrUFCo05YYv4kk2JTIyPK1H5
+	oKKo7AkPdi5MAoysehz6lOFneW8ncwAxpVX1jMqlmW2xrRHNgA40qSJhux1Paqi2HB2EzbzhhVRIw
+	ofyX71xJ1AGCKOWIP1yzprXmqG2HkjKUBtb8YGiCcpndWco1lHeMbif5NHd9pXBNGR21AuI98pzR9
+	CULj4PKBBGqPGXNieG3v5fnCImiwR5fQedSTx2WocLNSql8ldT+umcqk633eMbZjMcNveSCqpXwvd
+	52MpuHTg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u8r6p-001Jm2-1F;
+	Sun, 27 Apr 2025 09:47:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 09:47:07 +0800
+Date: Sun, 27 Apr 2025 09:47:07 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Subject: Re: [PATCH 02/15] crypto: lib/poly1305 - Add block-only interface
-Message-ID: <20250427014108.GE68006@quark>
+Message-ID: <aA2Mm-eDnnnKzsAc@gondor.apana.org.au>
 References: <cover.1745490652.git.herbert@gondor.apana.org.au>
  <7c55da6f6310d4830360b088a5cc947e1da9b38f.1745490652.git.herbert@gondor.apana.org.au>
  <20250424161431.GE2427@sol.localdomain>
  <aAt21pphcto2Cjxa@gondor.apana.org.au>
+ <20250427014108.GE68006@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,35 +52,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAt21pphcto2Cjxa@gondor.apana.org.au>
+In-Reply-To: <20250427014108.GE68006@quark>
 
-On Fri, Apr 25, 2025 at 07:49:42PM +0800, Herbert Xu wrote:
-> On Thu, Apr 24, 2025 at 09:14:31AM -0700, Eric Biggers wrote:
-> > 
-> > Use 'raw_key' instead of 'key' when referring to the 16-byte polynomial hash key
-> > which is the first half of the full 32-byte Poly1305 one-time key.
-> 
-> OK I'll change that.
-> 
-> > > +	desc->buflen = BLOCK_HASH_UPDATE(&poly1305_block, &desc->state,
-> > > +					 src, nbytes, POLY1305_BLOCK_SIZE,
-> > > +					 desc->buf, desc->buflen);
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(poly1305_update_generic);
-> > 
-> > Again, should just write this out without the weird macro, which is also being
-> > used incorrectly here.
-> 
-> If you have a better way of abstracting out the partial block
-> handling, please let me know.
+On Sat, Apr 26, 2025 at 06:41:08PM -0700, Eric Biggers wrote:
+>
+> It doesn't seem to be worth abstracting out further.  Especially with the slight
+> variations in different algorithms and APIs which are hard to handle correctly
+> in a shared macro.
 
-It doesn't seem to be worth abstracting out further.  Especially with the slight
-variations in different algorithms and APIs which are hard to handle correctly
-in a shared macro.
+The fact that using the sha256 partial block code reduced the
+poly1305_update function code size by half proves that it is
+worthwhile to have just one implementation.
 
-> As to using it incorrectly, could you please be more specific?
+I've gone through every single shash algorithm already and I
+don't see any variations that would be an impediment.
 
-You're assigning desc->buflen to itself.  Which presumably you missed since the
-macro obfuscates what is going on.
+> You're assigning desc->buflen to itself.  Which presumably you missed since the
+> macro obfuscates what is going on.
 
-- Eric
+I still don't get it.  I'm assigning the new buflen as returned
+by the macro to desc->buflen, how is that a problem?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
