@@ -1,41 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119231FBEA9
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 05:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3D57E9
+	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 05:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745731315; cv=none; b=ucwHW5l5aEuPoMu7Bv+ThhCQHQKnaCVAZsfx33w7om/rihA8cRspS1yeJEyyzYf4tkvbfYbT9BUWtpPRWLTtXp/N8VCao9njkYTiHJ24wRI7AHzRLWKt7ycBwmjfIcvlmX2eFRJ9wkm1aBvFhEoQVFzDpjrdZc03X+RWplHJrog=
+	t=1745731334; cv=none; b=QMA/G2QSJW+uzvdcL9Zmdv5S2WvxzinG6Zhdwq0ZIiXdCij1+Y8XSSfna7OoN6pXXtZfNVFN4RK5nAxhpHQXuWTu51/nkJ5Ju+QAbgvVPh2oEQ5Dvd6wGjbZbLHgDvOk3ytZ+9gUB3tZShWdzAuZn8UnB+Nsb2tddt0SYqUm3h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745731315; c=relaxed/simple;
-	bh=XCqD8rsC7z9TkRge8SgDpIO0TVBf+M0ctSCcUF835QQ=;
-	h=Date:Message-Id:From:Subject:To; b=sYak+pwFKn3NJLflpeLdG3vzpXMmtkAvRJ7cMWRCdysTd1Hu53zq1nsYUTddjcBjmIT2/MojjLF7pQ5exJ3BLnSGvTPArZfUdyqdqhXUX9idgbbFRdDUjBi8zCUfV2DwJM1vB2iHODUo/Psq0wjbzErIcjVVAlN3k/X435SZ/rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=oBdHiRAp; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745731334; c=relaxed/simple;
+	bh=0acb2YKlW2vHEraZdhPjBtZIV9+w7Pa/OzckyDO6JvA=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=J9RL2hpMoaiv0RR8kRFck92Nk0jMqHHeFKmNivCrwx9XK5qnIcws3aR+i0CWnaeHzjL8Qi8vRkaeMaY5wIUTTdnzZdLV8IOlJUbf8MsPFGD7nxFTFErQDuvat5rInYyL4aMR1wWlchnkDtya347xHqz716aVaAZAkg7qx19cbKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=X7SRxJ8X; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="oBdHiRAp"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="X7SRxJ8X"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=To:Subject:From:Message-Id:Date:Sender:Reply-To:Cc:MIME-Version
-	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
+	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=qHNquFb8CXfW2iFctPFU/JxnKCF/z1POS5FAYIko+tY=; b=oBdHiRApgaW/850Ku5fXxYpSIE
-	NVfPQIxQiNaawMCRzDfzjdYakGT/W0TkdxFhP6RWeWYJwc46Tzq2MijLJLa8VNZ2Duik8us3i4uiR
-	d9UWx4U+RJuXgg09kdSOSUDFobI0YzeLhrDLo2lUd3ijvCjOCec54rTnAdL1ZAGaNAYdq92oWmFne
-	ojjT1p/pjPkYSPADiIM6KiedcTKd77+j+OGm1DSXiUUC3rHQGbv9n7uF/glJntPIoO/PsPC0WvxR/
-	i3b/h7UH13d+JmkXq/Dd1AHtQwf/fwiSjcCPfACyfIsPOYdKN0mfAT/WOFyJKdbZhz7U+PmU7dQzz
-	YH74+p4A==;
+	bh=3v6KfEt9HlSWl8dHyyQV/3PlINdb6EieVuspQUEr5YQ=; b=X7SRxJ8Xqtg/jQFCWeUgmReZUp
+	sSxfhcPSRawGhArOo5oX8QrInSTow5Jd0eYUo+/8tBAZN0ezFydYCE/oDKZCygjzMiWXI7Luz+D+g
+	sBXiINWLwhoC1OxFFMm/b10BOZ3kOR6wkr+QOv98Dd54DThnDlOaHcJb2Z784emZ07+XBKf75feBB
+	n0aSmn4v7lUvH5XqBXVnF/96AMAmveX92rZaTgpxK+e+725GzLazCDnEy6IeMloorF9oqw65VuniU
+	wPYOwW0Dy8HqVXMDu5attB9YHKLD5BkReeTmED+pBOzTrPDea/tduzZsD1/dtMRbaIepYeqnhzk8+
+	IWwSAE1Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8uSb-001KyR-0J;
-	Sun, 27 Apr 2025 13:21:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 13:21:49 +0800
-Date: Sun, 27 Apr 2025 13:21:49 +0800
-Message-Id: <cover.1745730946.git.herbert@gondor.apana.org.au>
+	id 1u8uSt-001Kyc-1K;
+	Sun, 27 Apr 2025 13:22:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 13:22:07 +0800
+Date: Sun, 27 Apr 2025 13:22:07 +0800
+Message-Id: <5bab3019bd1b4d92b9219b7b5f2488936e39d63e.1745730946.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1745730946.git.herbert@gondor.apana.org.au>
+References: <cover.1745730946.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 00/11] crypto: lib - Add partial block helper
+Subject: [v3 PATCH 01/11] crypto: lib/sha256 - Move partial block handling out
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -43,68 +45,159 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-v3 modifies the block helper so that arrays can be used as state.
+Extract the common partial block handling into a helper macro
+that can be reused by other library code.
 
-This is based on
+Also delete the unused sha256_base_do_finalize function.
 
-	https://patchwork.kernel.org/project/linux-crypto/list/?series=955753
-	https://patchwork.kernel.org/project/linux-crypto/list/?series=957401
-
-This series introduces a partial block helper for lib/crypto hash
-algorithms based on the one from sha256_base.
-
-It then uses it on poly1305 to eliminate duplication between
-architectures.  In particular, instead of having complete update
-functions for each architecture, reduce it to a block function
-per architecture instead.  The partial block handling is handled
-by the generic library layer.
-
-The poly1305 implementation was anomalous due to the inability
-to call setkey in softirq.  It also has just a single user, which
-is chacha20poly1305 that is hard-coded to use poly1305.  Replace
-the gratuitous use of ahash in chacha20poly1305 with the lib/crypto
-poly1305 instead.
-
-This then allows the shash poly1305 to be removed.
-
-Herbert Xu (11):
-  crypto: lib/sha256 - Move partial block handling out
-  crypto: lib/poly1305 - Add block-only interface
-  crypto: arm/poly1305 - Add block-only interface
-  crypto: arm64/poly1305 - Add block-only interface
-  crypto: mips/poly1305 - Add block-only interface
-  crypto: powerpc/poly1305 - Add block-only interface
-  crypto: x86/poly1305 - Add block-only interface
-  crypto: chacha20poly1305 - Use lib/crypto poly1305
-  crypto: testmgr - Remove poly1305
-  crypto: poly1305 - Remove algorithm
-  crypto: lib/poly1305 - Use block-only interface
-
- arch/arm/lib/crypto/poly1305-armv4.pl         |   4 +-
- arch/arm/lib/crypto/poly1305-glue.c           | 113 ++----
- arch/arm64/lib/crypto/Makefile                |   3 +-
- arch/arm64/lib/crypto/poly1305-glue.c         | 105 ++----
- arch/mips/lib/crypto/poly1305-glue.c          |  75 +---
- arch/mips/lib/crypto/poly1305-mips.pl         |  12 +-
- arch/powerpc/lib/crypto/poly1305-p10-glue.c   | 109 ++----
- .../lib/crypto/poly1305-x86_64-cryptogams.pl  |  33 +-
- arch/x86/lib/crypto/poly1305_glue.c           | 169 +++------
- crypto/Kconfig                                |  14 +-
- crypto/Makefile                               |   2 -
- crypto/chacha20poly1305.c                     | 323 ++++--------------
- crypto/poly1305.c                             | 152 ---------
- crypto/testmgr.c                              |   6 -
- crypto/testmgr.h                              | 288 ----------------
- include/crypto/internal/blockhash.h           |  49 +++
- include/crypto/internal/poly1305.h            |  28 +-
- include/crypto/poly1305.h                     |  60 +---
- include/crypto/sha2.h                         |   9 +-
- include/crypto/sha256_base.h                  |  38 +--
- lib/crypto/poly1305.c                         |  83 ++---
- 21 files changed, 393 insertions(+), 1282 deletions(-)
- delete mode 100644 crypto/poly1305.c
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ include/crypto/internal/blockhash.h | 49 +++++++++++++++++++++++++++++
+ include/crypto/sha2.h               |  9 ++++--
+ include/crypto/sha256_base.h        | 38 ++--------------------
+ 3 files changed, 59 insertions(+), 37 deletions(-)
  create mode 100644 include/crypto/internal/blockhash.h
 
+diff --git a/include/crypto/internal/blockhash.h b/include/crypto/internal/blockhash.h
+new file mode 100644
+index 000000000000..b56cafee2628
+--- /dev/null
++++ b/include/crypto/internal/blockhash.h
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Handle partial blocks for block hash.
++ *
++ * Copyright (c) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * Copyright (c) 2025 Herbert Xu <herbert@gondor.apana.org.au>
++ */
++
++#ifndef _CRYPTO_INTERNAL_BLOCKHASH_H
++#define _CRYPTO_INTERNAL_BLOCKHASH_H
++
++#include <linux/string.h>
++#include <linux/types.h>
++
++#define BLOCK_HASH_UPDATE_BASE(block_fn, state, src, nbytes, bs, dv,	\
++			       buf, buflen)				\
++	({								\
++		unsigned int _nbytes = (nbytes);			\
++		unsigned int _buflen = (buflen);			\
++		unsigned int _bs = (bs);				\
++		const u8 *_src = (src);					\
++		u8 *_buf = (buf);					\
++		while ((_buflen + _nbytes) >= _bs) {			\
++			unsigned int len = _nbytes;			\
++			const u8 *data = _src;				\
++			int blocks, remain;				\
++			if (_buflen) {					\
++				remain = _bs - _buflen;			\
++				memcpy(_buf + _buflen, _src, remain);	\
++				data = _buf;				\
++				len = _bs;				\
++			}						\
++			remain = len % bs;				\
++			blocks = (len - remain) / (dv);			\
++			block_fn(state, data, blocks);			\
++			_src += len - remain - _buflen;			\
++			_nbytes -= len - remain - _buflen;		\
++			_buflen = 0;					\
++		}							\
++		memcpy(_buf + _buflen, _src, _nbytes);			\
++		_buflen += _nbytes;					\
++	})
++
++#define BLOCK_HASH_UPDATE(block, state, src, nbytes, bs, buf, buflen) \
++	BLOCK_HASH_UPDATE_BASE(block, state, src, nbytes, bs, 1, buf, buflen)
++#define BLOCK_HASH_UPDATE_BLOCKS(block, state, src, nbytes, bs, buf, buflen) \
++	BLOCK_HASH_UPDATE_BASE(block, state, src, nbytes, bs, bs, buf, buflen)
++
++#endif	/* _CRYPTO_INTERNAL_BLOCKHASH_H */
+diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
+index abbd882f7849..f873c2207b1e 100644
+--- a/include/crypto/sha2.h
++++ b/include/crypto/sha2.h
+@@ -71,8 +71,13 @@ struct crypto_sha256_state {
+ };
+ 
+ struct sha256_state {
+-	u32 state[SHA256_DIGEST_SIZE / 4];
+-	u64 count;
++	union {
++		struct crypto_sha256_state ctx;
++		struct {
++			u32 state[SHA256_DIGEST_SIZE / 4];
++			u64 count;
++		};
++	};
+ 	u8 buf[SHA256_BLOCK_SIZE];
+ };
+ 
+diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+index 08cd5e41d4fd..9f284bed5a51 100644
+--- a/include/crypto/sha256_base.h
++++ b/include/crypto/sha256_base.h
+@@ -8,6 +8,7 @@
+ #ifndef _CRYPTO_SHA256_BASE_H
+ #define _CRYPTO_SHA256_BASE_H
+ 
++#include <crypto/internal/blockhash.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha2.h>
+ #include <linux/math.h>
+@@ -40,35 +41,10 @@ static inline int lib_sha256_base_do_update(struct sha256_state *sctx,
+ 					    sha256_block_fn *block_fn)
+ {
+ 	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
+-	struct crypto_sha256_state *state = (void *)sctx;
+ 
+ 	sctx->count += len;
+-
+-	if (unlikely((partial + len) >= SHA256_BLOCK_SIZE)) {
+-		int blocks;
+-
+-		if (partial) {
+-			int p = SHA256_BLOCK_SIZE - partial;
+-
+-			memcpy(sctx->buf + partial, data, p);
+-			data += p;
+-			len -= p;
+-
+-			block_fn(state, sctx->buf, 1);
+-		}
+-
+-		blocks = len / SHA256_BLOCK_SIZE;
+-		len %= SHA256_BLOCK_SIZE;
+-
+-		if (blocks) {
+-			block_fn(state, data, blocks);
+-			data += blocks * SHA256_BLOCK_SIZE;
+-		}
+-		partial = 0;
+-	}
+-	if (len)
+-		memcpy(sctx->buf + partial, data, len);
+-
++	BLOCK_HASH_UPDATE_BLOCKS(block_fn, &sctx->ctx, data, len,
++				 SHA256_BLOCK_SIZE, sctx->buf, partial);
+ 	return 0;
+ }
+ 
+@@ -140,14 +116,6 @@ static inline int lib_sha256_base_do_finalize(struct sha256_state *sctx,
+ 	return lib_sha256_base_do_finup(state, sctx->buf, partial, block_fn);
+ }
+ 
+-static inline int sha256_base_do_finalize(struct shash_desc *desc,
+-					  sha256_block_fn *block_fn)
+-{
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
+-
+-	return lib_sha256_base_do_finalize(sctx, block_fn);
+-}
+-
+ static inline int __sha256_base_finish(u32 state[SHA256_DIGEST_SIZE / 4],
+ 				       u8 *out, unsigned int digest_size)
+ {
 -- 
 2.39.5
 
