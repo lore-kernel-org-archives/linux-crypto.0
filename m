@@ -1,41 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BF323F405;
-	Sun, 27 Apr 2025 06:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90B123F40D;
+	Sun, 27 Apr 2025 06:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745735460; cv=none; b=E5OY0Tb+7/mGEOArKlnaWYy4af5sdr6mTgdjToFUOF9aRSW49uGgnIbgcAFN26tAKzW9Oa3a4fCS7AsD8gunMYV1Tt1gMNerthDg+Zo6PtxNfnbe5x4FEilt8TkHrytiTACc6vFSksYRbFjlGri9EvisoFd0gxMf/hjNva8wnoQ=
+	t=1745735461; cv=none; b=FHkRG32QFdVima2VTb4jpm3ptT48/d0A0X0Riyyv2aPtkpBsOwwDWUkNaM8NV6wbSo4cAHWpI8UuJrxZrKMqujLbIORoKgbhR+SoAg3Mck0sbAthC3CBUE1FpHKGW0FbR7gEYu0+Lrk8r/5AlGEWWwOEbETlaYvC+5QObRtAOfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745735460; c=relaxed/simple;
-	bh=VJ7L7BYADzYNs+d8QhATh6t1ze4VTHt6LLIj98q3GcQ=;
-	h=Date:Message-Id:From:Subject:To:Cc; b=h7gehhLbfv2zTi/pEr82Ti3zPaXQXSrqssbmGQk1pVzqz5xpWFoC+6ZdsaI6bnbZmH/4/NzaAJ15/0f0A4Gk+Je3cdjxaG24NQzIOfgzxwP7GokE9K+S0/XQKVkxhIOrMABkRL00xjnx0HI0jCXUfRRJI7ob4SJj10DtVYA/ilw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fKrAb1QY; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745735461; c=relaxed/simple;
+	bh=AJUC1E6metM+0qOiiMC2y7Qbe9sfl580y+9gSOqvlqs=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=e7ed6YHc36zvm+22+0HwSbAmiTVSybUefzKkqEuuBosA3XydibulrTe/3KIiLYFqhsZhgiUTnx9qL07f4MfQG81/vj1anGoO68IGwrSMrT0jYmYPlddQcW/KZZpsOAR4WP86wkzG3a1ad4lNQ/ACAUMAcMPvf04vo9esxxzCL/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pwhukHUJ; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fKrAb1QY"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pwhukHUJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
-	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=oAXjI0apa7kqIIJEbs93dN3t43HIG2L7yLBf0wEIXg0=; b=fKrAb1QY6AYmSKC1+SbgwPZUB9
-	ND6uPjsk0kfdAruuwq3/wh1Rjs0ArDAhMxkfFj/YS8iPHgbV+WU3ZNU1TpzS2lZudY3arRUqlFEci
-	cTBYneIKtmDaXSHmf8SiUzDUr38H2kHgyB2twrVfSJjI8j7gHHEYPnP/kMnSC6DKRbJVivK8p4Gwg
-	DAHYRw4IH9o8iSK6l01mCSmN78jjq3othguu9t5gazmg9DloT8PSYrcPiVJlXhbtVri8zLPFnarWN
-	JC4zlJACV8FcZUWdwmtuPZnzOx5cHSZRXG9rOAnHMjIgXrXs+LP4m3XOp4BH0STFTfzldvCnTle1H
-	XRSE9/Lw==;
+	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
+	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rP+NZJSdMAUCrhmpmgiLvCOP7Z+FVOqs5gTXtI8IpWU=; b=pwhukHUJkptVYhk/7mJ/wQy1SE
+	ulrhnazPKrgrGSMvq/xnNHtH8aCk7R9kBOErlOtsdOkboxZvYdOzK+2EFFhVgN/SBxH8NtogqwhTr
+	vFwwAxgkrbkOhdpJWnivNzQjAMKp2XxBTtQk0SMbzwpW9hv7igOSWzJysOCBaDXYa1BJhIuhqc6hm
+	F+dJBOAlzGlExJ1XfHXx/BF+LUkmi/vDSOEBLFYJCjVU3AUORqHRown7MHDW7Rftl3ZN7MoHjpUsH
+	M5iPNcaoAiRhr3w7uYP+ct+kpWrHQGtX2c39KRGQORcGTtMBe1IbAmB/1PsDmST+4ITgsJ5i1SAZj
+	S6+TmzOw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8vXF-001LUW-2x;
-	Sun, 27 Apr 2025 14:30:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 14:30:41 +0800
-Date: Sun, 27 Apr 2025 14:30:41 +0800
-Message-Id: <cover.1745734678.git.herbert@gondor.apana.org.au>
+	id 1u8vXR-001LVY-1E;
+	Sun, 27 Apr 2025 14:30:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 14:30:53 +0800
+Date: Sun, 27 Apr 2025 14:30:53 +0800
+Message-Id: <df59c55070d5ea79f6c6c8c60ad155ec223b8fab.1745734678.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1745734678.git.herbert@gondor.apana.org.au>
+References: <cover.1745734678.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 00/13] Architecture-optimized SHA-256 library API
+Subject: [v2 PATCH 05/13] crypto: mips/sha256 - implement library instead of
+ shash
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org, linux-s390@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld " <Jason@zx2c4.com>, Linus Torvalds <torvalds@linux-foundation.org>
 Precedence: bulk
@@ -44,196 +47,252 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Changes in v2:
-- Rebase on top of lib partial block helper series.
-- Restore the block-only shash implementation of sha256.
-- Move the SIMD hardirq test out of the block functions so that
-  it is only done for the lib/crypto interface.
-- Split the lib/crypto sha256 module to break cycle in allmod build.
+From: Eric Biggers <ebiggers@google.com>
 
-This is based on
+Instead of providing crypto_shash algorithms for the arch-optimized
+SHA-256 code, instead implement the SHA-256 library.  This is much
+simpler, it makes the SHA-256 library functions be arch-optimized, and
+it fixes the longstanding issue where the arch-optimized SHA-256 was
+disabled by default.  SHA-256 still remains available through
+crypto_shash, but individual architectures no longer need to handle it.
 
-	https://patchwork.kernel.org/project/linux-crypto/list/?series=957415
-
-Original description:
-
-Following the example of several other algorithms (e.g. CRC32, ChaCha,
-Poly1305, BLAKE2s), this series refactors the kernel's existing
-architecture-optimized SHA-256 code to be available via the library API,
-instead of just via the crypto_shash API as it was before.  It also
-reimplements the SHA-256 crypto_shash API on top of the library API.
-
-This makes it possible to use the SHA-256 library in
-performance-critical cases.  The new design is also much simpler, with a
-negative diffstat of over 1200 lines.  Finally, this also fixes the
-longstanding issue where the arch-optimized SHA-256 was disabled by
-default, so people often forgot to enable it.
-
-For now the SHA-256 library is well-covered by the crypto_shash
-self-tests, but I plan to add a test for the library directly later.
-I've fully tested this series on arm, arm64, riscv, and x86.  On mips,
-powerpc, s390, and sparc I've only been able to partially test it, since
-QEMU does not support the SHA-256 instructions on those platforms.  If
-anyone with access to a mips, powerpc, s390, or sparc system that has
-SHA-256 instructions can verify that the crypto self-tests still pass,
-that would be appreciated.  But I don't expect any issues, especially
-since the new code is more straightforward than the old code.
-
-Eric Biggers (13):
-  crypto: sha256 - support arch-optimized lib and expose through shash
-  crypto: arm/sha256 - implement library instead of shash
-  crypto: arm64/sha256 - remove obsolete chunking logic
-  crypto: arm64/sha256 - implement library instead of shash
-  crypto: mips/sha256 - implement library instead of shash
-  crypto: powerpc/sha256 - implement library instead of shash
-  crypto: riscv/sha256 - implement library instead of shash
-  crypto: s390/sha256 - implement library instead of shash
-  crypto: sparc - move opcodes.h into asm directory
-  crypto: sparc/sha256 - implement library instead of shash
-  crypto: x86/sha256 - implement library instead of shash
-  crypto: sha256 - remove sha256_base.h
-  crypto: lib/sha256 - improve function prototypes
-
- arch/arm/configs/exynos_defconfig             |   1 -
- arch/arm/configs/milbeaut_m10v_defconfig      |   1 -
- arch/arm/configs/multi_v7_defconfig           |   1 -
- arch/arm/configs/omap2plus_defconfig          |   1 -
- arch/arm/configs/pxa_defconfig                |   1 -
- arch/arm/crypto/Kconfig                       |  21 -
- arch/arm/crypto/Makefile                      |   8 +-
- arch/arm/crypto/sha2-ce-glue.c                |  87 ----
- arch/arm/crypto/sha256_glue.c                 | 107 -----
- arch/arm/crypto/sha256_glue.h                 |   9 -
- arch/arm/crypto/sha256_neon_glue.c            |  75 ---
- arch/arm/lib/crypto/.gitignore                |   1 +
- arch/arm/lib/crypto/Kconfig                   |   7 +
- arch/arm/lib/crypto/Makefile                  |   8 +-
- arch/arm/{ => lib}/crypto/sha256-armv4.pl     |  20 +-
- .../sha2-ce-core.S => lib/crypto/sha256-ce.S} |  10 +-
- arch/arm/lib/crypto/sha256.c                  |  64 +++
- arch/arm64/configs/defconfig                  |   1 -
- arch/arm64/crypto/Kconfig                     |  19 -
- arch/arm64/crypto/Makefile                    |  13 +-
- arch/arm64/crypto/sha2-ce-glue.c              | 138 ------
- arch/arm64/crypto/sha256-glue.c               | 171 -------
- arch/arm64/crypto/sha512-glue.c               |   6 +-
- arch/arm64/lib/crypto/.gitignore              |   1 +
- arch/arm64/lib/crypto/Kconfig                 |   6 +
- arch/arm64/lib/crypto/Makefile                |   9 +-
- .../crypto/sha2-armv8.pl}                     |   2 +-
- .../sha2-ce-core.S => lib/crypto/sha256-ce.S} |  36 +-
- arch/arm64/lib/crypto/sha256.c                |  75 +++
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
  arch/mips/cavium-octeon/Kconfig               |   6 +
- .../mips/cavium-octeon/crypto/octeon-sha256.c | 139 ++----
+ .../mips/cavium-octeon/crypto/octeon-sha256.c | 139 ++++--------------
  arch/mips/configs/cavium_octeon_defconfig     |   1 -
- arch/mips/crypto/Kconfig                      |  10 -
- arch/powerpc/crypto/Kconfig                   |  11 -
- arch/powerpc/crypto/Makefile                  |   2 -
- arch/powerpc/crypto/sha256-spe-glue.c         | 128 ------
- arch/powerpc/lib/crypto/Kconfig               |   6 +
- arch/powerpc/lib/crypto/Makefile              |   3 +
- .../powerpc/{ => lib}/crypto/sha256-spe-asm.S |   0
- arch/powerpc/lib/crypto/sha256.c              |  70 +++
- arch/riscv/crypto/Kconfig                     |  11 -
- arch/riscv/crypto/Makefile                    |   3 -
- arch/riscv/crypto/sha256-riscv64-glue.c       | 125 -----
- arch/riscv/lib/crypto/Kconfig                 |   8 +
- arch/riscv/lib/crypto/Makefile                |   3 +
- .../sha256-riscv64-zvknha_or_zvknhb-zvkb.S    |   4 +-
- arch/riscv/lib/crypto/sha256.c                |  67 +++
- arch/s390/configs/debug_defconfig             |   1 -
- arch/s390/configs/defconfig                   |   1 -
- arch/s390/crypto/Kconfig                      |  10 -
- arch/s390/crypto/Makefile                     |   1 -
- arch/s390/crypto/sha256_s390.c                | 144 ------
- arch/s390/lib/crypto/Kconfig                  |   6 +
- arch/s390/lib/crypto/Makefile                 |   2 +
- arch/s390/lib/crypto/sha256.c                 |  47 ++
- arch/sparc/crypto/Kconfig                     |  10 -
- arch/sparc/crypto/Makefile                    |   2 -
- arch/sparc/crypto/aes_asm.S                   |   3 +-
- arch/sparc/crypto/aes_glue.c                  |   3 +-
- arch/sparc/crypto/camellia_asm.S              |   3 +-
- arch/sparc/crypto/camellia_glue.c             |   3 +-
- arch/sparc/crypto/des_asm.S                   |   3 +-
- arch/sparc/crypto/des_glue.c                  |   3 +-
- arch/sparc/crypto/md5_asm.S                   |   3 +-
- arch/sparc/crypto/md5_glue.c                  |   3 +-
- arch/sparc/crypto/sha1_asm.S                  |   3 +-
- arch/sparc/crypto/sha1_glue.c                 |   3 +-
- arch/sparc/crypto/sha256_glue.c               | 129 ------
- arch/sparc/crypto/sha512_asm.S                |   3 +-
- arch/sparc/crypto/sha512_glue.c               |   3 +-
- arch/sparc/{crypto => include/asm}/opcodes.h  |   6 +-
- arch/sparc/lib/Makefile                       |   1 +
- arch/sparc/lib/crc32c_asm.S                   |   3 +-
- arch/sparc/lib/crypto/Kconfig                 |   8 +
- arch/sparc/lib/crypto/Makefile                |   4 +
- arch/sparc/lib/crypto/sha256.c                |  64 +++
- arch/sparc/{ => lib}/crypto/sha256_asm.S      |   5 +-
- arch/x86/crypto/Kconfig                       |  14 -
- arch/x86/crypto/Makefile                      |   3 -
- arch/x86/crypto/sha256_ssse3_glue.c           | 432 ------------------
- arch/x86/lib/crypto/Kconfig                   |   8 +
- arch/x86/lib/crypto/Makefile                  |   3 +
- arch/x86/{ => lib}/crypto/sha256-avx-asm.S    |  12 +-
- arch/x86/{ => lib}/crypto/sha256-avx2-asm.S   |  12 +-
- .../crypto/sha256-ni-asm.S}                   |  36 +-
- arch/x86/{ => lib}/crypto/sha256-ssse3-asm.S  |  14 +-
- arch/x86/lib/crypto/sha256.c                  |  80 ++++
- arch/x86/purgatory/Makefile                   |   3 -
- arch/x86/purgatory/sha256.c                   |  15 +
- crypto/Kconfig                                |   1 +
- crypto/Makefile                               |   3 +-
- crypto/sha256.c                               | 198 ++++++++
- crypto/sha256_generic.c                       | 102 -----
- include/crypto/internal/sha2.h                |  75 +++
- include/crypto/sha2.h                         |  23 +-
- include/crypto/sha256_base.h                  | 148 ------
- lib/crypto/Kconfig                            |  30 ++
- lib/crypto/Makefile                           |   1 +
- lib/crypto/sha256-generic.c                   | 139 ++++++
- lib/crypto/sha256.c                           | 150 ++----
- 100 files changed, 1165 insertions(+), 2313 deletions(-)
- delete mode 100644 arch/arm/crypto/sha2-ce-glue.c
- delete mode 100644 arch/arm/crypto/sha256_glue.c
- delete mode 100644 arch/arm/crypto/sha256_glue.h
- delete mode 100644 arch/arm/crypto/sha256_neon_glue.c
- rename arch/arm/{ => lib}/crypto/sha256-armv4.pl (97%)
- rename arch/arm/{crypto/sha2-ce-core.S => lib/crypto/sha256-ce.S} (91%)
- create mode 100644 arch/arm/lib/crypto/sha256.c
- delete mode 100644 arch/arm64/crypto/sha2-ce-glue.c
- delete mode 100644 arch/arm64/crypto/sha256-glue.c
- rename arch/arm64/{crypto/sha512-armv8.pl => lib/crypto/sha2-armv8.pl} (99%)
- rename arch/arm64/{crypto/sha2-ce-core.S => lib/crypto/sha256-ce.S} (80%)
- create mode 100644 arch/arm64/lib/crypto/sha256.c
- delete mode 100644 arch/powerpc/crypto/sha256-spe-glue.c
- rename arch/powerpc/{ => lib}/crypto/sha256-spe-asm.S (100%)
- create mode 100644 arch/powerpc/lib/crypto/sha256.c
- delete mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
- rename arch/riscv/{ => lib}/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S (98%)
- create mode 100644 arch/riscv/lib/crypto/sha256.c
- delete mode 100644 arch/s390/crypto/sha256_s390.c
- create mode 100644 arch/s390/lib/crypto/sha256.c
- delete mode 100644 arch/sparc/crypto/sha256_glue.c
- rename arch/sparc/{crypto => include/asm}/opcodes.h (96%)
- create mode 100644 arch/sparc/lib/crypto/Kconfig
- create mode 100644 arch/sparc/lib/crypto/Makefile
- create mode 100644 arch/sparc/lib/crypto/sha256.c
- rename arch/sparc/{ => lib}/crypto/sha256_asm.S (95%)
- delete mode 100644 arch/x86/crypto/sha256_ssse3_glue.c
- rename arch/x86/{ => lib}/crypto/sha256-avx-asm.S (98%)
- rename arch/x86/{ => lib}/crypto/sha256-avx2-asm.S (98%)
- rename arch/x86/{crypto/sha256_ni_asm.S => lib/crypto/sha256-ni-asm.S} (85%)
- rename arch/x86/{ => lib}/crypto/sha256-ssse3-asm.S (98%)
- create mode 100644 arch/x86/lib/crypto/sha256.c
- create mode 100644 arch/x86/purgatory/sha256.c
- create mode 100644 crypto/sha256.c
- delete mode 100644 crypto/sha256_generic.c
- create mode 100644 include/crypto/internal/sha2.h
- delete mode 100644 include/crypto/sha256_base.h
- create mode 100644 lib/crypto/sha256-generic.c
+ arch/mips/crypto/Kconfig                      |  10 --
+ 4 files changed, 35 insertions(+), 121 deletions(-)
 
+diff --git a/arch/mips/cavium-octeon/Kconfig b/arch/mips/cavium-octeon/Kconfig
+index 450e979ef5d9..11f4aa6e80e9 100644
+--- a/arch/mips/cavium-octeon/Kconfig
++++ b/arch/mips/cavium-octeon/Kconfig
+@@ -23,6 +23,12 @@ config CAVIUM_OCTEON_CVMSEG_SIZE
+ 	  legally range is from zero to 54 cache blocks (i.e. CVMSEG LM is
+ 	  between zero and 6192 bytes).
+ 
++config CRYPTO_SHA256_OCTEON
++	tristate
++	default CRYPTO_LIB_SHA256
++	select CRYPTO_ARCH_HAVE_LIB_SHA256
++	select CRYPTO_LIB_SHA256_GENERIC
++
+ endif # CPU_CAVIUM_OCTEON
+ 
+ if CAVIUM_OCTEON_SOC
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-sha256.c b/arch/mips/cavium-octeon/crypto/octeon-sha256.c
+index 8e85ea65387c..f93faaf1f4af 100644
+--- a/arch/mips/cavium-octeon/crypto/octeon-sha256.c
++++ b/arch/mips/cavium-octeon/crypto/octeon-sha256.c
+@@ -1,8 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+- * Cryptographic API.
+- *
+- * SHA-224 and SHA-256 Secure Hash Algorithm.
++ * SHA-256 Secure Hash Algorithm.
+  *
+  * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
+  *
+@@ -15,9 +13,7 @@
+  */
+ 
+ #include <asm/octeon/octeon.h>
+-#include <crypto/internal/hash.h>
+-#include <crypto/sha2.h>
+-#include <crypto/sha256_base.h>
++#include <crypto/internal/sha2.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ 
+@@ -27,31 +23,24 @@
+  * We pass everything as 64-bit. OCTEON can handle misaligned data.
+  */
+ 
+-static void octeon_sha256_store_hash(struct crypto_sha256_state *sctx)
++void sha256_blocks_arch(u32 state[SHA256_STATE_WORDS],
++			const u8 *data, size_t nblocks)
+ {
+-	u64 *hash = (u64 *)sctx->state;
++	struct octeon_cop2_state cop2_state;
++	u64 *state64 = (u64 *)state;
++	unsigned long flags;
+ 
+-	write_octeon_64bit_hash_dword(hash[0], 0);
+-	write_octeon_64bit_hash_dword(hash[1], 1);
+-	write_octeon_64bit_hash_dword(hash[2], 2);
+-	write_octeon_64bit_hash_dword(hash[3], 3);
+-}
++	if (!octeon_has_crypto())
++		return sha256_blocks_generic(state, data, nblocks);
+ 
+-static void octeon_sha256_read_hash(struct crypto_sha256_state *sctx)
+-{
+-	u64 *hash = (u64 *)sctx->state;
++	flags = octeon_crypto_enable(&cop2_state);
++	write_octeon_64bit_hash_dword(state64[0], 0);
++	write_octeon_64bit_hash_dword(state64[1], 1);
++	write_octeon_64bit_hash_dword(state64[2], 2);
++	write_octeon_64bit_hash_dword(state64[3], 3);
+ 
+-	hash[0] = read_octeon_64bit_hash_dword(0);
+-	hash[1] = read_octeon_64bit_hash_dword(1);
+-	hash[2] = read_octeon_64bit_hash_dword(2);
+-	hash[3] = read_octeon_64bit_hash_dword(3);
+-}
+-
+-static void octeon_sha256_transform(struct crypto_sha256_state *sctx,
+-				    const u8 *src, int blocks)
+-{
+ 	do {
+-		const u64 *block = (const u64 *)src;
++		const u64 *block = (const u64 *)data;
+ 
+ 		write_octeon_64bit_block_dword(block[0], 0);
+ 		write_octeon_64bit_block_dword(block[1], 1);
+@@ -62,93 +51,23 @@ static void octeon_sha256_transform(struct crypto_sha256_state *sctx,
+ 		write_octeon_64bit_block_dword(block[6], 6);
+ 		octeon_sha256_start(block[7]);
+ 
+-		src += SHA256_BLOCK_SIZE;
+-	} while (--blocks);
+-}
++		data += SHA256_BLOCK_SIZE;
++	} while (--nblocks);
+ 
+-static int octeon_sha256_update(struct shash_desc *desc, const u8 *data,
+-				unsigned int len)
++	state64[0] = read_octeon_64bit_hash_dword(0);
++	state64[1] = read_octeon_64bit_hash_dword(1);
++	state64[2] = read_octeon_64bit_hash_dword(2);
++	state64[3] = read_octeon_64bit_hash_dword(3);
++	octeon_crypto_disable(&cop2_state, flags);
++}
++EXPORT_SYMBOL_GPL(sha256_blocks_arch);
++
++bool sha256_is_arch_optimized(void)
+ {
+-	struct crypto_sha256_state *sctx = shash_desc_ctx(desc);
+-	struct octeon_cop2_state state;
+-	unsigned long flags;
+-	int remain;
+-
+-	flags = octeon_crypto_enable(&state);
+-	octeon_sha256_store_hash(sctx);
+-
+-	remain = sha256_base_do_update_blocks(desc, data, len,
+-					      octeon_sha256_transform);
+-
+-	octeon_sha256_read_hash(sctx);
+-	octeon_crypto_disable(&state, flags);
+-	return remain;
++	return octeon_has_crypto();
+ }
+-
+-static int octeon_sha256_finup(struct shash_desc *desc, const u8 *src,
+-			       unsigned int len, u8 *out)
+-{
+-	struct crypto_sha256_state *sctx = shash_desc_ctx(desc);
+-	struct octeon_cop2_state state;
+-	unsigned long flags;
+-
+-	flags = octeon_crypto_enable(&state);
+-	octeon_sha256_store_hash(sctx);
+-
+-	sha256_base_do_finup(desc, src, len, octeon_sha256_transform);
+-
+-	octeon_sha256_read_hash(sctx);
+-	octeon_crypto_disable(&state, flags);
+-	return sha256_base_finish(desc, out);
+-}
+-
+-static struct shash_alg octeon_sha256_algs[2] = { {
+-	.digestsize	=	SHA256_DIGEST_SIZE,
+-	.init		=	sha256_base_init,
+-	.update		=	octeon_sha256_update,
+-	.finup		=	octeon_sha256_finup,
+-	.descsize	=	sizeof(struct crypto_sha256_state),
+-	.base		=	{
+-		.cra_name	=	"sha256",
+-		.cra_driver_name=	"octeon-sha256",
+-		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
+-		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
+-		.cra_blocksize	=	SHA256_BLOCK_SIZE,
+-		.cra_module	=	THIS_MODULE,
+-	}
+-}, {
+-	.digestsize	=	SHA224_DIGEST_SIZE,
+-	.init		=	sha224_base_init,
+-	.update		=	octeon_sha256_update,
+-	.finup		=	octeon_sha256_finup,
+-	.descsize	=	sizeof(struct crypto_sha256_state),
+-	.base		=	{
+-		.cra_name	=	"sha224",
+-		.cra_driver_name=	"octeon-sha224",
+-		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
+-		.cra_flags	=	CRYPTO_AHASH_ALG_BLOCK_ONLY,
+-		.cra_blocksize	=	SHA224_BLOCK_SIZE,
+-		.cra_module	=	THIS_MODULE,
+-	}
+-} };
+-
+-static int __init octeon_sha256_mod_init(void)
+-{
+-	if (!octeon_has_crypto())
+-		return -ENOTSUPP;
+-	return crypto_register_shashes(octeon_sha256_algs,
+-				       ARRAY_SIZE(octeon_sha256_algs));
+-}
+-
+-static void __exit octeon_sha256_mod_fini(void)
+-{
+-	crypto_unregister_shashes(octeon_sha256_algs,
+-				  ARRAY_SIZE(octeon_sha256_algs));
+-}
+-
+-module_init(octeon_sha256_mod_init);
+-module_exit(octeon_sha256_mod_fini);
++EXPORT_SYMBOL_GPL(sha256_is_arch_optimized);
+ 
+ MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm (OCTEON)");
++MODULE_DESCRIPTION("SHA-256 Secure Hash Algorithm (OCTEON)");
+ MODULE_AUTHOR("Aaro Koskinen <aaro.koskinen@iki.fi>");
+diff --git a/arch/mips/configs/cavium_octeon_defconfig b/arch/mips/configs/cavium_octeon_defconfig
+index f523ee6f25bf..88ae0aa85364 100644
+--- a/arch/mips/configs/cavium_octeon_defconfig
++++ b/arch/mips/configs/cavium_octeon_defconfig
+@@ -157,7 +157,6 @@ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_MD5_OCTEON=y
+ CONFIG_CRYPTO_SHA1_OCTEON=m
+-CONFIG_CRYPTO_SHA256_OCTEON=m
+ CONFIG_CRYPTO_SHA512_OCTEON=m
+ CONFIG_CRYPTO_DES=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
+index 9db1fd6d9f0e..6bf073ae7613 100644
+--- a/arch/mips/crypto/Kconfig
++++ b/arch/mips/crypto/Kconfig
+@@ -22,16 +22,6 @@ config CRYPTO_SHA1_OCTEON
+ 
+ 	  Architecture: mips OCTEON
+ 
+-config CRYPTO_SHA256_OCTEON
+-	tristate "Hash functions: SHA-224 and SHA-256 (OCTEON)"
+-	depends on CPU_CAVIUM_OCTEON
+-	select CRYPTO_SHA256
+-	select CRYPTO_HASH
+-	help
+-	  SHA-224 and SHA-256 secure hash algorithms (FIPS 180)
+-
+-	  Architecture: mips OCTEON using crypto instructions, when available
+-
+ config CRYPTO_SHA512_OCTEON
+ 	tristate "Hash functions: SHA-384 and SHA-512 (OCTEON)"
+ 	depends on CPU_CAVIUM_OCTEON
 -- 
 2.39.5
 
