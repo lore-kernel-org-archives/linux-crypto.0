@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CB37E9
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EB52629C
+	for <linux-crypto@vger.kernel.org>; Sun, 27 Apr 2025 01:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745715619; cv=none; b=kzBHEr4KN46RB88lWBMgrLcZl1WuK85soLFH5JxG3M946IIx2u/QdgV6cHBt9JKwjwxC6e4CUR0y5YhXzO+yfH7U9zk+MVgM8SbVo3SvBYTBqPuZDdU797gMVwk5QVv4QCj9j6htJ+94nq/LCMjLltud6v8den38ZHJNp27MXy4=
+	t=1745715621; cv=none; b=P0ajttFHyNJJfIl/A/SGu/GCySINPHzcyNLSIPUFACHoXqgptrmgyCQaIdqAibdjJ+0AM0p02kY44oj9vaAp2a3OQr2HgOUBMEWcwCXHtGk+4lwHI0/K5Ewj2d7AlLGrOmXThb0FDQQqjjsugrPwFKR/bD+ODeoLnU4iJds9dPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745715619; c=relaxed/simple;
-	bh=gFDaWU2hJrMuAwJEO+WZsrrmUC48ymN1Q2mpg6//LW8=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=dMZdq9SW2zFL451S0h09asqgf3RZ4eD2MGNl2yVR4fnkZaCBiYdAkZurpQU0kvYXFmyLDFe5R0ItDDbLuC8b/Phmj8ls1CS7G27d7sV5RWbu+pOGcGPmccU0/+o7FBoyLgTWrWesvoCyJ25k0jOnmHEVGmR35kkmpb5K1hwkXKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Kt6Y7oq2; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745715621; c=relaxed/simple;
+	bh=mpQhYhnY/3FMu1IP0byDJFsigEkYqSBRBUECJhejk+E=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=csveaQJ4lvCmZWDRFI1zeYIRQdFiWyZdX4ZgvYcyPLUnnWt73f/4nBJxetz4TdcShg5vKnRRdOTEmaP9isWPjBsMTIoYWMHOkmT39Fx0UnVw9faXtvu5sdMrx2b/PhqIOoPM0Hyby6KBua/zWbX1bFuln28Bt492J4+ateAevJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=iIPyCyQW; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Kt6Y7oq2"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="iIPyCyQW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=UiYCkScihZICtMn0+xj8oA0rXCmJg83l75mteihl5jA=; b=Kt6Y7oq2agDZgl7Yu863FTIuY3
-	7JVnt1tuqIUYP5ST8GGLEdHuG2qAmT86GaBcSFKFmMAypMG75AkIqhZPnoiopVk9/cdDqTCvJR9bD
-	h3D4QvTFxWf++9wj7eHdSHolpbLgTqDPotN0UxgXhJR9DCpKv9u5HaMaDgjSPw0vf2ufgDQABy4Ou
-	foXqD70H/u+3c7dj/WR6gsUQRTo5HX1eddimVD1mtLAiqKb7pvWsFtAuPx9V0v4ulLqHSnzT2sTsx
-	6RJvy2FvsDgZqc1SKvh2xAd0MuxqIPbaKMWZ/5TggrlMrbDN5MP7cixTK+nqjOVudl1PQIUOMZE3F
-	kL0b3ngg==;
+	bh=0rog3zcGLNQ/vv+Rih0aLedD2DdiDVav3CaqUpzdBeM=; b=iIPyCyQW5leq2DW9Uir0GpQlmI
+	K6wHAZEnlpO84sQ0DWd77mcr4tquSC+ayFw6kmnWA+PFV/dGtUXx7zHVIxfMr0sdPi4hIOq5y9hpa
+	DAI7Djy2XOz4aTVprLS67Jv94hyXci6K1aexTd10SWwt8lgKsxvajFaCKXV8wAVFHidGyvCcOeeI9
+	U+ygOXj//Zk4z80IaqVbT4xaE43qFq1dOlmw6oNY5dZ8WNv/j48EkPqSlo87LtIecsEu7FoiyRJWG
+	49oK16nuTyQhi73jHphke2qt8R8tlK4ZburE+CPoWvv/WWEUbgXAvr8IXEqzfEoOxh19ZUFo2TB4I
+	EHJIyhjQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u8qNQ-001JII-37;
-	Sun, 27 Apr 2025 09:00:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 09:00:12 +0800
-Date: Sun, 27 Apr 2025 09:00:12 +0800
-Message-Id: <8fd4d593d2a04e190655b3509a04b44e5aa9de14.1745714715.git.herbert@gondor.apana.org.au>
+	id 1u8qNT-001JIT-0s;
+	Sun, 27 Apr 2025 09:00:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 27 Apr 2025 09:00:15 +0800
+Date: Sun, 27 Apr 2025 09:00:15 +0800
+Message-Id: <010c608388d073491d22ed2378d7d1c5e384ddc4.1745714715.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1745714715.git.herbert@gondor.apana.org.au>
 References: <cover.1745714715.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 07/11] crypto: x86/poly1305 - Add block-only interface
+Subject: [v2 PATCH 08/11] crypto: chacha20poly1305 - Use lib/crypto poly1305
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,305 +45,503 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Add block-only interface.
+Since the poly1305 algorithm is fixed, there is no point in going
+through the Crypto API for it.  Use the lib/crypto poly1305 interface
+instead.
 
-Also remove the unnecessary SIMD fallback path.
+For compatiblity keep the poly1305 parameter in the algorithm name.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- .../lib/crypto/poly1305-x86_64-cryptogams.pl  |  33 +++--
- arch/x86/lib/crypto/poly1305_glue.c           | 125 +++++++-----------
- 2 files changed, 71 insertions(+), 87 deletions(-)
+ crypto/Kconfig            |   2 +-
+ crypto/chacha20poly1305.c | 323 ++++++++------------------------------
+ 2 files changed, 67 insertions(+), 258 deletions(-)
 
-diff --git a/arch/x86/lib/crypto/poly1305-x86_64-cryptogams.pl b/arch/x86/lib/crypto/poly1305-x86_64-cryptogams.pl
-index 409ec6955733..501827254fed 100644
---- a/arch/x86/lib/crypto/poly1305-x86_64-cryptogams.pl
-+++ b/arch/x86/lib/crypto/poly1305-x86_64-cryptogams.pl
-@@ -118,6 +118,19 @@ sub declare_function() {
- 	}
- }
- 
-+sub declare_typed_function() {
-+	my ($name, $align, $nargs) = @_;
-+	if($kernel) {
-+		$code .= "SYM_TYPED_FUNC_START($name)\n";
-+		$code .= ".L$name:\n";
-+	} else {
-+		$code .= ".globl	$name\n";
-+		$code .= ".type	$name,\@function,$nargs\n";
-+		$code .= ".align	$align\n";
-+		$code .= "$name:\n";
-+	}
-+}
-+
- sub end_function() {
- 	my ($name) = @_;
- 	if($kernel) {
-@@ -128,7 +141,7 @@ sub end_function() {
- }
- 
- $code.=<<___ if $kernel;
--#include <linux/linkage.h>
-+#include <linux/cfi_types.h>
- ___
- 
- if ($avx) {
-@@ -236,14 +249,14 @@ ___
- $code.=<<___ if (!$kernel);
- .extern	OPENSSL_ia32cap_P
- 
--.globl	poly1305_init_x86_64
--.hidden	poly1305_init_x86_64
-+.globl	poly1305_block_init_arch
-+.hidden	poly1305_block_init_arch
- .globl	poly1305_blocks_x86_64
- .hidden	poly1305_blocks_x86_64
- .globl	poly1305_emit_x86_64
- .hidden	poly1305_emit_x86_64
- ___
--&declare_function("poly1305_init_x86_64", 32, 3);
-+&declare_typed_function("poly1305_block_init_arch", 32, 3);
- $code.=<<___;
- 	xor	%eax,%eax
- 	mov	%rax,0($ctx)		# initialize hash value
-@@ -298,7 +311,7 @@ $code.=<<___;
- .Lno_key:
- 	RET
- ___
--&end_function("poly1305_init_x86_64");
-+&end_function("poly1305_block_init_arch");
- 
- &declare_function("poly1305_blocks_x86_64", 32, 4);
- $code.=<<___;
-@@ -4105,9 +4118,9 @@ avx_handler:
- 
- .section	.pdata
- .align	4
--	.rva	.LSEH_begin_poly1305_init_x86_64
--	.rva	.LSEH_end_poly1305_init_x86_64
--	.rva	.LSEH_info_poly1305_init_x86_64
-+	.rva	.LSEH_begin_poly1305_block_init_arch
-+	.rva	.LSEH_end_poly1305_block_init_arch
-+	.rva	.LSEH_info_poly1305_block_init_arch
- 
- 	.rva	.LSEH_begin_poly1305_blocks_x86_64
- 	.rva	.LSEH_end_poly1305_blocks_x86_64
-@@ -4155,10 +4168,10 @@ ___
- $code.=<<___;
- .section	.xdata
- .align	8
--.LSEH_info_poly1305_init_x86_64:
-+.LSEH_info_poly1305_block_init_arch:
- 	.byte	9,0,0,0
- 	.rva	se_handler
--	.rva	.LSEH_begin_poly1305_init_x86_64,.LSEH_begin_poly1305_init_x86_64
-+	.rva	.LSEH_begin_poly1305_block_init_arch,.LSEH_begin_poly1305_block_init_arch
- 
- .LSEH_info_poly1305_blocks_x86_64:
- 	.byte	9,0,0,0
-diff --git a/arch/x86/lib/crypto/poly1305_glue.c b/arch/x86/lib/crypto/poly1305_glue.c
-index cff35ca5822a..d98764ec3b47 100644
---- a/arch/x86/lib/crypto/poly1305_glue.c
-+++ b/arch/x86/lib/crypto/poly1305_glue.c
-@@ -3,34 +3,15 @@
-  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-  */
- 
--#include <crypto/internal/simd.h>
--#include <crypto/poly1305.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/fpu/api.h>
-+#include <crypto/internal/poly1305.h>
- #include <linux/jump_label.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 9878286d1d68..f87e2a26d2dd 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -784,8 +784,8 @@ config CRYPTO_AEGIS128_SIMD
+ config CRYPTO_CHACHA20POLY1305
+ 	tristate "ChaCha20-Poly1305"
+ 	select CRYPTO_CHACHA20
+-	select CRYPTO_POLY1305
+ 	select CRYPTO_AEAD
++	select CRYPTO_LIB_POLY1305
+ 	select CRYPTO_MANAGER
+ 	help
+ 	  ChaCha20 stream cipher and Poly1305 authenticator combined
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index d740849f1c19..b29f66ba1e2f 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -12,36 +12,23 @@
+ #include <crypto/chacha.h>
+ #include <crypto/poly1305.h>
+ #include <linux/err.h>
+-#include <linux/init.h>
  #include <linux/kernel.h>
++#include <linux/mm.h>
  #include <linux/module.h>
- #include <linux/sizes.h>
 +#include <linux/string.h>
- #include <linux/unaligned.h>
--#include <asm/cpu_device_id.h>
--#include <asm/simd.h>
--
--asmlinkage void poly1305_init_x86_64(void *ctx,
--				     const u8 key[POLY1305_BLOCK_SIZE]);
--asmlinkage void poly1305_blocks_x86_64(void *ctx, const u8 *inp,
--				       const size_t len, const u32 padbit);
--asmlinkage void poly1305_emit_x86_64(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
--				     const u32 nonce[4]);
--asmlinkage void poly1305_emit_avx(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
--				  const u32 nonce[4]);
--asmlinkage void poly1305_blocks_avx(void *ctx, const u8 *inp, const size_t len,
--				    const u32 padbit);
--asmlinkage void poly1305_blocks_avx2(void *ctx, const u8 *inp, const size_t len,
--				     const u32 padbit);
--asmlinkage void poly1305_blocks_avx512(void *ctx, const u8 *inp,
--				       const size_t len, const u32 padbit);
--
--static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx);
--static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx2);
--static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx512);
  
- struct poly1305_arch_internal {
- 	union {
-@@ -45,64 +26,50 @@ struct poly1305_arch_internal {
- 	struct { u32 r2, r1, r4, r3; } rn[9];
+ struct chachapoly_instance_ctx {
+ 	struct crypto_skcipher_spawn chacha;
+-	struct crypto_ahash_spawn poly;
+ 	unsigned int saltlen;
  };
  
--/* The AVX code uses base 2^26, while the scalar code uses base 2^64. If we hit
-- * the unfortunate situation of using AVX and then having to go back to scalar
-- * -- because the user is silly and has called the update function from two
-- * separate contexts -- then we need to convert back to the original base before
-- * proceeding. It is possible to reason that the initial reduction below is
-- * sufficient given the implementation invariants. However, for an avoidance of
-- * doubt and because this is not performance critical, we do the full reduction
-- * anyway. Z3 proof of below function: https://xn--4db.cc/ltPtHCKN/py
-- */
--static void convert_to_base2_64(void *ctx)
-+asmlinkage void poly1305_block_init_arch(
-+	struct poly1305_block_state *state,
-+	const u8 raw_key[POLY1305_BLOCK_SIZE]);
-+EXPORT_SYMBOL_GPL(poly1305_block_init_arch);
-+asmlinkage void poly1305_blocks_x86_64(struct poly1305_arch_internal *ctx,
-+				       const u8 *inp,
-+				       const size_t len, const u32 padbit);
-+asmlinkage void poly1305_emit_x86_64(const struct poly1305_state *ctx,
-+				     u8 mac[POLY1305_DIGEST_SIZE],
-+				     const u32 nonce[4]);
-+asmlinkage void poly1305_emit_avx(const struct poly1305_state *ctx,
-+				  u8 mac[POLY1305_DIGEST_SIZE],
-+				  const u32 nonce[4]);
-+asmlinkage void poly1305_blocks_avx(struct poly1305_arch_internal *ctx,
-+				    const u8 *inp, const size_t len,
-+				    const u32 padbit);
-+asmlinkage void poly1305_blocks_avx2(struct poly1305_arch_internal *ctx,
-+				     const u8 *inp, const size_t len,
-+				     const u32 padbit);
-+asmlinkage void poly1305_blocks_avx512(struct poly1305_arch_internal *ctx,
-+				       const u8 *inp,
-+				       const size_t len, const u32 padbit);
-+
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx);
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx2);
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx512);
-+
-+void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *inp,
-+			  unsigned int len, u32 padbit)
- {
--	struct poly1305_arch_internal *state = ctx;
--	u32 cy;
+ struct chachapoly_ctx {
+ 	struct crypto_skcipher *chacha;
+-	struct crypto_ahash *poly;
+ 	/* key bytes we use for the ChaCha20 IV */
+ 	unsigned int saltlen;
+ 	u8 salt[] __counted_by(saltlen);
+ };
+ 
+-struct poly_req {
+-	/* zero byte padding for AD/ciphertext, as needed */
+-	u8 pad[POLY1305_BLOCK_SIZE];
+-	/* tail data with AD/ciphertext lengths */
+-	struct {
+-		__le64 assoclen;
+-		__le64 cryptlen;
+-	} tail;
+-	struct scatterlist src[1];
+-	struct ahash_request req; /* must be last member */
+-};
 -
--	if (!state->is_base2_26)
--		return;
+ struct chacha_req {
+ 	u8 iv[CHACHA_IV_SIZE];
+ 	struct scatterlist src[1];
+@@ -62,7 +49,6 @@ struct chachapoly_req_ctx {
+ 	/* request flags, with MAY_SLEEP cleared if needed */
+ 	u32 flags;
+ 	union {
+-		struct poly_req poly;
+ 		struct chacha_req chacha;
+ 	} u;
+ };
+@@ -105,16 +91,6 @@ static int poly_verify_tag(struct aead_request *req)
+ 	return 0;
+ }
+ 
+-static int poly_copy_tag(struct aead_request *req)
+-{
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
 -
--	cy = state->h[0] >> 26; state->h[0] &= 0x3ffffff; state->h[1] += cy;
--	cy = state->h[1] >> 26; state->h[1] &= 0x3ffffff; state->h[2] += cy;
--	cy = state->h[2] >> 26; state->h[2] &= 0x3ffffff; state->h[3] += cy;
--	cy = state->h[3] >> 26; state->h[3] &= 0x3ffffff; state->h[4] += cy;
--	state->hs[0] = ((u64)state->h[2] << 52) | ((u64)state->h[1] << 26) | state->h[0];
--	state->hs[1] = ((u64)state->h[4] << 40) | ((u64)state->h[3] << 14) | (state->h[2] >> 12);
--	state->hs[2] = state->h[4] >> 24;
--#define ULT(a, b) ((a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(a) * 8 - 1))
--	cy = (state->hs[2] >> 2) + (state->hs[2] & ~3ULL);
--	state->hs[2] &= 3;
--	state->hs[0] += cy;
--	state->hs[1] += (cy = ULT(state->hs[0], cy));
--	state->hs[2] += ULT(state->hs[1], cy);
--#undef ULT
--	state->is_base2_26 = 0;
+-	scatterwalk_map_and_copy(rctx->tag, req->dst,
+-				 req->assoclen + rctx->cryptlen,
+-				 sizeof(rctx->tag), 1);
+-	return 0;
 -}
 -
--static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_BLOCK_SIZE])
+ static void chacha_decrypt_done(void *data, int err)
+ {
+ 	async_done_continue(data, err, poly_verify_tag);
+@@ -151,210 +127,76 @@ static int chacha_decrypt(struct aead_request *req)
+ 	return poly_verify_tag(req);
+ }
+ 
+-static int poly_tail_continue(struct aead_request *req)
++static int poly_hash(struct aead_request *req)
+ {
+ 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
++	const void *zp = page_address(ZERO_PAGE(0));
++	struct scatterlist *sg = req->src;
++	struct poly1305_desc_ctx desc;
++	struct scatter_walk walk;
++	struct {
++		union {
++			struct {
++				__le64 assoclen;
++				__le64 cryptlen;
++			};
++			u8 u8[16];
++		};
++	} tail;
++	unsigned int padlen;
++	unsigned int total;
++
++	if (sg != req->dst)
++		memcpy_sglist(req->dst, sg, req->assoclen);
+ 
+ 	if (rctx->cryptlen == req->cryptlen) /* encrypting */
+-		return poly_copy_tag(req);
++		sg = req->dst;
+ 
+-	return chacha_decrypt(req);
+-}
++	poly1305_init(&desc, rctx->key);
++	scatterwalk_start(&walk, sg);
+ 
+-static void poly_tail_done(void *data, int err)
 -{
--	poly1305_init_x86_64(ctx, key);
+-	async_done_continue(data, err, poly_tail_continue);
+-}
++	total = rctx->assoclen;
++	while (total) {
++		unsigned int n = scatterwalk_next(&walk, total);
+ 
+-static int poly_tail(struct aead_request *req)
+-{
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	int err;
+-
+-	preq->tail.assoclen = cpu_to_le64(rctx->assoclen);
+-	preq->tail.cryptlen = cpu_to_le64(rctx->cryptlen);
+-	sg_init_one(preq->src, &preq->tail, sizeof(preq->tail));
+-
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_tail_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, preq->src,
+-				rctx->tag, sizeof(preq->tail));
+-
+-	err = crypto_ahash_finup(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_tail_continue(req);
 -}
 -
--static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
--				 const u32 padbit)
+-static void poly_cipherpad_done(void *data, int err)
 -{
--	struct poly1305_arch_internal *state = ctx;
-+	struct poly1305_arch_internal *ctx =
-+		container_of(&state->h.h, struct poly1305_arch_internal, h);
+-	async_done_continue(data, err, poly_tail);
+-}
+-
+-static int poly_cipherpad(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	unsigned int padlen;
+-	int err;
+-
+-	padlen = -rctx->cryptlen % POLY1305_BLOCK_SIZE;
+-	memset(preq->pad, 0, sizeof(preq->pad));
+-	sg_init_one(preq->src, preq->pad, padlen);
+-
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_cipherpad_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, preq->src, NULL, padlen);
+-
+-	err = crypto_ahash_update(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_tail(req);
+-}
+-
+-static void poly_cipher_done(void *data, int err)
+-{
+-	async_done_continue(data, err, poly_cipherpad);
+-}
+-
+-static int poly_cipher(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	struct scatterlist *crypt = req->src;
+-	int err;
+-
+-	if (rctx->cryptlen == req->cryptlen) /* encrypting */
+-		crypt = req->dst;
+-
+-	crypt = scatterwalk_ffwd(rctx->src, crypt, req->assoclen);
+-
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_cipher_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, crypt, NULL, rctx->cryptlen);
+-
+-	err = crypto_ahash_update(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_cipherpad(req);
+-}
+-
+-static void poly_adpad_done(void *data, int err)
+-{
+-	async_done_continue(data, err, poly_cipher);
+-}
+-
+-static int poly_adpad(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	unsigned int padlen;
+-	int err;
++		poly1305_update(&desc, walk.addr, n);
++		scatterwalk_done_src(&walk, n);
++		total -= n;
++	}
  
- 	/* SIMD disables preemption, so relax after processing each page. */
- 	BUILD_BUG_ON(SZ_4K < POLY1305_BLOCK_SIZE ||
- 		     SZ_4K % POLY1305_BLOCK_SIZE);
+ 	padlen = -rctx->assoclen % POLY1305_BLOCK_SIZE;
+-	memset(preq->pad, 0, sizeof(preq->pad));
+-	sg_init_one(preq->src, preq->pad, padlen);
++	poly1305_update(&desc, zp, padlen);
  
--	if (!static_branch_likely(&poly1305_use_avx) ||
--	    (len < (POLY1305_BLOCK_SIZE * 18) && !state->is_base2_26) ||
--	    !crypto_simd_usable()) {
--		convert_to_base2_64(ctx);
-+	if (!static_branch_likely(&poly1305_use_avx)) {
- 		poly1305_blocks_x86_64(ctx, inp, len, padbit);
- 		return;
- 	}
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_adpad_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, preq->src, NULL, padlen);
++	scatterwalk_skip(&walk, req->assoclen - rctx->assoclen);
  
- 	do {
--		const size_t bytes = min_t(size_t, len, SZ_4K);
-+		const unsigned int bytes = min(len, SZ_4K);
+-	err = crypto_ahash_update(&preq->req);
+-	if (err)
+-		return err;
++	total = rctx->cryptlen;
++	while (total) {
++		unsigned int n = scatterwalk_next(&walk, total);
  
- 		kernel_fpu_begin();
- 		if (static_branch_likely(&poly1305_use_avx512))
-@@ -117,24 +84,26 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- 		inp += bytes;
- 	} while (len);
+-	return poly_cipher(req);
+-}
++		poly1305_update(&desc, walk.addr, n);
++		scatterwalk_done_src(&walk, n);
++		total -= n;
++	}
+ 
+-static void poly_ad_done(void *data, int err)
+-{
+-	async_done_continue(data, err, poly_adpad);
+-}
++	padlen = -rctx->cryptlen % POLY1305_BLOCK_SIZE;
++	poly1305_update(&desc, zp, padlen);
+ 
+-static int poly_ad(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	int err;
++	tail.assoclen = cpu_to_le64(rctx->assoclen);
++	tail.cryptlen = cpu_to_le64(rctx->cryptlen);
++	poly1305_update(&desc, tail.u8, sizeof(tail));
++	memzero_explicit(&tail, sizeof(tail));
++	poly1305_final(&desc, rctx->tag);
+ 
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_ad_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, req->src, NULL, rctx->assoclen);
++	if (rctx->cryptlen != req->cryptlen)
++		return chacha_decrypt(req);
+ 
+-	err = crypto_ahash_update(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_adpad(req);
+-}
+-
+-static void poly_setkey_done(void *data, int err)
+-{
+-	async_done_continue(data, err, poly_ad);
+-}
+-
+-static int poly_setkey(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	int err;
+-
+-	sg_init_one(preq->src, rctx->key, sizeof(rctx->key));
+-
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_setkey_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-	ahash_request_set_crypt(&preq->req, preq->src, NULL, sizeof(rctx->key));
+-
+-	err = crypto_ahash_update(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_ad(req);
+-}
+-
+-static void poly_init_done(void *data, int err)
+-{
+-	async_done_continue(data, err, poly_setkey);
+-}
+-
+-static int poly_init(struct aead_request *req)
+-{
+-	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+-	struct poly_req *preq = &rctx->u.poly;
+-	int err;
+-
+-	ahash_request_set_callback(&preq->req, rctx->flags,
+-				   poly_init_done, req);
+-	ahash_request_set_tfm(&preq->req, ctx->poly);
+-
+-	err = crypto_ahash_init(&preq->req);
+-	if (err)
+-		return err;
+-
+-	return poly_setkey(req);
++	memcpy_to_scatterwalk(&walk, rctx->tag, sizeof(rctx->tag));
++	return 0;
  }
-+EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
  
--static void poly1305_simd_emit(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
--			       const u32 nonce[4])
-+void poly1305_emit_arch(const struct poly1305_state *ctx,
-+			u8 mac[POLY1305_DIGEST_SIZE], const u32 nonce[4])
+ static void poly_genkey_done(void *data, int err)
  {
- 	if (!static_branch_likely(&poly1305_use_avx))
- 		poly1305_emit_x86_64(ctx, mac, nonce);
- 	else
- 		poly1305_emit_avx(ctx, mac, nonce);
+-	async_done_continue(data, err, poly_init);
++	async_done_continue(data, err, poly_hash);
  }
-+EXPORT_SYMBOL_GPL(poly1305_emit_arch);
  
- void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
+ static int poly_genkey(struct aead_request *req)
+@@ -388,7 +230,7 @@ static int poly_genkey(struct aead_request *req)
+ 	if (err)
+ 		return err;
+ 
+-	return poly_init(req);
++	return poly_hash(req);
+ }
+ 
+ static void chacha_encrypt_done(void *data, int err)
+@@ -437,14 +279,7 @@ static int chachapoly_encrypt(struct aead_request *req)
+ 	/* encrypt call chain:
+ 	 * - chacha_encrypt/done()
+ 	 * - poly_genkey/done()
+-	 * - poly_init/done()
+-	 * - poly_setkey/done()
+-	 * - poly_ad/done()
+-	 * - poly_adpad/done()
+-	 * - poly_cipher/done()
+-	 * - poly_cipherpad/done()
+-	 * - poly_tail/done/continue()
+-	 * - poly_copy_tag()
++	 * - poly_hash()
+ 	 */
+ 	return chacha_encrypt(req);
+ }
+@@ -458,13 +293,7 @@ static int chachapoly_decrypt(struct aead_request *req)
+ 
+ 	/* decrypt call chain:
+ 	 * - poly_genkey/done()
+-	 * - poly_init/done()
+-	 * - poly_setkey/done()
+-	 * - poly_ad/done()
+-	 * - poly_adpad/done()
+-	 * - poly_cipher/done()
+-	 * - poly_cipherpad/done()
+-	 * - poly_tail/done/continue()
++	 * - poly_hash()
+ 	 * - chacha_decrypt/done()
+ 	 * - poly_verify_tag()
+ 	 */
+@@ -503,21 +332,13 @@ static int chachapoly_init(struct crypto_aead *tfm)
+ 	struct chachapoly_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct crypto_skcipher *chacha;
+-	struct crypto_ahash *poly;
+ 	unsigned long align;
+ 
+-	poly = crypto_spawn_ahash(&ictx->poly);
+-	if (IS_ERR(poly))
+-		return PTR_ERR(poly);
+-
+ 	chacha = crypto_spawn_skcipher(&ictx->chacha);
+-	if (IS_ERR(chacha)) {
+-		crypto_free_ahash(poly);
++	if (IS_ERR(chacha))
+ 		return PTR_ERR(chacha);
+-	}
+ 
+ 	ctx->chacha = chacha;
+-	ctx->poly = poly;
+ 	ctx->saltlen = ictx->saltlen;
+ 
+ 	align = crypto_aead_alignmask(tfm);
+@@ -525,12 +346,9 @@ static int chachapoly_init(struct crypto_aead *tfm)
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		align + offsetof(struct chachapoly_req_ctx, u) +
+-		max(offsetof(struct chacha_req, req) +
+-		    sizeof(struct skcipher_request) +
+-		    crypto_skcipher_reqsize(chacha),
+-		    offsetof(struct poly_req, req) +
+-		    sizeof(struct ahash_request) +
+-		    crypto_ahash_reqsize(poly)));
++		offsetof(struct chacha_req, req) +
++		sizeof(struct skcipher_request) +
++		crypto_skcipher_reqsize(chacha));
+ 
+ 	return 0;
+ }
+@@ -539,7 +357,6 @@ static void chachapoly_exit(struct crypto_aead *tfm)
  {
--	poly1305_simd_init(&dctx->h, key);
- 	dctx->s[0] = get_unaligned_le32(&key[16]);
- 	dctx->s[1] = get_unaligned_le32(&key[20]);
- 	dctx->s[2] = get_unaligned_le32(&key[24]);
- 	dctx->s[3] = get_unaligned_le32(&key[28]);
- 	dctx->buflen = 0;
-+	poly1305_block_init_arch(&dctx->state, key);
+ 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
+ 
+-	crypto_free_ahash(ctx->poly);
+ 	crypto_free_skcipher(ctx->chacha);
  }
- EXPORT_SYMBOL(poly1305_init_arch);
  
-@@ -151,14 +120,15 @@ void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
- 		dctx->buflen += bytes;
+@@ -548,7 +365,6 @@ static void chachapoly_free(struct aead_instance *inst)
+ 	struct chachapoly_instance_ctx *ctx = aead_instance_ctx(inst);
  
- 		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
--			poly1305_simd_blocks(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 1);
-+			poly1305_blocks_arch(&dctx->state, dctx->buf,
-+					     POLY1305_BLOCK_SIZE, 1);
- 			dctx->buflen = 0;
- 		}
- 	}
- 
- 	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
- 		bytes = round_down(srclen, POLY1305_BLOCK_SIZE);
--		poly1305_simd_blocks(&dctx->h, src, bytes, 1);
-+		poly1305_blocks_arch(&dctx->state, src, bytes, 1);
- 		src += bytes;
- 		srclen -= bytes;
- 	}
-@@ -176,10 +146,11 @@ void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
- 		dctx->buf[dctx->buflen++] = 1;
- 		memset(dctx->buf + dctx->buflen, 0,
- 		       POLY1305_BLOCK_SIZE - dctx->buflen);
--		poly1305_simd_blocks(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 0);
-+		poly1305_blocks_arch(&dctx->state, dctx->buf,
-+				     POLY1305_BLOCK_SIZE, 0);
- 	}
- 
--	poly1305_simd_emit(&dctx->h, dst, dctx->s);
-+	poly1305_emit_arch(&dctx->h, dst, dctx->s);
- 	memzero_explicit(dctx, sizeof(*dctx));
+ 	crypto_drop_skcipher(&ctx->chacha);
+-	crypto_drop_ahash(&ctx->poly);
+ 	kfree(inst);
  }
- EXPORT_SYMBOL(poly1305_final_arch);
+ 
+@@ -559,7 +375,6 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 	struct aead_instance *inst;
+ 	struct chachapoly_instance_ctx *ctx;
+ 	struct skcipher_alg_common *chacha;
+-	struct hash_alg_common *poly;
+ 	int err;
+ 
+ 	if (ivsize > CHACHAPOLY_IV_SIZE)
+@@ -581,14 +396,9 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 		goto err_free_inst;
+ 	chacha = crypto_spawn_skcipher_alg_common(&ctx->chacha);
+ 
+-	err = crypto_grab_ahash(&ctx->poly, aead_crypto_instance(inst),
+-				crypto_attr_alg_name(tb[2]), 0, mask);
+-	if (err)
+-		goto err_free_inst;
+-	poly = crypto_spawn_ahash_alg(&ctx->poly);
+-
+ 	err = -EINVAL;
+-	if (poly->digestsize != POLY1305_DIGEST_SIZE)
++	if (strcmp(crypto_attr_alg_name(tb[2]), "poly1305") &&
++	    strcmp(crypto_attr_alg_name(tb[2]), "poly1305-generic"))
+ 		goto err_free_inst;
+ 	/* Need 16-byte IV size, including Initial Block Counter value */
+ 	if (chacha->ivsize != CHACHA_IV_SIZE)
+@@ -599,16 +409,15 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+-		     "%s(%s,%s)", name, chacha->base.cra_name,
+-		     poly->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
++		     "%s(%s,poly1305)", name,
++		     chacha->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_free_inst;
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+-		     "%s(%s,%s)", name, chacha->base.cra_driver_name,
+-		     poly->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
++		     "%s(%s,poly1305-generic)", name,
++		     chacha->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_free_inst;
+ 
+-	inst->alg.base.cra_priority = (chacha->base.cra_priority +
+-				       poly->base.cra_priority) / 2;
++	inst->alg.base.cra_priority = chacha->base.cra_priority;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = chacha->base.cra_alignmask;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct chachapoly_ctx) +
 -- 
 2.39.5
 
