@@ -1,80 +1,115 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB431EA65;
-	Mon, 28 Apr 2025 03:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F374328E0F
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 04:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745809746; cv=none; b=SZYSWT3nX7qObDtK+Uu5P2NASzX1xVx63njPGnaauj+FtdUN2pNqlK/6zOdbDzjcQW/lcZ/SRQ3ZxATrabM7tPpDCznvUkN2E1LouCNfGI+o5Q0d5Bv3h8iFKhWBPLH4EV2MQavxo2Nam5cdAKHp6HBZJs+PuNZhkfE+/kkhSoU=
+	t=1745816170; cv=none; b=k90otR6sn2DVj6jmFtSd9B/nzp1NFTyOSz8DVJyXtejH6cxR/ycI7v71CAOi1nr3I05cgvO52ZxxpLLe0nYDnULQtM61AqxB6VfgcjX0cN0Mp2vt6G8QIBpz8Min0u7/D8SLubj5lJeqbnoqGKpnJhblmBvjVpRO1Q0HGxVkkbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745809746; c=relaxed/simple;
-	bh=iLTEHCZSyJzcBLSrNbt97hFYVdaUqh8fJjiDPwHlhPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M5Y1rN1qFFs8HcH9Ya4BuBEhVu2CS0yogR50eAFWYtHKJTCg2TdQA0XCkZu73wGrba7LVR9mSOM0CoWxN2f+q+8CQDiDxDhSakOi1glRN+ErJ7QptpxanGiWHSiqvnMVOmbnKHXO36KPLwEjHVTHC13v9Mv8B6qUc8ZIkBTY0Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=SQkVXEkc; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745816170; c=relaxed/simple;
+	bh=qW/ikGBZsRbLog9n2q6vb9uGqJFHTxgkfKFYEZj/lrE=;
+	h=Date:Message-Id:From:Subject:To; b=TB41fKDy0FtEemKVJNkNr7/bIfpFgx/AoqeTgFKIxkHqMXqF8KUUeT23T4dwr9TQ9J+NgC4GI5Tb9gjEXFrIYvH01LGOGvrn4GKy83scbhK0z2JVjtVTa3AOeVfuOcXJyc8mQmBmydtksgOOgBuCddcjVcGIwlNVh9SOxZiWVhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NFIVI9e6; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="SQkVXEkc"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NFIVI9e6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=To:Subject:From:Message-Id:Date:Sender:Reply-To:Cc:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=J3vzUMnOsLaNzEHK42kIA445AJiwOm/XYFtRR4x1Ggk=; b=SQkVXEkc3vuSoeiHUmoL/qBNUy
-	ysWSAblsbuvUOG359Wyk/8nWoScXQd4L7GIJ4Xd38Hcrj2DR/a8pmabQhQWHVazQcejXNpHsyTx1h
-	h/hBQpNTKVok/u3+xY4E14431RXX10DkJtH35PSM2PeKugoHN+xXUWPEWscOwg5Dwhs61VBuKUffQ
-	4Si1gvfB0kxo1fWQxO2/ox72IJsK4hfGGpCJ0J2gDDJ2un/boFeEENZZtHe/JqpcaAYV0Q00tIET8
-	xWo1iROXM3b9xws4ee+6hhR7Yr66v541/IhLwjgXTLCirHAfiEGSxh9ytC5afOEKx0eB3hrNWQihe
-	Phc+NUCA==;
+	bh=IYn2pWS1WYvtcG/uaCSiw9g8qvLTVvub5DbheE5KdOs=; b=NFIVI9e65Y/Szr/HVku1FH6GVC
+	2keCxT+41foUdntBM+cSstozptHuAMDgwk/tkaGv4q7HLPhLc/3S91OB6WRYrNGyBt6Si10jQakIT
+	a1rd1rtYIey0WM2sfkRdJm+vK5pw1x67BGY9SM7ndPJ0+CbZ9RWQiC3SwYYei/n/ldtjV2f121P8C
+	efrRqmK7Yu1bXMDizOD+glPflRHHOlETRWOpHQY+NF2CgqVy7NMEvoEbZivZeNR2wNB3/I31NzSrb
+	8wxSFifsj4hBI9Eqde4wIKikbHHVfKZ0p85AuoLMgA/YpI3KRT3RzkPo5mwZz0UoKq6RHlGtSRqWI
+	ym5KefDQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9ErR-001VTp-0b;
-	Mon, 28 Apr 2025 11:08:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 11:08:49 +0800
-Date: Mon, 28 Apr 2025 11:08:49 +0800
+	id 1u9GXC-001WEc-2G;
+	Mon, 28 Apr 2025 12:56:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 12:56:02 +0800
+Date: Mon, 28 Apr 2025 12:56:02 +0800
+Message-Id: <cover.1745815528.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, jernej.skrabec@gmail.com,
-	samuel@sholland.org, wens@csie.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH RESEND] crypto: sun8i-ss: do not use sg_dma_len before
- calling DMA functions
-Message-ID: <aA7xQbuV2oOU1oFq@gondor.apana.org.au>
-References: <20250427111236.25668-1-clabbe.montjoie@gmail.com>
- <e147c220-92e1-40cb-920b-916cf6703b40@gmail.com>
+Subject: [v4 PATCH 00/11] crypto: lib - Add partial block helper
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e147c220-92e1-40cb-920b-916cf6703b40@gmail.com>
 
-On Sun, Apr 27, 2025 at 09:23:40PM +0300, Ovidiu Panait wrote:
-> 
-> On the other hand, multi_v7_defconfig has CONFIG_NEED_SG_DMA_LENGTH
-> enabled, so sg_dma_len(sg) defaults to sg->dma_length and it would need
-> to be used after calling dma_map_sg() (as indicated in the comment from
-> include/linux/scatterlist.h).
+v4 modifies the block helper so that the block function and state
+are back in local-scope variables, the lengths have been extended
+to size_t where necessary.
 
-In general, only use sg_dma_len if you are mapping an entire
-SG list with dma_map_sg.
+This is based on
 
-If you're using dma_map_single, do not use sg_dma_len.
+	https://patchwork.kernel.org/project/linux-crypto/list/?series=955753
+	https://patchwork.kernel.org/project/linux-crypto/list/?series=957401
 
-This is because dma_map_sg will try to merge entries together,
-thus creating an sg_dma_len that is bigger than the original
-(and reducing the SG list length accordingly).
+This series introduces a partial block helper for lib/crypto hash
+algorithms based on the one from sha256_base.
 
-OTOH dma_map_single can't possibly do that.
+It then uses it on poly1305 to eliminate duplication between
+architectures.  In particular, instead of having complete update
+functions for each architecture, reduce it to a block function
+per architecture instead.  The partial block handling is handled
+by the generic library layer.
 
-Cheers,
+The poly1305 implementation was anomalous due to the inability
+to call setkey in softirq.  It also has just a single user, which
+is chacha20poly1305 that is hard-coded to use poly1305.  Replace
+the gratuitous use of ahash in chacha20poly1305 with the lib/crypto
+poly1305 instead.
+
+This then allows the shash poly1305 to be removed.
+
+Note that there is still some testing coverage for lib/poly1305
+through the Crypto API chacha20poly1305 algorithm.
+
+Herbert Xu (11):
+  crypto: lib/sha256 - Move partial block handling out
+  crypto: lib/poly1305 - Add block-only interface
+  crypto: arm/poly1305 - Add block-only interface
+  crypto: arm64/poly1305 - Add block-only interface
+  crypto: mips/poly1305 - Add block-only interface
+  crypto: powerpc/poly1305 - Add block-only interface
+  crypto: x86/poly1305 - Add block-only interface
+  crypto: chacha20poly1305 - Use lib/crypto poly1305
+  crypto: testmgr - Remove poly1305
+  crypto: poly1305 - Remove algorithm
+  crypto: lib/poly1305 - Use block-only interface
+
+ arch/arm/lib/crypto/poly1305-armv4.pl         |   4 +-
+ arch/arm/lib/crypto/poly1305-glue.c           | 113 ++----
+ arch/arm64/lib/crypto/Makefile                |   3 +-
+ arch/arm64/lib/crypto/poly1305-glue.c         | 105 ++----
+ arch/mips/lib/crypto/poly1305-glue.c          |  75 +---
+ arch/mips/lib/crypto/poly1305-mips.pl         |  12 +-
+ arch/powerpc/lib/crypto/poly1305-p10-glue.c   | 109 ++----
+ .../lib/crypto/poly1305-x86_64-cryptogams.pl  |  33 +-
+ arch/x86/lib/crypto/poly1305_glue.c           | 169 +++------
+ crypto/Kconfig                                |  14 +-
+ crypto/Makefile                               |   2 -
+ crypto/chacha20poly1305.c                     | 323 ++++--------------
+ crypto/poly1305.c                             | 152 ---------
+ crypto/testmgr.c                              |   6 -
+ crypto/testmgr.h                              | 288 ----------------
+ include/crypto/internal/blockhash.h           |  52 +++
+ include/crypto/internal/poly1305.h            |  28 +-
+ include/crypto/poly1305.h                     |  60 +---
+ include/crypto/sha2.h                         |   9 +-
+ include/crypto/sha256_base.h                  |  38 +--
+ lib/crypto/poly1305.c                         |  83 ++---
+ 21 files changed, 396 insertions(+), 1282 deletions(-)
+ delete mode 100644 crypto/poly1305.c
+ create mode 100644 include/crypto/internal/blockhash.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
