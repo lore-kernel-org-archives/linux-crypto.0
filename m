@@ -1,130 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9878125F7B9
-	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 10:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBA9253B43
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 10:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745835742; cv=none; b=BBXPtbc7/pOaCGcHGvYG792lW6aLVxCaAELeHOk2kEldm2/dHrRsmS7ekMF22IiINUsCZbSgLM0shQhQDtsy+dG3ee/JX8VJceOu3GU0iZL5PmL5rGRy+oWl6HkQbkbAqTqk6eBA2Kcc28JuMn9FlHexubcaxvWIs1mcOs0GWww=
+	t=1745836139; cv=none; b=qC/K+vz64iFA1gc7p8hWO+3kiXtWeTW1xbhdftPa1FMHyi9eR2M266kznQSeiKNoiaRQuaQBEq/8rU6AS1OrR7ujN/uforBKgvcyhAcHaTnKORBzARA+h9Kp+uvOk+imBvyajAW6Q2OxXgW0aGTviBKfNzNXb9NgPu/viDEnckA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745835742; c=relaxed/simple;
-	bh=RqdM6tQLULttWm7Qo9KtY2xD21nhVT3B5OXxTPkQ95A=;
-	h=To:cc:Subject:MIME-Version:Content-Type:From:Date:Message-ID; b=k2cQwS8EhbBWz+bv/dxeXAmbMBfCmcaodp9hg0dEEzCsbW24+coiHbbv932E5o5UYtk4le0t8PZ7mFcZbCiOdSRLS15URUeAoVPLife84YsESoqSVvv5Y1V6VPrHeQgJV3MEGSHlkBtnWIjvdpvLSu9ERdsJiulX1EuZHlpFqHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=baN76/W5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1745836139; c=relaxed/simple;
+	bh=ruIOSYQ6oFubP9SOiCH9r1ANRa+KN/sarSp1jPgeVJw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T9uEdY8zkmtIZpxX3z6m+KD2sL8Z+PPPnJ0pcKVVjj+DwNVbYTbnJs1HhpcAB/e+Op33iACGKxzzfQzNjbz7YaXg5GoGYet+TTB9V6cTq+CznZfJJgg4kwkT+zlTevlJ6ffBTOBm93bWTD+wgsg15v4GGwc++RdNQAIbDriDplY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=XrUB3yLX; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baN76/W5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745835739;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XZR60ryduJ6qSqqolVECpQBm6DPYshoNtZhT2Jgpp+U=;
-	b=baN76/W5SyJyroTEr1zUcRmhpJaVruKVK+Vj58U3xnNciIr2CyP5/egxd8lmNmFOpbeB7V
-	oSN6vUYA0z8jiJuOGs6Fm7OROWBA2wDfet+XOpPfDKv0iTGDdqGHvmbZbi7uK+uC0HZqUu
-	qqYFm6pmq8AjZ37C95U/sKafBsc/VYs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-491-uYhzPZYtOZicjZElV4RmHQ-1; Mon,
- 28 Apr 2025 06:22:16 -0400
-X-MC-Unique: uYhzPZYtOZicjZElV4RmHQ-1
-X-Mimecast-MFC-AGG-ID: uYhzPZYtOZicjZElV4RmHQ_1745835734
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D183319560A6;
-	Mon, 28 Apr 2025 10:22:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7E1901800367;
-	Mon, 28 Apr 2025 10:22:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-To: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] crypto/krb5: Fix change to use SG miter to use offset
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="XrUB3yLX"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e6e1cd3f451so3522794276.2
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 03:28:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1745836137; x=1746440937; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ad2hfYAaXs4UcPz87uwN8ese08Wo0cmaLOPntlJfTgg=;
+        b=XrUB3yLXzeLjS4CKeq+Orb+d/TUv7EteRcwZ1EavXq/nHS1mLSN8XESHvRWn69OlQr
+         SJSwZ+2SyYB0LoGhGXBjGpsIJ9GWufJBuXN6OD4VpO/VIH6fYJ4O8GPaLiYJpyrKIOfZ
+         LP3/Yn0pqFTEETknLy91OrHPz0Z54xkMfazHA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745836137; x=1746440937;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ad2hfYAaXs4UcPz87uwN8ese08Wo0cmaLOPntlJfTgg=;
+        b=eUuTsO/j9T1ptpDCUDOC4JvJvItIap0/PZJ4OoDZWt+u/NwHMt+JkmSIwSTJyxuCvc
+         HsL5m0MbXXxSZDEB1yZcKj1V8QE85zSBb8qyW8Bfsy/PTzW8bxUVvvwRYBbc3wIConxa
+         F/opaWwhICBR+ItT/1NYm0iLZaVBkPIWpDwEt2epv9A30ccfGur1PllDCSaKuJMgdAME
+         yuAlUPeoLNnLIfd4ZAZmGvTnSR2dx3e0Ycvp8pIJfh3ndVAsusEBQju2iqkc1PjgJv9R
+         UGt65YHJFhDhD4Z8pmMUVOjS3SgL+gNEGBB5CYE2RoUS9mZOBrpBaIWII/gidxLCCf6Q
+         vPPQ==
+X-Gm-Message-State: AOJu0YzkUm63YIOV2NR5cNNyThvmqwt7r6dJCzs6wIpzuKu5ZIeGsFjC
+	iOyl2rzqLwYk+4tn9kH0nH+QbibSPg8vqLypGeNb5U6qWNNAmswE8Mm1s6XNPYqebghGvOo56ZX
+	9ff+sBdAlWDhL+Bxkohos04chh2GZcn+AUhipXA==
+X-Gm-Gg: ASbGncs7vY0gR7UYJdmguV45z1r9ABSdIdLol3cTh2ZqMSeNnO/xTbylFTaeMCkIrvI
+	sOdDqxo0aWe07xVPKbr4aDyk95emxU3k/H5AlI27OzAEbWf21H/O0oIa/OsnigTGxpNUc5HetDc
+	Oiu2ED8ude0jLXqQUbbmK/pnQ2tlwxt+Vjfgy81nOCg82DjEpdj0Fhymk=
+X-Google-Smtp-Source: AGHT+IFOb7bkGF47Z0Sj5W/G1ukJMIQOyZSKkD3DfgEzKXPBH1RQeqjnbUPM7iUBBh9JiUmhlk/NxninlzzPK6KVA3Y=
+X-Received: by 2002:a05:6902:c04:b0:e71:2a10:8fd with SMTP id
+ 3f1490d57ef6-e73167e73f2mr14760300276.26.1745836137015; Mon, 28 Apr 2025
+ 03:28:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3823907.1745835655.1@warthog.procyon.org.uk>
+References: <20250423101518.1360552-1-pavitrakumarm@vayavyalabs.com>
+ <20250423101518.1360552-2-pavitrakumarm@vayavyalabs.com> <e5f47f52-807d-45ce-bd62-090f4af72b3a@kernel.org>
+ <CALxtO0k0jeZF=Y5Ut_yhX8DxC3hVHWpnrcdJeBXP_GpA=O5T4w@mail.gmail.com> <628faa57-f135-4f62-9827-5c98d9265391@kernel.org>
+In-Reply-To: <628faa57-f135-4f62-9827-5c98d9265391@kernel.org>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Mon, 28 Apr 2025 15:58:45 +0530
+X-Gm-Features: ATxdqUHPW2Bs_aWRQo6-S8EuhqMYj3WXHtFTMowNg0HzbX933XBEOfJ7EiAHZM4
+Message-ID: <CALxtO0nFtAiK8oG=7k8bhxwwxcQo0XZawEbkRG9Prg4z6JshXQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/6] dt-bindings: crypto: Document support for SPAcc
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	herbert@gondor.apana.org.au, Ruud.Derwig@synopsys.com, 
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: David Howells <dhowells@redhat.com>
-Date: Mon, 28 Apr 2025 11:22:06 +0100
-Message-ID: <3824017.1745835726@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-[Note: Nothing in linus/master uses the krb5lib, though the bug is there,
- but it is used by AF_RXRPC's RxGK implementation in net-next, so can it g=
-o
- through the net-next tree rather than directly to Linus or through
- crypto?]
+Hi Krzysztof,
+   Its not possible to use it outside of the SoC. So for the current
+SPAcc IP testing we flash it to the PL part of the Zynq. Post which it
+behaves like a peripheral sitting on the system bus. The device is
+memory mapped and its interrupt is connected to GIC. A platform driver
+works perfectly in this case and that's what we have.
+   All the drivers that we have in the kernel are for crypto
+hardware/engines, which already are available as part of some SoC in
+the market. But in our case its still an IP. Since I dont have any
+reference/expertise, it would be great if you could suggest a way to
+handle such a case.
 
-The recent patch to make the rfc3961 simplified code use sg_miter rather
-than manually walking the scatterlist to hash the contents of a buffer
-described by that scatterlist failed to take the starting offset into
-account.
+Warm regards,
+PK
 
-This is indicated by the selftests reporting:
-
-    krb5: Running aes128-cts-hmac-sha256-128 mic
-    krb5: !!! TESTFAIL crypto/krb5/selftest.c:446
-    krb5: MIC mismatch
-
-Fix this by calling sg_miter_skip() before doing the loop to advance by th=
-e
-offset.
-
-This only affects packet signing modes and not full encryption in RxGK
-because, for full encryption, the message digest is handled inside the
-authenc and krb5enc drivers.
-
-Fixes: da6f9bf40ac2 ("crypto: krb5 - Use SG miter instead of doing it by h=
-and")
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- crypto/krb5/rfc3961_simplified.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/crypto/krb5/rfc3961_simplified.c b/crypto/krb5/rfc3961_simpli=
-fied.c
-index 79180d28baa9..e49cbdec7c40 100644
---- a/crypto/krb5/rfc3961_simplified.c
-+++ b/crypto/krb5/rfc3961_simplified.c
-@@ -89,6 +89,7 @@ int crypto_shash_update_sg(struct shash_desc *desc, stru=
-ct scatterlist *sg,
- =
-
- 	sg_miter_start(&miter, sg, sg_nents(sg),
- 		       SG_MITER_FROM_SG | SG_MITER_LOCAL);
-+	sg_miter_skip(&miter, offset);
- 	for (i =3D 0; i < len; i +=3D n) {
- 		sg_miter_next(&miter);
- 		n =3D min(miter.length, len - i);
-
+On Mon, Apr 28, 2025 at 2:41=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On 28/04/2025 10:13, Pavitrakumar Managutte wrote:
+> > Hi Krzysztof,
+> >    My comments are embedded below.
+> >
+> > Warm regards,
+> > PK
+> >
+> >
+> > On Wed, Apr 23, 2025 at 6:23=E2=80=AFPM Krzysztof Kozlowski <krzk@kerne=
+l.org> wrote:
+> >
+> >> On 23/04/2025 12:15, Pavitrakumar M wrote:
+> >>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> >>>
+> >>> Add DT bindings related to the SPAcc driver for Documentation.
+> >>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+> >>
+> >> These IP blocks are rarely usable on their own and need SoC
+> >> customization. Where any SoC users? Where are any SoC compatibles?
+> >>
+> >
+> > PK: This is a new IP designed by Synopsys, which we tested on the Xilin=
+x
+> > Zynqmp FPGA (ZCU104 board).
+> >        This is NOT a part of any SoC yet, but it might be in future.
+> >        Could you offer suggestions on how to handle such a case?
+>
+> Hm? How is it possible to use it outside of a SoC?
+>
+> Best regards,
+> Krzysztof
