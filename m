@@ -1,51 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35212951C0;
-	Mon, 28 Apr 2025 17:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0530D28F517
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 17:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745859727; cv=none; b=pLnpc70ZEOuQWPTCbp6ewj/p6TvfiMMCljVLpxDqm3Vd5julu4z48iPL/C2FlGoz63AcOZa/zRBRvWzk0pFt8ermlCuaqPrhMdrXhbxHx/2z4+DgG6TumpryGnRmwdvUMZF1x+ZdjZv5N6lY49WyIKtJSsGW9PM3WIRTDufmWPg=
+	t=1745861115; cv=none; b=SazwFyLysmYBz4e/LaMFAsQZHKom2mYJwaYGdxq6IbDjccEkYsNbimt8UqXU4RLjcp5fnpPP7BbwKGZWBPVnxBRb2RpUdP8bS2QDu6L/BijDQqZnFbtNidvaCsg4O5J6yB8e+rZNrN7iMlGDLZw0bQQwSAy5OxTVbxwEvkMFuSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745859727; c=relaxed/simple;
-	bh=E4ZzeBfk2GgJquy2SDIZkSeNX8NfXIoZAmTNK3XNeXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qk3uQOAuSB2+8kCiaeHMBAGvIrWYoOlAEirWS/shkcET1oyiCZfDu5CmNkLwFpIRIht9nHzNgnDuc3LaJfAHf+CdkZXuFSCpFdi94Au5//lLovV+FoKUP4n/CfUn14b5n6Mp6oeZhxEF1/AHYZRI2fqoaAIx8W2VzoRYQ5sAMpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nag0WVQ8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745861115; c=relaxed/simple;
+	bh=GegeX8gwQEhw54f3rtV1DHxdjTQabCDQnYUDXJFaLig=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i79QeNQSldt3/7qYsQAeYNxyAdsuR8Cw83Tog9OIJ8OjCh0u4CSUV/Ca/AnapapyKTKxKW+IN9GCO8mZs9hAmko2yyUHA80iK68Jv9F+mDn3LeMXzcRZuMBbUmZD+x/4g2AkS8ZBUX5Xn0J8Hq4EDr/9bN9nIAY2l/WNvYCXG4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O0e1bwTV; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nag0WVQ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3F35C4CEEE;
-	Mon, 28 Apr 2025 17:02:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745859726;
-	bh=E4ZzeBfk2GgJquy2SDIZkSeNX8NfXIoZAmTNK3XNeXw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Nag0WVQ8E1TihrQTSEoFR0DZgEIeqxXwyV4+iqc41yTiRiDzs5/2T7qkhTZmHaBIe
-	 3NpNYnemnWcQOCXagA5m6zVEi7yUaK7qNITYrJvmQFRS87Igf4LlFVCkGoqoGOGCVG
-	 rsFgw3ex79z6SbNqm4v8+b5mBZMqZ9O4OXQBeaDADtRT7kk2/LXqD81qq3/EBLuNs4
-	 Xf+BQasDscoPMcUxBho7bRSlGZgBqQCEuwezVvdvBqukAt516lxDSngixk8QEtC60Q
-	 hSwIdPcr5osF5Xfc1HTMgM8PDAUDpsO71gwKURmbiK0loWyPcYwTVOaYNJujt2ACtq
-	 ABI2T4XgqEKSw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	sparclinux@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	x86@kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: [PATCH v4 13/13] crypto: lib/sha256 - improve function prototypes
-Date: Mon, 28 Apr 2025 10:00:38 -0700
-Message-ID: <20250428170040.423825-14-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250428170040.423825-1-ebiggers@kernel.org>
-References: <20250428170040.423825-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O0e1bwTV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745861113; x=1777397113;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GegeX8gwQEhw54f3rtV1DHxdjTQabCDQnYUDXJFaLig=;
+  b=O0e1bwTVzoFWaGQF1czHihdsuoDVb+MrQ4ACHQMDtpG7QzuC8XFWXdOc
+   c+WMnvoRxW30UjfGHUtehLmUPeuIonqay6rproQlvmx50PzQUDEeaXbrs
+   cYwGHzkleyqiVEpARKgha1WQiJTzGJ4NCcLD8RYTT3STr/iLfoqRe0wLw
+   yni5FY7w/cWw9cGcAyWoZh7xqHHqtW8GcnyOX84NDqOcredKdQ/I+/4KI
+   kqMaWdzkXLOEE1qoswdaPSyF/hcdLDqWbTswgMH/W3HmsY+YyVC9dyJ15
+   aeBSF5XEKP+SrG+C2lFdHR5B78PxL4pVVj2dsqXUbaunPhBPHXYX8E+iL
+   Q==;
+X-CSE-ConnectionGUID: cQtSl/tSSRiwm5eUApoRYg==
+X-CSE-MsgGUID: JhXt6tZ1QSO2SmCbSBRu8g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="47340994"
+X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
+   d="scan'208";a="47340994"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 10:25:12 -0700
+X-CSE-ConnectionGUID: rLJVyJNER26CCmI/4FNc8g==
+X-CSE-MsgGUID: qvyQr0UmSTm1ViNFgf+AUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
+   d="scan'208";a="170808392"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by orviesa001.jf.intel.com with ESMTP; 28 Apr 2025 10:25:10 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - include qat_common in top Makefile
+Date: Mon, 28 Apr 2025 18:24:26 +0100
+Message-Id: <20250428172426.861977-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,92 +61,112 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Eric Biggers <ebiggers@google.com>
+To ensure proper functionality, each specific driver needs to access
+functions located in the qat_common folder.
 
-Follow best practices by changing the length parameters to size_t and
-explicitly specifying the length of the output digest arrays.
+Move the include path for qat_common to the top-level Makefile.
+This eliminates the need for redundant include directives in the
+Makefiles of individual drivers.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- include/crypto/sha2.h | 8 ++++----
- lib/crypto/sha256.c   | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/crypto/intel/qat/Makefile                | 1 +
+ drivers/crypto/intel/qat/qat_420xx/Makefile      | 1 -
+ drivers/crypto/intel/qat/qat_4xxx/Makefile       | 1 -
+ drivers/crypto/intel/qat/qat_c3xxx/Makefile      | 1 -
+ drivers/crypto/intel/qat/qat_c3xxxvf/Makefile    | 1 -
+ drivers/crypto/intel/qat/qat_c62x/Makefile       | 1 -
+ drivers/crypto/intel/qat/qat_c62xvf/Makefile     | 1 -
+ drivers/crypto/intel/qat/qat_dh895xcc/Makefile   | 1 -
+ drivers/crypto/intel/qat/qat_dh895xccvf/Makefile | 1 -
+ 9 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
-index 444484d1b1cfa..7dfc560daa2c7 100644
---- a/include/crypto/sha2.h
-+++ b/include/crypto/sha2.h
-@@ -93,13 +93,13 @@ static inline void sha256_init(struct sha256_state *sctx)
- 	sctx->state[5] = SHA256_H5;
- 	sctx->state[6] = SHA256_H6;
- 	sctx->state[7] = SHA256_H7;
- 	sctx->count = 0;
- }
--void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len);
--void sha256_final(struct sha256_state *sctx, u8 *out);
--void sha256(const u8 *data, unsigned int len, u8 *out);
-+void sha256_update(struct sha256_state *sctx, const u8 *data, size_t len);
-+void sha256_final(struct sha256_state *sctx, u8 out[SHA256_DIGEST_SIZE]);
-+void sha256(const u8 *data, size_t len, u8 out[SHA256_DIGEST_SIZE]);
- 
- static inline void sha224_init(struct sha256_state *sctx)
- {
- 	sctx->state[0] = SHA224_H0;
- 	sctx->state[1] = SHA224_H1;
-@@ -110,8 +110,8 @@ static inline void sha224_init(struct sha256_state *sctx)
- 	sctx->state[6] = SHA224_H6;
- 	sctx->state[7] = SHA224_H7;
- 	sctx->count = 0;
- }
- /* Simply use sha256_update as it is equivalent to sha224_update. */
--void sha224_final(struct sha256_state *sctx, u8 *out);
-+void sha224_final(struct sha256_state *sctx, u8 out[SHA224_DIGEST_SIZE]);
- 
- #endif /* _CRYPTO_SHA2_H */
-diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index 4b19cf977ef1b..563f09c9f3815 100644
---- a/lib/crypto/sha256.c
-+++ b/lib/crypto/sha256.c
-@@ -68,11 +68,11 @@ static inline void __sha256_update(struct sha256_state *sctx, const u8 *data,
- 	}
- 	if (len)
- 		memcpy(&sctx->buf[partial], data, len);
- }
- 
--void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
-+void sha256_update(struct sha256_state *sctx, const u8 *data, size_t len)
- {
- 	__sha256_update(sctx, data, len, false);
- }
- EXPORT_SYMBOL(sha256_update);
- 
-@@ -99,23 +99,23 @@ static inline void __sha256_final(struct sha256_state *sctx, u8 *out,
- 		put_unaligned_be32(sctx->state[i / 4], out + i);
- 
- 	memzero_explicit(sctx, sizeof(*sctx));
- }
- 
--void sha256_final(struct sha256_state *sctx, u8 *out)
-+void sha256_final(struct sha256_state *sctx, u8 out[SHA256_DIGEST_SIZE])
- {
- 	__sha256_final(sctx, out, SHA256_DIGEST_SIZE, false);
- }
- EXPORT_SYMBOL(sha256_final);
- 
--void sha224_final(struct sha256_state *sctx, u8 *out)
-+void sha224_final(struct sha256_state *sctx, u8 out[SHA224_DIGEST_SIZE])
- {
- 	__sha256_final(sctx, out, SHA224_DIGEST_SIZE, false);
- }
- EXPORT_SYMBOL(sha224_final);
- 
--void sha256(const u8 *data, unsigned int len, u8 *out)
-+void sha256(const u8 *data, size_t len, u8 out[SHA256_DIGEST_SIZE])
- {
- 	struct sha256_state sctx;
- 
- 	sha256_init(&sctx);
- 	sha256_update(&sctx, data, len);
+diff --git a/drivers/crypto/intel/qat/Makefile b/drivers/crypto/intel/qat/Makefile
+index 235b69f4f3f7..1eda8dc18515 100644
+--- a/drivers/crypto/intel/qat/Makefile
++++ b/drivers/crypto/intel/qat/Makefile
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
++subdir-ccflags-y := -I$(src)/qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat_common/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx/
+diff --git a/drivers/crypto/intel/qat/qat_420xx/Makefile b/drivers/crypto/intel/qat/qat_420xx/Makefile
+index 72b24b1804cf..f6df54d2993e 100644
+--- a/drivers/crypto/intel/qat/qat_420xx/Makefile
++++ b/drivers/crypto/intel/qat/qat_420xx/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_420XX) += qat_420xx.o
+ qat_420xx-y := adf_drv.o adf_420xx_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/Makefile b/drivers/crypto/intel/qat/qat_4xxx/Makefile
+index e8480bb80dee..188b611445e6 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/Makefile
++++ b/drivers/crypto/intel/qat/qat_4xxx/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_4XXX) += qat_4xxx.o
+ qat_4xxx-y := adf_drv.o adf_4xxx_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_c3xxx/Makefile b/drivers/crypto/intel/qat/qat_c3xxx/Makefile
+index d9e568572da8..43604c025f0c 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxx/Makefile
++++ b/drivers/crypto/intel/qat/qat_c3xxx/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx.o
+ qat_c3xxx-y := adf_drv.o adf_c3xxx_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile b/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
+index 31a908a211ac..03f6745b4aa2 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
++++ b/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXXVF) += qat_c3xxxvf.o
+ qat_c3xxxvf-y := adf_drv.o adf_c3xxxvf_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_c62x/Makefile b/drivers/crypto/intel/qat/qat_c62x/Makefile
+index cbdaaa135e84..f3d722bef088 100644
+--- a/drivers/crypto/intel/qat/qat_c62x/Makefile
++++ b/drivers/crypto/intel/qat/qat_c62x/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x.o
+ qat_c62x-y := adf_drv.o adf_c62x_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_c62xvf/Makefile b/drivers/crypto/intel/qat/qat_c62xvf/Makefile
+index 60e499b041ec..ed7f3f722d99 100644
+--- a/drivers/crypto/intel/qat/qat_c62xvf/Makefile
++++ b/drivers/crypto/intel/qat/qat_c62xvf/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C62XVF) += qat_c62xvf.o
+ qat_c62xvf-y := adf_drv.o adf_c62xvf_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/Makefile b/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
+index 5bf5c890c362..1427fe76f171 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
++++ b/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc.o
+ qat_dh895xcc-y := adf_drv.o adf_dh895xcc_hw_data.o
+diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile b/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
+index 93f9c81edf09..c2fdb6e0f68f 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
++++ b/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-y := -I $(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf.o
+ qat_dh895xccvf-y := adf_drv.o adf_dh895xccvf_hw_data.o
+
+base-commit: 2a603eac8926f981a481389e721a14c8ab576e47
 -- 
-2.49.0
+2.40.1
 
