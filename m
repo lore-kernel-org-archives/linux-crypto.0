@@ -1,243 +1,125 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D36C25E462
-	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 08:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9D51CAA6C;
+	Mon, 28 Apr 2025 09:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745828816; cv=none; b=qIk08ac1G9UQbiQ7HoSSFABCqbWBwf8KUi0PgAWy6+Y1yyuVw8E0TOF043PqWme01P5LFY1rb8B0IJHF/Pq6jNuDvGA+82l1GRuq5ibkupBQ+SEzdJwxZLBthM3TaexF88EgN0kitKiYyrXmEbiCRXFKo27/XgQWRYCqGgpxIQM=
+	t=1745831501; cv=none; b=OpX4ACb6GVbd2U+E8JSZjglkGN+zmVPLcElfOJqSCf7N3Bf2fOhIWtUmVj524qTZERg9misCOmXpR/79XB/p2kEAhsR/GixBzGEb/QTVP5L7PTzy2KsVCZu59QfkZO/SJsWJ+vZmMlvE2MZFwATpwLgzJgrI2e31ot6OJEszzgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745828816; c=relaxed/simple;
-	bh=T8SZ8DX9DHzGXS1oxkAHhDLvJLkNaoXfwhhJ1PwP9/Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mMAg+pVugvPd7rh2nVBDyFDypx7Nkzp2ALmbrufYPx0rHcBGKFO3vtn9qNUdC4YJhPr7Iur8wh5h+3j7eglLgM4IHRnHzDTJUEE5UaAP2qWd4J9MSbijoh4kwb2qUa/+R0XVmUkH2hGz7lTvyYhJliRUizrcuUQ1SBAPNK2QxVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=IUrYIwQU; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1745831501; c=relaxed/simple;
+	bh=7m0tP+q4T5mcm3kYzYk7AvWbv0g1gUih3/SFHpcXZHU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S/tZ2y6WgbpopsYpFM6SliNCk13QapXTYCKXUdAXdF5AVQZXNLYccaIozQhE9gPspCrv+jUJ4a3DHBWbMYNGQ24ScR9x5Djod89aXMH0LiaVquAz9kjqvAvZlTW2aVoCR2Oqqf9aUpbI7YQomzU5t7HufQDKvk7+adnG1TK1huc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YRg3Nghy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="IUrYIwQU"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6fece18b3c8so35759457b3.3
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 01:26:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1745828813; x=1746433613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ghcmrgUgSbDm4wcZcCaNT1wwBWxdZ/sWHCjglVCfqe4=;
-        b=IUrYIwQUukq4nyZO5RzjXewKZUEbUCD90ztNaG39Y/7gOE+r2ezY5l9z5eJL2ctosU
-         oY7tMOtdZBQ2Z58zEpkoclaRlqRByxDa5nhOBDM5fG0ZeFigWsveQI2ycKZ8Yhy8v3cb
-         LfTx/LCmTAvePwUmn/q6lZv5OLWGACJlSy2PA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745828813; x=1746433613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ghcmrgUgSbDm4wcZcCaNT1wwBWxdZ/sWHCjglVCfqe4=;
-        b=SxbBhpLDnQkTwhF/zsN/wF3v5Y968c6iCZLF58Z0j+VkKBz3OHJMDxm9taJv7/60Pp
-         kRYasQ6ccsCQlNV01Qg4JhHFquM4y3dEt5M97OxsaJ0mU/N0g5KVtdIrf8bgv42iZEVP
-         0ikcI7FhRuR0LYLt4av3xDkpLx1dtbrsyrlaBGwXqODv6+7u7YQt7PuRdbTF+BI6+Siu
-         HV4wyMp42nr81tgfRP1hDgeIFyiTkPqz4Wm7SRU4VHWiJeIUOLczNWhdInJPkZU4LT3k
-         kTA0IjWvWpDEASxStEnwiI2kg6E0wMDBkR1mSG7R5HFFfj+ZaXwiOsbPs8ABmXgcHMyg
-         JvPw==
-X-Gm-Message-State: AOJu0Yxsqr+XoJZd38aMI7zmouaBQ1XMz7GNlJaOiHFKXX+DhY6uEFBS
-	I29sRgiK7IKJ+T2KPDTjCi6mlJEmIniltNFMmYU9RwsjFwkuytjrTZx4w80VU4RysYJgF6VgTfJ
-	7gx3Qw90xQNSrnSiVYTJnGks3eSbyaRxHHap1BA==
-X-Gm-Gg: ASbGncshcdDF5XrYhTarFoLSYJDcWmhPMUJOcJR6Dta84o+htT+woj+O7cZx2uzUSx1
-	BMYsJH7I1slLW7lMhLxE1fIQSc5QoCxAnYk6O8wELY1CKYAjYltvMfrVMwayscsgWYsrdpwRpBO
-	KXYu2MX2o7zoeZ4e3Xf7YYTUgEdMnd/EiVG18LnMyIZMq2AGcyDm31e+o=
-X-Google-Smtp-Source: AGHT+IGTTOWD4mqDocBPkLm6H5LR08W1IDUGz6syBbpKa0wuDFnm8koHpJ/z7Hcj77PexwAyVbb4syjzYQ/2lsza3UA=
-X-Received: by 2002:a05:6902:e92:b0:e6e:4d8:81cf with SMTP id
- 3f1490d57ef6-e73165df443mr14045801276.23.1745828813532; Mon, 28 Apr 2025
- 01:26:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YRg3Nghy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 115A2C4CEE4;
+	Mon, 28 Apr 2025 09:11:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745831501;
+	bh=7m0tP+q4T5mcm3kYzYk7AvWbv0g1gUih3/SFHpcXZHU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YRg3NghyMqn8irHaDhFHiyYABHnLpFnoCpsABEGAMKZ/8HEGybgmAJBEvfVb/zjPY
+	 9fjMi0IAS1c7ZSgJkYEMBAN4AdDScDz++w5lbt3hZjuJae7wE/fwRdi88r6tz+BVDB
+	 V0hzj7xumBfGQ6LPn46wN8yeJ4Zy3xBFr0LVGDYe/Z6OIcvBAXhQ1E/fpQUOuCupg1
+	 cynOMhdvmOxLLJ22vUp2pkdvGsGh94jyjZ0ndbSwQFX/BmZWBVsUCcME+OdOrvyJ1H
+	 7zxYBbLfPwFtx0gS7L5x3Yf/dD2UcpykUfxotWrokpzsP8xKHJLEnJN9EQmT/yvfjN
+	 eT4OghP0/l52g==
+Message-ID: <628faa57-f135-4f62-9827-5c98d9265391@kernel.org>
+Date: Mon, 28 Apr 2025 11:11:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423101518.1360552-1-pavitrakumarm@vayavyalabs.com>
- <20250423101518.1360552-2-pavitrakumarm@vayavyalabs.com> <e5f47f52-807d-45ce-bd62-090f4af72b3a@kernel.org>
-In-Reply-To: <e5f47f52-807d-45ce-bd62-090f4af72b3a@kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Mon, 28 Apr 2025 13:56:42 +0530
-X-Gm-Features: ATxdqUFzsFfzOiZTTfcSFEA0yKYwV1MYLNlGc_twQTlRFGhIWQAsmjFO7nR7c1I
-Message-ID: <CALxtO0k4RkopERap_ykrMTZ4Qtdzm8hEPJGLCQ2pknQGjfQ4Eg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	herbert@gondor.apana.org.au, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ herbert@gondor.apana.org.au, Ruud.Derwig@synopsys.com,
+ manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
+ Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+References: <20250423101518.1360552-1-pavitrakumarm@vayavyalabs.com>
+ <20250423101518.1360552-2-pavitrakumarm@vayavyalabs.com>
+ <e5f47f52-807d-45ce-bd62-090f4af72b3a@kernel.org>
+ <CALxtO0k0jeZF=Y5Ut_yhX8DxC3hVHWpnrcdJeBXP_GpA=O5T4w@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <CALxtO0k0jeZF=Y5Ut_yhX8DxC3hVHWpnrcdJeBXP_GpA=O5T4w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
-   My comments are embedded below.
+On 28/04/2025 10:13, Pavitrakumar Managutte wrote:
+> Hi Krzysztof,
+>    My comments are embedded below.
+> 
+> Warm regards,
+> PK
+> 
+> 
+> On Wed, Apr 23, 2025 at 6:23 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> 
+>> On 23/04/2025 12:15, Pavitrakumar M wrote:
+>>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+>>>
+>>> Add DT bindings related to the SPAcc driver for Documentation.
+>>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+>>
+>> These IP blocks are rarely usable on their own and need SoC
+>> customization. Where any SoC users? Where are any SoC compatibles?
+>>
+> 
+> PK: This is a new IP designed by Synopsys, which we tested on the Xilinx
+> Zynqmp FPGA (ZCU104 board).
+>        This is NOT a part of any SoC yet, but it might be in future.
+>        Could you offer suggestions on how to handle such a case?
 
-Warm regards,
-PK
+Hm? How is it possible to use it outside of a SoC?
 
-
-On Wed, Apr 23, 2025 at 6:23=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 23/04/2025 12:15, Pavitrakumar M wrote:
-> > From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> >
-> > Add DT bindings related to the SPAcc driver for Documentation.
-> > DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
->
-> These IP blocks are rarely usable on their own and need SoC
-> customization. Where any SoC users? Where are any SoC compatibles?
-
-PK: This is a new IP designed by Synopsys, tested on the Xilinx Zynqmp
-FPGA (ZCU104 board).
-       This is NOT a part of any SoC yet, but it might be in future.
-       Could you offer suggestions on how to handle such a case?
-
->
-> <form letter>
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC (and consider --no-git-fallback argument, so you will
-> not CC people just because they made one commit years ago). It might
-> happen, that command when run on an older kernel, gives you outdated
-> entries. Therefore please be sure you base your patches on recent Linux
-> kernel.
->
-> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> people, so fix your workflow. Tools might also fail if you work on some
-> ancient tree (don't, instead use mainline) or work on fork of kernel
-> (don't, instead use mainline). Just use b4 and everything should be
-> fine, although remember about `b4 prep --auto-to-cc` if you added new
-> patches to the patchset.
-> </form letter>
->
-> > Engine is a crypto IP designed by Synopsys.
-> >
-> > Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> > Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> > Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> > Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-> > ---
-> >  .../bindings/crypto/snps,dwc-spacc.yaml       | 70 +++++++++++++++++++
-> >  1 file changed, 70 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-s=
-pacc.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.ya=
-ml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> > new file mode 100644
-> > index 000000000000..ffd4af5593a2
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> > @@ -0,0 +1,70 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Synopsys DesignWare Security Protocol Accelerator(SPAcc) Crypto=
- Engine
-> > +
-> > +maintainers:
-> > +  - Ruud Derwig <Ruud.Derwig@synopsys.com>
-> > +
-> > +description:
-> > +  DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto En=
-gine is
-> > +  a crypto IP designed by Synopsys, that can accelerate cryptographic
-> > +  operations.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - const: snps,dwc-spacc
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  snps,vspacc-priority:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description:
-> > +      Set priority mode on the Virtual SPAcc. This is Virtual SPAcc pr=
-iority
-> > +      weight. Its used in priority arbitration of the Virtual SPAccs.
->
-> Why would this be board configuration?
-
-PK: Got it, its Policy vs Mechanism. I will remove this property.
-
->
-> > +    minimum: 0
-> > +    maximum: 15
-> > +    default: 0
-> > +
-> > +  snps,vspacc-id:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: Virtual spacc index for validation and driver functio=
-ning.
->
-> Driver? Bindings are for hardware, not driver. You described the desired
-> Linux feature or behavior, not the actual hardware. The bindings are
-> about the latter, so instead you need to rephrase the property and its
-> description to match actual hardware capabilities/features/configuration
-> etc.
-
-PK: Will rephrase and fix that to convey the proper meaning.
-
->
-> > +    minimum: 0
-> > +    maximum: 7
-> > +
-> > +  snps,spacc-wdtimer:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: Watchdog timer count to replace the default value in =
-driver.
->
-> If this is watchdog, then use existing watchdog schema and its property.
-> If this is something else then... well, it cannot be something for
-> driver, so then drop.
-
-PK: I will rename this since its NOT a traditional watchdog, but its an
-      internal device counter that generates an interrupt based on a
-count value.
-      This counter starts ticking when there is a completed job sitting on
-      the status FIFO, to be serviced. This makes sure that there are no jo=
-bs
-      that get starved of processing.
-
->
-> > +    minimum: 0x19000
-> > +    maximum: 0xFFFFF
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - interrupts
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    crypto@40000000 {
-> > +        compatible =3D "snps,dwc-spacc";
-> > +        reg =3D <0x40000000 0x3FFFF>;
-> > +        interrupt-parent =3D <&gic>;
-> > +        interrupts =3D <0 89 4>;
->
-> Use proper defines for typical flags.
-
-PK: Will fix it.
-
->
->
->
-> Best regards,
-> Krzysztof
+Best regards,
+Krzysztof
