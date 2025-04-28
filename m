@@ -1,77 +1,100 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041B91D5159;
-	Mon, 28 Apr 2025 11:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC91266B67;
+	Mon, 28 Apr 2025 12:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745841292; cv=none; b=SLqdH4WZnCPGOU2m0PDJuTPmjRudgDWhry+zik1fxvbK/izKlRYGi7BwzxaOqawiKmrLzAJqHgtcPw5xVLMJrPLMImO2CfutVf9aDsX43CON8sFMFXIKLgKUxR4A/hkw4lDvmmP+u49/UJ+cR/6B/CGtLWUBwJTLUZbSaCUFSxE=
+	t=1745844937; cv=none; b=KqclnG4NKNZEFjXbF52VVi1UGNdNsGjU8E8bHBM18VGQTcR3rB0xXEA6r8rE56RALsQwS67ojICoGt5JZM72oeu+HCiqeMSdmbxUkQVHaY14FqY02sAMaB9Ht1Ia8Zj/7P4LTgVEgrlC9Y9c8AXesPSWyiK5iK4YVBjl9OfOfQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745841292; c=relaxed/simple;
-	bh=23kwinisccu34XpMcGpdPDdAalJwVI2LvbzrznvSi7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SEFpgYBbTjV8RgRc1JYW6kR8nXaLPJSPj3pgB18OknMvoxURrIXH4SMWf2ZsV+8bBy3pt8SCi5mO/0yhxtt1b9kkb23Ct/t+VL2pNVGEo5JBpJmb5NPnpEXc7Ya+CECTlV2legHY4+fbYDKOWKfNTu/CDLUKdWrGCO2ADjozpFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Exf5KlG1; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745844937; c=relaxed/simple;
+	bh=X+xLCbiG+4JgTGFLVyMpzBshiy8LrzoV71eX7VicFbo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dkBReUx8CcjItGJnidXEpfdYpp/5VuON46TccF+o1C6V+c8Rg7A/2iSDzF16SLnN1RKzifV/CIeBALmDnaCFLnpmtQpM7QJw1jGLe87JzppB7CUDb7sdJL0dGeapPpAA1LuQU5jBR678Hr3uf4ujAVGr1svxvHeqtoL+JeQ/kZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iSjrJ1yY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Exf5KlG1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=37rLIMLFlk5npwCc/iHhjmm772yYSs2S7drUMssNos0=; b=Exf5KlG1jNwSSx5K2CYsRXlgxz
-	EIc044a7f7ZLQYKBCotON1j483aD8yfVhp235sVZHMGGQsa3YzatkM2m4sQpuk4K5HlVPZgyV70Vj
-	P8e3LTcb2SQvvKKNp+p/zyMK24HUlIZW8MxtMSgmxkzohXWgdHk+yCREW2jtxHalzlEwttASUxIOh
-	6L9+UasiKlZeHBjZH5f8JlMJ+mKJv9SPymYIFlKSciUSG5Yfp+z2WA92N0UISUwjZX2Q6PkqDxv/Y
-	jtfeGq70DrmhfuKfQG7MVt8SRGIjKHNntSIp6uzKv6LVbw6/HaogauxOUTi4Xb6xsLTvJpUFX+2Eg
-	tJqaPY1w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9N4M-001bL3-30;
-	Mon, 28 Apr 2025 19:54:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:54:42 +0800
-Date: Mon, 28 Apr 2025 19:54:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: jernej.skrabec@gmail.com, samuel@sholland.org, wens@csie.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH RESEND] crypto: sun8i-ss: do not use sg_dma_len before
- calling DMA functions
-Message-ID: <aA9sgikONjK2ig5z@gondor.apana.org.au>
-References: <20250427111236.25668-1-clabbe.montjoie@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iSjrJ1yY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3962C4CEE4;
+	Mon, 28 Apr 2025 12:55:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745844937;
+	bh=X+xLCbiG+4JgTGFLVyMpzBshiy8LrzoV71eX7VicFbo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iSjrJ1yYBFS88e5l8XTZ0bYtP1CsipMiSfkHgL1ojBEgMgvmjgwK98hGFzikcYuQ0
+	 fbL6cwlDVD7ZdLEttMYaF4a9quHe5Qy9azNzpRBhUcZPj5Z/83vtM7vQ5le5BFihSl
+	 HhyRvI+Wfjrb81SG7XDm+E32gDlkcJA+8WZ7i5lU2hdA9ZIYbVRDCW7hmG687guIwX
+	 RQFIJhyRPPPLVuN5f08+1Xw3hWKZQ3h/T1yDmaMt9mHuBkvQLEwl4cskPx+Mkq0sbd
+	 UikqaBcYSbi3346DkprINITV/oHO9oKumJeO1YInc1q/w7lsnkw21ZOwg4MWwHbvuW
+	 srXcsf47tCOfw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Revert "crypto: crc32 - remove "_generic" from filenames"
+Date: Mon, 28 Apr 2025 14:54:02 +0200
+Message-Id: <20250428125530.2018272-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250427111236.25668-1-clabbe.montjoie@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Apr 27, 2025 at 01:12:36PM +0200, Corentin Labbe wrote:
-> When testing sun8i-ss with multi_v7_defconfig, all CBC algorithm fail crypto
-> selftests.
-> This is strange since on sunxi_defconfig, everything was ok.
-> The problem was in the IV setup loop which never run because sg_dma_len
-> was 0.
-> 
-> Fixes: 359e893e8af4 ("crypto: sun8i-ss - rework handling of IV")
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> ---
-> 
-> If someone know why sunxi_defconfig have sg_dma_len() which always works
-> even with any DMA call not done.
-> 
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+From: Arnd Bergmann <arnd@arndb.de>
 
-Patch applied.  Thanks.
+Each loadable module in the kernel must have a unique name, so renaming
+the crc32 crypto module made it conflict with the crc32 library, as
+shown by the build failure:
+
+ error: the following would cause module name conflict:
+   crypto/crc32.ko
+   lib/crc32.ko
+
+This could be solved by renaming one of the two conflicting modules
+to something else again. As I can't think of a better name, just
+revert back to the previous state as the easiest fix.
+
+Fixes: ce653e0a7e0a ("crypto: crc32 - remove "_generic" from filenames")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/Makefile                       | 8 ++++----
+ crypto/{crc32.c => crc32_generic.c}   | 0
+ crypto/{crc32c.c => crc32c_generic.c} | 0
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+ rename crypto/{crc32.c => crc32_generic.c} (100%)
+ rename crypto/{crc32c.c => crc32c_generic.c} (100%)
+
+diff --git a/crypto/Makefile b/crypto/Makefile
+index f238281b16c0..5d2f2a28d8a0 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -153,10 +153,10 @@ obj-$(CONFIG_CRYPTO_POLY1305) += poly1305.o
+ CFLAGS_poly1305.o += -DARCH=$(ARCH)
+ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+-obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
+-obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
+-CFLAGS_crc32c.o += -DARCH=$(ARCH)
+-CFLAGS_crc32.o += -DARCH=$(ARCH)
++obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
++obj-$(CONFIG_CRYPTO_CRC32) += crc32_generic.o
++CFLAGS_crc32c_generic.o += -DARCH=$(ARCH)
++CFLAGS_crc32_generic.o += -DARCH=$(ARCH)
+ obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+ obj-$(CONFIG_CRYPTO_KRB5ENC) += krb5enc.o
+ obj-$(CONFIG_CRYPTO_LZO) += lzo.o lzo-rle.o
+diff --git a/crypto/crc32.c b/crypto/crc32_generic.c
+similarity index 100%
+rename from crypto/crc32.c
+rename to crypto/crc32_generic.c
+diff --git a/crypto/crc32c.c b/crypto/crc32c_generic.c
+similarity index 100%
+rename from crypto/crc32c.c
+rename to crypto/crc32c_generic.c
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
