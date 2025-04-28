@@ -1,123 +1,111 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBA9253B43
-	for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 10:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB00EEC8;
+	Mon, 28 Apr 2025 11:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745836139; cv=none; b=qC/K+vz64iFA1gc7p8hWO+3kiXtWeTW1xbhdftPa1FMHyi9eR2M266kznQSeiKNoiaRQuaQBEq/8rU6AS1OrR7ujN/uforBKgvcyhAcHaTnKORBzARA+h9Kp+uvOk+imBvyajAW6Q2OxXgW0aGTviBKfNzNXb9NgPu/viDEnckA=
+	t=1745839230; cv=none; b=L6lny13/zBe0YrZbr18hFmubZQQhyJAGLHKeEN3b4O8NVay0X+IHxqGw+vdbrxwgqgHC7mKGAs91YGXZW0npJtEZKnC5vM0r2iXipYHptbE2FFPPfBEuOVg09bL4JzpUQtKwIa/uYR9TU7XRyJVkQ1QEmoVBeJY8fyLBP40+SWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745836139; c=relaxed/simple;
-	bh=ruIOSYQ6oFubP9SOiCH9r1ANRa+KN/sarSp1jPgeVJw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T9uEdY8zkmtIZpxX3z6m+KD2sL8Z+PPPnJ0pcKVVjj+DwNVbYTbnJs1HhpcAB/e+Op33iACGKxzzfQzNjbz7YaXg5GoGYet+TTB9V6cTq+CznZfJJgg4kwkT+zlTevlJ6ffBTOBm93bWTD+wgsg15v4GGwc++RdNQAIbDriDplY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=XrUB3yLX; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1745839230; c=relaxed/simple;
+	bh=lrGpwyIeyfi1QIbcIJ/Tj+3KQ+8NpzxTnUlKvV/xJi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWVCyBnitFzoqE4IdTXMC4sJm9wPTnk1IQJSY6V+/mqY1e3docSKKRxlcqUcvPyzQwYAnWE5stPdRTP34U7AMtVP1lefoCOtWeHgR1Oy/HP1erZ5nFL/jEcGOQadRJ8+tG0DwQQqLPxuyPSLf4yKoraponCf/BL9RwV/SaCdtOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pDiCebDu; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="XrUB3yLX"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e6e1cd3f451so3522794276.2
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Apr 2025 03:28:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1745836137; x=1746440937; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ad2hfYAaXs4UcPz87uwN8ese08Wo0cmaLOPntlJfTgg=;
-        b=XrUB3yLXzeLjS4CKeq+Orb+d/TUv7EteRcwZ1EavXq/nHS1mLSN8XESHvRWn69OlQr
-         SJSwZ+2SyYB0LoGhGXBjGpsIJ9GWufJBuXN6OD4VpO/VIH6fYJ4O8GPaLiYJpyrKIOfZ
-         LP3/Yn0pqFTEETknLy91OrHPz0Z54xkMfazHA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745836137; x=1746440937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ad2hfYAaXs4UcPz87uwN8ese08Wo0cmaLOPntlJfTgg=;
-        b=eUuTsO/j9T1ptpDCUDOC4JvJvItIap0/PZJ4OoDZWt+u/NwHMt+JkmSIwSTJyxuCvc
-         HsL5m0MbXXxSZDEB1yZcKj1V8QE85zSBb8qyW8Bfsy/PTzW8bxUVvvwRYBbc3wIConxa
-         F/opaWwhICBR+ItT/1NYm0iLZaVBkPIWpDwEt2epv9A30ccfGur1PllDCSaKuJMgdAME
-         yuAlUPeoLNnLIfd4ZAZmGvTnSR2dx3e0Ycvp8pIJfh3ndVAsusEBQju2iqkc1PjgJv9R
-         UGt65YHJFhDhD4Z8pmMUVOjS3SgL+gNEGBB5CYE2RoUS9mZOBrpBaIWII/gidxLCCf6Q
-         vPPQ==
-X-Gm-Message-State: AOJu0YzkUm63YIOV2NR5cNNyThvmqwt7r6dJCzs6wIpzuKu5ZIeGsFjC
-	iOyl2rzqLwYk+4tn9kH0nH+QbibSPg8vqLypGeNb5U6qWNNAmswE8Mm1s6XNPYqebghGvOo56ZX
-	9ff+sBdAlWDhL+Bxkohos04chh2GZcn+AUhipXA==
-X-Gm-Gg: ASbGncs7vY0gR7UYJdmguV45z1r9ABSdIdLol3cTh2ZqMSeNnO/xTbylFTaeMCkIrvI
-	sOdDqxo0aWe07xVPKbr4aDyk95emxU3k/H5AlI27OzAEbWf21H/O0oIa/OsnigTGxpNUc5HetDc
-	Oiu2ED8ude0jLXqQUbbmK/pnQ2tlwxt+Vjfgy81nOCg82DjEpdj0Fhymk=
-X-Google-Smtp-Source: AGHT+IFOb7bkGF47Z0Sj5W/G1ukJMIQOyZSKkD3DfgEzKXPBH1RQeqjnbUPM7iUBBh9JiUmhlk/NxninlzzPK6KVA3Y=
-X-Received: by 2002:a05:6902:c04:b0:e71:2a10:8fd with SMTP id
- 3f1490d57ef6-e73167e73f2mr14760300276.26.1745836137015; Mon, 28 Apr 2025
- 03:28:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pDiCebDu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=sh9fvtw3x+0OKhV0VoEJRrPasUJuLRYfxSzZzi6/cg8=; b=pDiCebDuIci7Mk4OEF0McCApuQ
+	FmKEjP5+MQvESpcUKisrKxMFEveGBInusJogYaKdCXiCiCus5aTr62ELhPOBxB7A3iFx5nMfbyjca
+	aF25QoTTyLb5uCnm1z1rKjXRPOHO/LOaH3RkzXLw5MzluhGQ5C317ZIWnpcMZbDwFBaLNOl+CApuM
+	ShLctgazkaiCjWI+bd7hFG0SDzWMbvvrIOP1RldsVCKLBQgfrUC1Wm5ctw9Uq5/eLt5g4Y4LUhCEB
+	1i7Oos4x9bzJD2VjBFQecqi8SPcsWEoqG6K7xT7u2XK1YRHdwwkWJpk+2UxDz6m/gGE45O73p8Ror
+	eTWhswvQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u9MWg-001aq7-24;
+	Mon, 28 Apr 2025 19:19:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:19:54 +0800
+Date: Mon, 28 Apr 2025 19:19:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] crypto/krb5: Fix change to use SG miter to use
+ offset
+Message-ID: <aA9kWu9eViN17ZBs@gondor.apana.org.au>
+References: <3824017.1745835726@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423101518.1360552-1-pavitrakumarm@vayavyalabs.com>
- <20250423101518.1360552-2-pavitrakumarm@vayavyalabs.com> <e5f47f52-807d-45ce-bd62-090f4af72b3a@kernel.org>
- <CALxtO0k0jeZF=Y5Ut_yhX8DxC3hVHWpnrcdJeBXP_GpA=O5T4w@mail.gmail.com> <628faa57-f135-4f62-9827-5c98d9265391@kernel.org>
-In-Reply-To: <628faa57-f135-4f62-9827-5c98d9265391@kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Mon, 28 Apr 2025 15:58:45 +0530
-X-Gm-Features: ATxdqUHPW2Bs_aWRQo6-S8EuhqMYj3WXHtFTMowNg0HzbX933XBEOfJ7EiAHZM4
-Message-ID: <CALxtO0nFtAiK8oG=7k8bhxwwxcQo0XZawEbkRG9Prg4z6JshXQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	herbert@gondor.apana.org.au, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3824017.1745835726@warthog.procyon.org.uk>
 
-Hi Krzysztof,
-   Its not possible to use it outside of the SoC. So for the current
-SPAcc IP testing we flash it to the PL part of the Zynq. Post which it
-behaves like a peripheral sitting on the system bus. The device is
-memory mapped and its interrupt is connected to GIC. A platform driver
-works perfectly in this case and that's what we have.
-   All the drivers that we have in the kernel are for crypto
-hardware/engines, which already are available as part of some SoC in
-the market. But in our case its still an IP. Since I dont have any
-reference/expertise, it would be great if you could suggest a way to
-handle such a case.
+On Mon, Apr 28, 2025 at 11:22:06AM +0100, David Howells wrote:
+> [Note: Nothing in linus/master uses the krb5lib, though the bug is there,
+>  but it is used by AF_RXRPC's RxGK implementation in net-next, so can it go
+>  through the net-next tree rather than directly to Linus or through
+>  crypto?]
 
-Warm regards,
-PK
+Sure I'm happy for this to go through net-next.
 
-On Mon, Apr 28, 2025 at 2:41=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 28/04/2025 10:13, Pavitrakumar Managutte wrote:
-> > Hi Krzysztof,
-> >    My comments are embedded below.
-> >
-> > Warm regards,
-> > PK
-> >
-> >
-> > On Wed, Apr 23, 2025 at 6:23=E2=80=AFPM Krzysztof Kozlowski <krzk@kerne=
-l.org> wrote:
-> >
-> >> On 23/04/2025 12:15, Pavitrakumar M wrote:
-> >>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> >>>
-> >>> Add DT bindings related to the SPAcc driver for Documentation.
-> >>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
-> >>
-> >> These IP blocks are rarely usable on their own and need SoC
-> >> customization. Where any SoC users? Where are any SoC compatibles?
-> >>
-> >
-> > PK: This is a new IP designed by Synopsys, which we tested on the Xilin=
-x
-> > Zynqmp FPGA (ZCU104 board).
-> >        This is NOT a part of any SoC yet, but it might be in future.
-> >        Could you offer suggestions on how to handle such a case?
->
-> Hm? How is it possible to use it outside of a SoC?
->
-> Best regards,
-> Krzysztof
+> The recent patch to make the rfc3961 simplified code use sg_miter rather
+> than manually walking the scatterlist to hash the contents of a buffer
+> described by that scatterlist failed to take the starting offset into
+> account.
+> 
+> This is indicated by the selftests reporting:
+> 
+>     krb5: Running aes128-cts-hmac-sha256-128 mic
+>     krb5: !!! TESTFAIL crypto/krb5/selftest.c:446
+>     krb5: MIC mismatch
+> 
+> Fix this by calling sg_miter_skip() before doing the loop to advance by the
+> offset.
+> 
+> This only affects packet signing modes and not full encryption in RxGK
+> because, for full encryption, the message digest is handled inside the
+> authenc and krb5enc drivers.
+> 
+> Fixes: da6f9bf40ac2 ("crypto: krb5 - Use SG miter instead of doing it by hand")
+> Reported-by: Marc Dionne <marc.dionne@auristor.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Chuck Lever <chuck.lever@oracle.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Simon Horman <horms@kernel.org>
+> cc: linux-afs@lists.infradead.org
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  crypto/krb5/rfc3961_simplified.c |    1 +
+>  1 file changed, 1 insertion(+)
+
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
