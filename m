@@ -1,49 +1,50 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FF44A21;
-	Mon, 28 Apr 2025 11:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0B9265604;
+	Mon, 28 Apr 2025 11:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745841200; cv=none; b=gjulGnp/PPKy/bleFsxs9bES0rey55yBTf+yQn5omP0oDsEKPEkxZrGO6qQEoL7qdR2cnQsYG57EssmNqIJDf+ndslH3uPAMjX6+F9WlZokrcgzlEMTSvTe+toWeVRdR5nLjpJc+nRgizhew2rX8jOu/OrMNcXkyHLhgmcfY4C8=
+	t=1745841232; cv=none; b=RsPqi7Zu8UAALatU724r9OtdYTQ+m354qMvL6ZQWuVl+OnjLfE6CRsgkyNRNjX5q/4Uy2PrMnB1YwxUPBgQ+iXVU2aSwcu7nLTRiOnZPovooA3y0rwZ7346nNZeKI9G36+hWe6l6Q04JLejiseC7yX65MkxzAOczqVhHnJxhbTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745841200; c=relaxed/simple;
-	bh=Sk7QTKYQHpO4MpyZjQ/Sv46Iq1zpM+5CWnp31Eg8Sy4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=GG/cGzPfJvKnsZMPy4sKm4X+sXIn2Xw0aGdRsqsplGX4aMXpqbfu3WO5HvhrvuzhPnlvfxapCULPrwKW7jhkHnXPmUP+/u4zxbpK2SijUkkSr5C9GqnDupxvoXQ205N397GJiSPj1uJthHjcAIbIkMFvRbeJMPF3zIHo+OvUTdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=F9HnbTnW; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745841232; c=relaxed/simple;
+	bh=+lweNaZ4IIR/WWP5vkBwcgvSpBh0/05FHECd2rEST0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BUXrIF9y2z/tm0SGQE31NUXcn/Hg5yh3oJ7LK3nDZQZsabzjE4t2oQ8AXlRwkCkeAmYGtMBhmHJKYlgQCmqJ1Up3jhqESNmjPSkcp1Oc5YaHYeujUZ2GhmXpJU+A8mavRwEQPGGS258sNFKKhvpwiOYlzNvzeic+Re5rPg6pacU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ftXANzCm; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="F9HnbTnW"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ftXANzCm"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8T1VCs93WeCfIwMLTXrgNJ1jyLMDpCR3K8Uym9nsnV4=; b=F9HnbTnW/poPgQVr/cZWd+pwSz
-	2p1UYqYxeKKqwA8eoU4d9x1FUmWqDFUKj4m1rUYjb/NZ9L/ay2spOHSOBLPXjjOkgGBjoE2P9jaY0
-	SO6fLRcrPnA4AqqV6iTh6DthFMKWQ5y+2BNRYeq6kcb0mNigo2TQnP1X+8q2t4Cf/E71Dp+6Lc2iG
-	rTQFgMhEtDcoE4KDOvGEy2T8moHCtm+9KViSFwmLwa/1cvp4ub/24zEUUuztEGO5LleSISGHI99Tf
-	g1Z9Vys8EoAA69OOsZwOKwArWjMhPqhm7YMnEeA5etXfn6zfP8eJ1HnmeULhjUSmQB4vIUfCLIheP
-	SY6L1ryw==;
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=JCIxb6KxtNgGIni8qVkGyXOpNxUgqN+zGP49XIJbcO4=; b=ftXANzCm1LJpcwaENbP4y31DDi
+	ntSqRpGQPeDv7PSeZDzzFM52Z/iBy5NTS1bFHvL9J6Up09bizKQLhAUwuhvpG6f6FxJg6V/H/iSt5
+	qwyxWypIr6w20qjwRiZv/Tt6ywzhAzoJtZs+6e8L/Tey3Xenn+2/CKjlh7PFnBYme4Zf09bIaOnoj
+	pd01Q7W6LGXWMqnwvKlD6gORLiHKImi00AF7s8s6LlJfbnOy2necdUj7JKA8t+a1PraGCfRRJ3tHX
+	Tq+6bKxdzUkdU4ySyeOhqeLK9sD1ZJeEZEnStazX2s5rd6qU5V62mpnwSBSbt4wGSWYUf0haaaYpr
+	e9SpAnZA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9N2q-001bJS-2Z;
-	Mon, 28 Apr 2025 19:53:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:53:08 +0800
-Date: Mon, 28 Apr 2025 19:53:08 +0800
+	id 1u9N3L-001bJb-0u;
+	Mon, 28 Apr 2025 19:53:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:53:39 +0800
+Date: Mon, 28 Apr 2025 19:53:39 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	x86@kernel.org, Jason@zx2c4.com, ardb@kernel.org
-Subject: Re: [PATCH v3 00/13] Finish disentangling ChaCha, Poly1305, and
- BLAKE2s from CRYPTO
-Message-ID: <aA9sJKUjfhRPMWSo@gondor.apana.org.au>
+To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Cc: clabbe.montjoie@gmail.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, wens@csie.org,
+	jernej.skrabec@gmail.com, samuel@sholland.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] crypto: sun8i-ce-cipher - fix error handling in
+ sun8i_ce_cipher_prepare()
+Message-ID: <aA9sQ5p9_wQ2Vmhb@gondor.apana.org.au>
+References: <20250425124517.2225963-1-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,175 +53,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422152716.5923-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20250425124517.2225963-1-ovidiu.panait.oss@gmail.com>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> This series removes the unnecessary dependency of the ChaCha, Poly1305,
-> and BLAKE2s library functions on the generic crypto infrastructure, i.e.
-> CONFIG_CRYPTO.  To do this, it moves the architecture-optimized
-> implementations of these functions into new directories
-> arch/*/lib/crypto/ which do not depend on CRYPTO.  This mirrors the
-> existing distinction between crypto/ and lib/crypto/.
+On Fri, Apr 25, 2025 at 03:45:14PM +0300, Ovidiu Panait wrote:
+> Fix two DMA cleanup issues on the error path in sun8i_ce_cipher_prepare():
 > 
-> The last two patches remove the selection of CRYPTO by CRYPTO_LIB_CHACHA
-> and CRYPTO_LIB_POLY1305, and they remove the corresponding *_INTERNAL
-> symbols which were needed only because of the entanglement with CRYPTO.
+> 1] If dma_map_sg() fails for areq->dst, the device driver would try to free
+>    DMA memory it has not allocated in the first place. To fix this, on the
+>    "theend_sgs" error path, call dma unmap only if the corresponding dma
+>    map was successful.
 > 
-> Note that Curve25519 is still entangled.  Later patches will fix that.
+> 2] If the dma_map_single() call for the IV fails, the device driver would
+>    try to free an invalid DMA memory address on the "theend_iv" path:
+>    ------------[ cut here ]------------
+>    DMA-API: sun8i-ce 1904000.crypto: device driver tries to free an invalid DMA memory address
+>    WARNING: CPU: 2 PID: 69 at kernel/dma/debug.c:968 check_unmap+0x123c/0x1b90
+>    Modules linked in: skcipher_example(O+)
+>    CPU: 2 UID: 0 PID: 69 Comm: 1904000.crypto- Tainted: G           O        6.15.0-rc3+ #24 PREEMPT
+>    Tainted: [O]=OOT_MODULE
+>    Hardware name: OrangePi Zero2 (DT)
+>    pc : check_unmap+0x123c/0x1b90
+>    lr : check_unmap+0x123c/0x1b90
+>    ...
+>    Call trace:
+>     check_unmap+0x123c/0x1b90 (P)
+>     debug_dma_unmap_page+0xac/0xc0
+>     dma_unmap_page_attrs+0x1f4/0x5fc
+>     sun8i_ce_cipher_do_one+0x1bd4/0x1f40
+>     crypto_pump_work+0x334/0x6e0
+>     kthread_worker_fn+0x21c/0x438
+>     kthread+0x374/0x664
+>     ret_from_fork+0x10/0x20
+>    ---[ end trace 0000000000000000 ]---
 > 
-> Changed in v3:
->   - Fixed build error on arm with CONFIG_CPU_THUMBONLY=y.
->   - Small whitespace and commit message fixes.
->   - Added Acked-by's.
+> To fix this, check for !dma_mapping_error() before calling
+> dma_unmap_single() on the "theend_iv" path.
 > 
-> Changed in v2:
->   - Introduced new directories arch/*/lib/crypto/ instead of keeping
->     the library functions in arch/*/crypto/.
-> 
-> Eric Biggers (13):
->  crypto: arm64 - drop redundant dependencies on ARM64
->  crypto: powerpc - drop redundant dependencies on PPC
->  crypto: s390 - drop redundant dependencies on S390
->  crypto: x86 - drop redundant dependencies on X86
->  crypto: arm - move library functions to arch/arm/lib/crypto/
->  crypto: arm64 - move library functions to arch/arm64/lib/crypto/
->  crypto: mips - move library functions to arch/mips/lib/crypto/
->  crypto: powerpc - move library functions to arch/powerpc/lib/crypto/
->  crypto: riscv - move library functions to arch/riscv/lib/crypto/
->  crypto: s390 - move library functions to arch/s390/lib/crypto/
->  crypto: x86 - move library functions to arch/x86/lib/crypto/
->  crypto: lib/chacha - remove INTERNAL symbol and selection of CRYPTO
->  crypto: lib/poly1305 - remove INTERNAL symbol and selection of CRYPTO
-> 
-> MAINTAINERS                                   |  1 +
-> arch/arm/crypto/Kconfig                       | 23 -----
-> arch/arm/crypto/Makefile                      | 14 +--
-> arch/arm/lib/Makefile                         |  2 +
-> arch/arm/lib/crypto/.gitignore                |  2 +
-> arch/arm/lib/crypto/Kconfig                   | 24 ++++++
-> arch/arm/lib/crypto/Makefile                  | 26 ++++++
-> arch/arm/{ => lib}/crypto/blake2s-core.S      |  0
-> arch/arm/{ => lib}/crypto/blake2s-glue.c      |  0
-> arch/arm/{ => lib}/crypto/chacha-glue.c       |  0
-> arch/arm/{ => lib}/crypto/chacha-neon-core.S  |  0
-> .../arm/{ => lib}/crypto/chacha-scalar-core.S |  0
-> arch/arm/{ => lib}/crypto/poly1305-armv4.pl   |  0
-> arch/arm/{ => lib}/crypto/poly1305-glue.c     |  0
-> arch/arm64/crypto/Kconfig                     | 17 +---
-> arch/arm64/crypto/Makefile                    |  9 +-
-> arch/arm64/lib/Makefile                       |  3 +
-> arch/arm64/lib/crypto/.gitignore              |  2 +
-> arch/arm64/lib/crypto/Kconfig                 | 14 +++
-> arch/arm64/lib/crypto/Makefile                | 16 ++++
-> .../arm64/{ => lib}/crypto/chacha-neon-core.S |  0
-> .../arm64/{ => lib}/crypto/chacha-neon-glue.c |  0
-> arch/arm64/{ => lib}/crypto/poly1305-armv8.pl |  0
-> arch/arm64/{ => lib}/crypto/poly1305-glue.c   |  0
-> arch/mips/crypto/Kconfig                      | 11 ---
-> arch/mips/crypto/Makefile                     | 17 ----
-> arch/mips/lib/Makefile                        |  2 +
-> arch/mips/lib/crypto/.gitignore               |  2 +
-> arch/mips/lib/crypto/Kconfig                  | 12 +++
-> arch/mips/lib/crypto/Makefile                 | 19 ++++
-> arch/mips/{ => lib}/crypto/chacha-core.S      |  0
-> arch/mips/{ => lib}/crypto/chacha-glue.c      |  0
-> arch/mips/{ => lib}/crypto/poly1305-glue.c    |  0
-> arch/mips/{ => lib}/crypto/poly1305-mips.pl   |  0
-> arch/powerpc/crypto/Kconfig                   | 22 +----
-> arch/powerpc/crypto/Makefile                  |  4 -
-> arch/powerpc/lib/Makefile                     |  2 +
-> arch/powerpc/lib/crypto/Kconfig               | 15 ++++
-> arch/powerpc/lib/crypto/Makefile              |  7 ++
-> .../{ => lib}/crypto/chacha-p10-glue.c        |  0
-> .../{ => lib}/crypto/chacha-p10le-8x.S        |  0
-> .../{ => lib}/crypto/poly1305-p10-glue.c      |  0
-> .../{ => lib}/crypto/poly1305-p10le_64.S      |  0
-> arch/riscv/crypto/Kconfig                     |  7 --
-> arch/riscv/crypto/Makefile                    |  3 -
-> arch/riscv/lib/Makefile                       |  1 +
-> arch/riscv/lib/crypto/Kconfig                 |  8 ++
-> arch/riscv/lib/crypto/Makefile                |  4 +
-> .../{ => lib}/crypto/chacha-riscv64-glue.c    |  0
-> .../{ => lib}/crypto/chacha-riscv64-zvkb.S    |  0
-> arch/s390/crypto/Kconfig                      | 16 ----
-> arch/s390/crypto/Makefile                     |  3 -
-> arch/s390/lib/Makefile                        |  1 +
-> arch/s390/lib/crypto/Kconfig                  |  7 ++
-> arch/s390/lib/crypto/Makefile                 |  4 +
-> arch/s390/{ => lib}/crypto/chacha-glue.c      |  0
-> arch/s390/{ => lib}/crypto/chacha-s390.S      |  0
-> arch/s390/{ => lib}/crypto/chacha-s390.h      |  0
-> arch/x86/crypto/Kconfig                       | 86 +++++++------------
-> arch/x86/crypto/Makefile                      | 15 ----
-> arch/x86/lib/Makefile                         |  2 +
-> arch/x86/lib/crypto/.gitignore                |  2 +
-> arch/x86/lib/crypto/Kconfig                   | 26 ++++++
-> arch/x86/lib/crypto/Makefile                  | 17 ++++
-> arch/x86/{ => lib}/crypto/blake2s-core.S      |  0
-> arch/x86/{ => lib}/crypto/blake2s-glue.c      |  0
-> .../x86/{ => lib}/crypto/chacha-avx2-x86_64.S |  0
-> .../{ => lib}/crypto/chacha-avx512vl-x86_64.S |  0
-> .../{ => lib}/crypto/chacha-ssse3-x86_64.S    |  0
-> arch/x86/{ => lib}/crypto/chacha_glue.c       |  0
-> .../crypto/poly1305-x86_64-cryptogams.pl      |  0
-> arch/x86/{ => lib}/crypto/poly1305_glue.c     |  0
-> crypto/Kconfig                                |  4 +-
-> lib/crypto/Kconfig                            | 56 +++++++-----
-> 74 files changed, 294 insertions(+), 234 deletions(-)
-> create mode 100644 arch/arm/lib/crypto/.gitignore
-> create mode 100644 arch/arm/lib/crypto/Kconfig
-> create mode 100644 arch/arm/lib/crypto/Makefile
-> rename arch/arm/{ => lib}/crypto/blake2s-core.S (100%)
-> rename arch/arm/{ => lib}/crypto/blake2s-glue.c (100%)
-> rename arch/arm/{ => lib}/crypto/chacha-glue.c (100%)
-> rename arch/arm/{ => lib}/crypto/chacha-neon-core.S (100%)
-> rename arch/arm/{ => lib}/crypto/chacha-scalar-core.S (100%)
-> rename arch/arm/{ => lib}/crypto/poly1305-armv4.pl (100%)
-> rename arch/arm/{ => lib}/crypto/poly1305-glue.c (100%)
-> create mode 100644 arch/arm64/lib/crypto/.gitignore
-> create mode 100644 arch/arm64/lib/crypto/Kconfig
-> create mode 100644 arch/arm64/lib/crypto/Makefile
-> rename arch/arm64/{ => lib}/crypto/chacha-neon-core.S (100%)
-> rename arch/arm64/{ => lib}/crypto/chacha-neon-glue.c (100%)
-> rename arch/arm64/{ => lib}/crypto/poly1305-armv8.pl (100%)
-> rename arch/arm64/{ => lib}/crypto/poly1305-glue.c (100%)
-> create mode 100644 arch/mips/lib/crypto/.gitignore
-> create mode 100644 arch/mips/lib/crypto/Kconfig
-> create mode 100644 arch/mips/lib/crypto/Makefile
-> rename arch/mips/{ => lib}/crypto/chacha-core.S (100%)
-> rename arch/mips/{ => lib}/crypto/chacha-glue.c (100%)
-> rename arch/mips/{ => lib}/crypto/poly1305-glue.c (100%)
-> rename arch/mips/{ => lib}/crypto/poly1305-mips.pl (100%)
-> create mode 100644 arch/powerpc/lib/crypto/Kconfig
-> create mode 100644 arch/powerpc/lib/crypto/Makefile
-> rename arch/powerpc/{ => lib}/crypto/chacha-p10-glue.c (100%)
-> rename arch/powerpc/{ => lib}/crypto/chacha-p10le-8x.S (100%)
-> rename arch/powerpc/{ => lib}/crypto/poly1305-p10-glue.c (100%)
-> rename arch/powerpc/{ => lib}/crypto/poly1305-p10le_64.S (100%)
-> create mode 100644 arch/riscv/lib/crypto/Kconfig
-> create mode 100644 arch/riscv/lib/crypto/Makefile
-> rename arch/riscv/{ => lib}/crypto/chacha-riscv64-glue.c (100%)
-> rename arch/riscv/{ => lib}/crypto/chacha-riscv64-zvkb.S (100%)
-> create mode 100644 arch/s390/lib/crypto/Kconfig
-> create mode 100644 arch/s390/lib/crypto/Makefile
-> rename arch/s390/{ => lib}/crypto/chacha-glue.c (100%)
-> rename arch/s390/{ => lib}/crypto/chacha-s390.S (100%)
-> rename arch/s390/{ => lib}/crypto/chacha-s390.h (100%)
-> create mode 100644 arch/x86/lib/crypto/.gitignore
-> create mode 100644 arch/x86/lib/crypto/Kconfig
-> create mode 100644 arch/x86/lib/crypto/Makefile
-> rename arch/x86/{ => lib}/crypto/blake2s-core.S (100%)
-> rename arch/x86/{ => lib}/crypto/blake2s-glue.c (100%)
-> rename arch/x86/{ => lib}/crypto/chacha-avx2-x86_64.S (100%)
-> rename arch/x86/{ => lib}/crypto/chacha-avx512vl-x86_64.S (100%)
-> rename arch/x86/{ => lib}/crypto/chacha-ssse3-x86_64.S (100%)
-> rename arch/x86/{ => lib}/crypto/chacha_glue.c (100%)
-> rename arch/x86/{ => lib}/crypto/poly1305-x86_64-cryptogams.pl (100%)
-> rename arch/x86/{ => lib}/crypto/poly1305_glue.c (100%)
-> 
-> 
-> base-commit: bb9c648b334be581a791c7669abaa594e4b5ebb7
+> Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
+> Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+> ---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
 All applied.  Thanks.
 -- 
