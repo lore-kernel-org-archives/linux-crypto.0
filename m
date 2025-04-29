@@ -1,46 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C07E242D6E;
-	Tue, 29 Apr 2025 16:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67D924A047;
+	Tue, 29 Apr 2025 16:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745944946; cv=none; b=sGyXXuCDWSOshyrtVnv5BLnmxA4hw3fDLh1a3BGAQTpvZi1JHktAOMtchybRtKlDejGzYobLkxEfqjJ+9JgSMSUlLJ4zHr1Jv68FO5XO8qcNKoDvtt2xkG5KpEsB9p5r9cHDbFDvmYXbPqZmJS+GQtDYSJLXsRB+xlsDEF91vFs=
+	t=1745945872; cv=none; b=u2/6ifII56JyZg3an4doJxwaOEBC5vAwYnzwEC/E2qQ00n7bivfCxkAY+IAzzFYwcF0MM9XPghG+S0KFA0UukzEz0IVCHYvFvGD1w3mBRItIIBKN1XgWN7kWPe18rIiGxiviheB8WGOaRMt8UvvM9F91bB4dTyqKJ4PBrvMg9W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745944946; c=relaxed/simple;
-	bh=ubCQ+1nz/UrnwBW5+P/ki1szuiGWwSLpS0BipGSViPU=;
+	s=arc-20240116; t=1745945872; c=relaxed/simple;
+	bh=Tg1ctzwo0ak0Lwu1YWKgH+RS3fovIZ1X+v294BjOsH8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K11qJDygB4Nv7Dq9xwRBv5qwM02Ooa3itrKLAlCDoAmCR0Z6IfbmuDUD4CR4qEANi+Tn40XbHCI2jT0pa8pG2jWq59AvbIdMWR+7rEw8igNp6B9t5AkIRj/h9RbQcUoifpYalAPAusMIgbockNIUiY54UQwBnwMSs3fUi4UaQ6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSZAwrAL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=E5eCeW9G/DNrxqMjMeS6kxib+gjQYz9CyZqnoldd0kEhlNgvIhtYcLWjQJq+9WiISZJbe+qFCxeGivQqm99xdgA6mmTEx18ceZLowYpXXm2ntArkAC2GRkoklRfWlzPeOGa9RSqWdP8nVRMQN68t7TLdLn0sT9rNvF8YC8jIK+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfHRE0Zf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSZAwrAL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356CCC4CEE3;
-	Tue, 29 Apr 2025 16:42:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfHRE0Zf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA3CC4CEEA;
+	Tue, 29 Apr 2025 16:57:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745944945;
-	bh=ubCQ+1nz/UrnwBW5+P/ki1szuiGWwSLpS0BipGSViPU=;
+	s=k20201202; t=1745945871;
+	bh=Tg1ctzwo0ak0Lwu1YWKgH+RS3fovIZ1X+v294BjOsH8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BSZAwrAL8nk18eoJTfmYkZwRh761GC4sL86Xdd4xSSeJooZtIwdH9ppNdrTKnrCNM
-	 m5tFwHimiws9PqkG/S7muSBLpwXrMVVTLNIA0tszpTF1DIfoSrH1JNrJEJXTRg5VRd
-	 VSAAmlU19ZRT/2CC+vGWlP784Itcdb0g1HESbAB1r/sgz0268peS95zCYxt/hPhVaQ
-	 x3oJbYKD0k4lmgnAyLGsShDWVI9kj0d3A6aYaCsn+uC5ZL/PIEh5D4fiVYgqSSkuXj
-	 O6PYQWbqw+d59CjTMX8JmoD8508dIhVPb20rK1eNcLTauEEN/muv3AURikZdih/4C2
-	 iIOAXk4cexscA==
-Date: Tue, 29 Apr 2025 09:42:23 -0700
+	b=VfHRE0ZfOmDAVECATIVhnIIEDv8InpF/NVtbUFhMnpUd0U4Y+5b0Ww4zgRVL1MNmR
+	 u8gCoUF2f9BknbD6Z34UXG4o4jeie06f9l37yhBS9hg7PyyZPh0t76hiNmFRLKGGi5
+	 iEyi9z3gFBB3tX3cQpD1giyD3J3AvQz31/yIHy3BsfSa938ZSffUIHVakH6CrbbrdF
+	 VDAjwRavumw/UONhO/E9zhOSkKcu9AG/KUZggezyKAUSbacO11GC7UHvJUwjFrcjyu
+	 f0RJmP3EuGwQ5b0kiClDl4KQSZySaB5MQps8Q90qLLDnvzKrTossosvNsmID5DJOBH
+	 TIWeglu12AohQ==
+Date: Tue, 29 Apr 2025 09:57:49 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Amadeusz =?utf-8?B?U8WCYXdpxYRza2k=?= <amadeuszx.slawinski@linux.intel.com>
-Subject: Re: [PATCH] firmware_loader: use SHA-256 library API instead of
- crypto_shash API
-Message-ID: <20250429164223.GB1743@sol.localdomain>
-References: <20250428190909.852705-1-ebiggers@kernel.org>
- <2025042935-ethanol-remodeler-bf69@gregkh>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	sparclinux@vger.kernel.org, linux-s390@vger.kernel.org,
+	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld " <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [v3 PATCH 00/13] Architecture-optimized SHA-256 library API
+Message-ID: <20250429165749.GC1743@sol.localdomain>
+References: <cover.1745816372.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,27 +48,64 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2025042935-ethanol-remodeler-bf69@gregkh>
+In-Reply-To: <cover.1745816372.git.herbert@gondor.apana.org.au>
 
-On Tue, Apr 29, 2025 at 07:54:42AM +0200, Greg Kroah-Hartman wrote:
-> On Mon, Apr 28, 2025 at 12:09:09PM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > This user of SHA-256 does not support any other algorithm, so the
-> > crypto_shash abstraction provides no value.  Just use the SHA-256
-> > library API instead, which is much simpler and easier to use.
-> > 
-> > Also take advantage of printk's built-in hex conversion using %*phN.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> > 
-> > This patch is targeting the firmware_loader tree for 6.16.
+On Mon, Apr 28, 2025 at 01:17:02PM +0800, Herbert Xu wrote:
+> Changes in v3:
+> - Add shash sha256-lib/sha224-lib to provide test coverage for libsha256.
 > 
+> This is based on
 > 
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 	https://patchwork.kernel.org/project/linux-crypto/list/?series=957558
+> 
+> Original description:
+> 
+> Following the example of several other algorithms (e.g. CRC32, ChaCha,
+> Poly1305, BLAKE2s), this series refactors the kernel's existing
+> architecture-optimized SHA-256 code to be available via the library API,
+> instead of just via the crypto_shash API as it was before.  It also
+> reimplements the SHA-256 crypto_shash API on top of the library API.
+> 
+> This makes it possible to use the SHA-256 library in
+> performance-critical cases.  The new design is also much simpler, with a
+> negative diffstat of over 1200 lines.  Finally, this also fixes the
+> longstanding issue where the arch-optimized SHA-256 was disabled by
+> default, so people often forgot to enable it.
+> 
+> For now the SHA-256 library is well-covered by the crypto_shash
+> self-tests, but I plan to add a test for the library directly later.
+> I've fully tested this series on arm, arm64, riscv, and x86.  On mips,
+> powerpc, s390, and sparc I've only been able to partially test it, since
+> QEMU does not support the SHA-256 instructions on those platforms.  If
+> anyone with access to a mips, powerpc, s390, or sparc system that has
+> SHA-256 instructions can verify that the crypto self-tests still pass,
+> that would be appreciated.  But I don't expect any issues, especially
+> since the new code is more straightforward than the old code.
+> 
+> Eric Biggers (13):
+>   crypto: sha256 - support arch-optimized lib and expose through shash
+>   crypto: arm/sha256 - implement library instead of shash
+>   crypto: arm64/sha256 - remove obsolete chunking logic
+>   crypto: arm64/sha256 - implement library instead of shash
+>   crypto: mips/sha256 - implement library instead of shash
+>   crypto: powerpc/sha256 - implement library instead of shash
+>   crypto: riscv/sha256 - implement library instead of shash
+>   crypto: s390/sha256 - implement library instead of shash
+>   crypto: sparc - move opcodes.h into asm directory
+>   crypto: sparc/sha256 - implement library instead of shash
+>   crypto: x86/sha256 - implement library instead of shash
+>   crypto: sha256 - remove sha256_base.h
+>   crypto: lib/sha256 - improve function prototypes
 
-Greg, it looks like you normally take patches to this file.  You can go ahead
-and take it if you want.  Thanks!
+To be clear, the objections I have on your v2 patchset still hold.  Your
+unsolicited changes to my patches add unnecessary complexity and redundancy,
+make the crypto_shash API even harder to use correctly, and also break the build
+for several architectures.  If you're going to again use your maintainer
+privileges to push these out anyway over my objections, I'd appreciate it if you
+at least made your dubious changes as incremental patches using your own
+authorship so that they can be properly reviewed/blamed.
+
+Please also note that I've sent a v4 which fixes the one real issue that my v1
+patchset had: https://lore.kernel.org/r/20250428170040.423825-1-ebiggers@kernel.org
 
 - Eric
