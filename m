@@ -1,130 +1,151 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B245F27B4E3
-	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 09:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8891C4609
+	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 10:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745917959; cv=none; b=dC+n3hdKSVqCIWK2XUffR9RpS/xYUHOoFHusbnrttYEz303oY/EjG/OWd/HlNaXJ4wx4JTFcHYbKOLexcYl8l0uSnJ7DysF+MtadWyFPVTtNvSs97dt8zNR/LdYoBkH6NE6VIS0QA7FwLVHgwymo4ZUOEHRmNBLg+h/K9U7j1Lw=
+	t=1745923577; cv=none; b=EE+T+0mhqfwDo4oSuegSJfr+HD5aaILxFxgZq7GlTljBkHrfkDSPjlHoAIVj5sXDcQBunAQ0xiLl0fq122jkTw1MfaEtcxh2MNr+kr1rnnlKTBUMZ/SG/pQ0qFPyQsEQUCjxPBn+ou0w5kKWzEsxn1jQwFEz0J026vFizUmDup0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745917959; c=relaxed/simple;
-	bh=pOS41m5lkMjQzadNx+j41GxqtdZXY/qNBY7dJb1WLds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mke89qZQoFCIAILidMGqrbMF6FJ3ZwpoinLeWIzGJ1j2iOmIYfCz5gAPWvwy6lq4DvTINbylfjHBQlOOljC/5gCRYJVAQ37YTKKAffgfoCwDPHSaVO0gdf+iKgLZ+1NuYcJMpb6GpBG6Q7mV9gFNmSKV49uI/PBNm2Pm2oDzAzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WE81ZGzA; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745923577; c=relaxed/simple;
+	bh=Fs1aFS6opvByAbBh37Sle+MMGbZEdG/PsjGn4YMxeV8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=La1UIPqvy2yY/vx4O+21nqsqp8vkx54IVFasvqPns35NnzbCc5eL5WvtDBrLHnyoLsgGERFeMiLPSR1rvC8k9Si7C5vhkiViqiUIz05g2kXXmFc7EPrxZFH5ScZPA+DY8uznmW5sjG3gm1dSlzhGieuVBd62ED9sH5AwKqlN2uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=MwevwRsG; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WE81ZGzA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=CqAIMgRGCvQM8g40vZqe+ONpJnCgmmHwbHVpU/epjPk=; b=WE81ZGzARSjsBXwk6xcnmCNa4X
-	PFw+bcB3zyQtx3uspBjOI0ikx9VD2/+/qVyLb/GYyANVitoNoz/TD+3Yed+NGUtPDfdV23SRvDQeq
-	cqW+EVPMD/ONm3eDqzOI+W2jNwm6v9554NcLZr428LahSKWLLHJ9oDDDJj2UGWRh3D0rat4+nN+6S
-	hZVHnTZ4GNsgpHqx3tk4wjZYcCtSKflFWGadpBKQtaz8K3SSvk87fkHGtj1Lh/JU5s+nS60kQA7Sh
-	vluY49HdwKpHBKrr1GQ1kbvBUhwEVxlCSVsXwN2zM6PAhdpv49sgCbhDsPfABq2YlFUe2NSysE5E7
-	rz/ZuTzA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9h0w-001tSF-31;
-	Tue, 29 Apr 2025 17:12:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 29 Apr 2025 17:12:30 +0800
-Date: Tue, 29 Apr 2025 17:12:30 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: s390/sha512 - Fix sha512 state size
-Message-ID: <aBCX_l0kSHVx4xQn@gondor.apana.org.au>
-References: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="MwevwRsG"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e6df4507690so4553014276.0
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 03:46:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1745923574; x=1746528374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hF8vKN9sh8z0ZO8tOpt/PfKR+YRXIdIXAv4/thippV0=;
+        b=MwevwRsGpthsFaaPfW+axNsh8M5IMzMwvlN0XKgsmlXfB8cavAnO08a5HtPtagqxNK
+         2ZqpB7+NN/1fR5wRhAp4aNN1bWz7N2KdOYpebwoi9f5prVN96KjT8JSJ5KV94qwOj5DF
+         FTGbjN/ueXG5RzfMVtBWu1toxnXiXoU4cjkSY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745923574; x=1746528374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hF8vKN9sh8z0ZO8tOpt/PfKR+YRXIdIXAv4/thippV0=;
+        b=TKcvOqGv2Q8ULzTpgTkRRpjrUr0acevMXcqUBH5Afd8cH814HqfKdC4HPGFnKEuHSp
+         77lZ3bsWAMA/ebHrUpQxSNFajG7QWcxwZ7oS9gMGwLFlnJ4s7Be0K8NRDOEI0IdW4iAw
+         BUjUIzBo91swx98WbvLKkl/4afrBlQqTZQGgH/fxqpgiMYnIWL/9YVq+1UJz5SPZDrkZ
+         keutjt1Y7F4EwX1OSRhJbWHO2hwShOJfjp4R+zQwiDUAVFw093uOW/n0wvyY8MCDcybx
+         nd6cNTf65YLWPu3QV47DoyBH1KoUEcpPRrqLDLzJ9xd0R1GAMmSUUSTZZBAYmcTUwABy
+         Dodg==
+X-Gm-Message-State: AOJu0Ywz4bQP/JLcEf6R1t+qaS2C8f8V9YZ1pE2wPZRAKP1OTF1Lq72C
+	T6d/5pq+tWwyZhBDhVw5HkeMNGDSWYfTeippFNbte7nS8AYf43he8DZXKXJxqknXDCEL91D/pC4
+	W5txmZ5hJ0G15VNUxCsLvOybU1WrWiXQj/SXuJbkbscCm7Qd8
+X-Gm-Gg: ASbGnctAXoYf+MaanOz7rSg80L9201J/9P/nKxOlPe19jpjSOmS69a2SZcEtheVcAtE
+	kE+cdBaAO5szojBBUIGnN8XJvBonJp5kdBcosmNVb2sr0NalolqMbNpcc2J0DF6IrU8c42bVTyi
+	iFYLHsVBdzKVmKJ9lKrmCuf/NQDLTnL+fmrQpJktEihA7uK1caSYiJikk=
+X-Google-Smtp-Source: AGHT+IGa5Soai89tjfK+oZA5gyBDX32F8Eol887fw+QprtCC0h1OiddDE+yPmdB8AvU79PCN3CxoqjI09aOhKcTBLtA=
+X-Received: by 2002:a05:6902:488f:b0:e73:cd3:5250 with SMTP id
+ 3f1490d57ef6-e73511bd4bemr3420566276.23.1745923573760; Tue, 29 Apr 2025
+ 03:46:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
+References: <20250423101518.1360552-5-pavitrakumarm@vayavyalabs.com> <aA30mVmjAahKb1P-@gondor.apana.org.au>
+In-Reply-To: <aA30mVmjAahKb1P-@gondor.apana.org.au>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Tue, 29 Apr 2025 16:16:02 +0530
+X-Gm-Features: ATxdqUGZ2Ep4oayvRUmOZ6OsH0awXvVmqSlv8_hTfisW-DbZ9yQhAWg1_Fka_E4
+Message-ID: <CALxtO0=gwbQH9Hk69spwN_Z4hZN833o4KNSgNKGm85w6XEgf5A@mail.gmail.com>
+Subject: Re: [PATCH v1 4/6] Add SPAcc ahash support
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
+	adityak@vayavyalabs.com, bhoomikak@vayavyalabs.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 29, 2025 at 10:57:38AM +0200, Harald Freudenberger wrote:
-> Hello Herbert
-> since commit 572b5c4682c7 "crypto: s390/sha512 - Use API partial block
-> handling"
-> all CI tests related to sha kernel modules on the next kernel fail.
+Hi Herbert,
+  My comments are embedded below.
 
-Thanks for catching this!
+Warm regards,
+PK
 
->  struct s390_sha_ctx {
->  	u64 count;		/* message length in bytes */
-> -	u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-> +	union {
-> +		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-> +		struct {
-> +			u64 state[SHA512_DIGEST_SIZE];                  <- really big
-> +			u64 count_hi;
-> +		} sha512;
-> +	};
+On Sun, Apr 27, 2025 at 2:41=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> Pavitrakumar M <pavitrakumarm@vayavyalabs.com> wrote:
+> >
+> > +static void spacc_digest_cb(void *spacc, void *tfm)
+> > +{
+> > +       int dig_sz;
+> > +       int err =3D -1;
+> > +       struct ahash_cb_data *cb =3D tfm;
+> > +       struct spacc_device *device =3D (struct spacc_device *)spacc;
+> > +
+> > +       dig_sz =3D crypto_ahash_digestsize(crypto_ahash_reqtfm(cb->req)=
+);
+> > +
+> > +       if (cb->ctx->single_shot)
+> > +               memcpy(cb->req->result, cb->ctx->digest_buf, dig_sz);
+> > +       else
+> > +               memcpy(cb->tctx->digest_ctx_buf, cb->ctx->digest_buf, d=
+ig_sz);
+> > +
+> > +       err =3D cb->spacc->job[cb->new_handle].job_err;
+> > +
+> > +       dma_pool_free(spacc_hash_pool, cb->ctx->digest_buf,
+> > +                     cb->ctx->digest_dma);
+> > +       spacc_free_mems(cb->ctx, cb->tctx, cb->req);
+> > +       spacc_close(cb->spacc, cb->new_handle);
+> > +
+> > +       if (cb->req->base.complete)
+> > +               ahash_request_complete(cb->req, err);
+>
+> This can only execute in softirq context, or you must disable BH.
 
-I was trying to keep this thing from growing over the 360 limit,
-hence the union.
+PK: Sure, I will fix that by disabling and enable the BH using
+local_disable_bh() and local_enable_bh()
 
-Instead I managed to make it go over the limit spectacularly :)
+>
+> > +       if (atomic_read(&device->wait_counter) > 0) {
+> > +               struct spacc_completion *cur_pos, *next_pos;
+> > +
+> > +               /* wake up waitQ to obtain a context */
+> > +               atomic_dec(&device->wait_counter);
+> > +               if (atomic_read(&device->wait_counter) > 0) {
+> > +                       mutex_lock(&device->spacc_waitq_mutex);
+> > +                       list_for_each_entry_safe(cur_pos, next_pos,
+> > +                                                &device->spacc_wait_li=
+st,
+> > +                                                list) {
+> > +                               if (cur_pos && cur_pos->wait_done =3D=
+=3D 1) {
+> > +                                       cur_pos->wait_done =3D 0;
+> > +                                       complete(&cur_pos->spacc_wait_c=
+omplete);
+> > +                                       list_del(&cur_pos->list);
+> > +                                       break;
+> > +                               }
+> > +                       }
+> > +                       mutex_unlock(&device->spacc_waitq_mutex);
+>
+> While mutex_lock obviously cannot be taken with softirqs disabled.
+> So what context is this function called in?
 
----8<---
-The sha512 state size in s390_sha_ctx is out by a factor of 8,
-fix it so that it stays below HASH_MAX_DESCSIZE.  Also fix the
-state init function which was writing garbage to the state.  Luckily
-this is not actually used for anything other than export.
+PK: Agreed. This function is called as part of my workqueue, so
+softirqs are not disabled. And the mutex_lock here is to traverse the
+wait queue and flag completion of a job so that the hardware context
+can be used by other waiting jobs. SPAcc has 16 hardware contexts
+only.
 
-Reported-by: Harald Freudenberger <freude@linux.ibm.com>
-Fixes: 572b5c4682c7 ("crypto: s390/sha512 - Use API partial block handling")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/s390/crypto/sha.h b/arch/s390/crypto/sha.h
-index 0a3cc1739144..d757ccbce2b4 100644
---- a/arch/s390/crypto/sha.h
-+++ b/arch/s390/crypto/sha.h
-@@ -24,7 +24,7 @@ struct s390_sha_ctx {
- 	union {
- 		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
- 		struct {
--			u64 state[SHA512_DIGEST_SIZE];
-+			u64 state[SHA512_DIGEST_SIZE / sizeof(u64)];
- 			u64 count_hi;
- 		} sha512;
- 	};
-diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
-index 14818fcc9cd4..3c5175e6dda6 100644
---- a/arch/s390/crypto/sha512_s390.c
-+++ b/arch/s390/crypto/sha512_s390.c
-@@ -22,13 +22,13 @@ static int sha512_init(struct shash_desc *desc)
- 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
- 
- 	ctx->sha512.state[0] = SHA512_H0;
--	ctx->sha512.state[2] = SHA512_H1;
--	ctx->sha512.state[4] = SHA512_H2;
--	ctx->sha512.state[6] = SHA512_H3;
--	ctx->sha512.state[8] = SHA512_H4;
--	ctx->sha512.state[10] = SHA512_H5;
--	ctx->sha512.state[12] = SHA512_H6;
--	ctx->sha512.state[14] = SHA512_H7;
-+	ctx->sha512.state[1] = SHA512_H1;
-+	ctx->sha512.state[2] = SHA512_H2;
-+	ctx->sha512.state[3] = SHA512_H3;
-+	ctx->sha512.state[4] = SHA512_H4;
-+	ctx->sha512.state[5] = SHA512_H5;
-+	ctx->sha512.state[6] = SHA512_H6;
-+	ctx->sha512.state[7] = SHA512_H7;
- 	ctx->count = 0;
- 	ctx->sha512.count_hi = 0;
- 	ctx->func = CPACF_KIMD_SHA_512;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
