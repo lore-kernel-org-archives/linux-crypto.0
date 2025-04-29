@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDEC28C5B9;
-	Tue, 29 Apr 2025 08:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AC929DB79;
+	Tue, 29 Apr 2025 08:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745916578; cv=none; b=QC6MesqmaroSkSZPuABUrP6qatjCBkdhXBFzA7SSc7yIC0iEaAKVTz4A49whSEFycwR2z1qFTdwSoc4/3eYV9PsETyQPyfv1W2foDDd8TM30sOhGDg0qMhWa7bkT1q9KUuMnF+QWwUtHWXTO1U5yqjX5bry3iI4vZ6f6HyAxwtQ=
+	t=1745916581; cv=none; b=M/YyPlf5dH1Abw+55uUlpD8P6p/TAbS1g5wMO/crC5C0GZ48tKaK9rzAGjQe/3/aI8QdD8nxc5oYBdnprfCT4f8ouUyJzV9OPTVeu+uos5fg6RBlq8u1AscfyDeXqYquNOeXrOC+t5/qCEXK4j5Z+0dGM2NXOTsVQrrs1ejyJ6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745916578; c=relaxed/simple;
-	bh=lk0LrX0a+HbVCJGoXwhGrCoxbYS5/SI46HtKwdLTy+M=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=ivj/mEMk63SOl3pWwxSWbVhM2v8CdxHwjrPkdHDBlhUFTm/jTeoEKSBOcUMDmF5ZgZtMuULDT7yKtYgDCyHcPGfu0aH0bzB0k8k9PllPuLwCfpN2RhT7UtS1crv0IyXlASS+LPoRLbT4bXX8iC+LFQVrh2+cDidQlVZg8gBD6rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CyXxzigB; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1745916581; c=relaxed/simple;
+	bh=jg+lymy4mj5ThNoZxb00tNuhdEbP/S1gRXJYL3X8Q2k=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=UvO9Yw131aQXi/QOj7ImOyIEgrZ9G+iMlCFtc4SHszlUs8AcUrEH+Kq1j3bCPbjHRILQKyn8tNyTv9R0XutVzVR5Y/JohacY/TNBwigEubt/8sKJ+XzpLlcl8ajr260Rd2UYFbyMxG/hqCI4RmcGeLhhmekVnjXjHYNLlGt81lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Mh3FYn1P; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CyXxzigB"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Mh3FYn1P"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vbsgneqm7qPcW1G8e6QkvQbfl14hNGGdkoz14LFgcro=; b=CyXxzigBC9xiBqHGg15bydfyqD
-	XfLj7V0kta7fJ5fz9/5G4zHkWP7hdUGjaPLqIQxBR0eTmi9qDtX/ActTJtd9jY8SygDOE0A/Hg2PL
-	TIWROzRjfZ0hJk82LNF5RkDVB6DVXs4hwNjZP2fZbvIg5ZSjoI1vSPM35f5mHwfligjZlAqv7vuPq
-	EuZEj1cYRtu0xtF1DHWSoIkMGfhTdWAn0lp32fpXqP+V+DI2tEazlWWxZlVgNshHp4VEkpc/Hq3xg
-	c1e5vWdsfcEiitXGiYxseN3tTxUlE2v9liZXZmEKewKKTrV09I9nRkx90mI9btT+LnLYUvBtzH2Rp
-	iLzxiBew==;
+	bh=fNZHqYKyf8pJWU/Udc/dkvjl+m1VOEutDtQ/8YuT3E4=; b=Mh3FYn1PZEOAoQaxjF9u9DfolB
+	mdmYQhRyEppBp6FzZ0m/NwOSrEBNNnyNw7w2HZYk6fryryQDyKAV0XSjPknh1EDIWJ83JGfC3H+kw
+	WSnJytLzcUPTrTEVw121ow6pTea7XxFXRyHEsqNRSsafwQM17UQrsdSOit4syqiW0Sj0IXS3/Q/K6
+	TlJfsXXL5LjqHoGsP43tWsAh3ZmYSBz09p5Dim9K6yWjMeBfKsPEqT1ewrakDp77Pn7DkZ1OAS61r
+	uF375GrZ2hbg8u/TW3NTcTcS53MAMqGFXlfjxwJKNXuvM7R/tUMYq1HdmjisNxkQriyd2YzRrxSdT
+	7ENfuXiA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9gei-001t5j-2R;
-	Tue, 29 Apr 2025 16:49:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 29 Apr 2025 16:49:32 +0800
-Date: Tue, 29 Apr 2025 16:49:32 +0800
-Message-Id: <cd23dee0d92e06f5b8d489b321dacb5dc4597376.1745916278.git.herbert@gondor.apana.org.au>
+	id 1u9gel-001t5u-0G;
+	Tue, 29 Apr 2025 16:49:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 29 Apr 2025 16:49:35 +0800
+Date: Tue, 29 Apr 2025 16:49:35 +0800
+Message-Id: <81cab16fad98103d8b5c28f2870de08b337c2d78.1745916278.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1745916278.git.herbert@gondor.apana.org.au>
 References: <cover.1745916278.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: s390/hmac - Extend hash length counters to 128
- bits
+Subject: [PATCH 2/2] crypto: s390/hmac - Use generic hash export format
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Harald Freudenberger <freude@linux.ibm.com>, Holger Dengler <dengler@linux.ibm.com>, linux-s390@vger.kernel.org
 Precedence: bulk
@@ -47,91 +46,253 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-As sha512 requires 128-bit counters, extend the hash length counters
-to that length.  Previously they were just 32 bits which means that
-a >4G sha256 hash would be incorrect.
+Convert the hash export format to match that of the generic
+algorithm.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/s390/crypto/hmac_s390.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ arch/s390/crypto/Kconfig     |   4 +-
+ arch/s390/crypto/hmac_s390.c | 175 ++++++++++++++++++++++++++++++++++-
+ 2 files changed, 173 insertions(+), 6 deletions(-)
 
+diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
+index e2c27588b21a..342c639ce2dc 100644
+--- a/arch/s390/crypto/Kconfig
++++ b/arch/s390/crypto/Kconfig
+@@ -91,7 +91,9 @@ config CRYPTO_DES_S390
+ 
+ config CRYPTO_HMAC_S390
+ 	tristate "Keyed-hash message authentication code: HMAC"
+-	select CRYPTO_HASH
++	select CRYPTO_HMAC
++	select CRYPTO_SHA256
++	select CRYPTO_SHA512
+ 	help
+ 	  s390 specific HMAC hardware support for SHA224, SHA256, SHA384 and
+ 	  SHA512.
 diff --git a/arch/s390/crypto/hmac_s390.c b/arch/s390/crypto/hmac_s390.c
-index bba9a818dfdc..e6edf1013228 100644
+index e6edf1013228..44f2a5d394d1 100644
 --- a/arch/s390/crypto/hmac_s390.c
 +++ b/arch/s390/crypto/hmac_s390.c
-@@ -72,23 +72,23 @@ struct s390_kmac_sha2_ctx {
- 	u8 param[MAX_DIGEST_SIZE + MAX_IMBL_SIZE + MAX_BLOCK_SIZE];
- 	union s390_kmac_gr0 gr0;
- 	u8 buf[MAX_BLOCK_SIZE];
--	unsigned int buflen;
-+	u64 buflen[2];
+@@ -53,6 +53,7 @@
+ #define SHA2_KEY_OFFSET(bs)	(SHA2_CV_SIZE(bs) + SHA2_IMBL_SIZE(bs))
+ 
+ struct s390_hmac_ctx {
++	struct crypto_shash *fb;
+ 	u8 key[MAX_BLOCK_SIZE];
  };
  
- /*
-  * kmac_sha2_set_imbl - sets the input message bit-length based on the blocksize
-  */
--static inline void kmac_sha2_set_imbl(u8 *param, unsigned int buflen,
--				      unsigned int blocksize)
-+static inline void kmac_sha2_set_imbl(u8 *param, u64 buflen_lo,
-+				      u64 buflen_hi, unsigned int blocksize)
- {
- 	u8 *imbl = param + SHA2_IMBL_OFFSET(blocksize);
+@@ -157,6 +158,11 @@ static int s390_hmac_sha2_setkey(struct crypto_shash *tfm,
+ 	struct s390_hmac_ctx *tfm_ctx = crypto_shash_ctx(tfm);
+ 	unsigned int ds = crypto_shash_digestsize(tfm);
+ 	unsigned int bs = crypto_shash_blocksize(tfm);
++	int err;
++
++	err = crypto_shash_setkey(tfm_ctx->fb, key, keylen);
++	if (err)
++		return err;
  
- 	switch (blocksize) {
- 	case SHA256_BLOCK_SIZE:
--		*(u64 *)imbl = (u64)buflen * BITS_PER_BYTE;
-+		*(u64 *)imbl = buflen_lo * BITS_PER_BYTE;
- 		break;
- 	case SHA512_BLOCK_SIZE:
--		*(u128 *)imbl = (u128)buflen * BITS_PER_BYTE;
-+		*(u128 *)imbl = (((u128)buflen_hi << 64) + buflen_lo) << 3;
- 		break;
- 	default:
- 		break;
-@@ -176,7 +176,8 @@ static int s390_hmac_sha2_init(struct shash_desc *desc)
- 	memcpy(ctx->param + SHA2_KEY_OFFSET(bs),
- 	       tfm_ctx->key, bs);
+ 	memset(tfm_ctx, 0, sizeof(*tfm_ctx));
  
--	ctx->buflen = 0;
-+	ctx->buflen[0] = 0;
-+	ctx->buflen[1] = 0;
- 	ctx->gr0.reg = 0;
- 	switch (crypto_shash_digestsize(desc->tfm)) {
- 	case SHA224_DIGEST_SIZE:
-@@ -206,8 +207,10 @@ static int s390_hmac_sha2_update(struct shash_desc *desc,
- 	unsigned int offset, n;
- 
- 	/* check current buffer */
--	offset = ctx->buflen % bs;
--	ctx->buflen += len;
-+	offset = ctx->buflen[0] % bs;
-+	ctx->buflen[0] += len;
-+	if (ctx->buflen[0] < len)
-+		ctx->buflen[1]++;
- 	if (offset + len < bs)
- 		goto store;
- 
-@@ -243,8 +246,8 @@ static int s390_hmac_sha2_final(struct shash_desc *desc, u8 *out)
- 	unsigned int bs = crypto_shash_blocksize(desc->tfm);
- 
- 	ctx->gr0.iimp = 0;
--	kmac_sha2_set_imbl(ctx->param, ctx->buflen, bs);
--	_cpacf_kmac(&ctx->gr0.reg, ctx->param, ctx->buf, ctx->buflen % bs);
-+	kmac_sha2_set_imbl(ctx->param, ctx->buflen[0], ctx->buflen[1], bs);
-+	_cpacf_kmac(&ctx->gr0.reg, ctx->param, ctx->buf, ctx->buflen[0] % bs);
- 	memcpy(out, ctx->param, crypto_shash_digestsize(desc->tfm));
- 
+@@ -273,7 +279,160 @@ static int s390_hmac_sha2_digest(struct shash_desc *desc,
  	return 0;
-@@ -262,7 +265,7 @@ static int s390_hmac_sha2_digest(struct shash_desc *desc,
- 		return rc;
+ }
  
- 	ctx->gr0.iimp = 0;
--	kmac_sha2_set_imbl(ctx->param, len,
-+	kmac_sha2_set_imbl(ctx->param, len, 0,
- 			   crypto_shash_blocksize(desc->tfm));
- 	_cpacf_kmac(&ctx->gr0.reg, ctx->param, data, len);
- 	memcpy(out, ctx->param, ds);
+-#define S390_HMAC_SHA2_ALG(x) {						\
++static int s390_hmac_sha2_init_tfm(struct crypto_shash *tfm)
++{
++	struct s390_hmac_ctx *ctx = crypto_shash_ctx(tfm);
++	struct crypto_shash *fb;
++
++	fb = crypto_alloc_shash(crypto_shash_alg_name(tfm), 0,
++				CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(fb))
++		return PTR_ERR(fb);
++
++	ctx->fb = fb;
++	return 0;
++}
++
++static void s390_hmac_sha2_exit_tfm(struct crypto_shash *tfm)
++{
++	struct s390_hmac_ctx *ctx = crypto_shash_ctx(tfm);
++
++	crypto_free_shash(ctx->fb);
++}
++
++static int s390_hmac_export_zero(struct shash_desc *desc, void *out)
++{
++	struct s390_hmac_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	struct crypto_shash *fb = ctx->fb;
++	SHASH_DESC_ON_STACK(fbdesc, fb);
++
++	fbdesc->tfm = fb;
++	return crypto_shash_init(fbdesc) ?:
++	       crypto_shash_export(fbdesc, out);
++}
++
++static int s390_hmac_export_sha256(struct shash_desc *desc, void *out)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	u64 total = ctx->buflen[0];
++	union {
++		u8 *u8;
++		u64 *u64;
++	} p = { .u8 = out };
++	unsigned int remain;
++	u64 hashed;
++	int err = 0;
++
++	hashed = round_down(total, SHA256_BLOCK_SIZE);
++	remain = total - hashed;
++
++	if (!hashed)
++		err = s390_hmac_export_zero(desc, out);
++	else
++		memcpy(p.u8, ctx->param, SHA256_DIGEST_SIZE);
++
++	p.u8 += SHA256_DIGEST_SIZE;
++	put_unaligned(total, p.u64++);
++
++	memcpy(p.u8, ctx->buf, remain);
++
++	return err;
++}
++
++static int s390_hmac_import_sha256(struct shash_desc *desc, const void *in)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	union {
++		const u8 *u8;
++		const u64 *u64;
++	} p = { .u8 = in };
++	unsigned int remain;
++	u64 total;
++	int err;
++
++	err = s390_hmac_sha2_init(desc);
++	if (err)
++		return err;
++
++	memcpy(ctx->param, p.u8, SHA256_DIGEST_SIZE);
++	p.u8 += SHA256_DIGEST_SIZE;
++
++	total = get_unaligned(p.u64++);
++	remain = total % SHA256_BLOCK_SIZE;
++	ctx->buflen[0] = total;
++
++	if (total - remain)
++		ctx->gr0.ikp = 1;
++
++	memcpy(ctx->buf, p.u8, remain);
++
++	return 0;
++}
++
++static int s390_hmac_export_sha512(struct shash_desc *desc, void *out)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	u64 total_hi = ctx->buflen[1];
++	u64 total = ctx->buflen[0];
++	union {
++		u8 *u8;
++		u32 *u32;
++		u64 *u64;
++	} p = { .u8 = out };
++	unsigned int remain;
++	u64 hashed;
++	int err = 0;
++
++	hashed = round_down(total, SHA512_BLOCK_SIZE);
++	remain = total - hashed;
++
++	if (!(hashed | total_hi))
++		err = s390_hmac_export_zero(desc, out);
++	else
++		memcpy(p.u8, ctx->param, SHA512_DIGEST_SIZE);
++
++	p.u8 += SHA512_DIGEST_SIZE;
++	put_unaligned(total, p.u64++);
++	put_unaligned(total_hi, p.u64++);
++
++	memcpy(p.u8, ctx->buf, remain);
++
++	return err;
++}
++
++static int s390_hmac_import_sha512(struct shash_desc *desc, const void *in)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	union {
++		const u8 *u8;
++		const u64 *u64;
++	} p = { .u8 = in };
++	unsigned int remain;
++	u64 total, total_hi;
++	int err;
++
++	err = s390_hmac_sha2_init(desc);
++	if (err)
++		return err;
++
++	memcpy(ctx->param, p.u8, SHA512_DIGEST_SIZE);
++	p.u8 += SHA512_DIGEST_SIZE;
++
++	total = get_unaligned(p.u64++);
++	total_hi = get_unaligned(p.u64++);
++	ctx->buflen[0] = total;
++	ctx->buflen[1] = total_hi;
++
++	remain = total % SHA512_BLOCK_SIZE;
++	if ((total - remain) | total_hi)
++		ctx->gr0.ikp = 1;
++
++	memcpy(ctx->buf, p.u8, remain);
++
++	return 0;
++}
++
++#define S390_HMAC_SHA2_ALG(x, exf, imf, state) {			\
+ 	.fc = CPACF_KMAC_HMAC_SHA_##x,					\
+ 	.alg = {							\
+ 		.init = s390_hmac_sha2_init,				\
+@@ -281,8 +440,13 @@ static int s390_hmac_sha2_digest(struct shash_desc *desc,
+ 		.final = s390_hmac_sha2_final,				\
+ 		.digest = s390_hmac_sha2_digest,			\
+ 		.setkey = s390_hmac_sha2_setkey,			\
++		.init_tfm = s390_hmac_sha2_init_tfm,			\
++		.exit_tfm = s390_hmac_sha2_exit_tfm,			\
++		.export = exf,						\
++		.import = imf,						\
+ 		.descsize = sizeof(struct s390_kmac_sha2_ctx),		\
+ 		.halg = {						\
++			.statesize = sizeof(struct state),		\
+ 			.digestsize = SHA##x##_DIGEST_SIZE,		\
+ 			.base = {					\
+ 				.cra_name = "hmac(sha" #x ")",		\
+@@ -291,6 +455,7 @@ static int s390_hmac_sha2_digest(struct shash_desc *desc,
+ 				.cra_priority = 400,			\
+ 				.cra_ctxsize = sizeof(struct s390_hmac_ctx), \
+ 				.cra_module = THIS_MODULE,		\
++				.cra_flags = CRYPTO_ALG_NEED_FALLBACK,	\
+ 			},						\
+ 		},							\
+ 	},								\
+@@ -301,10 +466,10 @@ static struct s390_hmac_alg {
+ 	unsigned int fc;
+ 	struct shash_alg alg;
+ } s390_hmac_algs[] = {
+-	S390_HMAC_SHA2_ALG(224),
+-	S390_HMAC_SHA2_ALG(256),
+-	S390_HMAC_SHA2_ALG(384),
+-	S390_HMAC_SHA2_ALG(512),
++	S390_HMAC_SHA2_ALG(224, s390_hmac_export_sha256, s390_hmac_import_sha256, sha256_state),
++	S390_HMAC_SHA2_ALG(256, s390_hmac_export_sha256, s390_hmac_import_sha256, sha256_state),
++	S390_HMAC_SHA2_ALG(384, s390_hmac_export_sha512, s390_hmac_import_sha512, sha512_state),
++	S390_HMAC_SHA2_ALG(512, s390_hmac_export_sha512, s390_hmac_import_sha512, sha512_state),
+ };
+ 
+ static __always_inline void _s390_hmac_algs_unregister(void)
 -- 
 2.39.5
 
