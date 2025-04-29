@@ -1,151 +1,113 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8891C4609
-	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 10:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF341F3FC8;
+	Tue, 29 Apr 2025 12:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745923577; cv=none; b=EE+T+0mhqfwDo4oSuegSJfr+HD5aaILxFxgZq7GlTljBkHrfkDSPjlHoAIVj5sXDcQBunAQ0xiLl0fq122jkTw1MfaEtcxh2MNr+kr1rnnlKTBUMZ/SG/pQ0qFPyQsEQUCjxPBn+ou0w5kKWzEsxn1jQwFEz0J026vFizUmDup0=
+	t=1745928274; cv=none; b=WZewW4nTHDACy7NIKPLWQDoGV1lV55PcG7d32pPbS7XcgNjdyRW3UC4/ZXLXcUwgp2THFITmWgXjDcXAfps+Hm3DyvV3wdOIl+dEvf/r4VMWl2UzoI+bpqT768s7Y1hhM+uo/t1GjIaymgIahiFTfvzLRJiqf4c8fZFKQAKjIig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745923577; c=relaxed/simple;
-	bh=Fs1aFS6opvByAbBh37Sle+MMGbZEdG/PsjGn4YMxeV8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=La1UIPqvy2yY/vx4O+21nqsqp8vkx54IVFasvqPns35NnzbCc5eL5WvtDBrLHnyoLsgGERFeMiLPSR1rvC8k9Si7C5vhkiViqiUIz05g2kXXmFc7EPrxZFH5ScZPA+DY8uznmW5sjG3gm1dSlzhGieuVBd62ED9sH5AwKqlN2uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=MwevwRsG; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1745928274; c=relaxed/simple;
+	bh=1TjoT5qfEmJRpfcaxR9aIFmERf07YaQAjsOV0XV5Nc8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hmteeY3DPykHnvNHhQ7SII/7s28UWwM7UqHSpDmDwp22haH2cMJ3gm6X7AS7ntzf8Jb2/X0WdvlukRfLsvscnFMjdv/QlETK7LNsTPYoQzza1W80Y4oKIKNP2ibmLZWRfvssWFmdLQeS+FJR0alBAmHTycObeQCm1US/qosHkH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=t46rUMLa; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="MwevwRsG"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e6df4507690so4553014276.0
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 03:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1745923574; x=1746528374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hF8vKN9sh8z0ZO8tOpt/PfKR+YRXIdIXAv4/thippV0=;
-        b=MwevwRsGpthsFaaPfW+axNsh8M5IMzMwvlN0XKgsmlXfB8cavAnO08a5HtPtagqxNK
-         2ZqpB7+NN/1fR5wRhAp4aNN1bWz7N2KdOYpebwoi9f5prVN96KjT8JSJ5KV94qwOj5DF
-         FTGbjN/ueXG5RzfMVtBWu1toxnXiXoU4cjkSY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745923574; x=1746528374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hF8vKN9sh8z0ZO8tOpt/PfKR+YRXIdIXAv4/thippV0=;
-        b=TKcvOqGv2Q8ULzTpgTkRRpjrUr0acevMXcqUBH5Afd8cH814HqfKdC4HPGFnKEuHSp
-         77lZ3bsWAMA/ebHrUpQxSNFajG7QWcxwZ7oS9gMGwLFlnJ4s7Be0K8NRDOEI0IdW4iAw
-         BUjUIzBo91swx98WbvLKkl/4afrBlQqTZQGgH/fxqpgiMYnIWL/9YVq+1UJz5SPZDrkZ
-         keutjt1Y7F4EwX1OSRhJbWHO2hwShOJfjp4R+zQwiDUAVFw093uOW/n0wvyY8MCDcybx
-         nd6cNTf65YLWPu3QV47DoyBH1KoUEcpPRrqLDLzJ9xd0R1GAMmSUUSTZZBAYmcTUwABy
-         Dodg==
-X-Gm-Message-State: AOJu0Ywz4bQP/JLcEf6R1t+qaS2C8f8V9YZ1pE2wPZRAKP1OTF1Lq72C
-	T6d/5pq+tWwyZhBDhVw5HkeMNGDSWYfTeippFNbte7nS8AYf43he8DZXKXJxqknXDCEL91D/pC4
-	W5txmZ5hJ0G15VNUxCsLvOybU1WrWiXQj/SXuJbkbscCm7Qd8
-X-Gm-Gg: ASbGnctAXoYf+MaanOz7rSg80L9201J/9P/nKxOlPe19jpjSOmS69a2SZcEtheVcAtE
-	kE+cdBaAO5szojBBUIGnN8XJvBonJp5kdBcosmNVb2sr0NalolqMbNpcc2J0DF6IrU8c42bVTyi
-	iFYLHsVBdzKVmKJ9lKrmCuf/NQDLTnL+fmrQpJktEihA7uK1caSYiJikk=
-X-Google-Smtp-Source: AGHT+IGa5Soai89tjfK+oZA5gyBDX32F8Eol887fw+QprtCC0h1OiddDE+yPmdB8AvU79PCN3CxoqjI09aOhKcTBLtA=
-X-Received: by 2002:a05:6902:488f:b0:e73:cd3:5250 with SMTP id
- 3f1490d57ef6-e73511bd4bemr3420566276.23.1745923573760; Tue, 29 Apr 2025
- 03:46:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="t46rUMLa"
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53TC4LEg3075773
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Apr 2025 07:04:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1745928261;
+	bh=UsgObZcraiB7Ioinl9l+ywg+X6K7yu8lVafI++/eN9I=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=t46rUMLaLhEcI1DEtX6zQxjfzZR2STckX75McEeezKBZFhqZiDdGiZeSVsQpYMh/N
+	 tkgMZsQjMJGVrhX0JyMN/2naAibkIkqVp8MVeNvjPkwml+3HMThK8ZjvQR4qTQuxYd
+	 e6Caw0J6K9mMhq/awpttZYxogTCPNrDPviZANwJw=
+Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53TC4LPe063443
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 29 Apr 2025 07:04:21 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 29
+ Apr 2025 07:04:21 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 29 Apr 2025 07:04:21 -0500
+Received: from [172.24.227.40] (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53TC4IbZ052806;
+	Tue, 29 Apr 2025 07:04:19 -0500
+Message-ID: <a0a6f359-27c8-4381-8619-d4aa2cd186fc@ti.com>
+Date: Tue, 29 Apr 2025 17:34:18 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423101518.1360552-5-pavitrakumarm@vayavyalabs.com> <aA30mVmjAahKb1P-@gondor.apana.org.au>
-In-Reply-To: <aA30mVmjAahKb1P-@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Tue, 29 Apr 2025 16:16:02 +0530
-X-Gm-Features: ATxdqUGZ2Ep4oayvRUmOZ6OsH0awXvVmqSlv8_hTfisW-DbZ9yQhAWg1_Fka_E4
-Message-ID: <CALxtO0=gwbQH9Hk69spwN_Z4hZN833o4KNSgNKGm85w6XEgf5A@mail.gmail.com>
-Subject: Re: [PATCH v1 4/6] Add SPAcc ahash support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-	adityak@vayavyalabs.com, bhoomikak@vayavyalabs.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] crypto: s390/hmac - Use generic hash export format
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List
+	<linux-crypto@vger.kernel.org>
+CC: Harald Freudenberger <freude@linux.ibm.com>,
+        Holger Dengler
+	<dengler@linux.ibm.com>, <linux-s390@vger.kernel.org>
+References: <cover.1745916278.git.herbert@gondor.apana.org.au>
+ <81cab16fad98103d8b5c28f2870de08b337c2d78.1745916278.git.herbert@gondor.apana.org.au>
+Content-Language: en-US
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <81cab16fad98103d8b5c28f2870de08b337c2d78.1745916278.git.herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Herbert,
-  My comments are embedded below.
+On 29/04/25 14:19, Herbert Xu wrote:
+> [...]
+> +
+> +static int s390_hmac_export_sha256(struct shash_desc *desc, void *out)
+> +{
+> +	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
+> +	u64 total = ctx->buflen[0];
+> +	union {
+> +		u8 *u8;
+> +		u64 *u64;
+> +	} p = { .u8 = out };
+> +	unsigned int remain;
+> +	u64 hashed;
+> +	int err = 0;
+> +
+> +	hashed = round_down(total, SHA256_BLOCK_SIZE);
+> +	remain = total - hashed;
+> +
+> +	if (!hashed)
+> +		err = s390_hmac_export_zero(desc, out);
+> +	else
+> +		memcpy(p.u8, ctx->param, SHA256_DIGEST_SIZE);
+> +
+> +	p.u8 += SHA256_DIGEST_SIZE;
+> +	put_unaligned(total, p.u64++);
+> +
+> +	memcpy(p.u8, ctx->buf, remain);
+> +
+> +	return err;
+> +}
+Why do pointer increment with different types through a union which is un-intuitive to understand and prone to easy errors in future. It is easy to mix up the layout of the data being stored. Why not just typecast void * to a struct exposing different fields? Same with sha512.
+> +
+> + [...]
+> +
+> +static int s390_hmac_export_sha512(struct shash_desc *desc, void *out)
+> +{
+> +	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
+> +	u64 total_hi = ctx->buflen[1];
+> +	u64 total = ctx->buflen[0];
+Can use uniform naming here. total_hi and total_lo.
 
-Warm regards,
-PK
+Regards
+T Pratham <t-pratham@ti.com>
 
-On Sun, Apr 27, 2025 at 2:41=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> Pavitrakumar M <pavitrakumarm@vayavyalabs.com> wrote:
-> >
-> > +static void spacc_digest_cb(void *spacc, void *tfm)
-> > +{
-> > +       int dig_sz;
-> > +       int err =3D -1;
-> > +       struct ahash_cb_data *cb =3D tfm;
-> > +       struct spacc_device *device =3D (struct spacc_device *)spacc;
-> > +
-> > +       dig_sz =3D crypto_ahash_digestsize(crypto_ahash_reqtfm(cb->req)=
-);
-> > +
-> > +       if (cb->ctx->single_shot)
-> > +               memcpy(cb->req->result, cb->ctx->digest_buf, dig_sz);
-> > +       else
-> > +               memcpy(cb->tctx->digest_ctx_buf, cb->ctx->digest_buf, d=
-ig_sz);
-> > +
-> > +       err =3D cb->spacc->job[cb->new_handle].job_err;
-> > +
-> > +       dma_pool_free(spacc_hash_pool, cb->ctx->digest_buf,
-> > +                     cb->ctx->digest_dma);
-> > +       spacc_free_mems(cb->ctx, cb->tctx, cb->req);
-> > +       spacc_close(cb->spacc, cb->new_handle);
-> > +
-> > +       if (cb->req->base.complete)
-> > +               ahash_request_complete(cb->req, err);
->
-> This can only execute in softirq context, or you must disable BH.
-
-PK: Sure, I will fix that by disabling and enable the BH using
-local_disable_bh() and local_enable_bh()
-
->
-> > +       if (atomic_read(&device->wait_counter) > 0) {
-> > +               struct spacc_completion *cur_pos, *next_pos;
-> > +
-> > +               /* wake up waitQ to obtain a context */
-> > +               atomic_dec(&device->wait_counter);
-> > +               if (atomic_read(&device->wait_counter) > 0) {
-> > +                       mutex_lock(&device->spacc_waitq_mutex);
-> > +                       list_for_each_entry_safe(cur_pos, next_pos,
-> > +                                                &device->spacc_wait_li=
-st,
-> > +                                                list) {
-> > +                               if (cur_pos && cur_pos->wait_done =3D=
-=3D 1) {
-> > +                                       cur_pos->wait_done =3D 0;
-> > +                                       complete(&cur_pos->spacc_wait_c=
-omplete);
-> > +                                       list_del(&cur_pos->list);
-> > +                                       break;
-> > +                               }
-> > +                       }
-> > +                       mutex_unlock(&device->spacc_waitq_mutex);
->
-> While mutex_lock obviously cannot be taken with softirqs disabled.
-> So what context is this function called in?
-
-PK: Agreed. This function is called as part of my workqueue, so
-softirqs are not disabled. And the mutex_lock here is to traverse the
-wait queue and flag completion of a job so that the hardware context
-can be used by other waiting jobs. SPAcc has 16 hardware contexts
-only.
-
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
