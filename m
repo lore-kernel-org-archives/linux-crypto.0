@@ -1,144 +1,130 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78B52BCF5F
-	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 08:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B245F27B4E3
+	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 09:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745917068; cv=none; b=fAoBiqRCOlYPNgr1Xgvo8k2yijydWwuSn0Bd8UTIO5g4a1HaHp93LiK/xKES6kDwrjDywf9m9ylo4XL6+vDM10xUbzvmTnLO9bddMUeOxCb+F/G7fAiQt3dB8bZP/eYu7j6d+7mhlJx8FNDm6pAI0nm1dnqRasqjfDQ3eQfGihY=
+	t=1745917959; cv=none; b=dC+n3hdKSVqCIWK2XUffR9RpS/xYUHOoFHusbnrttYEz303oY/EjG/OWd/HlNaXJ4wx4JTFcHYbKOLexcYl8l0uSnJ7DysF+MtadWyFPVTtNvSs97dt8zNR/LdYoBkH6NE6VIS0QA7FwLVHgwymo4ZUOEHRmNBLg+h/K9U7j1Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745917068; c=relaxed/simple;
-	bh=QekwfPSQUfzPAsI7zbh3tQ6RgYJFgCkChQj1XZ856PA=;
-	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type; b=WfkGYqYapKYtKO0RNaMWtXgsttlRUrME8N9sKxi3eHE72DsV7eX7G0dyDDqZ2vyV9oXZGYIjeyYLNRPQHHSgOaJuluqUze2Q3SP3aViUvWxKnnR+Ocnzjunf/ETKJonr5IWaAHnet9FbPI86McU3WoSBfmOhAjevTrkqk+v9Rio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DbKJBItq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1745917959; c=relaxed/simple;
+	bh=pOS41m5lkMjQzadNx+j41GxqtdZXY/qNBY7dJb1WLds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mke89qZQoFCIAILidMGqrbMF6FJ3ZwpoinLeWIzGJ1j2iOmIYfCz5gAPWvwy6lq4DvTINbylfjHBQlOOljC/5gCRYJVAQ37YTKKAffgfoCwDPHSaVO0gdf+iKgLZ+1NuYcJMpb6GpBG6Q7mV9gFNmSKV49uI/PBNm2Pm2oDzAzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WE81ZGzA; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DbKJBItq"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T4EXud028608;
-	Tue, 29 Apr 2025 08:57:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:reply-to:subject:to; s=pp1; bh=3Xlf90PsADa9hGAwzI+
-	O3dchW4Ca+HVszieSAmwzdF0=; b=DbKJBItqxs/SQiqbnpIhG3oUJWSvFZ+ppsU
-	dq3NO/9WY6CgF6Tfm0eQ9J/j3qOWc7Mi6OO3BLZ1EZ/VU0kHzriM0M4hgWxZfJBN
-	9CCK7lOhGjcibYZ4OT8NjWSTycaZEDMPQC/duFIWQD3y+51z12wd6wTiIa90AKHh
-	AtyA5qK0DvbmNgyoEjO79t6dDOC23dCz+aXBKtiib80w+5iMRBMP+7/x9ITbtIRV
-	oX1Og+sa8jAD3t6lsL3p+XaSYG3RGoTjVbG9m55zprliaSv58K0S6/AuuAAj5uWH
-	WZ/sT7IuJ+AoUfhzbS00cLqWsonRd1+D8MCa/O9Ern7PvNs7frg==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46ah8ma8ex-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Apr 2025 08:57:42 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53T6APrX024679;
-	Tue, 29 Apr 2025 08:57:41 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 469c1m27tx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Apr 2025 08:57:41 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53T8vd4x6357698
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 29 Apr 2025 08:57:39 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55F195805D;
-	Tue, 29 Apr 2025 08:57:39 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 199A958056;
-	Tue, 29 Apr 2025 08:57:39 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 29 Apr 2025 08:57:39 +0000 (GMT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WE81ZGzA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=CqAIMgRGCvQM8g40vZqe+ONpJnCgmmHwbHVpU/epjPk=; b=WE81ZGzARSjsBXwk6xcnmCNa4X
+	PFw+bcB3zyQtx3uspBjOI0ikx9VD2/+/qVyLb/GYyANVitoNoz/TD+3Yed+NGUtPDfdV23SRvDQeq
+	cqW+EVPMD/ONm3eDqzOI+W2jNwm6v9554NcLZr428LahSKWLLHJ9oDDDJj2UGWRh3D0rat4+nN+6S
+	hZVHnTZ4GNsgpHqx3tk4wjZYcCtSKflFWGadpBKQtaz8K3SSvk87fkHGtj1Lh/JU5s+nS60kQA7Sh
+	vluY49HdwKpHBKrr1GQ1kbvBUhwEVxlCSVsXwN2zM6PAhdpv49sgCbhDsPfABq2YlFUe2NSysE5E7
+	rz/ZuTzA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u9h0w-001tSF-31;
+	Tue, 29 Apr 2025 17:12:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 29 Apr 2025 17:12:30 +0800
+Date: Tue, 29 Apr 2025 17:12:30 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: s390/sha512 - Fix sha512 state size
+Message-ID: <aBCX_l0kSHVx4xQn@gondor.apana.org.au>
+References: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 29 Apr 2025 10:57:38 +0200
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
-        Holger Dengler
- <dengler@linux.ibm.com>, linux-crypto@vger.kernel.org
-Subject: s390: CI failures on all sha kernel modules on linux-next
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-Message-ID: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vtozriRCOrGPSOBjVTBf5C-FspA1YnX-
-X-Proofpoint-GUID: vtozriRCOrGPSOBjVTBf5C-FspA1YnX-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA2NCBTYWx0ZWRfX6DH9edC4pydq RtftBw96IWwkQNXXvjzULcvgOJYycaEMyp/25mtEIyq/UOGCdTlcnLyTfABdpNCiC8KjRvOE51p 7m8UC31h5K5JC2DyEvdtNVpnOVWkqLMIf+hCg1fKc2AP7sgQaFXseoXIoTtp1s/ia0C0pP2uCsY
- 8chLRJQeyCX4F9MQgtXMHzEgXjIFk9eo2hxfCAYUvzSGeQ9XtQEn5xQ2NBk6bAI0fYqi300hxhX 4F9w5YhvlxkjheVzGN4ohNRbtEqkEEn7opr4NLqEcz4ieJgTcNHCWnRgNTGDCxGXwPPFGrV0vbB ODyf7+0HFAbVdSqTsexTnL/h12RXv2BQSIxT8mfMqOPyYIXlrEI29+bOhz/bvmyjxYkjGlhnEI5
- RQQbY5beMey2P0hc8y9zALGPJd7EcqfYpzpybkLuoE3t9mfiHEmV5fCjAn+XnYruX8PUOcJc
-X-Authority-Analysis: v=2.4 cv=QNRoRhLL c=1 sm=1 tr=0 ts=68109486 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=wCzuwi-FhD5YxeNnkP4A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-29_03,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- mlxlogscore=629 spamscore=0 clxscore=1015 mlxscore=0 malwarescore=0
- bulkscore=0 priorityscore=1501 phishscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2504290064
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
 
-Hello Herbert
-since commit 572b5c4682c7 "crypto: s390/sha512 - Use API partial block 
-handling"
-all CI tests related to sha kernel modules on the next kernel fail.
+On Tue, Apr 29, 2025 at 10:57:38AM +0200, Harald Freudenberger wrote:
+> Hello Herbert
+> since commit 572b5c4682c7 "crypto: s390/sha512 - Use API partial block
+> handling"
+> all CI tests related to sha kernel modules on the next kernel fail.
 
-Some investigations shows that modprobe fails with -EINVAL, caused
-in shash.c line 477. After some reading through the commit I get the
-impression that the root cause is in the sudden increase of the
-alg.descsize from 213 bytes to 536 bytes. This is caused by the
-modifications of the s390_sha_ctx:
+Thanks for catching this!
 
-...
-  struct s390_sha_ctx {
-  	u64 count;		/* message length in bytes */
--	u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-+	union {
-+		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-+		struct {
-+			u64 state[SHA512_DIGEST_SIZE];                  <- really big
-+			u64 count_hi;
-+		} sha512;
-+	};
-  	int func;		/* KIMD function to use */
-  	bool first_message_part;
--	u8 buf[SHA_MAX_BLOCK_SIZE];
-  };
-...
+>  struct s390_sha_ctx {
+>  	u64 count;		/* message length in bytes */
+> -	u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
+> +	union {
+> +		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
+> +		struct {
+> +			u64 state[SHA512_DIGEST_SIZE];                  <- really big
+> +			u64 count_hi;
+> +		} sha512;
+> +	};
 
-as part of the patch. Having a close look here gives me the strong
-impression that the state here is way too big and it should be:
+I was trying to keep this thing from growing over the 360 limit,
+hence the union.
 
-...
-  struct s390_sha_ctx {
-  	u64 count;		/* message length in bytes */
--	u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-+	union {
-+		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
-+		struct {
+Instead I managed to make it go over the limit spectacularly :)
+
+---8<---
+The sha512 state size in s390_sha_ctx is out by a factor of 8,
+fix it so that it stays below HASH_MAX_DESCSIZE.  Also fix the
+state init function which was writing garbage to the state.  Luckily
+this is not actually used for anything other than export.
+
+Reported-by: Harald Freudenberger <freude@linux.ibm.com>
+Fixes: 572b5c4682c7 ("crypto: s390/sha512 - Use API partial block handling")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/s390/crypto/sha.h b/arch/s390/crypto/sha.h
+index 0a3cc1739144..d757ccbce2b4 100644
+--- a/arch/s390/crypto/sha.h
++++ b/arch/s390/crypto/sha.h
+@@ -24,7 +24,7 @@ struct s390_sha_ctx {
+ 	union {
+ 		u32 state[CPACF_MAX_PARMBLOCK_SIZE / sizeof(u32)];
+ 		struct {
+-			u64 state[SHA512_DIGEST_SIZE];
 +			u64 state[SHA512_DIGEST_SIZE / sizeof(u64)];
-+			u64 count_hi;
-+		} sha512;
-+	};
-  	int func;		/* KIMD function to use */
-  	bool first_message_part;
--	u8 buf[SHA_MAX_BLOCK_SIZE];
-  };
-...
-
-instead. With this modifications all our sha modules do load perfect
-and the CI tests succeed. Please check and maybe improve your patch.
-
-Thanks and have a nice day
-Harald Freudenberger
-
+ 			u64 count_hi;
+ 		} sha512;
+ 	};
+diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
+index 14818fcc9cd4..3c5175e6dda6 100644
+--- a/arch/s390/crypto/sha512_s390.c
++++ b/arch/s390/crypto/sha512_s390.c
+@@ -22,13 +22,13 @@ static int sha512_init(struct shash_desc *desc)
+ 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
+ 
+ 	ctx->sha512.state[0] = SHA512_H0;
+-	ctx->sha512.state[2] = SHA512_H1;
+-	ctx->sha512.state[4] = SHA512_H2;
+-	ctx->sha512.state[6] = SHA512_H3;
+-	ctx->sha512.state[8] = SHA512_H4;
+-	ctx->sha512.state[10] = SHA512_H5;
+-	ctx->sha512.state[12] = SHA512_H6;
+-	ctx->sha512.state[14] = SHA512_H7;
++	ctx->sha512.state[1] = SHA512_H1;
++	ctx->sha512.state[2] = SHA512_H2;
++	ctx->sha512.state[3] = SHA512_H3;
++	ctx->sha512.state[4] = SHA512_H4;
++	ctx->sha512.state[5] = SHA512_H5;
++	ctx->sha512.state[6] = SHA512_H6;
++	ctx->sha512.state[7] = SHA512_H7;
+ 	ctx->count = 0;
+ 	ctx->sha512.count_hi = 0;
+ 	ctx->func = CPACF_KIMD_SHA_512;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
