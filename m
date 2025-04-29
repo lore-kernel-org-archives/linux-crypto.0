@@ -1,39 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA8722AE7C
-	for <linux-crypto@vger.kernel.org>; Tue, 29 Apr 2025 16:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C07E242D6E;
+	Tue, 29 Apr 2025 16:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745944862; cv=none; b=aB8PGgJByOZN6eiDFNFgYKJgROFoWoNBK+MAcweT/axuDGYhdOpYB1dT/4Ukgo5gkNwU/0a82BHt/2FgWrVyDvaxsiOgCmU02X5g6A9FA8RR2BsuIG1IvsGZ2vVPHOzK2V0KzJ3aFjjx19xKzmG6c6dKXsPF5MYpDW0r3vRQeV8=
+	t=1745944946; cv=none; b=sGyXXuCDWSOshyrtVnv5BLnmxA4hw3fDLh1a3BGAQTpvZi1JHktAOMtchybRtKlDejGzYobLkxEfqjJ+9JgSMSUlLJ4zHr1Jv68FO5XO8qcNKoDvtt2xkG5KpEsB9p5r9cHDbFDvmYXbPqZmJS+GQtDYSJLXsRB+xlsDEF91vFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745944862; c=relaxed/simple;
-	bh=i6BuMH3Yd2UVM9B6nfAQGZm56UcltSA8KU3h6qndEGI=;
+	s=arc-20240116; t=1745944946; c=relaxed/simple;
+	bh=ubCQ+1nz/UrnwBW5+P/ki1szuiGWwSLpS0BipGSViPU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXZZwJHYbU36Pybkj6bkpt/I/wxtEhakPua1PFi/59Aha6Z0+fxoT4e6+79q8stGtCa97ARD1jfTXCqA8aVh8kx6UDtP/nUauEnMAKTbvSRgCcHPvbPE7Cc+d4H4uM/myUxvPJiLthlgfhsbRa4tmmSy7Z7mOqwBXmhccraumg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLnX4yV3; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=K11qJDygB4Nv7Dq9xwRBv5qwM02Ooa3itrKLAlCDoAmCR0Z6IfbmuDUD4CR4qEANi+Tn40XbHCI2jT0pa8pG2jWq59AvbIdMWR+7rEw8igNp6B9t5AkIRj/h9RbQcUoifpYalAPAusMIgbockNIUiY54UQwBnwMSs3fUi4UaQ6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSZAwrAL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLnX4yV3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F2DEC4CEE3;
-	Tue, 29 Apr 2025 16:41:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSZAwrAL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356CCC4CEE3;
+	Tue, 29 Apr 2025 16:42:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745944861;
-	bh=i6BuMH3Yd2UVM9B6nfAQGZm56UcltSA8KU3h6qndEGI=;
+	s=k20201202; t=1745944945;
+	bh=ubCQ+1nz/UrnwBW5+P/ki1szuiGWwSLpS0BipGSViPU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kLnX4yV37ZH3O+J9XzoS9iamKmkosuPVr8gGsPshyUuRC9K7lDc+fLbGd99lO6PWY
-	 bb3ly+VjhrOXbWnGmYLzNRRquNGNaoafr7cCi4tvh7DEpVJclN0J3BWBG7hnOHFFjB
-	 bx4vn+i21feBJ1BZuIZOask19faRDd5ES9NYzkV8CpFe1ob9rroUjSvCb3+0vyLoO4
-	 nkXUkeqnu/8psm1hXBJTOleKvslEKIysoJi6OLKGCCnNmSEqxYKoGb8EJsEK6URgHO
-	 qNm1wWtIheZB4JSMQvm/x1kWqads3P0dFCWDWKNoBdbxgH6Vk9Pdwug4fNYO9m78zJ
-	 R0Slh+CDNmYJA==
-Date: Tue, 29 Apr 2025 09:41:00 -0700
+	b=BSZAwrAL8nk18eoJTfmYkZwRh761GC4sL86Xdd4xSSeJooZtIwdH9ppNdrTKnrCNM
+	 m5tFwHimiws9PqkG/S7muSBLpwXrMVVTLNIA0tszpTF1DIfoSrH1JNrJEJXTRg5VRd
+	 VSAAmlU19ZRT/2CC+vGWlP784Itcdb0g1HESbAB1r/sgz0268peS95zCYxt/hPhVaQ
+	 x3oJbYKD0k4lmgnAyLGsShDWVI9kj0d3A6aYaCsn+uC5ZL/PIEh5D4fiVYgqSSkuXj
+	 O6PYQWbqw+d59CjTMX8JmoD8508dIhVPb20rK1eNcLTauEEN/muv3AURikZdih/4C2
+	 iIOAXk4cexscA==
+Date: Tue, 29 Apr 2025 09:42:23 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 1/1] Revert "crypto: run initcalls for generic
- implementations earlier"
-Message-ID: <20250429164100.GA1743@sol.localdomain>
-References: <aBBoqm4u6ufapUXK@gondor.apana.org.au>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Amadeusz =?utf-8?B?U8WCYXdpxYRza2k=?= <amadeuszx.slawinski@linux.intel.com>
+Subject: Re: [PATCH] firmware_loader: use SHA-256 library API instead of
+ crypto_shash API
+Message-ID: <20250429164223.GB1743@sol.localdomain>
+References: <20250428190909.852705-1-ebiggers@kernel.org>
+ <2025042935-ethanol-remodeler-bf69@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,27 +49,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aBBoqm4u6ufapUXK@gondor.apana.org.au>
+In-Reply-To: <2025042935-ethanol-remodeler-bf69@gregkh>
 
-On Tue, Apr 29, 2025 at 01:50:34PM +0800, Herbert Xu wrote:
-> diff --git a/arch/arm/lib/crypto/chacha-glue.c b/arch/arm/lib/crypto/chacha-glue.c
-> index 12afb40cf1ff..eb73ff0eaf2e 100644
-> --- a/arch/arm/lib/crypto/chacha-glue.c
-> +++ b/arch/arm/lib/crypto/chacha-glue.c
-> @@ -122,7 +122,7 @@ static int __init chacha_arm_mod_init(void)
->  	}
->  	return 0;
->  }
-> -arch_initcall(chacha_arm_mod_init);
-> +module_init(chacha_arm_mod_init);
+On Tue, Apr 29, 2025 at 07:54:42AM +0200, Greg Kroah-Hartman wrote:
+> On Mon, Apr 28, 2025 at 12:09:09PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > This user of SHA-256 does not support any other algorithm, so the
+> > crypto_shash abstraction provides no value.  Just use the SHA-256
+> > library API instead, which is much simpler and easier to use.
+> > 
+> > Also take advantage of printk's built-in hex conversion using %*phN.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> > 
+> > This patch is targeting the firmware_loader tree for 6.16.
+> 
+> 
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-arch/*/lib/ should be kept at arch_initcall.  It makes sense (it's arch/ code);
-it's library code with no dependencies on any other initcalls; and it can be
-used during initialization of other modules, notably with crypto/ depending on
-*_is_arch_optimized().  I understand that this patch sets the initcall level
-conditionally depending on whether each individual file uses static keys in
-*_is_arch_optimized() or not, but there's no need to add that complexity.  Just
-use arch_initcall.  (And FWIW I'll keep doing that arch/*/lib/crc*.c, even if
-you decide to mess up arch/*/lib/crypto/.)
+Greg, it looks like you normally take patches to this file.  You can go ahead
+and take it if you want.  Thanks!
 
 - Eric
