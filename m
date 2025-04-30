@@ -1,227 +1,236 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4E01E7660
-	for <linux-crypto@vger.kernel.org>; Wed, 30 Apr 2025 06:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189B4211A15;
+	Wed, 30 Apr 2025 07:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745993208; cv=none; b=RvNKdcVDKoJVri3mJvusLqKtn5CYN5mLjXknviKt/6SAhdSDQuiJfWniDNyszWoey2k/mx6XcI1agFZn8RchCqgdVhCbL/iXIOFlIhpQ3n6oL02WfkoovFyTE38zidGf07lqa/GYk9rpNI3ZJL8BdahsmR+0/0waQsyUZEqVFLk=
+	t=1745999849; cv=none; b=dfpvjCIs/LYnym9lrRhlndMGvyuqQ9ngQlEZ2Uxq6vp5ZuxO0Uk1v370M6RFRzKqMEEpKJcLv1fIu+eUP2eET95oEAeGi+J4l7ArYreHgEZ3vfIGr4zwezWcWuhFkssUcKtvXBJ10Yv3Fj88pQjDnG2+lOTupp8rt0KDPq/CJCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745993208; c=relaxed/simple;
-	bh=UG1ngoy9akYffSkrF9EMpWTo/p8az7qk5jexmXJ9W6A=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=ZR7n+PRR3/h7NWv26XQVWYd7NSblU+h46EEXHfNa+T6jU+25DzIfYu7Uex9ecW5gXomK4i8jabjYPbWqrqcqh4WbyFCjbdbpRsvk1hn/svdRKCIBQBpTNIK83XINZ9F94X3HSC/Ex4wMxEbTGA4ElyNFAK4JsikZ5wdFLA1Dzt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=b2WzfWCP; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="b2WzfWCP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
-	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=o/wNV86mISqaniQogxnq4SngQGpowScqNCsplOPFbg8=; b=b2WzfWCPkDqev0nBTHP5ewnE15
-	5OfQvKg1N4RF4JpIeb2e38gpH2cB0B5n8/nGt4lx/JbC/x/fs2BI8KMI8UjEMdL6lx1lKbd5+Fevc
-	MWLxkaoVj1JT+53U7HM3Dr4K5gGB9gkzcmxdPFs3lPgRUMBDykSc3xsKeUx9pGcpTEGu3Byz/5WvO
-	bvv/3j7e9qxRR187USqvJGPPO5/brgZgfBPfv/FPBvs2NtjhhyUdqBt6UdWvYd6wxV7u7opPOm/TK
-	XEzBD7ijFXSAfQN8FXKpKYNqHi6WdrcwpUT3stu3CpfyhW+tPVzfyySGlUfB8hEGFArfLvgrDo8B2
-	1SvvRW7Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uA0ag-002Ac1-2n;
-	Wed, 30 Apr 2025 14:06:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 14:06:42 +0800
-Date: Wed, 30 Apr 2025 14:06:42 +0800
-Message-Id: <70168abce2f7d9cb07bcb4e5b3d6dbc4b1265963.1745992998.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1745992998.git.herbert@gondor.apana.org.au>
-References: <cover.1745992998.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 12/12] crypto: sha256 - Use the partial block API
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	s=arc-20240116; t=1745999849; c=relaxed/simple;
+	bh=Te/psvuoE4DPXalvViQ5WNlPpel1jC36ND+0Plf7xC8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tuCVUH4y1JgQpQd1O8fHWi5NiATSlgTmcMqvNIf61JEvA4IdYrFncnXWds6WmHUcy1uZUqfTk90CKLMUr4kfu8q7jG+c+uBnqX2CZZYBsmp7RN4fGz9MCujmeJ4hAOOEkaHWPbN0q+BZ7FXTe8m6H23ja2SyZQvhcBrI9t59UBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8CxaWra1xFoTu_KAA--.10311S3;
+	Wed, 30 Apr 2025 15:57:14 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMBxGcTU1xFoWd+fAA--.41512S2;
+	Wed, 30 Apr 2025 15:57:10 +0800 (CST)
+Subject: Re: [PATCH v8 4/5] tpm: Add a driver for Loongson TPM device
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, peterhuewe@gmx.de,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-crypto@vger.kernel.org, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+ pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>,
+ Huacai Chen <chenhuacai@loongson.cn>
+References: <20250418093407.1335-1-zhaoqunqin@loongson.cn>
+ <20250418093407.1335-5-zhaoqunqin@loongson.cn> <aAaVP8yG6rM436uw@kernel.org>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <78d06edd-2f53-47ae-5c9b-5ad26ad1ce41@loongson.cn>
+Date: Wed, 30 Apr 2025 15:55:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <aAaVP8yG6rM436uw@kernel.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowMBxGcTU1xFoWd+fAA--.41512S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3AFy7CrWxAF4Utw4DZryxJFc_yoW7uw4rpF
+	WrCa1UCF4UJr1jk39IqrWDCF9Iv3s3Wry2kay7t34Uuryqy34rWryDGFy7Wa1xAr1kGr1I
+	vFZ3CFWfuF15u3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
+	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
+	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-Use the shash partial block API by default.  Add a separate set
-of lib shash algorithms to preserve testing coverage until lib/sha256
-has its own tests.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/sha256.c | 90 +++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 69 insertions(+), 21 deletions(-)
+ÔÚ 2025/4/22 ÉÏÎç2:58, Jarkko Sakkinen Ð´µÀ:
+> On Fri, Apr 18, 2025 at 05:34:06PM +0800, Qunqin Zhao wrote:
+>> Loongson Security Engine supports random number generation, hash,
+>> symmetric encryption and asymmetric encryption. Based on these
+>> encryption functions, TPM2 have been implemented in the Loongson
+>> Security Engine firmware. This driver is responsible for copying data
+>> into the memory visible to the firmware and receiving data from the
+>> firmware.
+>>
+>> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+>> ---
+>> v8: In the send callback, it will wait until the TPM2 command is
+>>      completed. So do not need to wait in the recv callback.
+>>      Removed Jarkko's tag cause there are some changes in v8
+>>
+>> v7: Moved Kconfig entry between TCG_IBMVTPM and TCG_XEN.
+>>      Added Jarkko's tag(a little change, should be fine).
+>>
+>> v6: Replace all "ls6000se" with "loongson"
+>>      Prefix all with tpm_loongson instead of tpm_lsse.
+>>      Removed Jarkko's tag cause there are some changes in v6
+>>
+>> v5: None
+>> v4: Prefix all with tpm_lsse instead of tpm.
+>>      Removed MODULE_AUTHOR fields.
+>>
+>> v3: Added reminder about Loongson security engine to git log.
+>>
+>>   drivers/char/tpm/Kconfig        |  9 ++++
+>>   drivers/char/tpm/Makefile       |  1 +
+>>   drivers/char/tpm/tpm_loongson.c | 78 +++++++++++++++++++++++++++++++++
+>>   3 files changed, 88 insertions(+)
+>>   create mode 100644 drivers/char/tpm/tpm_loongson.c
+>>
+>> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+>> index fe4f3a609..34302a875 100644
+>> --- a/drivers/char/tpm/Kconfig
+>> +++ b/drivers/char/tpm/Kconfig
+>> @@ -189,6 +189,15 @@ config TCG_IBMVTPM
+>>   	  will be accessible from within Linux.  To compile this driver
+>>   	  as a module, choose M here; the module will be called tpm_ibmvtpm.
+>>   
+>> +config TCG_LOONGSON
+>> +	tristate "Loongson TPM Interface"
+>> +	depends on CRYPTO_DEV_LOONGSON_SE
+>> +	help
+>> +	  If you want to make Loongson TPM support available, say Yes and
+>> +	  it will be accessible from within Linux. To compile this
+>> +	  driver as a module, choose M here; the module will be called
+>> +	  tpm_loongson.
+>> +
+>>   config TCG_XEN
+>>   	tristate "XEN TPM Interface"
+>>   	depends on TCG_TPM && XEN
+>> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+>> index 2b004df8c..cb534b235 100644
+>> --- a/drivers/char/tpm/Makefile
+>> +++ b/drivers/char/tpm/Makefile
+>> @@ -45,3 +45,4 @@ obj-$(CONFIG_TCG_CRB) += tpm_crb.o
+>>   obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
+>>   obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+>>   obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+>> +obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
+>> diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
+>> new file mode 100644
+>> index 000000000..c4d69d28d
+>> --- /dev/null
+>> +++ b/drivers/char/tpm/tpm_loongson.c
+>> @@ -0,0 +1,78 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+>> +
+>> +#include <linux/device.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/wait.h>
+>> +
+>> +#include "../../drivers/crypto/loongson/loongson-se.h"
+>> +#include "tpm.h"
+>> +
+>> +struct tpm_loongson_cmd {
+>> +	u32 cmd_id;
+>> +	u32 data_off;
+>> +	u32 data_len;
+>> +	u32 pad[5];
+>> +};
+>> +
+>> +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+>> +{
+>> +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+>> +	struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
+>> +
+>> +	memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
+>> +
+>> +	return cmd_ret->data_len;
+>> +}
+>> +
+>> +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+>> +{
+>> +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+>> +	struct tpm_loongson_cmd *cmd = tpm_engine->command;
+>> +
+>> +	cmd->data_len = count;
+>> +	memcpy(tpm_engine->data_buffer, buf, count);
+>> +
+>> +	return loongson_se_send_engine_cmd(tpm_engine);
+>> +}
+>> +
+>> +static const struct tpm_class_ops tpm_loongson_ops = {
+>> +	.flags = TPM_OPS_AUTO_STARTUP,
+>> +	.recv = tpm_loongson_recv,
+>> +	.send = tpm_loongson_send,
+>> +};
+>> +
+>> +static int tpm_loongson_probe(struct platform_device *pdev)
+>> +{
+>> +	struct loongson_se_engine *tpm_engine;
+>> +	struct device *dev = &pdev->dev;
+>> +	struct tpm_loongson_cmd *cmd;
+>> +	struct tpm_chip *chip;
+>> +
+>> +	tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
+>> +	if (!tpm_engine)
+>> +		return -ENODEV;
+>> +	cmd = tpm_engine->command;
+>> +	cmd->cmd_id = SE_CMD_TPM;
+>> +	cmd->data_off = tpm_engine->buffer_off;
+>> +
+>> +	chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+>> +	if (IS_ERR(chip))
+>> +		return PTR_ERR(chip);
+>> +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+>> +	dev_set_drvdata(&chip->dev, tpm_engine);
+>> +
+>> +	return tpm_chip_register(chip);
+>> +}
+>> +
+>> +static struct platform_driver tpm_loongson_driver = {
+>> +	.probe   = tpm_loongson_probe,
+>> +	.driver  = {
+>> +		.name  = "loongson-tpm",
+>> +	},
+>> +};
+>> +module_platform_driver(tpm_loongson_driver);
+>
+> It's otherwise fine but this should be just "tpm_loongson" :-)
+>
+> +1 revision add
+>
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+>
+> as long as this is renamed.
 
-diff --git a/crypto/sha256.c b/crypto/sha256.c
-index 9463c06ea39c..1068c206247f 100644
---- a/crypto/sha256.c
-+++ b/crypto/sha256.c
-@@ -45,14 +45,26 @@ static int crypto_sha256_update_generic(struct shash_desc *desc, const u8 *data,
- 	return remain;
- }
- 
--static int crypto_sha256_update_arch(struct shash_desc *desc, const u8 *data,
--				     unsigned int len)
-+static int crypto_sha256_update_lib(struct shash_desc *desc, const u8 *data,
-+				    unsigned int len)
- {
- 	sha256_update(shash_desc_ctx(desc), data, len);
- 	return 0;
- }
- 
--static int crypto_sha256_final_arch(struct shash_desc *desc, u8 *out)
-+static int crypto_sha256_update_arch(struct shash_desc *desc, const u8 *data,
-+				     unsigned int len)
-+{
-+	struct crypto_sha256_state *sctx = shash_desc_ctx(desc);
-+	int remain = len - round_down(len, SHA256_BLOCK_SIZE);
-+
-+	sctx->count += len - remain;
-+	sha256_choose_blocks(sctx->state, data, len / SHA256_BLOCK_SIZE,
-+			     false, true);
-+	return remain;
-+}
-+
-+static int crypto_sha256_final_lib(struct shash_desc *desc, u8 *out)
- {
- 	sha256_final(shash_desc_ctx(desc), out);
- 	return 0;
-@@ -74,10 +86,13 @@ static int crypto_sha256_finup_generic(struct shash_desc *desc, const u8 *data,
- static int crypto_sha256_finup_arch(struct shash_desc *desc, const u8 *data,
- 				    unsigned int len, u8 *out)
- {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	struct crypto_sha256_state *sctx = shash_desc_ctx(desc);
-+	int remain = len;
- 
--	sha256_update(sctx, data, len);
--	sha256_final(sctx, out);
-+	if (remain >= SHA256_BLOCK_SIZE)
-+		remain = crypto_sha256_update_arch(desc, data, remain);
-+	sha256_finup(sctx, data + len - remain, remain, out,
-+		     crypto_shash_digestsize(desc->tfm), false, true);
- 	return 0;
- }
- 
-@@ -88,20 +103,27 @@ static int crypto_sha256_digest_generic(struct shash_desc *desc, const u8 *data,
- 	return crypto_sha256_finup_generic(desc, data, len, out);
- }
- 
--static int crypto_sha256_digest_arch(struct shash_desc *desc, const u8 *data,
--				     unsigned int len, u8 *out)
-+static int crypto_sha256_digest_lib(struct shash_desc *desc, const u8 *data,
-+				    unsigned int len, u8 *out)
- {
- 	sha256(data, len, out);
- 	return 0;
- }
- 
-+static int crypto_sha256_digest_arch(struct shash_desc *desc, const u8 *data,
-+				     unsigned int len, u8 *out)
-+{
-+	crypto_sha256_init(desc);
-+	return crypto_sha256_finup_arch(desc, data, len, out);
-+}
-+
- static int crypto_sha224_init(struct shash_desc *desc)
- {
- 	sha224_block_init(shash_desc_ctx(desc));
- 	return 0;
- }
- 
--static int crypto_sha224_final_arch(struct shash_desc *desc, u8 *out)
-+static int crypto_sha224_final_lib(struct shash_desc *desc, u8 *out)
- {
- 	sha224_final(shash_desc_ctx(desc), out);
- 	return 0;
-@@ -165,16 +187,14 @@ static struct shash_alg algs[] = {
- 	},
- 	{
- 		.base.cra_name		= "sha256",
--		.base.cra_driver_name	= "sha256-" __stringify(ARCH),
--		.base.cra_priority	= 300,
-+		.base.cra_driver_name	= "sha256-lib",
- 		.base.cra_blocksize	= SHA256_BLOCK_SIZE,
- 		.base.cra_module	= THIS_MODULE,
- 		.digestsize		= SHA256_DIGEST_SIZE,
- 		.init			= crypto_sha256_init,
--		.update			= crypto_sha256_update_arch,
--		.final			= crypto_sha256_final_arch,
--		.finup			= crypto_sha256_finup_arch,
--		.digest			= crypto_sha256_digest_arch,
-+		.update			= crypto_sha256_update_lib,
-+		.final			= crypto_sha256_final_lib,
-+		.digest			= crypto_sha256_digest_lib,
- 		.descsize		= sizeof(struct sha256_state),
- 		.statesize		= sizeof(struct crypto_sha256_state) +
- 					  SHA256_BLOCK_SIZE + 1,
-@@ -183,20 +203,48 @@ static struct shash_alg algs[] = {
- 	},
- 	{
- 		.base.cra_name		= "sha224",
--		.base.cra_driver_name	= "sha224-" __stringify(ARCH),
--		.base.cra_priority	= 300,
-+		.base.cra_driver_name	= "sha224-lib",
- 		.base.cra_blocksize	= SHA224_BLOCK_SIZE,
- 		.base.cra_module	= THIS_MODULE,
- 		.digestsize		= SHA224_DIGEST_SIZE,
- 		.init			= crypto_sha224_init,
--		.update			= crypto_sha256_update_arch,
--		.final			= crypto_sha224_final_arch,
-+		.update			= crypto_sha256_update_lib,
-+		.final			= crypto_sha224_final_lib,
- 		.descsize		= sizeof(struct sha256_state),
- 		.statesize		= sizeof(struct crypto_sha256_state) +
- 					  SHA256_BLOCK_SIZE + 1,
- 		.import			= crypto_sha256_import_lib,
- 		.export			= crypto_sha256_export_lib,
- 	},
-+	{
-+		.base.cra_name		= "sha256",
-+		.base.cra_driver_name	= "sha256-" __stringify(ARCH),
-+		.base.cra_priority	= 300,
-+		.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					  CRYPTO_AHASH_ALG_FINUP_MAX,
-+		.base.cra_blocksize	= SHA256_BLOCK_SIZE,
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= SHA256_DIGEST_SIZE,
-+		.init			= crypto_sha256_init,
-+		.update			= crypto_sha256_update_arch,
-+		.finup			= crypto_sha256_finup_arch,
-+		.digest			= crypto_sha256_digest_arch,
-+		.descsize		= sizeof(struct crypto_sha256_state),
-+	},
-+	{
-+		.base.cra_name		= "sha224",
-+		.base.cra_driver_name	= "sha224-" __stringify(ARCH),
-+		.base.cra_priority	= 300,
-+		.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY |
-+					  CRYPTO_AHASH_ALG_FINUP_MAX,
-+		.base.cra_blocksize	= SHA224_BLOCK_SIZE,
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= SHA224_DIGEST_SIZE,
-+		.init			= crypto_sha224_init,
-+		.update			= crypto_sha256_update_arch,
-+		.finup			= crypto_sha256_finup_arch,
-+		.descsize		= sizeof(struct crypto_sha256_state),
-+	},
- };
- 
- static unsigned int num_algs;
-@@ -205,9 +253,9 @@ static int __init crypto_sha256_mod_init(void)
- {
- 	/* register the arch flavours only if they differ from generic */
- 	num_algs = ARRAY_SIZE(algs);
--	BUILD_BUG_ON(ARRAY_SIZE(algs) % 2 != 0);
-+	BUILD_BUG_ON(ARRAY_SIZE(algs) <= 2);
- 	if (!sha256_is_arch_optimized())
--		num_algs /= 2;
-+		num_algs -= 2;
- 	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
- }
- subsys_initcall(crypto_sha256_mod_init);
--- 
-2.39.5
+Will rename.
+
+Thanks for your reply,
+
+BR, Qunqin.
+
+>> +
+>> +MODULE_ALIAS("platform:loongson-tpm");
+>> +MODULE_LICENSE("GPL");
+>> +MODULE_DESCRIPTION("Loongson TPM driver");
+>> -- 
+>> 2.45.2
+>>
+>>
+> BR, Jarkko
 
