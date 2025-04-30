@@ -1,91 +1,102 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767F0210F45
-	for <linux-crypto@vger.kernel.org>; Wed, 30 Apr 2025 08:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA7F21B8FE;
+	Wed, 30 Apr 2025 08:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746001562; cv=none; b=FwKho1NEG+pdnKFVyE7RucJY/qMzSwR/jBcO4FBBF2WDvaC4iCw9O2jIPRCYC/AJNHjkWkCZF0QPvUiPPE/Bkc61ohwKBEZSzdtwm0xlkIDhbJgiF9AYAURwYyLL0JKmAu+aqvTxF88siPgWkenjHEVjxkenuEM0xPCdR5r7lew=
+	t=1746002828; cv=none; b=sn6YgVDIUkMTWgl7Uop8mziH9bcsRQL+lmgblj0nK9AfzPTOfuROwPUlQbx+BUCt9b5dfnv8Ly3edGejoZgXnj0LXbMH36tXCaOFT1DFGkkUtQoEU+Aan/Z1zap0TbK7U+dvzPG53gs3H5SL3XKDRg7VX5a0EbCcXbYcsG40WyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746001562; c=relaxed/simple;
-	bh=+AuIuIUyhweQGTDyMRQfCE77a6DyEX/P8ogaUVNAyAA=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hSPKw3D99twxVEV3M1g6I1rP5ovVasr8x5wbjcvJkP3YMImowij83v+RYWhN5Fle1eHq6j4cUF4T8OSI6LpKMhRTXK7F+e2m3DHF6Liq2E4VHnMaxZTpbI2KCbgN0O3B6Uyg+76A8Ky1OR8L8TlOhZqsRNUlMAFo/2RfH0YMcEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pZKzpB3G; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pZKzpB3G"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=B2vDGo7QRSKQj15Wy/+XQ5p+zBqiSWdx2R/Xmla2OGE=; b=pZKzpB3GXdAPnv7r4i3bLf+wFa
-	GwVOk77wxAAhfVcW/tqTCHTG9/TnDrm0QDs7p+Ev2KRFAhukfzRQWJDwAEKawXgXtmqw5D79Q5qTN
-	hlSLRFJtw7U/o7UDaYymDJ2uv1pXRCiiINUset8sNmkhDyoOwgxYQUsV440ldEPtRbWqVfhOfHvyn
-	SsysvnAQy1/xAW16wyXzAT1zCySahTQ/DTu0GXCs91Y9uxFrGqu5aOl8AmgO2WkMTbOEhm5ysKMed
-	aD9HRFxFHs4qtgDb6jQfFgImsIOQOh8STxBg+7yo8g4BFHu2nWvdQOYgrIQaYf0XO1DYQtB5Ltkq5
-	q7yO6Ibg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uA2lP-002D38-1W;
-	Wed, 30 Apr 2025 16:25:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 16:25:55 +0800
-Date: Wed, 30 Apr 2025 16:25:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: x86/blake2s - Include linux/init.h
-Message-ID: <aBHek23p0_0Xd6Wy@gondor.apana.org.au>
+	s=arc-20240116; t=1746002828; c=relaxed/simple;
+	bh=oujcGGtTWJdhqn+hsdcintVRbu2G4WyuFYXEHRDX0SI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=S92/rkCn05+JfIek7wZdZC13Zk+wn1KiIfxTbzT7NvIf9k/QcCSsOYG0l/yDsWt1YWTu7Qgv/nSxOywk0jHQG+gwBTjMlAOB4dQ/GGyobV8LelIkmf/RWQhRkHbiEsRIY6uPLXlTHgBQducsm1My16NtsAge8QIeMf3yb+8B3c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8AxDGuD4xFo_PnKAA--.7952S3;
+	Wed, 30 Apr 2025 16:46:59 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMCxbRt_4xFoD_ifAA--.8231S2;
+	Wed, 30 Apr 2025 16:46:57 +0800 (CST)
+Subject: Re: [PATCH v8 0/5] Add Loongson Security Engine chip driver
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: davem@davemloft.net, peterhuewe@gmx.de, jarkko@kernel.org,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-crypto@vger.kernel.org, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+ pmenzel@molgen.mpg.de, Lee Jones <lee@kernel.org>
+References: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
+ <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
+ <75bb29fa-6d77-6f95-eec4-ee183190da17@loongson.cn>
+ <aBHc2tT2-Duj3_-A@gondor.apana.org.au>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <6b7385ce-d8ad-1be9-4503-55460f40fe72@loongson.cn>
+Date: Wed, 30 Apr 2025 16:45:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <aBHc2tT2-Duj3_-A@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowMCxbRt_4xFoD_ifAA--.8231S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrKryUWw4DAFWrArW7Gw1ktFc_yoWfZwb_Cw
+	48uFnrGw1DGF4SgFs8Kr129F9FgFZrXF97Z3yIv3yay3s3Zr4jgr4xurnxuw4Syr4DJFs8
+	Zr429rZ3ZryfCosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbDkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0
+	oVCq3wAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa02
+	0Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1l
+	Yx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI
+	0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC2
+	0s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r4a6rW5MI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
+	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAI
+	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
 
-Explicitly include linux/init.h rather than pulling it through
-potluck.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- arch/x86/lib/crypto/blake2s-glue.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+在 2025/4/30 下午4:18, Herbert Xu 写道:
+> On Wed, Apr 30, 2025 at 04:14:40PM +0800, Qunqin Zhao wrote:
+>> Sorry to bother you, may i ask is it fine to move  the Security Engine base
+>> driver[Patch v8 1/5] to drivers/crypto ?
+>>
+>> The base driver uses MFD  interface  to register child device(tpm, rng) , as
+>> done in
+>>
+>> "drivers/iio/common/ssp_sensors/ssp_dev.c" and
+>> "drivers/firmware/xilinx/zynqmp.c".
+>>
+>> Thank you, and I look forward to hearing from you.
+> I don't mind at this point in time.  But if this driver were to
+> develop features way outside of the Crypto API in future then I
+> may change my mind.
 
-diff --git a/arch/x86/lib/crypto/blake2s-glue.c b/arch/x86/lib/crypto/blake2s-glue.c
-index 00f84f29cc8c..adc296cd17c9 100644
---- a/arch/x86/lib/crypto/blake2s-glue.c
-+++ b/arch/x86/lib/crypto/blake2s-glue.c
-@@ -3,17 +3,15 @@
-  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-  */
- 
--#include <crypto/internal/blake2s.h>
--
--#include <linux/types.h>
--#include <linux/jump_label.h>
--#include <linux/kernel.h>
--#include <linux/sizes.h>
--
- #include <asm/cpufeature.h>
- #include <asm/fpu/api.h>
- #include <asm/processor.h>
- #include <asm/simd.h>
-+#include <crypto/internal/blake2s.h>
-+#include <linux/init.h>
-+#include <linux/jump_label.h>
-+#include <linux/kernel.h>
-+#include <linux/sizes.h>
- 
- asmlinkage void blake2s_compress_ssse3(struct blake2s_state *state,
- 				       const u8 *block, const size_t nblocks,
--- 
-2.39.5
+Hi, Herbert, thanks for your reply.
 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+In future it just add child platform devices  name(sm2, sm3, sm4) to 
+"struct  mfd_cell engines".
+
+
+Hi, Huaci
+
+Let's go via Herbert's crypto tree for the base driver patch under 
+drivers/crypto/loongson/,
+
+What do you think of it?
+
+
+BR, Qunqin.
+
+>
+> Thanks,
+
