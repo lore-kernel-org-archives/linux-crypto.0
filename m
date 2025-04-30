@@ -1,56 +1,41 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA642111;
-	Wed, 30 Apr 2025 02:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB68BE5E
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Apr 2025 03:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745981268; cv=none; b=A9P+YX3TjDkueJNLw2J5ez/KlDVmROWWEI3Ac3rDUihzdwoUBlo2ys9wMmwvkI33/fpE3+YvhhxKMK3DmTmL2ozFmONTkSZXJ9WoY/WyNINMtFKyOblUnAWHBg2eXQ2ujQyQPYAfoiiR3eohmnvDyHx60xZMqbbx18N/P8ZoAis=
+	t=1745982985; cv=none; b=Ithxi4pMsNN9ZVRHo3ytySG/QiKVrr4k0Kgpj4Ai0l+XZXQctS4H1b/zbu8jY3WUDgoaaXebLr25vCcZFhXSCO/5EjnZNwGZkFyexiykyNrw3xlashKZ0tJEH2eQ4pFTeW6gyDsEEaBaLwlIZnBJBaMKBNKTH7v4KYeMiEN5sl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745981268; c=relaxed/simple;
-	bh=+Ob5i8Dn7eF+x4miDHXxuDe3afBUibimhKURbRd+Lic=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKcCOO9+8BW3h2syFISz5AYROlq25Mju9GvgSiI9UktvVodkSSEVCOltoSDE8pFviu3lUORG+imUE6jHuh8GjUgRbWjA+C6HC4GTmCSgkQ/RFwjWwhZRNo9Q7OqAOeE673Pq6b0BkwfYPRemH9+5DKi32N6vF00SeofpBzuNJhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qvKIYmzq; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745982985; c=relaxed/simple;
+	bh=6GVZZTarw8ZK8b4yJhzpQN+Hpu7IfIkI2d53RgNW/X8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SYrnjHGI3v1kvAb1+SilAyP9jUdLAOQFJkIVjhXBt3dPGv4VET/nmTBn7kBwgvWUPPweVtnBBqjiD/rVLUkLyr7xskYv8XbioPV9TtIFGeoXQxRQlUIzLC3thXie7uwHe+7kX6G8IErjMHBSSkIt9+4XyJvhvXNKUYj6wnqWgGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBno4nOB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qvKIYmzq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=dinu/IcYpDONett6L65YxigVMJYuWf4ibUzIRHPzHAw=; b=qvKIYmzqbInh9gBZMfH+8X0whE
-	qUkpzTfCxw9xC2P5jineD6QJ2m8LzDtnc9B3uf8fDjVnhqn58HRkMZtJEvqbTi/9tervXuMTAGw6x
-	suBN/jUCd+4VzFUPfGkAc8+WOfeOx6ta4vzEyqKGTthNyPljl9UVYDl9E7gxfhiVAUXUDlQp+fdXr
-	LABAdWp0aciRzG6Q0h/Hsul6Sj/kX67DYnouk/HA8+Rceb8MZuKHAJbG/Ih45T5fTdxj4gWUNAgoY
-	yBJZ6PfYoKLnKCxTFqdk5exfpAPsLOGfCfxINxEXeyfEJHB+1g4OI78MSh4RG9uJV4Jz9vBYklhuc
-	2aG57nbg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9xU2-00290q-2o;
-	Wed, 30 Apr 2025 10:47:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 10:47:38 +0800
-Date: Wed, 30 Apr 2025 10:47:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.15
-Message-ID: <aBGPSpJcLRrwiutd@gondor.apana.org.au>
-References: <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
- <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
- <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
- <Z-ofAGzvFfuGucld@gondor.apana.org.au>
- <Z_CUFE0pA3l6IwfC@gondor.apana.org.au>
- <Z_89K7tSzQVKRqr6@gondor.apana.org.au>
- <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBno4nOB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A8DC4CEE9;
+	Wed, 30 Apr 2025 03:16:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745982985;
+	bh=6GVZZTarw8ZK8b4yJhzpQN+Hpu7IfIkI2d53RgNW/X8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QBno4nOBKNgc9U1aMu5G1KnF5WExJLs9Ne3mWrJ6zMOJ6Yp0ApIzUXLkVNQqrB9iv
+	 ym0tneuhD8NgtS0X/3+O33LG47fFQTO9im5N3Hz07E0PPLGVk9mit+cjESXD4EtlUg
+	 +s5lAacUoRRuNuYCpHLfAwxx1qFni9nXnO391LI+/9VU52A+l/gvCgFpvPlOfLFopI
+	 qwYYanYPG0a6hSCHh9RZsfU93wqY2ve/QtAjS9hMpmRV0vayUqU1XAx9wNj98W5TG6
+	 n+YM0oUGPGKLPi7aM/1V5AsuiveNUaLu4P6eKMoanKO1tFSVUePbrxYfW5vJWs3XtW
+	 Nn9iyX+VV5IqQ==
+Date: Tue, 29 Apr 2025 20:16:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 1/1] Revert "crypto: run initcalls for generic
+ implementations earlier"
+Message-ID: <20250430031623.GA277467@sol.localdomain>
+References: <aBBoqm4u6ufapUXK@gondor.apana.org.au>
+ <20250429164100.GA1743@sol.localdomain>
+ <aBGJR55J3hkFZvfJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,34 +44,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
+In-Reply-To: <aBGJR55J3hkFZvfJ@gondor.apana.org.au>
 
-Hi Linus:
+On Wed, Apr 30, 2025 at 10:21:59AM +0800, Herbert Xu wrote:
+> On Tue, Apr 29, 2025 at 09:41:00AM -0700, Eric Biggers wrote:
+> >
+> > arch/*/lib/ should be kept at arch_initcall.  It makes sense (it's arch/ code);
+> > it's library code with no dependencies on any other initcalls; and it can be
+> 
+> There aren't any direct dependencies but if you end up executing
+> the code protected by those static branches things may well break.
+> 
+> For example, fpu_state_size_dynamic() is only initialised at
+> arch_initcall.  So if you enable these lib/crypto static branches,
+> *and* someone actually calls them early enough during arch_initcall,
+> they may end up hitting the FPU code before it's been properly
+> initialised.
+> 
+> I think it's prudent to delay the initialisation of these static
+> keys until later in the boot process, unless there is a demonstrated
+> need for accessing them early.
+> 
+> > use arch_initcall.  (And FWIW I'll keep doing that arch/*/lib/crc*.c, even if
+> > you decide to mess up arch/*/lib/crypto/.)
+> 
+> I'm not going to touch the crc stuff.
 
-The following changes since commit 8006aff15516a170640239c5a8e6696c0ba18d8e:
+If arch is really too early for arch/*/lib/, then subsys should be used instead.
+The point is that putting different algorithms at different levels would be
+confusing.
 
-  crypto: atmel-sha204a - Set hwrng quality to lowest possible (2025-04-23 09:32:57 +0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p6
-
-for you to fetch changes up to a32f1923c6d6e9e727d00558a15ec0af6639de19:
-
-  crypto: scompress - increment scomp_scratch_users when already allocated (2025-04-25 10:33:30 +0800)
-
-----------------------------------------------------------------
-This push fixes a regression in scompress.
-----------------------------------------------------------------
-
-Sabrina Dubroca (1):
-      crypto: scompress - increment scomp_scratch_users when already allocated
-
- crypto/scompress.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
