@@ -1,44 +1,45 @@
-Received: from sender3-pp-f112.zoho.com (sender3-pp-f112.zoho.com [136.143.184.112])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A627720C463;
-	Wed, 30 Apr 2025 16:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.184.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BA127718;
+	Wed, 30 Apr 2025 16:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746029855; cv=pass; b=HK7dQmmhKM0sB5759/KyQLwxQNboEe28CBgX9ikcIiMEw/DHkxMuoPA+sdfHwzo61No1iGG+Hihmc/sq31w8JN14vEqUzginvtynBnTUN8q+IrvPpfHNnbDfLSyo83VU3zHXWOKOTTNivdWGfgwbOuI2g/As+HWYAv8yi1BSRSI=
+	t=1746029875; cv=pass; b=AcrS8Wt/pbt0QLMcBa4XO+nUIEu6Zs+nWcgcLtznrhpEIet0uNvGTBszEket2928Qhq8bIVHdMhl6v2ay32BiK3slv2HIsiga2OAv5MZWqtkGWMzLM+ZvY1Qo5vQ6a3DAxpnw0aCk+8APZCP2MiehVMwagifGmTPPSWvUzWFbaw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746029855; c=relaxed/simple;
-	bh=UI12DHEIMvhSUwnuUOxmnhKeGFXyWQZ3ohVg1izPjHE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=J5US5sNCbxf4DQU25m94iXJ2mTtWQXYTe8Ytyn69U1TYsAi+41KiXvcWbZxzNU1woo0CH7abEGGVj29PLw1Vr6u2OPg7psadfQa8I0V6oqBT8ZbPCG8MebDEJ6gxwQld1BBYv6KH7WAV0+xzHIJZzc9nGxpFMYQ+FoAVXYBpX7k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=CtnL4PV2; arc=pass smtp.client-ip=136.143.184.112
+	s=arc-20240116; t=1746029875; c=relaxed/simple;
+	bh=5mNZSHb6mCpP3Lg66LkiacMQ3ZdAK5I0MUNG4QOKZPA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Ue3f96JXNYV8tNL08EsrmxHViSP8SI+sFQ5SFCQpGWTHSjKoz83hMC5bOcUdZ6H0dG/FwGeRVllTyzDSY+oPwtyjQzPhm8adcayClYhW6JCunQrtVNF9qbgQoWhNMALglR6eXJQ5wpGb1sWjAYTfA7H+sCBtm0iRpNzvWM0fA5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=YGOKalQd; arc=pass smtp.client-ip=136.143.188.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="CtnL4PV2"
-ARC-Seal: i=1; a=rsa-sha256; t=1746029812; cv=none; 
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="YGOKalQd"
+ARC-Seal: i=1; a=rsa-sha256; t=1746029816; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=B287je1pCwj5KlUdHqnWjILCE28CeDyD/RGttZ73msudPqKOQJa/HpKQzsv5GWQKR1XvfjRGkqhMcaHqZRzYQEjgwHyK6Ygpz+Apl58/sSUOv94GhXFf5QtK3g80fTd8Zc/EwVE71e0fxaAnZ+iQfuU9+6BvyDJbIvruac/Hhxo=
+	b=FnH76/YWeEy/aEeClOrvdV1Lr1/LcqU0T2iXebxS64wmnt9bOwGw7Ii7uaV/nz8OtwkHj7Aer7BevzuiFHLkFVofjaRn2QBVdVotk4szJ2ebbs1NzDA54A+d8GZaWAyzEzDoKityNgabm/BFSp2HtuXqQU4zKnV1E/p0j4c6FHA=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1746029812; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=F+Ts31OxWQ0WA/XXfCrTbdTi2PZ2UUmlCJRckaG2TDw=; 
-	b=WWi/OEwYNLm6TdqHoo9nv5gmmobRI5mQY/qYcMw2YeXjW1y8WzGDVaJvi6JL4//FXEO9P1AZu5/gJsTsorRtwnNY/59RIjJspK44fiq+988lggByD7kYQbsX6ajA+5ONHWSVcjqAf4419LIM+IuM4442cj0sedhXw05Cx3GCbIE=
+	t=1746029816; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=jDHqxj+pNMIqtx7OnVBhW5kzUARxjRYDjneVyS0hKvI=; 
+	b=VIreHB6PMr/QzD2QVbjiMIdn7jFqUoRrV2Vw2WdlIFRsBqkJ1WclndHIMWhsesttMvUEaNlPd7dwnUoMhmj+eOeaGyNqEXADlDfB02Hx69WeQifEsktplsyEUkuWyJQUOtP9qgFF4OUQ2Qc87ai9YH07gWD/hAjzBVddlfSPsNE=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
 	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1746029812;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1746029816;
 	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:To:To:Cc:Cc:Reply-To;
-	bh=F+Ts31OxWQ0WA/XXfCrTbdTi2PZ2UUmlCJRckaG2TDw=;
-	b=CtnL4PV2iszZr2tLD1X+Rxo0+MnLVjzqh6kPbne1NbQidAZESyn4vrjWd/EgVct0
-	fD2vXblzP/zTS2ETW0XN9QaR72t9n7aXuRBQ26zKcVhf4OzikZOOL68dKiymAbEe7qi
-	horD4tl69PFbvVzR7jLvOrne4Bu3Pfms0HOplmZQ=
-Received: by mx.zohomail.com with SMTPS id 1746029810436360.54725368726145;
-	Wed, 30 Apr 2025 09:16:50 -0700 (PDT)
+	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:References:In-Reply-To:To:To:Cc:Cc:Reply-To;
+	bh=jDHqxj+pNMIqtx7OnVBhW5kzUARxjRYDjneVyS0hKvI=;
+	b=YGOKalQd8pPactsftc5nDvQUxSHPdgkHSiIV4i0mhK1F3vvqLOlvJk5AO1zKX+xH
+	IvO4J1qrINjuLUtRPVqPDD6/kUih8ufB2OFtz5NyCqyEctYzB2XyU6lYejD80DWf1il
+	C3KApsl5jqAdSwLlUIBTWqT6QwHf13bge/sZDmv4=
+Received: by mx.zohomail.com with SMTPS id 1746029814097766.0947279438221;
+	Wed, 30 Apr 2025 09:16:54 -0700 (PDT)
 From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: [PATCH 0/3] RK3576 Hardware RNG
-Date: Wed, 30 Apr 2025 18:16:33 +0200
-Message-Id: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
+Date: Wed, 30 Apr 2025 18:16:34 +0200
+Subject: [PATCH 1/3] dt-bindings: rng: rockchip,rk3588-rng: add rk3576-rng
+ compatible
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,10 +48,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAOFMEmgC/zXMQQ6CMBCF4as0s3aStlhBrmJYlDrCxFB0WpWEc
- Hcbicv/Je9bIZEwJWjVCkJvTjzHEuagIIw+DoR8LQ1WW6eP9oxyr1x9wvEjccAmVLrpXW2MJyi
- Xh9CNlx936fYWer6KmvcRep8IwzxNnFsVacn4l6Hbti+PAwAKjwAAAA==
-X-Change-ID: 20250429-rk3576-hwrng-8c308b5711ae
+Message-Id: <20250430-rk3576-hwrng-v1-1-480c15b5843e@collabora.com>
+References: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
+In-Reply-To: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
 To: Daniel Golle <daniel@makrotopia.org>, 
  Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>, 
  Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
@@ -64,43 +64,44 @@ Cc: Sebastian Reichel <sebastian.reichel@collabora.com>,
  Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 X-Mailer: b4 0.14.2
 
-Gee Nicolas, how come your mom lets you write two Rockchip HWRNG drivers
-in a year?
+The RK3576 SoC contains another standalone TRNG implementation. While
+the register map and hardware is different, it has the same
+clocks/interrupts/resets as the RK3588's TRNG, so can go in the same
+binding.
 
-In short, RK3576 (and RK3562 and RK3528) introduce another HWRNG IP. It
-actually has quite a few cool features, but I ignored the cool bits and
-went straight for the true entropy. Some of the cool bits someone else
-may wish to add in the future: AES-CTR PRNG that's regularly reseeded
-from the entropy, adjustments for oscillator and oscillator ring lengths
-to maximise entropy generation, automatic continuous quality checking of
-the produced entropy by the hardware itself, etc.
-
-In testing, it seems to produce about 2 mbit/s of high quality entropy
-on the RK3576 with its default settings when we read the TRNG entropy
-output directly. That's less than we'd get if we had the hardware use
-the PRNG to stretch it, but I've decided to leave that up to Linux's
-entropy pool implementation for now.
-
-RK3562 and RK3528 probably just need a compatible and a DTS node to
-enable it as well, but I don't have any RK3562/RK3528 boards to test
-this with, so it's not done in this series.
+Add the compatible and generalise the title/description of the binding
+some more.
 
 Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 ---
-Nicolas Frattaroli (3):
-      dt-bindings: rng: rockchip,rk3588-rng: add rk3576-rng compatible
-      hwrng: rockchip - add support for RK3576's RNG
-      arm64: dts: rockchip: add RK3576 RNG node
+ Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- .../bindings/rng/rockchip,rk3588-rng.yaml          |  5 +-
- arch/arm64/boot/dts/rockchip/rk3576.dtsi           |  8 +++
- drivers/char/hw_random/rockchip-rng.c              | 73 ++++++++++++++++++++++
- 3 files changed, 84 insertions(+), 2 deletions(-)
----
-base-commit: 4e0a9c660788594b5b49ac07f0fbdccd2218431e
-change-id: 20250429-rk3576-hwrng-8c308b5711ae
+diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml b/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
+index ca71b400bcaee4ad9d9c96102fd5940233c2c70f..fcc5be80142dfae1952652907a5fafe8504e36c0 100644
+--- a/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
+@@ -4,9 +4,9 @@
+ $id: http://devicetree.org/schemas/rng/rockchip,rk3588-rng.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+-title: Rockchip RK3588 TRNG
++title: Rockchip RK3576/RK3588 TRNG
+ 
+-description: True Random Number Generator on Rockchip RK3588 SoC
++description: True Random Number Generator on Rockchip RK3576/RK3588 SoCs
+ 
+ maintainers:
+   - Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+@@ -14,6 +14,7 @@ maintainers:
+ properties:
+   compatible:
+     enum:
++      - rockchip,rk3576-rng
+       - rockchip,rk3588-rng
+ 
+   reg:
 
-Best regards,
 -- 
-Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+2.49.0
 
