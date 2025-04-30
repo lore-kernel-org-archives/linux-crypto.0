@@ -1,80 +1,90 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4623C1EB197;
-	Wed, 30 Apr 2025 08:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767F0210F45
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Apr 2025 08:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746001133; cv=none; b=sEpYGPw794DGREubyNig9pzftiLMgxUpYmQLlG3XQft4hbD8vJol/O3wf/mjwdWqjD6bcPHEvdVnVF0NSz+bwhfNrbe9RM3xDFehkLofQlIMr+zPi56XLklVsTsH4ysP+S1zyeh3lV4o1B4QQDGx1H+vCemt4DjHsAkmTa0/Klc=
+	t=1746001562; cv=none; b=FwKho1NEG+pdnKFVyE7RucJY/qMzSwR/jBcO4FBBF2WDvaC4iCw9O2jIPRCYC/AJNHjkWkCZF0QPvUiPPE/Bkc61ohwKBEZSzdtwm0xlkIDhbJgiF9AYAURwYyLL0JKmAu+aqvTxF88siPgWkenjHEVjxkenuEM0xPCdR5r7lew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746001133; c=relaxed/simple;
-	bh=bHAZEpmXSdLpFJLUjkk5FAmT9/oL5KYYAbtM4RoPUsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KVQG/XzuwIioJiPoBMH0O/JxDSLuQn+eoJavYE34l7ZTnY93GK7sEgVwafWIq6kGMSkg+/oMN/wXSX9KL/ehVXz+UyhAAkKPzNiDkimONHDUY+mmZP4p4voBzvOO7X+rHtSeYOYzs8ZHaug3WmCEC6aEI98magsO1gdjuv/c8jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qqJaDh4/; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1746001562; c=relaxed/simple;
+	bh=+AuIuIUyhweQGTDyMRQfCE77a6DyEX/P8ogaUVNAyAA=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=hSPKw3D99twxVEV3M1g6I1rP5ovVasr8x5wbjcvJkP3YMImowij83v+RYWhN5Fle1eHq6j4cUF4T8OSI6LpKMhRTXK7F+e2m3DHF6Liq2E4VHnMaxZTpbI2KCbgN0O3B6Uyg+76A8Ky1OR8L8TlOhZqsRNUlMAFo/2RfH0YMcEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pZKzpB3G; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qqJaDh4/"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pZKzpB3G"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=Dne3ROVglvwR4BrHcAfMFGXqQGQiHsk7Mm78Fflzfng=; b=qqJaDh4/YAUUQBOKMyxhXy2rF2
-	cRRkqbQ+60E67dd6gwWYxPTZuJDkUey3DHgcraCZtebWZysBFL/3Muq2S1pzbOFIb2frhAS01Y9EG
-	EoY3lOBUgKFFqpd5ig9U/u97qV7dgvZ9ReA2Vk5tPXmeeb46Gnv0bunoiNfOXyYIsQmdg6gU1aA68
-	ImQKJfgAHLB7HhaxyqxBZLRWB8Hhuf9nkj5E2xp4LlRzft7P0RM/qNcqRHeYHVoMXNxOAhevkWSCy
-	/5sbtpCBz7cV6rggl7ssRGReA9RKbNTsKaRkyJrBgqB1rmXvAXak9+QPjlFQwkMlZbY12rYteB+88
-	NGsJtYCw==;
+	bh=B2vDGo7QRSKQj15Wy/+XQ5p+zBqiSWdx2R/Xmla2OGE=; b=pZKzpB3GXdAPnv7r4i3bLf+wFa
+	GwVOk77wxAAhfVcW/tqTCHTG9/TnDrm0QDs7p+Ev2KRFAhukfzRQWJDwAEKawXgXtmqw5D79Q5qTN
+	hlSLRFJtw7U/o7UDaYymDJ2uv1pXRCiiINUset8sNmkhDyoOwgxYQUsV440ldEPtRbWqVfhOfHvyn
+	SsysvnAQy1/xAW16wyXzAT1zCySahTQ/DTu0GXCs91Y9uxFrGqu5aOl8AmgO2WkMTbOEhm5ysKMed
+	aD9HRFxFHs4qtgDb6jQfFgImsIOQOh8STxBg+7yo8g4BFHu2nWvdQOYgrIQaYf0XO1DYQtB5Ltkq5
+	q7yO6Ibg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uA2eI-002Cw4-1L;
-	Wed, 30 Apr 2025 16:18:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 16:18:34 +0800
-Date: Wed, 30 Apr 2025 16:18:34 +0800
+	id 1uA2lP-002D38-1W;
+	Wed, 30 Apr 2025 16:25:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 16:25:55 +0800
+Date: Wed, 30 Apr 2025 16:25:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: Huacai Chen <chenhuacai@kernel.org>, davem@davemloft.net,
-	peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
-	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	pmenzel@molgen.mpg.de, Lee Jones <lee@kernel.org>
-Subject: Re: [PATCH v8 0/5] Add Loongson Security Engine chip driver
-Message-ID: <aBHc2tT2-Duj3_-A@gondor.apana.org.au>
-References: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
- <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
- <75bb29fa-6d77-6f95-eec4-ee183190da17@loongson.cn>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: x86/blake2s - Include linux/init.h
+Message-ID: <aBHek23p0_0Xd6Wy@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <75bb29fa-6d77-6f95-eec4-ee183190da17@loongson.cn>
 
-On Wed, Apr 30, 2025 at 04:14:40PM +0800, Qunqin Zhao wrote:
->
-> Sorry to bother you, may i ask is it fine to move  the Security Engine base
-> driver[Patch v8 1/5] to drivers/crypto ?
-> 
-> The base driver uses MFD  interface  to register child device(tpm, rng) , as
-> done in
-> 
-> "drivers/iio/common/ssp_sensors/ssp_dev.c" and
-> "drivers/firmware/xilinx/zynqmp.c".
-> 
-> Thank you, and I look forward to hearing from you.
+Explicitly include linux/init.h rather than pulling it through
+potluck.
 
-I don't mind at this point in time.  But if this driver were to
-develop features way outside of the Crypto API in future then I
-may change my mind.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ arch/x86/lib/crypto/blake2s-glue.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Thanks,
+diff --git a/arch/x86/lib/crypto/blake2s-glue.c b/arch/x86/lib/crypto/blake2s-glue.c
+index 00f84f29cc8c..adc296cd17c9 100644
+--- a/arch/x86/lib/crypto/blake2s-glue.c
++++ b/arch/x86/lib/crypto/blake2s-glue.c
+@@ -3,17 +3,15 @@
+  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+  */
+ 
+-#include <crypto/internal/blake2s.h>
+-
+-#include <linux/types.h>
+-#include <linux/jump_label.h>
+-#include <linux/kernel.h>
+-#include <linux/sizes.h>
+-
+ #include <asm/cpufeature.h>
+ #include <asm/fpu/api.h>
+ #include <asm/processor.h>
+ #include <asm/simd.h>
++#include <crypto/internal/blake2s.h>
++#include <linux/init.h>
++#include <linux/jump_label.h>
++#include <linux/kernel.h>
++#include <linux/sizes.h>
+ 
+ asmlinkage void blake2s_compress_ssse3(struct blake2s_state *state,
+ 				       const u8 *block, const size_t nblocks,
+-- 
+2.39.5
+
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
