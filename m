@@ -1,116 +1,342 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77AD22206B1;
-	Wed, 30 Apr 2025 09:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745002505BE;
+	Wed, 30 Apr 2025 10:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746004330; cv=none; b=SOP2ffU/nBnpTZa5gLGdVZJqhE+Pk/h7wR/DpEKSHUG8hx23aKZVXtXbgnCAVPa8esYpgVcyXdC5WtnWycS7Y3uUNEwnUs2ZYQtC2NyXNdLeTJwUgJySVPMa2U4BrMUQaMv3vBZkJtE0kS++KzjZ3xccGI4YoJmUbLz5S4g0DZ8=
+	t=1746009269; cv=none; b=X5x3YfVkVaIJCAXShIG5CD9VngSHlHOTdcUI8UBU3zbeLDYgAp+Etf5X28MO/D1in55YnWaYtvfTgzW1+co9LNem5Y2/AGNClzxtytXxy4G5hNHt7w08cuThBUrQZGZsS1HFG4gvoTrLPZNGMdeJiR3P/hkJxWQgHEEIbt6Y7h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746004330; c=relaxed/simple;
-	bh=Qk0DryjXIt3ss4um7MXcOMei15BeSthVbi80x1XAoCM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=KY9EtUjBjPV+8tp06tiIIkcGKfNpfCWWD9PUdZbmyVx5HkpTkSvF+4JAbeF+LpfMgtqUhEKO2YRQYcTc5+645ULIPB7xWhOxBj4HDbpPIS63VkN/fxRmR5OChlQM7YIDVU8NuuERvekvokts7wXzlNqDabtLHs1fzGqwU1KahAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8Bx32tj6RFoAADLAA--.8960S3;
-	Wed, 30 Apr 2025 17:12:03 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMAxHsdb6RFocwSgAA--.44342S2;
-	Wed, 30 Apr 2025 17:11:57 +0800 (CST)
-Subject: Re: [PATCH v8 0/5] Add Loongson Security Engine chip driver
-To: Lee Jones <lee@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, jarkko@kernel.org
-Cc: davem@davemloft.net, peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de
-References: <20250418093506.1349-1-zhaoqunqin@loongson.cn>
- <CAAhV-H608_ddH0g0gyFCZSTVxYHOBqLXrtGYxZ1eoXX6eCcEuA@mail.gmail.com>
- <75bb29fa-6d77-6f95-eec4-ee183190da17@loongson.cn>
- <aBHc2tT2-Duj3_-A@gondor.apana.org.au>
- <6b7385ce-d8ad-1be9-4503-55460f40fe72@loongson.cn>
- <CAAhV-H6ku=imPGqaFrey6hCMwXSL4Qsoif9Rv=Gko2R1CBtGmw@mail.gmail.com>
- <20250430085809.GD1567507@google.com>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <0f2a34ce-3e4b-7dda-4835-34bfd0ef60fc@loongson.cn>
-Date: Wed, 30 Apr 2025 17:10:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1746009269; c=relaxed/simple;
+	bh=XJYNywt1rWr3YArrndoLaWM96DG+2bFlaSjQ0fVDVh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n/rel7KwTtLz3NQ7PLJtbw//HeAY3/Vqbcy4CRn7uPvC0eyYE4zGXwNeM7ZpmCZ7ejd2whltilrZdic7J5BsakAqEm5bBRni3QOszHHvDhdhVozeRe9uMQJAz8DoxGiOj2AR5iZtekNj61cclbQcVF715U5P+NstQbGTJdJ1eGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ga09qoaV; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ga09qoaV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=YvbyhZIVhrVcZrECRwfD/1Dt4t5xRDekoFM+vI/X2N8=; b=ga09qoaVhH5U8vCV3jeUhlCoZP
+	DjiD1VuEBTQf14I8wlurGlsiX09KJlq7GCUx81PKyYDIxDfrDGQ5Mn5LW9KbPhXSRZ//DIHN6VfjA
+	5WHdujhl3sU+eLWxrcS0Wu4WjuaPikO4Z+F8zBloYZ/LUxytgrSqZ4ry2882cZc2TTZPfl/UtI8qj
+	giN3MplvcAuay18BIly+t5hGPb5WIYmDiOgly0On6QuzvwHr/NLRsx1dkhcHjzYm3hpo4nWbs9X0y
+	nZ6ztHf3vXJvvq/UEOssCD5tp5Vlr2uT3LlzzBWq/Npup7DcTAr8y+EvPjuz8R8qt+lmk7D0wHPCF
+	DH8GR82g==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uA4lb-002F9j-1B;
+	Wed, 30 Apr 2025 18:34:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Apr 2025 18:34:15 +0800
+Date: Wed, 30 Apr 2025 18:34:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: T Pratham <t-pratham@ti.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>, linux-s390@vger.kernel.org
+Subject: [PATCH] crypto: s390/hmac - Use API partial block handling
+Message-ID: <aBH8p-YEF3wEe4Qm@gondor.apana.org.au>
+References: <cover.1745916278.git.herbert@gondor.apana.org.au>
+ <81cab16fad98103d8b5c28f2870de08b337c2d78.1745916278.git.herbert@gondor.apana.org.au>
+ <a0a6f359-27c8-4381-8619-d4aa2cd186fc@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250430085809.GD1567507@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMAxHsdb6RFocwSgAA--.44342S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7tFy7Cr4rWrW8WrWfKrWrtFc_yoW8Wr1kpF
-	47Jay2kF4Dtr4Fk3sFqr48AFyYy3s3tryFgr98Gas5Zas0vFyrAw4UGFWjkFWDZ3W8Jr1j
-	vF48AayS9F15ZabCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
-	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
-	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWrXVW3AwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr
-	0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jFApnUUUUU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0a6f359-27c8-4381-8619-d4aa2cd186fc@ti.com>
 
-
-在 2025/4/30 下午4:58, Lee Jones 写道:
-> On Wed, 30 Apr 2025, Huacai Chen wrote:
+On Tue, Apr 29, 2025 at 05:34:18PM +0530, T Pratham wrote:
 >
->> On Wed, Apr 30, 2025 at 4:47 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
->>>
->>> 在 2025/4/30 下午4:18, Herbert Xu 写道:
->>>> On Wed, Apr 30, 2025 at 04:14:40PM +0800, Qunqin Zhao wrote:
->>>>> Sorry to bother you, may i ask is it fine to move  the Security Engine base
->>>>> driver[Patch v8 1/5] to drivers/crypto ?
->>>>>
->>>>> The base driver uses MFD  interface  to register child device(tpm, rng) , as
->>>>> done in
->>>>>
->>>>> "drivers/iio/common/ssp_sensors/ssp_dev.c" and
->>>>> "drivers/firmware/xilinx/zynqmp.c".
->>>>>
->>>>> Thank you, and I look forward to hearing from you.
->>>> I don't mind at this point in time.  But if this driver were to
->>>> develop features way outside of the Crypto API in future then I
->>>> may change my mind.
->>> Hi, Herbert, thanks for your reply.
->>>
->>> In future it just add child platform devices  name(sm2, sm3, sm4) to
->>> "struct  mfd_cell engines".
->>>
->>>
->>> Hi, Huaci
->>>
->>> Let's go via Herbert's crypto tree for the base driver patch under
->>> drivers/crypto/loongson/,
->>>
->>> What do you think of it?
->> In my opinion drivers/mfd is better, because another user is in
->> drivers/char rather than drivers/crypto.
->>
->> But if moving to drivers/crypto is what Lee Jones wants, then everything is OK.
-> You can move the driver, but then you must not reference or use the MFD API.
+> Why do pointer increment with different types through a union which is un-intuitive to understand and prone to easy errors in future. It is easy to mix up the layout of the data being stored. Why not just typecast void * to a struct exposing different fields? Same with sha512.
 
-Then looks like i should move it back to drivers/mfd,  will do that in 
-next revision.
+You can't cast a void * to a random struct and start writing to
+it because of alignment faults.  Now s390 actually happens to be
+OK in that respect, but this way of writing exports is used by
+my ahash patches as well and I would like to keep them consistent.
 
-Thank you very much for everyone's replies.
+> Can use uniform naming here. total_hi and total_lo.
 
-BR, Qunqin.
+Thanks.  I've got rid of them altogether.
 
->
+It turns out that the patch I sent out yesterday is actually
+wrong as it predates the shash partial block API.  Here is a
+more up-to-date version:
 
+---8<---
+Use the Crypto API partial block handling.
+
+Also switch to the generic export format.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ arch/s390/crypto/hmac_s390.c | 154 ++++++++++++++++++++++++-----------
+ 1 file changed, 108 insertions(+), 46 deletions(-)
+
+diff --git a/arch/s390/crypto/hmac_s390.c b/arch/s390/crypto/hmac_s390.c
+index e6edf1013228..474b4233effd 100644
+--- a/arch/s390/crypto/hmac_s390.c
++++ b/arch/s390/crypto/hmac_s390.c
+@@ -9,10 +9,14 @@
+ #define pr_fmt(fmt)	KMSG_COMPONENT ": " fmt
+ 
+ #include <asm/cpacf.h>
+-#include <crypto/sha2.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/hmac.h>
++#include <crypto/sha2.h>
+ #include <linux/cpufeature.h>
++#include <linux/errno.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
++#include <linux/string.h>
+ 
+ /*
+  * KMAC param block layout for sha2 function codes:
+@@ -71,7 +75,6 @@ union s390_kmac_gr0 {
+ struct s390_kmac_sha2_ctx {
+ 	u8 param[MAX_DIGEST_SIZE + MAX_IMBL_SIZE + MAX_BLOCK_SIZE];
+ 	union s390_kmac_gr0 gr0;
+-	u8 buf[MAX_BLOCK_SIZE];
+ 	u64 buflen[2];
+ };
+ 
+@@ -95,8 +98,8 @@ static inline void kmac_sha2_set_imbl(u8 *param, u64 buflen_lo,
+ 	}
+ }
+ 
+-static int hash_key(const u8 *in, unsigned int inlen,
+-		    u8 *digest, unsigned int digestsize)
++static int hash_data(const u8 *in, unsigned int inlen,
++		     u8 *digest, unsigned int digestsize, bool final)
+ {
+ 	unsigned long func;
+ 	union {
+@@ -123,19 +126,23 @@ static int hash_key(const u8 *in, unsigned int inlen,
+ 
+ 	switch (digestsize) {
+ 	case SHA224_DIGEST_SIZE:
+-		func = CPACF_KLMD_SHA_256;
++		func = final ? CPACF_KLMD_SHA_256 : CPACF_KIMD_SHA_256;
+ 		PARAM_INIT(256, 224, inlen * 8);
++		if (!final)
++			digestsize = SHA256_DIGEST_SIZE;
+ 		break;
+ 	case SHA256_DIGEST_SIZE:
+-		func = CPACF_KLMD_SHA_256;
++		func = final ? CPACF_KLMD_SHA_256 : CPACF_KIMD_SHA_256;
+ 		PARAM_INIT(256, 256, inlen * 8);
+ 		break;
+ 	case SHA384_DIGEST_SIZE:
+-		func = CPACF_KLMD_SHA_512;
++		func = final ? CPACF_KLMD_SHA_512 : CPACF_KIMD_SHA_512;
+ 		PARAM_INIT(512, 384, inlen * 8);
++		if (!final)
++			digestsize = SHA512_DIGEST_SIZE;
+ 		break;
+ 	case SHA512_DIGEST_SIZE:
+-		func = CPACF_KLMD_SHA_512;
++		func = final ? CPACF_KLMD_SHA_512 : CPACF_KIMD_SHA_512;
+ 		PARAM_INIT(512, 512, inlen * 8);
+ 		break;
+ 	default:
+@@ -151,6 +158,12 @@ static int hash_key(const u8 *in, unsigned int inlen,
+ 	return 0;
+ }
+ 
++static int hash_key(const u8 *in, unsigned int inlen,
++		    u8 *digest, unsigned int digestsize)
++{
++	return hash_data(in, inlen, digest, digestsize, true);
++}
++
+ static int s390_hmac_sha2_setkey(struct crypto_shash *tfm,
+ 				 const u8 *key, unsigned int keylen)
+ {
+@@ -204,50 +217,31 @@ static int s390_hmac_sha2_update(struct shash_desc *desc,
+ {
+ 	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
+ 	unsigned int bs = crypto_shash_blocksize(desc->tfm);
+-	unsigned int offset, n;
++	unsigned int n = round_down(len, bs);
+ 
+-	/* check current buffer */
+-	offset = ctx->buflen[0] % bs;
+-	ctx->buflen[0] += len;
+-	if (ctx->buflen[0] < len)
++	ctx->buflen[0] += n;
++	if (ctx->buflen[0] < n)
+ 		ctx->buflen[1]++;
+-	if (offset + len < bs)
+-		goto store;
+ 
+-	/* process one stored block */
+-	if (offset) {
+-		n = bs - offset;
+-		memcpy(ctx->buf + offset, data, n);
+-		ctx->gr0.iimp = 1;
+-		_cpacf_kmac(&ctx->gr0.reg, ctx->param, ctx->buf, bs);
+-		data += n;
+-		len -= n;
+-		offset = 0;
+-	}
+ 	/* process as many blocks as possible */
+-	if (len >= bs) {
+-		n = (len / bs) * bs;
+-		ctx->gr0.iimp = 1;
+-		_cpacf_kmac(&ctx->gr0.reg, ctx->param, data, n);
+-		data += n;
+-		len -= n;
+-	}
+-store:
+-	/* store incomplete block in buffer */
+-	if (len)
+-		memcpy(ctx->buf + offset, data, len);
+-
+-	return 0;
++	ctx->gr0.iimp = 1;
++	_cpacf_kmac(&ctx->gr0.reg, ctx->param, data, n);
++	return len - n;
+ }
+ 
+-static int s390_hmac_sha2_final(struct shash_desc *desc, u8 *out)
++static int s390_hmac_sha2_finup(struct shash_desc *desc, const u8 *src,
++				unsigned int len, u8 *out)
+ {
+ 	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
+ 	unsigned int bs = crypto_shash_blocksize(desc->tfm);
+ 
++	ctx->buflen[0] += len;
++	if (ctx->buflen[0] < len)
++		ctx->buflen[1]++;
++
+ 	ctx->gr0.iimp = 0;
+ 	kmac_sha2_set_imbl(ctx->param, ctx->buflen[0], ctx->buflen[1], bs);
+-	_cpacf_kmac(&ctx->gr0.reg, ctx->param, ctx->buf, ctx->buflen[0] % bs);
++	_cpacf_kmac(&ctx->gr0.reg, ctx->param, src, len);
+ 	memcpy(out, ctx->param, crypto_shash_digestsize(desc->tfm));
+ 
+ 	return 0;
+@@ -273,22 +267,90 @@ static int s390_hmac_sha2_digest(struct shash_desc *desc,
+ 	return 0;
+ }
+ 
+-#define S390_HMAC_SHA2_ALG(x) {						\
++static int s390_hmac_export_zero(struct shash_desc *desc, void *out)
++{
++	struct crypto_shash *tfm = desc->tfm;
++	u8 ipad[SHA512_BLOCK_SIZE];
++	struct s390_hmac_ctx *ctx;
++	unsigned int bs;
++	int err, i;
++
++	ctx = crypto_shash_ctx(tfm);
++	bs = crypto_shash_blocksize(tfm);
++	for (i = 0; i < bs; i++)
++		ipad[i] = ctx->key[i] ^ HMAC_IPAD_VALUE;
++
++	err = hash_data(ipad, bs, out, crypto_shash_digestsize(tfm), false);
++	memzero_explicit(ipad, sizeof(ipad));
++	return err;
++}
++
++static int s390_hmac_export(struct shash_desc *desc, void *out)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	unsigned int ds = crypto_shash_digestsize(desc->tfm);
++	union {
++		u8 *u8;
++		u64 *u64;
++	} p = { .u8 = out };
++	int err = 0;
++
++	if (!ctx->gr0.ikp)
++		err = s390_hmac_export_zero(desc, out);
++	else
++		memcpy(p.u8, ctx->param, ds);
++	p.u8 += ds;
++	put_unaligned(ctx->buflen[0], p.u64++);
++	if (ds == SHA512_DIGEST_SIZE)
++		put_unaligned(ctx->buflen[1], p.u64);
++	return err;
++}
++
++static int s390_hmac_import(struct shash_desc *desc, const void *in)
++{
++	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
++	unsigned int ds = crypto_shash_digestsize(desc->tfm);
++	union {
++		const u8 *u8;
++		const u64 *u64;
++	} p = { .u8 = in };
++	int err;
++
++	err = s390_hmac_sha2_init(desc);
++	if (err)
++		return err;
++
++	memcpy(ctx->param, p.u8, ds);
++	p.u8 += ds;
++	ctx->buflen[0] = get_unaligned(p.u64++);
++	if (ds == SHA512_DIGEST_SIZE)
++		ctx->buflen[1] = get_unaligned(p.u64);
++	if (ctx->buflen[0] | ctx->buflen[1])
++		ctx->gr0.ikp = 1;
++	return 0;
++}
++
++#define S390_HMAC_SHA2_ALG(x, ss) {					\
+ 	.fc = CPACF_KMAC_HMAC_SHA_##x,					\
+ 	.alg = {							\
+ 		.init = s390_hmac_sha2_init,				\
+ 		.update = s390_hmac_sha2_update,			\
+-		.final = s390_hmac_sha2_final,				\
++		.finup = s390_hmac_sha2_finup,				\
+ 		.digest = s390_hmac_sha2_digest,			\
+ 		.setkey = s390_hmac_sha2_setkey,			\
++		.export = s390_hmac_export,				\
++		.import = s390_hmac_import,				\
+ 		.descsize = sizeof(struct s390_kmac_sha2_ctx),		\
+ 		.halg = {						\
++			.statesize = ss,				\
+ 			.digestsize = SHA##x##_DIGEST_SIZE,		\
+ 			.base = {					\
+ 				.cra_name = "hmac(sha" #x ")",		\
+ 				.cra_driver_name = "hmac_s390_sha" #x,	\
+ 				.cra_blocksize = SHA##x##_BLOCK_SIZE,	\
+ 				.cra_priority = 400,			\
++				.cra_flags = CRYPTO_AHASH_ALG_BLOCK_ONLY | \
++					     CRYPTO_AHASH_ALG_FINUP_MAX, \
+ 				.cra_ctxsize = sizeof(struct s390_hmac_ctx), \
+ 				.cra_module = THIS_MODULE,		\
+ 			},						\
+@@ -301,10 +363,10 @@ static struct s390_hmac_alg {
+ 	unsigned int fc;
+ 	struct shash_alg alg;
+ } s390_hmac_algs[] = {
+-	S390_HMAC_SHA2_ALG(224),
+-	S390_HMAC_SHA2_ALG(256),
+-	S390_HMAC_SHA2_ALG(384),
+-	S390_HMAC_SHA2_ALG(512),
++	S390_HMAC_SHA2_ALG(224, sizeof(struct crypto_sha256_state)),
++	S390_HMAC_SHA2_ALG(256, sizeof(struct crypto_sha256_state)),
++	S390_HMAC_SHA2_ALG(384, SHA512_STATE_SIZE),
++	S390_HMAC_SHA2_ALG(512, SHA512_STATE_SIZE),
+ };
+ 
+ static __always_inline void _s390_hmac_algs_unregister(void)
+-- 
+2.39.5
+
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
