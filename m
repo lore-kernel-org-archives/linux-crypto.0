@@ -1,77 +1,87 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FEE2609F5;
-	Thu,  1 May 2025 05:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D636622424E
+	for <linux-crypto@vger.kernel.org>; Thu,  1 May 2025 12:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746076760; cv=none; b=pidi2MtsVe2cL5d4bjJc5MLXnZ3D7bDTOtOzPeLt9neG53yW8lzxiEdL/nkdGwgMBlZXHExMBRckl65a2G+ZPZPqbMZqyWVGhe/tzMuwSm1Ffh5G0s7LSQXVUTAwrKS1VxacTrq4t5/WsqwmsrUcB7y1XqTrsoXDLmuTYkGkEqs=
+	t=1746103056; cv=none; b=N7ezMQ/3QJvDE/5VvoOcRVCXd9gHI+ae4nfb8KN4ygJflW8ZN0ZYpa0tHmGjbXvz89ZV9DrzQ4chi+h1YGds3AD7UthAjC82KC9XJDm1yAq5B/r+bHPhd7T9svqZPWyBOAhWEt+4yYQpBkN1A2DCTQ+w1ZaVQm1C2bBMnNR5rbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746076760; c=relaxed/simple;
-	bh=kB2nu9oQJWAumIVhwpNu9VX/9t+OVZ610msYAY5hvK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aSu7cagTTZdJAFXavms4C1cqt3I3PVYZvjKjl90Jripw2Nf+fvUkqOIQLP8hOIwKQ6MOlKBbVE6RjY9Ib3JJF0eJnMyNrOSHE14OFfK2Gz3Ntk3W8ww8WhdsSBQz5e0KmkTp4DcHbBkUAegPJ0l3nu0pj7PJz/yTa0XFegvC6CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ORsTUm+3; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1746103056; c=relaxed/simple;
+	bh=avtpwhIW3bRRLQb/AnzzrWa9Q7V8Gm+IjYRqviykG6E=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=kA/V4BxVY/CxhGc/oksgdVDUEpPwp8jJZhW4qzJ0Ss2heWkOGbdrSusEDxZyFd/SxlZ3Oi8vbZAJpQyuZGHXKg+kIG4JO37oT9U9dx1VpHM23zxeOFSGMqAw5sFoRMviXhx0GVxd1zxEENyG4PBlbDLyxQIzplHEGGm7sBY9rwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BcXtvL85; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ORsTUm+3"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BcXtvL85"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=9t5+R7MBB1CitzsoU7qrOUojn4639+WchyM4zx0d4j4=; b=ORsTUm+3tDs7MqOLXniwLbTENu
-	6p8Ijou3tB4FtepjWe3F1A6W8IvySh95cZdbo6AzTOgys1fAFOnLjgZl/ixeJAU3uP78oydLi8D//
-	yAax6cWpNxoAHYpOezO8beaYeuGHP68V4qdyQTdAirltbeZ3K5W1HWRLRdTu1DRHvIhqGACuMLtsD
-	L4/ELm9xRzxjZE9uSzRBsLPKu384XEncFgdp8RWbWcWOQIo8DOJNbz9+cCdkKdgpDc51jJ2r9y5VI
-	V7Wcl+IDdkPoN5XAqV8kKx2r8DlOwoCrwVYtmf6WPYNYB7nm6jKdpr5Y35dDNgam3PekRDwUujufp
-	tuz3w6FQ==;
+	bh=UysRE2plIUSbEbpILLQODfglafbuYBTuvvnKb7nmn6M=; b=BcXtvL85YWssku5iLQQTXSHuML
+	uLZmhSj0zqNJ0Y9Leb3G+94hjQ9a3YIIsVNxX9iKbrd3jOuD5N1EcuYcSs9wncvEZK5K2QFcYe6p4
+	/8NtwmNCdTgNh31UBIzfd12MVaYFIvr85Ri5eFNUuIcgDcwj79P45oDn5IgvHarhhZcp4yC4/qnXz
+	4dmGXXwzpj7MqQKj1LqWfGBhO2N0CYCDzc0YtQRRQNFSKyEsjKGm/7lR7GGzPqs1XI7J23wkiPQsT
+	bXNzqQ28Xu6HC0SEJJmLezjtM9zvGIGXr5bUb2AewA5Y3f4p7IK2ZLJf+nx4QBuUHYM+KvbXuwxgX
+	Fi0ULJnw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uAMK4-002SVz-1M;
-	Thu, 01 May 2025 13:19:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 May 2025 13:19:00 +0800
-Date: Thu, 1 May 2025 13:19:00 +0800
+	id 1uATAO-002bEh-0c;
+	Thu, 01 May 2025 20:37:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 May 2025 20:37:28 +0800
+Date: Thu, 01 May 2025 20:37:28 +0800
+Message-Id: <cover.1746102673.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	sparclinux@vger.kernel.org, linux-s390@vger.kernel.org,
-	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 00/12] crypto: sha256 - Use partial block API
-Message-ID: <aBMERARvCQsl-5iN@gondor.apana.org.au>
-References: <cover.1745992998.git.herbert@gondor.apana.org.au>
- <20250430174543.GB1958@sol.localdomain>
- <aBLMi5XOQKJyJGu-@gondor.apana.org.au>
- <20250501022617.GA65059@sol.localdomain>
+Subject: [PATCH 0/4] crypto: acomp - Add compression segmentation support
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250501022617.GA65059@sol.localdomain>
 
-On Wed, Apr 30, 2025 at 07:26:17PM -0700, Eric Biggers wrote:
->
-> Interesting approach -- pushing out misguided optimizations without data, then
-> demanding data for them to be reverted.  It's obviously worse for
-> len % 64 < 56 for the reason I gave, so this is a waste of time IMO.  But since
-> you're insisting on data anyway, here are some quick benchmarks on AMD Zen 5
-> (not going to bother formatting into a table):
-> 
-> Before your finup "optimization":
+This patch series is a reboot of the acomp multibuffer patch series.
+Instead of using request chaining, this time it is done using a
+plain SG list and a unit size.
 
-Thanks, I'll revert to the single-block version.
+Either the Crypto API or optionally the algorithm can dice up the
+request into unit-sized pieces.  The caller provides a single page
+and a 2-entry SG list for output, and the Crypto API or algorithm
+will dynamically extend it one page at a time through chaining if
+necessary.  The compressed result will be tightly packed together.
+
+If any unit fails to compress, a zero-length SG entry will be inserted
+for it.
+
+If at any time memory allocation fails (the first entry cannot fail
+since it's compressed into memory provided by the caller), then
+compression will stop and the caller can process what has been
+compressed so far before resuming by calling with an offset into
+the original SG list.
+
+Herbert Xu (4):
+  crypto: acomp - Clone folios properly
+  crypto: api - Rename CRYPTO_ALG_REQ_CHAIN to CRYPTO_ALG_REQ_VIRT
+  crypto: acomp - Add compression segmentation support
+  crypto: testmgr - Add multibuffer acomp testing
+
+ crypto/acompress.c                  | 172 ++++++++++++++++++++++++++--
+ crypto/ahash.c                      |   6 +-
+ crypto/algapi.c                     |   3 +
+ crypto/deflate.c                    |   2 +-
+ crypto/scompress.c                  |   2 +-
+ crypto/testmgr.c                    | 145 ++++++++++++-----------
+ include/crypto/acompress.h          | 107 +++++++++++++++--
+ include/crypto/algapi.h             |   9 +-
+ include/crypto/internal/acompress.h |  14 ++-
+ include/crypto/internal/hash.h      |   4 +-
+ include/linux/crypto.h              |   7 +-
+ 11 files changed, 367 insertions(+), 104 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
