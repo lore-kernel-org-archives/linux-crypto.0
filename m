@@ -1,116 +1,93 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291F8224AE1;
-	Thu,  1 May 2025 19:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0022F2F
+	for <linux-crypto@vger.kernel.org>; Fri,  2 May 2025 05:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746126462; cv=none; b=E/BWVB8BSdPzHNie+dF2bukjq6OFCPZJaPoqo0UTaMjKqUaIz4/UARELiHDTjei51Me7Ax651hI5gB6xgMUj6t8tb+8DwPs9ZF8Snz78B0Yg1bacX/E/Q30HPnqFO4DYqlGBZFikbAgiJAhgTdbc9fO4TRv6lxhPxK9xmTxzT30=
+	t=1746163866; cv=none; b=VNHIDZTx+HbwjHYXRpUdC5feRaR2h3fx8eiDwtxExfffYdzbL+KIRsxodb/T9SjV8T1qrCcjUKSHmAFjFxNwCWISWWUlIQ8XoOAe4uKlV/MEcXvjDSEwBIgB+U5172HNHOgKgJgmUb/w9qEvFxs6eaUskodW3HuBKGrwhRG3Gw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746126462; c=relaxed/simple;
-	bh=YXKPVxRR7Upwwq5LKZvZEYOzYl8UfelO+cPhSJKCGp4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MLwtpFBh+nM6H4yMAofChvznPIXz09OpeNjLQ6zX3SWxAawZ42COmx32jDBsnat+rPL9Gdgt/COlfF6JIMcxW1pkGvBc26EzQ4AJY+PNVEKOXbTGJCQsSR8WQO0Fy7dyF/P6+vahbiOAc+xRS6UTJ/BxObpVSTI+6DOnJpApHkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dzydkw8o; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746163866; c=relaxed/simple;
+	bh=/a0v4X3F3PxvcUU5GbkB/DDNQEwZL3ToNg5i1LCd8gU=;
+	h=Date:Message-Id:From:Subject:To; b=CF3BcqCuMZu8bMTyA43gX8LdjRJ2VOeF4GmO6PjIrwyDc3c8mikbNH8BW22+IvwbjS+OE2quHHjFybNbm5+A5Tnn820EdSliQr3FFWK5UjWxBw5gdkiT5n4lSeJxKb7pUu0Vt88MBaEiY/hdwTRlhErpEs61zlyAvpJRkwVas6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XXgz1gRx; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dzydkw8o"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac7bd86f637so437002766b.1;
-        Thu, 01 May 2025 12:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746126459; x=1746731259; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qsp9CaqkI2nnPLo+C7isQc9cYVKQaKUwpPDF4hWhLBE=;
-        b=Dzydkw8oe0zA2qq+AEJuUMC2BMe68TM+uoaJBq9pdiDKYKY8NHPQByUGUf59GUPsTm
-         mKn0PbfxQKKM1UhON43qFHmJFDlW91ueVd7FYSUYWj++eJ+qhu/Azx9wNIIMdp06W+Z0
-         lWKUmkjJAb0OF5n0S41vSWLJYe7YkXxjOySYroFlzroje2rdV14CPuh/2uhrOjIfl6ht
-         RTBuzaJPIylNtVfDOtPPCuN4EAw8Fdj6F8j5qU6CWFYmhZn91bh1gS1ueShCZwicrsV3
-         XBIAZCeBYaMD4LkosZKXO5kUMmMh3BaPl8rrhWZP+ZWfYMjYbRCjK5V95ZPLC++H2NQJ
-         Bukg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746126459; x=1746731259;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qsp9CaqkI2nnPLo+C7isQc9cYVKQaKUwpPDF4hWhLBE=;
-        b=nYPu2SqeSzlNyR1uoc/r0XTDoWsGyf3bWMLhxSzDEsGJ77eOCfJt2wWf2hjw8FqBoC
-         k5mcs1FE3YWnPaSggzgJOqQoS4zDhXIyoIXFXc3TN/ufQzHoFktp878bKB4G7+iG6kTw
-         csr+A7UwWlbpNg7CSi9YZy8zdyr/eGbasvm/AXuupDs4boBQJMDwuyQ8dQ/v9DugBLuJ
-         KUSAKXLweVHz5fuEgWQRrxTyfO9TSBeMbdzVk+uHnYOL2RuC8bDGhitnVYEyNZDZ1Q4R
-         ErYW+yjRxBJVeqRjSg3vDg1EaFNgeEFpKpYXax022MmHWg4j4i6u1ZnoaZWNj1ugq3l6
-         QvXg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3gQFbeB9+xvZYOZKcsx8L+anS9O/pVb6cBCGM+U36iA460H6O0lOcS+ry1Jp6ZoOC8nmUbwHKNUUffDha@vger.kernel.org, AJvYcCVPXGk3dUly3vbyvDv7d3bpPOwW8sL21YIsWOJsNcwcbIQVCGZ/hzV0KsJ1yWXJP/3j+pEzjWqAiTMPzeU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK4bI1bzsc7JPUIinysN2TZ6KtxiTic8Q2NQR2mrt9307wmYy2
-	GS8TiA6KjXAP+qV6S5/ME8/QpAVsNTU+wAg4vUHpw0dmzVcvNK05
-X-Gm-Gg: ASbGncs5WTlo6wWUOh9lgn+9PTKroQOoE3vyzgYuQ8EYqGCfVxWIct+h87eXYlZcS+b
-	xLXgi+PuPCUzdYz2Dib+mGXxdtiqwbQMhrWIlI3b1NK+C29ZG0D2opbyClgE7AYSObmAMr0w+4O
-	05kJEQVdlaYduvPv47eW5GCLK3m/Sbf7I+MvsDb9Lffh7qiQrB5+28KOWDm57760b0XiY4uNs8U
-	rMBGtmvyQtpi3Ztj8AhFSNFGMLKXtdEhQXUC+Yb5a0ZeojkZFcfRqzzTsHVDFT30ZZ16t6dJ8tj
-	FRw6aHhVVBXPkJr9oHr2O5y2H/tYio5pV1uuVC0ELE6Hd0VelsgSorenBy4/V3AK/JEB
-X-Google-Smtp-Source: AGHT+IFPbjdkqPWUcDwWn3gcKgKCDuCT59+nrEo/GOkvbNTeX+sbsXL7iBibXH8JV2ff9RTUgMaADg==
-X-Received: by 2002:a17:906:4fc5:b0:aca:c67d:eac0 with SMTP id a640c23a62f3a-acefe63defemr318866466b.0.1746126459184;
-        Thu, 01 May 2025 12:07:39 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:2f0e:c50a:8800:cf9e:ee0b:4a01:37f6])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad0c70c6917sm80349266b.4.2025.05.01.12.07.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 May 2025 12:07:38 -0700 (PDT)
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-To: clabbe.montjoie@gmail.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Cc: wens@csie.org,
-	jernej.skrabec@gmail.com,
-	samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 2/2] crypto: sun8i-ce-hash - use pm_runtime_resume_and_get()
-Date: Thu,  1 May 2025 22:06:51 +0300
-Message-ID: <20250501190651.3863582-2-ovidiu.panait.oss@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250501190651.3863582-1-ovidiu.panait.oss@gmail.com>
-References: <20250501190651.3863582-1-ovidiu.panait.oss@gmail.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XXgz1gRx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=To:Subject:From:Message-Id:Date:Sender:Reply-To:Cc:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=9LdDE0sMWSFbYXn2DaiIs4tfRKu12QaWr7s4UDo9ihc=; b=XXgz1gRx8q8hYSG6VV/wHKB/8j
+	cxAiK7Mg8MaqwjoLOGLmuCjFB5NxgDnfp/nzydYn9ePCauWQ0cnMPebs7EVXwhIbrjVx9rgSPl/QP
+	G2xHM8oyrSAWaUx89oO5fqhjcMijDo4FqERN3wYmmQMtyYmH0cVGNz/jHjnnPPRiwlR0nQlwGJE0s
+	XgaJDpG/sBJwzbbSzrdTGI6qPWYaqXpLwblTFb12yXWT9SeU2b0mPkr/oOQLbYRe9gNrYcF+V5JvP
+	m+bzZVRzUcjv84/ESX94dfCx/hZci+4SelyM5EasVTWz4f//8wIkqHj5QdmMqLg5tVjpT/OGp/LIS
+	9LGxAvbw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uAiz5-002lK7-1r;
+	Fri, 02 May 2025 13:30:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 May 2025 13:30:51 +0800
+Date: Fri, 02 May 2025 13:30:51 +0800
+Message-Id: <cover.1746162259.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v2 PATCH 0/9] crypto: sha256 - Use partial block API
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Replace pm_runtime_get_sync() usage with pm_runtime_resume_and_get() to
-simplify error handling.
+This is based on
 
-This is recommended in the documentation of pm_runtime_get_sync().
+	https://patchwork.kernel.org/project/linux-crypto/list/?series=957785
 
-Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+which in turn is applied on top of
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index ba13fb75c05d..bef44f350167 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -65,12 +65,11 @@ int sun8i_ce_hash_init_tfm(struct crypto_ahash *tfm)
- 		       crypto_ahash_driver_name(op->fallback_tfm),
- 		       CRYPTO_MAX_ALG_NAME);
- 
--	err = pm_runtime_get_sync(op->ce->dev);
-+	err = pm_runtime_resume_and_get(op->ce->dev);
- 	if (err < 0)
- 		goto error_pm;
- 	return 0;
- error_pm:
--	pm_runtime_put_noidle(op->ce->dev);
- 	crypto_free_ahash(op->fallback_tfm);
- 	return err;
- }
+	https://patchwork.kernel.org/project/linux-crypto/list/?series=957558
+
+Rather than going through the lib/sha256 partial block handling,
+use the native shash partial block API.  Add two extra shash
+algorithms to provide testing coverage for lib/sha256.
+
+Herbert Xu (9):
+  crypto: lib/sha256 - Add helpers for block-based shash
+  crypto: sha256 - Use the partial block API for generic
+  crypto: arch/sha256 - Export block functions as GPL only
+  crypto: arm/sha256 - Add simd block function
+  crypto: arm64/sha256 - Add simd block function
+  crypto: riscv/sha256 - Add simd block function
+  crypto: x86/sha256 - Add simd block function
+  crypto: lib/sha256 - Use generic block helper
+  crypto: sha256 - Use the partial block API
+
+ arch/arm/lib/crypto/Kconfig                   |   1 +
+ arch/arm/lib/crypto/sha256-armv4.pl           |  20 +--
+ arch/arm/lib/crypto/sha256.c                  |  16 +-
+ arch/arm64/crypto/sha512-glue.c               |   6 +-
+ arch/arm64/lib/crypto/Kconfig                 |   1 +
+ arch/arm64/lib/crypto/sha2-armv8.pl           |   2 +-
+ arch/arm64/lib/crypto/sha256.c                |  16 +-
+ .../mips/cavium-octeon/crypto/octeon-sha256.c |   4 +-
+ arch/powerpc/lib/crypto/sha256.c              |   4 +-
+ arch/riscv/lib/crypto/Kconfig                 |   1 +
+ arch/riscv/lib/crypto/sha256.c                |  17 +-
+ arch/s390/lib/crypto/sha256.c                 |   4 +-
+ arch/sparc/lib/crypto/sha256.c                |   4 +-
+ arch/x86/lib/crypto/Kconfig                   |   1 +
+ arch/x86/lib/crypto/sha256.c                  |  16 +-
+ crypto/sha256.c                               | 148 +++++++++++-------
+ include/crypto/internal/sha2.h                |  52 +++++-
+ include/crypto/sha2.h                         |  14 +-
+ lib/crypto/Kconfig                            |   8 +
+ lib/crypto/sha256.c                           |  97 ++----------
+ 20 files changed, 239 insertions(+), 193 deletions(-)
+
 -- 
-2.48.1
+2.39.5
 
