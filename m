@@ -1,60 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5184A17F7;
-	Sat,  3 May 2025 02:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56C8367;
+	Sat,  3 May 2025 14:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746238616; cv=none; b=aJbaOZ1VDXIqJ3ImzZIEgmlEkTD5NA7k3kbZ/yB6OJabvmY3JSU6DoFjmqVTwVgGeuBKy/bXiEUFKw46Ptl7m7pr13hk2AEvJCD0aFVOg2l2bdmP9iOByX4nY8uVMBFK5wUQ4M1f6/e/H2SdT4yjJ4+YwZDOy0mSe2IrX9d3r6Q=
+	t=1746283162; cv=none; b=XT7l5ihF2Jgz6Lfvi3SIS5TRLgeu+4TX71tbbs5JaPtb1iawtwXCfM/Yqo0NVjFQ6bc+sqPbg0uCf7Vo0bLKs4lceB5XEr0Lle7daU52foDh/sVIv9H+ZbVd3TqNzMi2PE2AvnCqrRS877+TPTI/GeN39mxdmfAuZ5Y/ipbAz2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746238616; c=relaxed/simple;
-	bh=S9yP0Y2wTVUeGaFh/FcZXkUd4IK0A01eTYPb6dzK/7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dir9VJosNwSuOb0F8cLTkS+xnmmu/L16DtT9hX4ioGwxwH685ZJjxHT1PvWmTgBXPkgekqO/fLqnVFxlQaU8Tn5YH1bVMHBFuodcK9cdUmzZCCNRUeTgyB+CZ8zFFvt/myepmn2Xo+0ewzHs3AWVnGArB74nGZOiZVnC/fRghDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=piP8naiz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746283162; c=relaxed/simple;
+	bh=Jr9HzCArpmz5liqhpXLnd+1v5ot8JBjFOX4E/k8pSis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pjksMK/Nl9HUZWnEL1DkgtVWOflR3hI3C/tmQYiPGmTfSFrTnFtjN5KmEfF2RQPzVirZApGs6JGusugP65paZVGbUgGe1QvGyt/uk8Ai4ffFGrYDpg4glxYiiZmEsDta8ssr7AejQ4MTimJuAgT2cOLM4r/2QhlcWuDHMz1TXdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTr0Sjcf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="piP8naiz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B42EC4CEE4;
-	Sat,  3 May 2025 02:16:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTr0Sjcf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96100C4CEE3;
+	Sat,  3 May 2025 14:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746238615;
-	bh=S9yP0Y2wTVUeGaFh/FcZXkUd4IK0A01eTYPb6dzK/7s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=piP8naizBQy2TPrVzfgu0ohGerlPNF8JCENFcyEFQf0D49XYtbImJth/oC8z4BqsO
-	 wjuWxhj6+wqRdqNMUsb3oqbt7Pfw6VPcZFb48Nw6alCV900VGZdmSokgJ1bl+TT2Gb
-	 87FXhVsMftqNtwz9cR1GEuUf8FtNN0wLrVUpmaGojN0MG5kMMBMSgi14P6He40E5eS
-	 G4EXTjL/GgEzwdgX7mviHI2KD/QMhpEfAYzjke4wz73QpGSB/t+vhS0jbz3LWn8GRE
-	 ufQ8pquxuafGG9bIfcUt+MiBdLT3zgghIgKtwQU70xdheqUB8JQE6fdgmmFQOwfdld
-	 fmzHxNMaSDYOA==
-Date: Fri, 2 May 2025 19:16:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, Hayes Wang
- <hayeswang@realtek.com>
-Subject: Re: [PATCH net-next] r8152: use SHA-256 library API instead of
- crypto_shash API
-Message-ID: <20250502191654.2da1f58b@kernel.org>
-In-Reply-To: <20250428191606.856198-1-ebiggers@kernel.org>
-References: <20250428191606.856198-1-ebiggers@kernel.org>
+	s=k20201202; t=1746283161;
+	bh=Jr9HzCArpmz5liqhpXLnd+1v5ot8JBjFOX4E/k8pSis=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RTr0SjcfzhXo8r92rzo29xHJTs63RuGBhSar+SkuDRwLHDeAi0VZKk7+ZgpwqUFW8
+	 p7/5e32srT9aD/0JRnfyHmsepXDCGJg9pvUd6lHh39qq1CgWMg4FBYLZq9oCA+Qklo
+	 yqg0LN+h/yrQPTzo0IEmQ0v5Mu/+TrU0aFNvx2zKyzQyAMamUR9dFi0wrWgztb4tpf
+	 1Pst1Up70ptz/Ki1YP5czDTwSPQAUIp4D8T3xw83KEGGyqTkEhqXlO2m4SOjOQ67P5
+	 3qtyEmSBgychtj7+fW1LwO/+b2KJw3a/Uqo1sMKJzfRnDlzgdXhMnbZcXh/smTqFqm
+	 hy3e2a1WL/btQ==
+Date: Sat, 3 May 2025 17:39:16 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: keyrings@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+Subject: Re: [PATCH] KEYS: Reduce smp_mb() calls in key_put()
+Message-ID: <aBYqlBoSq4FwiDKD@kernel.org>
+References: <20250430152554.23646-1-jarkko@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250430152554.23646-1-jarkko@kernel.org>
 
-On Mon, 28 Apr 2025 12:16:06 -0700 Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, Apr 30, 2025 at 06:25:53PM +0300, Jarkko Sakkinen wrote:
+> Rely only on the memory ordering of spin_unlock() when setting
+> KEY_FLAG_FINAL_PUT under key->user->lock in key_put().
 > 
-> This user of SHA-256 does not support any other algorithm, so the
-> crypto_shash abstraction provides no value.  Just use the SHA-256
-> library API instead, which is much simpler and easier to use.
+> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> ---
+>  security/keys/key.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> diff --git a/security/keys/key.c b/security/keys/key.c
+> index 7198cd2ac3a3..aecbd624612d 100644
+> --- a/security/keys/key.c
+> +++ b/security/keys/key.c
+> @@ -656,10 +656,12 @@ void key_put(struct key *key)
+>  				spin_lock_irqsave(&key->user->lock, flags);
+>  				key->user->qnkeys--;
+>  				key->user->qnbytes -= key->quotalen;
+> +				set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
+>  				spin_unlock_irqrestore(&key->user->lock, flags);
+> +			} else {
+> +				set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
+> +				smp_mb(); /* key->user before FINAL_PUT set. */
+>  			}
+> -			smp_mb(); /* key->user before FINAL_PUT set. */
+> -			set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
 
-Applied, thanks!
+Oops, my bad (order swap), sorry. Should have been:
+	
+ 				spin_unlock_irqrestore(&key->user->lock, flags);
+			} else {
+				smp_mb(); /* key->user before FINAL_PUT set. */
+ 			}
+			set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
+
+Should spin_lock()/unlock() be good enough or what good does smp_mb() do
+in that branch? Just checking if I'm missing something before sending
+fixed version.
+
+BR, Jarkko
