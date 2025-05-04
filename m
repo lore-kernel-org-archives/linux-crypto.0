@@ -1,58 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27960320F;
-	Sun,  4 May 2025 05:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C58EEA6
+	for <linux-crypto@vger.kernel.org>; Sun,  4 May 2025 06:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746337025; cv=none; b=brnYzzIws2aVsrAikWDCDL1thQ0bog/eHyCNMLaYGuBknudXOtf4E4jvSdlGxVEk3afBa/vjzh8w3j8eb8XLJk+QqJpXVgwDk+CFKAkskekvEIeP7xIXP427y2xyeZIYT5cdubRdfjgS4dIqauMxicRtQce7Lr1Q9CKDRvEafjo=
+	t=1746339237; cv=none; b=ZECbOm3AZn6wCzdrHtA34Va+LJ7a9prcxxxKqySthBNCz2TARr0CvjveaicUDFokLFUpaoTuyvUydfSJalERBKlcBA1WzoaKQiXSq8Uswcyq7QJpVNGhHncQnAV+LmrVy5+Aoz/zpNhMDacA4YnRfKYzfdhOTlHd4vLtGX5gNaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746337025; c=relaxed/simple;
-	bh=fpLZWtyahtmy3/LUtlIsk0Ranng5q9S5+N3o/YX9Eak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PlsuStsqOo3bX6dSmFtWDDlKIPx//vxNNGO94ZjWWR8EIlzEh1w7iTVdvjEasiLD0WkJBMCkKQPCk/peFlrg3pBFG6GpRqWAw87dRdRlvZnq/U0JYN493kvlVV/7Iby/rcSQEpniS6iGM8puRp88iJApsdm9RVzBI5q0Lx/NJmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fJhbTGpy; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1746339237; c=relaxed/simple;
+	bh=5Icq9J8Omj8x1+6UCb4dwN07ImC82QpH8jrxEPrvuwM=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mitONhUg7Gk0WHgi79HmV7ie7Xh0qpY9jJCTuJhVXEUeqyshsH8Zg2VGrZs3b9pJcxiefdTc4GYlCnR1szHXUTiQejkC2eJepOwKntmLwBtjveYD67qjJnbvNpG2Ovyy2oti+WbdWPj64KNyL1YSxzTc8i7Gt8m33hyBfqM7JcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=IJYy1jkf; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fJhbTGpy"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="IJYy1jkf"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=9wyyplTiopVOErcI7FhcsAXnP0UOiDJzt5tyc1ZRP70=; b=fJhbTGpyC55naIqgpIzdT6VD3C
-	uyoIp8Bh8JbycdR2IzF52YfgGzQITkqtUJyTwijb8RWrDv/KvVB1opqo1EYfoJgR3DpPBTM5Te+k+
-	9KRuwhi7Y0zJcgykuyDnyE90cMJ4qBRcOsbas7oNZthFhlxe13eExCYhZ/J7BP2ZjhsF5S9MuHaU+
-	KxS9tzH2eQwqKvOQ+OcKA/eKQvzQOXOzfhejqiWg+ZAbwHLlJBDErsyv3wnomE74TYqLPFuetg4o+
-	dpwqTToYf4CqEXGyOO8pLeDrSr7TE7nfMX+eD+0HYDkX2fEN3TzoPIqJwvCZgEiz3l3spkEDHPjBM
-	2k5tDTAA==;
+	bh=1XmS7rRPhB3TPkxz0Hm+9gSModKDXu9vJWrNodu1piA=; b=IJYy1jkfLalJFq3zG1jlARiUy+
+	6t0kcu3L000g8hM1NiayVfAnrcgil6Gp/xik96NrJSQho6iWCvtY5C7j+Zn+TMvfG9kXCXvxZBNO4
+	EN4L1yV/N8RvR2le/QwlBIZfoRrRgZiUqTbM/xPQVHEotoLbZva4AOEuDOC21XFLwIc+CZ/TkLaZq
+	5fbmnQ49AAxG5aSzgEadgPMi4BskkQIjyZqsgAM38ljTneV4FbOOawoutjtp60GhMwrA3ELS0CnSu
+	nZuhPoS2sU/cYUFz08slfoouSwoe3OIPv4sS5fSMfLaWhsL+EoKQNEGN9qYKkrarcjcdW38kay5in
+	9nUKyDAQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uBS1f-003BVM-0X;
-	Sun, 04 May 2025 13:36:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 04 May 2025 13:36:31 +0800
-Date: Sun, 4 May 2025 13:36:31 +0800
+	id 1uBSbm-003BkX-1t;
+	Sun, 04 May 2025 14:13:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 04 May 2025 14:13:50 +0800
+Date: Sun, 4 May 2025 14:13:50 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-Subject: [PATCH] KEYS: Invert FINAL_PUT bit
-Message-ID: <aBb833yQFY5EpEFx@gondor.apana.org.au>
-References: <aBYqlBoSq4FwiDKD@kernel.org>
- <20250430152554.23646-1-jarkko@kernel.org>
- <1121543.1746310761@warthog.procyon.org.uk>
- <aBa2bZGnJ2kRJJpa@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: zynqmp-sha - Fix partial block implementation
+Message-ID: <aBcFnjYJPkikKqE7@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,72 +46,132 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aBa2bZGnJ2kRJJpa@gondor.apana.org.au>
 
-On Sun, May 04, 2025 at 08:35:57AM +0800, Herbert Xu wrote:
-> 
-> Or even better, reverse the FINAL_PUT bit and call it ALIVE, so
-> that you can use test_bit_acquire and clear_bit_unlock.
+The zynqmp-sha partial block was based on an old design of the
+partial block API where the leftover calculation was done in the
+Crypto API.  As the leftover calculation is now done by the
+algorithm, fix this by passing the partial blocks to the fallback.
 
-Something like:
+Also zero the stack descriptors.
 
----8<---
-Invert the FINAL_PUT bit so that test_bit_acquire and clear_bit_unlock
-can be used instead of smp_mb.
-
+Fixes: 201e9ec3b621 ("crypto: zynqmp-sha - Use API partial block handling")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ drivers/crypto/xilinx/zynqmp-sha.c | 30 +++++++++++++++++++-----------
+ include/crypto/sha3.h              |  4 ++++
+ 2 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/key.h b/include/linux/key.h
-index ba05de8579ec..aaab26d84d25 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -236,7 +236,7 @@ struct key {
- #define KEY_FLAG_ROOT_CAN_INVAL	7	/* set if key can be invalidated by root without permission */
- #define KEY_FLAG_KEEP		8	/* set if key should not be removed */
- #define KEY_FLAG_UID_KEYRING	9	/* set if key is a user or user session keyring */
--#define KEY_FLAG_FINAL_PUT	10	/* set if final put has happened on key */
-+#define KEY_FLAG_DONT_GC_YET	10	/* set if final put has not happened on key yet */
+diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/zynqmp-sha.c
+index 67cf8d990a1d..5813017b6b79 100644
+--- a/drivers/crypto/xilinx/zynqmp-sha.c
++++ b/drivers/crypto/xilinx/zynqmp-sha.c
+@@ -59,7 +59,7 @@ static int zynqmp_sha_init_tfm(struct crypto_shash *hash)
+ 		return PTR_ERR(fallback_tfm);
  
- 	/* the key type and key description string
- 	 * - the desc is used to match a key against search criteria
-diff --git a/security/keys/gc.c b/security/keys/gc.c
-index f27223ea4578..d00002054ada 100644
---- a/security/keys/gc.c
-+++ b/security/keys/gc.c
-@@ -218,8 +218,8 @@ static void key_garbage_collector(struct work_struct *work)
- 		key = rb_entry(cursor, struct key, serial_node);
- 		cursor = rb_next(cursor);
- 
--		if (test_bit(KEY_FLAG_FINAL_PUT, &key->flags)) {
--			smp_mb(); /* Clobber key->user after FINAL_PUT seen. */
-+		if (test_bit_acquire(KEY_FLAG_DONT_GC_YET, &key->flags)) {
-+			/* Clobber key->user after final put seen. */
- 			goto found_unreferenced_key;
- 		}
- 
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 7198cd2ac3a3..7be12d132c4e 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -298,6 +298,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
- 	key->restrict_link = restrict_link;
- 	key->last_used_at = ktime_get_real_seconds();
- 
-+	key->flags |= KEY_FLAG_DONT_GC_YET;
- 	if (!(flags & KEY_ALLOC_NOT_IN_QUOTA))
- 		key->flags |= 1 << KEY_FLAG_IN_QUOTA;
- 	if (flags & KEY_ALLOC_BUILT_IN)
-@@ -658,8 +659,8 @@ void key_put(struct key *key)
- 				key->user->qnbytes -= key->quotalen;
- 				spin_unlock_irqrestore(&key->user->lock, flags);
- 			}
--			smp_mb(); /* key->user before FINAL_PUT set. */
--			set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
-+			/* Mark key as safe for GC after key->user done. */
-+			clear_bit_unlock(KEY_FLAG_DONT_GC_YET, &key->flags);
- 			schedule_work(&key_gc_work);
- 		}
+ 	if (crypto_shash_descsize(hash) <
+-	    crypto_shash_descsize(tfm_ctx->fbk_tfm)) {
++	    crypto_shash_statesize(tfm_ctx->fbk_tfm)) {
+ 		crypto_free_shash(fallback_tfm);
+ 		return -EINVAL;
  	}
+@@ -76,15 +76,24 @@ static void zynqmp_sha_exit_tfm(struct crypto_shash *hash)
+ 	crypto_free_shash(tfm_ctx->fbk_tfm);
+ }
+ 
++static int zynqmp_sha_continue(struct shash_desc *desc,
++			       struct shash_desc *fbdesc, int err)
++{
++	err = err ?: crypto_shash_export(fbdesc, shash_desc_ctx(desc));
++	shash_desc_zero(fbdesc);
++	return err;
++}
++
+ static int zynqmp_sha_init(struct shash_desc *desc)
+ {
+ 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+ 	struct crypto_shash *fbtfm = tctx->fbk_tfm;
+ 	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
++	int err;
+ 
+ 	fbdesc->tfm = fbtfm;
+-	return crypto_shash_init(fbdesc) ?:
+-	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
++	err = crypto_shash_init(fbdesc);
++	return zynqmp_sha_continue(desc, fbdesc, err);
+ }
+ 
+ static int zynqmp_sha_update(struct shash_desc *desc, const u8 *data, unsigned int length)
+@@ -92,11 +101,12 @@ static int zynqmp_sha_update(struct shash_desc *desc, const u8 *data, unsigned i
+ 	struct zynqmp_sha_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+ 	struct crypto_shash *fbtfm = tctx->fbk_tfm;
+ 	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
++	int err;
+ 
+ 	fbdesc->tfm = fbtfm;
+-	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
+-	       crypto_shash_update(fbdesc, data, length) ?:
+-	       crypto_shash_export_core(fbdesc, shash_desc_ctx(desc));
++	err = crypto_shash_import(fbdesc, shash_desc_ctx(desc)) ?:
++	      crypto_shash_update(fbdesc, data, length);
++	return zynqmp_sha_continue(desc, fbdesc, err);
+ }
+ 
+ static int zynqmp_sha_finup(struct shash_desc *desc, const u8 *data, unsigned int length, u8 *out)
+@@ -106,7 +116,7 @@ static int zynqmp_sha_finup(struct shash_desc *desc, const u8 *data, unsigned in
+ 	SHASH_DESC_ON_STACK(fbdesc, fbtfm);
+ 
+ 	fbdesc->tfm = fbtfm;
+-	return crypto_shash_import_core(fbdesc, shash_desc_ctx(desc)) ?:
++	return crypto_shash_import(fbdesc, shash_desc_ctx(desc)) ?:
+ 	       crypto_shash_finup(fbdesc, data, length, out);
+ }
+ 
+@@ -160,16 +170,14 @@ static struct zynqmp_sha_drv_ctx sha3_drv_ctx = {
+ 		.digest = zynqmp_sha_digest,
+ 		.init_tfm = zynqmp_sha_init_tfm,
+ 		.exit_tfm = zynqmp_sha_exit_tfm,
+-		.descsize = sizeof(struct sha3_state),
++		.descsize = SHA3_384_EXPORT_SIZE,
+ 		.digestsize = SHA3_384_DIGEST_SIZE,
+ 		.base = {
+ 			.cra_name = "sha3-384",
+ 			.cra_driver_name = "zynqmp-sha3-384",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				     CRYPTO_ALG_NEED_FALLBACK |
+-				     CRYPTO_AHASH_ALG_BLOCK_ONLY |
+-				     CRYPTO_AHASH_ALG_FINUP_MAX,
++				     CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_blocksize = SHA3_384_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct zynqmp_sha_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
+index 3c2559f51ada..41e1b83a6d91 100644
+--- a/include/crypto/sha3.h
++++ b/include/crypto/sha3.h
+@@ -9,15 +9,19 @@
+ 
+ #define SHA3_224_DIGEST_SIZE	(224 / 8)
+ #define SHA3_224_BLOCK_SIZE	(200 - 2 * SHA3_224_DIGEST_SIZE)
++#define SHA3_224_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_224_BLOCK_SIZE + 1
+ 
+ #define SHA3_256_DIGEST_SIZE	(256 / 8)
+ #define SHA3_256_BLOCK_SIZE	(200 - 2 * SHA3_256_DIGEST_SIZE)
++#define SHA3_256_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_256_BLOCK_SIZE + 1
+ 
+ #define SHA3_384_DIGEST_SIZE	(384 / 8)
+ #define SHA3_384_BLOCK_SIZE	(200 - 2 * SHA3_384_DIGEST_SIZE)
++#define SHA3_384_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_384_BLOCK_SIZE + 1
+ 
+ #define SHA3_512_DIGEST_SIZE	(512 / 8)
+ #define SHA3_512_BLOCK_SIZE	(200 - 2 * SHA3_512_DIGEST_SIZE)
++#define SHA3_512_EXPORT_SIZE	SHA3_STATE_SIZE + SHA3_512_BLOCK_SIZE + 1
+ 
+ #define SHA3_STATE_SIZE		200
+ 
+-- 
+2.39.5
+
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
