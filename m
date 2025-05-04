@@ -1,132 +1,210 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE76217996
-	for <linux-crypto@vger.kernel.org>; Sun,  4 May 2025 13:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF65013A86C
+	for <linux-crypto@vger.kernel.org>; Sun,  4 May 2025 15:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746365612; cv=none; b=ZytXMWpKtfXRxXLWkdGEJGdWy2XKqnpG5jLe1XrdWxkYELZ9k3ATto9mlJK3AvmRGiqCNWHoE0di6EixGEfCLZ3TzNXJdBsXurxIjFpeJDyMkpeSaNFKY08uU8tvmlF/E9cvgHUmFZemyOl6HmovWuYupFt3bc2xjGzgBV4I0M0=
+	t=1746370987; cv=none; b=cMgV2bTigmlddE9QPB/sSOFWLPnMzQb6zTaZ4J5/wN2F1hKIjuUuKrYPUw8ztZPnX0uNYaMPVYhZs+Gupdov5hS3tLjCboYS/14RbOs8ebABLNoyuNE3Y4bDvIUrluEuFeOL1jUzaN5HGBwaZow3Abs7UeWEMFkb08Ucniijun8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746365612; c=relaxed/simple;
-	bh=AhBkyBGCZSS1tbHAqF8aatgaPdimMv7f1DcGybq1tDs=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=GjaDuVT1hDHTatkU0+r43p0GzSDzDPUPjzYWEf1BpqyO1Xzprbo+pscUNLTnIcsSWsiwUNfbb5vuuGgw3SvKFXp1aO+rN4cX4YtmyMrI1xJ0YNwOqV/07UU7kqHtauPchwXy2cdPa5+Jr6aPguUyy3Ux75t+nRJsPI8yewsjY8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NzEvPtZ4; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746370987; c=relaxed/simple;
+	bh=N4cxeiFuZJq4ZkwPC0chJf/hRnNW/GZ4UmSHUGiYz/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NBOwI74XT0VTFTC8sKEBkg0yOZKMDuyKgTEn4HhwyHj7hROLZaOFVVvCQAFPKu1Ams1WL7D9MSaJlclumx22/JoRv5nDznPMaYsDPWAV4xTn3oKWL9vwMfxogdbiqeRBqL6hS/8JZwl5cAPa1HEasotoAauXUNIOm7Tugdt44Ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=a/1jX6U9; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NzEvPtZ4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
-	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=VQKiF4E97hrhPRFDvAOT3k2r6H930Y06mq1s/XY5LYQ=; b=NzEvPtZ4KvcSBRJdfddWhEwtgL
-	Sc2pQyHnmJ8KZZuma/ccTua7YYT8KcJ0cqwkHAndrlMbreyBhsZjrKykS1RGFseHRVqhLu/uTqija
-	qLCQlqzy2M//16Y8K/lBZ6k40fc2HwPwKJblJ69FDsnNpYNKl8/84tFAntgC97FFSEmduWt1iF4Dl
-	xH0m6TlB5oI5D6fyWMno7IAFliEcqK29J83piUOwy1PwfV1t++LmzYoUL9Ibh9+Ybm6406BXEevHx
-	pY5eFW6r9gPzlEdfn6e4mWMAzPGPo73w9wLxNK4zmbRppYbdR4r7ol5hug3uz6UzXwOYyZgfBmN9O
-	TKBJCgXQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uBZTB-003Ew3-2D;
-	Sun, 04 May 2025 21:33:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 04 May 2025 21:33:25 +0800
-Date: Sun, 04 May 2025 21:33:25 +0800
-Message-Id: <925947988bb2e72610c9e7fc1e889dd0c689222d.1746365585.git.herbert@gondor.apana.org.au>
-In-Reply-To: <40527d5a34051a880c06fdcead0f566cc0e5a0ce.1746365585.git.herbert@gondor.apana.org.au>
-References: <40527d5a34051a880c06fdcead0f566cc0e5a0ce.1746365585.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 6/6] crypto: padlock-sha - Use core import and export for
- fallback
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="a/1jX6U9"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e730ea57804so4037472276.1
+        for <linux-crypto@vger.kernel.org>; Sun, 04 May 2025 08:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1746370983; x=1746975783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bFW+c/pzu01ksPogBDsF0yztuQICEpFi/6JnX1ys5aQ=;
+        b=a/1jX6U9Mk/1hp0jwVQ5K0EiUFfjEsjyng/VBVauQtE6aVEojFUxWONgfZRmQbUR0Y
+         76I01tdvkumZxzZVbP7XRxfuD7csuX+Ybc55U5/0xlfkKsszs+zvNErTFIUj2kB6xuEZ
+         fsi9Qpz1nvA5Kg3zB04N8tWXbyfyU4B4B7J7QhpWHrEjaoqF2XHhTV9qydcEn/J30TtS
+         kR43YqtmKU6cD5wZ87IAabT7muvhlQ/fX3taxpQ3EmV5ERlAiI1c/G1dTQkmIRDzoelA
+         +tbENm7Z0ITGIKWVITwy9sLtNdgAyvci8DEfUHYbMZRjPNoMwGFIkAHcbTbA2fzSLNIy
+         AwwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746370983; x=1746975783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bFW+c/pzu01ksPogBDsF0yztuQICEpFi/6JnX1ys5aQ=;
+        b=sdx3H7fVo9TnqgOVKP8/9QJRDKFH3tDCaSeJ7OPMTMiUNgyhQCtqekZTudWr7MZKkP
+         Mz45j7M+Acm3phBoz9YXGULh4yXXrUXLQ+lwGZtYbCdI55q1tASne+kdYigSUsc3DHbf
+         vr6hT8rco8tLHIntAC7OwiMOB+qhOMPFMOdjYYbVUNBff2hQO/ENySqi5Wv8aBgWNnab
+         0LVEsJjPvuzDoD6LTwK1hZUOPA70c3GUSvhZKoIc/rSKEtgX7GwyB6Ggv6r2kN86fMTr
+         OMe/rx5Cp/Sc58Bi0NjKdkrfaNRQxfNC8CWSDek0oeNLGn1cckzFoZET1La42Wx7ljlR
+         Wytg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtRhV8AShpHHoi5H2//7/DcYLQ4zU0iOXVPixGLhpzvwBEhjPTfA+7aB4xJMi2x1jFN4GV67u6NYNEZX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8TPGhFivTonXo61M2CGCGg2qYJ4ijwaL2vZ5ScQcb3sUAt8f+
+	4U5U/ey804fySDelnNazStB5phq6j/Z44F0FgOrpef/ff410LL67AsCRSPVzad/0+szL0N3UzAC
+	0u8beoE/bkAsE6Q6VV/Jsn6lhHhLAcKLOqZq2
+X-Gm-Gg: ASbGncvIZvQpPUl41Dc2nKWLMAOvyiPQwPvmbN6YZNVnPLNRCexYuIEI8icUrBAwxhq
+	QJGJXGJ41G2SirzcCVYCNojeWh83P7eEPDohVrGXgbkIYTSrsD1vLKZwuoDpGAU+/fnw9IFyHDr
+	Yvt4bAf49x1eURTcczuuCPtA==
+X-Google-Smtp-Source: AGHT+IGh+tKAyMeigoarPIi+V1deYWycva3XdHdZPQu9YAQ/LoyQ/7QaDDfIn1SlXnCdq3yX/3xBVxLxcxwerl1v8k0=
+X-Received: by 2002:a05:690c:3682:b0:705:edab:f36d with SMTP id
+ 00721157ae682-708bcf63de9mr169594707b3.16.1746370983565; Sun, 04 May 2025
+ 08:03:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com> <20250502184421.1424368-2-bboscaccy@linux.microsoft.com>
+In-Reply-To: <20250502184421.1424368-2-bboscaccy@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Sun, 4 May 2025 11:02:52 -0400
+X-Gm-Features: ATxdqUF_SJM_Ksnl9ID37yfRWwOX1K9UN729WFbsKoyMwbuKaeF0TYKGFD4cZ_k
+Message-ID: <CAHC9VhQi2m19pJvUiTbzaNqh3omYGCVC43_G7H8EvZsPaOzevQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] security: Hornet LSM
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, David Howells <dhowells@redhat.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, llvm@lists.linux.dev, nkapron@google.com, 
+	teknoraver@meta.com, roberto.sassu@huawei.com, xiyou.wangcong@gmail.com, 
+	Tyler Hicks <code@tyhicks.com>, James Bottomley <James.Bottomley@hansenpartnership.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As padlock-sha is block-only, it needs to use core import and
-export on the fallback.
+On Fri, May 2, 2025 at 2:44=E2=80=AFPM Blaise Boscaccy
+<bboscaccy@linux.microsoft.com> wrote:
+>
+> This adds the Hornet Linux Security Module which provides signature
+> verification of eBPF programs. This allows users to continue to
+> maintain an invariant that all code running inside of the kernel has
+> been signed.
+>
+> The primary target for signature verification is light-skeleton based
+> eBPF programs which was introduced here:
+> https://lore.kernel.org/bpf/20220209054315.73833-1-alexei.starovoitov@gma=
+il.com/
+>
+> eBPF programs, before loading, undergo a complex set of operations
+> which transform pseudo-values within the immediate operands of
+> instructions into concrete values based on the running
+> system. Typically, this is done by libbpf in
+> userspace. Light-skeletons were introduced in order to support
+> preloading of bpf programs and user-mode-drivers by removing the
+> dependency on libbpf and userspace-based operations.
+>
+> Userpace modifications, which may change every time a program gets
+> loaded or runs on a slightly different kernel, break known signature
+> verification algorithms. A method is needed for passing unadulterated
+> binary buffers into the kernel in-order to use existing signature
+> verification algorithms. Light-skeleton loaders with their support of
+> only in-kernel relocations fit that constraint.
+>
+> Hornet employs a signature verification scheme similar to that of
+> kernel modules. A signature is appended to the end of an
+> executable file. During an invocation of the BPF_PROG_LOAD subcommand,
+> a signature is extracted from the current task's executable file. That
+> signature is used to verify the integrity of the bpf instructions and
+> maps which were passed into the kernel. Additionally, Hornet
+> implicitly trusts any programs which were loaded from inside kernel
+> rather than userspace, which allows BPF_PRELOAD programs along with
+> outputs for BPF_SYSCALL programs to run.
+>
+> The validation check consists of checking a PKCS#7 formatted signature
+> against a data buffer containing the raw instructions of an eBPF
+> program, followed by the initial values of any maps used by the
+> program. Maps are verified to be frozen before signature verification
+> checking to stop TOCTOU attacks.
+>
+> Signed-off-by: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+> ---
+>  Documentation/admin-guide/LSM/Hornet.rst |  65 ++++++
+>  Documentation/admin-guide/LSM/index.rst  |   1 +
+>  MAINTAINERS                              |   9 +
+>  crypto/asymmetric_keys/pkcs7_verify.c    |  10 +
+>  include/linux/kernel_read_file.h         |   1 +
+>  include/linux/verification.h             |   1 +
+>  include/uapi/linux/lsm.h                 |   1 +
+>  security/Kconfig                         |   3 +-
+>  security/Makefile                        |   1 +
+>  security/hornet/Kconfig                  |  24 +++
+>  security/hornet/Makefile                 |   4 +
+>  security/hornet/hornet_lsm.c             | 250 +++++++++++++++++++++++
+>  security/selinux/hooks.c                 |  12 +-
+>  security/selinux/include/classmap.h      |   2 +-
+>  14 files changed, 380 insertions(+), 4 deletions(-)
+>  create mode 100644 Documentation/admin-guide/LSM/Hornet.rst
+>  create mode 100644 security/hornet/Kconfig
+>  create mode 100644 security/hornet/Makefile
+>  create mode 100644 security/hornet/hornet_lsm.c
 
-Also call sha256_block_init instead of sha256_init although this
-is harmless as sha256_init doesn't write into the partial block
-area.
+...
 
-Fixes: 63dc06cd12f9 ("crypto: padlock-sha - Use API partial block handling")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- drivers/crypto/padlock-sha.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+> +Configuration Options
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Hornet provides a kconfig knob
+> +CONFIG_SECURITY_HORNET_WHITELIST_PID_ONE.  Enabling this will allow
+> +bpf programs to be loaded from pid 1 without undergoing a signature
+> +verification check. This option is not recommened for production
+> +systems.
 
-diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
-index c89b9c6b5f4c..329f60ad422e 100644
---- a/drivers/crypto/padlock-sha.c
-+++ b/drivers/crypto/padlock-sha.c
-@@ -42,27 +42,33 @@ static int padlock_sha1_init(struct shash_desc *desc)
- 
- static int padlock_sha256_init(struct shash_desc *desc)
- {
--	struct sha256_state *sctx = padlock_shash_desc_ctx(desc);
-+	struct crypto_sha256_state *sctx = padlock_shash_desc_ctx(desc);
- 
--	sha256_init(sctx);
-+	sha256_block_init(sctx);
- 	return 0;
- }
- 
- static int padlock_sha_update(struct shash_desc *desc,
- 			      const u8 *data, unsigned int length)
- {
--	struct padlock_sha_ctx *ctx = crypto_shash_ctx(desc->tfm);
- 	u8 *state = padlock_shash_desc_ctx(desc);
--	HASH_REQUEST_ON_STACK(req, ctx->fallback);
--	int remain;
-+	struct crypto_shash *tfm = desc->tfm;
-+	int err, remain;
- 
--	ahash_request_set_callback(req, 0, NULL, NULL);
--	ahash_request_set_virt(req, data, NULL, length);
--	remain = crypto_ahash_import(req, state) ?:
--		 crypto_ahash_update(req);
--	if (remain < 0)
--		return remain;
--	return crypto_ahash_export(req, state) ?: remain;
-+	remain = length - round_down(length, crypto_shash_blocksize(tfm));
-+	{
-+		struct padlock_sha_ctx *ctx = crypto_shash_ctx(tfm);
-+		HASH_REQUEST_ON_STACK(req, ctx->fallback);
-+
-+		ahash_request_set_callback(req, 0, NULL, NULL);
-+		ahash_request_set_virt(req, data, NULL, length - remain);
-+		err = crypto_ahash_import_core(req, state) ?:
-+		      crypto_ahash_update(req) ?:
-+		      crypto_ahash_export_core(req, state);
-+		HASH_REQUEST_ZERO(req);
-+	}
-+
-+	return err ?: remain;
- }
- 
- static int padlock_sha_export(struct shash_desc *desc, void *out)
-@@ -101,7 +107,7 @@ static int padlock_sha_finup(struct shash_desc *desc, const u8 *in,
- 
- 	ahash_request_set_callback(req, 0, NULL, NULL);
- 	ahash_request_set_virt(req, in, out, count);
--	return crypto_ahash_import(req, padlock_shash_desc_ctx(desc)) ?:
-+	return crypto_ahash_import_core(req, padlock_shash_desc_ctx(desc)) ?:
- 	       crypto_ahash_finup(req);
- }
- 
-@@ -165,7 +171,7 @@ static int padlock_init_tfm(struct crypto_shash *hash)
- 		return PTR_ERR(fallback_tfm);
- 	}
- 
--	if (crypto_shash_statesize(hash) <
-+	if (crypto_shash_statesize(hash) !=
- 	    crypto_ahash_statesize(fallback_tfm)) {
- 		crypto_free_ahash(fallback_tfm);
- 		return -EINVAL;
--- 
-2.39.5
+...
 
+> +config SECURITY_HORNET_WHITELIST_PID_ONE
+> +       bool "Whiltelist unsigned eBPF programs from PID 1"
+> +       depends on SECURITY_HORNET
+> +       default n
+> +       help
+> +         Selecting this will configure Hornet to allow eBPF loaded from =
+pid 1
+> +         to load without a verification check.
+> +         Further information can be found in
+> +         Documentation/admin-guide/LSM/Hornet.rst.
+> +
+> +         If you are unsure how to answer this question, answer N.
+
+...
+
+> +static int hornet_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *a=
+ttr,
+> +                               struct bpf_token *token, bool is_kernel)
+> +{
+> +       if (is_kernel)
+> +               return 0;
+> +#ifdef CONFIG_SECURITY_HORNET_WHITELIST_PID_ONE
+> +       if (current->pid =3D=3D 1)
+> +               return 0;
+> +#endif
+
+Two quick comments on the build-time conditional above.  First, unless
+there is some subtle reason why you only want the exception above to
+apply to a single thread in the init process, I would suggest using
+task_tgid_nr() instead of current->pid as I believe you want the init
+exception to apply to all threads running within the init process.
+Second, I think it would be helpful to rename the Kconfig knob to
+CONFIG_SECURITY_HORNET_PIDONE_TRANSITION, or similar, to help indicate
+that this is a transitional configuration option designed to make it
+easier for developers to move to a system with signed BPF programs
+without excessive warnings/errors from systemd in the beginning.  I
+would highlight the transitory intent of this Kconfig knob both in the
+Kconfig description as well as the Hornet.rst doc, a brief explanation
+of the drawback for enabling this long term or on "production" systems
+in the Hornet.rst section would also be a good idea.
+
+--=20
+paul-moore.com
