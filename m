@@ -1,131 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD5D1E1DE7;
-	Sun,  4 May 2025 16:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7752DA32;
+	Sun,  4 May 2025 17:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746377763; cv=none; b=PkkSRO1BzNsgwPjF+gxwSa9uh01LnskU3w8ax080RpwCktwzbE1/XeDuQw8e3KnszupGYOo9S6gtisScXOT4UOrExol0P0cetXSo3x2yHBwGjbz9NPCCn8/E6m+0+tDtmESwWK41Xf62r7vDM6i99JVmbMXOdiSeVcpQxhF3ydY=
+	t=1746379064; cv=none; b=jRSF86voA/RtW/pMl+QStVyXKSb0D09OCD9JYRWR6FYmGRsFoC9VvkhaMSpo8w0JzW9ngmfyxOENgTpi0Yb+tJogjvRxZMifXD529lIFokyfVxvLO4HS9Bd6QEfQNZpruIfvMRHRrQC1L3QYuJKcmwcd6kooqujkKcaV4cyaGF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746377763; c=relaxed/simple;
-	bh=7byS+mjeSFHrzb+IfI4pFxAaork3Tq6cUfMVQ3+Gz9Y=;
+	s=arc-20240116; t=1746379064; c=relaxed/simple;
+	bh=sgZPr4WYxTx1WRbDhzcd65kmX61osl9mq2JXEYcEsog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r/9DCSi2a+0/oK92onh1dppDoyHKvChvO/WB1GUl9PjFD6V6pqtaURyLPmkKuQfVohKe7K+LCxrrymM1KMMUMdzwntrHSPQ2I/764zryNbkdB81/QpgzdCKeUWEPhQNUn4soQVrjvamnRBmifiaKEIfEj0B4sirGhbcJF2A7tmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYPp7SoF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=gZoROkx4qbL8sQnDaI9h3hEPVMx0diwHfA00CaRbIulDU2xxoJTZzGUx+3xyfrc3oA/q/QmvDYN8oSS0rv4beD14fbKqBh8O5V7ANB43XQT+GhwYhp0LcjBgws2ITFLtu63vi02uXLri6gXPY954PzhJSsDpgZ74ulcSZR2l7X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dzF3+2p3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYPp7SoF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FD47C4CEE7;
-	Sun,  4 May 2025 16:56:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dzF3+2p3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46160C4CEE7;
+	Sun,  4 May 2025 17:17:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746377763;
-	bh=7byS+mjeSFHrzb+IfI4pFxAaork3Tq6cUfMVQ3+Gz9Y=;
+	s=k20201202; t=1746379063;
+	bh=sgZPr4WYxTx1WRbDhzcd65kmX61osl9mq2JXEYcEsog=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mYPp7SoFQgkP8sahvG/Tei97RR/8zhOMj0Tn7BI3CCTOTpgJihq65Tic8HqBDtw0Z
-	 HpbjfKZKMkyQbYT+x/m9OufNyXDhzdTmvo9lWAUn3ScsD6vXfrggpC2mU9jhHcMRXT
-	 1HOGbKr8sjgIgZcPMjWQ+eehI3Ng3ZukcUqOnR+wc6ecsBUD0DVWmbRW8aOu/E0nn8
-	 /QwUFwC94XFPjJVIzvyiQXU7XMGi46liIxxqTt/5pflc0qFXZm+QJZLWpFlh/VoOqn
-	 WSHY1YBDsuHx8qA4R++lGTjRCYxgsAKRi/qFHuQ3y1AcMLnONfknytVSlW0HeK9pcU
-	 vmxUuCeFjTGVw==
-Date: Sun, 4 May 2025 19:55:58 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-Subject: Re: [PATCH] KEYS: Reduce smp_mb() calls in key_put()
-Message-ID: <aBecHr6jBLWmJcyP@kernel.org>
-References: <20250430152554.23646-1-jarkko@kernel.org>
- <aBYqlBoSq4FwiDKD@kernel.org>
- <aBYwIcy5JCOamAkj@gondor.apana.org.au>
+	b=dzF3+2p3eM3+omSGCAO7tZReKg6vjRCGswmnoxWGXTC/q5W2lcEluacgfpdd5iRMH
+	 OewZZbLQN5+QEWBcF8J8/cD3KWnPuwEWucdvKt16OxN6UCSUbdiVa8yA54KcAwBVlq
+	 xdI0HGV5zQlkIX9OZ1F1/g/WECT0Yi8MHbvNNhDR7lLIALFmC329HbRUL+ycHmLMd5
+	 +e6ONxUb4zt4nW7VZpGEzKXj89ID8X59HKsLGEera0PjD1GPbxtYJirBJaXeeVLdst
+	 zMJ6XwdetaI6PhIsBbI0qac0GVouwurbVohTf5XCwsXtqQzDFX8uUjwrfZ5jADp9No
+	 tnUVmHYWeIavA==
+Date: Sun, 4 May 2025 19:17:41 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: T Pratham <t-pratham@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kamlesh Gurudasani <kamlesh@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Praneeth Bajjuri <praneeth@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] dt-bindings: crypto: Add binding for TI DTHE V2
+Message-ID: <20250504-tangible-courageous-robin-3e31d1@kuoka>
+References: <20250502121253.456974-2-t-pratham@ti.com>
+ <20250502121253.456974-3-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aBYwIcy5JCOamAkj@gondor.apana.org.au>
+In-Reply-To: <20250502121253.456974-3-t-pratham@ti.com>
 
-On Sat, May 03, 2025 at 11:02:57PM +0800, Herbert Xu wrote:
-> On Sat, May 03, 2025 at 05:39:16PM +0300, Jarkko Sakkinen wrote:
-> > On Wed, Apr 30, 2025 at 06:25:53PM +0300, Jarkko Sakkinen wrote:
-> > > Rely only on the memory ordering of spin_unlock() when setting
-> > > KEY_FLAG_FINAL_PUT under key->user->lock in key_put().
-> > > 
-> > > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > ---
-> > >  security/keys/key.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/security/keys/key.c b/security/keys/key.c
-> > > index 7198cd2ac3a3..aecbd624612d 100644
-> > > --- a/security/keys/key.c
-> > > +++ b/security/keys/key.c
-> > > @@ -656,10 +656,12 @@ void key_put(struct key *key)
-> > >  				spin_lock_irqsave(&key->user->lock, flags);
-> > >  				key->user->qnkeys--;
-> > >  				key->user->qnbytes -= key->quotalen;
-> > > +				set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
-> > >  				spin_unlock_irqrestore(&key->user->lock, flags);
-> > > +			} else {
-> > > +				set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
-> > > +				smp_mb(); /* key->user before FINAL_PUT set. */
-> > >  			}
-> > > -			smp_mb(); /* key->user before FINAL_PUT set. */
-> > > -			set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
-> > 
-> > Oops, my bad (order swap), sorry. Should have been:
-> > 	
-> >  				spin_unlock_irqrestore(&key->user->lock, flags);
-> > 			} else {
-> > 				smp_mb(); /* key->user before FINAL_PUT set. */
+On Fri, May 02, 2025 at 05:21:16PM GMT, T Pratham wrote:
+> Add DT binding for Texas Instruments DTHE V2 crypto accelerator.
 > 
-> You can use smp_mb__before_atomic here as it is equivalent to
-> smp_mb in this situation.
+> DTHE V2 is introduced as a part of TI AM62L SoC and can currently be
+> only found in it.
 > 
-> >  			}
-> > 			set_bit(KEY_FLAG_FINAL_PUT, &key->flags);
-> > 
-> > Should spin_lock()/unlock() be good enough or what good does smp_mb() do
-> > in that branch? Just checking if I'm missing something before sending
-> > fixed version.
+> Signed-off-by: T Pratham <t-pratham@ti.com>
+> ---
+>  .../devicetree/bindings/crypto/ti,dthev2.yaml | 55 +++++++++++++++++++
+
+Filename: nothing improved.
+
+>  MAINTAINERS                                   |  6 ++
+>  2 files changed, 61 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
 > 
-> I don't think spin_unlock alone is enough to replace an smp_mb.
-> A spin_lock + spin_unlock would be enough though.
-> 
-> However, looking at the bigger picture this smp_mb looks bogus.
-> What exactly is it protecting against?
-> 
-> The race condition that this is supposed to fix should have been
-> dealt with by the set_bit/test_bit of FINAL_PUT alone.  I don't
-> see any point in having this smb_mb at all.
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml b/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
+> new file mode 100644
+> index 000000000000..68ed9923eebb
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
+> @@ -0,0 +1,55 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/ti,dthev2.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: K3 SoC DTHE V2 crypto module
+> +
+> +maintainers:
+> +  - T Pratham <t-pratham@ti.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - ti,am62l-dthev2
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  dmas:
+> +    items:
+> +      - description: AES Engine RX DMA Channel
+> +      - description: AES Engine TX DMA Channel
+> +      - description: SHA Engine TX DMA Channel
+> +
+> +  dma-names:
+> +    items:
+> +      - const: rx
+> +      - const: tx1
+> +      - const: tx2
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - dmas
+> +  - dma-names
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    cbass_main {
 
-smp_mb() there makes sure that key->user change don't spill between
-key_put() and gc.
+soc or whatever is reasonable, but follow DTS coding style.
 
-GC pairs smp_mb() in key_put() after FINAL_PUT to make sure that also
-in its side key->user changes have been walled before moving the key
-as part of unrefenced keys.
+I already asked to match coding style, although about wrapping :/
 
-See also [1]. It cleared this up for me. Here user->lock easily misleads
-to overlook the actual synchronization scheme.
+> +        #address-cells = <2>;
+> +        #size-cells = <2>;
+> +
+> +        crypto@40800000 {
+> +          compatible = "ti,am62l-dthev2";
+> +          reg = <0x00 0x40800000 0x00 0x10000>;
+> +
+> +          dmas = <&main_bcdma 0 0 0x4700 0>,
+> +                <&main_bcdma 0 0 0xc701 0>,
+> +                <&main_bcdma 0 0 0xc700 0>;
 
-> 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Looks misaligned, again, see DTS coding style
 
-[1] https://lore.kernel.org/keyrings/1121543.1746310761@warthog.procyon.org.uk/
+> +          dma-names = "rx", "tx1", "tx2";
+> +        };
 
-BR, Jarkko
+Best regards,
+Krzysztof
+
