@@ -1,45 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467722820CF;
-	Mon,  5 May 2025 22:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB174308A61;
+	Mon,  5 May 2025 22:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483787; cv=none; b=JbusdVdnd03CUqYSUEL7Klb9gB1K/MN4M6Vn9ZajPrEOcuDJ3+y9pDZYAvfsc42fAibV8KmQci34PmKy7InJIVri12mnM+opdH6OVk/t/yXQSjBkhB5mgVe6ZVv8XEAElxHCo+bA/g3LL+9tN3L+LKG6/1o/eyhldCAHoKtr8bY=
+	t=1746484099; cv=none; b=gnZODx6QS9c35df2tZQwcf3kWLmXdf0bH1x758tM1HtOrrAyUp7DE39RipaGYO8Ps42srZUtqgdf0j4qKtrYkf8Qt06sxvSR0uW4WHuqtVV42W9pMxxIfueM3GNHfqojAY7PaxFYqDXgMmcFDv1ggQEHc2yTUXXpQrHwdll0SFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483787; c=relaxed/simple;
-	bh=LLJphMoB/scWFhUMq04iybMYcAOBEZhyWhFBrETrC4o=;
+	s=arc-20240116; t=1746484099; c=relaxed/simple;
+	bh=KYs1DcZ9bQzi1x2KNqpBUUAnWSnl28KCMr23ouWcsps=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dI744nRkPY9bxZJ47i2TrUyoeMOYhPxPgCyyoxP1SKFKUVI2GmfZDnFwKnzjWI7Bz0f0BGMSyZvK1r9pLGRIFEENbVfWbU8hSAvvkccgzMFplwoIB5AH9h+EYjlvJeTzBsktuSSwC/RaXkbP140SlQm/5s2MuzlfUvmwdVuUBHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DllBo6ki; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=hVjHfMLHci2mdYTT0Kake7JYVoYd/FMMT7BsuQEYxZ/ynb5r6KpOaH2baoTRq2yqMBjiFVhhmRJz3A/2rEjXGtJ2jJUSrC0YOMQsxkBnYuGqxxc10VxCjnvgGNOjMrfoPzwpob4dN7br2BGkCO1ZDKPTzrncsRFKSICLax3yknc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jLAXQ1Ob; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DllBo6ki"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A019FC4CEED;
-	Mon,  5 May 2025 22:23:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jLAXQ1Ob"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF78C4CEE4;
+	Mon,  5 May 2025 22:28:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483786;
-	bh=LLJphMoB/scWFhUMq04iybMYcAOBEZhyWhFBrETrC4o=;
+	s=k20201202; t=1746484098;
+	bh=KYs1DcZ9bQzi1x2KNqpBUUAnWSnl28KCMr23ouWcsps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DllBo6kieUN2UWIA/fvl6GXL0gsIEipbnrtIS/KTNgD9ygaRS3M4fw5VQwwHFS8iP
-	 JbH5XpgLd5/l3AOdsmXein94PbZurgp5QlxTM9Md4q/KZXr7z4LyqENgHYDTD1+Dv2
-	 3u/jmjDz3BhkM2uwgWGWBpfnWzBFErJCuiUuMrOI+n72ZOn5IKnrRad2fDNv8ybyhf
-	 7g4VcdGk+S3xketEgLC/7W/ym2I5kZM93IIOjCM8hp6XyS92pOaIAAJLLmX0FFt1OL
-	 vqkPojw3OWTQeUOZ1xzqt+6nv1o4NNyyv1Nu9WoCrDVbCzsCR/Xqjf7689Uw/xCCeF
-	 SzLF42vqb89AQ==
+	b=jLAXQ1Ob3iwgRzW+CKc50YphkT4hrB9W+3On/6BAFVseYmjWfJtCzwbaGfxysZnyC
+	 7NoehpoJSUpVdKSfyc68sH6PnQaKiAAH1bhfp+MgaZ5vJhkiDC+HervGDa0OFiRMfY
+	 7QeDoK/O20Yjh2kD02nEyPZ9fM1F+ollpIXboZxmB+XDaGbMf6BIykq32h8sGtQmf3
+	 LR8RDLlH+jgby/5Q5DBTbPoMf+8scjdb51dSjFMu5TFKpZ+yPYGcitIG0HwvXxBiC2
+	 8A21ULALGAgaaVRR7mEia52MTMyLSpSj9vsA2NUMsvmXxN6Zvxw+n/Jijo/aaFx2fZ
+	 XFqOzMxNZ7+6Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Sven Schwermer <sven@svenschwermer.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	shawnguo@kernel.org,
-	linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.14 217/642] crypto: mxs-dcp - Only set OTP_KEY bit for OTP key
-Date: Mon,  5 May 2025 18:07:13 -0400
-Message-Id: <20250505221419.2672473-217-sashal@kernel.org>
+	linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 349/642] crypto: ahash - Set default reqsize from ahash_alg
+Date: Mon,  5 May 2025 18:09:25 -0400
+Message-Id: <20250505221419.2672473-349-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -54,43 +50,64 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Sven Schwermer <sven@svenschwermer.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit caa9dbb76ff52ec848a57245062aaeaa07740adc ]
+[ Upstream commit 9e01aaa1033d6e40f8d7cf4f20931a61ce9e3f04 ]
 
-While MXS_DCP_CONTROL0_OTP_KEY is set, the CRYPTO_KEY (DCP_PAES_KEY_OTP)
-is used even if the UNIQUE_KEY (DCP_PAES_KEY_UNIQUE) is selected. This
-is not clearly documented, but this implementation is consistent with
-NXP's downstream kernel fork and optee_os.
+Add a reqsize field to struct ahash_alg and use it to set the
+default reqsize so that algorithms with a static reqsize are
+not forced to create an init_tfm function.
 
-Signed-off-by: Sven Schwermer <sven@svenschwermer.de>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/mxs-dcp.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ crypto/ahash.c        | 4 ++++
+ include/crypto/hash.h | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index d94a26c3541a0..133ebc9982362 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -265,12 +265,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 		    MXS_DCP_CONTROL0_INTERRUPT |
- 		    MXS_DCP_CONTROL0_ENABLE_CIPHER;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index b08b89ec26ec5..63960465eea17 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -489,6 +489,7 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 	struct ahash_alg *alg = crypto_ahash_alg(hash);
  
--	if (key_referenced)
--		/* Set OTP key bit to select the key via KEY_SELECT. */
--		desc->control0 |= MXS_DCP_CONTROL0_OTP_KEY;
--	else
-+	if (!key_referenced)
- 		/* Payload contains the key. */
- 		desc->control0 |= MXS_DCP_CONTROL0_PAYLOAD_KEY;
-+	else if (actx->key[0] == DCP_PAES_KEY_OTP)
-+		/* Set OTP key bit to select the key via KEY_SELECT. */
-+		desc->control0 |= MXS_DCP_CONTROL0_OTP_KEY;
+ 	crypto_ahash_set_statesize(hash, alg->halg.statesize);
++	crypto_ahash_set_reqsize(hash, alg->reqsize);
  
- 	if (rctx->enc)
- 		desc->control0 |= MXS_DCP_CONTROL0_CIPHER_ENCRYPT;
+ 	if (tfm->__crt_alg->cra_type == &crypto_shash_type)
+ 		return crypto_init_ahash_using_shash(tfm);
+@@ -654,6 +655,9 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
+ 	if (alg->halg.statesize == 0)
+ 		return -EINVAL;
+ 
++	if (alg->reqsize && alg->reqsize < alg->halg.statesize)
++		return -EINVAL;
++
+ 	err = hash_prepare_alg(&alg->halg);
+ 	if (err)
+ 		return err;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 2d5ea9f9ff43e..6692253f0b5be 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -132,6 +132,7 @@ struct ahash_request {
+  *	      This is a counterpart to @init_tfm, used to remove
+  *	      various changes set in @init_tfm.
+  * @clone_tfm: Copy transform into new object, may allocate memory.
++ * @reqsize: Size of the request context.
+  * @halg: see struct hash_alg_common
+  */
+ struct ahash_alg {
+@@ -148,6 +149,8 @@ struct ahash_alg {
+ 	void (*exit_tfm)(struct crypto_ahash *tfm);
+ 	int (*clone_tfm)(struct crypto_ahash *dst, struct crypto_ahash *src);
+ 
++	unsigned int reqsize;
++
+ 	struct hash_alg_common halg;
+ };
+ 
 -- 
 2.39.5
 
