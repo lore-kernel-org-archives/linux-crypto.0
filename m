@@ -1,308 +1,158 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0142136358
-	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 07:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A499D1F5413;
+	Mon,  5 May 2025 09:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746429325; cv=none; b=fOeUGoVKTsHANaFEYeLYltP8wrTbNCC7bwkLdhjbmbSrc5bScBHQSk5nDn2o0B8pFcQjnUUoj+kXVDjNa3QrSFWV9PLGKuftUnZCBeexcQQZAVSKXgbbGZVSkdvhOsGM9VQcluFMTHYJc7Z7Tb0RvckCneRJqlMZltPotSWjQM8=
+	t=1746436999; cv=none; b=kqGRtBQm3Tn22ApiEuAnZYyOiZ66oVa8G0YFH95mhmbiCpvAxpMZ1Eos58VD/pPASKbYwbDxO19OlCBjVYQP14XGCvTdw9BGMOGlzQLLJ6H6WsPVoRQVKIbNP3WG5jrTPItQ/um4t4dhA3GS78r5P6aw9lmT5yat2dsVwIOuAUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746429325; c=relaxed/simple;
-	bh=zMw4b8EWQpVGxTek6bJaShzDV3w3uyyJvjbHxYm3C9M=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HcbCZmm7CEIubUPj+zXEyWDgDjI9gK57l1tkJ+5zFbSG6ZL4NOaRQ+7eKN+Ve6QluBiCX1TuLzzWrTEb52Lhh93eUSmmGSi0wr77pJFyQdp8XSI5xZVV2KLo1h0bVJZmg8ND/N5eCJRrOOTLMXHHvA4pEAzdDfv1Uct81hAFH4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=d5Z8dthW; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746436999; c=relaxed/simple;
+	bh=vZVzH8G42DQbwrgI28bPyvXwEgyT2x3kpEopLCUdVVY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d425GNyvatjkO8L4haVreAJdE1PRKQHhmE6gfj/UYBmhvqEZINuoKdnA5hEvbqwqVX78fczZD2vrK3B7mdBFC915dJR/jTQIiwdRUKMT3UHmVxL6Y+2QRvRO09s+/l53QjTdGH0s8LtNos6k2ouGzsEbf2loHg75XRoUYStJeh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=IV0dlq6a; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="d5Z8dthW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=eH0X/X5HAkaWV6O2ktY32auDKU6u5y3hy/lgbAfrezY=; b=d5Z8dthWDTBITy+iDETEo/IjXT
-	v2D7CEL5e8STtZG6KZG4OHNKR5UHjILvo++Prbs7AZDeH04HpFrcXgm5YtTawimotZDpumyuYxH/D
-	MA6BDHEJjWqRgr9Bb2keBpCiqHsaoaa2JGH/mIEi9KwK8GLZU+PvGAA8g8b8y3Rewv+zq27RzLnSF
-	OymvqCfkfrT7/4b/xSubF1De6YYSpGLmf229H5rtDdO5qCZyPCjYr2spFwn9m1+OjifahNRgSR5wS
-	KjZ8txTp2e685vNUt7Ao52qqlU6Ribr28B/T155zlZGSwn6tyDM+876YF8qFTnlsCxcuF6mDbHrkA
-	aANKobWQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uBq2j-003UH9-1n;
-	Mon, 05 May 2025 15:15:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 May 2025 15:15:13 +0800
-Date: Mon, 5 May 2025 15:15:13 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: crypto4xx - Remove ahash-related code
-Message-ID: <aBhlgbCmoVou4DI6@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IV0dlq6a"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=iW4CW4d4XumMRURh9YquH3q5TrxPfyHgHt8LotFCrM4=; b=IV0dlq6aSyJKCBOUMDtmCvZzdj
+	Y21rxQ7blv8W9CdEGp7pPqOVCrFyQDgbnyM0Vp2qhfRZjwcDtFn4EeZXAIOF8NggSR/ENxCTNywZU
+	pP1Ceoni69JiHhK+67DMiNZMFz6FGfxRlDO4tRW/j8sd8U+M0JRAVVtjwaQYLhTRWkthXd+sga8RJ
+	LIXR7kRMffpdYis5SPTDrwn8CvVkOnnhFho+WjoG7kAJOyNhcxCOsspOO5dDzAooZSp6b2WW7U0SM
+	SSy4NA2EJYj/FKh6WI0b/mEgyIhDUwPc9lryS4yrurhXK7dnpcLWMsBwb/6wx6pVi0it7rwgmM0oz
+	2V3PEYKA==;
+Received: from sslproxy08.your-server.de ([78.47.166.52])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uBs1z-000G4i-1V;
+	Mon, 05 May 2025 11:22:35 +0200
+Received: from [85.195.247.12] (helo=[192.168.1.114])
+	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uBs1x-000Hhr-1M;
+	Mon, 05 May 2025 11:22:34 +0200
+Message-ID: <798dba24-b5a7-4584-a1f6-793883fe9b5e@iogearbox.net>
+Date: Mon, 5 May 2025 11:22:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Paul Moore <paul@paul-moore.com>, KP Singh <kpsingh@kernel.org>
+Cc: bboscaccy@linux.microsoft.com, James.Bottomley@hansenpartnership.com,
+ bpf@vger.kernel.org, code@tyhicks.com, corbet@lwn.net, davem@davemloft.net,
+ dhowells@redhat.com, gnoack@google.com, herbert@gondor.apana.org.au,
+ jarkko@kernel.org, jmorris@namei.org, jstancek@redhat.com,
+ justinstitt@google.com, keyrings@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-security-module@vger.kernel.org,
+ llvm@lists.linux.dev, masahiroy@kernel.org, mic@digikod.net,
+ morbo@google.com, nathan@kernel.org, neal@gompa.dev,
+ nick.desaulniers+lkml@gmail.com, nicolas@fjasle.eu, nkapron@google.com,
+ roberto.sassu@huawei.com, serge@hallyn.com, shuah@kernel.org,
+ teknoraver@meta.com, xiyou.wangcong@gmail.com
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org>
+ <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27628/Sun May  4 10:34:32 2025)
 
-The hash implementation in crypto4xx has been disabled since 2009.
-As nobody has tried to fix this remove all the dead code.
+On 5/4/25 7:36 PM, Paul Moore wrote:
+> On Fri, May 2, 2025 at 5:00 PM KP Singh <kpsingh@kernel.org> wrote:
+[...]
+>  From what I've seen in Blaise's efforts to implement BPF signature
+> validation in the upstream kernel he has been working in good faith
+> and has been trying to work with the greater BPF community at each
+> step along the way.  He attempted to learn from previously rejected
+> attempts with his first patchset, however, that too was rejected, but
+> with feedback on how he might proceed.  Blaise took that feedback and
+> implemented Hornet, traveling to LSFMMBPF to present his idea to the
+> BPF community, as well as the usual mailing list postings.  When there
+> was feedback that certain APIs would not be permitted, despite being
+> EXPORT_SYMBOL'd, Blaise made some adjustments and came back to the
+> lists with an updated version.  You are obviously free to object to
+> portions of Hornet, but I don't believe you can claim Blaise isn't
+> trying to work with the BPF community on this effort.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- drivers/crypto/amcc/crypto4xx_alg.c  | 106 ---------------------------
- drivers/crypto/amcc/crypto4xx_core.c |  43 +----------
- drivers/crypto/amcc/crypto4xx_core.h |   7 --
- 3 files changed, 1 insertion(+), 155 deletions(-)
+We also discussed at LSFMMBPF that the current approach taken addresses
+only a tiny fraction of BPF programs out there, meaning it will not be
+applicable to 99% of projects utilizing BPF (e.g. for a OSS listing see
+https://ebpf.io/applications/). What guidance would you provide to these
+projects once this is set in place? "Please do a full rewrite (iff even
+feasible) or accept user space breakage if some distro sets this generally
+in place (wrongly assuming this provides a generic solution for all BPF)?"
 
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index 289750f34ccf..38e8a61e9166 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -12,9 +12,6 @@
- #include <linux/interrupt.h>
- #include <linux/spinlock_types.h>
- #include <linux/scatterlist.h>
--#include <linux/crypto.h>
--#include <linux/hash.h>
--#include <crypto/internal/hash.h>
- #include <linux/dma-mapping.h>
- #include <crypto/algapi.h>
- #include <crypto/aead.h>
-@@ -602,106 +599,3 @@ int crypto4xx_decrypt_aes_gcm(struct aead_request *req)
- {
- 	return crypto4xx_crypt_aes_gcm(req, true);
- }
--
--/*
-- * HASH SHA1 Functions
-- */
--static int crypto4xx_hash_alg_init(struct crypto_tfm *tfm,
--				   unsigned int sa_len,
--				   unsigned char ha,
--				   unsigned char hm)
--{
--	struct crypto_alg *alg = tfm->__crt_alg;
--	struct crypto4xx_alg *my_alg;
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct dynamic_sa_hash160 *sa;
--	int rc;
--
--	my_alg = container_of(__crypto_ahash_alg(alg), struct crypto4xx_alg,
--			      alg.u.hash);
--	ctx->dev   = my_alg->dev;
--
--	/* Create SA */
--	if (ctx->sa_in || ctx->sa_out)
--		crypto4xx_free_sa(ctx);
--
--	rc = crypto4xx_alloc_sa(ctx, sa_len);
--	if (rc)
--		return rc;
--
--	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
--				 sizeof(struct crypto4xx_ctx));
--	sa = (struct dynamic_sa_hash160 *)ctx->sa_in;
--	set_dynamic_sa_command_0(&sa->ctrl, SA_SAVE_HASH, SA_NOT_SAVE_IV,
--				 SA_NOT_LOAD_HASH, SA_LOAD_IV_FROM_SA,
--				 SA_NO_HEADER_PROC, ha, SA_CIPHER_ALG_NULL,
--				 SA_PAD_TYPE_ZERO, SA_OP_GROUP_BASIC,
--				 SA_OPCODE_HASH, DIR_INBOUND);
--	set_dynamic_sa_command_1(&sa->ctrl, 0, SA_HASH_MODE_HASH,
--				 CRYPTO_FEEDBACK_MODE_NO_FB, SA_EXTENDED_SN_OFF,
--				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
--				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
--				 SA_NOT_COPY_HDR);
--	/* Need to zero hash digest in SA */
--	memset(sa->inner_digest, 0, sizeof(sa->inner_digest));
--	memset(sa->outer_digest, 0, sizeof(sa->outer_digest));
--
--	return 0;
--}
--
--int crypto4xx_hash_init(struct ahash_request *req)
--{
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	int ds;
--	struct dynamic_sa_ctl *sa;
--
--	sa = ctx->sa_in;
--	ds = crypto_ahash_digestsize(
--			__crypto_ahash_cast(req->base.tfm));
--	sa->sa_command_0.bf.digest_len = ds >> 2;
--	sa->sa_command_0.bf.load_hash_state = SA_LOAD_HASH_FROM_SA;
--
--	return 0;
--}
--
--int crypto4xx_hash_update(struct ahash_request *req)
--{
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	struct scatterlist dst;
--	unsigned int ds = crypto_ahash_digestsize(ahash);
--
--	sg_init_one(&dst, req->result, ds);
--
--	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
--				  req->nbytes, NULL, 0, ctx->sa_in,
--				  ctx->sa_len, 0, NULL);
--}
--
--int crypto4xx_hash_final(struct ahash_request *req)
--{
--	return 0;
--}
--
--int crypto4xx_hash_digest(struct ahash_request *req)
--{
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	struct scatterlist dst;
--	unsigned int ds = crypto_ahash_digestsize(ahash);
--
--	sg_init_one(&dst, req->result, ds);
--
--	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
--				  req->nbytes, NULL, 0, ctx->sa_in,
--				  ctx->sa_len, 0, NULL);
--}
--
--/*
-- * SHA1 Algorithm
-- */
--int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm)
--{
--	return crypto4xx_hash_alg_init(tfm, SA_HASH160_LEN, SA_HASH_ALG_SHA1,
--				       SA_HASH_MODE_HASH);
--}
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index c77d06ddb1ec..8cdc66d520c9 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -485,18 +485,6 @@ static void crypto4xx_copy_pkt_to_dst(struct crypto4xx_device *dev,
- 	}
- }
- 
--static void crypto4xx_copy_digest_to_dst(void *dst,
--					struct pd_uinfo *pd_uinfo,
--					struct crypto4xx_ctx *ctx)
--{
--	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *) ctx->sa_in;
--
--	if (sa->sa_command_0.bf.hash_alg == SA_HASH_ALG_SHA1) {
--		memcpy(dst, pd_uinfo->sr_va->save_digest,
--		       SA_HASH_ALG_SHA1_DIGEST_SIZE);
--	}
--}
--
- static void crypto4xx_ret_sg_desc(struct crypto4xx_device *dev,
- 				  struct pd_uinfo *pd_uinfo)
- {
-@@ -549,23 +537,6 @@ static void crypto4xx_cipher_done(struct crypto4xx_device *dev,
- 	skcipher_request_complete(req, 0);
- }
- 
--static void crypto4xx_ahash_done(struct crypto4xx_device *dev,
--				struct pd_uinfo *pd_uinfo)
--{
--	struct crypto4xx_ctx *ctx;
--	struct ahash_request *ahash_req;
--
--	ahash_req = ahash_request_cast(pd_uinfo->async_req);
--	ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(ahash_req));
--
--	crypto4xx_copy_digest_to_dst(ahash_req->result, pd_uinfo, ctx);
--	crypto4xx_ret_sg_desc(dev, pd_uinfo);
--
--	if (pd_uinfo->state & PD_ENTRY_BUSY)
--		ahash_request_complete(ahash_req, -EINPROGRESS);
--	ahash_request_complete(ahash_req, 0);
--}
--
- static void crypto4xx_aead_done(struct crypto4xx_device *dev,
- 				struct pd_uinfo *pd_uinfo,
- 				struct ce_pd *pd)
-@@ -642,9 +613,6 @@ static void crypto4xx_pd_done(struct crypto4xx_device *dev, u32 idx)
- 	case CRYPTO_ALG_TYPE_AEAD:
- 		crypto4xx_aead_done(dev, pd_uinfo, pd);
- 		break;
--	case CRYPTO_ALG_TYPE_AHASH:
--		crypto4xx_ahash_done(dev, pd_uinfo);
--		break;
- 	}
- }
- 
-@@ -912,8 +880,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 	}
- 
- 	pd->pd_ctl.w = PD_CTL_HOST_READY |
--		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AHASH) ||
--		 (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
-+		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
- 			PD_CTL_HASH_FINAL : 0);
- 	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
- 	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
-@@ -1019,10 +986,6 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
- 			rc = crypto_register_aead(&alg->alg.u.aead);
- 			break;
- 
--		case CRYPTO_ALG_TYPE_AHASH:
--			rc = crypto_register_ahash(&alg->alg.u.hash);
--			break;
--
- 		case CRYPTO_ALG_TYPE_RNG:
- 			rc = crypto_register_rng(&alg->alg.u.rng);
- 			break;
-@@ -1048,10 +1011,6 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
- 	list_for_each_entry_safe(alg, tmp, &sec_dev->alg_list, entry) {
- 		list_del(&alg->entry);
- 		switch (alg->alg.type) {
--		case CRYPTO_ALG_TYPE_AHASH:
--			crypto_unregister_ahash(&alg->alg.u.hash);
--			break;
--
- 		case CRYPTO_ALG_TYPE_AEAD:
- 			crypto_unregister_aead(&alg->alg.u.aead);
- 			break;
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 9c56c7ac6e4c..ee36630c670f 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -16,7 +16,6 @@
- #include <linux/ratelimit.h>
- #include <linux/mutex.h>
- #include <linux/scatterlist.h>
--#include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
-@@ -135,7 +134,6 @@ struct crypto4xx_alg_common {
- 	u32 type;
- 	union {
- 		struct skcipher_alg cipher;
--		struct ahash_alg hash;
- 		struct aead_alg aead;
- 		struct rng_alg rng;
- 	} u;
-@@ -183,11 +181,6 @@ int crypto4xx_encrypt_noiv_block(struct skcipher_request *req);
- int crypto4xx_decrypt_noiv_block(struct skcipher_request *req);
- int crypto4xx_rfc3686_encrypt(struct skcipher_request *req);
- int crypto4xx_rfc3686_decrypt(struct skcipher_request *req);
--int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm);
--int crypto4xx_hash_digest(struct ahash_request *req);
--int crypto4xx_hash_final(struct ahash_request *req);
--int crypto4xx_hash_update(struct ahash_request *req);
--int crypto4xx_hash_init(struct ahash_request *req);
- 
- /*
-  * Note: Only use this function to copy items that is word aligned.
--- 
-2.39.5
+In the presentation it was mentioned that you need something like Hornet
+for your Azure Smart NICs in order to utilize BPF for livesite investigation
+which is fine ofc, but given this only addresses a *tiny niche* of use cases,
+the guidance given at the LSFMMBPF conference was to go via BPF LSM route
+and implement it this way instead which Blaise agreed to look into. Given
+this is a niche use case it is exactly the fit for BPF LSM.
 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>> So for this approach, it's a:
+>>
+>> Nacked-by: KP Singh <kpsingh@kernel.org>
+> 
+> Noted.
+
+Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
