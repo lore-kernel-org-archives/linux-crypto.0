@@ -1,119 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E4617B425;
-	Mon,  5 May 2025 14:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E782561C2;
+	Mon,  5 May 2025 15:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746457039; cv=none; b=G5O7Gx3MHZVVFS2m8Z6wCPR4HLEJgBXZrYAOt4bWWbxBaaS6Iv3EhA3QeoFA3NTL30G77noOCrFD6ESDRZ3gzuBT+TCj0WOZ62PnLQoxybCkUdVQ+fT96vf0tfd76LAdqbiGEsZHP7QXgt56WLuNAdRKNxIPpmhO4MQzNT+WYwA=
+	t=1746460142; cv=none; b=XBePqsAE9GrGxFeSZ0LwJJhuPAWHSCSkA0VVtKnI5zfr36u+pJIxIM9PB80tlOe2oIUT6gbff2bioa3sNmrztcR53hWWzXnYQ3R8vBoDwBn5vbaAZ3zcZnmwQCUfxTRFz4uIbGzffybn5AmRIXxH2XTsArX1kJaMjcymm1kbZlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746457039; c=relaxed/simple;
-	bh=Sip1PnDID2/ngnatk9xALApIFhWqepNEXsu98AyzCMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M6pNt2U1FYlLtoGHlBOPdpwi5zBWUimGwySAf+pm42YQcw6RBvJnhKdkFTx/irk/vNKZ5wu8f3b8p0N8TwaygRNwZf+oYy1dtmX8zxI6owF4MD8cg7y3U/FXOrIAhaNS6q3CmeugHqJJgLNM2gmfaFm12vVUPQjDyH62N44uCps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U6WlL0uR; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1746460142; c=relaxed/simple;
+	bh=tNdJlfxtfHWQAARGwoyWKnpx70MF3hIPr6+xkdRMw6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EIGASIvSQL+RsEHkH383YKnAXqeA/eUSHFklRQH7BexP3x8MRSv3p1xuDI8eQ5ok8VqDdGF7N3L8ci7kK444h9ihM2rHV9mOyBuyR4Mvq+khL6FUIZXWcvCVjWmGpbxW2wiv//FKEei51/pn6NyGR63Le0/3pqLxdzZpYMvSVTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4sMa5mg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U6WlL0uR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746457037; x=1777993037;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Sip1PnDID2/ngnatk9xALApIFhWqepNEXsu98AyzCMU=;
-  b=U6WlL0uR5/QutGcgQlaIrVnfououjOem7VMgFR4MxhlZtJCL9on97s4E
-   suI0MPdrPx8nBq0hPT293f1D+s35tNzqHhdcEyW6ztImnNyVkZdDjrW09
-   FveWz1i922n4P5/VN3esMXftBG/P6QClaVHd01MkzyOXXeGmG7XmemA6/
-   +jA5fWK8OilzmPPFe1KkHsHih9Nt9+GiBHk9PuuMTq2Egu3sVIGHsrLF2
-   CNFjPpqZbTNISeYmcGh2y9TyEPwZWGweWWZTKKO2jcB006VGwCjC8ofG3
-   7dxrwKehOvPnEu2Gc1VAfs+ewxemMEXh3JkbUDY4kPf77u78D9EAX/o+k
-   w==;
-X-CSE-ConnectionGUID: qRY8q596QMOgXftNLcV3RQ==
-X-CSE-MsgGUID: alJmyazLRvi1RPtPjBbvhQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="65475568"
-X-IronPort-AV: E=Sophos;i="6.15,262,1739865600"; 
-   d="scan'208";a="65475568"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 07:57:16 -0700
-X-CSE-ConnectionGUID: dwURUL9HRTS3RSrgxuYveg==
-X-CSE-MsgGUID: aIp5ZAbNRyWXPZsDXP5leQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,262,1739865600"; 
-   d="scan'208";a="172499800"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 05 May 2025 07:57:13 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uBxFn-0005qL-22;
-	Mon, 05 May 2025 14:57:11 +0000
-Date: Mon, 5 May 2025 22:56:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Kamlesh Gurudasani <kamlesh@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
- (ECB, CBC)
-Message-ID: <202505052251.UeYNEjXC-lkp@intel.com>
-References: <20250502121253.456974-4-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4sMa5mg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 295CBC4CEE4;
+	Mon,  5 May 2025 15:48:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746460141;
+	bh=tNdJlfxtfHWQAARGwoyWKnpx70MF3hIPr6+xkdRMw6o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e4sMa5mg9/80nQp5jxlKMvorQz/69Omm/kVIG1CTygwri+HeGeSSM0ziFkECulLZR
+	 gcxcfEOx6w+gOD7TPgecPOOtdCk/NAyY0jB8oq0VclsIGkv0Xz19uxZm93PIAenCJi
+	 jdgHZqb7bq26F6WTDckm7qXbkrySRAtblcd1ic6V3OhJ6WC7z0xrIe7qf51KDWRwSs
+	 gI9Qtf2hQjh/tRayxfRKBtaJQX3DtR3F3MG1Uw3bvzBoZiTDNPlDwdM+JI+s1dHsww
+	 /QwUPGbRcDhPCGpA67IR0k+XaOodbtMwxr0eUyLBGNqtooSLaGQsVPXA5CqSGWkDTL
+	 P/EgHJbd/DeQA==
+Message-ID: <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
+Date: Mon, 5 May 2025 17:48:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250502121253.456974-4-t-pratham@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ herbert@gondor.apana.org.au, robh@kernel.org
+Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
+ adityak@vayavyalabs.com, Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
+ <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Pratham,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on next-20250505]
-[cannot apply to herbert-crypto-2.6/master robh/for-next linus/master v6.15-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/dt-bindings-crypto-Add-binding-for-TI-DTHE-V2/20250502-201653
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250502121253.456974-4-t-pratham%40ti.com
-patch subject: [PATCH v3 2/2] crypto: ti: Add driver for DTHE V2 AES Engine (ECB, CBC)
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20250505/202505052251.UeYNEjXC-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250505/202505052251.UeYNEjXC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505052251.UeYNEjXC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/crypto/ti/dthev2-common.c:15:
->> drivers/crypto/ti/dthev2-common.h:9:9: warning: '__TI_DTHEV2_H__' is used as a header guard here, followed by #define of a different macro [-Wheader-guard]
-       9 | #ifndef __TI_DTHEV2_H__
-         |         ^~~~~~~~~~~~~~~
-   drivers/crypto/ti/dthev2-common.h:10:9: note: '__TI_DTHE2V_H__' is defined here; did you mean '__TI_DTHEV2_H__'?
-      10 | #define __TI_DTHE2V_H__
-         |         ^~~~~~~~~~~~~~~
-         |         __TI_DTHEV2_H__
-   1 warning generated.
+On 05/05/2025 14:55, Pavitrakumar M wrote:
+> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> 
+> Add DT bindings related to the SPAcc driver for Documentation.
+> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+> Engine is a crypto IP designed by Synopsys.
+> 
+> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
 
 
-vim +/__TI_DTHEV2_H__ +9 drivers/crypto/ti/dthev2-common.h
+I do not see any improvements. It seems you ignored all comments, not
+single one was responded to or addressed.
 
-   > 9	#ifndef __TI_DTHEV2_H__
-    10	#define __TI_DTHE2V_H__
-    11	
+NAK
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+<form letter>
+This is a friendly reminder during the review process.
+
+It seems my or other reviewer's previous comments were not fully
+addressed. Maybe the feedback got lost between the quotes, maybe you
+just forgot to apply it. Please go back to the previous discussion and
+either implement all requested changes or keep discussing them.
+
+Thank you.
+</form letter>
+
+Best regards,
+Krzysztof
