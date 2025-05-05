@@ -1,205 +1,209 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097F9270EA4;
-	Mon,  5 May 2025 20:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB55270EA4
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 20:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746477437; cv=none; b=KY6k9OIsysMedaOfwBaOVMqSiswldijzOl7CNgCpg4Hm2MF6p9G8SD/7qrFzc2qAxdXOKCYgVDjN8iGdAMNnDUICSGX70tVrnEB8VzIvjXXwpv4gLzuIj7COURJl4i57D2BjPKZi8x2Ljrc8SX4Y/lZxM+Ic6REq7ZJ9BdiV9qk=
+	t=1746477677; cv=none; b=RMpAd34ioSjC2cuGNgritJmDOrO2jEBysDJLQVuP5VyUAX502GB8+7DfCVW9LdVxrLjvU96Zwv7UOCjtP3hk4wbzndLvg6JbSwv4V5of2SQH3ZlVARyZKABTR85gRxz+2+uj4zlnq3ODkXLniu4ZhYcofs7mg24byaIHv33Q81k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746477437; c=relaxed/simple;
-	bh=cllZGXSYE+1mv0E8H6N1+pAGeSY+cx5+GxtxNH2Atjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AbV1F4o9vxrpYAx/1cSJmh2ktihJKMMvLPFgXcI8zHb8MGX/jnde0YcJWZ/R3SwFU58bv8HbTFDAgc+DXWhmYUDfSSr2F+scErNAAZIlTaiPYO+tB+0Vszrq13bYdfzEhSI9pC5MlkKlKfXkeyuyMG9ZWPzpqjhOA83ZBcBnq0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jundvq8n; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746477677; c=relaxed/simple;
+	bh=d8LfDvKjYkgCUCdFIUw90/ekiXyN5J8SQRenxzuFPN0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e9mth9pJ0npqoXBr9GARc56RkNmDc1T3x+CWobI+sii59TGLyEJfbYSA/Kc+ALC3W4llAobDdmhnGOsiJ8NDIHi9ZZrWg4XWsQeglPItJaO5o1fL3i8dprVTee/+faR7IZJOcw1C3x1rZmOiex3wuFRS9pqlsDolUiuhAoqrc5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Owhl5LDL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jundvq8n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89B70C4CEF2;
-	Mon,  5 May 2025 20:37:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Owhl5LDL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08AD9C4CEEF
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 20:41:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746477436;
-	bh=cllZGXSYE+1mv0E8H6N1+pAGeSY+cx5+GxtxNH2Atjs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jundvq8n+gWMBBFomfjvYmEP149BbIEF6+jTLsqpVtWoeP2+Bh36UA9v6d5Wm7qsS
-	 kDDFt19bKjIXZtAbPHmfNyvMHinbNeVpPtrJm3cpR0LgD1LOeGKsuo+afb4ND4jaP0
-	 TxjFmPv2Vftd6MMqL1Paps7DNgL/mvFCc03mi2arJi7l0LSlzZhX6UcaiUl0xKZ6fa
-	 wzviqAj0sV8r4+XhTDAsbZ/TdE6wK1hyTOLJ2hqXdjM+UKrWtkJ9H6kcqozAhh1JIJ
-	 8zwRU+Z/3ZIkXdkx2kNUR+8oTAjXUubN0pvltG3jzSLc4EsujqiQHZPt/7xzeDq5yt
-	 ugAXB3Rn0MlxQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH v3 6/7] crypto: Kconfig - make CRYPTO_MANAGER a hidden symbol
-Date: Mon,  5 May 2025 13:33:44 -0700
-Message-ID: <20250505203345.802740-7-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250505203345.802740-1-ebiggers@kernel.org>
-References: <20250505203345.802740-1-ebiggers@kernel.org>
+	s=k20201202; t=1746477677;
+	bh=d8LfDvKjYkgCUCdFIUw90/ekiXyN5J8SQRenxzuFPN0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Owhl5LDLXkQNX7x4a0Z1G/aYlPwj725dS3lGDTCV+pR8BnaB+NmYGY89SDeQF3QeH
+	 QMcVS3pTVG7yr2bHdU7lOtM3GpgOBxthge8YONACDjcAlhOe4HTfIekToeKwPz3N+F
+	 SCvS1XUDNBQ9JydjTGHjI6amf0i1/NdehRIliJtQfQsIDhOYJyq9LDTsKQRHtbU2Kp
+	 VJmnHLfuSDXWtz/sjL8WEX+OzJduJRaezfIl3m0tVpYtQRnTmvcqfk+BJYCfe69Lou
+	 ij+YIV+P9kP38iUmIsVH/8hUm/82tum1XfYpsYxGLZYH5aF361BOrdowd6cGN/CkIz
+	 DWjJWz4Jh2/JQ==
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5cded3e2eso3509504a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 13:41:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUzEt1cLuBtqKeBdreBqgksvPmXknnXZsdppjNBDEJvJN1PaSwTSpYMknK0bVXCVOg2+4I3b5Tm8RuX4mg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRJDYYamUEN3DJENYQSGrWR6uKHXf6mBmM/5jIg6acWu+oFfwt
+	R04SVW0UfOZR4W02LI89YzkTBUrCldzFBnyt2KpgYThaRLG98ao2Nc+3q+HbcJ45eRwfSW+uwb9
+	FdYIeXR6wUo4YFHS/keopRcoxzMeU6suBk+/W
+X-Google-Smtp-Source: AGHT+IFfJkERYqcbzT4YQQTS+Mj+93sXv0WPP/4xBqB2yT0tfFb61yLhT9GQEjqTDYpKCZHUl0y2flUvtx0O/XgDMu4=
+X-Received: by 2002:a05:6402:280d:b0:5f9:dbc6:d363 with SMTP id
+ 4fb4d7f45d1cf-5fb70d52af5mr319781a12.32.1746477675536; Mon, 05 May 2025
+ 13:41:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
+In-Reply-To: <87o6w7ge3o.fsf@microsoft.com>
+From: KP Singh <kpsingh@kernel.org>
+Date: Mon, 5 May 2025 22:41:04 +0200
+X-Gmail-Original-Message-ID: <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
+X-Gm-Features: ATxdqUF8uthsI1M39wdVx3o5QcABchfWwSxBzLmXfLY2I-_y9VLmlQgWs2T9bB0
+Message-ID: <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Cc: James.Bottomley@hansenpartnership.com, bpf@vger.kernel.org, 
+	code@tyhicks.com, corbet@lwn.net, davem@davemloft.net, dhowells@redhat.com, 
+	gnoack@google.com, herbert@gondor.apana.org.au, jarkko@kernel.org, 
+	jmorris@namei.org, jstancek@redhat.com, justinstitt@google.com, 
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, llvm@lists.linux.dev, 
+	masahiroy@kernel.org, mic@digikod.net, morbo@google.com, nathan@kernel.org, 
+	neal@gompa.dev, nick.desaulniers+lkml@gmail.com, nicolas@fjasle.eu, 
+	nkapron@google.com, paul@paul-moore.com, roberto.sassu@huawei.com, 
+	serge@hallyn.com, shuah@kernel.org, teknoraver@meta.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+On Mon, May 5, 2025 at 7:30=E2=80=AFPM Blaise Boscaccy
+<bboscaccy@linux.microsoft.com> wrote:
+>
+> KP Singh <kpsingh@kernel.org> writes:
+>
+> [...]
+>
+> > Now if you really care about the use-case and want to work with the mai=
+ntainers
+> > and implement signing for the community, here's how we think it should =
+be done:
+> >
+> > * The core signing logic and the tooling stays in BPF, something that t=
+he users
+> >   are already using. No new tooling.
+> > * The policy decision on the effect of signing can be built into variou=
+s
+> >   existing LSMs. I don't think we need a new LSM for it.
+> > * A simple UAPI (emphasis on UAPI!) change to union bpf_attr in uapi/bp=
+f.h in
+> >   the BPF_PROG_LOAD command:
+> >
+> > __aligned_u64 signature;
+> > __u32 signature_size;
+>
+> I think having some actual details on the various parties' requirements
+> here would be helpful. KP, I do look forward to seeing your design;
+> however, having code signing proposals where the capabilities are
+> dictated from above and any dissent is dismissed as "you're doing it
+> wrong" isn't going to be helpful to anyone that needs to use this in
+> practice.
 
-There is no reason for people configuring the kernel to be asked about
-CRYPTO_MANAGER, so make it a hidden symbol.
+Please don't misrepresent the facts, you got feedback from Alexei in
+various threads, but you chose to argue on the points that were
+convenient for you (i.e. usage of BPF internal APIs) and yet you claim
+to "work with the BPF community and maintainers" by arguing instead of
+collaborating and paying attention to the feedback given to you.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/arm/configs/milbeaut_m10v_defconfig    | 1 -
- arch/arm/configs/pxa_defconfig              | 1 -
- arch/mips/configs/decstation_64_defconfig   | 1 -
- arch/mips/configs/decstation_defconfig      | 1 -
- arch/mips/configs/decstation_r4k_defconfig  | 1 -
- arch/mips/configs/ip28_defconfig            | 1 -
- arch/parisc/configs/generic-64bit_defconfig | 1 -
- arch/sh/configs/migor_defconfig             | 1 -
- crypto/Kconfig                              | 2 +-
- 9 files changed, 1 insertion(+), 9 deletions(-)
+1. https://lore.kernel.org/bpf/CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGm=
+RAjbusQ@mail.gmail.com/
 
-diff --git a/arch/arm/configs/milbeaut_m10v_defconfig b/arch/arm/configs/milbeaut_m10v_defconfig
-index 9dd47e1d90bb..242e7d5a3f68 100644
---- a/arch/arm/configs/milbeaut_m10v_defconfig
-+++ b/arch/arm/configs/milbeaut_m10v_defconfig
-@@ -91,11 +91,10 @@ CONFIG_CONFIGFS_FS=y
- # CONFIG_MISC_FILESYSTEMS is not set
- CONFIG_NLS_CODEPAGE_437=y
- CONFIG_NLS_ISO8859_1=y
- CONFIG_NLS_UTF8=y
- CONFIG_KEYS=y
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_SELFTESTS=y
- # CONFIG_CRYPTO_ECHAINIV is not set
- CONFIG_CRYPTO_AES=y
- CONFIG_CRYPTO_SEQIV=m
- CONFIG_CRYPTO_GHASH_ARM_CE=m
-diff --git a/arch/arm/configs/pxa_defconfig b/arch/arm/configs/pxa_defconfig
-index edc5b4d17f77..ded4b9a5accf 100644
---- a/arch/arm/configs/pxa_defconfig
-+++ b/arch/arm/configs/pxa_defconfig
-@@ -634,11 +634,10 @@ CONFIG_NLS_ASCII=m
- CONFIG_NLS_ISO8859_1=m
- CONFIG_NLS_ISO8859_15=m
- CONFIG_NLS_UTF8=m
- CONFIG_TIMER_STATS=y
- CONFIG_SECURITY=y
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_CRYPTD=m
- CONFIG_CRYPTO_AUTHENC=m
- CONFIG_CRYPTO_BENCHMARK=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
-diff --git a/arch/mips/configs/decstation_64_defconfig b/arch/mips/configs/decstation_64_defconfig
-index 9655567614aa..85a4472cb058 100644
---- a/arch/mips/configs/decstation_64_defconfig
-+++ b/arch/mips/configs/decstation_64_defconfig
-@@ -166,11 +166,10 @@ CONFIG_NLS_ISO8859_9=m
- CONFIG_NLS_ISO8859_13=m
- CONFIG_NLS_ISO8859_14=m
- CONFIG_NLS_ISO8859_15=m
- CONFIG_NLS_UTF8=m
- CONFIG_CRYPTO_RSA=m
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_CCM=m
- CONFIG_CRYPTO_GCM=m
- CONFIG_CRYPTO_CHACHA20POLY1305=m
- CONFIG_CRYPTO_CTS=m
- CONFIG_CRYPTO_LRW=m
-diff --git a/arch/mips/configs/decstation_defconfig b/arch/mips/configs/decstation_defconfig
-index 1539fe8eb34d..a3b2c8da2dde 100644
---- a/arch/mips/configs/decstation_defconfig
-+++ b/arch/mips/configs/decstation_defconfig
-@@ -161,11 +161,10 @@ CONFIG_NLS_ISO8859_9=m
- CONFIG_NLS_ISO8859_13=m
- CONFIG_NLS_ISO8859_14=m
- CONFIG_NLS_ISO8859_15=m
- CONFIG_NLS_UTF8=m
- CONFIG_CRYPTO_RSA=m
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_CCM=m
- CONFIG_CRYPTO_GCM=m
- CONFIG_CRYPTO_CHACHA20POLY1305=m
- CONFIG_CRYPTO_CTS=m
- CONFIG_CRYPTO_LRW=m
-diff --git a/arch/mips/configs/decstation_r4k_defconfig b/arch/mips/configs/decstation_r4k_defconfig
-index 58c36720c94a..a476717b8a6a 100644
---- a/arch/mips/configs/decstation_r4k_defconfig
-+++ b/arch/mips/configs/decstation_r4k_defconfig
-@@ -161,11 +161,10 @@ CONFIG_NLS_ISO8859_9=m
- CONFIG_NLS_ISO8859_13=m
- CONFIG_NLS_ISO8859_14=m
- CONFIG_NLS_ISO8859_15=m
- CONFIG_NLS_UTF8=m
- CONFIG_CRYPTO_RSA=m
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_CCM=m
- CONFIG_CRYPTO_GCM=m
- CONFIG_CRYPTO_CHACHA20POLY1305=m
- CONFIG_CRYPTO_CTS=m
- CONFIG_CRYPTO_LRW=m
-diff --git a/arch/mips/configs/ip28_defconfig b/arch/mips/configs/ip28_defconfig
-index e0040110a3ee..6db21e498faa 100644
---- a/arch/mips/configs/ip28_defconfig
-+++ b/arch/mips/configs/ip28_defconfig
-@@ -58,8 +58,7 @@ CONFIG_PROC_KCORE=y
- CONFIG_TMPFS=y
- CONFIG_TMPFS_POSIX_ACL=y
- CONFIG_NFS_FS=y
- CONFIG_NFS_V3_ACL=y
- CONFIG_ROOT_NFS=y
--CONFIG_CRYPTO_MANAGER=y
- # CONFIG_CRYPTO_HW is not set
- CONFIG_MAGIC_SYSRQ=y
-diff --git a/arch/parisc/configs/generic-64bit_defconfig b/arch/parisc/configs/generic-64bit_defconfig
-index ecc9ffcc11cd..d8cd7f858b2a 100644
---- a/arch/parisc/configs/generic-64bit_defconfig
-+++ b/arch/parisc/configs/generic-64bit_defconfig
-@@ -281,11 +281,10 @@ CONFIG_NLS_CODEPAGE_1250=m
- CONFIG_NLS_CODEPAGE_1251=m
- CONFIG_NLS_ASCII=m
- CONFIG_NLS_ISO8859_1=m
- CONFIG_NLS_ISO8859_2=m
- CONFIG_NLS_UTF8=m
--CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_ECB=m
- CONFIG_CRYPTO_PCBC=m
- CONFIG_CRYPTO_MD4=m
- CONFIG_CRYPTO_MD5=y
-diff --git a/arch/sh/configs/migor_defconfig b/arch/sh/configs/migor_defconfig
-index fc2010c241fb..31dbd8888aaa 100644
---- a/arch/sh/configs/migor_defconfig
-+++ b/arch/sh/configs/migor_defconfig
-@@ -85,8 +85,7 @@ CONFIG_UIO_PDRV_GENIRQ=y
- CONFIG_PROC_KCORE=y
- CONFIG_TMPFS=y
- CONFIG_NFS_FS=y
- CONFIG_ROOT_NFS=y
- CONFIG_DEBUG_FS=y
--CONFIG_CRYPTO_MANAGER=y
- # CONFIG_CRYPTO_ANSI_CPRNG is not set
- # CONFIG_CRYPTO_HW is not set
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bbe9cc408927..f160537a5550 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -146,11 +146,11 @@ config CRYPTO_HKDF
- 	select CRYPTO_SHA256 if CRYPTO_SELFTESTS
- 	select CRYPTO_SHA512 if CRYPTO_SELFTESTS
- 	select CRYPTO_HASH2
- 
- config CRYPTO_MANAGER
--	tristate "Cryptographic algorithm manager"
-+	tristate
- 	select CRYPTO_MANAGER2
- 	help
- 	  Create default cryptographic template instantiations such as
- 	  cbc(aes).
- 
--- 
-2.49.0
+  Your solution to address the ELF loader specific issue was to just
+allow list systemd? You totally ignored the part about loaders in
+golang and Rust that do not use ELF. How is this    "directive from
+above?"
 
+2. Alexei suggested to you in
+https://lore.kernel.org/bpf/87plhhjwqy.fsf@microsoft.com/
+
+  "A signature for the map plus a signature for the prog
+  that is tied to a map might be a better option.
+  At map creation time the contents can be checked,
+  the map is frozen, and then the verifier can proceed
+  with prog's signature checking."
+
+You never replied to this.
+
+3. To signing the attachment points, you replied
+
+> That statement is quite questionable. Yes, IIRC you brought that up. And
+> again, runtime policy enforcement has nothing to do with proving code
+> provenance. They are completely independent concerns.
+
+The place where the BPF program is attached is a key part of the
+provenance of the BPF program and its security (and other) effects can
+vary greatly based on that. (e.g. imagine a reject all LSM program
+that is attached to the wrong LSM hook). This is why it's not the same
+as module loading.
+
+4. https://lore.kernel.org/bpf/CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGm=
+RAjbusQ@mail.gmail.com/
+
+Programs can still access maps, now if you combine the issue of
+ELF-less loaders and that maps are writeable from other programs as
+freezing only affects userspace (i.e. when a binary gets an FD to a
+map and tries to modify it with syscalls) your implementation fails.
+
+The reply there about trusted user-space still needs to come with
+better guarantees from the kernel, and the kernel can indeed give
+better guarantees, which we will share. The reason for this is that
+your trusted binary is not immune to attacks, and once an attacker
+gains code execution as this trusted binary, there is no containing
+the compromise.
+
+- KP
+
+>
+> Also, I don't think anyone actually cares, at least I don't, who calls
+> verify_pkcs7_signature or whatnot. Verifying signed binary blobs with a
+> private key is a solved problem and isn't really interesting.
+>
+> Our requirements for code signing are just an extension of secure boot
+> and module signing logic:
+>
+> * Prove all code running in ring zero has been signed
+> * Not trivially defeatable by root
+> * Ultimately, no trusted userspace components
+> * Secure from and not vulnerable to TOCTOU attacks
+> * Shouldn't be overly vulnerable to supply-chain attacks
+> * The signature checking logic and control paths should be human-readable
+> * Work easily and be backportable to stable kernels
+> * There should be a simple kconfig option to turn this on or off
+> * This solution needs to be in the mainline kernel
+>
+> Hornet was implemented to meet those requirements, living in the LSM
+> subsystem, written in C. As of today, one cannot accomplish those
+> requirements via BPF-LSM, which is why C was chosen.
+>
+> One can easily realize there is absolutely no way to have a single
+> one-size-fits-all signing solution for everything listed in
+> https://ebpf.io/applications/.
+>
+> If you want to go the UAPI route, I would wholeheartedly recommend
+> making it extensible and having this data be available to the policy
+> LSMs.
+>
+> enum bpf_signature_type {
+>   /* x509 signature check against program instructions only */
+>   BPF_SIGNATURE_PROG_ONLY =3D 0,
+>   /* x509 combined signature check against program instructions and used =
+maps */
+>   BPF_SIGNATURE_PROG_USED_MAPS =3D 1,
+>   /* more of these to be determined via usage */
+>   ...
+> };
+>
+> _aligned_u64 signature;
+> __u32 signature_size;
+> __u32 signature_type;
+>
+> The other option for solving this in the general is in-kernel
+> loaders. That's gotten pushback as well.
+>
+> -blaise
+>
+>
+>
+>
+>
