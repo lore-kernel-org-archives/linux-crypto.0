@@ -1,90 +1,170 @@
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610674683;
-	Mon,  5 May 2025 13:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8690EC8FE
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 13:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746450110; cv=none; b=rsw+2RrMPUO8UO25l9MreLmRaQ2DAW+1ngzj+ERTbaYvmMqosokQOVg82Btpi4KEkDCWn2dRjtrv/fZJUusbcNU4scNt5caVlL1MUvN6Lq6+KdiISll23HZOBi1VQNccjKqT/r3tAjX2eUxKti5fLtLh9VRoRXXlicY0pBCSdig=
+	t=1746451887; cv=none; b=Bu9p0be0WpRQzKu1elPn1cHlstP5Xw/LbMtrrWQgdwECeruAadLMuvoAiMmowCYt1AgkaWKY/bFh0mcA+FMZW8ZcebqI0tN1IpcjC9bU58pduxXGC4wRh7pueeIUJHInnI2nZR7ZxjnQV9Ft6gSNwiFjmuhsYKliQOJyKUJ8Iws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746450110; c=relaxed/simple;
-	bh=HWtpxq8VSbL7osdg/n3YvEAARAvRWdjvgKI8goZ9yrg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Plcp4fxJFGakoL06UGIkj71vReE9+flFNnsWUV6rZ+3rDONlflpO0NieXS4aG+p1UedD2BNq8pR1pLfpVHB2Cf4lPymY5/VrVpYgkbDTKGpzYTvSt14a3M4HDfukzFkEilrY2SthxG8+iQwU67YSuvK+tr+OxGKjuED72dFtEWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=G/pbePtf; arc=none smtp.client-ip=185.11.138.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+	s=arc-20240116; t=1746451887; c=relaxed/simple;
+	bh=9vuZWKZCBFxezRU/zHa59Sr9XjDAud0SBF8y3+RIRUU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=haTRx4qJxBk55xscBFr97pw/S+H7NptlhU70qrlmf5XJ5CFoQQ/uRfViIMbqZSWq4ildY/+The84RoB5RdJFKQeR1r2vZM6K48s+S6dmzy+bsVN0GyOF23baycBTxXZTXQq7btQ/gZeGy07Fr8Y5GaF/thMTqUs/6GVmKhAH24w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CDSmGOZd; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="G/pbePtf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
-	s=gloria202408; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=WBYMe8AWciFRbGt/UH6lyqSHdnAGgD4jpjABIeG45Ss=; b=G/pbePtf629UUQemqdlgBwP/jR
-	MZV+7whYgmJ/tAJLSU+DLyqCxZ/wfKCgiDyKBYAfD1wpq88Eu8+7hPhfNwcNJcHvbYUTsRYld6gyi
-	Vzt9xbaQYFL6tKFKTRveu/knLvUBh+thg5wLRJpoEpgJadUBlIRLHtza6Kizff+5la/rQMNIFEiCO
-	GKL5qQMaJ75xsZpMB81aB0HsJoV6bL6kEpR5OC6723rGQezQeFzKGcqEL9COaPSx2ITSiX21OoIC0
-	Uc0vDch+cxHvVi5mbuRSPsEouddLoxf80+lxq6bWHL0wFwh0+9xub7lByQds7VRztvPVUAWJ3gn1c
-	K6hodFqg==;
-Received: from i53875a1d.versanet.de ([83.135.90.29] helo=localhost.localdomain)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1uBvRd-0006mT-UT; Mon, 05 May 2025 15:01:18 +0200
-From: Heiko Stuebner <heiko@sntech.de>
-To: Daniel Golle <daniel@makrotopia.org>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: Heiko Stuebner <heiko@sntech.de>,
-	Sebastian Reichel <sebastian.reichel@collabora.com>,
-	kernel@collabora.com,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH 0/3] RK3576 Hardware RNG
-Date: Mon,  5 May 2025 15:01:07 +0200
-Message-ID: <174645006215.1225797.3007982185133849135.b4-ty@sntech.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
-References: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CDSmGOZd"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 545AfLOT010802;
+	Mon, 5 May 2025 12:45:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=99aahL
+	4GoB8DQvuaxB4kVfw7rQXYGn5INTVtgjTAwVg=; b=CDSmGOZdQPQ2xBdyrKrMXp
+	expcylQ0/Sh58AvAzdwW3lb/H6u+GMg8nfq3jctAqMgPSSO6nDN/7MjdFWxB0Qxw
+	aiP78nPxC2V4I88QmEFWs+BzsxQuVSGEjMNuQfd7RIjWYEd5HOJ2dmgDtWkCu/DZ
+	XvNm9iQktkCgeXLu3eCacdDkxVzY8uvVAX8XnNFUIYY1v0OmZCSMAoUoIiO4wQOw
+	qZUmSc8C3VBz3U5/pENUJYruZk3rLMT/0QiTpsI+Bemj0eR5yQYpuGC/W7B6C4ym
+	jKJBd0CzxJHYqyN9aKbuTcPaA8vvengpqn0VZ92Xy2mTnpsd/jROH/HlN4CQwZfg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46eusrrgnn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 May 2025 12:45:15 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 545C8DM5002728;
+	Mon, 5 May 2025 12:45:14 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46dxfnp7v6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 May 2025 12:45:14 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 545CjAQh56623454
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 5 May 2025 12:45:10 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5DEEF20043;
+	Mon,  5 May 2025 12:45:10 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3EB7D20040;
+	Mon,  5 May 2025 12:45:10 +0000 (GMT)
+Received: from [9.111.162.37] (unknown [9.111.162.37])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  5 May 2025 12:45:10 +0000 (GMT)
+Message-ID: <9c50b5ad-39ae-4c0e-ac9b-ee95e8b7e8b0@linux.ibm.com>
+Date: Mon, 5 May 2025 14:45:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: s390/sha512 - Fix sha512 state size
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Holger Dengler <dengler@linux.ibm.com>, linux-crypto@vger.kernel.org,
+        Harald Freudenberger <freude@linux.ibm.com>
+References: <632df0c6adc88f82d27bbabcc3fc6d7f@linux.ibm.com>
+ <aBCX_l0kSHVx4xQn@gondor.apana.org.au>
+Content-Language: en-US, de-DE
+From: Ingo Franzki <ifranzki@linux.ibm.com>
+In-Reply-To: <aBCX_l0kSHVx4xQn@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HXn7LYSyB806AsiPOrXavZgAB1SIbl20
+X-Authority-Analysis: v=2.4 cv=dMSmmPZb c=1 sm=1 tr=0 ts=6818b2db cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=9qcPPypGzFYYKdnir20A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: HXn7LYSyB806AsiPOrXavZgAB1SIbl20
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA1MDExNiBTYWx0ZWRfX45OkBb3tQnXE Qzw83BxmaltJMBWmOvtGouD2qrD/N44WeztjNiLUYdbxaqTmdYo/XD+KVSPrbtRL0Ne2y8MaT+n S8o5QfPoawitXYjCBE35ZHii8IpnA7V+uhKRKxiMbqMeLI0P/4nyFdaF+sur4PSyKHX/TP6Vc3k
+ V3ULtc7OvSqGBNZ4RZkNxngQqqbjFHLerdoHcF1kpIXRbNnFfjhxLc2YU1qvQWcm++hZX2rbRV6 WLf8NQkleqoUiL2HG1AzvUVHpIF1IZnfWXopB0QqR7gU2HXpndjWRhoTePQYYFO1y4EURYWT7pT jQFDsrUruyCxjlL3IWsKTu08587kb1l3RTSz+hsMOgYRX5LBYlEdAlVfoN4C1EwxJRHueoYIgOS
+ WLlad1IBVM1pQIf/6vGXEIrd2Th0YWmpYw/96HQ9Em7VOS7wLtOnPnm8C6pAVxRiI70FFVdK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-05_05,2025-04-30_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1011 mlxlogscore=999 bulkscore=0 spamscore=0 suspectscore=0
+ adultscore=0 mlxscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2505050116
+
+On 29.04.2025 11:12, Herbert Xu wrote:
 
 
-On Wed, 30 Apr 2025 18:16:33 +0200, Nicolas Frattaroli wrote:
-> Gee Nicolas, how come your mom lets you write two Rockchip HWRNG drivers
-> in a year?
-> 
-> In short, RK3576 (and RK3562 and RK3528) introduce another HWRNG IP. It
-> actually has quite a few cool features, but I ignored the cool bits and
-> went straight for the true entropy. Some of the cool bits someone else
-> may wish to add in the future: AES-CTR PRNG that's regularly reseeded
-> from the entropy, adjustments for oscillator and oscillator ring lengths
-> to maximise entropy generation, automatic continuous quality checking of
-> the produced entropy by the hardware itself, etc.
-> 
-> [...]
+> diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
+> index 14818fcc9cd4..3c5175e6dda6 100644
+> --- a/arch/s390/crypto/sha512_s390.c
+> +++ b/arch/s390/crypto/sha512_s390.c
+> @@ -22,13 +22,13 @@ static int sha512_init(struct shash_desc *desc)
+>  	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
+>  
+>  	ctx->sha512.state[0] = SHA512_H0;
+> -	ctx->sha512.state[2] = SHA512_H1;
+> -	ctx->sha512.state[4] = SHA512_H2;
+> -	ctx->sha512.state[6] = SHA512_H3;
+> -	ctx->sha512.state[8] = SHA512_H4;
+> -	ctx->sha512.state[10] = SHA512_H5;
+> -	ctx->sha512.state[12] = SHA512_H6;
+> -	ctx->sha512.state[14] = SHA512_H7;
+> +	ctx->sha512.state[1] = SHA512_H1;
+> +	ctx->sha512.state[2] = SHA512_H2;
+> +	ctx->sha512.state[3] = SHA512_H3;
+> +	ctx->sha512.state[4] = SHA512_H4;
+> +	ctx->sha512.state[5] = SHA512_H5;
+> +	ctx->sha512.state[6] = SHA512_H6;
+> +	ctx->sha512.state[7] = SHA512_H7;
+>  	ctx->count = 0;
+>  	ctx->sha512.count_hi = 0;
+>  	ctx->func = CPACF_KIMD_SHA_512;
 
-Applied, thanks!
+We still get one selftest failure on sha384:
 
-[3/3] arm64: dts: rockchip: add RK3576 RNG node
-      commit: 5268f3b5d29887480011b44567bcbf0d422cda94
+/proc/crypto:
+name         : sha384
+driver       : sha384-s390
+module       : sha512_s390
+priority     : 300
+refcnt       : 1
+selftest     : unknown   <---------
+internal     : no
+type         : shash
+blocksize    : 128
+digestsize   : 48
 
-Best regards,
+Syslog:
+alg: shash: sha384-s390 test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
+
+Shouldn't the sha384_init() function also use array indexes 0-7 like your fix in sha512_init() ?
+It currently is:
+
+ static int sha384_init(struct shash_desc *desc)
+ {
+ 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
+ 
+ 	*(__u64 *)&ctx->state[0] = SHA384_H0;
+ 	*(__u64 *)&ctx->state[2] = SHA384_H1;
+ 	*(__u64 *)&ctx->state[4] = SHA384_H2;
+ 	*(__u64 *)&ctx->state[6] = SHA384_H3;
+ 	*(__u64 *)&ctx->state[8] = SHA384_H4;
+ 	*(__u64 *)&ctx->state[10] = SHA384_H5;
+ 	*(__u64 *)&ctx->state[12] = SHA384_H6;
+ 	*(__u64 *)&ctx->state[14] = SHA384_H7;
+ 	ctx->count = 0;
+ 	ctx->func = CPACF_KIMD_SHA_512;
+ 
+ 	return 0;
+ }
+
 -- 
-Heiko Stuebner <heiko@sntech.de>
+Ingo Franzki
+eMail: ifranzki@linux.ibm.com  
+Tel: ++49 (0)7031-16-4648
+Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen
+Geschäftsführung: David Faller
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
+IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
