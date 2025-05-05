@@ -1,252 +1,90 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A3E24EA9D
-	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610674683;
+	Mon,  5 May 2025 13:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746449876; cv=none; b=Rl1hUwxdWd73gu4httdLve//3b4ASbqid1vXrdcxpfwoHBKMHrYcti2Jt0+hsUD0viGrhF+xElRqvu2/mvtYN15eHiJZJ/TyMnPXu69rbaOtk6l6jz0H6Qf8KIwcP5u5GklcNrPUKZK5Pu2mBN1UbPGvMxfKo56LgdVdpFlYEBw=
+	t=1746450110; cv=none; b=rsw+2RrMPUO8UO25l9MreLmRaQ2DAW+1ngzj+ERTbaYvmMqosokQOVg82Btpi4KEkDCWn2dRjtrv/fZJUusbcNU4scNt5caVlL1MUvN6Lq6+KdiISll23HZOBi1VQNccjKqT/r3tAjX2eUxKti5fLtLh9VRoRXXlicY0pBCSdig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746449876; c=relaxed/simple;
-	bh=8oUH1gindRCn95AykEyqq+bxw3pe7IGaCCKXayWmVwU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hV0bJ7JoeFjoJuqACSUcctYniGEOSnMwfu8bV1cDiQ4I+GUIoPsWVD8Ll4qlDIEvuDSg4/xSu+IwSZOiHv1cW08GuGLrOAdmJe4Y+I/fR/gaMqkUJXC4kVDSQb2GXlhNhNUOrxsqdMs75PaTRq+cyUJIzAo805cF5qcDQY8ZxHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=n/d0gole; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1746450110; c=relaxed/simple;
+	bh=HWtpxq8VSbL7osdg/n3YvEAARAvRWdjvgKI8goZ9yrg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Plcp4fxJFGakoL06UGIkj71vReE9+flFNnsWUV6rZ+3rDONlflpO0NieXS4aG+p1UedD2BNq8pR1pLfpVHB2Cf4lPymY5/VrVpYgkbDTKGpzYTvSt14a3M4HDfukzFkEilrY2SthxG8+iQwU67YSuvK+tr+OxGKjuED72dFtEWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=G/pbePtf; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="n/d0gole"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af6a315b491so4011362a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 05:57:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1746449874; x=1747054674; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OT2S9CIDCEY28yXqIqPSnPzbGUeYFCEUZbs68pYw7Bw=;
-        b=n/d0goletsPdkyPTk/eD2xgTB4arKP0YEJEuLZ59D5CWD9cGOOwDHMHIMB2vcYTFdB
-         ped/8AHZszHDe5JgommzyzAB1N6BVJmj64eZauBeh1oCGVs3LjUe3YF+LfSJ47ORI3qn
-         bGhGy85VMnkosOuNHZK/ZuFsieAeXzHSd9yyw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746449874; x=1747054674;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OT2S9CIDCEY28yXqIqPSnPzbGUeYFCEUZbs68pYw7Bw=;
-        b=ZYMb8goLzka53rFT9YN0YPCwCjHE0/oxIs+KYHYeLwvcjtdZjbirk3DeOvOq5dwhcg
-         Yr8bRFiWXgoIOXuWESl+gdnahVRe3KqY9Pywvo+XROiS73wXJue2iHh1CGB75MLxOK79
-         sYFtI5FF42bGDhO0RAWlXeN+Rqt9d0BEJ3Nlgo6ihYJexjQ8XyGIQQ5v7UKoX7kaGL4N
-         fKJsRbJsEe1KYu7ANbtW0ITVoD8kUB+DUCg5tqOyEcxKn38m8uVgV7HGZvWxpRzUTy2Q
-         qddFPUzOSch4gCUyL2leVreEFfAvWhmISX5nd2pGwBl+UBxzor8okJHHGHAwHiTPXbg6
-         hPJw==
-X-Gm-Message-State: AOJu0YxFzcn+s6H0LpqvWDF6IO78HYs0fWaJnX32xrk/tj5oVScKLbx+
-	4cCY165swDpzcD3vDcht3ER6tkURcP/52aU8MjxTTFjWc680xVCcLlD5AiGnLSWn/qmixB6tkka
-	5
-X-Gm-Gg: ASbGnct6H8ckPbtwM0W8o6E1yFNQY/MVapnhMj5QTJy7mhmoQfkp4ouJg/fhUIG4pMO
-	tgJXagsWXugZnJjUpH+Ht4GlqVnMi+qpNp8zo2NkZixvzdmZ3NmratBWIJy4RxDy0Kk9E0To8A4
-	3n6iblBX2ijcoc5grQ7PefBlgF8CUqub2VqJjTjFi2mHOHfuFHxiV7FRk9XlOe2l0z4rKSlBnsZ
-	ol++JF6qOZWAB8LilEcJibuhLvx4QB160tOF7AWNc7rZ0Sxmi9n1Hgmy5AX3iQLAqsS8D12trfP
-	HrMM5AYjQeJ+3Z8KiL8HZXlmsQfUxryTf4EdTmOHdmL0FoB76yydsOAZN/EpsQ5o
-X-Google-Smtp-Source: AGHT+IG7EfH+S1yfDkjwtm2EFBSqfUuDVwnWJ+U6WeyJDohkZTH/ayy7+72RN9E3Rghf+/qo2mmsxA==
-X-Received: by 2002:a17:90b:2f10:b0:2ee:8ea0:6b9c with SMTP id 98e67ed59e1d1-30a6197c0fbmr14246738a91.12.1746449873998;
-        Mon, 05 May 2025 05:57:53 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fc6fsm53559565ad.145.2025.05.05.05.57.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 05:57:53 -0700 (PDT)
-From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-To: linux-crypto@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="G/pbePtf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=WBYMe8AWciFRbGt/UH6lyqSHdnAGgD4jpjABIeG45Ss=; b=G/pbePtf629UUQemqdlgBwP/jR
+	MZV+7whYgmJ/tAJLSU+DLyqCxZ/wfKCgiDyKBYAfD1wpq88Eu8+7hPhfNwcNJcHvbYUTsRYld6gyi
+	Vzt9xbaQYFL6tKFKTRveu/knLvUBh+thg5wLRJpoEpgJadUBlIRLHtza6Kizff+5la/rQMNIFEiCO
+	GKL5qQMaJ75xsZpMB81aB0HsJoV6bL6kEpR5OC6723rGQezQeFzKGcqEL9COaPSx2ITSiX21OoIC0
+	Uc0vDch+cxHvVi5mbuRSPsEouddLoxf80+lxq6bWHL0wFwh0+9xub7lByQds7VRztvPVUAWJ3gn1c
+	K6hodFqg==;
+Received: from i53875a1d.versanet.de ([83.135.90.29] helo=localhost.localdomain)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1uBvRd-0006mT-UT; Mon, 05 May 2025 15:01:18 +0200
+From: Heiko Stuebner <heiko@sntech.de>
+To: Daniel Golle <daniel@makrotopia.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: Heiko Stuebner <heiko@sntech.de>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	kernel@collabora.com,
+	linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	robh@kernel.org
-Cc: Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v2 6/6] Add SPAcc Kconfig and Makefile
-Date: Mon,  5 May 2025 18:25:38 +0530
-Message-Id: <20250505125538.2991314-7-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
-References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: (subset) [PATCH 0/3] RK3576 Hardware RNG
+Date: Mon,  5 May 2025 15:01:07 +0200
+Message-ID: <174645006215.1225797.3007982185133849135.b4-ty@sntech.de>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
+References: <20250430-rk3576-hwrng-v1-0-480c15b5843e@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 
-Add Makefile and Kconfig for SPAcc driver.
+On Wed, 30 Apr 2025 18:16:33 +0200, Nicolas Frattaroli wrote:
+> Gee Nicolas, how come your mom lets you write two Rockchip HWRNG drivers
+> in a year?
+> 
+> In short, RK3576 (and RK3562 and RK3528) introduce another HWRNG IP. It
+> actually has quite a few cool features, but I ignored the cool bits and
+> went straight for the true entropy. Some of the cool bits someone else
+> may wish to add in the future: AES-CTR PRNG that's regularly reseeded
+> from the entropy, adjustments for oscillator and oscillator ring lengths
+> to maximise entropy generation, automatic continuous quality checking of
+> the produced entropy by the hardware itself, etc.
+> 
+> [...]
 
-Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
----
- drivers/crypto/Kconfig            |   1 +
- drivers/crypto/Makefile           |   1 +
- drivers/crypto/dwc-spacc/Kconfig  | 103 ++++++++++++++++++++++++++++++
- drivers/crypto/dwc-spacc/Makefile |  16 +++++
- 4 files changed, 121 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
+Applied, thanks!
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 5686369779be..f3074218a4de 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -754,6 +754,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
- 
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 22eadcc8f4a2..c933b309e359 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -43,6 +43,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-y += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
-diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
-new file mode 100644
-index 000000000000..e43309fd76a3
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Kconfig
-@@ -0,0 +1,103 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+config CRYPTO_DEV_SPACC
-+	tristate "Support for dw_spacc Security Protocol Accelerator"
-+	depends on HAS_DMA
-+	default n
-+
-+	help
-+	  This enables support for SPAcc Hardware Accelerator.
-+
-+config CRYPTO_DEV_SPACC_CIPHER
-+	bool "Enable CIPHER functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_LIB_DES
-+	select CRYPTO_AES
-+	select CRYPTO_CBC
-+	select CRYPTO_ECB
-+	select CRYPTO_CTR
-+	select CRYPTO_XTS
-+	select CRYPTO_CTS
-+	select CRYPTO_OFB
-+	select CRYPTO_CFB
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_CHACHA20
-+
-+	help
-+	  Say y to enable Cipher functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_HASH
-+	bool "Enable HASH functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_HASH
-+	select CRYPTO_SHA1
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
-+	select CRYPTO_HMAC
-+	select CRYPTO_SM3
-+	select CRYPTO_CMAC
-+	select CRYPTO_MICHAEL_MIC
-+	select CRYPTO_XCBC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+
-+	help
-+	  Say y to enable Hash functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AEAD
-+	bool "Enable AEAD functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
-+	select CRYPTO_AES
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_CHACHAPOLY1305
-+	select CRYPTO_GCM
-+	select CRYPTO_CCM
-+
-+	help
-+	  Say y to enable AEAD functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AUTODETECT
-+	bool "Enable Autodetect functionality"
-+	depends on CRYPTO_DEV_SPACC
-+	default y
-+	help
-+	  Say y to enable Autodetect functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_IO
-+	bool "Enable Trace MMIO reads/writes stats"
-+	depends on CRYPTO_DEV_SPACC
-+	default n
-+	help
-+	  Say y to enable Trace MMIO reads/writes stats.
-+	  To Debug and trace IO register read/write oprations.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_DDT
-+	bool "Enable Trace DDT entries stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable Enable DDT entry stats.
-+	  To Debug and trace DDT opration
-+
-+config CRYPTO_DEV_SPACC_SECURE_MODE
-+	bool "Enable Spacc secure mode stats"
-+	default n
-+	depends on CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable SPAcc secure modes stats.
-+
-+config CRYPTO_DEV_SPACC_PRIORITY
-+	int "VSPACC priority value"
-+	depends on CRYPTO_DEV_SPACC
-+	range 0 15
-+	default 1
-+	help
-+	  Default arbitration priority weight for this Virtual SPAcc instance.
-+	  Hardware resets this to 1. Higher values means higher priority.
-diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc/Makefile
-new file mode 100644
-index 000000000000..bf46c8e13a31
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Makefile
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_SPACC) += snps-spacc.o
-+snps-spacc-objs = spacc_hal.o spacc_core.o \
-+spacc_manager.o spacc_interrupt.o spacc_device.o
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_HASH),y)
-+snps-spacc-objs += spacc_ahash.o
-+endif
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_CIPHER),y)
-+snps-spacc-objs += spacc_skcipher.o
-+endif
-+
-+ifeq ($(CONFIG_CRYPTO_DEV_SPACC_AEAD),y)
-+snps-spacc-objs += spacc_aead.o
-+endif
+[3/3] arm64: dts: rockchip: add RK3576 RNG node
+      commit: 5268f3b5d29887480011b44567bcbf0d422cda94
+
+Best regards,
 -- 
-2.25.1
-
+Heiko Stuebner <heiko@sntech.de>
