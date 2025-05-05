@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E782561C2;
-	Mon,  5 May 2025 15:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954D825CC41;
+	Mon,  5 May 2025 15:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746460142; cv=none; b=XBePqsAE9GrGxFeSZ0LwJJhuPAWHSCSkA0VVtKnI5zfr36u+pJIxIM9PB80tlOe2oIUT6gbff2bioa3sNmrztcR53hWWzXnYQ3R8vBoDwBn5vbaAZ3zcZnmwQCUfxTRFz4uIbGzffybn5AmRIXxH2XTsArX1kJaMjcymm1kbZlE=
+	t=1746460334; cv=none; b=tX/sh4d7kj5d6b5S5M+2yRCMAVfQeBI2eCWSrOoV7i05WxpkoZ2hWh3uKZT/FyWrXOHiFk8uS8/PMjQuqvTG526iMY8WqTZPsJXWVTrQF4qeo6w/PTPMsYn1Yv4sj3V55nlQfb+ncxEwo70HJjAqMtMPdExh33I7S3LAWJBQ/sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746460142; c=relaxed/simple;
-	bh=tNdJlfxtfHWQAARGwoyWKnpx70MF3hIPr6+xkdRMw6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EIGASIvSQL+RsEHkH383YKnAXqeA/eUSHFklRQH7BexP3x8MRSv3p1xuDI8eQ5ok8VqDdGF7N3L8ci7kK444h9ihM2rHV9mOyBuyR4Mvq+khL6FUIZXWcvCVjWmGpbxW2wiv//FKEei51/pn6NyGR63Le0/3pqLxdzZpYMvSVTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4sMa5mg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746460334; c=relaxed/simple;
+	bh=oHipo9l1DkopI6YNyKNW6X3HfiXeMdT87CEtPWAXtEM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Xeq5RvxSzq53EqV2HFSgggESRiwhIEphGs163gsSBN1NAjeDM3YP7z+a+B1VMAJYSouqyPnL6A8sJV7jf7lj+8pVXL+t1tgxzKOG9REQ+bYFl1IFHrxBV8EFJRk/mdcboD8RSGL2sVmzJxa3Wq2wMq7EOhJAZX2ALp9jdxk6xMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qj7kyvYb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4sMa5mg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 295CBC4CEE4;
-	Mon,  5 May 2025 15:48:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qj7kyvYb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A16C4CEE4;
+	Mon,  5 May 2025 15:52:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746460141;
-	bh=tNdJlfxtfHWQAARGwoyWKnpx70MF3hIPr6+xkdRMw6o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e4sMa5mg9/80nQp5jxlKMvorQz/69Omm/kVIG1CTygwri+HeGeSSM0ziFkECulLZR
-	 gcxcfEOx6w+gOD7TPgecPOOtdCk/NAyY0jB8oq0VclsIGkv0Xz19uxZm93PIAenCJi
-	 jdgHZqb7bq26F6WTDckm7qXbkrySRAtblcd1ic6V3OhJ6WC7z0xrIe7qf51KDWRwSs
-	 gI9Qtf2hQjh/tRayxfRKBtaJQX3DtR3F3MG1Uw3bvzBoZiTDNPlDwdM+JI+s1dHsww
-	 /QwUPGbRcDhPCGpA67IR0k+XaOodbtMwxr0eUyLBGNqtooSLaGQsVPXA5CqSGWkDTL
-	 P/EgHJbd/DeQA==
-Message-ID: <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
-Date: Mon, 5 May 2025 17:48:56 +0200
+	s=k20201202; t=1746460334;
+	bh=oHipo9l1DkopI6YNyKNW6X3HfiXeMdT87CEtPWAXtEM=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=qj7kyvYbsMwMdcYFQp6sDXx9OlsDHdY5Mbnga6AGOZxOs7Wnf+r06eQF1jxR+Jw+l
+	 y+lr2GUVDXEVor5y864zXPJt4GCqRH6u8D2XXttRwFwkWTtbOnC0RJDl85fKEoPQ8v
+	 Gz2HMI4SNY8tpKM8zJ4YMmUDfpYk2ZwGPd0ZTs1+AG4b8qSKvrdbdY1oyyn6bPhgS6
+	 09JRBy1mTRiCzcgyMgwKA1fGqO+daC1c1WSHlAaqRSSlYb/T8IQzXOmjQaF+hDvjjL
+	 nRFFV2woGBxsUdYCG83LQifxNVjY+JpB6xuWcNgyP3ujphhnPWjAZLjVWNWrJDO8Bw
+	 xbmCI/oMdz5bQ==
+Message-ID: <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
+Date: Mon, 5 May 2025 17:52:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,6 +36,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
+From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
  linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  herbert@gondor.apana.org.au, robh@kernel.org
@@ -43,7 +44,7 @@ Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
  adityak@vayavyalabs.com, Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
 References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
  <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -88,38 +89,40 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/05/2025 14:55, Pavitrakumar M wrote:
-> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+On 05/05/2025 17:48, Krzysztof Kozlowski wrote:
+> On 05/05/2025 14:55, Pavitrakumar M wrote:
+>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+>>
+>> Add DT bindings related to the SPAcc driver for Documentation.
+>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+>> Engine is a crypto IP designed by Synopsys.
+>>
+>> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+>> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+>> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+>> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
 > 
-> Add DT bindings related to the SPAcc driver for Documentation.
-> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
-> Engine is a crypto IP designed by Synopsys.
 > 
-> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> I do not see any improvements. It seems you ignored all comments, not
+> single one was responded to or addressed.
+> 
+> NAK
+> 
+> <form letter>
+> This is a friendly reminder during the review process.
+> 
+> It seems my or other reviewer's previous comments were not fully
+> addressed. Maybe the feedback got lost between the quotes, maybe you
+> just forgot to apply it. Please go back to the previous discussion and
+> either implement all requested changes or keep discussing them.
+> 
 
-
-I do not see any improvements. It seems you ignored all comments, not
-single one was responded to or addressed.
-
-NAK
-
-<form letter>
-This is a friendly reminder during the review process.
-
-It seems my or other reviewer's previous comments were not fully
-addressed. Maybe the feedback got lost between the quotes, maybe you
-just forgot to apply it. Please go back to the previous discussion and
-either implement all requested changes or keep discussing them.
-
-Thank you.
-</form letter>
+Hm, actually I see now email you responded to some but ignored several
+others, so still a no.
 
 Best regards,
 Krzysztof
