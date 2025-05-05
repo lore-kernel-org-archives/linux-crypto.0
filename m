@@ -1,132 +1,175 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C733217C98;
-	Mon,  5 May 2025 17:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08651A3056;
+	Mon,  5 May 2025 17:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746466209; cv=none; b=gkdzIXxMmHH/iFY11c/1tHzGeiK1CgGKWpdn6RqBZt3La/0bpSY7o073uLbs4+4N1gmDYGbrvqJ/tmPTEAcBiuBVmgirKwfxVixuqXmboOPCaM4WgddEMI6KpjqlNJPcw4xT8bfMBDAP38BPiiTziYMYlSEtk2FrV+hOVTZBWC8=
+	t=1746467557; cv=none; b=sY5v+zf6it7Dof8DUYAovO3GlmhPTxwdsxqop06kvdR/KqA2+U0IYPbFeYa/sPuZDeDcsmg3iUKKBnSZooKvlHWXiZWZMUjfo6cmYT7IE26GkqmMeDsssOQdEiVKa2VPhClU3jriUoJ8eddfx2bho0wz4OPi/pTconme5M2es/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746466209; c=relaxed/simple;
-	bh=R+GwlfGZoPlwh3YnWX8HPEVZTkofAG51fiG2PtNEH88=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Zn56ai+URqSKDxhppg1FKTtIfObTBWCuNCvpzMtYwTETffr1K7Ds+xQsOLOcdLkfR9JYUhxoOm2QAZRtu3BQNDNevBiYq4nVKVJ+zxNa19wFaBqdIv9G1V5igVuQbuXR9P2JOdSOnc62dAjT9vjNlh7H1hheZrPXLT7kphS5OGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=kOvVcZpQ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1746467557; c=relaxed/simple;
+	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mxILYlid0zvVeHiRz0EdvB/IYdVrW6pxHk6mBezFWnaPRmOyMMOnJDuIqa5ckCifCFl6pWtTKVgvNSQiztF2XPX4xuaRuHttLB0IcPfaQTrBbGhLd+elPW44rwlqlNr6uAjDf1xCsRsI12dwzS+CH1ZdNAvYjcmyp0hpAUyrN/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrFsSaO/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="kOvVcZpQ"
-Received: from narnia (unknown [40.78.12.133])
-	by linux.microsoft.com (Postfix) with ESMTPSA id E0D5F2115DC3;
-	Mon,  5 May 2025 10:30:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E0D5F2115DC3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1746466207;
-	bh=L5eUFsHvaH45uDsjDJjMZQptT9OSECb9z18nACTP45M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=kOvVcZpQ3T9sSH7pJ/HqSNP3wky0HxKFyWnu3+U7tjF1uLifCwAjeQCk7o7kn4hxM
-	 TFP3TzAMaTUbH/qAfIWuql1lE8KMJwB3+zRXEdgn3Dflf/I2scqy3aWQzbYogVDthy
-	 x3GkXKAcpGXd74KgoFzFnVhX8w1D1WUABHFiQ5dY=
-From: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-To: KP Singh <kpsingh@kernel.org>
-Cc: James.Bottomley@hansenpartnership.com, bpf@vger.kernel.org,
- code@tyhicks.com, corbet@lwn.net, davem@davemloft.net,
- dhowells@redhat.com, gnoack@google.com, herbert@gondor.apana.org.au,
- jarkko@kernel.org, jmorris@namei.org, jstancek@redhat.com,
- justinstitt@google.com, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-security-module@vger.kernel.org,
- llvm@lists.linux.dev, masahiroy@kernel.org, mic@digikod.net,
- morbo@google.com, nathan@kernel.org, neal@gompa.dev,
- nick.desaulniers+lkml@gmail.com, nicolas@fjasle.eu, nkapron@google.com,
- paul@paul-moore.com, roberto.sassu@huawei.com, serge@hallyn.com,
- shuah@kernel.org, teknoraver@meta.com, xiyou.wangcong@gmail.com, KP Singh
- <kpsingh@kernel.org>
-Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
-In-Reply-To: <20250502210034.284051-1-kpsingh@kernel.org>
-References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
- <20250502210034.284051-1-kpsingh@kernel.org>
-Date: Mon, 05 May 2025 10:30:03 -0700
-Message-ID: <87o6w7ge3o.fsf@microsoft.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrFsSaO/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A49C4CEE4;
+	Mon,  5 May 2025 17:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746467556;
+	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GrFsSaO/rc5NtMJpnqe/lDFOwhuNGiijkItvt4S7Dl6WQdwK53uxHqqI6jUNG+qlK
+	 Y3o0WbevDK7KU+DAXO4j2Ko/caQ1qSb1JQAZJC3L7wPgy0lz/kNCaMSQ1lZ4/5hTdx
+	 JSMpqE21g9ySrJ+Bv8hq7ZUhLTotzRxchKiIsJDjPvVNB4V43i9ajouo2lmF8BA4vb
+	 c4lGkGcmZUbbIrCXsBS4Oc/V6+M9MArYDDC920EnMDebr0u8hq9ye+R1itIWb20P/x
+	 YNQ+mFyBUP3wHNnCJsa5xuyaHHCJng795ZBLx9n/30ErfOdsbia+f3TVfDm+ddH3CT
+	 RtD2/5dWf9DTw==
+Date: Mon, 5 May 2025 20:52:32 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 00/15] Enable Inbound IPsec offload on
+ Marvell CN10K SoC
+Message-ID: <20250505175232.GN5848@unreal>
+References: <20250502132005.611698-1-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-1-tanmay@marvell.com>
 
-KP Singh <kpsingh@kernel.org> writes:
+On Fri, May 02, 2025 at 06:49:41PM +0530, Tanmay Jagdale wrote:
+> This patch series adds support for inbound inline IPsec flows for the
+> Marvell CN10K SoC.
 
-[...]
+It will be much easier if in commit messages and comments you
+will use kernel naming, e.g. "IPsec packet offload" and not "inline IPsec", e.t.c.
 
-> Now if you really care about the use-case and want to work with the maintainers
-> and implement signing for the community, here's how we think it should be done:
->
-> * The core signing logic and the tooling stays in BPF, something that the users
->   are already using. No new tooling.
-> * The policy decision on the effect of signing can be built into various
->   existing LSMs. I don't think we need a new LSM for it.
-> * A simple UAPI (emphasis on UAPI!) change to union bpf_attr in uapi/bpf.h in
->   the BPF_PROG_LOAD command:
->
-> __aligned_u64 signature; 
-> __u32 signature_size;
+Also, I'm wonder, do you have performance numbers for this code?
 
-I think having some actual details on the various parties' requirements
-here would be helpful. KP, I do look forward to seeing your design;
-however, having code signing proposals where the capabilities are
-dictated from above and any dissent is dismissed as "you're doing it
-wrong" isn't going to be helpful to anyone that needs to use this in
-practice.
+Thanks
 
-Also, I don't think anyone actually cares, at least I don't, who calls
-verify_pkcs7_signature or whatnot. Verifying signed binary blobs with a
-private key is a solved problem and isn't really interesting.
-
-Our requirements for code signing are just an extension of secure boot
-and module signing logic:
-
-* Prove all code running in ring zero has been signed
-* Not trivially defeatable by root
-* Ultimately, no trusted userspace components
-* Secure from and not vulnerable to TOCTOU attacks
-* Shouldn't be overly vulnerable to supply-chain attacks
-* The signature checking logic and control paths should be human-readable
-* Work easily and be backportable to stable kernels
-* There should be a simple kconfig option to turn this on or off
-* This solution needs to be in the mainline kernel
-
-Hornet was implemented to meet those requirements, living in the LSM
-subsystem, written in C. As of today, one cannot accomplish those
-requirements via BPF-LSM, which is why C was chosen.
-
-One can easily realize there is absolutely no way to have a single
-one-size-fits-all signing solution for everything listed in
-https://ebpf.io/applications/.
-
-If you want to go the UAPI route, I would wholeheartedly recommend
-making it extensible and having this data be available to the policy
-LSMs.
-
-enum bpf_signature_type {
-  /* x509 signature check against program instructions only */
-  BPF_SIGNATURE_PROG_ONLY = 0,
-  /* x509 combined signature check against program instructions and used maps */
-  BPF_SIGNATURE_PROG_USED_MAPS = 1,
-  /* more of these to be determined via usage */ 
-  ...
-};
-
-_aligned_u64 signature; 
-__u32 signature_size;
-__u32 signature_type;
-
-The other option for solving this in the general is in-kernel
-loaders. That's gotten pushback as well. 
-
--blaise
-
-
-
-
-
+> 
+> The packet flow
+> ---------------
+> An encrypted IPSec packet goes through two passes in the RVU hardware
+> before reaching the CPU.
+> First Pass:
+>   The first pass involves identifying the packet as IPSec, assigning an RQ,
+>   allocating a buffer from the Aura pool and then send it to CPT for decryption.
+> 
+> Second Pass:
+>   After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
+>   bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
+>   bytes of the decrypted packet which would help NIXRX in classification.
+>   CPT also sets BIT(11) of channel number to further help in identifcation.
+>   NIXRX allocates a new buffer for this packet and submits it to the CPU.
+> 
+> Once the decrypted metapacket packet is delivered to the CPU, get the WQE
+> pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
+> complete decrypted packet. We create an skb using this, set the relevant
+> XFRM packet mode flags to indicate successful decryption, and submit it
+> to the network stack.
+> 
+> 
+> Patches are grouped as follows:
+> -------------------------------
+> 1) CPT LF movement from crypto driver to RVU AF
+>     0001-crypto-octeontx2-Share-engine-group-info-with-AF-dri.patch
+>     0002-octeontx2-af-Configure-crypto-hardware-for-inline-ip.patch
+>     0003-octeontx2-af-Setup-Large-Memory-Transaction-for-cryp.patch
+>     0004-octeontx2-af-Handle-inbound-inline-ipsec-config-in-A.patch
+>     0005-crypto-octeontx2-Remove-inbound-inline-ipsec-config.patch
+> 
+> 2) RVU AF Mailbox changes for CPT 2nd pass RQ mask, SPI-to-SA table,
+>    NIX-CPT BPID configuration
+>     0006-octeontx2-af-Add-support-for-CPT-second-pass.patch
+>     0007-octeontx2-af-Add-support-for-SPI-to-SA-index-transla.patch
+>     0008-octeontx2-af-Add-mbox-to-alloc-free-BPIDs.patch
+> 
+> 3) Inbound Inline IPsec support patches
+>     0009-octeontx2-pf-ipsec-Allocate-Ingress-SA-table.patch
+>     0010-octeontx2-pf-ipsec-Setup-NIX-HW-resources-for-inboun.patch
+>     0011-octeontx2-pf-ipsec-Handle-NPA-threshhold-interrupt.patch
+>     0012-octeontx2-pf-ipsec-Initialize-ingress-IPsec.patch
+>     0013-octeontx2-pf-ipsec-Manage-NPC-rules-and-SPI-to-SA-ta.patch
+>     0014-octeontx2-pf-ipsec-Process-CPT-metapackets.patch
+>     0015-octeontx2-pf-ipsec-Add-XFRM-state-and-policy-hooks-f.patch
+> 
+> 
+> Bharat Bhushan (5):
+>   crypto: octeontx2: Share engine group info with AF driver
+>   octeontx2-af: Configure crypto hardware for inline ipsec
+>   octeontx2-af: Setup Large Memory Transaction for crypto
+>   octeontx2-af: Handle inbound inline ipsec config in AF
+>   crypto: octeontx2: Remove inbound inline ipsec config
+> 
+> Geetha sowjanya (1):
+>   octeontx2-af: Add mbox to alloc/free BPIDs
+> 
+> Kiran Kumar K (1):
+>   octeontx2-af: Add support for SPI to SA index translation
+> 
+> Rakesh Kudurumalla (1):
+>   octeontx2-af: Add support for CPT second pass
+> 
+> Tanmay Jagdale (7):
+>   octeontx2-pf: ipsec: Allocate Ingress SA table
+>   octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+>   octeontx2-pf: ipsec: Handle NPA threshold interrupt
+>   octeontx2-pf: ipsec: Initialize ingress IPsec
+>   octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+>   octeontx2-pf: ipsec: Process CPT metapackets
+>   octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+> 
+>  .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
+>  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
+>  .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
+>  .../marvell/octeontx2/otx2_cptpf_mbox.c       |  286 +---
+>  .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
+>  .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
+>  .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+>  .../ethernet/marvell/octeontx2/af/common.h    |    1 +
+>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
+>  .../net/ethernet/marvell/octeontx2/af/rvu.c   |    9 +-
+>  .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
+>  .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
+>  .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  706 +++++++++-
+>  .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
+>  .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  230 +++-
+>  .../marvell/octeontx2/af/rvu_nix_spi.c        |  220 +++
+>  .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   16 +
+>  .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1191 ++++++++++++++++-
+>  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  152 +++
+>  .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
+>  .../marvell/octeontx2/nic/otx2_common.h       |   16 +
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
+>  .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
+>  .../marvell/octeontx2/nic/otx2_txrx.c         |   25 +-
+>  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
+>  26 files changed, 2915 insertions(+), 462 deletions(-)
+>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+> 
+> -- 
+> 2.43.0
+> 
+> 
