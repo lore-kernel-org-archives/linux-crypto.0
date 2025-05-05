@@ -1,79 +1,196 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900CA24BCF5;
-	Mon,  5 May 2025 12:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3313F6FC3
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746448139; cv=none; b=aAQV6vXm/6N+Er+ZVBqeA3+FOnjTilhB44EEZ6bzQ+ZzA2GkWWPgBnMlcjqhT7eAg/lUivvnH3VuuThXwxp9uVD8D/RgBbHgvGe7uPafifBOpyfYix+e61CqxzHXqd/iZBAEYQbsIqKYtjvfb+6PHWtOjvTJG1G+x6SpMVQF6M4=
+	t=1746448366; cv=none; b=F/SDOXUJr1RgY4YsUbjFbHeaz5wAeqtlfu3hVtt5N0uJr2jfLtyW3msgBxVXveQDrGW+CpWfD721/VjACHWubYWfwuNjYSzJAH3RehNhZyPdNRqPYMz2yKLwkQFPHFOE1+J79/3mhjpy/Wd4sFPSdWA1nSjJlL8WekmHnm+c32g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746448139; c=relaxed/simple;
-	bh=kcxGWvgQ7OS5T5as6+IFxw5ad5yP5FYRncsZMv/ZIl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OBJg2DyLK45h3eshTxG6ImRHcA1K3yYqkXHFm4uhtbMstvrfieBTKV2y1SvwAr3wZwBWreKqf9caq6EykUvwM7CYrwEsm4UEKfY/KK3o+nRMOdYWTBzVF5M4QEVNCe+pDdZDK+vQ6SUbaEHK7Jtt7zcPmHDBghdzNaW/kaiGq48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=W20ITmkf; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1746448366; c=relaxed/simple;
+	bh=HNUFdAheGCAS5fh5V6LRxONnz1VzpzJy+sd/x/eWalo=;
+	h=Date:Message-Id:From:Subject:To; b=Ka5S1XbnP0YFsZk3SGUr4NOC5wXH+U16eRamYNZh84G7teYfjFX1jnXwUadRMaHOeTKJHQ0RglEmi2bf7kBpQKM1ACXsl0lV6lm59o0lX1WCiwjUCdeRMuRNh3GNyhG3n8UMvJpxN/r9lpJK2/51vT64UJjLDnxzrZVRmdRHg7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NfC+FOPr; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="W20ITmkf"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NfC+FOPr"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=To:Subject:From:Message-Id:Date:Sender:Reply-To:Cc:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=Ca8e9Y3sNqfrAp3cjUV9l5KRXpSXCvVgQ6g+oU+iRkE=; b=W20ITmkf0tV7tzMIkpptoasgb5
-	eZXZz15xpfCV19thXd+8BNpmCUqVjFSzy3+EZ5GhOGH+P3r3jANACcCo8E5bEycaVmG/74hgDDPDT
-	HV4Ck6NHCU8idIiU1ZYz1lwVfp5fx+7RdUv/XNHxsT9JUFlUEYCBqjlQ8UMlEpKJDqnqkjvU2Cl4C
-	da6uXwPIeaFFqclFfCRNPFAQ3slX+idpBwjX/tNzO+WzWbJXDS9vs6yF/ovsAPw5NdSDOQwAgBpLf
-	htgkPUavh2xRIwmZIeq3WbIh8I4TOQtNhjz6H1GNjzWlvESlHxsSDZeH9Xgc5vSaUtogh61D27EAK
-	DvILk6UQ==;
+	bh=SYMgHCMmudGW2BcUDR/0zlfomZn+xuLsKwhbmNfikB8=; b=NfC+FOPryxx4QD7VJOez3Haxij
+	HWG4sv2JUfxnt68oEbyw98L9MxIoextsYEpg1/NpeV9IxHNwdd+fNHpZ4bsa/wM5gJ+6ZpU+nB/1h
+	RNr7u2FM0bBovq9LE79LEqXYGM6Fdrn/MhTIpB7Cbqf+dsJxOrd57fjnAG8kLhVVQt6MrACixowxZ
+	JoLghCE2YjfvId9yOl2j6zBxHNA+4m/TJGr37urn0RNr5UB7mfbXdZB/ivcvm2l+qTviUvlXNcGoW
+	8hggLIPfAzf9KML/LipI2odE5hZLuS8AsdAZAi02M9FzRd1OZ3vWl9bRRi9LLHURYMPrN1PnYahCD
+	vT50e3Pg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uBuvs-003YIl-2N;
-	Mon, 05 May 2025 20:28:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 May 2025 20:28:28 +0800
-Date: Mon, 5 May 2025 20:28:28 +0800
+	id 1uBuzw-003YNO-0V;
+	Mon, 05 May 2025 20:32:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 May 2025 20:32:40 +0800
+Date: Mon, 05 May 2025 20:32:40 +0800
+Message-Id: <1bdf0bc9343ad20885076a17c5c720acfd4a2547.1746448291.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ethan Carter Edwards <ethan@ethancedwards.com>
-Cc: Weili Qian <qianweili@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 0/2] crypto: hisilicon/qm - memory allocation cleanups
-Message-ID: <aBiu7EeisHseyDgU@gondor.apana.org.au>
-References: <20250503-hisilicon_qm-v1-0-d4ebc242bc8a@ethancedwards.com>
+Subject: [PATCH 1/6] crypto: hash - Move core export and import into
+ internel/hash.h
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250503-hisilicon_qm-v1-0-d4ebc242bc8a@ethancedwards.com>
 
-On Sat, May 03, 2025 at 04:21:26PM -0400, Ethan Carter Edwards wrote:
-> This series contains two small cleanups to improve code quality and
-> readability. One removes a sizeof(char) piece of code (because it
-> evaluates to 1 anyways) and one switches to the helper function
-> devm_kcalloc.
-> 
-> Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
-> ---
-> Ethan Carter Edwards (2):
->       crypto: hisilicon/qm - remove sizeof(char)
->       crypto: hisilicon/qm - replace devm_kzalloc with devm_kcalloc
-> 
->  drivers/crypto/hisilicon/qm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> ---
-> base-commit: 37ff6e9a2ce321b7932d3987701757fb4d87b0e6
-> change-id: 20250503-hisilicon_qm-7b581a9b3799
+The core export and import functions are targeted at implementors
+so move them into internal/hash.h.
 
-All applied.  Thanks.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ include/crypto/hash.h          | 48 ----------------------------------
+ include/crypto/internal/hash.h | 48 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 48 deletions(-)
+
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 1760662ad70a..9fc9daaaaab4 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -506,18 +506,6 @@ int crypto_ahash_digest(struct ahash_request *req);
+  */
+ int crypto_ahash_export(struct ahash_request *req, void *out);
+ 
+-/**
+- * crypto_ahash_export_core() - extract core state for message digest
+- * @req: reference to the ahash_request handle whose state is exported
+- * @out: output buffer of sufficient size that can hold the hash state
+- *
+- * Export the hash state without the partial block buffer.
+- *
+- * Context: Softirq or process context.
+- * Return: 0 if the export creation was successful; < 0 if an error occurred
+- */
+-int crypto_ahash_export_core(struct ahash_request *req, void *out);
+-
+ /**
+  * crypto_ahash_import() - import message digest state
+  * @req: reference to ahash_request handle the state is imported into
+@@ -531,18 +519,6 @@ int crypto_ahash_export_core(struct ahash_request *req, void *out);
+  */
+ int crypto_ahash_import(struct ahash_request *req, const void *in);
+ 
+-/**
+- * crypto_ahash_import_core() - import core state
+- * @req: reference to ahash_request handle the state is imported into
+- * @in: buffer holding the state
+- *
+- * Import the hash state without the partial block buffer.
+- *
+- * Context: Softirq or process context.
+- * Return: 0 if the import was successful; < 0 if an error occurred
+- */
+-int crypto_ahash_import_core(struct ahash_request *req, const void *in);
+-
+ /**
+  * crypto_ahash_init() - (re)initialize message digest handle
+  * @req: ahash_request handle that already is initialized with all necessary
+@@ -933,18 +909,6 @@ int crypto_hash_digest(struct crypto_ahash *tfm, const u8 *data,
+  */
+ int crypto_shash_export(struct shash_desc *desc, void *out);
+ 
+-/**
+- * crypto_shash_export_core() - extract core state for message digest
+- * @desc: reference to the operational state handle whose state is exported
+- * @out: output buffer of sufficient size that can hold the hash state
+- *
+- * Export the hash state without the partial block buffer.
+- *
+- * Context: Softirq or process context.
+- * Return: 0 if the export creation was successful; < 0 if an error occurred
+- */
+-int crypto_shash_export_core(struct shash_desc *desc, void *out);
+-
+ /**
+  * crypto_shash_import() - import operational state
+  * @desc: reference to the operational state handle the state imported into
+@@ -959,18 +923,6 @@ int crypto_shash_export_core(struct shash_desc *desc, void *out);
+  */
+ int crypto_shash_import(struct shash_desc *desc, const void *in);
+ 
+-/**
+- * crypto_shash_import_core() - import core state
+- * @desc: reference to the operational state handle the state imported into
+- * @in: buffer holding the state
+- *
+- * Import the hash state without the partial block buffer.
+- *
+- * Context: Softirq or process context.
+- * Return: 0 if the import was successful; < 0 if an error occurred
+- */
+-int crypto_shash_import_core(struct shash_desc *desc, const void *in);
+-
+ /**
+  * crypto_shash_init() - (re)initialize message digest
+  * @desc: operational state handle that is already filled
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index f2bbdb74e11a..ef5ea75ac5c8 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -305,5 +305,53 @@ static inline unsigned int crypto_shash_coresize(struct crypto_shash *tfm)
+ #define HASH_REQUEST_ZERO(name) \
+ 	memzero_explicit(__##name##_req, sizeof(__##name##_req))
+ 
++/**
++ * crypto_ahash_export_core() - extract core state for message digest
++ * @req: reference to the ahash_request handle whose state is exported
++ * @out: output buffer of sufficient size that can hold the hash state
++ *
++ * Export the hash state without the partial block buffer.
++ *
++ * Context: Softirq or process context.
++ * Return: 0 if the export creation was successful; < 0 if an error occurred
++ */
++int crypto_ahash_export_core(struct ahash_request *req, void *out);
++
++/**
++ * crypto_ahash_import_core() - import core state
++ * @req: reference to ahash_request handle the state is imported into
++ * @in: buffer holding the state
++ *
++ * Import the hash state without the partial block buffer.
++ *
++ * Context: Softirq or process context.
++ * Return: 0 if the import was successful; < 0 if an error occurred
++ */
++int crypto_ahash_import_core(struct ahash_request *req, const void *in);
++
++/**
++ * crypto_shash_export_core() - extract core state for message digest
++ * @desc: reference to the operational state handle whose state is exported
++ * @out: output buffer of sufficient size that can hold the hash state
++ *
++ * Export the hash state without the partial block buffer.
++ *
++ * Context: Softirq or process context.
++ * Return: 0 if the export creation was successful; < 0 if an error occurred
++ */
++int crypto_shash_export_core(struct shash_desc *desc, void *out);
++
++/**
++ * crypto_shash_import_core() - import core state
++ * @desc: reference to the operational state handle the state imported into
++ * @in: buffer holding the state
++ *
++ * Import the hash state without the partial block buffer.
++ *
++ * Context: Softirq or process context.
++ * Return: 0 if the import was successful; < 0 if an error occurred
++ */
++int crypto_shash_import_core(struct shash_desc *desc, const void *in);
++
+ #endif	/* _CRYPTO_INTERNAL_HASH_H */
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
