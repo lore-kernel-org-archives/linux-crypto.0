@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1A04A1D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5996926E175
 	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 19:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746472297; cv=none; b=t1cHWi1re1zFYs7e3x30c40OC6vw+3iHGswRf3Ygxq5Q6jAYGivcBSthda6e9BbFao4S1PaskC9AjuDQyfT0u/GpWRqkwMkY/COH78+oPraOCb/FcggsnqzUTrjga92t2CUUvnbXSKtIWKQnHCqVOtSkbNPoMd9UROolNqL0kMQ=
+	t=1746472297; cv=none; b=q7nf9dB1q4dPzlbP1ACYpVGcDUodloRtY7Nk2oEOnB+K1JTljzDeqUzrZtw3m5gnRK3QjWSTL6wZNX7c3OtCyZ/NShR7Zvdp2nx+DPmZAyvwBfydSbzUCqISzNrg6J3KS8HP+pJAArqNBaHDD1vXak1NKcRn4gvYvDGjtYhh064=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746472297; c=relaxed/simple;
-	bh=W9GlfLupJ8un/8a0mB6DKsmxe5aVS/5mqb75tv8VGI8=;
+	bh=l+M5dpOFHFtihj6abcf696Sc9KhYLouQYRQjAQjIRHs=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ructC4uxDYrW3YWYIyledHYxUhirfllPMgaXPHXnK6jWyE/h1Ki2HjwsjUFcTDGhwbYRPDbJGe5gjHjzgBUWj9x6U3Yn7QzjrxutCP+Jm5AAfrWMlRDyjwcylTlw7CCjg+wNN+vR2Q9xE6dCJmeyQIo79/42FPkCZqHvvzxMbHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LD62nloZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=GttEtyEKkcFiVqmYYroOtft91IuSvX3mRJ4ZirI6joNFfyv0Hmohot9xm9C/rfB/xV4pWfIMWikqUxQNl/E0HKXncW2VGtuI3ij4pobYRJzSNOAZEAklkvwt9YtiNm2b4ZSWsHcSsILssbPW9DNMqjlCDL/rJ3ZxbqEMqyjTe/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgw7YAJM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LD62nloZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C3FCC4CEEE
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgw7YAJM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB17FC4CEE9
 	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 19:11:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746472296;
-	bh=W9GlfLupJ8un/8a0mB6DKsmxe5aVS/5mqb75tv8VGI8=;
+	bh=l+M5dpOFHFtihj6abcf696Sc9KhYLouQYRQjAQjIRHs=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=LD62nloZTuOi3cJ4GmNB+ylbY7aH+Pzg8iUPlpvWElGO8ewPtYB/FU0XddK/kv0JD
-	 Wq7Z06Ys1j/cI7+Q+hFOqUlgmCNbG+c3mtE7gdV5sSSi5r8N8nAcBLzW33MJizObfp
-	 33Jv+yk3/CIb/2sYG9Vple/l55oKZzNEOnyRNuYOWyW+Mpvd7xQ2ztMegsqreFQG+A
-	 LY/99YM8/O6I7ci/Sobs3wvGyxnJvnqNr4jFWnPKsdJl/n6lUcidCOj+pqJgFGOVaY
-	 9y3o4dlUhgMEvvlkojQyCb1hTwWT5DNAEJMqVk/3x1BdejNwsHkneDlcmt3/IsmjSx
-	 VdM0w+D4KjJPw==
+	b=cgw7YAJMDesePRBDwQb9a5xBMAsfrky4nmmwI0XjBgR+HIxqNDNJhL/rTbB8T/g+X
+	 qD5d2OkvQW6MuV6B9AtEb5NFpxwux1DFBIl1Rn3Ux4YwLLhj+NSUXFPt696sW/3K+t
+	 Oy6JD+IZKm7SEPWdTW9oen34OMAvt48n+7vNNPruxpcQcu9UZrlDsDW31Bh0sSUuzq
+	 QuXk11JDfXFtrtndGteUxnaWgiipRFO3bBEXzR61a/xQeROXwmsN8T/39VVX8+KgQS
+	 lOUs9rkN5E5Ibj1rCaCzyI09qmthRdRllwoeXNTOPVrcavXoFeRIw5iZtloymChPIE
+	 AynbkU1VNBXow==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Subject: [PATCH 1/8] crypto: algif_aead - use memcpy_sglist() instead of null skcipher
-Date: Mon,  5 May 2025 12:10:38 -0700
-Message-ID: <20250505191045.763835-2-ebiggers@kernel.org>
+Subject: [PATCH 2/8] crypto: authenc - use memcpy_sglist() instead of null skcipher
+Date: Mon,  5 May 2025 12:10:39 -0700
+Message-ID: <20250505191045.763835-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250505191045.763835-1-ebiggers@kernel.org>
 References: <20250505191045.763835-1-ebiggers@kernel.org>
@@ -49,279 +49,296 @@ instead of the so-called "null skcipher".  This is much simpler.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig      |   1 -
- crypto/algif_aead.c | 101 ++++++++------------------------------------
- 2 files changed, 18 insertions(+), 84 deletions(-)
+ crypto/Kconfig      |  1 -
+ crypto/authenc.c    | 32 +-------------------------------
+ crypto/authencesn.c | 38 +++-----------------------------------
+ 3 files changed, 4 insertions(+), 67 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 7bfad077f308..551eeeab3a0a 100644
+index 551eeeab3a0a..537602b8e60e 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1390,11 +1390,10 @@ config CRYPTO_USER_API_RNG_CAVP
- config CRYPTO_USER_API_AEAD
- 	tristate "AEAD cipher algorithms"
- 	depends on NET
+@@ -226,11 +226,10 @@ config CRYPTO_AUTHENC
+ 	tristate "Authenc support"
  	select CRYPTO_AEAD
  	select CRYPTO_SKCIPHER
+ 	select CRYPTO_MANAGER
+ 	select CRYPTO_HASH
 -	select CRYPTO_NULL
- 	select CRYPTO_USER_API
  	help
- 	  Enable the userspace interface for AEAD cipher algorithms.
+ 	  Authenc: Combined mode wrapper for IPsec.
  
- 	  See Documentation/crypto/userspace-if.rst and
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 7d58cbbce4af..79b016a899a1 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -25,32 +25,25 @@
+ 	  This is required for IPSec ESP (XFRM_ESP).
+ 
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 9521ae2f112e..a723769c8777 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -7,11 +7,10 @@
  
  #include <crypto/internal/aead.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/if_alg.h>
- #include <crypto/skcipher.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/authenc.h>
 -#include <crypto/null.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
  #include <linux/init.h>
- #include <linux/list.h>
  #include <linux/kernel.h>
- #include <linux/mm.h>
  #include <linux/module.h>
- #include <linux/net.h>
- #include <net/sock.h>
+@@ -26,11 +25,10 @@ struct authenc_instance_ctx {
+ };
  
--struct aead_tfm {
--	struct crypto_aead *aead;
--	struct crypto_sync_skcipher *null_tfm;
--};
--
- static inline bool aead_sufficient_data(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct sock *psk = ask->parent;
- 	struct alg_sock *pask = alg_sk(psk);
- 	struct af_alg_ctx *ctx = ask->private;
--	struct aead_tfm *aeadc = pask->private;
--	struct crypto_aead *tfm = aeadc->aead;
-+	struct crypto_aead *tfm = pask->private;
- 	unsigned int as = crypto_aead_authsize(tfm);
+ struct crypto_authenc_ctx {
+ 	struct crypto_ahash *auth;
+ 	struct crypto_skcipher *enc;
+-	struct crypto_sync_skcipher *null;
+ };
  
- 	/*
- 	 * The minimum amount of memory needed for an AEAD cipher is
- 	 * the AAD and in case of decryption the tag.
-@@ -62,42 +55,25 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- {
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct sock *psk = ask->parent;
- 	struct alg_sock *pask = alg_sk(psk);
--	struct aead_tfm *aeadc = pask->private;
--	struct crypto_aead *tfm = aeadc->aead;
-+	struct crypto_aead *tfm = pask->private;
- 	unsigned int ivsize = crypto_aead_ivsize(tfm);
+ struct authenc_request_ctx {
+ 	struct scatterlist src[2];
+ 	struct scatterlist dst[2];
+@@ -168,25 +166,10 @@ static void crypto_authenc_encrypt_done(void *data, int err)
  
- 	return af_alg_sendmsg(sock, msg, size, ivsize);
+ out:
+ 	authenc_request_complete(areq, err);
  }
  
--static int crypto_aead_copy_sgl(struct crypto_sync_skcipher *null_tfm,
--				struct scatterlist *src,
--				struct scatterlist *dst, unsigned int len)
+-static int crypto_authenc_copy_assoc(struct aead_request *req)
 -{
--	SYNC_SKCIPHER_REQUEST_ON_STACK(skreq, null_tfm);
+-	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+-	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(skreq, ctx->null);
 -
--	skcipher_request_set_sync_tfm(skreq, null_tfm);
--	skcipher_request_set_callback(skreq, CRYPTO_TFM_REQ_MAY_SLEEP,
+-	skcipher_request_set_sync_tfm(skreq, ctx->null);
+-	skcipher_request_set_callback(skreq, aead_request_flags(req),
 -				      NULL, NULL);
--	skcipher_request_set_crypt(skreq, src, dst, len, NULL);
+-	skcipher_request_set_crypt(skreq, req->src, req->dst, req->assoclen,
+-				   NULL);
 -
 -	return crypto_skcipher_encrypt(skreq);
 -}
 -
- static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 			 size_t ignored, int flags)
+ static int crypto_authenc_encrypt(struct aead_request *req)
  {
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct sock *psk = ask->parent;
- 	struct alg_sock *pask = alg_sk(psk);
- 	struct af_alg_ctx *ctx = ask->private;
--	struct aead_tfm *aeadc = pask->private;
--	struct crypto_aead *tfm = aeadc->aead;
--	struct crypto_sync_skcipher *null_tfm = aeadc->null_tfm;
-+	struct crypto_aead *tfm = pask->private;
- 	unsigned int i, as = crypto_aead_authsize(tfm);
- 	struct af_alg_async_req *areq;
- 	struct af_alg_tsgl *tsgl, *tmp;
- 	struct scatterlist *rsgl_src, *tsgl_src = NULL;
- 	int err = 0;
-@@ -221,15 +197,12 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 *	    |	   |
- 		 *	    | copy |
- 		 *	    v	   v
- 		 * RX SGL: AAD || PT || Tag
- 		 */
--		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
--					   areq->first_rsgl.sgl.sgt.sgl,
--					   processed);
--		if (err)
--			goto free;
-+		memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src,
-+			      processed);
- 		af_alg_pull_tsgl(sk, processed, NULL, 0);
- 	} else {
- 		/*
- 		 * Decryption operation - To achieve an in-place cipher
- 		 * operation, the following  SGL structure is used:
-@@ -239,16 +212,12 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 *	    | copy |	 | Create SGL link.
- 		 *	    v	   v	 |
- 		 * RX SGL: AAD || CT ----+
- 		 */
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	struct aead_instance *inst = aead_alg_instance(authenc);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+@@ -201,14 +184,11 @@ static int crypto_authenc_encrypt(struct aead_request *req)
  
--		 /* Copy AAD || CT to RX SGL buffer for in-place operation. */
--		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
--					   areq->first_rsgl.sgl.sgt.sgl,
--					   outlen);
--		if (err)
--			goto free;
-+		/* Copy AAD || CT to RX SGL buffer for in-place operation. */
-+		memcpy_sglist(areq->first_rsgl.sgl.sgt.sgl, tsgl_src, outlen);
+ 	src = scatterwalk_ffwd(areq_ctx->src, req->src, req->assoclen);
+ 	dst = src;
  
- 		/* Create TX SGL for tag and chain it to RX SGL. */
- 		areq->tsgl_entries = af_alg_count_tsgl(sk, processed,
- 						       processed - as);
- 		if (!areq->tsgl_entries)
-@@ -377,11 +346,11 @@ static struct proto_ops algif_aead_ops = {
- static int aead_check_key(struct socket *sock)
+ 	if (req->src != req->dst) {
+-		err = crypto_authenc_copy_assoc(req);
+-		if (err)
+-			return err;
+-
++		memcpy_sglist(req->dst, req->src, req->assoclen);
+ 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
+ 	}
+ 
+ 	skcipher_request_set_tfm(skreq, enc);
+ 	skcipher_request_set_callback(skreq, aead_request_flags(req),
+@@ -301,11 +281,10 @@ static int crypto_authenc_init_tfm(struct crypto_aead *tfm)
+ 	struct aead_instance *inst = aead_alg_instance(tfm);
+ 	struct authenc_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct crypto_ahash *auth;
+ 	struct crypto_skcipher *enc;
+-	struct crypto_sync_skcipher *null;
+ 	int err;
+ 
+ 	auth = crypto_spawn_ahash(&ictx->auth);
+ 	if (IS_ERR(auth))
+ 		return PTR_ERR(auth);
+@@ -313,18 +292,12 @@ static int crypto_authenc_init_tfm(struct crypto_aead *tfm)
+ 	enc = crypto_spawn_skcipher(&ictx->enc);
+ 	err = PTR_ERR(enc);
+ 	if (IS_ERR(enc))
+ 		goto err_free_ahash;
+ 
+-	null = crypto_get_default_null_skcipher();
+-	err = PTR_ERR(null);
+-	if (IS_ERR(null))
+-		goto err_free_skcipher;
+-
+ 	ctx->auth = auth;
+ 	ctx->enc = enc;
+-	ctx->null = null;
+ 
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		sizeof(struct authenc_request_ctx) +
+ 		ictx->reqoff +
+@@ -334,12 +307,10 @@ static int crypto_authenc_init_tfm(struct crypto_aead *tfm)
+ 		      sizeof(struct skcipher_request) +
+ 		      crypto_skcipher_reqsize(enc)));
+ 
+ 	return 0;
+ 
+-err_free_skcipher:
+-	crypto_free_skcipher(enc);
+ err_free_ahash:
+ 	crypto_free_ahash(auth);
+ 	return err;
+ }
+ 
+@@ -347,11 +318,10 @@ static void crypto_authenc_exit_tfm(struct crypto_aead *tfm)
  {
- 	int err = 0;
- 	struct sock *psk;
- 	struct alg_sock *pask;
--	struct aead_tfm *tfm;
-+	struct crypto_aead *tfm;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(tfm);
  
- 	lock_sock(sk);
- 	if (!atomic_read(&ask->nokey_refcnt))
-@@ -391,11 +360,11 @@ static int aead_check_key(struct socket *sock)
- 	pask = alg_sk(ask->parent);
- 	tfm = pask->private;
+ 	crypto_free_ahash(ctx->auth);
+ 	crypto_free_skcipher(ctx->enc);
+-	crypto_put_default_null_skcipher();
+ }
  
- 	err = -ENOKEY;
- 	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
--	if (crypto_aead_get_flags(tfm->aead) & CRYPTO_TFM_NEED_KEY)
-+	if (crypto_aead_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		goto unlock;
+ static void crypto_authenc_free(struct aead_instance *inst)
+ {
+ 	struct authenc_instance_ctx *ctx = aead_instance_ctx(inst);
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index b1c78313cbc1..d1bf0fda3f2e 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -10,11 +10,10 @@
  
- 	atomic_dec(&pask->nokey_refcnt);
- 	atomic_set(&ask->nokey_refcnt, 0);
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/authenc.h>
+-#include <crypto/null.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -29,11 +28,10 @@ struct authenc_esn_instance_ctx {
  
-@@ -452,68 +421,35 @@ static struct proto_ops algif_aead_ops_nokey = {
- 	.poll		=	af_alg_poll,
+ struct crypto_authenc_esn_ctx {
+ 	unsigned int reqoff;
+ 	struct crypto_ahash *auth;
+ 	struct crypto_skcipher *enc;
+-	struct crypto_sync_skcipher *null;
  };
  
- static void *aead_bind(const char *name, u32 type, u32 mask)
+ struct authenc_esn_request_ctx {
+ 	struct scatterlist src[2];
+ 	struct scatterlist dst[2];
+@@ -156,24 +154,10 @@ static void crypto_authenc_esn_encrypt_done(void *data, int err)
+ 		err = crypto_authenc_esn_genicv(areq, 0);
+ 
+ 	authenc_esn_request_complete(areq, err);
+ }
+ 
+-static int crypto_authenc_esn_copy(struct aead_request *req, unsigned int len)
+-{
+-	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+-	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(skreq, ctx->null);
+-
+-	skcipher_request_set_sync_tfm(skreq, ctx->null);
+-	skcipher_request_set_callback(skreq, aead_request_flags(req),
+-				      NULL, NULL);
+-	skcipher_request_set_crypt(skreq, req->src, req->dst, len, NULL);
+-
+-	return crypto_skcipher_encrypt(skreq);
+-}
+-
+ static int crypto_authenc_esn_encrypt(struct aead_request *req)
  {
--	struct aead_tfm *tfm;
--	struct crypto_aead *aead;
--	struct crypto_sync_skcipher *null_tfm;
+ 	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+ 	struct authenc_esn_request_ctx *areq_ctx = aead_request_ctx(req);
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+@@ -188,14 +172,11 @@ static int crypto_authenc_esn_encrypt(struct aead_request *req)
+ 	sg_init_table(areq_ctx->src, 2);
+ 	src = scatterwalk_ffwd(areq_ctx->src, req->src, assoclen);
+ 	dst = src;
+ 
+ 	if (req->src != req->dst) {
+-		err = crypto_authenc_esn_copy(req, assoclen);
+-		if (err)
+-			return err;
 -
--	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
--	if (!tfm)
--		return ERR_PTR(-ENOMEM);
--
--	aead = crypto_alloc_aead(name, type, mask);
--	if (IS_ERR(aead)) {
--		kfree(tfm);
--		return ERR_CAST(aead);
++		memcpy_sglist(req->dst, req->src, assoclen);
+ 		sg_init_table(areq_ctx->dst, 2);
+ 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, assoclen);
+ 	}
+ 
+ 	skcipher_request_set_tfm(skreq, enc);
+@@ -275,15 +256,12 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
+ 	u32 tmp[2];
+ 	int err;
+ 
+ 	cryptlen -= authsize;
+ 
+-	if (req->src != dst) {
+-		err = crypto_authenc_esn_copy(req, assoclen + cryptlen);
+-		if (err)
+-			return err;
 -	}
++	if (req->src != dst)
++		memcpy_sglist(dst, req->src, assoclen + cryptlen);
+ 
+ 	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
+ 				 authsize, 0);
+ 
+ 	if (!authsize)
+@@ -315,11 +293,10 @@ static int crypto_authenc_esn_init_tfm(struct crypto_aead *tfm)
+ 	struct aead_instance *inst = aead_alg_instance(tfm);
+ 	struct authenc_esn_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct crypto_ahash *auth;
+ 	struct crypto_skcipher *enc;
+-	struct crypto_sync_skcipher *null;
+ 	int err;
+ 
+ 	auth = crypto_spawn_ahash(&ictx->auth);
+ 	if (IS_ERR(auth))
+ 		return PTR_ERR(auth);
+@@ -327,18 +304,12 @@ static int crypto_authenc_esn_init_tfm(struct crypto_aead *tfm)
+ 	enc = crypto_spawn_skcipher(&ictx->enc);
+ 	err = PTR_ERR(enc);
+ 	if (IS_ERR(enc))
+ 		goto err_free_ahash;
+ 
+-	null = crypto_get_default_null_skcipher();
+-	err = PTR_ERR(null);
+-	if (IS_ERR(null))
+-		goto err_free_skcipher;
 -
--	null_tfm = crypto_get_default_null_skcipher();
--	if (IS_ERR(null_tfm)) {
--		crypto_free_aead(aead);
--		kfree(tfm);
--		return ERR_CAST(null_tfm);
--	}
--
--	tfm->aead = aead;
--	tfm->null_tfm = null_tfm;
--
--	return tfm;
-+	return crypto_alloc_aead(name, type, mask);
- }
+ 	ctx->auth = auth;
+ 	ctx->enc = enc;
+-	ctx->null = null;
  
- static void aead_release(void *private)
- {
--	struct aead_tfm *tfm = private;
--
--	crypto_free_aead(tfm->aead);
--	crypto_put_default_null_skcipher();
--	kfree(tfm);
-+	crypto_free_aead(private);
- }
+ 	ctx->reqoff = 2 * crypto_ahash_digestsize(auth);
  
- static int aead_setauthsize(void *private, unsigned int authsize)
- {
--	struct aead_tfm *tfm = private;
--
--	return crypto_aead_setauthsize(tfm->aead, authsize);
-+	return crypto_aead_setauthsize(private, authsize);
- }
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+@@ -350,12 +321,10 @@ static int crypto_authenc_esn_init_tfm(struct crypto_aead *tfm)
+ 		      sizeof(struct skcipher_request) +
+ 		      crypto_skcipher_reqsize(enc)));
  
- static int aead_setkey(void *private, const u8 *key, unsigned int keylen)
- {
--	struct aead_tfm *tfm = private;
--
--	return crypto_aead_setkey(tfm->aead, key, keylen);
-+	return crypto_aead_setkey(private, key, keylen);
- }
- 
- static void aead_sock_destruct(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct af_alg_ctx *ctx = ask->private;
- 	struct sock *psk = ask->parent;
- 	struct alg_sock *pask = alg_sk(psk);
--	struct aead_tfm *aeadc = pask->private;
--	struct crypto_aead *tfm = aeadc->aead;
-+	struct crypto_aead *tfm = pask->private;
- 	unsigned int ivlen = crypto_aead_ivsize(tfm);
- 
- 	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
- 	sock_kzfree_s(sk, ctx->iv, ivlen);
- 	sock_kfree_s(sk, ctx, ctx->len);
-@@ -522,14 +458,13 @@ static void aead_sock_destruct(struct sock *sk)
- 
- static int aead_accept_parent_nokey(void *private, struct sock *sk)
- {
- 	struct af_alg_ctx *ctx;
- 	struct alg_sock *ask = alg_sk(sk);
--	struct aead_tfm *tfm = private;
--	struct crypto_aead *aead = tfm->aead;
-+	struct crypto_aead *tfm = private;
- 	unsigned int len = sizeof(*ctx);
--	unsigned int ivlen = crypto_aead_ivsize(aead);
-+	unsigned int ivlen = crypto_aead_ivsize(tfm);
- 
- 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
- 	if (!ctx)
- 		return -ENOMEM;
- 	memset(ctx, 0, len);
-@@ -552,13 +487,13 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
  	return 0;
+ 
+-err_free_skcipher:
+-	crypto_free_skcipher(enc);
+ err_free_ahash:
+ 	crypto_free_ahash(auth);
+ 	return err;
  }
  
- static int aead_accept_parent(void *private, struct sock *sk)
+@@ -363,11 +332,10 @@ static void crypto_authenc_esn_exit_tfm(struct crypto_aead *tfm)
  {
--	struct aead_tfm *tfm = private;
-+	struct crypto_aead *tfm = private;
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(tfm);
  
--	if (crypto_aead_get_flags(tfm->aead) & CRYPTO_TFM_NEED_KEY)
-+	if (crypto_aead_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
- 
- 	return aead_accept_parent_nokey(private, sk);
+ 	crypto_free_ahash(ctx->auth);
+ 	crypto_free_skcipher(ctx->enc);
+-	crypto_put_default_null_skcipher();
  }
  
+ static void crypto_authenc_esn_free(struct aead_instance *inst)
+ {
+ 	struct authenc_esn_instance_ctx *ctx = aead_instance_ctx(inst);
 -- 
 2.49.0
 
