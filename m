@@ -1,59 +1,59 @@
 Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7010250C06
-	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D63125229D
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746449841; cv=none; b=U4VSkKChyQJ2kGWF6JidC9Y4pprk5M7syaAPQUCrz+EIxz+6lrqg9zoxCLp7j9aVAvKBd2AuH78e7ejT2LeKbzJsfqsgbndkEesbt5Xp1Nw/qJ/opBgrODk+7u6nFtx0RsdnFIKt3cOVtovQ7Jz+wm7sngB4/BxHf+CAZuyELic=
+	t=1746449855; cv=none; b=dKAlCYAryOKoXNymMha5TY8lwEcUg/cp2jXMDeYHYhsq6W5gdJD4HI2LWAj4zOJcEqUEjUUw/53HGt6ZA5JuYLfuLhzvCfcpzWDzBpR3vUXEXnu9qbha36q5uarPXnVORIIFAP/GvAOnJmy+A/hSPqe184TFQHWAlOHLkwjHmV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746449841; c=relaxed/simple;
-	bh=pAR5pnsFjYj6Yd8XlxUwBJlHawbFJyALxpNwp1QJVUU=;
+	s=arc-20240116; t=1746449855; c=relaxed/simple;
+	bh=fIB1g69k/DixNMVF3A97mf37NrC8uxIc0C7Hei6scFc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PDgHqbddyIWNsWIkpmflUgxyFY7hP2h3VH1Jr2ktfPLM16q1F5GV8UH+wjgeeMSsUOuwY7XYfw2u/aGgXaM+BxNJ+Reivdw4cwfg3yzL9HwsAQwxv4lH1la1fLMK3nXAtIZlMuNxD4uOGZOf7D8rIZewn79eG8H9auM0lXkbuhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=SMQYDPKL; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=MckQYqgjqvnbsmc34JRKdI2BdtXAc3EN0WTKWPRi91EhSPCyX8KLGqcKUai0dNBPpvQwj1NP+bzOSyaIOHrwzXsF8G3kqyup0CRMyu8rFRyFf3a+q8zCOjF/kLoY4466k3DuQCin7KAA/JukmrXAo6cX3ltKF3hZf/G9l+0luWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=pFcxz0Ho; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="SMQYDPKL"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2264aefc45dso67072735ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 05:57:16 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="pFcxz0Ho"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-224341bbc1dso54634005ad.3
+        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 05:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1746449836; x=1747054636; darn=vger.kernel.org;
+        d=vayavyalabs.com; s=google; t=1746449852; x=1747054652; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3sc/KUc8wwA77Le/Q5Jlw1INvdj2WFuIIBWLcmg3Vm4=;
-        b=SMQYDPKLITEBrWAMf8Tc6QhLzn+jsUgsEYN46699p0yUwbkijwePNzKLZCCO2CsL/D
-         Kzj14uKjrqTePYY7tFInCCueWZWoeBmo3R5Ei5MOH6uZfOFMLS1YEUGjaKkSs0SMhXHd
-         DyDJ7rMpRBC1hHnx6AcV1QUX/+1nlAsyW88RA=
+        bh=83PR/wutWRS6CgkTstNDdyhLJBiwi7ThHL/33xMyIxQ=;
+        b=pFcxz0HoRGO+yn/iLmDIPRO8ewZNVuUfN/5TuOSJ95EYmoMJ8kOVMaZGe62W9SAee1
+         sU4BwGvfoJjqosvqH1Vti8970QGEIdww8OoCYJDlkUrUL+99MOhfBo7s2moh+bqwUDWx
+         S+BE0E7DN6w2J8Vth4K+UW+3WtTe59e0kJXI8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746449836; x=1747054636;
+        d=1e100.net; s=20230601; t=1746449852; x=1747054652;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3sc/KUc8wwA77Le/Q5Jlw1INvdj2WFuIIBWLcmg3Vm4=;
-        b=PjBNqQSddiWVG+dN/UPZVGnVELWehFugwmHNTSipsz7zgDemGtYbT9AjWdxKbeayA4
-         VIQA6AGMp9ixzh/qUwmHEhr3zMDjI53fWebziRELZbDeoBnjK+aF3kSxXmNx9gmTfkUC
-         Og6W9bcDuyH1vqrGJ0QghpPCggjKiN0++0IcHJCI8A36RD5hpvW+Nx6eCpwCaXWSCMkU
-         jD0XsNy+0If+hlUMqNbBnPowNp6oFkytIzKYyVEsj+cehRb5i/oaHGb9SjEnYo8jb6SJ
-         gDBwboUHcot8dPUEUSKoXckAI69vbK+aojaYk+0keTCpvSDultsBe/4Med2e4nDSRC5f
-         +c9w==
-X-Gm-Message-State: AOJu0YwCcL48KuPrkzJJGj7zgInMzrjZuMF5oICaNsSWir1ME+WVbmA0
-	qOkohfhfMo4BvS9ZkNml4zM2/bKwZXy0Dp6IR4fWTRlgxEHPyCywJt9VboelhYSluu5z38Yz6Cv
-	j
-X-Gm-Gg: ASbGncujX6hDpzYArmTP4hP8tipsgo9N5IsTbTioQqCHjuzIRmPdoqP/9WE/v/HSKmJ
-	ag8MMLMlfwb4UTYZ8U+yM1SlvHbMow5S7vnmohmpbyJLUAXJfBUthnNkKqDMlLHIXW45Ee41uIF
-	/JUhngbalj+D6dq3XfV6fCiTArJGprYxhKY4UMMO3i1w+bm3mOQIED1HvMS/yXtZdVcETJXgy9H
-	7sQNkOxSmdBdILIdv5tZ2DKFK9AfvmjYh/wm8pKjEWEPVoYa18xlJeZ9666EO9re3WfNd6EPUi8
-	HJInJF+uSwSVihyx300H+ezRsrJEExmoW0CcgLkQlJKRY0hswUO2COxc9vROPiA7
-X-Google-Smtp-Source: AGHT+IHfYed5caxmN/d2oqW321Bg6dRU/s6/ZuqjmQDB7rnXQZcW7LOpyUGsb2OturKlaL6k/FWUig==
-X-Received: by 2002:a17:902:db11:b0:22c:33b2:e430 with SMTP id d9443c01a7336-22e1e8e9e21mr91806685ad.6.1746449835255;
-        Mon, 05 May 2025 05:57:15 -0700 (PDT)
+        bh=83PR/wutWRS6CgkTstNDdyhLJBiwi7ThHL/33xMyIxQ=;
+        b=Gq1722BLV4R/p4WwnTDcQR6MsJJjN7FHnkKlL60axXJ142Fhf1mWvORQEwfvFXT88R
+         kdCMQ7qtwT9sImJjxYb5RFEf17qLjhr+mO3taHRylyXSJfolKYQGG7BA9O2VjtwVQHi3
+         WiCzSjUzCtik7yk3xJE9AjChCKlzhNmc+uj1JjUOxWJdVWxO4RDoxhJOo7n/JL84CzPQ
+         Yh51jZWQNapHvR3YjQp4WutdZUygjEwyccVoF997uiAgnAStoQQchM0bB2cYQaKJVzxi
+         GlS+jmmeMnWauMLKJzbJJp3VqLC/ky6UQoui8FH7/20o9tssT9Yo+ks8p+PIZCXHnBPZ
+         XoNQ==
+X-Gm-Message-State: AOJu0YxUxNz1AvFk04CUXbjTsgNasR4+DWCDO3wPYdCzFJuxiM9j6KSH
+	QjDAQkfnbLIu2vTVwf+AW6mKcRUOUJhNjDNp+D+HPe6IHxF/DtILyZiRfOSHibpVjooJ5y4CVCb
+	Z
+X-Gm-Gg: ASbGncsgeqqfaTicozVOhBELg89DuKprIo8Ljw13/FnPRfoZQoY7EbADbnnGcCxdq+B
+	7YLvE89qU/KHFFLYb6Wp/4W1x68bqTTXYER7cBPl8yeBKbQdFWoI4hkCPGfkaLYa4HXo93xT2Qx
+	ndL737w34VxGEsZG+NeX7Y65aOEeh3C1FKeyxWbUciC4c2VF695+JLhaQwJI1E8HvaiDiyUEGsu
+	3KKGWGTfgmZmKHWIvKuCxP+WHk4afGGnyHuKWJ4BbGGjdUYH8+TWsTh08cwL9iII6NhQeUjwunL
+	E32TXj1dLahwVs1YdCQO/5C8pV1UaM0eO7MxIRndD+Lzwe3NZnCt8sN6na+s/PuF
+X-Google-Smtp-Source: AGHT+IHkhdvqyGR0IiPZbI7WEzwwkdCEAC+T1EPZ+10W9caSkyUTyeuj7/3h5IWq353JE4eka7WAjg==
+X-Received: by 2002:a17:903:1210:b0:21f:522b:690f with SMTP id d9443c01a7336-22e18c4f149mr132225195ad.46.1746449851838;
+        Mon, 05 May 2025 05:57:31 -0700 (PDT)
 Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fc6fsm53559565ad.145.2025.05.05.05.57.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fc6fsm53559565ad.145.2025.05.05.05.57.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 05:57:14 -0700 (PDT)
+        Mon, 05 May 2025 05:57:31 -0700 (PDT)
 From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 To: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
@@ -62,10 +62,11 @@ To: linux-crypto@vger.kernel.org,
 Cc: Ruud.Derwig@synopsys.com,
 	manjunath.hadli@vayavyalabs.com,
 	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v2 3/6] Add SPAcc AUTODETECT Support
-Date: Mon,  5 May 2025 18:25:35 +0530
-Message-Id: <20250505125538.2991314-4-pavitrakumarm@vayavyalabs.com>
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Subject: [PATCH v2 4/6] Add SPAcc ahash support
+Date: Mon,  5 May 2025 18:25:36 +0530
+Message-Id: <20250505125538.2991314-5-pavitrakumarm@vayavyalabs.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
 References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
@@ -79,1137 +80,1020 @@ Content-Transfer-Encoding: 8bit
 
 From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 
-SPAcc is configurable and it supports the below modes:
-1. AUTODETECT configuration - Autodetects the supported algos.
-2. Static configuration - The algo support is defined statically.
+Add ahash support to SPAcc driver.
+Below are the hash algos supported:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4)
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
+- hmac(sm3)
+- sm3
+- michael_mic
 
-Co-developed-by: Aditya Kulkarni <adityak@vayavyalabs.com>
-Signed-off-by: Aditya Kulkarni <adityak@vayavyalabs.com>
+Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
 Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
 Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
 ---
- drivers/crypto/dwc-spacc/spacc_core.c | 1094 +++++++++++++++++++++++++
- 1 file changed, 1094 insertions(+)
+ drivers/crypto/dwc-spacc/spacc_ahash.c | 972 +++++++++++++++++++++++++
+ 1 file changed, 972 insertions(+)
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
 
-diff --git a/drivers/crypto/dwc-spacc/spacc_core.c b/drivers/crypto/dwc-spacc/spacc_core.c
-index 2363f2db34ba..be9e84bb5c67 100644
---- a/drivers/crypto/dwc-spacc/spacc_core.c
-+++ b/drivers/crypto/dwc-spacc/spacc_core.c
-@@ -200,6 +200,882 @@ static const unsigned char template[] = {
- 	[CRYPTO_MODE_MAC_SM4_CMAC]      = 242,
- };
- 
-+#if IS_ENABLED(CONFIG_CRYPTO_DEV_SPACC_AUTODETECT)
-+static const struct {
-+	unsigned int min_version;
-+	struct {
-+		int outlen;
-+		unsigned char data[64];
-+	} test[7];
-+} testdata[CRYPTO_MODE_LAST] = {
-+	/* NULL */
-+	{ .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* AES_ECB */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data = { 0xc6, 0xa1, 0x3b, 0x37,
-+			0x87, 0x8f, 0x5b, 0x82, 0x6f, 0x4f, 0x81, 0x62, 0xa1,
-+			0xc8, 0xd8, 0x79,  },
-+		.test[3].outlen = 16, .test[3].data = { 0x91, 0x62, 0x51, 0x82,
-+			0x1c, 0x73, 0xa5, 0x22, 0xc3, 0x96, 0xd6, 0x27, 0x38,
-+			0x01, 0x96, 0x07,  },
-+		.test[4].outlen = 16, .test[4].data = { 0xf2, 0x90, 0x00, 0xb6,
-+			0x2a, 0x49, 0x9f, 0xd0, 0xa9, 0xf3, 0x9a, 0x6a, 0xdd,
-+			0x2e, 0x77, 0x80,  },
-+	},
-+
-+	/* AES_CBC */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data = { 0x0a, 0x94, 0x0b, 0xb5,
-+			0x41, 0x6e, 0xf0, 0x45, 0xf1, 0xc3, 0x94, 0x58, 0xc6,
-+			0x53, 0xea, 0x5a,  },
-+		.test[3].outlen = 16, .test[3].data = { 0x00, 0x60, 0xbf, 0xfe,
-+			0x46, 0x83, 0x4b, 0xb8, 0xda, 0x5c, 0xf9, 0xa6, 0x1f,
-+			0xf2, 0x20, 0xae,  },
-+		.test[4].outlen = 16, .test[4].data = { 0x5a, 0x6e, 0x04, 0x57,
-+			0x08, 0xfb, 0x71, 0x96, 0xf0, 0x2e, 0x55, 0x3d, 0x02,
-+			0xc3, 0xa6, 0x92,  },
-+	},
-+
-+	/* AES_CTR */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data = { 0x0a, 0x94, 0x0b, 0xb5,
-+			0x41, 0x6e, 0xf0, 0x45, 0xf1, 0xc3, 0x94, 0x58, 0xc6,
-+			0x53, 0xea, 0x5a,  },
-+		.test[3].outlen = 16, .test[3].data = { 0x00, 0x60, 0xbf, 0xfe,
-+			0x46, 0x83, 0x4b, 0xb8, 0xda, 0x5c, 0xf9, 0xa6, 0x1f,
-+			0xf2, 0x20, 0xae,  },
-+		.test[4].outlen = 16, .test[4].data = { 0x5a, 0x6e, 0x04, 0x57,
-+			0x08, 0xfb, 0x71, 0x96, 0xf0, 0x2e, 0x55, 0x3d, 0x02,
-+			0xc3, 0xa6, 0x92,  },
-+	},
-+
-+	/* AES_CCM */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 32, .test[2].data = { 0x02, 0x63, 0xec, 0x94,
-+			0x66, 0x18, 0x72, 0x96, 0x9a, 0xda, 0xfd, 0x0f, 0x4b,
-+			0xa4, 0x0f, 0xdc, 0xa5, 0x09, 0x92, 0x93, 0xb6, 0xb4,
-+			0x38, 0x34, 0x63, 0x72, 0x50, 0x4c, 0xfc, 0x8a, 0x63,
-+			0x02,  },
-+		.test[3].outlen = 32, .test[3].data = { 0x29, 0xf7, 0x63, 0xe8,
-+			0xa1, 0x75, 0xc6, 0xbf, 0xa5, 0x54, 0x94, 0x89, 0x12,
-+			0x84, 0x45, 0xf5, 0x9b, 0x27, 0xeb, 0xb1, 0xa4, 0x65,
-+			0x93, 0x6e, 0x5a, 0xc0, 0xa2, 0xa3, 0xe2, 0x6c, 0x46,
-+			0x29,  },
-+		.test[4].outlen = 32, .test[4].data = { 0x60, 0xf3, 0x10, 0xd5,
-+			0xc3, 0x85, 0x58, 0x5d, 0x55, 0x16, 0xfb, 0x51, 0x72,
-+			0xe5, 0x20, 0xcf, 0x8e, 0x87, 0x6d, 0x72, 0xc8, 0x44,
-+			0xbe, 0x6d, 0xa2, 0xd6, 0xf4, 0xba, 0xec, 0xb4, 0xec,
-+			0x39,  },
-+	},
-+
-+	/* AES_GCM */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 32, .test[2].data = { 0x93, 0x6c, 0xa7, 0xce,
-+			0x66, 0x1b, 0xf7, 0x54, 0x4b, 0xd2, 0x61, 0x8a, 0x36,
-+			0xa3, 0x70, 0x08, 0xc0, 0xd7, 0xd0, 0x77, 0xc5, 0x64,
-+			0x76, 0xdb, 0x48, 0x4a, 0x53, 0xe3, 0x6c, 0x93, 0x34,
-+			0x0f,  },
-+		.test[3].outlen = 32, .test[3].data = { 0xe6, 0xf9, 0x22, 0x9b,
-+			0x99, 0xb9, 0xc9, 0x0e, 0xd0, 0x33, 0xdc, 0x82, 0xff,
-+			0xa9, 0xdc, 0x70, 0x4c, 0xcd, 0xc4, 0x1b, 0xa3, 0x5a,
-+			0x87, 0x5d, 0xd8, 0xef, 0xb6, 0x48, 0xbb, 0x0c, 0x92,
-+			0x60,  },
-+		.test[4].outlen = 32, .test[4].data = { 0x47, 0x02, 0xd6, 0x1b,
-+			0xc5, 0xe5, 0xc2, 0x1b, 0x8d, 0x41, 0x97, 0x8b, 0xb1,
-+			0xe9, 0x78, 0x6d, 0x48, 0x6f, 0x78, 0x81, 0xc7, 0x98,
-+			0xcc, 0xf5, 0x28, 0xf1, 0x01, 0x7c, 0xe8, 0xf6, 0x09,
-+			0x78,  },
-+	},
-+
-+	/* AES-F8 */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* AES-XTS */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 32, .test[2].data = { 0xa0, 0x1a, 0x6f, 0x09,
-+			0xfa, 0xef, 0xd2, 0x72, 0xc3, 0x9b, 0xad, 0x35, 0x52,
-+			0xfc, 0xa1, 0xcb, 0x33, 0x69, 0x51, 0xc5, 0x23, 0xbe,
-+			0xac, 0xa5, 0x4a, 0xf2, 0xfc, 0x77, 0x71, 0x6f, 0x9a,
-+			0x86,  },
-+		.test[4].outlen = 32, .test[4].data = { 0x05, 0x45, 0x91, 0x86,
-+			0xf2, 0x2d, 0x97, 0x93, 0xf3, 0xa0, 0xbb, 0x29, 0xc7,
-+			0x9c, 0xc1, 0x4c, 0x3b, 0x8f, 0xdd, 0x9d, 0xda, 0xc7,
-+			0xb5, 0xaa, 0xc2, 0x7c, 0x2e, 0x71, 0xce, 0x7f, 0xce,
-+			0x0e,  },
-+	},
-+
-+	/* AES-CFB */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* AES-OFB */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* AES-CS1 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 31, .test[2].data = { 0x0a, 0x94, 0x0b, 0xb5,
-+			0x41, 0x6e, 0xf0, 0x45, 0xf1, 0xc3, 0x94, 0x58, 0xc6,
-+			0x53, 0xea, 0xae, 0xe7, 0x1e, 0xa5, 0x41, 0xd7, 0xae,
-+			0x4b, 0xeb, 0x60, 0xbe, 0xcc, 0x59, 0x3f, 0xb6, 0x63,
-+		},
-+		.test[3].outlen = 31, .test[3].data = { 0x00, 0x60, 0xbf, 0xfe,
-+			0x46, 0x83, 0x4b, 0xb8, 0xda, 0x5c, 0xf9, 0xa6, 0x1f,
-+			0xf2, 0x20, 0x2e, 0x84, 0xcb, 0x12, 0xa3, 0x59, 0x17,
-+			0xb0, 0x9e, 0x25, 0xa2, 0xa2, 0x3d, 0xf1, 0x9f, 0xdc,
-+		},
-+		.test[4].outlen = 31, .test[4].data = { 0x5a, 0x6e, 0x04, 0x57,
-+			0x08, 0xfb, 0x71, 0x96, 0xf0, 0x2e, 0x55, 0x3d, 0x02,
-+			0xc3, 0xa6, 0xcd, 0xfc, 0x25, 0x35, 0x31, 0x0b, 0xf5,
-+			0x6b, 0x2e, 0xb7, 0x8a, 0xa2, 0x5a, 0xdd, 0x77, 0x51,
-+		},
-+	},
-+
-+	/* AES-CS2 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 31, .test[2].data = { 0xae, 0xe7, 0x1e, 0xa5,
-+			0x41, 0xd7, 0xae, 0x4b, 0xeb, 0x60, 0xbe, 0xcc, 0x59,
-+			0x3f, 0xb6, 0x63, 0x0a, 0x94, 0x0b, 0xb5, 0x41, 0x6e,
-+			0xf0, 0x45, 0xf1, 0xc3, 0x94, 0x58, 0xc6, 0x53, 0xea,
-+		},
-+		.test[3].outlen = 31, .test[3].data = { 0x2e, 0x84, 0xcb, 0x12,
-+			0xa3, 0x59, 0x17, 0xb0, 0x9e, 0x25, 0xa2, 0xa2, 0x3d,
-+			0xf1, 0x9f, 0xdc, 0x00, 0x60, 0xbf, 0xfe, 0x46, 0x83,
-+			0x4b, 0xb8, 0xda, 0x5c, 0xf9, 0xa6, 0x1f, 0xf2, 0x20,
-+		},
-+		.test[4].outlen = 31, .test[4].data = { 0xcd, 0xfc, 0x25, 0x35,
-+			0x31, 0x0b, 0xf5, 0x6b, 0x2e, 0xb7, 0x8a, 0xa2, 0x5a,
-+			0xdd, 0x77, 0x51, 0x5a, 0x6e, 0x04, 0x57, 0x08, 0xfb,
-+			0x71, 0x96, 0xf0, 0x2e, 0x55, 0x3d, 0x02, 0xc3, 0xa6,
-+		},
-+	},
-+
-+	/* AES-CS3 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 31, .test[2].data = { 0xae, 0xe7, 0x1e, 0xa5,
-+			0x41, 0xd7, 0xae, 0x4b, 0xeb, 0x60, 0xbe, 0xcc, 0x59,
-+			0x3f, 0xb6, 0x63, 0x0a, 0x94, 0x0b, 0xb5, 0x41, 0x6e,
-+			0xf0, 0x45, 0xf1, 0xc3, 0x94, 0x58, 0xc6, 0x53, 0xea,
-+		},
-+		.test[3].outlen = 31, .test[3].data = { 0x2e, 0x84, 0xcb, 0x12,
-+			0xa3, 0x59, 0x17, 0xb0, 0x9e, 0x25, 0xa2, 0xa2, 0x3d,
-+			0xf1, 0x9f, 0xdc, 0x00, 0x60, 0xbf, 0xfe, 0x46, 0x83,
-+			0x4b, 0xb8, 0xda, 0x5c, 0xf9, 0xa6, 0x1f, 0xf2, 0x20,
-+		},
-+		.test[4].outlen = 31, .test[4].data = { 0xcd, 0xfc, 0x25, 0x35,
-+			0x31, 0x0b, 0xf5, 0x6b, 0x2e, 0xb7, 0x8a, 0xa2, 0x5a,
-+			0xdd, 0x77, 0x51, 0x5a, 0x6e, 0x04, 0x57, 0x08, 0xfb,
-+			0x71, 0x96, 0xf0, 0x2e, 0x55, 0x3d, 0x02, 0xc3, 0xa6,
-+		},
-+	},
-+
-+	/* MULTI2 */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* 3DES_CBC */
-+	{  .min_version = 0x65,
-+		.test[3].outlen = 16, .test[3].data = { 0x58, 0xed, 0x24, 0x8f,
-+			0x77, 0xf6, 0xb1, 0x9e, 0x47, 0xd9, 0xb7, 0x4a, 0x4f,
-+			0x5a, 0xe6, 0x6d,  }
-+	},
-+
-+	/* 3DES_ECB */
-+	{  .min_version = 0x65,
-+		.test[3].outlen = 16, .test[3].data = { 0x89, 0x4b, 0xc3, 0x08,
-+			0x54, 0x26, 0xa4, 0x41, 0x89, 0x4b, 0xc3, 0x08, 0x54,
-+			0x26, 0xa4, 0x41,  }
-+	},
-+
-+	/* DES_CBC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0xe1, 0xb2, 0x46, 0xe5,
-+			0xa7, 0xc7, 0x4c, 0xbc, 0xd5, 0xf0, 0x8e, 0x25, 0x3b,
-+			0xfa, 0x23, 0x80,  }
-+	},
-+
-+	/* DES_ECB */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0xa5, 0x17, 0x3a,
-+			0xd5, 0x95, 0x7b, 0x43, 0x70, 0xa5, 0x17, 0x3a, 0xd5,
-+			0x95, 0x7b, 0x43, 0x70,  }
-+	},
-+
-+	/* KASUMI_ECB */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x04, 0x7d, 0x5d,
-+			0x2c, 0x8c, 0x2e, 0x91, 0xb3, 0x04, 0x7d, 0x5d, 0x2c,
-+			0x8c, 0x2e, 0x91, 0xb3,  } },
-+
-+	/* KASUMI_F8 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0xfc, 0xf7, 0x45,
-+			0xee, 0x1d, 0xbb, 0xa4, 0x57, 0xa7, 0x45, 0xdc, 0x6b,
-+			0x2a, 0x1b, 0x50, 0x88,  }
-+	},
-+
-+	/* SNOW3G UEA2 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x95, 0xd3, 0xc8,
-+			0x13, 0xc0, 0x20, 0x24, 0xa3, 0x76, 0x24, 0xd1, 0x98,
-+			0xb6, 0x67, 0x4d, 0x4c,  }
-+	},
-+
-+	/* ZUC UEA3 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0xda, 0xdf, 0xb6,
-+			0xa2, 0xac, 0x9d, 0xba, 0xfe, 0x18, 0x9c, 0x0c, 0x75,
-+			0x79, 0xc6, 0xe0, 0x4e,  }
-+	},
-+
-+	/* CHACHA20_STREAM */
-+	{  .min_version = 0x65,
-+		.test[4].outlen = 16, .test[4].data =  { 0x55, 0xdf, 0x91,
-+			0xe9, 0x27, 0x01, 0x37, 0x69, 0xdb, 0x38, 0xd4, 0x28,
-+			0x01, 0x79, 0x76, 0x64 }
-+	},
-+
-+	/* CHACHA20_POLY1305 (AEAD) */
-+	{  .min_version = 0x65,
-+		.test[4].outlen = 16, .test[4].data =  { 0x89, 0xfb, 0x08,
-+			0x00, 0x29, 0x17, 0xa5, 0x40, 0xb7, 0x83, 0x3f, 0xf3,
-+			0x98, 0x1d, 0x0e, 0x63 }
-+	},
-+
-+	/* SM4_ECB 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x1e, 0x96, 0x34,
-+			0xb7, 0x70, 0xf9, 0xae, 0xba, 0xa9, 0x34, 0x4f, 0x5a,
-+			0xff, 0x9f, 0x82, 0xa3 }
-+	},
-+
-+	/* SM4_CBC 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x8f, 0x78, 0x76,
-+			0x3e, 0xe0, 0x60, 0x13, 0xe0, 0xb7, 0x62, 0x2c, 0x42,
-+			0x8f, 0xd0, 0x52, 0x8d }
-+	},
-+
-+	/* SM4_CFB 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x8f, 0x78, 0x76,
-+			0x3e, 0xe0, 0x60, 0x13, 0xe0, 0xb7, 0x62, 0x2c, 0x42,
-+			0x8f, 0xd0, 0x52, 0x8d }
-+	},
-+
-+	 /* SM4_OFB 128 */
-+	 {  .min_version = 0x65,
-+	 .test[2].outlen = 16, .test[2].data =  { 0x8f, 0x78, 0x76, 0x3e, 0xe0,
-+		 0x60, 0x13, 0xe0, 0xb7, 0x62, 0x2c, 0x42, 0x8f, 0xd0, 0x52,
-+		 0x8d }
-+	 },
-+
-+	 /* SM4_CTR 128 */
-+	 {  .min_version = 0x65,
-+	 .test[2].outlen = 16, .test[2].data =  { 0x8f, 0x78, 0x76, 0x3e, 0xe0,
-+		 0x60, 0x13, 0xe0, 0xb7, 0x62, 0x2c, 0x42, 0x8f, 0xd0, 0x52,
-+		 0x8d }
-+	 },
-+
-+	/* SM4_CCM 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x8e, 0x25, 0x5a,
-+			0x13, 0xc7, 0x43, 0x4d, 0x95, 0xef, 0x14, 0x15, 0x11,
-+			0xd0, 0xb9, 0x60, 0x5b }
-+	},
-+
-+	/* SM4_GCM 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x97, 0x46, 0xde,
-+			0xfb, 0xc9, 0x6a, 0x85, 0x00, 0xff, 0x9c, 0x74, 0x4d,
-+			0xd1, 0xbb, 0xf9, 0x66 }
-+	},
-+
-+	/* SM4_F8 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x77, 0x30, 0xff,
-+			0x70, 0x46, 0xbc, 0xf4, 0xe3, 0x11, 0xf6, 0x27, 0xe2,
-+			0xff, 0xd7, 0xc4, 0x2e }
-+	},
-+
-+	/* SM4_XTS 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x05, 0x3f, 0xb6,
-+			0xe9, 0xb1, 0xff, 0x09, 0x4f, 0x9d, 0x69, 0x4d, 0xc2,
-+			0xb6, 0xa1, 0x15, 0xde }
-+	},
-+
-+	/* SM4_CS1 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0x8f, 0x78, 0x76,
-+			0x3e, 0xe0, 0x60, 0x13, 0xe0, 0xb7, 0x62, 0x2c, 0x42,
-+			0x8f, 0xd0, 0x52, 0xa0 }
-+	},
-+
-+	/* SM4_CS2 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0xa0, 0x1c, 0xfe,
-+			0x91, 0xaa, 0x7e, 0xf1, 0x75, 0x6a, 0xe8, 0xbc, 0xe1,
-+			0x55, 0x08, 0xda, 0x71 }
-+	},
-+
-+	/* SM4_CS3 128 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 16, .test[2].data =  { 0xa0, 0x1c, 0xfe,
-+			0x91, 0xaa, 0x7e, 0xf1, 0x75, 0x6a, 0xe8, 0xbc, 0xe1,
-+			0x55, 0x08, 0xda, 0x71 }
-+	},
-+
-+	/*
-+	 * Hashes ... note they use the 2nd keysize
-+	 * array so the indecies mean different sizes!!!
-+	 */
-+
-+	/* MD5 HASH/HMAC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0x70, 0xbc, 0x8f, 0x4b,
-+			0x72, 0xa8, 0x69, 0x21, 0x46, 0x8b, 0xf8, 0xe8, 0x44,
-+			0x1d, 0xce, 0x51,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0xb6, 0x39, 0xc8, 0x73,
-+			0x16, 0x38, 0x61, 0x8b, 0x70, 0x79, 0x72, 0xaa, 0x6e,
-+			0x96, 0xcf, 0x90,  },
-+		.test[4].outlen = 16, .test[4].data = { 0xb7, 0x79, 0x68, 0xea,
-+			0x17, 0x32, 0x1e, 0x32, 0x13, 0x90, 0x6c, 0x2e, 0x9f,
-+			0xd5, 0xc8, 0xb3,  },
-+		.test[5].outlen = 16, .test[5].data = { 0x80, 0x3e, 0x0a, 0x2f,
-+			0x8a, 0xd8, 0x31, 0x8f, 0x8e, 0x12, 0x28, 0x86, 0x22,
-+			0x59, 0x6b, 0x05,  },
-+	},
-+	/* SHA1 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 20, .test[1].data = { 0xde, 0x8a, 0x84, 0x7b,
-+			0xff, 0x8c, 0x34, 0x3d, 0x69, 0xb8, 0x53, 0xa2, 0x15,
-+			0xe6, 0xee, 0x77, 0x5e, 0xf2, 0xef, 0x96,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 20, .test[1].data = { 0xf8, 0x54, 0x60, 0x50,
-+			0x49, 0x56, 0xd1, 0xcd, 0x55, 0x5c, 0x5d, 0xcd, 0x24,
-+			0x33, 0xbf, 0xdc, 0x5c, 0x99, 0x54, 0xc8,  },
-+		.test[4].outlen = 20, .test[4].data = { 0x66, 0x3f, 0x3a, 0x3c,
-+			0x08, 0xb6, 0x87, 0xb2, 0xd3, 0x0c, 0x5a, 0xa7, 0xcc,
-+			0x5c, 0xc3, 0x99, 0xb2, 0xb4, 0x58, 0x55,  },
-+		.test[5].outlen = 20, .test[5].data = { 0x9a, 0x28, 0x54, 0x2f,
-+			0xaf, 0xa7, 0x0b, 0x37, 0xbe, 0x2d, 0x3e, 0xd9, 0xd4,
-+			0x70, 0xbc, 0xdc, 0x0b, 0x54, 0x20, 0x06,  },
-+	},
-+	/* SHA224_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 28, .test[1].data = { 0xb3, 0x38, 0xc7, 0x6b,
-+			0xcf, 0xfa, 0x1a, 0x0b, 0x3e, 0xad, 0x8d, 0xe5, 0x8d,
-+			0xfb, 0xff, 0x47, 0xb6, 0x3a, 0xb1, 0x15, 0x0e, 0x10,
-+			0xd8, 0xf1, 0x7f, 0x2b, 0xaf, 0xdf,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 28, .test[1].data = { 0xf3, 0xb4, 0x33, 0x78,
-+			0x53, 0x4c, 0x0c, 0x4a, 0x1e, 0x31, 0xc2, 0xce, 0xda,
-+			0xc8, 0xfe, 0x74, 0x4a, 0xd2, 0x9b, 0x7c, 0x1d, 0x2f,
-+			0x5e, 0xa1, 0xaa, 0x31, 0xb9, 0xf5,  },
-+		.test[4].outlen = 28, .test[4].data = { 0x4b, 0x6b, 0x3f, 0x9a,
-+			0x66, 0x47, 0x45, 0xe2, 0x60, 0xc9, 0x53, 0x86, 0x7a,
-+			0x34, 0x65, 0x7d, 0xe2, 0x24, 0x06, 0xcc, 0xf9, 0x17,
-+			0x20, 0x5d, 0xc2, 0xb6, 0x97, 0x9a,  },
-+		.test[5].outlen = 28, .test[5].data = { 0x90, 0xb0, 0x6e, 0xee,
-+			0x21, 0x57, 0x38, 0xc7, 0x65, 0xbb, 0x9a, 0xf5, 0xb4,
-+			0x31, 0x0a, 0x0e, 0xe5, 0x64, 0xc4, 0x49, 0x9d, 0xbd,
-+			0xe9, 0xf7, 0xac, 0x9f, 0xf8, 0x05,  },
-+	},
-+
-+	/* SHA256_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data = { 0x66, 0x68, 0x7a, 0xad,
-+			0xf8, 0x62, 0xbd, 0x77, 0x6c, 0x8f, 0xc1, 0x8b, 0x8e,
-+			0x9f, 0x8e, 0x20, 0x08, 0x97, 0x14, 0x85, 0x6e, 0xe2,
-+			0x33, 0xb3, 0x90, 0x2a, 0x59, 0x1d, 0x0d, 0x5f, 0x29,
-+			0x25,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data = { 0x75, 0x40, 0x84, 0x49,
-+			0x54, 0x0a, 0xf9, 0x80, 0x99, 0xeb, 0x93, 0x6b, 0xf6,
-+			0xd3, 0xff, 0x41, 0x05, 0x47, 0xcc, 0x82, 0x62, 0x76,
-+			0x32, 0xf3, 0x43, 0x74, 0x70, 0x54, 0xe2, 0x3b, 0xc0,
-+			0x90,  },
-+		.test[4].outlen = 32, .test[4].data = { 0x41, 0x6c, 0x53, 0x92,
-+			0xb9, 0xf3, 0x6d, 0xf1, 0x88, 0xe9, 0x0e, 0xb1, 0x4d,
-+			0x17, 0xbf, 0x0d, 0xa1, 0x90, 0xbf, 0xdb, 0x7f, 0x1f,
-+			0x49, 0x56, 0xe6, 0xe5, 0x66, 0xa5, 0x69, 0xc8, 0xb1,
-+			0x5c,  },
-+		.test[5].outlen = 32, .test[5].data = { 0x49, 0x1f, 0x58, 0x3b,
-+			0x05, 0xe2, 0x3a, 0x72, 0x1d, 0x11, 0x6d, 0xc1, 0x08,
-+			0xa0, 0x3f, 0x30, 0x37, 0x98, 0x36, 0x8a, 0x49, 0x4c,
-+			0x21, 0x1d, 0x56, 0xa5, 0x2a, 0xf3, 0x68, 0x28, 0xb7,
-+			0x69,  },
-+	},
-+	/* SHA384_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 48, .test[1].data = { 0xa3, 0x8f, 0xff, 0x4b,
-+			0xa2, 0x6c, 0x15, 0xe4, 0xac, 0x9c, 0xde, 0x8c, 0x03,
-+			0x10, 0x3a, 0xc8, 0x90, 0x80, 0xfd, 0x47, 0x54, 0x5f,
-+			0xde, 0x94, 0x46, 0xc8, 0xf1, 0x92, 0x72, 0x9e, 0xab,
-+			0x7b, 0xd0, 0x3a, 0x4d, 0x5c, 0x31, 0x87, 0xf7, 0x5f,
-+			0xe2, 0xa7, 0x1b, 0x0e, 0xe5, 0x0a, 0x4a, 0x40,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 48, .test[1].data = { 0x6c, 0xd8, 0x89, 0xa0,
-+			0xca, 0x54, 0xa6, 0x1d, 0x24, 0xc4, 0x1d, 0xa1, 0x77,
-+			0x50, 0xd6, 0xf2, 0xf3, 0x43, 0x23, 0x0d, 0xb1, 0xf5,
-+			0xf7, 0xfc, 0xc0, 0x8c, 0xf6, 0xdf, 0x3c, 0x61, 0xfc,
-+			0x8a, 0xb9, 0xda, 0x12, 0x75, 0x97, 0xac, 0x51, 0x88,
-+			0x59, 0x19, 0x44, 0x13, 0xc0, 0x78, 0xa5, 0xa8,  },
-+		.test[4].outlen = 48, .test[4].data = { 0x0c, 0x91, 0x36, 0x46,
-+			0xd9, 0x17, 0x81, 0x46, 0x1d, 0x42, 0xb1, 0x00, 0xaa,
-+			0xfa, 0x26, 0x92, 0x9f, 0x05, 0xc0, 0x91, 0x8e, 0x20,
-+			0xd7, 0x75, 0x9d, 0xd2, 0xc8, 0x9b, 0x02, 0x18, 0x20,
-+			0x1f, 0xdd, 0xa3, 0x32, 0xe3, 0x1e, 0xa4, 0x2b, 0xc3,
-+			0xc8, 0xb9, 0xb1, 0x53, 0x4e, 0x6a, 0x49, 0xd2,  },
-+		.test[5].outlen = 48, .test[5].data = { 0x84, 0x78, 0xd2, 0xf1,
-+			0x44, 0x95, 0x6a, 0x22, 0x2d, 0x08, 0x19, 0xe8, 0xea,
-+			0x61, 0xb4, 0x86, 0xe8, 0xc6, 0xb0, 0x40, 0x51, 0x28,
-+			0x22, 0x54, 0x48, 0xc0, 0x70, 0x09, 0x81, 0xf9, 0xf5,
-+			0x47, 0x9e, 0xb3, 0x2c, 0x69, 0x19, 0xd5, 0x8d, 0x03,
-+			0x5d, 0x24, 0xca, 0x90, 0xa6, 0x9d, 0x80, 0x2a,  },
-+		.test[6].outlen = 48, .test[6].data = { 0x0e, 0x68, 0x17, 0x31,
-+			0x01, 0xa8, 0x28, 0x0a, 0x4e, 0x47, 0x22, 0xa6, 0x89,
-+			0xf0, 0xc6, 0xcd, 0x4e, 0x8c, 0x19, 0x4c, 0x44, 0x3d,
-+			0xb5, 0xa5, 0xf9, 0xfe, 0xea, 0xc7, 0x84, 0x0b, 0x57,
-+			0x0d, 0xd4, 0xe4, 0x8a, 0x3f, 0x68, 0x31, 0x20, 0xd9,
-+			0x1f, 0xc4, 0xa3, 0x76, 0xcf, 0xdd, 0x07, 0xa6,  },
-+	},
-+	/* SHA512_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 64, .test[1].data = { 0x50, 0x46, 0xad, 0xc1,
-+			0xdb, 0xa8, 0x38, 0x86, 0x7b, 0x2b, 0xbb, 0xfd, 0xd0,
-+			0xc3, 0x42, 0x3e, 0x58, 0xb5, 0x79, 0x70, 0xb5, 0x26,
-+			0x7a, 0x90, 0xf5, 0x79, 0x60, 0x92, 0x4a, 0x87, 0xf1,
-+			0x96, 0x0a, 0x6a, 0x85, 0xea, 0xa6, 0x42, 0xda, 0xc8,
-+			0x35, 0x42, 0x4b, 0x5d, 0x7c, 0x8d, 0x63, 0x7c, 0x00,
-+			0x40, 0x8c, 0x7a, 0x73, 0xda, 0x67, 0x2b, 0x7f, 0x49,
-+			0x85, 0x21, 0x42, 0x0b, 0x6d, 0xd3,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 64, .test[1].data = { 0xec, 0xfd, 0x83, 0x74,
-+			0xc8, 0xa9, 0x2f, 0xd7, 0x71, 0x94, 0xd1, 0x1e, 0xe7,
-+			0x0f, 0x0f, 0x5e, 0x11, 0x29, 0x58, 0xb8, 0x36, 0xc6,
-+			0x39, 0xbc, 0xd6, 0x88, 0x6e, 0xdb, 0xc8, 0x06, 0x09,
-+			0x30, 0x27, 0xaa, 0x69, 0xb9, 0x2a, 0xd4, 0x67, 0x06,
-+			0x5c, 0x82, 0x8e, 0x90, 0xe9, 0x3e, 0x55, 0x88, 0x7d,
-+			0xb2, 0x2b, 0x48, 0xa2, 0x28, 0x92, 0x6c, 0x0f, 0xf1,
-+			0x57, 0xb5, 0xd0, 0x06, 0x1d, 0xf3,  },
-+		.test[4].outlen = 64, .test[4].data = { 0x47, 0x88, 0x91, 0xe9,
-+			0x12, 0x3e, 0xfd, 0xdc, 0x26, 0x29, 0x08, 0xd6, 0x30,
-+			0x8f, 0xcc, 0xb6, 0x93, 0x30, 0x58, 0x69, 0x4e, 0x81,
-+			0xee, 0x9d, 0xb6, 0x0f, 0xc5, 0x54, 0xe6, 0x7c, 0x84,
-+			0xc5, 0xbc, 0x89, 0x99, 0xf0, 0xf3, 0x7f, 0x6f, 0x3f,
-+			0xf5, 0x04, 0x2c, 0xdf, 0x76, 0x72, 0x6a, 0xbe, 0x28,
-+			0x3b, 0xb8, 0x05, 0xb3, 0x47, 0x45, 0xf5, 0x7f, 0xb1,
-+			0x21, 0x2d, 0xe0, 0x8d, 0x1e, 0x29,  },
-+		.test[5].outlen = 64, .test[5].data = { 0x7e, 0x55, 0xda, 0x88,
-+			0x28, 0xc1, 0x6e, 0x9a, 0x6a, 0x99, 0xa0, 0x37, 0x68,
-+			0xf0, 0x28, 0x5e, 0xe2, 0xbe, 0x00, 0xac, 0x76, 0x89,
-+			0x76, 0xcc, 0x5d, 0x98, 0x1b, 0x32, 0x1a, 0x14, 0xc4,
-+			0x2e, 0x9c, 0xe4, 0xf3, 0x3f, 0x5f, 0xa0, 0xae, 0x95,
-+			0x16, 0x0b, 0x14, 0xf5, 0xf5, 0x45, 0x29, 0xd8, 0xc9,
-+			0x43, 0xf2, 0xa9, 0xbc, 0xdc, 0x03, 0x81, 0x0d, 0x36,
-+			0x2f, 0xb1, 0x22, 0xe8, 0x13, 0xf8,  },
-+		.test[6].outlen = 64, .test[6].data = { 0x5d, 0xc4, 0x80, 0x90,
-+			0x6b, 0x00, 0x17, 0x04, 0x34, 0x63, 0x93, 0xf1, 0xad,
-+			0x9a, 0x3e, 0x13, 0x37, 0x6b, 0x86, 0xd7, 0xc4, 0x2b,
-+			0x22, 0x9c, 0x2e, 0xf2, 0x1d, 0xde, 0x35, 0x39, 0x03,
-+			0x3f, 0x2b, 0x3a, 0xc3, 0x49, 0xb3, 0x32, 0x86, 0x63,
-+			0x6b, 0x0f, 0x27, 0x95, 0x97, 0xe5, 0xe7, 0x2b, 0x9b,
-+			0x80, 0xea, 0x94, 0x4d, 0x84, 0x2e, 0x39, 0x44, 0x8f,
-+			0x56, 0xe3, 0xcd, 0xa7, 0x12, 0x3e,  },
-+	},
-+	/* SHA512_224_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 28, .test[1].data = { 0x9e, 0x7d, 0x60, 0x80,
-+			0xde, 0xf4, 0xe1, 0xcc, 0xf4, 0xae, 0xaa, 0xc6, 0xf7,
-+			0xfa, 0xd0, 0x08, 0xd0, 0x60, 0xa6, 0xcf, 0x87, 0x06,
-+			0x20, 0x38, 0xd6, 0x16, 0x67, 0x74,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 28, .test[1].data = { 0xff, 0xfb, 0x43, 0x27,
-+			0xdd, 0x2e, 0x39, 0xa0, 0x18, 0xa8, 0xaf, 0xde, 0x84,
-+			0x0b, 0x5d, 0x0f, 0x3d, 0xdc, 0xc6, 0x17, 0xd1, 0xb6,
-+			0x2f, 0x8c, 0xf8, 0x7e, 0x34, 0x34,  },
-+		.test[4].outlen = 28, .test[4].data = { 0x00, 0x19, 0xe2, 0x2d,
-+			0x44, 0x80, 0x2d, 0xd8, 0x1c, 0x57, 0xf5, 0x57, 0x92,
-+			0x08, 0x13, 0xe7, 0x9d, 0xbb, 0x2b, 0xc2, 0x8d, 0x77,
-+			0xc1, 0xff, 0x71, 0x4c, 0xf0, 0xa9,  },
-+		.test[5].outlen = 28, .test[5].data = { 0x6a, 0xc4, 0xa8, 0x73,
-+			0x21, 0x54, 0xb2, 0x82, 0xee, 0x89, 0x8d, 0x45, 0xd4,
-+			0xe3, 0x76, 0x3e, 0x04, 0x03, 0xc9, 0x71, 0xee, 0x01,
-+			0x25, 0xd2, 0x7b, 0xa1, 0x20, 0xc4,  },
-+		.test[6].outlen = 28, .test[6].data = { 0x0f, 0x98, 0x15, 0x9b,
-+			0x11, 0xca, 0x60, 0xc7, 0x82, 0x39, 0x1a, 0x50, 0x8c,
-+			0xe4, 0x79, 0xfa, 0xa8, 0x0e, 0xc7, 0x12, 0xfd, 0x8c,
-+			0x9c, 0x99, 0x7a, 0xe8, 0x7e, 0x92,  },
-+	},
-+	/* SHA512_256_HASH */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data = { 0xaf, 0x13, 0xc0, 0x48,
-+			0x99, 0x12, 0x24, 0xa5, 0xe4, 0xc6, 0x64, 0x44, 0x6b,
-+			0x68, 0x8a, 0xaf, 0x48, 0xfb, 0x54, 0x56, 0xdb, 0x36,
-+			0x29, 0x60, 0x1b, 0x00, 0xec, 0x16, 0x0c, 0x74, 0xe5,
-+			0x54,  }
-+	},
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data = { 0x3a, 0x2c, 0xd0, 0x2b,
-+			0xfa, 0xa6, 0x72, 0xe4, 0xf1, 0xab, 0x0a, 0x3e, 0x70,
-+			0xe4, 0x88, 0x1a, 0x92, 0xe1, 0x3b, 0x64, 0x5a, 0x9b,
-+			0xed, 0xb3, 0x97, 0xc0, 0x17, 0x1f, 0xd4, 0x05, 0xf1,
-+			0x72,  },
-+		.test[4].outlen = 32, .test[4].data = { 0x6f, 0x2d, 0xae, 0xc6,
-+			0xe4, 0xa6, 0x5b, 0x52, 0x0f, 0x26, 0x16, 0xf6, 0xa9,
-+			0xc1, 0x23, 0xc2, 0xb3, 0x67, 0xfc, 0x69, 0xac, 0x73,
-+			0x87, 0xa2, 0x5b, 0x6c, 0x44, 0xad, 0xc5, 0x26, 0x2b,
-+			0x10,  },
-+		.test[5].outlen = 32, .test[5].data = { 0x63, 0xe7, 0xb8, 0xd1,
-+			0x76, 0x33, 0x56, 0x29, 0xba, 0x99, 0x86, 0x42, 0x0d,
-+			0x4f, 0xf7, 0x54, 0x8c, 0xb9, 0x39, 0xf2, 0x72, 0x1d,
-+			0x0e, 0x9d, 0x80, 0x67, 0xd9, 0xab, 0x15, 0xb0, 0x68,
-+			0x18,  },
-+		.test[6].outlen = 32, .test[6].data = { 0x64, 0x78, 0x56, 0xd7,
-+			0xaf, 0x5b, 0x56, 0x08, 0xf1, 0x44, 0xf7, 0x4f, 0xa1,
-+			0xa1, 0x13, 0x79, 0x6c, 0xb1, 0x31, 0x11, 0xf3, 0x75,
-+			0xf4, 0x8c, 0xb4, 0x9f, 0xbf, 0xb1, 0x60, 0x38, 0x3d,
-+			0x28,  },
-+	},
-+
-+	/* AESXCBC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0x35, 0xd9, 0xdc, 0xdb,
-+			0x82, 0x9f, 0xec, 0x33, 0x52, 0xe7, 0xbf, 0x10, 0xb8,
-+			0x4b, 0xe4, 0xa5,  },
-+		.test[3].outlen = 16, .test[3].data = { 0x39, 0x6f, 0x99, 0xb5,
-+			0x43, 0x33, 0x67, 0x4e, 0xd4, 0x45, 0x8f, 0x80, 0x77,
-+			0xe4, 0xd4, 0x14,  },
-+		.test[4].outlen = 16, .test[4].data = { 0x73, 0xd4, 0x7c, 0x38,
-+			0x37, 0x4f, 0x73, 0xd0, 0x78, 0xa8, 0xc6, 0xec, 0x05,
-+			0x67, 0xca, 0x5e,  },
-+	},
-+
-+	/* AESCMAC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0x15, 0xbe, 0x1b, 0xfd,
-+			0x8c, 0xbb, 0xaf, 0x8b, 0x51, 0x9a, 0x64, 0x3b, 0x1b,
-+			0x46, 0xc1, 0x8f,  },
-+		.test[3].outlen = 16, .test[3].data = { 0x4e, 0x02, 0xd6, 0xec,
-+			0x92, 0x75, 0x88, 0xb4, 0x3e, 0x83, 0xa7, 0xac, 0x32,
-+			0xb6, 0x2b, 0xdb,  },
-+		.test[4].outlen = 16, .test[4].data = { 0xa7, 0x37, 0x01, 0xbe,
-+			0xe8, 0xce, 0xed, 0x44, 0x49, 0x4a, 0xbb, 0xf6, 0x9e,
-+			0xd9, 0x31, 0x3e,  },
-+	},
-+
-+	/* KASUMIF9 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 4, .test[1].data = {  0x5b, 0x26, 0x81, 0x06
-+		}
-+	},
-+
-+	/* SNOW3G UIA2 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 4, .test[1].data = { 0x08, 0xed, 0x2c, 0x76,
-+		}
-+	},
-+
-+	/* ZUC UIA3 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 4, .test[1].data = { 0x6a, 0x2b, 0x4c, 0x3a,
-+		}
-+	},
-+
-+	/* POLY1305 */
-+	{  .min_version = 0x65,
-+		.test[4].outlen = 16, .test[4].data = { 0xef, 0x91, 0x06, 0x4e,
-+			0xce, 0x99, 0x9c, 0x4e, 0xfd, 0x05, 0x6a, 0x8c, 0xe6,
-+			0x18, 0x23, 0xad }
-+	},
-+
-+	/* SSLMAC MD5 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data = { 0x0e, 0xf4, 0xca, 0x32,
-+			0x32, 0x40, 0x1d, 0x1b, 0xaa, 0xfd, 0x6d, 0xa8, 0x01,
-+			0x79, 0xed, 0xcd,  },
-+	},
-+
-+	/* SSLMAC_SHA1 */
-+	{  .min_version = 0x65,
-+		.test[2].outlen = 20, .test[2].data = { 0x05, 0x9d, 0x99, 0xb4,
-+			0xf3, 0x03, 0x1e, 0xc5, 0x24, 0xbf, 0xec, 0xdf, 0x64,
-+			0x8e, 0x37, 0x2e, 0xf0, 0xef, 0x93, 0xa0,  },
-+	},
-+
-+	/* CRC32 */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 0
-+	},
-+
-+	/* TKIP-MIC */
-+	{  .min_version = 0x65,
-+		.test[0].outlen = 8, .test[0].data =   { 0x16, 0xfb, 0xa0,
-+			0x0e, 0xe2, 0xab, 0x6c, 0x97,  }
-+	},
-+
-+	/* SHA3-224 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 28, .test[1].data =  { 0x73, 0xe0, 0x87,
-+			0xae, 0x12, 0x71, 0xb2, 0xc5, 0xf6, 0x85, 0x46, 0xc9,
-+			0x3a, 0xb4, 0x25, 0x14, 0xa6, 0x9e, 0xef, 0x25, 0x2b,
-+			0xfd, 0xd1, 0x37, 0x55, 0x74, 0x8a, 0x00,  }
-+	},
-+
-+	/* SHA3-256 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data = { 0x9e, 0x62, 0x91, 0x97,
-+			0x0c, 0xb4, 0x4d, 0xd9, 0x40, 0x08, 0xc7, 0x9b, 0xca,
-+			0xf9, 0xd8, 0x6f, 0x18, 0xb4, 0xb4, 0x9b, 0xa5, 0xb2,
-+			0xa0, 0x47, 0x81, 0xdb, 0x71, 0x99, 0xed, 0x3b, 0x9e,
-+			0x4e,  }
-+	},
-+
-+	/* SHA3-384 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 48, .test[1].data =  { 0x4b, 0xda, 0xab,
-+			0xf7, 0x88, 0xd3, 0xad, 0x1a, 0xd8, 0x3d, 0x6d, 0x93,
-+			0xc7, 0xe4, 0x49, 0x37, 0xc2, 0xe6, 0x49, 0x6a, 0xf2,
-+			0x3b, 0xe3, 0x35, 0x4d, 0x75, 0x69, 0x87, 0xf4, 0x51,
-+			0x60, 0xfc, 0x40, 0x23, 0xbd, 0xa9, 0x5e, 0xcd, 0xcb,
-+			0x3c, 0x7e, 0x31, 0xa6, 0x2f, 0x72, 0x6d, 0x70, 0x2c,
-+		}
-+	},
-+
-+	/* SHA3-512 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 64, .test[1].data = { 0xad, 0x56, 0xc3, 0x5c,
-+			0xab, 0x50, 0x63, 0xb9, 0xe7, 0xea, 0x56, 0x83, 0x14,
-+			0xec, 0x81, 0xc4, 0x0b, 0xa5, 0x77, 0xaa, 0xe6, 0x30,
-+			0xde, 0x90, 0x20, 0x04, 0x00, 0x9e, 0x88, 0xf1, 0x8d,
-+			0xa5, 0x7b, 0xbd, 0xfd, 0xaa, 0xa0, 0xfc, 0x18, 0x9c,
-+			0x66, 0xc8, 0xd8, 0x53, 0x24, 0x8b, 0x6b, 0x11, 0x88,
-+			0x44, 0xd5, 0x3f, 0x7d, 0x0b, 0xa1, 0x1d, 0xe0, 0xf3,
-+			0xbf, 0xaf, 0x4c, 0xdd, 0x9b, 0x3f,  }
-+	},
-+
-+	/* SHAKE128 */
-+	{  .min_version = 0x65,
-+		.test[4].outlen = 16, .test[4].data =  { 0x24, 0xa7, 0xca,
-+			0x4b, 0x75, 0xe3, 0x89, 0x8d, 0x4f, 0x12, 0xe7, 0x4d,
-+			0xea, 0x8c, 0xbb, 0x65 }
-+	},
-+
-+	/* SHAKE256 */
-+	{  .min_version = 0x65,
-+		.test[4].outlen = 32, .test[4].data =  { 0xf5, 0x97, 0x7c,
-+			0x82, 0x83, 0x54, 0x6a, 0x63, 0x72, 0x3b, 0xc3, 0x1d,
-+			0x26, 0x19, 0x12, 0x4f,
-+			0x11, 0xdb, 0x46, 0x58, 0x64, 0x33, 0x36, 0x74, 0x1d,
-+			0xf8, 0x17, 0x57, 0xd5, 0xad, 0x30, 0x62 }
-+	},
-+
-+	/* CSHAKE128 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0xe0, 0x6f, 0xd8,
-+			0x50, 0x57, 0x6f, 0xe4, 0xfa, 0x7e, 0x13, 0x42, 0xb5,
-+			0xf8, 0x13, 0xeb, 0x23 }
-+	},
-+
-+	/* CSHAKE256 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data =  { 0xf3, 0xf2, 0xb5,
-+			0x47, 0xf2, 0x16, 0xba, 0x6f, 0x49, 0x83, 0x3e, 0xad,
-+			0x1e, 0x46, 0x85, 0x54,
-+			0xd0, 0xd7, 0xf9, 0xc6, 0x7e, 0xe9, 0x27, 0xc6, 0xc3,
-+			0xc3, 0xdb, 0x91, 0xdb, 0x97, 0x04, 0x0f }
-+	},
-+
-+	/* KMAC128 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0x6c, 0x3f, 0x29,
-+			0xfe, 0x01, 0x96, 0x59, 0x36, 0xb7, 0xae, 0xb7, 0xff,
-+			0x71, 0xe0, 0x3d, 0xff },
-+		.test[4].outlen = 16, .test[4].data =  { 0x58, 0xd9, 0x8d,
-+			0xe8, 0x1f, 0x64, 0xb4, 0xa3, 0x9f, 0x63, 0xaf, 0x21,
-+			0x99, 0x03, 0x97, 0x06 },
-+		.test[5].outlen = 16, .test[5].data =  { 0xf8, 0xf9, 0xb7,
-+			0xa4, 0x05, 0x3d, 0x90, 0x7c, 0xf2, 0xa1, 0x7c, 0x34,
-+			0x39, 0xc2, 0x87, 0x4b },
-+		.test[6].outlen = 16, .test[6].data =  { 0xef, 0x4a, 0xd5,
-+			0x1d, 0xd7, 0x83, 0x56, 0xd3, 0xa8, 0x3c, 0xf5, 0xf8,
-+			0xd1, 0x12, 0xf4, 0x44 }
-+	},
-+
-+	/* KMAC256 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data =  { 0x0d, 0x86, 0xfa,
-+			0x92, 0x92, 0xe4, 0x77, 0x24, 0x6a, 0xcc, 0x79, 0xa0,
-+			0x1e, 0xb4, 0xc3, 0xac,
-+			0xfc, 0x56, 0xbc, 0x63, 0xcc, 0x1b, 0x6e, 0xf6, 0xc8,
-+			0x99, 0xa5, 0x3a, 0x38, 0x14, 0xa2, 0x40 },
-+		.test[4].outlen = 32, .test[4].data =  { 0xad, 0x99, 0xed,
-+			0x20, 0x1f, 0xbe, 0x45, 0x07, 0x3d, 0xf4, 0xae, 0x9f,
-+			0xc2, 0xd8, 0x06, 0x18,
-+			0x31, 0x4e, 0x8c, 0xb6, 0x33, 0xe8, 0x31, 0x36, 0x00,
-+			0xdd, 0x42, 0x20, 0xda, 0x2b, 0xd5, 0x2b },
-+		.test[5].outlen = 32, .test[5].data =  { 0xf9, 0xc6, 0x2b,
-+			0x17, 0xa0, 0x04, 0xd9, 0xf2, 0x6c, 0xbf, 0x5d, 0xa5,
-+			0x9a, 0xd7, 0x36, 0x1d,
-+			0xad, 0x66, 0x6b, 0x3d, 0xb1, 0x52, 0xd3, 0x81, 0x39,
-+			0x20, 0xd4, 0xf0, 0x43, 0x72, 0x2c, 0xb7 },
-+		.test[6].outlen = 32, .test[6].data =  { 0xcc, 0x89, 0xe4,
-+			0x05, 0x58, 0x77, 0x38, 0x8b, 0x18, 0xa0, 0x7c, 0x8d,
-+			0x20, 0x99, 0xea, 0x6e,
-+			0x6b, 0xe9, 0xf7, 0x0c, 0xe1, 0xe5, 0xce, 0xbc, 0x55,
-+			0x4c, 0x80, 0xa5, 0xdc, 0xae, 0xf7, 0x94 }
-+	},
-+
-+	/* KMAC128XOF */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0x84, 0x07, 0x89,
-+			0x29, 0xa7, 0xf4, 0x98, 0x91, 0xf5, 0x64, 0x61, 0x8d,
-+			0xa5, 0x93, 0x00, 0x31 },
-+		.test[4].outlen = 16, .test[4].data =  { 0xf0, 0xa4, 0x1b,
-+			0x98, 0x0f, 0xb3, 0xf2, 0xbd, 0xc3, 0xfc, 0x64, 0x1f,
-+			0x73, 0x1f, 0xd4, 0x74 },
-+		.test[5].outlen = 16, .test[5].data =  { 0xa5, 0xc5, 0xad,
-+			0x25, 0x59, 0xf1, 0x5d, 0xea, 0x5b, 0x18, 0x0a, 0x52,
-+			0xce, 0x6c, 0xc0, 0x88 },
-+		.test[6].outlen = 16, .test[6].data =  { 0x1a, 0x81, 0xdd,
-+			0x81, 0x47, 0x89, 0xf4, 0x15, 0xcc, 0x18, 0x05, 0x81,
-+			0xe3, 0x95, 0x21, 0xc3 }
-+	},
-+
-+	/* KMAC256XOF */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data =  { 0xff, 0x85, 0xe9,
-+			0x61, 0x67, 0x96, 0x35, 0x58, 0x33, 0x38, 0x2c, 0xe8,
-+			0x25, 0x77, 0xbe, 0x63,
-+			0xd5, 0x2c, 0xa7, 0xef, 0xce, 0x9b, 0x63, 0x71, 0xb2,
-+			0x09, 0x7c, 0xd8, 0x60, 0x4e, 0x5a, 0xfa },
-+		.test[4].outlen = 32, .test[4].data =  { 0x86, 0x89, 0xc2,
-+			0x4a, 0xe8, 0x18, 0x46, 0x10, 0x6b, 0xf2, 0x09, 0xd7,
-+			0x37, 0x83, 0xab, 0x77,
-+			0xb5, 0xce, 0x7c, 0x96, 0x9c, 0xfa, 0x0f, 0xa0, 0xd8,
-+			0xde, 0xb5, 0xb7, 0xc6, 0xcd, 0xa9, 0x8f },
-+		.test[5].outlen = 32, .test[5].data =  { 0x4d, 0x71, 0x81,
-+			0x5a, 0x5f, 0xac, 0x3b, 0x29, 0xf2, 0x5f, 0xb6, 0x56,
-+			0xf1, 0x76, 0xcf, 0xdc,
-+			0x51, 0x56, 0xd7, 0x3c, 0x47, 0xec, 0x6d, 0xea, 0xc6,
-+			0x3e, 0x54, 0xe7, 0x6f, 0xdc, 0xe8, 0x39 },
-+		.test[6].outlen = 32, .test[6].data =  { 0x5f, 0xc5, 0xe1,
-+			0x1e, 0xe7, 0x55, 0x0f, 0x62, 0x71, 0x29, 0xf3, 0x0a,
-+			0xb3, 0x30, 0x68, 0x06,
-+			0xea, 0xec, 0xe4, 0x37, 0x17, 0x37, 0x2d, 0x5d, 0x64,
-+			0x09, 0x70, 0x63, 0x94, 0x80, 0x9b, 0x80 }
-+	},
-+
-+	/* HASH SM3 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data =  { 0xe0, 0xba, 0xb8,
-+			0xf4, 0xd8, 0x17, 0x2b, 0xa2, 0x45, 0x19, 0x0d, 0x13,
-+			0xc9, 0x41, 0x17, 0xe9,
-+			0x3b, 0x82, 0x16, 0x6c, 0x25, 0xb2, 0xb6, 0x98, 0x83,
-+			0x35, 0x0c, 0x19, 0x2c, 0x90, 0x51, 0x40 },
-+		.test[4].outlen = 32, .test[4].data =  { 0xe0, 0xba, 0xb8,
-+			0xf4, 0xd8, 0x17, 0x2b, 0xa2, 0x45, 0x19, 0x0d, 0x13,
-+			0xc9, 0x41, 0x17, 0xe9,
-+			0x3b, 0x82, 0x16, 0x6c, 0x25, 0xb2, 0xb6, 0x98, 0x83,
-+			0x35, 0x0c, 0x19, 0x2c, 0x90, 0x51, 0x40 },
-+		.test[5].outlen = 32, .test[5].data =  { 0xe0, 0xba, 0xb8,
-+			0xf4, 0xd8, 0x17, 0x2b, 0xa2, 0x45, 0x19, 0x0d, 0x13,
-+			0xc9, 0x41, 0x17, 0xe9,
-+			0x3b, 0x82, 0x16, 0x6c, 0x25, 0xb2, 0xb6, 0x98, 0x83,
-+			0x35, 0x0c, 0x19, 0x2c, 0x90, 0x51, 0x40 },
-+		.test[6].outlen = 32, .test[6].data =  { 0xe0, 0xba, 0xb8,
-+			0xf4, 0xd8, 0x17, 0x2b, 0xa2, 0x45, 0x19, 0x0d, 0x13,
-+			0xc9, 0x41, 0x17, 0xe9,
-+			0x3b, 0x82, 0x16, 0x6c, 0x25, 0xb2, 0xb6, 0x98, 0x83,
-+			0x35, 0x0c, 0x19, 0x2c, 0x90, 0x51, 0x40 }
-+	},
-+
-+	/* HMAC SM3 */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 32, .test[1].data =  { 0x68, 0xf0, 0x65,
-+			0xd8, 0xd8, 0xc9, 0xc2, 0x0e, 0x10, 0xfd, 0x52, 0x7c,
-+			0xf2, 0xd7, 0x42, 0xd3,
-+			0x08, 0x44, 0x22, 0xbc, 0xf0, 0x9d, 0xcc, 0x34, 0x7b,
-+			0x76, 0x13, 0x91, 0xba, 0xce, 0x4d, 0x17 },
-+		.test[4].outlen = 32, .test[4].data =  { 0xd8, 0xab, 0x2a,
-+			0x7b, 0x56, 0x21, 0xb1, 0x59, 0x64, 0xb2, 0xa3, 0xd6,
-+			0x72, 0xb3, 0x95, 0x81,
-+			0xa0, 0xcd, 0x96, 0x47, 0xf0, 0xbc, 0x8c, 0x16, 0x5b,
-+			0x9b, 0x7d, 0x2f, 0x71, 0x3f, 0x23, 0x19},
-+		.test[5].outlen = 32, .test[5].data =  { 0xa0, 0xd1, 0xd5,
-+			0xa0, 0x9e, 0x4c, 0xca, 0x8c, 0x7b, 0xe0, 0x8f, 0x70,
-+			0x92, 0x2e, 0x3f, 0x4c,
-+			0xa0, 0xca, 0xef, 0xa1, 0x86, 0x9d, 0xb2, 0xe1, 0xc5,
-+			0xfa, 0x9d, 0xfa, 0xbc, 0x11, 0xcb, 0x1f },
-+		.test[6].outlen = 32, .test[6].data =  { 0xa0, 0xd1, 0xd5,
-+			0xa0, 0x9e, 0x4c, 0xca, 0x8c, 0x7b, 0xe0, 0x8f, 0x70,
-+			0x92, 0x2e, 0x3f, 0x4c,
-+			0xa0, 0xca, 0xef, 0xa1, 0x86, 0x9d, 0xb2, 0xe1, 0xc5,
-+			0xfa, 0x9d, 0xfa, 0xbc, 0x11, 0xcb, 0x1f}
-+	},
-+
-+	/* MAC_SM4_XCBC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0x69, 0xaf, 0x45,
-+			0xe6, 0x0c, 0x78, 0x71, 0x7e, 0x44, 0x6c, 0xfe, 0x68,
-+			0xd4, 0xfe, 0x20, 0x8b },
-+		.test[4].outlen = 16, .test[4].data =  { 0x69, 0xaf, 0x45,
-+			0xe6, 0x0c, 0x78, 0x71, 0x7e, 0x44, 0x6c, 0xfe, 0x68,
-+			0xd4, 0xfe, 0x20, 0x8b },
-+		.test[5].outlen = 16, .test[5].data =  { 0x69, 0xaf, 0x45,
-+			0xe6, 0x0c, 0x78, 0x71, 0x7e, 0x44, 0x6c, 0xfe, 0x68,
-+			0xd4, 0xfe, 0x20, 0x8b },
-+		.test[6].outlen = 16, .test[6].data =  { 0x69, 0xaf, 0x45,
-+			0xe6, 0x0c, 0x78, 0x71, 0x7e, 0x44, 0x6c, 0xfe, 0x68,
-+			0xd4, 0xfe, 0x20, 0x8b }
-+	},
-+
-+	/* MAC_SM4_CMAC */
-+	{  .min_version = 0x65,
-+		.test[1].outlen = 16, .test[1].data =  { 0x36, 0xbe, 0xec,
-+			0x03, 0x9c, 0xc7, 0x0c, 0x28, 0x23, 0xdd, 0x71, 0x8b,
-+			0x3c, 0xbd, 0x7f, 0x37 },
-+		.test[4].outlen = 16, .test[4].data =  { 0x36, 0xbe, 0xec,
-+			0x03, 0x9c, 0xc7, 0x0c, 0x28, 0x23, 0xdd, 0x71, 0x8b,
-+			0x3c, 0xbd, 0x7f, 0x37 },
-+		.test[5].outlen = 16, .test[5].data =  { 0x36, 0xbe, 0xec,
-+			0x03, 0x9c, 0xc7, 0x0c, 0x28, 0x23, 0xdd, 0x71, 0x8b,
-+			0x3c, 0xbd, 0x7f, 0x37 },
-+		.test[6].outlen = 16, .test[6].data =  { 0x36, 0xbe, 0xec,
-+			0x03, 0x9c, 0xc7, 0x0c, 0x28, 0x23, 0xdd, 0x71, 0x8b,
-+			0x3c, 0xbd, 0x7f, 0x37 }
-+	},
+diff --git a/drivers/crypto/dwc-spacc/spacc_ahash.c b/drivers/crypto/dwc-spacc/spacc_ahash.c
+new file mode 100644
+index 000000000000..a1ed8e4571a0
+--- /dev/null
++++ b/drivers/crypto/dwc-spacc/spacc_ahash.c
+@@ -0,0 +1,972 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/dmapool.h>
++#include <crypto/sm3.h>
++#include <crypto/sha1.h>
++#include <crypto/sm4.h>
++#include <crypto/sha2.h>
++#include <crypto/sha3.h>
++#include <crypto/md5.h>
++#include <crypto/aes.h>
++#include <linux/dma-mapping.h>
++#include <linux/interrupt.h>
++#include <linux/platform_device.h>
++#include <crypto/scatterwalk.h>
++#include <crypto/internal/hash.h>
++#include <linux/delay.h>
++#include <linux/atomic.h>
++
++#include "spacc_core.h"
++#include "spacc_device.h"
++
++#define PPP_BUF_SIZE 128
++
++struct sdesc {
++	struct shash_desc shash;
++	char ctx[];
++};
++
++static struct dma_pool *spacc_hash_pool;
++static LIST_HEAD(spacc_hash_alg_list);
++static DEFINE_MUTEX(spacc_hash_alg_mutex);
++
++static struct mode_tab possible_hashes[] = {
++	{ .keylen[0] = 16, MODE_TAB_HASH("cmac(aes)", MAC_CMAC, 16,  16),
++	.sw_fb = true },
++	{ .keylen[0] = 48 | MODE_TAB_HASH_XCBC, MODE_TAB_HASH("xcbc(aes)",
++	MAC_XCBC, 16,  16), .sw_fb = true },
++
++	{ MODE_TAB_HASH("cmac(sm4)",	MAC_SM4_CMAC, 16, 16), .sw_fb = true },
++	{ .keylen[0] = 32 | MODE_TAB_HASH_XCBC, MODE_TAB_HASH("xcbc(sm4)",
++	MAC_SM4_XCBC, 16, 16), .sw_fb = true },
++
++	{ MODE_TAB_HASH("hmac(md5)",	HMAC_MD5, MD5_DIGEST_SIZE,
++	MD5_HMAC_BLOCK_SIZE), .sw_fb = true },
++	 { MODE_TAB_HASH("md5",		HASH_MD5, MD5_DIGEST_SIZE,
++	MD5_HMAC_BLOCK_SIZE), .sw_fb = true },
++
++	{ MODE_TAB_HASH("hmac(sha1)",	HMAC_SHA1, SHA1_DIGEST_SIZE,
++	SHA1_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha1",		HASH_SHA1, SHA1_DIGEST_SIZE,
++	SHA1_BLOCK_SIZE), .sw_fb = true },
++
++	{ MODE_TAB_HASH("sha224",	HASH_SHA224, SHA224_DIGEST_SIZE,
++	SHA224_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha256",	HASH_SHA256, SHA256_DIGEST_SIZE,
++	SHA256_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha384",	HASH_SHA384, SHA384_DIGEST_SIZE,
++	SHA384_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha512",	HASH_SHA512, SHA512_DIGEST_SIZE,
++	SHA512_BLOCK_SIZE), .sw_fb = true },
++
++	{ MODE_TAB_HASH("hmac(sha512)",	HMAC_SHA512, SHA512_DIGEST_SIZE,
++	SHA512_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("hmac(sha224)",	HMAC_SHA224, SHA224_DIGEST_SIZE,
++	SHA224_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("hmac(sha256)",	HMAC_SHA256, SHA256_DIGEST_SIZE,
++	SHA256_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("hmac(sha384)",	HMAC_SHA384, SHA384_DIGEST_SIZE,
++	SHA384_BLOCK_SIZE), .sw_fb = true },
++
++	{ MODE_TAB_HASH("sha3-224", HASH_SHA3_224, SHA3_224_DIGEST_SIZE,
++	SHA3_224_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha3-256", HASH_SHA3_256, SHA3_256_DIGEST_SIZE,
++	SHA3_256_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha3-384", HASH_SHA3_384, SHA3_384_DIGEST_SIZE,
++	SHA3_384_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sha3-512", HASH_SHA3_512, SHA3_512_DIGEST_SIZE,
++	SHA3_512_BLOCK_SIZE), .sw_fb = true },
++
++	{ MODE_TAB_HASH("hmac(sm3)", HMAC_SM3, SM3_DIGEST_SIZE,
++	SM3_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("sm3", HASH_SM3, SM3_DIGEST_SIZE,
++	SM3_BLOCK_SIZE), .sw_fb = true },
++	{ MODE_TAB_HASH("michael_mic", MAC_MICHAEL, 8, 8), .sw_fb = true },
 +
 +};
-+#endif
 +
- int spacc_sg_to_ddt(struct device *dev, struct scatterlist *sg,
- 		    int nbytes, struct pdu_ddt *ddt, int dma_direction)
- {
-@@ -560,6 +1436,223 @@ int spacc_close(struct spacc_device *dev, int handle)
- 	return spacc_job_release(dev, handle);
- }
- 
-+#if IS_ENABLED(CONFIG_CRYPTO_DEV_SPACC_AUTODETECT)
-+static int spacc_set_auxinfo(struct spacc_device *spacc, int jobid,
-+			     u32 direction, u32 bitsize)
++static void spacc_hash_cleanup_dma_dst(struct spacc_crypto_ctx *tctx,
++				       struct ahash_request *req)
 +{
-+	int ret = 0;
-+	struct spacc_job *job;
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
 +
-+	if (jobid < 0 || jobid >= SPACC_MAX_JOBS)
++	pdu_ddt_free(&ctx->dst);
++}
++
++static void spacc_hash_cleanup_dma_src(struct spacc_crypto_ctx *tctx,
++				       struct ahash_request *req)
++{
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	if (tctx->tmp_sgl && tctx->tmp_sgl[0].length != 0) {
++		dma_unmap_sg(tctx->dev, tctx->tmp_sgl, ctx->src_nents,
++			     DMA_TO_DEVICE);
++		kfree(tctx->tmp_sgl_buff);
++		tctx->tmp_sgl_buff = NULL;
++		tctx->tmp_sgl[0].length = 0;
++	} else {
++		dma_unmap_sg(tctx->dev, req->src, ctx->src_nents,
++			     DMA_TO_DEVICE);
++	}
++
++	pdu_ddt_free(&ctx->src);
++}
++
++static void spacc_hash_cleanup_dma(struct device *dev,
++				   struct ahash_request *req)
++{
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	dma_unmap_sg(dev, req->src, ctx->src_nents, DMA_TO_DEVICE);
++	pdu_ddt_free(&ctx->src);
++
++	dma_pool_free(spacc_hash_pool, ctx->digest_buf, ctx->digest_dma);
++	pdu_ddt_free(&ctx->dst);
++}
++
++static void spacc_init_calg(struct crypto_alg *calg,
++			    const struct mode_tab *mode)
++{
++	strscpy(calg->cra_name, mode->name);
++	calg->cra_name[sizeof(mode->name) - 1] = '\0';
++
++	strscpy(calg->cra_driver_name, "spacc-");
++	strcat(calg->cra_driver_name, mode->name);
++	calg->cra_driver_name[sizeof(calg->cra_driver_name) - 1] = '\0';
++
++	calg->cra_blocksize = mode->blocklen;
++}
++
++static int spacc_ctx_clone_handle(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++
++	if (tctx->handle < 0)
 +		return -EINVAL;
 +
-+	job = &spacc->job[jobid];
-+	if (!job) {
-+		ret = -EINVAL;
-+	} else {
-+		job->auxinfo_dir = direction;
-+		job->auxinfo_bit_align = bitsize;
-+	}
++	ctx->acb.new_handle = spacc_clone_handle(&priv->spacc, tctx->handle,
++						 &ctx->acb);
 +
-+	return ret;
-+}
-+
-+static void spacc_check_modes(struct spacc_device *spacc, int algo_mode,
-+			      int keysz_idx, void *virt, char *key,
-+			      struct pdu_ddt *ddt)
-+{
-+	int enc;
-+	int hash;
-+	int aadlen;
-+	int ivsize;
-+	int proclen;
-+	int rc = 0;
-+	int err = 0;
-+	bool output_zero_len;
-+	bool output_mismatch;
-+
-+	if ((template[algo_mode] & (1 << keysz_idx)) == 0)
-+		return;
-+
-+	/*
-+	 * Testing keysizes[keysz_idx] with algo 'algo_mode' which
-+	 * should match the ENUMs above
-+	 */
-+
-+	if (template[algo_mode] & 128) {
-+		enc = 0;
-+		hash = algo_mode;
-+	} else {
-+		enc = algo_mode;
-+		hash = 0;
-+	}
-+
-+	rc = spacc_open(spacc, enc, hash, -1, 0, NULL, NULL);
-+	if (rc < 0) {
-+		spacc->config.modes[algo_mode] &= ~(1 << keysz_idx);
-+		return;
-+	}
-+
-+	spacc_set_operation(spacc, rc, OP_ENCRYPT, 0, IP_ICV_APPEND, 0,
-+			0, 0);
-+
-+	/* if this is a hash or mac */
-+	if (template[algo_mode] & 128) {
-+		switch (algo_mode) {
-+		case CRYPTO_MODE_HASH_CSHAKE128:
-+		case CRYPTO_MODE_HASH_CSHAKE256:
-+		case CRYPTO_MODE_MAC_KMAC128:
-+		case CRYPTO_MODE_MAC_KMAC256:
-+		case CRYPTO_MODE_MAC_KMACXOF128:
-+		case CRYPTO_MODE_MAC_KMACXOF256:
-+		       /*
-+			* Special initial bytes to encode
-+			* length for cust strings
-+			*/
-+			key[0] = 0x01;
-+			key[1] = 0x70;
-+			break;
-+		}
-+
-+		spacc_write_context(spacc, rc, SPACC_HASH_OPERATION,
-+				key, keysizes[1][keysz_idx] +
-+				(algo_mode == CRYPTO_MODE_MAC_XCBC ? 32 : 0),
-+				key, 16);
-+	} else {
-+		u32 keysize;
-+
-+		ivsize = 16;
-+		keysize = keysizes[0][keysz_idx];
-+		switch (algo_mode) {
-+		case CRYPTO_MODE_CHACHA20_STREAM:
-+		case CRYPTO_MODE_AES_CCM:
-+		case CRYPTO_MODE_SM4_CCM:
-+			ivsize = 16;
-+			break;
-+		case CRYPTO_MODE_SM4_GCM:
-+		case CRYPTO_MODE_CHACHA20_POLY1305:
-+		case CRYPTO_MODE_AES_GCM:
-+			ivsize = 12;
-+			break;
-+		case CRYPTO_MODE_KASUMI_ECB:
-+		case CRYPTO_MODE_KASUMI_F8:
-+		case CRYPTO_MODE_3DES_CBC:
-+		case CRYPTO_MODE_3DES_ECB:
-+		case CRYPTO_MODE_DES_CBC:
-+		case CRYPTO_MODE_DES_ECB:
-+			ivsize = 8;
-+			break;
-+		case CRYPTO_MODE_SM4_XTS:
-+		case CRYPTO_MODE_AES_XTS:
-+			keysize <<= 1;
-+			break;
-+		}
-+		spacc_write_context(spacc, rc, SPACC_CRYPTO_OPERATION,
-+				key, keysize, key, ivsize);
-+	}
-+
-+	spacc_set_key_exp(spacc, rc);
-+
-+	switch (algo_mode) {
-+	case CRYPTO_MODE_ZUC_UEA3:
-+	case CRYPTO_MODE_SNOW3G_UEA2:
-+	case CRYPTO_MODE_MAC_SNOW3G_UIA2:
-+	case CRYPTO_MODE_MAC_ZUC_UIA3:
-+	case CRYPTO_MODE_KASUMI_F8:
-+		spacc_set_auxinfo(spacc, rc, 0, 0);
-+		break;
-+	case CRYPTO_MODE_MAC_KASUMI_F9:
-+		spacc_set_auxinfo(spacc, rc, 0, 8);
-+		break;
-+	}
-+
-+	memset(virt, 0, 256);
-+
-+	/*
-+	 * 16AAD/16PT or 32AAD/0PT depending on
-+	 * whether we're in a hash or not mode
-+	 */
-+	aadlen  = 16;
-+	proclen = 32;
-+	if (!enc)
-+		aadlen += 16;
-+
-+	switch (algo_mode) {
-+	case CRYPTO_MODE_SM4_CS1:
-+	case CRYPTO_MODE_SM4_CS2:
-+	case CRYPTO_MODE_SM4_CS3:
-+	case CRYPTO_MODE_AES_CS1:
-+	case CRYPTO_MODE_AES_CS2:
-+	case CRYPTO_MODE_AES_CS3:
-+		proclen = 31;
-+		fallthrough;
-+	case CRYPTO_MODE_SM4_XTS:
-+	case CRYPTO_MODE_AES_XTS:
-+		aadlen = 0;
-+	}
-+
-+	err = spacc_packet_enqueue_ddt(spacc, rc, ddt, ddt, proclen, 0,
-+			aadlen, 0, 0, 0);
-+	if (err == 0) {
-+		do {
-+			err = spacc_packet_dequeue(spacc, rc);
-+		} while (err == -EINPROGRESS);
-+	}
-+
-+	output_zero_len = !testdata[algo_mode].test[keysz_idx].outlen;
-+	output_mismatch = memcmp(testdata[algo_mode].test[keysz_idx].data, virt,
-+			testdata[algo_mode].test[keysz_idx].outlen);
-+
-+	if (err != 0 || output_zero_len || output_mismatch)
-+		spacc->config.modes[algo_mode] &= ~(1 << keysz_idx);
-+
-+
-+	spacc_close(spacc, rc);
-+
-+}
-+
-+int spacc_autodetect(struct spacc_device *spacc)
-+{
-+	int x, y;
-+	void *virt;
-+	dma_addr_t dma;
-+	struct pdu_ddt ddt;
-+	unsigned char key[64];
-+
-+	/* allocate DMA memory */
-+	virt = dma_alloc_coherent(get_ddt_device(), SPACC_TEST_DMA_BUFF_SIZE,
-+				  &dma, GFP_KERNEL);
-+	if (!virt)
++	if (ctx->acb.new_handle < 0) {
++		spacc_hash_cleanup_dma(tctx->dev, req);
 +		return -ENOMEM;
-+
-+	if (pdu_ddt_init(spacc->dptr, &ddt, 1)) {
-+		dma_free_coherent(get_ddt_device(), SPACC_TEST_DMA_BUFF_SIZE,
-+				  virt, dma);
-+		return -EIO;
 +	}
 +
-+	pdu_ddt_add(spacc->dptr, &ddt, dma, SPACC_TEST_DMA_BUFF_SIZE);
-+
-+	for (x = 0; x < 64; x++)
-+		key[x] = x;
-+
-+	for (x = 0; x < ARRAY_SIZE(template); x++) {
-+		spacc->config.modes[x] = template[x];
-+		if (template[x] && spacc->config.version >=
-+				testdata[x].min_version) {
-+			for (y = 0; y < (ARRAY_SIZE(keysizes[0])); y++)
-+				spacc_check_modes(spacc, x, y, virt, key, &ddt);
-+		}
-+	}
-+
-+	pdu_ddt_free(&ddt);
-+	dma_free_coherent(get_ddt_device(), SPACC_TEST_DMA_BUFF_SIZE, virt, dma);
++	ctx->acb.tctx  = tctx;
++	ctx->acb.ctx   = ctx;
++	ctx->acb.req   = req;
++	ctx->acb.spacc = &priv->spacc;
 +
 +	return 0;
 +}
 +
-+#else
++static int spacc_hash_init_dma(struct device *dev, struct ahash_request *req)
++{
++	int rc = -1;
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
 +
- static void spacc_static_modes(struct spacc_device *spacc, int x, int y)
- {
- 	/* disable the algos that are not supported here */
-@@ -596,6 +1689,7 @@ int spacc_static_config(struct spacc_device *spacc)
- 
- 	return 0;
- }
-+#endif
- 
- int spacc_clone_handle(struct spacc_device *spacc, int old_handle,
- 		       void *cbdata)
++	gfp_t mflags = GFP_ATOMIC;
++
++	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP)
++		mflags = GFP_KERNEL;
++
++	ctx->digest_buf = dma_pool_alloc(spacc_hash_pool, mflags,
++					 &ctx->digest_dma);
++
++	if (!ctx->digest_buf)
++		return -ENOMEM;
++
++	rc = pdu_ddt_init(dev, &ctx->dst, 1 | 0x80000000);
++	if (rc < 0) {
++		dev_err(dev, "ERR: PDU DDT init error\n");
++		rc = -EIO;
++		goto err_free_digest;
++	}
++
++	pdu_ddt_add(dev, &ctx->dst, ctx->digest_dma, SPACC_MAX_DIGEST_SIZE);
++
++	if (ctx->total_nents > 0 && ctx->single_shot) {
++		/* single shot */
++		spacc_ctx_clone_handle(req);
++
++		if (req->nbytes) {
++			rc = spacc_sg_to_ddt(dev, req->src, req->nbytes,
++					     &ctx->src, DMA_TO_DEVICE);
++		} else {
++			memset(tctx->tmp_buffer, '\0', PPP_BUF_SIZE);
++			sg_set_buf(&tctx->tmp_sgl[0], tctx->tmp_buffer,
++				   PPP_BUF_SIZE);
++			rc = spacc_sg_to_ddt(dev, &tctx->tmp_sgl[0],
++					     tctx->tmp_sgl[0].length,
++					     &ctx->src, DMA_TO_DEVICE);
++		}
++	} else if (ctx->total_nents == 0 && req->nbytes == 0) {
++		spacc_ctx_clone_handle(req);
++
++		/* zero length case */
++		memset(tctx->tmp_buffer, '\0', PPP_BUF_SIZE);
++		sg_set_buf(&tctx->tmp_sgl[0], tctx->tmp_buffer, PPP_BUF_SIZE);
++		rc = spacc_sg_to_ddt(dev, &tctx->tmp_sgl[0],
++				     tctx->tmp_sgl[0].length,
++				     &ctx->src, DMA_TO_DEVICE);
++	}
++
++	if (rc < 0)
++		goto err_free_dst;
++
++	ctx->src_nents = rc;
++
++	return rc;
++
++err_free_dst:
++	pdu_ddt_free(&ctx->dst);
++err_free_digest:
++	dma_pool_free(spacc_hash_pool, ctx->digest_buf, ctx->digest_dma);
++
++	return rc;
++}
++
++static void spacc_free_mems(struct spacc_crypto_reqctx *ctx,
++			    struct spacc_crypto_ctx *tctx,
++			    struct ahash_request *req)
++{
++	spacc_hash_cleanup_dma_dst(tctx, req);
++	spacc_hash_cleanup_dma_src(tctx, req);
++
++	if (ctx->single_shot) {
++		kfree(tctx->tmp_sgl);
++		tctx->tmp_sgl = NULL;
++
++		ctx->single_shot = 0;
++		if (ctx->total_nents)
++			ctx->total_nents = 0;
++	}
++}
++
++static void spacc_digest_cb(void *spacc, void *tfm)
++{
++	int dig_sz;
++	int err = -1;
++	struct ahash_cb_data *cb = tfm;
++	struct spacc_device *device = (struct spacc_device *)spacc;
++
++	dig_sz = crypto_ahash_digestsize(crypto_ahash_reqtfm(cb->req));
++
++	if (cb->ctx->single_shot)
++		memcpy(cb->req->result, cb->ctx->digest_buf, dig_sz);
++	else
++		memcpy(cb->tctx->digest_ctx_buf, cb->ctx->digest_buf, dig_sz);
++
++	err = cb->spacc->job[cb->new_handle].job_err;
++
++	dma_pool_free(spacc_hash_pool, cb->ctx->digest_buf,
++		      cb->ctx->digest_dma);
++	spacc_free_mems(cb->ctx, cb->tctx, cb->req);
++	spacc_close(cb->spacc, cb->new_handle);
++
++	if (cb->req->base.complete) {
++		local_bh_disable();
++		ahash_request_complete(cb->req, err);
++		local_bh_enable();
++	}
++
++	if (atomic_read(&device->wait_counter) > 0) {
++		struct spacc_completion *cur_pos, *next_pos;
++
++		/* wake up waitqueue to obtain a context */
++		atomic_dec(&device->wait_counter);
++		if (atomic_read(&device->wait_counter) > 0) {
++			mutex_lock(&device->spacc_waitq_mutex);
++			list_for_each_entry_safe(cur_pos, next_pos,
++						 &device->spacc_wait_list,
++						 list) {
++				if (cur_pos && cur_pos->wait_done == 1) {
++					cur_pos->wait_done = 0;
++					complete(&cur_pos->spacc_wait_complete);
++					list_del(&cur_pos->list);
++					break;
++				}
++			}
++			mutex_unlock(&device->spacc_waitq_mutex);
++		}
++	}
++}
++
++static int do_shash(struct device *dev, unsigned char *name,
++		    unsigned char *result, const u8 *data1,
++		    unsigned int data1_len, const u8 *data2,
++		    unsigned int data2_len, const u8 *key,
++		    unsigned int key_len)
++{
++	int rc = 0;
++	unsigned int size;
++	struct sdesc *sdesc;
++	struct crypto_shash *hash;
++
++	hash = crypto_alloc_shash(name, 0, 0);
++	if (IS_ERR(hash)) {
++		rc = PTR_ERR(hash);
++		dev_err(dev, "ERR: Crypto %s allocation error %d\n", name, rc);
++		return rc;
++	}
++
++	size = sizeof(struct shash_desc) + crypto_shash_descsize(hash);
++	sdesc = kmalloc(size, GFP_KERNEL);
++	if (!sdesc) {
++		rc = -ENOMEM;
++		goto do_shash_err;
++	}
++	sdesc->shash.tfm = hash;
++
++	if (key_len > 0) {
++		rc = crypto_shash_setkey(hash, key, key_len);
++		if (rc) {
++			dev_err(dev, "ERR: Could not setkey %s shash\n", name);
++			goto do_shash_err;
++		}
++	}
++
++	rc = crypto_shash_init(&sdesc->shash);
++	if (rc) {
++		dev_err(dev, "ERR: Could not init %s shash\n", name);
++		goto do_shash_err;
++	}
++
++	rc = crypto_shash_update(&sdesc->shash, data1, data1_len);
++	if (rc) {
++		dev_err(dev, "ERR: Could not update1\n");
++		goto do_shash_err;
++	}
++
++	if (data2 && data2_len) {
++		rc = crypto_shash_update(&sdesc->shash, data2, data2_len);
++		if (rc) {
++			dev_err(dev, "ERR: Could not update2\n");
++			goto do_shash_err;
++		}
++	}
++
++	rc = crypto_shash_final(&sdesc->shash, result);
++	if (rc)
++		dev_err(dev, "ERR: Could not generate %s hash\n", name);
++
++do_shash_err:
++	crypto_free_shash(hash);
++	kfree(sdesc);
++
++	return rc;
++}
++
++static int spacc_hash_setkey(struct crypto_ahash *tfm, const u8 *key,
++			     unsigned int keylen)
++{
++	int rc = 0;
++	int ret = 0;
++	unsigned int block_size;
++	unsigned int digest_size;
++	char hash_alg[CRYPTO_MAX_ALG_NAME];
++	const struct spacc_alg *salg = spacc_tfm_ahash(&tfm->base);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
++	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++
++	block_size = crypto_tfm_alg_blocksize(&tfm->base);
++	digest_size = crypto_ahash_digestsize(tfm);
++
++	/*
++	 * We will not use the hardware in case of HMACs
++	 * This was meant for hashes but it works for cmac/xcbc since we
++	 * only intend to support 128-bit keys...
++	 */
++	if (keylen > block_size && salg->mode->id != CRYPTO_MODE_MAC_CMAC) {
++		dev_dbg(salg->dev, "Exceeds keylen: %u\n", keylen);
++		dev_dbg(salg->dev, "Req. keylen hashing %s\n",
++			salg->calg->cra_name);
++
++		memset(hash_alg, 0x00, CRYPTO_MAX_ALG_NAME);
++		switch (salg->mode->id)	{
++		case CRYPTO_MODE_HMAC_SHA224:
++			rc = do_shash(salg->dev, "sha224", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		case CRYPTO_MODE_HMAC_SHA256:
++			rc = do_shash(salg->dev, "sha256", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		case CRYPTO_MODE_HMAC_SHA384:
++			rc = do_shash(salg->dev, "sha384", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		case CRYPTO_MODE_HMAC_SHA512:
++			rc = do_shash(salg->dev, "sha512", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		case CRYPTO_MODE_HMAC_MD5:
++			rc = do_shash(salg->dev, "md5", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		case CRYPTO_MODE_HMAC_SHA1:
++			rc = do_shash(salg->dev, "sha1", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++		case CRYPTO_MODE_HMAC_SM3:
++			rc = do_shash(salg->dev, "sm3", tctx->ipad, key,
++				      keylen, NULL, 0, NULL, 0);
++			break;
++
++		default:
++			return -EINVAL;
++		}
++
++		if (rc < 0) {
++			dev_err(salg->dev, "ERR: %d computing shash for %s\n",
++				rc, hash_alg);
++			return -EIO;
++		}
++
++		keylen = digest_size;
++		dev_dbg(salg->dev, "updated keylen: %u\n", keylen);
++
++		tctx->ctx_valid = false;
++
++		if (salg->mode->sw_fb) {
++			rc = crypto_ahash_setkey(tctx->fb.hash,
++						 tctx->ipad, keylen);
++			if (rc < 0)
++				return rc;
++		}
++	} else {
++		memcpy(tctx->ipad, key, keylen);
++		tctx->ctx_valid = false;
++
++		if (salg->mode->sw_fb) {
++			rc = crypto_ahash_setkey(tctx->fb.hash, key, keylen);
++			if (rc < 0)
++				return rc;
++		}
++	}
++
++	/* close handle since key size may have changed */
++	if (tctx->handle >= 0) {
++		spacc_close(&priv->spacc, tctx->handle);
++		put_device(tctx->dev);
++		tctx->handle = -1;
++		tctx->dev = NULL;
++	}
++
++	/* reset priv */
++	priv = NULL;
++	priv = dev_get_drvdata(salg->dev);
++	tctx->dev = get_device(salg->dev);
++	ret = spacc_is_mode_keysize_supported(&priv->spacc, salg->mode->id,
++					      keylen, 1);
++	if (ret) {
++		/* Grab the spacc context if no one is waiting */
++		tctx->handle = spacc_open(&priv->spacc,
++					  CRYPTO_MODE_NULL,
++					  salg->mode->id, -1,
++					  0, spacc_digest_cb, tfm);
++		if (tctx->handle < 0) {
++			dev_err(salg->dev, "ERR: Failed to open SPAcc context\n");
++			put_device(salg->dev);
++			return -EIO;
++		}
++
++	} else {
++		dev_err(salg->dev, "Keylen: %d not enabled for algo: %d",
++			keylen, salg->mode->id);
++	}
++
++	rc = spacc_set_operation(&priv->spacc, tctx->handle, OP_ENCRYPT,
++				 ICV_HASH, IP_ICV_OFFSET, 0, 0, 0);
++	if (rc < 0) {
++		spacc_close(&priv->spacc, tctx->handle);
++		tctx->handle = -1;
++		put_device(tctx->dev);
++		return -EIO;
++	}
++
++	if (salg->mode->id == CRYPTO_MODE_MAC_XCBC ||
++	    salg->mode->id == CRYPTO_MODE_MAC_SM4_XCBC) {
++		rc = spacc_compute_xcbc_key(&priv->spacc, salg->mode->id,
++					    tctx->handle, tctx->ipad,
++					    keylen, tctx->ipad);
++		if (rc < 0) {
++			dev_err(tctx->dev,
++				"Failed to compute XCBC key: %d\n", rc);
++			return -EIO;
++		}
++		rc = spacc_write_context(&priv->spacc, tctx->handle,
++					 SPACC_HASH_OPERATION, tctx->ipad,
++					 32 + keylen, NULL, 0);
++	} else {
++		rc = spacc_write_context(&priv->spacc, tctx->handle,
++					 SPACC_HASH_OPERATION, tctx->ipad,
++					 keylen, NULL, 0);
++	}
++
++	memset(tctx->ipad, 0, sizeof(tctx->ipad));
++	if (rc < 0) {
++		dev_err(tctx->dev, "ERR: Failed to write SPAcc context\n");
++		/* Non-fatal, we continue with the software fallback */
++		return 0;
++	}
++
++	tctx->ctx_valid = true;
++
++	return 0;
++}
++
++static int spacc_set_statesize(struct spacc_alg *salg)
++{
++	unsigned int statesize = 0;
++
++	switch (salg->mode->id) {
++	case CRYPTO_MODE_HMAC_SHA1:
++	case CRYPTO_MODE_HASH_SHA1:
++		statesize = sizeof(struct sha1_state);
++		break;
++	case CRYPTO_MODE_MAC_CMAC:
++	case CRYPTO_MODE_MAC_XCBC:
++		statesize = sizeof(struct crypto_aes_ctx);
++		break;
++	case CRYPTO_MODE_MAC_SM4_CMAC:
++	case CRYPTO_MODE_MAC_SM4_XCBC:
++		statesize = sizeof(struct sm4_ctx);
++		break;
++	case CRYPTO_MODE_HMAC_MD5:
++	case CRYPTO_MODE_HASH_MD5:
++		statesize = sizeof(struct md5_state);
++		break;
++	case CRYPTO_MODE_HASH_SHA224:
++	case CRYPTO_MODE_HASH_SHA256:
++	case CRYPTO_MODE_HMAC_SHA224:
++	case CRYPTO_MODE_HMAC_SHA256:
++		statesize = sizeof(struct sha256_state);
++		break;
++	case CRYPTO_MODE_HMAC_SHA512:
++	case CRYPTO_MODE_HASH_SHA512:
++		statesize = sizeof(struct sha512_state);
++		break;
++	case CRYPTO_MODE_HMAC_SHA384:
++	case CRYPTO_MODE_HASH_SHA384:
++		statesize = sizeof(struct spacc_crypto_reqctx);
++		break;
++	case CRYPTO_MODE_HASH_SHA3_224:
++	case CRYPTO_MODE_HASH_SHA3_256:
++	case CRYPTO_MODE_HASH_SHA3_384:
++	case CRYPTO_MODE_HASH_SHA3_512:
++		statesize = sizeof(struct sha3_state);
++		break;
++	case CRYPTO_MODE_HMAC_SM3:
++	case CRYPTO_MODE_MAC_MICHAEL:
++		statesize = sizeof(struct spacc_crypto_reqctx);
++		break;
++	default:
++		break;
++	}
++
++	return statesize;
++}
++
++static int spacc_hash_cra_init(struct crypto_tfm *tfm)
++{
++	struct spacc_priv *priv = NULL;
++	const struct spacc_alg *salg = spacc_tfm_ahash(tfm);
++	struct spacc_crypto_ctx *tctx = crypto_tfm_ctx(tfm);
++
++	tctx->handle    = -1;
++	tctx->ctx_valid = false;
++	tctx->dev       = get_device(salg->dev);
++
++	if (salg->mode->sw_fb) {
++		tctx->fb.hash = crypto_alloc_ahash(salg->calg->cra_name, 0,
++						   CRYPTO_ALG_NEED_FALLBACK);
++		if (IS_ERR(tctx->fb.hash) && tctx->handle >= 0) {
++			spacc_close(&priv->spacc, tctx->handle);
++			put_device(tctx->dev);
++			return PTR_ERR(tctx->fb.hash);
++		}
++
++		crypto_ahash_set_statesize(__crypto_ahash_cast(tfm),
++					   crypto_ahash_statesize(tctx->fb.hash));
++
++		crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++					 sizeof(struct spacc_crypto_reqctx) +
++					 crypto_ahash_reqsize(tctx->fb.hash));
++	} else {
++		crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++					 sizeof(struct spacc_crypto_reqctx));
++	}
++
++	return 0;
++}
++
++static void spacc_hash_cra_exit(struct crypto_tfm *tfm)
++{
++	struct spacc_crypto_ctx *tctx = crypto_tfm_ctx(tfm);
++	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++
++	crypto_free_ahash(tctx->fb.hash);
++	tctx->fb.hash = NULL;
++	if (tctx->handle >= 0)
++		spacc_close(&priv->spacc, tctx->handle);
++
++	put_device(tctx->dev);
++}
++
++static int spacc_hash_init(struct ahash_request *req)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	rc = crypto_ahash_init(&ctx->fb.hash_req);
++
++	return rc;
++}
++
++static int spacc_hash_update(struct ahash_request *req)
++{
++	int rc = 0;
++	int nbytes = req->nbytes;
++
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	if (!nbytes)
++		return 0;
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	ctx->fb.hash_req.nbytes = nbytes;
++	ctx->fb.hash_req.src = req->src;
++
++	rc = crypto_ahash_update(&ctx->fb.hash_req);
++
++	return rc;
++}
++
++static int spacc_hash_final(struct ahash_request *req)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	ctx->fb.hash_req.result = req->result;
++
++	rc = crypto_ahash_final(&ctx->fb.hash_req);
++
++	return rc;
++}
++
++static int spacc_hash_digest(struct ahash_request *req)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++	const struct spacc_alg *salg = spacc_tfm_ahash(&reqtfm->base);
++
++	/* direct single shot digest call */
++	ctx->single_shot = 1;
++	ctx->total_nents = sg_nents(req->src);
++
++	/* alloc tmp_sgl */
++	tctx->tmp_sgl = kmalloc(sizeof(*tctx->tmp_sgl) * 2, GFP_KERNEL);
++
++	if (!tctx->tmp_sgl)
++		return -ENOMEM;
++
++	sg_init_table(tctx->tmp_sgl, 2);
++	tctx->tmp_sgl[0].length = 0;
++
++	if (tctx->handle < 0 || !tctx->ctx_valid) {
++		priv = NULL;
++		priv = dev_get_drvdata(salg->dev);
++		tctx->dev = get_device(salg->dev);
++
++		rc = spacc_is_mode_keysize_supported(&priv->spacc,
++						     salg->mode->id, 0, 1);
++		if (rc)
++			tctx->handle = spacc_open(&priv->spacc,
++						  CRYPTO_MODE_NULL,
++						  salg->mode->id, -1, 0,
++						  spacc_digest_cb,
++						  reqtfm);
++		if (tctx->handle < 0) {
++			put_device(salg->dev);
++			dev_dbg(salg->dev,
++				"Digest:failed to open spacc context\n");
++			goto fallback;
++		}
++
++		rc = spacc_set_operation(&priv->spacc, tctx->handle,
++					 OP_ENCRYPT, ICV_HASH, IP_ICV_OFFSET,
++					 0, 0, 0);
++		if (rc < 0) {
++			spacc_close(&priv->spacc, tctx->handle);
++			dev_dbg(salg->dev,
++				"ERR: Failed to set operation\n");
++			tctx->handle = -1;
++			put_device(tctx->dev);
++			goto fallback;
++		}
++		tctx->ctx_valid = true;
++	}
++
++	rc = spacc_hash_init_dma(tctx->dev, req);
++	if (rc < 0)
++		goto fallback;
++
++	if (rc == 0) {
++		kfree(tctx->tmp_sgl);
++		tctx->tmp_sgl = NULL;
++		return 0;
++	}
++
++	rc = spacc_packet_enqueue_ddt(&priv->spacc, ctx->acb.new_handle,
++				      &ctx->src, &ctx->dst, req->nbytes,
++				      0, req->nbytes, 0, 0, 0);
++
++	if (rc < 0) {
++		spacc_hash_cleanup_dma(tctx->dev, req);
++		spacc_close(&priv->spacc, ctx->acb.new_handle);
++
++		if (rc != -EBUSY) {
++			dev_err(salg->dev, "ERR: Failed to enqueue job: %d\n",
++				rc);
++			kfree(tctx->tmp_sgl);
++			tctx->tmp_sgl = NULL;
++			return rc;
++		}
++
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++			return -EBUSY;
++
++		goto fallback;
++	}
++
++	return -EINPROGRESS;
++
++fallback:
++	kfree(tctx->tmp_sgl);
++	tctx->tmp_sgl = NULL;
++
++	/* start from scratch as init is not called before digest */
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	ctx->fb.hash_req.nbytes = req->nbytes;
++	ctx->fb.hash_req.src    = req->src;
++	ctx->fb.hash_req.result = req->result;
++
++	rc = crypto_ahash_digest(&ctx->fb.hash_req);
++
++	return rc;
++}
++
++static int spacc_hash_finup(struct ahash_request *req)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	ctx->fb.hash_req.nbytes     = req->nbytes;
++	ctx->fb.hash_req.src        = req->src;
++	ctx->fb.hash_req.result     = req->result;
++
++	rc = crypto_ahash_finup(&ctx->fb.hash_req);
++
++	return rc;
++}
++
++static int spacc_hash_import(struct ahash_request *req, const void *in)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	rc = crypto_ahash_import(&ctx->fb.hash_req, in);
++
++	return rc;
++}
++
++static int spacc_hash_export(struct ahash_request *req, void *out)
++{
++	int rc = 0;
++	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
++	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++
++	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++
++	ahash_request_set_callback(&ctx->fb.hash_req,
++				   CRYPTO_TFM_REQ_MAY_SLEEP,
++				   req->base.complete,
++				   req->base.data);
++
++	rc = crypto_ahash_export(&ctx->fb.hash_req, out);
++
++	return rc;
++}
++
++static const struct ahash_alg spacc_hash_template = {
++	.init   = spacc_hash_init,
++	.update = spacc_hash_update,
++	.final  = spacc_hash_final,
++	.finup  = spacc_hash_finup,
++	.digest = spacc_hash_digest,
++	.setkey = spacc_hash_setkey,
++	.export = spacc_hash_export,
++	.import = spacc_hash_import,
++
++	.halg.base = {
++		.cra_priority	= 300,
++		.cra_module	= THIS_MODULE,
++		.cra_init	= spacc_hash_cra_init,
++		.cra_exit	= spacc_hash_cra_exit,
++		.cra_ctxsize	= sizeof(struct spacc_crypto_ctx),
++		.cra_flags	= CRYPTO_ALG_TYPE_AHASH    |
++				  CRYPTO_ALG_ASYNC	   |
++				  CRYPTO_ALG_NEED_FALLBACK |
++				  CRYPTO_ALG_OPTIONAL_KEY
++	},
++};
++
++static int spacc_register_hash(struct spacc_alg *salg)
++{
++	int rc = 0;
++
++	salg->calg = &salg->alg.hash.halg.base;
++	salg->alg.hash = spacc_hash_template;
++
++	spacc_init_calg(salg->calg, salg->mode);
++	salg->alg.hash.halg.digestsize = salg->mode->hashlen;
++	salg->alg.hash.halg.statesize = spacc_set_statesize(salg);
++
++	rc = crypto_register_ahash(&salg->alg.hash);
++	if (rc < 0)
++		return rc;
++
++	mutex_lock(&spacc_hash_alg_mutex);
++	list_add(&salg->list, &spacc_hash_alg_list);
++	mutex_unlock(&spacc_hash_alg_mutex);
++
++	return 0;
++}
++
++int spacc_probe_hashes(struct platform_device *spacc_pdev)
++{
++	int rc = 0;
++	unsigned int index;
++	int registered = 0;
++	struct spacc_alg *salg;
++	struct spacc_priv *priv = dev_get_drvdata(&spacc_pdev->dev);
++
++	spacc_hash_pool = dma_pool_create("spacc-digest", &spacc_pdev->dev,
++					  SPACC_MAX_DIGEST_SIZE,
++					  SPACC_DMA_ALIGN, SPACC_DMA_BOUNDARY);
++
++	if (!spacc_hash_pool)
++		return -ENOMEM;
++
++	for (index = 0; index < ARRAY_SIZE(possible_hashes); index++)
++		possible_hashes[index].valid = 0;
++
++	for (index = 0; index < ARRAY_SIZE(possible_hashes); index++) {
++		if (possible_hashes[index].valid == 0 &&
++		    spacc_is_mode_keysize_supported(&priv->spacc,
++				    possible_hashes[index].id & 0xFF,
++				    possible_hashes[index].hashlen, 1)) {
++			salg = kmalloc(sizeof(*salg), GFP_KERNEL);
++			if (!salg)
++				return -ENOMEM;
++
++			salg->mode = &possible_hashes[index];
++
++			/* Copy all dev's over to the salg */
++			salg->dev = &spacc_pdev->dev;
++
++			rc = spacc_register_hash(salg);
++			if (rc < 0) {
++				kfree(salg);
++				continue;
++			}
++
++			registered++;
++			possible_hashes[index].valid = 1;
++		}
++	}
++
++	return registered;
++}
++
++int spacc_unregister_hash_algs(void)
++{
++	struct spacc_alg *salg, *tmp;
++
++	mutex_lock(&spacc_hash_alg_mutex);
++	list_for_each_entry_safe(salg, tmp, &spacc_hash_alg_list, list) {
++		crypto_unregister_alg(salg->calg);
++		list_del(&salg->list);
++		kfree(salg);
++	}
++	mutex_unlock(&spacc_hash_alg_mutex);
++
++	dma_pool_destroy(spacc_hash_pool);
++
++	return 0;
++}
 -- 
 2.25.1
 
