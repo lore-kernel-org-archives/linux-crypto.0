@@ -1,59 +1,59 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D63125229D
-	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EF31F8723
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 12:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746449855; cv=none; b=dKAlCYAryOKoXNymMha5TY8lwEcUg/cp2jXMDeYHYhsq6W5gdJD4HI2LWAj4zOJcEqUEjUUw/53HGt6ZA5JuYLfuLhzvCfcpzWDzBpR3vUXEXnu9qbha36q5uarPXnVORIIFAP/GvAOnJmy+A/hSPqe184TFQHWAlOHLkwjHmV0=
+	t=1746449869; cv=none; b=Vrq4Ibip5twAs1Mt8Du2yO1NIdXNTC5zIcKALdl4RNbekC1tox30dDNmkPOJujPooCTWMeVPw9XpYOuPbxY4UQm9JtdM98QjJ6+VNmBewYvGvUGhomTGugYr9H1mVEOATKFBVfcmmIz90Uh0gx5972qVfVnJEEY/i3yIxmoAx60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746449855; c=relaxed/simple;
-	bh=fIB1g69k/DixNMVF3A97mf37NrC8uxIc0C7Hei6scFc=;
+	s=arc-20240116; t=1746449869; c=relaxed/simple;
+	bh=SB/ErFkKaP5B2PKCeLuYl20A36nBTRIjcWziMO6baeo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MckQYqgjqvnbsmc34JRKdI2BdtXAc3EN0WTKWPRi91EhSPCyX8KLGqcKUai0dNBPpvQwj1NP+bzOSyaIOHrwzXsF8G3kqyup0CRMyu8rFRyFf3a+q8zCOjF/kLoY4466k3DuQCin7KAA/JukmrXAo6cX3ltKF3hZf/G9l+0luWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=pFcxz0Ho; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=hNzJ7e5NMpsmm4LE5h3CVrQOKfflR02ZH3BF8wxQcSjXM+x20i8HsFnc4GYddA54qMQmGRIAXE/u5pN7V+Hgg+OCBJzqG5P3xkbwxJxZivMYtwxBIlhfJ1NdW9ObDFRenGE1t/GS5HNuVrfiGCYJcbixfX6cuoX8cLbkPQcWWJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=fu8opAFg; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="pFcxz0Ho"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-224341bbc1dso54634005ad.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 05:57:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="fu8opAFg"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2240b4de12bso69222375ad.2
+        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 05:57:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1746449852; x=1747054652; darn=vger.kernel.org;
+        d=vayavyalabs.com; s=google; t=1746449865; x=1747054665; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=83PR/wutWRS6CgkTstNDdyhLJBiwi7ThHL/33xMyIxQ=;
-        b=pFcxz0HoRGO+yn/iLmDIPRO8ewZNVuUfN/5TuOSJ95EYmoMJ8kOVMaZGe62W9SAee1
-         sU4BwGvfoJjqosvqH1Vti8970QGEIdww8OoCYJDlkUrUL+99MOhfBo7s2moh+bqwUDWx
-         S+BE0E7DN6w2J8Vth4K+UW+3WtTe59e0kJXI8=
+        bh=rtwotsYBX/iM7v52PRJNTgMeV02TxTgozjVjSNdUGoE=;
+        b=fu8opAFg1hUbeZ81okgc2SIzdv0yaXPhriZL1Uu5tKxDcETpihAl8bNqzjzrnD+nig
+         Vf4iLwgMjjnA3c7PCtiHlfAG0JpuwNL0Nfz3bTRYXYDclmlwdJ6PeE8J2yA1pCIg44Ia
+         BSJZi/a3rq/yDSS5sjLxtdaxxNjKb2kOEBa1o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746449852; x=1747054652;
+        d=1e100.net; s=20230601; t=1746449865; x=1747054665;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=83PR/wutWRS6CgkTstNDdyhLJBiwi7ThHL/33xMyIxQ=;
-        b=Gq1722BLV4R/p4WwnTDcQR6MsJJjN7FHnkKlL60axXJ142Fhf1mWvORQEwfvFXT88R
-         kdCMQ7qtwT9sImJjxYb5RFEf17qLjhr+mO3taHRylyXSJfolKYQGG7BA9O2VjtwVQHi3
-         WiCzSjUzCtik7yk3xJE9AjChCKlzhNmc+uj1JjUOxWJdVWxO4RDoxhJOo7n/JL84CzPQ
-         Yh51jZWQNapHvR3YjQp4WutdZUygjEwyccVoF997uiAgnAStoQQchM0bB2cYQaKJVzxi
-         GlS+jmmeMnWauMLKJzbJJp3VqLC/ky6UQoui8FH7/20o9tssT9Yo+ks8p+PIZCXHnBPZ
-         XoNQ==
-X-Gm-Message-State: AOJu0YxUxNz1AvFk04CUXbjTsgNasR4+DWCDO3wPYdCzFJuxiM9j6KSH
-	QjDAQkfnbLIu2vTVwf+AW6mKcRUOUJhNjDNp+D+HPe6IHxF/DtILyZiRfOSHibpVjooJ5y4CVCb
-	Z
-X-Gm-Gg: ASbGncsgeqqfaTicozVOhBELg89DuKprIo8Ljw13/FnPRfoZQoY7EbADbnnGcCxdq+B
-	7YLvE89qU/KHFFLYb6Wp/4W1x68bqTTXYER7cBPl8yeBKbQdFWoI4hkCPGfkaLYa4HXo93xT2Qx
-	ndL737w34VxGEsZG+NeX7Y65aOEeh3C1FKeyxWbUciC4c2VF695+JLhaQwJI1E8HvaiDiyUEGsu
-	3KKGWGTfgmZmKHWIvKuCxP+WHk4afGGnyHuKWJ4BbGGjdUYH8+TWsTh08cwL9iII6NhQeUjwunL
-	E32TXj1dLahwVs1YdCQO/5C8pV1UaM0eO7MxIRndD+Lzwe3NZnCt8sN6na+s/PuF
-X-Google-Smtp-Source: AGHT+IHkhdvqyGR0IiPZbI7WEzwwkdCEAC+T1EPZ+10W9caSkyUTyeuj7/3h5IWq353JE4eka7WAjg==
-X-Received: by 2002:a17:903:1210:b0:21f:522b:690f with SMTP id d9443c01a7336-22e18c4f149mr132225195ad.46.1746449851838;
-        Mon, 05 May 2025 05:57:31 -0700 (PDT)
+        bh=rtwotsYBX/iM7v52PRJNTgMeV02TxTgozjVjSNdUGoE=;
+        b=R1x3BNiZbZJwKK2pethrkninAaJskgt1Xj2C/GGFt67FOVKOXa+PrOxKZd3yS7zE+8
+         lKzibzIyF8uARvvznUv/PvcrKff3KUU8pdE5JmL1nP+yw2cZFyL9QxAQ+FftjsEAxdRx
+         OkWbjwTVYW40r7mCUImUemMLVZ7RJ51uMKfwNQJo4QkwIxFJlhopUeD40aevYxVcPuU7
+         VS2KFFiQ68v4bV/Qy1hjZAYSbunau3DAyzsziBEB97nInyggFnypBJKA1r3bgBEwv/Q5
+         7wldwQbxyv0d03hkczZi5xTV5A6YPGKF7A2/GjY2Zn3sdIZF51/gQUgH9LZl5RhzjT/r
+         x5EQ==
+X-Gm-Message-State: AOJu0YyL9TLEp2U0SAhZAhVhUbyX7Yl5r9rJl+OzABbNZkZxwvmsAvPl
+	C2J02FiGQYRkxc1MQ30QUHiSjhtWGDJgic4WdQQC18eMvBMW9MkrkeI/pNKUs2A2UkdLWRagFwO
+	d
+X-Gm-Gg: ASbGncszxdThgNY0gdW4CNHUWyM8PJIj+9s71/K2Xe8pL9AOy9Y2Yq85tIWb40w1X+v
+	NaP2kBSNsdGU6a6wF5cofPGgvMRSl9/7rtbnPYXciQgqGb0KdwmYaUl5Cx2GXnhqOk7NH01uisA
+	7pQwwAlbBBrYmmPkhYmfC+tTYUWMSsZAhHqdu4Zm0FuBpsuWc1uMo7g+FLs7LT8eZow5oNp54CZ
+	TrmHnUAIA9BNnMjBJsWFdQfDO/vBgQv7Pb4GNYLBRv6BnWPa6XIj/uYXtxbVYFDtKExKWq/Z0/J
+	i6K9tBWq0aEZMJ6/M/VJesyC+zkxr+KKLqbT9UVeOwAfQ60qQerFkR1n/R5r5W4K
+X-Google-Smtp-Source: AGHT+IHX7gjc3IZG+nwfLrsWGGBNlTqKkRcL2HTaCZJA0gxEdUV12d4+Is0etWx/U5VeWD3pD1X3gQ==
+X-Received: by 2002:a17:902:d486:b0:224:de2:7fd6 with SMTP id d9443c01a7336-22e1ea3a994mr111321765ad.25.1746449864753;
+        Mon, 05 May 2025 05:57:44 -0700 (PDT)
 Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fc6fsm53559565ad.145.2025.05.05.05.57.28
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fc6fsm53559565ad.145.2025.05.05.05.57.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 05:57:31 -0700 (PDT)
+        Mon, 05 May 2025 05:57:44 -0700 (PDT)
 From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 To: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
@@ -62,11 +62,10 @@ To: linux-crypto@vger.kernel.org,
 Cc: Ruud.Derwig@synopsys.com,
 	manjunath.hadli@vayavyalabs.com,
 	adityak@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Subject: [PATCH v2 4/6] Add SPAcc ahash support
-Date: Mon,  5 May 2025 18:25:36 +0530
-Message-Id: <20250505125538.2991314-5-pavitrakumarm@vayavyalabs.com>
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v2 5/6] Add SPAcc AEAD support
+Date: Mon,  5 May 2025 18:25:37 +0530
+Message-Id: <20250505125538.2991314-6-pavitrakumarm@vayavyalabs.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
 References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
@@ -80,178 +79,93 @@ Content-Transfer-Encoding: 8bit
 
 From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 
-Add ahash support to SPAcc driver.
-Below are the hash algos supported:
-- cmac(aes)
-- xcbc(aes)
-- cmac(sm4)
-- xcbc(sm4)
-- hmac(md5)
-- md5
-- hmac(sha1)
-- sha1
-- sha224
-- sha256
-- sha384
-- sha512
-- hmac(sha224)
-- hmac(sha256)
-- hmac(sha384)
-- hmac(sha512)
-- sha3-224
-- sha3-256
-- sha3-384
-- sha3-512
-- hmac(sm3)
-- sm3
-- michael_mic
+Add AEAD support to SPAcc driver.
+Below are the supported AEAD algos:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc7539(chacha20,poly1305)
 
-Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
 Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
 Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
 ---
- drivers/crypto/dwc-spacc/spacc_ahash.c | 972 +++++++++++++++++++++++++
- 1 file changed, 972 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ drivers/crypto/dwc-spacc/spacc_aead.c | 1297 +++++++++++++++++++++++++
+ 1 file changed, 1297 insertions(+)
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
 
-diff --git a/drivers/crypto/dwc-spacc/spacc_ahash.c b/drivers/crypto/dwc-spacc/spacc_ahash.c
-new file mode 100644
-index 000000000000..a1ed8e4571a0
+diff --git a/drivers/crypto/dwc-spacc/spacc_aead.c b/drivers/crypto/dwc-spacc/spacc_aead.c
+new file mode 100755
+index 000000000000..9d7589239861
 --- /dev/null
-+++ b/drivers/crypto/dwc-spacc/spacc_ahash.c
-@@ -0,0 +1,972 @@
++++ b/drivers/crypto/dwc-spacc/spacc_aead.c
+@@ -0,0 +1,1297 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+#include <linux/dmapool.h>
-+#include <crypto/sm3.h>
-+#include <crypto/sha1.h>
-+#include <crypto/sm4.h>
-+#include <crypto/sha2.h>
-+#include <crypto/sha3.h>
-+#include <crypto/md5.h>
 +#include <crypto/aes.h>
++#include <crypto/sm4.h>
++#include <crypto/gcm.h>
++#include <crypto/aead.h>
++#include <crypto/authenc.h>
++#include <crypto/scatterwalk.h>
++#include <crypto/internal/aead.h>
++#include <linux/platform_device.h>
 +#include <linux/dma-mapping.h>
 +#include <linux/interrupt.h>
-+#include <linux/platform_device.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/hash.h>
 +#include <linux/delay.h>
 +#include <linux/atomic.h>
 +
-+#include "spacc_core.h"
 +#include "spacc_device.h"
++#include "spacc_core.h"
 +
-+#define PPP_BUF_SIZE 128
++static LIST_HEAD(spacc_aead_alg_list);
++static DEFINE_MUTEX(spacc_aead_alg_mutex);
 +
-+struct sdesc {
-+	struct shash_desc shash;
-+	char ctx[];
++#define ADATA_CCM_BUF		144
++#define SPACC_B0_SIZE		16
++#define SET_IV_IN_SRCBUF	0x80000000
++#define SET_IV_IN_CONTEXT	0x0
++#define AAD_BUF_SIZE		(4096 * 4)
++#define ADATA_BUF_SIZE		(AAD_BUF_SIZE + SPACC_B0_SIZE +\
++				 SPACC_MAX_IV_SIZE)
++
++struct spacc_iv_buf {
++	unsigned char iv[SPACC_MAX_IV_SIZE];
++	unsigned char spacc_adata[ADATA_BUF_SIZE];
++	struct scatterlist sg[2], spacc_adata_sg[2];
++	struct scatterlist *spacc_ptextsg, temp_aad[2];
 +};
 +
-+static struct dma_pool *spacc_hash_pool;
-+static LIST_HEAD(spacc_hash_alg_list);
-+static DEFINE_MUTEX(spacc_hash_alg_mutex);
++static struct kmem_cache *spacc_iv_pool;
 +
-+static struct mode_tab possible_hashes[] = {
-+	{ .keylen[0] = 16, MODE_TAB_HASH("cmac(aes)", MAC_CMAC, 16,  16),
-+	.sw_fb = true },
-+	{ .keylen[0] = 48 | MODE_TAB_HASH_XCBC, MODE_TAB_HASH("xcbc(aes)",
-+	MAC_XCBC, 16,  16), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("cmac(sm4)",	MAC_SM4_CMAC, 16, 16), .sw_fb = true },
-+	{ .keylen[0] = 32 | MODE_TAB_HASH_XCBC, MODE_TAB_HASH("xcbc(sm4)",
-+	MAC_SM4_XCBC, 16, 16), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("hmac(md5)",	HMAC_MD5, MD5_DIGEST_SIZE,
-+	MD5_HMAC_BLOCK_SIZE), .sw_fb = true },
-+	 { MODE_TAB_HASH("md5",		HASH_MD5, MD5_DIGEST_SIZE,
-+	MD5_HMAC_BLOCK_SIZE), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("hmac(sha1)",	HMAC_SHA1, SHA1_DIGEST_SIZE,
-+	SHA1_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha1",		HASH_SHA1, SHA1_DIGEST_SIZE,
-+	SHA1_BLOCK_SIZE), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("sha224",	HASH_SHA224, SHA224_DIGEST_SIZE,
-+	SHA224_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha256",	HASH_SHA256, SHA256_DIGEST_SIZE,
-+	SHA256_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha384",	HASH_SHA384, SHA384_DIGEST_SIZE,
-+	SHA384_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha512",	HASH_SHA512, SHA512_DIGEST_SIZE,
-+	SHA512_BLOCK_SIZE), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("hmac(sha512)",	HMAC_SHA512, SHA512_DIGEST_SIZE,
-+	SHA512_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("hmac(sha224)",	HMAC_SHA224, SHA224_DIGEST_SIZE,
-+	SHA224_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("hmac(sha256)",	HMAC_SHA256, SHA256_DIGEST_SIZE,
-+	SHA256_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("hmac(sha384)",	HMAC_SHA384, SHA384_DIGEST_SIZE,
-+	SHA384_BLOCK_SIZE), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("sha3-224", HASH_SHA3_224, SHA3_224_DIGEST_SIZE,
-+	SHA3_224_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha3-256", HASH_SHA3_256, SHA3_256_DIGEST_SIZE,
-+	SHA3_256_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha3-384", HASH_SHA3_384, SHA3_384_DIGEST_SIZE,
-+	SHA3_384_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sha3-512", HASH_SHA3_512, SHA3_512_DIGEST_SIZE,
-+	SHA3_512_BLOCK_SIZE), .sw_fb = true },
-+
-+	{ MODE_TAB_HASH("hmac(sm3)", HMAC_SM3, SM3_DIGEST_SIZE,
-+	SM3_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("sm3", HASH_SM3, SM3_DIGEST_SIZE,
-+	SM3_BLOCK_SIZE), .sw_fb = true },
-+	{ MODE_TAB_HASH("michael_mic", MAC_MICHAEL, 8, 8), .sw_fb = true },
-+
++static struct mode_tab possible_aeads[] = {
++	{ MODE_TAB_AEAD("rfc7539(chacha20,poly1305)",
++			CRYPTO_MODE_CHACHA20_POLY1305, CRYPTO_MODE_NULL,
++			16, 12, 1), .keylen = { 16, 24, 32 }
++	},
++	{ MODE_TAB_AEAD("gcm(aes)",
++			CRYPTO_MODE_AES_GCM, CRYPTO_MODE_NULL,
++			16, 12, 1), .keylen = { 16, 24, 32 }
++	},
++	{ MODE_TAB_AEAD("gcm(sm4)",
++			CRYPTO_MODE_SM4_GCM, CRYPTO_MODE_NULL,
++			16, 12, 1), .keylen = { 16 }
++	},
++	{ MODE_TAB_AEAD("ccm(aes)",
++			CRYPTO_MODE_AES_CCM, CRYPTO_MODE_NULL,
++			16, 16, 1), .keylen = { 16, 24, 32 }
++	},
++	{ MODE_TAB_AEAD("ccm(sm4)",
++			CRYPTO_MODE_SM4_CCM, CRYPTO_MODE_NULL,
++			16, 16, 1), .keylen = { 16, 24, 32 }
++	},
 +};
 +
-+static void spacc_hash_cleanup_dma_dst(struct spacc_crypto_ctx *tctx,
-+				       struct ahash_request *req)
++static void spacc_init_aead_alg(struct crypto_alg *calg,
++				const struct mode_tab *mode)
 +{
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	pdu_ddt_free(&ctx->dst);
-+}
-+
-+static void spacc_hash_cleanup_dma_src(struct spacc_crypto_ctx *tctx,
-+				       struct ahash_request *req)
-+{
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	if (tctx->tmp_sgl && tctx->tmp_sgl[0].length != 0) {
-+		dma_unmap_sg(tctx->dev, tctx->tmp_sgl, ctx->src_nents,
-+			     DMA_TO_DEVICE);
-+		kfree(tctx->tmp_sgl_buff);
-+		tctx->tmp_sgl_buff = NULL;
-+		tctx->tmp_sgl[0].length = 0;
-+	} else {
-+		dma_unmap_sg(tctx->dev, req->src, ctx->src_nents,
-+			     DMA_TO_DEVICE);
-+	}
-+
-+	pdu_ddt_free(&ctx->src);
-+}
-+
-+static void spacc_hash_cleanup_dma(struct device *dev,
-+				   struct ahash_request *req)
-+{
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	dma_unmap_sg(dev, req->src, ctx->src_nents, DMA_TO_DEVICE);
-+	pdu_ddt_free(&ctx->src);
-+
-+	dma_pool_free(spacc_hash_pool, ctx->digest_buf, ctx->digest_dma);
-+	pdu_ddt_free(&ctx->dst);
-+}
-+
-+static void spacc_init_calg(struct crypto_alg *calg,
-+			    const struct mode_tab *mode)
-+{
-+	strscpy(calg->cra_name, mode->name);
++	strscpy(calg->cra_name, mode->name, sizeof(mode->name) - 1);
 +	calg->cra_name[sizeof(mode->name) - 1] = '\0';
 +
 +	strscpy(calg->cra_driver_name, "spacc-");
@@ -261,143 +175,495 @@ index 000000000000..a1ed8e4571a0
 +	calg->cra_blocksize = mode->blocklen;
 +}
 +
-+static int spacc_ctx_clone_handle(struct ahash_request *req)
++static int ccm_16byte_aligned_len(int in_len)
 +{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++	int len;
++	int computed_mod;
 +
-+	if (tctx->handle < 0)
-+		return -EINVAL;
-+
-+	ctx->acb.new_handle = spacc_clone_handle(&priv->spacc, tctx->handle,
-+						 &ctx->acb);
-+
-+	if (ctx->acb.new_handle < 0) {
-+		spacc_hash_cleanup_dma(tctx->dev, req);
-+		return -ENOMEM;
++	if (in_len > 0) {
++		computed_mod = in_len % 16;
++		if (computed_mod)
++			len = in_len - computed_mod + 16;
++		else
++			len = in_len;
++	} else {
++		len = in_len;
 +	}
 +
-+	ctx->acb.tctx  = tctx;
-+	ctx->acb.ctx   = ctx;
-+	ctx->acb.req   = req;
-+	ctx->acb.spacc = &priv->spacc;
++	return len;
++}
++
++/* Taken from crypto/ccm.c */
++static int spacc_aead_format_adata(u8 *adata, unsigned int a)
++{
++	int len = 0;
++
++	/*
++	 * Add control info for associated data
++	 * RFC 3610 and NIST Special Publication 800-38C
++	 */
++	if (a < 65280) {
++		*(__be16 *)adata = cpu_to_be16(a);
++		len = 2;
++	} else  {
++		*(__be16 *)adata = cpu_to_be16(0xfffe);
++		*(__be32 *)&adata[2] = cpu_to_be32(a);
++		len = 6;
++	}
++
++	return len;
++}
++
++/* Taken from crypto/ccm.c */
++static int spacc_aead_set_msg_len(u8 *block, unsigned int msglen, int csize)
++{
++	__be32 data;
++
++	memset(block, 0, csize);
++	block += csize;
++
++	if (csize >= 4)
++		csize = 4;
++	else if (msglen > (unsigned int)(1 << (8 * csize)))
++		return -EOVERFLOW;
++
++	data = cpu_to_be32(msglen);
++	memcpy(block - csize, (u8 *)&data + 4 - csize, csize);
 +
 +	return 0;
 +}
 +
-+static int spacc_hash_init_dma(struct device *dev, struct ahash_request *req)
++static int spacc_aead_init_dma(struct device *dev, struct aead_request *req,
++			       u64 seq, uint32_t icvlen, int encrypt, int *alen)
 +{
-+	int rc = -1;
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++	struct crypto_aead *reqtfm      = crypto_aead_reqtfm(req);
++	struct spacc_crypto_ctx *tctx   = crypto_aead_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = aead_request_ctx(req);
 +
++	int B0len;
++	int rc = 0;
++	struct spacc_iv_buf *iv;
++	int ccm_aad_16b_len = 0;
++	int payload_len, spacc_adata_sg_buf_len;
++	unsigned int ivsize = crypto_aead_ivsize(reqtfm);
 +	gfp_t mflags = GFP_ATOMIC;
++
++	/* always have 1 byte of IV */
++	if (!ivsize)
++		ivsize = 1;
 +
 +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP)
 +		mflags = GFP_KERNEL;
 +
-+	ctx->digest_buf = dma_pool_alloc(spacc_hash_pool, mflags,
-+					 &ctx->digest_dma);
-+
-+	if (!ctx->digest_buf)
++	ctx->iv_buf = kmem_cache_alloc(spacc_iv_pool, mflags);
++	if (!ctx->iv_buf)
 +		return -ENOMEM;
++	iv = ctx->iv_buf;
 +
-+	rc = pdu_ddt_init(dev, &ctx->dst, 1 | 0x80000000);
-+	if (rc < 0) {
-+		dev_err(dev, "ERR: PDU DDT init error\n");
-+		rc = -EIO;
-+		goto err_free_digest;
-+	}
++	sg_init_table(iv->sg, ARRAY_SIZE(iv->sg));
++	sg_init_table(iv->spacc_adata_sg, ARRAY_SIZE(iv->spacc_adata_sg));
 +
-+	pdu_ddt_add(dev, &ctx->dst, ctx->digest_dma, SPACC_MAX_DIGEST_SIZE);
++	B0len = 0;
++	ctx->aead_nents = 0;
 +
-+	if (ctx->total_nents > 0 && ctx->single_shot) {
-+		/* single shot */
-+		spacc_ctx_clone_handle(req);
++	memset(iv->iv, 0, SPACC_MAX_IV_SIZE);
++	memset(iv->spacc_adata, 0, ADATA_BUF_SIZE);
 +
-+		if (req->nbytes) {
-+			rc = spacc_sg_to_ddt(dev, req->src, req->nbytes,
-+					     &ctx->src, DMA_TO_DEVICE);
-+		} else {
-+			memset(tctx->tmp_buffer, '\0', PPP_BUF_SIZE);
-+			sg_set_buf(&tctx->tmp_sgl[0], tctx->tmp_buffer,
-+				   PPP_BUF_SIZE);
-+			rc = spacc_sg_to_ddt(dev, &tctx->tmp_sgl[0],
-+					     tctx->tmp_sgl[0].length,
-+					     &ctx->src, DMA_TO_DEVICE);
++	/* copy the IV out for AAD */
++	memcpy(iv->iv, req->iv, ivsize);
++
++	/*
++	 * Now we need to figure out the cipher IV which may or
++	 * may not be "req->iv" depending on the mode we are in
++	 */
++	if (tctx->mode & SPACC_MANGLE_IV_FLAG) {
++		switch (tctx->mode & 0x7F00) {
++		case SPACC_MANGLE_IV_RFC3686:
++		case SPACC_MANGLE_IV_RFC4106:
++		case SPACC_MANGLE_IV_RFC4543:
++			{
++				unsigned char *odata = iv->spacc_adata;
++				/*
++				 * We're in RFC3686 mode so the last
++				 * 4 bytes of the key are the SALT
++				 */
++				memcpy(odata, tctx->csalt, 4);
++				memcpy(odata + 4, req->iv, ivsize);
++
++				odata[12] = 0;
++				odata[13] = 0;
++				odata[14] = 0;
++				odata[15] = 1;
++			}
++			break;
++		case SPACC_MANGLE_IV_RFC4309:
++			{
++				unsigned char *odata = iv->spacc_adata;
++				int L, M;
++				u32 lm = req->cryptlen;
++
++				/*
++				 * CCM mode
++				 * p[0..15] is the CTR IV
++				 * p[16..31] is the CBC-MAC B0 block
++				 */
++				B0len = SPACC_B0_SIZE;
++				/* IPsec requires L=4 */
++				L = 4;
++				M = tctx->auth_size;
++
++				/* CTR block */
++				odata[0] = L - 1;
++				memcpy(odata + 1, tctx->csalt, 3);
++				memcpy(odata + 4, req->iv, ivsize);
++				odata[12] = 0;
++				odata[13] = 0;
++				odata[14] = 0;
++				odata[15] = 1;
++
++				/* store B0 block at p[16..31] */
++				odata[16] = (1 << 6) | (((M - 2) >> 1) << 3)
++					| (L - 1);
++				memcpy(odata + 1 + 16, tctx->csalt, 3);
++				memcpy(odata + 4 + 16, req->iv, ivsize);
++
++				/* now store length */
++				odata[16 + 12 + 0] = (lm >> 24) & 0xFF;
++				odata[16 + 12 + 1] = (lm >> 16) & 0xFF;
++				odata[16 + 12 + 2] = (lm >> 8) & 0xFF;
++				odata[16 + 12 + 3] = (lm) & 0xFF;
++
++				/* now store the pre-formatted AAD */
++				odata[32] = (req->assoclen >> 8) & 0xFF;
++				odata[33] = (req->assoclen) & 0xFF;
++				/* we added 2 byte header to the AAD */
++				B0len += 2;
++			}
++			break;
 +		}
-+	} else if (ctx->total_nents == 0 && req->nbytes == 0) {
-+		spacc_ctx_clone_handle(req);
++	} else if (tctx->mode == CRYPTO_MODE_AES_CCM ||
++		   tctx->mode == CRYPTO_MODE_SM4_CCM) {
++		unsigned char *odata = iv->spacc_adata;
++		u8 *orig_iv = req->iv;
++		int L, M;
 +
-+		/* zero length case */
-+		memset(tctx->tmp_buffer, '\0', PPP_BUF_SIZE);
-+		sg_set_buf(&tctx->tmp_sgl[0], tctx->tmp_buffer, PPP_BUF_SIZE);
-+		rc = spacc_sg_to_ddt(dev, &tctx->tmp_sgl[0],
-+				     tctx->tmp_sgl[0].length,
++		u32 lm = (encrypt) ?
++			 req->cryptlen :
++			 req->cryptlen - tctx->auth_size;
++
++		/* to avoid the stale data from previous ccm operations.*/
++		memset(iv->spacc_adata, 0, ADATA_CCM_BUF);
++		iv->spacc_ptextsg = req->src;
++		/*
++		 * CCM mode
++		 * p[0..15] is the CTR IV
++		 * p[16..31] is the CBC-MAC B0 block
++		 */
++		B0len = SPACC_B0_SIZE;
++
++		/* IPsec requires L=4 */
++		L = req->iv[0] + 1;
++		M = tctx->auth_size;
++
++		/*
++		 * Note: rfc 3610 and NIST 800-38C require counter of
++		 * zero to encrypt auth tag.
++		 */
++		memset(orig_iv + 15 - orig_iv[0], 0, orig_iv[0] + 1);
++
++		/* CTR block */
++		memcpy(odata, req->iv, ivsize);
++		memcpy(odata + 16, req->iv, ivsize);
++
++		/*
++		 * Taken from ccm.c
++		 * Note: rfc 3610 and NIST 800-38C require counter of
++		 * zero to encrypt auth tag.
++		 */
++
++		/* store B0 block at p[16..31] */
++		odata[16] |= (8 * ((M - 2) / 2));
++
++		/* set adata if assoclen > 0 */
++		if (req->assoclen)
++			odata[16] |= 64;
++
++		/*
++		 * Now store length, this is L size starts from 16-L
++		 * to 16 of B0
++		 */
++		spacc_aead_set_msg_len(odata + 16 + 16 - L, lm, L);
++
++		if (req->assoclen) {
++			/* store pre-formatted AAD: AAD_LEN + AAD + PAD */
++			*alen = spacc_aead_format_adata(&odata[32],
++							req->assoclen);
++
++			ccm_aad_16b_len =
++				ccm_16byte_aligned_len(req->assoclen + *alen);
++
++			/* adding the rest of AAD from req->src */
++			scatterwalk_map_and_copy(odata + 32 + *alen,
++						 req->src, 0,
++						 req->assoclen, 0);
++
++			/* copy AAD to req->dst */
++			scatterwalk_map_and_copy(odata + 32 + *alen, req->dst,
++						 0, req->assoclen, 1);
++
++			iv->spacc_ptextsg = scatterwalk_ffwd(iv->temp_aad,
++							     req->src,
++							     req->assoclen);
++		}
++
++		/*
++		 * Default is to copy the iv over since the
++		 * cipher and protocol IV are the same
++		 */
++		memcpy(iv->spacc_adata, req->iv, ivsize);
++	}
++
++	/* this is part of the AAD */
++	sg_set_buf(iv->sg, iv->iv, ivsize);
++
++	/* GCM and CCM don't include the IV in the AAD */
++	switch (tctx->mode) {
++	case CRYPTO_MODE_AES_GCM_RFC4106:
++	case CRYPTO_MODE_AES_GCM:
++	case CRYPTO_MODE_SM4_GCM_RFC8998:
++	case CRYPTO_MODE_CHACHA20_POLY1305:
++	case CRYPTO_MODE_NULL:
++
++		payload_len    = req->cryptlen + icvlen + req->assoclen;
++		spacc_adata_sg_buf_len = SPACC_MAX_IV_SIZE + B0len;
++
++		/*
++		 * This is the actual IV getting fed to the core
++		 * (via IV IMPORT)
++		 */
++
++		sg_set_buf(iv->spacc_adata_sg, iv->spacc_adata,
++			   spacc_adata_sg_buf_len);
++
++		sg_chain(iv->spacc_adata_sg,
++			 sg_nents_for_len(iv->spacc_adata_sg,
++					  spacc_adata_sg_buf_len) + 1, req->src);
++
++		rc = spacc_sg_to_ddt(dev, iv->spacc_adata_sg,
++				     spacc_adata_sg_buf_len + payload_len,
 +				     &ctx->src, DMA_TO_DEVICE);
++
++		if (rc < 0)
++			goto err_free_iv;
++		ctx->aead_nents = rc;
++		break;
++	case CRYPTO_MODE_AES_CCM:
++	case CRYPTO_MODE_AES_CCM_RFC4309:
++	case CRYPTO_MODE_SM4_CCM:
++
++		if (encrypt)
++			payload_len =
++				ccm_16byte_aligned_len(req->cryptlen + icvlen);
++		else
++			payload_len =
++				ccm_16byte_aligned_len(req->cryptlen);
++
++		spacc_adata_sg_buf_len = SPACC_MAX_IV_SIZE + B0len +
++							ccm_aad_16b_len;
++
++		/*
++		 * This is the actual IV getting fed to the core (via IV IMPORT)
++		 * This has CTR IV + B0 + AAD(B1, B2, ...)
++		 */
++		sg_set_buf(iv->spacc_adata_sg, iv->spacc_adata,
++			   spacc_adata_sg_buf_len);
++		sg_chain(iv->spacc_adata_sg,
++			 sg_nents_for_len(iv->spacc_adata_sg,
++					  spacc_adata_sg_buf_len) + 1,
++					  iv->spacc_ptextsg);
++
++		rc = spacc_sg_to_ddt(dev, iv->spacc_adata_sg,
++				     spacc_adata_sg_buf_len + payload_len,
++				     &ctx->src, DMA_TO_DEVICE);
++		if (rc < 0)
++			goto err_free_iv;
++		ctx->aead_nents = rc;
++		break;
++	default:
++
++		/*
++		 * This is the actual IV getting fed to the core (via IV IMPORT)
++		 * This has CTR IV + B0 + AAD(B1, B2, ...)
++		 */
++		payload_len = req->cryptlen + icvlen + req->assoclen;
++		spacc_adata_sg_buf_len = SPACC_MAX_IV_SIZE + B0len;
++		sg_set_buf(iv->spacc_adata_sg, iv->spacc_adata,
++			   spacc_adata_sg_buf_len);
++
++		sg_chain(iv->spacc_adata_sg,
++			 sg_nents_for_len(iv->spacc_adata_sg,
++					  spacc_adata_sg_buf_len) + 1,
++					  req->src);
++
++		rc = spacc_sg_to_ddt(dev, iv->spacc_adata_sg,
++				     spacc_adata_sg_buf_len + payload_len,
++				     &ctx->src, DMA_TO_DEVICE);
++
++		if (rc < 0)
++			goto err_free_iv;
++		ctx->aead_nents = rc;
 +	}
 +
-+	if (rc < 0)
-+		goto err_free_dst;
++	/*
++	 * Putting in req->dst is good since it won't overwrite anything
++	 * even in case of CCM this is fine condition
++	 */
++	if (req->dst != req->src) {
++		switch (tctx->mode) {
++		case CRYPTO_MODE_AES_CCM:
++		case CRYPTO_MODE_AES_CCM_RFC4309:
++		case CRYPTO_MODE_SM4_CCM:
++			/*
++			 * If req->dst buffer len is not-positive,
++			 * then skip setting up of DMA
++			 */
++			if (req->dst->length <= 0) {
++				ctx->dst_nents = 0;
++				return 0;
++			}
 +
-+	ctx->src_nents = rc;
++			if (encrypt)
++				payload_len = req->cryptlen + icvlen +
++						req->assoclen;
++			else
++				payload_len = req->cryptlen - tctx->auth_size +
++						req->assoclen;
++			/*
++			 * For corner cases where PTlen=AADlen=0, we set default
++			 * to 16
++			 */
++			rc = spacc_sg_to_ddt(dev, req->dst,
++					     payload_len > 0 ? payload_len : 16,
++					     &ctx->dst, DMA_FROM_DEVICE);
++			if (rc < 0)
++				goto err_free_src;
++			ctx->dst_nents = rc;
++			break;
++		default:
 +
-+	return rc;
++			/*
++			 * If req->dst buffer len is not-positive,
++			 * then skip setting up of DMA
++			 */
++			if (req->dst->length <= 0) {
++				ctx->dst_nents = 0;
++				return 0;
++			}
 +
-+err_free_dst:
-+	pdu_ddt_free(&ctx->dst);
-+err_free_digest:
-+	dma_pool_free(spacc_hash_pool, ctx->digest_buf, ctx->digest_dma);
++			if (encrypt) {
++				payload_len = SPACC_MAX_IV_SIZE + req->cryptlen
++						+ icvlen + req->assoclen;
++			} else {
++				payload_len = req->cryptlen - tctx->auth_size +
++						req->assoclen;
++				if (payload_len <= 0)
++					return -EBADMSG;
++			}
++
++			rc = spacc_sg_to_ddt(dev, req->dst,
++					     payload_len > 0 ? payload_len : 16,
++					     &ctx->dst, DMA_FROM_DEVICE);
++			if (rc < 0)
++				goto err_free_src;
++			ctx->dst_nents = rc;
++		}
++	}
++
++	return 0;
++
++err_free_src:
++	if (ctx->aead_nents) {
++		dma_unmap_sg(dev, iv->spacc_adata_sg, ctx->aead_nents,
++			     DMA_TO_DEVICE);
++
++		pdu_ddt_free(&ctx->src);
++	}
++
++err_free_iv:
++	kmem_cache_free(spacc_iv_pool, ctx->iv_buf);
 +
 +	return rc;
 +}
 +
-+static void spacc_free_mems(struct spacc_crypto_reqctx *ctx,
-+			    struct spacc_crypto_ctx *tctx,
-+			    struct ahash_request *req)
++static void spacc_aead_cleanup_dma(struct device *dev, struct aead_request *req)
 +{
-+	spacc_hash_cleanup_dma_dst(tctx, req);
-+	spacc_hash_cleanup_dma_src(tctx, req);
++	struct spacc_crypto_reqctx *ctx = aead_request_ctx(req);
++	struct spacc_iv_buf *iv = ctx->iv_buf;
 +
-+	if (ctx->single_shot) {
-+		kfree(tctx->tmp_sgl);
-+		tctx->tmp_sgl = NULL;
-+
-+		ctx->single_shot = 0;
-+		if (ctx->total_nents)
-+			ctx->total_nents = 0;
++	if (req->src != req->dst && ctx->dst_nents > 0) {
++		dma_unmap_sg(dev, req->dst, ctx->dst_nents,
++			     DMA_FROM_DEVICE);
++		pdu_ddt_free(&ctx->dst);
 +	}
++
++	if (ctx->aead_nents) {
++		dma_unmap_sg(dev, iv->spacc_adata_sg, ctx->aead_nents,
++			     DMA_TO_DEVICE);
++
++		pdu_ddt_free(&ctx->src);
++	}
++
++	kmem_cache_free(spacc_iv_pool, ctx->iv_buf);
 +}
 +
-+static void spacc_digest_cb(void *spacc, void *tfm)
++static bool spacc_check_keylen(const struct spacc_alg *salg,
++			       unsigned int keylen)
 +{
-+	int dig_sz;
++	unsigned int bit_position, mask = salg->keylen_mask;
++
++	if (mask > (1ul << ARRAY_SIZE(salg->mode->keylen)) - 1)
++		return false;
++
++	for (bit_position = 0; mask; bit_position++, mask >>= 1) {
++		if (mask & 1 && salg->mode->keylen[bit_position] == keylen)
++			return true;
++	}
++
++	return false;
++}
++
++static void spacc_aead_cb(void *spacc, void *tfm)
++{
 +	int err = -1;
-+	struct ahash_cb_data *cb = tfm;
++	struct aead_cb_data *cb = tfm;
 +	struct spacc_device *device = (struct spacc_device *)spacc;
 +
-+	dig_sz = crypto_ahash_digestsize(crypto_ahash_reqtfm(cb->req));
++	u32 status_reg = readl(cb->spacc->regmap + SPACC_REG_STATUS);
 +
-+	if (cb->ctx->single_shot)
-+		memcpy(cb->req->result, cb->ctx->digest_buf, dig_sz);
-+	else
-+		memcpy(cb->tctx->digest_ctx_buf, cb->ctx->digest_buf, dig_sz);
++	/*
++	 * Extract RET_CODE field (bits 25:24) from STATUS register to check
++	 * result of the crypto operation.
++	 */
++	u32 status_ret = (status_reg >> 24) & 0x3;
 +
++	dma_sync_sg_for_cpu(cb->tctx->dev, cb->req->dst,
++			    cb->ctx->dst_nents, DMA_FROM_DEVICE);
++
++	/* ICV mismatch send bad msg */
++	if (status_ret == 0x1) {
++		err = -EBADMSG;
++		goto REQ_DST_CP_SKIP;
++	}
 +	err = cb->spacc->job[cb->new_handle].job_err;
 +
-+	dma_pool_free(spacc_hash_pool, cb->ctx->digest_buf,
-+		      cb->ctx->digest_dma);
-+	spacc_free_mems(cb->ctx, cb->tctx, cb->req);
++REQ_DST_CP_SKIP:
++	spacc_aead_cleanup_dma(cb->tctx->dev, cb->req);
 +	spacc_close(cb->spacc, cb->new_handle);
 +
-+	if (cb->req->base.complete) {
-+		local_bh_disable();
-+		ahash_request_complete(cb->req, err);
-+		local_bh_enable();
-+	}
++	/* call complete */
++	local_bh_disable();
++	aead_request_complete(cb->req, err);
++	local_bh_enable();
 +
 +	if (atomic_read(&device->wait_counter) > 0) {
 +		struct spacc_completion *cur_pos, *next_pos;
@@ -421,676 +687,714 @@ index 000000000000..a1ed8e4571a0
 +	}
 +}
 +
-+static int do_shash(struct device *dev, unsigned char *name,
-+		    unsigned char *result, const u8 *data1,
-+		    unsigned int data1_len, const u8 *data2,
-+		    unsigned int data2_len, const u8 *key,
-+		    unsigned int key_len)
-+{
-+	int rc = 0;
-+	unsigned int size;
-+	struct sdesc *sdesc;
-+	struct crypto_shash *hash;
-+
-+	hash = crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(hash)) {
-+		rc = PTR_ERR(hash);
-+		dev_err(dev, "ERR: Crypto %s allocation error %d\n", name, rc);
-+		return rc;
-+	}
-+
-+	size = sizeof(struct shash_desc) + crypto_shash_descsize(hash);
-+	sdesc = kmalloc(size, GFP_KERNEL);
-+	if (!sdesc) {
-+		rc = -ENOMEM;
-+		goto do_shash_err;
-+	}
-+	sdesc->shash.tfm = hash;
-+
-+	if (key_len > 0) {
-+		rc = crypto_shash_setkey(hash, key, key_len);
-+		if (rc) {
-+			dev_err(dev, "ERR: Could not setkey %s shash\n", name);
-+			goto do_shash_err;
-+		}
-+	}
-+
-+	rc = crypto_shash_init(&sdesc->shash);
-+	if (rc) {
-+		dev_err(dev, "ERR: Could not init %s shash\n", name);
-+		goto do_shash_err;
-+	}
-+
-+	rc = crypto_shash_update(&sdesc->shash, data1, data1_len);
-+	if (rc) {
-+		dev_err(dev, "ERR: Could not update1\n");
-+		goto do_shash_err;
-+	}
-+
-+	if (data2 && data2_len) {
-+		rc = crypto_shash_update(&sdesc->shash, data2, data2_len);
-+		if (rc) {
-+			dev_err(dev, "ERR: Could not update2\n");
-+			goto do_shash_err;
-+		}
-+	}
-+
-+	rc = crypto_shash_final(&sdesc->shash, result);
-+	if (rc)
-+		dev_err(dev, "ERR: Could not generate %s hash\n", name);
-+
-+do_shash_err:
-+	crypto_free_shash(hash);
-+	kfree(sdesc);
-+
-+	return rc;
-+}
-+
-+static int spacc_hash_setkey(struct crypto_ahash *tfm, const u8 *key,
++static int spacc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 +			     unsigned int keylen)
 +{
-+	int rc = 0;
++	int err = 0;
 +	int ret = 0;
-+	unsigned int block_size;
-+	unsigned int digest_size;
-+	char hash_alg[CRYPTO_MAX_ALG_NAME];
-+	const struct spacc_alg *salg = spacc_tfm_ahash(&tfm->base);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++	int singlekey = 0;
++	unsigned char xcbc[64];
++	unsigned int enckeylen;
++	unsigned int authkeylen;
++	const unsigned char *authkey, *enckey;
++	struct spacc_crypto_ctx *ctx  = crypto_aead_ctx(tfm);
++	const struct spacc_alg  *salg = spacc_tfm_aead(&tfm->base);
++	struct crypto_authenc_keys authenc_keys;
++	struct spacc_priv *priv;
 +
-+	block_size = crypto_tfm_alg_blocksize(&tfm->base);
-+	digest_size = crypto_ahash_digestsize(tfm);
++	/* are keylens valid? */
++	ctx->ctx_valid = false;
 +
-+	/*
-+	 * We will not use the hardware in case of HMACs
-+	 * This was meant for hashes but it works for cmac/xcbc since we
-+	 * only intend to support 128-bit keys...
-+	 */
-+	if (keylen > block_size && salg->mode->id != CRYPTO_MODE_MAC_CMAC) {
-+		dev_dbg(salg->dev, "Exceeds keylen: %u\n", keylen);
-+		dev_dbg(salg->dev, "Req. keylen hashing %s\n",
-+			salg->calg->cra_name);
++	switch (ctx->mode & 0xFF) {
++	case CRYPTO_MODE_SM4_GCM:
++	case CRYPTO_MODE_SM4_CCM:
++	case CRYPTO_MODE_NULL:
++	case CRYPTO_MODE_AES_GCM:
++	case CRYPTO_MODE_AES_CCM:
++	case CRYPTO_MODE_CHACHA20_POLY1305:
++		authkey      = key;
++		authkeylen   = 0;
++		enckey       = key;
++		enckeylen    = keylen;
++		ctx->keylen  = keylen;
++		singlekey    = 1;
++		goto skipover;
++	}
 +
-+		memset(hash_alg, 0x00, CRYPTO_MAX_ALG_NAME);
-+		switch (salg->mode->id)	{
-+		case CRYPTO_MODE_HMAC_SHA224:
-+			rc = do_shash(salg->dev, "sha224", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
++	err = crypto_authenc_extractkeys(&authenc_keys, key, keylen);
++	if (err)
++		return err;
++
++	authkeylen = authenc_keys.authkeylen;
++	authkey    = authenc_keys.authkey;
++	enckeylen  = authenc_keys.enckeylen;
++	enckey     = authenc_keys.enckey;
++
++skipover:
++	/* detect RFC3686/4106 and trim from enckeylen(and copy salt..) */
++	if (ctx->mode & SPACC_MANGLE_IV_FLAG) {
++		switch (ctx->mode & 0x7F00) {
++		case SPACC_MANGLE_IV_RFC3686:
++		case SPACC_MANGLE_IV_RFC4106:
++		case SPACC_MANGLE_IV_RFC4543:
++			memcpy(ctx->csalt, enckey + enckeylen - 4, 4);
++			enckeylen -= 4;
 +			break;
-+
-+		case CRYPTO_MODE_HMAC_SHA256:
-+			rc = do_shash(salg->dev, "sha256", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
++		case SPACC_MANGLE_IV_RFC4309:
++			memcpy(ctx->csalt, enckey + enckeylen - 3, 3);
++			enckeylen -= 3;
 +			break;
-+
-+		case CRYPTO_MODE_HMAC_SHA384:
-+			rc = do_shash(salg->dev, "sha384", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
-+			break;
-+
-+		case CRYPTO_MODE_HMAC_SHA512:
-+			rc = do_shash(salg->dev, "sha512", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
-+			break;
-+
-+		case CRYPTO_MODE_HMAC_MD5:
-+			rc = do_shash(salg->dev, "md5", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
-+			break;
-+
-+		case CRYPTO_MODE_HMAC_SHA1:
-+			rc = do_shash(salg->dev, "sha1", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
-+			break;
-+		case CRYPTO_MODE_HMAC_SM3:
-+			rc = do_shash(salg->dev, "sm3", tctx->ipad, key,
-+				      keylen, NULL, 0, NULL, 0);
-+			break;
-+
-+		default:
-+			return -EINVAL;
-+		}
-+
-+		if (rc < 0) {
-+			dev_err(salg->dev, "ERR: %d computing shash for %s\n",
-+				rc, hash_alg);
-+			return -EIO;
-+		}
-+
-+		keylen = digest_size;
-+		dev_dbg(salg->dev, "updated keylen: %u\n", keylen);
-+
-+		tctx->ctx_valid = false;
-+
-+		if (salg->mode->sw_fb) {
-+			rc = crypto_ahash_setkey(tctx->fb.hash,
-+						 tctx->ipad, keylen);
-+			if (rc < 0)
-+				return rc;
-+		}
-+	} else {
-+		memcpy(tctx->ipad, key, keylen);
-+		tctx->ctx_valid = false;
-+
-+		if (salg->mode->sw_fb) {
-+			rc = crypto_ahash_setkey(tctx->fb.hash, key, keylen);
-+			if (rc < 0)
-+				return rc;
 +		}
 +	}
 +
-+	/* close handle since key size may have changed */
-+	if (tctx->handle >= 0) {
-+		spacc_close(&priv->spacc, tctx->handle);
-+		put_device(tctx->dev);
-+		tctx->handle = -1;
-+		tctx->dev = NULL;
++	if (!singlekey) {
++		if (authkeylen > salg->mode->hashlen) {
++			dev_warn(ctx->dev, "Auth key size of %u is not valid\n",
++				 authkeylen);
++			return -EINVAL;
++		}
++	}
++
++	if (!spacc_check_keylen(salg, enckeylen)) {
++		dev_dbg(ctx->dev, "Enc key size of %u is not valid\n",
++			enckeylen);
++		return -EINVAL;
++	}
++
++	/*
++	 * if we're already open close the handle since
++	 * the size may have changed
++	 */
++	if (ctx->handle != -1) {
++		priv = dev_get_drvdata(ctx->dev);
++		spacc_close(&priv->spacc, ctx->handle);
++		put_device(ctx->dev);
++		ctx->handle = -1;
 +	}
 +
 +	/* reset priv */
 +	priv = NULL;
 +	priv = dev_get_drvdata(salg->dev);
-+	tctx->dev = get_device(salg->dev);
-+	ret = spacc_is_mode_keysize_supported(&priv->spacc, salg->mode->id,
-+					      keylen, 1);
++
++	/* increase reference */
++	ctx->dev = get_device(salg->dev);
++
++	/* check if its a valid mode */
++	ret = (spacc_is_mode_keysize_supported(&priv->spacc,
++					       salg->mode->aead.ciph & 0xFF,
++					       enckeylen, 0) &&
++					       spacc_is_mode_keysize_supported
++					       (&priv->spacc,
++						salg->mode->aead.hash & 0xFF,
++						authkeylen, 0));
++
 +	if (ret) {
-+		/* Grab the spacc context if no one is waiting */
-+		tctx->handle = spacc_open(&priv->spacc,
-+					  CRYPTO_MODE_NULL,
-+					  salg->mode->id, -1,
-+					  0, spacc_digest_cb, tfm);
-+		if (tctx->handle < 0) {
-+			dev_err(salg->dev, "ERR: Failed to open SPAcc context\n");
++		/* try to open spacc handle */
++		ctx->handle = spacc_open(&priv->spacc,
++					 salg->mode->aead.ciph & 0xFF,
++					 salg->mode->aead.hash & 0xFF,
++					 -1, 0, spacc_aead_cb, tfm);
++		if (ctx->handle < 0) {
 +			put_device(salg->dev);
++			dev_dbg(salg->dev, "Failed to open SPAcc context\n");
 +			return -EIO;
 +		}
-+
 +	} else {
-+		dev_err(salg->dev, "Keylen: %d not enabled for algo: %d",
++		dev_err(salg->dev, "  Keylen: %d not enabled for algo: %d",
 +			keylen, salg->mode->id);
 +	}
 +
-+	rc = spacc_set_operation(&priv->spacc, tctx->handle, OP_ENCRYPT,
-+				 ICV_HASH, IP_ICV_OFFSET, 0, 0, 0);
-+	if (rc < 0) {
-+		spacc_close(&priv->spacc, tctx->handle);
-+		tctx->handle = -1;
-+		put_device(tctx->dev);
++	/* setup XCBC key */
++	if (salg->mode->aead.hash == CRYPTO_MODE_MAC_XCBC) {
++		err = spacc_compute_xcbc_key(&priv->spacc,
++					     salg->mode->aead.hash,
++					     ctx->handle, authkey,
++					     authkeylen, xcbc);
++		if (err < 0) {
++			dev_warn(ctx->dev, "Failed to compute XCBC key: %d\n",
++				 err);
++			return -EIO;
++		}
++		authkey    = xcbc;
++		authkeylen = 48;
++	}
++
++	/* handle zero key/zero len DEC condition for SM4/AES GCM mode */
++	ctx->zero_key = 0;
++	if (!key[0]) {
++		int index, val = 0;
++
++		for (index = 0; index < keylen ; index++)
++			val += key[index];
++
++		if (val == 0)
++			ctx->zero_key = 1;
++	}
++
++	err = spacc_write_context(&priv->spacc, ctx->handle,
++				  SPACC_CRYPTO_OPERATION, enckey,
++				  enckeylen, NULL, 0);
++
++	if (err) {
++		dev_warn(ctx->dev,
++			 "Could not write cipher context: %d\n", err);
 +		return -EIO;
 +	}
 +
-+	if (salg->mode->id == CRYPTO_MODE_MAC_XCBC ||
-+	    salg->mode->id == CRYPTO_MODE_MAC_SM4_XCBC) {
-+		rc = spacc_compute_xcbc_key(&priv->spacc, salg->mode->id,
-+					    tctx->handle, tctx->ipad,
-+					    keylen, tctx->ipad);
-+		if (rc < 0) {
-+			dev_err(tctx->dev,
-+				"Failed to compute XCBC key: %d\n", rc);
++	if (!singlekey) {
++		err = spacc_write_context(&priv->spacc, ctx->handle,
++					  SPACC_HASH_OPERATION, authkey,
++					  authkeylen, NULL, 0);
++		if (err) {
++			dev_warn(ctx->dev,
++				 "Could not write hashing context: %d\n", err);
 +			return -EIO;
 +		}
-+		rc = spacc_write_context(&priv->spacc, tctx->handle,
-+					 SPACC_HASH_OPERATION, tctx->ipad,
-+					 32 + keylen, NULL, 0);
-+	} else {
-+		rc = spacc_write_context(&priv->spacc, tctx->handle,
-+					 SPACC_HASH_OPERATION, tctx->ipad,
-+					 keylen, NULL, 0);
 +	}
 +
-+	memset(tctx->ipad, 0, sizeof(tctx->ipad));
-+	if (rc < 0) {
-+		dev_err(tctx->dev, "ERR: Failed to write SPAcc context\n");
-+		/* Non-fatal, we continue with the software fallback */
-+		return 0;
-+	}
++	/* set expand key */
++	spacc_set_key_exp(&priv->spacc, ctx->handle);
++	ctx->ctx_valid = true;
 +
-+	tctx->ctx_valid = true;
++	memset(xcbc, 0, sizeof(xcbc));
++
++	/* copy key to ctx for fallback */
++	memcpy(ctx->key, key, keylen);
 +
 +	return 0;
 +}
 +
-+static int spacc_set_statesize(struct spacc_alg *salg)
++static int spacc_aead_setauthsize(struct crypto_aead *tfm,
++				  unsigned int authsize)
 +{
-+	unsigned int statesize = 0;
++	struct spacc_crypto_ctx *ctx = crypto_aead_ctx(tfm);
 +
-+	switch (salg->mode->id) {
-+	case CRYPTO_MODE_HMAC_SHA1:
-+	case CRYPTO_MODE_HASH_SHA1:
-+		statesize = sizeof(struct sha1_state);
-+		break;
-+	case CRYPTO_MODE_MAC_CMAC:
-+	case CRYPTO_MODE_MAC_XCBC:
-+		statesize = sizeof(struct crypto_aes_ctx);
-+		break;
-+	case CRYPTO_MODE_MAC_SM4_CMAC:
-+	case CRYPTO_MODE_MAC_SM4_XCBC:
-+		statesize = sizeof(struct sm4_ctx);
-+		break;
-+	case CRYPTO_MODE_HMAC_MD5:
-+	case CRYPTO_MODE_HASH_MD5:
-+		statesize = sizeof(struct md5_state);
-+		break;
-+	case CRYPTO_MODE_HASH_SHA224:
-+	case CRYPTO_MODE_HASH_SHA256:
-+	case CRYPTO_MODE_HMAC_SHA224:
-+	case CRYPTO_MODE_HMAC_SHA256:
-+		statesize = sizeof(struct sha256_state);
-+		break;
-+	case CRYPTO_MODE_HMAC_SHA512:
-+	case CRYPTO_MODE_HASH_SHA512:
-+		statesize = sizeof(struct sha512_state);
-+		break;
-+	case CRYPTO_MODE_HMAC_SHA384:
-+	case CRYPTO_MODE_HASH_SHA384:
-+		statesize = sizeof(struct spacc_crypto_reqctx);
-+		break;
-+	case CRYPTO_MODE_HASH_SHA3_224:
-+	case CRYPTO_MODE_HASH_SHA3_256:
-+	case CRYPTO_MODE_HASH_SHA3_384:
-+	case CRYPTO_MODE_HASH_SHA3_512:
-+		statesize = sizeof(struct sha3_state);
-+		break;
-+	case CRYPTO_MODE_HMAC_SM3:
-+	case CRYPTO_MODE_MAC_MICHAEL:
-+		statesize = sizeof(struct spacc_crypto_reqctx);
-+		break;
-+	default:
-+		break;
-+	}
++	ctx->auth_size = authsize;
 +
-+	return statesize;
-+}
-+
-+static int spacc_hash_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct spacc_priv *priv = NULL;
-+	const struct spacc_alg *salg = spacc_tfm_ahash(tfm);
-+	struct spacc_crypto_ctx *tctx = crypto_tfm_ctx(tfm);
-+
-+	tctx->handle    = -1;
-+	tctx->ctx_valid = false;
-+	tctx->dev       = get_device(salg->dev);
-+
-+	if (salg->mode->sw_fb) {
-+		tctx->fb.hash = crypto_alloc_ahash(salg->calg->cra_name, 0,
-+						   CRYPTO_ALG_NEED_FALLBACK);
-+		if (IS_ERR(tctx->fb.hash) && tctx->handle >= 0) {
-+			spacc_close(&priv->spacc, tctx->handle);
-+			put_device(tctx->dev);
-+			return PTR_ERR(tctx->fb.hash);
++	/* Taken from crypto/ccm.c */
++	switch (ctx->mode) {
++	case CRYPTO_MODE_SM4_GCM:
++	case CRYPTO_MODE_AES_GCM:
++		switch (authsize) {
++		case 4:
++		case 8:
++		case 12:
++		case 13:
++		case 14:
++		case 15:
++		case 16:
++			break;
++		default:
++			return -EINVAL;
 +		}
++		break;
 +
-+		crypto_ahash_set_statesize(__crypto_ahash_cast(tfm),
-+					   crypto_ahash_statesize(tctx->fb.hash));
++	case CRYPTO_MODE_AES_CCM:
++	case CRYPTO_MODE_SM4_CCM:
++		switch (authsize) {
++		case 4:
++		case 6:
++		case 8:
++		case 10:
++		case 12:
++		case 14:
++		case 16:
++			break;
++		default:
++			return -EINVAL;
++		}
++		break;
 +
-+		crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-+					 sizeof(struct spacc_crypto_reqctx) +
-+					 crypto_ahash_reqsize(tctx->fb.hash));
-+	} else {
-+		crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-+					 sizeof(struct spacc_crypto_reqctx));
++	case CRYPTO_MODE_CHACHA20_POLY1305:
++		switch (authsize) {
++		case 16:
++			break;
++		default:
++			return -EINVAL;
++		}
++		break;
 +	}
 +
 +	return 0;
 +}
 +
-+static void spacc_hash_cra_exit(struct crypto_tfm *tfm)
++static int spacc_aead_fallback(struct aead_request *req,
++			       struct spacc_crypto_ctx *ctx, int encrypt)
 +{
-+	struct spacc_crypto_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
++	int ret = 0;
++	struct aead_request *subreq = aead_request_ctx(req);
++	struct crypto_aead *reqtfm  = crypto_aead_reqtfm(req);
++	struct aead_alg *alg	    = crypto_aead_alg(reqtfm);
++	const char *aead_name	    = alg->base.cra_name;
 +
-+	crypto_free_ahash(tctx->fb.hash);
-+	tctx->fb.hash = NULL;
-+	if (tctx->handle >= 0)
-+		spacc_close(&priv->spacc, tctx->handle);
++	ctx->fb.aead = crypto_alloc_aead(aead_name, 0,
++					 CRYPTO_ALG_NEED_FALLBACK |
++					 CRYPTO_ALG_ASYNC);
++	if (IS_ERR(ctx->fb.aead)) {
++		dev_err(ctx->dev, "Spacc aead fallback tfm is NULL!\n");
++		return PTR_ERR(ctx->fb.aead);
++	}
 +
-+	put_device(tctx->dev);
-+}
-+
-+static int spacc_hash_init(struct ahash_request *req)
-+{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	rc = crypto_ahash_init(&ctx->fb.hash_req);
-+
-+	return rc;
-+}
-+
-+static int spacc_hash_update(struct ahash_request *req)
-+{
-+	int rc = 0;
-+	int nbytes = req->nbytes;
-+
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	if (!nbytes)
-+		return 0;
-+
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	ctx->fb.hash_req.nbytes = nbytes;
-+	ctx->fb.hash_req.src = req->src;
-+
-+	rc = crypto_ahash_update(&ctx->fb.hash_req);
-+
-+	return rc;
-+}
-+
-+static int spacc_hash_final(struct ahash_request *req)
-+{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	ctx->fb.hash_req.result = req->result;
-+
-+	rc = crypto_ahash_final(&ctx->fb.hash_req);
-+
-+	return rc;
-+}
-+
-+static int spacc_hash_digest(struct ahash_request *req)
-+{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
-+	const struct spacc_alg *salg = spacc_tfm_ahash(&reqtfm->base);
-+
-+	/* direct single shot digest call */
-+	ctx->single_shot = 1;
-+	ctx->total_nents = sg_nents(req->src);
-+
-+	/* alloc tmp_sgl */
-+	tctx->tmp_sgl = kmalloc(sizeof(*tctx->tmp_sgl) * 2, GFP_KERNEL);
-+
-+	if (!tctx->tmp_sgl)
++	subreq = aead_request_alloc(ctx->fb.aead, GFP_KERNEL);
++	if (!subreq)
 +		return -ENOMEM;
 +
-+	sg_init_table(tctx->tmp_sgl, 2);
-+	tctx->tmp_sgl[0].length = 0;
++	ret = crypto_aead_setkey(ctx->fb.aead, ctx->key, ctx->keylen);
++	if (ret)
++		dev_err(ctx->dev, "fallback aead setkey() returned:%d\n", ret);
 +
-+	if (tctx->handle < 0 || !tctx->ctx_valid) {
-+		priv = NULL;
-+		priv = dev_get_drvdata(salg->dev);
-+		tctx->dev = get_device(salg->dev);
++	crypto_aead_setauthsize(ctx->fb.aead, ctx->auth_size);
 +
-+		rc = spacc_is_mode_keysize_supported(&priv->spacc,
-+						     salg->mode->id, 0, 1);
-+		if (rc)
-+			tctx->handle = spacc_open(&priv->spacc,
-+						  CRYPTO_MODE_NULL,
-+						  salg->mode->id, -1, 0,
-+						  spacc_digest_cb,
-+						  reqtfm);
-+		if (tctx->handle < 0) {
-+			put_device(salg->dev);
-+			dev_dbg(salg->dev,
-+				"Digest:failed to open spacc context\n");
-+			goto fallback;
++	aead_request_set_tfm(subreq, ctx->fb.aead);
++	aead_request_set_callback(subreq, req->base.flags,
++				  req->base.complete, req->base.data);
++	aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
++			       req->iv);
++	aead_request_set_ad(subreq, req->assoclen);
++
++	if (encrypt)
++		ret = crypto_aead_encrypt(subreq);
++	else
++		ret = crypto_aead_decrypt(subreq);
++
++	aead_request_free(subreq);
++	crypto_free_aead(ctx->fb.aead);
++	ctx->fb.aead = NULL;
++
++	return ret;
++}
++
++static int spacc_aead_process(struct aead_request *req, u64 seq, int encrypt)
++{
++	int rc = 0;
++	int B0len;
++	int alen = 0;
++	u32 dstoff;
++	int icvremove;
++	int ivaadsize;
++	int ptaadsize = 0;
++	int iv_to_context;
++	int spacc_proc_len;
++	u32 spacc_icv_offset = 0;
++	int spacc_pre_aad_size;
++	int ccm_aad_16b_len = 0;
++	struct crypto_aead *reqtfm	= crypto_aead_reqtfm(req);
++	int ivsize			= crypto_aead_ivsize(reqtfm);
++	struct spacc_crypto_ctx *tctx   = crypto_aead_ctx(reqtfm);
++	struct spacc_crypto_reqctx *ctx = aead_request_ctx(req);
++	struct spacc_priv *priv		= dev_get_drvdata(tctx->dev);
++
++	ctx->encrypt_op = encrypt;
++
++	if (tctx->handle < 0 || !tctx->ctx_valid || (req->cryptlen +
++				req->assoclen) > priv->max_msg_len)
++		return -EINVAL;
++
++	/* IV is programmed to context by default */
++	iv_to_context = SET_IV_IN_CONTEXT;
++
++	if (encrypt) {
++		switch (tctx->mode & 0xFF) {
++		case CRYPTO_MODE_AES_GCM:
++		case CRYPTO_MODE_SM4_GCM:
++		case CRYPTO_MODE_CHACHA20_POLY1305:
++			/* For cryptlen = 0 */
++			if (req->cryptlen + req->assoclen == 0)
++				return spacc_aead_fallback(req, tctx, encrypt);
++			break;
++		case CRYPTO_MODE_AES_CCM:
++		case CRYPTO_MODE_SM4_CCM:
++
++			if (req->cryptlen + req->assoclen == 0)
++				return spacc_aead_fallback(req, tctx, encrypt);
++
++			/*
++			 * verify that msglen can in fact be represented
++			 * in L bytes
++			 *
++			 * 2 <= L <= 8, so 1 <= L' <= 7
++			 */
++			if (req->iv[0] < 1 || req->iv[0] > 7)
++				return -EINVAL;
++
++			break;
++		default:
++			return -EINVAL;
 +		}
-+
-+		rc = spacc_set_operation(&priv->spacc, tctx->handle,
-+					 OP_ENCRYPT, ICV_HASH, IP_ICV_OFFSET,
-+					 0, 0, 0);
-+		if (rc < 0) {
-+			spacc_close(&priv->spacc, tctx->handle);
-+			dev_dbg(salg->dev,
-+				"ERR: Failed to set operation\n");
-+			tctx->handle = -1;
-+			put_device(tctx->dev);
-+			goto fallback;
++	} else {
++		/* handle decryption */
++		switch (tctx->mode & 0xFF) {
++		case CRYPTO_MODE_AES_GCM:
++		case CRYPTO_MODE_SM4_GCM:
++		case CRYPTO_MODE_CHACHA20_POLY1305:
++			/* for assoclen = 0 */
++			if (req->assoclen == 0 &&
++			    (req->cryptlen - tctx->auth_size == 0))
++				return spacc_aead_fallback(req, tctx, encrypt);
++			break;
++		case CRYPTO_MODE_AES_CCM:
++		case CRYPTO_MODE_SM4_CCM:
++			if (req->assoclen == 0 &&
++			    (req->cryptlen - tctx->auth_size == 0))
++				return spacc_aead_fallback(req, tctx, encrypt);
++			/* 2 <= L <= 8, so 1 <= L' <= 7 */
++			if (req->iv[0] < 1 || req->iv[0] > 7)
++				return -EINVAL;
++			break;
++		default:
++			return -EINVAL;
 +		}
-+		tctx->ctx_valid = true;
 +	}
 +
-+	rc = spacc_hash_init_dma(tctx->dev, req);
++	icvremove = (encrypt) ? 0 : tctx->auth_size;
++
++	rc = spacc_aead_init_dma(tctx->dev, req, seq, (encrypt) ?
++			tctx->auth_size : 0, encrypt, &alen);
 +	if (rc < 0)
-+		goto fallback;
++		return -EINVAL;
 +
-+	if (rc == 0) {
-+		kfree(tctx->tmp_sgl);
-+		tctx->tmp_sgl = NULL;
-+		return 0;
++	if (req->assoclen)
++		ccm_aad_16b_len = ccm_16byte_aligned_len(req->assoclen + alen);
++
++	/* Note: This won't work if IV_IMPORT has been disabled */
++	ctx->cb.new_handle = spacc_clone_handle(&priv->spacc, tctx->handle,
++						&ctx->cb);
++	if (ctx->cb.new_handle < 0) {
++		spacc_aead_cleanup_dma(tctx->dev, req);
++		return -EINVAL;
 +	}
 +
-+	rc = spacc_packet_enqueue_ddt(&priv->spacc, ctx->acb.new_handle,
-+				      &ctx->src, &ctx->dst, req->nbytes,
-+				      0, req->nbytes, 0, 0, 0);
++	ctx->cb.tctx  = tctx;
++	ctx->cb.ctx   = ctx;
++	ctx->cb.req   = req;
++	ctx->cb.spacc = &priv->spacc;
++
++	/*
++	 * Write IV to the spacc-context
++	 * IV can be written to context or as part of the input src buffer
++	 * IV in case of CCM is going in the input src buff.
++	 * IV for GCM is written to the context.
++	 */
++	if (tctx->mode == CRYPTO_MODE_AES_GCM_RFC4106	||
++	    tctx->mode == CRYPTO_MODE_AES_GCM		||
++	    tctx->mode == CRYPTO_MODE_SM4_GCM_RFC8998	||
++	    tctx->mode == CRYPTO_MODE_CHACHA20_POLY1305	||
++	    tctx->mode == CRYPTO_MODE_NULL) {
++		iv_to_context = SET_IV_IN_CONTEXT;
++		rc = spacc_write_context(&priv->spacc, ctx->cb.new_handle,
++					 SPACC_CRYPTO_OPERATION, NULL, 0,
++					 req->iv, ivsize);
++
++		if (rc < 0) {
++			spacc_aead_cleanup_dma(tctx->dev, req);
++			spacc_close(&priv->spacc, ctx->cb.new_handle);
++			return -EINVAL;
++		}
++	}
++
++	/* CCM and GCM don't include the IV in the AAD */
++	if (tctx->mode == CRYPTO_MODE_AES_GCM_RFC4106	||
++	    tctx->mode == CRYPTO_MODE_AES_CCM_RFC4309	||
++	    tctx->mode == CRYPTO_MODE_AES_GCM		||
++	    tctx->mode == CRYPTO_MODE_AES_CCM		||
++	    tctx->mode == CRYPTO_MODE_SM4_CCM		||
++	    tctx->mode == CRYPTO_MODE_SM4_GCM_RFC8998	||
++	    tctx->mode == CRYPTO_MODE_CHACHA20_POLY1305	||
++	    tctx->mode == CRYPTO_MODE_NULL) {
++		ivaadsize = 0;
++	} else {
++		ivaadsize = ivsize;
++	}
++	/* CCM requires an extra block of AAD */
++	if (tctx->mode == CRYPTO_MODE_AES_CCM_RFC4309 ||
++	    tctx->mode == CRYPTO_MODE_AES_CCM	      ||
++	    tctx->mode == CRYPTO_MODE_SM4_CCM)
++		B0len = SPACC_B0_SIZE;
++	else
++		B0len = 0;
++
++	/*
++	 * GMAC mode uses AAD for the entire message.
++	 * So does NULL cipher
++	 */
++	if (tctx->mode == CRYPTO_MODE_AES_GCM_RFC4543 ||
++	    tctx->mode == CRYPTO_MODE_NULL) {
++		if (req->cryptlen >= icvremove)
++			ptaadsize = req->cryptlen - icvremove;
++	}
++
++	/*
++	 * Calculate and set the below, important parameters
++	 * spacc icv offset   - spacc_icv_offset
++	 * destination offset - dstoff
++	 * IV to context      - This is set for CCM, not set for GCM
++	 */
++	if (req->dst == req->src) {
++		dstoff = ((uint32_t)(SPACC_MAX_IV_SIZE + B0len +
++				     req->assoclen + ivaadsize));
++
++		/* CCM case */
++		if (tctx->mode == CRYPTO_MODE_AES_CCM_RFC4309	||
++		    tctx->mode == CRYPTO_MODE_AES_CCM		||
++		    tctx->mode == CRYPTO_MODE_SM4_CCM) {
++			iv_to_context = SET_IV_IN_SRCBUF;
++			dstoff = ((uint32_t)(SPACC_MAX_IV_SIZE + B0len +
++				 ccm_aad_16b_len + ivaadsize));
++		}
++	} else {
++		dstoff = ((uint32_t)(req->assoclen + ivaadsize));
++
++		/* CCM case */
++		if (tctx->mode == CRYPTO_MODE_AES_CCM_RFC4309	||
++		    tctx->mode == CRYPTO_MODE_AES_CCM		||
++		    tctx->mode == CRYPTO_MODE_SM4_CCM) {
++			iv_to_context = SET_IV_IN_SRCBUF;
++			dstoff = ((uint32_t)(req->assoclen + ivaadsize));
++		}
++	}
++
++	/*
++	 * Calculate and set the below, important parameters
++	 * spacc proc_len - spacc_proc_len
++	 * pre-AAD size   - spacc_pre_aad_size
++	 */
++	if (tctx->mode == CRYPTO_MODE_AES_CCM		||
++	    tctx->mode == CRYPTO_MODE_SM4_CCM		||
++	    tctx->mode == CRYPTO_MODE_AES_CCM_RFC4309	||
++	    tctx->mode == CRYPTO_MODE_SM4_CCM_RFC8998) {
++		spacc_proc_len = B0len + ccm_aad_16b_len
++				+ req->cryptlen + ivaadsize
++				- icvremove;
++		spacc_pre_aad_size = B0len + ccm_aad_16b_len
++				+ ivaadsize + ptaadsize;
++	} else {
++		spacc_proc_len = B0len + req->assoclen
++				+ req->cryptlen - icvremove
++				+ ivaadsize;
++		spacc_pre_aad_size = B0len + req->assoclen
++				+ ivaadsize + ptaadsize;
++	}
++
++	rc = spacc_set_operation(&priv->spacc,
++				 ctx->cb.new_handle,
++				 encrypt ? OP_ENCRYPT : OP_DECRYPT,
++				 ICV_ENCRYPT_HASH, IP_ICV_APPEND,
++				 spacc_icv_offset,
++				 tctx->auth_size, 0);
++
++	rc = spacc_packet_enqueue_ddt(&priv->spacc, ctx->cb.new_handle,
++				      &ctx->src,
++				      (req->dst == req->src) ? &ctx->src :
++				      &ctx->dst, spacc_proc_len,
++				      (dstoff << SPACC_OFFSET_DST_O) |
++				      SPACC_MAX_IV_SIZE,
++				      spacc_pre_aad_size,
++				      0, iv_to_context, 0);
 +
 +	if (rc < 0) {
-+		spacc_hash_cleanup_dma(tctx->dev, req);
-+		spacc_close(&priv->spacc, ctx->acb.new_handle);
++		spacc_aead_cleanup_dma(tctx->dev, req);
++		spacc_close(&priv->spacc, ctx->cb.new_handle);
 +
 +		if (rc != -EBUSY) {
-+			dev_err(salg->dev, "ERR: Failed to enqueue job: %d\n",
++			dev_err(tctx->dev, "  failed to enqueue job, ERR: %d\n",
 +				rc);
-+			kfree(tctx->tmp_sgl);
-+			tctx->tmp_sgl = NULL;
-+			return rc;
 +		}
 +
 +		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
 +			return -EBUSY;
 +
-+		goto fallback;
++		return -EINVAL;
 +	}
 +
++	/*
++	 * At this point the job is in flight to the engine ... remove first use
++	 * so subsequent calls don't expand the key again... ideally we would
++	 * pump a dummy job through the engine to pre-expand the key so that by
++	 * the time setkey was done we wouldn't have to do this.
++	 */
++	priv->spacc.job[tctx->handle].first_use  = 0;
++	priv->spacc.job[tctx->handle].ctrl &= ~(1UL
++			<< priv->spacc.config.ctrl_map[SPACC_CTRL_KEY_EXP]);
++
 +	return -EINPROGRESS;
-+
-+fallback:
-+	kfree(tctx->tmp_sgl);
-+	tctx->tmp_sgl = NULL;
-+
-+	/* start from scratch as init is not called before digest */
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	ctx->fb.hash_req.nbytes = req->nbytes;
-+	ctx->fb.hash_req.src    = req->src;
-+	ctx->fb.hash_req.result = req->result;
-+
-+	rc = crypto_ahash_digest(&ctx->fb.hash_req);
-+
-+	return rc;
 +}
 +
-+static int spacc_hash_finup(struct ahash_request *req)
++static int spacc_aead_encrypt(struct aead_request *req)
 +{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	ctx->fb.hash_req.nbytes     = req->nbytes;
-+	ctx->fb.hash_req.src        = req->src;
-+	ctx->fb.hash_req.result     = req->result;
-+
-+	rc = crypto_ahash_finup(&ctx->fb.hash_req);
-+
-+	return rc;
++	return spacc_aead_process(req, 0ULL, 1);
 +}
 +
-+static int spacc_hash_import(struct ahash_request *req, const void *in)
++static int spacc_aead_decrypt(struct aead_request *req)
 +{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-+
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
-+
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	rc = crypto_ahash_import(&ctx->fb.hash_req, in);
-+
-+	return rc;
++	return spacc_aead_process(req, 0ULL, 0);
 +}
 +
-+static int spacc_hash_export(struct ahash_request *req, void *out)
++static int spacc_aead_init(struct crypto_aead *tfm)
 +{
-+	int rc = 0;
-+	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-+	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-+	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
++	struct spacc_crypto_ctx *ctx   = crypto_aead_ctx(tfm);
++	const struct spacc_alg  *salg = spacc_tfm_aead(&tfm->base);
 +
-+	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
++	ctx->zero_key = 0;
++	ctx->fb.aead  = NULL;
++	ctx->handle   = -1;
++	ctx->mode     = salg->mode->aead.ciph;
++	ctx->dev      = get_device(salg->dev);
 +
-+	ahash_request_set_callback(&ctx->fb.hash_req,
-+				   CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   req->base.complete,
-+				   req->base.data);
-+
-+	rc = crypto_ahash_export(&ctx->fb.hash_req, out);
-+
-+	return rc;
-+}
-+
-+static const struct ahash_alg spacc_hash_template = {
-+	.init   = spacc_hash_init,
-+	.update = spacc_hash_update,
-+	.final  = spacc_hash_final,
-+	.finup  = spacc_hash_finup,
-+	.digest = spacc_hash_digest,
-+	.setkey = spacc_hash_setkey,
-+	.export = spacc_hash_export,
-+	.import = spacc_hash_import,
-+
-+	.halg.base = {
-+		.cra_priority	= 300,
-+		.cra_module	= THIS_MODULE,
-+		.cra_init	= spacc_hash_cra_init,
-+		.cra_exit	= spacc_hash_cra_exit,
-+		.cra_ctxsize	= sizeof(struct spacc_crypto_ctx),
-+		.cra_flags	= CRYPTO_ALG_TYPE_AHASH    |
-+				  CRYPTO_ALG_ASYNC	   |
-+				  CRYPTO_ALG_NEED_FALLBACK |
-+				  CRYPTO_ALG_OPTIONAL_KEY
-+	},
-+};
-+
-+static int spacc_register_hash(struct spacc_alg *salg)
-+{
-+	int rc = 0;
-+
-+	salg->calg = &salg->alg.hash.halg.base;
-+	salg->alg.hash = spacc_hash_template;
-+
-+	spacc_init_calg(salg->calg, salg->mode);
-+	salg->alg.hash.halg.digestsize = salg->mode->hashlen;
-+	salg->alg.hash.halg.statesize = spacc_set_statesize(salg);
-+
-+	rc = crypto_register_ahash(&salg->alg.hash);
-+	if (rc < 0)
-+		return rc;
-+
-+	mutex_lock(&spacc_hash_alg_mutex);
-+	list_add(&salg->list, &spacc_hash_alg_list);
-+	mutex_unlock(&spacc_hash_alg_mutex);
++	crypto_aead_set_reqsize(tfm, sizeof(struct spacc_crypto_reqctx));
 +
 +	return 0;
 +}
 +
-+int spacc_probe_hashes(struct platform_device *spacc_pdev)
++static void spacc_aead_exit(struct crypto_aead *tfm)
++{
++	struct spacc_crypto_ctx *ctx = crypto_aead_ctx(tfm);
++	struct spacc_priv *priv = dev_get_drvdata(ctx->dev);
++
++	ctx->fb.aead = NULL;
++	/* close spacc handle */
++	if (ctx->handle >= 0) {
++		spacc_close(&priv->spacc, ctx->handle);
++		ctx->handle = -1;
++	}
++
++	put_device(ctx->dev);
++}
++
++static struct aead_alg spacc_aead_algs = {
++	.setkey      = spacc_aead_setkey,
++	.setauthsize = spacc_aead_setauthsize,
++	.encrypt     = spacc_aead_encrypt,
++	.decrypt     = spacc_aead_decrypt,
++	.init        = spacc_aead_init,
++	.exit        = spacc_aead_exit,
++
++	.base.cra_priority = 300,
++	.base.cra_module   = THIS_MODULE,
++	.base.cra_ctxsize  = sizeof(struct spacc_crypto_ctx),
++	.base.cra_flags    = CRYPTO_ALG_TYPE_AEAD	 |
++			     CRYPTO_ALG_ASYNC		 |
++			     CRYPTO_ALG_NEED_FALLBACK	 |
++			     CRYPTO_ALG_KERN_DRIVER_ONLY |
++			     CRYPTO_ALG_OPTIONAL_KEY
++};
++
++static int spacc_register_aead(unsigned int aead_mode,
++			       struct platform_device *spacc_pdev)
 +{
 +	int rc = 0;
-+	unsigned int index;
-+	int registered = 0;
 +	struct spacc_alg *salg;
-+	struct spacc_priv *priv = dev_get_drvdata(&spacc_pdev->dev);
 +
-+	spacc_hash_pool = dma_pool_create("spacc-digest", &spacc_pdev->dev,
-+					  SPACC_MAX_DIGEST_SIZE,
-+					  SPACC_DMA_ALIGN, SPACC_DMA_BOUNDARY);
-+
-+	if (!spacc_hash_pool)
++	salg = kmalloc(sizeof(*salg), GFP_KERNEL);
++	if (!salg)
 +		return -ENOMEM;
 +
-+	for (index = 0; index < ARRAY_SIZE(possible_hashes); index++)
-+		possible_hashes[index].valid = 0;
++	salg->mode	= &possible_aeads[aead_mode];
++	salg->dev	= &spacc_pdev->dev;
++	salg->calg	= &salg->alg.aead.base;
++	salg->alg.aead	= spacc_aead_algs;
 +
-+	for (index = 0; index < ARRAY_SIZE(possible_hashes); index++) {
-+		if (possible_hashes[index].valid == 0 &&
-+		    spacc_is_mode_keysize_supported(&priv->spacc,
-+				    possible_hashes[index].id & 0xFF,
-+				    possible_hashes[index].hashlen, 1)) {
-+			salg = kmalloc(sizeof(*salg), GFP_KERNEL);
-+			if (!salg)
-+				return -ENOMEM;
++	spacc_init_aead_alg(salg->calg, salg->mode);
 +
-+			salg->mode = &possible_hashes[index];
++	salg->alg.aead.ivsize		  = salg->mode->ivlen;
++	salg->alg.aead.maxauthsize	  = salg->mode->hashlen;
++	salg->alg.aead.base.cra_blocksize = salg->mode->blocklen;
 +
-+			/* Copy all dev's over to the salg */
-+			salg->dev = &spacc_pdev->dev;
++	salg->keylen_mask = possible_aeads[aead_mode].keylen_mask;
 +
-+			rc = spacc_register_hash(salg);
-+			if (rc < 0) {
-+				kfree(salg);
-+				continue;
-+			}
-+
-+			registered++;
-+			possible_hashes[index].valid = 1;
++	if (salg->mode->aead.ciph & SPACC_MANGLE_IV_FLAG) {
++		switch (salg->mode->aead.ciph & 0x7F00) {
++		case SPACC_MANGLE_IV_RFC3686: /* CTR */
++		case SPACC_MANGLE_IV_RFC4106: /* GCM */
++		case SPACC_MANGLE_IV_RFC4543: /* GMAC */
++		case SPACC_MANGLE_IV_RFC4309: /* CCM */
++		case SPACC_MANGLE_IV_RFC8998: /* GCM/CCM */
++			salg->alg.aead.ivsize  = 12;
++			break;
 +		}
 +	}
 +
-+	return registered;
++	rc = crypto_register_aead(&salg->alg.aead);
++	if (rc < 0) {
++		kfree(salg);
++		return rc;
++	}
++
++	mutex_lock(&spacc_aead_alg_mutex);
++	list_add(&salg->list, &spacc_aead_alg_list);
++	mutex_unlock(&spacc_aead_alg_mutex);
++
++	return 0;
 +}
 +
-+int spacc_unregister_hash_algs(void)
++int spacc_probe_aeads(struct platform_device *spacc_pdev)
++{
++	int err = 0;
++	unsigned int x, y;
++	struct spacc_priv *priv = NULL;
++
++	size_t alloc_size = max_t(unsigned long,
++			roundup_pow_of_two(sizeof(struct spacc_iv_buf)),
++			dma_get_cache_alignment());
++
++	spacc_iv_pool = kmem_cache_create("spacc-aead-iv", alloc_size,
++					  alloc_size, 0, NULL);
++
++	if (!spacc_iv_pool)
++		return -ENOMEM;
++
++	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
++		possible_aeads[x].keylen_mask = 0;
++		possible_aeads[x].valid       = 0;
++	}
++
++	/* compute cipher key masks */
++	priv = dev_get_drvdata(&spacc_pdev->dev);
++
++	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
++		for (y = 0; y < ARRAY_SIZE(possible_aeads[x].keylen); y++) {
++			if (spacc_is_mode_keysize_supported(&priv->spacc,
++					    possible_aeads[x].aead.ciph & 0xFF,
++					    possible_aeads[x].keylen[y], 0))
++				possible_aeads[x].keylen_mask |= 1u << y;
++		}
++	}
++
++	/* scan for combined modes */
++	priv = dev_get_drvdata(&spacc_pdev->dev);
++
++	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
++		if (!possible_aeads[x].valid && possible_aeads[x].keylen_mask &&
++		    spacc_is_mode_keysize_supported(&priv->spacc,
++					possible_aeads[x].aead.hash & 0xFF,
++					possible_aeads[x].hashlen, 0)) {
++			possible_aeads[x].valid = 1;
++			err = spacc_register_aead(x, spacc_pdev);
++			if (err < 0)
++				goto error;
++		}
++	}
++
++	return 0;
++
++error:
++	return err;
++}
++
++int spacc_unregister_aead_algs(void)
 +{
 +	struct spacc_alg *salg, *tmp;
 +
-+	mutex_lock(&spacc_hash_alg_mutex);
-+	list_for_each_entry_safe(salg, tmp, &spacc_hash_alg_list, list) {
++	mutex_lock(&spacc_aead_alg_mutex);
++
++	list_for_each_entry_safe(salg, tmp, &spacc_aead_alg_list, list) {
 +		crypto_unregister_alg(salg->calg);
 +		list_del(&salg->list);
 +		kfree(salg);
 +	}
-+	mutex_unlock(&spacc_hash_alg_mutex);
 +
-+	dma_pool_destroy(spacc_hash_pool);
++	mutex_unlock(&spacc_aead_alg_mutex);
++
++	kmem_cache_destroy(spacc_iv_pool);
 +
 +	return 0;
 +}
