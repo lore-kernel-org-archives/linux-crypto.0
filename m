@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D856626FA60
-	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 19:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7128726F455
+	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 19:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746472297; cv=none; b=DKSidntmvXp9ZE8oRTUNzwtTQK2ZqYXgMXVy4QjdTi/i1ZQMeB2cqb90Pn4OZKtn2d2sEGLo4VIlWVQsU8eOQA+iOmgAgiDbG4bnLbKoboJ+Rk455cxbmVgJBTYI1DOZMFE+/uG+hpmAVti5SpzV3KTjO7Fi2MR6cgSGzaef6Ho=
+	t=1746472299; cv=none; b=IMkGmglZFyuql9uw9s1haQ9W0BFcLLLryy6509yY1ljYSkW3deNiXtsplfuwe6BagW4jjqg4xxmuRnKNNSHZdwjjkBcCpukuWAPDK29zwB4cEIqReZXG6x7p6PV1h2MGLtKyfGdhVGbJVs60MwqqdLGcXilsVfe/lSF5Z2M2hik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746472297; c=relaxed/simple;
-	bh=Ef9zmYIZe+4TF2b7Q1Lz2u+fhl0U7p7qqpocEBgQQ8o=;
+	s=arc-20240116; t=1746472299; c=relaxed/simple;
+	bh=r3yDby7yXjsAVyww+MMw4x3EvzWVi2TUdNfMMl1qhKk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T5mEbXSIaqpbMMDtLM4fH9Fk00qzaENUmidusWrEm86zpuGJiSoHXf5OxxCawS7pF/ZP5bfSMbySb117blmXHi5wFXgVoM+/vsfZsN26+YZiw+LK5Pa9oE/wjv+D19q0p88Uq9mYQQ3jeFlGz8VT942EqIcELRQz4u6K5gNvvvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGD8xjHt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Q6wqP0JH2ET8PSFIIIIcijhEHgjhGu7LwuqO0yyY8UJz3aLRrFI7j3h5TOEBOGVs9VI+Jo+8huL/yz/jbgHNIL/KBZKk4QvKf6nmSnSaVvjqiP22H5OYIhGG0Egp3mYuyT6mLVZSeMEU/ZzPoR/PLUmodLbqc3yS3CBlZaWJLRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NGJGjIGN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGD8xjHt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0147C4CEF1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NGJGjIGN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE9DAC4CEF2
 	for <linux-crypto@vger.kernel.org>; Mon,  5 May 2025 19:11:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746472297;
-	bh=Ef9zmYIZe+4TF2b7Q1Lz2u+fhl0U7p7qqpocEBgQQ8o=;
+	bh=r3yDby7yXjsAVyww+MMw4x3EvzWVi2TUdNfMMl1qhKk=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=gGD8xjHtUOzw6oCsX571V23i6FYfVsPtQlvX2cIuwl3/jB3N8v0ZLygqqjLA2Zlt2
-	 R7gjhIV2hvrpnqFuIbUh3MX2tw4bUhSSSd2GRv61bZ6QJl/V3B2W9K4w5AYme0dgTF
-	 CrwUzwt4LYqVqGU3OdKPjjpOmILAj/ybqnn0BR0uGZGnkOV1UAkp7XaA0ZAvDjHTKm
-	 vcQnKShukJqeviQ4kBKbQisrNqF7vjC2rqquag9M21+0Xuu+KdxgcTMBSAcKlIkck6
-	 YCA43zHoolXWPLXqflsz9WPzLmcdjHVCwKGfwVauPKxYdIQWiPkxtwOuwMYUstEDrw
-	 LiVTdIIum2GBA==
+	b=NGJGjIGN1fRERZAtIuvNY/XdLJCx27WoU2OpWX9cHrxItIfcRRg1n7pPiJlnojJ/8
+	 2kNZqpIApFYB+5aK4FBlUGe+5DQgxkIcRDq5SvVRfI7ECQbx8N4fHiOOEmIVuSzoZS
+	 9QoOGo10sO+qdbVZUMRE7yCKdlGuzlzuSHVTC3gj8ycvC/T1VBj34nSQmiE7VqSDNp
+	 8inOKrZGwTMmxKIOLeRbq0/SRxYOPc5OGqundAuqg78LFaXSdwY0cO3sPaxdI55Hqh
+	 D7Ql3P4ZEasKakQ91S87/BNN025fIdnUd7aDQhMCmVc3z2F4Zn12AnoEeZNaszF8nR
+	 RjhsVlNqfaWtA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Subject: [PATCH 7/8] crypto: null - merge CRYPTO_NULL2 into CRYPTO_NULL
-Date: Mon,  5 May 2025 12:10:44 -0700
-Message-ID: <20250505191045.763835-8-ebiggers@kernel.org>
+Subject: [PATCH 8/8] crypto: null - use memcpy_sglist()
+Date: Mon,  5 May 2025 12:10:45 -0700
+Message-ID: <20250505191045.763835-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250505191045.763835-1-ebiggers@kernel.org>
 References: <20250505191045.763835-1-ebiggers@kernel.org>
@@ -44,60 +44,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-There is no reason to have separate CRYPTO_NULL2 and CRYPTO_NULL
-options.  Just merge them into CRYPTO_NULL.
+Make null_skcipher_crypt() use memcpy_sglist() instead of the
+skcipher_walk API, as this is simpler.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig  | 10 +++-------
- crypto/Makefile |  2 +-
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ crypto/crypto_null.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index cf5a427bb54d..7347277bedf3 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -190,20 +190,16 @@ config CRYPTO_MANAGER_EXTRA_TESTS
- 	  This is intended for developer use only, as these tests take much
- 	  longer to run than the normal self tests.
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index 48c71b925f37..34588f39fdfc 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -13,10 +13,11 @@
+  */
  
- config CRYPTO_NULL
- 	tristate "Null algorithms"
--	select CRYPTO_NULL2
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_HASH
- 	help
- 	  These are 'Null' algorithms, used by IPsec, which do nothing.
+ #include <crypto/null.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
  
--config CRYPTO_NULL2
--	tristate
--	select CRYPTO_ALGAPI2
--	select CRYPTO_SKCIPHER2
--	select CRYPTO_HASH2
+ static int null_init(struct shash_desc *desc)
+@@ -58,23 +59,13 @@ static void null_crypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	memcpy(dst, src, NULL_BLOCK_SIZE);
+ }
+ 
+ static int null_skcipher_crypt(struct skcipher_request *req)
+ {
+-	struct skcipher_walk walk;
+-	int err;
 -
- config CRYPTO_PCRYPT
- 	tristate "Parallel crypto engine"
- 	depends on SMP
- 	select PADATA
- 	select CRYPTO_MANAGER
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 84f6911dc9ba..0f77e093512c 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -69,11 +69,11 @@ cryptomgr-y := algboss.o testmgr.o
- obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
- obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
- obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
- obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
- obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
--obj-$(CONFIG_CRYPTO_NULL2) += crypto_null.o
-+obj-$(CONFIG_CRYPTO_NULL) += crypto_null.o
- obj-$(CONFIG_CRYPTO_MD4) += md4.o
- obj-$(CONFIG_CRYPTO_MD5) += md5.o
- obj-$(CONFIG_CRYPTO_RMD160) += rmd160.o
- obj-$(CONFIG_CRYPTO_SHA1) += sha1_generic.o
- obj-$(CONFIG_CRYPTO_SHA256) += sha256.o
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		if (walk.src.virt.addr != walk.dst.virt.addr)
+-			memcpy(walk.dst.virt.addr, walk.src.virt.addr,
+-			       walk.nbytes);
+-		err = skcipher_walk_done(&walk, 0);
+-	}
+-
+-	return err;
++	if (req->src != req->dst)
++		memcpy_sglist(req->dst, req->src, req->cryptlen);
++	return 0;
+ }
+ 
+ static struct shash_alg digest_null = {
+ 	.digestsize		=	NULL_DIGEST_SIZE,
+ 	.setkey   		=	null_hash_setkey,
 -- 
 2.49.0
 
