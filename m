@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528E037F0A6;
-	Mon,  5 May 2025 23:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7282F4178;
+	Mon,  5 May 2025 23:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486539; cv=none; b=ea62hGDlLD+wcxbzF7T0wtv88hQIwNh7635OrQ5F3XR03brRHUQ4OwF/JaydJlOdOtOqktEnfLKOiv6ZZGRoA2b/D36U61fKwjf8So754Aab3TyGese3cBVCdaMuuMHe8uU+U0WvrOrJ6NvfrlrU4FE5NzI777syh5EaIki12x0=
+	t=1746486914; cv=none; b=LyxJt3hTn/7qqEd351HXZgh/yosF0uTgQAqT7Bg6lOsCTgJ7xJcxILzU07QmmG1usB488rRlKjoLdA4ttK1Y8v1ApoLnuzdrjYcX1YSWgUJ5f7D21ElsJ41TlXiOjY8mggYHr+xzwPNuTgA2HJ/HpopQJxcJSAzYUTdVy+KbuVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486539; c=relaxed/simple;
-	bh=KmeHPBQSaXkGmRVxa0Lv0B9c6Htwly5qyqjzEYZvUBI=;
+	s=arc-20240116; t=1746486914; c=relaxed/simple;
+	bh=3tnStuuC2HnThg25bCZdiDQF49qj+cDvT3YPacNb8Xs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bIjPPBQ98obJa5QoUWez31XKzmXYKHJaTXS8gm/sKDsj7LZqpHwij2Z2pA5vlEbn4YEqi3qqdTDfzRNRhqHfC1OHPQZnEB41RKWH3SWiCV4ahe9J7kAfkZD6Kkg/xagspfL9hN7r3FsU0ZRz26VR4v/KzxKuJGxPjL4yW8ZtXRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ta87RQ48; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VsYOzfpHdGd2w0hN5aTBercFx6X6H1fMKhwC4u6wcltPRcBRzl4LkTqq10dPl163d3ujuc5BkeZg3nNI5AsOR2fPoMQuG2/45VVlxe0sKBC7vLHfxI9H1lXieIcQIF4YqP22MIP6CJoHrM6lSQn2pXqTMy0qJNhgv7U+/5RXicU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QfphTk99; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ta87RQ48"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50590C4CEE4;
-	Mon,  5 May 2025 23:08:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfphTk99"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AEE8C4CEE4;
+	Mon,  5 May 2025 23:15:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486538;
-	bh=KmeHPBQSaXkGmRVxa0Lv0B9c6Htwly5qyqjzEYZvUBI=;
+	s=k20201202; t=1746486913;
+	bh=3tnStuuC2HnThg25bCZdiDQF49qj+cDvT3YPacNb8Xs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ta87RQ48Bd+egBbUW78LJYTlaXKkrcF5SlVW0CUsMbFwQNj3nIY0dDQwuNQv6eon0
-	 iMF8/VH6BusxlVByNNvX6opZCAEIyDruqjZaMivfKcoHYbRnPM6AESqkj67CZCA/Yl
-	 041KuXVKVmJiN3e7Szmr62mzdh9pSSSPQj4ylb+gHlulgHQNvh3iBgOnYdhfsEx9+C
-	 ypNk4RzciBhO/DhMH8dQIyJP82IolS8JU+0ATOeGUFVCiaq9uwTqaWS1z3qhhkoiSS
-	 okhJSIiPWrerwZ43I5FCAwvPSHzVkOlyemzEYCbWwcH4mzfQLvpgmBnNwQjIcCgOtL
-	 5ahAFY2FvaqIg==
+	b=QfphTk99ZpUzB8Ksyqo+8ZBICW6saZFPd2nw6ALWYxvsdiKOWA7r/+R3M1VOaz37N
+	 A+721Gd5aJGOVPwXcSr5CiKVsyNwqm/Qkcld2OrHT1z7IQ1uwjBi+Q66MT750RaQYm
+	 b603MQmcWKSmqO7+ZWQl45dklKm2N3b5COV9+G4dt0ZlwPcOCuBNslCDrry9MvbWzV
+	 xhK8lzSh4+x2LYe/kAEc2SFainbnunxUA61lLrTP+5ord+r30B0zOQFHMfg04hirlo
+	 scu6NR6HzUtr5FU3XIG8sPU66l+Uu3MknALOTo+Bjr2Cjq/QVDqP1GRCaQAD+FnoOn
+	 /gNcJ7cV38TeQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	davem@davemloft.net,
 	viro@zeniv.linux.org.uk,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 079/212] crypto: lzo - Fix compression buffer overrun
-Date: Mon,  5 May 2025 19:04:11 -0400
-Message-Id: <20250505230624.2692522-79-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 055/153] crypto: lzo - Fix compression buffer overrun
+Date: Mon,  5 May 2025 19:11:42 -0400
+Message-Id: <20250505231320.2695319-55-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
-References: <20250505230624.2692522-1-sashal@kernel.org>
+In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
+References: <20250505231320.2695319-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.136
+X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
@@ -139,7 +139,7 @@ index 2f58fafbbdddc..fc7b2b7ef4b20 100644
  
  obj-$(CONFIG_LZO_COMPRESS) += lzo_compress.o
 diff --git a/lib/lzo/lzo1x_compress.c b/lib/lzo/lzo1x_compress.c
-index 9d31e7126606a..f00dff9b9d4e1 100644
+index 76758e9296ba6..469c143f75852 100644
 --- a/lib/lzo/lzo1x_compress.c
 +++ b/lib/lzo/lzo1x_compress.c
 @@ -18,11 +18,22 @@
@@ -181,7 +181,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  	ip = in;
  	ii = ip;
  	ip += ti < 4 ? 4 - ti : 0;
-@@ -116,25 +128,32 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -118,25 +130,32 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  		if (t != 0) {
  			if (t <= 3) {
  				op[*state_offset] |= t;
@@ -214,7 +214,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  				do {
  					COPY8(op, ii);
  					COPY8(op + 8, ii + 8);
-@@ -151,6 +170,7 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -153,6 +172,7 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  		if (unlikely(run_length)) {
  			ip += run_length;
  			run_length -= MIN_ZERO_RUN_LENGTH;
@@ -222,7 +222,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  			put_unaligned_le32((run_length << 21) | 0xfffc18
  					   | (run_length & 0x7), op);
  			op += 4;
-@@ -243,10 +263,12 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -245,10 +265,12 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  		ip += m_len;
  		if (m_len <= M2_MAX_LEN && m_off <= M2_MAX_OFFSET) {
  			m_off -= 1;
@@ -235,7 +235,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  			if (m_len <= M3_MAX_LEN)
  				*op++ = (M3_MARKER | (m_len - 2));
  			else {
-@@ -254,14 +276,18 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -256,14 +278,18 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  				*op++ = M3_MARKER | 0;
  				while (unlikely(m_len > 255)) {
  					m_len -= 255;
@@ -254,7 +254,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  			if (m_len <= M4_MAX_LEN)
  				*op++ = (M4_MARKER | ((m_off >> 11) & 8)
  						| (m_len - 2));
-@@ -282,11 +308,14 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -284,11 +310,14 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  				m_len -= M4_MAX_LEN;
  				*op++ = (M4_MARKER | ((m_off >> 11) & 8));
  				while (unlikely(m_len > 255)) {
@@ -269,7 +269,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  			*op++ = (m_off << 2);
  			*op++ = (m_off >> 6);
  		}
-@@ -295,14 +324,20 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+@@ -297,14 +326,20 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
  		ii = ip;
  		goto next;
  	}
@@ -295,9 +295,9 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  	const unsigned char *ip = in;
  	unsigned char *op = out;
  	unsigned char *data_start;
-@@ -326,14 +361,18 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+@@ -328,14 +363,18 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
  	while (l > 20) {
- 		size_t ll = min_t(size_t, l, m4_max_offset + 1);
+ 		size_t ll = l <= (m4_max_offset + 1) ? l : (m4_max_offset + 1);
  		uintptr_t ll_end = (uintptr_t) ip + ll;
 +		int err;
 +
@@ -317,7 +317,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  		l  -= ll;
  	}
  	t += l;
-@@ -342,20 +381,26 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+@@ -344,20 +383,26 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
  		const unsigned char *ii = in + in_len - t;
  
  		if (op == data_start && t <= 238) {
@@ -344,7 +344,7 @@ index 9d31e7126606a..f00dff9b9d4e1 100644
  		if (t >= 16) do {
  			COPY8(op, ii);
  			COPY8(op + 8, ii + 8);
-@@ -368,31 +413,38 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+@@ -370,31 +415,38 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
  		} while (--t > 0);
  	}
  
