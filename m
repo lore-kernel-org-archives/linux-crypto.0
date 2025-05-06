@@ -1,175 +1,151 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67460279787
-	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 06:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0996320D50C;
+	Tue,  6 May 2025 06:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746513214; cv=none; b=sN1VFxnlLTWjgNtx2bj6/YkaRrrKcNGwCILJdkH3b3Aj3XWg1C6c1WN1rcjZ7rrZQJk5U4QTraW0URkE45gH82Y4VKUVYQRX8JBNGRNW6yFRVX0tx2gsCPAtTptitCwWUziLLCfiRKKqj7i4o9w0MEAzjB6rs2JiDV5kYM+xrko=
+	t=1746514284; cv=none; b=A7i/KONPvaFX2s+bfDUBu0qPi8psffz31INea7tLwQz0i2xAbVYjYfHLF6wDCHLlFPFZ9IUWcB/NGK6kZgXF3ZSSvMLK02SoSB2EWgYGnD9COUlr5UZHhKPk8fSBN2ZTbzJSh2CEnJFwAutHV32k/DogMBUlUcDVdScLaDROPxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746513214; c=relaxed/simple;
-	bh=ZbfaNYhylkE84/orsTBNrABjmfGALTYOqyDcN5wBiJc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d+aXJn91M24/vJp0sUrYtgQyYwwBUJvvXvtdCgWsknm+hSu4eSl6IAnMx3yYxoDmMMAH4fdM2Mk/uxhIndcR+lQ+OrbKlyZGh4L1OpuUSeae+HrhBn6j9jAE8AgRZgnCUZPPOevzJ1f18T4KQb5vzhAaks4DN6210zW+DIDRZ0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=QHz+65z/; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1746514284; c=relaxed/simple;
+	bh=f6MCVMoyIyDh6X4+NpBMr+x9iT3qZ16UKn4vne88fnw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QuBFKwBqlhDbQQpZOortOpt8QIlHs7cpHe3qyZVItAeQS92o8mwmh9vwX12dsZ9mbDaLtfXiaOUp50XwR4JVVUbToq0MteETcoKj11tjA/fwAXmSe9QCeWq+idNT4LzteIms8ynL6Ccbe/yE6aybNwb6XgM4zWRkZsyBrFzWFQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiC9h1cA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="QHz+65z/"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7099bc957d9so308647b3.0
-        for <linux-crypto@vger.kernel.org>; Mon, 05 May 2025 23:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1746513211; x=1747118011; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UXx9UG0NcgMBqkRTz272hPUucW27iAIqCFPb0LfA65Y=;
-        b=QHz+65z/Y+D0z5uC90DrHMdALXN48Vg8EGajcbZ1UgLUjTAANZG+NTV5uTvXe7T3JU
-         rkNrI+fGQRbNkDYGp2uU7o5C4w+084jS8Zvq53AAXe56t2X1vWDbDzqBwykWLsrR5XKe
-         epbCpyBszlTO9z3KXJVbrMfCW2IDsNvVeIYuE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746513211; x=1747118011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UXx9UG0NcgMBqkRTz272hPUucW27iAIqCFPb0LfA65Y=;
-        b=YxFjxJv1CHhDy2mqRLz02yF4miCjp+Qa818mbttt7/KXus6I1TCbMBj9iXc0/WORDr
-         6XsBiWx+7s215xApj4tQieu4Si4GKESMYSlUjtnUUIrcFJ5lvmAF8Dk9/c0A6MzbqW4w
-         yj25qIXnsjngFjXhgdpq9Afm2BPb/3HCfwfCYqSwXqTcmGBGdaveOgAmuDY4J99LmQ1p
-         Jn2HdRNHntK2WmCletC8PajxAD6HtzBhmMKbJD3GSVVFyFwTuOHQbl17cs0aCTx65Top
-         JktSOvnwc0IwifF+c0XN7EUBLHKemi9DDDgJOhFhpkKBqsYJgtm4FJCH/NStBoOkzNTC
-         x2Cg==
-X-Gm-Message-State: AOJu0Yy79mkAWcVJ55uqG/0ND2oe5I/XvliaL/1npljQJwRqtVgUuX3c
-	+swIkJIsnhPASIuNon7revGwXL4mqqxlhRReUyi5muYz7OR+ff59fE/t5Yvzx2SiRxJowqagHx8
-	RB0gCr2KZT3OyP14G6NGfgDBfdwm13F4COz3yeQ==
-X-Gm-Gg: ASbGncvShMNFVaZLOkQ5VecVc/pnlSyMyIZ+8ONfa/2yOSourOf6cpjX23sZtS3UwpV
-	m0i7AgHYzNSmbXTwNRQ3n9nI9qRsRZZnnu0H7o132/CMFR22RYTn7Q2ooBztJ8tzYiSLUVfpTeq
-	kYlDEr37wefJmMouzQ37v/23gS2O7D3ReFW9tIu/QWG+BGZ4YTA1wZfuRT
-X-Google-Smtp-Source: AGHT+IEzplNLh/W8XF0UXBTH2d6CbQzPrIugR7245xJcn67FnR5vMLrB0ITgWQx6Y2MzSwZNHhJR5JcRuH3xYCmtzRo=
-X-Received: by 2002:a05:690c:9c0e:b0:6f7:50b7:8fe0 with SMTP id
- 00721157ae682-708eaeb3560mr142555577b3.1.1746513211289; Mon, 05 May 2025
- 23:33:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiC9h1cA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D52DC4CEE4;
+	Tue,  6 May 2025 06:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746514283;
+	bh=f6MCVMoyIyDh6X4+NpBMr+x9iT3qZ16UKn4vne88fnw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RiC9h1cAhVOYw+f7nbJCESnvHsnlp/Zo8dlQQMrVi3QKsiK0fJ3WOv8PunT6DLvD9
+	 AHH1eG81vleGwVN0GMyGOAtQjad7TQHMDmpLHAc/NCymGmWjWMYXxwezwX/Pm7G40/
+	 6UWSTsMqYkMFghfm1upKDDEH/J5yy6KIagRlzD20KK+xXXgBTkE5O68rIWv9mRE0bU
+	 7nxHITvEb5GNQxctVq6CYliCQdnOe1zkcXzs0qbWk9d0fevdhRqMORVzTwy1Gm3fU9
+	 6AftAREM5KqWn6gLNN66hx73rG4MQa52rNXsHbxz96YOw65ktlqqY2T9NuBd80kp7Z
+	 UTw6w+d2+SF0g==
+Message-ID: <19b1fca7-e1b1-4190-9bcb-7ce36fabd02e@kernel.org>
+Date: Tue, 6 May 2025 08:51:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
- <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com> <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
- <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
-In-Reply-To: <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Tue, 6 May 2025 12:03:20 +0530
-X-Gm-Features: ATxdqUEW5XJBvrgIU4fNn6KtzeRiLwWfaYVl-_cyBfqL0wQWAjG5RACq9Gq3lPA
-Message-ID: <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com,
+ manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
+ Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
+ <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
+ <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
+ <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
+ <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
-  My comments are embedded below.
+On 06/05/2025 08:33, Pavitrakumar Managutte wrote:
+> Hi Krzysztof,
+>   My comments are embedded below.
+> 
+> Warm regards,
+> PK
+> 
+> On Mon, May 5, 2025 at 9:22 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>
+>> On 05/05/2025 17:48, Krzysztof Kozlowski wrote:
+>>> On 05/05/2025 14:55, Pavitrakumar M wrote:
+>>>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+>>>>
+>>>> Add DT bindings related to the SPAcc driver for Documentation.
+>>>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+>>>> Engine is a crypto IP designed by Synopsys.
+>>>>
+>>>> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+>>>> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+>>>> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+>>>> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+>>>
+>>>
+>>> I do not see any improvements. It seems you ignored all comments, not
+>>> single one was responded to or addressed.
+> 
+> PK: Addressed all the below
+> 
+> 1. SoC Bindings: We dont have any SoC bindings since its tested on the
+> Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
+> device here. Also added a detailed description for the same, which
+> describes how we have tested the SPAcc peripheral on Zynq. This was
+> based on your inputs to describe the existing hardware.
 
-Warm regards,
-PK
+1. I asked to use SoC specific compatibles and after such explanation
+that you use it in some different, hardware configuration, I asked to
+use that.
 
-On Mon, May 5, 2025 at 9:22=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.org=
-> wrote:
->
-> On 05/05/2025 17:48, Krzysztof Kozlowski wrote:
-> > On 05/05/2025 14:55, Pavitrakumar M wrote:
-> >> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> >>
-> >> Add DT bindings related to the SPAcc driver for Documentation.
-> >> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
-> >> Engine is a crypto IP designed by Synopsys.
-> >>
-> >> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> >> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> >> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> >> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-> >
-> >
-> > I do not see any improvements. It seems you ignored all comments, not
-> > single one was responded to or addressed.
+Reflect whatever your hardware is called in the compatible.
 
-PK: Addressed all the below
+I claim this cannot be used in a SoC without customization. If I
+understood correctly this is soft IP in FPGA for evaluation, so no one
+will be ever able to use it. Therefore this binding makes no sense to me
+in general: you do not add anything any customer could use. It is fine
+to add something which you use internally only, but again describe the
+hardware properly.
 
-1. SoC Bindings: We dont have any SoC bindings since its tested on the
-Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
-device here. Also added a detailed description for the same, which
-describes how we have tested the SPAcc peripheral on Zynq. This was
-based on your inputs to describe the existing hardware.
+2. I wrote you entire guide what is wrong with your Cc addresses and
+this was fully ignored. Neither responded to, nor resolved.
 
-2. snps,vspacc-priority: I have removed this from the device tree and
-now it will come as a KCONFIG option. Let the user configure the
-vspacc-priority based on his needs. Its a static configuration for a
-serup. This is needed as virtual-SPAcc is used in heterogeneous
-processor environments. So we bind each processor with a virtual
-SPAcc.
+I am not going to review the rest of the file.
 
-3. snps,vpsacc-id -  Descriptions updated as per your inputs. I had
-mentioned driver usage, its cleaned up.
-
-4. snps,spacc-wdtimer: SPAcc Watchdog is not a traditional watchdog,
-but just an internal counter which we have renamed to
-"spacc-internal-counter". Its not a watchdog in the traditional sense,
-so I have not used the existing watchdog schema and its property.
-
-5. interrupts =3D <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;  - Updated with
-macros as per your inputs.
-
-6. Herbert's comments have been addressed for skcipher, Aead and
-Hashes as below for the completion callbacks into the Crypto
-subsystem. Since we use workqueue for our bottom half, which is a
-process context, we disable/enable the local bh as shown below
-
-HASH:
-local_bh_disable();
-ahash_request_complete(cb->req, err);
-local_bh_enable();
-
-AEAD:
-local_bh_disable();
-aead_request_complete(cb->req, err);
-local_bh_enable();
-
-SKCIPHER:
-local_bh_disable();
-skcipher_request_complete(cb->req, err);
-local_bh_enable();
-
-7. Herbert's comment on "mutex_lock" usage in my bottom half is
-addressed as well. I am using a workqueue for my bottom half, which is
-a process context. I have mentioned the same in the email response to
-Herbert.
-
-8. I have updated the changelog from V1 -> V2 as well, detailing all
-the above changes.
-
-> >
-> > NAK
-> >
-> > <form letter>
-> > This is a friendly reminder during the review process.
-> >
-> > It seems my or other reviewer's previous comments were not fully
-> > addressed. Maybe the feedback got lost between the quotes, maybe you
-> > just forgot to apply it. Please go back to the previous discussion and
-> > either implement all requested changes or keep discussing them.
-> >
->
-> Hm, actually I see now email you responded to some but ignored several
-> others, so still a no.
-
-PK: I am and I will be addressing every single comment. Looking out
-for your inputs and feedback.
-
->
-> Best regards,
-> Krzysztof
+Best regards,
+Krzysztof
