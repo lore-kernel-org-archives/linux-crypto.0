@@ -1,138 +1,142 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469622FAEB2
-	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 02:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DDF3002BE;
+	Tue,  6 May 2025 02:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746497115; cv=none; b=tV6hd6XxbPQqcs0f8n/7Yty9M6/BXb+LMrfcmu1oJOliezduyr3aU6klKR2OrLoYpx0lasy5Gzz8SrsF8AUfs4WUJ/DDgRjMgejCfWwW/XPsyqRz9FWYEsGappyOG16IgBtD6s7YS+kqcWhxg/Vqbrkb/E+w9or/C9Te8grF8E0=
+	t=1746498150; cv=none; b=DFA3a6PBovByedIy7i4lWXawQ3QhCRct+8LQMiwk21MpKPO0fm0T2DsTvn38wv7/O1v14SrbsQ27AJZTDlf2rbLvV9llendcODgXFSUtbeGjIwlF2X18uRdC4erihkONBQ1sJRqT64anIZM98CxeudrORKcNRXzDaSYV6SKxsOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746497115; c=relaxed/simple;
-	bh=RyiK5mK+Q1ydkq/sAmdGcwqn006Q9VW4VRnjxr74W8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dUVPysqx7diW9m06/veUV+2FB/cHV4gtz0ra5cB8lYX/6jZIFbS/0MD2ATnFyJNYRWcOBhUzV2itBFch2X/oJrcK5cmrtPkfFGrkr79b3jleUQVZguAYpk4fZZIckryd/n6WFkSlj83RJk9fj/t3FDOf8d96IJQdCTyvcbcyuhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N0kOkd6g; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746498150; c=relaxed/simple;
+	bh=ISoOrhO6ZcvDNVxFY75Ue3gOfPZtfLJNwCTvo+6IKCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nQ3M183NJjPB11Jwzk8ODTTTZb+VwcycRkOCraXiEUyEjU2StfBL9GmT2JBBtYUOuhkPJCjAzBJMurD1gYzbbA7oi6xFxY6kub7akI/mKoNT6LhEvy+NvdKBVS9la4zV2+uasjVadOJlIX5qJPeGxn3VC4bC8bfN5E26YYExGsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=QKNCGEE5; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N0kOkd6g"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=8kK9xWLyjoouoN6uk5WQfKhGImTGU9lqY0wpnep/RNA=; b=N0kOkd6gF4ZDaSyRcYUzE8djWy
-	d9+KDNPqzKqXQUxwjPFPHTPmznuRPRNJAS0smswi+YcSUg2JnDSd9oH7nLBXABhP+qaa5XzsmLg/a
-	fSdGq5dRvjYCuCiAKWzId3FnQfZzCth7eYeYNkAIMb9oGpVorNC5Bi8FiBa5S/iIq3U7WzdFU7ja+
-	pwCr46jVcDgKkHOPZsRmUprJSJ/StOJELus5HCXCRtn115YdsXD7mY3JMV8gfcZCFyO//Kh4Q3Po2
-	xP4/sHVhpOxraHo8FMPWoy9Ruf3OImifRM43pSC7/Hmz0Vfc9I4gkPDSnA6L/5o9BMahOqSkEvBag
-	FGwTVefQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uC7gC-003l0R-0p;
-	Tue, 06 May 2025 10:05:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 May 2025 10:05:08 +0800
-Date: Tue, 6 May 2025 10:05:08 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: lib/poly1305 - Build main library on LIB_POLY1305
- and split generic code out
-Message-ID: <aBluVB9Xg2hbNlKX@gondor.apana.org.au>
-References: <cover.1745815528.git.herbert@gondor.apana.org.au>
- <0babdb56d14256b44249dc2bf3190ec200d9d738.1745815528.git.herbert@gondor.apana.org.au>
- <aBjAFG4+PXbPgqFw@gcabiddu-mobl.ger.corp.intel.com>
- <aBluBfXCtOoGrPKW@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="QKNCGEE5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1746498143;
+	bh=v+uGUtGJ32z0FgIlZfhka6lWrnQk6smEFdDaYfbWoH8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=QKNCGEE5fbWsEPrRdOMjiE/wjz+7Z4Z/lhBRWDuN8ogsHL9zdVXLS4F3Qp8yagddJ
+	 e5ZHn5jthJnzIJC+ik/sZgtzbXqj72IpIglLhpgICyZ7el2RuQ77QXWqb5bIcdibNq
+	 LCpXSr4zwv2mrttduH9iXe+3yrpylGeSmsv9Vkj00tk6eiySknhbMIChiqdAcG/vdU
+	 3KClsGBbqzENvTCr0BRE0DW3m/iOBRsQYzq2ssln4roaUAueIhvRjS9jtxPJ+KZEiF
+	 WTVu7J6P86HjXDSzmN2vEJ2NIcW+tPC5R/6erowG4pjI81AIWsltwui/egn+79nVjd
+	 xndpmWxr6u+wQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Zs2Gl47pBz4wcD;
+	Tue,  6 May 2025 12:22:23 +1000 (AEST)
+Date: Tue, 6 May 2025 12:22:22 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20250506122222.2a910820@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBluBfXCtOoGrPKW@gondor.apana.org.au>
+Content-Type: multipart/signed; boundary="Sig_/non9b/L3zyiXLRua3DSV_Sr";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Split the lib poly1305 code just as was done with sha256.  Make
-the main library code conditional on LIB_POLY1305 instead of
-LIB_POLY1305_GENERIC.
+--Sig_/non9b/L3zyiXLRua3DSV_Sr
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Fixes: 10a6d72ea355 ("crypto: lib/poly1305 - Use block-only interface")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Hi all,
 
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 71d3d05d666a..c47438161ff1 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -40,11 +40,13 @@ libcurve25519-y					+= curve25519.o
- obj-$(CONFIG_CRYPTO_LIB_DES)			+= libdes.o
- libdes-y					:= des.o
- 
--obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305.o
--libpoly1305-y					:= poly1305-donna32.o
--libpoly1305-$(CONFIG_ARCH_SUPPORTS_INT128)	:= poly1305-donna64.o
-+obj-$(CONFIG_CRYPTO_LIB_POLY1305)		+= libpoly1305.o
- libpoly1305-y					+= poly1305.o
- 
-+obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305-generic.o
-+libpoly1305-generic-y				:= poly1305-donna32.o
-+libpoly1305-generic-$(CONFIG_ARCH_SUPPORTS_INT128) := poly1305-donna64.o
-+
- obj-$(CONFIG_CRYPTO_LIB_SHA1)			+= libsha1.o
- libsha1-y					:= sha1.o
- 
-diff --git a/lib/crypto/poly1305-generic.c b/lib/crypto/poly1305-generic.c
-new file mode 100644
-index 000000000000..a73f700fa1fb
---- /dev/null
-+++ b/lib/crypto/poly1305-generic.c
-@@ -0,0 +1,24 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Poly1305 authenticator algorithm, RFC7539
-+ *
-+ * Copyright (C) 2015 Martin Willi
-+ *
-+ * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
-+ */
-+
-+#include <crypto/internal/poly1305.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+
-+void poly1305_block_init_generic(struct poly1305_block_state *desc,
-+				 const u8 raw_key[POLY1305_BLOCK_SIZE])
-+{
-+	poly1305_core_init(&desc->h);
-+	poly1305_core_setkey(&desc->core_r, raw_key);
-+}
-+EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
-+MODULE_DESCRIPTION("Poly1305 algorithm (generic implementation)");
-diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
-index 4c9996864090..5f2f2af3b59f 100644
---- a/lib/crypto/poly1305.c
-+++ b/lib/crypto/poly1305.c
-@@ -14,14 +14,6 @@
- #include <linux/string.h>
- #include <linux/unaligned.h>
- 
--void poly1305_block_init_generic(struct poly1305_block_state *desc,
--				 const u8 raw_key[POLY1305_BLOCK_SIZE])
--{
--	poly1305_core_init(&desc->h);
--	poly1305_core_setkey(&desc->core_r, raw_key);
--}
--EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
--
- void poly1305_init(struct poly1305_desc_ctx *desc,
- 		   const u8 key[POLY1305_KEY_SIZE])
- {
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+After merging the crypto tree, today's linux-next build (x86_64
+allmocdonfig) failed like this:
+
+x86_64-linux-gnu-ld: vmlinux.o: in function `__chacha20poly1305_encrypt':
+chacha20poly1305.c:(.text+0x1a690e1): undefined reference to `poly1305_init'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a690f1): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69145): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69182): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69192): undefined refere=
+nce to `poly1305_final'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6922d): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69246): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: vmlinux.o: in function `__chacha20poly1305_decrypt':
+chacha20poly1305.c:(.text+0x1a69480): undefined reference to `poly1305_init'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69490): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a694c8): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69505): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69510): undefined refere=
+nce to `poly1305_final'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a695eb): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a69604): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: vmlinux.o: in function `chacha20poly1305_crypt_sg_inpl=
+ace':
+chacha20poly1305.c:(.text+0x1a6c3f6): undefined reference to `poly1305_init'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c555): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c576): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c5af): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c5d8): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c617): undefined refere=
+nce to `poly1305_final'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c7c6): undefined refere=
+nce to `poly1305_final'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c7f9): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c822): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c854): undefined refere=
+nce to `poly1305_update'
+x86_64-linux-gnu-ld: chacha20poly1305.c:(.text+0x1a6c888): undefined refere=
+nce to `poly1305_final'
+
+Caused by commit
+
+  10a6d72ea355 ("crypto: lib/poly1305 - Use block-only interface")
+
+and maybe
+
+  a298765e28ad ("crypto: chacha20poly1305 - Use lib/crypto poly1305")
+
+I have used the crypto tree from next-20250505 for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/non9b/L3zyiXLRua3DSV_Sr
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgZcl4ACgkQAVBC80lX
+0GxexwgAjqdJDJ/bEJ2Jeg4q2RHlaTHwHhYqF5q2nqYUQV4HYjSdU+iq8VOp+O0Y
+95SzLLL3dhF4hlHFgbEXQbSeye/SCoz7rWvhdMYf2UrNuEciw1/BCFWM8+yUrmNR
+q/RG81Vsmt28al5eH9Tzrhwqokykro7WMVSkp/b0tl3/eDqYGs72qPm/CzpucNNV
+wn9R+4+5z4ZPzuWmUj/UKaxSjsmWZ/qxxFdORWC/pHNqRJC8ppnlnKKf1gG4Zsm5
+fpLEHC94te2tMvy70vvu/mTISenUFBE0cgw4OOEt+CX7djoxR6lAy9XGsf8OrNlq
+xtSWIcYIMLJbjMuSdUZ8mUpPDMc2WA==
+=iKS9
+-----END PGP SIGNATURE-----
+
+--Sig_/non9b/L3zyiXLRua3DSV_Sr--
