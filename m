@@ -1,109 +1,103 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883E51DDE9;
-	Tue,  6 May 2025 12:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9214623D28F;
+	Tue,  6 May 2025 13:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746533775; cv=none; b=C/9Qaa8pwAiudLCSn8FKDZJA5OcUDuS1TfhmfsqtEKCVvc+2R3Ln0RfD1MXqyes0M4FPGoeCH+Tu0J9TRwnll/Z5u2ZWxetYoFnzZqm1lGWJZk8EBSJ0GE9+SupMbdnQSc4D3sGkwo7XNEkxLzdcjPT+DGtTexgV/jvLDsmSNIE=
+	t=1746537553; cv=none; b=fMuraMF6XFT0ckt5/jf6UR1YVGQhesMKLydsNClPFr8ryScC1xUHyp8qZGLoCQL6FQk9N2ncBpn+YZLplbH31cmsLJ8toopS5LWGd3k5wxHSddRiLG6kB0nH1OS3LItlN85GO2z29hPe29CssudnKFUSF+6X5VU5jBjxrCgKhYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746533775; c=relaxed/simple;
-	bh=oEwS2B/SEVhvr/PEsjOt8P75XFO79S+SKeaI3RLVp/w=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=W8VxrriwXm7SjHwc5DgGc0Z+WV4qJ20E5ZnUeWIgiYxlsHyp3vneARLU0jRCEB7GpmoRJQbdBaygRkoiXJVfHQcOBS32baCIcWAezpos2XLypN1dw9GNKl520YIzVUfk0RZzx+EG6mgxYVCf+S0Gj0bQrziTxDlMNSe2F/+Aj6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8DxvnOJ_Rlo+rPWAA--.57490S3;
-	Tue, 06 May 2025 20:16:09 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMCxvMaE_RloXPG2AA--.50748S2;
-	Tue, 06 May 2025 20:16:06 +0800 (CST)
-Subject: Re: [PATCH v9 5/5] MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO
- DRIVER entry
-To: Yanteng Si <si.yanteng@linux.dev>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de,
- Huacai Chen <chenhuacai@loongson.cn>
-References: <20250506032053.11147-1-zhaoqunqin@loongson.cn>
- <a03b4963-55aa-4a75-b795-1e8f0db7ec89@linux.dev>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <00196f77-1060-fe67-3e6b-6721092207d6@loongson.cn>
-Date: Tue, 6 May 2025 20:14:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1746537553; c=relaxed/simple;
+	bh=iUzddKqL0iIvG6UutN1G6gNVWdgxVSxIUnXyf4QycaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMo83O4OZdHIctTSuWZm6nKpNxVRXbwX5FVHMQ3H1UqOucrV74jYDjGs1pi43ViEAYVmb/kUJxJNCF3HX+hld9XGH7eyCGl7PGJSeCYsZtMkYOfvTYb2PGd6l9ag/SYJenKjg5X6q9XhHMsPYO9LKNRb/Q7jy7NEJxHXWOy9RMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=k/vn7zxc; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="k/vn7zxc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=kHR2Y14bKRrsW5EJnr2zMkLPuETcVkgoZdQEZZ47vSE=; b=k/vn7zxcxor1/UJyd8b3ED6c6Z
+	2WbLB6yu4YlPVHMb11J69ZG3daWi7WPctkWSF00cnzAAfBy70+fuY2717t7ZLYomDVd682NtZrn6X
+	QwyenJE/BpAc35Mm/f1CaU0nzBp4BfB7Vx7EdudUL4fMl5Lp6YlRKly7I+U9hishlxdBgIY94qFOA
+	W9jGO6pC4QYjDqs/qC8JUAXw8XJWy145TviuaK8h91ecFu2SP3Cs1GgpdydJs1D4ShM2iMcE6CziW
+	2gbDDKBS7davfZrmTG0X0/6mDWJpaAlKWPaJg8qBchiIvS4OXnVbjJGRPFULvhiUDkrG7j0Xl2Mb+
+	EadVEoDg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uCICO-003y4w-2N;
+	Tue, 06 May 2025 21:19:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 May 2025 21:19:04 +0800
+Date: Tue, 6 May 2025 21:19:04 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
+ Turris Omnia
+Message-ID: <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
+References: <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
+ <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
+ <ZwZAExmK52txvHE8@gondor.apana.org.au>
+ <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
+ <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
+ <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
+ <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+ <Zw31JIEyh28vK9q7@gondor.apana.org.au>
+ <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+ <Zw9AsgqKHJfySScx@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a03b4963-55aa-4a75-b795-1e8f0db7ec89@linux.dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMCxvMaE_RloXPG2AA--.50748S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7Jw4fJFy7ZF48ury7WFWUKFX_yoWkKFg_Ca
-	yIkr1kGr18Jrn2g3W2gr97XwnxWa98Xa4rW3WUtw1fWw1jvFyDGFs7Cw1fA3WfWFWkGFnx
-	Jrn7WFZ7Ary2vosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbDAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0
-	oVCq3wAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa02
-	0Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1l
-	Yx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI
-	0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC2
-	0s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zw9AsgqKHJfySScx@gondor.apana.org.au>
 
+On Wed, Oct 16, 2024 at 12:27:30PM +0800, Herbert Xu wrote:
+> On Tue, Oct 15, 2024 at 07:38:27PM +0200, Klaus Kudielka wrote:
+> >
+> > So, I applied the TDMA-disable patch, and I saw the same errors.
+> > Then, I applied the printk patch on top of that, and here is the result.
+> > 
+> > Not sure, whether this makes any sense...
+> 
+> Interesting, I think this shows that the non-TDMA path doesn't
+> work at all :)
 
-在 2025/5/6 下午5:03, Yanteng Si 写道:
-> 在 5/6/25 11:20 AM, Qunqin Zhao 写道:
->> Changes to Loongson TPM driver would be best reviewed by the Loongson
->> crypto driver maintainers.
->>
->> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
->> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
->> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
->> ---
->> v8-v9: None
->> v7: Added tag from Jarkko and Huacai
->> v6: "tpm_lsse.c" -> "tpm_loongson"
->> v4-v5: None
->>
->>   MAINTAINERS | 1 +
->>   1 file changed, 1 insertion(+)
-> I'm just curious. Why is this patch kept outside the tmp_loongson 
-> patch set?
+So I'm looking at this driver again as part of my partial block
+work to eliminate partial block handling from drivers.
 
-Hi, Yanteng. Thanks for your reply.
+I haven't figured out exactly what's wrong with tdma, although
+the chaining IRQ completion handling looks a bit fragile in that
+if something goes wrong it'll simply mark all queued requests as
+complete, corrupting any requests that have not yet been sent to
+the hardware.
 
+However, I think I know what's wrong with the non-DMA path.  I
+dug up the old mv_cesa driver and it's clear that it simply can't
+handle zero-length final updates like a lot of other hardware drivers.
+This matches with what you sent me where all the test vectors that
+failed was test 0 which is a zero-length update.
 
-When sending this patch, git send-email prompted "too many commands"
+There used to be a fallback path but during the move to tdma
+that appears to have been lost.
 
-and disconnected from the server. Then I sent this patch separately.
+So if you're still interested I can create some patches for you
+to test.
 
-Even after setting sendemail.smtpBatchSize to 100, I still have this 
-problem.
-
-Now I am trying to find  Loongson SMTP server administrator to solve it.
-
-Have you ever encountered this kind of problem?
-
-
-BR, Qunqin.
-
->
-> <https://lore.kernel.org/loongarch/20250506031947.11130-1-zhaoqunqin@loongson.cn/T/#mf09225c286a8e2b92a677720afafb9e20be57a18> 
->
->
-> Thanks,
-> Yanteng
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
