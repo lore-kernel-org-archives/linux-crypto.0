@@ -1,151 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0996320D50C;
-	Tue,  6 May 2025 06:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361252236F0
+	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 07:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746514284; cv=none; b=A7i/KONPvaFX2s+bfDUBu0qPi8psffz31INea7tLwQz0i2xAbVYjYfHLF6wDCHLlFPFZ9IUWcB/NGK6kZgXF3ZSSvMLK02SoSB2EWgYGnD9COUlr5UZHhKPk8fSBN2ZTbzJSh2CEnJFwAutHV32k/DogMBUlUcDVdScLaDROPxQ=
+	t=1746516347; cv=none; b=jfoY1o6WeZVktyXPuSDJq3B08uBZUDDaEOy7syX+XrP4ZftcaDrM9Qi31VOMeWwVdlMeuUJ9gp7glc47eoSlgEr3VRNZdFin11tSzSH72ZC1RVOYUlBoK/DDxMhwxjpTP909RJ1uRwRiImEdOBIhThhRS3VQIUU5JteCRdtoQH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746514284; c=relaxed/simple;
-	bh=f6MCVMoyIyDh6X4+NpBMr+x9iT3qZ16UKn4vne88fnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QuBFKwBqlhDbQQpZOortOpt8QIlHs7cpHe3qyZVItAeQS92o8mwmh9vwX12dsZ9mbDaLtfXiaOUp50XwR4JVVUbToq0MteETcoKj11tjA/fwAXmSe9QCeWq+idNT4LzteIms8ynL6Ccbe/yE6aybNwb6XgM4zWRkZsyBrFzWFQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiC9h1cA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746516347; c=relaxed/simple;
+	bh=IQ2g0vfjS7LsZoWEsSyywdKste1NDyx+b2TdQtbkkbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AhA3JNtOyinaOOtrTffKZb8UsGxTscvcOQC8pLs5pV1Hnh1eBulM9q0AvVZir9yl+hRhHFTzePF4L2NPjuxrdCJOUhrZtSRiEAlFB2gOHaeWQHQsmf8mKMJE7x4kIjTd3PaPcTt9QgI6jr8w6U9pf5YCv/WJqe3mKvUVxPBM/2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jQy8B9So; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiC9h1cA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D52DC4CEE4;
-	Tue,  6 May 2025 06:51:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746514283;
-	bh=f6MCVMoyIyDh6X4+NpBMr+x9iT3qZ16UKn4vne88fnw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RiC9h1cAhVOYw+f7nbJCESnvHsnlp/Zo8dlQQMrVi3QKsiK0fJ3WOv8PunT6DLvD9
-	 AHH1eG81vleGwVN0GMyGOAtQjad7TQHMDmpLHAc/NCymGmWjWMYXxwezwX/Pm7G40/
-	 6UWSTsMqYkMFghfm1upKDDEH/J5yy6KIagRlzD20KK+xXXgBTkE5O68rIWv9mRE0bU
-	 7nxHITvEb5GNQxctVq6CYliCQdnOe1zkcXzs0qbWk9d0fevdhRqMORVzTwy1Gm3fU9
-	 6AftAREM5KqWn6gLNN66hx73rG4MQa52rNXsHbxz96YOw65ktlqqY2T9NuBd80kp7Z
-	 UTw6w+d2+SF0g==
-Message-ID: <19b1fca7-e1b1-4190-9bcb-7ce36fabd02e@kernel.org>
-Date: Tue, 6 May 2025 08:51:19 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jQy8B9So"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746516345; x=1778052345;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=IQ2g0vfjS7LsZoWEsSyywdKste1NDyx+b2TdQtbkkbI=;
+  b=jQy8B9SoYGrE7AJLIxVCguysNLmD2KDfHc41DqzOYD1WHDAwZN/abpQ6
+   BNOa/QKgq+tSBsoikRo0wlhIgEp2BVX1DqGSPw9uFfr7N94FDvXi0wuIu
+   R0hj27uvZXLmdXQojznXWwck+H6Gd1Z40JVPBwe4V7ZLNgJtyS3Pvz/P8
+   WKePyIWQH5Kf6cVe/J8msNzLdtyQ1HPFpWTkldkTATfJNKarMU45dJbVs
+   yShypI+ne8dch47uTGMTkZA9a7I0wcbt/qjI0QbOqlpM+4N9q1cU6mTQr
+   Sid+bWyABNbBIDgbLxdudARzQT8pADkYKZnZS8T/RIfxXSi2mOon3mcse
+   Q==;
+X-CSE-ConnectionGUID: Ch+Sst9TTC+PZwfOR2DcWA==
+X-CSE-MsgGUID: 7qVMsn9rRI+i3DHc7NECRQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="48299155"
+X-IronPort-AV: E=Sophos;i="6.15,265,1739865600"; 
+   d="scan'208";a="48299155"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 00:25:45 -0700
+X-CSE-ConnectionGUID: wX6htsutTjaL97/A+YS/7g==
+X-CSE-MsgGUID: TeqHJ+RxQmKZxQoFwNMbuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,265,1739865600"; 
+   d="scan'208";a="136048567"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 06 May 2025 00:25:44 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCCgQ-0006M6-02;
+	Tue, 06 May 2025 07:25:42 +0000
+Date: Tue, 6 May 2025 15:24:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org
+Subject: [herbert-cryptodev-2.6:master 12/70] crypto/chacha20poly1305.c:155:
+ undefined reference to `poly1305_init'
+Message-ID: <202505061528.81rDmpF9-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com,
- manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
- Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
- <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
- <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
- <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
- <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 06/05/2025 08:33, Pavitrakumar Managutte wrote:
-> Hi Krzysztof,
->   My comments are embedded below.
-> 
-> Warm regards,
-> PK
-> 
-> On Mon, May 5, 2025 at 9:22 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>
->> On 05/05/2025 17:48, Krzysztof Kozlowski wrote:
->>> On 05/05/2025 14:55, Pavitrakumar M wrote:
->>>> From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
->>>>
->>>> Add DT bindings related to the SPAcc driver for Documentation.
->>>> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
->>>> Engine is a crypto IP designed by Synopsys.
->>>>
->>>> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
->>>> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
->>>> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
->>>> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
->>>
->>>
->>> I do not see any improvements. It seems you ignored all comments, not
->>> single one was responded to or addressed.
-> 
-> PK: Addressed all the below
-> 
-> 1. SoC Bindings: We dont have any SoC bindings since its tested on the
-> Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
-> device here. Also added a detailed description for the same, which
-> describes how we have tested the SPAcc peripheral on Zynq. This was
-> based on your inputs to describe the existing hardware.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   43d9d3e84ee1bc1ca98a964e0963bab39de36a44
+commit: 10a6d72ea355b730aa9702da0fd36aef0898a80e [12/70] crypto: lib/poly1305 - Use block-only interface
+config: x86_64-randconfig-004-20250506 (https://download.01.org/0day-ci/archive/20250506/202505061528.81rDmpF9-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250506/202505061528.81rDmpF9-lkp@intel.com/reproduce)
 
-1. I asked to use SoC specific compatibles and after such explanation
-that you use it in some different, hardware configuration, I asked to
-use that.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505061528.81rDmpF9-lkp@intel.com/
 
-Reflect whatever your hardware is called in the compatible.
+Note: the herbert-cryptodev-2.6/master HEAD 43d9d3e84ee1bc1ca98a964e0963bab39de36a44 builds fine.
+      It only hurts bisectability.
 
-I claim this cannot be used in a SoC without customization. If I
-understood correctly this is soft IP in FPGA for evaluation, so no one
-will be ever able to use it. Therefore this binding makes no sense to me
-in general: you do not add anything any customer could use. It is fine
-to add something which you use internally only, but again describe the
-hardware properly.
+All errors (new ones prefixed by >>):
 
-2. I wrote you entire guide what is wrong with your Cc addresses and
-this was fully ignored. Neither responded to, nor resolved.
+   ld: crypto/chacha20poly1305.o: in function `poly_hash':
+>> crypto/chacha20poly1305.c:155: undefined reference to `poly1305_init'
+>> ld: crypto/chacha20poly1305.c:162: undefined reference to `poly1305_update'
+   ld: crypto/chacha20poly1305.c:168: undefined reference to `poly1305_update'
+   ld: crypto/chacha20poly1305.c:176: undefined reference to `poly1305_update'
+   ld: crypto/chacha20poly1305.c:182: undefined reference to `poly1305_update'
+   ld: crypto/chacha20poly1305.c:186: undefined reference to `poly1305_update'
+>> ld: crypto/chacha20poly1305.c:188: undefined reference to `poly1305_final'
 
-I am not going to review the rest of the file.
 
-Best regards,
-Krzysztof
+vim +155 crypto/chacha20poly1305.c
+
+71ebc4d1b27d34 Martin Willi 2015-06-01  129  
+a298765e28adae Herbert Xu   2025-04-28  130  static int poly_hash(struct aead_request *req)
+71ebc4d1b27d34 Martin Willi 2015-06-01  131  {
+71ebc4d1b27d34 Martin Willi 2015-06-01  132  	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+a298765e28adae Herbert Xu   2025-04-28  133  	const void *zp = page_address(ZERO_PAGE(0));
+a298765e28adae Herbert Xu   2025-04-28  134  	struct scatterlist *sg = req->src;
+a298765e28adae Herbert Xu   2025-04-28  135  	struct poly1305_desc_ctx desc;
+a298765e28adae Herbert Xu   2025-04-28  136  	struct scatter_walk walk;
+a298765e28adae Herbert Xu   2025-04-28  137  	struct {
+a298765e28adae Herbert Xu   2025-04-28  138  		union {
+a298765e28adae Herbert Xu   2025-04-28  139  			struct {
+a298765e28adae Herbert Xu   2025-04-28  140  				__le64 assoclen;
+a298765e28adae Herbert Xu   2025-04-28  141  				__le64 cryptlen;
+a298765e28adae Herbert Xu   2025-04-28  142  			};
+a298765e28adae Herbert Xu   2025-04-28  143  			u8 u8[16];
+a298765e28adae Herbert Xu   2025-04-28  144  		};
+a298765e28adae Herbert Xu   2025-04-28  145  	} tail;
+76cadf2244518d Eric Biggers 2019-06-02  146  	unsigned int padlen;
+a298765e28adae Herbert Xu   2025-04-28  147  	unsigned int total;
+71ebc4d1b27d34 Martin Willi 2015-06-01  148  
+a298765e28adae Herbert Xu   2025-04-28  149  	if (sg != req->dst)
+a298765e28adae Herbert Xu   2025-04-28  150  		memcpy_sglist(req->dst, sg, req->assoclen);
+71ebc4d1b27d34 Martin Willi 2015-06-01  151  
+71ebc4d1b27d34 Martin Willi 2015-06-01  152  	if (rctx->cryptlen == req->cryptlen) /* encrypting */
+a298765e28adae Herbert Xu   2025-04-28  153  		sg = req->dst;
+747909223397e1 Herbert Xu   2015-07-16  154  
+a298765e28adae Herbert Xu   2025-04-28 @155  	poly1305_init(&desc, rctx->key);
+a298765e28adae Herbert Xu   2025-04-28  156  	scatterwalk_start(&walk, sg);
+71ebc4d1b27d34 Martin Willi 2015-06-01  157  
+a298765e28adae Herbert Xu   2025-04-28  158  	total = rctx->assoclen;
+a298765e28adae Herbert Xu   2025-04-28  159  	while (total) {
+a298765e28adae Herbert Xu   2025-04-28  160  		unsigned int n = scatterwalk_next(&walk, total);
+71ebc4d1b27d34 Martin Willi 2015-06-01  161  
+a298765e28adae Herbert Xu   2025-04-28 @162  		poly1305_update(&desc, walk.addr, n);
+a298765e28adae Herbert Xu   2025-04-28  163  		scatterwalk_done_src(&walk, n);
+a298765e28adae Herbert Xu   2025-04-28  164  		total -= n;
+71ebc4d1b27d34 Martin Willi 2015-06-01  165  	}
+71ebc4d1b27d34 Martin Willi 2015-06-01  166  
+76cadf2244518d Eric Biggers 2019-06-02  167  	padlen = -rctx->assoclen % POLY1305_BLOCK_SIZE;
+a298765e28adae Herbert Xu   2025-04-28  168  	poly1305_update(&desc, zp, padlen);
+71ebc4d1b27d34 Martin Willi 2015-06-01  169  
+a298765e28adae Herbert Xu   2025-04-28  170  	scatterwalk_skip(&walk, req->assoclen - rctx->assoclen);
+71ebc4d1b27d34 Martin Willi 2015-06-01  171  
+a298765e28adae Herbert Xu   2025-04-28  172  	total = rctx->cryptlen;
+a298765e28adae Herbert Xu   2025-04-28  173  	while (total) {
+a298765e28adae Herbert Xu   2025-04-28  174  		unsigned int n = scatterwalk_next(&walk, total);
+71ebc4d1b27d34 Martin Willi 2015-06-01  175  
+a298765e28adae Herbert Xu   2025-04-28  176  		poly1305_update(&desc, walk.addr, n);
+a298765e28adae Herbert Xu   2025-04-28  177  		scatterwalk_done_src(&walk, n);
+a298765e28adae Herbert Xu   2025-04-28  178  		total -= n;
+71ebc4d1b27d34 Martin Willi 2015-06-01  179  	}
+71ebc4d1b27d34 Martin Willi 2015-06-01  180  
+a298765e28adae Herbert Xu   2025-04-28  181  	padlen = -rctx->cryptlen % POLY1305_BLOCK_SIZE;
+a298765e28adae Herbert Xu   2025-04-28  182  	poly1305_update(&desc, zp, padlen);
+71ebc4d1b27d34 Martin Willi 2015-06-01  183  
+a298765e28adae Herbert Xu   2025-04-28  184  	tail.assoclen = cpu_to_le64(rctx->assoclen);
+a298765e28adae Herbert Xu   2025-04-28  185  	tail.cryptlen = cpu_to_le64(rctx->cryptlen);
+a298765e28adae Herbert Xu   2025-04-28  186  	poly1305_update(&desc, tail.u8, sizeof(tail));
+a298765e28adae Herbert Xu   2025-04-28  187  	memzero_explicit(&tail, sizeof(tail));
+a298765e28adae Herbert Xu   2025-04-28 @188  	poly1305_final(&desc, rctx->tag);
+71ebc4d1b27d34 Martin Willi 2015-06-01  189  
+a298765e28adae Herbert Xu   2025-04-28  190  	if (rctx->cryptlen != req->cryptlen)
+a298765e28adae Herbert Xu   2025-04-28  191  		return chacha_decrypt(req);
+71ebc4d1b27d34 Martin Willi 2015-06-01  192  
+a298765e28adae Herbert Xu   2025-04-28  193  	memcpy_to_scatterwalk(&walk, rctx->tag, sizeof(rctx->tag));
+a298765e28adae Herbert Xu   2025-04-28  194  	return 0;
+71ebc4d1b27d34 Martin Willi 2015-06-01  195  }
+71ebc4d1b27d34 Martin Willi 2015-06-01  196  
+
+:::::: The code at line 155 was first introduced by commit
+:::::: a298765e28adaea199f722142c10dae7e24dedf8 crypto: chacha20poly1305 - Use lib/crypto poly1305
+
+:::::: TO: Herbert Xu <herbert@gondor.apana.org.au>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
