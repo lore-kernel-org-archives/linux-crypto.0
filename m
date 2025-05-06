@@ -1,178 +1,253 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F43827F19E;
-	Tue,  6 May 2025 14:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58945281371
+	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 14:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746540172; cv=none; b=o3CLtGK8P2nXhfsFSrZC4emNaLylo+a4xPjfGGEYChJzVZLcGspbpJpGADVV31UHqXQn5vRo6c1sXQ7QNV0K72VfRY3tmugh5e55OpD+QIf/F+ObHETEGMyqRZrY+fvC+awB9wa8huZeD9uchvrpDr8FfNOTinV9mg616kj+fGM=
+	t=1746540801; cv=none; b=lzqD10kuR0sY7GqDYrk6JpxeJ1U9KM4ef4QeYn8CJTYD5T3cejM1kOn1C8cNtw9bUIiN1hNtrROEH7KORbPzp/xaRaYCuvUZz2DBY2+0YFtijEq3YVpjnPuGMLFdaampUjNlgzALYplzqijKWbs0oEABePRvDLkt+JtkDuhN1Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746540172; c=relaxed/simple;
-	bh=+G2qkNKTUhDrIZKr/W75bELY7DzvB3g0pKfTn/szvsI=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=tUgx3CTDz8Q5q3iyfWT66VqhuLLzjqsx5HbCTwbUDOMebRkP5M5fQTqF8j6khpzhuXPX4nx9g5W0v58GCzoFPLcWDtSkr/WJFYoJbKn2lqIMt3RXpQxgsw+XRW4yYS5E2GScXQjWB5+dSYtvIhLlPWOinxuxA0c4Mk0HVt6iCj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pfdhf/eE; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1746540801; c=relaxed/simple;
+	bh=dvnpBTc5+V4/wKRdMg2GHV3TaYrI7wpbz7l2TiXkoro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MJim1B6XIqMKHlDr7tbJhRiHgt4J1xuThdlAZrkhodl1xTj3FlxoTobTYwchK0EnXuZ9Tv4Ft5zHljFUc1btbm9LmbX3PEshDwqAagfGbE23ZdUVCaBi/KfloxiEGuo77Bd3MufVrYguseGt36DeP3llxq342A7nalrmWVhGU3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TH3IqP4I; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pfdhf/eE"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 546BKcRc014059;
-	Tue, 6 May 2025 14:02:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=W/+4Z+9f6Y4VZRO0D9ToqRz8wkR8WFIXQeOWFnvww4U=; b=pfdhf/eEY9Zd
-	gnrDQR7bJnJIzT2/xgUH781Qk2//0isVJilr2wTui/ZBMMbLfidrZFS1x7vzikRB
-	ZrUIxZesDIW42nEQ10DZNXn4K5132Dazh1tjSt6aYEO8mFywD+mgyYkqu5Yfetiz
-	FcHEFFLp//co03J8uSJU6Ad60Q76NSItIk+bolN/TkxmFGuwmIHrJ1hw2WOsDHd5
-	efwZnmUTdgMxiWBElpsoLrFKnPZSa0GNF19WDDw3B+HSthEVfmjMr3do9r+Z41RT
-	XjOS71dvaIaSNwQjDFEaraQOcstv3InLAHi4cdgbzFtV1Eh2Ft75Mdplunr0fM1n
-	S2nkbI6lpQ==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46f5fw3jwt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 May 2025 14:02:45 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 546Ded0M014583;
-	Tue, 6 May 2025 14:02:43 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46dypkkhp7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 May 2025 14:02:43 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 546E2ggO28050096
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 May 2025 14:02:43 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9B2C65805C;
-	Tue,  6 May 2025 14:02:42 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0DB8658061;
-	Tue,  6 May 2025 14:02:42 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 May 2025 14:02:41 +0000 (GMT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TH3IqP4I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746540798;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UFcgBeXDokvr+kUt+Nx4wd/ULZnjMDwH1N2JLsWAOOw=;
+	b=TH3IqP4ICmBfw1d5MZEnJ+Y/9KPKZkdvYPS9Gsf4fe0trTZzi5j7LlykSIXGRWkXvULjcv
+	kZbwCbgZP854QYpV/yEQjP2UXXyVUA+/TGuCKY34pcZrRXvhefzqiPjHDxAkLDzVJswVD3
+	po/zvhuI/Oodnr3gGiFUoo+HA4LotI0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-178-t4037p3wN5K3lXpyMbW7CQ-1; Tue, 06 May 2025 10:13:14 -0400
+X-MC-Unique: t4037p3wN5K3lXpyMbW7CQ-1
+X-Mimecast-MFC-AGG-ID: t4037p3wN5K3lXpyMbW7CQ_1746540793
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac6ef2d1b7dso539338466b.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2025 07:13:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746540793; x=1747145593;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFcgBeXDokvr+kUt+Nx4wd/ULZnjMDwH1N2JLsWAOOw=;
+        b=vZYLAMTfLgj/sWc25y3nwEG/pRi6ifoSOJOYCjTmdd8SfKHyHc6ngpuXHYATWrr4dG
+         vNWnhkvTVmRzbpB5Vy+wEJBZUpZKbJWq5DRrFtqhDRtmXUbeWzI2no9gCMR0uc1BY4Eg
+         CZtFo2qpitL6OAjh0kPgDw7s9WfXCczO2BGG7tsh1L3yvhOHcxMoOUGfTmDx66teNLU5
+         GBcQ7Ttye9m9N69HkEmOQTu0wl2+VKeChzNdiDmWcwgQa7WZ3jYpzC//EiOlQtc35W6O
+         txSwy/LySIu7W8H+0zunjpSbUwfFzWm51pyXWSa+XSoh5Y9xz2UHLHBMnSyjYFEqTtdN
+         1t+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXBYQzcpCuwort9lhaFYzLg3bVgJvzF24H5zLgj1oTQei2XOFZntEOc1OlL7lUw4/l7ixhSLszPShL+dH8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5pRgXFmVtgop6Qyp0bt2akpR//WdOy6dePeAJN1CEnRzssqxo
+	NqnYD17j4jH6XEzU/m/T9XlqezhwnCZGuvgHDf9LVQXncYYUmRxeyJpEf1/NCFlEQeG0+Sx5rhJ
+	T/GmziPF4tL3PL01/RoGP56ajAT5q8h2eWs3do7oK+j1KBnR+ldwRrX5ByVNi2w==
+X-Gm-Gg: ASbGncuFR/9ugJ//YFKL0dDIpMocYWYlKXtVVRJlGTy6KALuDoSc9hRDRmo+Qzrql42
+	TlehZut9W3y8gw7CsMI86eQCea1YTlMH1c+sv5tltTg3I1XR1Gk4FkmaogZaFEeo03iAYMr2CQ/
+	tMI4hndnUioN89HmDhETr43etDjEWNKJl2tCCUVXWFNZ+TdHzrp2rdwXVs4UzDmIPm+IrFDjIuW
+	eTuKs/P+T2uf2NuhvgohR7SyheMtZSPxVknuRamcy61NXKSm/3eaU1RdoAqPbM++Q3dsdnPODJI
+	BpvPYpB8Dmj3muYD
+X-Received: by 2002:a17:907:a08e:b0:ace:9d4e:d0cd with SMTP id a640c23a62f3a-ad1a48bd2c0mr1016932266b.7.1746540793549;
+        Tue, 06 May 2025 07:13:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBtjlS6sVWj/jhXomSr6feRAM5taE6rOBhOmzWM1geyTp2Xsw9XEuNk4QndQH7TAg8XB5sEA==
+X-Received: by 2002:a17:907:a08e:b0:ace:9d4e:d0cd with SMTP id a640c23a62f3a-ad1a48bd2c0mr1016929066b.7.1746540793005;
+        Tue, 06 May 2025 07:13:13 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.145.28])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad18914d031sm710777166b.20.2025.05.06.07.13.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 07:13:12 -0700 (PDT)
+Date: Tue, 6 May 2025 16:13:04 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca, 
+	linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>, 
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH v9 4/5] tpm: Add a driver for Loongson TPM device
+Message-ID: <2nuadbg5awe6gvagxg7t5ewvxsbmiq4qrcrycvnrmt2etzq2ke@6oyzavctwrma>
+References: <20250506031947.11130-1-zhaoqunqin@loongson.cn>
+ <20250506031947.11130-5-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 06 May 2025 16:02:41 +0200
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dengler@linux.ibm.com, ifranzki@linux.ibm.com, fcallies@linux.ibm.com,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] s390/crypto: Rework protected key AES for true
- asynch support
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <Z-y3W4o5nz9qfijs@gondor.apana.org.au>
-References: <20250401145048.52564-1-freude@linux.ibm.com>
- <20250401145048.52564-3-freude@linux.ibm.com>
- <Z-y3W4o5nz9qfijs@gondor.apana.org.au>
-Message-ID: <26acddbb918cda48c948e7f07172ce3b@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA2MDEzMSBTYWx0ZWRfX7owFnVzG+19g 6q78YYOPQj2oOPQUb5ZipmSwSnX6mySytR3TN4sbUM+Eby+grd+7xFuY1PQyilvhQMIelr6LqYg 9gW6dteG5AZVSd9+sBYaggRhgbx+HQm1vrIyTLlGw44r2pY3DNRjfV8B/ORmcwhNe2k0Bk7bZG1
- PT3/w2DkDI2SXXTvc9Q2LTfXQEhioh6K4F7U1e4mpAz/Gj7TectAa37h/UqawtxLpBK2AAae7Pr 50fKSbyV2FHRyrSQedC5ajrpnx91bj4OgfNO1XQB9psjQYPyz7+Ii52cvBkshqNrFmbfqusfLZ4 +pbf2ENgJ8/KpaUcrXma8rmCsUUrYsyG4l0hMnVkVejtQIALiHUJj71Xr+P2ZnIoz/JtTH1wfgX
- En9QZyMRF1XDnupe5thiZlA6qjCAkEKgT3zgQh3E6YTz7Q3F6OIoDaotXnNkguNUxNqYNX95
-X-Proofpoint-ORIG-GUID: gM7t1P1LHarAYdW1Dka6K2AZYACk5u4G
-X-Proofpoint-GUID: gM7t1P1LHarAYdW1Dka6K2AZYACk5u4G
-X-Authority-Analysis: v=2.4 cv=IaaHWXqa c=1 sm=1 tr=0 ts=681a1685 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=9Z4Rn5OClx3nBGVvnmoA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-06_06,2025-05-05_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- bulkscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- suspectscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- mlxlogscore=620 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505060131
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250506031947.11130-5-zhaoqunqin@loongson.cn>
 
-On 2025-04-02 06:04, Herbert Xu wrote:
-> On Tue, Apr 01, 2025 at 04:50:47PM +0200, Harald Freudenberger wrote:
->> 
->> +static int ecb_paes_do_crypt(struct s390_paes_ctx *ctx,
->> +			     struct s390_pecb_req_ctx *req_ctx,
->> +			     bool maysleep)
-> 
-> ...
-> 
->> +	/* always walk on the ... */
->> +	while ((nbytes = walk->nbytes) != 0) {
->> +		/* only use complete blocks */
->> +		n = nbytes & ~(AES_BLOCK_SIZE - 1);
->> +		k = cpacf_km(ctx->fc | req_ctx->modifier, param,
->> +			     walk->dst.virt.addr, walk->src.virt.addr, n);
->> +		if (k)
->> +			rc = skcipher_walk_done(walk, nbytes - k);
->> +		if (k < n) {
->> +			if (!maysleep) {
->> +				rc = -EKEYEXPIRED;
->> +				goto out;
->> +			}
-> 
-> So this leaves the skcipher walk in a mapped state, to be resumed in
-> a work queue later.  Now I don't believe you guys have the horror of
-> HIGHMEM so it's not fatal, but it's still a bit of a hack and worthy
-> of a comment to at least stop people from other architectures copying
-> this.
-> 
+On Tue, May 06, 2025 at 11:19:46AM +0800, Qunqin Zhao wrote:
+>Loongson Security Engine supports random number generation, hash,
+>symmetric encryption and asymmetric encryption. Based on these
+>encryption functions, TPM2 have been implemented in the Loongson
+>Security Engine firmware. This driver is responsible for copying data
+>into the memory visible to the firmware and receiving data from the
+>firmware.
+>
+>Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+>Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+>Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+>---
+>v9: "tpm_loongson_driver" --> "tpm_loongson"
+>    "depends on CRYPTO_DEV_LOONGSON_SE" --> "depends on MFD_LOONGSON_SE"
+>
+>v8: In the send callback, it will wait until the TPM2 command is
+>    completed. So do not need to wait in the recv callback.
+>    Removed Jarkko's tag cause there are some changes in v8
+>
+>v7: Moved Kconfig entry between TCG_IBMVTPM and TCG_XEN.
+>    Added Jarkko's tag(a little change, should be fine).
+>
+>v6: Replace all "ls6000se" with "loongson"
+>    Prefix all with tpm_loongson instead of tpm_lsse.
+>    Removed Jarkko's tag cause there are some changes in v6
+>
+>v5: None
+>v4: Prefix all with tpm_lsse instead of tpm.
+>    Removed MODULE_AUTHOR fields.
+>
+>v3: Added reminder about Loongson security engine to git log.
+>
+> drivers/char/tpm/Kconfig        |  9 ++++
+> drivers/char/tpm/Makefile       |  1 +
+> drivers/char/tpm/tpm_loongson.c | 78 +++++++++++++++++++++++++++++++++
+> 3 files changed, 88 insertions(+)
+> create mode 100644 drivers/char/tpm/tpm_loongson.c
+>
+>diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+>index fe4f3a609..13f0682c6 100644
+>--- a/drivers/char/tpm/Kconfig
+>+++ b/drivers/char/tpm/Kconfig
+>@@ -189,6 +189,15 @@ config TCG_IBMVTPM
+> 	  will be accessible from within Linux.  To compile this driver
+> 	  as a module, choose M here; the module will be called tpm_ibmvtpm.
+>
+>+config TCG_LOONGSON
+>+	tristate "Loongson TPM Interface"
+>+	depends on MFD_LOONGSON_SE
+>+	help
+>+	  If you want to make Loongson TPM support available, say Yes and
+>+	  it will be accessible from within Linux. To compile this
+>+	  driver as a module, choose M here; the module will be called
+>+	  tpm_loongson.
+>+
+> config TCG_XEN
+> 	tristate "XEN TPM Interface"
+> 	depends on TCG_TPM && XEN
+>diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+>index 2b004df8c..cb534b235 100644
+>--- a/drivers/char/tpm/Makefile
+>+++ b/drivers/char/tpm/Makefile
+>@@ -45,3 +45,4 @@ obj-$(CONFIG_TCG_CRB) += tpm_crb.o
+> obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
+> obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+> obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+>+obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
+>diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
+>new file mode 100644
+>index 000000000..cbbd9c22a
+>--- /dev/null
+>+++ b/drivers/char/tpm/tpm_loongson.c
+>@@ -0,0 +1,78 @@
+>+// SPDX-License-Identifier: GPL-2.0
+>+/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+>+
+>+#include <linux/device.h>
+>+#include <linux/mfd/loongson-se.h>
+>+#include <linux/platform_device.h>
+>+#include <linux/wait.h>
+>+
+>+#include "tpm.h"
+>+
+>+struct tpm_loongson_cmd {
+>+	u32 cmd_id;
+>+	u32 data_off;
+>+	u32 data_len;
+>+	u32 pad[5];
+>+};
+>+
+>+static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+>+{
+>+	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+>+	struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
+>+
+>+	memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
 
-v4 will have this clearly documented.
+Should we limit the memcpy to `count`?
 
->> +			rc = paes_convert_key(ctx);
-> 
-> At first I thought this was racy, but then I realised that it is not
-> because only the crypto_engine thread gets called with maysleep ==
-> true.  Since there is only one crypto_engine thread this is safe.
-> 
-> I think this is not really obvious though and worthy of a comment to
-> explain the reliance on the single crypto engine thread.
-> 
+I mean, can happen that `count` is less than `cmd_ret->data_len`?
 
-This is racy but the code can handle that. The cpacf instruction
-refuses to do any operations if the converted key material (the 
-"protected" key)
-is invalid. So it is in fact thinkable and possible to replace an fresh
-protected key with an older (in the meantime invalid) protected key. As 
-the
-cpacf instruction detects this, refuses to operate with an invalid key 
-and
-the calling code triggers a (re-)conversion this does no harm. So it
-is racy but may only lead to additional conversions but never to invalid
-data on en- or decrypted.
+Thanks,
+Stefano
 
-> There is one more subtle issue to do with request ordering.  Because
-> networking requires packets to not be reordered, we enforce this in
-> the Crypto API.  An algorithm must not reorder the requests sent to
-> the same tfm.
-> 
-> To do that here, once a ctx goes into the crypto_engine, all future
-> requests to the same ctx must also go through the crypto_engine, as
-> long as at the time of the request being submitted prior work is still
-> outstanding.
-> 
-> The easiest way would be to have a counter in the ctx that keeps
-> track of how many requests are currently outstanding in the engine.
-> Then in paes_do_crypt you'd simply check the counter, and if it is
-> non-zero you always put the request into the engine.
-> 
+>+
+>+	return cmd_ret->data_len;
+>+}
+>+
+>+static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+>+{
+>+	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+>+	struct tpm_loongson_cmd *cmd = tpm_engine->command;
+>+
+>+	cmd->data_len = count;
+>+	memcpy(tpm_engine->data_buffer, buf, count);
+>+
+>+	return loongson_se_send_engine_cmd(tpm_engine);
+>+}
+>+
+>+static const struct tpm_class_ops tpm_loongson_ops = {
+>+	.flags = TPM_OPS_AUTO_STARTUP,
+>+	.recv = tpm_loongson_recv,
+>+	.send = tpm_loongson_send,
+>+};
+>+
+>+static int tpm_loongson_probe(struct platform_device *pdev)
+>+{
+>+	struct loongson_se_engine *tpm_engine;
+>+	struct device *dev = &pdev->dev;
+>+	struct tpm_loongson_cmd *cmd;
+>+	struct tpm_chip *chip;
+>+
+>+	tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
+>+	if (!tpm_engine)
+>+		return -ENODEV;
+>+	cmd = tpm_engine->command;
+>+	cmd->cmd_id = SE_CMD_TPM;
+>+	cmd->data_off = tpm_engine->buffer_off;
+>+
+>+	chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+>+	if (IS_ERR(chip))
+>+		return PTR_ERR(chip);
+>+	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+>+	dev_set_drvdata(&chip->dev, tpm_engine);
+>+
+>+	return tpm_chip_register(chip);
+>+}
+>+
+>+static struct platform_driver tpm_loongson = {
+>+	.probe   = tpm_loongson_probe,
+>+	.driver  = {
+>+		.name  = "loongson-tpm",
+>+	},
+>+};
+>+module_platform_driver(tpm_loongson);
+>+
+>+MODULE_ALIAS("platform:loongson-tpm");
+>+MODULE_LICENSE("GPL");
+>+MODULE_DESCRIPTION("Loongson TPM driver");
+>-- 
+>2.45.2
+>
+>
 
-I am struggling with that. The thing is how to keep this information.
-I extended the request context with a bool field telling me that there
-is/was a request pushed to the engine and thus all following crypto
-operations on this request need to go via engine.
-BUT ... the request context is not initial zeroized and there is no
-init() for a request and thus one does not know on invocation of the
-skcipher encrypt or decrypt function if the value of the bool field
-is taken for serious or needs initialization. Same would happen if
-there is a counter instead - how to initially set the counter value
-to 0? Any hints on this are welcome.
-
-> Cheers,
