@@ -1,48 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C192FA11D
-	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 02:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469622FAEB2
+	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 02:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746497038; cv=none; b=h45dW0FLO8YDIRAb/8nUNshFy0Flo0auIxBk5DlbiMkavcxybsZABXrtqTtt3cZ0UPAm907dxVU7RnaG7iW73qrYkXbwzFwyr8uWXxyHmy5OA1Hm49b7xhg5bm53/X4gPWePLIh6Ih2jG+j1UYW77e+Z7N5IBDBY0ub1ieNfh48=
+	t=1746497115; cv=none; b=tV6hd6XxbPQqcs0f8n/7Yty9M6/BXb+LMrfcmu1oJOliezduyr3aU6klKR2OrLoYpx0lasy5Gzz8SrsF8AUfs4WUJ/DDgRjMgejCfWwW/XPsyqRz9FWYEsGappyOG16IgBtD6s7YS+kqcWhxg/Vqbrkb/E+w9or/C9Te8grF8E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746497038; c=relaxed/simple;
-	bh=ASEVVBN5nOBBgKAJqtXsc0H+5KATq6Z/1yS8ll2g1YQ=;
+	s=arc-20240116; t=1746497115; c=relaxed/simple;
+	bh=RyiK5mK+Q1ydkq/sAmdGcwqn006Q9VW4VRnjxr74W8w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SQLuOa2yt4j5OOpeDzcGBgW98MrKVluINqhT/30ugYB5d3KNtQSAxYzqKOo46Q1JErxf6TUyn2225onXEf2003kdnqim5v7b+AdV2N3IYu6GdlTcGu8UljarmGS1bcNIe/dpH/sEpdvTgvdui5uB0O3L7KysnNFArsfEXkIIo2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cFg3PTKi; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=dUVPysqx7diW9m06/veUV+2FB/cHV4gtz0ra5cB8lYX/6jZIFbS/0MD2ATnFyJNYRWcOBhUzV2itBFch2X/oJrcK5cmrtPkfFGrkr79b3jleUQVZguAYpk4fZZIckryd/n6WFkSlj83RJk9fj/t3FDOf8d96IJQdCTyvcbcyuhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N0kOkd6g; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cFg3PTKi"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N0kOkd6g"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=4m+aKX+qNM0y+mGfgIU9ALDox23GoeqtAoggu44QW84=; b=cFg3PTKiblmV+feW0LSzvRtZkz
-	qGio8LXq0QpjLez2xY95TzCEnQQDAKBtkKrYP6afFV7DC2fax+aWykFHqR9Zc4tj3EUxUx59MMfEc
-	C198lcOOqxueoRtirZCewo/9PTEEX/sQ0RWmXvwhdX2zJhw9Ow2muiVnyuZArqi+mKxXNRbn6TtnN
-	V2fewbSnUcTQj7QRLp9E+VzR3aYGvxYj9+TuSWzwrWusZ25vmvc7HL7sYquWqmFF08a+m1xvU46Qw
-	fBFJnKJWSgLWPXBk+IIzLZOa81hDXytR5Dlb2dFHJ5BS5ibYn1wop5EEj9jILqBdedgrckPe5AkT+
-	jxVrTfaA==;
+	bh=8kK9xWLyjoouoN6uk5WQfKhGImTGU9lqY0wpnep/RNA=; b=N0kOkd6gF4ZDaSyRcYUzE8djWy
+	d9+KDNPqzKqXQUxwjPFPHTPmznuRPRNJAS0smswi+YcSUg2JnDSd9oH7nLBXABhP+qaa5XzsmLg/a
+	fSdGq5dRvjYCuCiAKWzId3FnQfZzCth7eYeYNkAIMb9oGpVorNC5Bi8FiBa5S/iIq3U7WzdFU7ja+
+	pwCr46jVcDgKkHOPZsRmUprJSJ/StOJELus5HCXCRtn115YdsXD7mY3JMV8gfcZCFyO//Kh4Q3Po2
+	xP4/sHVhpOxraHo8FMPWoy9Ruf3OImifRM43pSC7/Hmz0Vfc9I4gkPDSnA6L/5o9BMahOqSkEvBag
+	FGwTVefQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uC7ev-003kyO-0E;
-	Tue, 06 May 2025 10:03:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 May 2025 10:03:49 +0800
-Date: Tue, 6 May 2025 10:03:49 +0800
+	id 1uC7gC-003l0R-0p;
+	Tue, 06 May 2025 10:05:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 May 2025 10:05:08 +0800
+Date: Tue, 6 May 2025 10:05:08 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v4 PATCH 08/11] crypto: chacha20poly1305 - Use lib/crypto
- poly1305
-Message-ID: <aBluBfXCtOoGrPKW@gondor.apana.org.au>
+Subject: [PATCH] crypto: lib/poly1305 - Build main library on LIB_POLY1305
+ and split generic code out
+Message-ID: <aBluVB9Xg2hbNlKX@gondor.apana.org.au>
 References: <cover.1745815528.git.herbert@gondor.apana.org.au>
  <0babdb56d14256b44249dc2bf3190ec200d9d738.1745815528.git.herbert@gondor.apana.org.au>
  <aBjAFG4+PXbPgqFw@gcabiddu-mobl.ger.corp.intel.com>
+ <aBluBfXCtOoGrPKW@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,34 +52,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aBjAFG4+PXbPgqFw@gcabiddu-mobl.ger.corp.intel.com>
+In-Reply-To: <aBluBfXCtOoGrPKW@gondor.apana.org.au>
 
-On Mon, May 05, 2025 at 02:41:40PM +0100, Cabiddu, Giovanni wrote:
->
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index 9878286d1d68..f87e2a26d2dd 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> > @@ -784,8 +784,8 @@ config CRYPTO_AEGIS128_SIMD
-> >  config CRYPTO_CHACHA20POLY1305
-> >  	tristate "ChaCha20-Poly1305"
-> >  	select CRYPTO_CHACHA20
-> > -	select CRYPTO_POLY1305
-> >  	select CRYPTO_AEAD
-> > +	select CRYPTO_LIB_POLY1305
->
-> Should this be `select CRYPTO_LIB_POLY1305_GENERIC`, instead?
-
-The problem is that lib/crypto/Makefile only builds poly1305 if
-LIB_POLY1305_GENERIC is enabled.  That used to be OK because it
-was literally just the generic implementation.
-
-But now it's actually the overall poly1305 library code so it needs
-to become LIB_POLY1305 instead.  This also brings up the cyclic
-dependency seen with libsha256.  So lib/crypto/poly1305 needs to
-be split up accordingly.
-
----8<---
 Split the lib poly1305 code just as was done with sha256.  Make
 the main library code conditional on LIB_POLY1305 instead of
 LIB_POLY1305_GENERIC.
