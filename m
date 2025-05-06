@@ -1,93 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119D62F3A63;
-	Mon,  5 May 2025 23:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C192FA11D
+	for <linux-crypto@vger.kernel.org>; Tue,  6 May 2025 02:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486884; cv=none; b=ptpXXJvg5dDZGVkqyvwzIMCY+Ks/rUYRTWoxIs382SyRXDe3nZncnMyWQVu2x/1l3+R3hKE6s62eC6QeKZ9QQOddxp33z7nFs32QH/0KBbv6guxQDJXOFoM9BsvKtIy4NNM8BuI1ekml9t7OJ6MnOKedD9eUiwwt1TU8xf7kl3o=
+	t=1746497038; cv=none; b=h45dW0FLO8YDIRAb/8nUNshFy0Flo0auIxBk5DlbiMkavcxybsZABXrtqTtt3cZ0UPAm907dxVU7RnaG7iW73qrYkXbwzFwyr8uWXxyHmy5OA1Hm49b7xhg5bm53/X4gPWePLIh6Ih2jG+j1UYW77e+Z7N5IBDBY0ub1ieNfh48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486884; c=relaxed/simple;
-	bh=Y1nCOUYyEEMAjqY3ZzPW6+yjZTimEC9xDeL7HEYfkvg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UcdmLEb8VAm3i7K0zW2M+DgvIUfo4WIQJ2M1Am3XTthLIpncIyMBWa6m+uK9Mo+lOyAhlr1OmLKGbwaaYWycM9ZMHEzftejMDxbiXz/E8or93AQ7Q2OcqIdp+qqqdf8VPVzue5F+1l8vdENtWpFtgjrSZEmB/6CBm27Xd1EgW+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYaTSbr/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746497038; c=relaxed/simple;
+	bh=ASEVVBN5nOBBgKAJqtXsc0H+5KATq6Z/1yS8ll2g1YQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SQLuOa2yt4j5OOpeDzcGBgW98MrKVluINqhT/30ugYB5d3KNtQSAxYzqKOo46Q1JErxf6TUyn2225onXEf2003kdnqim5v7b+AdV2N3IYu6GdlTcGu8UljarmGS1bcNIe/dpH/sEpdvTgvdui5uB0O3L7KysnNFArsfEXkIIo2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cFg3PTKi; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYaTSbr/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D373DC4CEED;
-	Mon,  5 May 2025 23:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486882;
-	bh=Y1nCOUYyEEMAjqY3ZzPW6+yjZTimEC9xDeL7HEYfkvg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EYaTSbr/kyfDkk9J4kryeeP+0buAiSXLXE6KmaMnYXQUk/IKxPxkhtkwIL/bOAg85
-	 Ig5W8okyC/wntq7iMyx1Mi1ZEMjDMYbIr7liZZRyrH5mtIU9QlJarEitjCfIV73sxV
-	 6E70COEw1B0+tAriFBDXlgHk59Sj3VizSAMv0U58uSIBMBqaQO2c0GnAH9u0E4V8e6
-	 +ymmdyeegbgZBfxFfRg4Cbxk0jB2zyFpQ96V8WFFHYR6WdcE1IuVTG7cEJnsoNTgQc
-	 pSKfaR924ruGrEFftQYKuV5VYGNuvmlhp6SvrAEO6rBGQmbxf54BY+3kLondsTN2Jj
-	 HfLTX6R0qM4Og==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Shashank Gupta <shashankg@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sasha Levin <sashal@kernel.org>,
-	bbrezillon@kernel.org,
-	arno@natisbad.org,
-	schalla@marvell.com,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 041/153] crypto: octeontx2 - suppress auth failure screaming due to negative tests
-Date: Mon,  5 May 2025 19:11:28 -0400
-Message-Id: <20250505231320.2695319-41-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
-References: <20250505231320.2695319-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cFg3PTKi"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=4m+aKX+qNM0y+mGfgIU9ALDox23GoeqtAoggu44QW84=; b=cFg3PTKiblmV+feW0LSzvRtZkz
+	qGio8LXq0QpjLez2xY95TzCEnQQDAKBtkKrYP6afFV7DC2fax+aWykFHqR9Zc4tj3EUxUx59MMfEc
+	C198lcOOqxueoRtirZCewo/9PTEEX/sQ0RWmXvwhdX2zJhw9Ow2muiVnyuZArqi+mKxXNRbn6TtnN
+	V2fewbSnUcTQj7QRLp9E+VzR3aYGvxYj9+TuSWzwrWusZ25vmvc7HL7sYquWqmFF08a+m1xvU46Qw
+	fBFJnKJWSgLWPXBk+IIzLZOa81hDXytR5Dlb2dFHJ5BS5ibYn1wop5EEj9jILqBdedgrckPe5AkT+
+	jxVrTfaA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uC7ev-003kyO-0E;
+	Tue, 06 May 2025 10:03:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 May 2025 10:03:49 +0800
+Date: Tue, 6 May 2025 10:03:49 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v4 PATCH 08/11] crypto: chacha20poly1305 - Use lib/crypto
+ poly1305
+Message-ID: <aBluBfXCtOoGrPKW@gondor.apana.org.au>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <0babdb56d14256b44249dc2bf3190ec200d9d738.1745815528.git.herbert@gondor.apana.org.au>
+ <aBjAFG4+PXbPgqFw@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.181
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBjAFG4+PXbPgqFw@gcabiddu-mobl.ger.corp.intel.com>
 
-From: Shashank Gupta <shashankg@marvell.com>
+On Mon, May 05, 2025 at 02:41:40PM +0100, Cabiddu, Giovanni wrote:
+>
+> > diff --git a/crypto/Kconfig b/crypto/Kconfig
+> > index 9878286d1d68..f87e2a26d2dd 100644
+> > --- a/crypto/Kconfig
+> > +++ b/crypto/Kconfig
+> > @@ -784,8 +784,8 @@ config CRYPTO_AEGIS128_SIMD
+> >  config CRYPTO_CHACHA20POLY1305
+> >  	tristate "ChaCha20-Poly1305"
+> >  	select CRYPTO_CHACHA20
+> > -	select CRYPTO_POLY1305
+> >  	select CRYPTO_AEAD
+> > +	select CRYPTO_LIB_POLY1305
+>
+> Should this be `select CRYPTO_LIB_POLY1305_GENERIC`, instead?
 
-[ Upstream commit 64b7871522a4cba99d092e1c849d6f9092868aaa ]
+The problem is that lib/crypto/Makefile only builds poly1305 if
+LIB_POLY1305_GENERIC is enabled.  That used to be OK because it
+was literally just the generic implementation.
 
-This patch addresses an issue where authentication failures were being
-erroneously reported due to negative test failures in the "ccm(aes)"
-selftest.
-pr_debug suppress unnecessary screaming of these tests.
+But now it's actually the overall poly1305 library code so it needs
+to become LIB_POLY1305 instead.  This also brings up the cyclic
+dependency seen with libsha256.  So lib/crypto/poly1305 needs to
+be split up accordingly.
 
-Signed-off-by: Shashank Gupta <shashankg@marvell.com>
+---8<---
+Split the lib poly1305 code just as was done with sha256.  Make
+the main library code conditional on LIB_POLY1305 instead of
+LIB_POLY1305_GENERIC.
+
+Reported-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Fixes: 10a6d72ea355 ("crypto: lib/poly1305 - Use block-only interface")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-index 811ded72ce5fb..798bb40fed68d 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-@@ -410,9 +410,10 @@ static int cpt_process_ccode(struct otx2_cptlfs_info *lfs,
- 				break;
- 			}
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index 71d3d05d666a..c47438161ff1 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -40,11 +40,13 @@ libcurve25519-y					+= curve25519.o
+ obj-$(CONFIG_CRYPTO_LIB_DES)			+= libdes.o
+ libdes-y					:= des.o
  
--			dev_err(&pdev->dev,
--				"Request failed with software error code 0x%x\n",
--				cpt_status->s.uc_compcode);
-+			pr_debug("Request failed with software error code 0x%x: algo = %s driver = %s\n",
-+				 cpt_status->s.uc_compcode,
-+				 info->req->areq->tfm->__crt_alg->cra_name,
-+				 info->req->areq->tfm->__crt_alg->cra_driver_name);
- 			otx2_cpt_dump_sg_list(pdev, info->req);
- 			break;
- 		}
+-obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305.o
+-libpoly1305-y					:= poly1305-donna32.o
+-libpoly1305-$(CONFIG_ARCH_SUPPORTS_INT128)	:= poly1305-donna64.o
++obj-$(CONFIG_CRYPTO_LIB_POLY1305)		+= libpoly1305.o
+ libpoly1305-y					+= poly1305.o
+ 
++obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305-generic.o
++libpoly1305-generic-y				:= poly1305-donna32.o
++libpoly1305-generic-$(CONFIG_ARCH_SUPPORTS_INT128) := poly1305-donna64.o
++
+ obj-$(CONFIG_CRYPTO_LIB_SHA1)			+= libsha1.o
+ libsha1-y					:= sha1.o
+ 
+diff --git a/lib/crypto/poly1305-generic.c b/lib/crypto/poly1305-generic.c
+new file mode 100644
+index 000000000000..a73f700fa1fb
+--- /dev/null
++++ b/lib/crypto/poly1305-generic.c
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Poly1305 authenticator algorithm, RFC7539
++ *
++ * Copyright (C) 2015 Martin Willi
++ *
++ * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
++ */
++
++#include <crypto/internal/poly1305.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++void poly1305_block_init_generic(struct poly1305_block_state *desc,
++				 const u8 raw_key[POLY1305_BLOCK_SIZE])
++{
++	poly1305_core_init(&desc->h);
++	poly1305_core_setkey(&desc->core_r, raw_key);
++}
++EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
++MODULE_DESCRIPTION("Poly1305 algorithm (generic implementation)");
+diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
+index 4c9996864090..5f2f2af3b59f 100644
+--- a/lib/crypto/poly1305.c
++++ b/lib/crypto/poly1305.c
+@@ -14,14 +14,6 @@
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ 
+-void poly1305_block_init_generic(struct poly1305_block_state *desc,
+-				 const u8 raw_key[POLY1305_BLOCK_SIZE])
+-{
+-	poly1305_core_init(&desc->h);
+-	poly1305_core_setkey(&desc->core_r, raw_key);
+-}
+-EXPORT_SYMBOL_GPL(poly1305_block_init_generic);
+-
+ void poly1305_init(struct poly1305_desc_ctx *desc,
+ 		   const u8 key[POLY1305_KEY_SIZE])
+ {
 -- 
-2.39.5
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
