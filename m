@@ -1,98 +1,52 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53C61FDA7B
-	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2025 12:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D648D288536;
+	Wed,  7 May 2025 12:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746621806; cv=none; b=OXOTi3V03IuSi9dOF+gmJcG8UuxsUTjuYU77wxNmCoTlrW3WUD02ilzo2JAn5t5N85gtgZIKhMwQX2HFQ/2uwtUxl///lSRnsYBGWXCH4wv5ZYvyn/JW1dySqmG4cs1bKuWaUizT45OKcftWiFM0at6jpZa8o22wCnicNBle59k=
+	t=1746621926; cv=none; b=iauq3i9VwFIGAPtIDipkMkHN/bjDmSp8yuVx3LITqD5ZdNQugTqpmilmrV9SFnE81bl4ln8JPDWHMYtbcSSN0At+4NPb1iI4f4LtoHu6SxCTeSP445mIIfAyH7UZOd8ELdRGf44HVoKabhiAtiLCjcP5Ws1/BnSqWCc3zP2WBxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746621806; c=relaxed/simple;
-	bh=Jh7ppQVGS2zPm+OYaM+dtZNb0pZ8S7BvWa5QYfNSdKs=;
+	s=arc-20240116; t=1746621926; c=relaxed/simple;
+	bh=hWPZGZMyO9m9fh1QoW2+cS/xkUtBH3giL/aGBqo0sQA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ma2yQLgIVVefHaP1p8rRl0FkugBtTVARjJrXMw13id1G0cPYMdGcAROUBR6VZC33Jp6CgIOMa5AWZfOrWqVzcsSBeJqsRZeT/6mogioYh2dk9sSh5QLKRR/sGWZc8YDL+FHUEpWdiTFWNp4V/sbLSpLTVHTOhdcXaU2XDTg8axM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=G49xcCPx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=F+aM7uV/; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=G49xcCPx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=F+aM7uV/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zlpcc3HadlK/3AoT6L1MbyBSJ3zjRpK5d8nr3T0yqkzgCgRApjWwhNhFVHu0CVicup1HV01yLVvxnQF2nVHKkzl2lCpM27NXrQI2lEORyLAvbnkSt/E2G1BbRKZ82fLaGvwDoEeADa+xpM4yZG6e3iN96+RM81BQ/JFvh8usAUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RydokPtq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="G49xcCPx";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="F+aM7uV/";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="G49xcCPx";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="F+aM7uV/"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id BBF7A1F394;
-	Wed,  7 May 2025 12:43:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746621802;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Np014JMWsug6VDUnPXLhSGre5ID36rype2ECZNFtuR0=;
-	b=G49xcCPxiA+v1H7dw6gOOmLeksF1ZTvj+ctYgBCW8A4X3DpprngnDA864O6eV/pfJfMhED
-	Zhc5bWszorwpoTKbK4D0kXUB0rQ9Qbvh/9gQ+8wvaVw6A2wUo7CkWtHjxcV/VRaeGQHjzP
-	mSVmFOEwYX5Iy4HW16PgSXvcMK5ydUs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746621802;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Np014JMWsug6VDUnPXLhSGre5ID36rype2ECZNFtuR0=;
-	b=F+aM7uV/fiJ9gCpnu+ToZwzcNVeeVlu2OuH2XLZ8vMEwcb0dB5tw38i3mTx7/4FGhksM4D
-	5ED6VSf1RZW0mXAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=G49xcCPx;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="F+aM7uV/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746621802;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Np014JMWsug6VDUnPXLhSGre5ID36rype2ECZNFtuR0=;
-	b=G49xcCPxiA+v1H7dw6gOOmLeksF1ZTvj+ctYgBCW8A4X3DpprngnDA864O6eV/pfJfMhED
-	Zhc5bWszorwpoTKbK4D0kXUB0rQ9Qbvh/9gQ+8wvaVw6A2wUo7CkWtHjxcV/VRaeGQHjzP
-	mSVmFOEwYX5Iy4HW16PgSXvcMK5ydUs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746621802;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Np014JMWsug6VDUnPXLhSGre5ID36rype2ECZNFtuR0=;
-	b=F+aM7uV/fiJ9gCpnu+ToZwzcNVeeVlu2OuH2XLZ8vMEwcb0dB5tw38i3mTx7/4FGhksM4D
-	5ED6VSf1RZW0mXAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 93E81139D9;
-	Wed,  7 May 2025 12:43:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NnHkI2pVG2iXNgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Wed, 07 May 2025 12:43:22 +0000
-Date: Wed, 7 May 2025 14:43:21 +0200
-From: David Sterba <dsterba@suse.cz>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, "clm@fb.com" <clm@fb.com>,
-	"dsterba@suse.com" <dsterba@suse.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>, "embg@meta.com" <embg@meta.com>,
-	"Collet, Yann" <cyan@meta.com>,
-	"Will, Brian" <brian.will@intel.com>,
-	"Li, Weigang" <weigang.li@intel.com>
-Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
- through acomp
-Message-ID: <20250507124321.GF9140@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
- <20240426110941.5456-7-giovanni.cabiddu@intel.com>
- <20240429135645.GA3288472@perftesting>
- <20240429154129.GD2585@twin.jikos.cz>
- <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RydokPtq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA35C4CEEB;
+	Wed,  7 May 2025 12:45:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746621925;
+	bh=hWPZGZMyO9m9fh1QoW2+cS/xkUtBH3giL/aGBqo0sQA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RydokPtqw6JMBeritrP3myYZFnrzDRKicoD7SFnI4ez6VyTLq8yq93mi0/Tqb09eK
+	 kI0G3iGJxANin2RCOC4rO7RLuYrXF1O3FFIJKq+Ke2hlPVBrH7mW0dBds2biLe2QQE
+	 b6ZZmU5hrTpW8vbZb8AnNWk+9XdUdu/Hu5Ssgb3PA0KKlBVIlgiL8ZjRTv87JfZu7J
+	 kAMB3nhY4ewgMajr00ZLKTGgIarqwvMP/iPn2OjyqV1xI5VzRNMpRt6mF4A0TV25y5
+	 Zf8aS3MpZtvO1kESbFRaGp/OMhcWlWeZw12v43fE5aCqjGGFsWhZu9if099O2zvpjg
+	 fVWZVsQFH0P/Q==
+Date: Wed, 7 May 2025 13:45:17 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com, Kiran Kumar K <kirankumark@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>
+Subject: Re: [net-next PATCH v1 07/15] octeontx2-af: Add support for SPI to
+ SA index translation
+Message-ID: <20250507124517.GC3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-8-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -101,88 +55,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: BBF7A1F394
-X-Spam-Flag: NO
-X-Spam-Score: -3.21
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.21 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:replyto,suse.cz:dkim]
-X-Rspamd-Action: no action
+In-Reply-To: <20250502132005.611698-8-tanmay@marvell.com>
 
-On Tue, May 06, 2025 at 04:38:11PM +0100, Cabiddu, Giovanni wrote:
-> Hi David,
+On Fri, May 02, 2025 at 06:49:48PM +0530, Tanmay Jagdale wrote:
+> From: Kiran Kumar K <kirankumark@marvell.com>
 > 
-> I've resumed work on this, now that I have all necessary dependencies to
-> offload ZSTD to QAT.
+> In case of IPsec, the inbound SPI can be random. HW supports mapping
+> SPI to an arbitrary SA index. SPI to SA index is done using a lookup
+> in NPC cam entry with key as SPI, MATCH_ID, LFID. Adding Mbox API
+> changes to configure the match table.
 > 
-> On Mon, Apr 29, 2024 at 04:41:29PM +0100, David Sterba wrote:
-> ...
-> > I'd skip the style and implementation details for now. The absence of
-> > compression level support seems like the biggest problem, also in
-> > combination with uncondtional use of the acomp interface.
-> Regarding compression levels, Herbert suggested a new interface that
-> would effectively address this concern [1].
+> Signed-off-by: Kiran Kumar K <kirankumark@marvell.com>
+> Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
+> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
-It seems to be sufficient for passing the level from filesystem to
-crypto layer.
+...
 
-One thing I'm not sure is considered is that zstd has different
-requirements for workspace size depending on the level. In btrfs this is
-done in zstd_calc_ws_mem_sizes().
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index 715efcc04c9e..5cebf10a15a7 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -326,6 +326,10 @@ M(NIX_READ_INLINE_IPSEC_CFG, 0x8023, nix_read_inline_ipsec_cfg,		\
+>  M(NIX_LF_INLINE_RQ_CFG, 0x8024, nix_lf_inline_rq_cfg,		\
+>  				nix_rq_cpt_field_mask_cfg_req,  \
+>  				msg_rsp)	\
+> +M(NIX_SPI_TO_SA_ADD,    0x8026, nix_spi_to_sa_add, nix_spi_to_sa_add_req,   \
+> +				nix_spi_to_sa_add_rsp)                      \
+> +M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete, nix_spi_to_sa_delete_req,   \
+> +				msg_rsp)                                        \
 
-> > We'd have to enhance the compression format specifier to make it
-> > configurable in the sense: if accelerator is available use it, otherwise
-> > do CPU and synchronous compression.
-> For usability, wouldn't it be better to have a transparent solution? If
-> an accelerator is present, use it, rather than having a configuration
-> knob.
-> 
-> In any case, I would like to understand the best way forward here. I
-> would like to offload both zlib_deflate and ZSTD. However, I wouldn't
-> like to replicate the logic that calls the acomp APIs in both
-> fs/btrfs/zlib.c and fs/btrfs/zstd.c.
+Please keep line length to 80 columns or less in Networking code,
+unless it reduces readability.
 
-This looks doable, acomp_comp_pages() from your patch could work for
-both, the only difference is the parameter to crypto_alloc_acomp() and
-eventually the level.
+In this case perhaps:
 
-Otherwise, how to go forward with that. I think we'd need to get a few
-iterations staring from what you have, with added support for the levels
-and then we'll remove/replace the problematic parts like the numerous
-allocations.
+M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete,     \
+				nix_spi_to_sa_delete_req, \
+				msg_rsp)                  \
 
-As the first step, please send an update with the acomp levels added to
-zlib callbacks, so it works in normal conditons with all the
-allocations.
+Likewise throughout this patch (set).
+checkpatch.pl --max-line-length=80 is your friend.
 
-We'll need to move repeatedly used structures to the workspaces so that
-will be the second step. Once we settle on someting reasonable we can
-extend it and add zstd support.
+>  M(NIX_MCAST_GRP_CREATE,	0x802b, nix_mcast_grp_create, nix_mcast_grp_create_req,	\
+>  				nix_mcast_grp_create_rsp)			\
+>  M(NIX_MCAST_GRP_DESTROY, 0x802c, nix_mcast_grp_destroy, nix_mcast_grp_destroy_req,	\
+
+...
