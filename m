@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B4228A3F5;
-	Wed,  7 May 2025 13:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253A11C6FFA;
+	Wed,  7 May 2025 14:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746625588; cv=none; b=ast8aXGZwiZY/Acj9KLZPubohX64w12qB0d/0Ud9iLFvW5H0aALmmIBm1B9uht4t7v2lfuTfJC5sL142zz89TjwKcfNfSqjGN7bFDqKXUq8vQoRZ+MhWAgzXI0VxEBR6sY9v//NELiw4jOOIOET0ysWO5nqxRG2QXzgsKdpO5FI=
+	t=1746627624; cv=none; b=V+X7YAsOu2HDFti7pJc0BduwUYl3lPEFXryZhCRo84K6v9XY/KdKqj0/KExH4Cn85ReJn2zOG3nolSR47M9wwoqPtzb8tq3yZYiMlFBTb1Pf8K2hg614+nj1sPGZ/5j1EkSwGWVsZZWgqGEg4VKRON1aLEmua5YsuBGjnEVayls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746625588; c=relaxed/simple;
-	bh=hEESpH98vETQIZ0+XWffGzM7BGYfcwRdDsaQ4wEquqc=;
+	s=arc-20240116; t=1746627624; c=relaxed/simple;
+	bh=zFJGQcJDh3GTlEHOGdUdTPx+Zwgyp8f5kmfWwBkFe0M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CjPi5nEQF3+SVcIu5fleWSed0Y6y1Fo8cf7I/bgsGfP3DaauTWk79+37KnKubaB+qLx1sl07C4rYt82739ZJOGjIdb2ABWHnboJ8FxGKuek/CdPle3C7a+5ML1npiXGNtIGE80dkdgtdJyEm0If2MyK8KPDsX3uR0v01w4nACns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U23XjGTC; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZzjNqr8mOBkWLYTKcBdU2s/I4J3N4+HZL9SbdVoQ/KqMGGW5p6lLBrRYEXE3KiarUeaTd+omz2j25x/+/1jog1jmp4n9FPpzRMhkSCE1D0eWh0S4xot35Rz2+PMm5Q2EUfvN6JS35Y1/nJCQFgPuW0fqNTCzey2tTw7ic+Upt+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=np/Y1rUT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U23XjGTC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3B11C4CEE7;
-	Wed,  7 May 2025 13:46:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="np/Y1rUT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD53C4CEE2;
+	Wed,  7 May 2025 14:20:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746625587;
-	bh=hEESpH98vETQIZ0+XWffGzM7BGYfcwRdDsaQ4wEquqc=;
+	s=k20201202; t=1746627623;
+	bh=zFJGQcJDh3GTlEHOGdUdTPx+Zwgyp8f5kmfWwBkFe0M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U23XjGTCYK3gILMz2e+THb15dqmeOQYrj8DFI6aRtrdZ/3v0LvTzpK69PdnaYokfJ
-	 zKw4hTdJ6W/vVkXZCh45Iuj8yV7QqKa12C3QUJtmLL1gvpXv7qvG5/tstFyJrLFzZZ
-	 zpBy/xFgyUplNZ1MCUCw8LDmTfn9H2z9NPHzPMMiWnR6JaJikH3KxrfrWOWZeb3EEU
-	 sgOtWpT8UG9trtkVBkV0NmMJEnEerrcTAEbzOPsWh2dGueQMUoYxbMq6DaWJ+vZ78s
-	 vXdfAoJ9atJEdatSHVOAtR8ErUMRL8e8mVNsCPTKR/cEABikNuy0+cRUQe12mIzXHf
-	 jsi8KfgGfDr5A==
-Date: Wed, 7 May 2025 14:46:20 +0100
+	b=np/Y1rUTunYXY4TMdjSCYcErldhUYX4d2EUfq8UnKWwAom75C5hdAo+uoS8iqo31F
+	 DHs314yUPwhH3XAQxgTuhfdxETRWstr8qTH1Y7I2wVZH2o6LO0erpjghJUNxOT0RLz
+	 Qs6iKCB5VbVu6LQ6sMbDTRAFyozXr9fXJBKnyqfp79lExOx8DaYNpX7TqY4bUZLD+n
+	 au53LrT+sx5pc2yiy2ksNlHEBEiuoAJAvliqczw3yRH5ZqUEtr7SL2A/BF0vcCE0l8
+	 59Ry3FmZusxEUHAQQabSDb7RSRQA/6qhkIkzpXMaPqEMH9qsHMgRzvVYbiYOFr+HZT
+	 Y6gR+wCz88Dmw==
+Date: Wed, 7 May 2025 15:20:16 +0100
 From: Simon Horman <horms@kernel.org>
 To: Tanmay Jagdale <tanmay@marvell.com>
 Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
@@ -41,11 +41,11 @@ Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
 	gcherian@marvell.com
-Subject: Re: [net-next PATCH v1 10/15] octeontx2-pf: ipsec: Setup NIX HW
- resources for inbound flows
-Message-ID: <20250507134620.GE3339421@horms.kernel.org>
+Subject: Re: [net-next PATCH v1 11/15] octeontx2-pf: ipsec: Handle NPA
+ threshold interrupt
+Message-ID: <20250507142016.GF3339421@horms.kernel.org>
 References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-11-tanmay@marvell.com>
+ <20250502132005.611698-12-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,113 +54,101 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-11-tanmay@marvell.com>
+In-Reply-To: <20250502132005.611698-12-tanmay@marvell.com>
 
-On Fri, May 02, 2025 at 06:49:51PM +0530, Tanmay Jagdale wrote:
-> A incoming encrypted IPsec packet in the RVU NIX hardware needs
-> to be classified for inline fastpath processing and then assinged
-
-nit: assigned
-
-     checkpatch.pl --codespell is your friend
-
-> a RQ and Aura pool before sending to CPT for decryption.
+On Fri, May 02, 2025 at 06:49:52PM +0530, Tanmay Jagdale wrote:
+> The NPA Aura pool that is dedicated for 1st pass inline IPsec flows
+> raises an interrupt when the buffers of that aura_id drop below a
+> threshold value.
 > 
-> Create a dedicated RQ, Aura and Pool with the following setup
-> specifically for IPsec flows:
->  - Set ipsech_en, ipsecd_drop_en in RQ context to enable hardware
->    fastpath processing for IPsec flows.
->  - Configure the dedicated Aura to raise an interrupt when
->    it's buffer count drops below a threshold value so that the
->    buffers can be replenished from the CPU.
-> 
-> The RQ, Aura and Pool contexts are initialized only when esp-hw-offload
-> feature is enabled via ethtool.
-> 
-> Also, move some of the RQ context macro definitions to otx2_common.h
-> so that they can be used in the IPsec driver as well.
+> Add the following changes to handle this interrupt
+> - Increase the number of MSIX vectors requested for the PF/VF to
+>   include NPA vector.
+> - Create a workqueue (refill_npa_inline_ipsecq) to allocate and
+>   refill buffers to the pool.
+> - When the interrupt is raised, schedule the workqueue entry,
+>   cn10k_ipsec_npa_refill_inb_ipsecq(), where the current count of
+>   consumed buffers is determined via NPA_LF_AURA_OP_CNT and then
+>   replenished.
 > 
 > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
 ...
 
 > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-
-...
-
-> +static int cn10k_ipsec_setup_nix_rx_hw_resources(struct otx2_nic *pfvf)
+> index b88c1b4c5839..365327ab9079 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> @@ -519,10 +519,77 @@ static int cn10k_ipsec_setup_nix_rx_hw_resources(struct otx2_nic *pfvf)
+>  	return err;
+>  }
+>  
+> +static void cn10k_ipsec_npa_refill_inb_ipsecq(struct work_struct *work)
 > +{
-> +	struct otx2_hw *hw = &pfvf->hw;
-> +	int stack_pages, pool_id;
-> +	struct otx2_pool *pool;
-> +	int err, ptr, num_ptrs;
+> +	struct cn10k_ipsec *ipsec = container_of(work, struct cn10k_ipsec,
+> +						 refill_npa_inline_ipsecq);
+> +	struct otx2_nic *pfvf = container_of(ipsec, struct otx2_nic, ipsec);
+> +	struct otx2_pool *pool = NULL;
+> +	struct otx2_qset *qset = NULL;
+> +	u64 val, *ptr, op_int = 0, count;
+> +	int err, pool_id, idx;
 > +	dma_addr_t bufptr;
 > +
-> +	num_ptrs = 256;
-> +	pool_id = pfvf->ipsec.inb_ipsec_pool;
-> +	stack_pages = (num_ptrs + hw->stack_pg_ptrs - 1) / hw->stack_pg_ptrs;
+> +	qset = &pfvf->qset;
 > +
-> +	mutex_lock(&pfvf->mbox.lock);
+> +	val = otx2_read64(pfvf, NPA_LF_QINTX_INT(0));
+> +	if (!(val & 1))
+> +		return;
 > +
-> +	/* Initialize aura context */
-> +	err = cn10k_ipsec_ingress_aura_init(pfvf, pool_id, pool_id, num_ptrs);
-> +	if (err)
-> +		goto fail;
-> +
-> +	/* Initialize pool */
-> +	err = otx2_pool_init(pfvf, pool_id, stack_pages, num_ptrs, pfvf->rbsize, AURA_NIX_RQ);
-> +	if (err)
+> +	ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
 
-This appears to leak pool->fc_addr.
+Sparse complains about __iomem annotations around here:
 
-> +		goto fail;
+  .../cn10k_ipsec.c:539:13: warning: incorrect type in assignment (different address spaces)
+  .../cn10k_ipsec.c:539:13:    expected unsigned long long [usertype] *ptr
+  .../cn10k_ipsec.c:539:13:    got void [noderef] __iomem *
+  .../cn10k_ipsec.c:549:21: warning: incorrect type in assignment (different address spaces)
+  .../cn10k_ipsec.c:549:21:    expected unsigned long long [usertype] *ptr
+  .../cn10k_ipsec.c:549:21:    got void [noderef] __iomem *
+  .../cn10k_ipsec.c:620:13: warning: incorrect type in assignment (different address spaces)
+  .../cn10k_ipsec.c:620:13:    expected void *ptr
+  .../cn10k_ipsec.c:620:13:    got void [noderef] __iomem *
+
+> +	val = otx2_atomic64_add(((u64)pfvf->ipsec.inb_ipsec_pool << 44), ptr);
 > +
-> +	/* Flush accumulated messages */
-> +	err = otx2_sync_mbox_msg(&pfvf->mbox);
-> +	if (err)
-> +		goto pool_fail;
+> +	/* Error interrupt bits */
+> +	if (val & 0xff)
+> +		op_int = (val & 0xff);
 > +
-> +	/* Allocate pointers and free them to aura/pool */
-> +	pool = &pfvf->qset.pool[pool_id];
-> +	for (ptr = 0; ptr < num_ptrs; ptr++) {
-> +		err = otx2_alloc_rbuf(pfvf, pool, &bufptr, pool_id, ptr);
-> +		if (err) {
-> +			err = -ENOMEM;
-> +			goto pool_fail;
+> +	/* Refill buffers on a Threshold interrupt */
+> +	if (val & (1 << 16)) {
+> +		/* Get the current number of buffers consumed */
+> +		ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_CNT);
+> +		count = otx2_atomic64_add(((u64)pfvf->ipsec.inb_ipsec_pool << 44), ptr);
+> +		count &= GENMASK_ULL(35, 0);
+> +
+> +		/* Refill */
+> +		pool_id = pfvf->ipsec.inb_ipsec_pool;
+> +		pool = &pfvf->qset.pool[pool_id];
+> +
+> +		for (idx = 0; idx < count; idx++) {
+> +			err = otx2_alloc_rbuf(pfvf, pool, &bufptr, pool_id, idx);
+> +			if (err) {
+> +				netdev_err(pfvf->netdev,
+> +					   "Insufficient memory for IPsec pool buffers\n");
+> +				break;
+> +			}
+> +			pfvf->hw_ops->aura_freeptr(pfvf, pool_id,
+> +						    bufptr + OTX2_HEAD_ROOM);
 > +		}
-> +		pfvf->hw_ops->aura_freeptr(pfvf, pool_id, bufptr + OTX2_HEAD_ROOM);
+> +
+> +		op_int |= (1 << 16);
 > +	}
 > +
-> +	/* Initialize RQ and map buffers from pool_id */
-> +	err = cn10k_ipsec_ingress_rq_init(pfvf, pfvf->ipsec.inb_ipsec_rq, pool_id);
-> +	if (err)
-> +		goto pool_fail;
-> +
-> +	mutex_unlock(&pfvf->mbox.lock);
-> +	return 0;
-> +
-> +pool_fail:
-> +	mutex_unlock(&pfvf->mbox.lock);
-> +	qmem_free(pfvf->dev, pool->stack);
-> +	qmem_free(pfvf->dev, pool->fc_addr);
-> +	page_pool_destroy(pool->page_pool);
-> +	devm_kfree(pfvf->dev, pool->xdp);
-
-It is not clear to me why devm_kfree() is being called here.
-I didn't look deeply. But I think it is likely that
-either pool->xdp should be freed when the device is released.
-Or pool->xdp should not be allocated (and freed) using devm functions.
-
-> +	pool->xsk_pool = NULL;
-
-The clean-up of pool->stack, pool->page_pool), pool->xdp, and
-pool->xsk_pool, all seem to unwind initialisation performed by
-otx2_pool_init(). And appear to be duplicated elsewhere.
-I would suggest adding a helper for that.
-
-> +fail:
-> +	otx2_mbox_reset(&pfvf->mbox.mbox, 0);
-> +	return err;
+> +	/* Clear/ACK Interrupt */
+> +	if (op_int)
+> +		otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
+> +			     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | op_int);
 > +}
 
 ...
