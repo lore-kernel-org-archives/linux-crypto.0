@@ -1,98 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E55222F759;
-	Wed,  7 May 2025 22:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83EC291162
+	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2025 23:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746656332; cv=none; b=iFWVPV1bIIPqmcF808KsqRK7TNLP3VieRdTOt9l+gWXpPWzU/yHOfpxF1xWWHjWgkElcYqwjzBWwjrpwOe9qqnKxE1tA5ZqdR/1JRrljCkWFLTS+KKWdVQwDIKjRUYhPXl93/Ukg/wN2/kVkVGp5UXui0ZuoGV/EQMA7jin9pJw=
+	t=1746660112; cv=none; b=mt30UY8CfUf137jc0fYD/tJbV09WqmLzo6yAyIGzm2rmYPKtibVBZKzFLYKEcfe1C4LKOEPZu1xnkAtX1jC+LLFuYVfHYCgo64+uSY7qP6Fn5shE9aKEfnvxn0CPB/URzujtR51Jog6Q7dv4OJ++F5a9UOmgNmBjmSOguj0p24Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746656332; c=relaxed/simple;
-	bh=EEgrVpV+dxmZpKE2aC2GH0LMPotoCq/ED7mZZZVPrOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGXKbEFi5KGePAD9siyYhme7jeJpdkN4/LIgSvGMwZqX3fZ2txDokFYBbqQbMCaKyk75vyMI0TUiff1G/A/rMv/ht0ywKd7rEUi4jMlcahdr9GmBRt7Cn0v4wtO3F7tmo2dqENcXLgECOTf5Z9AwOjHuMydGSswfqRMBgUjRnLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HW9i1+ZW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746660112; c=relaxed/simple;
+	bh=bamgXzYV0UnQ2r1ph7sXoh7QCDp4e7MSXHZ/X1OQN2s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BsHxDQOctzzrBHAIMpT1zcTW0cMA4KF0qRAK+2Lce9VH+ECbHehgYPupA+Kbr7a2zsuFUBIH7vZiymIIPMI5Jjp+CN71qQMlzx9HG1gldo4HYSNxxheNCzjQfn8zt+GmmTqLXS86PmTj37DnFUNP9ai1BI6Q9pJiq/EVhVINtAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Dufagjjm; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HW9i1+ZW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7031BC4CEE2;
-	Wed,  7 May 2025 22:18:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746656331;
-	bh=EEgrVpV+dxmZpKE2aC2GH0LMPotoCq/ED7mZZZVPrOw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HW9i1+ZWzoLd/e9bujf1qVWc4oLPzoIis/DMPHIjPG4Lg+v2TPdqTr9QUjrfy3xA6
-	 LilZNWBQntwYzZV1RPplD4NAwhlcoCFs+Z+bFj5U2bi1PwPgblDNphdOhRJdm5EtCy
-	 Cw60wLu8RYdoLYzMoGZIdU47QksD3fVhi9bqZ5jHQixh3LYtQq3gLI1W1cHdys5QKK
-	 9/F0GzkplXSU36PJNe3pXjxhJpGny5aOaj3aWnq27QG91pMqJZyUjkOlEmYjHZkCGT
-	 LSn3niecaNRjbjhwe/MAUWzR4BKj4fKUqm3qDUbCOTt/mpAWdNOuY4BZKZNd1gjo6T
-	 nGhlayET1r+dg==
-Date: Wed, 7 May 2025 15:18:46 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: kernel test robot <lkp@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [linux-next:master 6141/9308]
- arch/mips/lib/crypto/chacha-core.S:264:118: error: unknown instruction, did
- you mean: rol, rotr?
-Message-ID: <20250507221846.GA526360@sol>
-References: <202505080409.EujEBwA0-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Dufagjjm"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-70960e0b4d5so3456707b3.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 May 2025 16:21:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1746660110; x=1747264910; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eiS55CU6GCzTdVaqv+v/fNQZYBIDDl972AoagHBKWUg=;
+        b=DufagjjmqAeKn6K4RZUlzNzx51kuZ50HrbTQHDXajJrHVRHUeR6fKn3zTLYLi/UCPR
+         mE6b2CZ9rsolEuvCNLhwPsyAh00f3244hhKbawmkrGiapbDzhPZYmI4ykn/ofb7pG6Av
+         oaUGSKpVNTN7Mpfa28SP0p1z6EvxK5tOtX8LTG9nHHdVHUfLa3wAUfzxqDtJ2jJEVgpc
+         gahKKHrGXYhkc+mTeMCqEBG7Bo+n0eRwzpTM4Lh211Qg1micZp+mCnzBzIZAjrIvlynn
+         IItkJ4fD350/B2CnYbJJRm7CWugTKWOEcj5iPL3JNZhYDu66nxRkx56+PD0qAHW/1jZ3
+         jjvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746660110; x=1747264910;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eiS55CU6GCzTdVaqv+v/fNQZYBIDDl972AoagHBKWUg=;
+        b=NblPzDxpRMliij4Hx0VaWdSapyZHg3v7R16JLcQIfiOwNgEc8Fg33m5d55uu5o2iOQ
+         eYMJZ9gcj055q6R8sBxYl+ycgJcfuYu8luS9VSySzUspsVOMJ/jVVohz7FQDvRMUIFVR
+         UU2PYRZkn1beq+SlGpxwwLHDBaQv2qcZZmrDKE7aGp8c7qdHvFTHcGft/WCW3aBDvZAc
+         Q0oovG7UGZRfhZSA6BuvkLV4YBzKCpKU0Kbc9KDgOCrIe9QNlvXl7I4VW8Ov0B87JCBS
+         S86l4kWJuJpZ9KBj/QcxJAfLrUMQ7+kQNTw7LXftujP0magXdZ0Uaa2JeKD3yeBE3bz+
+         C13w==
+X-Forwarded-Encrypted: i=1; AJvYcCVvOffvhm6r7OsuhlI4apku9KKLt8gAjPlT+BL4TkDXg/GJ4LFf+A572LaCGXyurRxYK9qZnvP3cZA4UZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6UBkIYN0V39k3xX3BLxcAtvQqe32E9YsFksyWR4sZKzfs3pe8
+	hDGw8iu+15QW6kHDf70r5hvgJkfI6wZpammhcI09HbUEx34J/6cILcjIVHsK4OyyAVz/DDka6Zf
+	aJIT9OOZC37jcM4o8326X+LG7tZZE7nusy5tX
+X-Gm-Gg: ASbGncsqWsy7Jie+PewTJ9eDz7CKF1I1UHfSF0ReqGCNliKRODAsx7lm4lI3Oa4kmbA
+	/j3/oc91dXRTeMmz/gc+zdPzSA2QuZXrCaOaIKf5LuJADLZDSphr6V9aQWDr98BwQCX+pnXJToW
+	cokfjZWYN/I7RUng86x4jhpMjFO/W2OpDR
+X-Google-Smtp-Source: AGHT+IEdiurNMDjEEGPDbl4FsASjSKl1b0yzZP+/scZr6xyvlLkYWyw7qnY1iU3gzpVhfzU/6D0/RDhTUKWUSun/1+U=
+X-Received: by 2002:a05:690c:6f11:b0:708:a778:b447 with SMTP id
+ 00721157ae682-70a1da3a702mr73951417b3.20.1746660109690; Wed, 07 May 2025
+ 16:21:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202505080409.EujEBwA0-lkp@intel.com>
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
+ <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com> <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
+In-Reply-To: <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 7 May 2025 19:21:38 -0400
+X-Gm-Features: ATxdqUHVijVfp4d_bipTBtoKTZV9oFot2QZoyM5v54DevQVu2k9jVQgfjdqjmrE
+Message-ID: <CAHC9VhSPLsi+GBtjJsQ8LUqPQW4aHtOL6gOqr9jfpR0i1izVZA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: KP Singh <kpsingh@kernel.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, bpf@vger.kernel.org, code@tyhicks.com, 
+	corbet@lwn.net, davem@davemloft.net, dhowells@redhat.com, gnoack@google.com, 
+	herbert@gondor.apana.org.au, jarkko@kernel.org, jmorris@namei.org, 
+	jstancek@redhat.com, justinstitt@google.com, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	llvm@lists.linux.dev, masahiroy@kernel.org, mic@digikod.net, morbo@google.com, 
+	nathan@kernel.org, neal@gompa.dev, nick.desaulniers+lkml@gmail.com, 
+	nicolas@fjasle.eu, nkapron@google.com, roberto.sassu@huawei.com, 
+	serge@hallyn.com, shuah@kernel.org, teknoraver@meta.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[+Cc linux-crypto, linux-mips, and the authors of the mips chacha-core.S]
+On Wed, May 7, 2025 at 1:48=E2=80=AFPM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> I'm with Paul on this: if you could share your design ideas more fully
+> than you have above that would help make this debate way more
+> technical.
 
-On Thu, May 08, 2025 at 04:36:30AM +0800, kernel test robot wrote:
-> Hi Eric,
-> 
-> First bad commit (maybe != root cause):
-> 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> head:   08710e696081d58163c8078e0e096be6d35c5fad
-> commit: 939a54ac073808db15ed411d563dfadb3ef12798 [6141/9308] crypto: mips - move library functions to arch/mips/lib/crypto/
-> config: mips-randconfig-r111-20250501 (https://download.01.org/0day-ci/archive/20250508/202505080409.EujEBwA0-lkp@intel.com/config)
-> compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project f819f46284f2a79790038e1f6649172789734ae8)
-> reproduce: (https://download.01.org/0day-ci/archive/20250508/202505080409.EujEBwA0-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202505080409.EujEBwA0-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> arch/mips/lib/crypto/chacha-core.S:264:118: error: unknown instruction, did you mean: rol, rotr?
->     addu $t0, $t4; addu $t1, $t5; addu $t2, $t6; addu $t3, $t7; xor $s5, $t0; xor $s4, $t1; xor $s3, $t2; xor $s2, $t3; rotl $s5, 16; rotl $s4, 16; rotl $s3, 16; rotl $s2, 16;;
+I think it would also help some of us, at the very least me, put your
+objections into context.  I believe the more durable solutions that
+end up in Linus' tree are combinations of designs created out of
+compromise, and right now we are missing the context and detail of
+your ideal solution to be able to do that compromise and get to a
+design and implementation we can all begrudgingly accept.  In the
+absence of a detailed alternate design, and considering that BPF
+signature validation efforts have sputtered along for years without
+any real success, we'll continue to push forward on-list with
+refinements to the current proposal in an effort to drive this to some
+form of resolution.
 
-This build error actually occurs before my commit too, and even on current
-mainline.  I don't know why it's just getting reported now.  It occurs only with
-clang, which is why I didn't notice it before (I did the mips build with gcc).
-Anyway, I don't really speak MIPS, but it looks like what's going on is the CPU
-only has a right rotate instruction, and binutils translates left rotates into
-right rotates, but clang doesn't.
+> I also get the impression that there might be a disagreement over
+> scope: what seems to be coming out of BPF is that every signing problem
+> and scenario must be solved before signing can be considered
+> acceptable; however, I think it's not unreasonable to attempt to cover
+> a portion of the use cases and allow for future additions of things
+> like policy so we can get some forward motion to allow others to play
+> with it and produce patches based on their use cases.
 
-'mips-linux-gnu-gcc -c -march=mips32r2' successfully compiles the following:
+Beyond any potential future updates to Hornet, I just wanted to make
+it clear that the Hornet LSM approach, like any LSM, can be disabled
+both at compile time for those users who build their own kernels, as
+well as at kernel boot time using the "lsm=3D" command line option for
+those who are limited to pre-built kernels, e.g. distro kernels.
+Users can always disable Hornet and replace it with another LSM,
+either a BPF LSM or a native/C LSM, of their choosing; the LSM
+framework is intentionally flexible to allow for this substitution and
+replacement, with plenty of existing examples already.
 
-    rotl $a0, 5
-
-... and with 'mips-linux-gnu-objdump' it comes back as:
-
-    ror	a0,a0,0x1b
-
-But 'clang -c -target mips-linux-gnu -march=mips32r2' errors out:
-
-    test.S:1:1: error: unknown instruction, did you mean: rol, rotr?
-    rotl $a0, 5
-
-I don't know if 'rotl' is "supposed" to work or not.  But either way, we could
-make the assembly code use right rotates only.
-
-- Eric
+--=20
+paul-moore.com
