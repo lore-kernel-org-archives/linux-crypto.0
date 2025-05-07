@@ -1,77 +1,114 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F071E25E3;
-	Wed,  7 May 2025 05:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1C1EE7BE;
+	Wed,  7 May 2025 05:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746596505; cv=none; b=P5AiEj0N7q/DTkKobb+NcX4AdHemw0W/fjHDG1fsl5w418PfPSNCrWOFuqfOh2XPoY5+jLEOfgCFNRVo4END054Tp79mloG7PhrIhoEYNoIk2z2j+T2/ASwbJHF2gveBrPCHCoU5+nbd7HkreF6KBPhcadGabZGsMv//AtOmY1c=
+	t=1746596692; cv=none; b=O9djkFBl+NFfWFWaYzKaoVUdphgeCOSc9pj7Fun81y9YtubfB8v8rYVr0r6XJR4ZK3mYxd412btdcHTD3qhxiKyI2Mck8nt/w7LrdLQa5b4TXrDwCBAVcLSQMHzljg2/LXAPLnaEgYVYVYdUdMOb8WBC1UCcX1Uy7PXbRZvk4OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746596505; c=relaxed/simple;
-	bh=LEtuTQ95S5zNWQ6ILd3h8AYtfPMOrGBJmza5TNoXkrw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pio899kAlbv38qLombI90SrSh+H67RVw9H+i8MQzyHJCjBmzFSgfJbwtmrd8t9np3Q/tgSaCOucIba9FHnjv07mBQyXH99XOcykEgZ+PRJfM3KSOjLb0rNwKtaCGt2kn3UIrzws8vQTVI5vt4PLSmZBvxr3Wgy3ejc+6FI7lDFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=rdWZE5Vg; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1746596692; c=relaxed/simple;
+	bh=JQX+pNi+rd47yrsUf9LzXxL1bR3OCMpgA5gg847AdJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhEZpFpH/ZjWSPZPUdAJ2vMqSK/Ri4ONBplvnuVbTdq8Xmo5Aw3zezylvPcbXZ682/H7a1JnnQkZWFJPYDOlemYuwAnYx8PfbNkpdgQhViqdctKF+FhHMooOLmnOUbGFiw10cZio9+rlEJPKk7/rMgstVpUf2DmyAOKXUAYT+ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MK6IJYal; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="rdWZE5Vg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=LEtuTQ95S5zNWQ6ILd3h8AYtfPMOrGBJmza5TNoXkrw=;
-	t=1746596503; x=1747806103; b=rdWZE5VgPZyk1G0wHId0gvixCBs9XtmamHnIlFALlXwBg2f
-	YaL4XD19WoeWLNO65jss3P+DBU7mWlGQGj/GwiG4Gwi8ODgfEQaZwhkyHjj5D786kEp5ortKAbVcv
-	gYAW9cNx1ro1w6SDjHoEiAkPG1C3Cefv/YFVTyQtmfm+Md+vphCe4LacSrYBAaSfzYpHc6r+f3y06
-	zIrNGKgERZtVdYG7r79ASy6/UwInjphP4Zrf0n6osC6Q88eQb4hfbD0gQlmSZd1DxqZ8Jqyp78DbQ
-	2ouhdZhW469HqJxNgTK9aDCvn23P0mhHSI8uqiTfI5Mgdd17Ih9RFBS2SSLEQ57g==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uCXXF-00000007LGf-2K7m;
-	Wed, 07 May 2025 07:41:38 +0200
-Message-ID: <1fff027e24110fe1692ab8bef06da99b31391b00.camel@sipsolutions.net>
-Subject: Re: [PATCH] um: Include linux/types.h in asm/fpu/api.h
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>, kernel test robot
- <lkp@intel.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, Richard Weinberger <richard@nod.at>, Anton
- Ivanov	 <anton.ivanov@cambridgegreys.com>, linux-um@lists.infradead.org
-Date: Wed, 07 May 2025 07:41:36 +0200
-In-Reply-To: <aBq6X-UYlQG9HUQd@gondor.apana.org.au>
-References: <202505070045.vWc04ygs-lkp@intel.com>
-	 <aBq6X-UYlQG9HUQd@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MK6IJYal"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746596690; x=1778132690;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JQX+pNi+rd47yrsUf9LzXxL1bR3OCMpgA5gg847AdJU=;
+  b=MK6IJYalkhLgDuZa2sGeIx0Rd0kXh4XubKcOw6OfbaIIGm9abJZWIACe
+   /KUBBoy1ZhEv2iF8/VRW7cFI/Ub+3jegyiEElIOpn/sd0dIEyzrYfrKgM
+   niZw9zLzD0/eA/72NxZMhEVBbwWRU7oVQOgakK4vSc8poFSJhcRVuDNkF
+   YJFBjxHg7RB90b6d1st2vBArnbD8rnwfs4XXi3pqWzynWAbi3dDE4vRHA
+   uRb0Yz7wuPTT8I/L/GJYYxcglpOB1y6XSM6pHgaSHEBpEpODPMgNU4Cdj
+   qer9K+eUvOWEaqyWyt6AWE/zsrjQUPDBnqeO4bsTG4i1efefgMwdrodNK
+   A==;
+X-CSE-ConnectionGUID: GzO16g5DTF6yO5ZFZ+iT7g==
+X-CSE-MsgGUID: 2GN5LkD1RPuSFNQQ1vYnaQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="48202530"
+X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
+   d="scan'208";a="48202530"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:44:49 -0700
+X-CSE-ConnectionGUID: h2ssVtyISB66sQtFkP2/BA==
+X-CSE-MsgGUID: 1ljMQRoCQ7G7X1gly5+u1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
+   d="scan'208";a="135844091"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 06 May 2025 22:44:45 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCXaF-00076C-1W;
+	Wed, 07 May 2025 05:44:43 +0000
+Date: Wed, 7 May 2025 13:44:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
+	pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+	herbert@gondor.apana.org.au
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, x86@kernel.org,
+	john.allen@amd.com, davem@davemloft.net, thomas.lendacky@amd.com,
+	michael.roth@amd.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] crypto: ccp: Add support to enable
+ CipherTextHiding on SNP_INIT_EX
+Message-ID: <202505071309.cJl7zfy2-lkp@intel.com>
+References: <94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra@amd.com>
 
-On Wed, 2025-05-07 at 09:41 +0800, Herbert Xu wrote:
->=20
-> I'll add this to the crypto tree if it's OK with the UML maintainers.
+Hi Ashish,
 
-Sure, seems trivial enough and nobody is likely to touch that file.
+kernel test robot noticed the following build errors:
 
-Thanks.
+[auto build test ERROR on next-20250417]
+[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master kvm/queue kvm/next linus/master kvm/linux-next v6.15-rc3 v6.15-rc2 v6.15-rc1 v6.15-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> ---8<---
-> Include linux/types.h before using bool.
->=20
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202505070045.vWc04ygs-lkp@i=
-ntel.com/
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/crypto-ccp-New-bit-field-definitions-for-SNP_PLATFORM_STATUS-command/20250422-082725
+base:   next-20250417
+patch link:    https://lore.kernel.org/r/94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra%40amd.com
+patch subject: [PATCH v3 3/4] crypto: ccp: Add support to enable CipherTextHiding on SNP_INIT_EX
+config: i386-buildonly-randconfig-002-20250422 (https://download.01.org/0day-ci/archive/20250507/202505071309.cJl7zfy2-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071309.cJl7zfy2-lkp@intel.com/reproduce)
 
-Acked-by: Johannes Berg <johannes@sipsolutions.net>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505071309.cJl7zfy2-lkp@intel.com/
 
-johannes
+All errors (new ones prefixed by >>):
+
+   In file included from arch/x86/kvm/svm/svm.c:24:
+>> include/linux/psp-sev.h:1035:74: error: use of undeclared identifier 'FALSE'
+    1035 | static inline bool is_sev_snp_ciphertext_hiding_supported(void) { return FALSE; }
+         |                                                                          ^
+   1 error generated.
 
 
+vim +/FALSE +1035 include/linux/psp-sev.h
+
+  1034	
+> 1035	static inline bool is_sev_snp_ciphertext_hiding_supported(void) { return FALSE; }
+  1036	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
