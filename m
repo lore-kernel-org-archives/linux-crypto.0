@@ -1,87 +1,121 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1921BA38;
-	Wed,  7 May 2025 02:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F98519AD5C
+	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2025 02:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746584648; cv=none; b=CM4Bc/DyMewoMmyVCcvUXBbAlGjtBB3RPpFSu+87HerLCjquk0+vqwKiNsuW6jVfCUIkdcrNd9qUOcXzbnhWJ6799rbd4XCC/R6NGDqy6DLbYgNImb22oQmjuz26TS19W5FmzXiIJquU45TJlKQ4V92TAyBklxAhjFn6UfDx+Qg=
+	t=1746585728; cv=none; b=hk0BXGMGOKX1jy540HlSFCAcS1RuScqJ4jWTB8FFI4WVN96Nhb4DGPCXIINzuXn3D4SDADT0x31OTPmACDwBFzgYcv9vVPEo3YOmvbZ85eCJM/dY5aQveojul6yWiqjrynt2KmTolAJxL5INUW20dfww4HJX6mwDJqWTahsC4Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746584648; c=relaxed/simple;
-	bh=oxVwR6k7jtHXBxy+y8dD5QPIH1Jzp6vp9TS+uJ4sHj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cNnn2k/YmLVFWTJan5uLCDKfs2o8EcABLweCw+AEZF1YzajneopTJW6WnJGDo9hZ4rHbhg+gtpqRYrtqbXdFb4g5QYyJErvg9zgJjsZIXaYQ2OU+K6ezV3HmfvCjnp+c+If7HgHW9OaTeETBw9+WgzeRGEkpQbEVE5FlJ6/Z8RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=b5worlEq; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746585728; c=relaxed/simple;
+	bh=6etL97QEsqJN3YZrjYchxkPsyMZOXMw61jInfbT3Xw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rKx9Tp1OZBTdQfHVOtmkqd5RjSEPc1bXpoq911JzOhztbdqW88a4OVZOVU5H3I43jU49S6Sf/UUKf7fpMS7Mtzd3we+Pm3EV3IwOBJbohObLTxywfVbP0b2E+ev0b0dRRme2Uq9Y01NzSlfSOojm+sM825qnv1riAU3oUD9ukvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IObWT5zk; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="b5worlEq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=mjQpoPzciVzeraBHDbJpOZa1vh7CWFxORP0jPzBi4cE=; b=b5worlEqzPvOEQPGBb8vPTY0w9
-	XchtEOvTtexqwL88pfI/pnAbpOKmfEHdg/1kJxHao0yUAAWNqNcTxDNbR/CLlGWesDPJIbq1zX2pE
-	SkHe8IA7YDEQFF/Fl6cVP0vCH8XhkIceb5v7E6r98kfx6+pfo/wrcK8AR7QwKlyqZHmxVbGBm58H3
-	KqBZjlA7J1XpQ0mb6vF7s8DBiUFmuS6ZFtFQ13LP4aoHL3+tZQWXBUW1A4Zx8ShmA1Ne5Vw/b9C03
-	NA4h3vfpw8gbyvFZZIoAd6bO6QMPEUIcAhc8BpJXCS1DjZsaVK1TpZdnz0sRRqSjqMZ586MUgvcSN
-	F1E5GULw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uCURt-00474U-1Q;
-	Wed, 07 May 2025 10:23:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 May 2025 10:23:53 +0800
-Date: Wed, 7 May 2025 10:23:53 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: "dsterba@suse.cz" <dsterba@suse.cz>, Josef Bacik <josef@toxicpanda.com>,
-	"clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>, "embg@meta.com" <embg@meta.com>,
-	"Collet, Yann" <cyan@meta.com>,
-	"Will, Brian" <brian.will@intel.com>,
-	"Li, Weigang" <weigang.li@intel.com>
-Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
- through acomp
-Message-ID: <aBrEOXWy8ldv93Ym@gondor.apana.org.au>
-References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
- <20240426110941.5456-7-giovanni.cabiddu@intel.com>
- <20240429135645.GA3288472@perftesting>
- <20240429154129.GD2585@twin.jikos.cz>
- <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IObWT5zk"
+Message-ID: <87e475ca-c4db-4fe4-94df-4e29f779a383@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746585713;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jR9JKWCrpFIfn9jOgzBStj0mD3xOCH22odNml15ltfQ=;
+	b=IObWT5zkKq5EkbWwVKTGdfdlbql9PSombG1SPX7hWaaxp/EZwXp2Nl3674HN9qu9nFmHVS
+	RgIulIF+wOLmuBVb0Sv6jMyjKYDRkt7uDwC8waWe5ZIGzGz9EYnlcH9IWiJyaih6994gMd
+	OrHpRZDB6IIrblHWYWCjsyBVZ6D71g8=
+Date: Wed, 7 May 2025 10:41:46 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v9 5/5] MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO
+ DRIVER entry
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+ peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
+ linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de,
+ Huacai Chen <chenhuacai@loongson.cn>
+References: <20250506032053.11147-1-zhaoqunqin@loongson.cn>
+ <a03b4963-55aa-4a75-b795-1e8f0db7ec89@linux.dev>
+ <00196f77-1060-fe67-3e6b-6721092207d6@loongson.cn>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <00196f77-1060-fe67-3e6b-6721092207d6@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 06, 2025 at 04:38:11PM +0100, Cabiddu, Giovanni wrote:
+
+在 5/6/25 8:14 PM, Qunqin Zhao 写道:
 >
-> > We'd have to enhance the compression format specifier to make it
-> > configurable in the sense: if accelerator is available use it, otherwise
-> > do CPU and synchronous compression.
-> For usability, wouldn't it be better to have a transparent solution? If
-> an accelerator is present, use it, rather than having a configuration
-> knob.
+> 在 2025/5/6 下午5:03, Yanteng Si 写道:
+>> 在 5/6/25 11:20 AM, Qunqin Zhao 写道:
+>>> Changes to Loongson TPM driver would be best reviewed by the Loongson
+>>> crypto driver maintainers.
+>>>
+>>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>>> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+>>> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+>>> ---
+>>> v8-v9: None
+>>> v7: Added tag from Jarkko and Huacai
+>>> v6: "tpm_lsse.c" -> "tpm_loongson"
+>>> v4-v5: None
+>>>
+>>>   MAINTAINERS | 1 +
+>>>   1 file changed, 1 insertion(+)
+>> I'm just curious. Why is this patch kept outside the tmp_loongson 
+>> patch set?
+>
+> Hi, Yanteng. Thanks for your reply.
+>
+>
+> When sending this patch, git send-email prompted "too many commands"
+>
+> and disconnected from the server. Then I sent this patch separately.
+>
+> Even after setting sendemail.smtpBatchSize to 100, I still have this 
+> problem.
 
-If you go through the Crypto API you won't need to add a new knob
-at all.
+>
+> Now I am trying to find  Loongson SMTP server administrator to solve it.
 
-The Crypto API is already configurable and comes with a knob
-pre-installed.  Just download crconf and you can configure which
-algorithm will be used by default:
+This is the best solution.
 
-https://git.code.sf.net/p/crconf/code
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+> Have you ever encountered this kind of problem?
+
+This seems to be a feature of the Loongson mailbox. I've observed that Yang
+
+Tiezhu also has a patch that is outside of the patch set. An interesting 
+pattern
+
+is that there are only five emails in one patch set.
+
+
+Thanks,
+
+Yanteng
+
+
+
+>
+>
+> BR, Qunqin.
+>
+>>
+>> <https://lore.kernel.org/loongarch/20250506031947.11130-1-zhaoqunqin@loongson.cn/T/#mf09225c286a8e2b92a677720afafb9e20be57a18> 
+>>
+>>
+>> Thanks,
+>> Yanteng
+>
