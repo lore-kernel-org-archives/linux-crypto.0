@@ -1,199 +1,126 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2519F19005E
-	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2025 12:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F5259CAD;
+	Wed,  7 May 2025 12:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746620284; cv=none; b=u6da513xxD4R8xz0nmk7t84gFm5Db+KOk/4NZjv7laivoGeIWJxFeZg+dVQz3inmOJ4/AHLkiWWh/1v/584d4NvxVAA1Ud/TBwWoe+2SeBjvuJBvUzXxvgyfwu39Y/olpwga8NGRdAAXY+U+vpBKFxeoyj67SDwxsTlDuTEJMJ0=
+	t=1746620719; cv=none; b=QdkteynTQiWrwCjYBBF3j/unbvTskH01vg6vpAtPXsf7QG2q4rCkvkvqR+DZncikbCt1iRaIyyrR4Fk9rqPTKg8XgBPkXs5tRUXuJeidPvUvp81o5XT/VOik4okA6nk82mnuobX9TkIKBrUpnRbChabZ34sEV0SpiufzuJWHsrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746620284; c=relaxed/simple;
-	bh=sjx1VvUpuZrn+f6R/06NXyWAQK3tB66xsabSMlG8sdQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SCip/8ywuOC7+83IsQB2yvsSeFpKFJl/B+JwB5mLa/9wn0AYO3KWh9lBFngcbgsPILIhUbcjqDEIYplhQu1QY1WnWIe7WZ/LuOzrp/vzbQG99ghBiQN6zxWMsL7lIoRMLQsdo/1aUKq+/J9MXEL+IY6emNgHTZPKm8kBemWOsq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pzYmo5Dg; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=opQa5CfL; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pzYmo5Dg; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=opQa5CfL; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1746620719; c=relaxed/simple;
+	bh=cz40EnS6pZZHgaOIDczKlc1lZuundH2EUfYDCvefvIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J7tuiUQS2kXrnUcuKfNjmq/RsZNQWuJWe2usFQYyyseQ6yjFyVLujejBiWuAqyLoH5ztg6h0Loz5fNAP5FBiFCzjA45Se073GthsqEN8bNXHuINTwFZ/NfRkVgVx4ZmQ9BMwNfW+4yXbYMBpdA8NjJVE6xSIhaqd6zkLO8ZgMPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=a5i+89Pi; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pzYmo5Dg";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="opQa5CfL";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pzYmo5Dg";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="opQa5CfL"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3C28121182;
-	Wed,  7 May 2025 12:18:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746620281;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvOWlFAVt6TAvCtF4cImf0T8NPcrWiIu0vrJDICQFGg=;
-	b=pzYmo5Dg2eULpKSBZT1qM2AtK9D5BQKgROqca6j1NnfDn4tce7Q0jpONPbT3ogXGswFBVz
-	D+++nnfA6xoX2jtej3oXOs5NfqunvTMxAhDsf4XfAmsmhEqRhbitBtR8BK81/HnvGckAhh
-	4IvbxknUg35Dc2jsMDlgAJOJy70Nc5g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746620281;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvOWlFAVt6TAvCtF4cImf0T8NPcrWiIu0vrJDICQFGg=;
-	b=opQa5CfLRquzhQR1vW7jSrSk77f7UBQcOCMK5QOltOZFn+Gk8Fg5X7JHNCkFtbLoMbWHN6
-	o7I6Q8HSeS+/H6Bw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746620281;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvOWlFAVt6TAvCtF4cImf0T8NPcrWiIu0vrJDICQFGg=;
-	b=pzYmo5Dg2eULpKSBZT1qM2AtK9D5BQKgROqca6j1NnfDn4tce7Q0jpONPbT3ogXGswFBVz
-	D+++nnfA6xoX2jtej3oXOs5NfqunvTMxAhDsf4XfAmsmhEqRhbitBtR8BK81/HnvGckAhh
-	4IvbxknUg35Dc2jsMDlgAJOJy70Nc5g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746620281;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mvOWlFAVt6TAvCtF4cImf0T8NPcrWiIu0vrJDICQFGg=;
-	b=opQa5CfLRquzhQR1vW7jSrSk77f7UBQcOCMK5QOltOZFn+Gk8Fg5X7JHNCkFtbLoMbWHN6
-	o7I6Q8HSeS+/H6Bw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08552139D9;
-	Wed,  7 May 2025 12:18:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id z1ROAXlPG2j/LQAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Wed, 07 May 2025 12:18:01 +0000
-Date: Wed, 7 May 2025 14:17:54 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-	Josef Bacik <josef@toxicpanda.com>, "clm@fb.com" <clm@fb.com>,
-	"dsterba@suse.com" <dsterba@suse.com>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>, "embg@meta.com" <embg@meta.com>,
-	"Collet, Yann" <cyan@meta.com>,
-	"Will, Brian" <brian.will@intel.com>,
-	"Li, Weigang" <weigang.li@intel.com>
-Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
- through acomp
-Message-ID: <20250507121754.GE9140@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
- <20240426110941.5456-7-giovanni.cabiddu@intel.com>
- <20240429135645.GA3288472@perftesting>
- <20240429154129.GD2585@twin.jikos.cz>
- <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
- <aBrEOXWy8ldv93Ym@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="a5i+89Pi"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=bghoxTN5gGRzwdkYPy7tq46B/hDeom/4Jnnum0OS7Po=; t=1746620717;
+	x=1747052717; b=a5i+89PiyohIg9rHfMMrLbZCM5851GmsoqvVdnD+raZY0CR83AlQyyCL8OhTa
+	D+8V26DT/Qo0W4Ntvwb0KBVpUXnHjm2tIs34e6jzpc1rtpCqGkTGVFRyOtXwhfxfKQg2BLRb9XcMs
+	8OJdOjdHe6ZdtTPMPwuMkpr0i2vfJxTMftTianDqGz6GUM38xSUt7Oh9aPNqVshrP37PVdosboF1r
+	MYxjdubpqOG+KQPRYz8uBru/+JGCIwDlGFTasBBqXUTJoEa7J4oxaxQoAW1M8aY7hmNp6RaAs1lkh
+	sl6kfId8JHJfWTKWkptG0P5H/ieXm/9b9u7PLokKlaOCrJyMsQ==;
+Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
+	id 1uCdpq-000wKB-38;
+	Wed, 07 May 2025 14:25:15 +0200
+Message-ID: <2b3aa30e-632d-4013-8bc2-d3ff8a2478b9@leemhuis.info>
+Date: Wed, 7 May 2025 14:25:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBrEOXWy8ldv93Ym@gondor.apana.org.au>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spam-Score: -3.00
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.00 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: powerpc/poly1305 - Add missing poly1305_emit_arch
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
+ <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
+ <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+From: Thorsten Leemhuis <linux@leemhuis.info>
+Content-Language: de-DE, en-US
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 n7RI
+In-Reply-To: <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1746620717;d0428d41;
+X-HE-SMSGID: 1uCdpq-000wKB-38
 
-On Wed, May 07, 2025 at 10:23:53AM +0800, Herbert Xu wrote:
-> On Tue, May 06, 2025 at 04:38:11PM +0100, Cabiddu, Giovanni wrote:
-> >
-> > > We'd have to enhance the compression format specifier to make it
-> > > configurable in the sense: if accelerator is available use it, otherwise
-> > > do CPU and synchronous compression.
-> > For usability, wouldn't it be better to have a transparent solution? If
-> > an accelerator is present, use it, rather than having a configuration
-> > knob.
+On 07.05.25 13:36, Herbert Xu wrote:
+> On Wed, May 07, 2025 at 01:03:06PM +0200, Thorsten Leemhuis wrote:
+>>
+>> """
+>> ld: warning: discarding dynamic section .glink
+>> ld: warning: discarding dynamic section .plt
+>> ld: linkage table error against `poly1305_emit_arch'
+>> ld: stubs don't match calculated size
+>> ld: can not build stubs: bad value
+>> ld: lib/crypto/poly1305.o: in function `poly1305_final':
+>> /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x2dc): undefined reference to `poly1305_emit_arch'
+>> ld: /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x378): undefined reference to `poly1305_emit_arch'
+>> make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux] Error 1
+>> make[1]: *** [/builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/Makefile:1250: vmlinux] Error 2
+>> """
 > 
-> If you go through the Crypto API you won't need to add a new knob
-> at all.
-> 
-> The Crypto API is already configurable and comes with a knob
-> pre-installed.  Just download crconf and you can configure which
-> algorithm will be used by default:
-> 
-> https://git.code.sf.net/p/crconf/code
+> Oops, the powerpc patch was missing the assembly part:
 
-First time I hear about such tool and given what it does I think it
-should have better visibility and presence also in "the other" git
-sources. It's not mentioned in linux Documentation either.
+Ha, happens, thx for providing the patch this quickly, it did
+the trick for me:
 
-SourceForge is not taken seriously for quite some time and the project
-landing page https://sourceforge.net/projects/crconf/ matches the
-pattern of abandoned SF projects, last commit 5 years ago.
+Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
 
-The first hit on gihub is https://github.com/Thermi/crconf and at least
-it matches the SF commits.
-
-The command line interface follows the iproute2 style that is
-arguably hard to navigate:
-
-  $ ./crconf
-  Usage: crconf add { ALG | DRIVER } TYPE [ PRIORITY ]
-	 crconf del DRIVER TYPE
-	 crconf update DRIVER TYPE [ PRIORITY ]
-	 crconf show { DRIVER TYPE | all }
-	 crconf help
-  ALG := alg <alg-name>
-  DRIVER := driver <driver-name>
-  TYPE := type ALGO-TYPE
-  PRIORITY := priority <number>
-  ALGO-TYPE := { 1 | 2 | 3 | 5 | 8 | 10 | 11 | 12 | 13 | 14 | 15 }
-		 1 == alg type cipher
-		 2 == alg type compress
-		 3 == alg type aead
-		 5 == alg type skcipher
-		 8 == alg type kpp
-		10 == alg type acompress
-		11 == alg type scompress
-		12 == alg type rng
-		13 == alg type akcipher
-		14 == alg type hash
-		14 == alg type shash
-		15 == alg type ahash
-
-The manual page lacks any useful examples and figuring out how to set
-the priority took me a few minutes of grepping in /proc/crypto, trial
-and error to end up with:
-
-  sudo ./crconf update driver sha256-generic type 14 priority 1000
-
-The usability has a lot of room for improvement.
-
-Anyway, assuming there will be a maintained, packaged in distros and
-user friendly tool to tweak the linux crypto subsystem I agree we don't
-have to do it in the filesystem or other subsystems.
+Ciao, Thorsten
