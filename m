@@ -1,206 +1,287 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FD01FBCB2;
-	Wed,  7 May 2025 17:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D271C84D7;
+	Wed,  7 May 2025 18:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746640099; cv=none; b=Asrz/8rC4w6+6eorhH/hn9dZ5EU3ewOQW8lMSI/b1Ovc6e+FWR+ZYEZRtoCep/LxjH1asounus4pY/Mw4L1dHww+PGlYKZaBMZDFP9kvpANn82wrbpMps2fjCksJBaN5BwBn8+nGlOUCspsmccCvcIF5HYklJI2eKszMnuotEr0=
+	t=1746642684; cv=none; b=dGVfirq4ZMoHpB+auX14HQSCBiMi/wNFs+2RortcIoqDH2htYZcI/4UU7j1JT+da21gb9IYz7i42BmEPUMSST/3ZloCMGYOJLUL0wMUjxLZacFWQS03cr/lMMbZSuv3DjKl1uvt8olA8Q9VRzfsSFIm6PtXpeMKPhP6X0qb+Uac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746640099; c=relaxed/simple;
-	bh=UBlSApUhEeUGo7ww9TaUpyamI6QF9U0i1qq6Ai0j4Eo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gFJ/dI274UALIa9tj3Po1hG/R0hcJ6EtxrhUtEkp9xv+1xLw+5wI+T9Mv5GfotDaisUZr5Q/b6gFcYQeSHZ9WAGZ47frqmRW8zrcYH7UOd/lPIUc4tLp9l3ZyTWsWzfeU4w22nAt4ifqM2HfRY9oPFumHBW4CzA89V2UeN8l3VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=H4gbTAQQ; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1746642684; c=relaxed/simple;
+	bh=SGMXgAXcsM1NyUQI3wXCgHNlUXq03+m075KqbY4kOcI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mul1Frmuuwfx6+PSKxsDFzyDuN+IbAvc7rO6qT9qTxmON7sKhIeS57MJJ5uGTCaxf1fC+8aNvohZDCZGJDaMwqKtm+JKNacQgGtdT1yZiALg7LOHdFQe+vuTTVbsmKeZMxDq6FOK3Ilx4Q1VRstvh1cKpSlySoJtODf4Qmba1ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+JuVX5/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="H4gbTAQQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1746640095;
-	bh=UBlSApUhEeUGo7ww9TaUpyamI6QF9U0i1qq6Ai0j4Eo=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=H4gbTAQQp+oJ2ZLO8DhM9xK6/Aa2Ly+FhA+l1fERRi0X5Cgi2ONeyRawfKBWTmWoq
-	 59WZ9gG742R14gGhDvP5chMcXPTQ5yVR2DbjCpP2yJAze0RyxYQG9mNMIDX29qgbVn
-	 zi6PM74manFprfD3Za1FlRhf+9aKqUeeyuoF4mDU=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id AD5E81C003D;
-	Wed, 07 May 2025 13:48:14 -0400 (EDT)
-Message-ID: <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
-Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: KP Singh <kpsingh@kernel.org>, Blaise Boscaccy
-	 <bboscaccy@linux.microsoft.com>
-Cc: bpf@vger.kernel.org, code@tyhicks.com, corbet@lwn.net,
- davem@davemloft.net,  dhowells@redhat.com, gnoack@google.com,
- herbert@gondor.apana.org.au,  jarkko@kernel.org, jmorris@namei.org,
- jstancek@redhat.com, justinstitt@google.com,  keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org,  linux-doc@vger.kernel.org,
- linux-kbuild@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org,  linux-security-module@vger.kernel.org,
- llvm@lists.linux.dev,  masahiroy@kernel.org, mic@digikod.net,
- morbo@google.com, nathan@kernel.org,  neal@gompa.dev,
- nick.desaulniers+lkml@gmail.com, nicolas@fjasle.eu,  nkapron@google.com,
- paul@paul-moore.com, roberto.sassu@huawei.com,  serge@hallyn.com,
- shuah@kernel.org, teknoraver@meta.com, xiyou.wangcong@gmail.com
-Date: Wed, 07 May 2025 13:48:14 -0400
-In-Reply-To: <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
-References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
-	 <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
-	 <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+JuVX5/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD32AC4CEE2;
+	Wed,  7 May 2025 18:31:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746642684;
+	bh=SGMXgAXcsM1NyUQI3wXCgHNlUXq03+m075KqbY4kOcI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f+JuVX5/GtoB4CH7l2pG0Dr+0ufWnisu3lbDByGcim1yRxks0K5LxFG6OPblV1fIJ
+	 dh2Tds03xvmUEdMk6WFLkb6Gp0tOqV289h8y0QRjXMBbMPOL6cqY5uhbwtXfbcRNu0
+	 baZ1L5IM8MrFyP9yneaXX3WqP3rajYRoDSWFVx8wcz+ewStsajveVJS5L7tuoYrYdG
+	 RxOHemsj9WquZbPkR+70XL5G8sdge+DUS39JKSAKzn7BT9WOsA/LLTHhwZ/jaMEb+7
+	 KqBwFlgq8fa9gyMhAHSPeBypuMelhwynm8GEY2lVCmQ0H05KFiwq2g/s8i1Av9p0Jc
+	 Mx/pynPRpVlZQ==
+Date: Wed, 7 May 2025 19:31:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 15/15] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <20250507183116.GI3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-16-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-16-tanmay@marvell.com>
 
-On Mon, 2025-05-05 at 22:41 +0200, KP Singh wrote:
-> On Mon, May 5, 2025 at 7:30=E2=80=AFPM Blaise Boscaccy
-> <bboscaccy@linux.microsoft.com> wrote:
-> >=20
-> > KP Singh <kpsingh@kernel.org> writes:
-> >=20
-> > [...]
-> >=20
-> > > Now if you really care about the use-case and want to work with
-> > > the maintainers and implement signing for the community, here's
-> > > how we think it should be done:
-> > >=20
-> > > * The core signing logic and the tooling stays in BPF, something
-> > > that the users are already using. No new tooling.
-> > > * The policy decision on the effect of signing can be built into
-> > > various existing LSMs. I don't think we need a new LSM for it.
-> > > * A simple UAPI (emphasis on UAPI!) change to union bpf_attr in
-> > > uapi/bpf.h in the BPF_PROG_LOAD command:
-> > >=20
-> > > __aligned_u64 signature;
-> > > __u32 signature_size;
-> >=20
-> > I think having some actual details on the various parties'
-> > requirements here would be helpful. KP, I do look forward to seeing
-> > your design; however, having code signing proposals where the
-> > capabilities are dictated from above and any dissent is dismissed
-> > as "you're doing it wrong" isn't going to be helpful to anyone that
-> > needs to use this in practice.
->=20
-> Please don't misrepresent the facts, you got feedback from Alexei in
-> various threads, but you chose to argue on the points that were
-> convenient for you (i.e. usage of BPF internal APIs) and yet you
-> claim to "work with the BPF community and maintainers" by arguing
-> instead of collaborating and paying attention to the feedback given
-> to you.
+On Fri, May 02, 2025 at 06:49:56PM +0530, Tanmay Jagdale wrote:
+> Add XFRM state hook for inbound flows and configure the following:
+>   - Install an NPC rule to classify the 1st pass IPsec packets and
+>     direct them to the dedicated RQ
+>   - Allocate a free entry from the SA table and populate it with the
+>     SA context details based on xfrm state data.
+>   - Create a mapping of the SPI value to the SA table index. This is
+>     used by NIXRX to calculate the exact SA context  pointer address
+>     based on the SPI in the packet.
+>   - Prepare the CPT SA context to decrypt buffer in place and the
+>     write it the CPT hardware via LMT operation.
+>   - When the XFRM state is deleted, clear this SA in CPT hardware.
+> 
+> Also add XFRM Policy hooks to allow successful offload of inbound
+> PACKET_MODE.
+> 
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> ---
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 449 ++++++++++++++++--
+>  1 file changed, 419 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> index bebf5cdedee4..6441598c7e0f 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> @@ -448,7 +448,7 @@ static int cn10k_inb_alloc_mcam_entry(struct otx2_nic *pfvf,
+>  	return err;
+>  }
+>  
+> -static int cn10k_inb_install_flow(struct otx2_nic *pfvf, struct xfrm_state *x,
+> +static int cn10k_inb_install_flow(struct otx2_nic *pfvf,
+>  				  struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+>  {
+>  	struct npc_install_flow_req *req;
+> @@ -463,14 +463,14 @@ static int cn10k_inb_install_flow(struct otx2_nic *pfvf, struct xfrm_state *x,
+>  	}
+>  
+>  	req->entry = inb_ctx_info->npc_mcam_entry;
+> -	req->features |= BIT(NPC_IPPROTO_ESP) | BIT(NPC_IPSEC_SPI) | BIT(NPC_DMAC);
+> +	req->features |= BIT(NPC_IPPROTO_ESP) | BIT(NPC_IPSEC_SPI);
+>  	req->intf = NIX_INTF_RX;
+>  	req->index = pfvf->ipsec.inb_ipsec_rq;
+>  	req->match_id = 0xfeed;
+>  	req->channel = pfvf->hw.rx_chan_base;
+>  	req->op = NIX_RX_ACTIONOP_UCAST_IPSEC;
+>  	req->set_cntr = 1;
+> -	req->packet.spi = x->id.spi;
+> +	req->packet.spi = inb_ctx_info->spi;
 
-I'm with Paul on this: if you could share your design ideas more fully
-than you have above that would help make this debate way more
-technical.
+I think this should be:
 
-However, I will try to respond to the other technical points from a
-general security point of view if it helps but I've made some guesses
-about what will work for you.
+	req->packet.spi = cpu_to_be32(inb_ctx_info->spi);
 
-[...]
-> 2. Alexei suggested to you in
-> https://lore.kernel.org/bpf/87plhhjwqy.fsf@microsoft.com/
->=20
-> =C2=A0 "A signature for the map plus a signature for the prog
-> =C2=A0 that is tied to a map might be a better option.
-> =C2=A0 At map creation time the contents can be checked,
-> =C2=A0 the map is frozen, and then the verifier can proceed
-> =C2=A0 with prog's signature checking."
->=20
-> You never replied to this.
+Flagged by Sparse.
 
-From a general security perspective allowing the creation of signed
-objects that must be combined in order to produce a thing (be it a
-program, a policy or whatever) is always problematic because after
-you've produced a range of these objects signed with the same key, they
-can be mixed and matched by an attacker, in ways you didn't anticipate,
-to produce unintended results and possibly exploits.  To avoid this, a
-single signature must cover the entire combination.
+Please also take a look at other Sparse warnings added by this patch (set).
 
-Having a single signature doesn't mean you can't make your scheme work:
-the signature could be over an array of two hashes, one for the program
-and one for the map, meaning that the signature could be verified and
-the hashes extracted, which could then be verified at different points
-in the execution and verification flow: say verify the program hash
-immediately but do the map hash after you're sure it can't be modified.
+>  	req->mask.spi = 0xffffffff;
+>  
+>  	/* Send message to AF */
 
-> 3. To signing the attachment points, you replied
->=20
-> > That statement is quite questionable. Yes, IIRC you brought that
-> > up. And again, runtime policy enforcement has nothing to do with
-> > proving code provenance. They are completely independent concerns.
->=20
-> The place where the BPF program is attached is a key part of the
-> provenance of the BPF program and its security (and other) effects
-> can vary greatly based on that. (e.g. imagine a reject all LSM
-> program that is attached to the wrong LSM hook). This is why it's not
-> the same as module loading.
+...
 
-I don't believe anyone's disputing this.  However, there is a
-difference between provenance and policy.  Signatures are just about
-provenance. You proposed adding a policy language to signing at LPC in
-2022 and I believe this could be done incrementally to the current
-patch set.
+> +static int cn10k_inb_write_sa(struct otx2_nic *pf,
+> +			      struct xfrm_state *x,
+> +			      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> +{
+> +	dma_addr_t res_iova, dptr_iova, sa_iova;
+> +	struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
+> +	struct cpt_inst_s inst;
+> +	u32 sa_size, off;
+> +	struct cpt_res_s *res;
+> +	u64 reg_val;
+> +	int ret;
+> +
+> +	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
+> +				 &res_iova, GFP_ATOMIC);
+> +	if (!res)
+> +		return -ENOMEM;
+> +
+> +	sa_cptr = inb_ctx_info->sa_entry;
+> +	sa_iova = inb_ctx_info->sa_iova;
+> +	sa_size = sizeof(struct cn10k_rx_sa_s);
+> +
+> +	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
+> +	if (!sa_dptr) {
+> +		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
+> +				  res_iova);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	for (off = 0; off < (sa_size / 8); off++)
+> +		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
+> +
+> +	memset(&inst, 0, sizeof(struct cpt_inst_s));
+> +
+> +	res->compcode = 0;
+> +	inst.res_addr = res_iova;
+> +	inst.dptr = (u64)dptr_iova;
+> +	inst.param2 = sa_size >> 3;
+> +	inst.dlen = sa_size;
+> +	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
+> +	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
+> +	inst.cptr = sa_iova;
+> +	inst.ctx_val = 1;
+> +	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
+> +
+> +	/* Re-use Outbound CPT LF to install Ingress SAs as well because
+> +	 * the driver does not own the ingress CPT LF.
+> +	 */
+> +	pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
 
-One possible stepping stone to this is to add signatures now and policy
-later but if you want the attach point also covered now, how about
-adding an optional third hash over attach_btf_id and the fd; if the
-hash is present it binds the attach point and if it isn't the skeleton
-can attach arbitrarily?=20
+I suspect this indicates that io_addr should have an __iomem annotation.
+And users should be updated accordingly.
 
-> 4.
-> https://lore.kernel.org/bpf/CAADnVQKF+B_YYwOCFsPBbrTBGKe4b22WVJFb8C0PHGmR=
-AjbusQ@mail.gmail.com/
->=20
-> Programs can still access maps, now if you combine the issue of
-> ELF-less loaders and that maps are writeable from other programs as
-> freezing only affects userspace (i.e. when a binary gets an FD to a
-> map and tries to modify it with syscalls) your implementation fails.
+> +	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
+> +	dmb(sy);
+> +
+> +	ret = cn10k_wait_for_cpt_respose(pf, res);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/* Trigger CTX flush to write dirty data back to DRAM */
+> +	reg_val = FIELD_PREP(GENMASK_ULL(45, 0), sa_iova >> 7);
+> +	otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
+> +
+> +out:
+> +	dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
+> +	dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
+> +	return ret;
+> +}
+> +
+> +static void cn10k_xfrm_inb_prepare_sa(struct otx2_nic *pf, struct xfrm_state *x,
+> +				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> +{
+> +	struct cn10k_rx_sa_s *sa_entry = inb_ctx_info->sa_entry;
+> +	int key_len = (x->aead->alg_key_len + 7) / 8;
+> +	u8 *key = x->aead->alg_key;
+> +	u32 sa_size = sizeof(struct cn10k_rx_sa_s);
+> +	u64 *tmp_key;
+> +	u32 *tmp_salt;
+> +	int idx;
+> +
+> +	memset(sa_entry, 0, sizeof(struct cn10k_rx_sa_s));
+> +
+> +	/* Disable ESN for now */
+> +	sa_entry->esn_en = 0;
+> +
+> +	/* HW context offset is word-31 */
+> +	sa_entry->hw_ctx_off = 31;
+> +	sa_entry->pkind = NPC_RX_CPT_HDR_PKIND;
+> +	sa_entry->eth_ovrwr = 1;
+> +	sa_entry->pkt_output = 1;
+> +	sa_entry->pkt_format = 1;
+> +	sa_entry->orig_pkt_free = 0;
+> +	/* context push size is up to word 31 */
+> +	sa_entry->ctx_push_size = 31 + 1;
+> +	/* context size, 128 Byte aligned up */
+> +	sa_entry->ctx_size = (sa_size / OTX2_ALIGN)  & 0xF;
+> +
+> +	sa_entry->cookie = inb_ctx_info->sa_index;
+> +
+> +	/* 1 word (??) prepanded to context header size */
+> +	sa_entry->ctx_hdr_size = 1;
+> +	/* Mark SA entry valid */
+> +	sa_entry->aop_valid = 1;
+> +
+> +	sa_entry->sa_dir = 0;			/* Inbound */
+> +	sa_entry->ipsec_protocol = 1;		/* ESP */
+> +	/* Default to Transport Mode */
+> +	if (x->props.mode == XFRM_MODE_TUNNEL)
+> +		sa_entry->ipsec_mode = 1;	/* Tunnel Mode */
+> +
+> +	sa_entry->et_ovrwr_ddr_en = 1;
+> +	sa_entry->enc_type = 5;			/* AES-GCM only */
+> +	sa_entry->aes_key_len = 1;		/* AES key length 128 */
+> +	sa_entry->l2_l3_hdr_on_error = 1;
+> +	sa_entry->spi = cpu_to_be32(x->id.spi);
+> +
+> +	/* Last 4 bytes are salt */
+> +	key_len -= 4;
+> +	memcpy(sa_entry->cipher_key, key, key_len);
+> +	tmp_key = (u64 *)sa_entry->cipher_key;
+> +
+> +	for (idx = 0; idx < key_len / 8; idx++)
+> +		tmp_key[idx] = be64_to_cpu(tmp_key[idx]);
+> +
+> +	memcpy(&sa_entry->iv_gcm_salt, key + key_len, 4);
+> +	tmp_salt = (u32 *)&sa_entry->iv_gcm_salt;
+> +	*tmp_salt = be32_to_cpu(*tmp_salt);
 
-In a world of trusted BPF, I think you can get to some confidence that
-an attacker can't simply insert an arbitrary BPF program to do this and
-nor could they get into ring0 without compromising the kernel, so map
-freezing provides a reasonable measure of safety.  It's not perfect,
-but it's good enough.
+Maybe I messed it up, but this seems clearer to me:
 
-> The reply there about trusted user-space still needs to come with
-> better guarantees from the kernel, and the kernel can indeed give
-> better guarantees, which we will share. The reason for this is that
-> your trusted binary is not immune to attacks, and once an attacker
-> gains code execution as this trusted binary, there is no containing
-> the compromise.
+	void *key = x->aead->alg_key;
 
-This is whitelisting systemd again?  I think as a temporary measure
-until systemd gets on-board with BPF signing, a config parameter is not
-unreasonable.
+	...
 
-I also get the impression that there might be a disagreement over
-scope: what seems to be coming out of BPF is that every signing problem
-and scenario must be solved before signing can be considered
-acceptable; however, I think it's not unreasonable to attempt to cover
-a portion of the use cases and allow for future additions of things
-like policy so we can get some forward motion to allow others to play
-with it and produce patches based on their use cases.
+	sa_entry->iv_gcm_salt = be32_to_cpup(key + key_len);
 
-Regards,
 
-James
+> +
+> +	/* Write SA context data to memory before enabling */
+> +	wmb();
+> +
+> +	/* Enable SA */
+> +	sa_entry->sa_valid = 1;
+> +}
+> +
+>  static int cn10k_ipsec_get_hw_ctx_offset(void)
+>  {
+>  	/* Offset on Hardware-context offset in word */
 
+...
+
+> @@ -1316,8 +1450,96 @@ static int cn10k_ipsec_validate_state(struct xfrm_state *x,
+>  static int cn10k_ipsec_inb_add_state(struct xfrm_state *x,
+>  				     struct netlink_ext_ack *extack)
+>  {
+
+...
+
+> +	netdev_dbg(netdev, "inb_ctx_info: sa_index:%d spi:0x%x mcam_entry:%d"
+> +		   " hash_index:0x%x way:0x%x\n",
+
+Please don't split strings. It makes searching for them more difficult.
+This is an exception to the 80 column line length rule.
+Although you may want to consider making the string shorter.
+
+...
