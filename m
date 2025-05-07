@@ -1,109 +1,111 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8362E13AD38;
-	Wed,  7 May 2025 01:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D752149C55;
+	Wed,  7 May 2025 01:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746581747; cv=none; b=tGB5C/QZtjanPFBKOCZYmRU+CwT3cuIelwEVvGn1A04PrRStTdQ/wKHLj7ffmE1/nTA9BUjJU5cJbGEykEOoewVfB6Qi7N6s6ZKCBWhSV5Wnd7vhwm46UUYsI+sgFi2a0zFj3ELs6iN8M0VkhrAWNYlr3LmGbrDsW8QDmKUY2sI=
+	t=1746582123; cv=none; b=aBz3Vuzrdx4s58QjDG3pscCblSToyzfJNSGDYKg0K+E53U7IgKPtDu36LJM5gHwqpOHK0Pov9fgTwgf24UlXbhJc7VW5+D1xL3FaKslxseELTsixgCgKjnErLiUg+gEjBohFHrQvCtdLQlZhhHtxlmNQlIr5N9ceHMRJNtwWYgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746581747; c=relaxed/simple;
-	bh=zgD0KtQ6+c4Xt135Y5OUFoybXsZd/9SqcHvNmny7ARQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hJXv2hcSzaJxvZWsvReGUDfuD4Biz+xw4lEEOYCZlcw+vjo5d5goR9iX0Us2LmUa3xtAfLbNCLIN0poxEwjNSsouk4Y5N4ynO9ztOaYcUhTo4rMa6ryM1/2awnyo9+cEgOeJ57WqR67SKBwToyzRPS56kEKfVy/NxxBs8kkoQpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8Axz3PruBpoE4_XAA--.25331S3;
-	Wed, 07 May 2025 09:35:39 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMAxTsXduBpoXMO4AA--.49926S2;
-	Wed, 07 May 2025 09:35:28 +0800 (CST)
-Subject: Re: [PATCH v9 4/5] tpm: Add a driver for Loongson TPM device
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de,
- Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
-References: <20250506031947.11130-1-zhaoqunqin@loongson.cn>
- <20250506031947.11130-5-zhaoqunqin@loongson.cn>
- <2nuadbg5awe6gvagxg7t5ewvxsbmiq4qrcrycvnrmt2etzq2ke@6oyzavctwrma>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <0b148f09-d20d-b6be-d31b-6c8a553658c9@loongson.cn>
-Date: Wed, 7 May 2025 09:33:32 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1746582123; c=relaxed/simple;
+	bh=qs4Q9hRdyQqHCJ/m3kq7Qdz4g8t65SKuAV3aUXmA3RY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a235a5yMrCscu0aSrQBN93b4yO8DfIH8/v/gi4U8l4GQmTjgu/EpJRIFtKoKP1NEo7SFzuXlXOcEopgN+/PIg827umeOdz6QLFM2MIKDwMn+y72DxTAs33ZS8UcXAgeyDdCzxiGN3cfKtJJaYGrDW+FN2SvlzjsFnQ4Q3j1t6gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OddfQllT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OddfQllT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1LAjmB/BuVJhNma0CNS0ZtI4c20tsdSol77PmLcH6eY=; b=OddfQllTz1VCGdH1DC80AhtUTj
+	U6FW8c5ZWAC7ure5nx1gtrPgd+TAmQb0hJHi3p6QbulxogVmqvMk2UcXWtJfcX5y/oitHXbM0ht7o
+	uiGxNKho6OzxhM7bFJ03FWds1Ys8eMFKI3KE4B+8irwgZTkc20jajPvfTmf+tImmK6SZl8jVjhLC2
+	wM4EsuTBCbDoLdpBCOmCm3ktcwHMZt5Anvx8qqwT1Tgeh9XJwRYEfVvukbDNjeb8wUgVDwwIiJswp
+	P4XSNQD3c6JRR/QhO3nrFuu7q0YNaZNpJVa7FZKmITCdKoOT07xxZAffA4KrU6xiO24RjMviJhLgZ
+	JKAxbzpQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uCTnD-0046hM-2g;
+	Wed, 07 May 2025 09:41:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 May 2025 09:41:51 +0800
+Date: Wed, 7 May 2025 09:41:51 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: kernel test robot <lkp@intel.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-crypto@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-um@lists.infradead.org
+Subject: [PATCH] um: Include linux/types.h in asm/fpu/api.h
+Message-ID: <aBq6X-UYlQG9HUQd@gondor.apana.org.au>
+References: <202505070045.vWc04ygs-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2nuadbg5awe6gvagxg7t5ewvxsbmiq4qrcrycvnrmt2etzq2ke@6oyzavctwrma>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMAxTsXduBpoXMO4AA--.49926S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uw4DJr43GF43AFyfWrW3urX_yoW8Xw4DpF
-	WfCa1UGFs8Kr18CwsrJrWfZry3ZrZ5XFWDXFWDA347Crn8Awn5J34UZr4vv3WDAF48Gw1I
-	vFWI9rWF93Z8uFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
-	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
-	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
-	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202505070045.vWc04ygs-lkp@intel.com>
 
+On Wed, May 07, 2025 at 12:25:45AM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   9b9d4ef0cf750c514735bfd77745387b95cbddda
+> commit: 5b90a779bc547939421bfeb333e470658ba94fb6 [50/70] crypto: lib/sha256 - Add helpers for block-based shash
+> config: um-randconfig-001-20250506 (https://download.01.org/0day-ci/archive/20250507/202505070045.vWc04ygs-lkp@intel.com/config)
+> compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505070045.vWc04ygs-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202505070045.vWc04ygs-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    In file included from lib/crypto/sha256.c:14:
+>    In file included from include/crypto/internal/sha2.h:6:
+>    In file included from include/crypto/internal/simd.h:9:
+>    In file included from arch/x86/include/asm/simd.h:5:
+> >> arch/um/include/asm/fpu/api.h:14:15: error: unknown type name 'bool'
+>       14 | static inline bool irq_fpu_usable(void)
+>          |               ^
+> >> arch/um/include/asm/fpu/api.h:16:9: error: use of undeclared identifier 'true'
+>       16 |         return true;
+>          |                ^
+>    2 errors generated.
 
-在 2025/5/6 下午10:13, Stefano Garzarella 写道:
-> On Tue, May 06, 2025 at 11:19:46AM +0800, Qunqin Zhao wrote:
->> Loongson Security Engine supports random number generation, hash,
->> symmetric encryption and asymmetric encryption. Based on these
->> encryption functions, TPM2 have been implemented in the Loongson
->> Security Engine firmware. This driver is responsible for copying data
->> into the memory visible to the firmware and receiving data from the
->> firmware.
->>
->> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
->> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
->> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
->> ---
->> v9: "tpm_loongson_driver" --> "tpm_loongson"
->>    "depends on CRYPTO_DEV_LOONGSON_SE" --> "depends on MFD_LOONGSON_SE"
->>
-...
->> +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t 
->> count)
->> +{
->> +    struct loongson_se_engine *tpm_engine = 
->> dev_get_drvdata(&chip->dev);
->> +    struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
->> +
->> +    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
->
-> Should we limit the memcpy to `count`?
->
-> I mean, can happen that `count` is less than `cmd_ret->data_len`?
+I'll add this to the crypto tree if it's OK with the UML maintainers.
 
-Hi, Stefan, thanks for your comment.
+Thanks,
 
-Firmware ensures "cmd_ret->data_len" will be less than TPM_BUFSIZE,  so 
-this would never happen.
+---8<---
+Include linux/types.h before using bool.
 
-BR, Qunqin.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202505070045.vWc04ygs-lkp@intel.com/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->
-> Thanks,
-> Stefano
-
+diff --git a/arch/um/include/asm/fpu/api.h b/arch/um/include/asm/fpu/api.h
+index 71bfd9ef3938..3abf67c83c40 100644
+--- a/arch/um/include/asm/fpu/api.h
++++ b/arch/um/include/asm/fpu/api.h
+@@ -2,6 +2,8 @@
+ #ifndef _ASM_UM_FPU_API_H
+ #define _ASM_UM_FPU_API_H
+ 
++#include <linux/types.h>
++
+ /* Copyright (c) 2020 Cambridge Greys Ltd
+  * Copyright (c) 2020 Red Hat Inc.
+  * A set of "dummy" defines to allow the direct inclusion
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
