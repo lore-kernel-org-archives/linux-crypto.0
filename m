@@ -1,126 +1,199 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F5259CAD;
-	Wed,  7 May 2025 12:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435BD257AF6;
+	Wed,  7 May 2025 12:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746620719; cv=none; b=QdkteynTQiWrwCjYBBF3j/unbvTskH01vg6vpAtPXsf7QG2q4rCkvkvqR+DZncikbCt1iRaIyyrR4Fk9rqPTKg8XgBPkXs5tRUXuJeidPvUvp81o5XT/VOik4okA6nk82mnuobX9TkIKBrUpnRbChabZ34sEV0SpiufzuJWHsrI=
+	t=1746621390; cv=none; b=r/a84wLqZaOpkENZ3BheIcfTM5wTJRHIGXxAbuFN+5igqyCGPdoRyzTkglmxTzr9yxDk6o5zTf6rkP8EksNeJq+XOuBzAe9hBLiMf6HoLsBS78Sha2zO1YYPMgjtZXnNc2MgSirV9tV5DrYup21WtKArfp1xb9xuuSEeQpAbq6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746620719; c=relaxed/simple;
-	bh=cz40EnS6pZZHgaOIDczKlc1lZuundH2EUfYDCvefvIU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J7tuiUQS2kXrnUcuKfNjmq/RsZNQWuJWe2usFQYyyseQ6yjFyVLujejBiWuAqyLoH5ztg6h0Loz5fNAP5FBiFCzjA45Se073GthsqEN8bNXHuINTwFZ/NfRkVgVx4ZmQ9BMwNfW+4yXbYMBpdA8NjJVE6xSIhaqd6zkLO8ZgMPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=a5i+89Pi; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1746621390; c=relaxed/simple;
+	bh=MwSEEjKCjF/7nGabal+tGMtp0qVnx0UYQgD2hVtyBfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gASyehfRM8U7b/dLowJq7RYrj60YoMtyCKEFSQ3+5dgVvvyBeAkckHm0G6PyapY88O1CZOjCp9lzAZKblxDNMpng0k/U/lmxqpVPXl7IxPkRagYdowDo58FspKx13CTAhKHGV1STd4aQaY2xqm14BgPkXbAYdFYVGHVuOON3Yos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nh4etkXD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="a5i+89Pi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=bghoxTN5gGRzwdkYPy7tq46B/hDeom/4Jnnum0OS7Po=; t=1746620717;
-	x=1747052717; b=a5i+89PiyohIg9rHfMMrLbZCM5851GmsoqvVdnD+raZY0CR83AlQyyCL8OhTa
-	D+8V26DT/Qo0W4Ntvwb0KBVpUXnHjm2tIs34e6jzpc1rtpCqGkTGVFRyOtXwhfxfKQg2BLRb9XcMs
-	8OJdOjdHe6ZdtTPMPwuMkpr0i2vfJxTMftTianDqGz6GUM38xSUt7Oh9aPNqVshrP37PVdosboF1r
-	MYxjdubpqOG+KQPRYz8uBru/+JGCIwDlGFTasBBqXUTJoEa7J4oxaxQoAW1M8aY7hmNp6RaAs1lkh
-	sl6kfId8JHJfWTKWkptG0P5H/ieXm/9b9u7PLokKlaOCrJyMsQ==;
-Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1uCdpq-000wKB-38;
-	Wed, 07 May 2025 14:25:15 +0200
-Message-ID: <2b3aa30e-632d-4013-8bc2-d3ff8a2478b9@leemhuis.info>
-Date: Wed, 7 May 2025 14:25:14 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nh4etkXD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF24C4CEE7;
+	Wed,  7 May 2025 12:36:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746621389;
+	bh=MwSEEjKCjF/7nGabal+tGMtp0qVnx0UYQgD2hVtyBfk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Nh4etkXD2QmdXeFIxepaVQ36xE/CnoqL71J4FagfBBbAJsZH9WfLTDXPDHB7PMjNQ
+	 0Ey6JCc5Cty+Ne91cafy6vhdUgF9t/0UDambHAc0jt0Y+7lmZdzxXzwivE1+MCffeA
+	 /l4MHYO9yaCaueOyI/2h2/CMqptIWq7QNgHMKXVkeazg/LdYmjcORZh/kQqQ8VQINx
+	 4QlwnqJVsaIqTYShXwG+epsnC9Pj1pRvyHmnM8BK6E1WlbkCLGoJ7CWk5Mr3Zb/EiN
+	 Mwlpzt5drHPEuaRZYEAeSyIV+SYm6FFHiN3FPuMB3vO+/EXKF2g3yPIAwjFbQ6fgvo
+	 zmzfu0CrynEvg==
+Date: Wed, 7 May 2025 13:36:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com, Rakesh Kudurumalla <rkudurumalla@marvell.com>
+Subject: Re: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT
+ second pass
+Message-ID: <20250507123622.GB3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-7-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: powerpc/poly1305 - Add missing poly1305_emit_arch
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <cover.1745815528.git.herbert@gondor.apana.org.au>
- <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
- <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
- <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
-From: Thorsten Leemhuis <linux@leemhuis.info>
-Content-Language: de-DE, en-US
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 n7RI
-In-Reply-To: <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1746620717;d0428d41;
-X-HE-SMSGID: 1uCdpq-000wKB-38
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-7-tanmay@marvell.com>
 
-On 07.05.25 13:36, Herbert Xu wrote:
-> On Wed, May 07, 2025 at 01:03:06PM +0200, Thorsten Leemhuis wrote:
->>
->> """
->> ld: warning: discarding dynamic section .glink
->> ld: warning: discarding dynamic section .plt
->> ld: linkage table error against `poly1305_emit_arch'
->> ld: stubs don't match calculated size
->> ld: can not build stubs: bad value
->> ld: lib/crypto/poly1305.o: in function `poly1305_final':
->> /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x2dc): undefined reference to `poly1305_emit_arch'
->> ld: /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x378): undefined reference to `poly1305_emit_arch'
->> make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux] Error 1
->> make[1]: *** [/builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/Makefile:1250: vmlinux] Error 2
->> """
+On Fri, May 02, 2025 at 06:49:47PM +0530, Tanmay Jagdale wrote:
+> From: Rakesh Kudurumalla <rkudurumalla@marvell.com>
 > 
-> Oops, the powerpc patch was missing the assembly part:
+> Implemented mailbox to add mechanism to allocate a
+> rq_mask and apply to nixlf to toggle RQ context fields
+> for CPT second pass packets.
+> 
+> Signed-off-by: Rakesh Kudurumalla <rkudurumalla@marvell.com>
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
-Ha, happens, thx for providing the patch this quickly, it did
-the trick for me:
+...
 
-Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> index 7fa98aeb3663..18e2a48e2de1 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> @@ -544,6 +544,7 @@ void rvu_program_channels(struct rvu *rvu)
+>  
+>  void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
+>  {
+> +	struct rvu_hwinfo *hw = rvu->hw;
+>  	int blkaddr = nix_hw->blkaddr;
+>  	u64 cfg;
+>  
+> @@ -558,6 +559,16 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
+>  	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CFG);
+>  	cfg |= BIT_ULL(1) | BIT_ULL(2);
 
-Ciao, Thorsten
+As per my comments on an earlier patch in this series:
+bits 1 and 2 have meaning. It would be nice to use a #define to
+convey this meaning to the reader.
+
+>  	rvu_write64(rvu, blkaddr, NIX_AF_CFG, cfg);
+> +
+> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST);
+> +
+> +	if (!(cfg & BIT_ULL(62))) {
+> +		hw->cap.second_cpt_pass = false;
+> +		return;
+> +	}
+> +
+> +	hw->cap.second_cpt_pass = true;
+> +	nix_hw->rq_msk.total = NIX_RQ_MSK_PROFILES;
+>  }
+>  
+>  void rvu_apr_block_cn10k_init(struct rvu *rvu)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> index 6bd995c45dad..b15fd331facf 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> @@ -6612,3 +6612,123 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
+>  
+>  	return ret;
+>  }
+> +
+> +static inline void
+> +configure_rq_mask(struct rvu *rvu, int blkaddr, int nixlf,
+> +		  u8 rq_mask, bool enable)
+> +{
+> +	u64 cfg, reg;
+> +
+> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf));
+> +	reg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_CFG(nixlf));
+> +	if (enable) {
+> +		cfg |= BIT_ULL(43);
+> +		reg = (reg & ~GENMASK_ULL(36, 35)) | ((u64)rq_mask << 35);
+> +	} else {
+> +		cfg &= ~BIT_ULL(43);
+> +		reg = (reg & ~GENMASK_ULL(36, 35));
+> +	}
+
+Likewise for the bit, mask, and shift here.
+
+And I think that using FIELD_PREP with another mask in place of the shift
+is also appropriate here.
+
+> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf), cfg);
+> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_CFG(nixlf), reg);
+> +}
+> +
+> +static inline void
+> +configure_spb_cpt(struct rvu *rvu, int blkaddr, int nixlf,
+> +		  struct nix_rq_cpt_field_mask_cfg_req *req, bool enable)
+> +{
+> +	u64 cfg;
+> +
+> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf));
+> +	if (enable) {
+> +		cfg |= BIT_ULL(37);
+> +		cfg &= ~GENMASK_ULL(42, 38);
+> +		cfg |= ((u64)req->ipsec_cfg1.spb_cpt_sizem1 << 38);
+> +		cfg &= ~GENMASK_ULL(63, 44);
+> +		cfg |= ((u64)req->ipsec_cfg1.spb_cpt_aura << 44);
+> +	} else {
+> +		cfg &= ~BIT_ULL(37);
+> +		cfg &= ~GENMASK_ULL(42, 38);
+> +		cfg &= ~GENMASK_ULL(63, 44);
+> +	}
+
+And here too.
+
+> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf), cfg);
+> +}
+
+...
+
+> +int rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
+> +					  struct nix_rq_cpt_field_mask_cfg_req *req,
+> +					  struct msg_rsp *rsp)
+
+It would be nice to reduce this to 80 columns wide or less.
+Perhaps like this?
+
+int
+rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
+				      struct nix_rq_cpt_field_mask_cfg_req *req,
+				      struct msg_rsp *rsp)
+
+Or perhaps by renaming nix_rq_cpt_field_mask_cfg_req to be shorter.
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+> index 245e69fcbff9..e5e005d5d71e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+> @@ -433,6 +433,8 @@
+>  #define NIX_AF_MDQX_IN_MD_COUNT(a)	(0x14e0 | (a) << 16)
+>  #define NIX_AF_SMQX_STATUS(a)		(0x730 | (a) << 16)
+>  #define NIX_AF_MDQX_OUT_MD_COUNT(a)	(0xdb0 | (a) << 16)
+> +#define NIX_AF_RX_RQX_MASKX(a, b)       (0x4A40 | (a) << 16 | (b) << 3)
+> +#define NIX_AF_RX_RQX_SETX(a, b)        (0x4A80 | (a) << 16 | (b) << 3)
+
+FIELD_PREP could be used here in conjunction with #defines
+for appropriate masks here too.
+
+>  
+>  #define NIX_PRIV_AF_INT_CFG		(0x8000000)
+>  #define NIX_PRIV_LFX_CFG		(0x8000010)
+
+...
