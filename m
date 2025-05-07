@@ -1,71 +1,58 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CE223C50E;
-	Wed,  7 May 2025 07:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEE672610;
+	Wed,  7 May 2025 08:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604746; cv=none; b=XMG8YB1VA8jqrBCxhcr+FwzbjM96gqk4kv4JiLp/bz+elbKk+IKzbMiZ2SXGBNVq9+TgOqCGW5mFpnD/S0IHZiabeWcaCR+GfQFUQ5l5ClRUsnBCNOXBkRdTz7uPMbMVKd/TAyPEJ4N14NsDJtnUKn+ZUQjBxJc+f0625koaimk=
+	t=1746607444; cv=none; b=Y43XFMyq3fGnbLlp1P4IJNpsVd/lxORq9hQt0S1/8k6KvB0ybrzWG+X5eEjHkyB6BJN8++PSME16G3azFo/3fpa7rPfHRiEabyavOJSrEsU1PgNzk03RLcg+zrnseGieSeNU4TSTTo++3IIpu65AUi9Cyx6slXjfDT8BaDEsvMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604746; c=relaxed/simple;
-	bh=e/9srmYivr2j7snT9tUmZWrhhMUFEDe4ILwhbNTCrl8=;
+	s=arc-20240116; t=1746607444; c=relaxed/simple;
+	bh=u3Fb8+gokSMQzhf+2mR0lZJLnZv3ZY4xGY2UaMpzyVU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CKa2Amz7ufOCrwOTUW5Q74xboOcx7lmqyI4Qp88+6usM+21XwalifPxR4H/8nk/3HNhNwT5NHI5z6XtsVOegHi4wwwDSKmTohKVSwFmeV3sI41+n//4nNTaauzxwlilZRLArSEA1HzC6KcJVOd/iArW7NW6v3DscDsc1caHGKN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bOAGQg3a; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIvuQ5ntDLZKeljdDbFM0tyR2YiXE9P5+2U13uBMSwEGK0l2TZPiroeSZL6gXTuMwI4Jg98Uslyw3vQ/m0R6v0H+icXG/UZiwAi1KNzsGAr7kSl0N3VfLgUapTKkKBOqlIG0cF+v3YvwJZgN7dmrdsFT1ZUZJ1HzkgO01HHQBIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ojHfJixQ; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bOAGQg3a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746604745; x=1778140745;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e/9srmYivr2j7snT9tUmZWrhhMUFEDe4ILwhbNTCrl8=;
-  b=bOAGQg3aZ+LUKqVuR+4Qo6vcwVrR3aw6bQaIQZUuiwv9WNco2aQyuW2Q
-   7O6bLVQw0jmumYjMPgTlqCMjsXelQ4pn394fdGhbQly8CPJNLWy1n5GxK
-   X13+efxKbZ5GW5co7jdgQm/5VqOcZgahFjgLoyl4Rz4IXkJ5HqzLz4flL
-   Z1uSvNTs3NjOqpoqfKq0gSEXzxjw1ax6yEFuhsy68z3Z2V+HA+fVrErsi
-   Tf0kuCs1gh38BtYKyByLKqG9i4JdaGVG+V5mos/wrn5rFHBz6vRtHdco+
-   wZbcFhppl84XIXy5GUgNfs2jLPDW1Hzc9HG8XEmeX5wKid9Xw93PWqYtW
-   w==;
-X-CSE-ConnectionGUID: 79w0Z3TuQLOoCju7LK9/JQ==
-X-CSE-MsgGUID: ex5vPLfhSsSvE9zGyHLXWQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="65727580"
-X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="65727580"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 00:59:04 -0700
-X-CSE-ConnectionGUID: ftQEJui7QoesuiniqJ53Tw==
-X-CSE-MsgGUID: eJ37biI+Rmu6BzW/07IiLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="140619565"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 07 May 2025 00:58:57 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uCZg6-0007N1-2A;
-	Wed, 07 May 2025 07:58:54 +0000
-Date: Wed, 7 May 2025 15:58:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tanmay Jagdale <tanmay@marvell.com>, bbrezillon@kernel.org,
-	arno@natisbad.org, schalla@marvell.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, sgoutham@marvell.com, lcherian@marvell.com,
-	gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
-	sbhatta@marvell.com, andrew+netdev@lunn.ch, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bbhushan2@marvell.com,
-	bhelgaas@google.com, pstanner@redhat.com,
-	gregkh@linuxfoundation.org, peterz@infradead.org, linux@treblig.org,
-	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
-	gcherian@marvell.com, Rakesh Kudurumalla <rkudurumalla@marvell.com>
-Subject: Re: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT
- second pass
-Message-ID: <202505071511.neU9Siwr-lkp@intel.com>
-References: <20250502132005.611698-7-tanmay@marvell.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ojHfJixQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=WUKmBmR4aG6kGIrfVbpySDx42tAvNoBV6Fg6tQriHps=; b=ojHfJixQLHaHVmpsVsNMFE7Os7
+	LIntKZ6xdR89Sdd7977O+VMgBWU+SqadN1J/VRabJ6GFemLvyQE6EkrD+4CoNn655Wl4UX/SOSQLZ
+	ouj7XKAP4LmvWKUGlU/SxtTkCFHTEtTTWsGLprrelyn5OS/ok0VpVnuI4s1gW6s/t7wjj4AiEubzV
+	FNMFAj4Hkq0Y+DcKqF8E0UKgv8s9M8qiTFnQ2lW+ULRQQHEG/AtDQkyoJ53grdKOTx7UFc117AiqB
+	5L0USZ3jHVGJgFvWz8JsAM86ydLjxBKK5vhIKZQ17NoykBC8+1FiTuEMGzRUA/Vm27y3GGYbG8WzR
+	swoLyiYA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uCaNg-004CNi-1U;
+	Wed, 07 May 2025 16:43:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 May 2025 16:43:56 +0800
+Date: Wed, 7 May 2025 16:43:56 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@gmail.com>
+Subject: [PATCH] crypto: marvell/cesa - Do not chain submitted requests
+Message-ID: <aBsdTJUAcQgW4ink@gondor.apana.org.au>
+References: <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
+ <ZwZAExmK52txvHE8@gondor.apana.org.au>
+ <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
+ <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
+ <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
+ <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+ <Zw31JIEyh28vK9q7@gondor.apana.org.au>
+ <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+ <Zw9AsgqKHJfySScx@gondor.apana.org.au>
+ <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,70 +61,177 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-7-tanmay@marvell.com>
+In-Reply-To: <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
 
-Hi Tanmay,
+On Tue, May 06, 2025 at 09:19:04PM +0800, Herbert Xu wrote:
+>
+> I haven't figured out exactly what's wrong with tdma, although
+> the chaining IRQ completion handling looks a bit fragile in that
+> if something goes wrong it'll simply mark all queued requests as
+> complete, corrupting any requests that have not yet been sent to
+> the hardware.
 
-kernel test robot noticed the following build warnings:
+I'm fairly confident that I've found the culprit.  Please try this
+patch and see if it makes tdma work again:
 
-[auto build test WARNING on net-next/main]
+---8<---
+This driver tries to chain requests together before submitting them
+to hardware in order to reduce completion interrupts.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250502-213203
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250502132005.611698-7-tanmay%40marvell.com
-patch subject: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT second pass
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250507/202505071511.neU9Siwr-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071511.neU9Siwr-lkp@intel.com/reproduce)
+However, it even extends chains that have already been submitted
+to hardware.  This is dangerous because there is no way of knowing
+whether the hardware has already read the DMA memory in question
+or not.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505071511.neU9Siwr-lkp@intel.com/
+Fix this by splitting the chain list into two.  One for submitted
+requests and one for requests that have not yet been submitted.
+Only extend the latter.
 
-All warnings (new ones prefixed by >>):
+Reported-by: Klaus Kudielka <klaus.kudielka@gmail.com>
+Fixes: 85030c5168f1 ("crypto: marvell - Add support for chaining crypto requests in TDMA mode")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ drivers/crypto/marvell/cesa/cesa.c |  2 +-
+ drivers/crypto/marvell/cesa/cesa.h |  9 +++--
+ drivers/crypto/marvell/cesa/tdma.c | 54 ++++++++++++++++++------------
+ 3 files changed, 40 insertions(+), 25 deletions(-)
 
->> drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6723:6: warning: variable 'rq_mask' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-    6723 |         if (req->ipsec_cfg1.rq_mask_enable) {
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6729:41: note: uninitialized use occurs here
-    6729 |         configure_rq_mask(rvu, blkaddr, nixlf, rq_mask,
-         |                                                ^~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6723:2: note: remove the 'if' if its condition is always true
-    6723 |         if (req->ipsec_cfg1.rq_mask_enable) {
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6710:13: note: initialize the variable 'rq_mask' to silence this warning
-    6710 |         int rq_mask, err;
-         |                    ^
-         |                     = 0
-   1 warning generated.
-
-
-vim +6723 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-
-  6702	
-  6703	int rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
-  6704						  struct nix_rq_cpt_field_mask_cfg_req *req,
-  6705						  struct msg_rsp *rsp)
-  6706	{
-  6707		struct rvu_hwinfo *hw = rvu->hw;
-  6708		struct nix_hw *nix_hw;
-  6709		int blkaddr, nixlf;
-  6710		int rq_mask, err;
-  6711	
-  6712		err = nix_get_nixlf(rvu, req->hdr.pcifunc, &nixlf, &blkaddr);
-  6713		if (err)
-  6714			return err;
-  6715	
-  6716		nix_hw = get_nix_hw(rvu->hw, blkaddr);
-  6717		if (!nix_hw)
-  6718			return NIX_AF_ERR_INVALID_NIXBLK;
-  6719	
-  6720		if (!hw->cap.second_cpt_pass)
-  6721			return NIX_AF_ERR_INVALID_NIXBLK;
-  6722	
-> 6723		if (req->ipsec_cfg1.rq_mask_enable) {
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index fa08f10e6f3f..9c21f5d835d2 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -94,7 +94,7 @@ static int mv_cesa_std_process(struct mv_cesa_engine *engine, u32 status)
+ 
+ static int mv_cesa_int_process(struct mv_cesa_engine *engine, u32 status)
+ {
+-	if (engine->chain.first && engine->chain.last)
++	if (engine->chain_hw.first && engine->chain_hw.last)
+ 		return mv_cesa_tdma_process(engine, status);
+ 
+ 	return mv_cesa_std_process(engine, status);
+diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
+index d215a6bed6bc..50ca1039fdaa 100644
+--- a/drivers/crypto/marvell/cesa/cesa.h
++++ b/drivers/crypto/marvell/cesa/cesa.h
+@@ -440,8 +440,10 @@ struct mv_cesa_dev {
+  *			SRAM
+  * @queue:		fifo of the pending crypto requests
+  * @load:		engine load counter, useful for load balancing
+- * @chain:		list of the current tdma descriptors being processed
+- *			by this engine.
++ * @chain_hw:		list of the current tdma descriptors being processed
++ *			by the hardware.
++ * @chain_sw:		list of the current tdma descriptors that will be
++ *			submitted to the hardware.
+  * @complete_queue:	fifo of the processed requests by the engine
+  *
+  * Structure storing CESA engine information.
+@@ -463,7 +465,8 @@ struct mv_cesa_engine {
+ 	struct gen_pool *pool;
+ 	struct crypto_queue queue;
+ 	atomic_t load;
+-	struct mv_cesa_tdma_chain chain;
++	struct mv_cesa_tdma_chain chain_hw;
++	struct mv_cesa_tdma_chain chain_sw;
+ 	struct list_head complete_queue;
+ 	int irq;
+ };
+diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
+index 388a06e180d6..40fcc852adfa 100644
+--- a/drivers/crypto/marvell/cesa/tdma.c
++++ b/drivers/crypto/marvell/cesa/tdma.c
+@@ -38,6 +38,15 @@ void mv_cesa_dma_step(struct mv_cesa_req *dreq)
+ {
+ 	struct mv_cesa_engine *engine = dreq->engine;
+ 
++	spin_lock_bh(&engine->lock);
++	if (engine->chain_sw.first == dreq->chain.first) {
++		engine->chain_sw.first = NULL;
++		engine->chain_sw.last = NULL;
++	}
++	engine->chain_hw.first = dreq->chain.first;
++	engine->chain_hw.last = dreq->chain.last;
++	spin_unlock_bh(&engine->lock);
++
+ 	writel_relaxed(0, engine->regs + CESA_SA_CFG);
+ 
+ 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
+@@ -96,25 +105,28 @@ void mv_cesa_dma_prepare(struct mv_cesa_req *dreq,
+ void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
+ 			struct mv_cesa_req *dreq)
+ {
+-	if (engine->chain.first == NULL && engine->chain.last == NULL) {
+-		engine->chain.first = dreq->chain.first;
+-		engine->chain.last  = dreq->chain.last;
++	struct mv_cesa_tdma_desc *last = engine->chain_sw.last;
++
++	/*
++	 * Break the DMA chain if the request being queued needs the IV
++	 * regs to be set before lauching the request.
++	 */
++	if (!last || dreq->chain.first->flags & CESA_TDMA_SET_STATE) {
++		engine->chain_sw.first = dreq->chain.first;
++		engine->chain_sw.last  = dreq->chain.last;
+ 	} else {
+-		struct mv_cesa_tdma_desc *last;
+-
+-		last = engine->chain.last;
+ 		last->next = dreq->chain.first;
+-		engine->chain.last = dreq->chain.last;
+-
+-		/*
+-		 * Break the DMA chain if the CESA_TDMA_BREAK_CHAIN is set on
+-		 * the last element of the current chain, or if the request
+-		 * being queued needs the IV regs to be set before lauching
+-		 * the request.
+-		 */
+-		if (!(last->flags & CESA_TDMA_BREAK_CHAIN) &&
+-		    !(dreq->chain.first->flags & CESA_TDMA_SET_STATE))
+-			last->next_dma = cpu_to_le32(dreq->chain.first->cur_dma);
++		last->next_dma = cpu_to_le32(dreq->chain.first->cur_dma);
++		last = dreq->chain.last;
++		engine->chain_sw.last = last;
++	}
++	/*
++	 * Break the DMA chain if the CESA_TDMA_BREAK_CHAIN is set on
++	 * the last element of the current chain.
++	 */
++	if (last->flags & CESA_TDMA_BREAK_CHAIN) {
++		engine->chain_sw.first = NULL;
++		engine->chain_sw.last = NULL;
+ 	}
+ }
+ 
+@@ -127,7 +139,7 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 
+ 	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
+ 
+-	for (tdma = engine->chain.first; tdma; tdma = next) {
++	for (tdma = engine->chain_hw.first; tdma; tdma = next) {
+ 		spin_lock_bh(&engine->lock);
+ 		next = tdma->next;
+ 		spin_unlock_bh(&engine->lock);
+@@ -149,12 +161,12 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 								 &backlog);
+ 
+ 			/* Re-chaining to the next request */
+-			engine->chain.first = tdma->next;
++			engine->chain_hw.first = tdma->next;
+ 			tdma->next = NULL;
+ 
+ 			/* If this is the last request, clear the chain */
+-			if (engine->chain.first == NULL)
+-				engine->chain.last  = NULL;
++			if (engine->chain_hw.first == NULL)
++				engine->chain_hw.last  = NULL;
+ 			spin_unlock_bh(&engine->lock);
+ 
+ 			ctx = crypto_tfm_ctx(req->tfm);
+-- 
+2.39.5
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
