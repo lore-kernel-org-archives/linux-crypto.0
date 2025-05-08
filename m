@@ -1,317 +1,193 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14E628A1D2
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 19:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746732223; cv=none; b=faHr/Xe025TIJLWtHaHvxCbIOf7HYcTP7WoJRH6luUm1ouWtkfA54SXI0Kj8kuUvx9iVHjBGbfL2kd9IAkD/xoPhz/fRZyPShrd0enllxBPX8SKV1MHxR8oLTkOxcLFf7jLtoD10UUWiZnF8deHPL6ERLYMUzeCB+wtjdLiw46o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746732223; c=relaxed/simple;
-	bh=HeIkrf/DTlLp0c59YdqAg+bDkVLnbRSgjhYsmzND7tI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C55HZQmeqsJ/u8xTJxy0MunIvo87G/BDBAxSGFeJ+sUm+24RRQ9dWn49gzZ3K32f19eaZdCr5hNI4twgD/nqk352WoFT05S3QoUxguWHcTdy3d/O7FaXdYhBE/FQpCFuGZb/lDoggR3ClQ42p5ou5JwV9KRvbATcYINNDe3KoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Tyxz/fox; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DF41F582E;
+	Thu,  8 May 2025 19:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746732345; cv=fail; b=cnxOfjkEhPFRO1wj174meQW4h05DqTQ42lp/tRsx1Bays1Dr/YCCXbAEjYRxtVOZPZRRjM0c/zpFV0Ggf2pTFktMKfdyIfYxL1q8jFk11fb0wQadEDfrQmwJPnXYezXNUaEoSDxYlri/524iATYJcKp8U93nQmo6hyYjjages5Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746732345; c=relaxed/simple;
+	bh=Asxum+uEy+Ytvi2IrZXa2qd+C7YRw/DkLzG2I6sI90E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=S63lXhz/XTIhcCqRYlEPQ7UGUi+qKnvpsl/PzpMfUxQJhKKwCOED/YC/SXnj0gxG8xV7G6gqbO6sw7eDpXSp4/n+NdxZ8scdkOl+jUZ1fsbmSRRfB8706RBChy9zEvj8XLY/nR0WBe3zEr42oRKj1DbePAgRYLSE6v/iS4Rjbtw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l6wvlDUk; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Tyxz/fox"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-708d90aa8f9so13268287b3.3
-        for <linux-crypto@vger.kernel.org>; Thu, 08 May 2025 12:23:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1746732219; x=1747337019; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yRhUkqEtn8po9SOqhjXsORJmLCNwN2s1m7eTeLsarYo=;
-        b=Tyxz/foxfwZ4j6csDDPw8SfNzdqM6hx0uRJrzTvmrqBu1gyw+UtQm+RqkDQ2t2y9kZ
-         RXc8vdyGNE2T96ys79BRYJEqAoMadivU5a0hb7k9cHf/V0RWsqrlZbW4DwSssaxpDKKC
-         dCgT9orpLEFjhDDlzBRQNtHlRbdZZoYZ/Dr2WuOjJkfVrwssJ9FqBMGBMiV0DbL3gl0V
-         IvT6Ryd86G7aSljGIQ7LUlGcvQPq/lXWSEFv2EBs462pHpf31Wc/wZf1dVv1xutRr1QG
-         aanSsvP2Z0iOlx8vjJSwZC/75Y/YzYVUeDnbd65E9wH8TtjQCQGqVjDvcBe3g4LMJo64
-         JPdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746732219; x=1747337019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yRhUkqEtn8po9SOqhjXsORJmLCNwN2s1m7eTeLsarYo=;
-        b=DyyzsgcAyETRcq5/njLXTpEWoY+2EAJm3My26rH/8u7KposrdRHgxB6g8ulZAJ7s+m
-         iDcM12gqEGK8KYaAlsi/RE7fE9u6Mllm1Z1hAuBMHiwH67g2qr5MjBHCXwu5BQDCbcFc
-         cD4rPvVyswqUpQ/ovGhX2s55fosjBovufmczp01ZcNK1cBMd0FnQWndAw/QwBuu+6tZD
-         w0+0lHCh2TrOkErggnOHO4jUhkOn+Pi8888Sy5MuZ+NNsijtjcj/Bj2GEUuxhFMUqEFk
-         jrIWoYxwV1ndRw/+vlr7KlvMMQUzuJKLvS57Bf3hSjak9Qg4hsWoFvWDtt0ijyx6D5mn
-         bIqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxMU4xecwTQ3LhOK8aYq1mHcAdCd/i542uozhaFE1OInZ6VL9x6+ekJ6FMYIg1Hn3I2DFRrw/hSI0V4VA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxhd8yHpR7gOYVzaGeYZ/jYsOtz029kXxKLCIARoEEluhpEzPww
-	Szhoui90lOe9vC/fGvU3Gqc8eE1IQKpo34+JJ5g9ITChgfz7bhVup7GrOJ3dKmknyYY//+vGBar
-	PWRt0fX5zGvA5S4YwRp9n2Q32G5XXJAHI0UJR
-X-Gm-Gg: ASbGncvk3r/IDFmQME214qPaB6h/m0EVHHjui9L4+M/17iQtsQlB/KXJpQtv96TjpKd
-	fLO8RngtYs+EdEWr3+3/QUSHruN4Vjx3uli05WB4hQaE3p+ZY7eQGMOCksbLK3reJ49ciPj6cPp
-	E4libWwbzkqq9pq8e1O5S242H4hcX/PUgD
-X-Google-Smtp-Source: AGHT+IED/fFzObiqlk4Rt9s6INYP5yEdYEWukKq9oUrT2cbOt6YSVHmtA8/2kHDXPkHkmR//EUTs9/SW8Ppo8a3d4F0=
-X-Received: by 2002:a05:690c:201f:b0:702:5134:aaac with SMTP id
- 00721157ae682-70a3f9e40bfmr7935957b3.2.1746732219206; Thu, 08 May 2025
- 12:23:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l6wvlDUk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746732343; x=1778268343;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Asxum+uEy+Ytvi2IrZXa2qd+C7YRw/DkLzG2I6sI90E=;
+  b=l6wvlDUkBr11UUKl8tI2XzYxPcw4MXOKJqqPH9pMg7yXqz3g7obugq1O
+   ULcBNLZPApOFhO9pghJvnXWOwgcLdnZWjw3tvpNLDKmTD7eihW5Qg4+8f
+   sDCPVgROAAewX9qapZGIzHzKi8le5TvPrTWRblTeSzg4Rq8djirXfx+na
+   sHp2QShh1LxNZmJnktayuy6V5FdSY92rdVt1dq65/tSn5BGOq3qOkyNFo
+   JoVILRHD2Bn5+X4BpYBOcXja35H7ZnN0n+uYvD36XDkhKNVjIUSAir8TX
+   TBVKPoGnV+BDBv5N3XBJVGm1TCtKyDRcYV/ploMNwx5Zf3R5NMUBgaWis
+   w==;
+X-CSE-ConnectionGUID: 4qf6WVdWQ/Srm6qDLye5mg==
+X-CSE-MsgGUID: x78YXSPBRna83t/q4EEt5g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="59201638"
+X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
+   d="scan'208";a="59201638"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 12:25:43 -0700
+X-CSE-ConnectionGUID: C2V7h/GgTZOh+KjPJ0nymQ==
+X-CSE-MsgGUID: 7eGTls9UR2mUvrq7alWyCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
+   d="scan'208";a="136399026"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 12:25:42 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 8 May 2025 12:25:42 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 8 May 2025 12:25:42 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 8 May 2025 12:25:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ETLn0PZi3gYr2Hu68BZmW1uNtHQKljo6yrvbsJke/whEqqerH2JhqKbBylMBv00cgqTW/1GNHOCPJZunsccG6LyT0KfFKR2rM1tCuzYW735xX7zPqj5Xhq7DX147UqCI7w3HEZwOzXK4O4Rq4ZBX0Yr6Bch3fW/rkAD+J6Fv8bwODAxlVIwzAUj2omFurhNQwDBa09JA17okdJLwrb017bSDsO6EekcQQZaOqj1baq7bTZmwv55HxWh42Cri4nYivB4x3rR4tBp9xBN79eZL9IWM23x15UcaUw7nnI/L23sLOjn9mTfYt4N18ImNYO9AYEgo+tAxpE0SinLac4uBqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Asxum+uEy+Ytvi2IrZXa2qd+C7YRw/DkLzG2I6sI90E=;
+ b=ndWMcgsvzVvuCrNfZ9murGZ6SKsRCupi8Y20tdoUICLr3GmCyMjJll9UWCBUKjbzI4tzsHRmELXrCjbATmK7yySn1T5PqaZuI81skoqrUb+iXB3YEOP+5G+8JN6gnWbnwmYKBBsc1x5zoAqnNRufuv5K4/uKcNZrIZGG+pJ5D2Ld3MYbs4JynlJ4bD/n1epEX+GyfXNibtbKAZlHIKffmJ+GjSyb7uPh4mYzrRYPYB1vTYpAVoo1kxJBxV79cxvreB1IvST0wZ5fLB143qF5hYUjJYpGcmDguVNCFmUKU+D9MGO7Plky1OJyLktYWNyp/NsrZXILM7mu9/DcgPYjGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB8121.namprd11.prod.outlook.com (2603:10b6:510:234::14)
+ by PH8PR11MB6802.namprd11.prod.outlook.com (2603:10b6:510:1ca::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Thu, 8 May
+ 2025 19:25:08 +0000
+Received: from PH7PR11MB8121.namprd11.prod.outlook.com
+ ([fe80::ec4e:64cf:cf1f:daab]) by PH7PR11MB8121.namprd11.prod.outlook.com
+ ([fe80::ec4e:64cf:cf1f:daab%6]) with mapi id 15.20.8722.020; Thu, 8 May 2025
+ 19:25:08 +0000
+From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev"
+	<chengming.zhou@linux.dev>, "usamaarif642@gmail.com"
+	<usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com"
+	<ying.huang@linux.alibaba.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org"
+	<ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C"
+	<kristen.c.accardi@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>
+CC: "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
+	<vinodh.gopal@intel.com>, "senozhatsky@chromium.org"
+	<senozhatsky@chromium.org>, "Sridhar, Kanchana P"
+	<kanchana.p.sridhar@intel.com>
+Subject: RE: [PATCH v9 00/19] zswap compression batching
+Thread-Topic: [PATCH v9 00/19] zswap compression batching
+Thread-Index: AQHbuhHkPoir1/4ImUuqCyXQmSE43bPJKO2g
+Date: Thu, 8 May 2025 19:25:08 +0000
+Message-ID: <PH7PR11MB81216A7376042A198C323708C98BA@PH7PR11MB8121.namprd11.prod.outlook.com>
+References: <20250430205305.22844-1-kanchana.p.sridhar@intel.com>
+In-Reply-To: <20250430205305.22844-1-kanchana.p.sridhar@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB8121:EE_|PH8PR11MB6802:EE_
+x-ms-office365-filtering-correlation-id: e2815136-c3df-4f0e-f3bd-08dd8e660b1d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?uENjWBt4aFKQynrKZONCLqybugUSduu7hVwcMVyKfIPwO5c6yEa9Bj5Kz6Yx?=
+ =?us-ascii?Q?DU/hQF6ldePaE9oW9zH/21JSaNvP3PqNB+MJr/+xOZTAB9BAL3F1vE/e+eM5?=
+ =?us-ascii?Q?ddtgl1pOGUDqhDn/aesRANebweHrnwUYzC4eczelNlpUkXzzyl6uLxGR0xKa?=
+ =?us-ascii?Q?CzwrG0kWpSHm4cXSYEwhnYZWHQu/x+XSmwjzpJCDuqGTPuNrfaLXl1CCWBi6?=
+ =?us-ascii?Q?lGjvLtD7jx3TOh8y3AImLXCAE8SkJ2TCNjKDD8IdJ3FJdq3ZG3Vb7vLTEMNt?=
+ =?us-ascii?Q?HpJhnt33ZQ5sTVtUWYcvEtCktNeZbW8LCa3jZRzl7BPrrDMAomBwqkPMdpCs?=
+ =?us-ascii?Q?AoGj3/f3Qub0qt4EVVJ6ElXJLqAJJQZAcNlpguhMyUeKsgpjQGHNPXtz0FNX?=
+ =?us-ascii?Q?eD0sU2iB2Hr9waegdbfBfw/ur6f4800ABQd0u1zymG50Fj+jBNF4JIX7Qo/c?=
+ =?us-ascii?Q?P8Nfb4/CX5f9xO7E8GtOCbtgXGQqhiWJteflYn1R6Olds551dbF+Xr8jLlN+?=
+ =?us-ascii?Q?s8M2ctKxhh+P/TAlQDtvsi/PjsFuvdlYC7+x69RN/hdN+V1fF9I+QH1nsWha?=
+ =?us-ascii?Q?jHD7GSV9xhMQRdvwVeCqVu7iagOByYqxIffSYIgoAFxgsYAvxnajbOqjRXmb?=
+ =?us-ascii?Q?+4e+ijQD2+QSvktO5S/0lDuWPz0cYBX4V1VvWKIv+5r9AYtU1W9njRjzNGWd?=
+ =?us-ascii?Q?Az6PayPv+F68fY5agL+7C9ZTRGEzaVQdsjtoFf+86BccWwz7ej5AsUDGyccc?=
+ =?us-ascii?Q?2EjAM/Lq5yGR/Q6eUf0QxJ8xc9/lNwFy3p7TJom4u05tGwH1qimYpVjG1ZxP?=
+ =?us-ascii?Q?VQkRjzP/9LulosIT7jE3o3CPwNM6zOl8xYdJgAT4Yg3HM6yetFSwiFa939j/?=
+ =?us-ascii?Q?MCiD7e2zPU9dIwKL8tegvgjJbSCvslhp7ZyFXYKNzKnipaKYkokid0fE7yBa?=
+ =?us-ascii?Q?OemmdgEuDbDCBWnRtQro4AhZH2u1FAlA9+CRv1P9K/QAmNG16fhPRKUfUJEq?=
+ =?us-ascii?Q?i3wqgqy+66xkEN6eS5mkMmMKekz1t4ptQBoDnMyJwoPC8f7590OyCBUBN0+K?=
+ =?us-ascii?Q?oDplDNM4I3kvhpoNrFAAzjfhAw+YaU98M7vN6D33xzLfi8wHZ/5pEDp9mJtN?=
+ =?us-ascii?Q?CghUh/hxulOHV+82CTWEBwku0iPHmDHcBjH7o6IAGqzOVvUqzeh/mB+7hg2d?=
+ =?us-ascii?Q?wRTM+jU8p0K6ql2bM7/fmXvX10Clu6IBc851Yoxr6/vztdrxA0ySs1IDmTCq?=
+ =?us-ascii?Q?jaYzvestjbg4N84/iIhmswSL38jYSjs39kBDN3bBuoRI8uV+J0oHbWf/DSBu?=
+ =?us-ascii?Q?msB9eIE0N1DDg9XjHh0qO8gDrlo4Ls+F9QYxt7+uQ+zQ4KBX5x5LAK950bih?=
+ =?us-ascii?Q?4W5Hy3irpAcJPhB2ZVvit5vTkReLXBVuL66hqM2ocCETL+e89Rdy605Sb1/7?=
+ =?us-ascii?Q?3IZ4oCkIhlHhB6Mmk6cbwUpCMiXALjmkui/joRu5tJuhWb24DQ6XNfEa5o86?=
+ =?us-ascii?Q?Co/FPDkY4v9+WiQ=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8121.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oj6k4qsetOm/KQI93OaR7mnlS3O7GZP8Xy7zf6rWZyvQ2eA3EOlLEGJFq8gp?=
+ =?us-ascii?Q?QLSdaqqzqIpAkr+5yb7jNiQa4aGNn8dSveNcUbfbO6bKmE0retH15ARd26I8?=
+ =?us-ascii?Q?lBLf3C68oEscTtRauOLGxshAj02YTG5CQbj0sbqwhIoEiM41JL1u1ajK+55/?=
+ =?us-ascii?Q?ESlLu0HJUOyacdHP5netaYKNn5eemIhhoGnxdWaE2ohFNGN0CKAj+mwwBDgL?=
+ =?us-ascii?Q?sVHUkdZuVlQlqwAMn2qkwFhnaCQmhhsCLyGn1oIwX1GfJ6lk+NJBFNkgOnt2?=
+ =?us-ascii?Q?vlrUPywaFuoNMSbMuZxX0LcLglvzo6pFbecIsyy+AZw8ZFAlChn4kV+1lySS?=
+ =?us-ascii?Q?2JZY35H0jpgcMfhqw/2u3UJwcEjlnGkpXD4erQ+vuBkC4oCJnfNAJolIIfq5?=
+ =?us-ascii?Q?bo7Tq2LK5UHLAFRwYgehzBltzb+qD68RrebcQw7kPKlHhyDFgQWAqXWG9hEs?=
+ =?us-ascii?Q?sTWySxIDax/AIHmvDQoAL/te2wgHCaaJZ7tXwiQ6BwQ219FUCt/TuVSQjvQO?=
+ =?us-ascii?Q?IkKneDdRrw52LK2Ed7RIvSZwTT6mvaSUIcmDkQcykBuNxF/ckgDmQrYZmg8U?=
+ =?us-ascii?Q?/veup6oYfPnY1bj/sEW7aggLiwJlIILG8FqpNp3TetcM1p8D3VG4R+C9O70l?=
+ =?us-ascii?Q?PLTpEwjllniGVZXLzymWQsoCb4ZrwW0F8pIRY1DqAiTLRQmL+VQXby71BfeD?=
+ =?us-ascii?Q?zyxtk+a9FNF769XhY6SABdlUupQDzXTsjljAFct/vmAZ+6CGZ0cuw4egEf0E?=
+ =?us-ascii?Q?IJCE9KoPM6DbKUXLZE7iyroKc+inejDW/LCMgt2NJ7oX1/wqyO0NASH+2zgM?=
+ =?us-ascii?Q?HfP6KoRsN0ydgG2rIVPJvJc9xDAII27nm0g3vBpzHgzwS9PQ7ZUmjsOMEzHK?=
+ =?us-ascii?Q?7HuKHBXrbPhi5PLoY1qgWGg/YKIfXYKkCu/L02OD9j62AEQUX/BRu4Nkq8RR?=
+ =?us-ascii?Q?DJ6nl6keKdXt/eJNbITUoJxyRkvqQwmhzatq8K/MIOp3d+SA8UqB+LZzMxOS?=
+ =?us-ascii?Q?gzae4owBq8zUeqzULYSQ1T1A1YSOgToaoh5l8g6CXQx1u5d/pSufW5P3J+k9?=
+ =?us-ascii?Q?EMOtx3rw24efN5vCuoY3aTMrh5ifVItd//Fir+9/0ZW4YZetyPUpFCzDTUn6?=
+ =?us-ascii?Q?wr+oFmbaHnxLScjI4D5DLyCuSOuBPxyCLges3r/rhjFNDQCF4tv4lL8DmUrs?=
+ =?us-ascii?Q?A6szSc5AfOL4bimOaWEYgIzbm64WrNiik3b+m7nDxu3OxL9hDfsUIRplTrsC?=
+ =?us-ascii?Q?T2K/S1geFilDs1o6k40rIX7d9bXAg/HET04WqGjAhLNI6mPEZwPaCZj6WJoI?=
+ =?us-ascii?Q?EQPjCOWnJr24Mb7/NmJxARTa2t4a+szrClZVnvX4P5FLQCZmmnUaBg+B7tma?=
+ =?us-ascii?Q?B7Ost0H+XrvrB8pnPsLcRn2zYB5EScRyJkdHax/x7we6AENZTiPQfsdd6R7k?=
+ =?us-ascii?Q?21PEWrksy9Triix3m+DojyUcy98t06Pz6mEK8b5qQlVgeyDa8PsmxHnGvjTI?=
+ =?us-ascii?Q?wg8LT1CkYF49cNPgqDRSv0xGC+N4FE9sIAOnpy/Ltj6ghq4tz+F+dz2GmTkH?=
+ =?us-ascii?Q?nlZzX+U8QOlwfLfyWwxBcpD+gBl/9uD10gdsA5r/uL9MjtlaxAFKW+pg+sgw?=
+ =?us-ascii?Q?AQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
- <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
- <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
- <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
- <CAHC9VhSPLsi+GBtjJsQ8LUqPQW4aHtOL6gOqr9jfpR0i1izVZA@mail.gmail.com> <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com>
-In-Reply-To: <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 8 May 2025 15:23:26 -0400
-X-Gm-Features: AX0GCFuAJrhkB_YivBhm4MSlZcxwdgMv-eoNvShg9MjoBr-qIW4iuPknLt97V1o
-Message-ID: <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, KP Singh <kpsingh@kernel.org>, 
-	James Bottomley <James.Bottomley@hansenpartnership.com>, 
-	Blaise Boscaccy <bboscaccy@linux.microsoft.com>, bpf <bpf@vger.kernel.org>, code@tyhicks.com, 
-	Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
-	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
-	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
-	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8121.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2815136-c3df-4f0e-f3bd-08dd8e660b1d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2025 19:25:08.0500
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZtWYdXXL7belzjXYKGD3EDUyq0CS7lL0b0U9qrjW7f+xZdhQHiDeBdbOWh/YIMMQagedDElYaySQDfcpmQG8CUGaP4+DJIB3xmWcR/NkWgg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6802
+X-OriginatorOrg: intel.com
 
-On Thu, May 8, 2025 at 1:45=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
-> On Wed, May 7, 2025 at 4:24=E2=80=AFPM Paul Moore <paul@paul-moore.com> w=
-rote:
-> > On Wed, May 7, 2025 at 1:48=E2=80=AFPM James Bottomley
-> > <James.Bottomley@hansenpartnership.com> wrote:
-> > >
-> > > I'm with Paul on this: if you could share your design ideas more full=
-y
-> > > than you have above that would help make this debate way more
-> > > technical.
-> >
-> > I think it would also help some of us, at the very least me, put your
-> > objections into context.  I believe the more durable solutions that
-> > end up in Linus' tree are combinations of designs created out of
-> > compromise, and right now we are missing the context and detail of
-> > your ideal solution to be able to do that compromise and get to a
-> > design and implementation we can all begrudgingly accept.  In the
-> > absence of a detailed alternate design, and considering that BPF
-> > signature validation efforts have sputtered along for years without
-> > any real success, we'll continue to push forward on-list with
-> > refinements to the current proposal in an effort to drive this to some
-> > form of resolution.
->
-> It sounds like you're asking for Linus's opinion.
+Adding Sergey.
 
-At this point no, although of course he is welcome to comment if he
-likes.  What we've been asking for is some detail on your preferred
-solution; all we've seen on the various threads thus far has been a
-small number of short sentences that leave far too much ambiguity
-around important parts of the design.  Without any clear direction on
-your ideal solution, Blaise has been continuing forward with proposals
-that we believe solve at least one use case and can be extended in the
-future to support others.
-
-Blaise started this most recent effort by attempting to address the
-concerns brought up in previous efforts, you and others rejected this
-first attempt and directed Blaise towards a light skeleton and LSM
-based approach, which is where he is at with Hornet.  Once again, you
-reject this approach with minimal guidance on what would be
-acceptable, and our response is to ask for clarification on your
-preferred design.  We're not asking for a full working solution,
-simply a couple of paragraphs outlining the design with enough detail
-to put forward a working solution that isn't immediately NACK'd.
-We've made this request multiple times in the past, most recently this
-past weekend, where KP replied that he would be "happy" to share
-designs/code.  Unfortunately, since then all we've received from
-either you or KP since then has been effectively just a list of your
-objections on repeat; surely typing out a couple of paragraphs
-outlining a design would have been quicker, easier, and more
-constructive then your latest reply?
-
-> This 'hornet' LSM attempts to implement signed bpf programs by
-> hacking into bpf internals:
-> https://lore.kernel.org/bpf/20250502184421.1424368-2-bboscaccy@linux.micr=
-osoft.com/
-
-I guess there are always two sides to every story, but "hacking into
-bpf internals" is not how I would characterize the Hornet approach.
-Hornet reads the light skeleton BPF loader and the associated BPF maps
-(the original BPF program) passed in from userspace into a buffer in
-order to verify a signature across the two BPF programs (loader +
-original).
-
-Hornet does this to verify the provenance and load time integrity of
-BPF programs, two very basic security goals that people have wanted
-for BPF programs for years, Blaise is simply the most recent person to
-try and get something into Linus' tree.
-
-> It got 3 Nacks from bpf maintainers.
-> Let me recap our objections:
->
-> 1. Your definition of attack surface says that root is untrusted.
-> Yet this "hornet" LSM allowlists systemd as trusted.  Allegedly,
-> it's an intermediate solution ...
-
-The Hornet proposal is not the first thing to implement a transition
-mechanism, but if that is really the blocker you want to go with I'm
-sure Blaise would be happy to back out the change.  My understanding
-is that it is really about reducing warnings from systemd and nothing
-more.
-
-> 2. you propose to mangle every binary in the system that needs to load
-> bpf programs with an extra "signature" at the end of the binary that
-> breaks ELF format.  I already explained earlier that such an approach
-> was a border line acceptable solution for kernel modules, but
-> certainly not ok as a general approach for all binaries.
-
-Let's just ignore the "borderline" comment on kernel module signing;
-the fact is that kernel module signing has been an accepted part of
-the upstream Linux kernel for years now, which is part of why Blaise
-used that as a starting point for the Hornet approach: keep things
-simple and build on something that works.  This is especially
-important as we are still largely guessing about the details of your
-ideal solution.
-
-Based on some of the vague feedback from you and KP, this week Blaise
-has been experimenting with passing a signature via the bpf_attr
-struct, but until you provide more detail on-list it is still a
-guessing game as to what you might accept.  The kmod inspired
-signature-on-ELF approach has the advantage of being much more
-self-contained, which is the reason we saw it as a good starting point
-that could be augmented with additional schemes in the future if/when
-needed.
-
-> 3. To read this mangled ELF you do:
-> file =3D get_task_exe_file(current);
-> buf_sz =3D kernel_read_file(file, 0, &buf, INT_MAX, &sz, READING_EBPF);
-> A malicious user can give you a multi gigabyte file and your LSM will
-> happily read it into the kernel memory. It's an obvious DoS vector.
-
-The LSM hook used by Hornet happens well after all of the BPF based
-capability and access control checks.  If anything, the ability of a
-malicious user to tamper with the BPF program being loaded helps
-highlight the importance of validating signatures on BPF programs.  In
-the worst case, if the kernel can't allocate a buffer the
-kernel_read_file() will fail and an error will be returned to
-userspace.
-
-> 4. I said multiple times it's not ok to do
-> bpf_map->ops->map_lookup_elem() outside of the bpf subsystem.
-> You did 'git grep' and argued that something in the net/ directory
-> is doing that.  Well,
-> ./scripts/get_maintainer.pl `git grep -l -- '->map_lookup_elem' net/`
-> is your answer.  net/core/filter.c is a part of the bpf subsystem.
-> The bpf originated in networking.
-
-Yet BPF was extracted out as a standalone mechanism that has grown
-well beyond its initial use as a socket data filter.  From my
-perspective either BPF is a standalone entity and the
-map_lookup_elem() API is necessary for at least one current user, the
-socket fitler, or map_lookup_elem() isn't an API in which case BPF
-isn't the general purpose tool that everyone claims.
-
-This touches on another issue that I've brought up before in this
-thread which is important.  The LSM subsystem doesn't care about how
-the LSM is implemented; C, BPF, and Rust (work is obviously still very
-early on the Rust side) are all valid implementation languages, and we
-make it clear that if you can do something in one language, you should
-be able to do it another.  While I don't believe you or KP have
-explicitly stated that your objection to the Hornet approach is
-largely due to it being written in C, Daniel did make a comment that
-Hornet should be written as a BPF LSM.  From the perspective of the
-LSM, something is either "legal" to do in a LSM, or it isn't; we don't
-qualify that determination based on the source language of the
-implementation.
-
-> Also, do build 'hornet' LSM with LOCKDEP and see how many bpf map
-> lifetime rules you violated with that map_lookup_elem() call.
-
-I'm sure Blaise will look into that.  I'm sure that if you, KP,
-Daniel, or anyone else in BPF land wanted to provide an alternate API
-for map access I'm sure Blaise would be happy to rework his code.  As
-we've stated multiple times, don't just say "no" say "no" with a good
-description about how to move forward.
-
-> 5. I also explained that map->frozen =3D=3D true doesn't guarantee that
-> the map is immutable.  It only freezes the map from user space writes.
-
-For this initial use case, we believe that is sufficient and is inline
-with kernel module loading, which is a good analogy.  The most
-critical part as far as we are concerned is that userspace can not
-tamper with the BPF map once the signature has been verified.  Yes,
-another in-kernel component might be able to tamper with the BPF map,
-but in-kernel components can do a number of bad things; this is yet
-one more reason why validating code that executes in kernel context is
-important.
-
-> 6. Though bpf instructions have standardized format LSMs shouldn't not
-> be in the business of parsing them. New instructions are being added.
-> We don't need a headache that an LSM will start crashing/misbehaving
-> when a new instruction is added or extended.
-> bpf instruction parsing belongs in the bpf subsystem.
-
-The current Hornet implementation ignores things it doesn't know
-about, sticking to parts of the BPF instruction set that is currently
-defined.  Who knows what Hornet might look like in another few
-revisions, or if it is replaced with another approach, but if it
-becomes part of Linus' tree it should be trivial to update it along
-with BPF.  There is precedence for this with other LSMs and other
-kernel subsystems.
-
-> 7. You do: copy_from_bpfptr_offset(&map_fd, ...) then proceed with
-> content extraction, but this is a user controlled address. It's an
-> obvious TOCTOU bug. The user can replace that map_fd after your LSM
-> read it and before bpf verifier reads it. So the signature checking
-> from LSM is fundamentally broken. I already explained that the
-> signature check has to be done within a bpf subsystem.
-
-As mentioned *many* times before, please provide more information on
-this.  To start, where *exactly* in the BPF subsystem would you accept
-a signature check.
-
-> In the last kernel release we added 'bool kernel' parameter to
-> security_bpf_prog_load() LSM hook assuming that you're going to work
-> with us on actual solution for signed bpf programs, but so far you
-> ignored our feedback and accused us of artificially delaying a
-> solution to signed programs, though we told you that the "light
-> skeleton" (that you incorrectly attempt to use here) was designed
-> specifically as a building block towards signed bpf programs:
->
-> See the cover letter from 2021:
-> https://lore.kernel.org/bpf/20210514003623.28033-1-alexei.starovoitov@gma=
-il.com/
-
-...
-
-> When Blaise volunteered to work on signed progs we pointed him to
-> light skeleton assuming that you're going to work with us to finish
-> this complex task.
-
-In order to work effectively we need a more detailed explanation of
-what you want to see with respect to BPF signing.  Thus far we've only
-seen rejections with very hand-wavy explanations on how to proceed.
-KP indicated almost a week ago that he is happy to share a couple of
-paragraphs on a preferred BPF signing approach, but we're still left
-waiting with the only feedback being a repeat of previous rejections
-and more vitrol.
-
---=20
-paul-moore.com
