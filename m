@@ -1,91 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1A5221725;
-	Thu,  8 May 2025 11:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9568713635C
+	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 11:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746702678; cv=none; b=sSrdlkDBbDIAtgVoWJMMTIvaFMD5g2KJLAI1r1lHiHHrhGjTVHNsZEHuqWviibRM7Gnwr8NSDNCHalvUfPtktSykIwCbpkU/SCYl8SU/Zi6t/btgBgwcrofJEr9e4U6S6l3TNud7Gu7iemSvqCGjpfoFrlVn3M0ru4I+mbtiVQw=
+	t=1746702761; cv=none; b=FaqlpDmxAuThWiDaE4o9kMXyQCN4JNBBYSQtw/BCbT/96Vxj3n3Ws4QI8kbtEB/Zjunrszim48kVs559wC2fPnUtyIHg6J2PqkbSFuBXJQvSkAQd1KLx4e2YndHxWZIq8drZigasqzZyLsV0VQZjQ3PQWgBTg02mEyIKk/H4K8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746702678; c=relaxed/simple;
-	bh=L35sGjV2JrIlqaBbVZ6eGeAVbUamQLlJvTICiOeQnE4=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=hVRlJ0MBoEkDQQHMyWZU5/PuEmBE28G+KA/agYlP5M8PyPMBl+O88lLbRWsOUKrd1BRj2b5icWwFj9+wZYZef3OE7yHOHlEqcm2FEvYbneeRw4OR2/VR3xhtcQpCmW7492RZAzr0Sy6f+yMjsr72T83Aoq2/aKktI6ykhQmsBAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3kx4mg9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746702761; c=relaxed/simple;
+	bh=dQv4VZZjttjwpAYaN2Cr2j22vzgaZy27VORq9EYvLaI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A8lB4EoqrEFO3u7fZD2s21QFFZZRlrmhVRMGnved5Yi/ht2gV4pWL67vDYChTfE2hGRnFnJCzdOkdQNY19O/p01MS2ND8wk+4cTjSM8xr4TnCD+57vSi82qUBkjAVKv8WOMfBW0nXTIFMO1s+i6QsKCBfPfYXrSKsMU51Jm4yAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CV9TL5+t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3kx4mg9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276ACC4CEEF;
-	Thu,  8 May 2025 11:11:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CV9TL5+t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10C54C4CEEF
+	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 11:12:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746702676;
-	bh=L35sGjV2JrIlqaBbVZ6eGeAVbUamQLlJvTICiOeQnE4=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=h3kx4mg9C2kCK86ER0JwCWUDEfF0t+gky3hig4tD+OVQXOutcj3Qy9DJdUiAKYre9
-	 +7xcw73nNMJqqlOWVb8K0tEyk8B2ZnAfvd4UxWiHespaffWQDatwfaxsqmCPv5f3yR
-	 cImIpETBBaotfX7NaMbT7n6I2NbbtDUqfP3uhIzCS8rGCmU2WreSNJ4VMep0iGUPTO
-	 pv8cBXhsKOmhSPUwabeT6waPNx9ptljb6mDscwwL+9BK2OibySbFFIdD2LwDkv2wKR
-	 rjOV14itw4lKb5xt9m6F3YZ22ocXuf5g/xZf/xNmNJfvdfsBEZqfVeDxjx8KneeGfd
-	 UJgaLoWsWRKaA==
-Date: Thu, 08 May 2025 06:11:14 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1746702761;
+	bh=dQv4VZZjttjwpAYaN2Cr2j22vzgaZy27VORq9EYvLaI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CV9TL5+tLhI/kBY4HRz4UYQxpsR4bXCnb0ZNiqtYiav5pvzlUEPLA2BVeRgjBMo8s
+	 xxrojTH2jQnX3lpoRzhgPZOpbJcidKfLxwQDnXykQveiu5u0bUSLxMkdZVMK9q5Dop
+	 EisJ+TOF7S8iozeZyWghtaANIs0kEG4gaVw82NYNWnEZdIvA6CYxDp14Aqq/Z5jvDT
+	 KksbmddqX1K53NnoWLo/FCU6/cUYfWdVJnHnVUVHXSfR9cgnNNzCCFahw7t199HXzB
+	 T68teNWa7Ypop+lyoIcvTujV1SNglzFyG/O4Muw2/+8Cth2uCBPvvVoGnlftg2BVKY
+	 ruFRP/ep+qjsQ==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54e98f73850so943317e87.1
+        for <linux-crypto@vger.kernel.org>; Thu, 08 May 2025 04:12:40 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzW681QCOEMfHez7UHpH73N491F8cvw7X1tamSTiNFHsf8akmT/
+	C4H8MhNIsDhCChCbsTnCEo5jpVqNGdWgryxXXT7WQMZhbM6yqFUaaVF90ARc+3a3jtehkKKxTY6
+	yF/qF/V3xEdABTe62EJFZOyIjLe8=
+X-Google-Smtp-Source: AGHT+IFGPDtvLpdITsEEqjXGSwOWV9roUGQMbaVqW0JaYrTV9EEgDYm6kB01vuz+QWi2eIIHHp2FwS1dEfhjWc9mkg8=
+X-Received: by 2002:a05:651c:512:b0:30c:2ff9:913f with SMTP id
+ 38308e7fff4ca-326b87a07b1mr10358451fa.2.1746702759412; Thu, 08 May 2025
+ 04:12:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
- Praneeth Bajjuri <praneeth@ti.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Manorit Chawdhry <m-chawdhry@ti.com>, devicetree@vger.kernel.org, 
- Vignesh Raghavendra <vigneshr@ti.com>, Conor Dooley <conor+dt@kernel.org>, 
- Kamlesh Gurudasani <kamlesh@ti.com>, linux-crypto@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>
-To: T Pratham <t-pratham@ti.com>
-In-Reply-To: <20250508101723.846210-3-t-pratham@ti.com>
-References: <20250508101723.846210-2-t-pratham@ti.com>
- <20250508101723.846210-3-t-pratham@ti.com>
-Message-Id: <174670267292.3889463.9488828665934209667.robh@kernel.org>
-Subject: Re: [PATCH v4 1/2] dt-bindings: crypto: Add binding for TI DTHE V2
+References: <20250507170901.151548-1-ebiggers@kernel.org>
+In-Reply-To: <20250507170901.151548-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 8 May 2025 13:12:28 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
+X-Gm-Features: ATxdqUFYGxXGhZglYKPIAlc9mrcFsSZRZtD9O4OPJJK-YwuYX3afTt3dDfEH5W4
+Message-ID: <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/sha256 - fix build when CONFIG_PREEMPT_VOLUNTARY=y
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	Thorsten Leemhuis <linux@leemhuis.info>, kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-On Thu, 08 May 2025 15:37:40 +0530, T Pratham wrote:
-> Add DT binding for Texas Instruments DTHE V2 crypto accelerator.
-> 
-> DTHE V2 is introduced as a part of TI AM62L SoC and can currently be
-> only found in it.
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
+On Wed, 7 May 2025 at 19:09, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Fix the build of sha256-ce.S when CONFIG_PREEMPT_VOLUNTARY=y by passing
+> the correct label to the cond_yield macro.  Also adjust the code to
+> execute only one branch instruction when CONFIG_PREEMPT_VOLUNTARY=n.
+>
+> Fixes: 6e36be511d28 ("crypto: arm64/sha256 - implement library instead of shash")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202505071811.yYpLUbav-lkp@intel.com/
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  .../bindings/crypto/ti,am62l-dthev2.yaml      | 50 +++++++++++++++++++
->  MAINTAINERS                                   |  6 +++
->  2 files changed, 56 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/ti,am62l-dthev2.yaml
-> 
+>  arch/arm64/lib/crypto/sha256-ce.S | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/lib/crypto/sha256-ce.S b/arch/arm64/lib/crypto/sha256-ce.S
+> index a8461d6dad634..f3e21c6d87d2e 100644
+> --- a/arch/arm64/lib/crypto/sha256-ce.S
+> +++ b/arch/arm64/lib/crypto/sha256-ce.S
+> @@ -121,14 +121,15 @@ CPU_LE(   rev32           v19.16b, v19.16b        )
+>
+>         /* update state */
+>         add             dgav.4s, dgav.4s, dg0v.4s
+>         add             dgbv.4s, dgbv.4s, dg1v.4s
+>
+> +       /* return early if voluntary preemption is needed */
+> +       cond_yield      1f, x5, x6
+> +
 
-My bot found errors running 'make dt_binding_check' on your patch:
+This will yield needlessly when the condition hits during the final iteration.
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250508101723.846210-3-t-pratham@ti.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+>         /* handled all input blocks? */
+> -       cbz             x2, 1f
+> -       cond_yield      3f, x5, x6
+> -       b               0b
+> +       cbnz            x2, 0b
+>
+>         /* store new state */
+>  1:     st1             {dgav.4s, dgbv.4s}, [x0]
+>         mov             x0, x2
+>         ret
+>
+> base-commit: 20e9579f11b6cbdf0556d9cd85a0aa7653caf341
+> --
+> 2.49.0
+>
