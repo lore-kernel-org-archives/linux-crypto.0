@@ -1,73 +1,74 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7B58472
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 05:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D92B1DE3C0
+	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 06:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746682990; cv=none; b=jFhtjssfWKPltuMKISUd5ZjpON9hDeJQuKYNK2ohD1rYBuOsVmyXxdaQpRsSKeVwSZ/WWIKnIMJcTVPXa7ebCEnMbGqT9LbVk3HRuh75vARvjAlZMFbPQ2VFqG8WlAmsLn6bfbBERXQ3ODXRUbjM4bfcuzF7xUlPpQ99KD+VIxQ=
+	t=1746685593; cv=none; b=Lha4auk9Op1nZguwts10Rglc0FWwJUjpqBpHAX0YGjHXRcKTtmyJSJAZsdbvg5GfSeI14fwJg2wm8Kw6aN6ZXQll6noUlwB093d+d4DxhvAEebga4Qvyff4VxbZplBuRGQhOEyEzo3Ah7ikqO+6tf/WzMHHsdquKiXKU4OaoNjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746682990; c=relaxed/simple;
-	bh=Fv8otgfb835vzC4YcxvRcQ71XivAi0oVk1wgiO9JmdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0d1IANnACsAkNvAtIfUEnfZ/iNtWLiXg+/NMHP01VIytAKwVVxQQy8StqqBan/zAguEHsiFa2Q3BYSGGsKtCg2+IJzFMUqdMO/457euvyvNjIO3ite+KRq/YIepbkl8zfuPHwzu2kXMNtu3D+CZjMDWZ8Ht47xRwmiiIp0f9bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=aHTiaVBR; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1746685593; c=relaxed/simple;
+	bh=RDPgm5xhma7QFLB18+5pqsvzgjikpNdaONSF0MiESTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=L4JZjHbtqbsrXrM4KIT0jh09KYoemT5Dtxgt2Gy65um2MZ9V1cs6EMOWUAmhZFCkGVN8LSOlvOSzdDOUg79bHhVlWW+2DQ5qZF9X1d8DCRTU7EaaWjKbLiZxQu02Lir3Jv8jMY1V1l8ccv+J+B90exr58pm+KyhpWXYf8aif8A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fnS3IeSp; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aHTiaVBR"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22c3407a87aso8635665ad.3
-        for <linux-crypto@vger.kernel.org>; Wed, 07 May 2025 22:43:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fnS3IeSp"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a0b6aa08e5so923816f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 07 May 2025 23:26:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1746682988; x=1747287788; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lvQH4NxuLOJyCK1IWxiQFZho+f+Pe1KaVnYyh/jEzUM=;
-        b=aHTiaVBRG3NDgewddiU09Hgaeb/5Q5f57p34g3DUf4SQWh8y5lFkyVSxE8Q4KPPNNq
-         Tlu6Sz8pbgFSwYNqPjdeDrKu0Ii50HdUjPQuAlDqGU8qbQ/bMMt51UNJgI1XcrVRT5ri
-         11wGCzfmG7eFx1BkGB8xHfKHDZU5GMdxXhy5g=
+        d=linaro.org; s=google; t=1746685589; x=1747290389; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vrj9ukkKygc1G8rKTTqLX2onZSR0aOFlnCDnYrntq9Q=;
+        b=fnS3IeSprMBvRYeEMrUA2d8rKUtOZPD13FDaKWxGfIhU0WsZJvvVdKDKQMf5+7e1t5
+         v206AGlMvxUm1T6Bq4Hf1SxlVefN01MJn3cmlFpGswzHy4PsPxeTo3UXlQUARs56Q3nb
+         OkA223MdQu1harumoYixuEKA/lywl0gWJ6fn8JfhBiZTRmMrqMMy8mRBflCnZeuIP8rs
+         noPQ0JBL0wTO7hbvdVyDo+VfAVwkxwA0/+2O5V2oiD1zIyQ1nDZo/uv0FYhwpnFLBxKE
+         87M4bZgooqdYCK4kK1L17GSuoucVq7LSHeeV5KZq7oFG2xCaKeT/4qHtXKLIn54QOxr2
+         CApQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746682988; x=1747287788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lvQH4NxuLOJyCK1IWxiQFZho+f+Pe1KaVnYyh/jEzUM=;
-        b=m0+ruAPDEt9kqclaDgwC/PD44hrH20OSRbUoUWbkDwBGFSE4xDhTSBHf5521JqvTrD
-         JFJx0CPTnp0bsaKhrHyfZ2bPV5QGPU/VSRUZsQoaMIkhPNLQCfoEWRiPqyB16D9NefD/
-         yrjefxcrGTwkBeIYxb6bD9OZsGVYJXcejRLYN7NYPKfN0KiRjN6XaVUqpaHv0pZhSrfA
-         t96GeP6hamX17EwMONNMMiDqlY2t6ZZNUkqzJ9xAxLhlaJeWB69BrIQHfz2Gbyi90Pum
-         e/DlF448wqpmzf5snKyfEQFyNCtKWdsnCDo4706Dlf0jiAvBhbMHYCtaqhl3pRSuvT6Z
-         6S8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU/ZMN5swS0w9JD3Kv3d1lBE+abnq5JiWvaqPb6JVCwKZRhXe+fY7oCcTM4OM5FSQeVDYVt9EAne2SXNls=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4rCMVT6khqIgwEYrxcx13AhROTtNOeUopSa7kX2QUoQzMBcWc
-	YR7wI2XwlZkWD4J82W2ks7PvzXyJoX9LZyTWcxzAlXKKwW697WVlBe98OcPouw==
-X-Gm-Gg: ASbGncveGL/1s3n9fMaPWHy8iUxM7LPGWRTdt86W3cubMFD75e/bRe4fYk8x9VaAfBf
-	4eHJ/2w6GwcxijsNt5Ecygh5aZ95lQFuj4zJsz0JR22CCoGszzgCW8VXQCrAT0nO0+mQ59d3WlW
-	eUIF3aYilg+hU9PXe2P5QCLOClwBMWs+gCreHP9/7+EMBvg7lNBwrx0inbBbLHn7UlaY6wy+Ltp
-	4rKP4XBXmENFM19sDwUkPK1EkEfY4aPCU6a3k/vJ5WDSRZC4QYBSMyLmyQNtZtIR3Oy9fIOrZNn
-	MvHwL7gF1avAwKw3L91QZyqpbGbTmPxA4bXmnkAYuB2vjhQIEfcT3C0=
-X-Google-Smtp-Source: AGHT+IFd8H6WezFjFWEMye3ZxfnhD0jJjbnmU7gtOapiiYZ6ZCqkdMrbyurP3RvcR5r5qSZ94Fi63Q==
-X-Received: by 2002:a17:902:e484:b0:224:179a:3b8f with SMTP id d9443c01a7336-22ed712c792mr20493145ad.23.1746682987970;
-        Wed, 07 May 2025 22:43:07 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:c794:38be:3be8:4c26])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e151eb171sm104038075ad.102.2025.05.07.22.42.45
+        d=1e100.net; s=20230601; t=1746685589; x=1747290389;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vrj9ukkKygc1G8rKTTqLX2onZSR0aOFlnCDnYrntq9Q=;
+        b=obOvB+miWUdu41BfBpk6tLhkGqTLJYJTc6016rlrVi3gnUtjAZMFvQwVJ1UOEQbjF8
+         8KvNYqf1OCdCkBV5X2QNgmApfb7Nt1ZiPyrqv4t6atYMjfLHOGTk2weZXLolaWcMTSE2
+         mAgDcd5EN005Mn7iw09/1V9PsuLfod4mIghjOfiQHvIs5Jl8tbjJsWYFUBu3qGvQcU8k
+         BDOv/4/s52Jlr7zRSrlhTWP3vkZuUU8JOxpKFP7bOk3yI5hS84yiuGOBqswiOsRvUpcN
+         jt8IhJ66/kZ95k44F1OQcpVrhdWXQenXBEuHiZuM0hHxYsVSXJWNJHYKf1TkEETuUahG
+         S8VA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMl+wNRWPHsJRdbcsl5GhmkKQT98YjB1kTlF+VXDnnGpR7U02QhRvZXnYShooGEyR379JP4aIRff9DJjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC862Ul8P6CfIY6yg1m1MO39xIJtKbwN6sdaxQt5vu9YLLlqte
+	20WKjYkDRGACDhysreIro1UVxFOKPp2KSdoFgV9lRKWeQm2tsWqNVt7tO5QFNSA=
+X-Gm-Gg: ASbGncvcA2Z1zo0OCxMy2Z3I65W8Ywe4nV3ji0SJaZhYh7Z0M0/NneUf0+1/9D1Xz+p
+	F1zdCQ83Db9Aok1zttsMEtQaJ5GtedastT6nRY5WS1Owm+LMAnSvNrxYZdl+EPSzSshI/BKAV3/
+	0qOfrM5isWsHl1z4h9Q3/wmvOkv3qzUP9blGOBErLTRAgM5kEgm18hJZivfo6ev6+oDL804ybMU
+	M2QFhc8fQt55GyEz1jsdujkXokcI8iLw0GffNz2JaX7epSe1zQ7eo0jm8Cl5Hjnv5ZjW2/CtRGY
+	QVcN7PzIhb/UqDU0VhWRigVFrw4E+/LYIuryqgPBPtiFsQ==
+X-Google-Smtp-Source: AGHT+IFAMx7JUFXY3xA7TDuVFEdfH0Qfm/mO3IujmuFv9MragYBfI8mgTfu7zRm8OHQ8pIMC9sOyhA==
+X-Received: by 2002:a5d:64ed:0:b0:3a0:b138:4810 with SMTP id ffacd0b85a97d-3a0b99171ecmr1632328f8f.17.1746685588890;
+        Wed, 07 May 2025 23:26:28 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3a099b178absm19380008f8f.97.2025.05.07.23.26.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 22:43:07 -0700 (PDT)
-Date: Thu, 8 May 2025 14:42:42 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Nhat Pham <nphamcs@gmail.com>, Minchan Kim <minchan@kernel.org>, 
-	"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH 2/3] crypto: acomp - Add setparam interface
-Message-ID: <2auyg2ozb5zppeadmufewg7pt4lam27iyimceqwtnqzt2avf4s@5sri6qk3bmhe>
-References: <cover.1716202860.git.herbert@gondor.apana.org.au>
- <74c13ddb46cb0a779f93542f96b7cdb1a20db3d4.1716202860.git.herbert@gondor.apana.org.au>
- <aBoyV37Biar4zHkW@gcabiddu-mobl.ger.corp.intel.com>
- <aBrDihaynGkKIFj8@gondor.apana.org.au>
- <20250507171644.GB181648@sol>
+        Wed, 07 May 2025 23:26:28 -0700 (PDT)
+Date: Thu, 8 May 2025 09:26:25 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Laurent M Coquerel <laurent.m.coquerel@intel.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	George Abraham P <george.abraham.p@intel.com>,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	Karthikeyan Gopal <karthikeyan.gopal@intel.com>,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH next] crypto: qat/qat_6xxx - Fix NULL vs IS_ERR() check in
+ adf_probe()
+Message-ID: <aBxOkY99jQF7q-7M@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -76,74 +77,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250507171644.GB181648@sol>
+X-Mailer: git-send-email haha only kidding
 
-Cc-ing zswap and zram folks.
+The pcim_iomap_region() returns error pointers.  It doesn't return NULL
+pointers.  Update the check to match.
 
-On (25/05/07 10:16), Eric Biggers wrote:
-> On Wed, May 07, 2025 at 10:20:58AM +0800, Herbert Xu wrote:
-> > On Tue, May 06, 2025 at 05:01:27PM +0100, Cabiddu, Giovanni wrote:
-> > >
-> > > > diff --git a/crypto/acompress.c b/crypto/acompress.c
-> > > > index 6fdf0ff9f3c0..cf37243a2a3c 100644
-> > > > --- a/crypto/acompress.c
-> > > > +++ b/crypto/acompress.c
-> > > ...
-> > > > +int crypto_acomp_setparam(struct crypto_acomp *tfm, const u8 *param,
-> > > > +			  unsigned int len)
-> > > Is the intent here to use strings to identify parameters? In such case,
-> > > `len` should be called `value`.
-> > > Or, is `param` a pointer to a structure?
-> > 
-> > param is just an arbitrary buffer with a length.  It's up to each
-> > algorithm to put an interpretation on param.
-> > 
-> > But I would recommend going with the existing Crypto API norm of
-> > using rtnl serialisation.
-> > 
-> > For example the existing struct zcomp_params (for zstd) would then
-> > look like this under rtnl (copied from authenc):
-> > 
-> > 	struct rtattr *rta = (struct rtattr *)param;
-> > 	struct crypto_zstd_param {
-> > 		__le32 dictlen;
-> > 		__le32 level;
-> > 	};
-> > 
-> > 	struct crypto_zstd_param *zstd_param;
-> > 
-> > 	if (!RTA_OK(rta, keylen))
-> > 		return -EINVAL;
-> > 	if (rta->rta_type != CRYPTO_AUTHENC_ZSTD_PARAM)
-> > 		return -EINVAL;
-> > 
-> > 	if (RTA_PAYLOAD(rta) != sizeof(*param))
-> > 		return -EINVAL;
-> > 
-> > 	zstd_param = RTA_DATA(rta);
-> > 	dictlen = le32_to_cpu(zstd_param->dictlen);
-> > 	level = le32_to_cpu(zstd_param->level);
-> > 
-> > 	param += rta->rta_len;
-> > 	len -= rta->rta_len;
-> > 
-> > 	if (len < dictlen)
-> > 		return -EINVAL;
-> > 
-> > 	dict = param;
-> 
-> That sounds crazy.  There's no need to serialize and deserialize byte streams
-> just for different parts of the kernel to talk to each other.
-> 
-> I'm still skeptical about the whole idea of trying to force people to go through
-> the Crypto API for compression.  It just results in the adoption of all the bad
-> ideas from the Crypto API.
+Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/crypto/intel/qat/qat_6xxx/adf_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So in zram (for the time being) we use a very tiny (trivial) compression
-API, which is more like wrappers around compression libs, we don't intend
-to support anything other than that, sort of simplifies things a lot.  But
-we are in a (slow) process of moving to async Crypto API.
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
+index 2531c337e0dd..132e26501621 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
+@@ -156,8 +156,8 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 		/* Map 64-bit PCIe BAR */
+ 		bar->virt_addr = pcim_iomap_region(pdev, bar_map[i], pci_name(pdev));
+-		if (!bar->virt_addr) {
+-			ret = -ENOMEM;
++		if (IS_ERR(bar->virt_addr)) {
++			ret = PTR_ERR(bar->virt_addr);
+ 			return dev_err_probe(dev, ret, "Failed to ioremap PCI region.\n");
+ 		}
+ 	}
+-- 
+2.47.2
 
-I suspect there are compression modules in the kernel that have only Crypto
-API hooks, e.g. drivers/crypto/intel/iaa/?  So in some cases (zswap + iaa)
-I guess Crypto API is the only answer.
