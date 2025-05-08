@@ -1,147 +1,97 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C76A27AC3E;
-	Thu,  8 May 2025 15:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD831E3DDB
+	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 16:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746716815; cv=none; b=tCykZ+lLUsPkq/2Wbu+zKEjTm4VKPxZYjqnVzyxt9+T/mZbIemChxA3//6XkIwUBMxAUgcDIj8eCiD3AfTBC72uWIsw3DD8JWvUndoN+zqUVq1ll+wscfZtnyzWR68TAZ+U1IVwdHEnIdZ14g175EtuT7xSByuev7ohH5CWN+WM=
+	t=1746720329; cv=none; b=DQNzAprpstTI6/xFGCZ1R7fXASJMDCfyK5A4AsJAaTyG/8aJ5BoBrhVJu0Jle1t5HcgDM75hPs5yNEC93M3OguPrO9TcSMXoFpjYTLY+B43YxQb1Q6+OiuoL8ldj9KAKCWSzBgAXCpF6E1C3HXJkBFLgJHypImq0mPv16PcMj2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746716815; c=relaxed/simple;
-	bh=hbTb4Ycr/d1ecNihiUJ856JR7dFexe12ufHLYP7hyIs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VpHOScAio6IPrh61xK+KjX/TVDc2kbzoVubNkDBNRuVfujltHO1lOk0aJvvrbo9vNJ+FkFFQ8fXkmDCgNNYqMcQPiZfXkev3UDxkIZPpQh4XJ/+ncdXsOWUuq54qzmzVeapXZhREQdl35D2XPDjF9fhaNF3S/IFC8rqlfCLJFRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o3pZSYpy; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1746720329; c=relaxed/simple;
+	bh=J0X9z5gm3wvXLSCUikMhZwi6A4FiSBZCE2jsWgwUZ6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HzVWS+ncOBAoTTzq5mzoUTtFM932747qLP62OaxRgpPKsvoLrHlzNEQJkd6zf4WT+443bkwTrwqcvcsFv91V0azC/vWBkcItXI5gTXcAOaRkvNXZgdWUWpsbdRTHj2TRUjPnTBco4iKm2GnkgMI0QlReBtD9CTJ+NPWR//tTVew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4BRA9kj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o3pZSYpy"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 548AfMCG013187;
-	Thu, 8 May 2025 15:06:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=BSmgeN
-	5HB91N9M1jV8w7LDYBEzoqBnjFqxH7vD60Jig=; b=o3pZSYpyppVLqGAAUptfXc
-	bvJG4AHVxvooB+S7GP3sZxoyJyvNIZRSXhA9MFfULyvu7wIv/UiBiwvp32mP4T9i
-	fWP1juZkev8fWrVPpkKJjC+PU8xjQxdXVzK3jLEAWDGzjncaphwrVWHGOsbibSfs
-	/FWGM1y/BRa7oNJfQq9Uw8zsXniPxup2Yb7NQH/0s87A3uTkaoM4uCSQiJH8qOts
-	zYRD2esuvznadVpOFfagXVL+z6/Yc2eyMcMec6oJCMURt+WZseJ9Dk/w4eWGI/MZ
-	JI5hx4ArMFt3yHkr9ZHF+9dxAuWaPq2GNj+iVu/Cusy01ynwiPhxGNxHZ1vGz74Q
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46gu2t1a0b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 May 2025 15:06:10 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 548B03tu013880;
-	Thu, 8 May 2025 15:05:52 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46e062nyg9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 May 2025 15:05:52 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 548F5qlA27918960
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 8 May 2025 15:05:52 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B47358055;
-	Thu,  8 May 2025 15:05:52 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F37EA58043;
-	Thu,  8 May 2025 15:05:49 +0000 (GMT)
-Received: from [9.61.251.83] (unknown [9.61.251.83])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  8 May 2025 15:05:49 +0000 (GMT)
-Message-ID: <1d2c2fdc-5c36-4d4e-8b25-8289b865726d@linux.ibm.com>
-Date: Thu, 8 May 2025 20:35:48 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4BRA9kj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5404BC4CEE7;
+	Thu,  8 May 2025 16:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746720328;
+	bh=J0X9z5gm3wvXLSCUikMhZwi6A4FiSBZCE2jsWgwUZ6g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p4BRA9kjBZ2Yr8JFJ2Zxt9LQJ/16p0h//TN9xBYFBkFBzKBlU72GmrBqo7PMncvQO
+	 dfqJhQ99KMH86ehTzXEwQl3XP3qaXtied0RcBCOblyGuoRidodB6+JzE9fZZaZXnb4
+	 AuxBUeEicUnB53y/3d9RYoeD2ZcFs/zrN2YCOWg+41bd7KT88JwNrMDryiQizP0Lvv
+	 hA1w30YJA1/8IUkLE3Ei3pMUQOe1HfuePHQIVQyG0he0Z2mtqs59Lo4lNdB1oR2Z/D
+	 86wiNCY6l09iRnln6z4IBVDv+Wne+7HO7vCih0o71kzqLeDrmoXm1+7+g9P1KC2ULj
+	 iFVYxozQLoiHQ==
+Date: Thu, 8 May 2025 09:05:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Thorsten Leemhuis <linux@leemhuis.info>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH] crypto: arm64/sha256 - fix build when
+ CONFIG_PREEMPT_VOLUNTARY=y
+Message-ID: <20250508160523.GA1218@sol>
+References: <20250507170901.151548-1-ebiggers@kernel.org>
+ <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: powerpc/poly1305 - Restore crypto_simd_usable
- test
-Content-Language: en-GB
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Thorsten Leemhuis <linux@leemhuis.info>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-References: <cover.1745815528.git.herbert@gondor.apana.org.au>
- <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
- <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
- <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
- <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
- <aByX_Y64C6lVRR8M@gondor.apana.org.au>
- <f66620e2-77e3-4713-a946-ddb2c8a0bccb@linux.ibm.com>
- <aByiNZNxqyTerdYG@gondor.apana.org.au>
-From: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-In-Reply-To: <aByiNZNxqyTerdYG@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=NLnV+16g c=1 sm=1 tr=0 ts=681cc862 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=FNyBlpCuAAAA:8 a=48bIoUrBYIooDiy4U3IA:9 a=QEXdDO2ut3YA:10
- a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-ORIG-GUID: FP_6_i-DOA52SaRGfd5Doiu48ydWtB-2
-X-Proofpoint-GUID: FP_6_i-DOA52SaRGfd5Doiu48ydWtB-2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA4MDEzMCBTYWx0ZWRfXz90klTix6jhx 4ku7tsJP+/6Ssabv4huefVsKUMqL+8l6vB6qri0KCBidPVx6gqu7f7tBsyI5nMBNvdpseExL5Yz tcmbxR/9gdwOtJgylYYTqOGcUZ/OwyC6Kf3oGi4u3ABRL2rt0Hny+CHnbTUtG8uFoFN/6Mt3cKD
- zke5EIrb7r8lX3jHSdl5rNYmVxucnfYb7JcKr7sqXc500enzJti9+6oWQVj0mR3I+ROyzyEOCAD NSWT204LLoJgH1Z9m8tBUQSPRBY2bWgQ9MhJ3kA4r1lR7sfTN57mm0K+fKGsH90QaCBCZ6MaTgq MXzI+j6+wzRYsvN1HanlCJ9X1/hH/mBUeCim/ZTLDkT2p6pUnFCQNrYKD9hD+GISBzW3ZvNMXCp
- CqrhKnQPYt5ndNmfFzbI+IhHViXLZfaNE4jwX5QFlxf9lohHV57EppSoH6TMX3bzckrX+9Bf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-08_05,2025-05-07_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- mlxlogscore=909 phishscore=0 mlxscore=0 impostorscore=0 clxscore=1015
- lowpriorityscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505080130
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
 
+On Thu, May 08, 2025 at 01:12:28PM +0200, Ard Biesheuvel wrote:
+> On Wed, 7 May 2025 at 19:09, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > From: Eric Biggers <ebiggers@google.com>
+> >
+> > Fix the build of sha256-ce.S when CONFIG_PREEMPT_VOLUNTARY=y by passing
+> > the correct label to the cond_yield macro.  Also adjust the code to
+> > execute only one branch instruction when CONFIG_PREEMPT_VOLUNTARY=n.
+> >
+> > Fixes: 6e36be511d28 ("crypto: arm64/sha256 - implement library instead of shash")
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/oe-kbuild-all/202505071811.yYpLUbav-lkp@intel.com/
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >  arch/arm64/lib/crypto/sha256-ce.S | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/lib/crypto/sha256-ce.S b/arch/arm64/lib/crypto/sha256-ce.S
+> > index a8461d6dad634..f3e21c6d87d2e 100644
+> > --- a/arch/arm64/lib/crypto/sha256-ce.S
+> > +++ b/arch/arm64/lib/crypto/sha256-ce.S
+> > @@ -121,14 +121,15 @@ CPU_LE(   rev32           v19.16b, v19.16b        )
+> >
+> >         /* update state */
+> >         add             dgav.4s, dgav.4s, dg0v.4s
+> >         add             dgbv.4s, dgbv.4s, dg1v.4s
+> >
+> > +       /* return early if voluntary preemption is needed */
+> > +       cond_yield      1f, x5, x6
+> > +
+> 
+> This will yield needlessly when the condition hits during the final iteration.
+> 
+> >         /* handled all input blocks? */
+> > -       cbz             x2, 1f
+> > -       cond_yield      3f, x5, x6
+> > -       b               0b
+> > +       cbnz            x2, 0b
 
-On 08/05/25 5:53 pm, Herbert Xu wrote:
-> On Thu, May 08, 2025 at 05:27:13PM +0530, Venkat Rao Bagalkote wrote:
->> Yes, its was on the same machine, next-20250506 passed.
-> OK I found one bug in my patches, I incorrectly removed the simd
-> tests for powerpc.  Does this patch help?
->
-> ---8<---
-> Restore the crypto_simd_usable test as powerpc needs it.
->
-> Fixes: 14d31979145d ("crypto: powerpc/poly1305 - Add block-only interface")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/arch/powerpc/lib/crypto/poly1305-p10-glue.c b/arch/powerpc/lib/crypto/poly1305-p10-glue.c
-> index 7cea0ebcc6bc..154eced0bf9e 100644
-> --- a/arch/powerpc/lib/crypto/poly1305-p10-glue.c
-> +++ b/arch/powerpc/lib/crypto/poly1305-p10-glue.c
-> @@ -6,6 +6,7 @@
->    */
->   #include <asm/switch_to.h>
->   #include <crypto/internal/poly1305.h>
-> +#include <crypto/internal/simd.h>
->   #include <linux/cpufeature.h>
->   #include <linux/jump_label.h>
->   #include <linux/kernel.h>
-> @@ -51,7 +52,7 @@ void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
->   	if (!static_key_enabled(&have_p10))
->   		return poly1305_blocks_generic(state, src, len, padbit);
->   	vsx_begin();
-> -	if (len >= POLY1305_BLOCK_SIZE * 4) {
-> +	if (crypto_simd_usable() && len >= POLY1305_BLOCK_SIZE * 4) {
->   		poly1305_p10le_4blocks(state, src, len);
->   		src += len - (len % (POLY1305_BLOCK_SIZE * 4));
->   		len %= POLY1305_BLOCK_SIZE * 4;
+cond_yield doesn't actually yield, though.  It just checks whether yielding is
+needed.  So the behavior is the same: on the last iteration this function
+returns 0 (i.e. 0 blocks remaining), regardless of whether it gets to the end by
+jumping there due to TSK_TI_PREEMPT being set or by falling through after seeing
+nblocks==0.  We could keep the nblocks==0 check first, but the cond_yield check
+is lightweight and it's probably better to avoid the extra branch instruction on
+every other iteration.
 
-
-Unfortunately, above patch dosent fix the boot warning.
-
-
-Regards,
-
-Venkat.
-
+- Eric
