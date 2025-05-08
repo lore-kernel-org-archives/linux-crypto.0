@@ -1,104 +1,80 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CF6A927;
-	Thu,  8 May 2025 12:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D40922A4F1;
+	Thu,  8 May 2025 13:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746709175; cv=none; b=cVT7zWn0vPoELkkEMELXP5NZaHGqrOnSfCpdj6ezJtPr0MVqaJDTyDvkevlDb/cqCR7bDzbzeeRl6xR2E7u5/oNOMsMbxYtVkrtbx6HuFYvGJUMLcnSWMV6BU25bxjYaEGq08tWkv4c3MX9lMNYfTa17Un0T8LP/ERbrJEHZ/YI=
+	t=1746709821; cv=none; b=hxTP9AjfvjVjoG++uSmQFChAUrtVBpcP/WNcoImFwGVWhbU1mkmAHysMuthO4NE9bEiyqygtb4sAg8K2vQGjdtI90vyOZS1fLYrGNKqAi5l7l55zL0MF5JM5iPqTHpd7mrE54diQ3IBpCTZDdsixmN1fnv8x3edp3XCIQ7dGfYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746709175; c=relaxed/simple;
-	bh=aJSE6ncB4PWgfyV5v7DV6bvwyMhTYTShI15ytKls2K0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jhrSwnACryNbKi/OLLYBDzGszE85fmZm/Wh4wwts/ZvKWCL+F3+3zBD+db4yl7ZvCLft2tIDED7RqTGjRAp3/nb0smrEI5WdHUvCvljX6HCRSxxRh44puUcj5fyby+KZRMXS1vDEUaI9W09MlPaS5/kcyS1QwnkTi6vNleKq+oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-879c44a1dc4so227749241.3;
-        Thu, 08 May 2025 05:59:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746709171; x=1747313971;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=01ZSEgdLjUpD4xto7wBwz7+BoSwten0GUTJr0EeQUdg=;
-        b=VsrWPwqrOQtLSESXiZ9PV/128ao3PGdqYL2qKXrftjJnMU5dgAITeF6hocVa8Fzph/
-         qhipr17QcbdIprkHNDbIsamet7+w3xKn2pQhtWI5d9/l85nakDjktedFnidrKgwexPCJ
-         Abio6P6omh6mlHqOprTzbVFUcVni9Vuc3b4ZEB5Rm+heOnXHaHEO6pdQ7OWRgvov+CxK
-         YfAA86j5rI5IAUwKFhFGGYoIlX51YbuheIsO3jtxRWPZO9glor3FzZR0zonC9ANCMUfD
-         PDyO7/kroVZ9UFIh+LoI8+LU/y+M7QS0gz8AvLiChCjUnZnCmYmd3vO8D7c4N/a3bwQd
-         dfkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYmxul031+Szh8qkBlHEpFxjiABW+WBV/FMOeFiEf9A+D8GhcBvejqHAJmAZPBwQ+RlbxiKrNyPEL6jN4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxtG7SBsT+5mJCkmEnmzth1yoG1R4eR/ybrgAVTZM3UkBNrDM2
-	qXpTXBN3qE1R9dSo4+TgEsjZsk7uH4ZHhZt4/sM5cNatkQPiS0WdqHWd+hR3
-X-Gm-Gg: ASbGncuCKAVB9ubnkFzyFKBH5Yp8vk32kVB87sAu5082ML5FJxv4JRgwA4bJMvEFa3w
-	2FcBVKCqqO66BX4Konl778I+i9YWD7mbzrlLtkxUafiKr0cdMPkgE8WQrLtfZdsUOBr10+bDCh6
-	4qhsIWFNHJ0OchABVpLjf0JCkyL+6VbMSYUE07tMUXRdqKPGmvjHbPdgeKUko0dPalJvqODPa/A
-	Depqxjyx6zltU82JalP/92LR4FYTSWEHkFNSuu7VcZg7HHHnD+JXfU5UUb/CJIG1qLMJCouUXQc
-	VBFD0WiXTR9iyaghJfqg9mU7k0Dvo3MfNEx4l7pQsj221eKJ+Qk8Vj6o1djp7yZM2fhE26I72LK
-	Jtns=
-X-Google-Smtp-Source: AGHT+IEPKv0VOn5vxekpsRMVhuMjevRmsVsb7itTSpASMTikCugYnYCEz4dI9aRKyvYs1VSsaXaOIg==
-X-Received: by 2002:a05:6102:5794:b0:4da:fc9d:f0a with SMTP id ada2fe7eead31-4dc738070afmr5044262137.15.1746709171094;
-        Thu, 08 May 2025 05:59:31 -0700 (PDT)
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com. [209.85.222.50])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8780b0216aesm2541923241.20.2025.05.08.05.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 05:59:30 -0700 (PDT)
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-879edc092e7so142639241.0;
-        Thu, 08 May 2025 05:59:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWM50TVp0QmloO6WEhBqxXUye5FzVyTgGWTUH4YByuI+1TQfXfsXN6ifGFYzd/9ZanTkZ+4v47BYLZUbpg=@vger.kernel.org
-X-Received: by 2002:a05:6102:5794:b0:4da:fc9d:f0a with SMTP id
- ada2fe7eead31-4dc738070afmr5044224137.15.1746709170498; Thu, 08 May 2025
- 05:59:30 -0700 (PDT)
+	s=arc-20240116; t=1746709821; c=relaxed/simple;
+	bh=pte1bCB2uCCVS7NjT5+1rghzcm7FMy84JWgVmHzg0K0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IIFmmXSvWuLzDIsVqE0pwlfpFeu/qDyYtg8z+XWXTKjegFOMZi+eAsCbGJ1BVodXiUfkZ+jozPMv/hpUOpGleydDiXi4Dl1SJqRV7N3ThzTt9P4ItL6jabv7EHcxWNgeUIo8cSLm7gPmhej2IamHM7U8MgGT6nQA7xNXgIXMcnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CoY9UkqE; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CoY9UkqE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ppq7AHmk7VzTx8O0SoLweDhwIEA4fRyR9YaSrcEMytw=; b=CoY9UkqEO2eLQ09+3CpHiRxAKh
+	U2NIJOcRVEgzbYDlmEqhHYC1SwiE9DYoT87iEK5o+xK7X0grtEmEnijB929GVhFT8nF4be1wbIyVt
+	Mfc65cEW2T599xYxAB0hbm5wv+gQRJUmhJvz/1YrPBqkBYjjcmfA4cyAt/FXBlslidsHjKgecgbon
+	Q6OYO6mgQieLCmK5XCwl86oOJq64PnczyP+j3Nk1ND65A9Au/hTj/7fgTYy/jPKt38xSsGiR2Zuvp
+	4VPR/yjSAENEJTvGn20xmEqUvY1TFhO6i/v4BhAFfLJ7JXwolSN3CyB7FkvFuBo5Mv15Sem+5rJC1
+	Waoso+bQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uD10v-004aos-2w;
+	Thu, 08 May 2025 21:10:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 May 2025 21:10:13 +0800
+Date: Thu, 8 May 2025 21:10:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: Klaus Kudielka <klaus.kudielka@gmail.com>, regressions@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@gmail.com>
+Subject: Re: [v3 PATCH] crypto: marvell/cesa - Do not chain submitted requests
+Message-ID: <aBytNdRyd5Ywh1Pq@gondor.apana.org.au>
+References: <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+ <Zw31JIEyh28vK9q7@gondor.apana.org.au>
+ <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+ <Zw9AsgqKHJfySScx@gondor.apana.org.au>
+ <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
+ <aBsdTJUAcQgW4ink@gondor.apana.org.au>
+ <aBt5Mxq1MeefwXGJ@Red>
+ <aBw-C_krkNsIoPlT@gondor.apana.org.au>
+ <aBw_iC_4okpiKglQ@gondor.apana.org.au>
+ <aBypVwhHHzmqqN5K@Red>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250505203345.802740-1-ebiggers@kernel.org> <20250505203345.802740-2-ebiggers@kernel.org>
-In-Reply-To: <20250505203345.802740-2-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 8 May 2025 14:59:18 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXhXMxE9yL7BeSgiw5mt5+-kMy3LaJ+QR6buxjWUxPFrQ@mail.gmail.com>
-X-Gm-Features: AX0GCFtEaUD2NCZLiE9qGON2RilPUzfQ6k2Dn9KkdLXJ6kvr02NTCLgMF07u628
-Message-ID: <CAMuHMdXhXMxE9yL7BeSgiw5mt5+-kMy3LaJ+QR6buxjWUxPFrQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/7] crypto: tcrypt - rename CRYPTO_TEST to CRYPTO_BENCHMARK
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBypVwhHHzmqqN5K@Red>
 
-On Mon, 5 May 2025 at 22:37, Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Thu, May 08, 2025 at 02:53:43PM +0200, Corentin Labbe wrote:
 >
-> tcrypt is actually a benchmarking module and not the actual tests.  This
-> regularly causes confusion.  Update the kconfig option name and help
-> text accordingly.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> The board do not panic anymore, but have still selftest errors:
+> See the full boot log at kernel.montjoie.ovh/477935.log
 
->  arch/m68k/configs/amiga_defconfig           |  2 +-
->  arch/m68k/configs/apollo_defconfig          |  2 +-
->  arch/m68k/configs/atari_defconfig           |  2 +-
->  arch/m68k/configs/bvme6000_defconfig        |  2 +-
->  arch/m68k/configs/hp300_defconfig           |  2 +-
->  arch/m68k/configs/mac_defconfig             |  2 +-
->  arch/m68k/configs/multi_defconfig           |  2 +-
->  arch/m68k/configs/mvme147_defconfig         |  2 +-
->  arch/m68k/configs/mvme16x_defconfig         |  2 +-
->  arch/m68k/configs/q40_defconfig             |  2 +-
->  arch/m68k/configs/sun3_defconfig            |  2 +-
->  arch/m68k/configs/sun3x_defconfig           |  2 +-
+Do you have a boot log without this patch to compare? You seem
+to be getting skcipher failures as well as hash failures while
+the original report only had hash failures.
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+Thanks,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
