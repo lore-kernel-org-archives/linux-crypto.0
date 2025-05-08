@@ -1,46 +1,54 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EEF4B1E6F
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 01:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952C978F37;
+	Thu,  8 May 2025 04:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746668308; cv=none; b=WLZ6xUdt9gqgRSGaUj/BpJ1jUIoR0N+QIf1rEANiZ4q/ZLFMRnEw0Rq8OkhiCiOshZsmvTNI6qvByqdEJXmqSo7/tq+PTAVpxneeClPZ5nzvl0utuUwyoMlgVc43Dpep5CKrdS1EVNA29ea0uk5cv5TQ1L7PaxKQTc7im48t414=
+	t=1746677960; cv=none; b=V1O7bypNaSYWXdg6oTKvUltooCdyFC997WSqTS7CA14YNrYLi6fzVBa1tvpJRVrPj3a7okh4k7uS/aM+Pzbd9G+KR2BEAPV85v0s67WsHO/PyEiqP3LFAOw1yeSQdjf/9g7vqveDXzYac8f1ELlc1QKujxF4R97BUEJO6lhUfu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746668308; c=relaxed/simple;
-	bh=0oC5jJG7M+xDoSuE+i/4KPomJOd8KPJIJ/AcLJKNm9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=i9xbbjCjuzLcsbJzW7GwufGGd9JfGV8xr2HxrQxjInVTEY5MGvhncj4gW/7lhvzAyfHP7xQaDAdizbLnijVNkQvt0GmyE0xbIIDAS/y2GFGTChMoo5eq+OhbMeHD8I00Y5jKZzJHGtVFfnvH/5cyKAgJ46HH0arVO9YDLOnA8MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gf2rSIyz; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746677960; c=relaxed/simple;
+	bh=Hu8NY9n961A/FBCHtTw8bjxVHEHWxXZ0tidmYP4RCZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnl6UefbbwjIUNRL22CqdVEJLxfsLh8NJ4Fjs4eJTtaymWI0QOTGdX5e77vKEU8cSPngRlbCccnU4bbcx0KBeHtwgU3yypXCEK2SkVZKcCQvd6L+0Rv64R1Df09/m9U8gTJ92fvRLP3DFwAKvMYf4JfZRk8Rd0+mLjOR7TxnMcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CY0zu2oz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gf2rSIyz"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4DL/sF/lt2pNiX8ONAJ2XcdbRYc1bavHnLJcYfQuHkk=; b=gf2rSIyz9WcP2bFqZL7t3uNG+Z
-	c6TTJrWMne4uXHNVhWZk30iXSan9bFG11+cVdflTGhLm/OPIjfXwgncUOQCcKOGSnagPmWWEhPlgl
-	bmKygmVA9yXZZit0J5BxKF4MGWkY4afGm4vB9ke+0DG5piMdbb5RPiGOX1+81Rn94UHDCO+2dQlAa
-	8fmmTKBjI+0KfqlXxR197sLV3WYy8ERRp9/eHgUtdFcn5TaWQ037vAnUaKc3Raqh/l+vVSMzu3XZH
-	UXs5ax9AJ4o7b/3ZG2lHKmm4GcnqjkUfh82Rl7L0ygN9IihRlhu5ntn3wCPkv3OtZI2EibS+XxeSQ
-	v8iHgPxw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uCqDJ-004Pex-1y;
-	Thu, 08 May 2025 09:38:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 May 2025 09:38:17 +0800
-Date: Thu, 8 May 2025 09:38:17 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	ardb@kernel.org, linux@leemhuis.info, lkp@intel.com
-Subject: Re: [PATCH] crypto: arm64/sha256 - fix build when
- CONFIG_PREEMPT_VOLUNTARY=y
-Message-ID: <aBwLCXZ83PahQoa_@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CY0zu2oz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F67C4CEE8;
+	Thu,  8 May 2025 04:19:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746677960;
+	bh=Hu8NY9n961A/FBCHtTw8bjxVHEHWxXZ0tidmYP4RCZE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CY0zu2ozYym4TdyWzRLtc1OkyRiFi8gJyrx1RmEdIo/TwdMXhmv/o1AqF/g18Vb4W
+	 Pn2HKxPp3xDZrQFCbYHQ90Hn+5r1rmhKmMOtPlT/Qsk+PnEwwPZHUcLBHnJ3rxlYil
+	 pRecnrgksWkx0rO135zsad4FhdqlhHCEq5yjvUgSQVuHITxtxRMHN1fmD3zXvwdtDM
+	 4nsb4cU0fUw6PsMWVS1d0VovXhg5bhRKiPsESUR6K+MzyHeliBh5p8hUqK06N0WBDa
+	 +1wA0a5KG+ZJyDypCVZ49KtReV4cq8Dc0Z0K+M7HfjbV+GpbCaLPtirpByOv4jYSTw
+	 kqZTTc/H7tFlQ==
+Date: Wed, 7 May 2025 21:19:14 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Sterba <dsterba@suse.cz>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+	Josef Bacik <josef@toxicpanda.com>, "clm@fb.com" <clm@fb.com>,
+	"dsterba@suse.com" <dsterba@suse.com>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	qat-linux <qat-linux@intel.com>, "embg@meta.com" <embg@meta.com>,
+	"Collet, Yann" <cyan@meta.com>,
+	"Will, Brian" <brian.will@intel.com>,
+	"Li, Weigang" <weigang.li@intel.com>
+Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
+ through acomp
+Message-ID: <20250508041914.GA669573@sol>
+References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
+ <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+ <20240429135645.GA3288472@perftesting>
+ <20240429154129.GD2585@twin.jikos.cz>
+ <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
+ <aBrEOXWy8ldv93Ym@gondor.apana.org.au>
+ <20250507121754.GE9140@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,26 +57,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250507170901.151548-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <20250507121754.GE9140@suse.cz>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Fix the build of sha256-ce.S when CONFIG_PREEMPT_VOLUNTARY=y by passing
-> the correct label to the cond_yield macro.  Also adjust the code to
-> execute only one branch instruction when CONFIG_PREEMPT_VOLUNTARY=n.
-> 
-> Fixes: 6e36be511d28 ("crypto: arm64/sha256 - implement library instead of shash")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202505071811.yYpLUbav-lkp@intel.com/
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> arch/arm64/lib/crypto/sha256-ce.S | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
+On Wed, May 07, 2025 at 02:17:54PM +0200, David Sterba wrote:
+> Anyway, assuming there will be a maintained, packaged in distros and
+> user friendly tool to tweak the linux crypto subsystem I agree we don't
+> have to do it in the filesystem or other subsystems.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I don't think there ever will be.  NETLINK_CRYPTO is obscure and hardly anyone
+uses it.  The kernel's generic crypto infrastructure is also really cumbersome
+to use, so the trend in the kernel overall has been a move away from the generic
+crypto infrastructure and towards straightforward library APIs (e.g.
+lib/crypto/) that just do the right thing with no configuration needed.
+
+btrfs already uses the compression library APIs.  Considering how disastrous
+crypto_acomp has been so far when other people tried to use it, most likely the
+right decision will be to keep using the library APIs for the vast majority of
+btrfs users, and have an alternative code path that uses crypto_acomp only when
+hardware offload is actually being used.
+
+There may also be a way to rework things so that the compression library APIs
+can use hardware offload, in which case the crypto API would play no role at
+all.  I understand the Zstandard library in userspace can use Intel QAT as an
+external sequence provider, so it's been proven that this can be done.
+
+BTW, I also have to wonder why this patchset is proposing accelerating zlib
+instead of Zstandard.  Zstandard is a much more modern algorithm.
+
+- Eric
