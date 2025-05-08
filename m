@@ -1,103 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9568713635C
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 11:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A40B665;
+	Thu,  8 May 2025 11:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746702761; cv=none; b=FaqlpDmxAuThWiDaE4o9kMXyQCN4JNBBYSQtw/BCbT/96Vxj3n3Ws4QI8kbtEB/Zjunrszim48kVs559wC2fPnUtyIHg6J2PqkbSFuBXJQvSkAQd1KLx4e2YndHxWZIq8drZigasqzZyLsV0VQZjQ3PQWgBTg02mEyIKk/H4K8E=
+	t=1746704396; cv=none; b=b+vx4CmwKp7vz5QIN6QhXxbQXBUhUu5sl2jAj3VvgyaswmxFzLOF1Fa+TVBOINCIMpJbhfqW9hwTzyPWTYNRx0rvHfMUgsFgs+yPyHwLm9I1Bu9oQR8pzFuIb6/XE0XgubIM2ipPudVQayEuyvVR44Tqzj2cvubifv8mIs3Y5qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746702761; c=relaxed/simple;
-	bh=dQv4VZZjttjwpAYaN2Cr2j22vzgaZy27VORq9EYvLaI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A8lB4EoqrEFO3u7fZD2s21QFFZZRlrmhVRMGnved5Yi/ht2gV4pWL67vDYChTfE2hGRnFnJCzdOkdQNY19O/p01MS2ND8wk+4cTjSM8xr4TnCD+57vSi82qUBkjAVKv8WOMfBW0nXTIFMO1s+i6QsKCBfPfYXrSKsMU51Jm4yAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CV9TL5+t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746704396; c=relaxed/simple;
+	bh=fPQdKvCJDhLYIvVC0aFX67n1LEU1/snDN+9EgYkgCFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvteankjgQ7stMd7ac/PcCx4qjDbEOJIBhJMm/nt9dWQ3sn0NXIz2K34JdG9Xi0bW6EJl6cNeRmxIcAZTX/f5NU3cMQXQysvkcWZ8zRpoVrRbQX4Kd6gpVXBmS0+bwbiac+9ReR3e6cTfXw7O/gqSv4qnmXjY4avFEjohRhi49c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=V5q87i8f; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CV9TL5+t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10C54C4CEEF
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 11:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746702761;
-	bh=dQv4VZZjttjwpAYaN2Cr2j22vzgaZy27VORq9EYvLaI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CV9TL5+tLhI/kBY4HRz4UYQxpsR4bXCnb0ZNiqtYiav5pvzlUEPLA2BVeRgjBMo8s
-	 xxrojTH2jQnX3lpoRzhgPZOpbJcidKfLxwQDnXykQveiu5u0bUSLxMkdZVMK9q5Dop
-	 EisJ+TOF7S8iozeZyWghtaANIs0kEG4gaVw82NYNWnEZdIvA6CYxDp14Aqq/Z5jvDT
-	 KksbmddqX1K53NnoWLo/FCU6/cUYfWdVJnHnVUVHXSfR9cgnNNzCCFahw7t199HXzB
-	 T68teNWa7Ypop+lyoIcvTujV1SNglzFyG/O4Muw2/+8Cth2uCBPvvVoGnlftg2BVKY
-	 ruFRP/ep+qjsQ==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54e98f73850so943317e87.1
-        for <linux-crypto@vger.kernel.org>; Thu, 08 May 2025 04:12:40 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzW681QCOEMfHez7UHpH73N491F8cvw7X1tamSTiNFHsf8akmT/
-	C4H8MhNIsDhCChCbsTnCEo5jpVqNGdWgryxXXT7WQMZhbM6yqFUaaVF90ARc+3a3jtehkKKxTY6
-	yF/qF/V3xEdABTe62EJFZOyIjLe8=
-X-Google-Smtp-Source: AGHT+IFGPDtvLpdITsEEqjXGSwOWV9roUGQMbaVqW0JaYrTV9EEgDYm6kB01vuz+QWi2eIIHHp2FwS1dEfhjWc9mkg8=
-X-Received: by 2002:a05:651c:512:b0:30c:2ff9:913f with SMTP id
- 38308e7fff4ca-326b87a07b1mr10358451fa.2.1746702759412; Thu, 08 May 2025
- 04:12:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="V5q87i8f"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=SWSIVafegTr2c9lkZjFs/xIIH46FvLh6zwN5OpSFD8g=; b=V5q87i8fQLjOQROwPuiopR311X
+	iySMgEPmhBnZdSm/Ks/2C74Dtj2CL3mxmbQO8wtjd/M2mEiHAlEAO5TJgX9tP9/GyyL+EjiHQ4n6d
+	9B3YfPqF3rFF+swo7mnAP+pp1An2DSOZHLDgNPKbhPuu3Tz5l31unhyyNdIZm3osmFOP73gBcrCgQ
+	mbOYD0N6AeEsi4vi6lx8psw5CNGvPbfuXwVIODaaHdPG0nuq8YpzVuKbqFk4NRnzsk64E5OeGvZ4W
+	WslSavsExHmT3AxdihtslZXlj+dgTj1tZejY2s0/rPhTtznBe0279TmqDF+Ey43TJzEa2yStZ9kld
+	/o7/tTag==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uCzbJ-004Zgm-0z;
+	Thu, 08 May 2025 19:39:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 May 2025 19:39:41 +0800
+Date: Thu, 8 May 2025 19:39:41 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Cc: Thorsten Leemhuis <linux@leemhuis.info>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH] crypto: powerpc/poly1305 - Add missing poly1305_emit_arch
+Message-ID: <aByX_Y64C6lVRR8M@gondor.apana.org.au>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
+ <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
+ <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+ <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250507170901.151548-1-ebiggers@kernel.org>
-In-Reply-To: <20250507170901.151548-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 8 May 2025 13:12:28 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
-X-Gm-Features: ATxdqUFYGxXGhZglYKPIAlc9mrcFsSZRZtD9O4OPJJK-YwuYX3afTt3dDfEH5W4
-Message-ID: <CAMj1kXEPvPKg3i9NkaYN+m4pGfw6P05g-H6_Dmb3AsQyRmU7MA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm64/sha256 - fix build when CONFIG_PREEMPT_VOLUNTARY=y
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Thorsten Leemhuis <linux@leemhuis.info>, kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
 
-On Wed, 7 May 2025 at 19:09, Eric Biggers <ebiggers@kernel.org> wrote:
+On Thu, May 08, 2025 at 02:46:06PM +0530, Venkat Rao Bagalkote wrote:
 >
-> From: Eric Biggers <ebiggers@google.com>
->
-> Fix the build of sha256-ce.S when CONFIG_PREEMPT_VOLUNTARY=y by passing
-> the correct label to the cond_yield macro.  Also adjust the code to
-> execute only one branch instruction when CONFIG_PREEMPT_VOLUNTARY=n.
->
-> Fixes: 6e36be511d28 ("crypto: arm64/sha256 - implement library instead of shash")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202505071811.yYpLUbav-lkp@intel.com/
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/arm64/lib/crypto/sha256-ce.S | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/lib/crypto/sha256-ce.S b/arch/arm64/lib/crypto/sha256-ce.S
-> index a8461d6dad634..f3e21c6d87d2e 100644
-> --- a/arch/arm64/lib/crypto/sha256-ce.S
-> +++ b/arch/arm64/lib/crypto/sha256-ce.S
-> @@ -121,14 +121,15 @@ CPU_LE(   rev32           v19.16b, v19.16b        )
->
->         /* update state */
->         add             dgav.4s, dgav.4s, dg0v.4s
->         add             dgbv.4s, dgbv.4s, dg1v.4s
->
-> +       /* return early if voluntary preemption is needed */
-> +       cond_yield      1f, x5, x6
-> +
+> I tested this patch by applying on next-20250507, though it fixes the build
+> issue, it has introduced a boot warning.
 
-This will yield needlessly when the condition hits during the final iteration.
+What was the last next tree that's known to be good on this machine?
 
->         /* handled all input blocks? */
-> -       cbz             x2, 1f
-> -       cond_yield      3f, x5, x6
-> -       b               0b
-> +       cbnz            x2, 0b
->
->         /* store new state */
->  1:     st1             {dgav.4s, dgbv.4s}, [x0]
->         mov             x0, x2
->         ret
->
-> base-commit: 20e9579f11b6cbdf0556d9cd85a0aa7653caf341
-> --
-> 2.49.0
->
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
