@@ -1,188 +1,230 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ECF221703;
-	Thu,  8 May 2025 08:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746692362; cv=fail; b=pUXwm3oNK0SuF6kSSqwZwC0RDzP8kebpadhRpdy6pJDZG1Q6cpKV2jOmScyMK14OOODHKmAPLyKzcG0Adl4orGcdV7jMj1fSWFEh4f6yMsnvdBiAs6XkN2xx9sf9Vu0H2BEddZJ1rCB+NKCzmzAs/uezFH8g3jA/i737ECkPodY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746692362; c=relaxed/simple;
-	bh=krrf3HSfDNmcHlVwJbwmvxKIjj8ITiLpjcMRZ1WPic0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tQtZSRhufIWG07sUf9fwaIn45O3XOitunb9/NGSUbwMG4rfxEZq8AiqVyb4ik8NvbERR33TIOAPTGaZDGHR5OPZeVAr9mNFHpVc5TXEDuwu5bBUM9Rj2W05PgH4TkwnWrno1G+izbW0WGBZOcjbBqYCQJbRgwq9MVoFgiudrPuE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DtqL0uZl; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F571A42C4;
+	Thu,  8 May 2025 09:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746695795; cv=none; b=HUMtn/HhJdpnfekIhvwDVk5NFECwDlqoxtR019tszWMghBsPdGXEBufw66cD3yg22YgT0YRz41+OWCGzDPpDqeimq8YKX8vFZBJ3Q/mvZ6fG8EM9GaKDMm9I4XgUnqei19OrawVVscegOWR9xyzyvuKh8tP6LHMGl2+E4JMllFo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746695795; c=relaxed/simple;
+	bh=IHBVqgqSDmB+55+UqaXdIH1khHeHtFN9JCHjpuEBUOU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qWKYYWxdDB2OIdFSXynsvRmOzqxmvAGMnhMb8MfrUlOeL3+lk2OrrlCW5odeAmKrhrtvirp44ha0qhuKM/AwuDULTvPPaKweN3DKSkTNgkAsfuQtJWJwrPWw1y0/LRsBIYNt32eWDJZjl4KjcIb2BsyIt9NU/vpwf9qR6Pp+AOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GKMx+nxs; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DtqL0uZl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746692360; x=1778228360;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=krrf3HSfDNmcHlVwJbwmvxKIjj8ITiLpjcMRZ1WPic0=;
-  b=DtqL0uZlgH8KHg4KHdM1fq3lVOA4ZTW347Ymass72h/63WOnzYfr6Uil
-   pfjwUobNmWrl6td0DxnjDMgYUhfF2wPnkK1Q5blso2wWnsDyMvHLo00/M
-   9Y24ntfMkAUewRyAcdSxXqUmohiz6GCyBSMXUZoGSIWUZplNd0+B45+G7
-   0SA6W/wgID0LTVkEZDj/KpGGUkxIOATjcgosR53XBmejqE+Xml7CR3/24
-   66sdb/dKeSOt4wY/5nSqZmc0DrwSyV1sMhRR2ID97xsZNsHfNzLpzgbtY
-   ZybMGatyVYF+dryx43N9rVcOWr1tswy4WCXyGb5vYyGWY6Cv0wrFa1oxk
-   A==;
-X-CSE-ConnectionGUID: 4t5/7pX0Sn25lH6opC4/BA==
-X-CSE-MsgGUID: kNekZxxZQvuH2KoRLBSl3Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="58663744"
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="58663744"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 01:19:10 -0700
-X-CSE-ConnectionGUID: +u2EyIRaTXOU6ahPg3ZpGw==
-X-CSE-MsgGUID: I+6hcv50QSqHgY0ylMDUuw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="137211604"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 01:19:10 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 8 May 2025 01:19:09 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 8 May 2025 01:19:09 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.46) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 8 May 2025 01:19:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GVpcHquDlbTmrapSQ/ItNUs5fMLLF0Xa3MGClF4p3Vdt6KA+LBNWBKkz2PL7lmbAd0on22LvBCdLRarjTB9NKdJQUM1RL/7pl0HO6IA5UBzGi4RxDAxqM2FXNrQpKs6qdE/8zeo1sXveVEuy22Z2/UrbBrlt7YMwKjOO5r6F3uuTOW8RwSn2ZYzDLRGx4CDgXBNtHvCoW16mfVWzsQVak7I3yI00eFsWDxWtTX7QloCg09JG29bYVFr+tRKM4ardkN+gOHJoMXPi+tDC8CNduv7AFDzbduLXlDp9q3NL3gX7+y3r9vZRWvinQCTZrmBnj7zNsE2bmARA2FWkGZ/8bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kR43zS1Cmv7/SEX6DWQOgMu4EWKQv4xegOhX6EBKiyE=;
- b=cTWPzSAKMUwV1bfbAr4JMz0bnkw65q93Pj6qD0k9wHzBq9AyCsOgxR56YueZj0po+fbGB7GLZotBPl9Ey0SmJ/SlXGuVAiyKTCgppR1D+luKQrr1KDW7G8+MvVJ97Xh2HIQj8QBLPqrL6msMIhRALgp0RRZsR1EM6I1Xc01xRYkRBaNhszrLzY5VlOfN34smEATDCHJDtBh6BXhI+L4qdYOSUXgW8O6sIwmqrxXiIIbLabtmJMvKpT9Ar0/1Pm0kzGbU1n8cl90IzdX2BaylGqZGBaTE4lb7H+OnGubivk79TH30VDHKVU7fHDwORSRJYRRbgnHh5HCPMmfJ1JZqwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by IA1PR11MB7319.namprd11.prod.outlook.com (2603:10b6:208:425::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.23; Thu, 8 May
- 2025 08:19:02 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778%5]) with mapi id 15.20.8678.028; Thu, 8 May 2025
- 08:19:02 +0000
-Date: Thu, 8 May 2025 09:18:50 +0100
-From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Laurent M Coquerel <laurent.m.coquerel@intel.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	George Abraham P <george.abraham.p@intel.com>, Suman Kumar Chakraborty
-	<suman.kumar.chakraborty@intel.com>, Karthikeyan Gopal
-	<karthikeyan.gopal@intel.com>, <qat-linux@intel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH next] crypto: qat/qat_6xxx - Fix NULL vs IS_ERR() check
- in adf_probe()
-Message-ID: <aBxo6nHlp92UjB4h@gcabiddu-mobl.ger.corp.intel.com>
-References: <aBxOkY99jQF7q-7M@stanley.mountain>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aBxOkY99jQF7q-7M@stanley.mountain>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DUZPR01CA0036.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:468::14) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GKMx+nxs"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5487nvWM012196;
+	Thu, 8 May 2025 09:16:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=OUQs9u
+	FbnBcoWm8xxAZWEmoDdHesKZKr25oTwpFqAMw=; b=GKMx+nxszPGU29lsko7dYD
+	hhGySEDlZp3nYfp+yU70Kowj8Ox37IqaBqNB/FjKiOsHXMGH7eVGvj0FbF5tALID
+	rNNs4sGJZWsAUkSpycyr4oi5DaPcgm9tGd0FG4YRE294FSKB7CO8QtQtcUhuGwGy
+	ko2lcq38EiJ9LkIyFJAEoFLPFQ+N2+vHehwQrQu+VFZduXAPbTFCF7j4kHIPdLEy
+	yzw0Mv+j1jA2AMHWh6+GoO/kxoJzVJDUT/De99GElTk5AsYMfZfVIRigTgNgrYAM
+	4tXeG1G1m/ZKeBBJfEtFLYtuMv14uBL0/k1sjUj8u6IiHCmiVtDOL9FksB+kQfeA
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46g5ejww6r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 May 2025 09:16:11 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5488bjSj001313;
+	Thu, 8 May 2025 09:16:10 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46dwftn8pe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 May 2025 09:16:10 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5489GAvD21496340
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 8 May 2025 09:16:10 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2B0E558055;
+	Thu,  8 May 2025 09:16:10 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E0D0858059;
+	Thu,  8 May 2025 09:16:07 +0000 (GMT)
+Received: from [9.61.251.83] (unknown [9.61.251.83])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  8 May 2025 09:16:07 +0000 (GMT)
+Message-ID: <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
+Date: Thu, 8 May 2025 14:46:06 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|IA1PR11MB7319:EE_
-X-MS-Office365-Filtering-Correlation-Id: 680712de-b902-4d45-219b-08dd8e08fdcf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?PN0WmQkSF5YG7NiQ6EpyPrD9HFU1vi/hsGLgaLqjXdhqPduvNGyT8lCs0zyu?=
- =?us-ascii?Q?bzyG3Z27eW857aFlFHVP25t4/pyVImcIwDdtFgKD3MFR9/T5TKgmXKgBk5QC?=
- =?us-ascii?Q?Lts1ELyM7EyfDGrAtk+6n/Qv6JHghIN2dOn93iwkoxpKXZ/BE7eu4wr6vnvA?=
- =?us-ascii?Q?Kf+I7F9nXdSRuXZtS8HdTvK0B0yg3TE29MQ0lQPin0+CuwUvzVQ5KOr8txJ5?=
- =?us-ascii?Q?yBgZhXGjiyf2Giv5GHn9+zAFcdIxwhWGcNMJZDVvMS2PJMYU1qN2SAAQIQCb?=
- =?us-ascii?Q?fcZ3T3uxU7fup7J1zRGpxFNFytO4dW1lp3jq8pf9J5QNEm8qMdU/Dgx145mF?=
- =?us-ascii?Q?8wjc7RB5ADZfyEc/RRw6CvHmvTNVGw63S03hDbFTxEye5HmmSfO05Gd9cObx?=
- =?us-ascii?Q?nOm8RhtrXmJSquKCG6qEftCOWuwQrpzxir+SmouwEuC+uW/YS6XduusG/ze7?=
- =?us-ascii?Q?N61t7MDW1l63yOOOzR2rejgTo1JCUXDgcJ7FIWHQwPF4NAEx7BoViBrF1Yek?=
- =?us-ascii?Q?xGaMkzZGKixGHNm1TBmYyTqBAQe0uvlytLJQmFKsdPVm30P8XgnpjS5qqu77?=
- =?us-ascii?Q?ptkwFnZ3mPfD9vb1TnUjre0wRXQ5lZnX53otrERdJWc45I6ml6xOWwdOyrkj?=
- =?us-ascii?Q?PxUrZdGgrR9vvILqDhdP7VwvCfCE9APhKSPw4x9e6Mmdv9L7cNfsQK4i5Niy?=
- =?us-ascii?Q?cIMyHJjvsH+hpBiQBXjoOA1RkzsORRMv98DHDrylQivDGmFz4cb4Hv2wb64G?=
- =?us-ascii?Q?XgGO562WYC13O6GVLEoouc5ONs54HYx8k+Q3CKKrwmNeiTKsF2+hZ13xczIr?=
- =?us-ascii?Q?I+X049WTDTBks03rT5sqDQV6naCxvEnBEOZUiGsZjUdt3+Tx9CStkug0rOVY?=
- =?us-ascii?Q?1kR9yBY8ZQRlPRdQVDd6NH++BXgm9dREJF3bDAisxZBK/O8Cz5K12ftpeG3s?=
- =?us-ascii?Q?Ty/2fsdrRUpJ8DlKA/90E7pQNLErfO29cdwdOWfQboV7jLhweKap3qpow4Bc?=
- =?us-ascii?Q?ThZiTAkFd+tOGfL3W6FpKkUhd6PZ/kmZPL/K0KpM4cKoEM92FN9NrfV3rPzg?=
- =?us-ascii?Q?ZPsYHW65pkZ4kRK61z2WTl6HPTb6QYDreEc/P+90BGtGUDGpdubO/HYrpFU8?=
- =?us-ascii?Q?aGylGTWk2oMoOb+mqQv4wZlTINWXvgNhsCJszcOgxkiiS5NKh0vq2jpNMEfV?=
- =?us-ascii?Q?jzv7k0TvXxDgDnYigk48RPQX57L3waPduYLKb7mWAIiaXetYooEV0qdhw6tn?=
- =?us-ascii?Q?UOXh8Q75rRtoukto315ETP+sjvIZGSXCzBcXyhG9R6DQYzUXCenHpRfn/mAY?=
- =?us-ascii?Q?4sbURGVtqfhnHsPhzlTNmovPrWFCtAGZk789cmXk7VSPj4rLAjAZryL6AbcL?=
- =?us-ascii?Q?KJnP4y6znuErT0xRZST4TZn1cAg9GH7/8Dw4/UEWAqsv4JE5gw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9v2eASjfwmBYqtjnmCUwlIJrIkd+mPHrbD8XEOUOKMA7SfndzAgSaKUbTlLk?=
- =?us-ascii?Q?iP3WvDsEBatyetd/JHx4fxEUK1EfuYY2USfW+rl/stcXEM//dxsyUYwBPZki?=
- =?us-ascii?Q?zzEFsIBC6p8u+0lhhKIJnbHWvRtKd7DoaXi+WxC2qulDiVM4v7LEPHewl2Yi?=
- =?us-ascii?Q?dC+Z0T9zyH2ApZ9r8GiPnOFSKcHRSlEDgCc3YUKxdHUkpKzOVPRAA08zqwF7?=
- =?us-ascii?Q?bq0T9LNKoR8jeUkIIFrEhM+AIn2ud3Rjde/ev1nsF6R65ybCHLig7I4aiVP1?=
- =?us-ascii?Q?NlzwQnlpe10p5jZYM5WuIiP96L5c8jQffbqDjy8/lzRd0SUGExjOccU40lOA?=
- =?us-ascii?Q?le8QmZJrQmx3qDWeZ4ALC1NLAV6iaWBuTcDj37DXi4RRQMHsDqJEXskbpP2e?=
- =?us-ascii?Q?lzj7U9nKjflYsBACNJ0Dh3CXx/jZBjaE2vZPMoyr5pXVRbMc4L+GxSFLzd0Y?=
- =?us-ascii?Q?VoFB42vgHb/HQi6e4CaWiyrDouHVF9CsnJuaDIF4tOgDw9RKlPgV1U4SJd9L?=
- =?us-ascii?Q?6J46gAa13Uai5RQDgUFDItseBN2MHck3xr1K+bE/UM6LRYXgQoz1vqbc9E4d?=
- =?us-ascii?Q?D4ki2LCM1RJggRg414LEQDMECVN+X2RnAjgIcTTx3CLtFMpxZTTGsPAzO4K7?=
- =?us-ascii?Q?TNDM7+53O8b1pXnwlbbQCRsXMlmXi+XUQS0ae+ar83RBHDD18fMhG2ckY0Dh?=
- =?us-ascii?Q?0BqZBJmycOVQKr9n3ol+pK2cPPzbzDQO6i1D5x08idi0GfbEa9IMBLvHwNH+?=
- =?us-ascii?Q?ZpWlCrPFH7vbXKYnCc1zYL9TkhySKgUV/HFwYHoiwaOA8y2OkphVbly0+m0F?=
- =?us-ascii?Q?9MzLNCuqVBWSJwnuvRvRIYyCPgnz/+OkvrARNJwT21HO/Q//B2QcwWWfszFD?=
- =?us-ascii?Q?VOv5hNR85b/Cb285SUwooytIEfy5nJehLuIDlB/O+CovXeHJosCVtwy8ss24?=
- =?us-ascii?Q?gX5lJ3+BKr7xwgdWrODgjl5OaW8GRrt/UGF5IQ2CrnXs6pyIOfhVeU9+tIWS?=
- =?us-ascii?Q?KqNsoVdZwwgxru/HHqC17elpqf5ryOSQmYT8nKN/fa2hRSf7VZuKPQpQb/gk?=
- =?us-ascii?Q?OsUb7p4wEyuU0x6Ls/c8ETj0/tqxn/i4yaZt9Zc0lU1U9rBSjbwB0++W/x32?=
- =?us-ascii?Q?F5FvxITtIbmKbR+ly3XaKL3aeeUGtQgHWn09TtZoP6J8Omk4FJHwRdhLs5MA?=
- =?us-ascii?Q?LJiAkPBMLy0huyiuvGC/83Jp6r2la/56VJvFuWG7KdNXutVJb4sWC0cWaxF9?=
- =?us-ascii?Q?+x1bFEfpE2l44xOW5mVp522W9MU4ckvUi8pnMX5d/j+0CFR0op477QpTQ76T?=
- =?us-ascii?Q?3ySct5WmvfHLa0AiFNGmAcXU69CRAVgeiFjCy21N6UfEG/eJV9USTdpCcOhk?=
- =?us-ascii?Q?a096fD7RJ16yJ3F8y7ObXuVr4iZnCfwp+bs5sLkXF3yY7/KG+qRbbzSyTXe2?=
- =?us-ascii?Q?rIHOmIkBTgFfskyBW88KY3FISSAUVpvm4fXTpsPirqjrbwOVWAjHe7TTW9pm?=
- =?us-ascii?Q?4C/IXXZxz0JkQbj4/jzoPcUnRznfQS+P9O2QjoQtnOlCESDk6ZPQemvqJcGX?=
- =?us-ascii?Q?elIM9KqMGVlwFqBx90ppLmKPThnBTv6XF5zxe9Ln8cGhRsDCYKkgmb/kNj3g?=
- =?us-ascii?Q?iA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 680712de-b902-4d45-219b-08dd8e08fdcf
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 08:19:02.7412
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1Re2BIpry9hidQaY7Bk6P+XHDKEn0v2iPrV8RqcW+F2VoLtVbsm7WpgUp2jlhy1ssHxmo0ia+ulj66zpMKMEl+EIvsl1pu9WuI0LMRL1SII=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7319
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: powerpc/poly1305 - Add missing poly1305_emit_arch
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Thorsten Leemhuis <linux@leemhuis.info>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
+ <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
+ <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+Content-Language: en-GB
+From: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+In-Reply-To: <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=SvuQ6OO0 c=1 sm=1 tr=0 ts=681c765b cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=lAgNKBcoAAAA:8 a=FNyBlpCuAAAA:8 a=VnNF1IyMAAAA:8 a=r7MKod_UI1lkIC2NXqAA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=drE6d5tx1tjNRBs8zHOc:22 a=RlW-AWeGUCXs_Nkyno-6:22
+X-Proofpoint-GUID: kJWh61mFWr0ADYxJozMTIY58WU1C0PNQ
+X-Proofpoint-ORIG-GUID: kJWh61mFWr0ADYxJozMTIY58WU1C0PNQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA4MDA4MiBTYWx0ZWRfX7iNdu0IiaF8d /UU6eo0IvCyMh3JVkhslGEfjp8MJkn7C97xr1wm6t0Ysf8PiVM06HR3BsPxuWoXELTDA+rdxoVc wlAjgOi5FixmlRA2JbhajKmxuJXxy9e2ompZJjacb33d/BY6E/BvazU38cUTTg92sgTaVtoe6HP
+ pHdufPXhjLwgNxOgAOm00+lCZJmXnT4JBGlOpWVMfd9J11aXW+dUx/doHRatfv458vsh3VNUBWv OopPPEGKxhZCkxPsQJWkPVxEex7n7SFU2TObpljPicaBCFYFx5vHjYYDiGKwn029Hzh3mWYd7E5 257WUxkS95zd0QWlrDkldU9/DHxO4tl67YtY+PtWN9s9WzzVa53fCXuzZsHBJdgR6A5M6EzJQlm
+ WxDBhhNLwr7r+l81KicPCD3K+4tFenV5cSSDVQQIHjKpMCr/0tCEnbcjjM//eHMZoNphOeb1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-08_03,2025-05-07_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 phishscore=0
+ adultscore=0 priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=0
+ clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2505080082
 
-Thanks Dan.
+Hello Herbert,
 
-On Thu, May 08, 2025 at 09:26:25AM +0300, Dan Carpenter wrote:
-> The pcim_iomap_region() returns error pointers.  It doesn't return NULL
-> pointers.  Update the check to match.
-> 
-> Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+On 07/05/25 5:06 pm, Herbert Xu wrote:
+> On Wed, May 07, 2025 at 01:03:06PM +0200, Thorsten Leemhuis wrote:
+>> """
+>> ld: warning: discarding dynamic section .glink
+>> ld: warning: discarding dynamic section .plt
+>> ld: linkage table error against `poly1305_emit_arch'
+>> ld: stubs don't match calculated size
+>> ld: can not build stubs: bad value
+>> ld: lib/crypto/poly1305.o: in function `poly1305_final':
+>> /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x2dc): undefined reference to `poly1305_emit_arch'
+>> ld: /builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/lib/crypto/poly1305.c:65:(.text+0x378): undefined reference to `poly1305_emit_arch'
+>> make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux] Error 1
+>> make[1]: *** [/builddir/build/BUILD/kernel-6.15.0-build/kernel-next-20250507/linux-6.15.0-0.0.next.20250507.443.vanilla.fc43.ppc64le/Makefile:1250: vmlinux] Error 2
+>> """
+> Oops, the powerpc patch was missing the assembly part:
+>
+> ---8<---
+> Rename poly1305_emit_64 to poly1305_emit_arch to conform with
+> the expectation of the poly1305 library.
+>
+> Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
+> Fixes: 14d31979145d ("crypto: powerpc/poly1305 - Add block-only interface")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/arch/powerpc/lib/crypto/poly1305-p10-glue.c b/arch/powerpc/lib/crypto/poly1305-p10-glue.c
+> index 16c2a8316696..7cea0ebcc6bc 100644
+> --- a/arch/powerpc/lib/crypto/poly1305-p10-glue.c
+> +++ b/arch/powerpc/lib/crypto/poly1305-p10-glue.c
+> @@ -17,6 +17,7 @@ asmlinkage void poly1305_64s(struct poly1305_block_state *state, const u8 *m, u3
+>   asmlinkage void poly1305_emit_arch(const struct poly1305_state *state,
+>   				   u8 digest[POLY1305_DIGEST_SIZE],
+>   				   const u32 nonce[4]);
+> +EXPORT_SYMBOL_GPL(poly1305_emit_arch);
+>   
+>   static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_p10);
+>   
+> diff --git a/arch/powerpc/lib/crypto/poly1305-p10le_64.S b/arch/powerpc/lib/crypto/poly1305-p10le_64.S
+> index a3c1987f1ecd..2ba2911b8038 100644
+> --- a/arch/powerpc/lib/crypto/poly1305-p10le_64.S
+> +++ b/arch/powerpc/lib/crypto/poly1305-p10le_64.S
+> @@ -1030,7 +1030,7 @@ SYM_FUNC_END(poly1305_64s)
+>   # Input: r3 = h, r4 = s, r5 = mac
+>   # mac = h + s
+>   #
+> -SYM_FUNC_START(poly1305_emit_64)
+> +SYM_FUNC_START(poly1305_emit_arch)
+>   	ld	10, 0(3)
+>   	ld	11, 8(3)
+>   	ld	12, 16(3)
+> @@ -1060,7 +1060,7 @@ Skip_h64:
+>   	std	10, 0(5)
+>   	std	11, 8(5)
+>   	blr
+> -SYM_FUNC_END(poly1305_emit_64)
+> +SYM_FUNC_END(poly1305_emit_arch)
+>   
+>   SYM_DATA_START_LOCAL(RMASK)
+>   .align 5
+
+
+I tested this patch by applying on next-20250507, though it fixes the 
+build issue, it has introduced a boot warning.
+
+
+Warning:
+
+
+[    1.644487] ------------[ cut here ]------------
+[    1.644490] WARNING: CPU: 3 PID: 1 at 
+lib/crypto/chacha20poly1305.c:359 chacha20poly1305_init+0x28/0x50
+[    1.644501] Modules linked in:
+[    1.644507] CPU: 3 UID: 0 PID: 1 Comm: swapper/0 Not tainted 
+6.15.0-rc5-next-20250507-00002-g8be5012869c6-dirty #1 VOLUNTARY
+[    1.644515] Hardware name: IBM,8375-42A POWER9 (architected) 0x4e0202 
+0xf000005 of:IBM,FW950.80 (VL950_131) hv:phyp pSeries
+[    1.644520] NIP:  c0000000020646c0 LR: c0000000020646b4 CTR: 
+00000000007088ec
+[    1.644525] REGS: c000000a03757960 TRAP: 0700   Not tainted 
+(6.15.0-rc5-next-20250507-00002-g8be5012869c6-dirty)
+[    1.644530] MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 
+28000282  XER: 0000000f
+[    1.644544] CFAR: c000000002064ec8 IRQMASK: 0
+[    1.644544] GPR00: c0000000020646b4 c000000a03757c00 c000000001dc8100 
+0000000000000001
+[    1.644544] GPR04: 0000000000000961 c0000009e94dd5c0 c000000a0d348000 
+0000000000000960
+[    1.644544] GPR08: 00000009e7270000 0000000000000000 0000000000000000 
+c0000013fb400000
+[    1.644544] GPR12: c0000013fc9fffa8 c000000017ffcb00 c0000000000113d8 
+0000000000000000
+[    1.644544] GPR16: 0000000000000000 0000000000000000 0000000000000000 
+0000000000000000
+[    1.644544] GPR20: 0000000000000000 0000000000000000 0000000000000000 
+0000000000000000
+[    1.644544] GPR24: 0000000000000000 0000000000000000 c0000000020b19a8 
+0000000000000006
+[    1.644544] GPR28: 0000000000000000 c0000000020b1960 c000000a05490a00 
+c000000002064698
+[    1.644600] NIP [c0000000020646c0] chacha20poly1305_init+0x28/0x50
+[    1.644607] LR [c0000000020646b4] chacha20poly1305_init+0x1c/0x50
+[    1.644612] Call Trace:
+[    1.644615] [c000000a03757c00] [c0000000020646b4] 
+chacha20poly1305_init+0x1c/0x50 (unreliable)
+[    1.644624] [c000000a03757c20] [c000000000010d1c] 
+do_one_initcall+0x5c/0x37c
+[    1.644631] [c000000a03757d00] [c000000002005394] 
+do_initcalls+0x144/0x18c
+[    1.644638] [c000000a03757d90] [c000000002005688] 
+kernel_init_freeable+0x214/0x288
+[    1.644645] [c000000a03757df0] [c0000000000113fc] kernel_init+0x2c/0x1b0
+[    1.644651] [c000000a03757e50] [c00000000000df5c] 
+ret_from_kernel_user_thread+0x14/0x1c
+[    1.644657] ---- interrupt: 0 at 0x0
+[    1.644661] Code: 7c0803a6 4e800020 3c4cffd6 38423a68 60000000 
+7c0802a6 f8010010 f821ffe1 4800028d 60000000 68630001 5463063e 
+<0b030000> 2c030000 4082000c 38600000
+[    1.644681] ---[ end trace 0000000000000000 ]---
+
+
+If you are planning to fix this in seperate patch, please add below tag.
+
+
+Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+
+
+Regards,
+
+Venkat.
+
