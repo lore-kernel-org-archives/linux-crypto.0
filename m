@@ -1,99 +1,317 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B48872624
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 19:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14E628A1D2
+	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 19:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746732089; cv=none; b=UA0lhvwQON2mK9LCjRUOcxw23gRVPbzbfET/Ho+v9XDnRaJIS1ZXKoJIK4uW2wT4FUl4e+vA0x9+/YRoKAzMUyFFVJn0O+U9uwZK9uO23v+ndclFSQTWZ4crLW5UnXKcWuxDvjDqFk3YnfNKoZ7sIpMzVrBvomk3kRGEmqm/eYI=
+	t=1746732223; cv=none; b=faHr/Xe025TIJLWtHaHvxCbIOf7HYcTP7WoJRH6luUm1ouWtkfA54SXI0Kj8kuUvx9iVHjBGbfL2kd9IAkD/xoPhz/fRZyPShrd0enllxBPX8SKV1MHxR8oLTkOxcLFf7jLtoD10UUWiZnF8deHPL6ERLYMUzeCB+wtjdLiw46o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746732089; c=relaxed/simple;
-	bh=INFtWfoFKzfi8BRZ5KQsSQzDdt0mkEqNMfs4pBazRGY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gwRzm2kPViCxi/XwrDE+cUhP4Dz1Lk4DaPK3O2S1hhVmpix4jH9wlyWZJohClABrPDCtuDmvqmVRyNQaBzIdlho4dXwzPij+AepEcYTOjaG7adHcvznF4WzqzIdzKrmZEjyLdqESA2EceJQSxpzvnpKkbtvl6PXUv3YhDYJwrbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OG4K6vgi; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1746732223; c=relaxed/simple;
+	bh=HeIkrf/DTlLp0c59YdqAg+bDkVLnbRSgjhYsmzND7tI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C55HZQmeqsJ/u8xTJxy0MunIvo87G/BDBAxSGFeJ+sUm+24RRQ9dWn49gzZ3K32f19eaZdCr5hNI4twgD/nqk352WoFT05S3QoUxguWHcTdy3d/O7FaXdYhBE/FQpCFuGZb/lDoggR3ClQ42p5ou5JwV9KRvbATcYINNDe3KoCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Tyxz/fox; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OG4K6vgi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746732088; x=1778268088;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=INFtWfoFKzfi8BRZ5KQsSQzDdt0mkEqNMfs4pBazRGY=;
-  b=OG4K6vgirEWRziI46VmtRss4/WxpoDyOBJxWG4LPfTiORc9JjWZCH4Qu
-   I9W3l4okiHk9Ac1h7R6qE0DZo9kVNyY84JRlDsEJ0o31NyJ+pZCjLu8Th
-   3XvcIZ4eOVwVJEpBd9m7kk54q/e+1fCM56QTvPf0YS45onOt7t1qLUeVo
-   GBYfS22PxwXKQrT0OQKfbdA7LdqGFldSebgk5A4hA5TnBvArdNragmNLz
-   XjC1hk5rGPNzqbeJhUeyvniFBP40pY3yv8T91wwd5IXquZcxeerXcBxlk
-   tVufEQVWqZo9fqFBs7BGyVAqoBJYfpewLlh0VtXnhdvffFuQc1a4IoEAp
-   w==;
-X-CSE-ConnectionGUID: d3gWltBDRJ6UdoolVlDUzw==
-X-CSE-MsgGUID: gnOVVW4uQBOL+tvkH3VUxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="59201016"
-X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
-   d="scan'208";a="59201016"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 12:21:27 -0700
-X-CSE-ConnectionGUID: Ij+eRQsGS06G6G4NSwNq7A==
-X-CSE-MsgGUID: Fh48hn0LT5GMSBeCUppjKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
-   d="scan'208";a="136398228"
-Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by fmviesa007.fm.intel.com with ESMTP; 08 May 2025 12:21:26 -0700
-From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-To: senozhatsky@chromium.org
-Cc: ebiggers@kernel.org,
-	giovanni.cabiddu@intel.com,
-	hannes@cmpxchg.org,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	minchan@kernel.org,
-	nphamcs@gmail.com,
-	yosry.ahmed@linux.dev,
-	kristen.c.accardi@intel.com,
-	vinicius.gomes@intel.com,
-	wajdi.k.feghali@intel.com,
-	kanchana.p.sridhar@intel.com
-Subject: Re: [PATCH 2/3] crypto: acomp - Add setparam interface
-Date: Thu,  8 May 2025 12:21:26 -0700
-Message-Id: <20250508192126.28232-1-kanchana.p.sridhar@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <2auyg2ozb5zppeadmufewg7pt4lam27iyimceqwtnqzt2avf4s@5sri6qk3bmhe>
-References: <2auyg2ozb5zppeadmufewg7pt4lam27iyimceqwtnqzt2avf4s@5sri6qk3bmhe>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Tyxz/fox"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-708d90aa8f9so13268287b3.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 May 2025 12:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1746732219; x=1747337019; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yRhUkqEtn8po9SOqhjXsORJmLCNwN2s1m7eTeLsarYo=;
+        b=Tyxz/foxfwZ4j6csDDPw8SfNzdqM6hx0uRJrzTvmrqBu1gyw+UtQm+RqkDQ2t2y9kZ
+         RXc8vdyGNE2T96ys79BRYJEqAoMadivU5a0hb7k9cHf/V0RWsqrlZbW4DwSssaxpDKKC
+         dCgT9orpLEFjhDDlzBRQNtHlRbdZZoYZ/Dr2WuOjJkfVrwssJ9FqBMGBMiV0DbL3gl0V
+         IvT6Ryd86G7aSljGIQ7LUlGcvQPq/lXWSEFv2EBs462pHpf31Wc/wZf1dVv1xutRr1QG
+         aanSsvP2Z0iOlx8vjJSwZC/75Y/YzYVUeDnbd65E9wH8TtjQCQGqVjDvcBe3g4LMJo64
+         JPdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746732219; x=1747337019;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yRhUkqEtn8po9SOqhjXsORJmLCNwN2s1m7eTeLsarYo=;
+        b=DyyzsgcAyETRcq5/njLXTpEWoY+2EAJm3My26rH/8u7KposrdRHgxB6g8ulZAJ7s+m
+         iDcM12gqEGK8KYaAlsi/RE7fE9u6Mllm1Z1hAuBMHiwH67g2qr5MjBHCXwu5BQDCbcFc
+         cD4rPvVyswqUpQ/ovGhX2s55fosjBovufmczp01ZcNK1cBMd0FnQWndAw/QwBuu+6tZD
+         w0+0lHCh2TrOkErggnOHO4jUhkOn+Pi8888Sy5MuZ+NNsijtjcj/Bj2GEUuxhFMUqEFk
+         jrIWoYxwV1ndRw/+vlr7KlvMMQUzuJKLvS57Bf3hSjak9Qg4hsWoFvWDtt0ijyx6D5mn
+         bIqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXxMU4xecwTQ3LhOK8aYq1mHcAdCd/i542uozhaFE1OInZ6VL9x6+ekJ6FMYIg1Hn3I2DFRrw/hSI0V4VA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhd8yHpR7gOYVzaGeYZ/jYsOtz029kXxKLCIARoEEluhpEzPww
+	Szhoui90lOe9vC/fGvU3Gqc8eE1IQKpo34+JJ5g9ITChgfz7bhVup7GrOJ3dKmknyYY//+vGBar
+	PWRt0fX5zGvA5S4YwRp9n2Q32G5XXJAHI0UJR
+X-Gm-Gg: ASbGncvk3r/IDFmQME214qPaB6h/m0EVHHjui9L4+M/17iQtsQlB/KXJpQtv96TjpKd
+	fLO8RngtYs+EdEWr3+3/QUSHruN4Vjx3uli05WB4hQaE3p+ZY7eQGMOCksbLK3reJ49ciPj6cPp
+	E4libWwbzkqq9pq8e1O5S242H4hcX/PUgD
+X-Google-Smtp-Source: AGHT+IED/fFzObiqlk4Rt9s6INYP5yEdYEWukKq9oUrT2cbOt6YSVHmtA8/2kHDXPkHkmR//EUTs9/SW8Ppo8a3d4F0=
+X-Received: by 2002:a05:690c:201f:b0:702:5134:aaac with SMTP id
+ 00721157ae682-70a3f9e40bfmr7935957b3.2.1746732219206; Thu, 08 May 2025
+ 12:23:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
+ <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
+ <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
+ <CAHC9VhSPLsi+GBtjJsQ8LUqPQW4aHtOL6gOqr9jfpR0i1izVZA@mail.gmail.com> <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com>
+In-Reply-To: <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 8 May 2025 15:23:26 -0400
+X-Gm-Features: AX0GCFuAJrhkB_YivBhm4MSlZcxwdgMv-eoNvShg9MjoBr-qIW4iuPknLt97V1o
+Message-ID: <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, KP Singh <kpsingh@kernel.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>, bpf <bpf@vger.kernel.org>, code@tyhicks.com, 
+	Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
+	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
+	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sergey,
+On Thu, May 8, 2025 at 1:45=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+> On Wed, May 7, 2025 at 4:24=E2=80=AFPM Paul Moore <paul@paul-moore.com> w=
+rote:
+> > On Wed, May 7, 2025 at 1:48=E2=80=AFPM James Bottomley
+> > <James.Bottomley@hansenpartnership.com> wrote:
+> > >
+> > > I'm with Paul on this: if you could share your design ideas more full=
+y
+> > > than you have above that would help make this debate way more
+> > > technical.
+> >
+> > I think it would also help some of us, at the very least me, put your
+> > objections into context.  I believe the more durable solutions that
+> > end up in Linus' tree are combinations of designs created out of
+> > compromise, and right now we are missing the context and detail of
+> > your ideal solution to be able to do that compromise and get to a
+> > design and implementation we can all begrudgingly accept.  In the
+> > absence of a detailed alternate design, and considering that BPF
+> > signature validation efforts have sputtered along for years without
+> > any real success, we'll continue to push forward on-list with
+> > refinements to the current proposal in an effort to drive this to some
+> > form of resolution.
+>
+> It sounds like you're asking for Linus's opinion.
 
-It is good to know that you are planning to move zram to the
-async crypto API. As you correctly observed, the Intel IAA driver is
-based on crypto acomp, which is Ok because we are currently working on
-upstreaming “zswap compression batching” [1] as the first kernel user of
-IAA. Our plan is to integrate IAA batching with zram, for which the
-embedded crypto acomp dependencies in iaa_crypto are the first challenge
-to overcome, while preserving the crypto interface for zswap. 
+At this point no, although of course he is welcome to comment if he
+likes.  What we've been asking for is some detail on your preferred
+solution; all we've seen on the various threads thus far has been a
+small number of short sentences that leave far too much ambiguity
+around important parts of the design.  Without any clear direction on
+your ideal solution, Blaise has been continuing forward with proposals
+that we believe solve at least one use case and can be extended in the
+future to support others.
 
-I would like to get your thoughts on whether the crypto_acomp batching
-interface in patch 10 [2] of the above series would be acceptable for
-zram IAA integration. If not, I was planning to create a layer in the
-iaa_crypto driver that would allow interfacing with zcomp without
-crypto. I figured it would be good to get some early feedback from you
-before I work on a potential zcomp interface for iaa_crypto (which is
-non-trivial), in light of your plans to move zram to use async crypto.
+Blaise started this most recent effort by attempting to address the
+concerns brought up in previous efforts, you and others rejected this
+first attempt and directed Blaise towards a light skeleton and LSM
+based approach, which is where he is at with Hornet.  Once again, you
+reject this approach with minimal guidance on what would be
+acceptable, and our response is to ask for clarification on your
+preferred design.  We're not asking for a full working solution,
+simply a couple of paragraphs outlining the design with enough detail
+to put forward a working solution that isn't immediately NACK'd.
+We've made this request multiple times in the past, most recently this
+past weekend, where KP replied that he would be "happy" to share
+designs/code.  Unfortunately, since then all we've received from
+either you or KP since then has been effectively just a list of your
+objections on repeat; surely typing out a couple of paragraphs
+outlining a design would have been quicker, easier, and more
+constructive then your latest reply?
 
-[1] https://patchwork.kernel.org/project/linux-mm/list/?series=958654
-[2] https://patchwork.kernel.org/project/linux-mm/patch/20250430205305.22844-11-kanchana.p.sridhar@intel.com/
+> This 'hornet' LSM attempts to implement signed bpf programs by
+> hacking into bpf internals:
+> https://lore.kernel.org/bpf/20250502184421.1424368-2-bboscaccy@linux.micr=
+osoft.com/
 
-I will add you to [1].
+I guess there are always two sides to every story, but "hacking into
+bpf internals" is not how I would characterize the Hornet approach.
+Hornet reads the light skeleton BPF loader and the associated BPF maps
+(the original BPF program) passed in from userspace into a buffer in
+order to verify a signature across the two BPF programs (loader +
+original).
 
-Thanks,
-Kanchana
+Hornet does this to verify the provenance and load time integrity of
+BPF programs, two very basic security goals that people have wanted
+for BPF programs for years, Blaise is simply the most recent person to
+try and get something into Linus' tree.
+
+> It got 3 Nacks from bpf maintainers.
+> Let me recap our objections:
+>
+> 1. Your definition of attack surface says that root is untrusted.
+> Yet this "hornet" LSM allowlists systemd as trusted.  Allegedly,
+> it's an intermediate solution ...
+
+The Hornet proposal is not the first thing to implement a transition
+mechanism, but if that is really the blocker you want to go with I'm
+sure Blaise would be happy to back out the change.  My understanding
+is that it is really about reducing warnings from systemd and nothing
+more.
+
+> 2. you propose to mangle every binary in the system that needs to load
+> bpf programs with an extra "signature" at the end of the binary that
+> breaks ELF format.  I already explained earlier that such an approach
+> was a border line acceptable solution for kernel modules, but
+> certainly not ok as a general approach for all binaries.
+
+Let's just ignore the "borderline" comment on kernel module signing;
+the fact is that kernel module signing has been an accepted part of
+the upstream Linux kernel for years now, which is part of why Blaise
+used that as a starting point for the Hornet approach: keep things
+simple and build on something that works.  This is especially
+important as we are still largely guessing about the details of your
+ideal solution.
+
+Based on some of the vague feedback from you and KP, this week Blaise
+has been experimenting with passing a signature via the bpf_attr
+struct, but until you provide more detail on-list it is still a
+guessing game as to what you might accept.  The kmod inspired
+signature-on-ELF approach has the advantage of being much more
+self-contained, which is the reason we saw it as a good starting point
+that could be augmented with additional schemes in the future if/when
+needed.
+
+> 3. To read this mangled ELF you do:
+> file =3D get_task_exe_file(current);
+> buf_sz =3D kernel_read_file(file, 0, &buf, INT_MAX, &sz, READING_EBPF);
+> A malicious user can give you a multi gigabyte file and your LSM will
+> happily read it into the kernel memory. It's an obvious DoS vector.
+
+The LSM hook used by Hornet happens well after all of the BPF based
+capability and access control checks.  If anything, the ability of a
+malicious user to tamper with the BPF program being loaded helps
+highlight the importance of validating signatures on BPF programs.  In
+the worst case, if the kernel can't allocate a buffer the
+kernel_read_file() will fail and an error will be returned to
+userspace.
+
+> 4. I said multiple times it's not ok to do
+> bpf_map->ops->map_lookup_elem() outside of the bpf subsystem.
+> You did 'git grep' and argued that something in the net/ directory
+> is doing that.  Well,
+> ./scripts/get_maintainer.pl `git grep -l -- '->map_lookup_elem' net/`
+> is your answer.  net/core/filter.c is a part of the bpf subsystem.
+> The bpf originated in networking.
+
+Yet BPF was extracted out as a standalone mechanism that has grown
+well beyond its initial use as a socket data filter.  From my
+perspective either BPF is a standalone entity and the
+map_lookup_elem() API is necessary for at least one current user, the
+socket fitler, or map_lookup_elem() isn't an API in which case BPF
+isn't the general purpose tool that everyone claims.
+
+This touches on another issue that I've brought up before in this
+thread which is important.  The LSM subsystem doesn't care about how
+the LSM is implemented; C, BPF, and Rust (work is obviously still very
+early on the Rust side) are all valid implementation languages, and we
+make it clear that if you can do something in one language, you should
+be able to do it another.  While I don't believe you or KP have
+explicitly stated that your objection to the Hornet approach is
+largely due to it being written in C, Daniel did make a comment that
+Hornet should be written as a BPF LSM.  From the perspective of the
+LSM, something is either "legal" to do in a LSM, or it isn't; we don't
+qualify that determination based on the source language of the
+implementation.
+
+> Also, do build 'hornet' LSM with LOCKDEP and see how many bpf map
+> lifetime rules you violated with that map_lookup_elem() call.
+
+I'm sure Blaise will look into that.  I'm sure that if you, KP,
+Daniel, or anyone else in BPF land wanted to provide an alternate API
+for map access I'm sure Blaise would be happy to rework his code.  As
+we've stated multiple times, don't just say "no" say "no" with a good
+description about how to move forward.
+
+> 5. I also explained that map->frozen =3D=3D true doesn't guarantee that
+> the map is immutable.  It only freezes the map from user space writes.
+
+For this initial use case, we believe that is sufficient and is inline
+with kernel module loading, which is a good analogy.  The most
+critical part as far as we are concerned is that userspace can not
+tamper with the BPF map once the signature has been verified.  Yes,
+another in-kernel component might be able to tamper with the BPF map,
+but in-kernel components can do a number of bad things; this is yet
+one more reason why validating code that executes in kernel context is
+important.
+
+> 6. Though bpf instructions have standardized format LSMs shouldn't not
+> be in the business of parsing them. New instructions are being added.
+> We don't need a headache that an LSM will start crashing/misbehaving
+> when a new instruction is added or extended.
+> bpf instruction parsing belongs in the bpf subsystem.
+
+The current Hornet implementation ignores things it doesn't know
+about, sticking to parts of the BPF instruction set that is currently
+defined.  Who knows what Hornet might look like in another few
+revisions, or if it is replaced with another approach, but if it
+becomes part of Linus' tree it should be trivial to update it along
+with BPF.  There is precedence for this with other LSMs and other
+kernel subsystems.
+
+> 7. You do: copy_from_bpfptr_offset(&map_fd, ...) then proceed with
+> content extraction, but this is a user controlled address. It's an
+> obvious TOCTOU bug. The user can replace that map_fd after your LSM
+> read it and before bpf verifier reads it. So the signature checking
+> from LSM is fundamentally broken. I already explained that the
+> signature check has to be done within a bpf subsystem.
+
+As mentioned *many* times before, please provide more information on
+this.  To start, where *exactly* in the BPF subsystem would you accept
+a signature check.
+
+> In the last kernel release we added 'bool kernel' parameter to
+> security_bpf_prog_load() LSM hook assuming that you're going to work
+> with us on actual solution for signed bpf programs, but so far you
+> ignored our feedback and accused us of artificially delaying a
+> solution to signed programs, though we told you that the "light
+> skeleton" (that you incorrectly attempt to use here) was designed
+> specifically as a building block towards signed bpf programs:
+>
+> See the cover letter from 2021:
+> https://lore.kernel.org/bpf/20210514003623.28033-1-alexei.starovoitov@gma=
+il.com/
+
+...
+
+> When Blaise volunteered to work on signed progs we pointed him to
+> light skeleton assuming that you're going to work with us to finish
+> this complex task.
+
+In order to work effectively we need a more detailed explanation of
+what you want to see with respect to BPF signing.  Thus far we've only
+seen rejections with very hand-wavy explanations on how to proceed.
+KP indicated almost a week ago that he is happy to share a couple of
+paragraphs on a preferred BPF signing approach, but we're still left
+waiting with the only feedback being a repeat of previous rejections
+and more vitrol.
+
+--=20
+paul-moore.com
