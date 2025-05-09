@@ -1,107 +1,115 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41FE218EB1;
-	Fri,  9 May 2025 11:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42583272E44;
+	Fri,  9 May 2025 12:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746788487; cv=none; b=O3equcl+Z7p7Hl1oomW1a6laCRB9rQB5t6fMqgmZugFLqLohHPS3HsxJXoyn5wwRsCqSwhYpqjfpwZ63Fdq/y9jiB7JXvAQrfbN2SYfY5xAURKfoFcJQpI0Ou6ssIHSh3gE0oxjcCxigZ7/SXidP9WSvSsvZeT87LR8Ub0jq6CE=
+	t=1746793756; cv=none; b=K3ltYYirvgegtyf1ib8LsGK2NvFvIfdA01zhbNdHt6DjpqbeQXfoY+7YpCTUtSjih1RrcDz6dp1pn39c6vV/j95gfOpJAscg82x1i+P/u7Em8ykDOakRk9kh78Gi3v6sam3Nq8ptS2UXql6BAKu4yIOfVgE/BKfdejHzeT150nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746788487; c=relaxed/simple;
-	bh=gRgLFX3wudpilZbhg89XKnOTVJhitrzM2EL48kaXQIY=;
+	s=arc-20240116; t=1746793756; c=relaxed/simple;
+	bh=3eoQG3YvVxmlJYDaiEVItGucK+HKphFxx9vtxG+0HxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fowYU7zsuty+6rnhZEMPrmqXoBqt9qdSOEH1RirsthnqTD9NYoFkSeM8W9zNeBkgHmnnWRs1QntOgG2KJvEAA+ivpml7iLAP9+BgxPWwKByns69vpyK1ffd6kNvyk8qr0YLpj9bAuf9DTHQYMc8QKp/Zoi7u1T3wTCgCYWKPRic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bOQ6qiBt; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=N5sFGw17zcl5T8MRdu5/JOr/XnY11tjGc6OZr6DNL1ImIS9O04YO+5TK6vqDvqAvsSpJUhz28HqvhxS7WTXEZrVZNLNy9FPHOjwwxEEXlqd1YaWpqjdAxEwudOH8UhnoY2QM7j/fuSecpzGnwDajZIvrSO4MWhh69LU8NwuNvXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PHQ44vc9; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOQ6qiBt"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a1fb17a9beso178404f8f.3;
-        Fri, 09 May 2025 04:01:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746788484; x=1747393284; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r53khiO3ex71dGFIBcMlSGwX4XCBTtxUE+p0BbXkqFo=;
-        b=bOQ6qiBtWmUJBqJUHnTjFVAcT2k1Vr8P2CNv2wxfNgqHRHQl1Ww+zEMhCdRIvYba6s
-         jHPaLyPI+yQbAMeRpN/ItUKP+qa8hlYS6Asrn25FWvuSaGPHc6nuHA2hYtZWymEM7nqK
-         iq8bKrqfRTeHhOzRtjlDdSnt6pAMEen0PiR0dh+e9lPuOqlGag/buFo931kjOVeuLbWF
-         GY0J9/uAJMiLLxOnyvJK7WS0OFv8WPVFPPruBdP9zVxWuoPDOhhSPEPScAoiaOW5FWQC
-         ofJJ9RXhKgHvnQcxGg25fF9ZxQx8otBA6uR4+ZlXrn7rQGTMaN59/A8AXbY+N7kyd9U9
-         HEMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746788484; x=1747393284;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r53khiO3ex71dGFIBcMlSGwX4XCBTtxUE+p0BbXkqFo=;
-        b=DOa687Fxa9qf9iQdhOFVm7m0ObZ5XNol9M+COtcRDDIrvxU81TRXDMVXOmmC0t4hfF
-         PJ8TDzsYAh2ezRXnvkyk6IuvDutz+EIeP68ag8pqHq7AnvRdsevMm1AvD6vCjeYrKuPX
-         JJwHEG8ogWWpx1cVNnq8KKJ3ihUGSIGOGUbVMoMJo8ICEo3ak2SAzOVIO4WoME+NHM8u
-         spBODrDVEXP451LLfPXZFN21bh/yNH4ywrKgAfC6nGR4PwKSYzA3+KGkVA2CxKju2a4G
-         WL3wHtjyQ71GW98nRtz353OWXrXXnb+gpgKH539a9FpyOK3LaccO+KwivPFVx1zhAeJi
-         YNgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfsZe+EE7u1v/yKrgZP8thf9IpcdBPoxLr7pKu6gKa+ucb4Z5d+Cv4FkWqR/7Z4rFF27xL79wBoMSdzf0=@vger.kernel.org, AJvYcCXn0lbPOfVK0Ir7Wz61U95U9HF90659o7eDAZjyPrWAZVShFE8mWhlsuwLuMqJpXh52CLXDl/UilgY4IpLw@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAml8b5CLWST71kuvTeqa9RhYsnKOqU5KRCe5s1N54nTof1M3K
-	zbPP6LrGjX03HnuF3PWmq1TuO3ZL8UZvLJrQSxubKWRN29bHWZCk
-X-Gm-Gg: ASbGncsEsM5jhHfh3OFygnz9yhNHjRJ4Nt0SIEbfN4vK7HBz27l0PaidYthpgaiTIfT
-	1Ips47ZIcWhVBmJYnjpMZLO0p8Wif/1XU+t2dAkT5FP5SLSXcUtJTLw1HqXAQE27Byrnnq+nl/j
-	aWY1Z5GE4NiZH0nI8PwCnWGLcz+l+aaHQQ7jW1i8jHjDc4HhPjv+U3txN+g5b5eZVYCOjoMaEfP
-	33pGQQBgf86lQKBQ9Gd049XfslWWSb2rzuFuQrugp7lZq4pEbp2RWI9IpYAREnL8dDgcgTxkZQi
-	ZCF3EzDaQJUKsPstmfMt6tSeIwfPkXrCvcrEvbJltg==
-X-Google-Smtp-Source: AGHT+IHxdrrT1mXNTg47HWfTSTmmEC51lBLDoX8qYM2Pqx0cEOFChgQ2wd+oIPWDgDsHqFvJei+Rdw==
-X-Received: by 2002:a05:6000:430d:b0:3a0:b9a9:2fd9 with SMTP id ffacd0b85a97d-3a1f64a34c6mr2544261f8f.51.1746788483860;
-        Fri, 09 May 2025 04:01:23 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a1f57de100sm2871878f8f.2.2025.05.09.04.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 May 2025 04:01:23 -0700 (PDT)
-Date: Fri, 9 May 2025 13:01:21 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Klaus Kudielka <klaus.kudielka@gmail.com>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PHQ44vc9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Nfy+p2+K50BeVO/KsNOia7LPtjZvYn6v3ybzTty3Vcc=; b=PHQ44vc9GqAsj0AvgjLkpbBLMw
+	Mj2eHzXFbfkyWWx9vTvJ6vAj6A5mBvq+zobNJhmonvOSH/QQAqPNhw7SfBWXRa9aWVe41sP5PmQ+Q
+	30FJYaXMWBtiLHdi0LmfKrPFEy9CUArRDIRRFbSpjwRXB2I50DPsBBnWBQhMn7Mi1d0XdqQq4mDBx
+	C4QLt2DeHJsceW9vAL5B2qktgzHlbZBZJWnZpPRabZbF6bvSSLye8lERq7GO14KApivJtpTpQAAO8
+	OxuesOvrJ91V9wR4bzc9Q72J/PWtizSDxLYQZSzmW8+U5RT6ZjBqu+il5V/JXk8R+VqaPM8Dzkmtv
+	sM8wrksA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uDMqa-004qxm-2T;
+	Fri, 09 May 2025 20:29:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 May 2025 20:29:00 +0800
+Date: Fri, 9 May 2025 20:29:00 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Cc: Thorsten Leemhuis <linux@leemhuis.info>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [v3 PATCH] crypto: marvell/cesa - Do not chain submitted requests
-Message-ID: <aB3ggeQDdaPblUxi@Red>
-References: <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
- <aBsdTJUAcQgW4ink@gondor.apana.org.au>
- <aBt5Mxq1MeefwXGJ@Red>
- <aBw-C_krkNsIoPlT@gondor.apana.org.au>
- <aBw_iC_4okpiKglQ@gondor.apana.org.au>
- <aBypVwhHHzmqqN5K@Red>
- <aBytNdRyd5Ywh1Pq@gondor.apana.org.au>
- <aBy06xyzh5kKC48a@Red>
- <aB10PqZNk0L-ly70@gondor.apana.org.au>
- <aB24nSeEJKtP1bO_@gondor.apana.org.au>
+	LKML <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH] crypto: powerpc/poly1305 - Fix input mixup in
+ poly1305_emit_arch
+Message-ID: <aB31DI4QBBZuQObQ@gondor.apana.org.au>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
+ <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
+ <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+ <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
+ <aByX_Y64C6lVRR8M@gondor.apana.org.au>
+ <f66620e2-77e3-4713-a946-ddb2c8a0bccb@linux.ibm.com>
+ <aByiNZNxqyTerdYG@gondor.apana.org.au>
+ <1d2c2fdc-5c36-4d4e-8b25-8289b865726d@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aB24nSeEJKtP1bO_@gondor.apana.org.au>
+In-Reply-To: <1d2c2fdc-5c36-4d4e-8b25-8289b865726d@linux.ibm.com>
 
-Le Fri, May 09, 2025 at 04:11:09PM +0800, Herbert Xu a écrit :
-> On Fri, May 09, 2025 at 11:19:26AM +0800, Herbert Xu wrote:
-> >
-> > I wonder if the skcipher code is corrupting the ahash state when
-> > run concurrently (and chained together).
-> 
-> Please try this patch to see if the hashes can work without
-> the skciphers.
-> 
+On Thu, May 08, 2025 at 08:35:48PM +0530, Venkat Rao Bagalkote wrote:
+>
+> Unfortunately, above patch dosent fix the boot warning.
 
-Hello
+This works for me:
 
-Got http://kernel.montjoie.ovh/478064.log
+---8<---
+Swap the order of the arguments in poly1305_emit_arch to match
+the prototype.
 
-Thanks
-Regards
+Fixes: 14d31979145d ("crypto: powerpc/poly1305 - Add block-only interface")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/powerpc/lib/crypto/poly1305-p10le_64.S b/arch/powerpc/lib/crypto/poly1305-p10le_64.S
+index 2ba2911b8038..5b368baf96d2 100644
+--- a/arch/powerpc/lib/crypto/poly1305-p10le_64.S
++++ b/arch/powerpc/lib/crypto/poly1305-p10le_64.S
+@@ -1027,7 +1027,7 @@ Out_no_poly1305_64:
+ SYM_FUNC_END(poly1305_64s)
+ 
+ #
+-# Input: r3 = h, r4 = s, r5 = mac
++# Input: r3 = h, r4 = mac, r5 = s
+ # mac = h + s
+ #
+ SYM_FUNC_START(poly1305_emit_arch)
+@@ -1051,14 +1051,14 @@ SYM_FUNC_START(poly1305_emit_arch)
+ 	mr	12, 8
+ 
+ Skip_h64:
+-	ld	6, 0(4)
+-	ld	7, 8(4)
++	ld	6, 0(5)
++	ld	7, 8(5)
+ 	addc	10, 10, 6
+ 	adde	11, 11, 7
+ 	addze	12, 12
+ 
+-	std	10, 0(5)
+-	std	11, 8(5)
++	std	10, 0(4)
++	std	11, 8(4)
+ 	blr
+ SYM_FUNC_END(poly1305_emit_arch)
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
