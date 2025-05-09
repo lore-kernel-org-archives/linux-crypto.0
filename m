@@ -1,60 +1,58 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB23221D8F
-	for <linux-crypto@vger.kernel.org>; Thu,  8 May 2025 22:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9D6182D7;
+	Fri,  9 May 2025 00:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746741894; cv=none; b=CWgFHahvFx8kn3T2ySZzsb2W71/WhXoG9k7Enhoy5uxNc4OV+Qc7fqkrV0Q8g9DfZmJA1OhdzDy7sAr5wXymkgNMbDH99AU5V30L+2R8B58vCxetjygb4Xsq45/Soq955rxndoSfh05bTCOW1He07FVUmaxpjd/NcdDmLNnaJsA=
+	t=1746751999; cv=none; b=kLulpU4gJU31o9J+bpEXw4BqG2kzKe5FGK11I0/PcpauAgndEBqyYMnHgLo5EbDRllHreypaAd0PGQAHTSlBGDA3bAp+XFwgkA10bZvts6rOWWjZZJ2L6+TAcGlAesIofv8J2GoEh2YpsZWorgzIVLVtNg+NXHjVdYKrqdyK2tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746741894; c=relaxed/simple;
-	bh=hn8wZ675qgkzV7Ye31mKLeSCHbv3AKPZm/m6DSzvAZQ=;
+	s=arc-20240116; t=1746751999; c=relaxed/simple;
+	bh=7tI/QR0WcvB+2PsIli1CD4nwjW4vq1lR0fYJi7u2MyI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hW1eWkb/kHGVODc6e35Jf71ToV8lbDgtGgDryTvDMOMZR0bsbRy98qZWY2i3ipjkifvbBSfHviuVRZz9F0z9PRl09tQleS0Hw6It7Q6Ri/+hv2Il9Qv41a0/oe/AXJk8xYPVnZbdSzB9TdDrfq869D4YRG1HVt+9aKlJAzCDZFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B2DSx2zQ; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4cGcb9Zgcid6mXKiWu9XIfkPyk2wV0fWBqsTagE8IBuGel9wUZFA4CicgCmnuFAv/tNYvVVVIFDiWFK4G0Hpy026QxknHe4uDbiVev0N6hvAt32YPupLt1i+sLgx+po15jxBvpzrivcXJKyz6/Xl1mc2YFMiZXmyCftq0PRTrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Rt1Qb/aT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B2DSx2zQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746741893; x=1778277893;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hn8wZ675qgkzV7Ye31mKLeSCHbv3AKPZm/m6DSzvAZQ=;
-  b=B2DSx2zQarlsUb+TrWWC79fYd7UyUuiMFgx55z40l6aArVc6oUyNt6Vc
-   NuEFDeN+F+w+0Pi2QXYGXTdfvgeN7O3CwIb3y2OZEsb+iq50z210LhewQ
-   CdzG90q0Otida6PlJw8NlxmcaCCsIUctRvbStFVwFxLBJwBpx8qUs8LXF
-   qQGKhFYFLjvd4iS2qdBycTxCx5wQP2ryVayc9uNq291VG6s+O5LOXB5Ln
-   niC0o2dmNYevE/8F4xtRAh4qhjbf/+vTBrSx17i/Uwot2fb+17/w/AO7g
-   7zoopDdPlwVvt28isZX6HkQEdBhZ4yDcMg6MeAjnfo9Ftt73pNkqk/9R0
-   g==;
-X-CSE-ConnectionGUID: GZsiuf+SQeWwwSbE+k3Kjg==
-X-CSE-MsgGUID: uW0zafM7SNmCw3peSkOwqQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="58765323"
-X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
-   d="scan'208";a="58765323"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 15:04:52 -0700
-X-CSE-ConnectionGUID: 6bjfNsRaS0uB13kdk8gHBg==
-X-CSE-MsgGUID: A0d901TWQW6wpbil0R0ffA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,273,1739865600"; 
-   d="scan'208";a="173599792"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 08 May 2025 15:04:51 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uD9MG-000BPx-3B;
-	Thu, 08 May 2025 22:04:48 +0000
-Date: Fri, 9 May 2025 06:03:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 2/6] crypto: ahash - Handle partial blocks in API
-Message-ID: <202505090505.7uAKB19V-lkp@intel.com>
-References: <26a6ba5a71b8848c6e79757a596ecc3838bf320e.1746448291.git.herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Rt1Qb/aT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=zA9GVEDdxoja+P718OpSN889xJ4reyChIzkHQopHvjk=; b=Rt1Qb/aTe3ekyQswjV0W+4iq0G
+	Qoha1i3aG1xkEVffqfd+y8bSkAg46HbGCdr+2LGJlDzYmoamGppNZJ1P2+EQLkzPuawPYbsUMFCbF
+	WenC65o5DCGxF7RETTgpzSDS+8qMdAc3Q6Ga/fCbsC8GxQkKb+b+gyogg1NJeeJckGD2AU3vT7wSH
+	VKfpGLqPzkSJF60xIUrUKkt/DcQKGd58Og4fdU29UUniBV7FHYvaUeZ8IpOZb0mN2T+BX+UvT/LoZ
+	tY6l6f9FdkolK9arSy053oaxIEvZrG3/LN0bTMAWQwebCtRBkl3l1ylBOA7ZdXybQ76eo9mGwVT/5
+	OOJY5d9w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uDBz7-004jGW-0l;
+	Fri, 09 May 2025 08:53:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 May 2025 08:53:05 +0800
+Date: Fri, 9 May 2025 08:53:05 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	Thorsten Leemhuis <linux@leemhuis.info>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Danny Tsen <dtsen@linux.ibm.com>
+Subject: Re: [PATCH] crypto: powerpc/poly1305 - Add missing poly1305_emit_arch
+Message-ID: <aB1R8eIdc3ZA5rCo@gondor.apana.org.au>
+References: <cover.1745815528.git.herbert@gondor.apana.org.au>
+ <915c874caf5451d560bf26ff59f58177aa8b7c17.1745815528.git.herbert@gondor.apana.org.au>
+ <242ebbf1-4ef0-41c3-83cb-a055c262ba4a@leemhuis.info>
+ <aBtF2jVZQwxGiHVk@gondor.apana.org.au>
+ <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
+ <aBx9OAyiDx7MYAVs@gondor.apana.org.au>
+ <20250508162954.GB1218@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,80 +61,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <26a6ba5a71b8848c6e79757a596ecc3838bf320e.1746448291.git.herbert@gondor.apana.org.au>
+In-Reply-To: <20250508162954.GB1218@sol>
 
-Hi Herbert,
+On Thu, May 08, 2025 at 09:29:54AM -0700, Eric Biggers wrote:
+>
+> My patchsets "Remove per-architecture poly1305 shash glue code" and
+> "Finish disentangling ChaCha, Poly1305, and BLAKE2s from CRYPTO", which included
+> commit 378a337ab40f, passed testing with qemu-system-ppc64 with -M pseries and
+> -cpu in [POWER7, POWER8, POWER9, Power10].  These issues, both the build failure
+> and test failure, were introduced by your patchset
+> "crypto: lib - Add partial block helper".
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on next-20250508]
-[cannot apply to herbert-crypto-2.6/master linus/master v6.15-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-ahash-Handle-partial-blocks-in-API/20250505-203411
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/26a6ba5a71b8848c6e79757a596ecc3838bf320e.1746448291.git.herbert%40gondor.apana.org.au
-patch subject: [PATCH 2/6] crypto: ahash - Handle partial blocks in API
-config: nios2-randconfig-r073-20250509 (https://download.01.org/0day-ci/archive/20250509/202505090505.7uAKB19V-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.3.0
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505090505.7uAKB19V-lkp@intel.com/
-
-smatch warnings:
-crypto/ahash.c:370 ahash_do_req_chain() warn: inconsistent indenting
-
-vim +370 crypto/ahash.c
-
-   338	
-   339	static int ahash_do_req_chain(struct ahash_request *req,
-   340				      int (*const *op)(struct ahash_request *req))
-   341	{
-   342		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-   343		int err;
-   344	
-   345		if (crypto_ahash_req_virt(tfm) || !ahash_request_isvirt(req))
-   346			return (*op)(req);
-   347	
-   348		if (crypto_ahash_statesize(tfm) > HASH_MAX_STATESIZE)
-   349			return -ENOSYS;
-   350	
-   351		{
-   352			u8 state[HASH_MAX_STATESIZE];
-   353	
-   354			if (op == &crypto_ahash_alg(tfm)->digest) {
-   355				ahash_request_set_tfm(req, crypto_ahash_fb(tfm));
-   356				err = crypto_ahash_digest(req);
-   357				goto out_no_state;
-   358			}
-   359	
-   360			err = crypto_ahash_export(req, state);
-   361			ahash_request_set_tfm(req, crypto_ahash_fb(tfm));
-   362			err = err ?: crypto_ahash_import(req, state);
-   363	
-   364			if (op == &crypto_ahash_alg(tfm)->finup) {
-   365				err = err ?: crypto_ahash_finup(req);
-   366				goto out_no_state;
-   367			}
-   368	
-   369			err = err ?: crypto_ahash_update(req);
- > 370				     crypto_ahash_export(req, state);
-   371	
-   372			ahash_request_set_tfm(req, tfm);
-   373			return err ?: crypto_ahash_import(req, state);
-   374	
-   375	out_no_state:
-   376			ahash_request_set_tfm(req, tfm);
-   377			return err;
-   378		}
-   379	}
-   380	
-
+Thanks.  I'll try to reproduce this.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
