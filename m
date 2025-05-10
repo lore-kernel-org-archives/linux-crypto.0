@@ -1,229 +1,157 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425341DE2B4;
-	Sat, 10 May 2025 09:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA941D7E42;
+	Sat, 10 May 2025 10:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746869901; cv=none; b=LfsmdHwg3E+nSnUSs5bsXNsy1n5/fTJzozQpTOleSmiJSoXKyrPv3/Jjs9asvsa0NRaTHODNuRS08j+qw/+ldt1G4Cs643e53Xr36PiZPgvmHBcPA63U0jaUXFhMZPphq4RR+lVhtJ1Fbwvt8QspWKaV5aaMLK7P/5D9+x8ojsU=
+	t=1746872384; cv=none; b=R6g5U4ULHAzcHGAYHiwC6UCD7TptU/tVuwjBr7F3wwKfSdpfjJcaqkF0Rkql5XEzFgMQfFJucpyo6SIBvZT3D9ycAhrkB3ug58hhZ/5y0EiDMdzVjJikN8TRPYUEi+BjjBPtzIs/yKNQRKZTjzp3NrUkbJEladMSzZ9z89Pgwro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746869901; c=relaxed/simple;
-	bh=0mTlCEWkW6rkQPOGq6Wkvk0qBns1LaA++h6ShXw6fho=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SxWrVVnXtKY/p911oWWPV4HQGUh+Le7m6KgGS3f8YScJXdhmuqmCF7IbLD4BgEc3TLA1X8iX81cdADeL6U7NfBV8rhS/yCcYGxjaEJ98L60EwKhkdLUCT47QenPyQiZ1r5v/u2LLmZ2fKBEELiRiV8Ds5GkCcfrX+aA6AxiJr5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/l4cX/+; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746872384; c=relaxed/simple;
+	bh=CLiOzy1L0qAdfOLj/pcxMMRzv6rN27Y5yfqCVDpA2Iw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YuEeWm2rqNs4Zxq2OvHktKdMZrQ+iC05+Pg5DAqTWSJ6e7V21IerLVNel9B2n7rOAc3+GV/1+GTDvaeJ9ec6nuOyzcpIXtIPdPiXQnc0pVIwRqqQPCxSkb+5Vy1M8yuTbx2YtvGmxxcuz+WrkhccLo42aK/Ogji1/Mm5Sx8sojw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=a1rmvyyF; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/l4cX/+"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a1d8c0966fso1461603f8f.1;
-        Sat, 10 May 2025 02:38:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746869897; x=1747474697; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Brc+ZiTm9hUXSm8GgCWOjwKSMPotzD18vsery3NQJm8=;
-        b=I/l4cX/+QwC9nLsNARE3rgQGSjcwS2lJqEFSEfNTxb5vXqfGfinJNnJUjP+I9adorb
-         AWwKmr8MVORh6vRYTZXY6arjZk2WDGnxF0eHft8wiXDYvnfkqLKVrbGfuHYZmqqXxAB9
-         QVA+TaniMFGVGbDGTQLCLrfoz7284mzm3f58lAFF8qA+ZZNIEI2G6gIhsv0m9rF7wMGY
-         jlibxnFuVzvmvKH6zIgn+V3uFFbbOsmqIeWXAlhX5NYYf+hWzpd1hg5vEMqF/BFbZfsH
-         0B/62DIsgNbnqb3R0DzTyFqKrKgYl5vnKWZ66sjpyGJShxNXML/rhqxA0a6Svwwe3sE0
-         2wHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746869897; x=1747474697;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Brc+ZiTm9hUXSm8GgCWOjwKSMPotzD18vsery3NQJm8=;
-        b=HZ8y6gd9D7YBen5uEPin+WPYbMbOWZSovlv6KA5FjqwhYRkAbrtPHGdGDlI+2/Y+6N
-         Dcqof9MMWWsTM0kFuAxKHKL4nGPJ83p0PxJkgDgT9q2VaaensjcL/4Ek+kQTuiNWFc0e
-         TjDU6wC1YNlSmp64vH3f9YOma/rQvc1XiIy5QZFS+5eOb01rOx4zm0cAJFZ99uvdLav2
-         W5c28FNyTuwPcInn4UQHD+ZHBco5wGyw/BN/G8D1t15QF4iuBNvCspIFAMtWVNXycuhh
-         Vhrd+OFATKXekqwpPPPs85Lo6TMbHdjraQA5YaklxLzpIYkn3KwiDAoAlNaD5ET6Gvol
-         P3XA==
-X-Forwarded-Encrypted: i=1; AJvYcCU12/IkSEu+HKbJUnmfSGcwogzc5Fbvh9DjfEpU5ciJBqa1rdYhTUCn0IE6aPor3kpimk6AeBueSteyDYI=@vger.kernel.org, AJvYcCWCdBvbMf5H6qUwYRh4Kgdfbm9VHgkBV8XpCNZGtmRwAlN/8FkpJPdq57paP4ElMYk3q9ud7V9n9afQuzt7@vger.kernel.org
-X-Gm-Message-State: AOJu0YySoWaUxvgsx6jO+nDEUUcm5n21sPZtOT4iRDb7njTM+hjpc491
-	DbBvg3iwDVqe3SDwK7p1xReA77nN6A2r51eoBIy4jVaJ8KUT6WTo
-X-Gm-Gg: ASbGncu1hDjaEw+r8UuKjRV2liZ9GPpE02hshIUeQskQv9mnKdeJmwqCptxB6+FOSVk
-	MK3BkPqMWWQKsehfmEifknHNVfgzd7mrLE+F5wWd+YZImpW3mw9XqdWc2/MYFjsQIJGigRYa3ab
-	jqwylqRjdHC2ANOKySaRhQRu4eHKRF3rkGLz389inQ8u1lz+nGrGJP01If6admeEF0fd8xUSFo7
-	46l41PdFtBsHz8CnN1+9wz8SY8coKZRTbf69BYA/cpkjPnthsrm315It9RUCVPjF6FMll8N/e4F
-	fLSx9v0BNvV3lNoX7mv4MP8PCO6YwnsM4NomzAk2/No3+6HYh3z9BXATIovqpckxT8PHDLmo89q
-	li0PbbhlPK7fPwyAhqP7w7A==
-X-Google-Smtp-Source: AGHT+IFbdGYVIQ49iY5bbmzcUxZMtkwMLdtF45nk6ZTl6i0nDudvhlHAg2cQZJagCGG2wfh9qIm1OA==
-X-Received: by 2002:a5d:5885:0:b0:38d:dc03:a3d6 with SMTP id ffacd0b85a97d-3a0b98fcdb9mr9604832f8f.4.1746869897251;
-        Sat, 10 May 2025 02:38:17 -0700 (PDT)
-Received: from ?IPv6:2a02:168:6806:0:dea1:3038:3d90:d2ab? ([2a02:168:6806:0:dea1:3038:3d90:d2ab])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ec98dsm5819768f8f.25.2025.05.10.02.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 May 2025 02:38:16 -0700 (PDT)
-Message-ID: <41680c5d41ed568e8c65451843e3ff212fd340c4.camel@gmail.com>
-Subject: Re: [v3 PATCH] crypto: marvell/cesa - Do not chain submitted
- requests
-From: Klaus Kudielka <klaus.kudielka@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="a1rmvyyF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=2CQLABHTiUCYQ/8Ab3/WMbbIvz0wpE+iyASKnTKQO5Y=; b=a1rmvyyFUrr5uFyKgQXdXQ8YJ6
+	EAld8qc8oJ6THihyd6LQ1BdzqksdwpWL7+PWtB3VZy1MO3SGcO2moBKbVg82f4QeLBE2hIYTwLkkO
+	AwTyii7Q+XOpErjkS/7aa8PKz1NEH+kogEzhG9kmNoaptb06ujwYRHNuWTZ5SflFJTsmzExwWlatp
+	WApVwZxZC7gMFyJw5lFd8FBdNC3lWMSuZrXzha+EPE4/XhQtJRMY2AZx0ZcBtPCosOe0UPdtDgiwb
+	LqBy4IzoELLn1Y+anOINKkSaSr0K5a1k82+WYobGEjpUIQTsOjrpeg7Jzfiyll6MWUkypEcXb8nJV
+	cRvE0p6A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uDhIv-00538x-0J;
+	Sat, 10 May 2025 18:19:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 May 2025 18:19:37 +0800
+Date: Sat, 10 May 2025 18:19:37 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
 Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, regressions@lists.linux.dev,
- 	linux-kernel@vger.kernel.org, Linux Crypto Mailing List	
- <linux-crypto@vger.kernel.org>, Boris Brezillon <bbrezillon@kernel.org>, 
- EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>, Romain Perier
- <romain.perier@gmail.com>
-Date: Sat, 10 May 2025 11:38:16 +0200
-In-Reply-To: <aB8W4iuvjvAZSJoc@gondor.apana.org.au>
-References: <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
-	 <Zw31JIEyh28vK9q7@gondor.apana.org.au>
-	 <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
-	 <Zw9AsgqKHJfySScx@gondor.apana.org.au>
-	 <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
-	 <aBsdTJUAcQgW4ink@gondor.apana.org.au> <aBt5Mxq1MeefwXGJ@Red>
-	 <aBw-C_krkNsIoPlT@gondor.apana.org.au>
-	 <aBw_iC_4okpiKglQ@gondor.apana.org.au>
-	 <dd55ba91a5aebce0e643cab5d57e4c87a006600f.camel@gmail.com>
-	 <aB8W4iuvjvAZSJoc@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1-1 
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@gmail.com>
+Subject: Re: [v3 PATCH] crypto: marvell/cesa - Do not chain submitted requests
+Message-ID: <aB8oOVLJ_k2YYMzP@gondor.apana.org.au>
+References: <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+ <Zw9AsgqKHJfySScx@gondor.apana.org.au>
+ <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
+ <aBsdTJUAcQgW4ink@gondor.apana.org.au>
+ <aBt5Mxq1MeefwXGJ@Red>
+ <aBw-C_krkNsIoPlT@gondor.apana.org.au>
+ <aBw_iC_4okpiKglQ@gondor.apana.org.au>
+ <dd55ba91a5aebce0e643cab5d57e4c87a006600f.camel@gmail.com>
+ <aB8W4iuvjvAZSJoc@gondor.apana.org.au>
+ <41680c5d41ed568e8c65451843e3ff212fd340c4.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <41680c5d41ed568e8c65451843e3ff212fd340c4.camel@gmail.com>
 
-On Sat, 2025-05-10 at 17:05 +0800, Herbert Xu wrote:
-> On Sat, May 10, 2025 at 10:32:53AM +0200, Klaus Kudielka wrote:
-> >=20
-> > So, I am back at the hardware (armada-385-turris-omnia), and gave this =
-patch a try.
-> > CONFIG_CRYPTO_DEV_MARVELL_CESA=3Dm
-> >=20
-> > Upon modprobe marvell-cesa, I get the following results.
->=20
-> Thanks, could you please try this patch which goes on top of the
-> previous v3 patch to disable chaining completely?
->=20
-> Thanks,
+On Sat, May 10, 2025 at 11:38:16AM +0200, Klaus Kudielka wrote:
+>
+> Patch applied on top.
+> On the first attempt all self-tests passed, but on the second and third unfortunately not.
 
-Patch applied on top.
-On the first attempt all self-tests passed, but on the second and third unf=
-ortunately not.
+OK, you can get more consistent errors by enabling extra testing with
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
 
-[   16.841981] marvell-cesa f1090000.crypto: CESA device successfully regis=
-tered
-[   16.912258] alg: ahash: mv-sha256 test failed (wrong result) on test vec=
-tor 2, cfg=3D"import/export"
-[   16.917574] alg: ahash: mv-md5 test failed (wrong result) on test vector=
- 3, cfg=3D"init+update+final misaligned buffer"
-[   16.921323] alg: self-tests for sha256 using mv-sha256 failed (rc=3D-22)
-[   16.931961] ------------[ cut here ]------------
-[   16.931966] WARNING: CPU: 1 PID: 388 at crypto/testmgr.c:5871 alg_test+0=
-x5f0/0x614
-[   16.931982] alg: self-tests for sha256 using mv-sha256 failed (rc=3D-22)
-[   16.931985] Modules linked in:
-[   16.931984] alg: self-tests for md5 using mv-md5 failed (rc=3D-22)
-[   16.931989] ------------[ cut here ]------------
-[   16.931989]  marvell_cesa libdes libaes
-[   16.931993] WARNING: CPU: 0 PID: 386 at crypto/testmgr.c:5871 alg_test+0=
-x5f0/0x614
-[   16.932001] CPU: 1 UID: 0 PID: 388 Comm: cryptomgr_test Not tainted 6.15=
-.0-rc5+ #5 NONE=20
-[   16.932004] alg: self-tests for md5 using mv-md5 failed (rc=3D-22)
-[   16.932007] Modules linked in:
-[   16.932009] Hardware name: Marvell Armada 380/385 (Device Tree)
-[   16.932012]  marvell_cesa
-[   16.932013] Call trace:=20
-[   16.932015]  libdes libaes
-[   16.932018]  unwind_backtrace from show_stack+0x10/0x14
-[   16.932033]  show_stack from dump_stack_lvl+0x50/0x64
-[   16.932042]  dump_stack_lvl from __warn+0x7c/0xd4
-[   16.932052]  __warn from warn_slowpath_fmt+0x110/0x16c
-[   16.932063]  warn_slowpath_fmt from alg_test+0x5f0/0x614
-[   16.932073]  alg_test from cryptomgr_test+0x18/0x38
-[   16.932080]  cryptomgr_test from kthread+0xe8/0x204
-[   16.932090]  kthread from ret_from_fork+0x14/0x28
-[   16.932097] Exception stack(0xf0aadfb0 to 0xf0aadff8)
-[   16.932102] dfa0:                                     00000000 00000000 =
-00000000 00000000
-[   16.932107] dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
-00000000 00000000
-[   16.932112] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[   16.932115] ---[ end trace 0000000000000000 ]---
-[   16.932115] CPU: 0 UID: 0 PID: 386 Comm: cryptomgr_test Not tainted 6.15=
-.0-rc5+ #5 NONE=20
-[   16.932122] Hardware name: Marvell Armada 380/385 (Device Tree)
-[   16.932125] Call trace:=20
-[   16.932127]  unwind_backtrace from show_stack+0x10/0x14
-[   16.932139]  show_stack from dump_stack_lvl+0x50/0x64
-[   16.932148]  dump_stack_lvl from __warn+0x7c/0xd4
-[   16.932157]  __warn from warn_slowpath_fmt+0x110/0x16c
-[   16.932168]  warn_slowpath_fmt from alg_test+0x5f0/0x614
-[   16.932178]  alg_test from cryptomgr_test+0x18/0x38
-[   16.932185]  cryptomgr_test from kthread+0xe8/0x204
-[   16.932193]  kthread from ret_from_fork+0x14/0x28
-[   16.932200] Exception stack(0xf0aa1fb0 to 0xf0aa1ff8)
-[   16.932205] 1fa0:                                     00000000 00000000 =
-00000000 00000000
-[   16.932210] 1fc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
-00000000 00000000
-[   16.932214] 1fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[   16.932217] ---[ end trace 0000000000000000 ]---
-[   16.932990] alg: ahash: mv-hmac-md5 setkey failed on test vector 0; expe=
-cted_error=3D0, actual_error=3D-80, flags=3D0x1
-[   16.943346] alg: self-tests for hmac(md5) using mv-hmac-md5 failed (rc=
-=3D-80)
-[   16.943353] ------------[ cut here ]------------
-[   16.943357] WARNING: CPU: 0 PID: 391 at crypto/testmgr.c:5871 alg_test+0=
-x5f0/0x614
-[   16.943370] alg: self-tests for hmac(md5) using mv-hmac-md5 failed (rc=
-=3D-80)
-[   16.943374] Modules linked in: marvell_cesa libdes libaes
-[   16.943408] CPU: 0 UID: 0 PID: 391 Comm: cryptomgr_test Tainted: G      =
-  W           6.15.0-rc5+ #5 NONE=20
-[   16.943418] Tainted: [W]=3DWARN
-[   16.943420] Hardware name: Marvell Armada 380/385 (Device Tree)
-[   16.943423] Call trace:=20
-[   16.943428]  unwind_backtrace from show_stack+0x10/0x14
-[   16.943445]  show_stack from dump_stack_lvl+0x50/0x64
-[   16.943455]  dump_stack_lvl from __warn+0x7c/0xd4
-[   16.943465]  __warn from warn_slowpath_fmt+0x110/0x16c
-[   16.943476]  warn_slowpath_fmt from alg_test+0x5f0/0x614
-[   16.943487]  alg_test from cryptomgr_test+0x18/0x38
-[   16.943495]  cryptomgr_test from kthread+0xe8/0x204
-[   16.943504]  kthread from ret_from_fork+0x14/0x28
-[   16.943512] Exception stack(0xf0ab9fb0 to 0xf0ab9ff8)
-[   16.943517] 9fa0:                                     00000000 00000000 =
-00000000 00000000
-[   16.943522] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
-00000000 00000000
-[   16.943527] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[   16.943530] ---[ end trace 0000000000000000 ]---
-[   16.943600] alg: ahash: mv-hmac-sha256 setkey failed on test vector 0; e=
-xpected_error=3D0, actual_error=3D-80, flags=3D0x1
-[   16.954188] alg: self-tests for hmac(sha256) using mv-hmac-sha256 failed=
- (rc=3D-80)
-[   16.954195] ------------[ cut here ]------------
-[   16.954200] WARNING: CPU: 0 PID: 394 at crypto/testmgr.c:5871 alg_test+0=
-x5f0/0x614
-[   16.954211] alg: self-tests for hmac(sha256) using mv-hmac-sha256 failed=
- (rc=3D-80)
-[   16.954215] Modules linked in: marvell_cesa libdes libaes
-[   16.954229] CPU: 0 UID: 0 PID: 394 Comm: cryptomgr_test Tainted: G      =
-  W           6.15.0-rc5+ #5 NONE=20
-[   16.954236] Tainted: [W]=3DWARN
-[   16.954238] Hardware name: Marvell Armada 380/385 (Device Tree)
-[   16.954241] Call trace:=20
-[   16.954244]  unwind_backtrace from show_stack+0x10/0x14
-[   16.954257]  show_stack from dump_stack_lvl+0x50/0x64
-[   16.954266]  dump_stack_lvl from __warn+0x7c/0xd4
-[   16.954275]  __warn from warn_slowpath_fmt+0x110/0x16c
-[   16.954286]  warn_slowpath_fmt from alg_test+0x5f0/0x614
-[   16.954296]  alg_test from cryptomgr_test+0x18/0x38
-[   16.954304]  cryptomgr_test from kthread+0xe8/0x204
-[   16.954312]  kthread from ret_from_fork+0x14/0x28
-[   16.954320] Exception stack(0xf0ac5fb0 to 0xf0ac5ff8)
-[   16.954324] 5fa0:                                     00000000 00000000 =
-00000000 00000000
-[   16.954329] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
-00000000 00000000
-[   16.954333] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[   16.954336] ---[ end trace 0000000000000000 ]---
+In any case, let's go back to the printk approach and see what's
+going on.  This patch could either go on top of the previous ones
+or be applied by itself.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 9c21f5d835d2..fd7f43575cb2 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -127,6 +127,8 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
+ 		if (!(status & mask))
+ 			break;
+ 
++		pr_err("mv_cesa_int: %d 0x%x 0x%x\n", engine->id, status, mask);
++
+ 		/*
+ 		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
+ 		 * relevant on some platforms.
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+index a46ae868110a..cc7efd9a099a 100644
+--- a/drivers/crypto/marvell/cesa/hash.c
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -396,6 +396,8 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
+ 	}
+ 
+ 	atomic_sub(ahashreq->nbytes, &engine->load);
++
++	pr_err("mv_cesa_ahash_complete: %d 0x%lx\n", engine->id, (unsigned long)ahashreq);
+ }
+ 
+ static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
+@@ -417,6 +419,8 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+ 	struct ahash_request *ahashreq = ahash_request_cast(req);
+ 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+ 
++	pr_err("mv_cesa_ahash_req_cleanup: %d 0x%lx\n", creq->base.engine->id, (unsigned long)ahashreq);
++
+ 	if (creq->last_req)
+ 		mv_cesa_ahash_last_cleanup(ahashreq);
+ 
+@@ -783,6 +787,7 @@ static int mv_cesa_ahash_queue_req(struct ahash_request *req)
+ 	engine = mv_cesa_select_engine(req->nbytes);
+ 	mv_cesa_ahash_prepare(&req->base, engine);
+ 
++	pr_err("mv_cesa_ahash_queue_req: %d 0x%lx\n", engine->id, (unsigned long)req);
+ 	ret = mv_cesa_queue_req(&req->base, &creq->base);
+ 
+ 	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
+index 9b5fd957dde2..59be742c5a1c 100644
+--- a/drivers/crypto/marvell/cesa/tdma.c
++++ b/drivers/crypto/marvell/cesa/tdma.c
+@@ -47,6 +47,8 @@ void mv_cesa_dma_step(struct mv_cesa_req *dreq)
+ 	engine->chain_hw.last = dreq->chain.last;
+ 	spin_unlock_bh(&engine->lock);
+ 
++	pr_err("mv_cesa_dma_step: %d 0x%lx 0x%lx 0x%lx\n", engine->id, (unsigned long)dreq, (unsigned long)dreq->chain.first->cur_dma, (unsigned long)dreq->chain.last->cur_dma);
++
+ 	writel_relaxed(0, engine->regs + CESA_SA_CFG);
+ 
+ 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
+@@ -137,6 +139,7 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 	int res = 0;
+ 
+ 	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
++	pr_err("mv_cesa_tdma_process: %d 0x%lx\n", engine->id, (unsigned long)tdma_cur);
+ 
+ 	for (tdma = engine->chain_hw.first; tdma; tdma = next) {
+ 		spin_lock_bh(&engine->lock);
+@@ -186,6 +189,8 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 			break;
+ 	}
+ 
++	pr_err("mv_cesa_tdma_process: %d %d 0x%lx\n", engine->id, res, (unsigned long)req);
++
+ 	/*
+ 	 * Save the last request in error to engine->req, so that the core
+ 	 * knows which request was faulty
