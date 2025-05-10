@@ -1,92 +1,269 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC2D7FBA2;
-	Sat, 10 May 2025 01:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3144E33F6;
+	Sat, 10 May 2025 04:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746841471; cv=none; b=eGOry2SSoNZXClNXChkxDEWAk8NrYLCcEYmc1YZTGLgepv23hSwc0jHy1HWPGYa7usC3cZyMAzHBLYzKB1HeyJ5WrbxMKI5PwcwpeHW8BdDZFI0o/1Zlh5d5AMvJCBFE1jwm8oW0kuAky23PXzsmMmG2hbayMGdeQy2KeAJY16I=
+	t=1746849676; cv=none; b=U+EKiQ6ytXQ4YWUIas/tArTjZz6Ks7mpBZaSRJqVFp6nDT/X9YxnFGWOvCuorKJDgvF9ytwP36IVUWIuCXAHmFVaji8l3Epm9dljNSuxHLSyMOmDtEoruZQxjW6FdlaV4sppL+xPFdxLpvJUVEo5hf0pIXf//7oP1Oin2Bm1q1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746841471; c=relaxed/simple;
-	bh=M5tx+r1QbIUCT1y1uSrH7KPbcnmkzXkMSj/LeL8Zzv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rzwgGYipEOLvwVUkaZH66HsailnvC+cqM9HIWVSWikQ+Fgh/hwSqfia9FdWMAU5SXSD4P57bssFqoU071EgqaOvJ9s2UpSCn/d7Qe3e+5hoM3GBivLf23htdMhGp5YDAzVybLUvGTOf9mGTKt+qukxxxEymztlbuQjHMybWio24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=n8vm+53d; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746849676; c=relaxed/simple;
+	bh=2yibZf/BqFCxmgeVfgrmZujspAalPwgoidGyV/l3wqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mswwtsyaXW7GnLCntpeqMZ7D6wF4SrbGFeviE9NqyprLX8OEUad/Rsvv6cgXYCmY7ECZlTBOYmF2LO8jMLCC/KLw6jwWX1cXIKKlg5nDWbm2CQsaTjeiK42824EjJ4jk9CXKC0qIzhA6ejGsWe2gW6czDp7FltTzuPoaP4V3VQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtFA2yLw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="n8vm+53d"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=VL+chSAODTarjeBDTkcr1EDJvwQEwFverB/SmL/keUM=; b=n8vm+53d2GgZ1XjCJLUyDsVI7p
-	dUIsGDXnPKNmve+HPc3E8gWFv88Vk05qPGXsFx/uk27TMLOPoNiLW4fCz9QTSgjts1RQMB5YWl4ir
-	LQCVsvURz3hcTvALV/txB5dsALOc37RyunEm+01U8MBuXs/tS6rouVHuq1tXymc94+tn9Lpw302Es
-	hkmDhL5VMz+9Y2WgrhzZtf1ZnuiTKCK3huZtY3VBYfQqM7UqCYdABXICTdKAhrZ/NAR4OYj93DYP7
-	LgOilsu95cnuSS8CYT+1pzCOCyfYKDdo5jhjTsoS9oLCWdlfnTeNXZ9vYkZdohboMG7GGcmFvhgtZ
-	yjVk+5xQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uDZGK-004zr6-2J;
-	Sat, 10 May 2025 09:44:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 May 2025 09:44:24 +0800
-Date: Sat, 10 May 2025 09:44:24 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Klaus Kudielka <klaus.kudielka@gmail.com>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [v3 PATCH] crypto: marvell/cesa - Do not chain submitted requests
-Message-ID: <aB6veEHqgrxBJs01@gondor.apana.org.au>
-References: <aBw-C_krkNsIoPlT@gondor.apana.org.au>
- <aBw_iC_4okpiKglQ@gondor.apana.org.au>
- <aBypVwhHHzmqqN5K@Red>
- <aBytNdRyd5Ywh1Pq@gondor.apana.org.au>
- <aBy06xyzh5kKC48a@Red>
- <aB10PqZNk0L-ly70@gondor.apana.org.au>
- <aB24nSeEJKtP1bO_@gondor.apana.org.au>
- <aB3ggeQDdaPblUxi@Red>
- <aB6oxlR6DINIvdLM@gondor.apana.org.au>
- <aB6t9lfMCSuYVxwv@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtFA2yLw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D388C4CEE2;
+	Sat, 10 May 2025 04:01:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746849675;
+	bh=2yibZf/BqFCxmgeVfgrmZujspAalPwgoidGyV/l3wqk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BtFA2yLwnVdjLHchIkfY7OY4x7J1kbx8Xk9ui86caJDELx4yrx0dwuZEXBXVmq8CV
+	 QDinFCNrmYM/EQRBfJ8BleQnnQooyBccyz1a57kc+XR43Bspf2dYrEqi//7DT8tKEZ
+	 aoVOrWDa4gtSWBYZuzf81hxc/vD6qTlyRS+hQe/RVLL1oxn4Ie1eBSyzBjPztC7468
+	 WxKEndhuCncg9H3kusGwV/iV/+JwORgbrVu/DdmRSBGL8SvQlTZeF4H5paNqvVPwJR
+	 FHbO5bStjeEe410D3BORjtXnOC70Ai7+alX7ntgliJi6jvzpQFW0dAmtejBVBzMtg/
+	 Psrz6tfXjg2zA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] lib/crc: make arch-optimized code use subsys_initcall
+Date: Fri,  9 May 2025 20:59:59 -0700
+Message-ID: <20250510035959.87995-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aB6t9lfMCSuYVxwv@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Sat, May 10, 2025 at 09:37:58AM +0800, Herbert Xu wrote:
->
-> In particular, when testmgr does an update+final, it will give a
-> non-NULL SG list to the final call.
+From: Eric Biggers <ebiggers@google.com>
 
-This ties in with all the test results so far because it appears
-that all the failed test vectors involve a final call.
+Make the architecture-optimized CRC code do its CPU feature checks in
+subsys_initcalls instead of arch_initcalls.  This makes it consistent
+with arch/*/lib/crypto/ and ensures that it runs after initcalls that
+possibly could be a prerequisite for kernel-mode FPU, such as x86's
+xfd_update_static_branch() and loongarch's init_euen_mask().
 
-> The buggy code in marvell/cesa will then read that non-NULL SG list
-> during the final call and overwrite the cached bytes with it.
-> However, I still can't see why that would make a difference because
-> it should contain the same data.
+Note: as far as I can tell, x86's xfd_update_static_branch() isn't
+*actually* needed for kernel-mode FPU.  loongarch's init_euen_mask() is
+needed to enable save/restore of the vector registers, but loongarch
+doesn't yet have any CRC or crypto code that uses vector registers
+anyway.  Regardless, let's be consistent with arch/*/lib/crypto/ and
+robust against any potential future dependency on an arch_initcall.
 
-I think I can see where it does make a difference.  The SG list
-is never mapped during the final call.  So the DMA address is going
-to be either crap or more likely the address from the previous
-update call where it was mapped.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
 
-Now depending on how DMA mapping works on your platform, that may
-indeed be buggy during concurrent calls only.
+I'm planning to take this through the crc tree.
 
-Cheers,
+ arch/arm/lib/crc-t10dif.c            | 2 +-
+ arch/arm/lib/crc32.c                 | 2 +-
+ arch/arm64/lib/crc-t10dif.c          | 2 +-
+ arch/loongarch/lib/crc32-loongarch.c | 2 +-
+ arch/mips/lib/crc32-mips.c           | 2 +-
+ arch/powerpc/lib/crc-t10dif.c        | 2 +-
+ arch/powerpc/lib/crc32.c             | 2 +-
+ arch/sparc/lib/crc32.c               | 2 +-
+ arch/x86/lib/crc-t10dif.c            | 2 +-
+ arch/x86/lib/crc32.c                 | 2 +-
+ arch/x86/lib/crc64.c                 | 2 +-
+ 11 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm/lib/crc-t10dif.c b/arch/arm/lib/crc-t10dif.c
+index 382437094bddd..1093f8ec13b0b 100644
+--- a/arch/arm/lib/crc-t10dif.c
++++ b/arch/arm/lib/crc-t10dif.c
+@@ -58,11 +58,11 @@ static int __init crc_t10dif_arm_init(void)
+ 		if (elf_hwcap2 & HWCAP2_PMULL)
+ 			static_branch_enable(&have_pmull);
+ 	}
+ 	return 0;
+ }
+-arch_initcall(crc_t10dif_arm_init);
++subsys_initcall(crc_t10dif_arm_init);
+ 
+ static void __exit crc_t10dif_arm_exit(void)
+ {
+ }
+ module_exit(crc_t10dif_arm_exit);
+diff --git a/arch/arm/lib/crc32.c b/arch/arm/lib/crc32.c
+index 7ef7db9c0de73..f2bef8849c7c3 100644
+--- a/arch/arm/lib/crc32.c
++++ b/arch/arm/lib/crc32.c
+@@ -101,11 +101,11 @@ static int __init crc32_arm_init(void)
+ 		static_branch_enable(&have_crc32);
+ 	if (elf_hwcap2 & HWCAP2_PMULL)
+ 		static_branch_enable(&have_pmull);
+ 	return 0;
+ }
+-arch_initcall(crc32_arm_init);
++subsys_initcall(crc32_arm_init);
+ 
+ static void __exit crc32_arm_exit(void)
+ {
+ }
+ module_exit(crc32_arm_exit);
+diff --git a/arch/arm64/lib/crc-t10dif.c b/arch/arm64/lib/crc-t10dif.c
+index 99d0b5668a286..c2ffe4fdb59d1 100644
+--- a/arch/arm64/lib/crc-t10dif.c
++++ b/arch/arm64/lib/crc-t10dif.c
+@@ -59,11 +59,11 @@ static int __init crc_t10dif_arm64_init(void)
+ 		if (cpu_have_named_feature(PMULL))
+ 			static_branch_enable(&have_pmull);
+ 	}
+ 	return 0;
+ }
+-arch_initcall(crc_t10dif_arm64_init);
++subsys_initcall(crc_t10dif_arm64_init);
+ 
+ static void __exit crc_t10dif_arm64_exit(void)
+ {
+ }
+ module_exit(crc_t10dif_arm64_exit);
+diff --git a/arch/loongarch/lib/crc32-loongarch.c b/arch/loongarch/lib/crc32-loongarch.c
+index 8e6d1f517e73c..b37cd8537b459 100644
+--- a/arch/loongarch/lib/crc32-loongarch.c
++++ b/arch/loongarch/lib/crc32-loongarch.c
+@@ -112,11 +112,11 @@ static int __init crc32_loongarch_init(void)
+ {
+ 	if (cpu_has_crc32)
+ 		static_branch_enable(&have_crc32);
+ 	return 0;
+ }
+-arch_initcall(crc32_loongarch_init);
++subsys_initcall(crc32_loongarch_init);
+ 
+ static void __exit crc32_loongarch_exit(void)
+ {
+ }
+ module_exit(crc32_loongarch_exit);
+diff --git a/arch/mips/lib/crc32-mips.c b/arch/mips/lib/crc32-mips.c
+index 84df361e71813..45e4d2c9fbf54 100644
+--- a/arch/mips/lib/crc32-mips.c
++++ b/arch/mips/lib/crc32-mips.c
+@@ -161,11 +161,11 @@ static int __init crc32_mips_init(void)
+ {
+ 	if (cpu_have_feature(cpu_feature(MIPS_CRC32)))
+ 		static_branch_enable(&have_crc32);
+ 	return 0;
+ }
+-arch_initcall(crc32_mips_init);
++subsys_initcall(crc32_mips_init);
+ 
+ static void __exit crc32_mips_exit(void)
+ {
+ }
+ module_exit(crc32_mips_exit);
+diff --git a/arch/powerpc/lib/crc-t10dif.c b/arch/powerpc/lib/crc-t10dif.c
+index ddd5c4088f508..4253842cc50d3 100644
+--- a/arch/powerpc/lib/crc-t10dif.c
++++ b/arch/powerpc/lib/crc-t10dif.c
+@@ -69,11 +69,11 @@ static int __init crc_t10dif_powerpc_init(void)
+ 	if (cpu_has_feature(CPU_FTR_ARCH_207S) &&
+ 	    (cur_cpu_spec->cpu_user_features2 & PPC_FEATURE2_VEC_CRYPTO))
+ 		static_branch_enable(&have_vec_crypto);
+ 	return 0;
+ }
+-arch_initcall(crc_t10dif_powerpc_init);
++subsys_initcall(crc_t10dif_powerpc_init);
+ 
+ static void __exit crc_t10dif_powerpc_exit(void)
+ {
+ }
+ module_exit(crc_t10dif_powerpc_exit);
+diff --git a/arch/powerpc/lib/crc32.c b/arch/powerpc/lib/crc32.c
+index 42f2dd3c85dde..77e5a37006f00 100644
+--- a/arch/powerpc/lib/crc32.c
++++ b/arch/powerpc/lib/crc32.c
+@@ -70,11 +70,11 @@ static int __init crc32_powerpc_init(void)
+ 	if (cpu_has_feature(CPU_FTR_ARCH_207S) &&
+ 	    (cur_cpu_spec->cpu_user_features2 & PPC_FEATURE2_VEC_CRYPTO))
+ 		static_branch_enable(&have_vec_crypto);
+ 	return 0;
+ }
+-arch_initcall(crc32_powerpc_init);
++subsys_initcall(crc32_powerpc_init);
+ 
+ static void __exit crc32_powerpc_exit(void)
+ {
+ }
+ module_exit(crc32_powerpc_exit);
+diff --git a/arch/sparc/lib/crc32.c b/arch/sparc/lib/crc32.c
+index 428fd5588e936..40d4720a42a1b 100644
+--- a/arch/sparc/lib/crc32.c
++++ b/arch/sparc/lib/crc32.c
+@@ -72,11 +72,11 @@ static int __init crc32_sparc_init(void)
+ 
+ 	static_branch_enable(&have_crc32c_opcode);
+ 	pr_info("Using sparc64 crc32c opcode optimized CRC32C implementation\n");
+ 	return 0;
+ }
+-arch_initcall(crc32_sparc_init);
++subsys_initcall(crc32_sparc_init);
+ 
+ static void __exit crc32_sparc_exit(void)
+ {
+ }
+ module_exit(crc32_sparc_exit);
+diff --git a/arch/x86/lib/crc-t10dif.c b/arch/x86/lib/crc-t10dif.c
+index d073b3678edc2..db7ce59c31ace 100644
+--- a/arch/x86/lib/crc-t10dif.c
++++ b/arch/x86/lib/crc-t10dif.c
+@@ -27,11 +27,11 @@ static int __init crc_t10dif_x86_init(void)
+ 		static_branch_enable(&have_pclmulqdq);
+ 		INIT_CRC_PCLMUL(crc16_msb);
+ 	}
+ 	return 0;
+ }
+-arch_initcall(crc_t10dif_x86_init);
++subsys_initcall(crc_t10dif_x86_init);
+ 
+ static void __exit crc_t10dif_x86_exit(void)
+ {
+ }
+ module_exit(crc_t10dif_x86_exit);
+diff --git a/arch/x86/lib/crc32.c b/arch/x86/lib/crc32.c
+index e6a6285cfca87..d09343e2cea93 100644
+--- a/arch/x86/lib/crc32.c
++++ b/arch/x86/lib/crc32.c
+@@ -86,11 +86,11 @@ static int __init crc32_x86_init(void)
+ 		static_branch_enable(&have_pclmulqdq);
+ 		INIT_CRC_PCLMUL(crc32_lsb);
+ 	}
+ 	return 0;
+ }
+-arch_initcall(crc32_x86_init);
++subsys_initcall(crc32_x86_init);
+ 
+ static void __exit crc32_x86_exit(void)
+ {
+ }
+ module_exit(crc32_x86_exit);
+diff --git a/arch/x86/lib/crc64.c b/arch/x86/lib/crc64.c
+index 1214ee726c16d..351a09f5813e2 100644
+--- a/arch/x86/lib/crc64.c
++++ b/arch/x86/lib/crc64.c
+@@ -37,11 +37,11 @@ static int __init crc64_x86_init(void)
+ 		INIT_CRC_PCLMUL(crc64_msb);
+ 		INIT_CRC_PCLMUL(crc64_lsb);
+ 	}
+ 	return 0;
+ }
+-arch_initcall(crc64_x86_init);
++subsys_initcall(crc64_x86_init);
+ 
+ static void __exit crc64_x86_exit(void)
+ {
+ }
+ module_exit(crc64_x86_exit);
+
+base-commit: 46e3311607d6c18a760fba4afbd5d24d42abb0f3
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.49.0
+
