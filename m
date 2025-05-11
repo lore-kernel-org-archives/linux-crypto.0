@@ -1,106 +1,105 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1102C749C;
-	Sun, 11 May 2025 02:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F5C140E34
+	for <linux-crypto@vger.kernel.org>; Sun, 11 May 2025 02:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746929420; cv=none; b=fDgT8zbJk/2IP5/uPF1JTRCEOLVjP8YlH86DT3Dz2+wPoxn0PIa4JjDu3V3CkWXcvha4Mctou7I0NioU0vZCq49KzK9DpfS/8aNb/6Y1chyTobbwmI5DpPMllUsEPSocu929Ycf48vAEEgfzT3dt4yE9RU3GIwXnprKuvueZk1s=
+	t=1746929673; cv=none; b=e0mnFnjCVrf6Y33YYfdD7IVCryxuFtAFTm95UqYUsDmI9rcLL8BUspTxtvzDJxPReOZ3lyT3aGx7TVEdcybhpHTEvcUg8txqDiN1HrTG39X8VDMiMEgObvoXg1nLtVZBgYEiPQTfwHX/+BV8FCuM0vdfUiKxTsHtNg/44A3u32o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746929420; c=relaxed/simple;
-	bh=TjbEOg6faQ/ajLscYrJKjvzmk8xZkMqa1VGs87f6YWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SbV8SidgJd4UgdC0XKPrBEizX1R/8yPwqT1OAA3a4mKs5x+GlkKLw7sWmNySbl4vZmH7cZcq54zeMtmNTsqG4qYXwIgELuzLh1Jk6seEHQhtub1s/IEEsKpW2x1glevsB1lBmwl+iuOVbW57P6pE/MlkKzA/m8gsN3AdRc6a6E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dY6wxncF; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1746929673; c=relaxed/simple;
+	bh=ErdE1KVMfWPkKsMxBdbzTAnSvWDLWI4LLjWjznFIFAE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t7WR1+uJXBfbpIDE0dpB3bVZs9cRmUZ4jdMZW281+NMdflMQjA5+32kOzKARvW9XOKF+kV/OmOzxIszLyIFCOl5EA5aM+1Mw13vcPPB/37IzVAcjGfVlm/zuL0kETWvA6v4NgFXBAKsUa1S1+tsWfbCcpaAlnu/a/yTPVglIgm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1IW0YD1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dY6wxncF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1CWY/3p83a71s1c0nZWdC5lD6l8cif6NWAoVMJXjvcQ=; b=dY6wxncFU5a/IhfMhnbVtgEEH9
-	3aY05cODJoQ1XeKtB008Qg2RFyG8zK/dUupiGzUh3K+YwiGN/1JPi6GuKMXYspd866vQBOEUU9Ype
-	XQ4TRhTYt5zAtWZ5jRSsddJZ6jir22A2b4OV0k+l6SXjdGOfg7f97WKlnxCCGh/f/PrlBYJtK+etD
-	GrEFTgBXPmDwtxuraLxpwptZDUxRA4GBuya5mx89wkbiPt0gdhp/3jEApsg9ah8syF1bczyUSfBwT
-	8NX27ZnXbBD4+gGSExMspPp807G61ks4iGMiKfzmNq/76lAnIEKoKsL+B8EmkFHsH5B40GIsmDMA1
-	t5HAaM3Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uDw8g-0059qN-0n;
-	Sun, 11 May 2025 10:10:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 11 May 2025 10:10:02 +0800
-Date: Sun, 11 May 2025 10:10:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Thorsten Leemhuis <linux@leemhuis.info>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Danny Tsen <dtsen@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-	Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [v2 PATCH] crypto: powerpc/poly1305 - Add poly1305_emit_arch
- wrapper
-Message-ID: <aCAG-rNiy0b1C9BF@gondor.apana.org.au>
-References: <37cf099e-d5c2-40d8-bc31-77e1f9623b1c@linux.ibm.com>
- <aByX_Y64C6lVRR8M@gondor.apana.org.au>
- <f66620e2-77e3-4713-a946-ddb2c8a0bccb@linux.ibm.com>
- <aByiNZNxqyTerdYG@gondor.apana.org.au>
- <1d2c2fdc-5c36-4d4e-8b25-8289b865726d@linux.ibm.com>
- <aB31DI4QBBZuQObQ@gondor.apana.org.au>
- <20250510044450.GA505731@sol>
- <aB7fvi_FBdnmLUON@gondor.apana.org.au>
- <20250510053308.GB505731@sol>
- <20250510223401.GK30295@gate.crashing.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1IW0YD1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7E0C16AAE
+	for <linux-crypto@vger.kernel.org>; Sun, 11 May 2025 02:14:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746929672;
+	bh=ErdE1KVMfWPkKsMxBdbzTAnSvWDLWI4LLjWjznFIFAE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=D1IW0YD1PWiJE7OexRFET8O5OoDdN/n+H+arvcGWRYzDPMBLnLwS7wBDNnB5yAxhL
+	 ylfsP9uxJzMd0NTxXPAeXHqq1kycZyDThZpY7qV0bJNBtaByGa3Gi+w6CUcx4TvJ7Q
+	 DN5kneaArqhcJFZ9EFuoR9zWEkxh2laX1LhLrZ5PTtbMKgWbdR5vO4pvI4rU0Cljeh
+	 SoL6hb+EFl+I94+/CrjFVOzvQPhkXkl5ucRcMwjXldZ4a8UuCqNzktPwx7j3xeUKyl
+	 96YqxHULEPy323MNYOsLGWDN0jh2e+XwlPuC93HfCvn4PTjDwQeLQ9yMvJcVAulu+4
+	 7bUct8jdLE4fQ==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5fc9c49c8adso2870882a12.3
+        for <linux-crypto@vger.kernel.org>; Sat, 10 May 2025 19:14:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVyY2mduRF9R/ERMdzxtN/5B+paFJFeuEuy2MfDtTogtOZI6vdfnIAz+dK6M3yHMP344xGJVOB8fsWKPfs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNqMl9aQvYbAg1YbV3IPqHRzQ6iHk590xkmpLf+b+sM09PoaJ+
+	gL5ZG0vmaA4YQxwYBjvWwj0B1zhmRhw7V4gcVFtdDpNMkKspKwsnJKr9/vcE27D+AEAL0Sm5lwX
+	ZyeBVpO7Wz0olkCWjc1FCgKvNJoQsa0l88731
+X-Google-Smtp-Source: AGHT+IExXmbIf+BhGVnj7doD3WnX7s+dvlTY3FdrciBuDVwzwOxxJvaT9GkVsNX9nEvSMBd0KFEz7jYxBN5tsLhkF2M=
+X-Received: by 2002:a05:6402:2396:b0:5fc:a51a:9c03 with SMTP id
+ 4fb4d7f45d1cf-5fca51a9f9fmr4891240a12.0.1746929670732; Sat, 10 May 2025
+ 19:14:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250510223401.GK30295@gate.crashing.org>
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
+ <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
+ <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
+ <CAHC9VhSPLsi+GBtjJsQ8LUqPQW4aHtOL6gOqr9jfpR0i1izVZA@mail.gmail.com>
+ <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com> <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
+In-Reply-To: <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
+From: KP Singh <kpsingh@kernel.org>
+Date: Sun, 11 May 2025 04:14:20 +0200
+X-Gmail-Original-Message-ID: <CACYkzJ528JBKbhiw1HNfv1kDBYv_C76cFB8a_Wa6DSqZp5_XuA@mail.gmail.com>
+X-Gm-Features: AX0GCFtRm2U2Z08Q-5iN5TPSVkChFMpfYbeWxPh5iWXOgSo5pdg9_y4ozgwfcPs
+Message-ID: <CACYkzJ528JBKbhiw1HNfv1kDBYv_C76cFB8a_Wa6DSqZp5_XuA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Paul Moore <paul@paul-moore.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>, bpf <bpf@vger.kernel.org>, code@tyhicks.com, 
+	Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
+	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
+	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, kysrinivasan@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, May 10, 2025 at 05:34:01PM -0500, Segher Boessenkool wrote:
->
-> What doe "may_use_simd" even *mean*?  At its declaration site it says
-> "whether it is allowable at this time to issue SIMD instructions or
-> access the SIMD register file", but that is 100% meaningless, you can do
-> SIMD in GPRs.
-> 
-> On PowerPC we have two separate register files dedicated to SIMD-like
-> stuff, the VMX and the VSX register files.  Which of those is this
-> function supposed to care about?
-> 
-> It looks like the whole "may_use_simd" thing is a misguided abstraction
-> unfortunately :-(
+[...]
 
-While we may debate the name of this function, the question is
-simply whether you need to save state or not when you get an
-interrupt.
+> Blaise started this most recent effort by attempting to address the
+> concerns brought up in previous efforts, you and others rejected this
+> first attempt and directed Blaise towards a light skeleton and LSM
+> based approach, which is where he is at with Hornet.  Once again, you
+> reject this approach with minimal guidance on what would be
+> acceptable, and our response is to ask for clarification on your
+> preferred design.  We're not asking for a full working solution,
+> simply a couple of paragraphs outlining the design with enough detail
+> to put forward a working solution that isn't immediately NACK'd.
+> We've made this request multiple times in the past, most recently this
+> past weekend, where KP replied that he would be "happy" to share
 
-If you don't need to save state, then may_use_simd doesn't apply
-to you.  If you need to manually save state when you get an IRQ,
-then you must obey the rules.
+Here's the proposed design:
 
-So even if VMX and VSX registers are separate, you must assume
-that in an IRQ either could be in use already and therefore you
-must not use any of them without saving the state.
+https://lore.kernel.org/bpf/CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com/#t
 
-The ideal solution is to save the state (if necessary) in softirqs,
-or simply disable softirqs when these instructions are in use.
-Then the fallback path can be removed, for softirqs at least.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> designs/code.  Unfortunately, since then all we've received from
+> either you or KP since then has been effectively just a list of your
+> objections on repeat; surely typing out a couple of paragraphs
+> outlining a design would have been quicker, easier, and more
+> constructive then your latest reply?
