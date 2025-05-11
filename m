@@ -1,105 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F5C140E34
-	for <linux-crypto@vger.kernel.org>; Sun, 11 May 2025 02:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6144B184;
+	Sun, 11 May 2025 03:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746929673; cv=none; b=e0mnFnjCVrf6Y33YYfdD7IVCryxuFtAFTm95UqYUsDmI9rcLL8BUspTxtvzDJxPReOZ3lyT3aGx7TVEdcybhpHTEvcUg8txqDiN1HrTG39X8VDMiMEgObvoXg1nLtVZBgYEiPQTfwHX/+BV8FCuM0vdfUiKxTsHtNg/44A3u32o=
+	t=1746933755; cv=none; b=o6BPb8nqn/uGl1/SPdr5gQkYp83eHpn18X4EW8BzEys1XtFgh+XaGn/+DrJui7uflFk80hDN5jrWwzzVm6jQAc7NIbLOo+ZiT3EUYRaN2Luxnyc6LqR6abcyWZA/f1m6RPT2jY/VfGbgFVnZLOXZbGkPUtL4PuldzNciHCMecIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746929673; c=relaxed/simple;
-	bh=ErdE1KVMfWPkKsMxBdbzTAnSvWDLWI4LLjWjznFIFAE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t7WR1+uJXBfbpIDE0dpB3bVZs9cRmUZ4jdMZW281+NMdflMQjA5+32kOzKARvW9XOKF+kV/OmOzxIszLyIFCOl5EA5aM+1Mw13vcPPB/37IzVAcjGfVlm/zuL0kETWvA6v4NgFXBAKsUa1S1+tsWfbCcpaAlnu/a/yTPVglIgm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1IW0YD1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746933755; c=relaxed/simple;
+	bh=YeoZRWRANmCUNbk4l2pyx/MrQB0OC5+emslCayfyyMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ocDvg0vZiDR3RdUX3BY8ENAhXzMMoRb4QaJbWBFeiJsKqE8RXE7nL7z+++b6gpW+LxJ1YlUMwZI6HMvuC4OjLeNtQK+2iw/ncwVqLSCe7v0Xn/+N7lPCHiObUhAZCHFpdr2w+f3ocMVDgbukqHVkEgoANjf+K47P36Du8jcV+c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=sloy2zEf; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1IW0YD1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7E0C16AAE
-	for <linux-crypto@vger.kernel.org>; Sun, 11 May 2025 02:14:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746929672;
-	bh=ErdE1KVMfWPkKsMxBdbzTAnSvWDLWI4LLjWjznFIFAE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=D1IW0YD1PWiJE7OexRFET8O5OoDdN/n+H+arvcGWRYzDPMBLnLwS7wBDNnB5yAxhL
-	 ylfsP9uxJzMd0NTxXPAeXHqq1kycZyDThZpY7qV0bJNBtaByGa3Gi+w6CUcx4TvJ7Q
-	 DN5kneaArqhcJFZ9EFuoR9zWEkxh2laX1LhLrZ5PTtbMKgWbdR5vO4pvI4rU0Cljeh
-	 SoL6hb+EFl+I94+/CrjFVOzvQPhkXkl5ucRcMwjXldZ4a8UuCqNzktPwx7j3xeUKyl
-	 96YqxHULEPy323MNYOsLGWDN0jh2e+XwlPuC93HfCvn4PTjDwQeLQ9yMvJcVAulu+4
-	 7bUct8jdLE4fQ==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5fc9c49c8adso2870882a12.3
-        for <linux-crypto@vger.kernel.org>; Sat, 10 May 2025 19:14:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVyY2mduRF9R/ERMdzxtN/5B+paFJFeuEuy2MfDtTogtOZI6vdfnIAz+dK6M3yHMP344xGJVOB8fsWKPfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNqMl9aQvYbAg1YbV3IPqHRzQ6iHk590xkmpLf+b+sM09PoaJ+
-	gL5ZG0vmaA4YQxwYBjvWwj0B1zhmRhw7V4gcVFtdDpNMkKspKwsnJKr9/vcE27D+AEAL0Sm5lwX
-	ZyeBVpO7Wz0olkCWjc1FCgKvNJoQsa0l88731
-X-Google-Smtp-Source: AGHT+IExXmbIf+BhGVnj7doD3WnX7s+dvlTY3FdrciBuDVwzwOxxJvaT9GkVsNX9nEvSMBd0KFEz7jYxBN5tsLhkF2M=
-X-Received: by 2002:a05:6402:2396:b0:5fc:a51a:9c03 with SMTP id
- 4fb4d7f45d1cf-5fca51a9f9fmr4891240a12.0.1746929670732; Sat, 10 May 2025
- 19:14:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="sloy2zEf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Y6MvY04rIvQC/jfLGWMBxjlXcQaD/D9jyPK+/bNE2uw=; b=sloy2zEf8jsRrBXH4m80u8EUSc
+	u63jtqcqATV9APkOptDJ77b9hnyjDFZun1D3AT8nry2hU3ZC5wZAYpXnQ8bdEdBJPY8+1qWd9o+qV
+	AfGAK75xCiYaa4qXejnEHfo3WnUtG268UUoZIGbDyscZjYOoq7T+aIeZ7F9KvwlN6dZY31H6ZMy+e
+	jbaV/SgZOsIoj4NOfXKjoem6FHQWWasHLh2uXpWTw9NAS935KgwjNCPmkcvGjPOuZ3F4fjQ9z3Rz8
+	WhEJ/YVvJP3bdTERqOBxO4iizx3dAOzv2SBqhaxI1+1wdkxJvlLO5P3gDIUSAxyWsgmiRkWT5z+gO
+	Qloq2c3Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uDxGk-005AGy-24;
+	Sun, 11 May 2025 11:22:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 11 May 2025 11:22:26 +0800
+Date: Sun, 11 May 2025 11:22:26 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, regressions@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@gmail.com>
+Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
+Message-ID: <aCAX8rj2ie4QMnTo@gondor.apana.org.au>
+References: <aBoMSHEMYj6FbH8o@gondor.apana.org.au>
+ <aBsdTJUAcQgW4ink@gondor.apana.org.au>
+ <aBt5Mxq1MeefwXGJ@Red>
+ <aBw-C_krkNsIoPlT@gondor.apana.org.au>
+ <aBw_iC_4okpiKglQ@gondor.apana.org.au>
+ <dd55ba91a5aebce0e643cab5d57e4c87a006600f.camel@gmail.com>
+ <aB8W4iuvjvAZSJoc@gondor.apana.org.au>
+ <41680c5d41ed568e8c65451843e3ff212fd340c4.camel@gmail.com>
+ <aB8t1ZTVBexqGlcm@gondor.apana.org.au>
+ <dcb0b04e479d6f3cfed87795d100ea09e4fbcf53.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
- <20250502210034.284051-1-kpsingh@kernel.org> <87o6w7ge3o.fsf@microsoft.com>
- <CACYkzJ7Ur4kFaGZTDvcFJpn0ZwJ9V+=3ZefUURtkrQGfa68zLg@mail.gmail.com>
- <5dbc2a55a655f57a30be3ff7c6faa1d272e9b579.camel@HansenPartnership.com>
- <CAHC9VhSPLsi+GBtjJsQ8LUqPQW4aHtOL6gOqr9jfpR0i1izVZA@mail.gmail.com>
- <CAADnVQ+C2KNR1ryRtBGOZTNk961pF+30FnU9n3dt3QjaQu_N6Q@mail.gmail.com> <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
-In-Reply-To: <CAHC9VhRjKV4AbSgqb4J_-xhkWAp_VAcKDfLJ4GwhBNPOr+cvpg@mail.gmail.com>
-From: KP Singh <kpsingh@kernel.org>
-Date: Sun, 11 May 2025 04:14:20 +0200
-X-Gmail-Original-Message-ID: <CACYkzJ528JBKbhiw1HNfv1kDBYv_C76cFB8a_Wa6DSqZp5_XuA@mail.gmail.com>
-X-Gm-Features: AX0GCFtRm2U2Z08Q-5iN5TPSVkChFMpfYbeWxPh5iWXOgSo5pdg9_y4ozgwfcPs
-Message-ID: <CACYkzJ528JBKbhiw1HNfv1kDBYv_C76cFB8a_Wa6DSqZp5_XuA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
-To: Paul Moore <paul@paul-moore.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, 
-	James Bottomley <James.Bottomley@hansenpartnership.com>, 
-	Blaise Boscaccy <bboscaccy@linux.microsoft.com>, bpf <bpf@vger.kernel.org>, code@tyhicks.com, 
-	Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
-	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
-	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
-	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, kysrinivasan@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dcb0b04e479d6f3cfed87795d100ea09e4fbcf53.camel@gmail.com>
 
-[...]
+On Sat, May 10, 2025 at 05:07:22PM +0200, Klaus Kudielka wrote:
+>
+> Here a result with the printk patch and the other two small fixes on top.
 
-> Blaise started this most recent effort by attempting to address the
-> concerns brought up in previous efforts, you and others rejected this
-> first attempt and directed Blaise towards a light skeleton and LSM
-> based approach, which is where he is at with Hornet.  Once again, you
-> reject this approach with minimal guidance on what would be
-> acceptable, and our response is to ask for clarification on your
-> preferred design.  We're not asking for a full working solution,
-> simply a couple of paragraphs outlining the design with enough detail
-> to put forward a working solution that isn't immediately NACK'd.
-> We've made this request multiple times in the past, most recently this
-> past weekend, where KP replied that he would be "happy" to share
+Thanks.  So it's clearly not the chaining that's causing the
+corruption.  The requests seem to bouncing between the two engines,
+but it's not clear whether that's relevant.
 
-Here's the proposed design:
+Please replace the previous printk patch with this that adds some
+info on the request being processed so I can see which request is
+which.
 
-https://lore.kernel.org/bpf/CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com/#t
-
-
-> designs/code.  Unfortunately, since then all we've received from
-> either you or KP since then has been effectively just a list of your
-> objections on repeat; surely typing out a couple of paragraphs
-> outlining a design would have been quicker, easier, and more
-> constructive then your latest reply?
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 9c21f5d835d2..fd7f43575cb2 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -127,6 +127,8 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
+ 		if (!(status & mask))
+ 			break;
+ 
++		pr_err("mv_cesa_int: %d 0x%x 0x%x\n", engine->id, status, mask);
++
+ 		/*
+ 		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
+ 		 * relevant on some platforms.
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+index 2200bc6a034f..be8471a8ab22 100644
+--- a/drivers/crypto/marvell/cesa/hash.c
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -396,6 +396,8 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
+ 	}
+ 
+ 	atomic_sub(ahashreq->nbytes, &engine->load);
++
++	pr_err("mv_cesa_ahash_complete: %d 0x%lx\n", engine->id, (unsigned long)ahashreq);
+ }
+ 
+ static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
+@@ -417,6 +419,8 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+ 	struct ahash_request *ahashreq = ahash_request_cast(req);
+ 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+ 
++	pr_err("mv_cesa_ahash_req_cleanup: %d 0x%lx\n", creq->base.engine->id, (unsigned long)ahashreq);
++
+ 	if (creq->last_req)
+ 		mv_cesa_ahash_last_cleanup(ahashreq);
+ 
+@@ -783,6 +787,7 @@ static int mv_cesa_ahash_queue_req(struct ahash_request *req)
+ 	engine = mv_cesa_select_engine(req->nbytes);
+ 	mv_cesa_ahash_prepare(&req->base, engine);
+ 
++	pr_err("mv_cesa_ahash_queue_req: %d 0x%lx %d %d\n", engine->id, (unsigned long)req, req->nbytes, creq->last_req);
+ 	ret = mv_cesa_queue_req(&req->base, &creq->base);
+ 
+ 	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
+index 9b5fd957dde2..59be742c5a1c 100644
+--- a/drivers/crypto/marvell/cesa/tdma.c
++++ b/drivers/crypto/marvell/cesa/tdma.c
+@@ -47,6 +47,8 @@ void mv_cesa_dma_step(struct mv_cesa_req *dreq)
+ 	engine->chain_hw.last = dreq->chain.last;
+ 	spin_unlock_bh(&engine->lock);
+ 
++	pr_err("mv_cesa_dma_step: %d 0x%lx 0x%lx 0x%lx\n", engine->id, (unsigned long)dreq, (unsigned long)dreq->chain.first->cur_dma, (unsigned long)dreq->chain.last->cur_dma);
++
+ 	writel_relaxed(0, engine->regs + CESA_SA_CFG);
+ 
+ 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
+@@ -137,6 +139,7 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 	int res = 0;
+ 
+ 	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
++	pr_err("mv_cesa_tdma_process: %d 0x%lx\n", engine->id, (unsigned long)tdma_cur);
+ 
+ 	for (tdma = engine->chain_hw.first; tdma; tdma = next) {
+ 		spin_lock_bh(&engine->lock);
+@@ -186,6 +189,8 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+ 			break;
+ 	}
+ 
++	pr_err("mv_cesa_tdma_process: %d %d 0x%lx\n", engine->id, res, (unsigned long)req);
++
+ 	/*
+ 	 * Save the last request in error to engine->req, so that the core
+ 	 * knows which request was faulty
