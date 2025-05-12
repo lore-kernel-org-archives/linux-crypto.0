@@ -1,66 +1,66 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EFD29375C
-	for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 12:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C101293B49
+	for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 12:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747051568; cv=none; b=aQTVETYRTNe1QKW58sVRV9HmUJJoBqUm6brKC3pj4Ar2kjTkhxoAdTHaTlLztd0LIU6XaQHX/om9dwLyMYg0x69YtgTpBMGXWmheKWSTrpr5ZYmiV4jSP1Q9PS3IzrIb+cadcheJZHzAM3fhSLay88Bcxt4K5WJCf0ioUbHDB5Q=
+	t=1747051569; cv=none; b=aPEHsz0EH2uXnd3g+uiERspZJag0kU0IvwXhjS7zqV7qKxlvLeEmAT16E92hgDLi/S84/INJuisuq3/lw+KVfD1gNtTG1uzQfDuHBnvb2CS9LezIFtsifRwNV+0cvXzchqXEEqD/50K9i1DxXD1asUSv2T0UHRMISC1+WoJavh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747051568; c=relaxed/simple;
-	bh=0EFZp6jCdPwGTF5uBHzyjqY+Ty0+cL5jFgXOVv/OZ1c=;
+	s=arc-20240116; t=1747051569; c=relaxed/simple;
+	bh=Pl0LyUgTiTeJq+yJ87khuxuTAGXPr2YU08fCOjU8zbM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ukkvc0oO/gPCiI8h3wlD3xnPZzNHu4YSSv1UESBR06+BJ44SgVY/SyVsnFeXgKXdlYeWIP6DWJracpHWqGda6vfLzgP9IuN03/9qyPgQA5NjmTW9zoKSZu18YUOZq5ObODOzkDBLYBgYLE9gkc/vwzyffJWVCA4M+E5DelJaTLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LHeDlf/t; arc=none smtp.client-ip=209.85.167.46
+	 In-Reply-To:To:Cc; b=Lk18ZMtsXfV7cPEyH5gq3w1+3FjMc62JCrhm/JMNfLyhsNCEV7mK8EGfdbOZ0on9JleBCWeEUFLKZM3kUoDx87cWUciLhyEatSeHF+jYvdrfbeOjfPJ+n+hBn/lwWO6G9BpYoES1Nd6irxyjif9VNNirD+gjiBkQmeMlLSf28sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nl/CGw2P; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LHeDlf/t"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54298ec925bso6442435e87.3
-        for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 05:06:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nl/CGw2P"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54fcb8b889cso2832144e87.3
+        for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 05:06:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747051564; x=1747656364; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1747051565; x=1747656365; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iMHCBS0if0cnlwKmMIsceybB2DKlEexq99G6FWGTcxI=;
-        b=LHeDlf/t7C47bEeJwr8OVj70g9EfwWvMYmhBLV6lBHgY+ztKmmCsMkyGaifX/1b9Nq
-         v6MWEWbmdeFZaS8warcpZ0C1iObw6SXdDUxlJlFPUaPGH14EK3FKGljZGD1AlFetZ1Po
-         MehdW6D1wbwjxuu/LlMm3xUGeFPV8yOyi8/+0fHB6rxMNoAzpFbpsj8XsXfSo+SUfgZR
-         EBOoMCmhEzsAHdpxJvyhtAgNoea+qZsaU4XXSpb/7yAItx4HdQWRSk/6H97EELvcmUvL
-         5BHH0yPle5ckwzzf7FCE7cZFU7DF2n17aO42lOc9MJl5x0oWaOAWBURXt/TRGJip1SS2
-         iNkw==
+        bh=/MYiew/7MjE/NSPkg8zeewtIqLpitjfhqjwjRNOSYf0=;
+        b=nl/CGw2PTZXu9Fnk2F9B0rxbCBotZyd8EzualAzuLQ0TuXUUa7m9QUIDETP3vmH3pt
+         nFRm1AruFM2lfVOVp7hPz9DSS6zuLUi4yS6bXPR+/vcxhxrOrz85E7lFi5sDe7t78/dc
+         pfz9KyT6ZXaWUBVtiy3rHIg2gtZGY7s9luTY8wxlM99jmtSw0OoZjgODMdU4z+Vfuq9V
+         0xmmb0Exqfa/0svHDgofdU/GgHwtTY+1X8IR2Q0G5qu0my3eHoHXgzOC2n0jKG2XimcS
+         ZyosdOun+VCnvgsDtTcXQOD9CCQTK+G7k62p965rlRJ5o8sLRrzqKuflK8PGizN3/DsS
+         vUjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747051564; x=1747656364;
+        d=1e100.net; s=20230601; t=1747051565; x=1747656365;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iMHCBS0if0cnlwKmMIsceybB2DKlEexq99G6FWGTcxI=;
-        b=BBqLhQfWrwsM6YzDL7QPLv7+dVB+m2vgh+ae+zh3orYea5Pn/FvByKi2dfSKDYW3tY
-         lbJuJNepsoA0PRLPb8o1MRck/EpQpL0n8iAaEayv/bJgNGl3mUYzFKPMq9QMi6V4VU2p
-         NBsJrxDnH24ayvIIGzSKG8ENSS8CzQwTXrHGUHliizEj3CpXoUo/UrFF0GPOc9hjetls
-         jG/Wp9ZwgLmMRRxs9IWUEcyEG1tyZktygghoXDWaeAlX9XlABCmMnxhiSjw86vizzovY
-         86Jj5Sr0m4U1R1O/Lj1gM8iKTwQ0Wm4SCQH5OMQdEVKNHDqawPuUR1Io+p+AMs0Q+EhH
-         eDxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUWuHuGHBlaVGj+MR3WzZSQ9PMh8SzCL+wFtE9wv9rv75+KGZ61IovxfXKhYpHa8D2CkA58mnfFEAFqsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq/spdpaI3ZxM4Z/NNyBAxy2olY3Fk0i3ARnDMb9xvDto7FAhO
-	kVPExV1uLfsiGMRRSy8tNpr1m+6iJMyU8nYBifxPYWIjJ6BlxQoojgUnLEfmJlP3qQzFSO1J01K
-	c
-X-Gm-Gg: ASbGncu1Tk8EBv5un7b2AdjGlw889SIQmtJR4u1dkq7v7FnOaQQZ2GPUAssN2uuXAdV
-	GJvui5g4v+FrkbiNYwdMilkxY2Su1npnC6x6XT4IQnz7sDOwafFSMdSVLCyDTyZ65Ulxo4Pyj9n
-	Bkrklh4MQye7fGrwmniqZPApBQfYGrZy+rLxlC/MLjlMd3FjxkJxiaaR+SybzuFT83y/2hhb1Af
-	NmF4o5Mqo2Gkhx+t+i8xqo+S21Uv/U6Tf3vt+RdCUtKRn4+6DO3C0ub+B7WRccy2ZkQLmQiL5I/
-	xHwP2BLlA7gZ/ROzjfm+wXAD9O3VRN8UqK17tt86lUxb+FYusOlyGA+Cxu+moVcrosANMYTT
-X-Google-Smtp-Source: AGHT+IFKLyv7PHn6Lok1bEUkjovUWReFWptxKqF+Zjq8PYbN39Dl2AbUjj1cgZazNFL5Lv8ZsKYfRA==
-X-Received: by 2002:a05:6512:3b86:b0:54f:c5bc:3cfd with SMTP id 2adb3069b0e04-54fc67e4cfdmr3762780e87.39.1747051563829;
-        Mon, 12 May 2025 05:06:03 -0700 (PDT)
+        bh=/MYiew/7MjE/NSPkg8zeewtIqLpitjfhqjwjRNOSYf0=;
+        b=StUMSL1rxnB47rdn1cZe3dVgaGXe5iTO8bDwroyzbcNKEw+M4lXGALhWBdAzQWGuT+
+         5ZUdmX48N/kv54FRPe6T1YTOYzoyR10c9ES2gBSOHVi4MWJvFS8/QYyrhMwC8BJ706GZ
+         JHjqXQPh8S5k3S0DEBp9HrCkqUXUiObuzvytkFQoTTPPdyOECpxBR+F2Dzj390NpHeuy
+         64Ffn+Kc7LwKUT5jbX60IX7rPEqh4se1aheR8nhUyo6LLNdzN6x8yTbYdMYc8c/fNLfA
+         sMRjtz2wVUBbh7TI1IVbmLX4guSXh5ZWdfaTEhs/fY0fafolo1jblRSz/GfuQnywhoSc
+         lIfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbGa2smtIarnJ57AfjMgMwDODue0L7JuExOCzB6jt8cH2z5smac0+aqmD+sDqWIMv3kSjtlfoqtUnCDiw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMJNg64iAV4YalZNYdxkFAxpkscVbP+wIHzpZIYKN76XZWJhqx
+	M47KildXyh9XW/3Dhy5Bc5jONHIuu5To7HNMAOkP6N0JsYs7UjgoTiijTx9QazLePGWrY5fixKi
+	m
+X-Gm-Gg: ASbGncs5XdEI4sz2yVNIqptAIWf2+8Jih7OAnFM8PDQ/I23dnmRc5sBofMKJpvT7qH9
+	YDZDVA6/gDYEDaGtiED6AJ6TiCDyjU8wAvoDT5wmv/bfDKimDB/I+J+9TM+4e+p/5HDGtxijWX9
+	Zqnk0LD8Nin1zS4zEaOk/7kysXbFnGuOw1Bc/2KvuqX4hyf40vzMMmuk7cZsxDWCAZ8NfLyXbVj
+	HCazOim2qX+mY+cqgYKv27nvvuFAfxlKvapnnc7W20iL3WifdLVBUJM7UdWe3vwwiYNRc9NITZu
+	7S2IL0S8JuHJ/dSg/lAe5dLNb0JZaI2iMFE9ZPMs2mcM+ALteMsj/BHyH+d/Vg==
+X-Google-Smtp-Source: AGHT+IEEk2VZG3z9Te9sVeOPNqXXigxd1r+ev72HZog3PhTFGJpu9Bl5l1Tn1D8zxgukbGbiw9kC3g==
+X-Received: by 2002:a05:6512:4381:b0:54d:6981:4b83 with SMTP id 2adb3069b0e04-54fc67cb105mr4892037e87.24.1747051564927;
+        Mon, 12 May 2025 05:06:04 -0700 (PDT)
 Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc64bf8a3sm1466033e87.189.2025.05.12.05.06.02
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc64bf8a3sm1466033e87.189.2025.05.12.05.06.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 05:06:03 -0700 (PDT)
+        Mon, 12 May 2025 05:06:04 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 12 May 2025 14:05:56 +0200
-Subject: [PATCH v3 10/12] ARM64: dts: bcm6856: Add BCMBCA peripherals
+Date: Mon, 12 May 2025 14:05:57 +0200
+Subject: [PATCH v3 11/12] ARM64: dts: bcm6858: Add BCMBCA peripherals
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250512-bcmbca-peripherals-arm-v3-10-86f97ab4326f@linaro.org>
+Message-Id: <20250512-bcmbca-peripherals-arm-v3-11-86f97ab4326f@linaro.org>
 References: <20250512-bcmbca-peripherals-arm-v3-0-86f97ab4326f@linaro.org>
 In-Reply-To: <20250512-bcmbca-peripherals-arm-v3-0-86f97ab4326f@linaro.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -90,26 +90,26 @@ X-Mailer: b4 0.14.2
 All the BCMBCA SoCs share a set of peripherals at 0xff800000,
 albeit at slightly varying memory locations on the bus and
 with varying IRQ assignments. ARM64 SoCs have additional
-peripherals at 0xff858000. Extend the BCM6856 the PERF window
-to 0x400000 and add the DMA block at offset 0x59000.
+peripherals at 0xff858000. Extend the peripheral window range
+to 0x400000 and add the DMA controller at offset 0x59000.
 
 Add the watchdog, GPIO blocks, RNG, LED, second UART and DMA
-blocks for the BCM6856 based on the vendor files 6856_map_part.h
-and 6856_intr.h from the "bcmopen-consumer" code drop.
+blocks for the BCM6858 based on the vendor files 6858_map_part.h
+and 6858_intr.h from the "bcmopen-consumer" code drop.
 
 This SoC has up to 256 possible GPIOs due to having 8
 registers with 32 GPIOs in each available.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi | 130 ++++++++++++++++++++++-
- 1 file changed, 129 insertions(+), 1 deletion(-)
+ arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi | 119 ++++++++++++++++++++++-
+ 1 file changed, 118 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi b/arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi
-index 00c62c1e5df00c722884a7adfcb7be08a43c0dc3..dcbd0fdd33d25fa340c417e8284826801ebc00bb 100644
---- a/arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi
-+++ b/arch/arm64/boot/dts/broadcom/bcmbca/bcm6856.dtsi
-@@ -93,11 +93,103 @@ gic: interrupt-controller@1000 {
+diff --git a/arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi b/arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi
+index caeaf428dc15db3089bf4dc62c4a272782c22c3f..c105a734a64897e714ed107e0ddccc5eebd415da 100644
+--- a/arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi
++++ b/arch/arm64/boot/dts/broadcom/bcmbca/bcm6858.dtsi
+@@ -111,11 +111,12 @@ gic: interrupt-controller@1000 {
  		};
  	};
  
@@ -118,20 +118,15 @@ index 00c62c1e5df00c722884a7adfcb7be08a43c0dc3..dcbd0fdd33d25fa340c417e828482680
  		compatible = "simple-bus";
  		#address-cells = <1>;
  		#size-cells = <1>;
--		ranges = <0x0 0x0 0xff800000 0x800000>;
+-		ranges = <0x0 0x0 0xff800000 0x62000>;
 +		ranges = <0x0 0x0 0xff800000 0x400000>;
-+
-+		watchdog@480 {
-+			compatible = "brcm,bcm6345-wdt";
-+			reg = <0x480 0x10>;
-+		};
-+
-+		watchdog@4c0 {
-+			compatible = "brcm,bcm6345-wdt";
-+			reg = <0x4c0 0x10>;
-+			status = "disabled";
-+		};
-+
+ 
+ 		twd: timer-mfd@400 {
+ 			compatible = "brcm,bcm4908-twd", "simple-mfd", "syscon";
+@@ -136,6 +137,86 @@ watchdog@28 {
+ 			};
+ 		};
+ 
 +		/* GPIOs 0 .. 31 */
 +		gpio0: gpio@500 {
 +			compatible = "brcm,bcm6345-gpio";
@@ -211,10 +206,11 @@ index 00c62c1e5df00c722884a7adfcb7be08a43c0dc3..dcbd0fdd33d25fa340c417e828482680
 +			#gpio-cells = <2>;
 +			status = "disabled";
 +		};
- 
++
  		uart0: serial@640 {
  			compatible = "brcm,bcm6345-uart";
-@@ -108,6 +200,29 @@ uart0: serial@640 {
+ 			reg = <0x640 0x18>;
+@@ -145,6 +226,29 @@ uart0: serial@640 {
  			status = "disabled";
  		};
  
@@ -244,7 +240,7 @@ index 00c62c1e5df00c722884a7adfcb7be08a43c0dc3..dcbd0fdd33d25fa340c417e828482680
  		hsspi: spi@1000 {
  			#address-cells = <1>;
  			#size-cells = <0>;
-@@ -133,5 +248,18 @@ nandcs: nand@0 {
+@@ -170,5 +274,18 @@ nandcs: nand@0 {
  				reg = <0>;
  			};
  		};
