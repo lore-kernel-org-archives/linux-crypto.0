@@ -1,66 +1,66 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEF0293746
-	for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 12:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7AB29293D
+	for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 12:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747051562; cv=none; b=WqYiF1PV5Vxs7XH74+u/Pki9+RIOcfPyhxuYUeFjgzMY9qlqSntBs7Ui52hbfwpd+0STtmNrLFWrlQPsR2bP+Lnn6fdBuGlpTnfT1m3yu1dObWfUdqmyMdc3DrSvV3DRdz3VWB5QESb9mg9xUim5OE+WWx64GaaYN9+kHA3m7zo=
+	t=1747051564; cv=none; b=ZhGUBlkKjzc6Ms93ueMIKOVr/oaxDvhdQO6Q+Rlln1SuSWVNqPTX1ccWt2UJvf0PjS2Axu/a36NBRBFBYl3uUYGUpTkdHGnhjDtEk21TUyBVHEXq3miumVWaMaESEhLdD2F4LYBegqx7TkYHbC4HsRDyiYcJ92gO3WoAkmmOhPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747051562; c=relaxed/simple;
-	bh=4bWaWkJdTEaXs9fYwJYdrqRwMIH+MjinXsdLRCjNiOs=;
+	s=arc-20240116; t=1747051564; c=relaxed/simple;
+	bh=iNvTgILnCEUuGyGVf2KAQalCWhryAWAdjzGVCQRI9V4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WsyEAji9KHcQaKIIrvfR6qGpwnpkaSXfmDLf1Kj5OZFzwe0n3gdp0iVY/lnmC/bP5qAQaYk2r3IsTRzXeByo3gbJhG/86A+R1V/dOob513PT0xTNU2D4vS4NAO+iLGJv9oAMHDnJKeSP3CA0rfSIYO9yGUEdIgzJlQXJMwYopUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qQu91j96; arc=none smtp.client-ip=209.85.167.50
+	 In-Reply-To:To:Cc; b=KGaGm88kPoNoAMLkn6t1KXoindk3YOhEsz8j2DGNxSlQAOBS+03HIuzXe+t11e5lCN4E7zIrRtYMqQF5Ks9t2ZBTQ8e4VM+ssMdnJuHkOzwst8TUpPVmQ+43PlLRRHtwPtgKojOzfDqLfuyW5ZtRrMRFs1HzLdoZdP5SCsM3iek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wKjYsaAO; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qQu91j96"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-54c0fa6d455so5254781e87.1
-        for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 05:06:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wKjYsaAO"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54d3ee30af1so4383991e87.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 05:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747051558; x=1747656358; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1747051560; x=1747656360; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Uqw+GjF+9qEiY0+j7o2mMDzIbpEBexjSYyH79EkvzYA=;
-        b=qQu91j96qmOhjAe0M7S1d821KxHB4UVhWmHEVfw30XU1RYlLcnyuLRbfSSZw4am3zJ
-         qtFt8M+S9Vf3EEG533xavyifxq5n4d4h9v9oXdrdhXkZzF1hGO1DHXgCU4Rd7djPyX2F
-         jAIqc8E3ThD1ogwA7CUREP+vOka+Yc7JqYTnFKr3vUuuLGdEXcrjJFGPkbi4RXtQ0oRv
-         vBiIHjrgn3poqtI8yiF6VuRIfeCxuiqDyAJFejvpFrIiiL24lm/2LxLw3XiwYm4iOOm6
-         O4hXqbFSrLpXc0F3GCDBtfZTnb3IZBjJxloXfjkYyo9/EA6AC+yhhG4GWP56vCZcDQFh
-         2aRw==
+        bh=13/MDnqvilhzElhCywJcKpSZ25QUsLbrCE4P0TR4EUU=;
+        b=wKjYsaAOT4Y0dUmaj1VuK9y9gVipWpyNb7O9BChkFszMZGoy7ZZTRJrBtOJ0p3UU4z
+         w78GxqEU6X3ymVy51OZCkLSinoOiV8kVSg6pAYXNPyIqgBJEjDZQ7LhnNpE/AceifMRc
+         iG9KqNPN0aK5txJhWr6r/Twa7ZsKcF8e3Ce2vQc6Ll+0q36Z2OqSYaLOenSpL3sOM2KC
+         F5xZeVqJS3wNuPe3jMttkO1xX0aS3rMbcJrWsvytzm5Hag55d/hTv7aM/tBevvbVgxH5
+         R0a6FNU2rFP+vrAyZqX3GE6I4a/CiJ1XlYYcTka8KKhgzvWbPCSx22b2dHWWYLEsdfIW
+         ZB3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747051558; x=1747656358;
+        d=1e100.net; s=20230601; t=1747051560; x=1747656360;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Uqw+GjF+9qEiY0+j7o2mMDzIbpEBexjSYyH79EkvzYA=;
-        b=pUmcLxPvIlrNyKQ7EZK4us2KHBDqziK2i2/3dHvAh7DLp7dRebTp36Febkv/hOwVUt
-         dihpa0fbw782OC6ljIh5SHtLxnsZ0vWFd81Nr57YyhiCt728ekDtQ4h9rlSUxz0sOG0o
-         wSBnWF7KVfV3HkCBLcmLRsIpojm/KLSmF55s9BAHl7rPnjkwoIjITvgD29SHnZPdFwCu
-         r6Zq4PkIDlw8qayLiNDqwfNZqny5IYGMpk6FBTbffB174Xaet1jAMeJaLP8nW5w9RqGi
-         BMIkSTIj2R55T4B0HMHTIV0eCWb/uLCkljx6XthSK8+BkTM76NFh6A8WBrFug3wEsK8k
-         Fa4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUAeD4DE655TxiKAYsAfNZ9+1/3b/PvURiqy5zCAflwX8ptU1RpR3KzepBc5ykpByaCnnDPAhfGJllaE2U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrLZMCwjOa+lJeISR8MlLNhhjaEHAZzYHlYusQMx4vWbv14eQn
-	CFs7HFFMWniBmQpE6xt9Vp1UpsIAG4Upga5rqsZ+0FT4HDKEbNdNgi7wwPv2D8EskeT4TjtjaTi
-	S
-X-Gm-Gg: ASbGnct5FgCPb8oDS4aEyw0/ykY6PLM7+5K5JR9MB7KEyyw4AF8RuUEFTOKSTflCuzF
-	K0Tg8aRIdVmIh5+pcCbT0Elx0fb4COqhBaABiPRU9YvBrKEHx6L86FCNDLdZGNAAQudy1Zc1Uxk
-	u3xZeaQ1Q4tF4pIhlZtiF/Rpyog/sWvFBjP1rLxSIdrSSTrjG1jE/lEKc62irTyjZ1b8mnhk1N4
-	gnZA1I4UoX7LmcEvEXUoLcoQTd2eI7etOaz0oaHOq7XMSFn4SDb0j9nrPW0tUQLYnD7ZIRn/9Gp
-	hZkHT59Ztdns+lvbM7bHKRrOebBb5IK6mULOuL/Bjmv95K9R1SKnyGR42fAtJS8xay1h9GWC
-X-Google-Smtp-Source: AGHT+IHfwoROTwu8y7TH1PMx5xgHrbT3nnfG+S98Biusb0bw61ipKrcXYXN7U64BqA6qV90JyJTVEQ==
-X-Received: by 2002:a05:6512:3ca9:b0:545:225d:6463 with SMTP id 2adb3069b0e04-54fc67d631cmr3718127e87.42.1747051558400;
-        Mon, 12 May 2025 05:05:58 -0700 (PDT)
+        bh=13/MDnqvilhzElhCywJcKpSZ25QUsLbrCE4P0TR4EUU=;
+        b=XUzL6S+66JpqSZK1/7/08s/MVFe3FieV+4ejp885Ith31f0TdMqcN+RniOajzthidc
+         9pymgoANb55DjCeWq7vBl/2g4qLdB2mHEHTwjUWKHbfzGYWKFvWkMhs72G1uFRFjoUaS
+         uV+rURYQCX1P6kTlYbHkEWddSrrlfP5RbouAhhhJv7xg/bRzsciw3ZoOoGBbByxCQyCb
+         zs33YQByIEfL3MykbUzsBdA41SbxGlzei+6BZuME4du5Oxez8uQbqPrEV9Xy1g9fLWYe
+         pRN+OsieJZUJIq4cW/v5BEudbE0EjUykWxP+Gv5LGk9yDKvNRB6FlQmIwh9e1ZYKJ9rj
+         eGXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkUxHgkfk7BqZcxRfzVEE9uCnOyVrLGuIb8rsYj6Mg6QAnaFWEstpT3r6xXL3N0er5eOS/p+tkd+1B5Uw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMcGeEibH1XWBpjT6H56DoU7G8nsuaWliyoK4kbeHUZHxhZPg2
+	+oCP6fvnz3Ak6R0QN/SYxiHO7vWFBIEE7ik2Z+LJCNAllkKb2zeYfrwP1oDYUXdLpx0yOcSY6Wt
+	w
+X-Gm-Gg: ASbGncvqZbu4YY7xoPtIk7rZhpu1t/1XS9iwBq12X7yxTNSlgexgi/Sj4ZEYnyWizoK
+	IRSsBm9/EKnsIzAQlF0OArLDvECc6zHXdV5D4M0dRSyogxCdkMs34aLfZ/fJnT5CutCvqu4F+S5
+	IwXSjUWs94JzAXnn3iLDVpuTDKtkkQlJkFGCjMKxYGFaRdjjWgn3VO8RFwR/eZTRGHuhSqtoYoO
+	jf6rg2O3+Wj5tk0FpoVonwEuWk7gWrGvwdK3oXGXrp3Ralg7N2JRQ5GFdbfHZ0t51z1lworxJIt
+	j9PULNC1mk+7qqURp9genMZ13bJFGk9fgnuEW3elp5avoHsTwaRWvUK2pj9qeQ==
+X-Google-Smtp-Source: AGHT+IFzh/yJYzxWy00yNIwvV6Uts3H5TcOvRtw6gs/HO6e30umcHnBY9xrWmL0juAaZeBMLvfWD/Q==
+X-Received: by 2002:a05:6512:3088:b0:549:8c86:9bf6 with SMTP id 2adb3069b0e04-54fc67e61a5mr4220105e87.39.1747051559621;
+        Mon, 12 May 2025 05:05:59 -0700 (PDT)
 Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc64bf8a3sm1466033e87.189.2025.05.12.05.05.57
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc64bf8a3sm1466033e87.189.2025.05.12.05.05.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 05:05:57 -0700 (PDT)
+        Mon, 12 May 2025 05:05:59 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 12 May 2025 14:05:52 +0200
-Subject: [PATCH v3 06/12] ARM: dts: bcm63138: Add BCMBCA peripherals
+Date: Mon, 12 May 2025 14:05:53 +0200
+Subject: [PATCH v3 07/12] ARM: dts: bcm63148: Add BCMBCA peripherals
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250512-bcmbca-peripherals-arm-v3-6-86f97ab4326f@linaro.org>
+Message-Id: <20250512-bcmbca-peripherals-arm-v3-7-86f97ab4326f@linaro.org>
 References: <20250512-bcmbca-peripherals-arm-v3-0-86f97ab4326f@linaro.org>
 In-Reply-To: <20250512-bcmbca-peripherals-arm-v3-0-86f97ab4326f@linaro.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -91,36 +91,25 @@ All the BCMBCA SoCs share a set of peripherals at 0xff800000,
 albeit at slightly varying memory locations on the bus and
 with varying IRQ assignments.
 
-Extend the peripheral interrupt window to 0x10000 as it need
-to fit the DMA block.
-
 Add the GPIO, RNG and LED and DMA blocks for the
-BCM63138 based on the vendor files 63138_map_part.h and
-63138_intr.h from the "bcmopen-consumer" code drop.
+BCM63148 based on the vendor files 63148_map_part.h and
+63148_intr.h from the "bcmopen-consumer" code drop.
 
 This SoC has up to 160 possible GPIOs due to having 5
 registers with 32 GPIOs in each available.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm/boot/dts/broadcom/bcm63138.dtsi | 79 +++++++++++++++++++++++++++++++-
- 1 file changed, 78 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/broadcom/bcm63148.dtsi | 64 ++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/arch/arm/boot/dts/broadcom/bcm63138.dtsi b/arch/arm/boot/dts/broadcom/bcm63138.dtsi
-index e74ba6bf370da63d3c115e38b4f20c71baff2116..4ec568586b14c89daceddea8f17381f72f512a93 100644
---- a/arch/arm/boot/dts/broadcom/bcm63138.dtsi
-+++ b/arch/arm/boot/dts/broadcom/bcm63138.dtsi
-@@ -184,13 +184,69 @@ ubus@fffe8000 {
- 		compatible = "simple-bus";
- 		#address-cells = <1>;
+diff --git a/arch/arm/boot/dts/broadcom/bcm63148.dtsi b/arch/arm/boot/dts/broadcom/bcm63148.dtsi
+index 53703827ee3fe58ead1dbe70536d7293ad842d0c..e071cddb28fc2888b8f408b4bc275290dd135642 100644
+--- a/arch/arm/boot/dts/broadcom/bcm63148.dtsi
++++ b/arch/arm/boot/dts/broadcom/bcm63148.dtsi
+@@ -99,6 +99,62 @@ bus@ff800000 {
  		#size-cells = <1>;
--		ranges = <0 0xfffe8000 0x8100>;
-+		ranges = <0 0xfffe8000 0x10000>;
- 
- 		timer: timer@80 {
- 			compatible = "brcm,bcm6328-timer", "syscon";
- 			reg = <0x80 0x3c>;
- 		};
+ 		ranges = <0 0xfffe8000 0x8000>;
  
 +		/* GPIOs 0 .. 31 */
 +		gpio0: gpio@100 {
@@ -178,10 +167,10 @@ index e74ba6bf370da63d3c115e38b4f20c71baff2116..4ec568586b14c89daceddea8f17381f7
 +			interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
 +		};
 +
- 		serial0: serial@600 {
+ 		uart0: serial@600 {
  			compatible = "brcm,bcm6345-uart";
- 			reg = <0x600 0x1b>;
-@@ -209,6 +265,14 @@ serial1: serial@620 {
+ 			reg = <0x600 0x20>;
+@@ -108,6 +164,14 @@ uart0: serial@600 {
  			status = "disabled";
  		};
  
@@ -196,26 +185,6 @@ index e74ba6bf370da63d3c115e38b4f20c71baff2116..4ec568586b14c89daceddea8f17381f7
  		hsspi: spi@1000 {
  			#address-cells = <1>;
  			#size-cells = <0>;
-@@ -248,6 +312,19 @@ bootlut: bootlut@8000 {
- 			reg = <0x8000 0x50>;
- 		};
- 
-+		pl081_dma: dma-controller@d000 {
-+			compatible = "arm,pl081", "arm,primecell";
-+			// The magic B105F00D info is missing
-+			arm,primecell-periphid = <0x00041081>;
-+			reg = <0xd000 0x1000>;
-+			interrupts = <GIC_SPI 23 IRQ_TYPE_LEVEL_HIGH>;
-+			memcpy-burst-size = <256>;
-+			memcpy-bus-width = <32>;
-+			clocks = <&periph_clk>;
-+			clock-names = "apb_pclk";
-+			#dma-cells = <2>;
-+		};
-+
- 		reboot {
- 			compatible = "syscon-reboot";
- 			regmap = <&timer>;
 
 -- 
 2.49.0
