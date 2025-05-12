@@ -1,37 +1,38 @@
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F99F23F417;
-	Mon, 12 May 2025 19:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CA22989AE;
+	Mon, 12 May 2025 19:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747078185; cv=none; b=ArN/bifVGNKTRoWpM6w+/7jOsf5d9sGNn8sURTcSZlBpNrDkTsUK2uRCmwvTTcttNauZm4NsWMBqRwySxLdxgtyPhBNzBT293v2sWWDobiUN6IrnEmhLEH8U5D9JRMruaGAN9w1xxhtGP+XsYSaWz/MW5v+8lzExvBeY3hhMnwM=
+	t=1747078187; cv=none; b=gsePK/frtlW/V/o6wQOupMi4SFScHC6O5VMSH3k5DhiUZh940qZG967yfAWWGurXiZSitRD4JkQGMIRKyEp78fw81FFdmt1cH3pEAO53V0Py4X4gyWRPlkxvTUhZjKIN8w98tIB6lY1pM0oFgEW0vBhzVd+cvr94N17fkOY4iGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747078185; c=relaxed/simple;
-	bh=Sdl1gDmVvVhvI5vO5ld0fmlqgs4/bpMSz4SEZl51ot0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OZZ12Ult+6Tb5c9m0UIxgcmhMm4Rrx03mVGykt+YfDj0Uky0OTA14biKHF28ipHbxxCf4VQA61R9DlNzXg1abHtdyTQ4/HnDo8ja7E87vnUtRMvQEJJa1GSVTQZtuEv0EVKg0NjOJoT1bWYPcV4pT/oo3oc4sLJWq+LUOZmSQ1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KGltEkjz; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1747078187; c=relaxed/simple;
+	bh=/61U+nFwbRYm9NmcMk+7wewKlEE4ETc8NUwzLZDc/gA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g1+uh+rSVDCQ4oxiGaAhwWNiOP7bQ+Ig/CPIt1FGbNJJ/5f650Bz60CkhpvwHlwl7Mj6cg5R9ybEN+kMvK7GNeaZYPrck61oIF9lSEL4jRC6ThrrwE/fU4OpNn4gHtCxqQmazpc5EpcVroWoxx7+uJ73yDu6wRS/uOTjh/cuiwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PMTaLIFH; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KGltEkjz"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PMTaLIFH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1747078184; x=1778614184;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Sdl1gDmVvVhvI5vO5ld0fmlqgs4/bpMSz4SEZl51ot0=;
-  b=KGltEkjzvM7iWn+lHQbk2YEm5wla86lXfIhLaxClwSUDXeyq9+U8xTrm
-   0slsRfFEbPPN+zX6n9miNG3tc52ZTVx8sJQOux9Sr7Ymz9pGbCn2cE4si
-   Ty3yyRczDMIRnA5U4pBQeDH7bIaLz3P/sfIk5tN7DO65EgevzRRyKSErV
-   t4/fhbj9vQqESF/Yhj0loB1vPL6sPl2NU/jsQN578HvQjZV7n4FkK/WMr
-   Q44VNbBEEvleK31TbqHh85lP5S+7r08s/rcwEh/Rq0iq2oPIDIG+xQ+vp
-   FoVG4OJ49FlHVcZ2LQ6E5bWHMmjCTWMPzdeYt6k6Zy8Ut3gAjZxhyJP5l
+  t=1747078185; x=1778614185;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=/61U+nFwbRYm9NmcMk+7wewKlEE4ETc8NUwzLZDc/gA=;
+  b=PMTaLIFHPRLMhmP11cjel4bgUf4RPSJTDcekm6HLb/AHSBr+Qc2d0fGL
+   zH+uBNGIwh2XzYXdhz19A3AJ9zHCTAVE0R5JKOJDVAxxmxtPqiIApcnts
+   nSCc/JNdc7+liJ8Ny/m7xQy90haZ/T1LpDCHj0JOzy2pcCZ8t+0vWPi6f
+   bgQMop/jEg5jYMVYshnX0T1zUOEmojbWCNBqP675uj/vBUiDdORB1laTD
+   Behpc2F9CnjCi9X0MDr1jB1ghZ7aHBmZFU5HwHP93bGzG3G1QzGJ4+8NV
+   wPVKpFqn0Y/vE7BD0Berqe+WeDPrrjPDtC/lTvFIqMefRZprfr4ohPkqX
    g==;
 X-CSE-ConnectionGUID: hYKpzzHaRPOvLPNNOvU8gw==
-X-CSE-MsgGUID: dl60q0MJRZCfEkOp56V1ig==
+X-CSE-MsgGUID: NLlxROieQM+TrxnEaF/p7w==
 X-IronPort-AV: E=Sophos;i="6.15,283,1739862000"; 
-   d="scan'208";a="209006606"
+   d="scan'208";a="209006608"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 May 2025 12:29:36 -0700
@@ -50,10 +51,12 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh@kernel.org>,
 CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>, "Ryan
  Wanner" <Ryan.Wanner@microchip.com>
-Subject: [PATCH 0/9] SAMA7D65 Add support for Crypto, CAN and PWM
-Date: Mon, 12 May 2025 12:27:26 -0700
-Message-ID: <cover.1747077616.git.Ryan.Wanner@microchip.com>
+Subject: [PATCH 2/9] dt-bindings: crypto: add sama7d65 in Atmel SHA
+Date: Mon, 12 May 2025 12:27:28 -0700
+Message-ID: <5c87dd0c60e3ab295bf084cabb59199d5cb4d93b.1747077616.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1747077616.git.Ryan.Wanner@microchip.com>
+References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,32 +68,28 @@ Content-Type: text/plain
 
 From: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-This set adds support for the SAMA7D65 SoC crypto subsystem and enabling
-them in the device tree. This set also adds PWM to the device tree, and
-adds and enables the CAN bus system for the SAMA7D65 SoC.
+Add DT bindings for SAMA7D65 SoC Atmel SHA.
 
-Ryan Wanner (9):
-  dt-bindings: crypto: add sama7d65 in Atmel AES
-  dt-bindings: crypto: add sama7d65 in Atmel SHA
-  dt-bindings: crypto: add sama7d65 in Atmel TDES
-  dt-bindings: rng: atmel,at91-trng: add sama7d65 TRNG
-  crypto: atmel - add support for AES and SHA IPs available on sama7d65
-    SoC
-  ARM: dts: microchip: sama7d65: Add crypto support
-  ARM: dts: microchip: sama7d65: Add PWM support
-  ARM: dts: microchip: sama7d65: Add CAN bus support
-  ARM: dts: microchip: sama7d65: Enable CAN bus
+Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
+---
+ .../devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml     | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- .../crypto/atmel,at91sam9g46-aes.yaml         |   4 +-
- .../crypto/atmel,at91sam9g46-sha.yaml         |   4 +-
- .../crypto/atmel,at91sam9g46-tdes.yaml        |   4 +-
- .../bindings/rng/atmel,at91-trng.yaml         |   1 +
- .../dts/microchip/at91-sama7d65_curiosity.dts |  35 +++++
- arch/arm/boot/dts/microchip/sama7d65.dtsi     | 128 ++++++++++++++++++
- drivers/crypto/atmel-aes.c                    |   1 +
- drivers/crypto/atmel-sha.c                    |   1 +
- 8 files changed, 175 insertions(+), 3 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
+index d378c53314dd..375464222942 100644
+--- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
++++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
+@@ -15,7 +15,9 @@ properties:
+     oneOf:
+       - const: atmel,at91sam9g46-sha
+       - items:
+-          - const: microchip,sam9x7-sha
++          - enum:
++            - microchip,sam9x7-sha
++            - microchip,sama7d65-sha
+           - const: atmel,at91sam9g46-sha
+ 
+   reg:
 -- 
 2.43.0
 
