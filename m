@@ -1,48 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73772576;
-	Mon, 12 May 2025 05:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423FF253932;
+	Mon, 12 May 2025 05:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747028772; cv=none; b=ZPrhUcEJuK9omqgaYPvy+lyMcv9f04w25PZx9sQ/xJ0d1s8IRP7gMcMVoMzbFJUJ3OfC5EKoIGDTQ8/PF9TCtRdZwoWeRUu7Ol94G4Ziu0rZVok/If14smHVhmomVE2JNM0yWKxmJ4E/KTzVVDtW45h6TA7wbzSw2dErRSfkWaM=
+	t=1747028799; cv=none; b=MN+FsEPJT2+k+/Ja60MbhMiiP6LSKMnZTi207gu/mN8K+yGWIbru/wIElZ018bL7WSGuNGh/yrgp8tsj70gLGTXgZw4qyqjZP8j8pNt7xpa2BN084wURGWZHSJs3Y3v2Qaw0a6OfMx4sZfGmkPIEuE8nDbWwlZ9dj+vbpF3CIVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747028772; c=relaxed/simple;
-	bh=u64s+zlla2jJXpvc4naROlFKmTDabF0VIueBA0xb8l4=;
+	s=arc-20240116; t=1747028799; c=relaxed/simple;
+	bh=/nxomLNQ0uR4756qgYMiNejXzmAfeJg1aKFobJ1To/4=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=sGOpSUJMncuFxBIN4Iy3efJqk3T0tfyTG31l/AhJdz2iHdSa9n6LbziJ5gpjCYotZ8KG8rXQh9Y0PqtvLhMRAEEVbxDhR4YnRSBCFPOT3oN0wViD9/pm2TmGEtIbDdYUY3FEE5QXBgKPtowaVflHUUzF+SkTtES5UbPqoUkN1tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=S/s7t2pO; arc=none smtp.client-ip=144.6.53.87
+	 Content-Disposition:In-Reply-To; b=MCwDr4B+yFhT/KBs532PV4b2Y7mxD1VjDO7o0JGN19F3PBBCb04H6k9o1OAg6+Or5h2jvDHHEOlubzLh0VAW1oxKoGtbJTzsitwqAfTENegZldnbh/+7RzL4Kc1F0Yan8U5qTB6opqnIwIFiEaDlwTodKyykHWxM3h9g6dBcrP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=a7pSxBUY; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="S/s7t2pO"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="a7pSxBUY"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
 	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xxYezVCCW8thv+qLiUz6l9UAqKd/qP+JO8d98YSqd48=; b=S/s7t2pOkSMknAlt9Xo72xB+Xk
-	2BeBKd0JobLfzVY1rfopu4wpLQVmbiyoIyrKWNfw7fJElr2DnZf+2tHomWPWndlZcrQd/HdtxrhMo
-	tTihOowVp20dSE+SUvgkndWKyD9qKp1x0wWN4TQ/VwCRY6nFbhGy50FuzlO8OKpMeqYiggyoTmsLl
-	jQkWg8LN7KnZjUelc9rjFiuoTc8BIYX9Cd3aVWjMbysGB/o95Lhq3vAWZktaVIkqPbsqxzOxFvI26
-	OMBaBIB1PNbiIjiT0ucY5IFwu4MO/jlIIwZjeJxlcxvoVPc77KsOtexUw0YOl1fVZTXqXTY0jvh6h
-	Lula7ezA==;
+	bh=IVoKLm0TRMU7MgXCmk2aD2suHFOk0S0fqlqkmCky9gk=; b=a7pSxBUYs71NsUkQRx2c561NfL
+	a6XU4EIpqP6UfctAZ2VPJS70+MApcGN5KXCgPujjxmngM8RWPPPgfj7NfzM8Nc9/wN+NlW0D1m59h
+	2Fj7Gy5zxrh5/4Iou5Gvjqdi8KRnJCuRFKpnPDKphWGuXXI4tKXjDdfcZo2H0rcppUI1enL9hZPQW
+	jw0YaIMY1S49JLORLgGeaHs2Ge4iPr8XCPn2zjq0fSdT5KghQ8u/j5b0LEm20vBWoYHq/mGI5DPEp
+	zxARVFK1xndm4MNVErYhSHVaykRjQl+JzXAzELRqQxtgxFknH9LShTaC7V36Bl1QW/0oSZz7o8DLb
+	H4cufN+w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uELz5-005LnN-2T;
-	Mon, 12 May 2025 13:45:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 12 May 2025 13:45:51 +0800
-Date: Mon, 12 May 2025 13:45:51 +0800
+	id 1uELzl-005Lo3-11;
+	Mon, 12 May 2025 13:46:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 12 May 2025 13:46:33 +0800
+Date: Mon, 12 May 2025 13:46:33 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	Jason@zx2c4.com, tytso@mit.edu
-Subject: Re: [PATCH 0/4] crypto: lib/chacha - improve type safety
-Message-ID: <aCGLDzAkVn65P4n4@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/7] Clean up the crypto testing options
+Message-ID: <aCGLOd2B5MB0tpPQ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,44 +47,101 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250505181824.647138-1-ebiggers@kernel.org>
+In-Reply-To: <20250505203345.802740-1-ebiggers@kernel.org>
 X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
 Eric Biggers <ebiggers@kernel.org> wrote:
-> This series can also be retrieved from:
+> This series reworks the crypto testing kconfig options to fix some
+> longstanding issues:
 > 
->    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git chacha-prototypes-v1
+> - Replace the inverted option CONFIG_CRYPTO_MANAGER_DISABLE_TESTS with a
+>  regular option CONFIG_CRYPTO_SELFTESTS.
 > 
-> This series improves type safety and clarity in the ChaCha functions by
-> strongly typing the state array and adding explicit array bounds for
-> other fixed-length arrays.  No functional changes.
+> - Make CONFIG_CRYPTO_SELFTESTS enable the full set of tests by default,
+>  removing CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
 > 
-> Eric Biggers (4):
->  crypto: lib/chacha - strongly type the ChaCha state
->  crypto: lib/chacha - use struct assignment to copy state
->  crypto: lib/chacha - add strongly-typed state zeroization
->  crypto: lib/chacha - add array bounds to function prototypes
+> - Automatically enable CONFIG_CRYPTO_MANAGER when needed for the tests.
 > 
-> arch/arm/lib/crypto/chacha-glue.c             | 34 ++++----
-> arch/arm/lib/crypto/chacha-scalar-core.S      |  5 +-
-> arch/arm64/lib/crypto/chacha-neon-glue.c      | 27 ++++---
-> arch/mips/lib/crypto/chacha-glue.c            |  6 +-
-> arch/powerpc/lib/crypto/chacha-p10-glue.c     | 17 ++--
-> arch/powerpc/lib/crypto/chacha-p10le-8x.S     |  6 +-
-> arch/riscv/lib/crypto/chacha-riscv64-glue.c   |  9 ++-
-> arch/riscv/lib/crypto/chacha-riscv64-zvkb.S   | 10 +--
-> arch/s390/lib/crypto/chacha-glue.c            | 13 +--
-> arch/x86/lib/crypto/chacha_glue.c             | 62 ++++++++------
-> crypto/chacha.c                               | 20 ++---
-> drivers/char/random.c                         | 41 +++++-----
-> fs/bcachefs/checksum.c                        | 18 ++---
-> include/crypto/chacha.h                       | 80 ++++++++++++-------
-> lib/crypto/chacha.c                           | 40 +++++-----
-> lib/crypto/chacha20poly1305-selftest.c        |  8 +-
-> lib/crypto/chacha20poly1305.c                 | 53 ++++++------
-> lib/crypto/libchacha.c                        |  2 +-
-> .../crypto/chacha20-s390/test-cipher.c        | 10 +--
-> 19 files changed, 253 insertions(+), 208 deletions(-)
+> - Rename cryptomgr.noextratests to cryptomgr.noslowtests.
+> 
+> - Remove cryptomgr.panic_on_fail, as panic_on_warn can be used instead.
+> 
+> - Rename CONFIG_CRYPTO_TEST to CONFIG_CRYPTO_BENCHMARK.
+> 
+> Changed in v3:
+>  - Keep options in defconfigs.
+>  - Make CRYPTO_SELFTESTS depend on DEBUG_KERNEL.
+> 
+> Changed in v2:
+>  - Moved selftest lines in lib/crypto/Makefile to appropriate places.
+>  - Fixed a commit message.
+> 
+> Eric Biggers (7):
+>  crypto: tcrypt - rename CRYPTO_TEST to CRYPTO_BENCHMARK
+>  crypto: testmgr - remove panic_on_fail
+>  crypto: testmgr - replace CRYPTO_MANAGER_DISABLE_TESTS with
+>    CRYPTO_SELFTESTS
+>  crypto: testmgr - make it easier to enable the full set of tests
+>  crypto: testmgr - rename noextratests to noslowtests
+>  crypto: Kconfig - make CRYPTO_MANAGER a hidden symbol
+>  crypto: testmgr - enable CRYPTO_MANAGER when CRYPTO_SELFTESTS
+> 
+> arch/arm/configs/exynos_defconfig           |   2 +-
+> arch/arm/configs/milbeaut_m10v_defconfig    |   3 +-
+> arch/arm/configs/pxa_defconfig              |   3 +-
+> arch/arm/configs/spitz_defconfig            |   2 +-
+> arch/arm64/configs/defconfig                |   2 +-
+> arch/loongarch/configs/loongson3_defconfig  |   2 +-
+> arch/m68k/configs/amiga_defconfig           |   2 +-
+> arch/m68k/configs/apollo_defconfig          |   2 +-
+> arch/m68k/configs/atari_defconfig           |   2 +-
+> arch/m68k/configs/bvme6000_defconfig        |   2 +-
+> arch/m68k/configs/hp300_defconfig           |   2 +-
+> arch/m68k/configs/mac_defconfig             |   2 +-
+> arch/m68k/configs/multi_defconfig           |   2 +-
+> arch/m68k/configs/mvme147_defconfig         |   2 +-
+> arch/m68k/configs/mvme16x_defconfig         |   2 +-
+> arch/m68k/configs/q40_defconfig             |   2 +-
+> arch/m68k/configs/sun3_defconfig            |   2 +-
+> arch/m68k/configs/sun3x_defconfig           |   2 +-
+> arch/mips/configs/decstation_64_defconfig   |   1 -
+> arch/mips/configs/decstation_defconfig      |   1 -
+> arch/mips/configs/decstation_r4k_defconfig  |   1 -
+> arch/mips/configs/gpr_defconfig             |   2 +-
+> arch/mips/configs/ip28_defconfig            |   1 -
+> arch/mips/configs/lemote2f_defconfig        |   2 +-
+> arch/mips/configs/mtx1_defconfig            |   2 +-
+> arch/mips/configs/rb532_defconfig           |   2 +-
+> arch/parisc/configs/generic-32bit_defconfig |   2 +-
+> arch/parisc/configs/generic-64bit_defconfig |   1 -
+> arch/powerpc/configs/g5_defconfig           |   2 +-
+> arch/powerpc/configs/powernv_defconfig      |   2 +-
+> arch/powerpc/configs/ppc64_defconfig        |   2 +-
+> arch/powerpc/configs/ppc64e_defconfig       |   2 +-
+> arch/powerpc/configs/ppc6xx_defconfig       |   2 +-
+> arch/s390/configs/debug_defconfig           |   4 +-
+> arch/s390/configs/defconfig                 |   4 +-
+> arch/sh/configs/migor_defconfig             |   1 -
+> arch/sparc/configs/sparc64_defconfig        |   2 +-
+> crypto/Kconfig                              |  45 ++++----
+> crypto/Makefile                             |   2 +-
+> crypto/algapi.c                             |   5 +-
+> crypto/algboss.c                            |   2 +-
+> crypto/api.c                                |   3 +-
+> crypto/hkdf.c                               |   2 +-
+> crypto/internal.h                           |   5 +-
+> crypto/kdf_sp800108.c                       |   2 +-
+> crypto/tcrypt.c                             |   8 +-
+> crypto/tcrypt.h                             |   4 +-
+> crypto/testmgr.c                            | 115 +++++---------------
+> include/crypto/internal/simd.h              |   6 +-
+> lib/crypto/Makefile                         |  11 +-
+> lib/crypto/aescfb.c                         |   2 +-
+> lib/crypto/aesgcm.c                         |   2 +-
+> lib/crypto/blake2s.c                        |   2 +-
+> lib/crypto/chacha20poly1305.c               |   2 +-
+> lib/crypto/curve25519.c                     |   2 +-
+> 55 files changed, 111 insertions(+), 183 deletions(-)
 > 
 > 
 > base-commit: 64745a9ca890ed60d78162ec511e1983e1946d73
