@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BBA29A9CA;
-	Mon, 12 May 2025 20:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B60C29AAE5;
+	Mon, 12 May 2025 20:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747083299; cv=none; b=Lun7aQOkHcc6z3uHIak+0Ym+69BXcS8chJEImUch6Bo9Bz99KK9lKlxPleoZZySQ8bLFpx7Qtq+MNuJSD6c4+YBtN9F/WnX5mX0Ma9z7youjqAL91woZ0akHYK9L0OWk/UKg9aQjeoHZBSmbSFpxa4r4WBfNjI3b0jUM/IFySsI=
+	t=1747083301; cv=none; b=Yw/azJazzp8oTdoLd/4mTh7P3zRoSMcy2BVIP6P+YERd/5YVNyTXIWTkxZsqHonMBw03K87FI++GghXqd2T/EG6dB2S6rQQTYtvM1uDjXPiqR4U8VEKY8wKPj4xZ8Y4abTynwfE7GB+VcB0hA0hvveJPdhC5tXi17084umOFT0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747083299; c=relaxed/simple;
-	bh=4MnOPiXLyFGyvIj0JXxrByxbb5sHvTSxERBoVbP3jrI=;
+	s=arc-20240116; t=1747083301; c=relaxed/simple;
+	bh=1Wb+WsqVMEuJbQLKe8Gt2DrmhyU52bmcmcDDaS0ZKGM=;
 	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=SLn3oqJcG89tumNPbMMdbvF9vquNchgy8vJGvXiDyKkBxVSfa5hZNxL1AismdWL+hHtDYIbS1/p028Uwm/NaWJb4hyMO05FjycYQ+ZUhjr4UQpQML8Uik3jT+WNUEHsPiF3WBp+UGtfdxf3RTdHYoKF5jAabWyqWyt4gr6Rc2nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L76NCfVV; arc=none smtp.client-ip=10.30.226.201
+	 Message-Id:Subject; b=STTvfd5MzFS9vZLc2McOMiVUSpCkrul6IlKMxFhElMWV1ad8HFU+vKcIiDc7JTY/ZRCRWRpE1gW5HDWnNP5DOYnM5170W8mmwk3slWTD1s46n99sXLRCjmGxQR//LPc5lQ5OnhDPiGC+VbQqKAf/3P6vyS3fKJZ4Jte5F8hyWKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j91pA5Yq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L76NCfVV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD0DBC4CEE9;
-	Mon, 12 May 2025 20:54:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j91pA5Yq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59535C4CEF2;
+	Mon, 12 May 2025 20:55:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747083299;
-	bh=4MnOPiXLyFGyvIj0JXxrByxbb5sHvTSxERBoVbP3jrI=;
+	s=k20201202; t=1747083300;
+	bh=1Wb+WsqVMEuJbQLKe8Gt2DrmhyU52bmcmcDDaS0ZKGM=;
 	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=L76NCfVVHHV1HoGV5ch5HkQi9AXePHnSPo+xJYB+NDcUqgB/ZLFx5ceZOcfev+iIk
-	 FpmLkPuKeifbuSRKiVPxiL+LgcZ6VkZuvLrCkQWNV0VWwQMeS8ONMDldGzPW4sIfur
-	 cy+oyufPgaaUZlDWKX34TlHoSTcZVAONqZKv+8EyxqnBhz9v8F5OIWwlhZWIbK51ew
-	 lJmJYoA/bKnt0JlxCorWowwR3Cxh8C9p0iaepG+LaamucPP2cmfmx1kDaUJ1tX/rQa
-	 3/mstXuPXX7X4cP0kcd/bYtuSQoM5cXtoVNIiHe/qKgd1IsjKopcaStQPFnHJtvyfd
-	 wHtl58Dujkraw==
-Date: Mon, 12 May 2025 15:54:57 -0500
+	b=j91pA5YqJOECZEmryiT5l3eX4hV0AuxbWjsTsrMlWWDn5zyzR47CwRWqoZHtT9dBr
+	 /UjK3+vR48nO1OS29TJe+i2IYrwZhC81RB5ufv4bhlhUF1R93NsqNjrh9PUW5P/kYy
+	 kaox+g6mX6dw+D0WwjUvR1YqGpBjAvKASKjPen4oybX/MZW/rVm+BXrKvw4Aj/2ZHd
+	 8FQv3oElcivsirQYuC1D7c+aBdrBPohHH6VRTGDedaxDP6FjOqiteP0Q9V4rvb/L1O
+	 YoXYXggIrTTPcpxJIVg33jvU0p9EZVHemdjOFl4YuZ4bKc5RLH7SctCIKuTSJZLlPN
+	 Rnxip5KxZHOsw==
+Date: Mon, 12 May 2025 15:54:59 -0500
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -36,41 +36,41 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: herbert@gondor.apana.org.au, alexandre.belloni@bootlin.com, 
- linux-crypto@vger.kernel.org, claudiu.beznea@tuxon.dev, 
- linux-kernel@vger.kernel.org, conor+dt@kernel.org, 
- linux-arm-kernel@lists.infradead.org, krzk+dt@kernel.org, 
- davem@davemloft.net, nicolas.ferre@microchip.com, 
- devicetree@vger.kernel.org, olivia@selenic.com
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, 
+ alexandre.belloni@bootlin.com, nicolas.ferre@microchip.com, 
+ olivia@selenic.com, devicetree@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ conor+dt@kernel.org, claudiu.beznea@tuxon.dev, krzk+dt@kernel.org, 
+ herbert@gondor.apana.org.au
 To: Ryan.Wanner@microchip.com
-In-Reply-To: <5c87dd0c60e3ab295bf084cabb59199d5cb4d93b.1747077616.git.Ryan.Wanner@microchip.com>
+In-Reply-To: <ea33a6222dda7c60fd404a4b0e9c4824e19ee1bf.1747077616.git.Ryan.Wanner@microchip.com>
 References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
- <5c87dd0c60e3ab295bf084cabb59199d5cb4d93b.1747077616.git.Ryan.Wanner@microchip.com>
-Message-Id: <174708329386.4035852.2868529061240392113.robh@kernel.org>
-Subject: Re: [PATCH 2/9] dt-bindings: crypto: add sama7d65 in Atmel SHA
+ <ea33a6222dda7c60fd404a4b0e9c4824e19ee1bf.1747077616.git.Ryan.Wanner@microchip.com>
+Message-Id: <174708329457.4035885.12979027152382055790.robh@kernel.org>
+Subject: Re: [PATCH 3/9] dt-bindings: crypto: add sama7d65 in Atmel TDES
 
 
-On Mon, 12 May 2025 12:27:28 -0700, Ryan.Wanner@microchip.com wrote:
+On Mon, 12 May 2025 12:27:29 -0700, Ryan.Wanner@microchip.com wrote:
 > From: Ryan Wanner <Ryan.Wanner@microchip.com>
 > 
-> Add DT bindings for SAMA7D65 SoC Atmel SHA.
+> Add DT bindings for SAMA7D65 SoC Atmel TDES.
 > 
 > Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 > ---
->  .../devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml     | 4 +++-
+>  .../devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml    | 4 +++-
 >  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
 
 My bot found errors running 'make dt_binding_check' on your patch:
 
 yamllint warnings/errors:
-./Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml:19:13: [warning] wrong indentation: expected 14 but found 12 (indentation)
+./Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml:19:13: [warning] wrong indentation: expected 14 but found 12 (indentation)
 
 dtschema/dtc warnings/errors:
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/5c87dd0c60e3ab295bf084cabb59199d5cb4d93b.1747077616.git.Ryan.Wanner@microchip.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/ea33a6222dda7c60fd404a4b0e9c4824e19ee1bf.1747077616.git.Ryan.Wanner@microchip.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
