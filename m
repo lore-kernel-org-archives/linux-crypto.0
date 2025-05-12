@@ -1,98 +1,80 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169108467
-	for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 12:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A76A8467;
+	Mon, 12 May 2025 12:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747051624; cv=none; b=UtIGSt1h7XO+SUmae4J+pxEVKfAhMvHcBicAdkdyr37BBecNxDSJK9lWfGn8iBslbEDRa8w4KYv6yA7wnej9irCQ2uS2ebCOo04WYdarpJcmSIGMDk1UkcmJo+zMswzgwgIbAWYLzhlOrXTytCGiq2FSJleQ3Xi2r5ddAmX/PQk=
+	t=1747051647; cv=none; b=mAHsuig9Retz0tQu7LHWgcYpXQhw6KVTO9atSfdWZly1hgDfEXvCbHiaFZkd3Q0uEDn5oXQyDdbh9IfxB/wRi9lSxCsm8Cq9+t85oxVt3sghSDLCSxACIOjlgz7WXuAHb873H1YsohCnymPQbPa7X6uSamKzzIwC8iBsIr6QK/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747051624; c=relaxed/simple;
-	bh=8WWWgeWVvcbHTtv0RBP4r1XUoDGKd++Wm/OvMpeSFds=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cc/Zr8f8fJ1Kchq64uBneTmXOcNLj8wsvoswMXGl9eE0W2oTxd+rpn0Av1x88jSokYZp5Bye+pxYqMvuMHNwD/EljcsTn3pP0c8F0+7uTMvoKVVAN2ubj20AjNoOV4J9DKXLCKDZsgHyq0ZYpT40NqEKSAi+XozmH3HLmvQmrzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XMUMeQXc; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1747051647; c=relaxed/simple;
+	bh=KEjnsHJTmV1Z4TWl36W98Srw4qW/9+nB64i8XHrY+8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ultg1JvPtypZpKB0hLX6+XnSV503LHPzy3wZJAloo1wp+ZAUoVcIn0rorpPZBlPBCVdtAyp+bBCCzNDkuq4/QF/V8RD6vHVDuqbpUBezYu4nocbt3uCD4E2pla2sGNMedlsbCny3nEakWFdfvCMvZKxSY/w86iMsJml+o2xCn7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TnRHSu2m; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XMUMeQXc"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54b1095625dso5205212e87.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 May 2025 05:07:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747051621; x=1747656421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8WWWgeWVvcbHTtv0RBP4r1XUoDGKd++Wm/OvMpeSFds=;
-        b=XMUMeQXcovQjNx2ZimJu/UlqDDyOLDgmgXlXFs61Pa1G1nF55+GUxWlksRbU6CUwhT
-         gmCp0iTOGcZmx/l/og07QRf7BcOtbvtJg66+/2vv8CNLGfxqJ2X91Ti3FB61BQ23No03
-         /lsxpICPQtwjBYskvVugWN10OsPnA8r4LLx0aLKJ05M05erHs9c9VoanTcvRX4f2ZAmO
-         4XfOqlTHcJuYkq+KPFRHt/KxGioYhc6omWxxXaqRBiwrJC/TxZFiABx2EvJVKPkxJCEr
-         aC9c5tBv0y3WcczQHl/dbkjO63tR4Yzd9ob2JfbJjEgI2k5nTjgCjvjNc/7Z8mf8Om9D
-         NyDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747051621; x=1747656421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8WWWgeWVvcbHTtv0RBP4r1XUoDGKd++Wm/OvMpeSFds=;
-        b=ZHUKSJsUQz33I9jD8fwns9/b7zqFXKbXIxcPuPSO5LRXUpbcRmshE8OMNxdtCEmKHU
-         OGVFIEclx2QPPzQppARXlXDmRg/bjCrTIUedBbWGhtEAk/eSFXHQTr2+hlsnNyTUr5UT
-         7oI667/eOp2K+XLVsmxgnCD5/7eLNaR7Zn07vGKxAU9vt7ALr8EkK2gyQyXY+MRUw7Lf
-         deAxIcNTsmmnGxOwwoJprncckYfUngeMiST3i4/yTmJuOL6RVt/onlRfER79RQKUk9DZ
-         7FXYos9pd36umgBGqa/nB/7UPMnYnjfUo/maJARWnGmTXKjdznAlwQpdl+gRhZaVU2JR
-         dFkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXhfbjGOYrWKL3N0UgBYerYeDltT8J/2lh1sNno2YWZgpb93tyLqDdjsyuPdZMXrZCEd0yc/mFNBahoWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6CMT3EVBfWNi/tv3LH349oUYZwqhoxjD+9KYNn/+hJcMUsNoA
-	BbWlvOXVVn2dt71IHxGvjJPK3A0NVMblRCWl5YmIKKvDoKJkrtj3hqQ3o3pUNECLXQn8eEvQh4I
-	efXlyDNqm5kuhWu+31skliEUL1HqU2ZegigJl+Q==
-X-Gm-Gg: ASbGncvNERoYkLOYughIdBnGWF+nnfFrBFh2BkF4ybvVoDTWEEumtDyY4MoYeaX9YFE
-	BhQM+eQJcVjh+rCH8Avob0G2Qg1EHpX8AKWolaX4UmqTDCl2OFa7UhYVLeVBpebG2jou0cIgIEP
-	XyKXqt/XNDWPHQHCNqqIbBVt8TKBqqYHN8
-X-Google-Smtp-Source: AGHT+IEx8k4So5xIBQnsOvPLJlE1JiI/knZvAo1IR6NtL1z/XpXpp8RjehZWw4mU/3r3Q3kmxi4fVz2sQoxO2BBk9mc=
-X-Received: by 2002:a05:6512:6602:b0:549:38eb:d694 with SMTP id
- 2adb3069b0e04-54fc67c477emr3402667e87.26.1747051621225; Mon, 12 May 2025
- 05:07:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TnRHSu2m"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Wvqa5iFzwoYyuZu2VdHRzgext+bLynWvV5+GUQyFRrY=; b=TnRHSu2mATXBeJT00uezEeqYVI
+	TO5gkH+uHoW0oWdOHMPsFCukcGg3I5VR03pJLs81onR/dy+qr2yDRxlTWirhMsYfHs122uQlUtHHI
+	VUl0r41DAWTb/uxoBdSx8PURa/pVywgUGIyEYMyxV3A89QcximCXjvHUlBy0SCkkRO9MfotL6NgLV
+	T+rqSjIRbGBgCAePdtnfBf9qQVTywnp0olEJTLmMgfzQIO8j2yYAPuIB2DtPKZGZ1rbJC/t3UzDd3
+	XSyS2UDY5PDytLKXtAEsKqNoAns5EbLthN2NlohhVzPbatOAtxVSVL5sBkX11stQsxHeeml6ratIV
+	/DzNaq6g==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uERw7-005Rw5-15;
+	Mon, 12 May 2025 20:07:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 12 May 2025 20:07:11 +0800
+Date: Mon, 12 May 2025 20:07:11 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>,
+	kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, keyrings@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+Subject: Re: [v3 PATCH] KEYS: Invert FINAL_PUT bit
+Message-ID: <aCHkb1CYXkIKNl4K@gondor.apana.org.au>
+References: <aCHeoSBOLF-mcY7I@kernel.org>
+ <aB3OsMWScE2I9DhG@gondor.apana.org.au>
+ <aBccz2nJs5Asg6cN@gondor.apana.org.au>
+ <202505091721.245cbe78-lkp@intel.com>
+ <1960113.1747041554@warthog.procyon.org.uk>
+ <2020395.1747051310@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250406-bcmbca-peripherals-arm-v2-0-22130836c2ed@linaro.org>
- <dc47e9ba-e23d-45d2-bae1-cac8bac2310b@broadcom.com> <ac86467d6f0b2c531f7d1356ade78e17@mail.gmail.com>
-In-Reply-To: <ac86467d6f0b2c531f7d1356ade78e17@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 12 May 2025 14:06:50 +0200
-X-Gm-Features: AX0GCFuoFVJJ2KLgVFQoQTOvfp299H6PlFukenI3FYuId0cEte28aXrmVaRLmh4
-Message-ID: <CACRpkdY0_u_7J_6JLAiVRz-oX+UZViUhyD0fSfi2u3ogVOPdbA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/12] ARM: bcm: Add some BCMBCA peripherals
-To: William Zhang <william.zhang@broadcom.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Anand Gore <anand.gore@broadcom.com>, Kursad Oney <kursad.oney@broadcom.com>, 
-	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Olivia Mackall <olivia@selenic.com>, 
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2020395.1747051310@warthog.procyon.org.uk>
 
-On Sat, May 10, 2025 at 3:11=E2=80=AFAM William Zhang
-<william.zhang@broadcom.com> wrote:
-
-> > Linus can you resubmit a v3 addressing William's feedback? I will drop
-> > your series for now. Thanks!
-> > --
-> > Florian
+On Mon, May 12, 2025 at 01:01:50PM +0100, David Howells wrote:
 >
-> I wonder if you get a chance to review my feedbacks on this series?
-> Let me know if you have any questions.
+> I can do unless Herbert wants to pass it through his tree?
 
-Sorry William, it fell off my radar!
+I have no desire to do that :)
 
-I fixed up the patch set and resent a v3 now!
-
-Yours,
-Linus Walleij
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
