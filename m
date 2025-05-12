@@ -1,38 +1,38 @@
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F881298C0B;
-	Mon, 12 May 2025 19:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E03298C27;
+	Mon, 12 May 2025 19:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747078188; cv=none; b=SJPA0uJwg12ocewM7hWdLJk83naV4W+W050h76GnfqOZgfDNJnhPhjfVSJrink8qB9TTQb3BSaexoO9HB0FIPZtnDnPiepkqJXQb8RsZEblTJbmsP24j9DB9d7++IrxhEYxXV/0OhD6SVwpQxxK730lTFLbYey76N1u7FUWY0YU=
+	t=1747078189; cv=none; b=jWY8CF79Sqc8fqKQg4Sff1kJPwoM+Wy8BEwQ/YVNqwI10cJ8akF5bjFq/nS3M5r4F7iedRXKfzexaj2wy7Ka8jIAzx+XK4WIhKsQTYycj0yDOX+AEsxZv/53PKeUxTyXCP50Mw1E2ZzTnOSqcqznnrqUDHEQAwjAPUKvHMzBFcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747078188; c=relaxed/simple;
-	bh=Uk6gMNlH4FiuwQmFLiKNXCHoWc0Q7toe1h2KyD5NpP8=;
+	s=arc-20240116; t=1747078189; c=relaxed/simple;
+	bh=DSd7HCJtABKxLA0P+qbEhaLgR9tQYl+AuyBtzzok9Dg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZyXAOQaAYd9AWdfIcTfwMRsWuPUMFcB/Hss8uZCB2O2FCfKULHfUx52q5SY1QxAjPFWHcrwamEggy0sL9FZjbWfuOwfGN451GyNWx9ot1cL3jdkkRQo2GuWxtngeRgskbdJl3hhjCH3FNdyxQZdy/Dj8F7YKyRVR5hX1FJBjisE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HvALpEzk; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=t3bi/eVGopuOLwcNWlkxnzqW6brxaFPNWKPd0ZVnzxaSxVLBv6NYiRQ9W7nPWgpQpe7LVi4ZOfglEuDVABfPPgligIkGu+5+DllhX0+QyUMol8npd/9/uIytGdD0bR5fbJr9qHg6OUB+NFuMye2pA9O11U831EaY7dJ1qp3O500=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lpbeeWr1; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HvALpEzk"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lpbeeWr1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1747078186; x=1778614186;
+  t=1747078187; x=1778614187;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Uk6gMNlH4FiuwQmFLiKNXCHoWc0Q7toe1h2KyD5NpP8=;
-  b=HvALpEzkLKyt5eUnjBrTSZwswqGtESuH2SfkLvQXznXnu8q8Cdh2uUaq
-   k2VgDS5GiCyjELYVmtJzrWWBMoYj+smZk/i2Ok4jxu+DVEP/Aff8DJvgC
-   BoDh5Fy1q3grj4vNXxd10UmcrgN4FY0Jw/LyBCMsLPBEZnSaHJ9EhfI46
-   WnYbXKrVHO/P1IA0hDte8mxGH8EZjaCwngYSX9t5siHlOwpgEoHp2wLoA
-   qcoiyFMpbine3l3hZgwMBFOeV1j0Wa6HDjm+wUYLU0Nxzyg+jkL4S2as5
-   EwYrGJ5MMoX4k8ldhHuwpjqeEiX3ma3duDmEeUCyzRhkEwI6VJTxYBkLD
-   Q==;
+  bh=DSd7HCJtABKxLA0P+qbEhaLgR9tQYl+AuyBtzzok9Dg=;
+  b=lpbeeWr17hN6TGbls/V0A7mwoFc2R9M4Uvc0J04dedJxFzyQlCPevK+n
+   eZChPNBonogkUVP4fY8L6VDfZeJCwVTfGK//2pvobAx1LMxMbLe4dxFPR
+   Nzoa5Yi85QlxoDsTmqfSAplwraIbuJZ+o/TZuzXwP8j2QLk14/jQQH2cT
+   Xm17R9011lbSgZevmtGmn0FvM0tgwee8nlMyFIOuSpEDmD/Rx2u6UEHkO
+   tUoFeSgRrm4rYj9Eowju+gRJMPzxmpxqVDYGsie1R7N0IUCROWg5bY2Er
+   7/2pmS3W78H9AiN5QUnI56zLV8xEzNWDUOtu0S0AJXs+NRMlsMQfOgatL
+   w==;
 X-CSE-ConnectionGUID: hYKpzzHaRPOvLPNNOvU8gw==
-X-CSE-MsgGUID: lV4VSQu2TQ2dJND9A8h/Lg==
+X-CSE-MsgGUID: xTN55bTJSl6rW4XcLv8AWw==
 X-IronPort-AV: E=Sophos;i="6.15,283,1739862000"; 
-   d="scan'208";a="209006609"
+   d="scan'208";a="209006610"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 May 2025 12:29:37 -0700
@@ -51,9 +51,9 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh@kernel.org>,
 CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>, "Ryan
  Wanner" <Ryan.Wanner@microchip.com>
-Subject: [PATCH 3/9] dt-bindings: crypto: add sama7d65 in Atmel TDES
-Date: Mon, 12 May 2025 12:27:29 -0700
-Message-ID: <ea33a6222dda7c60fd404a4b0e9c4824e19ee1bf.1747077616.git.Ryan.Wanner@microchip.com>
+Subject: [PATCH 4/9] dt-bindings: rng: atmel,at91-trng: add sama7d65 TRNG
+Date: Mon, 12 May 2025 12:27:30 -0700
+Message-ID: <68e45a56e70e0b0b001870905917e8f7ddac61a3.1747077616.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1747077616.git.Ryan.Wanner@microchip.com>
 References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
@@ -68,28 +68,25 @@ Content-Type: text/plain
 
 From: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-Add DT bindings for SAMA7D65 SoC Atmel TDES.
+Add compatible for Microchip SAMA7D65 SoC TRNG.
 
 Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 ---
- .../devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml    | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-index 6a441f79efea..337f5cac0f59 100644
---- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-+++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-@@ -15,7 +15,9 @@ properties:
-     oneOf:
-       - const: atmel,at91sam9g46-tdes
+diff --git a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+index b38f8252342e..f78614100ea8 100644
+--- a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
++++ b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+@@ -24,6 +24,7 @@ properties:
        - items:
--          - const: microchip,sam9x7-tdes
-+          - enum:
-+            - microchip,sam9x7-tdes
-+            - microchip,sama7d65-tdes
-           - const: atmel,at91sam9g46-tdes
+           - enum:
+               - microchip,sam9x7-trng
++              - microchip,sama7d65-trng
+           - const: microchip,sam9x60-trng
  
-   reg:
+   clocks:
 -- 
 2.43.0
 
