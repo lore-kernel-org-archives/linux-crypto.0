@@ -1,45 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E94D2BE112;
-	Tue, 13 May 2025 18:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A912BE112;
+	Tue, 13 May 2025 18:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747161647; cv=none; b=TScRiRMzUWys0tA9PR+XMSvCw62ubeJukfLaZgFuwNPuwbEy13/OICJwggyjw/eWy/C/cgXRIFnzybcDCnhql9UkCctxiukO+MxqUrG+Aa1h1Gu0/FyVVBNikqY2SIAfxliF0mMvzOPswNchOGppbIcECW21yIkkW5ShGWpDeeM=
+	t=1747161655; cv=none; b=PiC5P0o4j6kHPCwNM4+4RAgk57mA2Zu8pLCw/5F1SxJoEomijYhsqw3FxR8kDt9f0QJkwZPWH7DEcg9jm5UBP+/8aLfhsS11xj90ZPkFPt04cHTx09TKFrrQz0so4DcaPiFFoxIMaTHbbyjkKNdgLoZ1X3bZvJbfhV0xoId4VPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747161647; c=relaxed/simple;
-	bh=LUdo1YTEXYomgG1nU4pnAGqyr93S6Fk8DNsW3FmP8to=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k2ndPoA8b2W0HwxTFKAOKW//ZhjoAxKXk3e46yYX2/PpwAoA7h/S8z0JL0+EMgfIqTWZtu4pwvZd+Y9Ff4JrOkqKk4s5l48VwX4U58cfNQKUbIshrdyE8Hch2phTCkErLwylmiHHuKN9puKGmITBlAu3UB081rFvi4eNT2g4fJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCoDPiMF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747161655; c=relaxed/simple;
+	bh=CSxkHxtvf4bYVU+fLSgMiZJYTokFhZtPbi+1wA+zwjU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XlalHmZx8nupTg3MopprWaizhuAspr3ab7OIObNaj/MIC2EAIiP9veq0hBYuvc373EG6A59dM1fRCh67ImI6GXNUU9aVzLx0fW7ckZFvpmDRZcwstWCqBzRo1X4TcElYaNfU+5J+PRXHgES6BgB5fN0geF1BJAaY3Yi2L4z4g18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CuIn+iTz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCoDPiMF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53B7C4CEEB;
-	Tue, 13 May 2025 18:40:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuIn+iTz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26716C4CEEF;
+	Tue, 13 May 2025 18:40:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747161646;
-	bh=LUdo1YTEXYomgG1nU4pnAGqyr93S6Fk8DNsW3FmP8to=;
+	s=k20201202; t=1747161654;
+	bh=CSxkHxtvf4bYVU+fLSgMiZJYTokFhZtPbi+1wA+zwjU=;
 	h=From:To:Cc:Subject:Date:From;
-	b=mCoDPiMF+FsTw3FrWVSQ7Dn7ACIFgX0KW5Q/Qjj/p6xlz5pMKAKi9eYNfUKeExU0K
-	 MFAC0OIF/O5ixf8ZZaoIjY4bwps5DqkikLbLLuSAIEFNY/coxjmuxj+QK8ihYwDSpM
-	 GiKkbMXjetIaqI9LeSCOwwxNHCmLN55ug1m539fgDLL/oMFMZljTpyUyg2KcPb1AAk
-	 b8RYSev2PInn5GIXKP9ZIonSAhxm7LkdIa0GIuN2PTeHsjLxhQXFFX+A2x0mF/VFzI
-	 8X/ubDDanjqZkocE+alGHSsvdb4tc5qfOFZpWO0LCrzvzCVxLGBf138CeHk2jtgluF
-	 TXjSKpv5p4QhA==
+	b=CuIn+iTzBb6WjGeKGyGTW/Zig6waVxrbOARl1iA7/rBaZ1i4QhuJbPMT+diTPR2h5
+	 GNM8WcKDnDYLK1mehq317Kh3I87fr3gy3ElPZW3gEH4/3o1onTZkW63hF7M5GT/1/K
+	 k9z/aOZwsxfYS+KaTNol5zvP6q7yGvWzQyCv6/yKqOA5pivPrCD2QgVAgn0toTE0r8
+	 jrARz2HcYYc4+3Z/jDyp2xK+n5hw56rYs6eAVp9W+RfhIZoJH2l7oqPmhUouk79pUc
+	 yU0T5xxfgeCUZI2lhEutcyAtHlJMR3k5yuCQXxrW2q/59nIbP2TmwNWkNzJlO4Cuqt
+	 3O0K/KqFbsLEw==
 From: "Rob Herring (Arm)" <robh@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+	Tom Lendacky <thomas.lendacky@amd.com>
 Cc: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] dt-bindings: crypto: Drop obsolete mediatek,eip97-crypto
-Date: Tue, 13 May 2025 13:40:41 -0500
-Message-ID: <20250513184042.3051424-1-robh@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] dt-bindings: crypto: Convert amd,ccp-seattle-v1a to DT schema
+Date: Tue, 13 May 2025 13:40:50 -0500
+Message-ID: <20250513184051.3051660-1-robh@kernel.org>
 X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -49,49 +46,83 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The mediatek,eip97-crypto binding is half abandoned. The driver was
-dropped in 2020 as the Mediatek platforms use InsideSecure block and
-the driver for it. All the platforms except MT7623 were updated. A
-patch to update it was submitted, but never addressed the review
-comments.
+Convert the AMD Cryptographic Coprocessor binding to DT schema format.
+It's a straight forward conversion.
 
-Link: https://lore.kernel.org/all/20210303080923.16761-1-vic.wu@mediatek.com/
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- .../bindings/crypto/mediatek-crypto.txt       | 25 -------------------
- 1 file changed, 25 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+ .../bindings/crypto/amd,ccp-seattle-v1a.yaml  | 38 +++++++++++++++++++
+ .../devicetree/bindings/crypto/amd-ccp.txt    | 17 ---------
+ 2 files changed, 38 insertions(+), 17 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/amd,ccp-seattle-v1a.yaml
+ delete mode 100644 Documentation/devicetree/bindings/crypto/amd-ccp.txt
 
-diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+diff --git a/Documentation/devicetree/bindings/crypto/amd,ccp-seattle-v1a.yaml b/Documentation/devicetree/bindings/crypto/amd,ccp-seattle-v1a.yaml
+new file mode 100644
+index 000000000000..32bf3a1c3b42
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/amd,ccp-seattle-v1a.yaml
+@@ -0,0 +1,38 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/amd,ccp-seattle-v1a.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: AMD Cryptographic Coprocessor (ccp)
++
++maintainers:
++  - Tom Lendacky <thomas.lendacky@amd.com>
++
++properties:
++  compatible:
++    const: amd,ccp-seattle-v1a
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  dma-coherent: true
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    crypto@e0100000 {
++        compatible = "amd,ccp-seattle-v1a";
++        reg = <0xe0100000 0x10000>;
++        interrupts = <0 3 4>;
++        dma-coherent;
++    };
+diff --git a/Documentation/devicetree/bindings/crypto/amd-ccp.txt b/Documentation/devicetree/bindings/crypto/amd-ccp.txt
 deleted file mode 100644
-index 450da3661cad..000000000000
---- a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+index d87579d63da6..000000000000
+--- a/Documentation/devicetree/bindings/crypto/amd-ccp.txt
 +++ /dev/null
-@@ -1,25 +0,0 @@
--MediaTek cryptographic accelerators
+@@ -1,17 +0,0 @@
+-* AMD Cryptographic Coprocessor driver (ccp)
 -
 -Required properties:
--- compatible: Should be "mediatek,eip97-crypto"
+-- compatible: Should be "amd,ccp-seattle-v1a"
 -- reg: Address and length of the register set for the device
--- interrupts: Should contain the five crypto engines interrupts in numeric
--	order. These are global system and four descriptor rings.
--- clocks: the clock used by the core
--- clock-names: Must contain "cryp".
--- power-domains: Must contain a reference to the PM domain.
+-- interrupts: Should contain the CCP interrupt
 -
+-Optional properties:
+-- dma-coherent: Present if dma operations are coherent
 -
 -Example:
--	crypto: crypto@1b240000 {
--		compatible = "mediatek,eip97-crypto";
--		reg = <0 0x1b240000 0 0x20000>;
--		interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_LOW>,
--			     <GIC_SPI 83 IRQ_TYPE_LEVEL_LOW>,
--			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
--			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
--			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
--		clocks = <&ethsys CLK_ETHSYS_CRYPTO>;
--		clock-names = "cryp";
--		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
+-	ccp@e0100000 {
+-		compatible = "amd,ccp-seattle-v1a";
+-		reg = <0 0xe0100000 0 0x10000>;
+-		interrupt-parent = <&gic>;
+-		interrupts = <0 3 4>;
 -	};
 -- 
 2.47.2
