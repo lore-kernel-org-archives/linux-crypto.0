@@ -1,48 +1,48 @@
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C2F1E7C08;
-	Tue, 13 May 2025 06:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BFC101EE;
+	Tue, 13 May 2025 06:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747116571; cv=none; b=PF07Sp5pR7r/WFTmeCnOLrVv463JF+wrkMFzfu/VajZeq9F9mBXbKMZh6W3YqnloN0u3mq++KPUxGbQuxfmzWr5c7ubPmMv/xvjjHLzboG5fNaRrQLfH7/zGcb8HRqf4JcIYVjYg+itg989jNFvp0SBqfnWWD2D7szphCeP8ca4=
+	t=1747116763; cv=none; b=OxsTf9umW/i3F1rCPx9dCeFCeXKMXnOu64Exq28Wa+NbnPcy71OfFtS+qxgZP6kCYHxi+BepClC/AY3XkZxkWGvzxLusEFD/rui8cXk8WQCZdvY1jkzlRvLd1251F6anCJUlTQCHIfcZqh/Nt54fKuhPcY4DGCuf2sUWTlOPoUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747116571; c=relaxed/simple;
-	bh=DBAUxqh2hy8YWYEFdl3dKLIh+4+WUnk78OJrN/k/deY=;
+	s=arc-20240116; t=1747116763; c=relaxed/simple;
+	bh=p64bO3K4W8tGMzIR2yPBwFJkK/o2ty54bUOLqfL09TM=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zh8n1e/8pJ2nF0B1vnbHIJSldNviUEhMzeTTcVTaZy2FrHWQkK0QslPBTpQ5TgMEWoWspCqVl4lA7Dm5D0sRY6XerOvf9EMwVjUCtZt4AbGaxgpa68UUOnORfoDKLLKeY94HxGoNpdfDPjuyEiw2Rn+aILHQXuFBFBS/VvPVhYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=OXL6USZh; arc=none smtp.client-ip=67.231.156.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=t3o9EDF5yowwfYPGj0lvzq00+BWoZ5+TRkE+zjFKaUmfv6UHwy2iwkJBtmws9lsujj5yEXn1BrjtBwvY6TAZSbjjx89xideTEADXwk0fFaSeOOKXsmVdMbAsCS7yrjxjf8fZUosEkolqw8f0DjJ4biQVcR/tofEd7B6zZ/WEcSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Bt65S1qM; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="OXL6USZh"
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54CIOSFA002657;
-	Mon, 12 May 2025 23:09:12 -0700
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Bt65S1qM"
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54CNfi1H026767;
+	Mon, 12 May 2025 23:12:26 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=LTcavfpOP7R4BqtVts9MdBa87
-	U8Ph1y46o7oytL7FNY=; b=OXL6USZhfEU3wDSoGpfIZKspcY9t7/bXhBiURoCu7
-	sw/gUDJH3H0xoH4NYjOsEaS3hqoByB55QS6FPy8JRltt1hXoyS6r9oXeJ/OMiIHz
-	6WG/k3XxxBfVELuoMQ8JTW/yYK0H+ut7a484YnLVZZ8eYOH041x/zI5FtVCrOuao
-	yusL8WpA61fOUgEa1sx1HvpH21xzpzYDoeyb4JzU6YwbWHPet1RcMjI1WVtdB76b
-	CtxReFNt1zamUfW0ZOI4rBOeCZPfbN3YJ8gdSNf4Wi3LKFYGjndQEtiiMr23CxvO
-	2surSxZ+X7RxQ+URzK4Gw4ZkdMMNQ4AiqXnbxHqZlT0EA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46kp7ms5kf-1
+	:references:subject:to; s=pfpt0220; bh=U5kOMZuzPBvMyY4bCoAF/fh2o
+	1zBtyRTqAPgXNnaRQ8=; b=Bt65S1qMv1+fQ4Lmalt50zSvgGgoYZhMFa8m8udxL
+	eeFSEQYihR0liRKGCuu8IFmAXJ2D/hzeIb1qEC+5owPhekQI9ImnXBvtxe0jUhuJ
+	YRbbRWS2K1HRGvrTGy/5b4Nvi+8zLoVK401adNv5wwihqB8/Cf1QUTbj8/tnmHQU
+	XPWltEBuLGngUZ8S/hyKNd0VFdE4TJrzigmzJzQWAqnOVTmRSpLFtGtGBJYRG7GD
+	prlTMV1wx1POfz/EmT8G1yXNA+LseYHAlP0je3vmS5ETDSdQYnPMEAF5pLritSMs
+	j/kA8qHQ66ESP68mmpHcwPnHhk1YCD01OPVmeL1IXNTWA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46ktvr0kmp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 23:09:11 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Mon, 12 May 2025 23:12:25 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 12 May 2025 23:09:10 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 12 May 2025 23:09:10 -0700
+ 15.2.1544.4; Mon, 12 May 2025 23:12:25 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 12 May 2025 23:12:24 -0700
 Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id AE0B43F7077;
-	Mon, 12 May 2025 23:09:00 -0700 (PDT)
-Date: Tue, 13 May 2025 11:38:59 +0530
+	by maili.marvell.com (Postfix) with SMTP id AC5013F70A4;
+	Mon, 12 May 2025 23:12:16 -0700 (PDT)
+Date: Tue, 13 May 2025 11:42:15 +0530
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: Simon Horman <horms@kernel.org>
 CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -54,14 +54,16 @@ CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <peterz@infradead.org>, <linux@treblig.org>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <netdev@vger.kernel.org>, <rkannoth@marvell.com>, <sumang@marvell.com>,
-        <gcherian@marvell.com>
-Subject: Re: [net-next PATCH v1 04/15] octeontx2-af: Handle inbound inline
- ipsec config in AF
-Message-ID: <aCLh-9EchqDFeW66@optiplex>
+        <gcherian@marvell.com>, "Kiran
+ Kumar K" <kirankumark@marvell.com>,
+        Nithin Dabilpuram
+	<ndabilpuram@marvell.com>
+Subject: Re: [net-next PATCH v1 07/15] octeontx2-af: Add support for SPI to
+ SA index translation
+Message-ID: <aCLivwtIq5zwVFKI@optiplex>
 References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-5-tanmay@marvell.com>
- <20250507091918.GZ3339421@horms.kernel.org>
- <20250507092832.GA3339421@horms.kernel.org>
+ <20250502132005.611698-8-tanmay@marvell.com>
+ <20250507124517.GC3339421@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,55 +72,66 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250507092832.GA3339421@horms.kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA1NSBTYWx0ZWRfX8HgQU5K6rkNp UUJ2SbYIcR+KLtR1L4k0WdRjh7ClPtRyTKw2NaBjZacih/+8Q2J8SVRrmzb837mMcsECC7G0c7S A8XTjpAU+eMo80z3nC1bivKxo9jFg8yT2pYbah6e2HZyk6Bw9big+/7BsvfSRr0w1pZRnAOAgpT
- k/d1kmwfCDO7gJLdKqtLxZXDQI6md7oLpzBpseaBt+Z9VSu7Ho49hsOXmtxiH/03SckmJDcOyNN myJryKm42N5wTzXuwHydi4Ha1CalLArOlgN0SvWXvyE6P1CGsUBT+vo5/TZvv7CBcpj5Gxnr0TJ rX/UVqB6si306ihjIejk5cmQYRwdHTEy9qir4ARcNxqOyoNurhrCk3fOGuTUhz83B8sBMt81ufF
- rQCZH5Y8ZaI8ZQLTBD3PdJzzU0J7n4sfJswilQ9q0ZoZOc40h81l1JkpHxl2VdFXtzrNU/MD
-X-Proofpoint-GUID: nxpD1rjwKRq7ByMbXYvpALJydRp9jkFW
-X-Authority-Analysis: v=2.4 cv=YsYPR5YX c=1 sm=1 tr=0 ts=6822e207 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=FGfcEKYBuW_uT_4AAXsA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-ORIG-GUID: nxpD1rjwKRq7ByMbXYvpALJydRp9jkFW
+In-Reply-To: <20250507124517.GC3339421@horms.kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA1NiBTYWx0ZWRfX4pgD43kFI/cW CIA1lqbjCkuRcZJSt2JhPK7hVaLOUs1WX1bUQC3dwCTYUAln2KkbBAG3//SgFaalEtP04IjC5Yb hrFnWqd1eAX8e7MJNXPKR8eMSU5diTXFNtATaKa7tETF/Jr0BXsqYzVkEeN6nefiqFaHgpvYZkw
+ ymM3vv1jTnTLKAk7YEEVCCWpSHIkA+1TppwVhmhKFedC554OseCwW3g1f3AMrirzQG1BwJw8VAD T8l2Lel64ytBkBFyB/R1qB6eFajEGUForqrOfe6KiWUHi9DKf/1gu5SK6Q6oHN8/0BX2NoKr5vt 93xJ50Am0f85nEwmThno78xdVNnNf5zIcAv43aK70CA1+NCYdTOXSjKmJkwq03FxNZNkV61f+iu
+ /c5bL8AnmB1+JcKNWnLcNyxjPNZoK07JSL2edfWNfOfPc24xaj8OWBfBEkijcx9H131j6MHi
+X-Authority-Analysis: v=2.4 cv=V6x90fni c=1 sm=1 tr=0 ts=6822e2c9 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=fMs116VxaZ394lWZzjIA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: Vp5ijUOX21Gbk8xEyHqlbuNUmgRkwazK
+X-Proofpoint-GUID: Vp5ijUOX21Gbk8xEyHqlbuNUmgRkwazK
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-12_07,2025-05-09_01,2025-02-21_01
 
-Hi Simon,
-
-On 2025-05-07 at 14:58:32, Simon Horman (horms@kernel.org) wrote:
-> On Wed, May 07, 2025 at 10:19:18AM +0100, Simon Horman wrote:
-> > On Fri, May 02, 2025 at 06:49:45PM +0530, Tanmay Jagdale wrote:
-> > > From: Bharat Bhushan <bbhushan2@marvell.com>
+On 2025-05-07 at 18:15:17, Simon Horman (horms@kernel.org) wrote:
+> On Fri, May 02, 2025 at 06:49:48PM +0530, Tanmay Jagdale wrote:
+> > From: Kiran Kumar K <kirankumark@marvell.com>
+> > 
+> > In case of IPsec, the inbound SPI can be random. HW supports mapping
+> > SPI to an arbitrary SA index. SPI to SA index is done using a lookup
+> > in NPC cam entry with key as SPI, MATCH_ID, LFID. Adding Mbox API
+> > changes to configure the match table.
+> > 
+> > Signed-off-by: Kiran Kumar K <kirankumark@marvell.com>
+> > Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
+> > Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 > 
 > ...
 > 
-> > > diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-> > > index 5e6f70ac35a7..222419bd5ac9 100644
-> > > --- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-> > > +++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-> > > @@ -326,9 +326,6 @@ static int cptpf_handle_vf_req(struct otx2_cptpf_dev *cptpf,
-> > >  	case MBOX_MSG_GET_KVF_LIMITS:
-> > >  		err = handle_msg_kvf_limits(cptpf, vf, req);
-> > >  		break;
-> > > -	case MBOX_MSG_RX_INLINE_IPSEC_LF_CFG:
-> > > -		err = handle_msg_rx_inline_ipsec_lf_cfg(cptpf, req);
-> > > -		break;
-> > >  
-> > >  	default:
-> > >  		err = forward_to_af(cptpf, vf, req, size);
-> > 
-> > This removes the only caller of handle_msg_rx_inline_ipsec_lf_cfg()
-> > Which in turn removes the only caller of rx_inline_ipsec_lf_cfg(),
-> > and in turn send_inline_ipsec_inbound_msg().
-> > 
-> > Those functions should be removed by the same patch that makes the changes
-> > above.  Which I think could be split into a separate patch from the changes
-> > below.
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> > index 715efcc04c9e..5cebf10a15a7 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> > @@ -326,6 +326,10 @@ M(NIX_READ_INLINE_IPSEC_CFG, 0x8023, nix_read_inline_ipsec_cfg,		\
+> >  M(NIX_LF_INLINE_RQ_CFG, 0x8024, nix_lf_inline_rq_cfg,		\
+> >  				nix_rq_cpt_field_mask_cfg_req,  \
+> >  				msg_rsp)	\
+> > +M(NIX_SPI_TO_SA_ADD,    0x8026, nix_spi_to_sa_add, nix_spi_to_sa_add_req,   \
+> > +				nix_spi_to_sa_add_rsp)                      \
+> > +M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete, nix_spi_to_sa_delete_req,   \
+> > +				msg_rsp)                                        \
 > 
-> Sorry for not noticing before I sent my previous email,
-> but I now see that those functions are removed by the following patch.
-> But I do think this needs to be re-arranged a bit to avoid regressions
-> wrt W=1 builds.
-Yes, I agree. Will rearrange the code blocks in the next version.
+> Please keep line length to 80 columns or less in Networking code,
+> unless it reduces readability.
+> 
+> In this case perhaps:
+> 
+> M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete,     \
+> 				nix_spi_to_sa_delete_req, \
+> 				msg_rsp)                  \
+> 
+> Likewise throughout this patch (set).
+> checkpatch.pl --max-line-length=80 is your friend.
+ACK. I will adhere to the 80 columns in the next version.
 
-Thanks,
+Regards,
 Tanmay
+
+> 
+> >  M(NIX_MCAST_GRP_CREATE,	0x802b, nix_mcast_grp_create, nix_mcast_grp_create_req,	\
+> >  				nix_mcast_grp_create_rsp)			\
+> >  M(NIX_MCAST_GRP_DESTROY, 0x802c, nix_mcast_grp_destroy, nix_mcast_grp_destroy_req,	\
+> 
+> ...
