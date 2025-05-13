@@ -1,39 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD57186295;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D3F1ADC7B;
 	Tue, 13 May 2025 02:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747102924; cv=none; b=VtbbEw0inlSfsgdioj20s6eMFHX6oRmoE5W+yvhpkc5h763YSPLvHGFDOcImmgegVof1adGGjQTG9crqb+HuG2VOzstT6pzM7WYL2M1dbfnp+nrSkWhTBJ9chBIp3yFvhwcLVHQGSPWnnzRd3pESEWPoDulz+EJnJIhZy8VTOxw=
+	t=1747102925; cv=none; b=DTL+iVhH+609OLqpiaqgNn54T7gaOvpWTUOPsjqJ5NeIFt2gJBFE/rjkNFXsWNd6OqwJfywIL8h6IdFO4TT8y2dzbeIGk6Zj2B2CkYAnF8XmhS6M8YCqHNrg1kOgS/ixGama5hy7fvLJ40qj4w9620exHOyCBSXXYLZsXqOb4YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747102924; c=relaxed/simple;
-	bh=OvvDRRMFCxKSwydz4/Ws9K33Q9ka0Cl51MMbVyD9k6s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sLO84fS4ww9yZlpJtXf4LtOhYi4ezFXFydPZWV/IaCqpL0h7//45Qzu94RDwJhtjE9NhSF0LUsyjjOLyKZndoDjMHM18TyC4M7d/WU5Y78fxwKrO8FG8shrZeAxZtaRBqfySAufXqVUNiABBFYu/aqLWZegxvF+jsfv76B8nSio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJrTGS1+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747102925; c=relaxed/simple;
+	bh=FGVKGRCRWFRrt7YM9cMW+5TsjRx+U8B96ORS1mkNgWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZcuVRBJX+zZ2FidWc7Wf7YXxj4hvfqpYnvQakUe4mpWCmRv1gQNQeDUc49QfttoUNyuMx3fQyhkC43QvyGzypn9JRyDBcvJA598OpgUhE05a9FozczoO+4HrD866ncX4/5zhrofMoexyt7V1VelKC+XwLSdgzdRVQizyIlAPmMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=slndntNz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJrTGS1+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF405C4CEE7;
-	Tue, 13 May 2025 02:22:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="slndntNz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51705C4CEF1;
+	Tue, 13 May 2025 02:22:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1747102924;
-	bh=OvvDRRMFCxKSwydz4/Ws9K33Q9ka0Cl51MMbVyD9k6s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sJrTGS1+T7CrtWYQCS8Q9iNKDBMudlSeenaw9XRUwq5fBtBJSs/lUkBYliRvE0v7x
-	 ik1317DICw/2aAhtviM5O953+a4JUPbmebLf1KScdAOwLRwYAj8RnnwJUZzSjVLjef
-	 g27J4Si+urkPMpH3w1R2MDMrbVtnL/6+tgveBFn0ucGWITPCkAIvGM8gPxP9KbDH6G
-	 FgJ16jxmRJRf2Q86xT6Gd+4BgYGf0+YyqBwtz8HqsN6eFr6cVL4vlgtuqdIBY83MjN
-	 LTuhOK5J8H0uIvzlpIUtDuIyBYpU8o6U8ggGCMNGavIHK6hkjvBRPEPpIAwJmpTQiV
-	 i0iw8KC914hXw==
+	bh=FGVKGRCRWFRrt7YM9cMW+5TsjRx+U8B96ORS1mkNgWM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=slndntNzj+GBxIRe0tkwuf2RsDdwTnePoYn1nNihJaiq0EudzsqQ6KjxXu4lM4e+2
+	 DqRtNtj7b3AEaFf6lyFAoF5MRmc44ry2u4fgiba86e8AJs+mMJHOd2lqZpGVNM9b5Z
+	 IOXK6dBchbJJBFAjRugA4SEl0ENNOEJjq9D924elksSKc6vTg7RNsqr8JlGHx24zW7
+	 BBNxjfxUkFSY/etYTrZMbH6y9APigML+XUV2s75tL8A1Z7e6dXWwzzBu+CZX4xAzp/
+	 GTNGZUz8emtCkeues3oU3vjFhePUtTg63mo0xJyAm82oqdg5s8IdjQvtYb9MCHru2Y
+	 O5GnOir7wEpDg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 0/2] lib/crc16: unexport crc16_table and crc16_byte()
-Date: Mon, 12 May 2025 19:21:13 -0700
-Message-ID: <20250513022115.39109-1-ebiggers@kernel.org>
+Subject: [PATCH 1/2] w1: ds2406: use crc16() instead of crc16_byte() loop
+Date: Mon, 12 May 2025 19:21:14 -0700
+Message-ID: <20250513022115.39109-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250513022115.39109-1-ebiggers@kernel.org>
+References: <20250513022115.39109-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,21 +45,76 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series removes the only caller of crc16_byte() outside lib/crc16.c,
-then folds crc16_table and crc16_byte() into lib/crc16.c.  I'm planning
-to apply this to the crc tree.
+From: Eric Biggers <ebiggers@google.com>
 
-Eric Biggers (2):
-  w1: ds2406: use crc16() instead of crc16_byte() loop
-  lib/crc16: unexport crc16_table and crc16_byte()
+Instead of looping through each byte and calling crc16_byte(), instead
+just call crc16() on the whole buffer.  No functional change.
 
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
  drivers/w1/slaves/w1_ds2406.c | 12 ++----------
- include/linux/crc16.h         |  9 +--------
- lib/crc16.c                   |  9 ++++-----
- 3 files changed, 7 insertions(+), 23 deletions(-)
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-
-base-commit: e8d72b766adcde14188e68968f3cd05f4321691d
+diff --git a/drivers/w1/slaves/w1_ds2406.c b/drivers/w1/slaves/w1_ds2406.c
+index 1cae9b243ff8..76026d615111 100644
+--- a/drivers/w1/slaves/w1_ds2406.c
++++ b/drivers/w1/slaves/w1_ds2406.c
+@@ -27,12 +27,10 @@ static ssize_t w1_f12_read_state(
+ 	const struct bin_attribute *bin_attr,
+ 	char *buf, loff_t off, size_t count)
+ {
+ 	u8 w1_buf[6] = {W1_F12_FUNC_READ_STATUS, 7, 0, 0, 0, 0};
+ 	struct w1_slave *sl = kobj_to_w1_slave(kobj);
+-	u16 crc = 0;
+-	int i;
+ 	ssize_t rtnval = 1;
+ 
+ 	if (off != 0)
+ 		return 0;
+ 	if (!buf)
+@@ -45,13 +43,11 @@ static ssize_t w1_f12_read_state(
+ 		return -EIO;
+ 	}
+ 
+ 	w1_write_block(sl->master, w1_buf, 3);
+ 	w1_read_block(sl->master, w1_buf+3, 3);
+-	for (i = 0; i < 6; i++)
+-		crc = crc16_byte(crc, w1_buf[i]);
+-	if (crc == 0xb001) /* good read? */
++	if (crc16(0, w1_buf, sizeof(w1_buf)) == 0xb001) /* good read? */
+ 		*buf = ((w1_buf[3]>>5)&3)|0x30;
+ 	else
+ 		rtnval = -EIO;
+ 
+ 	mutex_unlock(&sl->master->bus_mutex);
+@@ -64,12 +60,10 @@ static ssize_t w1_f12_write_output(
+ 	const struct bin_attribute *bin_attr,
+ 	char *buf, loff_t off, size_t count)
+ {
+ 	struct w1_slave *sl = kobj_to_w1_slave(kobj);
+ 	u8 w1_buf[6] = {W1_F12_FUNC_WRITE_STATUS, 7, 0, 0, 0, 0};
+-	u16 crc = 0;
+-	int i;
+ 	ssize_t rtnval = 1;
+ 
+ 	if (count != 1 || off != 0)
+ 		return -EFAULT;
+ 
+@@ -81,13 +75,11 @@ static ssize_t w1_f12_write_output(
+ 	}
+ 
+ 	w1_buf[3] = (((*buf)&3)<<5)|0x1F;
+ 	w1_write_block(sl->master, w1_buf, 4);
+ 	w1_read_block(sl->master, w1_buf+4, 2);
+-	for (i = 0; i < 6; i++)
+-		crc = crc16_byte(crc, w1_buf[i]);
+-	if (crc == 0xb001) /* good read? */
++	if (crc16(0, w1_buf, sizeof(w1_buf)) == 0xb001) /* good read? */
+ 		w1_write_8(sl->master, 0xFF);
+ 	else
+ 		rtnval = -EIO;
+ 
+ 	mutex_unlock(&sl->master->bus_mutex);
 -- 
 2.49.0
 
