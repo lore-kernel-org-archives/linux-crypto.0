@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1B92BF976;
-	Tue, 13 May 2025 18:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427662BFC70;
+	Tue, 13 May 2025 18:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747161683; cv=none; b=EpPJuAnXSTAUKzrm4hdQZkPGUVVGEl5bB40ZnMtdKVAytG2xtpUoAgDTZXFywbe64Owon8SJf/wfYb5naZ8Vmi3etryBj1IDzxBeeJzAD0ej/rnFBnlUCQOLIFWjPQnjXrok+GrkbrOPX2PSSqUwxC6hfLNpRLarzfpdcdaYuNo=
+	t=1747161691; cv=none; b=nbU+YDyZ5yy+b/0XlY+foFoTwC1KzxPtZlcJeWnZXH+BycVcZD0XzpM3weP2ch1UFeYqvpsjC8YF68shLsFfnxvqEpnSoZUHkc758rD3gFymn41yxBZwgOBrt1VkWEhXriqczGfQToqmmYjcMtOgi5L1H66j+ZqT9fw9wDt1CJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747161683; c=relaxed/simple;
-	bh=ZxjeGbjASaZfwtnXHdzTOFRIZEfBHZ1cfd7hEC2kbJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMYT6BhxIW0Qr0+RmKz7eQmGqFP7mlTUPlhca0bV5MD3fv4nxnD6tuEGmhHmTpSSeFKDKUIgiOBWnEZeOLHuQ68SrU4ntOvuYx0d4QXwogEFwezSC/8jDydcLjY/GQfvGocPoYS1Xj/aKKzKtfpYBpnLWiURt8GivvdxnqBW1B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNBFJm5n; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747161691; c=relaxed/simple;
+	bh=mWjwPQab+dhArRDh85eKqU9teR4QKZ9UsfsO+NWBxcM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pRHrQGRxUTpngEUkhYJD2juTod5DBIqIygthjqshz0v/XnLv6LsxTo2gppfYQ18sCOngCymzGyvbsqUdO99gnIFGluZAILSNGvJYD77CGgNHYEOs/ongFCdzKc0dtfu6z2BKcfTJCkwJ6+W9KXgXGeFCQtDKB2a5vykup3Y1drg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gTChnBqN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNBFJm5n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBFFC4CEE4;
-	Tue, 13 May 2025 18:41:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gTChnBqN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F11C3C4CEE4;
+	Tue, 13 May 2025 18:41:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747161682;
-	bh=ZxjeGbjASaZfwtnXHdzTOFRIZEfBHZ1cfd7hEC2kbJ0=;
+	s=k20201202; t=1747161691;
+	bh=mWjwPQab+dhArRDh85eKqU9teR4QKZ9UsfsO+NWBxcM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=UNBFJm5nqmt05xCjSV/rOPZTe+s80ja5SgI3SpUiF26rUdfFsK7YInWc9meQp9mau
-	 toNTcyq+loIyz9nGUuiYq4npGQ3zmr/hiPSKqrt1OwJ5LikI8DER+isXmFcZbA+JCi
-	 lySuSJcxbgZClw3yzQ1PDiOQYqRzZhmzOAlmxJECgAHEkwFyPk6A0k0Hz45iB6d4ox
-	 Td1G8OcRSSSsAttCamCCAbynXShYiz+l7Sy8ESybPJEZQfyNRgZOQlD6HiCxN0Cbq6
-	 3rHj1N4i1XhtqlDXU/4vkpUNk3I9IBLPV7xuWmIu5Jf/hPQdMCRMi6COoV86sWTfnt
-	 LiUltenw/NcyQ==
+	b=gTChnBqNVXEFLI39T8laz/+fcOAjaVQ87bhPL0cxQ76a+YZVpkGpkfSZC4uWrjYOA
+	 HVC8oSH3ZtpayTU/iTg3UqKHdlatXU9pqEVOCnmNVYUo4Ot0eIOBrmHS2qr0hmhJHt
+	 Ze+Jt7KpxRw0w/4Z1n3hhs9rj0+ONMD1YBd7+PvCbk0OUnMxIJSSy9innG+3Z9AxG+
+	 /kdgWc/5uZc6Drnk5X/li5FiXSXDoO2t1n0IAfx9zaoMKMZ6FDoT7+rtElCsrjTPe5
+	 oOV8eX8Tlhjd0443W9pn0qOv/VvzYiFkMzhhPtfT/EiKjMIm2kxcDQV0dV7VsaQrKH
+	 kfgL/k5rYr6Sg==
 From: "Rob Herring (Arm)" <robh@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	James Hartley <james.hartley@imgtec.com>
+	Andrew Lunn <andrew@lunn.ch>,
+	Boris Brezillon <bbrezillon@kernel.org>
 Cc: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: crypto: Convert img,hash-accelerator to DT schema
-Date: Tue, 13 May 2025 13:41:16 -0500
-Message-ID: <20250513184118.3052496-1-robh@kernel.org>
+Subject: [PATCH] dt-bindings: crypto: Convert Marvell CESA to DT schema
+Date: Tue, 13 May 2025 13:41:23 -0500
+Message-ID: <20250513184125.3052705-1-robh@kernel.org>
 X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -46,124 +47,251 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert the Imagination Technologies hardware hash accelerator binding
-to DT schema format. It's a straight forward conversion.
+Convert the Marvell CESA binding to DT schema format. The
+marvell-cesa.txt and mv_cesa.txt are duplicate bindings.
+
+The clock properties are quite varied for each platform hence the
+if/then schemas. The old binding was fairly accurate with reality.
+
+The original binding didn't mention there is 1 interrupt per CESA
+engine. Based on users, there's a maximum of 2 engines.
 
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- .../bindings/crypto/img,hash-accelerator.yaml | 69 +++++++++++++++++++
- .../devicetree/bindings/crypto/img-hash.txt   | 27 --------
- 2 files changed, 69 insertions(+), 27 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/img,hash-accelerator.yaml
- delete mode 100644 Documentation/devicetree/bindings/crypto/img-hash.txt
+ .../bindings/crypto/marvell,orion-crypto.yaml | 133 ++++++++++++++++++
+ .../bindings/crypto/marvell-cesa.txt          |  44 ------
+ .../devicetree/bindings/crypto/mv_cesa.txt    |  32 -----
+ 3 files changed, 133 insertions(+), 76 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/marvell,orion-crypto.yaml
+ delete mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
+ delete mode 100644 Documentation/devicetree/bindings/crypto/mv_cesa.txt
 
-diff --git a/Documentation/devicetree/bindings/crypto/img,hash-accelerator.yaml b/Documentation/devicetree/bindings/crypto/img,hash-accelerator.yaml
+diff --git a/Documentation/devicetree/bindings/crypto/marvell,orion-crypto.yaml b/Documentation/devicetree/bindings/crypto/marvell,orion-crypto.yaml
 new file mode 100644
-index 000000000000..46617561ef94
+index 000000000000..b44d36c50ec4
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/img,hash-accelerator.yaml
-@@ -0,0 +1,69 @@
++++ b/Documentation/devicetree/bindings/crypto/marvell,orion-crypto.yaml
+@@ -0,0 +1,133 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/img,hash-accelerator.yaml#
++$id: http://devicetree.org/schemas/crypto/marvell,orion-crypto.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Imagination Technologies hardware hash accelerator
++title: Marvell Cryptographic Engines And Security Accelerator
 +
 +maintainers:
-+  - James Hartley <james.hartley@imgtec.com>
++  - Andrew Lunn <andrew@lunn.ch>
++  - Boris Brezillon <bbrezillon@kernel.org>
 +
-+description:
-+  The hash accelerator provides hardware hashing acceleration for
-+  SHA1, SHA224, SHA256 and MD5 hashes.
++description: |
++  Marvell Cryptographic Engines And Security Accelerator
 +
 +properties:
 +  compatible:
-+    const: img,hash-accelerator
++    enum:
++      - marvell,armada-370-crypto
++      - marvell,armada-xp-crypto
++      - marvell,armada-375-crypto
++      - marvell,armada-38x-crypto
++      - marvell,dove-crypto
++      - marvell,kirkwood-crypto
++      - marvell,orion-crypto
 +
 +  reg:
++    minItems: 1
 +    items:
-+      - description: Register base address and size
-+      - description: DMA port specifier
++      - description: Registers region
++      - description: SRAM region
++        deprecated: true
++
++  reg-names:
++    minItems: 1
++    items:
++      - const: regs
++      - const: sram
++        deprecated: true
 +
 +  interrupts:
-+    maxItems: 1
-+
-+  dmas:
-+    maxItems: 1
-+
-+  dma-names:
-+    items:
-+      - const: tx
++    description: One interrupt for each CESA engine
++    minItems: 1
++    maxItems: 2
 +
 +  clocks:
-+    items:
-+      - description: System clock for hash block registers
-+      - description: Hash clock for data path
++    description: One or two clocks for each CESA engine
++    minItems: 1
++    maxItems: 4
 +
 +  clock-names:
++    minItems: 1
 +    items:
-+      - const: sys
-+      - const: hash
++      - const: cesa0
++      - const: cesa1
++      - const: cesaz0
++      - const: cesaz1
 +
-+additionalProperties: false
++  marvell,crypto-srams:
++    description: Phandle(s) to crypto SRAM.
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    minItems: 1
++    maxItems: 2
++    items:
++      maxItems: 1
++
++  marvell,crypto-sram-size:
++    description: SRAM size reserved for crypto operations.
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 0x800
 +
 +required:
 +  - compatible
 +  - reg
++  - reg-names
 +  - interrupts
-+  - dmas
-+  - dma-names
-+  - clocks
-+  - clock-names
++  - marvell,crypto-srams
++
++allOf:
++  - if:
++      not:
++        properties:
++          compatible:
++            enum:
++              - marvell,kirkwood-crypto
++              - marvell,orion-crypto
++    then:
++      required:
++        - clocks
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - marvell,armada-370-crypto
++              - marvell,armada-375-crypto
++              - marvell,armada-38x-crypto
++              - marvell,armada-xp-crypto
++    then:
++      required:
++        - clock-names
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - marvell,armada-375-crypto
++              - marvell,armada-38x-crypto
++    then:
++      properties:
++        clocks:
++          minItems: 4
++        clock-names:
++          minItems: 4
++    else:
++      properties:
++        clocks:
++          maxItems: 2
++        clock-names:
++          maxItems: 2
++
++additionalProperties: false
 +
 +examples:
 +  - |
-+    #include <dt-bindings/interrupt-controller/mips-gic.h>
-+    #include <dt-bindings/clock/pistachio-clk.h>
-+
-+    hash@18149600 {
-+        compatible = "img,hash-accelerator";
-+        reg = <0x18149600 0x100>, <0x18101100 0x4>;
-+        interrupts = <GIC_SHARED 59 IRQ_TYPE_LEVEL_HIGH>;
-+        dmas = <&dma 8 0xffffffff 0>;
-+        dma-names = "tx";
-+        clocks = <&cr_periph SYS_CLK_HASH>, <&clk_periph PERIPH_CLK_ROM>;
-+        clock-names = "sys", "hash";
++    crypto@30000 {
++        compatible = "marvell,orion-crypto";
++        reg = <0x30000 0x10000>;
++        reg-names = "regs";
++        interrupts = <22>;
++        marvell,crypto-srams = <&crypto_sram>;
++        marvell,crypto-sram-size = <0x600>;
 +    };
-diff --git a/Documentation/devicetree/bindings/crypto/img-hash.txt b/Documentation/devicetree/bindings/crypto/img-hash.txt
+diff --git a/Documentation/devicetree/bindings/crypto/marvell-cesa.txt b/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
 deleted file mode 100644
-index 91a3d757d641..000000000000
---- a/Documentation/devicetree/bindings/crypto/img-hash.txt
+index 28d3f2496b89..000000000000
+--- a/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
 +++ /dev/null
-@@ -1,27 +0,0 @@
--Imagination Technologies hardware hash accelerator
--
--The hash accelerator provides hardware hashing acceleration for
--SHA1, SHA224, SHA256 and MD5 hashes
+@@ -1,44 +0,0 @@
+-Marvell Cryptographic Engines And Security Accelerator
 -
 -Required properties:
+-- compatible: should be one of the following string
+-	      "marvell,orion-crypto"
+-	      "marvell,kirkwood-crypto"
+-	      "marvell,dove-crypto"
+-	      "marvell,armada-370-crypto"
+-	      "marvell,armada-xp-crypto"
+-	      "marvell,armada-375-crypto"
+-	      "marvell,armada-38x-crypto"
+-- reg: base physical address of the engine and length of memory mapped
+-       region. Can also contain an entry for the SRAM attached to the CESA,
+-       but this representation is deprecated and marvell,crypto-srams should
+-       be used instead
+-- reg-names: "regs". Can contain an "sram" entry, but this representation
+-	     is deprecated and marvell,crypto-srams should be used instead
+-- interrupts: interrupt number
+-- clocks: reference to the crypto engines clocks. This property is not
+-	  required for orion and kirkwood platforms
+-- clock-names: "cesaX" and "cesazX", X should be replaced by the crypto engine
+-	       id.
+-	       This property is not required for the orion and kirkwoord
+-	       platforms.
+-	       "cesazX" clocks are not required on armada-370 platforms
+-- marvell,crypto-srams: phandle to crypto SRAM definitions
 -
--- compatible : "img,hash-accelerator"
--- reg : Offset and length of the register set for the module, and the DMA port
--- interrupts : The designated IRQ line for the hashing module.
--- dmas : DMA specifier as per Documentation/devicetree/bindings/dma/dma.txt
--- dma-names : Should be "tx"
--- clocks : Clock specifiers
--- clock-names : "sys" Used to clock the hash block registers
--		"hash" Used to clock data through the accelerator
+-Optional properties:
+-- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
+-			    specified the whole SRAM is used (2KB)
 -
--Example:
 -
--	hash: hash@18149600 {
--	compatible = "img,hash-accelerator";
--		reg = <0x18149600 0x100>, <0x18101100 0x4>;
--		interrupts = <GIC_SHARED 59 IRQ_TYPE_LEVEL_HIGH>;
--		dmas = <&dma 8 0xffffffff 0>;
--		dma-names = "tx";
--		clocks = <&cr_periph SYS_CLK_HASH>, <&clk_periph PERIPH_CLK_ROM>;
--		clock-names = "sys", "hash";
+-Examples:
+-
+-	crypto@90000 {
+-		compatible = "marvell,armada-xp-crypto";
+-		reg = <0x90000 0x10000>;
+-		reg-names = "regs";
+-		interrupts = <48>, <49>;
+-		clocks = <&gateclk 23>, <&gateclk 23>;
+-		clock-names = "cesa0", "cesa1";
+-		marvell,crypto-srams = <&crypto_sram0>, <&crypto_sram1>;
+-		marvell,crypto-sram-size = <0x600>;
+-	};
+diff --git a/Documentation/devicetree/bindings/crypto/mv_cesa.txt b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
+deleted file mode 100644
+index d9b92e2f3138..000000000000
+--- a/Documentation/devicetree/bindings/crypto/mv_cesa.txt
++++ /dev/null
+@@ -1,32 +0,0 @@
+-Marvell Cryptographic Engines And Security Accelerator
+-
+-Required properties:
+-- compatible: should be one of the following string
+-	      "marvell,orion-crypto"
+-	      "marvell,kirkwood-crypto"
+-	      "marvell,dove-crypto"
+-- reg: base physical address of the engine and length of memory mapped
+-       region. Can also contain an entry for the SRAM attached to the CESA,
+-       but this representation is deprecated and marvell,crypto-srams should
+-       be used instead
+-- reg-names: "regs". Can contain an "sram" entry, but this representation
+-	     is deprecated and marvell,crypto-srams should be used instead
+-- interrupts: interrupt number
+-- clocks: reference to the crypto engines clocks. This property is only
+-	  required for Dove platforms
+-- marvell,crypto-srams: phandle to crypto SRAM definitions
+-
+-Optional properties:
+-- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
+-			    specified the whole SRAM is used (2KB)
+-
+-Examples:
+-
+-	crypto@30000 {
+-		compatible = "marvell,orion-crypto";
+-		reg = <0x30000 0x10000>;
+-		reg-names = "regs";
+-		interrupts = <22>;
+-		marvell,crypto-srams = <&crypto_sram>;
+-		marvell,crypto-sram-size = <0x600>;
 -	};
 -- 
 2.47.2
