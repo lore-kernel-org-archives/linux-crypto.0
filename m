@@ -1,52 +1,55 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA51EEAC7;
-	Tue, 13 May 2025 08:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486AC1F237A;
+	Tue, 13 May 2025 08:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747123223; cv=none; b=S7MAF9xyCG12bzjGiX1/CIu5H1ExSmZg6jhZJg49Z2Vyz3DLlalZ7K8YtE9KXVOJA4o9qm4oy6teQKZmii+sWUnlJgdToAPhH3LjKjgLKeKoHhaWbPTEQZBbtFM8fzyiDVQ62WHzNO9gAlNbZS2/878tAdoLkmwUI5wAyzKw3jg=
+	t=1747123330; cv=none; b=Fs/Dc+kQpA9CoVvacYfEDsIj/oE+ui6v5R3Z9GgcCKvDj4exGI6dC3JmgKXjNmTAooG5KX8JXojZUYwEX0Fubakw/i1yp6JK77dfUA9T4qvsVdLB3g0Cbh90DOTlxn/infv4hrObLaBnaq8v/j0wQwod23BCvU7ioklJG1j7wpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747123223; c=relaxed/simple;
-	bh=wEenYHHWJ9V5aj4emFyoFLBOwGXkZN558Odcr7RWChA=;
+	s=arc-20240116; t=1747123330; c=relaxed/simple;
+	bh=8AlpCzHz8TYu2I39d9JcmlixFVJtz7YHX6TswcmhI7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ta6A7xQIvCQe4dwgIiR8qEPjzEcHOLCmrObHzfYt8nsodhDIfNAEvLMTOvdNYGJJUr92MrJlp52RXeeOIuKmVMWKkW9VM6yYRNrTR7lLySjWtjPWMwOdotr1GZ6q6yJbYLpzWjDYTo2vKjSlBAi5N6BQfGJj3mHyQdAiBzO6vyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=US9sP3tq; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSeM4+3dqA/I2jH+Wky3jmxCinONLx9l6VeJCs1lSp069U7uBFl9XS2x8T3sxi4aHdBiZAdNa5ziCWl/gdbzZwVYFCQth49sA+8mVw2B+t7KOUxzqJSHQLBrqc2JhnBBuZ/nFKo0Mvy7cSlGPhCvtDwuZeME9jdbtHxZjsWu/UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=QE38+k6H; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="US9sP3tq"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="QE38+k6H"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=HbsAu37T82bXcUeXJnp8nD65sIahcgoyyzcqcX2y3ZE=; b=US9sP3tqbb8EbobI3dSoMfXZb/
-	tDWXTeDo46GzC/9mkp9Q12y5Celu5x1QNqpJ1GzciOcXw61hulVzsGjnoFUDcz47/Zcu1+r3QFklz
-	RTL+J6EyouOhaVQlBNn78U/yu/OUZxD77uLUpRHYlPceqagF73OTsZBTR+5OzjU1mzlBerpi/qm35
-	7nDtIUpsYdKGSnkpeHYiLYD7INHGJaRAgm04JrTuTjZPeLZn0MbHUBKeSybHQ8p9I42fnZVJrSFYn
-	sbdbptUG9F2AaePoKUITm/QRKzlGSSNdxRKuaKcpONloTwXkuzgJD95a4vBtCigauB54knnVEA5zv
-	hdb1SeSA==;
+	bh=udPvSCRSnS0pLMv4b2XH86HcPTSJhkrdLImmvkdv1Ag=; b=QE38+k6H+mGxa3TKMTxlicJh9M
+	0vMBdCSj6ehOIwHSwWiwZcVQCSMkZVlkQ2yloLbJq3AFvXIffUrm7I6drOxQ5sej9lbUGStQLyLXL
+	xZL361GdJNngh+v+4igmgCNtZkuetRUkNEcv0GNUcFBB4inkfHg+fUaT97+M4anLYfXQOA/wUi88s
+	Som+95F4ndpWdL2WvX1le7NGCH5/S2nnQFOUHRcbwqO2cidhwD4XeXU/tGCucS7Le/m9Pm2pUJdgp
+	7tFYigMgn/VXX0bUiQKo5fx/eUD36Ioj9DBqGKoJCzu6vijpHR88NJnYuOoDQRhObCBm5B+KTbvVy
+	aFdAsLpA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uEkYZ-005hKh-2m;
-	Tue, 13 May 2025 16:00:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 May 2025 16:00:07 +0800
-Date: Tue, 13 May 2025 16:00:07 +0800
+	id 1uEka7-005hLH-11;
+	Tue, 13 May 2025 16:01:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 May 2025 16:01:43 +0800
+Date: Tue, 13 May 2025 16:01:43 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
- (ECB, CBC)
-Message-ID: <aCL8BxpHr5OpT04k@gondor.apana.org.au>
-References: <20250508101723.846210-2-t-pratham@ti.com>
- <20250508101723.846210-4-t-pratham@ti.com>
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev,
+	usamaarif642@gmail.com, ryan.roberts@arm.com, 21cnbao@gmail.com,
+	ying.huang@linux.alibaba.com, akpm@linux-foundation.org,
+	senozhatsky@chromium.org, linux-crypto@vger.kernel.org,
+	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org,
+	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com,
+	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com
+Subject: Re: [PATCH v9 02/19] crypto: acomp - Reinstate non-chained
+ crypto_acomp_[de]compress().
+Message-ID: <aCL8Z-XHk4StnvPQ@gondor.apana.org.au>
+References: <20250508194134.28392-1-kanchana.p.sridhar@intel.com>
+ <20250508194134.28392-3-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,41 +58,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250508101723.846210-4-t-pratham@ti.com>
+In-Reply-To: <20250508194134.28392-3-kanchana.p.sridhar@intel.com>
 
-On Thu, May 08, 2025 at 03:37:41PM +0530, T Pratham wrote:
+On Thu, May 08, 2025 at 12:41:17PM -0700, Kanchana P Sridhar wrote:
 >
-> +static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
-> +{
-> +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	struct dthe_data *dev_data = dthe_get_dev(ctx);
-> +
-> +	void __iomem *aes_base_reg = dev_data->regs + DTHE_P_AES_BASE;
-> +	u32 aes_irqenable_val = readl_relaxed(aes_base_reg + DTHE_P_AES_IRQENABLE);
-> +	u32 aes_sysconfig_val = readl_relaxed(aes_base_reg + DTHE_P_AES_SYSCONFIG);
-> +
-> +	memzero_explicit(ctx, sizeof(*ctx));
-> +	ctx->dev_data = dev_data;
-> +	ctx->ctx_info.aes_ctx = kzalloc(sizeof(*ctx->ctx_info.aes_ctx), GFP_KERNEL);
-> +	if (!ctx->ctx_info.aes_ctx)
-> +		return -ENOMEM;
+> diff --git a/crypto/acompress.c b/crypto/acompress.c
+> index 82fb3c04e68f..d08e0fe8cd9e 100644
+> --- a/crypto/acompress.c
+> +++ b/crypto/acompress.c
+> @@ -310,21 +310,13 @@ static int acomp_do_req_chain(struct acomp_req *req, bool comp)
+>  
+>  int crypto_acomp_compress(struct acomp_req *req)
+>  {
+> -	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
+> -
+> -	if (crypto_acomp_req_chain(tfm) || acomp_request_issg(req))
+> -		crypto_acomp_reqtfm(req)->compress(req);
+> -	return acomp_do_req_chain(req, true);
+> +	return crypto_acomp_reqtfm(req)->compress(req);
 
-The ctx_info union should just become part of ctx instead of a
-separate allocation.
-
-> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct dthe_aes_req_ctx));
-
-Please set cra_reqsize instead in the algorithm.
-
-> +	aes_sysconfig_val |= DTHE_AES_SYSCONFIG_DMA_DATA_IN_OUT_EN;
-> +	writel_relaxed(aes_sysconfig_val, aes_base_reg + DTHE_P_AES_SYSCONFIG);
-> +
-> +	aes_irqenable_val |= DTHE_AES_IRQENABLE_EN_ALL;
-> +	writel_relaxed(aes_irqenable_val, aes_base_reg + DTHE_P_AES_IRQENABLE);
-
-This does not look right.  The tfm allocation happens once for each
-key, and they could be done concurrently.  You should not be operating
-on the hardware in the init_tfm function.
+That's not right.  Request chaining has already been removed.
+What remains is linear address support which you've just removed
+with this patch.
 
 Cheers,
 -- 
