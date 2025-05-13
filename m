@@ -1,106 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295F017578;
-	Tue, 13 May 2025 07:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA51EEAC7;
+	Tue, 13 May 2025 08:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747122761; cv=none; b=aaZO8s/tKOwrw8cc8EH5ZP4jEU0ZdT4dudUC6VJHegqh6MnhDe0tH274IZG6G7J/K+trTFdqIZGw5MlLXrXnyjih9LhAkTRse7MUK4mMw1oamp4hA/2cyNrJgFaFK246bunmLOCQOlNC5xJb4+8wJLoU2E2l4jhIYwCzVFCUHdE=
+	t=1747123223; cv=none; b=S7MAF9xyCG12bzjGiX1/CIu5H1ExSmZg6jhZJg49Z2Vyz3DLlalZ7K8YtE9KXVOJA4o9qm4oy6teQKZmii+sWUnlJgdToAPhH3LjKjgLKeKoHhaWbPTEQZBbtFM8fzyiDVQ62WHzNO9gAlNbZS2/878tAdoLkmwUI5wAyzKw3jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747122761; c=relaxed/simple;
-	bh=wXxLScjGKsjLhWRczXN6p4PXXAWncz3wQwK5AUZd+xg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cu9YWvnrsbBqTci//JGuu1/cFcJtIuVmf4ebOVcec77/f3eHkiCFoKS9KmMPoz8n+5fI/rPm+DsiTn6xynm9zoy1jQB/JmI6jSSJBN1O8AnpZQwDVxo3kA6vE36e3YBliGl/Syy7f9Nc8A2owRGPOzRNRnlH7M6vjntOfM6uWwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HSogvT3P; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747123223; c=relaxed/simple;
+	bh=wEenYHHWJ9V5aj4emFyoFLBOwGXkZN558Odcr7RWChA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ta6A7xQIvCQe4dwgIiR8qEPjzEcHOLCmrObHzfYt8nsodhDIfNAEvLMTOvdNYGJJUr92MrJlp52RXeeOIuKmVMWKkW9VM6yYRNrTR7lLySjWtjPWMwOdotr1GZ6q6yJbYLpzWjDYTo2vKjSlBAi5N6BQfGJj3mHyQdAiBzO6vyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=US9sP3tq; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSogvT3P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F2CFC4CEE4;
-	Tue, 13 May 2025 07:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747122760;
-	bh=wXxLScjGKsjLhWRczXN6p4PXXAWncz3wQwK5AUZd+xg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HSogvT3PVXnIbmXrU9etRU5mYK/E99wnFgCrDdfnyulI+hfyU1MUl30lfhJPiNxLh
-	 ibN7R0qTWjMz6tL5UwXLF8Zk3c9kNFKSxSEWgNapDrsna0QzwLQas1oDoGZWG7Em3H
-	 WhgU/yKJt+TMopII9C8uHQUAYeTFoxJ64gqMZS6i/jvmukUWl4yVLl/O3DXrGiecW6
-	 L/f2HjXVKd9ZsitTjb0PYYsmLGSO5lzXvqhMMg9P5V4bYnInbJaqEKhLzCh4Jz/10d
-	 7LTU1TsujmtmC2KaDjeuEjKB8ErFfsPfmYN/L3BfLtKPxYbGEZklahSXX5CHcMTaZj
-	 f98XNQfoXyJdQ==
-Message-ID: <271da1c2-c322-4568-b484-c368e5e0ae7c@kernel.org>
-Date: Tue, 13 May 2025 09:52:37 +0200
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="US9sP3tq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=HbsAu37T82bXcUeXJnp8nD65sIahcgoyyzcqcX2y3ZE=; b=US9sP3tqbb8EbobI3dSoMfXZb/
+	tDWXTeDo46GzC/9mkp9Q12y5Celu5x1QNqpJ1GzciOcXw61hulVzsGjnoFUDcz47/Zcu1+r3QFklz
+	RTL+J6EyouOhaVQlBNn78U/yu/OUZxD77uLUpRHYlPceqagF73OTsZBTR+5OzjU1mzlBerpi/qm35
+	7nDtIUpsYdKGSnkpeHYiLYD7INHGJaRAgm04JrTuTjZPeLZn0MbHUBKeSybHQ8p9I42fnZVJrSFYn
+	sbdbptUG9F2AaePoKUITm/QRKzlGSSNdxRKuaKcpONloTwXkuzgJD95a4vBtCigauB54knnVEA5zv
+	hdb1SeSA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uEkYZ-005hKh-2m;
+	Tue, 13 May 2025 16:00:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 May 2025 16:00:07 +0800
+Date: Tue, 13 May 2025 16:00:07 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>,
+	Manorit Chawdhry <m-chawdhry@ti.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
+ (ECB, CBC)
+Message-ID: <aCL8BxpHr5OpT04k@gondor.apana.org.au>
+References: <20250508101723.846210-2-t-pratham@ti.com>
+ <20250508101723.846210-4-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] w1: ds2406: use crc16() instead of crc16_byte() loop
-To: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-References: <20250513022115.39109-1-ebiggers@kernel.org>
- <20250513022115.39109-2-ebiggers@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250513022115.39109-2-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250508101723.846210-4-t-pratham@ti.com>
 
-On 13/05/2025 04:21, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Instead of looping through each byte and calling crc16_byte(), instead
-> just call crc16() on the whole buffer.  No functional change.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  drivers/w1/slaves/w1_ds2406.c | 12 ++----------
->  1 file changed, 2 insertions(+), 10 deletions(-)
+On Thu, May 08, 2025 at 03:37:41PM +0530, T Pratham wrote:
+>
+> +static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
+> +{
+> +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct dthe_data *dev_data = dthe_get_dev(ctx);
+> +
+> +	void __iomem *aes_base_reg = dev_data->regs + DTHE_P_AES_BASE;
+> +	u32 aes_irqenable_val = readl_relaxed(aes_base_reg + DTHE_P_AES_IRQENABLE);
+> +	u32 aes_sysconfig_val = readl_relaxed(aes_base_reg + DTHE_P_AES_SYSCONFIG);
+> +
+> +	memzero_explicit(ctx, sizeof(*ctx));
+> +	ctx->dev_data = dev_data;
+> +	ctx->ctx_info.aes_ctx = kzalloc(sizeof(*ctx->ctx_info.aes_ctx), GFP_KERNEL);
+> +	if (!ctx->ctx_info.aes_ctx)
+> +		return -ENOMEM;
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+The ctx_info union should just become part of ctx instead of a
+separate allocation.
 
-Best regards,
-Krzysztof
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct dthe_aes_req_ctx));
+
+Please set cra_reqsize instead in the algorithm.
+
+> +	aes_sysconfig_val |= DTHE_AES_SYSCONFIG_DMA_DATA_IN_OUT_EN;
+> +	writel_relaxed(aes_sysconfig_val, aes_base_reg + DTHE_P_AES_SYSCONFIG);
+> +
+> +	aes_irqenable_val |= DTHE_AES_IRQENABLE_EN_ALL;
+> +	writel_relaxed(aes_irqenable_val, aes_base_reg + DTHE_P_AES_IRQENABLE);
+
+This does not look right.  The tfm allocation happens once for each
+key, and they could be done concurrently.  You should not be operating
+on the hardware in the init_tfm function.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
