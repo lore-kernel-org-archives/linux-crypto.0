@@ -1,55 +1,58 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEF523C519
-	for <linux-crypto@vger.kernel.org>; Tue, 13 May 2025 10:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F04827056D
+	for <linux-crypto@vger.kernel.org>; Tue, 13 May 2025 10:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747131936; cv=none; b=W7F0uZwxVuUiFHN31r0Bw28vor1XC9yxttRdLoElwGHpsywyUtRfKo2+5jFnQsyMR09dFvRdxHF8XZ0bPZcRO+2Wb2ugiFmpPgUBg9RjJHvIX9qodtf4bVkNj3Mu+9xOb0WTXVlr/60Ee3YI1iNxb0XekEycmwYYsISXmi2tuDo=
+	t=1747131939; cv=none; b=nTHdhos7b5vrYdUWwXsbGwATqubU+42HK8BJTBL7Yi2xn+NOCQBWOWlOvINMLaiUiRfvENehEXyDuCE3yp66NbmWlh71NWDX4HsMup7yRMzxd+eRwVvFdhhmb5LWDdPV5KGY4z8TYw51rI1Xg/ihb5YbyROHmCTKgNFoJrglzPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747131936; c=relaxed/simple;
-	bh=vPtMQcwwRObnaL74iAW+TMnh8G5RNmYVImDD6ulHa6I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QNJfWMhpwJQHXqql6oNCx951AUu4JgrLwQhiTNWHeL9y1tKPJuIVipK3KgSKKkGrcSCcQtZRGAb9QOtYbtVajRD31aQbkjwd6ekuPXazeHuFPX70InrNc82qVKWPVWT8losnnRdCnVtiu4msjxn1cVGE0z4UnvRvqkmtn5YJyLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iVrbALRe; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1747131939; c=relaxed/simple;
+	bh=afy3gUW1afOEJQkLuhDV/WUQx6m0aJNpWS36ogG5MBA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dCsNsnFytYPQ7Zgzfz6erQPV5iVAYU9rT0ctcJ/dnJqhUB4CL4vh/WJ+CbxaoNcnFq07qHF0etTkALdtUSIkig6Jmm9H4nO+nl7n1idBuoHkJHoj4p0z5ya4ej7yiWu9qXg1Qrwfia+nW9ONd9DTsSdy/DmR97jtn1NDgzMrF08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hmFIKXui; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iVrbALRe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hmFIKXui"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747131934; x=1778667934;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=vPtMQcwwRObnaL74iAW+TMnh8G5RNmYVImDD6ulHa6I=;
-  b=iVrbALRe5iVPDswxVHO3fgwCf9lLLmrP3f6OhDcuwNtFTMuL+/y2UeTH
-   4Gyd5rij+Iqd4W2DnDKyl1S7c9hvn9apPIYBCZ3ZK0vDLn9DkwDDWPkLl
-   Kv7erDv7N8voGYxvuh4lCSFMT2NIo71R2gmln4Yt9Fu6zkyMXRcH9tWZ1
-   tkTHgJ9C+uHnk9xsm7/kcGRuKUTUv2Gt89yI7RekmMKysWSxnNoqEPduh
-   91mzwP5hgE+dKG833YMyKoS9eGzymCUdsYsQNaWJO5LgUYAwOoXj7cN8i
-   ayvaS07uHAnCAtzNrzgkSpVHWnM2112LcBzubI726F+RswV8d30AlOquu
-   A==;
-X-CSE-ConnectionGUID: tCX2FkKjRTCFxrlvg7WcRQ==
-X-CSE-MsgGUID: nWgkRTMtS2qJ8x8b5pNLRA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48076410"
+  t=1747131937; x=1778667937;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=afy3gUW1afOEJQkLuhDV/WUQx6m0aJNpWS36ogG5MBA=;
+  b=hmFIKXuiAqwp2dWRR6XXNd5+kdQkZiCUQTuKHFCImP8NxVBUaDfXSNlf
+   /YkJmQs9IuVYZ4zYk1IlsDCWKDyOhxh/NtoynPyVFC+cBYxSFsIo+C3KC
+   i3TRfI3pp+rmbK8E61BtID4QM9muZg0SgVynyx9W2mQNGsY2MAkEaUmyY
+   qa1msttxho7D7YeeK4GvzNwXhvXu13nt9Vahs4pYUhEg3ZjrER13ZHxcZ
+   ksfHgbH6iQBReqw8Qy80ZUi5UKe3t4TeEHiIf7iQ5wIxtFptZVizDx4B8
+   rYlEmyXsdtzLqQoyqBm/DjjLNhsU8GrgbVkKAm0YC1bbSCzuCxZw+QjaX
+   w==;
+X-CSE-ConnectionGUID: 1YWNxOkUQiqWw/FjkpycgA==
+X-CSE-MsgGUID: Mpixb1CGTj+bJWI1Vn734A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48076419"
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="48076410"
+   d="scan'208";a="48076419"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:25:33 -0700
-X-CSE-ConnectionGUID: WSZgmRdYTwiy7WSGi6slUg==
-X-CSE-MsgGUID: N6fIEDLXQbi2tT/kWvV38w==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:25:37 -0700
+X-CSE-ConnectionGUID: fwbeBCsqTVSNRzbklp/OOg==
+X-CSE-MsgGUID: uXFHpwo0SxW1o30bSecOIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="142786391"
+   d="scan'208";a="142786422"
 Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by orviesa005.jf.intel.com with ESMTP; 13 May 2025 03:25:32 -0700
+  by orviesa005.jf.intel.com with ESMTP; 13 May 2025 03:25:36 -0700
 From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com
-Subject: [PATCH 0/2] crypto: qat - enable RAS for GEN6 devices
-Date: Tue, 13 May 2025 11:25:25 +0100
-Message-Id: <20250513102527.1181096-1-suman.kumar.chakraborty@intel.com>
+Subject: [PATCH 2/2] crypto: qat - enable reporting of error counters for GEN6 devices
+Date: Tue, 13 May 2025 11:25:27 +0100
+Message-Id: <20250513102527.1181096-3-suman.kumar.chakraborty@intel.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20250513102527.1181096-1-suman.kumar.chakraborty@intel.com>
+References: <20250513102527.1181096-1-suman.kumar.chakraborty@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,26 +61,74 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch set enables the reporting and handling of errors for
-QAT GEN6 devices. It also enables the reporting of error counters
-through sysfs and updates the ABI documentation. 
+Enable the reporting of error counters through sysfs for QAT GEN6
+devices and update the ABI documentation.
 
-Suman Kumar Chakraborty (2):
-  crypto: qat - enable RAS support for GEN6 devices
-  crypto: qat - enable reporting of error counters for GEN6 devices
+This enables the reporting of the following:
+   - errors_correctable - hardware correctable errors that allow the
+     system to recover without data loss.
+   - errors_nonfatal: errors that can be isolated to specific in-flight
+     requests.
+   - errors_fatal: errors that cannot be contained to a request,
+     requiring a Function Level Reset (FLR) upon occurrence.
 
- .../ABI/testing/sysfs-driver-qat_ras          |   8 +-
- .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |   2 +
- drivers/crypto/intel/qat/qat_6xxx/adf_drv.c   |   2 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_gen6_ras.c       | 818 ++++++++++++++++++
- .../intel/qat/qat_common/adf_gen6_ras.h       | 504 +++++++++++
- 6 files changed, 1331 insertions(+), 4 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ Documentation/ABI/testing/sysfs-driver-qat_ras | 8 ++++----
+ drivers/crypto/intel/qat/qat_6xxx/adf_drv.c    | 2 ++
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-
-base-commit: 3e9254bcf48fb7e387209be7cec96f0de6d2d37f
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat_ras b/Documentation/ABI/testing/sysfs-driver-qat_ras
+index 176dea1e9c0a..82ceb04445ec 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat_ras
++++ b/Documentation/ABI/testing/sysfs-driver-qat_ras
+@@ -4,7 +4,7 @@ KernelVersion:	6.7
+ Contact:	qat-linux@intel.com
+ Description:	(RO) Reports the number of correctable errors detected by the device.
+ 
+-		This attribute is only available for qat_4xxx devices.
++		This attribute is only available for qat_4xxx and qat_6xxx devices.
+ 
+ What:		/sys/bus/pci/devices/<BDF>/qat_ras/errors_nonfatal
+ Date:		January 2024
+@@ -12,7 +12,7 @@ KernelVersion:	6.7
+ Contact:	qat-linux@intel.com
+ Description:	(RO) Reports the number of non fatal errors detected by the device.
+ 
+-		This attribute is only available for qat_4xxx devices.
++		This attribute is only available for qat_4xxx and qat_6xxx devices.
+ 
+ What:		/sys/bus/pci/devices/<BDF>/qat_ras/errors_fatal
+ Date:		January 2024
+@@ -20,7 +20,7 @@ KernelVersion:	6.7
+ Contact:	qat-linux@intel.com
+ Description:	(RO) Reports the number of fatal errors detected by the device.
+ 
+-		This attribute is only available for qat_4xxx devices.
++		This attribute is only available for qat_4xxx and qat_6xxx devices.
+ 
+ What:		/sys/bus/pci/devices/<BDF>/qat_ras/reset_error_counters
+ Date:		January 2024
+@@ -38,4 +38,4 @@ Description:	(WO) Write to resets all error counters of a device.
+ 			# cat /sys/bus/pci/devices/<BDF>/qat_ras/errors_fatal
+ 			0
+ 
+-		This attribute is only available for qat_4xxx devices.
++		This attribute is only available for qat_4xxx and qat_6xxx devices.
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
+index 2531c337e0dd..d40030b585d3 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_drv.c
+@@ -173,6 +173,8 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (ret)
+ 		return dev_err_probe(dev, ret, "Failed to save pci state.\n");
+ 
++	accel_dev->ras_errors.enabled = true;
++
+ 	adf_dbgfs_init(accel_dev);
+ 
+ 	ret = devm_add_action_or_reset(dev, adf_dbgfs_cleanup, accel_dev);
 -- 
 2.40.1
 
