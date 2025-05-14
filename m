@@ -1,74 +1,186 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2125D27A450;
-	Wed, 14 May 2025 16:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A18280020
+	for <linux-crypto@vger.kernel.org>; Wed, 14 May 2025 17:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747240180; cv=none; b=Fc1kBezC6lYPp3wjnYsP7buyI4Kg67glfq4f1NBlFeP79TTdzL4m11/S/4QnAHFeMXDQ+KoZWa1XXNdHXXY85GSPzPPla2Ut2F5hqCsPeK7O800HNSMVt3D4+nk6UoiFNJdsLRVZYzPNGMrmzI69nh/cOiWtVVH5i7FQmVkqCZE=
+	t=1747243058; cv=none; b=DrtGvYRuANI4Ir6UPXgsQAai33a+FIE2xWTjw9ng+Id8jpssnkQ3XIeyeO0bXDQS0KA40rtc4leqi+mgWTJ2yC/Nd4TOZ8cjU4y8N2XUDJa9iaueT5wrLNkWhpgtAJx0kRl8EE0p3xHyhVcm88hE2acLYMh86hRRboYmmyUg92Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747240180; c=relaxed/simple;
-	bh=viHRzIvyfWm6Z/Hx1NafsPkUVC0n611P4vJNmAOjXhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gq7eqDQ0Rv7SqVi+vX+SNvk58s3ANGSCbS3Ng0PvHMuxmXT9l1fkC6VLb3Fe1dIYQsiqOHaKRWFlMM3N7EN4AyCswK3Mt6A+sWPJ76OrkaSQNG8M4MYY3Me+b3DdKGOy5mpAfY16tmgcGQve0A9HsO6AN0v9Rq2PbTA/eTe6yI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0Hz+2qT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747243058; c=relaxed/simple;
+	bh=FDhdtyxCTap+04aKrlvv+t4yDmBNbsQsV62cqYnEcWQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O9ILbhnNyh2Ky6xlhGlAoTlA056dV0DxNd4E7YNtVKDiE7ROAp7FFfn+rH3KTZrbp0BMdiE+gXt2L9/xVQvC00r+58NvutiCehgbDNY7bkDb+i1gaE2drl64+Xe462L8GxXXV+0Ax7WYwp9CFf2peeaWt4tPON6tyEaVceAci7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxVmr/ft; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0Hz+2qT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49AF8C4CEE3;
-	Wed, 14 May 2025 16:29:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxVmr/ft"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1DC0C16AAE
+	for <linux-crypto@vger.kernel.org>; Wed, 14 May 2025 17:17:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747240179;
-	bh=viHRzIvyfWm6Z/Hx1NafsPkUVC0n611P4vJNmAOjXhg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n0Hz+2qT7JlqFqIdhMkIf/FZS59SAcmunTrJe24zF6ImEDjtBid7Z/R0NnZeRevEW
-	 sWoZWTF/BcIW7FEQ2SSNphEXHZtyXGaG3PaDdoJ0l2eXCDzV4VCFRtInmygmiHRwVi
-	 Em/RO7XV4MgUVDWY6ARSyc8/W8oRlDbv9m9KE2pR9qRemS3EYuHdYd5T7K7ANLNVnh
-	 6at9sOk9/6tKuT7Y77aFXMIYD7cPigRCng6UwhNYTG7xeoATlHWsHD24iFDbsTf38M
-	 D3Da2oZS+i9uUho2wzhmIENiG23x1GphFdldsM5DtzQqOK927IugNtM7tiY4QIgUZb
-	 b1iEoflih8IjA==
-Date: Wed, 14 May 2025 09:29:33 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-	christophe.leroy@csgroup.eu, naveen@kernel.org, dtsen@linux.ibm.com,
-	segher@kernel.crashing.org, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: powerpc/poly1305 - add depends on BROKEN for now
-Message-ID: <20250514162933.GB1236@sol>
-References: <20250514051847.193996-1-ebiggers@kernel.org>
- <aCRlU0J7QoSJs5sy@gondor.apana.org.au>
+	s=k20201202; t=1747243057;
+	bh=FDhdtyxCTap+04aKrlvv+t4yDmBNbsQsV62cqYnEcWQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GxVmr/ftS93uarBMKzJWceF4i9WcC7bKkCJh8F6Nhk59cFukYASZ88mOuaxpNBYKj
+	 xD1zOe+mXSuBIXQjSjIg8ZUWQRWkLb2GQWLUbD0qmprod5Qoc5C4FmNwZty0XAV8rv
+	 LoHWK9XhMs5fGj79eLOUvSiiiLzqeZmpUSkiwBv1Bj7kbhniF7c5+k5A2JBXOyS+Q7
+	 YvqzPZYjq0KOnnqvvCiyUyKEfiLf0qqAyUGACDO7AIQwCYWB6rApq9vWnkJ7Ysf5L9
+	 URg/w2CjDBbpfqq3YcE+ivuaZsXk/L6ulnw9KwYBHASfYyCiAYu+yeUtuns0F3NQq8
+	 YKIQlC8ao2elg==
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5fbed53b421so149886a12.0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2025 10:17:37 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX3fJJliCGaHC9+Akt8RahdBVOGBErnlo1qa6mP7OvQKYLlx7WK34v1qDEhMryMq6SetfBkWgxevBf3gFM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZCjjOCyqRNAPKsW8FkyoZEVCaQj/GIaFU7CULS+c2CIh0Wr2z
+	5SOhiobDwiAB5Z2WvvnPu0WerbecuhWzAavDHKvJTGGIgmBdXz+hp3VdP5hV30TZz63fsQlSaei
+	jSGkvMUMHO1/5FxKN5bUJs6yCA4wHXUABndVr
+X-Google-Smtp-Source: AGHT+IEOVd6ylZgHdYkHjW+kgS0JvvQJmlojiJ55yxngXk0tGlu2ur8qbDKzXcFMtelFrk1TuWFTRE31C+Kg7x92aJA=
+X-Received: by 2002:a05:6402:238f:b0:5ff:b606:930b with SMTP id
+ 4fb4d7f45d1cf-5ffb6069372mr1068438a12.12.1747243056124; Wed, 14 May 2025
+ 10:17:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCRlU0J7QoSJs5sy@gondor.apana.org.au>
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+ <CACYkzJ5jsWFiXMRDwoGib5t+Xje6STTuJGRZM9Vg2dFz7uPa-g@mail.gmail.com>
+ <CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com> <beaa81748cf1325df67930bf74ea87e6cdcb3e46.camel@HansenPartnership.com>
+In-Reply-To: <beaa81748cf1325df67930bf74ea87e6cdcb3e46.camel@HansenPartnership.com>
+From: KP Singh <kpsingh@kernel.org>
+Date: Wed, 14 May 2025 19:17:25 +0200
+X-Gmail-Original-Message-ID: <CACYkzJ5XJOj08+hKheWDcqbPrFAwa+fFvOw+4QPAHBz1u2HgAg@mail.gmail.com>
+X-Gm-Features: AX0GCFsMtrdPzfS33E-5H3itP3YDxJJoQNEUvaPpI7wNO1nxLfvV3IZXpPdMWT8
+Message-ID: <CACYkzJ5XJOj08+hKheWDcqbPrFAwa+fFvOw+4QPAHBz1u2HgAg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Paul Moore <paul@paul-moore.com>, bboscaccy@linux.microsoft.com, bpf@vger.kernel.org, 
+	code@tyhicks.com, corbet@lwn.net, davem@davemloft.net, dhowells@redhat.com, 
+	gnoack@google.com, herbert@gondor.apana.org.au, jarkko@kernel.org, 
+	jmorris@namei.org, jstancek@redhat.com, justinstitt@google.com, 
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, llvm@lists.linux.dev, 
+	masahiroy@kernel.org, mic@digikod.net, morbo@google.com, nathan@kernel.org, 
+	neal@gompa.dev, nick.desaulniers+lkml@gmail.com, nicolas@fjasle.eu, 
+	nkapron@google.com, roberto.sassu@huawei.com, serge@hallyn.com, 
+	shuah@kernel.org, teknoraver@meta.com, xiyou.wangcong@gmail.com, 
+	kysrinivasan@gmail.com, Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 14, 2025 at 05:41:39PM +0800, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > As discussed in the thread containing
-> > https://lore.kernel.org/linux-crypto/20250510053308.GB505731@sol/, the
-> > Power10-optimized Poly1305 code is currently not safe to call in softirq
-> > context.  Disable it for now.  It can be re-enabled once it is fixed.
-> > 
-> > Fixes: ba8f8624fde2 ("crypto: poly1305-p10 - Glue code for optmized Poly1305 implementation for ppc64le")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> > arch/powerpc/lib/crypto/Kconfig | 1 +
-> > 1 file changed, 1 insertion(+)
-> 
-> I thought this fix should be enough, no?
-> 
-> https://patchwork.kernel.org/project/linux-crypto/patch/aB8Yy0JGvoErc0ns@gondor.apana.org.au/
+On Wed, May 14, 2025 at 5:39=E2=80=AFPM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> On Sun, 2025-05-11 at 04:01 +0200, KP Singh wrote:
+> [...]
+> > >
+> > For this specific BPF case, we will directly sign a composite of the
+> > first message and the hash of the second. Let H_meta =3D H(M_metadata).
+> > The block to be signed is effectively:
+> >
+> >     B_signed =3D I_loader || H_meta
+> >
+> > The signature generated is Sig(B_signed).
+> >
+> > The process then follows a similar pattern to the Alice and Bob
+> > model,
+> > where the kernel (Bob) verifies I_loader and H_meta using the
+> > signature. Then, the trusted I_loader is responsible for verifying
+> > M_metadata against the trusted H_meta.
+> >
+> > From an implementation standpoint:
+> >
+> > # Build
+> >
+> > bpftool (or some other tool in the user's build environment) knows
+> > about the metadata (M_metadata) and the loader program (I_loader). It
+> > first calculates H_meta =3D H(M_metadata). Then it constructs the
+> > object
+> > to be signed and computes the signature:
+> >
+> >     Sig(I_loader || H_meta)
+> >
+> > # Loader
+> >
+> > bpftool generates the loader program. The initial instructions of
+> > this loader program are designed to verify the SHA256 hash of the
+> > metadata (M_metadata) that will be passed in a map. These
+> > instructions effectively embed the precomputed H_meta as immediate
+> > values.
+> >
+> >     ld_imm64 r1, const_ptr_to_map // insn[0].src_reg =3D=3D
+> > BPF_PSEUDO_MAP_IDX
+> >     r2 =3D *(u64 *)(r1 + 0);
+> >     ld_imm64 r3, sha256_of_map_part1 // constant precomputed by
+> > bpftool (part of H_meta)
+> >     if r2 !=3D r3 goto out;
+> >
+> >     r2 =3D *(u64 *)(r1 + 8);
+> >     ld_imm64 r3, sha256_of_map_part2 // (part of H_meta)
+> >     if r2 !=3D r3 goto out;
+> >
+> >     r2 =3D *(u64 *)(r1 + 16);
+> >     ld_imm64 r3, sha256_of_map_part3 // (part of H_meta)
+> >     if r2 !=3D r3 goto out;
+> >
+> >     r2 =3D *(u64 *)(r1 + 24);
+> >     ld_imm64 r3, sha256_of_map_part4 // (part of H_meta)
+> >     if r2 !=3D r3 goto out;
+> >     ...
+> >
+> > This implicitly makes the payload equivalent to the signed block
+> > (B_signed)
+> >
+> >     I_loader || H_meta
+> >
+> > bpftool then generates the signature of this I_loader payload (which
+> > now contains the expected H_meta) using a key (system or user) with
+> > new flags that work in combination with bpftool -L
+>
+> Could I just push back a bit on this.  The theory of hash chains (which
+> I've cut to shorten) is about pure data structures.  The reason for
+> that is that the entire hash chain is supposed to be easily
+> independently verifiable in any environment because anything can
+> compute the hashes of the blocks and links.  This independent
+> verification of the chain is key to formally proving hash chains to be
+> correct.  In your proposal we lose the easy verifiability because the
+> link hash is embedded in the ebpf loader program which has to be
+> disassembled to do the extraction of the hash and verify the loader is
+> actually checking it.
 
-I didn't notice that.  Probably, though I don't have time to review this subtle
-Poly1305 code.  Especially with all the weird unions in the code.  Would be
-great if the PowerPC folks would take a look.
+I am not sure I understand your concern. This is something that can
+easily be built into tooling / annotations.
 
-- Eric
+    bpftool -S -v <verification_key> <loader> <metadata>
+
+Could you explain what's the use-case for "easy verifiability".
+
+>
+> I was looking at ways we could use a pure hash chain (i.e. signature
+> over loader and real map hash) and it does strike me that the above
+> ebpf hash verification code is pretty invariant and easy to construct,
+> so it could run as a separate BPF fragment that then jumps to the real
+> loader.  In that case, it could be constructed on the fly in a trusted
+> environment, like the kernel, from the link hash in the signature and
+> the signature could just be Sig(loader || map hash) which can then be
+
+The design I proposed does the same thing:
+
+    Sig(loader || H_metadata)
+
+metadata is actually the data (programs, context etc) that's passed in
+the map. The verification just happens in the loader program and the
+loader || H_metadata is implemented elegantly to avoid any separate
+payloads.
+
+> easily verified without having to disassemble ebpf code.  So we get the
+> formal provability benefits of using a real hash chain while still
+> keeping your verification in BPF.
+>
+> Regards,
+>
+> James
+>
+>
