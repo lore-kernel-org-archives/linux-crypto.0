@@ -1,65 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59D41FC7CB;
-	Wed, 14 May 2025 21:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE03140E34
+	for <linux-crypto@vger.kernel.org>; Wed, 14 May 2025 21:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747259758; cv=none; b=c01bYTcTIPO4FWjyKuXc7C0h0VlrnFl6g91k5K7NsZkYHHRkMX9K53EDMkJ4n7wbLyci0Xhh2RwicbZlJM/DKiRHzSayT+DLHS0qZzh/1tlYhku3Iq2K1TE+A+ZlIltdwZAh9Undsat2PIC2XNeVOeACXyWBqUFcGUyToCgzLfU=
+	t=1747259885; cv=none; b=iXDgPGFAEiOUcT2NzxaEiE/Mu5s4/hLp6iNqVR3C57pF66f+owFwerCgqQ3mOR4vO1eijwFw8lcNIpoa6C56QsoMDDq653FehrNN1RdSSy7clxGHkJTBIcMwVuEd7GHvv9RsFKXXLYNmyF/Yvek6rF4/FD0qutPQFREPF3TbDk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747259758; c=relaxed/simple;
-	bh=B9AnOxBtfLbjXRuIemT0SPiTgpAkH53dyjMLTG03uJ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G4l6Qn33bMRu6bc2vA8tbg4/DxJ4ELa91Gx+UnLMeNs+HP7m46Rv5NwOek80ETh2FmK+lRkpZXTwMHLCG4193JYGwgsdMAJGAY5oLb8SzLhPuwZQhNW5/gkmqYsk64xzINTXbU+RDpr+2EmD4c4Op/VjaIamDXUiWGdePpjDNn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8MVsKQk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747259885; c=relaxed/simple;
+	bh=Y0k6zt80v/NzClDM2+/2DtplJHKsCdpnYYoaTVipjNQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BrAQ+54RaBNYUhBUUedD7GCBtFrVf5Nyyc7b8wzN8LMYmNqiZQiQYIdnuP1VuR9XwR4vO9ovuAU2E2wQtNGbo1YomHnzgxPTyt1d9JvBzJwQL7xueSpe/3YNhvbMfPwMWXcnIVrMLdOf+6/kzPtapTxjBc9DDSYPXESyo0FIIns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=AEKEmHW/; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8MVsKQk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3FBC4CEE3;
-	Wed, 14 May 2025 21:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747259758;
-	bh=B9AnOxBtfLbjXRuIemT0SPiTgpAkH53dyjMLTG03uJ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W8MVsKQkHOYg7EXRVD3ZDrSrO2k+hAlBFUJKCHvJ2fV+xipeA0DOsJnGHNQC06Bym
-	 mDkzxwrtQgzVIr/O546cxLfSxSfhB6PJfNtDoHISvjUMshzvyovV7P5iM3Y9r4t3XJ
-	 6dx7CBqfp6qF2seWxnY6DYrDT9uSjpvhUq9vgCqGSxBBvaWg1aPVRrDOl1EZhU6VfZ
-	 ySsLVyfW6TgIpMQiT5aFHdPvCMsFq3RlQ/ez703BwVrbIzInvkx2QRXIVhYPWaSl6n
-	 vJCnywafz84hvTTnvxTJkQoFO1FXNOzbuGt53PdvBWm3cUyb+ZrmWh8gPb1p6OcM92
-	 BV/RbuekkgRjg==
-Date: Wed, 14 May 2025 16:55:56 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Ryan.Wanner@microchip.com
-Cc: linux-crypto@vger.kernel.org, claudiu.beznea@tuxon.dev,
-	conor+dt@kernel.org, krzk+dt@kernel.org,
-	linux-arm-kernel@lists.infradead.org, olivia@selenic.com,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH 4/9] dt-bindings: rng: atmel,at91-trng: add sama7d65 TRNG
-Message-ID: <174725975592.3107278.8713820681723567309.robh@kernel.org>
-References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
- <68e45a56e70e0b0b001870905917e8f7ddac61a3.1747077616.git.Ryan.Wanner@microchip.com>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="AEKEmHW/"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e7b391ba6a1so316366276.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2025 14:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1747259882; x=1747864682; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cd3hwDzjEL8BVjWNpHIodN9KpUcVouQgmKQ6Ucvmu/M=;
+        b=AEKEmHW/hvVLg8mQhMbspM92G5vZsiXE2KKqSDJYtAaspXQjrZS5ookhCyd+BNxw0i
+         81kB/zOp9jd+l1nyeYTAJWcm7Tdywu7S75Z87Ude0CYOYjBh4++0nr7mMoVzvPDiiuWe
+         jlV+3f901xMQqMOwnD7+KYrGNxU7+BL/Ysq0SkaMWArSp2shAYjs5tvinsasfZY57AL6
+         ZvM2jtvD4dD5dcEVYYpfzii5xw1ykjuYlyRVmlmsqbimg/UWpwp/0HRTpnvW4qFV8/hi
+         xStttFqJZfHfAyM5jonl4PlRRiQ/dGPPDT091ocHdj7j97/WWcokhZgMuTN4USrm2WiJ
+         TiJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747259882; x=1747864682;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cd3hwDzjEL8BVjWNpHIodN9KpUcVouQgmKQ6Ucvmu/M=;
+        b=vBMXsPaOP5TGkw+jR2CBlR3i6PxcPJR4mFnuoak+pMfAQm4UU7m2u+rxHkxRX1qVa1
+         p0UcW/2jdScMQNWt8cWflNjDXO8Yg3bB+2vx74nHF8ARK9vZE6NfvYDyCz+JodOEtZIZ
+         uILryfJa/xGRK0AnH+FI9uqwUdXYDGx+WewELOB2eNc/3zI3WWiJkE8evo6K1MpZPuN9
+         53gbmEcEBhOVGCrkJmS+F439SxIlB4VcLVk27Jqn/Z5bexoAnmpY5dlszToZJotnBZsd
+         uCJTxupZiJjKBHc5PuErFvL4RcBEzRvSpFgvbJBdBmVLVAGaRw7N0I1cBNiQ9mfInsW/
+         prig==
+X-Forwarded-Encrypted: i=1; AJvYcCUrguQ8rBp4G4gyc3HjFJ67/X9ykSsjnu2aKbFUzhLntmJ5NNF+8Z/lFDSlm/1iHJthzDrAU8Oz3RLAxPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8q6wBRSEj61xbr6fQJ86/fX3syrE/sMIHx0a1mj5EFAN8NVPN
+	Q3gVVumT25MebT2kQCz2m6onOLi+zHo2j8W+qOLHr76nSXNlgMgac9wO0YbZN3SkgLfoXnabNG+
+	7k7upVCEwCRZzWPJuw7ifwe1mDU9wXYEPtxsx
+X-Gm-Gg: ASbGncuX5Ouw4Z7bdsruVz7kbLdtNnRXLunHTPnBzWUmZyHIE0ABoXk2hZOSHz48uvd
+	koBFUDEUEAZHVZlN5xLJYSyRxYQanVXPO65WjFHto2ANnfiH0Ag0EmLWOqtyvtiYM5GMx1kXKPk
+	UH/8TJZeFZPgVATk7Bv3y6oYUlkiHcHVyqouWLNfvCssE=
+X-Google-Smtp-Source: AGHT+IHAu8/NGifUGGvqy1muRemXjrNd0svPOPeQFyYnJTSpuDaE7BUNisyhGtBUb1e5c878a+beHwpBV6XXMuiK0sc=
+X-Received: by 2002:a05:6902:114e:b0:e76:8058:a065 with SMTP id
+ 3f1490d57ef6-e7b3d4ba991mr6148542276.6.1747259882613; Wed, 14 May 2025
+ 14:58:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68e45a56e70e0b0b001870905917e8f7ddac61a3.1747077616.git.Ryan.Wanner@microchip.com>
+References: <20250428190430.850240-1-ebiggers@kernel.org> <20250514042147.GA2073@sol>
+In-Reply-To: <20250514042147.GA2073@sol>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 14 May 2025 17:57:52 -0400
+X-Gm-Features: AX0GCFu-8Aa284A3Wv4qgq0Bn3X2NviBEUYoaX5YYoj-p-8WsCK_D4vIgnJJLjo
+Message-ID: <CAHC9VhRL=Jsx8B1s-3qmVOXuRuRF2hTOi3uEnRiWra+7oQJvrg@mail.gmail.com>
+Subject: Re: [PATCH] apparmor: use SHA-256 library API instead of crypto_shash API
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: John Johansen <john.johansen@canonical.com>, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, May 14, 2025 at 12:22=E2=80=AFAM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
+> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> >
+> > This user of SHA-256 does not support any other algorithm, so the
+> > crypto_shash abstraction provides no value.  Just use the SHA-256
+> > library API instead, which is much simpler and easier to use.
+> >
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >
+> > This patch is targeting the apparmor tree for 6.16.
+> >
+> >  security/apparmor/Kconfig  |  3 +-
+> >  security/apparmor/crypto.c | 85 ++++++--------------------------------
+> >  2 files changed, 13 insertions(+), 75 deletions(-)
+>
+> Any interest in taking this patch through the apparmor or security trees?
 
-On Mon, 12 May 2025 12:27:30 -0700, Ryan.Wanner@microchip.com wrote:
-> From: Ryan Wanner <Ryan.Wanner@microchip.com>
-> 
-> Add compatible for Microchip SAMA7D65 SoC TRNG.
-> 
-> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
-> ---
->  Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+Something like this would need to go through the AppArmor tree.  As a
+FYI, the AppArmor devs are fairly busy at the moment so it may take a
+bit for them to get around to this.
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
-
+--=20
+paul-moore.com
