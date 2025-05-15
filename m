@@ -1,255 +1,100 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3BF296723
-	for <linux-crypto@vger.kernel.org>; Thu, 15 May 2025 05:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE24A280A57;
+	Thu, 15 May 2025 06:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747288502; cv=none; b=fUE8KgBkqtpOZRVcNoH+nc+5MZZ2jR92mtDRyhBF29olela8ri/dpizpjlr4USMHusyH4xDwe1E4wXhk/cfxXqw5vhxd1CTCK5yyTLoOhMbDOJ2yltNDyNOcKsN2GxlRDSOtnt9pAA/Y6TEC+eTu+9jK1p25QDQp9rWy4GgDbbg=
+	t=1747289637; cv=none; b=eOIr42fCHgfouqdkKSvkt7Qv8OGiNG6AE/Ym3xxEDOforXGkh1AanYzd/I/82ktAYpwBwIQz6BEKSgNPEKI7Cra7Fq9Rb4fhflBwqZjCGKMw9UPgQAmdY9w65SBJsukrl/v/OYTuNhI37an363syaLtNgggZpc7gW2XdD3ym6o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747288502; c=relaxed/simple;
-	bh=yGojNx+jIzm4WCoo2V3X+9dEe0YPK+/V2ejrOhkNL98=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=h35KdhPHgheFYsNO7PQuLZk7VJ00TTUh8bF6Kl0zAY7Z6s3+CLta52srTwZj25vlSDTeVpgJod8ULicPMTajBMu292ep41QYPDeB9v6ImX2aTIHhuLYwavTPggmhHdI4roNrplsYKr2vVJWyOEJoBunpOTmK/owYioyaBfbDsgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mFNFLTAY; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747289637; c=relaxed/simple;
+	bh=vtoknimTlct0P2pBjlgVFtfVvUE2Qtioz9EcT/r3oIw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LRPE67BJ+dfzpmUSM/1f4gJ3tW/qhlx+R4x5g/WYot/nwC/loFDvjWOZH/AC95obv59mI/al7M+NOJf/CDhofAJNgw2ums6xk7gsfWCxUOVTldeH5+KuC5pXH9tVxSAVvmgZ/itzkKwQhB/Z8jy3AV7u8fYhzKUEe8grErWy1rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LNw4mOFK; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mFNFLTAY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
-	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=OID+Vxpihm66ngBrcJBT7zrUr/7VrVJpUwfIeJhvlws=; b=mFNFLTAYn/DUbiOYV9pf0TwSgp
-	2n72sqO2f7e6qJYhsBkhWqBDOccU2N6p1OISdR2OXCfcp5FFmKZv9O4Ki/Y9fQLc2vZy7dkQ+NXan
-	ccwN6QCGmMkek+U+I9Muz8XSE1w/cCve14p22B1wsty32vLUKZBCSMe46i/JkCXjZH54wYRMZOkuz
-	kFPuEeZcbqT/83w4gM1eEyKIeZ7QbY9u/43F1pfxJDYZC0EyLEZuYqNY4sfRU0MKHjAFJIZahnnTk
-	JYGqgply4Wsj9vkDBYovH+wEbHgWciH7hd2vG38/LR4QI/tRxQ6aYwzyReql4c95b/M6Fs8Dftzi3
-	XKuDL9Dg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uFRYW-006Edm-1P;
-	Thu, 15 May 2025 13:54:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 May 2025 13:54:56 +0800
-Date: Thu, 15 May 2025 13:54:56 +0800
-Message-Id: <30e4640222d3763c5dcc70271931f90045f02146.1747288315.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1747288315.git.herbert@gondor.apana.org.au>
-References: <cover.1747288315.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v4 PATCH 11/11] crypto: testmgr - Add hash export format testing
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LNw4mOFK"
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54F48PEe026960;
+	Wed, 14 May 2025 23:13:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=anHo+MtlLOaSLRQrmIlyGcx
+	guu34jS62bNXAmb/2UMY=; b=LNw4mOFKrz30ja9BEm/gV86yZBjycQXhTcPg5rn
+	G5zX959Rr9qZcuwqqS8qK10FT/l9ghiBp1spb6cI3HuURFuUixN9xJpOzh6P79td
+	fKGs+XKP7U8F3QhTs4IGT6lNyFPlmVOMicBcWNFqZeub2aIsf3PTyGFDxQ4f9bhJ
+	H1WbcDqGcR7QL8anz5Ke9vZ6C61EHnrQ3xjU2ge8gdaJ4IXfL5zOvxq2SL1nwZsg
+	bgZCb8a1puyCmhP6E7iou7aqtyySJsQ/8AkAxSfjbo8hriznTZeD5dwI+gBnxGdW
+	SdOES5PXqEyyW5tJfZpEpA4+VlKeT1l5pQG32qV180E6lGA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46n4vngm63-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 May 2025 23:13:42 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 14 May 2025 23:13:41 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 14 May 2025 23:13:41 -0700
+Received: from bharat-OptiPlex-Tower-Plus-7020.. (unknown [10.28.34.254])
+	by maili.marvell.com (Postfix) with ESMTP id B2EE43F707D;
+	Wed, 14 May 2025 23:13:38 -0700 (PDT)
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <bbrezillon@kernel.org>, <schalla@marvell.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <giovanni.cabiddu@intel.com>, <linux@treblig.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Bharat Bhushan <bbhushan2@marvell.com>
+Subject: [PATCH 0/2] crypto: octeontx2: Changes related to LMTST memory
+Date: Thu, 15 May 2025 11:43:34 +0530
+Message-ID: <20250515061336.3348493-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: djwqasaALAIqBFIlDoqzKcpxMVL0ftAh
+X-Proofpoint-GUID: djwqasaALAIqBFIlDoqzKcpxMVL0ftAh
+X-Authority-Analysis: v=2.4 cv=aIDwqa9m c=1 sm=1 tr=0 ts=68258616 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=5-JLTSaU0EQnWg3z5X0A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE1MDA1OCBTYWx0ZWRfX26n/tu3pqqhL nrN2PLgcmcfkVjXr771VVFIPosuC5yAt7wBld7F9Jec/BkgygSmGIr7MbkkKN+4DCu7N8qhyzgd BTzLr32dDZW3AcmT4EwdomOJlv1Co3rWBEjKkhcdX9gXYYZ568ej9zLMuotBUPWklkWdQxoWW1h
+ QtLTkAAJ5A69AhaoR0JXfp2IYjFxu0FhWGpVAA5xi1gvvyH3j0g8F1TB3+Pc9C8lD+ptsvvvgGE R1sw9cg6glOTVxZLmyLQuLI39viGscwlJrxEj31rvJgOC9ASyxmb3Z6cm85LDEgGcDCt1bKyQRY vGqX10Kz075YgoytUsGSmSTxWdsg5Wyuw02VG69pkAcTBb3EMJR3mpAZ8dsNHZhOfqj/IXIE9eK
+ i6+87KroP6S9CnC04gzDCKn1EkLGyVhhzP2gzhjTPN2Fvs9hRbNuna8wpLrGYWWYKpfm6HIb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-15_02,2025-05-14_03,2025-02-21_01
 
-Ensure that the hash state can be exported to and imported from
-the generic algorithm.
+The first patch moves the initialization of cptlfs device info to the early
+probe stage, also eliminate redundant initialization.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/testmgr.c               | 95 ++++++++++++++++++++++++++++++----
- crypto/testmgr.h               |  2 +
- include/crypto/internal/hash.h |  6 +++
- 3 files changed, 94 insertions(+), 9 deletions(-)
+The second patch updates the driver to use a dynamically allocated
+memory region for LMTST instead of the statically allocated memory
+from firmware. It also adds myself as a maintainer.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 72005074a5c2..737064b31480 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -17,10 +17,19 @@
-  */
- 
- #include <crypto/aead.h>
--#include <crypto/hash.h>
-+#include <crypto/acompress.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/drbg.h>
-+#include <crypto/internal/cipher.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/simd.h>
-+#include <crypto/kpp.h>
-+#include <crypto/rng.h>
-+#include <crypto/sig.h>
- #include <crypto/skcipher.h>
- #include <linux/err.h>
- #include <linux/fips.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/once.h>
- #include <linux/prandom.h>
-@@ -28,14 +37,6 @@
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/uio.h>
--#include <crypto/rng.h>
--#include <crypto/drbg.h>
--#include <crypto/akcipher.h>
--#include <crypto/kpp.h>
--#include <crypto/acompress.h>
--#include <crypto/sig.h>
--#include <crypto/internal/cipher.h>
--#include <crypto/internal/simd.h>
- 
- #include "internal.h"
- 
-@@ -1464,6 +1465,49 @@ static int check_nonfinal_ahash_op(const char *op, int err,
- 	return 0;
- }
- 
-+static int check_ahash_export(struct ahash_request *req,
-+			      const struct hash_testvec *vec,
-+			      const char *vec_name,
-+			      const struct testvec_config *cfg,
-+			      const char *driver, u8 *hashstate)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	const unsigned int digestsize = crypto_ahash_digestsize(tfm);
-+	HASH_FBREQ_ON_STACK(fbreq, req);
-+	int err;
-+
-+	if (!vec->state)
-+		return 0;
-+
-+	err = crypto_ahash_export(req, hashstate);
-+	if (err) {
-+		pr_err("alg: ahash: %s mixed export() failed with err %d on test vector %s, cfg=\"%s\"\n",
-+		       driver, err, vec_name, cfg->name);
-+		return err;
-+	}
-+	err = crypto_ahash_import(req, vec->state);
-+	if (err) {
-+		pr_err("alg: ahash: %s mixed import() failed with err %d on test vector %s, cfg=\"%s\"\n",
-+		       driver, err, vec_name, cfg->name);
-+		return err;
-+	}
-+	err = crypto_ahash_import(fbreq, hashstate);
-+	if (err) {
-+		pr_err("alg: ahash: %s fallback import() failed with err %d on test vector %s, cfg=\"%s\"\n",
-+		       crypto_ahash_driver_name(crypto_ahash_reqtfm(fbreq)), err, vec_name, cfg->name);
-+		return err;
-+	}
-+	ahash_request_set_crypt(fbreq, NULL, hashstate, 0);
-+	testmgr_poison(hashstate, digestsize + TESTMGR_POISON_LEN);
-+	err = crypto_ahash_final(fbreq);
-+	if (err) {
-+		pr_err("alg: ahash: %s fallback final() failed with err %d on test vector %s, cfg=\"%s\"\n",
-+		       crypto_ahash_driver_name(crypto_ahash_reqtfm(fbreq)), err, vec_name, cfg->name);
-+		return err;
-+	}
-+	return check_hash_result("ahash export", hashstate, digestsize, vec, vec_name, driver, cfg);
-+}
-+
- /* Test one hash test vector in one configuration, using the ahash API */
- static int test_ahash_vec_cfg(const struct hash_testvec *vec,
- 			      const char *vec_name,
-@@ -1609,6 +1653,10 @@ static int test_ahash_vec_cfg(const struct hash_testvec *vec,
- 					      driver, vec_name, cfg);
- 		if (err)
- 			return err;
-+		err = check_ahash_export(req, vec, vec_name, cfg,
-+					 driver, hashstate);
-+		if (err)
-+			return err;
- 		err = do_ahash_op(crypto_ahash_final, req, &wait, cfg->nosimd);
- 		if (err) {
- 			pr_err("alg: ahash: %s final() failed with err %d on test vector %s, cfg=\"%s\"\n",
-@@ -1732,6 +1780,17 @@ static void generate_random_hash_testvec(struct rnd_state *rng,
- 	vec->digest_error = crypto_hash_digest(
- 		crypto_ahash_reqtfm(req), vec->plaintext,
- 		vec->psize, (u8 *)vec->digest);
-+
-+	if (vec->digest_error || !vec->state)
-+		goto done;
-+
-+	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+	ahash_request_set_virt(req, vec->plaintext, (u8 *)vec->digest,
-+			       vec->psize);
-+	crypto_ahash_init(req);
-+	crypto_ahash_update(req);
-+	crypto_ahash_export(req, (u8 *)vec->state);
-+
- done:
- 	snprintf(name, max_namelen, "\"random: psize=%u ksize=%u\"",
- 		 vec->psize, vec->ksize);
-@@ -1750,6 +1809,7 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	const unsigned int digestsize = crypto_ahash_digestsize(tfm);
-+	const unsigned int statesize = crypto_ahash_statesize(tfm);
- 	const unsigned int blocksize = crypto_ahash_blocksize(tfm);
- 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
- 	const char *algname = crypto_hash_alg_common(tfm)->base.cra_name;
-@@ -1822,6 +1882,22 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- 		goto out;
- 	}
- 
-+	if (crypto_hash_no_export_core(tfm) ||
-+	    crypto_hash_no_export_core(generic_tfm))
-+		;
-+	else if (statesize != crypto_ahash_statesize(generic_tfm)) {
-+		pr_err("alg: hash: statesize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, statesize,
-+		       crypto_ahash_statesize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
-+	} else {
-+		vec.state = kmalloc(statesize, GFP_KERNEL);
-+		err = -ENOMEM;
-+		if (!vec.state)
-+			goto out;
-+	}
-+
- 	/*
- 	 * Now generate test vectors using the generic implementation, and test
- 	 * the other implementation against them.
-@@ -1854,6 +1930,7 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- 	kfree(vec.key);
- 	kfree(vec.plaintext);
- 	kfree(vec.digest);
-+	kfree(vec.state);
- 	ahash_request_free(generic_req);
- 	crypto_free_ahash(generic_tfm);
- 	return err;
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 32d099ac9e73..5cf455a708b8 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -29,6 +29,7 @@
-  * hash_testvec:	structure to describe a hash (message digest) test
-  * @key:	Pointer to key (NULL if none)
-  * @plaintext:	Pointer to source data
-+ * @state:	Pointer to expected state
-  * @digest:	Pointer to expected digest
-  * @psize:	Length of source data in bytes
-  * @ksize:	Length of @key in bytes (0 if no key)
-@@ -39,6 +40,7 @@
- struct hash_testvec {
- 	const char *key;
- 	const char *plaintext;
-+	const char *state;
- 	const char *digest;
- 	unsigned int psize;
- 	unsigned short ksize;
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 0f85c543f80b..f052afa6e7b0 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -91,6 +91,12 @@ static inline bool crypto_hash_alg_needs_key(struct hash_alg_common *alg)
- 		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
- }
- 
-+static inline bool crypto_hash_no_export_core(struct crypto_ahash *tfm)
-+{
-+	return crypto_hash_alg_common(tfm)->base.cra_flags &
-+	       CRYPTO_AHASH_ALG_NO_EXPORT_CORE;
-+}
-+
- int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
- 		      struct crypto_instance *inst,
- 		      const char *name, u32 type, u32 mask);
+Bharat Bhushan (2):
+  crypto: octeontx2: Initialize cptlfs device info once
+  crypto: octeontx2: Use dynamic allocated memory region for lmtst
+
+ MAINTAINERS                                   |  1 +
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.c  | 89 ++++++++++++++-----
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.h  |  1 +
+ .../marvell/octeontx2/otx2_cpt_common.h       |  1 +
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  | 25 ++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c |  5 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 12 ++-
+ .../marvell/octeontx2/otx2_cptpf_main.c       | 18 +++-
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  6 +-
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  2 -
+ .../marvell/octeontx2/otx2_cptvf_main.c       | 19 ++--
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  1 +
+ drivers/pci/controller/pci-host-common.c      |  4 +
+ 13 files changed, 137 insertions(+), 47 deletions(-)
+
 -- 
-2.39.5
+2.34.1
 
