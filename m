@@ -1,179 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC468280A50;
-	Fri, 16 May 2025 23:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC5D27874B;
+	Fri, 16 May 2025 23:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747437702; cv=none; b=chHbnQ/x7LsfdG3snsbz+3RjJuOuxWlmbDH1hcK3Z52H6Y0SImsZurMtYScd0G8WdS2dqYCv4ywb1pvZjoNjzvBcgjG7ETMx3Eurn4EPvXdmp22SyT4q4JRD5fcKkKhHlTA9X8c59jRc+2hxh0sEGBcZh83jupKWucz7AjQrlmQ=
+	t=1747439364; cv=none; b=k7mBJZKNDgluvA3YnMSPlFC/imeSTy/3HevIKgZEzQXfHQdjad6/eRzqch19terMdZuNFHhFFVN5MHu7BU4RwWR0brnjOU1iSzB8vCZz6a/7rgDtbvKAIsf/UNBDCOhoRI9/J6LjwLjh5jI/QIunyeh1qT/sIgjg8Gb7DQ31r8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747437702; c=relaxed/simple;
-	bh=sLfkWTBYyB2WFGVd1rCVQoVKboVRhpxKeej9ZVD3hzM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RfMcok0Vj2x9r8E5qqo8t3ylgnTQdD21GIlhDKUJ4TlqtPVnQ9kDUd6ht7EnvhmOfiHhjH0XMEvdvu9K0X8nbaPtKucN1qW93Zj3p+uJFM4yk+cDQS8bhwRnGyASkWfBU+CUFSzwBPaOFYItPVHPmLfBdqUGeLN9NYyNm4gHQ1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gg3Un5t5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747439364; c=relaxed/simple;
+	bh=JynXQczZCmV7Hl5daVJbPr86DC3r593cY6JyojI2h9E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bejp73J3Ow1F22pPpN08eUE2dpK9c8c/yszJn+/nCoANrPoyAjpjIhnPnSrpfVlOgWvKQvarQRgXwTlkFsuibFZPYc2NOPhvyH9zUS3s+2RB+g7/6LfidJ6pgOPgqLmb1Ujfg06eC34LWyOJBYvOJaIpr3DW/D13Nzc9U36j86g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MiUXrZZB; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gg3Un5t5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC46C4CEF2;
-	Fri, 16 May 2025 23:21:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747437701;
-	bh=sLfkWTBYyB2WFGVd1rCVQoVKboVRhpxKeej9ZVD3hzM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gg3Un5t5FRNT6Yb37sRTNNOSXlRm2yt9IpI4JqgQKen7SkU4e/mZTxGXvNXcM0eaZ
-	 JTca3rNAEkTrn5QEzMv0q7FklKXl4vC61M/yiigTp03BbA4wC/r06vzzPUbEpoiVjb
-	 5sTDPoUBWmCP6zxktR2nIr4frhVzimb52t+kEoB5bh8xyxvJbGAy2LL0Weex2uPRVY
-	 OabLNGZN72GZGuO1kdKG/6HQ2VsG3nj5PzP1ued2gHGmLVeYZExRsr+y0sy+7GhJ+K
-	 aGDSGbRmo3I9Yeimz8DNRJ39vUrcloWAEUiVAPXbtXdD5Krq2B45XIzHY5EJKiwQtA
-	 Mw+rManAw+e6w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ayush Jain <Ayush.Jain3@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
-Date: Fri, 16 May 2025 16:18:58 -0700
-Message-ID: <20250516231858.27899-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250516231858.27899-1-ebiggers@kernel.org>
-References: <20250516231858.27899-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MiUXrZZB"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a0b9e2d640so2253046f8f.2;
+        Fri, 16 May 2025 16:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747439361; x=1748044161; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yLNmQk56WXrXrbrs+Rd+UwZYq2EuCmP2+ysJch2Gqcc=;
+        b=MiUXrZZBrUd9CJ/R3/+8Euo7FHdltR9apr1qojwyPposhAXDMtluhx6Ma77U3/fQ/9
+         WstozBnkwfFxrQnOtNkB0/TEqj+1GGSCJPiqQaCj8Bghob3bWTg+AHqt1p5wQm01bRRA
+         wRjV56XG3VayKgCkE+Av88VFUQcLkS45oKu3BmYfnXf0f+BhVeZPgornLkNEiOiwwpnz
+         05r1vWQxuRl1qnQlJRM/6vCTCJdzcKyVvAiwbvLxlQHhGkQZXGMf+9MBDGs/8mmABiJG
+         SbnMLS9EHdPuScZ4Lc1EXZN7vISEmhV49GwM8t+QMKqvSC2vsPdBP68Xgh2ZApyRJOQI
+         Fs3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747439361; x=1748044161;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yLNmQk56WXrXrbrs+Rd+UwZYq2EuCmP2+ysJch2Gqcc=;
+        b=o/QNgtJ6cCiFwd5nxwiDZFYghh74azp6qfn6FMB8ARPtuiS7I/G11BdJ9a1oOacVj5
+         7zfc/QuaNX9+k7vcJooYi6SK/5FOT7OsafRnhcT9iz7vRrsbqr4JPnguh+wj7qdf7GHc
+         SL4nYhPKhNI/dHqvDRjF5I6C3b8pUc0La433k4jqHh+C73IjkrCJT8UvZC/wALjGFG4e
+         ouL9JDfx+JN4UblcJDZO/RvaeLxPdvAKZWX6mJQEDXAcUxxbnxXh7BacA1TS6nzTJWu0
+         mUKXjg9l6FaakTZNrOsLwP+nob9IsIIig+1GSRtpKexn1dbKlBO/IqmTeh19XXxs9J9Z
+         xaXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5FeF7kkF2U5AYT6VdEIV8WLV8/pX1e4GJPfLulSzL2uKwJf/KKVpRUAIJhivnd7tVg0cSysnW8KI6BehfwDji@vger.kernel.org, AJvYcCUhZPY9yN5APNO51UZI+BTgxeBx880FxFPx+kPLwC0rdzGH11dg9lWbeTBLmOm/a1+5Qb4tOjey03XBd7KE@vger.kernel.org, AJvYcCVErITNKojpOXoE6sP1wXgeAouQ0pJKDPED3IVs5qoTpF4FxfT9Y2on3+FFcAF1UrOkaDU=@vger.kernel.org, AJvYcCWER5uU43BWVTqAJ6frriEbeu7d2P8SqFmyzSqrxRdZTUv6UgD1Ww2Lfsql+Qyrx1y23x/dh5nozf4zwm9YWxLrFXuPCf0F@vger.kernel.org, AJvYcCX0Ioi/NFBaoTDRy67CfC0VTsJBNvUEChe9DgUwHCMELZX2uQQAdNwjTzOJDiOZXo0rmBaGRFz09qm9@vger.kernel.org, AJvYcCX2xaznOQAGBUWdMR0kADGSVmGnLAcoYsbS2ibo/p9v/q2i3xSO1G1LIGzvwR5qKU/M0NYfTa5Yddo=@vger.kernel.org, AJvYcCX7lGViFscXfQtN794DogQ68CFV8lf0BQA1io5kxIRE2uJvioSduGN68Xw0X+5fL4jY3lurtktzDAUyj9lW@vger.kernel.org, AJvYcCXFqa5AyQLfFxBMbKKlVZLPoNidpivOQrHLz90AgrcrdeO38mF3CXNUtV/ACvaDycnlO6H0d85TTq5pRNnQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2v6MDp0LEt1fbawEwKKbyRzC0g37Lse4hVedzDwagB04GIbDZ
+	O8JbYM8Ea3UnV+DV9Nz8hhN2r8Dk6gdzXattPfMhLSe7XR09ujfIn+qrBLjQkU7+n+kEGh1XjiI
+	GIjDDlPM1IrKATVcVy0ZtfyqaDThmPyw=
+X-Gm-Gg: ASbGncsfaSO6/sS6H4j/xjd7yiJtLU1TFNooiTI+7gCwctt9VxB1Puemqia81mPWg8x
+	kaJSPOjF/o3w+7PtJEsj7FMjMxHL9SdYjrys52A7Ti5f6X4UndA5FtSZ+ie0J2dOj6GHCr2Qo88
+	S8pNaplmlOftmdIi99LrwRqk9HBnihoIWwcUgNiT0uGnLQKYG0JeNL8k445Ip1G85qOGqamHYo
+X-Google-Smtp-Source: AGHT+IEt13ebOwzpc+kY0WsGrWXwVoXKnKPvRfcOK4btMC7AsUlFZwn4kwFfwxO5xffregucUV2pzpgY8z4kdU24ZPU=
+X-Received: by 2002:adf:f50b:0:b0:3a3:5c97:d756 with SMTP id
+ ffacd0b85a97d-3a35c97d8aamr4266342f8f.17.1747439361049; Fri, 16 May 2025
+ 16:49:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+ <CACYkzJ5jsWFiXMRDwoGib5t+Xje6STTuJGRZM9Vg2dFz7uPa-g@mail.gmail.com>
+ <CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com>
+ <CAHC9VhQL_FkUH8F1fvFZmC-8UwZh3zkwjomCo1PiWNW0EGYUPw@mail.gmail.com>
+ <CACYkzJ4+=3owK+ELD9Nw7Rrm-UajxXEw8kVtOTJJ+SNAXpsOpw@mail.gmail.com> <CAHC9VhTeFBhdagvw4cT3EvA72EYCfAn6ToptpE9PWipG9YLrFw@mail.gmail.com>
+In-Reply-To: <CAHC9VhTeFBhdagvw4cT3EvA72EYCfAn6ToptpE9PWipG9YLrFw@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 16 May 2025 16:49:09 -0700
+X-Gm-Features: AX0GCFuvvvJ18JnaOTj0Zx7VVAejABXpQG7xGivhE2V41LonoDOtxmhIAAR39TA
+Message-ID: <CAADnVQJ4GDKvLSWuAMdwajA0V2DEw5m-O228QknW8Eo9jxhyig@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Paul Moore <paul@paul-moore.com>
+Cc: KP Singh <kpsingh@kernel.org>, Blaise Boscaccy <bboscaccy@linux.microsoft.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, bpf <bpf@vger.kernel.org>, 
+	code@tyhicks.com, Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
+	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
+	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, kysrinivasan@gmail.com, 
+	Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, May 16, 2025 at 12:49=E2=80=AFPM Paul Moore <paul@paul-moore.com> w=
+rote:
+>
+> On Wed, May 14, 2025 at 2:48=E2=80=AFPM KP Singh <kpsingh@kernel.org> wro=
+te:
+> > On Wed, May 14, 2025 at 5:06=E2=80=AFAM Paul Moore <paul@paul-moore.com=
+> wrote:
+> > > On Sat, May 10, 2025 at 10:01=E2=80=AFPM KP Singh <kpsingh@kernel.org=
+> wrote:
+> > > >
+> > >
+> > > ...
+> > >
+> > > > The signature check in the verifier (during BPF_PROG_LOAD):
+> > > >
+> > > >     verify_pkcs7_signature(prog->aux->sha, sizeof(prog->aux->sha),
+> > > > sig_from_bpf_attr, =E2=80=A6);
+> > >
+> > > I think we still need to clarify the authorization aspect of your
+> > > proposed design.
+> > >
+> > > Working under the assumption that the core BPF kernel code doesn't
+> > > want to enforce any restrictions, or at least as few as possible ...
+> >
+> > The assumption is not true, I should have clarified it in the original
+> > design. With the UAPI / bpf_attr the bpf syscall is simply denied if
+> > the signature does not verify, so we don't need any LSM logic for
+> > this. There is really no point in continuing as signature verification
+> > is a part of the API contract when the user passes the sig, keyring in
+> > the bpf syscall.
+>
+> I think we need some clarification on a few of these details, it would
+> be good if you could answer the questions below about the
+> authorization aspects of your design?
+>
+> * Is the signature validation code in the BPF verifier *always* going
+> to be enforced when a signature is passed in from userspace?  In other
+> words, in your design is there going to be either a kernel build time
+> or runtime configuration knob that could selectively enable (or
+> disable) signature verification in the BPF verifier?
 
-Make irq_fpu_usable() return false when irqs_disabled().  That makes the
-irqs_disabled() checks in kernel_fpu_begin_mask() and kernel_fpu_end()
-unnecessary, so also remove those.
+If there is a signature in union bpf_attr and it's incorrect
+the prog_load command will be rejected.
+No point in adding a knob to control that.
 
-Rationale:
+> * In the case where the signature validation code in the BPF verifier
+> is active, what happens when a signature is *not* passed in from
+> userspace?  Will the BPF verifier allow the program load to take
+> place?  Will the load operation be blocked?  Will the load operation
+> be subject to a more granular policy, and if so, how do you plan to
+> incorporate that policy decision into the BPF program load path?
 
-- There's no known use case for kernel-mode FPU when irqs_disabled().
-  arm64 and riscv already disallow kernel-mode FPU when irqs_disabled().
-  __save_processor_state() previously did expect kernel_fpu_begin() and
-  kernel_fpu_end() to work when irqs_disabled(), but this was a
-  different use case and not actual kernel-mode FPU use.
+If there is no signature the existing loading semantics will remain intact.
+We can discuss whether to add a sysctl or cgroup knob to disallow
+loading when signature is not present, but it probably should be
+a job of trivial LSM:
+if (prog_attr doesn't have signature &&
+   (task =3D=3D .. || task is under certain cgroup || whatever))
+  disallow.
 
-- This is more efficient, since one call to irqs_disabled() replaces two
-  irqs_disabled() and one in_hardirq().
 
-- This fixes irq_fpu_usable() to correctly return false during CPU
-  initialization.  Incorrectly returning true caused the SHA-256 library
-  code, which is called when loading AMD microcode, to take a
-  SIMD-optimized code path too early, causing a crash.  By correctly
-  returning false from irq_fpu_usable(), the generic SHA-256 code
-  correctly gets used instead.  (Note: SIMD-optimized SHA-256 doesn't
-  get enabled until subsys_initcall, but CPU hotplug can happen later.)
-
-Fixes: 11d7956d526f ("crypto: x86/sha256 - implement library instead of shash")
-Reported-by: Ayush Jain <Ayush.Jain3@amd.com>
-Closes: https://lore.kernel.org/r/20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/kernel/fpu/core.c | 49 ++++++++++++++------------------------
- 1 file changed, 18 insertions(+), 31 deletions(-)
-
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 476393b1d5e8f..9b3c5e17f86cd 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -66,42 +66,31 @@ struct fpu *x86_task_fpu(struct task_struct *task)
-  * Can we use the FPU in kernel mode with the
-  * whole "kernel_fpu_begin/end()" sequence?
-  */
- bool irq_fpu_usable(void)
- {
--	if (WARN_ON_ONCE(in_nmi()))
--		return false;
--
- 	/*
--	 * In kernel FPU usage already active?  This detects any explicitly
--	 * nested usage in task or softirq context, which is unsupported.  It
--	 * also detects attempted usage in a hardirq that has interrupted a
--	 * kernel-mode FPU section.
-+	 * To ensure that (non-explicitly-nested) kernel-mode FPU is always
-+	 * usable in task and softirq contexts, kernel_fpu_begin() disables
-+	 * preemption and softirqs, and kernel_fpu_end() re-enables them.  That
-+	 * is not compatible with hardirqs being disabled (including hardirq
-+	 * context), or with NMI context.  Support for kernel-mode FPU is not
-+	 * needed in those contexts anyway.  Return false in those contexts.
-+	 *
-+	 * Returning false when irqs_disabled() also eliminates the need to
-+	 * explicitly check whether the FPU has been initialized yet during CPU
-+	 * initialization.  Before then, hardirqs are still disabled.
- 	 */
-+	if (irqs_disabled() || WARN_ON_ONCE(in_nmi()))
-+		return false;
-+
-+	/* Catch any explicitly nested usage, which should never happen. */
- 	if (this_cpu_read(in_kernel_fpu)) {
--		WARN_ON_FPU(!in_hardirq());
-+		WARN_ON_FPU(1);
- 		return false;
- 	}
--
--	/*
--	 * When not in NMI or hard interrupt context, FPU can be used in:
--	 *
--	 * - Task context except from within fpregs_lock()'ed critical
--	 *   regions.
--	 *
--	 * - Soft interrupt processing context which cannot happen
--	 *   while in a fpregs_lock()'ed critical region.
--	 */
--	if (!in_hardirq())
--		return true;
--
--	/*
--	 * In hard interrupt context it's safe when soft interrupts
--	 * are enabled, which means the interrupt did not hit in
--	 * a fpregs_lock()'ed critical region.
--	 */
--	return !softirq_count();
-+	return true;
- }
- EXPORT_SYMBOL(irq_fpu_usable);
- 
- /*
-  * Track AVX512 state use because it is known to slow the max clock
-@@ -443,12 +432,11 @@ static __always_inline void __fpu_save_state(void)
- 	__cpu_invalidate_fpregs_state();
- }
- 
- void kernel_fpu_begin_mask(unsigned int kfpu_mask)
- {
--	if (!irqs_disabled())
--		fpregs_lock();
-+	fpregs_lock();
- 
- 	WARN_ON_FPU(!irq_fpu_usable());
- 	WARN_ON_FPU(this_cpu_read(in_kernel_fpu));
- 
- 	this_cpu_write(in_kernel_fpu, true);
-@@ -467,12 +455,11 @@ EXPORT_SYMBOL_GPL(kernel_fpu_begin_mask);
- void kernel_fpu_end(void)
- {
- 	WARN_ON_FPU(!this_cpu_read(in_kernel_fpu));
- 
- 	this_cpu_write(in_kernel_fpu, false);
--	if (!irqs_disabled())
--		fpregs_unlock();
-+	fpregs_unlock();
- }
- EXPORT_SYMBOL_GPL(kernel_fpu_end);
- 
- #ifdef CONFIG_PM_SLEEP
- /*
--- 
-2.49.0
-
+Note that the prog verification itself is independent of the signature.
+If prog fails to pass safety checks it will still be rejected
+even if signature is ok.
+We're not going to do a verifier bypass.
