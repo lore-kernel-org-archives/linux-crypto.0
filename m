@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2E82CCC1;
-	Fri, 16 May 2025 16:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186F526C38E;
+	Fri, 16 May 2025 17:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747413920; cv=none; b=P3gxXms17Z0FE/JowkZ1Ji2CU8IPWGo4znAa9nNNmofk4p/wzEKNYwuDpoWaT8nI68EHsJ4Zf5BcTDMmnrMZGPTsc6b7DQLY5MxfDlOMGJMuuCN8idcCGo+d8yXBIUmDq/FN+ATVikx/X9pEGIoALBbVqimppZsdUjIhJzw+9bY=
+	t=1747415006; cv=none; b=puyBnLuS93I/MMaATjqzbs7OnXH51rLIvv0rfEStZzYTAMjwB/EpXMbC8HzC0A7oOZXk1kW525A7kbYHNGn7BSYqmHBedGt5j+Fy4a9QFUK/dPzkIug5hjWTozfBt3xf7XJhQ7d3C3yNmAMFMJo7DKGLpHqQCg2CkBhrkHrqXmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747413920; c=relaxed/simple;
-	bh=aaeddjKPS3lR8AN7yb8sQWTZ85Q1HGJPB3fzIMlS0qY=;
+	s=arc-20240116; t=1747415006; c=relaxed/simple;
+	bh=t7L/mDLEjwlOUNwI2tKMC7EU8XgkPK5SpHN+h9gxzcg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ImrjvjvTXaJXMgqlmbq4dT4zJdlO1P9sl1MtxRmmKXHyMCtO6R+w8PfXB+F8dphbzCwfqcxXzpHZwJsgKANCxyu0bNc28IIMLhMMblrb4Th1wF+G4blFUdRhRxKnlenjT0Sh9s7xio6Ytj+do/l3K+IihjxvfHEAvuzQEcUk/WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIm0MP71; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLKIbwX5Lkd18KoRg1I0UwvgSksOVsdNnvDde62QtldnZWBABQAPnu2eH9oglR7SFpd4oSmIqeeh8zmZ+UOQFmQGJzCWNPWVgSG35XeQasI0b1ieUZVgvlWRAKL7LmI7uGCYz0vMxeOfTghEnDIhSXqmVaQdv02BLwNCvsrdtvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awYfYYzu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIm0MP71"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961F7C4CEE4;
-	Fri, 16 May 2025 16:45:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awYfYYzu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A1AC4CEE4;
+	Fri, 16 May 2025 17:03:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747413920;
-	bh=aaeddjKPS3lR8AN7yb8sQWTZ85Q1HGJPB3fzIMlS0qY=;
+	s=k20201202; t=1747415005;
+	bh=t7L/mDLEjwlOUNwI2tKMC7EU8XgkPK5SpHN+h9gxzcg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nIm0MP71xp35ItW1iqWDhC7qbcomrPszMSNm3MIGEUu5dBwVlNmFthv+Qj1dG0Eke
-	 6AZBy0iib84gieYfeKwv1d1QJL759/ddO7Ae54wbNSqF93THWtB14U+SyblfZU4ZFU
-	 nBGc0DzloOtBlMKsVD4HxYVx12UJMn8l0PkAYVt1AlyQgInQEZMB9IwUvDFRn6EQJ5
-	 +irrFa5aecSdD2UIxXTX2JqxkTSwTV6gyxmBaEwmqZu7Nj3B3mjSJZS/cMwv+61uWe
-	 lQhDnL0ee5Uu5X3uhmGTrsX+HqE56e68mq4NKDr9TxCKZ81hEKDil0JrZxZtUJEkv5
-	 u6DpMuL8B02LQ==
-Date: Fri, 16 May 2025 09:45:12 -0700
+	b=awYfYYzugx8Cc6kViojDPfxwYr8R4s7Zn/4EXllQCYeWVuJdNd0KQMh+6e1UKZ8c9
+	 DkZEq9H2Rgg78pjXrGJvNp4hEP5/Qn3D2IIPUuE22LSGYFj2P10aFcumf0XJHQIyz7
+	 szmK3V1L05l0kxOcc7vPIUZaAVaAuKVWbslOy5CmPWcFc83pKLKNsYnuHnja1GuTcX
+	 HPzAkpqrH7BgEK1aYx2y1hR42LLH0PxKiD5FZwP479Qbzv//lBzHFGfCqoGuynowBS
+	 DesAi2wkCX85ZXYIz62x45SjEiYxF7ARYL6cgOX/Bg00r66P1LOznboT3kv5gFP8Op
+	 peAylNkPKouTw==
+Date: Fri, 16 May 2025 10:03:16 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: lrw - Only add ecb if it is not already there
-Message-ID: <20250516164512.GC1241@sol>
-References: <202505151503.d8a6cf10-lkp@intel.com>
- <aCWlmOE6VQJoYeaJ@gondor.apana.org.au>
- <20250515200455.GL1411@quark>
- <aCcCKJ0NpdvIpvsH@gondor.apana.org.au>
+Cc: Borislav Petkov <bp@alien8.de>, Jain@formenos.rohan.me.apana.org.au,
+	Ayush <Ayush.Jain3@amd.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>, x86-ml <x86@kernel.org>,
+	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: lib/sha256 - Disable SIMD
+Message-ID: <20250516170316.GD1241@sol>
+References: <20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local>
+ <aCcirrsFFrrRqf5A@gondor.apana.org.au>
+ <aCcmJGuCnuyHmHbx@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,37 +46,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aCcCKJ0NpdvIpvsH@gondor.apana.org.au>
+In-Reply-To: <aCcmJGuCnuyHmHbx@gondor.apana.org.au>
 
-On Fri, May 16, 2025 at 05:15:20PM +0800, Herbert Xu wrote:
-> On Thu, May 15, 2025 at 01:04:55PM -0700, Eric Biggers wrote:
-> >
-> > It didn't actually make a difference until 795f85fca229 ("crypto: algboss - Pass
-> > instance creation error up") though, right?  Before then, if "ecb(...)" gave
-> > ENOENT then "ecb(ecb(...))" gave ENOENT too.
-> 
-> I would consider this a success, it actually caught lrw doing
-> something silly by trying to allocate "ecb(ecb(XXX))".  Sure we
-> can sweep all of this under the rug with ENOENT but it might end
-> up blowing up in a much worse place.
-> 
-> Also I don't think it's true that ecb(ecb(XXX)) will always give an
-> ENOENT if ecb(XXX) gives an ENOENT.  The error is actually originating
-> from the lskcipher code, which tries to construct ecb from either an
-> lskcipher, or a simple cipher.  It is the latter that triggers the
-> EINVAL error since the ecb template cannot create a simple cipher.
-> 
-> > As I said in
-> > https://lore.kernel.org/linux-crypto/20240924222839.GC1585@sol.localdomain/,
-> > that commit (which had no explanation) just seems wrong.  We should have simply
-> > stuck with ENOENT.
+On Fri, May 16, 2025 at 07:48:52PM +0800, Herbert Xu wrote:
+> On Fri, May 16, 2025 at 07:34:06PM +0800, Herbert Xu wrote:
 > > 
-> > But as usual my concern just got ignored and it got pushed out anyway.
+> > So what's happened is that previously if you call sha256_update
+> > from lib/crypto it would only use the generic C code to perform
+> > the operation.
+> > 
+> > This has now been changed to automatically use SIMD instructions
+> > which obviously blew up in your case.
 > 
-> I don't ignore all your concerns, just the ones that I think are
-> unwarranted :)
+> In the interim you can go back to the old ways and disable SIMD
+> for lib/crypto sha256 with this patch:
+> 
+> ---8<---
+> Disable SIMD usage in lib/crypto sha256 as it is causing crashes.
+> 
+> Reported-by: Borislav Petkov <bp@alien8.de>
+> Fixes: 950e5c84118c ("crypto: sha256 - support arch-optimized lib and expose through shash")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-I don't think this one is unwarranted.  We should keep the error codes simple
-and just use ENOENT for algorithms that don't exist.  This also affected AF_ALG.
+That's silly.  We should just fix x86's irq_fpu_usable() to return false before
+the CPU is properly initialized.  It already checks a per-cpu bool, so it
+shouldn't be too hard to fit that in.
+
+Using the generic SHA-256 code explicitly is also an option, but ideally the
+regular functions would just work.
 
 - Eric
