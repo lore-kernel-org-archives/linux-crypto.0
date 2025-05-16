@@ -1,192 +1,481 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF433E47B;
-	Fri, 16 May 2025 12:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3EE1C5D46
+	for <linux-crypto@vger.kernel.org>; Fri, 16 May 2025 15:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747399518; cv=none; b=OaDVscRSY3EnMpq4cEVL/BgFn1HUoe3XkvlZxYLLrimh+GSOW7m/VSvf3AtnJ7BcqvuvDqZwZlbvkyvsPqp5WKvS7faOmb679C0I6UjcUk7ivVi10BRecwvyH4GK3D3m+EsTmoa4jl+y/PKIO2QJf+jhQeWd1Q5KW56TlRuEu/4=
+	t=1747410249; cv=none; b=UR7oa4Vbj9phf64tblsfhTRQPTzmTTRAqFYHg6/meVgTpqT6Rg443+An0RV0Uevt+xi9rlLTI4k3cgkITe8L4h1B1arlCDtJXoYQBuMqhLV5DEmntrYErSmep/V6XjaSdYdTq7F2n3kxAsqviVPEg/NktJ6AIbqPDihINdpFrQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747399518; c=relaxed/simple;
-	bh=b+bZp3LtXEbGrStCGaZgWDnVpgEug9b43ERZEzO1k5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQnQxVCZg8oNkSrWwUQr53jHICsnL17Z9FeZY2kSn/bIu4n9GekwGNBxj/8RlYF969ZSZn/pa+kvHCqyHY3jOIVRN/Nfm7peHOcYWzkyCZXTcmVpYE6J+5EiVRKTVf6WlS+eWesjwDxYk8J8NkR6jGHZUICrBG09KaZ6PKkwDVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kPO54So2; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747410249; c=relaxed/simple;
+	bh=z/q0we/NAylUulTxMa4xOEcmg9BG7/ATMQUphI3binc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q0QD2ya9j+XgK4OFwIKFEGipMJSHHUCKYhRRnnIBry5H70X+9Anx/K3pL1IoO5vs2pqNVxLTehgGOZxZHQAjMtRuZsl69qWI8c+vi9yzJIbFupzeuxcDQaDFF2gfBI3x8kQITOtmGO/0rA8mxDwLUChIQ0voA50vO17Gjpk9ePg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f9EvaSVm; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kPO54So2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ruHbUrkCXkXLA4qCA0A9JMZjYSazW9Ft9mg99twBNTw=; b=kPO54So2xmjffePJvuKbIJUnVT
-	Ry+HFRtDLDQ6AxgECgfEHLFlWosv+5OENQ7plxnNByZIzh4TciiPmsAL9Yf7aArzniV7rDbCFFJbM
-	83bQYfQR+NoAy88ZeiK5bAxgEPMRk97YKEp3TBWixwrD8vJp3xvdDTIV/ByWK9RkrTXm8lwp+p/Ib
-	F1d2OhZENhrzA74niIjywW2hNBroHxEYQwZsFIvfzaI9J7Qt6MSvXGznkS6ELmQwaT6WRJvkil9kT
-	0PiekLR9AuDpY+un7/nzHxBe8HGCB9/TXjOmJO71Nmq3NR+7MvpeZXM5sJzj8zb1LvHI6FMUj+kMV
-	ZzQbbbBg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uFuR5-006afF-0g;
-	Fri, 16 May 2025 20:45:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 May 2025 20:45:11 +0800
-Date: Fri, 16 May 2025 20:45:11 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Klaus Kudielka <klaus.kudielka@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Message-ID: <aCczV6MF6xk5rRA3@gondor.apana.org.au>
-References: <aCAX8rj2ie4QMnTo@gondor.apana.org.au>
- <28184fb96e2de8a0af32816f5ff1b3d776b57217.camel@gmail.com>
- <aCMOyWVte4tw85_F@gondor.apana.org.au>
- <8e9b45bdafe6ac3f12bcbb5fce5bc9949566344f.camel@gmail.com>
- <aCQm0aHYnI6ciyPz@gondor.apana.org.au>
- <20dde00750d803a9a364ded99dab1e3e22daec77.camel@gmail.com>
- <20250515182131.GC1411@quark>
- <f0dc235e3d7bfa1f60cc01fd527da52024af54e0.camel@gmail.com>
- <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au>
- <aCcyXkeBvHQYvf2d@Red>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f9EvaSVm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747410248; x=1778946248;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=z/q0we/NAylUulTxMa4xOEcmg9BG7/ATMQUphI3binc=;
+  b=f9EvaSVmuHSYGCr2q0gkvt+GPFwgOD6HF/ImwOYN5NiGF7bkLU1/eK8A
+   i41/au022x5v68UeX2M7sWb+/MoT3jmqiaa7z8uWIS0pEE6zbylg89894
+   fNQPWvinAEsdoPRcITTNrPXJEBvEXB/DnzYEUxsr5lakfqpYuC8ghDiTT
+   D7REnmp9qDKgr5yZkvcMlSsfgfdDnT6fgz1UqEllTXcVVxPl1IoeoEb6E
+   FE/65ik8yR9lLRv+QuSAXna9HH9kWYbOZckuf/JzkVCYhKp78NBG2YNJ9
+   7gT7QZAVzInNPGRNUor0DSmvO3Ql0TjtdJ/+Z/ZGfISOAhKJaNiJ3eJhL
+   w==;
+X-CSE-ConnectionGUID: vEzzb+/+QgmkYT58Pv5f3w==
+X-CSE-MsgGUID: 9ZmIm6tERaylSE71Z1SF7A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11435"; a="53203004"
+X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
+   d="scan'208";a="53203004"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 08:44:07 -0700
+X-CSE-ConnectionGUID: noU8I2aqS2KIw3upUko+lg==
+X-CSE-MsgGUID: H5l/dl2VSRqfI/ViGH71TA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
+   d="scan'208";a="139250546"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by orviesa007.jf.intel.com with ESMTP; 16 May 2025 08:44:05 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	terrelln@fb.com,
+	dsterba@suse.com
+Subject: [PATCH] crypto: zstd - convert to acomp
+Date: Fri, 16 May 2025 16:43:31 +0100
+Message-Id: <20250516154331.1651694-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCcyXkeBvHQYvf2d@Red>
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16, 2025 at 02:41:02PM +0200, Corentin Labbe wrote:
->
-> Yes I have still errors:
+Convert the implementation to a native acomp interface using zstd
+streaming APIs, eliminating the need for buffer linearization.
 
-Great! Please apply my debugging patch and see if it shines any
-light on the problem.
+This includes:
+   - Removal of the scomp interface in favor of acomp
+   - Refactoring of stream allocation, initialization, and handling for
+     both compression and decompression using Zstandard streaming APIs
+   - Replacement of crypto_register_scomp() with crypto_register_acomp()
+     for module registration
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 9c21f5d835d2..fd7f43575cb2 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -127,6 +127,8 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
- 		if (!(status & mask))
- 			break;
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/zstd.c | 350 +++++++++++++++++++++++++++++---------------------
+ 1 file changed, 205 insertions(+), 145 deletions(-)
+
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index 7570e11b4ee6..d4679075e9f9 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -12,188 +12,248 @@
+ #include <linux/net.h>
+ #include <linux/vmalloc.h>
+ #include <linux/zstd.h>
+-#include <crypto/internal/scompress.h>
++#include <crypto/internal/acompress.h>
++#include <crypto/scatterwalk.h>
  
-+		pr_err("mv_cesa_int: %d 0x%x 0x%x\n", engine->id, status, mask);
-+
- 		/*
- 		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
- 		 * relevant on some platforms.
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index 2200bc6a034f..be8471a8ab22 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -396,6 +396,8 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
- 	}
  
- 	atomic_sub(ahashreq->nbytes, &engine->load);
+-#define ZSTD_DEF_LEVEL	3
++#define ZSTD_DEF_LEVEL		3
++#define ZSTD_MAX_WINDOWLOG	18
++#define ZSTD_MAX_SIZE		BIT(ZSTD_MAX_WINDOWLOG)
+ 
+ struct zstd_ctx {
+ 	zstd_cctx *cctx;
+ 	zstd_dctx *dctx;
+-	void *cwksp;
+-	void *dwksp;
++	size_t wksp_size;
++	zstd_parameters params;
++	u8 wksp[];
+ };
+ 
+-static zstd_parameters zstd_params(void)
++static DEFINE_MUTEX(zstd_stream_lock);
 +
-+	pr_err("mv_cesa_ahash_complete: %d 0x%lx\n", engine->id, (unsigned long)ahashreq);
++static void *zstd_alloc_stream(void)
+ {
+-	return zstd_get_params(ZSTD_DEF_LEVEL, 0);
+-}
+-
+-static int zstd_comp_init(struct zstd_ctx *ctx)
+-{
+-	int ret = 0;
+-	const zstd_parameters params = zstd_params();
+-	const size_t wksp_size = zstd_cctx_workspace_bound(&params.cParams);
+-
+-	ctx->cwksp = vzalloc(wksp_size);
+-	if (!ctx->cwksp) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ctx->cctx = zstd_init_cctx(ctx->cwksp, wksp_size);
+-	if (!ctx->cctx) {
+-		ret = -EINVAL;
+-		goto out_free;
+-	}
+-out:
+-	return ret;
+-out_free:
+-	vfree(ctx->cwksp);
+-	goto out;
+-}
+-
+-static int zstd_decomp_init(struct zstd_ctx *ctx)
+-{
+-	int ret = 0;
+-	const size_t wksp_size = zstd_dctx_workspace_bound();
+-
+-	ctx->dwksp = vzalloc(wksp_size);
+-	if (!ctx->dwksp) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ctx->dctx = zstd_init_dctx(ctx->dwksp, wksp_size);
+-	if (!ctx->dctx) {
+-		ret = -EINVAL;
+-		goto out_free;
+-	}
+-out:
+-	return ret;
+-out_free:
+-	vfree(ctx->dwksp);
+-	goto out;
+-}
+-
+-static void zstd_comp_exit(struct zstd_ctx *ctx)
+-{
+-	vfree(ctx->cwksp);
+-	ctx->cwksp = NULL;
+-	ctx->cctx = NULL;
+-}
+-
+-static void zstd_decomp_exit(struct zstd_ctx *ctx)
+-{
+-	vfree(ctx->dwksp);
+-	ctx->dwksp = NULL;
+-	ctx->dctx = NULL;
+-}
+-
+-static int __zstd_init(void *ctx)
+-{
+-	int ret;
+-
+-	ret = zstd_comp_init(ctx);
+-	if (ret)
+-		return ret;
+-	ret = zstd_decomp_init(ctx);
+-	if (ret)
+-		zstd_comp_exit(ctx);
+-	return ret;
+-}
+-
+-static void *zstd_alloc_ctx(void)
+-{
+-	int ret;
++	zstd_parameters params;
+ 	struct zstd_ctx *ctx;
++	size_t wksp_size;
+ 
+-	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	params = zstd_get_params(ZSTD_DEF_LEVEL, ZSTD_MAX_SIZE);
++
++	wksp_size = max_t(size_t,
++			  zstd_cstream_workspace_bound(&params.cParams),
++			  zstd_dstream_workspace_bound(ZSTD_MAX_SIZE));
++	if (!wksp_size)
++		return ERR_PTR(-EINVAL);
++
++	ctx = kvmalloc(sizeof(*ctx) + wksp_size, GFP_KERNEL);
+ 	if (!ctx)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	ret = __zstd_init(ctx);
+-	if (ret) {
+-		kfree(ctx);
+-		return ERR_PTR(ret);
+-	}
++	ctx->params = params;
++	ctx->wksp_size = wksp_size;
+ 
+ 	return ctx;
  }
  
- static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
-@@ -417,6 +419,8 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
- 	struct ahash_request *ahashreq = ahash_request_cast(req);
- 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
- 
-+	pr_err("mv_cesa_ahash_req_cleanup: %d 0x%lx\n", creq->base.engine->id, (unsigned long)ahashreq);
+-static void __zstd_exit(void *ctx)
++static struct crypto_acomp_streams zstd_streams = {
++	.alloc_ctx = zstd_alloc_stream,
++	.cfree_ctx = kvfree,
++};
 +
- 	if (creq->last_req)
- 		mv_cesa_ahash_last_cleanup(ahashreq);
- 
-@@ -783,6 +787,7 @@ static int mv_cesa_ahash_queue_req(struct ahash_request *req)
- 	engine = mv_cesa_select_engine(req->nbytes);
- 	mv_cesa_ahash_prepare(&req->base, engine);
- 
-+	pr_err("mv_cesa_ahash_queue_req: %d 0x%lx %d %d\n", engine->id, (unsigned long)req, req->nbytes, creq->last_req);
- 	ret = mv_cesa_queue_req(&req->base, &creq->base);
- 
- 	if (mv_cesa_req_needs_cleanup(&req->base, ret))
-diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
-index 9b5fd957dde2..59be742c5a1c 100644
---- a/drivers/crypto/marvell/cesa/tdma.c
-+++ b/drivers/crypto/marvell/cesa/tdma.c
-@@ -47,6 +47,8 @@ void mv_cesa_dma_step(struct mv_cesa_req *dreq)
- 	engine->chain_hw.last = dreq->chain.last;
- 	spin_unlock_bh(&engine->lock);
- 
-+	pr_err("mv_cesa_dma_step: %d 0x%lx 0x%lx 0x%lx\n", engine->id, (unsigned long)dreq, (unsigned long)dreq->chain.first->cur_dma, (unsigned long)dreq->chain.last->cur_dma);
++static int zstd_init(struct crypto_acomp *acomp_tfm)
+ {
+-	zstd_comp_exit(ctx);
+-	zstd_decomp_exit(ctx);
++	int ret = 0;
 +
- 	writel_relaxed(0, engine->regs + CESA_SA_CFG);
++	mutex_lock(&zstd_stream_lock);
++	ret = crypto_acomp_alloc_streams(&zstd_streams);
++	mutex_unlock(&zstd_stream_lock);
++
++	return ret;
+ }
  
- 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
-@@ -137,6 +139,7 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
- 	int res = 0;
+-static void zstd_free_ctx(void *ctx)
++static void zstd_exit(struct crypto_acomp *acomp_tfm)
+ {
+-	__zstd_exit(ctx);
+-	kfree_sensitive(ctx);
++	crypto_acomp_free_streams(&zstd_streams);
+ }
  
- 	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
-+	pr_err("mv_cesa_tdma_process: %d 0x%lx\n", engine->id, (unsigned long)tdma_cur);
+-static int __zstd_compress(const u8 *src, unsigned int slen,
+-			   u8 *dst, unsigned int *dlen, void *ctx)
++static int zstd_compress(struct acomp_req *req)
+ {
+-	size_t out_len;
+-	struct zstd_ctx *zctx = ctx;
+-	const zstd_parameters params = zstd_params();
++	struct crypto_acomp_stream *s;
++	unsigned int pos, scur, dcur;
++	unsigned int total_out = 0;
++	bool data_available = true;
++	zstd_out_buffer outbuf;
++	struct acomp_walk walk;
++	zstd_in_buffer inbuf;
++	struct zstd_ctx *ctx;
++	size_t pending_bytes;
++	size_t num_bytes;
++	int ret;
  
- 	for (tdma = engine->chain_hw.first; tdma; tdma = next) {
- 		spin_lock_bh(&engine->lock);
-@@ -186,6 +189,8 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
- 			break;
+-	out_len = zstd_compress_cctx(zctx->cctx, dst, *dlen, src, slen, &params);
+-	if (zstd_is_error(out_len))
+-		return -EINVAL;
+-	*dlen = out_len;
+-	return 0;
+-}
++	s = crypto_acomp_lock_stream_bh(&zstd_streams);
++	ctx = s->ctx;
+ 
+-static int zstd_scompress(struct crypto_scomp *tfm, const u8 *src,
+-			  unsigned int slen, u8 *dst, unsigned int *dlen,
+-			  void *ctx)
+-{
+-	return __zstd_compress(src, slen, dst, dlen, ctx);
+-}
++	ret = acomp_walk_virt(&walk, req, true);
++	if (ret)
++		goto err;
+ 
+-static int __zstd_decompress(const u8 *src, unsigned int slen,
+-			     u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	size_t out_len;
+-	struct zstd_ctx *zctx = ctx;
+-
+-	out_len = zstd_decompress_dctx(zctx->dctx, dst, *dlen, src, slen);
+-	if (zstd_is_error(out_len))
+-		return -EINVAL;
+-	*dlen = out_len;
+-	return 0;
+-}
+-
+-static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen,
+-			    void *ctx)
+-{
+-	return __zstd_decompress(src, slen, dst, dlen, ctx);
+-}
+-
+-static struct scomp_alg scomp = {
+-	.alloc_ctx		= zstd_alloc_ctx,
+-	.free_ctx		= zstd_free_ctx,
+-	.compress		= zstd_scompress,
+-	.decompress		= zstd_sdecompress,
+-	.base			= {
+-		.cra_name	= "zstd",
+-		.cra_driver_name = "zstd-scomp",
+-		.cra_module	 = THIS_MODULE,
++	ctx->cctx = zstd_init_cstream(&ctx->params, 0, ctx->wksp, ctx->wksp_size);
++	if (!ctx->cctx) {
++		ret = -EINVAL;
++		goto err;
  	}
- 
-+	pr_err("mv_cesa_tdma_process: %d %d 0x%lx\n", engine->id, res, (unsigned long)req);
 +
- 	/*
- 	 * Save the last request in error to engine->req, so that the core
- 	 * knows which request was faulty
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index 6815eddc9068..230501fe843b 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -374,6 +374,12 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
- 
- 		memcpy(ahashreq->result, data, digsize);
- 	} else {
-+		struct {
-+			u32 digest[8];
-+			u64 len;
-+		} state;
++	do {
++		dcur = acomp_walk_next_dst(&walk);
++		if (!dcur) {
++			ret = -ENOSPC;
++			goto err;
++		}
 +
-+		memcpy(state.digest, creq->state, digsize);
- 		for (i = 0; i < digsize / 4; i++)
- 			creq->state[i] = readl_relaxed(engine->regs +
- 						       CESA_IVDIG(i));
-@@ -393,6 +399,21 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
- 				for (i = 0; i < digsize / 4; i++)
- 					result[i] = cpu_to_be32(creq->state[i]);
- 			}
-+		} else {
-+			HASH_FBREQ_ON_STACK(fbreq, ahashreq);
++		outbuf.pos = 0;
++		outbuf.dst = (u8 *)walk.dst.virt.addr;
++		outbuf.size = dcur;
 +
-+			crypto_ahash_import_core(fbreq, &state);
-+			crypto_ahash_update(fbreq);
-+			crypto_ahash_export_core(fbreq, &state);
-+			if (memcmp(state.digest, creq->state, digsize)) {
-+				pr_err("mv_cesa_ahash_complete partial hash mismatch\n");
-+				print_hex_dump(KERN_ERR, "", DUMP_PREFIX_OFFSET,
-+						16, 1,
-+						state.digest, digsize, false);
-+				print_hex_dump(KERN_ERR, "", DUMP_PREFIX_OFFSET,
-+						16, 1,
-+						creq->state, digsize, false);
++		do {
++			scur = acomp_walk_next_src(&walk);
++			if (scur) {
++				inbuf.pos = 0;
++				inbuf.src = walk.src.virt.addr;
++				inbuf.size = scur;
++			} else {
++				data_available = false;
++				break;
 +			}
- 		}
- 	}
++
++			num_bytes = zstd_compress_stream(ctx->cctx, &outbuf, &inbuf);
++			if (ZSTD_isError(num_bytes)) {
++				ret = -EIO;
++				goto err;
++			}
++
++			pending_bytes = zstd_flush_stream(ctx->cctx, &outbuf);
++			if (ZSTD_isError(pending_bytes)) {
++				ret = -EIO;
++				goto err;
++			}
++
++			acomp_walk_done_src(&walk, inbuf.pos);
++		} while (dcur != outbuf.pos);
++
++		total_out += outbuf.pos;
++		acomp_walk_done_dst(&walk, dcur);
++	} while (data_available);
++
++	pos = outbuf.pos;
++	num_bytes = zstd_end_stream(ctx->cctx, &outbuf);
++	if (ZSTD_isError(num_bytes))
++		ret = -EIO;
++	else
++		total_out += (outbuf.pos - pos);
++
++err:
++	if (ret)
++		req->dlen = 0;
++	else
++		req->dlen = total_out;
++
++	crypto_acomp_unlock_stream_bh(s);
++
++	return ret;
++}
++
++static int zstd_decompress(struct acomp_req *req)
++{
++	struct crypto_acomp_stream *s;
++	unsigned int total_out = 0;
++	unsigned int scur, dcur;
++	zstd_out_buffer outbuf;
++	struct acomp_walk walk;
++	zstd_in_buffer inbuf;
++	struct zstd_ctx *ctx;
++	size_t pending_bytes;
++	int ret;
++
++	s = crypto_acomp_lock_stream_bh(&zstd_streams);
++	ctx = s->ctx;
++
++	ret = acomp_walk_virt(&walk, req, true);
++	if (ret)
++		goto err;
++
++	ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
++	if (!ctx->dctx) {
++		ret = -EINVAL;
++		goto err;
++	}
++
++	do {
++		scur = acomp_walk_next_src(&walk);
++		if (scur) {
++			inbuf.pos = 0;
++			inbuf.size = scur;
++			inbuf.src = walk.src.virt.addr;
++		} else {
++			break;
++		}
++
++		do {
++			dcur = acomp_walk_next_dst(&walk);
++			if (!dcur) {
++				ret = -ENOSPC;
++				goto err;
++			}
++
++			outbuf.pos = 0;
++			outbuf.dst = (u8 *)walk.dst.virt.addr;
++			outbuf.size = dcur;
++
++			pending_bytes = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
++			if (ZSTD_isError(pending_bytes)) {
++				ret = -EIO;
++				goto err;
++			}
++
++			total_out += outbuf.pos;
++
++			acomp_walk_done_dst(&walk, outbuf.pos);
++		} while (scur != inbuf.pos);
++
++		if (scur)
++			acomp_walk_done_src(&walk, scur);
++	} while (ret == 0);
++
++err:
++	if (ret)
++		req->dlen = 0;
++	else
++		req->dlen = total_out;
++
++	crypto_acomp_unlock_stream_bh(s);
++
++	return ret;
++}
++
++static struct acomp_alg zstd_acomp = {
++	.base = {
++		.cra_name = "zstd",
++		.cra_driver_name = "zstd-generic",
++		.cra_flags = CRYPTO_ALG_REQ_VIRT,
++		.cra_module = THIS_MODULE,
++	},
++	.init = zstd_init,
++	.exit = zstd_exit,
++	.compress = zstd_compress,
++	.decompress = zstd_decompress,
+ };
  
+ static int __init zstd_mod_init(void)
+ {
+-	return crypto_register_scomp(&scomp);
++	return crypto_register_acomp(&zstd_acomp);
+ }
+ 
+ static void __exit zstd_mod_fini(void)
+ {
+-	crypto_unregister_scomp(&scomp);
++	crypto_unregister_acomp(&zstd_acomp);
+ }
+ 
+ module_init(zstd_mod_init);
+
+base-commit: 3277a32e6662984c01997bec34d20ab0a98f85ce
+-- 
+2.40.1
+
