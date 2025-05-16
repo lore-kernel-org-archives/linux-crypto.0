@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4D3280A53;
-	Fri, 16 May 2025 23:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC468280A50;
+	Fri, 16 May 2025 23:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747437702; cv=none; b=LssBJtt6uZKs+6U7wkLbbXIwy6jGgnmt/fcDb0Edx+Jkq73Y1eXd9yZYBUOQfVsHoNuLIEE19AUW6VtOQBgY9dLU12BfUuYHnV+Sa/iRDKeQz7nNzkYJ+I1xWQqPlHfgUChVZKBnCydZu1Rnsb/bmBSVhEKKoT+xCDlD//n3Wu0=
+	t=1747437702; cv=none; b=chHbnQ/x7LsfdG3snsbz+3RjJuOuxWlmbDH1hcK3Z52H6Y0SImsZurMtYScd0G8WdS2dqYCv4ywb1pvZjoNjzvBcgjG7ETMx3Eurn4EPvXdmp22SyT4q4JRD5fcKkKhHlTA9X8c59jRc+2hxh0sEGBcZh83jupKWucz7AjQrlmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747437702; c=relaxed/simple;
-	bh=EyEIYHKmSDcRWjcjZuBlOz8/xbPehLGEHqj0Xc579mU=;
+	bh=sLfkWTBYyB2WFGVd1rCVQoVKboVRhpxKeej9ZVD3hzM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QgLofKP/sAhlhuBzW8ObPa2hDwBJAhx+td52vixJWj8SdUxTpygTs7IEEwOmdLMdqPiCrjshD2/zoC0qJZ5EWUH78EwSFtl+N2fGUhH2Yj7kvhPd2OCNsMq/nk36ZL0f/lg1Py8CQY2F4Ic9+7ioLBiH2bA2j5xjIHw92ovGVX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dV/au78r; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RfMcok0Vj2x9r8E5qqo8t3ylgnTQdD21GIlhDKUJ4TlqtPVnQ9kDUd6ht7EnvhmOfiHhjH0XMEvdvu9K0X8nbaPtKucN1qW93Zj3p+uJFM4yk+cDQS8bhwRnGyASkWfBU+CUFSzwBPaOFYItPVHPmLfBdqUGeLN9NYyNm4gHQ1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gg3Un5t5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dV/au78r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DC29C4CEE9;
-	Fri, 16 May 2025 23:21:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gg3Un5t5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC46C4CEF2;
+	Fri, 16 May 2025 23:21:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747437700;
-	bh=EyEIYHKmSDcRWjcjZuBlOz8/xbPehLGEHqj0Xc579mU=;
+	s=k20201202; t=1747437701;
+	bh=sLfkWTBYyB2WFGVd1rCVQoVKboVRhpxKeej9ZVD3hzM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dV/au78riVFVpGQw7WnhYNZLgBcB/NnyKgJNRSWGsVkWk4m16wMco8idAskCoVfLO
-	 +LyAWGHYkZtKuQjN4PEBCRu8Mb7FQBLbjqMJUEURUzN5VgMgIBf+rXvKkd7MGfjRT3
-	 nmf0YijhWYWA6TcwhMqE+IcCvn+XfTkBP7PzhHKgkfdu+xp6ESbq6xR5zRiuyWHORP
-	 CPb/zH6GuDCNlbfsa0VDd/EGyw+mAXzI8YwKeDEKVEzPuZIWywIN0BzTJoCu8wsEi9
-	 Kc82iV1eU0k5WHKrox6k+Qt3VgR1aBwNHkjKKmtqgSuYMTGI/qKVziu7BXyz18595+
-	 ADb2u8YfmKJvQ==
+	b=gg3Un5t5FRNT6Yb37sRTNNOSXlRm2yt9IpI4JqgQKen7SkU4e/mZTxGXvNXcM0eaZ
+	 JTca3rNAEkTrn5QEzMv0q7FklKXl4vC61M/yiigTp03BbA4wC/r06vzzPUbEpoiVjb
+	 5sTDPoUBWmCP6zxktR2nIr4frhVzimb52t+kEoB5bh8xyxvJbGAy2LL0Weex2uPRVY
+	 OabLNGZN72GZGuO1kdKG/6HQ2VsG3nj5PzP1ued2gHGmLVeYZExRsr+y0sy+7GhJ+K
+	 aGDSGbRmo3I9Yeimz8DNRJ39vUrcloWAEUiVAPXbtXdD5Krq2B45XIzHY5EJKiwQtA
+	 Mw+rManAw+e6w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Ayush Jain <Ayush.Jain3@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 1/3] x86/fpu: Add fpu_save_state() for __save_processor_state()
-Date: Fri, 16 May 2025 16:18:56 -0700
-Message-ID: <20250516231858.27899-2-ebiggers@kernel.org>
+Subject: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
+Date: Fri, 16 May 2025 16:18:58 -0700
+Message-ID: <20250516231858.27899-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250516231858.27899-1-ebiggers@kernel.org>
 References: <20250516231858.27899-1-ebiggers@kernel.org>
@@ -52,123 +52,128 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add a new function fpu_save_state() which handles the FPU state saving
-and invalidation that __save_processor_state() needs.  This will allow
-__save_processor_state() to stop using kernel_fpu_begin() and
-kernel_fpu_end() for something other than actual kernel-mode FPU.
+Make irq_fpu_usable() return false when irqs_disabled().  That makes the
+irqs_disabled() checks in kernel_fpu_begin_mask() and kernel_fpu_end()
+unnecessary, so also remove those.
 
+Rationale:
+
+- There's no known use case for kernel-mode FPU when irqs_disabled().
+  arm64 and riscv already disallow kernel-mode FPU when irqs_disabled().
+  __save_processor_state() previously did expect kernel_fpu_begin() and
+  kernel_fpu_end() to work when irqs_disabled(), but this was a
+  different use case and not actual kernel-mode FPU use.
+
+- This is more efficient, since one call to irqs_disabled() replaces two
+  irqs_disabled() and one in_hardirq().
+
+- This fixes irq_fpu_usable() to correctly return false during CPU
+  initialization.  Incorrectly returning true caused the SHA-256 library
+  code, which is called when loading AMD microcode, to take a
+  SIMD-optimized code path too early, causing a crash.  By correctly
+  returning false from irq_fpu_usable(), the generic SHA-256 code
+  correctly gets used instead.  (Note: SIMD-optimized SHA-256 doesn't
+  get enabled until subsys_initcall, but CPU hotplug can happen later.)
+
+Fixes: 11d7956d526f ("crypto: x86/sha256 - implement library instead of shash")
+Reported-by: Ayush Jain <Ayush.Jain3@amd.com>
+Closes: https://lore.kernel.org/r/20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/include/asm/fpu/api.h |  1 +
- arch/x86/kernel/fpu/core.c     | 43 ++++++++++++++++++++++++++++------
- 2 files changed, 37 insertions(+), 7 deletions(-)
+ arch/x86/kernel/fpu/core.c | 49 ++++++++++++++------------------------
+ 1 file changed, 18 insertions(+), 31 deletions(-)
 
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 8e6848f55dcdb..3ad359c5b100e 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -26,10 +26,11 @@
- #define KFPU_MXCSR	_BITUL(1)	/* MXCSR will be initialized */
- 
- extern void kernel_fpu_begin_mask(unsigned int kfpu_mask);
- extern void kernel_fpu_end(void);
- extern bool irq_fpu_usable(void);
-+extern void fpu_save_state(void);
- extern void fpregs_mark_activate(void);
- 
- /* Code that is unaware of kernel_fpu_begin_mask() can use this */
- static inline void kernel_fpu_begin(void)
- {
 diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 948b4f5fad99c..476393b1d5e8f 100644
+index 476393b1d5e8f..9b3c5e17f86cd 100644
 --- a/arch/x86/kernel/fpu/core.c
 +++ b/arch/x86/kernel/fpu/core.c
-@@ -118,11 +118,11 @@ static void update_avx_timestamp(struct fpu *fpu)
+@@ -66,42 +66,31 @@ struct fpu *x86_task_fpu(struct task_struct *task)
+  * Can we use the FPU in kernel mode with the
+  * whole "kernel_fpu_begin/end()" sequence?
+  */
+ bool irq_fpu_usable(void)
+ {
+-	if (WARN_ON_ONCE(in_nmi()))
+-		return false;
+-
+ 	/*
+-	 * In kernel FPU usage already active?  This detects any explicitly
+-	 * nested usage in task or softirq context, which is unsupported.  It
+-	 * also detects attempted usage in a hardirq that has interrupted a
+-	 * kernel-mode FPU section.
++	 * To ensure that (non-explicitly-nested) kernel-mode FPU is always
++	 * usable in task and softirq contexts, kernel_fpu_begin() disables
++	 * preemption and softirqs, and kernel_fpu_end() re-enables them.  That
++	 * is not compatible with hardirqs being disabled (including hardirq
++	 * context), or with NMI context.  Support for kernel-mode FPU is not
++	 * needed in those contexts anyway.  Return false in those contexts.
++	 *
++	 * Returning false when irqs_disabled() also eliminates the need to
++	 * explicitly check whether the FPU has been initialized yet during CPU
++	 * initialization.  Before then, hardirqs are still disabled.
+ 	 */
++	if (irqs_disabled() || WARN_ON_ONCE(in_nmi()))
++		return false;
++
++	/* Catch any explicitly nested usage, which should never happen. */
+ 	if (this_cpu_read(in_kernel_fpu)) {
+-		WARN_ON_FPU(!in_hardirq());
++		WARN_ON_FPU(1);
+ 		return false;
+ 	}
+-
+-	/*
+-	 * When not in NMI or hard interrupt context, FPU can be used in:
+-	 *
+-	 * - Task context except from within fpregs_lock()'ed critical
+-	 *   regions.
+-	 *
+-	 * - Soft interrupt processing context which cannot happen
+-	 *   while in a fpregs_lock()'ed critical region.
+-	 */
+-	if (!in_hardirq())
+-		return true;
+-
+-	/*
+-	 * In hard interrupt context it's safe when soft interrupts
+-	 * are enabled, which means the interrupt did not hit in
+-	 * a fpregs_lock()'ed critical region.
+-	 */
+-	return !softirq_count();
++	return true;
+ }
+ EXPORT_SYMBOL(irq_fpu_usable);
  
  /*
-  * Save the FPU register state in fpu->fpstate->regs. The register state is
-  * preserved.
-  *
-- * Must be called with fpregs_lock() held.
-+ * Must be called with fpregs_lock() held or hardirqs disabled.
-  *
-  * The legacy FNSAVE instruction clears all FPU state unconditionally, so
-  * register state has to be reloaded. That might be a pointless exercise
-  * when the FPU is going to be used by another task right after that. But
-  * this only affects 20+ years old 32bit systems and avoids conditionals all
-@@ -431,26 +431,31 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- 	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
+  * Track AVX512 state use because it is known to slow the max clock
+@@ -443,12 +432,11 @@ static __always_inline void __fpu_save_state(void)
+ 	__cpu_invalidate_fpregs_state();
  }
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
  
-+static __always_inline void __fpu_save_state(void)
-+{
-+	if (!(current->flags & (PF_KTHREAD | PF_USER_WORKER)) &&
-+	    !test_thread_flag(TIF_NEED_FPU_LOAD)) {
-+		set_thread_flag(TIF_NEED_FPU_LOAD);
-+		save_fpregs_to_fpstate(x86_task_fpu(current));
-+	}
-+	__cpu_invalidate_fpregs_state();
-+}
-+
  void kernel_fpu_begin_mask(unsigned int kfpu_mask)
  {
- 	if (!irqs_disabled())
- 		fpregs_lock();
+-	if (!irqs_disabled())
+-		fpregs_lock();
++	fpregs_lock();
  
  	WARN_ON_FPU(!irq_fpu_usable());
  	WARN_ON_FPU(this_cpu_read(in_kernel_fpu));
  
  	this_cpu_write(in_kernel_fpu, true);
+@@ -467,12 +455,11 @@ EXPORT_SYMBOL_GPL(kernel_fpu_begin_mask);
+ void kernel_fpu_end(void)
+ {
+ 	WARN_ON_FPU(!this_cpu_read(in_kernel_fpu));
  
--	if (!(current->flags & (PF_KTHREAD | PF_USER_WORKER)) &&
--	    !test_thread_flag(TIF_NEED_FPU_LOAD)) {
--		set_thread_flag(TIF_NEED_FPU_LOAD);
--		save_fpregs_to_fpstate(x86_task_fpu(current));
--	}
--	__cpu_invalidate_fpregs_state();
-+	__fpu_save_state();
- 
- 	/* Put sane initial values into the control registers. */
- 	if (likely(kfpu_mask & KFPU_MXCSR) && boot_cpu_has(X86_FEATURE_XMM))
- 		ldmxcsr(MXCSR_DEFAULT);
- 
-@@ -467,10 +472,34 @@ void kernel_fpu_end(void)
- 	if (!irqs_disabled())
- 		fpregs_unlock();
+ 	this_cpu_write(in_kernel_fpu, false);
+-	if (!irqs_disabled())
+-		fpregs_unlock();
++	fpregs_unlock();
  }
  EXPORT_SYMBOL_GPL(kernel_fpu_end);
  
-+#ifdef CONFIG_PM_SLEEP
-+/*
-+ * If the FPU registers are live for the current task, save them to current's
-+ * memory register state and set TIF_NEED_FPU_LOAD.  This is used by the suspend
-+ * and kexec code to prepare for the FPU registers being clobbered.  Unlike
-+ * kernel_fpu_begin(), this function can be called with hardirqs disabled, and
-+ * it does not initialize the FPU control registers for kernel-mode FPU use.
-+ */
-+void fpu_save_state(void)
-+{
-+	unsigned long flags;
-+
-+	WARN_ON_FPU(this_cpu_read(in_kernel_fpu));
-+
-+	/*
-+	 * This is sometimes called with hardirqs disabled, so we need to use
-+	 * local_irq_save/restore() instead of fpregs_lock/unlock().
-+	 */
-+	local_irq_save(flags);
-+	__fpu_save_state();
-+	local_irq_restore(flags);
-+}
-+#endif /* CONFIG_PM_SLEEP */
-+
+ #ifdef CONFIG_PM_SLEEP
  /*
-  * Sync the FPU register state to current's memory register state when the
-  * current task owns the FPU. The hardware register state is preserved.
-  */
- void fpu_sync_fpstate(struct fpu *fpu)
 -- 
 2.49.0
 
