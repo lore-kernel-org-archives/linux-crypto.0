@@ -1,87 +1,133 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F0E1A704B;
-	Fri, 16 May 2025 20:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078BC22DA15;
+	Fri, 16 May 2025 23:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747427676; cv=none; b=o3UY2A4oI8pgIBfOL9fwLhBdCx/GEGFOUfoo0nkcqjpqiIwqgszDp5vCNZUU9fKqMYLfaXmBgecECSA65oOP8eFRSHeKPTQNGRLN/kBuUadhBQE8culUO1wpPAiVsn8HbOkKI8A19uVRa0vriCVlAOQQya/hbwmTHwC+dELvQF4=
+	t=1747437701; cv=none; b=OEwNcswIhwiM+7ac3mi/vXfnnSvxbS2nh5ipeTwcBTM91/D/cGle2VznF6kzDm8YUbk3ZsmJNjGgjIy4u+QFatbZbHzuYCsf0prXD6T01739ES48KfX8g0T9nd4HHbqUF9OuyTX7rkG7aUchZT7vLerCXynVMm/imR2kT46QIvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747427676; c=relaxed/simple;
-	bh=oDITZp2JUKinj2OF3yzLkCxXdgtggFHsz66jrQHnX7E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gyuYGx9Ef9KiGWS1KgsKlwMElorF2TaRZagNaxM/3E1IHZ3zvs0Hzhl/5V6ZbXmIe27hNwGmH9gksH/8VjJGniffJhLuxft0/zr5rG+jtdGgP35VyNLM4U83dfYnqk2HRFZKeeQKrLhBKkUSac/DT1U6zp0TIfNzNbqltT08iTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bEcwge25; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6+GOcLMP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1747437701; c=relaxed/simple;
+	bh=OwRlj0tM+iP/0crW1PSRzlCFDkAFzLKKS3A/BV9mA2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Jtblw81xeFaOpVnM1Ho3JPSvbX8YFoM4Z4DWgkS+iTXZ+f1g5J7bCAAW47K3O09KfhxUXjQFFDnVWKcwjIAVDqEwFfsQgqPIH+aswuVfeJ0PubpFpFcelNhzvgjT+6gDHTUbKz9xnsya2A4Iijt+o12joz+z+eh6KVIVblEt3hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obsMl2Qj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bEcwge25";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6+GOcLMP"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747427672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NrUWaZXoz1DpdYXQ04WhnkJI4EjPXUKE2xGFcUiCM0=;
-	b=bEcwge25WHvSPXYxmX1EfAKXU+1OW8cAagPhMlF24quearlFyfmB4OieaWIft/TYqRRE95
-	CcWbMNoB5ytdvw59wXJ4rnKseIZ7YAmUaLwT1G3zjQFPGCwxmMSEMppiL9B7hZgrKPwuH8
-	tG9RgFztCg/fAyfir7s2fR/dJoGaraOSSemPNTjs96K8cz26wvS7YAgBo0hVkFA2R8ckoe
-	gowBIh/wAiY4/vODFZjxSaMh5vsYQdU29arGEqUoDus19NOsI6GVpzgZ6IibZ4EYh257Dh
-	21l5NcaZRT7NFFHpgRdLTpJY+6TIXlCbx3eokDO65fDme0zbeULp39CZ1QUmKw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747427672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NrUWaZXoz1DpdYXQ04WhnkJI4EjPXUKE2xGFcUiCM0=;
-	b=6+GOcLMPecrhZkZJmyFAjBKqTblvXaeC0BAYdi0zoR4KZm5RCGrye9urGVI335Db781haK
-	e6bq6QJ9p9h0piAA==
-To: Eric Biggers <ebiggers@kernel.org>, Borislav Petkov <bp@alien8.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Jain@formenos.rohan.me.apana.org.au, Ayush <Ayush.Jain3@amd.com>, Stephen
- Rothwell <sfr@canb.auug.org.au>, x86-ml <x86@kernel.org>, lkml
- <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: lib/sha256 - Disable SIMD
-In-Reply-To: <20250516190637.GA32835@sol>
-References: <20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local>
- <aCcirrsFFrrRqf5A@gondor.apana.org.au>
- <aCcmJGuCnuyHmHbx@gondor.apana.org.au> <20250516170316.GD1241@sol>
- <20250516181322.GGaCeAQjnIVQx_tX_R@fat_crate.local>
- <20250516190637.GA32835@sol>
-Date: Fri, 16 May 2025 22:34:31 +0200
-Message-ID: <878qmwi9bc.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obsMl2Qj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EFECC4AF0B;
+	Fri, 16 May 2025 23:21:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747437700;
+	bh=OwRlj0tM+iP/0crW1PSRzlCFDkAFzLKKS3A/BV9mA2A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=obsMl2Qj/M0jALKhFX8su33JKI/fDILbHUAKFbgBNwOXicOKeOUSukI71e3Xn8x3U
+	 zobV0ZMt9YtTApbmnAGXvlblFbdTcVpXUAw1yuc5z/4YO53g/WNrwrjK6EnRSxi4Xc
+	 eyZIzFVdY0IxzIhP89CXPmkWR90EBmhMULqJVjEDELOJDvdCdOgHtTDfbyhq+45Hir
+	 dKEQIG2U+hHyl4985BUe3Nu5PlJcEA/oXIQ4OXiFynFoObxI9AKa2Hnd9xKSLIDxHl
+	 HP7oI+TNxanGWdVKRJvmFHXhYYri4WzG5pAzHv69fZoS7dyP4l+d6A6vbUwDd+HEKi
+	 1uobTrZiUx7QA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ayush Jain <Ayush.Jain3@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 2/3] x86/pm: Use fpu_save_state() in __save_processor_state()
+Date: Fri, 16 May 2025 16:18:57 -0700
+Message-ID: <20250516231858.27899-3-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250516231858.27899-1-ebiggers@kernel.org>
+References: <20250516231858.27899-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16 2025 at 12:06, Eric Biggers wrote:
-> What would you say about going back to my earlier plan to make irq_fpu_usable()
-> return false when irqs_disabled(), like what arm64 does?  (As I had in
-> https://lore.kernel.org/lkml/20250220051325.340691-2-ebiggers@kernel.org/).
+From: Eric Biggers <ebiggers@google.com>
 
-> +	return !this_cpu_read(in_kernel_fpu) &&
-> +		!in_hardirq() && !irqs_disabled() && !in_nmi();
+Make __save_processor_state() use fpu_save_state() instead of a
+kernel_fpu_begin() and kernel_fpu_end() pair.  This matches more
+directly what it needs.  This eliminates the need for kernel_fpu_begin()
+and kernel_fpu_end() to support the irqs_disabled() case.
 
-The !in_hardirq() is redundant because hard interrupt context runs with
-interrupts disabled.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/power/cpu.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-> I think that would handle all these cases, as well as others.  We'd need to fix
-> __save_processor_state() to save the FPU state directly without pretending that
-> it's using kernel-mode FPU, but I don't know of any issues besides
-> that.
+diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
+index 916441f5e85ce..dde4ccbc77f4b 100644
+--- a/arch/x86/power/cpu.c
++++ b/arch/x86/power/cpu.c
+@@ -81,11 +81,17 @@ static void msr_restore_context(struct saved_context *ctxt)
+ static void __save_processor_state(struct saved_context *ctxt)
+ {
+ #ifdef CONFIG_X86_32
+ 	mtrr_save_fixed_ranges(NULL);
+ #endif
+-	kernel_fpu_begin();
++
++	/*
++	 * The FPU registers may be live for the current task, so save them to
++	 * current's memory register state.  The corresponding restore happens
++	 * lazily when returning to userspace, not in restore_processor_state().
++	 */
++	fpu_save_state();
+ 
+ 	/*
+ 	 * descriptor tables
+ 	 */
+ 	store_idt(&ctxt->idt);
+@@ -99,11 +105,10 @@ static void __save_processor_state(struct saved_context *ctxt)
+ 	ctxt->gdt_desc.size = GDT_SIZE - 1;
+ 	ctxt->gdt_desc.address = (unsigned long)get_cpu_gdt_rw(smp_processor_id());
+ 
+ 	store_tr(ctxt->tr);
+ 
+-	/* XMM0..XMM15 should be handled by kernel_fpu_begin(). */
+ 	/*
+ 	 * segment registers
+ 	 */
+ 	savesegment(gs, ctxt->gs);
+ #ifdef CONFIG_X86_64
+@@ -139,18 +144,10 @@ void save_processor_state(void)
+ }
+ #ifdef CONFIG_X86_32
+ EXPORT_SYMBOL(save_processor_state);
+ #endif
+ 
+-static void do_fpu_end(void)
+-{
+-	/*
+-	 * Restore FPU regs if necessary.
+-	 */
+-	kernel_fpu_end();
+-}
+-
+ static void fix_processor_context(void)
+ {
+ 	int cpu = smp_processor_id();
+ #ifdef CONFIG_X86_64
+ 	struct desc_struct *desc = get_cpu_gdt_rw(cpu);
+@@ -272,11 +269,10 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
+ 	wrmsrq(MSR_KERNEL_GS_BASE, ctxt->usermode_gs_base);
+ #else
+ 	loadsegment(gs, ctxt->gs);
+ #endif
+ 
+-	do_fpu_end();
+ 	tsc_verify_tsc_adjust(true);
+ 	x86_platform.restore_sched_clock_state();
+ 	cache_bp_restore();
+ 	perf_restore_debug_store();
+ 
+-- 
+2.49.0
 
-Looks about right.
-
-> Then we could also delete the irqs_disabled() checks that I added to
-> kernel_fpu_begin() and kernel_fpu_end().
-
-Yes. That conditional locking is horrible.
-
-Thanks,
-
-        tglx
