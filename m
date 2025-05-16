@@ -1,111 +1,122 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099B7238C1D;
-	Fri, 16 May 2025 12:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865FCA32;
+	Fri, 16 May 2025 12:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747397308; cv=none; b=hzJkMYJ8PfhA4hLmorSo1nuGBzoAwWNUxzZZR5f4GWYuR2rLYjmHBIRqxZOd7BS0cLVstPQnc0FXTbS3GCDKwnhd7vy79VVq0Mzxcxb0ZXw5gqKHtktxeDYntDz97h3VHiy/tm1j+aEpn/xm453XLFDLyISZcruO5MYH82uI82Q=
+	t=1747398458; cv=none; b=P5oVONDRk5ofQezZrFEy0EhhtTo5jRFIAZFcRZ854PiQg7KNmGNOgXxkGa4zu7UntuxpcIfLzCX6FCmNa7H/nFHdGxACOj6sjlmXMKccG9UPYc/jKoFtz5/gjT8C9me0bSvzOP6ihrMo4MiwKjMW0GUcppjvMIlYHFzjp06mE6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747397308; c=relaxed/simple;
-	bh=LLFTaXnhleq34jL/n5gBjVlQjNQtKROkYDnqUvpqa5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPtK4UGFLx06E2jj8iJ8lgKMgBiPAInYPBvUC/Ex73QbD+gnYhNt8bJHPI/VXE6a6S++LXzUygugZzamXRWZ+9VhZbZ8lLJxdmOEouiAUuNSIvEDCl6J46n00pex3DwPeA1aok+25sT7jyh+/NkG08dpsavQaPi3lJccuqVMao4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+9LraLU; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747398458; c=relaxed/simple;
+	bh=msf1u6psXmm5YGgNc/J1e9yKeJ4zJ9sPS2p6grmcTnI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iZ33gIeQlarrO8hmZ6eUIGzqmcHnukaJmw0NoPyfMalAN2v1e3fvrEVjkyPBSNglxrFgM+P1LO7Q8EVAzLaxJdFuwb/n8dX6PNyAZIIVfNh0yrYS5wDvHJRbRiQJxIkh0RX201yLKFtjhVslCsa8e7C4+wmOeHpgUK31fAQVMNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=OX8m74ex; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+9LraLU"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so15204145e9.1;
-        Fri, 16 May 2025 05:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747397305; x=1748002105; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l7S/vG1lp5geqRglunYVLNLd5lLTAffxPlQ/qp918/4=;
-        b=i+9LraLU+vxLQtPtNgarbmStQYEmWuOTuoxvpQRl/yiPpQhDXn9PdfgWT92Sje4+B5
-         Egfat00fnh33qd0tgDLhT2OtlOvX0QI9KIrzkkmBc73Dx4Tm5i82EFOZ0hY1MaGdeOQD
-         0vF7zUVYOle4JK6MUxY+CZZdZ2R7rIoD3wV15c5e6t2gDg9AxpNmdeG4WcfBKSvZCgm3
-         R3AUdggWy1YcHppL5+KhmUmMQAECkR0qVTwWXJOITFbZ5WcBmWCxN8RWoKL2zSlDw6XL
-         SW8W1hrw5IJkhvrM5JhirC9fRU0ZAFBSKFudSxAaDuc8NyrNmrJbo8lA6f6YzzThnDpK
-         YRbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747397305; x=1748002105;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l7S/vG1lp5geqRglunYVLNLd5lLTAffxPlQ/qp918/4=;
-        b=uQsZtH0ewakaqNDN4dpedQgMlyHc7QMZ06vYk5hA6UQsVawhgH7cZLUzskNpajw7AZ
-         +KJVP6w+oAGlb0yPaea0NxOBDneWZyI4FvRLcZEf/5/4t0YuoYbFVrGrRoP26hBACK2o
-         FdP2X0dg8X3qqQ3FCFTssal6stFEMHjnlYLVdWMUC0uLhhI/2Th8f6HeYvzU50gWKikb
-         iSI4wNdWQlx7v9fHD2Qv9Y7JiGuNFYFEmI6Z9ioF1oH+gCxELckm3GF87EQMzYuc+Wyk
-         xWjBJuriSfhq2P9Zimys7mH4G7RJBZ8SF5MPmGSx0EyCNKUz0TVrpERt8BvI7axEtJx2
-         BUeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKa9dtH638AxQ/baUR2FPCyxwnLtsDHIGAt65tzm9pvOQR5PmrQlquyLgc3Hj3zVJ/EKRgGK8YSR//NFN8@vger.kernel.org, AJvYcCWJLl9JZv8U+zvjtJe0bF73Qu0BRspPqcKL8Dyh+oofgl80wbDKjBl+uNlaxNNy4CWbiVjVqQhjYluxq3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypjvX3jFeQYMjx3ew1OLu6c2Y7lxWTs9uO4aKmGlMTWIuyatax
-	YTFSG/O6dgIyefzcgdDacTXfNSUvM3oa+v9+ipFxx2jUPU0UM2pzSAWH
-X-Gm-Gg: ASbGncvLoFBJZiUuHAA070ACAIDMkAY3Xb2hXmkR0o0H8OU6vYK7W2BwE16NmcRyuee
-	MhnXcGuxBg6EHSRxNh5HG6TqDYy7Xxedkssm5OoERN72c6zmzmd+5pCHBklqsNHVadzzAfOYlgq
-	T/LijH6Ffr53HMaXUiAQlKgHPSz0saVajmvNT6ND87qQu5Y5/ovGLFVXVNC/0G1Nfrdd2fWRa77
-	TXSl8i1UO9tOoYqqamtKF60/nowI569Br/bRhygcohrnOVfh4O3sVDhcnExMfyv4YUaAdinCLCr
-	ju3YGr6hckDpZyXUdPC/WeznEO6tGkaXmIOgDVhbp6a10xyP50q0WaY8ZnpQd9DfORZIf/cQfnO
-	2fUY=
-X-Google-Smtp-Source: AGHT+IETHNO4PZaxAV5fQzFYG7nB1lHUisZaUbqvlKR7l0R0thhXbB9LDnls9f0950ZGMS0nNFwq9w==
-X-Received: by 2002:a05:600c:821b:b0:43b:bfa7:c7d with SMTP id 5b1f17b1804b1-442f84c2008mr72290655e9.2.1747397304833;
-        Fri, 16 May 2025 05:08:24 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:2f07:610b:a400:6472:d2f9:d536:4c30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f338050csm102275725e9.10.2025.05.16.05.08.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 05:08:24 -0700 (PDT)
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-To: clabbe.montjoie@gmail.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Cc: wens@csie.org,
-	jernej.skrabec@gmail.com,
-	samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH] crypto: sun8i-ce - move fallback ahash_request to the end of the struct
-Date: Fri, 16 May 2025 15:06:56 +0300
-Message-ID: <20250516120656.3610623-1-ovidiu.panait.oss@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="OX8m74ex"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 57C6D40E0241;
+	Fri, 16 May 2025 12:27:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id uwSaCqau6FpN; Fri, 16 May 2025 12:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1747398447; bh=sG2uaaEQ4UYwgNQ5ATaaMB63qAcs03C2EG0pb4eWOjE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OX8m74expZfER3T0uDYUZICIDGPSBDimfLXl0fR3OhC6yCduNSpf2QC5eX8Rr2Gq8
+	 jWt4NplxvGpKuKhjX7+GliN3GLBAJ9ZpCkhkZ6LEAGhz5kEpW4Bg5eCaW9eIObotoF
+	 VUa8dSBKzkbMjviHTTr+tcvR3ypKNpWipnfjjDQMdkIoS/QveX80eoF6+GahuLDanr
+	 Jx2uBfv2K4teXJMO0mBewwkyy9q0aNCNcKVjMj5RS8eTQLvagFDqmoyzDkiuaZ8xG3
+	 +mqxZf8JpEIJw3QdgslBdtWqqrVZ9iNNIm/7n4+cSFs9gTeqCf6fVuF9rg5QYC1dol
+	 UWA5OvdJv8zjiy2mWJhOoN1QwAB+OlWGLuTslMfyeXdPm1J7Z+sg9hQfAACSy+PyvS
+	 Ngr1jdA3qW0PCW7M3NIKOLYx2DGwFIpWER21u8D9+QSwdFy11ADQBG1nzj4iqC0MHh
+	 bF5eENJpkrCiMnkoR1GE3NH2+0/ogpmJ/zycq553b73j658M8XG195yUJAKZFHbEtJ
+	 FjBAGWtjNQTZHn0a0DglVcqazBEEUXt5LOAgbE3ne2LDJDSHJJP02Zk8z200WTAkI3
+	 7u2f/e+4qXKPZYfC/jtlF3QjbFJvLRAwgjbUgIySb28oIBS1otWhLBUsQE9yObQr33
+	 Im30v/0KYKyoT+Q9wZAdBO8Q=
+Received: from zn.tnic (p579690ee.dip0.t-ipconnect.de [87.150.144.238])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C178740E0239;
+	Fri, 16 May 2025 12:27:20 +0000 (UTC)
+Date: Fri, 16 May 2025 14:27:15 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ayush Jain <Ayush.Jain3@amd.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>, x86-ml <x86@kernel.org>,
+	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] crypto: lib/sha256 - Disable SIMD
+Message-ID: <20250516122715.GCaCcvI7vq-DBzlNtK@fat_crate.local>
+References: <20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local>
+ <aCcirrsFFrrRqf5A@gondor.apana.org.au>
+ <aCcmJGuCnuyHmHbx@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aCcmJGuCnuyHmHbx@gondor.apana.org.au>
 
-'struct ahash_request' has a flexible array at the end, so it must be the
-last member in a struct, to avoid overwriting other struct members.
+On Fri, May 16, 2025 at 07:48:52PM +0800, Herbert Xu wrote:
+> On Fri, May 16, 2025 at 07:34:06PM +0800, Herbert Xu wrote:
+> > 
+> > So what's happened is that previously if you call sha256_update
+> > from lib/crypto it would only use the generic C code to perform
+> > the operation.
+> > 
+> > This has now been changed to automatically use SIMD instructions
+> > which obviously blew up in your case.
+> 
+> In the interim you can go back to the old ways and disable SIMD
+> for lib/crypto sha256 with this patch:
+> 
+> ---8<---
+> Disable SIMD usage in lib/crypto sha256 as it is causing crashes.
+> 
+> Reported-by: Borislav Petkov <bp@alien8.de>
 
-Therefore, move 'fallback_req' to the end of the 'sun8i_ce_hash_reqctx'
-struct.
+Please make that
 
-Fixes: 56f6d5aee88d ("crypto: sun8i-ce - support hash algorithms")
-Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reported-by: Ayush Jain <Ayush.Jain3@amd.com>
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 3b5c2af013d0..83df4d719053 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -308,8 +308,8 @@ struct sun8i_ce_hash_tfm_ctx {
-  * @flow:	the flow to use for this request
-  */
- struct sun8i_ce_hash_reqctx {
--	struct ahash_request fallback_req;
- 	int flow;
-+	struct ahash_request fallback_req; // keep at the end
- };
- 
- /*
+I'm just the messenger.
+
+> Fixes: 950e5c84118c ("crypto: sha256 - support arch-optimized lib and expose through shash")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/include/crypto/internal/sha2.h b/include/crypto/internal/sha2.h
+> index b9bccd3ff57f..e1b0308c0539 100644
+> --- a/include/crypto/internal/sha2.h
+> +++ b/include/crypto/internal/sha2.h
+> @@ -32,7 +32,7 @@ static inline void sha256_choose_blocks(
+>  	if (!IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_SHA256) || force_generic)
+>  		sha256_blocks_generic(state, data, nblocks);
+>  	else if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_SHA256_SIMD) &&
+> -		 (force_simd || crypto_simd_usable()))
+> +		 force_simd)
+>  		sha256_blocks_simd(state, data, nblocks);
+>  	else
+>  		sha256_blocks_arch(state, data, nblocks);
+> -- 
+
+If you end up doing this, that fixes it, obviously:
+
+Tested-by: Ayush Jain <Ayush.Jain3@amd.com>
+
+Thx.
+
 -- 
-2.48.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
