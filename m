@@ -1,206 +1,111 @@
-Received: from mx07-006a4e02.pphosted.com (mx07-006a4e02.pphosted.com [143.55.146.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949B3227EBF;
-	Fri, 16 May 2025 11:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.55.146.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099B7238C1D;
+	Fri, 16 May 2025 12:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747396559; cv=none; b=DMy2cIeZkHxgmFoRlNBpf8Guppkj3za19G6EiOqnkPNx+Wuhuz1rvuz89z+m3EyV+B3EAfnBt6W3QFa7db5aNNnaDfeEn5syCFjxTg95J6AbibLeppDdxiXwcj8ASFSoLiifSlxf3MGnbkjCAAggP2EPqJ+usTN8nCtToPJ4VG4=
+	t=1747397308; cv=none; b=hzJkMYJ8PfhA4hLmorSo1nuGBzoAwWNUxzZZR5f4GWYuR2rLYjmHBIRqxZOd7BS0cLVstPQnc0FXTbS3GCDKwnhd7vy79VVq0Mzxcxb0ZXw5gqKHtktxeDYntDz97h3VHiy/tm1j+aEpn/xm453XLFDLyISZcruO5MYH82uI82Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747396559; c=relaxed/simple;
-	bh=giXkP9+j3aa2B4vWkt+/h2ylfg8ZzjjCkVq81okbuaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BggkK3UIe0nSH9AAusBwUNc0flDeCA06Q599JIeeoFh0H7afI0WoOSu+p7/kFw+IoMX8K3LRQTE6g6HGi7gJ3EzJjdzKxi1ZaegnCz5va3IjrD1Oxui2ENGNA70q5V5AvpK4FdiaIbeP97XBo3XdfV6mSf3WFYytSKWmtfjdMmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es; spf=pass smtp.mailfrom=iram.es; dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b=rV4MaNF3; arc=none smtp.client-ip=143.55.146.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iram.es
+	s=arc-20240116; t=1747397308; c=relaxed/simple;
+	bh=LLFTaXnhleq34jL/n5gBjVlQjNQtKROkYDnqUvpqa5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPtK4UGFLx06E2jj8iJ8lgKMgBiPAInYPBvUC/Ex73QbD+gnYhNt8bJHPI/VXE6a6S++LXzUygugZzamXRWZ+9VhZbZ8lLJxdmOEouiAUuNSIvEDCl6J46n00pex3DwPeA1aok+25sT7jyh+/NkG08dpsavQaPi3lJccuqVMao4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+9LraLU; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b="rV4MaNF3"
-Received: from pps.filterd (m0316687.ppops.net [127.0.0.1])
-	by m0316687.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 54G9xZ29008804;
-	Fri, 16 May 2025 13:06:57 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iram.es; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=dkim3; bh=bAYUGQc7Hv5rKaaMRmows/SqSVf4
-	K8fqsjT9i6Qc9Mc=; b=rV4MaNF34s8G27C5bOSrMOefpzbnwgynEvS6vcjxBy1i
-	Mq+s4gKZkkLyil0gXiDBo0yYmYIfDW/bFZuwRaB5EhWmWGdmtApMGh/Z/ROFrs2M
-	KuzZ2+VjjZvyjKfPt/9g6vw7GCNsvl7WQ7Ps0Tm51un0GvjGdyEYE/rS1ibfChUk
-	F8ub0lMfbasg+cSLngx5oFK03GvmcqC+PWojhrY1UkyJsxv3zmb7uZAHT2b8ZVzh
-	7CQmgVe7hSNIPfkh33qf9EW4IrSUgipP1wcfNBwDb+Qe9hk7qZ0hvw07HPce+b7x
-	4xET90GnlLho/Ijpa+/13LP6PFZOgAxWvMpPleJ5YA==
-Received: from sim.rediris.es (mta-out04.sim.rediris.es [130.206.24.46])
-	by m0316687.ppops.net (PPS) with ESMTPS id 46p0mfm9qs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 May 2025 13:06:57 +0200 (MEST)
-Received: from sim.rediris.es (localhost.localdomain [127.0.0.1])
-	by sim.rediris.es (Postfix) with ESMTPS id C5065181FA5;
-	Fri, 16 May 2025 13:06:56 +0200 (CEST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by sim.rediris.es (Postfix) with ESMTP id A8707181FAB;
-	Fri, 16 May 2025 13:06:56 +0200 (CEST)
-X-Amavis-Modified: Mail body modified (using disclaimer) -
- mta-out04.sim.rediris.es
-Received: from sim.rediris.es ([127.0.0.1])
- by localhost (mta-out04.sim.rediris.es [127.0.0.1]) (amavis, port 10026)
- with ESMTP id IkzjQ4rBb6FP; Fri, 16 May 2025 13:06:56 +0200 (CEST)
-Received: from lt-gp.iram.es (haproxy01.sim.rediris.es [130.206.24.69])
-	by sim.rediris.es (Postfix) with ESMTPA id E3CE4181FA5;
-	Fri, 16 May 2025 13:06:55 +0200 (CEST)
-Date: Fri, 16 May 2025 13:06:54 +0200
-From: Gabriel Paubert <paubert@iram.es>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: kernel test robot <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Danny Tsen <dtsen@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] powerpc: Add gcc 128-bit shift helpers
-Message-ID: <aCccToR_71ETmPd-@lt-gp.iram.es>
-References: <202505152053.FrKekjCe-lkp@intel.com>
- <aCb7WW2gRrtEmgqD@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+9LraLU"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so15204145e9.1;
+        Fri, 16 May 2025 05:08:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747397305; x=1748002105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l7S/vG1lp5geqRglunYVLNLd5lLTAffxPlQ/qp918/4=;
+        b=i+9LraLU+vxLQtPtNgarbmStQYEmWuOTuoxvpQRl/yiPpQhDXn9PdfgWT92Sje4+B5
+         Egfat00fnh33qd0tgDLhT2OtlOvX0QI9KIrzkkmBc73Dx4Tm5i82EFOZ0hY1MaGdeOQD
+         0vF7zUVYOle4JK6MUxY+CZZdZ2R7rIoD3wV15c5e6t2gDg9AxpNmdeG4WcfBKSvZCgm3
+         R3AUdggWy1YcHppL5+KhmUmMQAECkR0qVTwWXJOITFbZ5WcBmWCxN8RWoKL2zSlDw6XL
+         SW8W1hrw5IJkhvrM5JhirC9fRU0ZAFBSKFudSxAaDuc8NyrNmrJbo8lA6f6YzzThnDpK
+         YRbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747397305; x=1748002105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l7S/vG1lp5geqRglunYVLNLd5lLTAffxPlQ/qp918/4=;
+        b=uQsZtH0ewakaqNDN4dpedQgMlyHc7QMZ06vYk5hA6UQsVawhgH7cZLUzskNpajw7AZ
+         +KJVP6w+oAGlb0yPaea0NxOBDneWZyI4FvRLcZEf/5/4t0YuoYbFVrGrRoP26hBACK2o
+         FdP2X0dg8X3qqQ3FCFTssal6stFEMHjnlYLVdWMUC0uLhhI/2Th8f6HeYvzU50gWKikb
+         iSI4wNdWQlx7v9fHD2Qv9Y7JiGuNFYFEmI6Z9ioF1oH+gCxELckm3GF87EQMzYuc+Wyk
+         xWjBJuriSfhq2P9Zimys7mH4G7RJBZ8SF5MPmGSx0EyCNKUz0TVrpERt8BvI7axEtJx2
+         BUeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKa9dtH638AxQ/baUR2FPCyxwnLtsDHIGAt65tzm9pvOQR5PmrQlquyLgc3Hj3zVJ/EKRgGK8YSR//NFN8@vger.kernel.org, AJvYcCWJLl9JZv8U+zvjtJe0bF73Qu0BRspPqcKL8Dyh+oofgl80wbDKjBl+uNlaxNNy4CWbiVjVqQhjYluxq3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypjvX3jFeQYMjx3ew1OLu6c2Y7lxWTs9uO4aKmGlMTWIuyatax
+	YTFSG/O6dgIyefzcgdDacTXfNSUvM3oa+v9+ipFxx2jUPU0UM2pzSAWH
+X-Gm-Gg: ASbGncvLoFBJZiUuHAA070ACAIDMkAY3Xb2hXmkR0o0H8OU6vYK7W2BwE16NmcRyuee
+	MhnXcGuxBg6EHSRxNh5HG6TqDYy7Xxedkssm5OoERN72c6zmzmd+5pCHBklqsNHVadzzAfOYlgq
+	T/LijH6Ffr53HMaXUiAQlKgHPSz0saVajmvNT6ND87qQu5Y5/ovGLFVXVNC/0G1Nfrdd2fWRa77
+	TXSl8i1UO9tOoYqqamtKF60/nowI569Br/bRhygcohrnOVfh4O3sVDhcnExMfyv4YUaAdinCLCr
+	ju3YGr6hckDpZyXUdPC/WeznEO6tGkaXmIOgDVhbp6a10xyP50q0WaY8ZnpQd9DfORZIf/cQfnO
+	2fUY=
+X-Google-Smtp-Source: AGHT+IETHNO4PZaxAV5fQzFYG7nB1lHUisZaUbqvlKR7l0R0thhXbB9LDnls9f0950ZGMS0nNFwq9w==
+X-Received: by 2002:a05:600c:821b:b0:43b:bfa7:c7d with SMTP id 5b1f17b1804b1-442f84c2008mr72290655e9.2.1747397304833;
+        Fri, 16 May 2025 05:08:24 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:2f07:610b:a400:6472:d2f9:d536:4c30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f338050csm102275725e9.10.2025.05.16.05.08.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 05:08:24 -0700 (PDT)
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+To: clabbe.montjoie@gmail.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Cc: wens@csie.org,
+	jernej.skrabec@gmail.com,
+	samuel@sholland.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Subject: [PATCH] crypto: sun8i-ce - move fallback ahash_request to the end of the struct
+Date: Fri, 16 May 2025 15:06:56 +0300
+Message-ID: <20250516120656.3610623-1-ovidiu.panait.oss@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCb7WW2gRrtEmgqD@gondor.apana.org.au>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE2MDEwNSBTYWx0ZWRfX7CsnzgdvuQVa
- Hc0cXDxfh9yA4+m/JqkPrYv58GcaKF2gqvrkHtx4ktpgF+qchKBAmO1vfHLNXItrxaNVEmmS5yA
- iQ5B0ELhcz8FOhNRnOfb++zNkj5qRa44Bdxqjz9WyKxw1Fkqk7eHk92A/qc675NjLSAYuI+0szR
- ve5FtbhAH+qplRVNcdyhzkKqJJf8mQg+pncjyCpBWQKSeKOjA0FbBvuJrcxES4u6kycmPs28fDz
- R6+Wk8hrNqdnWD/ofZ/P2fwtxJ92VlL6/NdE/C/j7DYd/UChPGvNdibzZNOWJuKjK6liRb3pks5
- EB64UGcBZCabpVQrWY839k5+3fsfT+/36RHAmhB6b+++0oB13dY9s2aIezsZ7kX0PQla7Ejbeo9
- XVSPThMtUaR7gPt/oCEHfgFOOf+h0QI0jvps/AhgmqsZwQxddlKBu+vixOL25xlnfTGh4RNX
-X-Proofpoint-GUID: H_SYM61NNgWlRx99XEkaczkpNMGGkLti
-X-Proofpoint-ORIG-GUID: H_SYM61NNgWlRx99XEkaczkpNMGGkLti
-X-Authority-Analysis: v=2.4 cv=EtzSrTcA c=1 sm=1 tr=0 ts=68271c51 cx=c_pps
- a=Kke4r4mcy+kRAsMtzpf9hg==:117 a=Kke4r4mcy+kRAsMtzpf9hg==:17
- a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=i3X5FwGiAAAA:8
- a=QyXUC8HyAAAA:8 a=FNyBlpCuAAAA:8 a=LpSzYAz8VI8wa4E5YnoA:9 a=CjuIK1q_8ugA:10
- a=mmqRlSCDY2ywfjPLJ4af:22 a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-16_04,2025-05-16_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=salida_notspam policy=salida score=0
- mlxscore=0 malwarescore=0 bulkscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 impostorscore=0 spamscore=0 lowpriorityscore=0
- adultscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505160105
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16, 2025 at 04:46:17PM +0800, Herbert Xu wrote:
-> On Thu, May 15, 2025 at 08:06:09PM +0800, kernel test robot wrote:
-> > tree:   https://urldefense.com/v3/__https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git__;!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkbHT4vfog$  master
-> > head:   484803582c77061b470ac64a634f25f89715be3f
-> > commit: c66d7ebbe2fa14e41913adb421090a7426f59786 [10914/11408] crypto: powerpc/poly1305 - Add SIMD fallback
-> > config: powerpc64-randconfig-002-20250515 (https://urldefense.com/v3/__https://download.01.org/0day-ci/archive/20250515/202505152053.FrKekjCe-lkp@intel.com/config__;!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkaPDLMaoA$ )
-> > compiler: powerpc64-linux-gcc (GCC) 8.5.0
-> > reproduce (this is a W=1 build): (https://urldefense.com/v3/__https://download.01.org/0day-ci/archive/20250515/202505152053.FrKekjCe-lkp@intel.com/reproduce__;!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkbNYWK3LQ$ )
-> 
-> Thanks for the report.  This patch should fix the problem.
+'struct ahash_request' has a flexible array at the end, so it must be the
+last member in a struct, to avoid overwriting other struct members.
 
-It won't work for big endian, nor for 32 bit obviously.
+Therefore, move 'fallback_req' to the end of the 'sun8i_ce_hash_reqctx'
+struct.
 
-Besides that, in arch/power/kernel/misc_32.S, you'll find a branchless
-version of these functions. It's for 64 bit shifts on 32 bit big-endian
-but it can easily be adapted to 128 bit shifts on 64 bit processors
-(swapping r3 and r4 depending on endianness).
+Fixes: 56f6d5aee88d ("crypto: sun8i-ce - support hash algorithms")
+Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Several functions of kernel/misc_32.S should arguably be moved to lib/.
-
-Cheers,
-Gabriel
-
-
-> 
-> ---8<---
-> When optimising for size, gcc generates out-of-line calls for 128-bit
-> integer shifts.  Add these functions to avoid build errors.
-> 
-> Fixes: c66d7ebbe2fa ("crypto: powerpc/poly1305 - Add SIMD fallback")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://urldefense.com/v3/__https://lore.kernel.org/oe-kbuild-all/202505152053.FrKekjCe-lkp@intel.com/__;!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkbo7rsvYg$ 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/arch/powerpc/lib/Makefile b/arch/powerpc/lib/Makefile
-> index 1cd74673cbf7..a41c071c1652 100644
-> --- a/arch/powerpc/lib/Makefile
-> +++ b/arch/powerpc/lib/Makefile
-> @@ -87,3 +87,5 @@ obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-powerpc.o
->  crc-t10dif-powerpc-y := crc-t10dif-glue.o crct10dif-vpmsum_asm.o
->  
->  obj-$(CONFIG_PPC64) += $(obj64-y)
-> +
-> +obj-$(CONFIG_ARCH_SUPPORTS_INT128) += tishift.o
-> diff --git a/arch/powerpc/lib/tishift.S b/arch/powerpc/lib/tishift.S
-> new file mode 100644
-> index 000000000000..79afef2d8d54
-> --- /dev/null
-> +++ b/arch/powerpc/lib/tishift.S
-> @@ -0,0 +1,54 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * Copyright (c) 2025 Herbert Xu <herbert@gondor.apana.org.au>
-> + */
-> +#include <asm/ppc_asm.h>
-> +#include <linux/export.h>
-> +
-> +_GLOBAL(__lshrti3)
-> +	cmplwi	r5,63
-> +	ble	1f
-> +	addi	r5,r5,-64
-> +	srd	r3,r4,r5
-> +	li	r4,0
-> +	blr
-> +1:
-> +	subfic	r7,r5,64
-> +	srd	r3,r3,r5
-> +	sld	r6,r4,r7
-> +	srd	r4,r4,r5
-> +	or	r3,r3,r6
-> +	blr
-> +EXPORT_SYMBOL(__lshrti3)
-> +
-> +_GLOBAL(__ashrti3)
-> +	cmplwi	r5,63
-> +	ble	1f
-> +	addi	r5,r5,-64
-> +	srad	r3,r4,r5
-> +	sradi	r4,r4,63
-> +	blr
-> +1:
-> +	subfic	r7,r5,64
-> +	srd	r3,r3,r5
-> +	sld	r6,r4,r7
-> +	srad	r4,r4,r5
-> +	or	r3,r3,r6
-> +	blr
-> +EXPORT_SYMBOL(__ashrti3)
-> +
-> +_GLOBAL(__ashlti3)
-> +	cmplwi	r5,63
-> +	ble	1f
-> +	addi	r5,r5,-64
-> +	sld	r4,r3,r5
-> +	li	r3,0
-> +	blr
-> +1:
-> +	subfic	r7,r5,64
-> +	sld	r4,r4,r5
-> +	srd	r6,r3,r7
-> +	sld	r3,r3,r5
-> +	or	r4,r4,r6
-> +	blr
-> +EXPORT_SYMBOL(__ashlti3)
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: https://urldefense.com/v3/__http://gondor.apana.org.au/*herbert/__;fg!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkbwt6bO1g$ 
-> PGP Key: https://urldefense.com/v3/__http://gondor.apana.org.au/*herbert/pubkey.txt__;fg!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkam0aoZDQ$ 
-> 
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 3b5c2af013d0..83df4d719053 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -308,8 +308,8 @@ struct sun8i_ce_hash_tfm_ctx {
+  * @flow:	the flow to use for this request
+  */
+ struct sun8i_ce_hash_reqctx {
+-	struct ahash_request fallback_req;
+ 	int flow;
++	struct ahash_request fallback_req; // keep at the end
+ };
  
+ /*
+-- 
+2.48.1
 
