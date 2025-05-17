@@ -1,44 +1,53 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF653FC0A;
-	Sat, 17 May 2025 01:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F632CA9;
+	Sat, 17 May 2025 01:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747445432; cv=none; b=hOj/qD/birQsGUU6HPAcPPr+mP5GTOu44nqdwAXt7xSjDCaariAftidRbI4V/LjkI/tASF90qyH8s3aMaHTRB66kJo5lKUrtZos5nXG1NMbEZ6AkQ8T5YvY8eAjxCppJVBDMXQsMCBDfw3hYM4IfuD9+OiB+aFfuV4B66MT+gGw=
+	t=1747446657; cv=none; b=GWQAAdOMyslV+BbZfkONpDtm7ONh3ARHHvm/cvX1LQcYFB8NZm6/BDZUPt6O8Rit2kvdylGRoJphjDca5s5yg50+rMp+6MjlrXxev8n46JuEs0xpn8p+p8S6jkluORjbEgmu0m4tTEs8VebbfdBpLVRimsBFOfqQ7TzHi3np96U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747445432; c=relaxed/simple;
-	bh=sD5DXr91JuiQh2HVBdc+MBupWujyMGyLfWDqGiTS5Xo=;
+	s=arc-20240116; t=1747446657; c=relaxed/simple;
+	bh=kWEqnvh96du7d+Zs/PEPLq24WcirQFult4+44G9wPEE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=di8juNaesApiGyqgLSN9zC0orHW5BwimIWVgniYcPsmBLzuHPIJus/VvT41AaIkj+YF+q8/veAdNusyxy404oXP97sZcj575e2lzNBu/RgfKCwHbnP8KWLSJmC+XasTaAMTJqLTgPFllVLFg1lLkirgQ/yAdMDPFgmNGUoa55ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=js5fK9Ib; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BXOj5wcwbPojGrfwFa+HIPr9Ex/m7+Av2jzZpIXDTPo4qgufi3G7Odqj9SXs4LjCxdXXHZxTw1cTqxQoOLddc+Irg/6+nLC2Yep5mIqeojKT9vx4ZZ5lIwvzx5gFBa0cy/YStaEPJtOGQpWJr7s8lWmDWZpVT/r/hJWDmM712dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZIgGx0Lm; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="js5fK9Ib"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D75C1C4CEE4;
-	Sat, 17 May 2025 01:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747445432;
-	bh=sD5DXr91JuiQh2HVBdc+MBupWujyMGyLfWDqGiTS5Xo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=js5fK9Ibe7/UuoQw+NClh216yLdx1G2lUumNmCflI119ZCrrzPffU0uxWhNt5H32U
-	 FTd3wt/UqySxDT+6OHcaF2JAXwRRsBc9TFfegMt+QwkfQ103ACP8V4PXwjQTXgRrqU
-	 bPtrOunntddED3YWlohnKP0VxvP+qtJmtMYd5Sv7owPEykJHI8aHp0Ya71WRjwpNT+
-	 vJDW/7qFTdCq+Lcds7+0EypOH+zj2OLFh+Ln9aFINTjGP84nYUueB7z36vk8bF38Ts
-	 2iY4KpbkmEKJoe1cpXK/uHVpX2ls3pK16w5Lgg1ihQK9kHDPPCWBae2OQPp/gQuIX4
-	 25lvx7Dfk9FaA==
-Date: Fri, 16 May 2025 18:30:22 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ayush Jain <Ayush.Jain3@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 0/3] x86: Don't support kernel-mode FPU with hardirqs
- disabled
-Message-ID: <20250517013022.GB1220@sol>
-References: <20250516231858.27899-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZIgGx0Lm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=UXb6LPirWZPeGfwUPWZJ+mkDqLNt13DgEKjkP7gfTRg=; b=ZIgGx0LmludT6ZEHkKfmw0k6Cj
+	lF4lirTVzW1/mMBvBxIFSEPn41NBWfVLh7z684v/EAtddcfiBBwNP8VTyCJ0NFq1ixC9uqIZGaXHl
+	BCszg06h0eEOhMfRYUz6RLMcl9OBZrfSpIMa4kgCO1MJ8fILcF/JavJhEJsAdSTXHKBuR7W/qoTxF
+	258OwDuRSVw0Hou1pjj1BXW8KY/u1HplLmuJLUcXAmu0q4WWsxYAZpnHVQALgbtTLO4wj6jZ+LTM/
+	vZvzmFoHKqqI7Lff64IIkaL2J5BMYMPpQ9puhhgyRsp0IUaNlYikcrvjjuAbayBhxRelDPFnV0jXp
+	QQl4luiQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uG6hE-006jky-08;
+	Sat, 17 May 2025 09:50:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 May 2025 09:50:40 +0800
+Date: Sat, 17 May 2025 09:50:40 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Gabriel Paubert <paubert@iram.es>
+Cc: kernel test robot <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Danny Tsen <dtsen@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	Michael Ellerman <mpe@ellerman.id.au>
+Subject: [v2 PATCH] powerpc: Add gcc 128-bit shift helpers
+Message-ID: <aCfrcNFYIWJruP4G@gondor.apana.org.au>
+References: <202505152053.FrKekjCe-lkp@intel.com>
+ <aCb7WW2gRrtEmgqD@gondor.apana.org.au>
+ <aCccToR_71ETmPd-@lt-gp.iram.es>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,37 +56,122 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250516231858.27899-1-ebiggers@kernel.org>
+In-Reply-To: <aCccToR_71ETmPd-@lt-gp.iram.es>
 
-On Fri, May 16, 2025 at 04:18:55PM -0700, Eric Biggers wrote:
-> This series returns to my earlier suggestion to make x86 not support
-> kernel-mode FPU when hardirqs are disabled, aligning it with arm64
-> (https://lore.kernel.org/r/20250220051325.340691-2-ebiggers@kernel.org).
-> To make this possible despite the use of the kernel-mode FPU functions
-> by __save_processor_state() (which I mentioned at
-> https://lore.kernel.org/r/20250228035924.GC5588@sol.localdomain), I've
-> changed __save_processor_state() to use a new function instead of
-> (mis)using the kernel-mode FPU functions.
+On Fri, May 16, 2025 at 01:06:54PM +0200, Gabriel Paubert wrote:
 > 
-> This slightly reduces the overhead of kernel-mode FPU (since the result
-> is fewer checks), and it fixes the issue reported at
-> https://lore.kernel.org/r/20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local/
-> where irq_fpu_usable() incorrectly returned false during CPU
-> initialization, causing a crash in the SHA-256 library code.
-> 
-> Eric Biggers (3):
->   x86/fpu: Add fpu_save_state() for __save_processor_state()
->   x86/pm: Use fpu_save_state() in __save_processor_state()
->   x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
-> 
->  arch/x86/include/asm/fpu/api.h |  1 +
->  arch/x86/kernel/fpu/core.c     | 92 ++++++++++++++++++++--------------
->  arch/x86/power/cpu.c           | 18 +++----
->  3 files changed, 62 insertions(+), 49 deletions(-)
+> It won't work for big endian, nor for 32 bit obviously.
 
-I realized I forgot about EFI again.  Ard had mentioned that earlier.
+Good catch, I will restrict the Kconfig option to little-endian.
+The accelerated crypto code which uses this is already restricted
+to little-endian anyway.
 
-I think we'll need a !irq_disabled()-safe solution for efi_fpu_begin().  It
-could be a different function from the regular kernel_fpu_begin(), though.
+The Kconfig option is also dependent on PPC64 so 32-bit shouldn't
+be a problem.
 
-- Eric
+> Besides that, in arch/power/kernel/misc_32.S, you'll find a branchless
+> version of these functions. It's for 64 bit shifts on 32 bit big-endian
+> but it can easily be adapted to 128 bit shifts on 64 bit processors
+> (swapping r3 and r4 depending on endianness).
+
+Nice.  I've replaced the shift code with one based on misc_32.S.
+
+> Several functions of kernel/misc_32.S should arguably be moved to lib/.
+
+I'll leave that to someone else :)
+
+Thanks,
+
+---8<---
+When optimising for size, gcc generates out-of-line calls for 128-bit
+integer shifts.  Add these functions to avoid build errors.
+
+Also restrict ARCH_SUPPORTS_INT128 to little-endian since the only
+user that prompted this poly1305 only supports that.
+
+Fixes: c66d7ebbe2fa ("crypto: powerpc/poly1305 - Add SIMD fallback")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://urldefense.com/v3/__https://lore.kernel.org/oe-kbuild-all/202505152053.FrKekjCe-lkp@intel.com/__;!!D9dNQwwGXtA!TSuOAutxjuD3Hp-RC0Fw9dTNuagdCKeNLTN71tv_OmhUxyAPLfIfwwpZop5pKFXgS4Jfkt830_tEMkbo7rsvYg$ 
+Suggested-by: Gabriel Paubert <paubert@iram.es>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index 651e0c32957a..7a7d39fa8b01 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -173,7 +173,7 @@ config PPC
+ 	select ARCH_STACKWALK
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
+ 	select ARCH_SUPPORTS_DEBUG_PAGEALLOC	if PPC_BOOK3S || PPC_8xx
+-	select ARCH_SUPPORTS_INT128		if PPC64 && CC_HAS_INT128
++	select ARCH_SUPPORTS_INT128		if PPC64 && CC_HAS_INT128 && CPU_LITTLE_ENDIAN
+ 	select ARCH_USE_BUILTIN_BSWAP
+ 	select ARCH_USE_CMPXCHG_LOCKREF		if PPC64
+ 	select ARCH_USE_MEMTEST
+diff --git a/arch/powerpc/lib/Makefile b/arch/powerpc/lib/Makefile
+index 1cd74673cbf7..a41c071c1652 100644
+--- a/arch/powerpc/lib/Makefile
++++ b/arch/powerpc/lib/Makefile
+@@ -87,3 +87,5 @@ obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-powerpc.o
+ crc-t10dif-powerpc-y := crc-t10dif-glue.o crct10dif-vpmsum_asm.o
+ 
+ obj-$(CONFIG_PPC64) += $(obj64-y)
++
++obj-$(CONFIG_ARCH_SUPPORTS_INT128) += tishift.o
+diff --git a/arch/powerpc/lib/tishift.S b/arch/powerpc/lib/tishift.S
+new file mode 100644
+index 000000000000..f63748b5e1c5
+--- /dev/null
++++ b/arch/powerpc/lib/tishift.S
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright (C) 1995-1996 Gary Thomas (gdt@linuxppc.org)
++ * Largely rewritten by Cort Dougan (cort@cs.nmt.edu)
++ * and Paul Mackerras.
++ * Copyright (c) 2025 Herbert Xu <herbert@gondor.apana.org.au>
++ */
++#include <asm/ppc_asm.h>
++#include <linux/export.h>
++
++_GLOBAL(__lshrti3)
++	subfic	r6,r5,64
++	srd	r3,r3,r5	# LSW = count > 63 ? 0 : LSW >> count
++	addi	r7,r5,-64	# could be xori, or addi with -64
++	sld	r6,r4,r6	# t1 = count > 63 ? 0 : MSW << (64-count)
++	srd	r7,r4,r7	# t2 = count < 64 ? 0 : MSW >> (count-64)
++	or	r3,r3,r6	# LSW |= t1
++	srd	r4,r4,r5	# MSW = MSW >> count
++	or	r3,r3,r7	# LSW |= t2
++	blr
++EXPORT_SYMBOL(__lshrti3)
++
++_GLOBAL(__ashrti3)
++	subfic	r6,r5,64
++	srd	r3,r3,r5	# LSW = count > 63 ? 0 : LSW >> count
++	addi	r7,r5,-64	# could be xori, or addi with -64
++	sld	r6,r4,r6	# t1 = count > 63 ? 0 : MSW << (64-count)
++	rlwinm	r8,r7,0,64	# t3 = (count < 64) ? 64 : 0
++	srad	r7,r4,r7	# t2 = MSW >> (count-64)
++	or	r3,r3,r6	# LSW |= t1
++	sld	r7,r7,r8	# t2 = (count < 64) ? 0 : t2
++	srad	r4,r4,r5	# MSW = MSW >> count
++	or	r3,r3,r7	# LSW |= t2
++	blr
++EXPORT_SYMBOL(__ashrti3)
++
++_GLOBAL(__ashlti3)
++	subfic	r6,r5,64
++	sld	r4,r4,r5	# MSW = count > 64 ? 0 : MSW << count
++	addi	r7,r5,-64	# could be xori, or addi with -64
++	srd	r6,r3,r6	# t1 = count > 63 ? 0 : LSW >> (64-count)
++	sld	r7,r3,r7	# t2 = count < 64 ? 0 : LSW << (count-64)
++	or	r4,r4,r6	# MSW |= t1
++	sld	r3,r3,r5	# LSW = LSW << count
++	or	r4,r4,r7	# MSW |= t2
++	blr
++EXPORT_SYMBOL(__ashlti3)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
