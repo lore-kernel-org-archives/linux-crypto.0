@@ -1,40 +1,40 @@
 Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3354B1E7B;
-	Sat, 17 May 2025 07:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573371BFE00;
+	Sat, 17 May 2025 07:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747467817; cv=none; b=TU0GhLfp7fBP8/Ek6v8PRWUpdiRwx9STH5LBi6XO/b4pVjf8Z/m4k7byDaQOgEabwiBnTJmmPAaBJg18+P9+NPLv1FdNhaPIXts4pDe6HueYQ2ynebXBckWZ8lppiPJIGneyjrdkS6DL3wc2kAWZugSW5Ewm269BqMRyfpA1wow=
+	t=1747468011; cv=none; b=I6x4XJR7Nj89ReBUoqt92O0D/ag7MM/eQOTMwxqZKRuT2AGBImwBsouu8woxYniER5EWzw5AogLFUhnHQ3nd0iggt4CFAD9xbpUCsEq6PhO2tuBKeoGacDEPU+YhkfZxem3mni+zJGH0RaarZfECRRVrujNvlnJ3ari0wTaV92o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747467817; c=relaxed/simple;
-	bh=/diPrcTC2ZcAz467a9q7d3yX2a+GYT9BwLzJlZoGwLE=;
+	s=arc-20240116; t=1747468011; c=relaxed/simple;
+	bh=BA21nTuyVrFj6BuwjvvE81q7qxBXx4vT2PWZSxnDhiI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jZec2Bg7hyGFwZ0w7U5j+JTpuWhafSDb7D/UdwPyS4Skra0+HhfLKs6gxwo2nZFWyBPXhLKRssIwUwKO7k4p7t7RjCq1DYY7OYyZ+p9lzNdMmqlLT8g4aqZxKr1OqiKUWxNQjbCVpgV/sFfU4P3Uog/aWMHSFrNTL9r8J6eBpAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=RhJ+KMZt; arc=none smtp.client-ip=185.125.188.120
+	 In-Reply-To:Content-Type; b=EeC+4BqnLMshF+ARP1avRTyOM6L5n5vf+9vTxv7BWTTtEGeZf0LxcqM/PPDz+0O0PF0PvWvTe4gRpOd52kIollzm/ls4118kw0DfoeQ8ytAuNElkd2/KIidKRi8qCLf5KNM0YRKUKD2feY7Hq92WIYnXRAJ1Fdbrg+RJNnsiV7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=JcCrj9C1; arc=none smtp.client-ip=185.125.188.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="RhJ+KMZt"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="JcCrj9C1"
 Received: from [172.20.3.254] (unknown [213.157.19.135])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 2BE023FAF0;
-	Sat, 17 May 2025 07:43:31 +0000 (UTC)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 3CCD43FAF0;
+	Sat, 17 May 2025 07:46:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1747467811;
-	bh=lanJpbv9eIpVwnNir9zHCZiOBrpASKbYIfOvh94qE0A=;
+	s=20210705; t=1747468006;
+	bh=Crrgymlnv/A4SeTHHwYIsTxLrWyj4Ayq+D7y5rXLS70=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
 	 In-Reply-To:Content-Type;
-	b=RhJ+KMZtISmBcG8VHzjLOZGEHQSzEn22K/Vvh1z4goxtT/GSulK/7RdtlQm7qSVtm
-	 TmMZEB/ieODGr3CE05DesfVT60YuSgTlI+HxyllppffHVryJspPqkQ2re6u9LvHxwu
-	 C88BTkSEo5GY57P5MmVL6a7Y0iD0jnmQy6/BM/Obo6CzW61WSd9k2Tc45PiwVXz99z
-	 DR9XQpNq2VpnK0T1pRdc2J7RF/2esN6u4dYCU1wa32rU3HgGqHC+q2PZj3BKYO9G7g
-	 neQyDrxPeXwt19iOaRMwm4y/pPpgQdzUnfPU0MWJV1NkJ6wswxy80zg2zGeURLRTbv
-	 KRTE+hMP0ZqHQ==
-Message-ID: <4f37c07c-3a39-4c98-b9c4-13356f5a10dc@canonical.com>
-Date: Sat, 17 May 2025 00:43:30 -0700
+	b=JcCrj9C1TAvakMYCkzaU6ElS7UZhucwmlKqL/9Ew699zNJSv9HWk7v3iKAJAKSOET
+	 Co1VOb78zNV4ACUb3vgIdi5guWfZBE/XQJg2vfPoduyjCpXlbCeG94RqXR/rpcN8tj
+	 8Ob6PxViL9xfaO0TkJ5tLty30RZuFbMVRNLW7ZBxBy01eXMC5IBtzqAUyuw6p/FQ9f
+	 pcqMSl9NJHOvJmf5+BNsWPBdtCS+owvrrLry34CoqcCtiBhX7JCeC22wD/07AEBySd
+	 NPDfQr7RaCnoO0xXE9u4HOdGdKM7TUzjBR4t07eCzCLiid82656CX5vLTIZqw5DSyd
+	 +22fo6Y535Baw==
+Message-ID: <bcd712e1-5894-4ffd-865a-d8de33aed1a6@canonical.com>
+Date: Sat, 17 May 2025 00:46:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,11 +44,12 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] apparmor: use SHA-256 library API instead of crypto_shash
  API
-To: Eric Biggers <ebiggers@kernel.org>, apparmor@lists.ubuntu.com
-Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
+To: Paul Moore <paul@paul-moore.com>, Eric Biggers <ebiggers@kernel.org>
+Cc: apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 References: <20250428190430.850240-1-ebiggers@kernel.org>
  <20250514042147.GA2073@sol>
+ <CAHC9VhRL=Jsx8B1s-3qmVOXuRuRF2hTOi3uEnRiWra+7oQJvrg@mail.gmail.com>
 Content-Language: en-US
 From: John Johansen <john.johansen@canonical.com>
 Autocrypt: addr=john.johansen@canonical.com; keydata=
@@ -94,29 +95,35 @@ Autocrypt: addr=john.johansen@canonical.com; keydata=
  +T7sv9+iY+e0Y+SolyJgTxMYeRnDWE6S77g6gzYYHmcQOWP7ZMX+MtD4SKlf0+Q8li/F9GUL
  p0rw8op9f0p1+YAhyAd+dXWNKf7zIfZ2ME+0qKpbQnr1oizLHuJX/Telo8KMmHter28DPJ03 lT9Q
 Organization: Canonical
-In-Reply-To: <20250514042147.GA2073@sol>
+In-Reply-To: <CAHC9VhRL=Jsx8B1s-3qmVOXuRuRF2hTOi3uEnRiWra+7oQJvrg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/13/25 21:21, Eric Biggers wrote:
-> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
->> From: Eric Biggers <ebiggers@google.com>
+On 5/14/25 14:57, Paul Moore wrote:
+> On Wed, May 14, 2025 at 12:22 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
+>>> From: Eric Biggers <ebiggers@google.com>
+>>>
+>>> This user of SHA-256 does not support any other algorithm, so the
+>>> crypto_shash abstraction provides no value.  Just use the SHA-256
+>>> library API instead, which is much simpler and easier to use.
+>>>
+>>> Signed-off-by: Eric Biggers <ebiggers@google.com>
+>>> ---
+>>>
+>>> This patch is targeting the apparmor tree for 6.16.
+>>>
+>>>   security/apparmor/Kconfig  |  3 +-
+>>>   security/apparmor/crypto.c | 85 ++++++--------------------------------
+>>>   2 files changed, 13 insertions(+), 75 deletions(-)
 >>
->> This user of SHA-256 does not support any other algorithm, so the
->> crypto_shash abstraction provides no value.  Just use the SHA-256
->> library API instead, which is much simpler and easier to use.
->>
->> Signed-off-by: Eric Biggers <ebiggers@google.com>
->> ---
->>
->> This patch is targeting the apparmor tree for 6.16.
->>
->>   security/apparmor/Kconfig  |  3 +-
->>   security/apparmor/crypto.c | 85 ++++++--------------------------------
->>   2 files changed, 13 insertions(+), 75 deletions(-)
+>> Any interest in taking this patch through the apparmor or security trees?
 > 
-> Any interest in taking this patch through the apparmor or security trees?
+> Something like this would need to go through the AppArmor tree.  As a
+> FYI, the AppArmor devs are fairly busy at the moment so it may take a
+> bit for them to get around to this.
 > 
-I can take it through my tree
-
+I am going to see how much of the backlog I can get through while traveling
+replies might get batch because I will be mostly off line but hopefully
+I can deal with most of it this weekend.
 
