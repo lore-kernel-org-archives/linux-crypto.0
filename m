@@ -1,40 +1,40 @@
 Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC294B1E7B;
-	Sat, 17 May 2025 07:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3354B1E7B;
+	Sat, 17 May 2025 07:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747467747; cv=none; b=Nl6resa8P/Yf2IivbUvJy4UXP5ckenKxhvDt94N8wSPucY1WTYo609Wrx8495W7xMgCrDTod2grCo/N+Mf09ceKoORcJ7eRzB0Z+zR+i10xrdYz+HMfrNDXew/nWKUx24S7XkdYC64+DGiVrsRTVdMF9pZD7O7UFo9AbnXqpsWA=
+	t=1747467817; cv=none; b=TU0GhLfp7fBP8/Ek6v8PRWUpdiRwx9STH5LBi6XO/b4pVjf8Z/m4k7byDaQOgEabwiBnTJmmPAaBJg18+P9+NPLv1FdNhaPIXts4pDe6HueYQ2ynebXBckWZ8lppiPJIGneyjrdkS6DL3wc2kAWZugSW5Ewm269BqMRyfpA1wow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747467747; c=relaxed/simple;
-	bh=uYn6X5KptqYq4oLBuy217WriZf8lMFOZ2i+WCF7q6sw=;
+	s=arc-20240116; t=1747467817; c=relaxed/simple;
+	bh=/diPrcTC2ZcAz467a9q7d3yX2a+GYT9BwLzJlZoGwLE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sjNclKKlbY5lmaKw6ULUbf0WTQrE9KsrkdWwX/BktwUJPGoyySmBcbvBmIULWhC4jW4oRzVrh7TqUzVEYrsgdNpEnIRgyab0KaLRPD/508kZvhRax9x8nHBDfKTex9fTq5KFcwsbqrm9KvY3alGaRLJlRBtdwgv050fVDAUPqoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=USKuqWHP; arc=none smtp.client-ip=185.125.188.120
+	 In-Reply-To:Content-Type; b=jZec2Bg7hyGFwZ0w7U5j+JTpuWhafSDb7D/UdwPyS4Skra0+HhfLKs6gxwo2nZFWyBPXhLKRssIwUwKO7k4p7t7RjCq1DYY7OYyZ+p9lzNdMmqlLT8g4aqZxKr1OqiKUWxNQjbCVpgV/sFfU4P3Uog/aWMHSFrNTL9r8J6eBpAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=RhJ+KMZt; arc=none smtp.client-ip=185.125.188.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="USKuqWHP"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="RhJ+KMZt"
 Received: from [172.20.3.254] (unknown [213.157.19.135])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id C744C3FAF0;
-	Sat, 17 May 2025 07:42:15 +0000 (UTC)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 2BE023FAF0;
+	Sat, 17 May 2025 07:43:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1747467735;
-	bh=tNwwwS/3kfyG+r0IhuUAksmNxwZppBafE6zBouPal/s=;
+	s=20210705; t=1747467811;
+	bh=lanJpbv9eIpVwnNir9zHCZiOBrpASKbYIfOvh94qE0A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
 	 In-Reply-To:Content-Type;
-	b=USKuqWHP8ftrp4TWMROFV/WCLB+A8sj+F0mO2kr2aqFjcgOXKEF1l33LBLJqD9AJO
-	 ianSqv0enNC8Gtez3aINLhw9l8cEnHKgDdZ6GiMpb0dJNY7F+xUNqyNHLd778ZhBI2
-	 TZYtp5aU3AYLEg8IZBeJqfrNnqJQurshpNzcN+r68AtxAMcmdPT18NoVPXWqHJrX7I
-	 Ukf0Be8I1sLsvB81EfL4aigSwO1mz79xQ9aEEoaiY2/WpW9iHAOKumn8aPvKiVOLTm
-	 3GfQKFFylg1T7WtsW7sonB/43qYrBJHK8+xZxRKIxHQo4/4wrmhtp0YnhYwOHGerlZ
-	 IS36VqK6l0RlQ==
-Message-ID: <ac8fdbfc-02f4-4f35-b8a1-e029b6b322c1@canonical.com>
-Date: Sat, 17 May 2025 00:42:14 -0700
+	b=RhJ+KMZtISmBcG8VHzjLOZGEHQSzEn22K/Vvh1z4goxtT/GSulK/7RdtlQm7qSVtm
+	 TmMZEB/ieODGr3CE05DesfVT60YuSgTlI+HxyllppffHVryJspPqkQ2re6u9LvHxwu
+	 C88BTkSEo5GY57P5MmVL6a7Y0iD0jnmQy6/BM/Obo6CzW61WSd9k2Tc45PiwVXz99z
+	 DR9XQpNq2VpnK0T1pRdc2J7RF/2esN6u4dYCU1wa32rU3HgGqHC+q2PZj3BKYO9G7g
+	 neQyDrxPeXwt19iOaRMwm4y/pPpgQdzUnfPU0MWJV1NkJ6wswxy80zg2zGeURLRTbv
+	 KRTE+hMP0ZqHQ==
+Message-ID: <4f37c07c-3a39-4c98-b9c4-13356f5a10dc@canonical.com>
+Date: Sat, 17 May 2025 00:43:30 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,6 +48,7 @@ To: Eric Biggers <ebiggers@kernel.org>, apparmor@lists.ubuntu.com
 Cc: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
 References: <20250428190430.850240-1-ebiggers@kernel.org>
+ <20250514042147.GA2073@sol>
 Content-Language: en-US
 From: John Johansen <john.johansen@canonical.com>
 Autocrypt: addr=john.johansen@canonical.com; keydata=
@@ -93,179 +94,29 @@ Autocrypt: addr=john.johansen@canonical.com; keydata=
  +T7sv9+iY+e0Y+SolyJgTxMYeRnDWE6S77g6gzYYHmcQOWP7ZMX+MtD4SKlf0+Q8li/F9GUL
  p0rw8op9f0p1+YAhyAd+dXWNKf7zIfZ2ME+0qKpbQnr1oizLHuJX/Telo8KMmHter28DPJ03 lT9Q
 Organization: Canonical
-In-Reply-To: <20250428190430.850240-1-ebiggers@kernel.org>
+In-Reply-To: <20250514042147.GA2073@sol>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/28/25 12:04, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On 5/13/25 21:21, Eric Biggers wrote:
+> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
+>> From: Eric Biggers <ebiggers@google.com>
+>>
+>> This user of SHA-256 does not support any other algorithm, so the
+>> crypto_shash abstraction provides no value.  Just use the SHA-256
+>> library API instead, which is much simpler and easier to use.
+>>
+>> Signed-off-by: Eric Biggers <ebiggers@google.com>
+>> ---
+>>
+>> This patch is targeting the apparmor tree for 6.16.
+>>
+>>   security/apparmor/Kconfig  |  3 +-
+>>   security/apparmor/crypto.c | 85 ++++++--------------------------------
+>>   2 files changed, 13 insertions(+), 75 deletions(-)
 > 
-> This user of SHA-256 does not support any other algorithm, so the
-> crypto_shash abstraction provides no value.  Just use the SHA-256
-> library API instead, which is much simpler and easier to use.
+> Any interest in taking this patch through the apparmor or security trees?
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+I can take it through my tree
 
-Acked-by: John Johansen <john.johansen@canonical.com>
-
-> ---
-> 
-> This patch is targeting the apparmor tree for 6.16.
-> 
->   security/apparmor/Kconfig  |  3 +-
->   security/apparmor/crypto.c | 85 ++++++--------------------------------
->   2 files changed, 13 insertions(+), 75 deletions(-)
-> 
-> diff --git a/security/apparmor/Kconfig b/security/apparmor/Kconfig
-> index 64cc3044a42ce..1e3bd44643dac 100644
-> --- a/security/apparmor/Kconfig
-> +++ b/security/apparmor/Kconfig
-> @@ -57,12 +57,11 @@ config SECURITY_APPARMOR_INTROSPECT_POLICY
->   	  cpu is paramount.
->   
->   config SECURITY_APPARMOR_HASH
->   	bool "Enable introspection of sha256 hashes for loaded profiles"
->   	depends on SECURITY_APPARMOR_INTROSPECT_POLICY
-> -	select CRYPTO
-> -	select CRYPTO_SHA256
-> +	select CRYPTO_LIB_SHA256
->   	default y
->   	help
->   	  This option selects whether introspection of loaded policy
->   	  hashes is available to userspace via the apparmor
->   	  filesystem. This option provides a light weight means of
-> diff --git a/security/apparmor/crypto.c b/security/apparmor/crypto.c
-> index aad486b2fca65..40e17e153f1e5 100644
-> --- a/security/apparmor/crypto.c
-> +++ b/security/apparmor/crypto.c
-> @@ -9,115 +9,54 @@
->    * Fns to provide a checksum of policy that has been loaded this can be
->    * compared to userspace policy compiles to check loaded policy is what
->    * it should be.
->    */
->   
-> -#include <crypto/hash.h>
-> +#include <crypto/sha2.h>
->   
->   #include "include/apparmor.h"
->   #include "include/crypto.h"
->   
-> -static unsigned int apparmor_hash_size;
-> -
-> -static struct crypto_shash *apparmor_tfm;
-> -
->   unsigned int aa_hash_size(void)
->   {
-> -	return apparmor_hash_size;
-> +	return SHA256_DIGEST_SIZE;
->   }
->   
->   char *aa_calc_hash(void *data, size_t len)
->   {
-> -	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
->   	char *hash;
-> -	int error;
-> -
-> -	if (!apparmor_tfm)
-> -		return NULL;
->   
-> -	hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
-> +	hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
->   	if (!hash)
->   		return ERR_PTR(-ENOMEM);
->   
-> -	desc->tfm = apparmor_tfm;
-> -
-> -	error = crypto_shash_init(desc);
-> -	if (error)
-> -		goto fail;
-> -	error = crypto_shash_update(desc, (u8 *) data, len);
-> -	if (error)
-> -		goto fail;
-> -	error = crypto_shash_final(desc, hash);
-> -	if (error)
-> -		goto fail;
-> -
-> +	sha256(data, len, hash);
->   	return hash;
-> -
-> -fail:
-> -	kfree(hash);
-> -
-> -	return ERR_PTR(error);
->   }
->   
->   int aa_calc_profile_hash(struct aa_profile *profile, u32 version, void *start,
->   			 size_t len)
->   {
-> -	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
-> -	int error;
-> +	struct sha256_state state;
->   	__le32 le32_version = cpu_to_le32(version);
->   
->   	if (!aa_g_hash_policy)
->   		return 0;
->   
-> -	if (!apparmor_tfm)
-> -		return 0;
-> -
-> -	profile->hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
-> +	profile->hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
->   	if (!profile->hash)
->   		return -ENOMEM;
->   
-> -	desc->tfm = apparmor_tfm;
-> -
-> -	error = crypto_shash_init(desc);
-> -	if (error)
-> -		goto fail;
-> -	error = crypto_shash_update(desc, (u8 *) &le32_version, 4);
-> -	if (error)
-> -		goto fail;
-> -	error = crypto_shash_update(desc, (u8 *) start, len);
-> -	if (error)
-> -		goto fail;
-> -	error = crypto_shash_final(desc, profile->hash);
-> -	if (error)
-> -		goto fail;
-> -
-> +	sha256_init(&state);
-> +	sha256_update(&state, (u8 *)&le32_version, 4);
-> +	sha256_update(&state, (u8 *)start, len);
-> +	sha256_final(&state, profile->hash);
->   	return 0;
-> -
-> -fail:
-> -	kfree(profile->hash);
-> -	profile->hash = NULL;
-> -
-> -	return error;
->   }
->   
->   static int __init init_profile_hash(void)
->   {
-> -	struct crypto_shash *tfm;
-> -
-> -	if (!apparmor_initialized)
-> -		return 0;
-> -
-> -	tfm = crypto_alloc_shash("sha256", 0, 0);
-> -	if (IS_ERR(tfm)) {
-> -		int error = PTR_ERR(tfm);
-> -		AA_ERROR("failed to setup profile sha256 hashing: %d\n", error);
-> -		return error;
-> -	}
-> -	apparmor_tfm = tfm;
-> -	apparmor_hash_size = crypto_shash_digestsize(apparmor_tfm);
-> -
-> -	aa_info_message("AppArmor sha256 policy hashing enabled");
-> -
-> +	if (apparmor_initialized)
-> +		aa_info_message("AppArmor sha256 policy hashing enabled");
->   	return 0;
->   }
-> -
->   late_initcall(init_profile_hash);
-> 
-> base-commit: 33035b665157558254b3c21c3f049fd728e72368
 
