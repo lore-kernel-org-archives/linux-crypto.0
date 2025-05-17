@@ -1,50 +1,44 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C91C2CA8
-	for <linux-crypto@vger.kernel.org>; Sat, 17 May 2025 01:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF653FC0A;
+	Sat, 17 May 2025 01:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747445155; cv=none; b=GfUDy/Gd+r2mfigcF9eHJvCwkpklW39dXV8hHPO4AV30EeFRONzd2LpSkOqIHXNGCm1cpPCKFJOkBh94DIB3UguppGWXvWP9YsbjMCCkXhaC1NlNYAm0oNg5zJNK56jsuwivdBUWSQWhkf9e3baW8dMlxHqkwCcxOex4V9gBdUc=
+	t=1747445432; cv=none; b=hOj/qD/birQsGUU6HPAcPPr+mP5GTOu44nqdwAXt7xSjDCaariAftidRbI4V/LjkI/tASF90qyH8s3aMaHTRB66kJo5lKUrtZos5nXG1NMbEZ6AkQ8T5YvY8eAjxCppJVBDMXQsMCBDfw3hYM4IfuD9+OiB+aFfuV4B66MT+gGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747445155; c=relaxed/simple;
-	bh=p7oUaygr3SrVMzUAXs+jxw0ixJ1u9iFLy3yYhkGUm3c=;
+	s=arc-20240116; t=1747445432; c=relaxed/simple;
+	bh=sD5DXr91JuiQh2HVBdc+MBupWujyMGyLfWDqGiTS5Xo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GsZRumitleAXRN+7qzPCJs0Zzs6paa44h4JbrfXS4SQ0z6w4GWum5kPpTZF4PC8/bqp7xebD31Du51EkXursEfMaaiGX9GinoUKUbBvlhY6KuSDbZLbKZdKQ7TVeIdi5sCLpgFs1fk66fDWnLAY5idb+CMSpWJj8WAdjGH6zHcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=iOb6m+vi; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=di8juNaesApiGyqgLSN9zC0orHW5BwimIWVgniYcPsmBLzuHPIJus/VvT41AaIkj+YF+q8/veAdNusyxy404oXP97sZcj575e2lzNBu/RgfKCwHbnP8KWLSJmC+XasTaAMTJqLTgPFllVLFg1lLkirgQ/yAdMDPFgmNGUoa55ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=js5fK9Ib; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="iOb6m+vi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=jknP3EIb1jIy6hJYH6SV0GcqhWSBw3owA4mPr6FuyYM=; b=iOb6m+viv8iNsUANWduts6IVAL
-	yCo4Yc88GMmt/S/J6e27/n/FfV/CBC0vnXJsXSMZKQMZo6VjS2EgI3N+LhKmjvgCPOjPCXbWzFO4C
-	stu7TLd1qI1Yj2xW28kujONrphExZ8dgTUof8vfaWgaobAQTwt8Wjg0a71O6Zg8ztuYfIzlTboPlH
-	+L/HO4RtDcZCOGClVN6WRvXKZNmjjLH/VLxDSXct2skQI2NaVXMRwQrRFo6CVW/2HqDWd0Tdz32gN
-	3KV6JQFYcGeUi+cJ2YeqpAMD3pCwElxHyrhuFRjt1nR2/88+YxmDEsaufFO1klpSNI9HCcJ3UUgeH
-	1wHBrdyg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uG6JA-006jbI-1p;
-	Sat, 17 May 2025 09:25:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 May 2025 09:25:48 +0800
-Date: Sat, 17 May 2025 09:25:48 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v4 PATCH 00/11] crypto: Add partial block API and hmac to ahash
-Message-ID: <aCflnGXIXBr9Qlm2@gondor.apana.org.au>
-References: <cover.1747288315.git.herbert@gondor.apana.org.au>
- <20250515193529.GJ1411@quark>
- <aCcD92EWd_8oxlEU@gondor.apana.org.au>
- <20250516164326.GB1241@sol>
- <aCfcDJX5XRUwnx-a@gondor.apana.org.au>
- <20250517011704.GA1220@sol>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="js5fK9Ib"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D75C1C4CEE4;
+	Sat, 17 May 2025 01:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747445432;
+	bh=sD5DXr91JuiQh2HVBdc+MBupWujyMGyLfWDqGiTS5Xo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=js5fK9Ibe7/UuoQw+NClh216yLdx1G2lUumNmCflI119ZCrrzPffU0uxWhNt5H32U
+	 FTd3wt/UqySxDT+6OHcaF2JAXwRRsBc9TFfegMt+QwkfQ103ACP8V4PXwjQTXgRrqU
+	 bPtrOunntddED3YWlohnKP0VxvP+qtJmtMYd5Sv7owPEykJHI8aHp0Ya71WRjwpNT+
+	 vJDW/7qFTdCq+Lcds7+0EypOH+zj2OLFh+Ln9aFINTjGP84nYUueB7z36vk8bF38Ts
+	 2iY4KpbkmEKJoe1cpXK/uHVpX2ls3pK16w5Lgg1ihQK9kHDPPCWBae2OQPp/gQuIX4
+	 25lvx7Dfk9FaA==
+Date: Fri, 16 May 2025 18:30:22 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ayush Jain <Ayush.Jain3@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 0/3] x86: Don't support kernel-mode FPU with hardirqs
+ disabled
+Message-ID: <20250517013022.GB1220@sol>
+References: <20250516231858.27899-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,32 +47,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250517011704.GA1220@sol>
+In-Reply-To: <20250516231858.27899-1-ebiggers@kernel.org>
 
-On Fri, May 16, 2025 at 06:17:04PM -0700, Eric Biggers wrote:
+On Fri, May 16, 2025 at 04:18:55PM -0700, Eric Biggers wrote:
+> This series returns to my earlier suggestion to make x86 not support
+> kernel-mode FPU when hardirqs are disabled, aligning it with arm64
+> (https://lore.kernel.org/r/20250220051325.340691-2-ebiggers@kernel.org).
+> To make this possible despite the use of the kernel-mode FPU functions
+> by __save_processor_state() (which I mentioned at
+> https://lore.kernel.org/r/20250228035924.GC5588@sol.localdomain), I've
+> changed __save_processor_state() to use a new function instead of
+> (mis)using the kernel-mode FPU functions.
 > 
-> There's already a huge quality problem with the drivers.  The last thing they
-> need is to have special code that runs only when an OOM condition occurs, which
-> won't be tested.
+> This slightly reduces the overhead of kernel-mode FPU (since the result
+> is fewer checks), and it fixes the issue reported at
+> https://lore.kernel.org/r/20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local/
+> where irq_fpu_usable() incorrectly returned false during CPU
+> initialization, causing a crash in the SHA-256 library code.
+> 
+> Eric Biggers (3):
+>   x86/fpu: Add fpu_save_state() for __save_processor_state()
+>   x86/pm: Use fpu_save_state() in __save_processor_state()
+>   x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
+> 
+>  arch/x86/include/asm/fpu/api.h |  1 +
+>  arch/x86/kernel/fpu/core.c     | 92 ++++++++++++++++++++--------------
+>  arch/x86/power/cpu.c           | 18 +++----
+>  3 files changed, 62 insertions(+), 49 deletions(-)
 
-I totally agree that we have a quality problem with the drivers.
-Which is the main reason why I moved the partial block handling
-out.  The less work the drivers do the less likely they're to
-screw it up.
+I realized I forgot about EFI again.  Ard had mentioned that earlier.
 
-For test coverage, we could easily add something similar to
-crypto_reenable_simd_for_test.
+I think we'll need a !irq_disabled()-safe solution for efi_fpu_begin().  It
+could be a different function from the regular kernel_fpu_begin(), though.
 
-Another thing we could do is to just let the drivers fail in these
-cases and return ENOMEM and handle the fallback in the Crypto API.
-
-> Can they really not just use mempools?
-
-I don't see how that solves the problem, they can still be exhausted
-can't they?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
