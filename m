@@ -1,44 +1,46 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314DD4B1E76;
-	Sat, 17 May 2025 04:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA1415689A;
+	Sat, 17 May 2025 07:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747454683; cv=none; b=gHmiRQKWSertujIz7dWZxDY2MkiBFvSueJKAwnUm2LQf8ehPo4R56m1P80q4d4H18IfRLDu++3bg9AIn3vqdUJc9truQ60/EWi8GDkbLpEvwbHSws+YN8jXBLr+YK9Hevh6XdREDueyv1Tj+ZO5AIWhOZN3bn1+CSl6o7fCOxFc=
+	t=1747465747; cv=none; b=hbVe62ATUtLrWne5zjE+TOJGq2jlt2OFGum+SRXqPKuF/haW1xod4SS+b3j+wJjfhtPwICM6EbLIAld0cg+gL0vAJpLjs8cgaYNg8LNNrKXod/DD74EXRSv+G1VhNsQf7JzJbtLuyDY74eJkciQGhx9FsJJYi0wL1s56f70REBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747454683; c=relaxed/simple;
-	bh=1vRjM3XvjwfIykQPa3Xkj1NllSnYDC3NpEBH9OkOJno=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=exD+piTP70JZR6NrqjwGgA+Yy6WFp8FrirMnJToei/OcnRdmX7IPvHbu34b8PAR5tVHQ5XaVASzetWLnQKXh40EzJ2qQtivVjt+Vv5R16qZUEeSmSwn+RuTQIYDZ7PxcZc5NIrdLnWrsTOhqZ9Sd44TNObGAmTEHZShlEdaZl3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EDx64oHx; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747465747; c=relaxed/simple;
+	bh=cixUaHmJPeAy0w9OJHTf4T/FfmSyq6GN6NLOKZFyEYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NupMC+HUk9H+JCfKv8054106BcYoJIBeeR8N4xnoQuD0n1Mw3C+RTvwrTvKmmpoCWToNshwQsGRq3krCfKPwvk8lT7HrOVQypyiAA1fW6vaXnyZ+qFZ5KcyYWzXMch7jfBpnl2GNG1gL54f9Wcjg1dAGTWDaXzFlKQXsEg2tjn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCpjNeHj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EDx64oHx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Uwqu2b52J98glaxbPk7AfH0U6sSJXaY/+XEyftIzbzk=; b=EDx64oHxMzQ6vAsNnA8/frK4vF
-	oNBGOspz07bgp10uR4DwooOW0fhoDjvAxC4OKwnibppueKxJqs6q0OCb0q4XhiDn7BqNVf7hI6/jD
-	yb9T3j5faH/LwFgMLEMThtkg1sIagSQe7VVHkaHY6IUfUmN4KFvWZRzAXhwT45rRR5i0YzW1QQxtp
-	+eKJFX06CXowF+FA/4kePGjVq+kv8mfTV7drNNEVXzbJWP4Vc9rBQk4P7S08CbsYDf7kgPM02d7+p
-	cvS+MWlBYn2mEJIlfE9WfNTldYAgpTZ0WOEqesf3ZmeZwh7k2zhJrOpN5PWUwkdK53yS6MgHNmalw
-	EDZa7sug==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uG8mn-006kn8-34;
-	Sat, 17 May 2025 12:04:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 May 2025 12:04:33 +0800
-Date: Sat, 17 May 2025 12:04:33 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCpjNeHj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31039C4CEE3;
+	Sat, 17 May 2025 07:09:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747465746;
+	bh=cixUaHmJPeAy0w9OJHTf4T/FfmSyq6GN6NLOKZFyEYw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RCpjNeHjO2aKbvNdlwWIy+3GB269SRrIM91wDAVVoWbIzU5fNUKIXrJEFLqgi+YQv
+	 PmYrcITCBsy2mdA5klrKoRPKglBsNb6442h098hTn68JWYzlJ1dq2TTXJDI1nJmr08
+	 1SDY2Y9brnIco5DVNmZMYrrhv/byUSNTbgeoEHQUzgpHO83KHHiZW67Zyg9OLusK4I
+	 qfmqVVc9cdnETNBWx5YWVZXKAo3/onw4w8oJAUzO8mp7wHUa01W1zu8xz6LK2El4FL
+	 HgalOj094PLloazT1UwSY52MfpXvx3KtXrEy2Bxpy34Qiaaw8JaZ6sKQtob0on+QKF
+	 BbcjxXsW4Ae2w==
+Date: Sat, 17 May 2025 09:09:01 +0200
+From: Ingo Molnar <mingo@kernel.org>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/8] SHA-256 cleanup
-Message-ID: <aCgK0TDExgBnBHX9@gondor.apana.org.au>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ayush Jain <Ayush.Jain3@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when
+ irqs_disabled()
+Message-ID: <aCg2DSYp0nakwX3l@gmail.com>
+References: <20250516231858.27899-1-ebiggers@kernel.org>
+ <20250516231858.27899-4-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,47 +49,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250517022428.401622-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20250516231858.27899-4-ebiggers@kernel.org>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> This series restores the SHA-256 code to have a clean design where the
-> crypto_shash API is implemented on top of the regular library API
-> instead of a special unsafe low-level API.  Diffstat is -41 lines.
-> 
-> Eric Biggers (8):
->  Revert "crypto: sha256 - Use the partial block API"
->  Revert "crypto: lib/sha256 - Use generic block helper"
->  Revert "crypto: x86/sha256 - Add simd block function"
->  Revert "crypto: riscv/sha256 - Add simd block function"
->  Revert "crypto: arm64/sha256 - Add simd block function"
->  Revert "crypto: arm/sha256 - Add simd block function"
->  Revert "crypto: sha256 - Use the partial block API for generic"
->  Revert "crypto: lib/sha256 - Add helpers for block-based shash"
-> 
-> arch/arm/lib/crypto/Kconfig         |   1 -
-> arch/arm/lib/crypto/sha256-armv4.pl |  20 ++--
-> arch/arm/lib/crypto/sha256.c        |  14 +--
-> arch/arm64/crypto/sha512-glue.c     |   6 +-
-> arch/arm64/lib/crypto/Kconfig       |   1 -
-> arch/arm64/lib/crypto/sha2-armv8.pl |   2 +-
-> arch/arm64/lib/crypto/sha256.c      |  14 +--
-> arch/riscv/lib/crypto/Kconfig       |   1 -
-> arch/riscv/lib/crypto/sha256.c      |  13 +--
-> arch/x86/lib/crypto/Kconfig         |   1 -
-> arch/x86/lib/crypto/sha256.c        |  12 +--
-> crypto/sha256.c                     | 142 ++++++++++------------------
-> include/crypto/internal/sha2.h      |  52 ++--------
-> include/crypto/sha2.h               |   7 +-
-> lib/crypto/Kconfig                  |   8 --
-> lib/crypto/sha256.c                 |  97 +++++++++++++++----
-> 16 files changed, 175 insertions(+), 216 deletions(-)
-> 
-> 
-> base-commit: 1bafd82d9a40cf09c6c40f1c09cc35b7050b1a9f
 
-Nack.  This breaks the cryptodev tree.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+* Eric Biggers <ebiggers@kernel.org> wrote:
+
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Make irq_fpu_usable() return false when irqs_disabled().  That makes the
+> irqs_disabled() checks in kernel_fpu_begin_mask() and kernel_fpu_end()
+> unnecessary, so also remove those.
+> 
+> Rationale:
+> 
+> - There's no known use case for kernel-mode FPU when irqs_disabled().
+
+Except EFI?
+
+>   arm64 and riscv already disallow kernel-mode FPU when irqs_disabled().
+>   __save_processor_state() previously did expect kernel_fpu_begin() and
+>   kernel_fpu_end() to work when irqs_disabled(), but this was a
+>   different use case and not actual kernel-mode FPU use.
+> 
+> - This is more efficient, since one call to irqs_disabled() replaces two
+>   irqs_disabled() and one in_hardirq().
+
+This is noise compared to the overhead of saving/restoring vector CPU 
+context ...
+
+> - This fixes irq_fpu_usable() to correctly return false during CPU
+>   initialization.  Incorrectly returning true caused the SHA-256 library
+>   code, which is called when loading AMD microcode, to take a
+>   SIMD-optimized code path too early, causing a crash.  By correctly
+>   returning false from irq_fpu_usable(), the generic SHA-256 code
+>   correctly gets used instead.  (Note: SIMD-optimized SHA-256 doesn't
+>   get enabled until subsys_initcall, but CPU hotplug can happen later.)
+
+Alternatively we could set in_kernel_fpu during CPU bootstrap, and 
+clear it once we know the FPU is usable? This is only a relatively 
+short early boot period, with no scheduling, right?
+
+Thanks,
+
+	Ingo
