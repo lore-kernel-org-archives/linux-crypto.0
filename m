@@ -1,129 +1,109 @@
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573371BFE00;
-	Sat, 17 May 2025 07:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5A31E1C36;
+	Sat, 17 May 2025 11:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747468011; cv=none; b=I6x4XJR7Nj89ReBUoqt92O0D/ag7MM/eQOTMwxqZKRuT2AGBImwBsouu8woxYniER5EWzw5AogLFUhnHQ3nd0iggt4CFAD9xbpUCsEq6PhO2tuBKeoGacDEPU+YhkfZxem3mni+zJGH0RaarZfECRRVrujNvlnJ3ari0wTaV92o=
+	t=1747481091; cv=none; b=NrRcDg0cieGrxgeUyN0mxmerVsJrJfErFHa8hsZTY77MEe0Tjwzso9I2aPVa/YduX3J6+Pi9Jj3Ho+Y92jdklWxEfaK91gxRtBGtlv9EfZm1K2nbti0dhb9xLI+Ppifctmu+/s0nqB1zdc5jQU243m4oE/y2Os9JLguGrQ6AooM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747468011; c=relaxed/simple;
-	bh=BA21nTuyVrFj6BuwjvvE81q7qxBXx4vT2PWZSxnDhiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EeC+4BqnLMshF+ARP1avRTyOM6L5n5vf+9vTxv7BWTTtEGeZf0LxcqM/PPDz+0O0PF0PvWvTe4gRpOd52kIollzm/ls4118kw0DfoeQ8ytAuNElkd2/KIidKRi8qCLf5KNM0YRKUKD2feY7Hq92WIYnXRAJ1Fdbrg+RJNnsiV7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=JcCrj9C1; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1747481091; c=relaxed/simple;
+	bh=ITQ8WoBgcuYy2CoCnaWW8b2dqVeJ6CVqmMWg/wOdEMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W8SaA5voMs2epiWPyXBTrIkb0yCMU/meR+D3w+8iKe0p1LSEB4jYqnso/M3yQRUU/hnDSADjZWSve5GoB+yLDYTYIA3f/AJWmx36WyyRzd/IRmY1hewfhGB9xbSivlYy5q1ugIgOAq8kwy418XO6YVP5Q+ZDZjUCPxYM7/N1XrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmxBAVxg; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="JcCrj9C1"
-Received: from [172.20.3.254] (unknown [213.157.19.135])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 3CCD43FAF0;
-	Sat, 17 May 2025 07:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1747468006;
-	bh=Crrgymlnv/A4SeTHHwYIsTxLrWyj4Ayq+D7y5rXLS70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=JcCrj9C1TAvakMYCkzaU6ElS7UZhucwmlKqL/9Ew699zNJSv9HWk7v3iKAJAKSOET
-	 Co1VOb78zNV4ACUb3vgIdi5guWfZBE/XQJg2vfPoduyjCpXlbCeG94RqXR/rpcN8tj
-	 8Ob6PxViL9xfaO0TkJ5tLty30RZuFbMVRNLW7ZBxBy01eXMC5IBtzqAUyuw6p/FQ9f
-	 pcqMSl9NJHOvJmf5+BNsWPBdtCS+owvrrLry34CoqcCtiBhX7JCeC22wD/07AEBySd
-	 NPDfQr7RaCnoO0xXE9u4HOdGdKM7TUzjBR4t07eCzCLiid82656CX5vLTIZqw5DSyd
-	 +22fo6Y535Baw==
-Message-ID: <bcd712e1-5894-4ffd-865a-d8de33aed1a6@canonical.com>
-Date: Sat, 17 May 2025 00:46:45 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmxBAVxg"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a365a68057so510378f8f.0;
+        Sat, 17 May 2025 04:24:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747481088; x=1748085888; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MSwDpQT84zdgO6wXxHFEBW2XxJars8UnwfBLwxECHy4=;
+        b=PmxBAVxgXTpI7KtnvuVV0NbaxhymuZ+xLoSwhq8fOejcmwvamfAapA65uMBTLYb8aw
+         D9VXBWjI7W8oOa8a6t6TPhNsReHJT9s1PQflc36m6gKrz3gx8OYYiHhcUD4i+TO8uGVK
+         1WiDIjBhMh9kpgvbMaEWYoPjVVt71t4EqTkh84lwBpD6FsJrwgF5yFKdaBLlWGSTmFO7
+         J9f+cgiZflmMdQHW+wI6OTMA1RczGc+YzdUlz863ZNQknJ8b5a85oCAXj/SX3Gado7PE
+         N56J2zkVkGYVMYc+N4R9A2ezElBHQPm5JlHq+k+b8x/Im1+91h72OPklL/NXLIkQw0pT
+         wyzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747481088; x=1748085888;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSwDpQT84zdgO6wXxHFEBW2XxJars8UnwfBLwxECHy4=;
+        b=JJwoU/eHskXKub6qNe1Qs7ybV43YHdcRBpv6M9UwzEUAm4gBsbhGuZNVJvv88sJGIL
+         K/ITJJBGrYGvUfLAdhl6L21YfQTAuPEC+CfOlthrtKUVTd7mXLJE2djh6RUa5LElhwk9
+         8T0IxD7f9dpQlfqeBF9npI3UAACJNOXk3NRRkQpjb4l4CvnZd/GNvEyt/H2aFu1mUhuZ
+         S7y5SFASPozoVgmi2frcsTUvGqN7Mi2ixnafoDr++4WqAXNjQkHCZCpNQLbv1b+Oq37y
+         ARnrAju7E4uygfv4y0vA/g4VVkTbSshmB2ClOVgeqYmpduFx+ozRQod2j1YzEXwHWt/T
+         XsqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKBza0mlh9ITfCol7OenUZKNTyNbU+uEgzk8Ry9kIBAPJukcXsFJ7/rf8o9EbqhuauF5I2Gs/gYX9yZD4=@vger.kernel.org, AJvYcCUWyflonRRHUuEfeq8ROFRc1zhA7OU9nehbSrbEERrZq4Ve0AAbMUrELxGAhXMskPdVxLqKzjIo8JlydSee@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4ArjgLtOWVdz/P1+Ja/i9yP5ZraiW/MCHfCVOKhvpLExs98z1
+	jIY91uDWirGB9yaAWNFTZMdljOdZ+4IaPed/u8QYRBsR3x1a6Fz9DeY7
+X-Gm-Gg: ASbGnctbJjbLy1/bs98srHirxxWWxy9iIWXIv82CnbI6RFbT1ho2J1m/HynB9PepFb6
+	lu538yf3pP5STJQGnI/hMAsLTg69oCgblyaE7rCvIXJgutdMJmgxN+lKh84edrOhaDq/fgr8XwK
+	1J0bHF7iGOmDAwQZliM17g4hcriA4D2il03NAgc70yBPO0O9WGIheb702azB45b/YYpFKt8hL7B
+	CdLoHbsefpirSrGakh/K/wYX5Glx+jggvkHtf9P8xl4bdeyFjG+FTtAWJzF4UwDFSIF+RtQ63kR
+	xFN2MXEuWnP0+9fVk+H1lAxLWMrllsY7kIqHawkc/i6dXRXWNCQVwsZAoJaAdt2l7N4AMzHzOLB
+	WucdAv/AcexQYxkRIG/UIxG26KMQ=
+X-Google-Smtp-Source: AGHT+IELLGTB3mvKaXwEU3iKQvyyKkC/EtqZga1x5Ws2/utzAKD+OKcH1q2bdpPcVf7VWr+9eHW4uA==
+X-Received: by 2002:a5d:6e4d:0:b0:3a3:5f36:33ee with SMTP id ffacd0b85a97d-3a35f3634demr3881503f8f.32.1747481088193;
+        Sat, 17 May 2025 04:24:48 -0700 (PDT)
+Received: from Red (lfbn-nic-1-341-50.w90-116.abo.wanadoo.fr. [90.116.174.50])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442f39ef8f7sm136118285e9.39.2025.05.17.04.24.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 May 2025 04:24:47 -0700 (PDT)
+Date: Sat, 17 May 2025 13:24:44 +0200
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Klaus Kudielka <klaus.kudielka@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>, regressions@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
+	Romain Perier <romain.perier@gmail.com>
+Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
+Message-ID: <aChx_ODF_hYKL8XO@Red>
+References: <28184fb96e2de8a0af32816f5ff1b3d776b57217.camel@gmail.com>
+ <aCMOyWVte4tw85_F@gondor.apana.org.au>
+ <8e9b45bdafe6ac3f12bcbb5fce5bc9949566344f.camel@gmail.com>
+ <aCQm0aHYnI6ciyPz@gondor.apana.org.au>
+ <20dde00750d803a9a364ded99dab1e3e22daec77.camel@gmail.com>
+ <20250515182131.GC1411@quark>
+ <f0dc235e3d7bfa1f60cc01fd527da52024af54e0.camel@gmail.com>
+ <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au>
+ <aCcyXkeBvHQYvf2d@Red>
+ <aCczV6MF6xk5rRA3@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] apparmor: use SHA-256 library API instead of crypto_shash
- API
-To: Paul Moore <paul@paul-moore.com>, Eric Biggers <ebiggers@kernel.org>
-Cc: apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20250428190430.850240-1-ebiggers@kernel.org>
- <20250514042147.GA2073@sol>
- <CAHC9VhRL=Jsx8B1s-3qmVOXuRuRF2hTOi3uEnRiWra+7oQJvrg@mail.gmail.com>
-Content-Language: en-US
-From: John Johansen <john.johansen@canonical.com>
-Autocrypt: addr=john.johansen@canonical.com; keydata=
- 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 lT9Q
-Organization: Canonical
-In-Reply-To: <CAHC9VhRL=Jsx8B1s-3qmVOXuRuRF2hTOi3uEnRiWra+7oQJvrg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <aCczV6MF6xk5rRA3@gondor.apana.org.au>
 
-On 5/14/25 14:57, Paul Moore wrote:
-> On Wed, May 14, 2025 at 12:22â€¯AM Eric Biggers <ebiggers@kernel.org> wrote:
->> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
->>> From: Eric Biggers <ebiggers@google.com>
->>>
->>> This user of SHA-256 does not support any other algorithm, so the
->>> crypto_shash abstraction provides no value.  Just use the SHA-256
->>> library API instead, which is much simpler and easier to use.
->>>
->>> Signed-off-by: Eric Biggers <ebiggers@google.com>
->>> ---
->>>
->>> This patch is targeting the apparmor tree for 6.16.
->>>
->>>   security/apparmor/Kconfig  |  3 +-
->>>   security/apparmor/crypto.c | 85 ++++++--------------------------------
->>>   2 files changed, 13 insertions(+), 75 deletions(-)
->>
->> Any interest in taking this patch through the apparmor or security trees?
+Le Fri, May 16, 2025 at 08:45:11PM +0800, Herbert Xu a écrit :
+> On Fri, May 16, 2025 at 02:41:02PM +0200, Corentin Labbe wrote:
+> >
+> > Yes I have still errors:
 > 
-> Something like this would need to go through the AppArmor tree.  As a
-> FYI, the AppArmor devs are fairly busy at the moment so it may take a
-> bit for them to get around to this.
+> Great! Please apply my debugging patch and see if it shines any
+> light on the problem.
 > 
-I am going to see how much of the backlog I can get through while traveling
-replies might get batch because I will be mostly off line but hopefully
-I can deal with most of it this weekend.
 
+Hello
+
+Your patch didnt apply cleanly on cryptodev/master in tdma.c
+I have fixed at hand and the result is:
+http://kernel.montjoie.ovh/478852.log
+
+Regards
