@@ -1,113 +1,170 @@
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA0321CC70;
-	Sun, 18 May 2025 14:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7912AC17;
+	Sun, 18 May 2025 15:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747579358; cv=none; b=YNkmUv2vfep/IE43ZVDQNCElQW/Nv5No4BvdSQq3psdxCWb9PuISBZb0zIH63EDcfYLiYOU5IHsJuSN45NnvTAi3AoxmPJUCZq2ceuaB8PKQkvIc3hCBFTF9Bqcevj0bcuSVhjKD6mHD8JOturnXylHgcQPd5/e/15eNrdAiogg=
+	t=1747583539; cv=none; b=Ppqkp9ymgm+4f0fjF89cwaIfX6TqMJk/bBUXG33j69xUNoBINcneWA5Q6olEEKR2JH7VwaiqgstPT7K8uFWksOUkowGIFYkKtMQy3w4WV7RmCT8X53yCA5uS7LAXh5BydewxeHJ2izB732ruBOY7+Xn7jnEcaZ9E44P+rFZFJYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747579358; c=relaxed/simple;
-	bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
+	s=arc-20240116; t=1747583539; c=relaxed/simple;
+	bh=+3sfbNrs775Nuch7lp3CXdZrxEkkKx2XOLmSr98QaCA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S1PO2xylGll94R/nHkgM/fczSfgeBTBNCUPWXd+AIM14ale7NIk1t3FbzhOR1IIuzM8dLLnZMamAhvP7JUocLFXGIPlls+RUyTAAMERX6iyUlcN9E8zgDzkjackaLw8PImIFER/bM7X4RuREbty72vgdZiNPxLtMUry3Nq68AXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G1bdDZCh; arc=none smtp.client-ip=209.85.208.66
+	 To:Cc:Content-Type; b=bJR8M9bsM1ulZZfPyevaLemMfSkJqBHmWCxP6TAln+KDREqcH9GGVA9uqxC0PUIzGqpvS5NLhcocg2S/FiZc95qDzSOhEY3VsT2DOX4YjbMOTzpGyFP5iebDtRunUE23J2D5rjmt1Arj4bt6437ALOGyfxRH75xFT7aLEr4K9P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cAkoIeKe; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1bdDZCh"
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-600210e4219so4856566a12.0;
-        Sun, 18 May 2025 07:42:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAkoIeKe"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a1f9791a4dso2341159f8f.0;
+        Sun, 18 May 2025 08:52:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747579355; x=1748184155; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747583535; x=1748188335; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
-        b=G1bdDZChhUwF2sG9iVs+z/F/5uX1r5kqzCa7/RAF39YNgFr5Ju19V4F5od73pYxw9b
-         BY02mHbrtNRrItX4s7d5HHt21X5GO7w0dGd0oFV4JsXRWqoKnfOXFT2n4+OIZ3/5gbCG
-         9Iiw4s5LFnnzd/grzoN3S1fVp1g22VkE6PYr8iQMx1cYb1ILwS+4Rq1cSUQfD8OLWmak
-         4Ofuow556uEVs6Q4e1+N73AXzIGpy0XL/vmEYJXHIh2bj/e5IhIrooh/eK8c4UgkTXvp
-         3tny1iEy17VP7QnRNC02oyWoTXvpGWgImMKilKUr1dUJ2wWw5uPNpOcPFw940WBbdEkM
-         9osg==
+        bh=c3as2gF+IatO8dg1hmkBSNBs2pFXaXsGSX1ZIQFwJQ4=;
+        b=cAkoIeKeBkAgaZf0+4psRdyr4cApTCvy7rXpKQN9mB3Nq88tIoO8H6GGZu+AwJ1VOP
+         +cA22pAgYrMTAxCSnHR5PmhUZF6NFg2UcHHcCqfbbPijYq7aXC8V+4Xklh2oaxOrA9DH
+         mjwwx6l5odZ3W1CiRthhY5/xqqoynth9VMljC0H6qNfJTeaULle3Y8J5QDsFH6kCEwG2
+         rhFBYDgihM7clcDR98obPAcmUT2FqZjuAuPU1mj6dLN74U95up3ORvoa/fsEvYYG2hTx
+         8kNwqlmkiVkzI53hxDxv/M6cQiJgYSgepM9JQU2novlnSRSmNSfLW3ODjl86u4J5PFHd
+         4P7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747579355; x=1748184155;
+        d=1e100.net; s=20230601; t=1747583535; x=1748188335;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
-        b=nin/U/PbR07oLePzhN5mU1XPjJzfQirSLbesBbenRDJW8Yuytunp/9qv+ZISA+m2Ew
-         ouL2eibE6WEZYRdczmsGk27KCbT4dj5Ssk6l23ATji+jZsWnaPXZMu1JUHSUhzhx1BJk
-         x3B6Jkesw9KjG1JLXDYzWoJD/A70EUzNAPEFmauQhNy94o1KBwUH/rE3+VLGqzv19oXP
-         wduSum7t1M0Drn6UKaPqTPksCi5VhUyUi69tI3uClmcVevmxhcrC9HcPqyzqInZIdU6f
-         tgouh7XnL/WtKFY8+G4oOEgfaRXkRr1aSVow+ZsZuj7PRGzXZ2jGmNe5OO3pO1ArqzXe
-         zlbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUh2XN1qysNgyScsPKSIauxItG+OjnwyUF6MxxkJJQArbtl5liifIBrhB1Z8SZI3rqcoBEMXyGisciMemYOWRYD@vger.kernel.org, AJvYcCUvxjxEtd8Ee7FW3gBVRIomRPyyRb1PPLIWD0YsHO3zUCace1c7VmBD7ttWP/+dG9I5Uv9L048kpDYs@vger.kernel.org, AJvYcCWlKabIPOI1wx0FzIypnjsbACZh61xYgoJ0dIaH8BOfRE7d3srJYYnZdAk75FEO45eiYyy4GzUo0DdK4RQ=@vger.kernel.org, AJvYcCWvb5nL4+qmLv/R1MX0s1Iu780VInluxfwoFhRCB73KDmZ2uT7M8b39soNgYgzVFe71atoX8Dd7t7MD@vger.kernel.org, AJvYcCXo6NiD6uHdxET/tatyKdf2JNLfyv4FGvG2YDNByGQeI7pJeC5Fzt4DjOfmziZWndt9t1Yt/THi/owtdYEZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyloTETXRsazmoivtTNjujBtDMpUd8mAcgNnnqaglx7Je3E9OAv
-	9NkWBPOj/k7uPJZ+ZFxpK2ubJ9csWwgE5JkZmjbToO86vyO9d93Po2vd+KwVEInsnNuUANZhNLL
-	xB6ToQTn8bXJF8h+wR+UCm/ZK8sucRCE=
-X-Gm-Gg: ASbGncsERKVSxQ7BRt1dL5UuEoye3hAsbwQCqzfuJK37N2XywRz6nAyJ3yXt+x3fopY
-	uCS9Jwda/RA+hMqNTBFfRRW8MZOlvpk7AUctjf+fTsltsN1E5y1mYAh86zvYi3fbPd5I1BlwmLY
-	WwjXhLa2+++fVdn02RiPR27gmAWMphhQ==
-X-Google-Smtp-Source: AGHT+IHB++m0GR0lO5TfW8cZq+R6bSxHcLUjm6jGofGJAl2FV1P4JdhTYEzSIBs2qV2FvWjm0WoY9STztiddXe/xN+k=
-X-Received: by 2002:a17:907:7d8d:b0:ad5:4998:9f1a with SMTP id
- a640c23a62f3a-ad549a7e5e8mr600457266b.5.1747579354599; Sun, 18 May 2025
- 07:42:34 -0700 (PDT)
+        bh=c3as2gF+IatO8dg1hmkBSNBs2pFXaXsGSX1ZIQFwJQ4=;
+        b=LwOOvdN84iV9uvyy6diaSAzim/3vXZNHpmI62uEPZ+S1XK2Uo4zM8SXSgW3Okgh6rJ
+         jC6087knAy5AjL0Ivi0beMJXWtXmb7gFaRiunaKXZX5LukRp9cR2mW8BWV6NG6UjvuvV
+         lEDzN35ske42VZsHaVBYJBlC31YWnV+6P4+wx1qL7zWoh6p7q/GDurEX00LnV8m0H8TQ
+         vt7y/M9WHUO24622dTkGGvViLhlhD05W9N4dhISFzaFqS0U+N2qec391yZHiUrTMsa6d
+         ZW2beoex2WfRT3I+aMcrR8sqd/QUsTshjbe0zSFwD16BMnBooqTl5eqsMa5vIA6+aq8I
+         i4lA==
+X-Forwarded-Encrypted: i=1; AJvYcCUF+4T59LTzyGa2XoE1k6EL11QdqLyAy4vvLqJiwo3NRTq0c1drBSD+gQkFAXXBAUiYww7kWAwqnFm4J5YX@vger.kernel.org, AJvYcCUJOqnyR1DP6TnRUZB4Vp3TF2z8waPRIuXWhMmdf/NyN98v0NcejJqPLyaNYO5wVHTSfuruiQL5AU8X@vger.kernel.org, AJvYcCUw++A5pdmRhhD1tRgRioZ4yKN84CH3096HZCLeUoxsBDd+biKDmE3I/91rMSWcC/rnPjuqwvm12xDHT6Rd@vger.kernel.org, AJvYcCVaQunn7hsm08ITjOIuzXSZq10bmKoddP/P3AXgZOGyk1Zj0nXrDv4V9OCbGnuGkK+shNfHsW8v3xU=@vger.kernel.org, AJvYcCWUMvqzKPo18qzbtAOOTEEZblAKhwNnekV7GPLOZE3Xlh+4g397dOfo5dHiT4bFTYtg1QJMlXM5VrxtOPD5a0AGxN62RWwD@vger.kernel.org, AJvYcCXMpZ6V7r/XhV2WUVmy3WHS1AZnJsjywLwU5ENFAMGMk9QGlAv9+z8BTpPuP/v6OVarsaU=@vger.kernel.org, AJvYcCXZsWmWOI+9XqJxhhuBxaY4PX+VwowccTEv5r9v2MiAcPoTRk6pQpC+RTgxx/0yaoMRUwhuxC9MZsDAbwHS4VwB@vger.kernel.org, AJvYcCXzYZdGI2ljZGQj2ccBIQ4wpJMD3+P4tTQqWen+8B+x2I28t5EUH6AWQuyKbTVOjQXgvr+orOOzjBIFLlja@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRTn7pohfqVD/vLV1S0FZ0FOWfaUs6megSqWcP4Ss+/3s6MIH1
+	n1ei/yo6S6ZZnaDa6J3YIW0Y7KHMrJQYhc935KEPTMcd8zp42ZWv/pGQyqJrEVtvG77a2vV6qap
+	bQpBCL/BZX6J+gYth63RZ2rRtFhurB8I=
+X-Gm-Gg: ASbGncuY24LoAXvs1m70+NwUk3Ny5ylM/hpd8Ygwzj4beFxgquI/DQK/9vwVM6tQdv9
+	Cs4ZERDpv8i5z/6lpi5f4KzPTnQFboMUvMwC6VKZxSPFNjKnk/IjB+wheip8EO+owYkt276IHum
+	Mepw8N47lEC9+amrHWivBYN3AfZOfrn8Buj9YOYiAd/UxFqwkjlQ1VnIveyYhLxw==
+X-Google-Smtp-Source: AGHT+IEiZa7/kL1vl+lHgpPDDtfRZ6UOCk/sObQ0RqGRPFYYBykx/zOKPS3oTQuTUrCCrc8E+OeC4fTdKLrwex1Vzss=
+X-Received: by 2002:a05:6000:188e:b0:39a:c9c1:5453 with SMTP id
+ ffacd0b85a97d-3a35c8457cbmr8695268f8f.49.1747583534541; Sun, 18 May 2025
+ 08:52:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <18F9BD47-282D-4225-AB6B-FDA4AD52D7AE@gmail.com>
- <9b18e8e3-f3e2-48d4-839a-56e1d8f62657@intel.com> <03d0db6b-628e-4a5e-8e71-852233b83f60@apertussolutions.com>
- <fbb23ee0-c0b4-4b0e-8861-940f8ceaf161@intel.com>
-In-Reply-To: <fbb23ee0-c0b4-4b0e-8861-940f8ceaf161@intel.com>
-From: Mike <mikewallacesmith90@gmail.com>
-Date: Sun, 18 May 2025 09:42:23 -0500
-X-Gm-Features: AX0GCFuU42_TMoi_HKtSGmNW7XrkC1FL6iyDZjOSvOw7NwM1rf6CdCYLar4WcGI
-Message-ID: <CAAyYeYjp0v2PYt1owTdOpQD8_NjakquyXbUr5M1a_OWLEKHQ0A@mail.gmail.com>
-Subject: Re: [PATCH v14 00/19] x86: Trenchboot secure dynamic launch Linux
- kernel support
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: "Daniel P. Smith" <dpsmith@apertussolutions.com>, Rich Persaud <persaur@gmail.com>, 
-	Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-efi@vger.kernel.org, iommu@lists.linux.dev, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, 
-	ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, 
-	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net, 
-	nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org, 
-	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com, 
-	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com, 
-	Sergii Dmytruk <sergii.dmytruk@3mdeb.com>, openxt@googlegroups.com, 
-	"Mowka, Mateusz" <mateusz.mowka@intel.com>, Ning Sun <ning.sun@intel.com>, 
-	tboot-devel@lists.sourceforge.net
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+ <CACYkzJ5jsWFiXMRDwoGib5t+Xje6STTuJGRZM9Vg2dFz7uPa-g@mail.gmail.com>
+ <CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com>
+ <CAHC9VhQL_FkUH8F1fvFZmC-8UwZh3zkwjomCo1PiWNW0EGYUPw@mail.gmail.com>
+ <CACYkzJ4+=3owK+ELD9Nw7Rrm-UajxXEw8kVtOTJJ+SNAXpsOpw@mail.gmail.com>
+ <CAHC9VhTeFBhdagvw4cT3EvA72EYCfAn6ToptpE9PWipG9YLrFw@mail.gmail.com>
+ <CAADnVQJ4GDKvLSWuAMdwajA0V2DEw5m-O228QknW8Eo9jxhyig@mail.gmail.com>
+ <CAHC9VhTJcV1mqBpxVUtpLhrN4Y9W_BGgB_La5QCqObGheK28Ug@mail.gmail.com>
+ <CAADnVQ+wE5cGhy6tgmWgUwkNutueEsrhh6UR8N2fzrZjt-vb4g@mail.gmail.com> <196e1f03128.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+In-Reply-To: <196e1f03128.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 18 May 2025 08:52:03 -0700
+X-Gm-Features: AX0GCFt9M3_dCkyMrm7XCxwJyjC1dFUOiX7_cT3eZ9_H0MvAbu0YgA5uhMOcM8E
+Message-ID: <CAADnVQ+=2PnYHui2L0g0brNc+NqV8MtaRaU-XXpoXfJoghXpww@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: Paul Moore <paul@paul-moore.com>
+Cc: KP Singh <kpsingh@kernel.org>, Blaise Boscaccy <bboscaccy@linux.microsoft.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, bpf <bpf@vger.kernel.org>, 
+	code@tyhicks.com, Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
+	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
+	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, kysrinivasan@gmail.com, 
+	Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 28, 2025 at 7:57=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
- wrote:
+On Sat, May 17, 2025 at 10:49=E2=80=AFPM Paul Moore <paul@paul-moore.com> w=
+rote:
 >
-> On 4/28/25 17:04, Daniel P. Smith wrote:
-> >> OK, but why do this in Linux as opposed to tboot? Right now, much of t=
-he
-> >> TXT magic is done outside of the kernel. Why do it *IN* the kernel?
-> >
-> > There was a patch set submitted to tboot to add AMD support. It was
-> > rejected as tboot is solely focused on Intel TXT implementation.
-> >
-> > This meant I either had to go the route of yet another standalone loade=
-r
-> > kernel or do it in the kernel. Doing it as an external loader would hav=
+> On May 17, 2025 12:13:50 PM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> > On Sat, May 17, 2025 at 8:03=E2=80=AFAM Paul Moore <paul@paul-moore.com=
+> wrote:
+> >> On Fri, May 16, 2025 at 7:49=E2=80=AFPM Alexei Starovoitov
+> >> <alexei.starovoitov@gmail.com> wrote:
+> >>> On Fri, May 16, 2025 at 12:49=E2=80=AFPM Paul Moore <paul@paul-moore.=
+com> wrote:
+> >>>>
+> >>>> I think we need some clarification on a few of these details, it wou=
+ld
+> >>>> be good if you could answer the questions below about the
+> >>>> authorization aspects of your design?
+> >>>>
+> >>>> * Is the signature validation code in the BPF verifier *always* goin=
+g
+> >>>> to be enforced when a signature is passed in from userspace?  In oth=
+er
+> >>>> words, in your design is there going to be either a kernel build tim=
 e
-> > required a new set of touchpoints, like the one you are highlighting. A=
-t
-> > which point, I am sure I would have gotten the question of why I didn't
-> > do it in the kernel.
+> >>>> or runtime configuration knob that could selectively enable (or
+> >>>> disable) signature verification in the BPF verifier?
+> >>>
+> >>> If there is a signature in union bpf_attr and it's incorrect
+> >>> the prog_load command will be rejected.
+> >>> No point in adding a knob to control that.
+> >>
+> >> I agree that when a signature is provided and that signature check
+> >> fails, the BPF load should be rejected.  I'm simply trying to
+> >> understand how you envision your design handling all of the cases, not
+> >> just this one, as well as what build and runtime options you expect
+> >> for controlling various aspects of this behavior.
+> >>
+> >>>> * In the case where the signature validation code in the BPF verifie=
+r
+> >>>> is active, what happens when a signature is *not* passed in from
+> >>>> userspace?  Will the BPF verifier allow the program load to take
+> >>>> place?  Will the load operation be blocked?  Will the load operation
+> >>>> be subject to a more granular policy, and if so, how do you plan to
+> >>>> incorporate that policy decision into the BPF program load path?
+> >>>
+> >>> If there is no signature the existing loading semantics will remain i=
+ntact.
+> >>> We can discuss whether to add a sysctl or cgroup knob to disallow
+> >>> loading when signature is not present ...
+> >>
+> >> As mentioned earlier this week, if the BPF verifier is performing the
+> >> signature verification as KP described, we will need a LSM hook after
+> >> the verifier to serve as an access control point.  Of course that
+> >> doesn't preclude the addition of some type of sysctl/cgroup/whatever
+> >> based access control, but the LSM hook would be needed regardless.
+> >
+> > No. New hook is not needed.
+>
+> It would be good for you to explain how the existing LSM hook is sufficie=
+nt
+> to authorize the loading of a BPF program using the signature validation
+> state determined in the BPF verifier.
 
-Will this cause any patent infringement issues in Linux [1]?
+I already explained:
+.. a job of trivial LSM:
+if (prog_attr doesn't have signature &&
+   (task =3D=3D .. || task is under certain cgroup || whatever))
+  disallow.
 
-1. https://patents.google.com/patent/US9075995B2
+If that's not obvious you have to wait for patches.
