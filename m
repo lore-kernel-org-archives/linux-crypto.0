@@ -1,240 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1FF18EB0;
-	Sun, 18 May 2025 13:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA0321CC70;
+	Sun, 18 May 2025 14:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747575046; cv=none; b=tDCS2lInPTgJlTLN9jdnTg3GqXnd65S40jgs0FSDe65y30OXI33A5PrS3Ho0ROEozsS8F0wJnq4aymOnqfKj7t57b73ja0JPuzTeGT7A/XNqgqIdsh/yMk4IuGs+V6FFsV8TRAPecT03t4w22u6nrgbN+dtkAtSgmR7zvp9EyAw=
+	t=1747579358; cv=none; b=YNkmUv2vfep/IE43ZVDQNCElQW/Nv5No4BvdSQq3psdxCWb9PuISBZb0zIH63EDcfYLiYOU5IHsJuSN45NnvTAi3AoxmPJUCZq2ceuaB8PKQkvIc3hCBFTF9Bqcevj0bcuSVhjKD6mHD8JOturnXylHgcQPd5/e/15eNrdAiogg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747575046; c=relaxed/simple;
-	bh=h/mUrVJM7mtzQeRDGH/SX1uV2RaDjsHk4zcwWMiwfOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqkUL4GHFY0Yr65M7Ak55O0sRn0ZRfwhuB1sRa2LR9C2b7e6HRwuAxpS8+nE1YL/a6ConP0MyzU+3mRG6CLbB+04LHBGYF2ZZalsPue48QnUpKe2uBQP8sJ16yfy5q369CRE3T1rQp7uG+q0MPPDaI5cZC8DYGEdTW7CzC2RVIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYCq5DG7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747579358; c=relaxed/simple;
+	bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S1PO2xylGll94R/nHkgM/fczSfgeBTBNCUPWXd+AIM14ale7NIk1t3FbzhOR1IIuzM8dLLnZMamAhvP7JUocLFXGIPlls+RUyTAAMERX6iyUlcN9E8zgDzkjackaLw8PImIFER/bM7X4RuREbty72vgdZiNPxLtMUry3Nq68AXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G1bdDZCh; arc=none smtp.client-ip=209.85.208.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYCq5DG7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F315C4CEE7;
-	Sun, 18 May 2025 13:30:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747575046;
-	bh=h/mUrVJM7mtzQeRDGH/SX1uV2RaDjsHk4zcwWMiwfOw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WYCq5DG7waC2MM6LdpfQvZ8RuyzZWChliLdTuHptF8fsvX/+lsC7rIDg91U9ELOd+
-	 jLiVo3Fqut8A8EtLNBh0HbNPL8RXya7DI+uAmwndlz7EP0uJWOtrn+QEZdgtlBpOJN
-	 zuvW5eGCsC20fbexfUZHS2S1FfxW07tUMTm3i42NCK9sIKsxks/Hfy8ubYWblFJDXa
-	 /AVcvAOd1LlEUZ/NJamI8LMll1sXPhdxL+GVkAruPOSc5jK33DsMLxN3nAqQIKrlSk
-	 rLhsyHtcrDE+WHF/bSf0PsOnplhOhoW9tLTTzz60qZ6N6NN85PowpKpnbvQJCQRaSo
-	 1WNLtflqtpsnA==
-Message-ID: <1f4d4292-fbf9-42db-b4e0-6f9326b937fc@kernel.org>
-Date: Sun, 18 May 2025 15:30:41 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1bdDZCh"
+Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-600210e4219so4856566a12.0;
+        Sun, 18 May 2025 07:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747579355; x=1748184155; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
+        b=G1bdDZChhUwF2sG9iVs+z/F/5uX1r5kqzCa7/RAF39YNgFr5Ju19V4F5od73pYxw9b
+         BY02mHbrtNRrItX4s7d5HHt21X5GO7w0dGd0oFV4JsXRWqoKnfOXFT2n4+OIZ3/5gbCG
+         9Iiw4s5LFnnzd/grzoN3S1fVp1g22VkE6PYr8iQMx1cYb1ILwS+4Rq1cSUQfD8OLWmak
+         4Ofuow556uEVs6Q4e1+N73AXzIGpy0XL/vmEYJXHIh2bj/e5IhIrooh/eK8c4UgkTXvp
+         3tny1iEy17VP7QnRNC02oyWoTXvpGWgImMKilKUr1dUJ2wWw5uPNpOcPFw940WBbdEkM
+         9osg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747579355; x=1748184155;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rAUybgx3w08Pk16V3V7ElWMaPW68BeTRsRpRxxQzxeE=;
+        b=nin/U/PbR07oLePzhN5mU1XPjJzfQirSLbesBbenRDJW8Yuytunp/9qv+ZISA+m2Ew
+         ouL2eibE6WEZYRdczmsGk27KCbT4dj5Ssk6l23ATji+jZsWnaPXZMu1JUHSUhzhx1BJk
+         x3B6Jkesw9KjG1JLXDYzWoJD/A70EUzNAPEFmauQhNy94o1KBwUH/rE3+VLGqzv19oXP
+         wduSum7t1M0Drn6UKaPqTPksCi5VhUyUi69tI3uClmcVevmxhcrC9HcPqyzqInZIdU6f
+         tgouh7XnL/WtKFY8+G4oOEgfaRXkRr1aSVow+ZsZuj7PRGzXZ2jGmNe5OO3pO1ArqzXe
+         zlbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUh2XN1qysNgyScsPKSIauxItG+OjnwyUF6MxxkJJQArbtl5liifIBrhB1Z8SZI3rqcoBEMXyGisciMemYOWRYD@vger.kernel.org, AJvYcCUvxjxEtd8Ee7FW3gBVRIomRPyyRb1PPLIWD0YsHO3zUCace1c7VmBD7ttWP/+dG9I5Uv9L048kpDYs@vger.kernel.org, AJvYcCWlKabIPOI1wx0FzIypnjsbACZh61xYgoJ0dIaH8BOfRE7d3srJYYnZdAk75FEO45eiYyy4GzUo0DdK4RQ=@vger.kernel.org, AJvYcCWvb5nL4+qmLv/R1MX0s1Iu780VInluxfwoFhRCB73KDmZ2uT7M8b39soNgYgzVFe71atoX8Dd7t7MD@vger.kernel.org, AJvYcCXo6NiD6uHdxET/tatyKdf2JNLfyv4FGvG2YDNByGQeI7pJeC5Fzt4DjOfmziZWndt9t1Yt/THi/owtdYEZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YyloTETXRsazmoivtTNjujBtDMpUd8mAcgNnnqaglx7Je3E9OAv
+	9NkWBPOj/k7uPJZ+ZFxpK2ubJ9csWwgE5JkZmjbToO86vyO9d93Po2vd+KwVEInsnNuUANZhNLL
+	xB6ToQTn8bXJF8h+wR+UCm/ZK8sucRCE=
+X-Gm-Gg: ASbGncsERKVSxQ7BRt1dL5UuEoye3hAsbwQCqzfuJK37N2XywRz6nAyJ3yXt+x3fopY
+	uCS9Jwda/RA+hMqNTBFfRRW8MZOlvpk7AUctjf+fTsltsN1E5y1mYAh86zvYi3fbPd5I1BlwmLY
+	WwjXhLa2+++fVdn02RiPR27gmAWMphhQ==
+X-Google-Smtp-Source: AGHT+IHB++m0GR0lO5TfW8cZq+R6bSxHcLUjm6jGofGJAl2FV1P4JdhTYEzSIBs2qV2FvWjm0WoY9STztiddXe/xN+k=
+X-Received: by 2002:a17:907:7d8d:b0:ad5:4998:9f1a with SMTP id
+ a640c23a62f3a-ad549a7e5e8mr600457266b.5.1747579354599; Sun, 18 May 2025
+ 07:42:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com,
- Conor Dooley <conor@kernel.org>, davem@davemloft.net,
- linux-kernel@vger.kernel.org, adityak@vayavyalabs.com,
- manjunath.hadli@vayavyalabs.com, Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
- <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com>
- <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
- <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org>
- <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
- <19b1fca7-e1b1-4190-9bcb-7ce36fabd02e@kernel.org>
- <CALxtO0m_iVo4nnfYg5PzL5K0HgG-U2yNVeS3S0hfdXnObbJDJA@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CALxtO0m_iVo4nnfYg5PzL5K0HgG-U2yNVeS3S0hfdXnObbJDJA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <18F9BD47-282D-4225-AB6B-FDA4AD52D7AE@gmail.com>
+ <9b18e8e3-f3e2-48d4-839a-56e1d8f62657@intel.com> <03d0db6b-628e-4a5e-8e71-852233b83f60@apertussolutions.com>
+ <fbb23ee0-c0b4-4b0e-8861-940f8ceaf161@intel.com>
+In-Reply-To: <fbb23ee0-c0b4-4b0e-8861-940f8ceaf161@intel.com>
+From: Mike <mikewallacesmith90@gmail.com>
+Date: Sun, 18 May 2025 09:42:23 -0500
+X-Gm-Features: AX0GCFuU42_TMoi_HKtSGmNW7XrkC1FL6iyDZjOSvOw7NwM1rf6CdCYLar4WcGI
+Message-ID: <CAAyYeYjp0v2PYt1owTdOpQD8_NjakquyXbUr5M1a_OWLEKHQ0A@mail.gmail.com>
+Subject: Re: [PATCH v14 00/19] x86: Trenchboot secure dynamic launch Linux
+ kernel support
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: "Daniel P. Smith" <dpsmith@apertussolutions.com>, Rich Persaud <persaur@gmail.com>, 
+	Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, iommu@lists.linux.dev, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, 
+	ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, 
+	peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net, 
+	nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org, 
+	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com, 
+	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com, 
+	Sergii Dmytruk <sergii.dmytruk@3mdeb.com>, openxt@googlegroups.com, 
+	"Mowka, Mateusz" <mateusz.mowka@intel.com>, Ning Sun <ning.sun@intel.com>, 
+	tboot-devel@lists.sourceforge.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 13/05/2025 08:30, Pavitrakumar Managutte wrote:
->>>>>
->>>>> I do not see any improvements. It seems you ignored all comments, not
->>>>> single one was responded to or addressed.
->>>
->>> PK: Addressed all the below
->>>
->>> 1. SoC Bindings: We dont have any SoC bindings since its tested on the
->>> Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
->>> device here. Also added a detailed description for the same, which
->>> describes how we have tested the SPAcc peripheral on Zynq. This was
->>> based on your inputs to describe the existing hardware.
->>
->> 1. I asked to use SoC specific compatibles and after such explanation
->> that you use it in some different, hardware configuration, I asked to
->> use that.
->>
->> Reflect whatever your hardware is called in the compatible.
-> 
-> PK: Some context from my side which might clear up things
-> 1. We have developed the SPAcc Crypto Linux driver for the Synopsys SPAcc IP.
-> 2. Yes, this is technically a soft IP which we test on FPGA (Zynq
-> Ultrascale Boards).
-> 3. We are NOT evaluating SPAcc IP and thus its not a custom use case
-> or a custom hardware.
-> 4. Also SPAcc IP is NOT part of any SoC yet, but it may be in future.
-> 
-> Synopsys Semiconductor IP Business:
-> Synopsys develops Semiconductor IPs (aka DesignWare IPs) and provides
-> Linux device drivers to the SoC Vendors. We, as partners of Synopsys,
-> develop Linux device drivers for the IP, in this case SPAcc. So as of
-> now SPAcc is just a semiconductor IP which is not part of any SoC. A
-> 3rd party SoC vendor would take this and integrate this as part of
-> their upcoming SoC.
-> 
-> SPAcc Semiconductor IP details:
-> https://www.synopsys.com/designware-ip/security-ip/security-protocol-accelerators.html
-> 
-> Synopsys DesignWare IPs
-> 1. DWC MMC Host controller drivers : drivers/mmc/host/dw_mmc.c
-> 2. DWC HSOTG Driver : drivers/usb/dwc2, drivers/usb/dwc3
-> 3. DWC Ethernet driver : drivers/net/ethernet/synopsys
-> 4. DWC DMA driver : drivers/dma/dw/
-> 
-> Intent of upstreaming IP drivers by Synopsys
-> 1. As a Semiconductor IP designer, Synopsys provides Linux device
-> drivers with their IPs to the customers.
-> 2. These Linux drivers handle all the configurations in those respective IPs.
-> 3. At this stage of driver development, the focus is on the Semiconductor IP
-> 4. Yes, the IP can be configured differently for different SoCs and
-> the driver has to take care of that.
-> 5. The driver might need some enhancements based on the SoC
-> configurations, which could be done later.
-> 6. Its a good approach to upstream IP drivers, so the vendors could
-> use/enhance the same open sourced drivers.
+On Mon, Apr 28, 2025 at 7:57=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
+ wrote:
+>
+> On 4/28/25 17:04, Daniel P. Smith wrote:
+> >> OK, but why do this in Linux as opposed to tboot? Right now, much of t=
+he
+> >> TXT magic is done outside of the kernel. Why do it *IN* the kernel?
+> >
+> > There was a patch set submitted to tboot to add AMD support. It was
+> > rejected as tboot is solely focused on Intel TXT implementation.
+> >
+> > This meant I either had to go the route of yet another standalone loade=
+r
+> > kernel or do it in the kernel. Doing it as an external loader would hav=
+e
+> > required a new set of touchpoints, like the one you are highlighting. A=
+t
+> > which point, I am sure I would have gotten the question of why I didn't
+> > do it in the kernel.
 
+Will this cause any patent infringement issues in Linux [1]?
 
-Yeah, I am familiar with this...
-
-> 
->>
->> I claim this cannot be used in a SoC without customization. If I
-> 
-> PK: Synopsys SPAcc is a highly configurable semiconductor IP. I agree
-> that it can be customized for the SoC vendors. But I dont understand
-> why it can't be used without SoC customizations for a default
-
-
-Ask hardware team what is necessary to implement given IP in an SoC. SoC
-architectures are not that simple, that you copy&paste some piece of
-VHDL code and it plugs into existing wiring. You need that wiring, you
-need that SoC specific bits in your design.
-
-> configuration. All the IP customizations are handled by the driver.
-
-I don't talk about driver. We talk about hardware and bindings.
-
-> Say, in the case of SPAcc, all the IP customizations are accessible as
-> part of the "Version" and "Version Extension-1, 2, 3" registers. So
-> the driver uses these IP customizations and nothing gets hardcoded. In
-> other cases, those customizations will come as vendor specific DT
-> properties.
-
-Do you understand the problem discussed here? There is a long standing
-policy, based on actual real hardware and real cases, that you cannot
-have generic compatibles for custom IP blocks. That's it.
-
-> 
-> As an IP, which can be memory mapped and with interrupt support, it
-> works perfectly with a default test configuration. And this is what
-> the current driver has.
-> 
->> understood correctly this is soft IP in FPGA for evaluation, so no one
->> will be ever able to use it. Therefore this binding makes no sense to me
-> 
-> PK: No, we are not evaluating, but we have developed a driver for
-> SPAcc, which has been tested on a FPGA.
-
-So some sort of FPGA in some sort of setup which you claim with this
-patch is exactly the same for every other SoC. That is the meaning of
-your patch, to which I objected.
-
-> 
->> in general: you do not add anything any customer could use. It is fine
->> to add something which you use internally only, but again describe the
->> hardware properly.
-> 
-> PK: Its not an internal use case. We have tested the SPAcc driver on a
-> FPGA, as detailed above. We dont have any custom hardware and the
-> SPAcc IP is tested in a default configuration.
-> 
-> Question : Could you help me understand how a semiconductor IP vendor
-> like Synopsys, upstream Linux drivers for its IPs? In the current
-
-We are not even talking here about drives. I do not have to provide you
-answers for drivers.
-
-I explained already what I expect from bindings: real hardware
-description, so either real SoC or whatever you are having there.
-
-> scheme of things, if the SoC bindings are mandatory then we dont have
-> them at this stage. Those would have to come from the 3rd party SoC
-> vendors.
-> 
-> As a work around, I could add SPAcc bindings to Synopsys's "nsimosci".
-> Please let me know.
-> ARC - linux/arch/arc/boot/dts/nsimosci.dts
-> 
->>
->> 2. I wrote you entire guide what is wrong with your Cc addresses and
->> this was fully ignored. Neither responded to, nor resolved.
-> 
-> PK: I have fixed that.
-
-
-How? How can you fix a sent v2 with the same issues I pointed out before?
-
-
-Best regards,
-Krzysztof
+1. https://patents.google.com/patent/US9075995B2
