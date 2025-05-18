@@ -1,91 +1,109 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CFD204090;
-	Sun, 18 May 2025 07:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F72C1373;
+	Sun, 18 May 2025 13:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747555153; cv=none; b=nnEUEaSL0O0E+GZqC6vN6ix5kWG2GmbQyDtHh7stcAs/IQJIL/w2nlpFBT18ZMRJ3mKzvzALscE+yl9SoHIDOhJXKarP6HCk0zE+hiiCVSoR/a+KAwuTgoEYM4AfnHRIgAaEL2SWwp4SpKA3QsEiR+kanl5CSSEdBEipxAOQBCo=
+	t=1747574351; cv=none; b=W2FgVzedgvBQWvEMhV7GRGtjqVGaCDjY8K3+Av28serrzYvTj3aPAJ/INbJV8QFKKjSwZy5OHHbytu941GiC2JOtbsh0a8JmpzHcg/R9A6JkbIglFJffRh7xBrlm7jTG3vqMC0MyHp8f31PRu7O8to6ULr6Rc8TwtIXf3czUeO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747555153; c=relaxed/simple;
-	bh=4J4KfFdyJy0mvKpxNX93AgMdd1xp0yDGzypCIuL8D/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8myLOmeWoSb2Yo4cijR3/xgjwHnuxIMBxTTDydSI6fasmJiYsljG+mn597YGObgk3csQHy1XOPV4jrvGtLaLQ4jfTnKfuxQxkaQPvtuUVe2lBdPplqtJ38XKqZRdJ69sEvqk1XGEJm7Az4gbPixQOezYbbTvUfcgs5JQbpwxxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N0F5ruP0; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747574351; c=relaxed/simple;
+	bh=zqPJuOXxqod++t44o4DuYRjFJgaOBYIO604IdtZ/VSE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uMARPL/m+wIzoDxBNnxXeePrN/Qih5oBP/duuND/qX/afD6XKCJ9ullU98UqxicFieAIvAT/yb7pEBMxXRaOBWmJrnpF3LP+nEipO37WRm+LoN+UzS3gJPA1NWXIsPTp+k2XMz0jlkgMMWPeiwY6Wvw+ZMD4qZT5v/JysG5rxqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EtuQAT+M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N0F5ruP0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1l+Vpf23qIz8+p+rgGR8X/y0yOK0TfII8bnSXZ4uOAw=; b=N0F5ruP0YwhjUStQHZnMh2TbyV
-	qvjG2Mb49hYpwpufK8xgfz0DnN+SC3v9rKJjpBNHi6vsCr6saeSkPRivnUmgdr9lojbf3ZLqP/U+Q
-	M+XdcL0DarGFNvNjW+MLyLo6V70pQqBxrqCH6EaGpWH2g07hU26rCJ3gBIk5namH89pASxf7tdvMM
-	rjzQnFtTGhDwDmJib/V31IX02Qg97v9g1PdQcGzxAT1Fw4W+e3HNIUFlFO/sQl/cszVpMwef2QSKa
-	SZaGs/PfOvvgewyF/MeTea1fYPem5uSS7/3zBZnMxgf6CCmcN2E2pQltBwmwUkgrtPnXd5wr6xzHr
-	vp1zZanA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uGYvC-006wH7-1Y;
-	Sun, 18 May 2025 15:58:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 18 May 2025 15:58:58 +0800
-Date: Sun, 18 May 2025 15:58:58 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Klaus Kudielka <klaus.kudielka@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Message-ID: <aCmTQoJw6XG1CkuZ@gondor.apana.org.au>
-References: <aCMOyWVte4tw85_F@gondor.apana.org.au>
- <8e9b45bdafe6ac3f12bcbb5fce5bc9949566344f.camel@gmail.com>
- <aCQm0aHYnI6ciyPz@gondor.apana.org.au>
- <20dde00750d803a9a364ded99dab1e3e22daec77.camel@gmail.com>
- <20250515182131.GC1411@quark>
- <f0dc235e3d7bfa1f60cc01fd527da52024af54e0.camel@gmail.com>
- <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au>
- <aCcyXkeBvHQYvf2d@Red>
- <aCczV6MF6xk5rRA3@gondor.apana.org.au>
- <aChx_ODF_hYKL8XO@Red>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EtuQAT+M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17127C4CEE7;
+	Sun, 18 May 2025 13:19:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747574351;
+	bh=zqPJuOXxqod++t44o4DuYRjFJgaOBYIO604IdtZ/VSE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=EtuQAT+MxP1GAaFTXXnnzw0HNIiXtfN6h78D9OLv9S74SNymO1gsGhp/UUqG3JpA0
+	 j9pmoOFDNiNbCwt7VF1iPNmMsiZ0DxFrrqSFc3tMHEQHNHwWAKoVHlUsqpxpTl3nci
+	 0kSDGHL+uu3VHErMoMm0jpgkyLTUukVsYi8chHctOkKabDmnnS7Q6/S0ai1o4ezgXm
+	 9OYe0RCZ6UmlL/CGmMqfZvhJxqeJ0qqRrzuaFeMZE+kuUQAqt1tGdcEnj1W4Ee2/1c
+	 bGsIc+NojAA2qppAo8h78OvHwRZ1f7XJbOAucZMUCTmsGFVQOcWNuXEmhbfOXaXlqx
+	 vXbE4nECNWgXw==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-329107e3f90so3774661fa.3;
+        Sun, 18 May 2025 06:19:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUL9zoGbkrM8CpXRAsVo77LpR5xFbkrV/FJZuoBJmypFeSUnILxmVZm9ueTLG5nByQiztqvtUU/Tqi9ZU4=@vger.kernel.org, AJvYcCVSJRh41pONmtblkVOPv9+ucNrSCBH9gaQiCFO5mWYaQmFYboVA8t8fM6YkR9JOlVm+enDZU5G8SBA=@vger.kernel.org, AJvYcCWbySZEDOiBZ6JfTbuYyiWYXP2OxLZd3MlWSy2UJwfNtnuFp8jW4URUI9C7AtIN+/nrMMPfBswOqXgZcSCH@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVkS0Kgq+fcer3jGyE41A+Q7OYPcB6/SMyIdPtvYeCkBMc8MZi
+	BuBae3ntAHFa7rKNMkGEHTbRm05KDal6PAUXufxR0Y3lbgLwulB1BJP+1BDfefC3vdGnX7e1N/+
+	4UO86h1Ee0s4/UGgDQ/wGRWWh6ZzpdxM=
+X-Google-Smtp-Source: AGHT+IErqxXbCbuTtNVXIG+u+d7vpWcTqptYViLWkXc2Q2KmR50BGaqxSQAOGQizG46jzCV5EsAkk2BeVoCgiwwTEIU=
+X-Received: by 2002:a05:651c:400c:b0:30b:f42b:72f6 with SMTP id
+ 38308e7fff4ca-3280977f153mr20883761fa.32.1747574349469; Sun, 18 May 2025
+ 06:19:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aChx_ODF_hYKL8XO@Red>
+References: <20250516231858.27899-1-ebiggers@kernel.org> <20250516231858.27899-4-ebiggers@kernel.org>
+ <aCg2DSYp0nakwX3l@gmail.com> <20250517183919.GC1239@sol> <aCl_cSO2XqtSQEZT@gmail.com>
+In-Reply-To: <aCl_cSO2XqtSQEZT@gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sun, 18 May 2025 15:18:58 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGVAbD9zxUQSwwGo=ueadqWWSdaQNDe_-7ZezpFLMJRMA@mail.gmail.com>
+X-Gm-Features: AX0GCFu1VtSQRdHeCMJJc1l14RlBDttfmugJzDPWh47VUQRPpT4-fKjjp6OfCwk
+Message-ID: <CAMj1kXGVAbD9zxUQSwwGo=ueadqWWSdaQNDe_-7ZezpFLMJRMA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, Ayush Jain <Ayush.Jain3@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, May 17, 2025 at 01:24:44PM +0200, Corentin Labbe wrote:
+On Sun, 18 May 2025 at 08:34, Ingo Molnar <mingo@kernel.org> wrote:
 >
-> Your patch didnt apply cleanly on cryptodev/master in tdma.c
-> I have fixed at hand and the result is:
-> http://kernel.montjoie.ovh/478852.log
+>
+> * Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> > > Alternatively we could set in_kernel_fpu during CPU bootstrap, and
+> > > clear it once we know the FPU is usable? This is only a relatively
+> > > short early boot period, with no scheduling, right?
+> >
+> > Yes, if there isn't agreement on this approach we can do that
+> > instead.  Say:
+> >
+> > - Replace in_kernel_fpu with kernel_fpu_supported, with the opposite
+> >   meaning (so that the initial value of false means "unsupported")
+>
+> I'm not against simplifying the x86 FPU model to exclude IRQs-off
+> context (especially if it also micro-optimizes some of the key runtime
+> kernel-FPU primitives), but it has to be a full solution and we'll have
+> to see how complicated the EFI changes get.
+>
+> Ie. without seeing the full cost-benefit balance it's hard to call this
+> in advance. Mind sending a full series that addresses the EFI case too?
+>
 
-Hah my debug patch was broken.  It didn't take into account the
-partial block when recalculating the hash with the fallback.
+EFI services are only called with IRQs disabled in exceptional cases,
+so it would be unfortunate if it prevents us from make meaningful
+improvements here. In ordinary cases, they are called from a
+workqueue, and I'd prefer it if we can address this without calling
+all EFI services with interrupts disabled either.
 
-However, this seems to suggest that my hunch was incorrect.  The
-partial hash wasn't being corrupted and it's actually the final
-calculation that was wrong.
+AIUI, the reason we cannot tolerate IRQs being disabled is because
+re-enabling softirqs will complain if IRQs are disabled, due to the
+fact that handling softirqs should not be attempted at that point?
 
-This could be good news.  Because if it is a hardware bug causing
-this, then the final calculation can be easily worked around by
-turning the final hash into a partial update.
+I don't know the history here, but I wonder if that isn't overly
+pedantic? Disabling softirqs could be avoided entirely when IRQs are
+off, given that they are disabled implicitly already. But why then is
+it not permitted to disable and re-enable softirqs under this
+condition, given that it makes no difference? Or perhaps I'm missing
+something here.
 
-Let me crank out a debugging patch for that.
+A good way to trigger such an exceptional case is running a kernel
+with efi-pstore and lkdtm built-in under QEMU with OVMF, and do
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+# echo PANIC > /sys/kernel/debug/provoke-crash/DIRECT
+
+Another case that likely executes with IRQs disabled (but I haven't
+double checked) is reset_system(), which may return with an error, or
+reboot/poweroff the machine and never return.
