@@ -1,80 +1,108 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6861E7C2E;
-	Mon, 19 May 2025 12:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D97E278E79;
+	Mon, 19 May 2025 12:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747659270; cv=none; b=u4k3KpfmkgSAWyJIn3Lzb3XIP4HCHR45BsbWpPgpzl5KuUtCXkfU/Vu5JZ+FiVa2S2RjYzcpM39DbZJ/gQuhrvuPBRwU8N7ogLh55378YzD+ZY1dB443FSJCnHnzm3HtRFIN4SlFG+CxCyRMG048NvmwywTVmED/wO7pkVh/2PE=
+	t=1747659472; cv=none; b=L7gvx9yuA7tOPr9uApRIXKyFvl8WUvOeZx6irqvuL4QZ0jx2ca17mZZTb788Wcz7QRvSa42eaKD0NayFEwie6/GGVIiEJs/aLSajOc/jV1v3hhf1QpDgTP51YvbLP+9oIXXKBFweczLyFVKT6D0uFa8VPgIbINCVtF98pury5b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747659270; c=relaxed/simple;
-	bh=Y8vfbAw7o2olarJnZW6Z6xjayrWHe56GUK693E1d9Sw=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AOmNyr/pUfL2U1qHr9LEizb/9z2MEdFgkyolT4rL/RnGVrBvb5yTU2qS10HNJNUPDooKfNOfvCY2vmw8q8Q1ThdmZEVahVKQfzbOvmrV+YqiaKA+7W4p/OXLSpfjEYwYReRTtPm+DQw0Mo1DJ0tf0gLypIGRY9TfLny0wONoRTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4b1Hf70SLQz1d1Dp;
-	Mon, 19 May 2025 20:52:47 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id C08951402EB;
-	Mon, 19 May 2025 20:54:19 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemg500006.china.huawei.com (7.202.181.43) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 19 May 2025 20:54:19 +0800
-Subject: Re: [PATCH v9 2/5] crypto: loongson - add Loongson RNG driver support
-To: Herbert Xu <herbert@gondor.apana.org.au>, Qunqin Zhao
-	<zhaoqunqin@loongson.cn>
-CC: <lee@kernel.org>, <davem@davemloft.net>, <peterhuewe@gmx.de>,
-	<jarkko@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-crypto@vger.kernel.org>, <jgg@ziepe.ca>,
-	<linux-integrity@vger.kernel.org>, <pmenzel@molgen.mpg.de>, Yinggang Gu
-	<guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
-References: <20250506031947.11130-1-zhaoqunqin@loongson.cn>
- <20250506031947.11130-3-zhaoqunqin@loongson.cn>
- <aCrIL_ZXL-UtaLdJ@gondor.apana.org.au>
- <96118a23-3e6c-c9d1-2135-bd7a22091f35@loongson.cn>
- <aCrqPnwr7lMJNOnL@gondor.apana.org.au>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <e7ad2dd5-78a5-618d-f450-ef0eed430adf@huawei.com>
-Date: Mon, 19 May 2025 20:54:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1747659472; c=relaxed/simple;
+	bh=kEOXFQHC9RoM8eAOkKs69L7ICX7VhE3OmdVsIRdGCTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nqJf4IIsNgGtbk9PIbH3vZdCVAUlmtmt/wEIjKPl5W8YpTEyZ+x5X2xtQ5dQLBy+VaDZkxTxg3TqCKgx0kbpXigosQP4/I1d6Htsj0pfR1S6RQn1dGp9aPYXexeVWerF9n5hWr0PdkkiwISS9mPt9CJm64Qvtw9D3LzIUaZU5EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IRwXHkt4; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IRwXHkt4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EBEFC4CEE4;
+	Mon, 19 May 2025 12:57:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747659471;
+	bh=kEOXFQHC9RoM8eAOkKs69L7ICX7VhE3OmdVsIRdGCTU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IRwXHkt41r88inU1cYD9K+LCn94Q8Ws6urXoNboBr8VBvQCWA4V5kfGosC6qdJR/C
+	 1c7J/73vEj/kTeRIF5XHlh3oqw5ttiZKLEp10C8MM8GDXVpcHdhEmtDUPEp4qD6XIe
+	 nO3/P45Or0YwpgI1iVyGObUXvRZ2cqcxTzKsbHf0yYRVkqahahdv5vGnPCEYF0w6B5
+	 Y2aqhZNcpombt/nRzszMzK9Jha2/lcNI9Uuk8Qc5qmGmJtPVEBiMYCw4dn8QEhxqTS
+	 KUAdwLevGYC6hMGntBQzgxKA73TD8XEW39gc5dukXPDbWwGxwDeprPkumRQHsw5kXS
+	 T3iUFMdZydSOQ==
+Date: Mon, 19 May 2025 14:57:46 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ayush Jain <Ayush.Jain3@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when
+ irqs_disabled()
+Message-ID: <aCsqyrHdMWlU3yc0@gmail.com>
+References: <20250516231858.27899-1-ebiggers@kernel.org>
+ <20250516231858.27899-4-ebiggers@kernel.org>
+ <aCg2DSYp0nakwX3l@gmail.com>
+ <20250517183919.GC1239@sol>
+ <aCl_cSO2XqtSQEZT@gmail.com>
+ <CAMj1kXGVAbD9zxUQSwwGo=ueadqWWSdaQNDe_-7ZezpFLMJRMA@mail.gmail.com>
+ <20250518200114.GA1764@sol>
+ <aCrmZnSokvmqfel3@gmail.com>
+ <CAMj1kXGe0hMD-71KYN_htJztAL+P8vFNf+9+W_aVDkHx3nCEWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aCrqPnwr7lMJNOnL@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemg500006.china.huawei.com (7.202.181.43)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGe0hMD-71KYN_htJztAL+P8vFNf+9+W_aVDkHx3nCEWA@mail.gmail.com>
 
-On 2025/5/19 16:22, Herbert Xu wrote:
-> On Mon, May 19, 2025 at 04:13:14PM +0800, Qunqin Zhao wrote:
->>
->> Then the HISI TRNG driver isn't a right demo?
+
+* Ard Biesheuvel <ardb@kernel.org> wrote:
+
+> On Mon, 19 May 2025 at 10:06, Ingo Molnar <mingo@kernel.org> wrote:
+> >
+> >
+> > * Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > > > # echo PANIC > /sys/kernel/debug/provoke-crash/DIRECT
+> > > >
+> > > > Another case that likely executes with IRQs disabled (but I haven't
+> > > > double checked) is reset_system(), which may return with an error, or
+> > > > reboot/poweroff the machine and never return.
+> > >
+> > > That makes sense to me.  preempt_disable() and preempt_enable() are already
+> > > allowed when IRQs are disabled, and I'm not sure why local_bh_disable() and
+> > > local_bh_enable() are different.
+> >
+> > Because local_bh_enable() may run softirq handlers immediately if
+> > there's pending softirqs, which shouldn't be done in hardirq context.
+> >
 > 
-> Yes the hisi trng looks wrong too.
+> Sure, but why is that mandatory?
 >
+> 
+> preempt_disable() has preempt_enable() and preempt_enable_no_resched()
+> counterparts.
 
-We are currently updating and plan to create software TFM for users when
-they unable to apply for hardware device queues, ensuring that users' tasks
-can continue to be completed.
+> [...] Could we have a local_bh_enable_no_xxx() version that 
+> re-enables async softirq processing on the current CPU but does not 
+> kick off a synchronous processing run?
+
+Yes, that's what __local_bh_enable() does, but if used it for 
+kernel_fpu_end() we'd be introducing random softirq processing 
+latencies. The softirq execution model is for softirqs to be 
+immediately executed after local_bh_enable(), and various networking 
+code is tuned to that behavior.
+
+You can try talking the networking folks into an asynchronous 
+local_bh_enable() executed on the next IRQ or the next scheduler tick 
+or so, but it's a non-trivial behavioral change. It would probably also 
+need user-return callback activation.
+
+I'm pretty sure that the naive implementation would increase LAN ping 
+latencies by +4 msecs on a typical distro kernel.
 
 Thanks,
-Longfang.
 
->> This can also avoid concurrent access to a device, otherwise i need to
->>
->> add mutex_lock/unlock in generate and seed callback.
-> 
-> Randomly failing the tfm allocation is not a solution to resource
-> control :)
-> 
-> Cheers,
-> 
+	Ingo
