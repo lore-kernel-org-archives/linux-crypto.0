@@ -1,51 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6712A2D;
-	Mon, 19 May 2025 05:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97881A2D;
+	Mon, 19 May 2025 05:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747634240; cv=none; b=hVvHytOWbmuAMGhhpUCTJ1XnGcChPymebndbAq9xQMXm3uCM3EyFG/rbqpJiqH+/O0YPAAl5zPT0mTtHvuxdj1dyIlAmLIJZaraLsU8xyC18xXzZ6OmnjmduWZeoTIVWoXdFIPH0RjJJf64AUKvsJwyIaqP8b6IL3cvPtdkj+/c=
+	t=1747634290; cv=none; b=c837AIZ6rk+ILyAl3bGofDc/uNx/2PFSGdWsx5mbMfX7DfDcCyRjvq8Vb8YoYNyQz4LLv/SHw/7QaeW4Iq5PhG9IR+avQfKTViC9Y7EiMV9X6YQH9thEKUM0VnJto3aUhz/vr98jsaLU5/udCiAvbgBAlSytn4WmRXjDM6mldos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747634240; c=relaxed/simple;
-	bh=mZBKw0wJmnWieD8RvOZ90E/QZ8DajgvOAWCuVqPbx2M=;
+	s=arc-20240116; t=1747634290; c=relaxed/simple;
+	bh=KFhosAFVYMcWYd1+oFgQon5+ArT4OVTpFWiDyovRQlY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qEE4s+Dqdu+bilABmXhFzG56V2aHonrwuezqnCXR52sWqihAWn5p1ygC7NGLWzQGW4SAxVCUIXgXvCV+wL7Mdvm1TbNMN3VEqqSlybYf+ZuOotHHMLNorJlwwdwWORz4waZklkCbSlcQT/FbKke4wYU8gIzr4CJma4vNt+90qJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=msxgBqP+; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=PAaOIJ6BEbnPMhXZHEqdFzVHGzCGTIiJKAA3ir7xIdq0wuY/tAC2HSbe/+2aBnQB15zMd7mgPZdIv4VCnBQZzQZULvCbvNHkFYcmvrOT+57UFTDspcgXIbZ9sc5lN4Q9UgA51KOdpOCyYJEuuNmGUzrhPa5azPKx/xraWKUv/08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TZdxRaVx; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="msxgBqP+"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TZdxRaVx"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=0zbSZULwMpBsF35qyqNlWF7Y18GG1Lj98fZQ/4Oi5ek=; b=msxgBqP+mlc27kvWTMpX+7lLkG
-	FhOl3sHQMXsS7oZlHmgJ1OFuwBBVVYPNVHNX3TMIdMqzzYc5HgVu8vdbDF6VvRGRCsPSJker9IyGo
-	95uClxLl2t+tWdQN2harV7L0oG/Xoo+J5Wzd2eo/Q420D9qHClavW0aHcz7ztbZVtbQCRcC4sZZ+N
-	2l2yG8qzY4AqBdFYYYRyry2O1XaCSBP7lG9WGmZFRPCnR+vb7b1mvl1lXTN8yf+akDd3LYO+Rvs0N
-	xZogCW0da3J43CBa5OhsK/ZXwiGe0fKLDNiiuT240Rd9u7PYZYSWieBcatDcYajVrsQh8JDmB/HRW
-	1+4VKTeg==;
+	bh=4KT6cUbz6JBlnZnp44KqbJaiklMh9glQrgRzRT1/6/k=; b=TZdxRaVxxJIW1AWRtqr8r1QtSA
+	1UbOCaURz3hJaYmiocGv+acLjE02v7WE/EsEbCyenZEx38fzphm3WhBaMGX4SSz0zsg2f3WtEA3DB
+	Atfm7eJC+ZvFAD2NLUeB7W5b9MbZb+ojxpXYqs7XGt2adYxroaR7gMVvkpeEy7oJMgMBIGyVhPi51
+	uzmUnvPbVuYH/bupQwh6iFM3zi5HWxe29W5rGfOGCYS/sMI/ZtxyLw+F1YEegx0r1NM/1a2m34Neh
+	Uw761audNi7eZDMLJziVY4Xcp9hOAPz9t0mq9lqJWATrxI4Icn4ETiFa2TmM2zkL51lw2GWzRWjdM
+	v0EKxziA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uGtUl-00781A-0x;
-	Mon, 19 May 2025 13:57:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 19 May 2025 13:57:03 +0800
-Date: Mon, 19 May 2025 13:57:03 +0800
+	id 1uGtVj-00781L-25;
+	Mon, 19 May 2025 13:58:04 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 19 May 2025 13:58:03 +0800
+Date: Mon, 19 May 2025 13:58:03 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, davem@davemloft.net, peterhuewe@gmx.de,
-	jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
-	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH v9 2/5] crypto: loongson - add Loongson RNG driver support
-Message-ID: <aCrIL_ZXL-UtaLdJ@gondor.apana.org.au>
-References: <20250506031947.11130-1-zhaoqunqin@loongson.cn>
- <20250506031947.11130-3-zhaoqunqin@loongson.cn>
+To: John Allen <john.allen@amd.com>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+	linux-kernel@vger.kernel.org, mario.limonciello@amd.com
+Subject: Re: [PATCH] crypto: ccp - Add support for PCI device 0x17D8
+Message-ID: <aCrIa1cgC8S73XGU@gondor.apana.org.au>
+References: <20250512181705.2428-1-john.allen@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,38 +49,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250506031947.11130-3-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250512181705.2428-1-john.allen@amd.com>
 
-On Tue, May 06, 2025 at 11:19:44AM +0800, Qunqin Zhao wrote:
->
-> +static int loongson_rng_init(struct crypto_tfm *tfm)
-> +{
-> +	struct loongson_rng_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	struct loongson_rng *rng;
-> +	int ret = -EBUSY;
-> +
-> +	mutex_lock(&rng_devices.lock);
-> +	list_for_each_entry(rng, &rng_devices.list, list) {
-> +		if (!rng->is_used) {
-> +			rng->is_used = true;
-> +			ctx->rng = rng;
-> +			ret = 0;
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&rng_devices.lock);
-> +
-> +	return ret;
-> +}
+On Mon, May 12, 2025 at 06:17:05PM +0000, John Allen wrote:
+> Add a new CCP/PSP PCI device ID.
+> 
+> Signed-off-by: John Allen <john.allen@amd.com>
+> ---
+>  drivers/crypto/ccp/sp-pci.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-This isn't right.  The number of TFMs in the system is unlimited.
-You should not pair each tfm with an individual hardwre device.
-
-If you want to do load-balancing you could certainly pick a device
-per tfm, but each device must be able to support an unlimited number
-of tfms.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
