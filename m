@@ -1,81 +1,41 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E56285418;
-	Mon, 19 May 2025 15:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED352746A
+	for <linux-crypto@vger.kernel.org>; Mon, 19 May 2025 15:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747667675; cv=none; b=gI4JWxE0B+qbl2W0R+rReipvdK5bSHVNkJQ4ZihIyWhSJvcNgXY7TA3VCVqrXnmhD7sgg8crDng9l5ZwZrnfPsHl8DUo86fE+BOV8WCZGfHlwZ9VKooCkpWKoO+Yn4rL0e4yp4rx2qvdSwN8owEFgx6g3XXZA3PKUbmUgaXxlxU=
+	t=1747668078; cv=none; b=hHhSEOoqdnnZfuDT/yu5ez6qs+aOUQI60nFjZa1QhHNEXlLCmO3sD9BCqh884uiLtJ113VeyOm12QI1xnx4lkAIg7DG6Vc35NJATZ77Ca8bvn5FwD4DYcjZT6YTFFN9fkbfcHL9TnAur0sejOe1pFWo3EmAblT8cU9zq5U0YCbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747667675; c=relaxed/simple;
-	bh=jBoiZ2GaWcghwbS8pyGx4WZcTi5x2cK8RY/sPEKxu5Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UYLzPo8yuwh+LAWZ/aJXNympwdlG/Cv+YP6ZNQ1gAW2RxSs82EbgOgJ8lLXa1TxnrZRbXPWQkHjHFMaoGLDtRRtT9tvAeEM4WAQzJ0gh6kH3I1E8RPuDRVbB0mSZTenbT+YKYRKkESA9X+wkUwtlqCjIrB3dHLDpE5rz+2pqj5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McyPLrHJ; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747668078; c=relaxed/simple;
+	bh=eTyaQbLsCQ/Kv9FKVGW8ze675sGI/GHIGW42m91U82Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JK8NN5lytwYCadnk4KqHgWGu8+TxIiI1nG3Pomp2OcOYJK1JrlfKqKMpZggYpxJaQKSjYqVnDn6cXLLqyTdJsmVAuidnBEDzHbX2RTapofv9uxRC9wHlzyQ79WTE8UXZ8+xLAhOX4UbtLb1qaHkouvIjKPh0XCFmGbr4YV0Jraw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N2tshOXb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McyPLrHJ"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ad52dfe06ceso346506666b.3;
-        Mon, 19 May 2025 08:14:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747667671; x=1748272471; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AzPLTyR8BLY/EVNJO6GgeWhpConHv27PYp6Y5vYD5J0=;
-        b=McyPLrHJkVIhMoo/jGkf2uZKOXfd0vPCBLzmokev2hnaUmA+Fq4xWunSdLsnJHj9e8
-         i0wCt7dkTR2sDIq3S+mpVQyOpL7oZq7KDy4DpZef4qlCENEnszCXcoiv7MLciLjvHTF2
-         5fHuOn9oLsBx0DNPVDwjuHhr/9Q8PfyHhkt12Ysrxu1zKbAGb5SFFH5ARZVqUfjzQ4bI
-         9TKf33GHVf3dNyrBXVh9ghczGEYmgX19CVF0LpvW4RghKv62pW49HSxiA3KrWCES5cOb
-         gmfdMm6TvAXF6o0hWfAKpoYt8zRu+oPZ8pyAYFHb2M08VDs84s8zIZ/tMsVOjLNlMgdC
-         9jxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747667671; x=1748272471;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AzPLTyR8BLY/EVNJO6GgeWhpConHv27PYp6Y5vYD5J0=;
-        b=XmOlynnTSyb68lOythlDjydE3mVC2emYCz3N23ZxSuyiwXaVINwhcxVVPOpqPUqKZt
-         /+GSBE//q7v/fWDjD4UgQ5qzIYT4B7JBCB23/pa34cVnYsQPtxI/WoDvPqyzLi9NqxrJ
-         E9gRQyHXpQe6Fnjz5+Ch99Vs1m2sHzaCjLEZHCWRGHVeKZza08kblZHvQMG/OkYWNiPS
-         nIiQuU/d0Drg3R1GHJZZK+q9mfQe1dK22oHHK2+n6BCh4NZ+pBx0JuJYF62OG2N+/W9F
-         Z9qDONf0kZiAkES1WOnTXoBt3fHzQBGBp0w8Agk0kQOSMktCyLQLlKVkNVYQGmTc8y1P
-         8E1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV+/hC5JLZ6Ts20r+H0abIsWHb931YOV28uuKXKevADp8xR1bDCijsFmklf0XTSReJHSKZdj5ctZTUpEnM=@vger.kernel.org, AJvYcCVC6na32E849MqXipI+VSL4dK5xwtoUWTTUkzQOxdqj/worfDV89cTl+LmWhdmP3zrCquXgCIXgO6fItWCT@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZAe4GsOj/sL0tQu17/h9lCFVulJlfsYiRjp0/jx38def8gP2H
-	78GJtM2CC76W6Yeje0xncPvyL3Wbim+A6qILzRit0a3gB4QXCGF+Ovm+1lk6Dw==
-X-Gm-Gg: ASbGncsHc7qZKQuO9OGLr3asTRrhKFmK9oKPbr2orWkgOvbXsKBQqovxkvDDWQ5J+dj
-	YupO8CMCHfnvjwCewK1bQJHPFlkqzquVCNeF5puCmyFp8WaxnS8AubPv+Zn3sU5x/AXE6j1i0JL
-	cRUGj0tadAqDfPXvjm9541reXaWOF6O8y25/gcKfUAWebP6qa4h/7CMLMgC/zASlSdIgjZIWwYu
-	KuVV0F14dDNxSP8WezKd0XUcE/+mlISViUVqHGUdV++r+DkPQ/cc+FKwW+OY/lyuwzs0rhNG8H1
-	pfbzsiGT6IKC9N+p6QldSmDdHjVPPxIpWDXVG/IbYDrN8Z/DQljs2EMSXCKHnm8QeaMneP4IbF8
-	dQJ8=
-X-Google-Smtp-Source: AGHT+IHgJ+seY57z+XoTNGawx66JWeSgri2TnpAdEN3iSpX2I08ljlzJynMEjU7v1ngmRpqeLCLRKA==
-X-Received: by 2002:a17:906:dc93:b0:ad5:6ca3:c795 with SMTP id a640c23a62f3a-ad56ca3cb15mr472987066b.33.1747667671489;
-        Mon, 19 May 2025 08:14:31 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:2f07:610b:a400:6472:d2f9:d536:4c30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d04b08bsm608522566b.13.2025.05.19.08.14.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 08:14:31 -0700 (PDT)
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-To: clabbe.montjoie@gmail.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Cc: wens@csie.org,
-	jernej.skrabec@gmail.com,
-	samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 3/3] crypto: sun8i-ce - use helpers to get hash block and digest sizes
-Date: Mon, 19 May 2025 18:13:50 +0300
-Message-ID: <20250519151350.3442981-3-ovidiu.panait.oss@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250519151350.3442981-1-ovidiu.panait.oss@gmail.com>
-References: <20250519151350.3442981-1-ovidiu.panait.oss@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N2tshOXb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B778C4CEE4;
+	Mon, 19 May 2025 15:21:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747668078;
+	bh=eTyaQbLsCQ/Kv9FKVGW8ze675sGI/GHIGW42m91U82Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N2tshOXbHkJN2aGugzCsOLVddYG5Yn6N5CgqPX9O7Hat/AtLNnt7D+JVejigrdGUK
+	 Bvy/UvnPiQ4noz+B+4dhnRwv6iTq2brq1jZzBsDNyTzcXt+norcgGMcivm4COfoukK
+	 DaIh468LYB37xT9cjfA/iag2J3lEDXqgnz9udAZOXKEZvd4+7vDCM/9PEC4zvi2uhS
+	 IvWl5IwGzrPJ5p+h71WZ6zRshUkEb32U0BC590U1OUEIguofN187zETmn0bOgCJ7I+
+	 M31o+L55vH7HRzrujxF8UkuGlbnKmDBkxpKIPQ1ZCDIQfj1rFTQB4MBKYlF6Bfv/IS
+	 uI1bP+GeEqrmg==
+From: Mario Limonciello <superm1@kernel.org>
+To: mario.limonciello@amd.com,
+	thomas.lendacky@amd.com,
+	john.allen@amd.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ccp - Add missing bootloader info reg for pspv6
+Date: Mon, 19 May 2025 10:21:01 -0500
+Message-ID: <20250519152107.2713743-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -84,38 +44,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use crypto_ahash_blocksize() and crypto_ahash_digestsize() helpers instead
-of directly accessing 'struct ahash_alg' members.
+From: Mario Limonciello <mario.limonciello@amd.com>
 
-Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+The bootloader info reg for pspv6 is the same as pspv4 and pspv5.
+
+Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/sp-pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index bef44f350167..13bdfb8a2c62 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -342,8 +342,8 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
- 	ce = algt->ce;
- 
--	bs = algt->alg.hash.base.halg.base.cra_blocksize;
--	digestsize = algt->alg.hash.base.halg.digestsize;
-+	bs = crypto_ahash_blocksize(tfm);
-+	digestsize = crypto_ahash_digestsize(tfm);
- 	if (digestsize == SHA224_DIGEST_SIZE)
- 		digestsize = SHA256_DIGEST_SIZE;
- 	if (digestsize == SHA384_DIGEST_SIZE)
-@@ -455,7 +455,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- err_unmap_result:
- 	dma_unmap_single(ce->dev, addr_res, digestsize, DMA_FROM_DEVICE);
- 	if (!err)
--		memcpy(areq->result, result, algt->alg.hash.base.halg.digestsize);
-+		memcpy(areq->result, result, crypto_ahash_digestsize(tfm));
- 
- err_unmap_src:
- 	dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index fa5283b05323c..998a5112d2491 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -453,6 +453,7 @@ static const struct psp_vdata pspv6 = {
+ 	.cmdresp_reg		= 0x10944,	/* C2PMSG_17 */
+ 	.cmdbuff_addr_lo_reg	= 0x10948,	/* C2PMSG_18 */
+ 	.cmdbuff_addr_hi_reg	= 0x1094c,	/* C2PMSG_19 */
++	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
+ 	.feature_reg            = 0x109fc,	/* C2PMSG_63 */
+ 	.inten_reg              = 0x10510,	/* P2CMSG_INTEN */
+ 	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
 -- 
-2.48.1
+2.43.0
 
