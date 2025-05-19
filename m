@@ -1,126 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8650426A1BD;
-	Mon, 19 May 2025 13:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6646428151E;
+	Mon, 19 May 2025 14:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747662669; cv=none; b=hpuTiYfwF3ao6KhKdiC2vYzO+DYl2tT9rEJ3MXKbe7p3o7RtUScbQckRfQ0u9i8tMpcXYY8jGR3cZnr836AaZrGsF0pNKh8panJghAu1FsI7DIVUtRBx3qCbOTZgVfSx7zzhQPUf7McaE5HEemMsrr9DGZEpOOgD1G9rqNAXDNg=
+	t=1747664437; cv=none; b=LTVg9jOt5CF4Nnl+9LjonkBL6RsLWzuIFjOrbt7NrH2Hconpyt4HkYge9ivE7FWXvKBIXkyd+E3HoiFTdpyJUyHr074Sgze8qFuaLXoDPTn5YYV79xJavJcAYUO3rK+NPGktDTwwJ39N0oujnuv3H3o3hgP1EyV/W3pO2QbvA0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747662669; c=relaxed/simple;
-	bh=/1PocrC/g6/kywMQw3oecq3XJZshz+LGXlLp7xFGcXA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D6lD4LITACJekCCAFs7SQzXV26F0e6KffusWns8aSQs8RekxW+pDuspsokcH/t/f6H97za35d5vd1UfejT/vJCesLTJzEZzYrIykU3Bm04b4DX+2CYo0Qsufs+CgjKCoenWgv3z/oMHy54bpQGY+O8cPN5OsJJbfI6olyIRxKJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqNQJdkr; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqNQJdkr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01A30C4CEF3;
-	Mon, 19 May 2025 13:51:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747662669;
-	bh=/1PocrC/g6/kywMQw3oecq3XJZshz+LGXlLp7xFGcXA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=oqNQJdkr09VouujpcMBI6H3VytyyGcIvfSEiEeZH0hGui96JIK46MvH6uFmzTC+OJ
-	 THvKUk6Wq0O6mCPbpoarvxY0d3JzHMQHEB/PX5RvpVGzjqblpFP/ddO3xEeMsgSBw5
-	 zx3E4YNhOrSSomNYttlzZPJc6s+hVC5BuV1luyZBrFf0k5XLH4acjJtyEArRTCkJNg
-	 hdAAHarQzma07j1YWTd2HCr0eVbfy91GYWBzRVP1vivPHTXoHiWutCC5PIarxEFOd4
-	 5j/LfEDFzgC7rxcOCv1DAB3UAj76PuUkBNandvG8wiolBr2N35gMWlIWF+vIrzZDqa
-	 xParAbdyvRz8g==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54e8e5d2cf0so5706396e87.2;
-        Mon, 19 May 2025 06:51:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVYEJ7JHrgtmq+y73svBUNl/zJW1AgORWqqTxNT21DxXbNp0Soli7gRLltKkUrU75ehKq3VrVehZuI=@vger.kernel.org, AJvYcCWbzpDaAUZh2/huXw6C9lImNtLFdnl5ZHAy6OIJzOHgT6MZXHPC+g2xsObrpsoTwP5kM9J3HBXU/fUcnMI=@vger.kernel.org, AJvYcCXs+b5+6SwbQ/KZWgFqZvBuNNR3V8jDs6gi4PXiW9prSBPSbKcx5MwIOVI8FDoOeFHCjokvMiQBFKYyf7AU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw6ntRXuZTY7US1BSReHCNm2IC3saLVrb0FY+vBQN5vj2AvisM
-	sHrkKVARiw9elF9bc/0/l9GRhWfwDnQ4+IE1lxwTJTVpVYOyVd3TYjO+Y5UZ2h1Qn5BgrZFWAUX
-	Z0JY888YrDoi1EZbuusL0Vdzn/vG3wRw=
-X-Google-Smtp-Source: AGHT+IFb2v4EJCc3DwoI2v4DG/puP29pToHb4pOCGsztJrkqgwEjkCUyQ1ea9iz7d/fjjtJlFRh5UFKcehqUrDJqUHE=
-X-Received: by 2002:a05:651c:e16:b0:329:1435:7eb7 with SMTP id
- 38308e7fff4ca-329143580c0mr10546371fa.22.1747662667322; Mon, 19 May 2025
- 06:51:07 -0700 (PDT)
+	s=arc-20240116; t=1747664437; c=relaxed/simple;
+	bh=QaTcfMhaqALXzJmEgyxGZWJ+zYjWOFxFsUrYOmwRYdo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QRDNWesYfbWnbwg+GD/Vaq73txQzJXDqsTCzPtQCG2uFUi2da04B49aaKpptpAOpmZeCl5UelGNLxIYHigpnn+eB22b+pMoeVl7qzEktZ7C3pv/mQ0SX7h3LsEPOFhJjj/oYHvxkh4wgIFAsc/MPQvrDrvUR8z9+B6iDM1in62Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4b1K2Z0j89z9sgR;
+	Mon, 19 May 2025 15:55:34 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id T1tLa2scvF_G; Mon, 19 May 2025 15:55:34 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4b1K2F3Z3xz9sl0;
+	Mon, 19 May 2025 15:55:17 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 74BA68B767;
+	Mon, 19 May 2025 15:55:17 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id ERUmtIadJGXE; Mon, 19 May 2025 15:55:17 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id AA9E88B763;
+	Mon, 19 May 2025 15:55:16 +0200 (CEST)
+Message-ID: <02c22854-eebf-4ad1-b89e-8c2b65ab8236@csgroup.eu>
+Date: Mon, 19 May 2025 15:55:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250516231858.27899-1-ebiggers@kernel.org> <20250516231858.27899-4-ebiggers@kernel.org>
- <aCg2DSYp0nakwX3l@gmail.com> <20250517183919.GC1239@sol> <aCl_cSO2XqtSQEZT@gmail.com>
- <CAMj1kXGVAbD9zxUQSwwGo=ueadqWWSdaQNDe_-7ZezpFLMJRMA@mail.gmail.com>
- <20250518200114.GA1764@sol> <aCrmZnSokvmqfel3@gmail.com> <CAMj1kXGe0hMD-71KYN_htJztAL+P8vFNf+9+W_aVDkHx3nCEWA@mail.gmail.com>
- <aCsqyrHdMWlU3yc0@gmail.com>
-In-Reply-To: <aCsqyrHdMWlU3yc0@gmail.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 19 May 2025 15:50:55 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHzFiQsjUH90J56ds2fgge-MUXmFMBWKtmb0LF=UjbJcg@mail.gmail.com>
-X-Gm-Features: AX0GCFulSVzXOSA9gt1CMU94HvVEsTZU8m38n0TNCBCwMMdgjXnKSSADJdmeVmo
-Message-ID: <CAMj1kXHzFiQsjUH90J56ds2fgge-MUXmFMBWKtmb0LF=UjbJcg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] x86/fpu: Don't support kernel-mode FPU when irqs_disabled()
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, Ayush Jain <Ayush.Jain3@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: powerpc/poly1305 - add depends on BROKEN for now
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ naveen@kernel.org, dtsen@linux.ibm.com, segher@kernel.crashing.org,
+ stable@vger.kernel.org
+References: <20250514051847.193996-1-ebiggers@kernel.org>
+ <aCRlU0J7QoSJs5sy@gondor.apana.org.au> <20250514162933.GB1236@sol>
+ <aCVNG2lm9x9dzu6x@gondor.apana.org.au>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <aCVNG2lm9x9dzu6x@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 19 May 2025 at 14:57, Ingo Molnar <mingo@kernel.org> wrote:
->
->
-> * Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> > On Mon, 19 May 2025 at 10:06, Ingo Molnar <mingo@kernel.org> wrote:
-> > >
-> > >
-> > > * Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > > > # echo PANIC > /sys/kernel/debug/provoke-crash/DIRECT
-> > > > >
-> > > > > Another case that likely executes with IRQs disabled (but I haven't
-> > > > > double checked) is reset_system(), which may return with an error, or
-> > > > > reboot/poweroff the machine and never return.
-> > > >
-> > > > That makes sense to me.  preempt_disable() and preempt_enable() are already
-> > > > allowed when IRQs are disabled, and I'm not sure why local_bh_disable() and
-> > > > local_bh_enable() are different.
-> > >
-> > > Because local_bh_enable() may run softirq handlers immediately if
-> > > there's pending softirqs, which shouldn't be done in hardirq context.
-> > >
-> >
-> > Sure, but why is that mandatory?
-> >
-> >
-> > preempt_disable() has preempt_enable() and preempt_enable_no_resched()
-> > counterparts.
->
-> > [...] Could we have a local_bh_enable_no_xxx() version that
-> > re-enables async softirq processing on the current CPU but does not
-> > kick off a synchronous processing run?
->
-> Yes, that's what __local_bh_enable() does, but if used it for
-> kernel_fpu_end() we'd be introducing random softirq processing
-> latencies. The softirq execution model is for softirqs to be
-> immediately executed after local_bh_enable(), and various networking
-> code is tuned to that behavior.
->
 
-All of that only applies when re-enabling softirqs with IRQs enabled.
 
-> You can try talking the networking folks into an asynchronous
-> local_bh_enable() executed on the next IRQ or the next scheduler tick
-> or so, but it's a non-trivial behavioral change. It would probably also
-> need user-return callback activation.
->
-> I'm pretty sure that the naive implementation would increase LAN ping
-> latencies by +4 msecs on a typical distro kernel.
->
+Le 15/05/2025 à 04:10, Herbert Xu a écrit :
+> On Wed, May 14, 2025 at 09:29:33AM -0700, Eric Biggers wrote:
+>>
+>> I didn't notice that.  Probably, though I don't have time to review this subtle
+>> Poly1305 code.  Especially with all the weird unions in the code.  Would be
+>> great if the PowerPC folks would take a look.
+> 
+> Of course more reviews would be great and I think they're all on
+> the cc list.
+> 
+> I did test this by manually forcing the conversion, which is how
+> I discovered that powerpc wasn't even using donna64.
+> 
 
-I don't see why we'd need all of that.
+As far as I can see related patches found in linux-next tree were not 
+sent to linuxppc-dev@lists.ozlabs.org.
 
-Conceptually, kernel_fpu_end() would do
+Could you resend them, and split out the introduction of 
+CONFIG_ARCH_SUPPORTS_INT128 from other parts of patch "crypto: 
+powerpc/poly1305 - Add SIMD fallback" and add the lib/tishift.S in the 
+patch which adds CONFIG_ARCH_SUPPORTS_INT128 ?
 
-if (irqs_disabled())
-   local_bh_enable_no_xxx();
-else
-   local_bh_enable();
-
-which cannot affect any existing use cases, given that the former case
-is forbidden atm.
+Thanks
+Christophe
