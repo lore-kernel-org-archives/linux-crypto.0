@@ -1,95 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD22242910;
-	Tue, 20 May 2025 16:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0252A1DB124;
+	Tue, 20 May 2025 23:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757515; cv=none; b=Ma428zK8/nAaywx9vGrjOUqwohGWWOgEwUDn3AYZAd8a/nvTof468xpaaL5LAKITyjzXNJvcJdgfsfl742dX06n7JyOLkSAQWvxJ1LE//1X+0P3/Arj+WocriSZnABAEFqbIbyhOUAmfg+anztVDBB1Zwo9eTGSn0yytwQkYQ0o=
+	t=1747782162; cv=none; b=r2C7Y/Tx5/4eZ9VCNmF3jTe8p/SpiGPAyXk3wyYdlfLq5NNVBePJHrqO1q8DwdDFUOJhp0pK8MRuKNzvW8ALIKVyHcQGsUpPxc7jgfonNZGRK42e7gtUrV6yJZu9Z/+5Ur/OTMJsjGK9ouafAArBD/tAlGlo1nWDJoAv7TJO+4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757515; c=relaxed/simple;
-	bh=8TCv7iaNOgpcGg7fLSHMHTHKnprZSRXQCZrTY/VJgR8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uVDs6rDy6E+TY44z8lV79Hnw2p8ETUHmtFPlAEDBFfzSRnIgSiIz/Sj/pYCPrApg9wAh4vunZcpUeLFjQahBiXwjBr0FHsEJf4r/HexfJlpF2vACecDjZX4ASCBgPJ8fOSQU8Ifs9Y89w0i3zqAVySlLpw/m6ftndRnBFDC6JRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddIqWwlM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747782162; c=relaxed/simple;
+	bh=X89w/Ge3vNdYTIH4Qr9ztFZLtgEVfBUbEt6JXk9CW60=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=heGRIhATPGNWoCDbgOY8E0Xf+EMNlPlLjjUIynCSfDY8V6pz9VNt+7c0MvdPwPZdvtFp9W6lhRXq6TYV79OYKuat3vvc/AUzL7/gp2MChwyTRfrWcjCmf7eymObR/WeA9iHeG0yW22fu+K+N0l2YTS6sbtnnodAzdQ2sviYsQeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=r1ifDl5j; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddIqWwlM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA7CFC4CEE9;
-	Tue, 20 May 2025 16:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757514;
-	bh=8TCv7iaNOgpcGg7fLSHMHTHKnprZSRXQCZrTY/VJgR8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ddIqWwlM5IMoAd6xU9iYH1SfbJrgQ9hh/qOVHQbYahrwQsOUCSCtqri/AMep18FEU
-	 QaXE5PAwESrihZRRUB00HFBaPm3e7iSw5jyIQ6csehhjYxyP99r9dRboT7dDUsHAXF
-	 oDVmjS/M0nQ58LSViKa3Dn9gAnrYMkDMRWWO9oWaGjfFF7xSWMdJscfKBka4Vd0p3P
-	 crh3+BFlg4os0UVFSiqhwhWoMtizS6VLZLI8mYssETQarrjdD7LhnJ5zVEYt7TaJ5I
-	 DkHiIIg3KnhRAbRXnJ/6WfXISzZhZQ1RXua4P1Lr07TgDf7HJBO2Dagyritsu3Ni9l
-	 fcdJm/O+DzU4A==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Karthikeyan Gopal <karthikeyan.gopal@intel.com>,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	George Abraham P <george.abraham.p@intel.com>,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: qat - add missing header inclusion
-Date: Tue, 20 May 2025 18:11:36 +0200
-Message-Id: <20250520161148.3562622-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="r1ifDl5j"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=sKVjQdW7Rud/G+zZZNUFlXpV899aZG0J0h6VJvtUqKw=; b=r1ifDl5j3I1BRXYPKzMAtUjLfL
+	SQCwo8c45463K/X1lu/l9TeMv/rzsIzOxEv6cQJrwd+3+gYi5gMSMbwAm7x0BrN4T0608zacAs32t
+	k+OUWsLDE/vuVQm2cKe+XK2owihSICKt96VKoGcpuruWEswSXmb4Rlxt9WkjKfWeVg+V9KmKXCRME
+	g9SysceYtTq4IoJcMz9rcwOXT//WwYhYO0U15pvROWuNqktzcv7fFyiy3pAX4GKeqHbmKcNz7a+03
+	G+xKoy1cvL/bIBbNxRXZOyGBdeMqhUDGHm3pfpMe4souctaw9boB3Ovqiaba1CyglGwU39BWBWYNN
+	DTikmaGw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uHVyM-007f2G-1Y;
+	Wed, 21 May 2025 07:02:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 May 2025 07:02:10 +0800
+Date: Wed, 21 May 2025 07:02:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Bharat Bhushan <bbhushan2@marvell.com>
+Cc: bbrezillon@kernel.org, schalla@marvell.com, davem@davemloft.net,
+	giovanni.cabiddu@intel.com, linux@treblig.org,
+	bharatb.linux@gmail.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 2/4 v2] crypto: octeontx2: Fix address alignment issue on
+ ucode loading
+Message-ID: <aC0J8g6UYxSw_7zZ@gondor.apana.org.au>
+References: <20250520130737.4181994-1-bbhushan2@marvell.com>
+ <20250520130737.4181994-3-bbhushan2@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520130737.4181994-3-bbhushan2@marvell.com>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Tue, May 20, 2025 at 06:37:35PM +0530, Bharat Bhushan wrote:
+>
+> @@ -1519,22 +1520,27 @@ int otx2_cpt_discover_eng_capabilities(struct otx2_cptpf_dev *cptpf)
+>  	if (ret)
+>  		goto delete_grps;
+>  
+> -	compl_rlen = ALIGN(sizeof(union otx2_cpt_res_s), OTX2_CPT_DMA_MINALIGN);
+> -	len = compl_rlen + LOADFVC_RLEN;
+> +	len = LOADFVC_RLEN + sizeof(union otx2_cpt_res_s) +
+> +	       OTX2_CPT_RES_ADDR_ALIGN;
+>  
+> -	result = kzalloc(len, GFP_KERNEL);
+> -	if (!result) {
+> +	rptr = kzalloc(len, GFP_KERNEL);
+> +	if (!rptr) {
+>  		ret = -ENOMEM;
+>  		goto lf_cleanup;
+>  	}
+> -	rptr_baddr = dma_map_single(&pdev->dev, (void *)result, len,
+> +
+> +	rptr_baddr = dma_map_single(&pdev->dev, rptr, len,
+>  				    DMA_BIDIRECTIONAL);
 
-Without this header, building the new driver fails with:
+After this change rptr is still unaligned.  However, you appear
+to be doing bidirectional DMA to rptr, so it should be aligned
+to ARCH_DMA_MINALIGN or you risk corrupting the surrounding
+memory.
 
-In file included from drivers/crypto/intel/qat/qat_common/adf_gen6_shared.c:7:
-drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h: In function 'adf_gen4_init_pf_pfvf_ops':
-drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h:13:34: error: 'adf_pfvf_comms_disabled' undeclared (first use in this function)
-   13 |         pfvf_ops->enable_comms = adf_pfvf_comms_disabled;
-      |                                  ^~~~~~~~~~~~~~~~~~~~~~~
+Only TO_DEVICE DMA addresses can be unaligned.
 
-Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h | 1 +
- drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h
-index a716545a764c..9efee0053f3a 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h
-@@ -4,6 +4,7 @@
- #define ADF_GEN2_PFVF_H
- 
- #include <linux/types.h>
-+#include "adf_common_drv.h"
- #include "adf_accel_devices.h"
- 
- #define ADF_GEN2_ERRSOU3 (0x3A000 + 0x0C)
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h
-index 17d1b774d4a8..2c8708117f70 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h
-@@ -4,6 +4,7 @@
- #define ADF_GEN4_PFVF_H
- 
- #include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
- 
- #ifdef CONFIG_PCI_IOV
- void adf_gen4_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops);
+Cheers,
 -- 
-2.39.5
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
