@@ -1,102 +1,86 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BFE27CCDF
-	for <linux-crypto@vger.kernel.org>; Tue, 20 May 2025 12:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411281A314C;
+	Tue, 20 May 2025 12:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747743186; cv=none; b=QBq8JOcFDTCJVhYnp2ZsoJtJVpDFhKH/i5FcWS3QAX52FMOBlbKbLI4EsXrkDVqJFX5FZP123L/UjSa2h2xY5k/vecQm29KdGHF18Gz0F99aFGjL2RnpbwvzaA1PP16kD8fUM32kqDdfQ520nwf/teZaJ1n14yAsyhagfqbqoC8=
+	t=1747745110; cv=none; b=RC0hrIY27DBcAM2/xsJop9DDYiVCofBepStLaaPU+Em9o5dxr/asDU/35xGCLq1e9MKssVELeYZgs7HGtE04D9BxJiZkkaBnQVuXrwP28gnbi+f6ZjPmlpRyCv4ldZEK7iAe4FPk73Uw8YpdWTNxMAIsItjgqR1mnPmkgofpheU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747743186; c=relaxed/simple;
-	bh=9jGH7pBhxzuh6crIIbm1E/FLg/jhRxyAoO82fVb6MB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hzvh+13cowI67Hz35StJWaIKf1LRqA+fM3TPusqfBQSYVqqEJhhZ3hYAptJ/ruhvioRxW8AIqmxujK4S3JiP6aGRV0RQ6fIzpXL8kmZxDBm7BpklnoYUrQmvPvFMFGdjcR1+41tZ/EUsFzK/dTKwMiOnUjB+gzF6Q6aa4YK18d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BckgQvAA; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747745110; c=relaxed/simple;
+	bh=/Bu5JoeggmmYsgYMlQJvoiHTFaiR1GhV3A0BYsQYMaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rMv/w33ocn9fZrsGkBSGPujlvPM6tdR7CZs92lZ2LVzPS4nKADrtVjUqH0kqF8lo0BS8Y/+170vo95fHXgN2l7GC8OPfHb1kwkjrMeuiSxZ0RvjaZ4ZC77tch1488JKTn7IC7S03XXhRIaUikdf3ERMv8jAQEOHK4oyQXJBZiOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=PXf7YfxV; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BckgQvAA"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-442f5b3c710so44119845e9.1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 May 2025 05:13:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747743183; x=1748347983; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MbMyl3/7oyXhYnNk5bCXQ5p/8U5ULGAfUGDG23y51+I=;
-        b=BckgQvAAyyJY0cD3WbVKoznQejZDCr9s4o+lOlAFe747grtLBd+mgZcQfg/S7rtff5
-         tCBPd7MMoamacegKvat3I5yGk3KiNGEcUSkXPcOmHZ+ENAJ1s4yi/9thjzNshuTsIHCq
-         mW+XJ0Q2nL/ICr/bgMmoYZs9aWAyw5nXMg6ymjupy27UyTrThQocAzPJ6zXYY4Pz9a/U
-         rOMANMlBCeppURWqjP9IDPttpeVk3V/8zBmCoxcXZUlm7iLqpQO7/gcXgkI3qmK0AQw9
-         Do7HtbcEvs2JkvcrKTTIdkRO8NGfMw+rCFvEtca1MrTbkDeAnthZmBC3uKwbP0KOV9rL
-         unQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747743183; x=1748347983;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MbMyl3/7oyXhYnNk5bCXQ5p/8U5ULGAfUGDG23y51+I=;
-        b=vXIeovR0q1XhhKI1XKrimz9ozCJAxzAsr7e2PNnp1mh4Ems9GoCqDd/ewq1fNkx03w
-         +JGt6UCUMXcskhSpmtAjcB+lyNyHIls9ocnLTDm3+m8uiSLrinAWG7mGdda2vVVbx8zM
-         7DGOeFIQg3Kb3Y027x1WnaSAmf2VckU3aERlCSddc62zYR7nxyZu745/l4vFuiuK40kb
-         UIlArM0kojC+IIqrEw6GQQtwPPjKV2EwcbRO486j3wIP14fjVVdh2TSS8+AG9gyypheD
-         G37V8z6O1882vOgJCdNcIWu8eBjl3tKYvTlld7UX3dv+YTZhyn6dgh72OdZTsLwW3HSX
-         NSug==
-X-Forwarded-Encrypted: i=1; AJvYcCWkaMBG+aK/XLjQIaHSFvlSPJmX3Dwfw0wB0LENz21p03TjsnOMSY0Ut91TS1tFwXOSd6Z7zxm2EWaKe/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrH8CkMhY0X08YFj/fs47BoAszLb4hMhKXbShOLdMDHuC3kPvw
-	P+jU+XXTXapKFov1xXmvv6CSzm0N4PCIjZMWEi9Wowa/qk6GZhPhB22I
-X-Gm-Gg: ASbGncs2gbHwr3yZ9lQZ9mYHxM2IgxWJC2myGZNcBCWD9y8fhMAbrhqn7231SDVoCfT
-	b9Ggiyol5r7Mvrra0fvd3grMitwDp/cimYOI4QRA34mu5l+9GjFcW5s33HNZivTDVhhQAksyR97
-	eVPyDR6VXatrqd0rlxth1oi3q+vfUhTw0sCjQVOxM89ItaxcvlGOkKhy6KSvThyK3anEldIO4vq
-	cSy9E0tErG4+WYRazc8tRRXGr7dCan3xkUtFLpopnJFbq696j8x9qjkK4sizWtvynvz/Irn/tru
-	GfxqMujA+Pf85s3WwFAume8HqKevylVrUbskR31GUep4JFc1bO8/
-X-Google-Smtp-Source: AGHT+IEbFRetBMqwdm3TyylgIhcXZuGpVMatHq+n3r/yUuD1fBGdMEeLfEEaymk/8Oki+y68NvDf2A==
-X-Received: by 2002:a05:600c:a08b:b0:43c:f895:cb4e with SMTP id 5b1f17b1804b1-442fd63c748mr191020955e9.17.1747743182612;
-        Tue, 20 May 2025 05:13:02 -0700 (PDT)
-Received: from Red ([2a01:cb1d:897:7800:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-447f7d9bde0sm28066545e9.40.2025.05.20.05.13.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 05:13:02 -0700 (PDT)
-Date: Tue, 20 May 2025 14:13:00 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: dsterba@suse.com, terrelln@fb.com, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, herbert@gondor.apana.org.au
-Subject: Re: [PATCH] crypto: zstd - convert to acomp
-Message-ID: <aCxxzOa23LJxKt-Y@Red>
-References: <20250516154331.1651694-1-suman.kumar.chakraborty@intel.com>
- <aCpKwjzLoqUi5ZwK@Red>
- <aCw1zDuv45AHR3YN@t21-qat.iind.intel.com>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PXf7YfxV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1747745101;
+	bh=mg6aKkZQLTEQjbbwlb5kNbIkwBaVOTUMSjCEbpPqIcs=;
+	h=Date:From:To:Cc:Subject:From;
+	b=PXf7YfxVtdGpsC2nh54hcxK0eKz4a7QgPNBRigRwVE2BH3l3ftsZuv/+do4sL5Uqw
+	 ztWRRlHQ0pJUHxVkq4gFJDXjBtkSART9/Oea7FtMgZA6AY1kSCx/iU4rxM2tSGAiD8
+	 O4kKZG5ZPtkJc+X6tGeNITOB0N1599i1W0MAUE6IrMH0njCEw2ZeK3RBE1cUu2O7Pp
+	 dPpEFAxUGraWo+9627YMLOlA9//ukuFI+sgkK9lKJOe6jwavHdaaZgucHR/UXvGnfS
+	 hjrSOme/KwEwP8mikpM458eBp7/Vmkg62OY+E1mNk+iHsCb4NwMXQjXF2+R38BnVo9
+	 oOscSjSsGTsiA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b1vQj5kxPz4wcd;
+	Tue, 20 May 2025 22:45:01 +1000 (AEST)
+Date: Tue, 20 May 2025 22:45:00 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the crypto tree
+Message-ID: <20250520224500.4d3b7d16@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aCw1zDuv45AHR3YN@t21-qat.iind.intel.com>
+Content-Type: multipart/signed; boundary="Sig_/e70/c5jrQ7WqOkCmO5/3iiu";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Le Tue, May 20, 2025 at 08:57:00AM +0100, Suman Kumar Chakraborty a écrit :
-> On Sun, May 18, 2025 at 11:01:54PM +0200, Corentin Labbe wrote:
-> > Le Fri, May 16, 2025 at 04:43:31PM +0100, Suman Kumar Chakraborty a écrit :
->  
-> > This patch lead to a selftest failure on qemu ARM:
-> 
-> Hi Coretin,
-> 
-> Can you please share the below 
->    - Configuration for the VM, including size of dram
->    - Kernel config file
-> 
-> Can you try increasing the DRAM size in the QEMU configuration and
-> check whether the self-test passes with the updated memory?
+--Sig_/e70/c5jrQ7WqOkCmO5/3iiu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-It is a qemu-system-arm "-M virt" qemu machine with 4096M so I cannot increase more the memory.
+Hi all,
 
-It fails also on qemu-system-x86, qemu-system-mipsel -M malta
+Commit
 
-You could find all config on my result page: http://kernel.montjoie.ovh/lkml/20250516154331.1651694-1-suman.kumar.chakraborty@intel.com/
+  d9f88adbf117 ("Revert "crypto: powerpc/poly1305 - Add SIMD fallback"")
 
-Regards
+is missing a Signed-off-by from its author and committer.
+
+Reverts are commits as well and so deserve reasonable commit messages
+and Signed-off-by tags.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/e70/c5jrQ7WqOkCmO5/3iiu
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgseUwACgkQAVBC80lX
+0GxXMwf/Vjk6VdxnikXK9Yzh0gy75Bq1oLd6B8yLoG7+6g7URHg2N9KEpD0kM/W8
+QS/f4IllXfP2xWmPX+uGjL3FmZQQY6rTHArUj8CsVMPGTx/zuFZNnkSkdsKRndE4
+QLdiNSz0ZNOu2oD613FaORmuKPI93r9zv5XRNNBVaRu3uIEW7IdrjXPRiFUSGUyl
+yfncHm+hXPxHWlkJIfSKETl+ggu8pZ1AwRaihkikvd/QrrEkpPhtuULeqSSYYZ3C
+wPkXUrSSaIyATHcbeXuk085XRKDlFkyK1OEz6Z8ebWcDJssC39E1ml43nCSrElqv
+SzewNAX8oq/S24SUL+UNUEjsnBX0Dg==
+=is5l
+-----END PGP SIGNATURE-----
+
+--Sig_/e70/c5jrQ7WqOkCmO5/3iiu--
