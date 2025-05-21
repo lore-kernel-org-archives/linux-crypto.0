@@ -1,148 +1,150 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902C321D585;
-	Wed, 21 May 2025 11:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0692426C393
+	for <linux-crypto@vger.kernel.org>; Wed, 21 May 2025 12:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747827390; cv=none; b=VkPn0gOmq8o1Ub+WOBbLO2edFAVoHWBuPrVrVlePiELTYK2VKbc1n/sljxRqiWq6yxBK1EC2IsbFOsqLxLQ6cijTKh3IZKq1aVpuC2DBXjRsCrYZ28Va9o8iY4qTZd4HZirmNi8+VpZ2fcLTlUx/DlPgrs+nppWYCTBZkWdG4kY=
+	t=1747832193; cv=none; b=boVSRuCJS6ohAEZnwHpY8g248n+fyWAjyOHJUW7iyqM6YyHwFEYWVtNU6zQQXFqFWnJW5LczDCoYiYHGNqgYmWf+i5tmMW028Wo7isvUv3m5N0fqf9tH1rFNYIJkdjr1EBZWdSByCgeUsmRhaT8FdPZ0rwo3aM1IBsAJPkmxViM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747827390; c=relaxed/simple;
-	bh=xTbNpjfZN34GRRoRHO5aWamaazzkYztBSsMKGrn1dvE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=HsM7+lc8bf5ctaRMHnoAfpJhxPCIu+9f93Ln9on41weafjvxpDEb/xHWa1MNX6X5A0sUg6uKkvw67ZgmqBQ4ls2Hv3QLqEEKTy8szYRbnW+LpKdrt1ocb3RQcds6JvfpL5LdsDscYzMRTtgQn1Y5uJPS3s3gmaSAL2tt64lc5s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=vfTiLOfE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Qm26I6T6; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1747832193; c=relaxed/simple;
+	bh=jqFh6OLy009sVDrIEZvFgfEAz7W9TfG0E1Id0rNgjYQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uB+l7AuLS3I4lGz7DbVVECIWjdGBSdJBlrlSyxacUdMlvuASvdPbbcdIlFaB0TpExD/tBb84LfURlMLv2GFiZrqoLuPxHu9PcKmMVlLMu9kS6G3fdGPzeQkwBEdvWxupMZpaAyfivr20RE3ZHIy81i1AoriHEAxVM/QrS8P6aRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UF5yLWte; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="vfTiLOfE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Qm26I6T6"
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 6A04611400F9;
-	Wed, 21 May 2025 07:36:27 -0400 (EDT)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-05.internal (MEProxy); Wed, 21 May 2025 07:36:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1747827387;
-	 x=1747913787; bh=CIqSpvAb/w6MeH6RH67fY52ebgYd8rXK46WCijqn65A=; b=
-	vfTiLOfE4IW0yqfJigIDkPtieD+Z62J7ROahJoOV3fbseZ7jUkYbDtIuSCEPqkuG
-	+oCs6jwdHL3prGZtcjz7FFiArCeSVMo72jS6U4J/eki/TKQjL2nW2F1k1mEjX8uD
-	HdqmN50HIhgxXnuE8p33LQMSrE3iYfX4/6eIsFswHfFbxHMHRkMbvSBvEdjgM8+y
-	Qoh6ZOXnp8q5CWkDrHt6oWa+02Kgr8xNQSNCSjAcx5RBtvijBTVyOGICemU7ELiJ
-	KwyOnzIpzhvkIZcBvVKZND0dRaDNWb+nHTiwUvptE6bzjwda0wax2YqiOX8BSJAO
-	RnhG5VyMhhd7iD4Gsbcm4g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747827387; x=
-	1747913787; bh=CIqSpvAb/w6MeH6RH67fY52ebgYd8rXK46WCijqn65A=; b=Q
-	m26I6T6LBBO7C6YjNTdTE4YnRrssA4bKvIObFFS9nEnwZvcOqLmGcS2Y7bs6dd+6
-	WRPR0AtmCfzFKMt3HHzpvHFYC88z7cTWKSvGDmXYnEGjxcw5w+M6j/lEjYAnzcRV
-	mxs4inr+tHc6TfuMmSk7yJe9wHU1LgWXjxd1Jkp4OGZVqUexmfp5QCVBEQNTCggD
-	axrlfpTnnqajL01h7xqhl6Ken+mj/Oe9j1f1xgtLLJQyMndVgUfFNeBFVWli0HQe
-	a4pB8RvYyjy0MibHNKI9QWEWOZ4BoeMt+mhENMhst/IrXwtay6WbLtzDlai4+23J
-	uhJqzcEqoyk7jks8bRN0w==
-X-ME-Sender: <xms:urotaFEuekNqLsitrn6lKiIId9aYo-rtbMyuwo359I2Tu9F_aCijHg>
-    <xme:urotaKWaRLl2lU9VtPgzqAoIu7au1wGwWHBNlTJYPhSdDA2k3DLL6holwe69tWkq0
-    wlIRpTRerWh_cqlLbE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvleekucdltddurdegfedvrddttd
-    dmucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgf
-    nhhsuhgsshgtrhhisggvpdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttd
-    enucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgj
-    fhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuc
-    eorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedu
-    keetgefggffhjeeggeetfefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdp
-    nhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegtlh
-    grsggsvgdrmhhonhhtjhhoihgvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhlrghu
-    shdrkhhuughivghlkhgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhomhgrihhnrd
-    hpvghrihgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhn
-    ughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepsggsrhgviihilhhlohhnse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtoheprhgvghhrvghsshhiohhnsheslhhishhtshdrlhhinhhugidrug
-    gvvhdprhgtphhtthhopegrrhhnrghuugdrvggsrghlrghrugesshhsihdrghhouhhvrdhf
-    rhdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdroh
-    hrgh
-X-ME-Proxy: <xmx:urotaHJuoiLvTugjsJt7qszTsX2Wvsj0CUYNtGCZ3I0Nz7YGYTujXg>
-    <xmx:urotaLHeXqAIrP7KXbC1evzP4RyxPwoH2hv2IhusQ0z1Cev3Gh7j_w>
-    <xmx:urotaLWb54lmDMOIFroeYrVI5uFAK3FWiINkdDX5c1tQF6LUOsGEVA>
-    <xmx:urotaGOGRM9oYGiC-x-rJtcMZ59LY1gFHGxny_8RyjkkQXav2IsYkg>
-    <xmx:u7otaNKUdx4VygAsSDKp3LfVXkd4eW1NGM8aXEvEKPVixVG9mFV8JztK>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C14631060061; Wed, 21 May 2025 07:36:26 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UF5yLWte"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LCqWMr018023;
+	Wed, 21 May 2025 12:55:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=1Dl3/w2twWEy/ihWLMjI0xKdu/iRo
+	OYbHs0xJY7lumc=; b=UF5yLWteKhtS1nsDAkOFh+pMQLZqWB41yT+iBh7rOXlPW
+	H2pyIBeIMZUGuJjSFLkUylN/5x14jcRZSouafh0N/07ZXR2TKqd+sVPTmBViraoU
+	T6MNK5NtaTfuobCLj3WUegfBhk5zirPObF4FdA5skFVOEOGMlbQcYYjiuFxoyl4R
+	CetIKiJfVNZo3dDb+5GR3nsXmKsn8ocPAn9juMIXN+Kap9pO0MVwwAfxmkWgirux
+	52EH2T9GHVDC4ZPX3prSWRpi9BqBEdEbUCkIuU8h12X730FmsZYcWQyFA3gR0oX2
+	4D3kMo8Fsni6UHYf+k/PBtTkhRnEkhTE2Xg9zgQ9A==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46sf7c80bh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 May 2025 12:55:57 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54LCF7wk020313;
+	Wed, 21 May 2025 12:55:56 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46rwetths6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 May 2025 12:55:56 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 54LCttq0027436;
+	Wed, 21 May 2025 12:55:55 GMT
+Received: from localhost.localdomain (dhcp-10-154-214-60.vpn.oracle.com [10.154.214.60])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 46rwetthqq-1;
+	Wed, 21 May 2025 12:55:55 +0000
+From: Vegard Nossum <vegard.nossum@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Marcus Meissner <meissner@suse.de>, Jarod Wilson <jarod@redhat.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        John Haxby <john.haxby@oracle.com>
+Subject: [PATCH] crypto/testmgr.c: desupport SHA-1 for FIPS 140
+Date: Wed, 21 May 2025 14:55:19 +0200
+Message-Id: <20250521125519.2839581-1-vegard.nossum@oracle.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Te525b7ee476102fc
-Date: Wed, 21 May 2025 13:36:06 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc: "Corentin Labbe" <clabbe.montjoie@gmail.com>,
- "Klaus Kudielka" <klaus.kudielka@gmail.com>,
- "Eric Biggers" <ebiggers@kernel.org>, regressions@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
- "'bbrezillon@kernel.org'" <bbrezillon@kernel.org>,
- "EBALARD Arnaud" <Arnaud.Ebalard@ssi.gouv.fr>,
- "Romain Perier" <romain.perier@gmail.com>
-Message-Id: <1024b1b7-9d58-4db4-a71a-108f6df7b623@app.fastmail.com>
-In-Reply-To: <aC2p6xkMz4BtzPYH@gondor.apana.org.au>
-References: <20250515182131.GC1411@quark>
- <f0dc235e3d7bfa1f60cc01fd527da52024af54e0.camel@gmail.com>
- <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au> <aCcyXkeBvHQYvf2d@Red>
- <aCczV6MF6xk5rRA3@gondor.apana.org.au> <aChx_ODF_hYKL8XO@Red>
- <aCmTQoJw6XG1CkuZ@gondor.apana.org.au> <aC1fY6IP-8MzVIbx@gondor.apana.org.au>
- <aC2aAvX07Aaho08d@gondor.apana.org.au>
- <23fe1dec-032a-41fb-8e60-3a1b6c098c4e@app.fastmail.com>
- <aC2p6xkMz4BtzPYH@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-21_04,2025-05-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ phishscore=0 spamscore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2505210125
+X-Proofpoint-GUID: _txlVD8LC1PCe4sONhgPBgTgNoC75U8l
+X-Proofpoint-ORIG-GUID: _txlVD8LC1PCe4sONhgPBgTgNoC75U8l
+X-Authority-Analysis: v=2.4 cv=OZ2YDgTY c=1 sm=1 tr=0 ts=682dcd5d b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=dt9VzEwgFbYA:10 a=PYnjg3YJAAAA:8 a=20KFwNOVAAAA:8 a=vmLDa1wCAAAA:8 a=yPCof4ZbAAAA:8 a=SVbLyAKZ51KGVHrPys8A:9
+ a=h8Bt5HTj68qkN2fS7gvA:22 cc=ntf awl=host:13207
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDEyNSBTYWx0ZWRfX+rZgte3CDKtW WInwIaciv7vsvUlj1AtLNX68CXLiF00+J9jJ9xreLjW5MfG05/+mUr48h+fpEa9z/kO6ErWzPjZ H9jSY37b9C+ZGHwNPQu6QAhudC+BvYJZ9HASuWNYaOvWwjj63PUb4qNRZSIfjVBBFbOEqsFIKCZ
+ qYZZqSi8zShwflrSeSEmqE5xx4ywXF0oG7mm80EnPWg4h+ACjiVsxa58dfrA6pfCWSigF8Yi4OP tjdiOTkL9WqoFNDbasmRAKsLlgNiGYvOQDSvpkkCQBCcXQ6TetF0jA5ImFjj93bd9uM3z/9QYvR p+zIO2pM/OcN0zKT/sEEFURB4c3bngYW13vIWuaHHWt5iLpL0P/NtYxq5MPLct2NgVZx5sNFncP
+ 1L9/KBg8h4e/PsaIQQmMlumuhbhyeOonxPHsNwduhtR91uborIwonyyA43QH555B57dNnjnP
 
-On Wed, May 21, 2025, at 12:24, Herbert Xu wrote:
-> On Wed, May 21, 2025 at 11:58:49AM +0200, Arnd Bergmann wrote:
->>
->> I did not see the entire background of the discussion, but would
->> point out that this is not supposed to work at all:
->
-> We're trying to find out why this driver fails under concurrent
-> load.  It works perfectly if you do one request at a time, but
-> when you hit it with load coming from both CPUs, it ends up
-> corrupting the data.
+The sunset period of SHA-1 is approaching [1] and FIPS 140 certificates
+have a validity of 5 years. Any distros starting FIPS certification for
+their kernels now would therefore most likely end up on the NIST
+Cryptographic Module Validation Program "historical" list before their
+certification expires.
 
-Ok. Which SoC exactly is this on? Armada XP or Armada 385?
+While SHA-1 is technically still allowed until Dec. 31, 2030, it is
+heavily discouraged by NIST and it makes sense to set .fips_allowed to
+0 now for any crypto algorithms that reference it in order to avoid any
+costly surprises down the line.
 
-> My suscipicion right now is DMA corruption.  One common thread
-> seems to be that if you only use dma_map_sg it works, but if
-> dma_alloc_coherent memory is used then it is corrupted (this
-> isn't proven yet, it's just what the printk patch was showing).
+[1]: https://www.nist.gov/news-events/news/2022/12/nist-retires-sha-1-cryptographic-algorithm
 
-I see. Just a few more ideas what it could be in case it's not
-what you suspect:
+Acked-by: Stephan Mueller <smueller@chronox.de>
+Cc: Marcus Meissner <meissner@suse.de>
+Cc: Jarod Wilson <jarod@redhat.com>
+Cc: Neil Horman <nhorman@tuxdriver.com>
+Cc: John Haxby <john.haxby@oracle.com>
+Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+---
+ crypto/testmgr.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-- the SRAM gets mapped into kernel space using ioremap(), which
-  on Armada 375/38x uses MT_UNCACHED rather than MT_DEVICE as
-  a workaround for a possible deadlock on actual MMIO registers.
-  It's possible that the SRAM should be mapped using a different
-  map flag to ensure it's actually consistent. If a store is
-  posted to the SRAM, it may still be in flight at the time that
-  the DMA master looks at it.
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 82977ea25db39..797613daf7e33 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4285,7 +4285,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "authenc(hmac(sha1),cbc(aes))",
+ 		.test = alg_test_aead,
+-		.fips_allowed = 1,
+ 		.suite = {
+ 			.aead = __VECS(hmac_sha1_aes_cbc_tv_temp)
+ 		}
+@@ -4304,7 +4303,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "authenc(hmac(sha1),ctr(aes))",
+ 		.test = alg_test_null,
+-		.fips_allowed = 1,
+ 	}, {
+ 		.alg = "authenc(hmac(sha1),ecb(cipher_null))",
+ 		.test = alg_test_aead,
+@@ -4314,7 +4312,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "authenc(hmac(sha1),rfc3686(ctr(aes)))",
+ 		.test = alg_test_null,
+-		.fips_allowed = 1,
+ 	}, {
+ 		.alg = "authenc(hmac(sha224),cbc(des))",
+ 		.test = alg_test_aead,
+@@ -5156,7 +5153,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "hmac(sha1)",
+ 		.test = alg_test_hash,
+-		.fips_allowed = 1,
+ 		.suite = {
+ 			.hash = __VECS(hmac_sha1_tv_template)
+ 		}
+@@ -5498,7 +5494,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "sha1",
+ 		.test = alg_test_hash,
+-		.fips_allowed = 1,
+ 		.suite = {
+ 			.hash = __VECS(sha1_tv_template)
+ 		}
+-- 
+2.34.1
 
-- I see a lot of chaining of DMA descriptors, but no dma_wmb()
-  or spinlock. A dma_wmb() or stronger (wmb, dma_mb, mb)
-  is probably required between writing to a coherent descriptor
-  and making it visible from another one. A spinlock is
-  of course needed if you have multiple CPUs adding data
-  into a shared linked list (I think this one is not shared
-  but haven't confirmed that).
-
-       Arnd
