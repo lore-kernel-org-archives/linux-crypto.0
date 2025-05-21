@@ -1,84 +1,130 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0741DDC11;
-	Wed, 21 May 2025 15:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD55239E6C
+	for <linux-crypto@vger.kernel.org>; Wed, 21 May 2025 22:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747841985; cv=none; b=E4fko2Ianb5tMLKKR5V3k2vBU9jVZkBNd65NUwMdoWlKgAVhmFYTFiIQAea345zllrgy88Fhuxt8mmC4oK/sA8PdzbBJMj3uenGeiZ8QITCgSswq1Za6X3Uh1ZYxo5a1VfR6pm02up4Sr9rdFyzfG8vaOFC7GeU3W2cc0P12yL8=
+	t=1747866402; cv=none; b=JZEs3Wccw3vrYnjNin02eU/Bpj/EX7sKHiBkQyBP5OPuPvmGwKFBmxxQ2aluc5QUsY+eaGL4ofjghujza650hIpgp1kaWPGqjggqg8h+9M3ojJj8NbrKryuCToUciu+cUVlPcqFNJguIbjoWpRyITatQiq+dRTQESedEAtrNhLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747841985; c=relaxed/simple;
-	bh=56+Ldh4ULNLQNcC6REQ8YVLq/mgCiT7EcjNDnX7Tc90=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JvqOPHp51uG+ihuzuglODMCtn52XJuTbIjmpkhzEU27s6w8KgyVTwVys07ry0qs9idcoej7X1tTK3+L/NSz5Vb5fqFkJUlUfjJ+6+RAVu7cC0XM3kGYyoQPFHq6vkaIF11fYA1CCn0TZ3aTIhAPxEMMCM6t5XZj9rHX7CiLP3Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uBSXWepw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6uCbu5Hg; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1747866402; c=relaxed/simple;
+	bh=9Wg6PPoLM9WFD1B0FiNbRv3qnbGj9YtPrQiT2xmvAlk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mc8kTUjmwqx5ucwQxUHxMTVqnQFpO+aanH4GUOeiPCebfb4QgHXpc3lbmkQYeF/cmXny27Pqxy/NI/HBWFmtxTlIFSVdarMsygbSa3RC/aK8c+WS5zmtOyfx7RO1C5TgHdxzu7t67/0xUkltxl6w9LAtUApCk3RRIsF0tyyjWiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=dWHtCK+1; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uBSXWepw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6uCbu5Hg"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747841982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rmcq2TZqKJFA2G8lP9ur6GmBE9CXTqv+xnC4EorPFrE=;
-	b=uBSXWepwy04FZ5OAW+bdMhkVDxZKnRFoFvcSyU26wrzPHHiMR2RIT5eFYMZx9J3K/SSIJL
-	tpvYDlWCYrvP4rnlWdFnF/903n3hSVc8aVkKl7l4Igx+Em8pym+h79CY/8mruDq633ZfhA
-	R//MLWVainfIYOzLPDMAI7jajRLQ6MEtBRYj3JOo0ITcPfuY+etDUkp3rZsUTBOGF3gpk4
-	G2TUKZworQX2Ba8rExYF9JbVdPHCiNILJ9GctemBTGYZchU/+z8y8cnRuV+YrZkos3jfl/
-	AGNPi3PggbvjeZnh0HQiThBjIzULPtsO5EwFVAxGFmkM5Z6OwqOl1xLEhxKoCg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747841982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rmcq2TZqKJFA2G8lP9ur6GmBE9CXTqv+xnC4EorPFrE=;
-	b=6uCbu5HgoqffgsRmJ1N1f5ehaBvHv6N15JcyB5LGgN6lW3xKJWe8/72HebdT+vIMRALI9u
-	jb1X7ap/5Rs8j2Dg==
-To: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Ayush Jain
- <Ayush.Jain3@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ard
- Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] x86/fpu: Fix irq_fpu_usable() to return false during
- CPU onlining
-In-Reply-To: <20250518193212.1822-1-ebiggers@kernel.org>
-References: <20250518193212.1822-1-ebiggers@kernel.org>
-Date: Wed, 21 May 2025 17:39:41 +0200
-Message-ID: <87v7puq8g2.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="dWHtCK+1"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70dfa8424c7so9914517b3.2
+        for <linux-crypto@vger.kernel.org>; Wed, 21 May 2025 15:26:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1747866399; x=1748471199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v2CpApAzFU/xdWj9L8OzabAbfmuyqqCQstsc9xr7aRs=;
+        b=dWHtCK+19LpV/OzjykLmVBgKbhcOVNo6dl8aB0xCje7M0djkO5qz6Brd4Vnj5mcKqI
+         1H5BuuIqWkinNZRXPToDvL+blTYOUCFrVj3IOcfW0WG7CAKmRKeOerkq8BF8rEJ8a6yG
+         EUdpdr16fxXqbeeTxYuVF/mjkMUUCCHD3JpO1rd/qvaNKZGYcfAZJ51/C0r4rNpFcKY5
+         G/WIktsPcA9J9qD7rjRrRBiA7aouCKaKzt/61Sm9K6rkO3kwYUmua+72BVLQXw6gtUty
+         0TIj9LWgjczs0LRj6jwoMssNL8YPLfT31FbyxqHBGs5nq6uyxvKzEysyiqfzGNA/JLiX
+         AAdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747866399; x=1748471199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v2CpApAzFU/xdWj9L8OzabAbfmuyqqCQstsc9xr7aRs=;
+        b=LTJOKpFKSWyyMc9uwr+9ZJbsCavTM8dt/weZWLOR+v1A7HA6l6mqTCymX/vE3ZP+Nd
+         CkyFmNP8DvIDPczjkNSBltIxRkNqD8CQ7G5RyNsAt2J1BwyX7RRqHbHO2Xe0G2Yqhyy5
+         VOynatds2muYQyTTc/hX9TCHnYiZfcW/C2OFCWjBk6v7FvCgKme/bWVMCVoyKaq2rwYv
+         phArY/Ra/Af/MGKk50DynmpNngF/fDpZxmsSvdOoYfR+mHH4mJcbP9oPmV38pieApYhA
+         vvYfE/7iNPVaCi/E9oVpcRG0kMTMuqiXkYxz6N9hV1YSh2sv86RVUrEKZ9TvKHCU1IbI
+         BNZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMkQSOchUJ2+BuCKixnxtYUqS2baOTyC3gEiu+JQn41YRCBJL7FNvU4qDkLerCJNbHZTfF9ogPTzukcQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZHQcQ8Yho1+Rzp+RIjPtHeFRTj+1DisZ3VSHUjJuxCDxLJbvt
+	VnajmTvCdCtg9WajRcodP7y/60U+xqHpKNKgfer9vLhKejx1XSwuhYOy9EXS0Q2Mhbb21z0FeZL
+	wq2i1pJSa+jmCXaSH8AYAjXhjhY0hYcNOMrha0iPU
+X-Gm-Gg: ASbGncstsV8uSHd65Da/OOE+VCZEtQLex+hkS40Qr08Mc8Wo59a5hEt7XLhDo3WDeRW
+	SOTwslK+L0ZOZHelRlq2IXG49wmLhc9eUtZ/BHJfYm1iVdZp0xkrrS2NgryBBkDI9putXk88U1a
+	6xXZJXtK6LzFOWWJYUhu8u/LRDLV5chzHd
+X-Google-Smtp-Source: AGHT+IHWrEn3lGbj54WMbP1QWqKgIGqbS12jw/F6NygMZdWDXAhufhQc4tMWD/kGAI3Getozp0LttKjpfQRDZM9iHFA=
+X-Received: by 2002:a05:690c:4883:b0:70d:f35d:4d26 with SMTP id
+ 00721157ae682-70df35d4d9fmr60596797b3.21.1747866399572; Wed, 21 May 2025
+ 15:26:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250502184421.1424368-1-bboscaccy@linux.microsoft.com>
+ <20250502210034.284051-1-kpsingh@kernel.org> <CAHC9VhS5Vevcq90OxTmAp2=XtR1qOiDDe5sSXReX5oXzf+siVQ@mail.gmail.com>
+ <CACYkzJ5jsWFiXMRDwoGib5t+Xje6STTuJGRZM9Vg2dFz7uPa-g@mail.gmail.com>
+ <CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com>
+ <CAHC9VhQL_FkUH8F1fvFZmC-8UwZh3zkwjomCo1PiWNW0EGYUPw@mail.gmail.com>
+ <CACYkzJ4+=3owK+ELD9Nw7Rrm-UajxXEw8kVtOTJJ+SNAXpsOpw@mail.gmail.com>
+ <CAHC9VhTeFBhdagvw4cT3EvA72EYCfAn6ToptpE9PWipG9YLrFw@mail.gmail.com>
+ <CAADnVQJ4GDKvLSWuAMdwajA0V2DEw5m-O228QknW8Eo9jxhyig@mail.gmail.com>
+ <CAHC9VhTJcV1mqBpxVUtpLhrN4Y9W_BGgB_La5QCqObGheK28Ug@mail.gmail.com>
+ <CAADnVQ+wE5cGhy6tgmWgUwkNutueEsrhh6UR8N2fzrZjt-vb4g@mail.gmail.com>
+ <196e1f03128.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+ <CAADnVQ+=2PnYHui2L0g0brNc+NqV8MtaRaU-XXpoXfJoghXpww@mail.gmail.com>
+ <CAHC9VhRKZdEia0XUMs2+hRVC7oDzkBfkk5FPMD+Fq5V7mAk=Vg@mail.gmail.com>
+ <CACYkzJ7oxFA3u9eKDpKgCsZsYsBojVJPHVeHZnVaYQ5e9DavmQ@mail.gmail.com> <CAHC9VhQ7Rr1jJm=HY2ixUWpsRuwCxjOq5OTMfn5k5hRzxTCz-Q@mail.gmail.com>
+In-Reply-To: <CAHC9VhQ7Rr1jJm=HY2ixUWpsRuwCxjOq5OTMfn5k5hRzxTCz-Q@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 21 May 2025 18:26:27 -0400
+X-Gm-Features: AX0GCFvZaSST-PWkU4_ibBxMlaa0A91pXSzh3ZzCdqeIU3YX4GLRRjzs5eOILBs
+Message-ID: <CAHC9VhTj3=ZXgrYMNA+G64zsOyZO+78uDs1g=kh91=GR5KypYg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Introducing Hornet LSM
+To: KP Singh <kpsingh@kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, bpf <bpf@vger.kernel.org>, 
+	code@tyhicks.com, Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, 
+	David Howells <dhowells@redhat.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	James Morris <jmorris@namei.org>, Jan Stancek <jstancek@redhat.com>, 
+	Justin Stitt <justinstitt@google.com>, keyrings@vger.kernel.org, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Bill Wendling <morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Neal Gompa <neal@gompa.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Nicolas Schier <nicolas@fjasle.eu>, nkapron@google.com, 
+	Roberto Sassu <roberto.sassu@huawei.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Shuah Khan <shuah@kernel.org>, Matteo Croce <teknoraver@meta.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, kysrinivasan@gmail.com, 
+	Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 18 2025 at 12:32, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Mon, May 19, 2025 at 6:58=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
+ote:
 >
-> irq_fpu_usable() incorrectly returned true before the FPU is
-> initialized.  The x86 CPU onlining code can call sha256() to checksum
-> AMD microcode images, before the FPU is initialized.  Since sha256()
-> recently gained a kernel-mode FPU optimized code path, a crash occurred
-> in kernel_fpu_begin_mask() during hotplug CPU onlining.
+> When the kernel performs a security relevant operation, such as
+> verifying the signature on a BPF program, where the result of the
+> operation serves as input to a policy decision, system measurement,
+> audit event, etc. the LSM hook needs to be located after the security
+> relevant operation takes place so that the hook is able to properly
+> take into account the state of the event/system and record the actual
+> result as opposed to an implied result (this is critical for auditing,
+> measurement, attestation, etc.).
 >
-> (The crash did not occur during boot-time CPU onlining, since the
-> optimized sha256() code is not enabled until subsys_initcalls run.)
->
-> Fix this by making irq_fpu_usable() return false before fpu__init_cpu()
-> has run.  To do this without adding any additional overhead to
-> irq_fpu_usable(), replace the existing per-CPU bool in_kernel_fpu with
-> kernel_fpu_allowed which tracks both initialization and usage rather
-> than just usage.  The initial state is false; FPU initialization sets it
-> to true; kernel-mode FPU sections toggle it to false and then back to
-> true; and CPU offlining restores it to the initial state of false.
->
-> Fixes: 11d7956d526f ("crypto: x86/sha256 - implement library instead of shash")
-> Reported-by: Ayush Jain <Ayush.Jain3@amd.com>
-> Closes: https://lore.kernel.org/r/20250516112217.GBaCcf6Yoc6LkIIryP@fat_crate.local
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> You explained why you believe the field/hook is not required, but I'm
+> asking for your *technical*objections*.  I understand that you believe
+> these changes are not required, but as described above, I happen to
+> disagree and therefore it would be helpful to understand the technical
+> reasons why you can't accept the field/hook changes.  Is there a
+> technical reason which would prevent such changes, or is it simply a
+> rejection of the use case and requirements above?
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Bubbling this back up to the top of your inbox ...
+
+--=20
+paul-moore.com
