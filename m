@@ -1,113 +1,128 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2B112E5B;
-	Wed, 21 May 2025 05:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA2279CF;
+	Wed, 21 May 2025 05:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747804011; cv=none; b=uw4BnfBfnd6PjeyWGgJcRnkInhrMcvRKYdRlIhxdxa74oJBLNmv6IT7PXmmtqPvS37QquFu45hlw6PmCSwxVsiVBm4U+XE2pYidRe3DakDnDGxmM7qQUty2DXFAYVQKWvCQE16QUK4yo9hV1tXs09s+NVDD0yAO8ZN2eVFN7p0o=
+	t=1747805877; cv=none; b=gfqx+0HDfGR/Msi43F7RLaGce4F6W43jY+l11ujSxMznya60BnlzhKsJkF6RpdWa9OGku+TXrmjDQvPZP9ecuTBEMOj392gf3lG65RYMPXtNCsD7nbV1Vl2qDEqyWdbwhYRvs13zmbkeXq2p18GR7GlGnvC+0WsPq+BKqYT2rO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747804011; c=relaxed/simple;
-	bh=Fye+R7aSAVFkLVJB4LRWCnkoEi6brZy46TD7AWNohgM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uY/KXfjKCHgwyJld/psWfWv9pYsfAtODEwHwzSHZjCoRMbxo2yAcTs7glY6m30wuLzNbAxo1os7H2g8peFbGS3dxpsX+O/FzeFCGWrbDQXiNA7GK4GFk+/w1FFOi0i938FOKjQmtjIl6kgRyKesodi19ct+cMrQ7VfmhnXskSRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Sy+2dtzf; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747805877; c=relaxed/simple;
+	bh=3lw/6ZmeRXC/eWpLMtwZ364acTLZd+iqqodrLc9oIss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XBc3rxIIHSD1D/xXHqV3fwCGMEVzrmCJFYkyvUiR9+5JtSEPQf1K05q1c1SNMkmj18aRRSpjfbcYuovuZVBmUbkyEZN6YZEyuodn0+D+MEH9+kHJl75i6WVTfENU1XqZHwHV2t0k8xw3wM8YP2QLO7kGfSRnZC8hQiavFGZfW1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcENZlUn; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Sy+2dtzf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=WUCO060a2/IvAmEmgmEmyLHDKu9iFQRjj/u3vUBQG2Q=; b=Sy+2dtzf4/pcfepLyLVAb4lVTS
-	65paAERZGJY5JNnqsweV54o3BG7vcpD8T9eLYSl1JPFCQla2F3hdBhASxFLzCmb+xYZAdxKkP1VH2
-	yVnNd9O1hs0+rY7eHlwvsrUY6hWox0Cptukt8Qrg80mxFS3Lyz2afyRdy944CYDgDAE5b2eDAxaCD
-	vdsLTeQKCurJl/S0AmeQULtsGexmc8vUb2Ll+GX1Z+XcPdQ5K7A7mw1wJz6B8qIZwzBJuaZL/xFma
-	aS6F+iAWxfEVwtlwJxnEAa+wolO8+Sr/btxWghSnWCLaBTscew8WxVeU0d9jzf2uTGRvKnIStABFr
-	3WzahrZA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uHbf9-007iP5-2W;
-	Wed, 21 May 2025 13:06:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 May 2025 13:06:43 +0800
-Date: Wed, 21 May 2025 13:06:43 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Klaus Kudielka <klaus.kudielka@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Message-ID: <aC1fY6IP-8MzVIbx@gondor.apana.org.au>
-References: <8e9b45bdafe6ac3f12bcbb5fce5bc9949566344f.camel@gmail.com>
- <aCQm0aHYnI6ciyPz@gondor.apana.org.au>
- <20dde00750d803a9a364ded99dab1e3e22daec77.camel@gmail.com>
- <20250515182131.GC1411@quark>
- <f0dc235e3d7bfa1f60cc01fd527da52024af54e0.camel@gmail.com>
- <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au>
- <aCcyXkeBvHQYvf2d@Red>
- <aCczV6MF6xk5rRA3@gondor.apana.org.au>
- <aChx_ODF_hYKL8XO@Red>
- <aCmTQoJw6XG1CkuZ@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcENZlUn"
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e7d5ca0b71fso277900276.1;
+        Tue, 20 May 2025 22:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747805875; x=1748410675; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wJi8Uhh+lzqIKZME4Ze4Y4J96yIckW6rCj2gYlAVdq8=;
+        b=VcENZlUnY7LepxYG9b+VOSLwqJxC1US1Kf0Nq/7WxY6r6tBS6/sPAUYjSxzb0JgCRC
+         Ba8N33Oa/+YM91ST9iUEq34IcqHEnXlJEFJ1aUMEPjnCBz85gd8rMq4XssHWlHZLeL1B
+         jUiVUgumBVs+Fm8b3U+lCP+BTaGYzEpVjMuI9jqO9HJ/YjMMIyJXb9Hx78jEBLEm6Tt6
+         rjf6PZd7MvvjVCpp8sOwXvqU/Lqli3csCRLkh6GNcn1se4NQOdLojgyMVgPqNXyuwknt
+         abZKysXegmBAsW17hk8QzI/HGwITEZkPoBxe+bVIk6mEkRqbBuDvyxA/I5omYLUwnqmU
+         Rzvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747805875; x=1748410675;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wJi8Uhh+lzqIKZME4Ze4Y4J96yIckW6rCj2gYlAVdq8=;
+        b=N8YrQqykmz5/eKNdYzM7sIeLeUdXHCszEK52fq9blnvOjwFCssZ1mLa8dnmflWJoi8
+         yxdM6JIhJeZ5bezoox1yfGLsofcTYmSEaur4XybqgQEomvdv1mAG+etpM1PU/yKQlQC+
+         TS5z49R0cg+rzbLZVtZzeA+cLyMVDtkDm4Uh3z6GgcTFCXg4F/ajy7boTCjX3dweC1sa
+         V1C4nOOoSH5Az5sLP67j9TFr++6aBnc5D83gmVCz8mk0ZIGX6BU/4ttPf4uWxRyPsbJR
+         hEEWhIBTBqD8BxPgazjSTckLoAoXkBquZerm5iwXAJ8dxY+6MhyZ7Ue/VUppoA3ZOmOj
+         VdMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPE2r5Kasp0UjgTVxd7T8aB+MTzkGL1Q0R6/4XhooQR4s9msktQGwfC1J8wEVUYPdZk7dkZ4KAM6ZUaPI=@vger.kernel.org, AJvYcCWGSDdUgsTXugNlSu72ZDgCpRivKh1Gqgiq8ekOSKTfdLeX5cg/gW7zmrbc6yFNtQrhalTayAEsHfl2E1Nx@vger.kernel.org, AJvYcCXRCHv593sEPq2TyysdrCvq75zLQq/JyM3Glr4pfVAM4rO41EXX99S9oBtyundxd2obs7E3fE2U@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeJNs+hflOJRidRAA7wSb2PUIQ3Oi15+A6YZw6d8Ke9D4OTXXd
+	x6PRD3WUobSdjBZFknuU9ge0pFzSCgtOxfDnRVgSyaVOX7mZpnolDNOy1UcxIJA5gaXqtD8pvT0
+	4FxMb81oLaKWr1TDFi7U8MDHtZyxZBXE=
+X-Gm-Gg: ASbGncvOQJaLzUrvq+LQcoPmrkNO2IKUSVREB71w8IRTcpoSQC9uHHMKl9bKpl68odc
+	VgElD8EE2CSo07edlAl6NpPB6HBZYyZjNT3jkgUXJJBQSPmG+DPMWWq1VKoTf/bq8CS1a6dodGB
+	cVVDIqGC/FNKQWIk6tM7ED5a4vbdhpRlU=
+X-Google-Smtp-Source: AGHT+IHG8nFmbbF5KqGD4r2dcJJXRBEpvP+aXS118vaPP+FX3tYHjvwmTsTPVWi+b7ZaeTKA9e4NtgZeCQBpPrtRMfE=
+X-Received: by 2002:a05:6902:120b:b0:e7b:8256:ec80 with SMTP id
+ 3f1490d57ef6-e7b8256ed38mr21558528276.20.1747805875077; Tue, 20 May 2025
+ 22:37:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCmTQoJw6XG1CkuZ@gondor.apana.org.au>
+References: <20250520130737.4181994-1-bbhushan2@marvell.com>
+ <20250520130737.4181994-3-bbhushan2@marvell.com> <aC0J8g6UYxSw_7zZ@gondor.apana.org.au>
+In-Reply-To: <aC0J8g6UYxSw_7zZ@gondor.apana.org.au>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Wed, 21 May 2025 11:07:43 +0530
+X-Gm-Features: AX0GCFvMCLodwcWAvmyb1AykHvfajITUZiZwSFFDvaTBZi1hS56YuDL_ebWQ5pg
+Message-ID: <CAAeCc_nj1Sk_dAkasYNvwtJtUc1et3cveoTETh25RSojStqNDQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4 v2] crypto: octeontx2: Fix address alignment issue on
+ ucode loading
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>, bbrezillon@kernel.org, schalla@marvell.com, 
+	davem@davemloft.net, giovanni.cabiddu@intel.com, linux@treblig.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 18, 2025 at 03:58:58PM +0800, Herbert Xu wrote:
+On Wed, May 21, 2025 at 4:32=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
 >
-> Hah my debug patch was broken.  It didn't take into account the
-> partial block when recalculating the hash with the fallback.
-> 
-> However, this seems to suggest that my hunch was incorrect.  The
-> partial hash wasn't being corrupted and it's actually the final
-> calculation that was wrong.
-> 
-> This could be good news.  Because if it is a hardware bug causing
-> this, then the final calculation can be easily worked around by
-> turning the final hash into a partial update.
+> On Tue, May 20, 2025 at 06:37:35PM +0530, Bharat Bhushan wrote:
+> >
+> > @@ -1519,22 +1520,27 @@ int otx2_cpt_discover_eng_capabilities(struct o=
+tx2_cptpf_dev *cptpf)
+> >       if (ret)
+> >               goto delete_grps;
+> >
+> > -     compl_rlen =3D ALIGN(sizeof(union otx2_cpt_res_s), OTX2_CPT_DMA_M=
+INALIGN);
+> > -     len =3D compl_rlen + LOADFVC_RLEN;
+> > +     len =3D LOADFVC_RLEN + sizeof(union otx2_cpt_res_s) +
+> > +            OTX2_CPT_RES_ADDR_ALIGN;
+> >
+> > -     result =3D kzalloc(len, GFP_KERNEL);
+> > -     if (!result) {
+> > +     rptr =3D kzalloc(len, GFP_KERNEL);
+> > +     if (!rptr) {
+> >               ret =3D -ENOMEM;
+> >               goto lf_cleanup;
+> >       }
+> > -     rptr_baddr =3D dma_map_single(&pdev->dev, (void *)result, len,
+> > +
+> > +     rptr_baddr =3D dma_map_single(&pdev->dev, rptr, len,
+> >                                   DMA_BIDIRECTIONAL);
+>
+> After this change rptr is still unaligned.  However, you appear
+> to be doing bidirectional DMA to rptr, so it should be aligned
+> to ARCH_DMA_MINALIGN or you risk corrupting the surrounding
+> memory.
 
-Further investigation shows that it's not so simple.  While one
-hash (md5) was definitely a final hash, the sha ones aren't.
-Indeed the sha256 hash was definitely corrupted at the partial
-stage and correctly identified by my printk.
+Yes, rptr was not aligned as ARCH_KMALLOC_MINALIGN and rptr alignment are s=
+ame.
+But as per the second part of the comment, rptr must be aligned to
+ARCH_DMA_MINALIGN.
+So will change total memory allocation and rptr and result_address
+alignment accordingly.
 
-So we'll have to look elsewhere for a solution.
-
-One thing that may or may not be a coincidence is that all the
-failed tests involve a partial block of data somewhere along
-the line.  I might just be grasping at straws but perhaps the
-partial block is the key?
-
-Can you please try this patch to see if it makes a difference?
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index 6815eddc9068..7a50b31d94b3 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -532,6 +532,7 @@ mv_cesa_ahash_dma_add_cache(struct mv_cesa_tdma_chain *chain,
- 		return ret;
- 
- 	memcpy(ahashdreq->cache, creq->cache, creq->cache_ptr);
-+	wmb();
- 
- 	return mv_cesa_dma_add_data_transfer(chain,
- 					     CESA_SA_DATA_SRAM_OFFSET,
+Thanks
+-Bharat
+>
+> Only TO_DEVICE DMA addresses can be unaligned.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
