@@ -1,46 +1,36 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9323221578;
-	Wed, 21 May 2025 01:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1BC22D7B1;
+	Wed, 21 May 2025 03:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747792799; cv=none; b=nAdfdcHhWE79TGZJQN0z+/CFwDC0IlnYHZLDaUgdjgY+yScR+zaBjkSpdN+WD3NoV9sSTNE4jxxMd9j+Tc7PCQyYKDPjrGD6aJ1P+qjjOL0YJ6Oj83BnSQWBjuraHClJraap/frQ0LgZvfr1FTP+fcmwbWkzl5FQMdBS49Ph58k=
+	t=1747797303; cv=none; b=phwsFJM4Uah3FODlCNNbaQ/2LkZtVbC6l6OnKagK0riapdaszUUhCLFpNliI9CY94j6fsldj83uUFME1JbbfbyQVh+vEEjVf8KcJTtuLyaKJ41GQUUToNi2oWfS1TTIcE2Hoz5v1UIXrM8t3EM4cusvbqPhvMJV9GcQSkZr9g5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747792799; c=relaxed/simple;
-	bh=Pv/KnH/JqD8jg/lF2un3qV14ygiPIJXZgUvFpPO2kZc=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NXCoALGIWSETwsVOKgtMOM7DR0yKPx8P+/EPHW8850aDSXn8eJtsW0zAF9oZIRN+j7b8ZnTDKfHZDO5FRqt9n3fP6Zo3njvQeR156QyRATmoSPK14PYbnILOymGc6mOJzMipYkotF8mInFT85mphAUUp6aAeDgRamJI4vOaLotQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pPAAdnG2; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747797303; c=relaxed/simple;
+	bh=JoN6Frh1H/LnALQNXfz2ZB5ZwN6+WKQwE9YXLVn5mLs=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=lO8+Y94xPuB4574QYljlwvC9bxUAisnC+11ynIbb1UPpmfoEgkatQorY3kE1Cm/wpbvZkuPqo33cW/NKeYBXlCGm8rNNjaKihQEx5ZeLMJKr8Cr+I/2+gYsQhZIfdKYDDP5PA0ojS+oastbrpNFE+co8KOEFvHw6YydGyXL650c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uOAfO28x; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pPAAdnG2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Z6OPD1c/C8KSKxUCnabqzGn3b89zx01gB/mJQTQcQOI=; b=pPAAdnG2+83c5jOqjKZArcaE9M
-	uCwwC7javr1c0+t45b64aQo9dWu1QpJV4KPm6Zje8M18Kqn1StjCfEvNtXhaFwxHwg1y/p63tg32o
-	eljrFzqKXDwhlZwev6jg/MjYqs7b2awdYwxxO7yGVIagnITvZAr9Y4mPLuZh6P8Y0yzikCTdWto1O
-	KtqXizBvHnDm20iJ4caRW6EPNhtc2NXDoUI9EzrBDuHLCq/cfvbPBgoJ6IkyBwI5JmOQgb4xaPSdd
-	47GbfbXH/qxJhMrP9BntgPDgcnWoZCnMKNe2ciNe3cASMnA3quwEkxy4wyDE9EIMkc9yNZ9Y0x2Nd
-	kiADwJUw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uHYkF-007gk3-0A;
-	Wed, 21 May 2025 09:59:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 May 2025 09:59:47 +0800
-Date: Wed, 21 May 2025 09:59:47 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.15
-Message-ID: <aC0zk5QbJJ_FDCKq@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uOAfO28x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1E00C4CEE4;
+	Wed, 21 May 2025 03:15:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747797302;
+	bh=JoN6Frh1H/LnALQNXfz2ZB5ZwN6+WKQwE9YXLVn5mLs=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=uOAfO28xyPKppSR6sr1ZIZxG7++AOl8LZWF1hCR/llvlNFbjhMT62l9ssD5/0iUnP
+	 L9lfigkoM7w6ryJHPm1Z39NlftSSJHENycG1243RnwharL2j0Q1VSGaGBDxTv0pcgG
+	 Yp4UaUAKwyvsnP6+xRwJunh0hODCzkWsA9TBk7r5MFNTYNvM2Lur6bvqccCAq1u+uw
+	 VZ4Gj0pMoDCjNNs+xjaeBfBXhxsChxmvg6IBXZBqPgPJhAEV2Z/0BcbL8CiGiaJJzI
+	 yBe8+h0l80cpkfBaTEV2UQ3w0K2dZrNQ2RHEsKfMNwbd17M2u6EPsSb3K/kg7W3S2O
+	 uhEKJ6bhj6JMQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE03F380CEEF;
+	Wed, 21 May 2025 03:15:39 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.15
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aC0zk5QbJJ_FDCKq@gondor.apana.org.au>
 References: <ZbstBewmaIfrFocE@gondor.apana.org.au>
  <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
  <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
@@ -50,48 +40,33 @@ References: <ZbstBewmaIfrFocE@gondor.apana.org.au>
  <Z_CUFE0pA3l6IwfC@gondor.apana.org.au>
  <Z_89K7tSzQVKRqr6@gondor.apana.org.au>
  <aAn_NWZjdX-wYHxR@gondor.apana.org.au>
- <aBGPSpJcLRrwiutd@gondor.apana.org.au>
+ <aBGPSpJcLRrwiutd@gondor.apana.org.au> <aC0zk5QbJJ_FDCKq@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aC0zk5QbJJ_FDCKq@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p7
+X-PR-Tracked-Commit-Id: b2df03ed4052e97126267e8c13ad4204ea6ba9b6
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5da472ae1f128840b27795fa461b47a85d882ce2
+Message-Id: <174779733836.1554736.3453438309835149712.pr-tracker-bot@kernel.org>
+Date: Wed, 21 May 2025 03:15:38 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBGPSpJcLRrwiutd@gondor.apana.org.au>
 
-Hi Linus:
+The pull request you sent on Wed, 21 May 2025 09:59:47 +0800:
 
-The following changes since commit a32f1923c6d6e9e727d00558a15ec0af6639de19:
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p7
 
-  crypto: scompress - increment scomp_scratch_users when already allocated (2025-04-25 10:33:30 +0800)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5da472ae1f128840b27795fa461b47a85d882ce2
 
-are available in the Git repository at:
+Thank you!
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.15-p7
-
-for you to fetch changes up to b2df03ed4052e97126267e8c13ad4204ea6ba9b6:
-
-  crypto: algif_hash - fix double free in hash_accept (2025-05-19 13:44:16 +0800)
-
-----------------------------------------------------------------
-This push fixes a regression in padata as well as an ancient
-double-free bug in af_alg.
-----------------------------------------------------------------
-
-Dominik Grzegorzek (1):
-      padata: do not leak refcount in reorder_work
-
-Ivan Pravdin (1):
-      crypto: algif_hash - fix double free in hash_accept
-
- crypto/algif_hash.c | 4 ----
- kernel/padata.c     | 3 ++-
- 2 files changed, 2 insertions(+), 5 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
