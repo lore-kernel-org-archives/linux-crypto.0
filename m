@@ -1,125 +1,124 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1886DF58;
-	Thu, 22 May 2025 03:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B797713C8EA;
+	Thu, 22 May 2025 03:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747883644; cv=none; b=rgJlBX3u5HiiJTyqL6sO1Txye/b7Ojd14O+uwZriq2coCPDQmCG9TgdKgVtDFLK7bmVSZYWsgVaBudgka8magwkzShSqtTJRgE1gA5i1fHtNGnYf5z3XX1fx4nnbrwQwTTesUuSq34+17gyApfAcftJEFQSrwOXL7cFDoueRcEQ=
+	t=1747886077; cv=none; b=HOSRD1411uX1/lCYcw2DMoUiZxJfTSrC8RBm5ywDjIgMFcSr903NwNMY9B6th9Uxm/bUipBUP78bnIYJqqh6Ui4j87OPMMAAlrpREX0lkZdGFzAlfSqImsPyGadhbAHwzrB4spmqSTCTsH4BMKQqYeOkrAdVQ5hmBsuaLjV+kMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747883644; c=relaxed/simple;
-	bh=wiT1vr9uF2pjY3S1MwJnyp5i3k/Wihi0DO7LrevA+aY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AZ6AUlKFaeVGjElfxiTH6MdC+lkO3jKf0DIHUIl4DwsIJpjAPwkUe1p9oU6y4ey3v3wUWgEWQvAPT5hkTPVYyOA3nSVoPDK/fGE4du45eXZD1yDw5PQSggrieSCNPu6n0GQNHyW4Jc7U9uGISddItV/Am1giPsrTwatjoNDTYaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NExLDvSx; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1747886077; c=relaxed/simple;
+	bh=2+jQzFNVa5cgzz6j8aCJcHo+8eX7DJJvhxssxR/Deyw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=RgeeOqa80JHF5Y7xgZU4lt/t0U4drR1c0LXD18ed+LiOx9RtpyeS6De9u9Yf2iqqcnsLZ7cKPp8HCj+zY8Dc6p7o0bKds4M+ihMYlYT7EFBmld0spn2mhB/FgZ5ox8EDegqLax/geIdSvV85/SoD07iZ8vcoUOnvwsb79bwM7SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=CsekdJ0B; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NExLDvSx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1iz/dspRKGJfames/a2O7Pg1SnBVWfkpTF65gemphXY=; b=NExLDvSxb1qc8PL4JvKo1XZ1la
-	CAb8bkNQsxxXF1HlmIOsTK4uHmeqz2WkUgDOjMqtPNRvV7LLTWFkF7GvblqJkyNS4fbqeIah2LGSC
-	+LEIo0rcSiui9no3MS+90HlMah1PjD9HqolOS2vFFuSBqsz/tWenHukCC6wFuWnU+Z1SWKDoGBIDx
-	9p5uO1LVE4H2dx+zHwHdrRo1vPD+B9CXvJcmb7olF7Jc641nLNSQ1M+guqpI0Zwbk5acBwY8d8EuR
-	Ton8Im7y4V/OWfzVAn08B+buzOomnbm1k1TCD/k/Vd6UnO8K/B15E7xjY0TgGZ38IiCDdU0B6Ldah
-	ebuLvYZg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uHwNY-007yxj-2z;
-	Thu, 22 May 2025 11:13:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 22 May 2025 11:13:56 +0800
-Date: Thu, 22 May 2025 11:13:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Klaus Kudielka <klaus.kudielka@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	"'bbrezillon@kernel.org'" <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Message-ID: <aC6WdO4E6ugCm42K@gondor.apana.org.au>
-References: <aCZ3_ZMAFu6gzlyt@gondor.apana.org.au>
- <aCcyXkeBvHQYvf2d@Red>
- <aCczV6MF6xk5rRA3@gondor.apana.org.au>
- <aChx_ODF_hYKL8XO@Red>
- <aCmTQoJw6XG1CkuZ@gondor.apana.org.au>
- <aC1fY6IP-8MzVIbx@gondor.apana.org.au>
- <aC2aAvX07Aaho08d@gondor.apana.org.au>
- <23fe1dec-032a-41fb-8e60-3a1b6c098c4e@app.fastmail.com>
- <aC2p6xkMz4BtzPYH@gondor.apana.org.au>
- <1024b1b7-9d58-4db4-a71a-108f6df7b623@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="CsekdJ0B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1747886068;
+	bh=E5969M2rt8A9H8jXyAe1CRFepbcBCsnguHNEWanyUaM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=CsekdJ0BbTNqTMFXEQe5LFbH2KPAKBh5GP57BjIjX2tO8fsVL9TLlDUB58qnKJtSA
+	 VAB6i/7Uht8V7hwz+w5fbhh8hhdtqDXzpeBGXXKN6Vnn9zC5DOkmuYnE1qMPEftoMo
+	 86Y9wA8IugGY4ey2XaR/Ow4xCxoQWe00I8uIMvKMKF32D3hTd2xxLZmeh3uHaPeLKM
+	 NB7A6sSu0qxQFGKJNP3XiQJ6Nj4Es3OwOU5A4ykzLOmRdEhX+v0X02SyPdqLhho7BQ
+	 aRBb9IEJSb/M8OJJ62WEbIsNcz0p2mos/FZESwaJmB37iZEbxa9/xcz0Brc4MeJkH8
+	 RjXaXfinVoWiw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b2vYb1RDkz4wcx;
+	Thu, 22 May 2025 13:54:27 +1000 (AEST)
+Date: Thu, 22 May 2025 13:54:26 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, ARM
+ <linux-arm-kernel@lists.infradead.org>, Eric Biggers <ebiggers@google.com>,
+ Fabio Estevam <festevam@denx.de>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the crypto tree with the arm-soc-fixes
+ tree
+Message-ID: <20250522135426.31baa98c@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1024b1b7-9d58-4db4-a71a-108f6df7b623@app.fastmail.com>
+Content-Type: multipart/signed; boundary="Sig_/ImKYQSiFcD9J_N.rImKCANl";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, May 21, 2025 at 01:36:06PM +0200, Arnd Bergmann wrote:
->
-> Ok. Which SoC exactly is this on? Armada XP or Armada 385?
+--Sig_/ImKYQSiFcD9J_N.rImKCANl
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I have no idea :) Corentin, can you tell Arnd what you're using
-for the tests?
+Hi all,
 
-> I see. Just a few more ideas what it could be in case it's not
-> what you suspect:
+Today's linux-next merge of the crypto tree got a conflict in:
 
-It appears to be proven now.  After replacing the coherent memroy
-with kmalloc + dma_map_single, it actually works reliably to pass
-all the crypto fuzz tests (hmac is still failing but I think that's
-a different issue).
+  arch/arm64/configs/defconfig
 
-Maybe I'm misreading the code, but I thought that dma_map_single on
-this machine should actually be a no-op because the device is marked
-as coherent? Arnd, Christophe?
+between commit:
 
-But it's clearly making a difference.  My suspicion arose because
-the fully linear hash digests where all data came from the user
-were never failing.  It was only failing when some of the data was
-coming from the bounce buffer within the driver.  That bounce buffer
-was setup with dma_map_pool (each being 64 bytes long).
+  6c9ab811871b ("arm64: defconfig: Ensure CRYPTO_CHACHA20_NEON is selected")
 
-> - the SRAM gets mapped into kernel space using ioremap(), which
->   on Armada 375/38x uses MT_UNCACHED rather than MT_DEVICE as
->   a workaround for a possible deadlock on actual MMIO registers.
->   It's possible that the SRAM should be mapped using a different
->   map flag to ensure it's actually consistent. If a store is
->   posted to the SRAM, it may still be in flight at the time that
->   the DMA master looks at it.
+from the arm-soc-fixes tree and commit:
 
-AFAICS we're not touching the SRAM directly.  Everything is mediated
-with the tdma unit on the cesa device.  So the cesa tdma unit is
-copying the data to and from the SRAM with DMA.
+  3357b6c94569 ("crypto: tcrypt - rename CRYPTO_TEST to CRYPTO_BENCHMARK")
 
-> - I see a lot of chaining of DMA descriptors, but no dma_wmb()
->   or spinlock. A dma_wmb() or stronger (wmb, dma_mb, mb)
->   is probably required between writing to a coherent descriptor
->   and making it visible from another one. A spinlock is
->   of course needed if you have multiple CPUs adding data
->   into a shared linked list (I think this one is not shared
->   but haven't confirmed that).
+from the crypto tree.
 
-Yes that chaining is definitely broken.  However, I don't think
-it's causing the corruption.  We've already tried disabling the
-chaining and it makes no difference whatsoever.
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
-In any case the tip of cryptodev now disables the broken chaining
-so it should no longer be an issue going forward.
+--=20
+Cheers,
+Stephen Rothwell
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --cc arch/arm64/configs/defconfig
+index e0d6ac7fd91a,4166bc4d3cec..000000000000
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@@ -1724,15 -1729,14 +1724,14 @@@ CONFIG_NLS_CODEPAGE_437=3D
+  CONFIG_NLS_ISO8859_1=3Dy
+  CONFIG_SECURITY=3Dy
+  CONFIG_CRYPTO_USER=3Dy
+ +CONFIG_CRYPTO_CHACHA20=3Dm
+- CONFIG_CRYPTO_TEST=3Dm
++ CONFIG_CRYPTO_BENCHMARK=3Dm
+  CONFIG_CRYPTO_ECHAINIV=3Dy
+  CONFIG_CRYPTO_MICHAEL_MIC=3Dm
+  CONFIG_CRYPTO_ANSI_CPRNG=3Dy
+  CONFIG_CRYPTO_USER_API_RNG=3Dm
+ -CONFIG_CRYPTO_CHACHA20_NEON=3Dm
+  CONFIG_CRYPTO_GHASH_ARM64_CE=3Dy
+  CONFIG_CRYPTO_SHA1_ARM64_CE=3Dy
+- CONFIG_CRYPTO_SHA2_ARM64_CE=3Dy
+  CONFIG_CRYPTO_SHA512_ARM64_CE=3Dm
+  CONFIG_CRYPTO_SHA3_ARM64=3Dm
+  CONFIG_CRYPTO_SM3_ARM64_CE=3Dm
+
+--Sig_/ImKYQSiFcD9J_N.rImKCANl
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgun/IACgkQAVBC80lX
+0GyPogf9FadLTwEAH1WdTiF1LfsqmcK2B26c+1VO43iD8/S8a2oCTMzPROrwkG57
+f1dO+XZs9ty4ypHdJSa9wO2xPSlxBaOEHYbBhaiMCXrlKcCVqAFyPKQkxBPyyzM+
+j6syCdxJ/ISlshRqhWnMyqusN44d4XlFsC7rOoyLeBwgmv1Cthtzw1yD9zfJIkEX
+rnUiuOgoM7LTyIIZeAtjdr8ADCasWmSTPWfqz+CPXUieMSOU1dFlvT0RIv2L80Zw
+ytUlzcoI2eO+bTk+Ffm+Rbgy8ndnOXSldDYR0K5O0sJkfSMV/cmeBFvfbiRi3phz
+edwWNOjwW+sq1VkG0gVqu+fNFSkRYA==
+=4qkD
+-----END PGP SIGNATURE-----
+
+--Sig_/ImKYQSiFcD9J_N.rImKCANl--
