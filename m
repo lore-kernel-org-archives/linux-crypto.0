@@ -1,64 +1,67 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6AD22259B;
-	Thu, 22 May 2025 08:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD08262FEA;
+	Thu, 22 May 2025 08:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747904286; cv=none; b=QWICIA89uLwZ1LQd3JnlzLQxluXgzTE43jY3aXYtbLXqo7//okslmYK39ev23z5tVnlkHebf2lgeFegAzs2wFy7rlzXCA+rjqtTiKftxXFiSrKhcB9TOw4+dfGtkBWwcSJzcoorNCHG61ngkepeHdkVWP9KNmJm4TKBA0u9or5A=
+	t=1747904286; cv=none; b=XYgvgxX2B2HdjmMrONEEZ15pIFfp1EseNLQFzM29sXIq8acEdKD1dYjUjY7E9DmGonlf6IRSnFnIc7MOh+S9OHSVnRZVdL3qzfFMmEXuv4bTr19Y3ZDDvYs1UltChCa5g1aUTEGb8jpTclg0tlvSmdw/F8ea6TmGBseRFCn8lUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747904286; c=relaxed/simple;
-	bh=/8SzdPdJRCUD+kdnzMwrPVzUfPKTOvoWoF3HgJWODvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/ohp4ACUOMYY686yAXnFoul6y2OzluLQV+vZkPpUu2oVOb1Dx9hFm4/N03dr9CAvCtEzZmnt+mrpo/1P8Q1gIMNQj5XczHuk0dmwjEMm/jfHeJNQDDTyPNxjLLAm1TlRegrfTyREsLdrKXCRTLkD/ZmDz96x/d3YQGkFGIEk3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bb0MEZme; arc=none smtp.client-ip=148.163.158.5
+	bh=5nFrjSaqinwvz6Wtj2wnI+yFguXhehoeoaBZrAenYy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dTXZeymlSj84kZUuKZ0QFZ1zBR2zJngLtNpY0iyk1Teie+u5pOsx+aU6Dg2WTNtS6yR2dPFF2IJKxIm6GnHdAzet/OO9Pdv/UgD9gEtKtk1eifT7J80rsH3CJUtDq21AoIPZKr1h6nyYAmO3yMF9s5abmT3GeByjgJ9EKf6IVsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TBZ+US2z; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bb0MEZme"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LMX8gE006679;
-	Thu, 22 May 2025 08:58:00 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TBZ+US2z"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M8pVKI002866;
+	Thu, 22 May 2025 08:58:03 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=Bx/rEuUxuzs7gyWVc8XdUVpRrUA5dK9EU/SQIevMz
-	C0=; b=bb0MEZme8EoyfpNIfgFRPB6/3UGXEAm2AM9aUYBM4z/T7Xw+etor+etPM
-	77IL0L0bKVFkmApSDzNKtnKQDj0oGoGyE9SJIwlJNFUkqy817PI1uiuZenn2vvSC
-	L/rILPdatdRwAfLhKswzXY919XEDZ+HBspMFXIX/CRS+tgGE4oIatoAL5f3c6r0Z
-	ypLaHW9TfKHjwJc5dd1XQ4HU/MFPZZkq5rqIdHHEJrSyd3ez8K8qjQVlGUKO6Gt9
-	TRGuIdVk8T6SWWSGbgCxZAVVbvDfRbNR2puI1ISlHERfaDVCftXMKJplr2WMo0ku
-	0pUYIOgbe+Wql5NE83NUbn7tQ0zMA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46sg234pqw-1
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=/hUdsTS5zZH4lKrBw
+	1ENmF1NgxrO+AECDGrtEbVdXVY=; b=TBZ+US2zB9gfiaJCH/tkZ7eu8Amm9Q4Bn
+	WNB2LGjamwYbEvjDWNXpuPjS61ibfcIWrSCGMSo5+D4TuOQr4R9QFaKho3mtpT4L
+	PBnEP0gxUmeXQMc+bm8vxLQMlMZsNjLa8WtYk5YhSGNm7xvQO7eTRLld6R3U2F1G
+	FkROQOjhCScpMxNBnIDvyw0hl7ghT8SJRW1jkfDz0ZQwEHXNT/4HlYpCQI8Fqmep
+	dXhGLOIUbOlQz+FUSQOzMNtCEZ5eHLjuN62GE2yu//ti4xEkiKFm1wzos1ITO7vn
+	rdycL8sCDJ9lb0pTp/TztHabWaasUAQdJQxITp/+byHJineuCNlyA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46t0sjg0w3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 08:58:00 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54M5SP0u010630;
-	Thu, 22 May 2025 08:57:59 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46rwnmgp52-1
+	Thu, 22 May 2025 08:58:02 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54M5IxNd031977;
+	Thu, 22 May 2025 08:58:01 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46rwmq8nyr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 08:57:59 +0000
+	Thu, 22 May 2025 08:58:01 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54M8vtGV55902580
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54M8vva028443134
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 08:57:56 GMT
+	Thu, 22 May 2025 08:57:57 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF8B020043;
-	Thu, 22 May 2025 08:57:55 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 5D53020040;
+	Thu, 22 May 2025 08:57:57 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9593420040;
-	Thu, 22 May 2025 08:57:55 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 20D5820043;
+	Thu, 22 May 2025 08:57:57 +0000 (GMT)
 Received: from funtu2.fritz.box?044ibm.com (unknown [9.152.224.229])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 May 2025 08:57:55 +0000 (GMT)
+	Thu, 22 May 2025 08:57:57 +0000 (GMT)
 From: Harald Freudenberger <freude@linux.ibm.com>
 To: herbert@gondor.apana.org.au, dengler@linux.ibm.com, ifranzki@linux.ibm.com
 Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
         fcallies@linux.ibm.com
-Subject: [PATCH v11 0/6] New s390 specific protected key hmac
-Date: Thu, 22 May 2025 10:57:49 +0200
-Message-ID: <20250522085755.40732-1-freude@linux.ibm.com>
+Subject: [PATCH v11 5/6] s390/crypto: Add selftest support for phmac
+Date: Thu, 22 May 2025 10:57:54 +0200
+Message-ID: <20250522085755.40732-6-freude@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250522085755.40732-1-freude@linux.ibm.com>
+References: <20250522085755.40732-1-freude@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -67,111 +70,218 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Cf8PmfsIr-FHRVPW9-AkYI4bl6OrVtjZ
-X-Authority-Analysis: v=2.4 cv=RPmzH5i+ c=1 sm=1 tr=0 ts=682ee718 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=dt9VzEwgFbYA:10 a=-xSpq2wtoGP2116iE9YA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDA4NiBTYWx0ZWRfX87WsgnSRmo9x 0KO1yePM1ZBoYcvcmyqNID0IGYmnsmi5dZMfjidRrETqX9f69iG+t3vw+80eKETud5D/UvJzm0V LPKXIStcOLLV988U4ykrd0uw5V45+EeVgxBwPRKEueGo6Lpf+n4LpeWnijenrHibScLsIQq0QfW
- cD3prmwmdvSWdCWSfpOeaRdQWO1Ina4i85Qjj6fUtoXHIYFDQT+4MOIo3TF/Cj9vDVk+IIU14s9 UOQQwfXP+Uc+bxiTFWNjI1xOh2HKyv0nXeqei5FTYruTATbn2kBtiAIbCsvPkUX9eefH0SqSdla jJGgY4VEulF/v29i3LRw6EDd82gszrwf2aCqv1f9ry3X5PGEfk4h20L/1r5xZW9GbO93liT+ycG
- mfxkoe6C5KTFl6V9f8aNR2o8nLe6U7Wvmp5YLco34BaDxZX/bSYITTjOCFvtK4TQYm1Envoe
-X-Proofpoint-GUID: Cf8PmfsIr-FHRVPW9-AkYI4bl6OrVtjZ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDA4NiBTYWx0ZWRfX9z3+0dg0oFF2 +s6m1VJjuXjsWbYyqxcl/hm8+MRCGaVL7X64I5cTJfQYz/V9pouezW159YyB7jLceexDyBtEOME /nsMXhfK2k9VCyTQSuURACF195Sb/O0plqdfByX88uHMjAEwDG5xaVXlJa8Vc5eRDpQaKBpYvsq
+ 5E7qqFr0POap9lQIRTimBEmd6oluZ93jhSLD0fTn1lpL0WZ9FsUuDD1cPxXUDVY4EbdClfxthNe oPeopqI8ERbbQq39y+Q+Swyeiiv/6ZdhhPmqIAjdNzwMl6v8Ckyvm46W5bwoOvhztqBlO5UEFdL MOoQj3CUu/1WJ/KtQ8eD0/3SRYqVMHMCJz+5tStmnf/c27xn9XXoCIvVknzR2pLtOI84zDcU4Tc
+ oXR/1TXUm6MqRIFOJPJEAanE+lDULM81FYIRu4GREzexJfQXyBTZhers+X/tdwVvaJvNd5vl
+X-Proofpoint-GUID: QaM-n7jYmux_5ma-wf-dxld5sXDg95Ap
+X-Proofpoint-ORIG-GUID: QaM-n7jYmux_5ma-wf-dxld5sXDg95Ap
+X-Authority-Analysis: v=2.4 cv=HcAUTjE8 c=1 sm=1 tr=0 ts=682ee71a cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=yASr4jyFyl_JLoGKBVkA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-22_04,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 impostorscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505220086
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 suspectscore=0 adultscore=0 impostorscore=0
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0
+ clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505220086
 
-Add support for protected key hmac ("phmac") for s390 arch.
+Add key preparation code in case of selftest running to the phmac
+setkey function:
 
-With the latest machine generation there is now support for
-protected key (that is a key wrapped by a master key stored
-in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
-for the s390 specific CPACF instruction kmac.
+As long as the CRYPTO_ALG_TESTED flag is not set, all setkey()
+invocations are assumed to carry sheer hmac clear key values and thus
+need some preparation to work with the phmac implementation. Thus it
+is possible to use the already available hmac test vectors implemented
+in the testmanager to test the phmac code.
 
-This patch adds support via 4 new hashes registered as
-phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
+When the CRYPTO_ALG_TESTED flag is set (after larval state) the phmac
+code assumes the key material is a blob digestible by the pkey kernel
+module which converts the blob into a working key for the phmac code.
 
-Changelog:
-v1: Initial version
-v2: Increase HASH_MAX_DESCSIZE generic (not just for arch s390).
-    Fix one finding to use kmemdup instead of kmalloc/memcpy from test
-    robot. Remove unneeded cpacf subfunctions checks. Simplify
-    clone_tfm() function. Rebased to s390/features.
-v3: Feedback from Herbert: Use GFP_ATOMIC in setkey function.
-    Feedback from Holger: rework tfm clone function, move convert key
-    invocation from setkey to init function. Rebased to updated
-    s390/features from 11/7/2024. Ready for integration if there are
-    no complains on v3.
-v4: Rewind back more or less to v2. Add code to check for non-sleeping
-    context. Non-sleeping context during attempt to derive the
-    protected key from raw key material is not accepted and
-    -EOPNOTSUPP is returned (also currently all derivation pathes
-    would in fact never sleep). In general the phmac implementation is
-    not to be used within non-sleeping context and the code header
-    mentions this. Tested with (patched) dm-integrity - works fine.
-v5: As suggested by Herbert now the shashes have been marked as
-    'internal' and wrapped by ahashes which use the cryptd if an
-    atomic context is detected. So the visible phmac algorithms are
-    now ahashes. Unfortunately the dm-integrity implementation
-    currently requests and deals only with shashes and this phmac
-    implementation is not fitting to the original goal any more...
-v6: As suggested by Herbert now a pure async phmac implementation.
-    Tested via AF_ALG interface. Untested via dm-integrity as this layer
-    only supports shashes. Maybe I'll develop a patch to switch the
-    dm-integrity to ahash as it is anyway the more flexible interface.
-v7: Total rework of the implementation. Now uses workqueues and triggers
-    asynch requests for key convert, init, update, final and digest.
-    Tested with instrumented code and with a reworked version of
-    dm-integrity which uses asynchronous hashes. A patch for dm-integrity
-    is on the way but yet needs some last hone work.
-v8: Added selftest. With the selftest comes some code which wraps the
-    clear key into a "clear key token" digestible by PKEY. The
-    selftest also uses import() and export(), so these are now also
-    implemented. Furthermore a finup() implementation is now also
-    available. Tested with AF_ALG testcases and dm-integrity, also
-    tested with some instrumented code to check that the asynch
-    workqueue functions do their job correctly. Coding is complete!
-v9: As suggested by Herbert use ahash_request_complete() and surround it
-    with local_bh_disable().
-v10: Split the pkey selftest patch into 3 patches. Slight rework of the
-     setkey function as suggested by Holger: When selftest is running
-     as much as possible of the production code should run. So now the
-     key prep with selftest is one additional if/then block instead of
-     an if/then/else construct.
-     Code is ready for integration and well tested.
-v11: Utterly rework with the insights collected with the paes rework
-     and the basic work done with the pkey rework over the last 5 month.
-     Note that patch #1 effectively reverts commit 7fa481734016
-     ("crypto: ahash - make hash walk functions private to ahash.c")
-     from Eric Biggers.
+Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+---
+ arch/s390/crypto/phmac_s390.c | 143 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 143 insertions(+)
 
-Harald Freudenberger (5):
-  crypto: ahash - make hash walk functions from ahash.c public
-  s390/crypto: New s390 specific protected key hash phmac
-  crypto: api - Add crypto_tfm_alg_get_flags() helper inline function
-  s390/crypto: Add selftest support for phmac
-  crypto: testmgr - Enable phmac selftest
-
-Holger Dengler (1):
-  s390/crypto: Add protected key hmac subfunctions for KMAC
-
- arch/s390/configs/debug_defconfig |    1 +
- arch/s390/configs/defconfig       |    1 +
- arch/s390/crypto/Makefile         |    1 +
- arch/s390/crypto/phmac_s390.c     | 1042 +++++++++++++++++++++++++++++
- arch/s390/include/asm/cpacf.h     |    4 +
- crypto/ahash.c                    |   26 +-
- crypto/testmgr.c                  |   30 +
- drivers/crypto/Kconfig            |   12 +
- include/crypto/internal/hash.h    |   23 +
- include/linux/crypto.h            |    5 +
- 10 files changed, 1124 insertions(+), 21 deletions(-)
- create mode 100644 arch/s390/crypto/phmac_s390.c
-
-
-base-commit: b5185ea1a6bd35957e556129bb92a64f83aa65e4
---
+diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+index b61454dedf0a..b1ca1fcbb927 100644
+--- a/arch/s390/crypto/phmac_s390.c
++++ b/arch/s390/crypto/phmac_s390.c
+@@ -176,6 +176,114 @@ struct phmac_req_ctx {
+ 	bool final;
+ };
+ 
++/*
++ * Pkey 'token' struct used to derive a protected key value from a clear key.
++ */
++struct hmac_clrkey_token {
++	u8  type;
++	u8  res0[3];
++	u8  version;
++	u8  res1[3];
++	u32 keytype;
++	u32 len;
++	u8 key[];
++} __packed;
++
++static int hash_key(const u8 *in, unsigned int inlen,
++		    u8 *digest, unsigned int digestsize)
++{
++	unsigned long func;
++	union {
++		struct sha256_paramblock {
++			u32 h[8];
++			u64 mbl;
++		} sha256;
++		struct sha512_paramblock {
++			u64 h[8];
++			u128 mbl;
++		} sha512;
++	} __packed param;
++
++#define PARAM_INIT(x, y, z)		   \
++	param.sha##x.h[0] = SHA##y ## _H0; \
++	param.sha##x.h[1] = SHA##y ## _H1; \
++	param.sha##x.h[2] = SHA##y ## _H2; \
++	param.sha##x.h[3] = SHA##y ## _H3; \
++	param.sha##x.h[4] = SHA##y ## _H4; \
++	param.sha##x.h[5] = SHA##y ## _H5; \
++	param.sha##x.h[6] = SHA##y ## _H6; \
++	param.sha##x.h[7] = SHA##y ## _H7; \
++	param.sha##x.mbl = (z)
++
++	switch (digestsize) {
++	case SHA224_DIGEST_SIZE:
++		func = CPACF_KLMD_SHA_256;
++		PARAM_INIT(256, 224, inlen * 8);
++		break;
++	case SHA256_DIGEST_SIZE:
++		func = CPACF_KLMD_SHA_256;
++		PARAM_INIT(256, 256, inlen * 8);
++		break;
++	case SHA384_DIGEST_SIZE:
++		func = CPACF_KLMD_SHA_512;
++		PARAM_INIT(512, 384, inlen * 8);
++		break;
++	case SHA512_DIGEST_SIZE:
++		func = CPACF_KLMD_SHA_512;
++		PARAM_INIT(512, 512, inlen * 8);
++		break;
++	default:
++		return -EINVAL;
++	}
++
++#undef PARAM_INIT
++
++	cpacf_klmd(func, &param, in, inlen);
++
++	memcpy(digest, &param, digestsize);
++
++	return 0;
++}
++
++/*
++ * make_clrkey_token() - wrap the clear key into a pkey clearkey token.
++ */
++static inline int make_clrkey_token(const u8 *clrkey, size_t clrkeylen,
++				    unsigned int digestsize, u8 *dest)
++{
++	struct hmac_clrkey_token *token = (struct hmac_clrkey_token *)dest;
++	unsigned int blocksize;
++	int rc;
++
++	token->type = 0x00;
++	token->version = 0x02;
++	switch (digestsize) {
++	case SHA224_DIGEST_SIZE:
++	case SHA256_DIGEST_SIZE:
++		token->keytype = PKEY_KEYTYPE_HMAC_512;
++		blocksize = 64;
++		break;
++	case SHA384_DIGEST_SIZE:
++	case SHA512_DIGEST_SIZE:
++		token->keytype = PKEY_KEYTYPE_HMAC_1024;
++		blocksize = 128;
++		break;
++	default:
++		return -EINVAL;
++	}
++	token->len = blocksize;
++
++	if (clrkeylen > blocksize) {
++		rc = hash_key(clrkey, clrkeylen, token->key, digestsize);
++		if (rc)
++			return rc;
++	} else {
++		memcpy(token->key, clrkey, clrkeylen);
++	}
++
++	return 0;
++}
++
+ /*
+  * phmac_tfm_ctx_setkey() - Set key value into tfm context, maybe construct
+  * a clear key token digestible by pkey from a clear key value.
+@@ -616,9 +724,32 @@ static int phmac_setkey(struct crypto_ahash *tfm,
+ 			const u8 *key, unsigned int keylen)
+ {
+ 	struct phmac_tfm_ctx *tfm_ctx = crypto_ahash_ctx(tfm);
++	struct crypto_tfm *tfm_base = crypto_ahash_tfm(tfm);
+ 	unsigned int ds = crypto_ahash_digestsize(tfm);
++	unsigned int bs = crypto_ahash_blocksize(tfm);
++	unsigned int tmpkeylen;
++	u8 *tmpkey = NULL;
+ 	int rc = 0;
+ 
++	if (!(crypto_tfm_alg_get_flags(tfm_base) & CRYPTO_ALG_TESTED)) {
++		/*
++		 * selftest running: key is a raw hmac clear key and needs
++		 * to get embedded into a 'clear key token' in order to have
++		 * it correctly processed by the pkey module.
++		 */
++		tmpkeylen = sizeof(struct hmac_clrkey_token) + bs;
++		tmpkey = kzalloc(tmpkeylen, GFP_KERNEL);
++		if (!tmpkey) {
++			rc = -ENOMEM;
++			goto out;
++		}
++		rc = make_clrkey_token(key, keylen, ds, tmpkey);
++		if (rc)
++			goto out;
++		keylen = tmpkeylen;
++		key = tmpkey;
++	}
++
+ 	/* copy raw key into tfm context */
+ 	rc = phmac_tfm_ctx_setkey(tfm_ctx, key, keylen);
+ 	if (rc)
+@@ -661,6 +792,7 @@ static int phmac_setkey(struct crypto_ahash *tfm,
+ 	}
+ 
+ out:
++	kfree(tmpkey);
+ 	pr_debug("rc=%d\n", rc);
+ 	return rc;
+ }
+@@ -854,6 +986,17 @@ static int __init s390_phmac_init(void)
+ 	struct phmac_alg *phmac;
+ 	int i, rc;
+ 
++	/* for selftest cpacf klmd subfunction is needed */
++	if (!cpacf_query_func(CPACF_KLMD, CPACF_KLMD_SHA_256))
++		return -ENODEV;
++	if (!cpacf_query_func(CPACF_KLMD, CPACF_KLMD_SHA_512))
++		return -ENODEV;
++
++	/* register a simple phmac pseudo misc device */
++	rc = misc_register(&phmac_dev);
++	if (rc)
++		return rc;
++
+ 	/* with this pseudo device alloc and start a crypto engine */
+ 	phmac_crypto_engine =
+ 		crypto_engine_alloc_init_and_set(phmac_dev.this_device,
+-- 
 2.43.0
 
