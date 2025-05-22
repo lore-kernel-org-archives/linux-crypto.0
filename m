@@ -1,274 +1,502 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA447E1;
-	Thu, 22 May 2025 13:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921554; cv=fail; b=U6VIn1eA6t1i5efiGAWDEsDQZy0W8X794QSDqlegNnyJMv8zmHZx7szYJSMxZm1V5i2Zb+qZY28PlmSnEJBzEyCLHkXB57iTiE0aN2LcrIwVFIIEekKhRVxcPKcEbPFcgbE4EADaHyerH+UPD/cRwSO4BUlAseRpZJoFm7AKVfk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921554; c=relaxed/simple;
-	bh=fi8Gq0ORR+lxFE5A1DGw4hfiiDKhHkiFWce7449cA5U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Tep5XJR1lR72otoC4zjDSdyUs65sORFO1filO2ci1e9wd1uLnhlf9EmdhxWKGcZreqkxNXT4YccLDzFlos+N4FrpU/YI3yKfS9Qe9LFXdk5zApTQcMVhY6ZVZ+PfiDZ5Bvii7ocqseKVgV4y2uceBv8/iUFZVgLQRvqrCHEBki0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=OWsDnS/h; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=T/RREHHK; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CDE7E1;
+	Thu, 22 May 2025 13:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747921606; cv=none; b=lagWjqRsN7/Jk1zzVww19XeV1+XFn7nhhatg1P1l6Wdh30T9afbglqTqch+UJtICNFfa/8XCHxq2GjCCEg4pEwDygEV6jcv/lIgM7DQQ7NFk4dQvLJXgOEtTwOxBCi8tyVDZ/duZE0ZRUqnfC+2RttwBjkD825phYamhyFVxIes=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747921606; c=relaxed/simple;
+	bh=6n4oHSCwmcszP/Pvx81zU+SzSpJl4P/QrDy57P+fj0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sob7iV1RF3KY31GlLOAZ8woyZNgJmJGefY437PTgqohdJr8dl+qlfAkKLmx2/RR6qJCgasCFwzanq7br65M/Da7oE8Ot3FUYJbz28V+rhAUEvGLOHlTolE6MYu5qVcH5818Gd3YxLgkZsKevzmQZqeGQdMv9nLuLVBYSkzThzKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAoZdNJd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OWsDnS/h";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="T/RREHHK"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MDb0V3032618;
-	Thu, 22 May 2025 13:44:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-id:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=fi8Gq0ORR+lxFE5A1DGw4hfiiDKhHkiFWce7449cA5U=; b=
-	OWsDnS/hddxsbmHbVi48D+ggHjPEiIPuFxv2c3SOdKO1RtHsR092OmeyNwcRJHH7
-	mFHlZTwMZGQ790tmHtZtinskGqiVkBs3SHkzjEhKKeQDoqO4pvvCeE856NRvOgHa
-	kCudrg6TxApFVroe8wQcbIoRR+eZceaGsYSshJFslB6qnD4xLV9cCagnWy647Fj7
-	Y7Y6k0sLqkp91DBXPWEApXJ8Eon6YW2U+YCNL+eGF3WMpFoNw0S02lcrvCVoQ68n
-	kzYWlnybx/PQ2eLLR6HQT5Wch7RC5z1H9NhjEmdvsGI1nVr5tuoht7483pRh18ig
-	S6DrZzSVreo9e6htGo5T+A==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46t4ya00k3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 13:44:33 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54MCUoUw034530;
-	Thu, 22 May 2025 13:44:32 GMT
-Received: from cy4pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11010071.outbound.protection.outlook.com [40.93.198.71])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46rwer6ge9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 13:44:32 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fs3Hm9FdzdCigc2ol/5LMof5+JDpOM+8Ity6k2lzeLrLPW6YhdQtIqYuzB40xxetrshJW5pBuKSZ31PVRKcx4qO4ieQO8QfA3VBmmZQ9mPG1gqtTxnnYS8vs2VLt9PReDLyJOUEkF//zpbtCA8tnryE8flghh5ZQLATmn9tbFluhqyhnw0ttSbMCsz1veTTRcyzwQLujWoKGilsBoxkiRSKxI+skTStkENN9oK62JZi4qgWjMJoQ3Mxy+ugom81ORajhBpFXDsmszSKJNPH4UT45kXNAHdR8ovabnP26hBP2GumbJ8iyhcjVZzqLadtwz8BC8Hk0jYTwQrvxGziK/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fi8Gq0ORR+lxFE5A1DGw4hfiiDKhHkiFWce7449cA5U=;
- b=Zv39Y8aF3lsAO6WWQbpWvkGx9HOm2hN0WG0JNEW6vwBwWa7t7vcAOoh2+V0smfk8Q9tiGYsdVJJVwgZ00dNTg8ZOBCrTWFhjowPy0LtyOvtKtVfs1S+5Hsy9tkyWmeduZavgEZS3UFi9wD82O0I/oIOgMf2U9maJhbwST9K2WExO57bAj7qGFabz6GoXIzmAgkhe5ji0qt2fQTsv7uyrQ2vLEzYo5y8F9vv0KwJA0Ysanaqp5TEYkkBMsLAdgDV0wl9u74QrUCphmgRvJ5XIfYKBsO1KTXECMqPA7dTdQCpeJdF0QTmnfYVgDOx8yiEfUd3V6Fqc1MmfIXFcmtP0cA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fi8Gq0ORR+lxFE5A1DGw4hfiiDKhHkiFWce7449cA5U=;
- b=T/RREHHKOpN++z32KVwxD3RbdSVuxMZnffaOWj9A19cOI/Q+74eO5WLg2uqbHeodzuyYKwJIZpiW+4r+5hsVfKFl2oTCDgiKuNu+I2Jeu4agwnSBqTyiIIw7gm2PEM9oMDp5KAbMPLVuDc8rOI/fwcIEks0q+kevax1QZE18h6M=
-Received: from DM6PR10MB2939.namprd10.prod.outlook.com (2603:10b6:5:6d::33) by
- SJ0PR10MB4734.namprd10.prod.outlook.com (2603:10b6:a03:2d2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.31; Thu, 22 May
- 2025 13:44:29 +0000
-Received: from DM6PR10MB2939.namprd10.prod.outlook.com
- ([fe80::3583:2675:5213:714a]) by DM6PR10MB2939.namprd10.prod.outlook.com
- ([fe80::3583:2675:5213:714a%7]) with mapi id 15.20.8746.031; Thu, 22 May 2025
- 13:44:29 +0000
-From: Dominik Grzegorzek <dominik.grzegorzek@oracle.com>
-To: "aishwarya.tcv@arm.com" <aishwarya.tcv@arm.com>
-CC: "chenridong@huawei.com" <chenridong@huawei.com>,
-        "broonie@kernel.org"
-	<broonie@kernel.org>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] padata: do not leak refcount in reorder_work
-Thread-Topic: [PATCH] padata: do not leak refcount in reorder_work
-Thread-Index: AQHbyBzG8YZTDergaEC1EuGadhnZELPepZyAgAAJcAA=
-Date: Thu, 22 May 2025 13:44:29 +0000
-Message-ID: <afc8bfdaf9f14fa1f77c62f2969c4a5403ad771d.camel@oracle.com>
-References: <20250518174531.1287128-1-dominik.grzegorzek@oracle.com>
-	 <20250522131041.8917-1-aishwarya.tcv@arm.com>
-In-Reply-To: <20250522131041.8917-1-aishwarya.tcv@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR10MB2939:EE_|SJ0PR10MB4734:EE_
-x-ms-office365-filtering-correlation-id: e1a5a23d-eecf-4db0-ec86-08dd9936c687
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Wjd4aExhTnRiWmhqSEpudFBQWTRRMCs5VWQzTmVST1JJUkRxVWhGL2hjNFZn?=
- =?utf-8?B?b1hWMEpNeDl4WjE0T2FlR25tbmpnWmVrU3FEbjl3RkE2UWJxNWpNcnJPcHJP?=
- =?utf-8?B?UFBaT0E3SUYwM1lQaUVYRW1lSm5ZR2Z4V0NlaFFVY01YYXZUMklkSWZHOGRI?=
- =?utf-8?B?MW1lUGhRRGF2bVNBTlA5T0F3MGZzV24rRCtDc1g1aFlmdTBPZFJiSjRQMmsy?=
- =?utf-8?B?VDdNRSs1dXpZSDlMN29MZHlnQjg5MTFlOWNzTXpXK25nb0Q3REhKRk1MZEpM?=
- =?utf-8?B?TDQ4Qm9XTmpzNHZ1TEdza3JCZWhUSEMrV1VDVjA4VDlEUXo1eUQ5ZU0vQnky?=
- =?utf-8?B?YXhzWUpHVUhJaFhUaytqSjRYeUlXVFIyOXFUd2NscW1OQ3YrQVVwbG9hVm8v?=
- =?utf-8?B?U0dSeWdIZmR3bVZZdGh1UXdnU0lrUUVUcGFQaWF1cGtXNmNCZWk4Rm9HTnNl?=
- =?utf-8?B?aEZ2dkFMMnRBQlorc1U2aUdRSm5USnNUaTk4ZGVTUFBzS0NGeGdtTnpnY3g4?=
- =?utf-8?B?dDA4YWM3aDVjR3JvQVBsZjYraFlHZXZOUyt1ZkhVMm93a1J5VjZuNUpYNmwx?=
- =?utf-8?B?Z0JWUUJUMGtxbEw2cm12U3NHK3NwQy90d2F3bEhaNmV5NWI4cmxndkNQZ3NU?=
- =?utf-8?B?WVZFREdkWjhCZ0xHZHpYenNBMlNUVGtPK01BM2ZjRms1TGp6QTdmVGtidHN3?=
- =?utf-8?B?ZGxKTWNId3pZYVhqeHp1M2l2RDIvdStYWHphTytvY3lLR0RqV0tzU3ZudVQy?=
- =?utf-8?B?blRhT2c3STF5ZzBoZE9KcnJuNWhjc3ZyeWJsUnZuVHMyUWdNOHdlZkpDNUVT?=
- =?utf-8?B?RGIzS0JnU0hXais1YjJNNVYzbzF4SzZGRi9BamVYZVlNR1JHSXJZc3EyclA5?=
- =?utf-8?B?NXphdUZDU3A4dHUxNDlIVmRxMU45Z1dxenJXWlhIN21idEJQYjBXeCtEdlFt?=
- =?utf-8?B?bUllQ0xCQUR4OUNNYy9UbDBLNklNUnBpYkRmbUhrYm53MzQvdzZiTlErQUl0?=
- =?utf-8?B?MXJJTWxnUW40Tm5yM3czWHFDc096Z05QS2N5RmRSc1FiSHdWUkhaYS9janQ3?=
- =?utf-8?B?bGJqZEkrWHAvc1oxTGtIZXo3ZDZvNktVTE1WeGFZdGd1eUI4ajZ1Zm1sWFhB?=
- =?utf-8?B?ak1aY1ZRVGtPTkZxamg1WVpPeEFSQ2lybVJKZ0RnQWd6RUZoamZCSXRCeDBk?=
- =?utf-8?B?LzNJamF3VlJLU2IvWTl0dEFSRTA1dXh2VTJmVk5KRVV3eXhxY3U2WFZWbnJ2?=
- =?utf-8?B?blc0cWNIalAvaDB3TEpiblBya1JUb216VXk2RnVteGppNjhEckFPUHhVazNz?=
- =?utf-8?B?UkRHQmRiT1oxK2xxdXNIZkJtLzV1UkMxV1R0QmJ0ZGlpbVNmWk5IKzJadVll?=
- =?utf-8?B?b2RDY3FYMi9CYTM0ZytzUjdYL01JZDcrN0JQWUdmcEgxTmNYUXBpemY3VnRS?=
- =?utf-8?B?ZVpwY1M4OEJxR2prdVVURjM5ODdZVHhUS2pUa2R3K3FXd1BZMmtPMHZ5MG0r?=
- =?utf-8?B?UGhaY1UzbWpCS2lsclpTeXpBbmJBZlVBOWRuTEM0RkU5OVJYTklnekVnNVNZ?=
- =?utf-8?B?UVVNQzdTVzdvSTRKSGRHVk9HUElUM0dXd2prbFZVWjJrSGF4bGl1cmpLcmoz?=
- =?utf-8?B?RFNrOVQ5cXcxbFZrY3dXN3pjOGpIdVZLTmFKUzM5b25PK0VMTzFZYmdzdG45?=
- =?utf-8?B?QkR4K2g4K2RGNE04UkVNUGNqNzJtMlNpTlBwZHRRZ2RVOFlFVWVwYzdQdDdJ?=
- =?utf-8?B?WG16bXRKYmR0RnFRc1Y4RW9mbHF1cXpjZnhOKzNHdWhwWVFscW9pS2ZMb3Rn?=
- =?utf-8?B?SHl4Qi9QOHVhWUtIRmE1cnNTa1BCdVRtYmJ3aUsyb2puOVJheGtvT2FWUE5D?=
- =?utf-8?B?WFkvTTB2Sm5EVmFZZTVoZXNBQ2VSYUNUZENDazgvU2wxS3JsRndPN1Z3bUEx?=
- =?utf-8?B?U0dPOWxpaWFqdDRFUTNIbndNM3MrbnczeVcxUnBJVjZKVFhGekhsanJyK2xI?=
- =?utf-8?Q?dZPYsBmEgVzbVFpCMICBMVMyefie0c=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB2939.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?RVhFVERpSjlqeklsQWlnSGdOVHp0R3ZxaXI1Ulk0VzZPYzRrakJxUXI5ekJj?=
- =?utf-8?B?TUZQUnU5SjR1VGdJTDk4NlhZam1QSEpoUG1TQUt0aVU4eVFXRHRMVnczVFVE?=
- =?utf-8?B?ZThkbk1CUzAzbkdCMWpheStTVlJOQk16b3V5c1RBd1J4bEZSK1JLbWRMY29L?=
- =?utf-8?B?MWE2bkNZQ3lya3dZVHR0RDRvR0NiajRDeEQ0and1aHR3a3FUVUhuK3FTMGhJ?=
- =?utf-8?B?em1pTFZockJPZ0t0QW4rbGUwREpSd3V3ZVJlTDNLcUZmUG5QM3JtUStnVDZu?=
- =?utf-8?B?VEtTbk02Y0ZDY2pYNVBGTVl0K0lPMkdxdFFKSk4wemtSWmxaTVVHMk9mUFZY?=
- =?utf-8?B?RVdnNnVUM3lCWFNOUUlVYnlUMUxqNGdBTjNGbzZsMFFXL1puNVVQQ2NCcUQz?=
- =?utf-8?B?ZzlseFFwQnFKRWdvYVFOVWIyd01LTmNrN1NPNGFXd3pKMG1mUHFxM2V1Y1Mx?=
- =?utf-8?B?Ym5POU5UWnZaTlVUYTFISzhYaTg3TjkzS1ErNjZiekF5UUR2NkFGMnovaTdW?=
- =?utf-8?B?QWxaMU1RUmJwa1FGck51T2ltUHo0YnhkOEdJY05hZ29vcU5ZVWdiY2t3VlZ1?=
- =?utf-8?B?VnVLOElkNlFreGhFVmpXVlBHWmNub3RhcDF0aGRnNkgrM1gzbUVTM2JqQnpr?=
- =?utf-8?B?WW0xVHZjWkZGOEt1Zyt5ZlBZcTZjWStsVC9JZlFzb3ByQ1FWaVZOZm1jeFo1?=
- =?utf-8?B?c1VJaVloMWM2bkVMYVQ1QnYzOTNQQnJ2SmNzMUtLZW1sampIbWduMUVZU1g5?=
- =?utf-8?B?N3NMd2hpTHJ0S1ZJWU5iOTZiMVUrekxGT3JwSW16dmozbzZhVmYzenRIeTcz?=
- =?utf-8?B?YVRGT1dRNFp5NVp5dWJ0Z3Z2andHdUVSTUZ6MGNPMGw1SUJVbGRjRHRXWFlh?=
- =?utf-8?B?VlcvRTRPWXJiK1RaVHJsbStvQnp0VW1RL0RIdnlyQVpMRVpkWk9Sb3Y5a1pz?=
- =?utf-8?B?b2xnK2NxTGFYUll5cDVwYlNGUG9mUm53Z0p2ZnpqVHhydkFFMFVOMnFTRXE4?=
- =?utf-8?B?UXFWZWdsOFVlYXUzTjNiaGZQS011WTM1Q25maXRIWEdsTEpXSHBQalJWZlJE?=
- =?utf-8?B?NDRhbWhZczQ5MEVMbk41UjJ6cEtRU29OSTJIM01kUzJOVkxZMFo0dG9xV01H?=
- =?utf-8?B?dHlwVmlJVjk0NGgyci8yTE5TYVBXQzc0MGxrM1VGRDNoam1NYXpoczFia2pL?=
- =?utf-8?B?VEZlTFhsRWc4ZXZGT0FIQVZTMjhoVk5kcjRHY1VwOEVHMzZrckdRUlJTNzl4?=
- =?utf-8?B?b1I0V3dtVDU4Ym5iRmxpTUxSbGU1ZERjbnMveUxpTFRYVjJWQUV2YmZtRVZj?=
- =?utf-8?B?OWJ0c2NLU2h1SCtRNE9zd09wTlpUdEgwVGxISDZPSG9BUngrR2VqZkdBRjlU?=
- =?utf-8?B?UzFHUlYzSThuYXJPc3c5NmlqQXVLTVlZcnVaZE0wVzlGQnRQbCtUdjE0U3Rw?=
- =?utf-8?B?T0xOQWYyNVNINGQyVC9PNFhxTHBRUU1LamN1Q3FVQVNob3pzR0hrLzBpdjlI?=
- =?utf-8?B?ZE9LSzRaWFcrcnFORnBManZleWRFOE1HLzB5SGt6RlhUVFcrdGZ2bmRQdG5j?=
- =?utf-8?B?cmpySnpEM0Q4bUYvdjVpQmtzNzU2NEF0ZE1kcHVuaHhBcFg4WG9ZRHdRZUxL?=
- =?utf-8?B?bi85VnZFd1N6TWEwcTc4TmpEYUlsd0h5Mjg1NXkzVXhLZE9zWGFGNm5yN1Zv?=
- =?utf-8?B?ME4zVXVWalltUEovbTk5cWI2dDB6M0tKUjgycTdXTCtEOXBSVmJCWjltMCtX?=
- =?utf-8?B?cXJ6RE9Xb1lGKzNuMjNuUzJkdWR4WHA3b2ZmQXJ3bWdTQk8wVm5XcDFOVWh4?=
- =?utf-8?B?QUV6dnBtVGlPdDVxMG9qYmptclRCeFhSUFk1NGRqNUI1bFptdjNpdFFwK0Vm?=
- =?utf-8?B?VWFwcUsvNm43Um1QV2d6MUZaUkJ2cTR4WDVVZGg0NG15cWFsZjJTbkVWMmt2?=
- =?utf-8?B?VDBycVBsV0NvSzJ5Z3pzSE9SMzJTTWFOekZoUlR1TXQ0RHVUUHhLcDZYazNE?=
- =?utf-8?B?VmZLblNmUldUMFArM3ZxT1ZCdXZSYW1nQWFsZVl6cU0yam54dmZTdHRMUzND?=
- =?utf-8?B?aFpsKzRkMzFXRUZRek9vem80STFzU3hNZTh6Nng0ZnRzQ3NvRDcweDFQNXlh?=
- =?utf-8?B?Qy9VM2d4SGlRa0d5UytsWlkxdGtqcllYc1I3WUxmOGVXeWI4QTNnNFEvUHNW?=
- =?utf-8?Q?KuQVAgF0HsKZtC3Xa5B0lao=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <76301AB1D30329428B5846ED750EB6AD@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAoZdNJd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF9CC4CEE4;
+	Thu, 22 May 2025 13:46:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747921605;
+	bh=6n4oHSCwmcszP/Pvx81zU+SzSpJl4P/QrDy57P+fj0s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LAoZdNJdbMA7katxxLi3eD0TxqovYFlXcgoUPUB7yMcNEbdfTpBAOC8SnLW/PFZ+T
+	 JQ/gyVyoVTdwz6gZFoH+O4AklTQ+57HLZv0Xmw3jWGXYRAjkPs1HnHISiovBBrmofK
+	 afWUmZIS8jxsSgjaUgwmNuvgHyJpSclPw1Jtv3yGKzsCkDLPcigFdqadfTx3qu8po2
+	 R6ujOkhNX8iuZcH/iY99OIGciJmJ87USWepCTG/mP/y8iA/q89JJdzJ9hfCzytiZwR
+	 v8kf1/viWnTfRb22Ba7Gmnc6zBkRL/fnUsSLjESMUbo9Z003ExL1pxyDI1/EDrB2u8
+	 OpvrTJZB7tUoQ==
+Date: Thu, 22 May 2025 14:46:39 +0100
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, peterhuewe@gmx.de,
+	jarkko@kernel.org, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH v9 1/5] mfd: Add support for Loongson Security Engine
+ chip controller
+Message-ID: <20250522134639.GE1199143@google.com>
+References: <20250506031947.11130-1-zhaoqunqin@loongson.cn>
+ <20250506031947.11130-2-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	RiOPpq17pJMoVSN84eVFUvAKML3wNh0zTMzDktHbhjTNd0Oe/SmW+P/fNEcYncC21dvHaGouGRqr9kq+YhD5x5wdGHQMtIK3u41oCtHNMQMZMX9t0x1ezPReVTVPur9ENi1rKVGVdguk4rFv86KtwB3kTJrD/sHnwiK1mAH7uAQ95ylOeBgruFqxe1X3MAu4xNr1oEAhKWseJ6ELCIYILskUoF5C8TnvH4EA+VE0zS+/HZtg4perszppXJSThb/rXqv3TgUNjR6b1Wp/qHjwEYrTqmNO1uTkV42bJ489dthNA9hUmKSsjaoQWLmOqefBlcLGbMnpZPyTtbys66KhNmoYEHnYd5smIiBV6UFrAS/SxQFdDUHXWSlpVRfqhirxpFEtUmmm73w1LC1MQXDkJDj0Jkoe0tiPMdgnGe09O+yAZOeAmH1Q9vqzoK4qY3Lc5LmGHLKjcl4YAJKdavgWUg9DfUSAWRkK2wmOJlyh09tCNxHF2bqqQl3oTFNR72+Q/vBSbMQ/8E/NtFjyvQyc/WOpatONe8baaS7fzL2357jPtc0TkEHL9Ar4byiPlmrS4jh8c2IimHBGPXwMaRhY/bSJ9U8JX11tsqBUreni3IU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB2939.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1a5a23d-eecf-4db0-ec86-08dd9936c687
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2025 13:44:29.4337
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /W90jpA936KWhG3ktR8S2mPLG2ECjatVdU6xTwvjdtycjwPzrmsKlHTY5sIkUROCl8506t/xCUR3/Idip5oLTuC1zULby6aBvtAyi6tNfqg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4734
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- suspectscore=0 adultscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2505220139
-X-Authority-Analysis: v=2.4 cv=WugrMcfv c=1 sm=1 tr=0 ts=682f2a41 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=DuBMkiAWZkss6Ydtu0EA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13206
-X-Proofpoint-GUID: yYGX-FwIdBxwTPum8HPxOfqhDRDyc6-k
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDEzOSBTYWx0ZWRfXyUuEWHA/tOTp 6r2ShYPaCOR/ncZ0lpnjTqD8UD7MwTVH0ELHy/7ILi8fPBNaBfyQd/jIXBViMupedr1hoglt96+ OxoD0OKlYOjDgdzHZUxCkuvg0NT4J2O+TmobvPFhlpm3mTztatvHy6umD3PeZyZp4UXRLwo9Gfv
- yGt57fG+yQF8IZxtAIQDVDDm8/8Hu7tgy9dcGmWu9FSYAsTXaCEyp9VL/OtOFq07fsVSSeirWHi ePyVUg+RKTO1G94NSlTRWsJMQjMwv/yRIPI5f4YWkmW8e2lCfLQdUxjOKsMp6DiRw+mC8gqip54 PBG8Bs6D6VEXqWwpvdzG0D+pQmcPjPrdMe+hd9JFgl/NAajb3S7s+epGl43tpyZNvQ09xoWXfl8
- CHienVRCQY4E+5O5AxY6nmyUCN6PWbhKu8S4BipviYmoqhA3hNJAIFM6NVTqvguA26zkzxRM
-X-Proofpoint-ORIG-GUID: yYGX-FwIdBxwTPum8HPxOfqhDRDyc6-k
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250506031947.11130-2-zhaoqunqin@loongson.cn>
 
-T24gVGh1LCAyMDI1LTA1LTIyIGF0IDE0OjEwICswMTAwLCBBaXNod2FyeWEgd3JvdGU6DQo+IEhp
-IERvbWluaWssDQo+IA0KPiBJIHdhbnRlZCB0byByZXBvcnQgYSByZWdyZXNzaW9uIG9ic2VydmVk
-IHdoaWxlIHJ1bm5pbmcgdGhlDQo+IGBrc2VsZnRlc3QtbW1gIHN1aXRlLCBzcGVjaWZpY2FsbHkg
-dGhlDQo+IGBtbV9ydW5fdm10ZXN0c19zaF9taWdyYXRpb25fbWlncmF0aW9uX3NoYXJlZF9hbm9u
-YCB0ZXN0LCBvbiBhbg0KPiBBcm02NCBNYXJ2ZWxsIFRodW5kZXIgWDIgKFRYMikgc3lzdGVtLg0K
-PiANCj4gVGhlIGtlcm5lbCB3YXMgYnVpbHQgdXNpbmcgZGVmY29uZmlnIHdpdGggdGhlIGFkZGl0
-aW9uYWwgY29uZmlnDQo+IGZyYWdtZW50IGZyb206DQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcv
-cHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC90cmVlL3Rvb2xzLw0K
-PiB0ZXN0aW5nL3NlbGZ0ZXN0cy9tbS9jb25maWcNCj4gDQo+IFRoaXMgd29ya3MgZmluZSBvbiB2
-Ni4xNS1yYzcuDQo+IA0KPiBBIGJpc2VjdCBpZGVudGlmaWVkIHRoaXMgcGF0Y2ggYXMgaW50cm9k
-dWNpbmcgdGhlIGZhaWx1cmUuIEJpc2VjdGVkDQo+IGl0IG9uIHRoZSB0YWcgInY2LjE1LXJjNy03
-LWc0YTk1YmMxMjFjY2QiIGF0IHJlcG86DQo+IGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20v
-bGludXgva2VybmVsL2dpdC90b3J2YWxkcy9saW51eC5naXQNCj4gDQo+IEZhaWx1cmUgbG9nOg0K
-PiAxMTE5MyAwMzoyOToxNC44MDY1MDLCoCAjICMgcnVubmluZyAuL21pZ3JhdGlvbg0KPiAxMTE5
-NCAwMzoyOToxNC44MDY4NzbCoCAjICMgLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAxMTE5NSAwMzoy
-OToxNC44MjA5MznCoCAjICMgVEFQIHZlcnNpb24gMTMNCj4gMTExOTYgMDM6Mjk6MTQuODIxMjM2
-wqAgIyAjIDEuLjYNCj4gMTExOTcgMDM6Mjk6MTQuODIxNTE5wqAgIyAjICMgU3RhcnRpbmcgNiB0
-ZXN0cyBmcm9tIDEgdGVzdCBjYXNlcy4NCj4gMTExOTggMDM6Mjk6MTQuODIxNzczwqAgIyAjICPC
-oCBSVU7CoMKgwqDCoMKgwqDCoMKgwqDCoCBtaWdyYXRpb24ucHJpdmF0ZV9hbm9uIC4uLg0KPiAx
-MTE5OSAwMzoyOTozNC42MDI5NjTCoCAjICMgI8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgT0vCoCBt
-aWdyYXRpb24ucHJpdmF0ZV9hbm9uDQo+IDExMjAwIDAzOjI5OjM0LjYwMzQxOMKgICMgIyBvayAx
-IG1pZ3JhdGlvbi5wcml2YXRlX2Fub24NCj4gMTEyMDEgMDM6Mjk6MzQuNjAzNjg3wqAgIyAjICPC
-oCBSVU7CoMKgwqDCoMKgwqDCoMKgwqDCoCBtaWdyYXRpb24uc2hhcmVkX2Fub24gLi4uDQo+IDEx
-MjAyIDAzOjI5OjM0Ljk3MzQ3OcKgICMgIyBEaWRuJ3QgbWlncmF0ZSAxIHBhZ2VzDQo+IDExMjAz
-IDAzOjI5OjM0Ljk3Mzg1NcKgICMgIyAjIG1pZ3JhdGlvbi5jOjE3NTpzaGFyZWRfYW5vbjpFeHBl
-Y3RlZCBtaWdyYXRlKHB0ciwNCj4gc2VsZi0+bjEsIHNlbGYtPm4yKSAoLTIpID09IDAgKDApDQo+
-IDExMjA0IDAzOjI5OjM0Ljk4NDc4N8KgICMgIyAjIHNoYXJlZF9hbm9uOiBUZXN0IHRlcm1pbmF0
-ZWQgYnkgYXNzZXJ0aW9uDQo+IDExMjA1IDAzOjI5OjM0Ljk4NTEwNcKgICMgIyAjwqDCoMKgwqDC
-oMKgwqDCoMKgIEZBSUzCoCBtaWdyYXRpb24uc2hhcmVkX2Fub24NCj4gMTEyMDYgMDM6Mjk6MzQu
-OTg1MzY1wqAgIyAjIG5vdCBvayAyIG1pZ3JhdGlvbi5zaGFyZWRfYW5vbg0KPiAxMTIwNyAwMzoy
-OTozNC45ODg1NjjCoCAjICMgI8KgIFJVTsKgwqDCoMKgwqDCoMKgwqDCoMKgIG1pZ3JhdGlvbi5w
-cml2YXRlX2Fub25fdGhwIC4uLg0KPiAxMTIwOCAwMzoyOTo1NC41OTc1NzLCoCAjICMgI8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgT0vCoCBtaWdyYXRpb24ucHJpdmF0ZV9hbm9uX3RocA0KPiAxMTIw
-OSAwMzoyOTo1NC41OTc5NTHCoCAjICMgb2sgMyBtaWdyYXRpb24ucHJpdmF0ZV9hbm9uX3RocA0K
-PiAxMTIxMCAwMzoyOTo1NC41OTg0ODfCoCAjICMgI8KgIFJVTsKgwqDCoMKgwqDCoMKgwqDCoMKg
-IG1pZ3JhdGlvbi5zaGFyZWRfYW5vbl90aHAgLi4uDQo+IDExMjExIDAzOjI5OjU1LjAxMTE4M8Kg
-ICMgIyBEaWRuJ3QgbWlncmF0ZSAxIHBhZ2VzDQo+IDExMjEyIDAzOjI5OjU1LjAxMTUyNMKgICMg
-IyAjIG1pZ3JhdGlvbi5jOjI0MTpzaGFyZWRfYW5vbl90aHA6RXhwZWN0ZWQNCj4gbWlncmF0ZShw
-dHIsDQo+IHNlbGYtPm4xLCBzZWxmLT5uMikgKC0yKSA9PSAwICgwKQ0KPiAxMTIxMyAwMzoyOTo1
-NS4wMjI1MTnCoCAjICMgIyBzaGFyZWRfYW5vbl90aHA6IFRlc3QgdGVybWluYXRlZCBieSBhc3Nl
-cnRpb24NCj4gMTEyMTQgMDM6Mjk6NTUuMDIyODM0wqAgIyAjICPCoMKgwqDCoMKgwqDCoMKgwqAg
-RkFJTMKgIG1pZ3JhdGlvbi5zaGFyZWRfYW5vbl90aHANCj4gMTEyMTUgMDM6Mjk6NTUuMDI3ODY0
-wqAgIyAjIG5vdCBvayA0IG1pZ3JhdGlvbi5zaGFyZWRfYW5vbl90aHANCj4gMTEyMTYgMDM6Mjk6
-NTUuMDI4MTU2wqAgIyAjICPCoCBSVU7CoMKgwqDCoMKgwqDCoMKgwqDCoCBtaWdyYXRpb24ucHJp
-dmF0ZV9hbm9uX2h0bGIgLi4uDQo+IDExMjE3IDAzOjMwOjE0LjU5NTMyN8KgICMgIyAjwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBPS8KgIG1pZ3JhdGlvbi5wcml2YXRlX2Fub25faHRsYg0KPiAxMTIx
-OCAwMzozMDoxNC41OTU3NzfCoCAjICMgb2sgNSBtaWdyYXRpb24ucHJpdmF0ZV9hbm9uX2h0bGIN
-Cj4gMTEyMTkgMDM6MzA6MTQuNTk2Mzk4wqAgIyAjICPCoCBSVU7CoMKgwqDCoMKgwqDCoMKgwqDC
-oCBtaWdyYXRpb24uc2hhcmVkX2Fub25faHRsYiAuLi4NCj4gMTEyMjAgMDM6MzA6MzQuNTk1MjM5
-wqAgIyAjICPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE9LwqAgbWlncmF0aW9uLnNoYXJlZF9hbm9u
-X2h0bGINCj4gMTEyMjEgMDM6MzA6MzQuNTk1NjIzwqAgIyAjIG9rIDYgbWlncmF0aW9uLnNoYXJl
-ZF9hbm9uX2h0bGINCj4gMTEyMjIgMDM6MzA6MzQuNTk1ODU5wqAgIyAjICMgRkFJTEVEOiA0IC8g
-NiB0ZXN0cyBwYXNzZWQuDQo+IDExMjIzIDAzOjMwOjM0LjYwMzgxNsKgICMgIyAjIFRvdGFsczog
-cGFzczo0IGZhaWw6MiB4ZmFpbDowIHhwYXNzOjAgc2tpcDowDQo+IGVycm9yOjANCj4gMTEyMjQg
-MDM6MzA6MzQuNjA0MTEwwqAgIyAjIFtGQUlMXQ0KPiAxMTIyNSAwMzozMDozNC42MDQzNDLCoCAj
-IG5vdCBvayA1NSBtaWdyYXRpb24gIyBleGl0PTENCj4gDQo+IFRoYW5rcywNCj4gQWlzaHdhcnlh
-DQoNCkhpLCANCg0KTG9va2luZyBhdCB0aGUgdGVzdCwgSSBkb24ndCB0aGluayB0aGlzIGlzIHJl
-bGF0ZWQuIFRoZSB0ZXN0IGFsbG9jYXRlcyBzb21lDQpwYWdlcyBhbmQgYXR0ZW1wdHMgdG8gbWln
-cmF0ZSB0aGVtIGJldHdlZW4gdHdvIE5VTUEgbm9kZXMuIEl0IHNlZW1zIHRvIGJlIGENCnNlbGZ0
-ZXN0IGZvciBtZW1vcnkgbWFuYWdlbWVudCBjb2RlLCBhbmQgSSBkb24ndCBzZWUgaG93IHRoaXMg
-cGF0Y2ggY291bGQgYWZmZWN0DQppdHMgb3V0Y29tZS4NCg0KRG8geW91IHNlZSB0aGlzIGZhaWx1
-cmUgY29uc2lzdGVudGx5LCBvciBpcyBpdCBvbmx5IGhhcHBlbmluZyBvY2Nhc2lvbmFsbHk/DQpJ
-J20gd29uZGVyaW5nIGlmIGl0IG1pZ2h0IGhhdmUgcGFzc2VkIGJ5IGNoYW5jZSB3aGVuIHRlc3Rp
-bmcgdGhlIHJlYWwgY3VscHJpdA0KZHVyaW5nIHRoZSBiaXNlY3QuDQoNClJlZ2FyZHMsIA0KRG9t
-aW5paw0K
+On Tue, 06 May 2025, Qunqin Zhao wrote:
+
+> Loongson Security Engine chip supports RNG, SM2, SM3 and SM4 accelerator
+> engines. This is the base driver for other specific engine drivers.
+> 
+> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+> v8: As explained in the cover letter, moved this driver form MFD to here.
+>     Cleanned up coding style. Added some comments. Divided DMA memory
+>     equally among all engines.
+> 
+> v7: Moved Kconfig entry between MFD_INTEL_M10_BMC_PMCI and MFD_QNAP_MCU.
+> 
+>     Renamed se_enable_int_locked() to se_enable_int(), then moved the
+>     lock out of se_disable_int().
+>  
+>     "se_send_genl_cmd" ---> "se_send_cmd".
+>     "struct lsse_ch" ---> "struct se_channel".
+> 
+> v6: Replace all "ls6000se" with "loongson"
+> v5: Registered "ls6000se-rng" device. 
+> v3-v4: None
+> 
+>  drivers/mfd/Kconfig             |  11 ++
+>  drivers/mfd/Makefile            |   2 +
+>  drivers/mfd/loongson-se.c       | 235 ++++++++++++++++++++++++++++++++
+>  include/linux/mfd/loongson-se.h |  52 +++++++
+>  4 files changed, 300 insertions(+)
+>  create mode 100644 drivers/mfd/loongson-se.c
+>  create mode 100644 include/linux/mfd/loongson-se.h
+
+General premise seems okay.
+
+Couple of questions and styling / readability issues.
+
+> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> index 22b936310..c2f94b315 100644
+> --- a/drivers/mfd/Kconfig
+> +++ b/drivers/mfd/Kconfig
+> @@ -2369,6 +2369,17 @@ config MFD_INTEL_M10_BMC_PMCI
+>  	  additional drivers must be enabled in order to use the functionality
+>  	  of the device.
+>  
+> +config MFD_LOONGSON_SE
+> +	tristate "Loongson Security Engine chip controller driver"
+> +	depends on LOONGARCH && ACPI
+> +	select MFD_CORE
+> +	help
+> +	  The Loongson Security Engine chip supports RNG, SM2, SM3 and
+> +	  SM4 accelerator engines. Each engine have its own DMA buffer
+> +	  provided by the controller. The kernel cannot directly send
+> +	  commands to the engine and must first send them to the controller,
+> +	  which will forward them to the corresponding engine.
+> +
+>  config MFD_QNAP_MCU
+>  	tristate "QNAP microcontroller unit core driver"
+>  	depends on SERIAL_DEV_BUS
+> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> index 948cbdf42..fc50601ca 100644
+> --- a/drivers/mfd/Makefile
+> +++ b/drivers/mfd/Makefile
+> @@ -290,3 +290,5 @@ obj-$(CONFIG_MFD_RSMU_I2C)	+= rsmu_i2c.o rsmu_core.o
+>  obj-$(CONFIG_MFD_RSMU_SPI)	+= rsmu_spi.o rsmu_core.o
+>  
+>  obj-$(CONFIG_MFD_UPBOARD_FPGA)	+= upboard-fpga.o
+> +
+> +obj-$(CONFIG_MFD_LOONGSON_SE)	+= loongson-se.o
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> new file mode 100644
+> index 000000000..ce38d8221
+> --- /dev/null
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -0,0 +1,235 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/* Copyright (C) 2025 Loongson Technology Corporation Limited */
+
+Author(s)?
+
+> +#include <linux/acpi.h>
+> +#include <linux/delay.h>
+> +#include <linux/device.h>
+> +#include <linux/dma-mapping.h>
+> +#include <linux/errno.h>
+> +#include <linux/init.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/loongson-se.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +
+> +struct loongson_se {
+> +	void __iomem *base;
+> +	spinlock_t dev_lock;
+> +	struct completion cmd_completion;
+> +
+> +	void *dmam_base;
+> +	int dmam_size;
+> +
+> +	struct mutex engine_init_lock;
+> +	struct loongson_se_engine engines[SE_ENGINE_MAX];
+> +};
+> +
+> +struct loongson_se_controller_cmd {
+> +	u32 command_id;
+> +	u32 info[7];
+> +};
+> +
+> +static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+> +{
+> +	u32 status;
+> +	int err;
+> +
+> +	spin_lock_irq(&se->dev_lock);
+> +
+> +	/* Notify the controller that the engine needs to be started */
+> +	writel(int_bit, se->base + SE_L2SINT_SET);
+
+Code that is squished together is difficult to read.
+
+'\n'
+
+> +	/* Polling until the controller has forwarded the engine command */
+> +	err = readl_relaxed_poll_timeout_atomic(se->base + SE_L2SINT_STAT, status,
+> +						!(status & int_bit), 1, 10000);
+
+How long is that?  Why was that number chosen?
+
+Please define the type, like:
+
+LOONSON_ENGINE_CMD_TIMEOUT_MS 10000
+
+... or whatever it is.
+
+> +	spin_unlock_irq(&se->dev_lock);
+> +
+> +	return err;
+> +}
+> +
+> +static int loongson_se_send_controller_cmd(struct loongson_se *se,
+> +					   struct loongson_se_controller_cmd *cmd)
+> +{
+> +	u32 *send_cmd = (u32 *)cmd;
+> +	int err, i;
+> +
+> +	for (i = 0; i < SE_SEND_CMD_REG_LEN; i++)
+> +		writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+
+Is there any reason not to use regmap?
+
+> +	err = loongson_se_poll(se, SE_INT_CONTROLLER);
+> +	if (err)
+> +		return err;
+> +
+> +	return wait_for_completion_interruptible(&se->cmd_completion);
+> +}
+> +
+> +int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+> +{
+> +	/* After engine initialization, the controller already knows
+> +	 * where to obtain engine commands from. Now all we need to
+> +	 * do is notify the controller that the engine needs to be started.
+> +	 */
+
+This is not a proper multi-line comment as per Coding Style.
+
+> +	int err = loongson_se_poll(engine->se, BIT(engine->id));
+> +
+> +	if (err)
+> +		return err;
+> +
+> +	return wait_for_completion_interruptible(&engine->completion);
+> +}
+> +EXPORT_SYMBOL_GPL(loongson_se_send_engine_cmd);
+> +
+> +struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+
+What calls this?  Whose 'dev' is that?
+
+> +{
+> +	struct loongson_se *se = dev_get_drvdata(dev);
+> +	struct loongson_se_engine *engine = &se->engines[id];
+> +	struct loongson_se_controller_cmd cmd;
+> +
+> +	engine->se = se;
+> +	engine->id = id;
+> +	init_completion(&engine->completion);
+> +
+> +	/* Divide DMA memory equally among all engines */
+> +	engine->buffer_size = se->dmam_size / SE_ENGINE_MAX;
+> +	engine->buffer_off = (se->dmam_size / SE_ENGINE_MAX) * id;
+> +	engine->data_buffer = se->dmam_base + engine->buffer_off;
+> +
+> +	/*
+> +	 * There has no engine0, use its data buffer as command buffer for other
+> +	 * engines. The DMA memory size is obtained from the ACPI table, which
+> +	 * ensures that the data buffer size of engine0 is larger than the
+> +	 * command buffer size of all engines.
+> +	 */
+> +	engine->command = se->dmam_base + id * (2 * SE_ENGINE_CMD_SIZE);
+
+Why 2?
+
+> +	engine->command_ret = engine->command + SE_ENGINE_CMD_SIZE;
+> +
+> +	mutex_lock(&se->engine_init_lock);
+
+'\n'
+
+> +	/* Tell the controller where to find engine command */
+> +	cmd.command_id = SE_CMD_SET_ENGINE_CMDBUF;
+> +	cmd.info[0] = id;
+> +	cmd.info[1] = engine->command - se->dmam_base;
+> +	cmd.info[2] = 2 * SE_ENGINE_CMD_SIZE;
+
+'\n'
+
+> +	if (loongson_se_send_controller_cmd(se, &cmd))
+> +		engine = NULL;
+
+'\n'
+
+> +	mutex_unlock(&se->engine_init_lock);
+> +
+> +	return engine;
+> +}
+> +EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+> +
+> +static irqreturn_t se_irq_handler(int irq, void *dev_id)
+> +{
+> +	struct loongson_se *se = dev_id;
+> +	u32 int_status;
+> +	int id;
+> +
+> +	spin_lock(&se->dev_lock);
+> +
+> +	int_status = readl(se->base + SE_S2LINT_STAT);
+
+'\n'
+
+> +	/* For controller */
+> +	if (int_status & SE_INT_CONTROLLER) {
+> +		complete(&se->cmd_completion);
+> +		int_status &= ~SE_INT_CONTROLLER;
+> +		writel(SE_INT_CONTROLLER, se->base + SE_S2LINT_CL);
+> +	}
+
+'\n'
+
+> +	/* For engines */
+> +	while (int_status) {
+> +		id = __ffs(int_status);
+> +		complete(&se->engines[id].completion);
+> +		int_status &= ~BIT(id);
+> +		writel(BIT(id), se->base + SE_S2LINT_CL);
+> +	}
+> +
+> +	spin_unlock(&se->dev_lock);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+> +{
+> +	struct loongson_se_controller_cmd cmd;
+> +	int err;
+> +
+> +	cmd.command_id = SE_CMD_START;
+> +	err = loongson_se_send_controller_cmd(se, &cmd);
+> +	if (err)
+> +		return err;
+> +
+> +	cmd.command_id = SE_CMD_SET_DMA;
+> +	cmd.info[0] = lower_32_bits(addr);
+> +	cmd.info[1] = upper_32_bits(addr);
+> +	cmd.info[2] = size;
+> +
+> +	return loongson_se_send_controller_cmd(se, &cmd);
+> +}
+> +
+> +static const struct mfd_cell engines[] = {
+> +	{ .name = "loongson-rng" },
+> +	{ .name = "loongson-tpm" },
+> +};
+> +
+> +static int loongson_se_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct loongson_se *se;
+> +	int nr_irq, irq, err;
+> +	dma_addr_t paddr;
+> +
+> +	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+> +	if (!se)
+> +		return -ENOMEM;
+
+'\n'
+
+> +	dev_set_drvdata(dev, se);
+> +	init_completion(&se->cmd_completion);
+> +	spin_lock_init(&se->dev_lock);
+> +	mutex_init(&se->engine_init_lock);
+> +
+> +	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+> +	if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
+> +		return -ENODEV;
+
+'\n'
+
+> +	se->dmam_base = dmam_alloc_coherent(dev, se->dmam_size, &paddr, GFP_KERNEL);
+> +	if (!se->dmam_base)
+> +		return -ENOMEM;
+> +
+> +	se->base = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(se->base))
+> +		return PTR_ERR(se->base);
+
+'\n'
+
+> +	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+> +
+> +	nr_irq = platform_irq_count(pdev);
+> +	if (nr_irq <= 0)
+> +		return -ENODEV;
+
+'\n'
+
+> +	while (nr_irq) {
+> +		irq = platform_get_irq(pdev, --nr_irq);
+
+Do the decrement separately at the end of the statement, not hidden here.
+
+Or, probably better still, use a for() loop.
+
+> +		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
+> +		if (err)
+> +			dev_err(dev, "failed to request irq: %d\n", irq);
+
+IRQ
+
+> +	}
+> +
+> +	err = loongson_se_init(se, paddr, se->dmam_size);
+> +	if (err)
+> +		return err;
+> +
+> +	return devm_mfd_add_devices(dev, 0, engines, ARRAY_SIZE(engines), NULL, 0, NULL);
+
+Why 0?
+
+> +}
+> +
+> +static const struct acpi_device_id loongson_se_acpi_match[] = {
+> +	{"LOON0011", 0},
+
+There should be spaces after the '{' and before the '}'.
+
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
+> +
+> +static struct platform_driver loongson_se_driver = {
+> +	.probe   = loongson_se_probe,
+> +	.driver  = {
+> +		.name  = "loongson-se",
+> +		.acpi_match_table = loongson_se_acpi_match,
+> +	},
+> +};
+> +module_platform_driver(loongson_se_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
+> +MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
+> +MODULE_DESCRIPTION("Loongson Security Engine chip controller driver");
+> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
+> new file mode 100644
+> index 000000000..f962d6143
+> --- /dev/null
+> +++ b/include/linux/mfd/loongson-se.h
+> @@ -0,0 +1,52 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +/* Copyright (C) 2025 Loongson Technology Corporation Limited */
+> +
+> +#ifndef __LOONGSON_SE_H__
+> +#define __LOONGSON_SE_H__
+
+__MFD_*
+
+> +#define SE_SEND_CMD_REG			0x0
+> +#define SE_SEND_CMD_REG_LEN		0x8
+> +/* controller command id */
+
+Uppercase char to start comments.
+
+"ID"
+
+> +#define SE_CMD_START			0x0
+> +#define SE_CMD_SET_DMA			0x3
+> +#define SE_CMD_SET_ENGINE_CMDBUF	0x4
+> +
+> +#define SE_S2LINT_STAT			0x88
+> +#define SE_S2LINT_EN			0x8c
+> +#define SE_S2LINT_CL			0x94
+> +#define SE_L2SINT_STAT			0x98
+> +#define SE_L2SINT_SET			0xa0
+> +
+> +#define SE_INT_ALL			0xffffffff
+> +#define SE_INT_CONTROLLER		BIT(0)
+> +
+> +#define SE_ENGINE_MAX			16
+> +#define SE_ENGINE_RNG			1
+> +#define SE_CMD_RNG			0x100
+> +
+> +#define SE_ENGINE_TPM			5
+> +#define SE_CMD_TPM			0x500
+> +
+> +#define SE_ENGINE_CMD_SIZE		32
+> +
+> +struct loongson_se_engine {
+> +	struct loongson_se *se;
+> +	int id;
+> +
+> +	/* Command buffer */
+> +	void *command;
+> +	void *command_ret;
+> +
+> +	void *data_buffer;
+> +	uint buffer_size;
+> +	/* Data buffer offset to DMA base */
+> +	uint buffer_off;
+> +
+> +	struct completion completion;
+> +
+> +};
+> +
+> +struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id);
+> +int loongson_se_send_engine_cmd(struct loongson_se_engine *engine);
+> +
+> +#endif
+> -- 
+> 2.45.2
+> 
+
+-- 
+Lee Jones [李琼斯]
