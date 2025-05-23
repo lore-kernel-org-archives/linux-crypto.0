@@ -1,85 +1,75 @@
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E615292911;
-	Fri, 23 May 2025 13:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A1F5FB95;
+	Fri, 23 May 2025 13:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748007069; cv=none; b=CT0iM8PNz1nvXWfz7LB32r/tzYEqKYIACNb9qs5trvak1C2vKdRP61Wy7nqVjKJjM4cMNyVtxTp8EyVqG6EgJEVdDC0U4MIm7gC/Vgd8vM133tPPx41cE5VRo/GOW7wQMVvZdRnOB4YswwEZkdQiAS0xg3isqARgQ78lu3ubrT4=
+	t=1748007225; cv=none; b=T//RaCOblFdyX4nLghnw4PC/zt9BBXTISis/cEHSDe9basINWMkftZHFrHZtlguXAKmWoM20EEYA7uRy4DclnU87yQJj6Gd4OOon3TeBXf9pGM42Rct8ibqk+gE5fcrIdWGiuNTPqQYfoXiGjrzuUnenSCPWk7TyZKa8QtSNsA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748007069; c=relaxed/simple;
-	bh=nnZRK8lPl9SyiDMJbFJSArxBQ5vkLzLDfP3ZLzu1lVA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sRmjUcUz11X3JvjPlC81VWQBOA+cdqMgdA5YL7kDPVA9hjBrpAkjt6Cu3CdoFrF448jNe80kHBEO9xrFx2+5kFIrP/XNP3kvfFDaMQs56ue9apWpTVd449hfu8SedwIL+ImAQ97OyX3y4aenxvIX0SK+3guBc0ZAdF4dzt60Q7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=ON1CM0cs; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="ON1CM0cs"
-Received: from localhost.localdomain (unknown [202.119.23.198])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 163121437;
-	Fri, 23 May 2025 21:31:00 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: qianweili@huawei.com
-Cc: wangzhou1@hisilicon.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH] crypto: hisilicon: use kfree_sensitive() for pool cleanup
-Date: Fri, 23 May 2025 13:30:57 +0000
-Message-Id: <20250523133057.4025075-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1748007225; c=relaxed/simple;
+	bh=+oWbheLtmxAxFo30a5sy0XXCegWFyhqhELgo3ZhyLng=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Y44ScvuSKRRn0D58g/JWji6Qu3wJIEg1q6nTaN13DRXZEXu2+Dk077W2wtxG1vGsF/xJOEusgb6cDGtC8oMt6dXY1dR4hFbWentp6z8N1b+Z84la6lO89GfI9t6bFs+s3RIk95vbxovadJZ7+xYYPd3FsWSAKkA/dOyT6MxSdJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
+Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
+ (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 May
+ 2025 15:18:32 +0200
+Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
+ S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%3]) with mapi id
+ 15.01.2507.039; Fri, 23 May 2025 15:18:32 +0200
+From: John Ernberg <john.ernberg@actia.se>
+To: =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>, Pankaj Gupta
+	<pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, "Rob
+ Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+	<s.hauer@pengutronix.de>
+CC: Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
+	<festevam@gmail.com>, Thomas Richard <thomas.richard@bootlin.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, John Ernberg <john.ernberg@actia.se>
+Subject: [PATCH 0/4] crypto: caam - iMX8QXP support (and related fixes)
+Thread-Topic: [PATCH 0/4] crypto: caam - iMX8QXP support (and related fixes)
+Thread-Index: AQHby+UudBZY+LpW90mK/tjBsTdMwg==
+Date: Fri, 23 May 2025 13:18:31 +0000
+Message-ID: <20250523131814.1047662-1-john.ernberg@actia.se>
+Accept-Language: en-US, sv-SE
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.49.0
+x-esetresult: clean, is OK
+x-esetid: 37303A2955B14453607162
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DF573AF18ED1AA43B5D721DEF54B24E9@actia.se>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDQ00YVk4ZTk9KT00aTU4fGFYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJS0lVSkpCVUlIVUpCQ1lXWRYaDxIVHRRZQVlPS0hVSktISk9ITFVKS0tVSk
-	JLS1kG
-X-HM-Tid: 0a96fd57027f03a1kunmd10b84c92accc8
-X-HM-MType: 10
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MTo6Lio6HzEzDBRLFksCAxdW
-	TBQKFD5VSlVKTE9DS0tMS01KSU9MVTMWGhIXVQESFxIVOwgeDlUeHw5VGBVFWVdZEgtZQVlJS0lV
-	SkpCVUlIVUpCQ1lXWQgBWUFKTU5ONwY+
-DKIM-Signature:a=rsa-sha256;
-	b=ON1CM0csT+ZFX3d7Kk/uaRI+fOv7MXWaytkLpuV5P8aebPyPD7jwwfd4ubE7b66Xe0zEBFHQauhTwOtJYUJkIA/k0/0AkbtBsz1xRT9x0OWKNIRT3exZoXvz6Eq+LZn7WczLoD3+g28B77e0ZVpX5gwZVRUPtmuXZIIzhamwvMY=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=jRFn8bu4n2o4gj3EMfZ9WV2kRTdw4d7yf31Z8DlFERQ=;
-	h=date:mime-version:subject:message-id:from;
 
-The error path of hisi_acc_create_sgl_pool() already calls
-kfree_sensitive() to wipe sensitive data before freeing the pool.
-However, hisi_acc_free_sgl_pool() currently uses plain kfree(), which
-may leave secrets behind in memory and undo the protection applied
-during creation.
-
-This patch replaces kfree() with kfree_sensitive() in
-hisi_acc_free_sgl_pool(), ensuring that all SGL pool deallocations
-securely clear their contents.
-
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
----
- drivers/crypto/hisilicon/sgl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index c974f95cd126..6a88a2056708 100644
---- a/drivers/crypto/hisilicon/sgl.c
-+++ b/drivers/crypto/hisilicon/sgl.c
-@@ -151,7 +151,7 @@ void hisi_acc_free_sgl_pool(struct device *dev, struct hisi_acc_sgl_pool *pool)
- 		dma_free_coherent(dev, block[i].size, block[i].sgl,
- 				  block[i].sgl_dma);
- 
--	kfree(pool);
-+	kfree_sensitive(pool);
- }
- EXPORT_SYMBOL_GPL(hisi_acc_free_sgl_pool);
- 
--- 
-2.34.1
-
+VGhpcyBzZXJpZXMgZW5hYmxlcyB0aGUgdXNlIG9mIHRoZSBDQUFNIChDcnlwdG9ncmFwaGljIEFj
+Y2VsZXJhdGlvbiBhbmQNCkFzc3VyYW5jZSBNb2R1bGUpIG9uIHRoZSBpTVg4UVhQIChhbmQgaXRz
+IHZhcmlhbnRzKS4NCg0KSG9yaWEgR2VhbnTEgyAoMSk6DQogIGFybTY0OiBkdHM6IGZyZWVzY2Fs
+ZTogaW14OHF4cC9pbXg4cW06IEFkZCBDQUFNIHN1cHBvcnQNCg0KSm9obiBFcm5iZXJnICgzKToN
+CiAgY3J5cHRvOiBjYWFtIC0gUHJldmVudCBjcmFzaCBvbiBzdXNwZW5kIHdpdGggaU1YOFFNIC8g
+aU1YOFVMUA0KICBjcnlwdG86IGNhYW0gLSBTdXBwb3J0IGlNWDhRWFAgYW5kIHZhcmlhbnRzIHRo
+ZXJlb2YNCiAgZHQtYmluZGluZ3M6IGNyeXB0bzogZnNsLHNlYy12NC4wOiBBbGxvdyBzdXBwbHlp
+bmcgcG93ZXItZG9tYWlucw0KDQogLi4uL2JpbmRpbmdzL2NyeXB0by9mc2wsc2VjLXY0LjAueWFt
+bCAgICAgICAgIHwgIDYgKysrDQogLi4uL2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4LXNzLXNlY3Vy
+aXR5LmR0c2kgIHwgMzggKysrKysrKysrKysrKysrKysrKw0KIGFyY2gvYXJtNjQvYm9vdC9kdHMv
+ZnJlZXNjYWxlL2lteDhxbS5kdHNpICAgICB8ICAxICsNCiBhcmNoL2FybTY0L2Jvb3QvZHRzL2Zy
+ZWVzY2FsZS9pbXg4cXhwLmR0c2kgICAgfCAgMSArDQogZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJs
+LmMgICAgICAgICAgICAgICAgICAgIHwgIDcgKystLQ0KIGRyaXZlcnMvY3J5cHRvL2NhYW0vaW50
+ZXJuLmggICAgICAgICAgICAgICAgICB8ICAxICsNCiA2IGZpbGVzIGNoYW5nZWQsIDUxIGluc2Vy
+dGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQogY3JlYXRlIG1vZGUgMTAwNjQ0IGFyY2gvYXJtNjQv
+Ym9vdC9kdHMvZnJlZXNjYWxlL2lteDgtc3Mtc2VjdXJpdHkuZHRzaQ0KDQotLSANCjIuNDkuMA0K
