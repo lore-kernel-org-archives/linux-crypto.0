@@ -1,311 +1,121 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354911A00FA
-	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 08:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB53183CC3
+	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 11:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747988711; cv=none; b=WXcllMLpJ7a1IgBDCQfeG+VyeT7fxIzxUWGVXpkoZU1YG42SaOnF6fJf/7qy1IBmh5aOBPZ71yNbiCTIKMkickq+zh2K92dLSXMXhX5Dz/8rjJ+GP4krwhS1DlHJrH0b3SA5Zw2UUsvZF6ftoekHBSeHhvXxZByTJ3gReeARTtM=
+	t=1747999482; cv=none; b=CV84HeuCK5nKmy4g1XgqPU3MclZ2JJi6DevO3013aCWOVlPud7MnMaMf/aqbdlQtXoXG1SjqJ2S5ry2AqMAUfjCxne1JtcDew6Gz8hej7P2ZXtz5Chb9nvK7C9W8CDMlqP1f5y8IYqsXb3OtuTSuvBS2D18M/zQ1OsfaeS4Kaig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747988711; c=relaxed/simple;
-	bh=+AB/cQQNplXspvGaT86SVBC30Q/dWPdXWy4t9hetblw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PdfoQI8DLPIL+JHfl1tZOmnWKvjc/2PTyNJzTCn6k/tbD+cO4b4TnOgOioSWm4kpGMCF//Ya0BqLUo/YKlxtEyrGkQ0mIeSWQ3LaCTy1/qqrSkaxiG9bIkEi02mV5U0u2w3rxnnHNX20aMJZ8w9guK5Yp2/ZEjBRoxEoI8Ch4oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=PX8cYalt; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1747999482; c=relaxed/simple;
+	bh=9mMH0+qS2+FRf4v4tKTwA5fM8bgg5PmVeeqvziw4ioE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=inZ1GWt01fCvKTEIHW6faeKq3GhCAPTXlazGAoFmroai88x19NLhHVvDBIoiIdEgqTnvr8X/Dx/Ay5u4xgBohpspNK0IuvrCWHuRGPebDe9/Uc3P7TMiE92JwY1mPwIont/0yyX2xdh3b+oQ22h88yVKVkZp5Ei5HtvHrmGjhTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EfF/iauz; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="PX8cYalt"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70de8897628so27074557b3.1
-        for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 01:25:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1747988708; x=1748593508; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ozTlr85p37MBd7DohafvC1Zxs26Mw+03vrNjyfwblzs=;
-        b=PX8cYaltT+kGwg2+HIYajizv1YCRIICtTgankrsX8kWNvI00ztItqb9r6g85TpLER1
-         Ql11syU56gMvFmjgb7FTA8mP+v0iYtOWEhQfb52d8XmSty53B6uzfjyv7xp1Z+PG1ZqV
-         xWer2eElCZTyaAkBx8hkqit/fn7ji+iJmt09s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747988708; x=1748593508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ozTlr85p37MBd7DohafvC1Zxs26Mw+03vrNjyfwblzs=;
-        b=Im/ySWPMqyqRSOvXBeasBWd2UNFp3gV7T4PavMC6p7ABT/177YSIC7n/Jtzkmg+yZK
-         YWtG7s2/DbspTpr8X3v0PgiKV+lerolFJUV9yiFExAE1knCyTusNYat8i7205ASDSLOx
-         XumrJSzK5rcWFFVs5bXpanWxyASE9xg2EqSjSR/uxt9ioDgBlojUxyjQZT2OXTkDBjrj
-         nD1k5TNU7AuNcchxRSg0GvyZI93mUJBwo4y1HPKmPIlX/NVkbrletMUXAz+kMMEV+VFb
-         2uiSnuyAGpWtf1lb6sMzFwTE6z9rfAq5CDHXoepQqyOGcIlG2zv8RQlj2Fqvy8rZsTmB
-         IIRQ==
-X-Gm-Message-State: AOJu0YxNbSTpFaANUP8v3SACo60/89jsEVQ/A3m2ZX3/xxSVSXJMxtR5
-	o/PHE8NfwjMAtHO2wGbq4DXiOMNJSKkY8V9XJxCqpyLgt7t8C9Ke1xdtID2C2TvxDFHnl/wHKqh
-	4pnc3t/uSEF2XVAisgC+4ZGZO5ZprNANgS1Zirh8HNg==
-X-Gm-Gg: ASbGncuHTlAlXGoGnm/kBhe8P/bBjnrfYILHDX4PYhjfL4YxLDkBirJWeAHldK1R05t
-	GhQJGDoVxSELIl5eD32K1/ToRRDZUNTpdsytIL24oZdDKQaHEo4cqE38Y8lxXX83aoHaiBBtfLW
-	HEWdQRNTmqKbJkqjQOmAiWr0bH9pZTUVneX7t7LK5sPd2ZMr5q+sAMBw7O9AlptgYrfw==
-X-Google-Smtp-Source: AGHT+IFp1nDjBz/k+ErE8pv4fuVNERq7UVPCCdHS62z95kN4AIyxp4riBxQk85up/GM2iKNyckB1WzGH3r45EqsvaQk=
-X-Received: by 2002:a05:690c:3389:b0:6f9:a3c6:b2e4 with SMTP id
- 00721157ae682-70cab0f8809mr382629937b3.37.1747988708071; Fri, 23 May 2025
- 01:25:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EfF/iauz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=qHzX0h8MOD5qxbKmfmtqC6qPyNtfJAkoA9NN73r0YCI=; b=EfF/iauzVRYNZ43foaEt54Lc/K
+	HYKfcwnjqRLwlvd9+r+VZprAEashxfTRw4UQvMC1pR8d7ZOOP/6/ncX/b0bFYFDCv7jqzTGCcodoT
+	VI6K644E3j9Lh4UajT2z6MzI/rwsLRF1Nfso/LXgnnCxmB2H17yvcfiG7x6WBmVYUDDkBGgR8+CCb
+	ss+vicm/usP5UbK0hR6lq889ze8FtKrkpYlMHY+f2jbyMUmkKJGiWwOSgncPGeTdEW5ewDLZTf0d0
+	6+jE/TEYlK6cYKRb5W3tz0GLgtYRxRDG+IUx00iRaGviZ8YyDiEuzRKvWCSLqYZ0lCdq69Oghdo1e
+	bW9WQGdg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uIQVu-008L2I-39;
+	Fri, 23 May 2025 19:24:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 May 2025 19:24:34 +0800
+Date: Fri, 23 May 2025 19:24:34 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ingo Franzki <ifranzki@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>
+Subject: [PATCH] crypto: s390/hmac - Fix counter in export state
+Message-ID: <aDBa8tuSvw1mnnKL@gondor.apana.org.au>
+References: <623a7fcb-b4cb-48e6-9833-57ad2b32a252@linux.ibm.com>
+ <aDAM9LKOWSKBbIUn@gondor.apana.org.au>
+ <152288d2-a034-4594-a5cc-d46faf34ac24@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
- <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com> <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
- <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org> <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
- <19b1fca7-e1b1-4190-9bcb-7ce36fabd02e@kernel.org> <CALxtO0m_iVo4nnfYg5PzL5K0HgG-U2yNVeS3S0hfdXnObbJDJA@mail.gmail.com>
- <1f4d4292-fbf9-42db-b4e0-6f9326b937fc@kernel.org>
-In-Reply-To: <1f4d4292-fbf9-42db-b4e0-6f9326b937fc@kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Fri, 23 May 2025 13:54:57 +0530
-X-Gm-Features: AX0GCFsQo5QAjdkSEaBPBTuoG0Peuu-cIMqDKQYLO4mkJNmy8gGJ-Qbxc3qqJuQ
-Message-ID: <CALxtO0kYMXjN5Atp_AZdPp1KuRRJrWh=jThwLCjO3Q1qmFR2wg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com, 
-	Conor Dooley <conor@kernel.org>, davem@davemloft.net, linux-kernel@vger.kernel.org, 
-	adityak@vayavyalabs.com, manjunath.hadli@vayavyalabs.com, 
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152288d2-a034-4594-a5cc-d46faf34ac24@linux.ibm.com>
 
-Hi Krzysztof,
-  My comments are embedded below. Appreciate your inputs.
+On Fri, May 23, 2025 at 10:02:18AM +0200, Ingo Franzki wrote:
+> 
+> Yes, indeed, reverting this commit makes the problem to go away. 
 
-Warm regards,
-PK
+Great.  While I've got your attenttion, could you also test this
+patch to see if it makes the hmac errors go away?
 
-On Sun, May 18, 2025 at 7:00=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 13/05/2025 08:30, Pavitrakumar Managutte wrote:
-> >>>>>
-> >>>>> I do not see any improvements. It seems you ignored all comments, n=
-ot
-> >>>>> single one was responded to or addressed.
-> >>>
-> >>> PK: Addressed all the below
-> >>>
-> >>> 1. SoC Bindings: We dont have any SoC bindings since its tested on th=
-e
-> >>> Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
-> >>> device here. Also added a detailed description for the same, which
-> >>> describes how we have tested the SPAcc peripheral on Zynq. This was
-> >>> based on your inputs to describe the existing hardware.
-> >>
-> >> 1. I asked to use SoC specific compatibles and after such explanation
-> >> that you use it in some different, hardware configuration, I asked to
-> >> use that.
-> >>
-> >> Reflect whatever your hardware is called in the compatible.
-> >
-> > PK: Some context from my side which might clear up things
-> > 1. We have developed the SPAcc Crypto Linux driver for the Synopsys SPA=
-cc IP.
-> > 2. Yes, this is technically a soft IP which we test on FPGA (Zynq
-> > Ultrascale Boards).
-> > 3. We are NOT evaluating SPAcc IP and thus its not a custom use case
-> > or a custom hardware.
-> > 4. Also SPAcc IP is NOT part of any SoC yet, but it may be in future.
-> >
-> > Synopsys Semiconductor IP Business:
-> > Synopsys develops Semiconductor IPs (aka DesignWare IPs) and provides
-> > Linux device drivers to the SoC Vendors. We, as partners of Synopsys,
-> > develop Linux device drivers for the IP, in this case SPAcc. So as of
-> > now SPAcc is just a semiconductor IP which is not part of any SoC. A
-> > 3rd party SoC vendor would take this and integrate this as part of
-> > their upcoming SoC.
-> >
-> > SPAcc Semiconductor IP details:
-> > https://www.synopsys.com/designware-ip/security-ip/security-protocol-ac=
-celerators.html
-> >
-> > Synopsys DesignWare IPs
-> > 1. DWC MMC Host controller drivers : drivers/mmc/host/dw_mmc.c
-> > 2. DWC HSOTG Driver : drivers/usb/dwc2, drivers/usb/dwc3
-> > 3. DWC Ethernet driver : drivers/net/ethernet/synopsys
-> > 4. DWC DMA driver : drivers/dma/dw/
-> >
-> > Intent of upstreaming IP drivers by Synopsys
-> > 1. As a Semiconductor IP designer, Synopsys provides Linux device
-> > drivers with their IPs to the customers.
-> > 2. These Linux drivers handle all the configurations in those respectiv=
-e IPs.
-> > 3. At this stage of driver development, the focus is on the Semiconduct=
-or IP
-> > 4. Yes, the IP can be configured differently for different SoCs and
-> > the driver has to take care of that.
-> > 5. The driver might need some enhancements based on the SoC
-> > configurations, which could be done later.
-> > 6. Its a good approach to upstream IP drivers, so the vendors could
-> > use/enhance the same open sourced drivers.
->
->
-> Yeah, I am familiar with this...
->
-> >
-> >>
-> >> I claim this cannot be used in a SoC without customization. If I
-> >
-> > PK: Synopsys SPAcc is a highly configurable semiconductor IP. I agree
-> > that it can be customized for the SoC vendors. But I dont understand
-> > why it can't be used without SoC customizations for a default
->
->
-> Ask hardware team what is necessary to implement given IP in an SoC. SoC
-> architectures are not that simple, that you copy&paste some piece of
-> VHDL code and it plugs into existing wiring. You need that wiring, you
-> need that SoC specific bits in your design.
+Thanks,
 
-PK: I discussed this with my hardware team and their response is as below.
+---8<---
+The hmac export state needs to be one block-size bigger to account
+for the ipad.
 
-"Besides the bus interface (base address) and interrupt described in
-the new binding there are standard power and clock and possibly a
-reset interface. However, these have no influence on the driver, so
-are not included in the dts to keep things simple.
-The hardware IP can be configured to run synchronously to the bus or
-have a clock crossing, but as there is no notion of time/frequency in
-the driver that's not relevant to the driver.
-Same for power signals, there is no additional power management in the IP b=
-lock.
-If you prefer power/clock/reset to be added, can you please point us
-to an example which you consider best practice that we can follow?"
+Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Fixes: 08811169ac01 ("crypto: s390/hmac - Use API partial block handling")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->
-> > configuration. All the IP customizations are handled by the driver.
->
-> I don't talk about driver. We talk about hardware and bindings.
->
-> > Say, in the case of SPAcc, all the IP customizations are accessible as
-> > part of the "Version" and "Version Extension-1, 2, 3" registers. So
-> > the driver uses these IP customizations and nothing gets hardcoded. In
-> > other cases, those customizations will come as vendor specific DT
-> > properties.
->
-> Do you understand the problem discussed here? There is a long standing
-> policy, based on actual real hardware and real cases, that you cannot
-> have generic compatibles for custom IP blocks. That's it.
->
-PK: Agreed
-
-> >
-> > As an IP, which can be memory mapped and with interrupt support, it
-> > works perfectly with a default test configuration. And this is what
-> > the current driver has.
-> >
-> >> understood correctly this is soft IP in FPGA for evaluation, so no one
-> >> will be ever able to use it. Therefore this binding makes no sense to =
-me
-> >
-> > PK: No, we are not evaluating, but we have developed a driver for
-> > SPAcc, which has been tested on a FPGA.
->
-> So some sort of FPGA in some sort of setup which you claim with this
-> patch is exactly the same for every other SoC. That is the meaning of
-> your patch, to which I objected.
-PK: Agreed
-
->
-> >
-> >> in general: you do not add anything any customer could use. It is fine
-> >> to add something which you use internally only, but again describe the
-> >> hardware properly.
-> >
-> > PK: Its not an internal use case. We have tested the SPAcc driver on a
-> > FPGA, as detailed above. We dont have any custom hardware and the
-> > SPAcc IP is tested in a default configuration.
-> >
-> > Question : Could you help me understand how a semiconductor IP vendor
-> > like Synopsys, upstream Linux drivers for its IPs? In the current
->
-> We are not even talking here about drives. I do not have to provide you
-> answers for drivers.
->
-> I explained already what I expect from bindings: real hardware
-> description, so either real SoC or whatever you are having there.
-
-PK: The SPAcc, is also tested on "nsimosci", which is an ARC based
-environment. This is our real use case. We already have the ARC dts
-files upstreamed as shown below
-
-linux/arch/arc/boot/dts/skeleton.dtsi
-linux/arch/arc/boot/dts/skeleton_hs.dtsi
-linux/arch/arc/boot/dts/nscimosci.dts
-linux/arch/arc/boot/dts/nscimosci_hs.dts
-
-I can add a SPAcc device node to
-linux/arch/arc/boot/dts/nscimosci_hs_spacc.dts and accordingly create
-the dts yaml bindings. With this change my SPAcc yaml binding is going
-to look like the below snippet.
-
--------------------------------------------------------------
-properties:
-  compatible:
-      - items:
-          - const: snps,skeleton_hs-spacc
-          - const: snps,dwc-spacc
-
-  reg:
-    maxItems: 1
-
-  interrupts:
-    maxItems: 1
-
-  clocks:
-    maxItems: 1
-
-  ...
-  ...
-
-required:
-  - compatible
-  - reg
-  - interrupts
-
-additionalProperties: false
-
-examples:
-  - |
-    #include <dt-bindings/interrupt-controller/arc-intc.h>
-
-    crypto@40000000 {
-        compatible =3D "snps,skeleton_hs-spacc", "snps,dwc-spacc";
-        reg =3D <0x40000000 0x3FFFF>;
-        interrupt-parent =3D <&core_intc>;
-        interrupts =3D <28>;
-        clocks =3D <&core_clk>;
-        snps,spacc-internal-counter =3D <0x20000>;
-        snps,vspacc-id =3D <0>;
-   };
-
--------------------------------------------------------------
-
->
->
-> > scheme of things, if the SoC bindings are mandatory then we dont have
-> > them at this stage. Those would have to come from the 3rd party SoC
-> > vendors.
-> >
-> > As a work around, I could add SPAcc bindings to Synopsys's "nsimosci".
-> > Please let me know.
-> > ARC - linux/arch/arc/boot/dts/nsimosci.dts
-> >
-> >>
-> >> 2. I wrote you entire guide what is wrong with your Cc addresses and
-> >> this was fully ignored. Neither responded to, nor resolved.
-> >
-> > PK: I have fixed that.
->
->
-> How? How can you fix a sent v2 with the same issues I pointed out before?
-PK: My bad, I will take care of that in V3.
->
->
-> Best regards,
-> Krzysztof
+diff --git a/arch/s390/crypto/hmac_s390.c b/arch/s390/crypto/hmac_s390.c
+index 93a1098d9f8d..58444da9b004 100644
+--- a/arch/s390/crypto/hmac_s390.c
++++ b/arch/s390/crypto/hmac_s390.c
+@@ -290,6 +290,7 @@ static int s390_hmac_export(struct shash_desc *desc, void *out)
+ 	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
+ 	unsigned int bs = crypto_shash_blocksize(desc->tfm);
+ 	unsigned int ds = bs / 2;
++	u64 lo = ctx->buflen[0];
+ 	union {
+ 		u8 *u8;
+ 		u64 *u64;
+@@ -301,9 +302,10 @@ static int s390_hmac_export(struct shash_desc *desc, void *out)
+ 	else
+ 		memcpy(p.u8, ctx->param, ds);
+ 	p.u8 += ds;
+-	put_unaligned(ctx->buflen[0], p.u64++);
++	lo += bs;
++	put_unaligned(lo, p.u64++);
+ 	if (ds == SHA512_DIGEST_SIZE)
+-		put_unaligned(ctx->buflen[1], p.u64);
++		put_unaligned(ctx->buflen[1] + (lo < bs), p.u64);
+ 	return err;
+ }
+ 
+@@ -316,14 +318,16 @@ static int s390_hmac_import(struct shash_desc *desc, const void *in)
+ 		const u8 *u8;
+ 		const u64 *u64;
+ 	} p = { .u8 = in };
++	u64 lo;
+ 	int err;
+ 
+ 	err = s390_hmac_sha2_init(desc);
+ 	memcpy(ctx->param, p.u8, ds);
+ 	p.u8 += ds;
+-	ctx->buflen[0] = get_unaligned(p.u64++);
++	lo = get_unaligned(p.u64++);
++	ctx->buflen[0] = lo - bs;
+ 	if (ds == SHA512_DIGEST_SIZE)
+-		ctx->buflen[1] = get_unaligned(p.u64);
++		ctx->buflen[1] = get_unaligned(p.u64) - (lo < bs);
+ 	if (ctx->buflen[0] | ctx->buflen[1])
+ 		ctx->gr0.ikp = 1;
+ 	return err;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
