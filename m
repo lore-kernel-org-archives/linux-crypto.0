@@ -1,129 +1,311 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96376198E9B
-	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 08:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354911A00FA
+	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 08:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747987349; cv=none; b=DFRbWqzsQrX/EPCK+zmaUYgQDPKmAWtKVKd/VOatnQw5I0jMxJLfwCDOHiPyqYXcPYDswPuWK21AtaJLuKfa6cThJ7vzKg/y8oR3CYhnRbprqW+3ij+1mOi5sgLsj2AcOPY8bHJErebwfAOqQUujeLL3y0kPWXyx4H4sxiGEOYM=
+	t=1747988711; cv=none; b=WXcllMLpJ7a1IgBDCQfeG+VyeT7fxIzxUWGVXpkoZU1YG42SaOnF6fJf/7qy1IBmh5aOBPZ71yNbiCTIKMkickq+zh2K92dLSXMXhX5Dz/8rjJ+GP4krwhS1DlHJrH0b3SA5Zw2UUsvZF6ftoekHBSeHhvXxZByTJ3gReeARTtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747987349; c=relaxed/simple;
-	bh=oy4e4ihx7fPvQkb6NL7keRmXqNj78wbBtBTUIGPUZ4o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ndLw60UNRyJzYhhjQ5jXkRnZgyB3Bh3cJHm6binX5dVoRqLgkrMv8ruS2mfq5snRg5z84/+XxUoCtlrVhrb7B/VcME2+Cr4y8Studll4v3IGwX0m261T0RvHenXDYW3zK+OYpRpzao1hu4/Bqboo49ueLNwgvA4iHD9AQz2CQks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bYB5VwHq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1747988711; c=relaxed/simple;
+	bh=+AB/cQQNplXspvGaT86SVBC30Q/dWPdXWy4t9hetblw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PdfoQI8DLPIL+JHfl1tZOmnWKvjc/2PTyNJzTCn6k/tbD+cO4b4TnOgOioSWm4kpGMCF//Ya0BqLUo/YKlxtEyrGkQ0mIeSWQ3LaCTy1/qqrSkaxiG9bIkEi02mV5U0u2w3rxnnHNX20aMJZ8w9guK5Yp2/ZEjBRoxEoI8Ch4oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=PX8cYalt; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bYB5VwHq"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MNW5NZ024713;
-	Fri, 23 May 2025 08:02:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=b9HNKD
-	jDWxE8w2AzofAcz/4sdbGmxsFBs20Vb3q9aXA=; b=bYB5VwHqf2cVNLausJg4g5
-	9OPejtUxIDwfc5GiQun96xRPpiX3lprguJvOCH6WyenRX+gdlOhSjGunzeAn/euU
-	+dhdoEAYH5A/pSU4EqDQ5zj7P6Nv85fu+349ETolLFPZauh25KWTbSKZFKm1jwIl
-	Nu9tJvB/PBiAjcdBiCyBMpQ/ddRx5ry6Z67lqHvw1N2eguS8q+yi/XzhxuFzeFx/
-	3JnY2++QnXS/qoDP3LuhozXL4cgQOstaUvlMV/enylM8/jFIqsp/+C5S7PF+tOqy
-	kYqdFrflR0ac3jYuEmfvgIeodTxSsKEDTXKFLNqul9YMIAUe+lWtRd01ZJoWiC7A
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46sxhweftb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 08:02:23 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54N5bqiG015497;
-	Fri, 23 May 2025 08:02:22 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46rwnnnkdh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 08:02:22 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54N82IKJ50921932
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 May 2025 08:02:18 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 76E012004D;
-	Fri, 23 May 2025 08:02:18 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 553F720040;
-	Fri, 23 May 2025 08:02:18 +0000 (GMT)
-Received: from [9.111.148.185] (unknown [9.111.148.185])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 May 2025 08:02:18 +0000 (GMT)
-Message-ID: <152288d2-a034-4594-a5cc-d46faf34ac24@linux.ibm.com>
-Date: Fri, 23 May 2025 10:02:18 +0200
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="PX8cYalt"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70de8897628so27074557b3.1
+        for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 01:25:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1747988708; x=1748593508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ozTlr85p37MBd7DohafvC1Zxs26Mw+03vrNjyfwblzs=;
+        b=PX8cYaltT+kGwg2+HIYajizv1YCRIICtTgankrsX8kWNvI00ztItqb9r6g85TpLER1
+         Ql11syU56gMvFmjgb7FTA8mP+v0iYtOWEhQfb52d8XmSty53B6uzfjyv7xp1Z+PG1ZqV
+         xWer2eElCZTyaAkBx8hkqit/fn7ji+iJmt09s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747988708; x=1748593508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ozTlr85p37MBd7DohafvC1Zxs26Mw+03vrNjyfwblzs=;
+        b=Im/ySWPMqyqRSOvXBeasBWd2UNFp3gV7T4PavMC6p7ABT/177YSIC7n/Jtzkmg+yZK
+         YWtG7s2/DbspTpr8X3v0PgiKV+lerolFJUV9yiFExAE1knCyTusNYat8i7205ASDSLOx
+         XumrJSzK5rcWFFVs5bXpanWxyASE9xg2EqSjSR/uxt9ioDgBlojUxyjQZT2OXTkDBjrj
+         nD1k5TNU7AuNcchxRSg0GvyZI93mUJBwo4y1HPKmPIlX/NVkbrletMUXAz+kMMEV+VFb
+         2uiSnuyAGpWtf1lb6sMzFwTE6z9rfAq5CDHXoepQqyOGcIlG2zv8RQlj2Fqvy8rZsTmB
+         IIRQ==
+X-Gm-Message-State: AOJu0YxNbSTpFaANUP8v3SACo60/89jsEVQ/A3m2ZX3/xxSVSXJMxtR5
+	o/PHE8NfwjMAtHO2wGbq4DXiOMNJSKkY8V9XJxCqpyLgt7t8C9Ke1xdtID2C2TvxDFHnl/wHKqh
+	4pnc3t/uSEF2XVAisgC+4ZGZO5ZprNANgS1Zirh8HNg==
+X-Gm-Gg: ASbGncuHTlAlXGoGnm/kBhe8P/bBjnrfYILHDX4PYhjfL4YxLDkBirJWeAHldK1R05t
+	GhQJGDoVxSELIl5eD32K1/ToRRDZUNTpdsytIL24oZdDKQaHEo4cqE38Y8lxXX83aoHaiBBtfLW
+	HEWdQRNTmqKbJkqjQOmAiWr0bH9pZTUVneX7t7LK5sPd2ZMr5q+sAMBw7O9AlptgYrfw==
+X-Google-Smtp-Source: AGHT+IFp1nDjBz/k+ErE8pv4fuVNERq7UVPCCdHS62z95kN4AIyxp4riBxQk85up/GM2iKNyckB1WzGH3r45EqsvaQk=
+X-Received: by 2002:a05:690c:3389:b0:6f9:a3c6:b2e4 with SMTP id
+ 00721157ae682-70cab0f8809mr382629937b3.37.1747988708071; Fri, 23 May 2025
+ 01:25:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CI: Selftest failures of s390 SHA3 and HMAC on next kernel
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>
-References: <623a7fcb-b4cb-48e6-9833-57ad2b32a252@linux.ibm.com>
- <aDAM9LKOWSKBbIUn@gondor.apana.org.au>
-Content-Language: en-US, de-DE
-From: Ingo Franzki <ifranzki@linux.ibm.com>
-In-Reply-To: <aDAM9LKOWSKBbIUn@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDA3MyBTYWx0ZWRfX8H9YAOo39tMk B1AI9yWuEHaQn++E5ApHHNUmaU8C5VkiCdO+UB3sKuQTjGQN0ntmT7u0HZwxcbswjmqUiugV3KM vc403sHCBC7krTjh/3scnLwHEXocTDtRYCMSl3vAvB6KcxGGrjeImtWNdJ58C9KUx1OWOTa/jmc
- 93SeVTpLfq/wQqQIKehUqGvmZqHnTVrh5sWKbXfYRj+Idh8RL29nBCBpO6Xe+2hCfYMinwKza/G qJHAT34AUwZTIMwk6wsAaSsvJUqsIkSTuSjlCJCT2tvErb+NxcCJXG+2Ea/FUc9S5ODRX5WJIQC 06BJZN+f9AGplXTXQaUemmRl7UyfJZpuqbgWzr3gbHeeJRXY9KTPEWxZFfAFicnTD4gbRDf+5+8
- /LxDMb82bBI4BxaX48AqbHkl+RWgaYirKT2IbBmtliAxhZc86VB+PGr65oKd0qZWgc3BSFbF
-X-Proofpoint-GUID: UemPp6lOeox6sbCnl5Hiofw9KRGIRfLT
-X-Authority-Analysis: v=2.4 cv=O685vA9W c=1 sm=1 tr=0 ts=68302b8f cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=pENMx6WK00e7tXqaNCkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: UemPp6lOeox6sbCnl5Hiofw9KRGIRfLT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-23_02,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=982
- spamscore=0 mlxscore=0 phishscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 clxscore=1015 malwarescore=0
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505230073
+References: <20250505125538.2991314-1-pavitrakumarm@vayavyalabs.com>
+ <20250505125538.2991314-2-pavitrakumarm@vayavyalabs.com> <5b6c66e8-3fac-408f-980c-f261ccd3fefd@kernel.org>
+ <bcf5c5de-e649-491b-9849-21eeaae0b64a@kernel.org> <CALxtO0=jB9L4WvaZNjP5qVB1tc9UfhjC5-u7e1dhveaQF=AOEQ@mail.gmail.com>
+ <19b1fca7-e1b1-4190-9bcb-7ce36fabd02e@kernel.org> <CALxtO0m_iVo4nnfYg5PzL5K0HgG-U2yNVeS3S0hfdXnObbJDJA@mail.gmail.com>
+ <1f4d4292-fbf9-42db-b4e0-6f9326b937fc@kernel.org>
+In-Reply-To: <1f4d4292-fbf9-42db-b4e0-6f9326b937fc@kernel.org>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Fri, 23 May 2025 13:54:57 +0530
+X-Gm-Features: AX0GCFsQo5QAjdkSEaBPBTuoG0Peuu-cIMqDKQYLO4mkJNmy8gGJ-Qbxc3qqJuQ
+Message-ID: <CALxtO0kYMXjN5Atp_AZdPp1KuRRJrWh=jThwLCjO3Q1qmFR2wg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Document support for SPAcc
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	herbert@gondor.apana.org.au, robh@kernel.org, Ruud.Derwig@synopsys.com, 
+	Conor Dooley <conor@kernel.org>, davem@davemloft.net, linux-kernel@vger.kernel.org, 
+	adityak@vayavyalabs.com, manjunath.hadli@vayavyalabs.com, 
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 23.05.2025 07:51, Herbert Xu wrote:
-> On Thu, May 22, 2025 at 04:13:59PM +0200, Ingo Franzki wrote:
->> Hi Herbert,
->>
->> in tonight's CI run the self-tests of the s390x kernel ciphers for SHA-3 and HMAC (with SHA-2) started to fail on the next kernel.
->> This must be something the came into the next kernel just recently (yesterday). It did not fail before tonight.
->>
->> Affected modules: sha3_512_s390, sha3_256_s390, and hmac_s390.
->> Not affected are: sha512_s390 and sha1_s390. 
->> sha256/sha224 no longer exist as module, probably due to the move to be a library now. 
->> All SHA-2 digest self-tests pass, but strangely, the HMAC with SHA-2 self-tests fail....
-> 
-> It's probably the export/import format tests.  Please try reverting
-> 
-> 	18c438b228558e05ede7dccf947a6547516fc0c7
-> 
-> and see if the problem goes away.  If it does then I'll revert that
-> for now and figure out why the s390 export format is still different.
+Hi Krzysztof,
+  My comments are embedded below. Appreciate your inputs.
 
-Yes, indeed, reverting this commit makes the problem to go away. 
+Warm regards,
+PK
 
-> 
-> Thanks,
+On Sun, May 18, 2025 at 7:00=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On 13/05/2025 08:30, Pavitrakumar Managutte wrote:
+> >>>>>
+> >>>>> I do not see any improvements. It seems you ignored all comments, n=
+ot
+> >>>>> single one was responded to or addressed.
+> >>>
+> >>> PK: Addressed all the below
+> >>>
+> >>> 1. SoC Bindings: We dont have any SoC bindings since its tested on th=
+e
+> >>> Zynq platform (on FPGA). So I have retained just the Synopsys SPAcc
+> >>> device here. Also added a detailed description for the same, which
+> >>> describes how we have tested the SPAcc peripheral on Zynq. This was
+> >>> based on your inputs to describe the existing hardware.
+> >>
+> >> 1. I asked to use SoC specific compatibles and after such explanation
+> >> that you use it in some different, hardware configuration, I asked to
+> >> use that.
+> >>
+> >> Reflect whatever your hardware is called in the compatible.
+> >
+> > PK: Some context from my side which might clear up things
+> > 1. We have developed the SPAcc Crypto Linux driver for the Synopsys SPA=
+cc IP.
+> > 2. Yes, this is technically a soft IP which we test on FPGA (Zynq
+> > Ultrascale Boards).
+> > 3. We are NOT evaluating SPAcc IP and thus its not a custom use case
+> > or a custom hardware.
+> > 4. Also SPAcc IP is NOT part of any SoC yet, but it may be in future.
+> >
+> > Synopsys Semiconductor IP Business:
+> > Synopsys develops Semiconductor IPs (aka DesignWare IPs) and provides
+> > Linux device drivers to the SoC Vendors. We, as partners of Synopsys,
+> > develop Linux device drivers for the IP, in this case SPAcc. So as of
+> > now SPAcc is just a semiconductor IP which is not part of any SoC. A
+> > 3rd party SoC vendor would take this and integrate this as part of
+> > their upcoming SoC.
+> >
+> > SPAcc Semiconductor IP details:
+> > https://www.synopsys.com/designware-ip/security-ip/security-protocol-ac=
+celerators.html
+> >
+> > Synopsys DesignWare IPs
+> > 1. DWC MMC Host controller drivers : drivers/mmc/host/dw_mmc.c
+> > 2. DWC HSOTG Driver : drivers/usb/dwc2, drivers/usb/dwc3
+> > 3. DWC Ethernet driver : drivers/net/ethernet/synopsys
+> > 4. DWC DMA driver : drivers/dma/dw/
+> >
+> > Intent of upstreaming IP drivers by Synopsys
+> > 1. As a Semiconductor IP designer, Synopsys provides Linux device
+> > drivers with their IPs to the customers.
+> > 2. These Linux drivers handle all the configurations in those respectiv=
+e IPs.
+> > 3. At this stage of driver development, the focus is on the Semiconduct=
+or IP
+> > 4. Yes, the IP can be configured differently for different SoCs and
+> > the driver has to take care of that.
+> > 5. The driver might need some enhancements based on the SoC
+> > configurations, which could be done later.
+> > 6. Its a good approach to upstream IP drivers, so the vendors could
+> > use/enhance the same open sourced drivers.
+>
+>
+> Yeah, I am familiar with this...
+>
+> >
+> >>
+> >> I claim this cannot be used in a SoC without customization. If I
+> >
+> > PK: Synopsys SPAcc is a highly configurable semiconductor IP. I agree
+> > that it can be customized for the SoC vendors. But I dont understand
+> > why it can't be used without SoC customizations for a default
+>
+>
+> Ask hardware team what is necessary to implement given IP in an SoC. SoC
+> architectures are not that simple, that you copy&paste some piece of
+> VHDL code and it plugs into existing wiring. You need that wiring, you
+> need that SoC specific bits in your design.
 
+PK: I discussed this with my hardware team and their response is as below.
 
--- 
-Ingo Franzki
-eMail: ifranzki@linux.ibm.com  
-Tel: ++49 (0)7031-16-4648
-Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
+"Besides the bus interface (base address) and interrupt described in
+the new binding there are standard power and clock and possibly a
+reset interface. However, these have no influence on the driver, so
+are not included in the dts to keep things simple.
+The hardware IP can be configured to run synchronously to the bus or
+have a clock crossing, but as there is no notion of time/frequency in
+the driver that's not relevant to the driver.
+Same for power signals, there is no additional power management in the IP b=
+lock.
+If you prefer power/clock/reset to be added, can you please point us
+to an example which you consider best practice that we can follow?"
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
+>
+> > configuration. All the IP customizations are handled by the driver.
+>
+> I don't talk about driver. We talk about hardware and bindings.
+>
+> > Say, in the case of SPAcc, all the IP customizations are accessible as
+> > part of the "Version" and "Version Extension-1, 2, 3" registers. So
+> > the driver uses these IP customizations and nothing gets hardcoded. In
+> > other cases, those customizations will come as vendor specific DT
+> > properties.
+>
+> Do you understand the problem discussed here? There is a long standing
+> policy, based on actual real hardware and real cases, that you cannot
+> have generic compatibles for custom IP blocks. That's it.
+>
+PK: Agreed
+
+> >
+> > As an IP, which can be memory mapped and with interrupt support, it
+> > works perfectly with a default test configuration. And this is what
+> > the current driver has.
+> >
+> >> understood correctly this is soft IP in FPGA for evaluation, so no one
+> >> will be ever able to use it. Therefore this binding makes no sense to =
+me
+> >
+> > PK: No, we are not evaluating, but we have developed a driver for
+> > SPAcc, which has been tested on a FPGA.
+>
+> So some sort of FPGA in some sort of setup which you claim with this
+> patch is exactly the same for every other SoC. That is the meaning of
+> your patch, to which I objected.
+PK: Agreed
+
+>
+> >
+> >> in general: you do not add anything any customer could use. It is fine
+> >> to add something which you use internally only, but again describe the
+> >> hardware properly.
+> >
+> > PK: Its not an internal use case. We have tested the SPAcc driver on a
+> > FPGA, as detailed above. We dont have any custom hardware and the
+> > SPAcc IP is tested in a default configuration.
+> >
+> > Question : Could you help me understand how a semiconductor IP vendor
+> > like Synopsys, upstream Linux drivers for its IPs? In the current
+>
+> We are not even talking here about drives. I do not have to provide you
+> answers for drivers.
+>
+> I explained already what I expect from bindings: real hardware
+> description, so either real SoC or whatever you are having there.
+
+PK: The SPAcc, is also tested on "nsimosci", which is an ARC based
+environment. This is our real use case. We already have the ARC dts
+files upstreamed as shown below
+
+linux/arch/arc/boot/dts/skeleton.dtsi
+linux/arch/arc/boot/dts/skeleton_hs.dtsi
+linux/arch/arc/boot/dts/nscimosci.dts
+linux/arch/arc/boot/dts/nscimosci_hs.dts
+
+I can add a SPAcc device node to
+linux/arch/arc/boot/dts/nscimosci_hs_spacc.dts and accordingly create
+the dts yaml bindings. With this change my SPAcc yaml binding is going
+to look like the below snippet.
+
+-------------------------------------------------------------
+properties:
+  compatible:
+      - items:
+          - const: snps,skeleton_hs-spacc
+          - const: snps,dwc-spacc
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    maxItems: 1
+
+  clocks:
+    maxItems: 1
+
+  ...
+  ...
+
+required:
+  - compatible
+  - reg
+  - interrupts
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/arc-intc.h>
+
+    crypto@40000000 {
+        compatible =3D "snps,skeleton_hs-spacc", "snps,dwc-spacc";
+        reg =3D <0x40000000 0x3FFFF>;
+        interrupt-parent =3D <&core_intc>;
+        interrupts =3D <28>;
+        clocks =3D <&core_clk>;
+        snps,spacc-internal-counter =3D <0x20000>;
+        snps,vspacc-id =3D <0>;
+   };
+
+-------------------------------------------------------------
+
+>
+>
+> > scheme of things, if the SoC bindings are mandatory then we dont have
+> > them at this stage. Those would have to come from the 3rd party SoC
+> > vendors.
+> >
+> > As a work around, I could add SPAcc bindings to Synopsys's "nsimosci".
+> > Please let me know.
+> > ARC - linux/arch/arc/boot/dts/nsimosci.dts
+> >
+> >>
+> >> 2. I wrote you entire guide what is wrong with your Cc addresses and
+> >> this was fully ignored. Neither responded to, nor resolved.
+> >
+> > PK: I have fixed that.
+>
+>
+> How? How can you fix a sent v2 with the same issues I pointed out before?
+PK: My bad, I will take care of that in V3.
+>
+>
+> Best regards,
+> Krzysztof
