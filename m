@@ -1,46 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B232F3E
-	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 12:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3562C224243
+	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 12:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748002001; cv=none; b=r7rGUqXZerTv4KhYuOw6Tp9C81wpI6GZOrzdmpLjxE9RfJ1yc34epR9y/y4Jpdb03aq6+u/QVFm7OmvPOzREO2s4uEeA20nw6KAnYQTxJcZ/fNG2CGDJ2ocdOnYQSp3JndwcWKY1I/aO57q2QBlMgJFdaDIzB/i4fWohXttFnlU=
+	t=1748003343; cv=none; b=PEXlMO5fx2NjTkaeqznTO0mu2g6xgGvEpaMAnQ0C83AyANAqB6N3MwBjpRcFIeDQHiMLrC4iXmGk1jP16Ql3BCSYB6H0GCOeAu6kTt4xMRY1YMB4LJHkaksgNyn64U9ee+iiUNW7POdy1jmBjtzRJ6NaJTE9LC98oSTYtVErJ5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748002001; c=relaxed/simple;
-	bh=r+2WMk2MFopVLu1knj7fJUt/u4MSdXUj4ol0XckOpKg=;
+	s=arc-20240116; t=1748003343; c=relaxed/simple;
+	bh=wbBhbvG1yBEFHJ0y7JsiF5o5h7o2LN6sGyGrqClTAek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ANpK5ZROJFr3lN/e/ESTt+7Iddb5sQ8wQqYaI9TtuBvsLDAut6UXi7XhlPluzFo1f0EJ+DQZr80F1nbg4B44r1NJaGppGeDZGlzr7e83YsTJ+R8iX0Eile8acKRocOIIVz5rYFcPSoTOHlwvaP9a9e3hfsBsgZBST3/IsQf/+0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GUQuRJss; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=aPby1ddH76J1hBIAxVOVH0SfFtnG8JlbwrxhjRhOEqs1ZJFxHQW/TeS+mYzDUKkHU4mzNUyUNh9G0xIM4087kV3BTO0xepVrvafNrITLMYzT+OwKzp0E0A7KQYl0I0/Gya/6yDiulrFXM8IGuE1X5S2KVqC7KLnAJptS23VUCgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PJXzGr/H; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GUQuRJss"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PJXzGr/H"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=hdBhAst6NQJdzBWnMYeLf5wpSXCnHUyZDq04FfSwfnQ=; b=GUQuRJssW1eszVCUz/4KBtgKlZ
-	VxM5s4COcDFC0zP8QGetryVo7ff10Rax1iybODJaGsDODEb4K8gXcz+8Icyqqh7EMfagxivC6lfOY
-	V2xmZ9EP2hHUc0wg/7UTIf8oVxK5QH4PdQ0HmSpqSMxS5NTrvRQu8DxlMFFB5JUGTcu2+/XUNjORW
-	EWNL8vXZTzluxUWg8WwfVNG4KRTsekGLdD7oCz9iRY3nzb0h0d0fxfHmXB5r8gt6RaAwke/gQBF5q
-	TPSVlJACpvpF7huECTsOHcWl24+L9qUf5GiddhzKGPTWzHtMYV9R59m1TakR8hbtb4a4Xt4ny9CfF
-	Ifsyn10g==;
+	bh=DknMK1FGjP65HNINgcldDaLMnrNdaik3skAiPi7daSE=; b=PJXzGr/Hn9tbPdygT9hh7tmfI9
+	VuzmsQE6KnRYlQtupnR9ciNxG1tzs2WSyOYPnDLyle6SRAiLvktiUJuamRvFgMkIOM0/gLFJaIwl0
+	Ayqnj2veznRFrNRJwiJIiVnwz5QvVdwK2FIGYRb0giCfXKV1WTvqUBg7LDUeyWCJLwTRsWrL/e7gA
+	H/42qTGqTldnZkQrO6cpuyKX4YgEHhnLC/vmp5P/UsHpOPSFGS0BlKieBGw+Ds3Jw0oOLu/diwoCn
+	l5PidzBIbngkOlEYpKuP2wDeRfhpxg5O6SmByoc/jls0KtAnPtsiA39jvIK1QgvFFIUVJWqxEUlmL
+	Nud2HYYQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uIRAZ-008LP6-0S;
-	Fri, 23 May 2025 20:06:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 May 2025 20:06:35 +0800
-Date: Fri, 23 May 2025 20:06:35 +0800
+	id 1uIRWC-008LdY-0r;
+	Fri, 23 May 2025 20:28:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 May 2025 20:28:56 +0800
+Date: Fri, 23 May 2025 20:28:56 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Ingo Franzki <ifranzki@linux.ibm.com>
 Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Holger Dengler <dengler@linux.ibm.com>
-Subject: Re: CI: Selftest failures of s390 SHA3 and HMAC on next kernel
-Message-ID: <aDBky-9a56tyJTuJ@gondor.apana.org.au>
+Subject: [PATCH] crypto: s390/sha3 - Use cpu byte-order when exporting
+Message-ID: <aDBqCEdH0U-cNIHA@gondor.apana.org.au>
 References: <623a7fcb-b4cb-48e6-9833-57ad2b32a252@linux.ibm.com>
  <aDBe3o77jZTFWY9B@gondor.apana.org.au>
  <38637840-a626-49a9-a548-c1a141917775@linux.ibm.com>
@@ -56,23 +56,125 @@ In-Reply-To: <38637840-a626-49a9-a548-c1a141917775@linux.ibm.com>
 
 On Fri, May 23, 2025 at 02:03:23PM +0200, Ingo Franzki wrote:
 >
-> Here is the output from modprobing sha3_256_s390:
-> I guess the output is somehow interleaved, since both sha3-224 and sha3-256 are tested concurrently.....
 > I hope you can sort it out what belongs to what.
 
-Nice :)
+Please let me know if this patch works or not:
 
-> May 23 13:50:09 b8345006.lnxne.boe kernel: alg: ahash: sha3 export state different from generic: sha3-256-s390
-> May 23 13:50:09 b8345006.lnxne.boe kernel: alg: ahash: sha3 export state different from generic: sha3-224-s390
-> May 23 13:50:09 b8345006.lnxne.boe kernel: 00000000: 82 b2 3c 2d 20 76 43 a5 08 dd 0f 8e 75 dc ac a1
+---8<---
+The sha3 partial hash on s390 is in little-endian just like the
+final hash.  However the generic implementation produces native
+or big-endian partial hashes.
 
-...
+Make s390 sha3 conform to that by doing the byte-swap on export
+and import.
 
-> May 23 13:50:09 b8345006.lnxne.boe kernel: 00000000: a5 43 76 20 2d 3c b2 82 a1 ac dc 75 8e 0f dd 08
+Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Fixes: 6f90ba706551 ("crypto: s390/sha3 - Use API partial block handling")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-So it is the byte-order.  That should be easy to fix.
-
-Thanks,
+diff --git a/arch/s390/crypto/sha.h b/arch/s390/crypto/sha.h
+index d757ccbce2b4..cadb4b13622a 100644
+--- a/arch/s390/crypto/sha.h
++++ b/arch/s390/crypto/sha.h
+@@ -27,6 +27,9 @@ struct s390_sha_ctx {
+ 			u64 state[SHA512_DIGEST_SIZE / sizeof(u64)];
+ 			u64 count_hi;
+ 		} sha512;
++		struct {
++			__le64 state[SHA3_STATE_SIZE / sizeof(u64)];
++		} sha3;
+ 	};
+ 	int func;		/* KIMD function to use */
+ 	bool first_message_part;
+diff --git a/arch/s390/crypto/sha3_256_s390.c b/arch/s390/crypto/sha3_256_s390.c
+index 4a7731ac6bcd..03bb4f4bab70 100644
+--- a/arch/s390/crypto/sha3_256_s390.c
++++ b/arch/s390/crypto/sha3_256_s390.c
+@@ -35,23 +35,33 @@ static int sha3_256_init(struct shash_desc *desc)
+ static int sha3_256_export(struct shash_desc *desc, void *out)
+ {
+ 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+-	struct sha3_state *octx = out;
++	union {
++		u8 *u8;
++		u64 *u64;
++	} p = { .u8 = out };
++	int i;
+ 
+ 	if (sctx->first_message_part) {
+-		memset(sctx->state, 0, sizeof(sctx->state));
+-		sctx->first_message_part = 0;
++		memset(out, 0, SHA3_STATE_SIZE);
++		return 0;
+ 	}
+-	memcpy(octx->st, sctx->state, sizeof(octx->st));
++	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
++		put_unaligned(le64_to_cpu(sctx->sha3.state[i]), p.u64++);
+ 	return 0;
+ }
+ 
+ static int sha3_256_import(struct shash_desc *desc, const void *in)
+ {
+ 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+-	const struct sha3_state *ictx = in;
++	union {
++		const u8 *u8;
++		const u64 *u64;
++	} p = { .u8 = in };
++	int i;
+ 
++	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
++		sctx->sha3.state[i] = cpu_to_le64(get_unaligned(p.u64++));
+ 	sctx->count = 0;
+-	memcpy(sctx->state, ictx->st, sizeof(ictx->st));
+ 	sctx->first_message_part = 0;
+ 	sctx->func = CPACF_KIMD_SHA3_256;
+ 
+diff --git a/arch/s390/crypto/sha3_512_s390.c b/arch/s390/crypto/sha3_512_s390.c
+index 018f02fff444..a5c9690eecb1 100644
+--- a/arch/s390/crypto/sha3_512_s390.c
++++ b/arch/s390/crypto/sha3_512_s390.c
+@@ -34,24 +34,33 @@ static int sha3_512_init(struct shash_desc *desc)
+ static int sha3_512_export(struct shash_desc *desc, void *out)
+ {
+ 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+-	struct sha3_state *octx = out;
+-
++	union {
++		u8 *u8;
++		u64 *u64;
++	} p = { .u8 = out };
++	int i;
+ 
+ 	if (sctx->first_message_part) {
+-		memset(sctx->state, 0, sizeof(sctx->state));
+-		sctx->first_message_part = 0;
++		memset(out, 0, SHA3_STATE_SIZE);
++		return 0;
+ 	}
+-	memcpy(octx->st, sctx->state, sizeof(octx->st));
++	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
++		put_unaligned(le64_to_cpu(sctx->sha3.state[i]), p.u64++);
+ 	return 0;
+ }
+ 
+ static int sha3_512_import(struct shash_desc *desc, const void *in)
+ {
+ 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+-	const struct sha3_state *ictx = in;
++	union {
++		const u8 *u8;
++		const u64 *u64;
++	} p = { .u8 = in };
++	int i;
+ 
++	for (i = 0; i < SHA3_STATE_SIZE / 8; i++)
++		sctx->sha3.state[i] = cpu_to_le64(get_unaligned(p.u64++));
+ 	sctx->count = 0;
+-	memcpy(sctx->state, ictx->st, sizeof(ictx->st));
+ 	sctx->first_message_part = 0;
+ 	sctx->func = CPACF_KIMD_SHA3_512;
+ 
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
