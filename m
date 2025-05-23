@@ -1,49 +1,54 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB53183CC3
-	for <linux-crypto@vger.kernel.org>; Fri, 23 May 2025 11:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6211322DA14;
+	Fri, 23 May 2025 11:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747999482; cv=none; b=CV84HeuCK5nKmy4g1XgqPU3MclZ2JJi6DevO3013aCWOVlPud7MnMaMf/aqbdlQtXoXG1SjqJ2S5ry2AqMAUfjCxne1JtcDew6Gz8hej7P2ZXtz5Chb9nvK7C9W8CDMlqP1f5y8IYqsXb3OtuTSuvBS2D18M/zQ1OsfaeS4Kaig=
+	t=1747999667; cv=none; b=iaQmmRUGyLtcd+/rmgXo1bnaAq7tNSGTXXUEMxrV1QLrIsvQaq/MZG+qnmNOkWHHrOIn7v7Wmr0nUmejvqVpS2ewzJiNws1bNcvz8X+RWRAKy0tLFT3cJIDmKwJ/EVdZoRq/uCP2IAsT+alVLCxUest9lCf6eHCAdVvHL41UrAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747999482; c=relaxed/simple;
-	bh=9mMH0+qS2+FRf4v4tKTwA5fM8bgg5PmVeeqvziw4ioE=;
+	s=arc-20240116; t=1747999667; c=relaxed/simple;
+	bh=5a6zXSJpthJyYT44WU0aQWWYfu96MpiKVHej83rcEj4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=inZ1GWt01fCvKTEIHW6faeKq3GhCAPTXlazGAoFmroai88x19NLhHVvDBIoiIdEgqTnvr8X/Dx/Ay5u4xgBohpspNK0IuvrCWHuRGPebDe9/Uc3P7TMiE92JwY1mPwIont/0yyX2xdh3b+oQ22h88yVKVkZp5Ei5HtvHrmGjhTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EfF/iauz; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=YixtR2iCmNJyezxdklBx2vbL3EqfdEUdvGcgxqtAvR3TLfH62X9F+AKxjcik8qausMH2ZD8xefOu8iAhW6/TXxownSISsjaInYXVrC7DuWtGNLEwD521fZv0m6Qlsfl+s/GfILxAvQ+TUqFUHJosfZuzTtx8B4KQ67NLbuq9ogY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=UZWt0IPU; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EfF/iauz"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="UZWt0IPU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=qHzX0h8MOD5qxbKmfmtqC6qPyNtfJAkoA9NN73r0YCI=; b=EfF/iauzVRYNZ43foaEt54Lc/K
-	HYKfcwnjqRLwlvd9+r+VZprAEashxfTRw4UQvMC1pR8d7ZOOP/6/ncX/b0bFYFDCv7jqzTGCcodoT
-	VI6K644E3j9Lh4UajT2z6MzI/rwsLRF1Nfso/LXgnnCxmB2H17yvcfiG7x6WBmVYUDDkBGgR8+CCb
-	ss+vicm/usP5UbK0hR6lq889ze8FtKrkpYlMHY+f2jbyMUmkKJGiWwOSgncPGeTdEW5ewDLZTf0d0
-	6+jE/TEYlK6cYKRb5W3tz0GLgtYRxRDG+IUx00iRaGviZ8YyDiEuzRKvWCSLqYZ0lCdq69Oghdo1e
-	bW9WQGdg==;
+	bh=/Ee1Be1+UNySSvEO6FEZOcPUAesZ+CIZK6qOt0mZxSg=; b=UZWt0IPUBXVoHCrxMHFQN2zzox
+	wYa2xM3VZodNjHqc4mcduwnV8ZP7Iy7EZQABbJ1vs8DMOhB9fU6FIGbuQlEEEd/uvL0cCC+tw2TfJ
+	RtsnYSTvuUaKHgU0qJoq10Hz/lQLXKZcyfCgukoaBQsa/aPNMD+WOTGFbnP5U2v378S1yOmsKEXb2
+	pMjziZCq90bKXAonm6EEmdcS3ndbsblC8xqhjYKGdMPx+8a0di++DlcPInaPB20sgnK0ooOS+yba0
+	vzx3+rZt80CusGJWcC4PF1Hls534aQYYmgoojuJCT5ZaclW2tijg3mzYi2fvkxlU5FzDiuhX8rw6D
+	LyUNPXwQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uIQVu-008L2I-39;
-	Fri, 23 May 2025 19:24:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 May 2025 19:24:34 +0800
-Date: Fri, 23 May 2025 19:24:34 +0800
+	id 1uIQYm-008L2w-08;
+	Fri, 23 May 2025 19:27:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 May 2025 19:27:32 +0800
+Date: Fri, 23 May 2025 19:27:32 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ingo Franzki <ifranzki@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>
-Subject: [PATCH] crypto: s390/hmac - Fix counter in export state
-Message-ID: <aDBa8tuSvw1mnnKL@gondor.apana.org.au>
-References: <623a7fcb-b4cb-48e6-9833-57ad2b32a252@linux.ibm.com>
- <aDAM9LKOWSKBbIUn@gondor.apana.org.au>
- <152288d2-a034-4594-a5cc-d46faf34ac24@linux.ibm.com>
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Cc: Arnd Bergmann <arnd@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Karthikeyan Gopal <karthikeyan.gopal@intel.com>,
+	Laurent M Coquerel <laurent.m.coquerel@intel.com>,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	George Abraham P <george.abraham.p@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: qat - add missing header inclusion
+Message-ID: <aDBbpOtpr5ATk4Rj@gondor.apana.org.au>
+References: <20250520161148.3562622-1-arnd@kernel.org>
+ <aC1c7+PQZN++5mgf@gcabiddu-mobl.ger.corp.intel.com>
+ <aC76tZFMTee1hHI3@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,69 +57,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <152288d2-a034-4594-a5cc-d46faf34ac24@linux.ibm.com>
+In-Reply-To: <aC76tZFMTee1hHI3@gcabiddu-mobl.ger.corp.intel.com>
 
-On Fri, May 23, 2025 at 10:02:18AM +0200, Ingo Franzki wrote:
+On Thu, May 22, 2025 at 11:21:41AM +0100, Cabiddu, Giovanni wrote:
+>
+> Without this header, the build of the new qat_6xxx driver fails when
+> CONFIG_PCI_IOV is not set:
 > 
-> Yes, indeed, reverting this commit makes the problem to go away. 
+>     In file included from drivers/crypto/intel/qat/qat_common/adf_gen6_shared.c:7:
+>     drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h: In function 'adf_gen4_init_pf_pfvf_ops':
+>     drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h:13:34: error: 'adf_pfvf_comms_disabled' undeclared (first use in this function)
+>        13 |         pfvf_ops->enable_comms = adf_pfvf_comms_disabled;
+>           |                                  ^~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.h | 1 +
+>  drivers/crypto/intel/qat/qat_common/adf_gen4_pfvf.h | 1 +
+>  2 files changed, 2 insertions(+)
 
-Great.  While I've got your attenttion, could you also test this
-patch to see if it makes the hmac errors go away?
-
-Thanks,
-
----8<---
-The hmac export state needs to be one block-size bigger to account
-for the ipad.
-
-Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
-Fixes: 08811169ac01 ("crypto: s390/hmac - Use API partial block handling")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/s390/crypto/hmac_s390.c b/arch/s390/crypto/hmac_s390.c
-index 93a1098d9f8d..58444da9b004 100644
---- a/arch/s390/crypto/hmac_s390.c
-+++ b/arch/s390/crypto/hmac_s390.c
-@@ -290,6 +290,7 @@ static int s390_hmac_export(struct shash_desc *desc, void *out)
- 	struct s390_kmac_sha2_ctx *ctx = shash_desc_ctx(desc);
- 	unsigned int bs = crypto_shash_blocksize(desc->tfm);
- 	unsigned int ds = bs / 2;
-+	u64 lo = ctx->buflen[0];
- 	union {
- 		u8 *u8;
- 		u64 *u64;
-@@ -301,9 +302,10 @@ static int s390_hmac_export(struct shash_desc *desc, void *out)
- 	else
- 		memcpy(p.u8, ctx->param, ds);
- 	p.u8 += ds;
--	put_unaligned(ctx->buflen[0], p.u64++);
-+	lo += bs;
-+	put_unaligned(lo, p.u64++);
- 	if (ds == SHA512_DIGEST_SIZE)
--		put_unaligned(ctx->buflen[1], p.u64);
-+		put_unaligned(ctx->buflen[1] + (lo < bs), p.u64);
- 	return err;
- }
- 
-@@ -316,14 +318,16 @@ static int s390_hmac_import(struct shash_desc *desc, const void *in)
- 		const u8 *u8;
- 		const u64 *u64;
- 	} p = { .u8 = in };
-+	u64 lo;
- 	int err;
- 
- 	err = s390_hmac_sha2_init(desc);
- 	memcpy(ctx->param, p.u8, ds);
- 	p.u8 += ds;
--	ctx->buflen[0] = get_unaligned(p.u64++);
-+	lo = get_unaligned(p.u64++);
-+	ctx->buflen[0] = lo - bs;
- 	if (ds == SHA512_DIGEST_SIZE)
--		ctx->buflen[1] = get_unaligned(p.u64);
-+		ctx->buflen[1] = get_unaligned(p.u64) - (lo < bs);
- 	if (ctx->buflen[0] | ctx->buflen[1])
- 		ctx->gr0.ikp = 1;
- 	return err;
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
