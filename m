@@ -1,60 +1,50 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC331EB3D;
-	Fri, 23 May 2025 15:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5EE17A318;
+	Fri, 23 May 2025 17:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748012600; cv=none; b=cEOX/azNj7m9R6BUF+QpQGOEO01t4ikuQe6QdV0iZeAc4DVQ2XDmYsErsN/T621Tne96dsW2a9RFJDWh0pieLFLLT7H9KY+zfcfV3loUperMtsxXKXaRsUIsdLmP0vx1iubTie5BktLIE7Et16ybivtyvNEvknE49kuhlsptNtE=
+	t=1748021391; cv=none; b=F29sIqBec67CMbiguRYLFddMlfPF6VAj8GVFN2qczclaeTYYLjyQEvHsNPlYYwUd1JflhiTE4+VRg8qsd43smBfOsiLRYKM+qbFRADFCfBTOfElBVmG1JxjUrF1yybIfjYxdud7HghkVpohrddRBqhjL3W8SDCkngrXrzjyftjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748012600; c=relaxed/simple;
-	bh=fUog4EcZ6l3VCGVXwvy9HlqR49ZQiexktQK4/+TeFAo=;
+	s=arc-20240116; t=1748021391; c=relaxed/simple;
+	bh=Hg+POBQs/xSBvuTsP18TF/uKSrgQvrTbuM9KHUW+3HE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KN5C3p0Mnp9gjk4QONMPwohLu2b3grf0iuBA2dKireQ+BLJ6p9xk7ckCNvyPRlwHoDeYT7oYOCJdi9AIOUxiJnln3fJ+BP4sCxpDYDiTMI2HOf99L2dTim4qfNDKDgcZYu1fxJ0uzpRmfd68f25o8mllbniQ+mWaOqgTDc90Lnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vk3Yhjy7; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=N2zSc/WqOb4fNvOCVFxatm2AUsOiD43MtTuxsMUuiXHe6aPFDlh5GGHZE/2Elopg52XgR8wa+O6RKtT56y2ekcmxXE+LhzrbKc6eYc+iWk3DlQRxW3qEjDGoANW0EVTCkb2apnxxl/5FzpjdQLDdpa6VfwtJ6aLuhZuw79swEA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HbZzzYVj; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vk3Yhjy7"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54NBLn5A006444;
-	Fri, 23 May 2025 15:03:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=7GCoRc
-	f0ZdqRRv5LBfq9T+RGaEeMQ2ZkeujoJkyP61w=; b=Vk3Yhjy7I2PZQQ1GecjhSn
-	4q3p8d/Mbq6itE6mnyDzLquv0+7JCqs3XTMC9hSPqrVr/d03XrjyUX9IUyvs3uOs
-	XMT/r/P03g6/8NrkFZMEbF4+0+sjdKQ7dSFgdeqBXIFTdKOPyFdokAAj9wpjpwY1
-	ueOINJupE/UXHCyczWAlPufuXqnieGQyTn+8C7AOW3zS2RvkreJlC0+peLI2+WLs
-	y9W1lg/0Uww2YL8T4aWezF3VzbZ8j2y5Q7iSKD55Viw6OQN6XBShOMpnzCsG/CCK
-	OkzL97CI0FkEfRHF6UlRR91lTLqojwV6BfggWGrXWjmHWms8l8dYKUHiEgJWfvwA
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46t9m7vt09-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 15:03:15 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54NEaroB024701;
-	Fri, 23 May 2025 15:03:15 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46rwkrf2r3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 15:03:15 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54NF3BP127460346
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 May 2025 15:03:11 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6EA5520043;
-	Fri, 23 May 2025 15:03:11 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 149F920040;
-	Fri, 23 May 2025 15:03:11 +0000 (GMT)
-Received: from [9.111.78.193] (unknown [9.111.78.193])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 May 2025 15:03:10 +0000 (GMT)
-Message-ID: <271ec75a-74c0-43a8-9878-aeb1862bb161@linux.ibm.com>
-Date: Fri, 23 May 2025 17:03:10 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HbZzzYVj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748021390; x=1779557390;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Hg+POBQs/xSBvuTsP18TF/uKSrgQvrTbuM9KHUW+3HE=;
+  b=HbZzzYVjelaF1fiyaFC40w+at4VPWFYz2pcl4VrZ8N/9JXodMko/OTnT
+   b3KtxdIzLYlXGo2B8S4Y5K1aTWP2glU21B0ngc00KKGRP5NgVzjqFQOEs
+   JtuCcdynQQr1PtJAASJxpufVkimojSidHZO2HggQUTbi0F1mnMMP+xx4y
+   +C9X0b8km12RGd3z+SIwtz1kUUfKCg/EOlx5BSQa+TK/pty1mPKqzJUDa
+   W/vHeQqPyznErMMd8AxHghfLlsxrbY2ZZBjpRFs1yug/LvkrvbIPiNbq/
+   gITGCWwQ9o3q4H92y5q19Wl+L0s3g7Wbad7RYSbiTfEhlpXAVVQ7UPnxM
+   w==;
+X-CSE-ConnectionGUID: 3D+JbRTsTDW04zolJJ5SlQ==
+X-CSE-MsgGUID: cINeZdSGS6m67R6dEiIJuA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="50009251"
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="50009251"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 10:29:49 -0700
+X-CSE-ConnectionGUID: PqTrVVY7SsqG0j33D4snSw==
+X-CSE-MsgGUID: 60OZtcGTTyOGheO66+8wWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="146204841"
+Received: from msatwood-mobl.amr.corp.intel.com (HELO [10.125.109.147]) ([10.125.109.147])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 10:29:49 -0700
+Message-ID: <f76327dd-b505-4a24-938c-5b917da9aff2@intel.com>
+Date: Fri, 23 May 2025 10:29:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,92 +52,87 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 6/6] crypto: testmgr - Enable phmac selftest
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        fcallies@linux.ibm.com, herbert@gondor.apana.org.au,
-        ifranzki@linux.ibm.com
-References: <20250522085755.40732-1-freude@linux.ibm.com>
- <20250522085755.40732-7-freude@linux.ibm.com>
+Subject: Re: [PATCH v4 5/5] KVM: SEV: Add SEV-SNP CipherTextHiding support
+To: Ashish Kalra <Ashish.Kalra@amd.com>, corbet@lwn.net, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au,
+ akpm@linux-foundation.org, paulmck@kernel.org, rostedt@goodmis.org
+Cc: x86@kernel.org, thuth@redhat.com, ardb@kernel.org,
+ gregkh@linuxfoundation.org, john.allen@amd.com, davem@davemloft.net,
+ thomas.lendacky@amd.com, michael.roth@amd.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <cover.1747696092.git.ashish.kalra@amd.com>
+ <e663930ca516aadbd71422af66e6939dd77e7b06.1747696092.git.ashish.kalra@amd.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-From: Holger Dengler <dengler@linux.ibm.com>
-In-Reply-To: <20250522085755.40732-7-freude@linux.ibm.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <e663930ca516aadbd71422af66e6939dd77e7b06.1747696092.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=SMZCVPvH c=1 sm=1 tr=0 ts=68308e34 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=w46-cfdy0MOtRbFV-QQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: VCQW80Z9Q4oBVv7-YksF4HxacW3330Sg
-X-Proofpoint-ORIG-GUID: VCQW80Z9Q4oBVv7-YksF4HxacW3330Sg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDEzNSBTYWx0ZWRfX7FmZ7KRmJpnj NbTwO+xmAqUV/wUC6N8fi8aQqCSIjhpU6WT1PHq9W7MziA1mtHzZV6MQ4IJVKvY/mjLex1N+yut lUb3DzGYCero7cFWDKE8jHvMroJ2f+CqbWe2JjTkL5Pe7YkK+MLJaipDaxyyviEVyIy1cg2Hffg
- RORJaK/QvATdGL+KLsUMpEuXS80ATJGwBjtEM4dv64tcnYYsCSC/+PEqQJiONjgXq/fkR+sIwFO 41R7s+pbmugHNyeudzkO0lMxL1oKn9Sk1UBgSCGavGTOv/I8t4SrDs+C9E88f9qAbUbb6kF1EgL izskkMemm+45wnH1Eabs1xUlcl3yZxPyirKgWfW7JKyZ7l6P4iidMWcEdNjKUvilxJ/1CbWji/7
- YZYQBSW4a71lj0ew7XNIdolKbhOOwkugz6qNcePkx7Kq3HC9QJtuzAM2xhRrI7orSbkyZL52
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-23_04,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 suspectscore=0 bulkscore=0 clxscore=1015 adultscore=0
- phishscore=0 mlxscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505230135
+Content-Transfer-Encoding: 7bit
 
-On 22/05/2025 10:57, Harald Freudenberger wrote:
-> Add phmac selftest invocation to the crypto testmanager.
-> 
-> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+On 5/19/25 17:02, Ashish Kalra wrote:
+> +	kvm-amd.ciphertext_hiding_nr_asids=
+> +			[KVM,AMD] Enables SEV-SNP CipherTextHiding feature and
+> +			controls show many ASIDs are available for SEV-SNP guests.
+> +			The ASID space is basically split into legacy SEV and
+> +			SEV-ES+. CipherTextHiding feature further splits the
+> +			SEV-ES+ ASID space into SEV-ES and SEV-SNP.
+> +			If the value is -1, then it is used as an auto flag
+> +			and splits the ASID space equally between SEV-ES and
+> +			SEV-SNP ASIDs.
 
-Acked-by: Holger Dengler <dengler@linux.ibm.com>
+This help text isn't great.
 
-> ---
->  crypto/testmgr.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index abd609d4c8ef..243dbe8f02e3 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -5385,6 +5385,36 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			.cipher = __VECS(fcrypt_pcbc_tv_template)
->  		}
->  	}, {
-> +#if IS_ENABLED(CONFIG_CRYPTO_PHMAC_S390)
-> +		.alg = "phmac(sha224)",
-> +		.test = alg_test_hash,
-> +		.fips_allowed = 1,
-> +		.suite = {
-> +			.hash = __VECS(hmac_sha224_tv_template)
-> +		}
-> +	}, {
-> +		.alg = "phmac(sha256)",
-> +		.test = alg_test_hash,
-> +		.fips_allowed = 1,
-> +		.suite = {
-> +			.hash = __VECS(hmac_sha256_tv_template)
-> +		}
-> +	}, {
-> +		.alg = "phmac(sha384)",
-> +		.test = alg_test_hash,
-> +		.fips_allowed = 1,
-> +		.suite = {
-> +			.hash = __VECS(hmac_sha384_tv_template)
-> +		}
-> +	}, {
-> +		.alg = "phmac(sha512)",
-> +		.test = alg_test_hash,
-> +		.fips_allowed = 1,
-> +		.suite = {
-> +			.hash = __VECS(hmac_sha512_tv_template)
-> +		}
-> +	}, {
-> +#endif
->  		.alg = "pkcs1(rsa,none)",
->  		.test = alg_test_sig,
->  		.suite = {
+It doesn't come out and say what the connection between CipherTextHiding
+and SEV-ES+. It's also impossible to choose a good number without
+knowing how large the ASID space is in the first place.
 
--- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
---
-IBM Systems, Linux on IBM Z Development
-dengler@linux.ibm.com
+Why use "-1"? Why not just take "auto" as a parameter?
+
+It also needs to say what CipherTextHiding is in the first place and be
+more clear about what the tradeoffs are from enabling this.
+
 
