@@ -1,39 +1,39 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B74194A44;
-	Sat, 24 May 2025 10:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5E12B93;
+	Sat, 24 May 2025 12:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748083871; cv=none; b=bnTA0I1JBmrdylvUvyXEznK4APaQ41zvveu1KIPnm4kcoQrw4GTcezpjF2VSGnTAEPKo8vw9hwhFPHd/qyOGcuFtczB5UPIev590vNoa+eQfNgh1O33r/IDg0A9+rAzrN2yirss5OMjAl9Z0gctTLWsg3gRh4sX0v2FmcF/dDXc=
+	t=1748089949; cv=none; b=u+/tqXu/tae1IhF9RzYqNmfZGxX5auT8KbSipaGMn5Sxm3uG8Cax2n8iVY8P+owURuayy7VOs5JfqoXLxrOYdN1te3btnSylTKfh3pnkMka08O3N5IWQ8ylpGdCWkc5PykHF7vhiwZQZuBWU5me4QavOcCAML4fbHXH4gWJwYIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748083871; c=relaxed/simple;
-	bh=JFu+VS20vdBLFIFDEhWFhFFvqU64yvYzJ6PwaZnXicM=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tWqK2nkIIF0SmcdLOmZ9mq2UW4dZTziNZ210186TaRVQQ/MFeYmRjANC4L+FQg19a94VclaP39HffXylA9scZVt7ZNw65qVLyPAjFyhxo9qWwk36Y7tMIsYCwd9FqLShA7I64El1UzsfGAq90Zz9gEcLOvgRJiQ2LyNaozkXYmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dkV7GpPc; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1748089949; c=relaxed/simple;
+	bh=NIpuf06wgYb3yJUOrA1R8Jz93nw3W0KBHBW1UEjoBN0=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9iwnnrglTym26u/wDLLbajTif7JQn6C5CNywWf3l1kvIgvRXamMdi0OjjS0PtWRvFUeBEeSRLM+t9S+/2b94m6W+99PFbDu/nsmbApaMAvWdR/KCM6f4UWWI8H92mFybb1+CLXmHb5SIukXDTHRuMBzLVe+eF/SQskEVdsM3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=K9LdA1To; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dkV7GpPc"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="K9LdA1To"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=lAAhk3vaszMpnBqCvw+YiMCd4Qo0RXVUB1sigsGC61U=; b=dkV7GpPcIe15ZJMkZ5AokG5mwl
-	hzoihBhR8BdFYGMdKFTeAQrSXvrPoqP3jyAeTc5jGellq5wHPiWJ3GBSOIEIRBIksetaVyGWy8jhB
-	bqRfNAcAXikWtOwuUvIo1L5WtC5wilUqPFJOdgcx5Of0Ta96fGWcWckv8mdnpHIuVHAhV9kYc/JZw
-	xRP0UcQCwMA/3WmPwX0/DrF2XLh7AquJsS4IF+hrI0+xxpzhGrmfmN5jXorbDWE/y4+ovKt4Roapi
-	pVO0CmkRlxUElvBZb2Dgh+TsBZjHa85TgbizqwDahbUOjo9Ol95i/KE1pahuY2u19JPP5SxDzTvfC
-	CQvTsfAQ==;
+	bh=J4CnmiHo1M098NXfFFPFdA7iGglzhKvYq8/yxhJhfGU=; b=K9LdA1To4jMJ0VwLCzS0r56616
+	3+wMBRZxzwTlFdBCFqf4tE70YVYXwFq5fwlUZuz4eFF1G3mHDl70Ns/vEqhP6r2XoxJC7QxB+ii1H
+	nzeRnbIu6s0eX88L6jgcf1+3ed8P8MqRYxFfWGigECPvvO05ut/w039bYShTP5vEQ7XIYYi4QNO60
+	XknevlWKUWP209+svkpmBV73rOJvYINe96ydHBMmhvoxzDyYoHs+jA1lVBFwzKxLjnTFq2ztLUiQf
+	At2T1uYsfDThoxKgJIH02UZoc4f/i5qBlsEd7sdcU1+tsJja5OjVhP4djPISl4qM1iNPKgQ0FobjE
+	i7cqYW/A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uImSy-008WmO-2a;
-	Sat, 24 May 2025 18:51:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 May 2025 18:51:00 +0800
-Date: Sat, 24 May 2025 18:51:00 +0800
+	id 1uIo32-008Xct-19;
+	Sat, 24 May 2025 20:32:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 May 2025 20:32:20 +0800
+Date: Sat, 24 May 2025 20:32:20 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
@@ -42,8 +42,9 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Dominik Grzegorzek <dominik.grzegorzek@oracle.com>,
 	Chen Ridong <chenridong@huawei.com>,
 	WangJinchao <wangjinchao@xfusion.com>
-Subject: [PATCH] padata: Fix pd UAF once and for all
-Message-ID: <aDGklJE5JKOpM7A_@gondor.apana.org.au>
+Subject: [v2 PATCH] padata: Fix pd UAF once and for all
+Message-ID: <aDG8VJqzxksIooIq@gondor.apana.org.au>
+References: <aDGklJE5JKOpM7A_@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,7 +53,12 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <aDGklJE5JKOpM7A_@gondor.apana.org.au>
 
+v2 removes the WARN_ON which is wrong as the serial worker drops the
+reference count after calling completion.
+
+---8<---
 There is a race condition/UAF in padata_reorder that goes back
 to the initial commit.  A reference count is taken at the start
 of the process in padata_do_parallel, and released at the end in
@@ -77,8 +83,8 @@ Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
  include/linux/padata.h |   3 -
- kernel/padata.c        | 135 ++++++++++++-----------------------------
- 2 files changed, 39 insertions(+), 99 deletions(-)
+ kernel/padata.c        | 132 ++++++++++++-----------------------------
+ 2 files changed, 37 insertions(+), 98 deletions(-)
 
 diff --git a/include/linux/padata.h b/include/linux/padata.h
 index 0146daf34430..b486c7359de2 100644
@@ -102,7 +108,7 @@ index 0146daf34430..b486c7359de2 100644
  
  /**
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 7eee94166357..45aeed9a0e55 100644
+index 7eee94166357..25cd3406477a 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
 @@ -261,20 +261,17 @@ EXPORT_SYMBOL(padata_do_parallel);
@@ -296,7 +302,7 @@ index 7eee94166357..45aeed9a0e55 100644
  
  	return pd;
  
-@@ -1144,16 +1092,11 @@ void padata_free_shell(struct padata_shell *ps)
+@@ -1144,12 +1092,6 @@ void padata_free_shell(struct padata_shell *ps)
  	if (!ps)
  		return;
  
@@ -309,12 +315,6 @@ index 7eee94166357..45aeed9a0e55 100644
  	mutex_lock(&ps->pinst->lock);
  	list_del(&ps->list);
  	pd = rcu_dereference_protected(ps->pd, 1);
--	padata_put_pd(pd);
-+	if (!WARN_ON(refcount_read(&pd->refcnt) != 1))
-+		padata_free_pd(pd);
- 	mutex_unlock(&ps->pinst->lock);
- 
- 	kfree(ps);
 
 base-commit: b2df03ed4052e97126267e8c13ad4204ea6ba9b6
 -- 
