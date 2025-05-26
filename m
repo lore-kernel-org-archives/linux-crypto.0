@@ -1,87 +1,74 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E121CD2C;
-	Mon, 26 May 2025 02:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034EC29A1;
+	Mon, 26 May 2025 02:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748225081; cv=none; b=MC4/ZXrCr6J3W4B/adYsrYiFhAep9hvJGdRNG4EXToR8r0Arg58zUsW1mKdYMLB/PTaFE3G6DSPz2MipD91iIE6FyUt2Vs87/EMyItyZZ4x+KJzvWCjN8fAzqBNgAdcQpc0KhzXpdeueKftHAPmAsBjR2HrwgdSNfX6adgsIYRs=
+	t=1748225818; cv=none; b=QKIfui8KGom/CLB43dbmt/ePzcSxT8mfta3l/huFozJpLZd+iFR5LuDw/r67gAcHTv2jdURRXBbIJ5ocva24csaJ3KzMvUnIfqtyY1fbl0kHctgFKEbylw99b/XGbZVnHMJSyj55aJbniu/sT2KAuRljvWNHeG6f+y2XNBtE1Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748225081; c=relaxed/simple;
-	bh=4KFRG0JoG2YFzjPvR9NRoAseUIIuSWEwDIujr8L/O8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W63tea/iY3iSKTL2ZN/yc0yhWegnlOJAs3hJrm3z7UC5oWmhoNdX4AO16dcKuddnB0Fn1oiHGMqvx9K81etrz8iNzxygpHWqtvJs1Q+NGttNgi39oDau9PVenaG4f/AaXsg6BQP2S+ZLNjEnvcWOcoQtdYjmUMqK2prNxiMMNQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowAAnPVUozDNoORIFAA--.2207S2;
-	Mon, 26 May 2025 10:04:29 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: akhilrajeev@nvidia.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	thierry.reding@gmail.com,
-	jonathanh@nvidia.com
-Cc: linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] crypto: tegra: Add crypto config in tegra_cmac_do_final()
-Date: Mon, 26 May 2025 10:04:02 +0800
-Message-ID: <20250526020403.230-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1748225818; c=relaxed/simple;
+	bh=EYFyMr0Y/R5g9sFPe7DAtm3hbt3TtZaWfEFRhVHMnJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNzz+CgivQVKSIQQNZ91qN0F9u/S4FtCvPuh/NqLB+eg11/PF2bjK+tHpX9DsXYA3lMLynRuMCGXEfCfXBPeNsQjwde873Sv91xY2xYT+o2uzFFMd8cRUlNotMm1x+BFOhhhPCwMdq9wa1fkHLCS+ThqWXfAjkyEeofFOudyKRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OwCD5HHL; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OwCD5HHL"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Ly2ecRcvwo7NqOtah69RwHLedx/XOXIh6rAJ+raLY4I=; b=OwCD5HHLaXEdok/bLtpEuqazC8
+	CbMt1DBITTDterATyV109GAPcQHeq27XRYDz29jJ8vTAVDS42O1S8LCDAu2t/VNbVWcyJtN4aUOCj
+	iz96N3E9OFbsEtbQKGl/kxge1Nns3bM1+3heNWVD79JghBjvpOd23wfI2ztvivA1TCLtpcisXkPqP
+	NC4j0XuhgmHwmIFUppIWPnYX0rwXYh5DDICLHDOQ2LpneSxf1ve3BCRSf3OsVnkqc2YR5ZO/G1b+r
+	SwYgtx13x+8GofBymcpK6LZx+vG4Xkxyx3Cib0bJqj32LjrDtHIcZvR6DGZvsEA83gmlrEM3aEMr4
+	joCqI7Zw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uJNO7-008wjr-1J;
+	Mon, 26 May 2025 10:16:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 26 May 2025 10:16:27 +0800
+Date: Mon, 26 May 2025 10:16:27 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
+	nstange@suse.de, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, chenridong@huawei.com,
+	wangweiyang2@huawei.com
+Subject: Re: [PATCH v2 3/3] padata: avoid UAF for reorder_work
+Message-ID: <aDPO-9j83gUg-eMg@gondor.apana.org.au>
+References: <20250110061639.1280907-1-chenridong@huaweicloud.com>
+ <20250110061639.1280907-4-chenridong@huaweicloud.com>
+ <aC_yoWXJcsLxfLR4@gondor.apana.org.au>
+ <faa23d11-4387-4952-bd29-034b4558668c@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAAnPVUozDNoORIFAA--.2207S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKF4rXr1kAr4kKF45Zw1UKFg_yoWkurc_ua
-	1UurnrX345Krs7uF4DurWxZr4jg343XFykKFyjqr45Ca15Xr1fXas2qF109r1UJa1DJFn3
-	W3y7ZFyUGw43ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
-	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAcOA2gzuGxdeQAAst
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <faa23d11-4387-4952-bd29-034b4558668c@huaweicloud.com>
 
-The function tegra_cmac_do_final() calls the function tegra234_aes_cfg(),
-but does not call tegra234_aes_crypto_cfg() to have a crypto
-configuration. A proper implementation can be found in
-tegra_ccm_do_ctr().
+On Mon, May 26, 2025 at 09:15:37AM +0800, Chen Ridong wrote:
+>
+> Unfortunately, I did not reproduce this bug, It was mentioned:
+> https://lore.kernel.org/all/20221019083708.27138-6-nstange@suse.de/
+> 
+> We through that the kworker is asynchronous, and this scenarios may happen.
 
-Add the tegra234_aes_crypto_cfg() for configuration.
+Right.  I think the only way this can happen is through padata_replace.
+That is indeed completely asynchronous and must be guarded against
+using the reference count.
 
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/crypto/tegra/tegra-se-aes.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
-index 9d130592cc0a..e01653985a31 100644
---- a/drivers/crypto/tegra/tegra-se-aes.c
-+++ b/drivers/crypto/tegra/tegra-se-aes.c
-@@ -1550,6 +1550,8 @@ static int tegra_cmac_do_final(struct ahash_request *req)
- 	rctx->datbuf.size = rctx->residue.size;
- 	rctx->total_len += rctx->residue.size;
- 	rctx->config = tegra234_aes_cfg(SE_ALG_CMAC, 0);
-+	rctx->crypto_config = tegra234_aes_crypto_cfg(SE_ALG_CMAC, 0) |
-+		SE_AES_KEY_INDEX(ctx->key_id);
- 
- 	/* Prepare command and submit */
- 	cmdlen = tegra_cmac_prep_cmd(ctx, rctx);
+Cheers,
 -- 
-2.42.0.windows.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
