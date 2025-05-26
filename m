@@ -1,144 +1,87 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE251B661;
-	Mon, 26 May 2025 01:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E121CD2C;
+	Mon, 26 May 2025 02:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748222146; cv=none; b=dcdeVdk+cIZjlAZnQ044a0Spks+Ae8CYcATiydwgcMPDxqXgBkMEfgJKMmemAuoGcFf5XKmyfWEGM1hLvEcF3kO7ldl+QJGKPAOjh1NK43/EBtumkouVwbq4kfOD/s0O0Abwm5XMeTe5P2VmHVvuBiQzXEgOTSdC2UQSsB3/CiU=
+	t=1748225081; cv=none; b=MC4/ZXrCr6J3W4B/adYsrYiFhAep9hvJGdRNG4EXToR8r0Arg58zUsW1mKdYMLB/PTaFE3G6DSPz2MipD91iIE6FyUt2Vs87/EMyItyZZ4x+KJzvWCjN8fAzqBNgAdcQpc0KhzXpdeueKftHAPmAsBjR2HrwgdSNfX6adgsIYRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748222146; c=relaxed/simple;
-	bh=kLgHflASkk+AOoCMgwo9BpScIU/wjvk0wobHRl8/3gs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BHn9/8LfSio/yGBIDEta+Diu8jMALnaRN83rMTt8QyUBioxP+AqVEOhGdc+CcaD5GY6znDOq0scl0N072/rubE94fG+sSlLWNi+NW8qpUnicllxDikRYUTQ8yAivP22HNexibCmt0KlWXGKrfpzrjn9NOa4KkFOQLhDnt77x6uQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4b5HrZ2CCYzYQtG9;
-	Mon, 26 May 2025 09:15:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 71C3B1A018D;
-	Mon, 26 May 2025 09:15:41 +0800 (CST)
-Received: from [10.67.109.79] (unknown [10.67.109.79])
-	by APP3 (Coremail) with SMTP id _Ch0CgDHG8a6wDNooAxJNQ--.29873S2;
-	Mon, 26 May 2025 09:15:39 +0800 (CST)
-Message-ID: <faa23d11-4387-4952-bd29-034b4558668c@huaweicloud.com>
-Date: Mon, 26 May 2025 09:15:37 +0800
+	s=arc-20240116; t=1748225081; c=relaxed/simple;
+	bh=4KFRG0JoG2YFzjPvR9NRoAseUIIuSWEwDIujr8L/O8g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W63tea/iY3iSKTL2ZN/yc0yhWegnlOJAs3hJrm3z7UC5oWmhoNdX4AO16dcKuddnB0Fn1oiHGMqvx9K81etrz8iNzxygpHWqtvJs1Q+NGttNgi39oDau9PVenaG4f/AaXsg6BQP2S+ZLNjEnvcWOcoQtdYjmUMqK2prNxiMMNQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-03 (Coremail) with SMTP id rQCowAAnPVUozDNoORIFAA--.2207S2;
+	Mon, 26 May 2025 10:04:29 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: akhilrajeev@nvidia.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	thierry.reding@gmail.com,
+	jonathanh@nvidia.com
+Cc: linux-crypto@vger.kernel.org,
+	linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH] crypto: tegra: Add crypto config in tegra_cmac_do_final()
+Date: Mon, 26 May 2025 10:04:02 +0800
+Message-ID: <20250526020403.230-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] padata: avoid UAF for reorder_work
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
- nstange@suse.de, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- chenridong@huawei.com, wangweiyang2@huawei.com
-References: <20250110061639.1280907-1-chenridong@huaweicloud.com>
- <20250110061639.1280907-4-chenridong@huaweicloud.com>
- <aC_yoWXJcsLxfLR4@gondor.apana.org.au>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <aC_yoWXJcsLxfLR4@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgDHG8a6wDNooAxJNQ--.29873S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF4kCFWrJrWUtr4kAF1xuFg_yoW8tryxpr
-	WYkay7tF48trs7G3s2qryaq3W093yfZw13Krs7K34rC390qry0vr42vrWa9Fnrurn7Ar1j
-	kFs5ZrnIv3yqvFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUUUUU
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAAnPVUozDNoORIFAA--.2207S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKF4rXr1kAr4kKF45Zw1UKFg_yoWkurc_ua
+	1UurnrX345Krs7uF4DurWxZr4jg343XFykKFyjqr45Ca15Xr1fXas2qF109r1UJa1DJFn3
+	W3y7ZFyUGw43ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
+	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUU
+	U==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAcOA2gzuGxdeQAAst
 
+The function tegra_cmac_do_final() calls the function tegra234_aes_cfg(),
+but does not call tegra234_aes_crypto_cfg() to have a crypto
+configuration. A proper implementation can be found in
+tegra_ccm_do_ctr().
 
+Add the tegra234_aes_crypto_cfg() for configuration.
 
-On 2025/5/23 11:59, Herbert Xu wrote:
-> On Fri, Jan 10, 2025 at 06:16:39AM +0000, Chen Ridong wrote:
->> From: Chen Ridong <chenridong@huawei.com>
->>
->> Although the previous patch can avoid ps and ps UAF for _do_serial, it
->> can not avoid potential UAF issue for reorder_work. This issue can
->> happen just as below:
->>
->> crypto_request			crypto_request		crypto_del_alg
->> padata_do_serial
->>   ...
->>   padata_reorder
->>     // processes all remaining
->>     // requests then breaks
->>     while (1) {
->>       if (!padata)
->>         break;
->>       ...
->>     }
->>
->> 				padata_do_serial
->> 				  // new request added
->> 				  list_add
->>     // sees the new request
->>     queue_work(reorder_work)
->> 				  padata_reorder
->> 				    queue_work_on(squeue->work)
->> ...
->>
->> 				<kworker context>
->> 				padata_serial_worker
->> 				// completes new request,
->> 				// no more outstanding
->> 				// requests
->>
->> 							crypto_del_alg
->> 							  // free pd
->>
->> <kworker context>
->> invoke_padata_reorder
->>   // UAF of pd
-> 
-> Looking back this explanation is actually broken.  The call
-> crypto_del_alg does not free anything immediately.  It can only
-> start freeing things once the final tfm user goes away.  Any crypto
-> request of that tfm must have completed before that happens.
-> 
-> If not there is a serious bug in the Crypto API.
-> 
-> So if crypto_del_alg is leading to a freeing of the pd while there
-> are still outstanding users of that tfm, then this points to a bug
-> in the Crypto API and not padata.
-> 
-> Can you still reproduce this bug easily if you revert the patches
-> in this series? If so we should be able to track down the real bug.
-> 
+Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/crypto/tegra/tegra-se-aes.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Unfortunately, I did not reproduce this bug, It was mentioned:
-https://lore.kernel.org/all/20221019083708.27138-6-nstange@suse.de/
-
-We through that the kworker is asynchronous, and this scenarios may happen.
-
-Thanks,
-Ridong
-
-> To recap, every tfm holds a ref count on the underlying crypto_alg.
-> All crypto requests must complete before a tfm can be freed, which
-> then leads to a drop of the refcount on crypto_alg.
-> 
-> A crypto_alg can only be freed when its ref count hits zero.  Only
-> then will the associated pd be freed.
-> 
-> So what's missing in the above picture is the entity that is freeing
-> the tfm, thus leading to the actual freeing of the alg and pd.
-> 
-> Thanks,
+diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+index 9d130592cc0a..e01653985a31 100644
+--- a/drivers/crypto/tegra/tegra-se-aes.c
++++ b/drivers/crypto/tegra/tegra-se-aes.c
+@@ -1550,6 +1550,8 @@ static int tegra_cmac_do_final(struct ahash_request *req)
+ 	rctx->datbuf.size = rctx->residue.size;
+ 	rctx->total_len += rctx->residue.size;
+ 	rctx->config = tegra234_aes_cfg(SE_ALG_CMAC, 0);
++	rctx->crypto_config = tegra234_aes_crypto_cfg(SE_ALG_CMAC, 0) |
++		SE_AES_KEY_INDEX(ctx->key_id);
+ 
+ 	/* Prepare command and submit */
+ 	cmdlen = tegra_cmac_prep_cmd(ctx, rctx);
+-- 
+2.42.0.windows.2
 
