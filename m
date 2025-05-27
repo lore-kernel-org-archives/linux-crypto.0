@@ -1,63 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E15248F74;
-	Mon, 26 May 2025 21:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD914C81;
+	Tue, 27 May 2025 02:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748294427; cv=none; b=K33UJocDPMZ1WTZAPsC2YgfaTS1U3S2y5hkkoIs34KAJxx4hpZA+DI3i4fk8IW+TJmMeYPFC6Rw9PJ7Q3tMEDVh7iJVaK+Z+b2v3eF6bCQ0Fpt7vMNe5RsCV7FtGthoOoXxpJlp2zFDwTidsOoVcd7T2Efy1IAbFCcRfYzHC7Cs=
+	t=1748313133; cv=none; b=SEOc32h80lNcjxs1viool54LMvZp3/r/uOv9ZzJx/GX2qkWRUuQQLtZ9V0yDOc4M/+lytWosogE95abxdWlfKx4cYs43xB0g09r0LGyzf6XsD93RP416nSfXI2dc9XpQ9CsORUojhL9FLkHvtqLNjDIid1lXAlyLBVKckRLEVCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748294427; c=relaxed/simple;
-	bh=1U02zqj6EtpoEwJo2alR0hyIGxV1Q21ZIR4NvwfPbd8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=P8DeH693rifwdkuvDGn5tvSof5yaj3j9QH9CT7i8iIPRK2Tr4hP6+f835ydU09RdciwkjpIfzcof8s65WA+PW9vwcPvWMO+9KWMk51VKPsUcIz+wywlSKaiyoWZwSYZGdrYgNjuwWsrmnTIn0KC7mjZSLA5kZ/XnWzROjsCCslk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezIjp6bA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748313133; c=relaxed/simple;
+	bh=6LWtrlebSnstaTUnn9Q4XGMJdN8BKFsl2P/abFtO5HY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i8jdE+sCxnt5oRiLW2iS7i0akUhvKP30VXBk0s7QJdu0OG2lgEK+BiiqJRBwwF8OwxSK7Jijhw959RjAOrmR7yTPBecWPEOc30PPyTmiVfiWU+GzwqKqvTfdaIJ1tUrH2Kl3XYXsYbje7HzVmx8Wo8QWtGfNiGQbYviqU0RV1YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=c5SKN0/i; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezIjp6bA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 085C9C4CEEE;
-	Mon, 26 May 2025 21:20:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748294427;
-	bh=1U02zqj6EtpoEwJo2alR0hyIGxV1Q21ZIR4NvwfPbd8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ezIjp6bA2pwjfJTmx3dGZGcRf2+03j+lyQzPh+fmlUQaAY+1DUxickGfGvoBC1svR
-	 XJRCSz2ImdAKj7jmL1E2BEt9gcxMa1GiLws8k+yQJfG5pTu1c9/SsIYCuAtYzFAch4
-	 RxPl1YyOz7amKZl4XHYuBHyFp74j6WrQbzztAJ6DU8KoQeEonGI0oCGNWfVq242Pji
-	 Zgfh5TubVhd05dJYOG6199NcMBoI6S3JNSk0OYDyJaXNPU4rsfdDSaLml3bYe2z8jO
-	 IxTz7fWZ9d/cAZSTlwTpFLPkGtYzNpCeXoUyowVe83hEQMZFFhEVuUuF0vgMsD4441
-	 QqwYIj8UvDWNw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BD9B3380AAE2;
-	Mon, 26 May 2025 21:21:02 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 6.16
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aDPmka4yENceDgPs@gondor.apana.org.au>
-References: <aDPmka4yENceDgPs@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aDPmka4yENceDgPs@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p1
-X-PR-Tracked-Commit-Id: 2297554f01df6d3d4e98a3915c183ce3e491740a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 14418ddcc2c2055743ac7ee53d5ac2cf8a8660a7
-Message-Id: <174829446156.1051981.4467417796956937768.pr-tracker-bot@kernel.org>
-Date: Mon, 26 May 2025 21:21:01 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="c5SKN0/i"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1748313122; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=HSuWbxTyaqkMGmR51mszZ5ozCfTdYw43QGwAvUIsLQw=;
+	b=c5SKN0/iXfoe6c8qUVmFtUPAfDbgsZ/5rnaUb5gR6J/WIc+MnIDILDFzmengN5Q0m0YYc9jTuDv7lJV0PzHISyYpNhmtKzJ6RvvSjZzLoF413oGmBJS8Y4GZzwV+hlOJMu9gn+73ClTsHsNxCLbTkJkJZNwM/oQuQUWqK6SgD98=
+Received: from 30.221.132.165(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wbw-YXZ_1748313120 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 27 May 2025 10:32:01 +0800
+Message-ID: <baafb2ad-e2a2-4d40-9759-109c2cad559c@linux.alibaba.com>
+Date: Tue, 27 May 2025 10:32:00 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate through
+ acomp
+To: Eric Biggers <ebiggers@kernel.org>, David Sterba <dsterba@suse.cz>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+ Josef Bacik <josef@toxicpanda.com>, "clm@fb.com" <clm@fb.com>,
+ "dsterba@suse.com" <dsterba@suse.com>,
+ "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ qat-linux <qat-linux@intel.com>, "embg@meta.com" <embg@meta.com>,
+ "Collet, Yann" <cyan@meta.com>, "Will, Brian" <brian.will@intel.com>,
+ "Li, Weigang" <weigang.li@intel.com>
+References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
+ <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+ <20240429135645.GA3288472@perftesting> <20240429154129.GD2585@twin.jikos.cz>
+ <aBos48ctZExFqgXt@gcabiddu-mobl.ger.corp.intel.com>
+ <aBrEOXWy8ldv93Ym@gondor.apana.org.au> <20250507121754.GE9140@suse.cz>
+ <20250508041914.GA669573@sol>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20250508041914.GA669573@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Mon, 26 May 2025 11:57:05 +0800:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p1
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/14418ddcc2c2055743ac7ee53d5ac2cf8a8660a7
+On 2025/5/8 12:19, Eric Biggers wrote:
 
-Thank you!
+...
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> 
+> BTW, I also have to wonder why this patchset is proposing accelerating zlib
+> instead of Zstandard.  Zstandard is a much more modern algorithm.
+
+I think simply because QAT doesn't support the Zstandard native offload.
+At least, for Intel Xeon Sapphire Rapids processors (it seems to have
+built-in QAT 4xxx), only LZ4 and deflate-family are natively supported.
+
+I've confirmed that SPR QAT deflate hardware decompresion already surpasses
+LZ4 software decompression on our cloud server setup, which is useful since
+it greatly improves decompression performance (even compared to software LZ4)
+and saves CPU overhead completely.
+
+For Zstandard, currently it seems it [1] just leverages part of the QAT
+engine: hardware sequence producer (matchfinder) to boost up Zstandard
+match finding And I think the current hardware QAT will have no positive
+effect on the Zstandard decompression.  Without hardware improvements, it
+seems it can be hardly changed.
+
+I think it's true for both 5th Sapphire Rapids processors and 6th Granite
+Rapids processors.  Correct if I'm wrong here but that is what I got so far.
+
+Thanks,
+Gao Xiang
+
+[1] https://github.com/intel/QAT-ZSTD-Plugin
+
+> 
+> - Eric
+> 
+
