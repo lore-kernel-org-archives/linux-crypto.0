@@ -1,106 +1,529 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665C73C01;
-	Tue, 27 May 2025 09:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0725A28E0F
+	for <linux-crypto@vger.kernel.org>; Tue, 27 May 2025 10:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748338196; cv=none; b=uq/d3QJEaDgkx6dw/MTh3gGHDzjpFpvqGLsBLgectLbhF0bYlsmmSx6M3F7BSYR1pbtFN8+RfJORfeWl0bDebx6ymyD9TgMKQ5Vo2NIVSeBhBPdZR+C5pSp8ajoBPDIz3bWl5NZFXGCGwthGYxqZGqtWlj/Fph+iYxqoZ49VB2c=
+	t=1748341412; cv=none; b=PFb48ijc9ElvMRojvL6Gnyg8hn8H1hn+Bi6j5dzZfahL+WpCHKTg/v1a6WHBri9O63b0zTEz6CDwdKDQg0LKZc+qMbn9J9XY2TyV20fqPDSWGi+eKxCrKUfkWg6Rzdc05kErevm8TA2UMSySP4nGwPMRXbLoRAXjVmdsRKxDMUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748338196; c=relaxed/simple;
-	bh=yx44wKhyWSIIz+gEiInWp3kNE5EdMe0ABsYt3dl6KlE=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=ENmcsxdHIk7TNBAW1Sc9MtW3wh26/L2W+NmP8AUYFIGR62dOFQd0R/JcZKiGVPodnaYjGOofjgKW5I7pmeSvPZ2wQUxGkv79zem2LM4CuWp7RsJcOZThZmEZpw1ryghheagqiL61yet8/HqDbHPC+BRCqwlrclRw+UltzzqR2KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZMy6YLI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748341412; c=relaxed/simple;
+	bh=F+mpur2ld/64hz1CK0qkpTYHl/KLSt9F+XfyBO3JO+A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tjT9fOqfZKzh5f69rrf/VP8UiWo1zAgqZxLE9ToQlECUgIy22al6vdNwSySoLWoSZiginlw3uSW3iVtLJwzZQkhFD1JO8yo1AV6ux8wMD2lDRjlsfEy3o0NxqKjD1dv1jz4nsBx4fgrttOWJqQFHpqZzo2Q+jnX+hXWzbvdrAyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HsUAiozl; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZMy6YLI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A10C4CEE9;
-	Tue, 27 May 2025 09:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748338195;
-	bh=yx44wKhyWSIIz+gEiInWp3kNE5EdMe0ABsYt3dl6KlE=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=VZMy6YLIzi0E+tQikW/k2S3coZ3itQpR7Mk9hxf6fnCc54gCAzsqhOtNJTvFe5vgM
-	 xjfF2OO8kayX4YwTLScTKkK22fQ5iwCT6WFL8J+JophziiQltlMzyUjrzwRhiUCP/f
-	 p1JIKY91iLQM9mCIjkhqRMMOV9t00vnyLx8qYoR5/RbZoWYQSYQIbjop79M4nTsomU
-	 VJzUGOkR97aRojNaoV3l6mmkxQvRTnC5POowQxwOsSyj5n42D4dZbu4tzsSUYPtnSv
-	 l+d8XYzaiCn6VNQQcm0xNiLMbIa7vcCRY/VDVtce7NSsHJ32cFMH/JJj8jpRxR5emG
-	 3jN9vw6i843fA==
-Date: Tue, 27 May 2025 04:29:53 -0500
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HsUAiozl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748341411; x=1779877411;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=F+mpur2ld/64hz1CK0qkpTYHl/KLSt9F+XfyBO3JO+A=;
+  b=HsUAiozlhlStJSxcoArELpSmQKTlEkq1QETV8Y4bFFRTOJ2NtFO4S9LN
+   UqUStRwOe+qvrfM5KbAkeAxJ9Z6+/h0iwa/+tK2dyaFu94b1sFqQARvVE
+   FMZFabRkuVb+EJDcnJ3rNGCQuhdh47SpPmiTWBxSNPa0m+A4eZ9B22u81
+   wk88Wn/Rc0/99/74wKACQSrJXJvz9FhraGRRrSvWpabZwl7bGKdxS4+ir
+   Ly9GNZ5dVGa+8dsoDmTale1tGbnZCcCalShyx3TGrVEyeStiHo/wWUMK1
+   IV9irR4+zWqROPopStMHv8yODLOr7HYqzgh11Df864twl/2cZwSv9nrl7
+   g==;
+X-CSE-ConnectionGUID: enbEabH4SjCFIyH5wtVjyQ==
+X-CSE-MsgGUID: UfaqURVkTEWFgiPBblF5xg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11445"; a="54130733"
+X-IronPort-AV: E=Sophos;i="6.15,318,1739865600"; 
+   d="scan'208";a="54130733"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 03:23:30 -0700
+X-CSE-ConnectionGUID: wepHITVERfGW12P9cLmPtQ==
+X-CSE-MsgGUID: DyX2h6VHRwKsX+S6Fo4RtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,318,1739865600"; 
+   d="scan'208";a="142741894"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by fmviesa007.fm.intel.com with ESMTP; 27 May 2025 03:23:27 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	dsterba@suse.com,
+	terrelln@fb.com,
+	clabbe.montjoie@gmail.com
+Subject: [v3] crypto: zstd - convert to acomp
+Date: Tue, 27 May 2025 11:23:21 +0100
+Message-Id: <20250527102321.516638-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Thomas Richard <thomas.richard@bootlin.com>, linux-crypto@vger.kernel.org, 
- Frank Li <Frank.li@nxp.com>, imx@lists.linux.dev, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- linux-arm-kernel@lists.infradead.org, Conor Dooley <conor+dt@kernel.org>, 
- =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
- Shawn Guo <shawnguo@kernel.org>, devicetree@vger.kernel.org, 
- Gaurav Jain <gaurav.jain@nxp.com>, Fabio Estevam <festevam@gmail.com>, 
- linux-kernel@vger.kernel.org, Pankaj Gupta <pankaj.gupta@nxp.com>
-To: John Ernberg <john.ernberg@actia.se>
-In-Reply-To: <20250527071552.1424997-4-john.ernberg@actia.se>
-References: <20250527071552.1424997-1-john.ernberg@actia.se>
- <20250527071552.1424997-4-john.ernberg@actia.se>
-Message-Id: <174833819381.3537254.5508047100817417003.robh@kernel.org>
-Subject: Re: [PATCH v2 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
- domains for iMX8QM and iMX8QXP
+Content-Transfer-Encoding: 8bit
 
+Convert the implementation to a native acomp interface using zstd
+streaming APIs, eliminating the need for buffer linearization.
 
-On Tue, 27 May 2025 07:16:03 +0000, John Ernberg wrote:
-> NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
-> resource management.
-> 
-> Allow specifying them for such SoCs.
-> 
-> Signed-off-by: John Ernberg <john.ernberg@actia.se>
-> 
-> ---
-> 
-> v2:
->  - Adjust commit message (Frank Li)
->  - Only allow power-domains when compatible with imx8qm (Frank Li)
-> ---
->  .../bindings/crypto/fsl,sec-v4.0.yaml         | 36 +++++++++++++++++++
->  1 file changed, 36 insertions(+)
-> 
+This includes:
+   - Removal of the scomp interface in favor of acomp
+   - Refactoring of stream allocation, initialization, and handling for
+     both compression and decompression using Zstandard streaming APIs
+   - Replacement of crypto_register_scomp() with crypto_register_acomp()
+     for module registration
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+v2->v3:
+   - Updated the logic to verify the existence of a single
+     flat buffer using the acomp walk API.
 
-yamllint warnings/errors:
+ crypto/zstd.c | 385 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 248 insertions(+), 137 deletions(-)
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml: patternProperties:^jr@[0-9a-f]+$: 'if' is not one of ['type', 'description', 'dependencies', 'dependentRequired', 'dependentSchemas', 'properties', 'patternProperties', 'additionalProperties', 'unevaluatedProperties', 'deprecated', 'required', 'not', 'allOf', 'anyOf', 'oneOf', '$ref']
-	from schema $id: http://devicetree.org/meta-schemas/nodes.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml: patternProperties:^jr@[0-9a-f]+$: 'then' is not one of ['type', 'description', 'dependencies', 'dependentRequired', 'dependentSchemas', 'properties', 'patternProperties', 'additionalProperties', 'unevaluatedProperties', 'deprecated', 'required', 'not', 'allOf', 'anyOf', 'oneOf', '$ref']
-	from schema $id: http://devicetree.org/meta-schemas/nodes.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml: patternProperties:^jr@[0-9a-f]+$: 'else' is not one of ['type', 'description', 'dependencies', 'dependentRequired', 'dependentSchemas', 'properties', 'patternProperties', 'additionalProperties', 'unevaluatedProperties', 'deprecated', 'required', 'not', 'allOf', 'anyOf', 'oneOf', '$ref']
-	from schema $id: http://devicetree.org/meta-schemas/nodes.yaml#
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index 7570e11b4ee6..5c8f2ebbda0f 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -12,188 +12,299 @@
+ #include <linux/net.h>
+ #include <linux/vmalloc.h>
+ #include <linux/zstd.h>
+-#include <crypto/internal/scompress.h>
++#include <crypto/internal/acompress.h>
++#include <crypto/scatterwalk.h>
+ 
+ 
+-#define ZSTD_DEF_LEVEL	3
++#define ZSTD_DEF_LEVEL		3
++#define ZSTD_MAX_WINDOWLOG	18
++#define ZSTD_MAX_SIZE		BIT(ZSTD_MAX_WINDOWLOG)
+ 
+ struct zstd_ctx {
+ 	zstd_cctx *cctx;
+ 	zstd_dctx *dctx;
+-	void *cwksp;
+-	void *dwksp;
++	size_t wksp_size;
++	zstd_parameters params;
++	union {
++		u8 wksp[0];
++		/* forces alignment */
++		u64 _align;
++	};
+ };
+ 
+-static zstd_parameters zstd_params(void)
++static DEFINE_MUTEX(zstd_stream_lock);
++
++static void *zstd_alloc_stream(void)
+ {
+-	return zstd_get_params(ZSTD_DEF_LEVEL, 0);
+-}
+-
+-static int zstd_comp_init(struct zstd_ctx *ctx)
+-{
+-	int ret = 0;
+-	const zstd_parameters params = zstd_params();
+-	const size_t wksp_size = zstd_cctx_workspace_bound(&params.cParams);
+-
+-	ctx->cwksp = vzalloc(wksp_size);
+-	if (!ctx->cwksp) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ctx->cctx = zstd_init_cctx(ctx->cwksp, wksp_size);
+-	if (!ctx->cctx) {
+-		ret = -EINVAL;
+-		goto out_free;
+-	}
+-out:
+-	return ret;
+-out_free:
+-	vfree(ctx->cwksp);
+-	goto out;
+-}
+-
+-static int zstd_decomp_init(struct zstd_ctx *ctx)
+-{
+-	int ret = 0;
+-	const size_t wksp_size = zstd_dctx_workspace_bound();
+-
+-	ctx->dwksp = vzalloc(wksp_size);
+-	if (!ctx->dwksp) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ctx->dctx = zstd_init_dctx(ctx->dwksp, wksp_size);
+-	if (!ctx->dctx) {
+-		ret = -EINVAL;
+-		goto out_free;
+-	}
+-out:
+-	return ret;
+-out_free:
+-	vfree(ctx->dwksp);
+-	goto out;
+-}
+-
+-static void zstd_comp_exit(struct zstd_ctx *ctx)
+-{
+-	vfree(ctx->cwksp);
+-	ctx->cwksp = NULL;
+-	ctx->cctx = NULL;
+-}
+-
+-static void zstd_decomp_exit(struct zstd_ctx *ctx)
+-{
+-	vfree(ctx->dwksp);
+-	ctx->dwksp = NULL;
+-	ctx->dctx = NULL;
+-}
+-
+-static int __zstd_init(void *ctx)
+-{
+-	int ret;
+-
+-	ret = zstd_comp_init(ctx);
+-	if (ret)
+-		return ret;
+-	ret = zstd_decomp_init(ctx);
+-	if (ret)
+-		zstd_comp_exit(ctx);
+-	return ret;
+-}
+-
+-static void *zstd_alloc_ctx(void)
+-{
+-	int ret;
++	zstd_parameters params;
+ 	struct zstd_ctx *ctx;
++	size_t wksp_size;
+ 
+-	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	params = zstd_get_params(ZSTD_DEF_LEVEL, ZSTD_MAX_SIZE);
++
++	wksp_size = max_t(size_t,
++			  zstd_cstream_workspace_bound(&params.cParams),
++			  zstd_dstream_workspace_bound(ZSTD_MAX_SIZE));
++	if (!wksp_size)
++		return ERR_PTR(-EINVAL);
++
++	ctx = kvmalloc(sizeof(*ctx) + wksp_size, GFP_KERNEL);
+ 	if (!ctx)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	ret = __zstd_init(ctx);
+-	if (ret) {
+-		kfree(ctx);
+-		return ERR_PTR(ret);
+-	}
++	ctx->params = params;
++	ctx->wksp_size = wksp_size;
+ 
+ 	return ctx;
+ }
+ 
+-static void __zstd_exit(void *ctx)
++static struct crypto_acomp_streams zstd_streams = {
++	.alloc_ctx = zstd_alloc_stream,
++	.cfree_ctx = kvfree,
++};
++
++static int zstd_init(struct crypto_acomp *acomp_tfm)
+ {
+-	zstd_comp_exit(ctx);
+-	zstd_decomp_exit(ctx);
++	int ret = 0;
++
++	mutex_lock(&zstd_stream_lock);
++	ret = crypto_acomp_alloc_streams(&zstd_streams);
++	mutex_unlock(&zstd_stream_lock);
++
++	return ret;
+ }
+ 
+-static void zstd_free_ctx(void *ctx)
++static void zstd_exit(struct crypto_acomp *acomp_tfm)
+ {
+-	__zstd_exit(ctx);
+-	kfree_sensitive(ctx);
++	crypto_acomp_free_streams(&zstd_streams);
+ }
+ 
+-static int __zstd_compress(const u8 *src, unsigned int slen,
+-			   u8 *dst, unsigned int *dlen, void *ctx)
++static int zstd_compress_one(struct acomp_req *req, struct zstd_ctx *ctx, unsigned int *dlen)
+ {
+-	size_t out_len;
+-	struct zstd_ctx *zctx = ctx;
+-	const zstd_parameters params = zstd_params();
++	unsigned int out_len;
+ 
+-	out_len = zstd_compress_cctx(zctx->cctx, dst, *dlen, src, slen, &params);
++	ctx->cctx = zstd_init_cctx(ctx->wksp, ctx->wksp_size);
++	if (!ctx->cctx)
++		return -EINVAL;
++
++	out_len = zstd_compress_cctx(ctx->cctx, sg_virt(req->dst),
++				     req->dlen, sg_virt(req->src),
++				     req->slen, &ctx->params);
+ 	if (zstd_is_error(out_len))
+ 		return -EINVAL;
++
+ 	*dlen = out_len;
++
+ 	return 0;
+ }
+ 
+-static int zstd_scompress(struct crypto_scomp *tfm, const u8 *src,
+-			  unsigned int slen, u8 *dst, unsigned int *dlen,
+-			  void *ctx)
++static int zstd_compress(struct acomp_req *req)
+ {
+-	return __zstd_compress(src, slen, dst, dlen, ctx);
+-}
++	struct crypto_acomp_stream *s;
++	unsigned int pos, scur, dcur;
++	unsigned int total_out = 0;
++	bool data_available = true;
++	zstd_out_buffer outbuf;
++	struct acomp_walk walk;
++	zstd_in_buffer inbuf;
++	struct zstd_ctx *ctx;
++	size_t pending_bytes;
++	size_t num_bytes;
++	int ret;
+ 
+-static int __zstd_decompress(const u8 *src, unsigned int slen,
+-			     u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	size_t out_len;
+-	struct zstd_ctx *zctx = ctx;
++	s = crypto_acomp_lock_stream_bh(&zstd_streams);
++	ctx = s->ctx;
+ 
+-	out_len = zstd_decompress_dctx(zctx->dctx, dst, *dlen, src, slen);
+-	if (zstd_is_error(out_len))
+-		return -EINVAL;
+-	*dlen = out_len;
+-	return 0;
+-}
++	ret = acomp_walk_virt(&walk, req, true);
++	if (ret)
++		goto out;
+ 
+-static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen,
+-			    void *ctx)
+-{
+-	return __zstd_decompress(src, slen, dst, dlen, ctx);
+-}
+-
+-static struct scomp_alg scomp = {
+-	.alloc_ctx		= zstd_alloc_ctx,
+-	.free_ctx		= zstd_free_ctx,
+-	.compress		= zstd_scompress,
+-	.decompress		= zstd_sdecompress,
+-	.base			= {
+-		.cra_name	= "zstd",
+-		.cra_driver_name = "zstd-scomp",
+-		.cra_module	 = THIS_MODULE,
++	ctx->cctx = zstd_init_cstream(&ctx->params, 0, ctx->wksp, ctx->wksp_size);
++	if (!ctx->cctx) {
++		ret = -EINVAL;
++		goto out;
+ 	}
++
++	do {
++		dcur = acomp_walk_next_dst(&walk);
++		if (!dcur) {
++			ret = -ENOSPC;
++			goto out;
++		}
++
++		outbuf.pos = 0;
++		outbuf.dst = (u8 *)walk.dst.virt.addr;
++		outbuf.size = dcur;
++
++		do {
++			scur = acomp_walk_next_src(&walk);
++			if (dcur == req->dlen && scur == req->slen) {
++				ret = zstd_compress_one(req, ctx, &total_out);
++				goto out;
++			}
++
++			if (scur) {
++				inbuf.pos = 0;
++				inbuf.src = walk.src.virt.addr;
++				inbuf.size = scur;
++			} else {
++				data_available = false;
++				break;
++			}
++
++			num_bytes = zstd_compress_stream(ctx->cctx, &outbuf, &inbuf);
++			if (ZSTD_isError(num_bytes)) {
++				ret = -EIO;
++				goto out;
++			}
++
++			pending_bytes = zstd_flush_stream(ctx->cctx, &outbuf);
++			if (ZSTD_isError(pending_bytes)) {
++				ret = -EIO;
++				goto out;
++			}
++			acomp_walk_done_src(&walk, inbuf.pos);
++		} while (dcur != outbuf.pos);
++
++		total_out += outbuf.pos;
++		acomp_walk_done_dst(&walk, dcur);
++	} while (data_available);
++
++	pos = outbuf.pos;
++	num_bytes = zstd_end_stream(ctx->cctx, &outbuf);
++	if (ZSTD_isError(num_bytes))
++		ret = -EIO;
++	else
++		total_out += (outbuf.pos - pos);
++
++out:
++	if (ret)
++		req->dlen = 0;
++	else
++		req->dlen = total_out;
++
++	crypto_acomp_unlock_stream_bh(s);
++
++	return ret;
++}
++
++static int zstd_decompress_one(struct acomp_req *req, struct zstd_ctx *ctx, unsigned int *dlen)
++{
++	size_t out_len;
++
++	ctx->dctx = zstd_init_dctx(ctx->wksp, ctx->wksp_size);
++	if (!ctx->dctx)
++		return -EINVAL;
++
++	out_len = zstd_decompress_dctx(ctx->dctx, sg_virt(req->dst),
++				       req->dlen, sg_virt(req->src),
++				       req->slen);
++	if (zstd_is_error(out_len))
++		return -EINVAL;
++
++	*dlen = out_len;
++
++	return 0;
++}
++
++static int zstd_decompress(struct acomp_req *req)
++{
++	struct crypto_acomp_stream *s;
++	unsigned int total_out = 0;
++	unsigned int scur, dcur;
++	zstd_out_buffer outbuf;
++	struct acomp_walk walk;
++	zstd_in_buffer inbuf;
++	struct zstd_ctx *ctx;
++	size_t pending_bytes;
++	int ret;
++
++	s = crypto_acomp_lock_stream_bh(&zstd_streams);
++	ctx = s->ctx;
++
++	ret = acomp_walk_virt(&walk, req, true);
++	if (ret)
++		goto out;
++
++	ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
++	if (!ctx->dctx) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	do {
++		scur = acomp_walk_next_src(&walk);
++		if (scur) {
++			inbuf.pos = 0;
++			inbuf.size = scur;
++			inbuf.src = walk.src.virt.addr;
++		} else {
++			break;
++		}
++
++		do {
++			dcur = acomp_walk_next_dst(&walk);
++			if (dcur == req->dlen && scur == req->slen) {
++				ret = zstd_decompress_one(req, ctx, &total_out);
++				goto out;
++			}
++
++			if (!dcur) {
++				ret = -ENOSPC;
++				goto out;
++			}
++
++			outbuf.pos = 0;
++			outbuf.dst = (u8 *)walk.dst.virt.addr;
++			outbuf.size = dcur;
++
++			pending_bytes = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
++			if (ZSTD_isError(pending_bytes)) {
++				ret = -EIO;
++				goto out;
++			}
++
++			total_out += outbuf.pos;
++
++			acomp_walk_done_dst(&walk, outbuf.pos);
++		} while (scur != inbuf.pos);
++
++		if (scur)
++			acomp_walk_done_src(&walk, scur);
++	} while (ret == 0);
++
++out:
++	if (ret)
++		req->dlen = 0;
++	else
++		req->dlen = total_out;
++
++	crypto_acomp_unlock_stream_bh(s);
++
++	return ret;
++}
++
++static struct acomp_alg zstd_acomp = {
++	.base = {
++		.cra_name = "zstd",
++		.cra_driver_name = "zstd-generic",
++		.cra_flags = CRYPTO_ALG_REQ_VIRT,
++		.cra_module = THIS_MODULE,
++	},
++	.init = zstd_init,
++	.exit = zstd_exit,
++	.compress = zstd_compress,
++	.decompress = zstd_decompress,
+ };
+ 
+ static int __init zstd_mod_init(void)
+ {
+-	return crypto_register_scomp(&scomp);
++	return crypto_register_acomp(&zstd_acomp);
+ }
+ 
+ static void __exit zstd_mod_fini(void)
+ {
+-	crypto_unregister_scomp(&scomp);
++	crypto_unregister_acomp(&zstd_acomp);
+ }
+ 
+ module_init(zstd_mod_init);
 
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250527071552.1424997-4-john.ernberg@actia.se
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+base-commit: b939a747dcec83d77fb23660204b82cf64f0b944
+-- 
+2.40.1
 
