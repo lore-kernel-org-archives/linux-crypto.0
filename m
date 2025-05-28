@@ -1,154 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C72210F4D;
-	Wed, 28 May 2025 06:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDEDE55B;
+	Wed, 28 May 2025 06:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748412884; cv=none; b=nw4ac8Egl6iFxgR5l/qUE0gFaXTQSHX9tEi2rUK3NlkwKsVmL6lJCo+zTWwGyfbT3Ab7RDd2PDkLu0sguYRs6V7hAVzfiTBnXMVYhzK8BU415aP6Coh8EnKSVGXtNVt+4Z8Xdb1w4yjfGRFhzx1AtgurYcs80CUhPI8g6vKzi50=
+	t=1748415584; cv=none; b=GywnpgbQx/TK46PIOFCvORIXAUWoIy4ZmzIWNr/hGHP98cJnQFHwhdaDEWOcO50pHH2PVaiY8j/F4H0g28+Vo0tTqeLk35y/V5+l+AoRg1Xb45esG0NWiIPpo3zaW9X2sq4aNaEVScevEwp4rPxvdVREYtfVtrpbd485FQUrm6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748412884; c=relaxed/simple;
-	bh=gSS4CjRAoDJno8ZPj89/BweAbZmckAAF42wPMM0GsLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g6l3qk21atcrmGnDsv/IVWYw1M74ZliTdRsbt5BEAr3qRJsd7cilGGeizMofARWGSZU7OCTqtpQeALI5ZFXsNK6El6d+ngkt6ztVFcXtH3pIZrnZpfuwpmGCzPXLwF4T7ndCnv2qK+r5ivNWafuco3ZF+n/TjEAwHnf9go36pCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aocLOYon; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aocLOYon"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98EFC4CEE7;
-	Wed, 28 May 2025 06:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748412884;
-	bh=gSS4CjRAoDJno8ZPj89/BweAbZmckAAF42wPMM0GsLU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aocLOYonwxONTi12LfiZ5xjosNb3Y5gKkNrj56+v0oqn+5bxipcc7fqfKMCLUiPqJ
-	 86koB/f3yH3JfJeFCzRulM0tj0iUYixZECMqlrrgJScAarzNXjZRjx0mo5Zc/ertnT
-	 8tvOuu4HUmgHrE5ANkuyKODt1Qj4IM4GjN2pJu4G+2hJp898Du/mknk+BrCDACyYrY
-	 cdhD6bs1tV3M5NFukEJcRQhBfTCDV7yjlZxxm8fSCmI3bDhNjtnt9hUHWF+Ioq30eW
-	 2vId+gOUX4vWP7jCqmsT4NHqRao2rZzclOgIRz3z+jiai+mHbfe19EkqU5HbAMTMQm
-	 xv3/SBt7Q0Rbg==
-Date: Tue, 27 May 2025 23:14:27 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Kees Cook <kees@kernel.org>, linux-hardening@vger.kernel.org
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kernel test robot <oliver.sang@intel.com>
-Subject: Re: [linus:master] [crypto]  40b9969796:
- UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c
-Message-ID: <20250528061427.GA42911@sol>
-References: <202505281024.f42beaa7-lkp@intel.com>
+	s=arc-20240116; t=1748415584; c=relaxed/simple;
+	bh=RuGpvcaQzP9nQ2WHgqYd3xi93wAwSSlvvq9QiQCOnrQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ba+qzhXLnyoNtDluWxa58kxg8+ASwyLHpydM2a1+zG5XEoz3F7LCJUE+c58FpwdJbTMa7pqaBrx8Z+PDmHNFJvpES5NuhAEnqZrkyV83AoKBHqlLYsOGeJmSEFbCwFcF/A4OBq8W684wbg9FJNibGzV2t6Dd6Xo++Acqu/JCqfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.178])
+	by gateway (Coremail) with SMTP id _____8Bx63FStDZoFq7_AA--.18759S3;
+	Wed, 28 May 2025 14:59:30 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.178])
+	by front1 (Coremail) with SMTP id qMiowMAxzxtQtDZoEG33AA--.60923S2;
+	Wed, 28 May 2025 14:59:28 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org,
+	herbert@gondor.apana.org.au,
+	jarkko@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	peterhuewe@gmx.de,
+	jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v10 0/5] Add Loongson Security Engine chip driver
+Date: Wed, 28 May 2025 14:59:39 +0800
+Message-ID: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202505281024.f42beaa7-lkp@intel.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAxzxtQtDZoEG33AA--.60923S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCr43XFy5WrW7Zw1kGr47ZFc_yoW5Gw4xpF
+	45C3yfCr4UJr47Cr93t34UCFyfZa4fJr9xKa9rXw15Wr9rAa48XrW3AFyUZF47ZFn3Jry2
+	vFWkCF4UGF1UXacCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-[+Kees and linux-hardening]
+The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
+accelerator engines. Each engine have its own DMA buffer provided
+by the controller. The kernel cannot directly send commands to the
+engine and must first send them to the controller, which will
+forward them to the corresponding engine. Based on these engines,
+TPM2 have been implemented in the chip, then let's treat TPM2 itself
+as an engine.
 
-On Wed, May 28, 2025 at 01:15:05PM +0800, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> by this commit, the config has below diff:
-> 
-> --- /pkg/linux/x86_64-randconfig-101-20250522/clang-20/d469eaed223fa485eabebd3bcd05ddd3c891f54e/.config 2025-05-23 23:44:56.781716572 +0800
-> +++ /pkg/linux/x86_64-randconfig-101-20250522/clang-20/40b9969796bfa49ed1b0f7ddc254f48cb2ac6d2c/.config 2025-05-24 02:08:29.858605300 +0800
-> @@ -4837,7 +4837,8 @@ CONFIG_CRYPTO_ACOMP2=y
->  CONFIG_CRYPTO_MANAGER=y
->  CONFIG_CRYPTO_MANAGER2=y
->  # CONFIG_CRYPTO_USER is not set
-> -CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y
-> +CONFIG_CRYPTO_SELFTESTS=y
-> +# CONFIG_CRYPTO_MANAGER_EXTRA_TESTS is not set
->  # CONFIG_CRYPTO_NULL is not set
->  CONFIG_CRYPTO_PCRYPT=m
->  CONFIG_CRYPTO_CRYPTD=y
-> 
-> it seems tests are enabled then we observe the UBSAN issues
-> 
-> d469eaed223fa485 40b9969796bfa49ed1b0f7ddc25
-> ---------------- ---------------------------
->        fail:runs  %reproduction    fail:runs
->            |             |             |
->            :6          100%           6:6     dmesg.UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c
->            :6          100%           6:6     dmesg.UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305.c
-> 
-> it's hard for bot to apply this commit to previous commits in bisect, so we just
-> make out below report FYI that we observe UBSAN issues in boot tests.
-> 
-> 
-> kernel test robot noticed "UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c" on:
-> 
-> commit: 40b9969796bfa49ed1b0f7ddc254f48cb2ac6d2c ("crypto: testmgr - replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> 
-> [test failed on linux-next/master 176e917e010cb7dcc605f11d2bc33f304292482b]
-> 
-> in testcase: boot
-> 
-> config: x86_64-randconfig-101-20250522
-> compiler: clang-20
-> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202505281024.f42beaa7-lkp@intel.com
-> 
-> 
-> [   12.442846][    T1] ------------[ cut here ]------------
-> [   12.443261][    T1] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8854:47
-> [   12.444084][    T1] 16 - 114 cannot be represented in type 'size_t' (aka 'unsigned long')
-> [   12.444682][    T1] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Tainted: G                T   6.15.0-rc5-00342-g40b9969796bf #1 VOLUNTARY
+v10: mfd: Cleanned up coding style.
+     crypto: Unlimited tfm
+     tpm: Added error check
 
-This issue predates the blamed commit, and it's specific to
-CONFIG_UBSAN_INTEGER_WRAP which was recently introduced.
+v9: Moved the base driver back to drivers/mfd. Cleanned up coding style.
 
-CONFIG_UBSAN_INTEGER_WRAP apparently requires clang 20.
+v8: Like Lee said, the base driver goes beyond MFD scope. Since these
+    are all encryption related drivers and SM2, SM3, and SM4 drivers
+    will be added to the crypto subsystem in the future, the base driver
+    need to be changed when adding these drivers. Therefore, it may be
+    more appropriate to place the base driver within the crypto
+    subsystem.
 
-To try to reproduce this, I built clang from the release/20.x branch, then built
-a kernel with CONFIG_UBSAN_INTEGER_WRAP=y.  When booting that kernel, there are
-many UBSAN reports:
+    Removed complete callback in all driver. Removed the concepts of
+    "channel", "msg" and "request" as they may be confusing. Used
 
-    [    0.000000] UBSAN: negation-overflow in lib/sort.c:199:36
+v7: Addressed Huacai's comments.
 
-    [    0.000000] UBSAN: negation-overflow in lib/sort.c:185:14
+v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
 
-    [    0.276708] UBSAN: unsigned-integer-overflow in ./include/linux/min_heap.h:329:24
+    crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+    ls6000se-rng.c ->loongson-rng.c
 
-    [    0.277376] UBSAN: negation-overflow in ./include/linux/min_heap.h:260:42
+    tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
 
-    [    0.871191] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8854:47
+v5: Registered "ls6000se-rng" device in mfd driver
 
-    [    0.890856] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8851:47
 
-    [    0.910455] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305.c:260:57
+Qunqin Zhao (5):
+  mfd: Add support for Loongson Security Engine chip controller
+  crypto: loongson - add Loongson RNG driver support
+  MAINTAINERS: Add entry for Loongson crypto driver
+  tpm: Add a driver for Loongson TPM device
+  MAINTAINERS: Add tpm_loongson.c to LOONGSON CRYPTO DRIVER entry
 
-    [    1.105542] UBSAN: unsigned-integer-overflow in lib/zstd/compress/zstd_compress_sequences.c:334:21
+ MAINTAINERS                            |   9 +
+ drivers/char/tpm/Kconfig               |   9 +
+ drivers/char/tpm/Makefile              |   1 +
+ drivers/char/tpm/tpm_loongson.c        |  84 ++++++++
+ drivers/crypto/Kconfig                 |   1 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/loongson/Kconfig        |   5 +
+ drivers/crypto/loongson/Makefile       |   1 +
+ drivers/crypto/loongson/loongson-rng.c | 211 +++++++++++++++++++++
+ drivers/mfd/Kconfig                    |  11 ++
+ drivers/mfd/Makefile                   |   2 +
+ drivers/mfd/loongson-se.c              | 253 +++++++++++++++++++++++++
+ include/linux/mfd/loongson-se.h        |  53 ++++++
+ 13 files changed, 641 insertions(+)
+ create mode 100644 drivers/char/tpm/tpm_loongson.c
+ create mode 100644 drivers/crypto/loongson/Kconfig
+ create mode 100644 drivers/crypto/loongson/Makefile
+ create mode 100644 drivers/crypto/loongson/loongson-rng.c
+ create mode 100644 drivers/mfd/loongson-se.c
+ create mode 100644 include/linux/mfd/loongson-se.h
 
-    [    1.113539] UBSAN: unsigned-integer-overflow in lib/zstd/compress/huf_compress.c:889:23
 
-    [    1.114597] UBSAN: unsigned-integer-overflow in lib/lz4/lz4_compress.c:294:9
+base-commit: c89756bcf406af313d191cfe3709e7c175c5b0cd
+-- 
+2.45.2
 
-So I did get the chacha20poly1305 ones, but they're hardly unique.
-
-If this new sanitizer is going to move forward, is there any sort of plan or
-guide for how to update code to be compatible with it?  Specifically considering
-common situations where unsigned wraparound (which is defined behavior in C) can
-be intentionally relied on, like calculating the distance from the next N-byte
-boundary.  What are the best practices now?
-
-Documentation/dev-tools/ubsan.rst says nothing about this and only mentions
-"undefined behavior", which this is not.
-
-- Eric
