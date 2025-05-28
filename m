@@ -1,80 +1,86 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18692741D1;
-	Wed, 28 May 2025 09:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B8D2750E9
+	for <linux-crypto@vger.kernel.org>; Wed, 28 May 2025 09:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748423499; cv=none; b=r59pGB1BVgaXKaHbtehkAQHPD70M+BP0RfIE07vxknChSF0TnxQnOy9SdZGeC6vqtVxAKqP7d2/NbAcgWh+KesLYR2Eh7XytfALkSnA591ydXts9l6kP8DVrRBQrBtzULD7YjGBO91Ds1ncOik4gB2oCsRqVwbOsd7LRNFDHlVY=
+	t=1748423723; cv=none; b=t8OvhRVZbDe38tN0IkaYLGsU3zEB6cnJLZhe6BDBGRqiCUlHfJxhov8ZUbdH+oIVGlLMAVz19c8houEqNADjkOjHL/fgxlLurKEK3xVZZe+9ktkORUM02sqn4PVZZ2We+ewHQPLwdnYWQtTD9/BZT7J2BVD8QNoMidTaotG3ISc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748423499; c=relaxed/simple;
-	bh=/vFKPh1GQHh0XWIVc4hvR0PFnGcJUo/nTfkkPEZSCHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uUg5DYj657Od/HbRfFtdeNJ2LAVNCcrdSJ290Vg+jtg99mUcrV55WrRsnkgYsnoAR0hhWiT2PZKFGKDsIvKpcjXsCgi6SDVkWIAo6UEBhX0HsxSQjTjTzyH6Yjp+ldYhG2bg6iwPVqqBX/jsR13GcKuOs7ut9Fl3nBk3oWKgClQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XiYGsPpB; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1748423723; c=relaxed/simple;
+	bh=4cXf7MErAkLA9U3B2oNG6s7tbUnnuq7wfLX8Cx+1mvM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H1uWw7KIPfpmNQAKCbcrmLeo/AH846cpErVHqLsTjr57sqcKlCX2CDlndEopC7H+Pvp6GgFmzjlXV76RtWknCUivRKIlWCMpfxszdaag0t2EoXQaYzm324uj7Q4KAdrEc4SnJAFLKa/EBkWSPEaM4n5jZdzxcAvvRadA3hNIln0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pn4kTPQj; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XiYGsPpB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/hsewaW5gU0vrr/tJ3ygObI/8cfPfFw3hytDh49lKGQ=; b=XiYGsPpBuaWC3YQZni+30nSzjA
-	xGxLsD0LdOE6O8C/2gdpedsoyGm07jG917zdcMvwPGa+fz2AdxxdzgiWcEUWwnr5Y6HcG4uPPYidN
-	3uLWTJCGj745hWOOCq3ALwXH6CCokZxLUpMFhgYdgm7N3AdZ9WsFkyYLCLKZpFLouunI6530ZZJyZ
-	xgwH+45vviAp7kuM0mN0zkQOQK1OrOOhb2JXvT7QxHyB/8qp5nlsISoVOmKLGTXzzXryuZCwM2QJG
-	o4HwnH7ah9B0SATr1cgppuhBS7WPIT1M58/UIPY7xF5oxSydl5deo4UcsUg4zTS1Usrrf5KzKesRw
-	D1Qv6Lwg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uKCoi-009OwC-1g;
-	Wed, 28 May 2025 17:11:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 May 2025 17:11:20 +0800
-Date: Wed, 28 May 2025 17:11:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: oe-kbuild@lists.linux.dev, Ashish Kalra <ashish.kalra@amd.com>,
-	lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [linux-next:master 1170/9308] drivers/crypto/ccp/sev-dev.c:1312
- __sev_platform_init_locked() error: we previously assumed 'error' could be
- null (see line 1297)
-Message-ID: <aDbTOBjTo0Le7T5a@gondor.apana.org.au>
-References: <202505071746.eWOx5QgC-lkp@intel.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pn4kTPQj"
+Message-ID: <0b328692-f333-4bba-9572-6f3c86dbed29@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748423709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FI9HKlKAfdwWrEKUw5etibdxZ+5o3KFvUbDhmI3SbF0=;
+	b=pn4kTPQjC7e1P+nXW2gDru2pUb+AApmOIFcvMaQQcceHjVel2fhXM4qGNuOjhIe8RJ3Tuh
+	h/pNN3yQAx9UsrZwpptM2jrubF5d11fQiql17wRMxC5c7x1plULl8WB2aidGKwNaCq3y3D
+	+NCJy9gWuRc8lQu3Isla4IudqVTf/Mg=
+Date: Wed, 28 May 2025 17:14:16 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202505071746.eWOx5QgC-lkp@intel.com>
+Subject: Re: [PATCH v10 0/5] Add Loongson Security Engine chip driver
+To: Huacai Chen <chenhuacai@kernel.org>, Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, jarkko@kernel.org,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ davem@davemloft.net, linux-crypto@vger.kernel.org, peterhuewe@gmx.de,
+ jgg@ziepe.ca, linux-integrity@vger.kernel.org
+References: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
+ <CAAhV-H7hBksA2P+vfMbpDVnbjW1Mo09Out_wOQLgLRXPLaFCfA@mail.gmail.com>
+ <cda7ef56-87b3-6594-c2b6-2a4f5a1b63ce@loongson.cn>
+ <CAAhV-H557CLtoF23nbRQaoDPdzuM5xgsS-+-1p_VeX0OreG2vQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <CAAhV-H557CLtoF23nbRQaoDPdzuM5xgsS-+-1p_VeX0OreG2vQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 07, 2025 at 02:09:22PM +0300, Dan Carpenter wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> head:   0a00723f4c2d0b273edd0737f236f103164a08eb
-> commit: 9770b428b1a28360663f1f5e524ee458b4cf454b [1170/9308] crypto: ccp - Move dev_info/err messages for SEV/SNP init and shutdown
-> config: x86_64-randconfig-161-20250430 (https://download.01.org/0day-ci/archive/20250507/202505071746.eWOx5QgC-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> | Closes: https://lore.kernel.org/r/202505071746.eWOx5QgC-lkp@intel.com/
-> 
-> smatch warnings:
-> drivers/crypto/ccp/sev-dev.c:1312 __sev_platform_init_locked() error: we previously assumed 'error' could be null (see line 1297)
+在 5/28/25 4:17 PM, Huacai Chen 写道:
+> On Wed, May 28, 2025 at 4:06 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>>
+>>
+>> 在 2025/5/28 下午3:17, Huacai Chen 写道:
+>>> Hi, Qunqin,
+>>>
+>>> As I said before, why the patch "MAINTAINERS: Add entry for Loongson
+>>> Security Module driver" is missing?
+>>
+>> Hi, Huacai
+>>
+>> https://lore.kernel.org/all/8e55801a-a46e-58d5-cf84-2ee8a733df9a@loongson.cn/
+> Sorry, I missed this email. But if you put all files in one entry, you
+> can merge Patch-3 and Patch-5 as the last patch (then you will also
+> not meet the 5 patches limit).
 
-Ashish, please fix this or I will revert the commit listed above.
+We are cutting the foot to fit the shoe. Sigh...
+
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yanteng
+> 
+> Huacai
+> 
+>>
+>> Thanks,
+>>
+>> Qunqin.
+>>
+>>>
+>>> Huacai
