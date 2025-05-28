@@ -1,169 +1,287 @@
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010051.outbound.protection.outlook.com [52.101.69.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E557278162;
-	Wed, 28 May 2025 15:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748444475; cv=none; b=CTnL0p82ID+OMBlBUMnv7xaujr/3omzKgkpHBxbY/7aHNJ7/GQlkAck4QtNdy4JFLVwoMeQOR71w9NAS89MXns6diLXcChSJ9XbrpfKSXL2RFZlXcbdWoroWG4vIypu80cBghl49h8xOmW2yQrfFTt6nFLfzo4mTP/akr3jNias=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748444475; c=relaxed/simple;
-	bh=tVOvSZ8WGTNMT3w3paP3QmhD8M1rHT/WEr04d2e45+I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iXfTr4PJg9JwXWtg58UmbQcxnqBtdJqqOF9gO8AMEee86gUJiiIbhIu9FYg9qT9GDaAZsE2Y60BaQECttVXi4eTzI3PXURMN3kYG92YBFFqlDJ9TdKOZD9DUE5YKNio26jd0t0E5vFSHl0mOTbOYvfc8PFR8OVGAH7Ln4pZtQJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HtQkGB6U; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2053D1DF98D;
+	Wed, 28 May 2025 15:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748444509; cv=fail; b=GfwrJv8HG5AUmyL4mPjH6hgFIglx+YPL6GH7z62LAT0aqMt9XNrto1mTN9+jta9kIvsd5tqT4JK7pSEGxsCaC8YXZNO8WXdaLtqH4toGMyEVsZuCgpr8iS4dNNF97Yh3jVl6rsVr6okK8p0P5wMh3+PC33kF3TKw1vTts1muBoA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748444509; c=relaxed/simple;
+	bh=lymmOo+0loRXqQTgjbWa8JL31ZwvMWIL2B5PPoik74k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jT7pg8kMh/j5Tx6aWqeLZVLTZgA6TFZL+uMcmPgBeEaV284cMdvREjNwzIgaiHB+iGJU7E5Gq4xNT3lZnoWCvYa9mTNACAg6UPiXnzQxapVK33KOxR21EJsWLowhD2rwNEFvlHrPcJLmCmScT52DDbUvZzFSCAku0xGQsxHfwQc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PgF+hwDd; arc=fail smtp.client-ip=52.101.69.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HtQkGB6U"
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54SDr8x5010777;
-	Wed, 28 May 2025 08:00:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=b
-	7wA58ZuF2OXeCi/aBSKESuuC9O3XlcY7z/3D2Eq/FY=; b=HtQkGB6Uz40VvLUrK
-	HsJy1cXhy5eQYUx+OUtzoHir/TLmCGs47lEqb5o01tPgOA5ZwjBiSDsL8yg2fm+m
-	eTFgMOB/+Anoh1hwzOmQZ/sTHAh86qLs5erWZYqopVBH/uAXTCGNDvshJRibaa6R
-	ocYYkrq5Jhz6w83Kz6+E0EnRqoaQm0/1II9xGykBBgDTIGksenJdlpVDvPHKk3OM
-	XvRL2g2TaZra4ESAtCsajuCdjLv9wN2Iga7V/1STmULD0IgI9IwjsDw3XtiyO3Me
-	jAFMcc0qiHOM5N3UPNbUhpXbjH8PQ9BdIGDy14Z0wjJ667sukhcGQG8ZJY1OII9C
-	0VCOw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46x1e30bce-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 08:00:03 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 28 May 2025 08:00:01 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 28 May 2025 08:00:01 -0700
-Received: from localhost.localdomain (unknown [10.28.36.167])
-	by maili.marvell.com (Postfix) with ESMTP id 3DB1F3F704F;
-	Wed, 28 May 2025 07:59:56 -0700 (PDT)
-From: Amit Singh Tomar <amitsinght@marvell.com>
-To: Srujana Challa <schalla@marvell.com>,
-        Bharat Bhushan
-	<bbhushan2@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Amit Singh Tomar <amitsinght@marvell.com>,
-        Kuan-Wei Chiu <visitorckw@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Philipp Stanner <pstanner@redhat.com>,
-        Shashank Gupta <shashankg@marvell.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Tanmay Jagdale <tanmay@marvell.com>
-Subject: [PATCH 2/2] crypto: octeontx2: get engine group number for asymmetric engine
-Date: Wed, 28 May 2025 20:29:41 +0530
-Message-ID: <20250528145941.2659706-3-amitsinght@marvell.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250528145941.2659706-1-amitsinght@marvell.com>
-References: <20250528145941.2659706-1-amitsinght@marvell.com>
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PgF+hwDd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=S5gZmQnbjRjzh11nlN6KRuHtqcLxEPGKtyPaDBaBZmDYFFU10mwtzon+GvWcYoLgHVhMSYyOfvySKH5PifLKxb7/grPI84osOn8IXiUWUhOnTp2tWl69qCZ1q7e73AnR629yEIupIicg2XhzfhHvir3YWAZnKuII18bpFVf2WXXV0uHJLRi5ssKznPROGTdArziyhaq7ALBQinE7+H/r66sQepdeTAz9WOuo88cHuUqOzFbKCCSymU1EV93OAnQKFNPBu+7nqZYw2v9bhMbeUfe1HqfsSACfVbp75sWrYIyIVtj8NvjcCcX32zGOetRgCloexe8i/eYRn6zHa2EGQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0sjfUW+ZcXX4x+xhmDE5Om1Vg9AojvW+UmIvpD4LNmw=;
+ b=jXmllfW1Crg7wyMJTqFmOv59RX+DI69WzIfkAhtPiFofjX+Wej4YU0ig79J2mcLUO3gC9ZXcym0oqo/l1pXYK9CRRxSFI4aVBuo3T8olZXmpZax428umcrjlekSne55PSEW9rvQUX4VJur8zloxsK4631y4yyUvIHXVF84b5zXnBzprKedXRPWt0RkwH7UGbnnvAuL3a8/09AnLb/ROtPKjXC2Hiw8Xhjrjma2uD0qabxhTue7BtnKDM6jdorcMbO2dWPeFETQI+RwRvgmiOB8T8MeQ/EyAl7awrTYZNHutueMqc62amxy4l8LBa/lEyQxniMrAfx4JsZl5Z1lKsIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0sjfUW+ZcXX4x+xhmDE5Om1Vg9AojvW+UmIvpD4LNmw=;
+ b=PgF+hwDdQ+kbtFezvqInq2V5e1FsPhjOe9NeWxrzqebr+LFRhhQnHILsFkIsiMwHqTEMLt4goLRauuBq8hzB+0EpRSgzsH6pecbFtz0siEUImdA8JDDjUxy4MfjAZ2Ue/dfe2NIUSw3mwTTTj258fswXUw7P5/0/GkctYXD45fYlaS1qJH6jwwfEALRKjCaUBdgUPSaeZ3gU7e3NyJemdL/cFbuwkIXZdXX3ch7US7UdG9QKhTI9UZkm3pT3wqc4Xr5pKrHT3ZDbSR1lL7El4oRZc/bE7LK1V7UtlKjx3xSmX2Jhder+Ihs5igiLj0063FO2IiHlZijy9QMzJrR2Mw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by PAXPR04MB8960.eurprd04.prod.outlook.com (2603:10a6:102:20f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.29; Wed, 28 May
+ 2025 15:01:44 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%2]) with mapi id 15.20.8746.030; Wed, 28 May 2025
+ 15:01:44 +0000
+Date: Wed, 28 May 2025 11:01:33 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: John Ernberg <john.ernberg@actia.se>
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Thomas Richard <thomas.richard@bootlin.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 4/4] arm64: dts: freescale: imx8qxp/imx8qm: Add CAAM
+ support
+Message-ID: <aDclTQ8Z5WcHMxgT@lizhi-Precision-Tower-5810>
+References: <20250528144259.2603914-1-john.ernberg@actia.se>
+ <20250528144259.2603914-5-john.ernberg@actia.se>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250528144259.2603914-5-john.ernberg@actia.se>
+X-ClientProxiedBy: SJ0PR03CA0237.namprd03.prod.outlook.com
+ (2603:10b6:a03:39f::32) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: e4x9pK3bpR8ZeCjYTmRVQB9mlElvoYSh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEzMCBTYWx0ZWRfXyCKjnCWrnV9r Xyywjxo2MIFrbHKH+a2/wW2SF2Jio4giVJwrAtNJvfxqtMuDbIyam1YWP1Ox3sT9qODtVcRIGou JXrJgph60mQGI3AasKaxL36bZYKuZiYLW8t09dXmnTJ4+xTLcuYNvw8ZEpPu4c9PjrJNMyduHUN
- qxaZJf8t6Tu7xNenjTpwfnEJ4lw6wFOnd4auvwj8SsGQeHdOXGg2DSXeI4Rjrm7+e/vpfb4A0wJ Yh6Z1ddbTC+Q6QrX/YBTfjUn+ow6I0zrjvABx5f3AP1Cq2z/WXMww2Gs4GmzqOsK4D30dlNYPXp gFb3/gA16HzxfBuUXRpXxOYBp4KGfQwHTkOOmteQvQzziU9fbHlC9s1KkH68sYJXvtH7TVxObDT
- XV7PgvRafgwjcmOuCIaZGBaDRnc5d7xpLEm3mcR4xdaOr13yWEFFmzif8dPw2Gteo0+sYc6p
-X-Proofpoint-GUID: e4x9pK3bpR8ZeCjYTmRVQB9mlElvoYSh
-X-Authority-Analysis: v=2.4 cv=baVrUPPB c=1 sm=1 tr=0 ts=683724f3 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=HShFi8kSKcbLiSuR9dgA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-28_07,2025-05-27_01,2025-03-28_01
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|PAXPR04MB8960:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5eea6d63-1b11-42c3-5de7-08dd9df88f46
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|52116014|7416014|1800799024|366016|38350700014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Vk1PLzlrR2ZkZlJ2c2pwakJERE5BUlVTbFpyU1dDTWVWYVUvNEpSeVY3aUZk?=
+ =?utf-8?B?UWNVOXhCTTdJOEYrSHhqZHk0S1lmQmtlTm5tZWZTWENtWUZUc2xraytlbDkv?=
+ =?utf-8?B?MzhmdDNZc0o4WkNpc0tCc3ZkaWpOcmtxYUJIN012ckIzanVGMjd2NStXcmVN?=
+ =?utf-8?B?NjQ4WlJidHRndU9rVVAxeC81WG1Gd1BXWm8yeElNbnN2ZForNzNHK2dVUmdk?=
+ =?utf-8?B?RGdxNnJqL09SN1l1L25xUUR2c0ZId0ZDQzdkR3lJeStmV0dFMVlibFdwVXoy?=
+ =?utf-8?B?NzFHdUVnY1JtWnhMVTZUeHVYOTIzMnVPTDcwc2tXSjRwektIaTFIV00wQlp0?=
+ =?utf-8?B?RUozWXpFeU1kVVlpbXZVVWd6OTMwNHhaVlROa3QwM0NTNy9XcGRkYzlXOTQ2?=
+ =?utf-8?B?SWJ5T3E2NndxdDFtbVQrOGljaVNZUFUyQ2dDZzVBblczR3dEd3lwVnhYWWwr?=
+ =?utf-8?B?WTYvbkdraGdwSnA4R284cUMrS2tPWlE1L3kwRmg0UjVCZ09yY3RMZDVJNkRP?=
+ =?utf-8?B?UEM1ZUdYT2Z3djlmUDFEay83YkxrWXBaZ0g0U3RHQXI5bGowWjExbFFleVBW?=
+ =?utf-8?B?ZTFFR2dLQlhSZjlBREZEWUk2aEhwMWY2K0s4dzl3VDZwczNUOHZSNExjSDJa?=
+ =?utf-8?B?cjRDb3p4UDNJWGNKNy9nUEREODArMWZCY1BSY1ZxSFJFWXc0dmF2ZGpIb0lJ?=
+ =?utf-8?B?OCtFdHhDaXQrNERCbEM1emNoSTFSUldLY0FjZmg2L2FEUU1sbFE4VThpWUo4?=
+ =?utf-8?B?d1NmZXNvUksvMTlHTmg4eWs0cUh5VVhpTzZrRk4rZmx6aXg1U2QxclgvS0tu?=
+ =?utf-8?B?QWZKdmFnWGRZN2t3V21Wa290Q2JPL3BpV0NjZmFmTDBDQWMvOFVSTnpwK25y?=
+ =?utf-8?B?Tll4a1lmOWZnUHpKbTc2Y00zSWhiOEVPbmgvSlZaLy9XdUJudzlDQVdoL3d4?=
+ =?utf-8?B?a3JKcnpqTUZyVU1rSGxla2U4OTkzV2hkNkRYODFWVU03NHozMGN3ejUzSERr?=
+ =?utf-8?B?cVVrdXhRS1lMdXFNVXczVHFHcm02ZWI5c29WQVhySllsVEZoSkR5YVVqYVM1?=
+ =?utf-8?B?SHNGRGc4TSt4NW0yQ09IVnZiNG1aVEQybzBFWTBHS0tvTEJrTFY5YUd0R3JQ?=
+ =?utf-8?B?OXg2MjF4MmRtUjVTRTU1S2pzQStkZ2tITVN3RldYdy83eTdHRFhzb29FNC9j?=
+ =?utf-8?B?WGREOE5qaVFMMkxiY2VieTdzeXVocTQrcGxKczZTdldGMFJDZmR5NmZDZVBm?=
+ =?utf-8?B?V3NyRmE2Q3lFcHhSM0NWd2NQL25rcGpFazlsUkNPK1g5aEJhNlI0VWV3dVBi?=
+ =?utf-8?B?Z2E5STEwUXNZNXRXdmYwdjBnazZIM2NJRXJ5bW82TEFtTUFQQU5Kc1NnMlV6?=
+ =?utf-8?B?MFh6UDZ4NXdDQW1kMUZmeG5IbEhHamliUjhocHJjMlBaTkp0NnJWZi92UVl2?=
+ =?utf-8?B?NjNHcGFMUk5ucXlRWC9FeFJYbTZVUUV5cGdpZ3VGUThDYkxsQ1ZFQytYeHlk?=
+ =?utf-8?B?S0RieXk4cXBjeiszc1VSeUpSbGlMZEdGVWRIRGVoYWsyNm9LREVvamN1UWZ5?=
+ =?utf-8?B?aktnSWNsOUozZERaR3ZOKzZXck1YYnFWMHJZVU5DSnVEdXIyYWI1TSs5ZlFq?=
+ =?utf-8?B?c1JhQS9iVHVMQk92TjByY2E3UG5jU2VJRUVxdWtwMVg4eUcrVXVPbUVPZWZT?=
+ =?utf-8?B?MmtWck1kL0pqVWtGU2lFKzNncmdGSUFGUHZ0ODhIZ0QzdjZGSkoxdTlhWlI1?=
+ =?utf-8?B?YlJObDZxTUdaWTg2QzBXUUhlYUhoVzdicnAyVFVZbThkd1BTbk1aSGk3VkVS?=
+ =?utf-8?B?M3pTdmg3UlhyTW45aXNqdzJBY1QzWDJJL2xQMWpGRzJkUTBpQUNCWElTSC9F?=
+ =?utf-8?B?S3FlQnVLUW9rdGhVVFdvSzB6VVBYbXJKTW5vWElKMnFqTCt4WUNoWnJpcnBj?=
+ =?utf-8?B?SlQzazExUFRrYWVGRjdSRjBUcVlOTUdkSXQ3YVYxM3J6ZHNiVnRqYkRWeVZ3?=
+ =?utf-8?Q?9DZ0e7tH3X/XOxoGkaWWwlGyXC8M7k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(7416014)(1800799024)(366016)(38350700014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WWJZZjdtS1NNK2pLUXQ1bXFmKzBKY2xBbWt6a1drdUtBcE1OUC9NbFdrNE1W?=
+ =?utf-8?B?djJhM3FBU1ErbWlSRnVYSi83NHNyR1dDV2F4S2VBcHhuNmVqSTFJVzNBbFVL?=
+ =?utf-8?B?bFNYaEhOeEpPSU1wTjVsdzV1QXh3UFJXOWQ2T3pLejRIQ1pzSTdlVW5JaWk5?=
+ =?utf-8?B?RjltSzJkRTlwWkExSklBTEg4dU13KzFBWlpxWSs5RkxxZkN6djY4dmxMZVla?=
+ =?utf-8?B?blRlSFhIK3lxa1lUZ0xjWjVxUGIzR3ZzQjVpMjdOcXZGQ0tPZGNkTEQxbUhl?=
+ =?utf-8?B?MFoyTWcwcUlDTjRPN29RVGtxTTFIU1dqck13VDJQNjZjTk0yZFczZXJiMHV3?=
+ =?utf-8?B?UGJSZVBLdjNnSmFRVktwa3ZpbUl1OURkdTBNcTl6NmFCY0JwcStRN3RNa0tB?=
+ =?utf-8?B?T0dIOWk0bG5HNkQ3b2FTZU0vT3JGVk16MG1wTXVQWGo5Z2ZFdDJyRWlWUHZ0?=
+ =?utf-8?B?aWRoU3lQVW8rclFaZmU3V3A5K0htK0pEZi8xK3ZPRlVqK09pY0NzTDBkSTFu?=
+ =?utf-8?B?SnVQSDlLT3JyRHY0KzB3WlFJZjJtOVJmVHhSd1JQTjd0WkZNbnZVVTNUMlNN?=
+ =?utf-8?B?aEhXR0JVNFpxQUNDUWdDZlUzRmZJTytsZlU4eXRjS3IrMkhmUmo4U0dVK2Zy?=
+ =?utf-8?B?MHhHTDdPQng5TXdDeG1aWUhGNlhVb2h2UWlDR3UzcWtaY1RlRUQwK3ZIZE16?=
+ =?utf-8?B?MGVxNEN4QWhrZlI2cnFTT2RoNXllWkF1cDlZaWYxYjRpYlcvUzVoOS9CV2Vx?=
+ =?utf-8?B?WWRmMk1NVDFCekQyeTlOVm5FeGNTSTZLL0tYbEUrQXRhaXJSc290bFRsS21J?=
+ =?utf-8?B?ZGNkbjZzYXFTSTVSbk5pOUtyV0EwTG44VlRmOFFGSnBvRWRQU3J4RGppbndt?=
+ =?utf-8?B?RUVVUERPMzJmbm1HMlZLUDhtd3pIUmZXb1Z4eERQK2NTQlJ4VG9weFdUNUp1?=
+ =?utf-8?B?U3ZSTXBaTU54WFZCcERGejBiTGo5Q2xoaFA4eVhub2NsYVl4cm1mbmVrTWFT?=
+ =?utf-8?B?dnloZEhvaTBQN0RBVVU3ZU9sb1YwK2x4dnhyaFBNNmRBQ1BaNkViQkd0S25w?=
+ =?utf-8?B?SWJkQ2JYaGdIY1FCMFpQaktodFJlblIwNHFuSjlMK09HM1l6SHV1Zndnb3VK?=
+ =?utf-8?B?dDFFUjA4WGNTUFg3b2NGYlR6WFVSVWsrUUVvcFpPYlZuRW95SXpvbXU0dkVy?=
+ =?utf-8?B?eTZvR00yU3JIWkozUnNoTHBuUWV5YS9FZi9pYUVDYjIvdldhbDBSMFdSTlhH?=
+ =?utf-8?B?NVV6ZzhmSW9QMXB6Y2tOUWxhNlNHUFB2SFZuTnEyalUyMFZIRFM0TGs3Q2Y0?=
+ =?utf-8?B?cGF3QUJuanZ3U1NaV0RUOTdPaXhtYVVUR05BQVk4WXlhbTJmcVNNTm5HcHo4?=
+ =?utf-8?B?QVdJN0FVK0w3anNmN2xscWlJdDJDZ3cyN2x0WGZCMnJlMTgrUSs0MXBLL3ZE?=
+ =?utf-8?B?SUF3M3hYeUZRY3lKUlNPWHRHTmkyT3BnY1JoS3RTUG9GdTNLbkNveFZkMTRr?=
+ =?utf-8?B?S3NycERQU3AvNktPWFRmd29ZNjh4ejR5ck9RbjZTWWdvSWIyMTdneEIrK2th?=
+ =?utf-8?B?STJIV0FLRHpxUGxWOUIwazlEUkF4cHhWaFM4dkhzc1dRODJiU0g4bnlmZkFP?=
+ =?utf-8?B?ekhaM01Ub2ZtOW5vVCswcjFIR05rNWRVcDRlbWkzSkprZnRQMUtMWGpBUTBJ?=
+ =?utf-8?B?ekJNT3RvOGQvdGl0c1lHMzdjREJ3OGV6cDFyVmw3UlRXbFRodUVSc1JzVEEr?=
+ =?utf-8?B?dElhWm1EUi9RS0s0M0xEcTExMUR5OXhJUlo3QXNoc3haYlFwM3k5WkNJQ0pa?=
+ =?utf-8?B?UHFRbURNODV4Y3RlUW1jd1FKMmx0Q24vL05HZUprMnlaQXVGVWFuRWZocUht?=
+ =?utf-8?B?VE1HbzQzSlJkUUNWZldFUWQwaUtIWk5UQWlhS2FYUW9GSTFHR3hnZEE4SGFW?=
+ =?utf-8?B?VHhvYnl2Q2VRdVdzdy9sVW5vOGo3TFR2QU9QVmpkK2ptVUhHV2RSeFMvMTll?=
+ =?utf-8?B?bDZUbE9iL1lGY2M2TDRRa1VFMXkwVWJSb3cxdkNFMVBjakU0VC9KMmtWb1BZ?=
+ =?utf-8?B?L2VteXU2Ym1iVTErU0NBWFZFZnhZQThaVGhXdXU5d00vZGVGaXJ6SXRIMXFN?=
+ =?utf-8?Q?Y8prAaZuEU6iqyXrv5lxVZpgZ?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5eea6d63-1b11-42c3-5de7-08dd9df88f46
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2025 15:01:44.2852
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lbqM0TWExjEGsB5wdkoJ/4865mhSG2PXQkcboypvDX975Z2Q73oiWq6ao5NLv6rAvTWzQDPBqe/eaOSnlyW6NA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8960
 
-Cryptographic Accelerator Unit (CPT) support different engine groups, one
-for asymmetric algorithms (only AE engines in this group), one for the
-most common symmetric algorithms (all SE and all IE engines in this group),
-and one for other symmetric algorithms (only SE engines in this group).
+On Wed, May 28, 2025 at 02:43:08PM +0000, John Ernberg wrote:
+> From: Horia Geantă <horia.geanta@nxp.com>
+>
+> The iMX8QXP and iMX8QM have a CAAM (Cryptographic Acceleration and
+> Assurance Module) like many other iMXs.
+>
+> Add the definitions for it.
+>
+> Job Rings 0 and 1 are bound to the SECO (Security Controller) ARM core
+> and are not exposed outside it. There's no point to define them in the
+> bindings as they cannot be used outside the SECO.
+>
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> [jernberg: Commit message, fixed dtbs_check warnings, trimmed memory ranges]
 
-For symmetric engine (SE), we obtain the group number using
-"MBOX_MSG_GET_ENG_GRP_NUM" mailbox. Let's follow a similar approach to
-determine the group number for asymmetric engine (AE).
+what's this for?  remove it if not related with this patch.
 
-Signed-off-by: Amit Singh Tomar <amitsinght@marvell.com>
----
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h   |  1 +
- .../crypto/marvell/octeontx2/otx2_cptvf_main.c  | 17 ++++++++++++++++-
- .../crypto/marvell/octeontx2/otx2_cptvf_mbox.c  |  2 ++
- .../marvell/octeontx2/otx2_cptvf_reqmgr.c       |  2 ++
- 4 files changed, 21 insertions(+), 1 deletion(-)
+Frank
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-index 49ec2b92e86d..1b9f75214d18 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-@@ -125,6 +125,7 @@ struct otx2_cptlfs_info {
- 	u8 are_lfs_attached;	/* Whether CPT LFs are attached */
- 	u8 lfs_num;		/* Number of CPT LFs */
- 	u8 kcrypto_se_eng_grp_num; /* Crypto symmetric engine group number */
-+	u8 kcrypto_ae_eng_grp_num; /* Crypto asymmetric engine group number */
- 	u8 kvf_limits;          /* Kernel crypto limits */
- 	atomic_t state;         /* LF's state. started/reset */
- 	int blkaddr;            /* CPT blkaddr: BLKADDR_CPT0/BLKADDR_CPT1 */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-index 79adc224066e..c1c44a7b89fa 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-@@ -276,7 +276,22 @@ static int cptvf_lf_init(struct otx2_cptvf_dev *cptvf)
- 			"Symmetric Engine group for crypto not available\n");
- 		return -ENOENT;
- 	}
--	eng_grp_msk = 1 << cptvf->lfs.kcrypto_se_eng_grp_num;
-+
-+	/* Get engine group number for asymmetric crypto */
-+	cptvf->lfs.kcrypto_ae_eng_grp_num = OTX2_CPT_INVALID_CRYPTO_ENG_GRP;
-+	ret = otx2_cptvf_send_eng_grp_num_msg(cptvf, OTX2_CPT_AE_TYPES);
-+	if (ret)
-+		return ret;
-+
-+	if (cptvf->lfs.kcrypto_ae_eng_grp_num ==
-+		OTX2_CPT_INVALID_CRYPTO_ENG_GRP) {
-+		dev_err(dev,
-+			"Asymmetric Engine group for crypto not available\n");
-+		return -ENOENT;
-+	}
-+
-+	eng_grp_msk = BIT(cptvf->lfs.kcrypto_se_eng_grp_num) |
-+		      BIT(cptvf->lfs.kcrypto_ae_eng_grp_num);
- 
- 	ret = otx2_cptvf_send_kvf_limits_msg(cptvf);
- 	if (ret)
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-index f36d75f40014..3078e2375d3b 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-@@ -126,6 +126,8 @@ static void process_pfvf_mbox_mbox_msg(struct otx2_cptvf_dev *cptvf,
- 		grp_num = rsp_grp->eng_grp_num;
- 		if (rsp_grp->eng_type == OTX2_CPT_SE_TYPES)
- 			cptvf->lfs.kcrypto_se_eng_grp_num = grp_num;
-+		else if (rsp_grp->eng_type == OTX2_CPT_AE_TYPES)
-+			cptvf->lfs.kcrypto_ae_eng_grp_num = grp_num;
- 		break;
- 	case MBOX_MSG_GET_KVF_LIMITS:
- 		rsp_limits = (struct otx2_cpt_kvf_limits_rsp *) msg;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-index 8b4ac269330a..e71494486c64 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-@@ -399,6 +399,8 @@ int otx2_cpt_get_eng_grp_num(struct pci_dev *pdev,
- 	switch (eng_type) {
- 	case OTX2_CPT_SE_TYPES:
- 		return cptvf->lfs.kcrypto_se_eng_grp_num;
-+	case OTX2_CPT_AE_TYPES:
-+		return cptvf->lfs.kcrypto_ae_eng_grp_num;
- 	default:
- 		dev_err(&cptvf->pdev->dev, "Unsupported engine type");
- 		break;
--- 
-2.48.1
-
+> Signed-off-by: John Ernberg <john.ernberg@actia.se>
+>
+> ---
+>
+> Imported from NXP tree, trimmed down and fixed the dtbs_check warnings.
+> Constrained the ranges to the needed ones.
+> Changed the commit message.
+> Original here: https://github.com/nxp-imx/linux-imx/commit/699e54b386cb9b53def401798d0a4e646105583d
+>
+> ---
+>
+> v3:
+>  - no changes
+>
+> v2:
+>  - Use new compatibles introduced in 3/4 (Frank Li)
+> ---
+>  .../boot/dts/freescale/imx8-ss-security.dtsi  | 38 +++++++++++++++++++
+>  arch/arm64/boot/dts/freescale/imx8qm.dtsi     |  1 +
+>  arch/arm64/boot/dts/freescale/imx8qxp.dtsi    |  1 +
+>  3 files changed, 40 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/freescale/imx8-ss-security.dtsi
+>
+> diff --git a/arch/arm64/boot/dts/freescale/imx8-ss-security.dtsi b/arch/arm64/boot/dts/freescale/imx8-ss-security.dtsi
+> new file mode 100644
+> index 000000000000..9ecabb2d03e9
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/freescale/imx8-ss-security.dtsi
+> @@ -0,0 +1,38 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * Copyright 2019 NXP
+> + */
+> +
+> +#include <dt-bindings/firmware/imx/rsrc.h>
+> +
+> +security_subsys: bus@31400000 {
+> +	compatible = "simple-bus";
+> +	#address-cells = <1>;
+> +	#size-cells = <1>;
+> +	ranges = <0x31400000 0x0 0x31400000 0x90000>;
+> +
+> +	crypto: crypto@31400000 {
+> +		compatible = "fsl,imx8qm-caam", "fsl,sec-v4.0";
+> +		reg = <0x31400000 0x90000>;
+> +		interrupts = <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>;
+> +		#address-cells = <1>;
+> +		#size-cells = <1>;
+> +		ranges = <0 0x31400000 0x90000>;
+> +		fsl,sec-era = <9>;
+> +		power-domains = <&pd IMX_SC_R_CAAM_JR2>;
+> +
+> +		sec_jr2: jr@30000 {
+> +			compatible = "fsl,imx8qm-job-ring", "fsl,sec-v4.0-job-ring";
+> +			reg = <0x30000 0x10000>;
+> +			interrupts = <GIC_SPI 453 IRQ_TYPE_LEVEL_HIGH>;
+> +			power-domains = <&pd IMX_SC_R_CAAM_JR2>;
+> +		};
+> +
+> +		sec_jr3: jr@40000 {
+> +			compatible = "fsl,imx8qm-job-ring", "fsl,sec-v4.0-job-ring";
+> +			reg = <0x40000 0x10000>;
+> +			interrupts = <GIC_SPI 454 IRQ_TYPE_LEVEL_HIGH>;
+> +			power-domains = <&pd IMX_SC_R_CAAM_JR3>;
+> +		};
+> +	};
+> +};
+> diff --git a/arch/arm64/boot/dts/freescale/imx8qm.dtsi b/arch/arm64/boot/dts/freescale/imx8qm.dtsi
+> index 6fa31bc9ece8..6df018643f20 100644
+> --- a/arch/arm64/boot/dts/freescale/imx8qm.dtsi
+> +++ b/arch/arm64/boot/dts/freescale/imx8qm.dtsi
+> @@ -612,6 +612,7 @@ vpu_dsp: dsp@556e8000 {
+>  	};
+>
+>  	/* sorted in register address */
+> +	#include "imx8-ss-security.dtsi"
+>  	#include "imx8-ss-cm41.dtsi"
+>  	#include "imx8-ss-audio.dtsi"
+>  	#include "imx8-ss-vpu.dtsi"
+> diff --git a/arch/arm64/boot/dts/freescale/imx8qxp.dtsi b/arch/arm64/boot/dts/freescale/imx8qxp.dtsi
+> index 05138326f0a5..e140155d65c6 100644
+> --- a/arch/arm64/boot/dts/freescale/imx8qxp.dtsi
+> +++ b/arch/arm64/boot/dts/freescale/imx8qxp.dtsi
+> @@ -321,6 +321,7 @@ map0 {
+>  	/* sorted in register address */
+>  	#include "imx8-ss-img.dtsi"
+>  	#include "imx8-ss-vpu.dtsi"
+> +	#include "imx8-ss-security.dtsi"
+>  	#include "imx8-ss-cm40.dtsi"
+>  	#include "imx8-ss-gpu0.dtsi"
+>  	#include "imx8-ss-adma.dtsi"
+> --
+> 2.49.0
