@@ -1,180 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE51419D07A;
-	Wed, 28 May 2025 16:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD4328DF03;
+	Wed, 28 May 2025 16:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748450760; cv=none; b=cqXpEly05r+pREimyrp69ErLAWV+sSZ44oTlC0N21W/TFmhP6/piRgukFjEbCWlyhggXE/unUWOcC9AwysyIfzC2Djel9+Wx4PhH/+2LXtINz/M12eG1y92uZTX0q7+6N+NbiT5GHRSIeXEwutMBD2Dfj9ThYsIQnvWG5UCxEmY=
+	t=1748451549; cv=none; b=Fe8dZmVpesr4gMo6qeopNS49mNf5wR/Mpbf+gC6al0oaCsj28gIteXucE25R9sDHXBWP47MkKgy39s25Pz5xr7kVM5Tzww/jnAs36BXVFMjsS5mAP+BlMEeFWrY8fifI1plnGXw0QyCFPEIu54/p9bPs9nKa/qAP+8DOoFLYIfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748450760; c=relaxed/simple;
-	bh=ZzP3dZbIvqBIvFOURta05rer0syVpr9AYK8L5vT3Cwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G4M64C11vrr8lkF/epF81v2cF2jjJlNkGBZICi4bbhK5LqqAjiwRSJ1z5iRX2C1FzhJtEwJR5gIFahsIx7mj8W5o1ppzcW47hBChlvrOdpKl+GZ5r9Wbt5PcRcb58O9zq8Z8FHWsnVu9EvAl2fRskkWYE/fwSQVQxtqDDYyv7io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVXzyTZM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748451549; c=relaxed/simple;
+	bh=xP2c9GIwsMqQtGZLR94lMghxEZG0UL4HkkMvzlYZWO8=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=N0ZRVW5B1cCd3pxE7yW2uVHK+E9TIZ3gMUnKvogSenEFWoXalO1CJ9dKsuTZXs+z5R7ijbm/p4bcUyEBCnwGU6EAZLPakyrm3LMgsZ/B38ekLnrIvP2gTH4/pEIgRQDK7Y/ieGdj35FF/it3l/J0SP4uWa9cZN7KjwnDq9Y8o7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=CbvEonSl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KYVf8BpU; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVXzyTZM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4561BC4CEE3;
-	Wed, 28 May 2025 16:45:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748450759;
-	bh=ZzP3dZbIvqBIvFOURta05rer0syVpr9AYK8L5vT3Cwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LVXzyTZMwmjueFCXAoq3KZlHkwl9jf4A8JjFcq88dAM8hfAUvmtIJwb4Bxl1ws/Tr
-	 ApiRG/VITi515B6Pd224PL11E1tw2OcX/bfPd9uyszUuCLjVdgABdingNaaqyC7mzp
-	 zIF8RYFthHLqWDi0F8kgcOQGCEuFDmi74VyHJq4TwH3+1LZ9YFgH+QGTaJqYd6q0el
-	 qWnBQpBmvMyzupU04McJocy6KvMvfgj9+u3CCT9Io12x+Eg2mBF88vXa+v2YwWoPti
-	 bnkKh0jPV2DP3SpwsBor/BcnjC4nejO+DYEbJIIIS9yKBw543336xSXo+fmxCKwpFg
-	 lpXE8h/tMxsPg==
-Date: Wed, 28 May 2025 09:45:55 -0700
-From: Kees Cook <kees@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>,
-	Justin Stitt <justinstitt@google.com>
-Cc: linux-hardening@vger.kernel.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-	linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kernel test robot <oliver.sang@intel.com>,
-	Arnd Bergmann <arnd@arndb.de>, llvm@lists.linux.dev
-Subject: Re: [linus:master] [crypto]  40b9969796:
- UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c
-Message-ID: <202505280937.6802F0F210@keescook>
-References: <202505281024.f42beaa7-lkp@intel.com>
- <20250528061427.GA42911@sol>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="CbvEonSl";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KYVf8BpU"
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id BF5F61140135;
+	Wed, 28 May 2025 12:59:06 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Wed, 28 May 2025 12:59:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1748451546;
+	 x=1748537946; bh=LDMLe1OsHNvAiaE+yCUbTBas5Ud07EYR3wfP01RS7as=; b=
+	CbvEonSlObjQmr/ENFYwXlOn3Cnv1cN+1IEx+e2Ab23SPHhfKgz1XueM3fIcXkNy
+	SNAp0dWWYLpZKbcTIbfHX2WF50LYIWSXFyoWc2k4lDZ5LWu8wh+Ve88KSODl6vla
+	PDOK3aQC9aMwqDtboyP5v5mx4IIAX2Ur49yCoiq3dSEHzalS8tsVt7X2MOZ+1X7a
+	FPrqnkEzHbUGqkywECJZMaABpCIXub1AUUaxeluVYhtY7YDGYr1GYd3N1PctEigD
+	FFseJAiDEo8rfwobpyHH8ZETk/Q3TxxWDfMVAWUrFv95sv32QbsaOfaH2aobzCtj
+	34WUyaPhAq0m1rSPDNteBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748451546; x=
+	1748537946; bh=LDMLe1OsHNvAiaE+yCUbTBas5Ud07EYR3wfP01RS7as=; b=K
+	YVf8BpUEaYAApd+aYNL/QKwjVaXyMecVPGA6F2XwKDk+X6SIwGCLbJS3KfOMpyb7
+	moV7fEYaVU2Gcxp6gttLPCXQ3kZTV9Hr7Sq6Ex4Ql6DweYicAPUtZ/wNpJG71ylk
+	hgy7zYqbVjO4pv4eBPsq2Y/FfJ1/Lk1UWgUpO56pWM55LNfxdcWAdC4w+VxwjoUx
+	q9YQWKLUkDsvSa1GPyKnHL9KVIwlqrboSy0xrp3bS7AAyWPyg+THIDCQ5CHeJ5q/
+	DuYLLnu16UIC0UFSwcX+XZKW/luz3uFtrNeng/xPGrTK59CzNLewj1VV8sO/zuo6
+	BwlGuk476VBHwu0MNewfA==
+X-ME-Sender: <xms:2EA3aGq_c7e29CDINjflnwN6vQsFRKUbM0wL4brFM1H1T2o9msR-zw>
+    <xme:2EA3aErY78NnJY5ukk14GqjiP4AQUxHV3mBQ-EFX19AOddbhFlReIIMHkr1SbmZFF
+    4oiyrZOGA09GdjRemY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvfeektdculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefk
+    jghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfd
+    cuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeeh
+    udekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+    pdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephh
+    gvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehj
+    uhhsthhinhhsthhithhtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehlkhhpsehinh
+    htvghlrdgtohhmpdhrtghpthhtohepohhlihhvvghrrdhsrghnghesihhnthgvlhdrtgho
+    mhdprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epkhgvvghssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhk
+    vghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehllh
+    hvmheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehlohhonhhgrghrtghh
+    sehlihhsthhsrdhlihhnuhigrdguvghv
+X-ME-Proxy: <xmx:2EA3aLPrCXH1sLOgxGk-N_ufObFw_-vDd88aHQv85aFF9g6SXA9TsA>
+    <xmx:2EA3aF6Z49KxjlhsBtzOxXAr-GUQ3t56s0p7YNs-AnjMnWXg0OgDmQ>
+    <xmx:2EA3aF6Fnml8oHrs4GRk-ujdxAV-1WPPJ8_WeK8n3b6N_O8cTKrWPQ>
+    <xmx:2EA3aFjZ31ssou5dbrszO3e6LRcGJsfzBiCQmfVOoCSGbH_QgocyIg>
+    <xmx:2kA3aGXqXDA0CXLM-NXCkKqSIAcrC_X5XH8KNVMj6ZHGavqs6JaLqFeb>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A1161700063; Wed, 28 May 2025 12:59:04 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250528061427.GA42911@sol>
+X-ThreadId: Tff0b0175c39a25d0
+Date: Wed, 28 May 2025 18:58:44 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Kees Cook" <kees@kernel.org>, "Eric Biggers" <ebiggers@kernel.org>,
+ "Justin Stitt" <justinstitt@google.com>
+Cc: linux-hardening@vger.kernel.org, oe-lkp@lists.linux.dev,
+ "kernel test robot" <lkp@intel.com>, linux-kernel@vger.kernel.org,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+ linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+ "kernel test robot" <oliver.sang@intel.com>, llvm@lists.linux.dev
+Message-Id: <324a5724-7bde-42f2-8910-e70b5b5f9d9e@app.fastmail.com>
+In-Reply-To: <202505280937.6802F0F210@keescook>
+References: <202505281024.f42beaa7-lkp@intel.com> <20250528061427.GA42911@sol>
+ <202505280937.6802F0F210@keescook>
+Subject: Re: [linus:master] [crypto]  40b9969796:
+ UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 27, 2025 at 11:14:27PM -0700, Eric Biggers wrote:
-> [+Kees and linux-hardening]
-> 
-> On Wed, May 28, 2025 at 01:15:05PM +0800, kernel test robot wrote:
-> > 
-> > 
-> > Hello,
-> > 
-> > by this commit, the config has below diff:
-> > 
-> > --- /pkg/linux/x86_64-randconfig-101-20250522/clang-20/d469eaed223fa485eabebd3bcd05ddd3c891f54e/.config 2025-05-23 23:44:56.781716572 +0800
-> > +++ /pkg/linux/x86_64-randconfig-101-20250522/clang-20/40b9969796bfa49ed1b0f7ddc254f48cb2ac6d2c/.config 2025-05-24 02:08:29.858605300 +0800
-> > @@ -4837,7 +4837,8 @@ CONFIG_CRYPTO_ACOMP2=y
-> >  CONFIG_CRYPTO_MANAGER=y
-> >  CONFIG_CRYPTO_MANAGER2=y
-> >  # CONFIG_CRYPTO_USER is not set
-> > -CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y
-> > +CONFIG_CRYPTO_SELFTESTS=y
-> > +# CONFIG_CRYPTO_MANAGER_EXTRA_TESTS is not set
-> >  # CONFIG_CRYPTO_NULL is not set
-> >  CONFIG_CRYPTO_PCRYPT=m
-> >  CONFIG_CRYPTO_CRYPTD=y
-> > 
-> > it seems tests are enabled then we observe the UBSAN issues
-> > 
-> > d469eaed223fa485 40b9969796bfa49ed1b0f7ddc25
-> > ---------------- ---------------------------
-> >        fail:runs  %reproduction    fail:runs
-> >            |             |             |
-> >            :6          100%           6:6     dmesg.UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c
-> >            :6          100%           6:6     dmesg.UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305.c
-> > 
-> > it's hard for bot to apply this commit to previous commits in bisect, so we just
-> > make out below report FYI that we observe UBSAN issues in boot tests.
-> > 
-> > 
-> > kernel test robot noticed "UBSAN:unsigned-integer-overflow_in_lib/crypto/chacha20poly1305-selftest.c" on:
-> > 
-> > commit: 40b9969796bfa49ed1b0f7ddc254f48cb2ac6d2c ("crypto: testmgr - replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS")
-> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> > 
-> > [test failed on linux-next/master 176e917e010cb7dcc605f11d2bc33f304292482b]
-> > 
-> > in testcase: boot
-> > 
-> > config: x86_64-randconfig-101-20250522
-> > compiler: clang-20
-> > test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> > 
-> > (please refer to attached dmesg/kmsg for entire log/backtrace)
-> > 
-> > 
-> > 
-> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <oliver.sang@intel.com>
-> > | Closes: https://lore.kernel.org/oe-lkp/202505281024.f42beaa7-lkp@intel.com
-> > 
-> > 
-> > [   12.442846][    T1] ------------[ cut here ]------------
-> > [   12.443261][    T1] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8854:47
-> > [   12.444084][    T1] 16 - 114 cannot be represented in type 'size_t' (aka 'unsigned long')
-> > [   12.444682][    T1] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Tainted: G                T   6.15.0-rc5-00342-g40b9969796bf #1 VOLUNTARY
-> 
-> This issue predates the blamed commit, and it's specific to
-> CONFIG_UBSAN_INTEGER_WRAP which was recently introduced.
-> 
-> CONFIG_UBSAN_INTEGER_WRAP apparently requires clang 20.
-> 
-> To try to reproduce this, I built clang from the release/20.x branch, then built
-> a kernel with CONFIG_UBSAN_INTEGER_WRAP=y.  When booting that kernel, there are
-> many UBSAN reports:
-> 
->     [    0.000000] UBSAN: negation-overflow in lib/sort.c:199:36
-> 
->     [    0.000000] UBSAN: negation-overflow in lib/sort.c:185:14
-> 
->     [    0.276708] UBSAN: unsigned-integer-overflow in ./include/linux/min_heap.h:329:24
-> 
->     [    0.277376] UBSAN: negation-overflow in ./include/linux/min_heap.h:260:42
-> 
->     [    0.871191] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8854:47
-> 
->     [    0.890856] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305-selftest.c:8851:47
-> 
->     [    0.910455] UBSAN: unsigned-integer-overflow in lib/crypto/chacha20poly1305.c:260:57
-> 
->     [    1.105542] UBSAN: unsigned-integer-overflow in lib/zstd/compress/zstd_compress_sequences.c:334:21
-> 
->     [    1.113539] UBSAN: unsigned-integer-overflow in lib/zstd/compress/huf_compress.c:889:23
-> 
->     [    1.114597] UBSAN: unsigned-integer-overflow in lib/lz4/lz4_compress.c:294:9
-> 
-> So I did get the chacha20poly1305 ones, but they're hardly unique.
-> 
-> If this new sanitizer is going to move forward, is there any sort of plan or
-> guide for how to update code to be compatible with it?  Specifically considering
-> common situations where unsigned wraparound (which is defined behavior in C) can
-> be intentionally relied on, like calculating the distance from the next N-byte
-> boundary.  What are the best practices now?
+On Wed, May 28, 2025, at 18:45, Kees Cook wrote:
+> On Tue, May 27, 2025 at 11:14:27PM -0700, Eric Biggers wrote:
+>> On Wed, May 28, 2025 at 01:15:05PM +0800, kernel test robot wrote:
 
-Hi, yes, this is still under development. I tried to make it hard to
-enable accidentally (not via COMPILE_TEST, not UBSAN-default, etc), but
-we (still) don't have a way to disable configs for randconfigs. :(
+> I'm not sure how to enforce "don't enable this unless you're developing
+> the Overflow Behavior Types" with current Kconfig, given the randconfig
+> gap... I have some memory of Arnd doing something special with his
+> randconfigs to avoid these kinds of things, but I can't find it now.
+>
 
-We're hoping to see Clang 21 with the more versatile Overflow Behavior Types:
-https://discourse.llvm.org/t/rfc-v2-clang-introduce-overflowbehaviortypes-for-wrapping-and-non-wrapping-arithmetic/86507
+The main thing I do on the randconfig builds to avoid obscure issues
+is to force CONFIG_COMPILE_TEST=y, but that only works for build
+testing, not actually running it.
 
-and our current testing is showing many fewer false positives. (Having
-run syzkaller for weeks now.)
-
-> Documentation/dev-tools/ubsan.rst says nothing about this and only mentions
-> "undefined behavior", which this is not.
-
-Right -- this will get extensive documentation before we move it out of
-its development phase.
-
-I'm not sure how to enforce "don't enable this unless you're developing
-the Overflow Behavior Types" with current Kconfig, given the randconfig
-gap... I have some memory of Arnd doing something special with his
-randconfigs to avoid these kinds of things, but I can't find it now.
-
--Kees
-
--- 
-Kees Cook
+      Arnd
