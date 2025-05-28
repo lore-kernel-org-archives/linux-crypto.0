@@ -1,126 +1,80 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19623274FCE
-	for <linux-crypto@vger.kernel.org>; Wed, 28 May 2025 09:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18692741D1;
+	Wed, 28 May 2025 09:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748422824; cv=none; b=SGq8kOLrpQHQh4lQj6BlGReDRmeZEtFa3MSQE5A2E+HUYYqJ6g7i0repVwc4rnByWVI0dpTOKBGE4bRQyacOgKPNdqiL57EW9gXyInmwdk9BzDi7rsFvTiBhW2CqQXyEJzlo/eyta/YEH5TQPyv7jaxlQlk6eYfSN3wi0hHZ9PA=
+	t=1748423499; cv=none; b=r59pGB1BVgaXKaHbtehkAQHPD70M+BP0RfIE07vxknChSF0TnxQnOy9SdZGeC6vqtVxAKqP7d2/NbAcgWh+KesLYR2Eh7XytfALkSnA591ydXts9l6kP8DVrRBQrBtzULD7YjGBO91Ds1ncOik4gB2oCsRqVwbOsd7LRNFDHlVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748422824; c=relaxed/simple;
-	bh=t1e/HvfosFpsLoFkhIGG8ncpvv+6aZviJ2nKgmWiOW8=;
+	s=arc-20240116; t=1748423499; c=relaxed/simple;
+	bh=/vFKPh1GQHh0XWIVc4hvR0PFnGcJUo/nTfkkPEZSCHw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwnDxF03nWchpmqqGZv20SKFkG2hMToFg91xcMju8keIpUHgcpt+hQIoEkIamnIp6NzoksIHurFCfuQ0rMokMCO6FgczZamzvqn/hAe5+yuMb0Rs2PjdKnfgtNg8SOe+9SVAVQkdVW4TQAd0j8OQzsbDiiuO5p7J3tOsa6t10Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2fmwfCT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUg5DYj657Od/HbRfFtdeNJ2LAVNCcrdSJ290Vg+jtg99mUcrV55WrRsnkgYsnoAR0hhWiT2PZKFGKDsIvKpcjXsCgi6SDVkWIAo6UEBhX0HsxSQjTjTzyH6Yjp+ldYhG2bg6iwPVqqBX/jsR13GcKuOs7ut9Fl3nBk3oWKgClQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XiYGsPpB; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2fmwfCT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748422822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=64QsXwazpQwW+tOYOMo7hDdSauBGVg6nC6ZKTpmi0VI=;
-	b=K2fmwfCTDs4dGc61cpflZabEFOjCWO6oam0nm+IY1Lvbu4lzezAithrhmsp2vOKWGMMiBJ
-	UAcOhUN6o7hSsJ/3z4jDSmQVHpgbwJd+W4wiTQy9xXxlKpWMG9aSxVq2vP1DXNLWggV3l+
-	CVn4NCFhicR0swLEFFd3vemDGlKeLVA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-Sjjtpq31OCKszEtHJDf8yg-1; Wed, 28 May 2025 05:00:20 -0400
-X-MC-Unique: Sjjtpq31OCKszEtHJDf8yg-1
-X-Mimecast-MFC-AGG-ID: Sjjtpq31OCKszEtHJDf8yg_1748422819
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a367b3bb78so2466691f8f.1
-        for <linux-crypto@vger.kernel.org>; Wed, 28 May 2025 02:00:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748422819; x=1749027619;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=64QsXwazpQwW+tOYOMo7hDdSauBGVg6nC6ZKTpmi0VI=;
-        b=OCcNlJRmfD3UxSKnHgNxrnAFIS166xNiPPqrCm8FLeN7jvnjodv3WeEdE+sRbrCDZe
-         j+FL/LPNUxJIfi8OXDN4GweyroCABMqzM4On1zWABlTJYrTR0VEFWOCWqVMtlJoYnFrN
-         4bI8mOQ7q21yoBO1DXG8LFEbhkAbDbwUPOOyeQVuBtT4Dy63n9VU/+NwnVM9eTHT4/mR
-         aSrLAPuX3s+GTbnYHUerqp/+OKrS1QhQK35SuMYwb15CFTdER7dParFP7Xuazf71CgAm
-         LZ+WuQ1M6ibiQY2rPf45vVEtiFz1KvhZJKQrJ1xSFwWWmzWUFDG9S20zeZaJDMk09iEN
-         Kb+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVab0CEhiPaokxRosV1XbthK3NTe3oiWWE6J7r+9d4xcN76i0glyLYMCqOZQHmTRxg8e4BLlSaq3JGNMB0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4HLVDsuSGHcnQhf78zptv9AUc3NAVR/H60etM5FCzdP0cJtRp
-	ME4pH4ranGLsJA/ucghchZ28vnFicSu5OGCgHZamF5sXVCOUXvyjG/jkvE4vxCgEpkkysgIlZ28
-	k8FCFSUqKsHp3IPE72lJKGKCzjPWiWpQ61xaFHjwQpMBp6GB7BUJVx8zT6u/CSwT9Zg==
-X-Gm-Gg: ASbGncu74p1WmrMqa4LmBPB1SiGhWpcxTPgk2BeWwiK5FJu9BM2IKcNRnGKMzZ9OOqp
-	q2ocZsAb0di4xr2wk55ZYNpn59Ufj14IT4YUNqDyR7kUEHXJs2yDY4T8QRZyJGNxIJc78zSPVeR
-	gmNFnfGX+RjMt1bvAZLaR8UPSMvjSU9L6HdYfQ5YHV394co5QjL4ACnuyxCrYK8PIY8SVfgOJDs
-	cne8DzS+eWMUKS+AqpphrKWDfTzoEB2VKjlhBkqDzHRVPVETe404paTGrP0el82sjEubWKCPbwr
-	a+eIUi77T0hg7gU54mVorSu4+nrvTceYnrvad672Eqe3rR/Si+ukKR8uieES
-X-Received: by 2002:a5d:5f8b:0:b0:3a3:6595:921f with SMTP id ffacd0b85a97d-3a4cb4b822dmr12928263f8f.41.1748422818879;
-        Wed, 28 May 2025 02:00:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjrV5vgUL5ysXDl7B3oxB4ovG+UqKk+QHfVQ+EndsK3P47vCbb2duzqpq4xfTjaqx9Sg54xQ==
-X-Received: by 2002:a5d:5f8b:0:b0:3a3:6595:921f with SMTP id ffacd0b85a97d-3a4cb4b822dmr12928217f8f.41.1748422818345;
-        Wed, 28 May 2025 02:00:18 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4eab0b596sm892079f8f.0.2025.05.28.02.00.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 02:00:17 -0700 (PDT)
-Date: Wed, 28 May 2025 11:00:12 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, jarkko@kernel.org, 
-	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca, linux-integrity@vger.kernel.org, 
-	Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH v10 4/5] tpm: Add a driver for Loongson TPM device
-Message-ID: <gymx5tbghi55gm76ydtuzzd6r522expft36twwtvpkbgcl266a@zelnthnhu7kq>
-References: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
- <20250528065944.4511-5-zhaoqunqin@loongson.cn>
- <7ifsmhpubkedbiivcnfrxlrhriti5ksb4lbgrdwhwfxtp5ledc@z2jf6sz4vdgd>
- <afaeb91a-afb4-428a-2c17-3ea5f098da22@loongson.cn>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XiYGsPpB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=/hsewaW5gU0vrr/tJ3ygObI/8cfPfFw3hytDh49lKGQ=; b=XiYGsPpBuaWC3YQZni+30nSzjA
+	xGxLsD0LdOE6O8C/2gdpedsoyGm07jG917zdcMvwPGa+fz2AdxxdzgiWcEUWwnr5Y6HcG4uPPYidN
+	3uLWTJCGj745hWOOCq3ALwXH6CCokZxLUpMFhgYdgm7N3AdZ9WsFkyYLCLKZpFLouunI6530ZZJyZ
+	xgwH+45vviAp7kuM0mN0zkQOQK1OrOOhb2JXvT7QxHyB/8qp5nlsISoVOmKLGTXzzXryuZCwM2QJG
+	o4HwnH7ah9B0SATr1cgppuhBS7WPIT1M58/UIPY7xF5oxSydl5deo4UcsUg4zTS1Usrrf5KzKesRw
+	D1Qv6Lwg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uKCoi-009OwC-1g;
+	Wed, 28 May 2025 17:11:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 May 2025 17:11:20 +0800
+Date: Wed, 28 May 2025 17:11:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: oe-kbuild@lists.linux.dev, Ashish Kalra <ashish.kalra@amd.com>,
+	lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [linux-next:master 1170/9308] drivers/crypto/ccp/sev-dev.c:1312
+ __sev_platform_init_locked() error: we previously assumed 'error' could be
+ null (see line 1297)
+Message-ID: <aDbTOBjTo0Le7T5a@gondor.apana.org.au>
+References: <202505071746.eWOx5QgC-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <afaeb91a-afb4-428a-2c17-3ea5f098da22@loongson.cn>
+In-Reply-To: <202505071746.eWOx5QgC-lkp@intel.com>
 
-On Wed, May 28, 2025 at 04:42:05PM +0800, Qunqin Zhao wrote:
->
->在 2025/5/28 下午3:57, Stefano Garzarella 写道:
->>>+    chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
->>>+    if (IS_ERR(chip))
->>>+        return PTR_ERR(chip);
->>>+    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
->>
->>Why setting TPM_CHIP_FLAG_IRQ?
->
->When tpm_engine completes  TPM_CC* command,
->
->the hardware will indeed trigger an interrupt to the kernel.
+On Wed, May 07, 2025 at 02:09:22PM +0300, Dan Carpenter wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> head:   0a00723f4c2d0b273edd0737f236f103164a08eb
+> commit: 9770b428b1a28360663f1f5e524ee458b4cf454b [1170/9308] crypto: ccp - Move dev_info/err messages for SEV/SNP init and shutdown
+> config: x86_64-randconfig-161-20250430 (https://download.01.org/0day-ci/archive/20250507/202505071746.eWOx5QgC-lkp@intel.com/config)
+> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> | Closes: https://lore.kernel.org/r/202505071746.eWOx5QgC-lkp@intel.com/
+> 
+> smatch warnings:
+> drivers/crypto/ccp/sev-dev.c:1312 __sev_platform_init_locked() error: we previously assumed 'error' could be null (see line 1297)
 
-IIUC that is hidden by loongson_se_send_engine_cmd(), that for this 
-driver is completely synchronous, no?
-
->
->>
->>IIUC this driver is similar to ftpm and svsm where the send is 
->>synchronous so having .status, .cancel, etc. set to 0 should be 
->>enough to call .recv() just after send() in tpm_try_transmit(). See 
->>commit 980a573621ea ("tpm: Make chip->{status,cancel,req_canceled} 
->>opt")
->The send callback would wait until the TPM_CC* command complete. We 
->don't need a poll.
-
-Right, that's what I was saying too, send() is synchronous (as in ftpm 
-and svsm). The polling in tpm_try_transmit() is already skipped since we 
-are setting .status = 0, .req_complete_mask = 0, .req_complete_val = 0, 
-etc. so IMHO this is exactly the same of ftpm and svsm, so we don't need 
-to set TPM_CHIP_FLAG_IRQ.
+Ashish, please fix this or I will revert the commit listed above.
 
 Thanks,
-Stefano
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
