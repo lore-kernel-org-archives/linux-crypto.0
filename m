@@ -1,173 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84A6211A29;
-	Wed, 28 May 2025 21:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23418634A;
+	Wed, 28 May 2025 22:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748469132; cv=none; b=e2JsBncRGziMZ6bkCWn9rxKovuPWNgJGQxTqQdFohgAzQkuqm8m83tYn200RAOzTO4zXxdzj2vIVayt3fSvLZ4uim1AEAwWzxLs6J4YQOgkRefzwuVPSl+T/Iw3zWiyJK3oGVufgjDveDLvHGJ7W5pOtM7RJWuNGxCpMptDQBTs=
+	t=1748470531; cv=none; b=MC397P/1ffb2VNT0BK+HnSzrr507e0/bpN715KswnZe5HxkXDQvn4+JIYzwNBUI57+SnOy+QY4UJLr7/tMa1Cen22g8+naCkg9LvLhgJV8tEi94grVujiqZYoP0xUjX87LOfuRgLMaNB9OVIuzA7QgjXfyzmPgeNLDpEbOpGuuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748469132; c=relaxed/simple;
-	bh=4gXpD5gzsKHRkYAgF4556xWhjY838szvkedKjVZOZZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgBtMWUbgXKimbkF4y44f/Kbrchm46rVu7sCdrfh/izNQ5u1YjIHMaUh+qKjdrq0zR4ko07qF7E2T9Ef10JJTJApXLBYMifZUyaltFA3dQhAOxPSZxesvjD4vhmkymK8Dri1IY9weiastd4Jhv7rtwWCQvgJbQsxIpZK7mz/Y2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Reto9zlK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748470531; c=relaxed/simple;
+	bh=aDsCpElC2i/bSA+1zi2eQ/hnJoCVt0Alx+eab1BZLhs=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=CJUj/LGEVLdx/pqKR1/PSWSemWhnDORLEloMu0/p1WomjMMlN0HO/pEvvyME2TO56QaTZoTLeOjyCL4t3g37r74m5pYSvFQS/wMBN/CRLt4EmLyzpNL1Q6t555hWzUSqchpEuvomFGVAEfs3w1cXYMh15oTeGH/IpRvh/M95o0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDPOUjyw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Reto9zlK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A33DC4CEE3;
-	Wed, 28 May 2025 21:52:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDPOUjyw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4227C4CEE3;
+	Wed, 28 May 2025 22:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748469131;
-	bh=4gXpD5gzsKHRkYAgF4556xWhjY838szvkedKjVZOZZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Reto9zlKGiybocpiqah7bOX9Od88N96vwzlIu8vXB+ZFGRtU+/eLYy7rOFlhMi8kB
-	 TQMP/NMKZnIhY/FPg2vxg00XUA/NJUekkNvO0vjgOxMz+SYPRsVTaFXP7xqPHTut17
-	 /+RQ4qNvDJqV8aLXAfB20aBmYMQTq+WrjxfSVlc4IGrT2BQOtpNQfSrElc21Y89zP9
-	 LSeHJ4gNVCaXyF9gFtlgsT3Uo6U9mMbGSOIyLRDotymboT/Bvgm4cCh/sjLB9/MC4c
-	 LxZPPDMycuk7qc7f2WAM7u6xF4ZzwrE1TgmjlEcQBSshVKoyoFZvlx1WU7pNp2Uyr4
-	 gJRRFowAgpApw==
-Date: Wed, 28 May 2025 16:52:09 -0500
-From: Rob Herring <robh@kernel.org>
-To: John Ernberg <john.ernberg@actia.se>
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>, Frank Li <Frank.li@nxp.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Thomas Richard <thomas.richard@bootlin.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
- domains for iMX8QM and iMX8QXP
-Message-ID: <20250528215209.GA862463-robh@kernel.org>
-References: <20250528144259.2603914-1-john.ernberg@actia.se>
- <20250528144259.2603914-4-john.ernberg@actia.se>
+	s=k20201202; t=1748470530;
+	bh=aDsCpElC2i/bSA+1zi2eQ/hnJoCVt0Alx+eab1BZLhs=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=SDPOUjywO+2A4gDrSWqsWzYgSbEiww29Sjxe/w/gFCe5sz1KodharjSA85ijVadSF
+	 PIl46aMabl4iatREt09mqEb7hGM2qqqlo9avdPflA4JOsGdwrhLAs0RSRUkqtQLIgg
+	 /sc5Hg1alihUYokoDJfG5C0WVJ8loEvTup8pDYBkm5zBBBBZU0mDSguG+b03H2b7LS
+	 nVz3RFQ70s95D7pKNzIWiCPLrrkyugk5WUuzOO90WuRldBBQPFDOt2BG8k2mhjI1b5
+	 1zHOBHvnPykDMfk0wD54O11IEBuhzQHrO61Apl4K6ECqn4iIJfrb0AlmNCX8g8gMx8
+	 6v9Q9369kopKg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFFD3822D1A;
+	Wed, 28 May 2025 22:16:05 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.16
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aDZ89Fs8Y20_fj2I@gondor.apana.org.au>
+References: <aDZ89Fs8Y20_fj2I@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aDZ89Fs8Y20_fj2I@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p2
+X-PR-Tracked-Commit-Id: 0a84874c7e7dde5cdddc80a82093120e924a348b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 408aa67404405c8519ddee70bc0e6c55daa7c959
+Message-Id: <174847056445.2608061.5885516562298346451.pr-tracker-bot@kernel.org>
+Date: Wed, 28 May 2025 22:16:04 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250528144259.2603914-4-john.ernberg@actia.se>
 
-On Wed, May 28, 2025 at 02:43:07PM +0000, John Ernberg wrote:
-> NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
-> resource management.
-> 
-> Allow specifying them for such SoCs.
-> 
-> Signed-off-by: John Ernberg <john.ernberg@actia.se>
-> 
-> ---
-> 
-> v3:
->  - Fix warnings discovered by Rob Herring's bot
->  - Declare the compatibles correctly (Krzysztof Kozlowski)
-> 
-> v2:
->  - Adjust commit message (Frank Li)
->  - Only allow power-domains when compatible with imx8qm (Frank Li)
-> ---
->  .../bindings/crypto/fsl,sec-v4.0.yaml         | 45 ++++++++++++++++++-
->  1 file changed, 44 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-> index 75afa441e019..a4ada0e2d97c 100644
-> --- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-> @@ -46,6 +46,7 @@ properties:
->        - items:
->            - enum:
->                - fsl,imx6ul-caam
-> +              - fsl,imx8qm-caam
->                - fsl,sec-v5.0
->            - const: fsl,sec-v4.0
->        - const: fsl,sec-v4.0
-> @@ -77,6 +78,9 @@ properties:
->    interrupts:
->      maxItems: 1
->  
-> +  power-domains:
-> +    maxItems: 1
-> +
->    fsl,sec-era:
->      description: Defines the 'ERA' of the SEC device.
->      $ref: /schemas/types.yaml#/definitions/uint32
-> @@ -106,7 +110,9 @@ patternProperties:
->                - const: fsl,sec-v5.0-job-ring
->                - const: fsl,sec-v4.0-job-ring
->            - items:
-> -              - const: fsl,sec-v5.0-job-ring
-> +              - enum:
-> +                - fsl,imx8qm-job-ring
-> +                - fsl,sec-v5.0-job-ring
->                - const: fsl,sec-v4.0-job-ring
->            - const: fsl,sec-v4.0-job-ring
->  
-> @@ -116,6 +122,9 @@ patternProperties:
->        interrupts:
->          maxItems: 1
->  
-> +      power-domains:
-> +        maxItems: 1
-> +
->        fsl,liodn:
->          description:
->            Specifies the LIODN to be used in conjunction with the ppid-to-liodn
-> @@ -212,6 +221,40 @@ required:
->    - reg
->    - ranges
->  
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: fsl,imx8qm-caam
-> +    then:
-> +      required:
-> +        - power-domains
-> +    else:
-> +      properties:
-> +        power-domains: false
-> +
-> +  - if:
+The pull request you sent on Wed, 28 May 2025 11:03:16 +0800:
 
-This 'if' belongs under the '^jr@[0-9a-f]+$' subschema which will then 
-remote a level here.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p2
 
-> +      patternProperties:
-> +        '^jr@[0-9a-f]+$':
-> +          type: object
-> +          properties:
-> +            compatible:
-> +              contains:
-> +                const: fsl,imx8qm-job-ring
-> +    then:
-> +      patternProperties:
-> +        '^jr@[0-9a-f]+$':
-> +          type: object
-> +          required:
-> +            - power-domains
-> +    else:
-> +      patternProperties:
-> +        '^jr@[0-9a-f]+$':
-> +          type: object
-> +          properties:
-> +            power-domains: false
-> +
->  additionalProperties: false
->  
->  examples:
-> -- 
-> 2.49.0
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/408aa67404405c8519ddee70bc0e6c55daa7c959
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
