@@ -1,189 +1,136 @@
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2060.outbound.protection.outlook.com [40.107.102.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E721CD2C;
-	Thu, 29 May 2025 01:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748481583; cv=fail; b=VAP5DqO2pEHzt3wCaFZ7H+/RRFlhmRTG2jUSxqXJYyvaUVRlJ+v5vRrpQGZh+rfMEfn8pRs54bkTiqeOZrnHlqP3TOGR2p+SEImPw7ImND+aaTWdmhGFImhKPOh907hVdUBr+7XLSQLswkVbL28Zq8PRlFG1IXUUdr/6BTzdLSY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748481583; c=relaxed/simple;
-	bh=w8sMi6CPO8WuwYYb5mssfTvg3BbgO/V0MTlECe7z2Ls=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sb6gXiRweiDlQF2VJOkfm2e8EP3/YqOZIoklil73FFZ+VtfGSZr/4/yZ1uGSvehPkKK45VIOPTeMTh39YXyytRZ7ndhBSUWIgqoPQO29IlSWonXBAazU3wGTM0fxKJXpSIxbS90vI4HHhj54ojQFqm8TukKpgnj72EJIqcoQDeY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vFRZpc9v; arc=fail smtp.client-ip=40.107.102.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vFRZpc9v"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RGY4EdM+1QbOZTEgpi2JjfRXXu+cb84KGKNhVNiPDv/zcSK8L8oMhrCF5U40WMKT6vm0oT/Bnxczzth/dY0Urn+DcCG+Sw+qUrjCoLQEzM1B+iS4aESUXQSN9SBkCAVsUvNZDXCof4PXSJp++jfj4ywqp27o95Z7bdIki1pkT2B/Pscb2KcJ+bliHJLJPgMtwsEbbsZO5IeWVg6LqZYBg5dEzGI3QYiSNj4aZtU158LCIxk/TPRe8JK6WdxnkjIukgqU1KplWLTgyv3JuC9MPmc+pwiuVtoQCe1WKf6f2GobwMn1LmgoWSpO323J6UnDXC7JL3wHsU5vOjFFZUndtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g7IyjSgm+NNeE+29aQOctAXa4IJX1W7MNhxjn1DAV4Y=;
- b=SEISaVUuHsPuJsFW5J6mnLdyMeqQDnht8oesIqqQ+gVnN3PicT19rbuLB5BtNzeYR7MvQ2iOlYbuVnGzMu3oahWN7gUu+P+udh+N+SeYd/E1MbPoyRbyfnibxz3E9KwWzNiubdmzNwCqu8/baitSbVAp5/MrM8vkY8rAy/LDdVOVghAO9VBGOWULKSFK+AGgLQ+9b8ULxGUqbLWvAfGxehO26iC3k55N9ghZDdaNLpYBIQUZ0siOMMhX46GHr9uvRkFkEWJ6wgZgsoJ6Cnqa5ZY5+u/8duJ2eiSPtmFCFedYhI1tGl4dL5033SqeYz62RiH6IlcYEdWfouyPOaWnog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g7IyjSgm+NNeE+29aQOctAXa4IJX1W7MNhxjn1DAV4Y=;
- b=vFRZpc9vN0zTJeTB/mEd8y9lE/20Tq7sRsRkykoxTD7tt5Z0elk/altiHeWH2IhXj19sLIr3WnGdCJVX2lr5tgofwLsyYL7x1OqBoPnFB8Uce7jfKHOtu894DYqdwB9WFFapsn7zXM/Ky3EqZ197eBSuTdfXPeYpUqJ75v4BfKE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.29; Thu, 29 May
- 2025 01:19:39 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%5]) with mapi id 15.20.8769.025; Thu, 29 May 2025
- 01:19:38 +0000
-Message-ID: <3ffa8780-f985-40ac-b011-e31c2cbfc8ba@amd.com>
-Date: Wed, 28 May 2025 20:19:34 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ccp: Fix dereferencing uninitialized error
- pointer
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: thomas.lendacky@amd.com, john.allen@amd.com, davem@davemloft.net,
- dan.carpenter@linaro.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250528202018.78192-1-Ashish.Kalra@amd.com>
- <aDebwj8rcuWPIKOa@gondor.apana.org.au>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <aDebwj8rcuWPIKOa@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PH7P220CA0152.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:510:33b::10) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FB4242D74;
+	Thu, 29 May 2025 02:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748485033; cv=none; b=hf/BylIZec8EUF3doJpotMgnJ6B+ci2fay7IUKvzFZS3LKRlCjz1oj6EWaP+lDFE1pE3GaTMFZZfP1mpZeuHQpHYrfnUtnXiZVnjHig+klJu/R7Jk8GaxQzxsH4f3WnvIiJu0An1sQjuzVl1Mnopcj+t1UmitGtXKDxkLbRXx4Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748485033; c=relaxed/simple;
+	bh=BXnpxy5x+WlgemioBql8EwhnNFniZqjZLbYpZqfqrmY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=j/MHGqe4KtcOyOSP+5Bt60FPbmSi+RACsKTU1BiNqLzRdxhQ79d9v7QG7Ud3UvPPZ5QMDQqS/c+4SNqkAbmg3zr+yxSgdFw6J/RvWeaTrUBUOX6HBGkIK3dQQF0tx5mIRJHFr7dHswW/9fO6WWKNnIbNLJ0HbYDz8auoVOtrRh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8BxrnKjwzdoZzQBAQ--.21261S3;
+	Thu, 29 May 2025 10:17:07 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMCxasSewzdoE2L5AA--.61626S2;
+	Thu, 29 May 2025 10:17:04 +0800 (CST)
+Subject: Re: [PATCH v10 4/5] tpm: Add a driver for Loongson TPM device
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, jarkko@kernel.org,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ davem@davemloft.net, linux-crypto@vger.kernel.org, peterhuewe@gmx.de,
+ jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+ Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
+References: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
+ <20250528065944.4511-5-zhaoqunqin@loongson.cn>
+ <7ifsmhpubkedbiivcnfrxlrhriti5ksb4lbgrdwhwfxtp5ledc@z2jf6sz4vdgd>
+ <afaeb91a-afb4-428a-2c17-3ea5f098da22@loongson.cn>
+ <gymx5tbghi55gm76ydtuzzd6r522expft36twwtvpkbgcl266a@zelnthnhu7kq>
+ <ccb1927d-c06a-9fde-6cbb-652974464f4b@loongson.cn>
+ <cfaf2fbb-5c6a-9f85-fdc9-325d82fb7821@loongson.cn>
+ <45xqguhrecn57cwc66hfws4eeqrb6rlijvh2z35e56ogojc2q4@pnlrgx57353b>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <7a0c5eae-f6c7-f2dc-9356-5419c7df4f6a@loongson.cn>
+Date: Thu, 29 May 2025 10:16:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|SA0PR12MB4382:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e3939b9-1174-48bd-d1b6-08dd9e4ee126
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SDVDWmd1a2hWU3N6T2xMZXJJbDdOeDhOTUxHcU96OW1DZW5RaUpCTWdYSHM4?=
- =?utf-8?B?eXRmNVUycVBXdWZvR3BQOWt5M2F2UDZORnByQXlxbU5neVlIZG9HbWZvOVgv?=
- =?utf-8?B?ajlDWVRCTVhOWXU2a1NmUHRaQ1VZRXZmaExUWmk0Y3gvZjFydDNoaTRGSkRB?=
- =?utf-8?B?V2hMTmpCenpoQVdsTU40c01WWHg3QUZuTjBFTXB2Y2dVSXRac0NyV0ZYakZy?=
- =?utf-8?B?emZhTis2aEFLWk0vL3A3S2NmZDhRdW9NOGptY3NQdE5teFZ1ZDMwTVQ3eWRm?=
- =?utf-8?B?VWxNOVFlQXZNMlVZWjRXTWhpUDdybWxVbm9XQy9PTm9CZzVxZDVSS3M2T2xQ?=
- =?utf-8?B?UlVxYUZoWjJjbU1hd0hnc1lFc09xdjE5eU5wZFRMMEZIakw3VUdwdXhWeVJp?=
- =?utf-8?B?M2g2ckZPMU5HZ3lJYXU4a0NaK0d3cHBrejF5ejhkN25tZnFBejdqTVpQRWh2?=
- =?utf-8?B?M05ZMmgzd0g1aThYbmNSVlhGT0dXcWVXbGlWZjk3S0ZCMDdXaEVRcEYrOFFQ?=
- =?utf-8?B?MFRXTTMrRW5lSGEwM1hPQkhqYktNYVhKTzRGbGJBQXB6b1lBenRvYzU5bmdG?=
- =?utf-8?B?eUZMRFNwUllWdVpDaytlZ1A5enJtaUIyTGh0Y3QrM3BIckFiMi93ZFhMWlhx?=
- =?utf-8?B?WGFjS2J1R0lNbU0wOU16eGlVNUp3SlFWeVBoendHcjhQcXFjWFlORTliL2o3?=
- =?utf-8?B?QUV1aDFjMU0wbklqenRDTVFLUmVnSE04V2E4endKbjFDcG1MRndmdTJnQUIw?=
- =?utf-8?B?aVVTOTdUQTFjMTkwWVFIMzNwVjFiYTF1TlZOV2tTVVVkUDRaeTVla1JmcmZP?=
- =?utf-8?B?bUNsQ1BzalU0UEpWOFJrWnhVNVAyTTJZazU0eVZ1d0NCZ0w0Wm10SG5EeVAy?=
- =?utf-8?B?eVJmZGI5WEFwT24xWGgyRWE2T1J5Smxsb0wvWUI4R1hVbDVVN1F4bTZuczF3?=
- =?utf-8?B?T2s0K1IwRHBoN094YzdReWNNbXJCeEZJV1VBRjlvK2NTb2FhMnE3NlE2VXM0?=
- =?utf-8?B?by9WVTgrUFlxd05oU2QyRFRxaFgvMXNmUGpIclBWWG9NK1pJVmJLbGNNRmVB?=
- =?utf-8?B?OWdreENBRnFwTGlJb2NWYVZQYVFLMkk3ZldwcUs2WnQ1ZTJKOWNGUy91TTVV?=
- =?utf-8?B?TXNDNmNlL21QMVRhUHRta2ZNUy9Pa1dldzRrUVBrSWJCZFdwV2FlckVuZ3NM?=
- =?utf-8?B?SkhlRk9KaTEvRGJmSnlJZFB0SFc2NWdwb0VweDJMTVVxdjU1L2ZzTS9wNzgv?=
- =?utf-8?B?Q3lrQkxMcVdFWTg1ZEZvYm5acGhWclZIZ1BNeTVscmFoUUFSMDZJNlptYzNV?=
- =?utf-8?B?T1NyVjFybExFVjhaK003SDlwRUZMZHZRUk5lUm9vNGNzRVFLcmlHdGM4Nks1?=
- =?utf-8?B?Nk9EVHp6Y0lqSUk5NVJrNTdBWU9YWVdmOGtoa3laUlUrYXNna3R2TGp0Rnl1?=
- =?utf-8?B?b05JR1RacDdSOFMzZmVZUTMrZ0lscWpoYWJHajNYejlJelZ5bHNGdFpJYVN6?=
- =?utf-8?B?K1ZWNkNPSXVpYWtGcGROSHFsdXp0K3E5QnQ0L1cwVTBLdjRxVkF5NjFGZjNj?=
- =?utf-8?B?NXIzNlB3cm9hTDJkbFNib2k3UkZnY1prYlVVZXk2YmN2eUlRblFReHg3VDNa?=
- =?utf-8?B?RHFUOW9LQ0hUN3g5QmwraUhkNjJpdUwxREFpSmJoYytnK3B2ZE5pMURWdkE1?=
- =?utf-8?B?VzRMSmt3N0VHUmdOTWl2MW90VlhRSnZyZ0g0NEJRK053Tlg2QmN0aTJCZFJG?=
- =?utf-8?B?Zkc2cUFYV0hGSlJwem4rbHZWcUJpS0EvL0dlS3hsdjM1a1IvRlpYT25NMFZX?=
- =?utf-8?B?cE8zQ2krWU1NYm00R0tldUg4NmxpdVk2YjBwMklpWEtxZVkxYUM2SzY1RnlI?=
- =?utf-8?B?QXNpd0liRjNUWnorWFYvd0VPUHl3ZzlGYW9UdEZtWFJVVGc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZG5VQ1kvVDNvNkNXdzY1R2luL1d3RUl3S2VCZ1N5OWN6NVphWU5BN1VLdDNI?=
- =?utf-8?B?MmhEVGF3L0NSR2kxZ3BBTGFJcFE0MXhib1AyY2xDTXhLNFFFd1AySzlLQXo3?=
- =?utf-8?B?aVQ4QytmYXU0UTFuT3VrQUdjUytuRHl2bHVxR0JNY1VPVC8vR2hqak13RDlx?=
- =?utf-8?B?bk9MU05BSGhOTmZxTCt0dmZyT1pvdElWanFLMU9PaWdQdFA3eVFLSHF5YkYv?=
- =?utf-8?B?TmZiK3p2Ti9aa2o0SVhDZVd2NG54NEJwaEpHSDE3YW9sS2VhSEgzVSsySG5h?=
- =?utf-8?B?T3N1MWg0eDJ1ckJrQWNLWE1SUm55UlJLQmYvd3ljRzN3dGl6Q29lb2xUL2lr?=
- =?utf-8?B?MVZKU25Vb2Z0cndYd3ZmUHFRR0VNYVNUQ3NITEFYVGZ6N2liMlhtMTY5dURz?=
- =?utf-8?B?TlREaEN6YzJIYzB4Um5sQ3o3Ky85YTVUbW85UkwvZVB0SXlaZk5raUlneE5v?=
- =?utf-8?B?MW40V0d5eTIzcHhVS0RHMkt0R1BtR3Fmd0loZzZsVGFOUDlPcW5FSGlzbitn?=
- =?utf-8?B?ZXRvTURlQ1JQVDlYRkJqUElGQm50Mm1hNzVib3M2TTZNVlBFWkhxMnJTS0I5?=
- =?utf-8?B?SnpTNEJwdFA1VndtaThkeGhYNHFQTDFaYnRVNEUweDdGb3BPUHVDM0F5NlZO?=
- =?utf-8?B?aWw3QURjd1JoY0g3K0pSRzFyTWZ6TGNkYmowUkxPcVRwdlI3THFPZmR6ZEx6?=
- =?utf-8?B?YStSZE8xRzZxR04xY3JNczczUDQ4MlFwSk1hdU5mbUFwcW5YdUVZVFZlTlRs?=
- =?utf-8?B?T0FGWkx2THdNYmxXUisrclpJZ2luQUFPV0ZPKzdvVk8vamNVQmo3OTVrdUFs?=
- =?utf-8?B?bTlOYlU1Z0p3SE5mNnJ6NmQ1Yms3eXJoTWVWbG1LMkxleUdKeTNkZ2NkWUVF?=
- =?utf-8?B?WkZxdDhBMlNOUGxWbTVxYU5mWXRFMzJ3RW85WVpYQlMyUXpqZWdnUkIzd2V0?=
- =?utf-8?B?MVc1Y3JOMjd3cGVWeU5xRTR3QnJDNVhlOGlzRHB6YXhsQkZrNlRkekMzQ0Mr?=
- =?utf-8?B?WHhhT1kwSmMxaEk0TEh1Ry8rbkF3RGt3MFdtUDU1Ri9nSFVXaVpseWNLL0Nq?=
- =?utf-8?B?M0RndXdkc0RFVjdrUm84M0dTUHlBYk1qaThUQTE1VHFvSlFpTmpiSGhNbGtt?=
- =?utf-8?B?dGI4RUNISWpqYTNiUU9wMDdYdmJENmxlS0xSYURHTytmbzVEbjhLN1U4UkZk?=
- =?utf-8?B?SjNKV1dsamhYOTM4MmJSZVUzOURDVnpGMzdUaEJiYlFnS0t5RHpZS05hcVRo?=
- =?utf-8?B?dkJ1TlNzTnk4SmU4SEdoRlIvcEhYNmUraXpnalI5c3dSaGFXejZERThhVXBx?=
- =?utf-8?B?TXd1Y3VoNUtQQVpTS2VrVThDcEtpbTR1akhNTGd0TEh5ZVBYWWlTTTh4cmlq?=
- =?utf-8?B?ZEczNlozUjRCbHBweEpkZ0h5MDRhY3ExeEhSRmpWNGU3MDRGMzVzbGV5dW5T?=
- =?utf-8?B?QTJCajlDeUNhaDlxNzN6MXhkRmE1akl3TXFQcTdIWHBqbzlWRGlPVU9WM1FU?=
- =?utf-8?B?NGdFbzFaalcrZkF1TC90QUJyNUw4bzF4VGhuOHExWHhPOXRMR25OVFhuWUJa?=
- =?utf-8?B?S1dCblRhdnRCK1lPMkg5a2dZeXNsS2VNSGh0dVQyMlVPTDZreFN1QXNLVnRB?=
- =?utf-8?B?eEcreGQvVmxYSzA2RitpS1poTzJVcW51U2hKa3VyVnNkckFoSmdLMFFnTUtj?=
- =?utf-8?B?OEhWdmpzSkoxWFB1T1VmYVJVRTBpR1E2cFJ3dGVGSy9SdWFralU0NUdjdUxB?=
- =?utf-8?B?elNWMlhIYkVWZmZNaGdBYXc2V1p1K1RLU2Y0RjlpRlY0S1ZEbGgyYXNwWm85?=
- =?utf-8?B?ZVNaK2J4VjRHS0lVRDBscjRrRGlrMGt3YVcrMFR4Z3VqR08weHJyTDhhOHl5?=
- =?utf-8?B?WG9OWjQ3cmJReFEvNWlXeTJhRFNGTHBWanN3alNDQ1RMOHpoN0RkSENhWEpK?=
- =?utf-8?B?UldCb1ZhMmg2YTVFc3FIbVlYTlA2RS9tL2dDQVVIdU1tcnd0OVlSTm05NW5m?=
- =?utf-8?B?eU5HVXFrNVo0bjhndTZVZERNeFdDdnUxUitvMlJXK21kOVYwWVV6d0tCSUVO?=
- =?utf-8?B?elpTUk8xTVZJS0g1NWIxaTZvaElSbEIxc1pvekR0S2xwaVpoaGpTYXJ3V3BH?=
- =?utf-8?Q?qkO8T8NaTT7al8ly/XKx9Pjlc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e3939b9-1174-48bd-d1b6-08dd9e4ee126
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 01:19:38.1009
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 48mdyb1whf8G1xyy8Tw2Hyo3cRXyX350EdSQaYrnAKlW0UIUIwA94aiw2IymncLwlYq5wC4hFPYuWD1ATZ8qbQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
+In-Reply-To: <45xqguhrecn57cwc66hfws4eeqrb6rlijvh2z35e56ogojc2q4@pnlrgx57353b>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowMCxasSewzdoE2L5AA--.61626S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Cr4UWFyrtF4fGFW8WrWkXwc_yoW5Jr1rpr
+	y7W3W7GFWDJr48tr1qqw4jyFZFkF4kAw45ZryrXr93J34qyrnaqF1UtrsY9rZF9r4xJ34x
+	XF4Yv3y3Wa45ZrXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
+	WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUU
+	U==
 
 
-On 5/28/2025 6:26 PM, Herbert Xu wrote:
-> On Wed, May 28, 2025 at 08:20:18PM +0000, Ashish Kalra wrote:
+在 2025/5/28 下午5:53, Stefano Garzarella 写道:
+> On Wed, May 28, 2025 at 05:34:49PM +0800, Qunqin Zhao wrote:
 >>
->> @@ -1320,10 +1322,10 @@ static int __sev_platform_init_locked(int *error)
->>  
->>  	/* Prepare for first SEV guest launch after INIT */
->>  	wbinvd_on_all_cpus();
->> -	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
->> +	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &dfflush_error);
->>  	if (rc) {
->>  		dev_err(sev->dev, "SEV: DF_FLUSH failed %#x, rc %d\n",
->> -			*error, rc);
->> +			dfflush_error, rc);
-> 
-> dfflush_error is never returned to the caller unlike psp_ret, is
-> this intentional?
+>> 在 2025/5/28 下午5:24, Qunqin Zhao 写道:
+>>>
+>>> 在 2025/5/28 下午5:00, Stefano Garzarella 写道:
+>>>> On Wed, May 28, 2025 at 04:42:05PM +0800, Qunqin Zhao wrote:
+>>>>>
+>>>>> 在 2025/5/28 下午3:57, Stefano Garzarella 写道:
+>>>>>>> +    chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+>>>>>>> +    if (IS_ERR(chip))
+>>>>>>> +        return PTR_ERR(chip);
+>>>>>>> +    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+>>>>>>
+>>>>>> Why setting TPM_CHIP_FLAG_IRQ?
+>>>>>
+>>>>> When tpm_engine completes  TPM_CC* command,
+>>>>>
+>>>>> the hardware will indeed trigger an interrupt to the kernel.
+>>>>
+>>>> IIUC that is hidden by loongson_se_send_engine_cmd(), that for this 
+>>>> driver is completely synchronous, no?
+>>>>
+>>>>>
+>>>>>>
+>>>>>> IIUC this driver is similar to ftpm and svsm where the send is 
+>>>>>> synchronous so having .status, .cancel, etc. set to 0 should be 
+>>>>>> enough to call .recv() just after send() in tpm_try_transmit(). 
+>>>>>> See commit 980a573621ea ("tpm: Make 
+>>>>>> chip->{status,cancel,req_canceled} opt")
+>>>>> The send callback would wait until the TPM_CC* command complete. 
+>>>>> We don't need a poll.
+>>>>
+>>>> Right, that's what I was saying too, send() is synchronous (as in 
+>>>> ftpm and svsm). The polling in tpm_try_transmit() is already 
+>>>> skipped since we are setting .status = 0, .req_complete_mask = 0, 
+>>>> .req_complete_val = 0, etc. so IMHO this is exactly the same of 
+>>>> ftpm and svsm, so we don't need to set TPM_CHIP_FLAG_IRQ.
+>>>
+>>> I see,  but why not skip polling directly in "if (chip->flags & 
+>>> TPM_CHIP_FLAG_IRQ)"  instead of do while?
+>>
+>> I mean, why not skip polling directly in "if (chip->flags & 
+>> TPM_CHIP_FLAG_IRQ)"?
+>>
+>> And In my opinion, TPM_CHIP_FLAG_SYNC and TPM_CHIP_FLAG_IRQ are 
+>> essentially the same, only with different names.
+>
+> When TPM_CHIP_FLAG_SYNC is defined, the .recv() is not invoked and 
+> .send() will send the command and retrieve the response. For some 
+> driver like ftpm this will save an extra copy/buffer.
 
-Yes, this is intentional. 
+I need to copy the data to the DMA data buffer. So my suggestion is to 
+let the vendor specific driver  decide whether to use the SYNC or IRQ flag.
 
-As this function does SEV_INIT, it needs to return the firmware error (psp_ret) of SEV_INIT back to the caller.
-
-For DF_FLUSH failures, errors are indicated only via the log and for that dfflush_error is used.
+IRQ flag is fine for me.
 
 Thanks,
-Ashish
 
-> 
-> Thanks,
+Qunqin.
+
+>
+> Stefano
 
