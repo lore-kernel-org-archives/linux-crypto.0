@@ -1,101 +1,123 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2A820299B;
-	Thu, 29 May 2025 09:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2367D26C385;
+	Thu, 29 May 2025 09:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748511634; cv=none; b=kMx09N/rasm5oUJXlsmWNNs6BPqmWutQWmukDOwhUBXRinw25PIb1bDJd572OFShuV9N3TyRUmbc7fS1hGWo+ge1XY5DrCFWJKH/8RnLFztorJAF2ybAbThSg/RhkXl74k4quRj86iCXA/yDofS9P7o823I2fOwD+XGnn9so5nY=
+	t=1748511726; cv=none; b=iCwRufOfKB7KEDDDw+HXpBHFBBDzACYOE7ZgVjn2b9nHNqLZ7sLnRU4uH3PzuP0FvJwO7m4d1jdeKMQJ8kwwx1OndWYGbK63o1ZTYtYTQnztlBw39uDV8Gl+LOsX6effvwyJrlGoVUxbRivVnkTf+owLlH1KlFiwHk4TBygKFV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748511634; c=relaxed/simple;
-	bh=N2jkP1iEfBcx2MnZSi2BVAFp57oKiRPTxIoY88diJ+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ny6V4EVeISCvX93lcnUGO9Q5NN1XUj3WzEMD8IQxtF2SNTXnexanKGCRub/l3nbXiWJjP18MHYAGArOtWYn66PPJhsHJtEDCvt1iLv5BpzUCQTj7uNbfqdouHXuePLOVdZH+QkQ5IJ7MUksiMRaojPHHnxTTtpMnfupTrK6toMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 1579D2C000A8;
-	Thu, 29 May 2025 11:40:22 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id C87AC20BE58; Thu, 29 May 2025 11:40:21 +0200 (CEST)
-Date: Thu, 29 May 2025 11:40:21 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [PATCH v2 00/18] PCI device authentication
-Message-ID: <aDgrhePailpBUMJU@wunner.de>
-References: <cover.1719771133.git.lukas@wunner.de>
- <2140c4e4-6df0-47c7-8301-c6eb70ada27d@amd.com>
- <ZovrK7GsDpOMp3Bz@wunner.de>
- <b1595ceb-a916-4ff0-97bd-1a223e0cef15@amd.com>
- <Z6zN8R-E9uJpkU7j@wunner.de>
- <dab69e0c-37c2-41f1-a9db-fe116fe4cbbd@amd.com>
- <91e2985f-0815-4918-b7cf-c593bc2fa96b@amd.com>
+	s=arc-20240116; t=1748511726; c=relaxed/simple;
+	bh=bAH8EM/gjf3gnkT94CNwWdhrV11ZTppR7UdhRKVzj50=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AHlxoEu0BDWflSxGh8sBiNamiRle7MrrP8vPS+eJhAvT4mSJiPldoJOqDdjOix9rLmVqAqmxqrQcbURNVTkdA49uHNpNxoIBf1d/ncjhjELzWrNssVaG0UNex3bmu7IAMKDUfGVj8Z722VjPhMQ39yBNvWVE7pZ6oF76uOe8UK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
+Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
+ (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 29 May
+ 2025 11:42:02 +0200
+Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
+ S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%3]) with mapi id
+ 15.01.2507.039; Thu, 29 May 2025 11:42:02 +0200
+From: John Ernberg <john.ernberg@actia.se>
+To: Frank Li <Frank.li@nxp.com>
+CC: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>, Pankaj Gupta
+	<pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, "Rob
+ Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+	<s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Thomas Richard
+	<thomas.richard@bootlin.com>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
+ domains for iMX8QM and iMX8QXP
+Thread-Topic: [PATCH v3 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
+ domains for iMX8QM and iMX8QXP
+Thread-Index: AQHbz97TDhLekXOKbkmerT2PfEO8vrPoAHkAgAE6HYA=
+Date: Thu, 29 May 2025 09:42:02 +0000
+Message-ID: <aDgr6Sc-7CafIr_i@w447anl.localdomain>
+References: <20250528144259.2603914-1-john.ernberg@actia.se>
+ <20250528144259.2603914-4-john.ernberg@actia.se>
+ <aDckaszTLMcUdIiY@lizhi-Precision-Tower-5810>
+In-Reply-To: <aDckaszTLMcUdIiY@lizhi-Precision-Tower-5810>
+Accept-Language: en-US, sv-SE
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-esetresult: clean, is OK
+x-esetid: 37303A2956B14453637562
+Content-Type: text/plain; charset="iso-8859-2"
+Content-ID: <A07E64761B5D8A4895653371B0A38C92@actia.se>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <91e2985f-0815-4918-b7cf-c593bc2fa96b@amd.com>
 
-On Thu, May 29, 2025 at 03:29:23PM +1000, Alexey Kardashevskiy wrote:
-> On 20/5/25 18:35, Alexey Kardashevskiy wrote:
-> > On 13/2/25 03:36, Lukas Wunner wrote:
-> > > Please find a rebase of v2 on v6.14-rc2 on this branch:
-> > > 
-> > > https://github.com/l1k/linux/commits/doe
-> > > 
-> > > A portion of the crypto patches that were part of v2 have landed
-> > > in v6.13. So the rebased version has shrunk.
-> > > 
-> > > There was a bit of fallout caused by the upstreamed crypto patches
-> > > and dealing with that kept me occupied during the v6.13 cycle.
-> > > However I'm now back working on the PCI/CMA patches,
-> > 
-> > Any luck with these? Asking as there is another respin
-> > https://lore.kernel.org/r/20250516054732.2055093-1-dan.j.williams@intel.com
-> > and it considers merge with yours. Thanks,
-> 
-> Ping?
+Hi Frank,
 
-I intend to push a new version to my repo after the merge window closes
-and that'll use netlink multicast to convey signatures to userspace.
+On Wed, May 28, 2025 at 10:57:46AM -0400, Frank Li wrote:
+> On Wed, May 28, 2025 at 02:43:07PM +0000, John Ernberg wrote:
+> > NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
+> > resource management.
+> >
+> > Allow specifying them for such SoCs.
+>=20
+> suggest comment:
+>=20
+> Add compatible string fsl,imx8qm-caam, and allow power-domains for it. Ke=
+ep
+> the same restriction for others.
 
-Thanks,
+Ack.
 
-Lukas
+>=20
+> >
+> > Signed-off-by: John Ernberg <john.ernberg@actia.se>
+> >
+> > ---
+> >
+> > v3:
+> >  - Fix warnings discovered by Rob Herring's bot
+> >  - Declare the compatibles correctly (Krzysztof Kozlowski)
+> >
+> > v2:
+> >  - Adjust commit message (Frank Li)
+> >  - Only allow power-domains when compatible with imx8qm (Frank Li)
+> > ---
+> >  .../bindings/crypto/fsl,sec-v4.0.yaml         | 45 ++++++++++++++++++-
+> >  1 file changed, 44 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml=
+ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+> > index 75afa441e019..a4ada0e2d97c 100644
+> > --- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+> > +++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+> > @@ -46,6 +46,7 @@ properties:
+> >        - items:
+> >            - enum:
+> >                - fsl,imx6ul-caam
+> > +              - fsl,imx8qm-caam
+>=20
+> suggest add fsl,imx8qxp-caam, fsl,imx8dxl-caam also
+
+While I know the DXL comes with the CAAM, I don't have access to any boards
+with a DXL on it nor the DXL security manual. So I cannot validate any
+changes I would make for the DXL variant.
+
+I propose to keep the DXL out of this patch set, is that ok for you?
+
+I'll add a compat for the QXP in V4.
+
+Thanks! // John Ernberg
+
+>=20
+> Frank=
