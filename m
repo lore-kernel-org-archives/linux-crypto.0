@@ -1,144 +1,113 @@
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7588028DB64;
-	Thu, 29 May 2025 09:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104F3A55;
+	Thu, 29 May 2025 10:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748512307; cv=none; b=pswjRB/iueclrmTZF7UZ84GDZbzQl/fzWrcrBnIv3ZbTXExMksMBpz9PbWjxgve06CvrMjuV0gAJSTbJvnPXKA8nXIRJ8ZAb0YTaVW7BWEwd4e7hBdVV7coVTUHdScJ4AWvP9O3iB69yvJSPqfE13YPA6+H8Czj0NSQLxaky3yM=
+	t=1748513498; cv=none; b=Eas8Vj+WtBkJL6Nzykv3g5Ytegg6zGoLCBoMrMCDTn43zhYu0A1w/lwekve8XBajH2+6srHBAB+thY3GedQT6A+V1oR+Ux6qgVha28r2gidMh0b1TwiucInskpMnIvwli9ynkdS/ydw9qj1eMYn1IZ511tsYdL9Rr+AglM4Mgfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748512307; c=relaxed/simple;
-	bh=OZsH8F+7jsk2HU7JWPEzcfoDDPzAr/AyR3QL1nKxMCE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lCRq0hTZASXl6wFbWKg05a+XeBtx8oS7P5HPfnalvdYidEwL08JAwN2IoW5rro6SSUcQVfvIrwXazGROH6b1O96ujBLqjWQ+wUHwNpo1vE3vGN6hnwbRI9XBKcWzxILfSWwisBoo5zbEb2OqgYONz2rvnAgrbQXwHzczSWg9KOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
- (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 29 May
- 2025 11:51:43 +0200
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%3]) with mapi id
- 15.01.2507.039; Thu, 29 May 2025 11:51:43 +0200
-From: John Ernberg <john.ernberg@actia.se>
-To: Frank Li <Frank.li@nxp.com>
-CC: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>, Pankaj Gupta
-	<pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, "Rob
- Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
-	<s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Thomas Richard
-	<thomas.richard@bootlin.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "stable@kernel.org"
-	<stable@kernel.org>
-Subject: Re: [PATCH v3 1/4] crypto: caam - Prevent crash on suspend with
- iMX8QM / iMX8ULP
-Thread-Topic: [PATCH v3 1/4] crypto: caam - Prevent crash on suspend with
- iMX8QM / iMX8ULP
-Thread-Index: AQHbz97TifK0/bkJfUas794AaCBb6bPn/yOAgAE+KIA=
-Date: Thu, 29 May 2025 09:51:43 +0000
-Message-ID: <aDguL2HynKmYyWnS@w447anl.localdomain>
-References: <20250528144259.2603914-1-john.ernberg@actia.se>
- <20250528144259.2603914-2-john.ernberg@actia.se>
- <aDcjS+3ing1W81QY@lizhi-Precision-Tower-5810>
-In-Reply-To: <aDcjS+3ing1W81QY@lizhi-Precision-Tower-5810>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-esetresult: clean, is OK
-x-esetid: 37303A2956B14453637562
-Content-Type: text/plain; charset="iso-8859-2"
-Content-ID: <BC60B83D8F1AE94D8772162555774B55@actia.se>
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1748513498; c=relaxed/simple;
+	bh=n1ZSZRRIrTneaJFYpJvpb9/RGVcZ0hY1kPCFwceGKRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dqcdyyvr6O1qaScbqi4I/k7vzvGsJhxJCPRypF3S5TfLPkGZcM1kSZe+ualpBiaNS4AfBA6/ZSW0X+ebCyl1LSQ4A4+5d/8ZPindSEwCRuX6V6sy+69ry37+MN8xKT0EX1jMkl9B1Z7nC6UsdqJf3ptXT7F8sraHJa7bXnnbQD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 69A492C051D4;
+	Thu, 29 May 2025 12:11:33 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 4D594244B9E; Thu, 29 May 2025 12:11:33 +0200 (CEST)
+Date: Thu, 29 May 2025 12:11:33 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Cc: Paul Moore <paul@paul-moore.com>, jarkko@kernel.org,
+	zeffron@riotgames.com, xiyou.wangcong@gmail.com,
+	kysrinivasan@gmail.com, code@tyhicks.com,
+	linux-security-module@vger.kernel.org, roberto.sassu@huawei.com,
+	James.Bottomley@hansenpartnership.com,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Quentin Monnet <qmo@kernel.org>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	Jordan Rome <linux@jordanrome.com>,
+	Martin Kelly <martin.kelly@crowdstrike.com>,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Matteo Croce <teknoraver@meta.com>, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/3] bpf: Add bpf_check_signature
+Message-ID: <aDgy1Wqn7WIFNXvb@wunner.de>
+References: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
+ <20250528215037.2081066-2-bboscaccy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250528215037.2081066-2-bboscaccy@linux.microsoft.com>
 
-Hi Frank,
+On Wed, May 28, 2025 at 02:49:03PM -0700, Blaise Boscaccy wrote:
+> +	if (!attr->signature_maps_size) {
+> +		sha256((u8 *)prog->insnsi, prog->len * sizeof(struct bpf_insn), (u8 *)&hash);
+> +		err = verify_pkcs7_signature(hash, sizeof(hash), signature, attr->signature_size,
+> +				     VERIFY_USE_SECONDARY_KEYRING,
+> +				     VERIFYING_EBPF_SIGNATURE,
+> +				     NULL, NULL);
 
-On Wed, May 28, 2025 at 10:52:59AM -0400, Frank Li wrote:
-> On Wed, May 28, 2025 at 02:43:07PM +0000, John Ernberg wrote:
-> > Since the CAAM on these SoCs is managed by another ARM core, called the
-> > SECO (Security Controller) on iMX8QM and Secure Enclave on iMX8ULP, whi=
-ch
-> > also reserves access to register page 0 suspend operations cannot touch
-> > this page.
-> >
-> > This is similar to when running OPTEE, where OPTEE will reserve page 0.
-> >
-> > Track this situation using a new state variable no_page0, reflecting if
-> > page 0 is reserved elsewhere, either by other management cores in SoC o=
-r
-> > by OPTEE.
-> >
-> > Replace the optee_en check in suspend/resume with the new check.
-> >
-> > optee_en cannot go away as it's needed elsewhere to gate OPTEE specific
-> > situations.
-> >
-> > Fixes the following splat at suspend:
-> >
-> >     Internal error: synchronous external abort: 0000000096000010 [#1] S=
-MP
-> >     Hardware name: Freescale i.MX8QXP ACU6C (DT)
-> >     pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
-> >     pc : readl+0x0/0x18
-> >     lr : rd_reg32+0x18/0x3c
-> >     sp : ffffffc08192ba20
-> >     x29: ffffffc08192ba20 x28: ffffff8025190000 x27: 0000000000000000
-> >     x26: ffffffc0808ae808 x25: ffffffc080922338 x24: ffffff8020e89090
-> >     x23: 0000000000000000 x22: ffffffc080922000 x21: ffffff8020e89010
-> >     x20: ffffffc080387ef8 x19: ffffff8020e89010 x18: 000000005d8000d5
-> >     x17: 0000000030f35963 x16: 000000008f785f3f x15: 000000003b8ef57c
-> >     x14: 00000000c418aef8 x13: 00000000f5fea526 x12: 0000000000000001
-> >     x11: 0000000000000002 x10: 0000000000000001 x9 : 0000000000000000
-> >     x8 : ffffff8025190870 x7 : ffffff8021726880 x6 : 0000000000000002
-> >     x5 : ffffff80217268f0 x4 : ffffff8021726880 x3 : ffffffc081200000
-> >     x2 : 0000000000000001 x1 : ffffff8020e89010 x0 : ffffffc081200004
-> >     Call trace:
-> >      readl+0x0/0x18
-> >      caam_ctrl_suspend+0x30/0xdc
-> >      dpm_run_callback.constprop.0+0x24/0x5c
-> >      device_suspend+0x170/0x2e8
-> >      dpm_suspend+0xa0/0x104
-> >      dpm_suspend_start+0x48/0x50
-> >      suspend_devices_and_enter+0x7c/0x45c
-> >      pm_suspend+0x148/0x160
-> >      state_store+0xb4/0xf8
-> >      kobj_attr_store+0x14/0x24
-> >      sysfs_kf_write+0x38/0x48
-> >      kernfs_fop_write_iter+0xb4/0x178
-> >      vfs_write+0x118/0x178
-> >      ksys_write+0x6c/0xd0
-> >      __arm64_sys_write+0x14/0x1c
-> >      invoke_syscall.constprop.0+0x64/0xb0
-> >      do_el0_svc+0x90/0xb0
-> >      el0_svc+0x18/0x44
-> >      el0t_64_sync_handler+0x88/0x124
-> >      el0t_64_sync+0x150/0x154
-> >     Code: 88dffc21 88dffc21 5ac00800 d65f03c0 (b9400000)
-> >
-> > Fixes: d2835701d93c ("crypto: caam - i.MX8ULP donot have CAAM page0 acc=
-ess")
-> > Fixes: 61bb8db6f682 ("crypto: caam - Add support for i.MX8QM")
->=20
-> Why need two fixes tags? It should be enough to keep oldest one.
+Has this ever been tested?
 
-It looked to me to improve clarity in affected supported modules by
-highlighting when each module support was added. I'll drop the second one.
+It looks like it will always return -EINVAL because:
 
-Best regards // John Ernberg
+  verify_pkcs7_signature()
+    verify_pkcs7_message_sig()
+      pkcs7_verify()
 
->=20
-> Frank
-> =
+... pkcs7_verify() contains a switch statement which you're not
+amending with a "case VERIFYING_EBPF_SIGNATURE" but which returns
+-EINVAL in the "default" case.
+
+Aside from that, you may want to consider introducing a new ".ebpf"
+keyring to allow adding trusted keys specifically for eBPF verification
+without having to rely on the system keyring.
+
+Constraining oneself to sha256 doesn't seem future-proof.
+
+Some minor style issues in the commit message caught my eye:
+
+> This introduces signature verification for eBPF programs inside of the
+> bpf subsystem. Two signature validation schemes are included, one that
+
+Use imperative mood, avoid repetitive "This ...", e.g.
+"Introduce signature verification of eBPF programs..."
+
+> The signature check is performed before the call to
+> security_bpf_prog_load. This allows the LSM subsystem to be clued into
+> the result of the signature check, whilst granting knowledge of the
+> method and apparatus which was employed.
+
+"Perform the signature check before calling security_bpf_prog_load()
+to allow..."
+
+Thanks,
+
+Lukas
