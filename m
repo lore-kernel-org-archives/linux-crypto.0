@@ -1,211 +1,143 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542F235079;
-	Fri, 30 May 2025 16:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE693201100;
+	Fri, 30 May 2025 16:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748621423; cv=none; b=tD3veXPr459F4PDJb6RogKsLa4JDwwGYtdRUNCdU+zHlmCqBOL7byPCiQeT47vnIAXKYYg1t4Tmk6dNsVyXOkvU6llRqqP6m2KDi+r0nNWcUaf5X5QRwy3E5XLd5vCmIXNBwCOLFWUrwDY8hidX/XbOOMWF+xRYkRNlkCo5714E=
+	t=1748621511; cv=none; b=HxJF8VdyNoXmF0S0kfmkfDEN1NVEGt5DtYO1czthVR1ihTAuARvEqAGfjFVh78Ml7zcshjJNGjJtwK/oyazjs9Pz5FO4v48FNahmPlZsddzIN8PbP7z87ZAE69tW5NZN2uYiUjzqwzb/yvgsnJ4CvtGRI+Yo4NkAFLvAiC9i1no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748621423; c=relaxed/simple;
-	bh=HrdqjSxm8EooDpiNXtzK0jxkcPuOsCkYBWG/5ijU9Vs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CD5FzBMT3OOlMC/qo6HRwEZh/R+yhW5bU8F1Bf7ad39t9Hl9VSHtgajF4AgWUKIBe5XW7x1K4UiY1Rc4F0S1Oc/byQWOY/JBVXQL85BLNQ4dk5TPKLy5pS5DRVvwyXZfuKAWs9fcUd/24NBoU+/Igw/Q7tw7v5gtUg54FO+1pLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rENlBUYw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748621511; c=relaxed/simple;
+	bh=wTQk6PCp/lFFKGrig6/uLoqINdQiBMib30kvAzZasYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BU8oKPsPcAKFqOAZvo0nnAOB6k+UoggP3+5oe9IzlP0yM2e+WQ+m01K0/CFeZUbrcOb+mx+TQIWLK/su/v+acYpoLaBh0Lxq9ObaJPxqk3mY0ZisTFEe5dlvpJx0iLXjVPOJiAppKaUrScWuMVlQiTc9M0HSIFID7khFoC1DGPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uv+vLdpk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rENlBUYw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D5F3C4CEE9;
-	Fri, 30 May 2025 16:10:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uv+vLdpk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4570CC4CEE9;
+	Fri, 30 May 2025 16:11:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748621423;
-	bh=HrdqjSxm8EooDpiNXtzK0jxkcPuOsCkYBWG/5ijU9Vs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rENlBUYwKHO69VBi1tQWKmiFmZKnZkVvbn5HBMT3R64ZgNRBclAKQkB/9eMyW/pKk
-	 uohi9UOcylwxV1RCNjbGiCFdkUBAipd/F5KH1jfJyZjnBBb6B9aGp0EblFKvPX2KHR
-	 hdJ7E1KATkw9G7mzMT7ugxwZ2pC5nk/TBrgJ7sAgaE4NSMI5X8bm/2EcYjMOx79mSC
-	 lrudjoTV35igerXVBEFaThQ7dsDxrM9DH36pFn1tktsxlfnOXDrfO6udw3u9WyvZh7
-	 F/P864zWPv4vZ3QYq/1c361XXgW68Dlc7YXVY5xpBJ9Wce2ES+xewr3dL54PxwcCUn
-	 HuG3XXOrGNAfw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto/crc32: register only one shash_alg
-Date: Fri, 30 May 2025 09:09:40 -0700
-Message-ID: <20250530160940.12761-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1748621511;
+	bh=wTQk6PCp/lFFKGrig6/uLoqINdQiBMib30kvAzZasYo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uv+vLdpkySLW3HE3WdXeTQ7ATCtjuH6p8unU0fNiyR5OqNTLXySrn45eSAfY3hjQS
+	 eCCJytd+GZadvja28z60ZKOrDNucABl1Xi1bC9y4LFKIcLZRvCqptVCKIpa5KZj6Ma
+	 HqF54hlf4ST6LxJ6njDal4HYtRHr+oZy4eW7hYePitcPABE2JBCUBWZ0zb0UX5Hwiv
+	 fImxIPboA7qBS9IyUix0weLO6B78CLk/7H910GFAkT5HMguRDYxYoReopdJOXTKZKN
+	 rEluHo/3rxzsdRFuVqa6u675+hI+gudMinKkf1DhJ9bxb3pJVPM/PDU2sYghU0WJRW
+	 YZxWLUuQMcCjQ==
+Date: Fri, 30 May 2025 17:11:47 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Harsh Jain <h.jain@amd.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	mounika.botcha@amd.com, sarat.chand.savitala@amd.com,
+	mohan.dhanawade@amd.com, michal.simek@amd.com
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: Add node for True Random Number
+ Generator
+Message-ID: <20250530-gab-vocally-110247b8f60c@spud>
+References: <20250529113116.669667-1-h.jain@amd.com>
+ <20250529113116.669667-2-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rnbGi+IB0VKW4Vv3"
+Content-Disposition: inline
+In-Reply-To: <20250529113116.669667-2-h.jain@amd.com>
 
-From: Eric Biggers <ebiggers@google.com>
 
-Stop unnecessarily registering a "crc32-generic" shash_alg when a
-"crc32-$(ARCH)" shash_alg is registered too.
+--rnbGi+IB0VKW4Vv3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-While every algorithm does need to have a generic implementation to
-ensure uniformity of support across platforms, that doesn't mean that we
-need to make the generic implementation available through crypto_shash
-when an optimized implementation is also available.
+On Thu, May 29, 2025 at 05:01:14PM +0530, Harsh Jain wrote:
+> Add TRNG node compatible string and reg properities.
+>=20
+> Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
+> Signed-off-by: Harsh Jain <h.jain@amd.com>
 
-Registering the generic shash_alg did allow users of the crypto_shash or
-crypto_ahash APIs to request the generic implementation specifically,
-instead of an optimized one.  However, the only known use case for that
-was the differential fuzz tests in crypto/testmgr.c.  Equivalent test
-coverage is now provided by crc_kunit.
+The signoff chain here looks wrong, since there's no From: field in the
+patch, meaning that you are the author and submitter, but the order of
+signoffs suggests that Mounika is the author. If you are in fact the
+author and submitter, what was their role?
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+> ---
+>  .../bindings/crypto/xlnx,versal-trng.yaml     | 36 +++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,versal-=
+trng.yaml
+>=20
+> diff --git a/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.ya=
+ml b/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
+> new file mode 100644
+> index 000000000000..547ed91aa873
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
+> @@ -0,0 +1,36 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/xlnx,versal-trng.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Xilinx Versal True Random Number Generator Hardware Accelerator
+> +
+> +maintainers:
+> +  - Harsh Jain <h.jain@amd.com>
+> +  - Mounika Botcha <mounika.botcha@amd.com>
+> +
+> +description:
+> +  The Versal True Random Number Generator cryptographic accelerator
+> +  is used to generate the random number.
 
-I'm planning to take this through the crc tree.
+I would be surprised if the random number generator did not generate
+random numbers. I think you can probably just drop the description
+entirely in the future
 
- crypto/crc32.c | 69 ++++++++------------------------------------------
- 1 file changed, 11 insertions(+), 58 deletions(-)
+> +
+> +properties:
+> +  compatible:
+> +    const: xlnx,versal-trng
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +required:
+> +  - reg
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    trng@f1230000 {
 
-diff --git a/crypto/crc32.c b/crypto/crc32.c
-index cc371d42601fd..b61d5663d0bac 100644
---- a/crypto/crc32.c
-+++ b/crypto/crc32.c
-@@ -57,33 +57,16 @@ static int crc32_init(struct shash_desc *desc)
- static int crc32_update(struct shash_desc *desc, const u8 *data,
- 			unsigned int len)
- {
- 	u32 *crcp = shash_desc_ctx(desc);
- 
--	*crcp = crc32_le_base(*crcp, data, len);
--	return 0;
--}
--
--static int crc32_update_arch(struct shash_desc *desc, const u8 *data,
--			     unsigned int len)
--{
--	u32 *crcp = shash_desc_ctx(desc);
--
- 	*crcp = crc32_le(*crcp, data, len);
- 	return 0;
- }
- 
- /* No final XOR 0xFFFFFFFF, like crc32_le */
--static int __crc32_finup(u32 *crcp, const u8 *data, unsigned int len,
--			 u8 *out)
--{
--	put_unaligned_le32(crc32_le_base(*crcp, data, len), out);
--	return 0;
--}
--
--static int __crc32_finup_arch(u32 *crcp, const u8 *data, unsigned int len,
--			      u8 *out)
-+static int __crc32_finup(u32 *crcp, const u8 *data, unsigned int len, u8 *out)
- {
- 	put_unaligned_le32(crc32_le(*crcp, data, len), out);
- 	return 0;
- }
- 
-@@ -91,16 +74,10 @@ static int crc32_finup(struct shash_desc *desc, const u8 *data,
- 		       unsigned int len, u8 *out)
- {
- 	return __crc32_finup(shash_desc_ctx(desc), data, len, out);
- }
- 
--static int crc32_finup_arch(struct shash_desc *desc, const u8 *data,
--		       unsigned int len, u8 *out)
--{
--	return __crc32_finup_arch(shash_desc_ctx(desc), data, len, out);
--}
--
- static int crc32_final(struct shash_desc *desc, u8 *out)
- {
- 	u32 *crcp = shash_desc_ctx(desc);
- 
- 	put_unaligned_le32(*crcp, out);
-@@ -111,72 +88,48 @@ static int crc32_digest(struct shash_desc *desc, const u8 *data,
- 			unsigned int len, u8 *out)
- {
- 	return __crc32_finup(crypto_shash_ctx(desc->tfm), data, len, out);
- }
- 
--static int crc32_digest_arch(struct shash_desc *desc, const u8 *data,
--			     unsigned int len, u8 *out)
--{
--	return __crc32_finup_arch(crypto_shash_ctx(desc->tfm), data, len, out);
--}
--
--static struct shash_alg algs[] = {{
-+static struct shash_alg alg = {
- 	.setkey			= crc32_setkey,
- 	.init			= crc32_init,
- 	.update			= crc32_update,
- 	.final			= crc32_final,
- 	.finup			= crc32_finup,
- 	.digest			= crc32_digest,
- 	.descsize		= sizeof(u32),
- 	.digestsize		= CHKSUM_DIGEST_SIZE,
- 
- 	.base.cra_name		= "crc32",
--	.base.cra_driver_name	= "crc32-generic",
- 	.base.cra_priority	= 100,
- 	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(u32),
- 	.base.cra_module	= THIS_MODULE,
- 	.base.cra_init		= crc32_cra_init,
--}, {
--	.setkey			= crc32_setkey,
--	.init			= crc32_init,
--	.update			= crc32_update_arch,
--	.final			= crc32_final,
--	.finup			= crc32_finup_arch,
--	.digest			= crc32_digest_arch,
--	.descsize		= sizeof(u32),
--	.digestsize		= CHKSUM_DIGEST_SIZE,
--
--	.base.cra_name		= "crc32",
--	.base.cra_driver_name	= "crc32-" __stringify(ARCH),
--	.base.cra_priority	= 150,
--	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
--	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
--	.base.cra_ctxsize	= sizeof(u32),
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_init		= crc32_cra_init,
--}};
--
--static int num_algs;
-+};
- 
- static int __init crc32_mod_init(void)
- {
--	/* register the arch flavor only if it differs from the generic one */
--	num_algs = 1 + ((crc32_optimizations() & CRC32_LE_OPTIMIZATION) != 0);
-+	const char *driver_name =
-+		(crc32_optimizations() & CRC32_LE_OPTIMIZATION) ?
-+			"crc32-" __stringify(ARCH) :
-+			"crc32-generic";
-+
-+	strscpy(alg.base.cra_driver_name, driver_name, CRYPTO_MAX_ALG_NAME);
- 
--	return crypto_register_shashes(algs, num_algs);
-+	return crypto_register_shash(&alg);
- }
- 
- static void __exit crc32_mod_fini(void)
- {
--	crypto_unregister_shashes(algs, num_algs);
-+	crypto_unregister_shash(&alg);
- }
- 
- module_init(crc32_mod_init);
- module_exit(crc32_mod_fini);
- 
- MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
- MODULE_DESCRIPTION("CRC32 calculations wrapper for lib/crc32");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("crc32");
--MODULE_ALIAS_CRYPTO("crc32-generic");
+"rng" I think is the standard node name here, since you need to respin
+to fix the signoff chain.
 
-base-commit: f66bc387efbee59978e076ce9bf123ac353b389c
--- 
-2.49.0
+> +        compatible =3D "xlnx,versal-trng";
+> +        reg =3D <0xf1230000 0x1000>;
+> +    };
+> +...
+> +
+> --=20
+> 2.34.1
+>=20
+>=20
 
+--rnbGi+IB0VKW4Vv3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaDnYwwAKCRB4tDGHoIJi
+0qw+AQCgQ0LZa9b6N09ngLAbztgXvj3A6gqZby43kH6gVRJjWQEAg2RePIl9eUus
+YDao47stg69hvfxUVfvQ19C3FVnbKwI=
+=Pldf
+-----END PGP SIGNATURE-----
+
+--rnbGi+IB0VKW4Vv3--
