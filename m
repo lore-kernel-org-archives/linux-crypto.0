@@ -1,223 +1,215 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8D2235079;
-	Fri, 30 May 2025 16:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88EB1DD9AB
+	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 16:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748621531; cv=none; b=BEFG24PauOgb8wFOvVXGC5HoziFpvqADCtF5qewy539BMyeNwgChVZtZZXQsGdiKi8O7RvZ/gIuoF6iVwNPSSs2yMOtNYA2faKti+hfZf0NRaPrSALOIhbH0mct4x/rNdAIaBiKvHIDv0J85gqhOuGbKLJSEsum8jQkE2QoKNww=
+	t=1748623339; cv=none; b=h7zyuSTWg4QnaBN3BO8XLSi4dNvee/+5oVaLCTyB0QAOAU3yfxKzK/YQ0lB7Unqs/NFhIcivNPAecTXwYdpw+qYvy+8qMfuqRTisw48zdPdnyesBIWsc0s0xNxQ1+RiiqaF1lynwITyX8zzgfJK5+/oEoHV3CvI4sAyhO4Nv9kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748621531; c=relaxed/simple;
-	bh=Z7hYRToBzVndugVw9/+VL1oIDvZ/G481tYi7Xm5XtUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dnHrdQ4hxGlcQ5V6g7McHVNL8K4TgYnFfyr2qCDoDP3snS8I8Pf/Cms2bQCBQEGfCg5xa/GgdfXHrg0l6x6+QwulhpjDA5plL/Rqu0SCmvynq56BE8v41pyATIJcyCOdld4hOJF1Ct1duVKefxVY4Y1HMRoN9C+qYM0RoLj5nOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmVzKZei; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748623339; c=relaxed/simple;
+	bh=6IpXsTCAiLKJWps9H8u+WyFNAUSFFMG0gHMOiyUtGhA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=usyCXoLPjoyp2i0+Zc9hDnnRQBr+Bi7JlJ71nMNVlrjgzB1ZIlh0pJb8YNY+V97b78RyA0C9aAYCU626s114SQnNeeSDSu49F2cL3Thh2/vjoBJ75gGlWBRTxVsGpKIiZaXYXla7rp/p9eXczg50CpJkZMjNkVgs8wDbJKjNHpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG6B+NN/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmVzKZei"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F50AC4CEE9;
-	Fri, 30 May 2025 16:12:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG6B+NN/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30A6AC2BC87
+	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 16:42:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748621530;
-	bh=Z7hYRToBzVndugVw9/+VL1oIDvZ/G481tYi7Xm5XtUw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VmVzKZeioeqaHpjIhbGPFl5Vfs4b4wDFUxHMnpf9qmBaVUAe1Ei+dxIhB80qmZxZP
-	 b2EUuibXcVdoxa7/QqrA+MrPEfmCSOWxBvDq2Ujudd1rP1/Q+iM3eE0lbDVSlAButU
-	 Yk41dX94rrDXLbpl2WIbMW52IIb0usKL2rnStsZIPUIM3tbLv5crN0YY4NvWReLLeP
-	 bFj914ylOovL2Wc5HiWCg6p6obELgB8WnJFPMsbvNf5Pc6asIBl6NsAyluUJTVSbCU
-	 /ZWJyESI3BWrdrfddgfHgrO5Urs8vQFmW14I6ZDYf++BOaHOaloiugciw4CVVv42KL
-	 Lzghx6VtbBOhg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto/crc32c: register only one shash_alg
-Date: Fri, 30 May 2025 09:10:42 -0700
-Message-ID: <20250530161042.13106-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1748623339;
+	bh=6IpXsTCAiLKJWps9H8u+WyFNAUSFFMG0gHMOiyUtGhA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=XG6B+NN/QJtpZyHenAGFWr311twH4kXCQ4IYLnZfgBCPnl1Lf8lCgkq/gU1x/hn0M
+	 T5RQYIWPz0YWVPLHlLUPiTbBmBStzARmh2HklwELAubSPIPh0Q38wSuAqrgPbyV2se
+	 bX2gJ4qhHlzP2UD3ey7ufLMJas+Dk+6/w2tsGomJzqqYLsoq2lsRcGiRylRujJfSgG
+	 pkffiG2zxky6WA77s+WrMD7N7iRg5ZZ9BTvx4PCzhVR6Rl3oIPqv8JDdnMAZysYKru
+	 aO3XllYbqtxVQXjJGHQOXf02fDv8Zx6re6yTozHptJI4gXun4yq0b+alPApvyRCTI0
+	 IUIbxKZQUpBsA==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-604533a2f62so4156254a12.3
+        for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 09:42:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVDpmwPhL22cCLYM+83Kq10W+LudOq067YxWm+hPoqBcMfAkzGAv0l6p0LfWEhM1XiypE9JjGDzRLeou68=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYfStfVAvoNGpSFctv6zyHz2dV69s6fvJJS3JwEeVBulI8X2qF
+	Do//uDoIwuu4qsb8mRcjdvrcrvJEh04bsDX2v4S+TPXHBvwtOxXJEiZdiehhq7GcJNZzkty95Sy
+	bNPvjvsnk2IdbS9ty2h0e0+HS1zYwP8QgGgaUXrae
+X-Google-Smtp-Source: AGHT+IF2FYqfEVWekW2bGIEEdeuqDw988e+H+6pMRWdod3exqVv2+/w3XumjYUA5HTJg6yynsg8WDmm2FjVwvBVk7yM=
+X-Received: by 2002:a05:6402:234d:b0:605:310a:7668 with SMTP id
+ 4fb4d7f45d1cf-6056e15e067mr3642169a12.22.1748623337297; Fri, 30 May 2025
+ 09:42:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
+In-Reply-To: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
+From: KP Singh <kpsingh@kernel.org>
+Date: Fri, 30 May 2025 18:42:05 +0200
+X-Gmail-Original-Message-ID: <CACYkzJ5oJASZ43B531gY8mESqAF3WYFKez-H5vKxnk8r48Ouxg@mail.gmail.com>
+X-Gm-Features: AX0GCFs-bIfXeMrte4iZc7juw786873JPtM7-P-E2EMKVgLQje7MKvpFUlnxFlU
+Message-ID: <CACYkzJ5oJASZ43B531gY8mESqAF3WYFKez-H5vKxnk8r48Ouxg@mail.gmail.com>
+Subject: Re: [PATCH 0/3] BPF signature verification
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Cc: Paul Moore <paul@paul-moore.com>, jarkko@kernel.org, zeffron@riotgames.com, 
+	xiyou.wangcong@gmail.com, kysrinivasan@gmail.com, code@tyhicks.com, 
+	linux-security-module@vger.kernel.org, roberto.sassu@huawei.com, 
+	James.Bottomley@hansenpartnership.com, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
+	Ignat Korchagin <ignat@cloudflare.com>, Quentin Monnet <qmo@kernel.org>, 
+	Jason Xing <kerneljasonxing@gmail.com>, Willem de Bruijn <willemb@google.com>, 
+	Anton Protopopov <aspsk@isovalent.com>, Jordan Rome <linux@jordanrome.com>, 
+	Martin Kelly <martin.kelly@crowdstrike.com>, Alan Maguire <alan.maguire@oracle.com>, 
+	Matteo Croce <teknoraver@meta.com>, bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, kys@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, May 28, 2025 at 11:50=E2=80=AFPM Blaise Boscaccy
+<bboscaccy@linux.microsoft.com> wrote:
+>
+> As suggested or mandated by KP Singh
+> https://lore.kernel.org/linux-security-module/CACYkzJ6VQUExfyt0=3D-FmXz46=
+GHJh3d=3DFXh5j4KfexcEFbHV-vg@mail.gmail.com/,
+> this patchset proposes and implements an alternative hash-chain
+> algorithm for signature verification of BPF programs.
+>
+>
+>
+> This design diverges in two key ways:
+>
+> 1. Signature Strategy
+>
+> Two different signature strategies are
+> implemented. One verifies only the signature of the loader program in
+> the kernel, as described in the link above. The other verifies the
+> program=E2=80=99s maps in-kernel via a hash chain.  The original design
+> required loader programs to be =E2=80=9Cself-aborting=E2=80=9D and embedd=
+ed the
+> terminal hash verification logic as metaprogramming code generation
+> routines inside libbpf. While this patchset supports that scheme, it
+> is considered undesirable in certain environments due to the potential
+> for supply-chain attack vectors and the lack of visibility for the LSM
 
-Stop unnecessarily registering a "crc32c-generic" shash_alg when a
-"crc32c-$(ARCH)" shash_alg is registered too.
+The loader program is signed by a trusted entity, If you trust the
+signature, then you trust it to do the signature verification. This is
+a fairly common pattern in security and a pattern that we will be
+using in other signed bpf use-cases which can choose to depend on
+signed loaders.
 
-While every algorithm does need to have a generic implementation to
-ensure uniformity of support across platforms, that doesn't mean that we
-need to make the generic implementation available through crypto_shash
-when an optimized implementation is also available.
+If your build environment that signs the BPF program is compromised
+and can inject arbitrary code, then signing does not help.  Can you
+explain what a supply chain attack would look like here?
 
-Registering the generic shash_alg did allow users of the crypto_shash or
-crypto_ahash APIs to request the generic implementation specifically,
-instead of an optimized one.  However, the only known use case for that
-was the differential fuzz tests in crypto/testmgr.c.  Equivalent test
-coverage is now provided by crc_kunit.
+> subsystem.  Additionally, it is impossible to verify the code
+> performing the signature verification, as it is uniquely regenerated
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+The LSM needs to ensure that it allows trusted LOADER programs i.e.
+with signatures and potentially trusted signed user-space binaries
+with unsigned or delegated signing (this will be needed for Cilium and
+bpftrace that dynamically generate BPF programs), that's a more
+important aspect of the LSM policy from a BPF perspective.
 
-I'm planning to take this through the crc tree.
+MAP_EXCLUSIVE is missing and is required which prevents maps from
+being accessed by other programs as explained in the proposal.
 
- crypto/crc32c.c | 70 +++++++------------------------------------------
- 1 file changed, 10 insertions(+), 60 deletions(-)
+Please hold off on further iterations, I am working on a series and
+will share these patches based on the design that was proposed.
 
-diff --git a/crypto/crc32c.c b/crypto/crc32c.c
-index e5377898414a2..e160695682f16 100644
---- a/crypto/crc32c.c
-+++ b/crypto/crc32c.c
-@@ -83,19 +83,10 @@ static int chksum_setkey(struct crypto_shash *tfm, const u8 *key,
- static int chksum_update(struct shash_desc *desc, const u8 *data,
- 			 unsigned int length)
- {
- 	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
- 
--	ctx->crc = crc32c_base(ctx->crc, data, length);
--	return 0;
--}
--
--static int chksum_update_arch(struct shash_desc *desc, const u8 *data,
--			      unsigned int length)
--{
--	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
--
- 	ctx->crc = crc32c(ctx->crc, data, length);
- 	return 0;
- }
- 
- static int chksum_final(struct shash_desc *desc, u8 *out)
-@@ -105,17 +96,10 @@ static int chksum_final(struct shash_desc *desc, u8 *out)
- 	put_unaligned_le32(~ctx->crc, out);
- 	return 0;
- }
- 
- static int __chksum_finup(u32 *crcp, const u8 *data, unsigned int len, u8 *out)
--{
--	put_unaligned_le32(~crc32c_base(*crcp, data, len), out);
--	return 0;
--}
--
--static int __chksum_finup_arch(u32 *crcp, const u8 *data, unsigned int len,
--			       u8 *out)
- {
- 	put_unaligned_le32(~crc32c(*crcp, data, len), out);
- 	return 0;
- }
- 
-@@ -125,98 +109,64 @@ static int chksum_finup(struct shash_desc *desc, const u8 *data,
- 	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
- 
- 	return __chksum_finup(&ctx->crc, data, len, out);
- }
- 
--static int chksum_finup_arch(struct shash_desc *desc, const u8 *data,
--			     unsigned int len, u8 *out)
--{
--	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
--
--	return __chksum_finup_arch(&ctx->crc, data, len, out);
--}
--
- static int chksum_digest(struct shash_desc *desc, const u8 *data,
- 			 unsigned int length, u8 *out)
- {
- 	struct chksum_ctx *mctx = crypto_shash_ctx(desc->tfm);
- 
- 	return __chksum_finup(&mctx->key, data, length, out);
- }
- 
--static int chksum_digest_arch(struct shash_desc *desc, const u8 *data,
--			      unsigned int length, u8 *out)
--{
--	struct chksum_ctx *mctx = crypto_shash_ctx(desc->tfm);
--
--	return __chksum_finup_arch(&mctx->key, data, length, out);
--}
--
- static int crc32c_cra_init(struct crypto_tfm *tfm)
- {
- 	struct chksum_ctx *mctx = crypto_tfm_ctx(tfm);
- 
- 	mctx->key = ~0;
- 	return 0;
- }
- 
--static struct shash_alg algs[] = {{
-+static struct shash_alg alg = {
- 	.digestsize		= CHKSUM_DIGEST_SIZE,
- 	.setkey			= chksum_setkey,
- 	.init			= chksum_init,
- 	.update			= chksum_update,
- 	.final			= chksum_final,
- 	.finup			= chksum_finup,
- 	.digest			= chksum_digest,
- 	.descsize		= sizeof(struct chksum_desc_ctx),
- 
- 	.base.cra_name		= "crc32c",
--	.base.cra_driver_name	= "crc32c-generic",
- 	.base.cra_priority	= 100,
- 	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct chksum_ctx),
- 	.base.cra_module	= THIS_MODULE,
- 	.base.cra_init		= crc32c_cra_init,
--}, {
--	.digestsize		= CHKSUM_DIGEST_SIZE,
--	.setkey			= chksum_setkey,
--	.init			= chksum_init,
--	.update			= chksum_update_arch,
--	.final			= chksum_final,
--	.finup			= chksum_finup_arch,
--	.digest			= chksum_digest_arch,
--	.descsize		= sizeof(struct chksum_desc_ctx),
--
--	.base.cra_name		= "crc32c",
--	.base.cra_driver_name	= "crc32c-" __stringify(ARCH),
--	.base.cra_priority	= 150,
--	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
--	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
--	.base.cra_ctxsize	= sizeof(struct chksum_ctx),
--	.base.cra_module	= THIS_MODULE,
--	.base.cra_init		= crc32c_cra_init,
--}};
--
--static int num_algs;
-+};
- 
- static int __init crc32c_mod_init(void)
- {
--	/* register the arch flavor only if it differs from the generic one */
--	num_algs = 1 + ((crc32_optimizations() & CRC32C_OPTIMIZATION) != 0);
-+	const char *driver_name =
-+		(crc32_optimizations() & CRC32C_OPTIMIZATION) ?
-+			"crc32c-" __stringify(ARCH) :
-+			"crc32c-generic";
-+
-+	strscpy(alg.base.cra_driver_name, driver_name, CRYPTO_MAX_ALG_NAME);
- 
--	return crypto_register_shashes(algs, num_algs);
-+	return crypto_register_shash(&alg);
- }
- 
- static void __exit crc32c_mod_fini(void)
- {
--	crypto_unregister_shashes(algs, num_algs);
-+	crypto_unregister_shash(&alg);
- }
- 
- module_init(crc32c_mod_init);
- module_exit(crc32c_mod_fini);
- 
- MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
- MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations wrapper for lib/crc32c");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("crc32c");
--MODULE_ALIAS_CRYPTO("crc32c-generic");
+>
+> for every program.
+>
+>
+>
+> 2. Timing of Signature Check
+>
+> This patchset moves the signature check to a point before
+> security_bpf_prog_load is invoked, due to an unresolved discussion
+> here:
 
-base-commit: f66bc387efbee59978e076ce9bf123ac353b389c
--- 
-2.49.0
+This is fine and what I had in mind, signature verification does not
+need to happen in the verifier and the existing hooks are good enough.
+I did not reply to Paul's comment since this is a fairly trivial
+detail and would be obvious in the implementation that the verifier is
+not the right place to check the signature anyways as the instruction
+buffer is only stable pre-verification.
 
+> https://lore.kernel.org/linux-security-module/CAHC9VhTj3=3DZXgrYMNA+G64zs=
+OyZO+78uDs1g=3Dkh91=3DGR5KypYg@mail.gmail.com/
+> This change allows the LSM subsystem to be informed of the signature
+> verification result=E2=80=94if it occurred=E2=80=94and the method used, a=
+ll without
+> introducing a new hook. It improves visibility and auditability,
+> reducing the =E2=80=9Ctrust me, friend=E2=80=9D aspect of the original de=
+sign.
+
+
+On Wed, May 28, 2025 at 11:50=E2=80=AFPM Blaise Boscaccy
+<bboscaccy@linux.microsoft.com> wrote:
+>
+> As suggested or mandated by KP Singh
+> https://lore.kernel.org/linux-security-module/CACYkzJ6VQUExfyt0=3D-FmXz46=
+GHJh3d=3DFXh5j4KfexcEFbHV-vg@mail.gmail.com/,
+> this patchset proposes and implements an alternative hash-chain
+> algorithm for signature verification of BPF programs.
+>
+> This design diverges in two key ways:
+>
+> 1. Signature Strategy
+>
+> Two different signature strategies are
+> implemented. One verifies only the signature of the loader program in
+> the kernel, as described in the link above. The other verifies the
+> program=E2=80=99s maps in-kernel via a hash chain.  The original design
+> required loader programs to be =E2=80=9Cself-aborting=E2=80=9D and embedd=
+ed the
+> terminal hash verification logic as metaprogramming code generation
+> routines inside libbpf. While this patchset supports that scheme, it
+> is considered undesirable in certain environments due to the potential
+> for supply-chain attack vectors and the lack of visibility for the LSM
+> subsystem.  Additionally, it is impossible to verify the code
+> performing the signature verification, as it is uniquely regenerated
+> for every program.
+>
+> 2. Timing of Signature Check
+>
+> This patchset moves the signature check to a point before
+> security_bpf_prog_load is invoked, due to an unresolved discussion
+> here:
+> https://lore.kernel.org/linux-security-module/CAHC9VhTj3=3DZXgrYMNA+G64zs=
+OyZO+78uDs1g=3Dkh91=3DGR5KypYg@mail.gmail.com/
+> This change allows the LSM subsystem to be informed of the signature
+> verification result=E2=80=94if it occurred=E2=80=94and the method used, a=
+ll without
+> introducing a new hook. It improves visibility and auditability,
+> reducing the =E2=80=9Ctrust me, friend=E2=80=9D aspect of the original de=
+sign.
+>
+>
+> Blaise Boscaccy (3):
+>   bpf: Add bpf_check_signature
+>   bpf: Support light-skeleton signatures in autogenerated code
+>   bpftool: Allow signing of light-skeleton programs
+>
+>  include/linux/bpf.h            |   2 +
+>  include/linux/verification.h   |   1 +
+>  include/uapi/linux/bpf.h       |   4 +
+>  kernel/bpf/arraymap.c          |  11 +-
+>  kernel/bpf/syscall.c           | 123 +++++++++++++++++++-
+>  tools/bpf/bpftool/Makefile     |   4 +-
+>  tools/bpf/bpftool/common.c     | 204 +++++++++++++++++++++++++++++++++
+>  tools/bpf/bpftool/gen.c        |  66 ++++++++++-
+>  tools/bpf/bpftool/main.c       |  24 +++-
+>  tools/bpf/bpftool/main.h       |  23 ++++
+>  tools/include/uapi/linux/bpf.h |   4 +
+>  tools/lib/bpf/libbpf.h         |   4 +
+>  tools/lib/bpf/skel_internal.h  |  28 ++++-
+>  13 files changed, 491 insertions(+), 7 deletions(-)
+>
+> --
+> 2.48.1
+>
