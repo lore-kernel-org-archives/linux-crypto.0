@@ -1,209 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DFC21CFFD
-	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 22:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A7C4C92;
+	Fri, 30 May 2025 23:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748645244; cv=none; b=j2r1a/ph2u+/w9oFtIDaDMPdE1jkqCCT7C5gmWchALRQpO/tvyYMcAR741Xk2NAc/cESQkr1tco9fw+E1Rnpe/gaE7jn2R/whRAM4pnvR0HUI03lrBYzjIjXBBAx2GaAIFlVygJ7i9+jreSIQdFPGH2HCgNQB2XiY1BNYHINyAk=
+	t=1748647333; cv=none; b=QcIOnpYIgx+FVF6hquR0Tb+nr0s+ExmRP+sdleHzxFCEly2ORV/SUuLQStC4S2gwXIJqj2/N4tk6T/2QhtgWZKqVsCyj13SCmKbLv21rOOGqylV9xY2y5fQfJwVUWl7ngFCfi4FiI+qt+79U/r3UFWN4PRtmlknQ63pLkaUMwkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748645244; c=relaxed/simple;
-	bh=HHG2788MAfzLv6FpNbSS2PT5GiBzIy9/XDiczvd4Vls=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z3PrQoY+ApDvkhDPCpkHv9aIayaClF/7eUjl79U3WTUKbEaFGnBAiLy6m3ns8bQJYDMef+f9qQ6dtwud0NNsFFojY1OlYc5OSiRoEuPTjeBgEB8Is6f07mwzwT+YnHAbB8ALr46aQSnL3KOwxbewTF6Mjp7ptxypebIRxSTFqEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1FWsg4t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748647333; c=relaxed/simple;
+	bh=u5QPujAxahr3lgKkWm19elD7yswC9DeG1bmDQxztD4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kZEZr1GhD5OWoOPbOFxEnQquBjjNPDepDwlRqSCeT4JAu3cFnIO3ipEX/G6OOjBCYeE0dcxCwdFdcrLiok+HG8IBtPLkQg1bim/adr6ZLNMVjqq/zzxFRrNCrrfUPsFYDmD3i0jXyg8Qb/5HukAbzaShmBHf0PFEAR9VbjgPTHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k0kaKnFC; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1FWsg4t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74AACC113D0
-	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 22:47:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748645243;
-	bh=HHG2788MAfzLv6FpNbSS2PT5GiBzIy9/XDiczvd4Vls=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=l1FWsg4tKRnT/+vxnW+s7WAje5WmMWUZwWWJwgmrze6OL8JCQRd2AsEPi0qy/q2RC
-	 ieMtxazaCgd4f/seXGhloWLSUi32DKh51gLbujFVpLiJvM7oq6upiGJ/KbjEisTHDV
-	 aECAHKirIPKQsJS9/FCXcZup+dlv+HZfaw4bcLnrRUO3s3etaFvwaLB+kjgQVbHjRb
-	 +2Xd1vQFTbNTGUO3RsGNPnvKCR4ONlY89hqqi6zfKGesSGGNg3Mk9vWC9cA1uiHUCS
-	 ERtmBtxatMMKGmI1uSuOSkByb3uO5OxQA1ApDrEEYesHc6w1iQtVqh/SBDAbh3PLA2
-	 0ykWFNEWnpAwQ==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60462000956so4249870a12.0
-        for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 15:47:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUHwTCCs2gghiw8zMNS7yUPKRA4F4PvVma4n73y3xZtMZdVNbae4EVlXfbxYrYHqqf8wsjPK7XrtVUPKbk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJeDooOb6xqgdi1OcTb2P3QB6M7ZSBY1Cq9s9QZbu0pg3HSUfI
-	TUCl4L8EBrg4zxYJIHMEs8qbL9RVuCLfn23HjGpEPUqDbMsPeFVJWwiRkE8Zu0RIWx8x1m2hVat
-	bnf6hOiaA2dZcb29eree7TtMQI3TCFlDoF8cCZK2g
-X-Google-Smtp-Source: AGHT+IFYxnUR608wUuerbDE05DFFV1ug2zC4oLVRvqWuBJ5505E/XEYgfXCYPZcgaF6AS2m1jiZPgriYTwhKBizbrzM=
-X-Received: by 2002:a05:6402:268c:b0:5fa:f7ed:f19c with SMTP id
- 4fb4d7f45d1cf-6057c1a98f4mr3487149a12.4.1748645241501; Fri, 30 May 2025
- 15:47:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k0kaKnFC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748647331; x=1780183331;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=u5QPujAxahr3lgKkWm19elD7yswC9DeG1bmDQxztD4c=;
+  b=k0kaKnFCvGV78ximktRG/6JwhkmVCy56OnBwQT60bK/mm9I3oR15qzyf
+   rJMN92Z0B8VpI/LXrPazh/Bco5H0tajVwaRhvH/3Bc33jfzHOma9NcQE1
+   S2vGDgXfvUJN3edP3aZsdGvDMeITMHBagPN5Xbg5xIXve1F0Bmj1cRrDE
+   rOZC308fHTIqVm8mjyoK4PuzOu/0A29b5YyNnj7PCV1fNL7HvC7ApEU99
+   4mQfsMe3aDiIACGmDQgJDoegRp+CHb+SLQPaf53eAVQFINDabOuFHNVrR
+   cgeJzyWQ83wq0C+QE6gJ9++eALVglkQ1nYxdlIegrJiBvZWWr4XYoHD60
+   g==;
+X-CSE-ConnectionGUID: ydTVgESmQViSBHpdcVFfIg==
+X-CSE-MsgGUID: 2uF0yv9kRPqVc3hPBT/EOA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11449"; a="54545613"
+X-IronPort-AV: E=Sophos;i="6.16,197,1744095600"; 
+   d="scan'208";a="54545613"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 16:22:10 -0700
+X-CSE-ConnectionGUID: Ryipz7i6Rr29OwdvhxkT1A==
+X-CSE-MsgGUID: kg7DH605RG2+dEWiylfPvA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,197,1744095600"; 
+   d="scan'208";a="143987977"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 30 May 2025 16:22:08 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uL937-000Y2W-26;
+	Fri, 30 May 2025 23:22:05 +0000
+Date: Sat, 31 May 2025 07:21:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Harsh Jain <h.jain@amd.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, mounika.botcha@amd.com,
+	sarat.chand.savitala@amd.com, mohan.dhanawade@amd.com,
+	michal.simek@amd.com
+Cc: oe-kbuild-all@lists.linux.dev, Harsh Jain <h.jain@amd.com>
+Subject: Re: [PATCH 2/3] crypto: xilinx: Add TRNG driver for Versal
+Message-ID: <202505310740.bRheYmxs-lkp@intel.com>
+References: <20250529113116.669667-3-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
- <CACYkzJ5oJASZ43B531gY8mESqAF3WYFKez-H5vKxnk8r48Ouxg@mail.gmail.com>
- <87iklhn6ed.fsf@microsoft.com> <CACYkzJ75JXUM_C2og+JNtBat5psrEzjsgcV+b74FwrNaDF68nA@mail.gmail.com>
- <87ecw5n3tz.fsf@microsoft.com> <CACYkzJ4ondubPHDF8HL-sseVQo7AtJ2uo=twqhqLWaE3zJ=jEA@mail.gmail.com>
- <878qmdn39e.fsf@microsoft.com>
-In-Reply-To: <878qmdn39e.fsf@microsoft.com>
-From: KP Singh <kpsingh@kernel.org>
-Date: Sat, 31 May 2025 00:47:10 +0200
-X-Gmail-Original-Message-ID: <CACYkzJ6ChW6GeG8CJiUR6w-Nu3U2OYednXgCYJmp6N5FysLc2w@mail.gmail.com>
-X-Gm-Features: AX0GCFvje4fvKUf4y96Q3VqXMLTB0Y_ktvXyo16G-5-1AcLf8dXPpXsGOmvMgcg
-Message-ID: <CACYkzJ6ChW6GeG8CJiUR6w-Nu3U2OYednXgCYJmp6N5FysLc2w@mail.gmail.com>
-Subject: Re: [PATCH 0/3] BPF signature verification
-To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Cc: Paul Moore <paul@paul-moore.com>, jarkko@kernel.org, zeffron@riotgames.com, 
-	xiyou.wangcong@gmail.com, kysrinivasan@gmail.com, code@tyhicks.com, 
-	linux-security-module@vger.kernel.org, roberto.sassu@huawei.com, 
-	James.Bottomley@hansenpartnership.com, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Ignat Korchagin <ignat@cloudflare.com>, Quentin Monnet <qmo@kernel.org>, 
-	Jason Xing <kerneljasonxing@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	Anton Protopopov <aspsk@isovalent.com>, Jordan Rome <linux@jordanrome.com>, 
-	Martin Kelly <martin.kelly@crowdstrike.com>, Alan Maguire <alan.maguire@oracle.com>, 
-	Matteo Croce <teknoraver@meta.com>, bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, kys@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250529113116.669667-3-h.jain@amd.com>
 
-On Sat, May 31, 2025 at 12:27=E2=80=AFAM Blaise Boscaccy
-<bboscaccy@linux.microsoft.com> wrote:
->
-> KP Singh <kpsingh@kernel.org> writes:
->
-> > On Sat, May 31, 2025 at 12:14=E2=80=AFAM Blaise Boscaccy
-> > <bboscaccy@linux.microsoft.com> wrote:
-> >>
-> >> KP Singh <kpsingh@kernel.org> writes:
-> >>
-> >> > On Fri, May 30, 2025 at 11:19=E2=80=AFPM Blaise Boscaccy
-> >> > <bboscaccy@linux.microsoft.com> wrote:
-> >> >>
-> >> >> KP Singh <kpsingh@kernel.org> writes:
-> >> >>
-> >> >
-> >> > [...]
-> >> >
-> >> >> >
-> >> >>
-> >> >> And that isn't at odds with the kernel being able to do it nor is i=
-t
-> >> >> with what I posted.
-> >> >>
-> >> >> > If your build environment that signs the BPF program is compromis=
-ed
-> >> >> > and can inject arbitrary code, then signing does not help.  Can y=
-ou
-> >> >> > explain what a supply chain attack would look like here?
-> >> >> >
-> >> >>
-> >> >> Most people here can read C code. The number of people that can rea=
-d
-> >> >> ebpf assembly metaprogramming code is much smaller. Compromising cl=
-ang
-> >> >> is one thing, compromising libbpf is another. Your proposal increas=
-es
-> >> >> the attack surface with no observable benefit. If I was going to le=
-ave a
-> >> >> hard-to-find backdoor into ring0, gen.c would be a fun place to exp=
-lore
-> >> >> doing it. Module and UEFI signature verification code doesn't live
-> >> >> inside of GCC or Clang as set of meta-instructions that get emitted=
-, and
-> >> >> there are very good reasons for that.
-> >> >>
-> >> >> Further, since the signature verification code is unique for each a=
-nd
-> >> >> every program it needs to be verified/proved/tested for each and ev=
-ery
-> >> >> program. Additionally, since all these checks are being forced outs=
-ide
-> >> >> of the kernel proper, with the insistence of keeping the LSM layer =
-in
-> >> >> the dark of the ultimate result, the only way to test that a progra=
-m
-> >> >> will fail if the map is corrupted is to physically corrupt each and
-> >> >> every program and test that individually. That isn't "elegant" nor =
-"user
-> >> >> friendly" in any way, shape or form.
-> >> >>
-> >> >> >> subsystem.  Additionally, it is impossible to verify the code
-> >> >> >> performing the signature verification, as it is uniquely regener=
-ated
-> >> >> >
-> >> >> > The LSM needs to ensure that it allows trusted LOADER programs i.=
-e.
-> >> >> > with signatures and potentially trusted signed user-space binarie=
-s
-> >> >> > with unsigned or delegated signing (this will be needed for Ciliu=
-m and
-> >> >> > bpftrace that dynamically generate BPF programs), that's a more
-> >> >> > important aspect of the LSM policy from a BPF perspective.
-> >> >> >
-> >> >>
-> >> >> I would like to be able to sign my programs please and have the ker=
-nel
-> >> >> verify it was done correctly. Why are you insisting that I *don't* =
-do
-> >> >> that?  I'm yet to see any technical objection to doing that. Do you=
- have
-> >> >> one that you'd like to share at this point?
-> >> >
-> >> > The kernel allows a trusted loader that's signed with your private
-> >> > key, that runs in the kernel context to delegate the verification.
-> >> > This pattern of a trusted / delegated loader is going to be required
-> >> > for many of the BPF use-cases that are out there (Cilium, bpftrace)
-> >> > that dynamically generate eBPF programs.
-> >> >
-> >> > The technical objection is that:
-> >> >
-> >> > * It does not align with most BPF use-cases out there as most
-> >> > use-cases need a trusted loader.
-> >>
-> >> No, it's definitely a use case. It's trivial to support both a trusted
-> >> loader and a signature over the hash chain of supplied assets.
-> >>
-> >> > * Locks us into a UAPI, whereas a signed LOADER allows us to
-> >> > incrementally build signing for all use-cases without compromising t=
-he
-> >> > security properties.
-> >> >
-> >>
-> >> Your proposal locks us into a UAPI as well. There is no way to make to
-> >> do this via UAPI without making a UAPI design choice.
-> >>
-> >> > BPF's philosophy is that of flexibility and not locking the users in=
-to
-> >> > a rigid in-kernel implementation and UAPI.
-> >> >
-> >>
-> >> Then why are you locking us into a rigid
-> >> only-signing-the-loader-is-allowed implementation?
-> >
-> > I explained this before, the delegated / trusted loader is needed by
-> > many BPF use-cases. A UAPI is forever, thus the lock-in.
-> >
->
-> Again, I'm not following. What is technically wrong with supporting both
-> signing a loader only and allowing for the signature of multiple
-> passed-in assets? It's trivial to support both and any path forward will
-> force a UAPI lock-in.
->
-> Do you simply feel that it isn't a valid use case and therefore we
-> shouldn't be allowed to do it?
->
+Hi Harsh,
 
-I am saying both are not needed when one (trusted loader) handles all
-cases. You are writing / generating the loader anyways, you have the
-private key, the only thing to be done is add a few lines to the
-loader to verify an embedded hash.
+kernel test robot noticed the following build errors:
 
-Let's have this discussion in the patch series, much easier to discuss
-with the code.
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.15 next-20250530]
+[cannot apply to xilinx-xlnx/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Harsh-Jain/dt-bindings-crypto-Add-node-for-True-Random-Number-Generator/20250529-193255
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250529113116.669667-3-h.jain%40amd.com
+patch subject: [PATCH 2/3] crypto: xilinx: Add TRNG driver for Versal
+config: arc-randconfig-r053-20250531 (https://download.01.org/0day-ci/archive/20250531/202505310740.bRheYmxs-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 10.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250531/202505310740.bRheYmxs-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505310740.bRheYmxs-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+   drivers/crypto/xilinx/xilinx-trng.c: In function 'xtrng_hwrng_trng_read':
+>> include/linux/compiler_types.h:557:38: error: call to '__compiletime_assert_299' declared with attribute error: min(ret, (max - i)) signedness error
+     557 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                      ^
+   include/linux/compiler_types.h:538:4: note: in definition of macro '__compiletime_assert'
+     538 |    prefix ## suffix();    \
+         |    ^~~~~~
+   include/linux/compiler_types.h:557:2: note: in expansion of macro '_compiletime_assert'
+     557 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |  ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:93:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      93 |  BUILD_BUG_ON_MSG(!__types_ok(ux, uy),  \
+         |  ^~~~~~~~~~~~~~~~
+   include/linux/minmax.h:98:2: note: in expansion of macro '__careful_cmp_once'
+      98 |  __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
+         |  ^~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:105:19: note: in expansion of macro '__careful_cmp'
+     105 | #define min(x, y) __careful_cmp(min, x, y)
+         |                   ^~~~~~~~~~~~~
+   drivers/crypto/xilinx/xilinx-trng.c:300:25: note: in expansion of macro 'min'
+     300 |   memcpy(data + i, buf, min(ret, (max - i)));
+         |                         ^~~
+--
+   In file included from <command-line>:
+   xilinx-trng.c: In function 'xtrng_hwrng_trng_read':
+>> include/linux/compiler_types.h:557:38: error: call to '__compiletime_assert_299' declared with attribute error: min(ret, (max - i)) signedness error
+     557 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                      ^
+   include/linux/compiler_types.h:538:4: note: in definition of macro '__compiletime_assert'
+     538 |    prefix ## suffix();    \
+         |    ^~~~~~
+   include/linux/compiler_types.h:557:2: note: in expansion of macro '_compiletime_assert'
+     557 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |  ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:93:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      93 |  BUILD_BUG_ON_MSG(!__types_ok(ux, uy),  \
+         |  ^~~~~~~~~~~~~~~~
+   include/linux/minmax.h:98:2: note: in expansion of macro '__careful_cmp_once'
+      98 |  __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
+         |  ^~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:105:19: note: in expansion of macro '__careful_cmp'
+     105 | #define min(x, y) __careful_cmp(min, x, y)
+         |                   ^~~~~~~~~~~~~
+   xilinx-trng.c:300:25: note: in expansion of macro 'min'
+     300 |   memcpy(data + i, buf, min(ret, (max - i)));
+         |                         ^~~
+
+
+vim +/__compiletime_assert_299 +557 include/linux/compiler_types.h
+
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  543  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  544  #define _compiletime_assert(condition, msg, prefix, suffix) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  545  	__compiletime_assert(condition, msg, prefix, suffix)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  546  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  547  /**
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  548   * compiletime_assert - break build and emit msg if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  549   * @condition: a compile-time constant condition to check
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  550   * @msg:       a message to emit if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  551   *
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  552   * In tradition of POSIX assert, this macro will break the build if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  553   * supplied condition is *false*, emitting the supplied error message if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  554   * compiler has support to do so.
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  555   */
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  556  #define compiletime_assert(condition, msg) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21 @557  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
