@@ -1,94 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17171219A71
-	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 23:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0883398B;
+	Sat, 31 May 2025 07:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748647951; cv=none; b=lIZO8yRmSId850RCXdR06gAItPtSADvcNwvGGsj3ofC5hylV7O/rdTe+xVDfXGbMNeWo3/DRQ9YZMI2+xpLgx5fmThNL9Xvd/LqM3U4P+IEOn62wIgx98gV9S63R6ugPH5r18AlAZG0tIkpBrnpF45siRlDZRIiHV3To1xOwIVw=
+	t=1748675384; cv=none; b=iFrthjAdEfdyWyYvTUIMld8oteA4YlIRW6Ao0OgHWHIhKhWe9s5BjXQDEXDnuVIaQUcxJnukhXYaD5CUO7i69GarcQ8VSrLJYYNTzD50mmJYr65bwK8ntjJ4vVavao324ohnBkzjPgZQfpYJJRlrKVIfOJ9jZf+XzFGdXB2j0AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748647951; c=relaxed/simple;
-	bh=kggCqTMPG5sotUIYA3iRlmrG1UM6sH0EEjF6Bj7Gd/Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ae5oGh8eOkrLA35Xa3sEXNav4bRFpzOw1xhUzYlJ9LsLUridDqwDeYD077RhX3MLOpbB/nbuwzgYXozLu5YwDm8l4keqZdnDZzscrp/LaDkIPNmndyou1TeHTdJ/DfZVDMwTK6E3Da9i9qYvP8Jxym/DRCihxWBALKGYwCZgSsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBJlGDdA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748675384; c=relaxed/simple;
+	bh=Z6Gq/f1CXcmVRhtyrER6YQ7RRt58OkBNZhatJf0kqsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=TSw2XJQhk1Q2cbccRiFkOj9NQ/vcHhpgUoAFUISZT4eRyE+5hRkm8+eLYFI8lcsRHHKrlvUA24BT2m2CaGW4QVaH/uuSPJ2ugMh6Umq8O1cuT4QHLu17ovvBCnkoL85HSixn5Tj2n+rTAEC6FJviJjDROtmKVBRZvmYIWgAuY6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HkNkU3iT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBJlGDdA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56DD2C4CEF7
-	for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 23:32:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748647950;
-	bh=kggCqTMPG5sotUIYA3iRlmrG1UM6sH0EEjF6Bj7Gd/Y=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MBJlGDdAy/YjAIoESj63/k2Kd+PzzEmI3LV/Tu+LxRHW+sOsSJZxlosyV/cjmOrCf
-	 MyrKHMVf+ZEVApBUQaFCuh0F97bYgEgLH6PrkIdhA6upA/TMLqW8OvdXZEDOf0R+ld
-	 P6ybXSaEnFLariJo6jqHFdxRgbBLmU/7pdZUYiUjG+BAqS9anvN1Kgmm7wQvlVYhKy
-	 iTl+Pv+L/XZCVmwdtFLch/puQk5Ecbv8uPRzopnkmaQ7MZYrDo2Vfyfl22H2BQrh9j
-	 qE3S5UggUGzGlY1Gs7aNY+rDik1UkriA2OAfsgEGUJpcqO+l61uYOf/EKwzxN0zVAe
-	 9g6sRVE+kZAvA==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6046ecc3e43so4014811a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 30 May 2025 16:32:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV+z9o/yzuRU/QfpWtmGNB6xub3JygUN5i6pOQO9bdtyCrTv6w4sAPZAfSfkGotdzXAP20Z3LIhyd90NYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3mToiIGuYp2SPlunzeE9AMy6HPFkUoNeGTzYcTvz0lbvVrt9X
-	ZMe6hOrUEoyJ5faPKrzwuPaW6jq9ZQ0rH/yoshE8Yike6xRVYHro5v+NB6meOPJRjLC18jWjxnv
-	qEvfPmAe4cuR/CF7zmUYCdiXOhNzSpcYxk54s8YdB
-X-Google-Smtp-Source: AGHT+IGnT7gcHCA6T9nJz/Po1RVmey5EX60YKSUOFtgmIA3wDq2w5CiZNs8pkH3x66RYx+isVTtJ5wHdkcQjB7rhyEM=
-X-Received: by 2002:a05:6402:84e:b0:601:94ab:790c with SMTP id
- 4fb4d7f45d1cf-6056e14ca18mr4710890a12.18.1748647948800; Fri, 30 May 2025
- 16:32:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HkNkU3iT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=J4azc6Yc11qa1ew19drbL2Y4D35dU0pLMu0fayd2zss=; b=HkNkU3iT2eSSAZDrHi2ryfKxDf
+	iVgXCFBlMaUCtaxGpurRMrC6H/aiLTJwmDdN0VdoQbV1D5ktvUB8Ji5L7lzxSYqKqT9wRgF01RW7Y
+	gqipYkYp5/N6+/xhpsepYToWxTtR+0F53z6M4VNEGo/wqfUnFbjrfbcPRGTpFO8OHzl4G63c/H1V1
+	0r1EqrGjoGKjoUna3xAUduwR9tuj7lNmGjY22JDNaQ6o624I8k0rNJPIfP6zetqs2HXNHI4xPySBh
+	GIPnWon+021UmWXeAb6sF1U84u5pbLobCX5TCyxZhTROs7yMQzgdonibY9n2U94dqXTSdlh6bij+v
+	+UBI/CYw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uLGLZ-009woT-0b;
+	Sat, 31 May 2025 15:09:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 31 May 2025 15:09:37 +0800
+Date: Sat, 31 May 2025 15:09:37 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	ardb@kernel.org
+Subject: Re: [PATCH] crypto/crc32: register only one shash_alg
+Message-ID: <aDqrMb7U18DcMSRl@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
- <CACYkzJ5oJASZ43B531gY8mESqAF3WYFKez-H5vKxnk8r48Ouxg@mail.gmail.com>
- <87iklhn6ed.fsf@microsoft.com> <CACYkzJ75JXUM_C2og+JNtBat5psrEzjsgcV+b74FwrNaDF68nA@mail.gmail.com>
- <87ecw5n3tz.fsf@microsoft.com> <CACYkzJ4ondubPHDF8HL-sseVQo7AtJ2uo=twqhqLWaE3zJ=jEA@mail.gmail.com>
- <878qmdn39e.fsf@microsoft.com> <CACYkzJ6ChW6GeG8CJiUR6w-Nu3U2OYednXgCYJmp6N5FysLc2w@mail.gmail.com>
- <875xhhn0jo.fsf@microsoft.com>
-In-Reply-To: <875xhhn0jo.fsf@microsoft.com>
-From: KP Singh <kpsingh@kernel.org>
-Date: Sat, 31 May 2025 01:32:18 +0200
-X-Gmail-Original-Message-ID: <CACYkzJ5gXf4MOdb4scid0TaQwpwewH5Zzn2W18XB1tFBoR2CQQ@mail.gmail.com>
-X-Gm-Features: AX0GCFv_7BJJSl838TozCcwnoaszDpfbe-yzu3mWadgSeXOyob3Yk8byF4z0Rt0
-Message-ID: <CACYkzJ5gXf4MOdb4scid0TaQwpwewH5Zzn2W18XB1tFBoR2CQQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] BPF signature verification
-To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-Cc: Paul Moore <paul@paul-moore.com>, jarkko@kernel.org, zeffron@riotgames.com, 
-	xiyou.wangcong@gmail.com, kysrinivasan@gmail.com, code@tyhicks.com, 
-	linux-security-module@vger.kernel.org, roberto.sassu@huawei.com, 
-	James.Bottomley@hansenpartnership.com, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Ignat Korchagin <ignat@cloudflare.com>, Quentin Monnet <qmo@kernel.org>, 
-	Jason Xing <kerneljasonxing@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	Anton Protopopov <aspsk@isovalent.com>, Jordan Rome <linux@jordanrome.com>, 
-	Martin Kelly <martin.kelly@crowdstrike.com>, Alan Maguire <alan.maguire@oracle.com>, 
-	Matteo Croce <teknoraver@meta.com>, bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, kys@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250530160940.12761-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-> And I'm saying that they are, based on wanting visibility in the LSM
-> layer, passing that along to the end user, and wanting to be able to
-> show correctness, along with mitigating an entire vector of supply chain
-> attacks targeting gen.c.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Stop unnecessarily registering a "crc32-generic" shash_alg when a
+> "crc32-$(ARCH)" shash_alg is registered too.
+> 
+> While every algorithm does need to have a generic implementation to
+> ensure uniformity of support across platforms, that doesn't mean that we
+> need to make the generic implementation available through crypto_shash
+> when an optimized implementation is also available.
+> 
+> Registering the generic shash_alg did allow users of the crypto_shash or
+> crypto_ahash APIs to request the generic implementation specifically,
+> instead of an optimized one.  However, the only known use case for that
+> was the differential fuzz tests in crypto/testmgr.c.  Equivalent test
+> coverage is now provided by crc_kunit.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> 
+> I'm planning to take this through the crc tree.
+> 
+> crypto/crc32.c | 69 ++++++++------------------------------------------
+> 1 file changed, 11 insertions(+), 58 deletions(-)
 
-What supply chain attack?I asked this earlier, you never replied, what
-does a supply chain attack here really look like?
+Please don't do this without first removing all drivers providing
+"crc32" as otherwise their test coverge will be reduced.
 
-
-- KP
-
->
-> So in summary, your objection to this is that you feel it's simply "not
-> needed", and those above risks/design problems aren't actually an issue?
->
-> > Let's have this discussion in the patch series, much easier to discuss
-> > with the code.
->
-> I think we've all been waiting for that. Yes, lets.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
