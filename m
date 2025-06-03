@@ -1,335 +1,263 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF6F23D28C;
-	Tue,  3 Jun 2025 16:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748967993; cv=fail; b=tOmqoI/XRhd3XOVbWNne8wWcTb4en4O4qKb/FOt++E6ftXaDq0VJmNSvZb35ipRMvY6C1GpQYFmU+Yr9A7+376QtZMYkqv2byURYdHqfusKr0Nt00yc9/ZO2yfdyW6LbPkCQvekarcjtAwDWMgI25KrByk6rGLXPjnJ8zGUu3fQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748967993; c=relaxed/simple;
-	bh=a3qCNjJPou8OEdV4sm/Oe1Acdi08FG0qM4hYwB6NOpg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y63r6Yd+duLWz/QE/0Y3k0tcc6iKbDQiZVxzkdsybdM/dBeQqBp8FweK2l9QpD0pBaxrGEzffHbH3+p1KSrOb0vGh6s5hRX8JUlDHoMbWNLVZlbAKZG74rLP/TIFEm+txDE+XCBlqRZ5MB6HFpSWd+aniYFY4R4Fa380aJm9Gr0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XY8IFX/M; arc=fail smtp.client-ip=40.107.237.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9E51B85C5;
+	Tue,  3 Jun 2025 23:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748994941; cv=none; b=Cc7YF0fIBp2VhqwtUUpJfb72pPaAs/JCcVFfdpg7SmRJxOmV/Acbw2bw1WhEPnczhhnoHXvxZhR8xyKdqdENFuZyaFoJWkGCtTd6RAIB8mww988ycmBWAxIEvRcIfsymiPqV+H2K2xfRmPBVxi1kybuzckJWKbDF/Znn11LD2S0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748994941; c=relaxed/simple;
+	bh=+FY+J2/g1tr0ztOnEC0gjxjzFDNvy158f5kZGrEYGLM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N4pjSANxzJMHot54swADguFCxLWoUgN45AbAi1FmtYUS/yqunPvCiPoJP2U+ybmkkVv5bED1znnHCuFbg/WOUo5tDMmlBYG2cWYtwZiXozIXfBeQxFukvtK53+uz/ZMmFdWQ9yziGUQJMS5Hxd1Ig0fwbO+WCgDUTCsmvS1OL+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HHmd5GGV; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XY8IFX/M"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nU4GB5DZxB0iQp8nTojxwsI+Av1d/J8cEurMExBiTTyQhhrJKQNTCe2YRcOdvW+32Pf1gaZovoXlD1EfuFOi50uLM38DnPCDIECzn2QVn0Vn5XzTcL2mmcbp2CvmFdIJGXg1d0PzStuRHUedYnOSHS7FahUZsn1yngsoogZkKGEW0ue8DXp2oNO0a3ZIBcr43cuDnwtMm2gPfUDHa3fWipnQI1tKpGRUFluXYcRyezWM5qMugl9BbZ3gPL8CwkrORBLixUo/SdkYMYp6kUrNMas3D0eeNBx8n2AMRHHZEi4+XMqsi7i80E9nVF/+ZOGecb7LEl4NjgfVJNv8U2eOqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l0VpPDVP8HyQcf/Oc+ij6mbqVJDI9HT+eU1x57WBKhc=;
- b=J7voBG40soGH1tAETQPJd7vcESs/i/zMhetLyupeF4I9+QRiZc3F1GcXjUinyvqT+6ZbK/EM4/WoV19HXHPceDXY1a6S6eVQAjnC/QDumRPK4NDvIJXOq2Sre4IGklzl4q1q6M75HnfknjZjsA+tUsJtQ6NwWL+DqR4Pt2yEw8ZGgKPOhommzpnvsnP124b43jRbwy41whJdJ/qCHshTPPl8aSKgu42TQd9fgSeirxYaO8wvDWG+nKLhyBd+dFKEYtQ5cI3CehDjSv0s2/rjKpoAuyawCtS7Dui9Kd6M8jEQmBEIjLkOaOUu5QywKT7qN45XLV42GQCGVgxdTDF+Uw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l0VpPDVP8HyQcf/Oc+ij6mbqVJDI9HT+eU1x57WBKhc=;
- b=XY8IFX/MADYuuWzP8EqscgCZzxos+R+X91Rs1RWzsQgeM2Dss4vvi1hf6aYDvdm7BsAm9u5CfKVGaArG1YaJstZu0kBevA7m2Ag3qNcxdA0MxDCQNYEf3Wyni+XOw0Cgq+LdcrfUZDMCLhb1BtnkyoavD+6XfAISB7/raUm9JwY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by PH0PR12MB7862.namprd12.prod.outlook.com (2603:10b6:510:26d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Tue, 3 Jun
- 2025 16:26:26 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8792.034; Tue, 3 Jun 2025
- 16:26:26 +0000
-Message-ID: <a6b39023-447d-67bf-9502-4340f9d41c81@amd.com>
-Date: Tue, 3 Jun 2025 11:26:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v4 5/5] KVM: SEV: Add SEV-SNP CipherTextHiding support
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, corbet@lwn.net, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au,
- akpm@linux-foundation.org, paulmck@kernel.org, rostedt@goodmis.org
-Cc: x86@kernel.org, thuth@redhat.com, ardb@kernel.org,
- gregkh@linuxfoundation.org, john.allen@amd.com, davem@davemloft.net,
- michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-References: <cover.1747696092.git.ashish.kalra@amd.com>
- <e663930ca516aadbd71422af66e6939dd77e7b06.1747696092.git.ashish.kalra@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <e663930ca516aadbd71422af66e6939dd77e7b06.1747696092.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1PR05CA0011.namprd05.prod.outlook.com
- (2603:10b6:806:2d2::13) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HHmd5GGV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748994939; x=1780530939;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+FY+J2/g1tr0ztOnEC0gjxjzFDNvy158f5kZGrEYGLM=;
+  b=HHmd5GGVTr3IxDzyR5nW+jlZ0UiHwBPVIydSYFLRRA0TqTzmGbOwBLAJ
+   +MfHpTw0bbzSDUrskoNQdO5+aR19jb04e/C4kBKymGGiAwtZmq67pyMHc
+   g/d40Aso1eGhYuUkYUNUo6uswcvo4bKEnlkaJYZKl0O5gbaR5ab2BXvXL
+   XHgtsY+MG+8NWC2eSAXpdhCgsvVgcr2XYCkXfKz3CEIE0wDW87RKlcAz6
+   9lHh7U0kypuRqTgqG06scOAJ9JOBno7CrKx1B5OM1254l7VTZUqLzK01W
+   PL8smmbmwDiI6jmq+FXW+dLMaDaBpVtqWdhIyhBghYRjnlM8zDpbQ4x60
+   w==;
+X-CSE-ConnectionGUID: 6CjMWzDATKmKmnsy4e4Lwg==
+X-CSE-MsgGUID: E09Z5Ph1SVe62QMPkFROrw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="50174300"
+X-IronPort-AV: E=Sophos;i="6.16,207,1744095600"; 
+   d="scan'208";a="50174300"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 16:55:39 -0700
+X-CSE-ConnectionGUID: fpV5Al96Sced5f1AMukjDw==
+X-CSE-MsgGUID: C8qxDrrKSTWR/2gCDxWEUg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,207,1744095600"; 
+   d="scan'208";a="150163152"
+Received: from unknown (HELO vcostago-mobl3.jf.intel.com) ([10.241.226.49])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 16:55:39 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Kristen Accardi <kristen.c.accardi@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Tom Zanussi <tom.zanussi@linux.intel.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: iaa - Fix race condition when probing IAA devices
+Date: Tue,  3 Jun 2025 16:55:31 -0700
+Message-ID: <20250603235531.159711-1-vinicius.gomes@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|PH0PR12MB7862:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1045002b-8655-413e-285f-08dda2bb62fd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dkZJRFFXczc3NXRrL2RSeDZxbGQxeUFLc3lnOTJleE5yaDRGNDZCVlZYWTN6?=
- =?utf-8?B?RnUzSXpMdEVQb2pSTUhNODc0S2JBR2ppYnk5UEt0T1ZaYnVuQzVuQmpWQnVU?=
- =?utf-8?B?ZkM2U0NjdWNqbE0xYUtBbXpKTlJTVnBweWdkNkpZQWJHL2E0bnhjM0poMDZE?=
- =?utf-8?B?cmZIbnIrUkRpcWNHSnl5MGtNT3hWbkk4V1dMWGg2ZUdvejA4aEVDWCs3azZE?=
- =?utf-8?B?M0NONVRVcU1UaTNDcXdHMXFzZFJlamNNOC9UZ2FGTlRIUHFZV2NWRU1JT2Nt?=
- =?utf-8?B?SHJlaXVhZ1Bld3dKS3RVKyt0TGgxdGtyZG5PMVA2eWw3UFlQNXBJVndDWkhR?=
- =?utf-8?B?R1BUb0xCM2hWY1BWUXVTZlNKTExMTE1qWllad2RadHQvVXZzUERteFROT3Fh?=
- =?utf-8?B?UmFlYWFSRWtxdmNzMmVBV0xNTGZlYnRqQ1FJWUYvS0hGekJYdEtDTzJDMWh3?=
- =?utf-8?B?TUZJTkxjaktvUHJPVEdKeXZBWWJNdmg2Q2QrN0pCQ1ZyaS9DTTRTT2RBbzJN?=
- =?utf-8?B?b29xNnBTTFBMdjlKZ2FJUThPSUNVcVdjRmN1VUFCZ0laMkZCem9FLzlTazJy?=
- =?utf-8?B?Y09qc0F4bUtvZkV2RXZaY1hSNnZlSVMyZjdQdCtuN0Z4OXljcU0vYzYyRzJV?=
- =?utf-8?B?OGRxWk9JV2V6VnpjU1JNTno1cHhLNzdsS2p0K29KaUFGcGtSQmxUaSsva2hy?=
- =?utf-8?B?N3ExMitvck5FQVBxV1MwQTZFYWoxaUVSVmR3QTVSMmJ0RGFVcHZCYVhUVytz?=
- =?utf-8?B?anEwakdKbEFHWUQyaWNXcXhjN21lMk0vL1F3VmZnUzh6d24rREJBOFZpa3E3?=
- =?utf-8?B?TTlodHA0KzhzN0tNMVdhQ3ZySktuU0dWblcyRks3ZENDa1JkdnAvdGEzOW9k?=
- =?utf-8?B?d0JXWHVUMzd2VWlrME0zM3dzdHZvUzNsbnJnSm5HdHpNT2ZuRTJhdUcxdW9Q?=
- =?utf-8?B?WDJkSmtpRmRDWTFHSDZ1NU4yQkNaUWFlU0p5aE85dU9YK281Z2ZCWkg3NWph?=
- =?utf-8?B?L3BIRzNEekk3VEVudkRHb2dSeU9WV0NDNzJmaHV2S1I4YTNuWXZMTGdjREFs?=
- =?utf-8?B?ZnhWWnB4WEhmVFhqdnVqSVZ3dkFlaXhzRkxvRzkxNWlqOWlZNUd5ZXB2OXV0?=
- =?utf-8?B?TnlTYURlcTV5L1A2WElPKzByblZGc3U3ckNFWFFrRVI0YlMwY1FyUVZ1TmJG?=
- =?utf-8?B?MDNSQTk2Rk1yVTBUdDNIQVpLaUl5b1IyTDJBVTRRWjl1UnJzTnd5TXJBWG03?=
- =?utf-8?B?d3hhZTh1OHNYeTJYTWg5Lzh2Wk1DWkZSTmlWYkNQcGxPZkVXR0R1bmU3MVVt?=
- =?utf-8?B?cGtPSXJQLy9qTWJjaVkwT3M2eklDeFZnalY5WXlMVVh3am5ETU5NMW1Ed3Vl?=
- =?utf-8?B?Mit3bHh2TzRSVGlrV0xlR3NDcXJYTXozUWxnVElWdDFuMS9HbndJek5TQnFw?=
- =?utf-8?B?aVlBSk90R1pLYll3bHA2NFNFZmRCY3FoRTk4QktsdkhMeWYrY2k4bmdkYlUx?=
- =?utf-8?B?Z0hEWkRKT2RqVGxQZ0ZhOUtkd3J1b1JrclJSeW1BNWZYOEhvMFVzalJJd0lx?=
- =?utf-8?B?VzAzZ3BzNFRhNU1RVmZYMW5QS0lXV0JkVG5LeWVGakUyeUNGbWlPc3NTd3hB?=
- =?utf-8?B?ZEtEMmRTUGw3c1pmTmt5MnFSSGplMUVObytvb2M5Z1FMS0R0T0ZxWXdsb21T?=
- =?utf-8?B?K0tpUkZtYis1UVBuMWYwNER0ZWM3V1kvN014SDZtMlRrWUk0VW96bWNpNllw?=
- =?utf-8?B?TzEwcExCWEw0MkpPczJZTUNjOEJwaE5mWEhXMkNHQXVPV2tkQnJLWEZ1Sldo?=
- =?utf-8?B?RFZhaUxXWURYMytBVENtMWdLdzVuL1BjOWMrN09zdFFlTlhhUys1dUJxWXQ1?=
- =?utf-8?B?MlJzNG5qRVBENnBjdmVoOFdJRC95OHF5VytWZkxLZTBLU241SmUrMUk4Ymda?=
- =?utf-8?B?Yk9aQ281NkdYbGtEeG5kVllmdkxzN2tBeVhTVzNlUThGL3VRRHpxMzNINkI4?=
- =?utf-8?B?c2swcjA0NlZnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Yy85UHo1UXRybXhiVW92bmc4cmFDRVJxV1F4V2djcmdvdmhEUW9jU3grNExn?=
- =?utf-8?B?eXBqb1BjSWt0VVdaZFRwTWUwaHdkOUJYbEFOSFpYek0yZmwxWlNIdEw3TCtp?=
- =?utf-8?B?aHJoaTBMVWRRUHJlRnVIcEpWOWx3aTM2TzdocXQ1RURHMWgydS9scTI3R00r?=
- =?utf-8?B?R1d2eTc1RWhsUVptSm84NDk0MXd3QkdBOVhxWE8yeXZZTVFGU01IN3FCRnRv?=
- =?utf-8?B?b3owMGthbUpnRktuaFdqSUR4blg1Qmd6ajlJRTdJa01SQU1SV3F3ckZVSk0y?=
- =?utf-8?B?NFNjYzg0MU5TeERJeXlNeFFNSDZzaFlGcjU3aDhNc1FNYTFtbHc0R1Vhdmkr?=
- =?utf-8?B?NGYrVVBHWDFWeFIrbXZtTUVyNWpmTDgzNkdodWxIV0JUaFhVZFRhazV0RG15?=
- =?utf-8?B?ZTZJdUhBOFRnQ1I2SWJRakxYUWlPZHBmdU9rQ3dWMCs0Q3N5Mmh2THM5Qkxt?=
- =?utf-8?B?UXBGU1BZNjFmelNhUEtoelVTVzVaVXJMUmxTWjlsUnptaEszUmlmNm9hOEZK?=
- =?utf-8?B?eklSQXd2VlZ2Sm1yUVUzN0g0K3Q0U1o5dDlndVdVcW9rSFNyOGNWTTh3Q2du?=
- =?utf-8?B?RVpocUhEd1Y3Y3prU0FJRmZrbXgzczNDT1BmQWd6NFJZQ1pTU1RTTVhYdm5C?=
- =?utf-8?B?dllnR1A2c1VIUGZLTTNWY0w5eW1WYWxnSEZqL1dzbllteDdsa1IyUW01czd4?=
- =?utf-8?B?NTBTTG1NbzlkVHhzTlRERHpSSmNyOXFuTjdNKzY4NFhCbVJ3M201SURFWmxC?=
- =?utf-8?B?OGFRMEFPcUpDU3lOcU9RUzN0QU5LcThyNjM2UndOZlM0ckVhK3JlR2cwVkti?=
- =?utf-8?B?S2F6NnhrSVVzTU5kckFmTmZ3djFpTXRza0d0ZjdnNmtkN3gwazlQVUhZYkw1?=
- =?utf-8?B?bmpaS2R6NitSNnAvTHU2QzVocjV5WmxpTVBUbno0emtuSWYwQU1IditrcURL?=
- =?utf-8?B?dXlkU1U0cUo3QlRURXpIaTM3cUFTcnhoWDlELzJwUko4b0RzVHRMUmE1MVYy?=
- =?utf-8?B?aDZONFJKY015MXNDK0VPWDR0aDRBVzQ2dXNFQ0wyc2pyakFlNVF1bCtKOVdP?=
- =?utf-8?B?bUMvb092eGkyRDloeGxaK3djL0MyOVhPaW4zeGN5VHgvajNtV0Fnb2Fzb1pn?=
- =?utf-8?B?YldUVk5LeXhoV01mUDBLZUZjSC8wKytqbmVXOVZNank1c1BzWkJ1WTBBNE5L?=
- =?utf-8?B?SVBjbTNXOS9sZ3YrQUIyVlVKd002WFdlc09uMHRPa0dhYW1WOS8xeUpwM0Q5?=
- =?utf-8?B?NFBocVZMemVBUTZUQVhwcHpJSVBCcGMzZUExOE0wL0xhUUJFYTdweVUrSEtv?=
- =?utf-8?B?R0tvYjBXNEhoM1FnQXlBdzZHVkZjNFVkNXV6dTRJUkxBcUg5TytjTTlrK0N0?=
- =?utf-8?B?eFU5UmUxZmppcTdaRjkzcTNIOUpVVXdkOU5lSVNOYWNrOFVKZy9MQzlsdENa?=
- =?utf-8?B?aThBN0owYTdoYnJzSkpGUTdrR3BTcHVZdUNxeWtKYk8xcWw0UHBkL2lySm5x?=
- =?utf-8?B?RjRFVFpjRDRrSCt1SzJ4YjJkaUM0d2R4UGpKL3g0MFBwb1dIRmpPRVlXcmRJ?=
- =?utf-8?B?b0w5eHd3dGZZVDhsUXdPajF2RlRWRkExY0h5c1d4RGRzZitTNVM1QXY1WkVP?=
- =?utf-8?B?MVEwaWlwK1JSUkxzeWtUdDFJaExQaXRLbDhsczZEbkI3MWcyNWJaZUNOSmlU?=
- =?utf-8?B?S0VQL0lJQTBsWm9IUm0zUlFDRUMxYStQQys4eE9FV00ybkFKZWgzNGd1TnJz?=
- =?utf-8?B?MmlQTE9la05yRThuQjVFS0NPaVNyWWxKUVo3Rm9hQzlBMXZPLzR4dHpTSkUx?=
- =?utf-8?B?bnM0a29NMmFNK0hyeHJydFl5QUZKZ0tVdDhUYVFOQlBPKzNENHExWG1HTVRq?=
- =?utf-8?B?Y0swQUJid05LMzJvSldKNVNDQWpCQURlWDlFZHpqSmVEL2p1d0JjRDJzUjlu?=
- =?utf-8?B?SUorWUFvcnNPUGtDOUc1OVFSWDV5ajI4WFVzRmJFQ3d3ZTF1ZER4ODBZbHZy?=
- =?utf-8?B?K2pkb0FXemlhamdrZGVtenlhOGFNL29adlNHOGpQQW4xZFFYQUdST1N0OWdT?=
- =?utf-8?B?WEpQaEN3eGlKbmx6ZlNxYmZJbXhEMDBZbXYrd1diNzJWY1BzTEhzOXc0b3Ew?=
- =?utf-8?Q?znQM9Mv1vMKUZQhBbEAiXfqFx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1045002b-8655-413e-285f-08dda2bb62fd
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 16:26:26.1258
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: g4uzoPIGFEIfN3ErEKgNZLZ0Y7uqjWcdetp/Ba1SflDjac4ZsOxMeYAWtfe8jvl4FcVWjAgQ6RvqbZ8DJk2qPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7862
+Content-Transfer-Encoding: 8bit
 
-On 5/19/25 19:02, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Ciphertext hiding prevents host accesses from reading the ciphertext of
-> SNP guest private memory. Instead of reading ciphertext, the host reads
-> will see constant default values (0xff).
-> 
-> The SEV ASID space is basically split into legacy SEV and SEV-ES+.
-> CipherTextHiding further partitions the SEV-ES+ ASID space into SEV-ES
+While adding new devices the per-cpu workqueue map are temporarily
+cleared, if a user tries to use them at that point it may fail. That
+is, code calling wq_table_next_wq() may race during probe when
+rebalance_wq_table() is called, which clears before rebuilding the
+workqueue map. Add a spinlock to protect serialize that.
 
-s/CipherTextHiding/Ciphertext hiding/
+Add some lockdep asserts to document when this new lock should be
+held.
 
-> and SEV-SNP.
-> 
-> Add new module parameter to the KVM module to enable CipherTextHiding
+It was reported that running iaa-deflate selftests using a IAA device
+while another is being probed could fail:
 
-Ditto.
+[   45.432348] ------------[ cut here ]------------
+[   45.432350] alg: self-tests for deflate using deflate-iaa failed (rc=-19)
+[   45.432372] WARNING: CPU: 43 PID: 1402 at crypto/testmgr.c:6026 alg_test.part.0+0x493/0x570
+[   45.432387] Modules linked in: iaa_crypto(+) mlx5_core qat_4xxx sr_mod ast igb mlxfw intel_qat cdrom drm_shmem_helper pci_hyperv_intf idxd
+[   45.432405]  dca dh_generic crc8 rpcrdma rdma_cm iw_cm ib_cm sunrpc ib_core
+[   45.432426] CPU: 43 UID: 0 PID: 1402 Comm: cryptomgr_test Not tainted 6.14.0-cwf.bkc.6.14.4.4.6.x86_64 #1
+[   45.432436] RIP: 0010:alg_test.part.0+0x493/0x570
+[   45.432442] Code: ef 8b 48 28 48 8b 50 20 e8 2a f9 ff ff 41 89 c0 e9 10 fe ff ff 44 89 c1 4c 89 e2 4c 89 ee 48 c7 c7 b8 86 3d 83 e8 dd 90 88 ff <0f> 0b 44 8b 44 24 04 e9 a9 fc ff ff 44 8d 7b 01 e9 90 fe ff ff 48
+[   45.432458] RSP: 0018:ffffc90024bb3de8 EFLAGS: 00010286
+[   45.432464] RAX: 0000000000000000 RBX: 000000000000004c RCX: 0000000000000000
+[   45.432469] RDX: 0000000000000002 RSI: ffffffff834ee543 RDI: 00000000ffffffff
+[   45.432472] RBP: 000000000000004d R08: 0000000000003d0e R09: ffffffff833d86e6
+[   45.432476] R10: 0000000000000001 R11: 0000000000000004 R12: ffff88a099be1000
+[   45.432480] R13: ffff88a099be1080 R14: 000000000000004d R15: 0000000000001340
+[   45.432483] FS:  0000000000000000(0000) GS:ffff88bfff8c0000(0000) knlGS:0000000000000000
+[   45.432488] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   45.432492] CR2: 00007fd70ad9c4e0 CR3: 000000000ce36001 CR4: 0000000108f70ef0
+[   45.432495] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   45.432497] DR3: 0000000000000000 DR6: 00000000ffff07f0 DR7: 0000000000000400
+[   45.432501] PKRU: 55555554
+[   45.432504] Call Trace:
+[   45.432508]  <TASK>
+[   45.432513]  ? __warn+0x81/0x130
+[   45.432524]  ? alg_test.part.0+0x493/0x570
+[   45.432529]  ? report_bug+0x1c7/0x1d0
+[   45.432540]  ? handle_bug+0x53/0x90
+[   45.432546]  ? exc_invalid_op+0x18/0x70
+[   45.432550]  ? asm_fred_entrypoint_kernel+0x45/0x60
+[   45.432562]  ? alg_test.part.0+0x493/0x570
+[   45.432570]  ? alg_test.part.0+0x493/0x570
+[   45.432574]  ? _raw_spin_unlock+0x18/0x40
+[   45.432583]  ? finish_task_switch.isra.0+0x97/0x290
+[   45.432594]  ? __schedule+0x2fc/0x7a0
+[   45.432603]  ? preempt_count_add+0x6d/0xa0
+[   45.432611]  ? __pfx_cryptomgr_test+0x10/0x10
+[   45.432619]  cryptomgr_test+0x24/0x40
+[   45.432628]  kthread+0x10f/0x250
+[   45.432636]  ? finish_task_switch.isra.0+0x97/0x290
+[   45.432644]  ? __pfx_kthread+0x10/0x10
+[   45.432650]  ? __pfx_kthread+0x10/0x10
+[   45.432648] initcall iaa_crypto_init_module+0x0/0x2b0 [iaa_crypto] returned 0 after 2388 usecs
+[   45.432657]  ret_from_fork+0x31/0x50
+[   45.432668]  ? __pfx_kthread+0x10/0x10
+[   45.432675]  ret_from_fork_asm+0x1a/0x30
+[   45.432685]  </TASK>
+[   45.432688] ---[ end trace 0000000000000000 ]---
 
-> support and a user configurable system-wide maximum SNP ASID value. If
-> the module parameter value is -1 then the ASID space is equally
-> divided between SEV-SNP and SEV-ES guests.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  .../admin-guide/kernel-parameters.txt         | 10 ++++++
->  arch/x86/kvm/svm/sev.c                        | 31 +++++++++++++++++++
->  2 files changed, 41 insertions(+)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 1e5e76bba9da..2cddb2b5c59d 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2891,6 +2891,16 @@
->  			(enabled). Disable by KVM if hardware lacks support
->  			for NPT.
->  
-> +	kvm-amd.ciphertext_hiding_nr_asids=
+Fixes: 2ec6761df889 ("crypto: iaa - Add support for deflate-iaa compression algorithm")
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 48 ++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 9 deletions(-)
 
-s/ns_asids/asids/
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index 23f585219fb4..2185c101bef3 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -35,28 +35,39 @@ static unsigned int cpus_per_iaa;
+ 
+ /* Per-cpu lookup table for balanced wqs */
+ static struct wq_table_entry __percpu *wq_table;
++static DEFINE_SPINLOCK(wq_table_lock);
+ 
+ static struct idxd_wq *wq_table_next_wq(int cpu)
+ {
+-	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
++	struct wq_table_entry *entry;
++	struct idxd_wq *wq;
++	int id;
++
++	guard(spinlock)(&wq_table_lock);
++
++	entry = per_cpu_ptr(wq_table, cpu);
+ 
+ 	if (++entry->cur_wq >= entry->n_wqs)
+ 		entry->cur_wq = 0;
+ 
+-	if (!entry->wqs[entry->cur_wq])
++	id = entry->cur_wq;
++	wq = entry->wqs[id];
++
++	if (!wq)
+ 		return NULL;
+ 
+ 	pr_debug("%s: returning wq at idx %d (iaa wq %d.%d) from cpu %d\n", __func__,
+-		 entry->cur_wq, entry->wqs[entry->cur_wq]->idxd->id,
+-		 entry->wqs[entry->cur_wq]->id, cpu);
++		 id, wq->idxd->id, wq->id, cpu);
+ 
+-	return entry->wqs[entry->cur_wq];
++	return wq;
+ }
+ 
+ static void wq_table_add(int cpu, struct idxd_wq *wq)
+ {
+ 	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
+ 
++	lockdep_assert_held(&wq_table_lock);
++
+ 	if (WARN_ON(entry->n_wqs == entry->max_wqs))
+ 		return;
+ 
+@@ -71,6 +82,8 @@ static void wq_table_free_entry(int cpu)
+ {
+ 	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
+ 
++	lockdep_assert_held(&wq_table_lock);
++
+ 	kfree(entry->wqs);
+ 	memset(entry, 0, sizeof(*entry));
+ }
+@@ -79,6 +92,8 @@ static void wq_table_clear_entry(int cpu)
+ {
+ 	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
+ 
++	lockdep_assert_held(&wq_table_lock);
++
+ 	entry->n_wqs = 0;
+ 	entry->cur_wq = 0;
+ 	memset(entry->wqs, 0, entry->max_wqs * sizeof(struct idxd_wq *));
+@@ -702,14 +717,23 @@ static int iaa_wq_put(struct idxd_wq *wq)
+ 	return ret;
+ }
+ 
+-static void free_wq_table(void)
++static void __free_wq_table(void)
+ {
+ 	int cpu;
+ 
++	lockdep_assert_held(&wq_table_lock);
++
+ 	for (cpu = 0; cpu < nr_cpus; cpu++)
+ 		wq_table_free_entry(cpu);
+ 
+ 	free_percpu(wq_table);
++}
++
++static void free_wq_table(void)
++{
++	guard(spinlock)(&wq_table_lock);
++
++	__free_wq_table();
+ 
+ 	pr_debug("freed wq table\n");
+ }
+@@ -719,15 +743,17 @@ static int alloc_wq_table(int max_wqs)
+ 	struct wq_table_entry *entry;
+ 	int cpu;
+ 
+-	wq_table = alloc_percpu(struct wq_table_entry);
++	guard(spinlock)(&wq_table_lock);
++
++	wq_table = alloc_percpu_gfp(struct wq_table_entry, GFP_ATOMIC);
+ 	if (!wq_table)
+ 		return -ENOMEM;
+ 
+ 	for (cpu = 0; cpu < nr_cpus; cpu++) {
+ 		entry = per_cpu_ptr(wq_table, cpu);
+-		entry->wqs = kcalloc(max_wqs, sizeof(*entry->wqs), GFP_KERNEL);
++		entry->wqs = kcalloc(max_wqs, sizeof(*entry->wqs), GFP_ATOMIC);
+ 		if (!entry->wqs) {
+-			free_wq_table();
++			__free_wq_table();
+ 			return -ENOMEM;
+ 		}
+ 
+@@ -836,6 +862,8 @@ static int wq_table_add_wqs(int iaa, int cpu)
+ 	struct pci_dev *pdev;
+ 	struct device *dev;
+ 
++	lockdep_assert_held(&wq_table_lock);
++
+ 	list_for_each_entry(iaa_device, &iaa_devices, list) {
+ 		idxd = iaa_device->idxd;
+ 		pdev = idxd->pdev;
+@@ -902,6 +930,8 @@ static void rebalance_wq_table(void)
+ 	pr_debug("rebalance: nr_nodes=%d, nr_cpus %d, nr_iaa %d, cpus_per_iaa %d\n",
+ 		 nr_nodes, nr_cpus, nr_iaa, cpus_per_iaa);
+ 
++	guard(spinlock)(&wq_table_lock);
++
+ 	clear_wq_table();
+ 
+ 	if (nr_iaa == 1) {
+-- 
+2.49.0
 
-I'm not sure that the "nr" adds anything here.
-
-> +			[KVM,AMD] Enables SEV-SNP CipherTextHiding feature and
-> +			controls show many ASIDs are available for SEV-SNP guests.
-> +			The ASID space is basically split into legacy SEV and
-> +			SEV-ES+. CipherTextHiding feature further splits the
-> +			SEV-ES+ ASID space into SEV-ES and SEV-SNP.
-> +			If the value is -1, then it is used as an auto flag
-> +			and splits the ASID space equally between SEV-ES and
-> +			SEV-SNP ASIDs.
-> +
-
-Ditto on Dave's comments.
-
->  	kvm-arm.mode=
->  			[KVM,ARM,EARLY] Select one of KVM/arm64's modes of
->  			operation.
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 383db1da8699..68dcb13d98f2 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -59,6 +59,10 @@ static bool sev_es_debug_swap_enabled = true;
->  module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
->  static u64 sev_supported_vmsa_features;
->  
-> +static int ciphertext_hiding_nr_asids;
-> +module_param(ciphertext_hiding_nr_asids, int, 0444);
-> +MODULE_PARM_DESC(max_snp_asid, "  Number of ASIDs available for SEV-SNP guests when CipherTextHiding is enabled");
-> +
->  #define AP_RESET_HOLD_NONE		0
->  #define AP_RESET_HOLD_NAE_EVENT		1
->  #define AP_RESET_HOLD_MSR_PROTO		2
-> @@ -200,6 +204,9 @@ static int sev_asid_new(struct kvm_sev_info *sev, unsigned long vm_type)
->  	/*
->  	 * The min ASID can end up larger than the max if basic SEV support is
->  	 * effectively disabled by disallowing use of ASIDs for SEV guests.
-> +	 * Similarly for SEV-ES guests the min ASID can end up larger than the
-> +	 * max when CipherTextHiding is enabled, effectively disabling SEV-ES
-> +	 * support.
->  	 */
->  
->  	if (min_asid > max_asid)
-> @@ -2955,6 +2962,7 @@ void __init sev_hardware_setup(void)
->  {
->  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
->  	struct sev_platform_init_args init_args = {0};
-> +	bool snp_cipher_text_hiding = false;
->  	bool sev_snp_supported = false;
->  	bool sev_es_supported = false;
->  	bool sev_supported = false;
-> @@ -3052,6 +3060,27 @@ void __init sev_hardware_setup(void)
->  	if (min_sev_asid == 1)
->  		goto out;
->  
-> +	/*
-> +	 * The ASID space is basically split into legacy SEV and SEV-ES+.
-> +	 * CipherTextHiding feature further partitions the SEV-ES+ ASID space
-> +	 * into ASIDs for SEV-ES and SEV-SNP guests.
-
-I think it is already understood that the ASID space is split between SEV
-and SEV-ES/SEV-SNP guests. So something like this maybe?
-
-The ciphertext hiding feature partions the joint SEV-ES/SEV-SNP ASID range
-into separate SEV-ES and SEV-SNP ASID ranges with teh SEV-SNP ASID range
-starting at 1.
-
-> +	 */
-> +	if (ciphertext_hiding_nr_asids && sev_is_snp_ciphertext_hiding_supported()) {
-> +		/* Do sanity checks on user-defined ciphertext_hiding_nr_asids */
-> +		if (ciphertext_hiding_nr_asids != -1 &&
-> +		    ciphertext_hiding_nr_asids >= min_sev_asid) {
-> +			pr_info("ciphertext_hiding_nr_asids module parameter invalid, limiting SEV-SNP ASIDs to %d\n",
-> +				 min_sev_asid);
-> +			ciphertext_hiding_nr_asids = min_sev_asid - 1;
-
-So specifying a number greater than min_sev_asid will result in enabling
-ciphertext hiding and no SEV-ES guests allowed even though you report that
-the number is invalid?
-
-I think the message can be worded better to convey what happens.
-
-"Requested ciphertext hiding ASIDs (%u) exceeds minimum SEV ASID (%u), setting ciphertext hiding ASID range to the maximum value (%u)\n"
-
-Or something a little more concise.
-
-> +		}
-> +
-> +		min_sev_es_asid = ciphertext_hiding_nr_asids == -1 ? (min_sev_asid - 1) / 2 :
-
-Should this be (min_sev_asid - 1) / 2 + 1 ?
-
-Take min_sev_asid = 3, that means min_sev_es_asid would be 2 and
-max_snp_asid would be 1, right?
-
-And if you set min_sev_es_asid before first you favor SEV-ES.
-
-So should you do:
-
-max_snp_asid = ciphertext_hiding_asids != -1 ? : (min_sev_asid - 1) / 2 + 1;
-min_sev_es_asid = max_snp_asid + 1;
-
-
-> +				  ciphertext_hiding_nr_asids + 1;
-> +		max_snp_asid = min_sev_es_asid - 1;
-> +		snp_cipher_text_hiding = true;
-> +		pr_info("SEV-SNP CipherTextHiding feature support enabled\n");
-
-"SEV-SNP ciphertext hiding enabled\n"
-
-No need to use the CipherTextHiding nomenclature everywhere.
-
-Thanks,
-Tom
-
-> +	}
-> +
->  	sev_es_asid_count = min_sev_asid - 1;
->  	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
->  	sev_es_supported = true;
-> @@ -3092,6 +3121,8 @@ void __init sev_hardware_setup(void)
->  	 * Do both SNP and SEV initialization at KVM module load.
->  	 */
->  	init_args.probe = true;
-> +	if (snp_cipher_text_hiding)
-> +		init_args.snp_max_snp_asid = max_snp_asid;
->  	sev_platform_init(&init_args);
->  }
->  
