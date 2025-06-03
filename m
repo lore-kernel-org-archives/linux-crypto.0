@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795CC146A66;
-	Tue,  3 Jun 2025 12:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8AF230269;
+	Tue,  3 Jun 2025 12:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748952462; cv=none; b=RlfsCAGBQ/cL90uiivchCLGW0e8IyYuQcX6tMr/yyQd5l18Fu0BXfNHdnMOEvO4BIuWdKjazjKEdalywnk+r6556HP/QKydPppe5mNhJVAqZc9FErj54qNfvNbQIX1JTVVELZXq0Tv/lF9hdoicLQD6OqxUvGLdF4F7koc0hek8=
+	t=1748953566; cv=none; b=nn4Ei5VjYcMdm0Xd2AgTEyozQ7tJ77nSvzkIDY1G7VSn2NLA14iwj7g1sjD00/bNTPQtcgrM8Ltvb0fYaNJRJg88FI4tSmmhud+6icecuf4E2YbFOosqx9lM6f1Vp7K/dzOdd+BMzEtnqq7udt98zvRCMGIz8sKyp4giq0BbEYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748952462; c=relaxed/simple;
-	bh=BbD8Z3F2Z41vAioRdlDjKkkvrHAem1eOimWX5TqDL6w=;
+	s=arc-20240116; t=1748953566; c=relaxed/simple;
+	bh=tHZkS2gDc5R6PRSSy2GDSAjrvxvt8ls4OrmreSQgCpk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i3Nza/i1vFISmkkoKoFfe7k6830c7puFrA1Sd084qPRNmHGo/w0dlG8E447CufkGdrNAfY8kAeOkFyGIdQ7VATKgLz+4Kk+1Nhz1lOO0rkodI58cell/7wHsqBpu0NPHp5r5CHGuM3EujTvjjMe+KpE5bryZa6iBk9s7F6eBvEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZ1tIPBC; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=iSC0wfiKcBWqX0LeO3bTbtQp6QXxWXrODA8UknmKPEFKsY4/fQ6fxpkJ5wnm4VgWsX8ezvUNfvpuP8pLhA3J2soALufXjfE+PCncWSs3Zs6MP9PrWWeHYplFiVppnYAxPxsNrPCvCNY/zN9/abAkqY4CQFJqp7aoh7giyC+383U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFm9vfNm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZ1tIPBC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96808C4CEEF;
-	Tue,  3 Jun 2025 12:07:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFm9vfNm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6544C4CEED;
+	Tue,  3 Jun 2025 12:26:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748952461;
-	bh=BbD8Z3F2Z41vAioRdlDjKkkvrHAem1eOimWX5TqDL6w=;
+	s=k20201202; t=1748953566;
+	bh=tHZkS2gDc5R6PRSSy2GDSAjrvxvt8ls4OrmreSQgCpk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bZ1tIPBCMC0FV0OvYa4IU2MI/zLxD6HAAJ/fn3ZQ+kC9SxgorXCRZkF7HWoXqEK0n
-	 iAUDRNsvbeHoYigOApXD/k43x+CXVPQ3n9oDBwYZZffCLBEEqfB1PfpYx9Y3hJ9hXU
-	 hVej6reVni5cdK8W5VOfHAxJLh/bYcfqAAuabxzwug1kXfUlMOrZfzgkq/YUWfF0TH
-	 fB8Jy9pBgprYgPdAxioRfm/9W0rVDFCbfWILT3l/j630UfqzWRXTtcZT2Z47Einhkc
-	 Ky5GLbIPIcidz7PtV6EeAhFEP3IaCAhYrnEn0f7QeqN9wBAPoMPFwVWUYSrCeI5hMn
-	 ULpe6x+Vrd1Wg==
-Message-ID: <ba13c2f1-9b08-4ba7-8093-d55c16143cb2@kernel.org>
-Date: Tue, 3 Jun 2025 14:07:24 +0200
+	b=qFm9vfNmitMHtkOT7TKrqnVlYO25yxCnAddldmljgmE57iso/wVRVfQXR/naZn52R
+	 1eE1rlSA+XdzIn5AwL0nuh4k1ioRzqBIDS9F84mvdNQQ6roh9EbpceJjIoKnn2pJqY
+	 4mPhnkmNLb3XAS3Re2IFURDN2NdtUXx44kWP4gE18HvBg7TVqjH7HF2zc2tJrwLzup
+	 RpVfMexUsGDPl1xVs0ANYaAX0eEsX0kqBH1tE76nik3sVVi0sleUBM9IUtRHsOz21J
+	 c8C154/rTtOPlAZw9thd/odBzUI+pzq2bh/SsqPYhCVnn/WTpaiZbHe+lm96SYoDdD
+	 hcuTKLs31P/Ew==
+Message-ID: <88c50d26-2e47-402f-a8e7-a058f06d08bd@kernel.org>
+Date: Tue, 3 Jun 2025 14:25:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,17 +35,18 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] Add SPAcc Skcipher support
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, Ruud.Derwig@synopsys.com,
- manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
- Shweta Raikar <shwetar@vayavyalabs.com>
-References: <20250602053231.403143-1-pavitrakumarm@vayavyalabs.com>
- <20250602053231.403143-3-pavitrakumarm@vayavyalabs.com>
- <9f6b4442-1fb0-479d-9514-410d4d8bfd98@kernel.org>
- <CALxtO0kitR0MnjzPwVT8nsuYThTRX+fbyOH9i2z1KKnCPg1dqg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] dt-bindings: crypto: Add binding for TI DTHE V2
+To: T Pratham <t-pratham@ti.com>, "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Praneeth Bajjuri <praneeth@ti.com>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Manorit Chawdhry <m-chawdhry@ti.com>,
+ devicetree@vger.kernel.org, Vignesh Raghavendra <vigneshr@ti.com>,
+ Conor Dooley <conor+dt@kernel.org>, Kamlesh Gurudasani <kamlesh@ti.com>,
+ linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
+References: <20250508101723.846210-2-t-pratham@ti.com>
+ <20250508101723.846210-3-t-pratham@ti.com>
+ <174670267292.3889463.9488828665934209667.robh@kernel.org>
+ <b254325e-32c6-4b5d-a20c-abe2888fea27@ti.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -91,25 +92,45 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <CALxtO0kitR0MnjzPwVT8nsuYThTRX+fbyOH9i2z1KKnCPg1dqg@mail.gmail.com>
+In-Reply-To: <b254325e-32c6-4b5d-a20c-abe2888fea27@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 03/06/2025 14:02, Pavitrakumar Managutte wrote:
-
->> Please run standard kernel tools for static analysis, like coccinelle,
->> smatch and sparse, and fix reported warnings. Also please check for
->> warnings when building with W=1 for gcc and clang. Most of these
->> commands (checks or W=1 build) can build specific targets, like some
->> directory, to narrow the scope to only your code. The code here looks
->> like it needs a fix. Feel free to get in touch if the warning is not clear.
+On 03/06/2025 12:52, T Pratham wrote:
+> On 08/05/25 16:41, Rob Herring (Arm) wrote:
 >>
-Confirm that you understood this. You sent us code with obvious flaws
-which would be found with tools. It's a proof you did not run these
-static tools. It's not the job of community reviewers to replace the
-tools. Using us instead of tools is... well, a mistake but if you think
-about our limited time then kind of close to inappropriate request. So
-did you understand the need of using tools BEFORE you post it?
+>> On Thu, 08 May 2025 15:37:40 +0530, T Pratham wrote:
+>>> Add DT binding for Texas Instruments DTHE V2 crypto accelerator.
+>>>
+>>> DTHE V2 is introduced as a part of TI AM62L SoC and can currently be
+>>> only found in it.
+>>>
+>>> Signed-off-by: T Pratham <t-pratham@ti.com>
+>>> ---
+>>>  .../bindings/crypto/ti,am62l-dthev2.yaml      | 50 +++++++++++++++++++
+>>>  MAINTAINERS                                   |  6 +++
+>>>  2 files changed, 56 insertions(+)
+>>>  create mode 100644 Documentation/devicetree/bindings/crypto/ti,am62l-dthev2.yaml
+>>>
+>>
+>> My bot found errors running 'make dt_binding_check' on your patch:
+>>
+>> yamllint warnings/errors:
+>>
+>> dtschema/dtc warnings/errors:
+>>
+>>
+>> doc reference errors (make refcheckdocs):
+>>
+>> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250508101723.846210-3-t-pratham@ti.com
+>>
+> Hi, the error logs here are empty. What does this mean (error, no error)?
+> 
+> Also, I ran `make dt_binding_check` locally and did not see any errors. Below dependencies are installed and up to date. 
+
+
+Probably false-positive. This happens sometimes, sorry for this. Service
+is provided as is, in good faith.
 
 Best regards,
 Krzysztof
