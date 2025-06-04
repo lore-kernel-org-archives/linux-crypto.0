@@ -1,215 +1,139 @@
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2059.outbound.protection.outlook.com [40.107.244.59])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DA4192598;
-	Wed,  4 Jun 2025 15:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749052632; cv=fail; b=jEn4EOuP/1ehMOyeTBgwvH9aeKdkuIgn1dJtx1bVrjzyLkKZWTNdYtaqDQdUlP7Al+3isr97nqxeDtxi+3MRix3+DZHAZPw0iLut37qr+AwE+2EOSNCFn9gA6XsQR0AVzBH+DDTZJgTd9KXnkKRpByDj5F2Y+jNFeg8++D5n3DY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749052632; c=relaxed/simple;
-	bh=OHrXWV1rKQM9VvVzFzQHIY9uHpVjpxmYlQysgo+dHGk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IIyLhzVSGfHwWw0ZiltzuZD2Iq4Osw0/+wmdg4iBFhaRJY7o8fFsaU+OtlXgItBtKfYeFySLqSVfSP9J9HbXmWdZr+zFdkOxaVVHjGPYQ4LxqoNaFIJfjFTg2nriZu1PgR/ACVlns+teSXVEXpCVTWP6bw9rftd8BwdaGZgTlYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bwyWL4LE; arc=fail smtp.client-ip=40.107.244.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4178D18E1F
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Jun 2025 16:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749052817; cv=none; b=npRcnp0XTQCVFbiNgJWg85ecux0u9xXYTmA9NpTsHTMlA1hRgRh7qF8AYTJ5DqnMV5aSG7VOnpVR4vGCZO+15A9vPzjV8VStfl7qvlBCyjqCTQLcsjMvi1hpW8y2qVUoO4DPbLo/R4mtVuOnofMJD/R9igkKpgayfOqLRz2LjJQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749052817; c=relaxed/simple;
+	bh=ztKV5dovRv6t9eKGojAmhhZV/rc0e0y8ab7nVS1tj70=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nBIUuBHW58MrhUsq44k9pkm8dbGgyQmxEzuqyfib14yzWQY+xLNUkomqWonhxj94Fncs7MMNx7LVNARCLHZZ8jweR5uJKYrUFr01MShV5Yl+WGQi4Dig5ErUlG9tXckCvzj9vvYS2gnMtSnCX1XwSelq1fQlwl91uYyMsBjT58g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bzQU9IyR; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bwyWL4LE"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Sy5jCaOjbC/YEb2gL6p5/XayvoDrGMwuCiYtZEfx6uDU/a1F5XTxDMzBYcy5e+XYbggO/7rprV2IJPpOwt9v67ws51YHTGHsE8onRAH9er6FYunF2yhqmn77t4iUTsNukTF3yVMMo3XRrlh+kUGJalY6aPhlcXJPkOSl2h2uWcvAeVDfXYvdVklP57XYaLQGOn44nW2bu/+UEYka/yimlRM+1zBAfIdlR5mfArE81VgbjOLDJhdxdf2DMm3t6I/qhOBsw5Fxa2ehL9DkUg5XEW/duMUCQreeBseamN4n7rV9bwyv6hwArPb3O9CPshcZJlc0rzi9LeA1KFvpeiTiZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7kc6ITDG6cbMSRaJw80DvIBpIRY2KAqxa56rHDznOfI=;
- b=lGNmY6yEZ3Mkqzz0yTQANAT/NgQ8G0949zmxKqhWrJDD56NPmvUNfknLnk6Kkdk6kgVjSr5Y206L1rqqYp1ojE+b2LRMH9uTCPGRZ1kNA9uds6iT4+SzQ2Kj7FLMKV4jJZhT2ffDYjtpELh7ood0DxfEKKBmI7kh5PRGUDpFsilnd2Le3C6IXIojH5aMYo55fi/QfKhR1hFQeXZISppUp7NXcBi6Ab+TKSyRM/JEUoQF5PEwFDh5FkH1NXTH5sHZt/TH7JNyiaelmz0WJA9c/SUoI7apYLeBbHPTWHubZxImxV1giDCUttzNfcI8pTC9Ah6ui4lSMi7g94OZJx+QHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7kc6ITDG6cbMSRaJw80DvIBpIRY2KAqxa56rHDznOfI=;
- b=bwyWL4LEmNse9uRQFYZyoG5VNFfJkgM6KtvA8LZDOevJkcwHMaaCOz3DvQwalCMcelj8v+CURPd4tVm/JvWe8L9VgLSURY6Le2sYMDrq9ehbsE9xfU6w0Xe6SPzf1ZA1Eyc0lf5cZx4wRDZMlOf4Ytjtty3izUyN1cwFpDJuqoU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by CH2PR12MB9519.namprd12.prod.outlook.com (2603:10b6:610:27c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.35; Wed, 4 Jun
- 2025 15:57:09 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8792.034; Wed, 4 Jun 2025
- 15:57:08 +0000
-Message-ID: <8cd27c20-6439-deec-f09c-e4f6f789761c@amd.com>
-Date: Wed, 4 Jun 2025 10:57:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] crypto: ccp: Fix SNP panic notifier unregistration
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, john.allen@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: aik@amd.com, dionnaglaze@google.com, michael.roth@amd.com,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250602191017.60936-1-Ashish.Kalra@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20250602191017.60936-1-Ashish.Kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BN0PR04CA0032.namprd04.prod.outlook.com
- (2603:10b6:408:e8::7) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bzQU9IyR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749052815; x=1780588815;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ztKV5dovRv6t9eKGojAmhhZV/rc0e0y8ab7nVS1tj70=;
+  b=bzQU9IyR8JypDXWtr3ILif+CieUnAam1o3lZmKUn+91cNYZ/c8GyO1Ib
+   Zvpkr8+juq+zq0Ix3hoix9xc/5r89J06GuwLqQGdsKZKAvuofWjH3jizS
+   zLisDc5grPd5VTBhx9TRbCMRV/nRkmfZn+m+ZycBKjrztplo9lJkSVWd3
+   Jq9GCY0fEHSV+Nmgvw79+ALK6T2AlRDpQrsKICaClk4EVGfBCsAwJqg2o
+   +FfKhCqwZTkPwIts8PTywi7NY4F5pfzr7GBkX73KAYczQXcFM7luROVFd
+   gOHYhfWnFrdpVBxxmBTMBFxAY9UsLR6qdX12F7mJcVBV1NhvEsugDmJvk
+   Q==;
+X-CSE-ConnectionGUID: frMnc4E1RN26TgytslrvBg==
+X-CSE-MsgGUID: YDtojGlrS8u6uEG+E4VjAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="62197308"
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="62197308"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 09:00:15 -0700
+X-CSE-ConnectionGUID: dmx5zy2yTQauo+uUMCdGVg==
+X-CSE-MsgGUID: SIpZK0hATpucBPO28KJTWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="176113777"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.204])
+  by fmviesa001.fm.intel.com with ESMTP; 04 Jun 2025 09:00:14 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix state restore for banks with exceptions
+Date: Wed,  4 Jun 2025 16:59:56 +0100
+Message-ID: <20250604160006.56369-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CH2PR12MB9519:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ab15a9b-b07a-4864-275e-08dda38075c3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RmszRTZWUGZ2SFQwK2N5ZG5Rc21pUUFsS05mU2tGUHdIZWZobnJkNnNVTXBn?=
- =?utf-8?B?L1VNVGJtOXJnVGRsZHNwTkN3NHNhL3R5N3ZzdzRPMHFoQk1oRUhoWEwwaWJr?=
- =?utf-8?B?c3N2L2Vra3ZMVFJmN3BOWm5SRUw4a0xwbkc3Tjc0NVgwL3NRYjBOL2RnKzBt?=
- =?utf-8?B?RXozQTYyMGpCRC9QbWxYS1ZocW9pY2NVWUprSFcwWXNJMzhKREJ3RkFRRTJT?=
- =?utf-8?B?ODNHby9DYzlwZFpqNXVVVzNhU3daSmFTbDE5bVl2Nnd4cEk1NFdieFRVNm5U?=
- =?utf-8?B?VFI0OWp2VjdSOGd2UU41ei9Xc2Y2WisySlcyeWEwT3pBcGhxbGRtYTNpVVZX?=
- =?utf-8?B?Vmt4WmpJZmtMUi9NcG9vc2w0ZlpBNGloeExCOGdCOGNkK2Jhd2ZZUktWTi8z?=
- =?utf-8?B?aHZybFJOWW1iTnI2bG5jU1d6dmYyN0MwYkVqU204UUhweEM0dkZ6NXJpZ24z?=
- =?utf-8?B?RjVhdDliOGZjOW5GeVZ0MDBLdjM5NEtvYjJTL3pvamNNcXJtVHpzZ2VRVTA3?=
- =?utf-8?B?R3BOVkJZSE1NaUlGWHRJRk5MRXNKTmFMeGZuSXhRcGJXbE5uTkl3UWpoeDBk?=
- =?utf-8?B?cldVVkdCMGdkOWs3aHZTeTFEeG5CMlkwVktOTTdhSW5MRkp2cSs2WWRicDgw?=
- =?utf-8?B?c1BTUjBEZitJMFFrOG9JNGkxZWtVOVhVb0s0aU94NTkxb1QvL0E2M0RFM0FG?=
- =?utf-8?B?aldjUFM4SDN1RWJBT3BtVElVOEtBdVdQT2c5SjVMWmdSY21TdE0zNmwrbURK?=
- =?utf-8?B?MnV5THhOeGlTN2hEc2RITVFkS1lMYzQ0aC9SeE9uUGMvSmZuSzZxUDVqbExF?=
- =?utf-8?B?aEpZc3V6eUZMakJyUGJ6Y3VId3dDVTY0a0oyUDQweWRmcHVqUXVOampkTHRX?=
- =?utf-8?B?VldQNmQrbkdidmRkUGNGN2xZaWQxMW13VFNOYWx2V282OU1JV2F6SjlhR3Mx?=
- =?utf-8?B?TXFhSFBRdmNYWVplNjdFZlNUMjdDNmhkTjhVekNhUFdkS1hGaFRLdndjK3NG?=
- =?utf-8?B?YWlwUU1YZFNtYnNsa1BwVTc5RnpNVUN6ZVRHa1M3OUFuY2tQczRrR3Q0WGVY?=
- =?utf-8?B?b2dwUUdGdGxUU3pQYW8wUUtCcTJ1c3pSb1lHVGc0K3o3MExOOXFSdXEyemM3?=
- =?utf-8?B?b3pvMXphd3JPR29rTHAwRjVGM0RhblY0WWlRZFBrcnNIOWMreDJJbms3QlJ0?=
- =?utf-8?B?UHYwd2VZZFpLL2gvUnhuMzNnSEw5dVFQS29QS29LSFA4OWJEcWFtL0c5MnA4?=
- =?utf-8?B?WjJKQzBQR1dMVmtoeE9Od0M5VU5ydzJhNng3M0JJck5UQXN6VURLS3JRaDJU?=
- =?utf-8?B?STJEL0JCR0dPTUVQc0g4T2FZRnoxd0xHZHFCSGd5V1lTNzgrOVM1TWxVUTJN?=
- =?utf-8?B?RkFwSk9jY0RaTElJSUFRd0RpR3BISnhwNVJyRnAzcDhXWDhuNG9Db0FLQnZJ?=
- =?utf-8?B?WjV3QTFESW5Id1FWQXhIb0YybXRpbXpsY2VraWRwb1R6bjhBNExEeFRFZ2lQ?=
- =?utf-8?B?RnAzK2ppdXI3SjZ0WnYyRXJua1dndFk1ZE1zTkdzVjYyN2l1cEZvL1doQktz?=
- =?utf-8?B?dC84R0RjWWpObnBQS3V4cVFidTMwVENvalREU3IwUndYRTM2ZXlTekg5NGY2?=
- =?utf-8?B?RmQ1T3VxZy9lbjhKZWdkQWx1TVhQZW9CSURNRkIwUWgxS01qclBjaE5lWEZB?=
- =?utf-8?B?bnpPK1pFOU11QVR0bmFCWkJIRnVlUHBHZ21YV1Z2SEkzU0FZaTltUTF6clo0?=
- =?utf-8?B?SGR4WWxPTVlBNGtYOHFNdW53cUNDaXZqTEZocW5NMjB0dmNjeVNrTEtHTTBC?=
- =?utf-8?B?cFdLQnQwVTZ0cnpCTW9GR0lyOWRjbzExcENWSWlDNElXUVhETkh0dmdHUzVi?=
- =?utf-8?B?Mno1em9uVU9nNk5lYWhsM2xPN0xZMDNCMGN4SjdNSzU5YXo0a0tTbUJXVWda?=
- =?utf-8?Q?fO6pTNDxaoc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?c0ZlcXYrQ1JuVjVsTUdpaS9LMlIzSU5zWVdhdUozczVoSFh6dzlTazBzYnRP?=
- =?utf-8?B?WWQzTHRvL1g1Sm1LN1o4WFAvcXlCLzdTaHNRWnNNeXVOTlpjYnRJWVAxWGcr?=
- =?utf-8?B?cWJFTUlSeVVhTndQd1ZhZm9HYlpGVjMyU2daY3M0YzhaNk1oRW9EbVdKak5V?=
- =?utf-8?B?NE8yeFNyMnpLQytxcS8xb3l2L0tQT1luNVVJRndUVGNEbnlyK3p1R3FzdUps?=
- =?utf-8?B?d01zQnR1dGExUzBqKy9iNlFzY2x1L1FLMTU3UldhLytucCtqS3pXeVh1aW05?=
- =?utf-8?B?dnp2ejFoTjZvQ2tEYnpUVHlVUzRxTDFEUTJad0lvOWJKdmYyaVBqVXZ5YVBP?=
- =?utf-8?B?UzQ0TXhJQW9sZ3JSTk94VGNkMmVyTy9FUk9YcjhLTGR5VDZPSHU2c04wOTFl?=
- =?utf-8?B?T1gyd3kxZUhSbForRnlUSGJJam5VMjlWS2F4b3Z2em5va1F2bitkNDFlTDZQ?=
- =?utf-8?B?SWhZOFdQdll5SU02VXJYSWlkR3lnRDdGZWpkUWEwSGR1elZYM0VHQ2RkODRh?=
- =?utf-8?B?U001MTR0NDAxMWtHcmlMMlkvNkttTVA2bThOVW5jZDRFRmIzVU1wNFZPZlhN?=
- =?utf-8?B?OU9XZjR6NFM5Z0NVTWtucG1rQ0RzZ082cklVYnBMVnFNN0Fhby9yalhiWm5o?=
- =?utf-8?B?VU5sY1lDQzJCZ2xvajUzL2FaM1hrUWdobmpKWXRDbDRpWEQydlhrWHlGamZ4?=
- =?utf-8?B?SWxERUc0bXpuUjhQeHliTE51c1JuS1FNRlg1eE0wek40SE83ZmtXckZWM2xa?=
- =?utf-8?B?dzQzZGhtdEdZT3JVK1FpdlI3YTk1MnVZSzh0MnJKRWhhaklHZ2xPT2ZmUk95?=
- =?utf-8?B?Ym5PVWozV2E0YURRTGtPOHlqQTlORjBkMU9NZXRocXZWMkRDVEE2aVJqSkc3?=
- =?utf-8?B?cUdXZmZZN1hBT05MYWU5VVQydTFSZWdYUnFQTmdTdlYxVi9jZVhFZjdwNWhp?=
- =?utf-8?B?TzI0QjFkNzZCMmJFSUJJUlF0SHNOczNkMDViSDFENVRZdGFiZG4ySyszU2Zl?=
- =?utf-8?B?OEVlckV2QmR4VHJvcG5EM2xnVTFaaVdEZHNSTUlrMDZxQlR1VmtxNHZJMjIz?=
- =?utf-8?B?V0VpT3VNaU40c1dCWWtQOC8ram9sUEx1RHV5SFFCaytKVEU3UVlKYlZ5aThl?=
- =?utf-8?B?aEdTSzVhRjErd010ZnVxNzJqVGNZMmFTVFpyaXRQQnZIaWF6UGdIOUxPMzRa?=
- =?utf-8?B?dHlkZ3JhZHo1Y3JDMmYweVQ5dTl5dEtuTGI3RHhVajRIdmh3NHBKeUpjclRM?=
- =?utf-8?B?aWc3aEJUTHVmSkRhZ1djSnZiekdPMnBNbmh2SHdGSTY2bk5CL1VZM0tlcmR0?=
- =?utf-8?B?Ti81K3ZrU3ZIU0FIbUR1R2JWcDJqUlZ5d3VKNWthTHVJRUI0bVloWWh2YVNC?=
- =?utf-8?B?RU1HUGlZR1c1dWZueDZBVnNMeVQ1VThscENMOHU2amxRMHAzZ2w5SUh4TlRv?=
- =?utf-8?B?bGRyTkJqQTNGQVdqS1VVbW9GTWErdVJHeTRzL1BYZ1d6ZDdJYmp6UmhhbTdT?=
- =?utf-8?B?VUsxTUJFTHF5WDR1RFl3ZnZCdWg2Sy8wQkx0b09BV3IvTGtZeWtveHdFSnNM?=
- =?utf-8?B?RHZ0TzVhUWxOK3lqVWM5ekZzV1J4Q2pIc1NhdXBvTVM3YTlvMklVRmRoSmRN?=
- =?utf-8?B?UlVzdWM2L1ZoVTFJSXhSU3g3M2JnT0tYSGRCVE56ck0waFAwbHo4RmtoRWhC?=
- =?utf-8?B?TTQwT2ptejRCRzF3WmROOUFIWE9xd3ZaVjcxSVdwOWNFUUdza3hnVVM4L3hs?=
- =?utf-8?B?TnI3dVp5ZCtTdkJFclM1Ym5oVzVnTGNscU5IU1ZTdXA4VzdTclZCY3ZNWllE?=
- =?utf-8?B?MlI1NEFwb0dXZXIwRUJGYnB1S1JiVmoyQk1QVStpWllZQ2V6TFJoTTYzRmRC?=
- =?utf-8?B?cnZYWXMvM0hWdkN3elpXWkhLa1NDL0tTUkx5cGxWMDFUalJMbjBpMW05RkRX?=
- =?utf-8?B?TEdTblJWRlRLVHRPOHZ0ZWF3czVDZ1ZuRXEwa1FTUVBOdlo1SlFwQUwxTnEw?=
- =?utf-8?B?Njk4Y3lCRDBKcWtRZzZiTnhsZ1dJc1pxV3R3MDF4YzhSK1pLNzF4YVRtYlVh?=
- =?utf-8?B?eUFBbnlKUVp5R1ZrU2ozRkc3M2g5SDJNT0ROdCtzdU80NDNPOURNczk0cXcy?=
- =?utf-8?Q?vMyTpF5qXjnNg1OPBOTzpZMuq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ab15a9b-b07a-4864-275e-08dda38075c3
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 15:57:08.5129
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h9wtCwrnkAYkl8lYNO7g9L2kL0tg1cZ1PY0IDVENb6vy6mUSq8rxtFqA9yzw/6nOvDaT5TybMgJf02qDFx+SqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9519
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 
-On 6/2/25 14:10, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Panic notifiers are invoked with RCU read lock held and when the
-> SNP panic notifier tries to unregister itself from the panic
-> notifier callback itself it causes a deadlock as notifier
-> unregistration does RCU synchronization.
+From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
 
-You mean that during a panic, __sev_snp_shutdown_locked() is trying to
-unregister the notifier?
+Change the logic in the restore function to properly handle bank
+exceptions.
 
-Wouldn't it be better to check if a panic is in progress and not try to
-perform the unregister?
+The check for exceptions in the saved state should be performed before
+conducting any other ringstat register checks.
+If a bank was saved with an exception, the ringstat will have the
+appropriate rp_halt/rp_exception bits set, causing the driver to exit
+the restore process with an error. Instead, the restore routine should
+first check the ringexpstat register, and if any exception was raised,
+it should stop further checks and return without any error. In other
+words, if a ring pair is in an exception state at the source, it should
+be restored the same way at the destination but without raising an error.
 
-Or, is snp_panic_notifier() resilient enough to just always have it
-registered / unregistered on module load/unload?
+Even though this approach might lead to losing the exception state
+during migration, the driver will log the exception from the saved state
+during the restore process.
 
-Also, wouldn't a better check be snp_panic_notifier.next != NULL during
-sev_pci_exit()?
+Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+Fixes: bbfdde7d195f ("crypto: qat - add bank save and restore flows")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   | 29 ++++++++++++++-----
+ 1 file changed, 22 insertions(+), 7 deletions(-)
 
-Thanks,
-Tom
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+index 0406cb09c5bb..14d0fdd66a4b 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+@@ -581,6 +581,28 @@ static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
+ 	ops->write_csr_int_srcsel_w_val(base, bank, state->iaintflagsrcsel0);
+ 	ops->write_csr_exp_int_en(base, bank, state->ringexpintenable);
+ 	ops->write_csr_int_col_ctl(base, bank, state->iaintcolctl);
++
++	/*
++	 * Verify whether any exceptions were raised during the bank save process.
++	 * If exceptions occurred, the status and exception registers cannot
++	 * be directly restored. Consequently, further restoration is not
++	 * feasible, and the current state of the ring should be maintained.
++	 */
++	val = state->ringexpstat;
++	if (val) {
++		pr_info("QAT: Bank %u state not fully restored due to exception in saved state (%#x)\n",
++			bank, val);
++		return 0;
++	}
++
++	/* Ensure that the restoration process completed without exceptions */
++	tmp_val = ops->read_csr_exp_stat(base, bank);
++	if (tmp_val) {
++		pr_err("QAT: Bank %u restored with exception: %#x\n",
++		       bank, tmp_val);
++		return -EFAULT;
++	}
++
+ 	ops->write_csr_ring_srv_arb_en(base, bank, state->ringsrvarben);
+ 
+ 	/* Check that all ring statuses match the saved state. */
+@@ -614,13 +636,6 @@ static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
+ 	if (ret)
+ 		return ret;
+ 
+-	tmp_val = ops->read_csr_exp_stat(base, bank);
+-	val = state->ringexpstat;
+-	if (tmp_val && !val) {
+-		pr_err("QAT: Bank was restored with exception: 0x%x\n", val);
+-		return -EINVAL;
+-	}
+-
+ 	return 0;
+ }
+ 
+-- 
+2.49.0
 
-> 
-> Fix SNP panic notifier to unregister itself during module unload
-> if SNP is initialized.
-> 
-> Fixes: 19860c3274fb ("crypto: ccp - Register SNP panic notifier only if SNP is enabled")
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 8fb94c5f006a..942d93da1136 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1787,9 +1787,6 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
->  	sev->snp_initialized = false;
->  	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
->  
-> -	atomic_notifier_chain_unregister(&panic_notifier_list,
-> -					 &snp_panic_notifier);
-> -
->  	/* Reset TMR size back to default */
->  	sev_es_tmr_size = SEV_TMR_SIZE;
->  
-> @@ -2562,4 +2559,8 @@ void sev_pci_exit(void)
->  		return;
->  
->  	sev_firmware_shutdown(sev);
-> +
-> +	if (sev->snp_initialized)
-> +		atomic_notifier_chain_unregister(&panic_notifier_list,
-> +						 &snp_panic_notifier);
->  }
