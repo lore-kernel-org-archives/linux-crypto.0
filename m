@@ -1,139 +1,135 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4178D18E1F
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Jun 2025 16:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC5B339A1;
+	Wed,  4 Jun 2025 16:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749052817; cv=none; b=npRcnp0XTQCVFbiNgJWg85ecux0u9xXYTmA9NpTsHTMlA1hRgRh7qF8AYTJ5DqnMV5aSG7VOnpVR4vGCZO+15A9vPzjV8VStfl7qvlBCyjqCTQLcsjMvi1hpW8y2qVUoO4DPbLo/R4mtVuOnofMJD/R9igkKpgayfOqLRz2LjJQ=
+	t=1749054129; cv=none; b=jMhyamVn6M8R3XwmzT7QoDtdAgx2joS5oBRj64Z5W+4ae9E8EZV4gmjUm5vLrg07KjnQvPDGQ5lSTlt1TPeCS2brjGfkSeJhIDgQf/f4XFADyMMJ9RE5XHBYD7RWJXs0e75pcJ467ZGX88lDSrFVrANb2I9TJbjAEETgpHEI0tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749052817; c=relaxed/simple;
-	bh=ztKV5dovRv6t9eKGojAmhhZV/rc0e0y8ab7nVS1tj70=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nBIUuBHW58MrhUsq44k9pkm8dbGgyQmxEzuqyfib14yzWQY+xLNUkomqWonhxj94Fncs7MMNx7LVNARCLHZZ8jweR5uJKYrUFr01MShV5Yl+WGQi4Dig5ErUlG9tXckCvzj9vvYS2gnMtSnCX1XwSelq1fQlwl91uYyMsBjT58g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bzQU9IyR; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1749054129; c=relaxed/simple;
+	bh=NwyhNX9L7Xq2ErWehfIalz8JzuMef0oO/ln44trXpA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gui4qMYhcfRWqIA4xziXBu5Oa3Kc06ASm9RapvP4lP8D/Qn3ehQeXuKL7T29Pkyepwm8uMlFkG7PaDx5CudMQjoZ/y0D5oC8zp8Vk8eXsEpWP5Vy8NQ10xGcViuUOMwUOkaB3gLgDj3gxidt+eKcRBbyqLHO2iRERJQXVk3fcNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H76lsaDM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bzQU9IyR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749052815; x=1780588815;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ztKV5dovRv6t9eKGojAmhhZV/rc0e0y8ab7nVS1tj70=;
-  b=bzQU9IyR8JypDXWtr3ILif+CieUnAam1o3lZmKUn+91cNYZ/c8GyO1Ib
-   Zvpkr8+juq+zq0Ix3hoix9xc/5r89J06GuwLqQGdsKZKAvuofWjH3jizS
-   zLisDc5grPd5VTBhx9TRbCMRV/nRkmfZn+m+ZycBKjrztplo9lJkSVWd3
-   Jq9GCY0fEHSV+Nmgvw79+ALK6T2AlRDpQrsKICaClk4EVGfBCsAwJqg2o
-   +FfKhCqwZTkPwIts8PTywi7NY4F5pfzr7GBkX73KAYczQXcFM7luROVFd
-   gOHYhfWnFrdpVBxxmBTMBFxAY9UsLR6qdX12F7mJcVBV1NhvEsugDmJvk
-   Q==;
-X-CSE-ConnectionGUID: frMnc4E1RN26TgytslrvBg==
-X-CSE-MsgGUID: YDtojGlrS8u6uEG+E4VjAQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="62197308"
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="62197308"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 09:00:15 -0700
-X-CSE-ConnectionGUID: dmx5zy2yTQauo+uUMCdGVg==
-X-CSE-MsgGUID: SIpZK0hATpucBPO28KJTWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="176113777"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.204])
-  by fmviesa001.fm.intel.com with ESMTP; 04 Jun 2025 09:00:14 -0700
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - fix state restore for banks with exceptions
-Date: Wed,  4 Jun 2025 16:59:56 +0100
-Message-ID: <20250604160006.56369-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H76lsaDM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2569C4CEE4;
+	Wed,  4 Jun 2025 16:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749054128;
+	bh=NwyhNX9L7Xq2ErWehfIalz8JzuMef0oO/ln44trXpA4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H76lsaDMCV/V1fSovSqUD3ZgpyfaAK1GSAcEleRzyy09LC73xwV/QIc5PtBoh9sIp
+	 kG8LzOzST625ooMG9JTmodtSLCJhJOoItoVy/NQK94w8L14M/wOScCcprXSwV6tUFL
+	 D5z6yam1/tUrHUK5r5r0NXnjaPSZEESwIqJs2J1m9eJ3lq/veABA/7m/8ItlkpJlYg
+	 F+B7FDrBIErALMwEN91J7NCms86WbbIgV6mJ3eKQJ3Pxt3t+Q8sqK/iMZ/Xo3NrnOv
+	 XoezvNldvYykhgLZ8BNfqsTyaGtlBlhKxUcMNTlc6/TnPOQyBEd3yTZSoeN+w+Po1X
+	 IMspJI66V/OxA==
+Date: Wed, 4 Jun 2025 19:22:04 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Cc: Paul Moore <paul@paul-moore.com>, zeffron@riotgames.com,
+	xiyou.wangcong@gmail.com, kysrinivasan@gmail.com, code@tyhicks.com,
+	linux-security-module@vger.kernel.org, roberto.sassu@huawei.com,
+	James.Bottomley@hansenpartnership.com,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Quentin Monnet <qmo@kernel.org>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	Jordan Rome <linux@jordanrome.com>,
+	Martin Kelly <martin.kelly@crowdstrike.com>,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Matteo Croce <teknoraver@meta.com>, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/3] BPF signature verification
+Message-ID: <aEByrCJ1R_OYDYxH@kernel.org>
+References: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250528215037.2081066-1-bboscaccy@linux.microsoft.com>
 
-From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+On Wed, May 28, 2025 at 02:49:02PM -0700, Blaise Boscaccy wrote:
+> As suggested or mandated by KP Singh
+> https://lore.kernel.org/linux-security-module/CACYkzJ6VQUExfyt0=-FmXz46GHJh3d=FXh5j4KfexcEFbHV-vg@mail.gmail.com/,
+> this patchset proposes and implements an alternative hash-chain
+> algorithm for signature verification of BPF programs.
+> 
+> This design diverges in two key ways:
+> 
+> 1. Signature Strategy
+> 
+> Two different signature strategies are
+> implemented. One verifies only the signature of the loader program in
+> the kernel, as described in the link above. The other verifies the
 
-Change the logic in the restore function to properly handle bank
-exceptions.
+Describe "the one" briefly, despite having the link.  Label them A and
+B, and also, why there are two strategies. Then you can use those labels
+as references later on in this description.
 
-The check for exceptions in the saved state should be performed before
-conducting any other ringstat register checks.
-If a bank was saved with an exception, the ringstat will have the
-appropriate rp_halt/rp_exception bits set, causing the driver to exit
-the restore process with an error. Instead, the restore routine should
-first check the ringexpstat register, and if any exception was raised,
-it should stop further checks and return without any error. In other
-words, if a ring pair is in an exception state at the source, it should
-be restored the same way at the destination but without raising an error.
+> program’s maps in-kernel via a hash chain.  The original design
+> required loader programs to be “self-aborting” and embedded the
+> terminal hash verification logic as metaprogramming code generation
+> routines inside libbpf. While this patchset supports that scheme, it
+> is considered undesirable in certain environments due to the potential
+> for supply-chain attack vectors and the lack of visibility for the LSM
+> subsystem.  Additionally, it is impossible to verify the code
+> performing the signature verification, as it is uniquely regenerated
+> for every program.
+> 
+> 2. Timing of Signature Check
+> 
+> This patchset moves the signature check to a point before
+> security_bpf_prog_load is invoked, due to an unresolved discussion
+> here:
+> https://lore.kernel.org/linux-security-module/CAHC9VhTj3=ZXgrYMNA+G64zsOyZO+78uDs1g=kh91=GR5KypYg@mail.gmail.com/
+> This change allows the LSM subsystem to be informed of the signature
+> verification result—if it occurred—and the method used, all without
+> introducing a new hook. It improves visibility and auditability,
+> reducing the “trust me, friend” aspect of the original design.
+> 
+> 
+> Blaise Boscaccy (3):
+>   bpf: Add bpf_check_signature
+>   bpf: Support light-skeleton signatures in autogenerated code
+>   bpftool: Allow signing of light-skeleton programs
+> 
+>  include/linux/bpf.h            |   2 +
+>  include/linux/verification.h   |   1 +
+>  include/uapi/linux/bpf.h       |   4 +
+>  kernel/bpf/arraymap.c          |  11 +-
+>  kernel/bpf/syscall.c           | 123 +++++++++++++++++++-
+>  tools/bpf/bpftool/Makefile     |   4 +-
+>  tools/bpf/bpftool/common.c     | 204 +++++++++++++++++++++++++++++++++
+>  tools/bpf/bpftool/gen.c        |  66 ++++++++++-
+>  tools/bpf/bpftool/main.c       |  24 +++-
+>  tools/bpf/bpftool/main.h       |  23 ++++
+>  tools/include/uapi/linux/bpf.h |   4 +
+>  tools/lib/bpf/libbpf.h         |   4 +
+>  tools/lib/bpf/skel_internal.h  |  28 ++++-
+>  13 files changed, 491 insertions(+), 7 deletions(-)
+> 
+> -- 
+> 2.48.1
+> 
 
-Even though this approach might lead to losing the exception state
-during migration, the driver will log the exception from the saved state
-during the restore process.
-
-Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-Fixes: bbfdde7d195f ("crypto: qat - add bank save and restore flows")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- .../intel/qat/qat_common/adf_gen4_hw_data.c   | 29 ++++++++++++++-----
- 1 file changed, 22 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-index 0406cb09c5bb..14d0fdd66a4b 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-@@ -581,6 +581,28 @@ static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
- 	ops->write_csr_int_srcsel_w_val(base, bank, state->iaintflagsrcsel0);
- 	ops->write_csr_exp_int_en(base, bank, state->ringexpintenable);
- 	ops->write_csr_int_col_ctl(base, bank, state->iaintcolctl);
-+
-+	/*
-+	 * Verify whether any exceptions were raised during the bank save process.
-+	 * If exceptions occurred, the status and exception registers cannot
-+	 * be directly restored. Consequently, further restoration is not
-+	 * feasible, and the current state of the ring should be maintained.
-+	 */
-+	val = state->ringexpstat;
-+	if (val) {
-+		pr_info("QAT: Bank %u state not fully restored due to exception in saved state (%#x)\n",
-+			bank, val);
-+		return 0;
-+	}
-+
-+	/* Ensure that the restoration process completed without exceptions */
-+	tmp_val = ops->read_csr_exp_stat(base, bank);
-+	if (tmp_val) {
-+		pr_err("QAT: Bank %u restored with exception: %#x\n",
-+		       bank, tmp_val);
-+		return -EFAULT;
-+	}
-+
- 	ops->write_csr_ring_srv_arb_en(base, bank, state->ringsrvarben);
- 
- 	/* Check that all ring statuses match the saved state. */
-@@ -614,13 +636,6 @@ static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
- 	if (ret)
- 		return ret;
- 
--	tmp_val = ops->read_csr_exp_stat(base, bank);
--	val = state->ringexpstat;
--	if (tmp_val && !val) {
--		pr_err("QAT: Bank was restored with exception: 0x%x\n", val);
--		return -EINVAL;
--	}
--
- 	return 0;
- }
- 
--- 
-2.49.0
-
+BR, Jarkko
