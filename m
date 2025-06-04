@@ -1,61 +1,63 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B620ABA42;
-	Wed,  4 Jun 2025 20:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0ACB1991B2;
+	Wed,  4 Jun 2025 20:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749070068; cv=none; b=FWVxv4hYlDe/vr4Xju+ZWJD27y2V0m+T1RmDJtQh1JcWVOClYp52WpZGTHhCTHQ+mSY7oxg07YrKcznI7iaWpwfwJSrsOa/mVhkdJWsHQjqUqBuPS7d/ibsWm8x5KACQSEbnej3fJLGzUyEmw/ffYsyTsIN++PYtCeazuVWhB5E=
+	t=1749070068; cv=none; b=eONZiesMCtW4ywVnXtebLXxlsuT+15ZQxS4qvRf7sTRnxaIOeitnRb9vqNpo1htCpobY/oBK6ygB0fyOdufg1QFMcCWXyt5r84ChsOAH/SDGfIEeldh/RHTBE+grezGl+nzO77yti6UoY4gH1hYlV9VGN0FAhFwWX0E6f54nyF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749070068; c=relaxed/simple;
-	bh=RtHwNpiafW8lh4RMaVBEcTJkb9on9G2678OvSBi07bI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vx79kSbWD+LUSSAuTCUp9C8l0wxdFzbJQB97l013+Zw/eFv6jbCoyPEGRxffjnOw/T3Q9xpnRVK3OEevg+Nc4jSdHMyUvDLJRhX3zcGot/crZyF6yAsufepN8x2oda9A1CrS/LzXjuNk1Ew4YDS+QrRY81xdVZpCXffLZbyDeVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAdLUBgc; arc=none smtp.client-ip=209.85.219.170
+	bh=jq0mJcRTZfVWPVZJ0q5moAk3SNLPOHGYllNcbo2Dk0Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dNdBsu8tQ/lnkgnBX6x2mAMdrjqLmdEU/fpHgxWjlFHpkZPVCDTuymPQvI44hSZukXmkcwuX91ep2xTYWpNBHTaRnxSB2zK7onk0+m9WpAFiUUHj5tBOYgNtxz0miYvOFUK34Wh1QOytmDSE3Ftm1gT7CpEh0zJNiB22ZJlhDlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arIy5d8y; arc=none smtp.client-ip=209.85.128.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAdLUBgc"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e812fc35985so336013276.0;
-        Wed, 04 Jun 2025 13:47:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arIy5d8y"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-70e447507a0so3103677b3.0;
+        Wed, 04 Jun 2025 13:47:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749070064; x=1749674864; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vjwViiFJwU8CgwCU7LAAMLSZKpx7OJjGK3xVMyJx3OI=;
-        b=VAdLUBgcR1KaX7P6nFn2zQBJ/VOuBWexVwKnEePukYKGRkV0FHbNevWYC2gNWIjE9D
-         aW5eWAvTVfQnatR7rbgOAEJ3KPF1HH9KQp8Aiw461cfgKDqkoaUO/p1B+mWL4piJTgKh
-         hdphprbFtX5gbLuOruOvqxLG9zfpLd6XlvcavN+cLcK6gaQQy8yoc63PgAANAjlsomWc
-         1qLsUVS2vFhIS8pgzv0sJeN0RE0Wnqg0JaencuwJ3/KsstS7VAJxw5KbYoFt/OyM9dzc
-         aBbRtt3WK+Dz6p08TDGpS3pshMuzRBFOffmLi6Zbq4QkGIunT0luyLdtaKWiMQlHz2Ff
-         L9Ug==
+        d=gmail.com; s=20230601; t=1749070066; x=1749674866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VnLuJi81jYOYtHY6H9BJUZiDmCvEueD8G16moADExgw=;
+        b=arIy5d8yDDMvAPauRuUlgTiJz4Y+cZ+NO7fuAkFM4YqSNg+GcrnID5LkisW6rad6/C
+         BnVT+mdAl6wPADR+ESVJcxkyRPmwxOrfCLdfS2mVrPdY6lOkXe54UpKdxxR/5l/QCXME
+         tKyoOXEjXRC9v38GArqfmoHcbe8+x+8vV5VWL+cwifkvH/eHOSsTtuxc0HZgc5mj5KtE
+         XcQf3ZO71Y/HnEIFaoTfP4DbWujeTtRoyPzw9j0V8Km7lGyyDLTMHNUfP0T38ECpyv0k
+         xlyoh79WN0aRPkrKNkPu3YDiy7xzIca/yGzLeUqA5uNZjPzOaxIruhJ/Cq4ntO46ka59
+         j1Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749070064; x=1749674864;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vjwViiFJwU8CgwCU7LAAMLSZKpx7OJjGK3xVMyJx3OI=;
-        b=B9i0z/8lcnSWy7/y+InL9UEjhyV2huH4yly70BeazsuNMLlFtzw/7zBLy52lrLKd5F
-         gNQ0ESjFJRtYZoCD2lnvA/Xrvy+Nixq8wdiOM0D45cZutY8gd6noTy3SNgd1gm1Nop4O
-         kUBeNUKpRGRYzAq5GJZmlR7l944EfmEoMtS8j16jrVliIQDVuGD6tu577fHVjIIUNO+W
-         XsMY8vRM+StyCZ3LYQZAQMyqGeT7L/z4ymlnFsH9IHLQO7l09y2hsAHmFxX6WlLkeEV9
-         XgQ6DLAsH3g11XSC8qgARZYJJyMJYF+c19MMzPmeK5aLMxtCEyoDS8PLWsu32pdf9Lbv
-         L73g==
-X-Forwarded-Encrypted: i=1; AJvYcCXfJPiqfvZmngxkxVq9Wc0LqTlvHjvdRjbsMVEFN3odB1zmp312NcdvWtXIGLEtik8dybtGndQTtqhNntw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEu+dXfkfxi2E1P0SDLL0rkxskqATInF6E/NtjU8uTCo7wCgb4
-	JtvkmL9O7T2/2oqTcBMW8YGkGn2qpFX1kt7RBhvXbj0lmmUHKj7SkgooR+X7Bg==
-X-Gm-Gg: ASbGncvme7ak+kNQaQcLnF/jhKZou+oFmdMDEras7Kg5JNfeOG9HtcGGCm88bFksb4a
-	gw4TKww4gS+PjZVOHh57yu+WORwnPcvC/G1InQH5qOd6F051RBxO/3eypnaG5mbUFnSsNin2quw
-	6pruxs4rMt2dTQH/PQS4pzlqyEKc6ni4N6PPkngKkES4kc6NN7z6IYSa9To40r4PZAm3zTyRyvr
-	yIBQ242fqckA60vUcjlKgto6giPbKn7wG926evP3LTW9aMgsM3uHcgOpaiAA64eOyAj4LzNGMhx
-	lvYPbYXbsEVraCfyz5IZn9/wMa/u973moHUxKmeyZCoFcEr0q2Y9JtehAur5fO1QIEtVvcUNt/P
-	2mPg+mp7AOMI=
-X-Google-Smtp-Source: AGHT+IHh5FeDd9yAuTUr4b6I32rGBvp1Xw2l6fOORmIF52EiRq6xHKfuHyoeapaXL005Tr7o9y7pcw==
-X-Received: by 2002:a05:690c:4984:b0:70d:f47a:7e3f with SMTP id 00721157ae682-710d9afa6a8mr62253357b3.20.1749070064529;
-        Wed, 04 Jun 2025 13:47:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749070066; x=1749674866;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VnLuJi81jYOYtHY6H9BJUZiDmCvEueD8G16moADExgw=;
+        b=ZW7Hq1nbvzgQ/FSJ8Vap95FRSjpoGEE/blS9KZ/HhSO022tFOEHolhpyBgSCocYkaJ
+         HG5nRT8RKla0woUP6DvqCKPMWKt+eSDRD/TWw20anPSoISzb9p0MwMOsx5ooB7ocILhv
+         Tv6hYBNAwU3WxeKpMlD1GBVw8oA8zLt+mOOWyygyrQXq5RA+VCkTmmcEKqhODaiSnWrm
+         1Dk7+OblUfZpSFHUGdpV0DWFJmZAsJhvvvUSV0hip+bzFSevrTEGpYC6tPIcTb909cfL
+         tONXPE7TvyyRZ6aiv+XqGWcuH0d/eqRlspr0ywInCVVCJdgrv9Nj1kv+HcTiL9KRhR+c
+         mKBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJMWAw0BEO7J2r7gbezP/TJcilCQkMfK72kU3h4jqeK00r5tiALp8XSa65oTb6rCVe/uQ2XnpIX845dR4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbkRN+0GMBitTauoN3eAHJ9GbZyrdwLMtHBoZd2Fv9tmbiHBKB
+	TBLOmf30ICrdRF2c0LqgagrpbxA6dunfv5ToN6b2dY68DKSH9Je80hD1JJa3Rg==
+X-Gm-Gg: ASbGncv+N4IjnqRrvGCrg5rPLtPsCsvsOZX214OtEUPvQMQmj6+KsSgYcifxTY/xLMo
+	Kw2E3QyaUahxniiFJsNcLXaOyjwT0NB6STzw8n2ICIFgEWskzN8OSy+DGjslzpeXsvB8e3hSdaX
+	0CODN7iPY45M0AsOMkyFATJulPerxX0VPudkPVjol06F/ESDxDn/8M2YDY4DJruL2ly7AmX6DnX
+	emoxSNoKnEre9bohZ4IreU4ckbPIML/jvta3Lp2Myy5yDkOHhtqsldJYBpkCOg9yG3tLy0uJpHd
+	jRCIJ71R75Q7XcbWJwqyprBPL0n6XXfO/i/N+NLbOBeOQMklaogoTUliZohDe5Jc8yK0zEWcmBx
+	ubeVdJw9PlyE=
+X-Google-Smtp-Source: AGHT+IFRGCS4OMkR70kokmyKiV6UlZ3z5bDnt5MnHwrXjTB8gLqidEVhNq9ar+to3naWMvi+zpCk8A==
+X-Received: by 2002:a05:690c:3609:b0:70e:16a3:ce96 with SMTP id 00721157ae682-710d9e5376dmr67442957b3.26.1749070065900;
+        Wed, 04 Jun 2025 13:47:45 -0700 (PDT)
 Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-70f8abce520sm31878677b3.22.2025.06.04.13.47.43
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-70f8ad005besm31774817b3.106.2025.06.04.13.47.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jun 2025 13:47:43 -0700 (PDT)
+        Wed, 04 Jun 2025 13:47:45 -0700 (PDT)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
@@ -66,10 +68,12 @@ To: linux-kernel@vger.kernel.org,
 	Pankaj Gupta <pankaj.gupta@nxp.com>,
 	Gaurav Jain <gaurav.jain@nxp.com>
 Cc: "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
-Subject: [PATCH 0/2] crypto: replace cpumask_next with better API
-Date: Wed,  4 Jun 2025 16:47:39 -0400
-Message-ID: <20250604204742.21183-1-yury.norov@gmail.com>
+Subject: [PATCH 1/2] crypto: pcrypt: Optimize pcrypt_aead_init_tfm()
+Date: Wed,  4 Jun 2025 16:47:40 -0400
+Message-ID: <20250604204742.21183-2-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250604204742.21183-1-yury.norov@gmail.com>
+References: <20250604204742.21183-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -78,20 +82,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yury Norov [NVIDIA]  <yury.norov@gmail.com>
+From: Yury Norov [NVIDIA] <yury.norov@gmail.com>
 
-Recently added cpumask_next_wrap() and cpumask_nth() work better than
-cpumask_next(). Use them where appropriate.
+The function opencodes cpumask_nth(). The dedicated helper is faster
+than an open for-loop.
 
-Yury Norov [NVIDIA] (2):
-  crypto: pcrypt: Optimize pcrypt_aead_init_tfm()
-  crypto: caam - Fix opencoded cpumask_next_wrap() in
-    caam_drv_ctx_init()
+Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+---
+ crypto/pcrypt.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
- crypto/pcrypt.c          | 7 ++-----
- drivers/crypto/caam/qi.c | 5 +----
- 2 files changed, 3 insertions(+), 9 deletions(-)
-
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index c33d29a523e0..c3a9d4f2995c 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -178,7 +178,7 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 
+ static int pcrypt_aead_init_tfm(struct crypto_aead *tfm)
+ {
+-	int cpu, cpu_index;
++	int cpu_index;
+ 	struct aead_instance *inst = aead_alg_instance(tfm);
+ 	struct pcrypt_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(tfm);
+@@ -187,10 +187,7 @@ static int pcrypt_aead_init_tfm(struct crypto_aead *tfm)
+ 	cpu_index = (unsigned int)atomic_inc_return(&ictx->tfm_count) %
+ 		    cpumask_weight(cpu_online_mask);
+ 
+-	ctx->cb_cpu = cpumask_first(cpu_online_mask);
+-	for (cpu = 0; cpu < cpu_index; cpu++)
+-		ctx->cb_cpu = cpumask_next(ctx->cb_cpu, cpu_online_mask);
+-
++	ctx->cb_cpu = cpumask_nth(cpu_index, cpu_online_mask);
+ 	cipher = crypto_spawn_aead(&ictx->spawn);
+ 
+ 	if (IS_ERR(cipher))
 -- 
 2.43.0
 
