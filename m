@@ -1,111 +1,186 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066D01C84A2;
-	Thu,  5 Jun 2025 14:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CE12B93
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Jun 2025 14:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749133747; cv=none; b=MGE9RlnQ2VJgarO28fNIf7XdhNzWRREnNoLlrJfnZE9qfbx8pL9psujRIRCeK+JFhUBLxDNqatw+O+PbIEaS9hnRlujXPDnMsAndfPrNII7KF1ul8Pi4qtNZrO0dyqJe828utL6SJ5wH2skNB2kVUOnAXnHfjkjfSD6B9ICK5Mc=
+	t=1749134137; cv=none; b=PYvxiYPMZr8rrNI99PmSyk7EUFr4qoRdsOFFDjlvJGoS/HT0T4StFcSlD/PI2ilrJ0N2mRVPVi3kSc4sEgOjSJZBQr2GyI1Wj7cuxJQuFUkXPR+BXpOoZhCFJpxBzqejSeCGON7UH/k0+kirGbdY+RsxljK3FhXPDaaiWe1T1eQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749133747; c=relaxed/simple;
-	bh=SAK1eCG6q30aTdJmw9lTFOqLAVILbrbvQ+z1shYGO1I=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=bmu9FuKTuPakRWOog/nDHvOvcVXvSrRBg/TfWUAsKj3F5h0qQAe5hEXA5c78ld9IaxMxBn9d8K1xf9GIUMIYtYHv94/ObujtMTI4qXpZQb2FEvrqwLtNGDczjUTqRUeYLmMYUyRMoSfEn6Zo5ctks6SW7nqzzZgrqO9Ab3RxDI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZe/8R3A; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZe/8R3A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A88C4CEE7;
-	Thu,  5 Jun 2025 14:29:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749133746;
-	bh=SAK1eCG6q30aTdJmw9lTFOqLAVILbrbvQ+z1shYGO1I=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=nZe/8R3AcLEvnjMDtpcPxvHPl9htAqqxUfWnCfPeVtEALXURX+X1eClc/1kxSL/t3
-	 NRjS70aAIVd1HT7OY8CQpCz7SUdsExAatXnNB7ZMw3AEljwwKzLP2WpTbFaOy/hxQ1
-	 BzDi2pF+eiO8CV47eTDm5heAYVVTjA4+Eqrrrvffyfwgd5daxBP9lzUVEmbFDt1kKZ
-	 6z2MlnTwVMPQUt7up3R2VKF8ru8O1rJZ7S1+l258aXwYlPkhSQioz/WAhYplUay7wC
-	 m5ZXUn7HgxyqAP6DtwIuXblxH3uKBGPV8B2bUBcov9tqrHDOt6sZRpULu/60SYe8Gp
-	 l2cKYrev88IWw==
-Date: Thu, 05 Jun 2025 09:29:04 -0500
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1749134137; c=relaxed/simple;
+	bh=OlfyT7QOAGZbPhpZHm4m2Her75B9jBRFNYXfZJNiRFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NNivIWLICPuJxGpfRiQmnb/NGSjWp5IZ6g2KaTqPWfr1DEtgCRbfRAmp20mfjiVxSBVqXQDto4dQZ3mARlyWX7RnLimu+jV2cgUG0WDl0UqECud9uZeoqgfml1cvdUuyolW9Fy7a4JV7hmWYjI75uMXMP5m5RXwb6ELpIGeFE1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A32502C06844;
+	Thu,  5 Jun 2025 16:29:36 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 8B94820D6D9; Thu,  5 Jun 2025 16:29:36 +0200 (CEST)
+Date: Thu, 5 Jun 2025 16:29:36 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Eric Biggers <ebiggers@google.com>
+Subject: Re: [v2 PATCH] Revert "crypto: run initcalls for generic
+ implementations earlier"
+Message-ID: <aEGp0MahOepfGpsm@wunner.de>
+References: <aBBoqm4u6ufapUXK@gondor.apana.org.au>
+ <aBHcftWYX1Pe9Ogh@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Frank Li <Frank.li@nxp.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, imx@lists.linux.dev, 
- Fabio Estevam <festevam@gmail.com>, linux-kernel@vger.kernel.org, 
- Shawn Guo <shawnguo@kernel.org>, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Pankaj Gupta <pankaj.gupta@nxp.com>, Conor Dooley <conor+dt@kernel.org>, 
- Gaurav Jain <gaurav.jain@nxp.com>, "David S . Miller" <davem@davemloft.net>, 
- Sascha Hauer <s.hauer@pengutronix.de>, linux-crypto@vger.kernel.org
-To: John Ernberg <john.ernberg@actia.se>
-In-Reply-To: <20250605132754.1771368-4-john.ernberg@actia.se>
-References: <20250605132754.1771368-1-john.ernberg@actia.se>
- <20250605132754.1771368-4-john.ernberg@actia.se>
-Message-Id: <174913374447.2520926.5612887459467477896.robh@kernel.org>
-Subject: Re: [PATCH v4 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
- domains for iMX8QM and iMX8QXP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBHcftWYX1Pe9Ogh@gondor.apana.org.au>
 
-
-On Thu, 05 Jun 2025 13:28:02 +0000, John Ernberg wrote:
-> NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
-> resource management.
+On Wed, Apr 30, 2025 at 04:17:02PM +0800, Herbert Xu wrote:
+> This reverts commit c4741b23059794bd99beef0f700103b0d983b3fd.
 > 
-> Add compatible strings for these SoCs (QXP and DXP gets to share as their
-> only difference is a core-count, Q=Quad core and D=Dual core), and allow
-> power-domains for them only. Keep the old restriction for others.
+> Crypto API self-tests no longer run at registration time and now
+> occur either at late_initcall or upon the first use.
 > 
-> Signed-off-by: John Ernberg <john.ernberg@actia.se>
+> Therefore the premise of the above commit no longer exists.  Revert
+> it and subsequent additions of subsys_initcall and arch_initcall.
 > 
-> ---
-> 
-> v4:
->  - Reword commit message (Frank Li)
->  - Add explicit imx8qxp compatible (Frank Li)
->  - Move the job-ring constraints back to the job-ring section under an
->    'allOf:' to avoid the warning from v2 (Rob Herring)
-> 
-> v3:
->  - Fix warnings discovered by Rob Herring's bot
->  - Declare the compatibles correctly (Krzysztof Kozlowski)
-> 
-> v2:
->  - Adjust commit message (Frank Li)
->  - Only allow power-domains when compatible with imx8qm (Frank Li)
-> ---
->  .../bindings/crypto/fsl,sec-v4.0.yaml         | 41 ++++++++++++++++++-
->  1 file changed, 40 insertions(+), 1 deletion(-)
-> 
+> Note that lib/crypto calls will stay at subsys_initcall (or rather
+> downgraded from arch_initcall) because they may need to occur
+> before Crypto API registration.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+The above is now commit ef93f1562803 in Linus' tree.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml:115:17: [warning] wrong indentation: expected 18 but found 16 (indentation)
+For SHA3, the initcall change ended up in a different, unrelated commit,
+0d474be2676d.
 
-dtschema/dtc warnings/errors:
+These changes break authentication of PCI devices upon their enumeration
+because it happens in a subsys_initcall, whereas the generic asymmetric
+and hash algorithms are now registered in a device_initcall, i.e. later.
 
-doc reference errors (make refcheckdocs):
+PCI device authentication is not yet in mainline.  I've provisionally
+added the patch below to my development branch and can include it in
+the next submission of the patches.  The development branch is at:
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250605132754.1771368-4-john.ernberg@actia.se
+https://github.com/l1k/linux/commits/doe
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+I just wanted to provide a heads-up and an opportunity for early feedback
+to this patch.
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
+Thanks!
 
-pip3 install dtschema --upgrade
+Lukas
 
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+-- >8 --
+
+Subject: [PATCH] crypto: Allow use of ECDSA, RSA, SHA2, SHA3 in
+ subsys_initcall
+
+Commit ef93f1562803 ("Revert "crypto: run initcalls for generic
+implementations earlier"") downgraded generic ECDSA, RSA, SHA2
+to a device_initcall when built into the kernel proper.
+
+Commit 0d474be2676d ("crypto: sha3-generic - Use API partial block
+handling") did the same for generic SHA3.
+
+To be able to authenticate PCI devices upon enumeration, move them back
+to subsys_initcall level (which is when PCI device enumeration happens).
+
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+---
+ crypto/algboss.c        | 2 +-
+ crypto/ecdsa.c          | 2 +-
+ crypto/rsa.c            | 2 +-
+ crypto/sha256.c         | 2 +-
+ crypto/sha3_generic.c   | 2 +-
+ crypto/sha512_generic.c | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 846f586..74517f2 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -247,7 +247,7 @@ static void __exit cryptomgr_exit(void)
+ 	BUG_ON(err);
+ }
+ 
+-module_init(cryptomgr_init);
++subsys_initcall(cryptomgr_init);
+ module_exit(cryptomgr_exit);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+index ce8e4364..a70b60a 100644
+--- a/crypto/ecdsa.c
++++ b/crypto/ecdsa.c
+@@ -334,7 +334,7 @@ static void __exit ecdsa_exit(void)
+ 	crypto_unregister_sig(&ecdsa_nist_p521);
+ }
+ 
+-module_init(ecdsa_init);
++subsys_initcall(ecdsa_init);
+ module_exit(ecdsa_exit);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 6c77340..b7d2152 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -430,7 +430,7 @@ static void __exit rsa_exit(void)
+ 	crypto_unregister_akcipher(&rsa);
+ }
+ 
+-module_init(rsa_init);
++subsys_initcall(rsa_init);
+ module_exit(rsa_exit);
+ MODULE_ALIAS_CRYPTO("rsa");
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/sha256.c b/crypto/sha256.c
+index 4aeb213..a20c920 100644
+--- a/crypto/sha256.c
++++ b/crypto/sha256.c
+@@ -264,7 +264,7 @@ static int __init crypto_sha256_mod_init(void)
+ 		num_algs -= 2;
+ 	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
+ }
+-module_init(crypto_sha256_mod_init);
++subsys_initcall(crypto_sha256_mod_init);
+ 
+ static void __exit crypto_sha256_mod_exit(void)
+ {
+diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
+index 41d1e50..47f5240 100644
+--- a/crypto/sha3_generic.c
++++ b/crypto/sha3_generic.c
+@@ -274,7 +274,7 @@ static void __exit sha3_generic_mod_fini(void)
+ 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+ }
+ 
+-module_init(sha3_generic_mod_init);
++subsys_initcall(sha3_generic_mod_init);
+ module_exit(sha3_generic_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
+index 7368173..bfea65f 100644
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -205,7 +205,7 @@ static void __exit sha512_generic_mod_fini(void)
+ 	crypto_unregister_shashes(sha512_algs, ARRAY_SIZE(sha512_algs));
+ }
+ 
+-module_init(sha512_generic_mod_init);
++subsys_initcall(sha512_generic_mod_init);
+ module_exit(sha512_generic_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
+-- 
+2.47.2
 
