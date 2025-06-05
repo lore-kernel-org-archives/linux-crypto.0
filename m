@@ -1,182 +1,114 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3CC2139C8
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Jun 2025 11:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA16919E971
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Jun 2025 11:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749122745; cv=none; b=NgGeDTPB9qUkM0UTUrBWjDUTGawA5zghRGNdi6AWPIKKvAjm1/qEl7uNpIalxSmhDFWmGU4PmcGmYCfIRk0xK+/muZyaOBUwmOKnNdDjxC6uuflgMl9TI8g6TkwW2YKOYi+j01B/XXso83N3CQElMt47uVQIfj4BNq0sulWPdE0=
+	t=1749122805; cv=none; b=WjvZmAIlg5NqjLcCSP0DRMviYKAPfYTwlW2vyzNpXBampbCPVdx8AdiOgnmVOtiGDLyrVBoaMspqTjwvVf7QlvbFUoF/grEL/6EsVsoBTNKSMg5sUYnga3quYXqe29oOzO4bVjMHsyNfs9oLjsXHh2E5ggUwlfGo5jy/Q+mQhP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749122745; c=relaxed/simple;
-	bh=Fj3ai4jsaGJjSTkFZh9vhbRKfJqQwKm6EMRITUOC/kg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S+iLfkKxOXaOlkXQeeiisMsch4R2tHux2zNz+lFfyTbzaEnfyhzFfjJARvhyJLV2TinWgsQvIxT+Qs38l+rH6N5hQkE2AWcnPE/TgyrLsoGXNyvHOUDF+Rh/UcBMl0MpYT3egLU4BomUBRpWYAJJlv8tHRbtFEJCsol42GtAPY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C4HHE4vy; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1749122805; c=relaxed/simple;
+	bh=y1LIejWfv33dpQTZWJ52uy0c8lDTnU39PfnRvm4vzGY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Oe1N6B+UzHAhhKOLhHgbuAj3K0SL+jict5p43BzOGVBrbUPIHoRwZRXsMun4V3i8ww4zafEtiNVVCVqCeA7VH8CLdH0M5FjPhDt4k6Mv68i2QV4vferFwJeeQgtBkfCb9mYVbBZC2nj9n210/XnK6vaZojOH50wiQyoTwLSUhXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M1rFsXAP; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C4HHE4vy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749122745; x=1780658745;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Fj3ai4jsaGJjSTkFZh9vhbRKfJqQwKm6EMRITUOC/kg=;
-  b=C4HHE4vytoxOIp0c34RHze9DBeUIups0AgQzCoXUXELUUeg4+ZpvfGzZ
-   cmXuN4gTHHomQYQA+qCpEHG4LnuqDBBat2uutVNKXrH6GiqZ9WaMsUepF
-   9mnmEK4jzet1i1fnw0X+NuQG3vGjbt8ZG3EspzE0cmrmwUSkRzTMk1UwZ
-   ykBHgqG2+Gk9F/dpiAxItTa88uvVq0EY2SnN3L3j4h4A6FdjY9jBKb6ul
-   efGuuul2q1HyJLJ4IjS6yn9374EHt/85VMvzyTietg+E8pdKmO47VKVeM
-   ugybzxuV43Z1DdozkvJWHGZAUQ43PZmViusjCqqtVyuRzjnXYQoBv/fWs
-   w==;
-X-CSE-ConnectionGUID: FfLFDnWQREa4pi2RcebX+w==
-X-CSE-MsgGUID: cqkuf9W2RXKmixfele+dvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="51305201"
-X-IronPort-AV: E=Sophos;i="6.16,211,1744095600"; 
-   d="scan'208";a="51305201"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2025 04:25:44 -0700
-X-CSE-ConnectionGUID: yuArTrXRTq2aWLDNPQ9XtQ==
-X-CSE-MsgGUID: OHmSixHFQaWnIaPoRzsB7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,211,1744095600"; 
-   d="scan'208";a="145988347"
-Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by fmviesa010.fm.intel.com with ESMTP; 05 Jun 2025 04:25:42 -0700
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-Subject: [PATCH 2/2] Documentation: qat: update sysfs-driver-qat for GEN6 devices
-Date: Thu,  5 Jun 2025 12:25:27 +0100
-Message-Id: <20250605112527.1185116-3-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250605112527.1185116-1-suman.kumar.chakraborty@intel.com>
-References: <20250605112527.1185116-1-suman.kumar.chakraborty@intel.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M1rFsXAP"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5557TGr9030925;
+	Thu, 5 Jun 2025 11:26:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=G3JXl6F2hPjVYW8hkI+IZoII4jtN
+	pRxAPqG5LtGJTvQ=; b=M1rFsXAPXN0QtNQpEh7sC5lbSUtA54AIXyvO49hbQeWp
+	qLnBJi1ZfqyP1xQakTOrmK/Mf5EgjAYd+VefKAOrCfO+kQlo08YyRSoR0/L3w8kW
+	3wxcxkgKlrhY1FUFzHkBOM+Mzw1ggmfjfI5iqx/FDK9VxlFHUwpGHLUlhKz9xHbb
+	GkYYOqcJB3R1qcA1aInstzuC91PobGGx+ABlGuPFYIbPOp0M6qR78NUdwUPSLeBN
+	qqYBEhhgSMvERcn1PFQJddrjDx8xR7YOsEsRCXMk5tqzanmQoq2y8Hr28OYHsMh+
+	OFZOrjCyMcPip47R7VrkH9GpQUBk2QlzIMNsZJCe3A==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471gf00b7q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 11:26:38 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5558cx3E031636;
+	Thu, 5 Jun 2025 11:26:37 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470cg04js7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 11:26:37 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 555BQXq119661300
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Jun 2025 11:26:33 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 77ADA20043;
+	Thu,  5 Jun 2025 11:26:33 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 45B342004B;
+	Thu,  5 Jun 2025 11:26:33 +0000 (GMT)
+Received: from [9.152.222.57] (unknown [9.152.222.57])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  5 Jun 2025 11:26:33 +0000 (GMT)
+Message-ID: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
+Date: Thu, 5 Jun 2025 13:26:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, ebiggers@kernel.org, freude@linux.ibm.com,
+        dengler@linux.ibm.com
+From: Ingo Franzki <ifranzki@linux.ibm.com>
+Subject: CI: Another strange crypto message in syslog
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ILvoA2cNzEtzwKw-fDVg8fcAC2WGf0uv
+X-Authority-Analysis: v=2.4 cv=DYMXqutW c=1 sm=1 tr=0 ts=68417eee cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=WBDv6BFkB0FwB3k-DwAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: ILvoA2cNzEtzwKw-fDVg8fcAC2WGf0uv
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA1MDA5NiBTYWx0ZWRfX15mFycqT5twF aO/hksRjfFG8ovyzV9z6cEkXkPf0X7uhkDtOx0apxk8oQoUh1zNM8e1O7ufTxwzYhx5kok22ENJ znAgYAZqFeKZi8txd4A4qX3UJVOQJULC8uSULCYX2I9Y3xlAyeUsz2DjFbkFvpjFHpXvjD0aOQW
+ HiXyWys+2eZThQUhN3727+RYe8yDst7OJPghPWlzqA3xqMmVwLbdS/gZNEAmL2wWo+KP2jAfYkp Y1vF+Z4Nb+K0VgV02+e7l4I/Z8JZaYETar8KXYNqvvww+RA5EKQNDocyquqieURCMZDBvpV6xpn 4AnpqmPMDUl2vgMZzy1f/yz6z1VT4dIzShDfOOVcdM6NW14DenPVn8Wr2fgYQNM94RznaeV1O74
+ 0agE3OsyT2wW4KjIW857fLYImZRtEzbHd70xFVFycu/D7Hr9ooKh/3XCisWYVguIHRtOzjPG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-05_02,2025-06-03_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=999 adultscore=0
+ malwarescore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506050096
 
-Reorganize and expand documentation for service configurations. This
-reworks the `cfg_services` section by removing explicit service
-combinations (e.g., asym;sym, sym;asym) and clarifying that multiple
-services can be configured in any order.
+Hi Herbert,
 
-Update the documentation to reflect that the attribute previously limited
-to qat_4xxx devices is also applicable to qat_6xxx devices.
+we see the following error messages in syslog on the current next kernel: 
 
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
----
- Documentation/ABI/testing/sysfs-driver-qat | 50 ++++++++++++----------
- 1 file changed, 27 insertions(+), 23 deletions(-)
+Jun 05 13:15:20 a35lp62.lnxne.boe kernel: basic hdkf test(hmac(sha256)): failed to allocate transform: -2     
+Jun 05 13:15:20 a35lp62.lnxne.boe kernel: alg: full crypto tests enabled.  This is intended for developer use only.
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-index f290e77cd590..b0561b9fc4eb 100644
---- a/Documentation/ABI/testing/sysfs-driver-qat
-+++ b/Documentation/ABI/testing/sysfs-driver-qat
-@@ -14,7 +14,7 @@ Description:	(RW) Reports the current state of the QAT device. Write to
- 		It is possible to transition the device from up to down only
- 		if the device is up and vice versa.
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/bus/pci/devices/<BDF>/qat/cfg_services
- Date:		June 2022
-@@ -23,24 +23,28 @@ Contact:	qat-linux@intel.com
- Description:	(RW) Reports the current configuration of the QAT device.
- 		Write to the file to change the configured services.
- 
--		The values are:
-+		One or more services can be enabled per device.
-+		Certain configurations are restricted to specific device types;
-+		where applicable this is explicitly indicated, for example
-+		(qat_6xxx) denotes applicability exclusively to that device series.
- 
--		* sym;asym: the device is configured for running crypto
--		  services
--		* asym;sym: identical to sym;asym
--		* dc: the device is configured for running compression services
--		* dcc: identical to dc but enables the dc chaining feature,
--		  hash then compression. If this is not required chose dc
--		* sym: the device is configured for running symmetric crypto
--		  services
--		* asym: the device is configured for running asymmetric crypto
--		  services
--		* asym;dc: the device is configured for running asymmetric
--		  crypto services and compression services
--		* dc;asym: identical to asym;dc
--		* sym;dc: the device is configured for running symmetric crypto
--		  services and compression services
--		* dc;sym: identical to sym;dc
-+		The available services include:
-+
-+		* sym: Configures the device for symmetric cryptographic operations.
-+		* asym: Configures the device for asymmetric cryptographic operations.
-+		* dc: Configures the device for compression and decompression
-+		  operations.
-+		* dcc: Similar to dc, but with the additional dc chaining feature
-+		  enabled, cipher then compress (qat_6xxx), hash then compression.
-+		  If this is not required choose dc.
-+		* decomp: Configures the device for decompression operations (qat_6xxx).
-+
-+		Service combinations are permitted for all services except dcc.
-+		On QAT GEN4 devices (qat_4xxx driver) a maximum of two services can be
-+		combined and on QAT GEN6 devices (qat_6xxx driver ) a maximum of three
-+		services can be combined.
-+		The order of services is not significant. For instance, sym;asym is
-+		functionally equivalent to asym;sym.
- 
- 		It is possible to set the configuration only if the device
- 		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
-@@ -59,7 +63,7 @@ Description:	(RW) Reports the current configuration of the QAT device.
- 			# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
- 			dc
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
- Date:		June 2023
-@@ -94,7 +98,7 @@ Description:	(RW) This configuration option provides a way to force the device i
- 			# cat /sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
- 			0
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/bus/pci/devices/<BDF>/qat/rp2srv
- Date:		January 2024
-@@ -126,7 +130,7 @@ Description:
- 			# cat /sys/bus/pci/devices/<BDF>/qat/rp2srv
- 			sym
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/bus/pci/devices/<BDF>/qat/num_rps
- Date:		January 2024
-@@ -140,7 +144,7 @@ Description:
- 			# cat /sys/bus/pci/devices/<BDF>/qat/num_rps
- 			64
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/bus/pci/devices/<BDF>/qat/auto_reset
- Date:		May 2024
-@@ -160,4 +164,4 @@ Description:	(RW) Reports the current state of the autoreset feature
- 		* 0/Nn/off: auto reset disabled. If the device encounters an
- 		  unrecoverable error, it will not be reset.
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is available for qat_4xxx and qat_6xxx devices.
+The first one seem to be failure, but I can't tell where..... I don't see any other typical selftest failure messages.
+-1 is ENOENT. It might be related to the recent changes with sha256 being now in a library...
+
+The second one is probably because the full selftests are now enabled by default. Does it make sense to output this message now anymore at all? 
+
+Kind regards,
+Ingo
+
 -- 
-2.40.1
+Ingo Franzki
+eMail: ifranzki@linux.ibm.com  
+Tel: ++49 (0)7031-16-4648
+Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen
+Geschäftsführung: David Faller
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
+IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
 
