@@ -1,88 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221B21F956
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Jun 2025 14:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066D01C84A2;
+	Thu,  5 Jun 2025 14:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749133620; cv=none; b=XF6qxqos1yGbyTIxeq1hJo516k+1j9ReJUkuYb6xv0sdJIj3pSh8vpmjPXquAYd6604rdwDnRpcggvOBD/5GhVSZdBQjCnYX8f8k6go/zB1aBER31lA184g7r2+zFolsfAisAoIk4snesuvjm/VlPxYgtZS6ufWp6VqqeL84Zck=
+	t=1749133747; cv=none; b=MGE9RlnQ2VJgarO28fNIf7XdhNzWRREnNoLlrJfnZE9qfbx8pL9psujRIRCeK+JFhUBLxDNqatw+O+PbIEaS9hnRlujXPDnMsAndfPrNII7KF1ul8Pi4qtNZrO0dyqJe828utL6SJ5wH2skNB2kVUOnAXnHfjkjfSD6B9ICK5Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749133620; c=relaxed/simple;
-	bh=9fk/3Oz9gPgVIBGOnImSXDZRYWS8R1Y9PTaxKv3SZK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RGTjWfLOTeNbf4MBfaPjWuIgY+As8DClbkg4Ac95RLocYCg5rvTRpVZxOso5AuFRwHOM1GDnamhPK8M1fMsmicNtCmvxNHQvfRj073LLnt0EoOUCNPpKoMDHDvYEoU8qOsG34Difw9opLdP54BNmQm8k8bI+XWyWicUzJk8PTO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYfmLHQN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749133747; c=relaxed/simple;
+	bh=SAK1eCG6q30aTdJmw9lTFOqLAVILbrbvQ+z1shYGO1I=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=bmu9FuKTuPakRWOog/nDHvOvcVXvSrRBg/TfWUAsKj3F5h0qQAe5hEXA5c78ld9IaxMxBn9d8K1xf9GIUMIYtYHv94/ObujtMTI4qXpZQb2FEvrqwLtNGDczjUTqRUeYLmMYUyRMoSfEn6Zo5ctks6SW7nqzzZgrqO9Ab3RxDI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZe/8R3A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYfmLHQN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692ABC4CEE7;
-	Thu,  5 Jun 2025 14:26:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZe/8R3A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A88C4CEE7;
+	Thu,  5 Jun 2025 14:29:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749133619;
-	bh=9fk/3Oz9gPgVIBGOnImSXDZRYWS8R1Y9PTaxKv3SZK8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QYfmLHQN7pp96OLm+u3e2mGl0psx680Dq28osy6lNES0Ryda0kYM7cBISUNtHiUW+
-	 DZTIBaZLMHTHvx0NLxgOONYGZHYxw1kuciH5LdUfpWLm66q/9kTIzLJRWTpuJ6m1PE
-	 oPeFpNyZo2qWiu/v+YD1VTNbTYPnWx2cOMeyuw9mHk9FY3chLK4yiY9UayYhVBZnzv
-	 JXCMUxlqvtZxuL6b1NZ53YYGJPbzBDtp7eAKSh6PVCJLvWB+GcIcAZGBfvfUkvZd1X
-	 fEhmDyLrOzrmvIfYldb+8MZ9VgOk6aIH6UkVdWpef/xyQY++hljxRBS1Fd4foanEsF
-	 uffFOBUyVaR5w==
-Date: Thu, 5 Jun 2025 07:26:41 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ingo Franzki <ifranzki@linux.ibm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
-	freude@linux.ibm.com, dengler@linux.ibm.com
-Subject: Re: CI: Another strange crypto message in syslog
-Message-ID: <20250605142641.GA1248@sol>
-References: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
+	s=k20201202; t=1749133746;
+	bh=SAK1eCG6q30aTdJmw9lTFOqLAVILbrbvQ+z1shYGO1I=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=nZe/8R3AcLEvnjMDtpcPxvHPl9htAqqxUfWnCfPeVtEALXURX+X1eClc/1kxSL/t3
+	 NRjS70aAIVd1HT7OY8CQpCz7SUdsExAatXnNB7ZMw3AEljwwKzLP2WpTbFaOy/hxQ1
+	 BzDi2pF+eiO8CV47eTDm5heAYVVTjA4+Eqrrrvffyfwgd5daxBP9lzUVEmbFDt1kKZ
+	 6z2MlnTwVMPQUt7up3R2VKF8ru8O1rJZ7S1+l258aXwYlPkhSQioz/WAhYplUay7wC
+	 m5ZXUn7HgxyqAP6DtwIuXblxH3uKBGPV8B2bUBcov9tqrHDOt6sZRpULu/60SYe8Gp
+	 l2cKYrev88IWw==
+Date: Thu, 05 Jun 2025 09:29:04 -0500
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Frank Li <Frank.li@nxp.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, imx@lists.linux.dev, 
+ Fabio Estevam <festevam@gmail.com>, linux-kernel@vger.kernel.org, 
+ Shawn Guo <shawnguo@kernel.org>, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Conor Dooley <conor+dt@kernel.org>, 
+ Gaurav Jain <gaurav.jain@nxp.com>, "David S . Miller" <davem@davemloft.net>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, linux-crypto@vger.kernel.org
+To: John Ernberg <john.ernberg@actia.se>
+In-Reply-To: <20250605132754.1771368-4-john.ernberg@actia.se>
+References: <20250605132754.1771368-1-john.ernberg@actia.se>
+ <20250605132754.1771368-4-john.ernberg@actia.se>
+Message-Id: <174913374447.2520926.5612887459467477896.robh@kernel.org>
+Subject: Re: [PATCH v4 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
+ domains for iMX8QM and iMX8QXP
 
-On Thu, Jun 05, 2025 at 01:26:34PM +0200, Ingo Franzki wrote:
-> Hi Herbert,
+
+On Thu, 05 Jun 2025 13:28:02 +0000, John Ernberg wrote:
+> NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
+> resource management.
 > 
-> we see the following error messages in syslog on the current next kernel: 
+> Add compatible strings for these SoCs (QXP and DXP gets to share as their
+> only difference is a core-count, Q=Quad core and D=Dual core), and allow
+> power-domains for them only. Keep the old restriction for others.
 > 
-> Jun 05 13:15:20 a35lp62.lnxne.boe kernel: basic hdkf test(hmac(sha256)): failed to allocate transform: -2     
-> Jun 05 13:15:20 a35lp62.lnxne.boe kernel: alg: full crypto tests enabled.  This is intended for developer use only.
+> Signed-off-by: John Ernberg <john.ernberg@actia.se>
 > 
-> The first one seem to be failure, but I can't tell where..... I don't see any other typical selftest failure messages.
-> -1 is ENOENT. It might be related to the recent changes with sha256 being now in a library...
+> ---
+> 
+> v4:
+>  - Reword commit message (Frank Li)
+>  - Add explicit imx8qxp compatible (Frank Li)
+>  - Move the job-ring constraints back to the job-ring section under an
+>    'allOf:' to avoid the warning from v2 (Rob Herring)
+> 
+> v3:
+>  - Fix warnings discovered by Rob Herring's bot
+>  - Declare the compatibles correctly (Krzysztof Kozlowski)
+> 
+> v2:
+>  - Adjust commit message (Frank Li)
+>  - Only allow power-domains when compatible with imx8qm (Frank Li)
+> ---
+>  .../bindings/crypto/fsl,sec-v4.0.yaml         | 41 ++++++++++++++++++-
+>  1 file changed, 40 insertions(+), 1 deletion(-)
+> 
 
-No, it's from the following commit:
+My bot found errors running 'make dt_binding_check' on your patch:
 
-    commit ef93f1562803cd7bb8159e3abedaf7f47dce4e35
-    Author: Herbert Xu <herbert@gondor.apana.org.au>
-    Date:   Wed Apr 30 16:17:02 2025 +0800
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml:115:17: [warning] wrong indentation: expected 18 but found 16 (indentation)
 
-        Revert "crypto: run initcalls for generic implementations earlier"
+dtschema/dtc warnings/errors:
 
-That moved the crypto_shash support for hmac and sha256 from subsys_initcall to
-module_init, which put at the same level as crypto_hkdf_module_init which
-depends on it.
+doc reference errors (make refcheckdocs):
 
-I guess we just move crypto_hkdf_module_init to late_initcall for now.
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250605132754.1771368-4-john.ernberg@actia.se
 
-> The second one is probably because the full selftests are now enabled by
-> default. Does it make sense to output this message now anymore at all? 
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
-The crypto self-tests remain disabled by default; there's just no longer a
-difference between the "regular tests" and the "full tests".  The warning makes
-sense to me.  There should be an indication that the tests are running since
-they take a long time and should not be enabled in production kernels.
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
-If this is s390, arch/s390/configs/defconfig has CONFIG_CRYPTO_SELFTESTS=y.  Is
-that really what you want?  I tried to remove it as part of
-https://lore.kernel.org/linux-crypto/20250419161543.139344-4-ebiggers@kernel.org/,
-but someone complained about that patch so I ended up dropping it.  But maybe
-you still want to remove it from arch/s390/configs/defconfig.  There's already
-arch/s390/configs/debug_defconfig that has it enabled too, and maybe you only
-want tests enabled in the "debug" one?
+pip3 install dtschema --upgrade
 
-- Eric
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
