@@ -1,136 +1,133 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D89920F09A;
-	Fri,  6 Jun 2025 10:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDD22045AD
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Jun 2025 11:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749207517; cv=none; b=IpIiVfTkFaR6zOliDjta1T9SBxoReVf4DC/83k9p7alekYJBuPE9QZbh/RPhK3woiYPkiy7B9QVkJw7mnHv5S7IoERZa3gx2tFwVZ/aL8XHTJVLovRlMfwPQIsML17E9o4JAeGUmHNfNvG/LLfIiYyWEa0jEMVHVU32cZZJmDvk=
+	t=1749207766; cv=none; b=Td7If+VRGihyZNdccxg8wP1FFPs04aiBKKKeraj74pJYY5TdhhAPlYPfBMeGd8Q1UodHm1Q7XYkCnuYc2GRsO/A6sc82lO7uv85XmIqWdCSPlQDnmWcJGkkDuF68ZqbTU8oZKEJRVmkrtKjwrofHhiM7hMusStckM6KDjNGUHj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749207517; c=relaxed/simple;
-	bh=6rTR5qhArzs7JaDLfBWlMMihigZBq70sto6kq9gME/c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kt99+BcupHk1PHnJ1FBvB8v8o1pV1IVcwjmf0U1XFH2eYIWtL+pOYqWrPJofCWKZxMuK8b0Vu2OYuVlkcfvPeQbIQSSrw4FwQADZPoOM4g2uHFvamhCik6AmB92zZzaGPxh+rCqUq8e5HuMgGmkqJkx3bMo6ZJ5g99fEItiXAlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=B5L6he+B; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1749207766; c=relaxed/simple;
+	bh=sozKJ1pwU9KulGgyEdYs/zM27kuoxVEnTkT5+Zsz6DA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BSN/SjaD710SHOCprfGw2Gvmb8SqIPmyjOMmVUrlpU3JRVL8rXO3Gduurt3vvJyCKA8j5qVMnce14TcXduCcJsIE2h5u/FQNV/fWkWpaujQDPe8o2odOyEmFtidyBY4qFu0Tll2niyeZ5bS5YCKv5eLhQDZKOn4Tzo0DzS1MoCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=bgLhgynR; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="B5L6he+B"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5568GdVH024322;
-	Fri, 6 Jun 2025 10:58:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=HvybIUrky2Ylqll0vNupJS
-	dh61ID7HsNEIdYFcNeiq4=; b=B5L6he+BeOoLW5y9rcyEE5HH711++oMMCPI6hB
-	Wgy2nYxU2RWeg9waBw9qDr4j5+CBZY8j8OcRQJQ1iYia0FKmaDsz/Xu+1I/RAg2N
-	OZKYS0UZWpmTLegdMd/mG+Hx1K0SU6LaF39s0lFxGVVOADPfz1N1Bj7iI34Tbc/P
-	20VAWZnHuUv4irKYySiiEevRVEdcWjlACerURJCvctS2KgVL9LZ1SC9n4eV38qyP
-	gZVYU8jxiaoLOjOPfL0X/IM5XwWBgTRL4Le6NVW7cAl4dedbaxoALgw5w5oFNMCT
-	lA5VKdN/PCmOurvD/AS691cSN1xHcYACMtPo4fJcoydqomtg==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47202whyrw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Jun 2025 10:58:27 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 556AwRip007922
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Jun 2025 10:58:27 GMT
-Received: from hu-utiwari-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 6 Jun 2025 03:58:24 -0700
-From: <quic_utiwari@quicinc.com>
-To: Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <bartosz.golaszewski@linaro.org>,
-        <quic_neersoni@quicinc.com>
-Subject: [PATCH] crypto: qce - Add suspend and resume support
-Date: Fri, 6 Jun 2025 16:28:08 +0530
-Message-ID: <20250606105808.2119280-1-quic_utiwari@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="bgLhgynR"
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e7387d4a336so1911677276.2
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Jun 2025 04:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1749207763; x=1749812563; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ahRtYL+8yDFcivQALpBf2mOu61lf53lXLD7NaXvC65s=;
+        b=bgLhgynRYJXCbIemWLbGKSD0JM+LwkgiES6QeIwuoM8N659Q4sWIZMPLOsMlaA/9/U
+         enBFcl0aFNzt31BPfVMt01cuNZdThraBCOfVipYOruONQ4fryUetYvet/H7ZrPoMPbiU
+         diMeAPTrxOpTW6g5xLXp64KAfB2+iiy2/+IPM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749207763; x=1749812563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ahRtYL+8yDFcivQALpBf2mOu61lf53lXLD7NaXvC65s=;
+        b=LN9uikqxmygk6yVCabK3upsHqmIXXsF+aASlHuiz5IuICg80FZn2aKucLhjv+/EuoH
+         mKRip1B8ALPhcuvWWO/AMwzmswdolCQ39jZOpNl6oNJTf0edhW4JvJaDIKv/c9xXjnoh
+         ir60r7GZ69i+Y/rMoKMlT6teHLj+9qwpc88j0lMyNWODOp1A5zBg9g0sH0VRAJTJWo2J
+         GR0ES71y1IGFua2tyTNkl+KVVD/D+iiT0OqZuWtISN30cB4+xkL5hD8BuDNQo3WeZrY0
+         895JoO3cJcBJPaRTj3VwERpLztivgLBzVZuzqXLlzzAjBXPbMSBsiEhg+c2pDz/k9wLJ
+         8Dmw==
+X-Gm-Message-State: AOJu0YyjPenZ7oUydokw9lOra5N175nYJgIgIPT4kC7biBGJT0TfJwUd
+	MSEAQckpynQMvg51bT0Pn975sEnPT8TlkoPJT972OHlRAFJlMShVOPMog/FKHOigVHcyMKCq7mW
+	phxbOdqDCvyO2G00PMGOfGK18fAVUmjEiGsYRwzFoQQ==
+X-Gm-Gg: ASbGncsdsx3M31Dm4z0xb0JGU8gZ5/53fE/EWbGWbspaYrtUaQedDpRKPZK93v9IIvA
+	v5a2skOriBxdRtn74of4dPSmJJflguJv8r/iPv4wH22L6Ui+1YrmcYu/DEd4i+DhQkD4+dI/zo/
+	OMNzgrmrpTbOfp+9VWuiSNdCuycZHZlxQLng==
+X-Google-Smtp-Source: AGHT+IGPzGcL995Ml8WGyM8F6pt8IT4FINGEryh/hRSPtX851l83sDh2GRSHk3nE//BpH0WioFvDwKZiue7AzRpCHR4=
+X-Received: by 2002:a05:6902:18c7:b0:e7d:ca03:4474 with SMTP id
+ 3f1490d57ef6-e81a21c56b0mr4251268276.36.1749207763644; Fri, 06 Jun 2025
+ 04:02:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: bj5entsUtkRlWHvNPkWVOt36YaJ06O_2
-X-Proofpoint-GUID: bj5entsUtkRlWHvNPkWVOt36YaJ06O_2
-X-Authority-Analysis: v=2.4 cv=Y/D4sgeN c=1 sm=1 tr=0 ts=6842c9d3 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=6IFa9wvqVegA:10 a=COk6AnOGAAAA:8 a=HUDAnx6uG5BSWO10QkMA:9
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA2MDA5NyBTYWx0ZWRfX0/ebGCBvKFMV
- 8eZWP5WWwuFL9O9xIHEcJwT2+jehTdvOEPoUTXqrThpYVAtR1tb5TBuI4Y3Jn8cTqhJrQ8R99he
- WeKZf8eY16ykJuTYKPflCzn1smeZ8Mqla30raHnCeSEuapyOsMRHVGpm7v/Or1ZuPgNxE2kddhw
- 4UF4l0yYwQc9r8v0qeNTaY3mjlkdaXzfPkolVX8KWpu3GHWqFnJF9amnMRqkoSuCMyUhL4uoKpf
- ZJ1TeDPUiHp9Q81/Bx7aU/FhPggeIBOx8BnDpVPfmi7BD2Ay6vbNEXls1XHmFcMuqG7naG3C/XR
- GYuyRCdbxtiJ7Sk9SNRIXWwyXM8+VWjxxWnO1bkO2ZweDvkB6a/oB5Z2IVyqxEASDNAvi4ARX5u
- tfXCZMrCwXzpcQpxDjdO7s3paepn+6cKp5WvU1cfde5irQoR9pqdfdPSK6vuC53+zjzN/0Y6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-06_03,2025-06-05_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 priorityscore=1501 spamscore=0 adultscore=0 impostorscore=0
- lowpriorityscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
- bulkscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506060097
+References: <20250602053231.403143-1-pavitrakumarm@vayavyalabs.com>
+ <20250602053231.403143-2-pavitrakumarm@vayavyalabs.com> <fae97f84-bdb9-42de-b292-92d2b262f16a@kernel.org>
+ <CALxtO0mpQtqPB0h_Wff2dLGo=Mxk02JJQkK4rn+=TuScNdSfxQ@mail.gmail.com>
+ <3570be5b-cb20-4259-9a9b-959098b902d0@kernel.org> <CALxtO0mH=GwhQxQBsmMQYd+qgAue9WxXN1XWo9BncVJvJk6d8A@mail.gmail.com>
+ <cd6e92af-1304-4078-9ed7-de1cb53c66da@kernel.org>
+In-Reply-To: <cd6e92af-1304-4078-9ed7-de1cb53c66da@kernel.org>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Fri, 6 Jun 2025 16:32:32 +0530
+X-Gm-Features: AX0GCFsCPqpKREAd4CvP0DqZO_E5hMC88EBV6qNiDOowkNyZIs0O6qWj-K7X0KI
+Message-ID: <CALxtO0mVMTWqidSv7LQSQd-rA_TmJy_0xgBSd=mP27kg=AXQRg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/6] dt-bindings: crypto: Document support for SPAcc
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, Ruud.Derwig@synopsys.com, 
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Udit Tiwari <quic_utiwari@quicinc.com>
+Hi Krzysztof,
+  Appreciate your inputs and feedback. My comments are embedded below.
 
-Add basic suspend and resume callbacks to the QCE platform driver to
-manage interconnect bandwidth during system sleep and wake-up cycles.
+Warm regards,
+PK
 
-Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
----
- drivers/crypto/qce/core.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+On Wed, Jun 4, 2025 at 7:37=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.org=
+> wrote:
+>
+> On 04/06/2025 14:20, Pavitrakumar Managutte wrote:
+> >>
+> >>>>> +
+> >>>>> +  snps,vspacc-id:
+> >>>>> +    $ref: /schemas/types.yaml#/definitions/uint32
+> >>>>> +    description: |
+> >>>>> +      Virtual SPAcc instance identifier.
+> >>>>> +      The SPAcc hardware supports multiple virtual instances (dete=
+rmined by
+> >>>>> +      ELP_SPACC_CONFIG_VSPACC_CNT parameter), and this ID is used =
+to identify
+> >>>>> +      which virtual instance this node represents.
+> >>>>
+> >>>> No, IDs are not accepted.
+> >>>
+> >>> PK: This represents the specific virtual SPAcc that is being used in
+> >>> the current configuration. It is used to index into the register bank=
+s
+> >>> and the context memories of the virtual SPAcc that is being used. The
+> >>> SPAcc IP can be configured as dedicated virtual SPAccs in
+> >>> heterogeneous environments.
+> >>
+> >> OK. Why registers are not narrowed to only this instance? It feels lik=
+e
+> >> you provide here full register space for multiple devices and then
+> >> select the bank with above ID.
+> >
+> > PK: No, we cant narrow the registers to only this instance since its
+> > is just a single SPAcc with multiple virtual SPAcc instances. The same
+> > set of registers(aka register banks) and context memories are
+> > repeated, but sit at different offset addresses (i*4000 +
+> > register-offsets). The crypto hardware engine inside is shared by all
+> > the virtual SPAccs. This is very much for a heterogeneous computing
+> > scenario.
+>
+> Then maybe you have one crypto engine? You ask us to guess all of this,
+> also because you do not upstream the DTS for real product. Any
+> mentioning of "virtual" already raises concerns...
 
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index e95e84486d9a..2566bdad5d4a 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -249,6 +249,21 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 	return devm_qce_register_algs(qce);
- }
- 
-+static int qce_crypto_suspend(struct platform_device *pdev, pm_message_t state)
-+{
-+	struct qce_device *qce = platform_get_drvdata(pdev);
-+
-+	return icc_set_bw(qce->mem_path, 0, 0);
-+}
-+
-+static int qce_crypto_resume(struct platform_device *pdev)
-+{
-+	struct qce_device *qce = platform_get_drvdata(pdev);
-+
-+	return icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH,
-+		QCE_DEFAULT_MEM_BANDWIDTH);
-+}
-+
- static const struct of_device_id qce_crypto_of_match[] = {
- 	{ .compatible = "qcom,crypto-v5.1", },
- 	{ .compatible = "qcom,crypto-v5.4", },
-@@ -259,6 +274,8 @@ MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
- 
- static struct platform_driver qce_crypto_driver = {
- 	.probe = qce_crypto_probe,
-+	.suspend = qce_crypto_suspend,
-+	.resume = qce_crypto_resume,
- 	.driver = {
- 		.name = KBUILD_MODNAME,
- 		.of_match_table = qce_crypto_of_match,
--- 
-2.34.1
+PK: Yes this is a single crypto engine, maybe I should have detailed
+that in the cover letter. I will fix that. And what I have pushed in
+the patch is my complete DTS. It might need updating depending on the
+vendor use case, which we are committed to support and maintain here.
 
+>
+> Best regards,
+> Krzysztof
