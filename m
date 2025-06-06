@@ -1,258 +1,166 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2082.outbound.protection.outlook.com [40.107.243.82])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F304F36D;
-	Fri,  6 Jun 2025 06:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749190423; cv=fail; b=rz1T1cJpfoqHscBOQs+nvi/cRTwHSfYI5WE+c6JiBIOduUmmGlTvtg481RE55JC93mKTFFQxVY4cqwYi0h1Ng1u+Ee45v8LBxiet4PIadstuknOSAZ5YpBWaTtTrfgFmMI7ciElyZU2gTamyGh+ITGMtWxXDzDGZpsLt4MVoTzM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749190423; c=relaxed/simple;
-	bh=OivBTTg9+7FEb4909RJd9avSkXY07u2zpj6oQ8jW9ww=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rEfiD4kEoBjoUgEe77QNf48xMiPIp76Jzl7ZYdGRLip74r1+GYt96S58EzDjnX4e+NWu+kTuZULUSLza6wARktQ/sPp0f1V8iadTooltJ2dPtXi9eTEfmn9bW5Hkk0S1XoOrnoVSvRvFdcL0B9ioDM2n/wZlNPmVFNqM86Otzq8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BLn1ublB; arc=fail smtp.client-ip=40.107.243.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085223596A
+	for <linux-crypto@vger.kernel.org>; Fri,  6 Jun 2025 07:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749194378; cv=none; b=n6JH/gOsocN5a3KSO8jx3kaFqR16/wIbci5DyH/2WzQzcpLUd4SvevHbC5wfbj3qo4p9Cq72x5xf+zJEkDDjfwSnESjghZ1NxfYyC4WEec7nBErX9h1DFO7Z2NNnD+HhZbNn8dbf0c0ZMG6nDZi3iMocV+cnchbNIjnDaG3Ii9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749194378; c=relaxed/simple;
+	bh=T/ql8rJvxDj2UlFWx6OlfUXdimfGfwJbm8DbCK0CZiE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=QzIJPV+qDr7/ev/ZzPcVAwPZtV+TrJNpdOSrW5m10DhRtCdXHg91c1oFM2W31JnljvMkPQelx+eLe9D4GviVRfNlVMPQ5caqS6PROSfjFXKAEai+drDg5olhq4h10w2p/hHCcZsGXf5IeJwf4TUX/j/tsgTyG/0jq3WdIc9Hz98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eVUARr+7; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BLn1ublB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IPsrVLv/jDn8PRMij67nzASL1uXp99Wwf6NgzokBp80tPyMsSZ1m1NRSAKsC9UAVZIRsNCO96M7plyW7R2pqH/exuhCu7zUDrrKpYD4GldiGbasUwm4J25Li8iT2VMhsM48EAhyDzEEmfZXQpDd0Erh5LUJvC6d8WgGjdmW/uaZ90wa3NkXXIF0OtFjiAnl0oCCbugFoD2ZlMhLY9PNy6MHeq4MteQOf96YPhhgr07wNPQe/XcVvdJzOoD9/w/R31dUcvpbrZv6Y2us3OyARMVIlSzd8OA8+CNRYtrc2gypy6NpnUzKSaIDIl1F6i9aH7//rQD2MvpfbNzo+49EIsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=73rJTSj5A+NleqSHeoCTbb8uujln46EPncHTF4ME8tg=;
- b=KnqIkm0JKbHm9cBofEa+PrwVlVLxD9kDYO8T5+2Q0FM/bffkA9bAjgdFhjRZCNuHED6Fm85Xh8oR17UJlfWLL7lt39M/h4g3vVSe0YS+ovmN07NVWjUqSrDXlLuvQReItJNBcX67vnvoELxjhcfI0KCTjDZFGqUGDXZD2rrwGUo1n7FhS3agaBz1HhbrDYLmvLW7m4Nmn+WSrJcrxFTOw7VMnsZIc06x6olAb859F2+nk0+WTsC7w5ej7PCTAS727CQjJO263DEhVNpvIg6Sn+qIyMX64sfy2YqWYdRLN5U3Wr3nBx1CGxujmtzK7JIQMQ33vSmtP6T1Q2hoMu96SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=73rJTSj5A+NleqSHeoCTbb8uujln46EPncHTF4ME8tg=;
- b=BLn1ublBf56DiK3nWEm+MdY+f5QzyfDahZeNsUWowfWMAy5V1a02yRIBhlaH6rnb4ggZafsgnZqOZ9Ey5GTvujmK22z7Gc7HXr4+xfNuA4NFyrMf6qdxAabZGswYzXXxspoO/g10s/mHzLp+39NoWaFM8dZH/dLpfIkpe9ruaag=
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com (2603:10b6:8:1a9::10)
- by CH3PR12MB9281.namprd12.prod.outlook.com (2603:10b6:610:1c8::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Fri, 6 Jun
- 2025 06:13:39 +0000
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb]) by DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb%3]) with mapi id 15.20.8792.034; Fri, 6 Jun 2025
- 06:13:39 +0000
-From: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
-To: Conor Dooley <conor@kernel.org>
-CC: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "Botcha, Mounika" <Mounika.Botcha@amd.com>,
-	"Savitala, Sarat Chand" <sarat.chand.savitala@amd.com>, "Dhanawade, Mohan"
-	<mohan.dhanawade@amd.com>, "Simek, Michal" <michal.simek@amd.com>
-Subject: RE: [PATCH 1/3] dt-bindings: crypto: Add node for True Random Number
- Generator
-Thread-Topic: [PATCH 1/3] dt-bindings: crypto: Add node for True Random Number
- Generator
-Thread-Index: AQHb0I0+SNgKjRpq7kSnxlwWslfjOLPrWfuAgApYHZA=
-Date: Fri, 6 Jun 2025 06:13:38 +0000
-Message-ID:
- <DS0PR12MB93455B069928EF2DB772D970976EA@DS0PR12MB9345.namprd12.prod.outlook.com>
-References: <20250529113116.669667-1-h.jain@amd.com>
- <20250529113116.669667-2-h.jain@amd.com>
- <20250530-gab-vocally-110247b8f60c@spud>
-In-Reply-To: <20250530-gab-vocally-110247b8f60c@spud>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ActionId=eaf15017-b7cb-4ab5-8aea-5685e59b95f5;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=0;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=true;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-06-06T06:09:45Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR12MB9345:EE_|CH3PR12MB9281:EE_
-x-ms-office365-filtering-correlation-id: 47aab24e-51f6-4dcd-478c-08dda4c14775
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?0FSiY4aepbweo3FIUkOZJ7md5b99GGUwUMsAeUVdWXfK+r8YAq7VlM30KOhr?=
- =?us-ascii?Q?/KQzPIp5ZQgUCJxTYRLMLXtKhRg50QeXR1Phe004t+nkVS5ayDB37rqm3Nt/?=
- =?us-ascii?Q?sonGiLqh2Umvy30/O3spI+3Myngy3TDj6FCu+cBfNxPhiaC7BD5fI91OI94n?=
- =?us-ascii?Q?WFMURwlv2KBm/iKOXYc3d78086Lu9h2E4ANx0zrGaAoZOBGLjcvWjmlq95Hy?=
- =?us-ascii?Q?tYihfOVm1Eowt21KFq0I2ag7KbgcU4Mz47wgi759p6XHr9fIAjdMVPRs1LFS?=
- =?us-ascii?Q?bq5nJeeZSY/sZ0FZwe02+qzv1n4bRiOxV4X1Tg6/9Z7SFuoqaERwu+9h4Lj7?=
- =?us-ascii?Q?LX2HyFgZ63u+SGXOFBcEnm85LKZ9ZXN44OMxKyofvE+9FqMNkuyLpeYXrCB9?=
- =?us-ascii?Q?uHp6XDEDGBm4SDaGd99h/I7pg948l9xzGAfDs6GGGXb2jLDarQmQ5etsmajy?=
- =?us-ascii?Q?1jxQnqTkCGlUWCrJk7mKTZG11lBanUyFdKMMhjW0GLgIrYx4ykPb2p3XAX+E?=
- =?us-ascii?Q?ZJ885ScfO8ja4bxMN7dRkqQmqokGMVD80ZPlwY4qQ/3W7h28PwlFEWyyKTKF?=
- =?us-ascii?Q?bZ9viE/lBaEKGkn2nWSwPnq1fDNR0J3ECaXLW/+bUuG/s8KZ5LavodOmvedT?=
- =?us-ascii?Q?zf2p0Qo0vvHuMscB4jXlrCTokGHeo8i2wIWUemegXAjGx5fJIwOxV3VJtW8p?=
- =?us-ascii?Q?B6uZVNWxvNIO1Q3bvLgQxcDwkW1Hc2STyhkhWcD8WOiQ8E9t9d7+NiOcpz4u?=
- =?us-ascii?Q?QPE+dlUT5DPzBlvJpFqv+bOwNtA+j0TY9BdlsygiBWPtwh2Mt5vD/r1icNLx?=
- =?us-ascii?Q?Ql5tjeKOn8TCl8WagzUYyeUEeFPiVX4lR4YgDm410q1c0uAdJO1uIUnQHsJY?=
- =?us-ascii?Q?kS0I2aZTwQW9MWcQ1wSOUpdMegrTqKSK3UKhHuq3Oqd16FjdEIG4Uilu/vya?=
- =?us-ascii?Q?i/NUiBkGwTS5kLJojFIRAjJjLS8VLpFCBBwYpbgCAgSFYj1FUz3v1n1EFq97?=
- =?us-ascii?Q?j9nyEM4h0WU7nnOi+WKzQOzVUj56rDnIRmQiehgsLLkPhQAQrAfyNwnl2TQ9?=
- =?us-ascii?Q?T62ZaFv+6paMiYCCWC1VWF5O6FUb1qhIDGjjGizTAZ+pS6HVG/0vE2P6vQcM?=
- =?us-ascii?Q?ijuHGXFSfEIE4Ky8zJCEzYqK/4Mm3itKyj7STtC4OvgHP8Hvqt4W70XCmkGa?=
- =?us-ascii?Q?wlwuoxD28i6AaczFvAFpxL6GQo4JM0KgEtOS3w7Y6nLNLdLrZnzpzV1LaHcq?=
- =?us-ascii?Q?8xvamHDCEiz/5qD72n4+RrOm6Y7Tud1lU7HDE837X2jDnernbh6zJ3VOFkbi?=
- =?us-ascii?Q?6CmH2XqfE2VMKviILEUA7zCK8S/J6/RbRVanDJAKYnfA6DR46QqLpydPXwS9?=
- =?us-ascii?Q?EsPBW/SgKVWzeoRw8VFOqRvK5P99pENZJq7beLBT+g+INQiOH5mKNF9HpUeB?=
- =?us-ascii?Q?aQ3mdhSzfGney058UTbn3c6iEC9Z69tN?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB9345.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?mCPASIlHCk089+4E0GUWkXDpu0c0pj4h2sOk+haXQNZ3w+XKCcKF5QAS+pUs?=
- =?us-ascii?Q?u4dX3hxoQn8KnszSn+xokzsO0Wtp9TmSIOxzLh+ginhUhr3KnZQyNt0pnFKz?=
- =?us-ascii?Q?u1wGjw2VoKKLeNT/EyQo4och2GwTT45CkSjFSsGbZYlZJjC7DvbBctKnJ+84?=
- =?us-ascii?Q?X9CmWjFeL/yTLPJVXA/tpicQrFemF0RSpAH1TJvKg/0ut75vwamf5Wv4q6C7?=
- =?us-ascii?Q?6Opl3CoZXuSkCHIUZQvonRKgaE1+sDexpOL1a75BOOW6VBrDf7FbenUbr+BX?=
- =?us-ascii?Q?wSe4FpPcRl52xooWnvQLydkmws3qJT1UznqTsmSqXKSvOzrkGdfLZ+Wq2uoz?=
- =?us-ascii?Q?IlQKCR7hZdVaXuwivhUET5lzSfqhVA454k8uBx5T98TxP7DynRtIaqEQ5OEu?=
- =?us-ascii?Q?xwbc2o3eb88xCSLbX8L9G4rbY67oGY3NN/a6ybo3WPE4wKZxYVEYtUO6b9+U?=
- =?us-ascii?Q?HvuAmLN/eneWGgdMAgIeXlr3dFiO70E0/O12tMfyZzZFd2Ui5LkC2SuIbu9V?=
- =?us-ascii?Q?of2mEFHWLRu+KRzzCo8oCIgemFjnB9MqlLpNkATpTOLwsnmuR4SIkQaECzWV?=
- =?us-ascii?Q?ry4MyLOK89toPvP3QAF3UD/keUMvU/Tu36YwBczHcDJmX5ryF2eFkLqpmnqK?=
- =?us-ascii?Q?1SZnYotcWBkBYgXYdodjdVWfQdtzpSRUEJyGeqRP7KOTS3qCWWr1bBTTzvnd?=
- =?us-ascii?Q?5xh3PQVTT6S8m9tLp+xk0t7DwkhCdwAIUhWwaiZRzGK51WeQ7pO2a3CGYpJ2?=
- =?us-ascii?Q?aoSetEUmJksJI/d2JlIKS9MrFNSBSKyt/DsNAdodWAGoCLpn90j+5NSM5j7L?=
- =?us-ascii?Q?aULJo/HgQg6EbxQ/VDGmzhjXRTwCLYAEeeci8pshAl+MVSrYbprBo88UXoJB?=
- =?us-ascii?Q?wZZ5qcKpCUC+wDx4LT0RFweJmTmf49WkAv6rnFhACYSRaHc/vvI7y7v0tHPS?=
- =?us-ascii?Q?qZ6YrjP4zZ5hcrcI0VP2klIfoBX/RH3DfjgrUvCRLOQ8PMMcDwQL0thbB3/f?=
- =?us-ascii?Q?xzPG5T6h9NpoFBYNzM/3E8bJajzYF8zaE8jDaeGIoNPa9y5dDMozfJLdbC7d?=
- =?us-ascii?Q?u60H7XULHQIoHtWz6Sh2RxxrehAOjWn2LDf1c8lGzwYGMlTyWrbrZS243BU+?=
- =?us-ascii?Q?WYc6mW53StlkpGzPKNYyzs4xnj+fpPAod6Miphiryh5c8ueJPFifsYfBaF80?=
- =?us-ascii?Q?9ty5kqktY0D62dwVa3p6jBeEN+Zddn7wW7yeCxUTs6DyRYUDoUphDE5xTrL4?=
- =?us-ascii?Q?XpqX1aE5fTDWDbtkzSqdruqh2giQbRQ1UXxIVl1Nkw8efqoT11dJgFnlZ6VL?=
- =?us-ascii?Q?sv91sUhqaumRXaoz6sDB5oFTdto4azpagCOLqsI9E0UpkWTqfbr6FYh8Cw5O?=
- =?us-ascii?Q?Tjv49V4FuWL7Dlq0+Ml4PpWfVdF/EiVvR51tUBuBcd8YJwq7g8aRQ8FUMflN?=
- =?us-ascii?Q?CjrZNf9wOKI+zKK+RP0KdTSJM4Z5T4ObX1dMrXwXqBCQBlE0fneCMeamdvxx?=
- =?us-ascii?Q?AyHOjv7UkiWbnZNPIArJjuYswW5RtmT9l8cnIXr64ikPWH+fJKKojDf7jTTl?=
- =?us-ascii?Q?s7pwrZc7OjFCQqb498s=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eVUARr+7"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5563iHrw000602;
+	Fri, 6 Jun 2025 07:19:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
+	 bh=pABEG7jkQjvD9VGBSmw9DtZwsEMzOyC8iBj5hWz9Tfc=; b=eVUARr+7ID23
+	B6/pwWWj/bA59sJ1c/kp3pnn2wityml1MpLaHAhO59GaUS0lrwFkVIvs0v6D3n0V
+	wbnanH3qDIfrKOSCgiMJa1pln9g42WTr9XZKEgpgy2D90rBGQNEetMcNRzluXd1Y
+	ewI9TYinHvijBRXGbmPKDqCWpGhHk5xf+eERU4EDR3Y1JryHBrbvvigFmMJRw7F9
+	hXxhpH8BRwJ+abQ1OScyzIpeNK4exNEdw43TyY/wK1/Zp9k9Zx2cUumctqQJ42dA
+	y9NOr1BKd/4EcOWRS8b8fnm2EKq3jk5F3PrLqbGLP/toIuiOaMuiMrV6lvFPisqA
+	BKvsRpcKXg==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47332ypn0g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Jun 2025 07:19:21 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55674Zlf024776;
+	Fri, 6 Jun 2025 07:19:21 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkmra06-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Jun 2025 07:19:21 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5567JKuA29491788
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Jun 2025 07:19:20 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DDD0058050;
+	Fri,  6 Jun 2025 07:19:19 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5891558056;
+	Fri,  6 Jun 2025 07:19:19 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Jun 2025 07:19:19 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB9345.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47aab24e-51f6-4dcd-478c-08dda4c14775
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2025 06:13:39.0889
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CcyaQUCEkTMQ7Oh4A4hvnzJAx/twT/Quip7srCH0myrhAnaqmYPlgLButWMjC/ye
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9281
+Date: Fri, 06 Jun 2025 09:19:18 +0200
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
+        Herbert Xu
+ <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, dengler@linux.ibm.com
+Subject: Re: CI: Another strange crypto message in syslog
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <20250605142641.GA1248@sol>
+References: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
+ <20250605142641.GA1248@sol>
+Message-ID: <66d4c382f0fbe4ca5486ccfa1f0a4699@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2fdqEx9Wp2CX1YzB7XMHnEXRcPMDkL3L
+X-Proofpoint-ORIG-GUID: 2fdqEx9Wp2CX1YzB7XMHnEXRcPMDkL3L
+X-Authority-Analysis: v=2.4 cv=SO9CVPvH c=1 sm=1 tr=0 ts=6842967a cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=FNyBlpCuAAAA:8 a=FRACuIAxF-nezQ5b0g0A:9 a=CjuIK1q_8ugA:10
+ a=RlW-AWeGUCXs_Nkyno-6:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA2MDA2NCBTYWx0ZWRfXyHcXNxOuQwEa HSmoeEbsHN4Wj2TljYH2eVYUg78mINMuRAb2ib0L9xOTBkkHptNswKfE0SpWFMjNxQupHlFJ0r5 +J2Iu8JyiUagXjs313APubg7FZDvPFi0q+MhbytUQwlTxxC1UynF0SQZJhfM2I/fJ8AZg0CVajE
+ pbkdHAOFzU56cKfncetG4XSUnyj5qnv0wKyh2FWk11JD0wxrR3H0BzpHYG+C3kqNZlL/qOCIC4z Op+OSXYwlDeexmx4RobQWXo0LymJFmAfxoJKQW+TvQUHSpBOgd5Rnz7W1WTtAq70jeh4KlfVCaK RVggjc3JPmwMivkw4YHPr90MAlrM/RqNFiyOjZCbx48UO0XsX/v0wQtmWVGjwbZiJ47PHuApPK7
+ sPwN9YAKCeNaDLL/wRQz16zXoNe29n9Xg78/JrQTuYRVES7dxXB6YVY8c/fNiY9/qqOLZZoe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-06_01,2025-06-05_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ mlxlogscore=999 clxscore=1015 spamscore=0 lowpriorityscore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506060064
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+On 2025-06-05 16:26, Eric Biggers wrote:
+> On Thu, Jun 05, 2025 at 01:26:34PM +0200, Ingo Franzki wrote:
+>> Hi Herbert,
+>> 
+>> we see the following error messages in syslog on the current next 
+>> kernel:
+>> 
+>> Jun 05 13:15:20 a35lp62.lnxne.boe kernel: basic hdkf 
+>> test(hmac(sha256)): failed to allocate transform: -2
+>> Jun 05 13:15:20 a35lp62.lnxne.boe kernel: alg: full crypto tests 
+>> enabled.  This is intended for developer use only.
+>> 
+>> The first one seem to be failure, but I can't tell where..... I don't 
+>> see any other typical selftest failure messages.
+>> -1 is ENOENT. It might be related to the recent changes with sha256 
+>> being now in a library...
+> 
+> No, it's from the following commit:
+> 
+>     commit ef93f1562803cd7bb8159e3abedaf7f47dce4e35
+>     Author: Herbert Xu <herbert@gondor.apana.org.au>
+>     Date:   Wed Apr 30 16:17:02 2025 +0800
+> 
+>         Revert "crypto: run initcalls for generic implementations 
+> earlier"
+> 
+> That moved the crypto_shash support for hmac and sha256 from 
+> subsys_initcall to
+> module_init, which put at the same level as crypto_hkdf_module_init 
+> which
+> depends on it.
+> 
+> I guess we just move crypto_hkdf_module_init to late_initcall for now.
+> 
+>> The second one is probably because the full selftests are now enabled 
+>> by
+>> default. Does it make sense to output this message now anymore at all?
+> 
+> The crypto self-tests remain disabled by default; there's just no 
+> longer a
+> difference between the "regular tests" and the "full tests".  The 
+> warning makes
+> sense to me.  There should be an indication that the tests are running 
+> since
+> they take a long time and should not be enabled in production kernels.
+> 
+> If this is s390, arch/s390/configs/defconfig has 
+> CONFIG_CRYPTO_SELFTESTS=y.  Is
+> that really what you want?  I tried to remove it as part of
+> https://lore.kernel.org/linux-crypto/20250419161543.139344-4-ebiggers@kernel.org/,
+> but someone complained about that patch so I ended up dropping it.  But 
+> maybe
+> you still want to remove it from arch/s390/configs/defconfig.  There's 
+> already
+> arch/s390/configs/debug_defconfig that has it enabled too, and maybe 
+> you only
+> want tests enabled in the "debug" one?
+> 
+> - Eric
 
-> -----Original Message-----
-> From: Conor Dooley <conor@kernel.org>
-> Sent: Friday, May 30, 2025 9:42 PM
-> To: Jain, Harsh (AECG-SSW) <h.jain@amd.com>
-> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; devicetree@vger.kernel.org; Botcha, Mounika
-> <Mounika.Botcha@amd.com>; Savitala, Sarat Chand
-> <sarat.chand.savitala@amd.com>; Dhanawade, Mohan
-> <mohan.dhanawade@amd.com>; Simek, Michal <michal.simek@amd.com>
-> Subject: Re: [PATCH 1/3] dt-bindings: crypto: Add node for True Random Nu=
-mber
-> Generator
->
-> On Thu, May 29, 2025 at 05:01:14PM +0530, Harsh Jain wrote:
-> > Add TRNG node compatible string and reg properities.
-> >
-> > Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
-> > Signed-off-by: Harsh Jain <h.jain@amd.com>
->
-> The signoff chain here looks wrong, since there's no From: field in the
-> patch, meaning that you are the author and submitter, but the order of
-> signoffs suggests that Mounika is the author. If you are in fact the
-> author and submitter, what was their role?
-
-Author should be Mounika. I will add From: Mounika Botcha <mounika.botcha@a=
-md.com> in next version.
-
-Thanks
-
->
-> > ---
-> >  .../bindings/crypto/xlnx,versal-trng.yaml     | 36 +++++++++++++++++++
-> >  1 file changed, 36 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,versa=
-l-
-> trng.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.=
-yaml
-> b/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
-> > new file mode 100644
-> > index 000000000000..547ed91aa873
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
-> > @@ -0,0 +1,36 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/xlnx,versal-trng.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Xilinx Versal True Random Number Generator Hardware Accelerator
-> > +
-> > +maintainers:
-> > +  - Harsh Jain <h.jain@amd.com>
-> > +  - Mounika Botcha <mounika.botcha@amd.com>
-> > +
-> > +description:
-> > +  The Versal True Random Number Generator cryptographic accelerator
-> > +  is used to generate the random number.
->
-> I would be surprised if the random number generator did not generate
-> random numbers. I think you can probably just drop the description
-> entirely in the future
-
-I will update the description
-
->
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: xlnx,versal-trng
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +required:
-> > +  - reg
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    trng@f1230000 {
->
-> "rng" I think is the standard node name here, since you need to respin
-> to fix the signoff chain.
-
-
-Sure
-
->
-> > +        compatible =3D "xlnx,versal-trng";
-> > +        reg =3D <0xf1230000 0x1000>;
-> > +    };
-> > +...
-> > +
-> > --
-> > 2.34.1
-> >
-> >
+Looks like we have no other options than disabling the selftests in 
+defconfig.
+We have debug_defconfig - with all the now huge set of test running in 
+CI.
+But for my feeling it was making total sense to have a subset of the 
+tests
+run with registration of each crypto algorithm even in production 
+kernels.
+However, as wrote ... there is no choice anymore.
