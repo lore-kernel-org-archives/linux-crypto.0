@@ -1,162 +1,262 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8ACE207669
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Jun 2025 11:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8F91EF389;
+	Sat,  7 Jun 2025 20:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749296661; cv=none; b=utRvMs5Zltbivs+U4mbL8Bd1l6XJ1Vky8OPx1fXDxoNwJXfmaxShpRu7EPVgTmaK1Kmu74QIKcd6wy+mHltCoGazXzyMBu7uPekJOBokUj6fCxMfTlS2l7VntDrNBgb8nQPaNRCMhIInzj8ceJPL4CtZQrokqV5TLTLngPg0n+o=
+	t=1749326848; cv=none; b=U8yCB9iiD1+qZOhPQ619EqMfciRoIq5JLp6PNmDofz95lDckYGvngzhddNPC7haaYtttsalZxM8YuHU4wnd5xbXyK+cH2JrWkN+ibxHee8N7PuJBZ7yPP5KEFxA00ESQLIp0fozE6BP6HPdAC7WxxowtpBHoTrGARoNzID7/WqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749296661; c=relaxed/simple;
-	bh=gv0tMOWwWLz9TNHcfO9BCckdP/os8K0yPX8V/NxNjNw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tIdjSK9+Jj7E2TNu//eA4pC9uEOH9wCvGnh1CR6zkWzdX0Y1vQORPb1yzQ2DejwaLnFQA89DbRDm529CCgzJqVH78ZSwpIK//G96D1Ou8tByNVnBN3+2PzmAnIlvtiEmhityBda/vBqzv5mqQUuJ9dMMUF1YEkEhXLq/X++gSfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=i4h6b5Sj; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+	s=arc-20240116; t=1749326848; c=relaxed/simple;
+	bh=8ysByzQduGckfXH5YPNhqS7N079XpguFcwm0rjzocS8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qoKrWKk3CJpCS5h0cb76UHd90VyjGoDhybKeXJPhuKGQdfriz5g2A8ZgitlL7Bm1UAeL2SLjUGBCuI0RHh3hPaPaHqxoVlY2qgkJuDSB6GihZyp0+tWckkLdo5NWiTn5wU1YUemFuPurVkLrgotkqJ2MynNbI/eWWMKAr+nvHdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gRoV1HUb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="i4h6b5Sj"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-addda47ebeaso559226166b.1
-        for <linux-crypto@vger.kernel.org>; Sat, 07 Jun 2025 04:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1749296658; x=1749901458; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UymOFrjabx3ry9XfCk+Bu/z/xm63u4bINQR9bUcHuP0=;
-        b=i4h6b5Sj1/YxVOjsQpWrQtiCtX/BGlwKU9/b/q6azV5AdMlEYDWzNLz1EkCW4FjZth
-         gaWuXsQzF1smqwdbyx0HC+6oYmwYmtkk6geJFzhI/gqy5I2uiERo0uHu2bvtRDjaUbcA
-         blUjLMdow0fM8qt+yIdPUoA023Bb6R7kYtRAdz1uAtUKO1jz7MX7e6NP2EM6BVbmqXjI
-         Yihd8/WLrq2PbkKG79xt2GxYzAJEH0fZkQ4zTzi4zssEEL2dLomWETMGWernt69AOk0/
-         l+NRhwR1HrTJ6hbJLlFHNWohCyhCDiQPdO5OuhpvaYmaD4Go7xaRU3PB1KBI6lEzVS4H
-         xxKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749296658; x=1749901458;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UymOFrjabx3ry9XfCk+Bu/z/xm63u4bINQR9bUcHuP0=;
-        b=xFcRYBlKcJn4EUclycpanOwVQCxvOkw+dNLgx2ZqIKeS+uNH6qEMT3eXLIclsJnvOa
-         B8t5KoB2I/NMCJ5zp3puZJBILYaaUR/6t1n1P8wII6IZg6esNhGxZSuhyJtDepofOTwm
-         SdeoRTXjSPdHH7whav9/Ypb2qjh/nLGbTR35ialYkenWX/FJKv2h/dNWUEmoU7P6aKDh
-         /zsUSj4voebNy/XF1Rf4Fl6sgZcwO99lW0gaoFb8Mi2AOsFyglYrjsz4ktHtxKiXH1lz
-         XxFDfGgmR4UPm6N1v9prp/Ttoix397Ma+jyYGb1xeJsmKxj8IvwL2L+4oEhaOzkpfyuz
-         GgUA==
-X-Gm-Message-State: AOJu0YwNHXNdKi9ybypQwluo8WQjulHcUgqf5l854/QvTRKMElHuaVlu
-	9qmFMY7ZCNXboSBYI/9sFAT4H09d4H+YwTaQpqivJev8jelR8KANGzo3ec1UnJEqT54=
-X-Gm-Gg: ASbGncty920uGx+wQZnX6dWpl+9VGpU4lRkop80dXOt5f2YvMqgGoPhL/3ZwG52r4B9
-	u82lvJ5ioNRXqqJNTCiiH8qCwNXK4fdmq5rmmMEBowpcI+I/2BcI9w+pMQ5bpvJp9h5BRVw9pn0
-	PVeORO1Nmp64ko6gGoCoFJQ+Qv/iZEJaparm//m2INOwARHxkaFdyMcAnmGKk21Fzs2riHRB+ZB
-	E8Jw9O2kEpa6lCVGwRKSincX2lolTfFAyqmBmAzIB2TrWoSCKa0ITxCHXqXPa21W5k7UMQdOPiN
-	XSB8SfKI6f4CAIYyjweclllv3GnrCNKlvifg4mIuTC5aVMkMhxJxi+kEJN5p6nu6/HR3wwE=
-X-Google-Smtp-Source: AGHT+IEA1Rq7VWwYJS4G4kmb+z0nn7gMvEpZQk2GAonFxGlvr7kubnoaKOkM5BseiEpQ88K45+xR8A==
-X-Received: by 2002:a17:907:9713:b0:ad8:93a3:29ba with SMTP id a640c23a62f3a-ade1aa06c53mr606411166b.17.1749296657956;
-        Sat, 07 Jun 2025 04:44:17 -0700 (PDT)
-Received: from [192.168.50.4] ([82.78.167.126])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1d5f9b37sm264185666b.0.2025.06.07.04.44.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Jun 2025 04:44:17 -0700 (PDT)
-Message-ID: <9391cd59-b23a-4df0-9799-e9766adac460@tuxon.dev>
-Date: Sat, 7 Jun 2025 14:44:16 +0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gRoV1HUb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AED56C4CEE4;
+	Sat,  7 Jun 2025 20:07:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749326848;
+	bh=8ysByzQduGckfXH5YPNhqS7N079XpguFcwm0rjzocS8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gRoV1HUb3mHoY0NTYNASmp068PIC0+XHH58cJ1J/iml3lxpURVeKEZfPdxsgVO5/E
+	 TK3DERbIu0ad4NpJR3YGEuSRMtm8k0KjsQ/e1B6ndkfW21OCXr4gvOkwsYwPuN7LH/
+	 4julzDjZZsQKV+2RON+e5sGErNlrupPxAURkSYaOM2C+BkrgAr2ludEhiDvmARNi+k
+	 OIE8uM5VlwuktsCf7eeazyazLOd7RJ842W1OKAjSs1loeQcPjLgsXntgyAhj96Wgjf
+	 gAb3yMih0ZFeI3XRHtMjOILX48N06wdtI+yfb6G24YVDu7SeDfBtRilpxHm1LhCGKV
+	 HbiZlzB1oy8aA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org,
+	linux-arch@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is integrated
+Date: Sat,  7 Jun 2025 13:04:42 -0700
+Message-ID: <20250607200454.73587-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] ARM: dts: microchip: sama7d65: Enable CAN bus
-To: Ryan.Wanner@microchip.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, nicolas.ferre@microchip.com,
- alexandre.belloni@bootlin.com, olivia@selenic.com
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
- <0e34e0416c43f4de6d2cef5cea46087af4577a50.1747077616.git.Ryan.Wanner@microchip.com>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <0e34e0416c43f4de6d2cef5cea46087af4577a50.1747077616.git.Ryan.Wanner@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+
+This series is also available at:
+
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git lib-crc-arch-v2
+
+This series improves how lib/crc supports arch-optimized code.  First,
+instead of the arch-optimized CRC code being in arch/$(SRCARCH)/lib/, it
+will now be in lib/crc/$(SRCARCH)/.  Second, the API functions (e.g.
+crc32c()), arch-optimized functions (e.g. crc32c_arch()), and generic
+functions (e.g. crc32c_base()) will now be part of a single module for
+each CRC type, allowing better inlining and dead code elimination.  The
+second change is made possible by the first.
+
+As an example, consider CONFIG_CRC32=m on x86.  We'll now have just
+crc32.ko instead of both crc32-x86.ko and crc32.ko.  The two modules
+were already coupled together and always both got loaded together via
+direct symbol dependency, so the separation provided no benefit.
+
+Note: later I'd like to apply the same design to lib/crypto/ too, where
+often the API functions are out-of-line so this will work even better.
+In those cases, for each algorithm we currently have 3 modules all
+coupled together, e.g. libsha256.ko, libsha256-generic.ko, and
+sha256-x86.ko.  We should have just one, inline things properly, and
+rely on the compiler's dead code elimination to decide the inclusion of
+the generic code instead of manually setting it via kconfig.
+
+Having arch-specific code outside arch/ was somewhat controversial when
+Zinc proposed it back in 2018.  But I don't think the concerns are
+warranted.  It's better from a technical perspective, as it enables the
+improvements mentioned above.  This model is already successfully used
+in other places in the kernel such as lib/raid6/.  The community of each
+architecture still remains free to work on the code, even if it's not in
+arch/.  At the time there was also a desire to put the library code in
+the same files as the old-school crypto API, but that was a mistake; now
+that the library is separate, that's no longer a constraint either.
+
+Changed in v2:
+   - Fixed build warning on architectures without any optimized CRC code
+   - Fixed build warning in sparc/crc32.h by removing pr_fmt
+   - Moved fallback definitions of crc32*_arch back into arch files
+   - Remove ARCH_HAS_CRC* symbols at end of series instead of beginning,
+     so that they're not removed until they're no longer being selected
+   - Slightly improved some commit messages
+   - Rebased onto other pending lib/crc changes
+
+Eric Biggers (12):
+  lib/crc: move files into lib/crc/
+  lib/crc: prepare for arch-optimized code in subdirs of lib/crc/
+  lib/crc/arm: migrate arm-optimized CRC code into lib/crc/
+  lib/crc/arm64: migrate arm64-optimized CRC code into lib/crc/
+  lib/crc/loongarch: migrate loongarch-optimized CRC code into lib/crc/
+  lib/crc/mips: migrate mips-optimized CRC code into lib/crc/
+  lib/crc/powerpc: migrate powerpc-optimized CRC code into lib/crc/
+  lib/crc/riscv: migrate riscv-optimized CRC code into lib/crc/
+  lib/crc/s390: migrate s390-optimized CRC code into lib/crc/
+  lib/crc/sparc: migrate sparc-optimized CRC code into lib/crc/
+  lib/crc/x86: migrate x86-optimized CRC code into lib/crc/
+  lib/crc: remove ARCH_HAS_* kconfig symbols
+
+ Documentation/core-api/kernel-api.rst         |  14 +--
+ MAINTAINERS                                   |   4 +-
+ arch/arm/Kconfig                              |   2 -
+ arch/arm/lib/Makefile                         |   6 -
+ arch/arm64/Kconfig                            |   2 -
+ arch/arm64/lib/Makefile                       |   6 -
+ arch/loongarch/Kconfig                        |   1 -
+ arch/loongarch/lib/Makefile                   |   2 -
+ arch/mips/Kconfig                             |   1 -
+ arch/mips/lib/Makefile                        |   2 -
+ arch/powerpc/Kconfig                          |   2 -
+ arch/powerpc/lib/Makefile                     |   6 -
+ arch/riscv/Kconfig                            |   3 -
+ arch/riscv/lib/Makefile                       |   6 -
+ arch/s390/Kconfig                             |   1 -
+ arch/s390/lib/Makefile                        |   3 -
+ arch/sparc/Kconfig                            |   1 -
+ arch/sparc/lib/Makefile                       |   2 -
+ arch/x86/Kconfig                              |   3 -
+ arch/x86/lib/Makefile                         |  10 --
+ include/linux/crc-t10dif.h                    |  10 +-
+ include/linux/crc32.h                         |  30 +----
+ include/linux/crc64.h                         |  22 +---
+ lib/Kconfig                                   |  87 +------------
+ lib/Kconfig.debug                             |  21 ----
+ lib/Makefile                                  |  32 +----
+ lib/crc/.gitignore                            |   5 +
+ lib/crc/Kconfig                               | 118 ++++++++++++++++++
+ lib/crc/Makefile                              |  63 ++++++++++
+ .../arm/lib => lib/crc/arm}/crc-t10dif-core.S |   0
+ .../crc-t10dif.c => lib/crc/arm/crc-t10dif.h  |  23 +---
+ {arch/arm/lib => lib/crc/arm}/crc32-core.S    |   0
+ arch/arm/lib/crc32.c => lib/crc/arm/crc32.h   |  38 ++----
+ .../lib => lib/crc/arm64}/crc-t10dif-core.S   |   0
+ .../crc/arm64/crc-t10dif.h                    |  22 +---
+ .../arm64/lib => lib/crc/arm64}/crc32-core.S  |   0
+ .../lib/crc32.c => lib/crc/arm64/crc32.h      |  19 +--
+ lib/{ => crc}/crc-ccitt.c                     |   3 -
+ lib/{ => crc}/crc-itu-t.c                     |   0
+ lib/{crc-t10dif.c => crc/crc-t10dif-main.c}   |  37 ++++--
+ lib/{ => crc}/crc16.c                         |   0
+ lib/{crc32.c => crc/crc32-main.c}             |  69 ++++++++--
+ lib/{ => crc}/crc4.c                          |   0
+ lib/{crc64.c => crc/crc64-main.c}             |  47 +++++--
+ lib/{ => crc}/crc7.c                          |   0
+ lib/{ => crc}/crc8.c                          |   0
+ lib/{ => crc}/gen_crc32table.c                |   4 +-
+ lib/{ => crc}/gen_crc64table.c                |  11 +-
+ .../crc/loongarch/crc32.h                     |  32 +----
+ .../lib/crc32-mips.c => lib/crc/mips/crc32.h  |  33 +----
+ .../crc/powerpc/crc-t10dif.h                  |  20 +--
+ .../crc/powerpc}/crc-vpmsum-template.S        |   0
+ .../lib/crc32.c => lib/crc/powerpc/crc32.h    |  38 ++----
+ .../crc/powerpc}/crc32c-vpmsum_asm.S          |   0
+ .../crc/powerpc}/crct10dif-vpmsum_asm.S       |   0
+ .../lib => lib/crc/riscv}/crc-clmul-consts.h  |   0
+ .../crc/riscv}/crc-clmul-template.h           |   0
+ {arch/riscv/lib => lib/crc/riscv}/crc-clmul.h |   0
+ .../crc/riscv/crc-t10dif.h                    |   8 +-
+ {arch/riscv/lib => lib/crc/riscv}/crc16_msb.c |   0
+ .../lib/crc32.c => lib/crc/riscv/crc32.h      |  17 +--
+ {arch/riscv/lib => lib/crc/riscv}/crc32_lsb.c |   0
+ {arch/riscv/lib => lib/crc/riscv}/crc32_msb.c |   0
+ .../lib/crc64.c => lib/crc/riscv/crc64.h      |  11 +-
+ {arch/riscv/lib => lib/crc/riscv}/crc64_lsb.c |   0
+ {arch/riscv/lib => lib/crc/riscv}/crc64_msb.c |   0
+ {arch/s390/lib => lib/crc/s390}/crc32-vx.h    |   0
+ arch/s390/lib/crc32.c => lib/crc/s390/crc32.h |  16 +--
+ {arch/s390/lib => lib/crc/s390}/crc32be-vx.c  |   0
+ {arch/s390/lib => lib/crc/s390}/crc32le-vx.c  |   0
+ .../lib/crc32.c => lib/crc/sparc/crc32.h      |  42 ++-----
+ .../sparc/lib => lib/crc/sparc}/crc32c_asm.S  |   0
+ lib/crc/tests/Makefile                        |   2 +
+ lib/{ => crc}/tests/crc_kunit.c               |   0
+ .../lib => lib/crc/x86}/crc-pclmul-consts.h   |   0
+ .../lib => lib/crc/x86}/crc-pclmul-template.S |   0
+ .../lib => lib/crc/x86}/crc-pclmul-template.h |   0
+ .../crc-t10dif.c => lib/crc/x86/crc-t10dif.h  |  18 +--
+ .../lib => lib/crc/x86}/crc16-msb-pclmul.S    |   0
+ {arch/x86/lib => lib/crc/x86}/crc32-pclmul.S  |   0
+ arch/x86/lib/crc32.c => lib/crc/x86/crc32.h   |  30 +----
+ {arch/x86/lib => lib/crc/x86}/crc32c-3way.S   |   0
+ {arch/x86/lib => lib/crc/x86}/crc64-pclmul.S  |   0
+ arch/x86/lib/crc64.c => lib/crc/x86/crc64.h   |  21 +---
+ lib/tests/Makefile                            |   1 -
+ 85 files changed, 406 insertions(+), 621 deletions(-)
+ create mode 100644 lib/crc/.gitignore
+ create mode 100644 lib/crc/Kconfig
+ create mode 100644 lib/crc/Makefile
+ rename {arch/arm/lib => lib/crc/arm}/crc-t10dif-core.S (100%)
+ rename arch/arm/lib/crc-t10dif.c => lib/crc/arm/crc-t10dif.h (70%)
+ rename {arch/arm/lib => lib/crc/arm}/crc32-core.S (100%)
+ rename arch/arm/lib/crc32.c => lib/crc/arm/crc32.h (69%)
+ rename {arch/arm64/lib => lib/crc/arm64}/crc-t10dif-core.S (100%)
+ rename arch/arm64/lib/crc-t10dif.c => lib/crc/arm64/crc-t10dif.h (70%)
+ rename {arch/arm64/lib => lib/crc/arm64}/crc32-core.S (100%)
+ rename arch/arm64/lib/crc32.c => lib/crc/arm64/crc32.h (81%)
+ rename lib/{ => crc}/crc-ccitt.c (98%)
+ rename lib/{ => crc}/crc-itu-t.c (100%)
+ rename lib/{crc-t10dif.c => crc/crc-t10dif-main.c} (78%)
+ rename lib/{ => crc}/crc16.c (100%)
+ rename lib/{crc32.c => crc/crc32-main.c} (58%)
+ rename lib/{ => crc}/crc4.c (100%)
+ rename lib/{crc64.c => crc/crc64-main.c} (66%)
+ rename lib/{ => crc}/crc7.c (100%)
+ rename lib/{ => crc}/crc8.c (100%)
+ rename lib/{ => crc}/gen_crc32table.c (95%)
+ rename lib/{ => crc}/gen_crc64table.c (81%)
+ rename arch/loongarch/lib/crc32-loongarch.c => lib/crc/loongarch/crc32.h (71%)
+ rename arch/mips/lib/crc32-mips.c => lib/crc/mips/crc32.h (82%)
+ rename arch/powerpc/lib/crc-t10dif.c => lib/crc/powerpc/crc-t10dif.h (75%)
+ rename {arch/powerpc/lib => lib/crc/powerpc}/crc-vpmsum-template.S (100%)
+ rename arch/powerpc/lib/crc32.c => lib/crc/powerpc/crc32.h (64%)
+ rename {arch/powerpc/lib => lib/crc/powerpc}/crc32c-vpmsum_asm.S (100%)
+ rename {arch/powerpc/lib => lib/crc/powerpc}/crct10dif-vpmsum_asm.S (100%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc-clmul-consts.h (100%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc-clmul-template.h (100%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc-clmul.h (100%)
+ rename arch/riscv/lib/crc-t10dif.c => lib/crc/riscv/crc-t10dif.h (62%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc16_msb.c (100%)
+ rename arch/riscv/lib/crc32.c => lib/crc/riscv/crc32.h (66%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc32_lsb.c (100%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc32_msb.c (100%)
+ rename arch/riscv/lib/crc64.c => lib/crc/riscv/crc64.h (65%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc64_lsb.c (100%)
+ rename {arch/riscv/lib => lib/crc/riscv}/crc64_msb.c (100%)
+ rename {arch/s390/lib => lib/crc/s390}/crc32-vx.h (100%)
+ rename arch/s390/lib/crc32.c => lib/crc/s390/crc32.h (81%)
+ rename {arch/s390/lib => lib/crc/s390}/crc32be-vx.c (100%)
+ rename {arch/s390/lib => lib/crc/s390}/crc32le-vx.c (100%)
+ rename arch/sparc/lib/crc32.c => lib/crc/sparc/crc32.h (60%)
+ rename {arch/sparc/lib => lib/crc/sparc}/crc32c_asm.S (100%)
+ create mode 100644 lib/crc/tests/Makefile
+ rename lib/{ => crc}/tests/crc_kunit.c (100%)
+ rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-consts.h (100%)
+ rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-template.S (100%)
+ rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-template.h (100%)
+ rename arch/x86/lib/crc-t10dif.c => lib/crc/x86/crc-t10dif.h (56%)
+ rename {arch/x86/lib => lib/crc/x86}/crc16-msb-pclmul.S (100%)
+ rename {arch/x86/lib => lib/crc/x86}/crc32-pclmul.S (100%)
+ rename arch/x86/lib/crc32.c => lib/crc/x86/crc32.h (76%)
+ rename {arch/x86/lib => lib/crc/x86}/crc32c-3way.S (100%)
+ rename {arch/x86/lib => lib/crc/x86}/crc64-pclmul.S (100%)
+ rename arch/x86/lib/crc64.c => lib/crc/x86/crc64.h (61%)
 
 
-
-On 12.05.2025 22:27, Ryan.Wanner@microchip.com wrote:
-> From: Ryan Wanner <Ryan.Wanner@microchip.com>
-> 
-> Enable CAN bus for SAMA7D65 curiosity board.
-> 
-> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
-> ---
->  .../dts/microchip/at91-sama7d65_curiosity.dts | 35 +++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts b/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
-> index 53a657cf4efb..34935179897e 100644
-> --- a/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
-> +++ b/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
-> @@ -38,7 +38,24 @@ reg_5v: regulator-5v {
->  		regulator-max-microvolt = <5000000>;
->  		regulator-always-on;
->  	};
-> +};
-> +
-
-Please drop the empty line in a different patch.
-
-> +&can1 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pinctrl_can1_default>;
-> +	status = "okay";
-> +};
->  
-> +&can2 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pinctrl_can2_default>;
-> +	status = "okay";
-> +};
-> +
-> +&can3 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pinctrl_can3_default>;
-> +	status = "okay";
->  };
->  
->  &dma0 {
-> @@ -278,6 +295,24 @@ &main_xtal {
->  };
->  
->  &pioa {
-> +	pinctrl_can1_default: can1-default {
-> +		pinmux = <PIN_PD10__CANTX1>,
-> +			<PIN_PD11__CANRX1>;
-
-The "<" on on this line would have to be aligned with the one on the
-previous line. Same for the other places in this patch.
-
-I can address all these minor bits while applying, if any.
-
-Other than this:
-
-Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-
-> +		bias-disable;
-> +	};
-> +
-> +	pinctrl_can2_default: can2-default {
-> +		pinmux = <PIN_PD12__CANTX2>,
-> +			<PIN_PD13__CANRX2>;
-> +		bias-disable;
-> +	};
-> +
-> +	pinctrl_can3_default: can3-default {
-> +		pinmux = <PIN_PD14__CANTX3>,
-> +			<PIN_PD15__CANRX3>;
-> +		bias-disable;
-> +	};
-> +
->  	pinctrl_gmac0_default: gmac0-default {
->  		pinmux = <PIN_PA26__G0_TX0>,
->  			 <PIN_PA27__G0_TX1>,
+base-commit: 464e77d8417003dfa3b0f556eba0297169483249
+-- 
+2.49.0
 
