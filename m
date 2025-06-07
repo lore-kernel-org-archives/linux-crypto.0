@@ -1,300 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BE27260B;
-	Sat,  7 Jun 2025 03:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200221F5413
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Jun 2025 11:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749266603; cv=none; b=Rsu8CB5+yFazX7T77+qwZ+Vkgs9VdiRk9pytrAhwhqbAXkgL6l7O5+Sf5/T3FxlJxPFmBL2x3m61xdnVzmftB+gZlOgg5hdeWkok7CglINvQodewiTUwJ/DtdHWWfMb1F78AbpeaIU6SmqAbqg6LRbLy7+OFAFOg1w16rCC2n2o=
+	t=1749296452; cv=none; b=bAfVOy5R15Zb+FiUOS1WGPoI7c7b7I4GorQBLOudKf6JfgTLSkB5QKuR5DG+u8S2eG65x7WbutRxDx8TdTBD0qzTiH1yFXiTkgZgXULjinQpidocL9AFFzW7r3rqFZmuAR/NQpk6js3C5x/xLk54/41gC6r+A+WffQDNhHto7dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749266603; c=relaxed/simple;
-	bh=4KkaeERUTza7ud5U3Lid+c15+viOHMNi1hI6jY0buFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BQcj6I1CGx4rcZioZdeKFCb2QhzFNwCJWf2sn09iB7e/cj9ktZ+GXwl+wCFARZwVohL6pWpKocdJdoBfpGgVDKO/LtaHv7kkF2bgpnHFHDnh6ICYf+4Xc6Rw3vGi069tJB7RfXJFlJMWruWDtmiWA+kasOIkPC0Lc/wVW0Jo1Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMDff+EH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749296452; c=relaxed/simple;
+	bh=ubJJtE7i8YMPz9SRvgygJqN81AJ/lnwSeX3JzR7GieA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YUeNSRgShnJIGSrYitUUAsBLYYcT9K+IYn/S/MckN5ZxlPvWHy8kWp9rsCWQ9oBp4p/2PYg8nwKrb0Q2XevJWcfnfOF9hZRSwK+Nq7Zo/9I1qakF5tXqsGlQ3dzFtdMcKS1XAZLyU50VOJdr+hOiQc4RxKNkFx0KIa8sAGf4WRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=EzkfRxVu; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMDff+EH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3135C4CEE4;
-	Sat,  7 Jun 2025 03:23:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749266602;
-	bh=4KkaeERUTza7ud5U3Lid+c15+viOHMNi1hI6jY0buFw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QMDff+EHn50k39KtDFelpVUgwESch/vhZfXQTVvCvvhivYwoQWeZKLhq3t+SOP0UJ
-	 Gfq+fLfIqh/HEnNJGklu9ImPZEHAmK0BbYn/itNv8PfMSopPuGSwu+bkZgPWOTg1G6
-	 jiGy4aNvyhGhIg+qBi7LaeNzYZkr7OZoampwAK2l/Xg6/+K0tYTQqznc2foqkBWatF
-	 cOxBFVzxzAyVb6Zx003H62NTCe3aZLoESxw9ZmRLDSk5XX23jD/gWP8M7j1R/9D8vs
-	 NouM+QcEbhE5eGY/XW0qhkyzYlqXCUt/MftdDmLyNK0aN2crYnNAlIhmdQYMjNK8L5
-	 DqCz70QVCc13Q==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] lib/crc32: remove unused combination support
-Date: Fri,  6 Jun 2025 20:22:28 -0700
-Message-ID: <20250607032228.27868-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="EzkfRxVu"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ad883afdf0cso554379666b.0
+        for <linux-crypto@vger.kernel.org>; Sat, 07 Jun 2025 04:40:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1749296448; x=1749901248; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JiKPxyE+L/mL7ntMB6eAW2AGGkAO+xZvdmfN92Ddt1o=;
+        b=EzkfRxVuzuJi3pL622gzlOW9f+US+z153IKlduDkd2FOWJp6wK7e33ej7Ljvk9niIY
+         +MWoRwBLv3mmE8awEfIVyjrCFtimM7gBo/Y+ZpMCyBVOTFut/yHiNF3K8seYaGFyYi2c
+         Ms7C4oJ8+IfvT5PScg0QtoD+/VG4p1hyd9BB9cMcHbwEKp3LkvAhs6OgWyux7IQaFVd5
+         dS2YfT26JulgirJyW+z1w+CfQ5o2JSHhDwffSVfXlAHrtZ+gc5KX6vfA5nUfsW2/Nw/s
+         /zDAPdyNu4ZpETD5q2eiDXfO06BJC8/nlOvKFb344ZIMagnnAYxRQsD8m/fp42pBhz8B
+         LkBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749296448; x=1749901248;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JiKPxyE+L/mL7ntMB6eAW2AGGkAO+xZvdmfN92Ddt1o=;
+        b=Y0RFyfioT1BNO+djUCzEAO9GLTFUWiCclzx9GIvbH6hZdgS9nyERfJG0XKG8cxUJ6d
+         r+QkQJUuNKxzv7mumb+i9hvEjmqG+CyccRkv23LV8E8gK7+MySMz4y+T5nMRuPKTQQoO
+         XZDN6yi82ousApeNRJc6HHYsPVa6E5JY78nedqKrr1EQhdihPmR9k2g8AK/qd3456DJz
+         W2MVsAglveC3ZiBjvaB79IUY7ibdV75uMVDLMYltkBMORvmvx4aqbO5hrAUS3FnNOjuH
+         RCLzh0MaVQ2WvL1IDZdi7nctbFawEMqK6/S56cpOOkUHNjXbcygJnHDA7AfU2KsU2hvw
+         Vemg==
+X-Gm-Message-State: AOJu0YwmtmwPTLnhOK+lgOZ8g0Qlnsqmc5l5vwXujFOXFx6fvo9Sb22j
+	7FNUsv/331KjFZCNOFj20cZ98FpDHq+8IklMhdyBo/XFUZflO5WjnUPjuO9zc18uLhg=
+X-Gm-Gg: ASbGnctZ+Y4nZRke9G8NkNg6jCTshEgaRSZ9SwO3a4QXRXe/PIcy2RCcHoUArMW9m1d
+	LBP6+s7/rLTWIBUTK21ZjTOs7SObZiYkZO+4HOL6TcwsT94IzQtJi+gBWKuHU8nMXNsoqYiAYKd
+	IeA4zZX4nqQbJLZ8hqJYhnc5kRBi3qwyl/AAmiPTB2QPU853oSYtfesXotc76TB9vr6kuafvQVc
+	GywtidCQeqFpD1zX8339jTk1RFFVKYhVIK5IFDXv3SP6FhiPoILg9og6LnV/Vo4RZCKxann9ks4
+	XhBuKOxf7eiSTMwS2RNrQHTZ6215dl6hxtcMg2vg+PqUVfCuo+auOYCnG1RuO9heH8tDZ1kpuwF
+	U95/1EA==
+X-Google-Smtp-Source: AGHT+IFH+/W+aC/DziM0dgJNs2fwK23eiIJdn/dAFXAJM2ZH6flXjX0d+7niB19viLz/Kl7VwDI7TQ==
+X-Received: by 2002:a17:906:ef0b:b0:acf:15d:2385 with SMTP id a640c23a62f3a-ade1a9fd850mr693582666b.16.1749296448424;
+        Sat, 07 Jun 2025 04:40:48 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.126])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc7b3b6sm268238766b.173.2025.06.07.04.40.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 07 Jun 2025 04:40:47 -0700 (PDT)
+Message-ID: <f03c5c49-e890-428d-9c5c-649bad512170@tuxon.dev>
+Date: Sat, 7 Jun 2025 14:40:46 +0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] dt-bindings: crypto: add sama7d65 in Atmel AES
+To: Ryan.Wanner@microchip.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, nicolas.ferre@microchip.com,
+ alexandre.belloni@bootlin.com, olivia@selenic.com
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <cover.1747077616.git.Ryan.Wanner@microchip.com>
+ <a5509576e211bcf528e088f78e619575a26bbd8f.1747077616.git.Ryan.Wanner@microchip.com>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <a5509576e211bcf528e088f78e619575a26bbd8f.1747077616.git.Ryan.Wanner@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Eric Biggers <ebiggers@google.com>
+Hi, Ryan,
 
-Remove crc32_le_combine() and crc32_le_shift(), since they are no longer
-used.
+On 12.05.2025 22:27, Ryan.Wanner@microchip.com wrote:
+> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+> 
+> Add DT bindings for SAMA7D65 SoC in atmel AES.
 
-Although combination is an interesting thing that can be done with CRCs,
-it turned out that none of the users of it in the kernel were even close
-to being worthwhile.  All were much better off simply chaining the CRCs
-or processing zeroes.
+Would be good to improve the description here, e.g., specify differences,
+similarities b/w SAMA7D65 and SAM9X7 or SAM9G46. Same for other similar
+patches in this series.
 
-Let's remove the CRC32 combination code for now.  It can come back
-(potentially optimized with carryless multiplication instructions) if
-there is ever a case where it would actually be worthwhile.
+Thank you,
+Claudiu
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- include/linux/crc32.h | 25 ----------------
- lib/crc32.c           | 67 -------------------------------------------
- lib/tests/crc_kunit.c | 39 +------------------------
- 3 files changed, 1 insertion(+), 130 deletions(-)
-
-diff --git a/include/linux/crc32.h b/include/linux/crc32.h
-index 8c1883b81b420..36bbc0405aa04 100644
---- a/include/linux/crc32.h
-+++ b/include/linux/crc32.h
-@@ -46,35 +46,10 @@ static inline u32 crc32c(u32 crc, const void *p, size_t len)
- u32 crc32_optimizations(void);
- #else
- static inline u32 crc32_optimizations(void) { return 0; }
- #endif
- 
--/**
-- * crc32_le_combine - Combine two crc32 check values into one. For two
-- * 		      sequences of bytes, seq1 and seq2 with lengths len1
-- * 		      and len2, crc32_le() check values were calculated
-- * 		      for each, crc1 and crc2.
-- *
-- * @crc1: crc32 of the first block
-- * @crc2: crc32 of the second block
-- * @len2: length of the second block
-- *
-- * Return: The crc32_le() check value of seq1 and seq2 concatenated,
-- * 	   requiring only crc1, crc2, and len2. Note: If seq_full denotes
-- * 	   the concatenated memory area of seq1 with seq2, and crc_full
-- * 	   the crc32_le() value of seq_full, then crc_full ==
-- * 	   crc32_le_combine(crc1, crc2, len2) when crc_full was seeded
-- * 	   with the same initializer as crc1, and crc2 seed was 0. See
-- * 	   also crc32_combine_test().
-- */
--u32 crc32_le_shift(u32 crc, size_t len);
--
--static inline u32 crc32_le_combine(u32 crc1, u32 crc2, size_t len2)
--{
--	return crc32_le_shift(crc1, len2) ^ crc2;
--}
--
- #define crc32(seed, data, length)  crc32_le(seed, (unsigned char const *)(data), length)
- 
- /*
-  * Helpers for hash table generation of ethernet nics:
-  *
-diff --git a/lib/crc32.c b/lib/crc32.c
-index 95429861d3aca..6811b37df2aad 100644
---- a/lib/crc32.c
-+++ b/lib/crc32.c
-@@ -23,11 +23,10 @@
-  */
- 
- /* see: Documentation/staging/crc32.rst for a description of algorithms */
- 
- #include <linux/crc32.h>
--#include <linux/crc32poly.h>
- #include <linux/module.h>
- #include <linux/types.h>
- 
- #include "crc32table.h"
- 
-@@ -49,76 +48,10 @@ u32 crc32c_base(u32 crc, const u8 *p, size_t len)
- 		crc = (crc >> 8) ^ crc32ctable_le[(crc & 255) ^ *p++];
- 	return crc;
- }
- EXPORT_SYMBOL(crc32c_base);
- 
--/*
-- * This multiplies the polynomials x and y modulo the given modulus.
-- * This follows the "little-endian" CRC convention that the lsbit
-- * represents the highest power of x, and the msbit represents x^0.
-- */
--static u32 gf2_multiply(u32 x, u32 y, u32 modulus)
--{
--	u32 product = x & 1 ? y : 0;
--	int i;
--
--	for (i = 0; i < 31; i++) {
--		product = (product >> 1) ^ (product & 1 ? modulus : 0);
--		x >>= 1;
--		product ^= x & 1 ? y : 0;
--	}
--
--	return product;
--}
--
--/**
-- * crc32_generic_shift - Append @len 0 bytes to crc, in logarithmic time
-- * @crc: The original little-endian CRC (i.e. lsbit is x^31 coefficient)
-- * @len: The number of bytes. @crc is multiplied by x^(8*@len)
-- * @polynomial: The modulus used to reduce the result to 32 bits.
-- *
-- * It's possible to parallelize CRC computations by computing a CRC
-- * over separate ranges of a buffer, then summing them.
-- * This shifts the given CRC by 8*len bits (i.e. produces the same effect
-- * as appending len bytes of zero to the data), in time proportional
-- * to log(len).
-- */
--static u32 crc32_generic_shift(u32 crc, size_t len, u32 polynomial)
--{
--	u32 power = polynomial;	/* CRC of x^32 */
--	int i;
--
--	/* Shift up to 32 bits in the simple linear way */
--	for (i = 0; i < 8 * (int)(len & 3); i++)
--		crc = (crc >> 1) ^ (crc & 1 ? polynomial : 0);
--
--	len >>= 2;
--	if (!len)
--		return crc;
--
--	for (;;) {
--		/* "power" is x^(2^i), modulo the polynomial */
--		if (len & 1)
--			crc = gf2_multiply(crc, power, polynomial);
--
--		len >>= 1;
--		if (!len)
--			break;
--
--		/* Square power, advancing to x^(2^(i+1)) */
--		power = gf2_multiply(power, power, polynomial);
--	}
--
--	return crc;
--}
--
--u32 crc32_le_shift(u32 crc, size_t len)
--{
--	return crc32_generic_shift(crc, len, CRC32_POLY_LE);
--}
--EXPORT_SYMBOL(crc32_le_shift);
--
- u32 crc32_be_base(u32 crc, const u8 *p, size_t len)
- {
- 	while (len--)
- 		crc = (crc << 8) ^ crc32table_be[(crc >> 24) ^ *p++];
- 	return crc;
-diff --git a/lib/tests/crc_kunit.c b/lib/tests/crc_kunit.c
-index 064c2d5815579..f08d985d8860e 100644
---- a/lib/tests/crc_kunit.c
-+++ b/lib/tests/crc_kunit.c
-@@ -34,18 +34,16 @@ static size_t test_buflen;
-  *	  Bit-reversed if @le is true.
-  * @func: The function to compute a CRC.  The type signature uses u64 so that it
-  *	  can fit any CRC up to CRC-64.  The CRC is passed in, and is expected
-  *	  to be returned in, the least significant bits of the u64.  The
-  *	  function is expected to *not* invert the CRC at the beginning and end.
-- * @combine_func: Optional function to combine two CRCs.
-  */
- struct crc_variant {
- 	int bits;
- 	bool le;
- 	u64 poly;
- 	u64 (*func)(u64 crc, const u8 *p, size_t len);
--	u64 (*combine_func)(u64 crc1, u64 crc2, size_t len2);
- };
- 
- static u32 rand32(void)
- {
- 	return prandom_u32_state(&rng);
-@@ -142,11 +140,11 @@ static size_t generate_random_length(size_t max_length)
- 	}
- 	return len % (max_length + 1);
- }
- 
- /* Test that v->func gives the same CRCs as a reference implementation. */
--static void crc_main_test(struct kunit *test, const struct crc_variant *v)
-+static void crc_test(struct kunit *test, const struct crc_variant *v)
- {
- 	size_t i;
- 
- 	for (i = 0; i < CRC_KUNIT_NUM_TEST_ITERS; i++) {
- 		u64 init_crc, expected_crc, actual_crc;
-@@ -186,39 +184,10 @@ static void crc_main_test(struct kunit *test, const struct crc_variant *v)
- 				    "Wrong result with len=%zu offset=%zu nosimd=%d",
- 				    len, offset, nosimd);
- 	}
- }
- 
--/* Test that CRC(concat(A, B)) == combine_CRCs(CRC(A), CRC(B), len(B)). */
--static void crc_combine_test(struct kunit *test, const struct crc_variant *v)
--{
--	int i;
--
--	for (i = 0; i < 100; i++) {
--		u64 init_crc = generate_random_initial_crc(v);
--		size_t len1 = generate_random_length(CRC_KUNIT_MAX_LEN);
--		size_t len2 = generate_random_length(CRC_KUNIT_MAX_LEN - len1);
--		u64 crc1, crc2, expected_crc, actual_crc;
--
--		prandom_bytes_state(&rng, test_buffer, len1 + len2);
--		crc1 = v->func(init_crc, test_buffer, len1);
--		crc2 = v->func(0, &test_buffer[len1], len2);
--		expected_crc = v->func(init_crc, test_buffer, len1 + len2);
--		actual_crc = v->combine_func(crc1, crc2, len2);
--		KUNIT_EXPECT_EQ_MSG(test, expected_crc, actual_crc,
--				    "CRC combination gave wrong result with len1=%zu len2=%zu\n",
--				    len1, len2);
--	}
--}
--
--static void crc_test(struct kunit *test, const struct crc_variant *v)
--{
--	crc_main_test(test, v);
--	if (v->combine_func)
--		crc_combine_test(test, v);
--}
--
- static __always_inline void
- crc_benchmark(struct kunit *test,
- 	      u64 (*crc_func)(u64 crc, const u8 *p, size_t len))
- {
- 	static const size_t lens_to_test[] = {
-@@ -335,21 +304,15 @@ static void crc_t10dif_benchmark(struct kunit *test)
- static u64 crc32_le_wrapper(u64 crc, const u8 *p, size_t len)
- {
- 	return crc32_le(crc, p, len);
- }
- 
--static u64 crc32_le_combine_wrapper(u64 crc1, u64 crc2, size_t len2)
--{
--	return crc32_le_combine(crc1, crc2, len2);
--}
--
- static const struct crc_variant crc_variant_crc32_le = {
- 	.bits = 32,
- 	.le = true,
- 	.poly = 0xedb88320,
- 	.func = crc32_le_wrapper,
--	.combine_func = crc32_le_combine_wrapper,
- };
- 
- static void crc32_le_test(struct kunit *test)
- {
- 	crc_test(test, &crc_variant_crc32_le);
-
-base-commit: 119b1e61a769aa98e68599f44721661a4d8c55f3
--- 
-2.49.0
+> 
+> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
+> ---
+>  .../devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml     | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+> index 7dc0748444fd..1de4ee70a05f 100644
+> --- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+> @@ -15,7 +15,9 @@ properties:
+>      oneOf:
+>        - const: atmel,at91sam9g46-aes
+>        - items:
+> -          - const: microchip,sam9x7-aes
+> +          - enum:
+> +            - microchip,sam9x7-aes
+> +            - microchip,sama7d65-aes
+>            - const: atmel,at91sam9g46-aes
+>  
+>    reg:
 
