@@ -1,46 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFA32A1BA;
-	Sun,  8 Jun 2025 23:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0DB2A1BA;
+	Sun,  8 Jun 2025 23:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749426428; cv=none; b=eY13bqOt1otnbRfiWTVhhFindziCBaaPJgSxUdXb+kI79h1g9D070YXOEO1+ivv/fTGMQ1GN1DGji25sRfLWS00OI5HT0rNoKGmbJlY9ReD2VjUV+pYWsu0RlUtrv5T2PfVgBrLkNbFjRlyhZtAGsv0MIQ4CJAMhNUE4c9odA1o=
+	t=1749426483; cv=none; b=SamdxFoKHE5wiyvzdOJRMaOJ7WgsxOIMbUxp3SfVNdEfjXKyFz9ijZmd9apjQGPm/ZXMHs3ECcnWHXGYXos8I4yf2/xD1Lzcr9C2JO5wRPEaKSBa9Wo9VRPWmR2FKaWOVtCZtCLDE+ijNFjCaFipMgBROrtAJKKw1f3mwd6LlWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749426428; c=relaxed/simple;
-	bh=He/qqF7BxEbAQ+KhVIwOAYIjY3DpawZEJHr+Xte/K6Q=;
+	s=arc-20240116; t=1749426483; c=relaxed/simple;
+	bh=KT/w6FBT4N6PSgfhF3FSGdgyAUAhCEGDFvPvlVX2I2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+Ot9BiVeE5ljmtAe79J1zJs6TToDtCY2+e+9UinX7wo/NhU3KvvUcYOe1RSjiGKhkmAThp0HscSwHTA6eV+lseOUELhNknSeTOKRbd1uqR8qWNv06qsSe8pt74CGaXHhrVFmIGYkq4zLvERtVUhpwPKWgw6maqGQlAt5qww9iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EPyWCyBV; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jDMIdKpOLYcv9L/IXNshCKQr+g6/1ruV1ngYB3WfnVee7gbRWr0ilfQR5s5TJFNH2jGaacV+mdNFFHmeGtv5OZ+Wk1XvRYLAWxGhjb4L5JdtXOqrOcXT0w/JVUhWiD0yMCvXuxa2E1b28uwPFifNadynz2pl83uZIyB4ZXi4psQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mj/thd2Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EPyWCyBV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8491AC4CEEE;
-	Sun,  8 Jun 2025 23:47:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mj/thd2Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 038EAC4CEEE;
+	Sun,  8 Jun 2025 23:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749426428;
-	bh=He/qqF7BxEbAQ+KhVIwOAYIjY3DpawZEJHr+Xte/K6Q=;
+	s=k20201202; t=1749426483;
+	bh=KT/w6FBT4N6PSgfhF3FSGdgyAUAhCEGDFvPvlVX2I2U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EPyWCyBVPXpu72efvExgg8gLAw9penLyFzlo1qRsspsqyd4JZoFxW7hHQvlnEtIIa
-	 1BxGaS04c9RuFEve+dtCt1LEb2SSISR2VgjLm0WYXRDHNt8nXsOorMQAj8PjQpmAB0
-	 F5rfSxl/09kNUJny72FkrWqXDDqrWHkySwoyI3r23w9s9UZxhxYgVcxmIH21znQLYr
-	 RAY4VaCbmTRnWUl2bEewz1enz7kzJYX9fFC9W66bUVBifTQ9wgF652vwOiRoE9mHCR
-	 SyixTBnJQbaXXeJQKz8gWyl2YRqW1kNgBMYmIhv1mCruOadbFAPFkGtBFHhXGzcMB6
-	 +EWaHxDKp/9YA==
-Date: Sun, 8 Jun 2025 16:46:46 -0700
+	b=mj/thd2Z9uYe8ddf/YWYAFUEWePinPdYjbTu3zsxtF0EGbMbUwdTFcBVCvLyqWqkL
+	 s8TD+FN4opFmHQ7GjeY4VZu8ZJ7KUhFXrxGEq03XPBJ9D2xl90iH0CE+OUFMzFVz4n
+	 iN/J0T055wmB9CEPVyecBVuULJ03Q1ocQBZa0ZCSS1yKTgQzuF38Q3ERr4lcd2AJuq
+	 tq2jNVQr6Rerr0MgIhheSVV4hcs59a7DV18WyrUxNMhTtQuU8J3rHi1P0dvehdgGnM
+	 BypM9OZDAB/2ny7ZcnodBHqDSsoWn7ly8eQOXcNF5B9D/4DwjG5+kebOI3AFPUDl6O
+	 N/rO7KWDT/9+A==
+Date: Sun, 8 Jun 2025 16:47:41 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
-	x86@kernel.org, linux-arch@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld " <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 00/13] lib/crc: improve how arch-optimized code is
- integrated
-Message-ID: <20250608234646.GE1259@sol>
-References: <20250601224441.778374-1-ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] lib/crc32: remove unused combination support
+Message-ID: <20250608234741.GF1259@sol>
+References: <20250607032228.27868-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,51 +41,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250601224441.778374-1-ebiggers@kernel.org>
+In-Reply-To: <20250607032228.27868-1-ebiggers@kernel.org>
 
-On Sun, Jun 01, 2025 at 03:44:28PM -0700, Eric Biggers wrote:
-> This series improves how lib/crc supports arch-optimized code.  First,
-> instead of the arch-optimized CRC code being in arch/$(SRCARCH)/lib/, it
-> will now be in lib/crc/$(SRCARCH)/.  Second, the API functions (e.g.
-> crc32c()), arch-optimized functions (e.g. crc32c_arch()), and generic
-> functions (e.g. crc32c_base()) will now be part of a single module for
-> each CRC type, allowing better inlining and dead code elimination.  The
-> second change is made possible by the first.
+On Fri, Jun 06, 2025 at 08:22:28PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> As an example, consider CONFIG_CRC32=m on x86.  We'll now have just
-> crc32.ko instead of both crc32-x86.ko and crc32.ko.  The two modules
-> were already coupled together and always both got loaded together via
-> direct symbol dependency, so the separation provided no benefit.
+> Remove crc32_le_combine() and crc32_le_shift(), since they are no longer
+> used.
 > 
-> Note: later I'd like to apply the same design to lib/crypto/ too, where
-> often the API functions are out-of-line so this will work even better.
-> In those cases, for each algorithm we currently have 3 modules all
-> coupled together, e.g. libsha256.ko, libsha256-generic.ko, and
-> sha256-x86.ko.  We should have just one, inline things properly, and
-> rely on the compiler's dead code elimination to decide the inclusion of
-> the generic code instead of manually setting it via kconfig.
+> Although combination is an interesting thing that can be done with CRCs,
+> it turned out that none of the users of it in the kernel were even close
+> to being worthwhile.  All were much better off simply chaining the CRCs
+> or processing zeroes.
 > 
-> Having arch-specific code outside arch/ was somewhat controversial when
-> Zinc proposed it back in 2018.  But I don't think the concerns are
-> warranted.  It's better from a technical perspective, as it enables the
-> improvements mentioned above.  This model is already successfully used
-> in other places in the kernel such as lib/raid6/.  The community of each
-> architecture still remains free to work on the code, even if it's not in
-> arch/.  At the time there was also a desire to put the library code in
-> the same files as the old-school crypto API, but that was a mistake; now
-> that the library is separate, that's no longer a constraint either.
+> Let's remove the CRC32 combination code for now.  It can come back
+> (potentially optimized with carryless multiplication instructions) if
+> there is ever a case where it would actually be worthwhile.
 > 
-> Patches 1 and 2, which I previously sent out by themselves, are
-> prerequisites because they eliminate the need for the CRC32 library API
-> to expose the generic functions.
-> 
-> Eric Biggers (13):
->   crypto/crc32: register only one shash_alg
->   crypto/crc32c: register only one shash_alg
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  include/linux/crc32.h | 25 ----------------
+>  lib/crc32.c           | 67 -------------------------------------------
+>  lib/tests/crc_kunit.c | 39 +------------------------
+>  3 files changed, 1 insertion(+), 130 deletions(-)
 
-Applied the first 2 patches to
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
-
-The remaining patches have new versions in the v2 series.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
 
 - Eric
