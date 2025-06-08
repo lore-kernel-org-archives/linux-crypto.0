@@ -1,72 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFF8219A95;
-	Sat,  7 Jun 2025 23:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A82382;
+	Sun,  8 Jun 2025 00:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749340029; cv=none; b=K5kGQFJ9238INzLdGDjLe9LuPx32GggC7b1+1/lfDapEikW86Qya6cQHmCtfWzkQoyAIsVS7x1B5dKhne4Uc616fBjf+ECk1FraGHBNGyay5oFB5ZQrIcykO3s4sOAOMtrkwUNMF+ig2hRPKlZRkuOI507Tc1G92AcqubIl/ms8=
+	t=1749341639; cv=none; b=era6L9XdoTEx2uzalTjSPj+t5bPrTeP/drAV72I4J9u8MiJN18uYWZGY24ecWktFJ31PxMK7bsUYQoO8fOBthGGqppjNgn5XvCe9lHPBsM7mTCTCIJKtBU1Z6ovu9huBbuTEl77nbEA/bjDr8MGLJXLgHtXRESLGcnBE9OzbrFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749340029; c=relaxed/simple;
-	bh=LLYBi6lLM9yrrhCbb5rR61lngl1sYzAS5pqk0JZQ3I0=;
+	s=arc-20240116; t=1749341639; c=relaxed/simple;
+	bh=quZdiXcvNr3IBppY0g+Z1c7C/jdGgRtoRWBt5ZrMY5g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sUpe3PYSdQhbTmbYCTae+0v7gRWNjAYmt46+BbQwm3yYJkRYGF4gqBcnQU4s4hAmaSMazds1vLrNItY4G/73iL1m1nBuRND8EsH5Gnag+mwK+VVgu99pkWfp3v6rFpExXZLRzXYvo0+nx+RmdxGixK5ZYbEXp7IOMi88kzF5yGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=jsPgU/cc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BYCBSknRhxenbFKIFweeou6ebBMCvPo1+CFiMX8lyOr4AAw1ABNiDmzqMePjCev7s1m58jbPGBzFrX1rqulL32iaUkcIAnqM9R/oTt4pK2xozQytOYCIf41q5TIAT7lCnYkhfO0kqXfJM7OarJR/SYkMJca5l8NUDYHBR4i7KFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBqnfaCO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jsPgU/cc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FE6DC4CEE4;
-	Sat,  7 Jun 2025 23:47:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jsPgU/cc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1749340025;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9BLd3zVhm1uyr2zWfOpGUqAHdfaRE3TGpoHRN6aaMSk=;
-	b=jsPgU/ccygnXS60vh3VCJ8IeDnGtsomv+dciNUeunJ0SO8LqmCcTqPcJBkB2QFrLru1ll1
-	E9OF1lkNEqMRShrw2za9BAoJsJQKmF9rvzmtd3v/rLI1EduGNSPRtry+Kyl+tncxIkS+aK
-	UrU1VhYkP4pcQtnNoKmPvrZIA/DIb6Q=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 669734c3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Sat, 7 Jun 2025 23:47:04 +0000 (UTC)
-Date: Sat, 7 Jun 2025 17:47:02 -0600
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	linux-arch@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
- integrated
-Message-ID: <aETPdvg8qXv18MDu@zx2c4.com>
-References: <20250607200454.73587-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBqnfaCO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DFCC4CEE4;
+	Sun,  8 Jun 2025 00:13:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749341639;
+	bh=quZdiXcvNr3IBppY0g+Z1c7C/jdGgRtoRWBt5ZrMY5g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eBqnfaCO76quaRDAFJ/zY7KJKPGHXyxXmPOzQ917mWwC4jLmFf7+u7y2WRaoCpems
+	 B9dT5/bv24LPrb+M8C7tXXqa4bLmCZp7x63KtU51b54wQWLRo3ZFTALPCMfuGTMdM4
+	 WszzWfXZql6dFuelmbo8SErtO2zOTmRDT6HQZ5oBIRuS3bNk7055Sm1zIe+PxA7WJP
+	 YErLjTVlrT7+KbXx3SfLW+1NHHSfzgG6yTyadcClVxvNCNYNhX6be/hA/VaIwWYjCe
+	 WVtotFAzRo6g4PdrR5ZWcLt27ckdzfIfF6xv2uEqCg2r1hf4Ph60oxtNbGovQToqMu
+	 ADgR88FmyYQ9A==
+Date: Sat, 7 Jun 2025 19:13:56 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: quic_utiwari@quicinc.com
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bartosz.golaszewski@linaro.org, quic_neersoni@quicinc.com
+Subject: Re: [PATCH] crypto: qce - Add suspend and resume support
+Message-ID: <6dfweyi65aoly24nhrq3dc5u3dpaqv4fhdwerc6axu63dkgltx@i5y7lptwnuwu>
+References: <20250606105808.2119280-1-quic_utiwari@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250607200454.73587-1-ebiggers@kernel.org>
+In-Reply-To: <20250606105808.2119280-1-quic_utiwari@quicinc.com>
 
-On Sat, Jun 07, 2025 at 01:04:42PM -0700, Eric Biggers wrote:
-> Having arch-specific code outside arch/ was somewhat controversial when
-> Zinc proposed it back in 2018.  But I don't think the concerns are
-> warranted.  It's better from a technical perspective, as it enables the
-> improvements mentioned above.  This model is already successfully used
-> in other places in the kernel such as lib/raid6/.  The community of each
-> architecture still remains free to work on the code, even if it's not in
-> arch/.  At the time there was also a desire to put the library code in
-> the same files as the old-school crypto API, but that was a mistake; now
-> that the library is separate, that's no longer a constraint either.
+On Fri, Jun 06, 2025 at 04:28:08PM +0530, quic_utiwari@quicinc.com wrote:
+> From: Udit Tiwari <quic_utiwari@quicinc.com>
+> 
+> Add basic suspend and resume callbacks to the QCE platform driver to
+> manage interconnect bandwidth during system sleep and wake-up cycles.
 
-I can't express how happy I am to see this revived. It's clearly the
-right way forward and makes it a lot simpler for us to dispatch to
-various arch implementations and also is organizationally simpler.
+Please follow
+https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
+and start your commit message with a problem description. Why do we want
+to "manage interconnect bandwidth"?
 
-Jason
+> 
+> Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+> ---
+>  drivers/crypto/qce/core.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index e95e84486d9a..2566bdad5d4a 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
+> @@ -249,6 +249,21 @@ static int qce_crypto_probe(struct platform_device *pdev)
+>  	return devm_qce_register_algs(qce);
+>  }
+>  
+> +static int qce_crypto_suspend(struct platform_device *pdev, pm_message_t state)
+> +{
+> +	struct qce_device *qce = platform_get_drvdata(pdev);
+> +
+> +	return icc_set_bw(qce->mem_path, 0, 0);
+
+Couldn't you be using icc_disable(); here?
+
+> +}
+> +
+> +static int qce_crypto_resume(struct platform_device *pdev)
+> +{
+> +	struct qce_device *qce = platform_get_drvdata(pdev);
+> +
+> +	return icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH,
+> +		QCE_DEFAULT_MEM_BANDWIDTH);
+
+icc_enable();
+
+
+That said, as already requested, please also drop these votes at runtime
+when the block is unused.
+
+> +}
+> +
+>  static const struct of_device_id qce_crypto_of_match[] = {
+>  	{ .compatible = "qcom,crypto-v5.1", },
+>  	{ .compatible = "qcom,crypto-v5.4", },
+> @@ -259,6 +274,8 @@ MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
+>  
+>  static struct platform_driver qce_crypto_driver = {
+>  	.probe = qce_crypto_probe,
+> +	.suspend = qce_crypto_suspend,
+> +	.resume = qce_crypto_resume,
+
+Please implement .driver.pm instead.
+
+Regards,
+Bjorn
+
+>  	.driver = {
+>  		.name = KBUILD_MODNAME,
+>  		.of_match_table = qce_crypto_of_match,
+> -- 
+> 2.34.1
+> 
