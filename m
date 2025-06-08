@@ -1,38 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0DB2A1BA;
-	Sun,  8 Jun 2025 23:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADB22A1BA;
+	Sun,  8 Jun 2025 23:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749426483; cv=none; b=SamdxFoKHE5wiyvzdOJRMaOJ7WgsxOIMbUxp3SfVNdEfjXKyFz9ijZmd9apjQGPm/ZXMHs3ECcnWHXGYXos8I4yf2/xD1Lzcr9C2JO5wRPEaKSBa9Wo9VRPWmR2FKaWOVtCZtCLDE+ijNFjCaFipMgBROrtAJKKw1f3mwd6LlWM=
+	t=1749426520; cv=none; b=FE0qDwTrm3z/8JeenzmVFJVbV+MjMoo2J9XZhweMosvp43rTX+2yi8L6Aq0IlhkKcDLc+c2VTNpAEt8l2oJphtYTfk0Wu1fgtwwwySOgN9sG6+Vdkxn/NXpM7n6+XeXJylpkIYyIoLGlK/GRid1xJHryWjLLxNLcaBtz2sZMt6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749426483; c=relaxed/simple;
-	bh=KT/w6FBT4N6PSgfhF3FSGdgyAUAhCEGDFvPvlVX2I2U=;
+	s=arc-20240116; t=1749426520; c=relaxed/simple;
+	bh=PNJP4F4SM5CKWVi44F6XN3CvXe0mnkBMQtyo2ioWp6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDMIdKpOLYcv9L/IXNshCKQr+g6/1ruV1ngYB3WfnVee7gbRWr0ilfQR5s5TJFNH2jGaacV+mdNFFHmeGtv5OZ+Wk1XvRYLAWxGhjb4L5JdtXOqrOcXT0w/JVUhWiD0yMCvXuxa2E1b28uwPFifNadynz2pl83uZIyB4ZXi4psQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mj/thd2Z; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ew85N6Pw8RXgCw+SlArvTUzyj3SXJAqqPDOtTNFN53EPyjr/ZC/G49MlZc74aZdw8vocPUZswrmUS5q2XiJ8qJIRruKbAMtPgU16mu6t9WovVDUQrtl908F1y0nOrTrQ7AKUxO3c1+CgtpvtHkH/ZkwUXDG82GzTJdclQwIk+Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOEtAeuZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mj/thd2Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 038EAC4CEEE;
-	Sun,  8 Jun 2025 23:48:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOEtAeuZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ECB5C4CEEE;
+	Sun,  8 Jun 2025 23:48:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749426483;
-	bh=KT/w6FBT4N6PSgfhF3FSGdgyAUAhCEGDFvPvlVX2I2U=;
+	s=k20201202; t=1749426519;
+	bh=PNJP4F4SM5CKWVi44F6XN3CvXe0mnkBMQtyo2ioWp6k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mj/thd2Z9uYe8ddf/YWYAFUEWePinPdYjbTu3zsxtF0EGbMbUwdTFcBVCvLyqWqkL
-	 s8TD+FN4opFmHQ7GjeY4VZu8ZJ7KUhFXrxGEq03XPBJ9D2xl90iH0CE+OUFMzFVz4n
-	 iN/J0T055wmB9CEPVyecBVuULJ03Q1ocQBZa0ZCSS1yKTgQzuF38Q3ERr4lcd2AJuq
-	 tq2jNVQr6Rerr0MgIhheSVV4hcs59a7DV18WyrUxNMhTtQuU8J3rHi1P0dvehdgGnM
-	 BypM9OZDAB/2ny7ZcnodBHqDSsoWn7ly8eQOXcNF5B9D/4DwjG5+kebOI3AFPUDl6O
-	 N/rO7KWDT/9+A==
-Date: Sun, 8 Jun 2025 16:47:41 -0700
+	b=JOEtAeuZjpWvk9z46QbzwFTvSH+ljw/hQKIzEhZJx7YF2EwgrcI3+lI1VVKscms0d
+	 m3qcoPnMMDVh4lKObwmfsWuGFAfWfD9VrvL51JeF8gEdf9j5e89zlEOEgaCwxiok5N
+	 /aXy/hTwK0fEa7Z/G4j2/UPMcbFCWgXgxCUhbLoCrXwDNwOBWfrQbnnk/HZXwh/U2/
+	 WnpIAIMFGu/oqqi+ROzvz89sXkm5O6vGwJ/PQ3JdxSPps11zhBrcyuDg/46eion+ad
+	 2/v4rAxctCfEtqWu0G117hIgv+MXBMm76WuvxTusmww2Scut4P917GLHnfL8cwD0i5
+	 36P1VSkTzVNzw==
+Date: Sun, 8 Jun 2025 16:48:17 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] lib/crc32: remove unused combination support
-Message-ID: <20250608234741.GF1259@sol>
-References: <20250607032228.27868-1-ebiggers@kernel.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org,
+	linux-arch@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
+ integrated
+Message-ID: <20250608234817.GG1259@sol>
+References: <20250607200454.73587-1-ebiggers@kernel.org>
+ <aETPdvg8qXv18MDu@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,30 +49,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250607032228.27868-1-ebiggers@kernel.org>
+In-Reply-To: <aETPdvg8qXv18MDu@zx2c4.com>
 
-On Fri, Jun 06, 2025 at 08:22:28PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sat, Jun 07, 2025 at 05:47:02PM -0600, Jason A. Donenfeld wrote:
+> On Sat, Jun 07, 2025 at 01:04:42PM -0700, Eric Biggers wrote:
+> > Having arch-specific code outside arch/ was somewhat controversial when
+> > Zinc proposed it back in 2018.  But I don't think the concerns are
+> > warranted.  It's better from a technical perspective, as it enables the
+> > improvements mentioned above.  This model is already successfully used
+> > in other places in the kernel such as lib/raid6/.  The community of each
+> > architecture still remains free to work on the code, even if it's not in
+> > arch/.  At the time there was also a desire to put the library code in
+> > the same files as the old-school crypto API, but that was a mistake; now
+> > that the library is separate, that's no longer a constraint either.
 > 
-> Remove crc32_le_combine() and crc32_le_shift(), since they are no longer
-> used.
+> I can't express how happy I am to see this revived. It's clearly the
+> right way forward and makes it a lot simpler for us to dispatch to
+> various arch implementations and also is organizationally simpler.
 > 
-> Although combination is an interesting thing that can be done with CRCs,
-> it turned out that none of the users of it in the kernel were even close
-> to being worthwhile.  All were much better off simply chaining the CRCs
-> or processing zeroes.
-> 
-> Let's remove the CRC32 combination code for now.  It can come back
-> (potentially optimized with carryless multiplication instructions) if
-> there is ever a case where it would actually be worthwhile.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  include/linux/crc32.h | 25 ----------------
->  lib/crc32.c           | 67 -------------------------------------------
->  lib/tests/crc_kunit.c | 39 +------------------------
->  3 files changed, 1 insertion(+), 130 deletions(-)
+> Jason
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+Thanks!  Can I turn that into an Acked-by?
 
 - Eric
