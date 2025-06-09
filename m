@@ -1,76 +1,76 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2073.outbound.protection.outlook.com [40.107.236.73])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2062.outbound.protection.outlook.com [40.107.244.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA1733F6;
-	Mon,  9 Jun 2025 04:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C13719AD70;
+	Mon,  9 Jun 2025 04:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749444698; cv=fail; b=TDET/ztLj7RFbalx0JOvK7HR3TGZ82vFwjPbznOrgY42XFDggyl+2lvwyg4PsNCgsM6XXdX2eE/nFilgyHp3y17L+bjDn4VjXcsXLRjwXf7MapSuVZIaR+s3sRiLSDnhhFGzrh1A93hLQCL5Z8X1EfemS2JTF16/0GP6MT1Ceog=
+	t=1749444699; cv=fail; b=TSL0rBrxkkyWjo/m9COrTLZkoKLcIG4ISSJK87vsZ4E46Hp4QgvYicGTj0K5zt/fYgRiYRV1hytTCncf3UUMNWsRh1BN18PA5iNHxGBNVToL1lHyIXwDsfc9o0A/GCSfP4xsC1mcMnO7CXQT52xUWtA2mA8x9TCd+dVQAeSGJrI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749444698; c=relaxed/simple;
-	bh=BnKHssEn1YmsxSu8/un5ujyzy6DU2nTOnSnio/xwemg=;
+	s=arc-20240116; t=1749444699; c=relaxed/simple;
+	bh=MoI5QoDfZPxXPpY63QdCyXKdQQGXxZM94BedQ9p1wJU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NG6UeVGaROqoF7qnGe9ddjcy/W4EAQ5f8IMo+8pqUB1YaP8uyN+1QeOXAv7R2/hug8yTIBVKeYPAVX1zRcmholc3UPfXUzx8xM4ztqGbcQNd2f2qaVctT8SsUBhS/o4na8rdCrvTPEYgVdvBU8WcpOcAwis2eoZJOwgnY6Vhzeo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3y9LS+XY; arc=fail smtp.client-ip=40.107.236.73
+	 MIME-Version:Content-Type; b=GCo5EZN6wTdxDlpW6hRC5gWAcJKhQxlfGWMApuWY+lvbHRz0yzO8LtBoHmju9SAxzWgfLCTDUhd3mJeyZFhdSPffKw0fI6H4Zf9mtebzsaUFieO/P6c9MbAgBxGqaKFJCb5+dF/UQVMqWSvyztLP75OqMTUBtK8u0h6tF84prqU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DFZaN/Zn; arc=fail smtp.client-ip=40.107.244.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3y9LS+XY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DFZaN/Zn"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dvO4SYjheKv/DFFPS1WXrPrk/Ms5rU0asyHole297ESUUpIu7sHboUKZOcCRMX1JYydymGTysr9s3yDoe0Da5WO4yS9WOK39HqrOqUMmqYdSV6rmWdTa/c/fqsiFXPEhXJR+ZNyN2opm9XvIRgVHK/BCuSkVnIgbmN7RnwwNeNnAjkrjQy6fS3vHZqCGl1oCJsz3j9i1zDJVtqky+6KUD1RGhXWn3n1g8u8FOkdgD2vSWeOrbecOdo1U8E/wa4Uctc3YxvcYYLbXsvoR8l1PLxKGt6hjnVYS5PM7L2gpjvEmKNqmdyc4mQyWQ4YHmB1nE4k5mnZ1Ix/+84wDJ3W9bA==
+ b=Z8yOrkc9is13rROcgbWGuNgbYpm270B1tUQGeQcn2a9vS8ETUKSeL1OjjBKph6Lb/LsX+DNPZ3h1zykLHbXhVOHyBXUHZkHn9aLHhY/EbGdXGMelGAhvER3BWJruCgnWPZYXULS3301u+xSzPJqmTINlMEdkypIbg3gB+RkM6qAfM1r3W8k31busSvQfph1PBTbPBiQ+CRLEubZ0k9Srb4lXdXU/yxEOEODF/wZa/WBCXnbDlqshW89H5iWe61wtWsBnVNU7412jfdTcpiQYeW6pH4NkHo4N5W7vd6MovHoYnmOTvFpZWm2Tb3tpZNxRpsM1677rFjV65wP9Az3taw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oSXnda0Nk4/moBRR1HBdBhGHnz72fYK1ITx4A2LfxFM=;
- b=A+VDHJkr1cJenCSVEfz0u68VgLFNwxb1pmmMoJd0aS24XreP71iK4NTbjQ8MFWCAhxNdSCkskIz4+gFa6FsFCpYF80Zijxw4cZ39qblh1Ol8OjuY3G64C6Aazk358JK86/6vucBk1z2my0hPiEQnplFx9iJ+W7oLAQ1Ei9IWqXztlHhN1LlFJ6RWo9tOEHMQe591SLEKeOqkCaA1fjGDI79JPzhQqzkHj1PhHcfYeMjGYdS9zh0MG4ZZfU5nRM2jfNxkNGd/iE8aUjIcAcpKdmsCWgedFjL3NIw+Y5I0+5MgHzX6HjduNm2LrID8w3OSt+7cILqeNUXENiIhmcm2rA==
+ bh=TUHpRqDKxmGsQCLJlc0SNCuvSYql0lFht/UId3+I7mA=;
+ b=N+AxbbaqZxWnqb49LsuGbIS/XigFoRgwQiJhgfm/WBP2O8cXN5xFqajmX+2k3wHcPrzeAGOLqirTuaTW9GBQFEJCIyCNiwB/sNRQ4CAhgPyODmyFWsZL4+1Pjj7iO6+BFHIVZEJNkDuoXMNOKSpKp+TKYggEQhQLFGy+9p3+aAlipFDDO5AWfdJbLSrjiUF9LQqoHcNoKEUzHt94BX1bzB6aBF9tyr5buV7I04fJqX4yZJVpWd12q2c88o530miIREBio7tpyeZMGxX2aWyA5/CMTCP3EHOBkCOu/gj2P32WYw3eRolJNZ4fT+CM3cYMZrMnHcqHt4sqqh4xRgwurg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oSXnda0Nk4/moBRR1HBdBhGHnz72fYK1ITx4A2LfxFM=;
- b=3y9LS+XYLhWULiihIilPRxGHWnjbtD9lO97D5sNQcH6S31KUWMmzGtgzldbiO5O+Rek1xbKpmvLLAylyRf6Pzl2ajlZadXMUFHN7XhGNvoUbNBhQuvhBF42at7alswpmxvmZy50v9FTjr3vg0QeAr2uvrzXayDGaxpA/NfIVYnc=
-Received: from BL1PR13CA0101.namprd13.prod.outlook.com (2603:10b6:208:2b9::16)
- by PH7PR12MB9074.namprd12.prod.outlook.com (2603:10b6:510:2f4::16) with
+ bh=TUHpRqDKxmGsQCLJlc0SNCuvSYql0lFht/UId3+I7mA=;
+ b=DFZaN/Zna8J50mLb7IwIUv5jqgLmp724N/DpM+NeHWeIk67+BveeNMaMhBVaJ8DASKPCmUFMV9ajyKjfQq8OYkwLbYBUH8t2EbBOas9RpzK/D31VX9HN8WA18NOkp1muB0XXPud3RLyT57PYC4U8xjovAFXl8O2tUxazsj79kjU=
+Received: from DM6PR21CA0008.namprd21.prod.outlook.com (2603:10b6:5:174::18)
+ by SJ5PPF0170DF9F2.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::985) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.40; Mon, 9 Jun
- 2025 04:51:29 +0000
-Received: from BL02EPF0002992D.namprd02.prod.outlook.com
- (2603:10b6:208:2b9:cafe::e2) by BL1PR13CA0101.outlook.office365.com
- (2603:10b6:208:2b9::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Mon, 9 Jun
+ 2025 04:51:33 +0000
+Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
+ (2603:10b6:5:174:cafe::c0) by DM6PR21CA0008.outlook.office365.com
+ (2603:10b6:5:174::18) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.16 via Frontend Transport; Mon,
- 9 Jun 2025 04:51:29 +0000
+ 9 Jun 2025 04:51:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0002992D.mail.protection.outlook.com (10.167.249.58) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.71) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 04:51:28 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 04:51:32 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sun, 8 Jun
- 2025 23:51:28 -0500
+ 2025 23:51:31 -0500
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
  (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sun, 8 Jun
- 2025 23:51:27 -0500
+ 2025 23:51:30 -0500
 Received: from xhdharshah40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Sun, 8 Jun 2025 23:51:25 -0500
+ Transport; Sun, 8 Jun 2025 23:51:28 -0500
 From: Harsh Jain <h.jain@amd.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<mounika.botcha@amd.com>, <sarat.chand.savitala@amd.com>,
 	<mohan.dhanawade@amd.com>, <michal.simek@amd.com>
 CC: Harsh Jain <h.jain@amd.com>
-Subject: [PATCH v2 2/6] crypto: xilinx: Add TRNG driver for Versal
-Date: Mon, 9 Jun 2025 10:21:06 +0530
-Message-ID: <20250609045110.1786634-3-h.jain@amd.com>
+Subject: [PATCH v2 3/6] crypto: drbg: Export CTR DRBG DF functions
+Date: Mon, 9 Jun 2025 10:21:07 +0530
+Message-ID: <20250609045110.1786634-4-h.jain@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250609045110.1786634-1-h.jain@amd.com>
 References: <20250609045110.1786634-1-h.jain@amd.com>
@@ -86,530 +86,472 @@ Received-SPF: None (SATLEXMB05.amd.com: h.jain@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0002992D:EE_|PH7PR12MB9074:EE_
-X-MS-Office365-Filtering-Correlation-Id: be4c0a90-c5d9-400d-2dd0-08dda7114bf3
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|SJ5PPF0170DF9F2:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea532df3-1c1a-40c8-e79d-08dda7114e0d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9NkVh+3G1+KIqemcJDG5ryg3IKQN6nNAV8qVJpxj+zU8MHBDbgeCSjhYFprg?=
- =?us-ascii?Q?3GKaXtYf9SVlcXjODnC92fbnR0ObWH60z1SU7P6/R9snKpK1/MzSzRSzXwaj?=
- =?us-ascii?Q?ge7C9u+MUPwIvVnaQMw0nB8VTGTNITwiEwk6ncASxOmVzd84McK7d1YCweQz?=
- =?us-ascii?Q?trT/e2vTVZpt44BRHZDfO7pnwPdk9oMg6zS4c9EGzqQdhpi3768G9JE9H2dQ?=
- =?us-ascii?Q?CxRPD+sH29oKFIz2iXx9wN2KllQ8AXohObCpPblNtxQbVulDQ3wejzHzyf1x?=
- =?us-ascii?Q?Gzl5sZN7e6lKlQWT4gYQkSfyw/+wxNyuCBQme/E9gW5zT8gw77zRX6EuS5Dv?=
- =?us-ascii?Q?mQnzMpLukZZtOmbOEsz1x49PJVCqWl1/Uc0gZ5yFK4tsUQ01cranulmN0MNY?=
- =?us-ascii?Q?kDSUJMp6IeOVn+2xt7KvKw+bOhP8aoi512YUXv2tXwFFOSXaHhBru3sgGW4B?=
- =?us-ascii?Q?p+w+kJQX6bpYuIPqa+RAYlyWDbZ+HZySL5ibOK+1Y4crbWLa/vBm3D7x4DY7?=
- =?us-ascii?Q?08nQMV3qij1LVl2BbohLR8/e6bAoPvIEpmp2B9iJznCi9LICFQqCGXSc3L0V?=
- =?us-ascii?Q?GIvW9/d0yKV2OPXBua6eW3dakg01STZnNa/QxhObeIXysK+M6lkYwzQzUAa8?=
- =?us-ascii?Q?ZThiWex0iFq6nfHN1iXyMafAVkdn6JlL9HoXMNO7D9yWcDgQzwxuPiqY2bVp?=
- =?us-ascii?Q?UF2NUtSTtbWiVF9j1jhI+mh7EJF9KMuoIX4idBOuZbrvQYOnnP5GzRHMJ3UE?=
- =?us-ascii?Q?jLdLZelQtyXYk3Temb861cLJFR9+8rqEGBsXmC4Smf8FM8oYIdeqRV4UpNcY?=
- =?us-ascii?Q?42QLnTb28/091F77Dyk2AL+SwNT4cJM8rQaHRua15ZX1fb/yhfCqyuVp4OzZ?=
- =?us-ascii?Q?YDqr38Yf5HjMUCpDLKn6wSIoMphJ6n1OT8rYueRvIJL5pTL09LFN8qhwcPuC?=
- =?us-ascii?Q?SXLXWVXXMFGZs2bsLOnWz+FREAWkaApW0v3DAZ2eVsANv9kRwFmOibsYFXr+?=
- =?us-ascii?Q?AyXydq7CQq2ByIdU3VuoraS+JHnl5lOsLmNppbTQpFR7BL/BwKr2mmqALALD?=
- =?us-ascii?Q?8wsuVjr3w/cavnRKPJS7zW4pUGSXeDtRggiH8K3aV/XGYpSo5QJtZ5q0uApg?=
- =?us-ascii?Q?I27FmrxDYSK7Tv3tZI07b0+17R/hftBT0771cgutqbrAWl8ONn+IbzruTyXj?=
- =?us-ascii?Q?a6wYO13vTAr3gijTa19nz+VDQu0RvloxqhB8QI5YpceHNkQpJZeQk+Mmh2mg?=
- =?us-ascii?Q?qrQbIqZkmXsIqbQFkQWao7+8La5gRJqiTJqmt/hrTGadIs3/ZWd70GPX6GQm?=
- =?us-ascii?Q?QxV4Z0uOOaxd7eQI2AWgR2ON9EIA7XBQlRv5GnnznEXCEHFOgVtRqL1SKap0?=
- =?us-ascii?Q?tbC4TWsvNG5Y618sGBBOnxrcM3MxOdjhObd1whtlvOarpk/V/BrCgBT/fJML?=
- =?us-ascii?Q?mYzA7s26P9p18bpgz6vBBVC2tyDvqbnVIc4/GOD+etQ2eA1KZl3jGkBYBjHl?=
- =?us-ascii?Q?JguyXcp+5pIxzCxsaDmb1g7HcLjZph4UUG+R?=
+	=?us-ascii?Q?N3y/UEN0s3pcQP6DSXcbgpwVWJdOLWZZvMbThJCfUBip9ze1V6cVCIKoHcw7?=
+ =?us-ascii?Q?XrYBgCGD9BptMehM5i8pyFn09vAm6/FZ6eT4QPGySITca/wCjRkjukayTJI5?=
+ =?us-ascii?Q?z0cmDe883cQon9fTMeLw2gfKucEYh/v5kp4Oc7L4FMWiFVovA0PffXiewJBl?=
+ =?us-ascii?Q?HsAU68uGRlujcwSRMNM7ZZC6X4fW89V8G3cuURLVkTFX7cnKLbuo2HJIGemf?=
+ =?us-ascii?Q?0eHiQSEXZiTkiEvOe625EbXtyDR3xITKls0jJ0BB+cSsHISE2K5hZOasvrk2?=
+ =?us-ascii?Q?3L64TO5ZkLVvHVdfAzCrrAooP/2/uBbRGWo2Jjl/tVMdprRe8er0VRqa4cUx?=
+ =?us-ascii?Q?xQPsc9wQK/4+6OYbyJ3JH+c1b2QYpuHg1bmEnZDO493aSqF4JQW9nxDNTiTN?=
+ =?us-ascii?Q?St25QFi+fOqnsi+O5KXUfMbMhUriy3Q83x+qX7mzRlgBjSZk66E3t4WL2MGo?=
+ =?us-ascii?Q?YDda7FpO4nylmxAu5bc1zO9Z7u7/PfTuhSf+CJqAOJFYcMX+pz4Gzdk6gIxQ?=
+ =?us-ascii?Q?WE+/t0vSwSvVq0twTqZUHKMZRyD0eCEe7uFjxpM3psyRJGhabYXWU9S/dbmq?=
+ =?us-ascii?Q?/8COGfNRJj3qmAd3TGXjb+CcpYC4bSS2z1X3GFvECCFAX3qCrJ1HVHhP9PGx?=
+ =?us-ascii?Q?mSml7gpz3BPcRSKuqHYQb2uHOQ/zb5uU54ze2A07SZHPZYlVCmyaRmWsNI7m?=
+ =?us-ascii?Q?uDkOvUum5nUJW0jJSA1fPmxMkjbTIDlE62F0A7+DPPwIOmaZtGmkW5CEqCtQ?=
+ =?us-ascii?Q?oUxkLywgMmOYIuhiaByknu1uqi3NyOEYnxB9BejuWsvMTzn9R6cl/ZHW65Rz?=
+ =?us-ascii?Q?TugdR0F5bx8CPEm+MjACfxdHxg8xbbtMdxE+ZEZ2CLG703e7oeLEFr/3dD4h?=
+ =?us-ascii?Q?3CUQWolq3kadPXl1Zf+OOsajBWu334cvYrXs14+G/SqqYRjiiHJfg04LcFiU?=
+ =?us-ascii?Q?75TimP3foBLreraKU2ZlnTiqvrUo9juHyxW2WYsDFlb3AupE6nKNJbm0HSZU?=
+ =?us-ascii?Q?O3tNFuXJohSpzhd+9NfXVLxJza41oNH5VB3VdUq8DoSlWxn3krtO4hqsnarU?=
+ =?us-ascii?Q?bPSJL1dU8m/Ymy5VtfkbNAkG/3PrNjLX6SaNH0FxAk7agUkOFBKeOAMLCuRz?=
+ =?us-ascii?Q?MJityZY6ngv+DWCVnCssGCyKyZo2e6ZjXIHpNiBFYWgwqKZDgMg0O/nDRIQu?=
+ =?us-ascii?Q?3cOOEK8qeXGEefx9IHxjLkDbapNhnfx+3/Vy+c1FHS8d6hI9TgpDzBej6lG8?=
+ =?us-ascii?Q?YBklRtSHgmV1Wc+P8GYl3QTC/LaEuBjUvPxpiHrgA0bfiOQA3XiNDnhd327r?=
+ =?us-ascii?Q?P/RKnc/kkF/Nt+S5IeNReFEi/p/YQsHDInNXGP1t3BeWOXCapuLdfanYi452?=
+ =?us-ascii?Q?NuwcNSouhuSSMKDK+q3chUB+PQHyS/1ZUi/8/Vn9w233RUlaOTDZVyBA9zmU?=
+ =?us-ascii?Q?41/5iepV9dT27tKgHO6qkelEB7p5vSG2ne6JvxuRUq5bKZPlZuFAuPBOynfR?=
+ =?us-ascii?Q?Rv6FZxcmFhGk467ktD5mdmggY1WWovf6KZ4T?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 04:51:28.6564
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 04:51:32.1290
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be4c0a90-c5d9-400d-2dd0-08dda7114bf3
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea532df3-1c1a-40c8-e79d-08dda7114e0d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0002992D.namprd02.prod.outlook.com
+	CY4PEPF0000E9D8.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9074
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF0170DF9F2
 
-Add True Random Number Generator(TRNG) driver for Versal
-platform.
+Export drbg_ctr_df() derivative function to re-use it in xilinx trng
+driver. Changes has been tested by enabling CONFIG_CRYPTO_USER_API_RNG_CAVP
 
-Co-developed-by: Mounika Botcha <mounika.botcha@amd.com>
-Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
 Signed-off-by: Harsh Jain <h.jain@amd.com>
 ---
- MAINTAINERS                         |   6 +
- drivers/crypto/Kconfig              |  12 +
- drivers/crypto/xilinx/Makefile      |   1 +
- drivers/crypto/xilinx/xilinx-trng.c | 408 ++++++++++++++++++++++++++++
- 4 files changed, 427 insertions(+)
- create mode 100644 drivers/crypto/xilinx/xilinx-trng.c
+ crypto/drbg.c                       | 108 +++++++++++++++-------------
+ drivers/crypto/Kconfig              |   1 +
+ drivers/crypto/xilinx/xilinx-trng.c |  30 +++++++-
+ include/crypto/drbg.h               |  15 ++++
+ 4 files changed, 101 insertions(+), 53 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 85f7619e06b6..6995a0017a35 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26578,6 +26578,12 @@ F:	drivers/misc/Makefile
- F:	drivers/misc/xilinx_sdfec.c
- F:	include/uapi/misc/xilinx_sdfec.h
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index dbe4c8bb5ceb..322c630c54b8 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -294,10 +294,11 @@ MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes192");
+ MODULE_ALIAS_CRYPTO("drbg_pr_ctr_aes128");
+ MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes128");
  
-+XILINX TRNG DRIVER
-+M:	Mounika Botcha <mounika.botcha@amd.com>
-+M:	Harsh Jain <h.jain@amd.com>
-+S:	Maintained
-+F:	drivers/crypto/xilinx/xilinx-trng.c
+-static void drbg_kcapi_symsetkey(struct drbg_state *drbg,
+-				 const unsigned char *key);
+-static int drbg_kcapi_sym(struct drbg_state *drbg, unsigned char *outval,
+-			  const struct drbg_string *in);
++static void drbg_kcapi_symsetkey(struct crypto_cipher *tfm,
++				 const unsigned char *key,
++				 u8 keylen);
++static int drbg_kcapi_sym(struct crypto_cipher *tfm, unsigned char *outval,
++			  const struct drbg_string *in, u8 blocklen_bytes);
+ static int drbg_init_sym_kernel(struct drbg_state *drbg);
+ static int drbg_fini_sym_kernel(struct drbg_state *drbg);
+ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+@@ -306,28 +307,31 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ #define DRBG_OUTSCRATCHLEN 256
+ 
+ /* BCC function for CTR DRBG as defined in 10.4.3 */
+-static int drbg_ctr_bcc(struct drbg_state *drbg,
 +
- XILINX UARTLITE SERIAL DRIVER
- M:	Peter Korsgaard <jacmet@sunsite.dk>
- L:	linux-serial@vger.kernel.org
++static int drbg_ctr_bcc(struct crypto_cipher *tfm,
+ 			unsigned char *out, const unsigned char *key,
+-			struct list_head *in)
++			struct list_head *in,
++			u8 blocklen_bytes,
++			u8 keylen)
+ {
+ 	int ret = 0;
+ 	struct drbg_string *curr = NULL;
+ 	struct drbg_string data;
+ 	short cnt = 0;
+ 
+-	drbg_string_fill(&data, out, drbg_blocklen(drbg));
++	drbg_string_fill(&data, out, blocklen_bytes);
+ 
+ 	/* 10.4.3 step 2 / 4 */
+-	drbg_kcapi_symsetkey(drbg, key);
++	drbg_kcapi_symsetkey(tfm, key, keylen);
+ 	list_for_each_entry(curr, in, list) {
+ 		const unsigned char *pos = curr->buf;
+ 		size_t len = curr->len;
+ 		/* 10.4.3 step 4.1 */
+ 		while (len) {
+ 			/* 10.4.3 step 4.2 */
+-			if (drbg_blocklen(drbg) == cnt) {
++			if (blocklen_bytes == cnt) {
+ 				cnt = 0;
+-				ret = drbg_kcapi_sym(drbg, out, &data);
++				ret = drbg_kcapi_sym(tfm, out, &data, blocklen_bytes);
+ 				if (ret)
+ 					return ret;
+ 			}
+@@ -339,13 +343,13 @@ static int drbg_ctr_bcc(struct drbg_state *drbg,
+ 	}
+ 	/* 10.4.3 step 4.2 for last block */
+ 	if (cnt)
+-		ret = drbg_kcapi_sym(drbg, out, &data);
++		ret = drbg_kcapi_sym(tfm, out, &data, blocklen_bytes);
+ 
+ 	return ret;
+ }
+ 
+ /*
+- * scratchpad usage: drbg_ctr_update is interlinked with drbg_ctr_df
++ * scratchpad usage: drbg_ctr_update is interlinked with crypto_drbg_ctr_df
+  * (and drbg_ctr_bcc, but this function does not need any temporary buffers),
+  * the scratchpad is used as follows:
+  * drbg_ctr_update:
+@@ -362,7 +366,7 @@ static int drbg_ctr_bcc(struct drbg_state *drbg,
+  *				drbg_statelen(drbg) + drbg_blocklen(drbg)
+  *		length: drbg_statelen(drbg)
+  *
+- * drbg_ctr_df:
++ * crypto_drbg_ctr_df:
+  *	pad
+  *		start: df_data + drbg_statelen(drbg)
+  *		length: drbg_blocklen(drbg)
+@@ -381,21 +385,24 @@ static int drbg_ctr_bcc(struct drbg_state *drbg,
+  *			the final output of all BCC rounds are truncated).
+  *			Therefore, add drbg_blocklen(drbg) to cover all
+  *			possibilities.
++ * refer to crypto_drbg_ctr_df_datalen() to get required length
+  */
+ 
+ /* Derivation Function for CTR DRBG as defined in 10.4.2 */
+-static int drbg_ctr_df(struct drbg_state *drbg,
++int crypto_drbg_ctr_df(struct crypto_cipher *tfm,
+ 		       unsigned char *df_data, size_t bytes_to_return,
+-		       struct list_head *seedlist)
++		       struct list_head *seedlist,
++		       u8 blocklen_bytes,
++		       u8 statelen)
+ {
+ 	int ret = -EFAULT;
+ 	unsigned char L_N[8];
+ 	/* S3 is input */
+ 	struct drbg_string S1, S2, S4, cipherin;
+ 	LIST_HEAD(bcc_list);
+-	unsigned char *pad = df_data + drbg_statelen(drbg);
+-	unsigned char *iv = pad + drbg_blocklen(drbg);
+-	unsigned char *temp = iv + drbg_blocklen(drbg);
++	unsigned char *pad = df_data + statelen;
++	unsigned char *iv = pad + blocklen_bytes;
++	unsigned char *temp = iv + blocklen_bytes;
+ 	size_t padlen = 0;
+ 	unsigned int templen = 0;
+ 	/* 10.4.2 step 7 */
+@@ -410,10 +417,11 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	size_t generated_len = 0;
+ 	size_t inputlen = 0;
+ 	struct drbg_string *seed = NULL;
++	u8 keylen;
+ 
+-	memset(pad, 0, drbg_blocklen(drbg));
+-	memset(iv, 0, drbg_blocklen(drbg));
+-
++	memset(pad, 0, blocklen_bytes);
++	memset(iv, 0, blocklen_bytes);
++	keylen = statelen - blocklen_bytes;
+ 	/* 10.4.2 step 1 is implicit as we work byte-wise */
+ 
+ 	/* 10.4.2 step 2 */
+@@ -429,10 +437,10 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	drbg_cpu_to_be32(bytes_to_return, &L_N[4]);
+ 
+ 	/* 10.4.2 step 5: length is L_N, input_string, one byte, padding */
+-	padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
++	padlen = (inputlen + sizeof(L_N) + 1) % (blocklen_bytes);
+ 	/* wrap the padlen appropriately */
+ 	if (padlen)
+-		padlen = drbg_blocklen(drbg) - padlen;
++		padlen = blocklen_bytes - padlen;
+ 	/*
+ 	 * pad / padlen contains the 0x80 byte and the following zero bytes.
+ 	 * As the calculated padlen value only covers the number of zero
+@@ -442,7 +450,7 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	pad[0] = 0x80;
+ 
+ 	/* 10.4.2 step 4 -- first fill the linked list and then order it */
+-	drbg_string_fill(&S1, iv, drbg_blocklen(drbg));
++	drbg_string_fill(&S1, iv, blocklen_bytes);
+ 	list_add_tail(&S1.list, &bcc_list);
+ 	drbg_string_fill(&S2, L_N, sizeof(L_N));
+ 	list_add_tail(&S2.list, &bcc_list);
+@@ -451,7 +459,7 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	list_add_tail(&S4.list, &bcc_list);
+ 
+ 	/* 10.4.2 step 9 */
+-	while (templen < (drbg_keylen(drbg) + (drbg_blocklen(drbg)))) {
++	while (templen < (keylen + (blocklen_bytes))) {
+ 		/*
+ 		 * 10.4.2 step 9.1 - the padding is implicit as the buffer
+ 		 * holds zeros after allocation -- even the increment of i
+@@ -459,22 +467,23 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 		 */
+ 		drbg_cpu_to_be32(i, iv);
+ 		/* 10.4.2 step 9.2 -- BCC and concatenation with temp */
+-		ret = drbg_ctr_bcc(drbg, temp + templen, K, &bcc_list);
++		ret = drbg_ctr_bcc(tfm, temp + templen, K, &bcc_list,
++				   blocklen_bytes, keylen);
+ 		if (ret)
+ 			goto out;
+ 		/* 10.4.2 step 9.3 */
+ 		i++;
+-		templen += drbg_blocklen(drbg);
++		templen += blocklen_bytes;
+ 	}
+ 
+ 	/* 10.4.2 step 11 */
+-	X = temp + (drbg_keylen(drbg));
+-	drbg_string_fill(&cipherin, X, drbg_blocklen(drbg));
++	X = temp + (keylen);
++	drbg_string_fill(&cipherin, X, blocklen_bytes);
+ 
+ 	/* 10.4.2 step 12: overwriting of outval is implemented in next step */
+ 
+ 	/* 10.4.2 step 13 */
+-	drbg_kcapi_symsetkey(drbg, temp);
++	drbg_kcapi_symsetkey(tfm, temp, keylen);
+ 	while (generated_len < bytes_to_return) {
+ 		short blocklen = 0;
+ 		/*
+@@ -482,12 +491,12 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 		 * implicit as the key is only drbg_blocklen in size based on
+ 		 * the implementation of the cipher function callback
+ 		 */
+-		ret = drbg_kcapi_sym(drbg, X, &cipherin);
++		ret = drbg_kcapi_sym(tfm, X, &cipherin, blocklen_bytes);
+ 		if (ret)
+ 			goto out;
+-		blocklen = (drbg_blocklen(drbg) <
++		blocklen = (blocklen_bytes <
+ 				(bytes_to_return - generated_len)) ?
+-			    drbg_blocklen(drbg) :
++			    blocklen_bytes :
+ 				(bytes_to_return - generated_len);
+ 		/* 10.4.2 step 13.2 and 14 */
+ 		memcpy(df_data + generated_len, X, blocklen);
+@@ -497,11 +506,12 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	ret = 0;
+ 
+ out:
+-	memset(iv, 0, drbg_blocklen(drbg));
+-	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
+-	memset(pad, 0, drbg_blocklen(drbg));
++	memset(iv, 0, blocklen_bytes);
++	memset(temp, 0, statelen + blocklen_bytes);
++	memset(pad, 0, blocklen_bytes);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(crypto_drbg_ctr_df);
+ 
+ /*
+  * update function of CTR DRBG as defined in 10.2.1.2
+@@ -548,7 +558,9 @@ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
+ 
+ 	/* 10.2.1.3.2 step 2 and 10.2.1.4.2 step 2 */
+ 	if (seed) {
+-		ret = drbg_ctr_df(drbg, df_data, drbg_statelen(drbg), seed);
++		ret = crypto_drbg_ctr_df(drbg->priv_data, df_data, drbg_statelen(drbg), seed,
++					 drbg_blocklen(drbg),
++					 drbg_statelen(drbg));
+ 		if (ret)
+ 			goto out;
+ 	}
+@@ -1310,10 +1322,8 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		sb_size = 0;
+ 	else if (drbg->core->flags & DRBG_CTR)
+ 		sb_size = drbg_statelen(drbg) + drbg_blocklen(drbg) + /* temp */
+-			  drbg_statelen(drbg) +	/* df_data */
+-			  drbg_blocklen(drbg) +	/* pad */
+-			  drbg_blocklen(drbg) +	/* iv */
+-			  drbg_statelen(drbg) + drbg_blocklen(drbg); /* temp */
++			  crypto_drbg_ctr_df_datalen(drbg_statelen(drbg),
++						     drbg_blocklen(drbg));
+ 	else
+ 		sb_size = drbg_statelen(drbg) + drbg_blocklen(drbg);
+ 
+@@ -1800,21 +1810,17 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 	return alignmask;
+ }
+ 
+-static void drbg_kcapi_symsetkey(struct drbg_state *drbg,
+-				 const unsigned char *key)
++static void drbg_kcapi_symsetkey(struct crypto_cipher *tfm,
++				 const unsigned char *key, u8 keylen)
+ {
+-	struct crypto_cipher *tfm = drbg->priv_data;
+-
+-	crypto_cipher_setkey(tfm, key, (drbg_keylen(drbg)));
++	crypto_cipher_setkey(tfm, key, keylen);
+ }
+ 
+-static int drbg_kcapi_sym(struct drbg_state *drbg, unsigned char *outval,
+-			  const struct drbg_string *in)
++static int drbg_kcapi_sym(struct crypto_cipher *tfm, unsigned char *outval,
++			  const struct drbg_string *in, u8 blocklen_bytes)
+ {
+-	struct crypto_cipher *tfm = drbg->priv_data;
+-
+ 	/* there is only component in *in */
+-	BUG_ON(in->len < drbg_blocklen(drbg));
++	BUG_ON(in->len < blocklen_bytes);
+ 	crypto_cipher_encrypt_one(tfm, outval, in->buf);
+ 	return 0;
+ }
 diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 5686369779be..209720b42ec6 100644
+index 209720b42ec6..1bbac5298ffa 100644
 --- a/drivers/crypto/Kconfig
 +++ b/drivers/crypto/Kconfig
-@@ -711,6 +711,18 @@ config CRYPTO_DEV_TEGRA
- 	  Select this to enable Tegra Security Engine which accelerates various
- 	  AES encryption/decryption and HASH algorithms.
- 
-+config CRYPTO_DEV_XILINX_TRNG
-+	tristate "Support for Xilinx True Random Generator"
-+	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
-+	select CRYPTO_RNG
-+	select HW_RANDOM
-+	help
-+	  Xilinx Versal SoC driver provides kernel-side support for True Random Number
-+	  Generator and Pseudo random Number in CTR_DRBG mode as defined in NIST SP800-90A.
-+
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called xilinx-trng.
-+
- config CRYPTO_DEV_ZYNQMP_AES
- 	tristate "Support for Xilinx ZynqMP AES hw accelerator"
+@@ -714,6 +714,7 @@ config CRYPTO_DEV_TEGRA
+ config CRYPTO_DEV_XILINX_TRNG
+ 	tristate "Support for Xilinx True Random Generator"
  	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
-diff --git a/drivers/crypto/xilinx/Makefile b/drivers/crypto/xilinx/Makefile
-index 730feff5b5f2..9b51636ef75e 100644
---- a/drivers/crypto/xilinx/Makefile
-+++ b/drivers/crypto/xilinx/Makefile
-@@ -1,3 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_XILINX_TRNG) += xilinx-trng.o
- obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += zynqmp-aes-gcm.o
- obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_SHA3) += zynqmp-sha.o
++	select CRYPTO_DRBG_CTR
+ 	select CRYPTO_RNG
+ 	select HW_RANDOM
+ 	help
 diff --git a/drivers/crypto/xilinx/xilinx-trng.c b/drivers/crypto/xilinx/xilinx-trng.c
-new file mode 100644
-index 000000000000..3b861d1a8a8d
---- /dev/null
+index 3b861d1a8a8d..adaf69c58647 100644
+--- a/drivers/crypto/xilinx/xilinx-trng.c
 +++ b/drivers/crypto/xilinx/xilinx-trng.c
-@@ -0,0 +1,408 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * AMD Versal True Random Number Generator driver
-+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.
-+ */
+@@ -57,6 +57,8 @@
+ struct xilinx_rng {
+ 	void __iomem *rng_base;
+ 	struct device *dev;
++	unsigned char *scratchpadbuf;
++	struct crypto_cipher *tfm;
+ 	struct mutex lock;	/* Protect access to TRNG device */
+ 	struct hwrng trng;
+ };
+@@ -195,9 +197,14 @@ static int xtrng_reseed_internal(struct xilinx_rng *rng)
+ 	ret = xtrng_collect_random_data(rng, entropy, TRNG_SEED_LEN_BYTES, true);
+ 	if (ret != TRNG_SEED_LEN_BYTES)
+ 		return -EINVAL;
++	ret = crypto_drbg_ctr_df(rng->tfm, rng->scratchpadbuf,
++				 TRNG_SEED_LEN_BYTES, &seedlist, AES_BLOCK_SIZE,
++				 TRNG_SEED_LEN_BYTES);
++	if (ret)
++		return ret;
+ 
+ 	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET,
+-				       (u32 *)entropy, TRNG_NUM_INIT_REGS);
++				       (u32 *)rng->scratchpadbuf, TRNG_NUM_INIT_REGS);
+ 	/* select reseed operation */
+ 	iowrite32(TRNG_CTRL_PRNGXS_MASK, rng->rng_base + TRNG_CTRL_OFFSET);
+ 
+@@ -327,6 +334,7 @@ static void xtrng_hwrng_unregister(struct hwrng *trng)
+ static int xtrng_probe(struct platform_device *pdev)
+ {
+ 	struct xilinx_rng *rng;
++	size_t sb_size;
+ 	int ret;
+ 
+ 	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
+@@ -340,6 +348,19 @@ static int xtrng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(rng->rng_base);
+ 	}
+ 
++	rng->tfm = crypto_alloc_cipher("aes", 0, 0);
++	if (IS_ERR(rng->tfm)) {
++		pr_info("DRBG: could not allocate cipher TFM handle:\n");
++		return PTR_ERR(rng->tfm);
++	}
 +
-+#include <linux/bitfield.h>
-+#include <linux/clk.h>
-+#include <linux/crypto.h>
-+#include <linux/firmware/xlnx-zynqmp.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/platform_device.h>
++	sb_size = crypto_drbg_ctr_df_datalen(TRNG_SEED_LEN_BYTES, AES_BLOCK_SIZE);
++	rng->scratchpadbuf = devm_kzalloc(&pdev->dev, sb_size, GFP_KERNEL);
++	if (!rng->scratchpadbuf) {
++		ret = -ENOMEM;
++		goto cipher_cleanup;
++	}
++
+ 	xtrng_trng_reset(rng->rng_base);
+ 	ret = xtrng_reseed_internal(rng);
+ 	if (ret) {
+@@ -352,8 +373,9 @@ static int xtrng_probe(struct platform_device *pdev)
+ 	ret = crypto_register_rng(&xtrng_trng_alg);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Crypto Random device registration failed: %d\n", ret);
+-		return ret;
++		goto cipher_cleanup;
+ 	}
++
+ 	ret = xtrng_hwrng_register(&rng->trng);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "HWRNG device registration failed: %d\n", ret);
+@@ -366,6 +388,9 @@ static int xtrng_probe(struct platform_device *pdev)
+ crypto_rng_free:
+ 	crypto_unregister_rng(&xtrng_trng_alg);
+ 
++cipher_cleanup:
++	crypto_free_cipher(rng->tfm);
++
+ 	return ret;
+ }
+ 
+@@ -377,6 +402,7 @@ static void xtrng_remove(struct platform_device *pdev)
+ 	rng = platform_get_drvdata(pdev);
+ 	xtrng_hwrng_unregister(&rng->trng);
+ 	crypto_unregister_rng(&xtrng_trng_alg);
++	crypto_free_cipher(rng->tfm);
+ 	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET, zero,
+ 				       TRNG_NUM_INIT_REGS);
+ 	xtrng_write_multiple_registers(rng->rng_base + TRNG_PER_STRNG_OFFSET, zero,
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index af5ad51d3eef..978a4a0c34e0 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -53,6 +53,7 @@
+ #include <linux/mutex.h>
+ #include <linux/list.h>
+ #include <linux/workqueue.h>
 +#include <crypto/internal/cipher.h>
-+#include <crypto/internal/rng.h>
-+#include <crypto/aes.h>
-+#include <crypto/drbg.h>
-+
-+/* TRNG Registers Offsets */
-+#define TRNG_STATUS_OFFSET			0x4U
-+#define TRNG_CTRL_OFFSET			0x8U
-+#define TRNG_EXT_SEED_OFFSET			0x40U
-+#define TRNG_PER_STRNG_OFFSET			0x80U
-+#define TRNG_CORE_OUTPUT_OFFSET			0xC0U
-+#define TRNG_RESET_OFFSET			0xD0U
-+#define TRNG_OSC_EN_OFFSET			0xD4U
-+
-+/* Mask values */
-+#define TRNG_RESET_VAL_MASK			BIT(0)
-+#define TRNG_OSC_EN_VAL_MASK			BIT(0)
-+#define TRNG_CTRL_PRNGSRST_MASK			BIT(0)
-+#define TRNG_CTRL_EUMODE_MASK			BIT(8)
-+#define TRNG_CTRL_TRSSEN_MASK			BIT(2)
-+#define TRNG_CTRL_PRNGSTART_MASK		BIT(5)
-+#define TRNG_CTRL_PRNGXS_MASK			BIT(3)
-+#define TRNG_CTRL_PRNGMODE_MASK			BIT(7)
-+#define TRNG_STATUS_DONE_MASK			BIT(0)
-+#define TRNG_STATUS_QCNT_MASK			GENMASK(11, 9)
-+#define TRNG_STATUS_QCNT_16_BYTES		0x800
-+
-+/* Sizes in bytes */
-+#define TRNG_SEED_LEN_BYTES			48U
-+#define TRNG_ENTROPY_SEED_LEN_BYTES		64U
-+#define TRNG_SEC_STRENGTH_SHIFT			5U
-+#define TRNG_SEC_STRENGTH_BYTES			BIT(TRNG_SEC_STRENGTH_SHIFT)
-+#define TRNG_BYTES_PER_REG			4U
-+#define TRNG_RESET_DELAY			10
-+#define TRNG_NUM_INIT_REGS			12U
-+#define TRNG_READ_4_WORD			4
-+#define TRNG_DATA_READ_DELAY			8000
-+
-+struct xilinx_rng {
-+	void __iomem *rng_base;
-+	struct device *dev;
-+	struct mutex lock;	/* Protect access to TRNG device */
-+	struct hwrng trng;
-+};
-+
-+struct xilinx_rng_ctx {
-+	struct xilinx_rng *rng;
-+};
-+
-+static struct xilinx_rng *xilinx_rng_dev;
-+
-+static void xtrng_readwrite32(void __iomem *addr, u32 mask, u8 value)
+ 
+ /*
+  * Concatenation Helper and string operation helper
+@@ -264,6 +265,14 @@ static inline int crypto_drbg_reset_test(struct crypto_rng *drng,
+ 	return crypto_rng_reset(drng, pers->buf, pers->len);
+ }
+ 
++static inline int crypto_drbg_ctr_df_datalen(u8 statelen, u8 blocklen)
 +{
-+	u32 val;
-+
-+	val = ioread32(addr);
-+	val = (val & (~mask)) | (mask & value);
-+	iowrite32(val, addr);
++	return statelen +	/* df_data */
++		blocklen +	/* pad */
++		blocklen +	/* iv */
++		statelen + blocklen;  /* temp */
 +}
 +
-+static void xtrng_trng_reset(void __iomem *addr)
-+{
-+	xtrng_readwrite32(addr + TRNG_RESET_OFFSET, TRNG_RESET_VAL_MASK, TRNG_RESET_VAL_MASK);
-+	udelay(TRNG_RESET_DELAY);
-+	xtrng_readwrite32(addr + TRNG_RESET_OFFSET, TRNG_RESET_VAL_MASK, 0);
-+}
+ /* DRBG type flags */
+ #define DRBG_CTR	((drbg_flag_t)1<<0)
+ #define DRBG_HMAC	((drbg_flag_t)1<<1)
+@@ -283,4 +292,10 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+ 
++int crypto_drbg_ctr_df(struct crypto_cipher *tfm,
++		       unsigned char *df_data, size_t bytes_to_return,
++		       struct list_head *seedlist,
++		       u8 blocklen_bytes,
++		       u8 statelen);
 +
-+static void xtrng_hold_reset(void __iomem *addr)
-+{
-+	xtrng_readwrite32(addr + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSRST_MASK,
-+			  TRNG_CTRL_PRNGSRST_MASK);
-+	iowrite32(TRNG_RESET_VAL_MASK, addr + TRNG_RESET_OFFSET);
-+	udelay(TRNG_RESET_DELAY);
-+}
-+
-+static void xtrng_softreset(struct xilinx_rng *rng)
-+{
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSRST_MASK,
-+			  TRNG_CTRL_PRNGSRST_MASK);
-+	udelay(TRNG_RESET_DELAY);
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSRST_MASK, 0);
-+}
-+
-+/* Return no. of bytes read */
-+static size_t xtrng_readblock32(void __iomem *rng_base, __be32 *buf, int blocks32, bool wait)
-+{
-+	int read = 0, ret;
-+	int timeout = 1;
-+	int i, idx;
-+	u32 val;
-+
-+	if (wait)
-+		timeout = TRNG_DATA_READ_DELAY;
-+
-+	for (i = 0; i < (blocks32 * 2); i++) {
-+		/* TRNG core generate data in 16 bytes. Read twice to complete 32 bytes read */
-+		ret = readl_poll_timeout(rng_base + TRNG_STATUS_OFFSET, val,
-+					 (val & TRNG_STATUS_QCNT_MASK) ==
-+					 TRNG_STATUS_QCNT_16_BYTES, !!wait, timeout);
-+		if (ret)
-+			break;
-+
-+		for (idx = 0; idx < TRNG_READ_4_WORD; idx++) {
-+			*(buf + read) = cpu_to_be32(ioread32(rng_base + TRNG_CORE_OUTPUT_OFFSET));
-+			read += 1;
-+		}
-+	}
-+	return read * 4;
-+}
-+
-+static int xtrng_collect_random_data(struct xilinx_rng *rng, u8 *rand_gen_buf,
-+				     int no_of_random_bytes, bool wait)
-+{
-+	u8 randbuf[TRNG_SEC_STRENGTH_BYTES];
-+	int byteleft, blocks, count = 0;
-+	int ret;
-+
-+	byteleft = no_of_random_bytes & (TRNG_SEC_STRENGTH_BYTES - 1);
-+	blocks = no_of_random_bytes >> TRNG_SEC_STRENGTH_SHIFT;
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSTART_MASK,
-+			  TRNG_CTRL_PRNGSTART_MASK);
-+	if (blocks) {
-+		ret = xtrng_readblock32(rng->rng_base, (__be32 *)rand_gen_buf, blocks, wait);
-+		if (!ret)
-+			return 0;
-+		count += ret;
-+	}
-+
-+	if (byteleft) {
-+		ret = xtrng_readblock32(rng->rng_base, (__be32 *)randbuf, 1, wait);
-+		if (!ret)
-+			return count;
-+		memcpy(rand_gen_buf + (blocks * TRNG_SEC_STRENGTH_BYTES), randbuf, byteleft);
-+		count += byteleft;
-+	}
-+
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET,
-+			  TRNG_CTRL_PRNGMODE_MASK | TRNG_CTRL_PRNGSTART_MASK, 0U);
-+
-+	return count;
-+}
-+
-+static void xtrng_write_multiple_registers(void __iomem *base_addr, u32 *values, size_t n)
-+{
-+	void __iomem *reg_addr;
-+	size_t i;
-+
-+	/* Write seed value into EXTERNAL_SEED Registers in big endian format */
-+	for (i = 0; i < n; i++) {
-+		reg_addr = (base_addr + ((n - 1 - i) * TRNG_BYTES_PER_REG));
-+		iowrite32((u32 __force)(cpu_to_be32(values[i])), reg_addr);
-+	}
-+}
-+
-+static void xtrng_enable_entropy(struct xilinx_rng *rng)
-+{
-+	iowrite32(TRNG_OSC_EN_VAL_MASK, rng->rng_base + TRNG_OSC_EN_OFFSET);
-+	xtrng_softreset(rng);
-+	iowrite32(TRNG_CTRL_EUMODE_MASK | TRNG_CTRL_TRSSEN_MASK, rng->rng_base + TRNG_CTRL_OFFSET);
-+}
-+
-+static int xtrng_reseed_internal(struct xilinx_rng *rng)
-+{
-+	u8 entropy[TRNG_ENTROPY_SEED_LEN_BYTES];
-+	u32 entropylen = TRNG_SEED_LEN_BYTES;
-+	struct drbg_string data;
-+	LIST_HEAD(seedlist);
-+	u32 val;
-+	int ret;
-+
-+	drbg_string_fill(&data, entropy, entropylen);
-+	list_add_tail(&data.list, &seedlist);
-+	memset(entropy, 0, sizeof(entropy));
-+	xtrng_enable_entropy(rng);
-+
-+	/* collect random data to use it as entropy (input for DF) */
-+	ret = xtrng_collect_random_data(rng, entropy, TRNG_SEED_LEN_BYTES, true);
-+	if (ret != TRNG_SEED_LEN_BYTES)
-+		return -EINVAL;
-+
-+	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET,
-+				       (u32 *)entropy, TRNG_NUM_INIT_REGS);
-+	/* select reseed operation */
-+	iowrite32(TRNG_CTRL_PRNGXS_MASK, rng->rng_base + TRNG_CTRL_OFFSET);
-+
-+	/* Start the reseed operation with above configuration and wait for STATUS.Done bit to be
-+	 * set. Monitor STATUS.CERTF bit, if set indicates SP800-90B entropy health test has failed.
-+	 */
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSTART_MASK,
-+			  TRNG_CTRL_PRNGSTART_MASK);
-+
-+	ret = readl_poll_timeout(rng->rng_base + TRNG_STATUS_OFFSET, val,
-+				 (val & TRNG_STATUS_DONE_MASK) == TRNG_STATUS_DONE_MASK,
-+				  1U, 15000U);
-+	if (ret)
-+		return ret;
-+
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET, TRNG_CTRL_PRNGSTART_MASK, 0U);
-+
-+	return 0;
-+}
-+
-+static int xtrng_random_bytes_generate(struct xilinx_rng *rng, u8 *rand_buf_ptr,
-+				       u32 rand_buf_size, int wait)
-+{
-+	int nbytes;
-+	int ret;
-+
-+	xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET,
-+			  TRNG_CTRL_PRNGMODE_MASK | TRNG_CTRL_PRNGXS_MASK,
-+			  TRNG_CTRL_PRNGMODE_MASK | TRNG_CTRL_PRNGXS_MASK);
-+	nbytes = xtrng_collect_random_data(rng, rand_buf_ptr, rand_buf_size, wait);
-+
-+	ret = xtrng_reseed_internal(rng);
-+	if (ret) {
-+		dev_err(rng->dev, "Re-seed fail\n");
-+		return ret;
-+	}
-+
-+	return nbytes;
-+}
-+
-+static int xtrng_trng_generate(struct crypto_rng *tfm, const u8 *src, u32 slen,
-+			       u8 *dst, u32 dlen)
-+{
-+	struct xilinx_rng_ctx *ctx = crypto_rng_ctx(tfm);
-+	int ret;
-+
-+	mutex_lock(&ctx->rng->lock);
-+	ret = xtrng_random_bytes_generate(ctx->rng, dst, dlen, true);
-+	mutex_unlock(&ctx->rng->lock);
-+
-+	return ret < 0 ? ret : 0;
-+}
-+
-+static int xtrng_trng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
-+{
-+	return 0;
-+}
-+
-+static int xtrng_trng_init(struct crypto_tfm *rtfm)
-+{
-+	struct xilinx_rng_ctx *ctx = crypto_tfm_ctx(rtfm);
-+
-+	ctx->rng = xilinx_rng_dev;
-+
-+	return 0;
-+}
-+
-+static struct rng_alg xtrng_trng_alg = {
-+	.generate = xtrng_trng_generate,
-+	.seed = xtrng_trng_seed,
-+	.seedsize = 0,
-+	.base = {
-+		.cra_name = "stdrng",
-+		.cra_driver_name = "xilinx-trng",
-+		.cra_priority = 300,
-+		.cra_ctxsize = sizeof(struct xilinx_rng_ctx),
-+		.cra_module = THIS_MODULE,
-+		.cra_init = xtrng_trng_init,
-+	},
-+};
-+
-+static int xtrng_hwrng_trng_read(struct hwrng *hwrng, void *data, size_t max, bool wait)
-+{
-+	u8 buf[TRNG_SEC_STRENGTH_BYTES];
-+	struct xilinx_rng *rng;
-+	int ret = -EINVAL, i = 0;
-+
-+	rng = container_of(hwrng, struct xilinx_rng, trng);
-+	/* Return in case wait not set and lock not available. */
-+	if (!mutex_trylock(&rng->lock) && !wait)
-+		return 0;
-+	else if (!mutex_is_locked(&rng->lock) && wait)
-+		mutex_lock(&rng->lock);
-+
-+	while (i < max) {
-+		ret = xtrng_random_bytes_generate(rng, buf, TRNG_SEC_STRENGTH_BYTES, wait);
-+		if (ret < 0)
-+			break;
-+
-+		memcpy(data + i, buf, min(ret, (max - i)));
-+		i += min(ret, (max - i));
-+	}
-+	mutex_unlock(&rng->lock);
-+
-+	return ret;
-+}
-+
-+static int xtrng_hwrng_register(struct hwrng *trng)
-+{
-+	int ret;
-+
-+	trng->name = "Xilinx Versal Crypto Engine TRNG";
-+	trng->read = xtrng_hwrng_trng_read;
-+
-+	ret = hwrng_register(trng);
-+	if (ret)
-+		pr_err("Fail to register the TRNG\n");
-+
-+	return ret;
-+}
-+
-+static void xtrng_hwrng_unregister(struct hwrng *trng)
-+{
-+	hwrng_unregister(trng);
-+}
-+
-+static int xtrng_probe(struct platform_device *pdev)
-+{
-+	struct xilinx_rng *rng;
-+	int ret;
-+
-+	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-+	if (!rng)
-+		return -ENOMEM;
-+
-+	rng->dev = &pdev->dev;
-+	rng->rng_base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(rng->rng_base)) {
-+		dev_err(&pdev->dev, "Failed to map resource %ld\n", PTR_ERR(rng->rng_base));
-+		return PTR_ERR(rng->rng_base);
-+	}
-+
-+	xtrng_trng_reset(rng->rng_base);
-+	ret = xtrng_reseed_internal(rng);
-+	if (ret) {
-+		dev_err(&pdev->dev, "TRNG Seed fail\n");
-+		return ret;
-+	}
-+
-+	xilinx_rng_dev = rng;
-+	mutex_init(&rng->lock);
-+	ret = crypto_register_rng(&xtrng_trng_alg);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Crypto Random device registration failed: %d\n", ret);
-+		return ret;
-+	}
-+	ret = xtrng_hwrng_register(&rng->trng);
-+	if (ret) {
-+		dev_err(&pdev->dev, "HWRNG device registration failed: %d\n", ret);
-+		goto crypto_rng_free;
-+	}
-+	platform_set_drvdata(pdev, rng);
-+
-+	return 0;
-+
-+crypto_rng_free:
-+	crypto_unregister_rng(&xtrng_trng_alg);
-+
-+	return ret;
-+}
-+
-+static void xtrng_remove(struct platform_device *pdev)
-+{
-+	struct xilinx_rng *rng;
-+	u32 zero[TRNG_NUM_INIT_REGS] = { };
-+
-+	rng = platform_get_drvdata(pdev);
-+	xtrng_hwrng_unregister(&rng->trng);
-+	crypto_unregister_rng(&xtrng_trng_alg);
-+	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET, zero,
-+				       TRNG_NUM_INIT_REGS);
-+	xtrng_write_multiple_registers(rng->rng_base + TRNG_PER_STRNG_OFFSET, zero,
-+				       TRNG_NUM_INIT_REGS);
-+	xtrng_hold_reset(rng->rng_base);
-+	xilinx_rng_dev = NULL;
-+}
-+
-+static const struct of_device_id xtrng_of_match[] = {
-+	{ .compatible = "xlnx,versal-rng", },
-+	{},
-+};
-+
-+MODULE_DEVICE_TABLE(of, xtrng_of_match);
-+
-+static struct platform_driver xtrng_driver = {
-+	.driver = {
-+		.name = "xlnx,versal-rng",
-+		.of_match_table	= xtrng_of_match,
-+	},
-+	.probe = xtrng_probe,
-+	.remove = xtrng_remove,
-+};
-+
-+module_platform_driver(xtrng_driver);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Harsh Jain <h.jain@amd.com>");
-+MODULE_AUTHOR("Mounika Botcha <mounika.botcha@amd.com>");
-+MODULE_DESCRIPTION("True Random Number Generator Driver");
+ #endif /* _DRBG_H */
 -- 
 2.34.1
 
