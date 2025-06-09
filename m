@@ -1,90 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF40610D;
-	Mon,  9 Jun 2025 06:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B443E155342;
+	Mon,  9 Jun 2025 07:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749451055; cv=none; b=d1O8aeLu+05XciiGE7cuoQX/U1SnzEd90WCyUJPMjSkXywpB/62OfxWsnHZ7nZKu1iWgwX1rdBqwZ5kNe96JYlPpNHks5WijBduuYUrpju0x/bVw600Izjl+qcHfvi1JYCCd5LV4TFhDxm0qHKUR3XINgEDNTRITLRU+ucIWUzw=
+	t=1749454845; cv=none; b=EG2cbr2UTdPN6PFh5WCtezTOKUc2gS3SuccV1ECncSUJZ4It4amoYj8zJYa0AAhK+kKCkzGFiybibvln39LVDY9BdJDceNO3o/2ZUoOlSwBgM+HqYoa+DkvCrBeQ/fEOzz7y/LVLrRTrx/1MgvRGcnS7H4J7Ciq04AHiOx+t6zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749451055; c=relaxed/simple;
-	bh=PzPxuWTz0u4ZdESLKo1cP6MTOvIeW+qr8Pz1HoSaTws=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=mpNE+CNnp0B+xb1WPD0IW/E3L+J637WYlESgb8MCwYqv4/ulZdVg68PN52DpwN14AC704wRk2Bdadf955bz0YDBgq2BKFMFLch5vVn2hCBb33cL99eTyDtjUtCB4OFAOrZLyoWlh3F7D6elQhEyQNDejlz0zwtuU4xCHgdSgVaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V8ZNxTSL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749454845; c=relaxed/simple;
+	bh=209nlqUCXw1v1f3VX0uAONXnvWEHs95NYNmSYw3A208=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hGqR0101xDAVE57UVjw+KYMrg3J/KU++28lIGogjp5NCOSkuxFZswbpF/WiIp6XSU7vuWkmhHNIyDnRi5Mwc+zjr8wvxhi8soPvi/YPQuQbcpe0V7awKXtmGP5ftmie2O+Ol6oA4w+EHeRzTxhgVibhv6sU5KctM4HbGwf7L4xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gY73dLvT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V8ZNxTSL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB4CFC4CEEB;
-	Mon,  9 Jun 2025 06:37:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gY73dLvT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D454C4CEEB;
+	Mon,  9 Jun 2025 07:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749451055;
-	bh=PzPxuWTz0u4ZdESLKo1cP6MTOvIeW+qr8Pz1HoSaTws=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=V8ZNxTSLqo34AjPTIBPoxYV+v+Dt0J3rX2PsFN+vffXNhBZeLS6SeBFpuV0525ngC
-	 s1uta5iUMsIDfEX5ms5m/EcdQNy432shhW1Pd+bLCZ9EtfR6JmCM7QW7Uz3+rUOIP1
-	 INXL/A+LDsSonJPr9zizKZ6ir7sGweiqoMurTdqzuAqvHophaExI37FMvyOWOsJ18S
-	 Lp0mk4urYcaO0x3HJT9xgpoZuH3rSzHhwv8rHKq2cLF59Ql7jFai/Ktf10EiaVAeOO
-	 f+4rSLZ4XXuSVgwdGHG7jO2Qg5aNE6sGbKuCI5GaVI6Oz9iFBlOPwQ4eYHy4wV8IY+
-	 uS3Td6CybmxQQ==
-Date: Mon, 09 Jun 2025 01:37:34 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1749454845;
+	bh=209nlqUCXw1v1f3VX0uAONXnvWEHs95NYNmSYw3A208=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gY73dLvTuG20cJBz/uTBYeNpVArZbVpympdOLaTXmTkeunUr3SogtkPrwip9348ep
+	 GlTKa/1aKhnLBecgL6YOHGiyn6aWWyzDNjIomZXEgN5BhgUj0hO1mpCxdKv9aobqz4
+	 RnoBw1oQVRZdaapyQ1FXeBDESYqX3Q0OfYu1fpREr/8jdQi513Lp7mLf63c+XEToKH
+	 LYD8l/KcwV19regOTXQOVdkfp/yPLBBpzHKzu/sXfWel7SlgoHtargDiNocTs3CBSM
+	 6lBah99e7LOsXVUIFQVjuP75ksUm9JxSa89Qa+QLFdgswE9W8Py551smm+rsV6wroC
+	 3VMj1AV9M7FpQ==
+Date: Mon, 9 Jun 2025 09:40:40 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org,
+	linux-arch@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
+ integrated
+Message-ID: <aEaP-A21IB4ufbZT@gmail.com>
+References: <20250607200454.73587-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: mohan.dhanawade@amd.com, devicetree@vger.kernel.org, 
- davem@davemloft.net, herbert@gondor.apana.org.au, michal.simek@amd.com, 
- mounika.botcha@amd.com, sarat.chand.savitala@amd.com, 
- linux-crypto@vger.kernel.org
-To: Harsh Jain <h.jain@amd.com>
-In-Reply-To: <20250609045110.1786634-2-h.jain@amd.com>
-References: <20250609045110.1786634-1-h.jain@amd.com>
- <20250609045110.1786634-2-h.jain@amd.com>
-Message-Id: <174945105401.1083809.6139700384718518785.robh@kernel.org>
-Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Add node for True Random
- Number Generator
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250607200454.73587-1-ebiggers@kernel.org>
 
 
-On Mon, 09 Jun 2025 10:21:05 +0530, Harsh Jain wrote:
-> From: Mounika Botcha <mounika.botcha@amd.com>
+* Eric Biggers <ebiggers@kernel.org> wrote:
+
+> This series is also available at:
 > 
-> Add TRNG node compatible string and reg properities.
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git lib-crc-arch-v2
 > 
-> Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
-> Signed-off-by: Harsh Jain <h.jain@amd.com>
-> ---
->  .../bindings/crypto/xlnx,versal-trng.yaml     | 36 +++++++++++++++++++
->  1 file changed, 36 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
+> This series improves how lib/crc supports arch-optimized code.  First,
+> instead of the arch-optimized CRC code being in arch/$(SRCARCH)/lib/, it
+> will now be in lib/crc/$(SRCARCH)/.  Second, the API functions (e.g.
+> crc32c()), arch-optimized functions (e.g. crc32c_arch()), and generic
+> functions (e.g. crc32c_base()) will now be part of a single module for
+> each CRC type, allowing better inlining and dead code elimination.  The
+> second change is made possible by the first.
 > 
+> As an example, consider CONFIG_CRC32=m on x86.  We'll now have just
+> crc32.ko instead of both crc32-x86.ko and crc32.ko.  The two modules
+> were already coupled together and always both got loaded together via
+> direct symbol dependency, so the separation provided no benefit.
+> 
+> Note: later I'd like to apply the same design to lib/crypto/ too, where
+> often the API functions are out-of-line so this will work even better.
+> In those cases, for each algorithm we currently have 3 modules all
+> coupled together, e.g. libsha256.ko, libsha256-generic.ko, and
+> sha256-x86.ko.  We should have just one, inline things properly, and
+> rely on the compiler's dead code elimination to decide the inclusion of
+> the generic code instead of manually setting it via kconfig.
+> 
+> Having arch-specific code outside arch/ was somewhat controversial when
+> Zinc proposed it back in 2018.  But I don't think the concerns are
+> warranted.  It's better from a technical perspective, as it enables the
+> improvements mentioned above.  This model is already successfully used
+> in other places in the kernel such as lib/raid6/.  The community of each
+> architecture still remains free to work on the code, even if it's not in
+> arch/.  At the time there was also a desire to put the library code in
+> the same files as the old-school crypto API, but that was a mistake; now
+> that the library is separate, that's no longer a constraint either.
+> 
+> Changed in v2:
+>    - Fixed build warning on architectures without any optimized CRC code
+>    - Fixed build warning in sparc/crc32.h by removing pr_fmt
+>    - Moved fallback definitions of crc32*_arch back into arch files
+>    - Remove ARCH_HAS_CRC* symbols at end of series instead of beginning,
+>      so that they're not removed until they're no longer being selected
+>    - Slightly improved some commit messages
+>    - Rebased onto other pending lib/crc changes
+> 
+> Eric Biggers (12):
+>   lib/crc: move files into lib/crc/
+>   lib/crc: prepare for arch-optimized code in subdirs of lib/crc/
+>   lib/crc/arm: migrate arm-optimized CRC code into lib/crc/
+>   lib/crc/arm64: migrate arm64-optimized CRC code into lib/crc/
+>   lib/crc/loongarch: migrate loongarch-optimized CRC code into lib/crc/
+>   lib/crc/mips: migrate mips-optimized CRC code into lib/crc/
+>   lib/crc/powerpc: migrate powerpc-optimized CRC code into lib/crc/
+>   lib/crc/riscv: migrate riscv-optimized CRC code into lib/crc/
+>   lib/crc/s390: migrate s390-optimized CRC code into lib/crc/
+>   lib/crc/sparc: migrate sparc-optimized CRC code into lib/crc/
+>   lib/crc/x86: migrate x86-optimized CRC code into lib/crc/
+>   lib/crc: remove ARCH_HAS_* kconfig symbols
 
-My bot found errors running 'make dt_binding_check' on your patch:
+For the movement of the x86 bits:
 
-yamllint warnings/errors:
+  Acked-by: Ingo Molnar <mingo@kernel.org>
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml: $id: Cannot determine base path from $id, relative path/filename doesn't match actual path or filename
- 	 $id: http://devicetree.org/schemas/crypto/xlnx,versal-rng.yaml
- 	file: /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
+>  rename {arch/s390/lib => lib/crc/s390}/crc32be-vx.c (100%)
+>  rename {arch/s390/lib => lib/crc/s390}/crc32le-vx.c (100%)
+>  rename arch/sparc/lib/crc32.c => lib/crc/sparc/crc32.h (60%)
+>  rename {arch/sparc/lib => lib/crc/sparc}/crc32c_asm.S (100%)
+>  create mode 100644 lib/crc/tests/Makefile
+>  rename lib/{ => crc}/tests/crc_kunit.c (100%)
+>  rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-consts.h (100%)
+>  rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-template.S (100%)
+>  rename {arch/x86/lib => lib/crc/x86}/crc-pclmul-template.h (100%)
+>  rename arch/x86/lib/crc-t10dif.c => lib/crc/x86/crc-t10dif.h (56%)
+>  rename {arch/x86/lib => lib/crc/x86}/crc16-msb-pclmul.S (100%)
+>  rename {arch/x86/lib => lib/crc/x86}/crc32-pclmul.S (100%)
 
-doc reference errors (make refcheckdocs):
+One small namespace suggestion: wouldn't it be better to move the arch 
+support code to lib/crc/arch/, instead of lib/crc/? That way any 
+generic code will stand out better and architecture directories don't 
+crowd out what is supposed to be generic code.
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250609045110.1786634-2-h.jain@amd.com
+Thanks,
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+	Ingo
