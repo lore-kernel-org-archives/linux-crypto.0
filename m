@@ -1,146 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95130E571;
-	Mon,  9 Jun 2025 19:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7C71CF7AF
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Jun 2025 20:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749498547; cv=none; b=OSE0ZctC5bAodMo8c/rzs/feOcJxKgWJTkFAtXLr4NLHRyH/irA4/+Cw6wYoHhOK7hxDyfjy37kQBGstFJQsSSGZhJ+0V26jdkxaTEd6im0i8H7rEcePW79JMATlSmU0g1IjpJ+aXXIOBILF/NJnTijI+ITJzIdyOJHpxEc80oU=
+	t=1749500009; cv=none; b=eIPY1AT+ouo8ipXvVcm7iZCK45clX3UN546tzEC2motXkFQjXZRWSUp2lZAcBX8oenIPucuxQs16kgUWy/ob/cpzV0xI2CxfwSZqsP7Xkw0SdwyJ0XrdkgKKemrjtBf92AckV2wf4d+yIFElemgl4Uig8F0tg77xYpPHw3WRf+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749498547; c=relaxed/simple;
-	bh=RLgUdqwZ9jil0fkdDSzWjVe6IIMp+UtbacVJeNotnRE=;
+	s=arc-20240116; t=1749500009; c=relaxed/simple;
+	bh=Us2N/NCViJOTrbWcEGQmIkQWyzzEmf6mDW8hu15e8a8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaP/+uejKMhsVm9gy+qe/JNcxtBwZvQNbk56i9wsfZVSDkC21wpUUqVaL32cHaNYpSkxQOccpAK24GEsKrBred6Oq3FVApxHjS+PLJJPszdz0g8HKhj5RGK4lcIZJSUAN8H9iN0M5YL3E8EAP9Zcwr7feMIjhWYEiHup4CSZ6Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QK55junN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pk24uDWIvF0QIC0vuRipQUg48/PYJi7XAB5lI0GMFYwb7LQB55br+T84UBUy2oM1EYVO47mkHnnJ3WaB5oKrcTbeKyBoSBcvaii79ynYzgw+jHM4uNBwsS4Vz9qHzI89kIhfjzmwMWbEtyrtCWICdIRBUV6cW7rlF77j9dlydco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBHudaaA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QK55junN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5945C4CEEB;
-	Mon,  9 Jun 2025 19:49:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBHudaaA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FE1C4CEEF;
+	Mon,  9 Jun 2025 20:13:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749498547;
-	bh=RLgUdqwZ9jil0fkdDSzWjVe6IIMp+UtbacVJeNotnRE=;
+	s=k20201202; t=1749500008;
+	bh=Us2N/NCViJOTrbWcEGQmIkQWyzzEmf6mDW8hu15e8a8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QK55junN0VbW2TGQ60ZqBGWYViH46R3lRyu4gUydEyY+Hh3KaitiLfFEvBnWI1r1X
-	 lRkAy+lEDKGHHODwZuKXmXjD3bma7Uo1p9YeuJDFpOg4S9P5g+Xcg0SSU2vvttcHI9
-	 4lR9wO8MNIVxc41xXD74pTH5t5lC3rxHs3ajYv7zAHTC7u7F8taQisrWv24jWv6eEY
-	 NAMjDv3elM0fob7CfJw9CVKzwDdg4KQs5dEb5YS6zjc++7S4SPPwQj4A+dAgJwJgOn
-	 FVNqVUnGBa5/HSJl7pxNXInlROg8XV9V78mjoJUj00SM7blrPSGCR341rm1XL707q3
-	 l5n84gNAl0U8g==
-Date: Mon, 9 Jun 2025 12:48:45 -0700
+	b=mBHudaaA4FyOfGmwQqHtLG8mku9PBc/04nNV5565X0ECQOc6/j3+GtYTm0h5ay5r8
+	 4jAHuJe0gk/ISOvQXzdHK/jxbyUkzJ8dOr9b5k7LiNtc4RSSP2HrkgZf4yvoUUxn4L
+	 ksBPGzIjOGhje3qjTKwjtnzFK33r8FWf1Z45ze9VrZpVko2E95tCO7qUg1FVhx9vZR
+	 CWvd8/sMzP5CXS1csIjR5bSlBvPkaPlbWF1H7KJ8kWstmlVGoUAtVvTj6nvmMEr0nF
+	 IZSK9K5i7ejbuKqzyeNXcGa/QBE6hUr1ApP/gqGNdGYgbeqb32OIkHjASCSMYebRas
+	 Ns84xPQ5yqd6A==
+Date: Mon, 9 Jun 2025 13:13:06 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Julian Calaby <julian.calaby@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	linux-arch@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
- integrated
-Message-ID: <20250609194845.GC1255@sol>
-References: <20250607200454.73587-1-ebiggers@kernel.org>
- <CAGRGNgV_4X3O-qo3XFGexi9_JqJXK9Mf82=p8CQ4BoD3o-Hypw@mail.gmail.com>
+To: Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+	herbert@gondor.apana.org.au, paul.walmsley@sifive.com,
+	alex@ghiti.fr, appro@cryptogams.org, zhang.lyra@gmail.com
+Subject: Re: [PATCH v3] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS
+ implementation
+Message-ID: <20250609201306.GD1255@sol>
+References: <20250609074655.203572-3-zhihang.shao.iscas@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGRGNgV_4X3O-qo3XFGexi9_JqJXK9Mf82=p8CQ4BoD3o-Hypw@mail.gmail.com>
+In-Reply-To: <20250609074655.203572-3-zhihang.shao.iscas@gmail.com>
 
-On Mon, Jun 09, 2025 at 06:15:24PM +1000, Julian Calaby wrote:
-> Hi Eric,
+On Mon, Jun 09, 2025 at 03:46:57PM +0800, Zhihang Shao wrote:
+> From: Zhihang Shao <zhihang.shao.iscas@gmail.com>
 > 
-> On Sun, Jun 8, 2025 at 6:07 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > This series is also available at:
-> >
-> >     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git lib-crc-arch-v2
-> >
-> > This series improves how lib/crc supports arch-optimized code.  First,
-> > instead of the arch-optimized CRC code being in arch/$(SRCARCH)/lib/, it
-> > will now be in lib/crc/$(SRCARCH)/.  Second, the API functions (e.g.
-> > crc32c()), arch-optimized functions (e.g. crc32c_arch()), and generic
-> > functions (e.g. crc32c_base()) will now be part of a single module for
-> > each CRC type, allowing better inlining and dead code elimination.  The
-> > second change is made possible by the first.
-> >
-> > As an example, consider CONFIG_CRC32=m on x86.  We'll now have just
-> > crc32.ko instead of both crc32-x86.ko and crc32.ko.  The two modules
-> > were already coupled together and always both got loaded together via
-> > direct symbol dependency, so the separation provided no benefit.
-> >
-> > Note: later I'd like to apply the same design to lib/crypto/ too, where
-> > often the API functions are out-of-line so this will work even better.
-> > In those cases, for each algorithm we currently have 3 modules all
-> > coupled together, e.g. libsha256.ko, libsha256-generic.ko, and
-> > sha256-x86.ko.  We should have just one, inline things properly, and
-> > rely on the compiler's dead code elimination to decide the inclusion of
-> > the generic code instead of manually setting it via kconfig.
-> >
-> > Having arch-specific code outside arch/ was somewhat controversial when
-> > Zinc proposed it back in 2018.  But I don't think the concerns are
-> > warranted.  It's better from a technical perspective, as it enables the
-> > improvements mentioned above.  This model is already successfully used
-> > in other places in the kernel such as lib/raid6/.  The community of each
-> > architecture still remains free to work on the code, even if it's not in
-> > arch/.  At the time there was also a desire to put the library code in
-> > the same files as the old-school crypto API, but that was a mistake; now
-> > that the library is separate, that's no longer a constraint either.
+> This is a straight import of the OpenSSL/CRYPTOGAMS Poly1305
+> implementation for riscv authored by Andy Polyakov.
+> The file 'poly1305-riscv.pl' is taken straight from this upstream
+> GitHub repository [0] at commit 33fe84bc21219a16825459b37c825bf4580a0a7b,
+> and this commit fixed a bug in riscv 64bit implementation.
 > 
-> Quick question, and apologies if this has been covered elsewhere.
-> 
-> Why not just use choice blocks in Kconfig to choose the compiled-in
-> crc32 variant instead of this somewhat indirect scheme?
->
-> This would keep the dependencies grouped by arch and provide a single place to
-> choose whether the generic or arch-specific method is used.
+> [0] https://github.com/dot-asm/cryptogams
 
-It's not clear exactly what you're suggesting, but it sounds like you're
-complaining about this:
+There are a couple minor differences between the CRYPTOGAMS file and the one in
+this patch.  Please make sure those are documented.
 
-    config CRC32_ARCH
-            bool
-            depends on CRC32 && CRC_OPTIMIZATIONS
-            default y if ARM && KERNEL_MODE_NEON
-            default y if ARM64
-            default y if LOONGARCH
-            default y if MIPS && CPU_MIPSR6
-            default y if PPC64 && ALTIVEC
-            default y if RISCV && RISCV_ISA_ZBC
-            default y if S390
-            default y if SPARC64
-            default y if X86
+> +config CRYPTO_POLY1305_RISCV
+> +	tristate
+> +	default CRYPTO_LIB_POLY1305
+> +    select CRYPTO_ARCH_HAVE_LIB_POLY1305
 
-We could instead make each arch be responsible for selecting this from
-lib/crc/$(SRCARCH)/Kconfig, which lib/crc/Kconfig would then have to include.
-But I don't think the small bit of additional per-arch separation would be worth
-the extra complexity here.  Something similar applies to lib/crc/Makefile too.
+Fix the indentation here.
 
-This patchset strikes a balance where the vast majority of the arch-specific CRC
-code is isolated in lib/crc/$(SRCARCH), and the exceptions are just
-lib/crc/Makefile and lib/crc/Kconfig.  I think these exceptions make sense,
-given that we're building a single module per CRC variant.  We'd have to go
-through some hoops to isolate the arch-specific Kconfig and Makefile snippets
-into per-arch files, which don't seem worth it here IMO.
+> +void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
+> +			  unsigned int len, u32 padbit)
+> +{
+> +	len = round_down(len, POLY1305_BLOCK_SIZE);
+> +	poly1305_blocks(state, src, len, 1);
+> +}
+> +EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
 
-> It would also allow for alternatives if that ever becomes a thing and
+This is ignoring the padbit and forcing it to 1, so this will compute the wrong
+Poly1305 value for messages with length not a multiple of 16 bytes.
 
-If you mean one arch with multiple alternative implementations of a particular
-CRC variant, that already exists for many of the architectures.  They just build
-in as many as can be, and the best one is chosen at boot or module load time.
-
-But that's existing behavior, unchanged by this patchset.
-
-> compile testing of the arch-specific variants if that even offers any
-> actual value.
-
-They all use instructions specific to the corresponding arch, so I don't think
-any of them would be compatible with COMPILE_TEST.
+chacha20poly1305-selftest still passes, so it must not test this case.  We need
+to add a self-test for Poly1305 directly, ideally using KUnit.
 
 - Eric
