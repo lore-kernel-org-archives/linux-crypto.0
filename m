@@ -1,126 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D602D218E9F;
-	Tue, 10 Jun 2025 19:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9D029D19
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 19:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749582753; cv=none; b=Y9d2AOnjpwkR3Ix4TRd7fzgyUqliv2eVB1Y8TNcPiCMjO9ngEfGGkRHPqyQoVrLSSK0JyXMZoK4Qeewr7RWMxr9O6VJ9U6ZLDZ86qSsbnauB++WCR7OYEpMA0Rn0spbbrBl3y4Orh5RbMBDdsJ15Uf61XNx9wkug5x7S/Fs55Hg=
+	t=1749583098; cv=none; b=gHt8aqKxC724v8Gv5bvUOto48VR63mED64szEFR1yNRk3o3IAjDlVA8SZSkiJeoKQJ+pvZAyrbz0KtrLjDBOZdW+uYDv0nDrvL02N4dp4njCKkGTf6la1Q0RqpBJPU3YLj64mBtrnrhyj3xkQhaRu/7OflJDPIL40SDit6xX4GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749582753; c=relaxed/simple;
-	bh=eJzXTcGjqeHES133w/mCLelMBBcBENx890a5ygHX1H0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GHaF+aoyjaDEUgviO+ViaLFYIjW1ccVLgCGid33HWm5HPCE1FdWYH/8fpGEE1roEol8pE42FfmCznR76nWwWbh0BL6mTU/effjRQ7BcyKUEc/Yt1Zn7k/PmnExZHo9YDcAb4M5zMq1oDIn9TSvsQ4dSkDlf5KMR7NzIF/pZNuEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaI2+LQh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749583098; c=relaxed/simple;
+	bh=Hgi9E8q0mLSLZfB/ljNw8agdvIzOBd6qO7E7LF0qQT8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Cm7GKoScbNdRv+GbXvfbLBZ3c3j9mfwqURBTL85M3p6cPmw2bT12RrQJIInOK6SJB2qqVzenfDe7Ado3odDNz+0nLqp2tBPGL9JbjRzLsij9cagdv65unOIobn8synD2bGKNbVEjkclkqAr0bNfafc9p7tYZ9VsOGxABlhUgQBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rueBjuRA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaI2+LQh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18FAEC4CEED;
-	Tue, 10 Jun 2025 19:12:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rueBjuRA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630C7C4CEED;
+	Tue, 10 Jun 2025 19:18:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749582752;
-	bh=eJzXTcGjqeHES133w/mCLelMBBcBENx890a5ygHX1H0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VaI2+LQhuUUCHinnXIKNJGDX1SFqmIEkgM49ZG9mFtgdSJtyidxE5kSPaTUdtIRoe
-	 x8gwG8h5JFpcv2x49bFujV90PS+vJ0dv/ZdkpuflWTUErcb97YgGQv2W6l9qVPbl16
-	 v8SyhbEe0m3HO6534SqykjGShxll+Ne/4t8f1iJYheRExnhSX55A4hNPQKnkRcYq5L
-	 hc0Tmlxcb6hRLqfqF7Unr6UlRwwPll4NW5PiZ7zHf35KF4TOdiyOcT86XrweAAiuH8
-	 NHMgbbCpwoQbMy2vS7ZoKum77mLaoScoDb3mUTDNNDNTl+qp1ZRyBmI7CkispOKzd9
-	 LnPbDInTrzhvw==
-Date: Tue, 10 Jun 2025 12:12:08 -0700
+	s=k20201202; t=1749583094;
+	bh=Hgi9E8q0mLSLZfB/ljNw8agdvIzOBd6qO7E7LF0qQT8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rueBjuRAZHO82dzCNAiJlxhyyftdDjlKuwDK1wYGhtRTe26/3GFllynVfNJZ/oPPe
+	 NkN9pGA4NOwWwLM25UUzvcMgoqx3TVBHlVxaqDFtZSmLGueL2Vs6vnqkDaUsl7R4UE
+	 EB7g9lgQafdfpjP7285CO0G09j2SrKAYa6gwvd2qXuk3I7ueTydcBJ1jqKqHWtizTX
+	 HDy8pJGt94m/gg7OZtSQPffDji/n/gMTa6rAcnuwvenCjUXfUuBXZ+hfYwAP+dvRcG
+	 OuNC7+4WzpGeaCJjqbfRfWPwO6SAN5o4MfqadN6210WuQkAxfNPBzF+U0taL0HoiOh
+	 gRBg+ZqzM9heg==
 From: Eric Biggers <ebiggers@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	linux-arch@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
- integrated
-Message-ID: <20250610191208.GD1649@sol>
-References: <20250607200454.73587-1-ebiggers@kernel.org>
- <aETPdvg8qXv18MDu@zx2c4.com>
- <20250608234817.GG1259@sol>
- <aEhtyvBajGE80_2Z@zx2c4.com>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
+	freude@linux.ibm.com,
+	dengler@linux.ibm.com
+Subject: [PATCH] crypto: hkdf - move to late_initcall
+Date: Tue, 10 Jun 2025 12:16:00 -0700
+Message-ID: <20250610191600.54994-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <8bf5f1b2-db97-4923-aab0-0d2a8b269221@linux.ibm.com>
+References: <8bf5f1b2-db97-4923-aab0-0d2a8b269221@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aEhtyvBajGE80_2Z@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 10, 2025 at 11:39:22AM -0600, Jason A. Donenfeld wrote:
-> On Sun, Jun 08, 2025 at 04:48:17PM -0700, Eric Biggers wrote:
-> > On Sat, Jun 07, 2025 at 05:47:02PM -0600, Jason A. Donenfeld wrote:
-> > > On Sat, Jun 07, 2025 at 01:04:42PM -0700, Eric Biggers wrote:
-> > > > Having arch-specific code outside arch/ was somewhat controversial when
-> > > > Zinc proposed it back in 2018.  But I don't think the concerns are
-> > > > warranted.  It's better from a technical perspective, as it enables the
-> > > > improvements mentioned above.  This model is already successfully used
-> > > > in other places in the kernel such as lib/raid6/.  The community of each
-> > > > architecture still remains free to work on the code, even if it's not in
-> > > > arch/.  At the time there was also a desire to put the library code in
-> > > > the same files as the old-school crypto API, but that was a mistake; now
-> > > > that the library is separate, that's no longer a constraint either.
-> > > 
-> > > I can't express how happy I am to see this revived. It's clearly the
-> > > right way forward and makes it a lot simpler for us to dispatch to
-> > > various arch implementations and also is organizationally simpler.
-> > > 
-> > > Jason
-> > 
-> > Thanks!  Can I turn that into an Acked-by?
-> 
-> Took me a little while longer to fully review it. Sure,
-> 
->     Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> 
-> Side note: I wonder about eventually turning some of the static branches
-> into static calls.
+From: Eric Biggers <ebiggers@google.com>
 
-Yes, Linus was wondering the same thing earlier.  It does run into a couple
-issues.  First, only x86 and powerpc implement static_call properly; everywhere
-else it's just an indirect call.  Second, there's often some code shared above
-the level at which we'd like to do the dispatch.  For example, consider crc32_le
-on x86.  If we expand the CRC_PCLMUL macro and inline crc32_le_arch and
-crc32_le_base as the compiler does, crc32_le ends up as:
+The HKDF self-tests depend on the HMAC algorithms being registered.
+HMAC is now registered at module_init, which put it at the same level as
+HKDF.  Move HKDF to late_initcall so that it runs afterwards.
 
-    u32 crc32_le(u32 crc, const u8 *p, size_t len)
-    {
-            if (len >= 16 && static_branch_likely(&have_pclmulqdq) &&
-                crypto_simd_usable()) {
-                    const void *consts_ptr;
+Fixes: ef93f1562803 ("Revert "crypto: run initcalls for generic implementations earlier"")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/hkdf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-                    consts_ptr = crc32_lsb_0xedb88320_consts.fold_across_128_bits_consts;
-                    kernel_fpu_begin();
-                    crc = static_call(crc32_lsb_pclmul)(crc, p, len, consts_ptr);
-                    kernel_fpu_end();
-                    return crc;
-            }
-            while (len--)
-                    crc = (crc >> 8) ^ crc32table_le[(crc & 255) ^ *p++];
-            return crc;
-    }
+diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+index f24c2a8d4df99..82d1b32ca6ce4 100644
+--- a/crypto/hkdf.c
++++ b/crypto/hkdf.c
+@@ -564,10 +564,10 @@ static int __init crypto_hkdf_module_init(void)
+ 	return 0;
+ }
+ 
+ static void __exit crypto_hkdf_module_exit(void) {}
+ 
+-module_init(crypto_hkdf_module_init);
++late_initcall(crypto_hkdf_module_init);
+ module_exit(crypto_hkdf_module_exit);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("HMAC-based Key Derivation Function (HKDF)");
 
-The existing static_call selects between 3 different assembly functions, all of
-which require a kernel-mode FPU section and only support len >= 16.
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+-- 
+2.49.0
 
-We could instead unconditionally do a static_call upon entry to the function,
-with 4 possible targets.  But then we'd have to duplicate the kernel FPU
-begin/end sequence in 3 different functions.  Also, it would add an extra
-function call for the case where 'len < 16', which is a common case and is
-exactly the case where per-call overhead matters the most.
-
-However, if we could actually inline the static call into the *callers* of
-crc32_le(), that would make it more worthwhile.  I'm not sure that's possible,
-though, especially considering that this code is tristate.
-
-Anyway, this is tangential to this patchset.  Though the new way the code is
-organized does make it more feasible to have e.g. a centralized static_call in
-the future if we choose to go in that direction.
-
-- Eric
