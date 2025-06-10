@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9ABE23E334;
-	Tue, 10 Jun 2025 06:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E26521CA0C;
+	Tue, 10 Jun 2025 06:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749536264; cv=none; b=GI7CExPjpx2eIgPNtQrEkNqtAN1LQzNN7t0K/CfrAR4gCnF2xWNgzN3zW33MHbeRwi2BfSNI18P5MUK5PU4R8p4PvVvAmANI7iiUG+Kfj5iI0qtxpGa0rCJgkPHyuvPc9insFzyuEfTlIqRPCX+dcMuEpNICs05PRd+80y2vZBk=
+	t=1749536293; cv=none; b=jTnYe6FtOAjBJU5BayOjwybOq/ucB69oGjbgXVMFXveI+buxH+o/uzWndhuhYpJuKuj1ftcugJlzIRpYr4Ot8jA+joy6YJRpmA+Mq96Y4Jv841fihvfEWq5BUec8ulp1mS1SZjdHCRYR/obPSAsEgDwLn3VqOU31jaKnA/MqjwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749536264; c=relaxed/simple;
-	bh=tS9TEJcOrcUjJeSPb1DGlyHmkVgVfhsApk9YNnckZBs=;
+	s=arc-20240116; t=1749536293; c=relaxed/simple;
+	bh=D0g1DOcag4cdF5sx5ZRvOjVmCzsKl+PlivoRyPJLiYQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GyVu8dorunoRahyhZ4Ick7S1KJm9Gy5mGYQXijVsOgqqHGE6gcfyyNN+Ie3ounwa9Al4s7GzXRoVRuMQPGgMOyBkNFDfa++ZA0ZVd+KJIhdIBFn7WMKHkiA5QYOVGlM3CGQ5uKa1Shjx/U4O1xE7h+xvwNPAtL10zDKQN4Js/y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMEgTunC; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=U6jhyiCcH/6XyDBZ2QB/WdUWgqUgGJ2ixT9LxiqPS9bp/CUoz+To/v/QXJm7cy0EF0uT9zDgjRF6rQSLRA750wLf56OSFmGSN+hL8KwhTf143TSVBoX1gy+x9bd7IueKNKUHh7yF52TvyDveZyLFWxcpDcCKz60LVej0IMjdM+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSeSOCTj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMEgTunC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E805DC4CEEF;
-	Tue, 10 Jun 2025 06:17:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSeSOCTj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7426FC4CEEF;
+	Tue, 10 Jun 2025 06:18:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749536264;
-	bh=tS9TEJcOrcUjJeSPb1DGlyHmkVgVfhsApk9YNnckZBs=;
+	s=k20201202; t=1749536293;
+	bh=D0g1DOcag4cdF5sx5ZRvOjVmCzsKl+PlivoRyPJLiYQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AMEgTunC5Y9V2wcmXoeGVZnuhACJEBGaUb3vPzD31CTkRujMkLibb9ZwzKKW7rDLb
-	 sfOA6f9/t8JcHdRvy4jSGzQw7M6V3cv8nRQa+WMt5nQvkIXxGyuMjvnkWxL2CITkvw
-	 X9UnFtGSI5/2VPBymBwxQPvbuHX32zuDugbf4D002QosRqabRzaaCVivAz7jP8cnXv
-	 Z92+jjZ0Bub/J3LI1RzqKMm2PKfpA6jwWYor6XmBQXB1BNvdcTBjQS1FbxbGBQnlEU
-	 L679Y1gDxsVfnx5PMZn61ZSnsS49ZAQejB2GVPo7kRJlg24JdtZE/YM1JCwEY/NAkl
-	 fWt3N3MSUsDKQ==
-Message-ID: <c1c36fb1-67a3-4660-816f-a2f15786f2a9@kernel.org>
-Date: Tue, 10 Jun 2025 08:17:39 +0200
+	b=lSeSOCTjSbdYmUBe12nKrk77o8VyNgc+Fd80PSTSsHcjyvGAJc0UO+8EaINXk6szN
+	 Sf1iaTwurUpTelyZcKs4sZdIGwnZV9UZX33HcsUtJRyKMBoEu+W13xp4o0xF0SlYA9
+	 l+lukzQMHOdItezJVVbv/z2xE5tkcpDmPiNA62l7c0wyteb+w/IR4BAQYPLPnR+GNN
+	 iuz4qOrM99eYsleRMfseTNqsZvm35Vz+T1IXu3nGMpYZaTOuCTaJB9C0SemqzP3Aqo
+	 EHT1D3apvZqmxcGIDs2ebvJgU/ffof9aoPzuEg+ZTraLDqoMbLqfUoPFOnqi5smh1P
+	 O37ihVw91u+lw==
+Message-ID: <25b144f6-ccf6-4426-a021-11f3f00074bd@kernel.org>
+Date: Tue, 10 Jun 2025 08:18:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,15 +35,15 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/6] crypto: xilinx: Select dependant Kconfig option
- for CRYPTO_DRBG_CTR
+Subject: Re: [PATCH v2 5/6] crypto: xilinx: Fix missing goto in probe
 To: Harsh Jain <h.jain@amd.com>, herbert@gondor.apana.org.au,
  davem@davemloft.net, linux-crypto@vger.kernel.org,
  devicetree@vger.kernel.org, mounika.botcha@amd.com,
  sarat.chand.savitala@amd.com, mohan.dhanawade@amd.com, michal.simek@amd.com
-Cc: kernel test robot <lkp@intel.com>
+Cc: kernel test robot <lkp@intel.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>
 References: <20250609045110.1786634-1-h.jain@amd.com>
- <20250609045110.1786634-5-h.jain@amd.com>
+ <20250609045110.1786634-6-h.jain@amd.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -89,26 +89,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250609045110.1786634-5-h.jain@amd.com>
+In-Reply-To: <20250609045110.1786634-6-h.jain@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 09/06/2025 06:51, Harsh Jain wrote:
-> CRYPTO_DRBG_MENU Kconfig option is dependant on CRYPTO_DRBG_CTR.
-> Select CRYPTO_DRBG_MENU to fix warning reported by kernel test robot.
+> Add goto to clean up allocated cipher on reseed failure.
 > 
-
-Fixes?
-
-If not, why is this a separate commit? Are you adding known bug in the
-same patchset just to fix it later?
-
 > Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202505301900.Ufegky8f-lkp@intel.com/
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/r/202505311325.22fIOcCt-lkp@intel.com/
 
-That's report for your patch!
-
-> Signed-off-by: Harsh Jain <h.jain@amd.com>
+Please stop adding bugs and fixing them afterwards. Fix your patch first.
 
 
 
