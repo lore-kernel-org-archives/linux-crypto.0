@@ -1,81 +1,74 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9D029D19
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 19:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370372620F1
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 19:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749583098; cv=none; b=gHt8aqKxC724v8Gv5bvUOto48VR63mED64szEFR1yNRk3o3IAjDlVA8SZSkiJeoKQJ+pvZAyrbz0KtrLjDBOZdW+uYDv0nDrvL02N4dp4njCKkGTf6la1Q0RqpBJPU3YLj64mBtrnrhyj3xkQhaRu/7OflJDPIL40SDit6xX4GY=
+	t=1749583316; cv=none; b=etP3rhO07VU9wazo7kOn33ao8/i+Zvohk5KmiQBUnc0B6KB0kg/PYdql0H7UFxXD8lI390yot8cgFG40m/OyrYS1RhmKgBKmM8WdNYnWdjL3EIXfQyhJH6tY7HtfF/GWxDLm54/Ate7dr9dhrl4zNZBuv/k6aFsNPV2IRhzjkM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749583098; c=relaxed/simple;
-	bh=Hgi9E8q0mLSLZfB/ljNw8agdvIzOBd6qO7E7LF0qQT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cm7GKoScbNdRv+GbXvfbLBZ3c3j9mfwqURBTL85M3p6cPmw2bT12RrQJIInOK6SJB2qqVzenfDe7Ado3odDNz+0nLqp2tBPGL9JbjRzLsij9cagdv65unOIobn8synD2bGKNbVEjkclkqAr0bNfafc9p7tYZ9VsOGxABlhUgQBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rueBjuRA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749583316; c=relaxed/simple;
+	bh=MvY65196OkKGiQelyzXqMzmcV5/FC5X0KU+wsmCw2F4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CLauj2EQXvD5Fqddpzazp044wHStfpThKJycYuixMAGX6ECf4ZtEZI9hhr0wsqkSYyGPHuo1+YbKgJWmpaoT8ammNbHTTm/mMSsej0U1nTKuAufjV3nxG5UrxE9ZBoa8WY+VqOw02pQvtYVpRw1r8zyXBrZY90ox0LFa8pnRf+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwljCyWY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rueBjuRA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630C7C4CEED;
-	Tue, 10 Jun 2025 19:18:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwljCyWY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB41C4CEED;
+	Tue, 10 Jun 2025 19:21:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749583094;
-	bh=Hgi9E8q0mLSLZfB/ljNw8agdvIzOBd6qO7E7LF0qQT8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rueBjuRAZHO82dzCNAiJlxhyyftdDjlKuwDK1wYGhtRTe26/3GFllynVfNJZ/oPPe
-	 NkN9pGA4NOwWwLM25UUzvcMgoqx3TVBHlVxaqDFtZSmLGueL2Vs6vnqkDaUsl7R4UE
-	 EB7g9lgQafdfpjP7285CO0G09j2SrKAYa6gwvd2qXuk3I7ueTydcBJ1jqKqHWtizTX
-	 HDy8pJGt94m/gg7OZtSQPffDji/n/gMTa6rAcnuwvenCjUXfUuBXZ+hfYwAP+dvRcG
-	 OuNC7+4WzpGeaCJjqbfRfWPwO6SAN5o4MfqadN6210WuQkAxfNPBzF+U0taL0HoiOh
-	 gRBg+ZqzM9heg==
+	s=k20201202; t=1749583316;
+	bh=MvY65196OkKGiQelyzXqMzmcV5/FC5X0KU+wsmCw2F4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MwljCyWYyc8YtDsnvhBJ9wOOCxFpAopoKjI6sf7A7Wyb9RY4m84YGhhMqWyZM4/XK
+	 5VZA+L/9/rkc0/UWOZR9lB9xiZ8yHz1gj4gA5XXKbn79to1O/nsjXd0TKNmn9xMotg
+	 /yJcY3eyxkx7kmYsiOhYMcpBvjEFTawUqOyMfgdGElaMIWH9krgZRCgzLWGSwY8LVu
+	 4SobJYaZskufh0q8t+Rg61TTIEcXnOf7noRIKEPB9b6JPNKezv47wZojtYBfpNdiMO
+	 M5+GmFrYqClQCn9MRMiS2UDcT4CPFnzABcCQICxWEiISQM2jbc3IWhwjjGJY77ef1P
+	 +pqmqVO/nvcCw==
+Date: Tue, 10 Jun 2025 12:21:32 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
-	freude@linux.ibm.com,
-	dengler@linux.ibm.com
-Subject: [PATCH] crypto: hkdf - move to late_initcall
-Date: Tue, 10 Jun 2025 12:16:00 -0700
-Message-ID: <20250610191600.54994-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <8bf5f1b2-db97-4923-aab0-0d2a8b269221@linux.ibm.com>
-References: <8bf5f1b2-db97-4923-aab0-0d2a8b269221@linux.ibm.com>
+To: Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+	herbert@gondor.apana.org.au, paul.walmsley@sifive.com,
+	alex@ghiti.fr, appro@cryptogams.org, zhang.lyra@gmail.com
+Subject: Re: [PATCH v3] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS
+ implementation
+Message-ID: <20250610192132.GE1649@sol>
+References: <20250609074655.203572-3-zhihang.shao.iscas@gmail.com>
+ <20250609201306.GD1255@sol>
+ <EC8AB5A0-D5C9-4D18-A986-DE66BE46E09A@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <EC8AB5A0-D5C9-4D18-A986-DE66BE46E09A@gmail.com>
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Jun 10, 2025 at 02:57:29PM +0800, Zhihang Shao wrote:
+> 
+> >> +void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
+> >> +  unsigned int len, u32 padbit)
+> >> +{
+> >> + len = round_down(len, POLY1305_BLOCK_SIZE);
+> >> + poly1305_blocks(state, src, len, 1);
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
+> > 
+> > This is ignoring the padbit and forcing it to 1, so this will compute the wrong
+> > Poly1305 value for messages with length not a multiple of 16 bytes.
+> 
+> So Does this mean here the argument of poly1305_blocks should be fixed as poly1305_blocks(state, src, len, padbit)?
+> But since the padbit is set to 1 in poly1305_blocks_arch according to the implementation in lib/crypto/poly1305.c, 
+> it seems to be no difference here.
+> 
+> Looking forward to your reply.
 
-The HKDF self-tests depend on the HMAC algorithms being registered.
-HMAC is now registered at module_init, which put it at the same level as
-HKDF.  Move HKDF to late_initcall so that it runs afterwards.
+While the common case is padbit=1, poly1305_final() passes padbit=0 in the case
+where the message ends with a partial block.  So both values have to be
+supported.
 
-Fixes: ef93f1562803 ("Revert "crypto: run initcalls for generic implementations earlier"")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/hkdf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/hkdf.c b/crypto/hkdf.c
-index f24c2a8d4df99..82d1b32ca6ce4 100644
---- a/crypto/hkdf.c
-+++ b/crypto/hkdf.c
-@@ -564,10 +564,10 @@ static int __init crypto_hkdf_module_init(void)
- 	return 0;
- }
- 
- static void __exit crypto_hkdf_module_exit(void) {}
- 
--module_init(crypto_hkdf_module_init);
-+late_initcall(crypto_hkdf_module_init);
- module_exit(crypto_hkdf_module_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("HMAC-based Key Derivation Function (HKDF)");
-
-base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
--- 
-2.49.0
-
+- Eric
