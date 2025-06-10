@@ -1,41 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB932472B6;
-	Tue, 10 Jun 2025 18:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4098D242D90;
+	Tue, 10 Jun 2025 18:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749580981; cv=none; b=iMPyrLGAi/LY9xDRJ9WCfP7z//Rhx03kUSOR6ntcOWEhFNuBhzNk6vWLPdqGyj7r/MulWDKn/Dhg4rZ8vGWUiklGxiY+NiJUqifvEBQzNhmKc0z1hY8hBDy80fcphnDWQFpwplfSz2QHY9rP2sz8EF4YEqK+pyw6Ayq3Rvsrfx8=
+	t=1749581300; cv=none; b=K1s24Dcqy0tWM3KiE6Cw9bKlpgP+zhIuuZc128Bc9gRE44Y+YU1sHwVWA6UTRiqehC/76DQhAzaEZrMD2aF9RAQAHh6HJAwD4rVCGrV5nAjU6kfpQLXiUU8J4B+IszntYw4HuXWyJ/UbDvzEeCY0qaqd9hC2XmM4xKMnsqN+4RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749580981; c=relaxed/simple;
-	bh=76AFPhpIHmHUuCuBRSQyPGtgXYLqcKab6s57DbAk9BU=;
+	s=arc-20240116; t=1749581300; c=relaxed/simple;
+	bh=fW4WUlLPzTcOGUmKEUJPh5AreVUZepIXG7py1Yrxjzw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZCQH8J0WoWv77jnDaMrImYgFIyP018pJRjY4TtmhdjOEqdIP6S+hXxQRL2c9u4SJ0+/FHtFkQ3FgK6gvpWqz9v0MnZRv4w0RvJOfYQ3Rq3FCjLjGEfInKsrIp0/QLA4pgLO3vgTTsn1REfWVj/Wsig1g/xztRpPH88oL2moDOJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8QJF7UL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=J5fdeL4tAz0i77qjv2ivPrif6dpY94K3J/TuAVDuXMIo33I2TwfarApBIzMzg1cMDflinlFfnpJITUF41rdS+hndXpjtCfrJA5sMnRti5QLgOEdIotnS1wu/ciWMPTz1oSujgnqS3wSLeqabqq2BVyc+jQdxYQ4bnC4UDU6AY40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N2rR2VQ8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8QJF7UL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B65DC4CEED;
-	Tue, 10 Jun 2025 18:43:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N2rR2VQ8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B537C4CEED;
+	Tue, 10 Jun 2025 18:48:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749580981;
-	bh=76AFPhpIHmHUuCuBRSQyPGtgXYLqcKab6s57DbAk9BU=;
+	s=k20201202; t=1749581299;
+	bh=fW4WUlLPzTcOGUmKEUJPh5AreVUZepIXG7py1Yrxjzw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k8QJF7ULNO0d9Bxmy8u9L/ktJXugbopyy1Yt5iPtHj31mU74LQtmz3FcPx7Lchq8y
-	 DcRwgx3VGXDzA/2RYyNNZYTShGL88SCvpo+1NqUUx6DiMFASLpKp6G3ObAxBTWKtOE
-	 cju96Y6tJ0NhOGNvMogJNARP+rLi9k89H5nT2vlqB+zKFP9ObgDzzj3oOWQe/ztlnk
-	 lOtYLycjq3nLqaxxtENP3iuvAxyXWHCd2nPUId87oyzdkAvr7gEH7lxu+jXpOQizpT
-	 n63d3cZbwEhDds9b9EvgnsgP4kq3HoNmwR1TxGJlrUCxBR1zXIOqOaOfNXSdqM7tpA
-	 GV+t5Vk/OQwWA==
-Date: Tue, 10 Jun 2025 11:42:37 -0700
+	b=N2rR2VQ8Oq9Cmc6H9eooraC/6WL6LWGn/CyQscdSYoBnxrd6j556t8Yr4T5TQT33Y
+	 KjAddPGzxn/a1xZsEPhM/wtGddhOqKWPsMgUketQdpHVnfaf6YaA4v61Gwh2iKlc4q
+	 XkImdNQGb8y/Dgab6Udgq58Wxqco3rHtvNJ/qMnxwy9JcEIqHgZDQeAJCWUxC+A3oV
+	 OL2cGfo+A5I1Vic3XRH5dNQh8oPwI4lU72wrwqRIvmCAJJGgAq2b9hXkSx0B0RmSDD
+	 yJDpesZCL8iTxUJpJJvTqXeUEjtLqkz9iTejv45bhW3iFAmqRSy59HNfkPBVXi01hH
+	 mICO2Doj48fpw==
+Date: Tue, 10 Jun 2025 11:47:55 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH] crypto: lib/curve25519-hacl64 - Disable KASAN with
- clang-17 and older
-Message-ID: <20250610184237.GB1649@sol>
-References: <20250609-curve25519-hacl64-disable-kasan-clang-v1-1-08ea0ac5ccff@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+	x86@kernel.org, linux-arch@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 00/12] lib/crc: improve how arch-optimized code is
+ integrated
+Message-ID: <20250610184755.GC1649@sol>
+References: <20250607200454.73587-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,52 +49,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250609-curve25519-hacl64-disable-kasan-clang-v1-1-08ea0ac5ccff@kernel.org>
+In-Reply-To: <20250607200454.73587-1-ebiggers@kernel.org>
 
-On Mon, Jun 09, 2025 at 03:45:20PM -0700, Nathan Chancellor wrote:
-> After commit 6f110a5e4f99 ("Disable SLUB_TINY for build testing"), which
-> causes CONFIG_KASAN to be enabled in allmodconfig again, arm64
-> allmodconfig builds with clang-17 and older show an instance of
-> -Wframe-larger-than (which breaks the build with CONFIG_WERROR=y):
+On Sat, Jun 07, 2025 at 01:04:42PM -0700, Eric Biggers wrote:
+> This series is also available at:
 > 
->   lib/crypto/curve25519-hacl64.c:757:6: error: stack frame size (2336) exceeds limit (2048) in 'curve25519_generic' [-Werror,-Wframe-larger-than]
->     757 | void curve25519_generic(u8 mypublic[CURVE25519_KEY_SIZE],
->         |      ^
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git lib-crc-arch-v2
 > 
-> When KASAN is disabled, the stack usage is roughly quartered:
+> This series improves how lib/crc supports arch-optimized code.  First,
+> instead of the arch-optimized CRC code being in arch/$(SRCARCH)/lib/, it
+> will now be in lib/crc/$(SRCARCH)/.  Second, the API functions (e.g.
+> crc32c()), arch-optimized functions (e.g. crc32c_arch()), and generic
+> functions (e.g. crc32c_base()) will now be part of a single module for
+> each CRC type, allowing better inlining and dead code elimination.  The
+> second change is made possible by the first.
 > 
->   lib/crypto/curve25519-hacl64.c:757:6: error: stack frame size (608) exceeds limit (128) in 'curve25519_generic' [-Werror,-Wframe-larger-than]
->     757 | void curve25519_generic(u8 mypublic[CURVE25519_KEY_SIZE],
->         |      ^
+> As an example, consider CONFIG_CRC32=m on x86.  We'll now have just
+> crc32.ko instead of both crc32-x86.ko and crc32.ko.  The two modules
+> were already coupled together and always both got loaded together via
+> direct symbol dependency, so the separation provided no benefit.
 > 
-> Using '-Rpass-analysis=stack-frame-layout' shows the following variables
-> and many, many 8-byte spills when KASAN is enabled:
+> Note: later I'd like to apply the same design to lib/crypto/ too, where
+> often the API functions are out-of-line so this will work even better.
+> In those cases, for each algorithm we currently have 3 modules all
+> coupled together, e.g. libsha256.ko, libsha256-generic.ko, and
+> sha256-x86.ko.  We should have just one, inline things properly, and
+> rely on the compiler's dead code elimination to decide the inclusion of
+> the generic code instead of manually setting it via kconfig.
 > 
->   Offset: [SP-144], Type: Variable, Align: 8, Size: 40
->   Offset: [SP-464], Type: Variable, Align: 8, Size: 320
->   Offset: [SP-784], Type: Variable, Align: 8, Size: 320
->   Offset: [SP-864], Type: Variable, Align: 32, Size: 80
->   Offset: [SP-896], Type: Variable, Align: 32, Size: 32
->   Offset: [SP-1016], Type: Variable, Align: 8, Size: 120
+> Having arch-specific code outside arch/ was somewhat controversial when
+> Zinc proposed it back in 2018.  But I don't think the concerns are
+> warranted.  It's better from a technical perspective, as it enables the
+> improvements mentioned above.  This model is already successfully used
+> in other places in the kernel such as lib/raid6/.  The community of each
+> architecture still remains free to work on the code, even if it's not in
+> arch/.  At the time there was also a desire to put the library code in
+> the same files as the old-school crypto API, but that was a mistake; now
+> that the library is separate, that's no longer a constraint either.
 > 
-> When KASAN is disabled, there are still spills but not at many and the
-> variables list is smaller:
+> Changed in v2:
+>    - Fixed build warning on architectures without any optimized CRC code
+>    - Fixed build warning in sparc/crc32.h by removing pr_fmt
+>    - Moved fallback definitions of crc32*_arch back into arch files
+>    - Remove ARCH_HAS_CRC* symbols at end of series instead of beginning,
+>      so that they're not removed until they're no longer being selected
+>    - Slightly improved some commit messages
+>    - Rebased onto other pending lib/crc changes
 > 
->   Offset: [SP-192], Type: Variable, Align: 32, Size: 80
->   Offset: [SP-224], Type: Variable, Align: 32, Size: 32
->   Offset: [SP-344], Type: Variable, Align: 8, Size: 120
-> 
-> Disable KASAN for this file when using clang-17 or older to avoid
-> blowing out the stack, clearing up the warning.
-> 
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  lib/crypto/Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
+> Eric Biggers (12):
+>   lib/crc: move files into lib/crc/
+>   lib/crc: prepare for arch-optimized code in subdirs of lib/crc/
+>   lib/crc/arm: migrate arm-optimized CRC code into lib/crc/
+>   lib/crc/arm64: migrate arm64-optimized CRC code into lib/crc/
+>   lib/crc/loongarch: migrate loongarch-optimized CRC code into lib/crc/
+>   lib/crc/mips: migrate mips-optimized CRC code into lib/crc/
+>   lib/crc/powerpc: migrate powerpc-optimized CRC code into lib/crc/
+>   lib/crc/riscv: migrate riscv-optimized CRC code into lib/crc/
+>   lib/crc/s390: migrate s390-optimized CRC code into lib/crc/
+>   lib/crc/sparc: migrate sparc-optimized CRC code into lib/crc/
+>   lib/crc/x86: migrate x86-optimized CRC code into lib/crc/
+>   lib/crc: remove ARCH_HAS_* kconfig symbols
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
-
-Thanks!
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
 
 - Eric
