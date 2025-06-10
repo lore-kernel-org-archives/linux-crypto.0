@@ -1,60 +1,64 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F9F298CB1
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 12:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23900246BD6
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 13:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749559053; cv=none; b=URZjenPIeDJR9/at4rRtbsvXKIK6Wvxhkt1sf7iR21/ybzUzej8G4R+3ToHozUcY5FVvsUOO3NW6J8dCQQxbrH8CTvJZkUgJdfMO3fFWDNFwP6EH5VqBk1vR8xopolhjRwwMDV3jTPVt3EXsktC0Ab1k42Ovb20eFH4U+QBW2Eo=
+	t=1749562006; cv=none; b=KQ6PVq82RTeqjnzmUtskEQKPcBL8nq2AOJoYePszpQUaiwwBhTQE9R5Ce9QJpYPbcAj1ONzLtZ9/X1TT39ZmYoYPHTzJYe7ZgDNpIBEp8pjQJkcVoGzvDjHwp9NAoeKZe0t7U0HeLP0VQrKlmEpIO+shEdtJ/qwoZBooqDlwqpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749559053; c=relaxed/simple;
-	bh=ZcEhrgMhE7NTsUQib/yV+rSwyvjiLTa6R/gpG5JjouM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TzlP7GRpkCVp8QTejnDBa/h0mGMmMzqaMAycRsHRDyw1fBRgyoE7PjeB/w50TJJ5h2rHPLNf6rPDIjAdTko2mqrOs642z9MbUomU0tfxfEybhk05hw3oDEs6+uvtDbywrSKHPAgeiHVq2KEzwWtDSNYgOwoq2jvyJGB405k6yhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GxgwfAts; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1749562006; c=relaxed/simple;
+	bh=APZDvGSYegJLN/zQ5E9EYiraL6K9C4h9tep0OmCRjBM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WvdYvNiPwnEJlHv/toZ6hGeLV2lTiJXttTduAwyM2dkoT3DXB75T7txc89ylvs0TvqSRkM+VP/j7Vfaxx4EvgGrs0CYyeSlsYTFgkBBlbSBJQLlnO6HyOFZGeIBavwTnQB/qzLyH6NpO7Lq0rBTgJ0LUrPPXTqz5Y5emU7CirXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=og2ZjfZ0; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GxgwfAts"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55A9wDCX027642;
-	Tue, 10 Jun 2025 12:37:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=0ujY3M
-	KE4iUOIxF9NWDvPVDFS4q2pmilMgOnRHaEcd4=; b=GxgwfAtsQi9lQX9R/vPhsE
-	XeD5NjwuUWoOidSYEgMNmXRf841NCEWLIogcuXceU0c7B0jgZNRaRy0UT//ZyVrQ
-	xT5QX2zDtFSFhfunbQqxwhmR5QCAUZnETGjIJf5bwzcDax1RUAbo6qQQOWj6qI95
-	j895QVW3T0UmpL0wwPc2agKn6XwgrBwuP2Xz6uf5bMBJYqXbSKNl144w4ltQyBM2
-	GWGwXgOwwVulQO4mT9RroEySUFNaWuxh0N3IatbvKRTBIZ2NriassldJkHQ03AHL
-	NA/quzk6nQk7DFi/goWpqRsf1dVZJ9qBagCiiaG9X9ZiOZGFTYstQdk3R0aT5cwQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 474x4m3bn9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Jun 2025 12:37:25 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55A98G67014908;
-	Tue, 10 Jun 2025 12:37:24 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4750rp2bge-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Jun 2025 12:37:24 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55ACbJQQ43450720
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Jun 2025 12:37:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E0D6120043;
-	Tue, 10 Jun 2025 12:37:19 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE04F20040;
-	Tue, 10 Jun 2025 12:37:19 +0000 (GMT)
-Received: from [9.111.152.178] (unknown [9.111.152.178])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 10 Jun 2025 12:37:19 +0000 (GMT)
-Message-ID: <8bf5f1b2-db97-4923-aab0-0d2a8b269221@linux.ibm.com>
-Date: Tue, 10 Jun 2025 14:37:19 +0200
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="og2ZjfZ0"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cfe63c592so62724945e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jun 2025 06:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cryptogams.org; s=gmail; t=1749562003; x=1750166803; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LH44WntEY2fTVqXbHAq8i1nzDw/kDJ8Gl3v9f3DoQvQ=;
+        b=og2ZjfZ0VExlWvgsJ+UxBD8vqJdDlPe9ZEQOMcGUZRkJclVEQbqsodVh5aRkZar2Qo
+         3anmhmjZwYfthiVIFGnB4q9/1JjlG2t3ogXa6pEtbS4OnxMXO3s+YhLNzgb4z+QCxQOE
+         GOJqTmcQZtfBGQJz6AGUMYwVVOtC2qX81E60Bc2/CorjryxtGWCCGG+kAqbboZFKFsSx
+         XUfvLTLm7FPnHFuXoRjhExqV7R8Ewdud1BkBCYHEq6an2HLqfLx+lezO2HtiFyCRcthM
+         oxqtbRBRdBY63sqq5U5PAsAuaCoMQH1OC9KI/vC2IuzKs5iHF3Qd67Az4T0HIqcB4pJj
+         i+5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749562003; x=1750166803;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LH44WntEY2fTVqXbHAq8i1nzDw/kDJ8Gl3v9f3DoQvQ=;
+        b=HO68gN9kD0bpPJZT5tI9ew/eGrPU0LX5ghC9WNKVh6tykd5NPU8QTmUTNa7HdWQ+6T
+         nQ8nDjzoa36gjxGJ/FZLT0+Ph6bUF82UkdCUgyZab5QAM0MUD6HgwuUPY+Qkk+e0elKr
+         NCYnkGYwi8SPNtyocRnVGFQE+SZ0xC6gKUO6PkcPQuxdVFcnBSi+Lc06tsFKxwT8tdVn
+         sJ2tjvQr4Ve/jsIFd+cNo87B8wSlB512JVzWOJC6Nyg68PZZJTvfUjtjHHKMGXFmj4er
+         ItWC0Fw5/gsmKDmqfBamsTNVl+IG+NFe2lEjPfTkMB3dUosb1DmCRdagcOu0egc2xfxl
+         dacA==
+X-Gm-Message-State: AOJu0Yyv1Vi+dSw9Lt4IyuW61NB5mz/fSoZTgf+vWmEM5bJQNeZA5miF
+	KlfuNdpVR7OghUflJEvo4USBXif0ZkkHwfUORYtha4kjUMqIdWQB5iQnG1wNiYOWw5Y=
+X-Gm-Gg: ASbGnctHjEAHGqPfRQlH7pIxpU+6YOEMWgmJxB2OjctRfELvFuNLt3xMzbzFMwHLmvU
+	5D5/VIv6POZb9Q0w4IsVfG3mlksVUU1zdwDSePY1rtOQzk29w8RmE0kRoX/sVSboeStQlwJmNxM
+	WPTQUIVQghbulyn5NePGSvyXkwS7bP4L+mJFE/AYalUZUwDHbRVXw8UwOIWl+RnZ7zInrqMHEWO
+	9bJGPjFREqy/jHUYDCrCUAU5hYJ4YeU9tyZk55I4LrakwV8v+ig/ZBPKg/sP7/+9CsywDIH0E8Q
+	yRUBS+EIsvIxhbeTtuaxZMusYRe++34+LjoZP6t4L6waRzaNikiQ3LACOU3Js2ozMAd4S0WVEuI
+	+lzaUR4QRVE0gq9D2
+X-Google-Smtp-Source: AGHT+IFlQReiFJK/Af7RgrjNQqPklkEfv1/bZJWTvAfp+oUAWvrqUQ2eGtnyyMmp2qtcoWM8f0FNSA==
+X-Received: by 2002:a05:600c:314a:b0:450:cfe1:a827 with SMTP id 5b1f17b1804b1-4530bba5129mr95169265e9.31.1749562003150;
+        Tue, 10 Jun 2025 06:26:43 -0700 (PDT)
+Received: from [10.59.10.179] ([185.201.75.120])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-452730d15f4sm143315905e9.40.2025.06.10.06.26.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jun 2025 06:26:42 -0700 (PDT)
+Message-ID: <f237f87e-50bb-4cbe-a1f9-f1ce41173725@cryptogams.org>
+Date: Tue, 10 Jun 2025 15:26:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,66 +66,37 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: CI: Another strange crypto message in syslog
+From: Andy Polyakov <appro@cryptogams.org>
+Subject: Re: [PATCH v3] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS
+ implementation
 To: Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, freude@linux.ibm.com, dengler@linux.ibm.com
-References: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
- <20250605142641.GA1248@sol>
-Content-Language: en-US, de-DE
-From: Ingo Franzki <ifranzki@linux.ibm.com>
-In-Reply-To: <20250605142641.GA1248@sol>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Y4X4sgeN c=1 sm=1 tr=0 ts=68482705 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=FNyBlpCuAAAA:8 a=BascJXSDbS2ylCxpsY0A:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=RlW-AWeGUCXs_Nkyno-6:22
-X-Proofpoint-GUID: -XB_HE0Cxv1xRAlwsErzwt7lM9sp1Wq0
-X-Proofpoint-ORIG-GUID: -XB_HE0Cxv1xRAlwsErzwt7lM9sp1Wq0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEwMDA5NiBTYWx0ZWRfXwv4PtOOtslS7 LyjEz4OiMOjETU2Ijkaj9PYvHrPrTYVuNJkkRuwWu/2ePC4AGRD3gZZDfdfnNmhw/4PKvcu2HHt bjlgyLw6zRrf8IJ2IKwG2cjbPI1ZLP56G7pKEaQOJOFm8Y9+CaU/jvDxMK7ouO4KjUKGpThol9M
- 57moEn4bcnR0xJ9k7zrt9tQrR5Wg9tm/sp+UEf3oDyYZoghLwCwmCLY8jV8MaUqXWDW5VSG/8Hl nX897itIvauMe5PI6BiJTlKkpb9hwprQ813kkQ+iSzBJ5Zy8/x56H+t2gUR0LMG/hxaDAX8Kt+e Xr0Inx4MHYOR9RFPZSBgZAPqM9DJAjUAg2mSaybr5Pnk5J0RoSyGHTlMkBvsTEcOGuBoKA7Py6f
- iV43JrAl1xR56Psej4sXcXR+WAv2bkkhIXp1mf56hSUoW/rAUn00mz80HyKg9C5GGjnREgWE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-10_04,2025-06-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0 adultscore=0
- impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 priorityscore=1501
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506100096
+ Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+ herbert@gondor.apana.org.au, paul.walmsley@sifive.com, alex@ghiti.fr,
+ zhang.lyra@gmail.com
+References: <20250609074655.203572-3-zhihang.shao.iscas@gmail.com>
+ <20250609201306.GD1255@sol>
+Content-Language: en-US
+In-Reply-To: <20250609201306.GD1255@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 05.06.2025 16:26, Eric Biggers wrote:
-> No, it's from the following commit:
+>> +void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
+>> +			  unsigned int len, u32 padbit)
+>> +{
+>> +	len = round_down(len, POLY1305_BLOCK_SIZE);
+>> +	poly1305_blocks(state, src, len, 1);
+>> +}
+>> +EXPORT_SYMBOL_GPL(poly1305_blocks_arch);
 > 
->     commit ef93f1562803cd7bb8159e3abedaf7f47dce4e35
->     Author: Herbert Xu <herbert@gondor.apana.org.au>
->     Date:   Wed Apr 30 16:17:02 2025 +0800
-> 
->         Revert "crypto: run initcalls for generic implementations earlier"
-> 
-> That moved the crypto_shash support for hmac and sha256 from subsys_initcall to
-> module_init, which put at the same level as crypto_hkdf_module_init which
-> depends on it.
-> 
-> I guess we just move crypto_hkdf_module_init to late_initcall for now.
+> This is ignoring the padbit and forcing it to 1, so this will compute the wrong
+> Poly1305 value for messages with length not a multiple of 16 bytes.
 
-It still fails the same way in a current next kernel. Will there be a fix for it any time soon?
+Right. There seems to be misunderstanding. It should be sufficient to 
+pass -Dpoly1305_blocks=poly1305_blocks_arch as one compiles the assembly 
+module, linux/lib/crypto takes proper care of the padding and the padbit 
+to meet the assembly module's "expectations." In other words there is no 
+need to implement this glue subroutine in C, not here.
 
-BTW: I guess there is a typo:
-	"basic hdkf test(hmac(sha256)): failed to allocate transform: -2"
-should probably read:
-	"basic hkdf ..."
-All the code around this string is about HKDF (HMAC Key Derivation Function), not HDKF.
+Cheers.
 
--- 
-Ingo Franzki
-eMail: ifranzki@linux.ibm.com  
-Tel: ++49 (0)7031-16-4648
-Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
