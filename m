@@ -1,118 +1,100 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C804244663;
-	Wed, 11 Jun 2025 21:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A941DF754
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 21:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749676673; cv=none; b=ZKFwVRgUaXiBVN4vriF/04yNt00cS01dGBOY8g5/fJ0nWt2RtK6ZjTNz3C5v+dAGPyNAZ5+FF41m81tanpJqeW6dG5yPbkieRb4TzyIWO4hz1uDDNRTLE5jD7sr651uaJ14100U+r7w3aHdmphBAD/AIBR/ApeTGM22aZauuWsM=
+	t=1749676899; cv=none; b=ItAekGVVc7W+1tkOuzodFI6y9dWhz1UZxCifNvZnggjam8K/0to2aFbanDYxWfkM6ej6tDM1Jm+J4ogxDl3PqBsMIby7k0KkAN28V9l/p/RZs13MSuE71L5VV+k4y0wx0JYQumO1uzVzn0vatX+TvSV6JGTg51iilVS4ADhUU+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749676673; c=relaxed/simple;
-	bh=S+LipCKWtqniA6VgzkhLx9Mj5Oe60IIUsMAQ1B//s/Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GHc7JUBK6mdhKBO9RCDZYgTiRGONhuX2CUnVt8bvsQqpBkU66VewdOXlK8yn7MiH7s/LiAFHFlYeJR+xEByRu7sLLL6fZzTsv0UaoqsFIdixNhrT8JBEusfyszp5jHJXTVBUna1hbM85uFY4wNTQ+8c12xnRpN07eH3TYhpZjT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VJSwI2gi; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1749676899; c=relaxed/simple;
+	bh=M6HxvA49p+fK8bp/m2l/SRceWAjSLs3kZZfYsnrgxUg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P39yY9hTxyzKHJ3wQw8K+Cp41cbj4TTqRrylpO7l45V2q4FPUMK3Vb7dUYXhpzweT1ZDlbe9x6xJhx5kshnOxVYpUisuwnUGMZlAouwQwlhJnpRvt39pxCzQejxg9GccBh/DnCL/YvO+1eAIVIAGU1CGFBoKPghq3+L9Tuw8b20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ZEw3xTYh; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VJSwI2gi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749676672; x=1781212672;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=S+LipCKWtqniA6VgzkhLx9Mj5Oe60IIUsMAQ1B//s/Y=;
-  b=VJSwI2giPmAx+0exXoMaG+5K9OhP4TaekzWbMOcvenSYeinyjDl464oz
-   ppAWlF+AoOwe80S1VM5v6lQyofM5DpNNV7GPqocEW0iAY+RmU9GifCqy7
-   zFpms0yVf7VNwILgG2G865Auewt4+YPXz5XTptwL4WbBnIxmJk84vhIe+
-   AN9tc3fD94z4eXsGK5VBE+WUFvtnxRIqUDbalbadtLu4jcBMQJr1qDufv
-   MkSUjveZ/CiL9gqShEwMNlynicExzGFSawJ3oIpjd+auWVVr3/dAR/3Bm
-   dbeuRwmXl/LnQPoejZD+cFYSStOojbjujMKS9MSbl7Xg3yP47OhlByb1L
-   A==;
-X-CSE-ConnectionGUID: BkUpkPbGRlqTF8WOH/x7Jw==
-X-CSE-MsgGUID: QaPe45AHQgCEU5qQY13kDA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51933720"
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="51933720"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:17:51 -0700
-X-CSE-ConnectionGUID: AyUrXfxOQvWhfcZggceskg==
-X-CSE-MsgGUID: UF5g3Q3QTjGRe/vCcTgspg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="178263481"
-Received: from unknown (HELO vcostago-mobl3) ([10.241.226.49])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:17:50 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kristen Accardi <kristen.c.accardi@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Tom Zanussi <tom.zanussi@linux.intel.com>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: iaa - Fix race condition when probing IAA devices
-In-Reply-To: <aEjnbdoqzLoMifRn@gondor.apana.org.au>
-References: <20250603235531.159711-1-vinicius.gomes@intel.com>
- <aEjnbdoqzLoMifRn@gondor.apana.org.au>
-Date: Wed, 11 Jun 2025 14:17:49 -0700
-Message-ID: <878qlyugea.fsf@intel.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ZEw3xTYh"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-addcea380eeso49025466b.0
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 14:21:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1749676896; x=1750281696; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OgzdZm4+49mKePkx+kNZ7H8LSMYhd60zWxBKo/56OGU=;
+        b=ZEw3xTYhQtfK1GfVgl2KU6awL5GPzlwb6Ba6X1ue3Xuqs5H3MhGtQu7PW+ldn4ej3g
+         LJ+s32gQ6FVR9/MKdSFbjqCbu8Rvt+p+rxp90X9SORXwkZKKEwNdNiZST5oF8rBgOOim
+         xoMDwEUsiznoSYFtBKQBQYMAiIQ4lWfAsZiqQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749676896; x=1750281696;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OgzdZm4+49mKePkx+kNZ7H8LSMYhd60zWxBKo/56OGU=;
+        b=L4RUTJdnHZqa9l3hyPriY/WNpdM1iR/t9DmSSegA7+CdDwA/YKLDujM4a83b9TXCM4
+         aPbVQzNDdsFUdrQ7gtDTVKKhqnwKYKIHLOpeGXAaq3cjpR09RSUbXw8SIhOFic4uGC23
+         G3wEbJQAvpv4HNP6BKYv9YVnIYd30xh3GOehieoL+Txm5JTEUjdjxauKTvsBO18PPRdz
+         tno352TpMO5MdubtUj+Q5o+H8TDbesJZQfw+8SvQANXzR8ocMWs4sxjtjl0+ZLBmCKWN
+         TCVm85NQpUeaOQfppvD8+gos77B/2oQ1FpuI4cZ9cMX0n/Hf1zKS5rjJGD1ahi59gMQR
+         D8IA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlSILer5YUYez3jXeuRQwMIaq7D1jWlA31maki0BeB1kk5EgrJJHGxlhxU7c3pkpw706CbTf8asPWNPoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyao/yikc+v5/QveOYjq9rV4Dx9s2rwYz6ZMXvlOZIcWgrzChwp
+	VctngVeciGmhAoZ4IKPrs6QFVTFLGrspVbBfOoBMwviKrY3JbEbcVuR6kK1kyqr1JHcMysFRGI7
+	q7cM3V5I=
+X-Gm-Gg: ASbGncsM3GzkDBelzOU0ty7f2MSMF8n9C3Cc5rJFODuwJLWKV7FuVC9FJ5nGJ1JaxMn
+	T2TZnVhCgkvxKe8pGovRr3CbeUreP+Nb2qeD33Gcqx9jczrRgb3xkwacaJYrYfoIzGGoAywbAH3
+	JT9w+c2l5lpLu8OszcQE0WsrslibDcABis+odwHhXRqh62bQneLjq4sfwrmUS6zRRjkAk7HQmWF
+	n+qXDJsHC5ui8qT9PJoCKs9A/7uhtoPgcOyz1RCWVIyvHzN83+l7PCpzZpJjDCcU+4AENpqiQaF
+	gOK3sJR7l70d1h3YSzqe3qG3SD6OewAmzloVqaAlyyoCOKa3Cn3l/9OLxTq+CHaxWKNNMbUhr8H
+	KGOmmZcmBUQIrHNgmYjKcNAiEzLbk30+sZ38Z
+X-Google-Smtp-Source: AGHT+IGFdn1zvm2e3Sd6WQZ+X4ePFh8+ExfTPpLwSALs3zgWMffpgGMBcGqNIb85+u5N5kNdmCWqeg==
+X-Received: by 2002:a17:907:3e27:b0:ad8:9b5d:2c38 with SMTP id a640c23a62f3a-adea92b4fb9mr60331066b.26.1749676895795;
+        Wed, 11 Jun 2025 14:21:35 -0700 (PDT)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adeadf4284bsm12416366b.179.2025.06.11.14.21.34
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Jun 2025 14:21:34 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so575024a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 14:21:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVL0LDeP7Y/53ykeZmPAdVkz6xaeOBWIM8cFJ7g3BHcryoTO1wIir4yK1D6q/tpfuIXAddpicPQ6LED5jQ=@vger.kernel.org
+X-Received: by 2002:a05:6402:34c8:b0:601:6c34:5ed2 with SMTP id
+ 4fb4d7f45d1cf-6086a8d8175mr280985a12.4.1749676894398; Wed, 11 Jun 2025
+ 14:21:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <301015.1748434697@warthog.procyon.org.uk> <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
+ <CAHk-=wjY7b0gDcXiecsimfmOgs0q+aUp_ZxPHvMfdmAG_Ex_1Q@mail.gmail.com>
+ <382106.1749667515@warthog.procyon.org.uk> <CAHk-=wgBt2=pnDVvH9qnKjxBgm87Q_th4SLzkv9YkcRAp7Bj2A@mail.gmail.com>
+ <20250611203834.GR299672@ZenIV>
+In-Reply-To: <20250611203834.GR299672@ZenIV>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 11 Jun 2025 14:21:17 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgGMd31KshGecZJCupkGJQteupgk1SqswBsbHadMfpVhg@mail.gmail.com>
+X-Gm-Features: AX0GCFtJBJ0_GDTJQXbaSb0DbKUaXWaGBcUByl4A2_DrwE75v36idPEAZwBhho8
+Message-ID: <CAHk-=wgGMd31KshGecZJCupkGJQteupgk1SqswBsbHadMfpVhg@mail.gmail.com>
+Subject: Re: [PATCH] KEYS: Invert FINAL_PUT bit
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-
-> On Tue, Jun 03, 2025 at 04:55:31PM -0700, Vinicius Costa Gomes wrote:
->>
->> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
->> index 23f585219fb4..2185c101bef3 100644
->> --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
->> +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
->> @@ -35,28 +35,39 @@ static unsigned int cpus_per_iaa;
->>  
->>  /* Per-cpu lookup table for balanced wqs */
->>  static struct wq_table_entry __percpu *wq_table;
->> +static DEFINE_SPINLOCK(wq_table_lock);
+On Wed, 11 Jun 2025 at 13:38, Al Viro <viro@zeniv.linux.org.uk> wrote:
 >
-> This can be called in BH context so you need to disable BH when
-> taking the spinlock.
->
+> Speaking of the stuff fallen through the cracks - could you take another
+> look at https://lore.kernel.org/all/20250602041118.GA2675383@ZenIV/?
 
-My tests with lockdep enabled must have missed something, will verify
-and fix this.
+Also done.
 
->>  static struct idxd_wq *wq_table_next_wq(int cpu)
->>  {
->> -	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
->> +	struct wq_table_entry *entry;
->> +	struct idxd_wq *wq;
->> +	int id;
->> +
->> +	guard(spinlock)(&wq_table_lock);
->> +
->> +	entry = per_cpu_ptr(wq_table, cpu);
->
-> You're taking a global spinlock around a per-cpu variable.  In that
-> case you might as well get rid of the per-cpu variable and use the
-> spinlock only.
->
+Well, the script part is, it's still doing the test-build and I'll
+have to make a commit message etc.
 
-From what I could gather, the idea of the per-cpu workqueue table ("map"
-really) is more to "spread" the workqueues to different CPUS than to
-reduce contention.
-
-If the question is more about the choice of using per-cpu variables, I
-can look for alternatives.
-
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-
-Cheers,
--- 
-Vinicius
+              Linus
