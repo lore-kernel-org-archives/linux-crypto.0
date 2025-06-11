@@ -1,338 +1,99 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047AD22B8AB
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 18:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AAD27CCDB
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 18:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749668012; cv=none; b=Sm+V5F3WCa7eOc9TqWOIE40r5BDJaUfyvGj2rCCiebO1qXZ8bbOTN/M5p9adij/kzEK6j1f7spUkxht9xGXArOeCQ+vyfpbsKH8YDoBHniwD8ocUQcR9Uqu2get7r5f+caqQdRGPW2POBzCCe1vKZq9lWvg5KfoDU3o8m8SKbd8=
+	t=1749668381; cv=none; b=oWyjo27O0NJ61mi4b71DloJu6z1UbDAh9Aba73CuUug/eEjFmK+papXc3TEP7gsxDmXvPNaBuLalDy8L7sq6Oex0BWnQpbUaNSve/KcOkfrc3K1gYGMgahnLkQ/FvTM46HKeHf69abi5/jlVon4u61AV37fRgufP6xmPxg16bVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749668012; c=relaxed/simple;
-	bh=6PhEVxny/pNtFQ59Y3RQZ7Fspzsg+hSD3GfWX/lMYGE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=MdQ0jLbReWC/CPO3ezxfH/5DEiRtpCELsGewt7pIFR4WnSE+XZJ/7wyY9lp6trN7WFi2denDJrCu5eSNVrpEsIwBgDLFEVDIrtAeVQUzL5DMCNLKOLAX5EE1aWmvPKVyh9Z7U0n7WBRGyQ2XHyRdpwgTa+AcP7a0xDTHQEYJBeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=XA7w2nDL; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
+	s=arc-20240116; t=1749668381; c=relaxed/simple;
+	bh=novuMTuhYNzqynSwAmnzr3dM+uqQhwQCtXMewPa/Wkg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JkJ3j8W8WQ/rHkATiLvdCI00E1139sV2K7mvyFM2QFNKBIdTw68DYfJJ+8apECviltYAC1cQJ1NShz8TfauMffOEyrG7Hty/j54rDVPEK73eoBTY28ytD4jRRsB2npbMF+JZUXbzANhRtQZnNVyVWrQJGVICC60LYaRdeGnPWI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=CGUwc5Lc; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="XA7w2nDL"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="CGUwc5Lc"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-60789b450ceso410258a12.2
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 11:59:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1749668378; x=1750273178; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=p4nKI6dictu7VKkBmue+gE/ANqM7N/0dOk6jpGABvHA=;
+        b=CGUwc5LcY/RKYUQmw1G93Y6GCRtWiXcYG7pedu+cPr622ChpXEu1BMslwTpWid2zPC
+         74d1mPILRllHcn9IiEzRHs2eSI3KKNIO8PuLrpQNXeIEtUTGQzBF82oTDwfR59Qskcoe
+         jsf3AP1ejl4BxquhUL1OIR3QgRCjcDq9BSDSo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749668378; x=1750273178;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p4nKI6dictu7VKkBmue+gE/ANqM7N/0dOk6jpGABvHA=;
+        b=LJbhrE/cvt/eZgZ/qmQs0BvXpWDfB352P3evMqQJDELMVdlLPwnnDfPQisfuPW1diL
+         SAr0vxegaiA5a4YWcWUEgpTf/Q4aav08ssZQsBxrCJ8oJBEmaOzmDXtc5hALbBqRkVS7
+         pxVqO53vea6Op25Y1O2nhyIY4nVPDplHXWgzh9YjpZo2TYZ8bDn4ukdS93Iq5D2jzrmH
+         /RRn+54hl4eC+fyATsMThISwwbMBCRZwlIn0mS9kQ2PVHtpGot1x/ZckWH0f7pftz+3Y
+         FNxr9TKnsR2bFAN7NyunAwxbAioMO6m6NOnGM2OUMZlE3dZ3d5cl/bQSQ/bt6MKO+l7W
+         2toA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpoR4m/tLEXjYLzzQXcRkLEnYZqeAmNm0iOy9Z9E8t38AX1FI3x3NMYgUjP4NsgOxs/zRT4bEoPE5il/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzreY2nN9b/29jiKcBq1x3QQT9E99GZJY6Hr3hMx1sFDXqzJq3h
+	zzTFS9u+k5uMNBkv+9rbcoMsA5NtDMQblX3cthNoINRO+TJbb4MOqnCSMRRuRGbRGUALfsfViZ2
+	lCEMMoGY=
+X-Gm-Gg: ASbGncvsJ7z0MmEf1l7Fybk7RB9/biC1krAztfGiEU6WMhh0xuIYsz749Kt3zEa91eB
+	VUFkaZ6k/v1EgX/ByEnYsrndltu7Z6AwhF+pRgXAIBIelEIqRnaoh8O74rbL/Gz3AZsWwErRD0M
+	ZYcZIJ7TEONgxSt0xqxfvnWKrw+gqCP//RLA/objImWFAdbv8ZqnhJlRnHyqygDxrP4P+gxQUJL
+	V1N7sZMAV3m5MwkPWq+OIky+ikDN0WJmmU8x5ge9+hIfeRI5ngok86Fb+e8sO4356yK7VRVuMmf
+	TGSKohpDuFQA71Bz6UhSEC5LHOs87Y+u+tBYKlTFVxrPaxy9QrujSb07NijbazvSYN5KuVs9XO6
+	ll/hLSZ34RozPB4zrA3aN6Z7vSXoJQjwhZFys
+X-Google-Smtp-Source: AGHT+IG37zc8zktMbvksf1YPYc9otl7YcUkfXVhfngQ0l1KAfAmryj7v8JfSVV1J+uk3nC+xJQEXpg==
+X-Received: by 2002:a05:6402:524c:b0:602:ef0a:cef8 with SMTP id 4fb4d7f45d1cf-60863b0502emr1109569a12.18.1749668377914;
+        Wed, 11 Jun 2025 11:59:37 -0700 (PDT)
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com. [209.85.208.52])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6086a551246sm5844a12.8.2025.06.11.11.59.36
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Jun 2025 11:59:37 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-60497d07279so431211a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 11:59:36 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUH1wSSvvImA9bCu8uoFoj3y0+D/55vutNC9b65hByG114uAOC0OdskmSlkTnJ4opYLWKsXC/qIGYCZs/I=@vger.kernel.org
+X-Received: by 2002:a05:6402:2344:b0:607:77ec:fa8c with SMTP id
+ 4fb4d7f45d1cf-6086382094emr984600a12.1.1749668376614; Wed, 11 Jun 2025
+ 11:59:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
-	t=1749668005;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z9Ngc8BFLZcajbvkbgoSnpknnsO3kDOod4k2hOKAQ5I=;
-	b=XA7w2nDLbTvEx2DxApU0fK4nBiU8wSbr+hOWKcheZi+I5vL2p1tRMzmQ4zETvZarA30gX9
-	A7nxAFeKZUHAegbKYh65W3CkhfCs5WkzYBbseRoWNJOXFtl0UENPifpx4MIzxju4WptBDV
-	EjC3t+hQfz4+Rbi7ml/qrb3IlLwssRRcNfOiDXiWoZgDELyVZ8+dtYuDfsFeaJLs4MfPi9
-	o+AqRrq36nZpBznuXub2sp4sMGTSe6EtAljk7xZi5U2RzZUuMS4FkpgB528/Gxlk/Rc/QO
-	Cg8T/L1ZkcfKUHKQL0EhF8b/XB4lfoKqhsho4z1wdp94O/VwLBTPuhtuFokDnQ==
-Content-Type: multipart/signed;
- boundary=a2b9797885f3d11a998329b426c25f7c213f5b963f86d455ce2a3ec162a6;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Wed, 11 Jun 2025 20:53:17 +0200
-Message-Id: <DAJXJHLY2ITB.3IBN23DX0RO4Z@cknow.org>
-Cc: <linux-kernel@vger.kernel.org>, "Ingo Franzki" <ifranzki@linux.ibm.com>
-Subject: Re: [PATCH] crypto: testmgr - reinstate kconfig support for fast
- tests only
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Diederik de Haas" <didi.debian@cknow.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
- "Herbert Xu" <herbert@gondor.apana.org.au>
-References: <20250611175525.42516-1-ebiggers@kernel.org>
-In-Reply-To: <20250611175525.42516-1-ebiggers@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+References: <301015.1748434697@warthog.procyon.org.uk> <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
+ <CAHk-=wjY7b0gDcXiecsimfmOgs0q+aUp_ZxPHvMfdmAG_Ex_1Q@mail.gmail.com> <382106.1749667515@warthog.procyon.org.uk>
+In-Reply-To: <382106.1749667515@warthog.procyon.org.uk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 11 Jun 2025 11:59:19 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgBt2=pnDVvH9qnKjxBgm87Q_th4SLzkv9YkcRAp7Bj2A@mail.gmail.com>
+X-Gm-Features: AX0GCFtsLno8Yfd-XNr8pAuQD_5-TGkXF-CBKKMqVdzdI6GXK5Wl1KZHm9JyRfA
+Message-ID: <CAHk-=wgBt2=pnDVvH9qnKjxBgm87Q_th4SLzkv9YkcRAp7Bj2A@mail.gmail.com>
+Subject: Re: [PATCH] KEYS: Invert FINAL_PUT bit
+To: David Howells <dhowells@redhat.com>
+Cc: Paul Moore <paul@paul-moore.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---a2b9797885f3d11a998329b426c25f7c213f5b963f86d455ce2a3ec162a6
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-
-I was about to respond to your reply, but I guess this may be a better
-fit for it. The TL;DR: version is this:
-
-If you think distros shouldn't enable it, as you initially clearly
-described and it seems to me you still think so, the right thing for
-distros to do, is to disable those test. Which in turn means the fast
-tests should not be reinstated (?).
-
-On Wed Jun 11, 2025 at 7:55 PM CEST, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, 11 Jun 2025 at 11:45, David Howells <dhowells@redhat.com> wrote:
 >
-> Commit 698de822780f ("crypto: testmgr - make it easier to enable the
-> full set of tests") removed support for building kernels that run only
-> the "fast" set of crypto self-tests by default.  This assumed that
-> nearly everyone actually wanted the full set of tests, *if* they had
-> already chosen to enable the tests at all.
->
-> Unfortunately, it turns out that both Debian and Fedora have the crypto
-> self-tests enabled in their production kernels, and they seem to want to
+> Do you want a signed tag and git pull for it?
 
-I explicitly referenced https://bugs.debian.org/599441 as that was the
-only justification I found for enabling it.
-In it, on 2010-10-07 "Mario 'BitKoenig' Holbe" said:
+Particularly during the merge window that makes sense just to make it
+trigger my usual "git pull" pattern, but now that I'm more aware of it
+I can just take the patch directly.
 
-  I personally think (re)enabling these tests would be a way safer
-  default for a distribution kernel which runs on lots of different
-  hardware setups
+Anyway - done just to get this behind us. But for next time, just do
+it as a signed tag pull request, _particularly_ during the merge
+window when most other emails get much lower priority.
 
-Before I looked up that bug, I had not heard of that person, so I don't
-know if they're a crypto expert or just a random person on the internet.
-It also doesn't say *why* they thought it would be a good idea to enable
-those tests.
-I have no idea what Fedora's reasoning was for enabling it. Maybe their
-reasons were sound; I think Debian's are rather thin (that I could
-find). And from ~ 15 years ago.
-
-> keep them enabled.  The full set of tests isn't great for that, since
-
-I think the 'new' description is(/was) great. A subject matter expert
-says/said "don't enable this on production kernels". I wish all Kconfig
-help texts were this clear :-)
-So based on the previous description, it seems wise that Debian (and
-Fedora) would update their kernel config and disable those test.
-
-In *my* update to 6.16-rc1, I only 'converted' to new names.
-A change to my kernel config (ie disable the tests) would be in a
-separate commit (with an appropriate commit msg).
-I hadn't done that yet as I was curious what the results would be.
-
-So "they seem to want to keep them enabled" seems a premature
-conclusion; at least wrt Debian and AFAICT.
-It's also possible that if/when people see the kernel warning, they'd
-file a new Debian bug to have it disabled.
-
-(I've made some contributions in the past, but) I am not part of
-Debian's kernel team, so I don't know what they will decide.
-=20
-I'll gladly leave it up to you if you still think reinstating the fast
-tests is worth it, but I felt a bit more context was warranted.
-
-Cheers,
-  Diederik
-
-> they take significantly longer to run and slow down the boot.
->
-> One issue is that the crypto self-tests are being (mis)used to meet FIPS
-> 140-3 pre-operational testing requirements.  But actually the more
-> fundamental issue is that the crypto/ subsystem has many buggy and
-> untested drivers for off-CPU hardware accelerators on rare platforms.
-> As a result, apparently in some cases the tests are actually being
-> relied on *in production kernels* to stop buggy drivers from being used.
-> I think this is kind of crazy (untested drivers should just not be
-> enabled at all), but that seems to be how things work currently.
->
-> Thus, reintroduce a kconfig option that controls the level of testing.
-> Instead of the original CRYPTO_MANAGER_EXTRA_TESTS which was confusing
-> and disabled by default, go with CRYPTO_SELFTESTS_FULL which is enabled
-> by default (but dependent on CRYPTO_SELFTESTS, of course).
->
-> Given the "production kernel" use cases, also remove the dependency on
-> DEBUG_KERNEL from CRYPTO_SELFTESTS.  It was introduced by
-> commit 40b9969796bf ("crypto: testmgr - replace
-> CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS") and wasn't present
-> on the original option.
->
-> I also haven't reinstated all the #ifdefs in crypto/testmgr.c.  Instead,
-> just rely on the compiler to optimize out unused code.
->
-> Fixes: 40b9969796bf ("crypto: testmgr - replace CRYPTO_MANAGER_DISABLE_TE=
-STS with CRYPTO_SELFTESTS")
-> Fixes: 698de822780f ("crypto: testmgr - make it easier to enable the full=
- set of tests")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->
-> This patch is targeting the crypto tree for 6.16.
->
->  crypto/Kconfig                 | 18 ++++++++++++++----
->  crypto/testmgr.c               | 15 ++++++++++++---
->  include/crypto/internal/simd.h |  6 ++++--
->  lib/crypto/Makefile            |  2 +-
->  4 files changed, 31 insertions(+), 10 deletions(-)
->
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index e9fee7818e270..8612ebf655647 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -174,20 +174,30 @@ config CRYPTO_USER
->  	  Userspace configuration for cryptographic instantiations such as
->  	  cbc(aes).
-> =20
->  config CRYPTO_SELFTESTS
->  	bool "Enable cryptographic self-tests"
-> -	depends on DEBUG_KERNEL
->  	help
->  	  Enable the cryptographic self-tests.
-> =20
->  	  The cryptographic self-tests run at boot time, or at algorithm
->  	  registration time if algorithms are dynamically loaded later.
-> =20
-> -	  This is primarily intended for developer use.  It should not be
-> -	  enabled in production kernels, unless you are trying to use these
-> -	  tests to fulfill a FIPS testing requirement.
-> +config CRYPTO_SELFTESTS_FULL
-> +	bool "Enable the full set of cryptographic self-tests"
-> +	depends on CRYPTO_SELFTESTS
-> +	default y
-> +	help
-> +	  Enable the full set of cryptographic self-tests for each algorithm.
-> +
-> +	  For development and pre-release testing, leave this as 'y'.
-> +
-> +	  If you're keeping the crypto self-tests enabled in a production
-> +	  kernel, you likely want to set this to 'n' to speed up the boot.  Thi=
-s
-> +	  will cause the "slow" tests to be skipped.  This may suffice for a
-> +	  quick sanity check of drivers and for FIPS 140-3 pre-operational self=
--
-> +	  testing, but some issues can be found only by the full set of tests.
-> =20
->  config CRYPTO_NULL
->  	tristate "Null algorithms"
->  	select CRYPTO_ALGAPI
->  	select CRYPTO_SKCIPHER
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 72005074a5c26..32f753d6c4302 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -43,17 +43,22 @@ MODULE_IMPORT_NS("CRYPTO_INTERNAL");
-> =20
->  static bool notests;
->  module_param(notests, bool, 0644);
->  MODULE_PARM_DESC(notests, "disable all crypto self-tests");
-> =20
-> +#ifdef CONFIG_CRYPTO_SELFTESTS_FULL
->  static bool noslowtests;
->  module_param(noslowtests, bool, 0644);
->  MODULE_PARM_DESC(noslowtests, "disable slow crypto self-tests");
-> =20
->  static unsigned int fuzz_iterations =3D 100;
->  module_param(fuzz_iterations, uint, 0644);
->  MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
-> +#else
-> +#define noslowtests 1
-> +#define fuzz_iterations 0
-> +#endif
-> =20
->  #ifndef CONFIG_CRYPTO_SELFTESTS
-> =20
->  /* a perfect nop */
->  int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
-> @@ -317,13 +322,13 @@ struct testvec_config {
-> =20
->  #define TESTVEC_CONFIG_NAMELEN	192
-> =20
->  /*
->   * The following are the lists of testvec_configs to test for each algor=
-ithm
-> - * type when the fast crypto self-tests are enabled.  They aim to provid=
-e good
-> - * test coverage, while keeping the test time much shorter than the full=
- tests
-> - * so that the fast tests can be used to fulfill FIPS 140 testing requir=
-ements.
-> + * type when the "fast" crypto self-tests are enabled.  They aim to prov=
-ide good
-> + * test coverage, while keeping the test time much shorter than the "ful=
-l" tests
-> + * so that the "fast" tests can be enabled in a wider range of circumsta=
-nces.
->   */
-> =20
->  /* Configs for skciphers and aeads */
->  static const struct testvec_config default_cipher_testvec_configs[] =3D =
-{
->  	{
-> @@ -1181,18 +1186,22 @@ static void generate_random_testvec_config(struct=
- rnd_state *rng,
->  	WARN_ON_ONCE(!valid_testvec_config(cfg));
->  }
-> =20
->  static void crypto_disable_simd_for_test(void)
->  {
-> +#ifdef CONFIG_CRYPTO_SELFTESTS_FULL
->  	migrate_disable();
->  	__this_cpu_write(crypto_simd_disabled_for_test, true);
-> +#endif
->  }
-> =20
->  static void crypto_reenable_simd_for_test(void)
->  {
-> +#ifdef CONFIG_CRYPTO_SELFTESTS_FULL
->  	__this_cpu_write(crypto_simd_disabled_for_test, false);
->  	migrate_enable();
-> +#endif
->  }
-> =20
->  /*
->   * Given an algorithm name, build the name of the generic implementation=
- of that
->   * algorithm, assuming the usual naming convention.  Specifically, this =
-appends
-> diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/sim=
-d.h
-> index 7e7f1ac3b7fda..9e338e7aafbd9 100644
-> --- a/include/crypto/internal/simd.h
-> +++ b/include/crypto/internal/simd.h
-> @@ -42,13 +42,15 @@ void simd_unregister_aeads(struct aead_alg *algs, int=
- count,
->   * crypto_simd_usable() - is it allowed at this time to use SIMD instruc=
-tions or
->   *			  access the SIMD register file?
->   *
->   * This delegates to may_use_simd(), except that this also returns false=
- if SIMD
->   * in crypto code has been temporarily disabled on this CPU by the crypt=
-o
-> - * self-tests, in order to test the no-SIMD fallback code.
-> + * self-tests, in order to test the no-SIMD fallback code.  This overrid=
-e is
-> + * currently limited to configurations where the "full" self-tests are e=
-nabled,
-> + * because it might be a bit too invasive to be part of the "fast" self-=
-tests.
->   */
-> -#ifdef CONFIG_CRYPTO_SELFTESTS
-> +#ifdef CONFIG_CRYPTO_SELFTESTS_FULL
->  DECLARE_PER_CPU(bool, crypto_simd_disabled_for_test);
->  #define crypto_simd_usable() \
->  	(may_use_simd() && !this_cpu_read(crypto_simd_disabled_for_test))
->  #else
->  #define crypto_simd_usable() may_use_simd()
-> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> index 3e79283b617d9..f9e44aac6619b 100644
-> --- a/lib/crypto/Makefile
-> +++ b/lib/crypto/Makefile
-> @@ -60,9 +60,9 @@ libsha256-y					:=3D sha256.o
->  obj-$(CONFIG_CRYPTO_LIB_SHA256_GENERIC)		+=3D libsha256-generic.o
->  libsha256-generic-y				:=3D sha256-generic.o
-> =20
->  obj-$(CONFIG_MPILIB) +=3D mpi/
-> =20
-> -obj-$(CONFIG_CRYPTO_SELFTESTS)			+=3D simd.o
-> +obj-$(CONFIG_CRYPTO_SELFTESTS_FULL)		+=3D simd.o
-> =20
->  obj-$(CONFIG_CRYPTO_LIB_SM3)			+=3D libsm3.o
->  libsm3-y					:=3D sm3.o
->
-> base-commit: aef17cb3d3c43854002956f24c24ec8e1a0e3546
-
-
---a2b9797885f3d11a998329b426c25f7c213f5b963f86d455ce2a3ec162a6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaEnQnwAKCRDXblvOeH7b
-bj9mAP98h7N1N7UhiG7N/oWUjkZAFnUeL4ZDV1EjWptXXp12zQEA5CpLBrl9zQ70
-f2LcDH+l+KfOk78W1yjoGGMqCBPM/A8=
-=XUmy
------END PGP SIGNATURE-----
-
---a2b9797885f3d11a998329b426c25f7c213f5b963f86d455ce2a3ec162a6--
+             Linus
