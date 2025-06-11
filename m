@@ -1,365 +1,229 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0950026E71A
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Jun 2025 11:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749642094; cv=none; b=PILbyp/lVGzp0gWniCErttyE5U+VoN0qdA8twvBr5HDIalnc96lAVk/ZyZxp/k8x1huEV66JWbM2vMm4CLeI07uN2HqwJ6p2EMDBc9u5PwneAm0tV088qSeFY4ku8TeE9f3CgEkk3/WqhM5NsLwWEnmXgODOBHCbQfchh9TQi5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749642094; c=relaxed/simple;
-	bh=ljOrfD1DmNbylpcSlP76RTFNedYKTqurtpHab4OwTsQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=gI4kvcAaTJRgQOPUnzy4mnEJtGeH7dMkVOmDCQTf7lMT7mqe9bFcHraa6aG+cxWrq7yJI5jdfwnjFXVVAdA4jnEpr7ykCy9wagugJ/XJ3wevgCVmXjYyQiAICT3pCc4AqcDpjTCInYEekY/PIjDYe//1op/Ld/IlqmlkEZi/f24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=g7qTMC0H; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74938269CE8;
+	Wed, 11 Jun 2025 12:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749646403; cv=fail; b=HZTWOKltTefByMEYx2GPs7sYfvtj7N99xkCEH4N6fsCPlVzID5KTJzB3mbP7Ae9lpaFAzu5uhQpXcP/F+5+c67F7DeYhyKEB6xfjiqtnuXXg9XK7n5dyZw8dAUQKntcqBOx6wd7we3P163sE9YFhts/cj0qUB3oWHugiOHswMwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749646403; c=relaxed/simple;
+	bh=KZ535954n1OrdFSwDykxBKngj0ZPSTuWJtsLBkZcpzA=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=pp80QiIn6NGOM9+XIXOO2LhbJ9Hv3LmDm2nCnJwVu+Ny0C1HcQKXN0YVLjo42n3FzKzqkj4GIBR7R5VghEJMtLv6ixz1rKZRpidMo/U3Tblpw9/QzrS/CQm2DkS00onBQPZR0qabkTA05iQFU76cX8dhyUvta+osld41VAk79jg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EBHCDC8h; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="g7qTMC0H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EBHCDC8h"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749646401; x=1781182401;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=KZ535954n1OrdFSwDykxBKngj0ZPSTuWJtsLBkZcpzA=;
+  b=EBHCDC8hpKCemOvWXaegOkbnZAX9UFHI0QgkBDdGPlElf8zqQrdE4b1n
+   aSh6uLmDPmmEi6jY2bNxhM5SGUKUoccsjOEYKWVgEivFCdvxlq5mfdaKU
+   AdEFkz+CDwylrvDLKuCuvKkEViTxEuXNFM/aIL+z/nBQXxgQHepCJOjG3
+   779E8td/Mjo8M/9He9xEIVasxTfoyZjqzlyq7pkdMJMbDbZQNbF+6S5nK
+   A3u4fbH3DpKleL+nc+N3x+jNI0JJYWq34yNhuGvDBb7yXBog2v9ISt8VV
+   kZdckAzfJ3LO4wnF7JBLqVbb2xzoRC74p5u3tNTYHx536ezbxnSFsoHYw
+   A==;
+X-CSE-ConnectionGUID: +5pNb3D2QcK0BPMaXqNQyQ==
+X-CSE-MsgGUID: 3Ix/4KRpSpyIJ2cw0GDslQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51500242"
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="51500242"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 05:53:19 -0700
+X-CSE-ConnectionGUID: /jCaDI7lRk24CXmNy8X1LQ==
+X-CSE-MsgGUID: 1CDeGw3gQPS/A0/sAerUGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="152468965"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 05:53:20 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 05:53:19 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 05:53:19 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.73)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 05:53:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D//a+ywew8mpF6S4ODP/7y6jqUsOqXDWbp/F0ab9WD15Tg7MSUmMf8EB2Ed1Jkj1VNU/oLN3o4pJtfRPy0RuiDzFCOFbruiBF8dms063bCgER3Or/Mw+LO+ZaIZ9jrfbYn5/82LiVoq/suMkGKbuy7gX616WNOk2mbc0xoMbZaSfBcHQgMiiAFm6vKjcheeUA2ztUjzFB7Mxs08wNH9aXwy2OA8wVfwBPiagzjiGiC5S0/Jej+vxtmVrFt0GI3LxclZn1002obouFBtJgAY5CezUQ4o46Kfcd5eSc4benhvTZKTHCdoALkwZG64bt6cOJzhe79pC2owMaR4L8D8v6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+XjASrKPExHJAk8pho0wTlaBU89BUjYAvkraHd/JCPo=;
+ b=o/4A8xwd+Fril8d3kDS1yz5U0PNR45P26z2FIuOJq/XXfW0feYxSomQlQ40qg0ZNmss8/Gh/U9Vf/oxqWu0iaRABcYgiJBcsedIHcXnmI3z92pvhV9IXQviQPBWo1zdh6bDuBjn4HJLB2SivDAcgFi0Ab51ZlTrDrMHurkA9WujPjNEmKrhgWXFh3vJhPmUM6vtl5APe8W72GgNalUNyuw1EJ7ZUb6phDEMNMtf0CAeXvTaeyE/HAL7Gsvf+kNczyvLrmzrMX/RBhQtjHWMKEeOpq5kuHAS7SfSeuwAUr9MCv+nw1LBKr5xV9bLAclUGD/sSiNJx+CtuE6Ow7CnWJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by SJ5PPF8F93806F5.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::845) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Wed, 11 Jun
+ 2025 12:53:04 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778%3]) with mapi id 15.20.8835.018; Wed, 11 Jun 2025
+ 12:53:03 +0000
+Date: Wed, 11 Jun 2025 13:52:55 +0100
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Mario Limonciello <superm1@kernel.org>, <bhelgaas@google.com>,
+	<alex.williamson@redhat.com>
+CC: <mario.limonciello@amd.com>, <rafael.j.wysocki@intel.com>,
+	<huang.ying.caritas@gmail.com>, <stern@rowland.harvard.edu>,
+	<linux-pci@vger.kernel.org>, <mike.ximing.chen@intel.com>,
+	<ahsan.atta@intel.com>, <suman.kumar.chakraborty@intel.com>,
+	<kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] PCI: Explicitly put devices into D0 when initializing
+ - Bug report
+Message-ID: <aEl8J3kv6HAcAkUp@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250424043232.1848107-1-superm1@kernel.org>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DU7P190CA0014.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:10:550::12) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
-	t=1749642083;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fxnjuZ3xwpIpSVvv3DwGJe1m2GKwbpliPokqupcsJEU=;
-	b=g7qTMC0HoMUUikZtkKCw10K/fst3gi13rV2DlZBzA8OXRlpRyecUMzvEwN6WtZunyuuFzp
-	RGiwPMITezZhNtqp6+p9/xEUr5Lj+Czly3D3dO9LbwB5yW67gsNVYg20Ye36kfv1YHUS6q
-	h2GwOmkqn3A5DorYiZsEFiQ27C31aakcSImY+ukKPY+ZFK5Ej6A3sBpkhuOJXDW2emW29c
-	vg6j0wV3m6Jw4hHuHb+VgRA0vfiktrApkAwPCWIUxM/JycuQ5E4CQAPmUfWQnvnaEz2GBR
-	1UwIwpj9yCfKbRcKBz08YGopEsW3zPAfouKlYR6DrhS491G1i1Gw7Qa0bhLAqw==
-Content-Type: multipart/signed;
- boundary=c36e9657663e9deaef35050d42feea9240774d94463be57bf8f99adf8b46;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Wed, 11 Jun 2025 13:41:06 +0200
-Message-Id: <DAJOCL4UQWZ1.2CB0NH55US5EI@cknow.org>
-Subject: Re: [PATCH v3 3/7] crypto: testmgr - replace
- CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Diederik de Haas" <didi.debian@cknow.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
- <linux-rockchip@lists.infradead.org>
-Cc: <linux-kernel@vger.kernel.org>, "Corentin Labbe" <clabbe@baylibre.com>,
- <linux-arm-kernel@lists.infradead.org>
-References: <20250505203345.802740-1-ebiggers@kernel.org>
- <20250505203345.802740-4-ebiggers@kernel.org>
-In-Reply-To: <20250505203345.802740-4-ebiggers@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|SJ5PPF8F93806F5:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a1132c0-4c7c-4ab3-d6b7-08dda8e6e77a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?BPD4yfXnFxHPUleVMuC4ihXj1WLWv9ywPVK1Zw/2pottFk4GOZ8XkO1TI71B?=
+ =?us-ascii?Q?z8ruH155k2aZCibpUpXJ6brL0j51eHz5nAadUaH8hP0xy+/Li7bF++7PKwDp?=
+ =?us-ascii?Q?Qs7SBgWMsr9MwyL5LuGHwQfozLQ3gqSV34QAZy5oqfXpPxfD/HZIXMKwtAju?=
+ =?us-ascii?Q?o0RMraTe8RoL/p9cCcj2BPfDEU9fEP2HZetTeZNGaomLMubgdIBVj4xAvuzS?=
+ =?us-ascii?Q?ek7UHVMet2IHEMqC4NLh6L88JZy89cEfOxzN5JiIb7qAAI+OF9e7xlO5IdHk?=
+ =?us-ascii?Q?ZAVHyNiCrQS7pfzI4gmnGu+7x13IyJ7f5ef8UQK6cl8RYn8rC9wtsZM+F1oc?=
+ =?us-ascii?Q?J7ui5Y5Cur8/CT49kutg4SnxtMnIrB6VOcmj+RBo9lJx7zHgnizEQnf1Tppr?=
+ =?us-ascii?Q?3f1qKRJuEWV2cshiYYRYuQ4MkS7TMbIZevJZlcwwvxXiyicneU2798yfNIWd?=
+ =?us-ascii?Q?mylve4Lb9GkDp2JrHM/IDFzkDJ+6IoebOkizDrsdtTCPUAncAuPeV9Hwg8r1?=
+ =?us-ascii?Q?50l7JURP6111b0He7rgFwZ0qN26FK0AqrJnoZf8dGKwKdt6F4q/vNiMAn2OT?=
+ =?us-ascii?Q?1QvnrjEYzbzLHIqyRYyjoCLOswrlFKzfRTVrwFgf2SB4AYfwlyDqmHXN7ONM?=
+ =?us-ascii?Q?d1oxzW1FyHH/sDFIWV3enYmBUsTqrfa0O/eP7PgnxlKodH5DRbQGlLbykZ1e?=
+ =?us-ascii?Q?2rJu1ULFJWdKjPCD1DjsRDsYnZJRuM2A8DIbjJ2tWVIbi17IJrL2sOSvfSXS?=
+ =?us-ascii?Q?51ou6FB+uLYWJvoh0ZSCnqXzLdpFmy88tNTt5PPbqzL2T0gtLAzpf0GIfVYf?=
+ =?us-ascii?Q?VtzYTD8nsbFa6nWvi2M7ztbsXS9FdNGyELu8ZQUThYYfQWoB3ps1SZ11DNJF?=
+ =?us-ascii?Q?2i3wSfJOPBtAy9Fwl7i6p75S6l2klr/OlOCobD+14ENuL+vUzwfwSZfFLpxk?=
+ =?us-ascii?Q?/DuK2SD588MqLtaIGNQb3I7gqnCCsAIBam2n4ofRNhqeZH+pDSSXm99rqTt7?=
+ =?us-ascii?Q?t1KfH6T1/msHCpClJKBlcS13fRBGwcUvSu/EXYQF2ZC7XYgm4SXmzZOGnuFb?=
+ =?us-ascii?Q?KnW3km/tnd7+klfIBPUJ9J78gFSPzrwZ3eb820nC6AFxqS6yHzwuG6lpeLme?=
+ =?us-ascii?Q?WluKvyxdBuDI566gUVEt0psFh1t46t3AHZr7aOFuq5U6UZA3eBoUZFJp6+1O?=
+ =?us-ascii?Q?QdTmSwzoeirmgMLLyH/qYn26zY1/YndPloW0wvWY3wzW+N5C1NYGqRq70gem?=
+ =?us-ascii?Q?KzCt6uaDco07cbJmBGTM0X8ZN5D9RqGdIfvZUkKtF6iavQNcMiy8hkMPgKzz?=
+ =?us-ascii?Q?HHPDBzkbg1Oo8WVvJBS5IWmvY43p8n33couE8J4RefVe9mNLay36JHkFBNS9?=
+ =?us-ascii?Q?v9McIYi/lkb2g3E0JXYjnd9Fh5ZTYdVCm3jBnIcAEXY92R/HfqnjX6jUBpEh?=
+ =?us-ascii?Q?UwRW7i5yLVE=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9wnGjvSiCkY2b+gmCyiaZ3r8xssC7akCGgO8yFHhOBnvOykrFM8RVm+5YnMn?=
+ =?us-ascii?Q?3Q5TXDP5jiicueU4ALK6sm/oBNyiQDxOXRVMmvYZ6s6KIPF3YVNcUgcKNQ/r?=
+ =?us-ascii?Q?udfx5VkUXl2KeG0gb4Y+XuUbTrqXYeIyzJFa1v6OTo1R+hu9kDLD+tZ9HK1Y?=
+ =?us-ascii?Q?pu4ttTzT4unmgvMMcys0iwWhIEkUMkLzQrMOzRmO+d+s6iqBYUSWqhCJIiw0?=
+ =?us-ascii?Q?n3mPEuGlwCMxgLGB3edDb9m614HZh7tn7pwaNWt4Yk25xPap9KFCZ9f7Hxjd?=
+ =?us-ascii?Q?F+3HyDYO09iOQdlndy/7K2HAc1pfBKPSK0YsJ7TTKL4EwTx1fcN/Z4Tej4BP?=
+ =?us-ascii?Q?4lgoyLiIZnON9nwHO1ddZf190moc/CA+clT8jGF7f+8GYd1M0YNfnfjOHaML?=
+ =?us-ascii?Q?Mgy+e6lmRCdUZounGuaXJabLkDrAXhboLtBMEOVGFyiC3RVNpF4NbHySbKTD?=
+ =?us-ascii?Q?zYvSBlkvqVlwt3ckz5FO7VEzPvpGDd8GHFv/MBLcrPwq8zDDagJxLnVtl7wW?=
+ =?us-ascii?Q?EpZNsgt0nMxVbgTXehB/Ijtg5hxhF6Q1B46jizMeJaB0qR1AUhxuSnLBo7ks?=
+ =?us-ascii?Q?iMbiEZjr7ROg1y9+kKE3UiuERKniM5SAas3v9yYZD/1UdPU7nYT73N8fiCAq?=
+ =?us-ascii?Q?7D+ggNDtVCL/qDX3JaPF5j5RDLi62apPzTQvYEWsLxNrdjMuMjpjxuvxHE7U?=
+ =?us-ascii?Q?e3+dVsznVT062qWpGgTn28PbwmQ9FrpnWVkhiq0hfZle7LAeJPCRJIF+xiJy?=
+ =?us-ascii?Q?nb8/yGU0s9tLVxP0d4MD3aSeUYOtJN3hhcUlLl6oFwuZkiHMtJ6mAOSiy+oU?=
+ =?us-ascii?Q?1AVZiHHeOPK4mJKKHhBsKK6NccsdzqzUyzWBpD6O1jFi+o1KLPLw4I/p3IVz?=
+ =?us-ascii?Q?qmcqvcoZ7KMMomv2sFOopasxgtsDvGqXedGAAmcJ4fXlQRErn7JUENdLpxgE?=
+ =?us-ascii?Q?MAdF6PoRxd5DgN/7Vw9D6jEyAeH4ZjPO43mAosxAn2UXwNXQELvujdmZMrQP?=
+ =?us-ascii?Q?z+CwO7c8cKBOvzPyIYL7ecK52L8yNRsEqAlRiTcn4ocWNdrdBSlvGc4e7vGn?=
+ =?us-ascii?Q?s3Zj9kvz4yAxjQa7qFMgh5HH1NsQNTApAO7tv3Z3nUdRBGllL937n8qsGZ26?=
+ =?us-ascii?Q?zre7G6Djh1gqgdGVByZJWvQ0oC50FjJJnlCqF5SR0NeBopymwAlCnO0nKSaS?=
+ =?us-ascii?Q?vQLt28LXTGqLT4W7VrO5WAPvZpYtipdr7vUqJPgDywHo+7Taoeauj4fJ7R+N?=
+ =?us-ascii?Q?Kppdv+SvAF369Uokt0T/wicoTkhtWfkS0NHyVBXbepFTy634+nH5tOVAlK/C?=
+ =?us-ascii?Q?ItoDfaoS6U/Z7lWYKDVsddlJkh4dbgp3mkSYg2EccsWl+DhT5vvQiCh0PwuC?=
+ =?us-ascii?Q?7pFtjekoN8E4WUVH2HDNX2Jb16pAG+oEJZg2F6zLRJS58NBkar5+6lIj6ARa?=
+ =?us-ascii?Q?trroWpGJBzF3hgsIcDbYbg3Sws5/4fChMm0OipU8R32syYaDyixG2rSo2+C+?=
+ =?us-ascii?Q?R1ZH/qdetAGKIz+kL1areFhjeLz7FZLvN3GIVjwmbxvnnBuQ/ke9tZzwKT1p?=
+ =?us-ascii?Q?+FwDhNWeE4V4BzgaBw46ZEA8acBEoskXa8okETneG/hqKwP3PLBydioA8m4n?=
+ =?us-ascii?Q?lg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a1132c0-4c7c-4ab3-d6b7-08dda8e6e77a
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 12:53:03.7837
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bQP0KQ4/2hRtegwt4P1P5XPK49xPL0WseIHkTQTYMtDuuAq7ZTfO18XN6G8iLIWSenGMT58X+VH6JdHWpuLMyCcityE9zt3Dr4db79b03ng=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF8F93806F5
+X-OriginatorOrg: intel.com
 
---c36e9657663e9deaef35050d42feea9240774d94463be57bf8f99adf8b46
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+Hi Mario, Bjorn and Alex,
 
-Hi Eric,
-
-On Mon May 5, 2025 at 10:33 PM CEST, Eric Biggers wrote:
-> The negative-sense of CRYPTO_MANAGER_DISABLE_TESTS is a longstanding
-> mistake that regularly causes confusion.  Especially bad is that you can
-> have CRYPTO=3Dn && CRYPTO_MANAGER_DISABLE_TESTS=3Dn, which is ambiguous.
->
-> Replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS which has the
-> expected behavior.
->
-> The tests continue to be disabled by default.
+On Wed, Apr 23, 2025 at 11:31:32PM -0500, Mario Limonciello wrote:
+> From: Mario Limonciello <mario.limonciello@amd.com>
+> 
+> AMD BIOS team has root caused an issue that NVME storage failed to come
+> back from suspend to a lack of a call to _REG when NVME device was probed.
+> 
+> commit 112a7f9c8edbf ("PCI/ACPI: Call _REG when transitioning D-states")
+> added support for calling _REG when transitioning D-states, but this only
+> works if the device actually "transitions" D-states.
+> 
+> commit 967577b062417 ("PCI/PM: Keep runtime PM enabled for unbound PCI
+> devices") added support for runtime PM on PCI devices, but never actually
+> 'explicitly' sets the device to D0.
+> 
+> To make sure that devices are in D0 and that platform methods such as
+> _REG are called, explicitly set all devices into D0 during initialization.
+> 
+> Fixes: 967577b062417 ("PCI/PM: Keep runtime PM enabled for unbound PCI devices")
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 > ---
->  <snip>
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index da352f1984ea..8f1353bbba18 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
->  <snip>
-> @@ -171,20 +171,26 @@ config CRYPTO_USER
->  	select CRYPTO_MANAGER
->  	help
->  	  Userspace configuration for cryptographic instantiations such as
->  	  cbc(aes).
-> =20
-> -config CRYPTO_MANAGER_DISABLE_TESTS
-> -	bool "Disable run-time self tests"
-> -	default y
-> +config CRYPTO_SELFTESTS
-> +	bool "Enable cryptographic self-tests"
-> +	depends on DEBUG_KERNEL
->  	help
-> -	  Disable run-time self tests that normally take place at
-> -	  algorithm registration.
-> +	  Enable the cryptographic self-tests.
-> +
-> +	  The cryptographic self-tests run at boot time, or at algorithm
-> +	  registration time if algorithms are dynamically loaded later.
-> +
-> +	  This is primarily intended for developer use.  It should not be
-> +	  enabled in production kernels, unless you are trying to use these
-> +	  tests to fulfill a FIPS testing requirement.
+Through a bisect, we identified that this patch, in v6.16-rc1,
+introduces a regression on vfio-pci across all Intel QuickAssist (QAT)
+devices. Specifically, the ioctl VFIO_GROUP_GET_DEVICE_FD call fails
+with -EACCES.
 
-I built a 6.16-rc1 kernel [1] and its config is based upon Debian's and
-that has enabled CRYPTO_SELFTESTS [2] (due to Debian bug 599441 [3]).
+Upon further investigation, the -EACCES appears to originate from the
+rpm_resume() function, which is called by pm_runtime_resume_and_get()
+within vfio_pci_core_enable(). Here is the exact call trace:
 
-I then installed it on 3 Rockchip based devices and booted into that.
-1. Radxa Rock 5B (rk3588)
-2. PINE64 Quartz64 Model B (rk3568)
-3. PINE64 RockPro64 (rk3399)
+    drivers/base/power/runtime.c: rpm_resume()
+    drivers/base/power/runtime.c: __pm_runtime_resume()
+    include/linux/pm_runtime.h: pm_runtime_resume_and_get()
+    drivers/vfio/pci/vfio_pci_core.c: vfio_pci_core_enable()
+    drivers/vfio/pci/vfio_pci.c: vfio_pci_open_device()
+    drivers/vfio/vfio_main.c: device->ops->open_device()
+    drivers/vfio/vfio_main.c: vfio_df_device_first_open()
+    drivers/vfio/vfio_main.c: vfio_df_open()
+    drivers/vfio/group.c: vfio_df_group_open()
+    drivers/vfio/group.c: vfio_device_open_file()
+    drivers/vfio/group.c: vfio_group_ioctl_get_device_fd()
+    drivers/vfio/group.c: vfio_group_fops_unl_ioctl(..., VFIO_GROUP_GET_DEVICE_FD, ...)
 
-The full dmesg output for level 0-4 can be found at [4], [5] and [6]
+Is this a known issue that affects other devices? Is there any ongoing
+discussion or fix in progress?
 
-The filtered dmesg output for Rock 5B:
-ERROR:
-[    0.709822] basic hdkf test(hmac(sha256)): failed to allocate transform:=
- -2
-WARNING:
-[    0.710686] alg: full crypto tests enabled.  This is intended for develo=
-per use only.
-[    8.877288] alg: skcipher: skipping comparison tests for xctr-aes-ce bec=
-ause xctr(aes-generic) is unavailable
+Thanks,
 
-The filtered dmesg output for Quartz64-B:
-ERROR:
-[    1.479206] basic hdkf test(hmac(sha256)): failed to allocate transform:=
- -2
-WARNING:
-[    1.480685] alg: full crypto tests enabled.  This is intended for develo=
-per use only.
-[   18.176195] alg: skcipher: skipping comparison tests for xctr-aes-ce bec=
-ause xctr(aes-generic) is unavailable
-
-For both of these, 1 warning is to be expected (developer use only).
-But I do wonder about the error and the other warning. Is that a
-problem? And if so, is that on the crypto or the Rockchip side?
-
-But the filtered dmesg output on RockPro64 seems way more serious:
-ERROR:
-[    1.232672] basic hdkf test(hmac(sha256)): failed to allocate transform:=
- -2
-[   14.172991] alg: ahash: rk-sha1 export() overran state buffer on test ve=
-ctor 0, cfg=3D"import/export"
-[   14.202291] alg: ahash: rk-sha256 export() overran state buffer on test =
-vector 0, cfg=3D"import/export"
-[   14.230887] alg: ahash: rk-md5 export() overran state buffer on test vec=
-tor 0, cfg=3D"import/export"
-WARNING:
-[    1.234017] alg: full crypto tests enabled.  This is intended for develo=
-per use only.
-[   14.173876] alg: self-tests for sha1 using rk-sha1 failed (rc=3D-75)
-[   14.173883] ------------[ cut here ]------------
-[   14.174845] alg: self-tests for sha1 using rk-sha1 failed (rc=3D-75)
-[   14.174886] WARNING: CPU: 4 PID: 669 at crypto/testmgr.c:5807 alg_test+0=
-x6ec/0x708
-[   14.176112] Modules linked in: snd_soc_simple_card_utils snd_soc_spdif_t=
-x snd_soc_rockchip_i2s des_generic gpio_ir_recv snd_soc_core v4l2_h264(+) r=
-ockchip_rga videobuf2_dma_contig ecdh_generic videobuf2_dma_sg leds_gpio v4=
-l2_mem2mem panfrost rfkill pwm_fan snd_compress dw_hdmi_i2s_audio pwrseq_co=
-re gpu_sched rk_crypto(+) snd_pcm_dmaengine videobuf2_memops drm_shmem_help=
-er dw_hdmi_cec videobuf2_v4l2 crypto_engine libdes snd_pcm videodev snd_tim=
-er ofpart snd coresight_cpu_debug soundcore videobuf2_common spi_nor rockch=
-ip_saradc mc mtd industrialio_triggered_buffer coresight_etm4x rockchip_the=
-rmal kfifo_buf industrialio coresight cpufreq_dt evdev binfmt_misc pkcs8_ke=
-y_parser efi_pstore configfs nfnetlink ip_tables x_tables autofs4 ext4 crc1=
-6 mbcache jbd2 realtek phy_rockchip_samsung_hdptx phy_rockchip_naneng_combp=
-hy panel_boe_th101mb31ig002_28a xhci_plat_hcd xhci_hcd rockchipdrm dw_hdmi_=
-qp dw_hdmi dwc3 cec rc_core dw_mipi_dsi udc_core rk808_regulator dwmac_rk s=
-tmmac_platform ulpi analogix_dp stmmac fusb302 tcpm
-[   14.176292]  drm_dp_aux_bus pcs_xpcs fan53555 typec drm_display_helper p=
-hylink mdio_devres drm_client_lib dwc3_of_simple pwm_regulator gpio_rockchi=
-p gpio_keys fixed phy_rockchip_pcie of_mdio ehci_platform sdhci_of_arasan o=
-hci_platform drm_dma_helper fixed_phy phy_rockchip_inno_usb2 ohci_hcd sdhci=
-_pltfm ehci_hcd fwnode_mdio dw_wdt drm_kms_helper phy_rockchip_emmc rockchi=
-p_dfi io_domain pwm_rockchip libphy phy_rockchip_typec sdhci nvmem_rockchip=
-_efuse usbcore pl330 dw_mmc_rockchip drm spi_rockchip dw_mmc_pltfm mdio_bus=
- cqhci dw_mmc usb_common i2c_rk3x
-[   14.188362] CPU: 4 UID: 0 PID: 669 Comm: cryptomgr_test Not tainted 6.16=
--rc1+unreleased-arm64-cknow #1 PREEMPTLAZY  Debian 6.16~rc1-1~exp1
-[   14.189451] Hardware name: Pine64 RockPro64 v2.1 (DT)
-[   14.189897] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[   14.190510] pc : alg_test+0x6ec/0x708
-[   14.190844] lr : alg_test+0x6ec/0x708
-[   14.191170] sp : ffff800081df3d30
-[   14.191463] x29: ffff800081df3dd0 x28: 00000000000000bd x27: 00000000fff=
-fffb5
-[   14.192094] x26: 00000000000000bf x25: ffffd9bef0455000 x24: 00000000000=
-00178
-[   14.192725] x23: 00000000ffffffff x22: ffff000008799880 x21: 00000000080=
-0018f
-[   14.193355] x20: ffff000008799800 x19: ffffd9beef0558b8 x18: 00000000000=
-00018
-[   14.193985] x17: 0000000000006fd8 x16: ffffd9beeef9e128 x15: 00000000000=
-00000
-[   14.194616] x14: 0f4bc94cbbc50b90 x13: 0000000000000325 x12: 000000000f4=
-bc94c
-[   14.195247] x11: ffffd9beeffffff8 x10: 0000000000000d30 x9 : ffffd9beee1=
-16028
-[   14.195877] x8 : ffff000007518d90 x7 : 0000000000000004 x6 : 00000000000=
-00000
-[   14.196506] x5 : 0000000000000000 x4 : 0000000000000001 x3 : 00000000000=
-00010
-[   14.197137] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000075=
-18000
-[   14.197767] Call trace:
-[   14.197986]  alg_test+0x6ec/0x708 (P)
-[   14.198315]  cryptomgr_test+0x2c/0x58
-[   14.198642]  kthread+0x150/0x250
-[   14.198932]  ret_from_fork+0x10/0x20
-[   14.199251] ---[ end trace 0000000000000000 ]---
-[   14.203118] alg: self-tests for sha256 using rk-sha256 failed (rc=3D-75)
-[   14.203122] ------------[ cut here ]------------
-[   14.204104] alg: self-tests for sha256 using rk-sha256 failed (rc=3D-75)
-[   14.204133] WARNING: CPU: 4 PID: 672 at crypto/testmgr.c:5807 alg_test+0=
-x6ec/0x708
-[   14.205381] Modules linked in: snd_soc_simple_card_utils snd_soc_spdif_t=
-x snd_soc_rockchip_i2s des_generic gpio_ir_recv snd_soc_core v4l2_h264 rock=
-chip_rga videobuf2_dma_contig ecdh_generic videobuf2_dma_sg leds_gpio v4l2_=
-mem2mem panfrost rfkill pwm_fan snd_compress dw_hdmi_i2s_audio pwrseq_core =
-gpu_sched rk_crypto(+) snd_pcm_dmaengine videobuf2_memops drm_shmem_helper =
-dw_hdmi_cec videobuf2_v4l2 crypto_engine libdes snd_pcm videodev snd_timer =
-ofpart snd coresight_cpu_debug soundcore videobuf2_common spi_nor rockchip_=
-saradc mc mtd industrialio_triggered_buffer coresight_etm4x rockchip_therma=
-l kfifo_buf industrialio coresight cpufreq_dt evdev binfmt_misc pkcs8_key_p=
-arser efi_pstore configfs nfnetlink ip_tables x_tables autofs4 ext4 crc16 m=
-bcache jbd2 realtek phy_rockchip_samsung_hdptx phy_rockchip_naneng_combphy =
-panel_boe_th101mb31ig002_28a xhci_plat_hcd xhci_hcd rockchipdrm dw_hdmi_qp =
-dw_hdmi dwc3 cec rc_core dw_mipi_dsi udc_core rk808_regulator dwmac_rk stmm=
-ac_platform ulpi analogix_dp stmmac fusb302 tcpm
-[   14.205591]  drm_dp_aux_bus pcs_xpcs fan53555 typec drm_display_helper p=
-hylink mdio_devres drm_client_lib dwc3_of_simple pwm_regulator gpio_rockchi=
-p gpio_keys fixed phy_rockchip_pcie of_mdio ehci_platform sdhci_of_arasan o=
-hci_platform drm_dma_helper fixed_phy phy_rockchip_inno_usb2 ohci_hcd sdhci=
-_pltfm ehci_hcd fwnode_mdio dw_wdt drm_kms_helper phy_rockchip_emmc rockchi=
-p_dfi io_domain pwm_rockchip libphy phy_rockchip_typec sdhci nvmem_rockchip=
-_efuse usbcore pl330 dw_mmc_rockchip drm spi_rockchip dw_mmc_pltfm mdio_bus=
- cqhci dw_mmc usb_common i2c_rk3x
-[   14.217640] CPU: 4 UID: 0 PID: 672 Comm: cryptomgr_test Tainted: G      =
-  W           6.16-rc1+unreleased-arm64-cknow #1 PREEMPTLAZY  Debian 6.16~r=
-c1-1~exp1
-[   14.218866] Tainted: [W]=3DWARN
-[   14.219130] Hardware name: Pine64 RockPro64 v2.1 (DT)
-[   14.219576] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[   14.220188] pc : alg_test+0x6ec/0x708
-[   14.220521] lr : alg_test+0x6ec/0x708
-[   14.220847] sp : ffff800081e03d30
-[   14.221140] x29: ffff800081e03dd0 x28: 00000000000000bd x27: 00000000fff=
-fffb5
-[   14.221771] x26: 00000000000000c1 x25: ffffd9bef0455000 x24: 00000000000=
-00178
-[   14.222402] x23: 00000000ffffffff x22: ffff00000b49c880 x21: 00000000080=
-0018f
-[   14.223033] x20: ffff00000b49c800 x19: ffffd9beef0558b8 x18: 00000000fff=
-ffffe
-[   14.223663] x17: 7463657620747365 x16: ffffd9beee6829e8 x15: ffffd9bef03=
-eb09f
-[   14.224294] x14: 0000000000000000 x13: ffffd9bef03eb0a3 x12: ffffd9bef00=
-85e60
-[   14.224923] x11: ffffd9bef002deb8 x10: ffffd9bef0085eb8 x9 : ffffd9beee1=
-7c8cc
-[   14.225553] x8 : 0000000000000001 x7 : 0000000000017fe8 x6 : c0000000fff=
-fefff
-[   14.226183] x5 : ffff0000f7766448 x4 : 0000000000000000 x3 : 00000000000=
-00027
-[   14.226812] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000075=
-1bb40
-[   14.227443] Call trace:
-[   14.227662]  alg_test+0x6ec/0x708 (P)
-[   14.227991]  cryptomgr_test+0x2c/0x58
-[   14.228319]  kthread+0x150/0x250
-[   14.228611]  ret_from_fork+0x10/0x20
-[   14.228929] ---[ end trace 0000000000000000 ]---
-[   14.231753] alg: self-tests for md5 using rk-md5 failed (rc=3D-75)
-[   14.231758] ------------[ cut here ]------------
-[   14.232696] alg: self-tests for md5 using rk-md5 failed (rc=3D-75)
-[   14.232742] WARNING: CPU: 4 PID: 674 at crypto/testmgr.c:5807 alg_test+0=
-x6ec/0x708
-[   14.233943] Modules linked in: v4l2_vp9 snd_soc_audio_graph_card snd_soc=
-_simple_card_utils snd_soc_spdif_tx snd_soc_rockchip_i2s des_generic gpio_i=
-r_recv snd_soc_core v4l2_h264 rockchip_rga videobuf2_dma_contig ecdh_generi=
-c videobuf2_dma_sg leds_gpio v4l2_mem2mem panfrost rfkill pwm_fan snd_compr=
-ess dw_hdmi_i2s_audio pwrseq_core gpu_sched rk_crypto(+) snd_pcm_dmaengine =
-videobuf2_memops drm_shmem_helper dw_hdmi_cec videobuf2_v4l2 crypto_engine =
-libdes snd_pcm videodev snd_timer ofpart snd coresight_cpu_debug soundcore =
-videobuf2_common spi_nor rockchip_saradc mc mtd industrialio_triggered_buff=
-er coresight_etm4x rockchip_thermal kfifo_buf industrialio coresight cpufre=
-q_dt evdev binfmt_misc pkcs8_key_parser efi_pstore configfs nfnetlink ip_ta=
-bles x_tables autofs4 ext4 crc16 mbcache jbd2 realtek phy_rockchip_samsung_=
-hdptx phy_rockchip_naneng_combphy panel_boe_th101mb31ig002_28a xhci_plat_hc=
-d xhci_hcd rockchipdrm dw_hdmi_qp dw_hdmi dwc3 cec rc_core dw_mipi_dsi udc_=
-core rk808_regulator dwmac_rk stmmac_platform ulpi
-[   14.234122]  analogix_dp stmmac fusb302 tcpm drm_dp_aux_bus pcs_xpcs fan=
-53555 typec drm_display_helper phylink mdio_devres drm_client_lib dwc3_of_s=
-imple pwm_regulator gpio_rockchip gpio_keys fixed phy_rockchip_pcie of_mdio=
- ehci_platform sdhci_of_arasan ohci_platform drm_dma_helper fixed_phy phy_r=
-ockchip_inno_usb2 ohci_hcd sdhci_pltfm ehci_hcd fwnode_mdio dw_wdt drm_kms_=
-helper phy_rockchip_emmc rockchip_dfi io_domain pwm_rockchip libphy phy_roc=
-kchip_typec sdhci nvmem_rockchip_efuse usbcore pl330 dw_mmc_rockchip drm sp=
-i_rockchip dw_mmc_pltfm mdio_bus cqhci dw_mmc usb_common i2c_rk3x
-[   14.246439] CPU: 4 UID: 0 PID: 674 Comm: cryptomgr_test Tainted: G      =
-  W           6.16-rc1+unreleased-arm64-cknow #1 PREEMPTLAZY  Debian 6.16~r=
-c1-1~exp1
-[   14.247667] Tainted: [W]=3DWARN
-[   14.247931] Hardware name: Pine64 RockPro64 v2.1 (DT)
-[   14.248377] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[   14.248991] pc : alg_test+0x6ec/0x708
-[   14.249332] lr : alg_test+0x6ec/0x708
-[   14.249664] sp : ffff800081e0bd30
-[   14.249957] x29: ffff800081e0bdd0 x28: 00000000000000bd x27: 00000000fff=
-fffb5
-[   14.250588] x26: 00000000000000a4 x25: ffffd9bef0455000 x24: 00000000000=
-00178
-[   14.251220] x23: 00000000ffffffff x22: ffff00000b49c280 x21: 00000000080=
-0018f
-[   14.251852] x20: ffff00000b49c200 x19: ffffd9beef0558b8 x18: 00000000000=
-00018
-[   14.252484] x17: 0000000000007050 x16: ffffd9beeef9e128 x15: 00000000000=
-00000
-[   14.253114] x14: 0a8fc7a77222d736 x13: 00000000000003da x12: 000000000a8=
-fc7a7
-[   14.253747] x11: ffffd9beeffffff8 x10: 0000000000000d30 x9 : ffffd9beee1=
-16028
-[   14.254377] x8 : ffff00000b6d3510 x7 : 0000000000000004 x6 : 00000000000=
-00000
-[   14.255008] x5 : 0000000000000000 x4 : 0000000000000001 x3 : 00000000000=
-00010
-[   14.255637] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff00000b6=
-d2780
-[   14.256268] Call trace:
-[   14.256498]  alg_test+0x6ec/0x708 (P)
-[   14.256835]  cryptomgr_test+0x2c/0x58
-[   14.257164]  kthread+0x150/0x250
-[   14.257455]  ret_from_fork+0x10/0x20
-[   14.257774] ---[ end trace 0000000000000000 ]---
-[   14.828425] alg: skcipher: skipping comparison tests for xctr-aes-ce bec=
-ause xctr(aes-generic) is unavailable
-
-I'm assuming this is problematic and hopefully you can tell whether this
-is on the crypto or Rockchip side as well. In case of the latter, if
-you'd have pointers as to where the problem is/may be, that would be
-appreciated.
-
-[1] https://salsa.debian.org/diederik/linux/-/tree/cknow/general
-[2] https://salsa.debian.org/kernel-team/linux/-/commit/6991dd77f350
-6991dd77f350 ("crypto: Explicitly enable algorithm self-tests (Closes: #599=
-441)")
-[3] https://bugs.debian.org/599441
-[4] https://paste.sr.ht/~diederik/c18ad65427080d4c48e8bd2ac27282682069aff1
-[5] https://paste.sr.ht/~diederik/8fde0c2c1d005a15bb8a3b6d7ba8ae3298733250
-[6] https://paste.sr.ht/~diederik/cdcb6c4522fa782f9a692b7ea0cf33c2301e2176
-
-Cheers,
-  Diederik
-
---c36e9657663e9deaef35050d42feea9240774d94463be57bf8f99adf8b46
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaElrXAAKCRDXblvOeH7b
-bs/+AQClPPe4tZNNFJz24t2cRxLV/95TtxY52ZefqGhDPjneogEA9gnaR1mtglZq
-721GhOOKRssXZBg0Hlt4d3KnKhzPXw4=
-=y3gL
------END PGP SIGNATURE-----
-
---c36e9657663e9deaef35050d42feea9240774d94463be57bf8f99adf8b46--
+-- 
+Giovanni
