@@ -1,16 +1,16 @@
 Received: from mail.actia.se (mail.actia.se [212.181.117.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF51425BEE3;
-	Wed, 11 Jun 2025 11:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E192686A9;
+	Wed, 11 Jun 2025 11:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749641898; cv=none; b=B+1erbqELyN3zThncVlHtMwycEo18gicKRS0vPGMQnWPF1A97JSqA0iTeZpPKANClhzMESBmePqpXhl9nCZSg34ojMqIXYS5iHTYh9zvaY/0YlzLBbxcgWAPTD3ogmz4DllgyVQ1TrNBZ3W+SdLG47V1bRxFDn65w6oE3aFrrKk=
+	t=1749641900; cv=none; b=jAsGQZPIS2Yn6X5kDHVex2kURVbjDamGJQ5uvtjh2Uw4kTIPqAuCbWtuYqk29SfWQ6k2nhFjo8/rvPyeRtAa2T8kGLfwYbRoE12S7aTlvL1SCR6omMU3YXklXvTiJa6lEebHS+S3yQ14piE/0PIB22PuOyrwN5bLjVYTHUtB1kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749641898; c=relaxed/simple;
-	bh=lFIiCxagljBVffqnRrnjwcZ0JXB78ORWTbEbUmz1K0M=;
+	s=arc-20240116; t=1749641900; c=relaxed/simple;
+	bh=QjjfpprZcBMaT5FvuG1gvDNAcfuJqnVL3vAGHBa+4UM=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uwJ12YTlZWzEk5Tgj0PmsEYyINYS/hcYOqBAaAwXAVyVLqidaURPzwPzk7tQNfwWkUagi241hwIOa1WJCSwzgKMauPeCS1sMuf0i4Ye8NyX/AOLl90L1BfMQFqmOczOCWahFs9hxuTQMggV4kXKGTo6uR1k0t1Kyv8Ugb0khEfk=
+	 Content-Type:MIME-Version; b=cQki7AbbcjfiEdNuvKQybLiIJAKr6t6kR35Wf6raZTU0qWFfypRgEji31HUSAGsndBrAg2IfuK7EvTP1phk5xWnzm8HqMSCTRKz9JRDiZbhzTHgfQutjD8Wve0uLOepLHKm6Se2kEo8tbkNi7mUsyto4s2zlveTH9tGevy3iRMQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
@@ -36,12 +36,13 @@ CC: Peng Fan <peng.fan@nxp.com>, Frank Li <Frank.Li@nxp.com>, "Pengutronix
 	"imx@lists.linux.dev" <imx@lists.linux.dev>,
 	"linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, John Ernberg <john.ernberg@actia.se>
-Subject: [PATCH v6 2/4] crypto: caam - Support iMX8QXP and variants thereof
-Thread-Topic: [PATCH v6 2/4] crypto: caam - Support iMX8QXP and variants
- thereof
-Thread-Index: AQHb2sVNSN6Tna4ATUu1t4WZeEYssQ==
-Date: Wed, 11 Jun 2025 11:38:08 +0000
-Message-ID: <20250611113748.2986988-3-john.ernberg@actia.se>
+Subject: [PATCH v6 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power domains
+ for iMX8QM and iMX8QXP
+Thread-Topic: [PATCH v6 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
+ domains for iMX8QM and iMX8QXP
+Thread-Index: AQHb2sVOw2EPnCaNEEyN6zn+Wq3zBQ==
+Date: Wed, 11 Jun 2025 11:38:09 +0000
+Message-ID: <20250611113748.2986988-4-john.ernberg@actia.se>
 References: <20250611113748.2986988-1-john.ernberg@actia.se>
 In-Reply-To: <20250611113748.2986988-1-john.ernberg@actia.se>
 Accept-Language: en-US, sv-SE
@@ -60,17 +61,16 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-The iMX8QXP (and variants such as the QX, DX, DXP) all identify as iMX8QXP.
+NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
+resource management.
 
-They have the exact same restrictions as the supported iMX8QM introduced
-at commit 61bb8db6f682 ("crypto: caam - Add support for i.MX8QM")
-
-Loosen the check a little bit with a wildcard to also match the iMX8QXP
-and its variants.
+Add compatible strings for these SoCs (QXP and DXP gets to share as their
+only difference is a core-count, Q=3DQuad core and D=3DDual core), and allo=
+w
+power-domains for them only. Keep the old restriction for others.
 
 Signed-off-by: John Ernberg <john.ernberg@actia.se>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-Reviewed-by: Peng Fan <peng.fan@nxp.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 ---
 
@@ -78,33 +78,114 @@ v6:
  - no changes
 
 v5:
+ - Fixup indentation (Rob Herring's bot)
  - Collect tags
 
 v4:
- - no changes
+ - Reword commit message (Frank Li)
+ - Add explicit imx8qxp compatible (Frank Li)
+ - Move the job-ring constraints back to the job-ring section under an
+   'allOf:' to avoid the warning from v2 (Rob Herring)
 
 v3:
- - no changes
+ - Fix warnings discovered by Rob Herring's bot
+ - Declare the compatibles correctly (Krzysztof Kozlowski)
 
 v2:
- - Collect review tag
+ - Adjust commit message (Frank Li)
+ - Only allow power-domains when compatible with imx8qm (Frank Li)
 ---
- drivers/crypto/caam/ctrl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../bindings/crypto/fsl,sec-v4.0.yaml         | 41 ++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 766c447c9cfb..ce7b99019537 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -573,7 +573,7 @@ static const struct soc_device_attribute caam_imx_soc_t=
-able[] =3D {
- 	{ .soc_id =3D "i.MX7*",  .data =3D &caam_imx7_data },
- 	{ .soc_id =3D "i.MX8M*", .data =3D &caam_imx7_data },
- 	{ .soc_id =3D "i.MX8ULP", .data =3D &caam_imx8ulp_data },
--	{ .soc_id =3D "i.MX8QM", .data =3D &caam_imx8ulp_data },
-+	{ .soc_id =3D "i.MX8Q*", .data =3D &caam_imx8ulp_data },
- 	{ .soc_id =3D "VF*",     .data =3D &caam_vf610_data },
- 	{ .family =3D "Freescale i.MX" },
- 	{ /* sentinel */ }
+diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml b/D=
+ocumentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+index 75afa441e019..dcc755d2709a 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
++++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+@@ -46,6 +46,8 @@ properties:
+       - items:
+           - enum:
+               - fsl,imx6ul-caam
++              - fsl,imx8qm-caam
++              - fsl,imx8qxp-caam
+               - fsl,sec-v5.0
+           - const: fsl,sec-v4.0
+       - const: fsl,sec-v4.0
+@@ -77,6 +79,9 @@ properties:
+   interrupts:
+     maxItems: 1
+=20
++  power-domains:
++    maxItems: 1
++
+   fsl,sec-era:
+     description: Defines the 'ERA' of the SEC device.
+     $ref: /schemas/types.yaml#/definitions/uint32
+@@ -106,7 +111,10 @@ patternProperties:
+               - const: fsl,sec-v5.0-job-ring
+               - const: fsl,sec-v4.0-job-ring
+           - items:
+-              - const: fsl,sec-v5.0-job-ring
++              - enum:
++                  - fsl,imx8qm-job-ring
++                  - fsl,imx8qxp-job-ring
++                  - fsl,sec-v5.0-job-ring
+               - const: fsl,sec-v4.0-job-ring
+           - const: fsl,sec-v4.0-job-ring
+=20
+@@ -116,6 +124,9 @@ patternProperties:
+       interrupts:
+         maxItems: 1
+=20
++      power-domains:
++        maxItems: 1
++
+       fsl,liodn:
+         description:
+           Specifies the LIODN to be used in conjunction with the ppid-to-l=
+iodn
+@@ -125,6 +136,20 @@ patternProperties:
+         $ref: /schemas/types.yaml#/definitions/uint32-array
+         items:
+           - maximum: 0xfff
++    allOf:
++      - if:
++          properties:
++            compatible:
++              contains:
++                enum:
++                  - fsl,imx8qm-job-ring
++                  - fsl,imx8qxp-job-ring
++        then:
++          required:
++            - power-domains
++        else:
++          properties:
++            power-domains: false
+=20
+   '^rtic@[0-9a-f]+$':
+     type: object
+@@ -212,6 +237,20 @@ required:
+   - reg
+   - ranges
+=20
++if:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - fsl,imx8qm-caam
++          - fsl,imx8qxp-caam
++then:
++  required:
++    - power-domains
++else:
++  properties:
++    power-domains: false
++
+ additionalProperties: false
+=20
+ examples:
 --=20
 2.49.0
