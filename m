@@ -1,43 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B2B1D5CDD;
-	Wed, 11 Jun 2025 20:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AE11DFF7;
+	Wed, 11 Jun 2025 20:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749672851; cv=none; b=hkWqgu3Ri+ij6kP/at9l5pdSJhtyiMhSGSiotlh46jezsZaBqgM55IuSygoB0EGRJJFZRWHKRJMeZyvp+JxB6mfuU6WSQtNH7r8KkkCp/UPiXryhYmq5KarwiZ7iLiw6C30bJnmqHH5xf+i4Fdccz/TazwH7cHUUZO2936sdJfE=
+	t=1749674321; cv=none; b=nAJE1ed8Ez4By8iYUWrMrWq3CxmkuJuaQVWN5cEjUQkVVBDOtnygd8dH9eSeaq6HJtbeYtjWEkI9UxExUPeBiF/UuKmwlrJu13U08v/TgP/D1pdVYg0T13TeTndJZdOayHlcfQgzFahPT7eVPTC7EN68ldXdYGUr+kZTPjG66h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749672851; c=relaxed/simple;
-	bh=pc4A14uBtyU5JBH56xfhuBFcz0wfEaJnMR+dxnKdUmg=;
+	s=arc-20240116; t=1749674321; c=relaxed/simple;
+	bh=Fq8ELmuibnelHYrzd1Mzwt71QMVSkNfHVRs9SHbwKbU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bdEUniD866/F2g6I4+nI8392bGnJPJD554sm5YFeDck+lYCJcOJGlFDHsu2/RDV19s8m6KDHVAOfkZvJEzRqmp83mqRrmpVRtLEFMlINiUHM+Xg6ktV8OUZXU01e+qrzNpT58yZAjeXDGC2UU/rdQWDrpHKriNM57T9OVAqjaBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuZNdPTK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=W9LKcBL+8Puc3UDwJfLoMqooOo7/IwYf05SxT6Y6zt8/E22s7e3s7INwcWJQ7bSqkKuiV12/R5ywqpElo9N+lauFT+Na5MEW/QeBRZ9tWBFf74waLSYsMobPcDLopg+zKCOJcKBQTTOrNnkhB/y811iAEZxlEvTI30JL9Gvz3cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=EoUvEmL6; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuZNdPTK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A74D4C4CEE3;
-	Wed, 11 Jun 2025 20:14:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749672850;
-	bh=pc4A14uBtyU5JBH56xfhuBFcz0wfEaJnMR+dxnKdUmg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NuZNdPTKe0zGFI9gQLWE8FNtgpYjh+X7k+lHSctapDyd2JYhOcDKZpKToP1y/X5uD
-	 YoOLq9tcnE7TFzJWaCJiOQRUEkJed2CZlnW7h1S31mi5v6bE3YnJHMPmPu419XVXTA
-	 QZYGtKOYa48qXvYu922pgQjpklTe0KfZ/MGYsCcXE1M0H/dbwD1vDwiCJZMNhlCOgO
-	 wKuN0t6r0lU4sPEQmMVIOAMl3IvGA6V82MDbLUuwGWpieny23xdvQcz6NoMhXsneId
-	 Ee4LEwwUyJIBnEZlNAdSDPuNVEWuFZQpoxCgMfu6EpWk8pCq/0z+1ZSdtchRqBfs+b
-	 Q7V8PgA/9AhDA==
-Date: Wed, 11 Jun 2025 20:14:08 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Diederik de Haas <didi.debian@cknow.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, Ingo Franzki <ifranzki@linux.ibm.com>
-Subject: Re: [PATCH] crypto: testmgr - reinstate kconfig support for fast
- tests only
-Message-ID: <20250611201408.GB4097002@google.com>
-References: <20250611175525.42516-1-ebiggers@kernel.org>
- <DAJXJHLY2ITB.3IBN23DX0RO4Z@cknow.org>
- <20250611190458.GA4097002@google.com>
- <DAJYOYMK9UJD.LB0N2L64FFA@cknow.org>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="EoUvEmL6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=xA+/2rvyHlvLh6sMEKRsJ8AH3tUN9/JJhk5cfiv7zYA=; b=EoUvEmL6WVTMg96LSOD4HzjyyK
+	GpXRfcZJcRohRPWjWHdUAUYxev0kE4Z4mvgdj95Cjf0VVg6A7khkgJjpEeEa2+Fo3xGQ1V1wM5uin
+	QZu1CUW8bTWsiA5ytC0Z4URZ0JSIRTzuMSf8W3l8fa50tHPU7BUJbdv5s5XN87tCDFATwIDFz9Xvz
+	pPFwWcjBBDzt1gL6wAcGfLkdRs/0C5b8hOgn1Hob7x1JnCH9YZfkrwh/Jcn3qdFphnle1i9FoZPWf
+	k9jOjVOgnKzF4q9uVJfHKKH6wsT7WTQlOxrQdx9sLi3m8hEX6g1wFaTdhab2XpnPkmfa0chhRWl/F
+	p8KGJVug==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uPSDS-000000066Qx-3B6L;
+	Wed, 11 Jun 2025 20:38:35 +0000
+Date: Wed, 11 Jun 2025 21:38:34 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KEYS: Invert FINAL_PUT bit
+Message-ID: <20250611203834.GR299672@ZenIV>
+References: <301015.1748434697@warthog.procyon.org.uk>
+ <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
+ <CAHk-=wjY7b0gDcXiecsimfmOgs0q+aUp_ZxPHvMfdmAG_Ex_1Q@mail.gmail.com>
+ <382106.1749667515@warthog.procyon.org.uk>
+ <CAHk-=wgBt2=pnDVvH9qnKjxBgm87Q_th4SLzkv9YkcRAp7Bj2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,43 +52,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DAJYOYMK9UJD.LB0N2L64FFA@cknow.org>
+In-Reply-To: <CAHk-=wgBt2=pnDVvH9qnKjxBgm87Q_th4SLzkv9YkcRAp7Bj2A@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Wed, Jun 11, 2025 at 09:47:27PM +0200, Diederik de Haas wrote:
-> On Wed Jun 11, 2025 at 9:04 PM CEST, Eric Biggers wrote:
-> > On Wed, Jun 11, 2025 at 08:53:17PM +0200, Diederik de Haas wrote:
-> >> I was about to respond to your reply, but I guess this may be a better
-> >> fit for it. The TL;DR: version is this:
-> >> 
-> >> If you think distros shouldn't enable it, as you initially clearly
-> >> described and it seems to me you still think so, the right thing for
-> >> distros to do, is to disable those test. Which in turn means the fast
-> >> tests should not be reinstated (?).
+On Wed, Jun 11, 2025 at 11:59:19AM -0700, Linus Torvalds wrote:
+> On Wed, 11 Jun 2025 at 11:45, David Howells <dhowells@redhat.com> wrote:
 > >
-> > I mean, not enabling the tests in production is how it should be.
-> >
-> > But Fedora already enabled CRYPTO_SELFTESTS, apparently because of FIPS
-> > (https://gitlab.com/cki-project/kernel-ark/-/merge_requests/3886).
+> > Do you want a signed tag and git pull for it?
 > 
-> That is recent and there's at least 1 person I recognize as having
-> proper expertise in this matter ;-)
-
-FWIW, here's an example from just today where the crypto self-tests prevented a
-buggy driver from being used in Debian:
-https://lore.kernel.org/linux-crypto/20250611101750.6839-1-AlanSong-oc@zhaoxin.com/
-
-> > throw untested and broken hardware drivers over the wall at users.  As long as
+> Particularly during the merge window that makes sense just to make it
+> trigger my usual "git pull" pattern, but now that I'm more aware of it
+> I can just take the patch directly.
 > 
-> Only speaking for myself, my *assumption* is that crypto functionality
-> in hardware is/should be faster and would lessen the load on the CPU
-> (which with several SBCs seems really worthwhile).
+> Anyway - done just to get this behind us. But for next time, just do
+> it as a signed tag pull request, _particularly_ during the merge
+> window when most other emails get much lower priority.
 
-Often the hardware offloads are actually slower.  They require sending the CPU
-an interrupt once the operation is done, which has a lot of overhead.  They also
-tend to be optimized for throughput rather than latency, and only provide good
-throughput when given a large number of concurrent requests.
-
-Inline encryption does actually work, but that is a separate type of accelerator
-and not what we're talking about here.
-
-- Eric
+Speaking of the stuff fallen through the cracks - could you take another
+look at https://lore.kernel.org/all/20250602041118.GA2675383@ZenIV/?
