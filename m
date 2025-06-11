@@ -1,16 +1,16 @@
 Received: from mail.actia.se (mail.actia.se [212.181.117.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E192686A9;
-	Wed, 11 Jun 2025 11:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AC525BEF2;
+	Wed, 11 Jun 2025 11:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749641900; cv=none; b=jAsGQZPIS2Yn6X5kDHVex2kURVbjDamGJQ5uvtjh2Uw4kTIPqAuCbWtuYqk29SfWQ6k2nhFjo8/rvPyeRtAa2T8kGLfwYbRoE12S7aTlvL1SCR6omMU3YXklXvTiJa6lEebHS+S3yQ14piE/0PIB22PuOyrwN5bLjVYTHUtB1kU=
+	t=1749641902; cv=none; b=lbAa8zGELncRxImkAGTBzb4mK/JhRNtTJlRck9GxS+EqbL99JjyUGframPs6s11lcgVLtgax7yjMbKs5SDIWsNWVUDjD6qnthwQzY4DmTticoVotYff/PzuiO0eqI3qheDqgtG8NJaHwgeRXM1f9H9uC13HE/ITfc4taIPQ+/Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749641900; c=relaxed/simple;
-	bh=QjjfpprZcBMaT5FvuG1gvDNAcfuJqnVL3vAGHBa+4UM=;
+	s=arc-20240116; t=1749641902; c=relaxed/simple;
+	bh=RF8tZiWdJUUbfAebIfpZ2EQt2sn5aseOWwh3y5E2b5w=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cQki7AbbcjfiEdNuvKQybLiIJAKr6t6kR35Wf6raZTU0qWFfypRgEji31HUSAGsndBrAg2IfuK7EvTP1phk5xWnzm8HqMSCTRKz9JRDiZbhzTHgfQutjD8Wve0uLOepLHKm6Se2kEo8tbkNi7mUsyto4s2zlveTH9tGevy3iRMQ=
+	 Content-Type:MIME-Version; b=J/GmoSb2a6ii0dU6dhvE/+6OvqqcvkKdRUYCWbNNcT8wKQnePnn/DV2emnmtD1NnXQFXKRfGbHM+IOc/Vj/tSgvMQbsXcg6HdSLDuV2ff/En4ptNzk8jdjKXXeAW7TLEinShPGT0KQ43zsbIsWIGO0sWc3QsOaD/oUAJvi0SIXY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
@@ -22,7 +22,7 @@ Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
  S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%3]) with mapi id
  15.01.2507.039; Wed, 11 Jun 2025 13:38:09 +0200
 From: John Ernberg <john.ernberg@actia.se>
-To: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>, Pankaj Gupta
+To: =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>, Pankaj Gupta
 	<pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu
 	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, "Rob
  Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
@@ -36,13 +36,13 @@ CC: Peng Fan <peng.fan@nxp.com>, Frank Li <Frank.Li@nxp.com>, "Pengutronix
 	"imx@lists.linux.dev" <imx@lists.linux.dev>,
 	"linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, John Ernberg <john.ernberg@actia.se>
-Subject: [PATCH v6 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power domains
- for iMX8QM and iMX8QXP
-Thread-Topic: [PATCH v6 3/4] dt-bindings: crypto: fsl,sec-v4.0: Add power
- domains for iMX8QM and iMX8QXP
-Thread-Index: AQHb2sVOw2EPnCaNEEyN6zn+Wq3zBQ==
+Subject: [PATCH v6 4/4] arm64: dts: freescale: imx8qxp/imx8qm: Add CAAM
+ support
+Thread-Topic: [PATCH v6 4/4] arm64: dts: freescale: imx8qxp/imx8qm: Add CAAM
+ support
+Thread-Index: AQHb2sVOAXmd4TEBjUCisdSH8JiddQ==
 Date: Wed, 11 Jun 2025 11:38:09 +0000
-Message-ID: <20250611113748.2986988-4-john.ernberg@actia.se>
+Message-ID: <20250611113748.2986988-5-john.ernberg@actia.se>
 References: <20250611113748.2986988-1-john.ernberg@actia.se>
 In-Reply-To: <20250611113748.2986988-1-john.ernberg@actia.se>
 Accept-Language: en-US, sv-SE
@@ -52,8 +52,9 @@ X-MS-TNEF-Correlator:
 x-mailer: git-send-email 2.49.0
 x-esetresult: clean, is OK
 x-esetid: 37303A2956B14453627160
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <45207C18BEFD1A4599757711765979BD@actia.se>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,131 +62,87 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-NXP SoCs like the iMX8QM, iMX8QXP or iMX8DXP use power domains for
-resource management.
-
-Add compatible strings for these SoCs (QXP and DXP gets to share as their
-only difference is a core-count, Q=3DQuad core and D=3DDual core), and allo=
-w
-power-domains for them only. Keep the old restriction for others.
-
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
----
-
-v6:
- - no changes
-
-v5:
- - Fixup indentation (Rob Herring's bot)
- - Collect tags
-
-v4:
- - Reword commit message (Frank Li)
- - Add explicit imx8qxp compatible (Frank Li)
- - Move the job-ring constraints back to the job-ring section under an
-   'allOf:' to avoid the warning from v2 (Rob Herring)
-
-v3:
- - Fix warnings discovered by Rob Herring's bot
- - Declare the compatibles correctly (Krzysztof Kozlowski)
-
-v2:
- - Adjust commit message (Frank Li)
- - Only allow power-domains when compatible with imx8qm (Frank Li)
----
- .../bindings/crypto/fsl,sec-v4.0.yaml         | 41 ++++++++++++++++++-
- 1 file changed, 40 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml b/D=
-ocumentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-index 75afa441e019..dcc755d2709a 100644
---- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-+++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
-@@ -46,6 +46,8 @@ properties:
-       - items:
-           - enum:
-               - fsl,imx6ul-caam
-+              - fsl,imx8qm-caam
-+              - fsl,imx8qxp-caam
-               - fsl,sec-v5.0
-           - const: fsl,sec-v4.0
-       - const: fsl,sec-v4.0
-@@ -77,6 +79,9 @@ properties:
-   interrupts:
-     maxItems: 1
-=20
-+  power-domains:
-+    maxItems: 1
-+
-   fsl,sec-era:
-     description: Defines the 'ERA' of the SEC device.
-     $ref: /schemas/types.yaml#/definitions/uint32
-@@ -106,7 +111,10 @@ patternProperties:
-               - const: fsl,sec-v5.0-job-ring
-               - const: fsl,sec-v4.0-job-ring
-           - items:
--              - const: fsl,sec-v5.0-job-ring
-+              - enum:
-+                  - fsl,imx8qm-job-ring
-+                  - fsl,imx8qxp-job-ring
-+                  - fsl,sec-v5.0-job-ring
-               - const: fsl,sec-v4.0-job-ring
-           - const: fsl,sec-v4.0-job-ring
-=20
-@@ -116,6 +124,9 @@ patternProperties:
-       interrupts:
-         maxItems: 1
-=20
-+      power-domains:
-+        maxItems: 1
-+
-       fsl,liodn:
-         description:
-           Specifies the LIODN to be used in conjunction with the ppid-to-l=
-iodn
-@@ -125,6 +136,20 @@ patternProperties:
-         $ref: /schemas/types.yaml#/definitions/uint32-array
-         items:
-           - maximum: 0xfff
-+    allOf:
-+      - if:
-+          properties:
-+            compatible:
-+              contains:
-+                enum:
-+                  - fsl,imx8qm-job-ring
-+                  - fsl,imx8qxp-job-ring
-+        then:
-+          required:
-+            - power-domains
-+        else:
-+          properties:
-+            power-domains: false
-=20
-   '^rtic@[0-9a-f]+$':
-     type: object
-@@ -212,6 +237,20 @@ required:
-   - reg
-   - ranges
-=20
-+if:
-+  properties:
-+    compatible:
-+      contains:
-+        enum:
-+          - fsl,imx8qm-caam
-+          - fsl,imx8qxp-caam
-+then:
-+  required:
-+    - power-domains
-+else:
-+  properties:
-+    power-domains: false
-+
- additionalProperties: false
-=20
- examples:
---=20
-2.49.0
+RnJvbTogSG9yaWEgR2VhbnTEgyA8aG9yaWEuZ2VhbnRhQG54cC5jb20+DQoNClRoZSBpTVg4UVhQ
+IGFuZCBpTVg4UU0gaGF2ZSBhIENBQU0gKENyeXB0b2dyYXBoaWMgQWNjZWxlcmF0aW9uIGFuZA0K
+QXNzdXJhbmNlIE1vZHVsZSkgbGlrZSBtYW55IG90aGVyIGlNWHMuDQoNCkFkZCB0aGUgZGVmaW5p
+dGlvbnMgZm9yIGl0Lg0KDQpKb2IgUmluZ3MgMCBhbmQgMSBhcmUgYm91bmQgdG8gdGhlIFNFQ08g
+KFNlY3VyaXR5IENvbnRyb2xsZXIpIEFSTSBjb3JlDQphbmQgYXJlIG5vdCBleHBvc2VkIG91dHNp
+ZGUgaXQuIFRoZXJlJ3Mgbm8gcG9pbnQgdG8gZGVmaW5lIHRoZW0gaW4gdGhlDQpiaW5kaW5ncyBh
+cyB0aGV5IGNhbm5vdCBiZSB1c2VkIG91dHNpZGUgdGhlIFNFQ08uDQoNClNpZ25lZC1vZmYtYnk6
+IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdlYW50YUBueHAuY29tPg0KU2lnbmVkLW9mZi1ieTogSm9o
+biBFcm5iZXJnIDxqb2huLmVybmJlcmdAYWN0aWEuc2U+DQpSZXZpZXdlZC1ieTogUGVuZyBGYW4g
+PHBlbmcuZmFuQG54cC5jb20+DQpSZXZpZXdlZC1ieTogRnJhbmsgTGkgPEZyYW5rLkxpQG54cC5j
+b20+DQoNCi0tLQ0KDQpJbXBvcnRlZCBmcm9tIE5YUCB0cmVlLCB0cmltbWVkIGRvd24gYW5kIGZp
+eGVkIHRoZSBkdGJzX2NoZWNrIHdhcm5pbmdzLg0KQ29uc3RyYWluZWQgdGhlIHJhbmdlcyB0byB0
+aGUgbmVlZGVkIG9uZXMuDQpDaGFuZ2VkIHRoZSBjb21taXQgbWVzc2FnZS4NCk9yaWdpbmFsIGhl
+cmU6IGh0dHBzOi8vZ2l0aHViLmNvbS9ueHAtaW14L2xpbnV4LWlteC9jb21taXQvNjk5ZTU0YjM4
+NmNiOWI1M2RlZjQwMTc5OGQwYTRlNjQ2MTA1NTgzZA0KDQotLS0NCg0KdjY6DQogLSBQcm9wZXJs
+eSBzb3J0IHByb3BlcnRpZXMgKEZyYW5rIExpKQ0KIC0gQ29sbGVjdCB0YWdzDQoNCnY1Og0KIC0g
+Q29sbGVjdCB0YWdzDQoNCnY0Og0KIC0gRHJvcCBbIF0gcmV3b3JrIGRldGFpbGluZyBmcm9tIGNv
+bW1pdCBsb2cuIChGcmFuayBMaSkNCiAtIEFkZCBhbiBvdmVycmlkZSBkdHNpIHRvIGNoYW5nZSB0
+aGUgY29tcGF0aWJsZXMgb24gUVhQIGR1ZSB0byBjaGFuZ2VzIGluDQogICAzLzQuIChGcmFuayBM
+aSkNCg0KdjM6DQogLSBubyBjaGFuZ2VzDQoNCnYyOg0KIC0gVXNlIG5ldyBjb21wYXRpYmxlcyBp
+bnRyb2R1Y2VkIGluIDMvNCAoRnJhbmsgTGkpDQotLS0NCiAuLi4vYm9vdC9kdHMvZnJlZXNjYWxl
+L2lteDgtc3Mtc2VjdXJpdHkuZHRzaSAgfCAzOCArKysrKysrKysrKysrKysrKysrDQogYXJjaC9h
+cm02NC9ib290L2R0cy9mcmVlc2NhbGUvaW14OHFtLmR0c2kgICAgIHwgIDEgKw0KIC4uLi9kdHMv
+ZnJlZXNjYWxlL2lteDhxeHAtc3Mtc2VjdXJpdHkuZHRzaSAgICB8IDE2ICsrKysrKysrDQogYXJj
+aC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvaW14OHF4cC5kdHNpICAgIHwgIDIgKw0KIDQgZmls
+ZXMgY2hhbmdlZCwgNTcgaW5zZXJ0aW9ucygrKQ0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2Fy
+bTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4LXNzLXNlY3VyaXR5LmR0c2kNCiBjcmVhdGUgbW9k
+ZSAxMDA2NDQgYXJjaC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvaW14OHF4cC1zcy1zZWN1cml0
+eS5kdHNpDQoNCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4
+LXNzLXNlY3VyaXR5LmR0c2kgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4LXNz
+LXNlY3VyaXR5LmR0c2kNCm5ldyBmaWxlIG1vZGUgMTAwNjQ0DQppbmRleCAwMDAwMDAwMDAwMDAu
+LjNlMDQxNDJhY2E1Yw0KLS0tIC9kZXYvbnVsbA0KKysrIGIvYXJjaC9hcm02NC9ib290L2R0cy9m
+cmVlc2NhbGUvaW14OC1zcy1zZWN1cml0eS5kdHNpDQpAQCAtMCwwICsxLDM4IEBADQorLy8gU1BE
+WC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjArDQorLyoNCisgKiBDb3B5cmlnaHQgMjAxOSBO
+WFANCisgKi8NCisNCisjaW5jbHVkZSA8ZHQtYmluZGluZ3MvZmlybXdhcmUvaW14L3JzcmMuaD4N
+CisNCitzZWN1cml0eV9zdWJzeXM6IGJ1c0AzMTQwMDAwMCB7DQorCWNvbXBhdGlibGUgPSAic2lt
+cGxlLWJ1cyI7DQorCSNhZGRyZXNzLWNlbGxzID0gPDE+Ow0KKwkjc2l6ZS1jZWxscyA9IDwxPjsN
+CisJcmFuZ2VzID0gPDB4MzE0MDAwMDAgMHgwIDB4MzE0MDAwMDAgMHg5MDAwMD47DQorDQorCWNy
+eXB0bzogY3J5cHRvQDMxNDAwMDAwIHsNCisJCWNvbXBhdGlibGUgPSAiZnNsLGlteDhxbS1jYWFt
+IiwgImZzbCxzZWMtdjQuMCI7DQorCQlyZWcgPSA8MHgzMTQwMDAwMCAweDkwMDAwPjsNCisJCWlu
+dGVycnVwdHMgPSA8R0lDX1NQSSAxNDggSVJRX1RZUEVfTEVWRUxfSElHSD47DQorCQkjYWRkcmVz
+cy1jZWxscyA9IDwxPjsNCisJCSNzaXplLWNlbGxzID0gPDE+Ow0KKwkJcmFuZ2VzID0gPDAgMHgz
+MTQwMDAwMCAweDkwMDAwPjsNCisJCXBvd2VyLWRvbWFpbnMgPSA8JnBkIElNWF9TQ19SX0NBQU1f
+SlIyPjsNCisJCWZzbCxzZWMtZXJhID0gPDk+Ow0KKw0KKwkJc2VjX2pyMjoganJAMzAwMDAgew0K
+KwkJCWNvbXBhdGlibGUgPSAiZnNsLGlteDhxbS1qb2ItcmluZyIsICJmc2wsc2VjLXY0LjAtam9i
+LXJpbmciOw0KKwkJCXJlZyA9IDwweDMwMDAwIDB4MTAwMDA+Ow0KKwkJCWludGVycnVwdHMgPSA8
+R0lDX1NQSSA0NTMgSVJRX1RZUEVfTEVWRUxfSElHSD47DQorCQkJcG93ZXItZG9tYWlucyA9IDwm
+cGQgSU1YX1NDX1JfQ0FBTV9KUjI+Ow0KKwkJfTsNCisNCisJCXNlY19qcjM6IGpyQDQwMDAwIHsN
+CisJCQljb21wYXRpYmxlID0gImZzbCxpbXg4cW0tam9iLXJpbmciLCAiZnNsLHNlYy12NC4wLWpv
+Yi1yaW5nIjsNCisJCQlyZWcgPSA8MHg0MDAwMCAweDEwMDAwPjsNCisJCQlpbnRlcnJ1cHRzID0g
+PEdJQ19TUEkgNDU0IElSUV9UWVBFX0xFVkVMX0hJR0g+Ow0KKwkJCXBvd2VyLWRvbWFpbnMgPSA8
+JnBkIElNWF9TQ19SX0NBQU1fSlIzPjsNCisJCX07DQorCX07DQorfTsNCmRpZmYgLS1naXQgYS9h
+cmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4cW0uZHRzaSBiL2FyY2gvYXJtNjQvYm9v
+dC9kdHMvZnJlZXNjYWxlL2lteDhxbS5kdHNpDQppbmRleCA2ZmEzMWJjOWVjZTguLjZkZjAxODY0
+M2YyMCAxMDA2NDQNCi0tLSBhL2FyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2lteDhxbS5k
+dHNpDQorKysgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4cW0uZHRzaQ0KQEAg
+LTYxMiw2ICs2MTIsNyBAQCB2cHVfZHNwOiBkc3BANTU2ZTgwMDAgew0KIAl9Ow0KIA0KIAkvKiBz
+b3J0ZWQgaW4gcmVnaXN0ZXIgYWRkcmVzcyAqLw0KKwkjaW5jbHVkZSAiaW14OC1zcy1zZWN1cml0
+eS5kdHNpIg0KIAkjaW5jbHVkZSAiaW14OC1zcy1jbTQxLmR0c2kiDQogCSNpbmNsdWRlICJpbXg4
+LXNzLWF1ZGlvLmR0c2kiDQogCSNpbmNsdWRlICJpbXg4LXNzLXZwdS5kdHNpIg0KZGlmZiAtLWdp
+dCBhL2FyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2lteDhxeHAtc3Mtc2VjdXJpdHkuZHRz
+aSBiL2FyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2lteDhxeHAtc3Mtc2VjdXJpdHkuZHRz
+aQ0KbmV3IGZpbGUgbW9kZSAxMDA2NDQNCmluZGV4IDAwMDAwMDAwMDAwMC4uMTVmMTIzOWRhYjI0
+DQotLS0gL2Rldi9udWxsDQorKysgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4
+cXhwLXNzLXNlY3VyaXR5LmR0c2kNCkBAIC0wLDAgKzEsMTYgQEANCisvLyBTUERYLUxpY2Vuc2Ut
+SWRlbnRpZmllcjogR1BMLTIuMCsNCisvKg0KKyAqIENvcHlyaWdodCAyMDI1IEFjdGlhIE5vcmRp
+YyBBQg0KKyAqLw0KKw0KKyZjcnlwdG8gew0KKwljb21wYXRpYmxlID0gImZzbCxpbXg4cXhwLWNh
+YW0iLCAiZnNsLHNlYy12NC4wIjsNCit9Ow0KKw0KKyZzZWNfanIyIHsNCisJY29tcGF0aWJsZSA9
+ICJmc2wsaW14OHF4cC1qb2ItcmluZyIsICJmc2wsc2VjLXY0LjAtam9iLXJpbmciOw0KK307DQor
+DQorJnNlY19qcjMgew0KKwljb21wYXRpYmxlID0gImZzbCxpbXg4cXhwLWpvYi1yaW5nIiwgImZz
+bCxzZWMtdjQuMC1qb2ItcmluZyI7DQorfTsNCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2Jvb3Qv
+ZHRzL2ZyZWVzY2FsZS9pbXg4cXhwLmR0c2kgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2Fs
+ZS9pbXg4cXhwLmR0c2kNCmluZGV4IDA1MTM4MzI2ZjBhNS4uZTJlNzk5Y2MyOTRjIDEwMDY0NA0K
+LS0tIGEvYXJjaC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvaW14OHF4cC5kdHNpDQorKysgYi9h
+cmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4cXhwLmR0c2kNCkBAIC0zMjEsNiArMzIx
+LDcgQEAgbWFwMCB7DQogCS8qIHNvcnRlZCBpbiByZWdpc3RlciBhZGRyZXNzICovDQogCSNpbmNs
+dWRlICJpbXg4LXNzLWltZy5kdHNpIg0KIAkjaW5jbHVkZSAiaW14OC1zcy12cHUuZHRzaSINCisJ
+I2luY2x1ZGUgImlteDgtc3Mtc2VjdXJpdHkuZHRzaSINCiAJI2luY2x1ZGUgImlteDgtc3MtY200
+MC5kdHNpIg0KIAkjaW5jbHVkZSAiaW14OC1zcy1ncHUwLmR0c2kiDQogCSNpbmNsdWRlICJpbXg4
+LXNzLWFkbWEuZHRzaSINCkBAIC0zMzIsNiArMzMzLDcgQEAgbWFwMCB7DQogDQogI2luY2x1ZGUg
+ImlteDhxeHAtc3MtaW1nLmR0c2kiDQogI2luY2x1ZGUgImlteDhxeHAtc3MtdnB1LmR0c2kiDQor
+I2luY2x1ZGUgImlteDhxeHAtc3Mtc2VjdXJpdHkuZHRzaSINCiAjaW5jbHVkZSAiaW14OHF4cC1z
+cy1hZG1hLmR0c2kiDQogI2luY2x1ZGUgImlteDhxeHAtc3MtY29ubi5kdHNpIg0KICNpbmNsdWRl
+ICJpbXg4cXhwLXNzLWxzaW8uZHRzaSINCi0tIA0KMi40OS4wDQo=
