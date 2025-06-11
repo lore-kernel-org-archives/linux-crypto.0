@@ -1,52 +1,52 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AE9221708;
-	Wed, 11 Jun 2025 09:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3374184;
+	Wed, 11 Jun 2025 09:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749633836; cv=none; b=T9dQdChnRWuMLp23BncIUYbAhlx287gMY7LTCpUg9FlUFt2B7n0EWEklukOCPISvXI3imK4pWQa8psD6DIF5Hd2gXYpg1l+sZ7rNErKy2S8TWcOSYpGBNVEBRx/pwbbZRLqDZnUZ2WjLq9vprExhxszl+m9zem3Aap/Q+iKJ9kk=
+	t=1749634325; cv=none; b=Vmz9cXA/men3SF+0z02ef64B8lOC6ElqlWiYVGr9Vufw1cUuI42B/ajzR7R+eMPbw/2mwSy5aN9/xxgsU+40XioqQWfuotg/7CYz5e/tuzyq9LFuJTtKPpvenF0cMUkFYrtZH49wRvQs383Oo0Kr3rMd8pEZgIRY3Ic7k5rpZbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749633836; c=relaxed/simple;
-	bh=qKs2rXCD0kRLf2iapx2r9Tgv95LwvPC2wN8BZQGoz3E=;
+	s=arc-20240116; t=1749634325; c=relaxed/simple;
+	bh=LmZ31E7MChujgxR77XXadJkwWr9pvhCZDHHo1V0tBZQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jzU3uKXagsPlkHITPNTYVuPuWKGTNTsNUbGHtn/ZnuymNJK0QihEtW7/a72VaCZsnzNhUZr5/VQcBz/1JpmQyzXnOyv461ALDugSVWq0SmQxh/zYcnd32x2HbtxFpOA0JKpeXuAQ+YbD5aLjOxAP7hY+wc1Q0Zhb6QEWralnTUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fIA1Ythm; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=GlxpQzsS4JQcTCMCq4a6VtqMzRU3xqJ5cc+n9WZjA8Leev22FoMlwyvdlqTf3uE6pjsOzKoWKkv/xYgfm9zfcFbqrQ2IzqJgf3RZdKcg3WMV8Kxt3c7RnfwWujvYbLO1/V2WUdlnvNgonbH30EnhwdShscF0au4XzKJJ5NxCthk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gtwKM+od; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fIA1Ythm"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gtwKM+od"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=5MvjPaR0xlmnGQTOLXVKPuHYfW/FxurPRTBaqohXJ/o=; b=fIA1YthmoTPvZEC40yWITQnVfn
-	lqFPz13KrKnFdT8nUh1UZc3ndvAgOfB9P7alUJPkx59jzIR2eFYFSIxbk7wTKRVUcep3NLJGJbmoN
-	uGYoAG/cheINwFVkH5mXWzALvlppYwvg5BwRxOaGBbUiodeJ/hfD8h8XDl7wBd7gRGTdRie0zgGve
-	4Grt9Qpp2opWJQ9T9eTU9JI60Ut+yCGz85qA6bcot7YyaFKL7lybgo1ubzAzPMvF45l0NBjMo8cFx
-	dCD05c77hmS6kcH04RuKnwWNk1IVMmDUHeHBz/PCpL+TWnxwiWPzKHDdpZ1vYJfHObHrSKHTgWxtI
-	au6EoLEw==;
+	bh=ef0vG2Qb0B/9UQbtrUTyLcOStPCflHZCkTnTCb3H4no=; b=gtwKM+odIDwwOzeJgQaccGplYh
+	SGlLNE60/v3KPAFkaRGwWbsIjiUOlV2/imQP5XD4m3EZ9cmBsFEP9lLZlXDbZc26EqM0PWBMBEezX
+	MtMTUgqdYQBeFGRX3WxzmjES4NZNnjgRUENxJAcQNROuzkFnnLGbrgl2w+SzT6QaCXC9rc0d4e7+P
+	3Oq5sctZs0DqBxg1JsENcpiLVguX6hCUwog7tUpfiXfP3rxu34GJFnlFOK/obK7lg+3Jdjp1StiJR
+	GEvqoAqQ2J0pe7Vz7i0sobH9ulSs6ee2HOj6VsYWNk1VnhXfjqzAOrVAP7N/ZdAoDz51ciVQuAxwS
+	MdBIsgBw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uPHgT-00CJES-0p;
-	Wed, 11 Jun 2025 17:23:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Jun 2025 17:23:49 +0800
-Date: Wed, 11 Jun 2025 17:23:49 +0800
+	id 1uPHoJ-00CJMi-1a;
+	Wed, 11 Jun 2025 17:31:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Jun 2025 17:31:55 +0800
+Date: Wed, 11 Jun 2025 17:31:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-	linux-integrity@vger.kernel.org,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH v10 2/5] crypto: loongson - add Loongson RNG driver
- support
-Message-ID: <aElLJY9MnkEQx935@gondor.apana.org.au>
-References: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
- <20250528065944.4511-3-zhaoqunqin@loongson.cn>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>,
+	Manorit Chawdhry <m-chawdhry@ti.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v5 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
+ (ECB, CBC)
+Message-ID: <aElNCwUZnlgXzuPW@gondor.apana.org.au>
+References: <20250603124217.957116-1-t-pratham@ti.com>
+ <20250603124217.957116-3-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,23 +55,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250528065944.4511-3-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250603124217.957116-3-t-pratham@ti.com>
 
-On Wed, May 28, 2025 at 02:59:41PM +0800, Qunqin Zhao wrote:
+On Tue, Jun 03, 2025 at 06:07:29PM +0530, T Pratham wrote:
 >
-> +	if (!rng_devices.is_init) {
-> +		ret = crypto_register_rng(&loongson_rng_alg);
-> +		if (ret) {
-> +			dev_err(&pdev->dev, "failed to register crypto(%d)\n", ret);
-> +			return ret;
-> +		}
-> +		INIT_LIST_HEAD(&rng_devices.list);
-> +		mutex_init(&rng_devices.lock);
-> +		rng_devices.is_init = true;
-> +	}
+> +static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
+> +{
+> +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct dthe_data *dev_data = dthe_get_dev(ctx);
+> +
+> +	memzero_explicit(ctx, sizeof(*ctx));
 
-This doesn't look right.  What stops two devices from both entering
-this code path when is_init == false?
+This is unnecessary.  The tfm context is zeroed by default.
 
 Cheers,
 -- 
