@@ -1,27 +1,28 @@
 Received: from mail.actia.se (mail.actia.se [212.181.117.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFCE23BCF8;
-	Wed, 11 Jun 2025 11:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF51425BEE3;
+	Wed, 11 Jun 2025 11:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749641895; cv=none; b=BQRML9CB8Muy2GeSMEhUIqdBd3qqpqeEvK4IjIEClJGJvFHkb6KECVcckx/6oRGNydTZnJniAetQJH3A3vRFYR7k7jWsSDeHUPEN1g3lEbga5i+7jVcJf67Q+WsAAh6+p3GguQ+sJeC4AZP19+JlePCvxSrL3TQlBoIU54PVN6o=
+	t=1749641898; cv=none; b=B+1erbqELyN3zThncVlHtMwycEo18gicKRS0vPGMQnWPF1A97JSqA0iTeZpPKANClhzMESBmePqpXhl9nCZSg34ojMqIXYS5iHTYh9zvaY/0YlzLBbxcgWAPTD3ogmz4DllgyVQ1TrNBZ3W+SdLG47V1bRxFDn65w6oE3aFrrKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749641895; c=relaxed/simple;
-	bh=mLT6Szq/xGEa3XXcxtJnhZSsdic8SU0ZR7G+WQsu4dI=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Pg+XvDmVRHB358f9nFmPjvcPml+/kin+xgtQXtBFq1iOiRg0AwGiCLG99LY5lYIXiwtJDcfA0CLaXB8iKIC/yRRntvM9cVY256s5wAsnNhDvJ42RTWf4Xf+royvT7Y93lZ5NbQ9ZU5xLWT31jJhL3E6CI5GZM2xS5uD8V4lK0Jo=
+	s=arc-20240116; t=1749641898; c=relaxed/simple;
+	bh=lFIiCxagljBVffqnRrnjwcZ0JXB78ORWTbEbUmz1K0M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uwJ12YTlZWzEk5Tgj0PmsEYyINYS/hcYOqBAaAwXAVyVLqidaURPzwPzk7tQNfwWkUagi241hwIOa1WJCSwzgKMauPeCS1sMuf0i4Ye8NyX/AOLl90L1BfMQFqmOczOCWahFs9hxuTQMggV4kXKGTo6uR1k0t1Kyv8Ugb0khEfk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=actia.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
 Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
  (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 11 Jun
- 2025 13:38:08 +0200
+ 2025 13:38:09 +0200
 Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
  S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%3]) with mapi id
- 15.01.2507.039; Wed, 11 Jun 2025 13:38:08 +0200
+ 15.01.2507.039; Wed, 11 Jun 2025 13:38:09 +0200
 From: John Ernberg <john.ernberg@actia.se>
-To: =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>, Pankaj Gupta
+To: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>, Pankaj Gupta
 	<pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu
 	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, "Rob
  Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
@@ -35,12 +36,14 @@ CC: Peng Fan <peng.fan@nxp.com>, Frank Li <Frank.Li@nxp.com>, "Pengutronix
 	"imx@lists.linux.dev" <imx@lists.linux.dev>,
 	"linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, John Ernberg <john.ernberg@actia.se>
-Subject: [PATCH v6 0/4] crypto: caam - iMX8QXP support (and related fixes)
-Thread-Topic: [PATCH v6 0/4] crypto: caam - iMX8QXP support (and related
- fixes)
-Thread-Index: AQHb2sVNVczInQ6djkqz+g3DSp7mBg==
+Subject: [PATCH v6 2/4] crypto: caam - Support iMX8QXP and variants thereof
+Thread-Topic: [PATCH v6 2/4] crypto: caam - Support iMX8QXP and variants
+ thereof
+Thread-Index: AQHb2sVNSN6Tna4ATUu1t4WZeEYssQ==
 Date: Wed, 11 Jun 2025 11:38:08 +0000
-Message-ID: <20250611113748.2986988-1-john.ernberg@actia.se>
+Message-ID: <20250611113748.2986988-3-john.ernberg@actia.se>
+References: <20250611113748.2986988-1-john.ernberg@actia.se>
+In-Reply-To: <20250611113748.2986988-1-john.ernberg@actia.se>
 Accept-Language: en-US, sv-SE
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -48,9 +51,8 @@ X-MS-TNEF-Correlator:
 x-mailer: git-send-email 2.49.0
 x-esetresult: clean, is OK
 x-esetid: 37303A2956B14453627160
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9FD4A6CEBDB8CF48B68EA0CA7731A73B@actia.se>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,41 +60,51 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-VGhpcyBzZXJpZXMgZW5hYmxlcyB0aGUgdXNlIG9mIHRoZSBDQUFNIChDcnlwdG9ncmFwaGljIEFj
-Y2VsZXJhdGlvbiBhbmQNCkFzc3VyYW5jZSBNb2R1bGUpIG9uIHRoZSBpTVg4UVhQIChhbmQgaXRz
-IHZhcmlhbnRzKS4NCg0KdjY6IChkZXRhaWxlZCBjaGFuZ2Vsb2cgaW4gZWFjaCBwYXRjaCkNCiAt
-IEZpeCBwcm9wZXJ0eSBvcmRlciBpbiBiaW5kaW5ncyAoRnJhbmsgTGkpDQogLSBDb2xsZWN0IHRh
-Z3MNCg0KdjU6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWNyeXB0by8yMDI1MDYxMDA4
-NTExMC4yMjk1MzkyLTEtam9obi5lcm5iZXJnQGFjdGlhLnNlL1QNCiAtIEZpeCBpbmRlbnRhdGlv
-biBpc3N1ZXMgaW4gYmluZGluZ3MgKFJvYiBIZXJyaW5nJ3MgYm90KQ0KIC0gQ29sbGVjdCB0YWdz
-DQoNCnY0OiBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1jcnlwdG8vMjAyNTA2MDUxMzI3
-NTQuMTc3MTM2OC0xLWpvaG4uZXJuYmVyZ0BhY3RpYS5zZS9UDQogLSBEZWNsYXJlIG1vcmUgY29t
-cGF0aWJsZXMgaW4gYmluZGluZ3MgKEZyYW5rIExpKQ0KIC0gTW92ZSBqb2ItcmluZyBjb21wYXQg
-Y2hlY2sgdW5kZXIgdGhlIGpvYi1yaW5nIHN1YnNjaGVtYSAoUm9iIEhlcnJpbmcpDQoNCnYzOiBo
-dHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1jcnlwdG8vMjAyNTA1MjgxNDQyNTkuMjYwMzkx
-NC0xLWpvaG4uZXJuYmVyZ0BhY3RpYS5zZS9UDQogLSBGaXggZGV2aWNldHJlZSBDSSBkZXRlY3Rl
-ZCBlcnJvcnMgKFJvYiBIZXJyaW5nJ3MgYm90KQ0KIC0gRGVjbGFyZSB0aGUgY29tcGF0aWJsZXMg
-Y29ycmVjdGx5IGluIGJpbmRpbmdzIChLcnp5c3p0b2YgS296bG93c2tpKQ0KDQp2MjogaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtY3J5cHRvLzIwMjUwNTI3MDcxNTUyLjE0MjQ5OTctMS1q
-b2huLmVybmJlcmdAYWN0aWEuc2UvVA0KIC0gQ2xhcmlmeSBpbiB0aGUgY29tbWl0IG1lc3NhZ2Ug
-aG93IHRoZSBjcmFzaCBmaXggd29ya3MgKEZyYW5rIExpKQ0KIC0gUmVzdHJpY3QgcG93ZXItZG9t
-YWlucyBvbmx5IGZvciBpTVg4USogU29DcyBpbiBiaW5kaW5ncyAoRnJhbmsgTGkpDQogLSBDb2xs
-ZWN0IHRhZ3MNCg0KdjE6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWNyeXB0by8yMDI1
-MDUyMzEzMTgxNC4xMDQ3NjYyLTEtam9obi5lcm5iZXJnQGFjdGlhLnNlL1QNCg0KSG9yaWEgR2Vh
-bnTEgyAoMSk6DQogIGFybTY0OiBkdHM6IGZyZWVzY2FsZTogaW14OHF4cC9pbXg4cW06IEFkZCBD
-QUFNIHN1cHBvcnQNCg0KSm9obiBFcm5iZXJnICgzKToNCiAgY3J5cHRvOiBjYWFtIC0gUHJldmVu
-dCBjcmFzaCBvbiBzdXNwZW5kIHdpdGggaU1YOFFNIC8gaU1YOFVMUA0KICBjcnlwdG86IGNhYW0g
-LSBTdXBwb3J0IGlNWDhRWFAgYW5kIHZhcmlhbnRzIHRoZXJlb2YNCiAgZHQtYmluZGluZ3M6IGNy
-eXB0bzogZnNsLHNlYy12NC4wOiBBZGQgcG93ZXIgZG9tYWlucyBmb3IgaU1YOFFNIGFuZA0KICAg
-IGlNWDhRWFANCg0KIC4uLi9iaW5kaW5ncy9jcnlwdG8vZnNsLHNlYy12NC4wLnlhbWwgICAgICAg
-ICB8IDQxICsrKysrKysrKysrKysrKysrKy0NCiAuLi4vYm9vdC9kdHMvZnJlZXNjYWxlL2lteDgt
-c3Mtc2VjdXJpdHkuZHRzaSAgfCAzOCArKysrKysrKysrKysrKysrKw0KIGFyY2gvYXJtNjQvYm9v
-dC9kdHMvZnJlZXNjYWxlL2lteDhxbS5kdHNpICAgICB8ICAxICsNCiAuLi4vZHRzL2ZyZWVzY2Fs
-ZS9pbXg4cXhwLXNzLXNlY3VyaXR5LmR0c2kgICAgfCAxNiArKysrKysrKw0KIGFyY2gvYXJtNjQv
-Ym9vdC9kdHMvZnJlZXNjYWxlL2lteDhxeHAuZHRzaSAgICB8ICAyICsNCiBkcml2ZXJzL2NyeXB0
-by9jYWFtL2N0cmwuYyAgICAgICAgICAgICAgICAgICAgfCAgNyArKy0tDQogZHJpdmVycy9jcnlw
-dG8vY2FhbS9pbnRlcm4uaCAgICAgICAgICAgICAgICAgIHwgIDEgKw0KIDcgZmlsZXMgY2hhbmdl
-ZCwgMTAyIGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQogY3JlYXRlIG1vZGUgMTAwNjQ0
-IGFyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2lteDgtc3Mtc2VjdXJpdHkuZHRzaQ0KIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9pbXg4cXhwLXNz
-LXNlY3VyaXR5LmR0c2kNCg0KLS0gDQoyLjQ5LjANCg==
+The iMX8QXP (and variants such as the QX, DX, DXP) all identify as iMX8QXP.
+
+They have the exact same restrictions as the supported iMX8QM introduced
+at commit 61bb8db6f682 ("crypto: caam - Add support for i.MX8QM")
+
+Loosen the check a little bit with a wildcard to also match the iMX8QXP
+and its variants.
+
+Signed-off-by: John Ernberg <john.ernberg@actia.se>
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+
+---
+
+v6:
+ - no changes
+
+v5:
+ - Collect tags
+
+v4:
+ - no changes
+
+v3:
+ - no changes
+
+v2:
+ - Collect review tag
+---
+ drivers/crypto/caam/ctrl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 766c447c9cfb..ce7b99019537 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -573,7 +573,7 @@ static const struct soc_device_attribute caam_imx_soc_t=
+able[] =3D {
+ 	{ .soc_id =3D "i.MX7*",  .data =3D &caam_imx7_data },
+ 	{ .soc_id =3D "i.MX8M*", .data =3D &caam_imx7_data },
+ 	{ .soc_id =3D "i.MX8ULP", .data =3D &caam_imx8ulp_data },
+-	{ .soc_id =3D "i.MX8QM", .data =3D &caam_imx8ulp_data },
++	{ .soc_id =3D "i.MX8Q*", .data =3D &caam_imx8ulp_data },
+ 	{ .soc_id =3D "VF*",     .data =3D &caam_vf610_data },
+ 	{ .family =3D "Freescale i.MX" },
+ 	{ /* sentinel */ }
+--=20
+2.49.0
