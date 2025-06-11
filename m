@@ -1,148 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC31218591;
-	Wed, 11 Jun 2025 16:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C972E610F;
+	Wed, 11 Jun 2025 16:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749659697; cv=none; b=pHMUBtjxAPWFbttpbhCYaHbqzl+AivQAR069yWZbIjNfVjEQ48mozOzFuIHEqBaZ2hxO/yUkxiPiU2TQTXjm0Y968XxcopFokzH+qTMM1KppGOIV5Jefb/nTB8r5h2cD7DQ7Q6on7+bfVWv2XKiDGeFk/T7zRUbH8WVVK/GWigY=
+	t=1749660463; cv=none; b=kHkshG5z1kAHnaSWAkXvJcrRzzT0WVd+6Dc3bwoYx9XzraQGC9bPIXQVSkmEJUjKHwj05SG+/wM1Kq/un201Ww2+5EAiLKw1m5mGkj/+toaoD4u75Bo8D6ooG/qBi2vfnEv7+XkWmpiysXQH6mAQ6wSzrjw2R+drNwPvUPCDUQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749659697; c=relaxed/simple;
-	bh=YnBjJCjZGkkrgSbru8fgRTSfROvOQq67aVGW6ZpVPgA=;
+	s=arc-20240116; t=1749660463; c=relaxed/simple;
+	bh=ATrbfAkxfXBN7T6ZyMKbNj8vLHFLN6YtT6rOvmO5aG8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MP/wI0hOM7COxBSajhZN4jX+WB8GjhWlK0LEA2krlKNbG3/wuQoAEEyUyreYDqQXTJ6HrgflE2ElCAv9d2NBhHheV0G3vQfdvC+suR8Jty0AZ2gk0fQdrexuiOKMfPzjZRGE/S54uvRrKw1DhHkQvd1ziCIX95iibAHN4TudoJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dB+LPFkp; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RrlOFe3qJdKUVfgmtQVbwsWFYpe3Mn41+ykXpxokhRujue23A9NKQckQU7An9HHn2yLWC5vg6jYpi/vKN+dk1ljBOTox2ld8we3tzQDfFTdQO3LXWiFzD7D8ZvHGisgyenNTUwhXCIiV1vjerJ6QDJIoydq2/J5LfoOENdEFO4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qvlw2CSX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dB+LPFkp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A1BC4CEE3;
-	Wed, 11 Jun 2025 16:34:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qvlw2CSX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F724C4CEE3;
+	Wed, 11 Jun 2025 16:47:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749659695;
-	bh=YnBjJCjZGkkrgSbru8fgRTSfROvOQq67aVGW6ZpVPgA=;
+	s=k20201202; t=1749660461;
+	bh=ATrbfAkxfXBN7T6ZyMKbNj8vLHFLN6YtT6rOvmO5aG8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dB+LPFkpPB50dxO2SwKdjRyNRaC4GTJSF+jgfUyoydG4rqDU1/cAhbNfTSc4Zi6Df
-	 cV8hG9u7FZ6UAF7suixSuRhW4+uJrn7i3DRvt3R0wPygCK3FUGNKhxalSjH8aXsUPd
-	 pxWXAGsiEuQRHVLDEtNQkLeJJJu+Isfkoau6xj9RGtyfbdMSE9GH5KAjxfgOwqu/Oa
-	 4hTDzIFuHtOcc8hbq1nVmumB6UOvemPyeCnkPO3/L89aimaVaFZt4DFf0+Oge2dYJF
-	 k5oBFgO/bq0TEWR0qyGieLeOrCEvvx8lei1ZR18LWITEp/URmXPA/H89o8+Fsvy2UL
-	 XG9XKd3xyk6TA==
-Date: Wed, 11 Jun 2025 09:34:30 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Diederik de Haas <didi.debian@cknow.org>
-Cc: linux-crypto@vger.kernel.org, linux-rockchip@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 3/7] crypto: testmgr - replace
- CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS
-Message-ID: <20250611163430.GA1254@sol>
-References: <20250505203345.802740-1-ebiggers@kernel.org>
- <20250505203345.802740-4-ebiggers@kernel.org>
- <DAJOCL4UQWZ1.2CB0NH55US5EI@cknow.org>
+	b=Qvlw2CSX3aAkzEft0go9oT9ndvFJxfQGgKRPZP3YQ/RCO7I0zOIcQFgGoutcVkHuY
+	 JzyMlnw6WfR9KWtTb6FNboSdG0wLI1rXjuJPPw+lIVnq4XombBSoOhdvpzguvUp8j7
+	 29htLOaPHYUZaJ2K4ySGgQWZd1nu456+II1VORfcjBaJOFtMr0Vfgi38vg35KuEV61
+	 JOUbn/ePxyBY8BUgD8m2lJ/e4X0G4VaKpqnBDkDtCgMoWDYrY9/yjEWI61JUiAXqBR
+	 2zNNV8YF4Lv6fgjyxyinkmYx5Kvlsa0C29vAp6O2KeQMPAkaHp0CxKyGed+0CGa3FM
+	 gzfxEH5tg8Upw==
+Date: Wed, 11 Jun 2025 19:47:38 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Paul Moore <paul@paul-moore.com>
+Cc: David Howells <dhowells@redhat.com>, torvalds@linux-foundation.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KEYS: Invert FINAL_PUT bit
+Message-ID: <aEmzKhXJ_nc4que3@kernel.org>
+References: <301015.1748434697@warthog.procyon.org.uk>
+ <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <DAJOCL4UQWZ1.2CB0NH55US5EI@cknow.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
 
-On Wed, Jun 11, 2025 at 01:41:06PM +0200, Diederik de Haas wrote:
-> Hi Eric,
-> 
-> On Mon May 5, 2025 at 10:33 PM CEST, Eric Biggers wrote:
-> > The negative-sense of CRYPTO_MANAGER_DISABLE_TESTS is a longstanding
-> > mistake that regularly causes confusion.  Especially bad is that you can
-> > have CRYPTO=n && CRYPTO_MANAGER_DISABLE_TESTS=n, which is ambiguous.
+On Tue, Jun 10, 2025 at 08:22:59PM -0400, Paul Moore wrote:
+> On Wed, May 28, 2025 at 8:19 AM David Howells <dhowells@redhat.com> wrote:
 > >
-> > Replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS which has the
-> > expected behavior.
+> > Hi Linus,
 > >
-> > The tests continue to be disabled by default.
+> > Could you apply this, please?  There shouldn't be any functional change,
+> > rather it's a switch to using combined bit-barrier ops and lesser barriers.
+> > A better way to do this might be to provide set_bit_release(), but the end
+> > result would be much the same.
+> >
+> > Thanks,
+> > David
 > > ---
-> >  <snip>
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index da352f1984ea..8f1353bbba18 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> >  <snip>
-> > @@ -171,20 +171,26 @@ config CRYPTO_USER
-> >  	select CRYPTO_MANAGER
-> >  	help
-> >  	  Userspace configuration for cryptographic instantiations such as
-> >  	  cbc(aes).
-> >  
-> > -config CRYPTO_MANAGER_DISABLE_TESTS
-> > -	bool "Disable run-time self tests"
-> > -	default y
-> > +config CRYPTO_SELFTESTS
-> > +	bool "Enable cryptographic self-tests"
-> > +	depends on DEBUG_KERNEL
-> >  	help
-> > -	  Disable run-time self tests that normally take place at
-> > -	  algorithm registration.
-> > +	  Enable the cryptographic self-tests.
-> > +
-> > +	  The cryptographic self-tests run at boot time, or at algorithm
-> > +	  registration time if algorithms are dynamically loaded later.
-> > +
-> > +	  This is primarily intended for developer use.  It should not be
-> > +	  enabled in production kernels, unless you are trying to use these
-> > +	  tests to fulfill a FIPS testing requirement.
+> > From: Herbert Xu <herbert@gondor.apana.org.au>
+> >
+> > KEYS: Invert FINAL_PUT bit
+> >
+> > Invert the FINAL_PUT bit so that test_bit_acquire and clear_bit_unlock
+> > can be used instead of smp_mb.
+> >
+> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > cc: keyrings@vger.kernel.org
+> > cc: linux-security-module@vger.kernel.org
+> > cc: linux-crypto@vger.kernel.org
+> > cc: linux-integrity@vger.kernel.org
+> > ---
+> >  include/linux/key.h |    2 +-
+> >  security/keys/gc.c  |    4 ++--
+> >  security/keys/key.c |    5 +++--
+> >  3 files changed, 6 insertions(+), 5 deletions(-)
 > 
-> I built a 6.16-rc1 kernel [1] and its config is based upon Debian's and
-> that has enabled CRYPTO_SELFTESTS [2] (due to Debian bug 599441 [3]).
-> 
-> I then installed it on 3 Rockchip based devices and booted into that.
-> 1. Radxa Rock 5B (rk3588)
-> 2. PINE64 Quartz64 Model B (rk3568)
-> 3. PINE64 RockPro64 (rk3399)
-> 
-> The full dmesg output for level 0-4 can be found at [4], [5] and [6]
-> 
-> The filtered dmesg output for Rock 5B:
-> ERROR:
-> [    0.709822] basic hdkf test(hmac(sha256)): failed to allocate transform: -2
-> WARNING:
+> It doesn't look like this has made its way to Linus.  David or Jarkko,
+> do one of you want to pick this up into a tree and send this to Linus
+> properly?
 
-https://lore.kernel.org/r/20250610191600.54994-1-ebiggers@kernel.org/ fixed the
-HKDF failure.  It was caused by a patch that changed initcall levels.
+I'm open for anything but need comment from David at first. It is up to
+him as he carries the torch ATM for this one :-)
 
-> [    8.877288] alg: skcipher: skipping comparison tests for xctr-aes-ce because xctr(aes-generic) is unavailable
-
-That's expected if you have CONFIG_CRYPTO_AES_ARM64_CE_BLK enabled but
-CONFIG_CRYPTO_XCTR disabled.  Some tests are skipped in that case.
-
-> [   14.172991] alg: ahash: rk-sha1 export() overran state buffer on test vector 0, cfg="import/export"
-> [   14.202291] alg: ahash: rk-sha256 export() overran state buffer on test vector 0, cfg="import/export"
-> [   14.230887] alg: ahash: rk-md5 export() overran state buffer on test vector 0, cfg="import/export"
-
-That means the Rockchip crypto driver is broken.
-
-It may have been broken for a long time.  Hardly anyone ever tests the hardware
-crypto drivers, as they only work on very specific platforms and are often
-useless anyway.  The software crypto is much better tested and often faster.
-
-I don't think broken drivers like these should even be in the kernel at all.
-
-For now, you should just disable CONFIG_CRYPTO_DEV_ROCKCHIP.
-
-Anyway, the more interesting part of your email is that you pointed out that
-Debian has the crypto self-tests enabled, precisely in order to automatically
-disable buggy drivers like these.
-
-And actually Fedora does this too.
-
-This seems kind of crazy.  But unfortunately, the crypto/ philosophy seems to be
-to enable as many untested and buggy drivers as possible, then rely on them
-being (incompletely) self-tested in production.  So, aparently this is a thing.
-
-But of course the distros won't want to enable the full set of tests, which
-would slow down boot times significantly, but rather only the "fast" ones (as
-they were doing before)...
-
-So I'll send a patch that adds back a kconfig knob to run the fast tests only,
-which I had removed in commit 698de822780f.
-
-- Eric
+BR, Jarkko
