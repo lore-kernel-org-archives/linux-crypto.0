@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047A2198851;
-	Thu, 12 Jun 2025 18:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BCA29C339;
+	Thu, 12 Jun 2025 18:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749753597; cv=none; b=TPyhcTB5kQI+aPKY2ekZQmwLnojjRgcvhL364ngxT8DNv+QxZDzGLZhzM9OnLHOFRoVHDWY3LbX2et1cmAoITuF5Rv4HGtspn94cNSDVKb32aBdZleFJ45h3ddHlNQfxA3TQGn+GCmVSdKyW4DqxO3fmpqAiTC5S35kCY6y9ArE=
+	t=1749754314; cv=none; b=F75/ubCs9twZWFxl/JJxOd6vWOCr7FxK+J+O4zaiBxfVYlDnjFSrwsr80MaipTGPZ+goPmWeM+ZUjfgxdH4J6O0rEYt1VvWWiMTbMQzfefxLNnpnCwdySDgaKPpPt8J/Hmi0N/RMygWyfU3j+phbe7u+kIVLmhMa9V2cJ57TQMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749753597; c=relaxed/simple;
-	bh=AUdHu5W7PllgwG7FXZE4UVUoSuuY/27nAsnL/kArZ+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZtcZdZ9AgsEGH9KBQ2r00WiNYcPm6mRipJQ/mSzyX76iC6fjV2PmkwAJQmN6ZC1snP0Mi0Ikj7zKMLljo2jjdHKcVuVDHiBtP1pir9j5aq6FqG91Zd+vANGGfZRKay3cvOg+S5OfasU/kLrbZMdLKq4jJeoqJu9yrLN0+CXmd+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNAG+B2H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749754314; c=relaxed/simple;
+	bh=ZkGvEl+IdFIcC/SL1FWpdfjNft83b+XO9Ln+/V8agMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kyx2qHbqTzL0r6NlHwKuH/ibEhY/AUNmgTZ4PxcEj/HMzaYqPqnXzjehMxMWIfCBg8qAIdwM+9AbAKx+erTyatAFwz7WsdSkg+zTxK/D7nDE47XZ/FJNuZjnhZ2z0DRwABPSF9RO9hbfQanau3K429CjnmL96ylees4jqDNWv8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awTZrN7J; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNAG+B2H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FC33C4CEEA;
-	Thu, 12 Jun 2025 18:39:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awTZrN7J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD5FFC4CEEE;
+	Thu, 12 Jun 2025 18:51:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749753596;
-	bh=AUdHu5W7PllgwG7FXZE4UVUoSuuY/27nAsnL/kArZ+Q=;
+	s=k20201202; t=1749754313;
+	bh=ZkGvEl+IdFIcC/SL1FWpdfjNft83b+XO9Ln+/V8agMs=;
 	h=From:To:Cc:Subject:Date:From;
-	b=VNAG+B2H9oNbOAlcvLcIFI/SQR5gFPtk2VaxvTDKAgVWc+0L4kyqhTeRDzXVivgvu
-	 c6IhR1lH+hPFFDouAU5p45IVF5zcNKCTeXHXXs0p1yb0WIrLLb+ZcY+BKk6AdT7bjA
-	 P3BmDflhB4WMhroPrr7j7wAePE13EO9/9KX7RMonXroNwBdfsJVNl8C8orU/mr7G6m
-	 h8v+z0oyYw8Bg1Vjp90Q/C7nTecCWfAHsHCBhsNbFBT9UtpL4Vsx7eAwML4ZB5RdnB
-	 2fLUgU0uJhGHsx9akUognutcFpjm+95yjm7vCjC0Tn8FVbY5edjfv5EDHhPgF2d1mC
-	 uZu7d/jfLgKKQ==
+	b=awTZrN7JmtuNuAdpxJPaI4sRKWkSWMZuIvQQO5uCoYwWUd/5cCQN/wuuhcDFXE1ZH
+	 q79e5E7o3YEIt3blnQ8kzHH1xm6b8Er2fyKo9XbDTbPsKqBv6XR3PqvcsgiZGkiRNn
+	 jYRFf6pzwBkiSmSt/bKeqEhXVmIYERH/JwMuYIYYAkNYmYTIL966q6xYKOSbRnNKop
+	 96OddO/7DNDaSG462eSsW4e5EKzUE6Sh+nHs/bKvvIz0I0f0lrF4tsYrsxlWTWixlP
+	 tgsAI3K/jkPSDJ1NT2PeRx4sWYpcrkMo3Ae8VFDuFQ3LaMWtOVyLtgLsZvBnKNP01L
+	 ZiGC7cDUpAf5g==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] lib/crc: explicitly include <linux/export.h>
-Date: Thu, 12 Jun 2025 11:38:52 -0700
-Message-ID: <20250612183852.114878-1-ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld " <Jason@zx2c4.com>
+Subject: [PATCH] lib/crypto: explicitly include <linux/export.h>
+Date: Thu, 12 Jun 2025 11:51:26 -0700
+Message-ID: <20250612185126.159473-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -48,198 +49,650 @@ commit a934a57a42f6 ("scripts/misc-check: check missing #include
 <linux/export.h> when W=1").  While at it, sort the include lists
 alphabetically.
 
+This handles all of lib/crypto/, but not arch/*/lib/crypto/.  The
+exports in arch/*/lib/crypto/ will go away when the code is properly
+integrated into lib/crypto/ as planned.
+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
 
-I'm planning to take this via the crc-next tree.
+This patch is targeting libcrypto-next.
 
- lib/crc/crc-ccitt.c       | 5 +++--
- lib/crc/crc-itu-t.c       | 5 +++--
- lib/crc/crc-t10dif-main.c | 5 +++--
- lib/crc/crc16.c           | 5 +++--
- lib/crc/crc32-main.c      | 1 +
- lib/crc/crc4.c            | 1 +
- lib/crc/crc64-main.c      | 4 +++-
- lib/crc/crc7.c            | 5 +++--
- lib/crc/crc8.c            | 3 ++-
- 9 files changed, 22 insertions(+), 12 deletions(-)
+ lib/crypto/aes.c                | 1 +
+ lib/crypto/aescfb.c             | 9 ++++-----
+ lib/crypto/aesgcm.c             | 7 +++----
+ lib/crypto/arc4.c               | 1 +
+ lib/crypto/blake2s-generic.c    | 9 +++++----
+ lib/crypto/blake2s.c            | 9 +++++----
+ lib/crypto/chacha.c             | 7 ++++---
+ lib/crypto/chacha20poly1305.c   | 8 ++++----
+ lib/crypto/curve25519-generic.c | 1 +
+ lib/crypto/des.c                | 7 +++----
+ lib/crypto/gf128mul.c           | 1 +
+ lib/crypto/libchacha.c          | 7 +++----
+ lib/crypto/memneq.c             | 3 ++-
+ lib/crypto/mpi/mpi-add.c        | 2 ++
+ lib/crypto/mpi/mpi-bit.c        | 2 ++
+ lib/crypto/mpi/mpi-cmp.c        | 2 ++
+ lib/crypto/mpi/mpi-mul.c        | 2 ++
+ lib/crypto/mpi/mpi-pow.c        | 2 ++
+ lib/crypto/mpi/mpi-sub-ui.c     | 2 ++
+ lib/crypto/mpi/mpicoder.c       | 3 ++-
+ lib/crypto/mpi/mpiutil.c        | 2 ++
+ lib/crypto/poly1305-donna32.c   | 3 ++-
+ lib/crypto/poly1305-donna64.c   | 3 ++-
+ lib/crypto/poly1305-generic.c   | 1 +
+ lib/crypto/poly1305.c           | 1 +
+ lib/crypto/sha1.c               | 6 +++---
+ lib/crypto/sha256-generic.c     | 1 +
+ lib/crypto/sha256.c             | 1 +
+ lib/crypto/sm3.c                | 1 +
+ lib/crypto/utils.c              | 3 ++-
+ 30 files changed, 67 insertions(+), 40 deletions(-)
 
-diff --git a/lib/crc/crc-ccitt.c b/lib/crc/crc-ccitt.c
-index 8d2bc419230b3..f8692c3de101a 100644
---- a/lib/crc/crc-ccitt.c
-+++ b/lib/crc/crc-ccitt.c
-@@ -1,10 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0-only
- 
--#include <linux/types.h>
--#include <linux/module.h>
- #include <linux/crc-ccitt.h>
-+#include <linux/export.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
- 
- /*
-  * This mysterious table is just the CRC of each possible byte. It can be
-  * computed using the standard bit-at-a-time methods. The polynomial can
-  * be seen in entry 128, 0x8408. This corresponds to x^0 + x^5 + x^12.
-diff --git a/lib/crc/crc-itu-t.c b/lib/crc/crc-itu-t.c
-index 1d26a1647da53..6e413a290f54f 100644
---- a/lib/crc/crc-itu-t.c
-+++ b/lib/crc/crc-itu-t.c
-@@ -1,13 +1,14 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-  *      crc-itu-t.c
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index eafe14d021f5a..b57fda3460f1b 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -3,10 +3,11 @@
+  * Copyright (C) 2017-2019 Linaro Ltd <ard.biesheuvel@linaro.org>
   */
  
--#include <linux/types.h>
+ #include <crypto/aes.h>
+ #include <linux/crypto.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ #include <linux/unaligned.h>
+ 
+ /*
+  * Emit the sbox as volatile const to prevent the compiler from doing
+diff --git a/lib/crypto/aescfb.c b/lib/crypto/aescfb.c
+index 437613265e14f..5ed46745f55cc 100644
+--- a/lib/crypto/aescfb.c
++++ b/lib/crypto/aescfb.c
+@@ -3,16 +3,15 @@
+  * Minimal library implementation of AES in CFB mode
+  *
+  * Copyright 2023 Google LLC
+  */
+ 
 -#include <linux/module.h>
- #include <linux/crc-itu-t.h>
+-
+-#include <crypto/algapi.h>
+-#include <crypto/aes.h>
+-
+ #include <asm/irqflags.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
 +#include <linux/export.h>
 +#include <linux/module.h>
+ 
+ static void aescfb_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
+ 				 const void *src)
+ {
+ 	unsigned long flags;
+diff --git a/lib/crypto/aesgcm.c b/lib/crypto/aesgcm.c
+index 277824d6b4af7..8ebbf4342f6de 100644
+--- a/lib/crypto/aesgcm.c
++++ b/lib/crypto/aesgcm.c
+@@ -3,17 +3,16 @@
+  * Minimal library implementation of GCM
+  *
+  * Copyright 2022 Google LLC
+  */
+ 
+-#include <linux/module.h>
+-
++#include <asm/irqflags.h>
+ #include <crypto/algapi.h>
+ #include <crypto/gcm.h>
+ #include <crypto/ghash.h>
+-
+-#include <asm/irqflags.h>
++#include <linux/export.h>
++#include <linux/module.h>
+ 
+ static void aesgcm_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
+ 				 const void *src)
+ {
+ 	unsigned long flags;
+diff --git a/lib/crypto/arc4.c b/lib/crypto/arc4.c
+index 838812d182164..4e950e1e66d08 100644
+--- a/lib/crypto/arc4.c
++++ b/lib/crypto/arc4.c
+@@ -6,10 +6,11 @@
+  *
+  * Jon Oberheide <jon@oberheide.org>
+  */
+ 
+ #include <crypto/arc4.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ 
+ int arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len)
+ {
+ 	int i, j = 0, k = 0;
+diff --git a/lib/crypto/blake2s-generic.c b/lib/crypto/blake2s-generic.c
+index 09682136b57c6..9828176a2efec 100644
+--- a/lib/crypto/blake2s-generic.c
++++ b/lib/crypto/blake2s-generic.c
+@@ -7,15 +7,16 @@
+  * Information: https://blake2.net/
+  *
+  */
+ 
+ #include <crypto/internal/blake2s.h>
+-#include <linux/types.h>
+-#include <linux/string.h>
+-#include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/bug.h>
++#include <linux/export.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/types.h>
+ #include <linux/unaligned.h>
+ 
+ static const u8 blake2s_sigma[10][16] = {
+ 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+ 	{ 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 },
+diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+index b0f9a678300b3..f6ec68c3dcdae 100644
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -7,16 +7,17 @@
+  * Information: https://blake2.net/
+  *
+  */
+ 
+ #include <crypto/internal/blake2s.h>
+-#include <linux/types.h>
+-#include <linux/string.h>
++#include <linux/bug.h>
++#include <linux/export.h>
++#include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/init.h>
+-#include <linux/bug.h>
++#include <linux/string.h>
 +#include <linux/types.h>
  
- /* CRC table for the CRC ITU-T V.41 0x1021 (x^16 + x^12 + x^5 + 1) */
- const u16 crc_itu_t_table[256] = {
- 	0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
- 	0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
-diff --git a/lib/crc/crc-t10dif-main.c b/lib/crc/crc-t10dif-main.c
-index 08f1f1042a712..0c595cb0d4c1c 100644
---- a/lib/crc/crc-t10dif-main.c
-+++ b/lib/crc/crc-t10dif-main.c
+ static inline void blake2s_set_lastblock(struct blake2s_state *state)
+ {
+ 	state->f[0] = -1;
+ }
+diff --git a/lib/crypto/chacha.c b/lib/crypto/chacha.c
+index ced87dd31a97f..5962e65c5a9fd 100644
+--- a/lib/crypto/chacha.c
++++ b/lib/crypto/chacha.c
+@@ -3,17 +3,18 @@
+  * The "hash function" used as the core of the ChaCha stream cipher (RFC7539)
+  *
+  * Copyright (C) 2015 Martin Willi
+  */
+ 
++#include <crypto/chacha.h>
++#include <linux/bitops.h>
+ #include <linux/bug.h>
+-#include <linux/kernel.h>
+ #include <linux/export.h>
+-#include <linux/bitops.h>
++#include <linux/export.h>
++#include <linux/kernel.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+-#include <crypto/chacha.h>
+ 
+ static void chacha_permute(struct chacha_state *state, int nrounds)
+ {
+ 	u32 *x = state->x;
+ 	int i;
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index e29eed49a5a14..0b49d6aedefdd 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -5,20 +5,20 @@
+  * This is an implementation of the ChaCha20Poly1305 AEAD construction.
+  *
+  * Information: https://tools.ietf.org/html/rfc8439
+  */
+ 
+-#include <crypto/chacha20poly1305.h>
+ #include <crypto/chacha.h>
++#include <crypto/chacha20poly1305.h>
+ #include <crypto/poly1305.h>
+ #include <crypto/utils.h>
+-
+-#include <linux/unaligned.h>
+-#include <linux/kernel.h>
++#include <linux/export.h>
+ #include <linux/init.h>
++#include <linux/kernel.h>
+ #include <linux/mm.h>
+ #include <linux/module.h>
++#include <linux/unaligned.h>
+ 
+ static void chacha_load_key(u32 *k, const u8 *in)
+ {
+ 	k[0] = get_unaligned_le32(in);
+ 	k[1] = get_unaligned_le32(in + 4);
+diff --git a/lib/crypto/curve25519-generic.c b/lib/crypto/curve25519-generic.c
+index de7c99172fa25..f8aa70c9f5598 100644
+--- a/lib/crypto/curve25519-generic.c
++++ b/lib/crypto/curve25519-generic.c
+@@ -8,10 +8,11 @@
+  *
+  * Information: https://cr.yp.to/ecdh.html
+  */
+ 
+ #include <crypto/curve25519.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ 
+ const u8 curve25519_null_point[CURVE25519_KEY_SIZE] __aligned(32) = { 0 };
+ const u8 curve25519_base_point[CURVE25519_KEY_SIZE] __aligned(32) = { 9 };
+ 
+diff --git a/lib/crypto/des.c b/lib/crypto/des.c
+index d3423b34a8e9b..a906070136dc3 100644
+--- a/lib/crypto/des.c
++++ b/lib/crypto/des.c
+@@ -5,25 +5,24 @@
+  * DES & Triple DES EDE Cipher Algorithms.
+  *
+  * Copyright (c) 2005 Dag Arne Osvik <da@osvik.no>
+  */
+ 
++#include <crypto/des.h>
++#include <crypto/internal/des.h>
+ #include <linux/bitops.h>
+ #include <linux/compiler.h>
+ #include <linux/crypto.h>
+ #include <linux/errno.h>
++#include <linux/export.h>
+ #include <linux/fips.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/types.h>
+-
+ #include <linux/unaligned.h>
+ 
+-#include <crypto/des.h>
+-#include <crypto/internal/des.h>
+-
+ #define ROL(x, r) ((x) = rol32((x), (r)))
+ #define ROR(x, r) ((x) = ror32((x), (r)))
+ 
+ /* Lookup tables for key expansion */
+ 
+diff --git a/lib/crypto/gf128mul.c b/lib/crypto/gf128mul.c
+index fbe72cb3453a5..2a34590fe3f10 100644
+--- a/lib/crypto/gf128mul.c
++++ b/lib/crypto/gf128mul.c
+@@ -47,10 +47,11 @@
+  This file provides fast multiplication in GF(2^128) as required by several
+  cryptographic authentication modes
+ */
+ 
+ #include <crypto/gf128mul.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ 
+ #define gf128mul_dat(q) { \
+diff --git a/lib/crypto/libchacha.c b/lib/crypto/libchacha.c
+index ebcca381e248a..26862ad90a964 100644
+--- a/lib/crypto/libchacha.c
++++ b/lib/crypto/libchacha.c
+@@ -3,16 +3,15 @@
+  * The ChaCha stream cipher (RFC7539)
+  *
+  * Copyright (C) 2015 Martin Willi
+  */
+ 
+-#include <linux/kernel.h>
+-#include <linux/export.h>
+-#include <linux/module.h>
+-
+ #include <crypto/algapi.h> // for crypto_xor_cpy
+ #include <crypto/chacha.h>
++#include <linux/export.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
+ 
+ void chacha_crypt_generic(struct chacha_state *state, u8 *dst, const u8 *src,
+ 			  unsigned int bytes, int nrounds)
+ {
+ 	/* aligned to potentially speed up crypto_xor() */
+diff --git a/lib/crypto/memneq.c b/lib/crypto/memneq.c
+index a2afd10349c92..44daacb8cb513 100644
+--- a/lib/crypto/memneq.c
++++ b/lib/crypto/memneq.c
+@@ -57,13 +57,14 @@
+  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#include <linux/unaligned.h>
+ #include <crypto/algapi.h>
++#include <linux/export.h>
+ #include <linux/module.h>
++#include <linux/unaligned.h>
+ 
+ /* Generic path for arbitrary size */
+ static inline unsigned long
+ __crypto_memneq_generic(const void *a, const void *b, size_t size)
+ {
+diff --git a/lib/crypto/mpi/mpi-add.c b/lib/crypto/mpi/mpi-add.c
+index 3015140d48602..c0375c1672fa3 100644
+--- a/lib/crypto/mpi/mpi-add.c
++++ b/lib/crypto/mpi/mpi-add.c
+@@ -9,10 +9,12 @@
+  *	 way the data is stored; this is to support the abstraction
+  *	 of an optional secure memory allocation which may be used
+  *	 to avoid revealing of sensitive data due to paging etc.
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ 
+ int mpi_add(MPI w, MPI u, MPI v)
+ {
+ 	mpi_ptr_t wp, up, vp;
+diff --git a/lib/crypto/mpi/mpi-bit.c b/lib/crypto/mpi/mpi-bit.c
+index 934d813113606..b3d0e7ddbc03d 100644
+--- a/lib/crypto/mpi/mpi-bit.c
++++ b/lib/crypto/mpi/mpi-bit.c
+@@ -16,10 +16,12 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ #include "longlong.h"
+ 
+ #define A_LIMB_1 ((mpi_limb_t) 1)
+ 
+diff --git a/lib/crypto/mpi/mpi-cmp.c b/lib/crypto/mpi/mpi-cmp.c
+index ceaebe181cd70..b42929296bcef 100644
+--- a/lib/crypto/mpi/mpi-cmp.c
++++ b/lib/crypto/mpi/mpi-cmp.c
+@@ -16,10 +16,12 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ 
+ int mpi_cmp_ui(MPI u, unsigned long v)
+ {
+ 	mpi_limb_t limb = v;
+diff --git a/lib/crypto/mpi/mpi-mul.c b/lib/crypto/mpi/mpi-mul.c
+index 7e6ff1ce3e9b6..d79f186ad90bc 100644
+--- a/lib/crypto/mpi/mpi-mul.c
++++ b/lib/crypto/mpi/mpi-mul.c
+@@ -9,10 +9,12 @@
+  *	 way the data is stored; this is to support the abstraction
+  *	 of an optional secure memory allocation which may be used
+  *	 to avoid revealing of sensitive data due to paging etc.
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ 
+ int mpi_mul(MPI w, MPI u, MPI v)
+ {
+ 	mpi_size_t usize, vsize, wsize;
+diff --git a/lib/crypto/mpi/mpi-pow.c b/lib/crypto/mpi/mpi-pow.c
+index 67fbd4c2503d0..9e695a3bda3a0 100644
+--- a/lib/crypto/mpi/mpi-pow.c
++++ b/lib/crypto/mpi/mpi-pow.c
+@@ -11,12 +11,14 @@
+  *	 to avoid revealing of sensitive data due to paging etc.
+  *	 The GNU MP Library itself is published under the LGPL;
+  *	 however I decided to publish this code under the plain GPL.
+  */
+ 
++#include <linux/export.h>
+ #include <linux/sched.h>
+ #include <linux/string.h>
++
+ #include "mpi-internal.h"
+ #include "longlong.h"
+ 
+ /****************
+  * RES = BASE ^ EXP mod MOD
+diff --git a/lib/crypto/mpi/mpi-sub-ui.c b/lib/crypto/mpi/mpi-sub-ui.c
+index b41b082b5f3e3..0edcdbd24833a 100644
+--- a/lib/crypto/mpi/mpi-sub-ui.c
++++ b/lib/crypto/mpi/mpi-sub-ui.c
+@@ -30,10 +30,12 @@
+  * You should have received copies of the GNU General Public License and the
+  * GNU Lesser General Public License along with the GNU MP Library.  If not,
+  * see https://www.gnu.org/licenses/.
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ 
+ int mpi_sub_ui(MPI w, MPI u, unsigned long vval)
+ {
+ 	if (u->nlimbs == 0) {
+diff --git a/lib/crypto/mpi/mpicoder.c b/lib/crypto/mpi/mpicoder.c
+index dde01030807de..47f6939599b33 100644
+--- a/lib/crypto/mpi/mpicoder.c
++++ b/lib/crypto/mpi/mpicoder.c
+@@ -17,12 +17,13 @@
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+  */
+ 
+ #include <linux/bitops.h>
+-#include <linux/count_zeros.h>
+ #include <linux/byteorder/generic.h>
++#include <linux/count_zeros.h>
++#include <linux/export.h>
+ #include <linux/scatterlist.h>
+ #include <linux/string.h>
+ #include "mpi-internal.h"
+ 
+ #define MAX_EXTERN_MPI_BITS 16384
+diff --git a/lib/crypto/mpi/mpiutil.c b/lib/crypto/mpi/mpiutil.c
+index 979ece5a81d25..7f2db830f4043 100644
+--- a/lib/crypto/mpi/mpiutil.c
++++ b/lib/crypto/mpi/mpiutil.c
+@@ -16,10 +16,12 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+  */
+ 
++#include <linux/export.h>
++
+ #include "mpi-internal.h"
+ 
+ /****************
+  * Note:  It was a bad idea to use the number of limbs to allocate
+  *	  because on a alpha the limbs are large but we normally need
+diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.c
+index 0a4a2d99e3654..b66131b3f6d4b 100644
+--- a/lib/crypto/poly1305-donna32.c
++++ b/lib/crypto/poly1305-donna32.c
 @@ -4,13 +4,14 @@
   *
-  * Copyright (c) 2007 Oracle Corporation.  All rights reserved.
-  * Written by Martin K. Petersen <martin.petersen@oracle.com>
+  * This is based in part on Andrew Moon's poly1305-donna, which is in the
+  * public domain.
   */
  
--#include <linux/types.h>
--#include <linux/module.h>
- #include <linux/crc-t10dif.h>
++#include <crypto/internal/poly1305.h>
 +#include <linux/export.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
+ #include <linux/kernel.h>
+ #include <linux/unaligned.h>
+-#include <crypto/internal/poly1305.h>
  
- /*
-  * Table generated using the following polynomial:
-  * x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-  * gt: 0x8bb7
-diff --git a/lib/crc/crc16.c b/lib/crc/crc16.c
-index 9c71eda9bf4b9..931660a8cbaaa 100644
---- a/lib/crc/crc16.c
-+++ b/lib/crc/crc16.c
-@@ -1,13 +1,14 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-  *      crc16.c
-  */
- 
--#include <linux/types.h>
--#include <linux/module.h>
- #include <linux/crc16.h>
-+#include <linux/export.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
- 
- /** CRC table for the CRC-16. The poly is 0x8005 (x^16 + x^15 + x^2 + 1) */
- static const u16 crc16_table[256] = {
- 	0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
- 	0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
-diff --git a/lib/crc/crc32-main.c b/lib/crc/crc32-main.c
-index b86ee66075d0e..70c4ef170526d 100644
---- a/lib/crc/crc32-main.c
-+++ b/lib/crc/crc32-main.c
-@@ -23,10 +23,11 @@
-  */
- 
- /* see: Documentation/staging/crc32.rst for a description of algorithms */
- 
- #include <linux/crc32.h>
-+#include <linux/export.h>
- #include <linux/module.h>
- #include <linux/types.h>
- 
- #include "crc32table.h"
- 
-diff --git a/lib/crc/crc4.c b/lib/crc/crc4.c
-index e7e1779c67d91..8e83fbe60bdc9 100644
---- a/lib/crc/crc4.c
-+++ b/lib/crc/crc4.c
-@@ -2,10 +2,11 @@
- /*
-  * crc4.c - simple crc-4 calculations.
-  */
- 
- #include <linux/crc4.h>
-+#include <linux/export.h>
- #include <linux/module.h>
- 
- static const uint8_t crc4_tab[] = {
- 	0x0, 0x7, 0xe, 0x9, 0xb, 0xc, 0x5, 0x2,
- 	0x1, 0x6, 0xf, 0x8, 0xa, 0xd, 0x4, 0x3,
-diff --git a/lib/crc/crc64-main.c b/lib/crc/crc64-main.c
-index e4a6d879e84c3..aef8282b63fba 100644
---- a/lib/crc/crc64-main.c
-+++ b/lib/crc/crc64-main.c
-@@ -31,13 +31,15 @@
-  *
-  * Copyright 2018 SUSE Linux.
-  *   Author: Coly Li <colyli@suse.de>
-  */
- 
-+#include <linux/crc64.h>
-+#include <linux/export.h>
- #include <linux/module.h>
- #include <linux/types.h>
--#include <linux/crc64.h>
-+
- #include "crc64table.h"
- 
- static inline __maybe_unused u64
- crc64_be_generic(u64 crc, const u8 *p, size_t len)
+ void poly1305_core_setkey(struct poly1305_core_key *key,
+ 			  const u8 raw_key[POLY1305_BLOCK_SIZE])
  {
-diff --git a/lib/crc/crc7.c b/lib/crc/crc7.c
-index 8dd991cc61146..46b95d7ac6ce0 100644
---- a/lib/crc/crc7.c
-+++ b/lib/crc/crc7.c
-@@ -1,13 +1,14 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-  *      crc7.c
-  */
- 
--#include <linux/types.h>
--#include <linux/module.h>
- #include <linux/crc7.h>
-+#include <linux/export.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
- 
- /*
-  * Table for CRC-7 (polynomial x^7 + x^3 + 1).
-  * This is a big-endian CRC (msbit is highest power of x),
-  * aligned so the msbit of the byte is the x^6 coefficient
-diff --git a/lib/crc/crc8.c b/lib/crc/crc8.c
-index 1ad8e501d9b69..329c52158c455 100644
---- a/lib/crc/crc8.c
-+++ b/lib/crc/crc8.c
-@@ -14,12 +14,13 @@
-  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-  */
- 
- #define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
- 
--#include <linux/module.h>
- #include <linux/crc8.h>
-+#include <linux/export.h>
-+#include <linux/module.h>
- #include <linux/printk.h>
- 
- /**
-  * crc8_populate_msb - fill crc table for given polynomial in reverse bit order.
+ 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+diff --git a/lib/crypto/poly1305-donna64.c b/lib/crypto/poly1305-donna64.c
+index 530287531b2ee..8a72a5a849446 100644
+--- a/lib/crypto/poly1305-donna64.c
++++ b/lib/crypto/poly1305-donna64.c
+@@ -4,13 +4,14 @@
   *
+  * This is based in part on Andrew Moon's poly1305-donna, which is in the
+  * public domain.
+  */
+ 
++#include <crypto/internal/poly1305.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/unaligned.h>
+-#include <crypto/internal/poly1305.h>
+ 
+ void poly1305_core_setkey(struct poly1305_core_key *key,
+ 			  const u8 raw_key[POLY1305_BLOCK_SIZE])
+ {
+ 	u64 t0, t1;
+diff --git a/lib/crypto/poly1305-generic.c b/lib/crypto/poly1305-generic.c
+index a73f700fa1fb8..71a16c5c538b4 100644
+--- a/lib/crypto/poly1305-generic.c
++++ b/lib/crypto/poly1305-generic.c
+@@ -6,10 +6,11 @@
+  *
+  * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
+  */
+ 
+ #include <crypto/internal/poly1305.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ 
+ void poly1305_block_init_generic(struct poly1305_block_state *desc,
+ 				 const u8 raw_key[POLY1305_BLOCK_SIZE])
+diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
+index 5f2f2af3b59f8..a6dc182b6c22d 100644
+--- a/lib/crypto/poly1305.c
++++ b/lib/crypto/poly1305.c
+@@ -7,10 +7,11 @@
+  * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
+  */
+ 
+ #include <crypto/internal/blockhash.h>
+ #include <crypto/internal/poly1305.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ 
+diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
+index ebb60519ae939..6d809c3088be3 100644
+--- a/lib/crypto/sha1.c
++++ b/lib/crypto/sha1.c
+@@ -4,16 +4,16 @@
+  * and to avoid unnecessary copies into the context array.
+  *
+  * This was based on the git SHA1 implementation.
+  */
+ 
+-#include <linux/kernel.h>
++#include <crypto/sha1.h>
++#include <linux/bitops.h>
+ #include <linux/export.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/bitops.h>
+ #include <linux/string.h>
+-#include <crypto/sha1.h>
+ #include <linux/unaligned.h>
+ 
+ /*
+  * If you have 32 registers or more, the compiler can (and should)
+  * try to change the array[] accesses into registers. However, on
+diff --git a/lib/crypto/sha256-generic.c b/lib/crypto/sha256-generic.c
+index a16ad4f25ebb7..2968d95d04038 100644
+--- a/lib/crypto/sha256-generic.c
++++ b/lib/crypto/sha256-generic.c
+@@ -10,10 +10,11 @@
+  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+  * Copyright (c) 2014 Red Hat Inc.
+  */
+ 
+ #include <crypto/internal/sha2.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ 
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 107e5162507a7..6bfa4ae8dfb59 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -11,10 +11,11 @@
+  * Copyright (c) 2014 Red Hat Inc.
+  */
+ 
+ #include <crypto/internal/blockhash.h>
+ #include <crypto/internal/sha2.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ 
+ /*
+diff --git a/lib/crypto/sm3.c b/lib/crypto/sm3.c
+index efff0e267d84d..c6b9ad8a3ac66 100644
+--- a/lib/crypto/sm3.c
++++ b/lib/crypto/sm3.c
+@@ -7,10 +7,11 @@
+  * Copyright (C) 2017 Gilad Ben-Yossef <gilad@benyossef.com>
+  * Copyright (C) 2021 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+  */
+ 
+ #include <crypto/sm3.h>
++#include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ 
+diff --git a/lib/crypto/utils.c b/lib/crypto/utils.c
+index 87da2a6dd161e..dec381d5e9065 100644
+--- a/lib/crypto/utils.c
++++ b/lib/crypto/utils.c
+@@ -3,13 +3,14 @@
+  * Crypto library utility functions
+  *
+  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
+  */
+ 
+-#include <linux/unaligned.h>
+ #include <crypto/utils.h>
++#include <linux/export.h>
+ #include <linux/module.h>
++#include <linux/unaligned.h>
+ 
+ /*
+  * XOR @len bytes from @src1 and @src2 together, writing the result to @dst
+  * (which may alias one of the sources).  Don't call this directly; call
+  * crypto_xor() or crypto_xor_cpy() instead.
 
-base-commit: 7234baeec076d4c2ac05d160ed8cdb2f2d033069
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
 -- 
 2.49.0
 
