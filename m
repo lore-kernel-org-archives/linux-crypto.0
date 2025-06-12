@@ -1,159 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52C919049B
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Jun 2025 14:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAFE1B0416;
+	Thu, 12 Jun 2025 15:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749737448; cv=none; b=sX5aKMOWX6Kn4hsefldBJn/1odzRbqkbeAAgyvS1phy8Cn7v2Bfr2Uvd+WWWYwSlzT9OVyeqNjxkbL7XbXKyF/+TQ0F08Uz6CkGkj+1CcvKheoHl9gXVuAm8X4LpvG9ovIe8f6jKrrK+IBbi2ZJ52PB/1hyIoyU+XyYnRuoEdM0=
+	t=1749743868; cv=none; b=YBVBbOfgsUnIZmknKmtpNWGTOjIKLY/kEf9gda5PfGm4hPIHrM6h+RbRHAOIY2L+cAyGU7PNI1q10q9HCmkAj0LZCq50ZFxKePdKUkE1IpithLZx1sQcUr+2lAON+8wW0jYHvtDy8w5JYDnqVWe7yKtdgZ1uoEXlczTxEKmUqlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749737448; c=relaxed/simple;
-	bh=rx2127rFnhUhdp1EywtDCGhrT9qHfuVS0rW2DH6MNzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SJDPyBT55jSL9t5YLzuQy6ebozYnP/4dPo5uRbdXmyhR0oI1RBnLfJm5Q6KcUFpUtDEUd+Yxt3hyyMFLRFJTFk6/W3ioazDNjCnt5D1HiT76wZj6+54Z3uM729MW2votsyq7TYObwzVnTIEr2LkNqyXBfFyGX3oHh90Od3DsL9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bIzsRces; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749743868; c=relaxed/simple;
+	bh=I+yj5RaeRFm4XV7nYay72iV3VtIk9fY58cl2ElhN9GY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oOKhmzG43I3qO2lwg4hVwPF+3YhQShu0tpZ3mhYYGxZFT4eOaxkZxOkzqE6YmRg2AJR1ZriaMyqEAu7MwEgG+whGfGGRlUTTe0E85Cj7lRrlqizyG1PgwSmAdyiM2isWhXe8GHGk9QAo0+HOEnbyt0PTztQp4DDiLPhJvB1mZJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kj3syDB7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIzsRces"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749737445;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P1JMQZmzbIb6utls8iGRZ0NkyFLiqg1p9Vq7xmlV1lU=;
-	b=bIzsRcesHUlYToGYVHhBpSp1jpO2VduWog1Pg4zmQ8Zi/g+/0a6+5REPIiFDTLtiPksuqk
-	2C3h92mvx+3nQwyAX/hwBqKoYenLqE8YGcDsp9t3cONOfQd6NEQAQA7nvJ0Hr79ZEj87VE
-	RfFiF5mCswV+HpLfy01kCZOd3KX9+10=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-486-ubVQ-dTQNmGrfAFCq5kbsw-1; Thu,
- 12 Jun 2025 10:10:44 -0400
-X-MC-Unique: ubVQ-dTQNmGrfAFCq5kbsw-1
-X-Mimecast-MFC-AGG-ID: ubVQ-dTQNmGrfAFCq5kbsw_1749737441
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F7DE1955F42;
-	Thu, 12 Jun 2025 14:10:41 +0000 (UTC)
-Received: from [192.168.37.1] (unknown [10.22.58.9])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A98121956050;
-	Thu, 12 Jun 2025 14:10:36 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
- Steve French <sfrench@samba.org>, Chuck Lever <chuck.lever@oracle.com>,
- Mimi Zohar <zohar@linux.ibm.com>, Paulo Alcantara <pc@manguebit.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Jeffrey Altman <jaltman@auristor.com>, hch@infradead.org,
- linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] Keyrings: How to make them more useful
-Date: Thu, 12 Jun 2025 10:10:34 -0400
-Message-ID: <D33BA76E-E2D3-42C8-A983-A733ECD71CCE@redhat.com>
-In-Reply-To: <462886.1749731810@warthog.procyon.org.uk>
-References: <462886.1749731810@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kj3syDB7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E397C4CEEB;
+	Thu, 12 Jun 2025 15:57:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749743865;
+	bh=I+yj5RaeRFm4XV7nYay72iV3VtIk9fY58cl2ElhN9GY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kj3syDB7EWGXmmPQEn6faQJJCP8Zx4/ZbWfx7JOkjzRF0b8VXypiFh+vqdaR8hl+p
+	 ioh5TDwlCz6GFe+gIMxEfYVqfpLapRk1/3/fdNPt56AIGQrTtOVSuQlX6VXMXgbPgz
+	 1H1mS98XcOEm0C/62bgT59L+f+uAFOvphLCOqS1N5Ff2+I9VbhNd/R7nmixjuliDT+
+	 0ECTov3sUQ13ituxxnl50KKaOAe7VR/jHdHqVUmefGy91C/DN+y0FzI6a5iphvbODD
+	 q/NVOs5UaO1MPd6POp4EdPrhAFHt+ixI/0LAvQGsIFBVVj8kPrXJc2LfkO+5YDX4IB
+	 YlD+RzbQxcOtg==
+Date: Thu, 12 Jun 2025 15:57:43 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Simon Richter <Simon.Richter@hogyros.de>, linux-fscrypt@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, ceph-devel@vger.kernel.org
+Subject: Re: [PATCH] fscrypt: don't use hardware offload Crypto API drivers
+Message-ID: <20250612155743.GA3529549@google.com>
+References: <20250611205859.80819-1-ebiggers@kernel.org>
+ <7f63be76-289b-4a99-b802-afd72e0512b8@hogyros.de>
+ <20250612005914.GA546455@google.com>
+ <20250612062521.GA1838@sol>
+ <aEqU0iU1tBrLEYUq@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aEqU0iU1tBrLEYUq@gcabiddu-mobl.ger.corp.intel.com>
 
-On 12 Jun 2025, at 8:36, David Howells wrote:
+On Thu, Jun 12, 2025 at 09:50:26AM +0100, Giovanni Cabiddu wrote:
+> On Wed, Jun 11, 2025 at 11:25:21PM -0700, Eric Biggers wrote:
+> 
+> ...
+> 
+> > FWIW, here's what happens if you try to use the Intel QAT driver with dm-crypt:
+> > https://lore.kernel.org/r/CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com/
+> 
+> /s/happens/happened/
+> 
+> ... and it got fixed
+> https://lore.kernel.org/all/20220506082327.21605-1-giovanni.cabiddu@intel.com/
 
-> Hi Jarkko, Steve, Chuck, Mimi, et al.,
->
-> I think work needs to be done on the keyrings subsystem to make them more
-> useful for network filesystems and other kernel services such as TLS and
-> crypto.
->
-> There are a number of issues that I think need addressing:
->
->  (1) One of the flaws in the initial design is that whilst keys have a type
->      (which is necessary), this has to be specified as part of the lookup or
->      the search, which is overly restrictive.
->
->      It probably would have been better to search by description alone and
->      then, if a key is found, have any type of key with that description
->      returned and let the app/service investigate the key to find the type.
->
->      Now, this is still possible to implement on top of the existing API: just
->      allow a NULL type to be passed in - but we might need some way to
->      enumerate all the keys with that description, but of different types.
->      Possibly, the search function should return all the matching keys.
->
->      Possibly, within the kernel, for each keyring, all the keys of the same
->      description can be stored within a group structure, and the search
->      returns the group.  This could also have the added benefit of maybe
->      making it easier to handle updates.
->
->  (2) For certain applications, keys need versioning - and we need to be able
->      to get access to older versions (at least to some extent) of the keys.
->      An example of this is cifs where (if I understand it correctly) the key
->      version gets cranked, but not all servers may have caught up yet, so we
->      need to be able to try the keys in descending order of version.
->
->      This could also work within the group idea mentioned above.
->
->  (3) For certain applications, such as AFS and AF_RXRPC, we may need to be
->      able to keep a number of keys around that have the same description
->      (e.g. cell name) and basic type (e.g. rxrpc) and version, but that have
->      different crypto types (e.g. Rx security classes and Kerberos types, such
->      as RxGK+aes256-cts-hmac-sha1-96, RxGK+aes128-cts-hmac-sha256-128 or
->      RxKAD) as different servers in the same cell might not support all or we
->      might be implementing a server that is offering multiple crypto types.
->
->      So we might need a "subtype" as well as a version.
->
->  (4) I think the keyring ACLs idea need to be revived.  We have a whole bunch
->      of different keyrings, each with a specific 'domain' of usage for the
->      keys contained therein for checking signatures on things.  Can we reduce
->      this to one keyring and use ACLs to declare the specific purposes for
->      which a key may be used or the specific tasks that may use it?  Use
->      special subject IDs (ie. not simply UIDs/GIDs) to mark this.
->
->  (5) Replace the upcall mechanism with a listenable service channel, so that a
->      userspace service (possibly part of systemd or driven from systemd) can
->      listen on it and perform key creation/maintenance services.
+But it reached users in the first place, including stable kernels.  And
+apparently the issues were going on for years and were known to the authors of
+the driver
+(https://lore.kernel.org/linux-crypto/91fe9f87-54d7-4140-4d1a-eac8e2081a7c@gmail.com/).
 
->      From previous discussions with the systemd maintainer, it would be a lot
->      easier for them to manage if the key is attached to a file descriptor -
->      at least for the duration of the maintenance operation.
->
->      Further, this needs to be containerised in some way so that requests from
->      different containers can be handled separately - and can be
->      distinguished.
+We simply don't have issues like this with the AES-NI or VAES XTS code.
 
-Indeed one challenge on this front is configuring how to stitch together the
-various callers and recievers especially when one wants an upcall from one
-set of namespaces to be serviced within another.
+And separately, QAT was reported to be much slower than AES-NI for synchronous use
+(https://lore.kernel.org/linux-crypto/0171515-7267-624-5a22-238af829698f@redhat.com/)
 
-I had previously posted some work in this area that fleshes out the idea of
-a "key agent" which is a userspace process that can receive a notification
-to instantiate a key.  The nice part (IMO) of this idea is that the keyagent
-is represented by a key itself, so the channel is available to any process
-that has the keyagent key in their keyrings.
+Later, I added VAES accelerated AES-XTS code which is over twice as fast as
+AES-NI on the latest Intel CPUs, so that likely widened the gap even more.
 
-This allows a system to have a single keyagent for all processes/namespaces
-for a particular key type, or to build a more granular configuration where
-agents are confined within the same (or different) namespaces as the calling
-process.
+Yet, the QAT driver registers its "xts(aes)" implementation with priority 4001,
+compared to priority 800 for the VAES accelerated one.  So the QAT one is the
+one that will be used by fscrypt!
 
-I'd be happy to continue work on this front, since long-term it would allow
-us to convert various NFS upcall mechanisms such that NFS access within a
-container wouldn't require duplicated gssd/svcgssd/idmapper userspace
-processes in every container if all the system needed was to use a single
-global instance.  It would also allow the partitioning of secure
-cryptographic material (like keytabs and certificate secrets) from
-containers that might still want to use NFS, but not divulge those secrets
-to the processes in that container.
+That seems like a major issue even just from a performance perspective.
 
-Ben
+I expect this patch will significantly improve fscrypt performance on Intel
+servers that have QAT.
 
+- Eric
