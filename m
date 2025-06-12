@@ -1,95 +1,68 @@
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8731A9B32;
-	Thu, 12 Jun 2025 10:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3922828032E;
+	Thu, 12 Jun 2025 10:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749723374; cv=none; b=jjRB1g15dgzMtyi0MDtn2256yfYlUUrc64Ub3oqqFIem1YBC0QQ4O0ARDSiDyejgN8cCOfetcIYuD1lsLJRcqm4UE5dibsJGkWB2OvGAWzp9Q8zcgMGs+1hhnbRQ6wTWxgnm9CBrEplGD0TFjqAJtUP2cE7Y/f7564XLUO567nk=
+	t=1749724356; cv=none; b=HR9vd4/OWcXL9bplXwWjJ2oD9+HN8DI+PtDVGZJCu6v05tPbnIch8bLPM40V1C3fT8+RuT4b1YVjLHOvlJDUNsHBCxzWHVmrfC1v7wQ4Taj7CO6ZvjpUPVGkzGUeOczQxRobRIEzSJVvnDj9gfrf2xrtlnYkZSSpNTYKqmG5SVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749723374; c=relaxed/simple;
-	bh=U8Ib+vhgknJZUGujsTIacxWsiwarvISy9tV/JoJj3mE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=In2mZ4Oy0db9/gKLpVZqHlMGPaumCHAyVA/DsHEcaabbPBX5YxNH/eg3Knnm8H8Ro8PtXK9U64od2nRuOZxcICFeYUSFSrMz+g5MlV3HW3NgFg9jWBht0EelHQQMgqxwGrZSIqQBRF44Uuy3tLTQxaGGV5rMuziE01Vxrku/knI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vlgNQb4s; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1749724356; c=relaxed/simple;
+	bh=YMnRaTUFakFJLPvl7q3vCoMeTDEm9FrrLwyT1W/42nk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QWGyARZ/hqdTuX+eYNO+aUBuR5YhUiifhjERTQXoGJ6cdvpmMvFEx1tK3rR4TcuOc2TCQjYNM/VagVGQi8o0gNab0pFfcjMA4ddmA7KNpupwpc5p1BIsXULW5erHBowMapr7Hm/wOwFAfZEkulbv5DvcPCAhIrjx/fhJ3TXcvCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Adhe+qAt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vlgNQb4s"
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55CAFxWp2886298;
-	Thu, 12 Jun 2025 05:15:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749723359;
-	bh=w1BvpyF39z5hMo5/VBX/0oCDLHJPdp2C+Dbe2C2TKsM=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=vlgNQb4seNrwaouEv9+opWOU/k/iDzdQY6kL8THh/EMZ6I61r9DMp4NfWInqBpHFq
-	 Dfzbx2R4JFIEIpktNhmtGodgG4x3x7ipw9MEAGtiXlaDx/ImOhNrsmhcG85R8eFx0N
-	 0qTNfc8AqFb1qzhocK6DRFVnnFdCrpOMuPkPynkA=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55CAFxsK3562020
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 12 Jun 2025 05:15:59 -0500
-Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 12
- Jun 2025 05:15:58 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 12 Jun 2025 05:15:58 -0500
-Received: from [172.24.227.40] (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55CAFtXR1834025;
-	Thu, 12 Jun 2025 05:15:55 -0500
-Message-ID: <b27eab62-cfe0-4dfc-8429-ea464eef9e6f@ti.com>
-Date: Thu, 12 Jun 2025 15:45:54 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Adhe+qAt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B59C7C4CEEA;
+	Thu, 12 Jun 2025 10:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749724356;
+	bh=YMnRaTUFakFJLPvl7q3vCoMeTDEm9FrrLwyT1W/42nk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Adhe+qAttboQeqrW31YXMRcpFEw+Cfjk/7Dd3/UlW2It87CK+vAw8qc/6foHLRNyV
+	 k7clu4nQLf4qyHiFyBAkROiQ71bragstzHznsC1EFlSU3kX0B2mIIUwkTe5DgfNxtO
+	 ZSzFeJyAaK53rmb66VND8EZguN+12wAIe1ZWu7IWzjZL3V8VA64/ElHHnxEbl6DPPB
+	 WO/pWpTY3ky2JQfCfKvqKvwvuzKX5Na2ls9bCTaL2LfsC16MWqY4xsQIERQZWRqAJt
+	 QI1CGvBzv2vYovhuI/2UsIdAzmkmZUFdQeU/ipvF8p+VmvSjFsXAJRJun08ICb6VaC
+	 LLFf5mqV/c41w==
+Date: Thu, 12 Jun 2025 13:32:32 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Paul Moore <paul@paul-moore.com>, David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KEYS: Invert FINAL_PUT bit
+Message-ID: <aEqswAc8nkXVAJH7@kernel.org>
+References: <301015.1748434697@warthog.procyon.org.uk>
+ <CAHC9VhRn=EGu4+0fYup1bGdgkzWvZYpMPXKoARJf2N+4sy9g2w@mail.gmail.com>
+ <CAHk-=wjY7b0gDcXiecsimfmOgs0q+aUp_ZxPHvMfdmAG_Ex_1Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
- (ECB, CBC)
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Kamlesh Gurudasani
-	<kamlesh@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Praneeth Bajjuri
-	<praneeth@ti.com>,
-        Manorit Chawdhry <m-chawdhry@ti.com>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, Vinod Koul
-	<vkoul@kernel.org>,
-        <dmaengine@vger.kernel.org>
-References: <20250603124217.957116-1-t-pratham@ti.com>
- <20250603124217.957116-3-t-pratham@ti.com>
- <aElSKF88vBsIOJMV@gondor.apana.org.au>
-Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <aElSKF88vBsIOJMV@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjY7b0gDcXiecsimfmOgs0q+aUp_ZxPHvMfdmAG_Ex_1Q@mail.gmail.com>
 
-On 11/06/25 15:23, Herbert Xu wrote:
-> On Tue, Jun 03, 2025 at 06:07:29PM +0530, T Pratham wrote:
->>
->> +	// Need to do a timeout to ensure finalise gets called if DMA callback fails for any reason
->> +	ret = wait_for_completion_timeout(&rctx->aes_compl, msecs_to_jiffies(DTHE_DMA_TIMEOUT_MS));
+On Wed, Jun 11, 2025 at 10:50:46AM -0700, Linus Torvalds wrote:
+> On Tue, 10 Jun 2025 at 17:23, Paul Moore <paul@paul-moore.com> wrote:
+> >
+> > It doesn't look like this has made its way to Linus.
 > 
-> This doesn't look safe.  What if the callback is invoked after a
-> timeout? That would be a UAF.
+> Bah. It "made it" in the sense that sure, it's in my inbox.
 > 
-> Does the DMA engine provide any timeout mechanism? If not, then
-> you could do it with a delayed work struct.  Just make sure that
-> you cancel the work struct in the normal path callback.  Vice versa
-> you need to terminate the DMA job in the timeout work struct.
+> But particularly during the the early merge window I end up heavily
+> limiting my emails to pull requests. And then it ended up composted at
+> the bottom of my endless pile of emails.
 > 
-> Cheers,
+> I guess I can still take it if people just say "do it".
+> 
+>             Linus
 
-Calling dma_terminate_sync() here should suffice I presume? I'll update the code accordingly.
++1 for picking it.
 
-Regards
-T Pratham <t-pratham@ti.com>
+BR, Jarkko
