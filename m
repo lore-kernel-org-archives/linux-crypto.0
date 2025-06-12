@@ -1,89 +1,245 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949B22AE6D;
-	Thu, 12 Jun 2025 18:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047A2198851;
+	Thu, 12 Jun 2025 18:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749752853; cv=none; b=e3mXLTMcycQTg5Y9KuovOX0LpUC/LEGi7nfgSVQzhneSHuUoPIRt/xyjiuekjjmvoMn5aB7vnPNirVvW6eeznodSM72RGU6zDPEhq24DJk2rDlIVD+BzZnFcsjiW76Lm3TsswBJt4rwmZEK7eF+09Ia15+D0YVmSzwNKuVj9JQM=
+	t=1749753597; cv=none; b=TPyhcTB5kQI+aPKY2ekZQmwLnojjRgcvhL364ngxT8DNv+QxZDzGLZhzM9OnLHOFRoVHDWY3LbX2et1cmAoITuF5Rv4HGtspn94cNSDVKb32aBdZleFJ45h3ddHlNQfxA3TQGn+GCmVSdKyW4DqxO3fmpqAiTC5S35kCY6y9ArE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749752853; c=relaxed/simple;
-	bh=sLe44bhVPcyWtKzfId4ZB2+nTWu/lWdLaI+SCIPyRKI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hbz9+8RRT8Xb8AlUALFOXURJPBn6ayZLpFMco1sWVLAGs+CL7VVslYazYxDVdpfRIX7nIEXOC7rLnh6moXprHDgus3VSqXIEUmt/NRnhqTjhlN/kTk00WdSFUC+g6m+5EaYSwkgdc30L9Y/ug/LTHKknajZOPcALOX+aIjlJxqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=xMncFVVR; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1749753597; c=relaxed/simple;
+	bh=AUdHu5W7PllgwG7FXZE4UVUoSuuY/27nAsnL/kArZ+Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZtcZdZ9AgsEGH9KBQ2r00WiNYcPm6mRipJQ/mSzyX76iC6fjV2PmkwAJQmN6ZC1snP0Mi0Ikj7zKMLljo2jjdHKcVuVDHiBtP1pir9j5aq6FqG91Zd+vANGGfZRKay3cvOg+S5OfasU/kLrbZMdLKq4jJeoqJu9yrLN0+CXmd+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNAG+B2H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="xMncFVVR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1749752849;
-	bh=sLe44bhVPcyWtKzfId4ZB2+nTWu/lWdLaI+SCIPyRKI=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=xMncFVVRGXzz9QDMbQjKFXqrLRU1AG9il5S4YeeusWGKkUgDdvDOzfV6/m9yHCgCx
-	 LxEvhmyNLKKf5fCBwMe2/OsDdYAFRZb3b5clYbbsFPLGii8922Z+pWgkvSTbCFTzOj
-	 QJocwBzx4RGdJ6hWhXmCtOti6wlE/mxuveGUHw08=
-Received: from [IPv6:2601:5c4:4302:c21::a774] (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 89DB91C02E3;
-	Thu, 12 Jun 2025 14:27:28 -0400 (EDT)
-Message-ID: <2dc7318d6c74b27a49b4c64b513f3da13d980473.camel@HansenPartnership.com>
-Subject: Re: [RFC] Keyrings: How to make them more useful
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org, Jarkko
- Sakkinen <jarkko@kernel.org>, Steve French <sfrench@samba.org>, Chuck Lever
- <chuck.lever@oracle.com>,  Mimi Zohar <zohar@linux.ibm.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, Herbert Xu
- <herbert@gondor.apana.org.au>,  Jeffrey Altman <jaltman@auristor.com>,
- hch@infradead.org, linux-afs@lists.infradead.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-crypto@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Date: Thu, 12 Jun 2025 14:27:27 -0400
-In-Reply-To: <462886.1749731810@warthog.procyon.org.uk>
-References: <462886.1749731810@warthog.procyon.org.uk>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNElecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHURfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvdHRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmBLmY0FCRs1hL0ACgkQgUrkfCFIVNaEiQgAg18F4G7PGWQ68xqnIrccke7Reh5thjUz6kQIii6Dh64BDW6/UvXn20UxK2uSs/0TBLO81k1mV4c6rNE+H8b7IEjieGR9frBsp/+Q01JpToJfzzMUY7ZTDV1IXQZ+AY9L7vRzyimnJHx0Ba4JTlAyHB+Ly5i4Ab2+uZcnNfBXquWrG3oPWz+qPK88LJLya5Jxse1m1QT6R/isDuPivBzntLOooxPk+Cwf5sFAAJND+idTAzWzslexr9j7rtQ1UW6FjO4CvK9yVNz7dgG6FvEZl6J/HOr1rivtGgpCZTBzKNF8jg034n49zGfKkkzWLuXbPUOp3/oGfsKv8pnEu1c2GbQpSmFtZXMgQm90dG9tbGV5IDxqZWpiQGxpbnV4LnZuZXQuaWJtLmNvbT6JAVYEEwEIAEACGwMHCwkIBwMCAQYVC
-	AIJCgsEFgIDAQIeAQIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mXBQkbNYS9AAoJEIFK5HwhSFTWEYEH/1YZpV+1uCI2MVz0wTRlnO/3OW/xnyigrw+K4cuO7MToo0tHJb/qL9CBJ2ddG6q+GTnF5kqUe87t7M7rSrIcAkIZMbJmtIbKk0j5EstyYqlE1HzvpmssGpg/8uJBBuWbU35af1ubKCjUs1+974mYXkfLmS0a6h+cG7atVLmyClIc2frd3o0zHF9+E7BaB+HQzT4lheQAXv9KI+63ksnbBpcZnS44t6mi1lzUE65+Am1z+1KJurF2Qbj4AkICzJjJa0bXa9DmFunjPhLbCU160LppaG3OksxuNOTkGCo/tEotDOotZNBYejWaXN2nr9WrH5hDfQ5zLayfKMtLSd33T9u0IUphbWVzIEJvdHRvbWxleSA8amVqYkBrZXJuZWwub3JnPokBVQQTAQgAPwIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmAUJGzWEvQAKCRCBSuR8IUhU1gacCAC+QZN+RQd+FOoh5g884HQm8S07ON0/2EMiaXBiL6KQb5yP3w2PKEhug3+uPzugftUfgPEw6emRucrFFpwguhriGhB3pgWJIrTD4JUevrBgjEGOztJpbD73bLLyitSiPQZ6OFVOqIGhdqlc3n0qoNQ45n/w3LMVj6yP43SfBQeQGEdq4yHQxXPs0XQCbmr6Nf2p8mNsIKRYf90fCDmABH1lfZxoGJH/frQOBCJ9bMRNCNy+aFtjd5m8ka5M7gcDvM7TAsKhD5O5qFs4aJHGajF4gCGoWmXZGrISQvrNl9kWUhgsvoPqb2OTTeAQVRuV8C4FQamxzE3MRNH25j6s/qujtCRKYW1lcyBCb3R0b21sZXkgPGplamJAbGludXguaWJtLmNvbT6JAVQEEwEIAD
-	4CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQTVYG5zyLRicb6tmt+BSuR8IUhU1gUCYEuZmQUJGzWEvQAKCRCBSuR8IUhU1kyHB/9VIOkf8RapONUdZ+7FgEpDgESE/y3coDeeb8jrtJyeefWCA0sWU8GSc9KMcMoSUetUreB+fukeVTe/f2NcJ87Bkq5jUEWff4qsbqf5PPM+wlD873StFc6mP8koy8bb7QcH3asH9fDFXUz7Oz5ubI0sE8+qD+Pdlk5qmLY5IiZ4D98V239nrKIhDymcuL7VztyWfdFSnbVXmumIpi79Ox536P2aMe3/v+1jAsFQOIjThMo/2xmLkQiyacB2veMcBzBkcair5WC7SBgrz2YsMCbC37X7crDWmCI3xEuwRAeDNpmxhVCb7jEvigNfRWQ4TYQADdC4KsilPfuW8Edk/8tPtCVKYW1lcyBCb3R0b21sZXkgPEpCb3R0b21sZXlAT2Rpbi5jb20+iQEfBDABAgAJBQJXI+B0Ah0gAAoJEIFK5HwhSFTWzkwH+gOg1UG/oB2lc0DF3lAJPloSIDBW38D3rezXTUiJtAhenWrH2Cl/ejznjdTukxOcuR1bV8zxR9Zs9jhUin2tgCCxIbrdvFIoYilMMRKcue1q0IYQHaqjd7ko8BHn9UysuX8qltJFar0BOClIlH95gdKWJbK46mw7bsXeD66N9IhAsOMJt6mSJmUdIOMuKy4dD4X3adegKMmoTRvHOndZQClTZHiYt5ECRPO534Lb/gyKAKQkFiwirsgx11ZSx3zGlw28brco6ohSLMBylna/Pbbn5hII86cjrCXWtQ4mE0Y6ofeFjpmMdfSRUxy6LHYd3fxVq9PoAJTv7vQ6bLTDFNa0KkphbWVzIEJvdHRvbWxleSA8SkJvdHRvbWxleUBQYXJhbGxlbHMuY29tPokBHwQwAQIACQUCVyPgjAIdIAAKCRCBSuR8IUhU1tXiB/9D9OOU8qB
-	CZPxkxB6ofp0j0pbZppRe6iCJ+btWBhSURz25DQzQNu5GVBRQt1Us6v3PPGU1cEWi5WL935nw+1hXPIVB3x8hElvdCO2aU61bMcpFd138AFHMHJ+emboKHblnhuY5+L1OlA1QmPw6wQooCor1h113lZiBZGrPFxjRYbWYVQmVaM6zhkiGgIkzQw/g9v57nAzYuBhFjnVHgmmu6/B0N8z6xD5sSPCZSjYSS38UG9w189S8HVr4eg54jReIEvLPRaxqVEnsoKmLisryyaw3EpqZcYAWoX0Am+58CXq3j5OvrCvbyqQIWFElba3Ka/oT7CnTdo/SUL/jPNobtCxKYW1lcyBCb3R0b21sZXkgPGplamJAaGFuc2VucGFydG5lcnNoaXAuY29tPokBVwQTAQgAQRYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJjg2eQAhsDBQkbNYS9BQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEIFK5HwhSFTWbtAH/087y9vzXYAHMPbjd8etB/I3OEFKteFacXBRBRDKXI9ZqK5F/xvd1fuehwQWl2Y/sivD4cSAP0iM/rFOwv9GLyrr82pD/GV/+1iXt9kjlLY36/1U2qoyAczY+jsS72aZjWwcO7Og8IYTaRzlqif9Zpfj7Q0Q1e9SAefMlakI6dcZTSlZWaaXCefdPBCc7BZ0SFY4kIg0iqKaagdgQomwW61nJZ+woljMjgv3HKOkiJ+rcB/n+/moryd8RnDhNmvYASheazYvUwaF/aMj5rIb/0w5p6IbFax+wGF5RmH2U5NeUlhIkTodUF/P7g/cJf4HCL+RA1KU/xS9o8zrAOeut2+4UgRaZ7bmEwgqhkjOPQMBBwIDBH4GsIgL0yQij5S5ISDZmlR7qDQPcWUxMVx6zVPsAoITdjKFjaDmUATkS+l5zmiCrUBcJ6MBavPiYQ4kqn4/xwaJAbMEGAEIACYCGwIWIQTVYG5zyLRi
-	cb6tmt+BSuR8IUhU1gUCZag0LwUJDwLkSQCBdiAEGRMIAB0WIQTnYEDbdso9F2cI+arnQslM7pishQUCWme25gAKCRDnQslM7pishdi9AQDyOvLYOBkylBqiTlJrMnGCCsWgGZwPpKq3e3s7JQ/xBAEAlx29pPY5z0RLyIDUsjf9mtkSNTaeaQ6TIjDrFa+8XH8JEIFK5HwhSFTWkasH/j7LL9WH9dRfwfTwuMMj1/KGzjU/4KFIu4uKxDaevKpGS7sDx4F56mafCdGD8u4+ri6bJr/3mmuzIdyger0vJdRlTrnpX3ONXvR57p1JHgCljehE1ZB0RCzIk0vKhdt8+CDBQWfKbbKBTmzA7wR68raMQb2D7nQ9d0KXXbtr7Hag29yj92aUAZ/sFoe9RhDOcRUptdYyPKU1JHgJyc0Z7HwNjRSJ4lKJSKP+Px0/XxT3gV3LaDLtHuHa2IujLEAKcPzTr5DOV+xsgA3iSwTYI6H5aEe+ZRv/rA4sdjqRiVpo2d044aCUFUNQ3PiIHPAZR3KK5O64m6+BJMDXBvgSsMy4VgRaZ7clEggqhkjOPQMBBwIDBMfuMuE+PECbOoYjkD0Teno7TDbcgxJNgPV7Y2lQbNBnexMLOEY6/xJzRi1Xm/o9mOyZ+VIj8h4G5V/eWSntNkwDAQgHiQE8BBgBCAAmAhsMFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoNBwFCQ8C4/cACgkQgUrkfCFIVNZs4AgAnIjU1QEPLdpotiy3X01sKUO+hvcT3/Cd6g55sJyKJ5/U0o3f8fdSn6MWPhi1m62zbAxcLJFiTZ3OWNCZAMEvwHrXFb684Ey6yImQ9gm2dG2nVuCzr1+9gIaMSBeZ+4kUJqhdWSJjrNLQG38GbnBuYOJUD+x6oJ2AT10/mQfBVZ3qWDQXr/je2TSf0OIXaWyG6meG5yTqOEv0eaTH22yBb1nbodoZkmlMMb56jzRGZuorhFE06
-	N0Eb0kiGz5cCIrHZoH10dHWoa7/Z+AzfL0caOKjcmsnUPcmcrqmWzJTEibLA81z15GBCrldfQVt+dF7Us2kc0hKUgaWeI8Gv4CzwLkCDQRUdhaZARAApeF9gbNSBBudW8xeMQIiB/CZwK4VOEP7nGHZn3UsWemsvE9lvjbFzbqcIkbUp2V6ExM5tyEgzio2BavLe1ZJGHVaKkL3cKLABoYi/yBLEnogPFzzYfK2fdipm2G+GhLaqfDxtAQ7cqXeo1TCsZLSvjD+kLVV1TvKlaHS8tUCh2oUyR7fTbv6WHi5H8DLyR0Pnbt9E9/Gcs1j11JX+MWJ7jset2FVDsB5U1LM70AjhXiDiQCtNJzKaqKdMei8zazWS50iMKKeo4m/adWBjG/8ld3fQ7/Hcj6Opkh8xPaCnmgDZovYGavw4Am2tjRqE6G6rPQpS0we5I6lSsKNBP/2FhLmI9fnsBnZC1l1NrASRSX1BK0xf4LYB2Ww3fYQmbbApAUBbWZ/1aQoc2ECKbSK9iW0gfZ8rDggfMw8nzpmEEExl0hU6wtJLymyDV+QGoPx5KwYK/6qAUNJQInUYz8z2ERM/HOI09Zu3jiauFBDtouSIraX/2DDvTf7Lfe1+ihARFSlp64kEMAsjKutNBK2u5oj4H7hQ7zD+BvWLHxMgysOtYYtwggweOrM/k3RndsZ/z3nsGqF0ggct1VLuH2eznDksI+KkZ3Bg0WihQyJ7Z9omgaQAyRDFct+jnJsv2Iza+xIvPei+fpbGNAyFvj0e+TsZoQGcC34/ipGwze651UAEQEAAYkBHwQoAQIACQUCVT6BaAIdAwAKCRCBSuR8IUhU1p5QCAC7pgjOM17Hxwqz9mlGELilYqjzNPUoZt5xslcTFGxj/QWNzu0K8gEQPePnc5dTfumzWL077nxhdKYtoqwm2C6fOmXiJBZx6khBfRqctUvN2DlOB6dFf5I+1QT9TRBvceGzw01E4Gi0xjWKAB6OII
-	MAdnPcDVFzaXJdlAAJdjfg/lyJtAyxifflG8NnXJ3elwGqoBso84XBNWWzbc5VKmatzhYLOvXtfzDhu4mNPv/z7S1HTtRguI0NlH5RVBzSvfzybin9hysE3/+r3C0HJ2xiOHzucNAmG03aztzZYDMTbKQW4bQqeD5MJxT68vBYu8MtzfIe41lSLpb/qlwq1qg0iQElBBgBAgAPBQJUdhaZAhsMBQkA7U4AAAoJEIFK5HwhSFTW3YgH/AyJL2rlCvGrkLcas94ND9Pmn0cUlVrPl7wVGcIV+6I4nrw6u49TyqNMmsYam2YpjervJGgbvIbMzoHFCREi6R9XyUsw5w7GCRoWegw2blZYi5A52xe500+/RruG//MKfOtVUotu3N+u7FcXaYAg9gbYeGNZCV70vI+cnFgq0AEJRdjidzfCWVKPjafTo7jHeFxX7Q22kUfWOkMzzhoDbFg0jPhVYNiEXpNyXCwirzvKA7bvFwZPlRkbfihaiXDE7QKIUtQ10i5kw4C9rqDKwx8F0PaWDRF9gGaKd7/IJGHJaac/OcSJ36zxgkNgLsVX5GUroJ2GaZcR7W9Vppj5H+C4UgRkuRyTEwgqhkjOPQMBBwIDBOySomnsW2SkApXv1zUBaD38dFEj0LQeDEMdSE7bm1fnrdjAYt0f/CtbUUiDaPodQk2qeHzOP6wA/2K6rrjwNIWJAT0EGAEIACcDGyAEFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmWoM/gFCQSxfmUACgkQgUrkfCFIVNZhTgf/VQxtQ5rgu2aoXh2KOH6naGzPKDkYDJ/K7XCJAq3nJYEpYN8G+F8mL/ql0hrihAsHfjmoDOlt+INa3AcG3v0jDZIMEzmcjAlu7g5NcXS3kntcMHgw3dCgE9eYDaKGipUCubdXvBaZWU6AUlTldaB8FE6u7It7+UO+IW4/L+KpLYKs8V5POInu2rqahlm7vgxY5iv4Txz4EvCW2e4dAlG
-	8mT2Eh9SkH+YVOmaKsajgZgrBxA7fWmGoxXswEVxJIFj3vW7yNc0C5HaUdYa5iGOMs4kg2ht4s7yy7NRQuh7BifWjo6BQ6k4S1H+6axZucxhSV1L6zN9d+lr3Xo/vy1unzA==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNAG+B2H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FC33C4CEEA;
+	Thu, 12 Jun 2025 18:39:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749753596;
+	bh=AUdHu5W7PllgwG7FXZE4UVUoSuuY/27nAsnL/kArZ+Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VNAG+B2H9oNbOAlcvLcIFI/SQR5gFPtk2VaxvTDKAgVWc+0L4kyqhTeRDzXVivgvu
+	 c6IhR1lH+hPFFDouAU5p45IVF5zcNKCTeXHXXs0p1yb0WIrLLb+ZcY+BKk6AdT7bjA
+	 P3BmDflhB4WMhroPrr7j7wAePE13EO9/9KX7RMonXroNwBdfsJVNl8C8orU/mr7G6m
+	 h8v+z0oyYw8Bg1Vjp90Q/C7nTecCWfAHsHCBhsNbFBT9UtpL4Vsx7eAwML4ZB5RdnB
+	 2fLUgU0uJhGHsx9akUognutcFpjm+95yjm7vCjC0Tn8FVbY5edjfv5EDHhPgF2d1mC
+	 uZu7d/jfLgKKQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] lib/crc: explicitly include <linux/export.h>
+Date: Thu, 12 Jun 2025 11:38:52 -0700
+Message-ID: <20250612183852.114878-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2025-06-12 at 13:36 +0100, David Howells wrote:
-[...]
-> Thoughts?
+From: Eric Biggers <ebiggers@google.com>
 
-One of the problems I keep tripping over is different special casing
-for user keyrings (which are real struct key structures) and system
-keyrings which are special values of the pointer in struct key *.
+Fix build warnings with W=1 that started appearing after
+commit a934a57a42f6 ("scripts/misc-check: check missing #include
+<linux/export.h> when W=1").  While at it, sort the include lists
+alphabetically.
 
-For examples of what this special handling does, just look at things
-like bpf_trace.c:bpf_lookup_{user|system}_key
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
 
-Since the serial allocation code has a hard coded not less than 3
-(which looks for all the world like it was designed to mean the two
-system keyring id's were never used as user serial numbers) I think we
-could simply allow the two system keyring ids to be passed into
-lookup_user_key() (which now might be a bit misnamed) and special case
-not freeing it in put_key().
+I'm planning to take this via the crc-next tree.
 
-Regards,
+ lib/crc/crc-ccitt.c       | 5 +++--
+ lib/crc/crc-itu-t.c       | 5 +++--
+ lib/crc/crc-t10dif-main.c | 5 +++--
+ lib/crc/crc16.c           | 5 +++--
+ lib/crc/crc32-main.c      | 1 +
+ lib/crc/crc4.c            | 1 +
+ lib/crc/crc64-main.c      | 4 +++-
+ lib/crc/crc7.c            | 5 +++--
+ lib/crc/crc8.c            | 3 ++-
+ 9 files changed, 22 insertions(+), 12 deletions(-)
 
-James
+diff --git a/lib/crc/crc-ccitt.c b/lib/crc/crc-ccitt.c
+index 8d2bc419230b3..f8692c3de101a 100644
+--- a/lib/crc/crc-ccitt.c
++++ b/lib/crc/crc-ccitt.c
+@@ -1,10 +1,11 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
+-#include <linux/types.h>
+-#include <linux/module.h>
+ #include <linux/crc-ccitt.h>
++#include <linux/export.h>
++#include <linux/module.h>
++#include <linux/types.h>
+ 
+ /*
+  * This mysterious table is just the CRC of each possible byte. It can be
+  * computed using the standard bit-at-a-time methods. The polynomial can
+  * be seen in entry 128, 0x8408. This corresponds to x^0 + x^5 + x^12.
+diff --git a/lib/crc/crc-itu-t.c b/lib/crc/crc-itu-t.c
+index 1d26a1647da53..6e413a290f54f 100644
+--- a/lib/crc/crc-itu-t.c
++++ b/lib/crc/crc-itu-t.c
+@@ -1,13 +1,14 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+  *      crc-itu-t.c
+  */
+ 
+-#include <linux/types.h>
+-#include <linux/module.h>
+ #include <linux/crc-itu-t.h>
++#include <linux/export.h>
++#include <linux/module.h>
++#include <linux/types.h>
+ 
+ /* CRC table for the CRC ITU-T V.41 0x1021 (x^16 + x^12 + x^5 + 1) */
+ const u16 crc_itu_t_table[256] = {
+ 	0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
+ 	0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
+diff --git a/lib/crc/crc-t10dif-main.c b/lib/crc/crc-t10dif-main.c
+index 08f1f1042a712..0c595cb0d4c1c 100644
+--- a/lib/crc/crc-t10dif-main.c
++++ b/lib/crc/crc-t10dif-main.c
+@@ -4,13 +4,14 @@
+  *
+  * Copyright (c) 2007 Oracle Corporation.  All rights reserved.
+  * Written by Martin K. Petersen <martin.petersen@oracle.com>
+  */
+ 
+-#include <linux/types.h>
+-#include <linux/module.h>
+ #include <linux/crc-t10dif.h>
++#include <linux/export.h>
++#include <linux/module.h>
++#include <linux/types.h>
+ 
+ /*
+  * Table generated using the following polynomial:
+  * x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+  * gt: 0x8bb7
+diff --git a/lib/crc/crc16.c b/lib/crc/crc16.c
+index 9c71eda9bf4b9..931660a8cbaaa 100644
+--- a/lib/crc/crc16.c
++++ b/lib/crc/crc16.c
+@@ -1,13 +1,14 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+  *      crc16.c
+  */
+ 
+-#include <linux/types.h>
+-#include <linux/module.h>
+ #include <linux/crc16.h>
++#include <linux/export.h>
++#include <linux/module.h>
++#include <linux/types.h>
+ 
+ /** CRC table for the CRC-16. The poly is 0x8005 (x^16 + x^15 + x^2 + 1) */
+ static const u16 crc16_table[256] = {
+ 	0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
+ 	0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
+diff --git a/lib/crc/crc32-main.c b/lib/crc/crc32-main.c
+index b86ee66075d0e..70c4ef170526d 100644
+--- a/lib/crc/crc32-main.c
++++ b/lib/crc/crc32-main.c
+@@ -23,10 +23,11 @@
+  */
+ 
+ /* see: Documentation/staging/crc32.rst for a description of algorithms */
+ 
+ #include <linux/crc32.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ #include <linux/types.h>
+ 
+ #include "crc32table.h"
+ 
+diff --git a/lib/crc/crc4.c b/lib/crc/crc4.c
+index e7e1779c67d91..8e83fbe60bdc9 100644
+--- a/lib/crc/crc4.c
++++ b/lib/crc/crc4.c
+@@ -2,10 +2,11 @@
+ /*
+  * crc4.c - simple crc-4 calculations.
+  */
+ 
+ #include <linux/crc4.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ 
+ static const uint8_t crc4_tab[] = {
+ 	0x0, 0x7, 0xe, 0x9, 0xb, 0xc, 0x5, 0x2,
+ 	0x1, 0x6, 0xf, 0x8, 0xa, 0xd, 0x4, 0x3,
+diff --git a/lib/crc/crc64-main.c b/lib/crc/crc64-main.c
+index e4a6d879e84c3..aef8282b63fba 100644
+--- a/lib/crc/crc64-main.c
++++ b/lib/crc/crc64-main.c
+@@ -31,13 +31,15 @@
+  *
+  * Copyright 2018 SUSE Linux.
+  *   Author: Coly Li <colyli@suse.de>
+  */
+ 
++#include <linux/crc64.h>
++#include <linux/export.h>
+ #include <linux/module.h>
+ #include <linux/types.h>
+-#include <linux/crc64.h>
++
+ #include "crc64table.h"
+ 
+ static inline __maybe_unused u64
+ crc64_be_generic(u64 crc, const u8 *p, size_t len)
+ {
+diff --git a/lib/crc/crc7.c b/lib/crc/crc7.c
+index 8dd991cc61146..46b95d7ac6ce0 100644
+--- a/lib/crc/crc7.c
++++ b/lib/crc/crc7.c
+@@ -1,13 +1,14 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+  *      crc7.c
+  */
+ 
+-#include <linux/types.h>
+-#include <linux/module.h>
+ #include <linux/crc7.h>
++#include <linux/export.h>
++#include <linux/module.h>
++#include <linux/types.h>
+ 
+ /*
+  * Table for CRC-7 (polynomial x^7 + x^3 + 1).
+  * This is a big-endian CRC (msbit is highest power of x),
+  * aligned so the msbit of the byte is the x^6 coefficient
+diff --git a/lib/crc/crc8.c b/lib/crc/crc8.c
+index 1ad8e501d9b69..329c52158c455 100644
+--- a/lib/crc/crc8.c
++++ b/lib/crc/crc8.c
+@@ -14,12 +14,13 @@
+  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
+ 
+ #define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/module.h>
+ #include <linux/crc8.h>
++#include <linux/export.h>
++#include <linux/module.h>
+ #include <linux/printk.h>
+ 
+ /**
+  * crc8_populate_msb - fill crc table for given polynomial in reverse bit order.
+  *
+
+base-commit: 7234baeec076d4c2ac05d160ed8cdb2f2d033069
+-- 
+2.49.0
 
