@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56811E487;
-	Thu, 12 Jun 2025 07:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5F51EB1AC;
+	Thu, 12 Jun 2025 07:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749713619; cv=none; b=p6SgpaC8aXlAPsPLMVlqmva3HGu/c3gXNUb6gpfQGyr5nkWTE8zPm13VlZvhvAQkzJnBEN5hzAQHMjkf+9e9ub2ol5KdlA46ll3tyEOh2i8SBUxSulCtlEz+5+vdJ2v4iVKjTAFeX0sj1qFjR0/DwkHxJmqKT3AeyOR1aeBXG3A=
+	t=1749713633; cv=none; b=ucF3OYa6zisA6EdOmvtgdArx0+3+3uUrCRSoh4lGqUbUcUinyrcn4aX+bay04HdHNrdCpcWOX88Aq7XqBhCJVLWMggsK2VFYJvAmm7NnVEETaRVkcoRWLgO4h5mSvMhzBZnGi/RK3Hg2ggZrkHYb4EWi0BLCCMp4sUuzQWT5heQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749713619; c=relaxed/simple;
-	bh=eMVf5i/rjXCwUDBunHluaNYVd2aReIzEbyrk/akS6SE=;
+	s=arc-20240116; t=1749713633; c=relaxed/simple;
+	bh=EbHKzoPyQisbGeHdM80h8YEnwMflGlq+HV1pHMAF6V4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OrphBWs7N7FLeLAvWxg0G/QAYMyM6VYuo2tdkHlkrxnuRpyiTuv4j5Vm/l3IxFOGWuqpQK1KVA9jhboaMOd2BPVH5HFdUgkT7ZZUqoevzD0axjKO9exhioGSd7dtLG7p1J3Tu0WUbNVklC3BW02SQz2qXL6hbY4/YTEhJUwBz/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIkEpOh/; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=eBYSILoFljcUaXPFOonoIdhOdIjNU4IzpYlIsHBmMTu7InclK6oLoCTRHgMIXnPBrlZjCj0f2denTD15MOAtWW/5fLPLB0ltJDQ7X6BGhzOaLdWgB9f4KG6y8PgUkNviyXBMIcGqwccs1TOT7afqPiofjcVjkeYhRoSZzZ5JS2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXGKpdpn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIkEpOh/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D83C4CEEA;
-	Thu, 12 Jun 2025 07:33:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXGKpdpn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE00C4CEEA;
+	Thu, 12 Jun 2025 07:33:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749713619;
-	bh=eMVf5i/rjXCwUDBunHluaNYVd2aReIzEbyrk/akS6SE=;
+	s=k20201202; t=1749713633;
+	bh=EbHKzoPyQisbGeHdM80h8YEnwMflGlq+HV1pHMAF6V4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nIkEpOh/leHSAK/TmibTxoCw4LzvIZXA+elH9JggWfUGlAmGa/hCrKKiqM6/2FZnC
-	 fM4ny4Lk2eimLk0NqGFpddofiaSaKKdKHL7yL0eRsWEnnxxTA5eKBUZ2YxZSc7bCmK
-	 PnSAbKvcu81kRWQHx2YSELgpC6RfyF+qRR930MEg4sVi0FD1yYXM4tA5QOi+1WrDws
-	 rEAygblHNaHdxRJdymugTgajQGLK3z39vXhArXjSdB9YkVBfuTswZFW0Mw4Pf0fZ4N
-	 rr8ep5j6M2AKyqxLLL4EvEyPN+eyGSM2vykSGHEVfDnjayMP3ZRNb1kV+IS0gYPUrN
-	 N0dUPBUyACviA==
-Date: Thu, 12 Jun 2025 09:33:36 +0200
+	b=VXGKpdpnT2hyJ+J7CIpd2//Fa60D0zBcaRMYr2eTGJLt0Nxu3ed/Zp7FWySnVvvu9
+	 +bfopb8q134a/Sq10yvpF4nr7e9iGVIxpJYijDVhiPd/5qkxAU+7tGE4NNrvooQY26
+	 ol5PgVzhsjhAkr6Bl1os57YFVEmYLy9+zmRP3PQq8Vlrj6PblqCD8r2g9REy/SpNJY
+	 KwrN9CMvuyUdrY01iKho6DMlJ35c+Xc4ddPjSM7Wo8PonWtUmEJg9BMtc1ryownH2p
+	 kSr5BUv2gJhXV/mz++pvahkc1u84ceOP5/3MspX+AGL+7UF41wbhaiWh1+hYOnCB81
+	 FU4pnb3f67jvA==
+Date: Thu, 12 Jun 2025 09:33:50 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Ryan.Wanner@microchip.com
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, robh@kernel.org, 
@@ -34,10 +34,10 @@ Cc: herbert@gondor.apana.org.au, davem@davemloft.net, robh@kernel.org,
 	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, olivia@selenic.com, 
 	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] dt-bindings: crypto: add sama7d65 in Atmel AES
-Message-ID: <20250612-economic-teal-nuthatch-30dcad@kuoka>
+Subject: Re: [PATCH v2 02/10] dt-bindings: crypto: add sama7d65 in Atmel SHA
+Message-ID: <20250612-translucent-space-mussel-054ce7@kuoka>
 References: <cover.1749666053.git.Ryan.Wanner@microchip.com>
- <7aa1862f790ea19bf7bb55e07ec4b9295c5f7a44.1749666053.git.Ryan.Wanner@microchip.com>
+ <a62591306df47ba006470a00e6c25d9df419a4fb.1749666053.git.Ryan.Wanner@microchip.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,17 +46,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <7aa1862f790ea19bf7bb55e07ec4b9295c5f7a44.1749666053.git.Ryan.Wanner@microchip.com>
+In-Reply-To: <a62591306df47ba006470a00e6c25d9df419a4fb.1749666053.git.Ryan.Wanner@microchip.com>
 
-On Wed, Jun 11, 2025 at 12:47:25PM GMT, Ryan.Wanner@microchip.com wrote:
+On Wed, Jun 11, 2025 at 12:47:26PM GMT, Ryan.Wanner@microchip.com wrote:
 > From: Ryan Wanner <Ryan.Wanner@microchip.com>
 > 
-> Add DT bindings for SAMA7D65 SoC in atmel AES.
+> Add DT bindings for SAMA7D65 SoC Atmel SHA.
 > 
-> The SAMA7D65 similar to the SAM9x75 SoC supports HMAC, dual buffer, and
-> GCM. And similar all 3 it supports CBC, CFB, CTR, ECB, and XTS.
+> The SAMA7D65 similar to the SAM9x75 SoC supports SHA1/224/256/384/512
+> and supports HMAC for the same hashes. They both also support automatic
+> padding as well as double buffering.
 > 
 > Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
+> ---
+>  .../devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml     | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
