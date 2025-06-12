@@ -1,84 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A518211F;
-	Thu, 12 Jun 2025 06:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56811E487;
+	Thu, 12 Jun 2025 07:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749709547; cv=none; b=rx68tkwBttmXHVtMPoQrKTlPioYm7yKcpPWExQ/1wa82NjL62wyvISO5ULjItgvihERT8YvOo9neEfErwJdY3jDR02rkqPcm44CSwZL408O6JZxR7cdyak2ttKthKkyYoQ7lvMwcwWc9sWE5Gpu1VI269e2OV/Z/stdkpj156wk=
+	t=1749713619; cv=none; b=p6SgpaC8aXlAPsPLMVlqmva3HGu/c3gXNUb6gpfQGyr5nkWTE8zPm13VlZvhvAQkzJnBEN5hzAQHMjkf+9e9ub2ol5KdlA46ll3tyEOh2i8SBUxSulCtlEz+5+vdJ2v4iVKjTAFeX0sj1qFjR0/DwkHxJmqKT3AeyOR1aeBXG3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749709547; c=relaxed/simple;
-	bh=M9CxTHdXT5WrEkUahJ2svzM+9WFZHYH6PnfsJfmp96g=;
+	s=arc-20240116; t=1749713619; c=relaxed/simple;
+	bh=eMVf5i/rjXCwUDBunHluaNYVd2aReIzEbyrk/akS6SE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Djh84M6tZ0v+3ps2c5Krk/3p82KW9ugH6QqAXm3tV6Ijt/r9O+8EUyMXBYY6T7z79YFdO8piN+5p6UCp2vfQahE/n421kkSpjhB9RAHHnKeTsfym0uGMr21EvqyP4gEmnmja9MX/8JGudaWULcDsOij6e29uODz861xIlI3r0sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JKL18zga; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OrphBWs7N7FLeLAvWxg0G/QAYMyM6VYuo2tdkHlkrxnuRpyiTuv4j5Vm/l3IxFOGWuqpQK1KVA9jhboaMOd2BPVH5HFdUgkT7ZZUqoevzD0axjKO9exhioGSd7dtLG7p1J3Tu0WUbNVklC3BW02SQz2qXL6hbY4/YTEhJUwBz/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIkEpOh/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKL18zga"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C556AC4CEEA;
-	Thu, 12 Jun 2025 06:25:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIkEpOh/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D83C4CEEA;
+	Thu, 12 Jun 2025 07:33:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749709547;
-	bh=M9CxTHdXT5WrEkUahJ2svzM+9WFZHYH6PnfsJfmp96g=;
+	s=k20201202; t=1749713619;
+	bh=eMVf5i/rjXCwUDBunHluaNYVd2aReIzEbyrk/akS6SE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JKL18zgaAsvyau0vg8RznAF41pnRn29ke6AvxA2D7Mw7V5apl+KttEkVoHd6d/tnL
-	 Tuo1iauSla5SB1LKgm+CI852NO9cSM9ti1JUQsc/o7dMziPmdWh9ZdbdQ2+TqECf72
-	 tKe6h029giSgUjLMox+O2hYJKhtS6lMpSEfXLsJfJnNduiMUk/nc06zKPQ6Xuo/CLw
-	 gDfzldMCEdbHvb9VdubI943kkJgzbIHMo9wMyw6AZYo1x8aI4EOPR+sgVoGrwCPBtm
-	 IjKOYTe5ai8875DlouqZWShNo2Danpn8JLN4tG1KOtY8p69UDDT8P0t64FjMsOusx5
-	 x4gCYIr9ucEUA==
-Date: Wed, 11 Jun 2025 23:25:21 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	ceph-devel@vger.kernel.org
-Subject: Re: [PATCH] fscrypt: don't use hardware offload Crypto API drivers
-Message-ID: <20250612062521.GA1838@sol>
-References: <20250611205859.80819-1-ebiggers@kernel.org>
- <7f63be76-289b-4a99-b802-afd72e0512b8@hogyros.de>
- <20250612005914.GA546455@google.com>
+	b=nIkEpOh/leHSAK/TmibTxoCw4LzvIZXA+elH9JggWfUGlAmGa/hCrKKiqM6/2FZnC
+	 fM4ny4Lk2eimLk0NqGFpddofiaSaKKdKHL7yL0eRsWEnnxxTA5eKBUZ2YxZSc7bCmK
+	 PnSAbKvcu81kRWQHx2YSELgpC6RfyF+qRR930MEg4sVi0FD1yYXM4tA5QOi+1WrDws
+	 rEAygblHNaHdxRJdymugTgajQGLK3z39vXhArXjSdB9YkVBfuTswZFW0Mw4Pf0fZ4N
+	 rr8ep5j6M2AKyqxLLL4EvEyPN+eyGSM2vykSGHEVfDnjayMP3ZRNb1kV+IS0gYPUrN
+	 N0dUPBUyACviA==
+Date: Thu, 12 Jun 2025 09:33:36 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ryan.Wanner@microchip.com
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com, 
+	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, olivia@selenic.com, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/10] dt-bindings: crypto: add sama7d65 in Atmel AES
+Message-ID: <20250612-economic-teal-nuthatch-30dcad@kuoka>
+References: <cover.1749666053.git.Ryan.Wanner@microchip.com>
+ <7aa1862f790ea19bf7bb55e07ec4b9295c5f7a44.1749666053.git.Ryan.Wanner@microchip.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250612005914.GA546455@google.com>
+In-Reply-To: <7aa1862f790ea19bf7bb55e07ec4b9295c5f7a44.1749666053.git.Ryan.Wanner@microchip.com>
 
-On Thu, Jun 12, 2025 at 12:59:14AM +0000, Eric Biggers wrote:
-> On Thu, Jun 12, 2025 at 09:21:26AM +0900, Simon Richter wrote:
-> > Hi,
-> > 
-> > On 6/12/25 05:58, Eric Biggers wrote:
-> > 
-> > > But
-> > > otherwise this style of hardware offload is basically obsolete and has
-> > > been superseded by hardware-accelerated crypto instructions directly on
-> > > the CPU as well as inline storage encryption (UFS/eMMC).
-> > 
-> > For desktop, yes, but embedded still has quite a few of these, for example
-> > the STM32 crypto offload engine
+On Wed, Jun 11, 2025 at 12:47:25PM GMT, Ryan.Wanner@microchip.com wrote:
+> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+> 
+> Add DT bindings for SAMA7D65 SoC in atmel AES.
+> 
+> The SAMA7D65 similar to the SAM9x75 SoC supports HMAC, dual buffer, and
+> GCM. And similar all 3 it supports CBC, CFB, CTR, ECB, and XTS.
+> 
+> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-By the way, I noticed you specifically mentioned STM32.  I'm not sure if you
-looked at the links I had in my commit message, but one of them
-(https://github.com/google/fscryptctl/issues/32) was actually for the STM32
-driver being broken and returning the wrong results, which broke filename
-encryption.  The user fixed the issue by disabling the STM32 driver, and they
-seemed okay with that.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-That doesn't sound like something useful, IMO.  It sounds more like something
-actively harmful to users.
+Best regards,
+Krzysztof
 
-Here's another one I forgot to mention:
-https://github.com/google/fscryptctl/issues/9
-
-I get blamed for these issues, because it's fscrypt that breaks.
-
-FWIW, here's what happens if you try to use the Intel QAT driver with dm-crypt:
-https://lore.kernel.org/r/CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com/
-https://lore.kernel.org/r/0171515-7267-624-5a22-238af829698f@redhat.com/
-
-- Eric
