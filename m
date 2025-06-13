@@ -1,124 +1,198 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE69C1AD3FA
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 14:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853671D07BA
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 15:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749826486; cv=none; b=N2sFUp4GzOQ3QFoaBmXj9Ie4K+O0yhmPuueJJ331D9CKXtC2QW7ce0aoSWaO/hGp2vWzC6S5YsIpYPtGODn1r7yPKzhicJxX/bxocLm90qTaXMeIVirINqAlyCWCzf8iqIzv/nTKQvveLZ09lwjUmzGZ5n1x95YF4VXJt3qgugE=
+	t=1749828111; cv=none; b=Yklqz9RUZlAPDwA6dHiI8qhRIT5FurNru48iCKBMM4bTz9aOfJQ+TCR9PbO+CcsniKzV1Dwy6SAFXT3Ic9puUhiQuc5IakrL7QIs5gx3oUBmxcj/fRojga9NU/zGXTTsZDO7JfYaBLRV5VeG+lBUfXuUpSUt4sQY+3tyHEEe5kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749826486; c=relaxed/simple;
-	bh=LLeEIarksbDR+ruAO6Ua1Prx+jcWWce/HEzaa3B8Jro=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=b7HmRdsZJ0pZCbfInFJS3cZnQt7+uq8ra3y5L3ZHd32lJAhMi8aGQ/LFQX9Y5AITjHe6ehaD94v2YFgefBYQTBBMmaBiJPOofmldJoS84/M90P2RlVOccVWGx3sbQ6jhNwl/zp2R027QFVNI2B/TydX28030kgHmUGxkxhPtPPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S5mgAT/n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749828111; c=relaxed/simple;
+	bh=uVB7JqWEdw+CUmYag1IWb5TKX0/wUP6kgR0CS8szMxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E0N4PMa8ngPBEfk8h0HgJ/pj22vVaf+mHrIhs8gV1Zu8y2IDOAR9Gau6ETU58UnYcEza6jJboAPAEulOzAmQQVb3h1wacS5/ocF0Mk0+bYdgfvz+Y2P4v+y0zMZ+w187/W25Oplr19xC5rACNb/9iSjzCG3dWcUOdPeh4O6+5LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EE2yw+Ki; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5mgAT/n"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749826482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=9So26a++MHUdK9v3881Z330reK+K0iJs2Fhpuw5P5s0=;
-	b=S5mgAT/nIU6yCDI9MzuSnKyyORxm72Ltaau04jj9B4UR8KoR3oT7q5bZcI0BAekNtiDqex
-	QJmOmghcWDO7StJE5k4ToA19gyz8sFADmF1+oRZDbrPFZk2URnw61ZYw58YmKHoUO2O6We
-	mO8goQnbeBY2EeD/s/XPr6JOEiGF/Mk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-446--al5Mx2MNJW6W7t9IKXaOg-1; Fri,
- 13 Jun 2025 10:54:38 -0400
-X-MC-Unique: -al5Mx2MNJW6W7t9IKXaOg-1
-X-Mimecast-MFC-AGG-ID: -al5Mx2MNJW6W7t9IKXaOg_1749826477
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 298081956080;
-	Fri, 13 Jun 2025 14:54:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DF932195E340;
-	Fri, 13 Jun 2025 14:54:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-    Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
-    torvalds@linux-foundation.org, Paul Moore <paul@paul-moore.com>
-cc: dhowells@redhat.com, Lukas Wunner <lukas@wunner.de>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Clemens Lang <cllang@redhat.com>,
-    David Bohannon <dbohanno@redhat.com>,
-    Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
-    linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Module signing and post-quantum crypto public key algorithms
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EE2yw+Ki"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-310447fe59aso22490991fa.0
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 08:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1749828107; x=1750432907; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZfchqGq9v7IhyOen8OFPORyNqw+wkP/m7hKYa17CVlk=;
+        b=EE2yw+Ki3FsZ0W3mEVa2bh0tm7mpKUvKGCtAaoqRnEYkQyoJk550NvUPDiS+7Pxjyy
+         csQ7v9FoLeWCTuFy1TWrcu8Q9TvNR0pfKnnB1kkmXe2f8BOE6bH0LY1xlt2wsj8nvqZ4
+         x7eZF+dSrkIBAiTMeGvYeASUjEpb+nCSV0kSL8ONO7td1YsIPVSpdP8LHnMglxw27sr3
+         hIjwXvqnGEy6u3RG4z1aFv6GIdegBLcqp3LjkFAxIMg0vGNJCdP8PvSJhhY/+yMjYduE
+         p10QAlm/5SvSps+juOqs/PT6vySEYQfPb+nfETE+aC4YYZCx1WSIghgP5KXaWvEOpOpK
+         YL9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749828107; x=1750432907;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZfchqGq9v7IhyOen8OFPORyNqw+wkP/m7hKYa17CVlk=;
+        b=L/695HCUYJlxTu5goyVM63SQYsnYEiLqVpjLNA9Se1G2s74TLWAz/uzGEW4yy2PrOP
+         dQkTrRFWFtS/XS4RQ96PLB0hQ9ZbUsVgsRdZXwJl8iteFPMyGqXR02HngeCIIBgI5Ooa
+         Cs3d6nhgXlwzlfolAkp0ePWiVk5znf1RqXtiSdk3YLw1v2+5aob+nTfHv6qEB8DXsDV/
+         KDeUuFyRJ5O0ErQHN7RrCYODIYtEcr2jv4vAHvM7SSxjcUkHHWYOwCF+RWSdbSi9H6nU
+         gvNwgCEleTIBpY60YF/WB4PGUN4hZBLHjb383byf63nwurbh5N/czX19/6EbWypwWOs/
+         3bUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWo1JRhm4U9R3DmHXOSe3CCO9drSCw0IegQdO2Ra0WP9/HVHWEvoEDpBTLqPXoq8JGKYdL1KSziPayh9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy6IBL1P5cAEr0rNFT2JJH6m+gkDh/MIS0A64oJYbSwlkfEguz
+	ymqw8SAWrNjQWTzlfpkkwySYzrlIEkJTG2rF3wv/kpl6XfGctnzBIb+UgK1BSV923GVkxJwhZkG
+	P8avaIK0V1eqa+x6JAgnNsw37L7Uy5fC1TsEglLI2tQ==
+X-Gm-Gg: ASbGncuOBPrudAJNjWcCyvEeDfBnT2Welu0Dl20V8UuaCJDIfXzXkyT1ZsrX1c5GSM3
+	7tqG7MirBt0VsFVb50ArTW9+uOStDYc3si/+dFf4cvaluop4h9t7tJwzE9w48VNo0c6HF06eixM
+	H5sYoD79P9Fsbu0vF2lq8k1KgfwZBo3gZtbJyeVSf2LQpTDUFcxoO1eWcljxSe
+X-Google-Smtp-Source: AGHT+IGhbT0KIAwzD8LitDpsZIDQI/jceYs7SmyyfGe8Qi870ifYMH6IWcfgYNPDngg1R6c//N8Xv0NkIVOZ9UG2OJs=
+X-Received: by 2002:a05:651c:4005:b0:32b:3c33:2b2c with SMTP id
+ 38308e7fff4ca-32b3eb840c7mr5515541fa.40.1749828106551; Fri, 13 Jun 2025
+ 08:21:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <501215.1749826470.1@warthog.procyon.org.uk>
-Date: Fri, 13 Jun 2025 15:54:30 +0100
-Message-ID: <501216.1749826470@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <501216.1749826470@warthog.procyon.org.uk>
+In-Reply-To: <501216.1749826470@warthog.procyon.org.uk>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Fri, 13 Jun 2025 16:21:35 +0100
+X-Gm-Features: AX0GCFtTTDGSnh9mGuiJh4V_OMLcbYtlhgcof7sEKmJZK1pQvYqN2rFCLHpFf18
+Message-ID: <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com>
+Subject: Re: Module signing and post-quantum crypto public key algorithms
+To: David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Stephan Mueller <smueller@chronox.de>, 
+	Simo Sorce <simo@redhat.com>, torvalds@linux-foundation.org, 
+	Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>, Clemens Lang <cllang@redhat.com>, 
+	David Bohannon <dbohanno@redhat.com>, Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi David,
 
-So we need to do something about the impending quantum-related obsolescence of
-the RSA signatures that we use for module signing, kexec, BPF signing, IMA and
-a bunch of other things.
+On Fri, Jun 13, 2025 at 3:54=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Hi,
+>
+> So we need to do something about the impending quantum-related obsolescen=
+ce of
+> the RSA signatures that we use for module signing, kexec, BPF signing, IM=
+A and
+> a bunch of other things.
 
-From my point of view, the simplest way would be to implement key verification
-in the kernel for one (or more) of the available post-quantum algorithms (of
-which there are at least three), driving this with appropriate changes to the
-X.509 certificate to indicate that's what we want to use.
+Is it that impending? At least for now it seems people are more
+concerned about quantum-safe TLS, so their communications cannot be
+decrypted later. But breaking signatures of open source modules
+probably only makes sense when there is an actual capability to break
+RSA (or ECDSA)
 
-The good news is that Stephan Mueller has an implemementation that includes
-kernel bits that we can use, or, at least, adapt:
+> From my point of view, the simplest way would be to implement key verific=
+ation
+> in the kernel for one (or more) of the available post-quantum algorithms =
+(of
+> which there are at least three), driving this with appropriate changes to=
+ the
+> X.509 certificate to indicate that's what we want to use.
+>
+> The good news is that Stephan Mueller has an implemementation that includ=
+es
+> kernel bits that we can use, or, at least, adapt:
+>
+>         https://github.com/smuellerDD/leancrypto/
+>
+> Note that we only need the signature verification bits.  One question, th=
+ough:
+> he's done it as a standalone "leancrypto" module, not integrated into cry=
+pto/,
+> but should it be integrated into crypto/ or is the standalone fine?
+>
+> The not so good news, as I understand it, though, is that the X.509 bits =
+are
+> not yet standardised.
 
-	https://github.com/smuellerDD/leancrypto/
+Does it matter from a kernel perspective? As far as I remember we just
+attach the "plain" signature to binary. Or is it about provisioning
+the key through the keystore?
 
-Note that we only need the signature verification bits.  One question, though:
-he's done it as a standalone "leancrypto" module, not integrated into crypto/,
-but should it be integrated into crypto/ or is the standalone fine?
+>
+> However!  Not everyone agrees with this.  An alternative proposal would r=
+ather
+> get the signature verification code out of the kernel entirely.  Simo Sor=
+ce's
+> proposal, for example, AIUI, is to compile all the hashes we need into th=
+e
+> kernel at build time, possibly with a hashed hash list to be loaded later=
+ to
+> reduce the amount of uncompressible code in the kernel.  If signatures ar=
+e
+> needed at all, then this should be offloaded to a userspace program (whic=
+h
+> would also have to be hashed and marked unptraceable and I think unswappa=
+ble)
+> to do the checking.
 
-The not so good news, as I understand it, though, is that the X.509 bits are
-not yet standardised.
+Can indeed work for modules, but with our limited deployment of IMA in
+production with many services even with the current approach we get
+some complains:
+  * verification takes too long for some binaries (which were not
+stripped for example)
+  * just hashing the binaries over and over burns some CPU and
+actually burns only 1 CPU at a time (stalling it)
 
+We need to consider cases, for example, when a python script calls
+some binaries via system(3) or similar in a tight loop. Yes, with IMA
+we would verify only once, but still there are cases, when software
+updates happen frequently or config management "templates" the
+binaries, so they change all the time.
 
-However!  Not everyone agrees with this.  An alternative proposal would rather
-get the signature verification code out of the kernel entirely.  Simo Sorce's
-proposal, for example, AIUI, is to compile all the hashes we need into the
-kernel at build time, possibly with a hashed hash list to be loaded later to
-reduce the amount of uncompressible code in the kernel.  If signatures are
-needed at all, then this should be offloaded to a userspace program (which
-would also have to be hashed and marked unptraceable and I think unswappable)
-to do the checking.
+> I don't think we can dispense with signature checking entirely, though: w=
+e
+> need it for third party module loading, quick single-module driver update=
+s and
+> all the non-module checking stuff.  If it were to be done in userspace, t=
+his
+> might entail an upcall for each signature we want to check - either that,=
+ or
+> the kernel has to run a server process that it can delegate checking to.
 
-I don't think we can dispense with signature checking entirely, though: we
-need it for third party module loading, quick single-module driver updates and
-all the non-module checking stuff.  If it were to be done in userspace, this
-might entail an upcall for each signature we want to check - either that, or
-the kernel has to run a server process that it can delegate checking to.
+Agreed - we should have an in-kernel option
 
-It's also been suggested that PQ algorithms are really slow.  For kernel
-modules that might not matter too much as we may well not load more than 200
-or so during boot - but there are other users that may get used more
-frequently (IMA, for example).
+> It's also been suggested that PQ algorithms are really slow.  For kernel
+> modules that might not matter too much as we may well not load more than =
+200
+> or so during boot - but there are other users that may get used more
+> frequently (IMA, for example).
 
+Yep, mentioned above.
 
-Now, there's also a possible hybrid approach, if I understand Roberto Sassu's
-proposal correctly, whereby it caches bundles of hashes obtained from, say,
-the hashes included in an RPM.  These bundles of hashes can be checked by
-signature generated by the package signing process.  This would reduce the PQ
-overhead to checking a bundle and would also make IMA's measuring easier as
-the hashes can be added in the right order, rather than being dependent on the
-order that the binaries are used.
+>
+> Now, there's also a possible hybrid approach, if I understand Roberto Sas=
+su's
+> proposal correctly, whereby it caches bundles of hashes obtained from, sa=
+y,
+> the hashes included in an RPM.  These bundles of hashes can be checked by
+> signature generated by the package signing process.  This would reduce th=
+e PQ
+> overhead to checking a bundle and would also make IMA's measuring easier =
+as
+> the hashes can be added in the right order, rather than being dependent o=
+n the
+> order that the binaries are used.
 
-David
+This makes it somewhat similar to UEFI secure boot trusted signature
+DB, where one can have either a trusted public key to verify the
+signature or a direct allowlist of hashes
 
+> David
+>
+
+Ignat
