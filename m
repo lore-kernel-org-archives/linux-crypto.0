@@ -1,116 +1,125 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1842E11B5;
-	Fri, 13 Jun 2025 16:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749832505; cv=pass; b=TKWUsrVTO5fSgU5WmXYpiZms7ornwYpix0wF9ATcGbKAgOhpnOmclrkCIEdeMf+u5SjC6w/ef1ShZ06ZT+fVBZPzYzRRf/+nM1o6ZvkxHt5rSoq3/GvfOFunxZiHxOkdxWiB1ZUSIjYIt6IVY0h+d3+SQ+05G+WkfU8Chc/+CTg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749832505; c=relaxed/simple;
-	bh=JH7+5xcP0Gxy40aZWNJIxfN8DceUAl68OpLJLha0Qss=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=idE2JB9XRkaLo4n8RIuoDoW3Rx93FVq+Czz9QNKVtGrm0bfd+AgkaegJt87I+sqjZYj1e5w/nSOzWEKWnOkCVcd9+F8JN+ifu2ivICW6iL7QM8pa0fuSohybvBamD4WAOQj6HBWD4/XyWufW2fsefeDIQ//rOcNTnbi0DOzc2K4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=najrXMw2; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=p2LAhlLT; arc=pass smtp.client-ip=85.215.255.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A99DDBC
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 16:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749832581; cv=none; b=jPgheTzF2PIsdsqtlXpMBh90Yj2Fx11uW558amQ8xLL6+t/s1MQvVyUWQQqeosqbz+1vVjys9AMgO3O0KfiUQwjC25zSuTwQAyrgY85/P9CrF+IU1pcifL0/3HHaeitWIzoMB0BxU13v1hfA2vTg2rd5sFXD3X6tRMRQdJxQljo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749832581; c=relaxed/simple;
+	bh=6IDK3mFK3aUcD6DqmEoL/rBAW6jbXc5FxEXCTke0bD8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sQIT1qw5lV6viHxNFEWChMvpskA3pZZJc2mjZwkj10AR3uvyBaK0MUSwAv7lF7nqq5cq2Uagw+mFzzln799YXVGfQ+E8hrtZsQuq+ckaY12LT52EKdE0Vc2xq+A9ljzyNIEn5X416jTAO9MJRs3sx1Yr65B29Qa38GAQ4e6ROWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=EIHZ5bUg; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="najrXMw2";
-	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="p2LAhlLT"
-ARC-Seal: i=1; a=rsa-sha256; t=1749832488; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=YEUIGp/kETBI6M2oLy+dhlduCnG1F194AG016SwkQHeKh4HLaVJXRsaYIM0UgMIO69
-    w/nQXXBb1F4gAIq7ThOlX+oMw5ThXtG2ubJgwYz71I3RF/xkEe5IDFZFO1+UOybp+GrU
-    AeOdoO9eCiyQBYbujA1RXMxeMoBCtgn/696mrdP7tPbNyLaaXPNUqYCKoy8KJehqLh+7
-    PkbeRa4eYFj9fhR5dLBaQS5BfjP1CiEi+DPle1PAdkPqpTgk59DEVT62m54tsN5GeuQz
-    pax4RZJCw6OL5B3f+7CCKqcgBf8X3qbKFS9PJIV7ErXgzkIN2SaFlnBp2FNcNHVk2jOK
-    xThQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1749832488;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=7ay36h4xp3J0JHjWRZu5rdj9y5vlRyjYR8YhExn3xUI=;
-    b=OGk9EFcSNu4xyt9f6Lk1dESSWi5DN8DIE0zaHAzSi2Dp0mK6YIRkEmgd7iF6IVgIrE
-    SG6CS2GApLkKrJU9fWP9nsfc1otA/WriPqJczVZ07e3BFjP0KbgZK6Jc066/C+tpqmcK
-    X/9Yk2Rt75mhDafsQXPhQwihhv581gHmyQBCFtJV5ZCVRNezWqpztk1mTvNbsgFPul90
-    fG8QP01S3QIaABmbaFfU58+IZuvUc6CLWrr+KS2pnxrrb6fpl8japOn1+q/HVlqk+9gU
-    SiTnPU5og/jbKJA3VM+MwGvi1CzTi6BV87b6s3MjFmmd8b5fbnTCIMu7RBvBYv3KbJkT
-    a2lw==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1749832488;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=7ay36h4xp3J0JHjWRZu5rdj9y5vlRyjYR8YhExn3xUI=;
-    b=najrXMw2MMFXu4+7P4o+wnKQsGj2uJTlbmLMLMEwn8gAlSIzdbgtrCdOnYBd99+KI+
-    sl4Il0zJJolSo265Gf4OAfAokOgigZFO4v05AbqHjfVv83O6Hv09fy61EUVBmWN7td+F
-    U6lzQrqqayoTbixcm8bJm5unM1tP4zwdyrMJhkcE5aT1CtIfMPeKESRQEPny5yS+sOVp
-    6HyWTUGpblzXL9gCjQRe9m9zP1rRHtPzMQ3OYw/J2mou5t8SXtAHCBmdc0QnHNBdkWej
-    vn7v7R8r0/yfNz9tM0y+ZxUACCARI79Lc2F/LkBw4CFJ4iF0CDHDkMd3JNO2v91Nrzu/
-    qKJQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1749832488;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=7ay36h4xp3J0JHjWRZu5rdj9y5vlRyjYR8YhExn3xUI=;
-    b=p2LAhlLTCa+gMKHcYr86RN4e9cQeYSyoTMaeQDccLU6W0Lv5q3R0kK18SZhTsfJeWF
-    EM2oiw/oYzen8dgWSDAQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJfScBm5T"
-Received: from tauon.localnet
-    by smtp.strato.de (RZmta 51.3.0 DYNA|AUTH)
-    with ESMTPSA id f29bbf15DGYkxsw
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 13 Jun 2025 18:34:46 +0200 (CEST)
-From: Stephan Mueller <smueller@chronox.de>
-To: David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Simo Sorce <simo@redhat.com>,
- torvalds@linux-foundation.org, Paul Moore <paul@paul-moore.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>,
- Clemens Lang <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>,
- Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-Date: Fri, 13 Jun 2025 18:34:46 +0200
-Message-ID: <11297298.5MRjnR8RnV@tauon>
-In-Reply-To:
- <01f2f3171dd0f1cd9dcb496ac66bc6903767a2d2.camel@HansenPartnership.com>
-References:
- <501216.1749826470@warthog.procyon.org.uk>
- <01f2f3171dd0f1cd9dcb496ac66bc6903767a2d2.camel@HansenPartnership.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="EIHZ5bUg"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-adf3b33f968so88227466b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 09:36:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1749832577; x=1750437377; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=76g08zX1QgiOXgDWQ+4Q63FmolLqjqLzmJdnqen2jZI=;
+        b=EIHZ5bUgn98VOQ0SUZbMdi544m1oiO9Fdp/dGsrOQJMZAuaS0UVCpkIRcQDiGEvnu5
+         0eO4yTEGsIj3JG6dMk1OJWgm17yZ8nBtRXEpn6M+FpdDyZWLY3C7vXt8FGHWsuR4rQSc
+         U/yBJgsJdXcY/9YtEsXcUbsQ1n/MXflsfkHBk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749832577; x=1750437377;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=76g08zX1QgiOXgDWQ+4Q63FmolLqjqLzmJdnqen2jZI=;
+        b=PlNyJs7/dJ2FovFe5+QfJbnpfCv3099pSF+BrfBnO36ABQzdwcrZziPfIF6O6pRBCo
+         Zbvz7bKuHaW1vOITY2tSr0vkvRKBYAlbBqdUfu+XFor+6bdm7Y2OWrycG7pO0Yu2Ullj
+         QDUYseL6+Ddf5aJxd0SSXBdETdDXA5CbPioCnO0BSDz09FQe/NlPvQOqltAJKOP6fv73
+         HAx5RqRDSiQhHhKcr4Fj5TbFPuqnzvArBFcWK5PusF2FdLqwafy7N7rY43v9AgfJqTaZ
+         LanUxV6e8QvBVivshLnxoz/vnztstItkUaenvZ8DQ1eo+zrs+b4nZdw/836Fs1qJ02aV
+         lkjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYPakzIltsIsrQLelS1TJ6NxZwLlHAdI2pUeLVqvsagiFaSTSdySWGJ6HSp222mpFHjnEZuNjTeYa/Bpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhrTkO/EOX1c5wehBjtIca+y6fzeTTpJLGrQCOabBOjsExysuq
+	nEW+6VSffifn97YSJcb02fH3lSQUgpjU7NzTmTygmV60HsIn0XOz45iLnW/b1KTFMM7R2zkzzhm
+	5WkRSR2vqMQ==
+X-Gm-Gg: ASbGncs2lRxPefBr0xVk6pSuzgbSoC7nelirx4IFqjERN0LKuQfT0VKGsug13DxPWvo
+	GB/njGCp5wiS4AdWqu4fcHUp90qGhOlXLVcr9KrOjIpmetif1Iq01+2vTLpjqXL9S/XQQxVmlSK
+	bAG//4VLsoRWXpxG7Pjrmy8O5NFsW9YxSvqNDc4pnjt7ff9rsgTNZWybYptvIa4yzV5XqidmUMo
+	x60RAXv8S2CNv+vXlUHYJe3SZQV1m2Uvbmsym9JauaxpVcXO8ujctBe+3FIn8exATj43NBTOUpN
+	6Mnv+9E8qnrzSGQxcTApxy3heX5+QSaRGBTJ8xxBNsOxKPw6Bj0THq85diWGpxh3s7LhEVhymeB
+	2Ji6fgX66VBvR6+M5uhJhEbH9arYjGP9HXpdz4yrU/vQNrMA=
+X-Google-Smtp-Source: AGHT+IETaRzAStTSBs3VRXKY4R+0/tsWkWaMssu6jDsK9/mXmLbl6LdL3694RFmCy8i606HCoJOhNQ==
+X-Received: by 2002:a17:907:d9f:b0:ad8:adf3:7d6d with SMTP id a640c23a62f3a-adf9eab3418mr37170666b.21.1749832577387;
+        Fri, 13 Jun 2025 09:36:17 -0700 (PDT)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88ff249sm150227266b.82.2025.06.13.09.36.16
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jun 2025 09:36:16 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-607873cc6c4so4726785a12.1
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 09:36:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWwHXlk4/IwSBEgntgqVHtagfYmWOUgfNWCDJly7bKMJOYSGBaClm/vhN4bm7cdK3CnphgOM8wYT4xZqi8=@vger.kernel.org
+X-Received: by 2002:a05:6402:35cd:b0:602:427c:452b with SMTP id
+ 4fb4d7f45d1cf-608ce49d897mr365341a12.3.1749832576184; Fri, 13 Jun 2025
+ 09:36:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+References: <20250611020923.1482701-8-ebiggers@kernel.org> <aEjo6YZn59m5FnZ_@gondor.apana.org.au>
+ <20250611033957.GA1484147@sol> <aEj8J3ZIYEFp_XT4@gondor.apana.org.au>
+ <20250611035842.GB1484147@sol> <20250613053624.GA163131@sol>
+ <aEu5cyDOMcKteW_b@gondor.apana.org.au> <20250613055439.GB163131@sol>
+ <CAMj1kXEDCRfCgvtuhRc+a=m1kVt-zkcCqi_=_WOFTmt4Hz2gGg@mail.gmail.com> <aEvjrhkLnB_GEKnV@gondor.apana.org.au>
+In-Reply-To: <aEvjrhkLnB_GEKnV@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 13 Jun 2025 09:35:59 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiewoOfhK=NVQT2uf+29Kngv9F9J6ObJRFUKi6n-=B06g@mail.gmail.com>
+X-Gm-Features: AX0GCFu7lGsyyFJqLRh6z7a562txhJJOyTpVqIIzlie72BRGPF0wH2A3ccvLGV0
+Message-ID: <CAHk-=wiewoOfhK=NVQT2uf+29Kngv9F9J6ObJRFUKi6n-=B06g@mail.gmail.com>
+Subject: Re: [PATCH 07/16] crypto: sha512 - replace sha512_generic with
+ wrapper around SHA-512 library
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org, 
+	Jason@zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-Am Freitag, 13. Juni 2025, 18:13:43 Mitteleurop=C3=A4ische Sommerzeit schri=
-eb James=20
-Bottomley:
+On Fri, 13 Jun 2025 at 01:39, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> First of all the export format is being made consistent so that
+> any hardware hash can switch over to a software fallback after
+> it has started, e.g., in the event of a memory allocation failure.
 
-Hi James,
+Can we please instead aim to *simplify* the crypto thing?
 
-> > The good news is that Stephan Mueller has an implemementation that
-> > includes
-> >=20
-> > kernel bits that we can use, or, at least, adapt:
-> > 	https://github.com/smuellerDD/leancrypto/
->=20
-> So the only hybrid scheme in there is dilithium+25519 which doesn't
-> quite fit the bill (although I'm assuming dilithium+448 could easily be
-> implemented)
+Just say that hw accelerators that have this kind of issue shouldn't
+be used. At all. And certainly not be catered to by generic code.
 
-Dilithium-ED448 just landed. One bug to squash though.
+The whole hw acceleration is very dubious to begin with unless it's
+directly tied to the source (or destination) of the data in the first
+place, so that there isn't extra data movement.
 
-Ciao
-Stephan
+And if there are any software fallbacks, that "dubious to begin with"
+pretty much becomes "entirely pointless".
 
+If the point is that there are existing stupid hw drivers that already
+do that fallback internally, then please just *keep* that kind of
+idiocy and workarounds in the drivers.
 
+It's actually *better* to have a broken garbage hardware driver - that
+you can easily just disable on its own - than having a broken garbage
+generic crypto layer that people just don't want to use at all because
+it's such a ess.
+
+This whole "make the mess that is the crypto layer EVEN MORE OF A
+MESS" model of development is completely broken in my opinion.
+
+There's a reason people prefer to have just the sw library without any
+of the indirection or complexity of the crypto layer.
+
+           Linus
