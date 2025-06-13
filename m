@@ -1,147 +1,87 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903F72DA742
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 07:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEDD2DA751;
+	Fri, 13 Jun 2025 08:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749801476; cv=none; b=pawXOeUwDIpbz9vxDWSCxBzb0fMgEDOZZwkaP7BrFiKTmE1Fp6pgIzX+vPyodYagZ6MPJGLqeBdHWETglMBW6sTsVRpff14vW8/9vy6FsQg3hfoU0CQzBxkvhBCPKsQJjbGPPegT4x96aOByhn0jTyVYeQw5I6OCe8L8A5avbYQ=
+	t=1749803959; cv=none; b=Z2nI/hJZhErjfgQiPFZ4/Ei7syEgCPe0BYRLRYzJl3tSFoE2qZVZH7daOSxeOdddIsK3hSJkbfNqAXeNj1RX/gowBPb0RYvEa6PZR67Bb5zmRH2BZGVTkx6HvAlmaleNFmt2P7BsIhIRvm2Z4xiEOU1QHIq3H2Z22plBSEwWyrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749801476; c=relaxed/simple;
-	bh=QqKEj8d/6nhYZGpndkGRC6psU7P4KEDelUr5aNfYhQU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=E7XdHsabqPfgXhb8ZH4VuoKDkWRtRJKwwmkOxjrtqqT3E+0ZMXttvp1pchJTRX3T2Tas0pr2dAWnHPgKBlXCrFOS46L76ljeRL1OAVwisIXI+VuWzk6VdnwDXG4ioT82XrFLcO/85btzrfznUQVhjCcCkIUJeEUKORxdIjGolWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=sG6q1yao; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
+	s=arc-20240116; t=1749803959; c=relaxed/simple;
+	bh=6xWAtqVWcnVhNq3FdMxXgZW7X9XJpphcbjy58tJXXKI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JtX0bBRwO/49SYa9M6TaL9TZwT5NOIRjzgR+OLGfzqfYCCj/mYpcV453elKGIGP8qbyvYFmSg1gXIZFdqvPrx3xsoKYJc0fFyTzjqj23IyWYbkd/Cxc1cgenJ3T8Kqsq1I5YzxKqEvU/uYGG0FwV5bv0pn4DfnlGFnv1WyFQmZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Dqacu+sT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="sG6q1yao"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Dqacu+sT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=z2jx2sNLNoJ0ygGTf3Y8T5QDDcxRyAG0f6aRQMfMYKs=; b=Dqacu+sT7ilY3QllsgF/kbefo0
+	GdITohgE0nQBt/EYnqx4lHQgvV4Dv6F1wIU9eQAl4ci4vNvkw5yOCf/xRMQJjk97CC1+WtFXiNmt9
+	ng1hmwEm7mvHCGCLGIPB7Y0qihOstz/KTuCJv0q+xNXMeFq9dhAhp2IxaG8qNR9AHI2DHj2vAxXXY
+	9q/fvfkAp4GpD+vKUtKur21el66NXn0IUE0vQ7byU41Bhod/OxxMR6yFo6zPsd6p9ujY4MfOYL0b3
+	Wtj8YQibzup0USfdWJ89Ve02aoDvW+cit1BycTBi4ecJ+kNE+EJ8cz7FFwUxzo64ntpSAv/kuwscm
+	zwvheCug==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uPzwM-00Cs6f-1z;
+	Fri, 13 Jun 2025 16:39:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jun 2025 16:39:10 +0800
+Date: Fri, 13 Jun 2025 16:39:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+	x86@kernel.org, Jason@zx2c4.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH 07/16] crypto: sha512 - replace sha512_generic with
+ wrapper around SHA-512 library
+Message-ID: <aEvjrhkLnB_GEKnV@gondor.apana.org.au>
+References: <20250611020923.1482701-8-ebiggers@kernel.org>
+ <aEjo6YZn59m5FnZ_@gondor.apana.org.au>
+ <20250611033957.GA1484147@sol>
+ <aEj8J3ZIYEFp_XT4@gondor.apana.org.au>
+ <20250611035842.GB1484147@sol>
+ <20250613053624.GA163131@sol>
+ <aEu5cyDOMcKteW_b@gondor.apana.org.au>
+ <20250613055439.GB163131@sol>
+ <CAMj1kXEDCRfCgvtuhRc+a=m1kVt-zkcCqi_=_WOFTmt4Hz2gGg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
-	t=1749801470;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L+YN4MTZBkTzMLCaO2wC4gmmUGZnS4C1FG9BefD5M2o=;
-	b=sG6q1yaomuV3OMNUoQqhkbuH1Xcj2p7del+A7bay2fusZru9OEE8vWFR9UthMbY3VpLLfI
-	FUolafPTe92AVJjXi4pi5inFQskTUn+5VcHL1uolO93tIKvk8tlCvfrwE0e3akdsHhcC8V
-	xULhpn0qpRQt3dVp2ppv0jcfC8bE3yRFWAhE3OIwjSlJd+fb0tB+Svm/dPDtaN8FVUic8Q
-	AlUuSwdrSq1M+QGe+Yic0cPdymG4mu6zz0PJ+rqKgAXWDJlPscQ3e8bvOMPMPVcUGhiwnQ
-	jVaBmQpd3KW1TkF59UGitXhqsK7wY8V8Q1vheo3YthkTxgD8q+/QVo+u1ZZMvg==
-Content-Type: multipart/signed;
- boundary=8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Fri, 13 Jun 2025 09:57:32 +0200
-Message-Id: <DAL8UI7TH6IJ.2EVGYOYRQSS89@cknow.org>
-Cc: <linux-crypto@vger.kernel.org>, <linux-rockchip@lists.infradead.org>,
- <linux-kernel@vger.kernel.org>, "Corentin Labbe" <clabbe@baylibre.com>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 3/7] crypto: testmgr - replace
- CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Diederik de Haas" <didi.debian@cknow.org>
-To: "Eric Biggers" <ebiggers@kernel.org>
-References: <20250505203345.802740-1-ebiggers@kernel.org>
- <20250505203345.802740-4-ebiggers@kernel.org>
- <DAJOCL4UQWZ1.2CB0NH55US5EI@cknow.org> <20250611163430.GA1254@sol>
-In-Reply-To: <20250611163430.GA1254@sol>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXEDCRfCgvtuhRc+a=m1kVt-zkcCqi_=_WOFTmt4Hz2gGg@mail.gmail.com>
 
---8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-
-On Wed Jun 11, 2025 at 6:34 PM CEST, Eric Biggers wrote:
-> On Wed, Jun 11, 2025 at 01:41:06PM +0200, Diederik de Haas wrote:
->> On Mon May 5, 2025 at 10:33 PM CEST, Eric Biggers wrote:
->> > The negative-sense of CRYPTO_MANAGER_DISABLE_TESTS is a longstanding
->> > mistake that regularly causes confusion.  Especially bad is that you c=
-an
->> > have CRYPTO=3Dn && CRYPTO_MANAGER_DISABLE_TESTS=3Dn, which is ambiguou=
-s.
->> >
->> > Replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS which has t=
-he
->> > expected behavior.
->> >
->> > The tests continue to be disabled by default.
->> > ---
->> >  <snip>
->>=20
->> I built a 6.16-rc1 kernel [1] and its config is based upon Debian's and
->> that has enabled CRYPTO_SELFTESTS [2] (due to Debian bug 599441 [3]).
->>=20
->> I then installed it on 3 Rockchip based devices and booted into that.
->> 1. Radxa Rock 5B (rk3588)
->> 2. PINE64 Quartz64 Model B (rk3568)
->> 3. PINE64 RockPro64 (rk3399)
->>=20
->> The filtered dmesg output for Rock 5B:
->> ERROR:
->> [    0.709822] basic hdkf test(hmac(sha256)): failed to allocate transfo=
-rm: -2
->> WARNING:
+On Fri, Jun 13, 2025 at 09:38:11AM +0200, Ard Biesheuvel wrote:
 >
-> https://lore.kernel.org/r/20250610191600.54994-1-ebiggers@kernel.org/ fix=
-ed the
-> HKDF failure.  It was caused by a patch that changed initcall levels.
->
->> [    8.877288] alg: skcipher: skipping comparison tests for xctr-aes-ce =
-because xctr(aes-generic) is unavailable
->
-> That's expected if you have CONFIG_CRYPTO_AES_ARM64_CE_BLK enabled but
-> CONFIG_CRYPTO_XCTR disabled.  Some tests are skipped in that case.
+> Perhaps I am just slow, but could you please explain again what the
+> point is of all these changes?
+> 
+> Where is h/w accelerated ahash being used to the extent that it
+> justifies changing all this existing code to accommodate it?
 
-Happy to report that with that patch and that config option, the error
-and warning are now gone. Thanks :-)
+There are two separate changes.
 
-PULL request for the patch is already sent to Linus:
-https://lore.kernel.org/linux-crypto/aEupSzhTI4h8kz-5@gondor.apana.org.au/
+First of all the export format is being made consistent so that
+any hardware hash can switch over to a software fallback after
+it has started, e.g., in the event of a memory allocation failure.
 
->> [   14.172991] alg: ahash: rk-sha1 export() overran state buffer on test=
- vector 0, cfg=3D"import/export"
->> [   14.202291] alg: ahash: rk-sha256 export() overran state buffer on te=
-st vector 0, cfg=3D"import/export"
->> [   14.230887] alg: ahash: rk-md5 export() overran state buffer on test =
-vector 0, cfg=3D"import/export"
->
-> That means the Rockchip crypto driver is broken.
-
-The crypto driver for rk3399 is still broken.
-
-> Anyway, the more interesting part of your email is that you pointed out t=
-hat
-> Debian has the crypto self-tests enabled, precisely in order to automatic=
-ally
-> disable buggy drivers like these.
->
-> So I'll send a patch that adds back a kconfig knob to run the fast tests =
-only,
-> which I had removed in commit 698de822780f.
-
-I responded about this to a new patch submission here:
-https://lore.kernel.org/linux-crypto/DAJXJHLY2ITB.3IBN23DX0RO4Z@cknow.org/
-and v2 of that patch can be found here:
-https://lore.kernel.org/linux-crypto/20250612174709.26990-1-ebiggers@kernel=
-.org/
+The partial block API handling on the other hand is about simplifying
+the drivers so that they are less error-prone.
 
 Cheers,
-  Diederik
-
---8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaEvZ9AAKCRDXblvOeH7b
-bgePAP4+kEWYKZ1eqayKsFe8tBfUVxnfdStRKU8Qr/95saO95wEApLF/txTDorHT
-OXmTzRTcsInQy9LVjH2/+08cAly/KQs=
-=NvpI
------END PGP SIGNATURE-----
-
---8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42--
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
