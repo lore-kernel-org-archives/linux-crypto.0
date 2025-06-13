@@ -1,100 +1,88 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DB818CC1D;
-	Thu, 12 Jun 2025 23:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6437A1B95B;
+	Fri, 13 Jun 2025 00:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749769792; cv=none; b=nRJ8lJFy5JsR07WJ16G07AcoV82F2+qn7of7MG0mIQMP6fB2dOvm6vUMQqJCNV3DwG9upLWQPnytnsxXoZR4PMtYBzStW5G0CphAptt96hYet44X3rew6j60+imc5B4JHsWt161FUV3OLNL4diNT901QgJ5fN24ZwFtQa9FjKz4=
+	t=1749773799; cv=none; b=eZbBPtR20er4hB86xN7cLOn5TOOTMAi14wYg9jJIb8iZpXMK2+2z92ajPK8JvDAldcxai1QTyrhp4H36LMRmzCqgPQ/lt8rW5ZD9+xYZSqqUUhsp0UxKBfMwvXBh/Ugrt+arPtm6/DidoftE0oOUnTcyb9eYpRpnlxuM+wj1cCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749769792; c=relaxed/simple;
-	bh=BXwHG2qudgkITh3YDB4mez2Ozgw6n+T3YbBgSyNz5Yc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kHRxSaYGpuiPvBVvWDA9v2GIg5wXigcyjbSULNCjY/mMopAoh3JS9/IU02eaV/8ELKSklJxNJFxzHMwyqN7o6GjNhCpd0WiVMr0jJr3DB5YhmXJMss2Pv+V5mx42oUV7cJbEOwrt4qMmQj6JdI3Qw3Rcfpr8LssHbYVMOQYOUsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faeHGAQT; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1749773799; c=relaxed/simple;
+	bh=xlOcpHawrpAE7xy6gDyBeZgUCJfIzjIJTd8pKNa6LD4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WtT0qBHpEYYyeRL26LyEhKNLmzsqWKD5q5ry+OXp6k4u2KfDB1x5eqeSAg6QI9dWf8tAY/JFigkGmsGuJFevXVTL7QzUYJiSLl/5L38+s5KRM+Mp5QzybMUVKj61prPdqkA2x0W4v6Dcqg2gTNM21jE3yLk7X0EX7ndaDG4jq/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LadC5D/C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faeHGAQT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749769791; x=1781305791;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=BXwHG2qudgkITh3YDB4mez2Ozgw6n+T3YbBgSyNz5Yc=;
-  b=faeHGAQTUoOeQ6ZsWhzw6D/yv/NxWCj9LwUuJtOts/TIuPVNrao4kBtb
-   bcvanBx9apimYbvFCzEnAKC8G93lvAqa8yZX0SEpCKqm35CeviQBlctyK
-   UyHJOh6Yr8Mm6I0w6y9AIfpJ3fX2gzyDJQ7/sVg1jxHkPY6c7f1twcn1v
-   IgjSSZL07Ryf3+HWh/B5mrZM76SCTOWEg0odqHbi3lM8EXzVy9sCVv8Cs
-   Lc1jRyWVwcZEQPpjUsc+9K5AFRrGr/Utmu+aSnWX4easuPadNWtBE3zum
-   Z/9DvwGo6bKv7pv5PXNFiKvfxP6i3c3WW1QBtFdNPVX/fiKWT6u6EjeAk
-   w==;
-X-CSE-ConnectionGUID: unRk1cMvQpSq2VXESzFmsQ==
-X-CSE-MsgGUID: Yx5tf/cFSwmVssDgEXHgiA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="74501287"
-X-IronPort-AV: E=Sophos;i="6.16,232,1744095600"; 
-   d="scan'208";a="74501287"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 16:09:50 -0700
-X-CSE-ConnectionGUID: H6PAIMCESeen2bH58cIwEA==
-X-CSE-MsgGUID: A5LZmhLvTT++P3wZtJYNBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,232,1744095600"; 
-   d="scan'208";a="148551513"
-Received: from unknown (HELO vcostago-mobl3) ([10.241.226.49])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 16:09:50 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kristen Accardi <kristen.c.accardi@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Tom Zanussi <tom.zanussi@linux.intel.com>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: iaa - Fix race condition when probing IAA devices
-In-Reply-To: <aEpn0B6CrMNcD-Oj@gondor.apana.org.au>
-References: <20250603235531.159711-1-vinicius.gomes@intel.com>
- <aEjnbdoqzLoMifRn@gondor.apana.org.au> <878qlyugea.fsf@intel.com>
- <aEpn0B6CrMNcD-Oj@gondor.apana.org.au>
-Date: Thu, 12 Jun 2025 16:09:49 -0700
-Message-ID: <87qzzo8sle.fsf@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LadC5D/C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DC6C4CEEB;
+	Fri, 13 Jun 2025 00:16:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749773798;
+	bh=xlOcpHawrpAE7xy6gDyBeZgUCJfIzjIJTd8pKNa6LD4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=LadC5D/Cu+CFO0cDGK0falq7Nvk3BmGWe0T6kp1cb7ZjmzGLsDYEzGcc1zFCOjrp0
+	 OP0XCVPPQv4gjTykEhmEuHf8mZgVz8XJHilaZdp1aI7K1EcDdHaF1vXxi+qnKFVd9O
+	 r5Wf8uX88jxleyiedQdD6zSB+/njRo7NW/pAz2G2ZW0z+5F3JvKqOtGd9tF07fsPvi
+	 FI84w44Hit28l2fAUQ7yga+7qt+hIbsNQ/AR+kCCGYb8KVYwkEpEj4/bO9TR7vpBlZ
+	 ctqZByGMX9bwxKy9FIOBXi3sffRmw0z24FgTtMLzkG76JhUjX4T3bTtd6D+FVj/yTI
+	 hh+PpZaJT1FBw==
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e812c817de0so1443958276.0;
+        Thu, 12 Jun 2025 17:16:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUzkBbLYHKOGB2oI8U06t6ii3VxPUxS5NLW0wRu3Xo1ZGs42hKLiuZSGCpPkTwDKElLVjZ1avyvJwq/fBo=@vger.kernel.org, AJvYcCVDoGexyL5JE8w5baRzgyK5F47R12/wW/omlyuNf0qseQFzbK9Co/05r2yDgAu5PUPrj8akuhAGyengJGrPQP1bATAq8Ws9@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDxj/oK2sB1Grb7aVRkDa7/DN5HT+rC0QlqAfegkc1ryrXjz5O
+	BPjNms+2ccKMZ99i9vAu4ZIaAJcfvLBa/eHfk66sVDoYtsfSYdhQSDxsrxhIk1mmCunEZ3ZU0XG
+	qg6vQBestvV3YIlCJ7y1UZoFC19Xr/so=
+X-Google-Smtp-Source: AGHT+IHvou+02vOs446nDMpw0JYSOHKq8Ing5XCWydC5vK4qd3PrqXqtVVEEDwlrsmUqBtQsumfoOxTRbKq0tOBjd20=
+X-Received: by 2002:a05:690c:7309:b0:710:e966:bf96 with SMTP id
+ 00721157ae682-711637513cdmr21819607b3.27.1749773798185; Thu, 12 Jun 2025
+ 17:16:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250514050546.155041-1-ebiggers@kernel.org> <CAKtyLkEnJGFCAuurSihU_bUTCzEqTXEx_0dG0OHQ8353do0okA@mail.gmail.com>
+ <20250612190926.GD1283@sol>
+In-Reply-To: <20250612190926.GD1283@sol>
+From: Fan Wu <wufan@kernel.org>
+Date: Thu, 12 Jun 2025 17:16:26 -0700
+X-Gmail-Original-Message-ID: <CAKtyLkGayHWvW8s-CP6sx9Aj6SZ0MJXvTHq2UiiYnisaLzRqPw@mail.gmail.com>
+X-Gm-Features: AX0GCFvDqOryf23shP1gLhA7dPmlh0oEWMar_VzX17VOXNn6aa6toU7g-xdtrxo
+Message-ID: <CAKtyLkGayHWvW8s-CP6sx9Aj6SZ0MJXvTHq2UiiYnisaLzRqPw@mail.gmail.com>
+Subject: Re: [PATCH] ipe: use SHA-256 library API instead of crypto_shash API
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Fan Wu <wufan@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-
-> On Wed, Jun 11, 2025 at 02:17:49PM -0700, Vinicius Costa Gomes wrote:
->>
->> >From what I could gather, the idea of the per-cpu workqueue table ("map"
->> really) is more to "spread" the workqueues to different CPUS than to
->> reduce contention.
->> 
->> If the question is more about the choice of using per-cpu variables, I
->> can look for alternatives.
+On Thu, Jun 12, 2025 at 12:09=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
 >
-> Prior to your patch, the compress/decompress paths simply did a
-> lockless per-cpu lookup to find the wq.  Now you're taking a global
-> spinlock to do the same lookup.
+> On Wed, May 14, 2025 at 12:40:45PM -0700, Fan Wu wrote:
+> > On Tue, May 13, 2025 at 10:06=E2=80=AFPM Eric Biggers <ebiggers@kernel.=
+org> wrote:
+> > >
+> > > From: Eric Biggers <ebiggers@google.com>
+> > >
+> > > audit_policy() does not support any other algorithm, so the crypto_sh=
+ash
+> > > abstraction provides no value.  Just use the SHA-256 library API
+> > > instead, which is much simpler and easier to use.
+> > >
+> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> >
+> > Thanks. Will pull this into ipe/next.
+> >
+> > -Fan
 >
-> That makes no sense.  Either it should be redesigned to not use
-> a spinlock, or the per-cpu data structure should be removed since
-> it serves no purpose as you're always taking a global spinlock.
+> Thanks!  I notice this isn't in v6.16-rc1.  When is the pull request plan=
+ned?
 >
+> - Eric
 
-Will think a bit harder on this. It could be the code is trying too hard
-being smart and there's a easier/simpler way out. I was only trying to
-solve a bug that some folks found.
+The current plan is to send the pull request during the next merge window.
 
-
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-
-Cheer,
--- 
-Vinicius
+-Fan
