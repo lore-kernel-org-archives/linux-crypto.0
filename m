@@ -1,125 +1,63 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5D0226D1E;
-	Fri, 13 Jun 2025 17:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749837329; cv=pass; b=KHzjdlILD8avmmmIgTYA7UW5M18HHmOR+a6GlNvGUMQ2yaqpY0Wecy+elFVcOiXY3fGmQu2cBn7IUJqJopShIRCVPj8FpsNQHP0d1eUxVh6AW8x2RHW/C24lIhJEHJu+CuaVEIGwsPgkVZ2yZK3IYpW1Bp7B1Ln3advGChdwdfw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749837329; c=relaxed/simple;
-	bh=ofr+fvQbblYayi+b6RtbvNLe46eCfV6/Q2We6eydfN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nSgEfeajIHWMelmtWdTLOKl20vQRmGr1irc0V3q2fNAh/BdeRjzzczXoQBO/CcgOulGLzfkY3OmQuD0rxq9ox1qaJ1Qb2KSRwEpZNKZQeZ+zqRob83UTSLOLgpvrcfCE80ACw/Iv5C+jzsl3SzUI5PCCRiFIEElJeiKpT2HtMbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=MJsQo9AQ; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=Ndo0S8cQ; arc=pass smtp.client-ip=85.215.255.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50865225A3D;
+	Fri, 13 Jun 2025 18:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749837863; cv=none; b=rt+np+niSy4mheZf2PW+XgbokQg9opGkneleMHTaToeVz7x1j3qjqBseOWnz7GnNflHI5K8hr7g3FWoqLBRhrlMh9wru0njq45vRx8h/5mkyBhgoFh4S5SzuOxp2/eJZfoTUxwMdgNORfxiFR8aqICaWQbo8bZ1YsrWA9VXDBUM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749837863; c=relaxed/simple;
+	bh=QoWL+WLjv4+FfD13sRd00iIwab26JFHdbKgK4m9ZyNo=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=BD7VOCEFKyyFuSqjh1VL9tWkQtlTFO3r3/JdexVBJWq57gVgpE1mR+e7NxeWnl0U6zEUi8XyJ3ool6LOe1UKYtwp2kyfuJ15oijxwMJxDFQdO3juqUZRo26po/bnJja3iS0Gp6nQLacnEijMi3U2EC8CEs73FqHx7gLBWP3cs2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMm5aTwn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="MJsQo9AQ";
-	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="Ndo0S8cQ"
-ARC-Seal: i=1; a=rsa-sha256; t=1749837314; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=X6WxiaTf1eWL8+ivP3OTpzZB4FCb9jVDhhwGjwe25qKtiS0JBd1pEarbkYa+Q3ONpZ
-    cV0tSKLiw5E8iB31YaB/yV92yekzN++6Bnf7A3z9K3tou2BspLtD4v80dNSWTM6+3SRd
-    H96GdzVrRJrjYxyGt7KnE/5vF5kjfqB9QXJHyHVgjFYqtFVrprrK+3KJcxvB4wJdP8CW
-    xNWOXn7MoWdWKU9tEJjt+0jDN9Jih2E+5mg6jg5rKSJLLve0c85UqWFCPXhT8SwLSDDN
-    Su5aRJrI0XZzlx21kfPCZZILOCTihdnQQEvA2R2IqzRRxMsSsa3soex+whNEzhPH3nmv
-    LpqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1749837314;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=ofr+fvQbblYayi+b6RtbvNLe46eCfV6/Q2We6eydfN0=;
-    b=lGByFhG90J7+WGmxaFo3PKQpskzdWJKaClC1LBxQiXoTzZL0UZ/R0h+W8l2y/nQu7J
-    j+zIC51yjSScTuZLmA+1eMxGpnEpXYNQtX9kUymrGGlr0hqeNtcVZCSD6IcGYHQl/IUo
-    bUy8/H/zLuWT3gkYrzTKDw6E9eZL1UTzOf3PzpB2Rh453aMC/waT78ZcKlgJuL0Lcy4I
-    x7671bePlUSnDqRtOD+ADffwp7F/JAfUrdW3KJBSjbOuaddKd/6LJpNnXmP1F956TJS3
-    7/MyhHZYNgwOs6V27/sS8HEYxfta+kIqIDTY+wh0qY7NdO6KO/b6J782eQde1WPUxTEa
-    +C5A==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1749837314;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=ofr+fvQbblYayi+b6RtbvNLe46eCfV6/Q2We6eydfN0=;
-    b=MJsQo9AQ6ACFPZdMfRxS3MoyVMcMV3qBpsRZgKoT9XQp9bOOoi3nmhRGj8n3cgIKXU
-    PYPu70Zdgee4pwx0teEN3LhVZKvgxo1i2FiaXWjPXHhJ2F9EXa2x5CrrRBBTDNKtoFso
-    bNxwt4qzjw6vMO4skKMXh7HJsgqX0FBFyhe9KEAWIc/ronvXnyUkRQeuXw8v8YEQdUHi
-    M3Vrbh/V2Igcr8n3NOG8R9+49jA8IkoShQRAilKd3VKmnf4l6wqzwTSACfiAX/G3P2ul
-    qb1bhDU8d5ztBnrgj2LjBBt/Vd1fpbxTMH+skSKX83ci7OtUtK9iEfT0hkfaQUnaTZKJ
-    SdcA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1749837314;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=ofr+fvQbblYayi+b6RtbvNLe46eCfV6/Q2We6eydfN0=;
-    b=Ndo0S8cQNoboJ8bgQijqYjzmdQP1YnhKAqZjZrPChzeHKia3BAQ2pUDHt7fD9sGD/E
-    RO71IVAkGwF4ZEZ7zcBw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJfScBm5T"
-Received: from tauon.localnet
-    by smtp.strato.de (RZmta 51.3.0 DYNA|AUTH)
-    with ESMTPSA id f29bbf15DHtCxyu
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 13 Jun 2025 19:55:12 +0200 (CEST)
-From: Stephan Mueller <smueller@chronox.de>
-To: Simo Sorce <simo@redhat.com>, Ignat Korchagin <ignat@cloudflare.com>,
- David Howells <dhowells@redhat.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, torvalds@linux-foundation.org,
- Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
- Clemens Lang <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>,
- Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-Date: Fri, 13 Jun 2025 19:55:12 +0200
-Message-ID: <13066544.VsHLxoZxqI@tauon>
-In-Reply-To:
- <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
-References:
- <501216.1749826470@warthog.procyon.org.uk>
- <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com>
- <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMm5aTwn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20487C4CEE3;
+	Fri, 13 Jun 2025 18:04:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749837863;
+	bh=QoWL+WLjv4+FfD13sRd00iIwab26JFHdbKgK4m9ZyNo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=cMm5aTwnPZaqMUP5SaQBhlSIMtGwx+tIjzktITjwhVrH3QZtXAkHN4QSLI0CN8cpv
+	 ctdW20kwxLywF+oPifr4MScKssh5lSpZYnDVomJGY10BMFgGV1l/giQ4H5OamRlybl
+	 qk/hc+Fx+krvrBayyw2/QSvcp2tznCOFfW1e9uDuB311y8E/Oe/K4ekdxICb/YHx49
+	 Ib3T82iOL46ouL5U9DPxUZHa25EuS8yi5ImvHIIUg9aNR6nF2D/FH2yV2xjvbcX2Ln
+	 QQg3gfiHw58IBknyX5xOGEVdW2z/1ovDz2jY88/EZ/9z5pSs+RKeB8VFXpJ1IRCJmM
+	 zhmA6TxAYki4A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADFE380AAD0;
+	Fri, 13 Jun 2025 18:04:53 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.16
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aEupSzhTI4h8kz-5@gondor.apana.org.au>
+References: <aEupSzhTI4h8kz-5@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aEupSzhTI4h8kz-5@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p4
+X-PR-Tracked-Commit-Id: 40a98e702b528c631094f2e524d309faf33dc774
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ad6159087fbbd754bfe940bd62b6322307925faa
+Message-Id: <174983789254.834702.8944781738634806282.pr-tracker-bot@kernel.org>
+Date: Fri, 13 Jun 2025 18:04:52 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
 
-Am Freitag, 13. Juni 2025, 19:50:22 Mitteleurop=C3=A4ische Sommerzeit schri=
-eb James=20
-Bottomley:
+The pull request you sent on Fri, 13 Jun 2025 12:30:03 +0800:
 
-Hi James,
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p4
 
-> On Fri, 2025-06-13 at 13:33 -0400, Simo Sorce wrote:
-> > Premise: this problem can't be ignored, even if you think Quantum
-> > Computers are BS, various government regulations are pushing all
-> > commercial entities to require PQ signatures, so we have to deal with
-> > this problem.
->=20
-> I agree it's coming, but there's currently no date for post quantum
-> requirement in FIPS, which is the main driver for this.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ad6159087fbbd754bfe940bd62b6322307925faa
 
-Perhaps [1] should be considered if you refer to FIPS?
+Thank you!
 
-=46urther, [2] also gives a timeline.
-
-[1] https://csrc.nist.gov/pubs/ir/8547/ipd
-
-[2] https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/
-nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-nationa=
-l-
-se/
-
-Ciao
-Stephan
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
