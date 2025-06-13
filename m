@@ -1,123 +1,96 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A57291C0A;
-	Fri, 13 Jun 2025 08:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5572DA751;
+	Fri, 13 Jun 2025 09:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749804706; cv=none; b=Qgg9pjw78Zz5oe/Z+hcCfuugAgFN9M01PhgTHhaXOu9aMuIu//GaiyisZxCu3eBubBUih2ffsm/wmXDoDZHA0OpX7q8HPieMpWc0YNvyMydVvm5QZvPO5LH3eKtZoRlYYkNiKfmFgQvtI38ZqnKlHLimWqdbQmGgtC8Wn4D065o=
+	t=1749805362; cv=none; b=l6JbK8Y/Ll3SKku9coQu2ZHVm9FpsmtJcpQ7h/W2EnfNDnBZczZWc3e7uMUZz5uvTbd1Yc9UVT8yFElAw3QxDZJzBhcZUI7LcpirpCA9ystFF67JlpjVnA1AGhd6jURz1SpOf9y9soes4hkTFkFyUEGsqTaJ5QQm4wTLBYdxJQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749804706; c=relaxed/simple;
-	bh=XjnRFn+DLVFoTo5zHOySZabgyaoUWVbhHCCtwku0/2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ec4Ul/uqug03vfAwxsekUQA4LY2U+Fx6GNBJlDF7c8zDIkJ/RlmbTptrLQamru+Qj0YdTSgPO+/d56xw2FB2mWl2oPXKYqt6ohj9dALoQdcXx/zkYCih/GP9OPZRV1cqSrOCz4+C23bxDeRiaK8u+ulhK+Svn0XdxQBfY0qjako=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ejeNYxJx; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1749805362; c=relaxed/simple;
+	bh=Iu6PP0aeFHgxr8x/QF4l4Q7vhV0Xw+zRs3mVruxMCto=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=V5SPWcpiIzSYIqzhJJNwQN8bI4b8ve0jZEiHQb4oWd11ZTLexX49ownCDmQVufK234e6dJzdfxG4kaxLy8aJsYh//mMZ1Cj0maMKozGMemAgYZ9bOwiB9NiznwBdbe2fVKvreXu668q7Py8hPVI8+GBCOq8n4V/dR9huDCr359I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=TJC+HIwQ; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ejeNYxJx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=wMKt/wPLq9KRfU6Jf04/z1jGFWH/wF4jH0NXJm6Bhlo=; b=ejeNYxJxjqQkEf+Qtb4/A1GtfZ
-	b7jAaCx+igD/opjcpb3XKwVwchdM/PXR4tiwHprFmt4/L2Xs+ZpChWQHUuX2LYsCxrUU+eiustbeA
-	ZKVolER6TWQLfjepmarO/P1DHA89vwzY7ArJk9gDAzisKwslfsuuBqb/Wg3/aWQPZOOjQoyMRELCP
-	8Xbl2WNglxWI/mZ9MWHvlGbxuFigF+67XenNjqAmRVolrvDDN1QbLFg2RHZ/qe/i3LN+yRpvaWrJm
-	DTsKHT9mnfmMylzfbbw6eoUAmVq33jZS3a+a6lk6aGGMWMPA7TQxzmLPlMLIij5j0NMLYobmukZhv
-	QJp9aG1g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uQ08Q-00CsF4-2w;
-	Fri, 13 Jun 2025 16:51:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jun 2025 16:51:38 +0800
-Date: Fri, 13 Jun 2025 16:51:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
-	Jason@zx2c4.com, torvalds@linux-foundation.org
-Subject: [PATCH] crypto: ahash - Stop legacy tfms from using the set_virt
- fallback path
-Message-ID: <aEvmmr0huGGd2Psv@gondor.apana.org.au>
-References: <20250611020923.1482701-8-ebiggers@kernel.org>
- <aEjo6YZn59m5FnZ_@gondor.apana.org.au>
- <20250611033957.GA1484147@sol>
- <aEj8J3ZIYEFp_XT4@gondor.apana.org.au>
- <20250611035842.GB1484147@sol>
- <20250613053624.GA163131@sol>
- <aEu5cyDOMcKteW_b@gondor.apana.org.au>
- <20250613055439.GB163131@sol>
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="TJC+HIwQ"
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55D7x6wD001805;
+	Fri, 13 Jun 2025 11:02:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	dhCZHLOoz/DA9KLk72kzXl6//47HjrLiscmsJROqQU4=; b=TJC+HIwQFnR8RuRE
+	wppUKNBTKL3/NwpFH9nE0ngb/rqF9Lu/ileLRgMIYn9UyLjZyEKItkKvekDrpNco
+	CH2Ar921nY18Xdl/0P13yXdoS1ZBzpkgQY+25liPF5pVzK8R6E9CTtow/QLDHGU6
+	yPdG0oZwXpqhwfLaDOymuGleYwO6An1dIpbs9rOSkv8i7GQoffy8c3UWJ+uMlfvM
+	tauK1RzCWrm/luM7ZBmnYOHOabBLRh89Nw6WHyd9Vc/fcI6/JJ5bdV1tgLduLKaj
+	fzoB7FPeV6Etip+hdlvBfqPA2PiZJrvr7H+x16QQsMmf1UpyJFlDeSmTAZ3RplPw
+	qdJ18Q==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 474ajaktns-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Jun 2025 11:02:23 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 8DF594005E;
+	Fri, 13 Jun 2025 11:01:37 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id DA3C7B9447F;
+	Fri, 13 Jun 2025 11:01:04 +0200 (CEST)
+Received: from [10.48.86.103] (10.48.86.103) by SHFDAG1NODE3.st.com
+ (10.75.129.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 13 Jun
+ 2025 11:01:04 +0200
+Message-ID: <8f4c2f36-71af-4c84-bcee-2554cea991d0@foss.st.com>
+Date: Fri, 13 Jun 2025 11:01:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613055439.GB163131@sol>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] fscrypt: don't use hardware offload Crypto API drivers
+To: Eric Biggers <ebiggers@kernel.org>, <linux-fscrypt@vger.kernel.org>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mtd@lists.infradead.org>, <linux-ext4@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>, <ceph-devel@vger.kernel.org>
+References: <20250611205859.80819-1-ebiggers@kernel.org>
+Content-Language: en-US
+From: Maxime MERE <maxime.mere@foss.st.com>
+In-Reply-To: <20250611205859.80819-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
+ (10.75.129.71)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_10,2025-06-12_02,2025-03-28_01
 
-On Thu, Jun 12, 2025 at 10:54:39PM -0700, Eric Biggers wrote:
->
-> Actually, crypto_ahash::base::fb is initialized if CRYPTO_ALG_NEED_FALLBACK,
-> which many of the drivers already set.  Then crypto_ahash_update() calls
-> ahash_do_req_chain() if the algorithm does *not* have
-> CRYPTO_AHASH_ALG_BLOCK_ONLY set.  Which then exports the driver's custom state
-> and tries to import it into the fallback.
-> 
-> As far as I can tell, it's just broken for most of the existing drivers.
+Hello,
 
-This fallback path is only meant to be used for drivers that have
-been converted.  But you're right there is a check missing in there.
+On 6/11/25 22:58, Eric Biggers wrote:
+> To protect users from these buggy and seemingly unhelpful drivers that I
+> have no way of testing, let's make fscrypt not use them.  Unfortunately
+> there is no direct support for doing so in the Crypto API, but we can
+> achieve something very close to it by disallowing algorithms that have
+> ASYNC, ALLOCATES_MEMORY, or KERN_DRIVER_ONLY set.
 
-Thanks,
+I agree that software drivers are more efficient and less prone to bugs 
+than hardware drivers. However, I would like to highlight the fact that 
+certain ST products (the STM32MP2x series) have features that allow the 
+loading of a secret key via an internal bus from a Secure OS to the CRYP 
+peripheral (usable by the kernel). This enables cryptographic operations 
+to be delegated to the non-secure side (the kernel) without exposing the 
+key.
 
----8<---
-Ensure that drivers that have not been converted to the ahash API
-do not use the ahash_request_set_virt fallback path as they cannot
-use the software fallback.
+If fscrypt no longer supports hardware drivers, then this type of 
+functionality could not be used, which I find unfortunate because it is 
+something that might interest users.
 
-Reported-by: Eric Biggers <ebiggers@kernel.org>
-Fixes: 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index e10bc2659ae4..992228a9f283 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -347,6 +347,9 @@ static int ahash_do_req_chain(struct ahash_request *req,
- 	if (crypto_ahash_statesize(tfm) > HASH_MAX_STATESIZE)
- 		return -ENOSYS;
- 
-+	if (crypto_hash_no_export_core(tfm))
-+		return -ENOSYS;
-+
- 	{
- 		u8 state[HASH_MAX_STATESIZE];
- 
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 0f85c543f80b..f052afa6e7b0 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -91,6 +91,12 @@ static inline bool crypto_hash_alg_needs_key(struct hash_alg_common *alg)
- 		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
- }
- 
-+static inline bool crypto_hash_no_export_core(struct crypto_ahash *tfm)
-+{
-+	return crypto_hash_alg_common(tfm)->base.cra_flags &
-+	       CRYPTO_AHASH_ALG_NO_EXPORT_CORE;
-+}
-+
- int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
- 		      struct crypto_instance *inst,
- 		      const char *name, u32 type, u32 mask);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+cheers,
+
+Maxime
