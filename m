@@ -1,96 +1,138 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E201B24BD1A;
-	Fri, 13 Jun 2025 09:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766C279E1;
+	Fri, 13 Jun 2025 10:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749807456; cv=none; b=bxeUKkW4DewEUbqisgComIxY+QZh5PF6oSUZnzScol1PgvWN7W23HVs6XFEpXlvj0hkHOf4qzpjfBwiiOe0emNPmSjt7iMvC14ict5DesQYAKqBDQ0D+KXPQoZlTCSx18Y2DD0cGVH1kYDOltEinA4NNjrkxu0YOQ0KRJ9xuLQU=
+	t=1749810800; cv=none; b=cFDAy6NatbKrH9FqD5N29zD/NSZoaSn6piONf9FJTHIWSpylS46nLUNtrZJtd9OD8NtlrTbl2BNVmwxoYmbzX0zP7aPrvFIueRoMQkClzBKRULH2qpfRxPC0W8yZy6N7agj7Kju+jWuyW6qc/SJq6Gu0fyUFt63XGzxeCtL83OA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749807456; c=relaxed/simple;
-	bh=LVGyPoTvGZsBOzqQfrIsvNze7QqZjHs9OK9VMHDYCqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vo/Q8uieGnr8aU1PTOwACMfyjHxw+2nY94Jhx59jgNUWiV77F+Ts56xlB1uNWEv5dpt/afEX2dHjTtPKH4CkxQV6aOILCc5Tz7n397VLkMXIbKLIV/WLipN96rzsF8r9v6NdHI7le6anQuMA1V/F9CYQKzs7M759xgPraUwYKwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mcS8bw6V; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1749810800; c=relaxed/simple;
+	bh=DA/GpmXgrYZDR1Jokw6r2RFpNDpiElINfqhDc1jBzZE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m2s3IVCo2QkgLdTOdW2pIu8gZK+YL/Vrz7qGrJvADdg9J3zS7ufUc7d0i6QR+mtJKbnCQnqlvyS5JQD4JZWNZ29iLkwpWAzHhQDx/VyoeWKgbFGYFFqnUj+Md182d8veBnxCssosyLE/9hW67KGywG7IImci1XKCyb+heOWEEf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gYSoxEzB; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mcS8bw6V"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Il348ew1NcDZnfG/kOxQ1x1yaRu/XX/vljLMeyjCTRw=; b=mcS8bw6VPavZ04H3b2/teVgcnQ
-	UPEES/MxnjAw3RdSQtDCM6hY4+7yAULub59MhAIqklbtzvKl1U59T73sHlvrmsAcPqTAjn3ZHc2/2
-	lC565uPQU2WT4MOYd+YAyBTU6HYG1DMw20fZYSYLx3BpMeCVYXDFIeHP/WXacFVGZnZWFLzaIGTZo
-	IX3Q36r3a2WqmXVnqqBUnWThH8Avx0saFXIpK4rAKWQPFXhIHLAWpoG8fMVM0TzC+p7qSDQnWBqij
-	JJxwrqhFey78rh3pwHP+EMCydDJTTPayLQQA8TfZcmZiq0L8B+H7ih1SkoOpQA/zHZb2YFkm1NFfb
-	2LBp4LIQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uQ0qg-00Ct2Y-1Z;
-	Fri, 13 Jun 2025 17:37:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jun 2025 17:37:22 +0800
-Date: Fri, 13 Jun 2025 17:37:22 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Amit Singh Tomar <amitsinght@marvell.com>
-Cc: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kuan-Wei Chiu <visitorckw@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Shashank Gupta <shashankg@marvell.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Tanmay Jagdale <tanmay@marvell.com>
-Subject: Re: [PATCH 0/2] extend engine group handling for Additional types
-Message-ID: <aEvxUlNBAbtYln5i@gondor.apana.org.au>
-References: <20250528145941.2659706-1-amitsinght@marvell.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gYSoxEzB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749810799; x=1781346799;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DA/GpmXgrYZDR1Jokw6r2RFpNDpiElINfqhDc1jBzZE=;
+  b=gYSoxEzBgb+iBgQ1qRPgNcSUe2A929abnllmw8nSz57FwHCsDsK68T0f
+   Fbjgjwe0lzyT8o/faO8ddzI61VTRJgl52TYO7XhA1R031Xz8MC43fCEWm
+   kt01xMoZQFn4bO8qdluezSM4oPOaWtMBpWz8z2gmHiNSxKyHnKGJGLfkh
+   7TSzSsB5tVaSZ3tN5CCiHuPt1PrysNSR9nqeDGIecMm1QlIxTetLLJG22
+   74Ho5NB7glZvdxQWthJ5hj4cdvZbojYFbMux2pvB3czxRm4kLkhkp4VpB
+   YA1Le54GKEWkV63D2a3i2GFfUtJh8+HkVDmFyFkbkzjVGFdhZp33rqki2
+   A==;
+X-CSE-ConnectionGUID: QPsNl8FIT5SnGHq+rd06SQ==
+X-CSE-MsgGUID: upwFH8p1Qv69NXDmA7Hzsg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="55695736"
+X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
+   d="scan'208";a="55695736"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 03:33:17 -0700
+X-CSE-ConnectionGUID: l8eTIZgDTUWpx5Zx4PRHGg==
+X-CSE-MsgGUID: Awor3s5vQSmA8lh5BWGMKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
+   d="scan'208";a="148680699"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.204])
+  by fmviesa009.fm.intel.com with ESMTP; 13 Jun 2025 03:33:15 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: ebiggers@kernel.org,
+	linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] crypto: qat - lower priority for skcipher and aead algorithms
+Date: Fri, 13 Jun 2025 11:32:27 +0100
+Message-ID: <20250613103309.22440-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250528145941.2659706-1-amitsinght@marvell.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 28, 2025 at 08:29:39PM +0530, Amit Singh Tomar wrote:
-> The Cryptographic Accelerator Unit (CPT) on MARVELL platform supports
-> different engine groups to execute both symmetric and asymmetric
-> algorithms. This small patch set introduces minor enhancements to the
-> engine group handling logic to ensure the correct group numbers are
-> obtained for AE and SE.
-> 
-> patch(1/1) 
-> 	* extend the otx2_cpt_get_kcrypto_eng_grp_num() API to support
-> 	  retrieving engine group numbers for additional engine types.
-> 
-> patch(2/2)
-> 	* Add support for retrieving the engine group number for the asymmetric
-> 	  engine type.
-> 
-> Amit Singh Tomar (2):
->   crypto: octeontx2: Rework how engine group number is obtained
->   crypto: octeontx2: get engine group number for asymmetric engine
-> 
->  .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  3 ++-
->  drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  3 ++-
->  .../marvell/octeontx2/otx2_cptvf_algs.c       |  6 +++--
->  .../marvell/octeontx2/otx2_cptvf_main.c       | 26 +++++++++++++++----
->  .../marvell/octeontx2/otx2_cptvf_mbox.c       |  7 ++++-
->  .../marvell/octeontx2/otx2_cptvf_reqmgr.c     | 14 ++++++++--
->  6 files changed, 47 insertions(+), 12 deletions(-)
-> 
-> -- 
-> 2.48.1
+Most kernel applications utilizing the crypto API operate synchronously
+and on small buffer sizes, therefore do not benefit from QAT acceleration.
 
-All applied.  Thanks.
+Reduce the priority of QAT implementations for both skcipher and aead
+algorithms, allowing more suitable alternatives to be selected by default.
+
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Link: https://lore.kernel.org/all/20250613012357.GA3603104@google.com/
+Cc: stable@vger.kernel.org
+---
+ drivers/crypto/intel/qat/qat_common/qat_algs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+index 3c4bba4a8779..d69cc1e5e023 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+@@ -1277,7 +1277,7 @@ static struct aead_alg qat_aeads[] = { {
+ 	.base = {
+ 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
+-		.cra_priority = 4001,
++		.cra_priority = 100,
+ 		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+@@ -1294,7 +1294,7 @@ static struct aead_alg qat_aeads[] = { {
+ 	.base = {
+ 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
+-		.cra_priority = 4001,
++		.cra_priority = 100,
+ 		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+@@ -1311,7 +1311,7 @@ static struct aead_alg qat_aeads[] = { {
+ 	.base = {
+ 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
+-		.cra_priority = 4001,
++		.cra_priority = 100,
+ 		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+@@ -1329,7 +1329,7 @@ static struct aead_alg qat_aeads[] = { {
+ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "cbc(aes)",
+ 	.base.cra_driver_name = "qat_aes_cbc",
+-	.base.cra_priority = 4001,
++	.base.cra_priority = 100,
+ 	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+@@ -1347,7 +1347,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "ctr(aes)",
+ 	.base.cra_driver_name = "qat_aes_ctr",
+-	.base.cra_priority = 4001,
++	.base.cra_priority = 100,
+ 	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = 1,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+@@ -1365,7 +1365,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "xts(aes)",
+ 	.base.cra_driver_name = "qat_aes_xts",
+-	.base.cra_priority = 4001,
++	.base.cra_priority = 100,
+ 	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |
+ 			  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.49.0
+
