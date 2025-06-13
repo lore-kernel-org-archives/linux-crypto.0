@@ -1,105 +1,116 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E0D1AD3FA
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 15:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8603E1F4628;
+	Fri, 13 Jun 2025 16:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749829405; cv=none; b=gcPY7FrQ4cYRFkBJQ2YxoVuU3rTRr8k7FPpfaXnDmmUufkr1GcqWBRyiVVfSfkVOVJB4SfDDXDzRRX+rvzMJVRI+iXryM8Pv/Rz9VsMjrYzK1iZwkvGI13P6voY1gub2bfWNW+JTzY3jqxsssIZWhH5a4Nb2X/mHV0RIDGo2GI0=
+	t=1749830525; cv=none; b=pIGV8tWduKnOaPKhvVMpMd2undb3g1DMbNiqAU/LgvoidqVj8krF6m/tZhS4L5YRvevTzPnfT6zjvRgdfbNBVi6HV5cJEXA/rRCB1ctrZoyTa+10WT2k3grMyPlRR817xIbv2I5gIN9zMBWkaUAWL+32oVOdM4mRQISxvFJ7YEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749829405; c=relaxed/simple;
-	bh=ErljPl4av/QaQOhDCXeS4el6raSxykJe0R1j3QAerS0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eBtIYvHetJ4+W2/EFNIefOZkLiXBuXDTSTZZy1ZD+X5zWCIjUK+Gh6xL2JwK+F64z+ObgONJCB4i/tAmS9UFMnFHzbVW+NPfRBI/QXDKLIGKWZxApU0Jpupy+RAxoH3iYJrvOaNdwOVAxmQnLNd+GRsCX8GHPPadmlJiKuv7K+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=V4aBVBCK; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1749830525; c=relaxed/simple;
+	bh=sP+WTByBn7c1i+cE70EYSmAqeZL2rfsXlCl547H8JHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ew1ZCXNIAwp9XvWPA5m8NmJqH4OYu6M/mAj6rr1l5iXQwN8gJeYAc/INNk3D8duOers/n0rnrZgLYxhouqjvzrxxuZK8b2yX/0c23akbhFTdEW5Vs1htu+adpdkE2PY0fdr19daMiq35qhJoBdHxPTiSuuXJinVaj79wnbFMndA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Zhfihg3Q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="V4aBVBCK"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ade5b8aab41so473878666b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 08:43:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1749829402; x=1750434202; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FcZeGwCm22Kaq6Zayr5a6cqDxVP6CQrhoWJiO/5RmRE=;
-        b=V4aBVBCKgcFz5PpDzpbTCY73ocfms0i8kisAnkkvJZrqqZ7o9Y4/+NAo9aTstVWA8X
-         2r/jpYJUfzPOnrPKA1vL4DFVYOOxUTMWcI6kp5XBYWdXXz0DrsQbcJq5VFEg/Oejthdc
-         c4B14iV5JgVp8dOc3gVMWdtX7D0p44krAmLfU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749829402; x=1750434202;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FcZeGwCm22Kaq6Zayr5a6cqDxVP6CQrhoWJiO/5RmRE=;
-        b=CmfMEzubHX57FuUSWA18B6uHsaghf1x0jURH3vT9w4mZdcRnJ6vaRaKp4gQ4Gb0A3h
-         TuVrd1tZPIz6X4HRAJ0fbVFTnsfl+naf046nPyp1KRxgaY6VufhW/xV5VyazdAFoC4KV
-         bkK3jcIh4YO7/pkVpqU8TEcXIcnFdFqPEDLeRq/VkmTU0PAlrujNUFr1a+HNWaUqvK4Y
-         MWkyB74sChJ67eU85X/WT96+SEg0nCZm9Q4pIvyY6xiiETPA382il/Joant6qClI4m7T
-         smumzxCArKTQvK4+/Gak6T14BW3QjtHxoEHJ7CvC1nbqMQ6rCWKdwW7Qqh4/GArX7LWN
-         f68g==
-X-Forwarded-Encrypted: i=1; AJvYcCV2x2msLuqZOF0YzxZjkV8Rgep5W+YsQd1H8C6voQUkiMHajKStsVs64TG8vyDGrInxuzNCpz5pif89rWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqCXq4teXQh3Casl8FhjU0jjWpB3LQHTrjwkvRmibzAmujvxYX
-	LLQtI4BlGNCljwEXgoQmtmUyi4C7TrZnLgFmt+W0jBjwvecp5rGO7w2+PGaRk7+m2nidYCYLThn
-	J6KuMA0c=
-X-Gm-Gg: ASbGncslKJeMDoDnqsyPm+m6TSK0Vvx/AMun92p8O3xgLxEIMLTSnqYuQqg5eyf2wL6
-	rsyGh7CRC9J4aR5ubS/f3z81fJQGKoQpKpQg2JFQq7ZVn5JL7Q+nrvVNctE+9wk8EW3anIUUHCb
-	gk+gZwMkdjzloFN7Xj2HSkFiwP23DNBiqOYDjSi4bHoc0CQ2VKJj2IIur4uMD00/HH/xOATjy2O
-	tbiuEKkDAjkrfgBlT+oJhXkKzaHFvN008F1KV8WRi3mzNHXlVLydq215EjzjprBguvQraC/2FaU
-	mF/r9g9o6gO2zN9Uno9iMTxwX2/pDfcEt5DLjxTPdBYI3iU/A/6PA43Gi9ymOOdKmI/C/Y73L9e
-	NAehOOagWE75cS4zENLMh/GTBUmOq6wB/Pvv4
-X-Google-Smtp-Source: AGHT+IF7fo8LriFtn5Q+0VPD9iG8kWU8oVlmoFCPaiZogpo+Oqk7k2GlvDQ52yiczRKwftAqS5hpPQ==
-X-Received: by 2002:a17:907:971e:b0:ade:32fa:739e with SMTP id a640c23a62f3a-adec54dac66mr387584966b.2.1749829401730;
-        Fri, 13 Jun 2025 08:43:21 -0700 (PDT)
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec89292e4sm143542066b.124.2025.06.13.08.43.20
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 08:43:20 -0700 (PDT)
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60700a745e5so5145869a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 08:43:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVjxpqVtI4lMvnfZFt+kEYyqG6h0j+FYwvdHB/TD7oJ/H/lx7vo8X2uZll0/G2dbxGoiwG0i2xUS/Q8BHc=@vger.kernel.org
-X-Received: by 2002:a05:6402:26c7:b0:607:eb04:72f0 with SMTP id
- 4fb4d7f45d1cf-608b4910f1emr3292023a12.4.1749829399723; Fri, 13 Jun 2025
- 08:43:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zhfihg3Q"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55DATE0P029060;
+	Fri, 13 Jun 2025 16:01:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=dxMSfWlJLSP1Q2CznlmbgSk8Q0tBnI
+	ErVGASW4hTcD0=; b=Zhfihg3QYV80iCtJFIZNXzwNsO28/CBzBPA1NW4+cP5VWr
+	k5l0f/92cmSa5uH4HyGSN7MW6sSZu3gD2JREmvkY9IWiDksFl/haBc28Yev1eh2p
+	fR3cqw2RD+tVrXIr7ijzmVyteuDmhjWOR5YkS2N2qTSLKs3rs5KGToPoP9lOHn28
+	Zc0+P608Mn4Oofwq9OObNNP0q5WFKuFHs7VgiBgMYGALGpI5XLkpWYhrNGGVAIJg
+	CsvXGDatoWJVdD4D+XIN/bR1Z2kVnng6dv251wWZwQ5XqU8LCwiGj9YrhbE5Yqqs
+	c0WIsVuRjG1it6BmiiXjCc1Dtc3+1matXW8Zfx8g==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 474dv8225n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Jun 2025 16:01:47 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55DFim5F019573;
+	Fri, 13 Jun 2025 16:01:46 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4752f2tec9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Jun 2025 16:01:45 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55DG1irx33227464
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Jun 2025 16:01:44 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3311620040;
+	Fri, 13 Jun 2025 16:01:44 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4533A20043;
+	Fri, 13 Jun 2025 16:01:43 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.111.81.121])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 13 Jun 2025 16:01:43 +0000 (GMT)
+Date: Fri, 13 Jun 2025 18:01:41 +0200
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org, linux-arch@vger.kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 09/12] lib/crc/s390: migrate s390-optimized CRC code
+ into lib/crc/
+Message-ID: <aExLZaoBCg55rZWJ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20250607200454.73587-1-ebiggers@kernel.org>
+ <20250607200454.73587-10-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <501216.1749826470@warthog.procyon.org.uk>
-In-Reply-To: <501216.1749826470@warthog.procyon.org.uk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 13 Jun 2025 08:43:02 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgYdf08uju5UrDZ9kEgsC9yrtBNOTzSX6zAbOdRfg+JkA@mail.gmail.com>
-X-Gm-Features: AX0GCFtHIfBeIIpdLiCaIbjGHR268VNaR19hWtgTk1l0lqwTG5TIoyTmne_dSmw
-Message-ID: <CAHk-=wgYdf08uju5UrDZ9kEgsC9yrtBNOTzSX6zAbOdRfg+JkA@mail.gmail.com>
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Stephan Mueller <smueller@chronox.de>, 
-	Simo Sorce <simo@redhat.com>, Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>, 
-	Ignat Korchagin <ignat@cloudflare.com>, Clemens Lang <cllang@redhat.com>, 
-	David Bohannon <dbohanno@redhat.com>, Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250607200454.73587-10-ebiggers@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: oqxWeEseK0qommY-tA52lM8_yDgYBZ8b
+X-Proofpoint-GUID: oqxWeEseK0qommY-tA52lM8_yDgYBZ8b
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEzMDExNSBTYWx0ZWRfX2SFXW8bIydO8 QijS4XnzPyWGv7hUAVPhEsrOB00xE8g+gtnZ5TKc3xm/6m22RAo7pWDdkAUOPF1K6LO6qJEf193 PxiDvBNjb2KojolH7uIG4xIF5aoOVAuWCvsnLPUnzUljRW/4dT+d6yR8TGdRxod4wQd7u9oXLyt
+ 960X1pKDQBdkA9i2fSfl/dxiyGZuXG6X5RlU4ZS8JXRnJlDwSVv11Yh0NZ3so0jxjPrI/YVMcT2 6jW8eHHK29fMPvF4SWZi3ZgmFX9oL1/VYz01noMZpHwwtcEMmmSVoqdhzy0/dmzN0+Go88V0p57 Weg2+fyKZ+PNLuJB+wyFM7SDDMfP0OJ1UZqOon8sp39ETo2dKYj4MRErDeC122oOtE8J8jykSry
+ lFdOt02pLQfhwmo1MyS48Be/xFyI96QJGhA1Fc1zghsJy38d3Mb+b7BSNKN7KQSA+ld6RejI
+X-Authority-Analysis: v=2.4 cv=CfMI5Krl c=1 sm=1 tr=0 ts=684c4b6b cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=1XWaLZrsAAAA:8 a=DtkNC_JpMhehFE-g-C8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-13_01,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ phishscore=0 priorityscore=1501 clxscore=1011 impostorscore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=403 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506130115
 
-On Fri, 13 Jun 2025 at 07:54, David Howells <dhowells@redhat.com> wrote:
->
-> So we need to do something about the impending quantum-related obsolescence [..]
+On Sat, Jun 07, 2025 at 01:04:51PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Move the s390-optimized CRC code from arch/s390/lib/crc* into its new
+> location in lib/crc/s390/, and wire it up in the new way.  This new way
+> of organizing the CRC code eliminates the need to artificially split the
+> code for each CRC variant into separate arch and generic modules,
+> enabling better inlining and dead code elimination.  For more details,
+> see "lib/crc: prepare for arch-optimized code in subdirs of lib/crc/".
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+...
 
-I'd suggest you worry more about the rumors that Kazakhstan is growing
-a veritable army of gerbils, and giving them all ABACUSES!
+Hi Eric,
 
-What's your plan for that imminent attack vector? Because they could
-be here any day.
+With this series I am getting on s390:
 
-Yes, yes, please stop using RSA and relying over-much on big prime
-numbers. But let's not throw the "Post Quantum" word around as if it
-was reality.
+alg: hash: skipping comparison tests for crc32c-s390 because crc32c-generic is unavailable
 
-The reality of kernel security remains actual bugs - both in hardware
-and in software - not some buzzword.
-
-             Linus
+Thanks!
