@@ -1,83 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AFA2DA75D;
-	Fri, 13 Jun 2025 07:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903F72DA742
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 07:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749800306; cv=none; b=jBRlthqHM8HfPOqSVIR6Xkv+rR89UGuZba+B8DIBztF6GcqiuLGFa7LmN10SDVwpYV7hgczpGIzGCkVkK4N3YfS1aDC2rgEvdQTeyLGTcDdC/Qcq/F8m/kQ7eFIQvwjKV0Jgbw/yWY0q1Nq/tIuK2/E7zUt18NQtCZt3lzjVWHg=
+	t=1749801476; cv=none; b=pawXOeUwDIpbz9vxDWSCxBzb0fMgEDOZZwkaP7BrFiKTmE1Fp6pgIzX+vPyodYagZ6MPJGLqeBdHWETglMBW6sTsVRpff14vW8/9vy6FsQg3hfoU0CQzBxkvhBCPKsQJjbGPPegT4x96aOByhn0jTyVYeQw5I6OCe8L8A5avbYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749800306; c=relaxed/simple;
-	bh=Zk9E7B0cLEq92YUYEu39PlPpaS6WCK5qgzp4ebsQ2B0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iqOZZp9+7e8OYsyLjKas/o0eiKuoQlt+JOn/Y2GbRcVRP2a5gWa1vcgt3ziOwjCajDixd4dyVS+dD/PK3s7GQn983zYo/vxQyFCqzgtkbn7DZUJijhNF1qFPWhD+YaSIFbbQxetX+p3I03TfcNZSw8Ek+xUFZNjPKO9xr85GA8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtfSBnNC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749801476; c=relaxed/simple;
+	bh=QqKEj8d/6nhYZGpndkGRC6psU7P4KEDelUr5aNfYhQU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=E7XdHsabqPfgXhb8ZH4VuoKDkWRtRJKwwmkOxjrtqqT3E+0ZMXttvp1pchJTRX3T2Tas0pr2dAWnHPgKBlXCrFOS46L76ljeRL1OAVwisIXI+VuWzk6VdnwDXG4ioT82XrFLcO/85btzrfznUQVhjCcCkIUJeEUKORxdIjGolWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=sG6q1yao; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtfSBnNC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6E6C4CEE3;
-	Fri, 13 Jun 2025 07:38:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749800306;
-	bh=Zk9E7B0cLEq92YUYEu39PlPpaS6WCK5qgzp4ebsQ2B0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=WtfSBnNCUmuYf5NcrAgqVTt96tHIUKFJjXr7PvpldJPScV0tuOvGnajWm1O3tZXkO
-	 nUOYkh9/7JmQb8F0mP1BcS18U37CM95+rlMGvYqivLv3nUq73wkPXM9Px3rBBvzljy
-	 Frwe/AcLm5NwMOuO43bPX8iKA2Z/g8Xiyo7A4AEaRFzzia45NqUH2jwPOhxX9zH3rE
-	 BDWaV8f5tyEjPv0Gvfeep2/ETr4Y5PgqniqLy3mbJnHbhzjoE8R8+XgJO8Bav5IvGl
-	 atQUCp6R4L243D9DJeMrDkwWUS0sZVeix0Zke6AclHXAJWjg3ZH0+q+gNdIlQVoc4M
-	 PgnnFOti0q+Tg==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54afb5fcebaso1859816e87.3;
-        Fri, 13 Jun 2025 00:38:25 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV2yzUBCA/fHxiOBgS+4vXDQhgZxrv8BHMuaeCC5t+fcySygFibJD8eJNEiCeNhlT4ZMLJGUQAXbNgchw==@vger.kernel.org, AJvYcCVhnlTYaztUgP5gBBy96DVeIfzMxN0QIwKzbKBssk5EskcgzSVhZXqR/SQH1bf0Xmj7o4QZ6oJM1xC1Ljo=@vger.kernel.org, AJvYcCW9N+i20JBbQjTQG5w7hTxwWQ03pM555iCDnCqVU0XSeRJS0L61M1uZAeLJlyXdn3ngzatETz/GnS3JODRs@vger.kernel.org, AJvYcCWCc25JUqNY/tZBTb4arH0UzZD0vXoJO1zOh4Rz5A8sNxv+0QtySN3+92RGUtORibNa/EHZ/bN94biGyA==@vger.kernel.org, AJvYcCXXtL8umL8YUZaa8/qlrgCzZ7FRFIZj7Q1wOwFD+Evy+LjLtJKFMe4DtXmxzr+TOPcxhWjy1Ed2s5JN0w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDS1q+aj8N7fCbzauCm9HgFC+jwLqRwir8v918oaYgvyG5bV6P
-	G3YJyKnmymQCQkpw2XtfbK4iUhICpu6f4GFbd/rhP6+06SoMECLMQN6VYBN9e07waXrGmV7+nD9
-	GWgC6XmMmGyFqQnzTbdrA8EU1kocwIn4=
-X-Google-Smtp-Source: AGHT+IHlO4hZ7n7uTJh4T8Gyrwm4r7eJzxuJkITnqDB9Kgj30CFlF7REbfDIhM5d+j/NBrv+1KJlS3nHK1VNyHiQv00=
-X-Received: by 2002:a05:6512:138b:b0:553:2190:fef9 with SMTP id
- 2adb3069b0e04-553af97a5c9mr527698e87.34.1749800304328; Fri, 13 Jun 2025
- 00:38:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="sG6q1yao"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250611020923.1482701-8-ebiggers@kernel.org> <aEjo6YZn59m5FnZ_@gondor.apana.org.au>
- <20250611033957.GA1484147@sol> <aEj8J3ZIYEFp_XT4@gondor.apana.org.au>
- <20250611035842.GB1484147@sol> <20250613053624.GA163131@sol>
- <aEu5cyDOMcKteW_b@gondor.apana.org.au> <20250613055439.GB163131@sol>
-In-Reply-To: <20250613055439.GB163131@sol>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 13 Jun 2025 09:38:11 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEDCRfCgvtuhRc+a=m1kVt-zkcCqi_=_WOFTmt4Hz2gGg@mail.gmail.com>
-X-Gm-Features: AX0GCFs24ZatfLP--3A0HdZVLkk0PxiYFRdOEZErG1-T31ygmhYk5yo9nxe3t44
-Message-ID: <CAMj1kXEDCRfCgvtuhRc+a=m1kVt-zkcCqi_=_WOFTmt4Hz2gGg@mail.gmail.com>
-Subject: Re: [PATCH 07/16] crypto: sha512 - replace sha512_generic with
- wrapper around SHA-512 library
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org, 
-	Jason@zx2c4.com, torvalds@linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1749801470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L+YN4MTZBkTzMLCaO2wC4gmmUGZnS4C1FG9BefD5M2o=;
+	b=sG6q1yaomuV3OMNUoQqhkbuH1Xcj2p7del+A7bay2fusZru9OEE8vWFR9UthMbY3VpLLfI
+	FUolafPTe92AVJjXi4pi5inFQskTUn+5VcHL1uolO93tIKvk8tlCvfrwE0e3akdsHhcC8V
+	xULhpn0qpRQt3dVp2ppv0jcfC8bE3yRFWAhE3OIwjSlJd+fb0tB+Svm/dPDtaN8FVUic8Q
+	AlUuSwdrSq1M+QGe+Yic0cPdymG4mu6zz0PJ+rqKgAXWDJlPscQ3e8bvOMPMPVcUGhiwnQ
+	jVaBmQpd3KW1TkF59UGitXhqsK7wY8V8Q1vheo3YthkTxgD8q+/QVo+u1ZZMvg==
+Content-Type: multipart/signed;
+ boundary=8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Fri, 13 Jun 2025 09:57:32 +0200
+Message-Id: <DAL8UI7TH6IJ.2EVGYOYRQSS89@cknow.org>
+Cc: <linux-crypto@vger.kernel.org>, <linux-rockchip@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>, "Corentin Labbe" <clabbe@baylibre.com>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 3/7] crypto: testmgr - replace
+ CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <didi.debian@cknow.org>
+To: "Eric Biggers" <ebiggers@kernel.org>
+References: <20250505203345.802740-1-ebiggers@kernel.org>
+ <20250505203345.802740-4-ebiggers@kernel.org>
+ <DAJOCL4UQWZ1.2CB0NH55US5EI@cknow.org> <20250611163430.GA1254@sol>
+In-Reply-To: <20250611163430.GA1254@sol>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 13 Jun 2025 at 07:55, Eric Biggers <ebiggers@kernel.org> wrote:
+--8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+
+On Wed Jun 11, 2025 at 6:34 PM CEST, Eric Biggers wrote:
+> On Wed, Jun 11, 2025 at 01:41:06PM +0200, Diederik de Haas wrote:
+>> On Mon May 5, 2025 at 10:33 PM CEST, Eric Biggers wrote:
+>> > The negative-sense of CRYPTO_MANAGER_DISABLE_TESTS is a longstanding
+>> > mistake that regularly causes confusion.  Especially bad is that you c=
+an
+>> > have CRYPTO=3Dn && CRYPTO_MANAGER_DISABLE_TESTS=3Dn, which is ambiguou=
+s.
+>> >
+>> > Replace CRYPTO_MANAGER_DISABLE_TESTS with CRYPTO_SELFTESTS which has t=
+he
+>> > expected behavior.
+>> >
+>> > The tests continue to be disabled by default.
+>> > ---
+>> >  <snip>
+>>=20
+>> I built a 6.16-rc1 kernel [1] and its config is based upon Debian's and
+>> that has enabled CRYPTO_SELFTESTS [2] (due to Debian bug 599441 [3]).
+>>=20
+>> I then installed it on 3 Rockchip based devices and booted into that.
+>> 1. Radxa Rock 5B (rk3588)
+>> 2. PINE64 Quartz64 Model B (rk3568)
+>> 3. PINE64 RockPro64 (rk3399)
+>>=20
+>> The filtered dmesg output for Rock 5B:
+>> ERROR:
+>> [    0.709822] basic hdkf test(hmac(sha256)): failed to allocate transfo=
+rm: -2
+>> WARNING:
 >
-> On Fri, Jun 13, 2025 at 01:38:59PM +0800, Herbert Xu wrote:
-> > On Thu, Jun 12, 2025 at 10:36:24PM -0700, Eric Biggers wrote:
-> > >
-> > > You do know that most of the sha512 asynchronous hash drivers use custom state
-> > > formats and not your new one, right?  So your code in ahash_do_req_chain() is
-> > > broken for most asynchronous hash drivers anyway.
-> >
-> > Every driver needs to be converted by hand.  Once a driver has
-> > been converted it'll be marked as block-only which activates
-> > the fallback path in ahash.
+> https://lore.kernel.org/r/20250610191600.54994-1-ebiggers@kernel.org/ fix=
+ed the
+> HKDF failure.  It was caused by a patch that changed initcall levels.
 >
+>> [    8.877288] alg: skcipher: skipping comparison tests for xctr-aes-ce =
+because xctr(aes-generic) is unavailable
+>
+> That's expected if you have CONFIG_CRYPTO_AES_ARM64_CE_BLK enabled but
+> CONFIG_CRYPTO_XCTR disabled.  Some tests are skipped in that case.
 
-Perhaps I am just slow, but could you please explain again what the
-point is of all these changes?
+Happy to report that with that patch and that config option, the error
+and warning are now gone. Thanks :-)
 
-Where is h/w accelerated ahash being used to the extent that it
-justifies changing all this existing code to accommodate it?
+PULL request for the patch is already sent to Linus:
+https://lore.kernel.org/linux-crypto/aEupSzhTI4h8kz-5@gondor.apana.org.au/
+
+>> [   14.172991] alg: ahash: rk-sha1 export() overran state buffer on test=
+ vector 0, cfg=3D"import/export"
+>> [   14.202291] alg: ahash: rk-sha256 export() overran state buffer on te=
+st vector 0, cfg=3D"import/export"
+>> [   14.230887] alg: ahash: rk-md5 export() overran state buffer on test =
+vector 0, cfg=3D"import/export"
+>
+> That means the Rockchip crypto driver is broken.
+
+The crypto driver for rk3399 is still broken.
+
+> Anyway, the more interesting part of your email is that you pointed out t=
+hat
+> Debian has the crypto self-tests enabled, precisely in order to automatic=
+ally
+> disable buggy drivers like these.
+>
+> So I'll send a patch that adds back a kconfig knob to run the fast tests =
+only,
+> which I had removed in commit 698de822780f.
+
+I responded about this to a new patch submission here:
+https://lore.kernel.org/linux-crypto/DAJXJHLY2ITB.3IBN23DX0RO4Z@cknow.org/
+and v2 of that patch can be found here:
+https://lore.kernel.org/linux-crypto/20250612174709.26990-1-ebiggers@kernel=
+.org/
+
+Cheers,
+  Diederik
+
+--8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCaEvZ9AAKCRDXblvOeH7b
+bgePAP4+kEWYKZ1eqayKsFe8tBfUVxnfdStRKU8Qr/95saO95wEApLF/txTDorHT
+OXmTzRTcsInQy9LVjH2/+08cAly/KQs=
+=NvpI
+-----END PGP SIGNATURE-----
+
+--8d0444eb434897e482c102aa76e1f2eca706077e00be5351cd2962a65c42--
