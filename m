@@ -1,146 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B37D224AE0;
-	Fri, 13 Jun 2025 19:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE1E195;
+	Sat, 14 Jun 2025 00:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749842913; cv=none; b=Esqls5m1UW0SHBRAISYeX5/gnQT8rjGyTcQi/HXtmgRV949ZWAHvnnyBE2iWo3+4JMZv9utMqvMbWp37uYmc7R8qR90yFq0YDrCMGAn5ANUz9UgxxLlv18s0nNoN9PLiCodAthuOFHIb6MprzF4L3thbUWDZBJ5dAxuDaQa0HJU=
+	t=1749859532; cv=none; b=F8X4RQdTqiWGYCLGs2XgV2uw/Mbbg+cC13rlIaFSV2IydUuqx8h2V8Ihfm0np48Mo1XYEoc0o31vAAVXmBv31LmCnkBtxpT9tUIb5wGX4zr0tayjwZLoVpZvdYWZRnx/sPaiqz66bJ+MxxZAGnjp83VUhLNWTjTGl/fENGx7G1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749842913; c=relaxed/simple;
-	bh=jgxd/KLTpMn+1xos+E2mMxUdigs9o/yog02a9nfmnBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NI/LL6xV2V2OrSNnfWQe8DMzpMDzTkiqml8+cOeUQ4z1J7eFDg/0GbnfIjuz1IlZEafiJJs7axmfE5uhA8l1dWO8JUUGjGue0SsvtqLK+G/T/k+sTmXPdEAH7LdIKb3RadfLChSyPF6gFWB1Pvu3YXYU3EiY1CIQ02j2lIrJb7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pabXO6MY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749859532; c=relaxed/simple;
+	bh=H5w145svL9nD4MH3xVlTF5B1o8n9qcI7nSL6AjSPvEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nnMiQ8YJYvfD+0a2V5wz/Akva6dF1VzqaV0C37LJNH1ud6KP9tRSpo9YKmvUyFUdodd0oyepn5EltSVLwMZi1QEMZxsnUsl0hiLGmolB+c67KpitSqr165dceJFvF/nTqykUX9vhQW3dB+8a7PFjCA9TB6ASwZr7SLMlVaDuJsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=VfJAjbIJ; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pabXO6MY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 263BDC4CEE3;
-	Fri, 13 Jun 2025 19:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749842913;
-	bh=jgxd/KLTpMn+1xos+E2mMxUdigs9o/yog02a9nfmnBA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pabXO6MYfhA3OABQgHutOXNzyyVkX6iHprCfvvYZX6FTzT1QhN3qVeuY3h+KF1tUH
-	 V6hsZczcz81K8CdzM7GAonAFi0V/ZQ9ORqG6oldUoeMbo+kklLam1YMHmT+bOEHZnp
-	 2gzpH864SNk9twWHIi0yXOdZvQgEEgwSXrUYtx+Rs+O5sLk35nthCcLk4vF+SJDj4O
-	 k4q2nmk+cCiG8UBvEf3G/1Fgn8jqE58QT8meoZzyNczx4vjA9I/euJCW6KfWgwUK7p
-	 joAB9VzJ4cvZW+XvFXkjb1x6vPnnZDIMu5UMadavXLfQeU7RZSbnZgaH+1RefT0wNe
-	 k0SiTwVf/mReQ==
-Date: Fri, 13 Jun 2025 12:28:06 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - lower priority for skcipher and aead
- algorithms
-Message-ID: <20250613192806.GE1284@sol>
-References: <20250613103309.22440-1-giovanni.cabiddu@intel.com>
- <20250613190150.GD1284@sol>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="VfJAjbIJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=yRYoeJ7ZBLsFcQYXYz2a1BqOYHOwVX9w3w22zNi8Rjc=; b=VfJAjbIJ3ViqSq8k
+	qkcvCMOdc3CmJ0vMFXxKG2y9zW/P3PU29Uik2SEOfgYPJ88ujsLKvzzilvT0I+a1AlQCzvhTHR1aG
+	Dy0B4LDPEdoeqj96qaWUQ8cgggm4EmE/9iUi21dzlz3yfLWWD3nyfGUudAmssVC0NA9U6xOchwAIP
+	MEoAqzYGv9jQFt0XHPTighe5iIZglel2CKal7qwafRsdvogf8tF7QUOk2rgp09Ove6VGdlWGY5ZM3
+	CnxzDGzaxQQv2UhAnjLVE2wBcYPrjl5j6DxxAqY3dAAZsacL7kBIH8gbD/aIHPfTezgCDgHxajHE6
+	FgiItT54BPuyeE3C+g==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1uQEOR-009aBD-0v;
+	Sat, 14 Jun 2025 00:05:07 +0000
+From: linux@treblig.org
+To: arei.gonglei@huawei.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	virtualization@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] virtio-crypto: Remove unused virtcrypto functions
+Date: Sat, 14 Jun 2025 01:05:05 +0100
+Message-ID: <20250614000505.596563-1-linux@treblig.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613190150.GD1284@sol>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 13, 2025 at 12:01:50PM -0700, Eric Biggers wrote:
-> On Fri, Jun 13, 2025 at 11:32:27AM +0100, Giovanni Cabiddu wrote:
-> > Most kernel applications utilizing the crypto API operate synchronously
-> > and on small buffer sizes, therefore do not benefit from QAT acceleration.
-> > 
-> > Reduce the priority of QAT implementations for both skcipher and aead
-> > algorithms, allowing more suitable alternatives to be selected by default.
-> > 
-> > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > Link: https://lore.kernel.org/all/20250613012357.GA3603104@google.com/
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  drivers/crypto/intel/qat/qat_common/qat_algs.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-> > index 3c4bba4a8779..d69cc1e5e023 100644
-> > --- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
-> > +++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-> > @@ -1277,7 +1277,7 @@ static struct aead_alg qat_aeads[] = { {
-> >  	.base = {
-> >  		.cra_name = "authenc(hmac(sha1),cbc(aes))",
-> >  		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
-> > -		.cra_priority = 4001,
-> > +		.cra_priority = 100,
-> >  		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  		.cra_blocksize = AES_BLOCK_SIZE,
-> >  		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-> > @@ -1294,7 +1294,7 @@ static struct aead_alg qat_aeads[] = { {
-> >  	.base = {
-> >  		.cra_name = "authenc(hmac(sha256),cbc(aes))",
-> >  		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
-> > -		.cra_priority = 4001,
-> > +		.cra_priority = 100,
-> >  		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  		.cra_blocksize = AES_BLOCK_SIZE,
-> >  		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-> > @@ -1311,7 +1311,7 @@ static struct aead_alg qat_aeads[] = { {
-> >  	.base = {
-> >  		.cra_name = "authenc(hmac(sha512),cbc(aes))",
-> >  		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
-> > -		.cra_priority = 4001,
-> > +		.cra_priority = 100,
-> >  		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  		.cra_blocksize = AES_BLOCK_SIZE,
-> >  		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-> > @@ -1329,7 +1329,7 @@ static struct aead_alg qat_aeads[] = { {
-> >  static struct skcipher_alg qat_skciphers[] = { {
-> >  	.base.cra_name = "cbc(aes)",
-> >  	.base.cra_driver_name = "qat_aes_cbc",
-> > -	.base.cra_priority = 4001,
-> > +	.base.cra_priority = 100,
-> >  	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  	.base.cra_blocksize = AES_BLOCK_SIZE,
-> >  	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
-> > @@ -1347,7 +1347,7 @@ static struct skcipher_alg qat_skciphers[] = { {
-> >  }, {
-> >  	.base.cra_name = "ctr(aes)",
-> >  	.base.cra_driver_name = "qat_aes_ctr",
-> > -	.base.cra_priority = 4001,
-> > +	.base.cra_priority = 100,
-> >  	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  	.base.cra_blocksize = 1,
-> >  	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
-> > @@ -1365,7 +1365,7 @@ static struct skcipher_alg qat_skciphers[] = { {
-> >  }, {
-> >  	.base.cra_name = "xts(aes)",
-> >  	.base.cra_driver_name = "qat_aes_xts",
-> > -	.base.cra_priority = 4001,
-> > +	.base.cra_priority = 100,
-> >  	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |
-> >  			  CRYPTO_ALG_ALLOCATES_MEMORY,
-> >  	.base.cra_blocksize = AES_BLOCK_SIZE,
-> > -- 
-> > 2.49.0
-> > 
-> 
-> Acked-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> But, I think your commit message may be misleading:
-> 
-> > Most kernel applications utilizing the crypto API operate synchronously
-> > and on small buffer sizes, therefore do not benefit from QAT acceleration.
-> 
-> That implies that QAT acceleration *would* be beneficial for kernel applications
-> using asynchronous processing, large buffer sizes, or both.
-> 
-> But as far as I know, that hasn't been shown to be true either.  Those things
-> would likely make the performance characteristics of the QAT driver less bad,
-> but that doesn't necessarily mean it would become better than VAES.  VAES is
-> already incredibly fast, and far easier to use.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Also, it seems that you're considering 4096 bytes to be a "small" buffer size,
-which is kind of misleading too.  In dm-crypt for example 4096-byte sectors (the
-recommended setting these days) are considered "large sectors", differentiating
-them from the traditional 512-byte sectors.
+virtcrypto_devmgr_get_first() and virtcrypto_dev_in_use() were added in
+2016 by
+commit dbaf0624ffa5 ("crypto: add virtio-crypto driver")
 
-- Eric
+but have remained unused.
+
+Remove them.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/crypto/virtio/virtio_crypto_common.h |  2 --
+ drivers/crypto/virtio/virtio_crypto_mgr.c    | 36 --------------------
+ 2 files changed, 38 deletions(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
+index 7059bbe5a2eb..19c934af3df6 100644
+--- a/drivers/crypto/virtio/virtio_crypto_common.h
++++ b/drivers/crypto/virtio/virtio_crypto_common.h
+@@ -113,8 +113,6 @@ struct virtio_crypto_request {
+ int virtcrypto_devmgr_add_dev(struct virtio_crypto *vcrypto_dev);
+ struct list_head *virtcrypto_devmgr_get_head(void);
+ void virtcrypto_devmgr_rm_dev(struct virtio_crypto *vcrypto_dev);
+-struct virtio_crypto *virtcrypto_devmgr_get_first(void);
+-int virtcrypto_dev_in_use(struct virtio_crypto *vcrypto_dev);
+ int virtcrypto_dev_get(struct virtio_crypto *vcrypto_dev);
+ void virtcrypto_dev_put(struct virtio_crypto *vcrypto_dev);
+ int virtcrypto_dev_started(struct virtio_crypto *vcrypto_dev);
+diff --git a/drivers/crypto/virtio/virtio_crypto_mgr.c b/drivers/crypto/virtio/virtio_crypto_mgr.c
+index bddbd8ebfebe..06c74fa132cd 100644
+--- a/drivers/crypto/virtio/virtio_crypto_mgr.c
++++ b/drivers/crypto/virtio/virtio_crypto_mgr.c
+@@ -81,42 +81,6 @@ void virtcrypto_devmgr_rm_dev(struct virtio_crypto *vcrypto_dev)
+ 	mutex_unlock(&table_lock);
+ }
+ 
+-/*
+- * virtcrypto_devmgr_get_first()
+- *
+- * Function returns the first virtio crypto device from the acceleration
+- * framework.
+- *
+- * To be used by virtio crypto device specific drivers.
+- *
+- * Return: pointer to vcrypto_dev or NULL if not found.
+- */
+-struct virtio_crypto *virtcrypto_devmgr_get_first(void)
+-{
+-	struct virtio_crypto *dev = NULL;
+-
+-	mutex_lock(&table_lock);
+-	if (!list_empty(&virtio_crypto_table))
+-		dev = list_first_entry(&virtio_crypto_table,
+-					struct virtio_crypto,
+-				    list);
+-	mutex_unlock(&table_lock);
+-	return dev;
+-}
+-
+-/*
+- * virtcrypto_dev_in_use() - Check whether vcrypto_dev is currently in use
+- * @vcrypto_dev: Pointer to virtio crypto device.
+- *
+- * To be used by virtio crypto device specific drivers.
+- *
+- * Return: 1 when device is in use, 0 otherwise.
+- */
+-int virtcrypto_dev_in_use(struct virtio_crypto *vcrypto_dev)
+-{
+-	return atomic_read(&vcrypto_dev->ref_count) != 0;
+-}
+-
+ /*
+  * virtcrypto_dev_get() - Increment vcrypto_dev reference count
+  * @vcrypto_dev: Pointer to virtio crypto device.
+-- 
+2.49.0
+
