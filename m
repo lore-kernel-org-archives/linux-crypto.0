@@ -1,102 +1,86 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B987C120
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Jun 2025 00:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D4418BC0C;
+	Sat, 14 Jun 2025 04:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749859728; cv=none; b=fuhDb6ZSKhw0cZG4ZWb/C97BHCJSO859fN/wC8G6bLWE8SzjAl4FI0kPR5X11Q7hzFbyqScXJoKiOB47eD6PMJ7hTkg/TiRbLlBnn1UliOtB8w+nCCKt54pGdM2sjfFU5CQI7C0N47Ofev2X0Euf8+tIzu13Z+5oFj8Qd5FOX6g=
+	t=1749876831; cv=none; b=FYmkJ+LtJ3KklYGHRXeR0lz2Pa6Ys4GYnMAAIUCjvfoZXmv7IwBAQ7TOsZ+pRp0eF0PBajDdd/G36XWSCJBgcftWdwS+UXdgECs6SxJbTbrAZnpyasyrrHXT3SlNaEQDu/Dd6Hh8ZkGm6tDYproZ1Ltxfv1KWO87JMfNN0Hrz78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749859728; c=relaxed/simple;
-	bh=foA6oyqgR5qgnydNJ6GYL4dauZjrmBgM5QlI2k6EVy4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PKKqnOnlD0pOuDoD9Cd0wiwuw4k1oSln9Zp36ZP3QBM3eVYCjx88ZXpO093m72X+00NLzrEQAEGe7sUhMV0/WOoaY9FeGqXIZjZRY+/Lys7LjLsiAp/j2fn1TVYXacHGxF1+efqNkYbY4ssLXIMCcCUf3YstB4Erhii3i8hWZc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuzhuo.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g2ByygCU; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuzhuo.bounces.google.com
+	s=arc-20240116; t=1749876831; c=relaxed/simple;
+	bh=LidFlTi/IsbSYffEMZSY1sUJMyaqh8baxe0hyVagAyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SqcaoJy3LSCHqzfD2p1Ov2TDvas0Bg/ytjEHjh/19K7Pg4rIE7FVgRa9/Vk4rSgPNrs9potQlyd6iDlWQ6FYSPBA45yJC9q7Imvf2iGoZ5TPQqXeI2nInBoG6pq6/cpajXGgu/v+r3iLCMwTJ7bUoB6YL9+ZnxBwQ33nHhjuSRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7ws5yFE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g2ByygCU"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138e65efe2so2728693a91.1
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jun 2025 17:08:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749859726; x=1750464526; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l3yN+pb1nHRQrMzXHzyq/fi9BjDqDpB+21NaqBWaxXY=;
-        b=g2ByygCUSUkcR5IgFyj+ng2Nsda43wh7zlKOARFnf27gkG3CD0UEmQMsoZzIniEDBF
-         fpQ7NJodK1jR+NtK63uXyJEFQAlaS3elPbjAqCMjrigIPH7SfOECERcciDzDvVuWjsb1
-         ukh/dTJznt+o3X5Fr72Hk7gbk/iRke9TsHg8thBTHKC3Vuh+/en5frVKmXGNHOUnQEdP
-         wlRC5fJ7wpEhBwHtu6obOpEU3/zbT2NkIvoTQLegw1MCVddkJPK3Ex8Uqo7v1EEX7vwq
-         2RB044RSvmwfYm3eaw/chlXf6QaqlK79hXZKk07HKwkU9bbHnKqyM0GcjXszn3fWJg7t
-         dskw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749859726; x=1750464526;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l3yN+pb1nHRQrMzXHzyq/fi9BjDqDpB+21NaqBWaxXY=;
-        b=udKTALMEx2hEXYCPx+VqguLzlA6z7h9ulVii8EdIB0zgIiPfC5ptAM9u/rT7gStGwL
-         qCCBhnFREZGpwFJMqcRu4UcSnOLEUAXv1YDGGabVVXPPqjelnrrS3Zum+D8QH/KyXGdA
-         LhxVh4YN3/KYKRtqKGammULHwCgBdvZcJyva59RNPnqp0sD+A0AEhxGgn+jx1Wt6QcXF
-         5lNhFXKPRHAo5A2xkWLGa/vU197x9/BTO4DRywmZ+qFEjSXvi+4kstuvhvndjIGAoek5
-         lODEfjH5SMhMxo7u9ByURVRcwUDtxkRRKnsfRR4nDsmK8VGfbRu+3nt9mlRsvvy7+3fe
-         5jTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWocjhPCh51GSfju6eNV4ZhcpmvF85gje+mmn24b4+gmj0dc/p5lrTdXpkZ2BKsCmbi4p7B47/Q+Ze7IyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWBPaHrRLdbToRie+YmtVJw5t53yPT9Ltj5SsAv4Gd5l8GrD4z
-	NuKkVY03iQOmbov8QqsfpRVSekQx4gCUyJ793Ff4H5RZBthmQq8DKs+NEbJpX9u9oFf9LdeGVKU
-	Y4ohmwA==
-X-Google-Smtp-Source: AGHT+IE6UM0RmST7g5H5n/ibK6y/YCjmguPYg7pTwOXIkmY9pOYlCloFeEz5pTDQwVFdDlqtC5ZLYXEmAWE=
-X-Received: from pjh14.prod.google.com ([2002:a17:90b:3f8e:b0:311:f309:e314])
- (user=yuzhuo job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3504:b0:312:959:dc4f
- with SMTP id 98e67ed59e1d1-313f1c77fc2mr1955724a91.5.1749859726587; Fri, 13
- Jun 2025 17:08:46 -0700 (PDT)
-Date: Fri, 13 Jun 2025 17:08:28 -0700
-In-Reply-To: <20250614000828.311722-1-yuzhuo@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7ws5yFE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0FDCC4CEEB;
+	Sat, 14 Jun 2025 04:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749876830;
+	bh=LidFlTi/IsbSYffEMZSY1sUJMyaqh8baxe0hyVagAyM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R7ws5yFEPJMU+E644zMbOuX8Vk8LmQzOcu4+pA08MDoDwMYG3KAbq0T25fMobWSsE
+	 inEv+u9fAiBqzlejlPTq068xQi+/dzfwPuwxK043BY8akotvIRHOe0LrMSnZjuAxy1
+	 6TlHIkV39Pe51mHkZhLMPx9kEG5nVSmyfHmLw16m2YqwW2k3c14sL5UeP6irjhvjDJ
+	 ErEzYhKlLhcuQ1NDJ5WvcQHquoeGjDl1M/8hRSMAHMFDMQVCCgubJj6wfMhzv8uKXk
+	 LDBCIYeuG2bjuerrxuYHlEC0sMZWZXfDnBeQA886sTfFvrUs4ZoJq7QJ2yoNREu8LA
+	 EkrVOPYzZ3SlA==
+Date: Fri, 13 Jun 2025 21:53:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Yuzhuo Jing <yuzhuo@google.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Ian Rogers <irogers@google.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 0/2] crypto: Fix sha1 compile error
+Message-ID: <20250614045323.GF1284@sol>
+References: <20250614000828.311722-1-yuzhuo@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250614000828.311722-1-yuzhuo@google.com>
-X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
-Message-ID: <20250614000828.311722-3-yuzhuo@google.com>
-Subject: [PATCH v1 2/2] crypto: Fix sha1 signed pointer comparison compile error
-From: Yuzhuo Jing <yuzhuo@google.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Ian Rogers <irogers@google.com>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: Yuzhuo Jing <yuzhuo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250614000828.311722-1-yuzhuo@google.com>
 
-In include/crypto/sha1_base.h, sha1_block_fn type is defined as
-void(sha1_block_fn)(struct sha1_state *sst, u8 const *src, int blocks);
+On Fri, Jun 13, 2025 at 05:08:26PM -0700, Yuzhuo Jing wrote:
+> This is a followup patch series for an ongoing patch series to reuse
+> kernel tree sha1 utils in perf tools and remove libcrypto dependency.
+> This mirrors the fixes made in perf back to the kernel tree so we can
+> use tools/perf/check-headers.sh to monitor future changes.
+> Link: https://lore.kernel.org/lkml/aC9lXhPFcs5fkHWH@x1/t/#u
+> 
+> This series contains two patches: one fixing signed and unsigned integer
+> comparisons and another fixing function type mismatches.
+> 
+> Yuzhuo Jing (2):
+>   crypto: Fix sha1 signed integer comparison compile error
+>   crypto: Fix sha1 signed pointer comparison compile error
+> 
+>  crypto/sha1_generic.c      | 2 +-
+>  include/crypto/sha1_base.h | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-In lib/crypto/sha1.c, the second argument on sha1_transform is defined
-as "const char *", which causes type mismatch when calling
-sha1_transform from sha1_generic_block_fn in crypto/sha1_generic.c.
+I don't like these signedness inconsistencies in the code either, and I'll be
+fixing these (among many other issues) when I refactor SHA-1 to have a proper
+lib/crypto/ API similar to what I'm currently doing with SHA-2.  That being
+said, the kernel doesn't have these warnings enabled, and especially in its
+current state this code isn't really designed to be copied into a userspace
+program.
 
-We don't break the widely used sha1_block_fn or sha1_transform function
-signatures, so this patch converts the pointer sign at usage to fix the
-compile error for environments that enable -Werror=pointer-sign.
+So I feel that the premise of this patchset, and more importantly also the one
+you linked to above for tools/perf/, is a bit misguided.
 
-Signed-off-by: Yuzhuo Jing <yuzhuo@google.com>
----
- crypto/sha1_generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I've sent an alternative patchset for you to consider:
+https://lore.kernel.org/all/20250614044133.660848-1-ebiggers@kernel.org/.  It
+adds a minimal SHA-1 implementation, including a test, to tools/perf/util/.  The
+SHA-1 implementation is less than 100 lines anyway.
 
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-index 325b57fe28dc..3a3f9608b989 100644
---- a/crypto/sha1_generic.c
-+++ b/crypto/sha1_generic.c
-@@ -33,7 +33,7 @@ static void sha1_generic_block_fn(struct sha1_state *sst, u8 const *src,
- 	u32 temp[SHA1_WORKSPACE_WORDS];
- 
- 	while (blocks--) {
--		sha1_transform(sst->state, src, temp);
-+		sha1_transform(sst->state, (const char *)src, temp);
- 		src += SHA1_BLOCK_SIZE;
- 	}
- 	memzero_explicit(temp, sizeof(temp));
--- 
-2.50.0.rc1.591.g9c95f17f64-goog
+The effort it would take to "share" the kernel's code here is just not worth it,
+IMO.  Especially when I have some significant refactoring planned on the kernel
+side which would make the tools/perf copy diverge anyway.
 
+- Eric
