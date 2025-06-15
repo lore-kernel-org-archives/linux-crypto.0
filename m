@@ -1,79 +1,115 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFA6262811
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Jun 2025 09:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C1127BF95;
+	Sun, 15 Jun 2025 18:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749981366; cv=none; b=bffrIrPYVqdBlC3QYG0qSLvHXIFhH0/oyju1WpnxqE5T0QE8oiFZEKatEOkhyL4VOTzV89Wo4EjuheItVffg/wEqj9N+Wr/8tYHeqhEwYL/0ZPrdkUteune6bjgiUOcBPkmzj6hGF58RMdkUb1ojH0PhjmMJJfNmiwhLf41XLio=
+	t=1750013226; cv=none; b=nQBKTC5rc6Kk+M+QzUWUM6Ug9p6LJ3fiqkqd03pbnBca/5pB7iNXmqxPtiCTeFjh3vD6PmDQDgYecXjTOulj99KpMeBDMP4AWBWTOopOHgkbNaSCr4CPtv3orxz9exSZ3+ZeU+2EJyqATkmUk6obyVPPwaidoHjs1WL5XyEfgZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749981366; c=relaxed/simple;
-	bh=dZIhcLUob/yE99krHJIG/yTSjf70smLK4p8/iQjCoPE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=GHz5mZ2S6X24x4GWS/0jiVxsx0HU7Bg+PznDv7JV/nOS8gKl19dHXFSKk6OusSLH5xfhBaKJ5BUsNZ0R3xqvrgjiWy/e1AUomrwExqU/Ts3oTQdyhFLW7X/hV+vH3KI3WOV+wY9VtA4SSts5A8Ug6VJzga4HaJ19VZYe0B7XowQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-86cc7cdb86fso395836439f.1
-        for <linux-crypto@vger.kernel.org>; Sun, 15 Jun 2025 02:56:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749981364; x=1750586164;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ocLTJRY+fhwTjCrhxf4nK0M6rGEU4j+JnFi0dOpX+ow=;
-        b=IqzQtjlwxIievsNBV8lo55zVhr1qBh44gS/1WHirdNJrhZ3uetLiDzrsYPUievVAMH
-         TsVYjx2CMVF/g2fNLdPJ7myhQ9mnBlkkb9XOFiOvlmyVP/Y0jEQOg7BZn0xttaZ4GYmt
-         hfTuJ9Xcai1qqmtIg4Tj4zdDZc8AoqQt57orXpvEx3Ya0FOH77u4wFIYd9sXX14t+OfA
-         NzKDwUOIl+9G68dl7ILoseFwhFeT8QKcP26BeAL4gzBc7Ui8NUqWQw1Tqp1GeOn0EtfJ
-         rMv5NFYy5NGYNJGPN30fkabgfuMmUE6HymsdZ4if68HGFBygdQDnpcdZ98ch5Km98VLB
-         xeRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbrE4gNi4N1o5jMAQfrkNylQfhJBmKOvTvGeVyjGTA0DnWAojMz6pxbAdCYzDcSUyelhQxHZp4wTqaDqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgYlakUmXWmKTvuWGzLMRuNRGpsj/8zAOzbpjS/wDAKhwqw5wV
-	4yZZ9VBa0qbzAfnJrp+D6OPLvbwu6upjz2rv0qb6G5lRsPPIqkOqjmQvLIw03YfuTzvenp2t0QT
-	GuVOic4/UGarCPjh5cAtH0noLx1XwzCUguIzT4oE3w+h7qrjRimjPrlyvpCg=
-X-Google-Smtp-Source: AGHT+IEgPdrA2IM9OWgw6N/hK3nuguJZrWn9t3hAUZqWQkF7lKWgmWhh4O4vCROHhhDs8bphPbTlJovLhvktfgyPBoq6myrdvO2n
+	s=arc-20240116; t=1750013226; c=relaxed/simple;
+	bh=5b3uNryP074LRzS0e8lRw21Ibl8znCFGJk8dG32zXQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b2w4MYW2vJCtPQcnzMs8C37/SmewTwzXzd6Sd6TVE89eHo4yzn8VS6qFmYA+TqZ9vU2iiqn/ks+oUR7AbCZxjpAaua8eTLNAfcPZ4S8XQLn0QkbNZS74amdp/p6Zh4VV4TmHcK6hFAxC6ltVLxX1CNcwrzmGhGWrM1Delb+Ldk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dBPtFxhS; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dBPtFxhS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA633C4CEE3;
+	Sun, 15 Jun 2025 18:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750013226;
+	bh=5b3uNryP074LRzS0e8lRw21Ibl8znCFGJk8dG32zXQw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dBPtFxhSJMUXxmaT/KxQ35nsgIcXL/g9ImLlDTQb++SUrhRAv5BrYEyhMzlivQTnA
+	 b5r6qgTgn/HKGqJKv8iIJZIrBrbSU8quRUHzUx02dyadCT/fXANUmLE4BYuuyerOk5
+	 syWDFFmKz8D7g32RagfLqYXxRSTC1HcHir74l/R1J5sHSjE1peKYYs60gZCL3eQPFb
+	 cTq1v0r+DKJnH6n9ApPtKk3wepQy940tpEOG1qlya7EY3CViKAzbLFJr2wnU1AGoVG
+	 WMCEPfl0m7mcUWeu5p5Yg2rrbz49hc8W2AJ7VRhT2wOOyNch3zWfyN/nLXRv7u5Cna
+	 suPZqRSuvlvJQ==
+Date: Sun, 15 Jun 2025 11:46:38 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+	x86@kernel.org, Jason@zx2c4.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH] crypto: ahash - Stop legacy tfms from using the set_virt
+ fallback path
+Message-ID: <20250615184638.GA1480@sol>
+References: <aEjo6YZn59m5FnZ_@gondor.apana.org.au>
+ <20250611033957.GA1484147@sol>
+ <aEj8J3ZIYEFp_XT4@gondor.apana.org.au>
+ <20250611035842.GB1484147@sol>
+ <20250613053624.GA163131@sol>
+ <aEu5cyDOMcKteW_b@gondor.apana.org.au>
+ <20250613055439.GB163131@sol>
+ <aEvmmr0huGGd2Psv@gondor.apana.org.au>
+ <20250615031807.GA81869@sol>
+ <CAMj1kXGd93Kg0Vs8ExLhK=fxhRBASU9sOPfgYUogv+rwVqgUsg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:160b:b0:3dd:bb7e:f1af with SMTP id
- e9e14a558f8ab-3de07cedfc2mr57014685ab.20.1749981364287; Sun, 15 Jun 2025
- 02:56:04 -0700 (PDT)
-Date: Sun, 15 Jun 2025 02:56:04 -0700
-In-Reply-To: <684c5575.a00a0220.279073.0012.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <684e98b4.a00a0220.279073.002b.GAE@google.com>
-Subject: Re: [syzbot] [bcachefs?] KASAN: use-after-free Read in poly1305_update
-From: syzbot <syzbot+bfaeaa8e26281970158d@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net, 
-	herbert@gondor.apana.org.au, hpa@zytor.com, kent.overstreet@linux.dev, 
-	linux-bcachefs@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, mmpgouride@gmail.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGd93Kg0Vs8ExLhK=fxhRBASU9sOPfgYUogv+rwVqgUsg@mail.gmail.com>
 
-syzbot has bisected this issue to:
+On Sun, Jun 15, 2025 at 09:22:51AM +0200, Ard Biesheuvel wrote:
+> On Sun, 15 Jun 2025 at 05:18, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> ...
+> > After disabling the crypto self-tests, I was then able to run a benchmark of
+> > SHA-256 hashing 4096-byte messages, which fortunately didn't encounter the
+> > recursion bug.  I got the following results:
+> >
+> >     ARMv8 crypto extensions: 1864 MB/s
+> >     Generic C code: 358 MB/s
+> >     Qualcomm Crypto Engine: 55 MB/s
+> >
+> > So just to clarify, you believe that asynchronous hash drivers like the Qualcomm
+> > Crypto Engine one are useful, and the changes that you're requiring to the
+> > CPU-based code are to support these drivers?
+> >
+> 
+> And this offload engine only has one internal queue, right? Whereas
+> the CPU results may be multiplied by the number of cores on the soc.
+> It would still be interesting how much of this is due to latency
+> rather than limited throughput but it seems highly unlikely that there
+> are any message sizes large enough where QCE would catch up with the
+> CPUs. (AIUI, the only use case we have in the kernel today for message
+> sizes that are substantially larger than this is kTLS, but I'm not
+> sure how well it works with crypto_aead compared to offload at a more
+> suitable level in the networking stack, and this driver does not
+> implement GCM in the first place)
+> 
+> On ARM socs, these offload engines usually exist primarily for the
+> benefit of the verified boot implementation in mask ROM, which
+> obviously needs to be minimal but doesn't have to be very fast in
+> order to get past the first boot stages and hand over to software.
+> Then, since the IP block is there, it's listed as a feature in the
+> data sheet, even though it is not very useful when running under the
+> OS.
 
-commit d97de0d017cde0d442c3d144b4f969f43064cc0f
-Author: Kent Overstreet <kent.overstreet@linux.dev>
-Date:   Tue Aug 13 01:31:25 2024 +0000
+With 1 MiB messages, I get 1913 MB/s with ARMv8 CE and 142 MB/s with QCE.
 
-    bcachefs: Make bkey_fsck_err() a wrapper around fsck_err()
+(BTW, that's single-buffer ARMv8 CE.  My two-buffer code is over 3000 MB/s.)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1683290c580000
-start commit:   02adc1490e6d Merge tag 'spi-fix-v6.16-rc1' of git://git.ke..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1583290c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1183290c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=162faeb2d1eaefb4
-dashboard link: https://syzkaller.appspot.com/bug?extid=bfaeaa8e26281970158d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1555310c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12810e82580000
+I then changed my benchmark code to take full advantage of the async API and
+submit as many requests as the hardware can handle.  (This would be a best-case
+scenario for QCE; in many real use cases this is not possible.)  Result with QCE
+was 58 MB/s with 4 KiB messages or 155 MB/s for 1 MiB messages.
 
-Reported-by: syzbot+bfaeaa8e26281970158d@syzkaller.appspotmail.com
-Fixes: d97de0d017cd ("bcachefs: Make bkey_fsck_err() a wrapper around fsck_err()")
+So yes, QCE seems to have only one queue, and even that one queue is *much*
+slower than just using the CPU.  It's even slower than the generic C code.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+And until I fixed it recently, the Crypto API defaulted to using QCE instead of
+ARMv8 CE.
+
+But this seems to be a common pattern among the offload engines.
+I noticed a similar issue with Intel QAT, which I elaborate on in this patch:
+https://lore.kernel.org/r/20250615045145.224567-1-ebiggers@kernel.org
+
+- Eric
