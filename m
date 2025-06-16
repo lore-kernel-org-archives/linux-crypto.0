@@ -1,46 +1,50 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3724928DEFF
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Jun 2025 02:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3D628D8C0;
+	Mon, 16 Jun 2025 02:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750042629; cv=none; b=lgQcBvzAt0nohPh6EDUK88Cw5F30q21azwBvtU6z5k2pOKsPY/g+YJFTozbPBUJ09N9mBBM5T3rpmlwgplKAI21Nrd10CPjvBHBW4gGF/wIWWQqdldXhmqPVRyDU2vEpedaPMeVC1Wecwh3HMzD+BEhOppFWeUuWcX1NaCs7Zw4=
+	t=1750042677; cv=none; b=jqTly/dgYYhbU0gtUqJervhABDGar3HQJCQlkY2ka2TgrFWHPhth1zzVqk6wDSxhp33VnxKyGzpCpQY072ifHRpmvpdhPaSrYzNazo+0WSWc4uAG241Kr4Cz7ul15JYsIQM1EBbRe5fBZVBS80Y3+yCdodW64uB0zOyXAY8T0QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750042629; c=relaxed/simple;
-	bh=IlileO4qK2gVr8FrZUaG4vyYdn26DjI8Qw79oT1sbSY=;
+	s=arc-20240116; t=1750042677; c=relaxed/simple;
+	bh=JHtyBMhZMq7rLRDVHqLS9ppKc+pVnVIs1DsdASXRp98=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8TRvQeh4x4UgOAnAkvekX7msnnPoioAWLNXY48TzoMkD+lTBkffM6VTNDZu85yqesl+6K+PNFIOrDBBq66pe6VIj5TuJ7M0EZ1/FS63rfvgzWaII24vQcVrsJewwyxd8wKPWepu1v26F7q5VxtxCbTp/kOqzrePGQaHydaT+HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fFTSQZ3I; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lbw5gWJFz27dKMcJ0OBLjCapyW7b4BmsC7dBUeHgi6DQeNp2DQgILEL6wTOq+GIcReSUrdeJX8ov0yWhJ2wdo+2LAS7EkpXvwEHnsoR9/AwG/ueIIDPbu9PreIAojY1OB20URs1UMQUUqk3liXmGSuXNhtgtTszFTf3v6Fhw1HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=lESr2ySu; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fFTSQZ3I"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="lESr2ySu"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=wY3hEnVyj4t8yRO5mwj8+4+HrwUruaWQT+ZV1XqCcJ4=; b=fFTSQZ3IZXQbsV3u1GDeZJzs2o
-	zg7f5YApynt+Ct8wBrpj9NThGGIFn6I90o5uYqbB95LEYz3RNnyMlIWQ2qylw0Hr+YOJXPb8A7eu9
-	+P16OEg52bPVhVHImme0SUtxffUIh6L4mg7D0Ode2cRNjP++4zz21PXxsG8sAJKEmykjbuJ3wrdMn
-	A9Y+pABSitZwRVgN4hoXHMG84Kt8QRsU99rWMoIzCepJOhItsVsRRRp+hIwA/0MV+dSlZzUljuGwC
-	6id4hcan60BaziflIummLNBi7NMI8yrBbF50sSL3Onv9nNNHgh5lSrdnUHHVG5L3ilvuQwTKNL26Z
-	UxIEjFAg==;
+	bh=7By6MJ1Fsc8uXWLkUPRl/M51yuYgmOKip7AFJpU06TY=; b=lESr2ySuFhGN2Bp4nrQcAtFJdr
+	JGF6VpgVU1gldJ0wxHBZFMoFvjKpuc4kK/Gat6MLM5L2di6E/D2zJ6SbIcb0fOGa9KRS2AFzbdT1V
+	pH1kYQ+07eTazom1WFHGih9ixT6uz2uhF0JnX17mfdFLfWb4H/zBfA5Vb7jVeaHg4vV1dZccs8WA3
+	r29gaU0WYkOe/p1ZcazoEzyRqqAGd/YTrX+4zypuadJ+l/oRhYZqE9fC0sQyoLw1ZblKZOH63P7cF
+	xfB8BxdtyW2DoEU6wXRC6TNSMUQZMjEk0DMRr6R4HvmUb1l1NIB6P7OeJF29wbkARXzMn/R9EVdA5
+	p1kIHjQg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uQzmk-000Ibi-2f;
-	Mon, 16 Jun 2025 10:57:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Jun 2025 10:57:02 +0800
-Date: Mon, 16 Jun 2025 10:57:02 +0800
+	id 1uQznY-000Id0-0N;
+	Mon, 16 Jun 2025 10:57:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Jun 2025 10:57:51 +0800
+Date: Mon, 16 Jun 2025 10:57:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-Subject: Re: [PATCH] crypto: qat - fix state restore for banks with exceptions
-Message-ID: <aE-H_ueJQ9QMJyg6@gondor.apana.org.au>
-References: <20250604160006.56369-1-giovanni.cabiddu@intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>
+Subject: Re: [PATCH 0/2] crypto: replace cpumask_next with better API
+Message-ID: <aE-IL6Nyrb6OO-9D@gondor.apana.org.au>
+References: <20250604204742.21183-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,36 +53,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250604160006.56369-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20250604204742.21183-1-yury.norov@gmail.com>
 
-On Wed, Jun 04, 2025 at 04:59:56PM +0100, Giovanni Cabiddu wrote:
-> From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+On Wed, Jun 04, 2025 at 04:47:39PM -0400, Yury Norov wrote:
+> From: Yury Norov [NVIDIA]  <yury.norov@gmail.com>
 > 
-> Change the logic in the restore function to properly handle bank
-> exceptions.
+> Recently added cpumask_next_wrap() and cpumask_nth() work better than
+> cpumask_next(). Use them where appropriate.
 > 
-> The check for exceptions in the saved state should be performed before
-> conducting any other ringstat register checks.
-> If a bank was saved with an exception, the ringstat will have the
-> appropriate rp_halt/rp_exception bits set, causing the driver to exit
-> the restore process with an error. Instead, the restore routine should
-> first check the ringexpstat register, and if any exception was raised,
-> it should stop further checks and return without any error. In other
-> words, if a ring pair is in an exception state at the source, it should
-> be restored the same way at the destination but without raising an error.
+> Yury Norov [NVIDIA] (2):
+>   crypto: pcrypt: Optimize pcrypt_aead_init_tfm()
+>   crypto: caam - Fix opencoded cpumask_next_wrap() in
+>     caam_drv_ctx_init()
 > 
-> Even though this approach might lead to losing the exception state
-> during migration, the driver will log the exception from the saved state
-> during the restore process.
+>  crypto/pcrypt.c          | 7 ++-----
+>  drivers/crypto/caam/qi.c | 5 +----
+>  2 files changed, 3 insertions(+), 9 deletions(-)
 > 
-> Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-> Fixes: bbfdde7d195f ("crypto: qat - add bank save and restore flows")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  .../intel/qat/qat_common/adf_gen4_hw_data.c   | 29 ++++++++++++++-----
->  1 file changed, 22 insertions(+), 7 deletions(-)
+> -- 
+> 2.43.0
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
