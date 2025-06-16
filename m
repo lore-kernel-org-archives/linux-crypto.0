@@ -1,91 +1,115 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEFE189F56;
-	Mon, 16 Jun 2025 08:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603FA1E8337;
+	Mon, 16 Jun 2025 10:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750063138; cv=none; b=BAzEFRGhodJl+xYOgRmny7E4m8wmZi7BdREpwSMXcwIKaAxOwTcJ26trYt3ddLjHj6OHvK7wwgMGEUDxJX+mYm8WgvmggPxIw29md51HuGIEj5g+tL1CFcuaT3QIh4Pgh6rJMN0WiYcIvAYqoQ47NUbRxe9YQXMIFX9PzdnXfek=
+	t=1750069280; cv=none; b=cbqx4jqZPt1FMyIYlxHzSONmDjbnSWN9KhuRj/f4JPRur2TO1Tkkg8PSM4RFWLgnxK+WvaGYq4iEkGfbPz8v21Ebux3en8DjK/DT9uYy5XwpRj2D/IJvRBru4UPkzVQQsB996v9lB53eWZ/NmDWEcrkjrjnGtQBF87xDikOcK3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750063138; c=relaxed/simple;
-	bh=cs8ODmouFFhPJh9ppcqIIdAqVeG7KRkviTSrm0mHKd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uc9SWAo2DVoy9QZYZ4EaM1DVFVJ9KojYHjDccdPIwfcnP9Qz8A2MEU64sfr7VAhRLl0EJh1vEgB7n8AxboaYO+sDFiceBlxWFoLZv5HyTmVCOkW5G/2G69EfJDH4pXcpoqfuSNlSrXlqgURYM0AnjvrKZgkZl3f/ZwGYLn2oi5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=oIZhSQc1; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1750069280; c=relaxed/simple;
+	bh=NbJoM5LfG3qBcRohRdPVhQO3z/elUf1FtTUs4Rnoxr0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HNODtTGtzjkixWqbukAUHSAs9BX8GKpvh5VoKY+zdFcBW0lVvDPEspfV0RguK2tK5gmlM1vw/nBh/zXHConza2MW+QiN5yww9NUChFHd+pLqEz6vSrT5r/dPyYDym4wwKtqkqTDHNGGjuc4KUQPXzhpQCoMDGj7lhqQBl578i/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=h19Cefhf; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="oIZhSQc1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=4LqocdEhXQ0As2fdnIbbMcmHN/Z5fyN5voDLLrNKoLI=; b=oIZhSQc1uwRsFCprF8kPjONbZY
-	Di/4WoFmADFFM5gvcMEGT8g32fLITLjeUm7mRYaGQgJXAsrAAFolafDZV5hQeB7Rwfy4KA7PW/L8t
-	0kmpeSjDgMrEMtmfYF/7/6cCzUQsH9LtpX9xXPyyPTYnqmixgAy1PwaYwEA+y+p0QDK0YwDf9lELi
-	U6Et4a16pEfFyKoL7AoN37JlBoHI9MuUZ1VwDsM09EClvYY1eVVbQTFDeYva42XTBKT4cPTESjyCZ
-	QTy5bFSYklnZyi4vcx+JcbZ7tBm81hDv654BOD8tNk0h7J33HKcgz2fX8hgTENg64grWaAM328yNF
-	3d5kgPLA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uR57V-000M79-0u;
-	Mon, 16 Jun 2025 16:38:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Jun 2025 16:38:49 +0800
-Date: Mon, 16 Jun 2025 16:38:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Linux Crypto List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: [PATCH] padata: Remove comment for reorder_work
-Message-ID: <aE_YGbugmAlKk2tC@gondor.apana.org.au>
-References: <20250616153134.1583c3bb@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="h19Cefhf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1750069278; x=1781605278;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NbJoM5LfG3qBcRohRdPVhQO3z/elUf1FtTUs4Rnoxr0=;
+  b=h19CefhfdfWVr2b052T4xa0BogZfmikdaZYYRFJfuiNy+CtTIJqsrDBD
+   eRzFqO5H9rt7DMpS3bJ5daE8SUb0CteTl8nYRNa8UTCRdyPweZMMV2Woz
+   /zwfJi5hTY0ApxbfXeBKuF3pludY16Q9ROTSkoPK9c/kSw6zcj3wkTOo0
+   fo/KLHcWNj/cwdsaODJROeR12ukVZuWgeqcMYZ0aCWh/cJKu3eInremIC
+   7hBPjcEnOi72U/fQn0dSFdHd3ZkP16op7T627PkFSUxFGosF69ya3kMHI
+   e7/+MlMpayQJJpJEd9Ac4FeO157UmPKSCqD0RNzmY7CDp+u2AB52mQPEP
+   w==;
+X-CSE-ConnectionGUID: NkMxLeT9QaGXvpWNNipztw==
+X-CSE-MsgGUID: 7tHYdufdSRiWVAqsQ/5L5Q==
+X-IronPort-AV: E=Sophos;i="6.16,240,1744095600"; 
+   d="scan'208";a="42842138"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2025 03:21:17 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 16 Jun 2025 03:21:07 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Mon, 16 Jun 2025 03:21:04 -0700
+Date: Mon, 16 Jun 2025 10:21:03 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Robert Marko <robert.marko@sartura.hr>
+CC: <catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <vkoul@kernel.org>,
+	<andi.shyti@kernel.org>, <broonie@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<kernel@pengutronix.de>, <ore@pengutronix.de>, <luka.perkov@sartura.hr>,
+	<arnd@arndb.de>
+Subject: Re: [PATCH v7 1/6] arm64: lan969x: Add support for Microchip LAN969x
+ SoC
+Message-ID: <20250616102103.faoc5tqp22we67zl@DEN-DL-M70577>
+References: <20250613114148.1943267-1-robert.marko@sartura.hr>
+ <20250613114148.1943267-2-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250616153134.1583c3bb@canb.auug.org.au>
+In-Reply-To: <20250613114148.1943267-2-robert.marko@sartura.hr>
 
-On Mon, Jun 16, 2025 at 03:31:34PM +1000, Stephen Rothwell wrote:
-> Hi all,
+> This adds support for the Microchip LAN969x ARMv8-based SoC switch family.
 > 
-> After merging the crypto tree, today's linux-next build (htmldocs)
-> produced this warning:
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> Acked-by: Daniel Machon <daniel.machon@microchip.com>
+> ---
+>  arch/arm64/Kconfig.platforms | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 > 
-> include/linux/padata.h:104: warning: Excess struct member 'reorder_work' description in 'parallel_data'
+> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+> index a541bb029aa4..834910f11864 100644
+> --- a/arch/arm64/Kconfig.platforms
+> +++ b/arch/arm64/Kconfig.platforms
+> @@ -133,6 +133,20 @@ config ARCH_SPARX5
+>           security through TCAM-based frame processing using versatile
+>           content aware processor (VCAP).
 > 
-> Introduced by commit
+> +config ARCH_LAN969X
+> +       bool "Microchip LAN969X SoC family"
+> +       select PINCTRL
+> +       select DW_APB_TIMER_OF
+
+The lan969x SoC uses the clk-lan966x driver. Would it not make sense to select
+it here?
+
+  +       select COMMON_CLK_LAN966X
+
+> +       help
+> +         This enables support for the Microchip LAN969X ARMv8-based
+> +         SoC family of TSN-capable gigabit switches.
+> +
+> +         The LAN969X Ethernet switch family provides a rich set of
+> +         switching features such as advanced TCAM-based VLAN and QoS
+> +         processing enabling delivery of differentiated services, and
+> +         security through TCAM-based frame processing using versatile
+> +         content aware processor (VCAP).
+> +
+>  config ARCH_K3
+>         bool "Texas Instruments Inc. K3 multicore SoC architecture"
+>         select PM_GENERIC_DOMAINS if PM
+> --
+> 2.49.0
 > 
->   71203f68c774 ("padata: Fix pd UAF once and for all")
 
-Thanks for the report Stephen!
-
----8<---
-Remove comment for reorder_work which no longer exists.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Fixes: 71203f68c774 ("padata: Fix pd UAF once and for all")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index b486c7359de2..765f2778e264 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -90,7 +90,6 @@ struct padata_cpumask {
-  * @processed: Number of already processed objects.
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-- * @reorder_work: work struct for reordering.
-  */
- struct parallel_data {
- 	struct padata_shell		*ps;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+/Daniel
