@@ -1,176 +1,137 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700E127FB10
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Jun 2025 10:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E349F322A
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Jun 2025 14:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750071023; cv=none; b=mP/wd/yUnGGouDStjc3UvDOCWcKZr51l7VEjbOxinujiITgSMVNE3culVV/21TpQ/BUYGWusezP+EzAsw5fygSRpyilX5xx4nj2qXYSRvhtS5TGKuncH1yIL59jUCPEySWifyJgx1UkkBvAJd7udPtuFJFDeM7sW0RAc3zaUDUE=
+	t=1750082567; cv=none; b=tFtmxYp2Fhjv4VoQGV0rfwMcCv6892dBA8z4L+cMxQPjUWjDQvQ1srrHc6CY4oeFMeO2qvcvEGtplgo5nSHuKvZ/1SZP6YYhtyLTHED2ftn9g7f1wA2JWhGSurCAV7aopOorIhYP5bNomoMBZPhALiIrRjU2cm4Ky2GXpZMmlkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750071023; c=relaxed/simple;
-	bh=WFXyuIl1ai7zW0/bNIEBCW5gSywUyqO1acDZrRnaqoU=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=jgxextRjWDK9u6AG/A6LHERTdAFXIvKVGo1SaR3KPdYOzKp1bR/3Jhmq7YS0/rnhTYUM8eaGdpT2R5Q+6L2c5TN48/Wwa7k1GLrEC5jF2c4crZ1Y0D0rPIxVz6hAunQQD5t2ybJkezbFppDzF/mYPdRORWFauWhRujLHUv845Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NlMmUu5z; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1750082567; c=relaxed/simple;
+	bh=d0ARDgvB9SsiJbkPZbgooQRX1EUc9fd8sBsLDXLnLXk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WVnh1Xj8c8qKHgKBE6zfwX7mmAK26V6r6slxSKExEEdLDcZR029r82CXgnvwR7FhtyoG0vv8wsfd8SYMcrGQQ4cpsprqUXynfQLGUoIp66t5oHeo+JUqW6XWHRceJzYQOmXf61YXo/ahKoBigpVqOVLkCx2X0M5HFIWJtPzWUdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GDQPjJa4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NlMmUu5z"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55G9Tbx7029530;
-	Mon, 16 Jun 2025 10:50:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=gzAVNTd9kAiXR8EDovxsCWEhs2XX686pdIXH3YYqDXE=; b=NlMmUu5zttb7
-	/zwmOTXJOPN19UGBxJDmHvgbokg3y8c/sV9eFz4SWvnFEqlIKvs7XNjovLCnLPu9
-	ICJQ/Wgw9TiU/cmmdJ8FrG+GfRNcqwy60NxXRHaskZOXuP1mj3nAlIYAtQ2fTKkn
-	UndHIJiFA0WgMemH4xnL+8Ad9tbr0xTMwXGG4O3mowzNBhh4Vrb3jn4e4ET5bDpy
-	h0Drcy3+uhqZdvcHFQ+oHt/o/ks9jeXE+mOq7vxlsII0moV5I90uqrMoUW/lx3lM
-	5/5CM6bRiA/44LcIKMzDsznxiAoQPg5wKwzNiaks4XbMbu/dCUrJEpmpn22ct3Fr
-	iCyFdBUmnw==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790s49a3g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 10:50:10 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55GA8YXb014247;
-	Mon, 16 Jun 2025 10:50:10 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 479p425cb4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 10:50:09 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55GAo8Zu60293438
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Jun 2025 10:50:09 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AB75058054;
-	Mon, 16 Jun 2025 10:50:08 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2AA7A58060;
-	Mon, 16 Jun 2025 10:50:08 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 16 Jun 2025 10:50:08 +0000 (GMT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GDQPjJa4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750082564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d0ARDgvB9SsiJbkPZbgooQRX1EUc9fd8sBsLDXLnLXk=;
+	b=GDQPjJa4oxjfDf9MW+tCwyhBcw+1rju8SzGY+ZGOqMenDkzUAWboLVQi47r8tqItpTc3K4
+	STpsw+8dkiVkr4aADRm27TVStWImsfvbrSFOluPNosVzMdRyPy3Y7e4ZsaMXB3UQs9b5Ii
+	/WIQZStZBAC3QsayDpYDAw+uxTlfFVM=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-7RpjBdVZPXmu5o1AVSvAQg-1; Mon, 16 Jun 2025 10:02:41 -0400
+X-MC-Unique: 7RpjBdVZPXmu5o1AVSvAQg-1
+X-Mimecast-MFC-AGG-ID: 7RpjBdVZPXmu5o1AVSvAQg_1750082561
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6fb1f84a448so43257846d6.0
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jun 2025 07:02:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750082561; x=1750687361;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d0ARDgvB9SsiJbkPZbgooQRX1EUc9fd8sBsLDXLnLXk=;
+        b=nRsxIeOjyCgOAt763o9Dds008Va8jMA+r73IBBpPSApnypaIWDkGG/TDYUY+qV2JJR
+         t7UdCTUsr4A7RZAUUdPmbEhur3WOakZQrg5fA3m9Owhid855PR5bJLvqjLIXajP752bS
+         gNLpd2hQPhe/SsRBjIPyHbps9ygQNdMJhaaDNWSdW8bmAKn2tBaajqYV7n4yNWah1xrq
+         ti2MXMafzsquMinkoiFEanZAryZo3pFG1wFDq2AXo2RNgDN9w+U3tTsLKxdcIVxtKKq0
+         grNf7yfa2eVDpbyEMN1RKHSSrc12Yc3DE2fOUI5uXBooXLMb8P1PcxbjBN7buncyRP2Q
+         1avQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOzyYAZjmYdj5fG9veUOp9Ha2SwQl71LLhirsbCf4uyx0JgqDhzv91j0cEkY4hej5oqHwmTdKgvOrlkR0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1atJ7b/DPrYheXpISw/50Jl9VKt7m4YCcBoqpUTJTdrguPpl8
+	gFDI6Z6p3vyy79NBHhiGnqnNf3MZz/J574Hqraarf+QFJUKke2VAW136M7nZ8gtqljDagat5u18
+	ZURtu3yJEO/dWp/kdT6Z8gsw9dE4wMnHcty7IcbjKsdudC2ExpFkuryzyUEuFY9wUvw==
+X-Gm-Gg: ASbGncv9ZTXdLXiTdzyoj3cV0jPqZozgWQnVfti7BBv7I60fxTa/hdpxTDfbwpalNiQ
+	NVkF+hnKAJVlt0Ijgy6+RgcYA7AEu/Idh9gTYyNy0FI1b3QgLzlF8C79jQPW8ZxWHYXJ7Fq7uWW
+	o9EKTcObI1xNzoHm/pEMBnMu+RlTl3G/shB5t4mA2t0ICOXiGzSbYg8yBEzj6cDC7mTzz2pZxGD
+	cl+h68ZY1Gqj4LcW3sSVVVB45aDcBUfqjA6Ytt1E714o8wwj+A6OMm5fhlL6viI2PeKOugNDJR6
+	ecKnVU751xyBSjrx
+X-Received: by 2002:a05:6214:5707:b0:6fa:c46c:6fa6 with SMTP id 6a1803df08f44-6fb47725e9emr140484886d6.12.1750082560763;
+        Mon, 16 Jun 2025 07:02:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBcR/KFEr6tqTnCHltQ+VrJiT6moThRhF0UozL35I/ow0X/uSWOEQ9XgxjQtT6GjShaQTWUA==
+X-Received: by 2002:a05:6214:5707:b0:6fa:c46c:6fa6 with SMTP id 6a1803df08f44-6fb47725e9emr140484276d6.12.1750082560204;
+        Mon, 16 Jun 2025 07:02:40 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::baf])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb525553c3sm16042316d6.104.2025.06.16.07.02.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 07:02:39 -0700 (PDT)
+Message-ID: <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com>
+Subject: Re: Module signing and post-quantum crypto public key algorithms
+From: Simo Sorce <simo@redhat.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>, Ignat Korchagin
+	 <ignat@cloudflare.com>, David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Stephan Mueller
+	 <smueller@chronox.de>, torvalds@linux-foundation.org, Paul Moore
+	 <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>, Clemens Lang
+	 <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>, Roberto Sassu
+	 <roberto.sassu@huawei.com>, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Mon, 16 Jun 2025 10:02:38 -0400
+In-Reply-To: <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
+References: <501216.1749826470@warthog.procyon.org.uk>
+		 <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com>
+		 <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com>
+	 <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 16 Jun 2025 12:50:07 +0200
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ingo Franzki <ifranzki@linux.ibm.com>,
-        Herbert Xu
- <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, dengler@linux.ibm.com
-Subject: Re: CI: Another strange crypto message in syslog
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20250606174508.GA53397@google.com>
-References: <d4520a75-c765-406b-a115-a79bbdf8d199@linux.ibm.com>
- <20250605142641.GA1248@sol> <66d4c382f0fbe4ca5486ccfa1f0a4699@linux.ibm.com>
- <20250606174508.GA53397@google.com>
-Message-ID: <319c7c1d4af5c1014d4a88ade39207ea@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDA2NyBTYWx0ZWRfX+Koi0jr8t6Bt yZnkvDJBxBGMU6ddg8JhQjN7g7X96BlthzXmrKK48e4jId6JC4jo68wMVgi0fFiPpnli3VQnDkz R2Cki0RFPLtqK0Hw3+fiir4ht3IPItjau8idySVNiGeKfUOmxcjlzz3ogAAa/OPbJl66t1UvL6q
- d019mrcEFcyWlJZWb9E2T9OeI0z2BpR0HibxsZ+IIXk154u4D9dLAYS+0Kzt8pCeO72oLp8Z72k S6Mi6YteMGPXgN5FVo3g4FU1rdFVJtyCN7MKpm8zqtcsw/6GnD0m9cl/pyU6RsiPgtBO+LqxsoV EaEaXp8nj8kliLDlCY8y230x/5m9PjzOirUrlvoic4rI4mTkT4XMHZv9WBIKeD1ewLqCiOndZR4
- JKBGQ/vgdiWrGuKqOFAz/VB8PbSNnfEkpCu/9LBInnOC4kCpWRq1tcIJvitJ/pUpx4X9iKNQ
-X-Proofpoint-ORIG-GUID: f3p31kRhs0pLJDatqME-Alm-W1cC7Nlc
-X-Authority-Analysis: v=2.4 cv=Qc9mvtbv c=1 sm=1 tr=0 ts=684ff6e2 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=nqbsJgCpBFVI0rgiQ9sA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: f3p31kRhs0pLJDatqME-Alm-W1cC7Nlc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-16_04,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 spamscore=0 impostorscore=0 phishscore=0 mlxscore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 bulkscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506160067
 
-On 2025-06-06 19:45, Eric Biggers wrote:
-> On Fri, Jun 06, 2025 at 09:19:18AM +0200, Harald Freudenberger wrote:
->> > The crypto self-tests remain disabled by default; there's just no longer
->> > a
->> > difference between the "regular tests" and the "full tests".  The
->> > warning makes
->> > sense to me.  There should be an indication that the tests are running
->> > since
->> > they take a long time and should not be enabled in production kernels.
->> >
->> > If this is s390, arch/s390/configs/defconfig has
->> > CONFIG_CRYPTO_SELFTESTS=y.  Is
->> > that really what you want?  I tried to remove it as part of
->> > https://lore.kernel.org/linux-crypto/20250419161543.139344-4-ebiggers@kernel.org/,
->> > but someone complained about that patch so I ended up dropping it.  But
->> > maybe
->> > you still want to remove it from arch/s390/configs/defconfig.  There's
->> > already
->> > arch/s390/configs/debug_defconfig that has it enabled too, and maybe you
->> > only
->> > want tests enabled in the "debug" one?
->> >
->> > - Eric
->> 
->> Looks like we have no other options than disabling the selftests in
->> defconfig.
->> We have debug_defconfig - with all the now huge set of test running in 
->> CI.
->> But for my feeling it was making total sense to have a subset of the 
->> tests
->> run with registration of each crypto algorithm even in production 
->> kernels.
->> However, as wrote ... there is no choice anymore.
-> 
-> There's still a command-line option cryptomgr.noslowtests=1.
-> 
-> If you really want it, we could add back a kconfig option to control 
-> whether the
-> self-tests run the "fast" tests only or not.  I thought that the only 
-> use case
-> for running the "fast" tests only was for people who are misusing these 
-> tests
-> for FIPS pre-operational self-testing.  (Which has always been a poor 
-> match, as
-> FIPS requires only a single test of any length per algorithm, for only 
-> a subset
-> of algorithms.  It's totally different from actually doing proper 
-> testing.)
-> Those people should be okay with the command-line option.
-> 
-> I do think the idea of running the tests in production kernels is 
-> questionable.
-> There are enough tests now that you can't run all of them (and indeed 
-> you are
-> not asking for that), which means the production testing will be 
-> incomplete, and
-> the real testing needs to be done in the development phase with a build 
-> that has
-> the tests enabled anyway.  The same applies to other kernel subsystems 
-> too.
-> 
-> - Eric
+On Fri, 2025-06-13 at 13:50 -0400, James Bottomley wrote:
+> I agree it's coming, but there's currently no date for post quantum
+> requirement in FIPS, which is the main driver for this.
 
-In general I agree to this. Clearly it makes no sense to run all
-the tests all time when a new algorithm is registered.
-The thing is ... everybody wants to test as close as possible to the
-production systems. So the kernels are usually build for production - 
-now without
-any selftests. But all the Linux distributors happily patch whatever 
-they think
-is necessary and build production kernels - now without any in-kernel 
-crypto
-selftests. The only places where selftests are now executed is in 
-'special'
-environments like CIs or on development systems and hopefully findings 
-there
-are handled seriously by the maintainers and developers.
+The driver is the CNSA 2.0 document which has precise deadlines, not
+FIPS. That said ML-KEM and ML-DSA can already be validated, so FIPS is
+also covered.
 
-Harald Freudenberger
+> Current estimates say Shor's algorithm in "reasonable[1]" time requires
+> around a million qubits to break RSA2048, so we're still several orders
+> of magnitude off that.
+
+Note that you are citing sources that identify needed physical qbits
+for error correction, but what IBM publishes is a roadmap for *error
+corrected* logical qbits. If they can pull that off that computer will
+already be way too uncomfortably close (you need 2n+3 error corrected
+logical qbits to break RSA).
+
+> Grover's only requires just over 2,000 (which
+> is why NIST is worried about that first).
+
+Grover can at most half the search space, so it is not really a
+concern, even with the smallest key sizes the search space is still
+2^64 ... so it makes little sense to spend a lot of engineering time to
+find all places where doubling key size break things and then do a
+micro-migration to that. It is better to focus the scarce resources on
+the long term.
+
+>=20
+> Regards,
+>=20
+> James
+>=20
+> [1] you can change this by a couple of orders of magnitude depending on
+> how long you're willing to wait
+
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
+
