@@ -1,118 +1,111 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEB52EF9DA;
-	Tue, 17 Jun 2025 19:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646932EAB6F
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 19:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750188626; cv=none; b=k37D29sO/rSRtNaI0KEHpvI3ep6Jew566tjGh1TREAsSwAQXG9tT/ucKOf0Tch99KuciO4aKqITaB5fgK1MXMUoCPxALmZelYI636liUvhRiFDTAKTh9WSode9/UEGkokRMQ0efjoFxJTgJavc9SX8Vgvnzc/9P1G5T6MyBorow=
+	t=1750189458; cv=none; b=nkbO6oo6yCt9Tv74BxKHUEUHJibZW79bietu9HyivhueuGrAo8htGtzw8VwvGr70jlNouM+rVlI31wsOmoqXb6ytw47EJjhjjhiSb6cej7Ozgadjy37jnD7arRYYHYNFdpjXI9bohzGfu/cQXvKMRFI1I6kF6uzqDCdlPj3VyXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750188626; c=relaxed/simple;
-	bh=Q22B5BmjRWYDJ3wy+OdZ8UrQI/3O8aKyIep+1+rXazw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qhHIMlkYohvGS8upudHJ1kbTsL9Bl7L9iRZZwKIlxXWCAXqVa+BEtvIScxj2ZxT5F27HfuCgd+v1mUrrsq5pngOLQSp66Q6gA5TWOwaHDgcPCVZyBHUkVfhdcG6Dd2gjseHx0q57AG6yedjmP/1N1d+cQKYYRGISX3jvdkwbCP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=sCtpF/Kl; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1750189458; c=relaxed/simple;
+	bh=GglwgC9V6N5x5dY/greRFE2ImYu5s9zU1NI2hHBVjMU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=io9dRfqmXHHTHBy0CgpH8Uk5HxF/nBAESPbougqjqA7qNsDSlyQ2bOGnxFCUsGLEOZ5K6SfFFhGW/YuqFGtWjyU+qRsGfbgbMLHipp2d9zx861+BTgiXWgxx1/8xB/itlyVekj06GY5gpKFbZS9izxDyPwzZqsGLjWrvpJAoh6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=MfYfgTBf; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="sCtpF/Kl"
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.167.115.14])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 28EFC2117FA0;
-	Tue, 17 Jun 2025 12:30:16 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 28EFC2117FA0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1750188617;
-	bh=ir/SqTy2ukWEw+C/xLgwNOdq2SInlhwjnmgWuEINj/o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sCtpF/Kl1X5bBd6TwkG+r70cURR8EDUFjxvtU2bpAN2QVJyFdN0Y7qAKHrdNP0vlK
-	 e34WBgisU2nz6dyum/n91kqiVVnvH+5Lj2YISWrmKmzEVpn48aiPevukwHnDRtTyc6
-	 FF6A+emSTVx2v6AGYJXsz/GGjMjvnb+o+RX8dYEU=
-From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jeffbarnes@linux.microsoft.com
-Subject: [PATCH] crypto: Restore sha384 and hmac_sha384 drbgs in FIPS mode
-Date: Tue, 17 Jun 2025 15:30:05 -0400
-Message-Id: <20250617193005.1756307-1-jeffbarnes@linux.microsoft.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="MfYfgTBf"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ade4679fba7so1122976566b.2
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 12:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1750189453; x=1750794253; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BlEsfucVc/RasLKZoG4B3LJbpSakOO/+DV6/Nb67hA=;
+        b=MfYfgTBfympgPOCejPRlacaQ2xSeWXzJsF7Iwjca6GTFxYez5PLk+BD2r11lmLKXC7
+         c5Sp4B6OtlvroLdqq5TEQstgQJXfY8PCR5VEYQG2V4ZusT7jwtuV9vCrnr2FQMAm9an6
+         g5wTWBeeBzuII18xwdfO+mbIX7eJdLZM5Jsis=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750189453; x=1750794253;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9BlEsfucVc/RasLKZoG4B3LJbpSakOO/+DV6/Nb67hA=;
+        b=DqV+YQbB8BoeX8ezH/FPhxGzAcAG1OLUL5qGYgsR8g+KAyQ2VIVVfB+qStiqD3rYmI
+         DrHuO01b1E3VzrjwfvhDhdi2wyl3kWG7nJTH/suq/KvB3KNk4AM1ykC4Xa2f3cgB7OyH
+         mnamPu8DqjIqU1Td9SE5zpaEicmLN8And1jPaJq3utaQ7Qq0ULE2MIobAqFDG+1Fpdov
+         QVIwFo0xMnRBvz3M5OKucsxCys7/1dAP/PTItoy+EFS1p5rWsjJfG+GrdVBvQPeWE2Q7
+         YDiOJT/+zOFxnGnkLCv5t6Rl3UZOF5havXnl72336oOJXvLGzsyw4v8WdLAfsf98rnAk
+         DgBw==
+X-Gm-Message-State: AOJu0YwELkzarBfTRYMMZ5O+QJIn+SXztakbrgqoR3sRYjAvsDwaQcaz
+	qmVnwy9+wnLBbJZdTGW9tpj9gX70rKkx5mVk2wjEqhYoZ9h7LrTlG7j8OPb2gCcMnW5ynfwfh10
+	wq3whiEs=
+X-Gm-Gg: ASbGncsvBYyKXjBWTCru9lUIya08HLEiRiE33HreXRVqqQ8KLq2ooSck/4KQluE47WL
+	9CVs4fCuIbksNlxVxeLpXX/ESJ6rvpMixl6dhHEk16yeT+ZK/11Ef5b3xYI1TANqf8GMJhMrAbt
+	Rvgvexgmx1Bi6WqhJnwnbe7AfASH8HotaUpolcOnqAXXG8azBIU8xZ/zNHZdHoME1PRIwVYd1M9
+	AS1fKNzhstRuwM1es1FDBp/jvLLrCasGIUmEen9aJkNEcnrEcGWRUHEhpvVnuMnfnlmu86eWKGZ
+	oQ1Q/y0fRnLMzi2q5OR9Y64pofViaC/QC43PFWO3OjLQWhnIYHg15KkpIEB9VnrVbnkSGxl6dkH
+	0OvIBef3qrWE1pXRyWjqXh3hvcvECFUCGuE0K
+X-Google-Smtp-Source: AGHT+IGd2+KqMqcVNYJuAiUYHwlG8kl+9KqL/dDE642axjLf3EGMyLEzg1nyE19GMUZdi/gQnlVqmA==
+X-Received: by 2002:a17:907:9446:b0:adb:2e9d:bc27 with SMTP id a640c23a62f3a-adfad5de029mr1446178466b.54.1750189453513;
+        Tue, 17 Jun 2025 12:44:13 -0700 (PDT)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec8158d8esm910066066b.5.2025.06.17.12.44.11
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jun 2025 12:44:11 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-60702d77c60so12933477a12.3
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 12:44:11 -0700 (PDT)
+X-Received: by 2002:a05:6402:278e:b0:602:29e0:5e2f with SMTP id
+ 4fb4d7f45d1cf-608d086197cmr14681659a12.10.1750189450991; Tue, 17 Jun 2025
+ 12:44:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250616014019.415791-1-ebiggers@kernel.org> <20250617060523.GH8289@sol>
+ <CAHk-=wi5d4K+sF2L=tuRW6AopVxO1DDXzstMQaECmU2QHN13KA@mail.gmail.com> <20250617192212.GA1365424@google.com>
+In-Reply-To: <20250617192212.GA1365424@google.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 17 Jun 2025 12:43:54 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiB6XYBt81zpebysAoya4T-YiiZEmW_7+TtoA=FSCA4XQ@mail.gmail.com>
+X-Gm-Features: AX0GCFszNgSlkg9Mnl9IREDvPmSYgcHDQLiQJ6pRqgmPlre4NTxTJm_9n0SX2DU
+Message-ID: <CAHk-=wiB6XYBt81zpebysAoya4T-YiiZEmW_7+TtoA=FSCA4XQ@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] SHA-512 library functions
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	sparclinux@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Set .fips_allowed in the following drbg alg_test_desc structs.
+On Tue, 17 Jun 2025 at 12:22, Eric Biggers <ebiggers@kernel.org> wrote:
+>>
+> The tests are already in their own patches: patches 4 and 5.  Yes, this patchset
+> has a negative diffstat once you subtract them.
 
-drbg_nopr_hmac_sha384
-drbg_nopr_sha384
-drbg_pr_hmac_sha384
-drbg_pr_sha384
+Yes, the patches were separate, but my point stands.
 
-The sha384 and hmac_sha384 DRBGs with and without prediction resistance
-were disallowed in an early version of the FIPS 140-3 Implementation
-Guidance document. Hence, the fips_allowed flag in struct alg_test_desc
-pertaining to the affected DRBGs was unset. The IG has been withdrawn
-and they are allowed again.
+Let me repeat that part of the email since you seem to have missed it:
 
-Furthermore, when the DRBGs are configured, /proc/crypto shows that
-drbg_*pr_sha384 and drbg_*pr_hmac_sha384 are fips-approved ("fips: yes")
-but because their self-tests are not run (a consequence of unsetting
-the fips_allowed flag), the drbgs won't load successfully with the seeming
-contradictory "fips: yes" in /proc/crypto.
+> If I see a pull request that only adds new tests, it's a no-brainer.
+>
+> If I see a pull request that only re-organizes the code and the
+> diffstat just just renames with some small updates for new locations,
+> it's a no-brainer.
+>
+> If I see a pull request that does both, it's a pain in the arse,
+> because then I need to start to look into individual commits and go
+> "which does what".
 
-This series contains a single patch that sets the fips_allowed flag in
-the sha384-impacted DRBGs, which restores the ability to load them in
-FIPS mode.
+IOW, I really prefer pull requests to do clearly separate things too
+when we're talking re-organization. Or at the very least spell things
+out *very* clearly.
 
-Link: https://lore.kernel.org/linux-crypto/979f4f6f-bb74-4b93-8cbf-6ed653604f0e@jvdsn.com/
-Link: https://csrc.nist.gov/CSRC/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf
+Otherwise I have to waste time just to go split things out _anyway_.
 
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: David S. Miller <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
----
- crypto/testmgr.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 2f5f6b52b2d4..815d1f31dbac 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4897,6 +4897,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		 */
- 		.alg = "drbg_nopr_hmac_sha384",
- 		.test = alg_test_null,
-+		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_nopr_hmac_sha512",
- 		.test = alg_test_drbg,
-@@ -4915,6 +4916,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		/* covered by drbg_nopr_sha256 test */
- 		.alg = "drbg_nopr_sha384",
- 		.test = alg_test_null,
-+		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_nopr_sha512",
- 		.fips_allowed = 1,
-@@ -4946,6 +4948,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		/* covered by drbg_pr_hmac_sha256 test */
- 		.alg = "drbg_pr_hmac_sha384",
- 		.test = alg_test_null,
-+		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_pr_hmac_sha512",
- 		.test = alg_test_null,
-@@ -4961,6 +4964,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		/* covered by drbg_pr_sha256 test */
- 		.alg = "drbg_pr_sha384",
- 		.test = alg_test_null,
-+		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_pr_sha512",
- 		.fips_allowed = 1,
--- 
-2.34.1
-
+            Linus
