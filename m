@@ -1,126 +1,161 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85402EF9C9
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 21:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E272F30CC;
+	Tue, 17 Jun 2025 21:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750194639; cv=none; b=NX0SIKUFqoQlDhQ0ZWNnr4djFSy5JkS3/f9r6ydCpcTubnc05HRFdlumc6UKWh0OPaPM+Fy2xjOR4cbCqcxTuQVHoV1AFKcvhni8yKiLbS6wf1I/LiI79k63N7jfq5R863jKbwBUbrsVVBccJ2fSOB635h6zEdUsDBFqZuTlbbc=
+	t=1750195903; cv=none; b=YyXbgnKGU5fBBnG/viMoxabLCi3Oi3x5KdGDZDPqdovyFh2d4pQhPg0tAwIu0psdWQvCdzngwhPfs8FfK+aElKZCwH914IEtvbv4pctSFyOP3+2HpYZaq2twYhSmBYB4yW58RyTCAldb/qBJIKuQXEWHicI/Mz1A3RMy49dru9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750194639; c=relaxed/simple;
-	bh=ir2qXEQz0ITQfoN65/zED7gUfzbFZUXr94ByJGJvwQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A2Ber42/SYSCR+HUcpX+hw2UNwE7zlgkfTJ1OssLEwG+i0aPYR587XFOBdJb1Hvwrdlxzv+p5+5ppsjTN0ZytFRqhymEdbVke2v4jyJAIZ1Wr7/VxDdlL9uqgSDNmncOwdY/NoTF0ZFsgG9fAQjTCCS0D3g0B5CZaRwu+07qbBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=GKGxioJe; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1750195903; c=relaxed/simple;
+	bh=1YfwZW+S936XwdA8SGfJ1ZJvlipD9uTXygNO4srMawo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BWrl/fwZcbwWBEcKxMkQFCJPUAghwLr4ETQ3G0/zqBGUnvzaVwO+umBbCrqaHe9Wt2xY1m0b6lkI/Jp7FrJr2E00mA8gPxcCrk3hPGMaKqW877GTFTqBfep3XdCaFEKktQZnkAFa+SxNOGWu57oLURUcQOEumwlHExYURyd/FKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmarUdqc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="GKGxioJe"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6071ac9dc3eso10773334a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 14:10:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1750194634; x=1750799434; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NscEjg9Y1LWinfHLpsahI5dfBkkxck14FsEzSEH/mHM=;
-        b=GKGxioJeNQ1m3MD+VTMFWiahlOG40+CTfxNSdw6ozP/K0DiboOKFT1CYrPNsR9hG+C
-         S4wl1fAL0nwXFJoNPcxlUofj6jn7zWG6CQ5fZVIurImhqLwNJXzSGz8RveJ1TIGiKaQW
-         DZ6u+A+f/kRtJ9rOqSJ0xtaaZHD1uiDiEf+lw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750194634; x=1750799434;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NscEjg9Y1LWinfHLpsahI5dfBkkxck14FsEzSEH/mHM=;
-        b=FImsGvYRMk2wg1DMvl3oosJZBqDmZ1MFWJ+vfr11wrTzrP5sVRYCbtPcogagoGZK5N
-         Z9HdA/wJWk4LRSbgL4TPC+qxeAKI1BuVQWg10BHHw3f2Y0AW+qTu+O137siWoaN2k/qG
-         zYSkv70lnNXKHTuAJmyeqg1WXdwO08bbHdKf4bfJULApihWQWjr1JWtIkZfSz4OhYhvo
-         G8FiVdkIX6h3qxtQ4RLDyZUjyw6KXj5OFcehiu/kgfYPxnu6K/hfq/qIOMn9REnoeWeW
-         DwtJWyw6M5vklE96iYmGmwBs+C68bMQttqSRAg4buNkTnhoJI1mHa60fxDKxedhtZ4XW
-         dPdQ==
-X-Gm-Message-State: AOJu0Yz0KYVfOeOjT8a94TQpLY1JSanXTZXPmHEklqgi30hrmNBrg8d4
-	O/1FDW71ZqlEnm9mscHy4qipXfFi+l0WFiAgx4DoUhlCNp0efDq1S9d0Ep7+6SvT8dYFjT9W5Xn
-	602Je1Mc=
-X-Gm-Gg: ASbGnct/DrWpiSApKiBp1+Qfebb4NK0J7NnYr9I4V6YA69r8XYvBzBfG8kjs/WNnPnK
-	ZBG4/qd6gRg3eyuItyo87fo8ebLrqXMY5/eBxZwxWYhVJIEgqpm5jkQTeE3G5ESxAXZf8/wECv6
-	h8NnQO7qw9s52ge3VSCGF/KpJJ4rvZtYWlRuoZgztnWhK/jdM417D8he8QPKGE1ZXyST/hRy0lt
-	mjrddziZgqwZMzHdUr1dOdOjm2SSAIFcApxvJpUVJQ5biauQK9DSMxWzjAkxjEqnzJbAOxbXX+k
-	j95KjttMeRSb+KKSR+ux98JGydGChFcIFeiYsU9s4agwd9WtdAvIx06fFPdTKskKWrqTH16jUGm
-	VyRzzLo/3KBCOdd6Br1adQROgM3At4BVEy83E
-X-Google-Smtp-Source: AGHT+IG8CkYhYrqO/e6OFDrqgouVUkG7WovcTTu1CkYIf6bwJ1MTjVUxcFofiOGSEDDyOOWL+oI2Gw==
-X-Received: by 2002:a05:6402:1e88:b0:605:c057:729 with SMTP id 4fb4d7f45d1cf-608d09a0e00mr12895601a12.34.1750194633985;
-        Tue, 17 Jun 2025 14:10:33 -0700 (PDT)
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com. [209.85.208.53])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-608fb58e00dsm6118218a12.32.2025.06.17.14.10.32
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 14:10:32 -0700 (PDT)
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6077d0b9bbeso11416770a12.3
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 14:10:32 -0700 (PDT)
-X-Received: by 2002:a05:6402:5188:b0:607:f55d:7c56 with SMTP id
- 4fb4d7f45d1cf-608d097a0a3mr14798722a12.25.1750194632040; Tue, 17 Jun 2025
- 14:10:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmarUdqc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEBBFC4CEF1;
+	Tue, 17 Jun 2025 21:31:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750195902;
+	bh=1YfwZW+S936XwdA8SGfJ1ZJvlipD9uTXygNO4srMawo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YmarUdqcOEke0FSqL0Xg4J8Lsf3Wt1uxrnUTrBql9tooIzqRSqrJXRb/RthUG96tM
+	 UhmIuCJamZ3RxGpHFDGNgVGHqRgU1HHltdd03/dUDd3yZXgKOp1z4NJsBzWdqKZRoT
+	 Nhpr9RanMRtnDUygTTyNdDrv/EZ+9j1PkN20sbSIICvlIom/jxXKO7Iy/l/5DOxHrK
+	 Bbs/ObfLHkXDYrqiBgMagOsKvqyvb6JzIr1I9Liskj/HU2yXXiA0ZapCnbVd5Mg2Kc
+	 jqYO7cFto/25mDOQtAHCbJcXHeN3ftaqa2xSE6M8SFyV/zeuKzmBhVcfLIJFp6Mr6z
+	 Mn6XCuVHjg8Yw==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Rajendra Nayak <quic_rjendra@quicinc.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Amit Kucheria <amitk@kernel.org>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Wesley Cheng <quic_wcheng@quicinc.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
+	Lee Jones <lee@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alex Elder <elder@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Andy Gross <agross@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Georgi Djakov <djakov@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Robert Foss <rfoss@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Taniya Das <quic_tdas@quicinc.com>,
+	Sibi Sankar <quic_sibis@quicinc.com>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Imran Shaik <quic_imrashai@quicinc.com>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Jessica Zhang <quic_jesszhan@quicinc.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	David Wronek <david@mainlining.org>,
+	Jens Reidel <adrian@mainlining.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Danila Tikhonov <danila@jiaxyga.com>
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	linux-remoteproc@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-hardening@vger.kernel.org,
+	linux@mainlining.org,
+	~postmarketos/upstreaming@lists.sr.ht,
+	Connor Mitchell <c.dog29@hotmail.com>
+Subject: Re: (subset) [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and Google Pixel 4a
+Date: Tue, 17 Jun 2025 16:31:26 -0500
+Message-ID: <175019588888.714929.17490930593303808143.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
+References: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616014019.415791-1-ebiggers@kernel.org> <20250617060523.GH8289@sol>
- <CAHk-=wi5d4K+sF2L=tuRW6AopVxO1DDXzstMQaECmU2QHN13KA@mail.gmail.com>
- <20250617192212.GA1365424@google.com> <CAHk-=wiB6XYBt81zpebysAoya4T-YiiZEmW_7+TtoA=FSCA4XQ@mail.gmail.com>
- <20250617195858.GA1288@sol> <CAHk-=whJjS_wfxCDhkj2fNp1XPAbxDDdNwF1iqZbamZumBmZPg@mail.gmail.com>
- <20250617203726.GC1288@sol>
-In-Reply-To: <20250617203726.GC1288@sol>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 17 Jun 2025 14:10:15 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whLENPVgWtHg5jt42he8Eb2pFzZngbvfSWXUmq64cyaAw@mail.gmail.com>
-X-Gm-Features: AX0GCFteh8AxHdG-O3SktB-Vd7hTjMUC_EBJsHwrbakY8eEhqvV4OBO-zVcDyV4
-Message-ID: <CAHk-=whLENPVgWtHg5jt42he8Eb2pFzZngbvfSWXUmq64cyaAw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/17] SHA-512 library functions
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 17 Jun 2025 at 13:37, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Okay.  For now I'll keep the test commits last and plan for a separate pull
-> request with them, based on the first.  I fear I'll quickly run into
-> interdependencies, in which case I'll need to fall back to "one pull request and
-> spell things out very clearly".  But I'll try it.
 
-Thanks.
+On Tue, 22 Apr 2025 23:17:01 +0300, Danila Tikhonov wrote:
+> This patch series adds support for the Qualcomm Snapdragon 730/730G/732G
+> (SM7150) platform along with the Google Pixel 4a (sunfish) device. Since
+> the most critical drivers were submitted and applied in separate patch
+> series, this series is largely composed of DT bindings and device‑trees.
+> 
+> To date, we’ve tested SM7150 support on the following eleven devices:
+> - Google Pixel 4a (sunfish)
+> - Samsung Galaxy A71 (a715f)
+> - Lenovo Tab P11 Pro (j706f)
+> - Xiaomi POCO X2 (phoenix)
+> - Xiaomi POCO X3 (karna) / POCO X3 NFC (surya)
+> - Xiaomi Redmi Note 10 Pro (sweet)
+> - Xiaomi Redmi Note 12 Pro (sweet_k6a)
+> - Xiaomi Mi 9T / Redmi K20 (davinci)
+> - Xiaomi Mi Note 10 Lite (toco)
+> - Xiaomi Mi Note 10 (CC9 Pro) & Mi Note 10 Pro (CC9 Pro Premium) (tucana)
+> - Xiaomi Mi 11 Lite 4G (courbet)
+> 
+> [...]
 
-Note that this "split it out" is really _only_ for when there's big
-code movement and re-organization like this - it's certainly not a
-general thing.
+Applied, thanks!
 
-So you don't need to feel like I'm going to ask you to jump through
-hoops in general for normal crypto library updates, this is really
-only for these kinds of initial "big code movement" things.
+[01/33] dt-bindings: arm: cpus: Add Kryo 470 CPUs
+        commit: 7b768d1235dbd98ef7268596995d86df31afce21
 
-> Just so it's clear, this is the diffstat of this patchset broken down by
-> non-test code (patches 1-3 and 6-17) and tests (4-5):
->
->     Non-test:
->          65 files changed, 1524 insertions(+), 1756 deletions(-)
->
->     Test:
->          14 files changed, 2488 insertions(+)
-
-Looks good. That's the kind of diffstat that makes me happy to pull:
-the first one removes move code than it adds, and the second one very
-clearly just adds tests.
-
-So yes, this is the kind of thing that makes my life easy..
-
-> Note that the non-test part includes kerneldoc comments.  I'll assume you aren't
-> going to insist on those being in a separate "documentation" pull request...
-
-Naah, they're relatively tiny, and don't skew the diffstat in huge ways.
-
-             Linus
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
