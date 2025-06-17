@@ -1,166 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98132E266E;
-	Tue, 17 Jun 2025 13:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24B621D00E
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 18:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750168460; cv=none; b=c2Mm4hIvAH4mugDHphcEXgDie0Wjodbk9w5I3DmDphdNanMX6LObfPFQFOUV5FKBJkyhgcnwZHlohYSwSF2y2hQvY95eWp3nmuAIOxaFGYDFYjS5s4BoIdkjYGvMe0g6zewvNvJouRZN2ELiTAnUBcLVhw3HgPZPo74aAifg1S4=
+	t=1750184977; cv=none; b=uHnkb1M4CWVWZ2y5hTLkJWfs0oOFuoE6urR1oettmZKu7StMCsyI7WPY8byUuBQOrbkKZA3kIveVYNmD++Gc4+rxuwiyzoZxyPkS28/ID1VuQ/UWSxBxSmErXY7eolqhYiYr+mcSG+zysqWVfyAI1i50PoTBOiQYlAx7NDozim0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750168460; c=relaxed/simple;
-	bh=+mvYcib1jOLn2MJdJlLe3/Of17qNWzn3vv5uSzZoKSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kl/yJjI2fxj794RFGX1W66GaO/HqBu3oYdwnoKk3K2k8e9FwB9AL+PU18zphQadJuaYjFSiQ7opWs0gwaPIdiuL/ZGKb1oGwFGi+NJ09xnnulnYlJ3vgDTZ2++LZI8W0H10gl2PuGm95LgWXOlsyIKD4gQ/kUwFuOpgtdgz27jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qQbquBVW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750184977; c=relaxed/simple;
+	bh=4D7DO/f/TIDpTtJg/TTFmgQrH4mAxp5ug7V7AlGUGEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pF1NF3wTV6hc1QWYNGsK+NVml85UgUj0jHYXQhOp2M66Y9077t26sp6xrxnxlFlSCJBfvLnZBEJjwngCEjTD2rNMypOkgD5ZSkis9lhycp31kAb2sCFqiDBp04dAyZo+d77PnhLY30YjLHI9gqtvrN45vBBwBikeh22c+QUI2+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ZULnhdeA; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQbquBVW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 161CEC4CEF5;
-	Tue, 17 Jun 2025 13:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750168459;
-	bh=+mvYcib1jOLn2MJdJlLe3/Of17qNWzn3vv5uSzZoKSU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qQbquBVWTNilpD9J2DZukqDqhw6dYV6sQdAC3swnhkXDCzrarHfIjtDx6+iaanIj2
-	 /w49fQnKSs5gIvxmaG8LRqyy10uW6vxniN9Vtlf836msmzLX6mULgZBsyo2VCzTtdQ
-	 v8HEJuCYV3Vzp6qLFx9lNWclFdUMun1+SF3Xe0r/IgIThr2gBMuIJcCrwNKPXlzr4k
-	 qKVgTe3En5KlysSFaraPhOlK6Hm77MlTIQOT81QI2BUf7+QXEZ3OYgm8HvmQq5bDyj
-	 EA6ptglxv3jHHKeLyaL/2d/HPCJgn2G8R6Gxm7WZ6HZYrmkdGksTvaIIGBQm3ZA2aU
-	 6u12Pn3Ty9DSA==
-Date: Tue, 17 Jun 2025 16:54:15 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: keyrings@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jeffrey Altman <jaltman@auristor.com>, hch@infradead.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] Keyrings: How to make them more useful
-Message-ID: <aFFzWwPoXMhMJjTL@kernel.org>
-References: <462886.1749731810@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ZULnhdeA"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6077d0b9bbeso11158512a12.3
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 11:29:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1750184973; x=1750789773; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BpmH32X+ubnFGRkDpBaCqaiio/3lQgXW15x6m1ucLKk=;
+        b=ZULnhdeAZv+Trzzq5xzt/azn4/Dh+J6LuQR9TATLOD8coIES4JnNPqeaeQoN9LvgF7
+         KlhVBrAk0Cfljg1ouLWQuEcxHXE7DC1msQ7pxvlQSiCXEUa30IGvcPvAjUZTxyLf0wDC
+         NI7XXjEZCn4CwdSwugKLYQxp2JqqUnoa4XBm0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750184973; x=1750789773;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BpmH32X+ubnFGRkDpBaCqaiio/3lQgXW15x6m1ucLKk=;
+        b=KAdyuXuHL0Xw8szWuAuwIMJJd/R/rIsLUWro7Z0DOn86u0iKC0q8iNObCsOS3L5ilN
+         23UBMzODbywdXfvSviaUcS21CUk4hY50J70Pe0td2ia6fbjL9hPoS8fbabBQIoEK514y
+         TqLbObywC9ApERlkyU2MU8SBMDStormdO9cmmy3McmQUsLsFt475VdrdZcvMkpCWwsrN
+         5jQxG/7nR7lt+mMNJJRDbTq6qY/EGz4poNGDqTvXCwBrQWCjqUsAwKGPBuDTH+4bwXuP
+         GW0/RzQ/M0TLMs1735dDAE+5OJidw+ysx1Km8fKAPvk2SkZq8ZCMTYnMITo8OlgoB++5
+         ZvgA==
+X-Gm-Message-State: AOJu0YyFXbO8m/MIhBEcSOju5C2XHCm4kk6GL1ag7YinU/yPUCEkd0j7
+	DuKXC4OepxWramHfw1esFO33o5nwlIFJIjlOmCPmwBDhN6VU+LblmuglZto0k9QXgY6MTNafvjL
+	MgCpzsMU=
+X-Gm-Gg: ASbGncvaeumhGRLSwwhZZiRXqGN4TiWZ55BQQJy/t+0A75lLKntfpeJvsjYsnpRhEkb
+	wy12ZA3adgRcMAs44+rv3LsRld5pZ1fJRcaCWkMM9doHXWdwLACgFZLL/YSlLOgr7B2SSh5uCMj
+	R65LfnEQ8gS9LQIgdP0EicnF0DPxL5/ma+ibcyXMiuofT6SPRb+h5oIn10j4totFtTm/VZO9RW3
+	G/47g5ZiigwSn/c8n0Z6WNiJvFb5CyRbrI613ZlY60U0r2s2+pIf4gMMU1KfDnzVK4i4HTevrZj
+	MpnmMDpA9/J7lBAbRhZDo8k62fHtH3qTcxiHLhAjg5YNv5Fqi5mLXRuBz3nmuzeE9Yx4u+TWS4P
+	1eGS/tM8dic89TTdwVum3eqXeDflebrNe6ecE
+X-Google-Smtp-Source: AGHT+IH8LxGg9OvscuxkkK3SUI//goI+TbXfeCakYh2sFy73ElOG9oBqLrPmRYWH4Izd647ghKxkZw==
+X-Received: by 2002:a17:907:2d91:b0:ad2:3f54:1834 with SMTP id a640c23a62f3a-adfad451601mr1279486366b.40.1750184972719;
+        Tue, 17 Jun 2025 11:29:32 -0700 (PDT)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88ff249sm889889066b.82.2025.06.17.11.29.32
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jun 2025 11:29:32 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-605b9488c28so11675860a12.2
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 11:29:32 -0700 (PDT)
+X-Received: by 2002:a05:6402:40ce:b0:5ff:f72e:f494 with SMTP id
+ 4fb4d7f45d1cf-608d099f37bmr12876236a12.31.1750184971733; Tue, 17 Jun 2025
+ 11:29:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <462886.1749731810@warthog.procyon.org.uk>
+References: <20250616014019.415791-1-ebiggers@kernel.org> <20250617060523.GH8289@sol>
+In-Reply-To: <20250617060523.GH8289@sol>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 17 Jun 2025 11:29:15 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi5d4K+sF2L=tuRW6AopVxO1DDXzstMQaECmU2QHN13KA@mail.gmail.com>
+X-Gm-Features: AX0GCFsDpDEWkWJGZUHtM58JGRAX5cSPaq4yB3fqNYhO8hMv3GVq-qz3C44LzlI
+Message-ID: <CAHk-=wi5d4K+sF2L=tuRW6AopVxO1DDXzstMQaECmU2QHN13KA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] SHA-512 library functions
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	sparclinux@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 12, 2025 at 01:36:50PM +0100, David Howells wrote:
-> Hi Jarkko, Steve, Chuck, Mimi, et al.,
-> 
-> I think work needs to be done on the keyrings subsystem to make them more
-> useful for network filesystems and other kernel services such as TLS and
-> crypto.
-> 
-> There are a number of issues that I think need addressing:
-> 
->  (1) One of the flaws in the initial design is that whilst keys have a type
->      (which is necessary), this has to be specified as part of the lookup or
->      the search, which is overly restrictive.
-> 
->      It probably would have been better to search by description alone and
->      then, if a key is found, have any type of key with that description
->      returned and let the app/service investigate the key to find the type.
-> 
->      Now, this is still possible to implement on top of the existing API: just
->      allow a NULL type to be passed in - but we might need some way to
->      enumerate all the keys with that description, but of different types.
->      Possibly, the search function should return all the matching keys.
-> 
->      Possibly, within the kernel, for each keyring, all the keys of the same
->      description can be stored within a group structure, and the search
->      returns the group.  This could also have the added benefit of maybe
->      making it easier to handle updates.
+On Mon, 16 Jun 2025 at 23:05, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> An additional note on testing: [..]
 
-All keys matching the description can be collected by iterating all the
-key types (instead of passing NULL).
+Talking about testing - when adding test scripts, can you do it as a
+separate thing entirely - either before or after?
 
-Having only a syscall for the process has of course much better
-concurrency properties.  Just trying to understand the improvements by
-actual measure, that's all.
+As it is, this code movement is hard to judge just because the stats
+are all messed up with new tests:
 
->  (2) For certain applications, keys need versioning - and we need to be able
->      to get access to older versions (at least to some extent) of the keys.
->      An example of this is cifs where (if I understand it correctly) the key
->      version gets cranked, but not all servers may have caught up yet, so we
->      need to be able to try the keys in descending order of version.
-> 
->      This could also work within the group idea mentioned above.
-> 
->  (3) For certain applications, such as AFS and AF_RXRPC, we may need to be
->      able to keep a number of keys around that have the same description
->      (e.g. cell name) and basic type (e.g. rxrpc) and version, but that have
->      different crypto types (e.g. Rx security classes and Kerberos types, such
->      as RxGK+aes256-cts-hmac-sha1-96, RxGK+aes128-cts-hmac-sha256-128 or
->      RxKAD) as different servers in the same cell might not support all or we
->      might be implementing a server that is offering multiple crypto types.
-> 
->      So we might need a "subtype" as well as a version.
+ 77 files changed, 4012 insertions(+), 1756 deletions(-)
 
-1. How the history is capped? I presume it is a fixed-size circular
-   buffer, where the oldest entry is deleted, when the key is updated.
-1. How history queried by the caller?
-2. How a newer version is revoked in favor of a newer version?
+that's 2k+ new lines of code that pretty much entirely hides the
+question of "did this code movement result in a simpler / same / more
+complex end result".
 
->  (4) I think the keyring ACLs idea need to be revived.  We have a whole bunch
->      of different keyrings, each with a specific 'domain' of usage for the
->      keys contained therein for checking signatures on things.  Can we reduce
->      this to one keyring and use ACLs to declare the specific purposes for
->      which a key may be used or the specific tasks that may use it?  Use
->      special subject IDs (ie. not simply UIDs/GIDs) to mark this.
+So in general, I'd really prefer big re-organizations to be *separate*
+from new code changes.
 
-Is subject ID some kind of token that a process can hold (and possibly
-can be sent to a process)?
+It's just a pain to review renaming when it's mixed up with other
+changes - whether renaming variables or whole files.
 
-> 
->  (5) Replace the upcall mechanism with a listenable service channel, so that a
->      userspace service (possibly part of systemd or driven from systemd) can
->      listen on it and perform key creation/maintenance services.
-> 
->      From previous discussions with the systemd maintainer, it would be a lot
->      easier for them to manage if the key is attached to a file descriptor -
->      at least for the duration of the maintenance operation.
-> 
->      Further, this needs to be containerised in some way so that requests from
->      different containers can be handled separately - and can be
->      distinguished
+And that's as true on an individual commit level (we try to avoid
+renaming things *and* making other changes in one go) as it is on a
+pull request level.
 
-This sounds like an universally sane idea (outside the scope of the
-patch set).
+If I see a pull request that only adds new tests, it's a no-brainer.
 
-> 
->  (6) Move away from keeping DNS records in a keyring, but rather keep them in
->      some sort of shrinkable list.  They could still be looked up over a
->      secure channel.
+If I see a pull request that only re-organizes the code and the
+diffstat just just renames with some small updates for new locations,
+it's a no-brainer.
 
-Don't expertise to understand the benefits of this change. 
+If I see a pull request that does both, it's a pain in the arse,
+because then I need to start to look into individual commits and go
+"which does what".
 
-
-> 
-> To aid with at least (1), (2) and (3) and possibly (4), I think it might be
-> worth adding an extended add_key() system call that takes an additional
-> parameter string:
-> 
-> 	key_serial_t add_key2(const char *type,
-> 			      const char *description,
-> 			      const char *parameters,
-> 			      const void payload, size_t plen,
-> 			      key_serial_t keyring);
-> 
-> The parameters would get passed to the key type driver for it to extract
-> things like version number and subtype from without the need to try and fold
-> it into the payload (which may, for example, be a binary ticket obtained from
-> kerberos).  Though possibly that is a bad example as the kerberos ticket may
-> contain multiple keys.
-
-Does the parameter list mimic kernel command-line style of comma
-separated attributes?
-
-BR, Jarkko
+            Linus
