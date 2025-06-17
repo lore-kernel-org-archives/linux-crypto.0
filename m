@@ -1,48 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20C115539A;
-	Tue, 17 Jun 2025 04:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEE91E49F;
+	Tue, 17 Jun 2025 04:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750134506; cv=none; b=pggJzdX9N0dGp2sPBTmU9L2c3zUgB8vZrlaIFtcWk4bzbSnbW5lWbtogkDK8ydzk8gxH8zZwpdFMm5OAwRIv5POXywbJx/fJgD2QklpsLia83tFink5UsnlYb4SLpoFWN1aOOamPUBQD8HjK4sRIyA4nWJTe6NtErfJR16QRcKU=
+	t=1750136249; cv=none; b=kGCJH3m0IVR6VW4rpqFJu57Gxh0vgugZntnz9VUqouKRE8Y7YPmFmLwWWgys07W7eTVxnNBd4zKYxS4ebWK2Z8hPZZTghg0t0iJhWyZttrrGzO78SFKYcauKOJV7YAGD6XY3T4Bxpy/uHOqhBF9GKODqu+I98S5v3vaiPn1V8iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750134506; c=relaxed/simple;
-	bh=PnJko5vxDtAYo4xtfL54bpZLAmxUI5zpeQ7QYnXzKvQ=;
+	s=arc-20240116; t=1750136249; c=relaxed/simple;
+	bh=q/Kg1esu+cPgiA6+vrjnz5edDszeYiU+GwkduGfZsCo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=djyoCCWWTExKIbv80M1rtpjo3DodiWsSKRKkGnilE8dJX0rxBNbP5GunH26wTKtafbsj/ZDE/sGVn2LrqyxNwquOaqp4UVK0MKeQhDU+j1MYw8PupkoSqEJUthSRwqDsXPJU+yJFDTpSc5tgI1pbszqJSTicjJhX9HOIqYxJtPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JT0Zap80; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=MpFo4XmIzZkyrYGLiFAmNpFKQCLZ0jQBv/YSOW1kG/JDynGVNwLsCjWADoeTtAR+won+HuxHW9bldRV4wnVgsbyiej+8s46442hgkIFPrekXPjIyZpskcbQcbqWtV6yy+tYYkTGkFFtbrJjRGdjAsscGTO8uMbudElv0X5vK3t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N3YUIUtE; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JT0Zap80"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A85E2C4CEE3;
-	Tue, 17 Jun 2025 04:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750134506;
-	bh=PnJko5vxDtAYo4xtfL54bpZLAmxUI5zpeQ7QYnXzKvQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JT0Zap801QYfqX2dK6+3BKLTq1OF46HXM2SK+yQrcSWC8I0+zNUAnAAgk3oW5qz/j
-	 bViQ4PWHNR7sp/btqryPHfVoaJaLBgME5dXhIHLrA94VDiVckwTcRtJbO06HZZt725
-	 dH11OlQhV9Gkmc+f21JopULDKqTzdurT1MHX3Ovf0jI/T0VAFNegSarfjXrg+fOzga
-	 7QmwpodhbrLN8MkjoeEVEpft84z0LxroJd+JdiXE7PUl8teApAvmMPmHyMAC6mxsh9
-	 m4HJsdClJkT8S4S/Pr/gigmN6cn6niFTyWi9dvmj2s3bw717Dms2/jXMNlK4IMUalG
-	 hZVoqhPXnyhpg==
-Date: Mon, 16 Jun 2025 21:27:55 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: T Pratham <t-pratham@ti.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>
-Subject: Re: [PATCH v5 0/2] Add support for Texas Instruments DTHE V2 crypto
- accelerator
-Message-ID: <20250617042755.GG8289@sol>
-References: <20250603124217.957116-1-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N3YUIUtE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=obGrpb+Tpt/ckRKGUcPmCd/zRt19JMaRenjkRk+pawg=; b=N3YUIUtE+4qPAnXDNKxp/Lcjea
+	j3olYwLpvlijPT8rN3RniQXfKb1utGoUGWj4E8uORjMDlW9mCzQQhKx835IRbjelkxC622V7zkIYO
+	Xl7zsCBBkClvk9HEnj8sMeKcLw6izMlMdcuCrqvw7pyzkOPdp9tyEJIqkjBoKzxqsW1GslT6bmloz
+	HlBRBIJ6lZYxwjScC9nxiDu3jKm7grRQ+CMWQsWbs4AwugTokaW34GTVwE+LCs3sq8ijuXLYhLYRC
+	7UGc6A/C6sHn+LYDLuMbKQGDOzcaj/8N9p3E2D1wrnSOLgqA/D7EdBKHX9hrrdf3xZ0+3H09plDjw
+	Ykorhndw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uRO8T-000ZxS-1V;
+	Tue, 17 Jun 2025 12:57:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 17 Jun 2025 12:57:05 +0800
+Date: Tue, 17 Jun 2025 12:57:05 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat - lower priority for skcipher and aead
+ algorithms
+Message-ID: <aFD1obs5rQaMLA4u@gondor.apana.org.au>
+References: <20250613103309.22440-1-giovanni.cabiddu@intel.com>
+ <aE-a-q_wQ5qNFcF_@gondor.apana.org.au>
+ <aFAyBgwCUN2NLXOE@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,40 +52,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250603124217.957116-1-t-pratham@ti.com>
+In-Reply-To: <aFAyBgwCUN2NLXOE@gcabiddu-mobl.ger.corp.intel.com>
 
-On Tue, Jun 03, 2025 at 06:07:27PM +0530, T Pratham wrote:
-> This series adds support for TI DTHE V2 crypto accelerator. DTHE V2 is a
-> new crypto accelerator which contains multiple crypto IPs [1].
-> This series implements support for ECB and CBC modes of AES for the AES
-> Engine of the DTHE, using skcipher APIs of the kernel.
-> 
-> Tested with:
-> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> 
-> and tcrypt,
-> sudo modprobe tcrypt mode=500 sec=1
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
-> ---
-> [1]: Section 14.6.3 (DMA Control Registers -> DMASS_DTHE)
-> Link: https://www.ti.com/lit/ug/sprujb4/sprujb4.pdf
+On Mon, Jun 16, 2025 at 04:02:30PM +0100, Giovanni Cabiddu wrote:
+>
+> This level of performance is observed in userspace, where it is possible
+> to (1) batch requests to amortize MMIO overhead (e.g., multiple requests
+> per write), (2) submit requests asynchronously, (3) use flat buffers
+> instead of scatter-gather lists, and (4) rely on polling rather than
+> interrupts.
 
-Numbers, please.  What is the specific, real use case in Linux where this
-patchset actually improves performance?  Going off the CPU and back again just
-to en/decrypt some data is hugely expensive.
+So is batching a large number of 4K requests requests sufficient
+to achieve the maximum throughput? Or does it require physically
+contiguous memory much greater than 4K in size?
 
-Note that the manual you linked to above explicitly states that the CPU supports
-the ARMv8 Cryptography Extensions.  That definitively makes any off-CPU offload
-obsolete.  But even without that, these sorts of off-CPU offloads have always
-been highly questionable.
-
-I think it's implausible that this patchset could actually be beneficial.
-
-In fact, it might actually be really harmful.  You set your algorithms to
-priority 30000, which makes them be prioritized over ARMv8 CE.  I've seen
-exactly that bug with other "accelerators", which actually regressed performance
-by over 50x compared to simply staying on the CPU.
-
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
