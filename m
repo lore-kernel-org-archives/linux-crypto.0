@@ -1,105 +1,157 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEC22EFDB0
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 20:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512CA2EFD81
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 20:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750190916; cv=none; b=Lp3+OfGYNrWn8oErWp/SIuyZOHRFpBsBNr6pcQZnWJ0e84dEtRLP1RCu4n7lvt/8HgS+i//8LcbDwYobAtR+fcsVE66IRNBOQTXBT7K60v46TVjNYacDUJDY/j56y2LOo2GOD9UR5dXfqEexl9MbjmLov54N6Y67dVIJSPoi+dc=
+	t=1750191480; cv=none; b=Fx0sV695aXSS5tgIK68r21J4V3Rf/1ssLBb5F24U1ZbqEjehqxgylloEXxqh79cUoefNwWRBuNDp4DsxO4lQs4cgb7tohnMCGBf+/iIEmbqtd2R/hZ+Ip0HLBesvqKumA8HBSqawu7JtBz/jswU99DvlSdYW57YSLczptmM3JQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750190916; c=relaxed/simple;
-	bh=NQoGyMTrLvZ94cQK6qr/U5S3n/jCYrB9gj8+lWNrtVE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StaNQ3HrnrTLQlOTh2pgqdPsickI0As5IlOrakQRPeiV9oQNwdFgTA5ZF0D+ZUYYQtnCC3r5A8axCebZB0az6VBnpeuDDYR8duCpv7cDZXKk9nuLY2rAAaPvxF91LTnnH3FfKYhmCwOb1kdyJrbBkVAFMzzv83BMMzBxxpHHwYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=cVe6dkP9; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1750191480; c=relaxed/simple;
+	bh=zixkYSTlnTXNunGXrz2f3XuMUKY+iD6Yqa6w5WoCFcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XHEGjfIww2PyWvwQFS6m10Lk7IG+OTuNaJFhPE3L7bw4Dk9LegUXNXBaV3hLEBORkmqMuOVDYHWh8aKWNbHWykLy9ancdm+FMZhkN0f6nwj2itykaiTJ6bhdP2gxF4U3Zc2r4FELsiT436OidBYahuO5gGChh6kMtGgNgD1wEH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=p1c/BRYe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IPMmjWE7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=p1c/BRYe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IPMmjWE7; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="cVe6dkP9"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60707b740a6so9403795a12.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 13:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1750190913; x=1750795713; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KANIOG1UnKUU5UjGnVcj73JF4ShRkYSB4zL4V2vR3Pc=;
-        b=cVe6dkP9uur6QzffCy42W2mR8Cl8MOM/rhWryIhyZ2BIXOptljutjIT5SaNy2w2mT7
-         dHO4C71dPNwSFNHw8odgeex01Lr+qLxenTwYKKWN88Sf5kmHaiaFtlaHo/AfUNk9fGEz
-         VJaMGV7u6xv4yvTjVhntFzssofIfR1FwBGFFk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750190913; x=1750795713;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KANIOG1UnKUU5UjGnVcj73JF4ShRkYSB4zL4V2vR3Pc=;
-        b=wGzKq+CQV5si8o7d4AjOBags/RKnMdW7IUq63PlneVqHyBSK8RgSrqQ1khbyXAho3C
-         o0MYtNR5oIr/FTkn+/Que6x8Bcg3qHiMEo9gbuega/2IVMed4/86Hvc2UG/vf59fjcO1
-         WRcgAVEI8g5+d74NFu79u2nElk4jKzCUGQwTjmz9UOTxbaLrXfIbpHOWQtDnU6/pO1o6
-         MpJzxjd04+/KWLIzyVTHRT99V9VUYILML2Q4Prvq9/nb23OFFUDB2+KvScbNJwbC7ZXT
-         rkufDL56iNDvRFfE4PTluHAJlC3emld2BlgSyNhCpih0Gi4LCokAOhxy/s28Isd+hTX0
-         RzfA==
-X-Gm-Message-State: AOJu0YxYxRmeZiRlW6LpIqXe/dYoEt9PSA9NjHzyS+kv56QCNkSl09r/
-	GsTzqlZ4nNslhdkHLPx2JKGSpJ2J+xguaRtIv5NhAcojX35W9thMQvc7x4YYIEjhbh/NFkoGbgz
-	Du6/grgo=
-X-Gm-Gg: ASbGncuX7/5UHmYxrWZWifqeZ98tp7tggAXoX7+m7jcyqr0rnnZfLLCyiKRnK2s3DP6
-	6nke0itwRzHzdZ0vXLYu0jCrEqXVALszoiBrMoKVD7Cd75q0KoiucGFXESMz7kwaUUbkZod1wXg
-	tkZ/L/CACfefLoDAT5eVTIcvTr1nmHaQyTJfh8CjvZnt6EuUjRpn/8pXf+AODOo39BRJ2r0EhqW
-	VO83OmLExLJ2kgu61BHJs06vr17fEUTIwC2hv3V0eizzwEDcfWXEZ8X61YNq1+sfYNPOnmQp08O
-	cdsJJtaWm3xjIeakdWSQ+Aw3ySYvlH7o6vaSkzpFJUvrpWjANeWo26MrMVH3n9VPABnNoiFWvHv
-	wTmyjwMAU3yNc2HA7+waXbeeRrwamiBUimEiE
-X-Google-Smtp-Source: AGHT+IE3JoTqZ4sbxrezF/n+m+8hKnbXSQcSri0SwJwncqQBb0LJ5muaqoGvvN1XsVqzI7fZb1p6+g==
-X-Received: by 2002:a05:6402:2550:b0:5f3:857f:2b38 with SMTP id 4fb4d7f45d1cf-608d0948ae9mr13954186a12.17.1750190912725;
-        Tue, 17 Jun 2025 13:08:32 -0700 (PDT)
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com. [209.85.208.52])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-608b48a8477sm8353857a12.6.2025.06.17.13.08.30
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 13:08:30 -0700 (PDT)
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6077dea37easo11922542a12.3
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 13:08:30 -0700 (PDT)
-X-Received: by 2002:a05:6402:2550:b0:5f3:857f:2b38 with SMTP id
- 4fb4d7f45d1cf-608d0948ae9mr13954090a12.17.1750190910438; Tue, 17 Jun 2025
- 13:08:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="p1c/BRYe";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IPMmjWE7";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="p1c/BRYe";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IPMmjWE7"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 744011F79D;
+	Tue, 17 Jun 2025 20:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750191477;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X21ZcOxVwbSzRFwETfVZj2snZJOVF9FMz7fREHpUJgQ=;
+	b=p1c/BRYefOKu0C9E60tYNbH7+IltbRjTI3o9oqAT7d+qetlBXnZ/+4Xxh3Rq1Bb7cv1EU3
+	i+S2ZAo1471BlGgMMrbQ+kICcT+IHDS4/97AoGXcHKgdPM3i5Z2vQ6/fm5IiBiTaNBl2tM
+	t2o6QPDnXxx5WQeeMRgktsDImT+x/8w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750191477;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X21ZcOxVwbSzRFwETfVZj2snZJOVF9FMz7fREHpUJgQ=;
+	b=IPMmjWE7F01ChjTElFtZBXO3U3W8/hAwSDwpFXEBcdyqUOXSSlcUPPxGNqetj/TBiUWkBw
+	kGUW5ioOTqjiWzAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750191477;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X21ZcOxVwbSzRFwETfVZj2snZJOVF9FMz7fREHpUJgQ=;
+	b=p1c/BRYefOKu0C9E60tYNbH7+IltbRjTI3o9oqAT7d+qetlBXnZ/+4Xxh3Rq1Bb7cv1EU3
+	i+S2ZAo1471BlGgMMrbQ+kICcT+IHDS4/97AoGXcHKgdPM3i5Z2vQ6/fm5IiBiTaNBl2tM
+	t2o6QPDnXxx5WQeeMRgktsDImT+x/8w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750191477;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X21ZcOxVwbSzRFwETfVZj2snZJOVF9FMz7fREHpUJgQ=;
+	b=IPMmjWE7F01ChjTElFtZBXO3U3W8/hAwSDwpFXEBcdyqUOXSSlcUPPxGNqetj/TBiUWkBw
+	kGUW5ioOTqjiWzAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 45AEE13A69;
+	Tue, 17 Jun 2025 20:17:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8ZjHEHXNUWhoTQAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Tue, 17 Jun 2025 20:17:57 +0000
+Date: Tue, 17 Jun 2025 22:17:48 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>, linux-btrfs@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>
+Subject: Re: [PATCH 2/2] crypto/crc32[c]: register only "-lib" drivers
+Message-ID: <20250617201748.GE4037@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20250613183753.31864-1-ebiggers@kernel.org>
+ <20250613183753.31864-3-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616014019.415791-1-ebiggers@kernel.org> <20250617060523.GH8289@sol>
- <CAHk-=wi5d4K+sF2L=tuRW6AopVxO1DDXzstMQaECmU2QHN13KA@mail.gmail.com>
- <20250617192212.GA1365424@google.com> <CAHk-=wiB6XYBt81zpebysAoya4T-YiiZEmW_7+TtoA=FSCA4XQ@mail.gmail.com>
- <20250617195858.GA1288@sol>
-In-Reply-To: <20250617195858.GA1288@sol>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 17 Jun 2025 13:08:14 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whJjS_wfxCDhkj2fNp1XPAbxDDdNwF1iqZbamZumBmZPg@mail.gmail.com>
-X-Gm-Features: AX0GCFuoL7ATRJ2CnwP4RNLTBvlSmkXnXI8fTIZk-24R8V3-BYf3WTK_tAsCN-o
-Message-ID: <CAHk-=whJjS_wfxCDhkj2fNp1XPAbxDDdNwF1iqZbamZumBmZPg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/17] SHA-512 library functions
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250613183753.31864-3-ebiggers@kernel.org>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:replyto,suse.cz:mid,imap1.dmz-prg2.suse.org:helo];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
 
-On Tue, 17 Jun 2025 at 12:59, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Again, the tests depend on the code they test being added first.
+On Fri, Jun 13, 2025 at 11:37:53AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> For the "crc32" and "crc32c" shash algorithms, instead of registering
+> "*-generic" drivers as well as conditionally registering "*-$(ARCH)"
+> drivers, instead just register "*-lib" drivers.  These just use the
+> regular library functions crc32_le() and crc32c(), so they just do the
+> right thing and are fully accelerated when supported by the CPU.
+> 
+> This eliminates the need for the CRC library to export crc32_le_base()
+> and crc32c_base().  Separate patches make those static functions.
+> 
+> Since this patch removes the "crc32-generic" and "crc32c-generic" driver
+> names which crypto/testmgr.c expects to exist, update crypto/testmgr.c
+> accordingly.  This does mean that crypto/testmgr.c will no longer
+> fuzz-test the "generic" implementation against the "arch" implementation
+> for crc32 and crc32c, but this was redundant with crc_kunit anyway.
+> 
+> Besides the above, and btrfs_init_csum_hash() which the previous patch
+> fixed, no code appears to have been relying on the "crc32-generic" or
+> "crc32c-generic" driver names specifically.
+> 
+> btrfs does export the checksum driver name in
+> /sys/fs/btrfs/$uuid/checksum.  This patch makes that file contain
+> "crc32c-lib" instead of "crc32c-generic" or "crc32c-$(ARCH)".  This
+> should be fine, since in practice the purpose of this file seems to have
+> been just to allow users to manually check whether they needed to enable
+> the optimized CRC32C code.  This was needed only because of the bug in
+> old kernels where the optimized CRC32C code defaulted to off and even
+> needed to be explicitly added to the ramdisk to be used.  Now that it
+> just works in Linux 6.14 and later, there's no need for users to take
+> any action and this file is basically obsolete.
 
-Sure, and that's fine. We have lots of "this depends on that".
-
-> I could do two pull requests, the first with all non-test code and the second
-> with all test code, where the second depends on the first, i.e. it will have the
-> last commit of the first as its base commit.  Is that what you want?
-
-Yes.
-
-Or if one single pull request, split out the diffstat with the
-explanation (that's the "Or at the very least spell things out *very*
-clearly" option). But two separate pull requests would actually be my
-preference.
-
-          Linus
+Well, not the whole file, because it says which checksumming algo is
+used for the filesystem, but the implementation part is.
