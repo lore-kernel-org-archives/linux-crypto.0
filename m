@@ -1,96 +1,90 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101A62BFC67;
-	Tue, 17 Jun 2025 09:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298882147E6
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Jun 2025 10:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750153826; cv=none; b=bNzm4RLaUTng/qLzRsk3wfQIIrs7qC3kdwj8rM3R5skkxiQg90xjbnl9dU4mE7uon6QrIo/BrdYcc+MZ3j31M6Wz90AjJyZHzoihW8JLgtmPWQOz9Gl1dWA/SX+TbHGTZ9YUrjfM5IOt18YGT89Jw+ri8tKL4/vv6S8oZmxeZYk=
+	t=1750157562; cv=none; b=E+QbxLY/x0rFrHsNea0KV7cSmBfkHygm5R8ibxgKSbMPtEvmZV8atSOH6R+/p0mLGtLIv1yQWrxuGmlIhPQ4TrtGyIflQlAqFXUl8MN/vnKVnvzf48ewBIGFMKid1hDPevVSJxYRtfR2OVMRMk1HNVG20AnDQItESSPtnMaFWls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750153826; c=relaxed/simple;
-	bh=5GsdevIxGH4DwmsS8ehE6KbJIaaZA2uhhha9UifZLhk=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=uJ5L/KY6sTSlIks7KRqod7M3zzo2CSDsbAEUQs/mQm3KnYzwD6pH0nWd69twft4EGxumLW5aiNYjPklMhU9kK6K7YYvrvegSoy82BMFbVyiBRaN2LDZTTYhBy9idL/g4S+p9Yfaww7KuZRfSjx5pTdobzOIsQN7tjUBv1uHabdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8Cx_eJcOlFoZk4YAQ--.15430S3;
-	Tue, 17 Jun 2025 17:50:20 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMBxnhtYOlFoqyoeAQ--.32990S2;
-	Tue, 17 Jun 2025 17:50:18 +0800 (CST)
-Subject: Re: [PATCH v10 2/5] crypto: loongson - add Loongson RNG driver
- support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: lee@kernel.org, jarkko@kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, davem@davemloft.net,
- linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org, Yinggang Gu <guyinggang@loongson.cn>,
- Huacai Chen <chenhuacai@loongson.cn>
-References: <20250528065944.4511-1-zhaoqunqin@loongson.cn>
- <20250528065944.4511-3-zhaoqunqin@loongson.cn>
- <aElLJY9MnkEQx935@gondor.apana.org.au>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <4efdb35f-dfb0-c44f-b3ec-7ca98717820c@loongson.cn>
-Date: Tue, 17 Jun 2025 17:49:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1750157562; c=relaxed/simple;
+	bh=KQwSUaQybMD6lY9YaZ1O8Z2vfX3lxr6RXAESXQXfSgo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kScoZwYPz7SGmI2aKgp23c+w2jroeCAX/MPhCsHFCevYJcX1Y+3mRB4KVQRoY1SkHwiwtwfTO/lwki8rzQFOhss6zm0/YQGpqa0alalbw9aSHzBDRV89vcFVbi7YlbxVjYCvoyZVSsK2lDsHdyoPRhEgBvO5NUiI0Hx0Ek7k2sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PaZuVLKS; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PaZuVLKS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750157561; x=1781693561;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KQwSUaQybMD6lY9YaZ1O8Z2vfX3lxr6RXAESXQXfSgo=;
+  b=PaZuVLKS3CFEmvz0v5bkXgItNNfd1wl/Uf61ZXS1CnQbxBJ/Dk2PTtY7
+   s9qHegLqU8aH6wnuzgGsL/MrlCYEi7isSMfc/Ibs/y3dC32fITuy0/iyS
+   CxAscDO3SzremgHWqIkvgLa11yZgJDcDaDLWBP2Z7yVsHBI1OkI6pknbC
+   tfTeaT4w5LZ84tkpyPAzSy5klFIEf64a7/ciQnFs36lUgLYq+oVShMabp
+   t20XH3CJHmjmVrKrIzIWTpMWJRoL1R1fLFZa4HT01D2mWJeR/2pibC+Nf
+   kfuwp0MDn4+CSi9Y040glSHqD8+5F/tEqNPoQNaQRLHfd8UQl270Elzec
+   Q==;
+X-CSE-ConnectionGUID: D3oIjXwfRBu2gTLiABNRmw==
+X-CSE-MsgGUID: bKsMx/T/QU+4Cp+jPvvbFg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="63683684"
+X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
+   d="scan'208";a="63683684"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 03:52:40 -0700
+X-CSE-ConnectionGUID: FfOi5jufT8CEDaDudXOlNQ==
+X-CSE-MsgGUID: 807skD6xRX+T6Bx4Hzb8DA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
+   d="scan'208";a="148656962"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by fmviesa007.fm.intel.com with ESMTP; 17 Jun 2025 03:52:39 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+Subject: [PATCH] crypto: qat - remove duplicate masking for GEN6 devices
+Date: Tue, 17 Jun 2025 11:52:32 +0100
+Message-Id: <20250617105232.979689-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aElLJY9MnkEQx935@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMBxnhtYOlFoqyoeAQ--.32990S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrZr4rKw45ZFW8tFyrtr1kJFc_yoW3JFXEqa
-	n2v3s8ur97CF4rX34akr4rWry8GFW3tFZ2grykZayxtw4fXa98uF48ur1a9F4qgryfCr93
-	urn8G39Yqr1UWosvyTuYvTs0mTUanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbDxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0
-	oVCq3wAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa02
-	0Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1l
-	Yx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI
-	0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC2
-	0s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
-	cVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
+The ICP_ACCEL_CAPABILITIES_CIPHER capability is masked out redundantly
+for QAT GEN6 devices.
 
-在 2025/6/11 下午5:23, Herbert Xu 写道:
-> On Wed, May 28, 2025 at 02:59:41PM +0800, Qunqin Zhao wrote:
->> +	if (!rng_devices.is_init) {
->> +		ret = crypto_register_rng(&loongson_rng_alg);
->> +		if (ret) {
->> +			dev_err(&pdev->dev, "failed to register crypto(%d)\n", ret);
->> +			return ret;
->> +		}
->> +		INIT_LIST_HEAD(&rng_devices.list);
->> +		mutex_init(&rng_devices.lock);
->> +		rng_devices.is_init = true;
->> +	}
-> This doesn't look right.  What stops two devices from both entering
-> this code path when is_init == false?
+Remove it to avoid code duplication.
 
-Will use __MUTEX_INITIALIZER  macro to statically initialize 
-rng_devices. lock,
+This does not introduce any functional change.
 
-and then use this lock to stop two devices form both entering this code 
-path.
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c | 1 -
+ 1 file changed, 1 deletion(-)
 
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+index 48a29a102dd0..cc8554c65d0b 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+@@ -629,7 +629,6 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
+ 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CHACHA_POLY;
+ 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_AESGCM_SPC;
+ 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_AES_V2;
+-		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CIPHER;
+ 	}
+ 	if (fusectl1 & ICP_ACCEL_GEN6_MASK_AUTH_SLICE) {
+ 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_AUTHENTICATION;
 
-Thanks,
-
-Qunqin
-
->
-> Cheers,
+base-commit: 1a81ee21c0d32b37b76e754a0a6350b3e5833cd8
+-- 
+2.40.1
 
