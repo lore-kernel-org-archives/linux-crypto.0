@@ -1,59 +1,43 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA3A28399;
-	Tue, 17 Jun 2025 05:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B64C2D1;
+	Tue, 17 Jun 2025 06:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750138605; cv=none; b=EkccutisdwLrtxQxiv50h+HgZeAy8yEGtsPu41feARw7cthL7lTvBYZ+8e4RrPQ0SNv3VPloqtYzH/OjtWJz61bKg/uq5jlMHkvcU4r5NOr5o0hvjaxL9FWeKaBCGmZkVcGh8MMtfWoEFZdA5C/rb3DB///hQiy3WhmqeaP9ejs=
+	t=1750140354; cv=none; b=apLmnlTsAyNqsIglK8VaC97BAifi01T4GZnvKhq4gDBw5jWN1Ftgl9kd2v/2XSaB9kDpzwh8qY+1o43XeAo9RKPsF75yU3XxDzh51MYginFNdd7I6bB6oJoeF3mZv/Zgg3uXT9IGTDxWTFQolCydoNzOJWenVaGPIehziTKXG0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750138605; c=relaxed/simple;
-	bh=jbP9uGjsDMznmBpJruQX9jR+BpwYKtH06lHDqNl37Ig=;
+	s=arc-20240116; t=1750140354; c=relaxed/simple;
+	bh=NdEJIIDfmHJ1ATQaLMe0WV6YWvExdcsSuFGjNOOoGIk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDnxqCR9vltQBVPBW4SdhNxT47G/wMC8AENYMWQFpHR4ciniMpa8D82wYyJMyD/qYSv/S7EB5WEeH1B5ntaTyvhJS+U5eoMYgWXPL4Qis+1XJsN5uOfR+vp2YV92KRvSJ3T4LlGlh+HtnhybdLPi/YcgUktrMOhruztIjEPtn4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=X1d4KBud; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=NAMGsHWnbMzNGB4CRpvCAIt4aHf0SHvz1TVdic4CLKejxeiNsiIg5b69QcuNX83U4OdzWpQgbAcROnJyvt+oIUM27QcDQkI6qAGBR9s/mSp7KCzoE1j8RK4OlGbT1+3eKuCvPF0FqHvsmXWVEsg0vc75D6qL6wKqMhcb2KqcoE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C3BZtawf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="X1d4KBud"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=fYuxPv6o911HB4LCZgDj4D5PgU252TUBup/qW5CJp1o=; b=X1d4KBud3m/P/cmFBCichdGAsS
-	Z4agd+LbHf/jktjYPjr0UZ12PlmvJTHMmqvYk7u51VmGLMinXgXwBJ+kUi0d0Bd/hl/bQJxa9CMak
-	obu5dv9cx9b0qHzYYQj50NZgyM70T8oGAKpvIztivAE3V5xQIJ54OZwlbQhhlub/2UBWAARvdN5bo
-	bEZcZhcxUDLmYaiUnbDRqDY0UJOcuI0IuHWEbwPXg7aaI6CGkzK+FULoAh7vNqvMnoLnQojtWaaj3
-	eOYJHFZXLPO40htgO86vJIfHcwSoO3MLf4SJZFE3TRxgcaEG+THAzuqze1HlKOkKDMuauNA1EmoNo
-	FJLXeUxg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uROkl-000aIV-0S;
-	Tue, 17 Jun 2025 13:36:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 17 Jun 2025 13:36:38 +0800
-Date: Tue, 17 Jun 2025 13:36:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Klaus Kudielka <klaus.kudielka@gmail.com>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, regressions@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	EBALARD Arnaud <Arnaud.Ebalard@ssi.gouv.fr>,
-	Romain Perier <romain.perier@gmail.com>
-Subject: Re: [PATCH] crypto: marvell/cesa - Avoid empty transfer descriptor
-Message-ID: <aFD-5i8RrA4tHJ6Y@gondor.apana.org.au>
-References: <dcb0b04e479d6f3cfed87795d100ea09e4fbcf53.camel@gmail.com>
- <aCAX8rj2ie4QMnTo@gondor.apana.org.au>
- <28184fb96e2de8a0af32816f5ff1b3d776b57217.camel@gmail.com>
- <aCMOyWVte4tw85_F@gondor.apana.org.au>
- <8e9b45bdafe6ac3f12bcbb5fce5bc9949566344f.camel@gmail.com>
- <aCQm0aHYnI6ciyPz@gondor.apana.org.au>
- <20dde00750d803a9a364ded99dab1e3e22daec77.camel@gmail.com>
- <aCa7J3I8DyRs7pP_@gondor.apana.org.au>
- <c01e9b258e024e745ef8711bb94e0d5f6d7d4f96.camel@gmail.com>
- <043472e83b086681ff3a6d0130bfa01ceeff5fa8.camel@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C3BZtawf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48056C4CEE7;
+	Tue, 17 Jun 2025 06:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750140353;
+	bh=NdEJIIDfmHJ1ATQaLMe0WV6YWvExdcsSuFGjNOOoGIk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C3BZtawfFfNAxwNgYqwerTEy2C2JB63EFa3FCEVVyQ9GQhcoMPbEk90oxtVULSrjZ
+	 L4eNUIVXoeP7+sgk9qm9fL/7N9lrcvz3wrDkQhBN4eirAG/nDTfxJx7xOqAMZ1VgS6
+	 5fqwCEiW77gZ6yz6TlaZ0GnyCwpW++sVv659hwnTUhwaoZBHhcd+8PrRm1Nv/m2V1O
+	 KABwq8oVHcxJ9HzYIb7Cawz4eu+RTNeVyNL2Rw3pncUGQC7rpFerSeUw6hnMMa/snk
+	 9Cv2iWNRtYVIqDXdtVY605IgZBeq+T8VN/Q6zLMjOxWF1C3ScW6/2SHncDPDBjKk2u
+	 fK3nx+USjN5CQ==
+Date: Mon, 16 Jun 2025 23:05:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 00/17] SHA-512 library functions
+Message-ID: <20250617060523.GH8289@sol>
+References: <20250616014019.415791-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,31 +46,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <043472e83b086681ff3a6d0130bfa01ceeff5fa8.camel@gmail.com>
+In-Reply-To: <20250616014019.415791-1-ebiggers@kernel.org>
 
-On Tue, Jun 17, 2025 at 07:32:28AM +0200, Klaus Kudielka wrote:
-> Hello,
-> 
-> Plain v6.16-rc1 with marvell-cesa as module and CRYPTO_SELFTESTS enabled.
-> Identical behaviour as reported previously with the cryptodev tree (see below).
-> 
-> According to /proc/crypto, all marvell-cesa selftests (including ahash) appear to pass reliably again.
-> 
-> If we can trust the information in /proc/crypto, I would suggest to revert commit
-> e845d2399a00f866f287e0cefbd4fc7d8ef0d2f7 ("crypto: marvell/cesa - Disable hash algorithms")
+On Sun, Jun 15, 2025 at 06:40:02PM -0700, Eric Biggers wrote:
+> - Tests are KUnit tests, and they are fairly thorough (more thorough
+>   than crypto/testmgr.c) and also optionally include benchmarks.
 
-Corentin is still able to reproduce failures reliably.  While
-I have a patch that seems to reduce the failure rate for him it
-is not yet a complete fix.  There is also no full explanation of
-why my patch even works to the extent that it does (the DMA memory
-is supposed to be cache-coherent but perhaps it isn't).
+An additional note on testing: I have scripts that build the kernel for all the
+arches that have arch-specific code in lib/crc/ or lib/crypto/, launch them in
+QEMU with various -cpu options, and gather the results of the tests and any
+other issues like warns or panics.
 
-So I think it is still premature at this point.  There is also a
-known problem with the hmac code where it fails to deal with zero-length
-updates correctly.
+I'll get it into a sharable form at some point.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+As far as the coverage of the arch-specific code in this specific patchset goes,
+I've verified that my testing strategy covers all sha512_blocks() code paths,
+including fallbacks, on arm, arm64, s390, riscv, and x86.
+
+The two incomplete ones are mips and sparc, where I cannot test their optimized
+code paths in sha512_blocks() because QEMU does not support it.
+
+Still, I don't expect any issues.  That code is ultimately doing the same thing
+as it was before for SHA-512 block processing, just integrated in a simpler way.
+
+FWIW, my policy going forward is that any new arch-specific code in lib/crc/ or
+lib/crypto/ *MUST* come with QEMU support so that it can be tested.  It's only
+migration of existing code (usually from arch/*/crypto/) like this where I may
+tolerate not being able to test it; that code gets "grandfathered in"...
+
+- Eric
