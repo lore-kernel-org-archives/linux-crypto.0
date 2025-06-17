@@ -1,77 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B64C2D1;
-	Tue, 17 Jun 2025 06:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E958728C5A3;
+	Tue, 17 Jun 2025 07:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750140354; cv=none; b=apLmnlTsAyNqsIglK8VaC97BAifi01T4GZnvKhq4gDBw5jWN1Ftgl9kd2v/2XSaB9kDpzwh8qY+1o43XeAo9RKPsF75yU3XxDzh51MYginFNdd7I6bB6oJoeF3mZv/Zgg3uXT9IGTDxWTFQolCydoNzOJWenVaGPIehziTKXG0E=
+	t=1750144307; cv=none; b=RRWPCPsVe4F63fyVUYMmT5yVtaDJOsU22soo7ErDrZlVWCaxcSRSiG5m5bqs1DX8evdj/w+YygFtR1pn3t+JV0YAJB5KdUfV+1OAOCMaHffPk+mtlsy/04Lbzv4Gt2kZHtT+B4jWhdXRmwgA66wzG/vZx9x+gKggW5MCiAm+/qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750140354; c=relaxed/simple;
-	bh=NdEJIIDfmHJ1ATQaLMe0WV6YWvExdcsSuFGjNOOoGIk=;
+	s=arc-20240116; t=1750144307; c=relaxed/simple;
+	bh=16SBmkOZkrr53DEdJsjOJUewxQnLL0IKyT3zlCUJ458=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NAMGsHWnbMzNGB4CRpvCAIt4aHf0SHvz1TVdic4CLKejxeiNsiIg5b69QcuNX83U4OdzWpQgbAcROnJyvt+oIUM27QcDQkI6qAGBR9s/mSp7KCzoE1j8RK4OlGbT1+3eKuCvPF0FqHvsmXWVEsg0vc75D6qL6wKqMhcb2KqcoE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C3BZtawf; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=rYMerXLs7Jk1EImzSBL92N20m6wGYxp2fqWVCo67ypY8OQJ/LzkXDpZ21B7DEgR0KG3nrs2/Ul8pLBT4ErPZDQqS/D6TF5VU5xNCgznN0JLLxHnq3H8dt3C3jlZt4yTLs4t9/6+GPcYZ3jzwA5OhEBhtF+BU6FmH3PTprHQ+txk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RK5W/QbZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C3BZtawf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48056C4CEE7;
-	Tue, 17 Jun 2025 06:05:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RK5W/QbZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6AFC4CEE3;
+	Tue, 17 Jun 2025 07:11:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750140353;
-	bh=NdEJIIDfmHJ1ATQaLMe0WV6YWvExdcsSuFGjNOOoGIk=;
+	s=k20201202; t=1750144306;
+	bh=16SBmkOZkrr53DEdJsjOJUewxQnLL0IKyT3zlCUJ458=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C3BZtawfFfNAxwNgYqwerTEy2C2JB63EFa3FCEVVyQ9GQhcoMPbEk90oxtVULSrjZ
-	 L4eNUIVXoeP7+sgk9qm9fL/7N9lrcvz3wrDkQhBN4eirAG/nDTfxJx7xOqAMZ1VgS6
-	 5fqwCEiW77gZ6yz6TlaZ0GnyCwpW++sVv659hwnTUhwaoZBHhcd+8PrRm1Nv/m2V1O
-	 KABwq8oVHcxJ9HzYIb7Cawz4eu+RTNeVyNL2Rw3pncUGQC7rpFerSeUw6hnMMa/snk
-	 9Cv2iWNRtYVIqDXdtVY605IgZBeq+T8VN/Q6zLMjOxWF1C3ScW6/2SHncDPDBjKk2u
-	 fK3nx+USjN5CQ==
-Date: Mon, 16 Jun 2025 23:05:23 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
-	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v2 00/17] SHA-512 library functions
-Message-ID: <20250617060523.GH8289@sol>
-References: <20250616014019.415791-1-ebiggers@kernel.org>
+	b=RK5W/QbZ6h4lSx6maUIN0qwCon6YggAY0V4zSn8QeqIH4WpR7YFyDGgX8FeqW9rxU
+	 N9yfhFy1s1X1iOMnBIBueTF051Tii8RSRhDfAO6ITR0npo9MIDF2apqqCQz4y6GlYV
+	 kdVUEfTCo+OKyPCacPLwXBpeic/lNVrEd8FUTjaLRMHkng7LLmuZyG0YNEoqRc4ufb
+	 jnE+ROiM64f8bdsNq+QAqU1qsaXdur8CRmzUevekayh/xBWWUuAPzrDCo8dO4qRgul
+	 NJO3mgqGvXXyEpOI65E8dDkcCadIBH/UsUAC1wKJ2Ra366GJjwr0bWE+w4ey1pCOIv
+	 079bm3aM7soJQ==
+Date: Tue, 17 Jun 2025 09:11:43 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Harsh Jain <h.jain@amd.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, mounika.botcha@amd.com, 
+	sarat.chand.savitala@amd.com, mohan.dhanawade@amd.com, michal.simek@amd.com
+Subject: Re: [PATCH v3 1/3] dt-bindings: crypto: Add node for True Random
+ Number Generator
+Message-ID: <20250617-rational-benign-woodpecker-6ee31a@kuoka>
+References: <20250612052542.2591773-1-h.jain@amd.com>
+ <20250612052542.2591773-2-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250616014019.415791-1-ebiggers@kernel.org>
+In-Reply-To: <20250612052542.2591773-2-h.jain@amd.com>
 
-On Sun, Jun 15, 2025 at 06:40:02PM -0700, Eric Biggers wrote:
-> - Tests are KUnit tests, and they are fairly thorough (more thorough
->   than crypto/testmgr.c) and also optionally include benchmarks.
+On Thu, Jun 12, 2025 at 10:55:40AM GMT, Harsh Jain wrote:
+> From: Mounika Botcha <mounika.botcha@amd.com>
+> 
+> Add TRNG node compatible string and reg properities.
+> 
+> Signed-off-by: Mounika Botcha <mounika.botcha@amd.com>
+> Signed-off-by: Harsh Jain <h.jain@amd.com>
+> ---
+>  .../bindings/crypto/xlnx,versal-trng.yaml     | 36 +++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,versal-trng.yaml
 
-An additional note on testing: I have scripts that build the kernel for all the
-arches that have arch-specific code in lib/crc/ or lib/crypto/, launch them in
-QEMU with various -cpu options, and gather the results of the tests and any
-other issues like warns or panics.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-I'll get it into a sharable form at some point.
+Best regards,
+Krzysztof
 
-As far as the coverage of the arch-specific code in this specific patchset goes,
-I've verified that my testing strategy covers all sha512_blocks() code paths,
-including fallbacks, on arm, arm64, s390, riscv, and x86.
-
-The two incomplete ones are mips and sparc, where I cannot test their optimized
-code paths in sha512_blocks() because QEMU does not support it.
-
-Still, I don't expect any issues.  That code is ultimately doing the same thing
-as it was before for SHA-512 block processing, just integrated in a simpler way.
-
-FWIW, my policy going forward is that any new arch-specific code in lib/crc/ or
-lib/crypto/ *MUST* come with QEMU support so that it can be tested.  It's only
-migration of existing code (usually from arch/*/crypto/) like this where I may
-tolerate not being able to test it; that code gets "grandfathered in"...
-
-- Eric
