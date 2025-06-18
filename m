@@ -1,92 +1,48 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A0F224220
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Jun 2025 08:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9316927FB3B;
+	Wed, 18 Jun 2025 08:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750237120; cv=none; b=vBPNtSsI2r81sUgrrK/csc6IKBw+L/jVEEu26fIzep4pThNGY/t2TKHcU02LJrmfLgzteLPWqn9vF0EfM/k6Dk5jB9dil60aJtyQJx38i92EazH+BD/3Gs8tnE1iBp+Sfpc13rIz/KU/gD+C6LOoCELskYMmjITbvtWtyf727TA=
+	t=1750237130; cv=none; b=fVyokrSUPEMhfWxiIXkyTk/pzy3wd3c7pNhrGS0HxchdxCvpckclSOZnX0A3T19UbxR91/2yneOydi5yVx6wTFPXAuc+iKiCm8eZLjDeUOJYp1OceH8iL+mLCcgGXC1aJ80ehm5IWQDe1G8cFtdijiZ8dlClyhYiPYh+S3Ak0/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750237120; c=relaxed/simple;
-	bh=z3yuffy1eALNXrkmrwmqI6TkfvCQquUhQsYjlbPmOT4=;
+	s=arc-20240116; t=1750237130; c=relaxed/simple;
+	bh=5M+epsQJuYsgtW1xT9tVo9CfIRyK4mYVTJnnaBSlvFg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QwkbXh4ZslJuLtYF2udi77sOeePOVcFZMQnih61UGePHVkz5nlB2Ecy5CRtgAxyfXtvNylr0ChHToLXSdE5kOT28WzhAA8FP0fOIMRcQnx7tfrJVcNuHbkxIyBT+XnxqIXB7g0Gw7qKh8p7FTthtmviDEYPRc84125a9YRTsyTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FiBWNpGP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WJVXBVHn; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FiBWNpGP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WJVXBVHn; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sukt6m1GSFwu/gSDAMFmiZnoB084BsXKLp9CCbh3VrVsOgFBk5E8HrXFJGWSnSBc64Tp5YxrrM9EMKMmiwBWxVFD4G4kReKrO1OfpKfrDVPyD1z34BEk9ZxDbYbWdMhKuIzhnxZVgT2rKnGB0+95PWA7hcGaZZCT9u6L/e5j/+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PfNtoGMP; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FiBWNpGP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WJVXBVHn";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FiBWNpGP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WJVXBVHn"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6DA681F7C7;
-	Wed, 18 Jun 2025 08:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750237115;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ESdoJ1xH5fOmnegw7v0Kss6JCi/Yc1YGw1HrlbZJ+g=;
-	b=FiBWNpGPkNZuI9pBGbEfIE8tn7cUbkzS5N0uUni7wDXdmVgoCcyGEG6i0xSiovCIsY4wD1
-	jzboZAptVip0iWtNgVs7bkJUTrmH1pa1+w8AjF6Kna/4EIipD4jwGyWQc/zQ8pPFY1BCap
-	b3GuxF7LPdPlEpUwWucuiW6ySqXnB8s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750237115;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ESdoJ1xH5fOmnegw7v0Kss6JCi/Yc1YGw1HrlbZJ+g=;
-	b=WJVXBVHnksrwQpupP9c65Z1aKIGFunc0/U0QARYrWzlf48F608G8BKDY0cznu1XNEOqGZL
-	zJ4R7QGIYp8yFuAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750237115;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ESdoJ1xH5fOmnegw7v0Kss6JCi/Yc1YGw1HrlbZJ+g=;
-	b=FiBWNpGPkNZuI9pBGbEfIE8tn7cUbkzS5N0uUni7wDXdmVgoCcyGEG6i0xSiovCIsY4wD1
-	jzboZAptVip0iWtNgVs7bkJUTrmH1pa1+w8AjF6Kna/4EIipD4jwGyWQc/zQ8pPFY1BCap
-	b3GuxF7LPdPlEpUwWucuiW6ySqXnB8s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750237115;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ESdoJ1xH5fOmnegw7v0Kss6JCi/Yc1YGw1HrlbZJ+g=;
-	b=WJVXBVHnksrwQpupP9c65Z1aKIGFunc0/U0QARYrWzlf48F608G8BKDY0cznu1XNEOqGZL
-	zJ4R7QGIYp8yFuAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3645513721;
-	Wed, 18 Jun 2025 08:58:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 6Zm0DLt/UmjGEgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Wed, 18 Jun 2025 08:58:35 +0000
-Date: Wed, 18 Jun 2025 10:58:33 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, linux-btrfs@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH 2/2] crypto/crc32[c]: register only "-lib" drivers
-Message-ID: <20250618085833.GG4037@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20250613183753.31864-1-ebiggers@kernel.org>
- <20250613183753.31864-3-ebiggers@kernel.org>
- <20250617201748.GE4037@suse.cz>
- <20250617202050.GB1288@sol>
- <20250617204756.GD1288@sol>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PfNtoGMP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=i1ZZ6oG+6yWbqdMTo+o/eUA7r/zkbPIbRks8u9ynkkg=; b=PfNtoGMP/g2nY1Q8g6u7kajrt7
+	FLJjZMKAqegDssrNVJ4TxFwGQknxnmZ+Z9D3IejKLYz5dHGAQcsN4Edu6UyewIsXHSinmrgPVJM8Q
+	pt7+VOWGNvRPxSNDiq9VpfGFFcLsv06r3pdDX+doEBm0RcMYmDgR/PODTyGCdzGaxaC787R4IAUdR
+	zH2rAlJI9gdiVBbOVipgPnK/ieBKOSG+7Hj+aHlZRqWliHly8xyR/450/k4Pz6uOiZcy7MS3s6vwI
+	X27CSq8buiN+bBMvN4rJk6jb0yvQe94YPv2Cx2q4rWdjSwRuW6JAo9yfVElvvUzhg2xVTvKlIUb9B
+	r5xgJJhw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uRoNl-000u17-0R;
+	Wed, 18 Jun 2025 16:58:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 18 Jun 2025 16:58:36 +0800
+Date: Wed, 18 Jun 2025 16:58:36 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+	dengler@linux.ibm.com, ifranzki@linux.ibm.com,
+	fcallies@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+	agordeev@linux.ibm.com
+Subject: Re: [PATCH v12 0/6] New s390 specific protected key hmac
+Message-ID: <aFJ_vFIrVWZX-_5r@gondor.apana.org.au>
+References: <20250617134440.48000-1-freude@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -95,89 +51,107 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250617204756.GD1288@sol>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Spam-Level: 
+In-Reply-To: <20250617134440.48000-1-freude@linux.ibm.com>
 
-On Tue, Jun 17, 2025 at 01:47:56PM -0700, Eric Biggers wrote:
-> On Tue, Jun 17, 2025 at 01:20:50PM -0700, Eric Biggers wrote:
-> > On Tue, Jun 17, 2025 at 10:17:48PM +0200, David Sterba wrote:
-> > > On Fri, Jun 13, 2025 at 11:37:53AM -0700, Eric Biggers wrote:
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > For the "crc32" and "crc32c" shash algorithms, instead of registering
-> > > > "*-generic" drivers as well as conditionally registering "*-$(ARCH)"
-> > > > drivers, instead just register "*-lib" drivers.  These just use the
-> > > > regular library functions crc32_le() and crc32c(), so they just do the
-> > > > right thing and are fully accelerated when supported by the CPU.
-> > > > 
-> > > > This eliminates the need for the CRC library to export crc32_le_base()
-> > > > and crc32c_base().  Separate patches make those static functions.
-> > > > 
-> > > > Since this patch removes the "crc32-generic" and "crc32c-generic" driver
-> > > > names which crypto/testmgr.c expects to exist, update crypto/testmgr.c
-> > > > accordingly.  This does mean that crypto/testmgr.c will no longer
-> > > > fuzz-test the "generic" implementation against the "arch" implementation
-> > > > for crc32 and crc32c, but this was redundant with crc_kunit anyway.
-> > > > 
-> > > > Besides the above, and btrfs_init_csum_hash() which the previous patch
-> > > > fixed, no code appears to have been relying on the "crc32-generic" or
-> > > > "crc32c-generic" driver names specifically.
-> > > > 
-> > > > btrfs does export the checksum driver name in
-> > > > /sys/fs/btrfs/$uuid/checksum.  This patch makes that file contain
-> > > > "crc32c-lib" instead of "crc32c-generic" or "crc32c-$(ARCH)".  This
-> > > > should be fine, since in practice the purpose of this file seems to have
-> > > > been just to allow users to manually check whether they needed to enable
-> > > > the optimized CRC32C code.  This was needed only because of the bug in
-> > > > old kernels where the optimized CRC32C code defaulted to off and even
-> > > > needed to be explicitly added to the ramdisk to be used.  Now that it
-> > > > just works in Linux 6.14 and later, there's no need for users to take
-> > > > any action and this file is basically obsolete.
-> > > 
-> > > Well, not the whole file, because it says which checksumming algo is
-> > > used for the filesystem, but the implementation part is.
-> > 
-> > Oh, right.  It's one of those sysfs files that don't follow the normal sysfs
-> > convention and contain multiple values.  I'll update the paragraph above to
-> > clarify that it's referring to the driver name part of the file.
+On Tue, Jun 17, 2025 at 03:44:34PM +0200, Harald Freudenberger wrote:
+> Add support for protected key hmac ("phmac") for s390 arch.
 > 
-> I revised it to:
+> With the latest machine generation there is now support for
+> protected key (that is a key wrapped by a master key stored
+> in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
+> for the s390 specific CPACF instruction kmac.
 > 
-> btrfs does export the checksum name and checksum driver name in
-> /sys/fs/btrfs/$uuid/checksum.  This commit makes the driver name portion
-> of that file contain "crc32c-lib" instead of "crc32c-generic" or
-> "crc32c-$(ARCH)".  This should be fine, since in practice the purpose of
-> the driver name portion of this file seems to have been just to allow
-> users to manually check whether they needed to enable the optimized
-> CRC32C code.  This was needed only because of the bug in old kernels
-> where the optimized CRC32C code defaulted to off and even needed to be
-> explicitly added to the ramdisk to be used.  Now that it just works in
-> Linux 6.14 and later, there's no need for users to take any action and
-> the driver name portion of this is basically obsolete.  (Also, note that
-> the crc32c driver name already changed in 6.14.)
+> This patch adds support via 4 new hashes registered as
+> phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
+> 
+> Changelog:
+> v1: Initial version
+> v2: Increase HASH_MAX_DESCSIZE generic (not just for arch s390).
+>     Fix one finding to use kmemdup instead of kmalloc/memcpy from test
+>     robot. Remove unneeded cpacf subfunctions checks. Simplify
+>     clone_tfm() function. Rebased to s390/features.
+> v3: Feedback from Herbert: Use GFP_ATOMIC in setkey function.
+>     Feedback from Holger: rework tfm clone function, move convert key
+>     invocation from setkey to init function. Rebased to updated
+>     s390/features from 11/7/2024. Ready for integration if there are
+>     no complains on v3.
+> v4: Rewind back more or less to v2. Add code to check for non-sleeping
+>     context. Non-sleeping context during attempt to derive the
+>     protected key from raw key material is not accepted and
+>     -EOPNOTSUPP is returned (also currently all derivation pathes
+>     would in fact never sleep). In general the phmac implementation is
+>     not to be used within non-sleeping context and the code header
+>     mentions this. Tested with (patched) dm-integrity - works fine.
+> v5: As suggested by Herbert now the shashes have been marked as
+>     'internal' and wrapped by ahashes which use the cryptd if an
+>     atomic context is detected. So the visible phmac algorithms are
+>     now ahashes. Unfortunately the dm-integrity implementation
+>     currently requests and deals only with shashes and this phmac
+>     implementation is not fitting to the original goal any more...
+> v6: As suggested by Herbert now a pure async phmac implementation.
+>     Tested via AF_ALG interface. Untested via dm-integrity as this layer
+>     only supports shashes. Maybe I'll develop a patch to switch the
+>     dm-integrity to ahash as it is anyway the more flexible interface.
+> v7: Total rework of the implementation. Now uses workqueues and triggers
+>     asynch requests for key convert, init, update, final and digest.
+>     Tested with instrumented code and with a reworked version of
+>     dm-integrity which uses asynchronous hashes. A patch for dm-integrity
+>     is on the way but yet needs some last hone work.
+> v8: Added selftest. With the selftest comes some code which wraps the
+>     clear key into a "clear key token" digestible by PKEY. The
+>     selftest also uses import() and export(), so these are now also
+>     implemented. Furthermore a finup() implementation is now also
+>     available. Tested with AF_ALG testcases and dm-integrity, also
+>     tested with some instrumented code to check that the asynch
+>     workqueue functions do their job correctly. Coding is complete!
+> v9: As suggested by Herbert use ahash_request_complete() and surround it
+>     with local_bh_disable().
+> v10: Split the pkey selftest patch into 3 patches. Slight rework of the
+>      setkey function as suggested by Holger: When selftest is running
+>      as much as possible of the production code should run. So now the
+>      key prep with selftest is one additional if/then block instead of
+>      an if/then/else construct.
+>      Code is ready for integration and well tested.
+> v11: Utterly rework with the insights collected with the paes rework
+>      and the basic work done with the pkey rework over the last 5 month.
+>      Note that patch #1 effectively reverts commit 7fa481734016
+>      ("crypto: ahash - make hash walk functions private to ahash.c")
+>      from Eric Biggers.
+> v12: Fixed some typos, adaptions to 128 bit total counter,
+>      misc_register() invocation was missing in the patches series,
+>      added Herbert's proposal for a new function crypto_ahash_tested().
+> 
+> Harald Freudenberger (5):
+>   crypto: ahash - make hash walk functions from ahash.c  public
+>   s390/crypto: New s390 specific protected key hash phmac
+>   crypto: api - Add crypto_ahash_tested() helper function
+>   s390/crypto: Add selftest support for phmac
+>   crypto: testmgr - Enable phmac selftest
+> 
+> Holger Dengler (1):
+>   s390/crypto: Add protected key hmac subfunctions for KMAC
+> 
+>  arch/s390/configs/debug_defconfig |    1 +
+>  arch/s390/configs/defconfig       |    1 +
+>  arch/s390/crypto/Makefile         |    1 +
+>  arch/s390/crypto/phmac_s390.c     | 1048 +++++++++++++++++++++++++++++
+>  arch/s390/include/asm/cpacf.h     |    4 +
+>  crypto/ahash.c                    |   26 +-
+>  crypto/testmgr.c                  |   30 +
+>  drivers/crypto/Kconfig            |   13 +
+>  include/crypto/internal/hash.h    |   30 +
+>  9 files changed, 1133 insertions(+), 21 deletions(-)
+>  create mode 100644 arch/s390/crypto/phmac_s390.c
+> 
+> 
+> base-commit: 1029436218e50168812dbc44b16bca6d35721b0b
+> --
+> 2.43.0
 
-This is OK, thanks.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
