@@ -1,112 +1,288 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDE9283CB3;
-	Wed, 18 Jun 2025 09:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427DC287503;
+	Wed, 18 Jun 2025 10:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750238997; cv=none; b=o/vaJV+/vgr33Lfm+hxrowZljMZZVYQQzCLb86v2v8/e3eAwpDMTSFHXiqVhIu7pjQKCBoncVnw5PyjFiyvJmu6uxR4Y+FztrLFYcuj2WBBJRDCUew1bTrHvNe2va1VtRyQ4ZcTsIJtlMy5bv41WBP80+5rPBVXw97qiEgaHBmY=
+	t=1750240849; cv=none; b=G/tIdpVuHX0ENYOPoCO+WEZoDXC1jnMO+Jq92sk8nWNzWXljqZXoZyV68GidDLxqSJZpw/46nkRUY8OqsV9cXY89KWaa2Nn1sIRO6Ow8kIt6gdnw7g1EqyTVKxAOmGsM36vURko+faJdau8OXKCQRIh4HQUrPQniHitPxMdwxRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750238997; c=relaxed/simple;
-	bh=SHb+FYxYFmzYXTrHqY58CjmUGi/fCNcxhXjCEShlv3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZlIGhE2SNcoMf8ECZoVekgSV81rqLP0TyuuFBEhdlc/66OkodrUjQY+9CT+ML4H4FS0EkpVwF2QaZh256Q43cYI0HPDeJx1G8IOIUXmEdxy2aBah8MJi33zDNd+jQBKSqa7bsOpy+mF0NSKq/0guh93DxcnoPC8EiqpMuQ8KFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QjelM2dg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QjelM2dg"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I2IuiC028616;
-	Wed, 18 Jun 2025 09:29:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=mOOOnDaC8EFQbgAba12lgHxi3tNja2
-	71Nl1KAhpuL9U=; b=QjelM2dgbsWc3GtC+Ndo6SGSK+6KL4tIihpXFlDOKCg3kA
-	HswJHemPbvPiEnpytIcQ+YTdDmZe3WuSkdE2QvsyjYWSD/o8byxvh4Bmi3RL3twa
-	fLR820rJAKF0Jjs1eT2T3Q2CTaLsadEQR4VQDgCfdXqfHlZnORLYBpiS1OaDe5fN
-	ZQRyVFoEfWm9mhWB+XPtlHtkwsj0QPGpWZTNLI+HyuaTOVNEvLLEkwfI0bm1a7zs
-	hTjkIgWhEV+lzzacY63Hk7KEXax9GX5wF4GwGXna8Lg5TNdANIpEwJOmVLWnHlie
-	InDDaLXHvk7XxGvsd1PsWbQyydd0meOcwJ7OKAWg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r25bgb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Jun 2025 09:29:52 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55I9GCTj014267;
-	Wed, 18 Jun 2025 09:29:51 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 479p42fv9d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Jun 2025 09:29:51 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55I9Tlab42926580
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 09:29:47 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B6F982004B;
-	Wed, 18 Jun 2025 09:29:47 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6BDD920043;
-	Wed, 18 Jun 2025 09:29:47 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.133])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 18 Jun 2025 09:29:47 +0000 (GMT)
-Date: Wed, 18 Jun 2025 11:29:45 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org, dengler@linux.ibm.com,
-        ifranzki@linux.ibm.com, fcallies@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com
-Subject: Re: [PATCH v12 3/6] s390/crypto: New s390 specific protected key
- hash phmac
-Message-ID: <20250618092945.7535D4b-hca@linux.ibm.com>
-References: <20250617134440.48000-1-freude@linux.ibm.com>
- <20250617134440.48000-4-freude@linux.ibm.com>
+	s=arc-20240116; t=1750240849; c=relaxed/simple;
+	bh=+bwrmATEJ3vMzAzcXlDYS9cwcyBUTb/ChcZNvS/z83g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=n9KMI5KjQzl1Or4sQL03XpQR8FN2ctk4ooQkw8f2mxOghqZQukjL8187Yb48H2UEBUBQscqEM4xAgCiWZW9/2eR8XUssBSTYoIfZi2CdIZz7NkdTEDqALVbx+KSz5VnH9M1+OvGbNBlD0DkQnf82cuC/55iKCzu8uGZ4pTz8kHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bMfNK6wtlznfVN;
+	Wed, 18 Jun 2025 17:59:29 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 57914180B71;
+	Wed, 18 Jun 2025 18:00:40 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 18 Jun 2025 18:00:39 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<liulongfang@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
+	<shenyang39@huawei.com>, <wanghaibin.wang@huawei.com>, Zenghui Yu
+	<yuzenghui@huawei.com>
+Subject: [PATCH] crypto: hisilicon - Use fine grained DMA mapping direction
+Date: Wed, 18 Jun 2025 18:00:26 +0800
+Message-ID: <20250618100026.1586-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250617134440.48000-4-freude@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NUFIjbu1fex7WWDKd82zVCTvWAtNk8vZ
-X-Proofpoint-ORIG-GUID: NUFIjbu1fex7WWDKd82zVCTvWAtNk8vZ
-X-Authority-Analysis: v=2.4 cv=AqTu3P9P c=1 sm=1 tr=0 ts=68528710 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=tV9you1X9CY752Hip54A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA4MCBTYWx0ZWRfX3YUy2VxqCtTm 0KVgsi6Mcso66g+SRRHq4fLaVTw0gmUcdBuW2QJAUoJ3v3uKPkXsoplkVlXbz8jdvYUeKXAkHid /4oXzDDfvJnzBxzryd67Nuz38i/GZshTfWv9cKkxel0FEsi4Ut7MyuP22CvmjdGa6jwbrGqfzun
- t2jK8hE88d0MkfqkK8k0ND8tf2cKkGFXh95EU8+dOj+rVCzYs84Zl1Z4EkyfLUfKLJ059JwiUr0 r9gsOX8U8KpSVIh+CjCjMFM4baEEAHup4GvXAbptqUYyNCVnPaYjQulK27Ae7Z+5YeWSX2h8e3+ Wkop3e6Ol7aaRbpykB8P939oYH5sTkQxxVKGpgoVMWZlTJSsrBklMumdz4I9TokdO4Qf5fvJufd
- 7fwDsCXJgTq6S5Lx5m18Q78bfIRY2N76GjCihbh46+j6b1hN7Zf2UJ6uTqqE3qr6x0OyoWBe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-18_03,2025-06-18_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=414 mlxscore=0 spamscore=0
- bulkscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506180080
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Tue, Jun 17, 2025 at 03:44:37PM +0200, Harald Freudenberger wrote:
-> Add support for protected key hmac ("phmac") for s390 arch.
-> 
-> With the latest machine generation there is now support for
-> protected key (that is a key wrapped by a master key stored
-> in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
-> for the s390 specific CPACF instruction kmac.
-> 
-> This patch adds support via 4 new ahashes registered as
-> phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
-> 
-> Co-developed-by: Holger Dengler <dengler@linux.ibm.com>
-> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
-> Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
-> ---
+The following splat was triggered when booting the kernel built with
+arm64's defconfig + CRYPTO_SELFTESTS + DMA_API_DEBUG.
 
-Co-developed-by must come together with a Signed-off-by tag.
-See Documentation/process/submitting-patches.rst.
+ ------------[ cut here ]------------
+ DMA-API: hisi_sec2 0000:75:00.0: cacheline tracking EEXIST, overlapping mappings aren't supported
+ WARNING: CPU: 24 PID: 1273 at kernel/dma/debug.c:596 add_dma_entry+0x248/0x308
 
-Holger, can you provide your Sign-off, please?
+ Call trace:
+  add_dma_entry+0x248/0x308 (P)
+  debug_dma_map_sg+0x208/0x3e4
+  __dma_map_sg_attrs+0xbc/0x118
+  dma_map_sg_attrs+0x10/0x24
+  hisi_acc_sg_buf_map_to_hw_sgl+0x80/0x218 [hisi_qm]
+  sec_cipher_map+0xc4/0x338 [hisi_sec2]
+  sec_aead_sgl_map+0x18/0x24 [hisi_sec2]
+  sec_process+0xb8/0x36c [hisi_sec2]
+  sec_aead_crypto+0xe4/0x264 [hisi_sec2]
+  sec_aead_encrypt+0x14/0x20 [hisi_sec2]
+  crypto_aead_encrypt+0x24/0x38
+  test_aead_vec_cfg+0x480/0x7e4
+  test_aead_vec+0x84/0x1b8
+  alg_test_aead+0xc0/0x498
+  alg_test.part.0+0x518/0x524
+  alg_test+0x20/0x64
+  cryptomgr_test+0x24/0x44
+  kthread+0x130/0x1fc
+  ret_from_fork+0x10/0x20
+ ---[ end trace 0000000000000000 ]---
+ DMA-API: Mapped at:
+  debug_dma_map_sg+0x234/0x3e4
+  __dma_map_sg_attrs+0xbc/0x118
+  dma_map_sg_attrs+0x10/0x24
+  hisi_acc_sg_buf_map_to_hw_sgl+0x80/0x218 [hisi_qm]
+  sec_cipher_map+0xc4/0x338 [hisi_sec2]
+
+This occurs in selftests where the input and the output scatterlist point
+to the same underlying memory (e.g., when tested with INPLACE_TWO_SGLISTS
+mode).
+
+The problem is that the hisi_sec2 driver maps these two different
+scatterlists using the DMA_BIDIRECTIONAL flag which leads to overlapped
+write mappings which are not supported by the DMA layer.
+
+Fix it by using the fine grained and correct DMA mapping directions. While
+at it, switch the DMA directions used by the hisi_zip driver too.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+
+The hisi_zip part has not been tested due to a lack of HW. I'd appreciate
+it if someone could help to test it.
+
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 21 +++++++++++++--------
+ drivers/crypto/hisilicon/sgl.c             | 15 ++++++++-------
+ drivers/crypto/hisilicon/zip/zip_crypto.c  | 13 +++++++------
+ include/linux/hisi_acc_qm.h                |  4 ++--
+ 4 files changed, 30 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 8ea5305bc320..7d04e770a8c2 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -965,6 +965,7 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
+ 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+ 	struct sec_alg_res *res = &qp_ctx->res[req->req_id];
+ 	struct device *dev = ctx->dev;
++	enum dma_data_direction src_direction;
+ 	int ret;
+ 
+ 	if (req->use_pbuf) {
+@@ -990,10 +991,11 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
+ 		a_req->out_mac_dma = res->out_mac_dma;
+ 	}
+ 
++	src_direction = dst == src ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
+ 	req->in = hisi_acc_sg_buf_map_to_hw_sgl(dev, src,
+ 						qp_ctx->c_in_pool,
+ 						req->req_id,
+-						&req->in_dma);
++						&req->in_dma, src_direction);
+ 	if (IS_ERR(req->in)) {
+ 		dev_err(dev, "fail to dma map input sgl buffers!\n");
+ 		return PTR_ERR(req->in);
+@@ -1003,7 +1005,7 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
+ 		ret = sec_aead_mac_init(a_req);
+ 		if (unlikely(ret)) {
+ 			dev_err(dev, "fail to init mac data for ICV!\n");
+-			hisi_acc_sg_buf_unmap(dev, src, req->in);
++			hisi_acc_sg_buf_unmap(dev, src, req->in, src_direction);
+ 			return ret;
+ 		}
+ 	}
+@@ -1015,11 +1017,12 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
+ 		c_req->c_out = hisi_acc_sg_buf_map_to_hw_sgl(dev, dst,
+ 							     qp_ctx->c_out_pool,
+ 							     req->req_id,
+-							     &c_req->c_out_dma);
++							     &c_req->c_out_dma,
++							     DMA_FROM_DEVICE);
+ 
+ 		if (IS_ERR(c_req->c_out)) {
+ 			dev_err(dev, "fail to dma map output sgl buffers!\n");
+-			hisi_acc_sg_buf_unmap(dev, src, req->in);
++			hisi_acc_sg_buf_unmap(dev, src, req->in, src_direction);
+ 			return PTR_ERR(c_req->c_out);
+ 		}
+ 	}
+@@ -1036,10 +1039,12 @@ static void sec_cipher_unmap(struct sec_ctx *ctx, struct sec_req *req,
+ 	if (req->use_pbuf) {
+ 		sec_cipher_pbuf_unmap(ctx, req, dst);
+ 	} else {
+-		if (dst != src)
+-			hisi_acc_sg_buf_unmap(dev, src, req->in);
+-
+-		hisi_acc_sg_buf_unmap(dev, dst, c_req->c_out);
++		if (dst != src) {
++			hisi_acc_sg_buf_unmap(dev, dst, c_req->c_out, DMA_FROM_DEVICE);
++			hisi_acc_sg_buf_unmap(dev, src, req->in, DMA_TO_DEVICE);
++		} else {
++			hisi_acc_sg_buf_unmap(dev, src, req->in, DMA_BIDIRECTIONAL);
++		}
+ 	}
+ }
+ 
+diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+index c974f95cd126..7a9ef2a9972a 100644
+--- a/drivers/crypto/hisilicon/sgl.c
++++ b/drivers/crypto/hisilicon/sgl.c
+@@ -210,15 +210,15 @@ static void clear_hw_sgl_sge(struct hisi_acc_hw_sgl *hw_sgl)
+  * @pool: Pool which hw sgl memory will be allocated in.
+  * @index: Index of hisi_acc_hw_sgl in pool.
+  * @hw_sgl_dma: The dma address of allocated hw sgl.
++ * @dir: DMA direction.
+  *
+  * This function builds hw sgl according input sgl, user can use hw_sgl_dma
+  * as src/dst in its BD. Only support single hw sgl currently.
+  */
+ struct hisi_acc_hw_sgl *
+-hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+-			      struct scatterlist *sgl,
+-			      struct hisi_acc_sgl_pool *pool,
+-			      u32 index, dma_addr_t *hw_sgl_dma)
++hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev, struct scatterlist *sgl,
++			      struct hisi_acc_sgl_pool *pool, u32 index,
++			      dma_addr_t *hw_sgl_dma, enum dma_data_direction dir)
+ {
+ 	struct hisi_acc_hw_sgl *curr_hw_sgl;
+ 	unsigned int i, sg_n_mapped;
+@@ -232,7 +232,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+ 
+ 	sg_n = sg_nents(sgl);
+ 
+-	sg_n_mapped = dma_map_sg(dev, sgl, sg_n, DMA_BIDIRECTIONAL);
++	sg_n_mapped = dma_map_sg(dev, sgl, sg_n, dir);
+ 	if (!sg_n_mapped) {
+ 		dev_err(dev, "DMA mapping for SG error!\n");
+ 		return ERR_PTR(-EINVAL);
+@@ -276,16 +276,17 @@ EXPORT_SYMBOL_GPL(hisi_acc_sg_buf_map_to_hw_sgl);
+  * @dev: The device which hw sgl belongs to.
+  * @sgl: Related scatterlist.
+  * @hw_sgl: Virtual address of hw sgl.
++ * @dir: DMA direction.
+  *
+  * This function unmaps allocated hw sgl.
+  */
+ void hisi_acc_sg_buf_unmap(struct device *dev, struct scatterlist *sgl,
+-			   struct hisi_acc_hw_sgl *hw_sgl)
++			   struct hisi_acc_hw_sgl *hw_sgl, enum dma_data_direction dir)
+ {
+ 	if (!dev || !sgl || !hw_sgl)
+ 		return;
+ 
+-	dma_unmap_sg(dev, sgl, sg_nents(sgl), DMA_BIDIRECTIONAL);
++	dma_unmap_sg(dev, sgl, sg_nents(sgl), dir);
+ 	clear_hw_sgl_sge(hw_sgl);
+ 	hw_sgl->entry_sum_in_chain = 0;
+ 	hw_sgl->entry_sum_in_sgl = 0;
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 7327f8f29b01..b97513981a3b 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -224,7 +224,8 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+ 		return -EINVAL;
+ 
+ 	req->hw_src = hisi_acc_sg_buf_map_to_hw_sgl(dev, a_req->src, pool,
+-						    req->req_id << 1, &req->dma_src);
++						    req->req_id << 1, &req->dma_src,
++						    DMA_TO_DEVICE);
+ 	if (IS_ERR(req->hw_src)) {
+ 		dev_err(dev, "failed to map the src buffer to hw sgl (%ld)!\n",
+ 			PTR_ERR(req->hw_src));
+@@ -233,7 +234,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+ 
+ 	req->hw_dst = hisi_acc_sg_buf_map_to_hw_sgl(dev, a_req->dst, pool,
+ 						    (req->req_id << 1) + 1,
+-						    &req->dma_dst);
++						    &req->dma_dst, DMA_FROM_DEVICE);
+ 	if (IS_ERR(req->hw_dst)) {
+ 		ret = PTR_ERR(req->hw_dst);
+ 		dev_err(dev, "failed to map the dst buffer to hw slg (%d)!\n",
+@@ -258,9 +259,9 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+ 	return -EINPROGRESS;
+ 
+ err_unmap_output:
+-	hisi_acc_sg_buf_unmap(dev, a_req->dst, req->hw_dst);
++	hisi_acc_sg_buf_unmap(dev, a_req->dst, req->hw_dst, DMA_FROM_DEVICE);
+ err_unmap_input:
+-	hisi_acc_sg_buf_unmap(dev, a_req->src, req->hw_src);
++	hisi_acc_sg_buf_unmap(dev, a_req->src, req->hw_src, DMA_TO_DEVICE);
+ 	return ret;
+ }
+ 
+@@ -303,8 +304,8 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+ 		err = -EIO;
+ 	}
+ 
+-	hisi_acc_sg_buf_unmap(dev, acomp_req->src, req->hw_src);
+-	hisi_acc_sg_buf_unmap(dev, acomp_req->dst, req->hw_dst);
++	hisi_acc_sg_buf_unmap(dev, acomp_req->dst, req->hw_dst, DMA_FROM_DEVICE);
++	hisi_acc_sg_buf_unmap(dev, acomp_req->src, req->hw_src, DMA_TO_DEVICE);
+ 
+ 	acomp_req->dlen = ops->get_dstlen(sqe);
+ 
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 99fcf65d575f..0c4c84b8c3be 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -556,9 +556,9 @@ int hisi_qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+ struct hisi_acc_sgl_pool;
+ struct hisi_acc_hw_sgl *hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+ 	struct scatterlist *sgl, struct hisi_acc_sgl_pool *pool,
+-	u32 index, dma_addr_t *hw_sgl_dma);
++	u32 index, dma_addr_t *hw_sgl_dma, enum dma_data_direction dir);
+ void hisi_acc_sg_buf_unmap(struct device *dev, struct scatterlist *sgl,
+-			   struct hisi_acc_hw_sgl *hw_sgl);
++			   struct hisi_acc_hw_sgl *hw_sgl, enum dma_data_direction dir);
+ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+ 						   u32 count, u32 sge_nr);
+ void hisi_acc_free_sgl_pool(struct device *dev,
+-- 
+2.33.0
+
