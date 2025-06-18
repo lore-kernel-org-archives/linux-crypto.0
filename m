@@ -1,48 +1,48 @@
 Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79842E8DEE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8632E8DEB;
 	Wed, 18 Jun 2025 11:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750246296; cv=none; b=PG9OrjD8CTa5YG9jsRpqQg7oBR4s+XrWVUVpN/7dhbFk9onug1d/J0MVdPX+WoOCcXIoe93WLtO4NuZxI/4e/w+gV9ikUH5Fy1LdcVNicciyzHcH2uKC0qsmdu2A3bljR0UP9r9DReOz9mkHi7RxeQ6UB7cPwE7EqYN4pru3m3c=
+	t=1750246296; cv=none; b=oY+KmLNrTym6mCvETfJI7NKLJRhJ0RAipEIz8RYplWlGo/TDs5DXk8VdDgRGkIdyXFlTWHvkaWkQ1z+zWOOVK/m1H/p9o3IEkkxj90vXToSW331Ud2GNvs2492Ni10GGmvUB1pxpcpiD3DkHN77ZcdwVKqFkICjIfDBd+nZj/PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750246296; c=relaxed/simple;
-	bh=CV+TVRzOwmCKt5S/eKHL+ZZJLaKFwT4f5qNATDVxcBk=;
+	bh=dcftnHlNI6tsQRyg/6XP/gJt7ThU+HpusO48OVpF7eY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YhXFrjtTug1BOpH/XGkUd8sdqImmyHA1uoRmcqr0S5fSiWy4pfMtYGFFZXS4vIQgjQDhbLeUfwLNoQKE4IOLIWly8RcPfDO10mOy2XUUNQAw8REBrDL3bSAaZ/jXo3A2eFP8SlcJI1CdwYzksTvxSmo2VSheKWqhZvEVnkSxyuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=FnDjiCdZ; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=u5FMET7Jzlbwzcr6GxNhusLFWhGpwWupEHc/V26ny/SJZVwQCPZNxI0jizR/vWeujY6UcuPL/QqlmVelLrY/kY9f7Ea7YDUeIOAkiiyUe/9FvWPHfxLupMwzcwNjOUd5vZ/INdbWQlsJo/jHqlwX0OUdLNPlqfnNAI5wQxWbkcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hvjwfJRK; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FnDjiCdZ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hvjwfJRK"
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I7qnJr023248;
-	Wed, 18 Jun 2025 04:31:28 -0700
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I7qnJs023248;
+	Wed, 18 Jun 2025 04:31:29 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=1
-	ilTK+Pe1WM4fcLlDnWP1S/XObgmJEQS46gTQd9Pt4A=; b=FnDjiCdZHU9TOAKRj
-	dD+TYvLOtFkNx3gGyeBi7/3Egl43WQ7ptkU2xsbuwPxk6kuYHAVgj/igYaOnZB5L
-	hIFiAFtX/XLjCB18b5tcH6OvOOchSar91unceyduGO8XPUfB2TQDCm63KYHe/e/7
-	vGqJCcAxPyJrz8g+3IuWTRqinL+7kYkrFj3uESOg3usd8tGaK8BkJ1qmBBGl0VB4
-	4UcJmzdiOOpjymlzSPvDgGHvoSSVG+JioHU5fTSkpNQyXI8/1kZDcAJ0NK5zG9dt
-	/blmf7kyvqb0ll82nL3VWJd4MRUDzvY08Pe7DekE2hNuOFkLKpIejnoYgWTsnflR
-	3hraA==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=z
+	pIgDbWC6Ui9zpifKcBXrnMy50fyhJ/5NheSEAz32qU=; b=hvjwfJRKixD3wlVCx
+	cZNsL/qrrz+gMeg4GbcN/RxJG69CWJ4eMzLYuWlxFwbX+UyQfuZZE9TQLQ3zJMOg
+	IVxlp8tP9qfeiQGZiwdYXgQKgJq7zNAZUhQ5reNAZQnFE5IXM05gx1P+zcI1dYT7
+	qmnhzkKErjHyaQJX74OlJjxIzkSl4vsjowQH1HanfkR8zaARJbMDO2RCCNRGAQSN
+	JFUm99ELIJ7tsOKAtrhBoB0q6sLzDrHWihx338TvncjsSeIiGt76dw7fOAP0BMBZ
+	TvFy3jvLUB4rvqDKyqsEVbvBLc3UcCfj3TzEsVa9tri2czQYnQc9bEBKVdLMixQQ
+	J/k/Q==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47bsf2redd-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47bsf2redd-2
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Jun 2025 04:31:20 -0700 (PDT)
+	Wed, 18 Jun 2025 04:31:29 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 18 Jun 2025 04:31:12 -0700
+ 15.2.1544.4; Wed, 18 Jun 2025 04:31:15 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 18 Jun 2025 04:31:12 -0700
+ Transport; Wed, 18 Jun 2025 04:31:15 -0700
 Received: from optiplex.marvell.com (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with ESMTP id 273F93F7048;
-	Wed, 18 Jun 2025 04:31:08 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id AF9573F7048;
+	Wed, 18 Jun 2025 04:31:12 -0700 (PDT)
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: <davem@davemloft.net>, <leon@kernel.org>, <horms@kernel.org>,
         <sgoutham@marvell.com>, <bbhushan2@marvell.com>,
@@ -50,9 +50,9 @@ To: <davem@davemloft.net>, <leon@kernel.org>, <horms@kernel.org>,
 CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
         Tanmay Jagdale
 	<tanmay@marvell.com>
-Subject: [PATCH net-next v2 08/14] octeontx2-pf: ipsec: Allocate Ingress SA table
-Date: Wed, 18 Jun 2025 17:00:02 +0530
-Message-ID: <20250618113020.130888-9-tanmay@marvell.com>
+Subject: [PATCH net-next v2 09/14] octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+Date: Wed, 18 Jun 2025 17:00:03 +0530
+Message-ID: <20250618113020.130888-10-tanmay@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250618113020.130888-1-tanmay@marvell.com>
 References: <20250618113020.130888-1-tanmay@marvell.com>
@@ -64,212 +64,367 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: cS3zoXCpFS2g5drkJjme4YNy5LWWxzJt
-X-Proofpoint-GUID: cS3zoXCpFS2g5drkJjme4YNy5LWWxzJt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA5OCBTYWx0ZWRfX7Cox5mYSBESj 5H/raG81XKmvdQRp+UFwjDzZVDhPgLgfxa19Efx5cdZgKZZNV7BlTjIjIh8y/A72us5s8MqvvKu LGhzkIlg5h9BZKLg8NyurE+PJHNu7+fy/sdOlnbTvyzhKeOTt1s25IsVUBhqUy6bNm0aQ0mkxDb
- pyZ6M6bqZBlC/PZLuJ8WYnUrX8dGHy6abq/4GKg6tlGRrLsB9c1923UzGm5bedUduZnqdfNkTiv 7eXZA4mWXedzyi3xt+QxHB7N2BcRwKoRwS/4MMilgRKycw2bGV7c6thi4zwShmip/o85FeXuagl 5MlYuJqUgM24u/NOj70vl2bZUY0FvAyy+CGpbEgu/crdQ31H/GI6lZyqwZj2nQhqT6NQASs2kSd
- amQBBxsGERyzXu2zYKkUF+GF9JoIpy6goEAXO3Fu+OpG8xoIzKY/r9FN6MvZZHniRDcAx/Iu
-X-Authority-Analysis: v=2.4 cv=Yu4PR5YX c=1 sm=1 tr=0 ts=6852a38b cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=ShQPJPp02mSZ9WD1TkIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 2Kq40C3oeL89A8BDrWT4Lj5HtCq5fp7o
+X-Proofpoint-GUID: 2Kq40C3oeL89A8BDrWT4Lj5HtCq5fp7o
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA5OCBTYWx0ZWRfX00NoKMMCh8Fd HY7JF0L4bgJnKhNvhSUNM/AiSLJYpLBkKOsj2rg5a92uGGg5dHjFzMnxEslems1hRC8gZzOAF9Z JbqQmQaJ5NM0wpxVB2Cc9h4Gi1ljWB5ETC1gQn/Hbp0GfOE8KzcHM8bITtifTxi1pfDLLhM25V+
+ q5LRR95ZI/b4chbK/DC5XiBmDZrCeIke5KQBd+OTAudnZZlmdWCC9sh2tIhuAOQwNWa3NhDk3n5 mMH5xSxOGNpag6o5GAIIzofNYlK0OVHjE+/CDbxvX1D4tXewyyqVrW6zzKaAOfX3TihIhVMEOFT OgctnRGC87GAiU+vxoEM74FFkRTwSCBuBr+7n0gcOAehkBwaeLCeoGEwk+Ooa1cryJkhjloasIY
+ jGU+/DsOnnSG8qe6oUXaD7S27vwBK7cW1AYAcIHleNelCibqqCTVgBSwFV43GZ2AhAGh5qyW
+X-Authority-Analysis: v=2.4 cv=Yu4PR5YX c=1 sm=1 tr=0 ts=6852a391 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=eRz5E_71QNUotyJBA5UA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-06-18_04,2025-06-18_02,2025-03-28_01
 
-Every NIX LF has the facility to maintain a contiguous SA table that
-is used by NIX RX to find the exact SA context pointer associated with
-a particular flow. Allocate a 128-entry SA table where each entry is of
-2048 bytes which is enough to hold the complete inbound SA context.
+A incoming encrypted IPsec packet in the RVU NIX hardware needs
+to be classified for inline fastpath processing and then assigned
+a RQ and Aura pool before sending to CPT for decryption.
 
-Add the structure definitions for SA context (cn10k_rx_sa_s) and
-SA bookkeeping information (ctx_inb_ctx_info).
+Create a dedicated RQ, Aura and Pool with the following setup
+specifically for IPsec flows:
+ - Set ipsech_en, ipsecd_drop_en in RQ context to enable hardware
+   fastpath processing for IPsec flows.
+ - Configure the dedicated Aura to raise an interrupt when
+   it's buffer count drops below a threshold value so that the
+   buffers can be replenished from the CPU.
 
-Also, initialize the inb_sw_ctx_list to track all the SA's and their
-associated NPC rules and hash table related data.
+The RQ, Aura and Pool contexts are initialized only when esp-hw-offload
+feature is enabled via ethtool.
+
+Also, move some of the RQ context macro definitions to otx2_common.h
+so that they can be used in the IPsec driver as well.
 
 Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 ---
 Changes in V2:
-- None
+- Fixed logic to free pool in case of errors
+- Spelling fixes
 
-V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-10-tanmay@marvell.com/
+V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-11-tanmay@marvell.com/
 
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 20 ++++
- .../marvell/octeontx2/nic/cn10k_ipsec.h       | 93 +++++++++++++++++++
- 2 files changed, 113 insertions(+)
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 199 +++++++++++++++++-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |   2 +
+ .../marvell/octeontx2/nic/otx2_common.c       |  23 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |  16 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   4 +
+ 5 files changed, 225 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index c691f0722154..ae2aa0b73e96 100644
+index ae2aa0b73e96..6283633ca58c 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -787,6 +787,7 @@ int cn10k_ipsec_init(struct net_device *netdev)
+@@ -346,6 +346,191 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
+ 	return ret;
+ }
+ 
++static int cn10k_ipsec_ingress_aura_init(struct otx2_nic *pfvf,
++					 struct otx2_pool *pool,
++					 int aura_id, int pool_id,
++					 int numptrs)
++{
++	struct npa_aq_enq_req *aq;
++
++	/* Initialize this aura's context via AF */
++	aq = otx2_mbox_alloc_msg_npa_aq_enq(&pfvf->mbox);
++	if (!aq)
++		return -ENOMEM;
++
++	aq->aura_id = aura_id;
++	/* Will be filled by AF with correct pool context address */
++	aq->aura.pool_addr = pool_id;
++	aq->aura.pool_caching = 1;
++	aq->aura.shift = ilog2(numptrs) - 8;
++	aq->aura.count = numptrs;
++	aq->aura.limit = numptrs;
++	aq->aura.avg_level = 255;
++	aq->aura.ena = 1;
++	aq->aura.fc_ena = 1;
++	aq->aura.fc_addr = pool->fc_addr->iova;
++	aq->aura.fc_hyst_bits = 0; /* Store count on all updates */
++	aq->aura.thresh_up = 1;
++	aq->aura.thresh = aq->aura.count / 4;
++	aq->aura.thresh_qint_idx = 0;
++
++	/* Enable backpressure for RQ aura */
++	if (!is_otx2_lbkvf(pfvf->pdev)) {
++		aq->aura.bp_ena = 0;
++		/* If NIX1 LF is attached then specify NIX1_RX.
++		 *
++		 * Below NPA_AURA_S[BP_ENA] is set according to the
++		 * NPA_BPINTF_E enumeration given as:
++		 * 0x0 + a*0x1 where 'a' is 0 for NIX0_RX and 1 for NIX1_RX so
++		 * NIX0_RX is 0x0 + 0*0x1 = 0
++		 * NIX1_RX is 0x0 + 1*0x1 = 1
++		 * But in HRM it is given that
++		 * "NPA_AURA_S[BP_ENA](w1[33:32]) - Enable aura backpressure to
++		 * NIX-RX based on [BP] level. One bit per NIX-RX; index
++		 * enumerated by NPA_BPINTF_E."
++		 */
++		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
++			aq->aura.bp_ena = 1;
++#ifdef CONFIG_DCB
++		aq->aura.nix0_bpid = pfvf->bpid[pfvf->queue_to_pfc_map[aura_id]];
++#else
++		aq->aura.nix0_bpid = pfvf->bpid[0];
++#endif
++
++		/* Set backpressure level for RQ's Aura */
++		aq->aura.bp = RQ_BP_LVL_AURA;
++	}
++
++	/* Fill AQ info */
++	aq->ctype = NPA_AQ_CTYPE_AURA;
++	aq->op = NPA_AQ_INSTOP_INIT;
++
++	return otx2_sync_mbox_msg(&pfvf->mbox);
++}
++
++static int cn10k_ipsec_ingress_rq_init(struct otx2_nic *pfvf, u16 qidx, u16 lpb_aura)
++{
++	struct otx2_qset *qset = &pfvf->qset;
++	struct nix_cn10k_aq_enq_req *aq;
++
++	/* Get memory to put this msg */
++	aq = otx2_mbox_alloc_msg_nix_cn10k_aq_enq(&pfvf->mbox);
++	if (!aq)
++		return -ENOMEM;
++
++	aq->rq.cq = qidx;
++	aq->rq.ena = 1;
++	aq->rq.pb_caching = 1;
++	aq->rq.lpb_aura = lpb_aura; /* Use large packet buffer aura */
++	aq->rq.lpb_sizem1 = (DMA_BUFFER_LEN(pfvf->rbsize) / 8) - 1;
++	aq->rq.xqe_imm_size = 0; /* Copying of packet to CQE not needed */
++	aq->rq.flow_tagw = 32; /* Copy full 32bit flow_tag to CQE header */
++	aq->rq.qint_idx = 0;
++	aq->rq.lpb_drop_ena = 1; /* Enable RED dropping for AURA */
++	aq->rq.xqe_drop_ena = 1; /* Enable RED dropping for CQ/SSO */
++	aq->rq.xqe_pass = RQ_PASS_LVL_CQ(pfvf->hw.rq_skid, qset->rqe_cnt);
++	aq->rq.xqe_drop = RQ_DROP_LVL_CQ(pfvf->hw.rq_skid, qset->rqe_cnt);
++	aq->rq.lpb_aura_pass = RQ_PASS_LVL_AURA;
++	aq->rq.lpb_aura_drop = RQ_DROP_LVL_AURA;
++	aq->rq.ipsech_ena = 1;		/* IPsec HW fast path enable */
++	aq->rq.ipsecd_drop_ena = 1;	/* IPsec dynamic drop enable */
++	aq->rq.xqe_drop_ena = 0;
++	aq->rq.ena_wqwd = 1;		/* Store NIX headers in packet buffer */
++	aq->rq.first_skip = 16;		/* Store packet after skiiping 16*8 bytes
++					 * to accommodate NIX headers.
++					 */
++
++	/* Fill AQ info */
++	aq->qidx = qidx;
++	aq->ctype = NIX_AQ_CTYPE_RQ;
++	aq->op = NIX_AQ_INSTOP_INIT;
++
++	return otx2_sync_mbox_msg(&pfvf->mbox);
++}
++
++static int cn10k_ipsec_setup_nix_rx_hw_resources(struct otx2_nic *pfvf)
++{
++	struct otx2_hw *hw = &pfvf->hw;
++	struct otx2_pool *pool = NULL;
++	int stack_pages, pool_id;
++	int err, ptr, num_ptrs;
++	dma_addr_t bufptr;
++
++	num_ptrs = 256;
++	pool_id = pfvf->ipsec.inb_ipsec_pool;
++	stack_pages = (num_ptrs + hw->stack_pg_ptrs - 1) / hw->stack_pg_ptrs;
++	pool = &pfvf->qset.pool[pool_id];
++
++	/* Allocate memory for HW to update Aura count.
++	 * Alloc one cache line, so that it fits all FC_STYPE modes.
++	 */
++	if (!pool->fc_addr) {
++		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
++		if (err)
++			return err;
++	}
++
++	mutex_lock(&pfvf->mbox.lock);
++
++	/* Initialize aura context */
++	err = cn10k_ipsec_ingress_aura_init(pfvf, pool, pool_id, pool_id,
++					    num_ptrs);
++	if (err)
++		goto fail;
++
++	/* Initialize pool */
++	err = otx2_pool_init(pfvf, pool_id, stack_pages, num_ptrs, pfvf->rbsize,
++			     AURA_NIX_RQ);
++	if (err)
++		goto fail;
++
++	/* Flush accumulated messages */
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++	if (err)
++		goto pool_fail;
++
++	/* Allocate pointers and free them to aura/pool */
++	for (ptr = 0; ptr < num_ptrs; ptr++) {
++		err = otx2_alloc_rbuf(pfvf, pool, &bufptr, pool_id, ptr);
++		if (err) {
++			err = -ENOMEM;
++			goto pool_fail;
++		}
++		pfvf->hw_ops->aura_freeptr(pfvf, pool_id, bufptr + OTX2_HEAD_ROOM);
++	}
++
++	/* Initialize RQ and map buffers from pool_id */
++	err = cn10k_ipsec_ingress_rq_init(pfvf, pfvf->ipsec.inb_ipsec_rq, pool_id);
++	if (err)
++		goto pool_fail;
++
++	mutex_unlock(&pfvf->mbox.lock);
++	return 0;
++
++pool_fail:
++	qmem_free(pfvf->dev, pool->stack);
++	page_pool_destroy(pool->page_pool);
++fail:
++	mutex_unlock(&pfvf->mbox.lock);
++	otx2_mbox_reset(&pfvf->mbox.mbox, 0);
++	qmem_free(pfvf->dev, pool->fc_addr);
++	return err;
++}
++
++static int cn10k_inb_cpt_init(struct net_device *netdev)
++{
++	struct otx2_nic *pfvf = netdev_priv(netdev);
++	int ret = 0;
++
++	ret = cn10k_ipsec_setup_nix_rx_hw_resources(pfvf);
++	if (ret) {
++		netdev_err(netdev, "Failed to setup NIX HW resources for IPsec\n");
++		return ret;
++	}
++
++	return ret;
++}
++
+ static int cn10k_outb_cpt_clean(struct otx2_nic *pf)
+ {
+ 	int ret;
+@@ -765,14 +950,22 @@ static void cn10k_ipsec_sa_wq_handler(struct work_struct *work)
+ int cn10k_ipsec_ethtool_init(struct net_device *netdev, bool enable)
  {
  	struct otx2_nic *pf = netdev_priv(netdev);
- 	u32 sa_size;
-+	int err;
++	int ret = 0;
  
+ 	/* IPsec offload supported on cn10k */
  	if (!is_dev_support_ipsec_offload(pf->pdev))
- 		return 0;
-@@ -797,6 +798,22 @@ int cn10k_ipsec_init(struct net_device *netdev)
- 			 OTX2_ALIGN : sizeof(struct cn10k_tx_sa_s);
- 	pf->ipsec.sa_size = sa_size;
+ 		return -EOPNOTSUPP;
  
-+	/* Set sa_tbl_entry_sz to 2048 since we are programming NIX RX
-+	 * to calculate SA index as SPI * 2048. The first 1024 bytes
-+	 * are used for SA context and  the next half for bookkeeping data.
-+	 */
-+	pf->ipsec.sa_tbl_entry_sz = 2048;
-+	err = qmem_alloc(pf->dev, &pf->ipsec.inb_sa, CN10K_IPSEC_INB_MAX_SA,
-+			 pf->ipsec.sa_tbl_entry_sz);
-+	if (err)
-+		return err;
+-	/* Initialize CPT for outbound ipsec offload */
+-	if (enable)
+-		return cn10k_outb_cpt_init(netdev);
++	/* Initialize CPT for outbound and inbound IPsec offload */
++	if (enable) {
++		ret = cn10k_outb_cpt_init(netdev);
++		if (ret)
++			return ret;
 +
-+	memset(pf->ipsec.inb_sa->base, 0,
-+	       pf->ipsec.sa_tbl_entry_sz * CN10K_IPSEC_INB_MAX_SA);
-+
-+	/* List to track all ingress SAs */
-+	INIT_LIST_HEAD(&pf->ipsec.inb_sw_ctx_list);
-+
- 	INIT_WORK(&pf->ipsec.sa_work, cn10k_ipsec_sa_wq_handler);
- 	pf->ipsec.sa_workq = alloc_workqueue("cn10k_ipsec_sa_workq", 0, 0);
- 	if (!pf->ipsec.sa_workq) {
-@@ -828,6 +845,9 @@ void cn10k_ipsec_clean(struct otx2_nic *pf)
- 	}
++		ret = cn10k_inb_cpt_init(netdev);
++		if (ret)
++			return ret;
++	}
  
- 	cn10k_outb_cpt_clean(pf);
-+
-+	/* Free Ingress SA table */
-+	qmem_free(pf->dev, pf->ipsec.inb_sa);
- }
- EXPORT_SYMBOL(cn10k_ipsec_clean);
- 
+ 	/* Don't do CPT cleanup if SA installed */
+ 	if (pf->ipsec.outb_sa_count) {
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-index 43fbce0d6039..7ffbbedf26d5 100644
+index 7ffbbedf26d5..6da69e6802c8 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-@@ -52,10 +52,14 @@ DECLARE_STATIC_KEY_FALSE(cn10k_ipsec_sa_enabled);
- #define CN10K_CPT_LF_NQX(a)		(CPT_LFBASE | 0x400 | (a) << 3)
- #define CN10K_CPT_LF_CTX_FLUSH		(CPT_LFBASE | 0x510)
- 
-+/* Inbound SA*/
-+#define CN10K_IPSEC_INB_MAX_SA	128
-+
- /* IPSEC Instruction opcodes */
- #define CN10K_IPSEC_MAJOR_OP_WRITE_SA 0x01UL
- #define CN10K_IPSEC_MINOR_OP_WRITE_SA 0x09UL
- #define CN10K_IPSEC_MAJOR_OP_OUTB_IPSEC 0x2AUL
-+#define CN10K_IPSEC_MAJOR_OP_INB_IPSEC 0x29UL
- 
- enum cn10k_cpt_comp_e {
- 	CN10K_CPT_COMP_E_NOTDONE = 0x00,
-@@ -81,6 +85,19 @@ enum cn10k_cpt_hw_state_e {
- 	CN10K_CPT_HW_IN_USE
- };
- 
-+struct cn10k_inb_sw_ctx_info {
-+	struct list_head list;
-+	struct cn10k_rx_sa_s *sa_entry;
-+	struct xfrm_state *x_state;
-+	dma_addr_t sa_iova;
-+	u32 npc_mcam_entry;
-+	u32 sa_index;
-+	__be32 spi;
-+	u16 hash_index;	/* Hash index from SPI_TO_SA match */
-+	u8 way;		/* SPI_TO_SA match table way index */
-+	bool delete_npc_and_match_entry;
-+};
-+
- struct cn10k_ipsec {
- 	/* Outbound CPT */
- 	u64 io_addr;
-@@ -92,6 +109,12 @@ struct cn10k_ipsec {
- 	u32 outb_sa_count;
- 	struct work_struct sa_work;
+@@ -111,6 +111,8 @@ struct cn10k_ipsec {
  	struct workqueue_struct *sa_workq;
-+
-+	/* For Inbound Inline IPSec flows */
-+	u32 sa_tbl_entry_sz;
-+	struct qmem *inb_sa;
-+	struct list_head inb_sw_ctx_list;
-+	DECLARE_BITMAP(inb_sa_table, CN10K_IPSEC_INB_MAX_SA);
- };
  
- /* CN10K IPSEC Security Association (SA) */
-@@ -146,6 +169,76 @@ struct cn10k_tx_sa_s {
- 	u64 hw_ctx[6];		/* W31 - W36 */
- };
+ 	/* For Inbound Inline IPSec flows */
++	u16 inb_ipsec_rq;
++	u16 inb_ipsec_pool;
+ 	u32 sa_tbl_entry_sz;
+ 	struct qmem *inb_sa;
+ 	struct list_head inb_sw_ctx_list;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 713928d81b9e..fcd516ddc36e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -878,22 +878,6 @@ void otx2_sqb_flush(struct otx2_nic *pfvf)
+ 	}
+ }
  
-+struct cn10k_rx_sa_s {
-+	u64 inb_ar_win_sz	: 3; /* W0 */
-+	u64 hard_life_dec	: 1;
-+	u64 soft_life_dec	: 1;
-+	u64 count_glb_octets	: 1;
-+	u64 count_glb_pkts	: 1;
-+	u64 count_mib_bytes	: 1;
-+	u64 count_mib_pkts	: 1;
-+	u64 hw_ctx_off		: 7;
-+	u64 ctx_id		: 16;
-+	u64 orig_pkt_fabs	: 1;
-+	u64 orig_pkt_free	: 1;
-+	u64 pkind		: 6;
-+	u64 rsvd_w0_40		: 1;
-+	u64 eth_ovrwr		: 1;
-+	u64 pkt_output		: 2;
-+	u64 pkt_format		: 1;
-+	u64 defrag_opt		: 2;
-+	u64 x2p_dst		: 1;
-+	u64 ctx_push_size	: 7;
-+	u64 rsvd_w0_55		: 1;
-+	u64 ctx_hdr_size	: 2;
-+	u64 aop_valid		: 1;
-+	u64 rsvd_w0_59		: 1;
-+	u64 ctx_size		: 4;
+-/* RED and drop levels of CQ on packet reception.
+- * For CQ level is measure of emptiness ( 0x0 = full, 255 = empty).
+- */
+-#define RQ_PASS_LVL_CQ(skid, qsize)	((((skid) + 16) * 256) / (qsize))
+-#define RQ_DROP_LVL_CQ(skid, qsize)	(((skid) * 256) / (qsize))
+-
+-/* RED and drop levels of AURA for packet reception.
+- * For AURA level is measure of fullness (0x0 = empty, 255 = full).
+- * Eg: For RQ length 1K, for pass/drop level 204/230.
+- * RED accepts pkts if free pointers > 102 & <= 205.
+- * Drops pkts if free pointers < 102.
+- */
+-#define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
+-#define RQ_PASS_LVL_AURA (255 - ((95 * 256) / 100)) /* RED when 95% is full */
+-#define RQ_DROP_LVL_AURA (255 - ((99 * 256) / 100)) /* Drop when 99% is full */
+-
+ int otx2_rq_init(struct otx2_nic *pfvf, u16 qidx, u16 lpb_aura)
+ {
+ 	struct otx2_qset *qset = &pfvf->qset;
+@@ -1243,6 +1227,13 @@ int otx2_config_nix(struct otx2_nic *pfvf)
+ 	nixlf->rss_sz = MAX_RSS_INDIR_TBL_SIZE;
+ 	nixlf->rss_grps = MAX_RSS_GROUPS;
+ 	nixlf->xqe_sz = pfvf->hw.xqe_size == 128 ? NIX_XQESZ_W16 : NIX_XQESZ_W64;
++	/* Add an additional RQ for inline inbound IPsec flows
++	 * and store the RQ index for setting it up later when
++	 * IPsec offload is enabled via ethtool.
++	 */
++	nixlf->rq_cnt++;
++	pfvf->ipsec.inb_ipsec_rq = pfvf->hw.rx_queues;
 +
-+	u64 rsvd_w1_31_0	: 32; /* W1 */
-+	u64 cookie		: 32;
+ 	/* We don't know absolute NPA LF idx attached.
+ 	 * AF will replace 'RVU_DEFAULT_PF_FUNC' with
+ 	 * NPA LF attached to this RVU PF/VF.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 6b59881f78e0..5d23f5623118 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -84,6 +84,22 @@ enum arua_mapped_qtypes {
+ /* Send skid of 2000 packets required for CQ size of 4K CQEs. */
+ #define SEND_CQ_SKID	2000
+ 
++/* RED and drop levels of CQ on packet reception.
++ * For CQ level is measure of emptiness ( 0x0 = full, 255 = empty).
++ */
++#define RQ_PASS_LVL_CQ(skid, qsize)	((((skid) + 16) * 256) / (qsize))
++#define RQ_DROP_LVL_CQ(skid, qsize)	(((skid) * 256) / (qsize))
 +
-+	u64 sa_valid		: 1; /* W2 Control Word */
-+	u64 sa_dir		: 1;
-+	u64 rsvd_w2_2_3		: 2;
-+	u64 ipsec_mode		: 1;
-+	u64 ipsec_protocol	: 1;
-+	u64 aes_key_len		: 2;
-+	u64 enc_type		: 3;
-+	u64 life_unit		: 1;
-+	u64 auth_type		: 4;
-+	u64 encap_type		: 2;
-+	u64 et_ovrwr_ddr_en	: 1;
-+	u64 esn_en		: 1;
-+	u64 tport_l4_incr_csum	: 1;
-+	u64 iphdr_verify	: 2;
-+	u64 udp_ports_verify	: 1;
-+	u64 l2_l3_hdr_on_error	: 1;
-+	u64 rsvd_w25_31		: 7;
-+	u64 spi			: 32;
++/* RED and drop levels of AURA for packet reception.
++ * For AURA level is measure of fullness (0x0 = empty, 255 = full).
++ * Eg: For RQ length 1K, for pass/drop level 204/230.
++ * RED accepts pkts if free pointers > 102 & <= 205.
++ * Drops pkts if free pointers < 102.
++ */
++#define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
++#define RQ_PASS_LVL_AURA (255 - ((95 * 256) / 100)) /* RED when 95% is full */
++#define RQ_DROP_LVL_AURA (255 - ((99 * 256) / 100)) /* Drop when 99% is full */
 +
-+	u64 w3;			/* W3 */
+ #define OTX2_GET_RX_STATS(reg) \
+ 	otx2_read64(pfvf, NIX_LF_RX_STATX(reg))
+ #define OTX2_GET_TX_STATS(reg) \
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 4e2d1206e1b0..6337657cd907 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1627,6 +1627,10 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
+ 	hw->sqpool_cnt = otx2_get_total_tx_queues(pf);
+ 	hw->pool_cnt = hw->rqpool_cnt + hw->sqpool_cnt;
+ 
++	/* Increase pool count by 1 for ingress inline IPsec */
++	pf->ipsec.inb_ipsec_pool = hw->pool_cnt;
++	hw->pool_cnt++;
 +
-+	u8 cipher_key[32];	/* W4 - W7 */
-+	u32 rsvd_w8_0_31;	/* W8 : IV */
-+	u32 iv_gcm_salt;
-+	u64 rsvd_w9;		/* W9 */
-+	u64 rsvd_w10;		/* W10 : UDP Encap */
-+	u32 dest_ipaddr;	/* W11 - Tunnel mode: outer src and dest ipaddr */
-+	u32 src_ipaddr;
-+	u64 rsvd_w12_w30[19];	/* W12 - W30 */
-+
-+	u64 ar_base;		/* W31 */
-+	u64 ar_valid_mask;	/* W32 */
-+	u64 hard_sa_life;	/* W33 */
-+	u64 soft_sa_life;	/* W34 */
-+	u64 mib_octs;		/* W35 */
-+	u64 mib_pkts;		/* W36 */
-+	u64 ar_winbits;		/* W37 */
-+
-+	u64 rsvd_w38_w100[63];
-+};
-+
- /* CPT instruction parameter-1 */
- #define CN10K_IPSEC_INST_PARAM1_DIS_L4_CSUM		0x1
- #define CN10K_IPSEC_INST_PARAM1_DIS_L3_CSUM		0x2
+ 	if (!otx2_rep_dev(pf->pdev)) {
+ 		/* Maximum hardware supported transmit length */
+ 		pf->tx_max_pktlen = pf->netdev->max_mtu + OTX2_ETH_HLEN;
 -- 
 2.43.0
 
