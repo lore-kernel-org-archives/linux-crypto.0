@@ -1,63 +1,63 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F80324EA9D;
-	Thu, 19 Jun 2025 12:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2D9251782;
+	Thu, 19 Jun 2025 12:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750335861; cv=none; b=u3Nsz5am1N076BhiEZUQXtqxWyUvD++Pf/+N/jyJnLE4d7iZxiixfIXrfMM57NYLtXdTZnrTkoRNJalM/wJY98/2t2XdxtZ85WFafHo0sAMcFrq0TjTgUiFfUiH2yDbfWRplAumDeayJtiVV8A4KKxNGIm6bif6WnjYFslfOf6o=
+	t=1750335862; cv=none; b=SzEp1/AjGeZ+GARuInfhkX0OdeDIKl+NxQXm5+thYGSAmnZrmgNaHuYfpzDREHl2fs5eOWp1Yrr19P4KyTjnt4mbKUYlfFT8iXi294hTPsGL8ASHwGbw6cmgAvXwrZVc9QdyNH6GySPNIUM7TaLnkYtmW3t2SDGzoxGtT9qvm/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750335861; c=relaxed/simple;
-	bh=MVmmWlPksmaiBVibi00qDI48RIUv844ifSFHgrjus/c=;
+	s=arc-20240116; t=1750335862; c=relaxed/simple;
+	bh=kINjivbB1+ylLn7tV9af00mOK273H9HJI0nMG3aaa1c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VSq21hVmYGRc90ikTLSxvGk7bqYRrTyPYI7zNKbl5EcjZFYq0FKIuw6QtVz2AEfXUrpYJUZJmo8B88onqmR9jEsb+7U+J7jjhe8deH2QQhoxyW0pfYbjX3M8HREFGQQlsHmPw3DOuaajEX5UCAj8Komi+vDq5IdL/JWSAg8MtYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGnZU3bb; arc=none smtp.client-ip=209.85.208.41
+	 MIME-Version; b=WlPUTnkRued/pK8DmBlPCTPGXdyDje/rSlHX68ePlYV84/Z5aPGcTB8Pxdm1mZ9mX7UqwfYuZGrfg/+PdYyTjByteI73Zq7blJwO0CQFDEBtz7y0MVlgtDWEvI3qAt2d/JDpTvyGVeAJ9PlttMjXe0biWwkv0YCUq+Yq9kfy0H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lTDfPL0m; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGnZU3bb"
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-60497d07279so1406120a12.3;
-        Thu, 19 Jun 2025 05:24:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lTDfPL0m"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ad93ff9f714so135257066b.2;
+        Thu, 19 Jun 2025 05:24:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750335858; x=1750940658; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750335859; x=1750940659; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nOCWgCxa5TuHqEzs7P/Xd0Uu+UeKSk+lfEEEEay9BLo=;
-        b=KGnZU3bbiDwo3MXIXyFx4KmgC6ZE3Z/cp2mLaMm2iJQlrrnU1oQrUPOE7gAQ6xUpiz
-         p0xwo3n9S5MVyTKd35ijwrEesjM3ZO3U36ZpxZFjYdirTELgWHh3rNoRe1HCshw+WgoI
-         rrIxLXJ0GCWz4pRje2tZWQXZS7cm4Nhr3Zfiu6UrZWZiP3hC5iG4jDYlvynYCUX/ywI9
-         HV4nUCkViENfD58bHY0msLmrBXuAZWv+U3jRwLOKcEUe1kXpDFSdvOU4giiuSpLCahA/
-         A5AvjZlQbeEb/nJjFrz5XLGqDjBdnSm2AxmUEJuCDc7x/caXcy9PKCsXDZ+0eIFh8sDP
-         xabQ==
+        bh=SfOFmSReN1wX8YEf6gXPwdHyf/C+wiQacKthqWE/o4Y=;
+        b=lTDfPL0miKfZwuGXmgCxxQOpvY96FPrqvC/hXxPCbdGdeMewst7EkbRV/9jQK7h6Sm
+         pa/u7k5VshIK1GVmhxsvTFKaywScB24F2k7tO5cpIi3f0GEyX0/K0eYh/9VIFu/7wBGX
+         ouALiMIBzu7VembSFeJn+uE9ywskkkVKPVf9NkCAb7jK6rYCNrsnDtvdEmj4PVdHiP32
+         FMiufD8nCngV3jbyXzI38TJ19kyl2eGgMsIxN9mF7xBNb/MxEDtwfSA6qzAhoxSHK7jF
+         kvYB8cKsEH8drgElp2Kvnzaq9qGviV0czIMz+MRhKJcGRKjun70kJSzFqhIGz5paidgB
+         GMXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750335858; x=1750940658;
+        d=1e100.net; s=20230601; t=1750335859; x=1750940659;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nOCWgCxa5TuHqEzs7P/Xd0Uu+UeKSk+lfEEEEay9BLo=;
-        b=wYmbLc2mMMVbFLqC6vsJCp0SOk3wptD8B+BaPZLY9QMmljtoUiUr6HOZOVlNtTluwf
-         bIzv4ZP4XNSBEn6jwUDw8J7UJ8YxHBMjevrrR8FWMPVd85b+5B96OHgLrmt+gePUUQZ5
-         MXanQ4q4qqrTrS7KK3+iPsNDiX3MotFTVsWi3tEMwgKFQIUOavLxpWh5oS+sVyW9wyts
-         1DNaFiJLsfrQTeeEh7NCuRIOS62aaqWVosXvFfGrGhczQMiKQDv1hSLomKAZf7LLhyIm
-         Zilcd/XIzjuNevtHx+UJh58y1IuNndFjKqd7rSR1bZrRRPM0OalWLl6k0WlFf0rtNQ21
-         0org==
-X-Forwarded-Encrypted: i=1; AJvYcCXidHTjCrH5TEkIJjf2YPX+SHywH6TWce8RHJffvfgtoqoPqjr3KttBi+0Kr6AfwoAU3vD6EtG8ez8BA6TX@vger.kernel.org, AJvYcCXw022C+gG26FtzMCilnlZRFLeX8whTDyTdFrps68hWpg+oaUDIUS7Pv1UlUooEK8AqcbxifuuWCeU1OSQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxoo3b7aMv5fT9YuZLZC96/czFqo09/nQrHpvd7l9dQjCuEIa5R
-	vsRVbVo2WebQOHbmKL/BU41y50rm+rZVhRsO7QLx8PgHAaAXhkhVx0KN
-X-Gm-Gg: ASbGncvoghhGVf5gvPBdaj2zRn8z2pq/WOQp3ZNXD9ixLexr8nPbu9roYXNITWCoNS2
-	gPlL7mwT+rvW7TrlQDxSOh8PPYk2VSJqZJzJAzhnuqh3ztWpK+n9hjYXAXcOomus6zfqDz/TY7w
-	z1x2Thha98tuq01X0jebh7B5GcxG32QxnXhTVfLRzVor14OUQAAgqNEwJMmApi+iXwRJYPTmL1y
-	BltZrz2PrHLrtWaZvLt+TMKg5tjVmACmGGl95b0FKBWBXIYpe68GUXlQkuH7R49ab9hxiHEmiA6
-	VDrAUMZxUMvsyPNNQhmeunzZdAK2S9zliR45BwhigNcE445QmJHN8IJqvjEKEGpnSjhIBl6XbxR
-	eDNpyc+xYVpYQpw==
-X-Google-Smtp-Source: AGHT+IE+a44JiT4pmaQaCPgiF4SiL6W/ZMs6YLvucyMriX+08QeWg5qDOEHlRbDj5alSx6vbOGHqPA==
-X-Received: by 2002:a17:906:9fcb:b0:ad8:9e5b:9217 with SMTP id a640c23a62f3a-adfad60cb3bmr2167795566b.45.1750335857453;
-        Thu, 19 Jun 2025 05:24:17 -0700 (PDT)
+        bh=SfOFmSReN1wX8YEf6gXPwdHyf/C+wiQacKthqWE/o4Y=;
+        b=I8hXAxN3YQq7tnA91EvtzsQR0c3PkwfkBvFL8E9w/EnTAYpgB30G/V+C60U6d9wk6D
+         AHKb3/7UirBPkVj5cVi5+R3BOP8c9/hxyh7GBM1+Tr85uYA+5zczfw50AXvd0vmKkCsd
+         A0JRSFKELmyBNUplXr+5VjvVafANFt97dj65h9ODeyjafmhnQeUXNaZDkeF+JXmAqe7D
+         1PU0/A8OPLBiCDXsEYjfOvF4AuGkCbm5HE1prs6yL+NxMWT/b9EydlefvJSBNqXwac1B
+         pwTUCxIuN5UM0k/a/U1+JTY5ub0myHIJilTJl2UMWQRhv75/UysqOVHbn8OTbczXnIAA
+         qXFA==
+X-Forwarded-Encrypted: i=1; AJvYcCURCESjHRd+5eAYFlg4xqgbBgBiSdzZ9gRu14M3gsxGa+gz0uW7dtGUb7ZskWI8P9dFiytTPapF8UOUs/g=@vger.kernel.org, AJvYcCX3dyf9v6Hi4Wh2azYLHU+c4FBIh3UsraGhxAPS6FGHkIl2mUq2Ah7RsG1cvp9RCSGx5XKEbn3GuqPnadDA@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3gdpXBO5wuP5CQ5sDkM4iD/vS5xKbNycXFn5waUXMmWQjFEla
+	AwPcPIFjMiIdY0+esPAe8my4JDMmOD8f4DRDSrVgLvtzKEcunR9/7phb
+X-Gm-Gg: ASbGncuCvfnWac/jHTa9hhatiSG3LV3lgoXy9npwM2pqh0q3j76ygh/Luv/DH54ghG/
+	sV9vbAwGZHZ9FNbkx2cD0sau9ZQdHT0nSmr6VY+ujMTlOVTLSQW+3I9CWOlwwfu9thCMMwatH3C
+	i5sdtrrr2OlqNuATKJIp29aHt7WPTqC6fFCq6gj13vR9MG0CsMWwkRLhGH9wCJwNWUZpTw4xLwD
+	UOBKwPdjXrJ56+BNmdver0HYwDs/MSYcEpEz8jbJYPqdjcR4IBOiPBffIjEpwZnOM4oHFcckes9
+	Vnq8+BCfAR9Y7fAceaLRpz9Bdunj0Lpun3Tzksf/4g6A/7Kw4vYykGLQjQocjtGsv5hvImsVX0K
+	BM2pOhnNfkK3SQw==
+X-Google-Smtp-Source: AGHT+IGEPeo5IOklcxib13+gmY/mAxR132u//d0bSaTarIv0yq4bk3Wfepb86FCqZ57HZAhqV1/TKw==
+X-Received: by 2002:a17:906:c10f:b0:adb:3345:7594 with SMTP id a640c23a62f3a-adfad31e10cmr1852773366b.9.1750335858569;
+        Thu, 19 Jun 2025 05:24:18 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:2f0e:c51b:8900:a03f:12cb:72f7:9069])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae000b02bd3sm504688066b.3.2025.06.19.05.24.16
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae000b02bd3sm504688066b.3.2025.06.19.05.24.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 05:24:17 -0700 (PDT)
+        Thu, 19 Jun 2025 05:24:18 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -70,9 +70,9 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 06/10] crypto: sun8i-ce - fold sun8i_ce_cipher_run() into sun8i_ce_cipher_do_one()
-Date: Thu, 19 Jun 2025 15:23:12 +0300
-Message-ID: <20250619122316.2587236-7-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 07/10] crypto: sun8i-ce - pass task descriptor to cipher prepare/unprepare
+Date: Thu, 19 Jun 2025 15:23:13 +0300
+Message-ID: <20250619122316.2587236-8-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250619122316.2587236-1-ovidiu.panait.oss@gmail.com>
 References: <20250619122316.2587236-1-ovidiu.panait.oss@gmail.com>
@@ -84,68 +84,117 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fold sun8i_ce_cipher_run() into it's only caller, sun8i_ce_cipher_do_one(),
-to eliminate a bit of boilerplate.
-
-This will also make it a bit more clear that the skcipher do_one_request()
-callback follows the usual prepare -> run -> unprepare pattern.
+Rework sun8i_ce_cipher_prepare() and sun8i_ce_cipher_unprepare() to take a
+task descriptor pointer as a parameter. Move common flow setup code to
+sun8i_ce_cipher_do_one() and also remove the crypto_engine parameter, as it
+was not used anyway.
 
 Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 ---
- .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 34 ++++++++-----------
- 1 file changed, 15 insertions(+), 19 deletions(-)
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 37 +++++++------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index 9963e5962551..5fdb6a986b1f 100644
+index 5fdb6a986b1f..d206b4fb5084 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -360,31 +360,27 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
- 	dma_unmap_single(ce->dev, rctx->addr_key, op->keylen, DMA_TO_DEVICE);
+@@ -131,21 +131,19 @@ static int sun8i_ce_cipher_fallback(struct skcipher_request *areq)
+ 	return err;
  }
  
--static void sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
--{
--	struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(breq);
--	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
--	struct sun8i_ce_dev *ce = op->ce;
--	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(breq);
--	int flow, err;
--
+-static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req)
++static int sun8i_ce_cipher_prepare(struct skcipher_request *areq,
++				   struct ce_task *cet)
+ {
+-	struct skcipher_request *areq = container_of(async_req, struct skcipher_request, base);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_ce_dev *ce = op->ce;
+ 	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	struct sun8i_ce_alg_template *algt;
+-	struct sun8i_ce_flow *chan;
+-	struct ce_task *cet;
+ 	struct scatterlist *sg;
+ 	unsigned int todo, len, offset, ivsize;
+ 	u32 common, sym;
+-	int flow, i;
++	int i;
+ 	int nr_sgs = 0;
+ 	int nr_sgd = 0;
+ 	int err = 0;
+@@ -163,14 +161,9 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
+ 		algt->stat_req++;
+ 
 -	flow = rctx->flow;
--	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(breq->base.tfm));
--	sun8i_ce_cipher_unprepare(engine, areq);
--	local_bh_disable();
--	crypto_finalize_skcipher_request(engine, breq, err);
--	local_bh_enable();
--}
 -
+-	chan = &ce->chanlist[flow];
+-
+-	cet = chan->tl;
+ 	memset(cet, 0, sizeof(struct ce_task));
+ 
+-	cet->t_id = cpu_to_le32(flow);
++	cet->t_id = cpu_to_le32(rctx->flow);
+ 	common = ce->variant->alg_cipher[algt->ce_algo_id];
+ 	common |= rctx->op_dir | CE_COMM_INT;
+ 	cet->t_common_ctl = cpu_to_le32(common);
+@@ -314,24 +307,17 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	return err;
+ }
+ 
+-static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
+-				      void *async_req)
++static void sun8i_ce_cipher_unprepare(struct skcipher_request *areq,
++				      struct ce_task *cet)
+ {
+-	struct skcipher_request *areq = container_of(async_req, struct skcipher_request, base);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_ce_dev *ce = op->ce;
+ 	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
+-	struct sun8i_ce_flow *chan;
+-	struct ce_task *cet;
+ 	unsigned int ivsize, offset;
+ 	int nr_sgs = rctx->nr_sgs;
+ 	int nr_sgd = rctx->nr_sgd;
+-	int flow;
+ 
+-	flow = rctx->flow;
+-	chan = &ce->chanlist[flow];
+-	cet = chan->tl;
+ 	ivsize = crypto_skcipher_ivsize(tfm);
+ 
+ 	if (areq->src == areq->dst) {
+@@ -362,20 +348,25 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
+ 
  int sun8i_ce_cipher_do_one(struct crypto_engine *engine, void *areq)
  {
--	int err = sun8i_ce_cipher_prepare(engine, areq);
-+	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
-+	struct skcipher_request *req = skcipher_request_cast(areq);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct sun8i_cipher_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct sun8i_ce_dev *ce = ctx->ce;
-+	int err;
+-	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
+ 	struct skcipher_request *req = skcipher_request_cast(areq);
++	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(req);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sun8i_cipher_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_ce_dev *ce = ctx->ce;
++	struct sun8i_ce_flow *chan;
++	struct ce_task *cet;
+ 	int err;
  
-+	err = sun8i_ce_cipher_prepare(engine, areq);
+-	err = sun8i_ce_cipher_prepare(engine, areq);
++	chan = &ce->chanlist[rctx->flow];
++	cet = chan->tl;
++
++	err = sun8i_ce_cipher_prepare(req, cet);
  	if (err)
  		return err;
  
--	sun8i_ce_cipher_run(engine, areq);
-+	err = sun8i_ce_run_task(ce, rctx->flow,
-+				crypto_tfm_alg_name(req->base.tfm));
-+	sun8i_ce_cipher_unprepare(engine, areq);
-+
-+	local_bh_disable();
-+	crypto_finalize_skcipher_request(engine, req, err);
-+	local_bh_enable();
-+
- 	return 0;
- }
+ 	err = sun8i_ce_run_task(ce, rctx->flow,
+ 				crypto_tfm_alg_name(req->base.tfm));
+-	sun8i_ce_cipher_unprepare(engine, areq);
++	sun8i_ce_cipher_unprepare(req, cet);
  
+ 	local_bh_disable();
+ 	crypto_finalize_skcipher_request(engine, req, err);
 -- 
 2.49.0
 
