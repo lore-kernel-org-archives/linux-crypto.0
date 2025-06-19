@@ -1,63 +1,63 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E181E412A
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 21:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922C92206BF
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 21:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750367863; cv=none; b=iRgkai54ts0YC3r6ZkZrKa64IkzvE/ey7Hi0Pblg3omKJahESaID1J7WmX5EgPJhz2LGYrlQ5pohOEWkgoZZkABU1XgQdScIvmRbZmLBtWn3bMQuQ1C1Py+vm1hWIpnchKePmZXLtENMouYtwuvUqrUjTwRH/KLGboSjamoQa6Y=
+	t=1750367898; cv=none; b=m8Eh1lTaQ4B9t5eWA8xUUijiWIk51Fj2z5dNXVUcfN/i5nhq7WcQ/xE9NNoNnYURjtp6aOuBmjD7+ouBqAM+JcgwO6o+HfjVC4FWxMfDi9n60m2YyHzZW5FWHObSNhOvDCC/tuzfCN3soYGOegHm6SfL3vn8WaNhQ45JmtYE5yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750367863; c=relaxed/simple;
-	bh=dwgPbWkY90gjO6t7tMDzEltEqrI7ZZMpSWRqdn/V80s=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=b45cYf7LHhpqFtg5vI0TbJrsLJEkHEY0lrnjAchflyU7Z6LQCCeB4Da1BOfRoWrSA1oExiX3JRiav6+87xj65tl1E3HWT/c+imzQ5iOB3jyb9EkOmwP4i2aMwmrPxjzZH+b1SjBgaef116NzuaKxOx7/DEjb5tB8jnmooAtbSfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wn/RlATN; arc=none smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1750367898; c=relaxed/simple;
+	bh=XveJvn6E0Tafip4AuV0cCBSlRtYRGAYa66CoA6uodhM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=QB4pxkjhtubM8umEWWExRc+2hZFfTSLfZ9itNf4hGnK5r6YmYLXN5xaodYAQdueNkDbicFLVzA3lG00UcAI2Dd5jb41IRCGubdWJ+lVJjmthDjXP7TTQk8mQHnvHa9OPYc2zwCJ9LaM8kxXzVNBU8xFyYIJ+VvUapcctpyx4fLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLcqnfNF; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wn/RlATN"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-acbb85ce788so214372566b.3
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 14:17:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLcqnfNF"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-606ddbda275so2351549a12.1
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 14:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750367860; x=1750972660; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750367895; x=1750972695; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w8uxhuPsE+Gmb1nyywGbEH71TKlUhTY099WUmaO71RU=;
-        b=Wn/RlATNqYbq4onpAE7W+SVVzXS+RNWaE4ao2MH3KrAJNoOIqePusEv3LOIqyhUyXy
-         y+aUAyy9E9oyZC8CT3gaeWh05TfKoZO/oYpYq6wgMOrydSxK/gcwePoMMCk6pBxpxuHp
-         /2BWmuxYl3KLunhODw/LWKP9m2Vglw7bkEDJpzxh3i4JVieL0it8WJR9nwBb7+UlrVhf
-         bwTRrlyMVxgNz8fRnEg+ZamrMxN0KWNRm+BsOH7RlLv792kpbgQtc5J9V3SEZpS/ulOK
-         hO2Gg+/4SPfYRVLmvUDU1e8VOdseCI56DoH9C3MKPNyFpVGYTEjyK0kosCACCFJIY2oe
-         OAog==
+        bh=+GBIhcGUInxxcjU4QhonWLGcwxR59qY65tTYVWtE4q4=;
+        b=NLcqnfNFfI+SdzQDXAObTEpmImAbGK6xXCaiozFTedLGx7pekEr6dDBSKY8rTQ/bK1
+         1BtoWZ2rsepIppOnuWHlpy34XvUgI/NZDXBUQnuXVysigTehqFno5NBIEXfUa47Wk4pv
+         AShs5zZLL9otvFlO37OZWxUBqyiOQK4bBcumf2Qr+1DPcDh8beOtmrmvBDQ8oYoQVhPB
+         5H2qvPTSBp3lQ4vQQysK/9kmbO5SqLLSuT0ZTzOIKL0cbNu4jvFGA84aUvZBTDP5cpfq
+         EbE7BC65PHYoh/MmMbvl0PivH1SezZ80olDXP5veqg47is1zLP84jrr5R3G6XJ85/r5+
+         00/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750367860; x=1750972660;
+        d=1e100.net; s=20230601; t=1750367895; x=1750972695;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8uxhuPsE+Gmb1nyywGbEH71TKlUhTY099WUmaO71RU=;
-        b=NvXgwoXle4rILFeihXidYI0SwvN3Y2MHeVwgsJeDMG3yMmzlLHOCuKT7wXFlKFDGal
-         6WZxgiPdu1AccNN4DgQBqseofsiXlgl4spj5bpNVyavTi1ACwamfNzUAK3KEdm+8PpvW
-         4O//qVnMNkskAyD1bDpH1tSIaTIjeUQHwz/n6yWBDj//3FkDY26cLKTerADRqTeP4xU1
-         GRX32c63248NFsKbAin7SjNsjNj+6FYAE2qPcqblZ7NmoQuEI3qCbSVVzqLrUt1QXPeB
-         FMZ5N9M618nMS+JJQTVHpiEnT87WuuoKhIEK094jtrsbok87CpuN/dEQMYus/t5Xg427
-         GWWg==
-X-Gm-Message-State: AOJu0Yz2wljSBLiaMODY+eDBVW1ZVsMg/T2uulp+m7Stgmpce/HvMIDL
-	Z+2HLF7bnFiAMbtPoAL6OAsUtuEtm3rXI12rO0mdzHPagX6kUAnt1BRiaxZNhA==
-X-Gm-Gg: ASbGncvDQFoInHzg7L4sDUQuD9CttJatwMXw0VdQ06w6YmVyZ6TiN9BSmFK1K5V34+Q
-	llxTM1Yyh/s1ONww3BPGXJJaYDIH+FnfR1gEJO+NissO2WlFLWs007HNCZJ0djUuKwjoVNmxVxv
-	eH9KHELJ3AWtdinmsXd4O7PRNi90HACF3sHxne2acuN+9MiUsewmxD0JPW3eyzdpmsvhpeJV1sE
-	Tf4r6CAUyJrrvpCOHxrwNqCJNZSLIvkb6dUmahhkuInFl1FowIXSDUb6uaXGOUwWRD7O6RyBwly
-	O3tcNuAeqlJKKe5rUIEeom8Ecea7qUHbrFGU3c6oejrmFQQk0R848jz5Nr86c9dU21co2BLJIpV
-	WSnUVt94ZUMZ7hySn/ACL
-X-Google-Smtp-Source: AGHT+IGjIkW8rGaCREcplNmag94dOCwZ4Tp+WQ3mOtUuEP6gN1w7dR1p28bm+eNYXEjlOf7D8I1sZg==
-X-Received: by 2002:a17:907:2d27:b0:ad5:749b:a735 with SMTP id a640c23a62f3a-ae057a2859cmr37862866b.27.1750367859801;
-        Thu, 19 Jun 2025 14:17:39 -0700 (PDT)
+        bh=+GBIhcGUInxxcjU4QhonWLGcwxR59qY65tTYVWtE4q4=;
+        b=GskP+JC/axIjxs59eqBaQ+AUxPcrGKHzyjgk99F5SxyRmW1rr52em5fcvm4C5nuZGr
+         Pe4MUzQEZvWQS5v2NzR+9ga5GC+MVjSdXCv7WMsio+xYfbStetb1Qlu6EafPE/KJiApi
+         vkBaEPkEuoPpUnC2ZWQQhmWW1echuAxZoOTq2XwkegmRyl0CqGSlvcoDKloKzd3yhYUl
+         cvvfM89M0+KZSHsSxSeGO6sqdZDPlZdVj3vo72JbLhl04nkCX1l3fvIMhhcSmyPrvub6
+         +cSA0BNVI8NkFCJdbpFZfibhQIWz+Ve159otwPA8xSQhKVN39iQMp4sFL5m2ubB9gVSc
+         gacA==
+X-Gm-Message-State: AOJu0Yw7Vv7EftzAzDdFeVgcnJ1vNai+6nPPrkZ9GUX9LowGIwX97iGH
+	4BH28Bz2wHuOl9bj37XRM7SsPbRxk/fW7XurwlA+kZeKKL6q+/O0BgAK
+X-Gm-Gg: ASbGncs67aG0CTI3YS169htp/OaUVPTTYo3KKOdPwIDpjP5KwXR+uZ8PezgiWyS4u2I
+	SHZR2Yzkg8DnHlaothZWARPPh+EHnJq+xotJa3R1+0KkcpoRMxX8qxpGA42NDByxOcZrJdnP3Fl
+	zETFB3ppqqm6ZnbrmNFiU0hz5BkOaBZb73ais+3bWVL6q3QabUGPR3DCJvgh2Ygys0zd18BMDrE
+	v3dbfyO1QLvVeSl8dIMoo+VcyzND7v5m5Uoq7hf1QN8YOkXM8OAGiXQ9J+TGRszPwbdoPOFyAWH
+	rucOcLsM1w26s9nxn45RwLg/H3+ggJuehuCYk3xocfIpHg1lv8rJYjJOzqi+5TRJEASan2LH2GF
+	O2kss38j6KoTF2N/uW6xH71tlOnB2UX8=
+X-Google-Smtp-Source: AGHT+IFR4FzGOeJzjRYUI5GbjzTJWSdF9YzCRm3n/Y5I7580wV6YG5D1ci/8wRLyBTqKk97M3+R7jg==
+X-Received: by 2002:a17:907:1c9f:b0:ae0:54b9:dc17 with SMTP id a640c23a62f3a-ae0579533a8mr38286466b.11.1750367894711;
+        Thu, 19 Jun 2025 14:18:14 -0700 (PDT)
 Received: from [192.168.8.101] (78-80-16-228.customers.tmcz.cz. [78.80.16.228])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7f25csm48845666b.36.2025.06.19.14.17.38
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054084c01sm46754566b.80.2025.06.19.14.18.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 14:17:39 -0700 (PDT)
-Message-ID: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com>
-Date: Thu, 19 Jun 2025 23:17:37 +0200
+        Thu, 19 Jun 2025 14:18:14 -0700 (PDT)
+Message-ID: <8be28417-2733-4494-8a09-b4343a3bcf3d@gmail.com>
+Date: Thu, 19 Jun 2025 23:18:13 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,7 +69,7 @@ Content-Language: en-US
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 From: Milan Broz <gmazyland@gmail.com>
-Subject: OOPs in 6.16-rc2 crypto_shash_export due to partial block handling
+Subject: Failure in HMAC with Whirlpool hash in 6.16-rc2
 Autocrypt: addr=gmazyland@gmail.com; keydata=
  xsFNBE94p38BEADZRET8y1gVxlfDk44/XwBbFjC7eM6EanyCuivUPMmPwYDo9qRey0JdOGhW
  hAZeutGGxsKliozmeTL25Z6wWICu2oeY+ZfbgJQYHFeQ01NVwoYy57hhytZw/6IMLFRcIaWS
@@ -118,47 +118,36 @@ Content-Transfer-Encoding: 7bit
 
 Hi Herbert,
 
-there is an apparent regression in recent 6.16-rc2.
+another regression in kernel 6.16-rc2, this time in AF_ALF for Whirlpool hash.
 
-I can easily crash the kernel on 32bit machine with this OOPS:
+Cryptsetup can use kernel userspace API instead of userspace crypto lib and we
+have some testvectors to detect breakage of crypto.
 
-: Oops: Oops: 0000 [#1] SMP
-: CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.16.0-rc2+ #993 PREEMPT(full)
-: Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
-: Workqueue: kcryptd-254:0-1 kcryptd_crypt [dm_crypt]
-: EIP: __crypto_shash_export+0xf/0x90
-: Code: 4a c1 c7 40 20 a0 b4 4a c1 81 cf 0e 00 04 08 89 78 50 e9 2b ff ff ff 8d 74 26 00 55 89 e5 57 56 53 89 c3 89 d6 8b 00 8b 40 14 <8b> 50 fc f6 40 13 01 74 04 4a 2b 50 14 85 c9 74 10 89 f2 89 d8 ff
-: EAX: 303a3435 EBX: c3007c90 ECX: 00000000 EDX: c3007c38
-: ESI: c3007c38 EDI: c3007c90 EBP: c3007bfc ESP: c3007bf0
-: DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010216
-: CR0: 80050033 CR2: 303a3431 CR3: 04fbe000 CR4: 00350e90
-: Call Trace:
-:  crypto_shash_export+0x65/0xc0
-:  crypt_iv_lmk_one+0x106/0x1a0 [dm_crypt]
+It now fails with PBKDF with Whirlpool hash (HMAC).
+
+You can reproduce it compiling cryptsetup with kernel API backend and run vector test:
+./autogen.sh
+./configure --with-crypto_backend=kernel
+make check-programs
+tests/vectors-test
 ...
+
+PBKDF vector 17 pbkdf2-sha1 [OK]
+PBKDF vector 18 pbkdf2-sha256 [OK]
+PBKDF vector 19 pbkdf2-sha512 [OK]
+PBKDF vector 20 pbkdf2-whirlpool [API FAILED]
+PBKDF test failed.
 
 The bisect points to
 
-commit 8cf4c341f1931c20c564ab2ee0f9eb990a606cac
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Apr 18 10:59:04 2025 +0800
+Date:   Thu May 15 13:54:42 2025 +0800
 
-     crypto: md5-generic - Use API partial block handling
+     crypto: hmac - Add export_core and import_core
 
-     Use the Crypto API partial block handling.
+     Add export_import and import_core so that hmac can be used as a
+     fallback by block-only drivers.
 
-I think there is a buffer overflow in crypto_shash_export, it does not crash on 64bit perhaps
-because of different alignment, but I can be mistaken.
-
-As plen is blocksize + 1, this line in crypto_shash_export seems write out of m5 state:
-
-   unsigned int plen = crypto_shash_blocksize(tfm) + 1;
-   ...
-   memcpy(out + ss - plen, buf + descsize - plen, plen);
-
-It is easily reproducible with cryptsetup testuite script tests/loopaes-test (on 32bit system).
-
-Let me know if you need more info.
-
+Please let me know if you need more info.
 Milan
 
