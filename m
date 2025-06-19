@@ -1,75 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6233213E6D;
-	Thu, 19 Jun 2025 18:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F2630E84E;
+	Thu, 19 Jun 2025 18:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750358128; cv=none; b=Io6m2io/6gamqanSIjlVPXKuLxynPLAjhXr6o69OrarLBaucD69Js2b3QNZ47Zou0GDlTbWUWD6yAwKX/JhQs7gVDSnR70IyB2UAuQIA9q9wgiWQCmFdqs5qxV7MBbWcq8os3nUJPlgdw3jatmKSAQeint3Fc/4/Emh+eqAuv/g=
+	t=1750358995; cv=none; b=kI5Bc7XXozV73YE3TxvNRtipvnhSCx0BC77797YVTL7DzAfkJrLMasYolPVkW4DqIofpNufucwqPDXo6hF5PPTfYVwbyeK8D81IKXeqNYqsSPelMvmWpOds0um2+MmEQ4JARTrvN1H1g5dzjqGvVe61/3XnQjxkNsj49uGnJLj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750358128; c=relaxed/simple;
-	bh=qH5/JEmkvzKPI6/HH8DjDLCOwejQwXCTuISnD7/tw+0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a/sx+09HaNsZzLIkbGA7yechbc+3bQTVbpOTSSiZCu9hy1NRJugBVgtcJumpo1exCxunq4CluSQIqGmYcKJaSzB+f8+42i+Pbj/2QCbmJtPEmvFsZDgjAo2jix8ll+b2flNKU46C2lRZnOinbl34/BetpAYVEEQNOtfedD66BTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMEQcIZc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750358995; c=relaxed/simple;
+	bh=IgLZ+wW2iKf4zedwAhePtcnxjJWns1fhdBd/jedKVVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qR4gtlIjgen6SZhOfIhKIc5Rz0nIrVlciToGKoi/0oZQhZdRO7igGBh6PfDMxqMlR1Qo41xP1Ly3cWnOmydCw81mw7ENIAyjJNkCEcqncBls6ugb0kmWuFSrxVi9C9fm5ythnd+o3w7d8PXKYa0WU1bKBFulmUPDFXb4/dP/+hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b1ljQc3t; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMEQcIZc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A33A2C4CEEA;
-	Thu, 19 Jun 2025 18:35:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750358128;
-	bh=qH5/JEmkvzKPI6/HH8DjDLCOwejQwXCTuISnD7/tw+0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nMEQcIZcSEhyX9Kp2JPu8J6YgLcs2ThnNud8Juzg+VQihg3rPpas+qXiH+CKLR33o
-	 Kq0G+FKIQyV2u40098yDv/gi6mzH/FnffQ2xucfDGnlD88c5zMneW4yZ8LTX2eTIY9
-	 V0i8mornn0FufW1jUAiQkl1oYrAqZcqwriM0xCl4/MPFyMvqasv9o8AvWPRj1Gm29D
-	 D8pnqrYA7D3r7+zFoytwYbZ28GJ4yxjEqH9fxBgBLkSRDjhIOMq5A5NBS5yJTw4Wgm
-	 bAd9NIQhsNPhk5SDMWV9SIOU5ABiBSuI1WmXkHf9rul8IIyAcMCQj3pJey16FOJDG1
-	 VKJrUeFxs9yXg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH 3/3] lib/crc/crc64: add include/linux/crc64.h to kernel-api.rst
-Date: Thu, 19 Jun 2025 11:34:14 -0700
-Message-ID: <20250619183414.100082-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250619183414.100082-1-ebiggers@kernel.org>
-References: <20250619183414.100082-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="b1ljQc3t"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55JB4SVH002785;
+	Thu, 19 Jun 2025 18:49:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=aCu9v7
+	Bko2S3a/lR0+u625Si9DterNuLFxnjektrgNQ=; b=b1ljQc3tdB1/UhXc9zztog
+	7g7p3qukkXoDjQALWH1zEGu7j6H6gQFtuUYP1da6mlyi6vYj3CXboHtirCnY6laS
+	HGr+7cgZsMKcyYB6/3JztYYlyNEaZVsUndIBiqhaEY9krVKOb6gyoVT28cTOqcPh
+	Ojd+AIzbbvggCiL6V2Oozh6RVHh2OIBlEtTL3Jwv3QCGMPTLH2D3UbixLDkIbz3t
+	2dxoh7GfeUbBu0kKEiWbkhJzK0a6I3UF4HU93Ec7L0hwWyObn1JLsXgfR+9F1NGC
+	+yZsBqvzDeJkdqKtDx8AFRouaNLLoO97YQMy76otN8dEgUPSfceSbC8fXbP+HUhw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47beet4v0v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Jun 2025 18:49:36 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55JFYcg2021612;
+	Thu, 19 Jun 2025 18:49:35 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47cahwb9ux-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Jun 2025 18:49:35 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55JInZnF10683088
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 19 Jun 2025 18:49:35 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 159565805A;
+	Thu, 19 Jun 2025 18:49:35 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3EEE758056;
+	Thu, 19 Jun 2025 18:49:34 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 19 Jun 2025 18:49:34 +0000 (GMT)
+Message-ID: <53e81761-47e1-400e-933d-0a53018c9cab@linux.ibm.com>
+Date: Thu, 19 Jun 2025 14:49:33 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Module signing and post-quantum crypto public key algorithms
+To: Simo Sorce <simo@redhat.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Ignat Korchagin <ignat@cloudflare.com>,
+        David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>, torvalds@linux-foundation.org,
+        Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
+        Clemens Lang <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>,
+        Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <501216.1749826470@warthog.procyon.org.uk>
+ <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com>
+ <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com>
+ <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
+ <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com>
+ <69775877d04b8ee9f072adfd2c595187997e59fb.camel@HansenPartnership.com>
+ <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bPmLlaqINDo009ZWaJ3t33eb6lBrAuBY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE5MDE1NCBTYWx0ZWRfXx5xWkXk8OiF/ nZ3EsvctxQPUTp/nMKLrwiOkBpq2knbo+0lC4URZ0AdllEzLiXW13t0CBvXAyj7nPpc+lXBGllK lB44iiVDcXZW5k6bb+j+IAhbA9CDej85O+tOTntJuu+mnkltVrTt6nRUuKzFa73u/OPV8D0aDuS
+ GTvOsoUSb0t+NqeYX4M1PawmTnsHJglPFrFCBvItGrQcBtIBm39ENtaLTiDHc4chJ1D3qzYcZkg Rmm5ncfkKt2R41hB2wYx+5gm0ySNYlMzZ1Y0yauIAKsU8LFZo67hKrAx18T1/B7R+6ungCVr9S9 GCzmT9Wx9XOmDzDQLZCPRJaN1VrjS6yl2fqhPSMz66Ye0iygJTPK6Bhbgfe2YG25IU8dKOxbtzP
+ h53x/s9JC8JdpV6ESPwi8k5tucsyPc6N8yOMFJVqM9Q9b4JgHgt3AiasadSK/Bq1xQQk1Ev8
+X-Authority-Analysis: v=2.4 cv=PrSTbxM3 c=1 sm=1 tr=0 ts=68545bc0 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=NEAV23lmAAAA:8 a=6FsnnaTg7kJAo-EUfpsA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: bPmLlaqINDo009ZWaJ3t33eb6lBrAuBY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-19_06,2025-06-18_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxlogscore=999
+ bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0
+ phishscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506190154
 
-From: Eric Biggers <ebiggers@google.com>
 
-The other CRC functions with kerneldoc are here, so add crc64.h too.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- Documentation/core-api/kernel-api.rst | 2 ++
- 1 file changed, 2 insertions(+)
+On 6/16/25 1:27 PM, Simo Sorce wrote:
+> 
+> Of course we can decide to hedge *all bets* and move to a composed
+> signature (both a classic and a PQ one), in which case I would suggest
+> looking into signatures that use ML-DSA-87 + Ed448 or ML-DSA-87 + P-521
+> ,ideally disjoint, with a kernel policy that can decide which (or both)
+> needs to be valid/checked so that the policy can be changed quickly via
+> configuration if any of the signature is broken.
+> 
 
-diff --git a/Documentation/core-api/kernel-api.rst b/Documentation/core-api/kernel-api.rst
-index 0096463c7d7f7..111f6a595e48d 100644
---- a/Documentation/core-api/kernel-api.rst
-+++ b/Documentation/core-api/kernel-api.rst
-@@ -154,10 +154,12 @@ CRC Functions
- .. kernel-doc:: lib/crc/crc-itu-t.c
-    :export:
- 
- .. kernel-doc:: include/linux/crc32.h
- 
-+.. kernel-doc:: include/linux/crc64.h
-+
- Base 2 log and power Functions
- ------------------------------
- 
- .. kernel-doc:: include/linux/log2.h
-    :internal:
--- 
-2.50.0
+FYI: based on this implementation of ML-DSA-44/65/87
+
+https://github.com/IBM/mlca/tree/main/qsc/crystals
+
+(entry point is mlca_verify)
+
+I created a prototype of a kernel driver for mldsa-44/65/87 that can 
+verify self-signed mldsa certs created with this openssl command:
+
+openssl \
+	req \
+	-x509 \
+	-newkey mldsa44 \
+	-keyout localhost-mldsa44.key \
+	-subj /CN=localhost \
+	-addext subjectAltName=DNS:localhost \
+	-days 30 \
+	-nodes \
+	-out localhost-mldsa44.crt
+
+(it seems to use the shake256 hash by default)
+
+https://github.com/stefanberger/linux-ima-namespaces/commits/mldsa.06092025/
+
+There's lots of cleanup needed, but with a test suite in user space, 
+this should not be too difficult.
 
