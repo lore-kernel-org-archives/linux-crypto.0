@@ -1,90 +1,62 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6FF30E827;
-	Thu, 19 Jun 2025 18:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB7223CB;
+	Thu, 19 Jun 2025 18:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750356625; cv=none; b=Z1hjF83RxP3/t1zHBAEzlri0Lus+MUcDsKvB2+FZsNNPUK/lPWXWuApFbg9pRhfBWono4ccTInDzgjQNkeqmhgDp8mWiCKCh5I+t6P914GLO8tlTWR6vKM6B7ZD/vgDx+OOtUH6lGr2pAo/FMHULhOxn1HYS5z0UA4n/TRc01yY=
+	t=1750358128; cv=none; b=rgfMFCVP/FWWEZaHi95Z/nbOatYt44mSyoDaJJP7m1O1AEonjwJgOjPk+D2v1BUp8hUNjHFvZ3NmS2tmVUz1QrxGjL/8oxRccADrgQr9pRo/barkGXOxHsS3XjEuxCN+iXxndABpsv3y0vDIiGTLZZejD23tQzVVIUdhFzJmpBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750356625; c=relaxed/simple;
-	bh=8NdxjQh1wQGIx0t1SPod5gYipeYIYwG78j5c0YMVNo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nAfC8A5CVS2TmuKXI4M7SB/hOiz3oBaEGDIbrxOzKgRkIYJzYwtXwErA0i+PONr2NVH4ff44Km8iQoYzsDmT7f4+elfvbqbbh7kd4VjT7QiD8Amhuo/wFMJ21Mb0pxPkSwEEPIcNM+imh0il2KbKvLFCzOVBy9/HWqg9cbZ8IRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEL9JSGn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750358128; c=relaxed/simple;
+	bh=OVgxB0JNGmUfOOdryOeQCzf81rBLhoS9ohDXBCGWS4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NUfiiXNsgP0UsEVS8Uh0in9ChzVqmNG4AqqDW86U4lq6hpFJn6ynlxJT/d5i0vTy62lrS//OhsCW6pAnsqBnC9WmqFqzMcnmUN00SapaEa4IKhnwUnbfznf9iddftjIKBxCwTRq6bCsrZV6CzGduTioYpZZAgAukzzI8LtLaOYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMPX2Mi/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEL9JSGn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2409C4CEEA;
-	Thu, 19 Jun 2025 18:10:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMPX2Mi/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D41CCC4CEEA;
+	Thu, 19 Jun 2025 18:35:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750356625;
-	bh=8NdxjQh1wQGIx0t1SPod5gYipeYIYwG78j5c0YMVNo8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YEL9JSGnf+xP/a34eZBVWZQH0Nat8kaYwCEiFT/WY9jnd3xnyw08D8gOZrpKMdEo/
-	 0LN4euivbYiaavwfvTV1Yl3XGYNbEg4UMnhrsdCpZCWCpK9hIpekmKrDf/VA+UV8Dw
-	 T7i7Va9fvsYrxV0NBlhs1ryZ3UvQ8hYM6OEa3mnRW0Lue/nYq9uSxxUnXtZrW5u0PI
-	 W+bANQWt/m3Qsh3PdoDIxYH05OPii2X1tvqfEl8Q7CH45c+WFAYflt29UDwGV4r+HE
-	 QWAXCQW9DOBlQtNeKD0RUDrzpUxFhmw3ZM8h9j+ACfEfg7nHg2nctZiH3Njmme2sXN
-	 sKL9vC4+e2s2g==
-Date: Thu, 19 Jun 2025 20:10:22 +0200
-From: Antoine Tenart <atenart@kernel.org>
-To: fourier.thomas@gmail.com
-Cc: Antoine Tenart <atenart@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: inside-secure: Fix `dma_unmap_sg()` nents value
-Message-ID: <itx47uifmow4fcovhritufa76pfes4zsor4ttyf2bzzoycugvc@ivv65ci3wrwq>
-References: <20250619152838.349584-1-fourier.thomas@gmail.com>
+	s=k20201202; t=1750358128;
+	bh=OVgxB0JNGmUfOOdryOeQCzf81rBLhoS9ohDXBCGWS4A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IMPX2Mi/YHV+wzkfp2oRMCgjWG85PPvBTlWa/iz9a4tCEwA2YgtHDYmZ1m8e1ZYPC
+	 eH4z015TTGwFGbfajSSdAhRnAJQWdYVMQ2qZe0NgxAg9vtbI9EB63RF0PXcSqFIbRC
+	 8oQVBzfTXusDbDxvCM2ap262GjDWVv4IMSxrPdvjAmzt2UcX+s5i0wTm+iG3xQ+nYs
+	 hoYZs2BCKnQmT6TeRiksF0amUy5NsP6XUv/XrqF8xCdTpKk7FTDwtEw5avlKjwEv2p
+	 x0qv8zd8ofterabxzuAJIEYjYaP48OBQoN7Cb1bsfXDcJXK+7hFMpBEL9f7wTWl6+p
+	 npqCm/faDz8uw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH 0/3] lib/crc: improve docs and change crc32() to inline function
+Date: Thu, 19 Jun 2025 11:34:11 -0700
+Message-ID: <20250619183414.100082-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250619152838.349584-1-fourier.thomas@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-IMO the patch subject could be improved, to remove the ` and to be more
-descriptive. E.g.
+Document crc32_le(), crc32_be(), and crc32c().  Also change crc32() from
+a macro to an inline function.
 
-"crypto: inside-secure: unmap DMA buffers using the original number of entries"
+Eric Biggers (3):
+  lib/crc/crc32: document crc32_le(), crc32_be(), and crc32c()
+  lib/crc/crc32: change crc32() from macro to inline function and remove
+    cast
+  lib/crc/crc64: add include/linux/crc64.h to kernel-api.rst
 
-On Thu, Jun 19, 2025 at 05:28:36PM +0200, fourier.thomas@gmail.com wrote:
-> 
-> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-> index d2b632193beb..1ef1ccfaaa95 100644
-> --- a/drivers/crypto/inside-secure/safexcel_hash.c
-> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-> @@ -249,7 +249,10 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv,
->  	safexcel_complete(priv, ring);
->  
->  	if (sreq->nents) {
-> -		dma_unmap_sg(priv->dev, areq->src, sreq->nents, DMA_TO_DEVICE);
-> +		dma_unmap_sg(priv->dev,
-> +			     areq->src,
-> +			     sg_nents_for_len(areq->src, areq->nbytes),
-> +			     DMA_TO_DEVICE);
+ Documentation/core-api/kernel-api.rst |  6 ++-
+ include/linux/crc32.h                 | 74 ++++++++++++++++++++++++++-
+ include/linux/crc32poly.h             | 16 ++----
+ 3 files changed, 81 insertions(+), 15 deletions(-)
 
-No need to put 'areq->src,' on a new line.
 
->  		sreq->nents = 0;
->  	}
->  
-> @@ -497,7 +500,10 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
->  			 DMA_FROM_DEVICE);
->  unmap_sg:
->  	if (req->nents) {
-> -		dma_unmap_sg(priv->dev, areq->src, req->nents, DMA_TO_DEVICE);
-> +		dma_unmap_sg(priv->dev,
-> +			     areq->src,
-> +			     sg_nents_for_len(areq->src, areq->nbytes),
-> +			     DMA_TO_DEVICE);
+base-commit: ee925097a5a76eaf9c4954cdd7288a070d57a8d4
+-- 
+2.50.0
 
-Same here.
-
-Otherwise this looks good to me. With those fixed, you can add:
-
-Reviewed-by: Antoine Tenart <atenart@kernel.org>
-
-Thanks!
