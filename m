@@ -1,236 +1,164 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F76242923;
-	Thu, 19 Jun 2025 20:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750364526; cv=fail; b=UNQ4AJ0casCmLhRwVT4H9ZjXmpQiGGg+LSayQc/QFhsZVhQwfYOGAb6Csfnw/1ke3gGQTcJNWAhA5heJjcM9HwNYZTWVpSzacDRijPYHhBjT9CYUfz1B8YfZjZmNyYOK+AS7CjAmmv/JcukW5m0RSp0S5nCBdZ3XSKsMTkhI1CA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750364526; c=relaxed/simple;
-	bh=LUnnCKjFK1XAtC4qkk0FduA3GLvaMpoSmugb1Zt+2WM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=jxtLfibayhWMX+6qg1cMtanYo/m4enr8qE8y1pm5fccGY+8JMrNAZI4h9DfKbJmNKc+eQR2aLsurn06dncrkCRiZ+vkUizwRqs7JMgScNIpmXwpYei55XCNgO+ESPDTYivCOpUpPwJrkIuPyAbwo5QeL0D2VnaQGY/a5GiWF2e4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OQx1MtdF; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E181E412A
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 21:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750367863; cv=none; b=iRgkai54ts0YC3r6ZkZrKa64IkzvE/ey7Hi0Pblg3omKJahESaID1J7WmX5EgPJhz2LGYrlQ5pohOEWkgoZZkABU1XgQdScIvmRbZmLBtWn3bMQuQ1C1Py+vm1hWIpnchKePmZXLtENMouYtwuvUqrUjTwRH/KLGboSjamoQa6Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750367863; c=relaxed/simple;
+	bh=dwgPbWkY90gjO6t7tMDzEltEqrI7ZZMpSWRqdn/V80s=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=b45cYf7LHhpqFtg5vI0TbJrsLJEkHEY0lrnjAchflyU7Z6LQCCeB4Da1BOfRoWrSA1oExiX3JRiav6+87xj65tl1E3HWT/c+imzQ5iOB3jyb9EkOmwP4i2aMwmrPxjzZH+b1SjBgaef116NzuaKxOx7/DEjb5tB8jnmooAtbSfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wn/RlATN; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OQx1MtdF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750364524; x=1781900524;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=LUnnCKjFK1XAtC4qkk0FduA3GLvaMpoSmugb1Zt+2WM=;
-  b=OQx1MtdF6JCwbhUo9bsCBrtWvrTg4iCeeJG0qx0vAAzCN2cuXKl/q9T3
-   nxESc4Sa8WFBbjLrwQJ2Cm/dlzjeiYAJwKOXgsKTV2eWTV+OKg0/jIHY+
-   k8p2jJ4wjYQvuWmGNMFAXIBjMtqxNhmxk59mkAgS1CYWudfVV51Dj1E/5
-   wNcGs436rXd0Brp3bFFf5lEbAKLKmMnBg54svKzcWbHGUzxsLmMq9ylL2
-   UgYGHs10Lr9miNJPrEknQK2w+Sf/AF3UwmsbzCJoYGYdbXW37ukt23wUB
-   waItiwb82y7GWBlebuXZiZ48jR7FOaxrQjMA5EOVJhvW14VOsJE2hhsYO
-   Q==;
-X-CSE-ConnectionGUID: brv9/zl0SiyE96P5INTGYw==
-X-CSE-MsgGUID: 6BNv6WQKQ86HknF7L4iJ3A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="70189289"
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="70189289"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 13:22:00 -0700
-X-CSE-ConnectionGUID: X1HldhNHSV+jmxKVIZr1xA==
-X-CSE-MsgGUID: ZgVpkpP3T3arqlBjXp1a4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="154742856"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 13:22:00 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 19 Jun 2025 13:21:59 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Thu, 19 Jun 2025 13:21:59 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.53)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 19 Jun 2025 13:21:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O/a68s/dhThlme7SN27E8LQnYz+xFoOYe+sU/MLQt/BBT51EzuU6cWDD/k4BrQy2NEqo1cy4CamgF92rPQYkUqxXnXEaEQ+NlSiWxsfr1WgIR1MMplSNyvigqtu/aIJs5NNBV+NQc1WcckJN1FvAbUoiTjAlfjVV9WYV6p4//f8TUVbyTjMh3QuBX/KCqBCauQi6OLpx9BU1zUulRp/vBh0wH0DgoZDjcS0i9b6mkPPfiY/43D7obHoqNUlfLj/KoJPbWFwf9yvLsAL6LzbF8KlOgbEkoOgvsW7WZDEch9ZZ7BieX9uuFFkHhNNzCOanD/3jwayj1KoINCq5IxcN4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hr1t1pKU3Dy20aC8kONdRZKSEOVWh3s4EDjk4gTsxrg=;
- b=xuCrArDVVRj995cYCvbVxuM50SrJoKVdzpyD9HuFl7agcfAWs3htCtVuyUcuH6G9bIofEDNEaPl2rBjP4APH5uW2YfDoBeH5MJD5EmE6boxyBunqtiU9nSf0tqnQUmHHWjB4QQcHVtkZ4x11TtsbW1RPerjXpNcjZNw3F8Gw3fDLB7r9jdVSWVqMya8xozzuQpJl9lnGBUMoJEQZ1qXlimojlVazXx1OZjJJanpA5iXoznugQDjzGA1F03lWTnBatRAVY+kgKxR22WkKPOYrgkkf8Ubz+CvRIKqnbGJM5Odp4WDfHI3/WpTejA17jvsONXrbrTSP5ODgWOfbX0onCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by IA3PR11MB9350.namprd11.prod.outlook.com (2603:10b6:208:574::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.35; Thu, 19 Jun
- 2025 20:21:53 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778%5]) with mapi id 15.20.8857.021; Thu, 19 Jun 2025
- 20:21:53 +0000
-Date: Thu, 19 Jun 2025 21:21:46 +0100
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, <stable@vger.kernel.org>
-Subject: Re: [PATCH] crypto: qat - lower priority for skcipher and aead
- algorithms
-Message-ID: <aFRxWsDS6sIMFgIy@gcabiddu-mobl.ger.corp.intel.com>
-References: <20250613103309.22440-1-giovanni.cabiddu@intel.com>
- <aE-a-q_wQ5qNFcF_@gondor.apana.org.au>
- <aFAyBgwCUN2NLXOE@gcabiddu-mobl.ger.corp.intel.com>
- <aFD1obs5rQaMLA4u@gondor.apana.org.au>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFD1obs5rQaMLA4u@gondor.apana.org.au>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DU7P190CA0016.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:10:550::6) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wn/RlATN"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-acbb85ce788so214372566b.3
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 14:17:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750367860; x=1750972660; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w8uxhuPsE+Gmb1nyywGbEH71TKlUhTY099WUmaO71RU=;
+        b=Wn/RlATNqYbq4onpAE7W+SVVzXS+RNWaE4ao2MH3KrAJNoOIqePusEv3LOIqyhUyXy
+         y+aUAyy9E9oyZC8CT3gaeWh05TfKoZO/oYpYq6wgMOrydSxK/gcwePoMMCk6pBxpxuHp
+         /2BWmuxYl3KLunhODw/LWKP9m2Vglw7bkEDJpzxh3i4JVieL0it8WJR9nwBb7+UlrVhf
+         bwTRrlyMVxgNz8fRnEg+ZamrMxN0KWNRm+BsOH7RlLv792kpbgQtc5J9V3SEZpS/ulOK
+         hO2Gg+/4SPfYRVLmvUDU1e8VOdseCI56DoH9C3MKPNyFpVGYTEjyK0kosCACCFJIY2oe
+         OAog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750367860; x=1750972660;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w8uxhuPsE+Gmb1nyywGbEH71TKlUhTY099WUmaO71RU=;
+        b=NvXgwoXle4rILFeihXidYI0SwvN3Y2MHeVwgsJeDMG3yMmzlLHOCuKT7wXFlKFDGal
+         6WZxgiPdu1AccNN4DgQBqseofsiXlgl4spj5bpNVyavTi1ACwamfNzUAK3KEdm+8PpvW
+         4O//qVnMNkskAyD1bDpH1tSIaTIjeUQHwz/n6yWBDj//3FkDY26cLKTerADRqTeP4xU1
+         GRX32c63248NFsKbAin7SjNsjNj+6FYAE2qPcqblZ7NmoQuEI3qCbSVVzqLrUt1QXPeB
+         FMZ5N9M618nMS+JJQTVHpiEnT87WuuoKhIEK094jtrsbok87CpuN/dEQMYus/t5Xg427
+         GWWg==
+X-Gm-Message-State: AOJu0Yz2wljSBLiaMODY+eDBVW1ZVsMg/T2uulp+m7Stgmpce/HvMIDL
+	Z+2HLF7bnFiAMbtPoAL6OAsUtuEtm3rXI12rO0mdzHPagX6kUAnt1BRiaxZNhA==
+X-Gm-Gg: ASbGncvDQFoInHzg7L4sDUQuD9CttJatwMXw0VdQ06w6YmVyZ6TiN9BSmFK1K5V34+Q
+	llxTM1Yyh/s1ONww3BPGXJJaYDIH+FnfR1gEJO+NissO2WlFLWs007HNCZJ0djUuKwjoVNmxVxv
+	eH9KHELJ3AWtdinmsXd4O7PRNi90HACF3sHxne2acuN+9MiUsewmxD0JPW3eyzdpmsvhpeJV1sE
+	Tf4r6CAUyJrrvpCOHxrwNqCJNZSLIvkb6dUmahhkuInFl1FowIXSDUb6uaXGOUwWRD7O6RyBwly
+	O3tcNuAeqlJKKe5rUIEeom8Ecea7qUHbrFGU3c6oejrmFQQk0R848jz5Nr86c9dU21co2BLJIpV
+	WSnUVt94ZUMZ7hySn/ACL
+X-Google-Smtp-Source: AGHT+IGjIkW8rGaCREcplNmag94dOCwZ4Tp+WQ3mOtUuEP6gN1w7dR1p28bm+eNYXEjlOf7D8I1sZg==
+X-Received: by 2002:a17:907:2d27:b0:ad5:749b:a735 with SMTP id a640c23a62f3a-ae057a2859cmr37862866b.27.1750367859801;
+        Thu, 19 Jun 2025 14:17:39 -0700 (PDT)
+Received: from [192.168.8.101] (78-80-16-228.customers.tmcz.cz. [78.80.16.228])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7f25csm48845666b.36.2025.06.19.14.17.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 14:17:39 -0700 (PDT)
+Message-ID: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com>
+Date: Thu, 19 Jun 2025 23:17:37 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|IA3PR11MB9350:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6863a4a-55e3-4592-d436-08ddaf6eee2d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?N2tudEg1Z2NFMlVoRlNQREVnNnNVRXJRMlptSjVsZjFYTjA5Q1Mrcm55QW1O?=
- =?utf-8?B?ZzlQWjNtc2NPT0NGN2JTOUFBQ2V4NjlrN1R6bTBSZ1MwcVk0ZW1EUnJwTmZD?=
- =?utf-8?B?U0c1Zm4yZlhDMnMvZW5zSlMrRzcvaEtseEVXcjJ5MTJVUzRhUTFvZGdac3h5?=
- =?utf-8?B?YjVKY3cvZ1JMVmwvWDdpZ2w2OUNaSG1TdWQzSzJKUVpCWnVRZlZYdUc2QkRs?=
- =?utf-8?B?R0VTbHdYR2JzcWpCZjlVVVpTSXB2SUVnOGYzR3oxRzU5QWhFOWo0TXMyQUZI?=
- =?utf-8?B?bml1YUtOci91aEFtZi85eDJGTUx3TXU3ODFTYkk5ajF3dlZLZEdqRVFpRWZr?=
- =?utf-8?B?ZlJkVjVKNHhwdW9WSEFOYmlOUFFkZFptbUg0SkoyTjY5VmJMazBjU0ZYVnZO?=
- =?utf-8?B?UW9rRWZmMENOc3ZzVHBUWE5od1c0SkhWZUV0MkpCcWwzbVRjTzZhNW1OQU53?=
- =?utf-8?B?NmF3M0dCVVFXWU5LSDBpWmFDdFNGU1VWMFNKL2hIM01GaWcyRzlldlU3V0F3?=
- =?utf-8?B?ZlhDeTBUS0pNSnJJSWFSVmxIWFF6T3NMSGxSbWRWRXE1OXlWUFFmNFlKcEcy?=
- =?utf-8?B?VldFaGQrYmNlb2hIZWxiMW00cmhFRFB3UkRZWUdJKys3WWVWdUFLaEFjdDZt?=
- =?utf-8?B?dnlHaE1vMER6clVzcTFjMkJ1d2dGOEkycHZXc0I3bWl0L1pMckNMUzU5alVi?=
- =?utf-8?B?dWthMEU5ZERsYkZPRVpNcmZyc3pOODdPRHlDd0JCRmM2Q0NERlNYWm43dGRh?=
- =?utf-8?B?d0V5NzdwSDRUYkNRcFFKZnFnUk5UVGtYbG9GbUhRc3kvZzBHbGppU0NjY2sw?=
- =?utf-8?B?TkNzU3gwMEh0QU95dDFCbDIzQnRvWE1WcGZtNXdwL1hUa3ZFRnBDSytSdStT?=
- =?utf-8?B?ZWc5bk93UzBVcGNrZHEvbGMvb0wrUE1zYUNsR3QvWjFQQlR2ZUw4YStxUkhw?=
- =?utf-8?B?UnFweEgySWprTER0ZHBnNDJqQ0pIOWVKMHNVYjhlaWxSa25XNSs2aFljeGhr?=
- =?utf-8?B?ajZDTFdpbmE3LzZid2g2cnkwUVluT3BTZCthUjYwS29HWStLNytkN3BPSzh4?=
- =?utf-8?B?R05lYTdjcWdnTXhlSzMyRFJuOElWQTFuSEpEV2dOeEJHTyt1Q0k4YVJIZmI3?=
- =?utf-8?B?eVJoSEU5Slhvb0NBQmxPS2FXUVdYLzFkWlZJTVNIak1VUTVFOWRpUS9OZGFs?=
- =?utf-8?B?RnhPZExxTFZra1dPZUg2ZDE3T21DUWpqZVU5WTdzSzZjZlA5b3R3MWtkNG5v?=
- =?utf-8?B?c2ZEQ2hsWXN5ZzZIdWV0U3pOdklVYnZpOENEWXJzeHlrT0k0Z0xNVG9wYUdq?=
- =?utf-8?B?T2RyTjFMaEFkNlNRUU04SWRrd1dHTExSNzBFWGtjU2NOamFRK0RCdTRIaU81?=
- =?utf-8?B?QUdqZVlSdTNlL0JOamM3U2t1R3RSZGZmSnprMVpyS3Vpd2Z6b3FJQit5dng3?=
- =?utf-8?B?dkhwQnV6cmxTVVRvNGFTczZKZFlkZWJyemNESnpRRzZoVEdxWHVEMnEvUkhh?=
- =?utf-8?B?VUdTRzk2WS94dGVGL0R4d1U2YTlrQXJkcjhaRTVGWGVROVNLN2RpU0MvSTYy?=
- =?utf-8?B?RTduenVpNnhvZ2NUSkYxMXVlUExLTnpSdHIvL2FaY3ZweU9VaEUrQ3djT2FO?=
- =?utf-8?B?YnY0WFQxVjZJb1daSUR3WWExeVc2Y2JEb3FGQnlyR24rMXI5MlpUUmFxZFZL?=
- =?utf-8?B?YWdneHUwYm43Zm4zSXJ3ZzVERnpiTzNMSzljYUxRVjhQTm9VSThxaS91WVZR?=
- =?utf-8?B?eEhKVXNncWNsTGRYb0JyY1FZd2tRZGc0Y1dRU1JmK2IxMmN3VFJKcW5Fa01Z?=
- =?utf-8?B?dkRzbERDeE1hL2pWek9TNVZFaHE1cHlLellmZTllRzJiR1ovMUE0TkxkU2N4?=
- =?utf-8?B?ZHB5SUhyVkdIbEtacElNMTdlV05USkxJMkNwZmswVnlzS0V5R3c1bENZWGRU?=
- =?utf-8?Q?P3FqdMCQaKU=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TExWcmptcjE2VUNNWUNEZEk0R0c3N0FFYnh3aFN5TWd2c2lPVzNhT1JOblMv?=
- =?utf-8?B?YUdCZjBZcFNkMHRBMVdtNEpSNExCNEx0bWxtVFdrejBGM1d6Y05XR1c2ZG5h?=
- =?utf-8?B?U2d5cnV5ajFZMTFmQkpYa2RvY3U2OUJqRmZEdnllNkN4dUtleWwvVVBrNHVz?=
- =?utf-8?B?NEtZUW15ZGFNWHVldWFBWndlRXRDcHhwK3ZIYmZjZlF1YU8zUWNBSjZRSzEz?=
- =?utf-8?B?bWlTYUxXd3Y0dnBqbXFXNTl3enh1K3BNOXpjS3V4NGplcmVRMFRBd2JkdSt4?=
- =?utf-8?B?SnB5RHlTclhYRjdnUVVRbllCR1Nya3dwdHlLb2dIeHdsR3BRWVFPZUtJaW9s?=
- =?utf-8?B?Z09kZ2lzSWR4eXB5Ym9MOU1pUXU3NnNKNnNhYWtIZzNCMnBFU1MzVXBLRi96?=
- =?utf-8?B?RWY5WGMwLzlDLzMrL2ROdnRkUkdDdGRibkVzblhkVkI3WmNLdS9Qc1pwN3h3?=
- =?utf-8?B?OVFQUlBmMlNndTlsbVR0eGUxRUkzRTFpL05PbG9DYUllcUp0MUNJUmFzZ1E1?=
- =?utf-8?B?SGE0YzNZQTlxU3BBbmxHRHV3Uk00M0FIRXFuN095Um9NWjVzc0gwU1ZEbWty?=
- =?utf-8?B?emdCdExGRUIxLzNzVm5jODdwN0JLaXMzSDRkb0hHU1g4ZXRQcGFiNExzN1Yy?=
- =?utf-8?B?Y2paYWtXa0YyQ3ZRa245dTlIR3N4b2FQK3N6UUtUVGF1cDZtaitSbk5IYW03?=
- =?utf-8?B?aUpXaEZ4WlAvYUlRY1BNMlpWWXRnNUZuYncxQmVWUUFEb01uOU8wOHRSN1hL?=
- =?utf-8?B?UkRUZjRhVjUwQVliSkFzS2tpR1hPd2swVU5EWXZ6NkZyQ2NlZkh5OVpDaXZL?=
- =?utf-8?B?NlRUZFByTDBxdzMxbm40c3pDOWZZblpaN1Bua3h1eGdvOGJwQStHeFQ0SnFr?=
- =?utf-8?B?R0VtZkFJWVppeVRUdHBzdjZzVVAzT1FFUVdXNFQ2bUtyUE13S0hwdGlETXZM?=
- =?utf-8?B?UUVKTUt2dWpzb2NPcm9yQWFpR1hBd1A1WFlMc3NXMkE4QU4veWk4VVdrdWNz?=
- =?utf-8?B?ajR3VGJUd0lQc2pUdTdxOXlGR05UNDJSc1p6aWI4UDdpSWwveHIwcEJQNm5a?=
- =?utf-8?B?M1B3emVnbVA0aFl6cTJQd2t3Smo4NGdOVkNNTHJEczYzRjAzN29reDcwRnd4?=
- =?utf-8?B?RnF3WDFRV0d0TG5ReXdnZDN4ZEc2bmhFajFEM1pRaEhoT3I2SGltT2xmWU1G?=
- =?utf-8?B?L1lTSzRxM3pwNzVLRDZ5U0poWG9wYjNURHMwOE04RWwvclQ1NUlnR2p4cFJ5?=
- =?utf-8?B?L2FNWFd4aVZIYlFpMjIwT1JaNnZWSk8ySmtkWkFTbEpnb1gvcG9UWlV6d3Zl?=
- =?utf-8?B?akg0NDJSNm5DNXAybWpKcnllaksreEFnRE9ZSEU4bWcyMXVlV0lJKzZrK1d0?=
- =?utf-8?B?S2tJVEVFeVQ2b2VuWXM0ODNTSFNXOFZXTXMvVEZkN2FmNnJrVkFnR2kvOERH?=
- =?utf-8?B?OUpjUEJVQXRWY2JYUzFHc0VCN1hmSEFpTG0xTHl4aUlCRS96aTJUYkVPUHpF?=
- =?utf-8?B?TU1BemFiTWg4aU1jU1pyK1JPM21udk5jN1pSQUFxcjBSMytmc0d0dzk4MVdV?=
- =?utf-8?B?aEdSM29ScU4ySjRJVTh2QVJUTVhMMVB2Vm5xRzROYnhLSTBKd1RsVjI1Wk9M?=
- =?utf-8?B?THZnQWw3VTN3RWVBdkQ5SVl2eGppTGpnYVF4UzcvZUYyUVJ6c2R5K3d0MmJS?=
- =?utf-8?B?R0RRUlhhMGlSRlFJOS96dE83RHl5ZThuSnJMWTE2OTMxTzZGdy9VMGxma2h5?=
- =?utf-8?B?elNIbHRmT3RFNVhmZityaHNQbWdBME5NblRzczRZWndocDFGME0xRTM1QjlF?=
- =?utf-8?B?T0hiYzEvbVJJMUNycE1TT2RQMGFhQ2xNTEcwbXFFaVhZK0dBT0xkWlZ4aVBh?=
- =?utf-8?B?YkFxRUk2MGdvR3hSSkhsVEExYlFBaEMrNjl4ekFScTE0Vjc2UzdkWXpwc2Qy?=
- =?utf-8?B?ZHFnV25rcUVXVHoxYlBuSnpLc2FuT2hvWnAzK0dDSHJrejhEclNVVTViMjY1?=
- =?utf-8?B?K012NUdMa2lOZVNlYVhqTTdEZEczOTd2ZFJwbHVZY0Q3aTJ0TDRjczhUNlAw?=
- =?utf-8?B?VUF0WThId3RaN2NXNFM2dVVVZyt5MnF4b3NzOHcxdkNRdkI1MStpTUdtZ005?=
- =?utf-8?B?YmQxRTJ5ZWsyTFFWcVYvajZHbG51SDdzUkZkZmJDaE8rT0dYSVZZNHdkUTRH?=
- =?utf-8?B?aXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6863a4a-55e3-4592-d436-08ddaf6eee2d
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2025 20:21:53.5883
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tVmuL/paJPAEF0NO6uKFHfYdqMG+93VclAoVxy9/+x2K5864WbbfCNIe0egz784iELQ2izs6cP7fsJO6BlaU3qTEC8vbfQZspRiXII7yJVE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9350
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: OOPs in 6.16-rc2 crypto_shash_export due to partial block handling
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 12:57:05PM +0800, Herbert Xu wrote:
-> On Mon, Jun 16, 2025 at 04:02:30PM +0100, Giovanni Cabiddu wrote:
-> >
-> > This level of performance is observed in userspace, where it is possible
-> > to (1) batch requests to amortize MMIO overhead (e.g., multiple requests
-> > per write), (2) submit requests asynchronously, (3) use flat buffers
-> > instead of scatter-gather lists, and (4) rely on polling rather than
-> > interrupts.
-> 
-> So is batching a large number of 4K requests requests sufficient
-> to achieve the maximum throughput? Or does it require physically
-> contiguous memory much greater than 4K in size?
+Hi Herbert,
 
-Yes, batching a large number of 4KiB requests is sufficient to achieve
-near-maximum throughput.
+there is an apparent regression in recent 6.16-rc2.
 
-In an experiment using the skcipher APIs in asynchronous mode, I was
-able to reach approximately 11 GB/s throughput with 4KiB buffers. To
-achieve this, I had to increase the request queue depth and adjust the
-interrupt coalescing timer, which is set quite high by default.
+I can easily crash the kernel on 32bit machine with this OOPS:
 
-I'm continuing to experiment. For example, I modified the code to send a
-direct pointer to the device when the source and destination scatterlist
-entries each contain only a single segment. This should reduce I/O
-overhead by avoiding the need to read the scatter-gather list
-descriptors.
+: Oops: Oops: 0000 [#1] SMP
+: CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.16.0-rc2+ #993 PREEMPT(full)
+: Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+: Workqueue: kcryptd-254:0-1 kcryptd_crypt [dm_crypt]
+: EIP: __crypto_shash_export+0xf/0x90
+: Code: 4a c1 c7 40 20 a0 b4 4a c1 81 cf 0e 00 04 08 89 78 50 e9 2b ff ff ff 8d 74 26 00 55 89 e5 57 56 53 89 c3 89 d6 8b 00 8b 40 14 <8b> 50 fc f6 40 13 01 74 04 4a 2b 50 14 85 c9 74 10 89 f2 89 d8 ff
+: EAX: 303a3435 EBX: c3007c90 ECX: 00000000 EDX: c3007c38
+: ESI: c3007c38 EDI: c3007c90 EBP: c3007bfc ESP: c3007bf0
+: DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010216
+: CR0: 80050033 CR2: 303a3431 CR3: 04fbe000 CR4: 00350e90
+: Call Trace:
+:  crypto_shash_export+0x65/0xc0
+:  crypt_iv_lmk_one+0x106/0x1a0 [dm_crypt]
+...
 
-Regarding the synchronous use case, preliminary analysis shows that the
-main bottlenecks are: (1) interrupt handling — particularly the overhead
-of completion handling, with significant time spent in the tasklet
-executing crypto_req_done() and (2) latency waiting on the device. I'm
-exploring ways to improve these.
+The bisect points to
 
-While this work might seem moot given that AES is faster in the core,
-the same optimizations are applicable to the compression service, where
-QAT can still provide benefits.
+commit 8cf4c341f1931c20c564ab2ee0f9eb990a606cac
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Apr 18 10:59:04 2025 +0800
 
-Regards,
+     crypto: md5-generic - Use API partial block handling
 
--- 
-Giovanni
+     Use the Crypto API partial block handling.
+
+I think there is a buffer overflow in crypto_shash_export, it does not crash on 64bit perhaps
+because of different alignment, but I can be mistaken.
+
+As plen is blocksize + 1, this line in crypto_shash_export seems write out of m5 state:
+
+   unsigned int plen = crypto_shash_blocksize(tfm) + 1;
+   ...
+   memcpy(out + ss - plen, buf + descsize - plen, plen);
+
+It is easily reproducible with cryptsetup testuite script tests/loopaes-test (on 32bit system).
+
+Let me know if you need more info.
+
+Milan
+
