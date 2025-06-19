@@ -1,95 +1,65 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9782417F2
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 12:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F92F22B598;
+	Thu, 19 Jun 2025 14:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750337991; cv=none; b=fh0uAFX3eF10qzCwYYC242RAp49wH7poNwRKB2MfcTs/HAChh03pK3shZZ0G7AI2gCYfBZEicPsMxc4yNq0JOIS45B2C/+CJngnnTf/mrGoTGpww2sxEHowXR/zRlt6Y0uDOt7wo11DWvuyxYkEmsPzx7e8NwuQw1hk80TYjkKQ=
+	t=1750343889; cv=none; b=esdbbZ6gs6yn/G2PA7Z2PLQ3HhZ9CcBHLdtbUkNe6Mixqbz2qa54ym8FXJvP1bwRqxpvVqOPf3XCbSEIa4G7PaLpDDvcIoB7WGdGKSM90Rmx+T5lhzjMMa+20YN+G+H72Mg/mgtjopMAz0O+XpSfsWikShT7HjlMQeVCjojqMg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750337991; c=relaxed/simple;
-	bh=hzUwxanX9FkaxmnBz6ieL27U5CQ3U+3fFh7ugzU4ymg=;
+	s=arc-20240116; t=1750343889; c=relaxed/simple;
+	bh=X9vVkMtiXPrn4Hu8FElJ+z6PvCWbhe9Vge+jEseQxMc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/wmeAhOlwE99jZ4UcgFMuLhOL1ihi3353wELkCUb2o4BG19hKU/El5Pdu2/drff7HoCRxOCv5ZOR3DMdzzKLN9idf+bAjTg1krp3jJr8WzqzXDkxI1jxJrG3WED7Om4wfDQ2RXdnvNoFP/XycxubojaQDoMgdSCx997LhhodTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a7pFG0JK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dg4ZIBXY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a7pFG0JK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dg4ZIBXY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=g8FdMTtRvkRr00lCR4J6P2cZiitc5KW0pgVoup+QFUXep6fVRzMDkM/e3/t+HYg4Co+QVh+ZCK9zunY4bg21T4B/uyib9KCGe5UY1WIp9Beeyw6cdkX0YQqBZUocTh3hB4nrkFAjmRJb+IoobK5GEypCXZEbV/EIEPWHwa87ybY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IJxZtbfH; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a7pFG0JK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dg4ZIBXY";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a7pFG0JK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dg4ZIBXY"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 68F2F211CF;
-	Thu, 19 Jun 2025 12:59:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750337988;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
-	b=a7pFG0JKoS/RamkB8c+lYWRY6y60He2zTYbjRBZDHW6nnhBa4rPI80S3fBqxoAy8M+rotM
-	Sc5bMfzjG9RbDZ1LLVLlNSLQaXIHRUM4UBMsDvSDlN6ZttW3xJgO+ndb0XxJUY/mYZKvck
-	x2llTCQaH2jRyyUuLLXO24VOPPlNbQ8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750337988;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
-	b=Dg4ZIBXY6n2RO9iJ67FWxk51JnmXZ148Ok2UKpD4/yWwkrttD3hLHGD3Ef33ctkusqtfZl
-	C4ifcAUBC9ruaRDw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=a7pFG0JK;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Dg4ZIBXY
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750337988;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
-	b=a7pFG0JKoS/RamkB8c+lYWRY6y60He2zTYbjRBZDHW6nnhBa4rPI80S3fBqxoAy8M+rotM
-	Sc5bMfzjG9RbDZ1LLVLlNSLQaXIHRUM4UBMsDvSDlN6ZttW3xJgO+ndb0XxJUY/mYZKvck
-	x2llTCQaH2jRyyUuLLXO24VOPPlNbQ8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750337988;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
-	b=Dg4ZIBXY6n2RO9iJ67FWxk51JnmXZ148Ok2UKpD4/yWwkrttD3hLHGD3Ef33ctkusqtfZl
-	C4ifcAUBC9ruaRDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C6C913721;
-	Thu, 19 Jun 2025 12:59:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id S90uEsQJVGiMBwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Thu, 19 Jun 2025 12:59:48 +0000
-Date: Thu, 19 Jun 2025 14:59:44 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Daniel Vacek <neelx@suse.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-btrfs@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH 2/2] crypto/crc32[c]: register only "-lib" drivers
-Message-ID: <20250619125944.GJ4037@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20250613183753.31864-1-ebiggers@kernel.org>
- <20250613183753.31864-3-ebiggers@kernel.org>
- <20250617201748.GE4037@suse.cz>
- <20250617202050.GB1288@sol>
- <20250617204756.GD1288@sol>
- <CAPjX3Ff-A+M9Ad7iJFTDGAs=M1d6zOqDq48i1GmRn967a_GDsw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IJxZtbfH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750343887; x=1781879887;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X9vVkMtiXPrn4Hu8FElJ+z6PvCWbhe9Vge+jEseQxMc=;
+  b=IJxZtbfHT56eeMUgroPPxhtvgGrwThsALVu8qeU3SDs97lBnk3infR85
+   992qt87X1tRsnqVJek8evzt6sZLyjWFslnXOnPzJzyWgtOZnrxQEdv35r
+   pBMGh4PuQiEvqP/pR1ZUHiQtismWNjOJUG1TXnyLmS0fShYf1xUAsmzhC
+   BtvuBhFajBuGzlRxBFN0xAu+C3L8MupNFry1EmvKino0B2+gjGuX+C8nq
+   t6MDns7x3B2qNYKIycAp+v0ECFHFRZyMV9FfNvBkh7XrMKmQIKzQC9459
+   ozKd/IPWwF3+N70JDVbDsHGYi7XLPKFRGSTpzWrSaGJEdA8+rGGwwGn3M
+   w==;
+X-CSE-ConnectionGUID: CD0MMLNSTICslleDQhuzHQ==
+X-CSE-MsgGUID: f0CDxhbsRu+Y47XHahaajA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="56399109"
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="56399109"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 07:38:07 -0700
+X-CSE-ConnectionGUID: AGQuVQKNQg6CKFX5oshRpA==
+X-CSE-MsgGUID: dObaJX+/QkiD7AJ4llXM6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="150886370"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 19 Jun 2025 07:38:04 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uSGOv-000KpW-35;
+	Thu, 19 Jun 2025 14:38:01 +0000
+Date: Thu, 19 Jun 2025 22:37:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tanmay Jagdale <tanmay@marvell.com>, davem@davemloft.net,
+	leon@kernel.org, horms@kernel.org, sgoutham@marvell.com,
+	bbhushan2@marvell.com, herbert@gondor.apana.org.au
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, Kiran Kumar K <kirankumark@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>,
+	Tanmay Jagdale <tanmay@marvell.com>
+Subject: Re: [PATCH net-next v2 06/14] octeontx2-af: Add support for SPI to
+ SA index translation
+Message-ID: <202506192219.aw9iy7xb-lkp@intel.com>
+References: <20250618113020.130888-7-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -98,62 +68,101 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPjX3Ff-A+M9Ad7iJFTDGAs=M1d6zOqDq48i1GmRn967a_GDsw@mail.gmail.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 68F2F211CF
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.21
-X-Spam-Level: 
+In-Reply-To: <20250618113020.130888-7-tanmay@marvell.com>
 
-On Thu, Jun 19, 2025 at 12:27:13PM +0200, Daniel Vacek wrote:
-> > I revised it to:
-> >
-> > btrfs does export the checksum name and checksum driver name in
-> > /sys/fs/btrfs/$uuid/checksum.  This commit makes the driver name portion
-> > of that file contain "crc32c-lib" instead of "crc32c-generic" or
-> > "crc32c-$(ARCH)".  This should be fine, since in practice the purpose of
-> > the driver name portion of this file seems to have been just to allow
-> > users to manually check whether they needed to enable the optimized
-> > CRC32C code.  This was needed only because of the bug in old kernels
-> > where the optimized CRC32C code defaulted to off and even needed to be
-> > explicitly added to the ramdisk to be used.  Now that it just works in
-> > Linux 6.14 and later, there's no need for users to take any action and
-> > the driver name portion of this is basically obsolete.  (Also, note that
-> > the crc32c driver name already changed in 6.14.)
-> 
-> How about instead removing that part since it's useless now?
+Hi Tanmay,
 
-There's no best answer, removing it makes sense but could break
-somebody's scripts parsing that file. The information put to "(...)"
-might be useful in the future again. It's less harm to leave it there
-than to deal with potential fallout if it's removed.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250618-193646
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250618113020.130888-7-tanmay%40marvell.com
+patch subject: [PATCH net-next v2 06/14] octeontx2-af: Add support for SPI to SA index translation
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20250619/202506192219.aw9iy7xb-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250619/202506192219.aw9iy7xb-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506192219.aw9iy7xb-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c: In function 'nix_spi_to_sa_index_check_duplicate':
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c:25:21: error: implicit declaration of function 'FIELD_GET' [-Wimplicit-function-declaration]
+      25 |         spi_index = FIELD_GET(NIX_AF_SPI_TO_SA_SPI_INDEX_MASK, wkey);
+         |                     ^~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c: In function 'nix_spi_to_sa_index_table_update':
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c:53:16: error: implicit declaration of function 'FIELD_PREP' [-Wimplicit-function-declaration]
+      53 |         wkey = FIELD_PREP(NIX_AF_SPI_TO_SA_SPI_INDEX_MASK, req->spi_index);
+         |                ^~~~~~~~~~
+
+
+vim +/FIELD_GET +25 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+
+     9	
+    10	static bool
+    11	nix_spi_to_sa_index_check_duplicate(struct rvu *rvu,
+    12					    struct nix_spi_to_sa_add_req *req,
+    13					    struct nix_spi_to_sa_add_rsp *rsp,
+    14					    int blkaddr, int16_t index, u8 way,
+    15					    bool *is_valid, int lfidx)
+    16	{
+    17		u32 spi_index;
+    18		u16 match_id;
+    19		bool valid;
+    20		u64 wkey;
+    21		u8 lfid;
+    22	
+    23		wkey = rvu_read64(rvu, blkaddr, NIX_AF_SPI_TO_SA_KEYX_WAYX(index, way));
+    24	
+  > 25		spi_index = FIELD_GET(NIX_AF_SPI_TO_SA_SPI_INDEX_MASK, wkey);
+    26		match_id = FIELD_GET(NIX_AF_SPI_TO_SA_MATCH_ID_MASK, wkey);
+    27		lfid = FIELD_GET(NIX_AF_SPI_TO_SA_LFID_MASK, wkey);
+    28		valid = FIELD_GET(NIX_AF_SPI_TO_SA_KEYX_WAYX_VALID, wkey);
+    29	
+    30		*is_valid = valid;
+    31		if (!valid)
+    32			return 0;
+    33	
+    34		if (req->spi_index == spi_index && req->match_id == match_id &&
+    35		    lfidx == lfid) {
+    36			rsp->hash_index = index;
+    37			rsp->way = way;
+    38			rsp->is_duplicate = true;
+    39			return 1;
+    40		}
+    41		return 0;
+    42	}
+    43	
+    44	static void  nix_spi_to_sa_index_table_update(struct rvu *rvu,
+    45						      struct nix_spi_to_sa_add_req *req,
+    46						      struct nix_spi_to_sa_add_rsp *rsp,
+    47						      int blkaddr, int16_t index,
+    48						      u8 way, int lfidx)
+    49	{
+    50		u64 wvalue;
+    51		u64 wkey;
+    52	
+  > 53		wkey = FIELD_PREP(NIX_AF_SPI_TO_SA_SPI_INDEX_MASK, req->spi_index);
+    54		wkey |= FIELD_PREP(NIX_AF_SPI_TO_SA_MATCH_ID_MASK, req->match_id);
+    55		wkey |= FIELD_PREP(NIX_AF_SPI_TO_SA_LFID_MASK, lfidx);
+    56		wkey |= FIELD_PREP(NIX_AF_SPI_TO_SA_KEYX_WAYX_VALID, req->valid);
+    57	
+    58		rvu_write64(rvu, blkaddr, NIX_AF_SPI_TO_SA_KEYX_WAYX(index, way),
+    59			    wkey);
+    60		wvalue = (req->sa_index & 0xFFFFFFFF);
+    61		rvu_write64(rvu, blkaddr, NIX_AF_SPI_TO_SA_VALUEX_WAYX(index, way),
+    62			    wvalue);
+    63		rsp->hash_index = index;
+    64		rsp->way = way;
+    65		rsp->is_duplicate = false;
+    66	}
+    67	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
