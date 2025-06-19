@@ -1,144 +1,256 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F2630E84E;
-	Thu, 19 Jun 2025 18:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92FF152DE7;
+	Thu, 19 Jun 2025 19:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750358995; cv=none; b=kI5Bc7XXozV73YE3TxvNRtipvnhSCx0BC77797YVTL7DzAfkJrLMasYolPVkW4DqIofpNufucwqPDXo6hF5PPTfYVwbyeK8D81IKXeqNYqsSPelMvmWpOds0um2+MmEQ4JARTrvN1H1g5dzjqGvVe61/3XnQjxkNsj49uGnJLj0=
+	t=1750360926; cv=none; b=Y+oSTXisw2kjdxNrNMXTIFtm/ovQ3qaidaCnpPPHiQTReKCHies/zobKm9rLyEDYdfKr6tCasqfzIb/eZDBpivk+yFlZRN+kfFFpgpxVxFlJiS6FW7lIOupM14Oe2qgMJHzmeVB45swRxYGaxUjEKa9KxVt2UYLWtBorBzSXBCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750358995; c=relaxed/simple;
-	bh=IgLZ+wW2iKf4zedwAhePtcnxjJWns1fhdBd/jedKVVw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qR4gtlIjgen6SZhOfIhKIc5Rz0nIrVlciToGKoi/0oZQhZdRO7igGBh6PfDMxqMlR1Qo41xP1Ly3cWnOmydCw81mw7ENIAyjJNkCEcqncBls6ugb0kmWuFSrxVi9C9fm5ythnd+o3w7d8PXKYa0WU1bKBFulmUPDFXb4/dP/+hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b1ljQc3t; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1750360926; c=relaxed/simple;
+	bh=jmrdGd3GvJ31TvJntp3ksEbB5xST5taMNbDxinY66vg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VtSM7RdvnVPl/jfR/wHLxBRvX0FTW27oKgfCmOGHuXKuYFBEkqp7gSsvBDL76Hp9tNg7yYKM8HOvOT1KLxGLOBGXzRHDCOxecBaQG5IzurQOWZqVkROYvMu8Hete5I3S26dXldBfcZCOjsT2B0msDinCED9fEvpPtsmC8b5502o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yz6Ikq5r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="b1ljQc3t"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55JB4SVH002785;
-	Thu, 19 Jun 2025 18:49:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aCu9v7
-	Bko2S3a/lR0+u625Si9DterNuLFxnjektrgNQ=; b=b1ljQc3tdB1/UhXc9zztog
-	7g7p3qukkXoDjQALWH1zEGu7j6H6gQFtuUYP1da6mlyi6vYj3CXboHtirCnY6laS
-	HGr+7cgZsMKcyYB6/3JztYYlyNEaZVsUndIBiqhaEY9krVKOb6gyoVT28cTOqcPh
-	Ojd+AIzbbvggCiL6V2Oozh6RVHh2OIBlEtTL3Jwv3QCGMPTLH2D3UbixLDkIbz3t
-	2dxoh7GfeUbBu0kKEiWbkhJzK0a6I3UF4HU93Ec7L0hwWyObn1JLsXgfR+9F1NGC
-	+yZsBqvzDeJkdqKtDx8AFRouaNLLoO97YQMy76otN8dEgUPSfceSbC8fXbP+HUhw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47beet4v0v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 19 Jun 2025 18:49:36 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55JFYcg2021612;
-	Thu, 19 Jun 2025 18:49:35 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47cahwb9ux-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 19 Jun 2025 18:49:35 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55JInZnF10683088
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 19 Jun 2025 18:49:35 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 159565805A;
-	Thu, 19 Jun 2025 18:49:35 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3EEE758056;
-	Thu, 19 Jun 2025 18:49:34 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 19 Jun 2025 18:49:34 +0000 (GMT)
-Message-ID: <53e81761-47e1-400e-933d-0a53018c9cab@linux.ibm.com>
-Date: Thu, 19 Jun 2025 14:49:33 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yz6Ikq5r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052A0C4CEEA;
+	Thu, 19 Jun 2025 19:22:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750360926;
+	bh=jmrdGd3GvJ31TvJntp3ksEbB5xST5taMNbDxinY66vg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Yz6Ikq5rKYwn4yMQdjVT/HIwxHppEMUsudT9DRL9wpMcXwK0vmNHJvL1ZX+nft3Mq
+	 X3fzlSr72u4abOQ48iOGEr1q1tRtyzPwTdkEQlxvyVRFFgpkBk7Is7YFlkwrQAYqKP
+	 YNHCr05v2Wk5yOyCOHspRwUvUlCsrfdFFXvl0JIBBw/oCEH7I5/jzWJdqMOgiet0WZ
+	 XgXglFN/Phfy8K0kEM5BY4BqXWAWl6FUuRC/T/PR9A24nUFAe2rNffVKY3DI0twp7A
+	 N07y4HroQCuXz3NdcciTuo9NNCoEJUws7EdSV2tpQ/zwti7FzUk0cHyBE3TMAvYCuk
+	 RNxytRVCM4sQg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Jason A . Donenfeld " <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org
+Subject: [PATCH v2 0/9] lib/crypto: move arch/$(ARCH)/lib/crypto/ to lib/crypto/$(ARCH)/
+Date: Thu, 19 Jun 2025 12:18:59 -0700
+Message-ID: <20250619191908.134235-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-To: Simo Sorce <simo@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Ignat Korchagin <ignat@cloudflare.com>,
-        David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>, torvalds@linux-foundation.org,
-        Paul Moore <paul@paul-moore.com>, Lukas Wunner <lukas@wunner.de>,
-        Clemens Lang <cllang@redhat.com>, David Bohannon <dbohanno@redhat.com>,
-        Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <501216.1749826470@warthog.procyon.org.uk>
- <CALrw=nGkM9V12y7dB8y84UHKnroregUwiLBrtn5Xyf3k4pREsg@mail.gmail.com>
- <de070353cc7ef2cd6ad68f899f3244917030c39b.camel@redhat.com>
- <3081793dc1d846dccef07984520fc544f709ca84.camel@HansenPartnership.com>
- <7ad6d5f61d6cd602241966476252599800c6a304.camel@redhat.com>
- <69775877d04b8ee9f072adfd2c595187997e59fb.camel@HansenPartnership.com>
- <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <3d650cc9ff07462e5c55cc3d9c0da72a3f2c5df2.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bPmLlaqINDo009ZWaJ3t33eb6lBrAuBY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE5MDE1NCBTYWx0ZWRfXx5xWkXk8OiF/ nZ3EsvctxQPUTp/nMKLrwiOkBpq2knbo+0lC4URZ0AdllEzLiXW13t0CBvXAyj7nPpc+lXBGllK lB44iiVDcXZW5k6bb+j+IAhbA9CDej85O+tOTntJuu+mnkltVrTt6nRUuKzFa73u/OPV8D0aDuS
- GTvOsoUSb0t+NqeYX4M1PawmTnsHJglPFrFCBvItGrQcBtIBm39ENtaLTiDHc4chJ1D3qzYcZkg Rmm5ncfkKt2R41hB2wYx+5gm0ySNYlMzZ1Y0yauIAKsU8LFZo67hKrAx18T1/B7R+6ungCVr9S9 GCzmT9Wx9XOmDzDQLZCPRJaN1VrjS6yl2fqhPSMz66Ye0iygJTPK6Bhbgfe2YG25IU8dKOxbtzP
- h53x/s9JC8JdpV6ESPwi8k5tucsyPc6N8yOMFJVqM9Q9b4JgHgt3AiasadSK/Bq1xQQk1Ev8
-X-Authority-Analysis: v=2.4 cv=PrSTbxM3 c=1 sm=1 tr=0 ts=68545bc0 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=NEAV23lmAAAA:8 a=6FsnnaTg7kJAo-EUfpsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: bPmLlaqINDo009ZWaJ3t33eb6lBrAuBY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-19_06,2025-06-18_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxlogscore=999
- bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0
- phishscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506190154
+Content-Transfer-Encoding: 8bit
 
+This series applies on top of
+https://lore.kernel.org/r/20250616014019.415791-1-ebiggers@kernel.org/
+and is also available in git at:
 
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git arch-to-lib-crypto-v2
 
-On 6/16/25 1:27 PM, Simo Sorce wrote:
-> 
-> Of course we can decide to hedge *all bets* and move to a composed
-> signature (both a classic and a PQ one), in which case I would suggest
-> looking into signatures that use ML-DSA-87 + Ed448 or ML-DSA-87 + P-521
-> ,ideally disjoint, with a kernel policy that can decide which (or both)
-> needs to be valid/checked so that the policy can be changed quickly via
-> configuration if any of the signature is broken.
-> 
+This series moves the contents of arch/$(ARCH)/lib/crypto/ into
+lib/crypto/$(ARCH)/.
 
-FYI: based on this implementation of ML-DSA-44/65/87
+The new code organization makes a lot more sense for how this code
+actually works and is developed.  In particular, it makes it possible to
+build each algorithm as a single module, with better inlining and dead
+code elimination.  For a more detailed explanation, see the patchset
+which did this for the CRC library code:
+https://lore.kernel.org/r/20250607200454.73587-1-ebiggers@kernel.org/.
+Also see the patchset which did this for SHA-512:
+https://lore.kernel.org/linux-crypto/20250616014019.415791-1-ebiggers@kernel.org/
 
-https://github.com/IBM/mlca/tree/main/qsc/crystals
+This is just a preparatory series, which does the move to get the files
+into their new location but keeps them building the same way as before.
+Later patch series will make the actual improvements to the way the
+arch-optimized code is integrated for each algorithm.
 
-(entry point is mlca_verify)
+Changed in v2:
+   - Instead of keeping arch/*/lib/crypto/.gitignore, instead add entry
+     for now-removed crypto directory to arch/*/lib/.gitignore.
+   - Adjusted commit messages and titles.
+   - Added Reviewed-by.
 
-I created a prototype of a kernel driver for mldsa-44/65/87 that can 
-verify self-signed mldsa certs created with this openssl command:
+Eric Biggers (9):
+  lib/crypto: arm: move arch/arm/lib/crypto/ into lib/crypto/
+  lib/crypto: arm64: move arch/arm64/lib/crypto/ into lib/crypto/
+  lib/crypto: mips: move arch/mips/lib/crypto/ into lib/crypto/
+  lib/crypto: powerpc: move arch/powerpc/lib/crypto/ into lib/crypto/
+  lib/crypto: riscv: move arch/riscv/lib/crypto/ into lib/crypto/
+  lib/crypto: s390: move arch/s390/lib/crypto/ into lib/crypto/
+  lib/crypto: sparc: move arch/sparc/lib/crypto/ into lib/crypto/
+  lib/crypto: x86: move arch/x86/lib/crypto/ into lib/crypto/
+  MAINTAINERS: drop arch/*/lib/crypto/ pattern
 
-openssl \
-	req \
-	-x509 \
-	-newkey mldsa44 \
-	-keyout localhost-mldsa44.key \
-	-subj /CN=localhost \
-	-addext subjectAltName=DNS:localhost \
-	-days 30 \
-	-nodes \
-	-out localhost-mldsa44.crt
+ MAINTAINERS                                      |  1 -
+ arch/arm/lib/.gitignore                          |  4 ++++
+ arch/arm/lib/Makefile                            |  2 --
+ arch/arm/lib/crypto/.gitignore                   |  3 ---
+ arch/arm64/lib/.gitignore                        |  4 ++++
+ arch/arm64/lib/Makefile                          |  3 ---
+ arch/arm64/lib/crypto/.gitignore                 |  3 ---
+ arch/mips/lib/.gitignore                         |  4 ++++
+ arch/mips/lib/Makefile                           |  2 --
+ arch/powerpc/lib/Makefile                        |  2 --
+ arch/riscv/lib/Makefile                          |  1 -
+ arch/s390/lib/Makefile                           |  1 -
+ arch/sparc/lib/Makefile                          |  1 -
+ arch/x86/lib/.gitignore                          |  4 ++++
+ arch/x86/lib/Makefile                            |  2 --
+ lib/crypto/Kconfig                               | 16 ++++++++--------
+ lib/crypto/Makefile                              | 11 ++++++++++-
+ lib/crypto/arm/.gitignore                        |  2 ++
+ {arch/arm/lib/crypto => lib/crypto/arm}/Kconfig  |  0
+ {arch/arm/lib/crypto => lib/crypto/arm}/Makefile |  0
+ .../lib/crypto => lib/crypto/arm}/blake2s-core.S |  0
+ .../lib/crypto => lib/crypto/arm}/blake2s-glue.c |  0
+ .../lib/crypto => lib/crypto/arm}/chacha-glue.c  |  0
+ .../crypto => lib/crypto/arm}/chacha-neon-core.S |  0
+ .../crypto/arm}/chacha-scalar-core.S             |  0
+ .../crypto => lib/crypto/arm}/poly1305-armv4.pl  |  0
+ .../crypto => lib/crypto/arm}/poly1305-glue.c    |  0
+ .../crypto => lib/crypto/arm}/sha256-armv4.pl    |  0
+ .../lib/crypto => lib/crypto/arm}/sha256-ce.S    |  0
+ {arch/arm/lib/crypto => lib/crypto/arm}/sha256.c |  0
+ lib/crypto/arm64/.gitignore                      |  2 ++
+ .../lib/crypto => lib/crypto/arm64}/Kconfig      |  0
+ .../lib/crypto => lib/crypto/arm64}/Makefile     |  0
+ .../crypto/arm64}/chacha-neon-core.S             |  0
+ .../crypto/arm64}/chacha-neon-glue.c             |  0
+ .../crypto/arm64}/poly1305-armv8.pl              |  0
+ .../crypto => lib/crypto/arm64}/poly1305-glue.c  |  0
+ .../crypto => lib/crypto/arm64}/sha2-armv8.pl    |  0
+ .../lib/crypto => lib/crypto/arm64}/sha256-ce.S  |  0
+ .../lib/crypto => lib/crypto/arm64}/sha256.c     |  0
+ .../lib/crypto => lib/crypto/mips}/.gitignore    |  0
+ .../mips/lib/crypto => lib/crypto/mips}/Kconfig  |  0
+ .../mips/lib/crypto => lib/crypto/mips}/Makefile |  0
+ .../lib/crypto => lib/crypto/mips}/chacha-core.S |  0
+ .../lib/crypto => lib/crypto/mips}/chacha-glue.c |  0
+ .../crypto => lib/crypto/mips}/poly1305-glue.c   |  0
+ .../crypto => lib/crypto/mips}/poly1305-mips.pl  |  0
+ .../lib/crypto => lib/crypto/powerpc}/Kconfig    |  0
+ .../lib/crypto => lib/crypto/powerpc}/Makefile   |  0
+ .../crypto/powerpc}/chacha-p10-glue.c            |  0
+ .../crypto/powerpc}/chacha-p10le-8x.S            |  0
+ .../crypto/powerpc}/poly1305-p10-glue.c          |  0
+ .../crypto/powerpc}/poly1305-p10le_64.S          |  0
+ .../crypto/powerpc}/sha256-spe-asm.S             |  0
+ .../lib/crypto => lib/crypto/powerpc}/sha256.c   |  0
+ .../lib/crypto => lib/crypto/riscv}/Kconfig      |  0
+ .../lib/crypto => lib/crypto/riscv}/Makefile     |  0
+ .../crypto/riscv}/chacha-riscv64-glue.c          |  0
+ .../crypto/riscv}/chacha-riscv64-zvkb.S          |  0
+ .../sha256-riscv64-zvknha_or_zvknhb-zvkb.S       |  0
+ .../lib/crypto => lib/crypto/riscv}/sha256.c     |  0
+ .../s390/lib/crypto => lib/crypto/s390}/Kconfig  |  0
+ .../s390/lib/crypto => lib/crypto/s390}/Makefile |  0
+ .../lib/crypto => lib/crypto/s390}/chacha-glue.c |  0
+ .../lib/crypto => lib/crypto/s390}/chacha-s390.S |  0
+ .../lib/crypto => lib/crypto/s390}/chacha-s390.h |  0
+ .../s390/lib/crypto => lib/crypto/s390}/sha256.c |  0
+ .../lib/crypto => lib/crypto/sparc}/Kconfig      |  0
+ .../lib/crypto => lib/crypto/sparc}/Makefile     |  0
+ .../lib/crypto => lib/crypto/sparc}/sha256.c     |  0
+ .../lib/crypto => lib/crypto/sparc}/sha256_asm.S |  0
+ .../x86/lib/crypto => lib/crypto/x86}/.gitignore |  0
+ {arch/x86/lib/crypto => lib/crypto/x86}/Kconfig  |  0
+ {arch/x86/lib/crypto => lib/crypto/x86}/Makefile |  0
+ .../lib/crypto => lib/crypto/x86}/blake2s-core.S |  0
+ .../lib/crypto => lib/crypto/x86}/blake2s-glue.c |  0
+ .../crypto/x86}/chacha-avx2-x86_64.S             |  0
+ .../crypto/x86}/chacha-avx512vl-x86_64.S         |  0
+ .../crypto/x86}/chacha-ssse3-x86_64.S            |  0
+ .../lib/crypto => lib/crypto/x86}/chacha_glue.c  |  0
+ .../crypto/x86}/poly1305-x86_64-cryptogams.pl    |  0
+ .../crypto => lib/crypto/x86}/poly1305_glue.c    |  0
+ .../crypto => lib/crypto/x86}/sha256-avx-asm.S   |  0
+ .../crypto => lib/crypto/x86}/sha256-avx2-asm.S  |  0
+ .../crypto => lib/crypto/x86}/sha256-ni-asm.S    |  0
+ .../crypto => lib/crypto/x86}/sha256-ssse3-asm.S |  0
+ {arch/x86/lib/crypto => lib/crypto/x86}/sha256.c |  0
+ 87 files changed, 38 insertions(+), 30 deletions(-)
+ create mode 100644 arch/arm/lib/.gitignore
+ delete mode 100644 arch/arm/lib/crypto/.gitignore
+ create mode 100644 arch/arm64/lib/.gitignore
+ delete mode 100644 arch/arm64/lib/crypto/.gitignore
+ create mode 100644 arch/mips/lib/.gitignore
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/Kconfig (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/Makefile (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/blake2s-core.S (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/blake2s-glue.c (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/chacha-glue.c (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/chacha-neon-core.S (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/chacha-scalar-core.S (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/poly1305-armv4.pl (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/poly1305-glue.c (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/sha256-armv4.pl (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/sha256-ce.S (100%)
+ rename {arch/arm/lib/crypto => lib/crypto/arm}/sha256.c (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/Kconfig (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/Makefile (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/chacha-neon-core.S (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/chacha-neon-glue.c (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/poly1305-armv8.pl (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/poly1305-glue.c (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/sha2-armv8.pl (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/sha256-ce.S (100%)
+ rename {arch/arm64/lib/crypto => lib/crypto/arm64}/sha256.c (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/.gitignore (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/Kconfig (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/Makefile (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/chacha-core.S (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/chacha-glue.c (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/poly1305-glue.c (100%)
+ rename {arch/mips/lib/crypto => lib/crypto/mips}/poly1305-mips.pl (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/Kconfig (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/Makefile (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/chacha-p10-glue.c (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/chacha-p10le-8x.S (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/poly1305-p10-glue.c (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/poly1305-p10le_64.S (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/sha256-spe-asm.S (100%)
+ rename {arch/powerpc/lib/crypto => lib/crypto/powerpc}/sha256.c (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/Kconfig (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/Makefile (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-glue.c (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-zvkb.S (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/sha256-riscv64-zvknha_or_zvknhb-zvkb.S (100%)
+ rename {arch/riscv/lib/crypto => lib/crypto/riscv}/sha256.c (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/Kconfig (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/Makefile (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/chacha-glue.c (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/chacha-s390.S (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/chacha-s390.h (100%)
+ rename {arch/s390/lib/crypto => lib/crypto/s390}/sha256.c (100%)
+ rename {arch/sparc/lib/crypto => lib/crypto/sparc}/Kconfig (100%)
+ rename {arch/sparc/lib/crypto => lib/crypto/sparc}/Makefile (100%)
+ rename {arch/sparc/lib/crypto => lib/crypto/sparc}/sha256.c (100%)
+ rename {arch/sparc/lib/crypto => lib/crypto/sparc}/sha256_asm.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/.gitignore (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/Kconfig (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/Makefile (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/blake2s-core.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/blake2s-glue.c (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/chacha-avx2-x86_64.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/chacha-avx512vl-x86_64.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/chacha-ssse3-x86_64.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/chacha_glue.c (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/poly1305-x86_64-cryptogams.pl (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/poly1305_glue.c (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/sha256-avx-asm.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/sha256-avx2-asm.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/sha256-ni-asm.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/sha256-ssse3-asm.S (100%)
+ rename {arch/x86/lib/crypto => lib/crypto/x86}/sha256.c (100%)
 
-(it seems to use the shake256 hash by default)
-
-https://github.com/stefanberger/linux-ima-namespaces/commits/mldsa.06092025/
-
-There's lots of cleanup needed, but with a test suite in user space, 
-this should not be too difficult.
+-- 
+2.50.0
 
