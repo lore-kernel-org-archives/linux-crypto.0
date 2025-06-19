@@ -1,44 +1,95 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E9023D2A5;
-	Thu, 19 Jun 2025 12:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9782417F2
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Jun 2025 12:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750336311; cv=none; b=hqr6SnWMfHFaPDYIRjvyT/mXkZnN5G6QX96YlfA99c9WbGWqa26jdqLEmj8PN2NT+WhggGx2YBGDhJuLBG5hGGpvWsfxtlZWZsBTM4Kf0fELMVGIpFLtRSDQqVihapsudRC/0d7bRG9FSG+Cf+f4540SA51zA27Gd9imqOHog9k=
+	t=1750337991; cv=none; b=fh0uAFX3eF10qzCwYYC242RAp49wH7poNwRKB2MfcTs/HAChh03pK3shZZ0G7AI2gCYfBZEicPsMxc4yNq0JOIS45B2C/+CJngnnTf/mrGoTGpww2sxEHowXR/zRlt6Y0uDOt7wo11DWvuyxYkEmsPzx7e8NwuQw1hk80TYjkKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750336311; c=relaxed/simple;
-	bh=FHJKzlnEQQqv5/RHU8cRM4LVX+71p8k/NOpMFy86sKE=;
+	s=arc-20240116; t=1750337991; c=relaxed/simple;
+	bh=hzUwxanX9FkaxmnBz6ieL27U5CQ3U+3fFh7ugzU4ymg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jk5v8eczlpstozfroO4uVPUBTeL/37j04o4UHcTABCOZ89XuLyuNSO+GY6Q79OTvRZp7y2U/TuotbPiJUMFxCQ4T99EeMBWCHyRB7i4xfsxsi/9y6+SrMLn7tM7qXleljqLbxkOIQ2jAPSHK0bVl/qEnHwtVOg8ZsoKD2KqKOoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	 Content-Type:Content-Disposition:In-Reply-To; b=k/wmeAhOlwE99jZ4UcgFMuLhOL1ihi3353wELkCUb2o4BG19hKU/El5Pdu2/drff7HoCRxOCv5ZOR3DMdzzKLN9idf+bAjTg1krp3jJr8WzqzXDkxI1jxJrG3WED7Om4wfDQ2RXdnvNoFP/XycxubojaQDoMgdSCx997LhhodTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a7pFG0JK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dg4ZIBXY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a7pFG0JK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dg4ZIBXY; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a7pFG0JK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dg4ZIBXY";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a7pFG0JK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dg4ZIBXY"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 8FD0B2C000B7;
-	Thu, 19 Jun 2025 14:31:40 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 3DCA93A07F9; Thu, 19 Jun 2025 14:31:40 +0200 (CEST)
-Date: Thu, 19 Jun 2025 14:31:40 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
-	torvalds@linux-foundation.org, Paul Moore <paul@paul-moore.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Clemens Lang <cllang@redhat.com>,
-	David Bohannon <dbohanno@redhat.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-Message-ID: <aFQDLCvTs8IaAQI_@wunner.de>
-References: <501216.1749826470@warthog.procyon.org.uk>
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 68F2F211CF;
+	Thu, 19 Jun 2025 12:59:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750337988;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
+	b=a7pFG0JKoS/RamkB8c+lYWRY6y60He2zTYbjRBZDHW6nnhBa4rPI80S3fBqxoAy8M+rotM
+	Sc5bMfzjG9RbDZ1LLVLlNSLQaXIHRUM4UBMsDvSDlN6ZttW3xJgO+ndb0XxJUY/mYZKvck
+	x2llTCQaH2jRyyUuLLXO24VOPPlNbQ8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750337988;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
+	b=Dg4ZIBXY6n2RO9iJ67FWxk51JnmXZ148Ok2UKpD4/yWwkrttD3hLHGD3Ef33ctkusqtfZl
+	C4ifcAUBC9ruaRDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=a7pFG0JK;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Dg4ZIBXY
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750337988;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
+	b=a7pFG0JKoS/RamkB8c+lYWRY6y60He2zTYbjRBZDHW6nnhBa4rPI80S3fBqxoAy8M+rotM
+	Sc5bMfzjG9RbDZ1LLVLlNSLQaXIHRUM4UBMsDvSDlN6ZttW3xJgO+ndb0XxJUY/mYZKvck
+	x2llTCQaH2jRyyUuLLXO24VOPPlNbQ8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750337988;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JG4f7NdtHK71JxKn5KK2TZ5uLvejWI4rHxqgPbNhPFo=;
+	b=Dg4ZIBXY6n2RO9iJ67FWxk51JnmXZ148Ok2UKpD4/yWwkrttD3hLHGD3Ef33ctkusqtfZl
+	C4ifcAUBC9ruaRDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C6C913721;
+	Thu, 19 Jun 2025 12:59:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id S90uEsQJVGiMBwAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Thu, 19 Jun 2025 12:59:48 +0000
+Date: Thu, 19 Jun 2025 14:59:44 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Daniel Vacek <neelx@suse.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-btrfs@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>
+Subject: Re: [PATCH 2/2] crypto/crc32[c]: register only "-lib" drivers
+Message-ID: <20250619125944.GJ4037@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20250613183753.31864-1-ebiggers@kernel.org>
+ <20250613183753.31864-3-ebiggers@kernel.org>
+ <20250617201748.GE4037@suse.cz>
+ <20250617202050.GB1288@sol>
+ <20250617204756.GD1288@sol>
+ <CAPjX3Ff-A+M9Ad7iJFTDGAs=M1d6zOqDq48i1GmRn967a_GDsw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,48 +98,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <501216.1749826470@warthog.procyon.org.uk>
+In-Reply-To: <CAPjX3Ff-A+M9Ad7iJFTDGAs=M1d6zOqDq48i1GmRn967a_GDsw@mail.gmail.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 68F2F211CF
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.21 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.21
+X-Spam-Level: 
 
-On Fri, Jun 13, 2025 at 03:54:30PM +0100, David Howells wrote:
-> The good news is that Stephan Mueller has an implemementation that includes
-> kernel bits that we can use, or, at least, adapt:
+On Thu, Jun 19, 2025 at 12:27:13PM +0200, Daniel Vacek wrote:
+> > I revised it to:
+> >
+> > btrfs does export the checksum name and checksum driver name in
+> > /sys/fs/btrfs/$uuid/checksum.  This commit makes the driver name portion
+> > of that file contain "crc32c-lib" instead of "crc32c-generic" or
+> > "crc32c-$(ARCH)".  This should be fine, since in practice the purpose of
+> > the driver name portion of this file seems to have been just to allow
+> > users to manually check whether they needed to enable the optimized
+> > CRC32C code.  This was needed only because of the bug in old kernels
+> > where the optimized CRC32C code defaulted to off and even needed to be
+> > explicitly added to the ramdisk to be used.  Now that it just works in
+> > Linux 6.14 and later, there's no need for users to take any action and
+> > the driver name portion of this is basically obsolete.  (Also, note that
+> > the crc32c driver name already changed in 6.14.)
 > 
-> 	https://github.com/smuellerDD/leancrypto/
+> How about instead removing that part since it's useless now?
 
-I assume Herbert will insist that any new algorithm is hardened
-against side channel attacks.  Thankfully, Stephan seems to have
-put some effort into that:
-
-   "side-channel-resistant: A valgrind-based dynamic side channel
-    analysis is applied to find time-variant code paths based on
-    secret data."
-
-> However!  Not everyone agrees with this.  An alternative proposal
-> would rather get the signature verification code out of the kernel
-> entirely.  Simo Sorce's proposal, for example, AIUI, is to compile
-> all the hashes we need into the kernel at build time, possibly with
-> a hashed hash list to be loaded later to reduce the amount of
-> uncompressible code in the kernel.
-
-Module signing isn't the only motivation to add PQC algorithms to
-the kernel.  Another is SPDM, a protocol for device authentication,
-measurement and secure channel setup.
-
-The DMTF has finally published SPDM 1.4.0 on May 25th and this
-revision adds support for PQC algorithms (see list on page 216):
-
-https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.4.0.pdf
-
-An in-kernel implementation is being worked on by Jonathan (+cc) and me:
-
-https://github.com/l1k/linux/commits/doe
-
-We haven't added SPDM 1.4 support yet, but will have to eventually.
-So far we only support RSA and ECDSA, because that's the baseline
-mandated by the PCIe Base Specification for PCI device authentication.
-I expect there'll be an ECN sooner rather than later to extend the
-baseline to PQC algorithms.
-
-Thanks,
-
-Lukas
+There's no best answer, removing it makes sense but could break
+somebody's scripts parsing that file. The information put to "(...)"
+might be useful in the future again. It's less harm to leave it there
+than to deal with potential fallout if it's removed.
