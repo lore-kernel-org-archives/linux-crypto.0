@@ -1,93 +1,144 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9632580FF
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Jun 2025 22:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B940224B13;
+	Thu, 19 Jun 2025 02:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284355; cv=none; b=KN3MnaUIXQvg5NoIpzEWOujhuJEUz+Jp8kiZgrycBxFKaFoBkqLr4sezeQcqowHV3OJ+AcifvUP9iwiNfSHa4OaEURX4htL11ee6jtEtI/vLshdl8HMDpf27/V8tdlwvb7eTWbTUHztZehaV3751dHHbEKTVVZIr5K6+SSwE2VM=
+	t=1750301542; cv=none; b=AWmmbusGpMmYmLpJBTdS29UMZAzCKXNYTsfdJJq8my9bXw0WclJ+Khw4uweoEuUNQnlpFTT/9NdNQJoCk3dVAgM9yr64YmR7pmxPgMr9z0yTnD1Q8UyM1w5E92p06GeDSXcRg714zfFCnm2nRs5DEr0WHP1k8OuB6TgrZ9LMWW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284355; c=relaxed/simple;
-	bh=5rW+yEzRFYI3xAPSoXYIpVxe+kLenfYFo9nAp3S3p7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E0EYxQaOxEZPvMU3G/1DtzH8M9aA3HjELJqLpah6cICcn8h3Decp0FKZXOmGw4Au0y6VZpz/d8FUF3t8nPM9Rm3vW2l06et8nliKsU1QVtUaJhU0aqyoKUccRbGSUtMEJumWro2kuanjYV9AWdBybInHEBj5L5+iHgmVtjVlD04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qEZl4+Qx; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qEZl4+Qx"
-Date: Wed, 18 Jun 2025 18:05:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750284341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PE2DkpVsnMSMwHSwMo0XH+9GhyNn27nNW7R4KOJ/9vI=;
-	b=qEZl4+Qx+IpgfUEK0yJKqTW+j3yJXYiRb3nHn8pf134PuuPnwKlmqUzSe28SzyoHBlyXDT
-	WTacvxtt6C/NOlM5PfjrshFo0agZqAB2dHQeGVBgTU6Dl4jmtdD7GlHWhioNfhQQgZQWKC
-	aIFOGmhgdL5wvebglcUR12mxO5hA9oQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [GIT PULL] Crypto library fixes for v6.16-rc3
-Message-ID: <dmkpj6q5mjw3bet6orkhcxtxwof4gufxknbroyfuwzrzcmdru6@4dmuaznfvkvz>
-References: <20250618194958.GA1312@sol>
- <w3t36hsxocm3uotbhnonsioomnvkqpmazctyogmx36ehlxezyz@h4vytlcacc7k>
- <20250618215918.GB1639822@google.com>
+	s=arc-20240116; t=1750301542; c=relaxed/simple;
+	bh=G0h+9piz8srcxOhaU5NXSgTuFSOxfqLH7RY2q+y74RA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WFzJ5MTWZNklGhaUgvfviljBF5OMLpWtsH6+d14slctvAU4nD+GeLjST5w8Lz6R0kgv+ru1d4A1bOMiU6D68+4LUwsyx8Xkji/SnZDKLt0qTyrVLdlhSZ+5GrcwST+wGXRctoPtO3dwwt9sfxYAAaCI0aKx+bwu6tiviSWWB0Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.180])
+	by gateway (Coremail) with SMTP id _____8DxQK9ae1NohY0ZAQ--.23696S3;
+	Thu, 19 Jun 2025 10:52:10 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.180])
+	by front1 (Coremail) with SMTP id qMiowMAxj8VPe1NoOXYgAQ--.34847S2;
+	Thu, 19 Jun 2025 10:51:59 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org,
+	herbert@gondor.apana.org.au,
+	jarkko@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	peterhuewe@gmx.de,
+	jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v11 0/4] dd Loongson Security Engine chip driver
+Date: Thu, 19 Jun 2025 10:51:34 +0800
+Message-ID: <20250619025138.2854-1-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618215918.GB1639822@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAxj8VPe1NoOXYgAQ--.34847S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCr43XFy5WrW7Zw17try3ZFc_yoW5Zr17pF
+	45C3yakr4UJFsrCr93J348CFyfZ3s3Jr9xKa9rXw15ur9xAa48XrW2kFyUAa17AFyrJry2
+	vFWkCF4UCF1UJacCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-On Wed, Jun 18, 2025 at 09:59:18PM +0000, Eric Biggers wrote:
-> On Wed, Jun 18, 2025 at 05:40:27PM -0400, Kent Overstreet wrote:
-> > On Wed, Jun 18, 2025 at 12:49:58PM -0700, Eric Biggers wrote:
-> > > The following changes since commit 19272b37aa4f83ca52bdf9c16d5d81bdd1354494:
-> > > 
-> > >   Linux 6.16-rc1 (2025-06-08 13:44:43 -0700)
-> > > 
-> > > are available in the Git repository at:
-> > > 
-> > >   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-> > > 
-> > > for you to fetch changes up to 9d4204a8106fe7dc80e3f2e440c8f2ba1ba47319:
-> > > 
-> > >   lib/crypto/poly1305: Fix arm64's poly1305_blocks_arch() (2025-06-16 12:51:34 -0700)
-> > > 
-> > > ----------------------------------------------------------------
-> > > 
-> > > - Fix a regression in the arm64 Poly1305 code
-> > 
-> > Some more tests too, perhaps? :)
-> > 
-> > This was a bit of a scary one, since poly1305 was returning an
-> > inconsistent result, not total garbage. Meaning most of the tests
-> > passed, but fortunately the migrate tests read data written by userspace
-> > with a different library.
-> 
-> Yep, I have a KUnit test for Poly1305 planned.  Actually, I already wrote a
-> preliminary one and used it to test this patch.  I just haven't sent it out for
-> review quite yet, since so far it's just a one-off test that isn't too complete,
-> and I'm not satisfied with it quite yet.  I'd like to reuse the
-> hash-test-template.h I'm adding for SHA-2
-> (https://lore.kernel.org/linux-crypto/20250616014019.415791-5-ebiggers@kernel.org/)
-> which would result in a more complete test.  I'd also like to include tests for
-> some of the overflow cases that are specific to Poly1305.
-> 
-> So we're kind of still in an early stage where we're defining what the KUnit
-> testing for lib/crypto/ is going to look like.  I am working on it, though!
+The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
+accelerator engines. Each engine have its own DMA buffer provided
+by the controller. The kernel cannot directly send commands to the
+engine and must first send them to the controller, which will
+forward them to the corresponding engine. Based on these engines,
+TPM2 have been implemented in the chip, then let's treat TPM2 itself
+as an engine.
 
-I do a little dance any time someeone says something like that about
-testing. Bravo :)
+v11: Put all updates to the MAINTAINERS in one patch
+     crypto: statically initialize rng_devices.lock, use this lock in
+             loongson_rng_probe().
 
-(And now, back to sifting through the rest of the rc1 breakage.)
+v10: mfd: Cleanned up coding style.
+     crypto: Unlimited tfm
+     tpm: Added error check
+
+v9: Moved the base driver back to drivers/mfd. Cleanned up coding style.
+
+v8: Like Lee said, the base driver goes beyond MFD scope. Since these
+    are all encryption related drivers and SM2, SM3, and SM4 drivers
+    will be added to the crypto subsystem in the future, the base driver
+    need to be changed when adding these drivers. Therefore, it may be
+    more appropriate to place the base driver within the crypto
+    subsystem.
+
+    Removed complete callback in all driver. Removed the concepts of
+    "channel", "msg" and "request" as they may be confusing. Used the
+    concepts of "egnine" and "command" may be better.
+
+v7: Addressed Huacai's comments.
+
+v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
+
+    crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+    ls6000se-rng.c ->loongson-rng.c
+
+    tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+
+v5: mfd: Registered "ls6000se-rng" device in mfd driver
+    tpm: Prefix all with tpm_loongson instead of tpm_lsse.
+         Replace all "ls6000se" with "loongson"
+
+v4: tpm: Removed MODULE_AUTHOR fields.
+         Prefix all with tpm_lsse instead of tpm.
+
+v3: Put the updates to the MAINTAINERS in a separate patch.
+    tpm: Added reminder about Loongson security engine to git log.
+
+v2: Removed misc driver. Added tpm driver.
+
+Qunqin Zhao (4):
+  mfd: Add support for Loongson Security Engine chip controller
+  crypto: loongson - add Loongson RNG driver support
+  tpm: Add a driver for Loongson TPM device
+  MAINTAINERS: Add entry for Loongson Security Engine drivers
+
+ MAINTAINERS                            |   9 +
+ drivers/char/tpm/Kconfig               |   9 +
+ drivers/char/tpm/Makefile              |   1 +
+ drivers/char/tpm/tpm_loongson.c        |  84 ++++++++
+ drivers/crypto/Kconfig                 |   1 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/loongson/Kconfig        |   5 +
+ drivers/crypto/loongson/Makefile       |   1 +
+ drivers/crypto/loongson/loongson-rng.c | 209 ++++++++++++++++++++
+ drivers/mfd/Kconfig                    |  11 ++
+ drivers/mfd/Makefile                   |   2 +
+ drivers/mfd/loongson-se.c              | 253 +++++++++++++++++++++++++
+ include/linux/mfd/loongson-se.h        |  53 ++++++
+ 13 files changed, 639 insertions(+)
+ create mode 100644 drivers/char/tpm/tpm_loongson.c
+ create mode 100644 drivers/crypto/loongson/Kconfig
+ create mode 100644 drivers/crypto/loongson/Makefile
+ create mode 100644 drivers/crypto/loongson/loongson-rng.c
+ create mode 100644 drivers/mfd/loongson-se.c
+ create mode 100644 include/linux/mfd/loongson-se.h
+
+
+base-commit: 52da431bf03b5506203bca27fe14a97895c80faf
+-- 
+2.45.2
+
