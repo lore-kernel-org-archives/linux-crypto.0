@@ -1,55 +1,64 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CF81624DE;
-	Thu, 19 Jun 2025 23:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030AD81ACA;
+	Fri, 20 Jun 2025 03:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750375369; cv=none; b=ZOYJD4HRRd4MILHMUk8d6A+fEDoCwtVY1MQZG6KQPYDcyS5xHsKVEcxKA5Qic66J0ef6idpwewZxO+xNKw+IEeK8anPVwLSGGPseCtBQrxHOvEmSCcWshJKv3v7jv3H1SkMzaeHON6dkVTcN6YJUpQhxRtf6BCYvDmCS7inJlmM=
+	t=1750388482; cv=none; b=CWP7IDGKYuGTl95n/XaXCC9mF+4dkLHcTZDAZ6tzEXRRClc8SqPZKod1ZDuAzqwNDmz9K3JXtsm8IfbOQ0tO+WLxRy004pd7GiSj2VQiBWRkP7zPYb6dvWT73iO0lZugEsKihDV1j9Dn2W3tyGGEGxct8EIAEEEHjKfHempL58w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750375369; c=relaxed/simple;
-	bh=Vfhc+F1NBou2Cp7Orz20Okwcw/W+PxblCM7CBaW11eE=;
+	s=arc-20240116; t=1750388482; c=relaxed/simple;
+	bh=f7V5rYWc1EwjcgrxpnoH3ziozc2NpXhZC+YcuAXFxeE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUAh52GwhKO/A91CE8/NI1IHik/lGqbnYzJx3oFr2glR9l4h6HoaJezaOzF+zH5Ad8qYEDyeTyJJF5+JUqsxnD9Mu4TO1pdtAFdEF9asrHRXDkTZPxEJhRY5MmL2VN/x8NfGtWi3KP5yXa5fLb6fCwTbEt3vuKJJB+lkVxjIWHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=nDz8fjGx; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJJqgGJVibP7XMKwp3nRZRE6FnDGLhiEWrTczavCDs1PVQKmNn4KYjRZ2+3mmWMfc3wAEosIsraTDyiLVJapJTb8Z1eaCz9lfzTlM3szpSdzlg0XNrkq3DHcvhYa5BzqV1OIc6abRi2HNYeKzHXamP9ndopP7rj50SW4sSoCPU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ecMWs2IE; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="nDz8fjGx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=W+Y2lsXPJdi1RUH/PSEB/FJQRlCoG8VD2Nqg0GB52nc=; b=nDz8fjGxN2pP7BV25fGFwk6IrT
-	ABdXg3zraCQs5jIG/UqGltCl9nP70gM7q8Cf8T+Kv+zQnujizKWmGKrFVJ3OQiruAARi6R2qXoXKx
-	qEH28ypgsmFsOp4+KMS8+1D6QCwxgIfsINmhcLu5XZupxv+hy+Ao/ipE7wY60o4I1IQma8VzYwcvJ
-	Y+e26aicEpu4ObHlSt0D5XMJq+AGJSmhMbhJP6ifuo1I1PZA4fyuLuykPjJZeKS2eSBERAmaqRRVc
-	thTSH5+0QfvPJqXepnFMISklrlohJ19s5PSob7hZtYmhbPn3YB0HVuYsCnzkAB/mVMPoH0KqhoRay
-	OPtOi5SQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uSOL8-000R2r-10;
-	Fri, 20 Jun 2025 07:22:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jun 2025 07:22:26 +0800
-Date: Fri, 20 Jun 2025 07:22:26 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: David Howells <dhowells@redhat.com>,
-	Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
-	torvalds@linux-foundation.org, Paul Moore <paul@paul-moore.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Clemens Lang <cllang@redhat.com>,
-	David Bohannon <dbohanno@redhat.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: Module signing and post-quantum crypto public key algorithms
-Message-ID: <aFSbsteSI9xTRA1Q@gondor.apana.org.au>
-References: <501216.1749826470@warthog.procyon.org.uk>
- <aFQDLCvTs8IaAQI_@wunner.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ecMWs2IE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750388481; x=1781924481;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=f7V5rYWc1EwjcgrxpnoH3ziozc2NpXhZC+YcuAXFxeE=;
+  b=ecMWs2IEvV9YE7XE7ZHHPOkzvHFd4oJPHx4eakVSUTkCgtcQFY0jSBVy
+   OXfOQphJVULkLXIJoWQxrL8uGVyBxnGFO2V47z19jmxRoCUhwz24XbXwC
+   j3gTg36Fd9zRhQW/j8CsLlBGPChwLUKLJS5u89TfJhGZGhI8QWmf3fPm9
+   ci7UJSrL10kel2QIMCF0VPmoekFUzPKUuXTzNNUtPL/vRnzsAemn3b8ll
+   zB0YsU9fEswWaYSIyRWxWTXCHpJ+R4lVCZMCInRj65lmlOlkDOFuftO6s
+   3asugS5qFMEiCdM302xvx6i9t7W86OrqYf1qJkcnGx6VG3vrdaznos0W8
+   w==;
+X-CSE-ConnectionGUID: gLPstCzDQjuo8/JZiDINmA==
+X-CSE-MsgGUID: 8tjdHGr7TSKgPSc0PK2h/w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="51871292"
+X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
+   d="scan'208";a="51871292"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 20:01:20 -0700
+X-CSE-ConnectionGUID: AscknAMsTSqjYgMPwfOSEw==
+X-CSE-MsgGUID: zF1ixVj+S4iOTJcojkyKRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
+   d="scan'208";a="181664045"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 19 Jun 2025 20:01:17 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uSS0B-000LJu-1o;
+	Fri, 20 Jun 2025 03:01:15 +0000
+Date: Fri, 20 Jun 2025 11:00:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>, clabbe.montjoie@gmail.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, wens@csie.org, jernej.skrabec@gmail.com,
+	samuel@sholland.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Subject: Re: [PATCH 10/10] crypto: sun8i-ce - implement request batching
+Message-ID: <202506201006.eQ2P1PuC-lkp@intel.com>
+References: <20250619122316.2587236-11-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,19 +67,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFQDLCvTs8IaAQI_@wunner.de>
+In-Reply-To: <20250619122316.2587236-11-ovidiu.panait.oss@gmail.com>
 
-On Thu, Jun 19, 2025 at 02:31:40PM +0200, Lukas Wunner wrote:
->
-> I assume Herbert will insist that any new algorithm is hardened
-> against side channel attacks.  Thankfully, Stephan seems to have
-> put some effort into that:
+Hi Ovidiu,
 
-No I think we should instead only support public keys.  There is
-no valid use-case for private keys in the kernel.
+kernel test robot noticed the following build warnings:
 
-Cheers,
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on next-20250619]
+[cannot apply to sunxi/sunxi/for-next herbert-crypto-2.6/master linus/master v6.16-rc2]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ovidiu-Panait/crypto-sun8i-ce-remove-channel-timeout-field/20250619-202957
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250619122316.2587236-11-ovidiu.panait.oss%40gmail.com
+patch subject: [PATCH 10/10] crypto: sun8i-ce - implement request batching
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250620/202506201006.eQ2P1PuC-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250620/202506201006.eQ2P1PuC-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506201006.eQ2P1PuC-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c: In function 'sun8i_ce_dump_task_descriptors':
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:178:52: warning: '%d' directive output may be truncated writing between 1 and 11 bytes into a region of size 7 [-Wformat-truncation=]
+     178 |                 snprintf(task, sizeof(task), "TASK %d:", i);
+         |                                                    ^~
+   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:178:46: note: directive argument in the range [-2147483641, 2147483646]
+     178 |                 snprintf(task, sizeof(task), "TASK %d:", i);
+         |                                              ^~~~~~~~~~
+   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:178:17: note: 'snprintf' output between 8 and 18 bytes into a destination of size 12
+     178 |                 snprintf(task, sizeof(task), "TASK %d:", i);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +178 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+
+   171	
+   172	static void sun8i_ce_dump_task_descriptors(struct sun8i_ce_flow *chan)
+   173	{
+   174		for (int i = 0; i < chan->reqs_no; ++i) {
+   175			struct ce_task *cet = &chan->tl[i];
+   176			char task[CE_MAX_TASK_DESCR_DUMP_MSG_SIZE];
+   177	
+ > 178			snprintf(task, sizeof(task), "TASK %d:", i);
+   179			print_hex_dump(KERN_INFO, task, DUMP_PREFIX_NONE, 16, 4,
+   180				       cet, sizeof(struct ce_task), false);
+   181		}
+   182	}
+   183	
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
