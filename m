@@ -1,73 +1,89 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDF7101EE;
-	Fri, 20 Jun 2025 03:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B37801;
+	Fri, 20 Jun 2025 03:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750388885; cv=none; b=Kn7B1uNdQpea06K5HFl85fmSnRaZtgLb6uhX/FN3RddR8oQ83rShhifp0ngQFomZ3sc208QqxFNwsBd24Rnh0XN1y9sWVTXsBo3YPzanmi0fFjNj0PB0dvnypRoK4+qRGPfI9w18qp+nJv19K6AqPqSFJVf5Eo7tNy/qPGJwkiM=
+	t=1750389475; cv=none; b=ENtZzKTRzElL/tpztxaXqLc8YIik3LLw/IrfjL1Fa2kWuwXzknjs5kmMHDaSpVHP422ZmQsxYiq/xnRAJj63c9eTnaWSYhlnDmuVJL8BTlP1nmlcEMAXJZWrUG2maQxsoSt6m47K78JhBdp3SWXfcape6aQhU4izMpMsw15ce6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750388885; c=relaxed/simple;
-	bh=jVnlMGB2Gp+7PhxPSzMaL1mkyfhdpjLlkrpSBTpoITk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L0aGmbxZBBkizkWDQBJmit5KemOTdBEUDNBUHzCoWkh38kkeZKT3AXYHdQyKWazvyWcEqNDWMZnxaO+mfRCT+Q3M4pna6Zk92PgstfWowmHC1kuKYLVu2ktIvuaerXcfCXNT08u3HgQ6WdDXlOlzKBw3DJbx+9QHaa2P/uKSM4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [192.168.43.209] (om126234060233.16.openmobile.ne.jp [126.234.60.233])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id 6E30F3F104;
-	Fri, 20 Jun 2025 05:07:45 +0200 (CEST)
-Message-ID: <99c059c6-6360-47d0-8513-7171d9f2e9af@hogyros.de>
-Date: Fri, 20 Jun 2025 12:07:39 +0900
+	s=arc-20240116; t=1750389475; c=relaxed/simple;
+	bh=f4WAufMQq5ggmSNmCwoJqGR4KXxe3q9/JSCnVafH2zQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=b0D8WBlQ2GLlEHcswY7UlJsUyCdZbUhsoUvXec6c+Yy9Z4CItwrYOO0ON7XDto/oxGy/AbQRNszeYVrhij1Li22kO+sZIgHx8jGVjN4fRYfZuC+hApDxB8z0saJcvZavr4jAxYfbJs8qCR57t+gWOLm/3nc/46gu23EmG+lz5Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=oXfvvIux; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="oXfvvIux"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=mQjZYQXHuM7O2SlRUBbFiuHe1vtibvQHiSpaNsCAw+Q=; b=oXfvvIuxaqH9EOG75UkLdv1B+C
+	3HtP6hO7lT2rA3p6XfxzeAvwJxGWyJdAwwbfloOWJMhrjEudqtxKqxCpSIBbJXU7WQrpVvvEi4Z4W
+	8cW5xe/LG/DyP9BzIkeFoFV+yd1l3eK8SZKY+FM1Z4S/qrRDhzUbiBp6og6YuxdalbGFck+A0Jdgx
+	9YAY6r2oxgPE40MTX18HtuKEmUqEwIuPZTu33Hv+h0K83mpFPVnBcPaejbxlyGSZpjAMeOR0jGDrV
+	r3XgLDPIm/7dz7cT7M/+mN8c0mraosjJHvtWBjpPG2NWREoLEy8Zhkrio/ZxdILSp8uTrFpDa8B8u
+	xZiyk2Hg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uSS0o-000T52-2z;
+	Fri, 20 Jun 2025 11:17:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jun 2025 11:17:42 +0800
+Date: Fri, 20 Jun 2025 11:17:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.16
+Message-ID: <aFTS1jNQ6DB51gUs@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/2] Add support for Texas Instruments DTHE V2 crypto
- accelerator
-To: Eric Biggers <ebiggers@kernel.org>, T Pratham <t-pratham@ti.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kamlesh Gurudasani <kamlesh@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
- Praneeth Bajjuri <praneeth@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>
-References: <20250603124217.957116-1-t-pratham@ti.com>
- <20250617042755.GG8289@sol>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <20250617042755.GG8289@sol>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi,
+Hi Linus:
 
-On 6/17/25 13:27, Eric Biggers wrote:
+The following changes since commit 40a98e702b528c631094f2e524d309faf33dc774:
 
-> Numbers, please.  What is the specific, real use case in Linux where this
-> patchset actually improves performance?  Going off the CPU and back again just
-> to en/decrypt some data is hugely expensive.
+  crypto: hkdf - move to late_initcall (2025-06-11 10:59:45 +0800)
 
-It would be cool to get some numbers from the IBM folks as well -- the 
-NX coprocessor can do AES and SHA, but it is not enabled in the Linux 
-kernel, only GZIP is (where I can definitely see a benefit, usually 
-somewhere between 3 to 9 GB/s depending on how hard it needs to look for 
-repetitions), so I'm wondering if that is an oversight, or deliberate.
+are available in the Git repository at:
 
-I also wonder if for some hardware, we can get a speedup by offloading 
-and polling for completion instead of waiting for an interrupt. It feels 
-wrong, but the thread is blocked no matter what.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.16-p5
 
-The other thing to ponder would be whether we can define a data size 
-threshold where the offloading overhead becomes small enough that it's 
-still worth it. That would also work for fscrypt, because with 4k 
-blocks, it would simply never choose the offload engine.
+for you to fetch changes up to df29f60369ccec0aa17d7eed7e2ae1fcdc9be6d4:
 
-    Simon
+  crypto: ahash - Fix infinite recursion in ahash_def_finup (2025-06-18 17:02:02 +0800)
+
+----------------------------------------------------------------
+This push fixes a regression in ahash (broken fallback finup)
+and reinstates a Kconfig option to control the extra self-tests.
+----------------------------------------------------------------
+
+Eric Biggers (1):
+      crypto: testmgr - reinstate kconfig control over full self-tests
+
+Herbert Xu (1):
+      crypto: ahash - Fix infinite recursion in ahash_def_finup
+
+ crypto/Kconfig                 | 25 +++++++++++++++++++++----
+ crypto/ahash.c                 |  4 +++-
+ crypto/testmgr.c               | 15 ++++++++++++---
+ include/crypto/internal/simd.h |  6 ++++--
+ lib/crypto/Makefile            |  2 +-
+ 5 files changed, 41 insertions(+), 11 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
