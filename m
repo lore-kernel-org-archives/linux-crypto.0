@@ -1,65 +1,65 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705C030E83E
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Jun 2025 08:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9D91E1E0C
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Jun 2025 08:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750406658; cv=none; b=RJHbSBqqO0727yvVNsitf1w8cfxr4/RXK+VvhHstzDVVcYUSrMEIJR47aUJo14vi4S06wR0GVY2mAF+qXP60qYYQmzZg6rgi+Z6bDlM5VDry/lnDeMrUB4yfM5D8xgE/mxEG1xZdaxDlOKt3Rh21UVY5aWlu7mtoLpzvQw3X39g=
+	t=1750407058; cv=none; b=BFBMKzwQ9Kbsal+NWzivXYRqW3gzyrPvau4i1VOYMCEQuB3dULi40BNHBcTyMy2jkSN+GpizIZ9zpahC3X+VwNhgGMsyUB/RCSCJuEazW4mY6uJOa1MJN5pW+b05u1IzHRef3LwsANBrclx6xWAzDEpxH0jVbF6zZ+rvl+N1gKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750406658; c=relaxed/simple;
-	bh=n/3fIWHZfJzhOTujA53DP7keuhAqVyp7k3fLFkQyb3A=;
+	s=arc-20240116; t=1750407058; c=relaxed/simple;
+	bh=es6iHuGCFi6dh05++Ucfyuu+xBaBAubXXAHCPrADR6I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hML5SqhPetUDJ4DC4ee0yiZTanJVX/9VHWSyPoxVDXu6BsSkB3IUZOkHtc73BaNY64a5Gv/2h/hS3+kDOpYnfwZH62Vq1C6joqaVaZiIje0RPNuufa+ZATnQWc3kGhlQXeTBLkdvUGDI6ZkyGSnkw2ZAmwLYW32ulY8zvzJCup0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dAd49aSk; arc=none smtp.client-ip=209.85.208.47
+	 In-Reply-To:Content-Type; b=FZm4giVIqYpa5mP98WOaFMUPsNTwxijsZbdtkgBfaskE32CDWboqQyM2mg+HroL12fhLcaYohCDJyA+5mDTw2OnLXe7NIRGupqN+WrqsuwQEHXCAAfm2DGs096jsNgUSFRv0CR6PIBwOSJ64kwYN95nTU97CCTh5Xz8q/HuP7xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfeRqwbx; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dAd49aSk"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-607ea238c37so3011984a12.2
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Jun 2025 01:04:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfeRqwbx"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a4fb9c2436so784771f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Jun 2025 01:10:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750406655; x=1751011455; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750407055; x=1751011855; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XxgHvAza9lzucEyGfJBYSkwi+l6FJLLetBFw6IaVvqg=;
-        b=dAd49aSk1WkQ1ip7rFKt+ClM4cFTXqM6x549Ibf0NJmBRz3Q6amYIpCrHbQCZFpi1/
-         pnCGp4gn8+naTJDoeLTxLIaV9Y/WeOzEIauzDe5rvm2guFpya+gffMWlJQZFcCnvjoc8
-         0PIr+U0+ibopGi7JJ44hQQ+Ntigaa9GXdqh+jkxsepPG94UjAgnULT1aiCR/vITddAPq
-         dt7oABTPJ7jjKDwKA2aovTWHWswLk1mdAqOijguQgLKy0UAQgZevoJ8hdZJDgmIPTP9e
-         DnDLPkYIaB/CUUHgxTFrV0a2XYisifbTIYt9RQuHNJ9Hbgmts68+nXIjCHtsLOHHDFzX
-         fohQ==
+        bh=IsMduxzxykvmdLpPy0cCHA2sqZJVkvDNGSlWWAG7xVc=;
+        b=OfeRqwbx5ssmnFO1c36Fnu6nt6oxNqsdW1eQYJQIGqg9EP5gSauQpIPSbv98NvdZUx
+         jyAxtvTk8AMH+Mjeguw9aObvpYnULvAGA8OtYoGpGUOqrFIlCJUUPuCmBQog/peofT19
+         cpA9x3XFian/dUyTNgxO6QHpzktYqAwv2yBmJSMdtGd7Vk04VBpE1iZla2xAW3oorq7F
+         cFFmr3L7GwW12YGNVCXHgyDRm1pAMZNPpsnMTXrd11ccuio7JqGKaOrXkSwRm9zyC92W
+         vPemhRWTcatPPEfHnCBqSYGuiJUnhgGF411Vbt5NCkjk91J4Z9NIsNgJ20qLmFke9azd
+         ySVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750406655; x=1751011455;
+        d=1e100.net; s=20230601; t=1750407055; x=1751011855;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XxgHvAza9lzucEyGfJBYSkwi+l6FJLLetBFw6IaVvqg=;
-        b=Ib+hy7jmCEoS11Nl8QYQ3qR8eGS9g2SPckZrpueuRozP4XMUBtfJDLhmhwSHRxtMm/
-         SUnhnvSLICufp5YHgk5sQqPxDsjGOAU1ftwlUKNL+m0HS9WEfF0IZg8/JiGtKoukXSBz
-         RS4ui8UoOQgLbNkwNgvDL+urmJ43gLgqirTI2atel5GVYGdZNaT3w4yH9YjZf9lh4M9A
-         XO6o6lAVhfdR61IVAEkdtlf2vfaFqqaZgc+C6hC4BRbYf1tEJiArMBQm3ajt5f4bN3J8
-         1xE5BAZnZZ1JYPU+90E0poX4jHbLBHVe2/ffGijVm7xoBdYsL8URlJezhAuhGZbFcXhb
-         awEg==
-X-Gm-Message-State: AOJu0Ywwi6l7BGtFUlLdMzDdrsCARzDpWnkHMNbLtnPG5OBH2fk0aL62
-	aCPwijovChdGmnzqYmnTTqETNd68z4K1NHBucAhq/o6hGdaS+pxmbCHC
-X-Gm-Gg: ASbGncvfFRAxlhX5yQoIk4gHdPU+uJugikmfqO6d9RC+OoOWS0gudAuatFituD92GDF
-	6RDpNMQF4sWwSLmfBjbRUHGK0o8vNMeXLyMAqlCq11QJwXFZxUv7yOzA/nWcSb4z9a+9hjJMWd6
-	f/GGEQwE8nqBTVuP8h80VGDswpyri1MSUGb+fvedyvLB+/F+IUwA5kjKrcGaJWix4OpFe4jKKlH
-	4TyyRghwjtCqnn1NtW7swQcjVb2o8gAA0JQX11JppDbFSZnAx8sq1ViPfcTlWWkpFcQzjpQG7yU
-	QGSHe4e4Phd1OJMzoQ0FRvxHB+S+sVn/aBvUt0U2NWeuJcaXxgc/kRoDLZvnfQYXrQGhc60GpFg
-	+pC7EdqOAbv6TxfttCiX6
-X-Google-Smtp-Source: AGHT+IE5fWGab2EWf6qV2gM2GyKNO3qx+p6jv8lprhcHKBfTDR0H8lDSkJ2uHgsoe6k0mhzzfgsDhw==
-X-Received: by 2002:a05:6402:4316:b0:5f3:f04b:5663 with SMTP id 4fb4d7f45d1cf-60a1cd31008mr1709094a12.24.1750406654469;
-        Fri, 20 Jun 2025 01:04:14 -0700 (PDT)
+        bh=IsMduxzxykvmdLpPy0cCHA2sqZJVkvDNGSlWWAG7xVc=;
+        b=tjcefArUgfB7XD0Gdc8fPGWDcnOZfo/Upvdzlc3zefiiUluUAOVNzn0Tv+9d+YxL+F
+         GFjEwRX8QbtYoYrj6SCdFvpiLV/XMBvW7/x3KHKtAuSiopnX0eL52KXNKNvkW/qeeHIw
+         VjwAHWpEn4KJXEkZ+PlDp81uEkvzRR/zlB9VNdrMRBp3N1M+eFu58TWrEx+ZbnTqXtGD
+         2A0djMlAS/falNgtGrwzr/QCefuYWknS5S2UqjdwOvK8nk3kgAvubljB5NzoOKHxxwLQ
+         te+0Fn6adYWDeDKlTE4ZXrW+2X6CmkNcpxcu3bk2DFeZZeW9HrL1Qhyq+AMpwVoGGL0a
+         bOzQ==
+X-Gm-Message-State: AOJu0Yz/UbggyjiSPQNRLMYFgM6oppGZ+lrOG3IZgF2wg+hlQFvQyqid
+	viHgyOxMiETyMIa8ZE7prw5LV+7BrF5Ok8t37nhBh4z9E5IFBmDBkgT/
+X-Gm-Gg: ASbGncvqIHAZDSNuMPpMuuW9bDueDkIKE1zhUnvGX6+xmu2bRLIoDECrwbkHJ6aWaj6
+	jnwhTc7szBAA7Y2ADMCtsjN2Bt1goCTot92Lu8gtJ6yxYToAZpKxKODKk63TFGIpyyeiFEx5XLf
+	D2wwf3xniKqhEucOgYLj7Hr1OWx+sPL1wbRE/8vO1HefKFwVOhglSds2Y621Fe+FWYTRLsjMliE
+	StihGdiFeAZQEDjo/m2o1oqci4tOj0cje3rW9IHI6qq5UmViOomDRbJxPKmFjw9Ph1qpBU21KhT
+	72qVNzLItjrkGDfHwAcK8qAQvWuW/fJ2JmPwctkzKRey7R62uWGkk8aMR135Wk3YXx4J1xz6vvP
+	tK2jebwhCZny9a/ueTb5SXVa81Nr3pGM=
+X-Google-Smtp-Source: AGHT+IFGZL+y4BQli3kmDheFwRMpwqkGhBG4NZxyb1mS1T1L3ux4ZdCaSezE1yL/5ggst/FgL6Q+vA==
+X-Received: by 2002:a05:6000:4a09:b0:3a5:2208:41d9 with SMTP id ffacd0b85a97d-3a6d12e074emr1466809f8f.40.1750407054585;
+        Fri, 20 Jun 2025 01:10:54 -0700 (PDT)
 Received: from [192.168.8.101] (78-80-16-228.customers.tmcz.cz. [78.80.16.228])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a18cbadb6sm1027090a12.62.2025.06.20.01.04.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d117c40dsm1387990f8f.65.2025.06.20.01.10.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jun 2025 01:04:14 -0700 (PDT)
-Message-ID: <afeb759d-0f6d-4868-8242-01157f144662@gmail.com>
-Date: Fri, 20 Jun 2025 10:04:12 +0200
+        Fri, 20 Jun 2025 01:10:54 -0700 (PDT)
+Message-ID: <fea81d0e-5b80-4247-8231-1e099be5bb1c@gmail.com>
+Date: Fri, 20 Jun 2025 10:10:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -67,13 +67,11 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: dm-crypt: Extend state buffer size in crypt_iv_lmk_one
+Subject: Re: [PATCH] crypto: wp512 - Use API partial block handling
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev
-References: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com>
- <aFTe3kDZXCAzcwNq@gondor.apana.org.au>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+References: <8be28417-2733-4494-8a09-b4343a3bcf3d@gmail.com>
+ <aFT2D0UeO0cQYV1C@gondor.apana.org.au>
 Content-Language: en-US
 From: Milan Broz <gmazyland@gmail.com>
 Autocrypt: addr=gmazyland@gmail.com; keydata=
@@ -119,48 +117,46 @@ Autocrypt: addr=gmazyland@gmail.com; keydata=
  vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
  xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
  Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
-In-Reply-To: <aFTe3kDZXCAzcwNq@gondor.apana.org.au>
+In-Reply-To: <aFT2D0UeO0cQYV1C@gondor.apana.org.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 6/20/25 6:09 AM, Herbert Xu wrote:
-> The output buffer size of of crypto_shash_export is returned by
-> crypto_shash_statesize.  Alternatively HASH_MAX_STATESIZE may be
-> used for stack buffers.
+On 6/20/25 7:47 AM, Herbert Xu wrote:
+> On Thu, Jun 19, 2025 at 11:18:13PM +0200, Milan Broz wrote:
+>>
+>> The bisect points to
+>>
+>> Author: Herbert Xu <herbert@gondor.apana.org.au>
+>> Date:   Thu May 15 13:54:42 2025 +0800
+>>
+>>      crypto: hmac - Add export_core and import_core
+>>
+>>      Add export_import and import_core so that hmac can be used as a
+>>      fallback by block-only drivers.
+>>
+>> Please let me know if you need more info.
 > 
-> Fixes: 8cf4c341f193 ("crypto: md5-generic - Use API partial block handling")
-> Reported-by: Milan Broz <gmazyland@gmail.com>
+> Please try this patch:
+> 
+> ---8<---
+> Use the Crypto API partial block handling.
+>      
 > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Yes, that fixes the issue, thanks!
+Hi,
 
-Tested-by: Milan Broz <gmazyland@gmail.com>
-
-Mikulas, I think this should go through DM tree, could you send it for 6.16?
-The full patch is here
-https://lore.kernel.org/linux-crypto/aFTe3kDZXCAzcwNq@gondor.apana.org.au/T/#u
-
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 9dfdb63220d7..cb4617df7356 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -517,7 +517,10 @@ static int crypt_iv_lmk_one(struct crypt_config *cc, u8 *iv,
->   {
->   	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
->   	SHASH_DESC_ON_STACK(desc, lmk->hash_tfm);
-> -	struct md5_state md5state;
-> +	union {
-> +		struct md5_state md5state;
-> +		u8 state[HASH_MAX_STATESIZE];
-> +	} u;
-
-I am ok with it, as this is an obscure IV case for old devices compatibility,
-but I would kind of expected the algorithm state struct is self-contained...
+Now I get wrong data instead of fail (both on 32bit and 64bit).
+Patch just applied over today's Linus' tree
 
 ...
+PBKDF vector 20 pbkdf2-whirlpool [FAILED]
+  got:  58 55 1e ef 29 40 d6 a2 f0 59 e0 d9 4a 50 c5 df 01 25 be ee 27 5b 35 47 6d 37 38 13 0f e0 da 29
+want:  9c 1c 74 f5 88 26 e7 6a 53 58 f4 0c 39 e7 80 89 07 c0 31 19 9a 50 a2 48 f1 d9 fe 78 64 e5 84 50
+PBKDF test failed.
 
-Thanks,
+(Whirlpool is translated to wp512 in the crypto backend and despite it is a quite rare use, some people
+used if for LUKS PBKDF2. Actually the whole vector test was reaction to wrong Whirlpool implementation
+in gcrypt years ago. It apparently can find breakage even today :-)
+
 Milan
 
