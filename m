@@ -1,86 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B36223185D;
-	Fri, 20 Jun 2025 20:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE95B137E;
+	Fri, 20 Jun 2025 21:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750452719; cv=none; b=GO1+tO6tCVmHPFVfd/Sq0MTAKDlr30x+tBUuUBeAMoltlK3wVbuGcpx2iuKdxHqEaDFqF70ZapPFgxX3lka0YPepuCZzF9FoQ7LBzd3R9HL3rAW5Qjz56wIcwGyVcwJonX8eQ1fvlQur2dljizAivp++45vHokvFOhyMM2BWlDI=
+	t=1750454866; cv=none; b=ixaAlfHumRd+qSevKVilDFfGrInbEvyto9RFl6TiV58ypoxCBwKT6wOUWp4yyoane6Q4DUKVeXVZtqy5Yy0YbnWIVBmoscxeVhWX1yOI97/+IOuF5W0/trul+vZOs5Z701PxW3jNomyPYSnlU3I+IQzyyyVM5WigMVIsu+fMwBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750452719; c=relaxed/simple;
-	bh=0NdZ4CRoINYOWhBpUl2mwfaStrZeKVVIQuamgT21rT4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c/0gBR+VXuPbLKI6YhfglFn1l6Kz8jedPsij99xYPv2pw2Z5tUBaT6dPtU8hzOlG+b076WqUs4+2kCpwzzLNaw8N+GjJ+hBZLhk/Pv1O0qtoUmTFAFic+bp+TFGUnwVh5xQr4arOaU7lAJQhfvVnedNXZjS40xs/kkXuZD7JkOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udySxNgu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750454866; c=relaxed/simple;
+	bh=p+s2U0fmyhm9d55BemGKbD2X2i9CJZsBrPbvF4f3HF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EvB/MkAsjS9fWOEgxjPmsjh7QV5xAQjTSYMFnTVugEiOXZKVoNkgHBZjZEFArkRRvnBlB5WoTfceTZlnbj9o+eaLa8Ug5S+YqejFX2yRcdIsr82VvLr8oUVJ7rs1wcl8btDHlSIEw0l3QqAEvMiBJPZmjEv3AKVcA5Nx013Nk9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ds5LwgI/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udySxNgu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A24DBC4CEE3;
-	Fri, 20 Jun 2025 20:51:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ds5LwgI/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BFEC4CEE3;
+	Fri, 20 Jun 2025 21:27:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750452718;
-	bh=0NdZ4CRoINYOWhBpUl2mwfaStrZeKVVIQuamgT21rT4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=udySxNguXn0+xQw3y+qMf/khi2PUVIUWo/5JK8PrpyzDyj9BJKg65RFYVQdNwYZjy
-	 5N4hYWfBH0uWgpHvZrGtbVB2UFPp6DCi8RnRbv8dXnTjVk4a5greJgp+/OWFvKsmOY
-	 la/rxPSWJg2dsp5zTBfGUoHOm/AD5LOw5UXSmUDIf3qv9AUgr4DIAlZlvnvmbIalSO
-	 MHZh9FnN6VYcYhuLFhcex1/SVhCYLzPs7QHzkkYzRJU0NAfisma7iegrN+a4ShXJil
-	 GJm7gYMkT8/tD4Ye/fwibnoumCLc/IjvjqLUIcliM5kIAcrNuwHtUXGbiq20D9ZtQN
-	 ozSHhePv3RKDQ==
+	s=k20201202; t=1750454864;
+	bh=p+s2U0fmyhm9d55BemGKbD2X2i9CJZsBrPbvF4f3HF4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ds5LwgI/bYZ6UOF1Y/q/iX9FiABAyMDbuJLEnx5x38j/VZwT3Ng9Z3m65OW2qs2fM
+	 JucWLQfkRXHRF/k4xkXgc07zo5nqDSEsaGDhRAW2uKqEJ0Ya22MmmxFlNewsXkBIGl
+	 G+FrikxHSQuYMlAzbqYH+w0a5m65Yj5TmMy8Wu6+YllIXCPIU1jTnIceE5RS4SchJa
+	 oBIu6H2ACmQVFniDwWpxpEctn78VfYHZ2rcoLF9+LAON4EWnajq8hfdkbyH/1wWxLc
+	 ATqrJrOS8V2VAvOYGKlyvJN5Nwm3eIMmt0692knVIoBUkOSjluJwa2mKRrsTgnI61b
+	 ysFwAcUy8QOXw==
+Date: Fri, 20 Jun 2025 14:27:42 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] nvmem: layouts: Switch from crc32() to crc32_le()
-Date: Fri, 20 Jun 2025 13:50:27 -0700
-Message-ID: <20250620205027.23403-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.0
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+	x86@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 00/17] SHA-512 library functions
+Message-ID: <20250620212742.GB5460@quark>
+References: <20250616014019.415791-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250616014019.415791-1-ebiggers@kernel.org>
 
-u_boot_env_parse() calls crc32() from within a scope that has a uint32_t
-variable named crc32.  This works only because crc32() is actually a
-macro that expands to crc32_le().  I'm planning to make it an inline
-function instead, which will make the usual C scoping rules apply to it.
-Therefore, update u_boot_env_parse() to be compatible with that.  To do
-so, just call crc32_le() directly instead of using the crc32() alias.
-(An alternative would be to rename the local variable.)
+On Sun, Jun 15, 2025 at 06:40:02PM -0700, Eric Biggers wrote:
+> This series applies to v6.16-rc1 and is targeting the libcrypto-next
+> tree.  It is also available at:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha512-lib-v2
+> 
+> This series adds support for SHA-384, SHA-512, HMAC-SHA384, and
+> HMAC-SHA512 to lib/crypto/.  The new functions take advantage of the
+> kernel's existing architecture-optimized implementations of the SHA-512
+> compression function.  The new functions are fully tested using KUnit.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+FYI, applied to
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-I'm planning to apply this patch to crc-next, since my patch
-https://lore.kernel.org/r/20250619183414.100082-3-ebiggers@kernel.org/
-depends on this.
+Additional reviews and acks would be greatly appreciated, though!
 
- drivers/nvmem/layouts/u-boot-env.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As per Linus's request, I reordered the KUnit tests (patches 4-5) to be last.
+I'll try to keep them last as additional non-test patches get applied.
 
-diff --git a/drivers/nvmem/layouts/u-boot-env.c b/drivers/nvmem/layouts/u-boot-env.c
-index 436426d4e8f91..274e8a456e8c1 100644
---- a/drivers/nvmem/layouts/u-boot-env.c
-+++ b/drivers/nvmem/layouts/u-boot-env.c
-@@ -146,11 +146,11 @@ int u_boot_env_parse(struct device *dev, struct nvmem_device *nvmem,
- 	crc32_addr = (__le32 *)(buf + crc32_offset);
- 	crc32 = le32_to_cpu(*crc32_addr);
- 	crc32_data_len = dev_size - crc32_data_offset;
- 	data_len = dev_size - data_offset;
- 
--	calc = crc32(~0, buf + crc32_data_offset, crc32_data_len) ^ ~0L;
-+	calc = crc32_le(~0, buf + crc32_data_offset, crc32_data_len) ^ ~0L;
- 	if (calc != crc32) {
- 		dev_err(dev, "Invalid calculated CRC32: 0x%08x (expected: 0x%08x)\n", calc, crc32);
- 		err = -EINVAL;
- 		goto err_kfree;
- 	}
+I also adjusted commit titles slightly to match what I'm planning to use for
+lib/crypto and lib/crc going forwards:
+    
+        lib/(crypto|crc): ((algorithm|arch|arch/algorithm):)? Subject
 
-base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
--- 
-2.50.0
+    e.g.
 
+        lib/crypto: sha512: Add KUnit tests for SHA-384 and SHA-512
+        lib/crypto: x86: Move arch/x86/lib/crypto/ into lib/crypto/
+        lib/crypto: x86/sha512: Migrate optimized SHA-512 code to library
+        lib/crypto: Explicitly include <linux/export.h>
+
+- Eric
