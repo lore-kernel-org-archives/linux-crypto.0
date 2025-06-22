@@ -1,120 +1,137 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD2A16F0FE;
-	Sat, 21 Jun 2025 11:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F586BE5E;
+	Sun, 22 Jun 2025 21:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750505816; cv=none; b=thpeweHrcIa9g1DvM/DOAgHVTkdVgXAF33Ney28xqG+XldJTwncXUR/gUv+vMnmzo6tebO7gj73nIfi/EEk4ZIwDOS1ISuTj8vhBWJUI5yXC4C07XBMH/uhZkO0ENj+sBQcZZFfw/RVeEotTqfSuLBA62+qYjuaDXzhAYVOr8ss=
+	t=1750626980; cv=none; b=MmB1hO2pE14qufZA7btwVx95EZ//PmKaR5MVTvTPozhx8PO15i3V3tBNcRwULlveVIMGF/v8eXTdHSi7WYK4rPJTOBRckRQn1MkFs52lw8b4yJ2l3PyEg7HV9RhGbF2KttONk8VOLYHNztNkZF66WuAw47mWuH8ZgE5mHNqjeFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750505816; c=relaxed/simple;
-	bh=mV0/m19M4pHbxXr+qp1ElJCzSPGhO1oydQg5fcI09WU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eOb0Cc5G35UNJCihlVj/w10IBu3FH8TO6PKZywVbUCHre75KAtCuv0Z8dZdEcuQCh6Y9GjrV4UnTyJ8P3rhESYhaiMMKNibq5CR+Jikb4KDdxS+BHuhMBz+JPYrlXTr72qhkSAOiDEJeeJFI3etsHyK+kLYhLGtSZrj8/iUbVmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fBN0Lqkf; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750626980; c=relaxed/simple;
+	bh=smFqOpzDgtIRpZ72/KNuKw9xxDYJK0rcoipTpmQHqO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DDOBGMGiY6t5IPdQ449Md59IBlQwWlEllfekJz+PCloDKqMKMeA0GmFLEXjPNMBRCGxwCsvN04z5BLpQ4Bm4izhcSbXANBK9HRqnIOB2aWLChautObFXzsglTPT2q0OfuGZhW8KmQb6DH83BMUqcIp6vvfEKm+KyRCQhrQ2F54s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=RGSsBMPS; arc=none smtp.client-ip=185.125.188.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBN0Lqkf"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6070293103cso4893725a12.0;
-        Sat, 21 Jun 2025 04:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750505813; x=1751110613; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sda2OhoJ3w8LYPtAn5n421n5aeMrDBa7WPjqMgtd13s=;
-        b=fBN0Lqkf1GLMhu59pHmgcVeA37gUSiz6bvLFy1yzsO38xI28l7PwzPK/5HeYne8Uu4
-         4ujKyE0bhUrOb2DZUtKqeM+fsQ9fAOQv2TpjYRNZeFKVXlQuyYL1qQPzlakGJk6OgiRm
-         NYR8gEdQgUebA6YZxCb9yrlOdO0EdrSolPQhKCPPLHiqTwCrWquZCPa9KuuP7A2ruk/t
-         bpuiosCXjgwa8BGwacgSo/axtB6oYRTWR5akV5t4K/ejcQkBMtANfbs13NAF+mPtB1To
-         dvgq6CIefyOHSHOjUXKgI8LHvlV7AjlbExVuFCt/l1FW6OEAOIB0wRbMnsuiuGAK82yb
-         cNlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750505813; x=1751110613;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sda2OhoJ3w8LYPtAn5n421n5aeMrDBa7WPjqMgtd13s=;
-        b=tNRSPVg43EYvA3TwTB6tj3oiculDLGV+S1Ar2dqM2w9q6h8if2c3w3RfhTXLQbpP8l
-         MTQEqwWAo2LR1qiV+oEETIoHsExzUu7kP3W/dIdxfRfeKeRJWt7NNXFfEQJob0nqfuK5
-         Jw1Ialx1v51SUs2QaRfIJxHX2TqPGkFgD1Lg3MjwvjZedY+e71mIxrYdHHUVHR4RXeYx
-         DaFc0VzPXh3h8a72WET15ptn7FCHlhKCezpnNxllLeXNSQSVrGl2iqrg7MxgCO8ngfvI
-         1uQhUrUd5Y3UwvzFxv6RHIF5v3VRRpW+SC843pnwUz0HNJtf0OtVexp9mnuMyhMf4sh6
-         y1Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCXnDGZyUvJKfemek7mUOg1CqrSTk4MUFByp4DUi+KH8nhqsMpM2H7DcMa7Z69bqTVguEhi7nqDJGHpgN4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztP1fBTFsPTHyTmINeGjunWL6vKJrCJrUVeIxVCkCyimK54bUW
-	9ll7f80B7dWuiUgO6JfLJfCXcXbQZEI9KXHYERfXVOSEhVyRNBHujdxImZg6vSZcUbYA4g==
-X-Gm-Gg: ASbGncsgpv7TagIlrv9gIOpb/fBDIsQ9mJaceiSzSgmYGftalZ+kqekMyAeQFJQ/Zzb
-	OmkMznIK36EBrFwpVe+P7nsiaN5bKIUWVgoO68Lr6DueBFZoMoDOmFuwEuXs91WOsNnQF7HEMzA
-	I9vzw3/c6Jgk/27fCK2iLQi2hF5r4c6RXzF1eFKJXNCjBDTjcNvLiDxVVPBRVtKWwEyUXaS+B0E
-	Q74WN04ZZhKGHFatQEC6PlGiNkKzkaIbI8sS/A+Xy1AvlaIWe02/RKO8KZ193KUkUvNIOR8izFg
-	0LpIFLBkUZ1L2WnUzm56j8M2f3x0UPUdTTxAeFLFCNahlH06bA/v/pjuiA8AnPpQxEvbYkeNzzx
-	IRQtxUgKOiZbCvQPtyr3kohiFe91ZqfJd0qdXjvPjRJjpu3df6i6S6Wnq6VITYA==
-X-Google-Smtp-Source: AGHT+IH/5TXSI1rj6xMu+Z81IX/O+NCoOrZDWhCbbXjbeQkCbJVMBKJOWDLDRetam300s58ViUcaow==
-X-Received: by 2002:a05:6402:35c2:b0:608:6189:eb59 with SMTP id 4fb4d7f45d1cf-60a1ccb4db9mr6411974a12.13.1750505812856;
-        Sat, 21 Jun 2025 04:36:52 -0700 (PDT)
-Received: from legolas.fritz.box (p200300d0af416e00f1f3934e32485304.dip0.t-ipconnect.de. [2003:d0:af41:6e00:f1f3:934e:3248:5304])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a1855374csm2968698a12.31.2025.06.21.04.36.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Jun 2025 04:36:52 -0700 (PDT)
-From: Markus Theil <theil.markus@gmail.com>
-To: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	Markus Theil <theil.markus@gmail.com>,
-	Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: jitter - fix intermediary handling
-Date: Sat, 21 Jun 2025 13:36:43 +0200
-Message-ID: <20250621113643.107745-1-theil.markus@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="RGSsBMPS"
+Received: from [192.168.192.84] (unknown [50.47.147.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 254D73FBC9;
+	Sun, 22 Jun 2025 21:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1750626969;
+	bh=o+FDdoi+ckxXrmDkrV8X8hgVTNw3ZhNAdA/9HiEbyEs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=RGSsBMPSX1AkgHJRZc6rxBzF8JcBOZHGHdswuwAgFFrvThw26gGUaU5F9C9ym5OEX
+	 /uiJYNmPq5AiECcajRl7+QErDRG+QMngHFTrzSPggwZMi2vh9hckxew4SwPbaXLNgr
+	 zhpKFMu3Fv+1zo+6Wl7U/ydDqlAknBZW7TFqbb/fWBdSrFxwLyOYsbfvhg99xBpTru
+	 ozBA94346HgGGW8Kb4w3SlSQrdmQKvcmMHJHGghsh3UKypZEV7W+05HWdSpjdliEWl
+	 aRDPm/AGDdtpgqHxVxrRCVyTFA1AF/CyelxFkMUxSgC67Ia1uLqJQfRLAksGb0FUiu
+	 HryASaG5YUUjQ==
+Message-ID: <c80d4e69-ef03-462c-9084-e6bb56f428e6@canonical.com>
+Date: Sun, 22 Jun 2025 14:16:07 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] apparmor: use SHA-256 library API instead of crypto_shash
+ API
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20250428190430.850240-1-ebiggers@kernel.org>
+ <20250514042147.GA2073@sol>
+ <4f37c07c-3a39-4c98-b9c4-13356f5a10dc@canonical.com>
+ <20250612191105.GE1283@sol>
+Content-Language: en-US
+From: John Johansen <john.johansen@canonical.com>
+Autocrypt: addr=john.johansen@canonical.com; keydata=
+ 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 lT9Q
+Organization: Canonical
+In-Reply-To: <20250612191105.GE1283@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The intermediary value was included in the wrong
-hash state. While there, adapt to user-space by
-setting the timestamp to 0 if stuck and inserting
-the values nevertheless.
+On 6/12/25 12:11, Eric Biggers wrote:
+> On Sat, May 17, 2025 at 12:43:30AM -0700, John Johansen wrote:
+>> On 5/13/25 21:21, Eric Biggers wrote:
+>>> On Mon, Apr 28, 2025 at 12:04:30PM -0700, Eric Biggers wrote:
+>>>> From: Eric Biggers <ebiggers@google.com>
+>>>>
+>>>> This user of SHA-256 does not support any other algorithm, so the
+>>>> crypto_shash abstraction provides no value.  Just use the SHA-256
+>>>> library API instead, which is much simpler and easier to use.
+>>>>
+>>>> Signed-off-by: Eric Biggers <ebiggers@google.com>
+>>>> ---
+>>>>
+>>>> This patch is targeting the apparmor tree for 6.16.
+>>>>
+>>>>    security/apparmor/Kconfig  |  3 +-
+>>>>    security/apparmor/crypto.c | 85 ++++++--------------------------------
+>>>>    2 files changed, 13 insertions(+), 75 deletions(-)
+>>>
+>>> Any interest in taking this patch through the apparmor or security trees?
+>>>
+>> I can take it through my tree
+> 
+> Thanks!  I notice this isn't in v6.16-rc1.  Do you have a pull request planned?
+> 
 
-Acked-by: Stephan Mueller <smueller@chronox.de>
-Signed-off-by: Markus Theil <theil.markus@gmail.com>
----
- crypto/jitterentropy-kcapi.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Hey Eric,
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index c24d4ff2b4a8..1266eb790708 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -144,7 +144,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
- 	 * Inject the data from the previous loop into the pool. This data is
- 	 * not considered to contain any entropy, but it stirs the pool a bit.
- 	 */
--	ret = crypto_shash_update(desc, intermediary, sizeof(intermediary));
-+	ret = crypto_shash_update(hash_state_desc, intermediary, sizeof(intermediary));
- 	if (ret)
- 		goto err;
- 
-@@ -157,11 +157,12 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
- 	 * conditioning operation to have an identical amount of input data
- 	 * according to section 3.1.5.
- 	 */
--	if (!stuck) {
--		ret = crypto_shash_update(hash_state_desc, (u8 *)&time,
--					  sizeof(__u64));
-+	if (stuck) {
-+		time = 0;
- 	}
- 
-+	ret = crypto_shash_update(hash_state_desc, (u8 *)&time, sizeof(__u64));
-+
- err:
- 	shash_desc_zero(desc);
- 	memzero_explicit(intermediary, sizeof(intermediary));
--- 
-2.49.0
+sorry I have been sick and didn't get a 6.16 pull request out. I am slowly trying
+to dig my way out of the backlog, which is several weeks deeo. I might get together
+a small PR of bug fixes before the 6.17 merge window but the bulk of what is in
+apparmor-next will be waiting to merge in 6.17 now.
+
+
 
