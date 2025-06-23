@@ -1,50 +1,65 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D6F23C4E1;
-	Mon, 23 Jun 2025 11:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17933242D90
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Jun 2025 11:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750679125; cv=none; b=YcP7X7jxW3bsGtFAlM1EoWZnvjQX3GhHbDy8GhOarN38z7nhxGwSpZGeCsSGFkQrDfYqr5aZtxFI0+afrJV1F6nE0Bm+I0QtcTlnL/cnrxd3BYRpt2OVJrISoU71nIhcK9cGblNjtDI6CbYQTC+MYcqtX3gVJ4VA7+iO9HWbNJ4=
+	t=1750679710; cv=none; b=IDsl0XSZnajgpOOQDGuS6U9d5b6tlJhkLpIkj8pdLuLl/g4wtRP5Ce7gw2cxLrSZK8JQLjEjD1JvGszQwkqdJoUb5dGwsdnZpsHxNqgsX6K2lTiLRBk2OL2rq/NX62NZc5rfqDOosOca1HU5vexyki9V5pHykCD1KEnKIG5f4kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750679125; c=relaxed/simple;
-	bh=vsHKsIjfBoPWXTQyZsx8BusZYQAQmtv78aK+QOB1fzw=;
+	s=arc-20240116; t=1750679710; c=relaxed/simple;
+	bh=DBoHB3g5lCybxegUqBfzOCEqqnq81NacHLbyicWWd6c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OwAgFMa6BHv9YHErSnDBCIcDQXhrFr5J+whTzYU1yRXML+zTs6NTkyI3tw0deCfRSffr2499UxMrUcV06AfjQvhUzL5FG7+tuvaBwJmkOO0pW9PnDnB9uXa+ChGfop7FK5oMWNf0v1mNKiwclteCenUVls6KrxmQaApbyxJ0Lpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kuLgdshq; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	 In-Reply-To:Content-Type; b=an3ksEfITsbsD4jaoKciHpDoASVjpPl+FFNjVFMH03s0/bb19Y8LGrp5FD11jGpUmw2LMP57iRNLDibVcmZmCX2t98sFX99cmaLcVBeOCah7SoXgL0WszgnYmeFWwGazvK9NJOju7YbkUJi7k7glCLvth4gAxu44LgERHLJAOtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWJ31u5t; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kuLgdshq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750679123; x=1782215123;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vsHKsIjfBoPWXTQyZsx8BusZYQAQmtv78aK+QOB1fzw=;
-  b=kuLgdshqDboREr3hd+aCLbufw1/YhMeVoGbWp4QwEF6TgWS3PcAQFNSk
-   un0tW7jeaU90cJs39LkEgCBqa3HkymHApsGQ8tGaNtdR2BRvXX32HEDef
-   3ozYPic2ejtdbOnNv3MAstq8fbxfQ7++dsuYyDm2q9oB1y8FyXBUIB4Ec
-   q/YXS8ELhwyriM9CGq0QoObwTCA9atlDJuET3FdZcRMqoXCb5jgn0b3hz
-   7h8mPDiKKzoThDZP5p89dT6U9ANL5xS3e8e0hvdqtkLG2WyeWJwYChnv6
-   VzkxJlf+YLdrEg/7G9q9EB+4sz486jz8VgO0aZ6O4IlXpGMayJyLSI5WT
-   w==;
-X-CSE-ConnectionGUID: RXlQhnqmRvuTyI9mEj9ElQ==
-X-CSE-MsgGUID: ZHUO3cvzTrSRcGYKYY580A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="52969896"
-X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
-   d="scan'208";a="52969896"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 04:45:21 -0700
-X-CSE-ConnectionGUID: c6ARgJ0bR6yOqWqlkLCkrg==
-X-CSE-MsgGUID: Xlj+kWGuS26kFIyJdiB53Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
-   d="scan'208";a="151351020"
-Received: from michalca-mobl.ger.corp.intel.com (HELO [10.245.86.188]) ([10.245.86.188])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 04:45:11 -0700
-Message-ID: <e538d06a-fb9a-4b07-9a00-33879ea5c1cd@linux.intel.com>
-Date: Mon, 23 Jun 2025 13:44:59 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWJ31u5t"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ad89ee255easo746343866b.3
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Jun 2025 04:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750679707; x=1751284507; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g07DgH9mtTRbBYxoH6YLsPXyTQbQTUkM8ZR4WkVgW+Y=;
+        b=AWJ31u5tMxabRb5cD1Dm/Ie3BC4hoQwrSr++98OXgUrjyVrR7R0Mv1wLMJTBz4s56p
+         7HkbeFl2hByVNDj+L109XasISWjyqYP6fiJ1NnSjhXH/AQ784AVU4E0Vry1zZL5YQeQB
+         IZCR9KPma89K27tsr3JB+vgg3zScbIbTJ/i/rzqUcBepZdTL444Rjm2BOs7SGm+vveat
+         EfKn2u0QEmp8qrh/38a21DSMvtyUf9YXs2Tq1TmHW/ey/oJVAKoG/zrAOdq9z+U63TBd
+         rk97wEDwuskgUQ4M5KhMKYPjLGK5YKM4DSMpkKJ4D5ITnR3x87+EmKNm0ft1Vdng4jgB
+         pwxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750679707; x=1751284507;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g07DgH9mtTRbBYxoH6YLsPXyTQbQTUkM8ZR4WkVgW+Y=;
+        b=RPBss7vsL1iufSf6pHQfjStSieVL90t0hGO4KwRyeW2NpnSACRS/2LnCkPRw3S2Qjk
+         4PvudmN7U7b7TrmsscVcjBCLahLFHdA7gSLUTGPdRa4G9PS+at8viGq51n9kBeyHfH7+
+         9OhtcjnIEkL5DkhK+89l2jPJ1v5vYQ4dJ5NVElJjLq52cM7wSzArEscMchiF5UiYHNgY
+         7QSkKxEDxDugpX6dX/66DeUln5cUqrvOzQ4g51WOL67ZyS021Tia2gOkWH+hlnx+GR0B
+         6YVVbN4Rf35NkA5u2ygXcj/N3VHjFtlDz1qHfzSfbVW3qUSqaNp/Yd62LIyhwerGkkM4
+         b3CQ==
+X-Gm-Message-State: AOJu0YxLk1lIY+xquNWLsUWUOmhyr2VJH232dOjcm/Bd5miwtFPJPlQ6
+	/E9sXZwxZsMGJ8oKVY45b4nQV54VVrxhKViYhjA49j+MZHg80RlN3HExEp92pQ==
+X-Gm-Gg: ASbGncs0H/1gsSVh1TWD7fB3wF4CS9sAfUKXjSKg+JvqyvDJDZTfMSNV4x8NwPd5OjA
+	8zFGHrszuFJ/3qGqux38dvL92s19dS4mooIyZAHEdDzstQEN6lDxc7kOsuFhCwho5ceZJh2AvkG
+	8PHLxIHcKl9jHLK34WFr6Khnl3IIzHa0vvfJV+nrnXXkQUDI7ErFlVLCA/zkgCSDR7frSzXVCCJ
+	mbkgYJeTQqOLEsvWLHsuu8bq8Rq9xXoffEtV9jCpdzwaeLLpKegaiobsIiQH6Qz6sYqrZoG5KDH
+	dX/aGyutYwIiv0u6PwjL+eDa3JtoFWLFfeNH0sa8VnMXv85zg772EaGb5Fud2v3OWuv+XuHWjoV
+	0K0VDkfDKRQ==
+X-Google-Smtp-Source: AGHT+IHJpwaMwrE4rRYDyw8cW4+8w6qw9qyp0n9KYAAdbHCw5hP6f1+4kgIVyn561TUeZ6KsOALsoA==
+X-Received: by 2002:a17:907:7214:b0:ade:7bd:e0ec with SMTP id a640c23a62f3a-ae057fa0dfemr1182353166b.56.1750679706698;
+        Mon, 23 Jun 2025 04:55:06 -0700 (PDT)
+Received: from [147.251.42.106] (fosforos.fi.muni.cz. [147.251.42.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0541bb5c3sm692303566b.129.2025.06.23.04.55.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 04:55:06 -0700 (PDT)
+Message-ID: <27689dcc-3018-472f-9db1-efba8f9d52d1@gmail.com>
+Date: Mon, 23 Jun 2025 13:55:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,642 +67,114 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 04/19] x86: Secure Launch main header file
-To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux.dev, daniel.kiper@oracle.com
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
- baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com,
- "Fedko, Artem" <artem.fedko@intel.com>,
- "Mowka, Mateusz" <mateusz.mowka@linux.intel.com>, adamx.pawlicki@intel.com
-References: <20250421162712.77452-1-ross.philipson@oracle.com>
- <20250421162712.77452-5-ross.philipson@oracle.com>
+Subject: Re: [v2 PATCH] dm-crypt: Extend state buffer size in crypt_iv_lmk_one
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Mikulas Patocka <mpatocka@redhat.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ dm-devel@lists.linux.dev
+References: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com>
+ <aFTe3kDZXCAzcwNq@gondor.apana.org.au>
+ <afeb759d-0f6d-4868-8242-01157f144662@gmail.com>
+ <cc21e81d-e03c-a8c8-e32c-f4e52ce18891@redhat.com>
+ <aFk2diodY0QhmZS8@gondor.apana.org.au>
 Content-Language: en-US
-From: "Camacho Romero, Michal" <michal.camacho.romero@linux.intel.com>
-Organization: FST FIR Dev Poland
-In-Reply-To: <20250421162712.77452-5-ross.philipson@oracle.com>
-Content-Type: text/plain; charset=UTF-8
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <aFk2diodY0QhmZS8@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello Ross,
-
-I'm BIOS Engineer from Intel, working on the TXT-related security modules development, including TBOOT project.
-I'm leaving you my thougths and objections on this patch:
-
-On 4/21/2025 6:26 PM, Ross Philipson wrote:
-
-Michal Camacho Romero: Replace all tabs with indentations (4 spaces) in the file
-
-> Introduce the main Secure Launch header file used in the early SL stub
-> and the early setup code.
+On 6/23/25 1:11 PM, Herbert Xu wrote:
+> On Mon, Jun 23, 2025 at 11:40:39AM +0200, Mikulas Patocka wrote:
+>>
+>> 345 bytes on the stack - I think it's too much, given the fact that it
+>> already uses 345 bytes (from SHASH_DESC_ON_STACK) and it may be called in
+>> a tasklet context. I'd prefer a solution that allocates less bytes.
+>>
+>> I don't see the beginning of this thread, so I'd like to ask what's the
+>> problem here, what algorithm other than md5 is used here that causes the
+>> buffer overflow?
 > 
-> This header file contains the following categories:
->  - Secure Launch implementation specific structures and definitions.
->  - Intel TXT architecture specific DRTM structures, definitions and functions
-> used by Secure Launch.
->  - DRTM TPM event logging definitions and helper functions.
+> The md5 export size has increased due to the partial block API
+> thus triggering the overflow.
 > 
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> ---
->  include/linux/slaunch.h | 559 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 559 insertions(+)
->  create mode 100644 include/linux/slaunch.h
-> 
-> diff --git a/include/linux/slaunch.h b/include/linux/slaunch.h
-> new file mode 100644
-> index 000000000000..ae67314c2aad
-> --- /dev/null
-> +++ b/include/linux/slaunch.h
-> @@ -0,0 +1,559 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Main Secure Launch header file.
-> + *
-> + * Copyright (c) 2025 Apertus Solutions, LLC
-> + * Copyright (c) 2025, Oracle and/or its affiliates.
-> + */
-> +
-> +#ifndef _LINUX_SLAUNCH_H
-> +#define _LINUX_SLAUNCH_H
-> +
-> +/*
-> + * Secure Launch Defined State Flags
-> + */
-> +#define SL_FLAG_ACTIVE		0x00000001
-> +#define SL_FLAG_ARCH_TXT	0x00000002
-> +
-> +/*
-> + * Secure Launch CPU Type
-> + */
-> +#define SL_CPU_INTEL	1
-> +
-> +#define __SL32_CS	0x0008
-> +#define __SL32_DS	0x0010
-> +
-> +/*
-> + * Intel Safer Mode Extensions (SMX)
-> + *
-> + * Intel SMX provides a programming interface to establish a Measured Launched
-> + * Environment (MLE). The measurement and protection mechanisms supported by the
-> + * capabilities of an Intel Trusted Execution Technology (TXT) platform. SMX is
-> + * the processor's programming interface in an Intel TXT platform.
-> + *
-> + * See:
-> + *   Intel SDM Volume 2 - 6.1 "Safer Mode Extensions Reference"
-> + *   Intel Trusted Execution Technology - Measured Launch Environment Developer's Guide
-> + */
-> +
-> +/*
-> + * SMX GETSEC Leaf Functions
-> + */
-> +#define SMX_X86_GETSEC_SEXIT	5
-> +#define SMX_X86_GETSEC_SMCTRL	7
-> +#define SMX_X86_GETSEC_WAKEUP	8
-> +
+> How about this patch?
 
-Michal Camacho Romero: Create a new header file, called include/linux/txt.h and move there the following code section (matched in the black quotations):
+For v2:
 
-""" [START]> +/*
-> + * Intel Trusted Execution Technology MMIO Registers Banks
-> + */
-> +#define TXT_PUB_CONFIG_REGS_BASE	0xfed30000
-> +#define TXT_PRIV_CONFIG_REGS_BASE	0xfed20000
-> +#define TXT_NR_CONFIG_PAGES     ((TXT_PUB_CONFIG_REGS_BASE - \
-> +				  TXT_PRIV_CONFIG_REGS_BASE) >> PAGE_SHIFT)
-> +
-> +/*
-> + * Intel Trusted Execution Technology (TXT) Registers
-> + */
-> +#define TXT_CR_STS			0x0000
-> +#define TXT_CR_ESTS			0x0008
-> +#define TXT_CR_ERRORCODE		0x0030
-> +#define TXT_CR_CMD_RESET		0x0038
-> +#define TXT_CR_CMD_CLOSE_PRIVATE	0x0048
-> +#define TXT_CR_DIDVID			0x0110
-> +#define TXT_CR_VER_EMIF			0x0200
-> +#define TXT_CR_CMD_UNLOCK_MEM_CONFIG	0x0218
-> +#define TXT_CR_SINIT_BASE		0x0270
-> +#define TXT_CR_SINIT_SIZE		0x0278
-> +#define TXT_CR_MLE_JOIN			0x0290
-> +#define TXT_CR_HEAP_BASE		0x0300
-> +#define TXT_CR_HEAP_SIZE		0x0308
-> +#define TXT_CR_SCRATCHPAD		0x0378
-> +#define TXT_CR_CMD_OPEN_LOCALITY1	0x0380
-> +#define TXT_CR_CMD_CLOSE_LOCALITY1	0x0388
-> +#define TXT_CR_CMD_OPEN_LOCALITY2	0x0390
-> +#define TXT_CR_CMD_CLOSE_LOCALITY2	0x0398
-> +#define TXT_CR_CMD_SECRETS		0x08e0
-> +#define TXT_CR_CMD_NO_SECRETS		0x08e8
-> +#define TXT_CR_E2STS			0x08f0
-> +
-> +/* TXT default register value */
-> +#define TXT_REGVALUE_ONE		0x1ULL
-> +
-> +/* TXTCR_STS status bits */
-> +#define TXT_SENTER_DONE_STS		BIT(0)
-> +#define TXT_SEXIT_DONE_STS		BIT(1)
-> +
-> +/*
-> + * SINIT/MLE Capabilities Field Bit Definitions
-> + */
+Tested-by: Milan Broz <gmazyland@gmail.com>
 
+Just for the context, the patch fixes OOPS on 32bit (but 64bit should overflow struct too):
 
-""" [END]
+: Oops: Oops: 0000 [#1] SMP
+: CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.16.0-rc2+ #993 PREEMPT(full)
+: Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+: Workqueue: kcryptd-254:0-1 kcryptd_crypt [dm_crypt]
+: EIP: __crypto_shash_export+0xf/0x90
+: Code: 4a c1 c7 40 20 a0 b4 4a c1 81 cf 0e 00 04 08 89 78 50 e9 2b ff ff ff 8d 74 26 00 55 89 e5 57 56 53 89 c3 89 d6 8b 00 8b 40 14 <8b> 50 fc f6 40 13 01 74 04 4a 2b 50 14 85 c9 74 10 89 f2 89 d8 ff
+: EAX: 303a3435 EBX: c3007c90 ECX: 00000000 EDX: c3007c38
+: ESI: c3007c38 EDI: c3007c90 EBP: c3007bfc ESP: c3007bf0
+: DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010216
+: CR0: 80050033 CR2: 303a3431 CR3: 04fbe000 CR4: 00350e90
+: Call Trace:
+:  crypto_shash_export+0x65/0xc0
+:  crypt_iv_lmk_one+0x106/0x1a0 [dm_crypt]
 
-Michal Camacho Romero: Change TXT_SINIT_MLE_CAP_WAKE_GETSEC macro's name to TXT_SINIT_MLE_CAP_RLP_WAKE_GETSEC and also  TXT_SINIT_MLE_CAP_WAKE_MONITOR macro's name to TXT_SINIT_MLE_CAP_RLP_WAKE_MONITOR then move them to the newly created include/linux/txt.h: 
+...
 
-> +#define TXT_SINIT_MLE_CAP_WAKE_GETSEC	0
-> +#define TXT_SINIT_MLE_CAP_WAKE_MONITOR	1
-> +
+The bisect was
 
-Michal Camacho Romero: Move the following code section (matched in the black quotations) into the new header file include/linux/txt.h:
+efd62c85525e212705368b24eb90ef10778190f5 is the first bad commit
+commit efd62c85525e212705368b24eb90ef10778190f5 (HEAD)
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Apr 18 10:59:04 2025 +0800
 
-""" [START]> +/*
-> + * OS/MLE Secure Launch Specific Definitions
-> + */
-> +#define TXT_OS_MLE_STRUCT_VERSION	1
-> +#define TXT_OS_MLE_MAX_VARIABLE_MTRRS	32
-> +
-> +/*
-> + * TXT Heap Table Enumeration
-> + */
-> +#define TXT_BIOS_DATA_TABLE		1
-> +#define TXT_OS_MLE_DATA_TABLE		2
-> +#define TXT_OS_SINIT_DATA_TABLE		3
-> +#define TXT_SINIT_MLE_DATA_TABLE	4
-> +#define TXT_SINIT_TABLE_MAX		TXT_SINIT_MLE_DATA_TABLE
-> +
+     crypto: md5-generic - Use API partial block handling
 
-""" [END]> +/*
-> + * Secure Launch Defined Error Codes used in MLE-initiated TXT resets.
-> + *
-> + * TXT Specification
-> + * Appendix I ACM Error Codes
-> + */
-> +#define SL_ERROR_GENERIC		0xc0008001
-> +#define SL_ERROR_TPM_INIT		0xc0008002
-> +#define SL_ERROR_TPM_INVALID_LOG20	0xc0008003
-> +#define SL_ERROR_TPM_LOGGING_FAILED	0xc0008004
-> +#define SL_ERROR_REGION_STRADDLE_4GB	0xc0008005
-> +#define SL_ERROR_TPM_EXTEND		0xc0008006
-> +#define SL_ERROR_MTRR_INV_VCNT		0xc0008007
-> +#define SL_ERROR_MTRR_INV_DEF_TYPE	0xc0008008
-> +#define SL_ERROR_MTRR_INV_BASE		0xc0008009
-> +#define SL_ERROR_MTRR_INV_MASK		0xc000800a
-> +#define SL_ERROR_MSR_INV_MISC_EN	0xc000800b
-> +#define SL_ERROR_INV_AP_INTERRUPT	0xc000800c
-> +#define SL_ERROR_INTEGER_OVERFLOW	0xc000800d
-> +#define SL_ERROR_HEAP_WALK		0xc000800e
-> +#define SL_ERROR_HEAP_MAP		0xc000800f
-> +#define SL_ERROR_REGION_ABOVE_4GB	0xc0008010
-> +#define SL_ERROR_HEAP_INVALID_DMAR	0xc0008011
-> +#define SL_ERROR_HEAP_DMAR_SIZE		0xc0008012
-> +#define SL_ERROR_HEAP_DMAR_MAP		0xc0008013
-> +#define SL_ERROR_HI_PMR_BASE		0xc0008014
-> +#define SL_ERROR_HI_PMR_SIZE		0xc0008015
-> +#define SL_ERROR_LO_PMR_BASE		0xc0008016
-> +#define SL_ERROR_LO_PMR_MLE		0xc0008017
-> +#define SL_ERROR_INITRD_TOO_BIG		0xc0008018
-> +#define SL_ERROR_HEAP_ZERO_OFFSET	0xc0008019
-> +#define SL_ERROR_WAKE_BLOCK_TOO_SMALL	0xc000801a
-> +#define SL_ERROR_MLE_BUFFER_OVERLAP	0xc000801b
-> +#define SL_ERROR_BUFFER_BEYOND_PMR	0xc000801c
-> +#define SL_ERROR_OS_SINIT_BAD_VERSION	0xc000801d
-> +#define SL_ERROR_EVENTLOG_MAP		0xc000801e
-> +#define SL_ERROR_TPM_INVALID_ALGS	0xc000801f
-> +#define SL_ERROR_TPM_EVENT_COUNT	0xc0008020
-> +#define SL_ERROR_TPM_INVALID_EVENT	0xc0008021
-> +#define SL_ERROR_INVALID_SLRT		0xc0008022
-> +#define SL_ERROR_SLRT_MISSING_ENTRY	0xc0008023
-> +#define SL_ERROR_SLRT_MAP		0xc0008024
-> +
-> +/*
-> + * Secure Launch Defined Limits
-> + */
-> +#define TXT_MAX_CPUS		512
-> +#define TXT_BOOT_STACK_SIZE	128
-> +
-> +/*
-> + * Secure Launch event log entry type. The TXT specification defines the
-> + * base event value as 0x400 for DRTM values.
-> + */
-> +#define TXT_EVTYPE_BASE			0x400
-> +#define TXT_EVTYPE_SLAUNCH		(TXT_EVTYPE_BASE + 0x102)
-> +#define TXT_EVTYPE_SLAUNCH_START	(TXT_EVTYPE_BASE + 0x103)
-> +#define TXT_EVTYPE_SLAUNCH_END		(TXT_EVTYPE_BASE + 0x104)
-> +
-> +/*
-> + * MLE scratch area offsets
-> + */
-> +#define SL_SCRATCH_AP_EBX		0
-> +#define SL_SCRATCH_AP_JMP_OFFSET	4
-> +#define SL_SCRATCH_AP_STACKS_OFFSET	8
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#include <linux/io.h>
-> +#include <linux/tpm.h>
-> +#include <linux/tpm_eventlog.h>
-> +
-> +/*
-> + * Secure Launch AP stack and monitor block
-> + */
-> +struct sl_ap_stack_and_monitor {
-> +	u32 monitor;
-> +	u32 cache_pad[15];
-> +	u32 stack_pad[15];
-> +	u32 apicid;
-> +} __packed;
-> +
-> +/*
-> + * Secure Launch AP wakeup information fetched in SMP boot code.
-> + */
-> +struct sl_ap_wake_info {
-> +	u32 ap_wake_block;
-> +	u32 ap_wake_block_size;
-> +	u32 ap_jmp_offset;
-> +	u32 ap_stacks_offset;
-> +};
-> +
+     Use the Crypto API partial block handling.
 
- Michal Camacho Romero: Move the following code section (matched in the black quotations) into the new header file include/linux/txt.h:
+Milan
 
-""" [START]> +/*
-> + * TXT heap extended data elements.
-> + */
-> +struct txt_heap_ext_data_element {
-> +	u32 type;
-> +	u32 size;
-> +	/* Data */
-> +} __packed;
-> +
-> +#define TXT_HEAP_EXTDATA_TYPE_END			0
-> +
-> +struct txt_heap_end_element {
-> +	u32 type;
-> +	u32 size;
-> +} __packed;
-> +
-> +#define TXT_HEAP_EXTDATA_TYPE_TPM_EVENT_LOG_PTR		5
-> +
-> +struct txt_heap_event_log_element {
-> +	u64 event_log_phys_addr;
-> +} __packed;
-> +
-> +#define TXT_HEAP_EXTDATA_TYPE_EVENT_LOG_POINTER2_1	8
-> +
-> +struct txt_heap_event_log_pointer2_1_element {
-> +	u64 phys_addr;
-> +	u32 allocated_event_container_size;
-> +	u32 first_record_offset;
-> +	u32 next_record_offset;
-> +} __packed;
-> +
-> +/*
-> + * Secure Launch defined OS/MLE TXT Heap table
-> + */
-> +struct txt_os_mle_data {
-> +	u32 version;
-> +	u32 reserved;
-> +	u64 slrt;
-> +	u64 txt_info;
-> +	u32 ap_wake_block;
-> +	u32 ap_wake_block_size;
-> +	u8 mle_scratch[64];
-> +} __packed;
-> +
-> +/*
-> + * TXT specification defined BIOS data TXT Heap table
-> + */
-> +struct txt_bios_data {
-> +	u32 version; /* Currently 5 for TPM 1.2 and 6 for TPM 2.0 */
-> +	u32 bios_sinit_size;
-> +	u64 reserved1;
-> +	u64 reserved2;
-> +	u32 num_logical_procs;
-
-
-Michal Camacho Romero: Put the comment /* Versions >= 5 with updates in version 6 */ under the sinit_flags struct member. The sinit_flags member exists in the BiosData struct since version 3. 
-
-> +	/* Versions >= 5 with updates in version 6 */
-
-
-> +	u32 sinit_flags;
-> +	u32 mle_flags;
-> +	/* Versions >= 4 */
-> +	/* Ext Data Elements */
-> +} __packed;
-> +
-> +/*
-> + * TXT specification defined OS/SINIT TXT Heap table
-> + */
-> +struct txt_os_sinit_data {
-> +	u32 version; /* Currently 6 for TPM 1.2 and 7 for TPM 2.0 */
-> +	u32 flags;
-> +	u64 mle_ptab;
-> +	u64 mle_size;
-> +	u64 mle_hdr_base;
-> +	u64 vtd_pmr_lo_base;
-> +	u64 vtd_pmr_lo_size;
-> +	u64 vtd_pmr_hi_base;
-> +	u64 vtd_pmr_hi_size;
-> +	u64 lcp_po_base;
-> +	u64 lcp_po_size;
-> +	u32 capabilities;
-> +	/* Version = 5 */
-> +	u64 efi_rsdt_ptr;
-> +	/* Versions >= 6 */
-> +	/* Ext Data Elements */
-> +} __packed;
-> +
-> +/*
-> + * TXT specification defined SINIT/MLE TXT Heap table
-> + */
-> +struct txt_sinit_mle_data {
-> +	u32 version;             /* Current values are 6 through 9 */
-> +	/* Versions <= 8 */
-> +	u8 bios_acm_id[20];
-> +	u32 edx_senter_flags;
-> +	u64 mseg_valid;
-> +	u8 sinit_hash[20];
-> +	u8 mle_hash[20];
-> +	u8 stm_hash[20];
-> +	u8 lcp_policy_hash[20];
-> +	u32 lcp_policy_control;
-> +	/* Versions >= 7 */
-> +	u32 rlp_wakeup_addr;
-> +	u32 reserved;
-> +	u32 num_of_sinit_mdrs;
-> +	u32 sinit_mdrs_table_offset;
-> +	u32 sinit_vtd_dmar_table_size;
-> +	u32 sinit_vtd_dmar_table_offset;
-> +	/* Versions >= 8 */
-> +	u32 processor_scrtm_status;
-> +	/* Versions >= 9 */
-> +	/* Ext Data Elements */
-> +} __packed;
-> +
-> +/*
-> + * TXT data reporting structure for memory types
-> + */
-> +struct txt_sinit_memory_descriptor_record {
-> +	u64 address;
-> +	u64 length;
-> +	u8 type;
-> +	u8 reserved[7];
-> +} __packed;
-> +
-> +/*
-> + * TXT data structure used by a responsive local processor (RLP) to start
-> + * execution in response to a GETSEC[WAKEUP].
-> + */
-> +struct smx_rlp_mle_join {
-> +	u32 rlp_gdt_limit;
-> +	u32 rlp_gdt_base;
-> +	u32 rlp_seg_sel;     /* cs (ds, es, ss are seg_sel+8) */
-> +	u32 rlp_entry_point; /* phys addr */
-> +} __packed;
-> +
-> +/*
-> + * TPM event log structures defined in both the TXT specification and
-> + * the TCG documentation.
-> + */
-> +#define TPM_EVTLOG_SIGNATURE "TXT Event Container"
-> +
-> +struct tpm_event_log_header {
-> +	char signature[20];
-> +	char reserved[12];
-> +	u8 container_ver_major;
-> +	u8 container_ver_minor;
-> +	u8 pcr_event_ver_major;
-> +	u8 pcr_event_ver_minor;
-> +	u32 container_size;
-> +	u32 pcr_events_offset;
-> +	u32 next_event_offset;
-> +	/* PCREvents[] */
-> +} __packed;
-> +
-> +/*
-> + * Functions to extract data from the Intel TXT Heap Memory. The layout
-> + * of the heap is as follows:
-> + *  +----------------------------+
-> + *  | Size Bios Data table (u64) |
-> + *  +----------------------------+
-> + *  | Bios Data table            |
-> + *  +----------------------------+
-> + *  | Size OS MLE table (u64)    |
-> + *  +----------------------------+
-> + *  | OS MLE table               |
-> + *  +--------------------------- +
-> + *  | Size OS SINIT table (u64)  |
-> + *  +----------------------------+
-> + *  | OS SINIT table             |
-> + *  +----------------------------+
-> + *  | Size SINIT MLE table (u64) |
-> + *  +----------------------------+
-> + *  | SINIT MLE table            |
-> + *  +----------------------------+
-> + *
-> + *  NOTE: the table size fields include the 8 byte size field itself.
-> + */
-> +static inline u64 txt_bios_data_size(void *heap)
-> +{
-> +	return *((u64 *)heap);
-> +}
-> +
-> +static inline void *txt_bios_data_start(void *heap)
-> +{
-> +	return heap + sizeof(u64);
-> +}
-> +
-> +static inline u64 txt_os_mle_data_size(void *heap)
-> +{
-> +	return *((u64 *)(heap + txt_bios_data_size(heap)));
-> +}
-> +
-> +static inline void *txt_os_mle_data_start(void *heap)
-> +{
-> +	return heap + txt_bios_data_size(heap) + sizeof(u64);
-> +}
-> +
-> +static inline u64 txt_os_sinit_data_size(void *heap)
-> +{
-> +	return *((u64 *)(heap + txt_bios_data_size(heap) +
-> +			txt_os_mle_data_size(heap)));
-> +}
-> +
-> +static inline void *txt_os_sinit_data_start(void *heap)
-> +{
-> +	return heap + txt_bios_data_size(heap) +
-> +		txt_os_mle_data_size(heap) + sizeof(u64);
-> +}
-> +
-> +static inline u64 txt_sinit_mle_data_size(void *heap)
-> +{
-> +	return *((u64 *)(heap + txt_bios_data_size(heap) +
-> +			txt_os_mle_data_size(heap) +
-> +			txt_os_sinit_data_size(heap)));
-> +}
-> +
-> +static inline void *txt_sinit_mle_data_start(void *heap)
-> +{
-> +	return heap + txt_bios_data_size(heap) +
-> +		txt_os_mle_data_size(heap) +
-> +		txt_os_sinit_data_size(heap) + sizeof(u64);
-> +}
-> +
-> +#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
-> +
-> +/*
-> + * TPM event logging functions.
-> + */
-> +
-> +/*
-> + * Find the TPM v2 event log element in the TXT heap. This element contains
-> + * the information about the size and location of the DRTM event log. Note
-> + * this is a TXT specific structure.
-> + *
-> + * See:
-> + *   Intel Trusted Execution Technology - Measured Launch Environment Developer's Guide - Appendix C.
-> + */
-> +static inline struct txt_heap_event_log_pointer2_1_element*
-> +tpm2_find_log2_1_element(struct txt_os_sinit_data *os_sinit_data)
-> +{
-> +	struct txt_heap_ext_data_element *ext_elem;
-> +
-> +	/* The extended element array as at the end of this table */
-> +	ext_elem = (struct txt_heap_ext_data_element *)
-> +		((u8 *)os_sinit_data + sizeof(struct txt_os_sinit_data));
-> +
-> +	while (ext_elem->type != TXT_HEAP_EXTDATA_TYPE_END) {
-> +		if (ext_elem->type == TXT_HEAP_EXTDATA_TYPE_EVENT_LOG_POINTER2_1) {
-> +			return (struct txt_heap_event_log_pointer2_1_element *)
-> +				((u8 *)ext_elem + sizeof(struct txt_heap_ext_data_element));
-> +		}
-> +		ext_elem = (struct txt_heap_ext_data_element *)
-> +			    ((u8 *)ext_elem + ext_elem->size);
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +/*
-> + * Log a TPM v1 formatted event to the given DRTM event log.
-> + */
-> +static inline int tpm_log_event(void *evtlog_base, u32 evtlog_size,
-> +				u32 event_size, void *event)
-> +{
-> +	struct tpm_event_log_header *evtlog =
-> +		(struct tpm_event_log_header *)evtlog_base;
-> +
-> +	if (memcmp(evtlog->signature, TPM_EVTLOG_SIGNATURE,
-> +		   sizeof(TPM_EVTLOG_SIGNATURE)))
-> +		return -EINVAL;
-> +
-> +	if (evtlog->container_size > evtlog_size)
-> +		return -EINVAL;
-> +
-> +	if (evtlog->next_event_offset + event_size > evtlog->container_size)
-> +		return -E2BIG;
-> +
-> +	memcpy(evtlog_base + evtlog->next_event_offset, event, event_size);
-> +	evtlog->next_event_offset += event_size;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Log a TPM v2 formatted event to the given DRTM event log.
-> + */
-> +static inline int tpm2_log_event(struct txt_heap_event_log_pointer2_1_element *elem,
-> +				 void *evtlog_base, u32 evtlog_size,
-> +				 u32 event_size, void *event)
-> +{
-> +	struct tcg_pcr_event *header =
-> +		(struct tcg_pcr_event *)evtlog_base;
-> +
-> +	/* Has to be at least big enough for the signature */
-> +	if (header->event_size < sizeof(TCG_SPECID_SIG))
-> +		return -EINVAL;
-> +
-> +	if (memcmp((u8 *)header + sizeof(struct tcg_pcr_event),
-> +		   TCG_SPECID_SIG, sizeof(TCG_SPECID_SIG)))
-> +		return -EINVAL;
-> +
-> +	if (elem->allocated_event_container_size > evtlog_size)
-> +		return -EINVAL;
-> +
-> +	if (elem->next_record_offset + event_size >
-> +	    elem->allocated_event_container_size)
-> +		return -E2BIG;
-> +
-> +	memcpy(evtlog_base + elem->next_record_offset, event, event_size);
-> +	elem->next_record_offset += event_size;
-> +
-> +	return 0;
-> +}
-> +
-"""[END]
-
-> +/*
-> + * External functions available in mainline kernel.
-> + */
-> +void slaunch_setup_txt(void);
-> +void slaunch_fixup_jump_vector(void);
-> +u32 slaunch_get_flags(void);
-> +struct sl_ap_wake_info *slaunch_get_ap_wake_info(void);
-> +struct acpi_table_header *slaunch_get_dmar_table(struct acpi_table_header *dmar);
-> +void __noreturn slaunch_txt_reset(void __iomem *txt,
-> +					 const char *msg, u64 error);
-> +void slaunch_finalize(int do_sexit);
-> +
-> +static inline bool slaunch_is_txt_launch(void)
-> +{
-> +	u32 mask = SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT;
-> +
-> +	return (slaunch_get_flags() & mask) == mask;
-> +}
-> +
-> +#else
-> +
-> +static inline void slaunch_setup_txt(void)
-> +{
-> +}
-> +
-> +static inline void slaunch_fixup_jump_vector(void)
-> +{
-> +}
-> +
-> +static inline u32 slaunch_get_flags(void)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline struct acpi_table_header *slaunch_get_dmar_table(struct acpi_table_header *dmar)
-> +{
-> +	return dmar;
-> +}
-> +
-> +static inline void slaunch_finalize(int do_sexit)
-> +{
-> +}
-> +
-> +static inline bool slaunch_is_txt_launch(void)
-> +{
-> +	return false;
-> +}
-> +
-> +#endif /* !IS_ENABLED(CONFIG_SECURE_LAUNCH) */
-> +
-> +#endif /* !__ASSEMBLY */
-> +
-> +#endif /* _LINUX_SLAUNCH_H */
-Regards,
-Michal Camacho Romero (michal.camacho.romero@linux.intel.com)
