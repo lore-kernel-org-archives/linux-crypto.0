@@ -1,140 +1,112 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3607C24468A;
-	Mon, 23 Jun 2025 10:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8753923AB81
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Jun 2025 10:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750675341; cv=none; b=NcPsjO1KwcGcMkmDxU2Mn7UGZ3UWQYs5VL7zfQPSzoKn/97N6mWWlXUkzwF7yLekW45E3B1k2fY5dHK8IG9VWpneLJiflJw9AA49JKqDiuqE/2ZR4nZq7vW9BLVjLMPc/3B5LqRAevA0sW64HaFcnqUrF14LVTOh77ZvxyXaOzo=
+	t=1750676140; cv=none; b=cTObY3AsnNmuYAYk/tTSFaRAuCkAkR9KjN0DednMAGfzx84Wo/i0cYOJLnOhFO07lLK4eZ1w+OX+r3UBXHFnGZPC6LcCxdJnIHB0FWmO1JF8cZffMPNiUPg9a/R9g6RiUlXFRGPfUyR0hRGQsOkOi57ol2RMWRGJyRCOiBxTrW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750675341; c=relaxed/simple;
-	bh=l931bTX5MDMkwV6ZzTaGAigtZpZ8cMxO2lXHTUUf198=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rrTYbqjn8fjujjDqWtLUsBqZEBs8q/Juj3C+qpsX9lKzoTuliu6Gq70PrzlvQbVZG71wxz2ZHS1fansHdzJv01VJv9x9W9yODnEwxbGM1M1Kss1JY2VbHpX7v2dAvBHFSqcurEKwrnYW/BfuzQYMBMd0gYAQUzpIORh6gFjhtG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3R9Dd9S; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750676140; c=relaxed/simple;
+	bh=kuqz1UH4mU07lApOh4u1QNYszUKmEc/6AE2nlZkskYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UHRYpms5UNIRmYqdzwn6S8AuxqEXWddmECqi6WxVWDJhlAyYnFaoFd+toc3aw+lE/uuLAOLJzvXuNv8Ajiis1HpJ1wxmDxa3lOF1Vdaf9j3oPzdNHEaIMOm7B5cKB95vSup2MY802vNhVgYF1lfbY0s233MOM3BNeOCpcPYuKxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jee781Ya; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3R9Dd9S"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ad89c32a7b5so652406866b.2;
-        Mon, 23 Jun 2025 03:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750675337; x=1751280137; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Yw6imxd4BTDTWrkr9aN2QlmFrVCvg38lQ/oem6/zBU=;
-        b=C3R9Dd9S1iFYWKRJ577v3wxWopK2h+mwxqGU0NWxLlhLSVkzm0mS+3eE9Vq8GPULmL
-         MVO5tu9RUe4IU4wcoRg+ayut5PopPQhOezUUmNIhZE0HwnjTspOxMKs3v2u2+dTx0f4v
-         LVYv4ohW7L126OFDJZjXtU1UhklFmkcl/VCEw8asNfHKKf70/M+vfVjr2xird1P7yFKG
-         5O7ZkI4obnvUb2ziE3wNEITFi1pUSJbm+wHN+x1WL8mrcSi3eQ4bBWVWJpGMLQ6ZA1DB
-         yf2PCEX1Zo3naYmejzFqfecuPiQv5ASXP9djBC/Bs+MikJt+rDoaukoOH1Tj4p6GUfBH
-         rIlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750675337; x=1751280137;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Yw6imxd4BTDTWrkr9aN2QlmFrVCvg38lQ/oem6/zBU=;
-        b=tD2u8ngwR7moyU+GkJ+W8ZhfzHFbdPzvgdO9UjTj7QnrqGO26BSBPLNO+nnQDm8vWZ
-         fuwvFsVBZiItvgzehkw0e1s9lAH4GntGceYQ5Oyfo3lR9kRSQUX32LhO7yxXe14WNeTX
-         182hLpFeNxI1i3TSVDoGJ4AN7nj3KSUwC/VQYLVouuumdBG3YxsShIMLUdD1l3+vELMz
-         6lvi325cPjoZaNrVig6NeG7LrMf8DxJ35tmm+y27VbhBh6W2RA5EcYeVkNCNnW3RvrRv
-         Ly1gVwI49CUH0M9mm771yS4o/fLNKjqtS2dXd5xOp7cZBBWfh7WAVUSmZm1lLEb8/xng
-         hnPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6CmKln5lma4tJNCqQx6ad0GdQQEQZdY/AYPCmMGay46VCOCpbPYlfZZa8iS5WWrQZ/NcU3fyGq//KJe3H@vger.kernel.org, AJvYcCVKTZ1/HOogqqWrOzbs8U8Fe+M1eaaul/LaCR71lhpwGodUNDggPFJGRhaAjmX+uJlzC1VjITEtje0YoMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye7pGylcKyQMCCD09jOHg6SyrH3XQ4rw0Me9Hx2AAWPrUqz3MH
-	NHF8dtC25ul9IP8hAFzvzNUkYUr3Ef9rVrhu+sUkrtCCQB/5YVRz0nWC
-X-Gm-Gg: ASbGncsbCOEOu9CBRWTfpG4nA/rHnwsgi/Uu1VxVV8uYqE/n0f0JFECczMjVQTee9kT
-	mpsiYg5DKezc11NryI/lW9e434YyJ/zBiNMWTCsysxG2SduvF3ZkVMeA/4Y8UpAprQ807+y+Nq6
-	WoIFk/haz6Q4/NC0HTV+L6vqVFCsaG+hYAsAiH5yz/3hoSYlRzk42FWsQWxY03/y58x7rrczwy0
-	JsGELfP+u+zoTzVKfBjomVSeE+8Vlpt1gzZB0AgWQuJwOSrVbMOFbatuJ0+O2bcWWXOVxu4pOiX
-	V8fPMItEOfo9h+lJWKH2TFDUepvpyHPmYHXc45sN389c/HbuXXk69hFDn2W0mdk3+rhpetfKaU4
-	vse0clyRaFrOm1PCZEAwK5VIWLUgd1ehc07eVUGTZ57CW6To=
-X-Google-Smtp-Source: AGHT+IEfNTyPHjwPJEzLQfQoS55yQsLH7CzoYZynUgBsxDONAr3ULxD/B75b39rL0u4RhOVhHN1eXA==
-X-Received: by 2002:a17:906:6a1a:b0:ad2:1cd6:aacf with SMTP id a640c23a62f3a-ae057c0d793mr1084866966b.47.1750675337254;
-        Mon, 23 Jun 2025 03:42:17 -0700 (PDT)
-Received: from ?IPV6:2a02:2f0e:c51b:8900:a03f:12cb:72f7:9069? ([2a02:2f0e:c51b:8900:a03f:12cb:72f7:9069])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0541b6894sm687693066b.111.2025.06.23.03.42.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 03:42:16 -0700 (PDT)
-Message-ID: <0b963009-85fe-473a-a65b-6b427bee98c5@gmail.com>
-Date: Mon, 23 Jun 2025 13:42:15 +0300
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jee781Ya"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750676138; x=1782212138;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=kuqz1UH4mU07lApOh4u1QNYszUKmEc/6AE2nlZkskYs=;
+  b=jee781YaRbYDUSu36oxMh7eBBx6f1FUnmvpXWuPUImIxtD5loYTQuhMK
+   KhJ0nDKjA9/0Bu1yQgrIxxKep6DFEWzSVFlWjE5RW5q/v1cDM48mrZyC8
+   h95BZW+1GpmkcDKg2/radriSLc4TzNFd8Ve1u0mh6JRVph+pQmNvG+4ui
+   JO5/5OkT/4JygEX0pRmR03rhyzPu8MnBTJqwSnhATHxdcjxiMbAug4VGs
+   cl5q85sqh/JQP16CVbChiCZGONsQgIWng733O1Mv2KG7RJR396CdnjPxn
+   gVF7JtoIHEGQhEo+C6hBq0KijBf9S/DWRZGWKqE86HtklG5EDEssSfDtA
+   A==;
+X-CSE-ConnectionGUID: +UH4bWzzSuOCtYhIHEr82Q==
+X-CSE-MsgGUID: XJnfdTKVTGmu9CFqw/o4Rg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11472"; a="70445608"
+X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
+   d="scan'208";a="70445608"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 03:55:38 -0700
+X-CSE-ConnectionGUID: oDootPeNQN+FShEmERMWoQ==
+X-CSE-MsgGUID: G0zOekpcTNKx81SXDc97Tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
+   d="scan'208";a="152078359"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 23 Jun 2025 03:55:37 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uTepq-000NyA-2A;
+	Mon, 23 Jun 2025 10:55:34 +0000
+Date: Mon, 23 Jun 2025 18:55:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org
+Subject: [herbert-cryptodev-2.6:master 11/61]
+ drivers/crypto/aspeed/aspeed-hace-hash.c:443 aspeed_ahash_fallback() warn:
+ inconsistent indenting
+Message-ID: <202506231830.us4hiwlZ-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: sun8i-ce: Fix `dma_unmap_sg()` nents value
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, Andre Przywara
- <andre.przywara@arm.com>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250623091009.65436-2-fourier.thomas@gmail.com>
-Content-Language: en-US
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-In-Reply-To: <20250623091009.65436-2-fourier.thomas@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Thomas,
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   82a0302e7167d0b7c6cde56613db3748f8dd806d
+commit: 508712228696eaddc4efc706e6a8dd679654f339 [11/61] crypto: aspeed/hash - Add fallback
+config: arm-randconfig-r073-20250623 (https://download.01.org/0day-ci/archive/20250623/202506231830.us4hiwlZ-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.3.0
 
-On 6/23/25 12:10 PM, Thomas Fourier wrote:
-> The `dma_unmap_sg()` functions should be called with the same nents as the
-> `dma_map_sg()`, not the value the map function returned.
-> 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506231830.us4hiwlZ-lkp@intel.com/
 
-This should already be fixed by:
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=b6cd3cfb5afe49952f8f6be947aeeca9ba0faebb
+smatch warnings:
+drivers/crypto/aspeed/aspeed-hace-hash.c:443 aspeed_ahash_fallback() warn: inconsistent indenting
 
-The sg nents are saved to request context during prepare() and then used
-in unprepare().
+vim +443 drivers/crypto/aspeed/aspeed-hace-hash.c
 
-Thanks,
-Ovidiu
+   422	
+   423	static noinline int aspeed_ahash_fallback(struct ahash_request *req)
+   424	{
+   425		struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
+   426		HASH_FBREQ_ON_STACK(fbreq, req);
+   427		u8 *state = rctx->buffer;
+   428		struct scatterlist sg[2];
+   429		struct scatterlist *ssg;
+   430		int ret;
+   431	
+   432		ssg = scatterwalk_ffwd(sg, req->src, rctx->offset);
+   433		ahash_request_set_crypt(fbreq, ssg, req->result,
+   434					rctx->total - rctx->offset);
+   435	
+   436		ret = aspeed_sham_export(req, state) ?:
+   437		      crypto_ahash_import_core(fbreq, state);
+   438	
+   439		if (rctx->flags & SHA_FLAGS_FINUP)
+   440			ret = ret ?: crypto_ahash_finup(fbreq);
+   441		else
+   442			ret = ret ?: crypto_ahash_update(fbreq);
+ > 443				     crypto_ahash_export_core(fbreq, state) ?:
+   444				     aspeed_sham_import(req, state);
+   445		HASH_REQUEST_ZERO(fbreq);
+   446		return ret;
+   447	}
+   448	
 
-> Fixes: 0605fa0f7826 ("crypto: sun8i-ce - split into prepare/run/unprepare")
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> index f9cf00d690e2..ce9d071f5693 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> @@ -326,8 +326,8 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
->  	struct sun8i_ce_flow *chan;
->  	struct ce_task *cet;
->  	unsigned int ivsize, offset;
-> -	int nr_sgs = rctx->nr_sgs;
-> -	int nr_sgd = rctx->nr_sgd;
-> +	int ns = sg_nents_for_len(areq->src, areq->cryptlen);
-> +	int nd = sg_nents_for_len(areq->dst, areq->cryptlen);
->  	int flow;
->  
->  	flow = rctx->flow;
-> @@ -336,11 +336,11 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
->  	ivsize = crypto_skcipher_ivsize(tfm);
->  
->  	if (areq->src == areq->dst) {
-> -		dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_BIDIRECTIONAL);
-> +		dma_unmap_sg(ce->dev, areq->src, ns, DMA_BIDIRECTIONAL);
->  	} else {
-> -		if (nr_sgs > 0)
-> -			dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_TO_DEVICE);
-> -		dma_unmap_sg(ce->dev, areq->dst, nr_sgd, DMA_FROM_DEVICE);
-> +		if (rctx->nr_sgs > 0)
-> +			dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
-> +		dma_unmap_sg(ce->dev, areq->dst, nd, DMA_FROM_DEVICE);
->  	}
->  
->  	if (areq->iv && ivsize > 0) {
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
