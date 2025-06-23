@@ -1,128 +1,94 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621B0230BFB;
-	Mon, 23 Jun 2025 09:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E00E235073;
+	Mon, 23 Jun 2025 09:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750669870; cv=none; b=B258clcwxfuaAanw+Kto0jFoOZTaSvAdgQQRYehWdNW/TodfbDtEY6twXt3zJznJavCODHaBG2DQ38mMV+lF/3OhqLjm3pxXfMRx6Nq2sRZlxhkNCJBBkFFNjn5U6xeSa/3oDfSZUbNZCiUQnb8/NwqTB4/nVFbup80gnt281Qw=
+	t=1750670272; cv=none; b=anJuqMemxXOGHZNeTN6dFKTtY7ASr92l12guISqyRnUTTi4VYV8wbSL7D9ODJtAsnGt7LVhUjh0V/yTZK4UtWshIEC/RyBF2Jui4INdz5iUXSusmnQqaUG1DCyE5nr6qIwevEGYby13JN81LDEnKHo2yzaojDef2zIwGfOfmFXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750669870; c=relaxed/simple;
-	bh=jgDGs6S8aBeEsYJh3stb90SoB64xktcDYB4e9GaxcnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPnbaig+RukTqxLYpUeSLDBIJWkmbL1lASyQGjHNKrE4bQZJNX4Te+sSOqwcAg2hVl0MJps5Zkrg3n9/LIAFqYHcSWfQtp5OZ0tnauL46pqb21TkK2Xmi0wkAcb2NQDVzzqgdJIg2ZzR2J12ttt7PKOIXTDcVgZPPrHQ9lJK22I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPJiVphB; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750670272; c=relaxed/simple;
+	bh=68yU88ZsDP6flv9Iq+6DZZiYCh5OnMcMFj+JtAHofX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fZBcNnu4IaTajgI6i0HE+9wIZJjCLqTuHD0G3NKLiRK9lOUMrbwGoZzN6L1FfZ9LdQFeKzMJYVT/ep5Ao8umDcW8PUsB1ZonunOCC95+SZXeOdGsk7Zf4zU4fx4mQPZ/nMgpS9oNHfZbuCKDbQO6DjjwT6q+0BJM+DQhQ14TNf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=IZ1BofxI; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPJiVphB"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45306976410so1101615e9.3;
-        Mon, 23 Jun 2025 02:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750669867; x=1751274667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gz8t2oZkkwfZO8pX28gYQB4KOa728jeU/jhzTTj6UZc=;
-        b=VPJiVphBewlnR0xYbCOAeTl9zCUO3DuySWECRKIUqhZ62uKm4T0FWDjFUoonP/jD7L
-         82tEmvn/M1Qlu5fToAo3DlNuHxglWk/SQpFojYDo/5Fmg5LzV+a355rqhQ9bKjDganKo
-         t5tdfbfdgitsNTCzEgqBQg8B3gR7pRP6FxHOYVSF2nhFjarX1qJwdsR+Lf9pQUzVgxU4
-         OFKZtAyfm+5m55E6rYIGnHXipLdPO0ggZpC/alUX6UbhWvVENZESw3S5X2P1B9LRxe6h
-         mDlUjmzXUxmj82eWg7ScYJ5Ra4ilG6M8cpr4KVuXXefRMtuGJZ8uBFg/ROESjDHyuNz8
-         G1Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750669867; x=1751274667;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gz8t2oZkkwfZO8pX28gYQB4KOa728jeU/jhzTTj6UZc=;
-        b=T69WchcJgR/6fvHBTi6ckHR4jVbhCZ0tMkxc52wzUMEFXvKHQ5TAZmCEx/R2fMFB6V
-         2iJKHPtUMQ+R32hcEox4MF0LEvNoLRl3uBO0yXJN+QJn54fELQR5YkKzGrOlONOJmkG6
-         oD2y9DnHcBPcub45guZGSAhOsAjKdYWexBX1o/iRH22b+78r2jZjDzotJr0Xw+KmlGGt
-         /Wzep2nsEkIfIg/ZjAcsPYtZDDLI7f7GP8OAk7bslKYFYW5fHdCBvdHNZxtGgiwsQhXt
-         xZTu4PqfkP6hnaMK/XRv/i6pmv4mFcFrnPTJ+5iTpMDBpjVl+HOUQlIm+mlixdKvT4W8
-         SirQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwx9Sp4+NLT1uLKA3pYHTUYCPgw0/fZ7C8PG98/7oTYNmT/Rvnc6T6AeQlmK2TUfOwmkKKsckSibZLfQuo@vger.kernel.org, AJvYcCXg+6ZJrLIHl8t4Px5Zr3O/T0zVhc3cEZNBkGvgFKoHAECPtmGDVJKtrroDjnwpI9Rrf/WDpEh+ksabgXU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZFah9Zq7/dKVLv9DA/75RpP38/edNkgMQEQqItD6vAnB/Bp4D
-	CXp0g56Qom9gFTOUJ8LSgq62tHJO13XyWpBJcsxb2u/plJ2piNMr7diN
-X-Gm-Gg: ASbGncvMZ5oZDrxXO7kW8EnjGnae1lsOx9UXMcuzfMEjxLo8RnwnE+9nJNq0B5sVWkw
-	hOIiHvz3os5XleyygzQ3cYB7Mgy8PVSU9vIemuqPf24/CL5zSTb/6MS920eu0Wrzt5ZmYfeHH5K
-	USYzaOdaDTHxsknARcHNo/XUXDZQxghgRJNLeBmfILHMo6Xz3NrF+PjZiXPiBmRErQM2/65NZjU
-	oVn0E/XO7sr10mIXK5+vG1O1XJzU84rezfjQ+s53S8FhQEfoIRbID5oqOnal91WB0OGM/R+HW30
-	5Y8Wx6XlZNPnDzSFwoQX9lYVW54BBkF4WpGILXBlshJGXiBEhaE+KdEXKOOdLHuND4K1l28LODD
-	D9pSQxQcv2zowTOMQ2zucx8UqOA==
-X-Google-Smtp-Source: AGHT+IGDWWZaT403xBnNIukKkNikvHSsmJYoL9MI3srvKJv2z/ou2KLsn00R7ev+p8rY646+IShMCw==
-X-Received: by 2002:a05:600c:4685:b0:442:e608:12a6 with SMTP id 5b1f17b1804b1-453653d3d5cmr41354345e9.1.1750669866408;
-        Mon, 23 Jun 2025 02:11:06 -0700 (PDT)
-Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:9a26:612f:7b52:ee76])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4536466596asm107683615e9.0.2025.06.23.02.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 02:11:06 -0700 (PDT)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="IZ1BofxI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3pK3yHQ00Ie28/bNXr2JxWFBovPz2NQMh4thf0IZUWY=; b=IZ1BofxImkLmpZME6FjqOE5Lpn
+	eBW2+jfeMSoHh2n+DGmDVDK4RbIKW386I5MPn2XhG2Holx2+oJD+LXq0ZT9qAkG2XlhGMuMFYXNOU
+	ligHE5OE1SC7GL7rf8PjD1zMCNs6p7Vwe7wXvguXkTi0iSEtPXLISHfLdELj807Xdlr/Z+2jlTfIS
+	+vZjwspVnRAuSxHqMGti5JLiDhRTA8LbgZzrK9Wu0g/zsU6mD7pcV+a1PeSXmkHL6lKTdwpxPR8/U
+	9yGBtyOAHn5jU9UY/ctFbKSVgSY/ST6wZ0xCNLPtIoe2NzbPrBjLBBprKUDmBvzOu58AHf/25lwrO
+	qNLScgMA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uTd3P-000FT4-2Q;
+	Mon, 23 Jun 2025 17:17:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 23 Jun 2025 17:17:24 +0800
+Date: Mon, 23 Jun 2025 17:17:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: sun8i-ce: Fix `dma_unmap_sg()` nents value
-Date: Mon, 23 Jun 2025 11:10:06 +0200
-Message-ID: <20250623091009.65436-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: Re: [PATCH] ARM: crypto: work around gcc-15 warning
+Message-ID: <aFkbpCBUr-ujNMCF@gondor.apana.org.au>
+References: <20250610093256.2645686-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250610093256.2645686-1-arnd@kernel.org>
 
-The `dma_unmap_sg()` functions should be called with the same nents as the
-`dma_map_sg()`, not the value the map function returned.
+On Tue, Jun 10, 2025 at 11:32:52AM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> I get a very rare -Wstringop-overread warning with gcc-15 for one function
+> in aesbs_ctr_encrypt():
+> 
+> arch/arm/crypto/aes-neonbs-glue.c: In function 'ctr_encrypt':
+> arch/arm/crypto/aes-neonbs-glue.c:212:1446: error: '__builtin_memcpy' offset [17, 2147483647] is out of the bounds [0, 16] of object 'buf' with type 'u8[16]' {aka 'unsigned char[16]'} [-Werror=array-bounds=]
+>   212 |                         src = dst = memcpy(buf + sizeof(buf) - bytes,
+> arch/arm/crypto/aes-neonbs-glue.c: In function 'ctr_encrypt':
+> arch/arm/crypto/aes-neonbs-glue.c:218:17: error: 'aesbs_ctr_encrypt' reading 1 byte from a region of size 0 [-Werror=stringop-overread]
+>   218 |                 aesbs_ctr_encrypt(dst, src, ctx->rk, ctx->rounds, bytes, walk.iv);
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> arch/arm/crypto/aes-neonbs-glue.c:218:17: note: referencing argument 2 of type 'const u8[0]' {aka 'const unsigned char[]'}
+> arch/arm/crypto/aes-neonbs-glue.c:218:17: note: referencing argument 3 of type 'const u8[0]' {aka 'const unsigned char[]'}
+> arch/arm/crypto/aes-neonbs-glue.c:218:17: note: referencing argument 6 of type 'u8[0]' {aka 'unsigned char[]'}
+> arch/arm/crypto/aes-neonbs-glue.c:36:17: note: in a call to function 'aesbs_ctr_encrypt'
+>    36 | asmlinkage void aesbs_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
+> 
+> This could happen in theory if walk.nbytes is larger than INT_MAX and gets
+> converted to a negative local variable.
+> 
+> Keep the type unsigned like the orignal nbytes to be sure there is no
+> integer overflow.
+> 
+> Fixes: c8bf850e991a ("crypto: arm/aes-neonbs-ctr - deal with non-multiples of AES block size")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/arm/crypto/aes-neonbs-glue.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Fixes: 0605fa0f7826 ("crypto: sun8i-ce - split into prepare/run/unprepare")
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index f9cf00d690e2..ce9d071f5693 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -326,8 +326,8 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
- 	struct sun8i_ce_flow *chan;
- 	struct ce_task *cet;
- 	unsigned int ivsize, offset;
--	int nr_sgs = rctx->nr_sgs;
--	int nr_sgd = rctx->nr_sgd;
-+	int ns = sg_nents_for_len(areq->src, areq->cryptlen);
-+	int nd = sg_nents_for_len(areq->dst, areq->cryptlen);
- 	int flow;
- 
- 	flow = rctx->flow;
-@@ -336,11 +336,11 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
- 	ivsize = crypto_skcipher_ivsize(tfm);
- 
- 	if (areq->src == areq->dst) {
--		dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_BIDIRECTIONAL);
-+		dma_unmap_sg(ce->dev, areq->src, ns, DMA_BIDIRECTIONAL);
- 	} else {
--		if (nr_sgs > 0)
--			dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_TO_DEVICE);
--		dma_unmap_sg(ce->dev, areq->dst, nr_sgd, DMA_FROM_DEVICE);
-+		if (rctx->nr_sgs > 0)
-+			dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
-+		dma_unmap_sg(ce->dev, areq->dst, nd, DMA_FROM_DEVICE);
- 	}
- 
- 	if (areq->iv && ivsize > 0) {
+Patch applied.  Thanks.
 -- 
-2.43.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
