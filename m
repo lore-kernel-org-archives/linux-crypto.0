@@ -1,130 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DEF2417D1
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Jun 2025 12:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BDD24A06D;
+	Mon, 23 Jun 2025 13:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750682573; cv=none; b=U3sR9KhDSpKj57Fq5JzPrALwMSg0lO5VZcve17ZUf+UMzoJWXpdK/hn8lhyDJ4DChrKlXPRn0TVp1bOg1UTTK83+6VAs5gBWbFM5xSGt/OQOeCXT43+8uqCejftf+c7jk7qWQF3CBc034qR9qtPShfR8pl1mEmiMntdetRWcUyc=
+	t=1750684728; cv=none; b=NrSuRU4SMQPwLjd+o0nW7dGa95sPzsqu2D9ZHZlJ4N4A4W7lPW6hYlKBwzapY3lkAUX5GNHVwxNw3u/G3sJfBVJU+BBArff3Tn/u7wYwpIY0VOt3DE441pGbhF1AnNyJeDrmzI4D9agzNZ9JSf5KLDG0o7/SPRwQbVn7eMgzgMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750682573; c=relaxed/simple;
-	bh=chF1uZFplXwQmgYOnogo76i3GdxrQkosEJzcq4dFzow=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=kkvpAE5KUzj2K6LyPjJlEPjZZEzFEEAT+R1fg4OupnnAna96ZpgW6KAfYvGl9DO7z8O4q0e3Qo4VwWCNMRge1whQ/8UjZSmpUUYA3+DzDZHSJ0ddaCDBAar/Io6QSYR/RhaLAyRhT4Qx6Eyv5L62fWnodUrjWRVtOy3Zi/R7hzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WF7UE4MM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750684728; c=relaxed/simple;
+	bh=wMGsgvucVLfYkbHXDDKTBfBWO+Z21DjXdQnoic/p3Wk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p/w20cGita/o+59w7EjlBMlixdQ3e3EQpToXYoRIWBuYoS4Ww8C9B1K5d38QgC16RIVOj0XvRp0Be68oXCd9r94rH7y/D86v9WfNvBWmNIs6RN2Tn6dT8MpawuoVQZthQPk0E4SogAF/8wgTOQ7KEWqo2IVuoKvnndDXPGZ6yUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lAB2kcxa; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WF7UE4MM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750682570;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i6wfaVASMTK3rRy1FpThH+NI3jGe1pbTtlZQ9RBaJaY=;
-	b=WF7UE4MMqnYDN/KqqUq2zLow6ibPR1S8hHfhuE3M9XWPrDzozbFOTs7g7Izfe9GVcyMR/W
-	J8K5Q6XUTuvkfiwTSdwslt8QQ+mhEa1DXFal3mjVf2xl8JYZvL4H3FrmMD2qcHCjXsm3ob
-	C5TEAuavr4q/581uCIoaxZeuGUoGGaM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-TFBpu6m1Nc6cFG7LYEu4Rw-1; Mon,
- 23 Jun 2025 08:42:48 -0400
-X-MC-Unique: TFBpu6m1Nc6cFG7LYEu4Rw-1
-X-Mimecast-MFC-AGG-ID: TFBpu6m1Nc6cFG7LYEu4Rw_1750682566
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B5EFD1809C8C;
-	Mon, 23 Jun 2025 12:42:46 +0000 (UTC)
-Received: from [10.22.80.93] (unknown [10.22.80.93])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53320180035E;
-	Mon, 23 Jun 2025 12:42:44 +0000 (UTC)
-Date: Mon, 23 Jun 2025 14:42:40 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Milan Broz <gmazyland@gmail.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-    "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-    dm-devel@lists.linux.dev
-Subject: Re: [v2 PATCH] dm-crypt: Extend state buffer size in
- crypt_iv_lmk_one
-In-Reply-To: <27689dcc-3018-472f-9db1-efba8f9d52d1@gmail.com>
-Message-ID: <23f34c41-0414-8e25-0d3f-bd6eea716732@redhat.com>
-References: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com> <aFTe3kDZXCAzcwNq@gondor.apana.org.au> <afeb759d-0f6d-4868-8242-01157f144662@gmail.com> <cc21e81d-e03c-a8c8-e32c-f4e52ce18891@redhat.com> <aFk2diodY0QhmZS8@gondor.apana.org.au>
- <27689dcc-3018-472f-9db1-efba8f9d52d1@gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lAB2kcxa"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55NALo9S027421;
+	Mon, 23 Jun 2025 13:18:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Fm1TgEJqD4pkBL0AQWKZeMMZSLmfKyy9sV2Yq+pUN
+	mQ=; b=lAB2kcxapN6l+BeUGFYK4nZugOEGX5+OGYTjiw3s2NTkQt/UFlJpBBvSI
+	Aetb7c6+TR8Q6Qeae8muA+/5wXBD4Cv7r9r6py8NBC/Tzv8Qsy3nV357TODfrBaB
+	8hp/RB/LSZyjnge/lxZfPVdfEyqEpzqeRZTWrtdvIyaKZthfgCuFgm+HyjjnQrQg
+	62DQrl+M7u/JFzjkRNpX3KG519UJbOYW4lKyWKQrkQUNcMRqBKYWmeagVVvi4sqY
+	nJkSszcfgAAbHfJd5dkoY7EJ8+pPE/7OHOhYZXKPDDCv8UFyt3ZWVbv2xLQwK/Bn
+	PNpqfWQeOWBNsk/jl3OHheShhz74w==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dk63j3sr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Jun 2025 13:18:39 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55NDI6ns015028;
+	Mon, 23 Jun 2025 13:18:39 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47e72tf01b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Jun 2025 13:18:39 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55NDIcSI7406200
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Jun 2025 13:18:38 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 91CF658043;
+	Mon, 23 Jun 2025 13:18:38 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1660358055;
+	Mon, 23 Jun 2025 13:18:38 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Jun 2025 13:18:38 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, James.Bottomley@HansenPartnership.com,
+        dhowells@redhat.com, simo@redhat.com,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [RFC PATCH 0/4] crypto: Add support for shake128/256 XOFs
+Date: Mon, 23 Jun 2025 09:18:26 -0400
+Message-ID: <20250623131830.2194643-1-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA4MCBTYWx0ZWRfX4Oz46gKGOtb5 69gLl/xGVOUhyGnJDyVpWyGAKLq+vKHMKdSrRSzpk6tB6+tmqSaU+dI0rFvSq/2PND/fxxWsVI6 CUcCCF+ZoX0XCpwbLWmDDDOfpd4Wt6jvJ0jaGyUaQF3wscangwwnvJZy6CDJeEfxlFA7AVklUIq
+ YDBO+VL/rOVd2aNAACdbLkF4oR6jL8i4NzZkZOBSHlmWd4GvUPDeoE3/dgVqhuBOk1/iYuOUC6U CrmxklaZKzaF9IOd8v+eBdLgoMkx4FtJ634V2KyIFeU0ptgmGH58aCOHvx8/JjdYF+3IOvpgDDA IMLJLXAfsZsGDLVlCi1IRZGDNyRVkt+zsHeo6zkMvU5AaUkjXou77AbxMaRvIcO8zncA5bs47g7
+ nUX3pIBqgEBIQo5Ovsp1b0JPdMSgazY7RyxfUjW0Lrce3g9FSTnBDDKVhx6Pm4sEYzxQU/nW
+X-Proofpoint-ORIG-GUID: AkDESnke_8RBEtgfl5LSaqp4IhG8v3rJ
+X-Proofpoint-GUID: AkDESnke_8RBEtgfl5LSaqp4IhG8v3rJ
+X-Authority-Analysis: v=2.4 cv=BfvY0qt2 c=1 sm=1 tr=0 ts=6859542f cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=6IFa9wvqVegA:10 a=JFUMmdeob1UW1lXIWCQA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-23_03,2025-06-23_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0 spamscore=0
+ impostorscore=0 mlxlogscore=686 malwarescore=0 phishscore=0 bulkscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506230080
 
+This series adds support for shake128/256 extended output functions (XOFs)
+along with test cases to verify the produced digest and XOF output. A new
+squeeze method is added to the shash_alg structure to get an arbitrary
+number of bytes from these XOFs.
 
+Regards,
+   Stefan
 
-On Mon, 23 Jun 2025, Milan Broz wrote:
+Stefan Berger (4):
+  crypto: Add squeeze function to shash_alg for support of XOFs
+  crypto: Add shake128/256 to generic sha3 module
+  crypto: Add tests cases for shake128 & shake256 to testmgr
+  crypto: Extend testmgr with tests for shake128/256 XOFs
 
-> On 6/23/25 1:11 PM, Herbert Xu wrote:
-> > On Mon, Jun 23, 2025 at 11:40:39AM +0200, Mikulas Patocka wrote:
-> > > 
-> > > 345 bytes on the stack - I think it's too much, given the fact that it
-> > > already uses 345 bytes (from SHASH_DESC_ON_STACK) and it may be called in
-> > > a tasklet context. I'd prefer a solution that allocates less bytes.
-> > > 
-> > > I don't see the beginning of this thread, so I'd like to ask what's the
-> > > problem here, what algorithm other than md5 is used here that causes the
-> > > buffer overflow?
-> > 
-> > The md5 export size has increased due to the partial block API
-> > thus triggering the overflow.
-> > 
-> > How about this patch?
+ crypto/hash_info.c             |   4 +
+ crypto/sha3_generic.c          | 211 +++++++++++++
+ crypto/shash.c                 |   9 +
+ crypto/testmgr.c               |  72 +++++
+ crypto/testmgr.h               | 522 +++++++++++++++++++++++++++++++++
+ include/crypto/algapi.h        |   2 +-
+ include/crypto/hash.h          |  25 +-
+ include/crypto/sha3.h          |  19 ++
+ include/uapi/linux/hash_info.h |   2 +
+ 9 files changed, 862 insertions(+), 4 deletions(-)
 
-OK. I accepted the patch and committed it to the linux-dm git.
-
-Mikulas
-
-> For v2:
-> 
-> Tested-by: Milan Broz <gmazyland@gmail.com>
-> 
-> Just for the context, the patch fixes OOPS on 32bit (but 64bit should overflow
-> struct too):
-> 
-> : Oops: Oops: 0000 [#1] SMP
-> : CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.16.0-rc2+ #993
-> PREEMPT(full)
-> : Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference
-> Platform, BIOS 6.00 11/12/2020
-> : Workqueue: kcryptd-254:0-1 kcryptd_crypt [dm_crypt]
-> : EIP: __crypto_shash_export+0xf/0x90
-> : Code: 4a c1 c7 40 20 a0 b4 4a c1 81 cf 0e 00 04 08 89 78 50 e9 2b ff ff ff
-> 8d 74 26 00 55 89 e5 57 56 53 89 c3 89 d6 8b 00 8b 40 14 <8b> 50 fc f6 40 13
-> 01 74 04 4a 2b 50 14 85 c9 74 10 89 f2 89 d8 ff
-> : EAX: 303a3435 EBX: c3007c90 ECX: 00000000 EDX: c3007c38
-> : ESI: c3007c38 EDI: c3007c90 EBP: c3007bfc ESP: c3007bf0
-> : DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010216
-> : CR0: 80050033 CR2: 303a3431 CR3: 04fbe000 CR4: 00350e90
-> : Call Trace:
-> :  crypto_shash_export+0x65/0xc0
-> :  crypt_iv_lmk_one+0x106/0x1a0 [dm_crypt]
-> 
-> ...
-> 
-> The bisect was
-> 
-> efd62c85525e212705368b24eb90ef10778190f5 is the first bad commit
-> commit efd62c85525e212705368b24eb90ef10778190f5 (HEAD)
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Fri Apr 18 10:59:04 2025 +0800
-> 
->     crypto: md5-generic - Use API partial block handling
-> 
->     Use the Crypto API partial block handling.
-> 
-> Milan
-> 
+-- 
+2.49.0
 
