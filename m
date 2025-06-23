@@ -1,113 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0725F1E231F
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Jun 2025 09:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3607C24468A;
+	Mon, 23 Jun 2025 10:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750671655; cv=none; b=JmPu6wZ+PQVc+pwK9RJnnammNMvPRfbbL2TJ1aSZvAY/oZsJeCfNuEbv9Ru6cG1nBiBAZB+Fd4WWewlxSH4wMr1easeHYmdW+di925hlTGzbpYgXnPYMiswT4BHcMD1fs2GukhssA0Hij1U9rnJYTAVCkGV7BlDa4rpBNZcwTus=
+	t=1750675341; cv=none; b=NcPsjO1KwcGcMkmDxU2Mn7UGZ3UWQYs5VL7zfQPSzoKn/97N6mWWlXUkzwF7yLekW45E3B1k2fY5dHK8IG9VWpneLJiflJw9AA49JKqDiuqE/2ZR4nZq7vW9BLVjLMPc/3B5LqRAevA0sW64HaFcnqUrF14LVTOh77ZvxyXaOzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750671655; c=relaxed/simple;
-	bh=QsRfJW7Cn1yNnUQoM5vDqmBJ7+dd/m17wB+nQYPVX+w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=uXbmTnDhiv+aLRizkQgM6PMgpn2vCatNUX7tQxX00w8ATossD2NRNGxhetf0eRE2wDOIBsYTAJl1XFhnjQ2j4brqIy0lG5lHp866txHqZdoqyO82KvO8lu/Y90zWWyMnBazsIGqVXUjqL2lU3gsQQbizWP9pjJuQdhq4Dez+QMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E+0zFtSP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750675341; c=relaxed/simple;
+	bh=l931bTX5MDMkwV6ZzTaGAigtZpZ8cMxO2lXHTUUf198=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rrTYbqjn8fjujjDqWtLUsBqZEBs8q/Juj3C+qpsX9lKzoTuliu6Gq70PrzlvQbVZG71wxz2ZHS1fansHdzJv01VJv9x9W9yODnEwxbGM1M1Kss1JY2VbHpX7v2dAvBHFSqcurEKwrnYW/BfuzQYMBMd0gYAQUzpIORh6gFjhtG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3R9Dd9S; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+0zFtSP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750671653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RVmNNR/2A8UUO46zI6tZfnHfGxmLMr5i7i5OIacu1uE=;
-	b=E+0zFtSPELoMO3F05GWdrmAyeDfNoaABzsOeNzARB+Us0fXijPvebWah2uDi8sXPB8dFcA
-	5vvH/IZHM+oV2ici72ebc40gpBW6UvDP0JuVMorX3oZk/3NSRHlOnh1f4PcXiR33zlyG7L
-	ZkwRC1ZHgJQFArraSy30Z4YZPsou1B4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-76uELt-lO5-xhrZL6Y-aOQ-1; Mon,
- 23 Jun 2025 05:40:47 -0400
-X-MC-Unique: 76uELt-lO5-xhrZL6Y-aOQ-1
-X-Mimecast-MFC-AGG-ID: 76uELt-lO5-xhrZL6Y-aOQ_1750671646
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25C461800368;
-	Mon, 23 Jun 2025 09:40:46 +0000 (UTC)
-Received: from [10.22.80.93] (unknown [10.22.80.93])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC85D1956096;
-	Mon, 23 Jun 2025 09:40:43 +0000 (UTC)
-Date: Mon, 23 Jun 2025 11:40:39 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Milan Broz <gmazyland@gmail.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-    "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-    dm-devel@lists.linux.dev
-Subject: Re: dm-crypt: Extend state buffer size in crypt_iv_lmk_one
-In-Reply-To: <afeb759d-0f6d-4868-8242-01157f144662@gmail.com>
-Message-ID: <cc21e81d-e03c-a8c8-e32c-f4e52ce18891@redhat.com>
-References: <f1625ddc-e82e-4b77-80c2-dc8e45b54848@gmail.com> <aFTe3kDZXCAzcwNq@gondor.apana.org.au> <afeb759d-0f6d-4868-8242-01157f144662@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3R9Dd9S"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ad89c32a7b5so652406866b.2;
+        Mon, 23 Jun 2025 03:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750675337; x=1751280137; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Yw6imxd4BTDTWrkr9aN2QlmFrVCvg38lQ/oem6/zBU=;
+        b=C3R9Dd9S1iFYWKRJ577v3wxWopK2h+mwxqGU0NWxLlhLSVkzm0mS+3eE9Vq8GPULmL
+         MVO5tu9RUe4IU4wcoRg+ayut5PopPQhOezUUmNIhZE0HwnjTspOxMKs3v2u2+dTx0f4v
+         LVYv4ohW7L126OFDJZjXtU1UhklFmkcl/VCEw8asNfHKKf70/M+vfVjr2xird1P7yFKG
+         5O7ZkI4obnvUb2ziE3wNEITFi1pUSJbm+wHN+x1WL8mrcSi3eQ4bBWVWJpGMLQ6ZA1DB
+         yf2PCEX1Zo3naYmejzFqfecuPiQv5ASXP9djBC/Bs+MikJt+rDoaukoOH1Tj4p6GUfBH
+         rIlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750675337; x=1751280137;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Yw6imxd4BTDTWrkr9aN2QlmFrVCvg38lQ/oem6/zBU=;
+        b=tD2u8ngwR7moyU+GkJ+W8ZhfzHFbdPzvgdO9UjTj7QnrqGO26BSBPLNO+nnQDm8vWZ
+         fuwvFsVBZiItvgzehkw0e1s9lAH4GntGceYQ5Oyfo3lR9kRSQUX32LhO7yxXe14WNeTX
+         182hLpFeNxI1i3TSVDoGJ4AN7nj3KSUwC/VQYLVouuumdBG3YxsShIMLUdD1l3+vELMz
+         6lvi325cPjoZaNrVig6NeG7LrMf8DxJ35tmm+y27VbhBh6W2RA5EcYeVkNCNnW3RvrRv
+         Ly1gVwI49CUH0M9mm771yS4o/fLNKjqtS2dXd5xOp7cZBBWfh7WAVUSmZm1lLEb8/xng
+         hnPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6CmKln5lma4tJNCqQx6ad0GdQQEQZdY/AYPCmMGay46VCOCpbPYlfZZa8iS5WWrQZ/NcU3fyGq//KJe3H@vger.kernel.org, AJvYcCVKTZ1/HOogqqWrOzbs8U8Fe+M1eaaul/LaCR71lhpwGodUNDggPFJGRhaAjmX+uJlzC1VjITEtje0YoMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye7pGylcKyQMCCD09jOHg6SyrH3XQ4rw0Me9Hx2AAWPrUqz3MH
+	NHF8dtC25ul9IP8hAFzvzNUkYUr3Ef9rVrhu+sUkrtCCQB/5YVRz0nWC
+X-Gm-Gg: ASbGncsbCOEOu9CBRWTfpG4nA/rHnwsgi/Uu1VxVV8uYqE/n0f0JFECczMjVQTee9kT
+	mpsiYg5DKezc11NryI/lW9e434YyJ/zBiNMWTCsysxG2SduvF3ZkVMeA/4Y8UpAprQ807+y+Nq6
+	WoIFk/haz6Q4/NC0HTV+L6vqVFCsaG+hYAsAiH5yz/3hoSYlRzk42FWsQWxY03/y58x7rrczwy0
+	JsGELfP+u+zoTzVKfBjomVSeE+8Vlpt1gzZB0AgWQuJwOSrVbMOFbatuJ0+O2bcWWXOVxu4pOiX
+	V8fPMItEOfo9h+lJWKH2TFDUepvpyHPmYHXc45sN389c/HbuXXk69hFDn2W0mdk3+rhpetfKaU4
+	vse0clyRaFrOm1PCZEAwK5VIWLUgd1ehc07eVUGTZ57CW6To=
+X-Google-Smtp-Source: AGHT+IEfNTyPHjwPJEzLQfQoS55yQsLH7CzoYZynUgBsxDONAr3ULxD/B75b39rL0u4RhOVhHN1eXA==
+X-Received: by 2002:a17:906:6a1a:b0:ad2:1cd6:aacf with SMTP id a640c23a62f3a-ae057c0d793mr1084866966b.47.1750675337254;
+        Mon, 23 Jun 2025 03:42:17 -0700 (PDT)
+Received: from ?IPV6:2a02:2f0e:c51b:8900:a03f:12cb:72f7:9069? ([2a02:2f0e:c51b:8900:a03f:12cb:72f7:9069])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0541b6894sm687693066b.111.2025.06.23.03.42.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 03:42:16 -0700 (PDT)
+Message-ID: <0b963009-85fe-473a-a65b-6b427bee98c5@gmail.com>
+Date: Mon, 23 Jun 2025 13:42:15 +0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: sun8i-ce: Fix `dma_unmap_sg()` nents value
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Chen-Yu Tsai <wens@csie.org>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>, Andre Przywara
+ <andre.przywara@arm.com>, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20250623091009.65436-2-fourier.thomas@gmail.com>
+Content-Language: en-US
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+In-Reply-To: <20250623091009.65436-2-fourier.thomas@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Thomas,
 
-
-On Fri, 20 Jun 2025, Milan Broz wrote:
-
-> Hi,
+On 6/23/25 12:10 PM, Thomas Fourier wrote:
+> The `dma_unmap_sg()` functions should be called with the same nents as the
+> `dma_map_sg()`, not the value the map function returned.
 > 
-> On 6/20/25 6:09 AM, Herbert Xu wrote:
-> > The output buffer size of of crypto_shash_export is returned by
-> > crypto_shash_statesize.  Alternatively HASH_MAX_STATESIZE may be
-> > used for stack buffers.
-> > 
-> > Fixes: 8cf4c341f193 ("crypto: md5-generic - Use API partial block handling")
-> > Reported-by: Milan Broz <gmazyland@gmail.com>
-> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Yes, that fixes the issue, thanks!
-> 
-> Tested-by: Milan Broz <gmazyland@gmail.com>
-> 
-> Mikulas, I think this should go through DM tree, could you send it for 6.16?
-> The full patch is here
-> https://lore.kernel.org/linux-crypto/aFTe3kDZXCAzcwNq@gondor.apana.org.au/T/#u
-> 
-> > diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> > index 9dfdb63220d7..cb4617df7356 100644
-> > --- a/drivers/md/dm-crypt.c
-> > +++ b/drivers/md/dm-crypt.c
-> > @@ -517,7 +517,10 @@ static int crypt_iv_lmk_one(struct crypt_config *cc, u8
-> > *iv,
-> >   {
-> >   	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
-> >   	SHASH_DESC_ON_STACK(desc, lmk->hash_tfm);
-> > -	struct md5_state md5state;
-> > +	union {
-> > +		struct md5_state md5state;
-> > +		u8 state[HASH_MAX_STATESIZE];
-> > +	} u;
 
-Hi
+This should already be fixed by:
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=b6cd3cfb5afe49952f8f6be947aeeca9ba0faebb
 
-345 bytes on the stack - I think it's too much, given the fact that it 
-already uses 345 bytes (from SHASH_DESC_ON_STACK) and it may be called in 
-a tasklet context. I'd prefer a solution that allocates less bytes.
+The sg nents are saved to request context during prepare() and then used
+in unprepare().
 
-I don't see the beginning of this thread, so I'd like to ask what's the 
-problem here, what algorithm other than md5 is used here that causes the 
-buffer overflow?
+Thanks,
+Ovidiu
 
-Mikulas
+> Fixes: 0605fa0f7826 ("crypto: sun8i-ce - split into prepare/run/unprepare")
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+> ---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> index f9cf00d690e2..ce9d071f5693 100644
+> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> @@ -326,8 +326,8 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
+>  	struct sun8i_ce_flow *chan;
+>  	struct ce_task *cet;
+>  	unsigned int ivsize, offset;
+> -	int nr_sgs = rctx->nr_sgs;
+> -	int nr_sgd = rctx->nr_sgd;
+> +	int ns = sg_nents_for_len(areq->src, areq->cryptlen);
+> +	int nd = sg_nents_for_len(areq->dst, areq->cryptlen);
+>  	int flow;
+>  
+>  	flow = rctx->flow;
+> @@ -336,11 +336,11 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
+>  	ivsize = crypto_skcipher_ivsize(tfm);
+>  
+>  	if (areq->src == areq->dst) {
+> -		dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_BIDIRECTIONAL);
+> +		dma_unmap_sg(ce->dev, areq->src, ns, DMA_BIDIRECTIONAL);
+>  	} else {
+> -		if (nr_sgs > 0)
+> -			dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_TO_DEVICE);
+> -		dma_unmap_sg(ce->dev, areq->dst, nr_sgd, DMA_FROM_DEVICE);
+> +		if (rctx->nr_sgs > 0)
+> +			dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
+> +		dma_unmap_sg(ce->dev, areq->dst, nd, DMA_FROM_DEVICE);
+>  	}
+>  
+>  	if (areq->iv && ivsize > 0) {
 
