@@ -1,45 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B360C5680;
-	Tue, 24 Jun 2025 02:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3036F5680;
+	Tue, 24 Jun 2025 02:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750733126; cv=none; b=VRxxo0bU9d0Gokl7uAlC+errRDMAJ0gesTcqTawHlsHoiEzd+pFY4Gq/7qVhifNWQcJ4bSpsC/USC5FLQoG1gWE0ZGb4rVrR+cCUgTap9MW/Urg7pqQ0p1ko7T0Pz4DvaynKxyGWVMOYE3sOIy467Qo7QVvfoyxuyhLMdfA5is0=
+	t=1750733174; cv=none; b=kyjaAo1DgSKcLU7c6GgwpAuPBtiHRF0LjIo1LvezzUzztL8BPmr3ZFnesMmNiHXa5PVgqAB/zw3prEf/nNhzW8kFZ9PE7RJONrjJkhMxmhflcuxapZGB3RdGdu6KC8aCURRLLPeud/p212QLwLuEYCDcm87TAqa39J5e9fu9bto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750733126; c=relaxed/simple;
-	bh=wvw4KZrFb3bDpFyljDt13+2hzP7dlyNidFKreU0+rGc=;
+	s=arc-20240116; t=1750733174; c=relaxed/simple;
+	bh=EjHWaD9DhlxJg5t8c7HONRRxLIGyndgE8Wf80m4Kmis=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gu8f9Q8i/M/GAZWaVSE0YpW3E2uFmKFLptD4TXdoEnla8Vnl2ZsWRcJ38dPmIL8pnWqoqPi7XSWM1EB7cqH8YMQKZWOCTBispOVZDtYgm7jI8JM5MLgxDeUXXOomh9oUU8LRA2eOU61l9RhIpFF5fYQL1v5PfVRr2RtwoBs2nLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oIipPcPU; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LtiakCl52Et4xMuROHO74eXetEltnemg0R0T8+Hm35BmZOaemGmgcZdrmEwVcr63zyslBSamMgK55vITzdcKTQWWHOd5r7yiBGpMFDsDE6jao5JKeXzrFQqaIWyLr03nd8FadVnjN0twL9h3uhtOGEwlQSGxcjDyN3qMUD5hUmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WQzERfzF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oIipPcPU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1A0AC4CEEA;
-	Tue, 24 Jun 2025 02:45:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQzERfzF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D782C4CEEA;
+	Tue, 24 Jun 2025 02:46:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750733126;
-	bh=wvw4KZrFb3bDpFyljDt13+2hzP7dlyNidFKreU0+rGc=;
+	s=k20201202; t=1750733173;
+	bh=EjHWaD9DhlxJg5t8c7HONRRxLIGyndgE8Wf80m4Kmis=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oIipPcPUENDbB1DVaM2klpFxZLymtMC1278ktKPXQMNZt41mnhj+ZJexStFH5JK2u
-	 nFXCl0kaNRAtFSccN6WfWV998QOsGwbB+qf9yeRG2pfUiPe5aPfG7a5fiaJzXH3RE/
-	 FIJSmpv+ncH9OqsDWsdaTgdlboVcC2ABX1ghnprIEbIl3QAUqvV2QqsDjZ1079FYkn
-	 jPt0nzSxpOunutckTus8H/G0ofSpk6ztujnJoy+KSEri/GKc+oFI2MLNBYknXyAgdT
-	 3HUYlPxE9SjpaR0UWveXbgSzRwttALUuqVwFQiG2HmGYrj+2QgHF3a3xvoxS0gN2+S
-	 O5Eof0eJUCorA==
-Date: Mon, 23 Jun 2025 19:44:51 -0700
+	b=WQzERfzFbi9TYBsOzZGjcurc4NUiaqvGetTgbt7gXN8LrkpwG8h9Q9Wi+Lbv3FkkF
+	 NuFeZx7p1CRYe+IUVZ7y0siwQIFTyDYtmJlXZlJJKLLfT2WjQ3l0bJF6zDxCVNir09
+	 GtJPc7RnnNgcMe/UbGq81VTSr1kjxaPyZncK5a1Lh9aURMVA18tp/njwiBLtBa6UnS
+	 zLba/PrqBsk9CgULPZ19dXd0dGT0yX/NUHXiRcK8anglUenv/MN66ZJQ6ucW7asDx3
+	 IBjLiLjAVcKOo4AmG/nWUQOsd8Y3WG7gta6uQLt5Sb5kUBkYf3j5q0Z6Rgr9V/zBG8
+	 7lQgQ6nP+ccXA==
+Date: Mon, 23 Jun 2025 19:45:39 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jason@zx2c4.com, Ard Biesheuvel <ardb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: Re: [PATCH v2 5/9] lib/crypto: riscv: move arch/riscv/lib/crypto/
- into lib/crypto/
-Message-ID: <20250624024451.GA7127@sol>
-References: <20250619191908.134235-6-ebiggers@kernel.org>
- <mhng-8FC37478-859D-40EA-A0E9-3EA86429DC53@palmerdabbelt-mac>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld " <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org
+Subject: Re: [PATCH] lib/crypto: x86/sha512: Remove unnecessary checks for
+ nblocks==0
+Message-ID: <20250624024539.GB7127@sol>
+References: <20250621021549.105357-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,52 +43,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <mhng-8FC37478-859D-40EA-A0E9-3EA86429DC53@palmerdabbelt-mac>
+In-Reply-To: <20250621021549.105357-1-ebiggers@kernel.org>
 
-On Mon, Jun 23, 2025 at 04:23:52PM -0700, Palmer Dabbelt wrote:
-> On Thu, 19 Jun 2025 12:19:04 PDT (-0700), ebiggers@kernel.org wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > Move the contents of arch/riscv/lib/crypto/ into lib/crypto/riscv/.
-> > 
-> > The new code organization makes a lot more sense for how this code
-> > actually works and is developed.  In particular, it makes it possible to
-> > build each algorithm as a single module, with better inlining and dead
-> > code elimination.  For a more detailed explanation, see the patchset
-> > which did this for the CRC library code:
-> > https://lore.kernel.org/r/20250607200454.73587-1-ebiggers@kernel.org/.
-> > Also see the patchset which did this for SHA-512:
-> > https://lore.kernel.org/linux-crypto/20250616014019.415791-1-ebiggers@kernel.org/
-> > 
-> > This is just a preparatory commit, which does the move to get the files
-> > into their new location but keeps them building the same way as before.
-> > Later commits will make the actual improvements to the way the
-> > arch-optimized code is integrated for each algorithm.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  arch/riscv/lib/Makefile                                         | 1 -
-> >  lib/crypto/Kconfig                                              | 2 +-
-> >  lib/crypto/Makefile                                             | 1 +
-> >  {arch/riscv/lib/crypto => lib/crypto/riscv}/Kconfig             | 0
-> >  {arch/riscv/lib/crypto => lib/crypto/riscv}/Makefile            | 0
-> >  .../riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-glue.c | 0
-> >  .../riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-zvkb.S | 0
-> >  .../crypto/riscv}/sha256-riscv64-zvknha_or_zvknhb-zvkb.S        | 0
-> >  {arch/riscv/lib/crypto => lib/crypto/riscv}/sha256.c            | 0
-> >  9 files changed, 2 insertions(+), 2 deletions(-)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/Kconfig (100%)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/Makefile (100%)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-glue.c (100%)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/chacha-riscv64-zvkb.S (100%)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/sha256-riscv64-zvknha_or_zvknhb-zvkb.S (100%)
-> >  rename {arch/riscv/lib/crypto => lib/crypto/riscv}/sha256.c (100%)
+On Fri, Jun 20, 2025 at 07:15:49PM -0700, Eric Biggers wrote:
+> Since sha512_blocks() is called only with nblocks >= 1, remove
+> unnecessary checks for nblocks == 0 from the x86 SHA-512 assembly code.
 > 
-> I'm assuming you want to keep these all together.
-> 
-> Acked-by: Palmer Dabbelt <palmer@dabbelt.com>
-> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/x86/sha512-avx-asm.S   | 6 +-----
+>  lib/crypto/x86/sha512-avx2-asm.S  | 5 +----
+>  lib/crypto/x86/sha512-ssse3-asm.S | 6 +-----
+>  3 files changed, 3 insertions(+), 14 deletions(-)
 
-Yes, I'm taking this series through libcrypto-next.  Thanks!
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
 - Eric
