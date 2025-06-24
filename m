@@ -1,40 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3036F5680;
-	Tue, 24 Jun 2025 02:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA72A6EB79;
+	Tue, 24 Jun 2025 02:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750733174; cv=none; b=kyjaAo1DgSKcLU7c6GgwpAuPBtiHRF0LjIo1LvezzUzztL8BPmr3ZFnesMmNiHXa5PVgqAB/zw3prEf/nNhzW8kFZ9PE7RJONrjJkhMxmhflcuxapZGB3RdGdu6KC8aCURRLLPeud/p212QLwLuEYCDcm87TAqa39J5e9fu9bto=
+	t=1750733284; cv=none; b=QuXLYDOJf6oTbPdFAbz9zYpRTgIWlx+B6n2uv7IS01/zPmoD3h265EeLJ+edG+baLtqPovmVDCVvUaUzbNO2NeVBTt1bLibTnD+HTXIEHOF69uR3D5d2Z57lljuJTlmS3Q1kbi7sxnHgIFwIPwWsvRZrSFb+LXxzN3d9eBib39o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750733174; c=relaxed/simple;
-	bh=EjHWaD9DhlxJg5t8c7HONRRxLIGyndgE8Wf80m4Kmis=;
+	s=arc-20240116; t=1750733284; c=relaxed/simple;
+	bh=0ZETP/chWGG4T9JGaFbl9fh8M/SzCRMYDw4aVpfGbeo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LtiakCl52Et4xMuROHO74eXetEltnemg0R0T8+Hm35BmZOaemGmgcZdrmEwVcr63zyslBSamMgK55vITzdcKTQWWHOd5r7yiBGpMFDsDE6jao5JKeXzrFQqaIWyLr03nd8FadVnjN0twL9h3uhtOGEwlQSGxcjDyN3qMUD5hUmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WQzERfzF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nbuaUd/BvCMNduuI7DSLXRpLzYt1Mht3VdRhHHz/WLWkC77/6Wpof4NKfFbIWNfKvsxT/PUJZ4wJg+WTtV4SHlXzwwEUfT8nDhZWniXDOUs/J530ZRElf7sXPqYMS/FQBbbepINI/3mQ9AsUF2PRtAaRaDrWIkSTWgulrlsySnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8VT+Qfs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQzERfzF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D782C4CEEA;
-	Tue, 24 Jun 2025 02:46:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8VT+Qfs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 421FEC4CEEA;
+	Tue, 24 Jun 2025 02:48:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750733173;
-	bh=EjHWaD9DhlxJg5t8c7HONRRxLIGyndgE8Wf80m4Kmis=;
+	s=k20201202; t=1750733284;
+	bh=0ZETP/chWGG4T9JGaFbl9fh8M/SzCRMYDw4aVpfGbeo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WQzERfzFbi9TYBsOzZGjcurc4NUiaqvGetTgbt7gXN8LrkpwG8h9Q9Wi+Lbv3FkkF
-	 NuFeZx7p1CRYe+IUVZ7y0siwQIFTyDYtmJlXZlJJKLLfT2WjQ3l0bJF6zDxCVNir09
-	 GtJPc7RnnNgcMe/UbGq81VTSr1kjxaPyZncK5a1Lh9aURMVA18tp/njwiBLtBa6UnS
-	 zLba/PrqBsk9CgULPZ19dXd0dGT0yX/NUHXiRcK8anglUenv/MN66ZJQ6ucW7asDx3
-	 IBjLiLjAVcKOo4AmG/nWUQOsd8Y3WG7gta6uQLt5Sb5kUBkYf3j5q0Z6Rgr9V/zBG8
-	 7lQgQ6nP+ccXA==
-Date: Mon, 23 Jun 2025 19:45:39 -0700
+	b=P8VT+QfsmFyNCARIa6+zv5GeEdHmGYz4b2CXf2QnLCgg2XjI+QzVHFQwaE54p21fT
+	 1LCZ7fSSZ2/nlpVQyeKmcrVqpGzdILXyh4DkrsBuW0Jm2+lMKrL2NYPCa2F1u7qiRq
+	 pmGy+v9rQbqcPMJ5c7Ar9+5dM1PmAGXhnP1d40AksQRUnbL04k4TUW/iADQsjNci5R
+	 /M7bl9YM8W8DfDHtijhEjzPSFgXIzwYJGmERAy0H9kLYjCZywd5ELycQkRygA06DgI
+	 eFstFLW0coTU18586ApXLRLRIQwaVckxTiXEMn3hF5HMSifi0iGk/xafn/MCD06Y2v
+	 j10n7GKclAZ1w==
+Date: Mon, 23 Jun 2025 19:47:30 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld " <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org
-Subject: Re: [PATCH] lib/crypto: x86/sha512: Remove unnecessary checks for
- nblocks==0
-Message-ID: <20250624024539.GB7127@sol>
-References: <20250621021549.105357-1-ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld " <Jason@zx2c4.com>,
+	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
+	linux-mips@vger.kernel.org, llvm@lists.linux.dev,
+	stable@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH] lib/crypto: mips/chacha: Fix clang build and remove
+ unneeded byteswap
+Message-ID: <20250624024730.GC7127@sol>
+References: <20250619225535.679301-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,18 +46,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250621021549.105357-1-ebiggers@kernel.org>
+In-Reply-To: <20250619225535.679301-1-ebiggers@kernel.org>
 
-On Fri, Jun 20, 2025 at 07:15:49PM -0700, Eric Biggers wrote:
-> Since sha512_blocks() is called only with nblocks >= 1, remove
-> unnecessary checks for nblocks == 0 from the x86 SHA-512 assembly code.
+On Thu, Jun 19, 2025 at 03:55:35PM -0700, Eric Biggers wrote:
+> The MIPS32r2 ChaCha code has never been buildable with the clang
+> assembler.  First, clang doesn't support the 'rotl' pseudo-instruction:
 > 
+>     error: unknown instruction, did you mean: rol, rotr?
+> 
+> Second, clang requires that both operands of the 'wsbh' instruction be
+> explicitly given:
+> 
+>     error: too few operands for instruction
+> 
+> To fix this, align the code with the real instruction set by (1) using
+> the real instruction 'rotr' instead of the nonstandard pseudo-
+> instruction 'rotl', and (2) explicitly giving both operands to 'wsbh'.
+> 
+> To make removing the use of 'rotl' a bit easier, also remove the
+> unnecessary special-casing for big endian CPUs at
+> .Lchacha_mips_xor_bytes.  The tail handling is actually
+> endian-independent since it processes one byte at a time.  On big endian
+> CPUs the old code byte-swapped SAVED_X, then iterated through it in
+> reverse order.  But the byteswap and reverse iteration canceled out.
+> 
+> Tested with chacha20poly1305-selftest in QEMU using "-M malta" with both
+> little endian and big endian mips32r2 kernels.
+> 
+> Fixes: 49aa7c00eddf ("crypto: mips/chacha - import 32r2 ChaCha code from Zinc")
+> Cc: stable@vger.kernel.org
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202505080409.EujEBwA0-lkp@intel.com/
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  lib/crypto/x86/sha512-avx-asm.S   | 6 +-----
->  lib/crypto/x86/sha512-avx2-asm.S  | 5 +----
->  lib/crypto/x86/sha512-ssse3-asm.S | 6 +-----
->  3 files changed, 3 insertions(+), 14 deletions(-)
+> 
+> This applies on top of other pending lib/crypto patches and can be
+> retrieved from git at:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git mips-chacha-fix
+> 
+>  lib/crypto/mips/chacha-core.S | 20 +++++++-------------
+>  1 file changed, 7 insertions(+), 13 deletions(-)
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
