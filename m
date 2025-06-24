@@ -1,213 +1,175 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB479259CA8
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2025 07:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D40E545
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2025 09:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750751391; cv=none; b=E5ZqKkkvDb744rDwdEK1TSt7A2HnA2HcPZ4e7keiwbnSRMwx/sCAtv70cgKRfuA+Uktn2waSoFS5kUMrysMBp390plqpQpc1STJZ5LwcdxIrahUfFWe3kCdUc/Uz+AOxx1OJDrfzUl8wTUqF+P9dTdsT+5HtloURhmdcf3ElcBc=
+	t=1750756434; cv=none; b=FCGc2uVYJz9l/qrCBxxGX6RygVK+697ToSueKT+nLxWkc1Q4piOdTy2Dx5vzIAN27SUgLdEVU8fWLdCC4Iscuvd+hJCxZB34XX2aPgzNN6fT3SVldcuI9EjHX2FZ7do3SZCgMjXAGspSGFta7IYiqPO+FkBd8H3Usywf+FquRYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750751391; c=relaxed/simple;
-	bh=4xp2xPZJDUDY92X1KIl/IiLpG/PQaUTTvnUq4UFdyEE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FvUhLJ1GiC5SR7rc97cIsd/VZf7Y2cFXZYBUMjiZ7eTAB7D3aiOyPLwuEjLa2I+IArYrLLDfpdx7hgLYd+LUcq8UVMMa79EYblx5iQTUGBoSK3lm0FuicCoX2HYGAPQ9KoPavQwH+zyoFCUdhJAA87AbpZ6n6xzOoC7TuXEf9O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Cm0w5dW9; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1750756434; c=relaxed/simple;
+	bh=Fj9kA2DvjkJlCS5AZd024qRG+gPqQ4L5VFl1xQm8Wm8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jHgI/Q2cZ8D2VBAaUk3MC1Suz5giJp6q4sOe4CyNJuA4CuMYTqWMItKtxuCrmplz3dy0QO5y4av4XQCxWjG+TIyAubExiB7Ow0RETNbjTN70YLYHdoOfXIec+Slj4vU0hSXbafJKxXD5BBF7JEmx/DBCmv60hocyRxID4Rvz4No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=mApsRHqh; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Cm0w5dW9"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e82596e88c4so96594276.1
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2025 00:49:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="mApsRHqh"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-553cf020383so175902e87.2
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2025 02:13:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1750751388; x=1751356188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a2GgMgmkIgP4lsnQEgW9b05jhOBEpY0FKkTliFZZAZY=;
-        b=Cm0w5dW9hfdydwMGSpxd64uT1g/bXw+bKlOMqkCgD3s6/idU+t41baNPVPjUGOomh2
-         5APYHmjUYMvblqw4l2KBVa7e5V9qD1WyTgfYakc5BSHL0WInn/m2O5Ds5+t212PD8+Dd
-         PVWLUqyfmJ38y85BVw9lrObN+A120KgLN1abI=
+        d=cryptogams.org; s=gmail; t=1750756431; x=1751361231; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VeAtLCIzELtEqAtC7OfqanDtQsJ0MWYyoX2KXzWO0Js=;
+        b=mApsRHqhiwoGxgn8mBEj1cFlQZg8Bll7tufs4vpnCFUezZY43hXn2GHTnn35F6rFUu
+         q/KHttL70MTm6OKmdfuf5wmruCfYl5pHVFXs7RU57FAoC7u7JUTHRX74Q58zOsW1+PXI
+         54Z9MVDNbF4moC9MELudY7aqJm/48sMq0wnZx6kDwQs4XX2GIRTUsdGEaO87O/J0511W
+         BF3SJz4X0xB7Y6fTuHWXj8FkMK5WHk6lnFJLlbD5mcU6hhyzEgWmNOcOuMOwxBdFjuZ3
+         PP4ulFPlobuNyDLK2C6Lfsr7S1Nodj/HhwZzF6Qd2YjrkLm1h1EVBGbwRJkqoRdY9Q82
+         HEjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750751388; x=1751356188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a2GgMgmkIgP4lsnQEgW9b05jhOBEpY0FKkTliFZZAZY=;
-        b=jxX3t4Ab7U0hue8hyQtBX0xLKxocraN9Hz+m7AumJ5GSYJeEft2GnmFOb/x3rssHkP
-         VMiasoQeZLniKSYjv9NIT9/8mriVlBRvVqUCAKtQZV9sqtqjMAuF5f1DI10NPp6h3Jae
-         zp6WkGIPzFnZZthQAQ+BSLYDGyYGdPUing/SchPzNuqLiNqgVLnoeNJuHyRUHdo4XM3r
-         97f4zWvjTKo9WNZLVeWq4AU6lst9Ao6zSz75i5PdLxsTzirqwl/E9HVZZVxJw8VjaTJc
-         WzQiOvRRqTRMJLD6mUuWEBGCAk/+18MH8CwF2YmEc/zRQ2s8KiPk7e6I5hp6lk7Hs6wb
-         zw5w==
-X-Gm-Message-State: AOJu0YwexU1R0RDBHcq6ZYn5ddNl1ojbCMJG4kcjULIdXXO8IoU5t5fQ
-	4ndv98mv68l8LHm14KmMkt7Bdt7rQ4/2v9ZZmjL4JqMVuflh86Gk+2HgcBD4l8zU5MsMPwIXUod
-	8Chv0muCo8hY+KraI1c2T17EOOnclKgMQ/Tv05Vbong==
-X-Gm-Gg: ASbGncs6jeu2Cakfog6i8opzB2Va5tmZTgF8N3Gku3DezOSfYV+fo5ij/8xsllwiW0V
-	QBvKXN+fFzCnkqt1dQXUf0z6pfXba93V+sAYBrLOOG6uAHTi7/PzV93yL0N8Tv1FcC4DvsyaI6H
-	TvvrJz95hRDayoFSS28iWkIyJvvcMK/5B8B5Cruch9mQw=
-X-Google-Smtp-Source: AGHT+IHv2WVZ5dtrz0QnXvOVMUjZgn0BsemAVul3jgQVDjh7OOHw30oiyOpFvnzhvWJNYzcwCTPLBstNxqzXGoDdbJo=
-X-Received: by 2002:a05:6902:108e:b0:e85:ed6b:4981 with SMTP id
- 3f1490d57ef6-e85ed6b4a78mr4950966276.23.1750751388575; Tue, 24 Jun 2025
- 00:49:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750756431; x=1751361231;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VeAtLCIzELtEqAtC7OfqanDtQsJ0MWYyoX2KXzWO0Js=;
+        b=RO6JkcqSw5zhErnBJF7FKTJ0mM/upFkGQICqVFVS9lBh2YDraEXHgOHFmbmFd64fFq
+         RJyQeE66RrHQpADyFQ0UIF0ISjuqx4ysnKO3ttd3vP1nhPeOS6k9XhVPPdnj27LxzpSO
+         aAV34X6/vk0CrPqMHY7ERvx0GscSvY6Jci7hJl2IQKHJbTzRqKHMzdS/Ob10y1gNZpWo
+         35TUcNydrJH2HAYuH7b5qd2+GXn6zsEEWEeJ3vIsvtADi0h/UR13L2XQqPRu6gathT1O
+         WSxLlJowuZ6OBfIbeYiHoxKH/hpSpVxofgcdsGTwqrKg3dtZ44M/jBA9lNYDJKA/qLL3
+         T0OA==
+X-Gm-Message-State: AOJu0Yy6aemQrvYvPKOABHn7P1LPMehUpRL15Ahfdncs43frVeSg+awJ
+	JrzKfoRQyvjCVJOXZdSDFWZRfLrDwZRCoe095yTxUdI3e0eXXN2mOccBuUMaOk7+t6g=
+X-Gm-Gg: ASbGncu1oa7MUS/vRuA3lEJL148QAyi2SxRgSy60eaVEYJU1HmGSSsD/+TeRIR3tePf
+	s0ChgJ1uW+qwusiVlRsN2LbMBo4ywVn+WxFJxWh5uG2Xn+a4GsFkmR02IMWlm3ouk9i9iVHsTbi
+	nL68lnGRwmlNqZlYUUruY/I5i8jwhsb4b9UpsyjYbIIMwv48BRbrU5lN1pCO4uoKIwvPg5s5WYv
+	RqXyWukbivioB9uNy2lRg7qd8U7sjdsY8lprMZZHaUm2S0EHejeILYOV471sVJ9TzmJDUcjr62M
+	jHoQS1qLZ+47i99aIsVJ8AQDtGNZBSK78D/cWDbR97NxwL+ML+VuyjBg9Ch3JB1kw2WaFOjwJYH
+	lhSyOfH21v3H+bQdpuqyDdOxxf640hw==
+X-Google-Smtp-Source: AGHT+IFaH46vGc8vI6X612n64uA9UbCTRBi9D9MK4NxdIERHjnEHGYL4HBCVvwI2kOhbR50is8W1kA==
+X-Received: by 2002:a05:6512:4056:10b0:554:f9c5:6b3e with SMTP id 2adb3069b0e04-554f9c56d46mr208217e87.41.1750756430826;
+        Tue, 24 Jun 2025 02:13:50 -0700 (PDT)
+Received: from [10.0.1.129] (c-92-32-242-43.bbcust.telenor.se. [92.32.242.43])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41bd232sm1729392e87.95.2025.06.24.02.13.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 02:13:50 -0700 (PDT)
+Message-ID: <48de9a74-58e8-49c2-8d8a-fa9c71bf0092@cryptogams.org>
+Date: Tue, 24 Jun 2025 11:13:49 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250602053231.403143-1-pavitrakumarm@vayavyalabs.com>
- <20250602053231.403143-2-pavitrakumarm@vayavyalabs.com> <fae97f84-bdb9-42de-b292-92d2b262f16a@kernel.org>
- <CALxtO0mpQtqPB0h_Wff2dLGo=Mxk02JJQkK4rn+=TuScNdSfxQ@mail.gmail.com>
- <3570be5b-cb20-4259-9a9b-959098b902d0@kernel.org> <CALxtO0mH=GwhQxQBsmMQYd+qgAue9WxXN1XWo9BncVJvJk6d8A@mail.gmail.com>
- <cd6e92af-1304-4078-9ed7-de1cb53c66da@kernel.org> <CALxtO0mVMTWqidSv7LQSQd-rA_TmJy_0xgBSd=mP27kg=AXQRg@mail.gmail.com>
- <e08b2f76-17b1-4411-a428-b2f0f8a7d7fd@kernel.org> <CALxtO0nReqeGKY+BNCBD10KSGttxxCrFzczxPjfrQM0eXv9Eug@mail.gmail.com>
- <b207cba7-47d3-43f4-8d59-38df9ec4eec2@kernel.org>
-In-Reply-To: <b207cba7-47d3-43f4-8d59-38df9ec4eec2@kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Tue, 24 Jun 2025 13:19:37 +0530
-X-Gm-Features: Ac12FXx9KD4UOHhj75qGAiuyDem7sV7v10kA6Mwb459PbL5ZJU-1N8SzFZSnTsI
-Message-ID: <CALxtO0k3_ib2G-4pL0h5HxHUXgJ=ArNY6eaThEzdsPiYPauDWw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/6] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, 
-	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS
+ implementation
+To: Eric Biggers <ebiggers@kernel.org>,
+ Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
+ herbert@gondor.apana.org.au, paul.walmsley@sifive.com, alex@ghiti.fr,
+ zhang.lyra@gmail.com
+References: <20250611033150.396172-2-zhihang.shao.iscas@gmail.com>
+ <20250624035057.GD7127@sol>
+Content-Language: en-US
+From: Andy Polyakov <appro@cryptogams.org>
+In-Reply-To: <20250624035057.GD7127@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Krzysztof,
-   My comments are embedded below, appreciate your inputs.
+>> +.globl	poly1305_init
+>> +.type	poly1305_init,\@function
+>> +poly1305_init:
+>> +#ifdef	__riscv_zicfilp
+>> +	lpad	0
+>> +#endif
+> 
+> The 'lpad' instructions aren't present in the upstream CRYPTOGAMS source.
 
-Warm regards,
-PK
+They are.
 
-On Fri, Jun 6, 2025 at 6:34=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.org=
-> wrote:
->
-> On 06/06/2025 14:58, Pavitrakumar Managutte wrote:
-> > On Fri, Jun 6, 2025 at 4:55=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel=
-.org> wrote:
-> >>
-> >> On 06/06/2025 13:02, Pavitrakumar Managutte wrote:
-> >>> Hi Krzysztof,
-> >>>   Appreciate your inputs and feedback. My comments are embedded below=
-.
-> >>>
-> >>> Warm regards,
-> >>> PK
-> >>>
-> >>> On Wed, Jun 4, 2025 at 7:37=E2=80=AFPM Krzysztof Kozlowski <krzk@kern=
-el.org> wrote:
-> >>>>
-> >>>> On 04/06/2025 14:20, Pavitrakumar Managutte wrote:
-> >>>>>>
-> >>>>>>>>> +
-> >>>>>>>>> +  snps,vspacc-id:
-> >>>>>>>>> +    $ref: /schemas/types.yaml#/definitions/uint32
-> >>>>>>>>> +    description: |
-> >>>>>>>>> +      Virtual SPAcc instance identifier.
-> >>>>>>>>> +      The SPAcc hardware supports multiple virtual instances (=
-determined by
-> >>>>>>>>> +      ELP_SPACC_CONFIG_VSPACC_CNT parameter), and this ID is u=
-sed to identify
-> >>>>>>>>> +      which virtual instance this node represents.
-> >>>>>>>>
-> >>>>>>>> No, IDs are not accepted.
-> >>>>>>>
-> >>>>>>> PK: This represents the specific virtual SPAcc that is being used=
- in
-> >>>>>>> the current configuration. It is used to index into the register =
-banks
-> >>>>>>> and the context memories of the virtual SPAcc that is being used.=
- The
-> >>>>>>> SPAcc IP can be configured as dedicated virtual SPAccs in
-> >>>>>>> heterogeneous environments.
-> >>>>>>
-> >>>>>> OK. Why registers are not narrowed to only this instance? It feels=
- like
-> >>>>>> you provide here full register space for multiple devices and then
-> >>>>>> select the bank with above ID.
-> >>>>>
-> >>>>> PK: No, we cant narrow the registers to only this instance since it=
-s
-> >>>>> is just a single SPAcc with multiple virtual SPAcc instances. The s=
-ame
-> >>>>> set of registers(aka register banks) and context memories are
-> >>>>> repeated, but sit at different offset addresses (i*4000 +
-> >>>>> register-offsets). The crypto hardware engine inside is shared by a=
-ll
-> >>>>> the virtual SPAccs. This is very much for a heterogeneous computing
-> >>>>> scenario.
-> >>>>
-> >>>> Then maybe you have one crypto engine? You ask us to guess all of th=
-is,
-> >>>> also because you do not upstream the DTS for real product. Any
-> >>>> mentioning of "virtual" already raises concerns...
-> >>>
-> >>> PK: Yes this is a single crypto engine, maybe I should have detailed
-> >>> that in the cover letter. I will fix that. And what I have pushed in
-> >>
-> >> So one node, thus no need for this entire virtual device split.
-> >
-> > PK: Agreed, its one node for our test case.
->
->
-> We do not talk about test case. We talk about this device.
-PK: Sure
-> >
-> >>
-> >>> the patch is my complete DTS. It might need updating depending on the
-> >>
-> >> If this is complete, then obviously "snps,vspacc-id" is not necessary.
-> >
-> > PK: Yes, its one node, to keep things simple. So we pick a virtual
-> > spacc with its vspacc-id for testing. That way we could test all the
-> > virtual spaccs with a single node, on a need basis.
-> >
-> > On the other hand we could create 'n' nodes for 'n' virtual spaccs and
->
-> You said it is complete, now you said you have 'n' more.
+> If they are necessary, this addition needs to be documented.
+> 
+> But they appear to be unnecessary.
 
-PK: I think the mistake from my side was to create 'n' nodes with the
-same base addresses and different Virtual IDs, and misinterpret your
-earlier guidance on this. Instead every "virtual" SPAcc instance can
-be represented with its own DT node, since its base address and IRQ
-numbers are unique. The "virtual" refers to a hardware feature in the
-SPAcc. Each virtual SPAcc, configured at hardware design-time, has its
-own control registers, IRQ numbers and contexts, only the crypto
-hardware is shared.
+They are better be there if Control Flow Integrity is on. It's the same 
+deal as with endbranch instruction on Intel and hint #34 on ARM. It's 
+possible that the kernel never engages CFI for itself, in which case all 
+the mentioned instructions are executed as nop-s. But note that here 
+they are compiled conditionally, so that if you don't compile the kernel 
+with -march=..._zicfilp_..., then they won't be there.
 
->
-> > register 'n' vspacc devices with the crypto subsystem. And bind the
-> > individual nodes with unique vspacc-ids. That might depend on the
->
-> I don't understand what is "binding" here. Use Linux or DT terminology.
+>> +#ifndef	__CHERI_PURE_CAPABILITY__
+>> +	andi	$tmp0,$inp,7		# $inp % 8
+>> +	andi	$inp,$inp,-8		# align $inp
+>> +	slli	$tmp0,$tmp0,3		# byte to bit offset
+>> +#endif
+>> +	ld	$in0,0($inp)
+>> +	ld	$in1,8($inp)
+>> +#ifndef	__CHERI_PURE_CAPABILITY__
+>> +	beqz	$tmp0,.Laligned_key
+>> +
+>> +	ld	$tmp2,16($inp)
+>> +	neg	$tmp1,$tmp0		# implicit &63 in sll
+>> +	srl	$in0,$in0,$tmp0
+>> +	sll	$tmp3,$in1,$tmp1
+>> +	srl	$in1,$in1,$tmp0
+>> +	sll	$tmp2,$tmp2,$tmp1
+>> +	or	$in0,$in0,$tmp3
+>> +	or	$in1,$in1,$tmp2
+>> +
+>> +.Laligned_key:
+> 
+> This code is going through a lot of trouble to work on RISC-V CPUs that don't
+> support efficient misaligned memory accesses.  That includes issuing loads of
+> memory outside the bounds of the given buffer, which is questionable (even if
+> it's guaranteed to not cross a page boundary).
 
-PK: My bad, I will take care of that.
+It's indeed guaranteed to not cross a page *nor* even cache-line 
+boundaries. Hence they can't trigger any externally observed side 
+effects the corresponding unaligned loads won't. What is the concern 
+otherwise? [Do note that the boundaries are not crossed on a 
+boundary-enforcable CHERI platform ;-)]
 
->
-> > vendor use case, for which we will add incremental support.
->
-> You did not get the point but you keep saying "yes". This discussion is
-> getting meaningless and you really do not want to listen. You have
-> either incomplete picture here or you have only one node. In both cases
-> virtual ID is not necessary. If you claim virtual ID is necessary, I
-> claim you have here incomplete picture and you are trying to represent
-> one device in multiple nodes. No.
->
-> Typically one device, one node.
->
-> NOT one device and 10 virtual nodes representing virtual devices.
+> The rest of the kernel's RISC-V crypto code, which is based on the vector
+> extension, just assumes that efficient misaligned memory accesses are supported.
 
-PK: Thanks, I believe I finally understand your point.
+Was it tested on real hardware though? I wonder what hardware is out 
+there that supports the vector crypto extensions?
 
->
-> Amount of ping pongs here is way beyond my patience, so before you
-> respond read that carefully and come with full and accurate hardware
-> description, so we will not have to ping pong trying to get any sort of
-> details.
->
-> Best regards,
-> Krzysztof
+> On a related topic, if this patch is accepted, the result will be inconsistent
+> optimization of ChaCha vs. Poly1305, which are usually paired:
+
+https://github.com/dot-asm/cryptogams/blob/master/riscv/chacha-riscv.pl
+
+>      (1) ChaCha optimized with the RISC-V vector extension
+>      (2) Poly1305 optimized with RISC-V scalar instructions
+> 
+> Surely a RISC-V vector extension optimized Poly1305 is going to be needed too?
+
+I'm a "test-on-hardware" guy. I've got Spacemit X60, which has a working 
+256-bit base vector implementation. I have a "teaser" Chacha vector 
+implementation that currently performs *worse* than scalar one, more 
+than twice worse. Working on improving it. For reference. One has to 
+recognize that cryptographic algorithms customarily have short 
+dependencies, which means that performance is dominated by instruction 
+latencies. There might or might not be ways to match the scalar 
+performance. Or course, even if it turns out to be impossible on this 
+processor, it doesn't mean that it won't make sense to keep the vector 
+implementation, because other processors might do better. In other 
+words, it's coming...
+
+> But with that being the case, will a RISC-V scalar optimized Poly1305 actually
+> be worthwhile to add too?  Especially without optimized ChaCha alongside it?
+
+Yes. Because vector implementations are inefficient on short inputs and 
+having a compatible scalar fall-back for short inputs is more than 
+appropriate. In other words starting with scalar implementations is a 
+sensible and perfectly meaningful step.
+
+Cheers.
+
