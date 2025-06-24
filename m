@@ -1,79 +1,143 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6DD280CC8;
-	Tue, 24 Jun 2025 11:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCB41B87D9
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2025 11:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750765081; cv=none; b=ZRmOd55fI5ZfwxmzycltIfQl+ELRo/d0fEd1YHuLBM8BXolhy6MToNawK1oHOJFknQD12/REtpLZasylRFR1EU2LGXBFbFLU7LHzGS+kGP8sZRVMF9x2ZxL3zCfnQoNaCVnh5UiXPdbZodpVfxOcr3IsKqEFZyDqODyF95xu4dU=
+	t=1750765146; cv=none; b=sDAvkxuuyCLIMOGdHT7CfT1MlPWD/UZY20WITLUkuqSZLt+77XbDzJ/FtYfHJOS9d2yQfCdHdBBZl1LLkKbjTTl0+vMPDZFVY4rrH6w8Mpdy4aI6yZHHOFIr28HUCWwEv+DXPn0dXpojRWu8Rlo3hLsRd7v9qtkXHnwhs7+FMi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750765081; c=relaxed/simple;
-	bh=UDqHUC1Dk/VABGIPyur0bI86ybDe6y9IgV48sFN7+FA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iOPIEGs0Ug9Qx9GSheCMw9BNNxpTEPRJQcVOyjaXGPPcGw/SqawZ1PcKGFnZO+WgLs5Z9L0dl8BkpgxUDPBHQbJkRmEi8nEoRmdBoggeiwqaVohz4lAr+czHfX2ccyZSYWsIfks6DttOXvp17+F6klBKWrP026vlaklBnl7y7Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XdcsDf2f; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1750765146; c=relaxed/simple;
+	bh=Fy/w/QAe7D+PrAigHGIwbRljUXqkmfJ27h7dF/KoXg4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=FaNTOBRp0k3BXVcsVsESVoVjtREM2st31Ura6sWPekd+F6SvIQU3bKntGuqkEjNRAhwQuekKB8g3hjqTWmAUhr8mVrbiglnUss4gbkxBKFA4A3xLKfglx6OVbuLYntf14HJwbhwize2dQ4J5lqFTU1Kie/LN6A57Cjpsq27EAbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eTu7AHlG; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XdcsDf2f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=LZw/6ty1L9t/CWo/sbTmTozblmSQyHbGRwJGD4t0DbQ=; b=XdcsDf2fuEV4TBlbZLfvGdQter
-	wUK1WOqRbS11RNHFOa8uFjUxabBINzDphdqKPhFFhsy8EJepnioHiwlYbvY1/UZ0B12RHuLlFAihV
-	9J+SFguuI4QmZ0vKQqwjm6AAuF3QueRx+Pgfa8xX7azdzQAwbpxMt9dJeaKRE0hNXsLrvTeQf3PDT
-	8XPkgwGIJ+e+EQQGAOYr92JK8UtPe3WaTGI7hBB9gi7j5bsh1AcrtM52xUEbI3VOkWjgkxxKPI8lm
-	GuWAkscajSbsnAX6BRDlpgJa48QonYKH+vYMrcO0q3WrcKSph565VWkJ20iBBOm2D4BFCsAlCY2Y+
-	JROt7SEA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uU1iv-000ZI6-0w;
-	Tue, 24 Jun 2025 19:37:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 24 Jun 2025 19:37:53 +0800
-Date: Tue, 24 Jun 2025 19:37:53 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-	dengler@linux.ibm.com, ifranzki@linux.ibm.com,
-	fcallies@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-	agordeev@linux.ibm.com
-Subject: Re: [PATCH v12 0/6] New s390 specific protected key hmac
-Message-ID: <aFqOEfmr6FP7FDj3@gondor.apana.org.au>
-References: <20250617134440.48000-1-freude@linux.ibm.com>
- <65e586b07ff55f21f3909509b6591f41@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eTu7AHlG"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55O6pAe6017031;
+	Tue, 24 Jun 2025 11:39:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=CU9U4SKUYmLCdFibYQK7Al/K9uNL
+	+QybsxGO043DhAk=; b=eTu7AHlGj0/6OxtGupoaIPKI01eOyeJ+mJOwG8006yjr
+	SzGvmldLr3XWU+y+hmg7aDFWTjAqXStLpAhsAD1ZftqBTN52O0gQg6cnv7pEGrmo
+	0PRM9j+hjN1m9csX+fshAjqaulDveHWsh8uUS0PzZwi7U2zeegTeEnbI022PAwz/
+	fzTMYzcEIlOIzJ6X4TFX7MLk++WIstFoDIJIKdfvZqYzx+VCQS+2Qp1kFYOkl8Rl
+	rw6Xk0DJxTMLvq8nKQm4Cr5JrkBqwet2CMlEd0UXBLFFLj20EelhBziUlS5UXEjV
+	QM7G4jL04gZX0cmArkEwt3dCMa2wNJ9RdwCydDENaA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dk63r5gx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Jun 2025 11:38:59 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55OAirAD002467;
+	Tue, 24 Jun 2025 11:38:59 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e8jm3mg0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Jun 2025 11:38:59 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55OBctNl51052860
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Jun 2025 11:38:55 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 304D820049;
+	Tue, 24 Jun 2025 11:38:55 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0CBBD20040;
+	Tue, 24 Jun 2025 11:38:55 +0000 (GMT)
+Received: from [9.111.221.43] (unknown [9.111.221.43])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 24 Jun 2025 11:38:54 +0000 (GMT)
+Message-ID: <9e33c893-2466-4d4e-afb1-966334e451a2@linux.ibm.com>
+Date: Tue, 24 Jun 2025 13:38:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65e586b07ff55f21f3909509b6591f41@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE
+To: Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
+Cc: Harald Freudenberger <freude@linux.ibm.com>,
+        Holger Dengler <dengler@linux.ibm.com>
+From: Ingo Franzki <ifranzki@linux.ibm.com>
+Subject: CI: another regression on linux-next with s390 sha384/sha512
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDA5NSBTYWx0ZWRfX0dU4kIYoX1ct FEN8rlHWHfssU3HpgTdvwMqA8UWJ24Gbd/Mp7JhWfgoBJNfuf2I3CgDuAYbQKwL06jBR5AFk83k rYlOmYaIkxtEh78RiibiXErKNtQQDkYRo9Kk1VzcV23dQopOU3q3Zdn2dZcnNv2GgRxPC/bglPF
+ 1Mj1H2BokSKNxxUSPsPB1izEBIaE8syZm4NtbmOjbFXWG0fBrV1y7vua9F6xtqThAoW6CBnNT7X QSijRJf9baLd0WNxc1UZXfgjXMU0MybZ8E/d4hItssas5wG+2ip/EW3Fz1MDhqqcExukIUz3MWb DYGmifD0BK1Z54uh+bgfPksAkIVfFeblCeIm10+FY6FhBaaxilpfvsYwCEinXnKrRL+ZYVTal9t
+ 0c6LPkFNeJeZUzWDk1MEPhJr25UYoQLKnQbGnw+GhkuB+zapgnMugePbyvvg+XHAGJZAwaKz
+X-Proofpoint-ORIG-GUID: KoNnX-oL0otn86jkEQtAWuk5ATuSNE3v
+X-Proofpoint-GUID: KoNnX-oL0otn86jkEQtAWuk5ATuSNE3v
+X-Authority-Analysis: v=2.4 cv=BfvY0qt2 c=1 sm=1 tr=0 ts=685a8e53 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=b18jdZ5K8X_WDl4z2j8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-24_04,2025-06-23_07,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0 spamscore=0
+ impostorscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 bulkscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506240095
 
-On Tue, Jun 24, 2025 at 01:34:41PM +0200, Harald Freudenberger wrote:
->
-> as the phmac implementation uses the newly introduced CRYPTO_ALG_NO_FALLBACK
-> flag, we can't deliver this patch series via s390. I talked with Heiko
-> about that and there are two options:
-> 1) We (s390) pick your patch 4ccd065a69df ("crypto: ahash - Add support for
->    drivers with no fallback") together with my patch series for the next
->    kernel's merge window.
-> 2) You (crypto) pick my patch series into your cryptodev-2.6 for next
->    kernel's merge window.
-> I would prefer option 2 as most of the patches anyway deal with crypto
-> and Heiko and I do not expect unsolvable merge conflicts with the next
-> kernel's merge.
-> So what is your opinion?
+Hi Herber, Eric,
 
-Sure I can do that if you wish.  Is it just that series or are
-there other dependencies that I need first?
+in last nights CI run a new regression was found that I guess is related to the movent of sha512 to the library.
+However it behaves different now with sha384/sha512 compared with sha224/sha256 (which has been moved to the library earlier)....
 
-Cheers,
+First of all sha512_s390.ko is no longer there. I guess that intended.
+
+However, /proc/crypto does show
+
+   name         : sha256
+   driver       : sha256-s390
+   module       : kernel
+
+and
+
+   name         : sha224
+   driver       : sha224-s390
+   module       : kernel
+
+but no -s390 driver for sha512 and sha384. It only shows 
+
+   name         : sha512
+   driver       : sha512-lib
+   module       : kernel
+
+and 
+
+   name         : sha384
+   driver       : sha384-lib
+   module       : kernel
+
+The -lib variants are also shown for sha224 and sha256, but those also have the s390 variants.
+
+So it looks like the s390 optimized sha384 and sha512 are now missing ? 
+
+Similar, the -generic variants are only available for sha256 and sha224, but not for sha384 and sha512:
+
+   name         : sha256
+   driver       : sha256-generic
+   module       : kernel
+
+Can this please be fixed? We really want to keep the s390 optimized versions of all digests! 
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ingo Franzki
+eMail: ifranzki@linux.ibm.com  
+Tel: ++49 (0)7031-16-4648
+Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen
+Geschäftsführung: David Faller
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
+IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
+
