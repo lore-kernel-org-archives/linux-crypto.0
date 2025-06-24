@@ -1,63 +1,63 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BC62D9EC4;
-	Tue, 24 Jun 2025 13:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7782B2DA746;
+	Tue, 24 Jun 2025 13:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750773209; cv=none; b=Rf2es8FgNjKpJhg7d9zEhRNXxlivkcqKyoJzdJkMT9SUsv+6kwjol4AxALCYQ1cKz6OCCZquYAPxLfox0f1iD42dqLA4WRp2QzckNURqpocIZeI5SvOpdZkH98A/aey+x60M5S/TNEA8ndSn3EL61HOWjToZssuCtepYmnfIAT8=
+	t=1750773211; cv=none; b=Ze9yy79z7ZI9WsI2d2tGeYjCF5/GvNn5jWvBVApF06tok2zYXjmS8HypuZbt+QrCOjuyT5QUdPDh8LHpq43wBxsxYQ2fKFBIMmL/CQvz5VIWsgvd1R3nJ77gjUusklOqpY2KpnGtdo8rk6/MRAPq1mNM6b9xGUlEQo8mmGCxgqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750773209; c=relaxed/simple;
-	bh=fSeZdx7/xTUHYwFlQuI2HrbMiEC0GcM6M74lWmTnauU=;
+	s=arc-20240116; t=1750773211; c=relaxed/simple;
+	bh=FB3vxSlu4hIcjqB99Vn0G/Ex3nRoTtJXDYzEZ35BwcI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lyJhPOABhN8YIVpqC2XT/vriDk/lFEMYRlSqkIfI7RhreuVGdiLYIi4MYMu4GYXsnwTO1/JYODbw+NL3bE+NUh/0/ANFyig0A8PDKOFuLbokjlUrsydP9GEf8q3MhaHZyVRK+32lV+aW5Ac0lv1SYkAxIX5BysYZhgOaqW7+b7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DOvU708c; arc=none smtp.client-ip=209.85.208.171
+	 MIME-Version; b=Pwk7ditGFDQMfTK3uvxc3dsuhXKfcHncU/2+/YP4SelfECIWnNddU2/9+oLLwgx5y+ZM+YVnanOy1SptFRKxDnCe+gRl7riZ2QihsjHpHBGQSsjDRi7cGVUXiyAUyL1RGt/zFV/scrMCLPOPwuuQ/owD995IctMhgfVTZ5SL3F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGDp6VOd; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOvU708c"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32b78b5aa39so56401611fa.1;
-        Tue, 24 Jun 2025 06:53:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGDp6VOd"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-551fc6d4a76so422719e87.0;
+        Tue, 24 Jun 2025 06:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750773206; x=1751378006; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750773208; x=1751378008; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2wX4W0I+7Z0KtrMiti+/n9dziiQ8RSkVplIT9xlgIJQ=;
-        b=DOvU708cadQzHMmA/2FERTjXsziTEnKYhD7iqkBqiajvBmgLH8mNY/7mc6LM2e/GTb
-         goBDBXD02mVmX+StH0PrikktzoJXlvHnyQ5R7rHKgpY5EJOZJIlky+s3SddgwoDBjibB
-         guZu/bzH2/ptctMMGH/8ILTP+H5H+YHJiLnDKxUW4iqa/mp4RLEzC0tzEvHbw6OOPYt0
-         vOpu8H17NSVzmuqOZlOFQInFUidantI+XK1/S93jSVMJSkWPSUfnnjtV0Q3r6mJYmYop
-         NVJjAnLD0rmzABpqLfRG7DfDqaM2T5IY9aViTXXCvxUhqcC2XLl6nSPaEC8xYuzxt2Gb
-         eDJg==
+        bh=XrOdE+R8rQ7wb6yuGln1m7tHcIz53gAsWt13GY/qj+U=;
+        b=TGDp6VOd9J2e8KqagJhMQRctDs9xZtPU0VAarRPjQmeKapwm7tO4yuZaRR41C46h5p
+         v30GkyYuD5vOq100O4N9/gzP8XFtsk5DDB0uhi15Gr9Hybn9NrVp1fnYuxNHbP5HFd06
+         llFeFZY01o3ieprlDHhtf5gzIDtKlEsBMAPJX4mNlh29IzKIUMhG4RvqSmH0VJgcs/eG
+         fogC6Jn3t1YvizFvX/+7WJhtvE9N2JxK39CgLujQ+tMFxUZGqFARMU6iBx0TyNGdSpGJ
+         k4gBo1th6CH2AF9YGOZ6BRheCIZSOn75sE7qvF0yfDoN1J0vXVrXzwUHet1WkMixL02X
+         8pCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750773206; x=1751378006;
+        d=1e100.net; s=20230601; t=1750773208; x=1751378008;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2wX4W0I+7Z0KtrMiti+/n9dziiQ8RSkVplIT9xlgIJQ=;
-        b=j+o9vScIYkyphIoSYTYGwnieNsUTPqVmkJlyUq5ELK6KotFzoU7qodnCK0xkqvgjDR
-         TMCyCw55JGPW9nIrNH69wgBAPFK1JexgGOYZbqXnAZee6vCCc4n8NNnJ/GMrhuFhVfYI
-         D4LhJ8Wh9/7SCpc8a7wBU9OeeHlRYiXuaZL2tqQcBAVh1cL4ikp2YyV6I5yJI+DGZrwQ
-         goE2UVf2kO+JQoEOTNQV56/Pid0d6o+u8O4a+GBLX+AcagwDikbf8C42n8pW6+ao/qiX
-         iML3VRj+sAgCWpoP+rIiozHUG9QGVjCTtHoqmxTI/ogKMBTz/LfL5/nFdpRkTCKHmJ8t
-         QWCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXjTwVioZ6jz80s4PKa3dWYAOt1+Car1XU4dEoyl48mo1NhWZQs7PLGp2dDGNgkGYQLcb6Cn3HdTkgm5U+a@vger.kernel.org, AJvYcCXmt5A8VmD2HDgqTezBRo1C1OM6eRT+fUZ/gr9qPMoaYQoMtqhBO4T9+EFhYfpdSVVnAeX7B5HScPa3@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvalkqVvygCQIJpv5cYPLtn2amI1yq3zGKMeUUGVvJcyQIhui7
-	9l1hFcLPV52rftRJbbw8ZYSmSpiYpYuc+R16LmHHLgt40MopnRZbaboQ
-X-Gm-Gg: ASbGncvBZgjTd8v0oSKPQ6gLy8YLUdV9THSkByrArlo1nLBHhyeVRd2PA2Yd0ayemDS
-	SU22lTVk/J9bCG2i/jEK0olV1eXEezpbfAbUYapM+lXtgeD1M5LOPSuUjDT6JZeYfpGsfAhL4Xp
-	z72tDHmFt6aVPAomhvQGVWT1kCBBqX4JJKzCHC2PyHYf7QUVNlF+zzSaACnRcsG5GG7XHQBj0F7
-	4ZyHEaI4mWqJaN4ynzGjTnG+AAyF3vQFaohlALTxTb2ROh04PX/j22dyG1gBFEa7SUy7gMYb9YP
-	GtSaoMWIThCruu6hqNdGjyPmRaEJSJhDbsq85QFFuFNHjIHk/ooJ+OlN1ICxWCSPG6c6GLnxOt3
-	2XnJD+wDjlwUwhIwNTmYCAlbdk5h/jEgqIcuxEHS+WwxpXjxfoqvGrDN/hUie0Q==
-X-Google-Smtp-Source: AGHT+IEQJZnJ9VZ+SzWrpy1cDVFBdhya8UkwmDkT4ryLdnwY06/Wc9BOqbcHUd4bE5urYlG3ueC5CA==
-X-Received: by 2002:a05:6512:3f27:b0:553:1f90:cca4 with SMTP id 2adb3069b0e04-553e3bb2933mr4766415e87.13.1750773205840;
-        Tue, 24 Jun 2025 06:53:25 -0700 (PDT)
+        bh=XrOdE+R8rQ7wb6yuGln1m7tHcIz53gAsWt13GY/qj+U=;
+        b=Se0H48YtZTIs0aVBRK2wVBZq+1Gf0RQOXMQ8JQ4LH2XZvnBet73Bo+KxG2qWyxtQPK
+         Im4g3R2hs7tstPfpUS9jK+XP7i1tOQJkgV/1uBX85T2BKlhNjLFbVrdsxsa09D0PqygT
+         3CRz5URi8T7t+scbwUwgFfim5OIFXYqjCGjhd/BodhJJwzg1zWERU/xwJUDXHS7Qhj17
+         oXHZK3sfKrA4Pzh3boQg9aP0cI3KrWOStdpXVuoZnpkw1HtZxp4y4dVyTnYskKpDKLG6
+         rXTCdtEidSVKvz3miNwL+Jb3iZ/BLbqjwP84GW4Xk4DWAKbQ6v0GlYssACm4YWM7avv9
+         60KQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMWd+FohRFNPuTRjsWsW+t5W7XBRR0dYI7lf6TIcbjWnsNEUgqr1DN1EOmwawOmtIlrfDf50t/UTwT@vger.kernel.org, AJvYcCUehXpcpi36gfCJELa40FEgwWog2/8ViV3v0TekaX3Ps9pncul79WhPOGJHQzNtnWsLBpKdMVJF3EB/NFcB@vger.kernel.org
+X-Gm-Message-State: AOJu0YyizSQQtb6EF0+/A4OxRu3eVN1eLdzauIljqsCKfy0LmP35QV4c
+	gdFF/USIdqRSLw5J9/NxIVlifr1pmqtoQHHqfXsBuqGagvhDys8EA6sS
+X-Gm-Gg: ASbGncuPXdgZUljrMThfkcQJ/3sltzC/vbJq0rMy76zMGnPYITo66WZ+hNpzBNGgVzx
+	/DaS0fo/pn0xvbDjLZVnvxrcEDDYfigdUuDCbsNR21FrZjdjyMYDmhizac3aaUb0Aw0uxA+XXLU
+	svBLnC6lbNfWxS4gfVdnjD/ZMIxQZOG5wB+tEAbGuQN0NT3jhZw+qhRIl5sqTiM2vGHEF5HnBO2
+	4I14Yy/CEQJyOa8bzpjg38FRUBTLAUSdyXBzptf6jJAdGAtw+d3A3YG/4rxAFSvzudtE5xD20oL
+	QSFgLuf/Afwv06Dq0gYABgdcZrZ0hmxn0UWtUO0ZD+q4YrXKoa9yDpHzTPJ/JySApW/CJFsevFy
+	whPYXuiS3RfipgE1up5IE11T/23LrBBqaf/nhggfvInNI547qVLSNwDA9ntucyQ==
+X-Google-Smtp-Source: AGHT+IHafsnl4ECTZ03u9TitK28MH2CBXpSvgAgKY7MlFSCMzj5F1inb04eM/bVapqiFOJ6IXEiRzA==
+X-Received: by 2002:a05:6512:3a95:b0:553:aaf1:f63d with SMTP id 2adb3069b0e04-553e3cfd76fmr4317885e87.29.1750773207460;
+        Tue, 24 Jun 2025 06:53:27 -0700 (PDT)
 Received: from user-A520M-DS3H.sberdevices.ru (broadband-188-32-30-96.ip.moscow.rt.ru. [188.32.30.96])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-554e6dc186esm1282905e87.114.2025.06.24.06.53.24
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-554e6dc186esm1282905e87.114.2025.06.24.06.53.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 06:53:25 -0700 (PDT)
+        Tue, 24 Jun 2025 06:53:27 -0700 (PDT)
 From: Alexey Romanov <romanov.alexey2000@gmail.com>
 To: neil.armstrong@linaro.org,
 	clabbe@baylibre.com,
@@ -75,9 +75,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Alexey Romanov <romanov.alexey2000@gmail.com>
-Subject: [PATCH v12 15/22] crypto: amlogic - Add support for A1-series
-Date: Tue, 24 Jun 2025 16:52:07 +0300
-Message-Id: <20250624135214.1355051-16-romanov.alexey2000@gmail.com>
+Subject: [PATCH v12 16/22] dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt lines
+Date: Tue, 24 Jun 2025 16:52:08 +0300
+Message-Id: <20250624135214.1355051-17-romanov.alexey2000@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250624135214.1355051-1-romanov.alexey2000@gmail.com>
 References: <20250624135214.1355051-1-romanov.alexey2000@gmail.com>
@@ -89,48 +89,58 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This platform data also can be used for S4 as fallback.
-Tested via tcrypt module and with custom tests.
+GXL and newer SoC's uses the DMA engine (not blkmv) for crypto HW.
+Crypto HW doesn't actually use the blkmv clk. At RTL level, crypto
+engine is hard-wired to a clk81 (CLKID_CLK81). Drop clock-names
+field from schema: name "blkmv" is invalid and "clk81" is confusing
+and sounds like something global.
 
+Also, GXL crypto IP isn't connected to the second interrupt line.
+This binding is useless, there are no users of this line.
+We must remove it from dt-bindings.
+
+Fixes: 7f7d115dfb51 ("dt-bindings: crypto: Add DT bindings documentation for amlogic-crypto")
 Signed-off-by: Alexey Romanov <romanov.alexey2000@gmail.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ .../devicetree/bindings/crypto/amlogic,gxl-crypto.yaml | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 9452f05d2f10..55a35697c0d7 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -298,6 +298,14 @@ static const struct meson_pdata meson_axg_pdata = {
- 	.support_192bit_key = true,
- };
+diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+index 948e11ebe4ee..fdc39797a2a9 100644
+--- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
++++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+@@ -20,20 +20,15 @@ properties:
+   interrupts:
+     items:
+       - description: Interrupt for flow 0
+-      - description: Interrupt for flow 1
  
-+static const struct meson_pdata meson_a1_pdata = {
-+	.descs_reg = 0x0,
-+	.status_reg = 0x8,
-+	.setup_desc_cnt = 1,
-+	.hasher_supported = true,
-+	.support_192bit_key = false,
-+};
-+
- static const struct of_device_id meson_crypto_of_match_table[] = {
- 	{
- 		.compatible = "amlogic,gxl-crypto",
-@@ -311,6 +319,14 @@ static const struct of_device_id meson_crypto_of_match_table[] = {
- 		.compatible = "amlogic,axg-crypto",
- 		.data = &meson_axg_pdata,
- 	},
-+	{
-+		.compatible = "amlogic,a1-crypto",
-+		.data = &meson_a1_pdata,
-+	},
-+	{
-+		.compatible = "amlogic,s4-crypto",
-+		.data = &meson_a1_pdata,
-+	},
- 	{},
- };
- MODULE_DEVICE_TABLE(of, meson_crypto_of_match_table);
+   clocks:
+     maxItems: 1
+ 
+-  clock-names:
+-    const: blkmv
+-
+ required:
+   - compatible
+   - reg
+   - interrupts
+   - clocks
+-  - clock-names
+ 
+ additionalProperties: false
+ 
+@@ -46,7 +41,6 @@ examples:
+     crypto: crypto-engine@c883e000 {
+         compatible = "amlogic,gxl-crypto";
+         reg = <0xc883e000 0x36>;
+-        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
+-        clocks = <&clkc CLKID_BLKMV>;
+-        clock-names = "blkmv";
++        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
++        clocks = <&clkc CLKID_CLK81>;
+     };
 -- 
 2.34.1
 
