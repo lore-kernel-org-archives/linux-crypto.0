@@ -1,88 +1,228 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D647229B768
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 10:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A3B205E02;
+	Wed, 25 Jun 2025 11:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750846167; cv=none; b=bNYjz9KPMSXRVeB6vvVRxnak/LjyMTN+jipM9KV8NClHRHsLL5KVQqc3lGjnEh7YUKI2H5J0zTIApxhzzEFpIudgoccZW1mrdeeWfyitBkK5pgKtuNkL+QD8NoUXOEhlU9sEcMG6Reu8ss/iA7ihT5Ncmo5yy/MbBkaEKNwb3C0=
+	t=1750852006; cv=none; b=A8UbSrZ7Pwcoed1sX2EFWRA/F0b97nN5udp1XW1SkYso1+b3wlm9nzX0NjoOHYJ5F0x4uUVQSjwasX1qyx6xvMD3/yarWQC6qnA8PimeqM2qRRfTnld2vNlMUzbmINJxfHkYIhA/jCkFiaWkFpbk/B40GXrjbnkY6KUPcQjR8i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750846167; c=relaxed/simple;
-	bh=oI2RpGynwZKHg1r8I3RrnIuamp73/gAftLmPz5TS9m8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=r3y7Gbieq8+j9El3oqYcFjt2wehZyCMlbG6yYu6ipj15p4FJGbDFQ85l8+t3s83sQ6IOgLTiOzyR8JAxCDbgHco1iEV9N6ACBTW4Syd8kB0odoJfS5JVLY0UDpz5MPTGgNeYrtr+D5kjeOozlWO6EKQj4Z1luj9XGLn2r/Kblw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=H1QYt0eu; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1750852006; c=relaxed/simple;
+	bh=z0XG3Bw6TLmnXq/PjkcVsBymSm1jVI29doeIVoNJiSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U5AwNPt9d/RftjMoFNXtaW84K8IlkD5Ro7/6BJMoIVSEFlwCIp/28guCp4Dl8SDIZ4luyUJZaFcZcq9W6lpcmc13bEhSbjiTnjgI/1q9Wmwkfx64sStaul6gh0yG8s5dM0YXll1WiJbv8W3UxGyIsd4M6HO8sJRl5qPkV7F94aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n8vED+Ix; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="H1QYt0eu"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70e3980757bso7251857b3.1
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 03:09:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1750846164; x=1751450964; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CEiCVSN83PBGlTUO/aKPbvLxDE47drJugzRrPtglAog=;
-        b=H1QYt0eue7lJmPmD4cBXFZOzdRrSG3BWGzBn/kCLiSJ5t90HWfewwUpIUnAIWxLiYV
-         ph1BAls97zuYe1+dITnmkxaiJZOhBYYLuaIZuDqRriEMJnNzIkCXxNLa6AkNh2ryRYr0
-         9YHGjNNIglnHoCUjh9m68FSrKUyXmy7tDaxuA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750846164; x=1751450964;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CEiCVSN83PBGlTUO/aKPbvLxDE47drJugzRrPtglAog=;
-        b=BLv/m6dFqTegw8MkajAvZgPmq5y0PDuUkUKiB+O3IjeuI+gKna2mEbAKWTbLdeOpP8
-         GFoL/az2Hh4DwvwM8ncArh/S74Ydv+oORCUo0+KOTT5x3aTBr9iVokm5qkZExGrhcfVZ
-         LZzfrEnZe07bdQHqDSnYA5+x7Y9GhVgBza+bIf7Js/dDI26YELiovAqQxBGZgS7txY1x
-         MRsFfJNZ2YEsyUDaRTbywvz91tQbp+WlbqUZ+1lhc2BGJrjeMIvX1ZyLxf2Ez4gkOIUQ
-         6ln9ObhutUuedAlUOz1kEpqcHJQrzedy1UhBfTyoaDH03BQawtjtZx67xsfY/DLhqZLb
-         3Lng==
-X-Gm-Message-State: AOJu0YweFT0OOBhNKaEj2cqL+nxvvNC0bCJc5df1dINGJITCnv3TKxib
-	dc9SHaNMsglQhx8u8sqAp4DV/ulfJcEz5D1glaGuGLuk3GIMUuyIIvPXS2OJOSvz/U5RXXt9H8Y
-	mXhqd0qz4vmKvZBSZz8iSX6pafcSNBOc0cH0rjzVNg65X/U1z+jxaNA0=
-X-Gm-Gg: ASbGnctONQkXZWgcdddrnQjbhlxbt1KkV+A0s/F3JD+8ssb5J0ToXE3MlJqSVTavSZL
-	5PoFf7ZaUN6HfVbZY0EFkK2BEvf9vkHt+Ft7soWcAEkwTWodsZB7UfwQiSAqIjvyAXRRuAsN5M9
-	jjmqLVOD7FUPQyf4XNfe/lxaixifeqxTD9svap5Q8R1b42
-X-Google-Smtp-Source: AGHT+IE1aUXHjwmMi7BZlk2A1yC70HJ9346ZaqdzowkQqD6P3DZhjnGW71Ddup7fmEocAbmHGGMMkpesmS7qjX9YHFU=
-X-Received: by 2002:a05:690c:a0a8:10b0:713:fe84:6f96 with SMTP id
- 00721157ae682-713fe847182mr50071817b3.14.1750846164592; Wed, 25 Jun 2025
- 03:09:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8vED+Ix"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B55EFC4CEEA;
+	Wed, 25 Jun 2025 11:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750852006;
+	bh=z0XG3Bw6TLmnXq/PjkcVsBymSm1jVI29doeIVoNJiSw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n8vED+Ixnm6GXHKMbmqqW2ZMWMwnjPrlReJbEoNfv9Y0gj9ADIZmCPB2vvWThRjnD
+	 1M/7AeX/HMARmgPGjA35x7qD8peBoF6O+l9fXQjuocKR2Y2/FmQcSfrPbXUI/R19oX
+	 oNKWYHe98z7krpsHN/u/liBM2RzLYDPIK+SGppc2mYx8LFBpCX/TJ2bz2CwsHexGkg
+	 LS5Q2N9cCTLYdL3UyXdpdMl/LGDzdG7HW4FHMQmDyMGr3nJ4mKcKYLDf2oKia3VNFa
+	 FWvqX3mqqAcNt93zYaj/f3mLrE6/t5iMLmKq2ZUFE66+Ol8EQQA7QoEUSuc5MWsEcq
+	 YMXdnWJ/+1d7g==
+Date: Wed, 25 Jun 2025 14:46:42 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Lee Jones <lee@kernel.org>
+Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	peterhuewe@gmx.de, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH v11 3/4] tpm: Add a driver for Loongson TPM device
+Message-ID: <aFvhorr3kZSuzVpv@kernel.org>
+References: <20250619025138.2854-1-zhaoqunqin@loongson.cn>
+ <20250619025138.2854-4-zhaoqunqin@loongson.cn>
+ <aFs2RDOeOKvWUN2L@kernel.org>
+ <20250625080527.GN795775@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Wed, 25 Jun 2025 15:39:13 +0530
-X-Gm-Features: Ac12FXwGQwKxnCuKXoH8hLW5xS3SXOk0DTiG9EfPSUeET8XWdVLzvSbULeoPDc4
-Message-ID: <CALxtO0mo4Xp3=RfcHZwmqsD=YsNYMrDmrTtXJ1VcnHNvWzaUkg@mail.gmail.com>
-Subject: cmac-sm4 & xcbc-sm4 issue
-To: linux-crypto@vger.kernel.org
-Cc: Aditya Venkatesh Kulkarni <adityak@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250625080527.GN795775@google.com>
 
-Hi,
-   On switching to Linux 6.16-rc1 for my SPAcc driver testing. I see
-below failures in CMAC(SM4) & XCBC(SM4).
+On Wed, Jun 25, 2025 at 09:05:27AM +0100, Lee Jones wrote:
+> On Wed, 25 Jun 2025, Jarkko Sakkinen wrote:
+> 
+> > On Thu, Jun 19, 2025 at 10:51:37AM +0800, Qunqin Zhao wrote:
+> > > Loongson Security Engine supports random number generation, hash,
+> > > symmetric encryption and asymmetric encryption. Based on these
+> > > encryption functions, TPM2 have been implemented in the Loongson
+> > > Security Engine firmware. This driver is responsible for copying data
+> > > into the memory visible to the firmware and receiving data from the
+> > > firmware.
+> > > 
+> > > Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> > > Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> > > Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+> > > ---
+> > >  drivers/char/tpm/Kconfig        |  9 ++++
+> > >  drivers/char/tpm/Makefile       |  1 +
+> > >  drivers/char/tpm/tpm_loongson.c | 84 +++++++++++++++++++++++++++++++++
+> > >  3 files changed, 94 insertions(+)
+> > >  create mode 100644 drivers/char/tpm/tpm_loongson.c
+> > > 
+> > > diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+> > > index dddd702b2..ba3924eb1 100644
+> > > --- a/drivers/char/tpm/Kconfig
+> > > +++ b/drivers/char/tpm/Kconfig
+> > > @@ -189,6 +189,15 @@ config TCG_IBMVTPM
+> > >  	  will be accessible from within Linux.  To compile this driver
+> > >  	  as a module, choose M here; the module will be called tpm_ibmvtpm.
+> > >  
+> > > +config TCG_LOONGSON
+> > > +	tristate "Loongson TPM Interface"
+> > > +	depends on MFD_LOONGSON_SE
+> > > +	help
+> > > +	  If you want to make Loongson TPM support available, say Yes and
+> > > +	  it will be accessible from within Linux. To compile this
+> > > +	  driver as a module, choose M here; the module will be called
+> > > +	  tpm_loongson.
+> > > +
+> > >  config TCG_XEN
+> > >  	tristate "XEN TPM Interface"
+> > >  	depends on TCG_TPM && XEN
+> > > diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+> > > index 9de1b3ea3..5b5cdc0d3 100644
+> > > --- a/drivers/char/tpm/Makefile
+> > > +++ b/drivers/char/tpm/Makefile
+> > > @@ -46,3 +46,4 @@ obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
+> > >  obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+> > >  obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+> > >  obj-$(CONFIG_TCG_SVSM) += tpm_svsm.o
+> > > +obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
+> > > diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
+> > > new file mode 100644
+> > > index 000000000..5cbdb37f8
+> > > --- /dev/null
+> > > +++ b/drivers/char/tpm/tpm_loongson.c
+> > > @@ -0,0 +1,84 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> > > +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+> > > +
+> > > +#include <linux/device.h>
+> > > +#include <linux/mfd/loongson-se.h>
+> > > +#include <linux/platform_device.h>
+> > > +#include <linux/wait.h>
+> > > +
+> > > +#include "tpm.h"
+> > > +
+> > > +struct tpm_loongson_cmd {
+> > > +	u32 cmd_id;
+> > > +	u32 data_off;
+> > > +	u32 data_len;
+> > > +	u32 pad[5];
+> > > +};
+> > > +
+> > > +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+> > > +{
+> > > +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+> > > +	struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
+> > > +
+> > > +	if (cmd_ret->data_len > count)
+> > > +		return -EIO;
+> > > +
+> > > +	memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
+> > > +
+> > > +	return cmd_ret->data_len;
+> > > +}
+> > > +
+> > > +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+> > > +{
+> > > +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+> > > +	struct tpm_loongson_cmd *cmd = tpm_engine->command;
+> > > +
+> > > +	if (count > tpm_engine->buffer_size)
+> > > +		return -E2BIG;
+> > > +
+> > > +	cmd->data_len = count;
+> > > +	memcpy(tpm_engine->data_buffer, buf, count);
+> > > +
+> > > +	return loongson_se_send_engine_cmd(tpm_engine);
+> > > +}
+> > > +
+> > > +static const struct tpm_class_ops tpm_loongson_ops = {
+> > > +	.flags = TPM_OPS_AUTO_STARTUP,
+> > > +	.recv = tpm_loongson_recv,
+> > > +	.send = tpm_loongson_send,
+> > > +};
+> > > +
+> > > +static int tpm_loongson_probe(struct platform_device *pdev)
+> > > +{
+> > > +	struct loongson_se_engine *tpm_engine;
+> > > +	struct device *dev = &pdev->dev;
+> > > +	struct tpm_loongson_cmd *cmd;
+> > > +	struct tpm_chip *chip;
+> > > +
+> > > +	tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
+> > > +	if (!tpm_engine)
+> > > +		return -ENODEV;
+> > > +	cmd = tpm_engine->command;
+> > > +	cmd->cmd_id = SE_CMD_TPM;
+> > > +	cmd->data_off = tpm_engine->buffer_off;
+> > > +
+> > > +	chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+> > > +	if (IS_ERR(chip))
+> > > +		return PTR_ERR(chip);
+> > > +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+> > > +	dev_set_drvdata(&chip->dev, tpm_engine);
+> > > +
+> > > +	return tpm_chip_register(chip);
+> > > +}
+> > > +
+> > > +static struct platform_driver tpm_loongson = {
+> > > +	.probe   = tpm_loongson_probe,
+> > > +	.driver  = {
+> > > +		.name  = "loongson-tpm",
+> > 
+> > This patch looks otherwise great but I'd prefer here tho use
+> > "tpm_loongson_probe" for the value of the name field.
+> 
+> Where does this stipulation come from?  No other driver does this [0].
+> driver.name should be a nicely formatted, human readable string
+> describing the name of the device.  Not a function name.
 
-alg: hash: failed to allocate transform for spacc-xcbc(sm4): -22
-alg: hash: failed to allocate transform for spacc-cmac(sm4): -22
-alg: self-tests for xcbc(sm4) using spacc-xcbc(sm4) failed (rc=-22)
-alg: self-tests for cmac(sm4) using spacc-cmac(sm4) failed (rc=-22)
+What defines "human-readable" here? I see both as somewhat the
+same level of "readability" ;-)
 
-On cat /proc/crypto, I dont see the CMAC(SM4-generic) &
-XCBC(SM4-generic) ciphers listed in spite of me enabling SM4 support
-in the kernel config. Am I missing something?
+> 
+> [0] git grep -A15 "static struct platform_driver" | grep ".name = .*probe"
 
-To test, I found a work around by doing a dummy transform alloc (&
-freeing it) for CMAC(SM4)/XCBC(SM4) using
-    struct crypto_ahash *tfm = crypto_alloc_ahash("cmac(sm4)", 0, 0);
-The above call registers cmac(sm4-generic) & xcbc(sm4-generic), which
-gets things working for the SM4 ciphers on hardware. That happens
-because the generic ciphers get registered after dummy transform
-alloc.
+What I'm getting:
 
-Appreciate some help on this.
+$ git grep -l -e platform_driver_register --or -e module_platform_driver
+drivers/char/tpm | xargs git grep "\.name"
+drivers/char/tpm/tpm_atmel.c:           .name = "tpm_atmel",
+drivers/char/tpm/tpm_ftpm_tee.c:                .name = "ftpm-tee",
+drivers/char/tpm/tpm_ftpm_tee.c:                .name           =
+"optee-ftpm",
+drivers/char/tpm/tpm_nsc.c:             .name    = "tpm_nsc",
+drivers/char/tpm/tpm_svsm.c:            .name = "tpm-svsm",
+drivers/char/tpm/tpm_tis.c:     .name = "tpm_tis",
+drivers/char/tpm/tpm_tis.c:             .name           = "tpm_tis",
+drivers/char/tpm/tpm_tis_synquacer.c:           .name           =
+"tpm_tis_synquacer",
 
-Warm regards,
-PK
+Do you consider e.g, "tpm_tis" as "less human-readable".
+
+I don't necessarily fight against the name chosen. Your arguments
+just plain no make sense, so I just merely want to understand this.
+That's all.
+
+> 
+> -- 
+> Lee Jones [李琼斯]
+
+BR, Jarkko
