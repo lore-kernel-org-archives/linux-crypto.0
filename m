@@ -1,172 +1,110 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861392D8DD6
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 15:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730F92D321A;
+	Wed, 25 Jun 2025 16:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750864998; cv=none; b=OvLujL8i+c1ymqmxeflbKPBjgM8VVFKP0WODFx/5A+ebwBjptZJVH/ZQUw1FjRFQ+DzmRvAuqXjMJOrTIzoTDN2qhGyYypW92+1xnEW+XH0imnItyWkxhNlncfpdjmNh3lRMOBDBEJSZQcNjOeibxS1d5QeszvN+T2BhJiQ4g+U=
+	t=1750869084; cv=none; b=dNghOEJpW0dF7SMuICok794K9/d3bHS+6IkxuUvxDaSjHQFowW9Qpu5qaOYL/aQhKsR1VWfJ4xIVjFcbjmqtvQwmGPhB3spE1XOia3cKLY7oVeHZiGp0/EZYm36eLuYvGAMpDfMFmK2UjBtwW9X4KJRPqD9OgPDIWa3aUU/QWbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750864998; c=relaxed/simple;
-	bh=7Sjl3arAU6l+ct4OIc3hiLJH1j7yUSh9QgIYsdqT8xU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CNzFsoRb1BYAEFDqk0hnYnn7MkitQlRtomTAlQ3TuVVb3YBl2hw2teKpXllNk7e1RTrikGs2HxEaOerFh6Qg7czfUcGGS2r+HE4qcznYMIUAh90osUfUuSgs7PcISsnxuLl7UUuXZ/ILczKYxvmUwfjbaLQgdsG8Ch2h8QHuaLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sWliHQBu; arc=none smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1750869084; c=relaxed/simple;
+	bh=Zj0315h1+Ugs/regjOq5i5dG08rRrPa2Cmoyc3sj6SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WWurkyqeuC934uhqmdun4PCPdL8rCPrUn3yuaYv7r1TkLl5FJ0n5kUKIjPzsLdedKKPIee/pgWLglhryhoIoO/XH9SSQ2G1UIMGc5sCl61FjDSBHkycjnEJU3qDfqHyDwm+Amtxjo2jFrSQSwqpzuVe7uiRMnRUf3pJcCZotylE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=snHTUn8v; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sWliHQBu"
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2efa219b5bbso14119fac.0
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 08:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750864995; x=1751469795; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nBTrV/qHiTTEHkO79YRzlOS2Pz4aSN6jHKI3tcdStg4=;
-        b=sWliHQBuClCdusCHGnUxgxH+qDzUycPYh/r6OlFFj/BBqVg1edY5wdUHWtW4IcIVSe
-         ljXxqq3vadBd8GU1M+LVbUF8RrMAd7bD/LlPME34cfn0C5RKWtaCU4TMQLVZ2OQcLOAF
-         pl7Ey7hzqbzqG9LjSXsiLALvbryDwdqmTMNrQd7lDczuSpfdoRwiqC+L+km6J0x0Fe6/
-         FV3XVOPR7OqF26PAv23SG3cICKzxtdcxTiDyjjvJ4reVfFKImb1m0HnRyEtyMnBIqEZK
-         izIhFFiAlN32Xtu1hq7zJfsArEiRXS1Vb2KbBUY2N0a1EqGb1xUv6dl/hyb2Lzi/onaF
-         5HEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750864995; x=1751469795;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nBTrV/qHiTTEHkO79YRzlOS2Pz4aSN6jHKI3tcdStg4=;
-        b=Lx38an4ZIfUGDZ2oVC9/2amm5GBIQR3E5UhJ62dL37u76caML7CIzIvqdR729DFImo
-         +XT8BPqMfSZSWlnAEwjY0x5YWYRozgcOxuTJMh/On1QdtTnDG2HukgCpi6bX9jnPVpyq
-         U7ZsV+W7bVXZFX3rIiaRyHYvMU3bwzdp3YBSxnRyuckDxIhcFwS0sLOh3rVuE0YeFlC0
-         /QsYESzjXR3mCbfjFWaZJY60j1Q1OHChRjJIpSyOu0PgmpuaPs0Mx4y5RIxRa+LxF2SK
-         thXBpdib1wzWp0iiCXXVTn5y9cH4KfDkQN/itYQqvAiPiIOtqZPtLlIovG4E4Kg5HdlB
-         zBUA==
-X-Gm-Message-State: AOJu0Yz47INFfcIMx4POUzlSqRGFYYd6QprDKPixcOGssEFtx7Tk2mMm
-	B7lO4jzNRG3pZoTTr8VHm5MLL1nw+Jo9ecnLMV/4qTqFigXNZkw7aN6+6c9u/+/LaRY2y3hn4MU
-	UxS8m
-X-Gm-Gg: ASbGncsplTZ1xh4XngQxXUKOWAp3/KKr82MHyOCFlku/RDiifadthyhI3QKAm3fjurx
-	1nDTxBZImUMqR+27CbjJ43tDM+xkPPZPZD7Kjp1CwWTO27Y4qptxkMA5AwYii39bF7dYOe59j8n
-	Z48eOYWzzWqSlcdXhL0ver+rjSDRP5zhLGg6mNibD2+0+pMwnI4/D+6XNQUNzv4kWUw/pNNb9q1
-	lp7ejAQF4QCqU1PZN5rXT1YS267vW3ae6H9VIrB/t6rn8RsBWSGRzHkKSFdxKBnduT3ufDhtpOR
-	UG/Udw59r8cnJtICg6/0hXF50d0aOCGH6OqtS8QmaxpiPE2ZtLZ7OWy+V2jN77VPycn36A==
-X-Google-Smtp-Source: AGHT+IHguMsxXTrJbsiT1mDaoVBogHuqrzn+L+bYL9CaleASD263clez8DE7J3zfh+CjCPzLTLd8EA==
-X-Received: by 2002:a05:6870:3d8a:b0:2e9:1c4a:9fdc with SMTP id 586e51a60fabf-2efb27430d7mr2440883fac.17.1750864995496;
-        Wed, 25 Jun 2025 08:23:15 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:1fca:a60b:12ab:43a3])
-        by smtp.gmail.com with UTF8SMTPSA id 586e51a60fabf-2efaf488114sm481919fac.14.2025.06.25.08.23.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:23:15 -0700 (PDT)
-Date: Wed, 25 Jun 2025 10:23:13 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: zstd - convert to acomp
-Message-ID: <92929e50-5650-40be-8c0a-de81e77f0acf@sabinyo.mountain>
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="snHTUn8v"
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55PFvITO009480;
+	Wed, 25 Jun 2025 18:30:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	Ar5cY3eqwri9AVFjIOQsbTDZ2wnQ244y0/ufHL/uq/A=; b=snHTUn8v8zy4BnVf
+	bkKsMzALzX/hWB50aMj4MxIHi4bX+SsAYGY3Ta0qS9W+Qov86Hf3IFmC6wwbjXKe
+	z+7twjq4QjRMRhSZLUxgBzx2nUR3tozW2d6dCqKxErksVbCQU6VU/JiwQwzNDwcn
+	U/1p4bdqn33j4ByolMt6WwqjLdE3h61JA8R5yccQhLkGEskbTqOvCPUA7/8p3XmS
+	3qkplYuF9MJHqCdFCqu0QAWkYnOvwX3wSSg4FJ6n+6+HrXVAi9jrPcnDQBoDD8cW
+	6WJ6dlJDiRbtJNS8vh0xlq+UK3j8XGCWgrXg1kalJWT759R+wTleuCh44x8N8dF3
+	PYWGSA==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 47dkmjtf7e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Jun 2025 18:30:47 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 5E1194002D;
+	Wed, 25 Jun 2025 18:29:58 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id DD36CBF53B0;
+	Wed, 25 Jun 2025 18:29:23 +0200 (CEST)
+Received: from [10.48.86.103] (10.48.86.103) by SHFDAG1NODE3.st.com
+ (10.75.129.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 25 Jun
+ 2025 18:29:23 +0200
+Message-ID: <c1671c5e-d824-4131-861e-470d09371e05@foss.st.com>
+Date: Wed, 25 Jun 2025 18:29:17 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] fscrypt: don't use hardware offload Crypto API drivers
+To: Eric Biggers <ebiggers@kernel.org>
+CC: <linux-fscrypt@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+        <linux-ext4@vger.kernel.org>, <linux-f2fs-devel@lists.sourceforge.net>,
+        <ceph-devel@vger.kernel.org>
+References: <20250611205859.80819-1-ebiggers@kernel.org>
+ <8f4c2f36-71af-4c84-bcee-2554cea991d0@foss.st.com>
+ <20250613144239.GA1287@sol>
+Content-Language: en-US
+From: Maxime MERE <maxime.mere@foss.st.com>
+In-Reply-To: <20250613144239.GA1287@sol>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
+ (10.75.129.71)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-25_05,2025-06-25_01,2025-03-28_01
 
-Hello Suman Kumar Chakraborty,
 
-Commit f5ad93ffb541 ("crypto: zstd - convert to acomp") from Jun 16,
-2025 (linux-next), leads to the following Smatch static checker
-warning:
 
-	crypto/zstd.c:273 zstd_decompress()
-	warn: duplicate check 'scur' (previous on line 235)
+On 6/13/25 16:42, Eric Biggers wrote:
+> Honestly, the responses to this thread so far have made it even more clear that
+> this patch is the right decision.
 
-crypto/zstd.c
-    208 static int zstd_decompress(struct acomp_req *req)
-    209 {
-    210         struct crypto_acomp_stream *s;
-    211         unsigned int total_out = 0;
-    212         unsigned int scur, dcur;
-    213         zstd_out_buffer outbuf;
-    214         struct acomp_walk walk;
-    215         zstd_in_buffer inbuf;
-    216         struct zstd_ctx *ctx;
-    217         size_t pending_bytes;
-    218         int ret;
-    219 
-    220         s = crypto_acomp_lock_stream_bh(&zstd_streams);
-    221         ctx = s->ctx;
-    222 
-    223         ret = acomp_walk_virt(&walk, req, true);
-    224         if (ret)
-    225                 goto out;
-    226 
-    227         ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
-    228         if (!ctx->dctx) {
-    229                 ret = -EINVAL;
-    230                 goto out;
-    231         }
-    232 
-    233         do {
-    234                 scur = acomp_walk_next_src(&walk);
-    235                 if (scur) {
-    236                         inbuf.pos = 0;
-    237                         inbuf.size = scur;
-    238                         inbuf.src = walk.src.virt.addr;
-    239                 } else {
-    240                         break;
+The chaining system I previously presented is just an example intended 
+to demonstrate the value of hardware drivers in the context of ST platforms.
 
-If scur is NULL then we break.
+The key point is that our hardware IP allows us to securely embed 
+encryption keys directly in hardware, making sure they are never visible 
+or accessible from Linux, which runs in a non-secure environment. Our 
+software architectures rely on a Secure OS running in parallel with 
+Linux, similar to what is done on Android. This Secure OS is responsible 
+for sensitive cryptographic operations.
 
-    241                 }
-    242 
-    243                 do {
-    244                         dcur = acomp_walk_next_dst(&walk);
-    245                         if (dcur == req->dlen && scur == req->slen) {
-    246                                 ret = zstd_decompress_one(req, ctx, walk.src.virt.addr,
-    247                                                           walk.dst.virt.addr, &total_out);
-    248                                 acomp_walk_done_dst(&walk, dcur);
-    249                                 acomp_walk_done_src(&walk, scur);
-    250                                 goto out;
-    251                         }
-    252 
-    253                         if (!dcur) {
-    254                                 ret = -ENOSPC;
-    255                                 goto out;
-    256                         }
-    257 
-    258                         outbuf.pos = 0;
-    259                         outbuf.dst = (u8 *)walk.dst.virt.addr;
-    260                         outbuf.size = dcur;
-    261 
-    262                         pending_bytes = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
-    263                         if (ZSTD_isError(pending_bytes)) {
-    264                                 ret = -EIO;
-    265                                 goto out;
-    266                         }
-    267 
-    268                         total_out += outbuf.pos;
-    269 
-    270                         acomp_walk_done_dst(&walk, outbuf.pos);
-    271                 } while (scur != inbuf.pos);
-    272 
---> 273                 if (scur)
+This Secure OS can manages the keys with a dedicated hardware peripheral 
+(SAES). The Linux side never sees the keys directly. Instead, the Secure 
+OS prepares the keys and shares them securely with the cryptographic 
+engine (CRYP) through a dedicated hardware bus.
 
-No need to check.  It's weird that the line before is
-} while (scur != inbuf.pos); instead of } while (inbuf.pos != scur);
-Normally, the variable goes first.
+This architecture improves security boundary: keys isolated from the 
+non-secure Linux environment. But decryption can be processed by the 
+linux kernel.
 
-    274                         acomp_walk_done_src(&walk, scur);
-    275         } while (ret == 0);
-    276 
-    277 out:
-    278         if (ret)
-    279                 req->dlen = 0;
-    280         else
-    281                 req->dlen = total_out;
-    282 
-    283         crypto_acomp_unlock_stream_bh(s);
-    284 
-    285         return ret;
-    286 }
+In addition, ST’s hardware crypto peripherals come with built-in 
+protections against side-channel attacks and have been certified with 
+SESIP and PSA level 3 security assurance, providing a level of security 
+difficult to achieve with software alone.
 
-regards,
-dan carpenter
+Regarding robustness and maintenance, ST ensures regular updates of its 
+drivers and can fix any reported bugs. We have conducted internal tests 
+with dm-crypt that demonstrate the proper functioning of these drivers 
+for this type of application.
+
+Maxime
