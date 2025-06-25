@@ -1,66 +1,66 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941A41C5D55
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 15:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861392D8DD6
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 15:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750864911; cv=none; b=vAGwV8Cdlg56SrtHm2jFXY/a92kWP6dfu3jGYHGtANT5DF1ozUo7z0H/i3f53DGfKZFxEzd6jtoMbFRtAemhiMA28Mo1xBni03J7ISfrgFYjzYiymisJ+o69cwpbg5yhk5Hqlb4fEfCa5mz/7YsrZCrlYouyW4Hx6abTvl6fAbE=
+	t=1750864998; cv=none; b=OvLujL8i+c1ymqmxeflbKPBjgM8VVFKP0WODFx/5A+ebwBjptZJVH/ZQUw1FjRFQ+DzmRvAuqXjMJOrTIzoTDN2qhGyYypW92+1xnEW+XH0imnItyWkxhNlncfpdjmNh3lRMOBDBEJSZQcNjOeibxS1d5QeszvN+T2BhJiQ4g+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750864911; c=relaxed/simple;
-	bh=FwaubJuigsZg8k8QqXeH6ngkMzsk/W7h25YDngdHAZw=;
-	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=pGF/yhr9wTRdU8Wj3zU/jG7yR7MNET/kTUiIQja1ujoMx4DtH5o/6zhd1EAKH/QxkMU+dexuTIQJoqwzUHgAqfdZxFyoa1tgBm1IhuXk+jPs9T8pZ/zxbWtxy1FT5Ufl0J6u517qvzGytjxv7VzVzMYPsKRd6BIdo4h6bWsLuwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JDGVd0kb; arc=none smtp.client-ip=209.85.210.41
+	s=arc-20240116; t=1750864998; c=relaxed/simple;
+	bh=7Sjl3arAU6l+ct4OIc3hiLJH1j7yUSh9QgIYsdqT8xU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=CNzFsoRb1BYAEFDqk0hnYnn7MkitQlRtomTAlQ3TuVVb3YBl2hw2teKpXllNk7e1RTrikGs2HxEaOerFh6Qg7czfUcGGS2r+HE4qcznYMIUAh90osUfUuSgs7PcISsnxuLl7UUuXZ/ILczKYxvmUwfjbaLQgdsG8Ch2h8QHuaLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sWliHQBu; arc=none smtp.client-ip=209.85.160.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JDGVd0kb"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-73a8d0e3822so965169a34.2
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 08:21:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sWliHQBu"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2efa219b5bbso14119fac.0
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 08:23:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750864908; x=1751469708; darn=vger.kernel.org;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
+        d=linaro.org; s=google; t=1750864995; x=1751469795; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=H65QKwaFiR2y48UiapcKDR0YMlcWeER7HaTLLMJ7tpo=;
-        b=JDGVd0kbvmGuSM65/m5TnkCWnHrFTGhV00UwzyRJV/dGGUKTisjPiNxfhxuJxmmPIk
-         MuXiRJ0SpnzozxXsFrCBXoNV8aUyRnbQa+2AdXGgsfZOXyRCFQs5CeG73LIpjrLjF3Nm
-         w+C8o+vHUbXYsQmBe+TfkodRY6Lh51VAbtE6TGWcqDFMvQLAzA0i2f8/WGGBx3vuAXBV
-         +Lta5PKM12JT9L0qqS2WjxwK+w96QKNBXvbHwLvj2SuUUA5YT8dXhm1EoRVReH0SxlHs
-         eX53kBwRGWG13YdCmhsf2YP2PSteGKNMKxTSl6eJiqMPEY3nOicPJuwpe7xxcD1OeFxv
-         zRPQ==
+        bh=nBTrV/qHiTTEHkO79YRzlOS2Pz4aSN6jHKI3tcdStg4=;
+        b=sWliHQBuClCdusCHGnUxgxH+qDzUycPYh/r6OlFFj/BBqVg1edY5wdUHWtW4IcIVSe
+         ljXxqq3vadBd8GU1M+LVbUF8RrMAd7bD/LlPME34cfn0C5RKWtaCU4TMQLVZ2OQcLOAF
+         pl7Ey7hzqbzqG9LjSXsiLALvbryDwdqmTMNrQd7lDczuSpfdoRwiqC+L+km6J0x0Fe6/
+         FV3XVOPR7OqF26PAv23SG3cICKzxtdcxTiDyjjvJ4reVfFKImb1m0HnRyEtyMnBIqEZK
+         izIhFFiAlN32Xtu1hq7zJfsArEiRXS1Vb2KbBUY2N0a1EqGb1xUv6dl/hyb2Lzi/onaF
+         5HEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750864908; x=1751469708;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
+        d=1e100.net; s=20230601; t=1750864995; x=1751469795;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H65QKwaFiR2y48UiapcKDR0YMlcWeER7HaTLLMJ7tpo=;
-        b=gXxNeSfVvWmmkkfTMHYg5H6uXyByubY0+JiAfvr6TtG5snXhU9Mi+FGBWxAn12S2FI
-         bvW0UFFcNUnn6oIQtp/ngk/AsjEnA+sugKsUw0Uzi/fjXizxyRhQ2AhycwlO9SW2yDeA
-         CmbLXREXy8p8PzJOzHv2fczmZun78IKp5rmY1fTaNA8PewpQB/tydTmt9wpscK7XJlEd
-         VYhWBg2Y4fXxVBy5j7sco/9o92GOiA5P/YQEqjqqi8Oyc6ArEV1kFZSW9ZVZ3IQ9DMXO
-         r6bQjCxGswGg2fWJXv8EIFAgYZFtoPQkHxmczJs7x7lG7pjlrEmBJ4eLZvmxKlS3yC2K
-         6yiw==
-X-Gm-Message-State: AOJu0YylK/fEwhwjUEApQc2eKydKi8Nhrz07yZurYDiw01a9GwP1FMtB
-	AVCwa1Lmnw635pHxqnfnEM7vdNVq2c6XTn7XjEf0HZkhR1rl8s4+gRmIk2q214PTtzU=
-X-Gm-Gg: ASbGncu6ZKFxD/05loxCNQSPIAqdm2/WuoqA8OEL2jq0AOz/c5/rHYNnv5vcEM97H41
-	ZWdKUJM+0tfuhtTwcJRa/rQolbhPOHRx0Fu/3BVFe18oy1xbMQcDV9XOTTIu8JgcncJdhObfkF9
-	XHSrIDNY4V8TIZUm071Hr2JMYPQ9fCDiPq/SbjC/HIAjjpz7M9cYh0VXoLxmUegEB9wcgmLBoao
-	9BpirYlkgcSFBEMZL83ZtaRkOO3YBHvLhpgBa4pqzXfLoDvM4bmG6RKfNgb5TUSs8noB2FvdP6Q
-	KLlPfpW98Mh0jBA08BpyaVjzhrMp7jYEMfqD1qHFsVFUCXIJHZJavXLcNOApd1NYR4iX7A==
-X-Google-Smtp-Source: AGHT+IHTpRmOtzQ2zNZRgia8DQxzidgtYee/zpuEiKBhrWpX4A3ipNTBxvQ0xzCaXKw1/NWZxal0vg==
-X-Received: by 2002:a05:6830:280e:b0:735:aca2:9bf6 with SMTP id 46e09a7af769-73adc815f81mr2502530a34.22.1750864908634;
-        Wed, 25 Jun 2025 08:21:48 -0700 (PDT)
+        bh=nBTrV/qHiTTEHkO79YRzlOS2Pz4aSN6jHKI3tcdStg4=;
+        b=Lx38an4ZIfUGDZ2oVC9/2amm5GBIQR3E5UhJ62dL37u76caML7CIzIvqdR729DFImo
+         +XT8BPqMfSZSWlnAEwjY0x5YWYRozgcOxuTJMh/On1QdtTnDG2HukgCpi6bX9jnPVpyq
+         U7ZsV+W7bVXZFX3rIiaRyHYvMU3bwzdp3YBSxnRyuckDxIhcFwS0sLOh3rVuE0YeFlC0
+         /QsYESzjXR3mCbfjFWaZJY60j1Q1OHChRjJIpSyOu0PgmpuaPs0Mx4y5RIxRa+LxF2SK
+         thXBpdib1wzWp0iiCXXVTn5y9cH4KfDkQN/itYQqvAiPiIOtqZPtLlIovG4E4Kg5HdlB
+         zBUA==
+X-Gm-Message-State: AOJu0Yz47INFfcIMx4POUzlSqRGFYYd6QprDKPixcOGssEFtx7Tk2mMm
+	B7lO4jzNRG3pZoTTr8VHm5MLL1nw+Jo9ecnLMV/4qTqFigXNZkw7aN6+6c9u/+/LaRY2y3hn4MU
+	UxS8m
+X-Gm-Gg: ASbGncsplTZ1xh4XngQxXUKOWAp3/KKr82MHyOCFlku/RDiifadthyhI3QKAm3fjurx
+	1nDTxBZImUMqR+27CbjJ43tDM+xkPPZPZD7Kjp1CwWTO27Y4qptxkMA5AwYii39bF7dYOe59j8n
+	Z48eOYWzzWqSlcdXhL0ver+rjSDRP5zhLGg6mNibD2+0+pMwnI4/D+6XNQUNzv4kWUw/pNNb9q1
+	lp7ejAQF4QCqU1PZN5rXT1YS267vW3ae6H9VIrB/t6rn8RsBWSGRzHkKSFdxKBnduT3ufDhtpOR
+	UG/Udw59r8cnJtICg6/0hXF50d0aOCGH6OqtS8QmaxpiPE2ZtLZ7OWy+V2jN77VPycn36A==
+X-Google-Smtp-Source: AGHT+IHguMsxXTrJbsiT1mDaoVBogHuqrzn+L+bYL9CaleASD263clez8DE7J3zfh+CjCPzLTLd8EA==
+X-Received: by 2002:a05:6870:3d8a:b0:2e9:1c4a:9fdc with SMTP id 586e51a60fabf-2efb27430d7mr2440883fac.17.1750864995496;
+        Wed, 25 Jun 2025 08:23:15 -0700 (PDT)
 Received: from localhost ([2603:8080:b800:f700:1fca:a60b:12ab:43a3])
-        by smtp.gmail.com with UTF8SMTPSA id 46e09a7af769-73a90cc31d4sm2288915a34.65.2025.06.25.08.21.48
+        by smtp.gmail.com with UTF8SMTPSA id 586e51a60fabf-2efaf488114sm481919fac.14.2025.06.25.08.23.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:21:48 -0700 (PDT)
-Message-ID: <685c140c.050a0220.552db.dab5@mx.google.com>
-X-Google-Original-Message-ID: <@sabinyo.mountain>
-Date: Wed, 25 Jun 2025 10:21:47 -0500
+        Wed, 25 Jun 2025 08:23:15 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:23:13 -0500
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: herbert@gondor.apana.org.au
+To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
 Cc: linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: aspeed/hash - Add fallback
+Subject: [bug report] crypto: zstd - convert to acomp
+Message-ID: <92929e50-5650-40be-8c0a-de81e77f0acf@sabinyo.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,46 +70,103 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Hello Herbert Xu,
+Hello Suman Kumar Chakraborty,
 
-The patch 508712228696: "crypto: aspeed/hash - Add fallback" from May
-13, 2025, leads to the following static checker warning:
+Commit f5ad93ffb541 ("crypto: zstd - convert to acomp") from Jun 16,
+2025 (linux-next), leads to the following Smatch static checker
+warning:
 
-	drivers/crypto/aspeed/aspeed-hace-hash.c:453 aspeed_ahash_fallback()
-	warn: inconsistent indenting
+	crypto/zstd.c:273 zstd_decompress()
+	warn: duplicate check 'scur' (previous on line 235)
 
-drivers/crypto/aspeed/aspeed-hace-hash.c
-    433 static noinline int aspeed_ahash_fallback(struct ahash_request *req)
-    434 {
-    435 	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
-    436 	HASH_FBREQ_ON_STACK(fbreq, req);
-    437 	u8 *state = rctx->buffer;
-    438 	struct scatterlist sg[2];
-    439 	struct scatterlist *ssg;
-    440 	int ret;
-    441 
-    442 	ssg = scatterwalk_ffwd(sg, req->src, rctx->offset);
-    443 	ahash_request_set_crypt(fbreq, ssg, req->result,
-    444 				rctx->total - rctx->offset);
-    445 
-    446 	ret = aspeed_sham_export(req, state) ?:
-    447 	      crypto_ahash_import_core(fbreq, state);
-    448 
-    449 	if (rctx->flags & SHA_FLAGS_FINUP)
-    450 		ret = ret ?: crypto_ahash_finup(fbreq);
-    451 	else
-    452 		ret = ret ?: crypto_ahash_update(fbreq);
---> 453 			     crypto_ahash_export_core(fbreq, state) ?:
-    454 			     aspeed_sham_import(req, state);
+crypto/zstd.c
+    208 static int zstd_decompress(struct acomp_req *req)
+    209 {
+    210         struct crypto_acomp_stream *s;
+    211         unsigned int total_out = 0;
+    212         unsigned int scur, dcur;
+    213         zstd_out_buffer outbuf;
+    214         struct acomp_walk walk;
+    215         zstd_in_buffer inbuf;
+    216         struct zstd_ctx *ctx;
+    217         size_t pending_bytes;
+    218         int ret;
+    219 
+    220         s = crypto_acomp_lock_stream_bh(&zstd_streams);
+    221         ctx = s->ctx;
+    222 
+    223         ret = acomp_walk_virt(&walk, req, true);
+    224         if (ret)
+    225                 goto out;
+    226 
+    227         ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
+    228         if (!ctx->dctx) {
+    229                 ret = -EINVAL;
+    230                 goto out;
+    231         }
+    232 
+    233         do {
+    234                 scur = acomp_walk_next_src(&walk);
+    235                 if (scur) {
+    236                         inbuf.pos = 0;
+    237                         inbuf.size = scur;
+    238                         inbuf.src = walk.src.virt.addr;
+    239                 } else {
+    240                         break;
 
-I guess this should be something like?
+If scur is NULL then we break.
 
-	ret = ret ?: crypto_ahash_export_core(fbreq, state);
-	ret = ret ?: aspeed_sham_import(req, state);
+    241                 }
+    242 
+    243                 do {
+    244                         dcur = acomp_walk_next_dst(&walk);
+    245                         if (dcur == req->dlen && scur == req->slen) {
+    246                                 ret = zstd_decompress_one(req, ctx, walk.src.virt.addr,
+    247                                                           walk.dst.virt.addr, &total_out);
+    248                                 acomp_walk_done_dst(&walk, dcur);
+    249                                 acomp_walk_done_src(&walk, scur);
+    250                                 goto out;
+    251                         }
+    252 
+    253                         if (!dcur) {
+    254                                 ret = -ENOSPC;
+    255                                 goto out;
+    256                         }
+    257 
+    258                         outbuf.pos = 0;
+    259                         outbuf.dst = (u8 *)walk.dst.virt.addr;
+    260                         outbuf.size = dcur;
+    261 
+    262                         pending_bytes = zstd_decompress_stream(ctx->dctx, &outbuf, &inbuf);
+    263                         if (ZSTD_isError(pending_bytes)) {
+    264                                 ret = -EIO;
+    265                                 goto out;
+    266                         }
+    267 
+    268                         total_out += outbuf.pos;
+    269 
+    270                         acomp_walk_done_dst(&walk, outbuf.pos);
+    271                 } while (scur != inbuf.pos);
+    272 
+--> 273                 if (scur)
 
-    455 	HASH_REQUEST_ZERO(fbreq);
-    456 	return ret;
-    457 }
+No need to check.  It's weird that the line before is
+} while (scur != inbuf.pos); instead of } while (inbuf.pos != scur);
+Normally, the variable goes first.
+
+    274                         acomp_walk_done_src(&walk, scur);
+    275         } while (ret == 0);
+    276 
+    277 out:
+    278         if (ret)
+    279                 req->dlen = 0;
+    280         else
+    281                 req->dlen = total_out;
+    282 
+    283         crypto_acomp_unlock_stream_bh(s);
+    284 
+    285         return ret;
+    286 }
 
 regards,
 dan carpenter
