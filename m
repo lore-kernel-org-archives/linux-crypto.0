@@ -1,43 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14D619E97A;
-	Wed, 25 Jun 2025 03:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D8C1DA60F
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Jun 2025 03:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750822394; cv=none; b=jr3UiSKp3WNwdfDfnTKKcxm9MGUVTgXiRpjFSg9p+BAU86lk6cNF5cKMTvQrdLl7IVYLkBti9k0qArjPZJ5Bi9dEDHVD3Qu233/r/6y/shlgKrKmpyvtFFwiO3yQ2CiZjeHPTdbs/ssehfzNqhH39oW5q1g3qmsxQ1KCCdyBN4I=
+	t=1750822663; cv=none; b=MQKTXYhX9NHZfUKxoCTMBd/ZUpYdoPuWcpkEjP/HlzEPkms9o72awvZCSygHQBhSbJGlOszxFm2AoGXZwz7243xQUMPN+ihEhyPS1BlNpemzbzi5kmEKlYuvMtEN5X34hhIRA2pDfW7gQQgOzMK9BzgaGggh4LW4xRjLdGYQ0uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750822394; c=relaxed/simple;
-	bh=S+zg+bDlCpe9lZBLnDQTYS3NMqzgftreSFsZWS6275U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCjhiNdctDtiuNVFFJQlRTpCgXA2GycDvOV49Os/VBzqLzVoDcKAb9HFdKdhJaIE6PNb1SgLX3IIjuBktZO9DQmwgz1lz/ifuxFBvzP0F1GKywUAdGXQjVCM95FzobX9YusYtwb5u+NIBNzwJuwRZH8J/MQeIaJWlhid/B/cQhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rA6JgHpW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750822663; c=relaxed/simple;
+	bh=RcqwAmH8reITbFxhGQhKgshOEqMaIPoTsuK/iug71/k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=cJWOehjbGV7DefYoqTNFSRUGuvhP/KoLmvHFEcXHRzLeRZQDe+0uS5vScRjBgNI7E5a+zHFuUz6a1yj9Z3gQdP/tfDsqc8N1Xz70Z7TNYO26wMfjoWoZBQFNjAMfm9c+RgmKep9c00NTeBmadH7WbfeZ+OpQUXO6kVEGmxfNXZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GqMaAVfE; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rA6JgHpW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 367C2C4CEE3;
-	Wed, 25 Jun 2025 03:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750822393;
-	bh=S+zg+bDlCpe9lZBLnDQTYS3NMqzgftreSFsZWS6275U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rA6JgHpWauA80ED/D0iBM35ETh5YQCVIJAVCd4ZmH05hGpM/zJPRyn0QezCvWOkLv
-	 tGegv6/Z5RsrdrRX1xzibmSQP4sgiAuiUrxgl5eY/uyNFcvjS3QC5Kpn9hkx9ulIV3
-	 kYadut0+Nl9zkVXi9yd4vqaJdc3W7IA89t6BQZmNsZcg7jPSzeLzD+17uXp4pOAvBu
-	 MYeswK3aPHcyoC3Aey+bahq5GhzEjEVAPZnz7d6RMswdDDRgoUvbRm15SshgXCJris
-	 J/UdA9JQE3vXUU6Ua9HU0Tak4dIRIjFEhMzK+KDUeIhSxyONGYhzohzlghw2Lztcjy
-	 Oxxf2EjIixOiw==
-Date: Tue, 24 Jun 2025 20:32:38 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [GIT PULL] Crypto Fixes for 6.16
-Message-ID: <20250625033238.GB8962@sol>
-References: <aFtidDP6MLX1V2A6@gondor.apana.org.au>
- <20250625030404.GA8962@sol>
- <aFtpj5y4HtzVDChg@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GqMaAVfE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=yb0X7GhkCHRrVWDPF6d+DINGflgvMKS1G6HPJLHUdG8=; b=GqMaAVfEpSnQN90fpVE31XIzVj
+	z8vtXfrUYcXxcfJykNsEk6xU5K8Ue2iJ/RnLlV6Gaqrr0a43vSdan+/rP0y1z+dy020cmbiVXnh/c
+	ZbF0VqMUisvS93qcMQaUmoeO3Fh9iQQ1aoTyO66SUYmiygonvVfYA15Hm8N+7KrPwB6GwPlgkVHXK
+	qXMzgTphHWM9xRMXVS7GjgGErrzFm/RFHvXu48vlp4n9Dmd8Qf1aPl7QRJ/jrmMCkXBh+NO0Mym7f
+	gH2gh5rnEDhAQI5pPwS8fR+4wbBcTzUlMrWqO5/ISheOwhAplcdkUYXN3jl+Km/QfAnyk9/kC2Jmc
+	vxREI27w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uUGhe-000n7g-2B;
+	Wed, 25 Jun 2025 11:37:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 25 Jun 2025 11:37:35 +0800
+Date: Wed, 25 Jun 2025 11:37:35 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: chelsio - Use crypto_shash_export_core
+Message-ID: <aFtu_wFQnjO6j8aX@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,44 +46,53 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFtpj5y4HtzVDChg@gondor.apana.org.au>
 
-On Wed, Jun 25, 2025 at 11:14:23AM +0800, Herbert Xu wrote:
-> On Tue, Jun 24, 2025 at 08:04:04PM -0700, Eric Biggers wrote:
-> >
-> > Wouldn't it make more sense to revert the "Crypto API partial block handling"
-> > stuff?  It's been causing a huge number of problems, and it's been getting
-> > superseded by the librarification changes anyway.
-> 
-> The partial block handling simplifies the implementation of both
-> software and hardware hash algorithms.  Just look at the diffstat.
+Use crypto_shash_export_core to export the core hash state without
+the partial blocks.
 
-Not software, since the library functions have to handle partial blocks anyway.
-There will be a negative diffstat for algorithms that haven't been converted to
-have a library API yet, but it will go away once they are.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> > Indeed, I just found that a lot of drivers in drivers/crypto/ haven't been
-> > updated to be aware of the extra byte that comes back from
-> > crypto_shash_export().  So there are a bunch of buffer overflows there too.
-> > (Not like drivers/crypto/ actually matters, but apparently your changes are for
-> > its benefit?  So it's interesting that it was actually broken by them.)
-> 
-> If anything this proves that enforcing a consistent hash format
-> is the right thing to do.  All those buggy code paths were assuming
-> that the export format is fixed which was not the case prior to the
-> partial blocks work.
-> 
-> But thanks for pointing me to these buggy drivers and I will send
-> out fixes for them.
-
-Well, they (reasonably enough) assume the format that all the CPU-based code
-previously used.  So they weren't really broken until your changes.
-
-Of course, the lack of type safety here is an artificial problem created by the
-generic crypto API which uses a 'void *' state.  The library functions simply
-use the C type system, so they just work and do not have this sort of silly
-issue where different places disagree about what struct a 'void *' points to...
-
-These legacy drivers should just use the library functions.
-
-- Eric
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index af37477ffd8d..be21e4e2016c 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -314,30 +314,30 @@ static int chcr_compute_partial_hash(struct shash_desc *desc,
+ 	if (digest_size == SHA1_DIGEST_SIZE) {
+ 		error = crypto_shash_init(desc) ?:
+ 			crypto_shash_update(desc, iopad, SHA1_BLOCK_SIZE) ?:
+-			crypto_shash_export(desc, (void *)&sha1_st);
++			crypto_shash_export_core(desc, &sha1_st);
+ 		memcpy(result_hash, sha1_st.state, SHA1_DIGEST_SIZE);
+ 	} else if (digest_size == SHA224_DIGEST_SIZE) {
+ 		error = crypto_shash_init(desc) ?:
+ 			crypto_shash_update(desc, iopad, SHA256_BLOCK_SIZE) ?:
+-			crypto_shash_export(desc, (void *)&sha256_st);
++			crypto_shash_export_core(desc, &sha256_st);
+ 		memcpy(result_hash, sha256_st.state, SHA256_DIGEST_SIZE);
+ 
+ 	} else if (digest_size == SHA256_DIGEST_SIZE) {
+ 		error = crypto_shash_init(desc) ?:
+ 			crypto_shash_update(desc, iopad, SHA256_BLOCK_SIZE) ?:
+-			crypto_shash_export(desc, (void *)&sha256_st);
++			crypto_shash_export_core(desc, &sha256_st);
+ 		memcpy(result_hash, sha256_st.state, SHA256_DIGEST_SIZE);
+ 
+ 	} else if (digest_size == SHA384_DIGEST_SIZE) {
+ 		error = crypto_shash_init(desc) ?:
+ 			crypto_shash_update(desc, iopad, SHA512_BLOCK_SIZE) ?:
+-			crypto_shash_export(desc, (void *)&sha512_st);
++			crypto_shash_export_core(desc, &sha512_st);
+ 		memcpy(result_hash, sha512_st.state, SHA512_DIGEST_SIZE);
+ 
+ 	} else if (digest_size == SHA512_DIGEST_SIZE) {
+ 		error = crypto_shash_init(desc) ?:
+ 			crypto_shash_update(desc, iopad, SHA512_BLOCK_SIZE) ?:
+-			crypto_shash_export(desc, (void *)&sha512_st);
++			crypto_shash_export_core(desc, &sha512_st);
+ 		memcpy(result_hash, sha512_st.state, SHA512_DIGEST_SIZE);
+ 	} else {
+ 		error = -EINVAL;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
