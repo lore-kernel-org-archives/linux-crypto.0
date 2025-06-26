@@ -1,151 +1,236 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639C228FFEE;
-	Thu, 26 Jun 2025 13:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750946111; cv=none; b=TriONpS+F4E0s4+tPS9FhpU0XYO/yTegdWFtsFFRCAKQmF6G5usoCdwYHyZ7X8Iqke/9emf6sHygLEabzxXODbH8yeqeGiqbjzzO9HRgAe9Nj2yLETI16xjOhtRa3Yqrsqu6tx4ItNoi6H4qeu2aW+MEXluaYusuI4t6KHiNKD8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750946111; c=relaxed/simple;
-	bh=j3SIJ3jwyvOUr835TAi2zHcTBQbFQUaiH6SzThFvG+Y=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=R7KKFRBS/nQjojL5fMM3dBvIwFgbyPmkalRWIduWNHX6FUhGHVCTCvfTXJJ3yNW2xr46c2LU8/6F31D6i6+joG5ERLV+9Wy/Vui31shqAW0TSl6vYxO+mXfUR8bcyp36PB5uNTLkM5k6Io0XSUzbCtNWcR+wdKEBQ9qsOTwrrak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JNCq8d9t; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66392E5438;
+	Thu, 26 Jun 2025 14:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750949413; cv=fail; b=bRIdMGjjv0k28LF0s7HjDMNskm3Wrtpq4iGtR1hMu5fcPTjoYasLws1PD6BB89YxF4m/RNYP46l+jK4VZiahhGhdXvYz+Mq5k5czvI6rVkYMw03hzNUVxfDCPMNPSauXJbnz7cR1mVFUIqlJUdCzfYXyhgUzZkg+e/O23K95Z88=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750949413; c=relaxed/simple;
+	bh=b6YhQ1AjSvy9h1pnyFTcrrMfplGHbtF6UCGdeCg+G+g=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hXMg+Q5uJJjGAlCkiBktmMhulXhR6AZYezIwAV7z00f+OT5TkrdZ7w8BrH74Z/YIb7n0MrEad0/jIDbv6kYc//Rro5yj4s032/n2Sfvj6r7gdh9QmmTCmnyG0G37185RLPXzQz2hWrVaOT1YhaeUT/Cn9gsnplqKj4VI7Ew3dPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GZ89sZvC; arc=fail smtp.client-ip=40.107.243.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JNCq8d9t"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55QDRCul023970;
-	Thu, 26 Jun 2025 13:55:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=Q1W3KEoUepJKWyu/Rav+OY+TinV9
-	DbB5FGKKSkiu1lQ=; b=JNCq8d9tIbDKcD7zw/ZzLHl4xgVr4fdL5n8eMRunttEm
-	3NmgOmo4E4tAbBy/D3YnBpfrzYU04WlNHn8ny0ey+usyV+WqDeO3xmunPOYkvhNo
-	IXS7Bt3aRU4eVj/dJ82pTGdujl8OZ2BGJFGMC/sf1uE7F+WV6JkYsbhqop4PUeoy
-	eAXaJWbketkgox413AjNeTeIPCAl18C/Vc74Uu8SR2kBGUll5BQlzt6lSDiEJJuz
-	j75AYWieoR90iJWmKMO4UKbbjsSAK9iY8YerzliXy7WfIan4/A4pBg3unqPM1aGJ
-	ss8+skx5/QjjHViWumPOri62Eq1R+aFu/Ac2Zt0v0A==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47h73k04qr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Jun 2025 13:55:04 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55QCOpSD006329;
-	Thu, 26 Jun 2025 13:55:03 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e82pf7yn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Jun 2025 13:55:03 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55QDsxqH44499450
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Jun 2025 13:54:59 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 80E2E20043;
-	Thu, 26 Jun 2025 13:54:59 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 63B0C20040;
-	Thu, 26 Jun 2025 13:54:59 +0000 (GMT)
-Received: from [9.152.222.112] (unknown [9.152.222.112])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 26 Jun 2025 13:54:59 +0000 (GMT)
-Message-ID: <12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com>
-Date: Thu, 26 Jun 2025 15:54:58 +0200
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GZ89sZvC"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=stPqN/68IuoUIjfcRfImMabSNPqx1zrprNayTBQVw97gXRKoZxmO2MFMxZGUYvTucmJSIJEgAHQDijtSLi3dfqIvcaKhe0b23/VMh5L4x9Fz/l61QNaWp1/xuDwNBlATF5uCnd/sB3q2fCOOA7rtt1/KgiH8cFQluZlUfuMFThXzZT/q4GkLcflfseAkjRCIANibm/DtLdKeZ7arcje91iHY7Rf+Cb5Gu0+uQpCTE6XY7X/+USkJpTQX2uCIP644ntMo0oXAMOHztaSJr01U4R3AKV0hBid3LaCnE2tHJhH2bZcJK7uoCDsYB2CFghocImmWZxN6Xt/HEZKmFwpDrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zcloSr5PMA5kVOhE1tAkfytc7OnVQyMAQMcSC+1MBPw=;
+ b=Ck6POgX7d/ePykjSqo5C/k5exG93qIOIULaw3Gmi3UXQ5kWNLQ6xR27LvY1sbhsMhO3Rp3PE5oihhA2Qzg+GSMP2uGnDCQBaVPBMQb7JcbHJWWXAy9JJHJDGEajYv522BZR63faSi4Jp9G48d1OnzutW3d+ttklACYjoQHkPF6uV3RWfJme4v9yLaYbhhnAQrHl4PMIlKk5RwkUE3PJcPO3JrFZaSljviAIlvlkMmxrCbHQZsQit65mXG1QTadF0ZeLzbP/Ic3Qh6TMS0Vi/SH98ZmZuI6UBMGOuX9DmcU16uldWDkIT/aTLQzW+tmdF2Urgn0zWtXR7c2VWZLbFdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zcloSr5PMA5kVOhE1tAkfytc7OnVQyMAQMcSC+1MBPw=;
+ b=GZ89sZvCk5z7I4Rd3pLEMCiOLPvZ9RUWZhl5GCS+Hg6m+bkvha20YQx3Wsdhq7vxX6O7B4wAQqbs2qc5UvIEByMeAAMtbIYotCslUlamPdkBrTW+hIkNBg/LYb5ut3yOSoTpIY5L50hrcqHDoPXYnr+FDnwDiqUnkWNk2CJ5w3s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com (2603:10b6:610:177::5)
+ by DS7PR12MB5719.namprd12.prod.outlook.com (2603:10b6:8:72::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Thu, 26 Jun
+ 2025 14:50:04 +0000
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::222c:662:e585:3404]) by CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::222c:662:e585:3404%7]) with mapi id 15.20.8880.021; Thu, 26 Jun 2025
+ 14:50:04 +0000
+Message-ID: <bce43912-699b-4738-87f2-6960f7eecdc6@amd.com>
+Date: Thu, 26 Jun 2025 09:50:01 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto/ccp: Fix locking on alloc failure handling
+To: Alexey Kardashevskiy <aik@amd.com>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ashish Kalra <ashish.kalra@amd.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
+References: <20250617094354.1357771-1-aik@amd.com>
+Content-Language: en-US
+From: "Pratik R. Sampat" <prsampat@amd.com>
+In-Reply-To: <20250617094354.1357771-1-aik@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR10CA0015.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::20) To CH3PR12MB8660.namprd12.prod.outlook.com
+ (2603:10b6:610:177::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US, de-DE
-To: Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org
-From: Ingo Franzki <ifranzki@linux.ibm.com>
-Subject: Syzbot finding: invalid-load in arch/s390/crypto/sha_common.c
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MGmnLCG0Lb0c7Urc59CfY-RBVQNaUBXR
-X-Proofpoint-GUID: MGmnLCG0Lb0c7Urc59CfY-RBVQNaUBXR
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI2MDExNiBTYWx0ZWRfX4MgkF+3BnT0k t1NW5vtcAhOLltVntTkRXIXnsl++UYZfpl5ikTfeK79rerfKA2CybPPeSY8CbDeTl6/3d2KwarZ 2Vk8nNzbGX42/Ndg4emzbftcklS6lb3CRhYu3w0vCQKsbEJf2D1UVVRUfnY7OBEPp9ouSrmOdup
- svrpUwNmMXdbx5U4byF4hVKAEKp2Kdgi+Xvs9S5ls/vsyWi62tdvZ18rT0idna/FfyA9Fzk3H7H tGLde/B7PGv/KpxZzGU4m1NlJ6K6G9+WKeTfw0r71LeNOZklZcZoXpG7FGo9LDXJFNRSPLHD4ha oMHXUcNfZw2eJQpf/LiDYbRUFJro+pW2WKsxLr4F2hDfdzhkONP+HrwX5ZYq5QQot5vREJ/I17+
- kJmcNmsNeJyB1HTq+dW/RpIOj4Tw4qZcTsYReGeY+vfaX/IuXLg2rtZpZ9pK9QrbRawrBqig
-X-Authority-Analysis: v=2.4 cv=Aovu3P9P c=1 sm=1 tr=0 ts=685d5139 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=thq5atkPxQpse1b1m10A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-26_06,2025-06-26_04,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 mlxscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506260116
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8660:EE_|DS7PR12MB5719:EE_
+X-MS-Office365-Filtering-Correlation-Id: a85d1e0f-2186-4456-64d7-08ddb4c0bc26
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b3pLaysyR0JXVWRMRS9HL1Z6MXdGN1NBZmtSOWM3TnVOdDczMmtMOWRzZFJz?=
+ =?utf-8?B?bUNPQW8xSTFsTzFvLzRWZUtkSkFPeVJvQ3JUQjBKcUdsUDZMaXpGWGptblVK?=
+ =?utf-8?B?RExJTXA0MzVTL3FSNlMvZGRrZnNpa1dZZW8zVHpZZFk2aUxXZE9KV1V0cnJl?=
+ =?utf-8?B?bzBHTzEzMkV4Nkc1d3JmWXJMVlZldmN5aG1nVE1zQkRremRwbFhDYitUMVJ2?=
+ =?utf-8?B?eldmemxoL3VNRmp4eVc0NEQvYmJ5aXoraHdMckVIUHlMK3lKTUwwOTFZdjlW?=
+ =?utf-8?B?eGJ0akZtZXhZUUJNdEplRlZaRlhZRU9NMjU0NDJZbjA2dUQyZ2pqNkJLWGRv?=
+ =?utf-8?B?VWNzS2l3OGJKM0pMVFdGaHFCV0lrSFhaVzR1b2pqSTZBaTFNcHI0M3ZqcFhH?=
+ =?utf-8?B?dWhWbFNPc2Rld1hFenFrcWd1MU9KNlBxS2tKUWdrYVZsNUJTaEtrSk5HQkZO?=
+ =?utf-8?B?QnRtaGk4QmdtVVI1OTVyaXpxcS9sSlBoL083YUJKZ2RHZGc2NTFMMXN3bit3?=
+ =?utf-8?B?N0VHSzFjR3ZlWW94YzllUmVnamNEa2JmWUhrNUdaeEVyWFJETEhLNWtySVdk?=
+ =?utf-8?B?KzBiMGNNZFpuaTQ5NWE5eWgxUDNYNWhmaGhoM1dlZmhFV2Z3bGM4LzR5QmQ2?=
+ =?utf-8?B?ZjZvL1BuWTJlQkd4NGlVRVZ2Z2NJUGJoWmpMUDAxLzZBSmJzQ0dJTDQzbExG?=
+ =?utf-8?B?TWpVQithd1NvWjV4bmdrbGxYMEF3VndUVXZzTDd0eDRuTkI3VFJObFF6Y1pW?=
+ =?utf-8?B?TGhDT1dWSXpWODh4VTJlQTBYSzl6bzM4ZDk3dW5odWQxMDJRaU1XVEF0Qndn?=
+ =?utf-8?B?SllpR2V2T2xKaDU3VFVaWDNHbldBbjVwTU14U253V0lsN0dqUWIxT1lETFlU?=
+ =?utf-8?B?N3p3QlZwQzB0Z3Z5QitsWTJKSDM2OHBXQ0hadGpNUENlN1BOZWdTN3BScUR1?=
+ =?utf-8?B?NXNQZUZsNVJidzYyR3c3cWZKSWFQOUc1Y05YS1FKMnZ3RytHTkdJeVA3bHRQ?=
+ =?utf-8?B?K1I3elV1aXZYZzBhUnYxNWNyUkNmYkYrWVp3VzFzSlNNTEpQRFV2ZVZqdWx4?=
+ =?utf-8?B?K2hLSUtOSkI4bVNyQUhRaWl5bURnWVRxNTFlSXVaVlE5VHYwellJUFdwOUl5?=
+ =?utf-8?B?SnJXcFFVSzBKekRwdGFmNXg1UVcwcFVyWXJoSWdGR1VqMTVaTlRWc1lnN3pH?=
+ =?utf-8?B?bmUzeWVlOEJSWlIzdWcvVVl2Y055RkZvQU1FMG50d1I3NWVFQ2YybTh2VnBF?=
+ =?utf-8?B?WEFGMDhJTHZnMlRLcGwzeThTdlBWSFVTd1dCTmxNbHZiNFFXcURlRXFCbjBM?=
+ =?utf-8?B?eXZVY0RrSTdCTEJITWdibm5VMVFlek5hNmRpZTgzcUZQYmQwcE1OMXh2a3hS?=
+ =?utf-8?B?c056SjFJU2NQQ01PR245MUpyT01YcExaMG1TNzYyQ1AxT1dpN0RLY2xCZDdt?=
+ =?utf-8?B?Vy91WUtTUWhQT05PN3J4WHpweUdTN3BvMDJKZWpJYk1ESlFUbDFSNlNrQSto?=
+ =?utf-8?B?UGRseXYwZVh3eDl0TXZrWEpNUUZ3ajF5ejdCVkNVZm11UVRHZTZqRGszNDNM?=
+ =?utf-8?B?ZDFXcFpkVk85cVRrM0phSU05bVlzaFZ0NFdXNTdzUnNQK0NHMmU3dFRyN2NM?=
+ =?utf-8?B?R2YrQ2M4dkdod1pnQkJGWmtZN3IwNW5kdnVYQlZLK1JlS01IYUg3NUF5c1hz?=
+ =?utf-8?B?NVRicnNpVHVoMzQ3MllRRkxkMThaVzlMU2pjSlp2QTNDd3dtb3o5YXl4UVNj?=
+ =?utf-8?B?Z1hDZDlHN1RKT2NiMFNWRk1zMkFpMTVLcEZ6ZW9qMnJNemo1QWNRVWFxVE5y?=
+ =?utf-8?B?MU1HY09GTVVNbmxUT3JyMHFUZkNab3YrenhicHlPQ1J4UmNRUFRLUnZRbk1E?=
+ =?utf-8?B?RXk2S1N3WTdvWDlWTXloK28yYUU4R2tabmdtSitYVUE0RXc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?c0tWNk9zaDlRNDBYalJMOXJtcEFzTXphcHhsNXRjMnVkNm9pY0I3aHpTdUtw?=
+ =?utf-8?B?eXh2a1ExWUI0bmxFQklHb01oMTdmUEp3THBqY3BuaGZiM2JiZEcrNE9lRFhn?=
+ =?utf-8?B?VzRlM3ErSWs4RUpvMG5yU29pWm1UK1N3ZzJLRFV4N2NJWkkrbERydHVoY3BL?=
+ =?utf-8?B?THA3RlltelFzbFd5enU3OTdRM3RJM1luZ0hTaDRramZWYmdaWEVEL1B1Mjll?=
+ =?utf-8?B?SitjeGtCcDIvdm5oVWV5b0toVlNYTjVjVktBeUtja3F2UUN6VFRjeHVPNDF3?=
+ =?utf-8?B?SlFOWlNPSjNxSzV2c1JETGtzVG9PMGFzdEI4UElIZEdhd1ppNk15eHR5WGRK?=
+ =?utf-8?B?cEJkQncwMEZlY1ltZkN2aVlSU1lSVjNzeUV4K2FUWlNvUml5WFpMa2piZExk?=
+ =?utf-8?B?QmM0UTdtS3UwY0lMcGZMTFlxZ3gySnVocTV6Rnh2SzRTWHk0MlN0UlJsc1Jl?=
+ =?utf-8?B?YlNlcjBwcVVkdlRJRmRTbXI1b0w3UjNuNGE2cGhsNzVVQ3dON1ZOdWg5VmZp?=
+ =?utf-8?B?OTgwb1RxWFIxQWlGVHNxaGpKSW03WHZJQnFyQWVCU3lCU2R4TkpKTFZaSUd4?=
+ =?utf-8?B?OXE5cGF1ZEhETmdmQTh1SzJ4RHlNUEthYVJCTWlHeVI4Y3QyanFtZlZweUFL?=
+ =?utf-8?B?N3dTQU9VMXd0TEc3RGRLNzNlc205bmVrQXZiQWFxU0dqc3NKWE1jRmlKbmd5?=
+ =?utf-8?B?SDQ2UU1lcmkyM0xxSHpUUmtlL3JOclV6bUtSTWRNamphdU0xckJBOVh1emJU?=
+ =?utf-8?B?M0NDR3ZJV3JIelBwWldwZ3FUbnYyTUFiejZudjFqMTBQN2ZVWnZ4QlAxWnBj?=
+ =?utf-8?B?cG1veHU3MEJ1OFI4UWxMRzN6QTNyek5LNUpwMlVCSTJEQjJVOURscU0wSG9F?=
+ =?utf-8?B?MUxaOFZhbnJJQUdhbHJJTnFESk9ETFE3MGxDbnhpSmovbVd0Y0lwL2Y1azRS?=
+ =?utf-8?B?amtiZnA1N2hoT1VyRzY3TldZbGp2RUpQOGVaQ1B2N01VMXVDMXJQcXl2ZWFn?=
+ =?utf-8?B?NzVKd1haS3BJMnpwc052dkdPd2g3K2tFYzh4YzZSdG1SZkQramVObzM4Yit2?=
+ =?utf-8?B?V0lQNE4xMlNYeC9yZitkMGVpYXF1UGJrUkxCbDQ4ZHhTVzdyMHEyOWRjb0dy?=
+ =?utf-8?B?RnBTWmlBejZlOE00bWl1cXdKdVFzNVd5ekRibHIzS01lMWN5eUVmVWhWZndp?=
+ =?utf-8?B?SiswcVM1L0FYTHdNK1Vzb216eG5LUGp4ampnVTRHRXVMRVVFTXpzTDg3c0gv?=
+ =?utf-8?B?b2VpK1VQR1lJWWpXd21IMk1PWGNCTHpObTc4Q1J2b294UFJZZFR5MllZOXdI?=
+ =?utf-8?B?TkdTRkgrdTB3OUMyUVJKTmRYd1JtT2tmU2RZWkVOZnZvbUhXRFNDVE9aOHow?=
+ =?utf-8?B?cE1NZXZEcGN0WUhRZkRJK0N2eTVzSEduNWhjcTJMSGd2cStoVHV3TWhldmVO?=
+ =?utf-8?B?OWJQYXJ3OG1UUDh4UUlnU0xiRGFEeGhJd1AwdUNLR2lxbGNhY21sWFRncldR?=
+ =?utf-8?B?cEt4UDN5UGIvU0xxOURrd0U2dHBlcWNoTytuTWxHL2xhN1BqWWVEM0toNXlR?=
+ =?utf-8?B?cTNQaStxZS9adWFNUEQyaEQ3c0lUcTRCR2h2VklNU3JJR0xZZGZ2ci9Ka1pn?=
+ =?utf-8?B?c0MwVG1Cb2UvVGZNVm1rbElSSi8reENJSkRPUnV2VUVKSllBZGZLUFRLYXc2?=
+ =?utf-8?B?elNEMTdxQ1JZTWRTR1g3NSt4NmtRV1h1ckR3c1FRQWhpeTl0ek1pdU11dEVX?=
+ =?utf-8?B?ajBhbHNWUk41a3kxNGFGdmZaTUlyZXRxRENickxHQUFhZkc0YVlVdGI5bm5G?=
+ =?utf-8?B?V1laS09GYjFMemZFZ1duN3QxQmpjQ0liZHVLQWVtcVVwTks5WnVrZHI4V2RM?=
+ =?utf-8?B?RFNrWE9DTnZaaWN0RnpnTWpDeTNYa09uUlJwT0oreDlDNm5qdFJidjYveEhO?=
+ =?utf-8?B?ZzJXNzRiWDZzMjM5Vy8rSU1qNVZ6aHBYT3NzTHpPeE93NjdZdlY4anQ3aFdG?=
+ =?utf-8?B?c3E0NFQzSi94V1JLUUZuVDF6MkNvWm82eHBBK3lVUTMwTWJNV3hDcFRLMFJF?=
+ =?utf-8?B?THorK2Rrc0Fjd3BsOGlOanZnV3JIeStiVk9zcEg3SlFWR29nbGN3ZlA3NS82?=
+ =?utf-8?Q?LAZnlxqzw7QggzvhBv66+xhew?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a85d1e0f-2186-4456-64d7-08ddb4c0bc26
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8660.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2025 14:50:04.2227
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wuVanIOleTXpoO5M8XHFnMi8wSTic/eyll/cEsfd67tiGD5iafElap2bVc3A3b3UKoJH8K2WpEsNJCsVawHXAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5719
 
-Hi Eric, Herbert,
+Hi Alexey,
 
-There is a Syzbot finding in arch/s390/crypto/sha_common.c.
-Yes that's s390 specific code, but I guess its due to the recent changes in the digest code....
+On 6/17/25 4:43 AM, Alexey Kardashevskiy wrote:
+> The __snp_alloc_firmware_pages() helper allocates pages in the firmware
+> state (alloc + rmpupdate). In case of failed rmpupdate, it tries
+> reclaiming pages with already changed state. This requires calling
+> the PSP firmware and since there is sev_cmd_mutex to guard such calls,
+> the helper takes a "locked" parameter so specify if the lock needs to
+> be held.
+> 
+> Most calls happen from snp_alloc_firmware_page() which executes without
+> the lock. However
+> 
+> commit 24512afa4336 ("crypto: ccp: Handle the legacy TMR allocation when SNP is enabled")
+> 
+> switched sev_fw_alloc() from alloc_pages() (which does not call the PSP) to
+> __snp_alloc_firmware_pages() (which does) but did not account for the fact
+> that sev_fw_alloc() is called from __sev_platform_init_locked()
+> (via __sev_platform_init_handle_tmr()) and executes with the lock held.
+> 
+> Add a "locked" parameter to __snp_alloc_firmware_pages().
+> Make sev_fw_alloc() use the new parameter to prevent potential deadlock in
+> rmp_mark_pages_firmware() if rmpupdate() failed.
+> 
+> Fixes: 24512afa4336 ("crypto: ccp: Handle the legacy TMR allocation when SNP is enabled")
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 
-Seems that field first_message_part (bool) of struct s390_sha_ctx has an invalid value when s390_sha_update_blocks() gets called.
-No idea why it could have an invalid value, I only see it being set to 0 or 1. Maybe ctx is pointing to an entirely wrong context in that call chain (bad pointer)? 
+Thank you for fixing this.
+I was facing a locking issue and was writing a similar patch when I
+discovered this!
 
-Does this ring a bell for you? 
+Reviewed-by: Pratik R. Sampat <prsampat@amd.com>
 
-Status: reporting: reported C repro on 2025/06/09 15:22
-Reported-by: syzbotz+cb049f03e0851197b31a@linux.ibm.com
-First crash: 16d, last: now
-
-------------[ cut here ]------------
-UBSAN: invalid-load in arch/s390/crypto/sha_common.c:26:11
-load of value 219 is not a valid value for type 'bool' (aka '_Bool')
-CPU: 3 UID: 0 PID: 425 Comm: syz-executor420 Not tainted 6.16.0-rc3-syzkaller-11626-g336ad76bd370 #0 PREEMPT(full) 
-Hardware name: IBM 3931 A01 701 (KVM/Linux)
-Call Trace:
- [<00026a33d504f4ee>] dump_stack_lvl+0x14e/0x1c0 lib/dump_stack.c:120 
- [<00026a33d501fce0>] ubsan_epilogue+0x20/0x50 lib/ubsan.c:233 
- [<00026a33d852b4cc>] __ubsan_handle_load_invalid_value+0xcc/0xe0 lib/ubsan.c:527 
- [<00026a33d51d0d6e>] s390_sha_update_blocks+0x2ae/0x310 arch/s390/crypto/sha_common.c:26 
- [<00026a33d7de95c4>] crypto_shash_finup+0x424/0x720 crypto/shash.c:152 
- [<00026a33d7e06022>] crypto_shash_update include/crypto/hash.h:992 [inline] 
- [<00026a33d7e06022>] hmac_setkey+0x5c2/0x7a0 crypto/hmac.c:73 
- [<00026a33d7de8e1c>] crypto_shash_setkey+0x8c/0x1f0 crypto/shash.c:56 
- [<00026a33d7dee7c2>] hkdf_extract+0x42/0xa0 crypto/hkdf.c:50 
- [<00026a33d5fd5c16>] fscrypt_init_hkdf+0x146/0x280 fs/crypto/hkdf.c:73 
- [<00026a33d5fd9dbe>] fscrypt_get_test_dummy_key_identifier+0xfe/0x1f0 fs/crypto/keyring.c:845 
- [<00026a33d5fe617a>] fscrypt_parse_test_dummy_encryption+0x4fa/0x720 fs/crypto/policy.c:827 
- [<00026a33d634d0b6>] ext4_parse_test_dummy_encryption+0x36/0xe0 fs/ext4/super.c:2071 
- [<00026a33d6348fbe>] ext4_parse_param+0xe7e/0x2130 fs/ext4/super.c:2314 
- [<00026a33d5f4a896>] vfs_parse_fs_param+0x216/0x510 fs/fs_context.c:146 
- [<00026a33d5f4b23a>] vfs_parse_fs_string fs/fs_context.c:188 [inline] 
- [<00026a33d5f4b23a>] vfs_parse_monolithic_sep fs/fs_context.c:230 [inline] 
- [<00026a33d5f4b23a>] generic_parse_monolithic+0x24a/0x2f0 fs/fs_context.c:258 
- [<00026a33d5ed4d88>] do_new_mount+0x248/0xab0 fs/namespace.c:3881 
- [<00026a33d5ed3450>] path_mount+0x680/0x1180 fs/namespace.c:4209 
- [<00026a33d5ed8606>] do_mount fs/namespace.c:4222 [inline] 
- [<00026a33d5ed8606>] __do_sys_mount fs/namespace.c:4433 [inline] 
- [<00026a33d5ed8606>] __se_sys_mount fs/namespace.c:4410 [inline] 
- [<00026a33d5ed8606>] __s390x_sys_mount+0x5c6/0x6e0 fs/namespace.c:4410 
- [<00026a33db0a14f2>] __do_syscall+0x122/0x230 arch/s390/kernel/syscall.c:125 
- [<00026a33db0c521e>] system_call+0x6e/0x90 arch/s390/kernel/entry.S:261 
----[ end trace ]---
-
-
-
--- 
-Ingo Franzki
-eMail: ifranzki@linux.ibm.com  
-Tel: ++49 (0)7031-16-4648
-Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 3451bada884e..16a11d5efe46 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -434,7 +434,7 @@ static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, boo
+>  	return rc;
+>  }
+>  
+> -static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order)
+> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
+>  {
+>  	unsigned long npages = 1ul << order, paddr;
+>  	struct sev_device *sev;
+> @@ -453,7 +453,7 @@ static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order)
+>  		return page;
+>  
+>  	paddr = __pa((unsigned long)page_address(page));
+> -	if (rmp_mark_pages_firmware(paddr, npages, false))
+> +	if (rmp_mark_pages_firmware(paddr, npages, locked))
+>  		return NULL;
+>  
+>  	return page;
+> @@ -463,7 +463,7 @@ void *snp_alloc_firmware_page(gfp_t gfp_mask)
+>  {
+>  	struct page *page;
+>  
+> -	page = __snp_alloc_firmware_pages(gfp_mask, 0);
+> +	page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+>  
+>  	return page ? page_address(page) : NULL;
+>  }
+> @@ -498,7 +498,7 @@ static void *sev_fw_alloc(unsigned long len)
+>  {
+>  	struct page *page;
+>  
+> -	page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len));
+> +	page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), true);
+>  	if (!page)
+>  		return NULL;
+>  
 
