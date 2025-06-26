@@ -1,248 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0F924A049;
-	Thu, 26 Jun 2025 10:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFAF26B97F;
+	Thu, 26 Jun 2025 10:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750933836; cv=none; b=a+zqRojV7YOWEp1iRn0AvaEcilFLY+8Xl1KNainA5aUoCwSaSfyCEBIpOSzI51mUPLJ7ajgHW/5Jc4gvFyjgEAgzGFFXzY+UcULDGNFFFIIGQwPUEX/JD7OuPjhOMRxaDKaKRXgPQTeqi6GtoaHYKUNUsNMqlbZDONhjuagFQg0=
+	t=1750935289; cv=none; b=gnx6fnBsWcimWVcGK+1tRKi234nJFJEIue2Kyx4Sxwc/tj0PNPFgn/S2k9T+3pSBe2Msp7RPK4cAv9O7tcS+5kQ7tUWR2jzO1TTjjn16PvqHR9Op2c4ytEd/xRtNq8/CI3mbYOmiV7eJIzsH5Zw7WuAAFmVkMQX/zNj205pg53Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750933836; c=relaxed/simple;
-	bh=8kyXYKJiS/ce5WIua8WcuOSLKA7ody3HqT7dIqUof0g=;
+	s=arc-20240116; t=1750935289; c=relaxed/simple;
+	bh=SEM6HyExhFU2GWoujVoE6yGCN9Pv/tey8fAImhfz2kk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fr+SoF8yUcwwFyYKqCrJ19SabrnQPGJbSWXi6xFkrjFoDfR+3ayJhk4vgHLtjDVkOsjW95SILG3GJJGMozNj18ZBZPsOCZlqQADW0jY1I0egitGwO7aN+QuZUo7T+4JzgdoogkrAx5B3DE+GXLNv2z+GXb+BGLN6XcS5qeqGbxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5AGOYYL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=l8JxqjVMYCfwFP9gOrglv53CNwR74p0LMB96/mDj2sNN7YJzDYDMsDwzvl1xdvNYIiYChRrMRrVnuqoouyyzgfudaZc5gCtX/bx6vCsGf21rdtakKvVuUF7KxyG6IEcMT7z9f/Io4g6Hp0/LXhElsU/suvc8UsnSIYxCAYQWspE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=JzIZAb9y; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5AGOYYL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E67C4CEEB;
-	Thu, 26 Jun 2025 10:30:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750933835;
-	bh=8kyXYKJiS/ce5WIua8WcuOSLKA7ody3HqT7dIqUof0g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A5AGOYYLv6GPhxjKe8Sl7aiwp4/lGEjmq+6mJqvH02Nf0fG/xD29v8eIC2T0+bfBy
-	 Rl0nzLtY1PN+AzmGPa/f1ge6I6l0bPjaIP2S7KGEUEI+XMDFHck8t92TErpW1Pt0ax
-	 QV2kb8N991mtVtm61s4m0WdzvMpwBGJwl7mcV60nJX7S0KaEJZGX3QLdOR47LH0BJM
-	 LBq0Xw6+xRZ+Sg7zmacqsqa2UZ8e8b87keZ/Eg0Ql0zlT04x0W9XBiFp92DzuOWD9Z
-	 8cJraH0Q0kODrFOhd2F8X2rGx6TtIEk4YP+WHXFYBOl7G4g+NYby8aiHqL2zSh6xgr
-	 u9/rl3A0uWV1w==
-Date: Thu, 26 Jun 2025 11:30:30 +0100
-From: Lee Jones <lee@kernel.org>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	peterhuewe@gmx.de, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH v11 3/4] tpm: Add a driver for Loongson TPM device
-Message-ID: <20250626103030.GA10134@google.com>
-References: <20250619025138.2854-1-zhaoqunqin@loongson.cn>
- <20250619025138.2854-4-zhaoqunqin@loongson.cn>
- <aFs2RDOeOKvWUN2L@kernel.org>
- <20250625080527.GN795775@google.com>
- <aFvhorr3kZSuzVpv@kernel.org>
- <20250625134047.GX795775@google.com>
- <aFwsIs6ri3HZictC@kernel.org>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="JzIZAb9y"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=nbd0Ne0622VhFQiazAeSeSd0HZDZzfsQfD/fxeuiTBM=; b=JzIZAb9yqA/BKjnoVRJ6SgLrdF
+	P9oJV+WK8T4kZ8BDAcptbzra9ua1gWjGlGljyxyKdDC4qE+9zWV2C23yHrpE8rvY3zxYfEVY/+tWs
+	zrGAb4FHicj0S7VJZGuke4v8muMVe6AHKWQnFvyPjyP5QpwhC2gbRoskLTYNyYMMn8hxDIk7LDKrZ
+	VP0VTOtQWzhq3MWafMzGTLl0YvOp3jfhqmfk/E0CDf3BTJDjgDFkepVxsHCn9UlMSg5Q7umPkBt+f
+	N+9RmOz+UdyEGEVoBqKM18onqC6yaCFY4hxwjNsLKee+ipC4GOYCmo3hSbP0UT/pRacv8GEXkGljG
+	ikYavItw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uUk0D-001AxH-26;
+	Thu, 26 Jun 2025 18:54:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Jun 2025 18:54:42 +0800
+Date: Thu, 26 Jun 2025 18:54:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+	dengler@linux.ibm.com, ifranzki@linux.ibm.com,
+	fcallies@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+	agordeev@linux.ibm.com
+Subject: Re: [PATCH v12 0/6] New s390 specific protected key hmac
+Message-ID: <aF0m8szuDueszXrP@gondor.apana.org.au>
+References: <20250617134440.48000-1-freude@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFwsIs6ri3HZictC@kernel.org>
+In-Reply-To: <20250617134440.48000-1-freude@linux.ibm.com>
 
-On Wed, 25 Jun 2025, Jarkko Sakkinen wrote:
-
-> On Wed, Jun 25, 2025 at 02:40:47PM +0100, Lee Jones wrote:
-> > On Wed, 25 Jun 2025, Jarkko Sakkinen wrote:
-> > 
-> > > On Wed, Jun 25, 2025 at 09:05:27AM +0100, Lee Jones wrote:
-> > > > On Wed, 25 Jun 2025, Jarkko Sakkinen wrote:
-> > > > 
-> > > > > On Thu, Jun 19, 2025 at 10:51:37AM +0800, Qunqin Zhao wrote:
-> > > > > > Loongson Security Engine supports random number generation, hash,
-> > > > > > symmetric encryption and asymmetric encryption. Based on these
-> > > > > > encryption functions, TPM2 have been implemented in the Loongson
-> > > > > > Security Engine firmware. This driver is responsible for copying data
-> > > > > > into the memory visible to the firmware and receiving data from the
-> > > > > > firmware.
-> > > > > > 
-> > > > > > Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > > > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > > > > Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> > > > > > Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
-> > > > > > ---
-> > > > > >  drivers/char/tpm/Kconfig        |  9 ++++
-> > > > > >  drivers/char/tpm/Makefile       |  1 +
-> > > > > >  drivers/char/tpm/tpm_loongson.c | 84 +++++++++++++++++++++++++++++++++
-> > > > > >  3 files changed, 94 insertions(+)
-> > > > > >  create mode 100644 drivers/char/tpm/tpm_loongson.c
-> > > > > > 
-> > > > > > diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
-> > > > > > index dddd702b2..ba3924eb1 100644
-> > > > > > --- a/drivers/char/tpm/Kconfig
-> > > > > > +++ b/drivers/char/tpm/Kconfig
-> > > > > > @@ -189,6 +189,15 @@ config TCG_IBMVTPM
-> > > > > >  	  will be accessible from within Linux.  To compile this driver
-> > > > > >  	  as a module, choose M here; the module will be called tpm_ibmvtpm.
-> > > > > >  
-> > > > > > +config TCG_LOONGSON
-> > > > > > +	tristate "Loongson TPM Interface"
-> > > > > > +	depends on MFD_LOONGSON_SE
-> > > > > > +	help
-> > > > > > +	  If you want to make Loongson TPM support available, say Yes and
-> > > > > > +	  it will be accessible from within Linux. To compile this
-> > > > > > +	  driver as a module, choose M here; the module will be called
-> > > > > > +	  tpm_loongson.
-> > > > > > +
-> > > > > >  config TCG_XEN
-> > > > > >  	tristate "XEN TPM Interface"
-> > > > > >  	depends on TCG_TPM && XEN
-> > > > > > diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
-> > > > > > index 9de1b3ea3..5b5cdc0d3 100644
-> > > > > > --- a/drivers/char/tpm/Makefile
-> > > > > > +++ b/drivers/char/tpm/Makefile
-> > > > > > @@ -46,3 +46,4 @@ obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
-> > > > > >  obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
-> > > > > >  obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
-> > > > > >  obj-$(CONFIG_TCG_SVSM) += tpm_svsm.o
-> > > > > > +obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
-> > > > > > diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
-> > > > > > new file mode 100644
-> > > > > > index 000000000..5cbdb37f8
-> > > > > > --- /dev/null
-> > > > > > +++ b/drivers/char/tpm/tpm_loongson.c
-> > > > > > @@ -0,0 +1,84 @@
-> > > > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > > > +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
-> > > > > > +
-> > > > > > +#include <linux/device.h>
-> > > > > > +#include <linux/mfd/loongson-se.h>
-> > > > > > +#include <linux/platform_device.h>
-> > > > > > +#include <linux/wait.h>
-> > > > > > +
-> > > > > > +#include "tpm.h"
-> > > > > > +
-> > > > > > +struct tpm_loongson_cmd {
-> > > > > > +	u32 cmd_id;
-> > > > > > +	u32 data_off;
-> > > > > > +	u32 data_len;
-> > > > > > +	u32 pad[5];
-> > > > > > +};
-> > > > > > +
-> > > > > > +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
-> > > > > > +{
-> > > > > > +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> > > > > > +	struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
-> > > > > > +
-> > > > > > +	if (cmd_ret->data_len > count)
-> > > > > > +		return -EIO;
-> > > > > > +
-> > > > > > +	memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
-> > > > > > +
-> > > > > > +	return cmd_ret->data_len;
-> > > > > > +}
-> > > > > > +
-> > > > > > +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> > > > > > +{
-> > > > > > +	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> > > > > > +	struct tpm_loongson_cmd *cmd = tpm_engine->command;
-> > > > > > +
-> > > > > > +	if (count > tpm_engine->buffer_size)
-> > > > > > +		return -E2BIG;
-> > > > > > +
-> > > > > > +	cmd->data_len = count;
-> > > > > > +	memcpy(tpm_engine->data_buffer, buf, count);
-> > > > > > +
-> > > > > > +	return loongson_se_send_engine_cmd(tpm_engine);
-> > > > > > +}
-> > > > > > +
-> > > > > > +static const struct tpm_class_ops tpm_loongson_ops = {
-> > > > > > +	.flags = TPM_OPS_AUTO_STARTUP,
-> > > > > > +	.recv = tpm_loongson_recv,
-> > > > > > +	.send = tpm_loongson_send,
-> > > > > > +};
-> > > > > > +
-> > > > > > +static int tpm_loongson_probe(struct platform_device *pdev)
-> > > > > > +{
-> > > > > > +	struct loongson_se_engine *tpm_engine;
-> > > > > > +	struct device *dev = &pdev->dev;
-> > > > > > +	struct tpm_loongson_cmd *cmd;
-> > > > > > +	struct tpm_chip *chip;
-> > > > > > +
-> > > > > > +	tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
-> > > > > > +	if (!tpm_engine)
-> > > > > > +		return -ENODEV;
-> > > > > > +	cmd = tpm_engine->command;
-> > > > > > +	cmd->cmd_id = SE_CMD_TPM;
-> > > > > > +	cmd->data_off = tpm_engine->buffer_off;
-> > > > > > +
-> > > > > > +	chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
-> > > > > > +	if (IS_ERR(chip))
-> > > > > > +		return PTR_ERR(chip);
-> > > > > > +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
-> > > > > > +	dev_set_drvdata(&chip->dev, tpm_engine);
-> > > > > > +
-> > > > > > +	return tpm_chip_register(chip);
-> > > > > > +}
-> > > > > > +
-> > > > > > +static struct platform_driver tpm_loongson = {
-> > > > > > +	.probe   = tpm_loongson_probe,
-> > > > > > +	.driver  = {
-> > > > > > +		.name  = "loongson-tpm",
-> > > > > 
-> > > > > This patch looks otherwise great but I'd prefer here tho use
-> > > > > "tpm_loongson_probe" for the value of the name field.
-> > > > 
-> > > > Where does this stipulation come from?  No other driver does this [0].
-> > > > driver.name should be a nicely formatted, human readable string
-> > > > describing the name of the device.  Not a function name.
-> > > 
-> > > What defines "human-readable" here? I see both as somewhat the
-> > > same level of "readability" ;-)
-> > > 
-> > > > 
-> > > > [0] git grep -A15 "static struct platform_driver" | grep ".name = .*probe"
-> > > 
-> > > What I'm getting:
-> > > 
-> > > $ git grep -l -e platform_driver_register --or -e module_platform_driver
-> > > drivers/char/tpm | xargs git grep "\.name"
-> > > drivers/char/tpm/tpm_atmel.c:           .name = "tpm_atmel",
-> > > drivers/char/tpm/tpm_ftpm_tee.c:                .name = "ftpm-tee",
-> > > drivers/char/tpm/tpm_ftpm_tee.c:                .name           =
-> > > "optee-ftpm",
-> > > drivers/char/tpm/tpm_nsc.c:             .name    = "tpm_nsc",
-> > > drivers/char/tpm/tpm_svsm.c:            .name = "tpm-svsm",
-> > > drivers/char/tpm/tpm_tis.c:     .name = "tpm_tis",
-> > > drivers/char/tpm/tpm_tis.c:             .name           = "tpm_tis",
-> > > drivers/char/tpm/tpm_tis_synquacer.c:           .name           =
-> > > "tpm_tis_synquacer",
-> > > 
-> > > Do you consider e.g, "tpm_tis" as "less human-readable".
-> > > 
-> > > I don't necessarily fight against the name chosen. Your arguments
-> > > just plain no make sense, so I just merely want to understand this.
-> > > That's all.
-> > 
-> > In 64% of cases '-' is preferred to '_' for device names.
-> > 
-> > Human readable is probably a bit of a stretch in this context, so I'll
-> > retract that part of the statement.  However, we should be using device
-> > names, not names of functions which remain meaningless (which is what I
-> > really meant by 'readable') to the user.  Where else do you see the
-> > .probe() function name being used as a device name?
+On Tue, Jun 17, 2025 at 03:44:34PM +0200, Harald Freudenberger wrote:
+> Add support for protected key hmac ("phmac") for s390 arch.
 > 
-> Oops now I see what you mean. I meant to write "tpm_loongson", i.e.
-> matching tpm_tis, tpm_crb etc. Sorry my bad.
+> With the latest machine generation there is now support for
+> protected key (that is a key wrapped by a master key stored
+> in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
+> for the s390 specific CPACF instruction kmac.
+> 
+> This patch adds support via 4 new hashes registered as
+> phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
+> 
+> Changelog:
+> v1: Initial version
+> v2: Increase HASH_MAX_DESCSIZE generic (not just for arch s390).
+>     Fix one finding to use kmemdup instead of kmalloc/memcpy from test
+>     robot. Remove unneeded cpacf subfunctions checks. Simplify
+>     clone_tfm() function. Rebased to s390/features.
+> v3: Feedback from Herbert: Use GFP_ATOMIC in setkey function.
+>     Feedback from Holger: rework tfm clone function, move convert key
+>     invocation from setkey to init function. Rebased to updated
+>     s390/features from 11/7/2024. Ready for integration if there are
+>     no complains on v3.
+> v4: Rewind back more or less to v2. Add code to check for non-sleeping
+>     context. Non-sleeping context during attempt to derive the
+>     protected key from raw key material is not accepted and
+>     -EOPNOTSUPP is returned (also currently all derivation pathes
+>     would in fact never sleep). In general the phmac implementation is
+>     not to be used within non-sleeping context and the code header
+>     mentions this. Tested with (patched) dm-integrity - works fine.
+> v5: As suggested by Herbert now the shashes have been marked as
+>     'internal' and wrapped by ahashes which use the cryptd if an
+>     atomic context is detected. So the visible phmac algorithms are
+>     now ahashes. Unfortunately the dm-integrity implementation
+>     currently requests and deals only with shashes and this phmac
+>     implementation is not fitting to the original goal any more...
+> v6: As suggested by Herbert now a pure async phmac implementation.
+>     Tested via AF_ALG interface. Untested via dm-integrity as this layer
+>     only supports shashes. Maybe I'll develop a patch to switch the
+>     dm-integrity to ahash as it is anyway the more flexible interface.
+> v7: Total rework of the implementation. Now uses workqueues and triggers
+>     asynch requests for key convert, init, update, final and digest.
+>     Tested with instrumented code and with a reworked version of
+>     dm-integrity which uses asynchronous hashes. A patch for dm-integrity
+>     is on the way but yet needs some last hone work.
+> v8: Added selftest. With the selftest comes some code which wraps the
+>     clear key into a "clear key token" digestible by PKEY. The
+>     selftest also uses import() and export(), so these are now also
+>     implemented. Furthermore a finup() implementation is now also
+>     available. Tested with AF_ALG testcases and dm-integrity, also
+>     tested with some instrumented code to check that the asynch
+>     workqueue functions do their job correctly. Coding is complete!
+> v9: As suggested by Herbert use ahash_request_complete() and surround it
+>     with local_bh_disable().
+> v10: Split the pkey selftest patch into 3 patches. Slight rework of the
+>      setkey function as suggested by Holger: When selftest is running
+>      as much as possible of the production code should run. So now the
+>      key prep with selftest is one additional if/then block instead of
+>      an if/then/else construct.
+>      Code is ready for integration and well tested.
+> v11: Utterly rework with the insights collected with the paes rework
+>      and the basic work done with the pkey rework over the last 5 month.
+>      Note that patch #1 effectively reverts commit 7fa481734016
+>      ("crypto: ahash - make hash walk functions private to ahash.c")
+>      from Eric Biggers.
+> v12: Fixed some typos, adaptions to 128 bit total counter,
+>      misc_register() invocation was missing in the patches series,
+>      added Herbert's proposal for a new function crypto_ahash_tested().
+> 
+> Harald Freudenberger (5):
+>   crypto: ahash - make hash walk functions from ahash.c  public
+>   s390/crypto: New s390 specific protected key hash phmac
+>   crypto: api - Add crypto_ahash_tested() helper function
+>   s390/crypto: Add selftest support for phmac
+>   crypto: testmgr - Enable phmac selftest
+> 
+> Holger Dengler (1):
+>   s390/crypto: Add protected key hmac subfunctions for KMAC
+> 
+>  arch/s390/configs/debug_defconfig |    1 +
+>  arch/s390/configs/defconfig       |    1 +
+>  arch/s390/crypto/Makefile         |    1 +
+>  arch/s390/crypto/phmac_s390.c     | 1048 +++++++++++++++++++++++++++++
+>  arch/s390/include/asm/cpacf.h     |    4 +
+>  crypto/ahash.c                    |   26 +-
+>  crypto/testmgr.c                  |   30 +
+>  drivers/crypto/Kconfig            |   13 +
+>  include/crypto/internal/hash.h    |   30 +
+>  9 files changed, 1133 insertions(+), 21 deletions(-)
+>  create mode 100644 arch/s390/crypto/phmac_s390.c
+> 
+> 
+> base-commit: 1029436218e50168812dbc44b16bca6d35721b0b
+> --
+> 2.43.0
 
-Ah, gotcha.  No worries.
-
-"tpm_loongson" wouldn't be my preference, but is acceptable.
-
+All applied.  Thanks.
 -- 
-Lee Jones [李琼斯]
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
