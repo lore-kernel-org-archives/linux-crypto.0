@@ -1,240 +1,143 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8106F2EA722
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 15:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89872E9EC0
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 16:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751038474; cv=none; b=FD0fRhYmheXhM5z+d8G39WZx42z78Q713a3aRStMgkmnpVIZovp00Ll/eby4cryh6YRu9a6mT/8KmYxGIleXgrLyjAk0FjEbupUm2SBv+PaRI0iK5/Cd/0iNrafdxZ6x+KPS+JNoZvOlUU1V2gItEy9m0iuVA76MC1f6B71PIPw=
+	t=1751040673; cv=none; b=kD5p7zJu9GjitxTM7ea23dMj+uwySC5mu7Hat74Xe6tfrh43TvgwDomMfS3+TYAxEXIN+fWkw4arxkgPo79rpBKn54v4+5aLs4G0LF3xl5P1ji9Ii49oFRbRpol9Pa9bF82nYEdUGCuzvYYB1m7yEhH7bTMK70pZSQ7HFZ7OgQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751038474; c=relaxed/simple;
-	bh=Ew8lpjg2KGw8RUtsdIdGkXQu5umyWwe0BTLTaVIb67w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PubGX2aDgrRmuhYGKP0QwpsxOOT4npnJZ6PVtVxyV8qilBrGLaWA3APd/CFAhwfgJvmN151/ECY8mwH/MTmi+7l9u7r4SOPpZnqMZ5UL/9vXDCC+D1ms+n78TIwvKmhqJdygu85who9ikOXEhjKq3DUI5SkRtpPXd0WRyAHLTkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZIh7/9dP; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1751040673; c=relaxed/simple;
+	bh=KEdowIP8nmfmWkiMsYe2bhkJS/bTsL8oOIQrNQ8uk1g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ME3+gfyHsdHamB8KwyszBwOY2Fuk9NONC49sCLSoxmbqwcvKupbXg/Z+hEnKu7BIhg7NmfKFMivD422+KO0/LuiIFC2Fj3AKqCKK1mfP9QasSfvDQv4BE3wC3tN732q4w6YdrZRd8f+fnAzmHRe+HBqqlOAMMTfxGBMBr54E7tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ENV9/WvX; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZIh7/9dP"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55RCHh7N007786
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 15:34:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fhpcGE0kY2U2qHSOUrNH4gIXVYCbpgzCRlKlqKyiksA=; b=ZIh7/9dPTaRIKAbz
-	qtcRTfYJUmfDMD/1CB8sEgyGGumkjtTwe+1FCskmH91irz9aLvC7+w8nrjV0yIl5
-	QB0xqTRmG3P3Ft7yR9hK7RMWZYwi2POUq3sly/dUJ48WJWKJ9oC/oYfZUNb7O7vm
-	LRWccN5ciTm5RhWLpEa4ACEx19S+i4nLKISatypp1vBgmGk4bGCx72jy9YNPJfE0
-	o0qY4acjP6oYf70tubxgG7+gVbaXm9gWVcLv0iapLnGrDbi7elYbdiW8YQARPy4E
-	GwNMvpxwKqqfzTXYEUxP9yi+/mXni1WFKeH7ELAXBg4/7DE74URNzH7E2BxvGiH2
-	99Dl+w==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47fbhqwpj0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 15:34:31 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7d2038aae69so3721385a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 08:34:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ENV9/WvX"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3df2fa612c4so280695ab.1
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Jun 2025 09:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751040668; x=1751645468; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TcIH4pjrPEib5s/3B0d1zkZ9Z/0XhgYXm5HComwjvMU=;
+        b=ENV9/WvXqhlCqDzU8pZtFwPIswzwn2FNh9zmda6IepWDui/ZdLS1F6uAZfxTidxmsQ
+         YzJdB92nj8gJMA400rcr+ZcCzppMyFVEkrBSwf4EvJ7a2mEcrbVKqPl502sHFQQB5KKz
+         pG9Z/kQ+ykI/VjeqBJuqM7vuCzcts7OEQgk8YE8pu71FRm/1lG3ZS9ViorAeBPRwWG6B
+         AHwIS8O1u7EmeP3tJJ7WNvpiJvhH2BSFns+2IXttACHOdlI1i55233CRXvkt/J155Noj
+         HfArQ7R71rPklTiv9qKvEorzbfOzpPYnzvc7PX5YL68P8JfxyfyvL0MX5oYLpggVqe4R
+         thBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751038470; x=1751643270;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fhpcGE0kY2U2qHSOUrNH4gIXVYCbpgzCRlKlqKyiksA=;
-        b=BoTUDOx8S53JvcaLOeD2D7Ke5Sio3UU4DL3hCzZCKdGG3XWrvGkgL4Iik7vJPAoEAu
-         QM/4uCw0IZRipnDtnRbySn6+as5xKxKs1LvGuf+N5dkbOCNpKLa4oVMtV0zpUD4nNfft
-         DqFQaft0rT7V4r4qilS8+pjvoHnFGZ6JAFTLP3O1kw3bVicpFjC+85iwOyH91dNEPIw1
-         4wDCUw+fBBtbHgZknYmEe2RYnB3B7b7jn4hJnj5qaNnxNjF6IZVjHmkO9ZoN5pG+quFs
-         ackzOocfZQTPHtQXjQmJl2BKPJfBEmPe7LgTHtU19C4LsR59osuCW4EECuiseMjTyK0T
-         DcXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNHXU0b56s3japSpXsGg79MMbd2VbSMYlgNIMXAkNK+SQIEcXMAFiamZJ2RGfOLgDGMGfnrYj2zJ0OeNg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvFo8yC3bWNfykmCHwTQI59EriveaqqIfKBByZtO/XkNIumxWB
-	VT8EXV7rmIsB/zq064zPyOVReThiAhG8VytMGIWBD6WQiYk3DN0pBZuFTO4XTk9bcgZoenxb9e8
-	kzfavcbCaUJGmTjT0Atmdhqdg0fIpvTcSe3305PGUnzXk4OHRT+xob9PYAnDnHmj1uKg=
-X-Gm-Gg: ASbGncu6CoQnyHVEzWJxDxbDg5ZwBUs3KEOpt8YjNps+XOWtzdc5m187lGUxW18U9xs
-	qYhIMVlXcEBnHNofp+dfBxchn5IAVojw1+jm6cDZQWyNAy0SqZtRVvs3ir9oJ3sbtkbNR5brUPX
-	B2eHK0VrZ8QtGdveUEUc53CuzvW4v/ZXHxQNivrsEG69eW8iYF0sFkOXCIU5IbFRPnvFQt+Rwkx
-	gGy9+qhp0nLLmHTdD0iSO4GKs4MpCWU2DW/uYy1g1HLNKPM+tvqePVw9+JE4SQ+MkPnilaA7BN9
-	u4K6/ZCuQrKKGgU796WrXkzKT5gvp9VFgdhixqxv9hf6M9xgGeNRD8B+oifqSjb1qEzONA8Xl5/
-	vsHA=
-X-Received: by 2002:a05:620a:4390:b0:7c0:bc63:7b73 with SMTP id af79cd13be357-7d443966417mr201233685a.13.1751038470191;
-        Fri, 27 Jun 2025 08:34:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHzOTtjkZGz3phOnalpunb7y20OgdgwVxcjlA9JNDAl2YYT7eAuxSBmhUwNsqtuPUIJtvAnnQ==
-X-Received: by 2002:a05:620a:4390:b0:7c0:bc63:7b73 with SMTP id af79cd13be357-7d443966417mr201228685a.13.1751038469653;
-        Fri, 27 Jun 2025 08:34:29 -0700 (PDT)
-Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363b244sm142288066b.30.2025.06.27.08.34.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jun 2025 08:34:28 -0700 (PDT)
-Message-ID: <3fbae47b-d20d-426b-a967-b584e32b8c6e@oss.qualcomm.com>
-Date: Fri, 27 Jun 2025 17:34:24 +0200
+        d=1e100.net; s=20230601; t=1751040668; x=1751645468;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TcIH4pjrPEib5s/3B0d1zkZ9Z/0XhgYXm5HComwjvMU=;
+        b=FgrkfcA346O6nSklgTkZ8SA46qfRzGD2b+yMm/VWQrucM2f+/a5nx27tOVzU54zrNA
+         KguVvhYr45DwQ/BNPxnvonv531Mw5bNqCOn90yOEecgrQXwZIzVGE5cq1sAgTrSpOq2t
+         ZFaZgiGvgLQZSh/gEAHciTabDdXsLWl+XVWqQEQhk3stP9sLC5xA9nsiaJWdedctWVY3
+         CJ1uAEX8oSRBGheLyuaBG5kn6WPvhnyd128n57FFTP9COi8MWWGNEO/fWwhfxAeLRlv9
+         boAYsbNw8FZcP5NcnpzsTEXvuVBJKl0Aj52Zk4Xjn6PQVMwjEmxThGzkxUqvWrKS4ZVt
+         mSbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZBKTpyQZWqxn0BC7UsmMKVqO3Y/Gz+J7qDTsY9PQa4M59tjTxptKuHUKxHy6aeDTdzhjIw+xDgNOtkdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQAyOCuVZV6LM/Iy1Kqaxuljqmry3yBOa/GkpVI5NprMTQTcOn
+	uWFeiIu9em5NF8vdvnYoxPMX7QB2X8c4NHOD8lYwzL73sXofiOhxLUqZrP4NR0qCiZJdtpET1nC
+	jKGCcd4QYyM8XmUxYpLe606RCO4wb2821x+UvtDy3
+X-Gm-Gg: ASbGncunNxJnO0HjvtNZo8MgMgVMHhVZvlYkYz1WcE6IN3egUWadZtjvajP1mEcKWlc
+	obBK8DTLLZ6SzUvBUGkUQnFMCrKr5n2gxH6+9JjXiur+m+yw7FK9091WrZTdM8wADBpr3O+jiyL
+	JeP5aBkPQNl9ppPeAwvTuk10W2vaQOqib+lZvgUjra
+X-Google-Smtp-Source: AGHT+IFg6e4a6YEfWbui8xwO9yD9rLdV6FsjD0j7apl8hIGvv47L9p86pecdsvAU0q7wRaa8l3NwHfyIyMgL9Gnaxno=
+X-Received: by 2002:a17:903:2ca:b0:237:e45b:4f45 with SMTP id
+ d9443c01a7336-23ae4db11d0mr267905ad.1.1751040668255; Fri, 27 Jun 2025
+ 09:11:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 14/14] arm64: dts: qcom: Add The Fairphone (Gen. 6)
-To: Luca Weiss <luca.weiss@fairphone.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Robert Marko <robimarko@gmail.com>,
-        Das Srinagesh <quic_gurus@quicinc.com>,
-        Thomas Gleixner
- <tglx@linutronix.de>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Amit Kucheria <amitk@kernel.org>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        linux-mmc@vger.kernel.org
-References: <20250625-sm7635-fp6-initial-v1-0-d9cd322eac1b@fairphone.com>
- <20250625-sm7635-fp6-initial-v1-14-d9cd322eac1b@fairphone.com>
- <4200b3b8-5669-4d5a-a509-d23f921b0449@oss.qualcomm.com>
- <DAXA7TKVM4GI.J6C7M3D1J1XF@fairphone.com>
- <6d4e77b3-0f92-44dd-b9b0-3129a5f3785b@oss.qualcomm.com>
- <DAXEA131KUXZ.WTO7PST1F3X6@fairphone.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <DAXEA131KUXZ.WTO7PST1F3X6@fairphone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: sW9AHjWsvLv0sq0GNqZZTfi8AIGQ1_PD
-X-Authority-Analysis: v=2.4 cv=Id+HWXqa c=1 sm=1 tr=0 ts=685eba07 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=huVnaSGCcg0LVUp1CDwA:9
- a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-GUID: sW9AHjWsvLv0sq0GNqZZTfi8AIGQ1_PD
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI3MDEyNiBTYWx0ZWRfX8SnuwfkadfDX
- 6ebhh02X3Ffbom0eCgbFi3BozBmQ6iAhTjK595y1O91XynLZDw8v8bXsICvQsoGJiv5vtLe1P4z
- X6v6Sj4rYP1ySQtiV1jDJvLHtTb0zEEtRJ+reVH1twiygBgLHuMr9g++AwUmLpoc/x8Q2ncPvj7
- LcvXZuLPQzYHERROQqywkTrs9wtp/0/AwXKcX6Y86NhVkTs1one00U5Lp+DguOzwN8BnxTeGaC9
- LcQYKOT0M5DW82ZGgWX0Gb0Uc6GyGqO9t13GYHAGnykjvX+7v59O7MfS4ufkM650RmPwlxiJ5za
- GbcLUUvrXgam6zT4p8KBCz35GCjqQk8wjM8VvJbXjRN24FlDLZagw610HEGRZRSWumKe9bvxxWs
- OBukT4dGctrFAAwOqYXbfPc/UEkb5AlYk9qz0VVZquaet2uD3FocQGOXdwCm3OCZxfNESiHX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-27_04,2025-06-26_05,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 bulkscore=0
- clxscore=1015 impostorscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0
- suspectscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506270126
+References: <20250611033150.396172-2-zhihang.shao.iscas@gmail.com>
+ <20250624035057.GD7127@sol> <48de9a74-58e8-49c2-8d8a-fa9c71bf0092@cryptogams.org>
+ <20250625035446.GC8962@sol> <CABCJKudbdWThfL71L-ccCpCeVZBW7Yhf3JXo9FvaPboRVaXOyg@mail.gmail.com>
+ <fa13aa9c-fd72-4aa3-98bc-becaf68a5469@cryptogams.org>
+In-Reply-To: <fa13aa9c-fd72-4aa3-98bc-becaf68a5469@cryptogams.org>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Fri, 27 Jun 2025 09:10:30 -0700
+X-Gm-Features: Ac12FXznZZZX9Qm6z0k4xbwNRAF0CTs4EHV5XI2tFLn6EJECgfKuduEu2PnIjzI
+Message-ID: <CABCJKucHNWz6J9vvDvKh_Je8eQTJO_1r0f6jsDTsDmfaxdBygg@mail.gmail.com>
+Subject: Re: [PATCH v4] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS implementation
+To: Andy Polyakov <appro@cryptogams.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, Zhihang Shao <zhihang.shao.iscas@gmail.com>, 
+	linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	herbert@gondor.apana.org.au, paul.walmsley@sifive.com, alex@ghiti.fr, 
+	zhang.lyra@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/27/25 4:44 PM, Luca Weiss wrote:
-> On Fri Jun 27, 2025 at 4:34 PM CEST, Konrad Dybcio wrote:
->> On 6/27/25 1:33 PM, Luca Weiss wrote:
->>> On Wed Jun 25, 2025 at 4:38 PM CEST, Konrad Dybcio wrote:
->>>> On 6/25/25 11:23 AM, Luca Weiss wrote:
->>>>> Add a devicetree for The Fairphone (Gen. 6) smartphone, which is based
->>>>> on the SM7635 SoC.
->>>>
->>>> [...]
->>>>
->>>>> +	/* Dummy panel for simple-framebuffer dimension info */
->>>>> +	panel: panel {
->>>>> +		compatible = "boe,bj631jhm-t71-d900";
->>>>> +		width-mm = <65>;
->>>>> +		height-mm = <146>;
->>>>> +	};
->>>>
->>>> I haven't ran through all the prerequisite-xx-id, but have
->>>> you submitted a binding for this?
->>>
->>> Actually not, kind of forgot about this. I believe I can create a
->>> (mostly?) complete binding for the panel, but this simple description
->>> for only width-mm & height-mm will differ from the final one, which will
->>> have the DSI port, pinctrl, reset-gpios and various supplies.
->>>
->>> I think I'll just drop it from v2 and keep it locally only, to get the
->>> simpledrm scaling right.
->>
->> Yeah I think that'd be best in general
-> 
-> Ack
+On Fri, Jun 27, 2025 at 2:07=E2=80=AFAM Andy Polyakov <appro@cryptogams.org=
+> wrote:
+>
+> > we would need
+> > to use SYM_TYPED_FUNC_START to emit CFI type information for them.
+>
+> I'm confused. My understanding is that SYM_TYPED_FUNC_START is about
+> clang -fsanitize=3Dkcfi, which is a different mechanism. Well, you might
+> be referring to future developments...
 
-[...]
+CONFIG_CFI_CLANG is supported in the kernel right now, which is why we
+need to make sure indirect call targets in assembly code are properly
+annotated.
 
->>>>> +&pm8550vs_d {
->>>>> +	status = "disabled";
->>>>> +};
->>>>> +
->>>>> +&pm8550vs_e {
->>>>> +	status = "disabled";
->>>>> +};
->>>>> +
->>>>> +&pm8550vs_g {
->>>>> +	status = "disabled";
->>>>> +};
->>>>
->>>> Hm... perhaps we should disable these by deafult
->>>
->>> Do you want me to do this in this patchset, or we clean this up later at
->>> some point? I'd prefer not adding even more dependencies to my patch
->>> collection right now.
->>
->> I can totally hear that..
->>
->> Let's include it in this patchset, right before SoC addition
->> I don't think there's any pm8550vs users trying to get merged in
->> parallel so it should be OK
-> 
-> Okay, can do. Disable all of them (_c, _d, _e, _g), and re-enable them
-> in current users? I assume there might also be boards that only have
-> e.g. _d and no _c.
+Like I said, if RISC-V gains kernel-mode Zicfilp support later, I
+would expect the SYM_TYPED_FUNC_START macro to be overridden to
+include the lpad instruction as well, similarly to other architectures
+that already support landing pad instructions. In either case, instead
+of including raw lpad instructions in the code, it should be up to the
+kernel to decide if landing pads (or other CFI annotations) are needed
+for the function.
 
-I suppose it's only fair to do so, in line with
+> > Also, if the kernel decides to use type-based landing pad labels for
+> > finer-grained CFI, "lpad 0" isn't going to work anyway.
+>
+> It would, it simply won't be fine-graned.
 
-d37e2646c8a5 ("arm64: dts: qcom: x1e80100-pmics: Enable all SMB2360 separately")
+Sorry for not being clear. If the kernel implements a fine-grained
+Zicfilp scheme, we wouldn't want universal indirect call targets (i.e.
+lpad 0) anywhere in the code. And even if we implement coarse-grained
+Zicfilp, we would only want landing pads in functions where they're
+needed to minimize the number of call targets.
 
+> > Perhaps it
+> > would make sense to just drop the lpad instruction in kernel builds
+> > for now to avoid confusion?
+>
+> Let's say I go for
+>
+> #ifdef __KERNEL__
+> SYM_TYPED_FUNC_START(poly1305_init, ...)
+> #else
+> .globl  poly1305_init
+> .type   poly1305_init,\@function
+> poly1305_init:
+> # ifdef __riscv_zicfilp
+>         lpad    0
+> # endif
+> #endif
+>
+> Would it be sufficient to #include <linux/cfi_types.h>?
 
->>>>> +&usb_1 {
->>>>> +	dr_mode = "otg";
->>>>> +
->>>>> +	/* USB 2.0 only */
->>>>
->>>> Because there's no usb3phy description yet, or due to hw design?
->>>
->>> HW design. Funnily enough with clk_ignore_unused this property is not
->>> needed, and USB(2.0) works fine then. Just when (I assume) the USB3
->>> clock is turned off which the bootloader has enabled, USB stops working.
->>
->> The USB controller has two possible clock sources: the PIPE_CLK that
->> the QMPPHY outputs, or the UTMI clock (qcom,select-utmi-as-pipe-clk).
-> 
-> So okay like this for you, for a USB2.0-only HW?
+Yes, but this requires the function to be indirectly called, because
+with CFI_CLANG the compiler only emits CFI type information for
+functions that are address-taken in C. If, like Eric suggested, these
+functions are not currently indirectly called, I would simply leave
+out the lpad instructions for kernel builds and worry about
+kernel-mode CFI annotations when they're actually needed:
 
-Yeah, maybe change the comment to something like:
+# if defined(__riscv_zicfilp) && !defined(__KERNEL__)
+        lpad    0
+# endif
 
-/* USB 2.0 only (RX/TX lanes physically not routed) */
-
-to avoid getting this question asked again
-
->> Because you said there's no USB3, I'm assuming DP-over-Type-C won't
->> be a thing either? :(
-> 
-> Yep. I'd have preferred USB3+DP as well since it's actually quite cool
-> to have with proper Linux. On Android, at least on older versions it's
-> barely usable imo. Can't even properly watch videos on the big screen
-> with that SW stack.
-
-Bummer! Not something we can change though :(
-
-Konrad
+Sami
