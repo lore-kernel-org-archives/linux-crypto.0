@@ -1,174 +1,158 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55CC1A23BE;
-	Sat, 28 Jun 2025 15:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB91D7DA93
+	for <linux-crypto@vger.kernel.org>; Sun, 29 Jun 2025 04:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751123737; cv=none; b=nEySpiQDEipQEZEAFN52hSdKY0k2HADCbZGQQdrVbU1ZeDHqPPxXIrk9eIvez1ANHeqRiH4Ba+jqfFIaTD+YIagMNJHQBpJTGpTwrVTViMJMRtlu+ORf3U1X4HwiaFoaqlFbbatuSTZaZjsZqMA8pHzlVkyiIJCcjA49jq2X4vA=
+	t=1751172566; cv=none; b=CMEqewzcukCSED0nz6Tf0XP3EsuvYtJghO/7wqq+Nqc/QAL+TxZi8S8Bung6O1LwrfEJX/cjpD1zxsbklqX+W6wcPjPjaxHG0tr+t/YNPYxGvqgfk+VM2lYXEUR6op9xE3odN3f6xPC23q19jg1MRkXz0l2Yyk6zyyqWNYkbWlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751123737; c=relaxed/simple;
-	bh=KdAezppgQ4Rh9Mn4QZ7Pfd2XJYyK3e0m9fFebe1kEkc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i/eomwB7jBQUHbCS93jnHcW61X5BnIoDFxeXsuvO79c0BZmHaj2R3sXrOKDeKH4JM37kuoJgF/KWg0bRJAUxR0N+dj8lETxsTJzNioK2xLqEFiXUPCCNiZ6u3uegKaI7Avn+P1jl5RxHE00E5wvTzF84nfvwE4B6krbIrHW0KJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H608KFXW; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H608KFXW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751123735; x=1782659735;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KdAezppgQ4Rh9Mn4QZ7Pfd2XJYyK3e0m9fFebe1kEkc=;
-  b=H608KFXWvhfhfYzgfVnOJmZilXWcyKA6kXbezAvvsOxtrbr7IIiDQfFe
-   LWF/efqb2dAUSC095lVR803ol5SItDfe3y9i0fqWnXn8AnEo7vvJMS6o/
-   oTQwQIg8rHiQWT3htO44OY2L4C7d5PXbHOOLJMbu2+RHaRl1LLYNp3C8n
-   +rWSh4GiAB7j5Iz831IXaV5C0gBBr87SvSKib63H/dPNYOiPj3mXFW8QA
-   m9UfK9ZlcjzjuDCCpBpw5oODCjIIacfcjTsgShcmQoibN2EwN4H91eEcY
-   6x1wQf2bgSIkhZdI3KPTe9Mq0sDOaqJQYerRFBGFOlhNv63O3AJe4Jlc2
-   A==;
-X-CSE-ConnectionGUID: J7mEWflWQj6jB+T5uQCnyg==
-X-CSE-MsgGUID: NyFjwwaJTyeZQmZeNQFrJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11478"; a="64010961"
-X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
-   d="scan'208";a="64010961"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2025 08:15:34 -0700
-X-CSE-ConnectionGUID: 5jv1ZLPETLOtX+oSb5jpwA==
-X-CSE-MsgGUID: OVow9ORfRYefx0FCy3/rpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
-   d="scan'208";a="157328041"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 28 Jun 2025 08:15:32 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uVXH7-000X8I-2o;
-	Sat, 28 Jun 2025 15:15:29 +0000
-Date: Sat, 28 Jun 2025 23:14:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jay Wang <wanjay@amazon.com>, stable@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	wanjay@amazon.com, Samuel Mendoza-Jonas <samjonas@amazon.com>,
-	Elena Avila <ellavila@amazon.com>
-Subject: Re: [PATCH 1/2] crypto: rng - Override drivers/char/random in FIPS
- mode
-Message-ID: <202506282235.pPmU7tOj-lkp@intel.com>
-References: <20250628042918.32253-2-wanjay@amazon.com>
+	s=arc-20240116; t=1751172566; c=relaxed/simple;
+	bh=/G+1vAbo4n+EqcDzwn0O2XGd7JR4h2NC/9qwvEBUQaQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u7h5YK+FSb10K/aX2fQDyQdmIbj5dZSQ1W0c3zs5MulxCtJ84yWZOZPpOntH0keRGwklSNE+Y8asi9iVqtAYvZZZTzgFQtUMaEgrxsN2oWJ7HObHuSxDR0ApxqMI4YoQ04KjnwDbUX6QPM24HjDabR+pPEdx0sVM9RMVvyeRYT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3de0dc57859so15186885ab.2
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Jun 2025 21:49:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751172564; x=1751777364;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P2mY2eamG78sGsn3j8Cd+B3ncgAl4vhBnOUZVJt6TG8=;
+        b=jYeI8cIVer5pcTIej7QBVOj43ciYNdPLQhdxIKcGUvab0QrAj1o1oqFQseaDih37fE
+         Hj1RF1eHx8m4+73JWJ2tYmHovhqnXcKRnGCQ28Z5h8GrcU3DZryzdKG21RR/U/IcLQGl
+         CfRQ1Fa9g0N4aGQELdG1uGWO+CB26kg2Nsj3BFSsK8AwdCSp79dzH3SId9ZH/xRSBN72
+         7eTF6ucwopvNrtgS29Yp8eWv2aPB/7jtmjOh/GJglnlE/uWIaKmTWL0LBsT/lHFqYPlV
+         dSoh8G4GXP3xX6Na9K6An2TEVWcsqo8eE2/yZbYVr6q+xnPiOXUec3ICLpYymkeHTfHH
+         3lgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSRiLX7SD35xBEiuzOEe6BTmFotRl5KYT3iOGO17oU+rn7s3gWNPVMFfuEo1EgYpbij6IcwUyOkj/BX14=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrrenxZVlo6jo3IieBrmHK6mJAB7qZ1jt4Qt8vf9F2+RdQK+s3
+	/VuV21keL+ISUJQURsy8rgYVBbbSqDm45tgHorxqp6aDy/Zqj2eL0+RzKUMqBmsbH1t4VWuXjuQ
+	CCASiZzTSgJ4Ksi4rvUklY2zxXOgFiGgD8jOfpsLEO0q/zqJ3c7YNZQbK7VU=
+X-Google-Smtp-Source: AGHT+IEDNwpVGLB58tw/xoj7Yro64h0VmQPbfvdd9zILkoAkCF8gPPqTLDcgooR46dJkY6VxiAQMb+CrLdF6evqDG5SuETe3RBNw
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250628042918.32253-2-wanjay@amazon.com>
+X-Received: by 2002:a05:6e02:214a:b0:3df:3926:88b7 with SMTP id
+ e9e14a558f8ab-3df4ab5672cmr88761325ab.5.1751172563896; Sat, 28 Jun 2025
+ 21:49:23 -0700 (PDT)
+Date: Sat, 28 Jun 2025 21:49:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6860c5d3.a00a0220.c1739.0009.GAE@google.com>
+Subject: [syzbot] [crypto?] possible deadlock in padata_do_serial
+From: syzbot <syzbot+bd936ccd4339cea66e6b@syzkaller.appspotmail.com>
+To: daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jay,
+Hello,
 
-kernel test robot noticed the following build errors:
+syzbot found the following issue on:
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.16-rc3 next-20250627]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+HEAD commit:    2ae2aaafb214 Add linux-next specific files for 20250624
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10deb70c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d85d3c440a754f86
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd936ccd4339cea66e6b
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jay-Wang/crypto-rng-Override-drivers-char-random-in-FIPS-mode/20250628-123147
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250628042918.32253-2-wanjay%40amazon.com
-patch subject: [PATCH 1/2] crypto: rng - Override drivers/char/random in FIPS mode
-config: x86_64-buildonly-randconfig-001-20250628 (https://download.01.org/0day-ci/archive/20250628/202506282235.pPmU7tOj-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250628/202506282235.pPmU7tOj-lkp@intel.com/reproduce)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506282235.pPmU7tOj-lkp@intel.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/689f558e5251/disk-2ae2aaaf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/355aae0f4972/vmlinux-2ae2aaaf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/94e736ebe604/bzImage-2ae2aaaf.xz
 
-All error/warnings (new ones prefixed by >>):
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bd936ccd4339cea66e6b@syzkaller.appspotmail.com
 
->> crypto/rng.c:272:21: error: variable 'crypto_devrandom_rng' has initializer but incomplete type
-     272 | static const struct random_extrng crypto_devrandom_rng = {
-         |                     ^~~~~~~~~~~~~
->> crypto/rng.c:273:10: error: 'const struct random_extrng' has no member named 'extrng_read'
-     273 |         .extrng_read = crypto_devrandom_read,
-         |          ^~~~~~~~~~~
->> crypto/rng.c:273:24: warning: excess elements in struct initializer
-     273 |         .extrng_read = crypto_devrandom_read,
-         |                        ^~~~~~~~~~~~~~~~~~~~~
-   crypto/rng.c:273:24: note: (near initialization for 'crypto_devrandom_rng')
->> crypto/rng.c:274:10: error: 'const struct random_extrng' has no member named 'owner'
-     274 |         .owner = THIS_MODULE,
-         |          ^~~~~
-   In file included from include/linux/printk.h:6,
-                    from include/asm-generic/bug.h:22,
-                    from arch/x86/include/asm/bug.h:103,
-                    from arch/x86/include/asm/alternative.h:9,
-                    from arch/x86/include/asm/barrier.h:5,
-                    from include/linux/list.h:11,
-                    from include/linux/swait.h:5,
-                    from include/linux/completion.h:12,
-                    from include/linux/crypto.h:15,
-                    from include/crypto/algapi.h:13,
-                    from include/crypto/internal/rng.h:12,
-                    from crypto/rng.c:11:
-   include/linux/init.h:182:21: warning: excess elements in struct initializer
-     182 | #define THIS_MODULE ((struct module *)0)
-         |                     ^
-   crypto/rng.c:274:18: note: in expansion of macro 'THIS_MODULE'
-     274 |         .owner = THIS_MODULE,
-         |                  ^~~~~~~~~~~
-   include/linux/init.h:182:21: note: (near initialization for 'crypto_devrandom_rng')
-     182 | #define THIS_MODULE ((struct module *)0)
-         |                     ^
-   crypto/rng.c:274:18: note: in expansion of macro 'THIS_MODULE'
-     274 |         .owner = THIS_MODULE,
-         |                  ^~~~~~~~~~~
-   crypto/rng.c: In function 'crypto_rng_init':
->> crypto/rng.c:280:17: error: implicit declaration of function 'random_register_extrng'; did you mean 'crypto_register_rng'? [-Werror=implicit-function-declaration]
-     280 |                 random_register_extrng(&crypto_devrandom_rng);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~
-         |                 crypto_register_rng
-   crypto/rng.c: In function 'crypto_rng_exit':
->> crypto/rng.c:286:9: error: implicit declaration of function 'random_unregister_extrng'; did you mean 'crypto_unregister_rng'? [-Werror=implicit-function-declaration]
-     286 |         random_unregister_extrng();
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_unregister_rng
-   crypto/rng.c: At top level:
->> crypto/rng.c:272:35: error: storage size of 'crypto_devrandom_rng' isn't known
-     272 | static const struct random_extrng crypto_devrandom_rng = {
-         |                                   ^~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+============================================
+WARNING: possible recursive locking detected
+6.16.0-rc3-next-20250624-syzkaller #0 Not tainted
+--------------------------------------------
+kworker/u8:11/20346 is trying to acquire lock:
+ffffe8ffffd55fd8 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffe8ffffd55fd8 (&pd_list->lock){+...}-{3:3}, at: padata_find_next kernel/padata.c:256 [inline]
+ffffe8ffffd55fd8 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:309 [inline]
+ffffe8ffffd55fd8 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x73e/0xb80 kernel/padata.c:379
+
+but task is already holding lock:
+ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:300 [inline]
+ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x5b5/0xb80 kernel/padata.c:379
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&pd_list->lock);
+  lock(&pd_list->lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+3 locks held by kworker/u8:11/20346:
+ #0: ffff888146e84948 ((wq_completion)pencrypt_parallel){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #0: ffff888146e84948 ((wq_completion)pencrypt_parallel){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3322
+ #1: ffffc9000bf7fbc0 ((work_completion)(&pw->pw_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3215 [inline]
+ #1: ffffc9000bf7fbc0 ((work_completion)(&pw->pw_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3322
+ #2: ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #2: ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:300 [inline]
+ #2: ffffe8ffffd5f4d8 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x5b5/0xb80 kernel/padata.c:379
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 20346 Comm: kworker/u8:11 Not tainted 6.16.0-rc3-next-20250624-syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: pencrypt_parallel padata_parallel_worker
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3044
+ check_deadlock kernel/locking/lockdep.c:3096 [inline]
+ validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3898
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5240
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ padata_find_next kernel/padata.c:256 [inline]
+ padata_reorder kernel/padata.c:309 [inline]
+ padata_do_serial+0x73e/0xb80 kernel/padata.c:379
+ padata_parallel_worker+0x75/0x1d0 kernel/padata.c:157
+ process_one_work kernel/workqueue.c:3239 [inline]
+ process_scheduled_works+0xade/0x17b0 kernel/workqueue.c:3322
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3403
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
 
-vim +/crypto_devrandom_rng +272 crypto/rng.c
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-   271	
- > 272	static const struct random_extrng crypto_devrandom_rng = {
- > 273		.extrng_read = crypto_devrandom_read,
- > 274		.owner = THIS_MODULE,
-   275	};
-   276	
-   277	static int __init crypto_rng_init(void)
-   278	{
-   279		if (fips_enabled)
- > 280			random_register_extrng(&crypto_devrandom_rng);
-   281		return 0;
-   282	}
-   283	
-   284	static void __exit crypto_rng_exit(void)
-   285	{
- > 286		random_unregister_extrng();
-   287	}
-   288	
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
