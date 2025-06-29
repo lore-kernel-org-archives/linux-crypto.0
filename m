@@ -1,108 +1,147 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4070320551C;
-	Sun, 29 Jun 2025 18:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203E81CBEAA;
+	Sun, 29 Jun 2025 20:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751222260; cv=none; b=RKO8c66nzA3X/MJv4cBLKOYE+orGserw2/9V7pE8X2lZO8i+cvZvnN+TbAUimb8sFDld+19G0w8ruAEWGzSEW28CrTmiUVkp3tyME05Gflo+GY2TWkGVB+jyXytpx/0dv/yY+QLAcelFeXjGlq4U33vz6y7o+Wb/kQJr2kdXj7k=
+	t=1751227641; cv=none; b=ZqDlPD6GAbiWcu+W6ieuPVDykdFKXY4F1Rh4Nx92IY8I+95uW0PBIF/img0XVXE3x4Y0Lpar4DjkeZEnbZ1qaNpzM3WhU91JpgLPiOs0LTUKpdB2Pmr4EpHM8S+LYVNegw13hgAoSLuen1N475mQ4h8Igkfyw8/00RPpzc2cD0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751222260; c=relaxed/simple;
-	bh=KanBzgbYjUGn8O9OHjq1zRnau02IuNRheXp0DCUghdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfHNZvcJdNoqFoWvIeDbAud0ORZT0p2lu+G/vBKdcq82GCmnL6BXwA5GpWKb8XKmer5JN3DUtP0BNvp0XWdc1EWqVvPGcLU33i6uB3+PoYy90hfr0z/QWnk3lYF5e4QJC2uUqFoSHSMNqPzdZ3pVGzn36zqA3014oNzEQKRldZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9CAHg41; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9CAHg41"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-453398e90e9so10513695e9.1;
-        Sun, 29 Jun 2025 11:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751222256; x=1751827056; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=j8592xP+JE6KeCXGDCqNX8dsf7ApqXKNRZpKKe+gG7o=;
-        b=N9CAHg41hmZ3nolXxqu+c1V73K//mjKHZkOy7//4ebnMGryivMaX0Hmt5aBB1vjCR1
-         cgu6kvslbnjX7qL7ccNHuKCOS0hMIYXBXvB50F8l79LufiKSzQms9ioX74ICwwsaQDzN
-         RKKhMb2x6Boi/XCPzQIifPEhWW2thBW3Cd+yQb2itdp18c0SBeJdSjW5QXTPY+z6Qajz
-         Uz47iJQJnqlZ1dtj7sObTQ8SNDiNSRsf8mlaZUYZUswI07ZNdJ5qH0RBMt94yGYOq9IZ
-         qbER30z08Dk7vVEVqaxmRVCnocAh2cmBjFi/HiNRJ5IoN0xc4LG0rjEpsH5zGM20SlU7
-         0Yuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751222256; x=1751827056;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j8592xP+JE6KeCXGDCqNX8dsf7ApqXKNRZpKKe+gG7o=;
-        b=LNqH9XlV2fnjOXyI+xdLumhMUtVfbjv91xWkRC2jk3FJFM9qc9vUAMRcim0UtjfqvY
-         zDzAAW0f2GIaOhylYpU2Op646tGgB9v6zjLDR3fsBcBl/doHErjOoOB5dRRpTXi1rHXP
-         6onSeOAJf0TOCdSGLPKVn44/OGIVeTah2pTFZDNRSg11+t4CXsLIsk+ZLm/CkFKQhbul
-         KSelI5J8Uk3rSG/R8MdoQPsnz02F6GdTQR5V5MDdwlJf7X5E77Pblqm4/9PTCWOhnvjx
-         rwsfk1DBA9KdFNcOK/PyXk8PD/Ajj/PCzzBI6VPtkyyayDs6WCeqAy+s3v39I2GS9Abx
-         iQqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVukMV3ppta74pXsmLjcLLBnVwuUJCgOZ6t3iLCSHsMGqqS6W/8ZghA8lRan8ZBHVMUUq0cMEVChRHe1lub@vger.kernel.org, AJvYcCXdRWkClDQaJw95oMNyFiGtdxkUEfozRN0EHsbXuZ6vJAVYijjJ5N4ghx+Pe+8k5hSJdS088WevWXlS+zc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw41OzwfBNJeTUBl93aVww6s0iWyCCD4wSZ7mK4xFpYHh4fwMU0
-	uGm3CdEHIAQZXJMTrSWF1TJWxoUej7+Pj2K1BVhLkP2hU4kprvrE5sQC
-X-Gm-Gg: ASbGnctCCI8fgvm4yR1v8u1s/x0mpSgjt8jie8KT8jvirTwklv74GQjpSR7+KOQ75Wt
-	7/sckWFRyPRNlc7DEncbV1dDo6k+nsdLk8Oov15/KssrFLDkX95uHcng6Iv9LsaU7j7Bfxuk9jS
-	tci5o4B/BmTgHX1Of55MHMVDcVM8Lac36okZuk7F+cdMDI1pehUhdwffj/DIf/DlnAqODRh+bKl
-	ygH2mVWRQs/w9lTu4EySD2W8p+H4C3n1GJU3dlIS8hGBhvslRUXH3k7ikypzynzxH5t7y//BAjW
-	/XckY02rbJWYSkD3AwK4eL3aAHiPVZJdv0E3lzUYfmk2QPzaxjtovPA9AqJTB1Y=
-X-Google-Smtp-Source: AGHT+IFUvGyHpZ0G55OgsZ+L5rcXJKuJV0BFFbxOe9Gz1CCPK1gH8KNx/GR6MT+iyUETgIG6fe7iHw==
-X-Received: by 2002:a05:600c:64cc:b0:43c:f629:66f4 with SMTP id 5b1f17b1804b1-45392b98066mr92287515e9.0.1751222256133;
-        Sun, 29 Jun 2025 11:37:36 -0700 (PDT)
-Received: from Red ([2a01:cb1d:897:7800:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4538233c523sm141486835e9.6.2025.06.29.11.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jun 2025 11:37:35 -0700 (PDT)
-Date: Sun, 29 Jun 2025 20:37:33 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, wens@csie.org,
-	jernej.skrabec@gmail.com, samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/10] crypto: sun8i-ce - implement request batching
-Message-ID: <aGGH7RH8-yHVVz25@Red>
-References: <20250626095813.83963-1-ovidiu.panait.oss@gmail.com>
+	s=arc-20240116; t=1751227641; c=relaxed/simple;
+	bh=UIJ3X4D0ffKfruWJPoE5+zvCmo9HErX2i9Wp9Oi7R5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ls2hK+LUknz73jx9HB+6z8J76GWSfMhfcH4TcJg1ol8ubc7bMLPNiPdaCWF2lssNWVRIs1KbfUVM8JegCpnkcEWOkko9mLqotFy2yvg/k2WbvJTADAzbwQG2/uMinsPTu5ghh4yipedZyXQrhuzkE9Lp4Pnta2PtexxY+N2avZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.196] (p5b13a6da.dip0.t-ipconnect.de [91.19.166.218])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3810B61E64787;
+	Sun, 29 Jun 2025 22:06:42 +0200 (CEST)
+Message-ID: <4585b0e7-7172-476d-8cd9-012ca65daa9b@molgen.mpg.de>
+Date: Sun, 29 Jun 2025 22:06:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: kdf108_init() takes over 250 ms
+To: Stephan Mueller <smueller@chronox.de>,
+ Tim Chen <tim.c.chen@linux.intel.com>, Robert Elliott <elliott@hpe.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>
+References: <6d6b6bcf-cab8-695b-568a-c1372ac531ee@molgen.mpg.de>
+ <MW5PR84MB1842811C4EECC0F4B35B5FB3AB709@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+ <2658706.V0ylg0ELTe@tauon.chronox.de>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <2658706.V0ylg0ELTe@tauon.chronox.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250626095813.83963-1-ovidiu.panait.oss@gmail.com>
 
-Le Thu, Jun 26, 2025 at 12:58:03PM +0300, Ovidiu Panait a �crit :
-> The Allwinner crypto engine can process multiple requests at a time,
-> if they are chained together using the task descriptor's 'next' field.
-> Having multiple requests processed in one go can reduce the number
-> of interrupts generated and also improve throughput.
-> 
-> When compared to the existing non-batching implementation, the tcrypt
-> multibuffer benchmark shows an increase in throughput of ~85% for 16 byte
-> AES blocks (when testing with 8 data streams on the OrangePi Zero2 board).
-> 
-> Patches 1-9 perform refactoring work on the existing do_one_request()
-> callbacks, to make them more modular and easier to integrate with the
-> request batching workflow.
-> 
-> Patch 10 implements the actual request batching.
-> 
-> Changes in v2:
->    - fixed [-Wformat-truncation=] warning reported by kernel test robot
-> 
+Dear Stephan, dear Robert,
 
-Hello
 
-Thanks for your patch, I am starting review and test it.
+Am 26.08.22 um 09:47 schrieb Stephan Mueller:
+> Am Dienstag, 23. August 2022, 22:10:01 CEST schrieb Elliott, Robert (Servers):
 
-@Herbert, please me give me time for it.
+>>> -----Original Message-----
+>>> From: Paul Menzel <pmenzel@molgen.mpg.de>
+>>> Sent: Tuesday, August 23, 2022 9:52 AM
 
-Regards
+[…]
+
+>>> On the Dell XPS 13 9370 with Debian sid/unstable, I noticed with Linux
+>>> 5.18.16, that  `crypto_kdf108_init()` takes 263 ms to run even with
+>>> disabled self-tests:
+>>>
+>>
+>> ...
+>>
+>>> [    0.000000] Command line: BOOT_IMAGE=/vmlinuz-5.18.0-4-amd64
+>>> root=UUID=56f398e0-1e25-4fda-aa9f-611dece4b333 ro quiet
+>>> module_blacklist=psmouse initcall_debug log_buf_len=4M cryptomgr.notests
+>>
+>> ...
+>>
+>>> [    0.272127] calling  crypto_kdf108_init+0x0/0x149 @ 1
+>>> [    0.530787] Freeing initrd memory: 39332K
+>>> [    0.534667] alg: self-tests disabled
+>>> [    0.534701] alg: self-tests for CTR-KDF (hmac(sha256)) passed
+>>> [    0.534703] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 262573 usecs
+>>
+>> ...
+>>
+>>>
+>>> With self-tests enabled it’s only less than a millisecond longer.
+>>>
+>>> ```
+>>> [    0.282389] calling  crypto_kdf108_init+0x0/0x149 @ 1
+>>> [    0.541096] Freeing initrd memory: 39332K
+>>> [    0.545674] alg: self-tests for CTR-KDF (hmac(sha256)) passed
+>>> [    0.545676] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 263284 usecs
+>>> ```
+>>
+>>
+>> crypto_kdf108_init() call its self-test function directly rather
+>> that alg_test(), which implements that notests flag. Maybe it
+>> should go through alg_test().
+> 
+> You are right that it does not uses the alg_test. This is because the KDF is
+> just a helper and not implemented as a template. I initially wanted and
+> provided a patch that turns the KDFs into templates which then would be able
+> to go though alg_test. It was not accepted, but instead only service functions
+> where accepted.
+> 
+> The reason for not accepting the template approach was that a complete new API
+> is needed to accommodate the KDFs. Initially I called the API "rng" because a
+> KDF and a PRNG are very very similar in nature: they take an arbitrary string
+> as input (the seed/key/personalization/additional info/label string) and
+> provide an arbitrary output (mathematically you can even use both
+> interchangeably for the same purposes - although cryptographically speaking
+> you do not want that). As this concept cannot be covered with the existing
+> APIs, a KDF cannot be rolled into those existing APIs as template. Side note:
+> the same question around such new API will appear as soon as somebody asks for
+> SHAKE to be added.
+> 
+> A low hanging fruit would be to also deactivate the KDF test when the notest
+> option is selected.
+> 
+>> Outside of that, check that Tim's x86-optimized SHA-256 module
+>> is loaded, so it is used rather than the generic implementation.
+>> One my system, that improves the kdf108 initialization time
+>> from 1.4 s to 0.38 s:
+>>
+>> With sha256_generic:
+>>    initcall sha256_generic_mod_init+0x0/0x16 returned 0 after 0 usecs
+>>    ...
+>>    initcall crypto_kdf108_init+0x0/0x18d returned 0 after 1425640 usecs
+>>
+>> With sha256_ssse3 (using its AVX2 implementation):
+>>    initcall sha256_ssse3_mod_init+0x0/0x1bf returned 0 after 12148 usecs
+>>    ...
+>>    initcall crypto_kdf108_init+0x0/0x153 returned 0 after 382799 usecs
+>>
+>> That's controlled by CONFIG_CRYPTO_SHA256_SSSE3.
+> 
+> The test is performed during kernel boot time with the available
+> implementation - the self test uses "hmac(sha256)". If the AVX2 is not
+> registered at that time with the kernel crypto API, it will not be available
+> for use. But it is not possible to hard-code the use of the AVX implementation
+> or any other implementation as it is not guaranteed to be present.
+> 
+> The issue would be alleviated it would go through alg_test though.
+As I didn’t notice this, or forgot it, for the record, this was 
+addressed by Eric Biggers in commit 0bf365c0efdd ("crypto: kdf - skip 
+self-test when tests disabled"), that first shows up in Linux v6.2-rc1.
+
+
+Kind regards,
+
+Paul
