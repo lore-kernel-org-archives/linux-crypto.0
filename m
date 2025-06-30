@@ -1,113 +1,196 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3312472A4
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 09:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAF234CF5
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 10:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751277307; cv=none; b=uWIxIECN50B66u2PMC3Jf9LhMN3n1E21JJjsFC/1hoWPjOJGPZzYq7vXe0ubEwRto4lVgiuaqYI5uWiP5/5lnAbfu059cM9VFdg2bcTcesBYIqNY9XLZNr5fOE9503A/Q2GRk+RdYgTUb4MtCiIOvCTEcfxxaANSVWQ9AN76Qng=
+	t=1751278902; cv=none; b=lGht0uFFo0zDmSzIcNciJBqD/hXAxiSeMM7V9GkUn7HXSsEKcIHPGuv9H/ppf2LUez/i/eW1K+IW7ojLmYF51Zj1E5QcMM639ZynHvvnEza1P0fu9d1x1sj9fk3P2fcNSoJkMA6G5kEq5lYiE+7Ei50tfp19PkrQAOBB3+4VGVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751277307; c=relaxed/simple;
-	bh=0PuwYRU65+rPcr6EqI4gz5+o/nz3zFEwP+cDO+KX260=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c4rj4yudPfmZDK93NJ6acZT6N3v80H0ccPTZY3lzCD8YQD30SJTxajgAVK7865/Plr6DWovzqE61MYIzRi3JuNzHPpWviEsNPSCK421WCfA3Bc3cf0O9PoU5sxw6JK6Jmvrhunp4zqlBfrtQhBUbSAiaaTWGEQ8WDZemofsC3DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=fW5UGTRU; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
+	s=arc-20240116; t=1751278902; c=relaxed/simple;
+	bh=6BYE8AWJQLw8WAxO3Q5aBUTeX661u26mmGmL2fLnCZI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=ZMWte7gXrGUqnavwgketK7hnIDbExh7q2oki11a66LE2f4YHBKu7r6zsvOtsSr7qa+q8pwN9/G47kSDHNun7FRn/BLvFh4O9OMkUM4vTKnj6oqc9WoJAu6fhK348Zy/savK5e+cz1NnnMcAB0RIFBNeAVlnbXegcAUBW7TruN40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=IrZueZJ4; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="fW5UGTRU"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5561ab55c4dso406468e87.2
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 02:55:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="IrZueZJ4"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae36e88a5daso373058066b.1
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 03:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cryptogams.org; s=gmail; t=1751277303; x=1751882103; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LfQy8ADCiBLlHkAJSuBLrY0Q7GgPSdM7/euzAA8eQg8=;
-        b=fW5UGTRU5uQV1ZEuxIU58L492ss3fMhWoD47CG0wQ1MVoHX4uYv4bAVt5luqnMpeH/
-         JmohjePacxyH13iFLcHcEJVLz9WkIjxNq47NrbB6ZTLdKPEkbDzU/biFlvuf45amehc2
-         1bPD/vk+w8EeIzeWPvs7hQbgw2ahsexnp+8ezuQlk+NNZZaLHvhzyH9yd3KIltG+cGO7
-         ynX32N5YkUbjN2YSXDzPc3FYbD8Mtszd3HW3f9rUjb+uOqgkzPCCYkwdnL8JfFEUHRks
-         atpVzkf/4NWx8F6MCQcV6N5n1FZxX1uYwDIMrWr14ZBGVln5AkTvUDMCu3fwWeJUf30B
-         hsLw==
+        d=fairphone.com; s=fair; t=1751278898; x=1751883698; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=91/ZncbDlmcGCt22EAMRhuZKL6uaG/hY8UyZ2Q+pYCo=;
+        b=IrZueZJ4qgDMos5cOw6vsmAKPNI7cL5oHlBxR9UC1YhL+Gik/jTsoOe6XDscbMCl/D
+         m0b1kr5wj7n3L0V7y6Gu2taGzuNze2Trz/4F1hoehV3UkaCRyOYZv4FTAZrixGoXDCAL
+         Ra1lqJVB3V41Bag3if4dM7UPHCeXCsx+seRMCn4xlr5ZNTzn5tZzCD1+ZJgfiE58pMj4
+         k6y6iBv4TNPQowcdRpGeLnYeAWQjQ2JzHgL8eT1PYbAbBm4rGdx1FUt/OygzgsenUAeb
+         75KzQYafl73kX3Oa9A+8PbNa0dpos0iA2Aa65Cxrg2FkYdFlf78aMhT5bCYVDMC6TetI
+         mL7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751277303; x=1751882103;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LfQy8ADCiBLlHkAJSuBLrY0Q7GgPSdM7/euzAA8eQg8=;
-        b=I7AU9QJXmNdZHlUZSdlpizR8ZEL67bBlODHAHK/4k/fjXjWmySNH0BP0ha+BFo4tD1
-         VLkJ//nuhqgAsHeDwitPuToTOz/wkmBFYdiXxdSlvuhP9463yM3oTjyA/n/lAZB6cSFQ
-         ag+Lu8uCoWXuRjY5lA0sJISt4SheN4BnDnE0A7VIHIRZ6J28P9V6xmwQfn7VN8vqVjaG
-         0ZCI4wKX2uBYCQnJP61asIBI+MKkxhAKqxuG50XxrfrRLfWXIYKYIHD7Uwtl/84QyCWB
-         KsEQ8X4CKvhdcOLK8j4B/ZTkKfOozYMQphV+WHtDiE87sMU8va6jTsZyVW0XWfrB3K6s
-         gtew==
-X-Forwarded-Encrypted: i=1; AJvYcCUIXvHOXHgFmpXUC9WqMMItjM7o4R6Uk56hxJ2pBSLsEB+TjjprpqnVwAn6OOOmetisMjoFhISX2bdx29g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx27RCU9OPoibhj5+Ds23zOpIARBVx5L80B2CB18n2woHH31P2Y
-	d9Funo7PfVASTl7XpZa+0WQgbYYmHVzGvf8p3npf6aEtr3jokeoU+NmiXQyYJB7qTBxHt6e6Nhe
-	3EVYn
-X-Gm-Gg: ASbGncu0hUCuKutha1101HYoBxn1+JKZh+zBxNlTCfIr2iXLpl2B2qWqdP7lKGUGSOi
-	CdvFJtbas9NFNr9t70sSOyExJq11Tlab68n4KKqzMFlKMshC/83jx4NC+Gu4OtEJjRi/icbKgYN
-	i2pxc7KoS7o7xGSaqmW7UI07A6Exn9kkVNfnrAeofCi7WjGQz2v9kdzNij577QCDgw0aaXeMKjz
-	OrKEJ+/t8/jLWxllynLzzHVUtw9VhA3a+KYdbYqwCKj20LDrJyNsg2CxCfreO40wNnadYrtVZMm
-	IZNtwZ2BfGJoAj3/efdq+ha2Jwqz5ZY7TO9ZCum2ghfoZZa0TNZVA/XlUG4i/PJHV5reHzwvwoE
-	ElXAMc4LGLKfpdS9Y3v3y+YKjUDwqew==
-X-Google-Smtp-Source: AGHT+IGPZA425rUTyu65BDLRuYis8nH5rdwyfHes60yjnoP9ss0FZbb0z/p5yM8y5tYGOxjb92a6GQ==
-X-Received: by 2002:a05:6512:3503:b0:553:241a:b93a with SMTP id 2adb3069b0e04-5550b89f457mr4656463e87.31.1751277303047;
-        Mon, 30 Jun 2025 02:55:03 -0700 (PDT)
-Received: from [10.0.1.129] (c-92-32-242-43.bbcust.telenor.se. [92.32.242.43])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32cd2deacd9sm12834901fa.11.2025.06.30.02.55.01
+        d=1e100.net; s=20230601; t=1751278898; x=1751883698;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=91/ZncbDlmcGCt22EAMRhuZKL6uaG/hY8UyZ2Q+pYCo=;
+        b=l+r1TMnIgKfgVJDFRigI7vIfn2W0HWekkpVNFuLdjr2aoOEw6NcyF2X2Vx5Qjv87ra
+         HlbL6BE+4GTnNRpsKucB4ld1lO2EPkr4jblk8JW9R5eZP+riM0pUX952yw3A+wR9W8TE
+         /BtfWy43ZlKpA0gvDYmzJ0/3WENfbRaYR1kPyVFjRZIv7zLOK2e84ZiXF+im0+xhIEjt
+         KxaeUOtDcpF8seeLN4FSsDD/5Rzbx6McBW8+kuOWh6eMGGIt3GV9lAqnjzaeTI4+x5up
+         xfMYjQ+cyJCNu2mQtKNFlIZ62A7bp5docs2+G9ivwOo0gbfY+vDui4+tu4s5HBuzwfND
+         RcMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMwTIL3NaVeGVlfh8H1k5QGIEqtSMdmd2BwJHLdS1HN7pduL8tG8rbj4MnE7Y6dQvJHS8eC+eDkSl1UwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7dft3TuE19M1zZ+8QTNZlpEcMNYQrNpUmYA9uix7qfd62jVtf
+	B2qzWNHc0OaVpZV4/qYblR4yNC37loEEwou74dnhlIWn8Vq7JbLxi/enIpHwOoWGA68=
+X-Gm-Gg: ASbGncvi1suh8Icc2jb6JbZSlO2kGufw1Nn/liicQyi/cT0K5Ng+eXy5iowIr5i5hWU
+	7oezPXUbvWPj9sAbFdxfqD4wAWswRGnuKZ/iPAVFv+DmF9x24rjfVaserj4xrcYX6xprXI8zaYd
+	ZeDO4Xcg4QFAX0NF/DMOSCKWGu4nFy25rvabEDTRVrOLxogZxt4gum1NBTBnqUFpVktFs/xZxne
+	hN3bMPUej1w+DWhr3EkrCkVmAWNrjqc9anvo9PTesPkgp03ACajiZsq0fguuL4MIzMdNy/CWbWf
+	IWDgPMb7AR1MMNIfbEH0D0trgx7S0Kk/LiQ6W6YQ5N53h7BAkENC7b1PJ4zfKMPrDr7SkG2tXc4
+	yv/xp3BkJ6N6jINaGSBIYN2ByFUsjaZj3aSfgXdR3zywQL7K4aDeiKatbPxMttINlrIvfYBU=
+X-Google-Smtp-Source: AGHT+IG0udIx5/vSjab4jTXQgQOixHxgW8J50sJp+ilVqsU6WQ7uEmPrf6nFFV5tvDzy3dhkra701g==
+X-Received: by 2002:a17:907:9691:b0:ae0:c6fb:2140 with SMTP id a640c23a62f3a-ae3500f374emr1085087666b.32.1751278898278;
+        Mon, 30 Jun 2025 03:21:38 -0700 (PDT)
+Received: from localhost (2001-1c00-3b8a-ea00-c4de-d39d-05f4-c77a.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b8a:ea00:c4de:d39d:5f4:c77a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a95esm649858666b.59.2025.06.30.03.21.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 02:55:02 -0700 (PDT)
-Message-ID: <f4fc05a3-e6b3-4951-bbb6-370d3e2e68d0@cryptogams.org>
-Date: Mon, 30 Jun 2025 11:55:01 +0200
+        Mon, 30 Jun 2025 03:21:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] crypto: riscv/poly1305 - import OpenSSL/CRYPTOGAMS
- implementation
-To: Eric Biggers <ebiggers@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>
-Cc: Zhihang Shao <zhihang.shao.iscas@gmail.com>,
- linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
- herbert@gondor.apana.org.au, paul.walmsley@sifive.com, alex@ghiti.fr,
- zhang.lyra@gmail.com
-References: <20250611033150.396172-2-zhihang.shao.iscas@gmail.com>
- <20250624035057.GD7127@sol>
- <48de9a74-58e8-49c2-8d8a-fa9c71bf0092@cryptogams.org>
- <20250625035446.GC8962@sol>
- <CABCJKudbdWThfL71L-ccCpCeVZBW7Yhf3JXo9FvaPboRVaXOyg@mail.gmail.com>
- <fa13aa9c-fd72-4aa3-98bc-becaf68a5469@cryptogams.org>
- <CABCJKucHNWz6J9vvDvKh_Je8eQTJO_1r0f6jsDTsDmfaxdBygg@mail.gmail.com>
- <20250627215151.GA1194754@google.com>
-Content-Language: en-US
-From: Andy Polyakov <appro@cryptogams.org>
-In-Reply-To: <20250627215151.GA1194754@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 30 Jun 2025 12:21:36 +0200
+Message-Id: <DAZSK2NT6TAT.1N6A4I8ETH92W@fairphone.com>
+Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-pm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+ <linux-mmc@vger.kernel.org>
+Subject: Re: [PATCH 14/14] arm64: dts: qcom: Add The Fairphone (Gen. 6)
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Konrad Dybcio" <konrad.dybcio@oss.qualcomm.com>, "Will Deacon"
+ <will@kernel.org>, "Robin Murphy" <robin.murphy@arm.com>, "Joerg Roedel"
+ <joro@8bytes.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
+ "Manivannan Sadhasivam" <mani@kernel.org>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ "Vinod Koul" <vkoul@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>,
+ "Konrad Dybcio" <konradybcio@kernel.org>, "Robert Marko"
+ <robimarko@gmail.com>, "Das Srinagesh" <quic_gurus@quicinc.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, "Jassi Brar" <jassisinghbrar@gmail.com>,
+ "Amit Kucheria" <amitk@kernel.org>, "Thara Gopinath"
+ <thara.gopinath@gmail.com>, "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+ "Zhang Rui" <rui.zhang@intel.com>, "Lukasz Luba" <lukasz.luba@arm.com>,
+ "Ulf Hansson" <ulf.hansson@linaro.org>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
+References: <20250625-sm7635-fp6-initial-v1-0-d9cd322eac1b@fairphone.com>
+ <20250625-sm7635-fp6-initial-v1-14-d9cd322eac1b@fairphone.com>
+ <4200b3b8-5669-4d5a-a509-d23f921b0449@oss.qualcomm.com>
+ <DAXA7TKVM4GI.J6C7M3D1J1XF@fairphone.com>
+ <6d4e77b3-0f92-44dd-b9b0-3129a5f3785b@oss.qualcomm.com>
+ <DAXEA131KUXZ.WTO7PST1F3X6@fairphone.com>
+ <3fbae47b-d20d-426b-a967-b584e32b8c6e@oss.qualcomm.com>
+In-Reply-To: <3fbae47b-d20d-426b-a967-b584e32b8c6e@oss.qualcomm.com>
 
->>> Would it be sufficient to #include <linux/cfi_types.h>?
->>
->> Yes, but this requires the function to be indirectly called, because
->> with CFI_CLANG the compiler only emits CFI type information for
->> functions that are address-taken in C. If, like Eric suggested, these
->> functions are not currently indirectly called, I would simply leave
->> out the lpad instructions for kernel builds and worry about
->> kernel-mode CFI annotations when they're actually needed:
->>
->> # if defined(__riscv_zicfilp) && !defined(__KERNEL__)
->>          lpad    0
->> # endif
-> 
-> These functions aren't indirectly called, and I'm intending to keep it that way.
+On Fri Jun 27, 2025 at 5:34 PM CEST, Konrad Dybcio wrote:
+> On 6/27/25 4:44 PM, Luca Weiss wrote:
+>> On Fri Jun 27, 2025 at 4:34 PM CEST, Konrad Dybcio wrote:
+>>> On 6/27/25 1:33 PM, Luca Weiss wrote:
+>>>> On Wed Jun 25, 2025 at 4:38 PM CEST, Konrad Dybcio wrote:
+>>>>> On 6/25/25 11:23 AM, Luca Weiss wrote:
+>>>>>> Add a devicetree for The Fairphone (Gen. 6) smartphone, which is bas=
+ed
+>>>>>> on the SM7635 SoC.
+>>>>>
+>>>>> [...]
+>>>>>
+>>>>>> +&pm8550vs_d {
+>>>>>> +	status =3D "disabled";
+>>>>>> +};
+>>>>>> +
+>>>>>> +&pm8550vs_e {
+>>>>>> +	status =3D "disabled";
+>>>>>> +};
+>>>>>> +
+>>>>>> +&pm8550vs_g {
+>>>>>> +	status =3D "disabled";
+>>>>>> +};
+>>>>>
+>>>>> Hm... perhaps we should disable these by deafult
+>>>>
+>>>> Do you want me to do this in this patchset, or we clean this up later =
+at
+>>>> some point? I'd prefer not adding even more dependencies to my patch
+>>>> collection right now.
+>>>
+>>> I can totally hear that..
+>>>
+>>> Let's include it in this patchset, right before SoC addition
+>>> I don't think there's any pm8550vs users trying to get merged in
+>>> parallel so it should be OK
+>>=20
+>> Okay, can do. Disable all of them (_c, _d, _e, _g), and re-enable them
+>> in current users? I assume there might also be boards that only have
+>> e.g. _d and no _c.
+>
+> I suppose it's only fair to do so, in line with
+>
+> d37e2646c8a5 ("arm64: dts: qcom: x1e80100-pmics: Enable all SMB2360 separ=
+ately")
 
-In which case lpad will be executed as nops. Anyway, does 
-https://github.com/dot-asm/cryptogams/commit/e6ae2202268d995e78fa5d137dde992bdff1b8e8 
-look all right?
+Sounds good, I've prepared this change for v2.
 
-Cheers.
+>
+>
+>>>>>> +&usb_1 {
+>>>>>> +	dr_mode =3D "otg";
+>>>>>> +
+>>>>>> +	/* USB 2.0 only */
+>>>>>
+>>>>> Because there's no usb3phy description yet, or due to hw design?
+>>>>
+>>>> HW design. Funnily enough with clk_ignore_unused this property is not
+>>>> needed, and USB(2.0) works fine then. Just when (I assume) the USB3
+>>>> clock is turned off which the bootloader has enabled, USB stops workin=
+g.
+>>>
+>>> The USB controller has two possible clock sources: the PIPE_CLK that
+>>> the QMPPHY outputs, or the UTMI clock (qcom,select-utmi-as-pipe-clk).
+>>=20
+>> So okay like this for you, for a USB2.0-only HW?
+>
+> Yeah, maybe change the comment to something like:
+>
+> /* USB 2.0 only (RX/TX lanes physically not routed) */
+>
+> to avoid getting this question asked again
+
+Ack
+
+/* USB 2.0 only, HW does not support USB 3.x */
+
+Regards
+Luca
+
+>
+>>> Because you said there's no USB3, I'm assuming DP-over-Type-C won't
+>>> be a thing either? :(
+>>=20
+>> Yep. I'd have preferred USB3+DP as well since it's actually quite cool
+>> to have with proper Linux. On Android, at least on older versions it's
+>> barely usable imo. Can't even properly watch videos on the big screen
+>> with that SW stack.
+>
+> Bummer! Not something we can change though :(
+>
+> Konrad
 
