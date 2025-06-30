@@ -1,158 +1,483 @@
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD02289E00;
-	Mon, 30 Jun 2025 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD83257AF0;
+	Mon, 30 Jun 2025 14:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751291661; cv=none; b=b3NHDH2H6EQ0mCSGyah1FjQB5IKN06NU+nYzjRtzb/sc9Ria352x1Ul/+eVvIIw8CNhqU7F+pgs1P31ZjdF+TbcedZPeAKBssHBE18vkqq2RI0KxUCfNJUmhGwQF5Nx73JA0a46DZK/HWjzWEY81OB3b4bGuv1gvk1UgZjDqyRY=
+	t=1751294334; cv=none; b=cKTJOdG5w7vHgRl2jS6DKJhATnlu1hljzV3RLqhNaZbEwvbw3ciLkHM0ABwcO3UEeIHrs5IVhLtPBk7duteEW1Un8nbSx4LTi5ToZQCiLWrjYVuagHgpRS3KAg4Lply1zK7SlEy50iz2U3wVm4f8oBA45FPXBh748QQhSXmxNpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751291661; c=relaxed/simple;
-	bh=XDIHXs4K7QWZcdabHUjQZzHGSYnnwRmcj9GQSvFWMks=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=t84sjE7VE0SB3VROJzaOkbZyghVoKWN7+R8pNiVP32zgnsWsXJ2dg6vdwpzz2Tp+Mbnazg2qDv4XutXUqaM0GMbvwjpre0cdB6xiYU0nSUIclkSMaEBqoP/yLlx8HlC1xMFedBErKWRmCloJ/inHl3pq2cUyCq8eUdOpiB86Sbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=HCpLW8xs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VlNd4II1; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1751294334; c=relaxed/simple;
+	bh=H1eGsfDh2XvEyiDLmFiwfZKwF4b7/9liBP37HpQIPCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o58X5v+QcYIFnI8YDAYUTd4+UQV6go8OrbCRbsiHpNiDCJX3ysMKHGrrVmDNfyZq5rt+61S9vkpjp6RaXB+iD4QSEXQN2OXbkw4+vh7ZaC6bfA3wySmJ/QU6eMn62kqaMCqLIiQPQYKiH7rW9+yXIqTC+3BymJesCPFL3J95k40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=im3lzhqG; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="HCpLW8xs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VlNd4II1"
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A41121400028;
-	Mon, 30 Jun 2025 09:54:16 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Mon, 30 Jun 2025 09:54:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1751291656;
-	 x=1751378056; bh=ik9oLe3KdALkxzKl69BBxlmJ8fpBBAh4pU7+UUhNIAg=; b=
-	HCpLW8xsF3EqejqRsdi4yjCzmlUTcGMoILiaKStETiAgoeykxvH8DpcWVyDgi7Zg
-	xX02l5ZTYkqo0QruDwzfQ++5RSoiqmz/kHiUUCOZiZA08maMoMNRBu4J0utGZaNS
-	TAFlOugGZqywPfBPzLWLK8CWreEh1ZpUQzLjUTy0KWh+FPWLM4HYflHiOyNjrWRp
-	M8ZaCKazgSGEfxTTuGveC6KrQEa0u/8GjsPXe85rOhttDPhXR8uogkwPdASMucj8
-	cjjdAgCA0JdmkfkfqRiP24v2d4N7x9f1V8PnIoLYLRQIBjAl4zCFd7nONXkI9Ech
-	FdRZ+inK4k7w8NzMsqM86Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1751291656; x=
-	1751378056; bh=ik9oLe3KdALkxzKl69BBxlmJ8fpBBAh4pU7+UUhNIAg=; b=V
-	lNd4II1MEchvr393QhsqIMCypt8IeM8qeUKvGbO0Qq7Wy2w+ub3YgnUiT0mQ12FX
-	KF0q7wdPAn4E8Nf8hsS68cO3yock4OkiY4SQNaeDwGZwTX7+OUcxsGWZabCcpoqR
-	82mkry5p9IJHYDpnFQLQ60+rrZPg6O2OCS6gDDjtx+EywTTMjcSgJwg+1BhPqmGe
-	PpnSeLcYKRPmzR7KJHgEn8S2pEiY1ZWOJCucyk2cxBYIfbcYxwTM5cdAFrU3T/YU
-	sJK78LjTadM0IPbp4mu0dum9PnEdbzR28u75DTplu97uq3ZuQIAUe6hTtQiR2ybY
-	J7hVufrDRH7au8tk+7P8g==
-X-ME-Sender: <xms:BpdiaGUGolou3QitfZg4BLCqsIQsIym4YCDRZA9BPbVpjvQSFuKbOw>
-    <xme:BpdiaCmTzevwMOgsbNp3SurxN3fnfZd5hxQ7tFPxER-J8eWckiPqYPWHZeCXCn0bM
-    4_Dpna6uxf0VicV6Rk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduudekjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpedvhfdvkeeuudevfffftefgvdevfedvleehvddvgeejvdefhedtgeegveehfeeljeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtoheptggrthgrlhhinhdrmhgrrhhinhgrshesrghrmhdrtghomhdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohephhgvrhgs
-    vghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegrnhguih
-    drshhhhihtiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghrohhonhhivgeskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepvhhkohhulheskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepfihilhhlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgr
-    rhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtth
-    hopegurghnihgvlhdrmhgrtghhohhnsehmihgtrhhotghhihhprdgtohhm
-X-ME-Proxy: <xmx:BpdiaKbW6kc3JjXJ_iF119Z2xF0TlpEZ7lZv-75taKItFXsh-Sj_Kg>
-    <xmx:BpdiaNX0wbV-b97Hre_u0SVfDSlOMJRgglPNtNh2F29eDDO-Qa2eMw>
-    <xmx:BpdiaAlhLEy218q7zgCoW-E8vY34X4w3snX9RIYXQv1AhPnnKNE1fQ>
-    <xmx:BpdiaCcDRhGlfi-Q6gHErHIhH-4Zlz1pe68U_7yL8dniJdgtiN14hw>
-    <xmx:CJdiaJYx9N4gSrfOr2NmNnOFHFvyapVyNj7lgmg6DXrTQTvDl3ADYuH->
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id CBC52700063; Mon, 30 Jun 2025 09:54:14 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="im3lzhqG"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UBTLdx012368;
+	Mon, 30 Jun 2025 14:38:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=c1SmB9aoBUHSFNebQ
+	ceGRLZxih19kgNxmRy29E7i8/Q=; b=im3lzhqGMxLzmiBzGlTPn6dywk4PpZ98A
+	ycFd5eMsSeU/iWkn171VydXEfa1qark1aSA30xXbG2BVy+sTX+1pktP93du/4Zyt
+	41gNoz11ZvH7C5KCpDtMzrcRXo2zWrOn68TYPbapI8t0lPsbjA4p8QwMZqGiIyTH
+	g9KrJCcY9cj9yUezNKGdmZrXSZmkQIf8Vh9+eovHOoPJwEI852PQCX348638OizA
+	4VlrCrx214fdPUTsK0PYEFwTdQuIzl8V3nxCEYcChELckWKcehyqKMK+8O53F18j
+	XcZiS27+nM54/qxNCu4cx1FyiFUYBNEvdEpChGGBN9GIHDyxwfWuw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fhr65-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Jun 2025 14:38:46 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UB733X021371;
+	Mon, 30 Jun 2025 14:38:45 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe35yb0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Jun 2025 14:38:45 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UEcisd43909396
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Jun 2025 14:38:44 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CB0258059;
+	Mon, 30 Jun 2025 14:38:44 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B9A6158058;
+	Mon, 30 Jun 2025 14:38:43 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 30 Jun 2025 14:38:43 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, James.Bottomley@HansenPartnership.com,
+        dhowells@redhat.com, simo@redhat.com,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v2 2/4] crypto: Add shake128/256 to generic sha3 module
+Date: Mon, 30 Jun 2025 10:38:32 -0400
+Message-ID: <20250630143834.2748285-3-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250630143834.2748285-1-stefanb@linux.ibm.com>
+References: <20250630143834.2748285-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Tad13d72cbf59a799
-Date: Mon, 30 Jun 2025 15:53:54 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Robert Marko" <robert.marko@sartura.hr>
-Cc: "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Olivia Mackall" <olivia@selenic.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, "Vinod Koul" <vkoul@kernel.org>,
- "Andi Shyti" <andi.shyti@kernel.org>, "Mark Brown" <broonie@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org,
- "Pengutronix Kernel Team" <kernel@pengutronix.de>, ore@pengutronix.de,
- luka.perkov@sartura.hr, "Daniel Machon" <daniel.machon@microchip.com>
-Message-Id: <3e522dcc-3b68-4137-bd3a-dcc2c889dbd3@app.fastmail.com>
-In-Reply-To: 
- <CA+HBbNFd5hCKqUZY25Sws-o-0QALLue-JROyze_9biyuZZv4mg@mail.gmail.com>
-References: <20250613114148.1943267-1-robert.marko@sartura.hr>
- <3ba837f8-70bb-4b9e-a9f9-0e71b9e073c4@app.fastmail.com>
- <CA+HBbNFd5hCKqUZY25Sws-o-0QALLue-JROyze_9biyuZZv4mg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/6] arm64: lan969x: Add support for Microchip LAN969x SoC
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: eo-JcFUep7AhLykOG3knCDNuwIIDxXy7
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDExNyBTYWx0ZWRfXzze742ORF/hP gEq4q+elVWBhC9GAu9buFclzaY5miEG9dKhD/T3WmVWLwR8JV4DBL8wGAJ4JnjM4VHyT147m0qT SV4AQuvG9+WGKie+m4IZ1FizFudrtxRbhLddnoSH5kWgPVddCGNtJBK2B++pCIkjVAuSvDD4UON
+ qCRNmsKUL5XDYnhRGvZO5iCHB2anAvlPrLvsL1p7y4cbzuJ0zau5dg+VeFSxOaIU1zZHNKjPmkH kRTo+DLq5QfMxzvXjo3c9jIFqRBEDfJOmvEqGchhSVCfTt3CB+DjGcIapibNX9S+yncHiFxFv+P QP23XzYbjLODiQhgumDpUO4Qoaj/pTX5/5mcfyYkw2zn5Rzi9+VlKHjIA2+GZzr6uTYCJVUEdqK
+ vd615lAzTSvE8V78IQ7V8zuN5tEOyRdUlgea10Ed46eVNix55qmyBjI+s1uGVXs/hKBvlsdH
+X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=6862a176 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=7PqV0hYhwxvHinq54jsA:9
+X-Proofpoint-GUID: eo-JcFUep7AhLykOG3knCDNuwIIDxXy7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-30_03,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506300117
 
-On Mon, Jun 30, 2025, at 15:21, Robert Marko wrote:
-> On Mon, Jun 16, 2025 at 8:34=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
-wrote:
->> On Fri, Jun 13, 2025, at 13:39, Robert Marko wrote:
->>
->> If the drivers on ARCH_LAN969X are largely shared with those on
->> ARCH_AT91, should they perhaps depend on a common symbol?
->>
->> That could be either the existing ARCH_AT91 as we do with LAN966,
->> or perhaps ARCH_MICROCHIP, which is already used for riscv/polarfire.
->
-> Hi Arnd, I thought about this, but I am not sure whether its worth it
-> since we need LAN969x arch anyway for other drivers that currently
-> depend on LAN966x or SparX-5 but will be extended for LAN969x (I have
-> this already queued locally but need this to land first).
+Extend the sha3 module with shake128 & shake256. For this, implement
+functions to get (squeeze) a number of bytes or blocks from the keccak
+sponge. A block here corresponds to the number of bytes available in the
+state buffer following a keccak permutation. On top of this functionality
+implement the general squeeze function that returns a requested number of
+bytes to the caller. Implement the 'final' function on top of the squeeze
+function. The 'final' function will always request a fixed number of bytes
+from the squeeze function and set the 'final' parameter to true, clearing
+the state of the hash as usual.
 
-I think in that case we would want one symbol for all of the above.
-We have a couple of cases where there multiple SoC product families
-get handled by a shared config symbol to make life easier for the
-kernel:
+Adjust the maximum hash description and block sizes due to shake128.
 
-- ARCH_IMX contains multiple chip families that are now owned
-  by NXP but that have a complex history with acquisitions and
-  product families that mix-and-match IP blocks, similar to
-  Microchip
+Extend the arrays for supported hashes with entries for shake128 and
+shake256.
 
-- ARCH_EXYNOS contains chips from Samsung, Google, Tesla and Axis
-  that all share a lot of components because they are all based on
-  Samsung designs
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/hash_info.c             |   4 +
+ crypto/sha3_generic.c          | 238 +++++++++++++++++++++++++++++++++
+ include/crypto/algapi.h        |   2 +-
+ include/crypto/hash.h          |   9 +-
+ include/crypto/sha3.h          |  19 +++
+ include/uapi/linux/hash_info.h |   2 +
+ 6 files changed, 268 insertions(+), 6 deletions(-)
 
-- ARCH_BCM contains several chip families that all started out
-  in Broadcom but actually share very few common components.
+diff --git a/crypto/hash_info.c b/crypto/hash_info.c
+index 9a467638c971..2e426be89463 100644
+--- a/crypto/hash_info.c
++++ b/crypto/hash_info.c
+@@ -32,6 +32,8 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
+ 	[HASH_ALGO_SHA3_256]    = "sha3-256",
+ 	[HASH_ALGO_SHA3_384]    = "sha3-384",
+ 	[HASH_ALGO_SHA3_512]    = "sha3-512",
++	[HASH_ALGO_SHAKE128]	= "shake128",
++	[HASH_ALGO_SHAKE256]	= "shake256",
+ };
+ EXPORT_SYMBOL_GPL(hash_algo_name);
+ 
+@@ -59,5 +61,7 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
+ 	[HASH_ALGO_SHA3_256]    = SHA3_256_DIGEST_SIZE,
+ 	[HASH_ALGO_SHA3_384]    = SHA3_384_DIGEST_SIZE,
+ 	[HASH_ALGO_SHA3_512]    = SHA3_512_DIGEST_SIZE,
++	[HASH_ALGO_SHAKE128]	= SHAKE128_DIGEST_SIZE,
++	[HASH_ALGO_SHAKE256]	= SHAKE256_DIGEST_SIZE,
+ };
+ EXPORT_SYMBOL_GPL(hash_digest_size);
+diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
+index 41d1e506e6de..f90484464afd 100644
+--- a/crypto/sha3_generic.c
++++ b/crypto/sha3_generic.c
+@@ -29,6 +29,8 @@
+ #define SHA3_INLINE	noinline
+ #endif
+ 
++#define DOMAIN_SEPARATOR_SHAKE	0x1F
++
+ #define KECCAK_ROUNDS 24
+ 
+ static const u64 keccakf_rndc[24] = {
+@@ -218,6 +220,216 @@ static int crypto_sha3_finup(struct shash_desc *desc, const u8 *src,
+ 	return 0;
+ }
+ 
++static int crypto_shake_init(struct shash_desc *desc)
++{
++	struct shake_state *sctx = shash_desc_ctx(desc);
++	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
++
++	sctx->rsiz = 200 - 2 * digest_size;
++	sctx->rsizw = sctx->rsiz / 8;
++	sctx->partial = 0;
++	sctx->ridx = 0;
++	sctx->finalized = false;
++	sctx->permute = false;
++	memset(sctx->st, 0, sizeof(sctx->st));
++
++	return 0;
++}
++
++static int crypto_shake_update(struct shash_desc *desc, const u8 *data,
++			       unsigned int len)
++{
++	struct shake_state *sctx = shash_desc_ctx(desc);
++	unsigned int done;
++	const u8 *src;
++
++	done = 0;
++	src = data;
++
++	if ((sctx->partial + len) > (sctx->rsiz - 1)) {
++		if (sctx->partial) {
++			done = -sctx->partial;
++			memcpy(sctx->buf + sctx->partial, data,
++			       done + sctx->rsiz);
++			src = sctx->buf;
++		}
++
++		do {
++			unsigned int i;
++
++			for (i = 0; i < sctx->rsizw; i++)
++				sctx->st[i] ^= get_unaligned_le64(src + 8 * i);
++			keccakf(sctx->st);
++
++			done += sctx->rsiz;
++			src = data + done;
++		} while (done + (sctx->rsiz - 1) < len);
++
++		sctx->partial = 0;
++	}
++	memcpy(sctx->buf + sctx->partial, src, len - done);
++	sctx->partial += (len - done);
++
++	return 0;
++}
++
++/*
++ * crypto_shake_squeeze_blocks - squeeze whole blocks
++ *
++ * @sctx: shake context
++ * @out: pointer to output buffer pointer
++ * @nblocks: number of whole blocks to return in @out
++ */
++static void crypto_shake_squeeze_blocks(struct shake_state *sctx,
++					u8 **out, size_t nblocks)
++{
++	__le64 *digest = (__le64 *)*out;
++	size_t i, j;
++
++	for (i = 0; i < nblocks; i++) {
++		if (sctx->permute)
++			keccakf(sctx->st);
++		sctx->permute = true;
++
++		for (j = 0; j < sctx->rsiz / 8; j++)
++			put_unaligned_le64(sctx->st[j], digest++);
++	}
++	*out = (u8 *)digest;
++}
++
++/*
++ * crypto_shake_squeeze_bytes - squeeze arbitrary number of bytes
++ *
++ * @sctx: shake context
++ * @out: output buffer
++ * @n: number of bytes to return in @out
++ */
++static void crypto_shake_squeeze_bytes(struct shake_state *sctx,
++				       u8 *out, size_t n)
++{
++	size_t i, j, to_copy, loops, nblocks;
++	__le64 *digest;
++
++	if (sctx->permute) {
++		keccakf(sctx->st);
++		sctx->permute = false;
++	}
++
++	while (n) {
++		to_copy = min(8 - (sctx->ridx & 7), n);
++		while (to_copy < 8) {
++			for (i = sctx->ridx; i < sctx->ridx + to_copy; i++)
++				*out++ = sctx->st[i / 8] >> 8 * (i & 7);
++
++			sctx->ridx += to_copy;
++			n -= to_copy;
++			if (sctx->ridx == sctx->rsiz) {
++				sctx->ridx = 0;
++				if (n == 0) {
++					sctx->permute = true;
++					return;
++				}
++				keccakf(sctx->st);
++			}
++			if (n == 0)
++				return;
++			if (n >= 8)
++				break;
++			to_copy = n;
++		}
++		/* sctx->ridx is 8-byte aligned now */
++
++		if (sctx->ridx == 0 && n >= sctx->rsiz) {
++			/* whole blocks */
++			nblocks = n / sctx->rsiz;
++			crypto_shake_squeeze_blocks(sctx, &out, nblocks);
++			n -= nblocks * sctx->rsiz;
++			if (n == 0)
++				return;
++			keccakf(sctx->st);
++			sctx->permute = false;
++		}
++
++		to_copy = min(n, sctx->rsiz - sctx->ridx);
++		while (to_copy >= 8) {
++			loops = to_copy / 8;
++
++			digest = (__le64 *)out;
++
++			j = sctx->ridx / 8;
++			for (i = j; i < j + loops; i++)
++				put_unaligned_le64(sctx->st[i], digest++);
++
++			sctx->ridx += loops * 8;
++			n -= loops * 8;
++			if (sctx->ridx == sctx->rsiz) {
++				sctx->ridx = 0;
++				if (n == 0) {
++					sctx->permute = true;
++					return;
++				}
++				keccakf(sctx->st);
++			}
++			if (n == 0)
++				return;
++
++			out = (u8 *)digest;
++			if (n >= sctx->rsiz || n < 8)
++				break;
++
++			to_copy = n;
++		}
++	}
++}
++
++static void crypto_shake_finalize(struct shake_state *sctx,
++				  u8 domsep)
++{
++	unsigned int inlen, i;
++
++	if (sctx->finalized)
++		return;
++
++	inlen = sctx->partial;
++	sctx->buf[inlen++] = domsep;
++	memset(sctx->buf + inlen, 0, sctx->rsiz - inlen);
++	sctx->buf[sctx->rsiz - 1] |= 0x80;
++
++	for (i = 0; i < sctx->rsizw; i++)
++		sctx->st[i] ^= get_unaligned_le64(sctx->buf + 8 * i);
++
++	sctx->finalized = true;
++	sctx->permute = true;
++}
++
++static int crypto_shake_squeeze(struct shash_desc *desc,
++				u8 *out, size_t outlen,
++				bool final)
++{
++	struct shake_state *sctx = shash_desc_ctx(desc);
++
++	if (!outlen)
++		goto done;
++
++	if (!sctx->finalized)
++		crypto_shake_finalize(sctx, DOMAIN_SEPARATOR_SHAKE);
++
++	crypto_shake_squeeze_bytes(sctx, out, outlen);
++done:
++	if (final)
++		memset(sctx, 0, sizeof(*sctx));
++
++	return 0;
++}
++
++static int crypto_shake_final(struct shash_desc *desc, u8 *out)
++{
++	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
++
++	return crypto_shake_squeeze(desc, out, digest_size, true);
++}
++
++
+ static struct shash_alg algs[] = { {
+ 	.digestsize		= SHA3_224_DIGEST_SIZE,
+ 	.init			= crypto_sha3_init,
+@@ -262,6 +474,28 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+ 	.base.cra_blocksize	= SHA3_512_BLOCK_SIZE,
+ 	.base.cra_module	= THIS_MODULE,
++}, {
++	.digestsize		= SHAKE128_DIGEST_SIZE,
++	.init			= crypto_shake_init,
++	.update			= crypto_shake_update,
++	.final			= crypto_shake_final,
++	.squeeze		= crypto_shake_squeeze,
++	.descsize		= sizeof(struct shake_state),
++	.base.cra_name		= "shake128",
++	.base.cra_driver_name	= "shake128-generic",
++	.base.cra_blocksize	= SHAKE128_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
++}, {
++	.digestsize		= SHAKE256_DIGEST_SIZE,
++	.init			= crypto_shake_init,
++	.update			= crypto_shake_update,
++	.final			= crypto_shake_final,
++	.squeeze		= crypto_shake_squeeze,
++	.descsize		= sizeof(struct shake_state),
++	.base.cra_name		= "shake256",
++	.base.cra_driver_name	= "shake256-generic",
++	.base.cra_blocksize	= SHAKE256_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
+ } };
+ 
+ static int __init sha3_generic_mod_init(void)
+@@ -288,3 +522,7 @@ MODULE_ALIAS_CRYPTO("sha3-384");
+ MODULE_ALIAS_CRYPTO("sha3-384-generic");
+ MODULE_ALIAS_CRYPTO("sha3-512");
+ MODULE_ALIAS_CRYPTO("sha3-512-generic");
++MODULE_ALIAS_CRYPTO("shake128");
++MODULE_ALIAS_CRYPTO("shake128-generic");
++MODULE_ALIAS_CRYPTO("shake256");
++MODULE_ALIAS_CRYPTO("shake256-generic");
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 188eface0a11..72c29dd1de9a 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,7 +20,7 @@
+  * static buffers that are big enough for any combination of
+  * algs and architectures. Ciphers have a lower maximum size.
+  */
+-#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_BLOCKSIZE		168 /* shake128 */
+ #define MAX_ALGAPI_ALIGNMASK		127
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 36b88d34c0dd..a94763913acf 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -177,14 +177,13 @@ struct shash_desc {
+ 
+ #define HASH_MAX_DIGESTSIZE	 64
+ 
+-/* Worst case is sha3-224. */
+-#define HASH_MAX_STATESIZE	 200 + 144 + 1
++/* Worst case is shake128 */
++#define HASH_MAX_STATESIZE	 200 + 168 + 5 * 4 + 4
+ 
+ /*
+- * Worst case is hmac(sha3-224-s390).  Its context is a nested 'shash_desc'
+- * containing a 'struct s390_sha_ctx'.
++ * Worst case is shake128
+  */
+-#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 360)
++#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 384)
+ #define MAX_SYNC_HASH_REQSIZE	(sizeof(struct ahash_request) + \
+ 				 HASH_MAX_DESCSIZE)
+ 
+diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
+index 41e1b83a6d91..cc393d06a8da 100644
+--- a/include/crypto/sha3.h
++++ b/include/crypto/sha3.h
+@@ -33,4 +33,23 @@ struct sha3_state {
+ 
+ int crypto_sha3_init(struct shash_desc *desc);
+ 
++
++#define SHAKE128_DIGEST_SIZE	(128 / 8)
++#define SHAKE128_BLOCK_SIZE	(200 - 2 * SHAKE128_DIGEST_SIZE)
++
++#define SHAKE256_DIGEST_SIZE	(256 / 8)
++#define SHAKE256_BLOCK_SIZE	(200 - 2 * SHAKE256_DIGEST_SIZE)
++
++struct shake_state {
++	u64		st[25];
++	unsigned int	rsiz;
++	unsigned int	rsizw;
++
++	unsigned int	partial;
++	u8		buf[SHAKE128_BLOCK_SIZE];
++	bool		finalized;
++	bool		permute;
++	unsigned int	ridx;
++};
++
+ #endif
+diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
+index 0af23ec196d8..97af74326d31 100644
+--- a/include/uapi/linux/hash_info.h
++++ b/include/uapi/linux/hash_info.h
+@@ -38,6 +38,8 @@ enum hash_algo {
+ 	HASH_ALGO_SHA3_256,
+ 	HASH_ALGO_SHA3_384,
+ 	HASH_ALGO_SHA3_512,
++	HASH_ALGO_SHAKE128,
++	HASH_ALGO_SHAKE256,
+ 	HASH_ALGO__LAST
+ };
+ 
+-- 
+2.49.0
 
-On the other hand, we have TI with its davinci, omap, omap2
-keystone2 and k3 platforms, or Marvell with orion, mvebu,
-pxa, mmp, octeon, octeontx, thunderx and thunderx2 platforms
-that overlap to varying degrees but use separate Kconfig symbols.
-
-Since you already have an ARCH_MICROCHIP used by one of the
-microchip platforms, the simplest approach seems to me to
-include at91, lan969x, lan966x and sparx-5 under that as well.
-You could just select that symbol from each of the four
-and then change any driver that is used by more than one of
-these families to use 'depends on ARCH_MICROCHIP' instead of
-listing them individually.
-
-I assume the mips based PIC32 and VCOREIII (ocelot/jaguar)
-are distant enough that they wouldn't share any drivers with
-the other families any more, but they could be put into that
-as well if that helps.
-
-     Arnd
