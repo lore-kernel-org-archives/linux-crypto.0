@@ -1,50 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D01D2900AD;
-	Mon, 30 Jun 2025 16:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3603191484;
+	Mon, 30 Jun 2025 16:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751299768; cv=none; b=LVoVWk9JZKSI4moBeJ9jm/vrSRlW6tS6fviY8vPgv6/zrXBlvRxyzk7Qf7edoa8aycL4b7GwObuhuR6PQUEMlKJOu1XjG4Q3G9QxViLlcRfvNuVeP6gpDoUPknwPNjKqNtUIGEXq4yUwsHDRCbOc0CLN0McE7fGR5S9hCm8aqtI=
+	t=1751300670; cv=none; b=Jx7U9/3+NWuL1ju7wpgZ+L+v23VIVe//t9tyPc+4S5ZiP27OliTEf4Lei4+ozse5nIBfbZtzyAYC0cqo0dauGX8xgEE8Kyh1KcjsWOG54HxYZobfFskBUrAgdvMth9D0qmXEmsB/5b2Hn9KauHth/ycB2fhAigN+twIGfEx5C88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751299768; c=relaxed/simple;
-	bh=pkoFPfsdz5mUfc5I4FK+MnyFLsCjGsnnD9jc5ME9fN4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Na8mjWQpbhI8bPB3kwceZxUUFP+pIR20reE4hxS3/rD3ByQCjpKOHc5Cwv9quMBhYwqPD4VHLfobEZh5tFmQwfc3igIT/di0iWSlvIUntBPenfD74Ep6gIGPW7S/YMqZ5fSjYbynoaLAUoAijI81qOLL9PzHA0w3nyNt3YyFlXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jnBxR32k; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751300670; c=relaxed/simple;
+	bh=aiWuN3GhqocDI35YBp5qTR55DHhbOh5tOWXvy8Qdgcc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SgbiAIEdu5ncc4W554zsAZaJj7qjTvU3mShLo5mYvu08JngDJ1Ono9wIXJ8JjhBu0t761Y4GxmYUNbjjko5A/4AVPxDlwoWRYZpdrpn9ohcIBbOP6uoLVvqcESG806s+BxMClhlpTNfAAXvGnVex/q3Pz7eFBetLBSM6hOvJ/VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnUaNgTr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jnBxR32k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC2DC4CEF3;
-	Mon, 30 Jun 2025 16:09:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnUaNgTr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20D01C4CEE3;
+	Mon, 30 Jun 2025 16:24:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751299767;
-	bh=pkoFPfsdz5mUfc5I4FK+MnyFLsCjGsnnD9jc5ME9fN4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jnBxR32keuveFDD/erORneyVQFZMExFVwQ2m1PRHBM8e09zhVEcpdxXezXwhIRIep
-	 1b/hAsrsEPE4GO34uoemDkgD6DfhLn2c+0We3yqTqkDW1Zdqk+usXyKw0ahpO/QyDk
-	 kq8OJiVNVNYv+79sZjwcLRLPE8u+AXxrFrb5rUo1EG4MgLQWKf4VRjl6PqF6ZW6RvL
-	 tO/4ewF4TqSoMw0NJ2cWpzPbScaI6j0B3laWfK7QYlGoz9vuy6ps6Y8wwL6bttBzRT
-	 i6YDWFUv5OhMZDpFhfE2wkKZC04+niDSZ+wBsXg2HLi3z3ji0M2HuML4L/kX6ufOLl
-	 sxIXnWBzurdOw==
+	s=k20201202; t=1751300670;
+	bh=aiWuN3GhqocDI35YBp5qTR55DHhbOh5tOWXvy8Qdgcc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DnUaNgTrFrd5oOvO/6bSOKTcJRGYb1m3IgxrWXMjQ8qV6dHtKS2r1V7FDscI7TLZ9
+	 7/SBtIZ2Bw62EgSgJ+1JXea1GgYOpgsogllqdf72Wlf/sL8uEXALO3KDlMAciWwCUQ
+	 L6e7czVtx3FcorhEPkyJenfU+EtPGpL/xbmYJpK1dAkB9Hv9/K4VQStsi8LYGeFk2J
+	 ElItXwJsm/GcdKFNdSd/Ruk2krjr8yuonuHHx6uT+nrRaIcFpavwsedaaeC1OJL8LD
+	 /tQxNcuwl8IklFsrj0JC5gOtL/M0vFWoggCEyDOTBdb31pNx3Jlj4LZuQLBh6ENBJ9
+	 yZO3J4h/KcptQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 14/14] lib/crypto: sha256: Document the SHA-224 and SHA-256 API
-Date: Mon, 30 Jun 2025 09:06:45 -0700
-Message-ID: <20250630160645.3198-15-ebiggers@kernel.org>
+Subject: [PATCH v3 0/2] KUnit tests for SHA-2 library functions
+Date: Mon, 30 Jun 2025 09:20:12 -0700
+Message-ID: <20250630162014.6463-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250630160645.3198-1-ebiggers@kernel.org>
-References: <20250630160645.3198-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,130 +43,63 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add kerneldoc comments, consistent with the kerneldoc comments of the
-SHA-384 and SHA-512 API.
+This series is also available at:
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- include/crypto/sha2.h | 76 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha2-kunit-v3
 
-diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
-index 2e3fc2cf4aa0d..e0a08f6addd00 100644
---- a/include/crypto/sha2.h
-+++ b/include/crypto/sha2.h
-@@ -153,17 +153,55 @@ void __hmac_sha256_init(struct __hmac_sha256_ctx *ctx,
-  */
- struct sha224_ctx {
- 	struct __sha256_ctx ctx;
- };
- 
-+/**
-+ * sha224_init() - Initialize a SHA-224 context for a new message
-+ * @ctx: the context to initialize
-+ *
-+ * If you don't need incremental computation, consider sha224() instead.
-+ *
-+ * Context: Any context.
-+ */
- void sha224_init(struct sha224_ctx *ctx);
-+
-+/**
-+ * sha224_update() - Update a SHA-224 context with message data
-+ * @ctx: the context to update; must have been initialized
-+ * @data: the message data
-+ * @len: the data length in bytes
-+ *
-+ * This can be called any number of times.
-+ *
-+ * Context: Any context.
-+ */
- static inline void sha224_update(struct sha224_ctx *ctx,
- 				 const u8 *data, size_t len)
- {
- 	__sha256_update(&ctx->ctx, data, len);
- }
-+
-+/**
-+ * sha224_final() - Finish computing a SHA-224 message digest
-+ * @ctx: the context to finalize; must have been initialized
-+ * @out: (output) the resulting SHA-224 message digest
-+ *
-+ * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
-+ *
-+ * Context: Any context.
-+ */
- void sha224_final(struct sha224_ctx *ctx, u8 out[SHA224_DIGEST_SIZE]);
-+
-+/**
-+ * sha224() - Compute SHA-224 message digest in one shot
-+ * @data: the message data
-+ * @len: the data length in bytes
-+ * @out: (output) the resulting SHA-224 message digest
-+ *
-+ * Context: Any context.
-+ */
- void sha224(const u8 *data, size_t len, u8 out[SHA224_DIGEST_SIZE]);
- 
- /**
-  * struct hmac_sha224_key - Prepared key for HMAC-SHA224
-  * @key: private
-@@ -273,17 +311,55 @@ void hmac_sha224_usingrawkey(const u8 *raw_key, size_t raw_key_len,
-  */
- struct sha256_ctx {
- 	struct __sha256_ctx ctx;
- };
- 
-+/**
-+ * sha256_init() - Initialize a SHA-256 context for a new message
-+ * @ctx: the context to initialize
-+ *
-+ * If you don't need incremental computation, consider sha256() instead.
-+ *
-+ * Context: Any context.
-+ */
- void sha256_init(struct sha256_ctx *ctx);
-+
-+/**
-+ * sha256_update() - Update a SHA-256 context with message data
-+ * @ctx: the context to update; must have been initialized
-+ * @data: the message data
-+ * @len: the data length in bytes
-+ *
-+ * This can be called any number of times.
-+ *
-+ * Context: Any context.
-+ */
- static inline void sha256_update(struct sha256_ctx *ctx,
- 				 const u8 *data, size_t len)
- {
- 	__sha256_update(&ctx->ctx, data, len);
- }
-+
-+/**
-+ * sha256_final() - Finish computing a SHA-256 message digest
-+ * @ctx: the context to finalize; must have been initialized
-+ * @out: (output) the resulting SHA-256 message digest
-+ *
-+ * After finishing, this zeroizes @ctx.  So the caller does not need to do it.
-+ *
-+ * Context: Any context.
-+ */
- void sha256_final(struct sha256_ctx *ctx, u8 out[SHA256_DIGEST_SIZE]);
-+
-+/**
-+ * sha256() - Compute SHA-256 message digest in one shot
-+ * @data: the message data
-+ * @len: the data length in bytes
-+ * @out: (output) the resulting SHA-256 message digest
-+ *
-+ * Context: Any context.
-+ */
- void sha256(const u8 *data, size_t len, u8 out[SHA256_DIGEST_SIZE]);
- 
- /**
-  * struct hmac_sha256_key - Prepared key for HMAC-SHA256
-  * @key: private
+This series adds KUnit tests for the SHA-2 library functions.
+
+Most of this code was originally part of my series
+"SHA-512 library functions".  I made a few updates in
+"SHA-256 library improvements".  As per the request from Linus that the
+tests be kept last on the branch for a separate pull request, I've
+reordered the history to add the tests last.  Thus this patch series.
+
+Testing strategy:
+- Each SHA variant gets its own KUnit test suite, but a header is used
+  to share most of the test code among the SHA variants.
+- Test against vectors generated by the Python hashlib and hmac modules.
+- Test incremental computation.
+- Test with a guard page to catch buffer overruns even in assembly code.
+- Test various overlap and alignment cases.
+- Compute hashes in task, softirq, and hardirq context in parallel, to
+  verify that the functions work as expected in all contexts and that
+  fallback code paths are exercised.
+- Test that the finalization functions zeroize their context.
+- Include benchmarks, guarded by a separate Kconfig option.
+
+Eric Biggers (2):
+  lib/crypto: sha512: Add KUnit tests for SHA-384 and SHA-512
+  lib/crypto: sha256: Add KUnit tests for SHA-224 and SHA-256
+
+ lib/crypto/Kconfig                    |   2 +
+ lib/crypto/Makefile                   |   2 +
+ lib/crypto/tests/Kconfig              |  25 +
+ lib/crypto/tests/Makefile             |   6 +
+ lib/crypto/tests/hash-test-template.h | 512 ++++++++++++++++++++
+ lib/crypto/tests/sha224-testvecs.h    | 470 ++++++++++++++++++
+ lib/crypto/tests/sha224_kunit.c       |  48 ++
+ lib/crypto/tests/sha256-testvecs.h    | 470 ++++++++++++++++++
+ lib/crypto/tests/sha256_kunit.c       |  48 ++
+ lib/crypto/tests/sha384-testvecs.h    | 566 ++++++++++++++++++++++
+ lib/crypto/tests/sha384_kunit.c       |  48 ++
+ lib/crypto/tests/sha512-testvecs.h    | 662 ++++++++++++++++++++++++++
+ lib/crypto/tests/sha512_kunit.c       |  48 ++
+ scripts/crypto/gen-hash-testvecs.py   |  83 ++++
+ 14 files changed, 2990 insertions(+)
+ create mode 100644 lib/crypto/tests/Kconfig
+ create mode 100644 lib/crypto/tests/Makefile
+ create mode 100644 lib/crypto/tests/hash-test-template.h
+ create mode 100644 lib/crypto/tests/sha224-testvecs.h
+ create mode 100644 lib/crypto/tests/sha224_kunit.c
+ create mode 100644 lib/crypto/tests/sha256-testvecs.h
+ create mode 100644 lib/crypto/tests/sha256_kunit.c
+ create mode 100644 lib/crypto/tests/sha384-testvecs.h
+ create mode 100644 lib/crypto/tests/sha384_kunit.c
+ create mode 100644 lib/crypto/tests/sha512-testvecs.h
+ create mode 100644 lib/crypto/tests/sha512_kunit.c
+ create mode 100755 scripts/crypto/gen-hash-testvecs.py
+
 -- 
 2.50.0
 
