@@ -1,350 +1,266 @@
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2045.outbound.protection.outlook.com [40.107.212.45])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B201622DFA3;
-	Mon, 30 Jun 2025 20:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751315029; cv=fail; b=KET8yIIFZ8fPMVkv1YNBqcW+IC1lYv89FtMX2hxflxb2Wqe4hEuIaNDNVLpZ8ZfkSegxaoS4ZxEdKMnL5CK+6CCEoiATvy3zvQBPr/uo5W9E4MOakJD3aBlVUUoYEQuLM97eFV0andr84b6/kjub6NMrJ8HuxlnKK6SljhfopNE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751315029; c=relaxed/simple;
-	bh=tZjsrv0CDUfoZKSrdgwDmlRaZ17KiMximC3uHKr4nxE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m7wkmOck+E3bGlCq73f9mgNLNFXeqtYw3Q7X6HhBxJhO6jMTjciRTg0CWAK6IDUPx+ChW2ii/+gnvTp3Co+bZRZMf/oLCCyEaioEf2ieFan1xVGQk61CI/2iYfIOR/6nuoIggahFCfEjJfKCTQ1Gz6RyFy87QRlucoSq0muwh7w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uPXYSA/Q; arc=fail smtp.client-ip=40.107.212.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4F2241CA3
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 21:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751320800; cv=none; b=O8p/nIMcfjK9alerunSR3HbpoePsk+QWBp6x6GX6PgoFU2XGGP5gHzgR7T/h9OJ9s508ZVpefLLHEpRGtyhcP9b6+HjnfywiDnJeSd+zYv3vJ+tNtM8zZjDJGlPv1nFqADbQUKgnXULx2mXvJhkZZdIE9yFdqp3EoaoK7Yr3Gzc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751320800; c=relaxed/simple;
+	bh=zuloaCZER//BFJaKOvxnCQbs1oE1h9o1l00traZvW+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rtYH4NPt8SpSsUJT09CeagxpcHxjkHJehNaxsP+cu/4pP9YCEI0cqWhJftH2kgYJ+176E7jitKBXK+I/bdMrzHnR6dlmbjKF6JwyGUUBoCgZ/Cg6T/P3uT9oZ9prWn2AFX0H4vB1BP8xq9b4rJx+22ADMU6/R3sY2FWJVZgI4vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=et1/w5/J; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uPXYSA/Q"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W38AV65olztgEIPA5Zy0zq6PumJKj4XBVusQ/Tu3KN0XF9GdQ0uVE1AgF4VrVCoaffCigJ4jo9ui+BMCJ8eyrzgnj4iJeCcUSezMkKtRLx1tKX2voBlxAx1yJgGOpYroxJoUEhPGUrF4nhwJ7UCKrOnYPb+lZ6HOXyNV+Lrixb0r2hAbp5G0bGTZQmh+s29CRLKg3UclkUPirg0f3hTOdeXjElmT5hiGPDSw7qs4N9Sb8q7Fy6XY9UEkqYYi1LjI7Wh8iAWMgeho/mGL5RiTuyRL6KVCzboYOPAX1ffimEjrg68UsHvOwtFrcNzdhtomx16y0kZCxN6Rwgt5ClWPGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QSIFxt2WmIFz6GuX48ivuWEAaoQ+LwvOKDkfBPZTNuI=;
- b=Ojg1I4RpM3vUhypwwAGC6xspeI0QniWv0k0OVCfYulkNL7cwHrnFt3PaxsuccFmevaBbYkVXJhS2KBb/uymvnYm9BSTY8K07wuqyrZK3MOitsXitKUpmNkhxnO9T2gAtbI2SIRsaa72Oe1H5Nk8qmqr11nxYbGn9LVZkGjG9kiAUPIw5w1d87McuIqq3Cm63u5Qd6wvOI79DXqdoGexHulRLpB4U2lY9dMaEs9mAcnr6rI+JyFHPR5oPHm0tOAakimVe+JVxR7sIP36CRvfNK6roEIhoxJSQTtRcCcA49e13X/+WjnT/GdbhMnQQEQcfBMhSE4l0l/NgNnh6/JMBVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QSIFxt2WmIFz6GuX48ivuWEAaoQ+LwvOKDkfBPZTNuI=;
- b=uPXYSA/Q6cdRp6z6SoMNk9xP54gu5O+NVLsXr8HJc1ySOM5joOEMkZIGQqNn/jMp3aWQNCCkaoKOZ+Onnv7PbRBhUeaxzwCGaFhMUABL7aX5od4gPplqjyRm1IVO2rQMVk8coNpBxisxU9cXJKAAmSqRi8sN7/bGVwbMHJhdgcU=
-Received: from SJ0PR13CA0092.namprd13.prod.outlook.com (2603:10b6:a03:2c5::7)
- by CY8PR12MB9033.namprd12.prod.outlook.com (2603:10b6:930:71::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.17; Mon, 30 Jun
- 2025 20:23:38 +0000
-Received: from SJ1PEPF0000231F.namprd03.prod.outlook.com
- (2603:10b6:a03:2c5:cafe::8d) by SJ0PR13CA0092.outlook.office365.com
- (2603:10b6:a03:2c5::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.19 via Frontend Transport; Mon,
- 30 Jun 2025 20:23:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF0000231F.mail.protection.outlook.com (10.167.242.235) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8901.15 via Frontend Transport; Mon, 30 Jun 2025 20:23:38 +0000
-Received: from ellora.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 30 Jun
- 2025 15:23:36 -0500
-From: "Pratik R. Sampat" <prsampat@amd.com>
-To: <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <ashish.kalra@amd.com>,
-	<thomas.lendacky@amd.com>, <john.allen@amd.com>,
-	<herbert@gondor.apana.org.au>, <bp@alien8.de>, <michael.roth@amd.com>,
-	<aik@amd.com>, <pbonzini@redhat.com>, <seanjc@google.com>, <prsampat@amd.com>
-Subject: [PATCH 1/1] crypto: ccp - Add the SNP_VERIFY_MITIGATION command
-Date: Mon, 30 Jun 2025 15:23:19 -0500
-Message-ID: <20250630202319.56331-2-prsampat@amd.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250630202319.56331-1-prsampat@amd.com>
-References: <20250630202319.56331-1-prsampat@amd.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="et1/w5/J"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UFrZij029593
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 21:59:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=j5Bn6WtEbimwKYIt4/ZjgnbS
+	pY9GsCsqCOMb7LdunEU=; b=et1/w5/JkJ7dXjXHYCkG8PGJ0gnTKCmfuMUAHgEo
+	HMusIxEdMGHLVJMBvRXcHeFJ0IU8yHu338YA+kKlJ8zoqUKay/z8lRaXyYA5xXQe
+	TvnFe7sGzVvRjLokMOAw9kZDHFwXOY0Y0VWk5XtDY5ivwcpJOldPKRyo0jsu82W1
+	67+g32o0eWSyLsW7C+lEHxRGzbCq8ncj10DBJcBvDfY5E/VHglRmsaJDBguRp+s7
+	tcQINy6lXufuwmV5jYBFBFKJHeiXSGnUQYng1bF6DrIdzL7T+BseAAMVuz0GKOTu
+	wwQiYhV6I7cl5nv7Eb2HThnTgr28MTwHHOVMFmYjdqxN8g==
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47j95hx5cg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 21:59:56 +0000 (GMT)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-315af08594fso2531545a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 14:59:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751320794; x=1751925594;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j5Bn6WtEbimwKYIt4/ZjgnbSpY9GsCsqCOMb7LdunEU=;
+        b=Olz1+0McFx2KZam1Mc67mF3P6iIwljCkmuZ3O8Eu20tHHp776cIgM6NLd5jlckNXm0
+         IK5F8q6arJNI78mzwsg+j2UgZiaDkqRIs+tGrPFSIKS3pywZArKb6DXEaSsVxWrfj29W
+         UBPzzXi2RDMxY07g1j3hU9A4L6yt+Clu+DrfBDkxBdRkki8XkF1kwwZRd1uNeUXh25qG
+         lMFRHljI0AJpuHzwtP/Ky5ISpQH10hPx77Its9f5hmEVxW7uFg0nuxXnoWuLNBdDzk+o
+         ch8RB6m6MBxC3CjrfUKVp6ujRsaCiYWODFXtM5Yti/VUI8OLIj1+I7Gmr2WpWQGgLA/5
+         gRhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaEHZ8i2FjMNIIltt0nxa92f4JkTm81uYcizve+Q4q3gepuBjdVAzCuf1TPeRxfiYybztua7izpKt2sL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY7y4HbtH52ytrBIGlbuqbH3sTnaD+DeA5H7tScwvd1GvPZpkH
+	tNbM1fTnsAVohi5Q95JXpGmP99M/yDO0hLqvFZ7Mys6tsuYfufBxcynktH/RL2xJkeFO3Il0MKA
+	UN2BslZYsjR2PJ+c1GwgLjLjeOWyzcTkkLhW1mGJqraMKV03aiynkQLbQk7dR33Zodzk=
+X-Gm-Gg: ASbGncvTSl54z6dhLesJ0eudUOrXt+5MRRnECOs9pAHre8IL+FO1ji6XcKfe/Nc73iv
+	hAfQ/Ef/qNF97lZZfvz1RkdD7qC22ALpQ9cGoFAy2jtb/Mi/gmru5e+rUTQaGXW7pKr5Zn9GbSE
+	MRC1EUbPGqdfxxR6kcWaldgZvxvBp6uMQ8mnoK6/erI+YOVjlp714xB/MQa8ac94Vs+Ki30sZ0I
+	UWjl3pncVKJ4gM1urI3pusfVT0082uO1JgHzs+7hT67+2xOYbCaMqLAnXdm9/HjehHp555hXy7z
+	AlKDLsi8eufEyjcSpu8i8IX/NKv7+Qglqei+5HTX5ypN9MoSTZUweZEA7JYhjb27J3QjpFrMvg2
+	HDIbNHA==
+X-Received: by 2002:a17:90b:268d:b0:312:e91c:e340 with SMTP id 98e67ed59e1d1-318c9283adfmr21494833a91.35.1751320793803;
+        Mon, 30 Jun 2025 14:59:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGb3EC+ajrtLWff/5gPWkKDnqD5kFdfXbHl7+2iA8bxSslPgNcBKF5TWjxSHHYgk8wAF+S2XQ==
+X-Received: by 2002:a17:90b:268d:b0:312:e91c:e340 with SMTP id 98e67ed59e1d1-318c9283adfmr21494807a91.35.1751320793324;
+        Mon, 30 Jun 2025 14:59:53 -0700 (PDT)
+Received: from hu-bjorande-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f542661asm14131485a91.26.2025.06.30.14.59.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 14:59:52 -0700 (PDT)
+Date: Mon, 30 Jun 2025 14:59:49 -0700
+From: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Robert Marko <robimarko@gmail.com>,
+        Das Srinagesh <quic_gurus@quicinc.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 00/14] Various dt-bindings for SM7635 and The Fairphone
+ (Gen. 6) addition
+Message-ID: <aGMI1Zv6D+K+vWZL@hu-bjorande-lv.qualcomm.com>
+References: <20250625-sm7635-fp6-initial-v1-0-d9cd322eac1b@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF0000231F:EE_|CY8PR12MB9033:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9593ff5-20f4-40d7-8f84-08ddb813ff3e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xhk0rcH9CeXxdMwGZ98SRET3c+IRP+ZaPlZHo/0LC2/Ka9ChxZcU4LbAQJ8R?=
- =?us-ascii?Q?kNdPJgbb50eh7VYQRM4cisFJjVTTk3wwKzuP21EOr5jVgjZSIgR0NZHVUDdN?=
- =?us-ascii?Q?7lTE8D0huPevlkPSoxw5D7ELmtJEYH2pOl6EVyrVjzfs5QOKGYjioIz8byCe?=
- =?us-ascii?Q?pNsN9QOJ5TAlynErUebPI5Q+kkah5daXRpu/lMMB3/z2ZOxn1F8z3gao0uFk?=
- =?us-ascii?Q?f22t4Guc5obDjm2N69uF3DsaZYSJ86E5/quYRjSogd2YbR2Z7yRXWeYWd/DA?=
- =?us-ascii?Q?HvHn+PU7NrV6O78mIzmcnU+0S4YRKY6pQBfFFWZASoHIXwht91tyQVhYHzF6?=
- =?us-ascii?Q?kfm5c/a6Z39O6JgkB6Yd7vytEZQOLCU2EAdPmsPAu0oaIgnI5gR++QFpEtCd?=
- =?us-ascii?Q?SyUh/nlsPGvQ7gOQc+LujfPJSvTUjPswYOV1rtk+tgR5ka/mvR/nXF2AbMgf?=
- =?us-ascii?Q?O7NwgBNkBn/ujSLcUOON95yLy1kN8Y5phxLGJOINv8XcTFoOvApBlel7ADo3?=
- =?us-ascii?Q?+LK4ouslTguf5T7WTShuFEEAVwEG7LB4lUngVoI1lWkvKEd+S827XKZWGDYF?=
- =?us-ascii?Q?RMA7CCyDLaC1LX4MQ7ElFcfho/Q7s7uOzXDbxj63oNK2C54FBlqIlGyfwXRj?=
- =?us-ascii?Q?7QpNnYvTAIK+b2svmW9LzzFRrDd/ppqG/gSSrJQ30ltp9lj3ilsGTxl3zalt?=
- =?us-ascii?Q?UY5RJqlmEKiYKVFlVdTG3IyNmdRmR9WDWvLwMrcWA8A2sTwMbILGkY3q1vhO?=
- =?us-ascii?Q?m7UuEGXzdJu59u4MEwOOQRTyPaO+3pj8D8N7YyEWCBHQQcdoNzxA0aS78AWg?=
- =?us-ascii?Q?PCInlW2ympQ7a9Z2w4VBe7jRWLnV2jqJEJqeA/3ojoU+bfAxGYcmBrPNZvlS?=
- =?us-ascii?Q?doJXDqbnCYIXA0Dix4/Pzmz2ja3RBU66czOdfR+QuWphKJlzzBZcLDXQq4es?=
- =?us-ascii?Q?MY6+4lP6onbh2/AmHZX21V/kI3DErFTRqkW8XMD0e2+YMo+6avYHPXh+2hIC?=
- =?us-ascii?Q?UQOtYhbXPHafowOtB5OZVxxTSo6g33IklmB4fZA7vJ00BYSaaRbt8niOMnWf?=
- =?us-ascii?Q?Xu7C1LfE9GPGSrV7/cXW3J0L0c5YL61exbtnXhcu2Rhb2S9SK2SjbyPeUf9b?=
- =?us-ascii?Q?zwyjCDezn11f2cCZvbawMpjsIGAhAg60Q7wfv+Ll3UcwCxhWRwzAFh4AGUYq?=
- =?us-ascii?Q?EVgsjKaIZrnoprHCBjPxfJ9PblCVSSIaHb7bxgJDnAuxwz2t2h1Tv+RLRguU?=
- =?us-ascii?Q?tQ/JKdPGvpLLBWy4uqbpWuDPUPdf3IAUjQIu/8WIWWzQm0MNdSvVExJueWnu?=
- =?us-ascii?Q?auzCypAuGfCfr5aOuDzow42+FdoVynsNFA+NjwgybEsSibGN8K3gkM6tJZN1?=
- =?us-ascii?Q?+7v1onal/DZLMtGpKoLM/HStG8frBp3e3CxDDAZYyKJT/0itFhpYs0jyMIPM?=
- =?us-ascii?Q?/p++Dyqa1M/PUwlEJgxhyAoezPwfed+SHYaNpEtqOdyvbjunBzjnZlPibuwy?=
- =?us-ascii?Q?og2wGUU0lZkCJiDAJzVHRJEZiY1piOTugvm7?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 20:23:38.1315
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9593ff5-20f4-40d7-8f84-08ddb813ff3e
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF0000231F.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB9033
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625-sm7635-fp6-initial-v1-0-d9cd322eac1b@fairphone.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDE4MCBTYWx0ZWRfX4hK0VKDhoY/4
+ ivq3rNoigugCTjxzRu9d5q/qutnwKhpRdSXJ4ouog3Ke4tdD0Qy/TzUnApsN8CmwR7p1yIwKKdc
+ 6HdsyhWRiJeYK7NdwJdO/d987LFn961G8zY4iRryeJerMOiJlNFD0kke5wqM/pn1uwphISM1LiO
+ qm3Qwrkbv3L76phgJsNbnBq8ocF55r9XsH4121OmQ7xIyMi2dmjn68kyfJIzTF67dtNQiPCXh1z
+ TtO9+KXjnBgqcLi/dlD5NBBGQPrYLB/UQVDUOSZ/DIZTsRzU7Rt/SiB/5IgCHZAwjtY9/3SsndG
+ r3K5XDUqtplbfBeIema21AAqweqg63YqzEPUBe9RMNla2syVF+NryO+WwwzsO/Zd0aK7KRCtyyB
+ 4YhRncNTgVWTgF1o1spqfEvB1d7pNlNSFGa+01gUv9RFNYtNIr7JoxirlgqI2h2NbtE2FYqK
+X-Proofpoint-ORIG-GUID: q8ieqxoP571lgKoPTLfAaEsNS53O5Lgb
+X-Authority-Analysis: v=2.4 cv=EuHSrTcA c=1 sm=1 tr=0 ts=686308dc cx=c_pps
+ a=RP+M6JBNLl+fLTcSJhASfg==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=6H0WHjuAAAAA:8 a=ykmX_Yx8RuNhN3dvDKMA:9
+ a=CjuIK1q_8ugA:10 a=iS9zxrgQBfv6-_F4QbHw:22 a=Soq9LBFxuPC4vsCAQt-j:22
+X-Proofpoint-GUID: q8ieqxoP571lgKoPTLfAaEsNS53O5Lgb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-30_05,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 mlxlogscore=999 malwarescore=0 mlxscore=0 phishscore=0
+ spamscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506300180
 
-The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
-can be used to query the status of currently supported vulnerability
-mitigations and to initiate mitigations within the firmware.
+On Wed, Jun 25, 2025 at 11:22:55AM +0200, Luca Weiss wrote:
+> Document various bits of the SM7635 SoC in the dt-bindings, which don't
+> really need any other changes.
+> 
+> Then we can add the dtsi for the SM7635 SoC and finally add a dts for
+> the newly announced The Fairphone (Gen. 6) smartphone.
+> 
+> Dependencies:
+> * The dt-bindings should not have any dependencies on any other patches.
+> * The qcom dts bits depend on most other SM7635 patchsets I have sent in
+>   conjuction with this one. The exact ones are specified in the b4 deps.
+> 
 
-See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
-more details.
+Very nice to see the various patches for this platform on LKML!
 
-Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
----
- Documentation/virt/coco/sev-guest.rst | 13 +++++++
- drivers/crypto/ccp/sev-dev.c          | 55 +++++++++++++++++++++++++++
- include/linux/psp-sev.h               | 30 +++++++++++++++
- include/uapi/linux/psp-sev.h          | 34 +++++++++++++++++
- 4 files changed, 132 insertions(+)
 
-diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-index 93debceb6eb0..8cc1eb375284 100644
---- a/Documentation/virt/coco/sev-guest.rst
-+++ b/Documentation/virt/coco/sev-guest.rst
-@@ -195,6 +195,19 @@ them into the system after obtaining them from the KDS, and corresponds
- closely to the SNP_VLEK_LOAD firmware command specified in the SEV-SNP
- spec.
- 
-+2.8 SNP_VERIFY_MITIGATION
-+-------------------------
-+:Technology: sev-snp
-+:Type: hypervisor ioctl cmd
-+:Parameters (in): struct sev_user_data_snp_verify_mitigation
-+:Returns (out): 0 on success, -negative on error
-+
-+SNP_VERIFY_MITIGATION enables the host to issue commands to the SEV firmware to
-+manage vulnerability mitigations. This command provides two subcommands: VERIFY
-+and STATUS. The VERIFY subcommand instructs the firmware to initiate mitigation
-+for a specified vulnerability. The STATUS subcommand queries the firmware for
-+the currently supported and verified mitigations.
-+
- 3. SEV-SNP CPUID Enforcement
- ============================
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 16a11d5efe46..9f43151bcdfe 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -228,6 +228,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_LAUNCH_FINISH:		return sizeof(struct sev_data_snp_launch_finish);
- 	case SEV_CMD_SNP_DBG_DECRYPT:		return sizeof(struct sev_data_snp_dbg);
- 	case SEV_CMD_SNP_DBG_ENCRYPT:		return sizeof(struct sev_data_snp_dbg);
-+	case SEV_CMD_SNP_VERIFY_MITIGATION:	return sizeof(struct sev_data_snp_verify_mitigation);
- 	case SEV_CMD_SNP_PAGE_UNSMASH:		return sizeof(struct sev_data_snp_page_unsmash);
- 	case SEV_CMD_SNP_PLATFORM_STATUS:	return sizeof(struct sev_data_snp_addr);
- 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
-@@ -2201,6 +2202,57 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
- 	return ret;
- }
- 
-+static int sev_ioctl_do_snp_verify_mitigation(struct sev_issue_cmd *argp, bool writable)
-+{
-+	struct sev_user_data_snp_verify_mitigation input;
-+	struct sev_data_snp_verify_mitigation data = {0};
-+	struct snp_verify_mitigation_dst *mit_dst = NULL;
-+	struct page *page = NULL;
-+	void __user *dst_uaddr;
-+	int ret;
-+
-+	if (!argp->data)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&input, u64_to_user_ptr(argp->data), sizeof(input)))
-+		return -EFAULT;
-+
-+	/* VERIFY command may change system state when applying the mitigation */
-+	if (!writable && input.subcommand == SNP_MIT_SUBCMD_REQ_VERIFY)
-+		return -EPERM;
-+
-+	data.length = sizeof(data);
-+	data.subcommand = input.subcommand;
-+	data.vector = input.vector;
-+
-+	if (!input.dst_uaddr)
-+		goto cmd;
-+
-+	dst_uaddr = (void __user *)input.dst_uaddr;
-+
-+	page = __snp_alloc_firmware_pages(GFP_KERNEL | __GFP_ZERO, 0, true);
-+	if (!page)
-+		return -ENOMEM;
-+
-+	mit_dst = page_address(page);
-+	data.dst_paddr = __psp_pa(mit_dst);
-+	data.dst_paddr_en = true;
-+
-+cmd:
-+	ret = __sev_do_cmd_locked(SEV_CMD_SNP_VERIFY_MITIGATION, &data, &argp->error);
-+	if (ret || !data.dst_paddr_en)
-+		goto out;
-+
-+	if (copy_to_user(dst_uaddr, mit_dst, sizeof(*mit_dst)))
-+		ret = -EFAULT;
-+
-+out:
-+	if (page)
-+		__snp_free_firmware_pages(page, 0, true);
-+
-+	return ret;
-+}
-+
- static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- {
- 	void __user *argp = (void __user *)arg;
-@@ -2264,6 +2316,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SNP_VLEK_LOAD:
- 		ret = sev_ioctl_do_snp_vlek_load(&input, writable);
- 		break;
-+	case SNP_VERIFY_MITIGATION:
-+		ret = sev_ioctl_do_snp_verify_mitigation(&input, writable);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto out;
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 0b3a36bdaa90..ee5d64b0959a 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -96,6 +96,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
- 	SEV_CMD_SNP_DBG_DECRYPT		= 0x0B0,
- 	SEV_CMD_SNP_DBG_ENCRYPT		= 0x0B1,
-+	SEV_CMD_SNP_VERIFY_MITIGATION	= 0x0B2,
- 	SEV_CMD_SNP_PAGE_SWAP_OUT	= 0x0C0,
- 	SEV_CMD_SNP_PAGE_SWAP_IN	= 0x0C1,
- 	SEV_CMD_SNP_PAGE_MOVE		= 0x0C2,
-@@ -812,6 +813,35 @@ struct sev_data_snp_commit {
- 	u32 len;
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_verify_mitigation - SNP_VERIFY_MITIGATION command params
-+ *
-+ * @length: Length of the command buffer read by the PSP
-+ * @subcommand: Mitigation sub-command for the firmware to execute.
-+ * @rsvd: Reserved
-+ * @vector: Bit specifying the vulnerability mitigation to process
-+ * @dst_paddr_en: Destination paddr enabled
-+ * @src_paddr_en: Source paddr enabled
-+ * @rsvd1: Reserved
-+ * @rsvd2: Reserved
-+ * @dst_paddr: Destination address to write the result
-+ * @src_paddr: Source address for optional input data
-+ * @rsvd3: Reserved
-+ */
-+struct sev_data_snp_verify_mitigation {
-+	u32 length;
-+	u16 subcommand;
-+	u16 rsvd;
-+	u64 vector;
-+	u32 dst_paddr_en : 1,
-+	    src_paddr_en : 1,
-+	    rsvd1 : 30;
-+	u8 rsvd2[4];
-+	u64 src_paddr;
-+	u64 dst_paddr;
-+	u8 rsvd3[24];
-+} __packed;
-+
- #ifdef CONFIG_CRYPTO_DEV_SP_PSP
- 
- /**
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index eeb20dfb1fda..ca0f44fef659 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -32,6 +32,7 @@ enum {
- 	SNP_COMMIT,
- 	SNP_SET_CONFIG,
- 	SNP_VLEK_LOAD,
-+	SNP_VERIFY_MITIGATION,
- 
- 	SEV_MAX,
- };
-@@ -249,6 +250,39 @@ struct sev_user_data_snp_wrapped_vlek_hashstick {
- 	__u8 data[432];				/* In */
- } __packed;
- 
-+#define SNP_MIT_SUBCMD_REQ_STATUS	0x0
-+#define SNP_MIT_SUBCMD_REQ_VERIFY	0x1
-+
-+/**
-+ * struct sev_user_data_snp_verify_mitigation - vulnerability mitigation op
-+ *
-+ * @subcommand: Mitigation sub-command for the firmware to execute.
-+ *              REQ_STATUS: 0x0 - Request status about currently supported and
-+ *                                verified mitigations
-+ *              REQ_VERIFY: 0x1 - Request to initiate verification mitigation
-+ *                                operation on a specific mitigation
-+ * @vector: A single bit to specify the mitigation to process
-+ * @dst_uaddr: Destination addr to write the result
-+ */
-+struct sev_user_data_snp_verify_mitigation {
-+	u16 subcommand;				/* In */
-+	u64 vector;				/* In */
-+	u64 dst_uaddr;				/* In */
-+} __packed;
-+
-+/**
-+ * struct snp_verify_mitigation_dst - mitigation result vectors
-+ *
-+ * @mit_verified_vector: Bit vector of vulnerability mitigations verified
-+ * @mit_supported_vector: Bit vector of vulnerability mitigations supported
-+ * @mit_failure_status: Status of the verification operation
-+ */
-+struct snp_verify_mitigation_dst {
-+	u64 mit_verified_vector;		/* OUT */
-+	u64 mit_supported_vector;		/* OUT */
-+	u32 mit_failure_status;			/* OUT */
-+} __packed;
-+
- /**
-  * struct sev_issue_cmd - SEV ioctl parameters
-  *
--- 
-2.49.0
+Can you please use the name "milos" in compatibles and filenames instead
+of sm7635.
 
+Regards,
+Bjorn
+
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
+> Luca Weiss (14):
+>       dt-bindings: arm-smmu: document the support on SM7635
+>       dt-bindings: cpufreq: qcom-hw: document SM7635 CPUFREQ Hardware
+>       dt-bindings: crypto: qcom,prng: document SM7635
+>       dt-bindings: firmware: qcom,scm: document SM7635 SCM Firmware Interface
+>       dt-bindings: qcom,pdc: document the SM7635 Power Domain Controller
+>       dt-bindings: mailbox: qcom-ipcc: document the SM7635 Inter-Processor Communication Controller
+>       dt-bindings: soc: qcom,aoss-qmp: document the SM7635 Always-On Subsystem side channel
+>       dt-bindings: thermal: qcom-tsens: document the SM7635 Temperature Sensor
+>       dt-bindings: dma: qcom,gpi: document the SM7635 GPI DMA Engine
+>       dt-bindings: mmc: sdhci-msm: document the SM7635 SDHCI Controller
+>       dt-bindings: soc: qcom: qcom,pmic-glink: document SM7635 compatible
+>       dt-bindings: arm: qcom: Add SM7635 and The Fairphone (Gen. 6)
+>       arm64: dts: qcom: Add initial SM7635 dtsi
+>       arm64: dts: qcom: Add The Fairphone (Gen. 6)
+> 
+>  Documentation/devicetree/bindings/arm/qcom.yaml    |    6 +
+>  .../bindings/cpufreq/cpufreq-qcom-hw.yaml          |    2 +
+>  .../devicetree/bindings/crypto/qcom,prng.yaml      |    1 +
+>  .../devicetree/bindings/dma/qcom,gpi.yaml          |    1 +
+>  .../devicetree/bindings/firmware/qcom,scm.yaml     |    2 +
+>  .../bindings/interrupt-controller/qcom,pdc.yaml    |    1 +
+>  .../devicetree/bindings/iommu/arm,smmu.yaml        |    3 +
+>  .../devicetree/bindings/mailbox/qcom-ipcc.yaml     |    1 +
+>  .../devicetree/bindings/mmc/sdhci-msm.yaml         |    1 +
+>  .../bindings/soc/qcom/qcom,aoss-qmp.yaml           |    1 +
+>  .../bindings/soc/qcom/qcom,pmic-glink.yaml         |    1 +
+>  .../devicetree/bindings/thermal/qcom-tsens.yaml    |    1 +
+>  arch/arm64/boot/dts/qcom/Makefile                  |    1 +
+>  arch/arm64/boot/dts/qcom/sm7635-fairphone-fp6.dts  |  837 ++++++
+>  arch/arm64/boot/dts/qcom/sm7635.dtsi               | 2806 ++++++++++++++++++++
+>  15 files changed, 3665 insertions(+)
+> ---
+> base-commit: d9946fe286439c2aeaa7953b8c316efe5b83d515
+> change-id: 20250623-sm7635-fp6-initial-15e40fef53cd
+> prerequisite-change-id: 20250616-eusb2-repeater-tuning-f56331c6b1fa:v2
+> prerequisite-patch-id: 5c504d171a4d1acd9ec376e01e0dd0fddbad92b8
+> prerequisite-patch-id: 0c97dcf5472fbed8ef4cffbd482f3169fe1e972d
+> prerequisite-change-id: 20250617-simple-drm-fb-icc-89461c559913:v2
+> prerequisite-patch-id: 1ce32150adbe39ad43d9a702623b55937d92a17c
+> prerequisite-patch-id: 3562d9a85381bee745402619a7acba9b951f145c
+> prerequisite-patch-id: f8447266657b779a546ecbbbc2e38bd61c422f08
+> prerequisite-patch-id: cb9d07c82e73ab3691e0ace9604bfa69cdd6bb64
+> prerequisite-patch-id: 18ab6ca6a024e5b8ea8138111064db593d72da35
+> prerequisite-change-id: 20250620-sm7635-socinfo-8c6ee8d82c9d:v1 # optional
+> prerequisite-patch-id: f1b2e11df96c271c9e3d010084809f361ee4249c
+> prerequisite-patch-id: 1471abf17230db340c67a84b5a9009f1f2ea6e0e
+> prerequisite-patch-id: 57bff00c4fedce1b78615375f12517b955dd1d16
+> prerequisite-change-id: 20250620-sm7635-pinctrl-9fe3d869346b:v1
+> prerequisite-patch-id: 43b88c44c6fc5b72a490cd3acc5d2585206e81f2
+> prerequisite-patch-id: b3b6ebd4a288bd4abf227c939a1a92eafb2cf2c8
+> prerequisite-change-id: 20250620-sm7635-clocks-7699d338dc37:v1
+> prerequisite-patch-id: 48485e0e7e8a992695af1690f8cd2c09c227a4bf
+> prerequisite-patch-id: 4685ceba3f900ad6d1d2ae35116d37f64a171d5d
+> prerequisite-patch-id: 80f71dad0c0a77da98e5e66b592f38db6d81b4b1
+> prerequisite-patch-id: 49a2fa1a14931d9143da232969e7487061466930
+> prerequisite-patch-id: f5d1794f61488235644f78ffc28e3dacdab215d1
+> prerequisite-patch-id: ab257573067ff09c94270e1fa6ad4de1480c06b9
+> prerequisite-patch-id: 6608bd3f2e198a0780736aebcea3b47ee03df9ef
+> prerequisite-patch-id: c463d0d2d84c8786ed9a09016f43b4657cbc231e
+> prerequisite-patch-id: e113e76af37f01befaf4059ee3063cb45b27fd6b
+> prerequisite-patch-id: 40f8b8acd07a9ff7da8683b1be6a58872250e849
+> prerequisite-change-id: 20250620-sm7635-clocks-misc-0f359ad830ea:v1
+> prerequisite-patch-id: 127f332296fced39a2fd2f9a1f446ba30ec28ceb
+> prerequisite-patch-id: d21a0c8ceb06523c9f3f4ce569d28714878b3f84
+> prerequisite-patch-id: 87029a8844ef174ab3e0f953a1d16957fe6c13cc
+> prerequisite-patch-id: 095c767d7b7aa67d47026589c926636e57349ca6
+> prerequisite-change-id: 20250620-sm7635-rpmhpd-dcb5dc066ce2:v1
+> prerequisite-patch-id: d71fe15334032610c05cb55aeb28bfaa44e3530c
+> prerequisite-patch-id: 729544e856b8046f7a311b719d9495f8b33c1e1f
+> prerequisite-change-id: 20250620-sm7635-icc-e495e0e66109:v1
+> prerequisite-patch-id: b387217215d6f83cbd50c380171b159a2f1406d8
+> prerequisite-patch-id: bffd82274c35f6d520f524aa2a9c1c4bef7e047e
+> prerequisite-change-id: 20250620-sm7635-eusb-phy-d3bab648cdf1:v1
+> prerequisite-patch-id: c242c9b099d738214def29d2e464b64be5f14e62
+> prerequisite-patch-id: 8c1eb426c08bc1ec9462e77139b3b64d5e1453e9
+> prerequisite-patch-id: cdbc469ab33002c6bf697c033755b598dd1a621e
+> prerequisite-patch-id: 6bb2900bb530880091622ef47d141fe1f5756a52
+> prerequisite-change-id: 20250620-sm7635-eusb-repeater-0d78f557290f:v1
+> prerequisite-patch-id: 5c504d171a4d1acd9ec376e01e0dd0fddbad92b8
+> prerequisite-patch-id: 0c97dcf5472fbed8ef4cffbd482f3169fe1e972d
+> prerequisite-patch-id: a618abb349c3de5b49f79b4b0f86d9ab502ad500
+> prerequisite-patch-id: 09f91ff3a25c16a0375bdfec80604a64eab0b4fb
+> prerequisite-patch-id: 8fca8b09d70409c5c78f9f1b77d0a4c75bce38cf
+> prerequisite-patch-id: f5c2c24d2baefcd7ff91718529ab2f2c264ab99f
+> prerequisite-change-id: 20250620-sm7635-remoteprocs-149da64084b8:v1
+> prerequisite-patch-id: 3c95a20dd456dfee100f2833de4e9931a2073c7d
+> prerequisite-patch-id: 5292d77663ea9c44346b8da86bda36e0cce3fe56
+> prerequisite-patch-id: 015edcb2a69b5e837dc7edfbc7adc22145ba611b
+> prerequisite-change-id: 20250620-sm7635-pmiv0104-34a679937d9d:v1
+> prerequisite-patch-id: 8fca8b09d70409c5c78f9f1b77d0a4c75bce38cf
+> prerequisite-patch-id: f5c2c24d2baefcd7ff91718529ab2f2c264ab99f
+> prerequisite-patch-id: d7a06ece910e7844c60b910fe8eed30ad2458f34
+> prerequisite-patch-id: e91b741c9cfc80aa149bfd8e43cae90ca58e17f2
+> prerequisite-patch-id: 5ba4a49c3792cb208ee064a6ba13545e40cb70ac
+> prerequisite-patch-id: 5bdfcbdd226f7223c04a65c1a3cdcc3ecad38858
+> prerequisite-change-id: 20250620-sm7635-pmxr2230-ee55a86a8c2b:v1
+> prerequisite-patch-id: f0bd6e083324f954b988647bb42d4e2be179fbda
+> prerequisite-patch-id: 8fe1c0fc544e8bcb35522c5eba0b36e83bfd0c19
+> prerequisite-patch-id: 525c9eb0087025024bb0aaec1ed1d7d2c0bc8f03
+> prerequisite-change-id: 20250623-pm7550-pmr735b-rpmh-regs-06087e5b3a99:v1
+> prerequisite-patch-id: 7360606a06f8fba3ea9a8f84b4ecfb8209e91ab0
+> prerequisite-patch-id: 7a06a346abdb7f7386912b92f2b84af87e7439a9
+> prerequisite-patch-id: 1e1a6eb9c5421812c07421f9fa7e3f16b26a42da
+> prerequisite-patch-id: 224df3e4068bee3a17bde32e16cd9366c55b5faf
+> 
+> Best regards,
+> -- 
+> Luca Weiss <luca.weiss@fairphone.com>
+> 
