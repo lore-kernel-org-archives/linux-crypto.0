@@ -1,74 +1,73 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF623ABB3;
-	Mon, 30 Jun 2025 08:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC564502F;
+	Mon, 30 Jun 2025 09:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751273857; cv=none; b=Su1ZIQ1uAGGx7yCLpzo5dRdVHyzITed18BMVVKisDXW7zwCPqpKF5ign3XgNzLlCM9JLbgbhz5je7DTBkeIeO9PZ2qKor1/DXqOZ4mGxMVAiGx4FyXRp0t4P4IiG6wJGEwchhRJYZF5zVZ6Gj948D1sjEjT6DfUVe9iYov71Sho=
+	t=1751275019; cv=none; b=t56p7SG+LIy1o17l9nxwZOsQlggnM9ws/ge2JbIZ4LMwrIROJnj2Dx9O+ACC0CEU8afXIeJzr01062SkTNpf6PRzreOc+dvAPGDUn73fC62cEqZo/6rILGQEewTPmC+/E8kAGzxoYWUwvuNnf+UqFCEx7LRe9sU2S/3AK+b9zr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751273857; c=relaxed/simple;
-	bh=APQjnfC0ho26CdR02Kmbiu4E9JMnLLbwfYZ7NNh8DYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SZSJl8NaMene9URlR35XHuxw8oKwmcwO9BRhgwt8fcNrfUpez8WQzuu2XVIPx1R35sFAcGA/dD6bXB88NvvYr+YDX8Un9nDNLxljMUyfwkyaLLUAOPf7CyMwOBPDljiE+e0ihVSMgfVWPF9cxUAPQAKU6RCNpluRS3tndgur2kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dv/vKlEW; arc=none smtp.client-ip=209.85.221.53
+	s=arc-20240116; t=1751275019; c=relaxed/simple;
+	bh=A1Scqaa0uqTalGcIVATionMFXUymgwrg8gg8u2Q2vQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gTxSale5C1h1ixr2xn5u8d1fgdUT8h8sIW0vSBRT/iWfXamzy+ObNT2fYEQiMDXbr1Q2AxORvkQZcuG5uNWSkc2Nji9pCjHOED/QbNdoKvKbLNtkw5QkU/Z29qZFBQybA+IdvPRNff5AskqQaWeWKyuYEEotyYm8BrodrVLIpwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRidN1N7; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dv/vKlEW"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a4f64cdc2dso683307f8f.1;
-        Mon, 30 Jun 2025 01:57:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRidN1N7"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-453442d3a15so1516895e9.0;
+        Mon, 30 Jun 2025 02:16:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751273854; x=1751878654; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751275016; x=1751879816; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=POF/lfjlBstPPmJqK/rxTYHM0xgWsKYRn8MW4p37XQs=;
-        b=Dv/vKlEWT9/oquHFb5ZheJlDCP0WqB9NbF/sGP2Wz9ITsB0GcPGoW8W/OdyGBSDioa
-         hYfnFggD3FmlzH9KUxaEfnWmuzWvwd8wAetYGZhhTmnmqlc1KAvR+HYXxO9BtAwzF02C
-         3SnT+mVHlT7Qlr8zDKC8tQ4H7MQw2rWLmutY6sQ59ofaTjvps6acVqN0sZAA1V0vEXvQ
-         1q+nef7KDJOUdPhx1kQM9WuhN1YcGu8nD0yQszWdDKerSscVwFVbmg2zWjbMPBsPJIR5
-         bFxTLLQPxTOE1WcvKDS07uOc89Gp7HqNyJUKGYr2YJayahcnYXnfObbn+N8jAiplUqLM
-         OYCQ==
+        bh=N6vAb/f1F0q1vHht05P9FW+B6191AVHmzVFqLR0tn6M=;
+        b=lRidN1N7zI2Ktm36OeHx22MGOEXf0qaexOhoHNwJ5bakpq1JhB1iWEsMn0q5BBvtMJ
+         CZcu06Psdjm7a86tz5CpN3bu1g+AeZ9pnZ2DZukiol16Au6TJAn6SzXwfn442+11+5BV
+         7vbLOL0IXOwtWDNwlOAw9+nM0JmMJxSX+lqEbck/JuY9Vz6vGFQ4gToi8Oewk93thhMW
+         O8cJ5+a8HOP5nwhX+iqMi+KpwxEC0HhSUI6CqRBCd4KBYHOqBHyDL+EZ025bVq8WrLZc
+         jO4y586t2HK2Z5SLd8nUKbPtevZAhsODn4QBsyQHvJQu5FPe398tHLStFanikQ4TRwFf
+         OVqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751273854; x=1751878654;
+        d=1e100.net; s=20230601; t=1751275016; x=1751879816;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=POF/lfjlBstPPmJqK/rxTYHM0xgWsKYRn8MW4p37XQs=;
-        b=byq87HAazaMhUVZIm7P6b8uCMFG2KhHFrsrTRD1Qpqj4G5g+4AAho7/QgLmDSZE5Eg
-         WVOM6+I3VrCBkuAm1XoLIvKNTX3SBagrWlY750aJjKZzI9kMmghZuW7msTwFPZ+0XkWi
-         v+SkkHr20inxm3K3dlpdt72OYIgAm85eF2bfPu47kkDn/hIyBwO/NoT/XNFsB8YlUAnr
-         qrsz8jKWSgxVUZdZGlGbFJTAx3H9NPi4N41W5DG1Ze8zHduc4mh9x58OXT9KGrrzAb8r
-         k9PY4A6FNK69SUFN47hV8iGrzZgH9qgEM3kcDlIOjP2Uu5QZVSW+5cH/cJiCytT8VLPW
-         Ct0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVT3mrNeqbCPDQ0N1zVHN13k8FyOJMn0VPrBrRcLiU51h2IuDiCcnxKVgEitCy+H6XF5tgAnx+7ZZzJE0in@vger.kernel.org, AJvYcCXXD2Il9keOW5Bw6lMYLFybST1lR7jUqqxQ50L3jNL3bxZioaz2ySAS7deuhDqeXaLR887D35IAgswnvqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRJFjYHItd0+Yp1iCkgvNXSC+bWZk6kgVBLAslSW7bM59OEsoN
-	qP9hPhFv2Ntk+B5nvjkiaiwpCZM8VIpAItv7R0gzCNMI7VbNPXYyryfu
-X-Gm-Gg: ASbGncvofkm3qs3ONfFKUQH5IN/qXvXAuWUzNgTfEep0VhnoqtFBxGnkQNyHvcEb7ss
-	qBjHz46iKXCrUvDls4YXG5hkfOoM+qE8CB95MIlc7XOYZ/RSBQ8koAJB86KMbz4iM2ZQCFICR+i
-	XmhDQcj0u/JZZiIY82NRQc33lTA/oyHKhAo9xgo4+1OIPJYDhwvtqBEn2z0+mqotK5ospbUc+YV
-	TQ1owQYhCgCa6YmhxGDqKXpAWm5HX5btiAMTf2QoatSJbtzztX4Upcjp2vpHO3m/bnj4wl+cCZD
-	y0JyXK1mq5Lu+f9aWRzHQo9l4XeLAEsyqsRWO4oNWGtad/w/AaNbaAwQRLoUm9yBuDKaeOAtnzS
-	UbgjJeIT9jsaV0co=
-X-Google-Smtp-Source: AGHT+IGlknY67astPqQ6Ts4eyHBJeWoLGAdmYYOyXUPQ5uMHairQGPegGqQwCezY1A48qiQrcuUVNw==
-X-Received: by 2002:a05:6000:402b:b0:3a4:f912:86af with SMTP id ffacd0b85a97d-3aaf2e9231cmr2195341f8f.2.1751273853675;
-        Mon, 30 Jun 2025 01:57:33 -0700 (PDT)
+        bh=N6vAb/f1F0q1vHht05P9FW+B6191AVHmzVFqLR0tn6M=;
+        b=MVM/rkqSxQeumFeP5HPKkbyEU1l5y/wdElBvTShrm81+RZoiqj6yPf8o4yHlahGiBX
+         lYOWQgNsRb5d8xg22vVWUSdzu3YSdhXm/RhaNgQSa1v64Y7Ectvgo3XaHQO7KhNQR9PT
+         f2f+RiUd3SLdIwZScH85YgyfJTNSzmLcDqPe/7ks9lEMX4Cm8GQmTlEpRjEZRj+Eo6cf
+         Z0AVt/v8T3U/3bSuQifnAiaTUMuXqQobY53xFNkOgAhvuEbQMNRYXoM+RqQDwFC9pFVP
+         LdliYbjV/N1S+wj41bcMuU/oesjaPV5Ca/IqpecidD4Fpmcgc+iDt03PvYVT4Xz5Y85Q
+         wdig==
+X-Forwarded-Encrypted: i=1; AJvYcCU/vJCvhXOLR6hGBUmJju/mK4GR8EMeHUqXBU0CYTfrttXD6JzvWIa7sO4m8mgVubTsky05APlRpdxSTDs=@vger.kernel.org, AJvYcCVflP5r3ek7PjZafY7emnIMLRRKGK4f6Pq3eRbNcaaRteLYUBsd3YQTzW8pgCQEyQgvDoCZV7a9hPCS1dho@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmskl1TqsR3L8ZL1M/WKBA7U9+BjDkt6gwfg2bRLWlWC6ZaDlQ
+	zBU7dKpQ62OrYdzGnfqS4tOaP45nEz1/vCMakI3C5rCSHmSbG8gCNCC4
+X-Gm-Gg: ASbGncsrOcXVbPHhtAuS+ssfYlUlKThFbDpjMHckgsw3InXBRI+xnbobHxDlM3BTfIZ
+	9udZFVNO0kCXNjejhjUyDxuR5A7bsa+E+9s4sAmFrgxnwshyuE2HtYxEJzlrP/TLN/aAdBZzt5m
+	5fkwk2HV3o2fI+hme8nCgqvUEOe2djithZmPQo8ZlMJrgJfAypu/2swwK3qa8teOelqj186djN3
+	0uy5EeIlxXGIeMIMid9MspLWWg7f0NH6vPh4TAHK8aer3LiMgtVBK9VbXaOM0eRfSss7hSQIcGv
+	wSRV37Q7ZlSz+90iSJjrPV+9SPjEYfHCUuLv4Iite2AuuQ21PW5I9s3U9CYiFe6nt/eYawq0pys
+	rkEqLW8OD+9XpgJo=
+X-Google-Smtp-Source: AGHT+IFq4O3vhNy373r9ubChGNUtHkqR+jLEsQTSQzOBZ4rPPGQkjAeJ1lH5EqhQTh72Iug6oZPQug==
+X-Received: by 2002:a05:600c:8b84:b0:453:7be3:3956 with SMTP id 5b1f17b1804b1-45395830b0bmr27637495e9.6.1751275016204;
+        Mon, 30 Jun 2025 02:16:56 -0700 (PDT)
 Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:234c:3c9a:efe4:2b60])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4538a3fe587sm130162475e9.19.2025.06.30.01.57.33
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-453823b6e9esm161857435e9.28.2025.06.30.02.16.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 01:57:33 -0700 (PDT)
+        Mon, 30 Jun 2025 02:16:55 -0700 (PDT)
 From: Thomas Fourier <fourier.thomas@gmail.com>
 To: 
 Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
-	Declan Murphy <declan.murphy@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Mark Gross <mgross@linux.intel.com>,
+	Andrew Bresticker <abrestic@chromium.org>,
+	James Hartley <james.hartley@imgtec.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: keembay: Fix dma_unmap_sg() nents value
-Date: Mon, 30 Jun 2025 10:57:06 +0200
-Message-ID: <20250630085707.62981-2-fourier.thomas@gmail.com>
+Subject: [PATCH] crypto: img-hash: Fix dma_unmap_sg() nents value
+Date: Mon, 30 Jun 2025 11:16:22 +0200
+Message-ID: <20250630091623.75655-2-fourier.thomas@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -81,52 +80,25 @@ Content-Transfer-Encoding: 8bit
 The dma_unmap_sg() functions should be called with the same nents as the
 dma_map_sg(), not the value the map function returned.
 
-Fixes: 472b04444cd3 ("crypto: keembay - Add Keem Bay OCS HCU driver")
+Fixes: d358f1abbf71 ("crypto: img-hash - Add Imagination Technologies hw hash accelerator")
 Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
- drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/crypto/img-hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
-index 95dc8979918d..8f9e21ced0fe 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
-@@ -68,6 +68,7 @@ struct ocs_hcu_ctx {
-  * @sg_data_total:  Total data in the SG list at any time.
-  * @sg_data_offset: Offset into the data of the current individual SG node.
-  * @sg_dma_nents:   Number of sg entries mapped in dma_list.
-+ * @nents:          Number of entries in the scatterlist.
-  */
- struct ocs_hcu_rctx {
- 	struct ocs_hcu_dev	*hcu_dev;
-@@ -91,6 +92,7 @@ struct ocs_hcu_rctx {
- 	unsigned int		sg_data_total;
- 	unsigned int		sg_data_offset;
- 	unsigned int		sg_dma_nents;
-+	unsigned int		nents;
- };
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index e050f5ff5efb..c527cd75b6fe 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -436,7 +436,7 @@ static int img_hash_write_via_dma_stop(struct img_hash_dev *hdev)
+ 	struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
  
- /**
-@@ -199,7 +201,7 @@ static void kmb_ocs_hcu_dma_cleanup(struct ahash_request *req,
+ 	if (ctx->flags & DRIVER_FLAGS_SG)
+-		dma_unmap_sg(hdev->dev, ctx->sg, ctx->dma_ct, DMA_TO_DEVICE);
++		dma_unmap_sg(hdev->dev, ctx->sg, 1, DMA_TO_DEVICE);
  
- 	/* Unmap req->src (if mapped). */
- 	if (rctx->sg_dma_nents) {
--		dma_unmap_sg(dev, req->src, rctx->sg_dma_nents, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, req->src, rctx->nents, DMA_TO_DEVICE);
- 		rctx->sg_dma_nents = 0;
- 	}
- 
-@@ -260,6 +262,10 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
- 			rc = -ENOMEM;
- 			goto cleanup;
- 		}
-+
-+		/* Save the value of nents to pass to dma_unmap_sg. */
-+		rctx->nents = nents;
-+
- 		/*
- 		 * The value returned by dma_map_sg() can be < nents; so update
- 		 * nents accordingly.
+ 	return 0;
+ }
 -- 
 2.43.0
 
