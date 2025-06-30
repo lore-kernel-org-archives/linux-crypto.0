@@ -1,66 +1,66 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A049D28C5C3;
-	Mon, 30 Jun 2025 14:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3C928D8DD;
+	Mon, 30 Jun 2025 14:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751294336; cv=none; b=sRKJU1f7T8jnPabHuVGJKriDQuFog4ZuHo0KdD7XqwjU7tXOAK8WYDAaXIgNs1O1zN2MYLtb5zaiLy+6ybZC7nEgCDa5KOE7/0+f/CgezHXl9enHw7h2p8wbWSS636d4ziSSJLLgV7kYEU2zm1ohL3e2o+R0df/tqENLdTGHGMo=
+	t=1751294338; cv=none; b=dwmJDiKtsC7M74c9dlWdNjU/PHYrAhF+ekhy8c4AFGWocEY0p6RvvzbP9sPvslOV3V5ESDv4K0C1psWezS8/6+hJJCHIrfPVgb8BLtam9jlfMbKcQjdCEA49X+OrCHtlhDOSVFopyBv+l2dscieTwKMBsLUFFOcqN4sq6d7+d0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751294336; c=relaxed/simple;
-	bh=YkpdTWyHs7BogwjbVOCLLOWPQw2lUFU7xGgB8Vz4XiI=;
+	s=arc-20240116; t=1751294338; c=relaxed/simple;
+	bh=3Dm2EvQRIR0T4Sf86i6v57leLVzU/HsxdjhmcBIpZdk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hNdVhKMRdZFqtxlSemi93xCv71rba1pmFKyFISa2yFhybEl+BvCIREijxC2v97j9jxMg7sgtkNTykZU0abVRFAf5j5kP7Pa6ELlwmpII1Z/bCrO4jJUhBsNBjrWby/aerRU21FHV7OAxgY8mLIVwKQBoIRpt/RUWBDwAaKxa7X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HAyuKSw6; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=lU7txGhlo3gyoJfkyAoc02XIk7ufYT8+iNwdkQdnICzlNBLqjvUjcZKiOD2UNooS5I1RZ/5g78/aBzFW8o/fiHbOEfeK5XEf9PpHu+kzBNTJuRCfiPrvV1KXFZS7ox93ZNq9yPMwhiq8UNYSrJKy9JrGIr0BcCHCD9Wk/KQwouM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LCvqCzMK; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HAyuKSw6"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55U8xoV4015498;
-	Mon, 30 Jun 2025 14:38:45 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LCvqCzMK"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55U7n3YK020638;
+	Mon, 30 Jun 2025 14:38:47 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=FoXKg6Hji1p/ojTmp
-	Vp6/rHsjyhOOpO76o2a912PFZE=; b=HAyuKSw6G1bEEBkwwq418GlX3dUv8m1BQ
-	FtvhdX9W5/XPxD+8eAt8onoT17SQuNQCdp5cDonxcQabxSAONdSyV1Bl0aDJ4Qfu
-	l6D/b4WvXFNWigI0Uy5vtWDZjsXGm/ypuUV5pT1EnldKKTUMGPJbjt7zSv1U2ooz
-	RPCZ0WhLi0tDzc7W9nH1ARj5/AA6WCBHTmAf7tKDVQVcC+UTcuVZjoV3Dya/DJUu
-	m7nZzKpYIsq5kRxJJzjTMR67K16BlXdGnGFyc9g82W9f1biDwOFgMuYvqMe9kDW7
-	vXIDKSIlhNOpAae+reTLHFpiCCBNOBQDSHS+XLqb+i1AINnF8mwow==
+	:mime-version:references:subject:to; s=pp1; bh=VoTC4pOceLA2aFQDf
+	FQXuB1pZ4YrvQB3uRkqqzXmIpk=; b=LCvqCzMKQjwIozdhoPHGKwa3A9QqYQhcJ
+	BstAgCKe0Y2I5z/+zKIkHjjDP8dglch6Brk/fCJh10x6csh8CBEJimHtfjYGs9Ky
+	cmbhfN4p+/XVL3WDpZKY9zr991eWq2NvGAtDpeMSB5XZi/CkzRtVnewQME1OufPM
+	MKQw6pHXpgrdpiF8SKNjxixnX7uxobu05zfK2vCWJvkobwvKkMlcci9heHTRX+ky
+	TrgtHfCMCda12pKlx0z9aL+gbXCDP8nFqNCBHSPUq5+PSihLFvdpmfhqhn2ixSWa
+	wEPSnNF1EYS1I9TJZHKkVWkIeW5qd+1sCLXqI7jeN1pOiu7jyk06g==
 Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j7wra05s-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fhr67-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 14:38:45 +0000 (GMT)
+	Mon, 30 Jun 2025 14:38:46 +0000 (GMT)
 Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UB733W021371;
-	Mon, 30 Jun 2025 14:38:44 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe35yax-1
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UB7KeH021398;
+	Mon, 30 Jun 2025 14:38:46 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe35yb2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 14:38:44 +0000
+	Mon, 30 Jun 2025 14:38:46 +0000
 Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UEchip17105504
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UEcjni8258232
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Jun 2025 14:38:43 GMT
+	Mon, 30 Jun 2025 14:38:45 GMT
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9503C58059;
-	Mon, 30 Jun 2025 14:38:43 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 6449D5805E;
+	Mon, 30 Jun 2025 14:38:45 +0000 (GMT)
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D20B658058;
-	Mon, 30 Jun 2025 14:38:42 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A157158058;
+	Mon, 30 Jun 2025 14:38:44 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
 	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Jun 2025 14:38:42 +0000 (GMT)
+	Mon, 30 Jun 2025 14:38:44 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.ibm.com>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net
 Cc: linux-kernel@vger.kernel.org, James.Bottomley@HansenPartnership.com,
         dhowells@redhat.com, simo@redhat.com,
         Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v2 1/4] crypto: Add squeeze function to shash_alg for support of XOFs
-Date: Mon, 30 Jun 2025 10:38:31 -0400
-Message-ID: <20250630143834.2748285-2-stefanb@linux.ibm.com>
+Subject: [PATCH v2 3/4] crypto: Add tests cases for shake128 & shake256 to testmgr
+Date: Mon, 30 Jun 2025 10:38:33 -0400
+Message-ID: <20250630143834.2748285-4-stefanb@linux.ibm.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250630143834.2748285-1-stefanb@linux.ibm.com>
 References: <20250630143834.2748285-1-stefanb@linux.ibm.com>
@@ -72,97 +72,377 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=E/PNpbdl c=1 sm=1 tr=0 ts=6862a175 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=n-XTF91Upou305-BhzYA:9
-X-Proofpoint-GUID: j1g4INO6doFYn94WUF0KCeDfofzljWv-
-X-Proofpoint-ORIG-GUID: j1g4INO6doFYn94WUF0KCeDfofzljWv-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDExNyBTYWx0ZWRfX0JMMKHrpI+i8 tVnKZ1ZvwHlioFw74gQz98Y/wwo2WxNGCSzIkovOiE3USUS5svXsdc1VJB2Ds8cP+l5e90JXZFY Fg+Zgbe5O9Ek5bW/TueUub9HONcw05qJzbzxecKNnSs/eX0YyJKdwB5qBwkm0NrbzNAvwivlkJ6
- A6T4bDmYOyhoU5mloEHh65ElpnbctdWrrkI+vpZI0xb/pr/r9OCqhLXsub0yUXig1TRBrmvqf50 GK1PkWsuCUtkXEjmPx9XNKOe32kAacgKBDSAizfNvCl62oCVFkRz1sMpxG1tIYYY9fML46Nlf+2 v5+wETc7nHAit1WNSx1Gk9l0v0V2kVE2/iPUJNGu7Vibe3vZG+2dT75gzhCUcfI/d7Ofd7Dewmd
- 6Srwx0PrIskTyiE+T35yoBqXOU/yu1vxaAgIj2DxrEcypPfQ/7TRUSsoBNMc+6xOLn09mBvD
+X-Proofpoint-ORIG-GUID: rQRTN4I-h6-35ng5qOCC9LUW1TaTMDPH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDExNyBTYWx0ZWRfX4kvF1UuSVcul K48F2YmxK6qG/qfhsLV7r+vxgsiBHVt6melcTP09qsFQnAJtQirX4EuAywKE5Aw/j2PTJCcpbOM EnC0MjUiIao7PzlBAAjk3JVa53xnfY1sdQeJUFYmZGpYnVTg+aUPFrJzxzb5npF1EdIIZIR5Sde
+ vEa+oDdLv6TA7n1oYN8ql4DVQPT50/Cb4bsCFlCF76T42XS914ayeXUuaeJjpNsRf8WguBunuNK 3KqPHVszIV5X5xLyCItGwyebVODgNMTX4NfpmSNBSpQr1yNoAy4oPo/DDQj7J03xXGKM1EUy+q1 FDYiwQon2A1kTV7Q1oCdPqelfC7RhelBqBaRMguZ035SOgsHckk3IWsLUGUoMe2blrwo+D4XVEw
+ iRIogbpiyW6fQEU5Te1ir3ndHmTogIiev+zFn+qy8jMS8Vuch46i8DMpsVPmlLhbIvH8pWzH
+X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=6862a177 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=xF6bd4FRdrIRRYsjWBcA:9
+X-Proofpoint-GUID: rQRTN4I-h6-35ng5qOCC9LUW1TaTMDPH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-06-30_03,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 clxscore=1015 adultscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 mlxlogscore=723 phishscore=0 suspectscore=0
+ malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
  definitions=main-2506300117
 
-Add a squeeze function for support of shake128/256 XOFs. This function
-accepts a variable-length output buffer for the XOFs to return their data
-in. The 'final' parameter clears the state of an XOF and should only be set
-to 'true' when the last output is requested.
+Add test cases for shake128 & shake256 to the testmgr to test their hash
+creation.
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- crypto/shash.c        |  9 +++++++++
- include/crypto/hash.h | 19 +++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ crypto/testmgr.c |  14 +++
+ crypto/testmgr.h | 310 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 324 insertions(+)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 4721f5f134f4..12b3882e9a26 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -86,6 +86,15 @@ int crypto_shash_init(struct shash_desc *desc)
- }
- EXPORT_SYMBOL_GPL(crypto_shash_init);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 97190d9dcc0e..6bd67ca23bb1 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5525,6 +5525,20 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(sha512_tv_template)
+ 		}
++	}, {
++		.alg = "shake128",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(shake128_tv_template)
++		}
++	}, {
++		.alg = "shake256",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(shake256_tv_template)
++		}
+ 	}, {
+ 		.alg = "sm3",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 32d099ac9e73..31e5918b761c 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -5914,6 +5914,316 @@ static const struct hash_testvec sha3_512_tv_template[] = {
+ 	},
+ };
  
-+int crypto_shash_squeeze(struct shash_desc *desc, u8 *out, size_t outlen,
-+			 bool final)
-+{
-+	if (!crypto_shash_alg(desc->tfm)->squeeze)
-+		return -EINVAL;
-+	return crypto_shash_alg(desc->tfm)->squeeze(desc, out, outlen, final);
-+}
-+EXPORT_SYMBOL_GPL(crypto_shash_squeeze);
++static const struct hash_testvec shake128_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\x7f\x9c\x2b\xa4\xe8\x8f\x82\x7d"
++				"\x61\x60\x45\x50\x76\x05\x85\x3e",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x85\xc8\xde\x88\xd2\x88\x66\xbf"
++				"\x08\x68\x09\x0b\x39\x61\x16\x2b",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++			     "jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest = "\x1a\x96\x18\x2b\x50\xfb\x8c\x7e"
++				"\x74\xe0\xa7\x07\x78\x8f\x55\xe9",
++	}, {
++		.plaintext = "\x08\x9f\x13\xaa\x41\xd8\x4c\xe3"
++			     "\x7a\x11\x85\x1c\xb3\x27\xbe\x55"
++			     "\xec\x60\xf7\x8e\x02\x99\x30\xc7"
++			     "\x3b\xd2\x69\x00\x74\x0b\xa2\x16"
++			     "\xad\x44\xdb\x4f\xe6\x7d\x14\x88"
++			     "\x1f\xb6\x2a\xc1\x58\xef\x63\xfa"
++			     "\x91\x05\x9c\x33\xca\x3e\xd5\x6c"
++			     "\x03\x77\x0e\xa5\x19\xb0\x47\xde"
++			     "\x52\xe9\x80\x17\x8b\x22\xb9\x2d"
++			     "\xc4\x5b\xf2\x66\xfd\x94\x08\x9f"
++			     "\x36\xcd\x41\xd8\x6f\x06\x7a\x11"
++			     "\xa8\x1c\xb3\x4a\xe1\x55\xec\x83"
++			     "\x1a\x8e\x25\xbc\x30\xc7\x5e\xf5"
++			     "\x69\x00\x97\x0b\xa2\x39\xd0\x44"
++			     "\xdb\x72\x09\x7d\x14\xab\x1f\xb6"
++			     "\x4d\xe4\x58\xef\x86\x1d\x91\x28"
++			     "\xbf\x33\xca\x61\xf8\x6c\x03\x9a"
++			     "\x0e\xa5\x3c\xd3\x47\xde\x75\x0c"
++			     "\x80\x17\xae\x22\xb9\x50\xe7\x5b"
++			     "\xf2\x89\x20\x94\x2b\xc2\x36\xcd"
++			     "\x64\xfb\x6f\x06\x9d\x11\xa8\x3f"
++			     "\xd6\x4a\xe1\x78\x0f\x83\x1a\xb1"
++			     "\x25\xbc\x53\xea\x5e\xf5\x8c\x00"
++			     "\x97\x2e\xc5\x39\xd0\x67\xfe\x72"
++			     "\x09\xa0\x14\xab\x42\xd9\x4d\xe4"
++			     "\x7b\x12\x86\x1d\xb4\x28\xbf\x56"
++			     "\xed\x61\xf8\x8f\x03\x9a\x31\xc8"
++			     "\x3c\xd3\x6a\x01\x75\x0c\xa3\x17"
++			     "\xae\x45\xdc\x50\xe7\x7e\x15\x89"
++			     "\x20\xb7\x2b\xc2\x59\xf0\x64\xfb"
++			     "\x92\x06\x9d\x34\xcb\x3f\xd6\x6d"
++			     "\x04\x78\x0f\xa6\x1a\xb1\x48\xdf"
++			     "\x53\xea\x81\x18\x8c\x23\xba\x2e"
++			     "\xc5\x5c\xf3\x67\xfe\x95\x09\xa0"
++			     "\x37\xce\x42\xd9\x70\x07\x7b\x12"
++			     "\xa9\x1d\xb4\x4b\xe2\x56\xed\x84"
++			     "\x1b\x8f\x26\xbd\x31\xc8\x5f\xf6"
++			     "\x6a\x01\x98\x0c\xa3\x3a\xd1\x45"
++			     "\xdc\x73\x0a\x7e\x15\xac\x20\xb7"
++			     "\x4e\xe5\x59\xf0\x87\x1e\x92\x29"
++			     "\xc0\x34\xcb\x62\xf9\x6d\x04\x9b"
++			     "\x0f\xa6\x3d\xd4\x48\xdf\x76\x0d"
++			     "\x81\x18\xaf\x23\xba\x51\xe8\x5c"
++			     "\xf3\x8a\x21\x95\x2c\xc3\x37\xce"
++			     "\x65\xfc\x70\x07\x9e\x12\xa9\x40"
++			     "\xd7\x4b\xe2\x79\x10\x84\x1b\xb2"
++			     "\x26\xbd\x54\xeb\x5f\xf6\x8d\x01"
++			     "\x98\x2f\xc6\x3a\xd1\x68\xff\x73"
++			     "\x0a\xa1\x15\xac\x43\xda\x4e\xe5"
++			     "\x7c\x13\x87\x1e\xb5\x29\xc0\x57"
++			     "\xee\x62\xf9\x90\x04\x9b\x32\xc9"
++			     "\x3d\xd4\x6b\x02\x76\x0d\xa4\x18"
++			     "\xaf\x46\xdd\x51\xe8\x7f\x16\x8a"
++			     "\x21\xb8\x2c\xc3\x5a\xf1\x65\xfc"
++			     "\x93\x07\x9e\x35\xcc\x40\xd7\x6e"
++			     "\x05\x79\x10\xa7\x1b\xb2\x49\xe0"
++			     "\x54\xeb\x82\x19\x8d\x24\xbb\x2f"
++			     "\xc6\x5d\xf4\x68\xff\x96\x0a\xa1"
++			     "\x38\xcf\x43\xda\x71\x08\x7c\x13"
++			     "\xaa\x1e\xb5\x4c\xe3\x57\xee\x85"
++			     "\x1c\x90\x27\xbe\x32\xc9\x60\xf7"
++			     "\x6b\x02\x99\x0d\xa4\x3b\xd2\x46"
++			     "\xdd\x74\x0b\x7f\x16\xad\x21\xb8"
++			     "\x4f\xe6\x5a\xf1\x88\x1f\x93\x2a"
++			     "\xc1\x35\xcc\x63\xfa\x6e\x05\x9c"
++			     "\x10\xa7\x3e\xd5\x49\xe0\x77\x0e"
++			     "\x82\x19\xb0\x24\xbb\x52\xe9\x5d"
++			     "\xf4\x8b\x22\x96\x2d\xc4\x38\xcf"
++			     "\x66\xfd\x71\x08\x9f\x13\xaa\x41"
++			     "\xd8\x4c\xe3\x7a\x11\x85\x1c\xb3"
++			     "\x27\xbe\x55\xec\x60\xf7\x8e\x02"
++			     "\x99\x30\xc7\x3b\xd2\x69\x00\x74"
++			     "\x0b\xa2\x16\xad\x44\xdb\x4f\xe6"
++			     "\x7d\x14\x88\x1f\xb6\x2a\xc1\x58"
++			     "\xef\x63\xfa\x91\x05\x9c\x33\xca"
++			     "\x3e\xd5\x6c\x03\x77\x0e\xa5\x19"
++			     "\xb0\x47\xde\x52\xe9\x80\x17\x8b"
++			     "\x22\xb9\x2d\xc4\x5b\xf2\x66\xfd"
++			     "\x94\x08\x9f\x36\xcd\x41\xd8\x6f"
++			     "\x06\x7a\x11\xa8\x1c\xb3\x4a\xe1"
++			     "\x55\xec\x83\x1a\x8e\x25\xbc\x30"
++			     "\xc7\x5e\xf5\x69\x00\x97\x0b\xa2"
++			     "\x39\xd0\x44\xdb\x72\x09\x7d\x14"
++			     "\xab\x1f\xb6\x4d\xe4\x58\xef\x86"
++			     "\x1d\x91\x28\xbf\x33\xca\x61\xf8"
++			     "\x6c\x03\x9a\x0e\xa5\x3c\xd3\x47"
++			     "\xde\x75\x0c\x80\x17\xae\x22\xb9"
++			     "\x50\xe7\x5b\xf2\x89\x20\x94\x2b"
++			     "\xc2\x36\xcd\x64\xfb\x6f\x06\x9d"
++			     "\x11\xa8\x3f\xd6\x4a\xe1\x78\x0f"
++			     "\x83\x1a\xb1\x25\xbc\x53\xea\x5e"
++			     "\xf5\x8c\x00\x97\x2e\xc5\x39\xd0"
++			     "\x67\xfe\x72\x09\xa0\x14\xab\x42"
++			     "\xd9\x4d\xe4\x7b\x12\x86\x1d\xb4"
++			     "\x28\xbf\x56\xed\x61\xf8\x8f\x03"
++			     "\x9a\x31\xc8\x3c\xd3\x6a\x01\x75"
++			     "\x0c\xa3\x17\xae\x45\xdc\x50\xe7"
++			     "\x7e\x15\x89\x20\xb7\x2b\xc2\x59"
++			     "\xf0\x64\xfb\x92\x06\x9d\x34\xcb"
++			     "\x3f\xd6\x6d\x04\x78\x0f\xa6\x1a"
++			     "\xb1\x48\xdf\x53\xea\x81\x18\x8c"
++			     "\x23\xba\x2e\xc5\x5c\xf3\x67\xfe"
++			     "\x95\x09\xa0\x37\xce\x42\xd9\x70"
++			     "\x07\x7b\x12\xa9\x1d\xb4\x4b\xe2"
++			     "\x56\xed\x84\x1b\x8f\x26\xbd\x31"
++			     "\xc8\x5f\xf6\x6a\x01\x98\x0c\xa3"
++			     "\x3a\xd1\x45\xdc\x73\x0a\x7e\x15"
++			     "\xac\x20\xb7\x4e\xe5\x59\xf0\x87"
++			     "\x1e\x92\x29\xc0\x34\xcb\x62\xf9"
++			     "\x6d\x04\x9b\x0f\xa6\x3d\xd4\x48"
++			     "\xdf\x76\x0d\x81\x18\xaf\x23\xba"
++			     "\x51\xe8\x5c\xf3\x8a\x21\x95\x2c"
++			     "\xc3\x37\xce\x65\xfc\x70\x07\x9e"
++			     "\x12\xa9\x40\xd7\x4b\xe2\x79\x10"
++			     "\x84\x1b\xb2\x26\xbd\x54\xeb\x5f"
++			     "\xf6\x8d\x01\x98\x2f\xc6\x3a\xd1"
++			     "\x68\xff\x73\x0a\xa1\x15\xac\x43"
++			     "\xda\x4e\xe5\x7c\x13\x87\x1e\xb5"
++			     "\x29\xc0\x57\xee\x62\xf9\x90\x04"
++			     "\x9b\x32\xc9\x3d\xd4\x6b\x02\x76"
++			     "\x0d\xa4\x18\xaf\x46\xdd\x51\xe8"
++			     "\x7f\x16\x8a\x21\xb8\x2c\xc3\x5a"
++			     "\xf1\x65\xfc\x93\x07\x9e\x35\xcc"
++			     "\x40\xd7\x6e\x05\x79\x10\xa7\x1b"
++			     "\xb2\x49\xe0\x54\xeb\x82\x19\x8d"
++			     "\x24\xbb\x2f\xc6\x5d\xf4\x68\xff"
++			     "\x96\x0a\xa1\x38\xcf\x43\xda\x71"
++			     "\x08\x7c\x13\xaa\x1e\xb5\x4c",
++		.psize     = 1023,
++		.digest    = "\x13\x0a\x5b\xcb\x83\x9f\x10\x89"
++			     "\xbb\x62\xda\xe4\xf4\xd3\x21\xf8",
++	},
++};
 +
- static int shash_default_finup(struct shash_desc *desc, const u8 *data,
- 			       unsigned int len, u8 *out)
- {
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 6f6b9de12cd3..36b88d34c0dd 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -209,6 +209,7 @@ struct shash_desc {
-  * @final: see struct ahash_alg
-  * @finup: see struct ahash_alg
-  * @digest: see struct ahash_alg
-+ * @squeeze: Get data from an XOF type of hash
-  * @export: see struct ahash_alg
-  * @import: see struct ahash_alg
-  * @export_core: see struct ahash_alg
-@@ -241,6 +242,8 @@ struct shash_alg {
- 		     unsigned int len, u8 *out);
- 	int (*digest)(struct shash_desc *desc, const u8 *data,
- 		      unsigned int len, u8 *out);
-+	int (*squeeze)(struct shash_desc *desc, u8 *out, size_t outlen,
-+		       bool final);
- 	int (*export)(struct shash_desc *desc, void *out);
- 	int (*import)(struct shash_desc *desc, const void *in);
- 	int (*export_core)(struct shash_desc *desc, void *out);
-@@ -1011,6 +1014,22 @@ static inline int crypto_shash_final(struct shash_desc *desc, u8 *out)
- 	return crypto_shash_finup(desc, NULL, 0, out);
- }
++static const struct hash_testvec shake256_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\x46\xb9\xdd\x2b\x0b\xa8\x8d\x13"
++				"\x23\x3b\x3f\xeb\x74\x3e\xeb\x24"
++				"\x3f\xcd\x52\xea\x62\xb8\x1b\x82"
++				"\xb5\x0c\x27\x64\x6e\xd5\x76\x2f",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x86\x7e\x2c\xb0\x4f\x5a\x04\xdc"
++				"\xbd\x59\x25\x01\xa5\xe8\xfe\x9c"
++				"\xea\xaf\xca\x50\x25\x56\x26\xca"
++				"\x73\x6c\x13\x80\x42\x53\x0b\xa4",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++			     "jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest = "\x4d\x8c\x2d\xd2\x43\x5a\x01\x28"
++				"\xee\xfb\xb8\xc3\x6f\x6f\x87\x13"
++				"\x3a\x79\x11\xe1\x8d\x97\x9e\xe1"
++				"\xae\x6b\xe5\xd4\xfd\x2e\x33\x29",
++	}, {
++		.plaintext = "\x08\x9f\x13\xaa\x41\xd8\x4c\xe3"
++			     "\x7a\x11\x85\x1c\xb3\x27\xbe\x55"
++			     "\xec\x60\xf7\x8e\x02\x99\x30\xc7"
++			     "\x3b\xd2\x69\x00\x74\x0b\xa2\x16"
++			     "\xad\x44\xdb\x4f\xe6\x7d\x14\x88"
++			     "\x1f\xb6\x2a\xc1\x58\xef\x63\xfa"
++			     "\x91\x05\x9c\x33\xca\x3e\xd5\x6c"
++			     "\x03\x77\x0e\xa5\x19\xb0\x47\xde"
++			     "\x52\xe9\x80\x17\x8b\x22\xb9\x2d"
++			     "\xc4\x5b\xf2\x66\xfd\x94\x08\x9f"
++			     "\x36\xcd\x41\xd8\x6f\x06\x7a\x11"
++			     "\xa8\x1c\xb3\x4a\xe1\x55\xec\x83"
++			     "\x1a\x8e\x25\xbc\x30\xc7\x5e\xf5"
++			     "\x69\x00\x97\x0b\xa2\x39\xd0\x44"
++			     "\xdb\x72\x09\x7d\x14\xab\x1f\xb6"
++			     "\x4d\xe4\x58\xef\x86\x1d\x91\x28"
++			     "\xbf\x33\xca\x61\xf8\x6c\x03\x9a"
++			     "\x0e\xa5\x3c\xd3\x47\xde\x75\x0c"
++			     "\x80\x17\xae\x22\xb9\x50\xe7\x5b"
++			     "\xf2\x89\x20\x94\x2b\xc2\x36\xcd"
++			     "\x64\xfb\x6f\x06\x9d\x11\xa8\x3f"
++			     "\xd6\x4a\xe1\x78\x0f\x83\x1a\xb1"
++			     "\x25\xbc\x53\xea\x5e\xf5\x8c\x00"
++			     "\x97\x2e\xc5\x39\xd0\x67\xfe\x72"
++			     "\x09\xa0\x14\xab\x42\xd9\x4d\xe4"
++			     "\x7b\x12\x86\x1d\xb4\x28\xbf\x56"
++			     "\xed\x61\xf8\x8f\x03\x9a\x31\xc8"
++			     "\x3c\xd3\x6a\x01\x75\x0c\xa3\x17"
++			     "\xae\x45\xdc\x50\xe7\x7e\x15\x89"
++			     "\x20\xb7\x2b\xc2\x59\xf0\x64\xfb"
++			     "\x92\x06\x9d\x34\xcb\x3f\xd6\x6d"
++			     "\x04\x78\x0f\xa6\x1a\xb1\x48\xdf"
++			     "\x53\xea\x81\x18\x8c\x23\xba\x2e"
++			     "\xc5\x5c\xf3\x67\xfe\x95\x09\xa0"
++			     "\x37\xce\x42\xd9\x70\x07\x7b\x12"
++			     "\xa9\x1d\xb4\x4b\xe2\x56\xed\x84"
++			     "\x1b\x8f\x26\xbd\x31\xc8\x5f\xf6"
++			     "\x6a\x01\x98\x0c\xa3\x3a\xd1\x45"
++			     "\xdc\x73\x0a\x7e\x15\xac\x20\xb7"
++			     "\x4e\xe5\x59\xf0\x87\x1e\x92\x29"
++			     "\xc0\x34\xcb\x62\xf9\x6d\x04\x9b"
++			     "\x0f\xa6\x3d\xd4\x48\xdf\x76\x0d"
++			     "\x81\x18\xaf\x23\xba\x51\xe8\x5c"
++			     "\xf3\x8a\x21\x95\x2c\xc3\x37\xce"
++			     "\x65\xfc\x70\x07\x9e\x12\xa9\x40"
++			     "\xd7\x4b\xe2\x79\x10\x84\x1b\xb2"
++			     "\x26\xbd\x54\xeb\x5f\xf6\x8d\x01"
++			     "\x98\x2f\xc6\x3a\xd1\x68\xff\x73"
++			     "\x0a\xa1\x15\xac\x43\xda\x4e\xe5"
++			     "\x7c\x13\x87\x1e\xb5\x29\xc0\x57"
++			     "\xee\x62\xf9\x90\x04\x9b\x32\xc9"
++			     "\x3d\xd4\x6b\x02\x76\x0d\xa4\x18"
++			     "\xaf\x46\xdd\x51\xe8\x7f\x16\x8a"
++			     "\x21\xb8\x2c\xc3\x5a\xf1\x65\xfc"
++			     "\x93\x07\x9e\x35\xcc\x40\xd7\x6e"
++			     "\x05\x79\x10\xa7\x1b\xb2\x49\xe0"
++			     "\x54\xeb\x82\x19\x8d\x24\xbb\x2f"
++			     "\xc6\x5d\xf4\x68\xff\x96\x0a\xa1"
++			     "\x38\xcf\x43\xda\x71\x08\x7c\x13"
++			     "\xaa\x1e\xb5\x4c\xe3\x57\xee\x85"
++			     "\x1c\x90\x27\xbe\x32\xc9\x60\xf7"
++			     "\x6b\x02\x99\x0d\xa4\x3b\xd2\x46"
++			     "\xdd\x74\x0b\x7f\x16\xad\x21\xb8"
++			     "\x4f\xe6\x5a\xf1\x88\x1f\x93\x2a"
++			     "\xc1\x35\xcc\x63\xfa\x6e\x05\x9c"
++			     "\x10\xa7\x3e\xd5\x49\xe0\x77\x0e"
++			     "\x82\x19\xb0\x24\xbb\x52\xe9\x5d"
++			     "\xf4\x8b\x22\x96\x2d\xc4\x38\xcf"
++			     "\x66\xfd\x71\x08\x9f\x13\xaa\x41"
++			     "\xd8\x4c\xe3\x7a\x11\x85\x1c\xb3"
++			     "\x27\xbe\x55\xec\x60\xf7\x8e\x02"
++			     "\x99\x30\xc7\x3b\xd2\x69\x00\x74"
++			     "\x0b\xa2\x16\xad\x44\xdb\x4f\xe6"
++			     "\x7d\x14\x88\x1f\xb6\x2a\xc1\x58"
++			     "\xef\x63\xfa\x91\x05\x9c\x33\xca"
++			     "\x3e\xd5\x6c\x03\x77\x0e\xa5\x19"
++			     "\xb0\x47\xde\x52\xe9\x80\x17\x8b"
++			     "\x22\xb9\x2d\xc4\x5b\xf2\x66\xfd"
++			     "\x94\x08\x9f\x36\xcd\x41\xd8\x6f"
++			     "\x06\x7a\x11\xa8\x1c\xb3\x4a\xe1"
++			     "\x55\xec\x83\x1a\x8e\x25\xbc\x30"
++			     "\xc7\x5e\xf5\x69\x00\x97\x0b\xa2"
++			     "\x39\xd0\x44\xdb\x72\x09\x7d\x14"
++			     "\xab\x1f\xb6\x4d\xe4\x58\xef\x86"
++			     "\x1d\x91\x28\xbf\x33\xca\x61\xf8"
++			     "\x6c\x03\x9a\x0e\xa5\x3c\xd3\x47"
++			     "\xde\x75\x0c\x80\x17\xae\x22\xb9"
++			     "\x50\xe7\x5b\xf2\x89\x20\x94\x2b"
++			     "\xc2\x36\xcd\x64\xfb\x6f\x06\x9d"
++			     "\x11\xa8\x3f\xd6\x4a\xe1\x78\x0f"
++			     "\x83\x1a\xb1\x25\xbc\x53\xea\x5e"
++			     "\xf5\x8c\x00\x97\x2e\xc5\x39\xd0"
++			     "\x67\xfe\x72\x09\xa0\x14\xab\x42"
++			     "\xd9\x4d\xe4\x7b\x12\x86\x1d\xb4"
++			     "\x28\xbf\x56\xed\x61\xf8\x8f\x03"
++			     "\x9a\x31\xc8\x3c\xd3\x6a\x01\x75"
++			     "\x0c\xa3\x17\xae\x45\xdc\x50\xe7"
++			     "\x7e\x15\x89\x20\xb7\x2b\xc2\x59"
++			     "\xf0\x64\xfb\x92\x06\x9d\x34\xcb"
++			     "\x3f\xd6\x6d\x04\x78\x0f\xa6\x1a"
++			     "\xb1\x48\xdf\x53\xea\x81\x18\x8c"
++			     "\x23\xba\x2e\xc5\x5c\xf3\x67\xfe"
++			     "\x95\x09\xa0\x37\xce\x42\xd9\x70"
++			     "\x07\x7b\x12\xa9\x1d\xb4\x4b\xe2"
++			     "\x56\xed\x84\x1b\x8f\x26\xbd\x31"
++			     "\xc8\x5f\xf6\x6a\x01\x98\x0c\xa3"
++			     "\x3a\xd1\x45\xdc\x73\x0a\x7e\x15"
++			     "\xac\x20\xb7\x4e\xe5\x59\xf0\x87"
++			     "\x1e\x92\x29\xc0\x34\xcb\x62\xf9"
++			     "\x6d\x04\x9b\x0f\xa6\x3d\xd4\x48"
++			     "\xdf\x76\x0d\x81\x18\xaf\x23\xba"
++			     "\x51\xe8\x5c\xf3\x8a\x21\x95\x2c"
++			     "\xc3\x37\xce\x65\xfc\x70\x07\x9e"
++			     "\x12\xa9\x40\xd7\x4b\xe2\x79\x10"
++			     "\x84\x1b\xb2\x26\xbd\x54\xeb\x5f"
++			     "\xf6\x8d\x01\x98\x2f\xc6\x3a\xd1"
++			     "\x68\xff\x73\x0a\xa1\x15\xac\x43"
++			     "\xda\x4e\xe5\x7c\x13\x87\x1e\xb5"
++			     "\x29\xc0\x57\xee\x62\xf9\x90\x04"
++			     "\x9b\x32\xc9\x3d\xd4\x6b\x02\x76"
++			     "\x0d\xa4\x18\xaf\x46\xdd\x51\xe8"
++			     "\x7f\x16\x8a\x21\xb8\x2c\xc3\x5a"
++			     "\xf1\x65\xfc\x93\x07\x9e\x35\xcc"
++			     "\x40\xd7\x6e\x05\x79\x10\xa7\x1b"
++			     "\xb2\x49\xe0\x54\xeb\x82\x19\x8d"
++			     "\x24\xbb\x2f\xc6\x5d\xf4\x68\xff"
++			     "\x96\x0a\xa1\x38\xcf\x43\xda\x71"
++			     "\x08\x7c\x13\xaa\x1e\xb5\x4c",
++		.psize     = 1023,
++		.digest    = "\x24\xab\xec\xa1\x22\x05\x1c\xf3"
++			     "\xce\xdc\xc1\x02\x31\x6c\x0f\x19"
++			     "\x0a\xb2\x77\x24\xe7\x68\x71\x3b"
++			     "\x9b\x6d\x5f\xbc\xcf\x60\x28\x4c",
++	},
++};
++
  
-+/**
-+ * crypto_shash_squeeze() - get xof message digest data
-+ * @desc: operational state handle that is already filled with data
-+ * @out: output buffer filled with the XOF message digest
-+ * @outlen: number of bytes to get from the XOF
-+ * @final: whether this is the final squeeze call
-+ *
-+ * Get message digest data from an extend output function (XOF)
-+ *
-+ * Context: Any context.
-+ * Return: 0 if the data could be created successfully; < 0 if an error
-+ *         occurred
-+ */
-+int crypto_shash_squeeze(struct shash_desc *desc, u8 *out, size_t outlen,
-+			 bool final);
-+
- static inline void shash_desc_zero(struct shash_desc *desc)
- {
- 	memzero_explicit(desc,
+ /*
+  * MD5 test vectors from RFC1321
 -- 
 2.49.0
 
