@@ -1,118 +1,95 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7527723F405
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 09:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B8521420F
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Jun 2025 09:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751275313; cv=none; b=ggenWMp0RXrYfo4CTAxWQLeTx2EDKmGJlC0d8Cl8eqgj789qvTLr85AyZJ8bipGBQJmyo/Ezor/9wZpXrDg+cNrSdIRVsplyrFPriRowCuI7oc2VZVBUgE6Q37iDaBMI2YV+aSPhkAIHzO6w8BUufZGtkbGtVU18E9LA37tw1VA=
+	t=1751275476; cv=none; b=SADaFS/suFZQJ/uz4QqQ6utbcVWzUR6116l9ysB7k3PHDf95EsBgfnD28QUGZOyHOx4wcU3SJP8NrZGTMxw78fHS/thME/sU8ays1sAWS36kGP3wW1AmIP92+/tbWbL2uzebfwK3yBq8q7ZmG1xwYGfthXzb2HFSvaB/DaMRtn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751275313; c=relaxed/simple;
-	bh=0Ra7ZREU2UOx+Y2diWLUE/UBYL2lGgw+yYgJGgIaejA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G//U4BZUnY2N/eWwk2XgU84JFg5kGz/R+uToHnv1QVZ/tUeEx5odnOjVjw4MBcNT7r3iqO+nx1vzqeSXJLQxqm7TcXidGpKdSMyiVuzlnFZMrqjUffsRmx9ogoxj/iLqh0Q/ZoyIN8vYghUy5SiGzI+3tsUgUti7ZIVaMK5cxI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LWZHzc4a; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1751275476; c=relaxed/simple;
+	bh=O0tubtzTnr3IFNko/vVKRwP/B3+U+gcmQjpnQW4/ohs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YqS2JSYAjQ06K0moYSoju+JG0/5QXJCpL2bEp24Syq6bknYdBLGOwz1c7ytWSJUd2WG4E9jDsU8HMN3F8jZZ+d7pFAkiHgLO5tUy59Ks4/2FNNYv2Up1Zc/HU/RjF2mu+06v2usey/c9uxxg+l7JrWlJ0bs4EhzoPVU/J1zSsis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pdml55sx; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LWZHzc4a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pdml55sx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751275311; x=1782811311;
+  t=1751275475; x=1782811475;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=0Ra7ZREU2UOx+Y2diWLUE/UBYL2lGgw+yYgJGgIaejA=;
-  b=LWZHzc4a+qF8LKW8rs5vxcKZYU6vwTQPbHgnbETylerQ+b3DKhKhf47K
-   HH01+vRFGm+zWCChOYYatjE/GgHxtKOLB54PPPl5K/SfQZv7LuqiQqn7l
-   nWmQpnHQOsdtwoDFZbhYPeixWDNmijRymCQRr5OM90KPjK0jFkG3nEAGS
-   ctqKUTAOnPhY7qxqp9VNjZ/0t2QybVQ1k2s7OvBPydNbjRCMHTyJtETel
-   HuSaZ9VlmHCMMMJG/vm2EDuIHKs6aWlnpKwUeNXDhtDZj3pm3Hx4StuXr
-   fQHPjHpLjKIS/Ra6vEzibKH5wPsYsNCbPApIVvd/K2NIlRomgd5ZgZkEO
-   w==;
-X-CSE-ConnectionGUID: 5XlKY3+MRyuL5F0WlXCBEA==
-X-CSE-MsgGUID: 84pDtuvqSdqtcNHUz3FAzA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="64091275"
+  bh=O0tubtzTnr3IFNko/vVKRwP/B3+U+gcmQjpnQW4/ohs=;
+  b=Pdml55sxGstmtd7rokQkzf4nC/lBttaMYE60q7T9Otwcjc95RoAf5VMo
+   Ocy/NbnDnXi0kR8SS9VtNd4Te6IbDOvEx0GibG7aQltEIcZPl5m28T5fd
+   cnjpxKgZANWReu/98k92Nq5FUskXwABiL7B9SjxlDh4UUlo6UAFVpn9yk
+   iZZhvptFkq17XU6zNMCm7VhZ+8HNCWaHe/xf+QJz6aCJGXt1B4rqUhQ2u
+   CWMUnAjKzyOiKd6z82ll8TrbYgLY7mt/PQTdsQplfRaoi1n3PMP8Quagk
+   FhsC07U/P9bn4gOQzrfDBWyLg24qX7+hC30YjiEQbVKUD5VXDuJoZ8ozs
+   g==;
+X-CSE-ConnectionGUID: 8m2BvftrRjStoGQAhUtQ7g==
+X-CSE-MsgGUID: mhsnfc/YQuOKo3SxFTA7bg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="53588450"
 X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="64091275"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 02:21:50 -0700
-X-CSE-ConnectionGUID: F9mNJbEBSHqe7ZUzfDme8g==
-X-CSE-MsgGUID: EnwxdKnUSEWtvasJWnRXuQ==
+   d="scan'208";a="53588450"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 02:24:34 -0700
+X-CSE-ConnectionGUID: B5O1+Vc6TZyEgD8JB7WYQQ==
+X-CSE-MsgGUID: 4M6/nOnhQY+183F7+3FWFQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="153949321"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.204])
-  by fmviesa008.fm.intel.com with ESMTP; 30 Jun 2025 02:21:47 -0700
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+   d="scan'208";a="159139241"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by orviesa005.jf.intel.com with ESMTP; 30 Jun 2025 02:24:32 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Bairavi Alagappan <bairavix.alagappan@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - disable ZUC-256 capability for QAT GEN5
-Date: Mon, 30 Jun 2025 10:20:49 +0100
-Message-ID: <20250630092103.17721-2-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.50.0
+	qat-linux@intel.com
+Subject: [PATCH] crypto: zstd - fix duplicate check warning
+Date: Mon, 30 Jun 2025 10:24:18 +0100
+Message-Id: <20250630092418.918411-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-From: Bairavi Alagappan <bairavix.alagappan@intel.com>
+Fix the following warnings reported by the static analyzer Smatch:
+    crypto/zstd.c:273 zstd_decompress()
+    warn: duplicate check 'scur' (previous on line 235)
 
-The ZUC-256 EEA (encryption) and EIA (integrity) algorithms are not
-supported on QAT GEN5 devices, as their current implementation does not
-align with the NIST specification. Earlier versions of the ZUC-256
-specification used a different initialization scheme, which has since
-been revised to comply with the 5G specification.
-
-Due to this misalignment with the updated specification, remove support
-for ZUC-256 EEA and EIA for QAT GEN5 by masking out the ZUC-256
-capability.
-
-Fixes: fcf60f4bcf549 ("crypto: qat - add support for 420xx devices")
-Signed-off-by: Bairavi Alagappan <bairavix.alagappan@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/linux-crypto/92929e50-5650-40be-8c0a-de81e77f0acf@sabinyo.mountain/
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ crypto/zstd.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-index 7c3c0f561c95..8340b5e8a947 100644
---- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-@@ -191,7 +191,6 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
- 			  ICP_ACCEL_CAPABILITIES_SM4 |
- 			  ICP_ACCEL_CAPABILITIES_AES_V2 |
- 			  ICP_ACCEL_CAPABILITIES_ZUC |
--			  ICP_ACCEL_CAPABILITIES_ZUC_256 |
- 			  ICP_ACCEL_CAPABILITIES_WIRELESS_CRYPTO_EXT |
- 			  ICP_ACCEL_CAPABILITIES_EXT_ALGCHAIN;
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index 657e0cf7b952..24edb4d616b5 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -268,10 +268,9 @@ static int zstd_decompress(struct acomp_req *req)
+ 			total_out += outbuf.pos;
  
-@@ -223,17 +222,11 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
+ 			acomp_walk_done_dst(&walk, outbuf.pos);
+-		} while (scur != inbuf.pos);
++		} while (inbuf.pos != scur);
  
- 	if (fusectl1 & ICP_ACCEL_GEN4_MASK_WCP_WAT_SLICE) {
- 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_ZUC;
--		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_ZUC_256;
- 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_WIRELESS_CRYPTO_EXT;
- 	}
+-		if (scur)
+-			acomp_walk_done_src(&walk, scur);
++		acomp_walk_done_src(&walk, scur);
+ 	} while (ret == 0);
  
--	if (fusectl1 & ICP_ACCEL_GEN4_MASK_EIA3_SLICE) {
-+	if (fusectl1 & ICP_ACCEL_GEN4_MASK_EIA3_SLICE)
- 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_ZUC;
--		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_ZUC_256;
--	}
--
--	if (fusectl1 & ICP_ACCEL_GEN4_MASK_ZUC_256_SLICE)
--		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_ZUC_256;
- 
- 	capabilities_asym = ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC |
- 			  ICP_ACCEL_CAPABILITIES_SM2 |
+ out:
 
 base-commit: 864453d2e854790ec8bfe7e05f84ecdb0167026d
 -- 
-2.50.0
+2.40.1
 
