@@ -1,69 +1,46 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3C928D8DD;
-	Mon, 30 Jun 2025 14:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497421E51D;
+	Mon, 30 Jun 2025 16:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751294338; cv=none; b=dwmJDiKtsC7M74c9dlWdNjU/PHYrAhF+ekhy8c4AFGWocEY0p6RvvzbP9sPvslOV3V5ESDv4K0C1psWezS8/6+hJJCHIrfPVgb8BLtam9jlfMbKcQjdCEA49X+OrCHtlhDOSVFopyBv+l2dscieTwKMBsLUFFOcqN4sq6d7+d0M=
+	t=1751299522; cv=none; b=Gh2IlKA06rolYP0uXj/YgLxE4hssFiqvsmxBjwRdPLj7d72t27492lXyaibfnpY2lP/X0kgCRYQpEpe93dAWPkzyBJs201izk9303xdgulgLN36Z0/ipG9y8JB+LjfIJAhZBUn66ntlxWTsHjnQLIEloq3IrEpJGDV05jJhtbp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751294338; c=relaxed/simple;
-	bh=3Dm2EvQRIR0T4Sf86i6v57leLVzU/HsxdjhmcBIpZdk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lU7txGhlo3gyoJfkyAoc02XIk7ufYT8+iNwdkQdnICzlNBLqjvUjcZKiOD2UNooS5I1RZ/5g78/aBzFW8o/fiHbOEfeK5XEf9PpHu+kzBNTJuRCfiPrvV1KXFZS7ox93ZNq9yPMwhiq8UNYSrJKy9JrGIr0BcCHCD9Wk/KQwouM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LCvqCzMK; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751299522; c=relaxed/simple;
+	bh=UkM9WqpU5Sx5JdLDa3qEPydxoH8maIJf8+SQ9HnNupo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AK2r2b0UICuAhI2AqqbSx8pHFuVs700nXlAsquKxWgPqQ9Hp4KgIp3aIhXZlqYyb/loInrTv3E3/mlZ/6YrTuoVK2FiwQnRprEYpn00+lBr63J/yQV6bCl3cxCZnNohhtGRer7KnlxkbytJzRhJhyrauTLTTKfJpmf/3Hm227EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sBYmJ8H3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LCvqCzMK"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55U7n3YK020638;
-	Mon, 30 Jun 2025 14:38:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=VoTC4pOceLA2aFQDf
-	FQXuB1pZ4YrvQB3uRkqqzXmIpk=; b=LCvqCzMKQjwIozdhoPHGKwa3A9QqYQhcJ
-	BstAgCKe0Y2I5z/+zKIkHjjDP8dglch6Brk/fCJh10x6csh8CBEJimHtfjYGs9Ky
-	cmbhfN4p+/XVL3WDpZKY9zr991eWq2NvGAtDpeMSB5XZi/CkzRtVnewQME1OufPM
-	MKQw6pHXpgrdpiF8SKNjxixnX7uxobu05zfK2vCWJvkobwvKkMlcci9heHTRX+ky
-	TrgtHfCMCda12pKlx0z9aL+gbXCDP8nFqNCBHSPUq5+PSihLFvdpmfhqhn2ixSWa
-	wEPSnNF1EYS1I9TJZHKkVWkIeW5qd+1sCLXqI7jeN1pOiu7jyk06g==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fhr67-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 14:38:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UB7KeH021398;
-	Mon, 30 Jun 2025 14:38:46 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe35yb2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 14:38:46 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UEcjni8258232
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Jun 2025 14:38:45 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6449D5805E;
-	Mon, 30 Jun 2025 14:38:45 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A157158058;
-	Mon, 30 Jun 2025 14:38:44 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Jun 2025 14:38:44 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, James.Bottomley@HansenPartnership.com,
-        dhowells@redhat.com, simo@redhat.com,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v2 3/4] crypto: Add tests cases for shake128 & shake256 to testmgr
-Date: Mon, 30 Jun 2025 10:38:33 -0400
-Message-ID: <20250630143834.2748285-4-stefanb@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sBYmJ8H3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CF64C4CEE3;
+	Mon, 30 Jun 2025 16:05:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751299521;
+	bh=UkM9WqpU5Sx5JdLDa3qEPydxoH8maIJf8+SQ9HnNupo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sBYmJ8H3kL3CkKIDl8seNCQySJ0kDr96EADkNECv264riK/6RWSRB6enyEPbhlRMC
+	 EEbAWcaPtQQgSgERS4LFaWhrPd67ViW9ZwIwoCS7ZUWuwku2ljagMRaEKaNkfI5lWa
+	 E2KENqUzzaFSAPFwi+eAAwSxROzfbCH82TCE+XnzNtIiDItAnNPrnKommdUgNbu1i+
+	 2EQfNtFttk+JJQqq8RJTLDrZfwufYxeMSD8VaLlJ37LuUVDRVO1wI39q5FJ3PWIvrh
+	 vWg7U67Yv3qMhNPykLFteLKS3EEFWJR+BxML9LC887iUl7PHuUmoHtN+nuTyAJ1APk
+	 /UWmXZ65pEwSQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v3 00/16] SHA-512 library functions
+Date: Mon, 30 Jun 2025 09:03:04 -0700
+Message-ID: <20250630160320.2888-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250630143834.2748285-1-stefanb@linux.ibm.com>
-References: <20250630143834.2748285-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,378 +48,201 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: rQRTN4I-h6-35ng5qOCC9LUW1TaTMDPH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDExNyBTYWx0ZWRfX4kvF1UuSVcul K48F2YmxK6qG/qfhsLV7r+vxgsiBHVt6melcTP09qsFQnAJtQirX4EuAywKE5Aw/j2PTJCcpbOM EnC0MjUiIao7PzlBAAjk3JVa53xnfY1sdQeJUFYmZGpYnVTg+aUPFrJzxzb5npF1EdIIZIR5Sde
- vEa+oDdLv6TA7n1oYN8ql4DVQPT50/Cb4bsCFlCF76T42XS914ayeXUuaeJjpNsRf8WguBunuNK 3KqPHVszIV5X5xLyCItGwyebVODgNMTX4NfpmSNBSpQr1yNoAy4oPo/DDQj7J03xXGKM1EUy+q1 FDYiwQon2A1kTV7Q1oCdPqelfC7RhelBqBaRMguZ035SOgsHckk3IWsLUGUoMe2blrwo+D4XVEw
- iRIogbpiyW6fQEU5Te1ir3ndHmTogIiev+zFn+qy8jMS8Vuch46i8DMpsVPmlLhbIvH8pWzH
-X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=6862a177 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=xF6bd4FRdrIRRYsjWBcA:9
-X-Proofpoint-GUID: rQRTN4I-h6-35ng5qOCC9LUW1TaTMDPH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-30_03,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 mlxlogscore=723 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506300117
 
-Add test cases for shake128 & shake256 to the testmgr to test their hash
-creation.
+[ I had applied v2 of this earlier, but since it's been accumulating
+  some minor fixups and it's still -rc4, I figured I'd just refresh it ]
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- crypto/testmgr.c |  14 +++
- crypto/testmgr.h | 310 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 324 insertions(+)
+This series is also available at:
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 97190d9dcc0e..6bd67ca23bb1 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5525,6 +5525,20 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.hash = __VECS(sha512_tv_template)
- 		}
-+	}, {
-+		.alg = "shake128",
-+		.test = alg_test_hash,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.hash = __VECS(shake128_tv_template)
-+		}
-+	}, {
-+		.alg = "shake256",
-+		.test = alg_test_hash,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.hash = __VECS(shake256_tv_template)
-+		}
- 	}, {
- 		.alg = "sm3",
- 		.test = alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 32d099ac9e73..31e5918b761c 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -5914,6 +5914,316 @@ static const struct hash_testvec sha3_512_tv_template[] = {
- 	},
- };
- 
-+static const struct hash_testvec shake128_tv_template[] = {
-+	{
-+		.plaintext = "",
-+		.digest	= "\x7f\x9c\x2b\xa4\xe8\x8f\x82\x7d"
-+				"\x61\x60\x45\x50\x76\x05\x85\x3e",
-+	}, {
-+		.plaintext = "a",
-+		.psize	= 1,
-+		.digest	= "\x85\xc8\xde\x88\xd2\x88\x66\xbf"
-+				"\x08\x68\x09\x0b\x39\x61\x16\x2b",
-+	}, {
-+		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
-+			     "jklmklmnlmnomnopnopq",
-+		.psize	= 56,
-+		.digest = "\x1a\x96\x18\x2b\x50\xfb\x8c\x7e"
-+				"\x74\xe0\xa7\x07\x78\x8f\x55\xe9",
-+	}, {
-+		.plaintext = "\x08\x9f\x13\xaa\x41\xd8\x4c\xe3"
-+			     "\x7a\x11\x85\x1c\xb3\x27\xbe\x55"
-+			     "\xec\x60\xf7\x8e\x02\x99\x30\xc7"
-+			     "\x3b\xd2\x69\x00\x74\x0b\xa2\x16"
-+			     "\xad\x44\xdb\x4f\xe6\x7d\x14\x88"
-+			     "\x1f\xb6\x2a\xc1\x58\xef\x63\xfa"
-+			     "\x91\x05\x9c\x33\xca\x3e\xd5\x6c"
-+			     "\x03\x77\x0e\xa5\x19\xb0\x47\xde"
-+			     "\x52\xe9\x80\x17\x8b\x22\xb9\x2d"
-+			     "\xc4\x5b\xf2\x66\xfd\x94\x08\x9f"
-+			     "\x36\xcd\x41\xd8\x6f\x06\x7a\x11"
-+			     "\xa8\x1c\xb3\x4a\xe1\x55\xec\x83"
-+			     "\x1a\x8e\x25\xbc\x30\xc7\x5e\xf5"
-+			     "\x69\x00\x97\x0b\xa2\x39\xd0\x44"
-+			     "\xdb\x72\x09\x7d\x14\xab\x1f\xb6"
-+			     "\x4d\xe4\x58\xef\x86\x1d\x91\x28"
-+			     "\xbf\x33\xca\x61\xf8\x6c\x03\x9a"
-+			     "\x0e\xa5\x3c\xd3\x47\xde\x75\x0c"
-+			     "\x80\x17\xae\x22\xb9\x50\xe7\x5b"
-+			     "\xf2\x89\x20\x94\x2b\xc2\x36\xcd"
-+			     "\x64\xfb\x6f\x06\x9d\x11\xa8\x3f"
-+			     "\xd6\x4a\xe1\x78\x0f\x83\x1a\xb1"
-+			     "\x25\xbc\x53\xea\x5e\xf5\x8c\x00"
-+			     "\x97\x2e\xc5\x39\xd0\x67\xfe\x72"
-+			     "\x09\xa0\x14\xab\x42\xd9\x4d\xe4"
-+			     "\x7b\x12\x86\x1d\xb4\x28\xbf\x56"
-+			     "\xed\x61\xf8\x8f\x03\x9a\x31\xc8"
-+			     "\x3c\xd3\x6a\x01\x75\x0c\xa3\x17"
-+			     "\xae\x45\xdc\x50\xe7\x7e\x15\x89"
-+			     "\x20\xb7\x2b\xc2\x59\xf0\x64\xfb"
-+			     "\x92\x06\x9d\x34\xcb\x3f\xd6\x6d"
-+			     "\x04\x78\x0f\xa6\x1a\xb1\x48\xdf"
-+			     "\x53\xea\x81\x18\x8c\x23\xba\x2e"
-+			     "\xc5\x5c\xf3\x67\xfe\x95\x09\xa0"
-+			     "\x37\xce\x42\xd9\x70\x07\x7b\x12"
-+			     "\xa9\x1d\xb4\x4b\xe2\x56\xed\x84"
-+			     "\x1b\x8f\x26\xbd\x31\xc8\x5f\xf6"
-+			     "\x6a\x01\x98\x0c\xa3\x3a\xd1\x45"
-+			     "\xdc\x73\x0a\x7e\x15\xac\x20\xb7"
-+			     "\x4e\xe5\x59\xf0\x87\x1e\x92\x29"
-+			     "\xc0\x34\xcb\x62\xf9\x6d\x04\x9b"
-+			     "\x0f\xa6\x3d\xd4\x48\xdf\x76\x0d"
-+			     "\x81\x18\xaf\x23\xba\x51\xe8\x5c"
-+			     "\xf3\x8a\x21\x95\x2c\xc3\x37\xce"
-+			     "\x65\xfc\x70\x07\x9e\x12\xa9\x40"
-+			     "\xd7\x4b\xe2\x79\x10\x84\x1b\xb2"
-+			     "\x26\xbd\x54\xeb\x5f\xf6\x8d\x01"
-+			     "\x98\x2f\xc6\x3a\xd1\x68\xff\x73"
-+			     "\x0a\xa1\x15\xac\x43\xda\x4e\xe5"
-+			     "\x7c\x13\x87\x1e\xb5\x29\xc0\x57"
-+			     "\xee\x62\xf9\x90\x04\x9b\x32\xc9"
-+			     "\x3d\xd4\x6b\x02\x76\x0d\xa4\x18"
-+			     "\xaf\x46\xdd\x51\xe8\x7f\x16\x8a"
-+			     "\x21\xb8\x2c\xc3\x5a\xf1\x65\xfc"
-+			     "\x93\x07\x9e\x35\xcc\x40\xd7\x6e"
-+			     "\x05\x79\x10\xa7\x1b\xb2\x49\xe0"
-+			     "\x54\xeb\x82\x19\x8d\x24\xbb\x2f"
-+			     "\xc6\x5d\xf4\x68\xff\x96\x0a\xa1"
-+			     "\x38\xcf\x43\xda\x71\x08\x7c\x13"
-+			     "\xaa\x1e\xb5\x4c\xe3\x57\xee\x85"
-+			     "\x1c\x90\x27\xbe\x32\xc9\x60\xf7"
-+			     "\x6b\x02\x99\x0d\xa4\x3b\xd2\x46"
-+			     "\xdd\x74\x0b\x7f\x16\xad\x21\xb8"
-+			     "\x4f\xe6\x5a\xf1\x88\x1f\x93\x2a"
-+			     "\xc1\x35\xcc\x63\xfa\x6e\x05\x9c"
-+			     "\x10\xa7\x3e\xd5\x49\xe0\x77\x0e"
-+			     "\x82\x19\xb0\x24\xbb\x52\xe9\x5d"
-+			     "\xf4\x8b\x22\x96\x2d\xc4\x38\xcf"
-+			     "\x66\xfd\x71\x08\x9f\x13\xaa\x41"
-+			     "\xd8\x4c\xe3\x7a\x11\x85\x1c\xb3"
-+			     "\x27\xbe\x55\xec\x60\xf7\x8e\x02"
-+			     "\x99\x30\xc7\x3b\xd2\x69\x00\x74"
-+			     "\x0b\xa2\x16\xad\x44\xdb\x4f\xe6"
-+			     "\x7d\x14\x88\x1f\xb6\x2a\xc1\x58"
-+			     "\xef\x63\xfa\x91\x05\x9c\x33\xca"
-+			     "\x3e\xd5\x6c\x03\x77\x0e\xa5\x19"
-+			     "\xb0\x47\xde\x52\xe9\x80\x17\x8b"
-+			     "\x22\xb9\x2d\xc4\x5b\xf2\x66\xfd"
-+			     "\x94\x08\x9f\x36\xcd\x41\xd8\x6f"
-+			     "\x06\x7a\x11\xa8\x1c\xb3\x4a\xe1"
-+			     "\x55\xec\x83\x1a\x8e\x25\xbc\x30"
-+			     "\xc7\x5e\xf5\x69\x00\x97\x0b\xa2"
-+			     "\x39\xd0\x44\xdb\x72\x09\x7d\x14"
-+			     "\xab\x1f\xb6\x4d\xe4\x58\xef\x86"
-+			     "\x1d\x91\x28\xbf\x33\xca\x61\xf8"
-+			     "\x6c\x03\x9a\x0e\xa5\x3c\xd3\x47"
-+			     "\xde\x75\x0c\x80\x17\xae\x22\xb9"
-+			     "\x50\xe7\x5b\xf2\x89\x20\x94\x2b"
-+			     "\xc2\x36\xcd\x64\xfb\x6f\x06\x9d"
-+			     "\x11\xa8\x3f\xd6\x4a\xe1\x78\x0f"
-+			     "\x83\x1a\xb1\x25\xbc\x53\xea\x5e"
-+			     "\xf5\x8c\x00\x97\x2e\xc5\x39\xd0"
-+			     "\x67\xfe\x72\x09\xa0\x14\xab\x42"
-+			     "\xd9\x4d\xe4\x7b\x12\x86\x1d\xb4"
-+			     "\x28\xbf\x56\xed\x61\xf8\x8f\x03"
-+			     "\x9a\x31\xc8\x3c\xd3\x6a\x01\x75"
-+			     "\x0c\xa3\x17\xae\x45\xdc\x50\xe7"
-+			     "\x7e\x15\x89\x20\xb7\x2b\xc2\x59"
-+			     "\xf0\x64\xfb\x92\x06\x9d\x34\xcb"
-+			     "\x3f\xd6\x6d\x04\x78\x0f\xa6\x1a"
-+			     "\xb1\x48\xdf\x53\xea\x81\x18\x8c"
-+			     "\x23\xba\x2e\xc5\x5c\xf3\x67\xfe"
-+			     "\x95\x09\xa0\x37\xce\x42\xd9\x70"
-+			     "\x07\x7b\x12\xa9\x1d\xb4\x4b\xe2"
-+			     "\x56\xed\x84\x1b\x8f\x26\xbd\x31"
-+			     "\xc8\x5f\xf6\x6a\x01\x98\x0c\xa3"
-+			     "\x3a\xd1\x45\xdc\x73\x0a\x7e\x15"
-+			     "\xac\x20\xb7\x4e\xe5\x59\xf0\x87"
-+			     "\x1e\x92\x29\xc0\x34\xcb\x62\xf9"
-+			     "\x6d\x04\x9b\x0f\xa6\x3d\xd4\x48"
-+			     "\xdf\x76\x0d\x81\x18\xaf\x23\xba"
-+			     "\x51\xe8\x5c\xf3\x8a\x21\x95\x2c"
-+			     "\xc3\x37\xce\x65\xfc\x70\x07\x9e"
-+			     "\x12\xa9\x40\xd7\x4b\xe2\x79\x10"
-+			     "\x84\x1b\xb2\x26\xbd\x54\xeb\x5f"
-+			     "\xf6\x8d\x01\x98\x2f\xc6\x3a\xd1"
-+			     "\x68\xff\x73\x0a\xa1\x15\xac\x43"
-+			     "\xda\x4e\xe5\x7c\x13\x87\x1e\xb5"
-+			     "\x29\xc0\x57\xee\x62\xf9\x90\x04"
-+			     "\x9b\x32\xc9\x3d\xd4\x6b\x02\x76"
-+			     "\x0d\xa4\x18\xaf\x46\xdd\x51\xe8"
-+			     "\x7f\x16\x8a\x21\xb8\x2c\xc3\x5a"
-+			     "\xf1\x65\xfc\x93\x07\x9e\x35\xcc"
-+			     "\x40\xd7\x6e\x05\x79\x10\xa7\x1b"
-+			     "\xb2\x49\xe0\x54\xeb\x82\x19\x8d"
-+			     "\x24\xbb\x2f\xc6\x5d\xf4\x68\xff"
-+			     "\x96\x0a\xa1\x38\xcf\x43\xda\x71"
-+			     "\x08\x7c\x13\xaa\x1e\xb5\x4c",
-+		.psize     = 1023,
-+		.digest    = "\x13\x0a\x5b\xcb\x83\x9f\x10\x89"
-+			     "\xbb\x62\xda\xe4\xf4\xd3\x21\xf8",
-+	},
-+};
-+
-+static const struct hash_testvec shake256_tv_template[] = {
-+	{
-+		.plaintext = "",
-+		.digest	= "\x46\xb9\xdd\x2b\x0b\xa8\x8d\x13"
-+				"\x23\x3b\x3f\xeb\x74\x3e\xeb\x24"
-+				"\x3f\xcd\x52\xea\x62\xb8\x1b\x82"
-+				"\xb5\x0c\x27\x64\x6e\xd5\x76\x2f",
-+	}, {
-+		.plaintext = "a",
-+		.psize	= 1,
-+		.digest	= "\x86\x7e\x2c\xb0\x4f\x5a\x04\xdc"
-+				"\xbd\x59\x25\x01\xa5\xe8\xfe\x9c"
-+				"\xea\xaf\xca\x50\x25\x56\x26\xca"
-+				"\x73\x6c\x13\x80\x42\x53\x0b\xa4",
-+	}, {
-+		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
-+			     "jklmklmnlmnomnopnopq",
-+		.psize	= 56,
-+		.digest = "\x4d\x8c\x2d\xd2\x43\x5a\x01\x28"
-+				"\xee\xfb\xb8\xc3\x6f\x6f\x87\x13"
-+				"\x3a\x79\x11\xe1\x8d\x97\x9e\xe1"
-+				"\xae\x6b\xe5\xd4\xfd\x2e\x33\x29",
-+	}, {
-+		.plaintext = "\x08\x9f\x13\xaa\x41\xd8\x4c\xe3"
-+			     "\x7a\x11\x85\x1c\xb3\x27\xbe\x55"
-+			     "\xec\x60\xf7\x8e\x02\x99\x30\xc7"
-+			     "\x3b\xd2\x69\x00\x74\x0b\xa2\x16"
-+			     "\xad\x44\xdb\x4f\xe6\x7d\x14\x88"
-+			     "\x1f\xb6\x2a\xc1\x58\xef\x63\xfa"
-+			     "\x91\x05\x9c\x33\xca\x3e\xd5\x6c"
-+			     "\x03\x77\x0e\xa5\x19\xb0\x47\xde"
-+			     "\x52\xe9\x80\x17\x8b\x22\xb9\x2d"
-+			     "\xc4\x5b\xf2\x66\xfd\x94\x08\x9f"
-+			     "\x36\xcd\x41\xd8\x6f\x06\x7a\x11"
-+			     "\xa8\x1c\xb3\x4a\xe1\x55\xec\x83"
-+			     "\x1a\x8e\x25\xbc\x30\xc7\x5e\xf5"
-+			     "\x69\x00\x97\x0b\xa2\x39\xd0\x44"
-+			     "\xdb\x72\x09\x7d\x14\xab\x1f\xb6"
-+			     "\x4d\xe4\x58\xef\x86\x1d\x91\x28"
-+			     "\xbf\x33\xca\x61\xf8\x6c\x03\x9a"
-+			     "\x0e\xa5\x3c\xd3\x47\xde\x75\x0c"
-+			     "\x80\x17\xae\x22\xb9\x50\xe7\x5b"
-+			     "\xf2\x89\x20\x94\x2b\xc2\x36\xcd"
-+			     "\x64\xfb\x6f\x06\x9d\x11\xa8\x3f"
-+			     "\xd6\x4a\xe1\x78\x0f\x83\x1a\xb1"
-+			     "\x25\xbc\x53\xea\x5e\xf5\x8c\x00"
-+			     "\x97\x2e\xc5\x39\xd0\x67\xfe\x72"
-+			     "\x09\xa0\x14\xab\x42\xd9\x4d\xe4"
-+			     "\x7b\x12\x86\x1d\xb4\x28\xbf\x56"
-+			     "\xed\x61\xf8\x8f\x03\x9a\x31\xc8"
-+			     "\x3c\xd3\x6a\x01\x75\x0c\xa3\x17"
-+			     "\xae\x45\xdc\x50\xe7\x7e\x15\x89"
-+			     "\x20\xb7\x2b\xc2\x59\xf0\x64\xfb"
-+			     "\x92\x06\x9d\x34\xcb\x3f\xd6\x6d"
-+			     "\x04\x78\x0f\xa6\x1a\xb1\x48\xdf"
-+			     "\x53\xea\x81\x18\x8c\x23\xba\x2e"
-+			     "\xc5\x5c\xf3\x67\xfe\x95\x09\xa0"
-+			     "\x37\xce\x42\xd9\x70\x07\x7b\x12"
-+			     "\xa9\x1d\xb4\x4b\xe2\x56\xed\x84"
-+			     "\x1b\x8f\x26\xbd\x31\xc8\x5f\xf6"
-+			     "\x6a\x01\x98\x0c\xa3\x3a\xd1\x45"
-+			     "\xdc\x73\x0a\x7e\x15\xac\x20\xb7"
-+			     "\x4e\xe5\x59\xf0\x87\x1e\x92\x29"
-+			     "\xc0\x34\xcb\x62\xf9\x6d\x04\x9b"
-+			     "\x0f\xa6\x3d\xd4\x48\xdf\x76\x0d"
-+			     "\x81\x18\xaf\x23\xba\x51\xe8\x5c"
-+			     "\xf3\x8a\x21\x95\x2c\xc3\x37\xce"
-+			     "\x65\xfc\x70\x07\x9e\x12\xa9\x40"
-+			     "\xd7\x4b\xe2\x79\x10\x84\x1b\xb2"
-+			     "\x26\xbd\x54\xeb\x5f\xf6\x8d\x01"
-+			     "\x98\x2f\xc6\x3a\xd1\x68\xff\x73"
-+			     "\x0a\xa1\x15\xac\x43\xda\x4e\xe5"
-+			     "\x7c\x13\x87\x1e\xb5\x29\xc0\x57"
-+			     "\xee\x62\xf9\x90\x04\x9b\x32\xc9"
-+			     "\x3d\xd4\x6b\x02\x76\x0d\xa4\x18"
-+			     "\xaf\x46\xdd\x51\xe8\x7f\x16\x8a"
-+			     "\x21\xb8\x2c\xc3\x5a\xf1\x65\xfc"
-+			     "\x93\x07\x9e\x35\xcc\x40\xd7\x6e"
-+			     "\x05\x79\x10\xa7\x1b\xb2\x49\xe0"
-+			     "\x54\xeb\x82\x19\x8d\x24\xbb\x2f"
-+			     "\xc6\x5d\xf4\x68\xff\x96\x0a\xa1"
-+			     "\x38\xcf\x43\xda\x71\x08\x7c\x13"
-+			     "\xaa\x1e\xb5\x4c\xe3\x57\xee\x85"
-+			     "\x1c\x90\x27\xbe\x32\xc9\x60\xf7"
-+			     "\x6b\x02\x99\x0d\xa4\x3b\xd2\x46"
-+			     "\xdd\x74\x0b\x7f\x16\xad\x21\xb8"
-+			     "\x4f\xe6\x5a\xf1\x88\x1f\x93\x2a"
-+			     "\xc1\x35\xcc\x63\xfa\x6e\x05\x9c"
-+			     "\x10\xa7\x3e\xd5\x49\xe0\x77\x0e"
-+			     "\x82\x19\xb0\x24\xbb\x52\xe9\x5d"
-+			     "\xf4\x8b\x22\x96\x2d\xc4\x38\xcf"
-+			     "\x66\xfd\x71\x08\x9f\x13\xaa\x41"
-+			     "\xd8\x4c\xe3\x7a\x11\x85\x1c\xb3"
-+			     "\x27\xbe\x55\xec\x60\xf7\x8e\x02"
-+			     "\x99\x30\xc7\x3b\xd2\x69\x00\x74"
-+			     "\x0b\xa2\x16\xad\x44\xdb\x4f\xe6"
-+			     "\x7d\x14\x88\x1f\xb6\x2a\xc1\x58"
-+			     "\xef\x63\xfa\x91\x05\x9c\x33\xca"
-+			     "\x3e\xd5\x6c\x03\x77\x0e\xa5\x19"
-+			     "\xb0\x47\xde\x52\xe9\x80\x17\x8b"
-+			     "\x22\xb9\x2d\xc4\x5b\xf2\x66\xfd"
-+			     "\x94\x08\x9f\x36\xcd\x41\xd8\x6f"
-+			     "\x06\x7a\x11\xa8\x1c\xb3\x4a\xe1"
-+			     "\x55\xec\x83\x1a\x8e\x25\xbc\x30"
-+			     "\xc7\x5e\xf5\x69\x00\x97\x0b\xa2"
-+			     "\x39\xd0\x44\xdb\x72\x09\x7d\x14"
-+			     "\xab\x1f\xb6\x4d\xe4\x58\xef\x86"
-+			     "\x1d\x91\x28\xbf\x33\xca\x61\xf8"
-+			     "\x6c\x03\x9a\x0e\xa5\x3c\xd3\x47"
-+			     "\xde\x75\x0c\x80\x17\xae\x22\xb9"
-+			     "\x50\xe7\x5b\xf2\x89\x20\x94\x2b"
-+			     "\xc2\x36\xcd\x64\xfb\x6f\x06\x9d"
-+			     "\x11\xa8\x3f\xd6\x4a\xe1\x78\x0f"
-+			     "\x83\x1a\xb1\x25\xbc\x53\xea\x5e"
-+			     "\xf5\x8c\x00\x97\x2e\xc5\x39\xd0"
-+			     "\x67\xfe\x72\x09\xa0\x14\xab\x42"
-+			     "\xd9\x4d\xe4\x7b\x12\x86\x1d\xb4"
-+			     "\x28\xbf\x56\xed\x61\xf8\x8f\x03"
-+			     "\x9a\x31\xc8\x3c\xd3\x6a\x01\x75"
-+			     "\x0c\xa3\x17\xae\x45\xdc\x50\xe7"
-+			     "\x7e\x15\x89\x20\xb7\x2b\xc2\x59"
-+			     "\xf0\x64\xfb\x92\x06\x9d\x34\xcb"
-+			     "\x3f\xd6\x6d\x04\x78\x0f\xa6\x1a"
-+			     "\xb1\x48\xdf\x53\xea\x81\x18\x8c"
-+			     "\x23\xba\x2e\xc5\x5c\xf3\x67\xfe"
-+			     "\x95\x09\xa0\x37\xce\x42\xd9\x70"
-+			     "\x07\x7b\x12\xa9\x1d\xb4\x4b\xe2"
-+			     "\x56\xed\x84\x1b\x8f\x26\xbd\x31"
-+			     "\xc8\x5f\xf6\x6a\x01\x98\x0c\xa3"
-+			     "\x3a\xd1\x45\xdc\x73\x0a\x7e\x15"
-+			     "\xac\x20\xb7\x4e\xe5\x59\xf0\x87"
-+			     "\x1e\x92\x29\xc0\x34\xcb\x62\xf9"
-+			     "\x6d\x04\x9b\x0f\xa6\x3d\xd4\x48"
-+			     "\xdf\x76\x0d\x81\x18\xaf\x23\xba"
-+			     "\x51\xe8\x5c\xf3\x8a\x21\x95\x2c"
-+			     "\xc3\x37\xce\x65\xfc\x70\x07\x9e"
-+			     "\x12\xa9\x40\xd7\x4b\xe2\x79\x10"
-+			     "\x84\x1b\xb2\x26\xbd\x54\xeb\x5f"
-+			     "\xf6\x8d\x01\x98\x2f\xc6\x3a\xd1"
-+			     "\x68\xff\x73\x0a\xa1\x15\xac\x43"
-+			     "\xda\x4e\xe5\x7c\x13\x87\x1e\xb5"
-+			     "\x29\xc0\x57\xee\x62\xf9\x90\x04"
-+			     "\x9b\x32\xc9\x3d\xd4\x6b\x02\x76"
-+			     "\x0d\xa4\x18\xaf\x46\xdd\x51\xe8"
-+			     "\x7f\x16\x8a\x21\xb8\x2c\xc3\x5a"
-+			     "\xf1\x65\xfc\x93\x07\x9e\x35\xcc"
-+			     "\x40\xd7\x6e\x05\x79\x10\xa7\x1b"
-+			     "\xb2\x49\xe0\x54\xeb\x82\x19\x8d"
-+			     "\x24\xbb\x2f\xc6\x5d\xf4\x68\xff"
-+			     "\x96\x0a\xa1\x38\xcf\x43\xda\x71"
-+			     "\x08\x7c\x13\xaa\x1e\xb5\x4c",
-+		.psize     = 1023,
-+		.digest    = "\x24\xab\xec\xa1\x22\x05\x1c\xf3"
-+			     "\xce\xdc\xc1\x02\x31\x6c\x0f\x19"
-+			     "\x0a\xb2\x77\x24\xe7\x68\x71\x3b"
-+			     "\x9b\x6d\x5f\xbc\xcf\x60\x28\x4c",
-+	},
-+};
-+
- 
- /*
-  * MD5 test vectors from RFC1321
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha512-lib-v3
+
+This series adds support for SHA-384, SHA-512, HMAC-SHA384, and
+HMAC-SHA512 to lib/crypto/.  The new functions take advantage of the
+kernel's existing architecture-optimized implementations of the SHA-512
+compression function.  The new functions are fully tested using KUnit.
+
+To avoid duplicating all arch-optimized implementations of the SHA-512
+compression function (~3000 lines of code total), they are moved into
+lib/crypto/ rather than copied.  To make the "sha384", "sha512",
+"hmac(sha384)", and "hmac(sha512)" crypto_shash algorithms in the
+old-school crypto API continue to be properly optimized after that, they
+are reimplemented on top of lib/crypto/, which is straightforward.
+
+The following lists some of the design choices and conventions that I've
+followed in more detail.  Where these differ from the code or APIs for
+other algorithms (e.g., SHA-256 in some cases), I'd like to do it this
+way going forward and plan to fix up the other algorithms accordingly:
+
+- APIs are fully documented with kerneldoc comments.
+
+- APIs cannot fail, and return void.
+
+- APIs work in all contexts.  This doesn't mean that they *should* be
+  called in all contexts, but rather they always just work as expected.
+
+- Tests are KUnit tests, and they are fairly thorough (more thorough
+  than crypto/testmgr.c) and also optionally include benchmarks.
+
+- Architecture-optimized code is integrated the same way I'm doing it
+  for lib/crc/: it's in subdirectories lib/crypto/$(SRCARCH), it's
+  enabled by default, and it's inlined into the same module as the
+  generic code.  This solves a number of problems; for more details, see
+  https://lore.kernel.org/r/20250607200454.73587-1-ebiggers@kernel.org
+
+- HMAC support is a first-class citizen.
+
+- APIs handle zeroization, when applicable.
+
+- Message contexts are *_ctx instead of *_state.  It's shorter, avoids
+  ambiguity with the compression function state, and matches OpenSSL.
+
+- Length arguments are size_t, are in bytes, are named len or *_len, and
+  immediately follow the corresponding buffer.  "Object" being operated
+  on is first argument; outputs otherwise follow inputs.
+
+- The structures for different algorithms use different types, which
+  prevents usage errors where functions are mixed up between algorithms.
+
+- The compression function state is strongly typed, not a plain array.
+
+Changed in v3:
+- Dropped KUnit tests from this series, since they'll be separate and
+  will need to go last in the branch (as per request from Linus)
+- Folded in the following fixups I previously sent:
+  "crypto: testmgr/sha512 - Omit generic_driver for no-op tests",
+  "crypto: sha512 - Use the correct legacy export format",
+  "lib/crypto: sha512: Reorder some code in sha512.c",
+  "lib/crypto: sha512: Do not include <crypto/internal/sha2.h>",
+  "lib/crypto: sha512: Fix a grammatical error in kerneldoc comments",
+  "lib/crypto: x86/sha512: Drop unnecessary ANNOTATE_NOENDBR"
+- Updated cra_priority values to be consistent with sha256.c and not
+  decreased from what the arch-optimized code used before
+- Added MODULE_ALIAS_CRYPTO() lines for the *-lib cra_driver_names
+- Updated commit titles to align with the conventions I'm adopting
+
+Changed in v2:
+- Added "crypto: sha512 - use same state format as legacy drivers"
+- Fixed build on user-mode Linux
+- Fixed W=1 build warning by adding <linux/export.h>
+- Optimized __sha512_final() and __hmac_sha512_final() slightly
+
+Eric Biggers (16):
+  crypto: sha512 - Rename conflicting symbols
+  lib/crypto: sha512: Add support for SHA-384 and SHA-512
+  lib/crypto: sha512: Add HMAC-SHA384 and HMAC-SHA512 support
+  crypto: riscv/sha512 - Stop depending on sha512_generic_block_fn
+  crypto: sha512 - Replace sha512_generic with wrapper around SHA-512
+    library
+  crypto: sha512 - Use same state format as legacy drivers
+  lib/crypto: arm/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: arm64/sha512: Migrate optimized SHA-512 code to library
+  mips: cavium-octeon: Move octeon-crypto.h into asm directory
+  lib/crypto: mips/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: riscv/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: s390/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: sparc/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: x86/sha512: Migrate optimized SHA-512 code to library
+  lib/crypto: x86/sha512: Remove unnecessary checks for nblocks==0
+  crypto: sha512 - Remove sha512_base.h
+
+ arch/arm/configs/exynos_defconfig             |   1 -
+ arch/arm/configs/milbeaut_m10v_defconfig      |   1 -
+ arch/arm/configs/multi_v7_defconfig           |   1 -
+ arch/arm/configs/omap2plus_defconfig          |   1 -
+ arch/arm/configs/pxa_defconfig                |   1 -
+ arch/arm/crypto/Kconfig                       |  10 -
+ arch/arm/crypto/Makefile                      |  15 -
+ arch/arm/crypto/sha512-glue.c                 | 110 -----
+ arch/arm/crypto/sha512-neon-glue.c            |  75 ----
+ arch/arm/crypto/sha512.h                      |   3 -
+ arch/arm64/configs/defconfig                  |   1 -
+ arch/arm64/crypto/Kconfig                     |  19 -
+ arch/arm64/crypto/Makefile                    |  14 -
+ arch/arm64/crypto/sha512-ce-glue.c            |  96 -----
+ arch/arm64/crypto/sha512-glue.c               |  83 ----
+ arch/mips/cavium-octeon/crypto/Makefile       |   1 -
+ .../mips/cavium-octeon/crypto/octeon-crypto.c |   3 +-
+ arch/mips/cavium-octeon/crypto/octeon-md5.c   |   3 +-
+ arch/mips/cavium-octeon/crypto/octeon-sha1.c  |   3 +-
+ .../mips/cavium-octeon/crypto/octeon-sha256.c |   3 +-
+ .../mips/cavium-octeon/crypto/octeon-sha512.c | 167 --------
+ arch/mips/configs/cavium_octeon_defconfig     |   1 -
+ arch/mips/crypto/Kconfig                      |  10 -
+ .../asm/octeon/crypto.h}                      |   0
+ arch/riscv/crypto/Kconfig                     |  11 -
+ arch/riscv/crypto/Makefile                    |   3 -
+ arch/riscv/crypto/sha512-riscv64-glue.c       | 124 ------
+ arch/s390/configs/debug_defconfig             |   1 -
+ arch/s390/configs/defconfig                   |   1 -
+ arch/s390/crypto/Kconfig                      |  10 -
+ arch/s390/crypto/Makefile                     |   1 -
+ arch/s390/crypto/sha512_s390.c                | 151 -------
+ arch/sparc/crypto/Kconfig                     |  10 -
+ arch/sparc/crypto/Makefile                    |   2 -
+ arch/sparc/crypto/sha512_glue.c               | 122 ------
+ arch/x86/crypto/Kconfig                       |  13 -
+ arch/x86/crypto/Makefile                      |   3 -
+ arch/x86/crypto/sha512_ssse3_glue.c           | 322 --------------
+ crypto/Kconfig                                |   4 +-
+ crypto/Makefile                               |   2 +-
+ crypto/sha512.c                               | 354 +++++++++++++++
+ crypto/sha512_generic.c                       | 217 ----------
+ crypto/testmgr.c                              |  10 +
+ drivers/crypto/starfive/jh7110-hash.c         |   8 +-
+ include/crypto/sha2.h                         | 350 +++++++++++++++
+ include/crypto/sha512_base.h                  | 120 ------
+ lib/crypto/Kconfig                            |  18 +
+ lib/crypto/Makefile                           |  36 ++
+ lib/crypto/arm/.gitignore                     |   2 +
+ .../crypto => lib/crypto/arm}/sha512-armv4.pl |   0
+ lib/crypto/arm/sha512.h                       |  38 ++
+ lib/crypto/arm64/.gitignore                   |   2 +
+ .../crypto/arm64}/sha512-ce-core.S            |  10 +-
+ lib/crypto/arm64/sha512.h                     |  46 ++
+ lib/crypto/mips/sha512.h                      |  74 ++++
+ .../riscv}/sha512-riscv64-zvknhb-zvkb.S       |   4 +-
+ lib/crypto/riscv/sha512.h                     |  41 ++
+ lib/crypto/s390/sha512.h                      |  28 ++
+ lib/crypto/sha512.c                           | 402 ++++++++++++++++++
+ lib/crypto/sparc/sha512.h                     |  42 ++
+ .../crypto => lib/crypto/sparc}/sha512_asm.S  |   0
+ .../crypto/x86}/sha512-avx-asm.S              |  11 +-
+ .../crypto/x86}/sha512-avx2-asm.S             |  12 +-
+ .../crypto/x86}/sha512-ssse3-asm.S            |  14 +-
+ lib/crypto/x86/sha512.h                       |  54 +++
+ 65 files changed, 1529 insertions(+), 1766 deletions(-)
+ delete mode 100644 arch/arm/crypto/sha512-glue.c
+ delete mode 100644 arch/arm/crypto/sha512-neon-glue.c
+ delete mode 100644 arch/arm/crypto/sha512.h
+ delete mode 100644 arch/arm64/crypto/sha512-ce-glue.c
+ delete mode 100644 arch/arm64/crypto/sha512-glue.c
+ delete mode 100644 arch/mips/cavium-octeon/crypto/octeon-sha512.c
+ rename arch/mips/{cavium-octeon/crypto/octeon-crypto.h => include/asm/octeon/crypto.h} (100%)
+ delete mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
+ delete mode 100644 arch/s390/crypto/sha512_s390.c
+ delete mode 100644 arch/sparc/crypto/sha512_glue.c
+ delete mode 100644 arch/x86/crypto/sha512_ssse3_glue.c
+ create mode 100644 crypto/sha512.c
+ delete mode 100644 crypto/sha512_generic.c
+ delete mode 100644 include/crypto/sha512_base.h
+ create mode 100644 lib/crypto/arm/.gitignore
+ rename {arch/arm/crypto => lib/crypto/arm}/sha512-armv4.pl (100%)
+ create mode 100644 lib/crypto/arm/sha512.h
+ create mode 100644 lib/crypto/arm64/.gitignore
+ rename {arch/arm64/crypto => lib/crypto/arm64}/sha512-ce-core.S (97%)
+ create mode 100644 lib/crypto/arm64/sha512.h
+ create mode 100644 lib/crypto/mips/sha512.h
+ rename {arch/riscv/crypto => lib/crypto/riscv}/sha512-riscv64-zvknhb-zvkb.S (98%)
+ create mode 100644 lib/crypto/riscv/sha512.h
+ create mode 100644 lib/crypto/s390/sha512.h
+ create mode 100644 lib/crypto/sha512.c
+ create mode 100644 lib/crypto/sparc/sha512.h
+ rename {arch/sparc/crypto => lib/crypto/sparc}/sha512_asm.S (100%)
+ rename {arch/x86/crypto => lib/crypto/x86}/sha512-avx-asm.S (98%)
+ rename {arch/x86/crypto => lib/crypto/x86}/sha512-avx2-asm.S (99%)
+ rename {arch/x86/crypto => lib/crypto/x86}/sha512-ssse3-asm.S (97%)
+ create mode 100644 lib/crypto/x86/sha512.h
+
 -- 
-2.49.0
+2.50.0
 
