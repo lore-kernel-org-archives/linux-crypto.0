@@ -1,48 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF30B2E4258;
-	Mon, 30 Jun 2025 17:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676C123ABB1;
+	Mon, 30 Jun 2025 17:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751304250; cv=none; b=ch5e+8o3PDIwnrUS3IMtksN+zmQqRFOEFvV9KLUKAkYKUEBY8/3E+/dsre/YLgnQ4pAnqTPtng5/Y8agQnp2D8f6qXubQg1Uun6FmLN8qV1R96Le+f0vDjXfQq8fbvVD108oyyNeVAphFcnOcI6vEG6REAt7R0BGmb1zfu+ZiaU=
+	t=1751305790; cv=none; b=CYIM0O+0WWPHCwCR+/3NUHfmgHhHg0LXcOVlSyxS5x9bez8FCvqb/vPVz2Mjb6n/kxo4sWK+Um/H2D+ksnIQRDgjO4reHEw/Hdo0Z7WJjX1Z5RCWJP/omcfm8NiU7YHR81XeZMCIrOGgrGbTh66+6trxLT1kzjn0a3RF+WK6OWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751304250; c=relaxed/simple;
-	bh=yp3Er/6VfXzjS/b8G0ZBuHpoMbKRiCHKh33gb8emuDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NgcimUPJEvZywWQY6IOqKELaJaDPy5IgUTKd9Ni+0UdIB1/0yQ5/fvIv8rb1/2lfBIDJfdUrQJl+ncNnsQd/FbLVyu0Ae9KJ1+EMdMtOMAfFu4b1W9wGUuNC7BwXWA30O6eEyLg69vpRxiYg8EF1pyIa+QkCHnHHr2WmULooh24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IhiAAvZ8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751305790; c=relaxed/simple;
+	bh=yoi4i5n4fYavqimbjruoWqPfoDDaWyBF/Jq0f8YDWfk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b+kZQWM3s/4j4YMrgMG7UUm1V3MP7RPHrLqwKe6YMvFGlotj8kbVPHU6H8J9L8ZtapWRwpLjiy9Sn0VjsyEHYxxBaGhAKw85YLUGOKhVOiz0932KmlLWJYfZkFO7SrEKxj0M/zFA9UhJLyDXau6Kn6+DCPXEh3I6hwn3VtkYgCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obBBMxy3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IhiAAvZ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364FFC4CEF2;
-	Mon, 30 Jun 2025 17:24:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obBBMxy3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0854C4CEE3;
+	Mon, 30 Jun 2025 17:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751304249;
-	bh=yp3Er/6VfXzjS/b8G0ZBuHpoMbKRiCHKh33gb8emuDs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IhiAAvZ8/KjMWPMOUgBqbAkqUwqCG6gWYYrdIFia4Va2L7C1B4aTrhrk4LbGz3AzN
-	 id7AydefDEUbdOqs1TkYNEsmfk1gnuUD0uSH/Y0gnQqVXyPQqkdkm8etmjhfxfcW1Y
-	 dGiu9w0Neg1ng/oxnLx8zhwiFmGpibWvlCXYPmMFl6SS7sjnjlKNgcECzkKSdZBESf
-	 RuLUSao3FRztHFngSHv3OaLWkKsQksRHThPLVUtyXCXAFDmhCgtkKu88fEwgVhpAE0
-	 wfwWi4t5MSQwTTuB7YZ+CdGIPnwERs84swWC1E5OV2T47PBXOdF2KWxV0AADqE1Nly
-	 Fld/vgL76xxLQ==
+	s=k20201202; t=1751305790;
+	bh=yoi4i5n4fYavqimbjruoWqPfoDDaWyBF/Jq0f8YDWfk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=obBBMxy3BYFAIbQN+AMObBhPvreutHdvFk7yTDY8A+cNTdYBk98gSFqk4GADNqSyd
+	 sMZOT50584KhZdRUf44ZW1Ln4r+VePJl3cs+r3TMEZ86ltMHeYenz76amLMVgnU1sG
+	 uUHhQM3lFDfFjdY4cSNIc2e+kqdXzmcAoA9V3KIw+OKgTUhXQzUdkXVCKCDNVLZ/Nc
+	 7lQs8RZs7Eyc2nNAck9+1lUBJojyJA6vbs05Dr4ipTZRyIUL9R4JlKDwPVuPMHWREr
+	 5J7CGBabK0eGVLp/aR6suj+69CAzzk+UZdeSln7gJV51/KAIzejM1eVpjhTQ90eFun
+	 gHic5WT98P90g==
 From: Eric Biggers <ebiggers@kernel.org>
-To: fsverity@lists.linux.dev
-Cc: linux-crypto@vger.kernel.org,
+To: linux-crypto@vger.kernel.org
+Cc: apparmor@lists.ubuntu.com,
+	John Johansen <john.johansen@canonical.com>,
 	linux-kernel@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-btrfs@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Theodore Ts'o <tytso@mit.edu>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/2] fsverity: Switch from crypto_shash to SHA-2 library
-Date: Mon, 30 Jun 2025 10:22:24 -0700
-Message-ID: <20250630172224.46909-3-ebiggers@kernel.org>
+Subject: [PATCH v2] apparmor: use SHA-256 library API instead of crypto_shash API
+Date: Mon, 30 Jun 2025 10:48:05 -0700
+Message-ID: <20250630174805.59010-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250630172224.46909-1-ebiggers@kernel.org>
-References: <20250630172224.46909-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,580 +43,180 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-fsverity supports two hash algorithms: SHA-256 and SHA-512.  Since both
-of these have a library API now, just use the library API instead of
-crypto_shash.  Even with multiple algorithms, the library-based code
-still ends up being quite a bit simpler, due to how clumsy the
-old-school crypto API is.  The library-based code is also more
-efficient, since it avoids overheads such as indirect calls.
+This user of SHA-256 does not support any other algorithm, so the
+crypto_shash abstraction provides no value.  Just use the SHA-256
+library API instead, which is much simpler and easier to use.
 
+Acked-by: John Johansen <john.johansen@canonical.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- Documentation/filesystems/fsverity.rst |   3 +-
- fs/verity/Kconfig                      |   6 +-
- fs/verity/enable.c                     |   8 +-
- fs/verity/fsverity_private.h           |  24 +--
- fs/verity/hash_algs.c                  | 194 +++++++++----------------
- fs/verity/open.c                       |  36 ++---
- fs/verity/verify.c                     |   7 +-
- 7 files changed, 102 insertions(+), 176 deletions(-)
 
-diff --git a/Documentation/filesystems/fsverity.rst b/Documentation/filesystems/fsverity.rst
-index dacdbc1149e67..412cf11e32985 100644
---- a/Documentation/filesystems/fsverity.rst
-+++ b/Documentation/filesystems/fsverity.rst
-@@ -183,12 +183,11 @@ FS_IOC_ENABLE_VERITY can fail with the following errors:
- - ``EKEYREJECTED``: the builtin signature doesn't match the file
- - ``EMSGSIZE``: the salt or builtin signature is too long
- - ``ENOKEY``: the ".fs-verity" keyring doesn't contain the certificate
-   needed to verify the builtin signature
- - ``ENOPKG``: fs-verity recognizes the hash algorithm, but it's not
--  available in the kernel's crypto API as currently configured (e.g.
--  for SHA-512, missing CONFIG_CRYPTO_SHA512).
-+  available in the kernel as currently configured
- - ``ENOTTY``: this type of filesystem does not implement fs-verity
- - ``EOPNOTSUPP``: the kernel was not configured with fs-verity
-   support; or the filesystem superblock has not had the 'verity'
-   feature enabled on it; or the filesystem does not support fs-verity
-   on this file.  (See `Filesystem support`_.)
-diff --git a/fs/verity/Kconfig b/fs/verity/Kconfig
-index 40569d3527a71..76d1c5971b826 100644
---- a/fs/verity/Kconfig
-+++ b/fs/verity/Kconfig
-@@ -1,14 +1,12 @@
- # SPDX-License-Identifier: GPL-2.0
+This is the slightly revised version of
+https://lore.kernel.org/r/20250428190430.850240-1-ebiggers@kernel.org/
+that I'm planning to apply to libcrypto-next for 6.17 to avoid a silent
+conflict with the sha256_state => sha256_ctx rename, as per the
+discussion in that thread.
+
+You can also get this patch and its dependencies from:
+
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git apparmor-sha256-lib-v2
+
+ security/apparmor/Kconfig  |  3 +-
+ security/apparmor/crypto.c | 85 ++++++--------------------------------
+ 2 files changed, 13 insertions(+), 75 deletions(-)
+
+diff --git a/security/apparmor/Kconfig b/security/apparmor/Kconfig
+index 64cc3044a42ce..1e3bd44643dac 100644
+--- a/security/apparmor/Kconfig
++++ b/security/apparmor/Kconfig
+@@ -57,12 +57,11 @@ config SECURITY_APPARMOR_INTROSPECT_POLICY
+ 	  cpu is paramount.
  
- config FS_VERITY
- 	bool "FS Verity (read-only file-based authenticity protection)"
+ config SECURITY_APPARMOR_HASH
+ 	bool "Enable introspection of sha256 hashes for loaded profiles"
+ 	depends on SECURITY_APPARMOR_INTROSPECT_POLICY
 -	select CRYPTO
- 	select CRYPTO_HASH_INFO
--	# SHA-256 is selected as it's intended to be the default hash algorithm.
--	# To avoid bloat, other wanted algorithms must be selected explicitly.
 -	select CRYPTO_SHA256
 +	select CRYPTO_LIB_SHA256
-+	select CRYPTO_LIB_SHA512
+ 	default y
  	help
- 	  This option enables fs-verity.  fs-verity is the dm-verity
- 	  mechanism implemented at the file level.  On supported
- 	  filesystems (currently ext4, f2fs, and btrfs), userspace can
- 	  use an ioctl to enable verity for a file, which causes the
-diff --git a/fs/verity/enable.c b/fs/verity/enable.c
-index c284f46d1b535..0816ec295c380 100644
---- a/fs/verity/enable.c
-+++ b/fs/verity/enable.c
-@@ -5,11 +5,10 @@
-  * Copyright 2019 Google LLC
+ 	  This option selects whether introspection of loaded policy
+ 	  hashes is available to userspace via the apparmor
+ 	  filesystem. This option provides a light weight means of
+diff --git a/security/apparmor/crypto.c b/security/apparmor/crypto.c
+index aad486b2fca65..227d47c149074 100644
+--- a/security/apparmor/crypto.c
++++ b/security/apparmor/crypto.c
+@@ -9,115 +9,54 @@
+  * Fns to provide a checksum of policy that has been loaded this can be
+  * compared to userspace policy compiles to check loaded policy is what
+  * it should be.
   */
  
- #include "fsverity_private.h"
- 
 -#include <crypto/hash.h>
- #include <linux/mount.h>
- #include <linux/sched/signal.h>
- #include <linux/uaccess.h>
++#include <crypto/sha2.h>
  
- struct block_buffer {
-@@ -22,11 +21,10 @@ struct block_buffer {
- static int hash_one_block(struct inode *inode,
- 			  const struct merkle_tree_params *params,
- 			  struct block_buffer *cur)
+ #include "include/apparmor.h"
+ #include "include/crypto.h"
+ 
+-static unsigned int apparmor_hash_size;
+-
+-static struct crypto_shash *apparmor_tfm;
+-
+ unsigned int aa_hash_size(void)
  {
- 	struct block_buffer *next = cur + 1;
--	int err;
+-	return apparmor_hash_size;
++	return SHA256_DIGEST_SIZE;
+ }
  
- 	/*
- 	 * Safety check to prevent a buffer overflow in case of a filesystem bug
- 	 * that allows the file size to change despite deny_write_access(), or a
- 	 * bug in the Merkle tree logic itself
-@@ -35,14 +33,12 @@ static int hash_one_block(struct inode *inode,
- 		return -EINVAL;
+ char *aa_calc_hash(void *data, size_t len)
+ {
+-	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
+ 	char *hash;
+-	int error;
+-
+-	if (!apparmor_tfm)
+-		return NULL;
  
- 	/* Zero-pad the block if it's shorter than the block size. */
- 	memset(&cur->data[cur->filled], 0, params->block_size - cur->filled);
+-	hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
++	hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
+ 	if (!hash)
+ 		return ERR_PTR(-ENOMEM);
  
--	err = fsverity_hash_block(params, inode, cur->data,
--				  &next->data[next->filled]);
--	if (err)
--		return err;
-+	fsverity_hash_block(params, inode, cur->data,
-+			    &next->data[next->filled]);
- 	next->filled += params->digest_size;
- 	cur->filled = 0;
+-	desc->tfm = apparmor_tfm;
+-
+-	error = crypto_shash_init(desc);
+-	if (error)
+-		goto fail;
+-	error = crypto_shash_update(desc, (u8 *) data, len);
+-	if (error)
+-		goto fail;
+-	error = crypto_shash_final(desc, hash);
+-	if (error)
+-		goto fail;
+-
++	sha256(data, len, hash);
+ 	return hash;
+-
+-fail:
+-	kfree(hash);
+-
+-	return ERR_PTR(error);
+ }
+ 
+ int aa_calc_profile_hash(struct aa_profile *profile, u32 version, void *start,
+ 			 size_t len)
+ {
+-	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
+-	int error;
++	struct sha256_ctx sctx;
+ 	__le32 le32_version = cpu_to_le32(version);
+ 
+ 	if (!aa_g_hash_policy)
+ 		return 0;
+ 
+-	if (!apparmor_tfm)
+-		return 0;
+-
+-	profile->hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
++	profile->hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
+ 	if (!profile->hash)
+ 		return -ENOMEM;
+ 
+-	desc->tfm = apparmor_tfm;
+-
+-	error = crypto_shash_init(desc);
+-	if (error)
+-		goto fail;
+-	error = crypto_shash_update(desc, (u8 *) &le32_version, 4);
+-	if (error)
+-		goto fail;
+-	error = crypto_shash_update(desc, (u8 *) start, len);
+-	if (error)
+-		goto fail;
+-	error = crypto_shash_final(desc, profile->hash);
+-	if (error)
+-		goto fail;
+-
++	sha256_init(&sctx);
++	sha256_update(&sctx, (u8 *)&le32_version, 4);
++	sha256_update(&sctx, (u8 *)start, len);
++	sha256_final(&sctx, profile->hash);
+ 	return 0;
+-
+-fail:
+-	kfree(profile->hash);
+-	profile->hash = NULL;
+-
+-	return error;
+ }
+ 
+ static int __init init_profile_hash(void)
+ {
+-	struct crypto_shash *tfm;
+-
+-	if (!apparmor_initialized)
+-		return 0;
+-
+-	tfm = crypto_alloc_shash("sha256", 0, 0);
+-	if (IS_ERR(tfm)) {
+-		int error = PTR_ERR(tfm);
+-		AA_ERROR("failed to setup profile sha256 hashing: %d\n", error);
+-		return error;
+-	}
+-	apparmor_tfm = tfm;
+-	apparmor_hash_size = crypto_shash_digestsize(apparmor_tfm);
+-
+-	aa_info_message("AppArmor sha256 policy hashing enabled");
+-
++	if (apparmor_initialized)
++		aa_info_message("AppArmor sha256 policy hashing enabled");
  	return 0;
  }
- 
-diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
-index b3506f56e180b..5fe854a5b9ad3 100644
---- a/fs/verity/fsverity_private.h
-+++ b/fs/verity/fsverity_private.h
-@@ -18,25 +18,30 @@
-  */
- #define FS_VERITY_MAX_LEVELS		8
- 
- /* A hash algorithm supported by fs-verity */
- struct fsverity_hash_alg {
--	struct crypto_shash *tfm; /* hash tfm, allocated on demand */
- 	const char *name;	  /* crypto API name, e.g. sha256 */
- 	unsigned int digest_size; /* digest size in bytes, e.g. 32 for SHA-256 */
- 	unsigned int block_size;  /* block size in bytes, e.g. 64 for SHA-256 */
- 	/*
- 	 * The HASH_ALGO_* constant for this algorithm.  This is different from
- 	 * FS_VERITY_HASH_ALG_*, which uses a different numbering scheme.
- 	 */
- 	enum hash_algo algo_id;
- };
- 
-+union fsverity_hash_ctx {
-+	struct sha256_ctx sha256;
-+	struct sha512_ctx sha512;
-+};
-+
- /* Merkle tree parameters: hash algorithm, initial hash state, and topology */
- struct merkle_tree_params {
- 	const struct fsverity_hash_alg *hash_alg; /* the hash algorithm */
--	const u8 *hashstate;		/* initial hash state or NULL */
-+	/* initial hash state if salted, NULL if unsalted */
-+	const union fsverity_hash_ctx *hashstate;
- 	unsigned int digest_size;	/* same as hash_alg->digest_size */
- 	unsigned int block_size;	/* size of data and tree blocks */
- 	unsigned int hashes_per_block;	/* number of hashes per tree block */
- 	unsigned int blocks_per_page;	/* PAGE_SIZE / block_size */
- 	u8 log_digestsize;		/* log2(digest_size) */
-@@ -74,20 +79,21 @@ struct fsverity_info {
- #define FS_VERITY_MAX_SIGNATURE_SIZE	(FS_VERITY_MAX_DESCRIPTOR_SIZE - \
- 					 sizeof(struct fsverity_descriptor))
- 
- /* hash_algs.c */
- 
--extern struct fsverity_hash_alg fsverity_hash_algs[];
-+extern const struct fsverity_hash_alg fsverity_hash_algs[];
- 
- const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
- 						      unsigned int num);
--const u8 *fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
--				      const u8 *salt, size_t salt_size);
--int fsverity_hash_block(const struct merkle_tree_params *params,
--			const struct inode *inode, const void *data, u8 *out);
--int fsverity_hash_buffer(const struct fsverity_hash_alg *alg,
--			 const void *data, size_t size, u8 *out);
-+union fsverity_hash_ctx *
-+fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
-+			    const u8 *salt, size_t salt_size);
-+void fsverity_hash_block(const struct merkle_tree_params *params,
-+			 const struct inode *inode, const void *data, u8 *out);
-+void fsverity_hash_buffer(const struct fsverity_hash_alg *alg,
-+			  const void *data, size_t size, u8 *out);
- void __init fsverity_check_hash_algs(void);
- 
- /* init.c */
- 
- void __printf(3, 4) __cold
-diff --git a/fs/verity/hash_algs.c b/fs/verity/hash_algs.c
-index 6b08b1d9a7d7c..9bb3c6344907e 100644
---- a/fs/verity/hash_algs.c
-+++ b/fs/verity/hash_algs.c
-@@ -5,14 +5,12 @@
-  * Copyright 2019 Google LLC
-  */
- 
- #include "fsverity_private.h"
- 
--#include <crypto/hash.h>
 -
- /* The hash algorithms supported by fs-verity */
--struct fsverity_hash_alg fsverity_hash_algs[] = {
-+const struct fsverity_hash_alg fsverity_hash_algs[] = {
- 	[FS_VERITY_HASH_ALG_SHA256] = {
- 		.name = "sha256",
- 		.digest_size = SHA256_DIGEST_SIZE,
- 		.block_size = SHA256_BLOCK_SIZE,
- 		.algo_id = HASH_ALGO_SHA256,
-@@ -23,144 +21,76 @@ struct fsverity_hash_alg fsverity_hash_algs[] = {
- 		.block_size = SHA512_BLOCK_SIZE,
- 		.algo_id = HASH_ALGO_SHA512,
- 	},
- };
- 
--static DEFINE_MUTEX(fsverity_hash_alg_init_mutex);
--
- /**
-- * fsverity_get_hash_alg() - validate and prepare a hash algorithm
-+ * fsverity_get_hash_alg() - get a hash algorithm by number
-  * @inode: optional inode for logging purposes
-  * @num: the hash algorithm number
-  *
-- * Get the struct fsverity_hash_alg for the given hash algorithm number, and
-- * ensure it has a hash transform ready to go.  The hash transforms are
-- * allocated on-demand so that we don't waste resources unnecessarily, and
-- * because the crypto modules may be initialized later than fs/verity/.
-+ * Get the struct fsverity_hash_alg for the given hash algorithm number.
-  *
-- * Return: pointer to the hash alg on success, else an ERR_PTR()
-+ * Return: pointer to the hash alg if it's known, otherwise NULL.
-  */
- const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
- 						      unsigned int num)
- {
--	struct fsverity_hash_alg *alg;
--	struct crypto_shash *tfm;
--	int err;
--
- 	if (num >= ARRAY_SIZE(fsverity_hash_algs) ||
- 	    !fsverity_hash_algs[num].name) {
- 		fsverity_warn(inode, "Unknown hash algorithm number: %u", num);
--		return ERR_PTR(-EINVAL);
--	}
--	alg = &fsverity_hash_algs[num];
--
--	/* pairs with smp_store_release() below */
--	if (likely(smp_load_acquire(&alg->tfm) != NULL))
--		return alg;
--
--	mutex_lock(&fsverity_hash_alg_init_mutex);
--
--	if (alg->tfm != NULL)
--		goto out_unlock;
--
--	tfm = crypto_alloc_shash(alg->name, 0, 0);
--	if (IS_ERR(tfm)) {
--		if (PTR_ERR(tfm) == -ENOENT) {
--			fsverity_warn(inode,
--				      "Missing crypto API support for hash algorithm \"%s\"",
--				      alg->name);
--			alg = ERR_PTR(-ENOPKG);
--			goto out_unlock;
--		}
--		fsverity_err(inode,
--			     "Error allocating hash algorithm \"%s\": %ld",
--			     alg->name, PTR_ERR(tfm));
--		alg = ERR_CAST(tfm);
--		goto out_unlock;
-+		return NULL;
- 	}
--
--	err = -EINVAL;
--	if (WARN_ON_ONCE(alg->digest_size != crypto_shash_digestsize(tfm)))
--		goto err_free_tfm;
--	if (WARN_ON_ONCE(alg->block_size != crypto_shash_blocksize(tfm)))
--		goto err_free_tfm;
--
--	pr_info("%s using implementation \"%s\"\n",
--		alg->name, crypto_shash_driver_name(tfm));
--
--	/* pairs with smp_load_acquire() above */
--	smp_store_release(&alg->tfm, tfm);
--	goto out_unlock;
--
--err_free_tfm:
--	crypto_free_shash(tfm);
--	alg = ERR_PTR(err);
--out_unlock:
--	mutex_unlock(&fsverity_hash_alg_init_mutex);
--	return alg;
-+	return &fsverity_hash_algs[num];
- }
- 
- /**
-  * fsverity_prepare_hash_state() - precompute the initial hash state
-  * @alg: hash algorithm
-  * @salt: a salt which is to be prepended to all data to be hashed
-- * @salt_size: salt size in bytes, possibly 0
-+ * @salt_size: salt size in bytes
-  *
-- * Return: NULL if the salt is empty, otherwise the kmalloc()'ed precomputed
-- *	   initial hash state on success or an ERR_PTR() on failure.
-+ * Return: the kmalloc()'ed initial hash state, or NULL if out of memory.
-  */
--const u8 *fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
--				      const u8 *salt, size_t salt_size)
-+union fsverity_hash_ctx *
-+fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
-+			    const u8 *salt, size_t salt_size)
- {
--	u8 *hashstate = NULL;
--	SHASH_DESC_ON_STACK(desc, alg->tfm);
- 	u8 *padded_salt = NULL;
- 	size_t padded_salt_size;
--	int err;
--
--	desc->tfm = alg->tfm;
--
--	if (salt_size == 0)
--		return NULL;
--
--	hashstate = kmalloc(crypto_shash_statesize(alg->tfm), GFP_KERNEL);
--	if (!hashstate)
--		return ERR_PTR(-ENOMEM);
-+	union fsverity_hash_ctx ctx;
-+	void *res = NULL;
- 
- 	/*
- 	 * Zero-pad the salt to the next multiple of the input size of the hash
- 	 * algorithm's compression function, e.g. 64 bytes for SHA-256 or 128
- 	 * bytes for SHA-512.  This ensures that the hash algorithm won't have
- 	 * any bytes buffered internally after processing the salt, thus making
- 	 * salted hashing just as fast as unsalted hashing.
- 	 */
- 	padded_salt_size = round_up(salt_size, alg->block_size);
- 	padded_salt = kzalloc(padded_salt_size, GFP_KERNEL);
--	if (!padded_salt) {
--		err = -ENOMEM;
--		goto err_free;
--	}
-+	if (!padded_salt)
-+		return NULL;
- 	memcpy(padded_salt, salt, salt_size);
--	err = crypto_shash_init(desc);
--	if (err)
--		goto err_free;
--
--	err = crypto_shash_update(desc, padded_salt, padded_salt_size);
--	if (err)
--		goto err_free;
--
--	err = crypto_shash_export(desc, hashstate);
--	if (err)
--		goto err_free;
--out:
--	kfree(padded_salt);
--	return hashstate;
- 
--err_free:
--	kfree(hashstate);
--	hashstate = ERR_PTR(err);
--	goto out;
-+	switch (alg->algo_id) {
-+	case HASH_ALGO_SHA256:
-+		sha256_init(&ctx.sha256);
-+		sha256_update(&ctx.sha256, padded_salt, padded_salt_size);
-+		res = kmemdup(&ctx.sha256, sizeof(ctx.sha256), GFP_KERNEL);
-+		break;
-+	case HASH_ALGO_SHA512:
-+		sha512_init(&ctx.sha512);
-+		sha512_update(&ctx.sha512, padded_salt, padded_salt_size);
-+		res = kmemdup(&ctx.sha512, sizeof(ctx.sha512), GFP_KERNEL);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+	}
-+	kfree(padded_salt);
-+	return res;
- }
- 
- /**
-  * fsverity_hash_block() - hash a single data or hash block
-  * @params: the Merkle tree's parameters
-@@ -168,50 +98,58 @@ const u8 *fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
-  * @data: virtual address of a buffer containing the block to hash
-  * @out: output digest, size 'params->digest_size' bytes
-  *
-  * Hash a single data or hash block.  The hash is salted if a salt is specified
-  * in the Merkle tree parameters.
-- *
-- * Return: 0 on success, -errno on failure
-  */
--int fsverity_hash_block(const struct merkle_tree_params *params,
--			const struct inode *inode, const void *data, u8 *out)
-+void fsverity_hash_block(const struct merkle_tree_params *params,
-+			 const struct inode *inode, const void *data, u8 *out)
- {
--	SHASH_DESC_ON_STACK(desc, params->hash_alg->tfm);
--	int err;
--
--	desc->tfm = params->hash_alg->tfm;
--
--	if (params->hashstate) {
--		err = crypto_shash_import(desc, params->hashstate);
--		if (err) {
--			fsverity_err(inode,
--				     "Error %d importing hash state", err);
--			return err;
--		}
--		err = crypto_shash_finup(desc, data, params->block_size, out);
--	} else {
--		err = crypto_shash_digest(desc, data, params->block_size, out);
-+	union fsverity_hash_ctx ctx;
-+
-+	if (!params->hashstate) {
-+		fsverity_hash_buffer(params->hash_alg, data, params->block_size,
-+				     out);
-+		return;
-+	}
-+
-+	switch (params->hash_alg->algo_id) {
-+	case HASH_ALGO_SHA256:
-+		ctx.sha256 = params->hashstate->sha256;
-+		sha256_update(&ctx.sha256, data, params->block_size);
-+		sha256_final(&ctx.sha256, out);
-+		return;
-+	case HASH_ALGO_SHA512:
-+		ctx.sha512 = params->hashstate->sha512;
-+		sha512_update(&ctx.sha512, data, params->block_size);
-+		sha512_final(&ctx.sha512, out);
-+		return;
-+	default:
-+		BUG();
- 	}
--	if (err)
--		fsverity_err(inode, "Error %d computing block hash", err);
--	return err;
- }
- 
- /**
-  * fsverity_hash_buffer() - hash some data
-  * @alg: the hash algorithm to use
-  * @data: the data to hash
-  * @size: size of data to hash, in bytes
-  * @out: output digest, size 'alg->digest_size' bytes
-- *
-- * Return: 0 on success, -errno on failure
-  */
--int fsverity_hash_buffer(const struct fsverity_hash_alg *alg,
--			 const void *data, size_t size, u8 *out)
-+void fsverity_hash_buffer(const struct fsverity_hash_alg *alg,
-+			  const void *data, size_t size, u8 *out)
- {
--	return crypto_shash_tfm_digest(alg->tfm, data, size, out);
-+	switch (alg->algo_id) {
-+	case HASH_ALGO_SHA256:
-+		sha256(data, size, out);
-+		return;
-+	case HASH_ALGO_SHA512:
-+		sha512(data, size, out);
-+		return;
-+	default:
-+		BUG();
-+	}
- }
- 
- void __init fsverity_check_hash_algs(void)
- {
- 	size_t i;
-diff --git a/fs/verity/open.c b/fs/verity/open.c
-index fdeb95eca3af3..0604cebe194cd 100644
---- a/fs/verity/open.c
-+++ b/fs/verity/open.c
-@@ -40,22 +40,22 @@ int fsverity_init_merkle_tree_params(struct merkle_tree_params *params,
- 	int level;
- 
- 	memset(params, 0, sizeof(*params));
- 
- 	hash_alg = fsverity_get_hash_alg(inode, hash_algorithm);
--	if (IS_ERR(hash_alg))
--		return PTR_ERR(hash_alg);
-+	if (!hash_alg)
-+		return -EINVAL;
- 	params->hash_alg = hash_alg;
- 	params->digest_size = hash_alg->digest_size;
- 
--	params->hashstate = fsverity_prepare_hash_state(hash_alg, salt,
--							salt_size);
--	if (IS_ERR(params->hashstate)) {
--		err = PTR_ERR(params->hashstate);
--		params->hashstate = NULL;
--		fsverity_err(inode, "Error %d preparing hash state", err);
--		goto out_err;
-+	if (salt_size) {
-+		params->hashstate =
-+			fsverity_prepare_hash_state(hash_alg, salt, salt_size);
-+		if (!params->hashstate) {
-+			err = -ENOMEM;
-+			goto out_err;
-+		}
- 	}
- 
- 	/*
- 	 * fs/verity/ directly assumes that the Merkle tree block size is a
- 	 * power of 2 less than or equal to PAGE_SIZE.  Another restriction
-@@ -156,22 +156,19 @@ int fsverity_init_merkle_tree_params(struct merkle_tree_params *params,
- 
- /*
-  * Compute the file digest by hashing the fsverity_descriptor excluding the
-  * builtin signature and with the sig_size field set to 0.
-  */
--static int compute_file_digest(const struct fsverity_hash_alg *hash_alg,
--			       struct fsverity_descriptor *desc,
--			       u8 *file_digest)
-+static void compute_file_digest(const struct fsverity_hash_alg *hash_alg,
-+				struct fsverity_descriptor *desc,
-+				u8 *file_digest)
- {
- 	__le32 sig_size = desc->sig_size;
--	int err;
- 
- 	desc->sig_size = 0;
--	err = fsverity_hash_buffer(hash_alg, desc, sizeof(*desc), file_digest);
-+	fsverity_hash_buffer(hash_alg, desc, sizeof(*desc), file_digest);
- 	desc->sig_size = sig_size;
--
--	return err;
- }
- 
- /*
-  * Create a new fsverity_info from the given fsverity_descriptor (with optional
-  * appended builtin signature), and check the signature if present.  The
-@@ -199,16 +196,11 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
- 		goto fail;
- 	}
- 
- 	memcpy(vi->root_hash, desc->root_hash, vi->tree_params.digest_size);
- 
--	err = compute_file_digest(vi->tree_params.hash_alg, desc,
--				  vi->file_digest);
--	if (err) {
--		fsverity_err(inode, "Error %d computing file digest", err);
--		goto fail;
--	}
-+	compute_file_digest(vi->tree_params.hash_alg, desc, vi->file_digest);
- 
- 	err = fsverity_verify_signature(vi, desc->signature,
- 					le32_to_cpu(desc->sig_size));
- 	if (err)
- 		goto fail;
-diff --git a/fs/verity/verify.c b/fs/verity/verify.c
-index 4fcad0825a120..481a381128cb9 100644
---- a/fs/verity/verify.c
-+++ b/fs/verity/verify.c
-@@ -5,11 +5,10 @@
-  * Copyright 2019 Google LLC
-  */
- 
- #include "fsverity_private.h"
- 
--#include <crypto/hash.h>
- #include <linux/bio.h>
- 
- static struct workqueue_struct *fsverity_read_workqueue;
- 
- /*
-@@ -200,12 +199,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 		struct page *hpage = hblocks[level - 1].page;
- 		const void *haddr = hblocks[level - 1].addr;
- 		unsigned long hblock_idx = hblocks[level - 1].index;
- 		unsigned int hoffset = hblocks[level - 1].hoffset;
- 
--		if (fsverity_hash_block(params, inode, haddr, real_hash) != 0)
--			goto error;
-+		fsverity_hash_block(params, inode, haddr, real_hash);
- 		if (memcmp(want_hash, real_hash, hsize) != 0)
- 			goto corrupted;
- 		/*
- 		 * Mark the hash block as verified.  This must be atomic and
- 		 * idempotent, as the same hash block might be verified by
-@@ -220,12 +218,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 		kunmap_local(haddr);
- 		put_page(hpage);
- 	}
- 
- 	/* Finally, verify the data block. */
--	if (fsverity_hash_block(params, inode, data, real_hash) != 0)
--		goto error;
-+	fsverity_hash_block(params, inode, data, real_hash);
- 	if (memcmp(want_hash, real_hash, hsize) != 0)
- 		goto corrupted;
- 	return true;
- 
- corrupted:
+ late_initcall(init_profile_hash);
+
+base-commit: 1f7eb3c393ab9e56b5746f5fd31796a73bdd4d48
 -- 
 2.50.0
 
