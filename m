@@ -1,40 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676C123ABB1;
-	Mon, 30 Jun 2025 17:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC5C28DB5E;
+	Mon, 30 Jun 2025 18:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751305790; cv=none; b=CYIM0O+0WWPHCwCR+/3NUHfmgHhHg0LXcOVlSyxS5x9bez8FCvqb/vPVz2Mjb6n/kxo4sWK+Um/H2D+ksnIQRDgjO4reHEw/Hdo0Z7WJjX1Z5RCWJP/omcfm8NiU7YHR81XeZMCIrOGgrGbTh66+6trxLT1kzjn0a3RF+WK6OWk=
+	t=1751306597; cv=none; b=oRY42/eXREgibcDhvz3MNNCJvzMxjQtSW0CJRBbplJkd0yvWbxl5eaiz994kPLqI9V2+WnLNopqqBN0NRjrNSFze1KizotnUCRhCRC9r8ZLs3BWLJ8G0UPvPrzdN9MA53616xZZwdOYZsOnRodhkKKhsgQMMSf4h5UcYBjXX7vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751305790; c=relaxed/simple;
-	bh=yoi4i5n4fYavqimbjruoWqPfoDDaWyBF/Jq0f8YDWfk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b+kZQWM3s/4j4YMrgMG7UUm1V3MP7RPHrLqwKe6YMvFGlotj8kbVPHU6H8J9L8ZtapWRwpLjiy9Sn0VjsyEHYxxBaGhAKw85YLUGOKhVOiz0932KmlLWJYfZkFO7SrEKxj0M/zFA9UhJLyDXau6Kn6+DCPXEh3I6hwn3VtkYgCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obBBMxy3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751306597; c=relaxed/simple;
+	bh=3fu6WHoX0URGY060hxVBPeAEeK1Opps1K0U3986os9E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VzASvXKBgFDASc0dg48LJV7iIi21kTGT6azawqHYspoEq7TO9bCxBUzbbdl8v2SqYOT53GSxvGcNieHG5TLZo3/ar0cGZqMRZNcJoAWxtH/q1jNaJ6nMPU1qukuRQunIzUbD0tCeJ8lbAM7+L+JkZzWBFF09bW/JJ0Xsxm9nfCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=fj7C9eSa; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obBBMxy3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0854C4CEE3;
-	Mon, 30 Jun 2025 17:49:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751305790;
-	bh=yoi4i5n4fYavqimbjruoWqPfoDDaWyBF/Jq0f8YDWfk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=obBBMxy3BYFAIbQN+AMObBhPvreutHdvFk7yTDY8A+cNTdYBk98gSFqk4GADNqSyd
-	 sMZOT50584KhZdRUf44ZW1Ln4r+VePJl3cs+r3TMEZ86ltMHeYenz76amLMVgnU1sG
-	 uUHhQM3lFDfFjdY4cSNIc2e+kqdXzmcAoA9V3KIw+OKgTUhXQzUdkXVCKCDNVLZ/Nc
-	 7lQs8RZs7Eyc2nNAck9+1lUBJojyJA6vbs05Dr4ipTZRyIUL9R4JlKDwPVuPMHWREr
-	 5J7CGBabK0eGVLp/aR6suj+69CAzzk+UZdeSln7gJV51/KAIzejM1eVpjhTQ90eFun
-	 gHic5WT98P90g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: apparmor@lists.ubuntu.com,
-	John Johansen <john.johansen@canonical.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2] apparmor: use SHA-256 library API instead of crypto_shash API
-Date: Mon, 30 Jun 2025 10:48:05 -0700
-Message-ID: <20250630174805.59010-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.0
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="fj7C9eSa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1751306595; x=1782842595;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=H4Oh57q6DX394QB4dtEUvzbAUew4Ut8DiElWzbBJVH4=;
+  b=fj7C9eSayRMdkjcMA/7MlcFIwjk7/pUgeAzmUkroING2qV3cyBVx5JRk
+   vm+b5p2RjVRu6Q/w1ooJ2+hiQ5F5uaCwV6GmuDmyCAR79ou6sgUUyfYU9
+   BmqXB5g3PA2eSi4TmWX0mpOTlnzLehWpDsoHqjKj5mqQ9PNaR6SNNi3mB
+   1zVtkxDRzL53f80qYOlwBF/1K2rnWK/ZYvY1MyhKotdOnfaeaeSw9aDB2
+   JgbtPkc6MKsI3xz+ZRQnH00H3g/SqsrBLAVwTIGCdea7GA4X1MaRecGZY
+   k6f9W8uadajA7C1l8j/1utw1Hb/0hEh2FYG3C44c40LIsA+rt3iqahflj
+   g==;
+X-IronPort-AV: E=Sophos;i="6.16,278,1744070400"; 
+   d="scan'208";a="211778402"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 18:03:15 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:44973]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.203:2525] with esmtp (Farcaster)
+ id aad0ec3f-3683-4e36-92eb-f7304bea6135; Mon, 30 Jun 2025 18:03:15 +0000 (UTC)
+X-Farcaster-Flow-ID: aad0ec3f-3683-4e36-92eb-f7304bea6135
+Received: from EX19D004UWA004.ant.amazon.com (10.13.138.200) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 30 Jun 2025 18:03:14 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D004UWA004.ant.amazon.com (10.13.138.200) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 30 Jun 2025 18:03:14 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<wanjay@amazon.com>
+Subject: [PATCH v6.12 0/2] crypto: rng - FIPS 140-3 compliance for random number generation
+Date: Mon, 30 Jun 2025 18:03:10 +0000
+Message-ID: <20250630180312.24627-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,181 +59,46 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
+ EX19D004UWA004.ant.amazon.com (10.13.138.200)
 
-This user of SHA-256 does not support any other algorithm, so the
-crypto_shash abstraction provides no value.  Just use the SHA-256
-library API instead, which is much simpler and easier to use.
+This patch series implements FIPS 140-3 compliance requirements for random
+number generation in the Linux kernel 6.12 stable. The changes ensure that
+when the kernel is operating in FIPS mode, FIPS-compliant random number
+generators from the Crypto API are used to override the default
+/dev/random implementation.
 
-Acked-by: John Johansen <john.johansen@canonical.com>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+The series consists of two patches:
 
-This is the slightly revised version of
-https://lore.kernel.org/r/20250428190430.850240-1-ebiggers@kernel.org/
-that I'm planning to apply to libcrypto-next for 6.17 to avoid a silent
-conflict with the sha256_state => sha256_ctx rename, as per the
-discussion in that thread.
+1. "random: Add hook to override device reads and getrandom(2)" - This patch
+   introduces the infrastructure to allow external RNGs to override the
+   default random number generation. Originally authored by Herbert Xu, this has
+   been adapted for kernel 6.12.
 
-You can also get this patch and its dependencies from:
+2. "crypto: rng - Override drivers/char/random only after FIPS RNGs available" -
+   This patch implements the actual FIPS mode override using a workqueue-based
+   approach to ensure proper initialization timing. It addresses timing issues
+   in a previous commit "crypto: rng - Override drivers/char/random only after
+   FIPS RNGs available" where the crypto RNG would attempt to override before
+   dependencies were ready, preventing potential boot failures.
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git apparmor-sha256-lib-v2
+These patches are required for FIPS 140-3 certification and compliance in
+government and enterprise environments where cryptographic standards must
+be strictly enforced.
 
- security/apparmor/Kconfig  |  3 +-
- security/apparmor/crypto.c | 85 ++++++--------------------------------
- 2 files changed, 13 insertions(+), 75 deletions(-)
+Herbert Xu (1):
+  random: Add hook to override device reads and getrandom(2)
 
-diff --git a/security/apparmor/Kconfig b/security/apparmor/Kconfig
-index 64cc3044a42ce..1e3bd44643dac 100644
---- a/security/apparmor/Kconfig
-+++ b/security/apparmor/Kconfig
-@@ -57,12 +57,11 @@ config SECURITY_APPARMOR_INTROSPECT_POLICY
- 	  cpu is paramount.
- 
- config SECURITY_APPARMOR_HASH
- 	bool "Enable introspection of sha256 hashes for loaded profiles"
- 	depends on SECURITY_APPARMOR_INTROSPECT_POLICY
--	select CRYPTO
--	select CRYPTO_SHA256
-+	select CRYPTO_LIB_SHA256
- 	default y
- 	help
- 	  This option selects whether introspection of loaded policy
- 	  hashes is available to userspace via the apparmor
- 	  filesystem. This option provides a light weight means of
-diff --git a/security/apparmor/crypto.c b/security/apparmor/crypto.c
-index aad486b2fca65..227d47c149074 100644
---- a/security/apparmor/crypto.c
-+++ b/security/apparmor/crypto.c
-@@ -9,115 +9,54 @@
-  * Fns to provide a checksum of policy that has been loaded this can be
-  * compared to userspace policy compiles to check loaded policy is what
-  * it should be.
-  */
- 
--#include <crypto/hash.h>
-+#include <crypto/sha2.h>
- 
- #include "include/apparmor.h"
- #include "include/crypto.h"
- 
--static unsigned int apparmor_hash_size;
--
--static struct crypto_shash *apparmor_tfm;
--
- unsigned int aa_hash_size(void)
- {
--	return apparmor_hash_size;
-+	return SHA256_DIGEST_SIZE;
- }
- 
- char *aa_calc_hash(void *data, size_t len)
- {
--	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
- 	char *hash;
--	int error;
--
--	if (!apparmor_tfm)
--		return NULL;
- 
--	hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
-+	hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
- 	if (!hash)
- 		return ERR_PTR(-ENOMEM);
- 
--	desc->tfm = apparmor_tfm;
--
--	error = crypto_shash_init(desc);
--	if (error)
--		goto fail;
--	error = crypto_shash_update(desc, (u8 *) data, len);
--	if (error)
--		goto fail;
--	error = crypto_shash_final(desc, hash);
--	if (error)
--		goto fail;
--
-+	sha256(data, len, hash);
- 	return hash;
--
--fail:
--	kfree(hash);
--
--	return ERR_PTR(error);
- }
- 
- int aa_calc_profile_hash(struct aa_profile *profile, u32 version, void *start,
- 			 size_t len)
- {
--	SHASH_DESC_ON_STACK(desc, apparmor_tfm);
--	int error;
-+	struct sha256_ctx sctx;
- 	__le32 le32_version = cpu_to_le32(version);
- 
- 	if (!aa_g_hash_policy)
- 		return 0;
- 
--	if (!apparmor_tfm)
--		return 0;
--
--	profile->hash = kzalloc(apparmor_hash_size, GFP_KERNEL);
-+	profile->hash = kzalloc(SHA256_DIGEST_SIZE, GFP_KERNEL);
- 	if (!profile->hash)
- 		return -ENOMEM;
- 
--	desc->tfm = apparmor_tfm;
--
--	error = crypto_shash_init(desc);
--	if (error)
--		goto fail;
--	error = crypto_shash_update(desc, (u8 *) &le32_version, 4);
--	if (error)
--		goto fail;
--	error = crypto_shash_update(desc, (u8 *) start, len);
--	if (error)
--		goto fail;
--	error = crypto_shash_final(desc, profile->hash);
--	if (error)
--		goto fail;
--
-+	sha256_init(&sctx);
-+	sha256_update(&sctx, (u8 *)&le32_version, 4);
-+	sha256_update(&sctx, (u8 *)start, len);
-+	sha256_final(&sctx, profile->hash);
- 	return 0;
--
--fail:
--	kfree(profile->hash);
--	profile->hash = NULL;
--
--	return error;
- }
- 
- static int __init init_profile_hash(void)
- {
--	struct crypto_shash *tfm;
--
--	if (!apparmor_initialized)
--		return 0;
--
--	tfm = crypto_alloc_shash("sha256", 0, 0);
--	if (IS_ERR(tfm)) {
--		int error = PTR_ERR(tfm);
--		AA_ERROR("failed to setup profile sha256 hashing: %d\n", error);
--		return error;
--	}
--	apparmor_tfm = tfm;
--	apparmor_hash_size = crypto_shash_digestsize(apparmor_tfm);
--
--	aa_info_message("AppArmor sha256 policy hashing enabled");
--
-+	if (apparmor_initialized)
-+		aa_info_message("AppArmor sha256 policy hashing enabled");
- 	return 0;
- }
--
- late_initcall(init_profile_hash);
+Jay Wang (1):
+  crypto: rng - Override drivers/char/random only after FIPS RNGs
+    available
 
-base-commit: 1f7eb3c393ab9e56b5746f5fd31796a73bdd4d48
--- 
-2.50.0
+ crypto/rng.c           |  92 +++++++++++++++++++++++++++++++++
+ drivers/char/random.c  | 114 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/random.h |   7 +++
+ 3 files changed, 213 insertions(+)
+
+--
+2.47.1
 
