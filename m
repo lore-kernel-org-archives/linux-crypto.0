@@ -1,127 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CB0CA4E;
-	Mon, 30 Jun 2025 17:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26829293C52;
+	Mon, 30 Jun 2025 17:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751303004; cv=none; b=bCHpAXapkg84PEsLe2lKNznAYrGU6ozGaqVahj1mkxKTMhGI+YuulS78hDI7PjHe2RZ4XY5T8AmulcIYKqaWHhaqymK0geKOgC9G8lpoA/RVHMAeX1FQlwFxt5IyZ6N0yJQ6Gy+gbkSEXi0tFUkeZ0b/mvzUoqfYNI/DlpA9JAs=
+	t=1751304249; cv=none; b=M7QDTw7mBjQJjo3ov4mddS5xC0M/afAK0JpHHXcYJ94Eb1IqatoawW0iQL6zCjT8Xs4hPhS03VC4JJYcpaXkjr4dOsk8k6dKkgO+uasPT7GVMUmZ0L+Dg7336WyyT5AHKO8oB0pewd4qlzqfnlC43aB1JVSQK1l0ryFVYvZwYMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751303004; c=relaxed/simple;
-	bh=7pdCdKfXKgNVJgSu9uMlTMuwlr8iJXqLYAu7X1e5P9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HyOMLUcSziZwFh+nzSY7fWNcrNmaiBkwxRfmCiDA7JnTj/pMuOgw8xG7LjFouxobq5SchHArU6qUSmr6PhBh9XUCFQ+IE6gOL8d0sWie+PPRHUEPaEjmqWRQmAg6CramoWlKjTjjZXKlpHEV8Y3q9OHtNOK5YzmyRvlrPg7yNWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sQiB/pHK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751304249; c=relaxed/simple;
+	bh=2ss1z+u5lNz4mtpxqOkRg3/823azXS0wN/bTXoBHKxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VvUk6Mm1EGawS8AdrImYr4V8PeXHEypalTGQ0lEJatTdZLuJ0XPTYecZV+SCJ6vgXWjeiJ0NlTvP+ITOLUO1UMXFyqQDD0kBSlcCIdvRDbeDEpMXsU6gcc1OugPiJAzSQbOlbtKGVFLsl5QHH9clO0VANYrbJYpTaTMl9UJAVSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+dvIOd6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQiB/pHK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D609CC4CEE3;
-	Mon, 30 Jun 2025 17:03:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+dvIOd6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F0F1C4CEE3;
+	Mon, 30 Jun 2025 17:24:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751303004;
-	bh=7pdCdKfXKgNVJgSu9uMlTMuwlr8iJXqLYAu7X1e5P9Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sQiB/pHKX4Cf2mkicAi9zi8JVZfNw+FgwpmOeSbmE2l0IjR36sr21mD/5bPKOjf+a
-	 JFQ0lTKLsgQ3pnSIR8UKLn/B6y4eMObpon8TTO4TvgxzWv9fHOyh5fHZmiNMTzqBzx
-	 QRkMiYJjvRQBvTa+67B+wjMxz/D50fOUXpdYIpt112vyzDIUcsCnPsHlLXlyn3FXCl
-	 SZS+EAEumBgQDLs0mCuy426H4rwGlkMeZqyq9S4L6e8udQD/NDydYWRU09Ew9J+TcD
-	 d3APRAHVSbWbmtGTaymXOoO4sMr4OqmXgj9WghKipAirSeQSMBv9zqnzf51b9tTSN7
-	 yv4jmr0vy5k5w==
-Date: Mon, 30 Jun 2025 10:02:45 -0700
+	s=k20201202; t=1751304248;
+	bh=2ss1z+u5lNz4mtpxqOkRg3/823azXS0wN/bTXoBHKxY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=s+dvIOd6tblfiP+FP5N3YqoXcALT9orqIV2/EdJGByixJ+wy2EpolTgjDbQiQBNdC
+	 /041gDK/TVoafEDYTGqo/lw91xjV+QIB+hAsyWJK9MOaE7M+vryw0pzRgN7ZWHrq2D
+	 fcBnjz2YShIC0Giw0nfbbtQxtontWDOyc9pLKIe4I71FKF4PZ4WPvS6uczM3wQ2q4j
+	 pTzaZYjRj98jZg06wWJouMvOpUpGVJhvH0/0USGnxgQCypu1sAr4/nAu5nd8M+aLpi
+	 Htk4dm8mQa2CX5FwFpXNOo+P8P5oMwjgZzVze8wdYacN3J2xnCRFfxQn1aKShmLCje
+	 3mdc0OzLVjbaA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Joerg Schmidbauer <jschmidb@de.ibm.com>,
+To: fsverity@lists.linux.dev
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-btrfs@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
-	Ingo Franzki <ifranzki@linux.ibm.com>
-Subject: Re: [PATCH] crypto: s390/sha - Fix uninitialized variable in SHA-1
- and SHA-2
-Message-ID: <20250630170245.GD1220@sol>
-References: <20250627185649.35321-1-ebiggers@kernel.org>
- <20250630165805.GC1220@sol>
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/2] Convert fs/verity/ to use SHA-2 library API
+Date: Mon, 30 Jun 2025 10:22:22 -0700
+Message-ID: <20250630172224.46909-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630165805.GC1220@sol>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 30, 2025 at 09:58:05AM -0700, Eric Biggers wrote:
-> On Fri, Jun 27, 2025 at 11:56:49AM -0700, Eric Biggers wrote:
-> > Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-> > added the field s390_sha_ctx::first_message_part and made it be used by
-> > s390_sha_update_blocks().  At the time, s390_sha_update_blocks() was
-> > used by all the s390 SHA-1, SHA-2, and SHA-3 algorithms.  However, only
-> > the initialization functions for SHA-3 were updated, leaving SHA-1 and
-> > SHA-2 using first_message_part uninitialized.
-> > 
-> > This could cause e.g. CPACF_KIMD_SHA_512 | CPACF_KIMD_NIP to be used
-> > instead of just CPACF_KIMD_NIP.  It's unclear why this didn't cause a
-> > problem earlier; this bug was found only when UBSAN detected the
-> > uninitialized boolean.  Perhaps the CPU ignores CPACF_KIMD_NIP for SHA-1
-> > and SHA-2.  Regardless, let's fix this.  For now just initialize to
-> > false, i.e. don't try to "optimize" the SHA state initialization.
-> > 
-> > Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
-> > and earlier, we'll also need to patch SHA-224 and SHA-256, as they
-> > hadn't yet been librarified (which incidentally fixed this bug).
-> > 
-> > Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
-> > Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > ---
-> > 
-> > This is targeting 6.16.  I'd prefer to take this through
-> > libcrypto-fixes, since the librarification work is also touching this
-> > area.  But let me know if there's a preference for the crypto tree or
-> > the s390 tree instead.
-> 
-> Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+This series, including all its prerequisites, is also available at:
 
-Forgot to mention: I revised the first two paragraphs of the commit message to
-fix a couple things and clarify that the accidental CPACF_KIMD_NIP was indeed
-ignored (as per Ingo):
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git fsverity-libcrypto-v1
 
-    crypto: s390/sha - Fix uninitialized variable in SHA-1 and SHA-2
-    
-    Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-    added the field s390_sha_ctx::first_message_part and made it be used by
-    s390_sha_update() (now s390_sha_update_blocks()).  At the time,
-    s390_sha_update() was used by all the s390 SHA-1, SHA-2, and SHA-3
-    algorithms.  However, only the initialization functions for SHA-3 were
-    updated, leaving SHA-1 and SHA-2 using first_message_part uninitialized.
-    
-    This could cause e.g. the function code CPACF_KIMD_SHA_512 |
-    CPACF_KIMD_NIP to be used instead of just CPACF_KIMD_SHA_512.  This
-    apparently was harmless, as the SHA-1 and SHA-2 function codes ignore
-    CPACF_KIMD_NIP; it is recognized only by the SHA-3 function codes
-    (https://lore.kernel.org/r/73477fe9-a1dc-4e38-98a6-eba9921e8afa@linux.ibm.com/).
-    Therefore, this bug was found only when first_message_part was later
-    converted to a boolean and UBSAN detected its uninitialized use.
-    Regardless, let's fix this by just initializing to false.
-    
-    Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
-    and earlier, we'll also need to patch SHA-224 and SHA-256, as they
-    hadn't yet been librarified (which incidentally fixed this bug).
-    
-    Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-    Cc: stable@vger.kernel.org
-    Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
-    Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
-    Acked-by: Heiko Carstens <hca@linux.ibm.com>
-    Reviewed-by: Ingo Franzki <ifranzki@linux.ibm.com>
-    Link: https://lore.kernel.org/r/20250627185649.35321-1-ebiggers@kernel.org
-    Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+This series makes fs/verity/ use the SHA-2 library API instead of the
+old-school crypto API.  This is simpler and more efficient.
+
+This depends on my SHA-2 library improvements for 6.17 (many patches),
+so this patchset might need to wait until 6.18.  But I'm also thinking
+about just basing the fsverity tree on libcrypto-next for 6.17.
+
+Eric Biggers (2):
+  lib/crypto: hash_info: Move hash_info.c into lib/crypto/
+  fsverity: Switch from crypto_shash to SHA-2 library
+
+ Documentation/filesystems/fsverity.rst |   3 +-
+ crypto/Kconfig                         |   3 -
+ crypto/Makefile                        |   1 -
+ fs/verity/Kconfig                      |   6 +-
+ fs/verity/enable.c                     |   8 +-
+ fs/verity/fsverity_private.h           |  24 +--
+ fs/verity/hash_algs.c                  | 194 +++++++++----------------
+ fs/verity/open.c                       |  36 ++---
+ fs/verity/verify.c                     |   7 +-
+ lib/crypto/Kconfig                     |   3 +
+ lib/crypto/Makefile                    |   2 +
+ {crypto => lib/crypto}/hash_info.c     |   0
+ 12 files changed, 107 insertions(+), 180 deletions(-)
+ rename {crypto => lib/crypto}/hash_info.c (100%)
+
+-- 
+2.50.0
+
