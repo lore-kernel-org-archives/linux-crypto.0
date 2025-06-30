@@ -1,138 +1,132 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D562258A;
-	Mon, 30 Jun 2025 07:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF623ABB3;
+	Mon, 30 Jun 2025 08:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751269065; cv=none; b=fLlyZhzcfqqgblC6KsTu8rQQjLLElfvsAGgmufB4oJQXGABTzMvlw3gEPYKmFFyfoYoKMiE86i6bcW4/Ic96CT2P9f6bR2i5S/nlmx9g4Ry0bgHd7xuW1vxZySzMDP1OuGX/Cc330Y5phRcea+xab5a6fW++izSIi0qRaOnkjT8=
+	t=1751273857; cv=none; b=Su1ZIQ1uAGGx7yCLpzo5dRdVHyzITed18BMVVKisDXW7zwCPqpKF5ign3XgNzLlCM9JLbgbhz5je7DTBkeIeO9PZ2qKor1/DXqOZ4mGxMVAiGx4FyXRp0t4P4IiG6wJGEwchhRJYZF5zVZ6Gj948D1sjEjT6DfUVe9iYov71Sho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751269065; c=relaxed/simple;
-	bh=sG18V9YH6xwaMCKoP5b6EmXZZdF6kA34hDti89/UFzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CljHt8S2S18CiSD8ZayDEqVl12z3nDtAVBZL9ezhVBi+JGwpg8A2k82vnJNmLSYYgsaM7CaqPQaFDWGBbxkS4jJ8Oi/RsZglxEqdEU0bb1UN+S6Ruf4gjdARHL4caJ+sW2zwk5GvtRpmNx1yMhKP55pLM//Ef1yiMWSbYewCIiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=e1i4YqiD; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751273857; c=relaxed/simple;
+	bh=APQjnfC0ho26CdR02Kmbiu4E9JMnLLbwfYZ7NNh8DYs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SZSJl8NaMene9URlR35XHuxw8oKwmcwO9BRhgwt8fcNrfUpez8WQzuu2XVIPx1R35sFAcGA/dD6bXB88NvvYr+YDX8Un9nDNLxljMUyfwkyaLLUAOPf7CyMwOBPDljiE+e0ihVSMgfVWPF9cxUAPQAKU6RCNpluRS3tndgur2kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dv/vKlEW; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e1i4YqiD"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55TKuAvD027682;
-	Mon, 30 Jun 2025 07:36:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=LRuxJGeazOAFE04HqsIYG5vhTHeYxo
-	okmIsQ4rJ0tr8=; b=e1i4YqiDY8naXnepnWvjDRT1icKqYeUPy0sKroEwdegooK
-	XhfgAqCcIHNY99Fo1ms6mc8/sunnG8B0qa4T2RyDa7atatmN9GaAEi0trTxO8t59
-	5BmkOURCLWZwzeqRt2LbBek/J5GYoEjShxtT4Hiu/BXe7lXlVFk6SWg583iLQS/+
-	VadCkhXg93j+UrNuKOmxrmNcWeVHKWcy8HRfraiNw1XkdkASwbhZjSkSW0bIhPBc
-	axodA+w9wi8dyp+cvXjrHNRgMuX+tcJVkcIELmUf/W6S5oKzKx4pxIO7Sjz2y43d
-	8apG/Ixb+L7BRxxnBDKsdy8lz7aU/gEtGWkWHT/w==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j84cyw1f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 07:36:39 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55U4P3Yt032250;
-	Mon, 30 Jun 2025 07:36:37 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47ju40d014-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 07:36:37 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55U7aVQC19136952
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Jun 2025 07:36:31 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2CCCE200F7;
-	Mon, 30 Jun 2025 07:36:31 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A9864200FD;
-	Mon, 30 Jun 2025 07:36:23 +0000 (GMT)
-Received: from osiris (unknown [9.111.82.77])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 30 Jun 2025 07:36:23 +0000 (GMT)
-Date: Mon, 30 Jun 2025 09:36:11 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Joerg Schmidbauer <jschmidb@de.ibm.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
-        Ingo Franzki <ifranzki@linux.ibm.com>
-Subject: Re: [PATCH] crypto: s390/sha - Fix uninitialized variable in SHA-1
- and SHA-2
-Message-ID: <20250630073611.15284Ab6-hca@linux.ibm.com>
-References: <20250627185649.35321-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dv/vKlEW"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a4f64cdc2dso683307f8f.1;
+        Mon, 30 Jun 2025 01:57:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751273854; x=1751878654; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=POF/lfjlBstPPmJqK/rxTYHM0xgWsKYRn8MW4p37XQs=;
+        b=Dv/vKlEWT9/oquHFb5ZheJlDCP0WqB9NbF/sGP2Wz9ITsB0GcPGoW8W/OdyGBSDioa
+         hYfnFggD3FmlzH9KUxaEfnWmuzWvwd8wAetYGZhhTmnmqlc1KAvR+HYXxO9BtAwzF02C
+         3SnT+mVHlT7Qlr8zDKC8tQ4H7MQw2rWLmutY6sQ59ofaTjvps6acVqN0sZAA1V0vEXvQ
+         1q+nef7KDJOUdPhx1kQM9WuhN1YcGu8nD0yQszWdDKerSscVwFVbmg2zWjbMPBsPJIR5
+         bFxTLLQPxTOE1WcvKDS07uOc89Gp7HqNyJUKGYr2YJayahcnYXnfObbn+N8jAiplUqLM
+         OYCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751273854; x=1751878654;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=POF/lfjlBstPPmJqK/rxTYHM0xgWsKYRn8MW4p37XQs=;
+        b=byq87HAazaMhUVZIm7P6b8uCMFG2KhHFrsrTRD1Qpqj4G5g+4AAho7/QgLmDSZE5Eg
+         WVOM6+I3VrCBkuAm1XoLIvKNTX3SBagrWlY750aJjKZzI9kMmghZuW7msTwFPZ+0XkWi
+         v+SkkHr20inxm3K3dlpdt72OYIgAm85eF2bfPu47kkDn/hIyBwO/NoT/XNFsB8YlUAnr
+         qrsz8jKWSgxVUZdZGlGbFJTAx3H9NPi4N41W5DG1Ze8zHduc4mh9x58OXT9KGrrzAb8r
+         k9PY4A6FNK69SUFN47hV8iGrzZgH9qgEM3kcDlIOjP2Uu5QZVSW+5cH/cJiCytT8VLPW
+         Ct0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVT3mrNeqbCPDQ0N1zVHN13k8FyOJMn0VPrBrRcLiU51h2IuDiCcnxKVgEitCy+H6XF5tgAnx+7ZZzJE0in@vger.kernel.org, AJvYcCXXD2Il9keOW5Bw6lMYLFybST1lR7jUqqxQ50L3jNL3bxZioaz2ySAS7deuhDqeXaLR887D35IAgswnvqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRJFjYHItd0+Yp1iCkgvNXSC+bWZk6kgVBLAslSW7bM59OEsoN
+	qP9hPhFv2Ntk+B5nvjkiaiwpCZM8VIpAItv7R0gzCNMI7VbNPXYyryfu
+X-Gm-Gg: ASbGncvofkm3qs3ONfFKUQH5IN/qXvXAuWUzNgTfEep0VhnoqtFBxGnkQNyHvcEb7ss
+	qBjHz46iKXCrUvDls4YXG5hkfOoM+qE8CB95MIlc7XOYZ/RSBQ8koAJB86KMbz4iM2ZQCFICR+i
+	XmhDQcj0u/JZZiIY82NRQc33lTA/oyHKhAo9xgo4+1OIPJYDhwvtqBEn2z0+mqotK5ospbUc+YV
+	TQ1owQYhCgCa6YmhxGDqKXpAWm5HX5btiAMTf2QoatSJbtzztX4Upcjp2vpHO3m/bnj4wl+cCZD
+	y0JyXK1mq5Lu+f9aWRzHQo9l4XeLAEsyqsRWO4oNWGtad/w/AaNbaAwQRLoUm9yBuDKaeOAtnzS
+	UbgjJeIT9jsaV0co=
+X-Google-Smtp-Source: AGHT+IGlknY67astPqQ6Ts4eyHBJeWoLGAdmYYOyXUPQ5uMHairQGPegGqQwCezY1A48qiQrcuUVNw==
+X-Received: by 2002:a05:6000:402b:b0:3a4:f912:86af with SMTP id ffacd0b85a97d-3aaf2e9231cmr2195341f8f.2.1751273853675;
+        Mon, 30 Jun 2025 01:57:33 -0700 (PDT)
+Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:234c:3c9a:efe4:2b60])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4538a3fe587sm130162475e9.19.2025.06.30.01.57.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 01:57:33 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+	Declan Murphy <declan.murphy@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Gross <mgross@linux.intel.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: keembay: Fix dma_unmap_sg() nents value
+Date: Mon, 30 Jun 2025 10:57:06 +0200
+Message-ID: <20250630085707.62981-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250627185649.35321-1-ebiggers@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lUTN_MH2-aHDhXdBvhoSJxnHTj2BMH8s
-X-Proofpoint-GUID: lUTN_MH2-aHDhXdBvhoSJxnHTj2BMH8s
-X-Authority-Analysis: v=2.4 cv=Ib6HWXqa c=1 sm=1 tr=0 ts=68623e87 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=adFIAS80RBVZD6iCsq0A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDA1OSBTYWx0ZWRfX4fBph0upJLoJ qAnseUygVc31k1QlUokbrLSgo1tcxWae2LXhVcad06UInBCAzoYSneVvU8zkzrsd+ooHLNqKLBs JGHGyAP6assaCXlMdDjozBidzIik70S5p5lVsG4sNoCW6rI4MWSikRASdJg80OsbMoqwoId1VhM
- OvN3aI2Z0vqXTxr2B3WqBB/1Gc3zEBdDkUnBHBeUtJf95/JYI4nN4eo9Le/p+Ycer41iFDxI6qu /o0aGbFJZiFftAWvI4Mqm2PmwiyyPN4vM9JIba+Wn4txqeiuxoFBCo6tuDKkpYOat3XpWYhovo3 td/MKH5hU42E9OAdoO4AYx4/LE6L5yqc1cs2HI1hJlxwKqJNtgwjXID2GeA6CK8plmzQNkiNePt
- 87rmZVMpdZvYUtjrjHYUeaB5w9a+4vFM2PUlxTPAUK7AYdg7f9VcT9P1UrTHI3kzp1hzpLNX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-30_01,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=442 lowpriorityscore=0 impostorscore=0
- mlxscore=0 malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506300059
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 27, 2025 at 11:56:49AM -0700, Eric Biggers wrote:
-> Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-> added the field s390_sha_ctx::first_message_part and made it be used by
-> s390_sha_update_blocks().  At the time, s390_sha_update_blocks() was
-> used by all the s390 SHA-1, SHA-2, and SHA-3 algorithms.  However, only
-> the initialization functions for SHA-3 were updated, leaving SHA-1 and
-> SHA-2 using first_message_part uninitialized.
-> 
-> This could cause e.g. CPACF_KIMD_SHA_512 | CPACF_KIMD_NIP to be used
-> instead of just CPACF_KIMD_NIP.  It's unclear why this didn't cause a
-> problem earlier; this bug was found only when UBSAN detected the
-> uninitialized boolean.  Perhaps the CPU ignores CPACF_KIMD_NIP for SHA-1
-> and SHA-2.  Regardless, let's fix this.  For now just initialize to
-> false, i.e. don't try to "optimize" the SHA state initialization.
-> 
-> Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
-> and earlier, we'll also need to patch SHA-224 and SHA-256, as they
-> hadn't yet been librarified (which incidentally fixed this bug).
-> 
-> Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
-> Cc: stable@vger.kernel.org
-> Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
-> Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This is targeting 6.16.  I'd prefer to take this through
-> libcrypto-fixes, since the librarification work is also touching this
-> area.  But let me know if there's a preference for the crypto tree or
-> the s390 tree instead.
-> 
->  arch/s390/crypto/sha1_s390.c   | 1 +
->  arch/s390/crypto/sha512_s390.c | 2 ++
->  2 files changed, 3 insertions(+)
+The dma_unmap_sg() functions should be called with the same nents as the
+dma_map_sg(), not the value the map function returned.
 
-Routing this via libcrypto-fixes is fine.
+Fixes: 472b04444cd3 ("crypto: keembay - Add Keem Bay OCS HCU driver")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+diff --git a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+index 95dc8979918d..8f9e21ced0fe 100644
+--- a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
++++ b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+@@ -68,6 +68,7 @@ struct ocs_hcu_ctx {
+  * @sg_data_total:  Total data in the SG list at any time.
+  * @sg_data_offset: Offset into the data of the current individual SG node.
+  * @sg_dma_nents:   Number of sg entries mapped in dma_list.
++ * @nents:          Number of entries in the scatterlist.
+  */
+ struct ocs_hcu_rctx {
+ 	struct ocs_hcu_dev	*hcu_dev;
+@@ -91,6 +92,7 @@ struct ocs_hcu_rctx {
+ 	unsigned int		sg_data_total;
+ 	unsigned int		sg_data_offset;
+ 	unsigned int		sg_dma_nents;
++	unsigned int		nents;
+ };
+ 
+ /**
+@@ -199,7 +201,7 @@ static void kmb_ocs_hcu_dma_cleanup(struct ahash_request *req,
+ 
+ 	/* Unmap req->src (if mapped). */
+ 	if (rctx->sg_dma_nents) {
+-		dma_unmap_sg(dev, req->src, rctx->sg_dma_nents, DMA_TO_DEVICE);
++		dma_unmap_sg(dev, req->src, rctx->nents, DMA_TO_DEVICE);
+ 		rctx->sg_dma_nents = 0;
+ 	}
+ 
+@@ -260,6 +262,10 @@ static int kmb_ocs_dma_prepare(struct ahash_request *req)
+ 			rc = -ENOMEM;
+ 			goto cleanup;
+ 		}
++
++		/* Save the value of nents to pass to dma_unmap_sg. */
++		rctx->nents = nents;
++
+ 		/*
+ 		 * The value returned by dma_map_sg() can be < nents; so update
+ 		 * nents accordingly.
+-- 
+2.43.0
+
