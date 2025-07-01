@@ -1,130 +1,103 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B25245022
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Jul 2025 06:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3B81DF73A
+	for <linux-crypto@vger.kernel.org>; Tue,  1 Jul 2025 09:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751350182; cv=none; b=H7t9pV6DgAVqBYk70ztwdMphVfJ8gS+Np1dR7v0cF+nk3GqCgjzoRDan3/Iz7UQ+XoHiCaTkJ8bCPaPY2mUtwIEMMJBIwAK1+Nl65/ivkpPkmNwlz43T4DZh+AYaPVYp17mEQWvVj/TTmFPOy6yAyTz/ytO+DlnPDfQBOYAbqwc=
+	t=1751363259; cv=none; b=u05796aIepLGqixM6ID1ZloRRDshtYdS1Z7vZfZLX69d5XLhBJFtHT194HXEMPgK3l8yCbAIDBpsLAJOOnsH8G/K4lgqRzoTC/h4MsTcpMybKvG+poVqXYJj04egFui/dkayKkrhbZahdiTPMdI3aMHy6CkpRcmLdcVKJ1cpx8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751350182; c=relaxed/simple;
-	bh=sZn1KgN8tgaYqNBol75eRQI21Lp06foomJyqYe+MuVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CkrT3UutzLLKVJIbBmzswAUaCZqtAgupZ2fUT42Q08eMrolBofedpB/UXWMgr5y+hUTRwJsskW9UYYNSEk9A6ceUL2xv3xRwIi5ErBzl1g7kl/mCDxVQNP+Oya/DlgqaMJSkepZETyxcbUR/hefYVonWNA2uxOMixg7H33LbjH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jVlGCc7S; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BrpUd7oo; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1751363259; c=relaxed/simple;
+	bh=eB3SMAxLw88teVb2YTbxy7MMWXKx8JY5e4gtUt+0zh4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kvpEjxHbGjcsJuk9sbviPb3+f4xTg9jVwsT+0bJU0LDzrwVRKP3UouPl9aIPJdUAAbdgH8nCNXuI8ujB3aVc2WvgPhHdqHAaPia+3gUAQfPvrQc8yu40LV4RcNuTMwRSln4hz35OL04j0Fr7X3otPym8jSpABC4GEBcwnw1b490=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mhpkR2h2; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jVlGCc7S";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BrpUd7oo"
-Date: Tue, 1 Jul 2025 08:09:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1751350178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=EiFSlrqpPfW1qkmBUTfWyy6a5h5zZAAmZJTwZwnI47E=;
-	b=jVlGCc7SFyom6K2ufBasnRNTrgiDWKOW32UWYUV1Laq9qW4yMqmP9b2WqYUzjQybuI5BAP
-	8EKN++Z19IewDxxLpce0wb+j4cb+WCWuTAv7PzXL1i8T4cJ0Y+5NqOUgFGWEds/lh5Us5z
-	PQMrW2RGFPcjs3T5S1UQW1tmyYdUQHL5Su/ekvhISG1O6CFwnVLebI5gy0TMaY3174MHy/
-	uwN9YjBDrfNMihxCAoolPsy49OZmdXndc1GZk3KL8Q3DT9unILIn6UF7CAXRglXeWx9bvv
-	h16pYGFZb9606s+QAHwCv3GUZaQ17tZUuIiT4xrIBMNt/tpzbY4eEzcIj3iVFA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1751350178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=EiFSlrqpPfW1qkmBUTfWyy6a5h5zZAAmZJTwZwnI47E=;
-	b=BrpUd7oofoVsBct+x62gPKUUOB96Aba7Tubgz/ZlqFAwyfbSHvPPl+59Mo3/yG0O8o37Ln
-	KypoegolQc3qkgDg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: linux-crypto@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>, Cc: 
-	Thomas Gleinxer <tglx@linutronix.de>;
-Subject: [PATCH] cryptd: Use nested-BH locking for cryptd_cpu_queue
-Message-ID: <20250701060936.r4gtQv9v@linutronix.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mhpkR2h2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751363258; x=1782899258;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eB3SMAxLw88teVb2YTbxy7MMWXKx8JY5e4gtUt+0zh4=;
+  b=mhpkR2h24DfNODmy1ztZ6Pw138yBIDi4tHhxbu2oALLnz35Iq9geC3Dx
+   m7Tg2KwEoUi+z5fAJM3MH8DK8hdyeBAnscQ8NSSHZXsYX+jdLow60XDJE
+   Qh+Lpd5yCureWNP3vWbd1vyiDLomYOGttLU+rf6w0vT4jP7Qg1jnc6Z5j
+   k2WyODRuOU4Bu+kSeBfXFFHX16lCvs+Z7NWcGWHHdkPnz8mQ5+BuiOw/X
+   OCT8OhURWokIxLDm8dZvBvGfRldxGI4ba2kcp3Q97bz7W/QzRN/kOMTxj
+   nmsd2RXFZJ1GB2ULEgrkphCfiU8rco2G+qsAO9LWa6AZ0DScqNM3ulqst
+   Q==;
+X-CSE-ConnectionGUID: iEVsXI/bQTCXCZLElRKJ/g==
+X-CSE-MsgGUID: 91fF7KF4SYuKj9W6V6n9Rw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="53483462"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="53483462"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 02:47:36 -0700
+X-CSE-ConnectionGUID: Jfmr5MfkQxy0PJnKajxe3Q==
+X-CSE-MsgGUID: mYwt3ObTQomDHlybCGLpvA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="154030051"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by fmviesa009.fm.intel.com with ESMTP; 01 Jul 2025 02:47:34 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+Subject: [PATCH 0/5] crypto: qat - refactor and add live migration enablers for GEN6 devices
+Date: Tue,  1 Jul 2025 10:47:25 +0100
+Message-Id: <20250701094730.227991-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-cryptd_queue::cryptd_cpu_queue is a per-CPU variable and relies on
-disabled BH for its locking. Without per-CPU locking in
-local_bh_disable() on PREEMPT_RT this data structure requires explicit
-locking.
+This patch series focuses on adding enablers required for live migration
+for QAT GEN6 devices and improving code reuse and maintainability across
+different QAT generations. The changes include refactoring shared logic,
+relocating reusable functionality, and improving code clarity and debugging
+support.
 
-Add a local_lock_t to the struct cryptd_cpu_queue and use
-local_lock_nested_bh() for locking. This change adds only lockdep
-coverage and does not alter the functional behaviour for !PREEMPT_RT.
+In detail:
+Patch #1 improves logging consistency.
+Patch #2 improves state checking logic.
+Patch #3 relocates bank state helper functions to a new file.
+Patch #4 relocates and renames the bank state structure
+Patch #5 add enablers for live migration for QAT GEN6 devices.
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
+Małgorzata Mielnik (2):
+  crypto: qat - relocate bank state helper functions
+  crypto: qat - add live migration enablers for GEN6 devices
 
-This patch requires a prerequisite for __local_lock_nested_bh() which
-has been made available at
-   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git local-lock-for-net
+Suman Kumar Chakraborty (3):
+  crypto: qat - use pr_fmt() in adf_gen4_hw_data.c
+  crypto: qat - replace CHECK_STAT macro with static inline function
+  crypto: qat - relocate and rename bank state structure definition
 
-It can be pulled in so that the crypto bits are independent of the TIP
-tree.
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   5 +-
+ .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |   4 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  38 +--
+ .../intel/qat/qat_common/adf_bank_state.c     | 238 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_bank_state.h     |  49 ++++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   | 199 +--------------
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   7 -
+ .../intel/qat/qat_common/adf_gen4_vf_mig.c    |   7 +-
+ .../intel/qat/qat_common/adf_gen6_shared.c    |   7 +
+ .../intel/qat/qat_common/adf_gen6_shared.h    |   2 +
+ 11 files changed, 314 insertions(+), 243 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_bank_state.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_bank_state.h
 
- crypto/cryptd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 5bb6f8d88cc2e..efff54e707cb5 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -34,6 +34,7 @@ MODULE_PARM_DESC(cryptd_max_cpu_qlen, "Set cryptd Max queue depth");
- static struct workqueue_struct *cryptd_wq;
- 
- struct cryptd_cpu_queue {
-+	local_lock_t bh_lock;
- 	struct crypto_queue queue;
- 	struct work_struct work;
- };
-@@ -110,6 +111,7 @@ static int cryptd_init_queue(struct cryptd_queue *queue,
- 		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
- 		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
- 		INIT_WORK(&cpu_queue->work, cryptd_queue_worker);
-+		local_lock_init(&cpu_queue->bh_lock);
- 	}
- 	pr_info("cryptd: max_cpu_qlen set to %d\n", max_cpu_qlen);
- 	return 0;
-@@ -135,6 +137,7 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
- 	refcount_t *refcnt;
- 
- 	local_bh_disable();
-+	local_lock_nested_bh(&queue->cpu_queue->bh_lock);
- 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
- 	err = crypto_enqueue_request(&cpu_queue->queue, request);
- 
-@@ -151,6 +154,7 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
- 	refcount_inc(refcnt);
- 
- out:
-+	local_unlock_nested_bh(&queue->cpu_queue->bh_lock);
- 	local_bh_enable();
- 
- 	return err;
-@@ -169,8 +173,10 @@ static void cryptd_queue_worker(struct work_struct *work)
- 	 * Only handle one request at a time to avoid hogging crypto workqueue.
- 	 */
- 	local_bh_disable();
-+	__local_lock_nested_bh(&cpu_queue->bh_lock);
- 	backlog = crypto_get_backlog(&cpu_queue->queue);
- 	req = crypto_dequeue_request(&cpu_queue->queue);
-+	__local_unlock_nested_bh(&cpu_queue->bh_lock);
- 	local_bh_enable();
- 
- 	if (!req)
+base-commit: 65433cdeb0bdd0ebd8d59edd3c2e6d5cbef787c3
 -- 
-2.50.0
+2.40.1
 
