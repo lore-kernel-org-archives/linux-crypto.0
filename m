@@ -1,147 +1,253 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2082.outbound.protection.outlook.com [40.107.223.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8726A2D780E;
-	Wed,  2 Jul 2025 19:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751486262; cv=none; b=f9sejaQejhaqyolV8ErsgxRppKx10TsThTj34okgyhxxXA6NkeF3qs/qF2GVI89rTrN6+Pns264Lnm4loXI09g1i2yRlrPW4geRnEen8mKXDNtvVl+Pp9Bm+pVSq9nqluKQ+QkqkA5pXL7klH9ZinTA3Lp4eXWE5GPSU0E5nU3c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751486262; c=relaxed/simple;
-	bh=CaQXOmGi1Q4hapePQLyAziFqod4bCIqfR+jrX6VTL94=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=g0Bncl1gTzQ7NNLPJsa+7pin3Bi3Bbt6ud91+VCtv+TS5ZcrRN6XKjoeS74w/ZdTypY8UfpY726nSonbDfrO4gcYEoDblB9ZnaiDMRvQYA/j6HRf/Chi/NO4nq1TrpTFSytFHwbalZG+Aj2P4Ny6bVsU2UQCPc2fucBsH2nCsrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iphs3Fr4; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31C12DE70F;
+	Wed,  2 Jul 2025 21:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751492807; cv=fail; b=cjjbEJqdudA6ujK7lcYw9moj8g5Qj04mzveJF98sybGXOp2ANI9EdsjKrwclzb2EqpFYKk0DITQu/889Ddx75OPSASjsvJqYGWXrNr9m1CHaogMywxNZdGlvIT3PDSp48KKysw99yTJlabKcQ7WXbdgHfd1IyC4WtUbyTwTu6MU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751492807; c=relaxed/simple;
+	bh=yGeYR7nvxGL6UO8YYs0TxyoVNG8dPBI3FhKm5S2h4Oc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=e9+N+QzChpulcsR/oiud2CHG/oeHnvsv5sW69uP2QcUipoTnMebNJWgktGM+isIpiJfx2fr9Ug5AKnpaYc6xgV34UT2w6EIYyCmzxRtGJYdD7ah/xXnTRHPN4f++DduQ0+EDdQEck3ne4ZU3zZwMPAcpnZUtDnWlz5wkSGeqJx0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uWIRhDgP; arc=fail smtp.client-ip=40.107.223.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iphs3Fr4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C284C4CEEE;
-	Wed,  2 Jul 2025 19:57:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751486262;
-	bh=CaQXOmGi1Q4hapePQLyAziFqod4bCIqfR+jrX6VTL94=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=iphs3Fr47nWhPR0TagxlvNifwvoipDSOQbi9gEDaqxer7o5R3rwhexpiw+MxfZQ1u
-	 1T/wgYkjS39E64y2k/kFWowyaORm+eOxHZbPVpm/RyaEX967hz53DKJy8jHVQ74gDD
-	 uxYv/eEKpEdwFhX2SQ0ePE7O73BUjPbA0mPN2ZtvRln7myS8SyAQamergJDu+lNqSy
-	 6MDhVy6t+8DutVkRvYGv0SCDbq+YBdE2cl+3c2VpXE1f2LB1EobYutBkLpw61ULGFm
-	 v0RvrEDiMNc50AMBjt4JOc03BHlzcScYmYQ0Brw7tT7aM967kBApfeLFLMLkEbEN6Q
-	 FCTpcbdusJgyQ==
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 6F059F40068;
-	Wed,  2 Jul 2025 15:57:40 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Wed, 02 Jul 2025 15:57:40 -0400
-X-ME-Sender: <xms:NI9laCs28QYlhPXfNvAXECAXg4qbxhG3NuDCBMXg9YZfRFjAY3ul-w>
-    <xme:NI9laHfO-CyLcRVqKE-_Ol55xS5aXihGQeRdR8XIEc0iMEY1hznDUBHvDOksQBBDG
-    S9-EIZPOlTvXWVMPyI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukedvlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugeskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeejjeffteetfeetkeeijedugeeuvdfgfeefiedtudeikeeggeefkefhudfhlefh
-    veenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidquddvkeehudejtddvgedq
-    vdekjedttddvieegqdgrrhhnugeppehkvghrnhgvlhdrohhrghesrghrnhgusgdruggvpd
-    hnsggprhgtphhtthhopedviedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheptggr
-    thgrlhhinhdrmhgrrhhinhgrshesrghrmhdrtghomhdprhgtphhtthhopehlihhnuhigse
-    grrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghlvgigrghnughrvgdrsggv
-    lhhlohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvg
-    hmlhhofhhtrdhnvghtpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgr
-    nhgrrdhorhhgrdgruhdprhgtphhtthhopegrnhguihdrshhhhihtiheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepsghrohhonhhivgeskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepjhhirhhishhlrggshieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvvgeskh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:NI9laNwqgy5fmKbVuN6ufKbwO6ci8zaZO8U14JNHCAEgzh5P4AhQcw>
-    <xmx:NI9laNNTDjb8W7aNnQQcl_IMMDlm4R1XJ0V42VSvlKV20oZtIMh-Vg>
-    <xmx:NI9laC8HMWDKpPVud9dKnhSew2dXQKf_9r40M52mqN30aq_C-E9CWA>
-    <xmx:NI9laFXljuNhqBIZQBYp2UflD1FESwb5MFox1kvgplWN5ZIFPu17ig>
-    <xmx:NI9laLeU29iC9nuQZTXb33cj2kzAeIBV2fTVHCIrvSYT0kEtjwVZsWbA>
-Feedback-ID: i36794607:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 4464B700068; Wed,  2 Jul 2025 15:57:40 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uWIRhDgP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YFOHkk/nNWJNztzIE4U84JXfIF37sYLHAa82mXKz9Frohm5gR/MzHJo9UAIybK7cteI2/22dS5GQj5RwEHcHDtW+sygeSY0egzpNe8X2Xec5VhpVFTZZKOOKZ8ES4+vg+D7YS/oYlaOExsDZxKlwW1sIKtzASsXN51/7LIDnPzKIlx3L09SIEiJJez1cRQ3EDRosJypPYj/gqlbsYtn0OxNohSLUDwJMx8sf+ZMcFOqpC8ViPD3e2xDFoINKa8ekBxJ7Vbcd0qEYLNEdv6Fc4n8sAceEO9hyhv47CHprKBmcG0nDtb78tCuI0abj6oIkIJxn5d5MdsyaDWe1Qpe5pw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mY21lKKfYmqhWco7iGUmC6iniWG24YVNC9Ge6ifHaa0=;
+ b=B9iQXLtcK7DbrVc8IshVNkklr4oKKoYT7F1fSoG9NrHxLrIzsZE4l2EqHTuaDWQ/LeKfNtpCa7m4DfvrauSxVYOokt3S0KWPSL38K1RfKyODNLzXIg3ENRUiTCHwczu45VBZyPn/lcTmvX8rMs9bTLpgYGiy2cRMCZSg2A4bdQz89P2mwvdSRFxEwcV4KyFmhhmebFlgL7EsIAWgrKT+1HdCgnUO1Kb1vljPmGQdrm2otmNtdeao26kvk/hFpuBkwHuvTZzXqtDfZQfGxzdCohH5KxJed6hL16qT+2mo/mOvPvu1tVduJqGim36gOZfBaD9cGH+SZ6S3Co54wHUcBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mY21lKKfYmqhWco7iGUmC6iniWG24YVNC9Ge6ifHaa0=;
+ b=uWIRhDgP8K4WPtRQWXrPbGUK7KHAeXhNx5UHJ55fNuinU1E2gkgd3ucnbfUoz7ou/xNz8QbYvNXA0wWqcbiETESGuc3gY/aAKd3zXmSBhl6ZuzkmHRqDu8/7K3fkbudJhVKicv5nnx1GWKGSOqx4pV4JluIctBUtNZZC5SvYV7o=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com (2603:10b6:8:95::17) by
+ IA1PR12MB6604.namprd12.prod.outlook.com (2603:10b6:208:3a0::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.19; Wed, 2 Jul 2025 21:46:43 +0000
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::66d2:1631:5693:7a06]) by DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::66d2:1631:5693:7a06%7]) with mapi id 15.20.8901.018; Wed, 2 Jul 2025
+ 21:46:42 +0000
+Message-ID: <790fd770-de75-4bdf-a1dd-492f880b5fd6@amd.com>
+Date: Wed, 2 Jul 2025 16:46:34 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 7/7] KVM: SEV: Add SEV-SNP CipherTextHiding support
+To: Ashish Kalra <Ashish.Kalra@amd.com>, corbet@lwn.net, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, akpm@linux-foundation.org, rostedt@goodmis.org,
+ paulmck@kernel.org
+Cc: nikunj@amd.com, Neeraj.Upadhyay@amd.com, aik@amd.com, ardb@kernel.org,
+ michael.roth@amd.com, arnd@arndb.de, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <cover.1751397223.git.ashish.kalra@amd.com>
+ <b43351fec4d513c6efcf9550461cb4c895357196.1751397223.git.ashish.kalra@amd.com>
+Content-Language: en-US
+From: Kim Phillips <kim.phillips@amd.com>
+Organization: AMD
+In-Reply-To: <b43351fec4d513c6efcf9550461cb4c895357196.1751397223.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0148.namprd13.prod.outlook.com
+ (2603:10b6:806:27::33) To DS7PR12MB6263.namprd12.prod.outlook.com
+ (2603:10b6:8:95::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Tf4af6f8839cae169
-Date: Wed, 02 Jul 2025 21:57:10 +0200
-From: "Arnd Bergmann" <arnd@kernel.org>
-To: "Robert Marko" <robert.marko@sartura.hr>,
- "Russell King" <linux@armlinux.org.uk>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>,
- "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
- "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
- "Olivia Mackall" <olivia@selenic.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, "Vinod Koul" <vkoul@kernel.org>,
- "Andi Shyti" <andi.shyti@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "Mark Brown" <broonie@kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Jiri Slaby" <jirislaby@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
- "Oleksij Rempel" <o.rempel@pengutronix.de>,
- "Daniel Machon" <daniel.machon@microchip.com>
-Cc: luka.perkov@sartura.hr
-Message-Id: <ea353170-6e03-4231-afc2-3dc45253931d@app.fastmail.com>
-In-Reply-To: <20250702183856.1727275-2-robert.marko@sartura.hr>
-References: <20250702183856.1727275-1-robert.marko@sartura.hr>
- <20250702183856.1727275-2-robert.marko@sartura.hr>
-Subject: Re: [PATCH v8 01/10] arm64: Add config for Microchip SoC platforms
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6263:EE_|IA1PR12MB6604:EE_
+X-MS-Office365-Filtering-Correlation-Id: 814a3d58-8933-4f05-d7c4-08ddb9b1eebe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WWxKWWx5VVcrbjM0OCtBSFMwcFdIU1dGNHNySkpkZUpQRnNKSzFZUTRJQjhz?=
+ =?utf-8?B?emV2R2NZcEx4ODJ1SWhGY2VSQWh0aEVWWlZjeUlkVjNGR25lQ3VJS3VFaTZ1?=
+ =?utf-8?B?czRFZlk4UnZWRGxZOG5sQmNTUEUwaDVady9vWDlEODU1M3p2V0RCYUtKSUNo?=
+ =?utf-8?B?d3M0VmhpVEhSUzFWREpPaUlMRFVUVGhvb3dTZXRXZkJiLzYzcVBGTGtnVy9n?=
+ =?utf-8?B?UGEyY1dzc09Va3Aycm42MlROalBKM0JCaHhhSkVXYnVGaExNUVFBNCtBSVpD?=
+ =?utf-8?B?aXh4cG1ITzNYUW9rdDZtWmhJRmRHcjIrRHFwaEVjME1MUE5DVHZkcVdpbnlK?=
+ =?utf-8?B?SmptbVlGUTlmL3QxMXNSMEJtcVZLUVFGY3Nzd0M0c2lQS0Fwek5DSFVwVjZW?=
+ =?utf-8?B?ZC9taVM3aTRnVVNoWGk2T0VDSk1rblVEbjRzZjJVc2RVVE9yUkUxOXJmY0dB?=
+ =?utf-8?B?Zmx3T01ESkZ4OER0Qi9IRWlIaDYzU2xhQVdOVlNxSlBvZ2tJbjVqOFJVMVhJ?=
+ =?utf-8?B?engyQ3ZTak1xM2lOZlAyWHdUN0hUWkR4ei95c2JqTGpBWVFpR0NKdTFZZmVm?=
+ =?utf-8?B?aG4xMjNFdjhNZEVkSTdjRmRpUmNxRkJRais1NjhQNStlaUhUUno3SWtYbTdz?=
+ =?utf-8?B?OVlOdjRkT2NGQlRuNnRQcytmc21IMmZqb2F1VWFMZWZXYXV6M0ROQ0ZZM2I2?=
+ =?utf-8?B?VXdlUVM5eUJiZHYxTjJHcFVOcXVZdTRzTXZ0RlAxMmJISHNSY2pDc1E2b0Er?=
+ =?utf-8?B?WTVBdmlmdDJGTWxXRExsMkNUbWMzMmdrY0Q1dEdYUlVaNzRFdWhQZENYWW1L?=
+ =?utf-8?B?d29lZVp6V1F3dFhjb0JTdjdPNGxhWThlTGtlMUppK1FlUS9VM29HN1c2MExa?=
+ =?utf-8?B?Q1NlazdsQ2tsQjlGaVJzZmZCSFg5ell2RUYxSDdPS0svektRam9QSEdPNFdw?=
+ =?utf-8?B?RFV4VUk2SkZQa1NzdFBGUFVnUDFmMU1sY2VCT0pxdThkUUZOaFRNVU1EbVpX?=
+ =?utf-8?B?K2ptWTg0Q3o2NXJCTks0SEkwTDQ0NXJMY2FXbS91U3RnWitVV1pVcUNIMHFj?=
+ =?utf-8?B?TjM0S0dwV2gydjFQRGw4dDZFTnplL2ZIM2ZGdXBPdWhPbCt6ajVOWitSWmV3?=
+ =?utf-8?B?VFA5OFZNb2xTRWF2TGNTRWZxNHFZNTlkRHJES05SQ3BhdHYzTnNoUUd3Rlht?=
+ =?utf-8?B?SFlUSWVVeFRNV1Jwd2tUVG9hVVRDWDM0dnJpdnZmc0ZhWU50Y0lnR3B5b3pn?=
+ =?utf-8?B?RDRvdVpxVUJ0Y01aQVVLZW9OOVVWVmY1VCtMQ0xGMGUyMFpzWmRxandoNEpT?=
+ =?utf-8?B?aXVFNEFuVnRDQVBGb3Zac0kwZmI5WWpBK3BZRVBJcjY4aFBJMy9mZ1NPRTY1?=
+ =?utf-8?B?anFUT1Z2QUxsZmZNQTZWZHpaTnZPTWpubS9sNlQ5Ujg2Z2p2ZDVqTElYZ2V6?=
+ =?utf-8?B?MFgxRHQ2K0R3OHhIZ2FKSmhyM3VmU0FRZ0hETGJ0bkhMc0gxbWRRWHhDM3lY?=
+ =?utf-8?B?by94VGhKNjhrZnFGRTd3V3hSZ0FxM1NmZDBZWmdPRzZyQTNUeUtnVG5XVk81?=
+ =?utf-8?B?ZmVTcFhlSjduNkRFdTZ6WFE3UUZ1cG5zdzVrR3pSUlRyNW1aRnpaMDNBREdi?=
+ =?utf-8?B?RkxRV0hxbi9VMVp3Szk5VlZNeWNKME0vQnV4UytGY3V6L09paVZNNU5adngz?=
+ =?utf-8?B?eGxJS0MrSnR3QVVhdVB5N3Q4UzJSTDhxQzdPWW1vamFBMGhqeGRQT3l4TDBz?=
+ =?utf-8?B?TnJNYlJyTFl4c2IvZmF5RHI2bzdpWGE3UU1UUU5iMHI0ekl4TEZXWXNYZE5i?=
+ =?utf-8?B?K0xFTmgvK3RxTHNwbGdDYWRPd1NOeEJjeExhaWJiZ3JTYlllRmZ2ajhCTFJU?=
+ =?utf-8?B?RGhZUnFJQTllLzZpQkpCdDYwWmh6dXFLR0szM1VQWmY0eWJyNHZDQWZrRnll?=
+ =?utf-8?B?ZEVTMy9XblBtVE10ME9sVk5TSG5TUTdRakV0bmxSQXpRRHE5cmJJajJHcENk?=
+ =?utf-8?B?Qjc1dW9aTHdnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6263.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aDdsaXQ2RXJyVjJtMHkwUlcyYmJtdzB4MHB0MldVWUF6ZEJ1QmNZTldycURr?=
+ =?utf-8?B?NEpDU3U3RjNYYndGaVVPMVd6Sm1VQTJXYm13RncvZnB3MDQrQk56amJ4VS9V?=
+ =?utf-8?B?RGl5anhjUWFYMjZ6TjJPRTh0aHpnek9XZXUxOEJudGhsNWQ3WFMwRkgrNVBw?=
+ =?utf-8?B?RDlpQ0hBbEhxdEVRRTdKTzlFNjBLbzRmTlh6SDB3WDJObHd4WDYrdEFDOEFt?=
+ =?utf-8?B?aS80aUFQaUV2RkdFYjUvVEFGREpwRUtzK0l2OEhTVS9xT3hjdjFVTUdGQnQz?=
+ =?utf-8?B?VG5xak5rVGhjSm1ucFRrWFRkZnA0NUFlSVNiaUlsTzk3MHd0NjN3NUg1eUpL?=
+ =?utf-8?B?SjEyd3JSZFo2L3RyTnB4cjJnRHovYVVIQndoVVJNOHpTdndSNGIza0JZV05X?=
+ =?utf-8?B?b3lPUmZ6eUZKbHZVQ0lDWTZwYVcwaWlTNHoxQTl5UlV2S1RSWG9ZQk5MQjZ4?=
+ =?utf-8?B?K1Q3UFFaVWVkMGtBdFh3aVBJMmN6S0dVSlNJcW5Id0tIM3VTMzM4eS9mNWpP?=
+ =?utf-8?B?eTRDVkhJZEpCc1JnckFVcDdISlBuWjE2c3BBd2ZGMzM3ZEpneG85V2FsL3ZY?=
+ =?utf-8?B?Uk04Tkp4SWpKdVlvSnV6WktWeHZoQnBicnJVTUErZVUrZzlRQ3FYZlUwZ204?=
+ =?utf-8?B?OWl5ZXJiQWhsT2kwTGR6M01QSzgvK2pGNkUrTHNENG9tNHd3ZUxOT3A2Rmsr?=
+ =?utf-8?B?RThQM1FlWk1rYWhrWEx3VjJWYnJnQjdJU2JlOXdGRjVOR1hMZi96Y0JRTEtY?=
+ =?utf-8?B?cTg1WTRxSSs0S25Jb0JvSWJPT0lBWEZOdUt5VXE2RHJHb3RMVmxBYUMxcjlm?=
+ =?utf-8?B?N1hqYkQwdEJUamRoNmFKL2FGNzFzdnlqc1BDeGZRbkNQVFJmbUxaRUJZd29x?=
+ =?utf-8?B?ZzJZRXgzUFpMekovOU1oQTJCK0VGL1YxZ2p1QytGd3hQTU5BUGgrNWVNcWoy?=
+ =?utf-8?B?OWk4ZllORWx4KzRYL3ozOVN5SU1aaWV1akladU9sdks3cUxPRURoaFlSYnRX?=
+ =?utf-8?B?ZElxMGZkZmttWlEwZ1NXdjlUeURNZG5vUGRsY2M2TnBhMm9LMWFpWkttblI1?=
+ =?utf-8?B?L2toc1hIUmVBTTdWa2x0V1ozdkNFbS9xcDlvRjRsdURQQWtjMzVYQitYUWRz?=
+ =?utf-8?B?bU12c2prd0JPbnlZdUZlR1VpYWJYS0lJeXh3aFl3RjB0M2ViYjhVUGk0Nncr?=
+ =?utf-8?B?TW54VTF3NWZ0L0VhdWVlRVI1S3pqQWl6N2lCaktleC9EQllsd1M0RVlqbENX?=
+ =?utf-8?B?ckdFdkVFVkU2Q21MMmFUOGdGQXdVVmE2Q29YcDJwUWpqWngwanU5NDYrMjB0?=
+ =?utf-8?B?bWtCRVdkbFpXMHVWMDZHT1BnNmJDVGovdEJYS1YyQzlicmx2ekY0NW5sdWk2?=
+ =?utf-8?B?eW9XV1dhakw0WDJyN25NMVRGNC9qK3dBcUh5WjdvZTIxMERKSGczWFhjVHdq?=
+ =?utf-8?B?cFFzZWhnNENSakJyRW1DbTNHUTFaQnBKMytlUHRKc0Z1aVliUzVWS2JZd3Jk?=
+ =?utf-8?B?dGdQYko0WGdKSHRQb1NlNGE1ZS9OWWwvYmpuKzZGc21ndG1ZVDhENk1MUFBU?=
+ =?utf-8?B?eEI1QzVHK0VhVnBaeFc0TUlOS3l2YzVQLzk4cGZzc09oVEhVckZ5dXgwd2U3?=
+ =?utf-8?B?Z3FnNUp6VDZveGpMME1HMnVtTkc1OEk3RS9BQ2FFRnp0UXQ5N1RHZkVhbFNo?=
+ =?utf-8?B?Z3FlTTVaeXdrZE5wMHBFYkNwMlFUZy9uZlc3bWtQckNzR0ovdEJmTThBNEgz?=
+ =?utf-8?B?c0c2ZEdRakYwV1pSYlhISjRFSWJkRjhyanJqeUlXMG1XdGV2NVpveFVOY0NE?=
+ =?utf-8?B?dHZvQ2NjWC9nNUI4QmhIRHhJWmJmdDNsOVgxRDZzZXFhVHlBSVZEdmUvbXhw?=
+ =?utf-8?B?aWx0ZmhIa2NNY1k5UU0vSTBXSFNyVEhJTUVNUndSLys3a3dhZll5ZFJZQ3c5?=
+ =?utf-8?B?MTdaS1FycklBSTEzZ2wwV3RhODU0b2R6SlZwOU9oMDlSYnFlQk5UaGpTb2Ja?=
+ =?utf-8?B?U1JaUFhRbjB0bDByWmF0SmFNaVNFZDB0eFR3QytaNW9FRHFzWU1RekxUUWNo?=
+ =?utf-8?B?alA5K21Id25wQ0N3aDRhUGdYWFpJTksrd3pIRkdibU9EcFlRZXkzOHdrQVB0?=
+ =?utf-8?Q?Hx5h54gJ27BFOvDUrIsh6H6RB?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 814a3d58-8933-4f05-d7c4-08ddb9b1eebe
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6263.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2025 21:46:42.4271
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V6ETwmmxkzuz2FUspyIkyWM0aWtgrzDIOvZzMGUISClECNKiTGolapKuVdQav9l3PnZq83chrAvVgjozLWvoSQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6604
 
-On Wed, Jul 2, 2025, at 20:35, Robert Marko wrote:
-> Currently, Microchip SparX-5 SoC is supported and it has its own symbol.
->
-> However, this means that new Microchip platforms that share drivers need
-> to constantly keep updating depends on various drivers.
->
-> So, to try and reduce this lets add ARCH_MICROCHIP symbol that drivers
-> could instead depend on.
+Hi Ashish,
 
-Thanks for updating the series to my suggestion!
+I can confirm that this v5 series fixes v4's __sev_do_cmd_locked
+assertion failure problem, thanks.  More comments inline:
 
-> @@ -174,6 +160,27 @@ config ARCH_MESON
->  	  This enables support for the arm64 based Amlogic SoCs
->  	  such as the s905, S905X/D, S912, A113X/D or S905X/D2
-> 
-> +menuconfig ARCH_MICROCHIP
-> +	bool "Microchip SoC support"
+On 7/1/25 3:16 PM, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+
+Extra From: line not necessary.
+
+> @@ -2913,10 +2921,46 @@ static bool is_sev_snp_initialized(void)
+>   	return initialized;
+>   }
+>   
+> +static bool check_and_enable_sev_snp_ciphertext_hiding(void)
+> +{
+> +	unsigned int ciphertext_hiding_asid_nr = 0;
 > +
-> +if ARCH_MICROCHIP
+> +	if (!sev_is_snp_ciphertext_hiding_supported()) {
+> +		pr_warn("Module parameter ciphertext_hiding_asids specified but ciphertext hiding not supported or enabled\n");
+> +		return false;
+> +	}
 > +
-> +config ARCH_SPARX5
-> +	bool "Microchip Sparx5 SoC family"
+> +	if (isdigit(ciphertext_hiding_asids[0])) {
+> +		if (kstrtoint(ciphertext_hiding_asids, 10, &ciphertext_hiding_asid_nr)) {
+> +			pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
+> +				ciphertext_hiding_asids);
+> +			return false;
+> +		}
+> +		/* Do sanity checks on user-defined ciphertext_hiding_asids */
+> +		if (ciphertext_hiding_asid_nr >= min_sev_asid) {
+> +			pr_warn("Requested ciphertext hiding ASIDs (%u) exceeds or equals minimum SEV ASID (%u)\n",
+> +				ciphertext_hiding_asid_nr, min_sev_asid);
+> +			return false;
+> +		}
+> +	} else if (!strcmp(ciphertext_hiding_asids, "max")) {
+> +		ciphertext_hiding_asid_nr = min_sev_asid - 1;
+> +	} else {
+> +		pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
+> +			ciphertext_hiding_asids);
+> +		return false;
+> +	}
 
-This part is the one bit I'm not sure about: The user-visible
-arm64 CONFIG_ARCH_* symbols are usually a little higher-level,
-so I don't think we want both ARCH_MICROCHIP /and/ ARCH_SPARX5
-here, or more generally speaking any of the nested ARCH_*
-symbols.
+This code can be made much simpler if all the invalid
+cases were combined to emit a single pr_warn().
 
-This version of your patch is going to be slightly annoying
-to existing sparx5 users because updating an old .config
-breaks when ARCH_MICROCHIP is not enabled.
+> @@ -3036,7 +3090,9 @@ void __init sev_hardware_setup(void)
+>   			min_sev_asid, max_sev_asid);
+>   	if (boot_cpu_has(X86_FEATURE_SEV_ES))
+>   		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+> -			str_enabled_disabled(sev_es_supported),
+> +			sev_es_supported ? min_sev_es_asid < min_sev_asid ? "enabled" :
+> +									    "unusable" :
+> +									    "disabled",
+>   			min_sev_es_asid, max_sev_es_asid);
+>   	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
+>   		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
 
-The two options that I would prefer here are 
+If I set ciphertext_hiding_asids=99, I get the new 'unusable':
 
-a) make ARCH_SPARX5 a hidden symbol in order to keep the
-   series bisectable, remove it entirely once all references
-   are moved over to ARCH_MICROCHIP
+kvm_amd: SEV-SNP ciphertext hiding enabled
+...
+kvm_amd: SEV enabled (ASIDs 100 - 1006)
+kvm_amd: SEV-ES unusable (ASIDs 100 - 99)
+kvm_amd: SEV-SNP enabled (ASIDs 1 - 99)
 
-b) Make ARCH_MICROCHIP a hidden symbol that is selected by
-   ARCH_SPARX5 but keep the menu unchanged.
+Ok.
 
-Let's see what the sparx5 and at91 maintainers think about
-these options.
+Now, if I set ciphertext_hiding_asids=0, I get:
 
-The other patches all look fine to me.
+kvm_amd: SEV-SNP ciphertext hiding enabled
+...
+kvm_amd: SEV enabled (ASIDs 100 - 1006)
+kvm_amd: SEV-ES enabled (ASIDs 1 - 99)
+kvm_amd: SEV-SNP enabled (ASIDs 1 - 0)
 
-     Arnd
+..where SNP is unusable this time, yet it's not flagged as such.
+
+If there's no difference between "unusable" and not enabled, then
+I think it's better to keep the not enabled messaging behaviour
+and just not emit the line at all:  It's confusing to see the
+invalid "100 - 99" and "1 - 0" ranges.
+
+Thanks,
+
+Kim
