@@ -1,75 +1,98 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815522EAB6D
-	for <linux-crypto@vger.kernel.org>; Thu,  3 Jul 2025 17:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2683D2EFDB8;
+	Thu,  3 Jul 2025 17:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751563253; cv=none; b=ikpX9ndr4pfqPBCcTzy331iAmFyD6TNth143csTaDJylcEfKXu0LrMnW3IKvIyKcpnJFyvpgW2WhdIQLhmZxIwk49oDBbW21DGkMel080JnacdbBUQNjmsBLHJi3W0w/6Mt8zrEoBwAgQ044H196kcdF21Iuv6J6sL6J34FNHzI=
+	t=1751563277; cv=none; b=lAWuysgeTeaEisHhPeMG2ezFZ7K7O1J3cn1LZA7MKVhPZ2CpxIlxnV5AiFTfF1W3KWmi9M5E3J9HcdPcC/wrMY8JwpYJ4KJbyvqcBB979EwGVuMbCUtb69lK2Wyi8/vhhqgJ5ldl9ZjjfsMhGMqMK2w7YgqQ/ByhyiPrgvbMEWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751563253; c=relaxed/simple;
-	bh=vPDISl6g5NAEE77KMXZjR8RjrfgvmCsHGDrvYGyHqjo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PSTW0cg0MPlBtrXWUwyT/JLM3O1jH9uffSWXGaXpzs4ccZwaF0Jx0gITCc9SFpNvJn5ChpzjSZt6Heh80y8hc4GOqslA1JSkb2tDHye8arLI/k84mrHsaB73ap4Z4mVzNih2vrW2386qR0gXNQyUz5LJVVSxNl0giF9X6tY7LkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=he8awb9p; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751563277; c=relaxed/simple;
+	bh=QSWSgP88K9/XOwXn+0LAYcUUYUYzmhBKlB//U0h7uNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PUDJVLz0256+h/9EDeUxMaAfKM+maLpoJIJQKrwvPRa2wahrdsp7OxG73gHqdZQxHZNtTBiuXHdvAMuDR+YOjx2X6OilmUIdJDTJWxW7/vG9oxxue8mxb/8tI+Hj2rzg+l8BI+Ch1YW0ptjDLpLLSkOnMmgnSWFqZ5FtOqAjLug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmcCscFG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="he8awb9p"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751563249;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rBaauVU/2eqVg/IBff0Zf0cOYUFCWODEuFnTMq8cS+Q=;
-	b=he8awb9plbq9DFTpyr14nwlbX5WEp2zlR5FdoAVvjO8oTV+9deiVZpszeN3Jo5B7eUsr71
-	5KC5jP7TrP0eTfnydp/z691c6B2T9ccxDtBS1fiG/goVl3P45469tzlVxuShl7GWOM08FJ
-	wj37Y+m8bkD0SRcoAgr8SKTwRUgDWkU=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nick Terrell <terrelln@fb.com>,
-	David Sterba <dsterba@suse.com>
-Cc: linux-hardening@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: zstd - replace zero-length array with flexible array member
-Date: Thu,  3 Jul 2025 19:19:34 +0200
-Message-ID: <20250703171933.253654-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmcCscFG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D17C4CEE3;
+	Thu,  3 Jul 2025 17:21:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751563274;
+	bh=QSWSgP88K9/XOwXn+0LAYcUUYUYzmhBKlB//U0h7uNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cmcCscFGjUVTvi02LFPDrtB4XhBXhIkok/0xvyZvccqVpa4psFK6L82D2SPVCgnSP
+	 UdPJc3izafcoHPP8TTH5V6WG52EYUvCR88QaT+1MMONc7pcor0o4bgRAzThfxGcT3A
+	 FSH6//LbV9m6na8XsSQZmtvjnGuPaKzSj6CwIvpaGSBEcgCZghfBCKvE6zdoC33ijp
+	 +e6dPq/CnEOb4b9LRtSbwgWjcgoK7BPakxin+/56rx+M6egpBw0a2ZzCnxrZEYC0Fu
+	 J8UwCAyzEFVzEVJ1YCFwqGK2qEOpKNPFGO4KoKUFjIqjbSi/hBQ3Zxmox1SA9rQjmY
+	 RqwZKWNOvznQw==
+Date: Thu, 3 Jul 2025 10:20:32 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Joerg Schmidbauer <jschmidb@de.ibm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
+	Ingo Franzki <ifranzki@linux.ibm.com>
+Subject: Re: [PATCH] crypto: s390/sha - Fix uninitialized variable in SHA-1
+ and SHA-2
+Message-ID: <20250703172032.GA2284@sol>
+References: <20250627185649.35321-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250627185649.35321-1-ebiggers@kernel.org>
 
-Replace the deprecated zero-length array with a modern flexible array
-member in the struct zstd_ctx.
+On Fri, Jun 27, 2025 at 11:56:49AM -0700, Eric Biggers wrote:
+> Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
+> added the field s390_sha_ctx::first_message_part and made it be used by
+> s390_sha_update_blocks().  At the time, s390_sha_update_blocks() was
+> used by all the s390 SHA-1, SHA-2, and SHA-3 algorithms.  However, only
+> the initialization functions for SHA-3 were updated, leaving SHA-1 and
+> SHA-2 using first_message_part uninitialized.
+> 
+> This could cause e.g. CPACF_KIMD_SHA_512 | CPACF_KIMD_NIP to be used
+> instead of just CPACF_KIMD_NIP.  It's unclear why this didn't cause a
+> problem earlier; this bug was found only when UBSAN detected the
+> uninitialized boolean.  Perhaps the CPU ignores CPACF_KIMD_NIP for SHA-1
+> and SHA-2.  Regardless, let's fix this.  For now just initialize to
+> false, i.e. don't try to "optimize" the SHA state initialization.
+> 
+> Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
+> and earlier, we'll also need to patch SHA-224 and SHA-256, as they
+> hadn't yet been librarified (which incidentally fixed this bug).
+> 
+> Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
+> Cc: stable@vger.kernel.org
+> Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
+> Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> This is targeting 6.16.  I'd prefer to take this through
+> libcrypto-fixes, since the librarification work is also touching this
+> area.  But let me know if there's a preference for the crypto tree or
+> the s390 tree instead.
+> 
+>  arch/s390/crypto/sha1_s390.c   | 1 +
+>  arch/s390/crypto/sha512_s390.c | 2 ++
+>  2 files changed, 3 insertions(+)
 
-No functional changes intended.
+I just realized this patch is incomplete: it updated s390_sha1_init(),
+sha384_init(), and sha512_init(), but not s390_sha1_import() and sha512_import()
+which need the same fix...  I'll send a v2.
 
-Link: https://github.com/KSPP/linux/issues/78
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- crypto/zstd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-index 657e0cf7b952..c489976c3e8b 100644
---- a/crypto/zstd.c
-+++ b/crypto/zstd.c
-@@ -25,7 +25,7 @@ struct zstd_ctx {
- 	zstd_dctx *dctx;
- 	size_t wksp_size;
- 	zstd_parameters params;
--	u8 wksp[0] __aligned(8);
-+	u8 wksp[] __aligned(8);
- };
- 
- static DEFINE_MUTEX(zstd_stream_lock);
--- 
-2.50.0
-
+- Eric
