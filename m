@@ -1,288 +1,162 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65A817BA3;
-	Thu,  3 Jul 2025 05:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0504934CF5;
+	Thu,  3 Jul 2025 06:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751521698; cv=none; b=mrj0Ec0G0yyUW6BEX+sUYTKXt070Pdns2/u6qOcy/JBMOjQgYE3GtqOasSCowBnJbz41Vdp4Tz7jpCtzgrC+fILGG0NtSOQirhJ/VEBayR1kmRGkfzHk4/ssvx+Bz38/16IXjzHtafQi+K99l3zydnx6So5P9A0PkJ34E6pQ5Qk=
+	t=1751524107; cv=none; b=eOiDnEc9+NsM3R2V+H/6bcS51/B64k7M4LBEf4evgafS2VzodvhvVIzqV4FGYicy7waneDgLhsKP987oheAuY2VqWM1JrTS4YyTI7HTDgTKVx9puWAeMUNgW4llegXHQJdzTUSXCWdgjiCY2xsL/Czc+Nw+5zJwvj7VTUiU0kgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751521698; c=relaxed/simple;
-	bh=s/0ASVxWkl+DUk9Fc9PcXkeV9l+ngQ6HsiuuvYu/+Ec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ljT2Y1ipvaNwaA3gWaLW4/HgO3SKwWyEjOjKgwhggGJsj0iNNoPnvsWkRPp4t2mRHfm1S1dArMZgRL99Yf0VcI7162Gr4m15Y2Lp0mU8QIqKf8BkzuNXS6Mxqm1+BdD5p7tEmBQYZHRLF7kgroWtz1bccER0lSOMQtTw5K1dnwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N4qZs273; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751524107; c=relaxed/simple;
+	bh=k2fQ15blhXnokoZCixT/LqKBpaoOPiZz7TLHKu3xLxE=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=XiSIWW1AAav4UrZUcrrz7Me8iIJ+RU3eKxDqcywDsU+M0vg9FVCpm/SUW+ahTI8ZN8Lc9v7bFKV1jUSsMStlwKm9dtG0cH63jzIF6pNef4wIFJMgV7pIY6bUDgGcRlKQ/xnuH8rLN2kQYG155cagzDm815KuomSV8QnbRltxKiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=yPQ8Hje4; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4qZs273"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ae0de1c378fso738821066b.3;
-        Wed, 02 Jul 2025 22:48:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751521695; x=1752126495; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mVj3wbnpG5hZNCBW23hwPMbmFGflIAtjMdLxGwdCGg8=;
-        b=N4qZs273SfHw+Nq1LCSa8wWWS7LdEp5/mkob1ot8E8BHVstj6ZRIjkbH4nUx/W+NoH
-         C/otLcpWkHgbDPnbzKhCOIUVJvKVr0YZkG3IdB9vGUoXxgQFvd00NNwLwK8nKqyunSb+
-         P1pN3M8KkVHVNOSBOYoIc45FstOL6BWeKtBT8UtYVeTmxnCx5MT2UwKMXhDDJD0R1skj
-         N28IEIXkfgAsnd41SFNcklmIEZf8gZeBnkvywXrsmGV3hmSY+8/neuNN81Tb9SFMcHBJ
-         i1G5AEVfXSW6OgnR9gVNriI0F04fp8IgB4FBwJkMSmSXQp3OLhNsYsptqTonfNHFslJK
-         84UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751521695; x=1752126495;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mVj3wbnpG5hZNCBW23hwPMbmFGflIAtjMdLxGwdCGg8=;
-        b=nVqlgk46Y0k/iVr35T8BabWxAF2deQFnc+Sh92fed0vEZHuqolKqfwBUCbIzpbblPl
-         wKydSUeOprCq3o5J4/TG3P5XmMFaBh1kuGgh+xBWitmODlnesqBcX1MTwF58/nPmnkWf
-         gjbfDspMkUlWyH0ylYPzSEbzEZbpHRGY0rffUR9UvU9iQrbcHqBPVG7RC0+czjpiH3Yp
-         tbpscBjGfZEnoRdFTbVzASLckCCNiosR6R69kzAvCaSBKboy7+HYwuuhmf95ZajD7I1h
-         5uJE2USZdJw3bkoADLh3cXU4e+wIT98dC5mLBhYTZ7a3gTCbrWxudNaFPA5Hlwxqu2zQ
-         xA5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUdoGQQ2xwJqizCY5DUsA1aQ9YwMnbgodiPRkPAhvsipEJxA9knstBgiYRDzDrsgrNV/LJHGIS+VMq3@vger.kernel.org, AJvYcCVB/HVPqWo8yaFP5Ea2w5EEBvTtWehwbIxMHYMi3d40e5tmLcxr5u1C6CRwigRu6MMDE2y4O3Y9oMlpCpzY@vger.kernel.org, AJvYcCX8ivKK9bCkbOYY6sbnumK1PSWNCk0jbICZH1f8G26Rw4haN/iSsECuiH9uP9K6qUGKxSPkVfJwlQ3KmyyL@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb2aixJEP1EmPaCXw0Edkb+sG0OdFJhIre4mcLyJ/4fQhBkLIf
-	V+9qhQ7s8/RTNh1DaTLSyoMvyE9zILj665yOzBuZW3flyfEOfQhTvsuN6JRgXdGug3t4WBzMIeG
-	ik+M2APE7VFA7yHGHZfsQCBOHhrT3HDQ=
-X-Gm-Gg: ASbGncuABNiDXch0y8lmzkNMGo3EX6MJ6xG4geva6RC/PoCmm/baVxhz5zWYLL8qabL
-	+mIDbkTHCS1x0FP6oAdoMtbELxFHLwXIg8OPeNHirCjY30eqLk0ejVqMB37qzfNJbdujcMVdPDf
-	onB0d9jxqS14EVquxclNDLdf7zYc0D8faltzyMlQuptsi5fWMw9KU=
-X-Google-Smtp-Source: AGHT+IEHsVPE3MDluqiXrzyqwGMpX8WERAG/uuR5m6RypAsfJLS1wDinsd9LROKX8eiMRN45fBicLWwb1QGhfOCCjXw=
-X-Received: by 2002:a17:907:94c1:b0:ae3:53b3:b67d with SMTP id
- a640c23a62f3a-ae3d83d9a6fmr176784666b.1.1751521694551; Wed, 02 Jul 2025
- 22:48:14 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="yPQ8Hje4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1751523797;
+	bh=nE5o0ZqeNH5gAh0+GhcCOmyyvJ/oaeaGfaV8MIneIgk=;
+	h=From:To:Cc:Subject:Date;
+	b=yPQ8Hje4K5Rz2pz7rPuUdFaKpeGnsnW6ZKqh6DJvGKFxwFZm86d3AJ4b2l0DhxhDQ
+	 xTh8ehxF1h5X/0e9HdKrM+NHRuq2eFX/CUllhDEMbl2TXWH7VEXLfgykgRFqG1R9no
+	 NNs9jdKyKoo7nExLuWVG2jxYhKKEu2fu5SUDbl/s=
+Received: from meizu-Precision-3660.meizu.com ([14.21.33.154])
+	by newxmesmtplogicsvrsza28-0.qq.com (NewEsmtp) with SMTP
+	id 5CF33025; Thu, 03 Jul 2025 14:23:15 +0800
+X-QQ-mid: xmsmtpt1751523795tikroen7m
+Message-ID: <tencent_D06DEE8D71295798F385BCC52FACAE96A207@qq.com>
+X-QQ-XMAILINFO: MMwjR1C73eIs3QfeLzO2lVtLnj7bWfRMm+8Iu0tVq8lBrc+Mi/7zpRftqsC4Ri
+	 1fRium/jka+geMb5PIdCC69ZnQ0NMT4kzyQJS3hg7IplUlc81FMbJS+cojkr6C2Bk2EtsnGI/vxY
+	 krvAPKvVhdo8+UIq5J/kc4penx/O/3ZFBGt8Xk+r2R780k/b2a6akT2+3wOyfR8xkVUTeEwyGfv6
+	 DnuMPJxxLbYQkg56ZPmptat9fdKz7rmhFGP+PylC71fwSfNVdIKTyNTA/84RLkCu68EwjBve5imp
+	 CwN37vk6C9KwXmy4xH64r48lPIbDAQRRwQRmvIkX3RyXP3NrGiM6hcawzxfqQllVnMttX+cU8r+Z
+	 erOjQ50Ae/17BLE269goMX5zA9GN7v8NWPV3mnVHsg76xnBj6Vrm7RveJLAuivF4unib933y2x40
+	 rB28NWy2cWWJRPCFgEwY7yzIM8F9cZ5+8Gmm+xYWhnH375TutQ/wG9L2idy1EEW1p1XmYGFAMjXR
+	 DoHEU9Nnfb0vBnFAO5rg3twDSvki62rA16hEc4QjVDZ8H6rDCnzEbQL4ZzxXAj0ClXLX8tFPVXRn
+	 QRVLxxHNSvYOGbbNvy+CMbLOTHV7jYAxc+DlsmdfkFKbvcC+bPdJ77VblOuKc8jPaOR2tic/bwGZ
+	 JhqiodUEP4DvymwKvF+QXzv8J6XgbbXZ/ISO3AbgG3RDVgmK3GlRT9uJf+TC2qtOqPIOI/p9bA7w
+	 UE78ZWNVzIq72TT4+LkEqfZLoZ3DTZbuyL+pUwTQ8eO0PnYXUOq7rUBUp4lv4Y3p49viJEacU8LY
+	 oqiudUAlYvszwWMeYusMXnb7oU1vEbfnUWJ8Lri0uLKF7+nbHd0B5CIK40aLV5RPndm2h8Gf5TOH
+	 2SrEYqwJE2qriBBq83IEk+4gbK0ZEiIl14kPPydDYxb6V5a7zVQaxJeIQflilCzPtWj2DQesS4OA
+	 kSyilN/9oF6//2nJ6ydnbepamIQa4+zhKi9apeIb+QAdrMW0nKsUQ3Af85K62FzgAz00pBTZeI/c
+	 e3Zg+eSAF117X1/pPuzkRsGqxGdfAi8NQhV9fRRg==
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Yuwen Chen <ywen.chen@foxmail.com>
+To: ebiggers@kernel.org,
+	tytso@mit.edu,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	jaegeuk@kernel.org
+Cc: linux-fscrypt@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Yuwen Chen <ywen.chen@foxmail.com>
+Subject: [PATCH] fscrypt: improve filename encryption and decryption performance
+Date: Thu,  3 Jul 2025 14:19:01 +0800
+X-OQ-MSGID: <20250703061901.3662034-1-ywen.chen@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624135214.1355051-1-romanov.alexey2000@gmail.com>
-In-Reply-To: <20250624135214.1355051-1-romanov.alexey2000@gmail.com>
-From: Anand Moon <linux.amoon@gmail.com>
-Date: Thu, 3 Jul 2025 11:17:57 +0530
-X-Gm-Features: Ac12FXyST0hXGZG3XMCb1p96mhr--D9oLQ205yN9d2sNvp8JX62uy4InGQKfyz4
-Message-ID: <CANAwSgRcO9sq_+pYLTwpANi2fkVAxe_3RPtSvTuqmoNnUwtU=g@mail.gmail.com>
-Subject: Re: [PATCH v12 00/22] Support more Amlogic SoC families in crypto driver
-To: Alexey Romanov <romanov.alexey2000@gmail.com>
-Cc: neil.armstrong@linaro.org, clabbe@baylibre.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, khilman@baylibre.com, 
-	jbrunet@baylibre.com, martin.blumenstingl@googlemail.com, 
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Alexey,
+With the CONFIG_UNICODE configuration enabled, the fname_decrypt
+and fscrypt_fname_encrypt functions may be called very frequently.
+Since filenames are generally short, the frequent invocation of
+memory allocation and release operations by these two functions
+will lead to very poor performance.
 
-On Tue, 24 Jun 2025 at 20:29, Alexey Romanov
-<romanov.alexey2000@gmail.com> wrote:
->
-> Hello!
->
-> This patchset expand the funcionality of the Amlogic
-> crypto driver by adding support for more SoC families:
-> AXG, G12A, G12B, SM1, A1, S4.
->
-> Also specify and enable crypto node in device tree
-> for reference Amlogic devices.
->
-> Tested on GXL, AXG, G12A/B, SM1, A1 and S4 devices via
-> custom tests [1] and tcrypt module.
->
-Is it possible to enable this module on GXBB platforms
-that use the older crypto architecture?
+Signed-off-by: Yuwen Chen <ywen.chen@foxmail.com>
+---
+ fs/crypto/fname.c         | 11 +++--------
+ include/crypto/skcipher.h |  9 +++++++++
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-Crypto Engine
-o AES block cipher with 128/192/256 bits keys, standard 16 bytes block
-size and streaming ECB, CBC and CTR modes
-o DES/TDES block cipher with ECB and CBC modes supporting 64 bits key
-for DES and 192 bits key for 3DES
-o Hardware key-ladder operation and DVB-CSA for transport stream encryption
-o Built-in hardware True Random Number Generator (TRNG), CRC and
-SHA-1/SHA-2 (SHA-224/SHA-256) engine
+diff --git a/fs/crypto/fname.c b/fs/crypto/fname.c
+index 010f9c0a4c2f1..a3cc30ff3586b 100644
+--- a/fs/crypto/fname.c
++++ b/fs/crypto/fname.c
+@@ -77,6 +77,7 @@ static inline bool fscrypt_is_dot_dotdot(const struct qstr *str)
+ 	return is_dot_dotdot(str->name, str->len);
+ }
+ 
++#define MAX_SKCIPHER_REQSIZE (384)
+ /**
+  * fscrypt_fname_encrypt() - encrypt a filename
+  * @inode: inode of the parent directory (for regular filenames)
+@@ -92,10 +93,10 @@ static inline bool fscrypt_is_dot_dotdot(const struct qstr *str)
+ int fscrypt_fname_encrypt(const struct inode *inode, const struct qstr *iname,
+ 			  u8 *out, unsigned int olen)
+ {
+-	struct skcipher_request *req = NULL;
+ 	DECLARE_CRYPTO_WAIT(wait);
+ 	const struct fscrypt_inode_info *ci = inode->i_crypt_info;
+ 	struct crypto_skcipher *tfm = ci->ci_enc_key.tfm;
++	SKCIPHER_REQUEST_ON_STACK(req, tfm, MAX_SKCIPHER_REQSIZE);
+ 	union fscrypt_iv iv;
+ 	struct scatterlist sg;
+ 	int res;
+@@ -124,7 +125,6 @@ int fscrypt_fname_encrypt(const struct inode *inode, const struct qstr *iname,
+ 
+ 	/* Do the encryption */
+ 	res = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
+-	skcipher_request_free(req);
+ 	if (res < 0) {
+ 		fscrypt_err(inode, "Filename encryption failed: %d", res);
+ 		return res;
+@@ -148,18 +148,14 @@ static int fname_decrypt(const struct inode *inode,
+ 			 const struct fscrypt_str *iname,
+ 			 struct fscrypt_str *oname)
+ {
+-	struct skcipher_request *req = NULL;
+ 	DECLARE_CRYPTO_WAIT(wait);
+ 	struct scatterlist src_sg, dst_sg;
+ 	const struct fscrypt_inode_info *ci = inode->i_crypt_info;
+ 	struct crypto_skcipher *tfm = ci->ci_enc_key.tfm;
++	SKCIPHER_REQUEST_ON_STACK(req, tfm, MAX_SKCIPHER_REQSIZE);
+ 	union fscrypt_iv iv;
+ 	int res;
+ 
+-	/* Allocate request */
+-	req = skcipher_request_alloc(tfm, GFP_NOFS);
+-	if (!req)
+-		return -ENOMEM;
+ 	skcipher_request_set_callback(req,
+ 		CRYPTO_TFM_REQ_MAY_BACKLOG | CRYPTO_TFM_REQ_MAY_SLEEP,
+ 		crypto_req_done, &wait);
+@@ -172,7 +168,6 @@ static int fname_decrypt(const struct inode *inode,
+ 	sg_init_one(&dst_sg, oname->name, oname->len);
+ 	skcipher_request_set_crypt(req, &src_sg, &dst_sg, iname->len, &iv);
+ 	res = crypto_wait_req(crypto_skcipher_decrypt(req), &wait);
+-	skcipher_request_free(req);
+ 	if (res < 0) {
+ 		fscrypt_err(inode, "Filename decryption failed: %d", res);
+ 		return res;
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 9e5853464345b..ff2c5ac9252ff 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -226,6 +226,15 @@ struct lskcipher_alg {
+ 			crypto_sync_skcipher_tfm((_tfm)), \
+ 		 (void *)__##name##_desc)
+ 
++
++#define SKCIPHER_REQUEST_ON_STACK(name, _tfm, reqsize) \
++	char __##name##_desc[sizeof(struct skcipher_request) + reqsize \
++		] CRYPTO_MINALIGN_ATTR; \
++	struct skcipher_request *name = \
++		(((struct skcipher_request *)__##name##_desc)->base.tfm = \
++			crypto_skcipher_tfm((_tfm)), \
++		 (void *)__##name##_desc)
++
+ /**
+  * DOC: Symmetric Key Cipher API
+  *
+-- 
+2.34.1
 
-Thanks I have tested using the following command on G12B Odroid N2plus.
-
-$ sudo modprobe tcrypt sec=1 mode=200
-[   42.857936] tcrypt: testing speed of sync ecb(aes) (ecb-aes-ce) encryption
-[   42.859184] tcrypt: test 0 (128 bit key, 16 byte blocks): 7019057
-operations in 1 seconds (112304912 bytes)
-[   43.861782] tcrypt: test 1 (128 bit key, 64 byte blocks): 6136472
-operations in 1 seconds (392734208 bytes)
-[   44.865778] tcrypt: test 2 (128 bit key, 128 byte blocks): 5506574
-operations in 1 seconds (704841472 bytes)
-[   45.869854] tcrypt: test 3 (128 bit key, 256 byte blocks): 4460371
-operations in 1 seconds (1141854976 bytes)
-[   46.873939] tcrypt: test 4 (128 bit key, 1024 byte blocks): 2014161
-operations in 1 seconds (2062500864 bytes)
-[   47.878034] tcrypt: test 5 (128 bit key, 1424 byte blocks): 1553828
-operations in 1 seconds (2212651072 bytes)
-[   48.882023] tcrypt: test 6 (128 bit key, 4096 byte blocks): 599874
-operations in 1 seconds (2457083904 bytes)
-
-Please add my
-
-Tested-by: Anand Moon <linux.amoon@gmail.com>
-
-Thanks
--Anand
-> ---
->
-> Changes V1 -> V2 [2]:
->
-> - Rebased over linux-next.
-> - Adjusted device tree bindings description.
-> - A1 and S4 dts use their own compatible, which is a G12 fallback.
->
-> Changes V2 -> V3 [3]:
->
-> - Fix errors in dt-bindings and device tree.
-> - Add new field in platform data, which determines
-> whether clock controller should be used for crypto IP.
-> - Place back MODULE_DEVICE_TABLE.
-> - Correct commit messages.
->
-> Changes V3 -> V4 [4]:
->
-> - Update dt-bindings as per Krzysztof Kozlowski comments.
-> - Fix bisection: get rid of compiler errors in some patches.
->
-> Changes V4 -> V5 [5]:
->
-> - Tested on GXL board:
->   1. Fix panic detected by Corentin Labbe [6].
->   2. Disable hasher backend for GXL: in its current realization
->      is doesn't work. And there are no examples or docs in the
->      vendor SDK.
-> - Fix AES-CTR realization: legacy boards (gxl, g12, axg) requires
->   inversion of the keyiv at keys setup stage.
-> - A1 now uses its own compatible string.
-> - S4 uses A1 compatible as fallback.
-> - Code fixes based on comments Neil Atrmstrong and Rob Herring.
-> - Style fixes (set correct indentations)
->
-> Changes V5 -> V6 [7]:
->
-> - Fix DMA sync warning reported by Corentin Labbe [8].
-> - Remove CLK input from driver. Remove clk definition
->   and second interrput line from crypto node inside GXL dtsi.
->
-> Changes V6 -> V7 [9]:
->
-> - Fix dt-schema: power domain now required only for A1.
-> - Use crypto_skcipher_ctx_dma() helper for cipher instead of
->   ____cacheline_aligned.
-> - Add import/export functions for hasher.
-> - Fix commit message for patch 17, acorrding to discussion [10].
->
-> Changes V7 -> V8 [11]:
->
-> - Test patchset with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS: fix some bugs
->   in hasher logic.
-> - Use crypto crypto_ahash_ctx_dma in hasher code.
-> - Correct clock definition: clk81 is required for all SoC's.
-> - Add fixed-clock (clk81) definition for A1/S4.
-> - Add information (in commit messages) why different compatibles are used.
->
-> Changes V8 -> V9 [12]:
->
-> - Remove required field clk-names from dt-schema according to Rob Herring
-> recommendation [13].
-> - Fix commit order: all dt-bindings schema commits now located earlier
-> than any changes in device tree.
-> - Fix typos and add more clarifications in dt-schema patches.
->
-> Changes V9 -> V10 [14]:
->
-> - Rebased over linux-next (20241106).
-> - Remove patches with AES-CTR support. This was a dishonest implementation of CTR algo.
-> - Update commit headers in accordance with the accepted rules in each
->   of the subsystems.
-> - Moved adding power-domains (dt-bindings) in desired commit.
->
-> Changes V10 -> V11 [15]:
->
-> - Rebased over linux-next (20241213).
-> - Fix unused variable warnings reported by kernel test robot [16].
-> - Fix dts warnings reported by kernel test robot. [17].
-> - Add Rob Herring RvB tags for dt-bindings patches.
-> - Remove ____cacheline_aligned macro. Use crypto_ahash/tfm_ctx_dma(),
->   crypto_ahash_set_reqsize_dma() and crypto_dma_align() instead.
->
-> Changes V11 -> V12 [18]:
->
-> - Rebased over linux-next (20250624).
-> - Remove digest() method for hasher.
-> - Add ____cacheline_aligned for meson_hasher_req_ctx structure. Hardware requires
->   that these buffers be located in different cache lines.
->
-> Links:
->   - [1] https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7
->   - [2] https://lore.kernel.org/all/20240110201216.18016-1-avromanov@salutedevices.com/
->   - [3] https://lore.kernel.org/all/20240123165831.970023-1-avromanov@salutedevices.com/
->   - [4] https://lore.kernel.org/all/20240205155521.1795552-1-avromanov@salutedevices.com/
->   - [5] https://lore.kernel.org/all/20240212135108.549755-1-avromanov@salutedevices.com/
->   - [6] https://lore.kernel.org/all/ZcsYaPIUrBSg8iXu@Red/
->   - [7] https://lore.kernel.org/all/20240301132936.621238-1-avromanov@salutedevices.com/
->   - [8] https://lore.kernel.org/all/Zf1BAlYtiwPOG-Os@Red/
->   - [9] https://lore.kernel.org/all/20240326153219.2915080-1-avromanov@salutedevices.com/
->   - [10] https://lore.kernel.org/all/20240329-dotted-illusive-9f0593805a05@wendy/
->   - [11] https://lore.kernel.org/all/20240411133832.2896463-1-avromanov@salutedevices.com/
->   - [12] https://lore.kernel.org/all/20240607141242.2616580-1-avromanov@salutedevices.com/
->   - [13] https://lore.kernel.org/all/20240610222827.GA3166929-robh@kernel.org/
->   - [14] https://lore.kernel.org/all/20240820145623.3500864-1-avromanov@salutedevices.com/
->   - [15] https://lore.kernel.org/all/20241108102907.1788584-1-avromanov@salutedevices.com/
->   - [16] https://lore.kernel.org/all/202411090235.a7vEgZQo-lkp@intel.com/
->   - [17] https://lore.kernel.org/all/202411090619.fQTDHg7w-lkp@intel.com/
->   - [18] https://lore.kernel.org/all/20241213140755.1298323-1-avromanov@salutedevices.com/#t
->
-> Alexey Romanov (22):
->   crypto: amlogic - Don't hardcode IRQ count
->   crypto: amlogic - Add platform data
->   crypto: amlogic - Remove clock input
->   crypto: amlogic - Add MMIO helpers
->   crypto: amlogic - Move get_engine_number()
->   crypto: amlogic - Drop status field from meson_flow
->   crypto: amlogic - Move algs definition and cipher API to cipher.c
->   crypto: amlogic - Cleanup defines
->   crypto: amlogic - Process more than MAXDESCS descriptors
->   crypto: amlogic - Avoid kzalloc in engine thread
->   crypto: amlogic - Introduce hasher
->   crypto: amlogic - Use fallback for 192-bit keys
->   crypto: amlogic - Add support for G12-series
->   crypto: amlogic - Add support for AXG-series
->   crypto: amlogic - Add support for A1-series
->   dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt
->     lines
->   dt-bindings: crypto: amlogic,gxl-crypto: support new SoC's
->   arm64: dts: amlogic: gxl: correct crypto node definition
->   arm64: dts: amlogic: a1: add crypto node
->   arm64: dts: amlogic: s4: add crypto node
->   arm64: dts: amlogic: g12: add crypto node
->   arm64: dts: amlogic: axg: add crypto node
->
->  .../bindings/crypto/amlogic,gxl-crypto.yaml   |  32 +-
->  arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |  14 +
->  arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
->  .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
->  arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   6 +-
->  arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  13 +
->  drivers/crypto/amlogic/Makefile               |   2 +-
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 587 ++++++++++++------
->  drivers/crypto/amlogic/amlogic-gxl-core.c     | 289 +++++----
->  drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 485 +++++++++++++++
->  drivers/crypto/amlogic/amlogic-gxl.h          | 111 +++-
->  11 files changed, 1191 insertions(+), 362 deletions(-)
->  create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
->
-> --
-> 2.34.1
->
->
-> _______________________________________________
-> linux-amlogic mailing list
-> linux-amlogic@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-amlogic
