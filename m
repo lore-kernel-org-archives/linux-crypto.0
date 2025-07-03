@@ -1,139 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9641E19CC02;
-	Thu,  3 Jul 2025 14:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815522EAB6D
+	for <linux-crypto@vger.kernel.org>; Thu,  3 Jul 2025 17:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751552504; cv=none; b=acxbHUsiaMzDrk3sT2kN+Pajz4PBzmukPrRfLoq2GUh9+l67jnWox+LAZJ421dI0fFblFox5f++m7PkNxTppkw4BPRNME/5bOEgPlZ8p6xYzB+5vUmFSkZHihJFhxe9QPG3/LI+zaJcZT1VGaMsMdfSB3QQYJF5zFRDZR1Hsw9s=
+	t=1751563253; cv=none; b=ikpX9ndr4pfqPBCcTzy331iAmFyD6TNth143csTaDJylcEfKXu0LrMnW3IKvIyKcpnJFyvpgW2WhdIQLhmZxIwk49oDBbW21DGkMel080JnacdbBUQNjmsBLHJi3W0w/6Mt8zrEoBwAgQ044H196kcdF21Iuv6J6sL6J34FNHzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751552504; c=relaxed/simple;
-	bh=8q/IVKrUxZauGxiUn174NgZfIXYmxkzaKI174acXcJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RailLG86oRa+c4S+xVxb/k+9+7xNHKUYP6OTno7DTtdbwj7MN+ZgQ6MHyueT6RDY1cCU4RqMfLGg00bTDBS84eX6U/dSuIuv1XcV4UWiYAvwxhM7mnH8eQDKjnQ3ZNvmuuE4j+JEsRDDexcis0sVwrUcswGTxH5qDAQRCNAZ5ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOnfj6Jd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751563253; c=relaxed/simple;
+	bh=vPDISl6g5NAEE77KMXZjR8RjrfgvmCsHGDrvYGyHqjo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PSTW0cg0MPlBtrXWUwyT/JLM3O1jH9uffSWXGaXpzs4ccZwaF0Jx0gITCc9SFpNvJn5ChpzjSZt6Heh80y8hc4GOqslA1JSkb2tDHye8arLI/k84mrHsaB73ap4Z4mVzNih2vrW2386qR0gXNQyUz5LJVVSxNl0giF9X6tY7LkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=he8awb9p; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOnfj6Jd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FE4AC4CEE3;
-	Thu,  3 Jul 2025 14:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751552504;
-	bh=8q/IVKrUxZauGxiUn174NgZfIXYmxkzaKI174acXcJY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gOnfj6JddvGC2tczpxc5Nhlp+9Z0UiFGRRU3sr4q71VnRB/GwYAQRCLZmuHr4sxxA
-	 vEZU7xqhdgzNxuNCO3jBWjnpljc8VTGcskBdQEC556pU9PhKZcOTRVcBCzaMmQR+bJ
-	 s9+uOMF6FGLhRLlVxnWJqQgXF4lPrSwE7sfN3zlKS0x9xMxXxyfq5b0b/Ys53xJ79N
-	 3/rhDg3aIR2ZYVy29OK+y6hX9gwwhCcLOcDN1+TDIDhuxGHglj5hs8laI0aqAr8uf2
-	 2UxfmVUtfg2N/objv3RDgkIZOnSwMCKi9DT6cACPvZ4UCg5vDGQ6jOT5EC7Tjapg5B
-	 Nu+V/A49DF7fQ==
-Date: Thu, 3 Jul 2025 15:21:36 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Robert Marko <robert.marko@sartura.hr>,
-	Russell King <linux@armlinux.org.uk>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>, Andi Shyti <andi.shyti@kernel.org>,
-	Lee Jones <lee@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Daniel Machon <daniel.machon@microchip.com>, luka.perkov@sartura.hr
-Subject: Re: [PATCH v8 01/10] arm64: Add config for Microchip SoC platforms
-Message-ID: <20250703-lapped-itunes-1cd711479f75@spud>
-References: <20250702183856.1727275-1-robert.marko@sartura.hr>
- <20250702183856.1727275-2-robert.marko@sartura.hr>
- <ea353170-6e03-4231-afc2-3dc45253931d@app.fastmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="he8awb9p"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751563249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rBaauVU/2eqVg/IBff0Zf0cOYUFCWODEuFnTMq8cS+Q=;
+	b=he8awb9plbq9DFTpyr14nwlbX5WEp2zlR5FdoAVvjO8oTV+9deiVZpszeN3Jo5B7eUsr71
+	5KC5jP7TrP0eTfnydp/z691c6B2T9ccxDtBS1fiG/goVl3P45469tzlVxuShl7GWOM08FJ
+	wj37Y+m8bkD0SRcoAgr8SKTwRUgDWkU=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nick Terrell <terrelln@fb.com>,
+	David Sterba <dsterba@suse.com>
+Cc: linux-hardening@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: zstd - replace zero-length array with flexible array member
+Date: Thu,  3 Jul 2025 19:19:34 +0200
+Message-ID: <20250703171933.253654-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MYqRzWYWScpig/dd"
-Content-Disposition: inline
-In-Reply-To: <ea353170-6e03-4231-afc2-3dc45253931d@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+Replace the deprecated zero-length array with a modern flexible array
+member in the struct zstd_ctx.
 
---MYqRzWYWScpig/dd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No functional changes intended.
 
-On Wed, Jul 02, 2025 at 09:57:10PM +0200, Arnd Bergmann wrote:
-> On Wed, Jul 2, 2025, at 20:35, Robert Marko wrote:
-> > Currently, Microchip SparX-5 SoC is supported and it has its own symbol.
-> >
-> > However, this means that new Microchip platforms that share drivers need
-> > to constantly keep updating depends on various drivers.
-> >
-> > So, to try and reduce this lets add ARCH_MICROCHIP symbol that drivers
-> > could instead depend on.
->=20
-> Thanks for updating the series to my suggestion!
->=20
-> > @@ -174,6 +160,27 @@ config ARCH_MESON
-> >  	  This enables support for the arm64 based Amlogic SoCs
-> >  	  such as the s905, S905X/D, S912, A113X/D or S905X/D2
-> >=20
-> > +menuconfig ARCH_MICROCHIP
-> > +	bool "Microchip SoC support"
-> > +
-> > +if ARCH_MICROCHIP
-> > +
-> > +config ARCH_SPARX5
-> > +	bool "Microchip Sparx5 SoC family"
->=20
-> This part is the one bit I'm not sure about: The user-visible
-> arm64 CONFIG_ARCH_* symbols are usually a little higher-level,
-> so I don't think we want both ARCH_MICROCHIP /and/ ARCH_SPARX5
-> here, or more generally speaking any of the nested ARCH_*
-> symbols.
->=20
-> This version of your patch is going to be slightly annoying
-> to existing sparx5 users because updating an old .config
-> breaks when ARCH_MICROCHIP is not enabled.
->=20
-> The two options that I would prefer here are=20
->=20
-> a) make ARCH_SPARX5 a hidden symbol in order to keep the
->    series bisectable, remove it entirely once all references
->    are moved over to ARCH_MICROCHIP
->=20
-> b) Make ARCH_MICROCHIP a hidden symbol that is selected by
->    ARCH_SPARX5 but keep the menu unchanged.
->=20
-> Let's see what the sparx5 and at91 maintainers think about
-> these options.
->=20
-> The other patches all look fine to me.
+Link: https://github.com/KSPP/linux/issues/78
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/zstd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-One more fun thing to consider is that we ended up defining
-ARCH_MICROCHIP on riscv because people didn't want to have an
-ARCH_MICROCHIP_POLARFIRE symbol enabling the pic64gx SoC. Therefore,
-anything that relies on CONFIG_AT91 to be only selectable by users on
-arm/arm64 when moved to CONFIG_ARCH_MICROCHIP (as this patch does) will
-become selectable on riscv as a result.
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index 657e0cf7b952..c489976c3e8b 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -25,7 +25,7 @@ struct zstd_ctx {
+ 	zstd_dctx *dctx;
+ 	size_t wksp_size;
+ 	zstd_parameters params;
+-	u8 wksp[0] __aligned(8);
++	u8 wksp[] __aligned(8);
+ };
+ 
+ static DEFINE_MUTEX(zstd_stream_lock);
+-- 
+2.50.0
 
---MYqRzWYWScpig/dd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaGaRywAKCRB4tDGHoIJi
-0kalAP9rQkzuJjuFkyPd9IlOQj3R+Ld5bQNONlz6IG3u/RaW3wEA1mcw+qjQrIc8
-tzY+P2Bw7n2cprxDhZQKO1xk0ihwGws=
-=qB70
------END PGP SIGNATURE-----
-
---MYqRzWYWScpig/dd--
