@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC01FFC6D;
-	Fri,  4 Jul 2025 04:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CB3207A18;
+	Fri,  4 Jul 2025 04:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751603018; cv=none; b=NOdMlpkyXDW72Bg8QHDQrae4Hmt+oVSD3ApZvWzYKjjqv306x22r5V0g75Dv0s0vuAGZl8QCT/OhF5UY+697XdwweGO5vDDEibKbv7J8wLm6fM+vBqEzcRoThILx3jX/ilViOwEFkaMkP+Es4BJIZlI6vf8vXAlz7j+7JhK/fYI=
+	t=1751603019; cv=none; b=JDEpNHETo1cwKhG/JJ42ertyDpNYeQUvx1b/JGX3mDpV6XVCGqw7YdAsj/EfyTnR4I4i2rn3AwjV8HpJeHecK31knX/iuG6+NQf9q0Ka8Ya+vibvRHZxBBwg1xQTDV/hIzd2L9dDkIvJHU/qEQqNL+vzvOcMZ5uYjXk9mAFHQWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751603018; c=relaxed/simple;
-	bh=Kmk+iJsQT2Exsw/kR1m8SAtMwjqShpsgO63jDQplw8s=;
+	s=arc-20240116; t=1751603019; c=relaxed/simple;
+	bh=m40pIlIO2wo0gnv2KOAZQPAYTnCzR21fSzFkg8x1DME=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H2LwqNuqqlb37XAflvXy+AuI5cPNsbgVfD/pDJfungB+eJk3VZTAwQv1XnaBNOGGjYnMCkyFSZXNDtj+SYBPg+FqcaI0skvBE3kVMkk+AOHLub7vhfx5ow+O5JPDmq7H1dR1+MXec7gE652WM/GO/dUXmJVUNILxideu1oF9GO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QU84ST+/; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=OJJTECcI7Ijx8U43iSd6sHN67sPTHe2bLz/0hXyM1jcC/vlAOCOxYSDczy4uz4w2sY8BVM03mZJCZeR9u2pLr1Ha0bLOweNuxRHIzENGKvE48w3TyO966H2QZgo+th+w+416hAi3ezshbpw7Ron+FuQyNZVYF4xyR6Jethaxt5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b2fDgciE; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QU84ST+/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b2fDgciE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751603017; x=1783139017;
+  t=1751603018; x=1783139018;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Kmk+iJsQT2Exsw/kR1m8SAtMwjqShpsgO63jDQplw8s=;
-  b=QU84ST+/W0BNYiLSyeEIZYt2AFx/DLRxbwwqVXP7Wufewoji07onqDVd
-   oCfZ+cYqfp69hD7qrjcJpsMQRLbnPmvBcnKSv8xgqxVz2ysayArngi6Xc
-   20TMZFroATC5Mgu0Jbo+fKfQ3TxdRiEz54SSZ+D62JLDIvPd/LeA2SpXk
-   z74/F39jKaItek/CJ8zQZmH5fLUHrb/7fd2sa/yMkYFlRVymwk3F956Hq
-   ofvQRLVdKkYxwY+yCmjxkcG5fHcXPQcQu6S83RUxb0qdiGuh0UK7ntV9J
-   Cy6PHGVeF/HvJoy6w08x7nilGfk4eP3Lp+NtJL0EFJKz71/qrk+L2KTKf
-   Q==;
-X-CSE-ConnectionGUID: d504oV5ETgyO8HwpbplJFQ==
-X-CSE-MsgGUID: rvCEyz7MRXqgIC7U6IdeTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53909097"
+  bh=m40pIlIO2wo0gnv2KOAZQPAYTnCzR21fSzFkg8x1DME=;
+  b=b2fDgciEr34QazgtAfgtb55eEOAQWQmTtzHZzQEha50IKyI2qEi+arsP
+   19poKgVibgj7QBO6M31jDMdVUzs83uIb8XjiHc8HaXGRUc+ZP+GsdEYRj
+   6pOiy17R08ceX339cokwhJ6slgWBmGKtkaYGUIFRmmIei1yeT7f7yNl+c
+   GYyztP2lNv2XeAm5nrv2rczh3c7tAAnRL1ySks6HUPlXRPeAL9Hk7Uc/k
+   IUOM5zlXkkbsLsu2CUCw4KLJ0UnF9895+aTXyQB5TkIMJtSC6TBMYUVGg
+   YHB6SZg5Ba0tMcVh145EOBZPZHIUr0NVzMCetMKUmCbs0aPGngaRqBno+
+   w==;
+X-CSE-ConnectionGUID: kGU9Nix/T9yuRht3IMN43w==
+X-CSE-MsgGUID: 622sYKi3TyG5EvTVJvkRPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53909125"
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="53909097"
+   d="scan'208";a="53909125"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 21:23:26 -0700
-X-CSE-ConnectionGUID: Er3bdchGTuG5T5PevgL8YA==
-X-CSE-MsgGUID: +jHzUwczSc+qv779WCs0GQ==
+X-CSE-ConnectionGUID: +Lpl7NRDQSitRqHUpZZD0Q==
+X-CSE-MsgGUID: xCWoZqZbQGCGzDo8ZVm1RA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="153968696"
+   d="scan'208";a="153968702"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by orviesa006.jf.intel.com with ESMTP; 03 Jul 2025 21:23:25 -0700
+  by orviesa006.jf.intel.com with ESMTP; 03 Jul 2025 21:23:26 -0700
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v10 12/25] crypto: acomp - Add "void *kernel_data" in "struct acomp_req" for kernel users.
-Date: Thu,  3 Jul 2025 21:23:10 -0700
-Message-Id: <20250704042323.10318-13-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v10 14/25] crypto: iaa - Enable async mode and make it the default.
+Date: Thu,  3 Jul 2025 21:23:12 -0700
+Message-Id: <20250704042323.10318-15-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250704042323.10318-1-kanchana.p.sridhar@intel.com>
 References: <20250704042323.10318-1-kanchana.p.sridhar@intel.com>
@@ -82,53 +82,84 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit adds a "void *kernel_data" member in "struct acomp_req":
+This patch enables the 'async' sync_mode in the driver. Further, it sets
+the default sync_mode to 'async', which makes it easier for IAA hardware
+acceleration in the iaa_crypto driver to be loaded by default in the most
+efficient/recommended 'async' mode for parallel
+compressions/decompressions, namely, asynchronous submission of
+descriptors, followed by polling for job completions. Earlier, the
+"sync" mode used to be the default.
 
-  @kernel_data:  Private API kernel code data for kernel users
+The iaa_crypto driver documentation has been updated with these
+changes.
 
-This allows kernel modules such as zswap and zram to input driver data
-without interfering with existing usage of acomp_req->base.data.
+This way, anyone who wants to use IAA for zswap/zram can do so after
+building the kernel, and without having to go through these steps to use
+async mode:
 
-Since acomp_request_set_params() is the main interface for kernel users
-to initialize the acomp_req members, this routine sets
-acomp_req->kernel_data to NULL. Kernel users such as zswap will need to
-explicitly set acomp_req->kernel_data for interacting with
-crypto_acomp_[de]compress(). This usage model will be covered in a
-separate patch-series.
+  1) disable all the IAA device/wq bindings that happen at boot time
+  2) rmmod iaa_crypto
+  3) modprobe iaa_crypto
+  4) echo async > /sys/bus/dsa/drivers/crypto/sync_mode
+  5) re-run initialization of the IAA devices and wqs
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- include/crypto/acompress.h | 3 +++
- 1 file changed, 3 insertions(+)
+ Documentation/driver-api/crypto/iaa/iaa-crypto.rst | 11 ++---------
+ drivers/crypto/intel/iaa/iaa_crypto_main.c         |  4 ++--
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 9eacb9fa375d7..0312322d2ca03 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -79,6 +79,7 @@ struct acomp_req_chain {
-  * @dvirt:	Destination virtual address
-  * @slen:	Size of the input buffer
-  * @dlen:	Size of the output buffer and number of bytes produced
-+ * @kernel_data:  Private API kernel code data for kernel users
-  * @chain:	Private API code data, do not use
-  * @__ctx:	Start of private context data
+diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+index 949bfa1ef6245..8e0e98d509720 100644
+--- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
++++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+@@ -272,7 +272,7 @@ The available attributes are:
+       echo async_irq > /sys/bus/dsa/drivers/crypto/sync_mode
+ 
+     Async mode without interrupts (caller must poll) can be enabled by
+-    writing 'async' to it (please see Caveat)::
++    writing 'async' to it::
+ 
+       echo async > /sys/bus/dsa/drivers/crypto/sync_mode
+ 
+@@ -281,14 +281,7 @@ The available attributes are:
+ 
+       echo sync > /sys/bus/dsa/drivers/crypto/sync_mode
+ 
+-    The default mode is 'sync'.
+-
+-    Caveat: since the only mechanism that iaa_crypto currently implements
+-    for async polling without interrupts is via the 'sync' mode as
+-    described earlier, writing 'async' to
+-    '/sys/bus/dsa/drivers/crypto/sync_mode' will internally enable the
+-    'sync' mode. This is to ensure correct iaa_crypto behavior until true
+-    async polling without interrupts is enabled in iaa_crypto.
++    The default mode is 'async'.
+ 
+   - g_comp_wqs_per_iaa
+ 
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index 0ed3d6e8ad0ec..cf12257f7400d 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -152,7 +152,7 @@ static bool iaa_verify_compress = true;
   */
-@@ -95,6 +96,7 @@ struct acomp_req {
- 	unsigned int slen;
- 	unsigned int dlen;
  
-+	void *kernel_data;
- 	struct acomp_req_chain chain;
+ /* Use async mode */
+-static bool async_mode;
++static bool async_mode = true;
+ /* Use interrupts */
+ static bool use_irq;
  
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-@@ -354,6 +356,7 @@ static inline void acomp_request_set_params(struct acomp_req *req,
- 	req->dst = dst;
- 	req->slen = slen;
- 	req->dlen = dlen;
-+	req->kernel_data = NULL;
- 
- 	req->base.flags &= ~(CRYPTO_ACOMP_REQ_SRC_VIRT |
- 			     CRYPTO_ACOMP_REQ_SRC_NONDMA |
+@@ -206,7 +206,7 @@ static int set_iaa_sync_mode(const char *name)
+ 		async_mode = false;
+ 		use_irq = false;
+ 	} else if (sysfs_streq(name, "async")) {
+-		async_mode = false;
++		async_mode = true;
+ 		use_irq = false;
+ 	} else if (sysfs_streq(name, "async_irq")) {
+ 		async_mode = true;
 -- 
 2.27.0
 
