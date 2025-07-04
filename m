@@ -1,340 +1,133 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69132116EE;
-	Fri,  4 Jul 2025 18:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DAE29A2;
+	Fri,  4 Jul 2025 20:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751654382; cv=none; b=k7bfq/Im6o9c8u2tWS2snDiNGPECLu2LVVwkMhMG+otlNJybH2nmFHNQoae9zmeF+eigKOS+WPZEiRXIV03aruECvJ+EAwW4OHS0Ulj/HdqJa8pCIWcIi755yw7wFj7MdhvCs7LnPbodcUJDEhgRPzufqOfM3UL4skH+ilVIhOE=
+	t=1751660066; cv=none; b=Nyhky6TzMZhtDrpoN5enYZjyUeHsS/7PlL0p/rosGQc2wvb86+AM2E6uARwriPLxeJGIMRymrdA7HXn8GhZ2fSTcRrOGaI5C85LWRGBTKv6v6LxOglElQWtAyq4vhj56SEOEygbJBnfiiWdxfC1Nhm0SOy0z5EfGEOvg8Lb16I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751654382; c=relaxed/simple;
-	bh=oIiPtbnQd8XpJxbubKts0sTbQUNsG/DmXU9eAiM+z60=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UI6gb8hLF37UQABHOSPBC0s4ttucWec65XyvwSeh+cIToYItVRohZgWHYijeUwZC8svQHwj+yXBwI9JxzZPvirImROErFdXst/eC6XfvFOyImXAPsNVItHeX5HUg6xs0fSKZBwZACFSo/QX4Kt7w5jcsvwHIS6KW0EGBcvgmsgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eFlvWqi7; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751660066; c=relaxed/simple;
+	bh=GrWs/V5I/ue3CYgK5F9/Hx1QroCU8tx9FBpQGZTBa00=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gzax7me0XIlvoyX4RrzpTQCHbctrHoKDEO+GMHBM6F/x6wBEk13l+rqyB+AR65UCLxl4mIv9XVA5csNxGTTYUiH23WUW97HhLfaypowRxCDCJWUaSf6AWzQxoDz5iWaYI4qfEPmuYxxfaK9wAXDzVbkNvZVHkO7NqpKpg0s7XrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=YVW+hlZ7; arc=none smtp.client-ip=185.125.188.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFlvWqi7"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6fd0a91ae98so9279376d6.1;
-        Fri, 04 Jul 2025 11:39:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751654380; x=1752259180; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZLSI4jmhCdQ92xJmwXMCUX4eg1LhZKqmG9IrE2rHlKE=;
-        b=eFlvWqi78S72kkPhLL2jrlXIaT913xyticAZ2Xg7XpQIIgTwWsBodfAnPXqbCvGTQc
-         DdByqLimRIO47M6yOGBSSzewPyUwH7gKn5HDl9ANKMdv1uBwYAzBvz0NU2qiYb2iGgTE
-         NoRFFwBS5HfZrF2iGWmkV34F+cigXfy1YRlb9rF56vNSaPym22BV7SeHxeh99ECWybdR
-         4TYXhIXWZ61jlfdihUtG47Lb+o2prk8ylJuvYTOEQj83yEOoymuDFIOcfjaWb11/BhOD
-         DWxK5QHNMb8SR5p2jyvbiOYyiwipugEkqLIRFNr1M2HJ+b8EEJMdCaFyZRQ++XCeKxgB
-         vwLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751654380; x=1752259180;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZLSI4jmhCdQ92xJmwXMCUX4eg1LhZKqmG9IrE2rHlKE=;
-        b=XZchkIgqPqgc600onei3SOvC4f78kxZ1nct+q8WWGGpELW0z0j76dmKs7bc7MDjtxm
-         MJ8gNMFtZKjlupd8ZOtZGSf4M5mESWgi1OutfUQqjLcNDFvkAs8M0NXFFwZrsgSHZh9c
-         X74iR185vcU1LIh0bViZnd7GzuK5JTe4QbytPLYkLrI4+5Ki3pJBypzR3czuVkI1j95M
-         vWM9lIfu2RHKn5CGJYw3LI+g9Xyq/52hQmIEI+8zeR/ZntYRRwIdivNoH459smeFi7FU
-         YBaox46/VYTHLmUl8eEa6Wab82Rl47NVlwmYh3jhF6yc+7gKGdT3Yvi3u5CA6BYPyt5Y
-         +gbw==
-X-Forwarded-Encrypted: i=1; AJvYcCURkDrFmaLWRr86HwZl767r5QzZ/xAJEvNr7+8m0SiwF3I30Gh31AiFs6mGRyUiT3Bz348CSgGxrCOzeSI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIN6LC5mX4es7nQlBgHRxi+6E9biUPQnsQ48Cv0bE/kbBe3G0C
-	QFFngHW8XjOH4HUnybJxITUOTyNLGfUoQSU88AAc4AcT7lM7kA38AygFAsahiNgnKBpY9pBKrlu
-	HnbqakoLJrZEY/4N6/9sT9YOxoUEAfEY=
-X-Gm-Gg: ASbGncsFuyDksNaPNrqapfM/EfED08xcg6rnXJCadHs4o7iwcz0+hnVtkSuHmovZm+5
-	4WiA/opzilZ46mCuxRKM110Q6k7Sv5m1H0uR3zAmZ9sK2/aM6GY5ZrxjIonHf7MZ87HSxDjBjJ7
-	8vxzKygDCtSDfz0ysiAwoHImgkWXQxAuBfTjXs2OnfBo8=
-X-Google-Smtp-Source: AGHT+IH+JWc+g38J/FXavoBpRFG4t26kf9xdnO56cRpAbEuqXLbNRw6f7/YaTbEFWCoX0zCKHZqZhrMJuqELKkmF+OE=
-X-Received: by 2002:ad4:5dcb:0:b0:6fa:fbde:7e23 with SMTP id
- 6a1803df08f44-702c8b71f2fmr45565996d6.8.1751654379557; Fri, 04 Jul 2025
- 11:39:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="YVW+hlZ7"
+Received: from [192.168.50.23] (S01061056118100b4.lb.shawcable.net [96.51.42.105])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 4F3193F702;
+	Fri,  4 Jul 2025 20:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1751660055;
+	bh=lk+V+156WnSEWPfShb3xaUyPVUkRJkFafIG/l9fCboo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=YVW+hlZ71wRJPC67/XmzgsqK6KRzyaYbLwyujwGRxGT3JdSqbDA20PsjqFufgcXck
+	 qyH4SZNKFiQZjwdwZwQQP2VG4D6dj9lK1ay5iWdCiO/vp85cxOz3IhslJB51OzEeu+
+	 +p3X1xKYReVmBqzctX5jXJrrk2arC0CviVb8bpIOfQP3DG4voQg+vqBiruJEN1SnII
+	 /Vl4ow1xHAWiPgZ9Sb4hZ93DRMiLyegE88fcgEIAACPODhS6m1LJYogF7FqeqI0w+J
+	 Gq9PrP4qbBw+zDO5uNJ745bNxD+dBlsWgY0rQoNGWh/1PDPOvl5Wp0W8VQDZNXFrov
+	 x0AJN8I2aflTA==
+Message-ID: <d7393780-d48a-49f6-b9dc-cca97a2e18fe@canonical.com>
+Date: Fri, 4 Jul 2025 13:14:11 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250704042323.10318-1-kanchana.p.sridhar@intel.com> <20250704042323.10318-21-kanchana.p.sridhar@intel.com>
-In-Reply-To: <20250704042323.10318-21-kanchana.p.sridhar@intel.com>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Fri, 4 Jul 2025 11:39:28 -0700
-X-Gm-Features: Ac12FXwCQLsXq5LlRFraBt2YLteHvlw4htbXYU6u9qy7Z6Cs1ldYzuebXMyBqvg
-Message-ID: <CAKEwX=PFJzc0pErjMcfeeheGL8u4GWMu2yr-iqWmFvYMKfT3fg@mail.gmail.com>
-Subject: Re: [PATCH v10 20/25] mm: zswap: Move the CPU hotplug procedures
- under "pool functions".
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
-	yosry.ahmed@linux.dev, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
-	ryan.roberts@arm.com, 21cnbao@gmail.com, ying.huang@linux.alibaba.com, 
-	akpm@linux-foundation.org, senozhatsky@chromium.org, 
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org, 
-	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com, 
-	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: manual merge of the apparmor tree with the libcrypto
+ tree
+To: Eric Biggers <ebiggers@kernel.org>,
+ Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Linux Crypto List <linux-crypto@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20250704153630.0fb1e2f3@canb.auug.org.au>
+ <20250704060447.GC4199@sol>
+Content-Language: en-US
+From: John Johansen <john.johansen@canonical.com>
+Autocrypt: addr=john.johansen@canonical.com; keydata=
+ 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 lT9Q
+Organization: Canonical
+In-Reply-To: <20250704060447.GC4199@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 3, 2025 at 9:23=E2=80=AFPM Kanchana P Sridhar
-<kanchana.p.sridhar@intel.com> wrote:
->
-> This patch merely moves zswap_cpu_comp_prepare() and
-> zswap_cpu_comp_dead() to be in the "pool functions" section because
-> these functions are invoked upon pool creation/deletion.
+On 7/3/25 23:04, Eric Biggers wrote:
+> On Fri, Jul 04, 2025 at 03:36:30PM +1000, Stephen Rothwell wrote:
+>> Hi all,
+>>
+>> Today's linux-next merge of the apparmor tree got a conflict in:
+>>
+>>    security/apparmor/crypto.c
+>>
+>> between commit:
+>>
+>>    ad7ca74e1c60 ("apparmor: use SHA-256 library API instead of crypto_shash API")
+>>
+>> from the libcrypto tree and commit:
+>>
+>>    e9ed1eb8f621 ("apparmor: use SHA-256 library API instead of crypto_shash API")
+>>
+>> from the apparmor tree.
+>>
+>> I fixed it up (I used the former version since it appears to be much
+>> newer) and can carry the fix as necessary. This is now fixed as far as
+>> linux-next is concerned, but any non trivial conflicts should be mentioned
+>> to your upstream maintainer when your tree is submitted for merging.
+>> You may also want to consider cooperating with the maintainer of the
+>> conflicting tree to minimise any particularly complex conflicts.
+> 
+> Thanks Stephen.  John, can you drop your version when you have a chance?
+> 
 
-Hmm idk, "compressed storage" section seems fitting for
-zswap_cpu_comp_prepare() and zswap_cpu_comp_dead().
+Ooops, sorry. done
 
-Is this patch necessary?
-
->
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> ---
->  mm/zswap.c | 188 ++++++++++++++++++++++++++---------------------------
->  1 file changed, 94 insertions(+), 94 deletions(-)
->
-> diff --git a/mm/zswap.c b/mm/zswap.c
-> index 3c0fd8a137182..3538ecaed5e16 100644
-> --- a/mm/zswap.c
-> +++ b/mm/zswap.c
-> @@ -248,6 +248,100 @@ static inline struct xarray *swap_zswap_tree(swp_en=
-try_t swp)
->  **********************************/
->  static void __zswap_pool_empty(struct percpu_ref *ref);
->
-> +static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *n=
-ode)
-> +{
-> +       struct zswap_pool *pool =3D hlist_entry(node, struct zswap_pool, =
-node);
-> +       struct crypto_acomp_ctx *acomp_ctx =3D per_cpu_ptr(pool->acomp_ct=
-x, cpu);
-> +       struct crypto_acomp *acomp =3D NULL;
-> +       struct acomp_req *req =3D NULL;
-> +       u8 *buffer =3D NULL;
-> +       int ret;
-> +
-> +       buffer =3D kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cp=
-u));
-> +       if (!buffer) {
-> +               ret =3D -ENOMEM;
-> +               goto fail;
-> +       }
-> +
-> +       acomp =3D crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_no=
-de(cpu));
-> +       if (IS_ERR(acomp)) {
-> +               pr_err("could not alloc crypto acomp %s : %ld\n",
-> +                               pool->tfm_name, PTR_ERR(acomp));
-> +               ret =3D PTR_ERR(acomp);
-> +               goto fail;
-> +       }
-> +
-> +       req =3D acomp_request_alloc(acomp);
-> +       if (!req) {
-> +               pr_err("could not alloc crypto acomp_request %s\n",
-> +                      pool->tfm_name);
-> +               ret =3D -ENOMEM;
-> +               goto fail;
-> +       }
-> +
-> +       /*
-> +        * Only hold the mutex after completing allocations, otherwise we=
- may
-> +        * recurse into zswap through reclaim and attempt to hold the mut=
-ex
-> +        * again resulting in a deadlock.
-> +        */
-> +       mutex_lock(&acomp_ctx->mutex);
-> +       crypto_init_wait(&acomp_ctx->wait);
-> +
-> +       /*
-> +        * if the backend of acomp is async zip, crypto_req_done() will w=
-akeup
-> +        * crypto_wait_req(); if the backend of acomp is scomp, the callb=
-ack
-> +        * won't be called, crypto_wait_req() will return without blockin=
-g.
-> +        */
-> +       acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +                                  crypto_req_done, &acomp_ctx->wait);
-> +
-> +       acomp_ctx->buffer =3D buffer;
-> +       acomp_ctx->acomp =3D acomp;
-> +       acomp_ctx->is_sleepable =3D acomp_is_async(acomp);
-> +       acomp_ctx->req =3D req;
-> +       mutex_unlock(&acomp_ctx->mutex);
-> +       return 0;
-> +
-> +fail:
-> +       if (acomp)
-> +               crypto_free_acomp(acomp);
-> +       kfree(buffer);
-> +       return ret;
-> +}
-> +
-> +static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node=
-)
-> +{
-> +       struct zswap_pool *pool =3D hlist_entry(node, struct zswap_pool, =
-node);
-> +       struct crypto_acomp_ctx *acomp_ctx =3D per_cpu_ptr(pool->acomp_ct=
-x, cpu);
-> +       struct acomp_req *req;
-> +       struct crypto_acomp *acomp;
-> +       u8 *buffer;
-> +
-> +       if (IS_ERR_OR_NULL(acomp_ctx))
-> +               return 0;
-> +
-> +       mutex_lock(&acomp_ctx->mutex);
-> +       req =3D acomp_ctx->req;
-> +       acomp =3D acomp_ctx->acomp;
-> +       buffer =3D acomp_ctx->buffer;
-> +       acomp_ctx->req =3D NULL;
-> +       acomp_ctx->acomp =3D NULL;
-> +       acomp_ctx->buffer =3D NULL;
-> +       mutex_unlock(&acomp_ctx->mutex);
-> +
-> +       /*
-> +        * Do the actual freeing after releasing the mutex to avoid subtl=
-e
-> +        * locking dependencies causing deadlocks.
-> +        */
-> +       if (!IS_ERR_OR_NULL(req))
-> +               acomp_request_free(req);
-> +       if (!IS_ERR_OR_NULL(acomp))
-> +               crypto_free_acomp(acomp);
-> +       kfree(buffer);
-> +
-> +       return 0;
-> +}
-> +
->  static struct zswap_pool *zswap_pool_create(char *type, char *compressor=
-)
->  {
->         struct zswap_pool *pool;
-> @@ -818,100 +912,6 @@ static void zswap_entry_free(struct zswap_entry *en=
-try)
->  /*********************************
->  * compressed storage functions
->  **********************************/
-> -static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *n=
-ode)
-> -{
-> -       struct zswap_pool *pool =3D hlist_entry(node, struct zswap_pool, =
-node);
-> -       struct crypto_acomp_ctx *acomp_ctx =3D per_cpu_ptr(pool->acomp_ct=
-x, cpu);
-> -       struct crypto_acomp *acomp =3D NULL;
-> -       struct acomp_req *req =3D NULL;
-> -       u8 *buffer =3D NULL;
-> -       int ret;
-> -
-> -       buffer =3D kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cp=
-u));
-> -       if (!buffer) {
-> -               ret =3D -ENOMEM;
-> -               goto fail;
-> -       }
-> -
-> -       acomp =3D crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_no=
-de(cpu));
-> -       if (IS_ERR(acomp)) {
-> -               pr_err("could not alloc crypto acomp %s : %ld\n",
-> -                               pool->tfm_name, PTR_ERR(acomp));
-> -               ret =3D PTR_ERR(acomp);
-> -               goto fail;
-> -       }
-> -
-> -       req =3D acomp_request_alloc(acomp);
-> -       if (!req) {
-> -               pr_err("could not alloc crypto acomp_request %s\n",
-> -                      pool->tfm_name);
-> -               ret =3D -ENOMEM;
-> -               goto fail;
-> -       }
-> -
-> -       /*
-> -        * Only hold the mutex after completing allocations, otherwise we=
- may
-> -        * recurse into zswap through reclaim and attempt to hold the mut=
-ex
-> -        * again resulting in a deadlock.
-> -        */
-> -       mutex_lock(&acomp_ctx->mutex);
-> -       crypto_init_wait(&acomp_ctx->wait);
-> -
-> -       /*
-> -        * if the backend of acomp is async zip, crypto_req_done() will w=
-akeup
-> -        * crypto_wait_req(); if the backend of acomp is scomp, the callb=
-ack
-> -        * won't be called, crypto_wait_req() will return without blockin=
-g.
-> -        */
-> -       acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> -                                  crypto_req_done, &acomp_ctx->wait);
-> -
-> -       acomp_ctx->buffer =3D buffer;
-> -       acomp_ctx->acomp =3D acomp;
-> -       acomp_ctx->is_sleepable =3D acomp_is_async(acomp);
-> -       acomp_ctx->req =3D req;
-> -       mutex_unlock(&acomp_ctx->mutex);
-> -       return 0;
-> -
-> -fail:
-> -       if (acomp)
-> -               crypto_free_acomp(acomp);
-> -       kfree(buffer);
-> -       return ret;
-> -}
-> -
-> -static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node=
-)
-> -{
-> -       struct zswap_pool *pool =3D hlist_entry(node, struct zswap_pool, =
-node);
-> -       struct crypto_acomp_ctx *acomp_ctx =3D per_cpu_ptr(pool->acomp_ct=
-x, cpu);
-> -       struct acomp_req *req;
-> -       struct crypto_acomp *acomp;
-> -       u8 *buffer;
-> -
-> -       if (IS_ERR_OR_NULL(acomp_ctx))
-> -               return 0;
-> -
-> -       mutex_lock(&acomp_ctx->mutex);
-> -       req =3D acomp_ctx->req;
-> -       acomp =3D acomp_ctx->acomp;
-> -       buffer =3D acomp_ctx->buffer;
-> -       acomp_ctx->req =3D NULL;
-> -       acomp_ctx->acomp =3D NULL;
-> -       acomp_ctx->buffer =3D NULL;
-> -       mutex_unlock(&acomp_ctx->mutex);
-> -
-> -       /*
-> -        * Do the actual freeing after releasing the mutex to avoid subtl=
-e
-> -        * locking dependencies causing deadlocks.
-> -        */
-> -       if (!IS_ERR_OR_NULL(req))
-> -               acomp_request_free(req);
-> -       if (!IS_ERR_OR_NULL(acomp))
-> -               crypto_free_acomp(acomp);
-> -       kfree(buffer);
-> -
-> -       return 0;
-> -}
-> -
->  static struct crypto_acomp_ctx *acomp_ctx_get_cpu_lock(struct zswap_pool=
- *pool)
->  {
->         struct crypto_acomp_ctx *acomp_ctx;
-> --
-> 2.27.0
->
