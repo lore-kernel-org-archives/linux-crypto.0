@@ -1,98 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BCC2FC3D1;
-	Fri,  4 Jul 2025 13:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF162FBFFB;
+	Fri,  4 Jul 2025 13:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751635569; cv=none; b=kcdPOv/9bd7oZbNuBzOIiMsMs+dsef9ZWPfJ04E5bOyTZy3OjYh79+00LVj+J74MOFVVn4X6PKi/s+hT+i9AUEhViXZSvFJNZ511Tp5S+dDbhMCT2owuPoJPpB4OJbcplVyXmHbD+juILMlalTCdBDVlDvfX6fE+T1915n7uKN0=
+	t=1751635593; cv=none; b=avrB5E6AXuHD7KSF+UsTqfQTxHkTQHdCq2KXoTKikAka00IM+7j5bQHpKg66aUwJr6AzXbKeAvDNpFhiT8JGJDStxIk5iVFrSoBtjxMknxmx3L6aIYPGJANFNJGWvp7gYxzFxnJNWIwU50RO72MnZEUmhTMXRNfTvD7mQI9Rgq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751635569; c=relaxed/simple;
-	bh=QfccnA0zgksNdZVm05TGsQ7eVbfl0jI/QjcOiED9+eg=;
+	s=arc-20240116; t=1751635593; c=relaxed/simple;
+	bh=kyUyzRPmMlTZg3dwhgl4ymERkrT4NxFWJPVtToPGm/4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EpkIs4p1QvGoKRhMAZAeXU42dQWwU+UOAE4tQJrLhRQLQSoT6eXXwdiOYAELIbDM0gi7QCHmsiXYQ7GVNQYnl2HMNXsrkRNac20WZYDtOVjjfexBWTI6+PBmKL/r3fg+e3ykkzgK6XqGZgrMdsWLK2Pyx+jQfCC3RFSOoTlLzgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mmRzdqSf; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=tT49Fxlt/urpwYuAQpdLEu9VpD6ud/TL5xHRSRosWvSj68O/FYIQVlxgFF205X2gVCpPGufw+exeeQCgNFcweAKf9zDbJXiA+h/gMk3ggUZePrWc47E6HMfPpChDNqGFfeT1+1TxE2n4PSL+PFInIdpyMqY9eCO4x/wtER9Yzcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktFG89Ww; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mmRzdqSf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD37C4AF09;
-	Fri,  4 Jul 2025 13:26:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktFG89Ww"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DB9EC4CEEB;
+	Fri,  4 Jul 2025 13:26:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751635568;
-	bh=QfccnA0zgksNdZVm05TGsQ7eVbfl0jI/QjcOiED9+eg=;
+	s=k20201202; t=1751635593;
+	bh=kyUyzRPmMlTZg3dwhgl4ymERkrT4NxFWJPVtToPGm/4=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mmRzdqSfD8ONxtlGzxNB29pHclwkaak8zScqIQshytzm/cx6ARkj8sp/kG8pRTdJ9
-	 COVGmCqf3SMaFTMRL1UsX8p/pWgLzL/AlQNhTJsLDojq0gdJO0yYlB7cGeYiFeTFUR
-	 BTZsySFOieY3QEO/6yWvG1qVXUlrIq/GNukGVrYDV9hcVEKBcdpy1ZfELW06zoXnxd
-	 F19/yKj/2aNYCZHSAlyLsP+LmzSCeJH8FFnmr9+aA92aAirL9B0lSlkLHbJwrK1Fjd
-	 ziZVgt8C6WW1KXEDQA+u6Nxf1bbhJ52bTRiBSIbpgVd5kB9SSIZJhaHaFFQdYHUgAQ
-	 ha89IDa3Cu5Sg==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-553b584ac96so930196e87.1;
-        Fri, 04 Jul 2025 06:26:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVqLg4G9e59uPXzU5dsvkAD+gbstEMA9yhRfUC65O0VRIv8kLQBVDMjCyZsLT31crBH0PGn7q5T5WuInQ==@vger.kernel.org, AJvYcCWgDyc8M1TRly9vTkpBBa9ct4RRwFVXV0NQU0Wfv7ot3usJdmzlntrAgBjO9TWsycgTYTXXBrlgXVAeNfOC@vger.kernel.org, AJvYcCX9s0dqxBil98VKg2YwtwsfI91u/EJJeJON9Vf7XduIh0i1oqdxCl68n1vmVgQjc8jpNFjbNcqHaDKnAQ==@vger.kernel.org, AJvYcCXkMG851Z9slO4leDH9WrB9zfRptv3qLcOBnDtykmFtx/V5O5pxr2moceO2tyWU3LclOtWbgjmdXKVlgEjY@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLkxr99dIOpzS+H25K0edfk+FBEH0QYFjqM1RWiBmSWLICh83q
-	gUyonXpEQSoB/wP+BU3rd6hlZR1JUR/F8YajqoDgbxuNywRwJf797GWZpbsHk4s4G3XEjRLUnl9
-	FSEayteFUI3leJdf/7gCrPRczWBtvy9o=
-X-Google-Smtp-Source: AGHT+IGvVOO4kge0EEISokAVNGwR5hqz4/i/BGd42crh5oVCF+hAQX4pwsOeZZ2n1F20FE5+Y24MNfsy4OsedRlOW9Q=
-X-Received: by 2002:a05:6512:3a88:b0:553:2e4a:bb58 with SMTP id
- 2adb3069b0e04-556dbe8b3e7mr1012627e87.9.1751635567154; Fri, 04 Jul 2025
- 06:26:07 -0700 (PDT)
+	b=ktFG89WwphsC6dzTTdSqf0q8HemxQz8titMQrHuiuVffn1K/DR1iPHHJYd5i+FSuE
+	 IrFQ1J9vgBK0BbrZW8uxBfMHy6RJ2hCypDeAuXCYt1SuU9BJ8nqwEvRl2uHwNm1j7r
+	 Od+aFCJeFhmBS32kQ0UtGxSZ2bFJWUB2DM8q5+JwpdM1jtpP+HBhOKT9P/dNmGDjKa
+	 Ffp0PkYRglZg+6MK6fRw1fBSnPaAJtPoS9onCdaJySeDbLxXM6bItSSGjURMmc7ZHX
+	 xGC5nfKWkIej2rtzj0xq6lyRGPnJLlP3T0p2k2So1ALOxVdcJM74ZOLzVV0tlGh5H6
+	 a41MFap/D0TZQ==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32b5226e6beso9173661fa.2;
+        Fri, 04 Jul 2025 06:26:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXTo6EI+OIQ0r+P8MAyq8DJhf3OaNtxkSkaEBDIDh74HgQXQIqUhIHMwWxQ14WIn5aTX2WOLwJEuxdeDeQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5dLLnjGVScD0j9shLXua6i5eO8OwFiIBu1of5AbmZYYc4vTzA
+	o4hcRoIAnKJ+SZdjymwRtwvQbwaEgfIXelaJwWJKDgDR6I0C2hKBPh1q4Yzs8DJP1rg/DZZDG9P
+	jWkn/r399w29ibFedM2goXxJ3SvbaNxo=
+X-Google-Smtp-Source: AGHT+IGBsqL3IhV3+I2vp36pAaiPTf+MiBU6Aq7//X/haPqRhPREvOBisg8DPFAiqakPWcQWAspygqlsQ0FezDh+Edc=
+X-Received: by 2002:a05:651c:54a:b0:32a:864a:46eb with SMTP id
+ 38308e7fff4ca-32efb0b23bamr7483541fa.0.1751635591767; Fri, 04 Jul 2025
+ 06:26:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630172224.46909-1-ebiggers@kernel.org>
-In-Reply-To: <20250630172224.46909-1-ebiggers@kernel.org>
+References: <20250704023958.73274-1-ebiggers@kernel.org>
+In-Reply-To: <20250704023958.73274-1-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 4 Jul 2025 15:25:54 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXG-eYjzxsZbCZKaje_a3jLAJMPXEu8Bb76O7ueO4tgisQ@mail.gmail.com>
-X-Gm-Features: Ac12FXxiAnERbdwaoRjBCKkpahtdEbFUP_6dhB0XhYuW8ofqI7av77U-BIpSKE4
-Message-ID: <CAMj1kXG-eYjzxsZbCZKaje_a3jLAJMPXEu8Bb76O7ueO4tgisQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Convert fs/verity/ to use SHA-2 library API
+Date: Fri, 4 Jul 2025 15:26:20 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEJ-WBuxj99fXaNU76chVhcXU1bc6X+CP7ogLCSQ2Nz8w@mail.gmail.com>
+X-Gm-Features: Ac12FXyFinlhxao-NhpgSrPuNKOlPVYvOG9lQGG-HRMkgXLt0s5YrQcO-YgGvaQ
+Message-ID: <CAMj1kXEJ-WBuxj99fXaNU76chVhcXU1bc6X+CP7ogLCSQ2Nz8w@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Small cleanups for x86 SHA-256
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, "Theodore Ts'o" <tytso@mit.edu>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 30 Jun 2025 at 19:24, Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, 4 Jul 2025 at 04:42, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> This series, including all its prerequisites, is also available at:
->
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git fsverity-libcrypto-v1
->
-> This series makes fs/verity/ use the SHA-2 library API instead of the
-> old-school crypto API.  This is simpler and more efficient.
->
-> This depends on my SHA-2 library improvements for 6.17 (many patches),
-> so this patchset might need to wait until 6.18.  But I'm also thinking
-> about just basing the fsverity tree on libcrypto-next for 6.17.
+> Two small cleanups for the x86 SHA-256 code.  Applies to libcrypto-next.
 >
 > Eric Biggers (2):
->   lib/crypto: hash_info: Move hash_info.c into lib/crypto/
->   fsverity: Switch from crypto_shash to SHA-2 library
+>   lib/crypto: x86/sha256: Move static_call above kernel-mode FPU section
+>   lib/crypto: x86/sha256: Remove unnecessary checks for nblocks==0
 >
-
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
->  Documentation/filesystems/fsverity.rst |   3 +-
->  crypto/Kconfig                         |   3 -
->  crypto/Makefile                        |   1 -
->  fs/verity/Kconfig                      |   6 +-
->  fs/verity/enable.c                     |   8 +-
->  fs/verity/fsverity_private.h           |  24 +--
->  fs/verity/hash_algs.c                  | 194 +++++++++----------------
->  fs/verity/open.c                       |  36 ++---
->  fs/verity/verify.c                     |   7 +-
->  lib/crypto/Kconfig                     |   3 +
->  lib/crypto/Makefile                    |   2 +
->  {crypto => lib/crypto}/hash_info.c     |   0
->  12 files changed, 107 insertions(+), 180 deletions(-)
->  rename {crypto => lib/crypto}/hash_info.c (100%)
+>  lib/crypto/x86/sha256-avx-asm.S   |  6 ----
+>  lib/crypto/x86/sha256-avx2-asm.S  |  4 ---
+>  lib/crypto/x86/sha256-ni-asm.S    |  5 ----
+>  lib/crypto/x86/sha256-ssse3-asm.S |  5 ----
+>  lib/crypto/x86/sha256.h           | 48 ++++++++++++++++---------------
+>  5 files changed, 25 insertions(+), 43 deletions(-)
 >
+>
+> base-commit: 5ecd15f4949fd36037725bd719b7d3f866291e6c
 > --
 > 2.50.0
 >
