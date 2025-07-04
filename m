@@ -1,67 +1,64 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3872C325B
-	for <linux-crypto@vger.kernel.org>; Thu,  3 Jul 2025 22:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1171DF725;
+	Fri,  4 Jul 2025 02:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751582830; cv=none; b=nmeZ6qgPNQmHdfiwIuUk9xQeF//Sl89xFDXGsqw/1eNmpa/Wklp5vAvu1IwtVofbU2zY0iIjE5yE3O73tUfGFoWDCpaNp1o1XEfrM77/pTPIVQPCK0Nze7+m30inxQYcX3XmZ/AxoDnw6vLEw4eG/A0xW2B+g7K+ykqBBmDiBGE=
+	t=1751596927; cv=none; b=kbgdTYDrO4tpCh1njFScTwA8wRYWEW6E8H10ootrgIZ9iybvd4v8mzF1TCyGw7Y9aloe2MZytGhFNmVoXUUJXra6rxYdbrZ2BUTgT6oL8RFjdh/1Z3UUJ39NL560wI1cBNrvXcOEp0237yULdN+ohO+Ac6gP7YYdYMNyger3xgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751582830; c=relaxed/simple;
-	bh=DSNEbePw/wOeNUq2xUCLQ1pB/OY0aOxgKSwxCOYMEyk=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=E4WZbqG7mXqZ0nNlEYYBHvc3306CRrJ+o3G8Yc7AkkIsELqp/Xbk/R1LADOPbObbFl//MS1EmGxaSumbPz1tIqj1lCpEd6Rsp0H+Wp0iGAX8hfthEISGXtnjOyXIS3rr+ttrZw/fkXWYzgGhB8XdlMLoRv++0Uvri+kxZ2AsN4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P+cRfvDL; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751596927; c=relaxed/simple;
+	bh=v1XVnqJQUcn6sALLisJ1BlBErGJpcSeLgRnAITE6LrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NXdcyUZEuOp83RAX+bX0kx2+X3BmX2eqILTsgXY3XMwI+bMVzYvdimRI7nWeR7K6qMseMhAdkQadzackIImgN7cEHfXmFdWiAqbWBC6Eg0lQciYScP5qYX9vS0sU/Kj9HTTLeUQ2ILa5PzNIS+VCoBRUmAtMkzyQnASoMNRNHsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1IX3xRj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P+cRfvDL"
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751582815;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DSNEbePw/wOeNUq2xUCLQ1pB/OY0aOxgKSwxCOYMEyk=;
-	b=P+cRfvDLupgeT4JgtUg3U1cRMw2ljYea7E1fphtBvveFfsovi6RSEGeW9kdDcNe5CfORjH
-	wpWp79rRbq2DCEUf+i5peSKEw3DBPZ9YlMJzH5CWoryhldmIHracidQOtiKdYlP1Rf9a/d
-	JDUKi/WlDcaa0c+YoIZcR5nZKsOGXtg=
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1IX3xRj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C62B2C4CEE3;
+	Fri,  4 Jul 2025 02:42:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751596927;
+	bh=v1XVnqJQUcn6sALLisJ1BlBErGJpcSeLgRnAITE6LrA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o1IX3xRjVj0mJChbUqCsyn+IZWT5YfZCpABgSsIZB7XG+XwSiUVtUHsCmRkkiGIJF
+	 uTAISAw58gpnaIYXVVB0E5QcJ8u4YmFoGV1gNA8ZpT2DiIVDCPtQpGqOlB3Zta8t+G
+	 xiKSDNpjRWpQtSecITUdNrALbNw4Pb+M2YNkJAB+Lpxg3WRhCU+umkj8+4NyFX0fWz
+	 LmUTONgiFmSl5J7JwAujlWrhSoMpirZHQs73mlqjWoX+jxgGLSU0ftnEUoNf7Yhd+7
+	 5VMH6L7UwQTln2p2tK/afpkeVFlr4XgftRhDxT+B5Yhni/BUnyhK2YdlLKbJxEMIkh
+	 ZrZyd7UDM1K7w==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/2] Small cleanups for x86 SHA-256
+Date: Thu,  3 Jul 2025 19:39:56 -0700
+Message-ID: <20250704023958.73274-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH] crypto: zstd - replace zero-length array with flexible
- array member
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-In-Reply-To: <202507031448.C3DAD52@keescook>
-Date: Fri, 4 Jul 2025 00:46:42 +0200
-Cc: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Nick Terrell <terrelln@fb.com>,
- David Sterba <dsterba@suse.com>,
- linux-hardening@vger.kernel.org,
- linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <1ED66B1B-339B-4C86-AA04-36E1345E0A02@linux.dev>
-References: <20250703171933.253654-2-thorsten.blum@linux.dev>
- <202507031448.C3DAD52@keescook>
-To: Kees Cook <kees@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On 3. Jul 2025, at 23:57, Kees Cook wrote:
-> And likely, to use __counted_by(wksp_size)
+Two small cleanups for the x86 SHA-256 code.  Applies to libcrypto-next.
 
-I hesitated because semantically "size" isn't a "count" although the
-values are the same here.
+Eric Biggers (2):
+  lib/crypto: x86/sha256: Move static_call above kernel-mode FPU section
+  lib/crypto: x86/sha256: Remove unnecessary checks for nblocks==0
 
-> Reviewed-by: Kees Cook <kees@kernel.org>
+ lib/crypto/x86/sha256-avx-asm.S   |  6 ----
+ lib/crypto/x86/sha256-avx2-asm.S  |  4 ---
+ lib/crypto/x86/sha256-ni-asm.S    |  5 ----
+ lib/crypto/x86/sha256-ssse3-asm.S |  5 ----
+ lib/crypto/x86/sha256.h           | 48 ++++++++++++++++---------------
+ 5 files changed, 25 insertions(+), 43 deletions(-)
 
-Thanks!
+
+base-commit: 5ecd15f4949fd36037725bd719b7d3f866291e6c
+-- 
+2.50.0
 
