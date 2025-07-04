@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFC01F4161;
-	Fri,  4 Jul 2025 04:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989631F5821;
+	Fri,  4 Jul 2025 04:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751603015; cv=none; b=FEwkoQXTMpc0msewQj0qJknkOwuSOT2ZjmdLTbor/VCea5ZDRxplApOwz6Oc3JvNprPI2mv3ppv1jI8POX1EOhAwQzqUv6UXouyuL4blmVxfxRYg6EzUeFG3rwzgouYqu5h0i0p1AP5eUBiP5HKQtxDQlxj/IOBBfHAm7Da9yiA=
+	t=1751603016; cv=none; b=qXGYwh21VAOgoVbmAdFiLAIPS3zV8gmpCmJGA/b54hfUzQo7jCqkEfnpuBGazmPV7G9jLrnwTYolIFrbR4jRl2y+49GGz0CZFg7idrJ4N7h84pq2FXWdJgpvdtmtZG0+LZ8BfS6T2QEBPFhAMAy+qJyjWfHV2nbPtEP42xZVkcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751603015; c=relaxed/simple;
-	bh=BH+2fulEg7N3rP+Cp0ptXHtd6vqePLyjcakelLEAKv8=;
+	s=arc-20240116; t=1751603016; c=relaxed/simple;
+	bh=wW2oBdqc6kS5eFxsLnyemvqbmCX1UL8eVoQLeIYK4lg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ES24lTBvmmA6eM8elSz/ZkqeJa8ZhkpcX/VxNBL0D0/O61e+tyC4ps6gAUnsLBu1Qc1BzwUPTv1VyxcsEMnsnRojpDSHumZWJrSdiWNYm9p6kDteIm6lcYCnyvn6lIfhATSIxznUr1mD+SSkrsANe2edESAM0rhW3nGBKO6h1rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A0rLTpfo; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=M/v0LIlVylnXYwLuK9X5DKdH7tIgJdqfIMrQksq1sF3+SKEbfIjmzkZs5ttTkGduVUuBSAaRdXDz1U+FF6AQk8tEEsKP6jmOCwOdHkDngPh+lhyvOWd1iHbd9I6fxeZ2YFt1Nbg0dmEr25FdoGKPI5bWT7yZbTV65xFPqREDCQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AG2aib7i; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A0rLTpfo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AG2aib7i"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751603014; x=1783139014;
+  t=1751603015; x=1783139015;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BH+2fulEg7N3rP+Cp0ptXHtd6vqePLyjcakelLEAKv8=;
-  b=A0rLTpfopInCeedebohk3PomNV6SuMa9H1kLJxCl6SQefxq//PR5nsfp
-   2J6sauV1MSnrLIfSspMkOxSr6O/FJnj3bTI695BPaLeJ5MQ1D9ovyIMgq
-   CLwwiM5LFtVLJbHRaIPomDGLbjHPuUG/l6aEAfZs2HFZL+R/OJcC/Uwx/
-   h/mLp2U3AZk1wNCk44/xeJp32CkFp8XWgtNYhpu3xHHa0tZ7NBcVT3VQp
-   DQm7cOXOpbQDp6O01A+qsDc7T0XsDaFLW8NocPkS3o6Es3P4cnwN2Phqx
-   qrn1vzUBW3qzZgSOPkLhbeB/9fb1AZ6ZaSIxdxxD1kVU6XPK+fzmpk4aH
+  bh=wW2oBdqc6kS5eFxsLnyemvqbmCX1UL8eVoQLeIYK4lg=;
+  b=AG2aib7il1ASr0e+hbnsVs5FrVESuN+rp32xeX3EKq/EopyTXLgPX3fB
+   ThzN0AlcUuInRMHFOBVlxKV7NtveJQdR8AuGVdBpnsKC2FpaHcjN9RqUX
+   YRVpwKFFS5+VgqASE3NkuJVIAsnUzEOa1SOO/cYABaXzpcHUSGQkd/7hl
+   CwhwCB1zK+ep3JiKptJIOFoIiS1p0TgRo6tDiLl1bIrGVm5tol0ApU5ft
+   wXAdE/LkoMNjxp0TmrdVduSlJJn6CZSFxarObcA2ALCkl2BLmHKS+yMm5
+   34FH2JskJWSxYxEkgn0lHg1vvfG10QAf+9mr/B10tvhffsSLH7mKoo7pS
    g==;
-X-CSE-ConnectionGUID: x9WTUhMZQSSsQb0qtlyuYg==
-X-CSE-MsgGUID: 4yJg4qfrRwKiMrUTlsTjEQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53909051"
+X-CSE-ConnectionGUID: 4Zc+GSdLQz6qJh9T1JAIbg==
+X-CSE-MsgGUID: b5OwIAy7S7OZIzEnCBJjZw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53909065"
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="53909051"
+   d="scan'208";a="53909065"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 21:23:25 -0700
-X-CSE-ConnectionGUID: R6/+Mv2TTD21crDu1xq2BQ==
-X-CSE-MsgGUID: 0qwUO5zNRtq8v+k+hMHeKA==
+X-CSE-ConnectionGUID: rqnYPMvvSGaY/iBNq8onIg==
+X-CSE-MsgGUID: 4uiY9tiXSAel0RGfPI8R0w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="153968682"
+   d="scan'208";a="153968685"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
   by orviesa006.jf.intel.com with ESMTP; 03 Jul 2025 21:23:25 -0700
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v10 08/25] crypto: iaa - Simplified, efficient job submissions for non-irq mode.
-Date: Thu,  3 Jul 2025 21:23:06 -0700
-Message-Id: <20250704042323.10318-9-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v10 09/25] crypto: iaa - Deprecate exporting add/remove IAA compression modes.
+Date: Thu,  3 Jul 2025 21:23:07 -0700
+Message-Id: <20250704042323.10318-10-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250704042323.10318-1-kanchana.p.sridhar@intel.com>
 References: <20250704042323.10318-1-kanchana.p.sridhar@intel.com>
@@ -82,80 +82,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds a new procedure, iaa_submit_desc_movdir64b(), that
-directly calls movdir64b. The core iaa_crypto routines that submit
-compress and decompress jobs now invoke iaa_submit_desc_movdir64b() in
-non-irq driver modes, instead of idxd_submit_desc().
+There is no use case right now for kernel users to dynamically
+add/remove IAA compression modes; hence this commit deletes the symbol
+exports of add_iaa_compression_mode() and remove_iaa_compression_mode().
 
-idxd_submit_desc() is called only in irq mode.
-
-This improves latency for the most commonly used iaa_crypto usage
-(i.e., async non-irq) in zswap/zram by eliminating redundant computes
-that would otherwise be incurred in idxd_submit_desc():
-
-  p50: -32 ns
-  p99: -1,048 ns
+The only supported usage model of IAA compression modes is for the code
+to be statically linked during the iaa_crypto module build,
+e.g. iaa_crypto_comp_fixed.c, and for available modes to be registered
+when the first IAA device wq is probed.
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 30 ++++++++++++++--------
- 1 file changed, 20 insertions(+), 10 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index fa23f50a77969..735ad54de2f01 100644
+index 735ad54de2f01..f265a0938ff1a 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -1782,6 +1782,24 @@ iaa_setup_decompress_hw_desc(struct idxd_desc *idxd_desc,
- 	return desc;
+@@ -367,10 +367,6 @@ static void free_iaa_compression_mode(struct iaa_compression_mode *mode)
+  * These tables are typically generated and captured using statistics
+  * collected from running actual compress/decompress workloads.
+  *
+- * A module or other kernel code can add and remove compression modes
+- * with a given name using the exported @add_iaa_compression_mode()
+- * and @remove_iaa_compression_mode functions.
+- *
+  * When a new compression mode is added, the tables are saved in a
+  * global compression mode list.  When IAA devices are added, a
+  * per-IAA device dma mapping is created for each IAA device, for each
+@@ -404,7 +400,6 @@ void remove_iaa_compression_mode(const char *name)
+ out:
+ 	mutex_unlock(&iaa_devices_lock);
  }
+-EXPORT_SYMBOL_GPL(remove_iaa_compression_mode);
  
-+/*
-+ * Call this for non-irq, non-enqcmds job submissions.
-+ */
-+static __always_inline void iaa_submit_desc_movdir64b(struct idxd_wq *wq,
-+						     struct idxd_desc *desc)
-+{
-+	void __iomem *portal = idxd_wq_portal_addr(wq);
-+
-+	/*
-+	 * The wmb() flushes writes to coherent DMA data before
-+	 * possibly triggering a DMA read. The wmb() is necessary
-+	 * even on UP because the recipient is a device.
-+	 */
-+	wmb();
-+
-+	iosubmit_cmds512(portal, desc->hw, 1);
-+}
-+
- static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 			struct idxd_wq *wq,
- 			dma_addr_t src_addr, unsigned int slen,
-@@ -1820,11 +1838,7 @@ static int iaa_compress(struct crypto_tfm *tfm, struct acomp_req *req,
- 					  ctx->mode, iaa_device->compression_modes[ctx->mode]);
+ /**
+  * add_iaa_compression_mode - Add an IAA compression mode
+@@ -481,7 +476,6 @@ int add_iaa_compression_mode(const char *name,
+ 	free_iaa_compression_mode(mode);
+ 	goto out;
+ }
+-EXPORT_SYMBOL_GPL(add_iaa_compression_mode);
  
- 	if (likely(!ctx->use_irq)) {
--		ret = idxd_submit_desc(wq, idxd_desc);
--		if (ret) {
--			dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
--			goto out;
--		}
-+		iaa_submit_desc_movdir64b(wq, idxd_desc);
- 
- 		/* Update stats */
- 		update_total_comp_calls();
-@@ -1912,11 +1926,7 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 	desc = iaa_setup_decompress_hw_desc(idxd_desc, src_addr, slen, dst_addr, *dlen);
- 
- 	if (likely(!ctx->use_irq)) {
--		ret = idxd_submit_desc(wq, idxd_desc);
--		if (ret) {
--			dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
--			goto fallback_software_decomp;
--		}
-+		iaa_submit_desc_movdir64b(wq, idxd_desc);
- 
- 		/* Update stats */
- 		update_total_decomp_calls();
+ static void free_device_compression_mode(struct iaa_device *iaa_device,
+ 					 struct iaa_device_compression_mode *device_mode)
 -- 
 2.27.0
 
