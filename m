@@ -1,129 +1,146 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804F2A927;
-	Sat,  5 Jul 2025 06:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433101FECA1;
+	Sat,  5 Jul 2025 07:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751695308; cv=none; b=smNoVHss34NH5Ji5eyKgU162YKLP6qnG5RkP+CceHbkdiwp9jzfMi4N5W2iwC5uAKHLggLQd2LxztW/MLyy8M17OhRZ3pSiI5MEwmhP45/I9FpZTyKDK52SfZ2nYOzj8bbanfM2D4ksGJt5RblNpdU5BXYUTniChV0FGkogS56o=
+	t=1751700104; cv=none; b=kg7xnD2+E3el7wE/c4Ra2rXidOPciJotFMX6ceILHHPH7R3TasSswa/Yqdn1oE5yz7niyRTf7MirLfzjUG4IpzXOdNyLSp8a36IIxNG5+I5jjQ3jng+GARJrNw/xFZttsdy0Tq3K60734Ms3ZbjdmqMwzs5oaYM2MIedpTpVIaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751695308; c=relaxed/simple;
-	bh=mXBlarxcOHoAVSL3KlFj7ecUcr1aQVy9IEIhWKHJqWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m2yRzMrMLDL+IUQ4PfMsEy/23lfe8bM7Y/Sua60FHHQ9C5W7aipQltnTq1AQFTvPX8sS9OW0Y2d1GjunA60lzHKr/hzazrmKoTgTVJ5bMKcOLAxBIG5kIDHo5zh02tKDz47F199BvbDujL/H73FCKWq+Oz/Lh3psHAwCs6f5XaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eUb118py; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eUb118py"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751695306; x=1783231306;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mXBlarxcOHoAVSL3KlFj7ecUcr1aQVy9IEIhWKHJqWo=;
-  b=eUb118pyDGTL7IkFyoov/heeiebjFrGrJYeCAeSaKcTl2i0u9t7b8piq
-   f2Bj0nu6jz/J2545FWhMfHYETn7KrG9japJTwRmzy9inD1UUGqtphbKrx
-   hAH/IFrHVg9ry6xbZ5DY/En6kFi0EHMXUzeBj/nqsctCTJv/2oBkypsti
-   mxLBZ7vu3djKbJxYIhJxAPH+jBXVX4nqrp8sfOX79dFagEcSXOnDjt/mG
-   vzwGapxDKWZTQZrEYru/zhsgXyNNwQpwL6Qoz+J9JfJdo4Rb8hcJ9XTS8
-   xDWtXgTlk0RoA4AhLEzaFPdarujarAI24DK38gJa5lfLHg71u2n0lRIjD
-   w==;
-X-CSE-ConnectionGUID: xKhsrGbUTkSk11oOUKUsNA==
-X-CSE-MsgGUID: 45l4oH1KSLSYPlgJPmUHvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11484"; a="65061964"
-X-IronPort-AV: E=Sophos;i="6.16,289,1744095600"; 
-   d="scan'208";a="65061964"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 23:01:31 -0700
-X-CSE-ConnectionGUID: NXB8hpnrQ6yeMZX6sGE8Nw==
-X-CSE-MsgGUID: hKgW5LbiQKuieAcNg6LaSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,289,1744095600"; 
-   d="scan'208";a="160445533"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 04 Jul 2025 23:01:26 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXvxj-0004KR-0A;
-	Sat, 05 Jul 2025 06:01:23 +0000
-Date: Sat, 5 Jul 2025 14:00:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	hannes@cmpxchg.org, yosry.ahmed@linux.dev, nphamcs@gmail.com,
-	chengming.zhou@linux.dev, usamaarif642@gmail.com,
-	ryan.roberts@arm.com, 21cnbao@gmail.com,
-	ying.huang@linux.alibaba.com, akpm@linux-foundation.org,
-	senozhatsky@chromium.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
-	surenb@google.com, kristen.c.accardi@intel.com,
-	vinicius.gomes@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, wajdi.k.feghali@intel.com,
-	vinodh.gopal@intel.com, kanchana.p.sridhar@intel.com
-Subject: Re: [PATCH v10 02/25] crypto: iaa - New architecture for IAA device
- WQ comp/decomp usage & core mapping.
-Message-ID: <202507051352.IIeHABGF-lkp@intel.com>
-References: <20250704042323.10318-3-kanchana.p.sridhar@intel.com>
+	s=arc-20240116; t=1751700104; c=relaxed/simple;
+	bh=LF8J+P/koEFy0Ko4H5/UKpmWQHaOlbyQL4Cbdi8KDRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L7IdtBtsYFiofO3eDFo8CbXsxKWzi5ISrBoXa3MXcDZln2lEWqZfN+zn4APPXZvnVsZDbE6nku3p/wD2aKKY4ghBk2tK9AytJJH7/IFdStF634bFNGxYBWm0KblRkmhccZpDqCeLThEWoodg6iSEN3/4/Lnkr/A+DLDt58McR/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.123])
+	by gateway (Coremail) with SMTP id _____8AxlnCB0mhoErsiAQ--.9285S3;
+	Sat, 05 Jul 2025 15:21:37 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.123])
+	by front1 (Coremail) with SMTP id qMiowJBxZOSA0mhoElgKAA--.60805S2;
+	Sat, 05 Jul 2025 15:21:37 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org,
+	herbert@gondor.apana.org.au,
+	jarkko@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	peterhuewe@gmx.de,
+	jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v12 0/4] Add Loongson Security Engine chip driver
+Date: Sat,  5 Jul 2025 15:20:41 +0800
+Message-ID: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704042323.10318-3-kanchana.p.sridhar@intel.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxZOSA0mhoElgKAA--.60805S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCr43XFy5WrW7Cw4xCr4rWFX_yoW5ZrWDpF
+	45C3yakr4UJrsrCr93Jry8CFyfZ3s3Jr9xKa9rXw15ur9rAa48XrW2yFyUAF47AF1rJry2
+	vFWkCF4UCF1UJacCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAF
+	wI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8HKZJUUUUU==
 
-Hi Kanchana,
+The Loongson Security Engine chip supports RNG, SM2, SM3 and SM4
+accelerator engines. Each engine have its own DMA buffer provided
+by the controller. The kernel cannot directly send commands to the
+engine and must first send them to the controller, which will
+forward them to the corresponding engine. Based on these engines,
+TPM2 have been implemented in the chip, then let's treat TPM2 itself
+as an engine.
 
-kernel test robot noticed the following build warnings:
+v12: "loongson-tpm" -> "tmp_loongson"
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master akpm-mm/mm-everything linus/master v6.16-rc4 next-20250704]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+v11: Put all updates to the MAINTAINERS in one patch
+     crypto: statically initialize rng_devices.lock, use this lock in
+             loongson_rng_probe().
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kanchana-P-Sridhar/crypto-iaa-Reorganize-the-iaa_crypto-driver-code/20250704-122613
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250704042323.10318-3-kanchana.p.sridhar%40intel.com
-patch subject: [PATCH v10 02/25] crypto: iaa - New architecture for IAA device WQ comp/decomp usage & core mapping.
-config: x86_64-randconfig-123-20250704 (https://download.01.org/0day-ci/archive/20250705/202507051352.IIeHABGF-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250705/202507051352.IIeHABGF-lkp@intel.com/reproduce)
+v10: mfd: Cleanned up coding style.
+     crypto: Unlimited tfm
+     tpm: Added error check
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507051352.IIeHABGF-lkp@intel.com/
+v9: Moved the base driver back to drivers/mfd. Cleanned up coding style.
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/intel/iaa/iaa_crypto_main.c:94:1: sparse: sparse: symbol 'first_wq_found_lock' was not declared. Should it be static?
+v8: Like Lee said, the base driver goes beyond MFD scope. Since these
+    are all encryption related drivers and SM2, SM3, and SM4 drivers
+    will be added to the crypto subsystem in the future, the base driver
+    need to be changed when adding these drivers. Therefore, it may be
+    more appropriate to place the base driver within the crypto
+    subsystem.
 
-vim +/first_wq_found_lock +94 drivers/crypto/intel/iaa/iaa_crypto_main.c
+    Removed complete callback in all driver. Removed the concepts of
+    "channel", "msg" and "request" as they may be confusing. Used the
+    concepts of "egnine" and "command" may be better.
 
-    77	
-    78	/*
-    79	 * First wq probed, to use until @iaa_crypto_enabled is 1:
-    80	 *
-    81	 * The first wq probed will be entered in the per-CPU comp/decomp wq tables
-    82	 * until the IAA compression modes are registered. This is done to facilitate
-    83	 * the compress/decompress calls from the crypto testmgr resulting from
-    84	 * calling crypto_register_acomp().
-    85	 *
-    86	 * With the new dynamic package-level rebalancing of WQs being
-    87	 * discovered asynchronously and concurrently with tests
-    88	 * triggered from device registration, this is needed to
-    89	 * determine when it is safe for the rebalancing of decomp/comp
-    90	 * WQs to de-allocate the per-package WQs and re-allocate them
-    91	 * based on the latest number of IAA devices and WQs.
-    92	 */
-    93	static struct idxd_wq *first_wq_found;
-  > 94	DEFINE_MUTEX(first_wq_found_lock);
-    95	
+v7: Addressed Huacai's comments.
 
+v6: mfd :MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
+
+    crypto :CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,
+    ls6000se-rng.c ->loongson-rng.c
+
+    tpm: TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+
+v5: mfd: Registered "ls6000se-rng" device in mfd driver
+    tpm: Prefix all with tpm_loongson instead of tpm_lsse.
+         Replace all "ls6000se" with "loongson"
+
+v4: tpm: Removed MODULE_AUTHOR fields.
+         Prefix all with tpm_lsse instead of tpm.
+
+v3: Put the updates to the MAINTAINERS in a separate patch.
+    tpm: Added reminder about Loongson security engine to git log.
+
+v2: Removed misc driver. Added tpm driver.
+
+Qunqin Zhao (4):
+  mfd: Add support for Loongson Security Engine chip controller
+  crypto: loongson - add Loongson RNG driver support
+  tpm: Add a driver for Loongson TPM device
+  MAINTAINERS: Add entry for Loongson Security Engine drivers
+
+ MAINTAINERS                            |   9 +
+ drivers/char/tpm/Kconfig               |   9 +
+ drivers/char/tpm/Makefile              |   1 +
+ drivers/char/tpm/tpm_loongson.c        |  84 ++++++++
+ drivers/crypto/Kconfig                 |   1 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/loongson/Kconfig        |   5 +
+ drivers/crypto/loongson/Makefile       |   1 +
+ drivers/crypto/loongson/loongson-rng.c | 209 ++++++++++++++++++++
+ drivers/mfd/Kconfig                    |  11 ++
+ drivers/mfd/Makefile                   |   2 +
+ drivers/mfd/loongson-se.c              | 253 +++++++++++++++++++++++++
+ include/linux/mfd/loongson-se.h        |  53 ++++++
+ 13 files changed, 639 insertions(+)
+ create mode 100644 drivers/char/tpm/tpm_loongson.c
+ create mode 100644 drivers/crypto/loongson/Kconfig
+ create mode 100644 drivers/crypto/loongson/Makefile
+ create mode 100644 drivers/crypto/loongson/loongson-rng.c
+ create mode 100644 drivers/mfd/loongson-se.c
+ create mode 100644 include/linux/mfd/loongson-se.h
+
+
+base-commit: a79a588fc1761dc12a3064fc2f648ae66cea3c5a
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.45.2
+
