@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E721D293C4F;
-	Sun,  6 Jul 2025 23:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BFE29E11F;
+	Sun,  6 Jul 2025 23:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751843504; cv=none; b=l0Y7yT3+TQufEFeHKJABSCqCpO2flEyRLiuvVPhw9/O9aahvMIBaopwzmRKbY5V0iuH7aw3cvLzgdbp00EX8onotu12vmnhuJcTZ2DhvuKKpaU59n2EuMLipbH/wZZlEaOh4Nz1ynZBbhdaakMoYaih/OnA9kV+V59IwUVmZCCU=
+	t=1751843504; cv=none; b=CAIgK5fwZAXCyf7n1SruYGpi3Apzr5V890eoP39Jin/7G6/2Ca5wM/jvOmRdF9S4Q1CpYkHc8jfvOUR+8anWEeOU49fQqhsOAsILH2Kf76jOBeZyY3JrxNBJXgGy6tbV2TZjSaNdygIsGjnfmTm5+IQzAWQRbYfhOLqJ9OUwGHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751843504; c=relaxed/simple;
-	bh=teoV448S0gcMOu8C5WoirpthEs9NO+TdMk4xuLOATJo=;
+	bh=XWfjXYT5FJgcE1mXz/f5qW91oQVmDL2Rc7vpGHvJHCk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c3MlUQVpVVgbIkheU9rAZfC+2OKH0Lo87z9xTfv7BGMV1QXmQPPmBfuYE8IU4ZjxqrcZDouaftwSYPxLe9j77DVMzxyHHDKJwoZOAhb0Mi3Yfz0fXm0eGTo+nRNgROsdb/osXkxMoSGQ3Y2ZN6QjdtAmcRyYs95NeqCftEMC1bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f3a7W0of; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=j7RM/qkUK366Z98/WYmqJZyQmx/d7eyRAOS5NA6Fq6KEamFciYvBmIWz86FCGKmr1Q2Os3vE3wSF2jhNU1hb0LtCSru5yosTRP+WFYNusszCTQKC2sx0B8CsfE4qyeJ4+jAtyL66qFPTuCRLP04loXODm0HQASPcgVfj9Yi00mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZw/74aY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3a7W0of"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C51AFC4CEF3;
-	Sun,  6 Jul 2025 23:11:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZw/74aY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF17FC4CEF2;
+	Sun,  6 Jul 2025 23:11:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751843503;
-	bh=teoV448S0gcMOu8C5WoirpthEs9NO+TdMk4xuLOATJo=;
+	s=k20201202; t=1751843504;
+	bh=XWfjXYT5FJgcE1mXz/f5qW91oQVmDL2Rc7vpGHvJHCk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f3a7W0of7/Jn47K34fx9xqgeSmDmpq/O5gMCPuremhPnhrR8nwudK87rOYh6nUYqd
-	 OLWLwRYYw2X37+u+56dtHC/AQTkEIjrXb+ZSc7XGDYjHMLfn8D9FSa0Ia+B0+F1S0f
-	 nVJKmv8qJw0qtGzW50Lw+T1S5O1aKhKjvXSvGkGyg+ntLDKkmeiPvRLoF4NhTTitdP
-	 OJ1n/3J0FSbQEL9n1uI1Xb27QBA9uF8IbpUdbePaW6x7BpBlVDWqGkBUHo1NCtSEdG
-	 quNoqEUTbkT2B68MKYjFZGb8+AczHW119pYGvbGi0SgC0eMj9I5feNFdJ7fnEk6ObS
-	 0aqVgphHrc6NA==
+	b=VZw/74aYNyJCvF/E+Jw7X4nCvVoF1NKvNTDjDkO+pFKvp8sd1Hz2oEKygRlE9SNKD
+	 kZ6an3PCWsh5GWm4eMc0X8yp39Cjrm1ZDbhlNAHXcL7A2Hj3wQt94iyJgg1j3YllVj
+	 LxG3tdal1EGEqgsswwdZlSoWFhiD993bVunTZl5qv22vTFOfJTiKotnaUjdeT6OXIC
+	 WaE5LyvYbTUdDj6xTB49htkSUrkp6/8JHXjo7OS4mMbxaYsF5dUu9nY1urWz8hF1yv
+	 /iReSS8SiAP6BNraPAb3kD7t4mi6PAgY3hiAddznUaDRLWYDpS+nqW+r75G3sHJXR7
+	 UwsKKa0LsJ0Rw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -33,10 +33,11 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/5] lib/crypto: arm/poly1305: Remove unneeded empty weak function
-Date: Sun,  6 Jul 2025 16:10:56 -0700
-Message-ID: <20250706231100.176113-2-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 2/5] lib/crypto: arm/poly1305: Fix register corruption in no-SIMD contexts
+Date: Sun,  6 Jul 2025 16:10:57 -0700
+Message-ID: <20250706231100.176113-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250706231100.176113-1-ebiggers@kernel.org>
 References: <20250706231100.176113-1-ebiggers@kernel.org>
@@ -48,39 +49,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The __weak and empty definition of poly1305_blocks_neon() was a
-workaround to prevent link errors when CONFIG_KERNEL_MODE_NEON=n, as
-compilers didn't always optimize out the call.
+Restore the SIMD usability check that was removed by commit 773426f4771b
+("crypto: arm/poly1305 - Add block-only interface").
 
-This call is now guarded by IS_ENABLED(CONFIG_KERNEL_MODE_NEON).  That
-guarantees the call is removed at compile time when NEON support is
-disabled.  Therefore, the workaround is no longer needed.
+This safety check is cheap and is well worth eliminating a footgun.
+While the Poly1305 functions *should* be called only where SIMD
+registers are usable, if they are anyway, they should just do the right
+thing instead of corrupting random tasks' registers and/or computing
+incorrect MACs.  Fixing this is also needed for poly1305_kunit to pass.
 
+Just use may_use_simd() instead of the original crypto_simd_usable(),
+since poly1305_kunit won't rely on crypto_simd_disabled_for_test.
+
+Fixes: 773426f4771b ("crypto: arm/poly1305 - Add block-only interface")
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/arm/poly1305-glue.c | 5 -----
- 1 file changed, 5 deletions(-)
+ lib/crypto/arm/poly1305-glue.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/lib/crypto/arm/poly1305-glue.c b/lib/crypto/arm/poly1305-glue.c
-index 2603b0771f2c..5b65b840c166 100644
+index 5b65b840c166..2d86c78af883 100644
 --- a/lib/crypto/arm/poly1305-glue.c
 +++ b/lib/crypto/arm/poly1305-glue.c
-@@ -25,15 +25,10 @@ asmlinkage void poly1305_blocks_neon(struct poly1305_block_state *state,
- asmlinkage void poly1305_emit_arch(const struct poly1305_state *state,
- 				   u8 digest[POLY1305_DIGEST_SIZE],
- 				   const u32 nonce[4]);
- EXPORT_SYMBOL_GPL(poly1305_emit_arch);
+@@ -5,10 +5,11 @@
+  * Copyright (C) 2019 Linaro Ltd. <ard.biesheuvel@linaro.org>
+  */
  
--void __weak poly1305_blocks_neon(struct poly1305_block_state *state,
--				 const u8 *src, u32 len, u32 hibit)
--{
--}
--
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
- 
+ #include <asm/hwcap.h>
+ #include <asm/neon.h>
++#include <asm/simd.h>
+ #include <crypto/internal/poly1305.h>
+ #include <linux/cpufeature.h>
+ #include <linux/jump_label.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -32,11 +33,11 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
  void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *src,
  			  unsigned int len, u32 padbit)
  {
+ 	len = round_down(len, POLY1305_BLOCK_SIZE);
+ 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
+-	    static_branch_likely(&have_neon)) {
++	    static_branch_likely(&have_neon) && likely(may_use_simd())) {
+ 		do {
+ 			unsigned int todo = min_t(unsigned int, len, SZ_4K);
+ 
+ 			kernel_neon_begin();
+ 			poly1305_blocks_neon(state, src, todo, padbit);
 -- 
 2.50.0
 
