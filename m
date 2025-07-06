@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE882BDC17;
-	Sun,  6 Jul 2025 23:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D522BE02E;
+	Sun,  6 Jul 2025 23:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751843506; cv=none; b=b1ErLvYUokt/t4jA8wQww5G5aVrCqtVU01yrI3SIx9l9RK2/0NmRPLuZ2Z3EIdSxC5ZqqnjjGG/dzNUpcsUMFEi1UuyyeqmFsJZMK2X4hi8SYgQ2mCH9s2Csdzna/c4PafIG/yq7loIUbpeB56W1SZXM/pt2wWDMaSMrW33Ohcw=
+	t=1751843507; cv=none; b=mcI+/udLC0Pe9e38xet3HJnLX9oX5du2mNHDgJTe8oEx0P0YhoFIUXErqxAnaFNyInE84rCvH5k2M3AbEuQcp5lNjLHepLQbM8ydHsmnxtbngTJyBhV+lQivAdiLe9V3obBbbsFdPCg4UV7hjMU4oyZKcJRnbo0oaDySIp81AmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751843506; c=relaxed/simple;
-	bh=bKAMxj63gaupN/jPkfJEbmvoMQTv+UmI9WM2d0qO3mE=;
+	s=arc-20240116; t=1751843507; c=relaxed/simple;
+	bh=Szsb85EsQ+Zh1w4jNZz/88qNbUj4Tj26HrAtW7FyjqU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Od2n2KYu8wCxhyvO5buU8olJ/S3vy/3a87DqIZW5EQ81v3E1Eq0YyuQox2OH/ScqTCgE5y6MfE82GzQQ1a13mty0jMacqhT7gmvy0zULBjRCNd7g8paMqnnyHbJlBNxu6FcXYOf56OMtXwJvO948GyF4DK0bLOdLdnGNr0y9Lwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hzVCEDK5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=AMqU+gKKT26W0QvwEQa0BbC8EcN3k7ZfZF5vw7x/8Ww3Buy5C8NQd5W1wX9luwO3eypTcgyZwpeybapLF0Fpc4QXgfRlcO9iN90R+rjd4edaun2i3uiS2rZy54XnMBgv7Xr87IRbjMHxDrrLFnPSRawQhdpotm70ahYDK0DsaGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLw6kDkr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hzVCEDK5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 684A0C4CEF3;
-	Sun,  6 Jul 2025 23:11:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLw6kDkr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 489D6C4CEED;
+	Sun,  6 Jul 2025 23:11:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1751843506;
-	bh=bKAMxj63gaupN/jPkfJEbmvoMQTv+UmI9WM2d0qO3mE=;
+	bh=Szsb85EsQ+Zh1w4jNZz/88qNbUj4Tj26HrAtW7FyjqU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hzVCEDK5NF34GmUsnPaUCZvX2iUQTpQOn313UltFqgaO2/uvwdrNURrbDQOejBenw
-	 NQ32GzxatZ9iOSvjGKBCRDp1TLey1lsIfGY5lKzKqJgT3S7kVlkXVZQPMQmOHvjJl3
-	 I6AoDiKgHxSVwb1UOXqNFi0JvVUjbvM9SdC+l3h84glZKhKD+f7F4CE8QX0JaJUMBY
-	 K8XHCTU/9F/lzXZ7zrzaawXsmFWrt9mn9UQ5EiESrSOwY8erVhCQKkD+wXmYxOgxNZ
-	 FXZDepSXX+MOy1aaEtASkDz/hjoqWd8x6aRVT8RzlH9UP99hCuNei9cp5+53WrXyxL
-	 D+NwPULFu5UAg==
+	b=BLw6kDkrizdxub9fjMWAZyiLgAQCIRS02Qtjf8aBUsmv08tcyRIpytwlj6zVajjSx
+	 A7gFOuwgrjL+9yKxrWrIi3ND3tl0UGiRNQPz5q2gRrfFMHt1YvASf4ssJfSo4nXqKc
+	 /33jxZCkDvHL93ZJGVywgCZdV7QkLSBkjZvmXZvdv/KuDakTidmefdfshG55iLCOZ1
+	 9gDLNdYzbhTlCxHYF0+CyeHRoGGkaLBeTqQ6p/0CJ839Vrva+HomoBhwSGAC60vnb7
+	 oAIEx4RUFtj1kMA0eLGt5ERxEXxrxjKQv0uci+8sRz4TeJL1SG7XG9IRfuS//mkmpX
+	 Ux/qgcMUvcIEw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH 4/5] lib/crypto: x86/poly1305: Fix register corruption in no-SIMD contexts
-Date: Sun,  6 Jul 2025 16:10:59 -0700
-Message-ID: <20250706231100.176113-5-ebiggers@kernel.org>
+Subject: [PATCH 5/5] lib/crypto: x86/poly1305: Fix performance regression on short messages
+Date: Sun,  6 Jul 2025 16:11:00 -0700
+Message-ID: <20250706231100.176113-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250706231100.176113-1-ebiggers@kernel.org>
 References: <20250706231100.176113-1-ebiggers@kernel.org>
@@ -49,92 +49,66 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Restore the SIMD usability check and base conversion that were removed
-by commit 318c53ae02f2 ("crypto: x86/poly1305 - Add block-only
-interface").
+Restore the len >= 288 condition on using the AVX implementation, which
+was incidentally removed by commit 318c53ae02f2 ("crypto: x86/poly1305 -
+Add block-only interface").  This check took into account the overhead
+in key power computation, kernel-mode "FPU", and tail handling
+associated with the AVX code.  Indeed, restoring this check slightly
+improves performance for len < 256 as measured using poly1305_kunit on
+an "AMD Ryzen AI 9 365" (Zen 5) CPU:
 
-This safety check is cheap and is well worth eliminating a footgun.
-While the Poly1305 functions *should* be called only where SIMD
-registers are usable, if they are anyway, they should just do the right
-thing instead of corrupting random tasks' registers and/or computing
-incorrect MACs.  Fixing this is also needed for poly1305_kunit to pass.
+    Length      Before       After
+    ======  ==========  ==========
+         1     30 MB/s     36 MB/s
+        16    516 MB/s    598 MB/s
+        64   1700 MB/s   1882 MB/s
+       127   2265 MB/s   2651 MB/s
+       128   2457 MB/s   2827 MB/s
+       200   2702 MB/s   3238 MB/s
+       256   3841 MB/s   3768 MB/s
+       511   4580 MB/s   4585 MB/s
+       512   5430 MB/s   5398 MB/s
+      1024   7268 MB/s   7305 MB/s
+      3173   8999 MB/s   8948 MB/s
+      4096   9942 MB/s   9921 MB/s
+     16384  10557 MB/s  10545 MB/s
 
-Just use irq_fpu_usable() instead of the original crypto_simd_usable(),
-since poly1305_kunit won't rely on crypto_simd_disabled_for_test.
+While the optimal threshold for this CPU might be slightly lower than
+288 (see the len == 256 case), other CPUs would need to be tested too,
+and these sorts of benchmarks can underestimate the true cost of
+kernel-mode "FPU".  Therefore, for now just restore the 288 threshold.
 
 Fixes: 318c53ae02f2 ("crypto: x86/poly1305 - Add block-only interface")
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/poly1305_glue.c | 40 +++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ lib/crypto/x86/poly1305_glue.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/lib/crypto/x86/poly1305_glue.c b/lib/crypto/x86/poly1305_glue.c
-index b7e78a583e07..968d84677631 100644
+index 968d84677631..856d48fd422b 100644
 --- a/lib/crypto/x86/poly1305_glue.c
 +++ b/lib/crypto/x86/poly1305_glue.c
-@@ -23,10 +23,46 @@ struct poly1305_arch_internal {
- 	u64 r[2];
- 	u64 pad;
- 	struct { u32 r2, r1, r4, r3; } rn[9];
- };
- 
-+/*
-+ * The AVX code uses base 2^26, while the scalar code uses base 2^64. If we hit
-+ * the unfortunate situation of using AVX and then having to go back to scalar
-+ * -- because the user is silly and has called the update function from two
-+ * separate contexts -- then we need to convert back to the original base before
-+ * proceeding. It is possible to reason that the initial reduction below is
-+ * sufficient given the implementation invariants. However, for an avoidance of
-+ * doubt and because this is not performance critical, we do the full reduction
-+ * anyway. Z3 proof of below function: https://xn--4db.cc/ltPtHCKN/py
-+ */
-+static void convert_to_base2_64(void *ctx)
-+{
-+	struct poly1305_arch_internal *state = ctx;
-+	u32 cy;
-+
-+	if (!state->is_base2_26)
-+		return;
-+
-+	cy = state->h[0] >> 26; state->h[0] &= 0x3ffffff; state->h[1] += cy;
-+	cy = state->h[1] >> 26; state->h[1] &= 0x3ffffff; state->h[2] += cy;
-+	cy = state->h[2] >> 26; state->h[2] &= 0x3ffffff; state->h[3] += cy;
-+	cy = state->h[3] >> 26; state->h[3] &= 0x3ffffff; state->h[4] += cy;
-+	state->hs[0] = ((u64)state->h[2] << 52) | ((u64)state->h[1] << 26) | state->h[0];
-+	state->hs[1] = ((u64)state->h[4] << 40) | ((u64)state->h[3] << 14) | (state->h[2] >> 12);
-+	state->hs[2] = state->h[4] >> 24;
-+	/* Unsigned Less Than: branchlessly produces 1 if a < b, else 0. */
-+#define ULT(a, b) ((a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(a) * 8 - 1))
-+	cy = (state->hs[2] >> 2) + (state->hs[2] & ~3ULL);
-+	state->hs[2] &= 3;
-+	state->hs[0] += cy;
-+	state->hs[1] += (cy = ULT(state->hs[0], cy));
-+	state->hs[2] += ULT(state->hs[1], cy);
-+#undef ULT
-+	state->is_base2_26 = 0;
-+}
-+
- asmlinkage void poly1305_block_init_arch(
- 	struct poly1305_block_state *state,
- 	const u8 raw_key[POLY1305_BLOCK_SIZE]);
- EXPORT_SYMBOL_GPL(poly1305_block_init_arch);
- asmlinkage void poly1305_blocks_x86_64(struct poly1305_arch_internal *ctx,
-@@ -60,11 +96,13 @@ void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *inp,
+@@ -96,11 +96,19 @@ void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *inp,
  
  	/* SIMD disables preemption, so relax after processing each page. */
  	BUILD_BUG_ON(SZ_4K < POLY1305_BLOCK_SIZE ||
  		     SZ_4K % POLY1305_BLOCK_SIZE);
  
--	if (!static_branch_likely(&poly1305_use_avx)) {
-+	if (!static_branch_likely(&poly1305_use_avx) ||
-+	    unlikely(!irq_fpu_usable())) {
-+		convert_to_base2_64(ctx);
++	/*
++	 * The AVX implementations have significant setup overhead (e.g. key
++	 * power computation, kernel FPU enabling) which makes them slower for
++	 * short messages.  Fall back to the scalar implementation for messages
++	 * shorter than 288 bytes, unless the AVX-specific key setup has already
++	 * been performed (indicated by ctx->is_base2_26).
++	 */
+ 	if (!static_branch_likely(&poly1305_use_avx) ||
++	    (len < POLY1305_BLOCK_SIZE * 18 && !ctx->is_base2_26) ||
+ 	    unlikely(!irq_fpu_usable())) {
+ 		convert_to_base2_64(ctx);
  		poly1305_blocks_x86_64(ctx, inp, len, padbit);
  		return;
  	}
- 
- 	do {
 -- 
 2.50.0
 
