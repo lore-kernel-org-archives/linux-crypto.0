@@ -1,46 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D522BE02E;
-	Sun,  6 Jul 2025 23:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8604919005E;
+	Sun,  6 Jul 2025 23:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751843507; cv=none; b=mcI+/udLC0Pe9e38xet3HJnLX9oX5du2mNHDgJTe8oEx0P0YhoFIUXErqxAnaFNyInE84rCvH5k2M3AbEuQcp5lNjLHepLQbM8ydHsmnxtbngTJyBhV+lQivAdiLe9V3obBbbsFdPCg4UV7hjMU4oyZKcJRnbo0oaDySIp81AmY=
+	t=1751844725; cv=none; b=N2pD8VLIFpvKcZ9jmvBA/w2WDkhjTaQcwKgoaDOGSW1iKUELn2aID+TGZSHB4vM9RoTcnNEqwY2xJx9FtULp4Cy3ZxGJ2X8xGUcz8TJEZgyKj7HKhkHYz6urcVYBPbtiYO43jcM/WvwnQTMYegJo4tyclng1wG12lPCizKVgBaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751843507; c=relaxed/simple;
-	bh=Szsb85EsQ+Zh1w4jNZz/88qNbUj4Tj26HrAtW7FyjqU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AMqU+gKKT26W0QvwEQa0BbC8EcN3k7ZfZF5vw7x/8Ww3Buy5C8NQd5W1wX9luwO3eypTcgyZwpeybapLF0Fpc4QXgfRlcO9iN90R+rjd4edaun2i3uiS2rZy54XnMBgv7Xr87IRbjMHxDrrLFnPSRawQhdpotm70ahYDK0DsaGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLw6kDkr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751844725; c=relaxed/simple;
+	bh=0FWbnG7QyBNp1oI6at5H0KfJHP1RiWwGueRRH9I0rQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hIsruB1m6VEfPB37Lij9pH4TlRO9rBjCdoEMjWabcLSwkQTSd/aoYyFqtJgAmEr+jqz+u3KLI1Iv2UqG7UO81BdpMwg3tVVh2Fh78j2mFeLc9itoxmhezMmwha3gng/gu8ko6YlumgIzLK33TxxukRkKaeVcO9cYSz+bQD9sJO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MReIxx3c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLw6kDkr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 489D6C4CEED;
-	Sun,  6 Jul 2025 23:11:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MReIxx3c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4DF4C4CEED;
+	Sun,  6 Jul 2025 23:32:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751843506;
-	bh=Szsb85EsQ+Zh1w4jNZz/88qNbUj4Tj26HrAtW7FyjqU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BLw6kDkrizdxub9fjMWAZyiLgAQCIRS02Qtjf8aBUsmv08tcyRIpytwlj6zVajjSx
-	 A7gFOuwgrjL+9yKxrWrIi3ND3tl0UGiRNQPz5q2gRrfFMHt1YvASf4ssJfSo4nXqKc
-	 /33jxZCkDvHL93ZJGVywgCZdV7QkLSBkjZvmXZvdv/KuDakTidmefdfshG55iLCOZ1
-	 9gDLNdYzbhTlCxHYF0+CyeHRoGGkaLBeTqQ6p/0CJ839Vrva+HomoBhwSGAC60vnb7
-	 oAIEx4RUFtj1kMA0eLGt5ERxEXxrxjKQv0uci+8sRz4TeJL1SG7XG9IRfuS//mkmpX
-	 Ux/qgcMUvcIEw==
+	s=k20201202; t=1751844725;
+	bh=0FWbnG7QyBNp1oI6at5H0KfJHP1RiWwGueRRH9I0rQA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MReIxx3c5U0V0PEN6qmIldU5ZLaa7fs7/P9TWin4tQB/xaxMlTuvOcyvk97KdrriR
+	 036MrKhwraHyPzJNoXTl6OdsjNZTgl3NMVIplm3K9gylbKogoIV+im46/c9i5Gr8N+
+	 mWuxKWQlyryHXtwwrP4LQsKCnqgDknwzUfLVwuAZ0pR3pQJ2HLpWVAW+LBCtRvqjjT
+	 xpBD+DTD0c2CO4tdOwR29XG6qMMkIyg68pejp4Tg0aE7yclzAUCdyir0kvTU+VCxaG
+	 4BCiVUdgHWRWcG8LTM9UzO4OoS+2cyq3pBLLnJ+HUtJiXgx+CQNsrWa77tlAwoiOml
+	 PbqjAuyRQcqFA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 5/5] lib/crypto: x86/poly1305: Fix performance regression on short messages
-Date: Sun,  6 Jul 2025 16:11:00 -0700
-Message-ID: <20250706231100.176113-6-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v4 0/4] KUnit tests for SHA-2 and Poly1305
+Date: Sun,  6 Jul 2025 16:28:13 -0700
+Message-ID: <20250706232817.179500-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250706231100.176113-1-ebiggers@kernel.org>
-References: <20250706231100.176113-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,66 +43,64 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Restore the len >= 288 condition on using the AVX implementation, which
-was incidentally removed by commit 318c53ae02f2 ("crypto: x86/poly1305 -
-Add block-only interface").  This check took into account the overhead
-in key power computation, kernel-mode "FPU", and tail handling
-associated with the AVX code.  Indeed, restoring this check slightly
-improves performance for len < 256 as measured using poly1305_kunit on
-an "AMD Ryzen AI 9 365" (Zen 5) CPU:
+This series is also available at:
 
-    Length      Before       After
-    ======  ==========  ==========
-         1     30 MB/s     36 MB/s
-        16    516 MB/s    598 MB/s
-        64   1700 MB/s   1882 MB/s
-       127   2265 MB/s   2651 MB/s
-       128   2457 MB/s   2827 MB/s
-       200   2702 MB/s   3238 MB/s
-       256   3841 MB/s   3768 MB/s
-       511   4580 MB/s   4585 MB/s
-       512   5430 MB/s   5398 MB/s
-      1024   7268 MB/s   7305 MB/s
-      3173   8999 MB/s   8948 MB/s
-      4096   9942 MB/s   9921 MB/s
-     16384  10557 MB/s  10545 MB/s
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-kunit-v4
 
-While the optimal threshold for this CPU might be slightly lower than
-288 (see the len == 256 case), other CPUs would need to be tested too,
-and these sorts of benchmarks can underestimate the true cost of
-kernel-mode "FPU".  Therefore, for now just restore the 288 threshold.
+This series adds the first KUnit tests for lib/crypto/, including tests
+for SHA-2 and Poly1305.
 
-Fixes: 318c53ae02f2 ("crypto: x86/poly1305 - Add block-only interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/crypto/x86/poly1305_glue.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Changed in v4:
+- Added Poly1305 tests.
+- Split the addition of hash-test-template.h and gen-hash-testvecs.py
+  into a separate patch.
+- Added two more test cases to hash-test-template.h
+  (test_hash_all_lens_up_to_4096 and test_hash_interrupt_context_2).
+- Simplified test_hmac to use a single consolidated test vector.
+- Lots of other cleanups.
 
-diff --git a/lib/crypto/x86/poly1305_glue.c b/lib/crypto/x86/poly1305_glue.c
-index 968d84677631..856d48fd422b 100644
---- a/lib/crypto/x86/poly1305_glue.c
-+++ b/lib/crypto/x86/poly1305_glue.c
-@@ -96,11 +96,19 @@ void poly1305_blocks_arch(struct poly1305_block_state *state, const u8 *inp,
- 
- 	/* SIMD disables preemption, so relax after processing each page. */
- 	BUILD_BUG_ON(SZ_4K < POLY1305_BLOCK_SIZE ||
- 		     SZ_4K % POLY1305_BLOCK_SIZE);
- 
-+	/*
-+	 * The AVX implementations have significant setup overhead (e.g. key
-+	 * power computation, kernel FPU enabling) which makes them slower for
-+	 * short messages.  Fall back to the scalar implementation for messages
-+	 * shorter than 288 bytes, unless the AVX-specific key setup has already
-+	 * been performed (indicated by ctx->is_base2_26).
-+	 */
- 	if (!static_branch_likely(&poly1305_use_avx) ||
-+	    (len < POLY1305_BLOCK_SIZE * 18 && !ctx->is_base2_26) ||
- 	    unlikely(!irq_fpu_usable())) {
- 		convert_to_base2_64(ctx);
- 		poly1305_blocks_x86_64(ctx, inp, len, padbit);
- 		return;
- 	}
+Changed in v3:
+- Split from SHA-512 and SHA-256 series, as per the request from Linus
+  that the tests be kept last on the branch.
+
+Eric Biggers (4):
+  lib/crypto: tests: Add hash-test-template.h and gen-hash-testvecs.py
+  lib/crypto: tests: Add KUnit tests for SHA-224 and SHA-256
+  lib/crypto: tests: Add KUnit tests for SHA-384 and SHA-512
+  lib/crypto: tests: Add KUnit tests for Poly1305
+
+ lib/crypto/Kconfig                    |   2 +
+ lib/crypto/Makefile                   |   2 +
+ lib/crypto/tests/Kconfig              |  46 ++
+ lib/crypto/tests/Makefile             |   5 +
+ lib/crypto/tests/hash-test-template.h | 680 ++++++++++++++++++++++++++
+ lib/crypto/tests/poly1305-testvecs.h  | 186 +++++++
+ lib/crypto/tests/poly1305_kunit.c     | 165 +++++++
+ lib/crypto/tests/sha224-testvecs.h    | 238 +++++++++
+ lib/crypto/tests/sha224_kunit.c       |  39 ++
+ lib/crypto/tests/sha256-testvecs.h    | 238 +++++++++
+ lib/crypto/tests/sha256_kunit.c       |  39 ++
+ lib/crypto/tests/sha384-testvecs.h    | 290 +++++++++++
+ lib/crypto/tests/sha384_kunit.c       |  39 ++
+ lib/crypto/tests/sha512-testvecs.h    | 342 +++++++++++++
+ lib/crypto/tests/sha512_kunit.c       |  39 ++
+ scripts/crypto/gen-hash-testvecs.py   | 146 ++++++
+ 16 files changed, 2496 insertions(+)
+ create mode 100644 lib/crypto/tests/Kconfig
+ create mode 100644 lib/crypto/tests/Makefile
+ create mode 100644 lib/crypto/tests/hash-test-template.h
+ create mode 100644 lib/crypto/tests/poly1305-testvecs.h
+ create mode 100644 lib/crypto/tests/poly1305_kunit.c
+ create mode 100644 lib/crypto/tests/sha224-testvecs.h
+ create mode 100644 lib/crypto/tests/sha224_kunit.c
+ create mode 100644 lib/crypto/tests/sha256-testvecs.h
+ create mode 100644 lib/crypto/tests/sha256_kunit.c
+ create mode 100644 lib/crypto/tests/sha384-testvecs.h
+ create mode 100644 lib/crypto/tests/sha384_kunit.c
+ create mode 100644 lib/crypto/tests/sha512-testvecs.h
+ create mode 100644 lib/crypto/tests/sha512_kunit.c
+ create mode 100755 scripts/crypto/gen-hash-testvecs.py
+
 -- 
 2.50.0
 
