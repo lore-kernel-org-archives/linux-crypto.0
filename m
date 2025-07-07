@@ -1,154 +1,136 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9247F13AF2;
-	Mon,  7 Jul 2025 06:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB231FF5E3
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Jul 2025 08:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751870881; cv=none; b=KcVL7Fy1Iw0J0w/lfIUL/KqJ+AbDPfN9N+/vOW8RhpNOnPTzK5WvsQwZpd2PZZtloB41JaDfiyZjsLr0H2JuF8hlIObC2ul6n0LlmMvc6DsJZ/qHdQt1gxJmR3v5+b9VPNOaOZVG89VoYq0GJYKdil6HRKkJvip0pMptw2MC/Kw=
+	t=1751878468; cv=none; b=a10pCGbeXQZUw9YZUVUQv7CwYbACKW9Q9DPlR3fPqeXhHpULM1zAwON6v2S4BDgN5EDXA6G83spWWqzuG0stN21H2/tlKvoqOgMszoD7z0UkqfkFKGl+WcvTOetNS5JSmHtgez/7Jee8QLEcZGFsitzBZ9znAqhh4JsnfjCREGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751870881; c=relaxed/simple;
-	bh=yqjGONfEVTT7qruYx6XGVxkfroAmgEahVUULQjcwk7o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EJdOx3dirpwdXEpXpco0ETY48SqqEf+4RQMtjjooGUw3NzXVVY7YNXNOQd749fKMlbinY8ymHIVoCk6ejYRqua3ByzJ+03EfOSZigVwhqUY+KQ1qVll0bEeqLrJCLdCpoRJuxJA9Wy+23z5MAyzoZKztTK5Z4ASx1Z+bHJisSEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k/IoXyEd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751878468; c=relaxed/simple;
+	bh=x8rAFjiOt9sQv5yeADGH4CTRlkIXKAuH8E9mZOCCjl0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EFe1aWNerBrzxV1mkduc/UdwRO6b9/jAbGiT8Hb8bqiCGiAjZaBSB0ce3t59uuGUJTOZ9QHJko/E9KIw5Qaw6owpPQQjHg/inft1EyGrKTfrHolgi+bPbFfM2T/6WksVvv6bSgEDF/+tzjsympwjnQE5ZI/gyWqM29yrG+Lq5BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IDH3/RIs; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k/IoXyEd"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 566LsOCa000560;
-	Mon, 7 Jul 2025 06:47:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=C6SFfQ
-	5N16J80f8wETQkLOQv2hbA4g31/sA9BAGHgEY=; b=k/IoXyEdMvnjwzzDGIlHrV
-	MXeMK7qI+p1BcF3mxVOQakZvYIcxnYFGPojv5YgmJuUtouIEP6teiNujqJzuTDYH
-	0pfqbhMjikPFuW/J2LsGbU+MBna5jqyDgQdWqPy7MhRHu8iDO+vxlkOtymRkWn9h
-	DEV+W2EmGpLFI7fYd/DvBOsBwApZK5aG5zHMd72ESI64IgPqT3yV+qc/l5B6eU3p
-	RQQQogz890X5SU4V2Tgzc0qBePsfOXuue0++HPq6w+1gjJvhLoO8gjX4NsKNe7MP
-	JPaUufUkviirXBls9i8IlnEn/tnporM/L32HhJGtvIcSLttPMWILx5YUUVQMcFbg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ptjqqmdm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Jul 2025 06:47:53 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5676ILuB024284;
-	Mon, 7 Jul 2025 06:47:15 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qh324hwx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Jul 2025 06:47:15 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5676lC5v41484716
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 7 Jul 2025 06:47:12 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E693220043;
-	Mon,  7 Jul 2025 06:47:11 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B5DF520040;
-	Mon,  7 Jul 2025 06:47:11 +0000 (GMT)
-Received: from [9.111.159.38] (unknown [9.111.159.38])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  7 Jul 2025 06:47:11 +0000 (GMT)
-Message-ID: <4f939109-60b8-441f-b9c5-b27fa9efd9f4@linux.ibm.com>
-Date: Mon, 7 Jul 2025 08:47:11 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IDH3/RIs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751878467; x=1783414467;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=x8rAFjiOt9sQv5yeADGH4CTRlkIXKAuH8E9mZOCCjl0=;
+  b=IDH3/RIs/QZjQNcrnMSNMb8Tf2Ma9JU9SnUR8Vl4jyTpjmuYl6Xs1jW0
+   t1U+MJsIMh+b1ugy81nHCWKrnHgg3Zcynw5Zr0pJ513zwPJiHHhyG3KF0
+   Ljm81KXsC3IPnUJGTXoesDej5zL78hMjkafonF9UZ9HH+4xT8822s5UvL
+   da28eXkmwBldbhCj1aPOTgfqlcLkKJdZLraV3B7LrSX50qT4pEexT9Js3
+   T48PK3lunPFpG5P8rAr/Ww1yVDN9oXcK3rvFtZWy4bBVSiE/9WazdhwFB
+   uGGQ2/cB9BhTGB8ElVU8huy5BZCLDd9xIS7apukgW26Dagd6qMbia6qRc
+   g==;
+X-CSE-ConnectionGUID: gOu1Ypi+TcOGzWBISMW1xw==
+X-CSE-MsgGUID: 2Cr7CyGATxOEWQuLshqn6g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11486"; a="65545819"
+X-IronPort-AV: E=Sophos;i="6.16,293,1744095600"; 
+   d="scan'208";a="65545819"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 01:54:27 -0700
+X-CSE-ConnectionGUID: /EDxkHbvR2Op7Y1WVZiSnA==
+X-CSE-MsgGUID: aPbs7HoXQfmANIuqhyP9gg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,293,1744095600"; 
+   d="scan'208";a="155514229"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by fmviesa009.fm.intel.com with ESMTP; 07 Jul 2025 01:54:25 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+Subject: [PATCH] crypto: qat - fix virtual channel configuration for GEN6 devices
+Date: Mon,  7 Jul 2025 09:54:17 +0100
+Message-Id: <20250707085417.1286691-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: s390/sha - Fix uninitialized variable in SHA-1
- and SHA-2
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, stable@vger.kernel.org
-References: <20250627185649.35321-1-ebiggers@kernel.org>
- <20250703172032.GA2284@sol>
-Content-Language: en-US, de-DE
-From: Ingo Franzki <ifranzki@linux.ibm.com>
-In-Reply-To: <20250703172032.GA2284@sol>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=GL8IEvNK c=1 sm=1 tr=0 ts=686b6d99 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=60ngpZ1s_TQx9FQ4v-QA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: P-8VuKcr_hXJCPy2aGgZlGXQVItTCWWs
-X-Proofpoint-GUID: P-8VuKcr_hXJCPy2aGgZlGXQVItTCWWs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA3MDAzNyBTYWx0ZWRfX7tkR9rx0uRZj MN2n67xReVirI58bh8hc3WredlwTtcLzqRXwW3Od1n+GY9i7SlV1JSD0OvBWJUA80SwVyoloQkj BlTQo+1s9T+GSabYcd7c9xpzvqZhG14VzO/DZGaHs6YYPBKK09fFFhW6gkBIRCR8JF7PVSTIaK4
- 0GbQX71MzuUR3rTlZ4wgIckeZv41vFSta7R+zo5fhbqLegih+zbgPEoKVKXsrienQlObgjGx7ok P59i5nsiSzFtm1/UnR0N4xYsqIzItiJLW3y7JlkZ/b783TLO3i3ZjCTF051jFNwxmEXD/Uj8ynk 6dy7/st55VBHigFF6A8sES3PwuzrUjoTRp9XJYpj/z3HWtRRqUSAf9cZh96dI8d9sgUDBP10Cqg
- EpVgAMRTb+xt1cPgr2kP3Tq535G6T6Voeoocu7tHPBQHEyeHUsHYof2tgBaSQmgbeG2I/Quv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-07_01,2025-07-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- clxscore=1015 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 spamscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507070037
 
-On 03.07.2025 19:20, Eric Biggers wrote:
-> On Fri, Jun 27, 2025 at 11:56:49AM -0700, Eric Biggers wrote:
->> Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
->> added the field s390_sha_ctx::first_message_part and made it be used by
->> s390_sha_update_blocks().  At the time, s390_sha_update_blocks() was
->> used by all the s390 SHA-1, SHA-2, and SHA-3 algorithms.  However, only
->> the initialization functions for SHA-3 were updated, leaving SHA-1 and
->> SHA-2 using first_message_part uninitialized.
->>
->> This could cause e.g. CPACF_KIMD_SHA_512 | CPACF_KIMD_NIP to be used
->> instead of just CPACF_KIMD_NIP.  It's unclear why this didn't cause a
->> problem earlier; this bug was found only when UBSAN detected the
->> uninitialized boolean.  Perhaps the CPU ignores CPACF_KIMD_NIP for SHA-1
->> and SHA-2.  Regardless, let's fix this.  For now just initialize to
->> false, i.e. don't try to "optimize" the SHA state initialization.
->>
->> Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
->> and earlier, we'll also need to patch SHA-224 and SHA-256, as they
->> hadn't yet been librarified (which incidentally fixed this bug).
->>
->> Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
->> Cc: stable@vger.kernel.org
->> Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
->> Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
->> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
->> ---
->>
->> This is targeting 6.16.  I'd prefer to take this through
->> libcrypto-fixes, since the librarification work is also touching this
->> area.  But let me know if there's a preference for the crypto tree or
->> the s390 tree instead.
->>
->>  arch/s390/crypto/sha1_s390.c   | 1 +
->>  arch/s390/crypto/sha512_s390.c | 2 ++
->>  2 files changed, 3 insertions(+)
-> 
-> I just realized this patch is incomplete: it updated s390_sha1_init(),
-> sha384_init(), and sha512_init(), but not s390_sha1_import() and sha512_import()
-> which need the same fix...  I'll send a v2.
+The TCVCMAP (Traffic Class to Virtual Channel Mapping) field in the
+PVC0CTL and PVC1CTL register controls how traffic classes are mapped to
+virtual channels in QAT GEN6 hardware.
 
-Good finding. Yes the import functions also need the fix.
-Your updates in "[PATCH v2] crypto: s390/sha - Fix uninitialized variable in SHA-1 and SHA-2" look good.
+The driver previously wrote a default TCVCMAP value to this register, but
+this configuration was incorrect.
 
-> 
-> - Eric
+Modify the TCVCMAP configuration to explicitly enable both VC0 and VC1,
+and map Traffic Classes 0 to 7 → VC0 and Traffic Class 8 → VC1.
+Replace FIELD_PREP() with FIELD_MODIFY() to ensure that only the intended
+TCVCMAP field is updated, preserving other bits in the register. This
+prevents unintended overwrites of unrelated configuration fields when
+modifying TC to VC mappings.
 
+Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c | 10 +++++-----
+ drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+index 4d93d5a56ba3..a21a10a8338f 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+@@ -532,8 +532,8 @@ static void set_vc_csr_for_bank(void __iomem *csr, u32 bank_number)
+ 	 * driver must program the ringmodectl CSRs.
+ 	 */
+ 	value = ADF_CSR_RD(csr, ADF_GEN6_CSR_RINGMODECTL(bank_number));
+-	value |= FIELD_PREP(ADF_GEN6_RINGMODECTL_TC_MASK, ADF_GEN6_RINGMODECTL_TC_DEFAULT);
+-	value |= FIELD_PREP(ADF_GEN6_RINGMODECTL_TC_EN_MASK, ADF_GEN6_RINGMODECTL_TC_EN_OP1);
++	FIELD_MODIFY(ADF_GEN6_RINGMODECTL_TC_MASK, &value, ADF_GEN6_RINGMODECTL_TC_DEFAULT);
++	FIELD_MODIFY(ADF_GEN6_RINGMODECTL_TC_EN_MASK, &value, ADF_GEN6_RINGMODECTL_TC_EN_OP1);
+ 	ADF_CSR_WR(csr, ADF_GEN6_CSR_RINGMODECTL(bank_number), value);
+ }
+ 
+@@ -549,7 +549,7 @@ static int set_vc_config(struct adf_accel_dev *accel_dev)
+ 	 * Read PVC0CTL then write the masked values.
+ 	 */
+ 	pci_read_config_dword(pdev, ADF_GEN6_PVC0CTL_OFFSET, &value);
+-	value |= FIELD_PREP(ADF_GEN6_PVC0CTL_TCVCMAP_MASK, ADF_GEN6_PVC0CTL_TCVCMAP_DEFAULT);
++	FIELD_MODIFY(ADF_GEN6_PVC0CTL_TCVCMAP_MASK, &value, ADF_GEN6_PVC0CTL_TCVCMAP_DEFAULT);
+ 	err = pci_write_config_dword(pdev, ADF_GEN6_PVC0CTL_OFFSET, value);
+ 	if (err) {
+ 		dev_err(&GET_DEV(accel_dev), "pci write to PVC0CTL failed\n");
+@@ -558,8 +558,8 @@ static int set_vc_config(struct adf_accel_dev *accel_dev)
+ 
+ 	/* Read PVC1CTL then write masked values */
+ 	pci_read_config_dword(pdev, ADF_GEN6_PVC1CTL_OFFSET, &value);
+-	value |= FIELD_PREP(ADF_GEN6_PVC1CTL_TCVCMAP_MASK, ADF_GEN6_PVC1CTL_TCVCMAP_DEFAULT);
+-	value |= FIELD_PREP(ADF_GEN6_PVC1CTL_VCEN_MASK, ADF_GEN6_PVC1CTL_VCEN_ON);
++	FIELD_MODIFY(ADF_GEN6_PVC1CTL_TCVCMAP_MASK, &value, ADF_GEN6_PVC1CTL_TCVCMAP_DEFAULT);
++	FIELD_MODIFY(ADF_GEN6_PVC1CTL_VCEN_MASK, &value, ADF_GEN6_PVC1CTL_VCEN_ON);
+ 	err = pci_write_config_dword(pdev, ADF_GEN6_PVC1CTL_OFFSET, value);
+ 	if (err)
+ 		dev_err(&GET_DEV(accel_dev), "pci write to PVC1CTL failed\n");
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
+index 78e2e2c5816e..8824958527c4 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
+@@ -99,7 +99,7 @@
+ #define ADF_GEN6_PVC0CTL_OFFSET			0x204
+ #define ADF_GEN6_PVC0CTL_TCVCMAP_OFFSET		1
+ #define ADF_GEN6_PVC0CTL_TCVCMAP_MASK		GENMASK(7, 1)
+-#define ADF_GEN6_PVC0CTL_TCVCMAP_DEFAULT	0x7F
++#define ADF_GEN6_PVC0CTL_TCVCMAP_DEFAULT	0x3F
+ 
+ /* VC1 Resource Control Register */
+ #define ADF_GEN6_PVC1CTL_OFFSET			0x210
+
+base-commit: e60a1d75144ab93ad528fa1457bc9ae704d51ab0
 -- 
-Ingo Franzki
-eMail: ifranzki@linux.ibm.com  
-Tel: ++49 (0)7031-16-4648
-Linux on IBM Z Development, Schoenaicher Str. 220, 71032 Boeblingen, Germany
+2.40.1
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen
-Geschäftsführung: David Faller
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM DATA Privacy Statement: https://www.ibm.com/privacy/us/en/
