@@ -1,50 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CA73214;
-	Mon,  7 Jul 2025 03:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1F61C5496;
+	Mon,  7 Jul 2025 03:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751858958; cv=none; b=jEVQTMorfW0rV73RasLWyxp51absugBcsrtAjUa/4m2zSxrb70k2Xpf3iaug9E0LtU+apuRn3/X7zsWfUilsZROelkjLaRfnkpHvOkWkhB2LlQ2czKyYubUeqiIgSKarq112BiGHZizrhAzGdyaIteKq7BIZ47LK7ei1IfGVHIs=
+	t=1751859029; cv=none; b=VU7ptOtd5zbtyxqa+b2MDleTHBZQ8DtYo/97sXhYvgHDqoGkeIPLGsVxeRQmMJeBRll6VUi5JguB3CxUT4rYkQVkZfiMnallojQTIIQ/yZzaI+ffhvGufQKGRSf/7SUC8CXMikMTuRmGkCXNPEXXuyZfiL4frl7GmcY7MT6sYfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751858958; c=relaxed/simple;
-	bh=RltF7f+GGOAdk1uXeWH9Q0yNg8vSevBU6Owoc5Jc03M=;
+	s=arc-20240116; t=1751859029; c=relaxed/simple;
+	bh=zgWUWXnoOgs4WQuXqxUYSa99tUfMSnh9VTi0Y3wUe+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEFo9xtQRbeQyGE2lJPunu7eLqXeC0JyFh0iLND4Rt28fX9tqdIHDpUNz1I796rr+jQpUlixkY4mWLzI6VDt7O2GRPkqxY2yJnFPOQMv6B25lwwDrzEmFcEBU4OR2mVKao4c4hoVSg1D1U35qrIHu7g0nOIdCRB+lnVD3wHKFyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=R7R9GKRz; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=WSNOAq9Dv7kGfqfvsac9hlhRT86Gx3RiU/+K41vrlvnDzYkhqZX1QSZw5xaX/EvRESKZaymX8IE0ntthbUcXcwAGLq/DkjdjNzBhuOfp8k7xsXo9pa43QrKCCQBTP2D9wY/WXJk9vl6qhgROi8BjX31xJAxA1GEcPJh07eqO+xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kP8AdzW6; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="R7R9GKRz"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kP8AdzW6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=cWbCCLkH3NHBs19k8S1rmvOybIRVJwRDSYoogeJP35M=; b=R7R9GKRzWMSstQEj1dxfFmlDq+
-	rAgcNvZ/yx5GS1nwg5OSaTYjAKHnA6KKf0rWubXKui6tMsnCxoArdEdwJqt017HUG+0GPC5AeYdYC
-	cZG2GX+jQON6cs7tySYn9PAd4Uf2MWkl/FmmrQKWz/maZPH6Isw6hpWJaZwSacTRSPiUHSsmKRq2f
-	kNdOhljKXJKSvecJ9F0AuoSJ77dcrGmeQSy9qV+qwW7hD9Q/eGZaV3oqUiiClhEVUgOrJ0J2LbgnF
-	BAJhtyjnEbshLyizR02mwAiEvk2QioT+KQOodPA2V5DNHsWQ5biC60cjuAZauwzY2SFFVTu+LzjA9
-	/N/Axp0w==;
+	bh=P42oqXCvwCJVBODBakO9+1nFTMsi65NMFfVdfyqI3BI=; b=kP8AdzW6dCKfboNvFPIeFURHjh
+	5PjGFmVcbTJrGZH/VeEuJ5//mjuSgBSUsmGaQQZhDi9NASRXdbQMo3+bDkuWP2v+MwefmdcWc0m8H
+	DOinMvWTgsB/4UBZPpA5rAVqnUXOyUtpieGvryvaX2KFAtdDsdTq+5P2Tonqb6y/fvncvOgW8WOUk
+	U5GjK3FTRVkCzMorpq3pjB3Pq+CHYRdGuI9oajnradFupMmuehdcglFoKP/z/IJA4P8BglqKJpuQG
+	DGoixtx5Pi8yyMmExjq6iY8Ni6GAYuoAci5ywmkq/RJGc55UVQzSNRaK0dsIk2qnmquWt/B8VupSk
+	IaAVHPvA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uYcI7-004VZO-0H;
-	Mon, 07 Jul 2025 11:29:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Jul 2025 15:29:11 +1200
-Date: Mon, 7 Jul 2025 15:29:11 +1200
+	id 1uYcJC-004Vag-2H;
+	Mon, 07 Jul 2025 11:30:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Jul 2025 15:30:19 +1200
+Date: Mon, 7 Jul 2025 15:30:19 +1200
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	"Borislav Petkov (AMD)" <bp@alien8.de>,
-	Michael Roth <michael.roth@amd.com>
-Subject: Re: [PATCH] crypto/ccp: Fix locking on alloc failure handling
-Message-ID: <aGs_B3NsVJiNWTSf@gondor.apana.org.au>
-References: <20250617094354.1357771-1-aik@amd.com>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Antoine Tenart <atenart@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: inside-secure: Fix `dma_unmap_sg()` nents
+ value
+Message-ID: <aGs_S7tDvsxXtJO9@gondor.apana.org.au>
+References: <20250620072930.8223-2-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,35 +51,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250617094354.1357771-1-aik@amd.com>
+In-Reply-To: <20250620072930.8223-2-fourier.thomas@gmail.com>
 
-On Tue, Jun 17, 2025 at 07:43:54PM +1000, Alexey Kardashevskiy wrote:
-> The __snp_alloc_firmware_pages() helper allocates pages in the firmware
-> state (alloc + rmpupdate). In case of failed rmpupdate, it tries
-> reclaiming pages with already changed state. This requires calling
-> the PSP firmware and since there is sev_cmd_mutex to guard such calls,
-> the helper takes a "locked" parameter so specify if the lock needs to
-> be held.
+On Fri, Jun 20, 2025 at 09:29:26AM +0200, Thomas Fourier wrote:
+> The `dma_unmap_sg()` functions should be called with the same nents as the
+> `dma_map_sg()`, not the value the map function returned.
 > 
-> Most calls happen from snp_alloc_firmware_page() which executes without
-> the lock. However
-> 
-> commit 24512afa4336 ("crypto: ccp: Handle the legacy TMR allocation when SNP is enabled")
-> 
-> switched sev_fw_alloc() from alloc_pages() (which does not call the PSP) to
-> __snp_alloc_firmware_pages() (which does) but did not account for the fact
-> that sev_fw_alloc() is called from __sev_platform_init_locked()
-> (via __sev_platform_init_handle_tmr()) and executes with the lock held.
-> 
-> Add a "locked" parameter to __snp_alloc_firmware_pages().
-> Make sev_fw_alloc() use the new parameter to prevent potential deadlock in
-> rmp_mark_pages_firmware() if rmpupdate() failed.
-> 
-> Fixes: 24512afa4336 ("crypto: ccp: Handle the legacy TMR allocation when SNP is enabled")
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> Fixes: c957f8b3e2e5 ("crypto: inside-secure - avoid unmapping DMA memory that was not mapped")
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+> Reviewed-by: Antoine Tenart <atenart@kernel.org>
 > ---
->  drivers/crypto/ccp/sev-dev.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  drivers/crypto/inside-secure/safexcel_hash.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
