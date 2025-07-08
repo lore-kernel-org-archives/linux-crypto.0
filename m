@@ -1,63 +1,194 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CC723D2BB;
-	Tue,  8 Jul 2025 20:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D972192F9;
+	Tue,  8 Jul 2025 21:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752007227; cv=none; b=u8nFQOkCXOmrjbWmOqz3lZjISHFsD/XYv+FsfzHQP63fx04bGfvpgTppT2Pm778N5rRba4kktA/DETyEWsZi9SWuRlt3b87SS7h5570yBYwZF1cFMGwOsCYFAHFFYLt8Rcietvs9L89cwLQpCkjJ+VmKb0OsxjPSlS9wzm6iWXQ=
+	t=1752011089; cv=none; b=G/qeEDfhLiTtC9wcjCDZ1bVkC9CDdcUJuRgmZjSIw2532M6VxlxfmLkn62RthvSB5WtdmMgShyGxBTekVlJ6gL8ByRzFmMNnXSKCB/utC9v+xZ+kirOQ0A/bDtbeWIP/OyJwy+6GI4IrUwajHIro6N/OPSeJH8+hS2wPUQmhZM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752007227; c=relaxed/simple;
-	bh=ZIayn8e4OzueYZMELhL5+WOuvDI/74uotmmV/2guudU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=JSwl/TGDX1GvgIvmv9LiifxoSdeE+AaJS5veO1lw3JR2PO/jkRUmuh4vtLZA6Yy4VJKY3F4BCXDV8KF2HoT0dUO5TeizQCKmaolHlYDDlOMDcsYYqJlB08pGnzahHlsYIg9cgkLOH9Lrl+bka8PShSULlFiQFsQ9TQGHDOiT+nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hmfhclPJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752011089; c=relaxed/simple;
+	bh=7Jf91Uu04pu+2C+bUdrSkKkCPNCAdHpoDzfsFFQwnSU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AmT8pn2UNhXKJsH5P8SnBNrg+vNdE7eewn8LsfUsg92IKIJ8TEZRWtCzhJrsJBl/S8J//ChTL3nxmlgi8KESP4awe/rSAsSZWS8HgmwX8Yvva+EaVgUMmRZXBqY9WUJhcBnrwUHAg2ypalEUWRkkAqm7txjMQx8yQx6oVXUSDMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ar3U1XoX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hmfhclPJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D11C4CEED;
-	Tue,  8 Jul 2025 20:40:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ar3U1XoX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65905C4CEF1;
+	Tue,  8 Jul 2025 21:44:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752007227;
-	bh=ZIayn8e4OzueYZMELhL5+WOuvDI/74uotmmV/2guudU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=hmfhclPJfhDclhh6yFrLN576vtqoJ3grCBVos+ubavvIoqVo7H3dA+BflVtC9+VmY
-	 B8JU5hKLyUvij2APBJzVE+KmgyL+ZYjABMoh/4CR1eok6VcWIT468KVyZ9xSLaQbZ4
-	 MBlPWsm3SOOdNpVeFzfBKd4tw1YGqj2PoxbnolfUEUO4Gb0rOSsZhHmH1Lu6q+7pvv
-	 zckI7tVHLL0baDQtoIkN+9u9QODyYQdFSZ+xJR2Ueti/YjVi0wwSMM1gUyvMV4zyFg
-	 +zwh8NjKv9lAF5DGuttnGlsSjviPB6E+Kl+NqT/WEEORSmu6C1Xtz5NBRmckfaGKuO
-	 FbNdF0bGhWXDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB171380DBEE;
-	Tue,  8 Jul 2025 20:40:49 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto library fix for v6.16-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250708164517.GA1255@sol>
-References: <20250708164517.GA1255@sol>
-X-PR-Tracked-List-Id: <linux-s390.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250708164517.GA1255@sol>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-X-PR-Tracked-Commit-Id: 68279380266a5fa70e664de754503338e2ec3f43
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a3b5b88ea9bc9da00bd89d94738bf7181b2516f7
-Message-Id: <175200724864.8458.2505833963148624358.pr-tracker-bot@kernel.org>
-Date: Tue, 08 Jul 2025 20:40:48 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Heiko Carstens <hca@linux.ibm.com>, Ingo Franzki <ifranzki@linux.ibm.com>
+	s=k20201202; t=1752011088;
+	bh=7Jf91Uu04pu+2C+bUdrSkKkCPNCAdHpoDzfsFFQwnSU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ar3U1XoXkziTibmwnOYMYVcBQLAdcE080fj9vJ+YXi1hJp2HgB5J5aAK0kd4tQ+FL
+	 /5cPMXE/BLXPyY9L6dhk/zrsABU6NSAJ+tMLbeyTO9UdkOQUPX6Udt9ok6BmXeXHdy
+	 7fHMF5JmY3mJNs0+DVvb9lw62eE/y4CnZ8zHUlQkUD118FyWpmgZ49vn4GVa0HNy6V
+	 vFdzdmITQYFJiQ86ljGe2YFZdtVpdcRTPAswUfXn1Rv48gA8n8Oq+Oc7us0Kkmmla8
+	 BhLFgZw0gZkuH39DDkXZEL2H2y92O8ojPT+5d5PIK5YgmMKVJdeOsUMwqxWJEiQ0Uw
+	 AylIjmKyJkLqg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ingo Franzki <ifranzki@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>
+Subject: [PATCH 6.12,6.15] crypto: s390/sha - Fix uninitialized variable in SHA-1 and SHA-2
+Date: Tue,  8 Jul 2025 21:44:23 +0000
+Message-ID: <20250708214423.3786226-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Tue, 8 Jul 2025 09:45:17 -0700:
+commit 68279380266a5fa70e664de754503338e2ec3f43 upstream.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+Commit 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
+added the field s390_sha_ctx::first_message_part and made it be used by
+s390_sha_update() (now s390_sha_update_blocks()).  At the time,
+s390_sha_update() was used by all the s390 SHA-1, SHA-2, and SHA-3
+algorithms.  However, only the initialization functions for SHA-3 were
+updated, leaving SHA-1 and SHA-2 using first_message_part uninitialized.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a3b5b88ea9bc9da00bd89d94738bf7181b2516f7
+This could cause e.g. the function code CPACF_KIMD_SHA_512 |
+CPACF_KIMD_NIP to be used instead of just CPACF_KIMD_SHA_512.  This
+apparently was harmless, as the SHA-1 and SHA-2 function codes ignore
+CPACF_KIMD_NIP; it is recognized only by the SHA-3 function codes
+(https://lore.kernel.org/r/73477fe9-a1dc-4e38-98a6-eba9921e8afa@linux.ibm.com/).
+Therefore, this bug was found only when first_message_part was later
+converted to a boolean and UBSAN detected its uninitialized use.
+Regardless, let's fix this by just initializing to zero.
 
-Thank you!
+Note: in 6.16, we need to patch SHA-1, SHA-384, and SHA-512.  In 6.15
+and earlier, we'll also need to patch SHA-224 and SHA-256, as they
+hadn't yet been librarified (which incidentally fixed this bug).
 
+Fixes: 88c02b3f79a6 ("s390/sha3: Support sha3 performance enhancements")
+Cc: stable@vger.kernel.org
+Reported-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Closes: https://lore.kernel.org/r/12740696-595c-4604-873e-aefe8b405fbf@linux.ibm.com
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
+Link: https://lore.kernel.org/r/20250703172316.7914-1-ebiggers@kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ arch/s390/crypto/sha1_s390.c   | 2 ++
+ arch/s390/crypto/sha256_s390.c | 3 +++
+ arch/s390/crypto/sha512_s390.c | 3 +++
+ 3 files changed, 8 insertions(+)
+
+diff --git a/arch/s390/crypto/sha1_s390.c b/arch/s390/crypto/sha1_s390.c
+index bc3a22704e09..10950953429e 100644
+--- a/arch/s390/crypto/sha1_s390.c
++++ b/arch/s390/crypto/sha1_s390.c
+@@ -36,10 +36,11 @@ static int s390_sha1_init(struct shash_desc *desc)
+ 	sctx->state[2] = SHA1_H2;
+ 	sctx->state[3] = SHA1_H3;
+ 	sctx->state[4] = SHA1_H4;
+ 	sctx->count = 0;
+ 	sctx->func = CPACF_KIMD_SHA_1;
++	sctx->first_message_part = 0;
+ 
+ 	return 0;
+ }
+ 
+ static int s390_sha1_export(struct shash_desc *desc, void *out)
+@@ -60,10 +61,11 @@ static int s390_sha1_import(struct shash_desc *desc, const void *in)
+ 
+ 	sctx->count = ictx->count;
+ 	memcpy(sctx->state, ictx->state, sizeof(ictx->state));
+ 	memcpy(sctx->buf, ictx->buffer, sizeof(ictx->buffer));
+ 	sctx->func = CPACF_KIMD_SHA_1;
++	sctx->first_message_part = 0;
+ 	return 0;
+ }
+ 
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+diff --git a/arch/s390/crypto/sha256_s390.c b/arch/s390/crypto/sha256_s390.c
+index 6f1ccdf93d3e..0204d4bca340 100644
+--- a/arch/s390/crypto/sha256_s390.c
++++ b/arch/s390/crypto/sha256_s390.c
+@@ -29,10 +29,11 @@ static int s390_sha256_init(struct shash_desc *desc)
+ 	sctx->state[5] = SHA256_H5;
+ 	sctx->state[6] = SHA256_H6;
+ 	sctx->state[7] = SHA256_H7;
+ 	sctx->count = 0;
+ 	sctx->func = CPACF_KIMD_SHA_256;
++	sctx->first_message_part = 0;
+ 
+ 	return 0;
+ }
+ 
+ static int sha256_export(struct shash_desc *desc, void *out)
+@@ -53,10 +54,11 @@ static int sha256_import(struct shash_desc *desc, const void *in)
+ 
+ 	sctx->count = ictx->count;
+ 	memcpy(sctx->state, ictx->state, sizeof(ictx->state));
+ 	memcpy(sctx->buf, ictx->buf, sizeof(ictx->buf));
+ 	sctx->func = CPACF_KIMD_SHA_256;
++	sctx->first_message_part = 0;
+ 	return 0;
+ }
+ 
+ static struct shash_alg sha256_alg = {
+ 	.digestsize	=	SHA256_DIGEST_SIZE,
+@@ -88,10 +90,11 @@ static int s390_sha224_init(struct shash_desc *desc)
+ 	sctx->state[5] = SHA224_H5;
+ 	sctx->state[6] = SHA224_H6;
+ 	sctx->state[7] = SHA224_H7;
+ 	sctx->count = 0;
+ 	sctx->func = CPACF_KIMD_SHA_256;
++	sctx->first_message_part = 0;
+ 
+ 	return 0;
+ }
+ 
+ static struct shash_alg sha224_alg = {
+diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
+index 04f11c407763..b53a7793bd24 100644
+--- a/arch/s390/crypto/sha512_s390.c
++++ b/arch/s390/crypto/sha512_s390.c
+@@ -30,10 +30,11 @@ static int sha512_init(struct shash_desc *desc)
+ 	*(__u64 *)&ctx->state[10] = SHA512_H5;
+ 	*(__u64 *)&ctx->state[12] = SHA512_H6;
+ 	*(__u64 *)&ctx->state[14] = SHA512_H7;
+ 	ctx->count = 0;
+ 	ctx->func = CPACF_KIMD_SHA_512;
++	ctx->first_message_part = 0;
+ 
+ 	return 0;
+ }
+ 
+ static int sha512_export(struct shash_desc *desc, void *out)
+@@ -58,10 +59,11 @@ static int sha512_import(struct shash_desc *desc, const void *in)
+ 	sctx->count = ictx->count[0];
+ 
+ 	memcpy(sctx->state, ictx->state, sizeof(ictx->state));
+ 	memcpy(sctx->buf, ictx->buf, sizeof(ictx->buf));
+ 	sctx->func = CPACF_KIMD_SHA_512;
++	sctx->first_message_part = 0;
+ 	return 0;
+ }
+ 
+ static struct shash_alg sha512_alg = {
+ 	.digestsize	=	SHA512_DIGEST_SIZE,
+@@ -95,10 +97,11 @@ static int sha384_init(struct shash_desc *desc)
+ 	*(__u64 *)&ctx->state[10] = SHA384_H5;
+ 	*(__u64 *)&ctx->state[12] = SHA384_H6;
+ 	*(__u64 *)&ctx->state[14] = SHA384_H7;
+ 	ctx->count = 0;
+ 	ctx->func = CPACF_KIMD_SHA_512;
++	ctx->first_message_part = 0;
+ 
+ 	return 0;
+ }
+ 
+ static struct shash_alg sha384_alg = {
+
+base-commit: 7b59ab988c01c190f1b528cf750d6f33b738d1e2
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.50.0.727.gbf7dc18ff4-goog
+
