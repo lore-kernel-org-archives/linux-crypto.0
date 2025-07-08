@@ -1,108 +1,103 @@
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E798229ACD4;
-	Tue,  8 Jul 2025 07:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B9F2DCF46;
+	Tue,  8 Jul 2025 12:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751961097; cv=none; b=lAfgNH+5fL77ztYGWoPFIRAyCN4p9StJgAor3dAStak84IdpgnIE4fM9Pvo91uvgxhEgbT1tMlVVUdwXj5iNXpdRSfNo6G8LH/E7ouS0AEeOjpy4UbvvPvAMmVXGe+lcglF392Iw/CyKzXuwTt/UPgU9rw4XseK23SnB1x9VNbU=
+	t=1751979519; cv=none; b=VNNoKfWADhCTQJAVM8cyf519QecMv0A3Ce22E05HWTvM8IslKLvFkeCo1Bgkeke5vCWOLmpHWlnd8OmDkhFORzAoG/ZXLW/JOs3ZYdvO/bJr0kXOYDbzobRQw4V4C5VkBr4dSfcUTPhMWDBFEHyAC+uIPNAfhMTIB5UY3FZrhgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751961097; c=relaxed/simple;
-	bh=5dvVW3pdLho+n4XOxAaO3k26gyabZjzykXYDBqe1/kE=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=ogNh+bX01DFX/mXml/A6DyyfoIO6I+jrpJFeYVkxknobRW3FEKXHgscZzT77uyK7EySu3ewjy64gNAteW3ykIOhRxQCgC2nQYLrEI5j8FosvP6bvJObAwgd5fz2MBJaHd2yYH+gc7NIJWGDcXXLBnutGsO8GMKFVXDX/tqNR+bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=U0cDHJnp; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1751979519; c=relaxed/simple;
+	bh=U+KD2SfDixKcBf4nlRtTUsKZNe6YPFFReciXtdVOck0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tHR0N8RcQTypidm6n8KzMEWpaa6RIZdO6tYSYjXBq3d4nNiplY4AGF7OSEsH6TcEbQkiNJ+glsbMwqy0DRoZjZkeg2PCwmrrFCo1HG7CttXwAf1Mm46kIHKmB/UmzFu3QIVWhMwV+7bn3m5Q3Y6B/3Z1fPa69Q+f4SiUPUtXAVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=je+z9hs2; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="U0cDHJnp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1751961088;
-	bh=ja69UZHY3ug8x60Ljsr6P2AspfvfaVgkyzqS4C9OqYs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=U0cDHJnp1ukw7nlI7hOPtIQy4B/NbeDkkUWDuiXd4m6JRgFRIl91pAFYkBHFXFk+B
-	 h6LP16p/OMWiX/5rQJvSl9brpSvW/h8dq93umDt9Xd+VWyjTa4Pql29YmrnX+hhFwM
-	 ZPbDCALni4O79zz+3tc8Tz0ghUQ/RFJqfANTNaSQ=
-Received: from meizu-Precision-3660.meizu.com ([14.21.33.153])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 8629B05B; Tue, 08 Jul 2025 15:33:34 +0800
-X-QQ-mid: xmsmtpt1751960014tmcng8hqz
-Message-ID: <tencent_8F6BAFE88DDB6EFCC8D5E81C3BCFEAEBB105@qq.com>
-X-QQ-XMAILINFO: NafziRg7Bx69zREP8ImlZ7bFOVvu5pSrDUDJdJso3mb7i24tC75td0mv6SL0Yz
-	 TpLlAORjRwcKpg8QZEVS9vAa3jcr4D0MKJl82pnqWVJb2ffbdCYttb8NAoNAx1+RY+lOJoVEhRyt
-	 vIuO67689OnTpJ0mAphag4C7auoVrAgK39sf+UYGcOGsdTBG6GYF306Z160r3dBw4JJFn/APZTct
-	 oOFE2Ui4oSz20p03LY3vIgkVnOUf6lZyfBfe2cZ9wgmz+6rSh7UX3qowFBu2ILMUf6dl6Aks69Vx
-	 zN9Jhis2rSzO9jr9MQgwZ+b3/Mrl6CFYQFCSkZ4cF5vl0lEihfWkSsSW12VOjTJS/KjTCRHW4pCE
-	 qHKcgLvr5kxzwBWKLRbrT+uzQg/hgLvAv5b4/nG4MJUZ4HxCvBox27aCp28pRb1GV4XfsLY9y4fW
-	 U/XpFUeH9aQTd712ON94A2rracdo9wQ0uPKvbYP6MjUD+Y+x6+RkHzv619tVT/Z+qD4AEv6iT2cO
-	 grzq48hq4nRShByuyYzJ4mSzwZDahzVq1iIc89foNuv4AVaK6lzrQz5bzG1cs3mZaLJp2ke2OnBY
-	 nCbRv5pZbnt/C+lxQi4eFZt01SsqPhvQfv/a5AR/yVLNb7SahSJ0kQ/hN8YgGnHIFjl59JrqZn0p
-	 aa+IVEUW+89q6qqWwifL9wvQ2yxqSUonpUwZcHh/3a+S34iPD94tCUTlMXlxPurikaA8h+mb65Kn
-	 7ghDUZE1E9HYQpzZ3esq4q9323AdUEjj4Gc8Df+e8xtShdLlSVmxDPrxU4GS1Fkz3cN/NKhOfueW
-	 0Rzr0rdCjR/IiO/6O4sN25U7VANZJDoqrMij4ZMXCLejGkLCsj3OZVywMnh3jI1HHMwA9sf/CfJ/
-	 Ug3JsCZE9OeVqAEtLNcvVwCtVo6TPJK8ERtX4FrDT5vlLwTa2erLpu21ZvYdLQn/e8ax4gNN4gaM
-	 lTuwdV5Jdklse9hBU8JGMPx9MaOsmFBPaAlYxxnmX10beWllS+epjENRaRV9DwsDAVO5L3SWArBX
-	 rVrUiofg==
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Yuwen Chen <ywen.chen@foxmail.com>
-To: ebiggers@kernel.org
-Cc: davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	jaegeuk@kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tytso@mit.edu,
-	ywen.chen@foxmail.com
-Subject: [PATCH v2] fscrypt: improve filename encryption and decryption performance
-Date: Tue,  8 Jul 2025 15:33:34 +0800
-X-OQ-MSGID: <20250708073334.848261-1-ywen.chen@foxmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250704051441.GA4199@sol>
-References: <20250704051441.GA4199@sol>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="je+z9hs2"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a4e742dc97so3363986f8f.0;
+        Tue, 08 Jul 2025 05:58:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751979516; x=1752584316; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=S3jJ8BMukDKm1ntMLDCU6/IXiTPsV5zOI4ZOEY7XVrU=;
+        b=je+z9hs2Tx/OaOZgGwP17geEVlgd1gjlAcNgYwFQI3ufexLLz0A06WBAz0AbySEu9w
+         04iMbjxMVLQkoU+zG0vYrW9aMH15FI61YisBSXxeBFuO77GzNgNyLkFzj2BKrAjSM7mp
+         W0XOeBZ5MWT4aI9LoQyPu7mG2Veey/Gt6ae09O6ETba7PMKtyun1MEA24q8ru9yIiDpP
+         tH9cFmCqNyolv/+LRvfYIC8MpVqB1TStYMhd6s01DmN+Q8HAPn7WEmRYFz5wjq1rhubq
+         3CcI6Xjdo14JDrGVHzTR15eTXy2yYw9OXrcOUK3YeXYHulatO4YGMJKY9xkPbVOdRSzS
+         +ZlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751979516; x=1752584316;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S3jJ8BMukDKm1ntMLDCU6/IXiTPsV5zOI4ZOEY7XVrU=;
+        b=gnBEeqEiTFHZALUgq9nwg8MNuD1PKQZEzlxhlv5cthYb+NCsAtpOVPji3+ZmGuET5U
+         hpX/gXMazrwFmXYz1+5lhHqyx/KJ2PmGDKSvvL9iClV3n1v0qCQW/1Z+Eys2AgkeieV0
+         VZ4nrnOztVP7O72Ck3L0Bap7+8PrYYFfcxIpSTEPGCVkoNcINq8YgUqfKe6kBeVw0EkT
+         4Z6ehU84Jw4jKbyjG8V8yLLO+H/nJqVno+tiiNEnz5WXqdDmB/iOOaa8T96ctQXUUkZT
+         nWE4TmnoWSFSMqdsR708y9HoM4YA2VqcxvJUf1haI+5IRhu1GQnuGEzeGh5uZ61cscQZ
+         R7fg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgnHQkeiBmNz/td5hjl9vt7VuVzHWffjHRSNK6Rky7A7TNdGB1oMP7kgwCGob1uizRS5jRh9xC3aZRwFM8@vger.kernel.org, AJvYcCVnLWap5Ih5JnRIqubgA3wtJTyEcR6Dy/pBgK0l1jkZmeqmC5l7xmfQqDrYrFB7jqZemsNb1XawLDiz/uE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcFtQh01CeNY5Uh83V2M7WzJ1ujI+U/coRtgzG2piotdg6yJXc
+	/pMveJkbI5h7mNgKuenyiXoDru+ZBDi919S1aJqQWmw7Q67LUms5AINl
+X-Gm-Gg: ASbGncsl5T4TCGV7Zk/+oFC9ACgZZDmJRPG74Dv/j8jt6AmXZw8Nqmn6XrTfbleDYX+
+	pjH3zbYFS1+23saS20ZwqBWNfve6mTs0kejBqJZKwrglR6o8xVhA9IdcGHBlO1w8RtCJT+e8Nta
+	Ecc/EH/3rxwRnXYJuygXqPiQR8iorAqcC0bzba7au7XgZAjaRawoOyemQa8GtLxMPHSwp3CFQSU
+	xfyRVUwEK+kbliOHTcUr6CRMkm+olZh1nnJxWY4caF57QuvmDESiEnSMX9CwjQJOIrXGQ+QGEAn
+	367K+io3hSir+M1Lz8P3OKLaKA6PTRbt0D4b3a4fgR6OYApuUQLTwvDD/w5QxXjyove9zyhxuA=
+	=
+X-Google-Smtp-Source: AGHT+IHN7LDQiiQu3mRLFgDwPBd6uS5/8IY+itp6iFFjd+pue4GlyC58MYxMurBFSzPsD4KJPUtVaQ==
+X-Received: by 2002:a5d:64e1:0:b0:3a3:70ab:b274 with SMTP id ffacd0b85a97d-3b5ddfcea37mr2397438f8f.12.1751979515491;
+        Tue, 08 Jul 2025 05:58:35 -0700 (PDT)
+Received: from Red ([2a01:cb1d:897:7800:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-454cd43f0dbsm21985665e9.5.2025.07.08.05.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 05:58:34 -0700 (PDT)
+Date: Tue, 8 Jul 2025 14:58:32 +0200
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, wens@csie.org,
+	jernej.skrabec@gmail.com, samuel@sholland.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/10] crypto: sun8i-ce - remove channel timeout field
+Message-ID: <aG0V-P_Zvlzhi2i7@Red>
+References: <20250626095813.83963-1-ovidiu.panait.oss@gmail.com>
+ <20250626095813.83963-2-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250626095813.83963-2-ovidiu.panait.oss@gmail.com>
 
-On Thu, 3 Jul 2025 22:14:41 -0700, Eric Biggers wrote:
-> I'm guessing you have some debugging options enabled in your kconfig.  Usually
-> the allocations aren't quite *that* expensive.  That being said, it's always
-> been really annoying that they have to be there.
+Le Thu, Jun 26, 2025 at 12:58:04PM +0300, Ovidiu Panait a écrit :
+> Using the number of bytes in the request as DMA timeout is really
+> inconsistent, as large requests could possibly set a timeout of
+> hundreds of seconds.
+> 
+> Remove the per-channel timeout field and use a single, static DMA
+> timeout of 3 seconds for all requests.
+> 
+> Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 
-Turn off most of the debugging options and merge these two patches
-for memory allocation. The performance test results are as follows:
-Before this submission was merged, when creating 10000 files,
-the performance test results are as follows:
-$ time /data/file_creater 10000
-0m10.90s real     0m00.00s user     0m10.69s system
+Yes, timeout was strangely handled, thanks for fixing this
 
-After merge these two patches, the performance is as follows:
-$ time /data/file_creater 10000
-0m05.32s real     0m00.00s user     0m05.28s system
+This patch is:
+Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+Reviewed-by: Corentin LABBE <clabbe.montjoie@gmail.com>
 
-> Unfortunately, as far as I know, you actually can't just allocate the
-> skcipher_request on the stack like that, since the legacy crypto API assumes
-> that the request memory is DMA-able.  On-stack requests also might not be
-> properly aligned (see
-> https://lore.kernel.org/all/CA+55aFxJOzMim_d-O2E2yip8JWo0NdYs_72sNwFKSkTjy8q0Sw@mail.gmail.com/
-> -- may be outdated, but I haven't heard otherwise).
+Thanks
+Regards
 
-Thank you for the reminder. This should be a problem here.
-Just, why can SYNC_SKCIPHER_REQUEST_ON_STACK be allocated on
-the stack? Is it possible to use ALIGN to achieve alignment?
-
-> The problem is really that the legacy crypto API (crypto_skcipher in this case)
-> was never really designed for efficient CPU-based crypto in the first place.
-> The correct solution is to add simple library APIs for the algorithms to
-> lib/crypto/, then update fscrypt to use that instead of crypto_skcipher.
-> I plan to do that, but I'm first focusing on other related things, such as doing
-> the same for fsverity.
-
-This sounds very good. For file name decryption, due to the
-relatively small amount of data, the cost of interface calls
-indeed cannot be ignored. Thank you very much for your guidance.
-
+PS: I started to review all patch one by one, sorry for being slow
