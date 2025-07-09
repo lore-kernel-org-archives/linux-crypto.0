@@ -1,100 +1,187 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670641BC41
-	for <linux-crypto@vger.kernel.org>; Wed,  9 Jul 2025 10:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752056920; cv=none; b=dsvDjkEcChOWLnNfLLc7DD0Kb67+U/1l+jN/Ctrg8JqeYvbkJhLtovYgqpS/BM9cZ12uJykzyH9LITxRxsHCRuXF0EZkruUKmfrWmLFoO3p0gQqv67MeEjxVjAV1SM0uPkoMuGtE00jbRr5hXDAX75qdQG4m6gQiVYMgPTmB+Hk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752056920; c=relaxed/simple;
-	bh=AkfwzbXzQfAXsW7SwyuiRXK49Dtsr0H/Zdta1XDnGuI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=TpsF0OOAPfetlwsgkz7k/ek5ZzRJwb1glUMRQpgW8YqsHYYsZsvpgosWKtFErac/u2R03RfXCeb3QN4LW/CqI5O/pBvjbuV6MtoZiSTbdIxqHCAeQjzZCGdqNMslB/GkkvFXd1Ew1RgTXf8jBSjO6dLwvbK7dSF+VKTRm7IVJaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGCDJVK0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E242D3ECF;
+	Wed,  9 Jul 2025 15:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752074064; cv=fail; b=OyXoXG3JQTyzHZhBwVF0f+S1GQpq16xG1TG6Wu2y3/atKL6Nye8Nz6Gjjc5qtQ7S+UMmw91HSbMawmUQC3cHauD6EECYbH7EI6+7vdYBLMOOo+joZgm8haxrcxVICBkLzttcXXsrADXd0jnYen3KlWv/bc661YHeVA/rXl6id3s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752074064; c=relaxed/simple;
+	bh=RIhxcX90RACjbGogym6xHLvMnLHkL1taVhSu55GsZCo=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ECLuKPGx1H7qx2uk8BcAV+FViGwWRMG+nsey3TKpw/zsdCZhYtGJdJxo/Ruu9hJznpuwsMHHCgjzDCvnOzUCyXOCCvP080/yoqjvYj8VjatdYdxdr9MOWwVMhN6eR6NUUKKv+50gaTwYPvgfX1KbiKD1nvZIW0lzzMAasAvUY+Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o5cqtbos; arc=fail smtp.client-ip=40.107.237.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGCDJVK0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752056917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UPfT/80yQAK1NV+ddQxET2DiICWgTa0fvjoECxIz92M=;
-	b=TGCDJVK0G0J1s0pRi6IqDkI07l3LIAaItnSIT0JBgaHValA3MSU8RL94Xpw5maT6jk2mfw
-	ksqrb/qG+vOm8GbJUil+QnnlYH8flEyWOi1Z50qWYhNGiK8ZmFV4lVqWyEPDnRR5r5Wlm1
-	A8j/A7bvS4SOrOhOk1MbZiNw0pua6BA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-En9MjsdWMLuEG60_hFMatw-1; Wed,
- 09 Jul 2025 06:28:34 -0400
-X-MC-Unique: En9MjsdWMLuEG60_hFMatw-1
-X-Mimecast-MFC-AGG-ID: En9MjsdWMLuEG60_hFMatw_1752056913
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6035D1944A8C;
-	Wed,  9 Jul 2025 10:28:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9C74D180035C;
-	Wed,  9 Jul 2025 10:28:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250709071140.99461-1-ebiggers@kernel.org>
-References: <20250709071140.99461-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-    netdev@vger.kernel.org
-Subject: Re: [PATCH] crypto/krb5: Fix memory leak in krb5_test_one_prf()
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o5cqtbos"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=byYUORxMODvBNv31vcFvQSVusAwhB1Zjn/C36Y57B/YxgDcno39n0sOnoE23H+LP+JwQLXcDwKuHFtBlHRu+WORn2yN4IWcRwD2p4gfFfozfI+/sV9qlkuqTZBmNzkoxDnQZSdfKoQtKKPEBGVJ76z8wjcPVXkcdn1kywJrzHO8ll+zi1ypVvo2jGtGPh1iZCQGRFSKVXhnxCCXKoMnseFuGu/cdCa1Lv2H3C3WZw613ApTBvCt+4pHcgNjpjjIiItWcc/ndgffNx+hlVP6olnTuOO8T2XAK1Ps+4H1ISPAtNXwJy/gDq8HRZcvWHiuHpSLcapiGl6+yUcnHnjCHog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rXKrkSl4K8XDpmrEB4Khce8QjHhPbxd7P2grPbKH/NI=;
+ b=OVgbx/wj/S/t9V45XDFSI0bndRrQpFqxT7UR5Nin5xe6F9guG9ViHkQ8YEBbm1V77Quf31yg6MGVIP7kWfzJeLUHqJZieK9fLpNWK1veqy2jwdsJSCIe2IQdQvKPMaIf0gLy5yGt/sw3ywOUQzFkgvIkcuKYGBOQ8chsTCj5vhjVlIS2xQ/dqDFP2fkBkvlZKV1zT0hO82EPC9F1e6seYGqPLh/RB12D/z0q7uNSySGZOL3hwsgzjlJ1OzgvdMYhPHKx9Y5RjV7S7nHNAMjmQ7/bMj6Hl19CmQvBIEkmMcMK5CWPOUa61Dm+1ZbYcRDpK78jIk8ps3ga2TiiOK8wIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rXKrkSl4K8XDpmrEB4Khce8QjHhPbxd7P2grPbKH/NI=;
+ b=o5cqtbosihOl81XfY9LH1ZneZnm6Ur70ruSG/Znq9ra9CqcG5S2CfJHOwVqH90spsUQFgXyA1kuJjVsTEmhTKnvM7MsYM8tqDEvILJZSh1hjH7RL/Qj966wZdlVYOpn7HmMBu/LaeVvvLmzj8MrKQ091AUMmKXYtORCegM6D4Eo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com (2603:10b6:610:177::5)
+ by PH7PR12MB5879.namprd12.prod.outlook.com (2603:10b6:510:1d7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.18; Wed, 9 Jul
+ 2025 15:14:19 +0000
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::222c:662:e585:3404]) by CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::222c:662:e585:3404%4]) with mapi id 15.20.8901.024; Wed, 9 Jul 2025
+ 15:14:19 +0000
+Message-ID: <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
+Date: Wed, 9 Jul 2025 10:14:17 -0500
+User-Agent: Mozilla Thunderbird
+From: "Pratik R. Sampat" <prsampat@amd.com>
+Subject: Re: [PATCH 1/1] crypto: ccp - Add the SNP_VERIFY_MITIGATION command
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+ herbert@gondor.apana.org.au, bp@alien8.de, michael.roth@amd.com,
+ aik@amd.com, pbonzini@redhat.com
+References: <20250630202319.56331-1-prsampat@amd.com>
+ <20250630202319.56331-2-prsampat@amd.com> <aG0jxWk1eor1A_Gd@google.com>
+Content-Language: en-US
+In-Reply-To: <aG0jxWk1eor1A_Gd@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0057.namprd13.prod.outlook.com
+ (2603:10b6:806:22::32) To CH3PR12MB8660.namprd12.prod.outlook.com
+ (2603:10b6:610:177::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2717584.1752056910.1@warthog.procyon.org.uk>
-Date: Wed, 09 Jul 2025 11:28:30 +0100
-Message-ID: <2717585.1752056910@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8660:EE_|PH7PR12MB5879:EE_
+X-MS-Office365-Filtering-Correlation-Id: bed56eb5-66dd-432b-b1b6-08ddbefb46c0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q1ZRM1p0bTRXamJnZXJZOVBTYkVTWS9NL2NHd1gwQlVPeFBQcnJ5a0cxZUFn?=
+ =?utf-8?B?dUtxRkwwWENWOWQvaExxNEc2RitkTHFZSmEwM3U4WENMdG5IRzFQSXE2V255?=
+ =?utf-8?B?RzhxTEJtdTRVUVBMWXhlVkJTSWdrZkZXZkhBZ0JMajhYWEVUblJUR1h0QUNw?=
+ =?utf-8?B?eEFJekxKVytKTnphVmpGcmRvVDk4T2hBMWVQNFJxSmY2b3ExS0RUYWtmYVRE?=
+ =?utf-8?B?MGpEY2lWRkZxTWNqNkxtT3FxT20vV3RoM0hjakpmZmFtOU14cWdPN3d2Zm9X?=
+ =?utf-8?B?UVliRVZ4ZWE5MUNhTUVPL0p0YWMrTkQ3OGR2Zy8vSkJIZXFYK1FucmFCWjM2?=
+ =?utf-8?B?STZZcGZJd0taMU4wbk1qSkpiVEhIRGNPWkF1Wlczd0VrV29VODBuWm81MkN3?=
+ =?utf-8?B?U3ZQanNTLzVFR1BTS3ZFV01XeG5KWkRqTUpET3dKK3RxUllrV2VDU1M4ZXpz?=
+ =?utf-8?B?dUVHQVJheitlenluTjJ0OVNqWXNyL2xXZUs1OUhLY1BKdmhWc2tPd3RkNE9x?=
+ =?utf-8?B?cEI3bFJKVFFvUUJQaS83cGhteDFuTnpEcGNWemNFV3pNUnBwUDJRV2VJenBy?=
+ =?utf-8?B?NVZrZk1zUXFMeUtaV0dJOUdFeitrRDhveGQySWZ1Y0ZBMkZHRWE5aERKT014?=
+ =?utf-8?B?dGNXdFZHU2dRR2RHQUJLSUQrWG5LMWRNdGdCMzBON2xKb1BXZGVZb285UjdL?=
+ =?utf-8?B?aUdwTFBFQU9oS2lmVXlPdHhlY2Ewa2VDRzVDVUdvcktOZTV3bWxFUnNYM0FE?=
+ =?utf-8?B?Ymg3bnJ5R2pKZDdKRnNmRk9QQ2crRjM0MUlvUHAzR04zT2owb2p5TXFURTZW?=
+ =?utf-8?B?Q3RVRGgvNmJweGRWNFNabVVERy9jNnJqRkhSbjZBQkU1aDJndnRlTCtPNEdl?=
+ =?utf-8?B?UDlwNVMxLzN6WityamZyc3ZKNlV0WWpGT0VwV1p1bVhGRkRVWG9tMFI5MXRj?=
+ =?utf-8?B?MkhUSmh0OEpiOTNYbXozdzVxTFVUeUJVaGQ4QlZTOGJndWZPZmNwNmpMU2JD?=
+ =?utf-8?B?TFczMjVVYlQvcCtjTGc1dlkrdE14MC9KTC84REwrbjZyWDNRODBzT3hQeEtX?=
+ =?utf-8?B?V2I0ZTZ6T3UrYUNsVnlDaFpQeVRXdnFLSFRRV1lWUVc1bkVCYTUwcU5veVhu?=
+ =?utf-8?B?QW8yU0tDZDh2Nm9WQ0JmdDVINnlkQWYzdDJxMTZNMi9oRkU0Zmw0YUxRZCtS?=
+ =?utf-8?B?V1MxWnN6MVNlMTJ5UFpQc203MEEwYmp0SWJnMDMvRVYyQ2p2aUUwVFZybHFs?=
+ =?utf-8?B?YmszREs0WWpKendXNmhoeEVDVWZOSzN3VTdCdVhOeWxPL0JaT1pSdm5XVWRw?=
+ =?utf-8?B?U0NTQjAwRWtWOWhJbVlrK2M4NWl6MHR0Y1hpT0RPQkk0dzcvM0YxaU55ejVT?=
+ =?utf-8?B?bGV0RUFNU1lMWlZkczZRbkNPSnNqSE1SaWpxaWNpUmZ2OW1YWkhkM05GZjhT?=
+ =?utf-8?B?VHRjSElGRDhpdTdzSDdIczF1cXp1Z1JRVkFaOUIwUTg2OFRMMjZ4dWR0SjdX?=
+ =?utf-8?B?Q09OM0I4YWo2d1BLUG1CNk1TTXErL0Z5bW9nc1pIeFBBbVR0Zk1KeHlUaUFQ?=
+ =?utf-8?B?bVNSUXhoVGpsYkVnWElUbXRnVjU2U0cwcStiNit3Vms2L1dCeVdpTjNlZys4?=
+ =?utf-8?B?OWUzR1lLLzhLN3lpZFRZMjgzOFNWWG5oOUZWZm1XcGRNKzFqbVFkSjFic1Bv?=
+ =?utf-8?B?VDJuTmNZYitOTnM0NWJwZzZNMmhwdUtPUGtZMTV4ZU5TT0g0WFZKN0EyQmNU?=
+ =?utf-8?B?SW1POUM1eEwyRGt6b25rRDJLQkZHMmRlL2p6UjQ2ZFlMVnM5cGpHeTF0R3VT?=
+ =?utf-8?B?QVYvQTJCblNiZ0Qwc2FpU1FxK2txcHpkcnNNc3ltNGpLN00wVmpZZ2Q0dVpo?=
+ =?utf-8?B?Z0hlalBDWmVkM3hjSTVRZTdmVlZuKzBpWSs4aUFsRHphdWZJOExCOXBYb0hk?=
+ =?utf-8?Q?nB6atL0goWY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bU1XZVpEZ1FwT2hZODFRRU5NY3JIMlg2bTNobnQ1cFZhZFQveGhPdUxVVjV0?=
+ =?utf-8?B?SGFWVDBLeDFra2VpeW1zUHdOblJMT210SFZzRWVkTDdVQnNzeTUvSE42OGZY?=
+ =?utf-8?B?ZW14TWZ2WG1veThzem9KTkRqN1kvQ29Zc3pYdm13Rm5ZVVlUMDFHWDgxRjRO?=
+ =?utf-8?B?aFN6SURITXBOc3lUdUNkVU5mU05Kckd3UlZnSGYvYzNXdzdXclJaNGtsRWpJ?=
+ =?utf-8?B?QUY0ZzVZbXA0MFgvcDh4QjhLMHFBY3ROZDJoejUya0s1b1MzNVk2RDZZTmRz?=
+ =?utf-8?B?TVdMRFNUNjRLUEFYaUpSTUdyYzVnYnMySisvZ2YxbjluMEx0MmxkZDhvZW44?=
+ =?utf-8?B?ZnNzZ2tiOFRiR0I4NnV4dzdLMmRRaVM0VUx1L05JMC9XUU1xVW5CVTJrbVMz?=
+ =?utf-8?B?YVBaT3JHbHdJaUkvSVBZMVo3YVlrRjFWR1NSWUpNUGxhSHIrSlpoeFZHZmxL?=
+ =?utf-8?B?Qm1YMTNqeXAwV2hzS2p5Mng4SmNNakdrOTVCT0lPazdrYnJGcXk5d1B3WllV?=
+ =?utf-8?B?Wk1GSTVSQWpSOVNBWWpNRUYyVHBkR09tOEdUTDhseXEwcFIvTnBtUFBRZUZ6?=
+ =?utf-8?B?Rm03aFpWOEY5N0ppaE1Hb2RQaWVlajRtdU01NGtZTTdBYUt2aXdtTWFQWCty?=
+ =?utf-8?B?SnVRU2xyYTlhWTMyMmdLZ0EvVm1JTGc3WHJPQVZ6eXcwWjliTXRINVZnSi9s?=
+ =?utf-8?B?SFltVXFkNlJnaG5TTDNyRXJEdkJLSU5LT0NvYXJScm1zVUErWHVtVGEvcHQy?=
+ =?utf-8?B?aXo1QnRnOGc0R0czYzhYeHM0OUE3cm5Ca2xEMklmK3A1V2hxSFJ1YU9wN1g5?=
+ =?utf-8?B?V3VSWGlZODZvNmxkUTZHWHgycCtZYlprbkZSR2IzRldPZUZ2bEMrSWMzMHRU?=
+ =?utf-8?B?OGJ0UFh1WG8xR1BVZVRWYjNvZ05jRTlwWDZFOFY0eUNBeUNuanViK0lBOU1u?=
+ =?utf-8?B?Q1NTbURxcHFPY2dnTXhWdVo2TCtmZ213VEtqaklMNFo0TGZDdGtNRGlpK1NO?=
+ =?utf-8?B?RzdZU0pVeUoyUDFrRUp4bEIybUxyZmpvem9iYVBYL3FvYVZQRXl6eEtMNEtV?=
+ =?utf-8?B?NmM1MHE2RU9ZWEwyTTBQMnJuUGpZTUNFK21WMHBsRHVZZENCK09ET3JBbXlM?=
+ =?utf-8?B?K0dvNWgzN1VUZ3Jad3JneUhTSURQaEhoK2o0UGM3SUNNTzArYnlCMjE1dmpL?=
+ =?utf-8?B?Vzd4all5MGNia0NLWkIrRXJ6bVpPTFk3c0x6aU5qcVdWZmd1bm8vc1NZNDQ3?=
+ =?utf-8?B?UnlKTG1JN3BPVW4xZ0dia3VjMGNJV3BWSm1qUWNSTVorTHFkRUV6Zk5ST0p4?=
+ =?utf-8?B?dDMrZzRRSm0xejYzcXgyYklFQ3J3eTY5VGNSUkNZczFDamRrMmhLblloaGUz?=
+ =?utf-8?B?TjE4ZFZuSWdKSzN3OEFjcDNtaG15SHRyWTVneDBENDFaMXdvM3pDOGh2MzJO?=
+ =?utf-8?B?NCtiVU4vdmtaT0FiOHd1b3NzQXVUTU1meElPbXhQU2x5Q2tHZVE2aWpMZ2tG?=
+ =?utf-8?B?dUhoNi94OW1kNHBPYk10QVRxMDJkNFNXQ1Y2Q2pxM1JGMEhMQmlhUUJwL1hK?=
+ =?utf-8?B?YkRXVXpVR1RMd1lSS0ZBY0YvaGJxTmZzZ2FCNW9vQzhWWVFkU2VuTXZGeDRk?=
+ =?utf-8?B?dGdUZEtLUjhVZEhXZ3M2U2c2c1kzYXp5RWNpWTRNVS9GYzU0NjFFQzVHc3NM?=
+ =?utf-8?B?Zzh6bzcrRzhiK3g4c2laNjd3aENBWS84NWhuM3NnMlQwRnRONGNWYmFIMDhI?=
+ =?utf-8?B?K2dJL3ZHcFJ4TzQ1My9TS2NMamN3STNSQmo0NDRlNmhFZXMvd2VRSDdCNFdo?=
+ =?utf-8?B?bC9FYmN4TTV3VUZpOFJyMmgwZ0JmdEVVRTVTRzBXYVZjZWhIcFRzQWd5b3hF?=
+ =?utf-8?B?VDN0MFlpWW5qbm4wZ3FmZEdzblB0b2J0UDQyQkhFQU90Vy84STZBWHRscWtU?=
+ =?utf-8?B?OFBMYlhFdGFHTGpTd1pZSWlCRklYZUJ6Q0U4dFNtRHR1ck5kc2l5Z0xVclNx?=
+ =?utf-8?B?eGtpbG51VmNhdzdzWE9zTjR1MHI2eEJLOUZrNXY4UmxJbjAyUVhFZzJRelhJ?=
+ =?utf-8?B?Z1V2aDZpdnJtalNtUytqN2FtYWJENUlwUEpJdVJvRzY0OXpkd0pwclNaQ0Jq?=
+ =?utf-8?Q?kjVh6uO4j8N4fiIK0BQFrN5GH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bed56eb5-66dd-432b-b1b6-08ddbefb46c0
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8660.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2025 15:14:19.1993
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nTCGPsZi/7tU2i2SZ+WfudCYMb/R+ee0BAMXgq6tAE06creMz7Svoz/QXm3l3TYH/7H3gp7euS3jyTjr2uBjXg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5879
 
-Hi Herbert,
+Hi Sean,
 
-Can you pick this up?
-
-Eric Biggers <ebiggers@kernel.org> wrote:
-
-> Fix a leak reported by kmemleak:
+On 7/8/25 8:57 AM, Sean Christopherson wrote:
+> On Mon, Jun 30, 2025, Pratik R. Sampat wrote:
+>> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
+>> can be used to query the status of currently supported vulnerability
+>> mitigations and to initiate mitigations within the firmware.
+>>
+>> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
+>> more details.
 > 
->     unreferenced object 0xffff8880093bf7a0 (size 32):
->       comm "swapper/0", pid 1, jiffies 4294877529
->       hex dump (first 32 bytes):
->         9d 18 86 16 f6 38 52 fe 86 91 5b b8 40 b4 a8 86  .....8R...[.@...
->         ff 3e 6b b0 f8 19 b4 9b 89 33 93 d3 93 85 42 95  .>k......3....B.
->       backtrace (crc 8ba12f3b):
->         kmemleak_alloc+0x8d/0xa0
->         __kmalloc_noprof+0x3cd/0x4d0
->         prep_buf+0x36/0x70
->         load_buf+0x10d/0x1c0
->         krb5_test_one_prf+0x1e1/0x3c0
->         krb5_selftest.cold+0x7c/0x54c
->         crypto_krb5_init+0xd/0x20
->         do_one_initcall+0xa5/0x230
->         do_initcalls+0x213/0x250
->         kernel_init_freeable+0x220/0x260
->         kernel_init+0x1d/0x170
->         ret_from_fork+0x301/0x410
->         ret_from_fork_asm+0x1a/0x30
-> 
-> Fixes: fc0cf10c04f4 ("crypto/krb5: Implement crypto self-testing")
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Nothing here explains why this needs to be exposed directly to userspace.
 
-Acked-by: David Howells <dhowells@redhat.com>
+The general idea is that not all mitigations may/can be applied
+immediately, for ex: some mitigations may require all the guest to be
+shutdown before they can be applied. So a host userspace interface to
+query+apply mitigations can be useful for that coordination before
+attempting to apply the mitigation.
 
+I also realized that I could use SNP_FEATURE_INFO's cached results from
+Ashish's CipherTextHiding series[1] to save us a firmware call if the
+verify mitigation in the ECX vector is unsupported.
+
+[1]: https://lore.kernel.org/kvm/cover.1751397223.git.ashish.kalra@amd.com/
+
+Thanks,
+Pratik 
