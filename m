@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCD62451C3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CAB2459F8;
 	Wed,  9 Jul 2025 20:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752091486; cv=none; b=BgAR/nzmiZavKKGJnhHNjjuIQpc/VkcX13QVTXWxCDInGTDzDuNljSRxiD7Bnug/990VVA+GzNW9MPjCYoq2YKfxRvh6AUPARnBfmhY9ilpmhEkVElBOQuR/C2H5z4h2+qKrT/5pwYTb7+mrf9nk7C8YkN2hrv03h1HEloIrIoA=
+	t=1752091486; cv=none; b=tGb68SMbIA0aSFa2/htGGNVbsxHt5BQ5laN6XhK+gHFxrjS/vYo/924xip4wAovuSYJ0W4klO7JZVSY2c7vP+PP13IeTLfwbD3SSoP+jJW27UXSQvrzXL9MJLcDXvwUOQwmg2dqe/LqBGShBnCBiO1WNMXKUL3FkcUxOKpUYS2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752091486; c=relaxed/simple;
-	bh=f/+eTrkd+hKOFmw69sSWlTlrVdnVV1GLHGOjgky+nUc=;
+	bh=ejx+AKaCrKlVyfipzv8g6m/dOKhPYN90jqLI7DXmKMU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VGqwdp/gZPtT0qohuGXUoxI11ROUCv1Eac3Ylp0Kx9Q8SxqJ/Goegi0XGpZO7+t/ahvxyToLShOUTPPPP7wk07qrMh3EYFEht5KhJ26+pepeJ995/it8EzuqVr9WTg14gZgZZSpaNDxw8KGjIDc+KbxEkA43THMRf7O2lHlS7C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulgwEIbl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QcgJNr5bkMovGYnMIhe3jT98TjCf0K7P5HiLrvIxoARKvVEIsu5Rxj2f+OZTRld8G8jOCVDSprCHiw8ig/VZKLXYv+7V8SkxDrMo47Th4wnHaUoUrNYSopQIbfRaiZnJOkebaKzsSrpbpxUPEc01r2l6bB+juKn0T0kyOXuyAfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dJFK+jW9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulgwEIbl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3271C4CEF4;
-	Wed,  9 Jul 2025 20:04:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dJFK+jW9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1342DC4CEF0;
+	Wed,  9 Jul 2025 20:04:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752091485;
-	bh=f/+eTrkd+hKOFmw69sSWlTlrVdnVV1GLHGOjgky+nUc=;
+	s=k20201202; t=1752091486;
+	bh=ejx+AKaCrKlVyfipzv8g6m/dOKhPYN90jqLI7DXmKMU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ulgwEIblVExqxNzDYOiShjqpmuT6BLqHqa54GnEPlmBHNOIoyrVbcpuafjMBEk2Up
-	 iVNbK6XHF95S9PWFuslSy3WMZ7wuFfOTbzVl1f2mRgvse9+cp/SXyKmfnlaXdy5O6Y
-	 HMY3S8H8wAu188p0lbEx3cSF2KOcJH0t6znP/oPtf29A8W378aFLKOt4ppHlgqnELU
-	 1jnh+oeu2SoHc39hbp0IK+CznKWdhe2a2SYfZrgxNvuWgrZVSUtHY9+XUEwMI6Izlz
-	 Qk+Y4VtuEoEWiVPdbfe1VD8kr9zhs5tr/ac4uup8JI5SOg80u6cSu4bqYWAIN863Uc
-	 qaUpQMdBCa8AA==
+	b=dJFK+jW9wVSnZAMujXRgyVC6VzPvPr2PYhfy1pzxGxWnM+28eCH1CjR0M83KN+ofL
+	 wzMrY/FzLFGReKWRLxKb/ncgaJ6M0ym18AD0IBGYNeFlsUzuYXk+dBZH6XZKAmZxoG
+	 OUKWWPE3nslXWZ50k8uCcuXSsk8QNgTWXhWxYhCgvb5aZJdZZkjUKHQe0R3dgOA4r5
+	 dJDwOazip1aI3haSEGeq7OF07MXgmZqACHGJhpvWFFAfxAtvKRV90JMSKmIJJqAK1/
+	 sr+7avmAWsJd5/fkQPjrB1PmB+zSQZ0X0bmcRDAWohShQ5i9kRNZ6wK53mq4SscyJn
+	 dzAE7CY2ZbLMQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v5 1/4] lib/crypto: tests: Add hash-test-template.h and gen-hash-testvecs.py
-Date: Wed,  9 Jul 2025 13:01:09 -0700
-Message-ID: <20250709200112.258500-2-ebiggers@kernel.org>
+Subject: [PATCH v5 2/4] lib/crypto: tests: Add KUnit tests for SHA-224 and SHA-256
+Date: Wed,  9 Jul 2025 13:01:10 -0700
+Message-ID: <20250709200112.258500-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250709200112.258500-1-ebiggers@kernel.org>
 References: <20250709200112.258500-1-ebiggers@kernel.org>
@@ -46,833 +46,686 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add hash-test-template.h which generates the following KUnit test cases
-for hash functions:
-
-    test_hash_test_vectors
-    test_hash_all_lens_up_to_4096
-    test_hash_incremental_updates
-    test_hash_buffer_overruns
-    test_hash_overlaps
-    test_hash_alignment_consistency
-    test_hash_ctx_zeroization
-    test_hash_interrupt_context_1
-    test_hash_interrupt_context_2
-    test_hmac  (when HMAC is supported)
-    benchmark_hash  (when CONFIG_CRYPTO_LIB_BENCHMARK=y)
-
-The initial use cases for this will be sha224_kunit, sha256_kunit,
-sha384_kunit, sha512_kunit, and poly1305_kunit.
-
-Add a Python script gen-hash-testvecs.py which generates the test
-vectors required by test_hash_test_vectors,
-test_hash_all_lens_up_to_4096, and test_hmac.
+Add KUnit test suites for the SHA-224 and SHA-256 library functions,
+including the corresponding HMAC support.  The core test logic is in the
+previously-added hash-test-template.h.  This commit just adds the actual
+KUnit suites, and it adds the generated test vectors to the tree so that
+gen-hash-testvecs.py won't have to be run at build time.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/tests/hash-test-template.h | 683 ++++++++++++++++++++++++++
- scripts/crypto/gen-hash-testvecs.py   | 102 ++++
- 2 files changed, 785 insertions(+)
- create mode 100644 lib/crypto/tests/hash-test-template.h
- create mode 100755 scripts/crypto/gen-hash-testvecs.py
+ lib/crypto/Kconfig                 |   2 +
+ lib/crypto/Makefile                |   2 +
+ lib/crypto/tests/Kconfig           |  29 ++++
+ lib/crypto/tests/Makefile          |   3 +
+ lib/crypto/tests/sha224-testvecs.h | 238 +++++++++++++++++++++++++++++
+ lib/crypto/tests/sha224_kunit.c    |  39 +++++
+ lib/crypto/tests/sha256-testvecs.h | 238 +++++++++++++++++++++++++++++
+ lib/crypto/tests/sha256_kunit.c    |  39 +++++
+ 8 files changed, 590 insertions(+)
+ create mode 100644 lib/crypto/tests/Kconfig
+ create mode 100644 lib/crypto/tests/Makefile
+ create mode 100644 lib/crypto/tests/sha224-testvecs.h
+ create mode 100644 lib/crypto/tests/sha224_kunit.c
+ create mode 100644 lib/crypto/tests/sha256-testvecs.h
+ create mode 100644 lib/crypto/tests/sha256_kunit.c
 
-diff --git a/lib/crypto/tests/hash-test-template.h b/lib/crypto/tests/hash-test-template.h
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index ee7e1e27ea6a9..c2a28a50ac576 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -178,10 +178,12 @@ config CRYPTO_LIB_SHA512_ARCH
+ 	default y if X86_64
+ 
+ config CRYPTO_LIB_SM3
+ 	tristate
+ 
++source "lib/crypto/tests/Kconfig"
++
+ if !KMSAN # avoid false positives from assembly
+ if ARM
+ source "lib/crypto/arm/Kconfig"
+ endif
+ if ARM64
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index 533bb1533e19b..8aaec39b85608 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -6,10 +6,12 @@ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $(<) > $(@)
+ 
+ quiet_cmd_perlasm_with_args = PERLASM $@
+       cmd_perlasm_with_args = $(PERL) $(<) void $(@)
+ 
++obj-$(CONFIG_KUNIT)				+= tests/
++
+ obj-$(CONFIG_CRYPTO_HASH_INFO)			+= hash_info.o
+ 
+ obj-$(CONFIG_CRYPTO_LIB_UTILS)			+= libcryptoutils.o
+ libcryptoutils-y				:= memneq.o utils.o
+ 
+diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
 new file mode 100644
-index 0000000000000..ffee1741a1b36
+index 0000000000000..455d05f61ac3e
 --- /dev/null
-+++ b/lib/crypto/tests/hash-test-template.h
-@@ -0,0 +1,683 @@
++++ b/lib/crypto/tests/Kconfig
+@@ -0,0 +1,29 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++
++# Option is named *_SHA256_KUNIT_TEST, though both SHA-224 and SHA-256 tests are
++# included, for consistency with the naming used elsewhere (e.g. CRYPTO_SHA256).
++config CRYPTO_LIB_SHA256_KUNIT_TEST
++	tristate "KUnit tests for SHA-224 and SHA-256" if !KUNIT_ALL_TESTS
++	depends on KUNIT
++	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
++	select CRYPTO_LIB_BENCHMARK_VISIBLE
++	select CRYPTO_LIB_SHA256
++	help
++	  KUnit tests for the SHA-224 and SHA-256 cryptographic hash functions
++	  and their corresponding HMACs.
++
++config CRYPTO_LIB_BENCHMARK_VISIBLE
++	bool
++
++config CRYPTO_LIB_BENCHMARK
++	bool "Include benchmarks in KUnit tests for cryptographic functions"
++	depends on CRYPTO_LIB_BENCHMARK_VISIBLE
++	help
++	  Include benchmarks in the KUnit tests for cryptographic functions.
++	  The benchmark results are printed to the kernel log when the
++	  corresponding KUnit test suite runs.
++
++	  This is useful for evaluating the performance of the cryptographic
++	  functions.  However, it will increase the runtime of the KUnit tests.
++
++	  If you're only interested in correctness testing, leave this disabled.
+diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
+new file mode 100644
+index 0000000000000..a0e5e117dc33e
+--- /dev/null
++++ b/lib/crypto/tests/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++
++obj-$(CONFIG_CRYPTO_LIB_SHA256_KUNIT_TEST) += sha224_kunit.o sha256_kunit.o
+diff --git a/lib/crypto/tests/sha224-testvecs.h b/lib/crypto/tests/sha224-testvecs.h
+new file mode 100644
+index 0000000000000..523adc178e1a8
+--- /dev/null
++++ b/lib/crypto/tests/sha224-testvecs.h
+@@ -0,0 +1,238 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha224 */
++
++static const struct {
++	size_t data_len;
++	u8 digest[SHA224_DIGEST_SIZE];
++} hash_testvecs[] = {
++	{
++		.data_len = 0,
++		.digest = {
++			0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9,
++			0x47, 0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4,
++			0x15, 0xa2, 0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a,
++			0xc5, 0xb3, 0xe4, 0x2f,
++		},
++	},
++	{
++		.data_len = 1,
++		.digest = {
++			0xe3, 0x4d, 0x79, 0x17, 0x75, 0x35, 0xdc, 0xd2,
++			0x27, 0xc9, 0x9d, 0x0b, 0x90, 0x0f, 0x21, 0x5d,
++			0x95, 0xfb, 0x9c, 0x6d, 0xa8, 0xec, 0x19, 0x15,
++			0x12, 0xef, 0xf5, 0x0f,
++		},
++	},
++	{
++		.data_len = 2,
++		.digest = {
++			0x81, 0xc7, 0x60, 0x0d, 0x6d, 0x13, 0x75, 0x70,
++			0x4b, 0xc0, 0xab, 0xea, 0x04, 0xe3, 0x78, 0x7e,
++			0x73, 0xb9, 0x0f, 0xb6, 0xae, 0x90, 0xf3, 0x94,
++			0xb2, 0x56, 0xda, 0xc8,
++		},
++	},
++	{
++		.data_len = 3,
++		.digest = {
++			0x24, 0xf0, 0x8c, 0x6e, 0x9d, 0xd6, 0x06, 0x80,
++			0x0a, 0x03, 0xee, 0x9b, 0x33, 0xec, 0x83, 0x42,
++			0x2c, 0x8b, 0xe7, 0xc7, 0xc6, 0x04, 0xfb, 0xc6,
++			0xa3, 0x3a, 0x4d, 0xc9,
++		},
++	},
++	{
++		.data_len = 16,
++		.digest = {
++			0x1c, 0x08, 0xa8, 0x55, 0x8f, 0xc6, 0x0a, 0xea,
++			0x2f, 0x1b, 0x54, 0xff, 0x8d, 0xd2, 0xa3, 0xc7,
++			0x42, 0xc2, 0x93, 0x3d, 0x73, 0x18, 0x84, 0xba,
++			0x75, 0x49, 0x34, 0xfd,
++		},
++	},
++	{
++		.data_len = 32,
++		.digest = {
++			0x45, 0xdd, 0xb5, 0xf0, 0x3c, 0xda, 0xe6, 0xd4,
++			0x6c, 0x86, 0x91, 0x29, 0x11, 0x2f, 0x88, 0x7d,
++			0xd8, 0x3c, 0xa3, 0xd6, 0xdd, 0x1e, 0xac, 0x98,
++			0xff, 0xf0, 0x14, 0x69,
++		},
++	},
++	{
++		.data_len = 48,
++		.digest = {
++			0x0b, 0xfb, 0x71, 0x4c, 0x06, 0x7a, 0xd5, 0x89,
++			0x76, 0x0a, 0x43, 0x8b, 0x2b, 0x47, 0x12, 0x56,
++			0xa7, 0x64, 0x33, 0x1d, 0xd3, 0x44, 0x17, 0x95,
++			0x23, 0xe7, 0x53, 0x01,
++		},
++	},
++	{
++		.data_len = 49,
++		.digest = {
++			0xc4, 0xae, 0x9c, 0x33, 0xd5, 0x1d, 0xf4, 0xa7,
++			0xfd, 0xb7, 0xd4, 0x6b, 0xc3, 0xeb, 0xa8, 0xbf,
++			0xfb, 0x07, 0x89, 0x4b, 0x07, 0x15, 0x22, 0xec,
++			0xe1, 0x45, 0x84, 0xba,
++		},
++	},
++	{
++		.data_len = 63,
++		.digest = {
++			0xad, 0x01, 0x34, 0x2a, 0xe2, 0x3b, 0x58, 0x06,
++			0x9f, 0x20, 0xc8, 0xfb, 0xf3, 0x20, 0x82, 0xa6,
++			0x9f, 0xee, 0x7a, 0xbe, 0xdf, 0xf3, 0x5d, 0x57,
++			0x9b, 0xce, 0x79, 0x96,
++		},
++	},
++	{
++		.data_len = 64,
++		.digest = {
++			0xa7, 0xa6, 0x47, 0xf7, 0xed, 0x2a, 0xe5, 0xe3,
++			0xc0, 0x1e, 0x7b, 0x40, 0xe4, 0xf7, 0x40, 0x65,
++			0x42, 0xc1, 0x6f, 0x7d, 0x8d, 0x0d, 0x17, 0x4f,
++			0xd3, 0xbc, 0x0d, 0x85,
++		},
++	},
++	{
++		.data_len = 65,
++		.digest = {
++			0xc4, 0x9c, 0xb5, 0x6a, 0x01, 0x2d, 0x10, 0xa9,
++			0x5f, 0xa4, 0x5a, 0xe1, 0xba, 0x40, 0x12, 0x09,
++			0x7b, 0xea, 0xdb, 0xa6, 0x7b, 0xcb, 0x56, 0xf0,
++			0xfd, 0x5b, 0xe2, 0xe7,
++		},
++	},
++	{
++		.data_len = 127,
++		.digest = {
++			0x14, 0xda, 0x0e, 0x01, 0xca, 0x78, 0x7d, 0x2d,
++			0x85, 0xa3, 0xca, 0x0e, 0x80, 0xf9, 0x95, 0x10,
++			0xa1, 0x7b, 0xa5, 0xaa, 0xfc, 0x95, 0x05, 0x08,
++			0x53, 0xda, 0x52, 0xee,
++		},
++	},
++	{
++		.data_len = 128,
++		.digest = {
++			0xa5, 0x24, 0xc4, 0x54, 0xe1, 0x50, 0xab, 0xee,
++			0x22, 0xc1, 0xa7, 0x27, 0x15, 0x2c, 0x6f, 0xf7,
++			0x4c, 0x31, 0xe5, 0x15, 0x25, 0x4e, 0x71, 0xc6,
++			0x7e, 0xa0, 0x11, 0x5d,
++		},
++	},
++	{
++		.data_len = 129,
++		.digest = {
++			0x73, 0xd0, 0x8c, 0xce, 0xed, 0xed, 0x9f, 0xaa,
++			0x21, 0xaf, 0xa2, 0x08, 0x80, 0x16, 0x15, 0x59,
++			0x3f, 0x1d, 0x7f, 0x0a, 0x79, 0x3d, 0x7b, 0x58,
++			0xf8, 0xc8, 0x5c, 0x27,
++		},
++	},
++	{
++		.data_len = 256,
++		.digest = {
++			0x31, 0xa7, 0xa1, 0xca, 0x49, 0x72, 0x75, 0xcc,
++			0x6e, 0x02, 0x9e, 0xad, 0xea, 0x86, 0x5c, 0x91,
++			0x02, 0xe4, 0xc9, 0xf9, 0xd3, 0x9e, 0x74, 0x50,
++			0xd8, 0x43, 0x6b, 0x85,
++		},
++	},
++	{
++		.data_len = 511,
++		.digest = {
++			0x40, 0x60, 0x8b, 0xb0, 0x03, 0xa9, 0x75, 0xab,
++			0x2d, 0x5b, 0x20, 0x9a, 0x05, 0x72, 0xb7, 0xa8,
++			0xce, 0xf2, 0x4f, 0x66, 0x62, 0xe3, 0x7e, 0x24,
++			0xd6, 0xe2, 0xea, 0xfa,
++		},
++	},
++	{
++		.data_len = 513,
++		.digest = {
++			0x4f, 0x5f, 0x9f, 0x1e, 0xb3, 0x66, 0x81, 0xdb,
++			0x41, 0x5d, 0x65, 0x97, 0x00, 0x8d, 0xdc, 0x62,
++			0x03, 0xb0, 0x4d, 0x6b, 0x5c, 0x7f, 0x1e, 0xa0,
++			0xfe, 0xfc, 0x0e, 0xb8,
++		},
++	},
++	{
++		.data_len = 1000,
++		.digest = {
++			0x08, 0xa8, 0xa1, 0xc0, 0xd8, 0xf9, 0xb4, 0xaa,
++			0x53, 0x22, 0xa1, 0x73, 0x0b, 0x45, 0xa0, 0x20,
++			0x72, 0xf3, 0xa9, 0xbc, 0x51, 0xd0, 0x20, 0x79,
++			0x69, 0x97, 0xf7, 0xe3,
++		},
++	},
++	{
++		.data_len = 3333,
++		.digest = {
++			0xe8, 0x60, 0x5f, 0xb9, 0x12, 0xe1, 0x6b, 0x24,
++			0xc5, 0xe8, 0x43, 0xa9, 0x5c, 0x3f, 0x65, 0xed,
++			0xbe, 0xfd, 0x77, 0xf5, 0x47, 0xf2, 0x75, 0x21,
++			0xc2, 0x8f, 0x54, 0x8f,
++		},
++	},
++	{
++		.data_len = 4096,
++		.digest = {
++			0xc7, 0xdf, 0x50, 0x16, 0x10, 0x01, 0xb7, 0xdf,
++			0x34, 0x1d, 0x18, 0xa2, 0xd5, 0xad, 0x1f, 0x50,
++			0xf7, 0xa8, 0x9a, 0x72, 0xfb, 0xfd, 0xd9, 0x1c,
++			0x57, 0xac, 0x08, 0x97,
++		},
++	},
++	{
++		.data_len = 4128,
++		.digest = {
++			0xdf, 0x16, 0x76, 0x7f, 0xc0, 0x16, 0x84, 0x63,
++			0xac, 0xcf, 0xd0, 0x78, 0x1e, 0x96, 0x67, 0xc5,
++			0x3c, 0x06, 0xe9, 0xdb, 0x6e, 0x7d, 0xd0, 0x07,
++			0xaa, 0xb1, 0x56, 0xc9,
++		},
++	},
++	{
++		.data_len = 4160,
++		.digest = {
++			0x49, 0xec, 0x5c, 0x18, 0xd7, 0x5b, 0xda, 0xed,
++			0x5b, 0x59, 0xde, 0x09, 0x34, 0xb2, 0x49, 0x43,
++			0x62, 0x6a, 0x0a, 0x63, 0x6a, 0x51, 0x08, 0x37,
++			0x8c, 0xb6, 0x29, 0x84,
++		},
++	},
++	{
++		.data_len = 4224,
++		.digest = {
++			0x3d, 0xc2, 0xc8, 0x43, 0xcf, 0xb7, 0x33, 0x14,
++			0x04, 0x93, 0xed, 0xe2, 0xcd, 0x8a, 0x69, 0x5c,
++			0x5a, 0xd5, 0x9b, 0x52, 0xdf, 0x48, 0xa7, 0xaa,
++			0x28, 0x2b, 0x5d, 0x27,
++		},
++	},
++	{
++		.data_len = 16384,
++		.digest = {
++			0xa7, 0xaf, 0xda, 0x92, 0xe2, 0xe7, 0x61, 0xdc,
++			0xa1, 0x32, 0x53, 0x2a, 0x3f, 0x41, 0x5c, 0x7e,
++			0xc9, 0x89, 0xda, 0x1c, 0xf7, 0x8d, 0x00, 0xbd,
++			0x21, 0x73, 0xb1, 0x69,
++		},
++	},
++};
++
++static const u8 hash_testvec_consolidated[SHA224_DIGEST_SIZE] = {
++	0x9e, 0xb8, 0x82, 0xab, 0x83, 0x37, 0xe4, 0x63,
++	0x84, 0xee, 0x21, 0x15, 0xc2, 0xbb, 0xa3, 0x17,
++	0x8f, 0xc4, 0x99, 0x33, 0xa0, 0x2c, 0x9f, 0xec,
++	0xca, 0xd0, 0xf3, 0x73,
++};
++
++static const u8 hmac_testvec_consolidated[SHA224_DIGEST_SIZE] = {
++	0x66, 0x34, 0x79, 0x92, 0x47, 0x0e, 0xcd, 0x70,
++	0xb0, 0x8b, 0x91, 0xcb, 0x94, 0x2f, 0x67, 0x65,
++	0x2f, 0xc9, 0xd2, 0x91, 0x32, 0xaf, 0xf7, 0x5f,
++	0xb6, 0x01, 0x5b, 0xf2,
++};
+diff --git a/lib/crypto/tests/sha224_kunit.c b/lib/crypto/tests/sha224_kunit.c
+new file mode 100644
+index 0000000000000..962ad46b9c994
+--- /dev/null
++++ b/lib/crypto/tests/sha224_kunit.c
+@@ -0,0 +1,39 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * Test cases for hash functions, including a benchmark.  This is included by
-+ * KUnit test suites that want to use it.  See sha512_kunit.c for an example.
-+ *
 + * Copyright 2025 Google LLC
 + */
-+#include <kunit/test.h>
-+#include <linux/hrtimer.h>
-+#include <linux/timekeeping.h>
-+#include <linux/vmalloc.h>
-+#include <linux/workqueue.h>
++#include <crypto/sha2.h>
++#include "sha224-testvecs.h"
 +
-+/* test_buf is a guarded buffer, i.e. &test_buf[TEST_BUF_LEN] is not mapped. */
-+#define TEST_BUF_LEN 16384
-+static u8 *test_buf;
++#define HASH sha224
++#define HASH_CTX sha224_ctx
++#define HASH_SIZE SHA224_DIGEST_SIZE
++#define HASH_INIT sha224_init
++#define HASH_UPDATE sha224_update
++#define HASH_FINAL sha224_final
++#define HMAC_KEY hmac_sha224_key
++#define HMAC_CTX hmac_sha224_ctx
++#define HMAC_PREPAREKEY hmac_sha224_preparekey
++#define HMAC_INIT hmac_sha224_init
++#define HMAC_UPDATE hmac_sha224_update
++#define HMAC_FINAL hmac_sha224_final
++#define HMAC hmac_sha224
++#define HMAC_USINGRAWKEY hmac_sha224_usingrawkey
++#include "hash-test-template.h"
 +
-+static u8 *orig_test_buf;
-+
-+static u64 random_seed;
-+
-+/*
-+ * This is a simple linear congruential generator.  It is used only for testing,
-+ * which does not require cryptographically secure random numbers.  A hard-coded
-+ * algorithm is used instead of <linux/prandom.h> so that it matches the
-+ * algorithm used by the test vector generation script.  This allows the input
-+ * data in random test vectors to be concisely stored as just the seed.
-+ */
-+static u32 rand32(void)
-+{
-+	random_seed = (random_seed * 25214903917 + 11) & ((1ULL << 48) - 1);
-+	return random_seed >> 16;
-+}
-+
-+static void rand_bytes(u8 *out, size_t len)
-+{
-+	for (size_t i = 0; i < len; i++)
-+		out[i] = rand32();
-+}
-+
-+static void rand_bytes_seeded_from_len(u8 *out, size_t len)
-+{
-+	random_seed = len;
-+	rand_bytes(out, len);
-+}
-+
-+static bool rand_bool(void)
-+{
-+	return rand32() % 2;
-+}
-+
-+/* Generate a random length, preferring small lengths. */
-+static size_t rand_length(size_t max_len)
-+{
-+	size_t len;
-+
-+	switch (rand32() % 3) {
-+	case 0:
-+		len = rand32() % 128;
-+		break;
-+	case 1:
-+		len = rand32() % 3072;
-+		break;
-+	default:
-+		len = rand32();
-+		break;
-+	}
-+	return len % (max_len + 1);
-+}
-+
-+static size_t rand_offset(size_t max_offset)
-+{
-+	return min(rand32() % 128, max_offset);
-+}
-+
-+static int hash_suite_init(struct kunit_suite *suite)
-+{
-+	/*
-+	 * Allocate the test buffer using vmalloc() with a page-aligned length
-+	 * so that it is immediately followed by a guard page.  This allows
-+	 * buffer overreads to be detected, even in assembly code.
-+	 */
-+	size_t alloc_len = round_up(TEST_BUF_LEN, PAGE_SIZE);
-+
-+	orig_test_buf = vmalloc(alloc_len);
-+	if (!orig_test_buf)
-+		return -ENOMEM;
-+
-+	test_buf = orig_test_buf + alloc_len - TEST_BUF_LEN;
-+	return 0;
-+}
-+
-+static void hash_suite_exit(struct kunit_suite *suite)
-+{
-+	vfree(orig_test_buf);
-+	orig_test_buf = NULL;
-+	test_buf = NULL;
-+}
-+
-+/*
-+ * Test the hash function against a list of test vectors.
-+ *
-+ * Note that it's only necessary to run each test vector in one way (e.g.,
-+ * one-shot instead of incremental), since consistency between different ways of
-+ * using the APIs is verified by other test cases.
-+ */
-+static void test_hash_test_vectors(struct kunit *test)
-+{
-+	for (size_t i = 0; i < ARRAY_SIZE(hash_testvecs); i++) {
-+		size_t data_len = hash_testvecs[i].data_len;
-+		u8 actual_hash[HASH_SIZE];
-+
-+		KUNIT_ASSERT_LE(test, data_len, TEST_BUF_LEN);
-+		rand_bytes_seeded_from_len(test_buf, data_len);
-+
-+		HASH(test_buf, data_len, actual_hash);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, actual_hash, hash_testvecs[i].digest, HASH_SIZE,
-+			"Wrong result with test vector %zu; data_len=%zu", i,
-+			data_len);
-+	}
-+}
-+
-+/*
-+ * Test that the hash function produces correct results for *every* length up to
-+ * 4096 bytes.  To do this, generate seeded random data, then calculate a hash
-+ * value for each length 0..4096, then hash the hash values.  Verify just the
-+ * final hash value, which should match only when all hash values were correct.
-+ */
-+static void test_hash_all_lens_up_to_4096(struct kunit *test)
-+{
-+	struct HASH_CTX ctx;
-+	u8 hash[HASH_SIZE];
-+
-+	static_assert(TEST_BUF_LEN >= 4096);
-+	rand_bytes_seeded_from_len(test_buf, 4096);
-+	HASH_INIT(&ctx);
-+	for (size_t len = 0; len <= 4096; len++) {
-+		HASH(test_buf, len, hash);
-+		HASH_UPDATE(&ctx, hash, HASH_SIZE);
-+	}
-+	HASH_FINAL(&ctx, hash);
-+	KUNIT_ASSERT_MEMEQ(test, hash, hash_testvec_consolidated, HASH_SIZE);
-+}
-+
-+/*
-+ * Test that the hash function produces the same result with a one-shot
-+ * computation as it does with an incremental computation.
-+ */
-+static void test_hash_incremental_updates(struct kunit *test)
-+{
-+	for (int i = 0; i < 1000; i++) {
-+		size_t total_len, offset;
-+		struct HASH_CTX ctx;
-+		u8 hash1[HASH_SIZE];
-+		u8 hash2[HASH_SIZE];
-+		size_t num_parts = 0;
-+		size_t remaining_len, cur_offset;
-+
-+		total_len = rand_length(TEST_BUF_LEN);
-+		offset = rand_offset(TEST_BUF_LEN - total_len);
-+		rand_bytes(&test_buf[offset], total_len);
-+
-+		/* Compute the hash value in one shot. */
-+		HASH(&test_buf[offset], total_len, hash1);
-+
-+		/*
-+		 * Compute the hash value incrementally, using a randomly
-+		 * selected sequence of update lengths that sum to total_len.
-+		 */
-+		HASH_INIT(&ctx);
-+		remaining_len = total_len;
-+		cur_offset = offset;
-+		while (rand_bool()) {
-+			size_t part_len = rand_length(remaining_len);
-+
-+			HASH_UPDATE(&ctx, &test_buf[cur_offset], part_len);
-+			num_parts++;
-+			cur_offset += part_len;
-+			remaining_len -= part_len;
-+		}
-+		if (remaining_len != 0 || rand_bool()) {
-+			HASH_UPDATE(&ctx, &test_buf[cur_offset], remaining_len);
-+			num_parts++;
-+		}
-+		HASH_FINAL(&ctx, hash2);
-+
-+		/* Verify that the two hash values are the same. */
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, hash1, hash2, HASH_SIZE,
-+			"Incremental test failed with total_len=%zu num_parts=%zu offset=%zu",
-+			total_len, num_parts, offset);
-+	}
-+}
-+
-+/*
-+ * Test that the hash function does not overrun any buffers.  Uses a guard page
-+ * to catch buffer overruns even if they occur in assembly code.
-+ */
-+static void test_hash_buffer_overruns(struct kunit *test)
-+{
-+	const size_t max_tested_len = TEST_BUF_LEN - sizeof(struct HASH_CTX);
-+	void *const buf_end = &test_buf[TEST_BUF_LEN];
-+	struct HASH_CTX *guarded_ctx = buf_end - sizeof(*guarded_ctx);
-+
-+	rand_bytes(test_buf, TEST_BUF_LEN);
-+
-+	for (int i = 0; i < 100; i++) {
-+		size_t len = rand_length(max_tested_len);
-+		struct HASH_CTX ctx;
-+		u8 hash[HASH_SIZE];
-+
-+		/* Check for overruns of the data buffer. */
-+		HASH(buf_end - len, len, hash);
-+		HASH_INIT(&ctx);
-+		HASH_UPDATE(&ctx, buf_end - len, len);
-+		HASH_FINAL(&ctx, hash);
-+
-+		/* Check for overruns of the hash value buffer. */
-+		HASH(test_buf, len, buf_end - HASH_SIZE);
-+		HASH_INIT(&ctx);
-+		HASH_UPDATE(&ctx, test_buf, len);
-+		HASH_FINAL(&ctx, buf_end - HASH_SIZE);
-+
-+		/* Check for overuns of the hash context. */
-+		HASH_INIT(guarded_ctx);
-+		HASH_UPDATE(guarded_ctx, test_buf, len);
-+		HASH_FINAL(guarded_ctx, hash);
-+	}
-+}
-+
-+/*
-+ * Test that the caller is permitted to alias the output digest and source data
-+ * buffer, and also modify the source data buffer after it has been used.
-+ */
-+static void test_hash_overlaps(struct kunit *test)
-+{
-+	const size_t max_tested_len = TEST_BUF_LEN - HASH_SIZE;
-+	struct HASH_CTX ctx;
-+	u8 hash[HASH_SIZE];
-+
-+	rand_bytes(test_buf, TEST_BUF_LEN);
-+
-+	for (int i = 0; i < 100; i++) {
-+		size_t len = rand_length(max_tested_len);
-+		size_t offset = HASH_SIZE + rand_offset(max_tested_len - len);
-+		bool left_end = rand_bool();
-+		u8 *ovl_hash = left_end ? &test_buf[offset] :
-+					  &test_buf[offset + len - HASH_SIZE];
-+
-+		HASH(&test_buf[offset], len, hash);
-+		HASH(&test_buf[offset], len, ovl_hash);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, hash, ovl_hash, HASH_SIZE,
-+			"Overlap test 1 failed with len=%zu offset=%zu left_end=%d",
-+			len, offset, left_end);
-+
-+		/* Repeat the above test, but this time use init+update+final */
-+		HASH(&test_buf[offset], len, hash);
-+		HASH_INIT(&ctx);
-+		HASH_UPDATE(&ctx, &test_buf[offset], len);
-+		HASH_FINAL(&ctx, ovl_hash);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, hash, ovl_hash, HASH_SIZE,
-+			"Overlap test 2 failed with len=%zu offset=%zu left_end=%d",
-+			len, offset, left_end);
-+
-+		/* Test modifying the source data after it was used. */
-+		HASH(&test_buf[offset], len, hash);
-+		HASH_INIT(&ctx);
-+		HASH_UPDATE(&ctx, &test_buf[offset], len);
-+		rand_bytes(&test_buf[offset], len);
-+		HASH_FINAL(&ctx, ovl_hash);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, hash, ovl_hash, HASH_SIZE,
-+			"Overlap test 3 failed with len=%zu offset=%zu left_end=%d",
-+			len, offset, left_end);
-+	}
-+}
-+
-+/*
-+ * Test that if the same data is hashed at different alignments in memory, the
-+ * results are the same.
-+ */
-+static void test_hash_alignment_consistency(struct kunit *test)
-+{
-+	u8 hash1[128 + HASH_SIZE];
-+	u8 hash2[128 + HASH_SIZE];
-+
-+	for (int i = 0; i < 100; i++) {
-+		size_t len = rand_length(TEST_BUF_LEN);
-+		size_t data_offs1 = rand_offset(TEST_BUF_LEN - len);
-+		size_t data_offs2 = rand_offset(TEST_BUF_LEN - len);
-+		size_t hash_offs1 = rand_offset(128);
-+		size_t hash_offs2 = rand_offset(128);
-+
-+		rand_bytes(&test_buf[data_offs1], len);
-+		HASH(&test_buf[data_offs1], len, &hash1[hash_offs1]);
-+		memmove(&test_buf[data_offs2], &test_buf[data_offs1], len);
-+		HASH(&test_buf[data_offs2], len, &hash2[hash_offs2]);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, &hash1[hash_offs1], &hash2[hash_offs2], HASH_SIZE,
-+			"Alignment consistency test failed with len=%zu data_offs=(%zu,%zu) hash_offs=(%zu,%zu)",
-+			len, data_offs1, data_offs2, hash_offs1, hash_offs2);
-+	}
-+}
-+
-+/* Test that HASH_FINAL zeroizes the context. */
-+static void test_hash_ctx_zeroization(struct kunit *test)
-+{
-+	static const u8 zeroes[sizeof(struct HASH_CTX)];
-+	struct HASH_CTX ctx;
-+
-+	rand_bytes(test_buf, 128);
-+	HASH_INIT(&ctx);
-+	HASH_UPDATE(&ctx, test_buf, 128);
-+	HASH_FINAL(&ctx, test_buf);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, &ctx, zeroes, sizeof(ctx),
-+			       "Hash context was not zeroized by finalization");
-+}
-+
-+#define IRQ_TEST_HRTIMER_INTERVAL us_to_ktime(5)
-+
-+struct hash_irq_test_state {
-+	bool (*func)(void *test_specific_state);
-+	void *test_specific_state;
-+	bool task_func_reported_failure;
-+	bool hardirq_func_reported_failure;
-+	bool softirq_func_reported_failure;
-+	unsigned long hardirq_func_calls;
-+	unsigned long softirq_func_calls;
-+	struct hrtimer timer;
-+	struct work_struct bh_work;
++static struct kunit_case hash_test_cases[] = {
++	HASH_KUNIT_CASES,
++	KUNIT_CASE(benchmark_hash),
++	{},
 +};
 +
-+static enum hrtimer_restart hash_irq_test_timer_func(struct hrtimer *timer)
-+{
-+	struct hash_irq_test_state *state =
-+		container_of(timer, typeof(*state), timer);
-+
-+	WARN_ON_ONCE(!in_hardirq());
-+	state->hardirq_func_calls++;
-+
-+	if (!state->func(state->test_specific_state))
-+		state->hardirq_func_reported_failure = true;
-+
-+	hrtimer_forward_now(&state->timer, IRQ_TEST_HRTIMER_INTERVAL);
-+	queue_work(system_bh_wq, &state->bh_work);
-+	return HRTIMER_RESTART;
-+}
-+
-+static void hash_irq_test_bh_work_func(struct work_struct *work)
-+{
-+	struct hash_irq_test_state *state =
-+		container_of(work, typeof(*state), bh_work);
-+
-+	WARN_ON_ONCE(!in_serving_softirq());
-+	state->softirq_func_calls++;
-+
-+	if (!state->func(state->test_specific_state))
-+		state->softirq_func_reported_failure = true;
-+}
-+
-+/*
-+ * Helper function which repeatedly runs the given @func in task, softirq, and
-+ * hardirq context concurrently, and reports a failure to KUnit if any
-+ * invocation of @func in any context returns false.  @func is passed
-+ * @test_specific_state as its argument.  At most 3 invocations of @func will
-+ * run concurrently: one in each of task, softirq, and hardirq context.
-+ *
-+ * The main purpose of this interrupt context testing is to validate fallback
-+ * code paths that run in contexts where the normal code path cannot be used,
-+ * typically due to the FPU or vector registers already being in-use in kernel
-+ * mode.  These code paths aren't covered when the test code is executed only by
-+ * the KUnit test runner thread in task context.  The reason for the concurrency
-+ * is because merely using hardirq context is not sufficient to reach a fallback
-+ * code path on some architectures; the hardirq actually has to occur while the
-+ * FPU or vector unit was already in-use in kernel mode.
-+ *
-+ * Another purpose of this testing is to detect issues with the architecture's
-+ * irq_fpu_usable() and kernel_fpu_begin/end() or equivalent functions,
-+ * especially in softirq context when the softirq may have interrupted a task
-+ * already using kernel-mode FPU or vector (if the arch didn't prevent that).
-+ * Crypto functions are often executed in softirqs, so this is important.
-+ */
-+static void run_irq_test(struct kunit *test, bool (*func)(void *),
-+			 int max_iterations, void *test_specific_state)
-+{
-+	struct hash_irq_test_state state = {
-+		.func = func,
-+		.test_specific_state = test_specific_state,
-+	};
-+	unsigned long end_jiffies;
-+
-+	/*
-+	 * Set up a hrtimer (the way we access hardirq context) and a work
-+	 * struct for the BH workqueue (the way we access softirq context).
-+	 */
-+	hrtimer_setup_on_stack(&state.timer, hash_irq_test_timer_func,
-+			       CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
-+	INIT_WORK(&state.bh_work, hash_irq_test_bh_work_func);
-+
-+	/* Run for up to max_iterations or 1 second, whichever comes first. */
-+	end_jiffies = jiffies + HZ;
-+	hrtimer_start(&state.timer, IRQ_TEST_HRTIMER_INTERVAL,
-+		      HRTIMER_MODE_REL_HARD);
-+	for (int i = 0; i < max_iterations && !time_after(jiffies, end_jiffies);
-+	     i++) {
-+		if (!func(test_specific_state))
-+			state.task_func_reported_failure = true;
-+	}
-+
-+	/* Cancel the timer and work. */
-+	hrtimer_cancel(&state.timer);
-+	flush_work(&state.bh_work);
-+
-+	/* Sanity check: the timer and BH functions should have been run. */
-+	KUNIT_EXPECT_GT_MSG(test, state.hardirq_func_calls, 0,
-+			    "Timer function was not called");
-+	KUNIT_EXPECT_GT_MSG(test, state.softirq_func_calls, 0,
-+			    "BH work function was not called");
-+
-+	/* Check for incorrect hash values reported from any context. */
-+	KUNIT_EXPECT_FALSE_MSG(
-+		test, state.task_func_reported_failure,
-+		"Incorrect hash values reported from task context");
-+	KUNIT_EXPECT_FALSE_MSG(
-+		test, state.hardirq_func_reported_failure,
-+		"Incorrect hash values reported from hardirq context");
-+	KUNIT_EXPECT_FALSE_MSG(
-+		test, state.softirq_func_reported_failure,
-+		"Incorrect hash values reported from softirq context");
-+}
-+
-+#define IRQ_TEST_DATA_LEN 256
-+#define IRQ_TEST_NUM_BUFFERS 3 /* matches max concurrency level */
-+
-+struct hash_irq_test1_state {
-+	u8 expected_hashes[IRQ_TEST_NUM_BUFFERS][HASH_SIZE];
-+	atomic_t seqno;
++static struct kunit_suite hash_test_suite = {
++	.name = "sha224",
++	.test_cases = hash_test_cases,
++	.suite_init = hash_suite_init,
++	.suite_exit = hash_suite_exit,
 +};
++kunit_test_suite(hash_test_suite);
 +
-+/*
-+ * Compute the hash of one of the test messages and verify that it matches the
-+ * expected hash from @state->expected_hashes.  To increase the chance of
-+ * detecting problems, cycle through multiple messages.
-+ */
-+static bool hash_irq_test1_func(void *state_)
-+{
-+	struct hash_irq_test1_state *state = state_;
-+	u32 i = (u32)atomic_inc_return(&state->seqno) % IRQ_TEST_NUM_BUFFERS;
-+	u8 actual_hash[HASH_SIZE];
-+
-+	HASH(&test_buf[i * IRQ_TEST_DATA_LEN], IRQ_TEST_DATA_LEN, actual_hash);
-+	return memcmp(actual_hash, state->expected_hashes[i], HASH_SIZE) == 0;
-+}
-+
-+/*
-+ * Test that if hashes are computed in task, softirq, and hardirq context
-+ * concurrently, then all results are as expected.
-+ */
-+static void test_hash_interrupt_context_1(struct kunit *test)
-+{
-+	struct hash_irq_test1_state state = {};
-+
-+	/* Prepare some test messages and compute the expected hash of each. */
-+	rand_bytes(test_buf, IRQ_TEST_NUM_BUFFERS * IRQ_TEST_DATA_LEN);
-+	for (int i = 0; i < IRQ_TEST_NUM_BUFFERS; i++)
-+		HASH(&test_buf[i * IRQ_TEST_DATA_LEN], IRQ_TEST_DATA_LEN,
-+		     state.expected_hashes[i]);
-+
-+	run_irq_test(test, hash_irq_test1_func, 100000, &state);
-+}
-+
-+struct hash_irq_test2_hash_ctx {
-+	struct HASH_CTX hash_ctx;
-+	atomic_t in_use;
-+	int offset;
-+	int step;
-+};
-+
-+struct hash_irq_test2_state {
-+	struct hash_irq_test2_hash_ctx ctxs[IRQ_TEST_NUM_BUFFERS];
-+	u8 expected_hash[HASH_SIZE];
-+	u16 update_lens[32];
-+	int num_steps;
-+};
-+
-+static bool hash_irq_test2_func(void *state_)
-+{
-+	struct hash_irq_test2_state *state = state_;
-+	struct hash_irq_test2_hash_ctx *ctx;
-+	bool ret = true;
-+
-+	for (ctx = &state->ctxs[0]; ctx < &state->ctxs[ARRAY_SIZE(state->ctxs)];
-+	     ctx++) {
-+		if (atomic_cmpxchg(&ctx->in_use, 0, 1) == 0)
-+			break;
-+	}
-+	if (WARN_ON_ONCE(ctx == &state->ctxs[ARRAY_SIZE(state->ctxs)])) {
-+		/*
-+		 * This should never happen, as the number of contexts is equal
-+		 * to the maximum concurrency level of run_irq_test().
-+		 */
-+		return false;
-+	}
-+
-+	if (ctx->step == 0) {
-+		/* Init step */
-+		HASH_INIT(&ctx->hash_ctx);
-+		ctx->offset = 0;
-+		ctx->step++;
-+	} else if (ctx->step < state->num_steps - 1) {
-+		/* Update step */
-+		HASH_UPDATE(&ctx->hash_ctx, &test_buf[ctx->offset],
-+			    state->update_lens[ctx->step - 1]);
-+		ctx->offset += state->update_lens[ctx->step - 1];
-+		ctx->step++;
-+	} else {
-+		/* Final step */
-+		u8 actual_hash[HASH_SIZE];
-+
-+		if (WARN_ON_ONCE(ctx->offset != TEST_BUF_LEN))
-+			ret = false;
-+		HASH_FINAL(&ctx->hash_ctx, actual_hash);
-+		if (memcmp(actual_hash, state->expected_hash, HASH_SIZE) != 0)
-+			ret = false;
-+		ctx->step = 0;
-+	}
-+	atomic_set_release(&ctx->in_use, 0);
-+	return ret;
-+}
-+
-+/*
-+ * Test that if hashes are computed in task, softirq, and hardirq context
-+ * concurrently, *including doing different parts of the same incremental
-+ * computation in different contexts*, then all results are as expected.
-+ * Besides detecting bugs similar to those that test_hash_interrupt_context_1
-+ * can detect, this test case can also detect bugs where hash function
-+ * implementations don't correctly handle these mixed incremental computations.
-+ */
-+static void test_hash_interrupt_context_2(struct kunit *test)
-+{
-+	struct hash_irq_test2_state *state;
-+	int remaining = TEST_BUF_LEN;
-+
-+	state = kunit_kzalloc(test, sizeof(*state), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, state);
-+
-+	rand_bytes(test_buf, TEST_BUF_LEN);
-+	HASH(test_buf, TEST_BUF_LEN, state->expected_hash);
-+
-+	/*
-+	 * Generate a list of update lengths to use.  Ensure that it contains
-+	 * multiple entries but is limited to a maximum length.
-+	 */
-+	static_assert(TEST_BUF_LEN / 4096 > 1);
-+	for (state->num_steps = 0;
-+	     state->num_steps < ARRAY_SIZE(state->update_lens) - 1 && remaining;
-+	     state->num_steps++) {
-+		state->update_lens[state->num_steps] =
-+			rand_length(min(remaining, 4096));
-+		remaining -= state->update_lens[state->num_steps];
-+	}
-+	if (remaining)
-+		state->update_lens[state->num_steps++] = remaining;
-+	state->num_steps += 2; /* for init and final */
-+
-+	run_irq_test(test, hash_irq_test2_func, 250000, state);
-+}
-+
-+#define UNKEYED_HASH_KUNIT_CASES                     \
-+	KUNIT_CASE(test_hash_test_vectors),          \
-+	KUNIT_CASE(test_hash_all_lens_up_to_4096),   \
-+	KUNIT_CASE(test_hash_incremental_updates),   \
-+	KUNIT_CASE(test_hash_buffer_overruns),       \
-+	KUNIT_CASE(test_hash_overlaps),              \
-+	KUNIT_CASE(test_hash_alignment_consistency), \
-+	KUNIT_CASE(test_hash_ctx_zeroization),       \
-+	KUNIT_CASE(test_hash_interrupt_context_1),   \
-+	KUNIT_CASE(test_hash_interrupt_context_2)
-+/* benchmark_hash is omitted so that the suites can put it last. */
-+
-+#ifdef HMAC
-+/*
-+ * Test the corresponding HMAC variant.
-+ *
-+ * This test case is fairly short, since HMAC is just a simple C wrapper around
-+ * the underlying unkeyed hash function, which is already well-tested by the
-+ * other test cases.  It's not useful to test things like data alignment or
-+ * interrupt context again for HMAC, nor to have a long list of test vectors.
-+ *
-+ * Thus, just do a single consolidated test, which covers all data lengths up to
-+ * 4096 bytes and all key lengths up to 292 bytes.  For each data length, select
-+ * a key length, generate the inputs from a seed, and compute the HMAC value.
-+ * Concatenate all these HMAC values together, and compute the HMAC of that.
-+ * Verify that value.  If this fails, then the HMAC implementation is wrong.
-+ * This won't show which specific input failed, but that should be fine.  Any
-+ * failure would likely be non-input-specific or also show in the unkeyed tests.
-+ */
-+static void test_hmac(struct kunit *test)
-+{
-+	static const u8 zeroes[sizeof(struct HMAC_CTX)];
-+	u8 *raw_key;
-+	struct HMAC_KEY key;
-+	struct HMAC_CTX ctx;
-+	u8 mac[HASH_SIZE];
-+	u8 mac2[HASH_SIZE];
-+
-+	static_assert(TEST_BUF_LEN >= 4096 + 293);
-+	rand_bytes_seeded_from_len(test_buf, 4096);
-+	raw_key = &test_buf[4096];
-+
-+	rand_bytes_seeded_from_len(raw_key, 32);
-+	HMAC_PREPAREKEY(&key, raw_key, 32);
-+	HMAC_INIT(&ctx, &key);
-+	for (size_t data_len = 0; data_len <= 4096; data_len++) {
-+		/*
-+		 * Cycle through key lengths as well.  Somewhat arbitrarily go
-+		 * up to 293, which is somewhat larger than the largest hash
-+		 * block size (which is the size at which the key starts being
-+		 * hashed down to one block); going higher would not be useful.
-+		 * To reduce correlation with data_len, use a prime number here.
-+		 */
-+		size_t key_len = data_len % 293;
-+
-+		HMAC_UPDATE(&ctx, test_buf, data_len);
-+
-+		rand_bytes_seeded_from_len(raw_key, key_len);
-+		HMAC_USINGRAWKEY(raw_key, key_len, test_buf, data_len, mac);
-+		HMAC_UPDATE(&ctx, mac, HASH_SIZE);
-+
-+		/* Verify that HMAC() is consistent with HMAC_USINGRAWKEY(). */
-+		HMAC_PREPAREKEY(&key, raw_key, key_len);
-+		HMAC(&key, test_buf, data_len, mac2);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, mac, mac2, HASH_SIZE,
-+			"HMAC gave different results with raw and prepared keys");
-+	}
-+	HMAC_FINAL(&ctx, mac);
-+	KUNIT_EXPECT_MEMEQ_MSG(test, mac, hmac_testvec_consolidated, HASH_SIZE,
-+			       "HMAC gave wrong result");
-+	KUNIT_EXPECT_MEMEQ_MSG(test, &ctx, zeroes, sizeof(ctx),
-+			       "HMAC context was not zeroized by finalization");
-+}
-+#define HASH_KUNIT_CASES UNKEYED_HASH_KUNIT_CASES, KUNIT_CASE(test_hmac)
-+#else
-+#define HASH_KUNIT_CASES UNKEYED_HASH_KUNIT_CASES
-+#endif
-+
-+/* Benchmark the hash function on various data lengths. */
-+static void benchmark_hash(struct kunit *test)
-+{
-+	static const size_t lens_to_test[] = {
-+		1,   16,  64,	127,  128,  200,   256,
-+		511, 512, 1024, 3173, 4096, 16384,
-+	};
-+	u8 hash[HASH_SIZE];
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
-+		kunit_skip(test, "not enabled");
-+
-+	/* Warm-up */
-+	for (size_t i = 0; i < 10000000; i += TEST_BUF_LEN)
-+		HASH(test_buf, TEST_BUF_LEN, hash);
-+
-+	for (size_t i = 0; i < ARRAY_SIZE(lens_to_test); i++) {
-+		size_t len = lens_to_test[i];
-+		/* The '+ 128' tries to account for per-message overhead. */
-+		size_t num_iters = 10000000 / (len + 128);
-+		u64 t;
-+
-+		KUNIT_ASSERT_LE(test, len, TEST_BUF_LEN);
-+		preempt_disable();
-+		t = ktime_get_ns();
-+		for (size_t j = 0; j < num_iters; j++)
-+			HASH(test_buf, len, hash);
-+		t = ktime_get_ns() - t;
-+		preempt_enable();
-+		kunit_info(test, "len=%zu: %llu MB/s", len,
-+			   div64_u64((u64)len * num_iters * 1000, t ?: 1));
-+	}
-+}
-diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
-new file mode 100755
-index 0000000000000..55f1010339a65
++MODULE_DESCRIPTION("KUnit tests and benchmark for SHA-224 and HMAC-SHA224");
++MODULE_LICENSE("GPL");
+diff --git a/lib/crypto/tests/sha256-testvecs.h b/lib/crypto/tests/sha256-testvecs.h
+new file mode 100644
+index 0000000000000..2db7b2042034e
 --- /dev/null
-+++ b/scripts/crypto/gen-hash-testvecs.py
-@@ -0,0 +1,102 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+#
-+# Script that generates test vectors for the given cryptographic hash function.
-+#
-+# Copyright 2025 Google LLC
++++ b/lib/crypto/tests/sha256-testvecs.h
+@@ -0,0 +1,238 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py sha256 */
 +
-+import hashlib
-+import hmac
-+import sys
++static const struct {
++	size_t data_len;
++	u8 digest[SHA256_DIGEST_SIZE];
++} hash_testvecs[] = {
++	{
++		.data_len = 0,
++		.digest = {
++			0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14,
++			0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24,
++			0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c,
++			0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55,
++		},
++	},
++	{
++		.data_len = 1,
++		.digest = {
++			0x45, 0xf8, 0x3d, 0x17, 0xe1, 0x0b, 0x34, 0xfc,
++			0xa0, 0x1e, 0xb8, 0xf4, 0x45, 0x4d, 0xac, 0x34,
++			0xa7, 0x77, 0xd9, 0x40, 0x4a, 0x46, 0x4e, 0x73,
++			0x2c, 0xf4, 0xab, 0xf2, 0xc0, 0xda, 0x94, 0xc4,
++		},
++	},
++	{
++		.data_len = 2,
++		.digest = {
++			0xf9, 0xd3, 0x52, 0x2f, 0xd5, 0xe0, 0x99, 0x15,
++			0x1c, 0xd6, 0xa9, 0x24, 0x4f, 0x40, 0xba, 0x25,
++			0x33, 0x43, 0x3e, 0xe1, 0x78, 0x6a, 0xfe, 0x7d,
++			0x07, 0xe2, 0x29, 0x7b, 0x6d, 0xc5, 0x73, 0xf5,
++		},
++	},
++	{
++		.data_len = 3,
++		.digest = {
++			0x71, 0xf7, 0xa1, 0xef, 0x69, 0x86, 0x0e, 0xe4,
++			0x87, 0x25, 0x58, 0x4c, 0x07, 0x2c, 0xfc, 0x60,
++			0xc5, 0xf6, 0xe2, 0x44, 0xaa, 0xfb, 0x41, 0xc7,
++			0x2b, 0xc5, 0x01, 0x8c, 0x39, 0x98, 0x30, 0x37,
++		},
++	},
++	{
++		.data_len = 16,
++		.digest = {
++			0x09, 0x95, 0x9a, 0xfa, 0x25, 0x18, 0x86, 0x06,
++			0xfe, 0x65, 0xc9, 0x2f, 0x91, 0x15, 0x74, 0x06,
++			0x6c, 0xbf, 0xef, 0x7b, 0x0b, 0xc7, 0x2c, 0x05,
++			0xdd, 0x17, 0x5d, 0x6f, 0x8a, 0xa5, 0xde, 0x3c,
++		},
++	},
++	{
++		.data_len = 32,
++		.digest = {
++			0xe5, 0x52, 0x3c, 0x85, 0xea, 0x1b, 0xe1, 0x6c,
++			0xe0, 0xdb, 0xc3, 0xef, 0xf0, 0xca, 0xc2, 0xe1,
++			0xb9, 0x36, 0xa1, 0x28, 0xb6, 0x9e, 0xf5, 0x6e,
++			0x70, 0xf7, 0xf9, 0xa7, 0x1c, 0xd3, 0x22, 0xd0,
++		},
++	},
++	{
++		.data_len = 48,
++		.digest = {
++			0x5f, 0x84, 0xd4, 0xd7, 0x2e, 0x80, 0x09, 0xef,
++			0x1c, 0x77, 0x7c, 0x25, 0x59, 0x63, 0x88, 0x64,
++			0xfd, 0x56, 0xea, 0x23, 0xf4, 0x4f, 0x2e, 0x49,
++			0xcd, 0xb4, 0xaa, 0xc7, 0x5c, 0x8b, 0x75, 0x84,
++		},
++	},
++	{
++		.data_len = 49,
++		.digest = {
++			0x22, 0x6e, 0xca, 0xda, 0x00, 0x2d, 0x90, 0x96,
++			0x24, 0xf8, 0x55, 0x17, 0x11, 0xda, 0x42, 0x1c,
++			0x78, 0x4e, 0xbf, 0xd9, 0xc5, 0xcf, 0xf3, 0xe3,
++			0xaf, 0xd3, 0x60, 0xcd, 0xaa, 0xe2, 0xc7, 0x22,
++		},
++	},
++	{
++		.data_len = 63,
++		.digest = {
++			0x97, 0xe2, 0x74, 0xdc, 0x6b, 0xa4, 0xaf, 0x32,
++			0x3b, 0x50, 0x6d, 0x80, 0xb5, 0xd3, 0x0c, 0x36,
++			0xea, 0x3f, 0x5d, 0x36, 0xa7, 0x49, 0x51, 0xf3,
++			0xbd, 0x69, 0x68, 0x60, 0x9b, 0xde, 0x73, 0xf5,
++		},
++	},
++	{
++		.data_len = 64,
++		.digest = {
++			0x13, 0x74, 0xb1, 0x72, 0xd6, 0x53, 0x48, 0x28,
++			0x42, 0xd8, 0xba, 0x64, 0x20, 0x60, 0xb6, 0x4c,
++			0xc3, 0xac, 0x5d, 0x93, 0x8c, 0xb9, 0xd4, 0xcc,
++			0xb4, 0x9f, 0x31, 0x1f, 0xeb, 0x68, 0x35, 0x58,
++		},
++	},
++	{
++		.data_len = 65,
++		.digest = {
++			0xda, 0xbe, 0xd7, 0xbc, 0x6e, 0xe6, 0x5a, 0x57,
++			0xeb, 0x9a, 0x93, 0xaa, 0x66, 0xd0, 0xe0, 0xc4,
++			0x29, 0x7f, 0xe9, 0x3b, 0x8e, 0xdf, 0x81, 0x82,
++			0x8d, 0x15, 0x11, 0x59, 0x4e, 0x13, 0xa5, 0x58,
++		},
++	},
++	{
++		.data_len = 127,
++		.digest = {
++			0x8c, 0x1a, 0xba, 0x40, 0x66, 0x94, 0x19, 0xf4,
++			0x2e, 0xa2, 0xae, 0x94, 0x53, 0x18, 0xb6, 0xfd,
++			0xa0, 0x12, 0xc5, 0xef, 0xd5, 0xd6, 0x1b, 0xa1,
++			0x37, 0xea, 0x19, 0x44, 0x35, 0x54, 0x85, 0x74,
++		},
++	},
++	{
++		.data_len = 128,
++		.digest = {
++			0xfd, 0x07, 0xd8, 0x77, 0x7d, 0x8b, 0x4f, 0xee,
++			0x60, 0x60, 0x26, 0xef, 0x2a, 0x86, 0xfb, 0x67,
++			0xeb, 0x31, 0x27, 0x03, 0x99, 0x3c, 0xde, 0xe5,
++			0x84, 0x72, 0x71, 0x4c, 0x33, 0x7b, 0x87, 0x13,
++		},
++	},
++	{
++		.data_len = 129,
++		.digest = {
++			0x97, 0xc5, 0x58, 0x38, 0x20, 0xc7, 0xde, 0xfa,
++			0xdd, 0x9b, 0x10, 0xc6, 0xc2, 0x2f, 0x94, 0xb5,
++			0xc0, 0x33, 0xc0, 0x20, 0x1c, 0x2f, 0xb4, 0x28,
++			0x5e, 0x36, 0xfa, 0x8c, 0x24, 0x1c, 0x18, 0x27,
++		},
++	},
++	{
++		.data_len = 256,
++		.digest = {
++			0x62, 0x17, 0x84, 0x26, 0x98, 0x30, 0x57, 0xca,
++			0x4f, 0x32, 0xd9, 0x09, 0x09, 0x34, 0xe2, 0xcb,
++			0x92, 0x45, 0xd5, 0xeb, 0x8b, 0x9b, 0x3c, 0xd8,
++			0xaa, 0xc7, 0xd2, 0x2b, 0x04, 0xab, 0xb3, 0x35,
++		},
++	},
++	{
++		.data_len = 511,
++		.digest = {
++			0x7f, 0xe1, 0x09, 0x78, 0x5d, 0x61, 0xfa, 0x5e,
++			0x9b, 0x8c, 0xb1, 0xa9, 0x09, 0x69, 0xb4, 0x24,
++			0x54, 0xf2, 0x1c, 0xc9, 0x5f, 0xfb, 0x59, 0x9d,
++			0x36, 0x1b, 0x37, 0x44, 0xfc, 0x64, 0x79, 0xb6,
++		},
++	},
++	{
++		.data_len = 513,
++		.digest = {
++			0xd2, 0x3b, 0x3a, 0xe7, 0x13, 0x4f, 0xbd, 0x29,
++			0x6b, 0xd2, 0x79, 0x26, 0x6c, 0xd2, 0x22, 0x43,
++			0x25, 0x34, 0x9b, 0x9b, 0x22, 0xb0, 0x9f, 0x61,
++			0x1d, 0xf4, 0xe2, 0x65, 0x68, 0x95, 0x02, 0x6c,
++		},
++	},
++	{
++		.data_len = 1000,
++		.digest = {
++			0x0c, 0x34, 0x53, 0x3f, 0x0f, 0x8a, 0x39, 0x8d,
++			0x63, 0xe4, 0x83, 0x6e, 0x11, 0x7d, 0x14, 0x8e,
++			0x5b, 0xf0, 0x4d, 0xca, 0x23, 0x24, 0xb5, 0xd2,
++			0x13, 0x3f, 0xd9, 0xde, 0x84, 0x74, 0x26, 0x59,
++		},
++	},
++	{
++		.data_len = 3333,
++		.digest = {
++			0xa8, 0xb8, 0x83, 0x01, 0x1b, 0x38, 0x7a, 0xca,
++			0x59, 0xe9, 0x5b, 0x37, 0x6a, 0xab, 0xb4, 0x85,
++			0x94, 0x73, 0x26, 0x04, 0xef, 0xed, 0xf4, 0x0d,
++			0xd6, 0x09, 0x21, 0x09, 0x96, 0x78, 0xe3, 0xcf,
++		},
++	},
++	{
++		.data_len = 4096,
++		.digest = {
++			0x0b, 0x12, 0x66, 0x96, 0x78, 0x4f, 0x2c, 0x35,
++			0xa4, 0xed, 0xbc, 0xb8, 0x30, 0xa6, 0x37, 0x9b,
++			0x94, 0x13, 0xae, 0x86, 0xf0, 0x20, 0xfb, 0x49,
++			0x8f, 0x5d, 0x20, 0x70, 0x60, 0x2b, 0x02, 0x70,
++		},
++	},
++	{
++		.data_len = 4128,
++		.digest = {
++			0xe4, 0xbd, 0xe4, 0x3b, 0x85, 0xf4, 0x6f, 0x11,
++			0xad, 0xc4, 0x79, 0xcc, 0x8e, 0x6d, 0x8b, 0x15,
++			0xbb, 0xf9, 0xd3, 0x65, 0xe1, 0xf8, 0x8d, 0x22,
++			0x65, 0x66, 0x66, 0xb3, 0xf5, 0xd0, 0x9c, 0xaf,
++		},
++	},
++	{
++		.data_len = 4160,
++		.digest = {
++			0x90, 0x5f, 0xe0, 0xfc, 0xb1, 0xdc, 0x38, 0x1b,
++			0xe5, 0x37, 0x3f, 0xd2, 0xcc, 0x48, 0xc4, 0xbc,
++			0xb4, 0xfd, 0xf7, 0x71, 0x5f, 0x6b, 0xf4, 0xc4,
++			0xa6, 0x08, 0x7e, 0xfc, 0x4e, 0x96, 0xf7, 0xc2,
++		},
++	},
++	{
++		.data_len = 4224,
++		.digest = {
++			0x1f, 0x34, 0x0a, 0x3b, 0xdb, 0xf7, 0x7a, 0xdb,
++			0x3d, 0x89, 0x85, 0x0c, 0xd2, 0xf0, 0x0c, 0xbd,
++			0x25, 0x39, 0x14, 0x06, 0x28, 0x0f, 0x6b, 0x5f,
++			0xe3, 0x1f, 0x2a, 0xb6, 0xca, 0x56, 0x41, 0xa1,
++		},
++	},
++	{
++		.data_len = 16384,
++		.digest = {
++			0x7b, 0x01, 0x2d, 0x84, 0x70, 0xee, 0xe0, 0x77,
++			0x3c, 0x17, 0x63, 0xfe, 0x40, 0xd7, 0xfd, 0xa1,
++			0x75, 0x90, 0xb8, 0x3e, 0x50, 0xcd, 0x06, 0xb7,
++			0xb9, 0xb9, 0x2b, 0x91, 0x4f, 0xba, 0xe4, 0x4c,
++		},
++	},
++};
 +
-+DATA_LENS = [0, 1, 2, 3, 16, 32, 48, 49, 63, 64, 65, 127, 128, 129, 256, 511,
-+             513, 1000, 3333, 4096, 4128, 4160, 4224, 16384]
++static const u8 hash_testvec_consolidated[SHA256_DIGEST_SIZE] = {
++	0x78, 0x1c, 0xb1, 0x9f, 0xe5, 0xe1, 0xcb, 0x41,
++	0x8b, 0x34, 0x00, 0x33, 0x57, 0xc3, 0x1c, 0x8f,
++	0x5c, 0x84, 0xc7, 0x8b, 0x87, 0x6a, 0x13, 0x29,
++	0x2f, 0xc4, 0x1a, 0x70, 0x5e, 0x40, 0xf2, 0xfe,
++};
 +
-+# Generate the given number of random bytes, using the length itself as the seed
-+# for a simple linear congruential generator (LCG).  The C test code uses the
-+# same LCG with the same seeding strategy to reconstruct the data, ensuring
-+# reproducibility without explicitly storing the data in the test vectors.
-+def rand_bytes(length):
-+    seed = length
-+    out = []
-+    for _ in range(length):
-+        seed = (seed * 25214903917 + 11) % 2**48
-+        out.append((seed >> 16) % 256)
-+    return bytes(out)
++static const u8 hmac_testvec_consolidated[SHA256_DIGEST_SIZE] = {
++	0x56, 0x96, 0x2e, 0x23, 0x3f, 0x94, 0x89, 0x0d,
++	0x0f, 0x24, 0x36, 0x2e, 0x19, 0x3d, 0xb5, 0xac,
++	0xb8, 0xcd, 0xf1, 0xc9, 0xca, 0xac, 0xee, 0x9d,
++	0x62, 0xe6, 0x81, 0xe5, 0x96, 0xf9, 0x38, 0xf5,
++};
+diff --git a/lib/crypto/tests/sha256_kunit.c b/lib/crypto/tests/sha256_kunit.c
+new file mode 100644
+index 0000000000000..1cd4caee6010d
+--- /dev/null
++++ b/lib/crypto/tests/sha256_kunit.c
+@@ -0,0 +1,39 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright 2025 Google LLC
++ */
++#include <crypto/sha2.h>
++#include "sha256-testvecs.h"
 +
-+def hash_init(alg):
-+    return hashlib.new(alg)
++#define HASH sha256
++#define HASH_CTX sha256_ctx
++#define HASH_SIZE SHA256_DIGEST_SIZE
++#define HASH_INIT sha256_init
++#define HASH_UPDATE sha256_update
++#define HASH_FINAL sha256_final
++#define HMAC_KEY hmac_sha256_key
++#define HMAC_CTX hmac_sha256_ctx
++#define HMAC_PREPAREKEY hmac_sha256_preparekey
++#define HMAC_INIT hmac_sha256_init
++#define HMAC_UPDATE hmac_sha256_update
++#define HMAC_FINAL hmac_sha256_final
++#define HMAC hmac_sha256
++#define HMAC_USINGRAWKEY hmac_sha256_usingrawkey
++#include "hash-test-template.h"
 +
-+def hash_update(ctx, data):
-+    ctx.update(data)
++static struct kunit_case hash_test_cases[] = {
++	HASH_KUNIT_CASES,
++	KUNIT_CASE(benchmark_hash),
++	{},
++};
 +
-+def hash_final(ctx):
-+    return ctx.digest()
++static struct kunit_suite hash_test_suite = {
++	.name = "sha256",
++	.test_cases = hash_test_cases,
++	.suite_init = hash_suite_init,
++	.suite_exit = hash_suite_exit,
++};
++kunit_test_suite(hash_test_suite);
 +
-+def compute_hash(alg, data):
-+    ctx = hash_init(alg)
-+    hash_update(ctx, data)
-+    return hash_final(ctx)
-+
-+def print_bytes(prefix, value, bytes_per_line):
-+    for i in range(0, len(value), bytes_per_line):
-+        line = prefix + ''.join(f'0x{b:02x}, ' for b in value[i:i+bytes_per_line])
-+        print(f'{line.rstrip()}')
-+
-+def print_static_u8_array_definition(name, value):
-+    print('')
-+    print(f'static const u8 {name} = {{')
-+    print_bytes('\t', value, 8)
-+    print('};')
-+
-+def print_c_struct_u8_array_field(name, value):
-+    print(f'\t\t.{name} = {{')
-+    print_bytes('\t\t\t', value, 8)
-+    print('\t\t},')
-+
-+def gen_unkeyed_testvecs(alg):
-+    print('')
-+    print('static const struct {')
-+    print('\tsize_t data_len;')
-+    print(f'\tu8 digest[{alg.upper()}_DIGEST_SIZE];')
-+    print('} hash_testvecs[] = {')
-+    for data_len in DATA_LENS:
-+        data = rand_bytes(data_len)
-+        print('\t{')
-+        print(f'\t\t.data_len = {data_len},')
-+        print_c_struct_u8_array_field('digest', compute_hash(alg, data))
-+        print('\t},')
-+    print('};')
-+
-+    data = rand_bytes(4096)
-+    ctx = hash_init(alg)
-+    for data_len in range(len(data) + 1):
-+        hash_update(ctx, compute_hash(alg, data[:data_len]))
-+    print_static_u8_array_definition(
-+            f'hash_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
-+            hash_final(ctx))
-+
-+def gen_hmac_testvecs(alg):
-+    ctx = hmac.new(rand_bytes(32), digestmod=alg)
-+    data = rand_bytes(4096)
-+    for data_len in range(len(data) + 1):
-+        ctx.update(data[:data_len])
-+        key_len = data_len % 293
-+        key = rand_bytes(key_len)
-+        mac = hmac.digest(key, data[:data_len], alg)
-+        ctx.update(mac)
-+    print_static_u8_array_definition(
-+            f'hmac_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
-+            ctx.digest())
-+
-+if len(sys.argv) != 2:
-+    sys.stderr.write('Usage: gen-hash-testvecs.py ALGORITHM\n')
-+    sys.stderr.write('ALGORITHM may be any supported by Python hashlib.\n')
-+    sys.stderr.write('Example: gen-hash-testvecs.py sha512\n')
-+    sys.exit(1)
-+
-+alg = sys.argv[1]
-+print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
-+print(f'/* This file was generated by: {sys.argv[0]} {" ".join(sys.argv[1:])} */')
-+gen_unkeyed_testvecs(alg)
-+gen_hmac_testvecs(alg)
++MODULE_DESCRIPTION("KUnit tests and benchmark for SHA-256 and HMAC-SHA256");
++MODULE_LICENSE("GPL");
 -- 
 2.50.1
 
