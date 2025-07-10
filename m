@@ -1,55 +1,55 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB873259C85
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 13:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6DC25BEF0
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 13:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752154442; cv=none; b=tmKrNeFvLARI6wur2Phv8CoNxbbdPdGqVF4bS9H5PK2JfGOebQ415/Sg4+KfHo+boZIuilmVVJk5PyeYxqQOlpwhCmYa+lgLVFV7R6FgqUx4Mw5877Fk/yxC0sGTxscLkALpZbE3l0Z2eLuu5cPzD6MK2R9pnP+u0NCXzwJTG5w=
+	t=1752154444; cv=none; b=hojE+7HJUJXDOPaIiEoBX6b2Dn7zaK7d6nu5iQq165jde9H2mQKNXZezS4QTexm45GueZ4dna3S24R/oyZiOwezrSKVLTtRkFm5xKKQN6wxaaEW+O4gk7rbgyi5tuDFTQmBwWax0GEmubrE9IafpJFpBXC1ORCzfnMB/Y+Hpi34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752154442; c=relaxed/simple;
-	bh=pyOzco7SKcnSbyggZW+0wUWwJXF287JJgoyZ5KfXipc=;
+	s=arc-20240116; t=1752154444; c=relaxed/simple;
+	bh=zSBnuxCAy+NocoV5cmEw2q4gjj2T49IuEuk4b+qVLuI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XyzdqlS7G1YxHNv6uPb/lCa/47VE9RRTBV+VBrTA2F9UnMPVRlWBCyBMd9KRKvf5o1ZKa5jPubXxjIcLJOCXYNFXwn5cJWEHsl5uQzB0zHQIG6rOvHAYRWUmOrf6PZ4bpB3SlG28JQPBQSgIYveqvKl6mU85z/TPZUb2NTscYFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H7TZRYNt; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=iYyd2WDQlphSxN67O4MoYDDlG+EDyHECSHG2hsgMPpZH7ZaerlPoxcoBkp9j13v42xK2eeGpVZb09jabGWWkQQStTQTwb3suvYvk4MMlaxtNjbvmDll6dvK3x9Cd2LrjgVnSvMFs2f+mTVRGtYFyyyxlXgbEuSWxdBRtBl94lSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TtSz6R4F; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H7TZRYNt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TtSz6R4F"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752154441; x=1783690441;
+  t=1752154443; x=1783690443;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pyOzco7SKcnSbyggZW+0wUWwJXF287JJgoyZ5KfXipc=;
-  b=H7TZRYNtaR/oTPKHJDPcVzkoSzhyHxTd2zgmLkxa7nG7E0IGaObqy6UU
-   CXmIx0v4oOTBKHlpzqLCYyUDui9sYu7E2G+6OyQXgD7IcN1hwcyU/7zY3
-   RHWR73vkG9RdpjwWE3+sBLYYguKgqn0YT4dj6lk8GoJtMwF0I54/oiJEM
-   RnZ60FCyUWjRVXw9cotfPRpS/wD2GpBDZ9K0/v2XMUw5rtTAekiUZlZMo
-   SDakd02PrUaEVsZqrrhpPhqtWXguWEEp6aiCuSwoLbmRUgKJdl43f4zu/
-   YeimLK8W/0EY99bJF79Gs6VYT/sDVvH5Av16BoeRbLAyfEX/b10VqrU0Y
-   w==;
-X-CSE-ConnectionGUID: XHfbZeLDT1u1V5qMvlJiog==
-X-CSE-MsgGUID: FJSjoJEAQLu8118Y4s+KiQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="58241844"
+  bh=zSBnuxCAy+NocoV5cmEw2q4gjj2T49IuEuk4b+qVLuI=;
+  b=TtSz6R4FtIxhUhG+zS7yr7NOdTSFCFsc0ksK4AJkOIIY3PqSddONC4Sg
+   4lGnNXjCVGoIIjX1LWLMv84n8z+87O2F+2DBsm4opbXgj2QKqj32wAJTY
+   ZV6g1oeg9GNFxnaJanBZYRaYRNg6B0rcppHGceg6cE87rDN7fuYsTAdrj
+   I3GIGyxQSTJQz2VpD4R/0537C3gWfUoIigjj0ryABx6cAIC5IszVejpXF
+   JzcLqfY+jyctapmBithdsAeGqBsfD7ACxLlKKbjz2d/dpqyRXoGQiiIuk
+   GEv7dqoX9GSkZWTb9LRBZiQvy2vy+73+e/Yw29tjGOkZJoYwfFojfNTOi
+   A==;
+X-CSE-ConnectionGUID: QJW56GbrS7ick6b8Ttr7xQ==
+X-CSE-MsgGUID: puTs+wiWTsGtv0e6sAXtMg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="58241846"
 X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="58241844"
+   d="scan'208";a="58241846"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 06:34:00 -0700
-X-CSE-ConnectionGUID: R0QylnRvTDSX+d5HOz7pqA==
-X-CSE-MsgGUID: NMkA10RCTdKDWTZuR+sapw==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 06:34:02 -0700
+X-CSE-ConnectionGUID: TKShfVWmTf2rpPdcfB6BCA==
+X-CSE-MsgGUID: pAJ9DpLuTqGr+G7CMfSyQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="155494657"
+   d="scan'208";a="155494661"
 Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by orviesa006.jf.intel.com with ESMTP; 10 Jul 2025 06:33:59 -0700
+  by orviesa006.jf.intel.com with ESMTP; 10 Jul 2025 06:34:01 -0700
 From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com
-Subject: [PATCH 5/8] crypto: qat - add adf_rl_get_num_svc_aes() in rate limiting
-Date: Thu, 10 Jul 2025 14:33:44 +0100
-Message-Id: <20250710133347.566310-6-suman.kumar.chakraborty@intel.com>
+Subject: [PATCH 6/8] crypto: qat - add get_svc_slice_cnt() in device data structure
+Date: Thu, 10 Jul 2025 14:33:45 +0100
+Message-Id: <20250710133347.566310-7-suman.kumar.chakraborty@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20250710133347.566310-1-suman.kumar.chakraborty@intel.com>
 References: <20250710133347.566310-1-suman.kumar.chakraborty@intel.com>
@@ -61,135 +61,131 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enhance the rate limiting (RL) infrastructure by adding
-adf_rl_get_num_svc_aes() which can be used to fetch the number of engines
-associated with the service type. Expand the structure adf_rl_hw_data
-with an array that contains the number of AEs per service.
+Enhance the adf_hw_device_data structure by introducing a new callback
+function get_svc_slice_cnt(), which provides a mechanism to query the
+total number of accelerator available on the device for a specific
+service.
 
-Implement adf_gen4_init_num_svc_aes() for QAT GEN4 devices to calculate
-the total number of acceleration engines dedicated to a specific service.
+Implement adf_gen4_get_svc_slice_cnt() for QAT GEN4 devices to support this
+new interface. This function returns the total accelerator count for a
+specific service.
 
+Co-developed-by: George Abraham P <george.abraham.p@intel.com>
+Signed-off-by: George Abraham P <george.abraham.p@intel.com>
 Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |  2 ++
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  2 ++
- .../intel/qat/qat_common/adf_gen4_hw_data.c   | 22 +++++++++++++++++++
- .../intel/qat/qat_common/adf_gen4_hw_data.h   |  1 +
- drivers/crypto/intel/qat/qat_common/adf_rl.c  | 13 ++++++++++-
- drivers/crypto/intel/qat/qat_common/adf_rl.h  |  1 +
- 6 files changed, 40 insertions(+), 1 deletion(-)
+ .../intel/qat/qat_420xx/adf_420xx_hw_data.c    |  1 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c      |  1 +
+ .../intel/qat/qat_common/adf_accel_devices.h   |  2 ++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c    | 18 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_gen4_hw_data.h    |  2 ++
+ drivers/crypto/intel/qat/qat_common/adf_rl.c   | 16 ++--------------
+ 6 files changed, 26 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-index 32bb9e1826d2..67a1c1d8e23e 100644
+index 67a1c1d8e23e..53fa91d577ed 100644
 --- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-@@ -301,6 +301,8 @@ static void adf_init_rl_data(struct adf_rl_hw_data *rl_data)
- 	rl_data->max_tp[SVC_DC] = ADF_420XX_RL_MAX_TP_DC;
- 	rl_data->scan_interval = ADF_420XX_RL_SCANS_PER_SEC;
- 	rl_data->scale_ref = ADF_420XX_RL_SLICE_REF;
-+
-+	adf_gen4_init_num_svc_aes(rl_data);
- }
+@@ -468,6 +468,7 @@ void adf_init_hw_data_420xx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
+ 	hw_data->clock_frequency = ADF_420XX_AE_FREQ;
+ 	hw_data->services_supported = adf_gen4_services_supported;
++	hw_data->get_svc_slice_cnt = adf_gen4_get_svc_slice_cnt;
  
- static int get_rp_group(struct adf_accel_dev *accel_dev, u32 ae_mask)
+ 	adf_gen4_set_err_mask(&hw_data->dev_err_mask);
+ 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
 diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index f917cc9db09d..9b728dba048b 100644
+index 9b728dba048b..740f68a36ac5 100644
 --- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -227,6 +227,8 @@ static void adf_init_rl_data(struct adf_rl_hw_data *rl_data)
- 	rl_data->max_tp[SVC_DC] = ADF_4XXX_RL_MAX_TP_DC;
- 	rl_data->scan_interval = ADF_4XXX_RL_SCANS_PER_SEC;
- 	rl_data->scale_ref = ADF_4XXX_RL_SLICE_REF;
-+
-+	adf_gen4_init_num_svc_aes(rl_data);
- }
+@@ -462,6 +462,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
+ 	hw_data->clock_frequency = ADF_4XXX_AE_FREQ;
+ 	hw_data->services_supported = adf_gen4_services_supported;
++	hw_data->get_svc_slice_cnt = adf_gen4_get_svc_slice_cnt;
  
- static u32 uof_get_num_objs(struct adf_accel_dev *accel_dev)
+ 	adf_gen4_set_err_mask(&hw_data->dev_err_mask);
+ 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index f76e0f6c66ae..9fe3239f0114 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -319,6 +319,8 @@ struct adf_hw_device_data {
+ 	u32 (*get_ena_thd_mask)(struct adf_accel_dev *accel_dev, u32 obj_num);
+ 	int (*dev_config)(struct adf_accel_dev *accel_dev);
+ 	bool (*services_supported)(unsigned long mask);
++	u32 (*get_svc_slice_cnt)(struct adf_accel_dev *accel_dev,
++				 enum adf_base_services svc);
+ 	struct adf_pfvf_ops pfvf_ops;
+ 	struct adf_hw_csr_ops csr_ops;
+ 	struct adf_dc_ops dc_ops;
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-index 3103755e416e..5e4b45c3fabe 100644
+index 5e4b45c3fabe..349fdb323763 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-@@ -558,3 +558,25 @@ void adf_gen4_init_dc_ops(struct adf_dc_ops *dc_ops)
- 	dc_ops->build_decomp_block = adf_gen4_build_decomp_block;
+@@ -580,3 +580,21 @@ void adf_gen4_init_num_svc_aes(struct adf_rl_hw_data *device_data)
+ 	device_data->svc_ae_mask[SVC_DECOMP] = 0;
  }
- EXPORT_SYMBOL_GPL(adf_gen4_init_dc_ops);
+ EXPORT_SYMBOL_GPL(adf_gen4_init_num_svc_aes);
 +
-+void adf_gen4_init_num_svc_aes(struct adf_rl_hw_data *device_data)
-+{
-+	struct adf_hw_device_data *hw_data;
-+	unsigned int i;
-+	u32 ae_cnt;
-+
-+	hw_data = container_of(device_data, struct adf_hw_device_data, rl_data);
-+	ae_cnt = hweight32(hw_data->get_ae_mask(hw_data));
-+	if (!ae_cnt)
-+		return;
-+
-+	for (i = 0; i < SVC_BASE_COUNT; i++)
-+		device_data->svc_ae_mask[i] = ae_cnt - 1;
-+
-+	/*
-+	 * The decompression service is not supported on QAT GEN4 devices.
-+	 * Therefore, set svc_ae_mask to 0.
-+	 */
-+	device_data->svc_ae_mask[SVC_DECOMP] = 0;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_init_num_svc_aes);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-index 7f2b9cb0fe60..7fa203071c01 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-@@ -175,5 +175,6 @@ void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
- 				u32 bank_number);
- bool adf_gen4_services_supported(unsigned long service_mask);
- void adf_gen4_init_dc_ops(struct adf_dc_ops *dc_ops);
-+void adf_gen4_init_num_svc_aes(struct adf_rl_hw_data *device_data);
- 
- #endif
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-index 926975539740..77465ab6702c 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-@@ -552,6 +552,17 @@ u32 adf_rl_calculate_slice_tokens(struct adf_accel_dev *accel_dev, u32 sla_val,
- 	return allocated_tokens;
- }
- 
-+static u32 adf_rl_get_num_svc_aes(struct adf_accel_dev *accel_dev,
-+				  enum adf_base_services svc)
++u32 adf_gen4_get_svc_slice_cnt(struct adf_accel_dev *accel_dev,
++			       enum adf_base_services svc)
 +{
 +	struct adf_rl_hw_data *device_data = &accel_dev->hw_device->rl_data;
 +
-+	if (svc >= SVC_BASE_COUNT)
++	switch (svc) {
++	case SVC_SYM:
++		return device_data->slices.cph_cnt;
++	case SVC_ASYM:
++		return device_data->slices.pke_cnt;
++	case SVC_DC:
++		return device_data->slices.dcpr_cnt;
++	default:
 +		return 0;
-+
-+	return device_data->svc_ae_mask[svc];
++	}
 +}
-+
- u32 adf_rl_calculate_ae_cycles(struct adf_accel_dev *accel_dev, u32 sla_val,
- 			       enum adf_base_services svc_type)
- {
-@@ -563,7 +574,7 @@ u32 adf_rl_calculate_ae_cycles(struct adf_accel_dev *accel_dev, u32 sla_val,
++EXPORT_SYMBOL_GPL(adf_gen4_get_svc_slice_cnt);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+index 7fa203071c01..cd26b6724c43 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+@@ -176,5 +176,7 @@ void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
+ bool adf_gen4_services_supported(unsigned long service_mask);
+ void adf_gen4_init_dc_ops(struct adf_dc_ops *dc_ops);
+ void adf_gen4_init_num_svc_aes(struct adf_rl_hw_data *device_data);
++u32 adf_gen4_get_svc_slice_cnt(struct adf_accel_dev *accel_dev,
++			       enum adf_base_services svc);
+ 
+ #endif
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+index 77465ab6702c..c6a54e465931 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+@@ -529,21 +529,9 @@ u32 adf_rl_calculate_slice_tokens(struct adf_accel_dev *accel_dev, u32 sla_val,
+ 	if (!sla_val)
  		return 0;
  
- 	avail_ae_cycles = hw_data->clock_frequency;
--	avail_ae_cycles *= hw_data->get_num_aes(hw_data) - 1;
-+	avail_ae_cycles *= adf_rl_get_num_svc_aes(accel_dev, svc_type);
- 	do_div(avail_ae_cycles, device_data->scan_interval);
++	/* Handle generation specific slice count adjustment */
+ 	avail_slice_cycles = hw_data->clock_frequency;
+-
+-	switch (svc_type) {
+-	case SVC_ASYM:
+-		avail_slice_cycles *= device_data->slices.pke_cnt;
+-		break;
+-	case SVC_SYM:
+-		avail_slice_cycles *= device_data->slices.cph_cnt;
+-		break;
+-	case SVC_DC:
+-		avail_slice_cycles *= device_data->slices.dcpr_cnt;
+-		break;
+-	default:
+-		break;
+-	}
++	avail_slice_cycles *= hw_data->get_svc_slice_cnt(accel_dev, svc_type);
  
- 	sla_val *= device_data->max_tp[svc_type];
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.h b/drivers/crypto/intel/qat/qat_common/adf_rl.h
-index dee7f0c81906..59f885916157 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_rl.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_rl.h
-@@ -89,6 +89,7 @@ struct adf_rl_hw_data {
- 	u32 pcie_scale_div;
- 	u32 dcpr_correction;
- 	u32 max_tp[RL_ROOT_MAX];
-+	u32 svc_ae_mask[SVC_BASE_COUNT];
- 	struct rl_slice_cnt slices;
- };
- 
+ 	do_div(avail_slice_cycles, device_data->scan_interval);
+ 	allocated_tokens = avail_slice_cycles * sla_val;
 -- 
 2.40.1
 
