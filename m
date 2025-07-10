@@ -1,120 +1,71 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B102877E2
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 06:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB59226CE0;
+	Thu, 10 Jul 2025 08:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752129600; cv=none; b=nlhjWvzSaS/k0sTZYP15crgvz5OrnyMPjlcpf14xIL1NAfBsSNurVzoU5kD7fx3hU1cBIltaULKADIayUE77X3BzAPxyqniE3cplRDV7NfHtx11/2kv2IhLsNqC3FOv9WTR8PPc3KBs6+rAYbefYmXHZUlMxvrjGNWlv8egSeEA=
+	t=1752134914; cv=none; b=Vb6q01ZMsLPFeXrNZg2+I+sbIF1nZ6pqvKJPifkJQku99mXStQKOQ9EDjcGJJW5jeAS21KMbryeqgyKzjQVJJNsv9lLDHJlNGFDNHeY97PCMggl5+Eow0a/SYWFau4cFzZGUDVSyTxLVi3K/f+VPerC8V5Y5inkU4MylVyyZnuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752129600; c=relaxed/simple;
-	bh=0sR3XDfwwvhNiUcLP91nHHaNV0iIULpBPiGW2C+67rI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iBY0IfHtT5cWMG5HXH3LOw1VB0lUUM6iLTyzQA6X9SsyezhvOyt+K8jyHzju4SlVoAIWpjCt5yY+LCDGg66j5sh960hTClpgUdxK7iHydCANhZQfBgNFfKun0Mj9vRZ2IqF3XIJxYDGC/p+41+1su3JfSv/ZCDRoOIbbdIpCuZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fepFGA2c; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752134914; c=relaxed/simple;
+	bh=6ctZAJksvs+Z8bSZM4K5HcWTAqZv1Nvb8sFGXgBLHbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=envG9ddjI3xKf5GBULq39bI90mGx4i7SnHWx32qog2bNjzSpn3x1YugQSNWwSa3RIrzjZYDaBgHp18X8p2APWBoz5F585VxA9FeRTMQnJdkprLC7IDQxiKGOrAEur6nooazbYjM2WJFTxsUxnsROSWXAsn6H0hUvQW3VAEu5dac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kFcHmoUx; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fepFGA2c"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752129599; x=1783665599;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0sR3XDfwwvhNiUcLP91nHHaNV0iIULpBPiGW2C+67rI=;
-  b=fepFGA2cFkZSDSWEO6hU3HDgPdZr/+B2EhZCsRw1CxbgYgZdq30FVVeU
-   sOE766i9BfRdjuR/a7hKuv9SYJ+kIFxl9Gh8PjahbWKyPLrvvKJdm3Lbx
-   oS6DWfk2miDIboy/OxjdIbfzkWW57bpjoCXwY6Hz+2Ahy+dhzT2xgxDub
-   dDCFNPNDQuYyaEm2XwAyiXVKlbz5PUfFk/MBriMyXa58RdEzmCtfrRKHW
-   cYcr+FZA19nIQ3s5NpWPv9DzTImbWndKzTpKxx4Ko9IYsHPnv9JLv2+pJ
-   W2zPeURCD6z7FkBcqLs88CR2JpvbRaS9yTh/6OHf+6dfLhXoJ8FdLSnZG
-   Q==;
-X-CSE-ConnectionGUID: 91MvkkrSQwm4+ctV7x4HeQ==
-X-CSE-MsgGUID: PyqxcrDTQWeRzgNXM25VBw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="53512254"
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="53512254"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 23:39:58 -0700
-X-CSE-ConnectionGUID: Ee3yxfuWT8ari/HF30e2Xg==
-X-CSE-MsgGUID: Q+6rN1nhS+ef9ymTlYcW0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
-   d="scan'208";a="155632201"
-Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by fmviesa007.fm.intel.com with ESMTP; 09 Jul 2025 23:39:57 -0700
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-Subject: [PATCH 3/3] Documentation: qat: update debugfs-driver-qat_telemetry for GEN6 devices
-Date: Thu, 10 Jul 2025 07:39:45 +0100
-Message-Id: <20250710063945.516678-4-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250710063945.516678-1-suman.kumar.chakraborty@intel.com>
-References: <20250710063945.516678-1-suman.kumar.chakraborty@intel.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kFcHmoUx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=h2M9UzPooAH4xms8AQ/UUyaHRr7orBGN4WSmNKt0TTs=; b=kFcHmoUxWcjbLkrbePzQ7yVZrF
+	FNB7PpULB3X+20i/zjqq83O44Q+yB9JeDVOek3lqoIvg8QjYO8D6HwQ07aFKlNqp2IPFCCY5JPjoh
+	Ab+lAfBWG/ImFlJT9RSwzZpyjdco/Lhnr+w7MIr3k0YTC7Ivcp7uu1Jn0irNMOTNPYbbh6fF0VV2a
+	/dSZ7kTfEbxDXVj6dVz8zqF2L1SCdA7xFYCFjSQbrmmqcBhbMCpodA6eYvpPQIrnj78bcKaNkgim1
+	aJX7EkhkbekSEb8CjE4XSz3RYW2ixDvg4wXTauiWcroWP5j3BUlmfQbqEl5aTGxN/ZPeFpZah8x9N
+	9mI5U6kA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uZm4f-005Olj-1u;
+	Thu, 10 Jul 2025 16:08:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Jul 2025 20:08:05 +1200
+Date: Thu, 10 Jul 2025 20:08:05 +1200
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Alexey Romanov <romanov.alexey2000@gmail.com>
+Cc: neil.armstrong@linaro.org, clabbe@baylibre.com, davem@davemloft.net,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	khilman@baylibre.com, jbrunet@baylibre.com,
+	martin.blumenstingl@googlemail.com, linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v12 11/22] crypto: amlogic - Introduce hasher
+Message-ID: <aG905asYccnkO3P1@gondor.apana.org.au>
+References: <20250624135214.1355051-1-romanov.alexey2000@gmail.com>
+ <20250624135214.1355051-12-romanov.alexey2000@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624135214.1355051-12-romanov.alexey2000@gmail.com>
 
-From: Vijay Sundar Selvamani <vijay.sundar.selvamani@intel.com>
+On Tue, Jun 24, 2025 at 04:52:03PM +0300, Alexey Romanov wrote:
+>
+> +static int meson_fill_partial_buffer(struct hasher_ctx *ctx, unsigned int len)
+> +{
 
-Expands telemetry documentation for supporting QAT GEN6 device. Introduces
-new parameters to capture compression, decompression slice utilization and
-execution count.
+Please use the new partial block API which removes the need to
+handle partial blocks.  See aspeed for an example.
 
-Co-developed-by: George Abraham P <george.abraham.p@intel.com>
-Signed-off-by: George Abraham P <george.abraham.p@intel.com>
-Signed-off-by: Vijay Sundar Selvamani <vijay.sundar.selvamani@intel.com>
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- Documentation/ABI/testing/debugfs-driver-qat_telemetry | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/ABI/testing/debugfs-driver-qat_telemetry b/Documentation/ABI/testing/debugfs-driver-qat_telemetry
-index eacee2072088..0dfd8d97e169 100644
---- a/Documentation/ABI/testing/debugfs-driver-qat_telemetry
-+++ b/Documentation/ABI/testing/debugfs-driver-qat_telemetry
-@@ -32,7 +32,7 @@ Description:	(RW) Enables/disables the reporting of telemetry metrics.
- 
- 		  echo 0 > /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/control
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is only available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/kernel/debug/qat_<device>_<BDF>/telemetry/device_data
- Date:		March 2024
-@@ -67,6 +67,10 @@ Description:	(RO) Reports device telemetry counters.
- 		exec_xlt<N>		execution count of Translator slice N
- 		util_dcpr<N>		utilization of Decompression slice N [%]
- 		exec_dcpr<N>		execution count of Decompression slice N
-+		util_cnv<N>		utilization of Compression and verify slice N [%]
-+		exec_cnv<N>		execution count of Compression and verify slice N
-+		util_dcprz<N>		utilization of Decompression slice N [%]
-+		exec_dcprz<N>		execution count of Decompression slice N
- 		util_pke<N>		utilization of PKE N [%]
- 		exec_pke<N>		execution count of PKE N
- 		util_ucs<N>		utilization of UCS slice N [%]
-@@ -100,7 +104,7 @@ Description:	(RO) Reports device telemetry counters.
- 		If a device lacks of a specific accelerator, the corresponding
- 		attribute is not reported.
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is only available for qat_4xxx and qat_6xxx devices.
- 
- What:		/sys/kernel/debug/qat_<device>_<BDF>/telemetry/rp_<A/B/C/D>_data
- Date:		March 2024
-@@ -225,4 +229,4 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
- 		``rp2srv`` from sysfs.
- 		See Documentation/ABI/testing/sysfs-driver-qat for details.
- 
--		This attribute is only available for qat_4xxx devices.
-+		This attribute is only available for qat_4xxx and qat_6xxx devices.
+Cheers,
 -- 
-2.40.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
