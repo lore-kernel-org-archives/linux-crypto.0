@@ -1,59 +1,59 @@
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AF28373;
-	Thu, 10 Jul 2025 08:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3574B6FC3;
+	Thu, 10 Jul 2025 08:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752136982; cv=none; b=CYDxf6Vv7hQfEGMnYGqrz21+rdb8lcMLrjcUSz0aIRJ7IkFIzetGDcI+QmM5awJLiJHKEPmkCymVbEu5n2aqL5nsUDgEq8NpiQU/0PmB5lx4BNH8sGD4v6cbirt6UhwhKzg+rY5sDEEhOPDWU70IfMWSEEYQiZ+ZZsLJQmXCqMI=
+	t=1752137099; cv=none; b=a4URdBCqSdF3TM9mlMXmPhagnJc06IjJ0mIlgHHv9tHwmbCq8PgszBzl4N44hKh/G1nz4Ks11cCXKddPXzKZ7FoE4GxawU2Rs36NeJDEGuG9xaYYW9PhLb6wr8Ma0xKqhfetyWquAyxHWmeTFJCurdK1uNULgrYLEozu4fN8AQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752136982; c=relaxed/simple;
-	bh=g459028/JSadOIU5ioN9lGsXNXo9bvmMiYxbBIqYAjw=;
+	s=arc-20240116; t=1752137099; c=relaxed/simple;
+	bh=0DeIS/eUKc5l8nyQlnzRZZMUEK1nHPCumjn758um+H0=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LJrC9G9WHGyu8GNd/wDuViC6O3/zZZ5mGgJLFEPdr9fvFS/hzDCFRkAvLa2Zzccri1/oLHX3Ez9waTzj8+Sx2eHHfaguC5WnktV/VC7dvkcRZAD5yVl+gdKblsxlUC3ID3BsvZ/3kHdo9B8bvps+D3ytU3Pukx+PKxUlE+aOIX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LWu3s865; arc=none smtp.client-ip=67.231.148.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=KCAg6AqjlSAseaBWP0KQDEqpBMgqnsArg8w/1JdfHE8XAEmTyrRm4oOnp8UlPj9IqNRSIVobRbHMVGM8L2jJASSWctwxOjCtvBK5/j18uBnABRar5IGJeRGnaLihYr9k+//Nixxtz6dA0543xpOIVFaD62p/X1Mb8yKVgJSAmlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VHbJ5ziv; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LWu3s865"
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569NWUIP004022;
-	Thu, 10 Jul 2025 01:42:43 -0700
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VHbJ5ziv"
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569NcE4G028281;
+	Thu, 10 Jul 2025 01:44:50 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=ht5d0M9rmt2zm2KkwM6vY0I9R
-	sgkRykgZ4IGgkysBTY=; b=LWu3s865BtK+1JjDdBMWe9olbl7Jou+vrLrfWe9nx
-	16gc/Hr2U5aJTY9C45Qp+n9BUe1+79v41hUOIsWSGU0QHkhmyIJZithdwNrl+cqH
-	l7WNI+jOe094TQItU3FzdGE9+0apCDiI+J0Nj6eXM5LR4/EukxVu6xqbpEpCu8c3
-	MmYhpq+4nnuz8wAI+tuWndELex7fNSNOa4+nv5kbkaVZO8HT6kxnLcyzP+ATFa9H
-	6vpJvljw1g24hW+8Xo2dg9P0Ua6w+Sd+gf8QdQ3TWhVF4x+hG6AC2rqysVZDr7xH
-	ky1Q+gJPsXFpe3PBzpgL3QOgoTRLTX1K6/hSNRgXmm+xA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47t26g98eu-1
+	:references:subject:to; s=pfpt0220; bh=f4wV+OEdxP/NnVe0R8EZ110HL
+	V6sAhW7nZL2hCAMY3Q=; b=VHbJ5zivrULuzEm+CLFbhliBE3NMiupuWIjVkyABY
+	+ODugE8E2qJjb3iARs21exacDcn2vBHFp1XCP51F06sxuOid4pDMbmdPYmtlb3BL
+	OOdSvngV5uRsxx8XAD+renNTZaJ5AOYrAcCOBIg7FE0rx1dPXBd0qvGRqVMmT8J5
+	twMQXtezbALdDUVqAn5A3yOWUZHJiCaR7ZHGDN+81e4a+L88d5qPqtOMQPh6mZey
+	u5t6+lDfI594HXWZpmBmMQCZOaElXbKjbGhvR0aWIUFYW7fJORBR6ztGTp1qFAgK
+	WOvs4ZU4MBlP8Xpc7yJYv970tuKRcZ+Eirz4IgLbDud0w==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47t26d97q3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Jul 2025 01:42:43 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Thu, 10 Jul 2025 01:44:50 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 10 Jul 2025 01:42:42 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 10 Jul 2025 01:42:42 -0700
+ 15.2.1544.4; Thu, 10 Jul 2025 01:44:49 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 10 Jul 2025 01:44:49 -0700
 Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id 5DB9F5B693B;
-	Thu, 10 Jul 2025 01:42:39 -0700 (PDT)
-Date: Thu, 10 Jul 2025 14:12:38 +0530
+	by maili.marvell.com (Postfix) with SMTP id 69EFF3F7041;
+	Thu, 10 Jul 2025 01:44:46 -0700 (PDT)
+Date: Thu, 10 Jul 2025 14:14:45 +0530
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: Simon Horman <horms@kernel.org>
 CC: <davem@davemloft.net>, <leon@kernel.org>, <sgoutham@marvell.com>,
         <bbhushan2@marvell.com>, <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 10/14] octeontx2-pf: ipsec: Handle NPA
- threshold interrupt
-Message-ID: <aG98_m30GHBGtLIt@optiplex>
+Subject: Re: [PATCH net-next v2 12/14] octeontx2-pf: ipsec: Process CPT
+ metapackets
+Message-ID: <aG99fdMVhJUNhxtZ@optiplex>
 References: <20250618113020.130888-1-tanmay@marvell.com>
- <20250618113020.130888-11-tanmay@marvell.com>
- <20250620110038.GJ194429@horms.kernel.org>
+ <20250618113020.130888-13-tanmay@marvell.com>
+ <20250620110657.GK194429@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,115 +62,107 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250620110038.GJ194429@horms.kernel.org>
-X-Proofpoint-GUID: Z7fgeOgn1PDE5_FCqGbv1NA8SvpBaCQi
-X-Authority-Analysis: v=2.4 cv=TJNFS0la c=1 sm=1 tr=0 ts=686f7d03 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=nDdoMcYX8gk1bqBtB7IA:9 a=CjuIK1q_8ugA:10
+In-Reply-To: <20250620110657.GK194429@horms.kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX1JOxMuumyVo3 ZazVfy6JmgnC3QcbC2kx4EEkBGJ8pI7ZtQkCT9R+Unih6KP/YC/VdVbEyl9OGjjk7NrDAOI6ZJA pfDt7WMzC+niz404yBSN/sfEuLxV/gvv3xC67YqvqQBYaA+1Z6hWSuBG++H832BLfVRdZEPad1C
+ kK4WS3dMWuJxDKvpbPoaxSSCHyMi9dOZOl3436P2RHu0Qe/ArBX133wjWU4iDWxChWRAfbjQogV Irhxfu7AKVc+LSVM1qkT2EZKg09KwoFqwen/2WEX+JizMQuLF5dHuCO4ZDfjTIpuSO17kne1ciP mym95dJ5JOFGA5ztrryhhdmewdWeP2yF5PaYiropo1KpInpUT16ijrZvvmt8k8Xb25OIv3ZMaQl
+ 0QmyZ3JsWaUJ5auFqz0nR7r4bAqQVXjTKhVzgVmNd174VsqMT8vKnInkSy8Bd/1KvBsaqBM0
+X-Proofpoint-GUID: KEqZ1-LRdpnbRpSQs1QwHKIvGJzVjeIV
+X-Proofpoint-ORIG-GUID: KEqZ1-LRdpnbRpSQs1QwHKIvGJzVjeIV
+X-Authority-Analysis: v=2.4 cv=O8A5vA9W c=1 sm=1 tr=0 ts=686f7d82 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=BK0mZRYZI33l8Kwai9EA:9 a=CjuIK1q_8ugA:10
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX8HJBEkePRp+8 cG/ABt8qW8G0jkKtF/eAtE0PSAJ6b8ZgTidEOuepL5PIV0+BKJILFPjJOjfbB3nuRLxTflLnAf9 Lm9tu6Yj5BZV99ekHFTfNs2/Oli1I5yxVxx1VhwRniJGgg4RooMjb8ZqXG63hYbXv6otNoakMow
- +tXzrBqiK5mRW94ykfDQPM3zQO3MjRU0pl9UUW26ijqBPwm0/SdT/3lhH3RNc1DG9VeD3OEN+mu DiU687fr6XaroUW9zd1f3msP+/ZHp88W7/t/hUk642uUu1sBSXdLT7QlP5BXTNYPDUCPfRaLjIJ B5ZY4VOcJVqWchVKZU1TY0EFkZjsUZvTDN5CPIRbYzvVwYsvtH/6NFiV7QLBSWUlEmfJPIUXIEr
- /NqzVt3dxDIwBdMcMe6erLqvW1UmIwQpelf5SWFqBFvawy3vdbgRGXQSxdnwjM5Zlom8yHj5
-X-Proofpoint-ORIG-GUID: Z7fgeOgn1PDE5_FCqGbv1NA8SvpBaCQi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-10_01,2025-07-09_01,2025-03-28_01
 
-Hi Simon,
-
-On 2025-06-20 at 16:30:38, Simon Horman (horms@kernel.org) wrote:
-> On Wed, Jun 18, 2025 at 05:00:04PM +0530, Tanmay Jagdale wrote:
-> > The NPA Aura pool that is dedicated for 1st pass inline IPsec flows
-> > raises an interrupt when the buffers of that aura_id drop below a
-> > threshold value.
+On 2025-06-20 at 16:36:57, Simon Horman (horms@kernel.org) wrote:
+> On Wed, Jun 18, 2025 at 05:00:06PM +0530, Tanmay Jagdale wrote:
+> > CPT hardware forwards decrypted IPsec packets to NIX via the X2P bus
+> > as metapackets which are of 256 bytes in length. Each metapacket
+> > contains CPT_PARSE_HDR_S and initial bytes of the decrypted packet
+> > that helps NIX RX in classifying and submitting to CPU. Additionally,
+> > CPT also sets BIT(11) of the channel number to indicate that it's a
+> > 2nd pass packet from CPT.
 > > 
-> > Add the following changes to handle this interrupt
-> > - Increase the number of MSIX vectors requested for the PF/VF to
-> >   include NPA vector.
-> > - Create a workqueue (refill_npa_inline_ipsecq) to allocate and
-> >   refill buffers to the pool.
-> > - When the interrupt is raised, schedule the workqueue entry,
-> >   cn10k_ipsec_npa_refill_inb_ipsecq(), where the current count of
-> >   consumed buffers is determined via NPA_LF_AURA_OP_CNT and then
-> >   replenished.
+> > Since the metapackets are not complete packets, they don't have to go
+> > through L3/L4 layer length and checksum verification so these are
+> > disabled via the NIX_LF_INLINE_RQ_CFG mailbox during IPsec initialization.
+> > 
+> > The CPT_PARSE_HDR_S contains a WQE pointer to the complete decrypted
+> > packet. Add code in the rx NAPI handler to parse the header and extract
+> > WQE pointer. Later, use this WQE pointer to construct the skb, set the
+> > XFRM packet mode flags to indicate successful decryption before submitting
+> > it to the network stack.
 > > 
 > > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 > > ---
 > > Changes in V2:
-> > - Fixed sparse warnings
+> > - Removed unnecessary casts
+> > - Don't convert complete cpt_parse_hdr from BE to LE and just
+> >   convert required fields
+> > - Fixed logic to avoid repeated calculation for start and end in sg
 > > 
-> > V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-12-tanmay@marvell.com/
+> > V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-15-tanmay@marvell.com/
 > > 
-> >  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 94 ++++++++++++++++++-
-> >  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  1 +
-> >  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  4 +
-> >  .../ethernet/marvell/octeontx2/nic/otx2_reg.h |  2 +
-> >  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  4 +
-> >  5 files changed, 104 insertions(+), 1 deletion(-)
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 52 +++++++++++++++++++
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.h       | 48 +++++++++++++++++
+> >  .../marvell/octeontx2/nic/otx2_common.h       |  2 +
+> >  .../marvell/octeontx2/nic/otx2_struct.h       | 16 ++++++
+> >  .../marvell/octeontx2/nic/otx2_txrx.c         | 29 +++++++++--
+> >  5 files changed, 144 insertions(+), 3 deletions(-)
 > > 
 > > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> 
-> ...
-> 
-> >  static int cn10k_inb_cpt_init(struct net_device *netdev)
-> >  {
-> >  	struct otx2_nic *pfvf = netdev_priv(netdev);
-> > -	int ret = 0;
-> > +	int ret = 0, vec;
-> > +	char *irq_name;
-> > +	void *ptr;
-> > +	u64 val;
+> > index 5cb6bc835e56..a95878378334 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> > @@ -346,6 +346,58 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
+> >  	return ret;
+> >  }
 > >  
-> >  	ret = cn10k_ipsec_setup_nix_rx_hw_resources(pfvf);
-> >  	if (ret) {
-> > @@ -528,6 +587,34 @@ static int cn10k_inb_cpt_init(struct net_device *netdev)
-> >  		return ret;
-> >  	}
-> >  
-> > +	/* Work entry for refilling the NPA queue for ingress inline IPSec */
-> > +	INIT_WORK(&pfvf->ipsec.refill_npa_inline_ipsecq,
-> > +		  cn10k_ipsec_npa_refill_inb_ipsecq);
+> > +struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
+> > +						     struct nix_cqe_rx_s *cqe,
+> > +						     struct sk_buff *skb,
+> > +						     int qidx)
+> > +{
+> > +	struct nix_rx_sg_s *sg = &cqe->sg;
+> > +	struct nix_wqe_rx_s *wqe = NULL;
+> > +	u64 *seg_addr = &sg->seg_addr;
+> > +	struct cpt_parse_hdr_s *cptp;
+> > +	struct xfrm_offload *xo;
+> > +	struct xfrm_state *xs;
+> > +	struct sec_path *sp;
+> > +	void *va;
 > > +
-> > +	/* Register NPA interrupt */
-> > +	vec = pfvf->hw.npa_msixoff;
-> > +	irq_name = &pfvf->hw.irq_name[vec * NAME_SIZE];
-> > +	snprintf(irq_name, NAME_SIZE, "%s-npa-qint", pfvf->netdev->name);
+> > +	/* CPT_PARSE_HDR_S is present in the beginning of the buffer */
+> > +	va = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain, *seg_addr));
 > > +
-> > +	ret = request_irq(pci_irq_vector(pfvf->pdev, vec),
-> > +			  cn10k_ipsec_npa_inb_ipsecq_intr_handler, 0,
-> > +			  irq_name, pfvf);
-> > +	if (ret) {
-> > +		dev_err(pfvf->dev,
-> > +			"RVUPF%d: IRQ registration failed for NPA QINT\n",
-> > +			rvu_get_pf(pfvf->pdev, pfvf->pcifunc));
-> > +		return ret;
-> > +	}
+> > +	cptp = (struct cpt_parse_hdr_s *)va;
 > > +
-> > +	/* Enable NPA threshold interrupt */
-> > +	ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
+> > +	/* Convert the wqe_ptr from CPT_PARSE_HDR_S to a CPU usable pointer */
+> > +	wqe = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
+> > +					     be64_to_cpu(cptp->wqe_ptr)));
 > 
 > Hi Tanmay,
 Hi Simon,
 
 > 
-> ptr is set but otherwise unused in this function.
-> Probably it should be removed.
-ACK. ptr is unused and I have removed it for the next version.
+> be64_to_cpu expects a __be64 argument, but the type of cptp->wqe_ptr is u64.
+> Or, IOW, be64_to_cpu expects to be based a big endian value but
+> the type of it's argument is host byte order.
+Okay. I will fix the structure definition to use __be types.
 
 > 
-> Flagged by clang and gcc with -Wunused-but-set-variable
+> > +
+> > +	/* Get the XFRM state pointer stored in SA context */
+> > +	xs = pfvf->ipsec.inb_sa->base +
+> > +	     (be32_to_cpu(cptp->cookie) * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
 > 
-> Also, Sparse warns that the return type of otx2_get_regaddr()
-> is  void __iomem *, but ptr does not have an __iomem annotation.
-> 
+> Likewise with cookie here.
+ACK.
 
+> 
+> :Flagged by Sparse.
+> 
+> ...
+> 
 With Regards,
 Tanmay
-> > +	val = BIT_ULL(43) | BIT_ULL(17);
-> > +	otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
-> > +		     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | val);
-> > +
-> > +	/* Enable interrupt */
-> > +	otx2_write64(pfvf, NPA_LF_QINTX_ENA_W1S(0), BIT_ULL(0));
-> > +
-> >  	return ret;
-> >  }
-> >  
