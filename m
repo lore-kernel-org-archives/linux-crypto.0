@@ -1,59 +1,59 @@
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5069D28C2B7;
-	Thu, 10 Jul 2025 08:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AF28373;
+	Thu, 10 Jul 2025 08:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752136827; cv=none; b=bT3cDNK+P+PBpcqkXh+T+2w6wUoi+qCFG3eryeDJV1G5eoW0dF7CoAAPZyO/MOZ9KTywz4r+G+zQqqP3qWYwnDCXeJNwd62zOpzr5AVuDX3SRrCCMgCZ4DnOmoKfXONH0771wP7ZYDHe7iyHVcrb24e5hED9SceRBGVP24tR0kI=
+	t=1752136982; cv=none; b=CYDxf6Vv7hQfEGMnYGqrz21+rdb8lcMLrjcUSz0aIRJ7IkFIzetGDcI+QmM5awJLiJHKEPmkCymVbEu5n2aqL5nsUDgEq8NpiQU/0PmB5lx4BNH8sGD4v6cbirt6UhwhKzg+rY5sDEEhOPDWU70IfMWSEEYQiZ+ZZsLJQmXCqMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752136827; c=relaxed/simple;
-	bh=k8QYU1NiNaTnKoiWQNFMKCjrByVIcOn1yXxiqWINZrc=;
+	s=arc-20240116; t=1752136982; c=relaxed/simple;
+	bh=g459028/JSadOIU5ioN9lGsXNXo9bvmMiYxbBIqYAjw=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iKqc+0L5P5mwdiEJVS2Kpr0a0WIMAFQNGqV/YzZfhXsgFZKiGCa2Kowu+KZ9wAbj5chSqdKhhuV2QaQZBQAUGMi4+wueyjcd9L2ILtIeTantfIy+F6d7gVW3FheK/YUUWV9sdj4PUp5p+gQbVCS8zuG1gJsyEoLBJx99aqvyDI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gesfyd+F; arc=none smtp.client-ip=67.231.156.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=LJrC9G9WHGyu8GNd/wDuViC6O3/zZZ5mGgJLFEPdr9fvFS/hzDCFRkAvLa2Zzccri1/oLHX3Ez9waTzj8+Sx2eHHfaguC5WnktV/VC7dvkcRZAD5yVl+gdKblsxlUC3ID3BsvZ/3kHdo9B8bvps+D3ytU3Pukx+PKxUlE+aOIX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LWu3s865; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gesfyd+F"
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56A62JoD005273;
-	Thu, 10 Jul 2025 01:40:14 -0700
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LWu3s865"
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569NWUIP004022;
+	Thu, 10 Jul 2025 01:42:43 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=xaeNAsq8SKhg81D5XrW0Cp4l0
-	a+Gg3NDnHtyBEMoAGg=; b=gesfyd+FM1rCey7NtAYA+TGghHIIDsygfRGtg3yAG
-	LlSiU8MTYvn56sl7aFeKSzqPmq9kiPRYPoOiPIoklT7c6IJJTI7Haprbv+egW5MZ
-	g6ujz7x+6pHn2KUguIRHQ8aX2xnsr+hS8ayGuvJllYrkuVPl58LAJo6bMTxnsB6O
-	nqBzFWH64qaDMW3Ee21OiACrx9r1hXsiWmyaP9EUIhKdN7/krr18vp7N6iFgEJxk
-	Vd3C16ZA/OB+weITy4sTi9emTDSLvPSNYvzL0gPntjuNR3gaTsD4a93kp4JpWDEl
-	yXU0kgUq/UXTche81sgZL8y+CgSJTHV7W1vb6jDO+Ux1g==
+	:references:subject:to; s=pfpt0220; bh=ht5d0M9rmt2zm2KkwM6vY0I9R
+	sgkRykgZ4IGgkysBTY=; b=LWu3s865BtK+1JjDdBMWe9olbl7Jou+vrLrfWe9nx
+	16gc/Hr2U5aJTY9C45Qp+n9BUe1+79v41hUOIsWSGU0QHkhmyIJZithdwNrl+cqH
+	l7WNI+jOe094TQItU3FzdGE9+0apCDiI+J0Nj6eXM5LR4/EukxVu6xqbpEpCu8c3
+	MmYhpq+4nnuz8wAI+tuWndELex7fNSNOa4+nv5kbkaVZO8HT6kxnLcyzP+ATFa9H
+	6vpJvljw1g24hW+8Xo2dg9P0Ua6w+Sd+gf8QdQ3TWhVF4x+hG6AC2rqysVZDr7xH
+	ky1Q+gJPsXFpe3PBzpgL3QOgoTRLTX1K6/hSNRgXmm+xA==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47t7w3gfjw-4
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47t26g98eu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Jul 2025 01:40:14 -0700 (PDT)
+	Thu, 10 Jul 2025 01:42:43 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 10 Jul 2025 01:40:07 -0700
+ 15.2.1544.4; Thu, 10 Jul 2025 01:42:42 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 10 Jul 2025 01:40:07 -0700
+ Transport; Thu, 10 Jul 2025 01:42:42 -0700
 Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id D9C395B6940;
-	Thu, 10 Jul 2025 01:40:03 -0700 (PDT)
-Date: Thu, 10 Jul 2025 14:10:03 +0530
+	by maili.marvell.com (Postfix) with SMTP id 5DB9F5B693B;
+	Thu, 10 Jul 2025 01:42:39 -0700 (PDT)
+Date: Thu, 10 Jul 2025 14:12:38 +0530
 From: Tanmay Jagdale <tanmay@marvell.com>
 To: Simon Horman <horms@kernel.org>
 CC: <davem@davemloft.net>, <leon@kernel.org>, <sgoutham@marvell.com>,
         <bbhushan2@marvell.com>, <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 14/14] octeontx2-pf: ipsec: Add XFRM state
- and policy hooks for inbound flows
-Message-ID: <aG98Y985la89vYR7@optiplex>
+Subject: Re: [PATCH net-next v2 10/14] octeontx2-pf: ipsec: Handle NPA
+ threshold interrupt
+Message-ID: <aG98_m30GHBGtLIt@optiplex>
 References: <20250618113020.130888-1-tanmay@marvell.com>
- <20250618113020.130888-15-tanmay@marvell.com>
- <20250620112249.GL194429@horms.kernel.org>
+ <20250618113020.130888-11-tanmay@marvell.com>
+ <20250620110038.GJ194429@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,110 +62,115 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250620112249.GL194429@horms.kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX2qprP3RMsJTL o0xmT2WaV7J8gHOv5HblrtPZlfQR7SbTuGhUjDjzASN3o/AWcBWuGPosZ+hcGqwus859XNAUHux iqYY57OG6TwlCDXgx26w2GtOYBlzGFSzA4iVCURXSEkAc9Pgv9SuYqqmqhQIteYMV8CxSbfdlJQ
- D5DSFSyq04FykYktpVOkNisYYch/BCP7RHxOG0KXPXvXwPjFfqcBCzIMbEjaYs9B4Dye9IaIcw7 qOOdCjRSXg13VHODn8c3AiNJIlaHuAbP6vx/J1zhujRmMCS1SrknFQAi9hTKuUyupDlsu+t6QZA 6V8+Llem07Q2BFzUHOeCuxvCTrt9+oDaH+qXEgjp8kkWaOM9odPzaGCrK1RDgqvnk+I8B7lvifD
- 6gc8LTBrHP6NeqEgTJGU4h4SDQ4gL8MsPo9kpFWjqhfjVOpmc0TSqLmVhMGgHwMcOt/kTCZg
-X-Proofpoint-GUID: Ce3dUlXNwKf48bYRfIh2pf8BUspLlIJv
-X-Proofpoint-ORIG-GUID: Ce3dUlXNwKf48bYRfIh2pf8BUspLlIJv
-X-Authority-Analysis: v=2.4 cv=dY+A3WXe c=1 sm=1 tr=0 ts=686f7c6e cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=xWn14IjVmXkPw4t3ZSQA:9 a=CjuIK1q_8ugA:10
+In-Reply-To: <20250620110038.GJ194429@horms.kernel.org>
+X-Proofpoint-GUID: Z7fgeOgn1PDE5_FCqGbv1NA8SvpBaCQi
+X-Authority-Analysis: v=2.4 cv=TJNFS0la c=1 sm=1 tr=0 ts=686f7d03 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=nDdoMcYX8gk1bqBtB7IA:9 a=CjuIK1q_8ugA:10
  a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDA3NCBTYWx0ZWRfX8HJBEkePRp+8 cG/ABt8qW8G0jkKtF/eAtE0PSAJ6b8ZgTidEOuepL5PIV0+BKJILFPjJOjfbB3nuRLxTflLnAf9 Lm9tu6Yj5BZV99ekHFTfNs2/Oli1I5yxVxx1VhwRniJGgg4RooMjb8ZqXG63hYbXv6otNoakMow
+ +tXzrBqiK5mRW94ykfDQPM3zQO3MjRU0pl9UUW26ijqBPwm0/SdT/3lhH3RNc1DG9VeD3OEN+mu DiU687fr6XaroUW9zd1f3msP+/ZHp88W7/t/hUk642uUu1sBSXdLT7QlP5BXTNYPDUCPfRaLjIJ B5ZY4VOcJVqWchVKZU1TY0EFkZjsUZvTDN5CPIRbYzvVwYsvtH/6NFiV7QLBSWUlEmfJPIUXIEr
+ /NqzVt3dxDIwBdMcMe6erLqvW1UmIwQpelf5SWFqBFvawy3vdbgRGXQSxdnwjM5Zlom8yHj5
+X-Proofpoint-ORIG-GUID: Z7fgeOgn1PDE5_FCqGbv1NA8SvpBaCQi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-10_01,2025-07-09_01,2025-03-28_01
 
 Hi Simon,
 
-On 2025-06-20 at 16:52:49, Simon Horman (horms@kernel.org) wrote:
-> On Wed, Jun 18, 2025 at 05:00:08PM +0530, Tanmay Jagdale wrote:
-> > Add XFRM state hook for inbound flows and configure the following:
-> >   - Install an NPC rule to classify the 1st pass IPsec packets and
-> >     direct them to the dedicated RQ
-> >   - Allocate a free entry from the SA table and populate it with the
-> >     SA context details based on xfrm state data.
-> >   - Create a mapping of the SPI value to the SA table index. This is
-> >     used by NIXRX to calculate the exact SA context  pointer address
-> >     based on the SPI in the packet.
-> >   - Prepare the CPT SA context to decrypt buffer in place and the
-> >     write it the CPT hardware via LMT operation.
-> >   - When the XFRM state is deleted, clear this SA in CPT hardware.
+On 2025-06-20 at 16:30:38, Simon Horman (horms@kernel.org) wrote:
+> On Wed, Jun 18, 2025 at 05:00:04PM +0530, Tanmay Jagdale wrote:
+> > The NPA Aura pool that is dedicated for 1st pass inline IPsec flows
+> > raises an interrupt when the buffers of that aura_id drop below a
+> > threshold value.
 > > 
-> > Also add XFRM Policy hooks to allow successful offload of inbound
-> > PACKET_MODE.
+> > Add the following changes to handle this interrupt
+> > - Increase the number of MSIX vectors requested for the PF/VF to
+> >   include NPA vector.
+> > - Create a workqueue (refill_npa_inline_ipsecq) to allocate and
+> >   refill buffers to the pool.
+> > - When the interrupt is raised, schedule the workqueue entry,
+> >   cn10k_ipsec_npa_refill_inb_ipsecq(), where the current count of
+> >   consumed buffers is determined via NPA_LF_AURA_OP_CNT and then
+> >   replenished.
 > > 
 > > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> > ---
+> > Changes in V2:
+> > - Fixed sparse warnings
+> > 
+> > V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-12-tanmay@marvell.com/
+> > 
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 94 ++++++++++++++++++-
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  1 +
+> >  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  4 +
+> >  .../ethernet/marvell/octeontx2/nic/otx2_reg.h |  2 +
+> >  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  4 +
+> >  5 files changed, 104 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 > 
 > ...
 > 
-> > @@ -1141,6 +1154,137 @@ static int cn10k_outb_write_sa(struct otx2_nic *pf, struct qmem *sa_info)
-> >  	return ret;
-> >  }
+> >  static int cn10k_inb_cpt_init(struct net_device *netdev)
+> >  {
+> >  	struct otx2_nic *pfvf = netdev_priv(netdev);
+> > -	int ret = 0;
+> > +	int ret = 0, vec;
+> > +	char *irq_name;
+> > +	void *ptr;
+> > +	u64 val;
 > >  
-> > +static int cn10k_inb_write_sa(struct otx2_nic *pf,
-> > +			      struct xfrm_state *x,
-> > +			      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
-> > +{
-> > +	dma_addr_t res_iova, dptr_iova, sa_iova;
-> > +	struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
-> > +	struct cpt_inst_s inst;
-> > +	u32 sa_size, off;
-> > +	struct cpt_res_s *res;
-> > +	u64 reg_val;
-> > +	int ret;
+> >  	ret = cn10k_ipsec_setup_nix_rx_hw_resources(pfvf);
+> >  	if (ret) {
+> > @@ -528,6 +587,34 @@ static int cn10k_inb_cpt_init(struct net_device *netdev)
+> >  		return ret;
+> >  	}
+> >  
+> > +	/* Work entry for refilling the NPA queue for ingress inline IPSec */
+> > +	INIT_WORK(&pfvf->ipsec.refill_npa_inline_ipsecq,
+> > +		  cn10k_ipsec_npa_refill_inb_ipsecq);
 > > +
-> > +	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
-> > +				 &res_iova, GFP_ATOMIC);
-> > +	if (!res)
-> > +		return -ENOMEM;
+> > +	/* Register NPA interrupt */
+> > +	vec = pfvf->hw.npa_msixoff;
+> > +	irq_name = &pfvf->hw.irq_name[vec * NAME_SIZE];
+> > +	snprintf(irq_name, NAME_SIZE, "%s-npa-qint", pfvf->netdev->name);
 > > +
-> > +	sa_cptr = inb_ctx_info->sa_entry;
-> > +	sa_iova = inb_ctx_info->sa_iova;
-> > +	sa_size = sizeof(struct cn10k_rx_sa_s);
-> > +
-> > +	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
-> > +	if (!sa_dptr) {
-> > +		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
-> > +				  res_iova);
-> > +		return -ENOMEM;
+> > +	ret = request_irq(pci_irq_vector(pfvf->pdev, vec),
+> > +			  cn10k_ipsec_npa_inb_ipsecq_intr_handler, 0,
+> > +			  irq_name, pfvf);
+> > +	if (ret) {
+> > +		dev_err(pfvf->dev,
+> > +			"RVUPF%d: IRQ registration failed for NPA QINT\n",
+> > +			rvu_get_pf(pfvf->pdev, pfvf->pcifunc));
+> > +		return ret;
 > > +	}
 > > +
-> > +	for (off = 0; off < (sa_size / 8); off++)
-> > +		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
-> > +
-> > +	memset(&inst, 0, sizeof(struct cpt_inst_s));
-> > +
-> > +	res->compcode = 0;
-> > +	inst.res_addr = res_iova;
-> > +	inst.dptr = (u64)dptr_iova;
-> > +	inst.param2 = sa_size >> 3;
-> > +	inst.dlen = sa_size;
-> > +	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
-> > +	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
-> > +	inst.cptr = sa_iova;
-> > +	inst.ctx_val = 1;
-> > +	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
-> > +
-> > +	/* Re-use Outbound CPT LF to install Ingress SAs as well because
-> > +	 * the driver does not own the ingress CPT LF.
-> > +	 */
-> > +	pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
-> > +	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
-> > +	dmb(sy);
+> > +	/* Enable NPA threshold interrupt */
+> > +	ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
 > 
 > Hi Tanmay,
+Hi Simon,
+
 > 
-> As I understand things the above effectively means that this
-> driver will only compile for ARM64.
+> ptr is set but otherwise unused in this function.
+> Probably it should be removed.
+ACK. ptr is unused and I have removed it for the next version.
+
 > 
-> I do understand that the driver is only intended to be used on ARM64.
-> But it is nice to get compile coverage on other 64bit systems,
-> in particular x86_64.
+> Flagged by clang and gcc with -Wunused-but-set-variable
 > 
-> And moreover, I think the guiding principle should be for drivers
-> to be as independent of the host system as possible.
+> Also, Sparse warns that the return type of otx2_get_regaddr()
+> is  void __iomem *, but ptr does not have an __iomem annotation.
 > 
-> Can we look into handling this a different way?
-ACK, I will use dma_wmb() here so that it is generic.
 
 With Regards,
 Tanmay
+> > +	val = BIT_ULL(43) | BIT_ULL(17);
+> > +	otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
+> > +		     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | val);
+> > +
+> > +	/* Enable interrupt */
+> > +	otx2_write64(pfvf, NPA_LF_QINTX_ENA_W1S(0), BIT_ULL(0));
+> > +
+> >  	return ret;
+> >  }
+> >  
