@@ -1,66 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A767221A43D;
-	Thu, 10 Jul 2025 19:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16CF1D432D
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 22:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752175974; cv=none; b=uLyUKuptasCLek73Isy9r65Q7dPq2CZLf/NFbFeawn4MvzfG2yDIhd3uGt+BIUcRZCpK4MZcZhG3t/ILMabxU1pLIPhZRjMz7NoUfC1XvbKHL+Jt5JSmYRz/59htoYwgVka0+T9G+PKkglZtrtyVYlmn4N4cX2svS0HfxDduhz8=
+	t=1752187558; cv=none; b=Y+Mw7iA9g25R7oLs6rl0SK5ySwta2me/pFz3nikUNapU+aEfJyNZZWseFInD/14JYH7Opy8gemtWizv8WHHJdEM9Gin8sB63YXN3KOZod/wgJ6l4p1RIJCboqgO79Tmdi6WYP6tObIJrMLmeZtjZNDmi5oB9/MtLBJAb7ZAkq8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752175974; c=relaxed/simple;
-	bh=5iv/ybBT1EWpCtzUTeH7jOisZdpjTSxsHX5LZWaBTBs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q6eSwtEnOD1JVKS/F6DpSYaMiPoVkkpPIvxTVClsZbDEypJh9+k6VPTwhH/BlPLVHuzIdspVvn3MC0oc3utoq/luGYAIGJXkWEn8ud75Q0VWGbJfGflHMmGQERO/ntR5H27LmP3EDStX1vPsJQXS+2KdHTS9e6P5x6ecmTV4QBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4KrJlDa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752187558; c=relaxed/simple;
+	bh=ASuthF9LWI0NYc2lvvZiPPexlWyLf6OJpDYK25Z9I1Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WFi1O8DM9f4e8yxzvNkstF9HCVz08WDFz9oJOJHiAhQz8FMINDUKwww1uGcbSbUqwrQAAUevTWEfpDeOyGOjz6RawM4W1k1f3WlY31Fm8dMf5by3Z6jPJTQBEW5nNGb7M4/1GEYqdYEcUAkN6wTXXalR43Vs4Ikpil7swFHSqaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OQmviEOF; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4KrJlDa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C0BC4CEE3;
-	Thu, 10 Jul 2025 19:32:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752175974;
-	bh=5iv/ybBT1EWpCtzUTeH7jOisZdpjTSxsHX5LZWaBTBs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d4KrJlDa0wqJNg3kV/Aycs4TlPYrAsCJRXY7pEr0yFXtTSr5FEeZGUF/jPySl86L0
-	 G2Wj3h88lJib/AeFNTfE55CceP6Z8QDP3lBTDwYqHHQju5mqPUOCa4/3mGS9h9fWN2
-	 8BE0kCRE4pggOceAMSsqBVWRr1gs6zAWJaNhtudIagRE9mkIDpF/mwipXJeEkW+oCM
-	 p3QbqdTQJ6FoWgjFXP97kQGwHc4BgJnkex2oGRmglmd2Gq6jytbt8BcKjvG56TNzdm
-	 tbQ0dW+FgZY3oL6JitibiLFuzcpQ3/iHOi8JgP4kOgyIMABWv4q4DV/rHXa0LiV7Mx
-	 Uwez3iX6QZFgw==
-Date: Thu, 10 Jul 2025 12:32:52 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Alex Markuze <amarkuze@redhat.com>
-Cc: linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Yuwen Chen <ywen.chen@foxmail.com>, linux-mtd@lists.infradead.org,
-	ceph-devel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/6] ceph: Remove gfp_t argument from
- ceph_fscrypt_encrypt_*()
-Message-ID: <20250710193252.GA20579@quark>
-References: <20250710060754.637098-1-ebiggers@kernel.org>
- <20250710060754.637098-7-ebiggers@kernel.org>
- <CAO8a2Sivm00NRM9Z-Fwp=FzcmkAP8m1uQR24-avT-tUug4VgmQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OQmviEOF"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313fab41f4bso1995129a91.0
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 15:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752187556; x=1752792356; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fwKKtCrQ1LTqQDaAmH0rDuR3xsbJlV6bm4J01KtR8OU=;
+        b=OQmviEOFcdmrNkbbhqt6p8QRfc2vIHVBd8+V+A4Ivglfg9x50JYLcI3mB9RGoHULKd
+         RjsiGlZEtFKOG+IIQHTfw5Q1caij7NdxanlPdrb1X/XI6VEGBjO0gaCa7VrfVt4AFjGE
+         BJJn2kI4J7szysXHS/alo+LLTn19JyEYrzpVNeyFnCxXRuLBUfHJXCGFOCEwz4AbyQUy
+         WUw/6QLes0rk65cE5Wvq5ENNboVi6wupd/Efuzr1mj2FCqvlEHci+aEsohsKnJC53Bml
+         kOiZHND/5iPHcWAq+pA98/um8QXxNNpZwsSisMatsRgubO8PdUfmJ5YrEzZxbp9xLOux
+         TREQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752187556; x=1752792356;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fwKKtCrQ1LTqQDaAmH0rDuR3xsbJlV6bm4J01KtR8OU=;
+        b=OfQ9WKEUxy8C9WeCClBrmW1aNq97ZmwchLp2I7e7huk1KJ54aPNG7iRuGb4zSbegg1
+         m6tl/gZE7qQcEmHg66zMKseUNi3AuZkp0qgLmAm5dAt8NDnNEFSePJs/UWNpCyyBAaLM
+         q/oXn5pB+x6iBQjyP9XKpASDe6DXyKWHWHQh/1MM08gOCt23zcEteqDiQguZCvGv2GDL
+         P6i/hPJmtgwshOlKYx/K13zRN3VOXJpDrLo3LwEWQWsAOmwRkIHdegL2HV/wLxDnrPr0
+         eFPHhYLsGyilEyG+3QfujmMR827+8t3EIoPP8znR5SemZKduP1g+51q1++2fKPR4d0Pj
+         8j+A==
+X-Gm-Message-State: AOJu0YyqIr2x8OaFkCJLSJTISa9pGP7Qw3vcZBgzuD7Qky4g9rU+VjtC
+	+LwD0zVVRLG3OBNdFyZa2KeSnuab0W4XauLCKm8NkdIqnTnjJA/8vU3lU5hJ17juUuRazuRt8Zm
+	I1jiJ/w==
+X-Google-Smtp-Source: AGHT+IFQLQws1wpWWj98zj6rPS2OtIN8GnmNDuftIFZrOMVh3t4f8o5j5+Wr0jCvHRAFb/wHyUgHGLmdh74=
+X-Received: from pjbqo16.prod.google.com ([2002:a17:90b:3dd0:b0:312:14e5:174b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d86:b0:313:d6ce:6c6e
+ with SMTP id 98e67ed59e1d1-31c4ca845e2mr1681544a91.8.1752187555916; Thu, 10
+ Jul 2025 15:45:55 -0700 (PDT)
+Date: Thu, 10 Jul 2025 15:45:54 -0700
+In-Reply-To: <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO8a2Sivm00NRM9Z-Fwp=FzcmkAP8m1uQR24-avT-tUug4VgmQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20250630202319.56331-1-prsampat@amd.com> <20250630202319.56331-2-prsampat@amd.com>
+ <aG0jxWk1eor1A_Gd@google.com> <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
+Message-ID: <aHBCosztx8QWC4G0@google.com>
+Subject: Re: [PATCH 1/1] crypto: ccp - Add the SNP_VERIFY_MITIGATION command
+From: Sean Christopherson <seanjc@google.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, bp@alien8.de, michael.roth@amd.com, aik@amd.com, 
+	pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jul 10, 2025 at 02:07:47PM +0300, Alex Markuze wrote:
-> Reviewed-by: Alex Markuze amarkuze@redhat.com
+On Wed, Jul 09, 2025, Pratik R. Sampat wrote:
+> Hi Sean,
+> 
+> On 7/8/25 8:57 AM, Sean Christopherson wrote:
+> > On Mon, Jun 30, 2025, Pratik R. Sampat wrote:
+> >> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
+> >> can be used to query the status of currently supported vulnerability
+> >> mitigations and to initiate mitigations within the firmware.
+> >>
+> >> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
+> >> more details.
+> > 
+> > Nothing here explains why this needs to be exposed directly to userspace.
+> 
+> The general idea is that not all mitigations may/can be applied
+> immediately, for ex: some mitigations may require all the guest to be
+> shutdown before they can be applied. So a host userspace interface to
+> query+apply mitigations can be useful for that coordination before
+> attempting to apply the mitigation.
 
-Thanks!  In the future, when sending a tag, please include brackets around your
-email address, like Reviewed-by: Alex Markuze <amarkuze@redhat.com>.  Otherwise,
-when applying the patch, b4 skips the tag:
+But why expose ioctls to effectively give userspace direct access to firmware?
+E.g. why not configure firmware mitigations via the kernel's upcoming
+Attack Vector Controls.
 
-    NOTE: some trailers ignored due to from/email mismatches:
-        ! Trailer: Reviewed-by: Alex Markuze amarkuze@redhat.com
-         Msg From: Alex Markuze <amarkuze@redhat.com>
-    NOTE: Rerun with -S to apply them anyway
-
-I'll add the brackets, so no need to resend anything.  But other maintainers
-could miss this, which would result in your review tags not being applied.
-
-- Eric
+https://lore.kernel.org/all/20250707183316.1349127-1-david.kaplan@amd.com
