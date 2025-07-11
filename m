@@ -1,128 +1,116 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEF9B665;
-	Fri, 11 Jul 2025 02:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E262110E;
+	Fri, 11 Jul 2025 04:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752200085; cv=none; b=s0qlKJKXkZuRh8AR64O5qHakToqU3a++r2L0amocdY0t7UreM9NBYIKrv1Cdl12m6SOJ1e1/zpPEZrLeZ5wBSTS2zkB1wI4YolgbUQR69Lt4/XIJgEfZ6fJ7pU3/kamCvNI3N86QbYPFWXSCtqXmYucpNY/nQfOYvhCSlx87Avs=
+	t=1752208960; cv=none; b=j/GSeyasc+VPaqDECuZpPlITNaL3V+jmqrolLa6ul0BuCGh7FK1CARIyGpE+ZYmvy9aIRgOeOUjD0ZQHINa191qDqRBv8X4aOFuVkveTsWGvygVLfeOJdGNpVROvUge+SG66Sqsy4RPCazOISQbWzFfpGhZ94dYcQIxr5lFSxRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752200085; c=relaxed/simple;
-	bh=HsCivigBSU9t2P+tGWBlpWxJJpKVlbwpxZlqF8U0KVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SJJi8uogayuGID0Gu8UFuUUFlOfymGIWJF4TEcPbjJJaM2LwXXkT9bxxdf5spaKvhS8d6RSiLYphVzmOTSgQtDAGu8gHG8UL5zfm8cMLMGw7QVEk8tgeZpGaFasTAfXma56APJ5sFleL5/CNj53hsDswD+qnYi9CMR/5CAGIGYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bdZtX72Whz2Cdk8;
-	Fri, 11 Jul 2025 10:10:28 +0800 (CST)
-Received: from kwepemh100007.china.huawei.com (unknown [7.202.181.92])
-	by mail.maildlp.com (Postfix) with ESMTPS id 90F0A140278;
-	Fri, 11 Jul 2025 10:14:33 +0800 (CST)
-Received: from [10.67.111.31] (10.67.111.31) by kwepemh100007.china.huawei.com
- (7.202.181.92) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 11 Jul
- 2025 10:14:32 +0800
-Message-ID: <3654a091-053a-4330-a019-a681d06166be@huawei.com>
-Date: Fri, 11 Jul 2025 10:14:31 +0800
+	s=arc-20240116; t=1752208960; c=relaxed/simple;
+	bh=LNaR3p2JIRTweop+jr3xdSyPokIoQbZkvtWJhXFwRMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dT3nd6BXJCX3eWX+0Cm1gRLxaIEtx91s/xa9Pox/r9mLCB0NjsdnFhsMdaTrJe/t+naXKSRvvPmkVZ2SVAoPvimRaJoKWvIStdw9JtZ4HhEcStK8X+bEhXAjXs6Voy8P0TYvGTHwtw/iyje71LOfWnWiR1d8sYTgGYQb/OFgn9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=RvIpb+9D; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="RvIpb+9D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1752208875;
+	bh=jQymZur1JYrMESNCl7bYfzi+o6CYK0z7OclHypjvAM8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RvIpb+9DBhYNzybuH2Z1wCAveLGvmsw4tL6O2HmZl5HVhyaPwinkNgmZHnepQ3xV6
+	 9JyhYoY9O18P+aTjdRyw1NIez5xs7nmc++QOfMwAKXBhisU6/3qZ9/of04RYb6ppxW
+	 2NAKze99BrR6LbysKB2CAPEc/IC9hqatuxUdu19ZB81HC8gNwI9jgCVcFBrT+BhucL
+	 U+stXZEVwvljeXqiscd+3JZc/gFEeoM09+7GuCukYhUC/uXCK+KLoojktidGPENoK/
+	 m2gojvM4QcbM7TUQpaDaJ8egjR5PI57kDpcKfX52W0mfkQdEcz2CdwPvvLpGH2HQcK
+	 Y51F2tX9znjjQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bdfDW1Pmdz4wbx;
+	Fri, 11 Jul 2025 14:41:15 +1000 (AEST)
+Date: Fri, 11 Jul 2025 14:42:29 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the libcrypto tree with the
+ libcrypto-fixes tree
+Message-ID: <20250711144229.0f65529a@canb.auug.org.au>
+In-Reply-To: <20250701123036.0d25bbfc@canb.auug.org.au>
+References: <20250701123036.0d25bbfc@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/4] Reintroduce the sm2 algorithm
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, David Howells
-	<dhowells@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Lukas Wunner
-	<lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>, "David S . Miller"
-	<davem@davemloft.net>, Jarkko Sakkinen <jarkko@kernel.org>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Tianjia
- Zhang <tianjia.zhang@linux.alibaba.com>, Dan Carpenter
-	<dan.carpenter@linaro.org>, <keyrings@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, Lu Jialin <lujialin4@huawei.com>,
-	GONG Ruiqi <gongruiqi1@huawei.com>
-References: <20250630133934.766646-1-gubowen5@huawei.com>
- <aGaCTOJ30KNPOBIC@zx2c4.com>
-Content-Language: en-US
-From: Gu Bowen <gubowen5@huawei.com>
-In-Reply-To: <aGaCTOJ30KNPOBIC@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemh100007.china.huawei.com (7.202.181.92)
+Content-Type: multipart/signed; boundary="Sig_/JZPEp5VBFGkgwFFt.CAcTy0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hi,
+--Sig_/JZPEp5VBFGkgwFFt.CAcTy0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 7/3/2025 9:14 PM, Jason A. Donenfeld wrote:
-> Hi,
-> 
-> On Mon, Jun 30, 2025 at 09:39:30PM +0800, Gu Bowen wrote:
->> To reintroduce the sm2 algorithm, the patch set did the following:
->>   - Reintroduce the mpi library based on libgcrypt.
->>   - Reintroduce ec implementation to MPI library.
->>   - Rework sm2 algorithm.
->>   - Support verification of X.509 certificates.
->>
->> Gu Bowen (4):
->>    Revert "Revert "lib/mpi: Extend the MPI library""
->>    Revert "Revert "lib/mpi: Introduce ec implementation to MPI library""
->>    crypto/sm2: Rework sm2 alg with sig_alg backend
->>    crypto/sm2: support SM2-with-SM3 verification of X.509 certificates
-> 
-> I am less than enthusiastic about this. Firstly, I'm kind of biased
-> against the whole "national flag algorithms" thing. But I don't know how
-> much weight that argument will have here. More importantly, however,
-> implementing this atop MPI sounds very bad. The more MPI we can get rid
-> of, the better.
-> 
-> Is MPI constant time? Usually the good way to implement EC algorithms
-> like this is to very carefully work out constant time (and fast!) field
-> arithmetic routines, verify their correctness, and then implement your
-> ECC atop that. At this point, there's *lots* of work out there on doing
-> fast verified ECC and a bunch of different frameworks for producing good
-> implementations. There are also other implementations out there you
-> could look at that people have presumably studied a lot. This is old
-> news. (In 3 minutes of scrolling around, I noticed that
-> count_leading_zeros() on a value is used as a loop index, for example.
-> Maybe fine, maybe not, I dunno; this stuff requires analysis.)
+Hi all,
 
-Actually, I wasn't very familiar with MPI in the past. Previously, the 
-implementation of sm2 was done through MPI, so I used it as well. 
-Perhaps I could try using the ecc algorithm in the kernel.
+On Tue, 1 Jul 2025 12:30:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>=20
+> Today's linux-next merge of the libcrypto tree got a conflict in:
+>=20
+>   arch/s390/crypto/sha512_s390.c
+>=20
+> between commit:
+>=20
+>   400bd45ba798 ("crypto: s390/sha - Fix uninitialized variable in SHA-1 a=
+nd SHA-2")
 
-> On the other hand, maybe you don't care because you only implement
-> verification, not signing, so all info is public? If so, the fact that
-> you don't care about CT should probably be made pretty visible. But
-> either way, you should still be concerned with having an actually good &
-> correct implementation of which you feel strongly about the correctness.
-> 
-> Secondly, the MPI stuff you're proposing here adds a 25519 and 448
-> implementation, and support for weierstrauss, montgomery, and edwards,
-> and... surely you don't need all of this for SM-2. Why add all this
-> unused code? Presumably because you don't really understand or "own" all
-> of the code that you're proposing to add. And that gives me a lot of
-> hesitation, because somebody is going to have to maintain this, and if
-> the person sending patches with it isn't fully on top of it, we're not
-> off to a good start.
-> 
-> Lastly, just to nip in the bud the argument, "but weierstrauss is all
-> the same, so why not just have one library to do all possible
-> weierstrauss curves?" -- the fact that this series reintroduces the
-> removed "generic EC library" indicates there's actually not another user
-> of it, even before we get into questions of whether it's a good idea.
+The above is now commit
 
-Thank you for your advice, it has been very beneficial for me as I just 
-started participating in the community. I will try to implement the 
-functionality with more robust code and only submit parts that I fully 
-understand.
+  68279380266a ("crypto: s390/sha - Fix uninitialized variable in SHA-1 and=
+ SHA-2")
 
-Best Regards，
-Guber
+in Linus' tree.
+
+> from the libcrypto-fixes tree and commit:
+>=20
+>   b7b366087e0f ("lib/crypto: s390/sha512: Migrate optimized SHA-512 code =
+to library")
+>=20
+> from the libcrypto tree.
+>=20
+> I fixed it up (I just deleted the file) and can carry the fix as
+> necessary. This is now fixed as far as linux-next is concerned, but any
+> non trivial conflicts should be mentioned to your upstream maintainer
+> when your tree is submitted for merging.  You may also want to consider
+> cooperating with the maintainer of the conflicting tree to minimise any
+> particularly complex conflicts.
 
 
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/JZPEp5VBFGkgwFFt.CAcTy0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhwljUACgkQAVBC80lX
+0GxkTgf7BPN8DhZiuplODW2uP5Hh0V5rO80HdOIQRSvP9nwbN112SZrnhN9GRYZv
+9lBncHgaTR0g6qwM2ys4o0CnnMcxf39p0G9EJiN34S8V38IcXqLz9VeOPcnbSKen
+IqMBx85H1mWJun7DE8GmkH8KsSoiTTkxk0IyGDeC6qlroWzhTAv1WdAH8VNyorUR
+UV2NHfwBChbxNyddmQcf5fV7DtSijqkhphYgDCFJ7hlFt4pfNdy3yjoj9E0NQmwj
+2sa0tDds/1pysOPIQTwS2a/EQGgj4Gpvu68dlX3whS0FgDIaPRWl5FgkwjFJQ1rO
+gMYbYYYSVWmlWbhqEIXB8LpwAjn7gQ==
+=TMNm
+-----END PGP SIGNATURE-----
+
+--Sig_/JZPEp5VBFGkgwFFt.CAcTy0--
