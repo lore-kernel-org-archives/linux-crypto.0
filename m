@@ -1,95 +1,128 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16CF1D432D
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 22:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEF9B665;
+	Fri, 11 Jul 2025 02:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752187558; cv=none; b=Y+Mw7iA9g25R7oLs6rl0SK5ySwta2me/pFz3nikUNapU+aEfJyNZZWseFInD/14JYH7Opy8gemtWizv8WHHJdEM9Gin8sB63YXN3KOZod/wgJ6l4p1RIJCboqgO79Tmdi6WYP6tObIJrMLmeZtjZNDmi5oB9/MtLBJAb7ZAkq8A=
+	t=1752200085; cv=none; b=s0qlKJKXkZuRh8AR64O5qHakToqU3a++r2L0amocdY0t7UreM9NBYIKrv1Cdl12m6SOJ1e1/zpPEZrLeZ5wBSTS2zkB1wI4YolgbUQR69Lt4/XIJgEfZ6fJ7pU3/kamCvNI3N86QbYPFWXSCtqXmYucpNY/nQfOYvhCSlx87Avs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752187558; c=relaxed/simple;
-	bh=ASuthF9LWI0NYc2lvvZiPPexlWyLf6OJpDYK25Z9I1Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WFi1O8DM9f4e8yxzvNkstF9HCVz08WDFz9oJOJHiAhQz8FMINDUKwww1uGcbSbUqwrQAAUevTWEfpDeOyGOjz6RawM4W1k1f3WlY31Fm8dMf5by3Z6jPJTQBEW5nNGb7M4/1GEYqdYEcUAkN6wTXXalR43Vs4Ikpil7swFHSqaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OQmviEOF; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OQmviEOF"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313fab41f4bso1995129a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jul 2025 15:45:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752187556; x=1752792356; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fwKKtCrQ1LTqQDaAmH0rDuR3xsbJlV6bm4J01KtR8OU=;
-        b=OQmviEOFcdmrNkbbhqt6p8QRfc2vIHVBd8+V+A4Ivglfg9x50JYLcI3mB9RGoHULKd
-         RjsiGlZEtFKOG+IIQHTfw5Q1caij7NdxanlPdrb1X/XI6VEGBjO0gaCa7VrfVt4AFjGE
-         BJJn2kI4J7szysXHS/alo+LLTn19JyEYrzpVNeyFnCxXRuLBUfHJXCGFOCEwz4AbyQUy
-         WUw/6QLes0rk65cE5Wvq5ENNboVi6wupd/Efuzr1mj2FCqvlEHci+aEsohsKnJC53Bml
-         kOiZHND/5iPHcWAq+pA98/um8QXxNNpZwsSisMatsRgubO8PdUfmJ5YrEzZxbp9xLOux
-         TREQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752187556; x=1752792356;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fwKKtCrQ1LTqQDaAmH0rDuR3xsbJlV6bm4J01KtR8OU=;
-        b=OfQ9WKEUxy8C9WeCClBrmW1aNq97ZmwchLp2I7e7huk1KJ54aPNG7iRuGb4zSbegg1
-         m6tl/gZE7qQcEmHg66zMKseUNi3AuZkp0qgLmAm5dAt8NDnNEFSePJs/UWNpCyyBAaLM
-         q/oXn5pB+x6iBQjyP9XKpASDe6DXyKWHWHQh/1MM08gOCt23zcEteqDiQguZCvGv2GDL
-         P6i/hPJmtgwshOlKYx/K13zRN3VOXJpDrLo3LwEWQWsAOmwRkIHdegL2HV/wLxDnrPr0
-         eFPHhYLsGyilEyG+3QfujmMR827+8t3EIoPP8znR5SemZKduP1g+51q1++2fKPR4d0Pj
-         8j+A==
-X-Gm-Message-State: AOJu0YyqIr2x8OaFkCJLSJTISa9pGP7Qw3vcZBgzuD7Qky4g9rU+VjtC
-	+LwD0zVVRLG3OBNdFyZa2KeSnuab0W4XauLCKm8NkdIqnTnjJA/8vU3lU5hJ17juUuRazuRt8Zm
-	I1jiJ/w==
-X-Google-Smtp-Source: AGHT+IFQLQws1wpWWj98zj6rPS2OtIN8GnmNDuftIFZrOMVh3t4f8o5j5+Wr0jCvHRAFb/wHyUgHGLmdh74=
-X-Received: from pjbqo16.prod.google.com ([2002:a17:90b:3dd0:b0:312:14e5:174b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d86:b0:313:d6ce:6c6e
- with SMTP id 98e67ed59e1d1-31c4ca845e2mr1681544a91.8.1752187555916; Thu, 10
- Jul 2025 15:45:55 -0700 (PDT)
-Date: Thu, 10 Jul 2025 15:45:54 -0700
-In-Reply-To: <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
+	s=arc-20240116; t=1752200085; c=relaxed/simple;
+	bh=HsCivigBSU9t2P+tGWBlpWxJJpKVlbwpxZlqF8U0KVI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SJJi8uogayuGID0Gu8UFuUUFlOfymGIWJF4TEcPbjJJaM2LwXXkT9bxxdf5spaKvhS8d6RSiLYphVzmOTSgQtDAGu8gHG8UL5zfm8cMLMGw7QVEk8tgeZpGaFasTAfXma56APJ5sFleL5/CNj53hsDswD+qnYi9CMR/5CAGIGYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bdZtX72Whz2Cdk8;
+	Fri, 11 Jul 2025 10:10:28 +0800 (CST)
+Received: from kwepemh100007.china.huawei.com (unknown [7.202.181.92])
+	by mail.maildlp.com (Postfix) with ESMTPS id 90F0A140278;
+	Fri, 11 Jul 2025 10:14:33 +0800 (CST)
+Received: from [10.67.111.31] (10.67.111.31) by kwepemh100007.china.huawei.com
+ (7.202.181.92) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 11 Jul
+ 2025 10:14:32 +0800
+Message-ID: <3654a091-053a-4330-a019-a681d06166be@huawei.com>
+Date: Fri, 11 Jul 2025 10:14:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250630202319.56331-1-prsampat@amd.com> <20250630202319.56331-2-prsampat@amd.com>
- <aG0jxWk1eor1A_Gd@google.com> <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
-Message-ID: <aHBCosztx8QWC4G0@google.com>
-Subject: Re: [PATCH 1/1] crypto: ccp - Add the SNP_VERIFY_MITIGATION command
-From: Sean Christopherson <seanjc@google.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, bp@alien8.de, michael.roth@amd.com, aik@amd.com, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 0/4] Reintroduce the sm2 algorithm
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, David Howells
+	<dhowells@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Lukas Wunner
+	<lukas@wunner.de>, Ignat Korchagin <ignat@cloudflare.com>, "David S . Miller"
+	<davem@davemloft.net>, Jarkko Sakkinen <jarkko@kernel.org>, Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Tianjia
+ Zhang <tianjia.zhang@linux.alibaba.com>, Dan Carpenter
+	<dan.carpenter@linaro.org>, <keyrings@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, Lu Jialin <lujialin4@huawei.com>,
+	GONG Ruiqi <gongruiqi1@huawei.com>
+References: <20250630133934.766646-1-gubowen5@huawei.com>
+ <aGaCTOJ30KNPOBIC@zx2c4.com>
+Content-Language: en-US
+From: Gu Bowen <gubowen5@huawei.com>
+In-Reply-To: <aGaCTOJ30KNPOBIC@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemh100007.china.huawei.com (7.202.181.92)
 
-On Wed, Jul 09, 2025, Pratik R. Sampat wrote:
-> Hi Sean,
+Hi,
+
+On 7/3/2025 9:14 PM, Jason A. Donenfeld wrote:
+> Hi,
 > 
-> On 7/8/25 8:57 AM, Sean Christopherson wrote:
-> > On Mon, Jun 30, 2025, Pratik R. Sampat wrote:
-> >> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
-> >> can be used to query the status of currently supported vulnerability
-> >> mitigations and to initiate mitigations within the firmware.
-> >>
-> >> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
-> >> more details.
-> > 
-> > Nothing here explains why this needs to be exposed directly to userspace.
+> On Mon, Jun 30, 2025 at 09:39:30PM +0800, Gu Bowen wrote:
+>> To reintroduce the sm2 algorithm, the patch set did the following:
+>>   - Reintroduce the mpi library based on libgcrypt.
+>>   - Reintroduce ec implementation to MPI library.
+>>   - Rework sm2 algorithm.
+>>   - Support verification of X.509 certificates.
+>>
+>> Gu Bowen (4):
+>>    Revert "Revert "lib/mpi: Extend the MPI library""
+>>    Revert "Revert "lib/mpi: Introduce ec implementation to MPI library""
+>>    crypto/sm2: Rework sm2 alg with sig_alg backend
+>>    crypto/sm2: support SM2-with-SM3 verification of X.509 certificates
 > 
-> The general idea is that not all mitigations may/can be applied
-> immediately, for ex: some mitigations may require all the guest to be
-> shutdown before they can be applied. So a host userspace interface to
-> query+apply mitigations can be useful for that coordination before
-> attempting to apply the mitigation.
+> I am less than enthusiastic about this. Firstly, I'm kind of biased
+> against the whole "national flag algorithms" thing. But I don't know how
+> much weight that argument will have here. More importantly, however,
+> implementing this atop MPI sounds very bad. The more MPI we can get rid
+> of, the better.
+> 
+> Is MPI constant time? Usually the good way to implement EC algorithms
+> like this is to very carefully work out constant time (and fast!) field
+> arithmetic routines, verify their correctness, and then implement your
+> ECC atop that. At this point, there's *lots* of work out there on doing
+> fast verified ECC and a bunch of different frameworks for producing good
+> implementations. There are also other implementations out there you
+> could look at that people have presumably studied a lot. This is old
+> news. (In 3 minutes of scrolling around, I noticed that
+> count_leading_zeros() on a value is used as a loop index, for example.
+> Maybe fine, maybe not, I dunno; this stuff requires analysis.)
 
-But why expose ioctls to effectively give userspace direct access to firmware?
-E.g. why not configure firmware mitigations via the kernel's upcoming
-Attack Vector Controls.
+Actually, I wasn't very familiar with MPI in the past. Previously, the 
+implementation of sm2 was done through MPI, so I used it as well. 
+Perhaps I could try using the ecc algorithm in the kernel.
 
-https://lore.kernel.org/all/20250707183316.1349127-1-david.kaplan@amd.com
+> On the other hand, maybe you don't care because you only implement
+> verification, not signing, so all info is public? If so, the fact that
+> you don't care about CT should probably be made pretty visible. But
+> either way, you should still be concerned with having an actually good &
+> correct implementation of which you feel strongly about the correctness.
+> 
+> Secondly, the MPI stuff you're proposing here adds a 25519 and 448
+> implementation, and support for weierstrauss, montgomery, and edwards,
+> and... surely you don't need all of this for SM-2. Why add all this
+> unused code? Presumably because you don't really understand or "own" all
+> of the code that you're proposing to add. And that gives me a lot of
+> hesitation, because somebody is going to have to maintain this, and if
+> the person sending patches with it isn't fully on top of it, we're not
+> off to a good start.
+> 
+> Lastly, just to nip in the bud the argument, "but weierstrauss is all
+> the same, so why not just have one library to do all possible
+> weierstrauss curves?" -- the fact that this series reintroduces the
+> removed "generic EC library" indicates there's actually not another user
+> of it, even before we get into questions of whether it's a good idea.
+
+Thank you for your advice, it has been very beneficial for me as I just 
+started participating in the community. I will try to implement the 
+functionality with more robust code and only submit parts that I fully 
+understand.
+
+Best Regards，
+Guber
+
+
