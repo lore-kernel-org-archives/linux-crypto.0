@@ -1,67 +1,67 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E841E991B
-	for <linux-crypto@vger.kernel.org>; Sun, 13 Jul 2025 08:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3201E5701
+	for <linux-crypto@vger.kernel.org>; Sun, 13 Jul 2025 08:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752393967; cv=none; b=hze8Ij62Az8vTr4EOzx7z+u27vjGvLKM0hVTwxelvLU67Ix0X0rCzdkRaOodMySUhgUNO21MIW2fu6C5fNSHK1+IdvDMiQPCdSgIDMQQgCUoau3/4pc9t65eSvyk4eZ2UjtJkWaz3Bj9vGCGJv497MFiEp6ARJ0jV1Sju+J15WI=
+	t=1752393977; cv=none; b=EAPZlCn+NCjXST2fHlDaZMpvq93+HZ0XnJ3bH7J/eulp6JQWYK4K6hsJ62M400IL2z9LQyE6RbeG4EUsv/lOuarhQtFMdNZbFMAiGmAT4X8XbqGTP8rOrn+n5RqfbYF4q7KKjZf4mAgzQyWV/f2X5PztCmWa3Uxk8DLRRFtzvxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752393967; c=relaxed/simple;
-	bh=VI60lC4ZmfORZyuxHBRWFEsQsFQCradJNwP6TkMJAbg=;
+	s=arc-20240116; t=1752393977; c=relaxed/simple;
+	bh=nbSwp5ROysMSTLKLxq6Pg7q3VCWJ3MFGpodgkXirdrk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eFfZ8G55bAGF5ADVBp9fTdVHP4xkXB6KnD62uxjj1aWhYNQeenVWltl9YpP3xgekC+cCB7T5fWm9gu2QHrYAkJzd+T0vglnVqnkIGbcekmPa+uRzFClMP02h7l7e4mWTilUw7jENPuZm1tuJrzmLneRj/x8Wu1EefsKHEBnQ7Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=fVzT5wL9; arc=none smtp.client-ip=209.85.221.53
+	 In-Reply-To:To:Cc; b=ZRHAWFmigfgkyHRagwNa5dRYmIPuckBziCuqwz9+c8EvTfqQux9LA0jDrUBhzarg6jdGKCsTvJkklNlCZANxfVW1ItQYrDt+yq453Ceqoqw1dLa2YvBMwjrnCjIHyY/blwkPI+aGdv+IFmnLvLWMxpRTMlkzDL9pXjvhUrEdKj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=dNQVvhcd; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="fVzT5wL9"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a588da60dfso2348308f8f.1
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Jul 2025 01:06:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="dNQVvhcd"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a6cd1a6fecso3329371f8f.3
+        for <linux-crypto@vger.kernel.org>; Sun, 13 Jul 2025 01:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1752393963; x=1752998763; darn=vger.kernel.org;
+        d=fairphone.com; s=fair; t=1752393973; x=1752998773; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=te4MJTBpVgJuhtRjxJH2s+xCNlwZ781R0MdiUCdRknI=;
-        b=fVzT5wL9nacXW/zSdVnPdDbwPO56ZOrrEUVOpNbIAb1f7W1u2/y2rWwm8bEANvkoxp
-         ozKpvIlwiIZ3WDVOOaZftzntoOQcYVO+BxYocNbPHLzFNo87Z7baIwvuLutQ29cq1CdI
-         xZE/PnHpaqHl4HJZyY99lA4aO46wIJyRAvO5X7okujkVvV7TeZOGZsn2irG1Bkr7jJ2I
-         FwvM+PpZiuHXcZ7rv/XYmi/2aI0xd5ekluMPu+EUSKl6sM+3E7+LpRJ9YM9MG914dduD
-         0P3QH25ryNPcyxK7NyZOOQq0mWLywPEMIG0CwEYP4SgPSe6VKzQ0gc6TghnP61zNSw6Z
-         zWqw==
+        bh=qjkVBqGocvldr3+5pDfPNG/mAD5wl5azsqsATuuDVzU=;
+        b=dNQVvhcdTYxNi3jJkFCbONfvWJSR48ZWbzFhlfnHutB0yhV4nnuzWie5e9/sSx5gO4
+         yRG98lDnyRgOVGpWyF49y0eafQ8YTyw8E40wm9stpMKN8weoLvkpKXqpFz7H8Oazydx2
+         DYFaBGHuk+Vr71FCru6Zp0xdhW38gA9jxQT2j/Frer0BceEoAhMs+GWZEcOyWLsHLUfJ
+         4dpCPhiTvE8JS7IsNDu6rEkJc3INlzYLHte04NsgINqP4pYa1y5yZkC1q1UZS7ctiLEb
+         efbK1ULXRMtX1b5pnvZLqv3tArnOhhIVhxUSFkvUFfZdGPrZ6cAZ7wlA6eimmirKibc5
+         ZDsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752393963; x=1752998763;
+        d=1e100.net; s=20230601; t=1752393973; x=1752998773;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=te4MJTBpVgJuhtRjxJH2s+xCNlwZ781R0MdiUCdRknI=;
-        b=Yml9N+z/DOKJgMEGOKOn2Uq2jhQyjA/yhj6jIq7lS+gFOccP8ZRZhJdHwaULoRiqF2
-         GYEXFLoL40rbAEWw9Sus2JzHvwWwHskTE8Yb/P0U6td0x/jgF3gCwuO5MArks6s+FicF
-         WwvBQe02BUTYkZTEdyCtHQsoYJk4geFsmxjZp98VZIlIv+2EVUf2oj2k/KaunHYyJaXz
-         Rz3l1yrMefhwxIHAOwDVigwQ1a4gNBvJRRpSNtcbrFfjxFR4OCRYYHdiLh1iNd0CmVer
-         1XY+9jZv/B1OuECMHEPqE90L76vV7wMLI4XWjOd3oiyKb2Y1+eLfJqG4OOA4Yc6c4ZQe
-         DYsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtMl+nf9k8KloJkEFyAnGAvzA/uUZOTYlxbkrdc2GEqQmf3SoULzbgsMwQXkJSJ8yIJEAgUCwpgL5aoSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0lG951ETixEpDUhOUHyHgo436lcpfiy7JhzTpX8REJkJJki5W
-	HBbbm2bfPDA3nkTCLkENfu19F2XHo5qRrGHbxU8YQSIPWfYwEELcORbfjUCe7+eVFHg=
-X-Gm-Gg: ASbGncs+3s8kjtLHGfI06j+S8eydMJUO5ba44nxDNnzMJKFW6rlx+Z1FXnWeCoYKVkp
-	bnd6NwI17lXmQ9G0+2nfubzfYd1y6Q3PJaISHehO/k3i4qeXLkHuYzXzJMiv9Pd0fQ74guKBiZp
-	xQfG07etVezcxNjsMAEPJ+amUpjHvgHatzKBDFKUZ/k0YxmCevl+UH/+HBzU+k5CT2ZeKd7H6gs
-	evTZhB3uAYdZLn8ku6iDKBRlS0emi0TkdGqKwxRIfWM8kleoU2jcgJQeIrWat1K0Z2GQBwLU6Mm
-	I55n++yvBQc8d39ml4teW5U75N/KMlnicPc+Ny3I87vUimku79NSYFEB/nXUXNSUVXNBDrr+DtV
-	j/qPhH4l7exykIjYxST/gc+/iHt6jW1YXCWw3lHhOh1mJY5s=
-X-Google-Smtp-Source: AGHT+IG58Q0+c/JdRpYP9OwThz11aodR+FjCZWHpjNmU/o1HqomzxkC9Hl2w1xFzYfqgnbsp0pIfUg==
-X-Received: by 2002:a5d:5f41:0:b0:3aa:c9a8:a387 with SMTP id ffacd0b85a97d-3b5f181bf12mr8730107f8f.0.1752393963493;
-        Sun, 13 Jul 2025 01:06:03 -0700 (PDT)
+        bh=qjkVBqGocvldr3+5pDfPNG/mAD5wl5azsqsATuuDVzU=;
+        b=b3ZebplxhPwueffiUB+EwqB+zPJkWi2DEjxYPPljWEEXugmeRD6zDwnEPoXAFNZG5R
+         bjfQN5RyWK1Zma+kzC9euSnmuF9or7Qejg3AXF5Fuwx62wvFC1kmpSLA7mHLC/Kbbpil
+         fxHNFKX1a496TkLP5tbTA+/478dxOvGJKiWwEM8WfWC3iehqJNmyDUXcY1ajSUTmaK/u
+         ju/0FN7GusgoJj+/jlJJKWz72C7qk3feET1yZKfpX2CUSPKFqGawm7N38t0GagXds6Bx
+         1QbtnleO7JL94SyBHUulupWb7zyewusdLErrGnYy9mwAf20yolLjRCasZfojrtXqpQfA
+         2XwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXgLCT3j3VPbZ59xR2zqVj8YmzaiJkI/mldkQRdGB5PxwZlVXCa83VDtcwiqwssyoBIlmdWljo5mJEXbbU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu3UiYt8iQyQkc1a+vKOBDaYfuRLIlLwz8AsQILMiZmmOstSNd
+	FpKxQesIYrpyoYYpujWLAG/PZIF3U27P09hpF2DrArNJb8IalurxHZyTFf6t6zmhmsc=
+X-Gm-Gg: ASbGncsFzr0OwB1wqFLldEzHpOg66Tv8tuZDOaEa1uQXj2sZTDuKPSb+e3pTcP/kkC8
+	u4WtzdSqbbPqrwz8ulvM+EH3GBObvkkJZacgUNJsRarSPFx92GUcc8my8RS3x6BoGbUjFCMvc8A
+	xdPC1aw8jJ8YudzRTF8UC4G+yxk8oOgH3S8tUiIp31FZa9UYkaTzb7UJLEphDk5Nq/dp638YQFS
+	qX8BrWZkDv7fmvi9al0gEEbUpxMhrlFMQvPBKesejyMQwWF6s6FmJ2aq3yY5IaVCda8ZbosW/l7
+	rlOdRhHqmlOjHWrkNBHJ4xNCW82vndZtnw4gYNBD3Dcu/fA8oEewTcDJj6fWYj4vDbmMk5WNVeg
+	6MyS23hvN7SGFM1gWw/evoJzKwZUxpIcMnyjY
+X-Google-Smtp-Source: AGHT+IE7aiBW0y1UJWTkFw2jo19wh2kKOFls92CeELkcuzfmOFh/b4a0X3Mbc9B6RVDds+HgM7Z+rg==
+X-Received: by 2002:a05:6000:4613:b0:3a5:2923:8006 with SMTP id ffacd0b85a97d-3b5f186ed15mr7662034f8f.25.1752393973014;
+        Sun, 13 Jul 2025 01:06:13 -0700 (PDT)
 Received: from [192.168.224.50] ([213.208.155.167])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc22a8sm9386608f8f.34.2025.07.13.01.05.58
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc22a8sm9386608f8f.34.2025.07.13.01.06.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Jul 2025 01:06:03 -0700 (PDT)
+        Sun, 13 Jul 2025 01:06:12 -0700 (PDT)
 From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Sun, 13 Jul 2025 10:05:23 +0200
-Subject: [PATCH v2 01/15] dt-bindings: arm-smmu: document the support on
- Milos
+Date: Sun, 13 Jul 2025 10:05:24 +0200
+Subject: [PATCH v2 02/15] dt-bindings: cpufreq: qcom-hw: document Milos
+ CPUFREQ Hardware
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250713-sm7635-fp6-initial-v2-1-e8f9a789505b@fairphone.com>
+Message-Id: <20250713-sm7635-fp6-initial-v2-2-e8f9a789505b@fairphone.com>
 References: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
 In-Reply-To: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
 To: Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
@@ -95,49 +95,41 @@ Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
  linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
  linux-mmc@vger.kernel.org, Luca Weiss <luca.weiss@fairphone.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1752393945; l=1456;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752393945; l=1165;
  i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=VI60lC4ZmfORZyuxHBRWFEsQsFQCradJNwP6TkMJAbg=;
- b=ysFcsREoBvX5mgay6H6zBC7kn964wfsE1peB4S1deXzOSQgOF/awLFfvR6VFGhwUAq6oh+c+L
- jGE9XkkTsEYCtwhnmfdvMrCBbHaWxNcEmIJjlZVGZSlmOWt5qi/15fU
+ bh=nbSwp5ROysMSTLKLxq6Pg7q3VCWJ3MFGpodgkXirdrk=;
+ b=URo7Ywj7eQLjWeGSKpTNmv79uc7iAPWio/PyLw17wxDECtuAiz2Bu3PfwHvwHO3pZ1RhCb5ag
+ VyL+DFxfUJDDy0DR7snG/iq810fQKBhCUA6IIAt4osJpIsLJpCqxh/T
 X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
  pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
 
-Add compatible for smmu representing support on the Milos SoC.
+Document the CPUFREQ Hardware on the Milos SoC.
 
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
- Documentation/devicetree/bindings/iommu/arm,smmu.yaml | 3 +++
- 1 file changed, 3 insertions(+)
+ Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/iommu/arm,smmu.yaml b/Documentation/devicetree/bindings/iommu/arm,smmu.yaml
-index 7b9d5507d6ccd6b845a57eeae59fe80ba75cc652..66d5a5ff78fa5dbb86db72db754c23b8cc8f188a 100644
---- a/Documentation/devicetree/bindings/iommu/arm,smmu.yaml
-+++ b/Documentation/devicetree/bindings/iommu/arm,smmu.yaml
-@@ -35,6 +35,7 @@ properties:
-       - description: Qcom SoCs implementing "qcom,smmu-500" and "arm,mmu-500"
+diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
+index e0242bed33420a39b8a8cff4229ba9eee994ca30..4fcadba87fbb90f960201aa0763f1a22c0f0f9b5 100644
+--- a/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
++++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
+@@ -34,6 +34,7 @@ properties:
+       - description: v2 of CPUFREQ HW (EPSS)
          items:
            - enum:
-+              - qcom,milos-smmu-500
-               - qcom,qcm2290-smmu-500
-               - qcom,qcs615-smmu-500
-               - qcom,qcs8300-smmu-500
-@@ -88,6 +89,7 @@ properties:
-       - description: Qcom Adreno GPUs implementing "qcom,smmu-500" and "arm,mmu-500"
-         items:
-           - enum:
-+              - qcom,milos-smmu-500
-               - qcom,qcm2290-smmu-500
-               - qcom,qcs615-smmu-500
-               - qcom,qcs8300-smmu-500
-@@ -534,6 +536,7 @@ allOf:
++              - qcom,milos-cpufreq-epss
+               - qcom,qcs8300-cpufreq-epss
+               - qcom,qdu1000-cpufreq-epss
+               - qcom,sa8255p-cpufreq-epss
+@@ -167,6 +168,7 @@ allOf:
          compatible:
-           items:
-             - enum:
-+                - qcom,milos-smmu-500
-                 - qcom,sar2130p-smmu-500
-                 - qcom,sm8550-smmu-500
-                 - qcom,sm8650-smmu-500
+           contains:
+             enum:
++              - qcom,milos-cpufreq-epss
+               - qcom,qcs8300-cpufreq-epss
+               - qcom,sc7280-cpufreq-epss
+               - qcom,sm8250-cpufreq-epss
 
 -- 
 2.50.1
