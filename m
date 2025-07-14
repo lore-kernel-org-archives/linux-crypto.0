@@ -1,209 +1,132 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5CC37160;
-	Mon, 14 Jul 2025 06:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752473134; cv=fail; b=R/+m6JFszopxMTrFEZIDKEg83q2IUBhH86jFM7W8MYAgL8c91L6WcYXyv7pFf99fhYyfY6/EASWK1Xian9AHaIlczEw0Jzr+DibJ6sSFTu1zuJRzzVPm/VGdybQPrVUVDVdlgeLZvJD/0pAWPOlyfheOlP+sdu8P6XBVIL7Zgx0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752473134; c=relaxed/simple;
-	bh=J40MAPUFHbXnBQ52yyEJJMAPozSpSdTejbebBvVKq3s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nX1WyOGXkkriTZuMVRxJcYu6m4Mc2zY9Tkx4YmJ5Ia0cbSK4ysV+P9OzZCpoVC9vcYmCADsHcSCGRHDOkb7lInjA4c9s1Hz9PBUMqRX2eIelA4TkVnGgIcATmMQLbz1PQOlYkoKy7PHTtQ+rtQU/9dvFo7gplC8cbhMez71dlHE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iraiC7qv; arc=fail smtp.client-ip=40.107.220.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D04222574;
+	Mon, 14 Jul 2025 06:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752473593; cv=none; b=Nt/+GU5MnS8zaxSM8ywnGkMAKTq4dYnp+qSclkY87/qMpn+otLns/xyBoANR6rG88CxFe7U4xBXeBIUMQGLDcvCzJsV8QPvWcMNqqkNxz027n2Ybt4TCg3xDYEKkgCF67PzQLECLjYkMqH7AG1k8skVbRE+bkTjuNceelmwUkFI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752473593; c=relaxed/simple;
+	bh=K6rTZa+mjUsFCcLD5fAui8r+wQYrBXhnTQ2dLU8CeRU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k/VDA0grBrMvshtcQ1hdjGI9Gd/6mVK5X/WdZjK9v5oFRhm/9D4Q4+6EsUjrlRSFWNSIIm54UWIpAa+0onJzeiXqZAXNeoaGT1nlZQKqwH6zkdscxH75WBDbmZdFY1aptYbO1oeVLHpCO2eRS8b0zwnIAlnea9endxOiKjMIvHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ALsZpZ5N; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iraiC7qv"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZnvAeGi+PScaTqlZgPIVrMb6mYYApjKot44HQ1yy8xTuvyip27PiZ7qje11c9txhMMLTjMq2F8R4Ls0wgfOphbmIJYONdqooD8NMAi0Tgf+WfD5vjA14NvF+ixh3gn16DyDYtM58k0mrhWcY4bONd1HJkLFYUszOVfGD37tw4a3pXYsgDrOyCvvwc6GufrQteGEjFfDWsCQ7XC2C2M5vjwrkB3eNmrgfg64eGZA2uWP+s5Wr2whxsscUwoGl3VL1DbDhEzwHh53Jetx+VKeKXYIsRIb6YCrKr6FO2WJLrYsBjtcN3CRBgKBLtTKsxLL5ODNpdBtprdRCbfSImmd+zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h4G9pHavOA4ffG4wDcXLxqHX3f2MHQNYTwsAqS+jMjw=;
- b=djA3hO7QVABwXs9sAA4hJlm17SzIhEMg3tSHk0naFFlPyQs9WX8R2sTJJ+UMvY2Yde6a9QS2XioH+SP9HUR/PwwxNAY37NguLX8eOjb5XbDd4Z0EqK8VPN+Oh4RFgv0dptzagQDdA9ZbMxtgvVd6Lp9JuSPNIS3ZI6AHHRvXEC0SfFdLvljI0B8r9u+OBYJMSG1HMSNjkCKD80fnHFDB40FJgC/OQJaZBZsYTdn+3nIjazgXKOZYk5iDrFlc9oqdL02CrAzWVmElIrU0n/2Z3EAw/sUWeVbksb8MiNbhZHg/cDHU5BEipRBTjurWnQS9lGAE88kfGoczkgw/9qDhcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h4G9pHavOA4ffG4wDcXLxqHX3f2MHQNYTwsAqS+jMjw=;
- b=iraiC7qvGIHIiU4ihpo9Vhf5Jw5umiqovCVVT0NYQyCnoFmqeAVRfPwhVPZodYdumE4yJIvO91UuER1BrT76BC+sDapYB/YpbJEX5c1jpi/tn7yJWqpJY8kfNnG4abbm8792/IvO3aH2IJfUgxcrxMFGBET/+XYP4u55EN4hf3A=
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com (2603:10b6:8:1a9::10)
- by CY3PR12MB9578.namprd12.prod.outlook.com (2603:10b6:930:109::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.35; Mon, 14 Jul
- 2025 06:05:30 +0000
-Received: from DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb]) by DS0PR12MB9345.namprd12.prod.outlook.com
- ([fe80::65ab:d63c:7341:edbb%6]) with mapi id 15.20.8901.033; Mon, 14 Jul 2025
- 06:05:29 +0000
-From: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "Botcha, Mounika"
-	<Mounika.Botcha@amd.com>, "Savitala, Sarat Chand"
-	<sarat.chand.savitala@amd.com>, "Dhanawade, Mohan" <mohan.dhanawade@amd.com>,
-	"Simek, Michal" <michal.simek@amd.com>, Stephan Mueller <smueller@chronox.de>
-Subject: RE: [PATCH v3 3/3] crypto: drbg: Export CTR DRBG DF functions
-Thread-Topic: [PATCH v3 3/3] crypto: drbg: Export CTR DRBG DF functions
-Thread-Index: AQHb21rB7NTssVrih0uUyq22WL8o47QmJIyAgAsevmA=
-Date: Mon, 14 Jul 2025 06:05:29 +0000
-Message-ID:
- <DS0PR12MB9345C8F5A728830DD9ABB1E19754A@DS0PR12MB9345.namprd12.prod.outlook.com>
-References: <20250612052542.2591773-1-h.jain@amd.com>
- <20250612052542.2591773-4-h.jain@amd.com>
- <aGs8N675Fe9svGTD@gondor.apana.org.au>
-In-Reply-To: <aGs8N675Fe9svGTD@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=True;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-07-14T05:06:04.0000000Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=3;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR12MB9345:EE_|CY3PR12MB9578:EE_
-x-ms-office365-filtering-correlation-id: aba6f8ea-07fc-4cc5-3481-08ddc29c6f8b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?0fETwVT/3gnDn92rAwxZ4U75/D3vkGKkSY1Xj1XadMrff4JCB8nkVZtFMR9W?=
- =?us-ascii?Q?hD/0fBkoxZLHtKqw5XFY4jVxDQM1y/DlmeNWluvkiWIBEF0VerCrTolTCCqV?=
- =?us-ascii?Q?BHc2WS6jiZH28iRvuRY9rjoofwHyrnm9jVuBcS/NC6tWr6D5kLiP59kKvuZQ?=
- =?us-ascii?Q?HmPyQNZe6NE7khLSzwhOTXKWJKdZR0Db/iPYgB4tfwNYK9awxqFmJ7bzza5y?=
- =?us-ascii?Q?4ap1swy+e4urfTxXGd1tQcumlUg9tFzrmzKd5QfpY5qBVfsoEYQ7i4Gf96JK?=
- =?us-ascii?Q?V7FPvyepbaO+wJ9ghg8pt61qDEyCUaCTdmurvUx5Ps8reTNscvDzJ4hXKQfi?=
- =?us-ascii?Q?slZcje37QsSkHx+0yNpDJkiqEhoT/BRpF/gcWVtaAcy5fCKSfRpBlafTKgi/?=
- =?us-ascii?Q?6tKMfsiYPXDtRGP2vLwcsAsrGlIPJXOkEdDLmpoYgrMSSbQWx+OlwH8K9ulI?=
- =?us-ascii?Q?CkNdl5+spv/k/baAJAthxc8Pif5LY3IxnF7JPB9xes/FCPBg/4fiRZa+zRyj?=
- =?us-ascii?Q?Gg+qDZI5deXjg/aaiXumQZSperdIw0r7SDpzIMPKTvqiL9fQoTQODBtY0sKv?=
- =?us-ascii?Q?1P5LXD4dGRt46+HycnSBBPYczv8p0JdSZaXDFul5EfCxg25ydV8PRXB0DcmG?=
- =?us-ascii?Q?bAN46Ll5PEiyxQtRtESJKYwNY4sJXGc4dDtgq1d+47fxY+48MhsJhgvQVUCt?=
- =?us-ascii?Q?78ZdxouDxmBT5mmCJH1ce+2i6AaR879ZPtPV8cUh5yYsRY/KrQAlgGuaaimj?=
- =?us-ascii?Q?fuJbLAH9K1pyVBNNm1lCbi1yTOr7PZrmaIiH5EVJH/43QGsnapJFSH9eIsdp?=
- =?us-ascii?Q?rdz1pkhOdymdtb71QJ1fTpKNMxJoApLQshxX85H8mvTf8p1gufdueQtt/MbS?=
- =?us-ascii?Q?1h0dyAw50XoWtb8NQlIUchD6POVk+UwfqdG98WpI1zz9dJk2PtVC4iLtKvb+?=
- =?us-ascii?Q?U2O/KpUUQgf+vpL6pYL912Z1/7dw4TE8hYR+bJApen4x/qZG60V3ncnItobO?=
- =?us-ascii?Q?dChGjhh8fRhEW+WnfJ6zatnMJRz3PN7Jed54aFgm3FiqCnnzpmFbZBlJM1sB?=
- =?us-ascii?Q?kjgUGWCXs70DrnNzGV1jU6gJV7f/ZlqwUI25jpvdjkaB5Ct0AON/68jE69hE?=
- =?us-ascii?Q?vWDl/fmMB+6Nk6S9kr9b+6l2aCosJFk1oKEYXpV755PhlFVBjufLOnXVmxJ7?=
- =?us-ascii?Q?RuRXhXnKw7GCTvQQt9TlzaIEwg9OJjo7rdhaAQbCWnvpwcfyqZ36KEOtJ1rW?=
- =?us-ascii?Q?FEzCHmPDcrDvJph/VT/rnxQD8VS0jrc7dBr91421hVham7OQ0Xr/mPNObp4a?=
- =?us-ascii?Q?1gWxaIWlUeOYpPon5Wqtud3Lcbm54O97NiluxONZzR5GrR28sgQDxbT6a7oB?=
- =?us-ascii?Q?kA/r2Pt1AUFAZzXZsP+xinnetG3qWtl8qK1ehtr8atjUw+RiUgSi54SFlinn?=
- =?us-ascii?Q?ikpWAnahpig=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB9345.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?/WCDldAmHO00s0sxIfg1FLQNRheLJR8Gl7EEtWeq6MmhFo5/mKD3kDKFhcp6?=
- =?us-ascii?Q?ebsgmXm8Je0gvNCfBLId8xpNT/TH9VWQYJP3adAGsY084DFmW1pchMB24SP0?=
- =?us-ascii?Q?cUVTs7u6jsEocUUYaLF/Zxf8CgW9OaRvNRbOax/PPr37B5nUmITLFJDD4sjE?=
- =?us-ascii?Q?/uqKgJLgGt0k8e5qPlE9FC0/X3JleCx5RKjtiIUZzg/ClBPhb98qqxKBA3pr?=
- =?us-ascii?Q?kD2+aNw0p0jXHTBUNNfB0B/qCeu6apzYLmic/bz1SQtgUED5iU9AlcL9pHMH?=
- =?us-ascii?Q?AllyokUnLSIpvjxkFFeoJs/609NzFWaHyLWrT547/4Y8iJkl4JHJ92+XqHrM?=
- =?us-ascii?Q?W98IP6t6wH4CYgYOktPwLWSN5wjX7Gl076n1exy849clktD/V2GQq4nbTwIZ?=
- =?us-ascii?Q?pWZGMKrgkWQ+wXl2SkO4USGJMUCcBaahgPJstrh+QXMiCLrv45053s89s1LP?=
- =?us-ascii?Q?Cb4Q22FaaCIBIRTdsaakQj85lRDrOH2KZU5uyQKu6RqxcN3XBTysRHQFfzi2?=
- =?us-ascii?Q?2VZbae8IRd/8TOuzMkLuC1U7+VLosI6/DIROA5SP63tYGtiUgRzjf5wub33o?=
- =?us-ascii?Q?9ebzpMy8lH9xjfwbpgZmvH2OVoQlb1xRR+HZjb82KlIOYx1gPTFDM0V1iBt7?=
- =?us-ascii?Q?jizVYSxTcPml+tuHPGeDld+zzN3uqDck8/PBic+P34y+RXTiAUaRFRbuH9a9?=
- =?us-ascii?Q?WDSk2zoVJcH+8WwciY05HZPKXW/GNRkQt3R7/4SlQJ0n7ZentxeY2q/aLT5j?=
- =?us-ascii?Q?MGOf5mJ92SPGRCV55/r2VFkjTOxJ1wjfZiJNman8cOTLwkc9rIIoVjyZpr6/?=
- =?us-ascii?Q?vdH3fK73quKaMHybxiGiP29f9HfcWYqQWCgy1U+t5+n2g+gyOnyvgoQvJANM?=
- =?us-ascii?Q?oXQkTMasemOV17Ouj/HO6WAfBoPmN6vEruWtFuV/gKoplS/YrhHJK+fjszwq?=
- =?us-ascii?Q?LZ5jIGyQlGdj6FLiNrZaAdT/7ndOr9l3spbYyse+FI2YOtPzIH3iEI7oCdyP?=
- =?us-ascii?Q?PqDgApLoecGDJ/0ihY1jsXIoUGYNPISJIf8opzYxDAsPdune11GB2+uCnyLj?=
- =?us-ascii?Q?JFoNPtKTYuGpqmW5Omgv+/MH/j2kfW84pjD3qVQtfmfg48WJE3QGEfaskbtT?=
- =?us-ascii?Q?MPXyPkA7cqY/07qgGFQKBdrcTHO6Ohs8vZGl8UR4KsXbHWKtSkkjMLuPV+Dx?=
- =?us-ascii?Q?zixp+FlvSz7D/R/UKeXPt0/bj4aQBmwyGI+uyMSgWvBc369EIYKUKaaXMZ11?=
- =?us-ascii?Q?NJxBbWCaudkVfuOqNEgU8kKolmyvGmkJyYrY67Iuk5XVnge2qu548exj9Q1o?=
- =?us-ascii?Q?1TCEkzQR6zPLZSqrmi/gcXPFpFUPitVHwSKKufshnMGVdNBfkr/QVWkeWibc?=
- =?us-ascii?Q?fZt8PFG3kW9Q/AyvMNX/6ZUDn3dgY7PW4zkvBZtbT5CIW7vJx39garwsOvXi?=
- =?us-ascii?Q?eOE0gx6eB4wg1eG6XVhJ8Hnb5CSqKqAOK2AqAexpczHdwp4koFFT05+oi/AT?=
- =?us-ascii?Q?QQtfVAKFrHrzEAxQmF4RRvAUqiOSkTAzc3w5toA1v7lJkCHi6P+EKUbBuXUw?=
- =?us-ascii?Q?ZDTi5+j9RfHHUJyT3U4=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALsZpZ5N"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60c3aafae23so10396899a12.1;
+        Sun, 13 Jul 2025 23:13:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752473590; x=1753078390; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vvozbmvdghn0xuJhVjwu4pQc8eFowQW5vD9wXdzvh2E=;
+        b=ALsZpZ5Nwk0QPl9HEVXg0BgXgV/0oGOnzEJeNal2xZfLiTqtprh8NIc+B9yAZo3Iyw
+         8RY7AeH/stuMCjEmmJBgcQNCDqXHEmAro34tjiskjt9cEYBFJwvbf7XgPG0ChQca3Fp1
+         5nyF2HY1O19gIFwAV0iPuQVzMwWmV1ELLeVifNIiilV/LbQuRNHTAQOYlfeEPsHCaDJn
+         I+6gq0/NE/ae8enM3WsoDcD1N04Zua/PHYgx6iL4E1d11pz3fYmMtOmCeSiojBnqO8U9
+         rgvjfmvMU3pd6JG0ooHR70qlHpOQvXaATLeJs8Rd2oeSPIjF28ACBmEUxwortIYxArWK
+         4Wlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752473590; x=1753078390;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vvozbmvdghn0xuJhVjwu4pQc8eFowQW5vD9wXdzvh2E=;
+        b=AX6KyacYKSsVmXSsn1BHeRqRMO2e7ZoQqLm0Q8MrjJ+MZXX3V3wqTVJlU4Un+cDXdh
+         0eHqOHe/iQKkWsA+P2wbl7XcS+tkxhMVmMKg5LCzRnAUK42krHN2Y4GYyhOM2TDn2dLq
+         +UkMql3hcqNxciNdjOES1jV+4T+goxrEyMrifUPxxW2d7Rh+SP7+EGGxStORcgQXvH+1
+         maimu5sfHNrUgdPBuueHHQdDHvFemDemJnziN7vCmgfZ8LU3rU4gDpCaEmIApDy+DTr/
+         FurycAhOqC3uVdiMEfDp5CLGRclM4iGZ5k4V9uiA9xpB5SgqMpJgFFXV2ht6awEJhWZK
+         AOkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP9cCEGBtIfr4mj8xq/Eb9LeEOYHuQaWg7DecbOSeLyjmdGBsu89NKvBfOe5Mpxy2p0WMa5X3eB2OQ@vger.kernel.org, AJvYcCUStQ+kZD3RgEiqCqamDPHN0+V8U//75gB5aBA/VFf/8TxBwYmlbFOrNTmcls2xSkxfzTkJbh1izJUn@vger.kernel.org, AJvYcCUu/1mhYdj5sMEGBzzl15XoaiyAFFWhgEjtWzX76d2pShQ/mNzScoB3zBJvqR/9LZq31mqppD0IV70=@vger.kernel.org, AJvYcCVstpNyGdvuY73VnuNsfHVFZp+Ibrgrdw6r36tXAZ6bHdgKEM8rbl+dffkiBgU4ZIz3E4mae5bxw5CYU5w=@vger.kernel.org, AJvYcCW0SyBXuZZvd/xJRQljFHmZZeK27WVLgdkeC50Y0Ub2vYEcwxbkffKOuPuFt/NDDMfwKU0qSkr3+OOeV0V3zg==@vger.kernel.org, AJvYcCW9KUj+JjF5ly7puv2tvDzq8+x1Op4tL9Qp0opokzItOLrzzOp8nZDLBSMKCFsv8iGwfAi2VpTAbRT/@vger.kernel.org, AJvYcCWCJTujwin9rvVzkB2+pYTryRkQpYeQHH7hj/ZAtqaa7ztVx09K4xQ05d8TrssfdLgBtpiikUwl6k0mJaas@vger.kernel.org, AJvYcCWVojriAO944z+btF5GTxaZUZCinYblWnzszeAL3ErTaCzTc4dmv9W51Pv3w/UOIkrUDJwcXKXnKsMlID1S@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHYB1+qM4aL9I+xyEElR/MdHfEasVuCVboe38WY1xF0F4jbRQb
+	PJhr5OJpS0nyaUrTHjE5Xs4BO1IeOKlW234I8ekBlgq7OXfOqlDGmcfE
+X-Gm-Gg: ASbGncsVzO3u2eRRPkqHSExy4M7lF3/AqBCyho/g29LYpWj7iPq7+3VHbuJ8XUz5zUh
+	XvbjJPk9jXCfIQMiqT4i+CEEISiQpedpCb9vyjf4+7DDhq3Jmr1V5+R9ShnnbGf8lPp9ovCVb0V
+	GYnbTFIeLu6NoJa8NB/aWSzV8nXEtD8QXaTDsjm4Gqp6HfiEMSBw0ai8XTXG1R/XJDWQIlXTcAX
+	+fSzIIeS5RrvTPZ8v5iGi2aYialOjERouHKAYIZ0FmgAYr0nhCdDUo3ukisQ2vqqTlQsWm852eH
+	0qrys1fbQfL7XFpn13BhNOrFlQ2Mm06BX3zlOngHXilZmyDqgE5qIF902v/whLdVa5ROZxTfdHb
+	5a30NVO/tm5Y+56IaMLVGLbeVXbKPIfOCHJ6CsLZkQrLFCOQKU5vR7qFhQU5KyQZ7j5UtkII022
+	eawnCCt9xeeqWy3IrLPLA+zA==
+X-Google-Smtp-Source: AGHT+IHhpjs0q3mi1BpnwNvryChqNwp5/Dw+yK56vrj/BWwwZ/DXYC0z9I3eOOpItRqe5sk1H/USWg==
+X-Received: by 2002:a17:906:9f86:b0:ae3:a4a6:a32e with SMTP id a640c23a62f3a-ae6e253ddf4mr1701256366b.29.1752473589912;
+        Sun, 13 Jul 2025 23:13:09 -0700 (PDT)
+Received: from [192.168.0.124] (ip-37-248-155-42.multi.internet.cyfrowypolsat.pl. [37.248.155.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8294bc2sm766171566b.135.2025.07.13.23.13.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Jul 2025 23:13:09 -0700 (PDT)
+Message-ID: <ee0d148e-71cd-4136-b3cb-145566abdfbe@gmail.com>
+Date: Mon, 14 Jul 2025 08:13:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB9345.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aba6f8ea-07fc-4cc5-3481-08ddc29c6f8b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2025 06:05:29.7983
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iIsMYUsKi1Aoesa4LommC+pm9yBhdJd9ivQA97qOhJie0fM1v7XHZo4trZQ+4M1L
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9578
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] Various dt-bindings for SM7635 and The Fairphone
+ (Gen. 6) addition
+To: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+ Luca Weiss <luca.weiss@fairphone.com>
+Cc: Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Robert Marko <robimarko@gmail.com>,
+ Das Srinagesh <quic_gurus@quicinc.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Jassi Brar <jassisinghbrar@gmail.com>,
+ Amit Kucheria <amitk@kernel.org>, Thara Gopinath <thara.gopinath@gmail.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>, Zhang Rui <rui.zhang@intel.com>,
+ Lukasz Luba <lukasz.luba@arm.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-mmc@vger.kernel.org
+References: <20250625-sm7635-fp6-initial-v1-0-d9cd322eac1b@fairphone.com>
+ <aGMI1Zv6D+K+vWZL@hu-bjorande-lv.qualcomm.com>
+Content-Language: en-US
+From: Artur Weber <aweber.kernel@gmail.com>
+In-Reply-To: <aGMI1Zv6D+K+vWZL@hu-bjorande-lv.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+On 6/30/25 23:59, Bjorn Andersson wrote:
+> On Wed, Jun 25, 2025 at 11:22:55AM +0200, Luca Weiss wrote:
+>> Document various bits of the SM7635 SoC in the dt-bindings, which don't
+>> really need any other changes.
+>>
+>> Then we can add the dtsi for the SM7635 SoC and finally add a dts for
+>> the newly announced The Fairphone (Gen. 6) smartphone.
+>>
+>> Dependencies:
+>> * The dt-bindings should not have any dependencies on any other patches.
+>> * The qcom dts bits depend on most other SM7635 patchsets I have sent in
+>>    conjuction with this one. The exact ones are specified in the b4 deps.
+>>
+> 
+> Very nice to see the various patches for this platform on LKML!
+> 
+> 
+> Can you please use the name "milos" in compatibles and filenames instead
+> of sm7635.
+Hi, small half-related question - does this mean that future Qualcomm
+SoC additions should use the codename for compatibles instead of the
+model number as well?
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Monday, July 7, 2025 8:47 AM
-> To: Jain, Harsh (AECG-SSW) <h.jain@amd.com>
-> Cc: davem@davemloft.net; linux-crypto@vger.kernel.org;
-> devicetree@vger.kernel.org; Botcha, Mounika <Mounika.Botcha@amd.com>;
-> Savitala, Sarat Chand <sarat.chand.savitala@amd.com>; Dhanawade, Mohan
-> <mohan.dhanawade@amd.com>; Simek, Michal <michal.simek@amd.com>;
-> Stephan Mueller <smueller@chronox.de>
-> Subject: Re: [PATCH v3 3/3] crypto: drbg: Export CTR DRBG DF functions
->
-> Caution: This message originated from an External Source. Use proper caut=
-ion
-> when opening attachments, clicking links, or responding.
->
->
-> On Thu, Jun 12, 2025 at 10:55:42AM +0530, Harsh Jain wrote:
-> > Export drbg_ctr_df() derivative function to re-use it in xilinx trng
-> > driver. Changes has been tested by enabling
-> CONFIG_CRYPTO_USER_API_RNG_CAVP
-> >
-> > Signed-off-by: Harsh Jain <h.jain@amd.com>
-> > ---
-> >  crypto/drbg.c                       | 108 +++++++++++++++-------------
-> >  drivers/crypto/Kconfig              |   2 +
-> >  drivers/crypto/xilinx/xilinx-trng.c |  32 ++++++++-
-> >  include/crypto/drbg.h               |  15 ++++
-> >  4 files changed, 103 insertions(+), 54 deletions(-)
->
-> Please move the df function out into its own module like crypto/hkdf.c.
+I was working on SM7435 (parrot) patches a while back; when I get around
+to submitting those, will I have to use "parrot" or "sm7435" in the
+compatibles?
 
-Thanks Herbert,
-
-There is hkdf.c and kdf_sp800108.c module, Both implements different NIST S=
-pecifications and DRBG derivative function represents different NIST Specif=
-ication.
-Moving it to hkdf.c may not be a best fit. How about adding new module for =
-" crypto_drbg_ctr_df ()"?
-
->
-> You should also keep the drbg changes to a minimum.
-
-drbg_ctr_df() needs tfm, blocklen, statelen which is currently derived from=
- struct drbg_state.
-If I updated structure drbg_state, It needs code changes in HMAC as well.
-To keep code changes minimum, I added required inputs as function arguments=
-.
-Do you have any other idea in mind?
-
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards
+Artur
