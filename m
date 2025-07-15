@@ -1,108 +1,132 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152E25C96;
-	Tue, 15 Jul 2025 06:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E182356BC;
+	Tue, 15 Jul 2025 07:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752560669; cv=none; b=ABzvJ3TuewGZyYnUNpc8AD2Jx8A7iUmzRmGUUPI4sW868UMcBK4sLjQVMRVeaXUwH03S+F4zS/YwS7CswQXMtH0drvIYn0ywB2SXa2UqZaBf/Q/Mfnud72V1OFFijY+YNZvweXSD/0bplOIZAOIlNdJeIa2c1OgEWe5Cvv4N648=
+	t=1752564197; cv=none; b=Ro6Zzg8CWlwEjRLM5W5Z2WpImTLlj1aw4JjQ5wwyuJb9B9lXIF+9AwsU3SWhgQbT0079w3QWaEnGZE5iZTLiqql6efBD7BIp68ce5s3niRqFw82nAxUiHyRvVUuI0iT+2wZA2SrooYKpu4rRUh1bTLvBYIs+zitNT6LhAW8TX6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752560669; c=relaxed/simple;
-	bh=g4vK8+ewCImz+rjK4arl+/dmIVCWj1Nv+zLRHy1djlM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OIxd5kPwvIvGDL77zd/7CQbbmug266qKNB9VdSGO7ltIPiGh50T6HytuKB80xKo6Mt1frdwb8WNLB3EEssqf/V6IC0ajyp+8UTRUgezRtzTrQEGmT5PHKaSGwbhuvbzvRCAZDGKUJOQosmTf4rfKU8287Oql1gFxPfmY2RpUmbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EpQ3RY1b; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EpQ3RY1b"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b31c84b8052so5878047a12.1;
-        Mon, 14 Jul 2025 23:24:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752560667; x=1753165467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/3GeJz9Omz0FOn0Kb8h9EISLJATP2UufU29k8Dqxp0Y=;
-        b=EpQ3RY1bj0fGYLiwYWYAJcmvvOyE/g70AX82qHEe3UwwYftSLG9LFCimysCDJ6zEX9
-         NEUQqk8aHbtY5tYrMCydkQp5Nn4nj8S0LEoKT+5JLGaPoPDxXprKQh+mLOBb8FySSNrV
-         TeBC/qS/WHYuLvePlss9QSEpVKwEJndV9WdKpDYDO2kWk/3C6Wq5BqQUBtkdPow9kDsR
-         lcWsBAXLzKmSkBK+vFqNLVLx65SehlO1dRCfnPiqOTnF9sWWV5uxHzQTdxY2WKfWISD+
-         IFfh2EbZpVgJSBCt1b0kdGnry+sin8m+qXGSyyZOSBaiAmh31muNT6UasJLPsJ+EWpXV
-         QCaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752560667; x=1753165467;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/3GeJz9Omz0FOn0Kb8h9EISLJATP2UufU29k8Dqxp0Y=;
-        b=rOS+e8ESo+BwQbTG8mB74RoXYwpzbTnzD5lo9JMpJ3UgipvKY01wBuFpy3in51ROKG
-         Wsd+BaKaxZjgtuSK8cydhH7amJ33vmPzA3UyPs/JgFVUvpDu087wylSM9SMipT4nJ6WG
-         yty4Rf95B9bzADYr3AgPZQwSMk+5xaelufeZSI30HyvllHmT6klCoVLtFOTUm5sFfA0R
-         5GX2TtldPfmxuhB31SSbDmeZuMkPRIdM+BShi2nzFCNTHj4dpvi0BN8m04+8gRsbuVXe
-         /86DdNoDgj2I67JkFAxI1zutMXu1uU4rOhfS8gWeczNZMIi+0cCoQvREL0XWGphc4853
-         f5Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMWycDZT6wwxKEGeD6ZvOD9HVtgsaIIS47lzOKjbZm0EXtmWN+woxdii9r82wd4a/efcTbhOYOGGAiOag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdnI24qp5GHZS1OB9coWDd54XR0uqQ6z/iOo4oQ4WxaPOrTuNC
-	K45CNz9O/ssLq6PnVEtNx4qqi11BCj0OMeT3OAJDK9WEtJxi427DPn9l
-X-Gm-Gg: ASbGncuoxema3vtIDEjtv8xWH180HvQ2RSXtqwy0nbEBHH1pCjm2WEnVCouHLt2d4+i
-	B4FWL05AJIKEry2yOF/dMGXeiO1s6DUJsCsSpa+dJ00vv0ClAEU78aVULahr54B6OfLG7sDf6iT
-	ONe/M+9Fc2EtWOtP/gy4NMOMoMnjDY2e2DCyjuKbLNMZsDsxV1usXjV4JzjtHEu3rvmp2keXixL
-	mf0MSgQcYlwlazhGYnBeO6H5m0InFiB9hA3Hnw+ROCY/q93qCJtopv5PmIpeG3lchbhUc6RRjNm
-	95Z72TzaLFB9G0cLgb5cVuy2cEbKaq9urSOk6ywVlPuCi9UNiQ0zs6NVopRSUhKN2abP9RIkify
-	iEZxOLV3ngw==
-X-Google-Smtp-Source: AGHT+IGr5QFN4my7ai4srRYNbiB648JUm4RpfKdWKlSeX2rSE4Qy8CMDRILi7aFyybTbT/54Byj0Lw==
-X-Received: by 2002:a05:6a21:b8b:b0:21f:5598:4c2c with SMTP id adf61e73a8af0-2311e535ba7mr27840761637.13.1752560667173;
-        Mon, 14 Jul 2025 23:24:27 -0700 (PDT)
-Received: from ws ([103.167.140.11])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f536aesm11729467b3a.137.2025.07.14.23.24.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 23:24:26 -0700 (PDT)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] padata: Reset next CPU when reorder sequence wraps around
-Date: Tue, 15 Jul 2025 14:23:57 +0800
-Message-ID: <20250715062401.172642-1-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1752564197; c=relaxed/simple;
+	bh=lml+OoGdyoRK+hmvByrWxM0CD5HdufSCxdLKr+WWkXY=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=rzSUdA8GtYT2kgHW3JMsKry/NfscNcsCCvHwXrBlkwVDyTmYgP1PXSi/i+Q/UlW7DJbaH15ybBW0v8zzR6ge1Vwq6hWfyySOZ+BjPfeWwUzMiBNpqSXLPxG2xPkF8gVNMzG+gayG0/MMvEP05HtApxqSMB3l83tYR82re8ELLq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bh9Xm4DjszHrSx;
+	Tue, 15 Jul 2025 15:19:04 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 578281401F3;
+	Tue, 15 Jul 2025 15:23:11 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Jul 2025 15:23:10 +0800
+Subject: Re: [PATCH v5 2/3] migration: qm updates BAR configuration
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <herbert@gondor.apana.org.au>, Linux Crypto Mailing
+ List <linux-crypto@vger.kernel.org>
+References: <20250630085402.7491-1-liulongfang@huawei.com>
+ <20250630085402.7491-3-liulongfang@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <7694ee87-2852-3759-1360-6349f46e7d70@huawei.com>
+Date: Tue, 15 Jul 2025 15:23:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250630085402.7491-3-liulongfang@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-When seq_nr wraps around, the next reorder job with seq 0 is hashed to
-the first CPU in padata_do_serial(). Correspondingly, need reset pd->cpu
-to the first one when pd->processed wraps around. Otherwise, if the
-number of used CPUs is not a power of 2, padata_find_next() will be
-checking a wrong list, hence deadlock.
+On 2025/6/30 16:54, Longfang Liu wrote:
+> On new platforms greater than QM_HW_V3, the configuration region for the
+> live migration function of the accelerator device is no longer
+> placed in the VF, but is instead placed in the PF.
+> 
+> Therefore, the configuration region of the live migration function
+> needs to be opened when the QM driver is loaded. When the QM driver
+> is uninstalled, the driver needs to clear this configuration.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>
 
-Fixes: 6fc4dbcf0276 ("padata: Replace delayed timer with immediate workqueue in padata_reorder")
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
----
- kernel/padata.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Hello, Herbert. There is a patch in this patchset that modifies the crypto subsystem.
+Could you help review it?
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 7eee94166357..ebb52c6db637 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -290,7 +290,11 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
- 	if (remove_object) {
- 		list_del_init(&padata->list);
- 		++pd->processed;
--		pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
-+		/* When sequence wraps around, reset to the first CPU. */
-+		if (unlikely(pd->processed == 0))
-+			pd->cpu = cpumask_first(pd->cpumask.pcpu);
-+		else
-+			pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
- 	}
- 
- 	spin_unlock(&reorder->lock);
--- 
-2.50.0
+Thanks.
+Longfang.
 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index d3f5d108b898..0a8888304e15 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -242,6 +242,9 @@
+>  #define QM_QOS_MAX_CIR_U		6
+>  #define QM_AUTOSUSPEND_DELAY		3000
+>  
+> +#define QM_MIG_REGION_SEL		0x100198
+> +#define QM_MIG_REGION_EN		0x1
+> +
+>   /* abnormal status value for stopping queue */
+>  #define QM_STOP_QUEUE_FAIL		1
+>  #define	QM_DUMP_SQC_FAIL		3
+> @@ -3004,11 +3007,36 @@ static void qm_put_pci_res(struct hisi_qm *qm)
+>  	pci_release_mem_regions(pdev);
+>  }
+>  
+> +static void hisi_mig_region_clear(struct hisi_qm *qm)
+> +{
+> +	u32 val;
+> +
+> +	/* Clear migration region set of PF */
+> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
+> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
+> +		val &= ~BIT(0);
+> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
+> +	}
+> +}
+> +
+> +static void hisi_mig_region_enable(struct hisi_qm *qm)
+> +{
+> +	u32 val;
+> +
+> +	/* Select migration region of PF */
+> +	if (qm->fun_type == QM_HW_PF && qm->ver > QM_HW_V3) {
+> +		val = readl(qm->io_base + QM_MIG_REGION_SEL);
+> +		val |= QM_MIG_REGION_EN;
+> +		writel(val, qm->io_base + QM_MIG_REGION_SEL);
+> +	}
+> +}
+> +
+>  static void hisi_qm_pci_uninit(struct hisi_qm *qm)
+>  {
+>  	struct pci_dev *pdev = qm->pdev;
+>  
+>  	pci_free_irq_vectors(pdev);
+> +	hisi_mig_region_clear(qm);
+>  	qm_put_pci_res(qm);
+>  	pci_disable_device(pdev);
+>  }
+> @@ -5630,6 +5658,7 @@ int hisi_qm_init(struct hisi_qm *qm)
+>  		goto err_free_qm_memory;
+>  
+>  	qm_cmd_init(qm);
+> +	hisi_mig_region_enable(qm);
+>  
+>  	return 0;
+>  
+> 
