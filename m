@@ -1,98 +1,108 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4217427510A;
-	Tue, 15 Jul 2025 09:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1045103F;
+	Tue, 15 Jul 2025 11:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752570105; cv=none; b=LIZpICW9BMtuNJdvpFS+lna+IcrALbsm3O4eP1rIvdVU5BxZhBVWrAstnnPWIhZkmYDLOklx6eN6t3ibh/+n3PQ8AuzQ8SQaUjoZ7Tims7NyD4py0oLKWo8xBRT62H9FKXPGm3du89zLxRyMWe7KG2NVlYdTFKdf0A/nQGuxGVE=
+	t=1752580645; cv=none; b=TNeMlUgkBrY9sp4LJeVDLXc7uk1U1S6+VIjAh2sct9f3sooREJ+7Qo57ibhKuhrDlUgB40FJYXwtZP0v7BGez8s9+6mZ4ENFYemonETCW28PUICfrME+3fbEP1FUIymGjffrJsPqL3nQ3B0BAvA+/94vaz99nvxjjDWV7KU2aFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752570105; c=relaxed/simple;
-	bh=fuOd3nnpezQ3sfAoEmbX/8c5F8SHT/InXaoj+BjRxiA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qwYIgj1zdKNeqH0CJtli+4DqkdK5YKCuKMqLt2Y8qYFgKBkWtpHo5mjiQYLdVtfgWtoOrTeSp+lbZ1L+3w0oIvM56OmPwDHbUc+gT7gW759uJY+PJHF0gKUiC/vzBQsk2pJGb78UFoZlo+7hccP3T9eJgINnuW+xSh6mxhopAGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XS8crzsg; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752580645; c=relaxed/simple;
+	bh=dQpJV9t4WX6MPhN775PSWNhE4Y8XrFDxHw+0baMar30=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=llQHunZW9zabW66iKOUjp3rj4Hfar2ByknhGCF+fDcyPiP8dJTrvUClZ2jKjhYW3BTkCu7NkIJNijb3jQhOjeVe1kmtlACPmJNgD0L1EtooUjPEP83VUBuptP1ZT6eeI+GNkvMq0PqoTw492F8KfC1klKBONgQw+e9TTk5mW/sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0d2IDV/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XS8crzsg"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4555f89b236so36709755e9.1;
-        Tue, 15 Jul 2025 02:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752570102; x=1753174902; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FYOrY3C9uX5DWx2tcaLyd3fYk/JwOj1/lQiUcN/Y4qY=;
-        b=XS8crzsgEeG5FJist7ljemLeSLJE9TL+c6AfgZ6iooVVPOtBeODrGvsDbr4YXFtdfE
-         oBG37T2ZwqP9KcwHKfWRFZarqlT/kXDSO/aAv9d6f+/VvoVgkSg9Yep3MobIERySivsC
-         v5wdw/uhhCAJE/wozZf0xhiHesf/hC6Wn2Yh92/QJa80TIiBLlHQ1LRKCIjmiUYY4Ip1
-         LmdBpAaadGrRYX6TV7ryw6ETnIrYk49Ahn/junyOQXombG6BZCGMGVRebmoQBc7H7JDU
-         xfLDys6Lb6gjlhnVDv2VdOgGA/x2Dmyq0jwSMwD0anoofNZCv+EUjhoTb6yTlFdRFDKm
-         UGag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752570102; x=1753174902;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FYOrY3C9uX5DWx2tcaLyd3fYk/JwOj1/lQiUcN/Y4qY=;
-        b=LpNjcYifOfRjN+t/kycJqUvLz51pflMLV/2DBESW54tXKoYNAnoOL0oChhcIe8sLQj
-         Za2TISrSiZRtSLsPFt98YUP8ymMmg0TfvK8W4h6VCdp4oDIzrUA49f8P6vh+qnzcJtXJ
-         DuhwGbrtt3MThS4tLHN4xYfUIWJTwXAFuU5YYrk8Jt2hMUWlEmwLlfKLNLmFLjYMnz0k
-         qpxPeMtvf2umAOIn9SQ16MnBpRmeVbEpCeJzk2Kv5SWs3fT+e2QT7fwPBA0B0JdjiACb
-         JU+rZ87MvYgVyz0ulWBqGJyv3bvzlyCwS/WkUXc7PS7srWanV5d8k/oD1VR4iYtZf4cT
-         N31Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVrfMnCmK9csYjwVkpYBUMq6bWtKzH+tOT3PkdwqHWfKaKpQPH6um6z58lcz9e498vAEWvqZp7ZyOG6KBM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWQTPWK4tXGSBnDyOawvkPRxoM4wNIURxTGGXBzXLSZF9uZy+L
-	juWPvLHLBNB88SqvqDVG+M6PeBltUk2OnhafCPmaBUOY3MLetQq3BvodRCOhUWKZdZtrJfLA0YC
-	3YNSiTN893Fy+MYgKB1IfpyQlTRkw6eZHn0F6H4I=
-X-Gm-Gg: ASbGncsg8ICh2Kr1Q863puZ5ZGoYZqfgqm6Dun7JAIDCcaWjdc+iwyNV5J9+abWZ93q
-	u5bJQvNb9u+zJSh/lIRBarS+Tobl4/WO15j2pI3Qy4DP2y4w59haNl11XCHrt7OY6qNt7Q66Ib7
-	93OYEVZQLCthn7DMfkvJMYcdXMrXmy7kdKfkEtd/DDFEV/7TtgNRDJJ+mlUOR+akl4ueFh5nhkf
-	R61KA==
-X-Google-Smtp-Source: AGHT+IHDmi5vNdNNW4a38pbOpn2VCkEAdlo/cmBFuJR6I4EJyMkyEM1iCQtYRQ6SwnQXzk4v65iTHdFjdW0oCgsEQqY=
-X-Received: by 2002:a05:600c:350f:b0:456:11a6:a511 with SMTP id
- 5b1f17b1804b1-45611a6a7e3mr70569675e9.20.1752570102130; Tue, 15 Jul 2025
- 02:01:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0d2IDV/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83826C4CEF6;
+	Tue, 15 Jul 2025 11:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752580644;
+	bh=dQpJV9t4WX6MPhN775PSWNhE4Y8XrFDxHw+0baMar30=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=N0d2IDV/1csdMXPNSESzqkWBceo9eaVAnc4jBjcAjEpg3Iup7r+euKYSnqkLVFT5i
+	 Xh4LxeXEudgDyNk9RqEaGEZ10ZWe7EpWpNb88PrBc937o9F0XsI6jgiOYl41kWMlnK
+	 imi0GiDM3Z/1SrKFbiwEGuerLx1oWJ5WWPSuSfUy5/JHNEyk8s5lwnO2elnciWGF0K
+	 Ur+k/0WVICwvy4XKzOE5xEN3QKGeDXD1+1fmXBdvNnnFkFGXagcupKzXGFPZZHtBQe
+	 A9Ue8BJc3WnegQNeb8tgkk851QJQ8Y8fHFxK9Fy3/6cfnhwwdoFE1//q/BUlJmlB7e
+	 c2KPB6bCsmNww==
+From: Will Deacon <will@kernel.org>
+To: Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vinod Koul <vkoul@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Robert Marko <robimarko@gmail.com>,
+	Das Srinagesh <quic_gurus@quicinc.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Amit Kucheria <amitk@kernel.org>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Luca Weiss <luca.weiss@fairphone.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	~postmarketos/upstreaming@lists.sr.ht,
+	phone-devel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-mmc@vger.kernel.org
+Subject: Re: [PATCH v2 00/15] Various dt-bindings for Milos and The Fairphone (Gen. 6) addition
+Date: Tue, 15 Jul 2025 12:57:09 +0100
+Message-Id: <175257604342.2786246.10984360441321957187.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
+References: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250715062401.172642-1-shaw.leon@gmail.com>
-In-Reply-To: <20250715062401.172642-1-shaw.leon@gmail.com>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Tue, 15 Jul 2025 17:01:04 +0800
-X-Gm-Features: Ac12FXxHgKYTi5qQjpp56bjSKoZPDexSCED2PmJMggXkM5ipk4gm0nExMKdu2pU
-Message-ID: <CABAhCORLzrKc6urUp_UOL-OybdbHUs+y62DTp2XxR9LobOqEig@mail.gmail.com>
-Subject: Re: [PATCH] padata: Reset next CPU when reorder sequence wraps around
-To: Steffen Klassert <steffen.klassert@secunet.com>, 
-	Daniel Jordan <daniel.m.jordan@oracle.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 7eee94166357..ebb52c6db637 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -290,7 +290,11 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
->         if (remove_object) {
->                 list_del_init(&padata->list);
->                 ++pd->processed;
-> -               pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
-> +               /* When sequence wraps around, reset to the first CPU. */
-> +               if (unlikely(pd->processed == 0))
-> +                       pd->cpu = cpumask_first(pd->cpumask.pcpu);
-> +               else
-> +                       pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
->         }
->
->         spin_unlock(&reorder->lock);
-> --
-> 2.50.0
->
+On Sun, 13 Jul 2025 10:05:22 +0200, Luca Weiss wrote:
+> Document various bits of the Milos SoC in the dt-bindings, which don't
+> really need any other changes.
+> 
+> Then we can add the dtsi for the Milos SoC and finally add a dts for
+> the newly announced The Fairphone (Gen. 6) smartphone.
+> 
+> Dependencies:
+> * The dt-bindings should not have any dependencies on any other patches.
+> * The qcom dts bits depend on most other Milos patchsets I have sent in
+>   conjuction with this one. The exact ones are specified in the b4 deps.
+> 
+> [...]
 
-Another question:
-Do we even need a per-CPU reorder_list? It's always used
-with a remote CPU id and spin-lock. Would a plain array of
-struct padata_list be sufficient?
+Applied SMMU bindings change to iommu (arm/smmu/bindings), thanks!
+
+[01/15] dt-bindings: arm-smmu: document the support on Milos
+        https://git.kernel.org/iommu/c/2f0187392cba
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
