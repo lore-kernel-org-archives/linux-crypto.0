@@ -1,109 +1,98 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692A726D4D8;
-	Tue, 15 Jul 2025 08:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4217427510A;
+	Tue, 15 Jul 2025 09:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752567127; cv=none; b=RGQkj6cDnvEhU8QPlRaX1lduOEQmFFxUq+ONMNoCpT4HmirZvsJkR51B5hDl1yZh4x3Z4Nk2UzI6tKIhKa1sgpa9KboWgdXZeo+fHb9evGnW5cHPhNrk2NzOyMKWdZGpKqT/kdBwcNF/7K10Jj3ckFinnTeHqlQwHO5HdjNoXI4=
+	t=1752570105; cv=none; b=LIZpICW9BMtuNJdvpFS+lna+IcrALbsm3O4eP1rIvdVU5BxZhBVWrAstnnPWIhZkmYDLOklx6eN6t3ibh/+n3PQ8AuzQ8SQaUjoZ7Tims7NyD4py0oLKWo8xBRT62H9FKXPGm3du89zLxRyMWe7KG2NVlYdTFKdf0A/nQGuxGVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752567127; c=relaxed/simple;
-	bh=EujtSF5v7W7AX5BDVTAJis/XOiCAixrztOTllSzkuuA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=gts4iPlBlkijnvfrzhobkTbLbQmO09LbtKjuqFXkBzqeb2TccfmjXBhU7MvAjkix5/fmPvQyjS3h8AMOIUGOOvf6CVjwgmnjSCanLAqdEkrPn0tCLtJViqEoIkE/G03qyiDW8K3g2lbl1LvY7RXWcGnkY2LKbMoL94YL8y9s5j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ch1jFVbj; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752570105; c=relaxed/simple;
+	bh=fuOd3nnpezQ3sfAoEmbX/8c5F8SHT/InXaoj+BjRxiA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qwYIgj1zdKNeqH0CJtli+4DqkdK5YKCuKMqLt2Y8qYFgKBkWtpHo5mjiQYLdVtfgWtoOrTeSp+lbZ1L+3w0oIvM56OmPwDHbUc+gT7gW759uJY+PJHF0gKUiC/vzBQsk2pJGb78UFoZlo+7hccP3T9eJgINnuW+xSh6mxhopAGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XS8crzsg; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ch1jFVbj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752567126; x=1784103126;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=EujtSF5v7W7AX5BDVTAJis/XOiCAixrztOTllSzkuuA=;
-  b=Ch1jFVbjj9ZolLzcrM2siOiy+7nxW7kqz33XPI+ggKSPDJfUh8tTeWmk
-   OXBNNjBtG3A/MQj3n7p5BA12ndna5k1Mj/4k8SQ3QZQCAJ8lr+fKN8qr0
-   /2dX7CNRifchDtqxpIs7eFC6UJljznbpzWuHx4r3bAyNGNUf2ESYT0pG8
-   gi+V+4CTC9rXtXXi1BN3zVXJCG/SSilyCxfyxauIKyrRLqyDa+n17HxI5
-   fXeoUCAPAZBa675FNT+iz+vatVnMBKON/M2O2UNIqb8YLZNDjZ+nUhwff
-   BwHMQzlD2zDIkDJEQtvOgKYxi9R+5ZpjBp/zdVkGUtuQG9h7G4pBk8Bb8
-   Q==;
-X-CSE-ConnectionGUID: Zqv2NBHSSzeveYj/PfGRUg==
-X-CSE-MsgGUID: Ytq9wQQoRmiBemsvxpgviA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11491"; a="66135480"
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="66135480"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 01:12:05 -0700
-X-CSE-ConnectionGUID: DU5mCpxPRceNseAZD54ZXw==
-X-CSE-MsgGUID: 8FnxOn3GSX2qBv9wAmXWYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,313,1744095600"; 
-   d="scan'208";a="157262754"
-Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by orviesa007.jf.intel.com with ESMTP; 15 Jul 2025 01:12:03 -0700
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: alex.williamson@redhat.com,
-	jgg@ziepe.ca,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	kvm@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	giovanni.cabiddu@intel.com
-Subject: [PATCH] vfio/qat: add support for intel QAT 6xxx virtual functions
-Date: Tue, 15 Jul 2025 09:11:50 +0100
-Message-Id: <20250715081150.1244466-1-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XS8crzsg"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4555f89b236so36709755e9.1;
+        Tue, 15 Jul 2025 02:01:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752570102; x=1753174902; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FYOrY3C9uX5DWx2tcaLyd3fYk/JwOj1/lQiUcN/Y4qY=;
+        b=XS8crzsgEeG5FJist7ljemLeSLJE9TL+c6AfgZ6iooVVPOtBeODrGvsDbr4YXFtdfE
+         oBG37T2ZwqP9KcwHKfWRFZarqlT/kXDSO/aAv9d6f+/VvoVgkSg9Yep3MobIERySivsC
+         v5wdw/uhhCAJE/wozZf0xhiHesf/hC6Wn2Yh92/QJa80TIiBLlHQ1LRKCIjmiUYY4Ip1
+         LmdBpAaadGrRYX6TV7ryw6ETnIrYk49Ahn/junyOQXombG6BZCGMGVRebmoQBc7H7JDU
+         xfLDys6Lb6gjlhnVDv2VdOgGA/x2Dmyq0jwSMwD0anoofNZCv+EUjhoTb6yTlFdRFDKm
+         UGag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752570102; x=1753174902;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FYOrY3C9uX5DWx2tcaLyd3fYk/JwOj1/lQiUcN/Y4qY=;
+        b=LpNjcYifOfRjN+t/kycJqUvLz51pflMLV/2DBESW54tXKoYNAnoOL0oChhcIe8sLQj
+         Za2TISrSiZRtSLsPFt98YUP8ymMmg0TfvK8W4h6VCdp4oDIzrUA49f8P6vh+qnzcJtXJ
+         DuhwGbrtt3MThS4tLHN4xYfUIWJTwXAFuU5YYrk8Jt2hMUWlEmwLlfKLNLmFLjYMnz0k
+         qpxPeMtvf2umAOIn9SQ16MnBpRmeVbEpCeJzk2Kv5SWs3fT+e2QT7fwPBA0B0JdjiACb
+         JU+rZ87MvYgVyz0ulWBqGJyv3bvzlyCwS/WkUXc7PS7srWanV5d8k/oD1VR4iYtZf4cT
+         N31Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVrfMnCmK9csYjwVkpYBUMq6bWtKzH+tOT3PkdwqHWfKaKpQPH6um6z58lcz9e498vAEWvqZp7ZyOG6KBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWQTPWK4tXGSBnDyOawvkPRxoM4wNIURxTGGXBzXLSZF9uZy+L
+	juWPvLHLBNB88SqvqDVG+M6PeBltUk2OnhafCPmaBUOY3MLetQq3BvodRCOhUWKZdZtrJfLA0YC
+	3YNSiTN893Fy+MYgKB1IfpyQlTRkw6eZHn0F6H4I=
+X-Gm-Gg: ASbGncsg8ICh2Kr1Q863puZ5ZGoYZqfgqm6Dun7JAIDCcaWjdc+iwyNV5J9+abWZ93q
+	u5bJQvNb9u+zJSh/lIRBarS+Tobl4/WO15j2pI3Qy4DP2y4w59haNl11XCHrt7OY6qNt7Q66Ib7
+	93OYEVZQLCthn7DMfkvJMYcdXMrXmy7kdKfkEtd/DDFEV/7TtgNRDJJ+mlUOR+akl4ueFh5nhkf
+	R61KA==
+X-Google-Smtp-Source: AGHT+IHDmi5vNdNNW4a38pbOpn2VCkEAdlo/cmBFuJR6I4EJyMkyEM1iCQtYRQ6SwnQXzk4v65iTHdFjdW0oCgsEQqY=
+X-Received: by 2002:a05:600c:350f:b0:456:11a6:a511 with SMTP id
+ 5b1f17b1804b1-45611a6a7e3mr70569675e9.20.1752570102130; Tue, 15 Jul 2025
+ 02:01:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250715062401.172642-1-shaw.leon@gmail.com>
+In-Reply-To: <20250715062401.172642-1-shaw.leon@gmail.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Tue, 15 Jul 2025 17:01:04 +0800
+X-Gm-Features: Ac12FXxHgKYTi5qQjpp56bjSKoZPDexSCED2PmJMggXkM5ipk4gm0nExMKdu2pU
+Message-ID: <CABAhCORLzrKc6urUp_UOL-OybdbHUs+y62DTp2XxR9LobOqEig@mail.gmail.com>
+Subject: Re: [PATCH] padata: Reset next CPU when reorder sequence wraps around
+To: Steffen Klassert <steffen.klassert@secunet.com>, 
+	Daniel Jordan <daniel.m.jordan@oracle.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Małgorzata Mielnik <malgorzata.mielnik@intel.com>
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index 7eee94166357..ebb52c6db637 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -290,7 +290,11 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
+>         if (remove_object) {
+>                 list_del_init(&padata->list);
+>                 ++pd->processed;
+> -               pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
+> +               /* When sequence wraps around, reset to the first CPU. */
+> +               if (unlikely(pd->processed == 0))
+> +                       pd->cpu = cpumask_first(pd->cpumask.pcpu);
+> +               else
+> +                       pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
+>         }
+>
+>         spin_unlock(&reorder->lock);
+> --
+> 2.50.0
+>
 
-Extend the qat_vfio_pci variant driver to support QAT 6xxx Virtual
-Functions (VFs). Add the relevant QAT 6xxx VF device IDs to the driver's
-probe table, enabling proper detection and initialization of these devices.
-
-Update the module description to reflect that the driver now supports all
-QAT generations.
-
-Signed-off-by: Małgorzata Mielnik <malgorzata.mielnik@intel.com>
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/vfio/pci/qat/main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
-index 845ed15b6771..499c9e1d67ee 100644
---- a/drivers/vfio/pci/qat/main.c
-+++ b/drivers/vfio/pci/qat/main.c
-@@ -675,6 +675,8 @@ static const struct pci_device_id qat_vf_vfio_pci_table[] = {
- 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4941) },
- 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4943) },
- 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4945) },
-+	/* Intel QAT GEN6 6xxx VF device */
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4949) },
- 	{}
- };
- MODULE_DEVICE_TABLE(pci, qat_vf_vfio_pci_table);
-@@ -696,5 +698,5 @@ module_pci_driver(qat_vf_vfio_pci_driver);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Xin Zeng <xin.zeng@intel.com>");
--MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration support for Intel(R) QAT GEN4 device family");
-+MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration support for Intel(R) QAT device family");
- MODULE_IMPORT_NS("CRYPTO_QAT");
-
-base-commit: bfeda8f971d01d0c1d0e3f4cf9d4e2b0a2b09d89
--- 
-2.40.1
-
+Another question:
+Do we even need a per-CPU reorder_list? It's always used
+with a remote CPU id and spin-lock. Would a plain array of
+struct padata_list be sufficient?
