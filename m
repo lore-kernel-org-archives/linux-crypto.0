@@ -1,101 +1,84 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBAE80B;
-	Tue, 15 Jul 2025 03:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179556FBF;
+	Tue, 15 Jul 2025 03:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752549658; cv=none; b=L99j1chjnNOSBeuzab49vmRR3jA+yoQw6Ka7E4cQPYyuEWBEKGko95GGADlDiteC2r0SUVUKakOva50xnqMZL9j98fnzIYw4TGLM+88sw6z3kUrdaUHCFNQ74YLhW7ugy6ZPTkHWFhU7+r7em1FR+sltDdrC0iPvxPHOTQi16EU=
+	t=1752549961; cv=none; b=gUVFjpCl5VhCm2lQoUdRRvM1Lh0hJXzg1cQkndT22cgdXCoErm2hy9K7lmpHYuN3eoPYqiYrGFgwygS5+cKl0u1kIWYPb40lR6ACyPbtRs3UuTc7SKTe1rSHlKIcrHlIneD3x3k1QW7K8neRt0/Fqk3Cs6LTHsx6CxAxzD6ZfJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752549658; c=relaxed/simple;
-	bh=M6zzaEdA7Yoaj1wVjRWHjo1L/FJpqf9aLpUQOpDIhvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nzhX4Uf1ew9Q6P5MGCTrz+6JzOeJsWlfLQ99jQ8N2fwZpZe04H9J7L7D141Id4zroPJnkaXzMHd08rhWCTe7dWwDaB0yG2R9B819K+nPLUctTLWlEiXxNuLhSCP+ir2+kULueAKeZZJhwhV+nZjLtjIaDeblxgQ3gINcNPSHg04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=jtNyAYps; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1752549961; c=relaxed/simple;
+	bh=U6uuaEVc+vahHf8s9S/yRKRjutpaUY5aXn+/TSZmWOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dc8ZVaNMLN2ccNRV0IOWdNS1WP8xPDGfcMTjQxFwn0xhBbHLUGrqI0RY1ToB0imo7kOCC5L97gP9K6jAtKRK3isex2QKUp+HQCkq8VAOYIh4mCgISdn/vueXJGGE53H2qQc4g8XYzqePlomnrMu9OHUcJxabx5Ms7zEEv2AByjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYTpsc1I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="jtNyAYps"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1752549545;
-	bh=U/ahC+c5V1A9bMBBbUoGlEVMsa+F2/kjHGLLn9AOLWo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=jtNyAYpsFHAV8aOaOVOhpmgitFunB8Mww541v87vvKhSrusWMt5a2m9RuOp10Tysz
-	 4ArdeoSr139Wzqsix27jKIJgOcA7mXGpOHTswf9I4ozkd7YL900bJCCV1bEtIn3WmE
-	 J6KYGxIKiogWQKQXnPlsY9bhymXq2o/2MiGiDgPoCq9NfM5hvKhWsnp7yPLW98ls6G
-	 EuuEoqr9v4StNRRQepyCoFdAQsEI62WBR1jHJXg9GsY/ImHZNS/IGGzArrdCYA3Zbq
-	 T+s1ZUSQCaYJPD6XA0p2h0xMLyVMBxtSO8eJk9VGhL2qlohT71N0MyBNF2dOY0elmA
-	 xgoe3I79XS0QQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bh4Cr4Y2lz4wb0;
-	Tue, 15 Jul 2025 13:19:04 +1000 (AEST)
-Date: Tue, 15 Jul 2025 13:20:51 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Linux Crypto List
- <linux-crypto@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the libcrypto tree with Linus' tree
-Message-ID: <20250715132051.4b4ce028@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYTpsc1I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658CFC4CEED;
+	Tue, 15 Jul 2025 03:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752549960;
+	bh=U6uuaEVc+vahHf8s9S/yRKRjutpaUY5aXn+/TSZmWOw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LYTpsc1Ic2OccNFYTOQE00RdS9a99NWuVmPGyujUKqop36anWgxpBFr/jewBjZ8jM
+	 AW7snBrQvHtZnQNbi9hFvySphrh5JvpQAkvYMu8JFcjCZ3MKOJ7F6RlShve4VnQEwF
+	 3rxc650pSb1cRF7oZGfESX7S+Ut6MXBBusRHIyMxKPOqVL2bv8OoSzDLQiBr564tja
+	 gvcDdq+E7tQ/yeQ6wSRO6udFwck7TpsrMaIjTyCdQH7+x10m9ilyZ+LZz+FpZg7jH1
+	 OsAUAtxq0JJhorTqsh08nSCYD+y/VXQDHUkVR5jGwka7zDSPueFliKxZG8ExbOZctI
+	 MMxbhJmwDvcPg==
+Date: Mon, 14 Jul 2025 22:25:59 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Das Srinagesh <quic_gurus@quicinc.com>, linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jassi Brar <jassisinghbrar@gmail.com>, linux-kernel@vger.kernel.org,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Robert Marko <robimarko@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Manivannan Sadhasivam <mani@kernel.org>, iommu@lists.linux.dev,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	~postmarketos/upstreaming@lists.sr.ht,
+	Vinod Koul <vkoul@kernel.org>, linux-pm@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Zhang Rui <rui.zhang@intel.com>, Amit Kucheria <amitk@kernel.org>,
+	linux-arm-msm@vger.kernel.org, phone-devel@vger.kernel.org
+Subject: Re: [PATCH v2 01/15] dt-bindings: arm-smmu: document the support on
+ Milos
+Message-ID: <175254995898.4166029.3581738288398276719.robh@kernel.org>
+References: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
+ <20250713-sm7635-fp6-initial-v2-1-e8f9a789505b@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/yeHmtDZi3DL4jT0QFGbocQw";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250713-sm7635-fp6-initial-v2-1-e8f9a789505b@fairphone.com>
 
---Sig_/yeHmtDZi3DL4jT0QFGbocQw
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Sun, 13 Jul 2025 10:05:23 +0200, Luca Weiss wrote:
+> Add compatible for smmu representing support on the Milos SoC.
+> 
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
+>  Documentation/devicetree/bindings/iommu/arm,smmu.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 
-Today's linux-next merge of the libcrypto tree got a conflict in:
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
-  arch/s390/crypto/sha1_s390.c
-
-between commit:
-
-  68279380266a ("crypto: s390/sha - Fix uninitialized variable in SHA-1 and=
- SHA-2")
-
-from Linus' tree and commit:
-
-  377982d5618a ("lib/crypto: s390/sha1: Migrate optimized code into library=
-")
-
-from the libcrypto tree.
-
-I fixed it up (I just removed the file) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/yeHmtDZi3DL4jT0QFGbocQw
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmh1yRMACgkQAVBC80lX
-0Gz8YQf+Lc0kbHvsXNgmk9e/BdVXxff4M5cY1sdAq5uUtjpibKXlMY/rTHA5vyoC
-ewgs8jfiM6OqEQjUqVtyur7Dg2YyTIhvhObc1UQ/vYN9eQfA+IRuE6KCW1eP8lTj
-ILoLy/1nG/r8TfE1Jqkt8EYuwBBC+7A8ExnZ3DfTRPZFeKPYjMtgmT9+4mX9OuQ1
-gZQgfcYElPDQ0jt7so3fchm1eMqjqtlkdu/mNKN7vCc1g5ZPziA/XHRYCXyvvyPt
-tDDd7fHd0FPeMsXs+H4NdsaNhlP7ujWOTI5TM6vTmWVP9WQl9ull6lPPyS7kqamn
-OwF0h2mE39EtqfWbef43SHMP+veueA==
-=jtEL
------END PGP SIGNATURE-----
-
---Sig_/yeHmtDZi3DL4jT0QFGbocQw--
