@@ -1,50 +1,49 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2050.outbound.protection.outlook.com [40.107.96.50])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2076.outbound.protection.outlook.com [40.107.94.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2D922127C;
-	Wed, 16 Jul 2025 09:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441262F19B4;
+	Wed, 16 Jul 2025 09:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752657652; cv=fail; b=ErGTmNFrsuDCcY/AtM3MEHcv9p/Ye3afn2FX+PE7P8T5MYTtGqmkDv9NII/ODyeQCjEPl59wH4IHp3nV5EMadortvRCtT8H3QKXOLk5jokU2M73p7I3kAfS6+LTZSqhNuwXV3/joO4OCoeA7CzEY3TjxgI4D3tzZi0EA3j/LUF4=
+	t=1752658945; cv=fail; b=trDBVx5vBKRjoe25DlcMyF1nWOtDthzModc7s+fn6CjtnU0lza5SJmixUM1Di12HmspeNxjs2VoZmFnMK+EGsQJgjkgrZhVPx72DpPiBCmLtKitoEb2Xb5gP0wVh2Kf1SLEU2/7owA86nsRaEtmh2rzq8gzJtMGZGx5LDou7eQY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752657652; c=relaxed/simple;
-	bh=63gyR6bSKU0U9E2N3gdYxeD3mtnj0VwSqnm0mVgZSZw=;
+	s=arc-20240116; t=1752658945; c=relaxed/simple;
+	bh=TSx/UcfHU6e2eZBhQVrI3JvsHxPFvBL+CbSW0Yjd9E8=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MrlYX5ElDWoY2SnWXUjT2CKkLG1yf4NEYKcHoQXIQUpCtaRgmvajt9aDubKihfDQQ/P5ModmyxeTWSh61KOy7e+FphGpksPdcyC+YEs4LWstuRJZbXAtdS2koJoWh5F3PWKYnvEN1ye8drg1cVp3gSroR/CG0cMfC8acie1WVlo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5CNXROt0; arc=fail smtp.client-ip=40.107.96.50
+	 Content-Type:MIME-Version; b=kFcXebdzMWvegsRTA3J3NnWSkANN4bPTLMwMzJtacJpftf+oVsZpHMUZoavKzXBVnzEPjsU6L7VlbCPLmqLYJVZSl/Ce98EIA1uSLWygTMIxcbTtTH8chOblwvOZG1tPsPZOEdBAyqO/Q4XKPu4P1olfgjc1Vz6ZuWcLQLTOkJg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YUgD2xOv; arc=fail smtp.client-ip=40.107.94.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5CNXROt0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YUgD2xOv"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ef20rqs8sRdeWOkWkuiAeWIV8JUAayU5N7ZBWK5rDLWmU7MuPAcF7E4A1LL50VdJZ8crP+O9diD3akI5ItGzSDgGbQ+MSDOBbLeMgQ9uWAx3Wf+F5sqrRuFqstfcB9IftJcdBAkNyily3f9i6pnf/XjLi4KAXumyulb9c+LHtww4LdJ5UnfdoamRUHwakBV3haVx4fd22+AYkTr2nXPr3EhleIycCRZpJXlAzGSJVwH8l4udNaam00HMsvWYmfLryuSVDDVKcQwCn5yVhcRwfezUUruhfB77xvrvFKQCbbMF9NO0DjKCuu7/+N2/vteFPlzyFhjeh7Xay//gB0NAFQ==
+ b=gc82R/i4toSZUSCCgvIDITQEKivil6OL35BhSzEU3K+MorWLbchThTT3cbVoJK5R31zD6i7nWbAt9XhtshsBxkleKgXMqMV2cRqkIdCPXw8hC6niP1Duqvm4IVCYJihnT0nfkKyRN3Ba4IG27O1KXQOJnP9Zm65pJFvUE646cekIi7YePnIhhAqT6R0cB+JFJIN4hicO2GHmLbtmWQ8I+r/uG2r1lt7sEcWhbxSA9DY1EVmY4szCrt21ENoolrTv+sEAkgMyhqpG6w8n0CoONrhXPnhDAhem0RALOktLoHLBynFIvQLpRoRz0I2NGIPD1R23uwBsQdUZKo1KJoGgKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ui1a+e8lJeS1Cf/M/Ls4ievV3Rk+n/3lF3gKBUN4KOI=;
- b=tkN+IArcfmBeHi/NvESkvJkD1nHqEMrWltbpl9vGvCYDIJM8oWHT3ZyIoazjsfF4eIeoKOm2RrwPGFPj4PPSXOhQrmfB7J6dDFNjtNJqE5fe685yIxReE/9MwQKrnPzIUHIQePgaupZ9OkxikG0Qq6iAPd8QiU3ilJLfeJ+zPGWRuo1fF1KYjWW70LOYvMrFKlW3sx6AeiTcW3QvOtStcbrV6GkH8dM1Z0Jg5nSP/gzE4v/WzJ+NybWIgv/ne0gvIQegLC1ZHxxlNo5IDI6ybrm9F6/FszcTjFTfRK+K5gZrg1p9X8Zel+JIW+eVyASWQ/b61njzjG60ND1d6Ry+ww==
+ bh=NhZtEibwT34769n4uat2IW8Ku4X2kmuYgRxg1GIe4+s=;
+ b=csaow/1PfBWfXDV/V49FJ19n0YTpHdhdEZogqWZIs0f+Mz3ts+61pOjDuPVDl13cdswm6Y4J7S3JEYmjwiWAn6KvPdv0+JpNqZyL4Wr8Hkq856fYaqusKUxQ1HNmPTqfCAQ/hniKRyngYcIWlDzhAPIwMKAZoCZrHoiBAkiZVPxDtDXXBGMl/70KWXmNw9TteGvuwxxj5Tfq113R7w+kB6ypGt6gBLFFeMP2nvm9nPBdm+NT4U7GasMSXPn5X2jchYtnvjS9R3g27QOKhPUlwRg1T1C0ZUGgtl6o0dVJLdCPN2eDqwgeezJMhK8jdxmxwNAI5vIg4rAiVk1ZZrkWjw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ui1a+e8lJeS1Cf/M/Ls4ievV3Rk+n/3lF3gKBUN4KOI=;
- b=5CNXROt07xdbcIS/eFT0KpNMoJMyFRlXAxE5/rVynp1sVRC99ib8t6JmxGo2lmcB2gVHc1iXMK2Z/obisEH8GbWwWteDJFSsPZM5bAxMvDj89B7fwXhl4vvwoaW9zsShGdrJZYhpqWa3ivbGYyUbZUUQrWBq324yoNojDheXxQo=
+ bh=NhZtEibwT34769n4uat2IW8Ku4X2kmuYgRxg1GIe4+s=;
+ b=YUgD2xOvvF66BNZXcoOuo1+WIvc9StfD7+RFuzrj7Uom/06HqfJ/8K3p6Cst39Q0J0i+W/RvIvXglcAaHPo/kfAJPwNhyr6FcgF8plJcTIJJNFJg+kRjpSaKHhUZ7pmSur94st9zqM0iUcJIMNcdK0WoHEMTk+6wssh0NQxkXNE=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- SN7PR12MB6813.namprd12.prod.outlook.com (2603:10b6:806:267::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.35; Wed, 16 Jul
- 2025 09:20:48 +0000
+ DS4PR12MB9564.namprd12.prod.outlook.com (2603:10b6:8:27e::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.36; Wed, 16 Jul 2025 09:42:21 +0000
 Received: from DS7PR12MB6048.namprd12.prod.outlook.com
  ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
  ([fe80::6318:26e5:357a:74a5%5]) with mapi id 15.20.8922.035; Wed, 16 Jul 2025
- 09:20:48 +0000
-Message-ID: <d7b3e0d1-4a93-4245-b09a-701bb14553d4@amd.com>
-Date: Wed, 16 Jul 2025 14:50:38 +0530
+ 09:42:20 +0000
+Message-ID: <7db3a4b2-dff6-4391-a642-b4c374646ca7@amd.com>
+Date: Wed, 16 Jul 2025 15:12:11 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] crypto: ccp: Skip SNP INIT for kdump boot
+Subject: Re: [PATCH v3 2/4] iommu/amd: Reuse device table for kdump
 To: Ashish Kalra <Ashish.Kalra@amd.com>, joro@8bytes.org,
  suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
  Sairaj.ArunKodilkar@amd.com, herbert@gondor.apana.org.au
@@ -53,15 +52,15 @@ Cc: seanjc@google.com, pbonzini@redhat.com, will@kernel.org,
  michael.roth@amd.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, kvm@vger.kernel.org
 References: <cover.1752605725.git.ashish.kalra@amd.com>
- <ef1b21891b8aea8ffab90b521c37ab79d5513a7b.1752605725.git.ashish.kalra@amd.com>
+ <42842f0455c1439327aaa593ef22576ef97c16ee.1752605725.git.ashish.kalra@amd.com>
 Content-Language: en-US
 From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <ef1b21891b8aea8ffab90b521c37ab79d5513a7b.1752605725.git.ashish.kalra@amd.com>
+In-Reply-To: <42842f0455c1439327aaa593ef22576ef97c16ee.1752605725.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0221.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:ea::17) To IA1PR12MB6043.namprd12.prod.outlook.com
- (2603:10b6:208:3d5::20)
+X-ClientProxiedBy: PN4PR01CA0089.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:2ae::7) To DS7PR12MB6048.namprd12.prod.outlook.com
+ (2603:10b6:8:9f::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,110 +68,295 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|SN7PR12MB6813:EE_
-X-MS-Office365-Filtering-Correlation-Id: 684d8996-502f-486e-1654-08ddc44a0c67
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|DS4PR12MB9564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d5ff05d-80dc-4670-01f0-08ddc44d0f57
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZkthQXdQaU1ncHBYQkJvUHZTSTdEQ1BpbkV2VFFFMDlxOUM4c3dlUDF5clp1?=
- =?utf-8?B?OEppYU9XMWlFc3V3MnYyN0hMcTAvc0dwSkgwbldYR0huK3E5Q1hFQ2pGUUU2?=
- =?utf-8?B?d1RGUnJNUDBHV2IzTVBBakpTVnJ1MzgydkFRS0FWSU5yL3Q2ZVRCRmhOSDdG?=
- =?utf-8?B?MkhBd1ptSXIyVlJkcVJUR0RVOU9XbXZ5ZmlsdHVFNEdSTExXWmsyYU9WVnNx?=
- =?utf-8?B?YXNJeUlLbCtwVTBFZHRQUTN2RFpDVTA3WXpHTVdMckJydzc4cmlsY3hFaHVl?=
- =?utf-8?B?K0NEQy9HcVJQcHBwbWJmWi9Zd01KZ3FyaG5NTFIzMlkyZEVTaVNyUHdhUnJ4?=
- =?utf-8?B?c0hjT20rL3dHZXByaFJFcG83a3ZWenZpWHdjZ0QyTlZJOWNvMitVZFBOdkhY?=
- =?utf-8?B?aGZYVVdxdEsxNTF4Q2NqTnlkVEhtWWlJVElIZU1EY3BxSXNKWlBpQzZUQWc0?=
- =?utf-8?B?cFFBS2I4cmZNMzZDTTU2U3FtQWJqM1JnbjJLSmYxTGVxTzByQmhoRTI1YmpY?=
- =?utf-8?B?TDJDK0IzQnRUNzBON1J3d0dYcldEYVlsOHd5NHVZK0djVnkwQ1VyaXFaRUVF?=
- =?utf-8?B?QlhBNXpEQy9FdG45ZW1wemJPNm5LTTVFRlpZeDRmY2I1VmluTzFCWWJza3JH?=
- =?utf-8?B?ZW1COE9INzV4QUNscXZLbWFsMFFKM013bU5ES0NDOWdmeVlFS0JTLy9KNnRu?=
- =?utf-8?B?Ylc0bTg0RkJPd0ZyZTNuZnkwU3NUazl1UHg2dGtIbDV1b29nSGZ5cGc1bVhR?=
- =?utf-8?B?bXhTWHhFWEo3L1Y4WEVCeU1zbS9mTTRPSklPSzM2VGFQNEhpK1BZYXJZUzlt?=
- =?utf-8?B?MTFhWnk3NWFMZVRjcnh1VFZuTDhoTmNPK0dFeklRTXBEeXZOaEEwbmxKV1kr?=
- =?utf-8?B?RVozYUZNUnJQRi9nMk0zVmxkUys2YU4yVFJOTFNpK285bktIRmxUeHUrTXNq?=
- =?utf-8?B?dWdEV0w3NTg2cjdlZTdRRmF4djdISE8wLzNvTWY3SGNqMlBablNTbTZ3cHdI?=
- =?utf-8?B?bk54OENuaWZxQ2xtczd6Z1ZFZnBYTzRrR09YM2E5eFQySlp0YUpxUURhZUJ4?=
- =?utf-8?B?emhHbnFGWUFzYXR1SW5QUTF0RXk4c1Vnc1R1L3BKcW4yOU1kSjlLWVdFWWVk?=
- =?utf-8?B?SE9wUE9td1lhS2ZjQWNZWk9kcWpPOUNYSUJ0N2VDbHExQk5yb3g5cFZVYUVF?=
- =?utf-8?B?MlJSeWJTNkU3czBxU0Q0OW04RUdRUVVMRXcya0lsU0pRYS9iMDJ2Y1NpT2hK?=
- =?utf-8?B?YkNZMVhpM1hZSXZVa0pIRVBDMWF5aS9lQUl5UzloKzZodGh4MVVKSFRMcm5z?=
- =?utf-8?B?cXNPRzZ5TkhXeElHKzBQUFN5OVFhU2xTNzNnUWRDdU5JbExab00vN0dnWWxu?=
- =?utf-8?B?SWhheW5yMy9tcy9OZGVFczEveTRxU1ZhOEdoNmtBeDBnYVhsRGQySndOaDRG?=
- =?utf-8?B?TVE5UlhWaGp4cFdyVWZOWHhrSHlzckc3OXFxSUtXMW0ydGFaV3Q0Z1NoUVI0?=
- =?utf-8?B?SmxVN3hiR0xuRnM4UXlZdzIxZDQxZFFqQXZiUkdJbXlqbmJuVllTc2hoK0tR?=
- =?utf-8?B?R3JSaUxiTmlBMEdETEt6aExrV0FVSXJ1WHFSRzFqYmU0VzlDbC9Mb1lLMkhE?=
- =?utf-8?B?ZDdwZW95bkw4Wi9xK29FRjNWTXFKK3ZiMkY0N2tOSnhTeitEbXhYVkdvQXFx?=
- =?utf-8?B?d1k1ZW0wNGpXSXhSMU9SVDRtaldZK2hvd09SSXNnR0tzSmFsa2o5WGJrUkRa?=
- =?utf-8?B?M2NzZjd3WnpIbE5pSHd0S1VVNVNyY2Mvck51U3FGaXpzMnlqdS9QUTFyY2E3?=
- =?utf-8?B?VS8rZXRpWjRNeS81YjVsdkdtZ0djeWU0eGdLaCtQSkh3MkNVNlVDSDlrY1lh?=
- =?utf-8?B?S3dXajlkSGp2MXpZOWhPOGt1NS9VcldSTnFKclFsZkVxOXkxMm5tNFpEL2o1?=
- =?utf-8?Q?XI0e9HLDHUE=3D?=
+	=?utf-8?B?L0ZLSjkrcjRTeVpMbEFHRzFzQW01VE4vZjk5bUh0TzFjSjNESk9ocDZrblBQ?=
+ =?utf-8?B?dUlQS0xZRUd5dTlBRGNET05rTFgzSzBrOVpHK2ZKVW9tMnRvMXVsVUZUSVoz?=
+ =?utf-8?B?Rk9FSnFoUnpKa0dqU1VkeGhiNzFKMldQNFBHUjlKdStkUVBSZ255dEg1aC9D?=
+ =?utf-8?B?c3Btb04zaXljTzdXalJpblRkaloxMTNUN3ZVZ0RaN2w2UXd5UUczV0JkbEcr?=
+ =?utf-8?B?ZVR5WEhYYzBQeTF1UmZUK2VNTnJWbWFzaDhTNGZ0WFhkMlN2eWVQZDlRRWMz?=
+ =?utf-8?B?L2FUdW5tcjZrMENCa0oxcm9xa2gyZGt5c0U0cE9jWXZkKzVZaktza2c5MHNI?=
+ =?utf-8?B?by9LRGU1NTM2YlI0aW82VnlvK0tsWTVRSjUxbkhzT041WWRnR2xrN1gyancr?=
+ =?utf-8?B?a3lKQjE2Tm5QZ21YZUNxWUVxQjVMaXI3MjdQVWovSUVZR0hIT0tjS1VvREhv?=
+ =?utf-8?B?TmQ5UmQ0WmQyaUFhUXgyRVFpTGVrV0lLNlRaZGhBbm56cUF2blhmMHVBV3I2?=
+ =?utf-8?B?WWRhajI2VXBURi9YeFFKQ2NWbjhyOERLdnlCeEVUTVAxQ1F4VEtub3NyTmVz?=
+ =?utf-8?B?VXBsdGNBYWZkQThwSzBQeUFCZFU0Z1oxTkZ3QnJCR3lNN0YxWEVuczl4c0lE?=
+ =?utf-8?B?TjlPOWdLdXFRQjJwY1VIRVRXSnV3Y0p2QTNHSThIRStpYU9TRithbkdKQWFt?=
+ =?utf-8?B?Vk45M0ZqM05DRkQwUHhPd3BsSWhUY3NpMWg0QUpYK2NuMzZVVE5DaVB5bTR0?=
+ =?utf-8?B?dnFSRVJXMkZzd2JER1d3S1dnQjZ6MlJwUVBiNG1LRFhUWTZaaDBuSU9PRk9p?=
+ =?utf-8?B?THRGbkcxWkM3Y1RnR2hSOTF6b1VtZFc5eDkxQlFNYVpBYlBlTEs2VjFmL00v?=
+ =?utf-8?B?eUExajFHNWN0bm9sdTB3TFlKRXRsSEhwMnZXd2hCM0tlcjIwWFB4OStjTGhz?=
+ =?utf-8?B?NjdCWGZ1bXRYL0dBL21mVllTdXI0RmdvS04xeWp4WnhBWTlzVGJqbEU4YXdG?=
+ =?utf-8?B?Vm1zS1BjM2tsSmtxNUs0cFltRi9tQWd0WHpWaVNTSjBwc2ZYNjcwd1BXY1ht?=
+ =?utf-8?B?cXE2R3k4eWtQT2dNeHFBWEVpaUJUaS9BSjNqZytCTmFhZ2xYZHhxN0hvbXhK?=
+ =?utf-8?B?Wk8yWW1qWlg5LzNBN283aFBaOHBiZFhaSVMyRlZwdWJIUXg3RzJieFM1YVVP?=
+ =?utf-8?B?OFZKZXk0UHVNeVJVTWxVWUVwT2h2VWRaYUdoZEhWZkNpeWxBMFhIODVBa0Vk?=
+ =?utf-8?B?YXBDdm5EOW1xMmx2UUhsMTBnMnA0aXFOZjVHeER0ODB3NGlib2R3czhhMURN?=
+ =?utf-8?B?ay95a0tSeFRDbWlmVzFmZ0FiVWJ5c1hTb1lBSnRSc3p6M0dQTTNYVWdOL0tD?=
+ =?utf-8?B?RTlGU1prWWtNWTdQVkVGRWVFbHJ4aHRnaE9yNnFlQXVURXRYOU5VUHd2MUdn?=
+ =?utf-8?B?WitsOFJUcGZ2ODQ1Nm92THFvWW45ZXVzd3k5NTViT3hsV3dJVUJUZUltSHhn?=
+ =?utf-8?B?WE5Qb1FjSGY4Y3RZeXBqUms0S2MvZzZZTkZsUjBUNGVKeDVadlduUnNDdVhC?=
+ =?utf-8?B?bTNlRGtZYkVoYndOTXhuSjB5VWdxZHJmZkphRUV4YWhUYzB6R1VqWXNrKzc1?=
+ =?utf-8?B?YmcwYm9qOEpsSURkRUFrZVFpYVN6bS9jZThISkluZ01DVHFiVVVGek1jWWNI?=
+ =?utf-8?B?ZVNadlY3a2s2ZzN3bk5pemNyM1dVTUk4V0Q4SUdzdE43YVFxZXpKRDBoQlZu?=
+ =?utf-8?B?dEdMYk1sZzhCcFhzeUZIdS8zeVZYYnhiZmdIOXBVL1dRQks1WTF2SFdOL293?=
+ =?utf-8?B?T1ZCeXduUk9Ca3dmMzQ5b3pUVVlqZmNvbFhBQW01WjNjc0tQeGQvVTRJUU1B?=
+ =?utf-8?B?M1YzVXFjTit3QWpBeXRBK2FvTzJBeDJjZnBReTdaY29MaytYUTVkR2xsOFVG?=
+ =?utf-8?Q?4L32LqQaR6c=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dU1sV1pGWTVzbnphZCtJam41TkUzYzBKSnVLUGhML05xRGluOFc1WXpZbmsv?=
- =?utf-8?B?TTlJc3h5WVFuMUJQQWI4S0I2L2ZodXZOS09pR1dXTUthQTZVTXVBOGFMVC9H?=
- =?utf-8?B?TnhzUTAzazJRMFFiRnUxNnEzYjU2UVhwWm9wSWdMVUl6YjZOWWNibGNqR3R6?=
- =?utf-8?B?d3JvSXNHWlJGMURUVno0WWRaaDVyYXFZbHVPcldMbDlKeVRZVmhqNVBmODR2?=
- =?utf-8?B?Zi9oRkk2Z3dFdTVDUGVXaVV3YkFzQUhVdUVLT0Q2QzRNbnhDSnVoUEQ0Vjht?=
- =?utf-8?B?ZFVRYjFBVzlaQ3Zlek9BMjhZelk5dTlTd0VuMkJRdXdLU3Q1VlVHYmZ5TE9T?=
- =?utf-8?B?REpIVU1YR2krRVBYWlJ6NERYM1YzaVJzS0lsaFNWRTkvTDQyWVgraHBudDRX?=
- =?utf-8?B?NFFUcWhsd3dReEE0aGJ1dUZ6TGtkQjlicjJnZTRMdXJhaCt3VFhDUzNmcXY3?=
- =?utf-8?B?VFBHYk94aHNqVE5qK3BtOTdZMU5VWEl6ZFF1VEEreGd2T0xWdXBKdUJCaUdP?=
- =?utf-8?B?S3ZOWE16ZXk4eW5FYUxhMEROS2NFM1ZXaFBaRHczdXVwanhZTDIzb3dZVU1p?=
- =?utf-8?B?N3ZSTjZHbjYyRnh1bmVZazd3UEVONEh3eUdVK1R2aGZudEpBcGZhSzVTaDVw?=
- =?utf-8?B?SWJabEVEN3lhWXNmaTBpSU1ueXI0Uk1PZGJFWW0xM3N0bm5pRkpMWlV4YXA3?=
- =?utf-8?B?TjNrMEt5QXdlSy93em1ZN0s2MFQ3OUJjYW0xbkNFdk85ZklMQTN6VSttODhY?=
- =?utf-8?B?U2VqZWhTbVArWnZkYi9mTU5ObUJhazFGeGVTbVp1MHQ4RWk0SWlhendvdmc1?=
- =?utf-8?B?dnVkWTQ2ZzMzb2JXR0ZlY25RN2RFaldQY1gyekY1K0hIUnZ5WVhTaW5ZVDh4?=
- =?utf-8?B?eVlhZWttWFBNWmFaak0wRWhpTFFoRWJCbzUxck9PaUtISFpXWURzOUZ3dm1U?=
- =?utf-8?B?V0UwT0VvMDd4ckNReG5kaTVSTHZ2VHhuVkV5ZTdXcXpwMzgyMnVZRGhNb0E1?=
- =?utf-8?B?MWVRbTIvMlk5bVJZbDZvSGdDeFBZcWpjSmZHeEhCRGpycTltOVVPeDBWK0VY?=
- =?utf-8?B?bVRhM2k4VWp6Vy84Nk5uMmhoU1hmanBKMEcrRXQ2ajk4ajdTUkl4cTMvK3hT?=
- =?utf-8?B?aWFlQzFsb21CK2lPMHJRUDB6VE1oT2dtTjEvYTNWZkE0aU5TbFh4RnhFSVQ0?=
- =?utf-8?B?dFRBb0dCaEhZcDRNZnhPa0NJUndWcW9UcG9ocm04bmxoUE9uU0Q5TEF4Ym1l?=
- =?utf-8?B?YnR6WUJUaFdlbGZBY0lGN0RrRWpiOTBRd0VLa0t4NXRVaWpjODhFa0NJc1o0?=
- =?utf-8?B?MWdKOTJjWXZoK0RibUM5KzJUam1ncU10RzhsRzJBcXBrNnYvM205eFdVamJV?=
- =?utf-8?B?WEl6a0V0anN3NERqejBwbHB5NjFJK2xsM2RQMjEzTWR3cGhpT0thQWx0WlZu?=
- =?utf-8?B?bWFkR0VIUVE1MkxnWjdCalJVMGZqdW55MTUxdU0ydzJkaEtNdlVaOEMzUllV?=
- =?utf-8?B?R3p3Rzl6SWJJOU9RSW1JM1JvRmJSdXNQTnBEN01zQitDdHJWaENlUG8xMkNa?=
- =?utf-8?B?NmN2U1pLK2V0clRvc2ttVy9VVDlwOWM3MTZ2MEV5ajBjcnpSakhuYlZiWnNO?=
- =?utf-8?B?clMyUjN1b1lXRHNVaUR5MWZ5K0M0YW4vbnh2d1A0bVEwSkNibVN5cGRTR25Q?=
- =?utf-8?B?VVBBSDF2OFJnQjllanMyOHVEN2lrT2NmZHZHanFCZGlJL1VsM1dIYTF0cUpr?=
- =?utf-8?B?WU41VlJXNE45UHdvci9URis5czQxS2ZZMVZKb1pZbG9VekFtT1BVakxhOHkz?=
- =?utf-8?B?RENvMU9UTGhwRlVJOHBIQ2JHaE4yKzJrbFNaMldJWnRTS0g1Nk9acVdQdXZB?=
- =?utf-8?B?MGlYTHZ6ZlcvVTRNRHY2QjUycC9iWUpSeEpqRU9VVys2QnFqVmUrZ0dFTHF3?=
- =?utf-8?B?RzFnM0YrQi9TUEZFTHNkd1hSaVNBTmFHd2JJU2NuYndnZERPdTZISWkrK05x?=
- =?utf-8?B?Q1pOSDV2YjJzc2hWUzF1KzFuNFJMWTBlQ0M5bS93eFFGUHhpc2UvbXdGL2Y0?=
- =?utf-8?B?QkxkMkJVYkMrT0hrRzV6SlhLUGlYZWJ2S21nRDdJQ1NVZWtza0QyZnFubHFG?=
- =?utf-8?Q?g9T8Vf84ek3LL0u1GTbnrOU8x?=
+	=?utf-8?B?ZG5od09mSEpkVmtwbzBRWnRQNHcrY2FrTzluNHpHSHBwTnQzaDJpMTNlZ1ZH?=
+ =?utf-8?B?NjVneDRDaGM4eExQbmYydFlheHY4ZXgxbUNWT2ZvdDE3Rmw5VTZaQ24rUi9k?=
+ =?utf-8?B?NkJIdkg3bjM5YkhwS0MzL0d1UVl6ZUQxbk5aL3Jna0tydERpNEhITHVwZlJ4?=
+ =?utf-8?B?NHZmK1dmNG8wNElRcmJRTkZqR1l3OXBncEpveSt6bHloZnJ1cWNkanQ1MWF5?=
+ =?utf-8?B?dW1jWVh2djI3ZVVmazdIZUlwd3p0dGR0VGswRW5MM3N6Tk9GVjBtZFNna3k0?=
+ =?utf-8?B?YU56b3NxcmprV2NEOG45aFowTkE3OUUxMUhzbGpjbU9KOFlCNnlJRHVnOWdZ?=
+ =?utf-8?B?dWsxTlE0K3B6bjA1THZJMlVNVGVrbzB6c0lkYm5lK0plMUJQOVJmdFZ5ZmNj?=
+ =?utf-8?B?TVR0b285c25Sb1ZNWnpiNUVTL0pWK3luU1N3bnBnYWZGREtMQ2JWeEJZSUd3?=
+ =?utf-8?B?QTlNL2JPTWhxVk1vck00aU9rVXZOb0YxV05NQTIreFJhWnB4VjFLS0JGWUIw?=
+ =?utf-8?B?ZXdhdGwyT1BhaHVjeHRNYzhobitySTM4VFQ2cllkV2x4bWVaSElvZThlbXFV?=
+ =?utf-8?B?UmxGZmwwUmtEaklsenNjUmpxVHgvSDkyQTR3SS9XVUsrekc2ZVpleXViTUpW?=
+ =?utf-8?B?Q3dPM0xYbkxmcERCR3poZXUwNzMyV2NGZTF4U0xCeFhGRVprcXVCRHFESktK?=
+ =?utf-8?B?d2xiWmMwQXdPU1cwUkhQWVBXUjVjSWQxeHRCcW1heVpudFdLYmVoOE11d2FW?=
+ =?utf-8?B?ZkdmNTk1L0k3SHNocENEaVdqb1JybmJWYVZiMmluN2h5dG5Fc2RXb3pzUmNE?=
+ =?utf-8?B?bDRsVnF5WUVOWmpCdlgrVlgxSDhZenN5Vm1WOU8zcWp6am8xckxIK05xemxj?=
+ =?utf-8?B?cU9TMUkyb2U0dUcrTmdrTExhK2tyOGw4blVrVzNRYlI1dkVaUlh5emJzMXVs?=
+ =?utf-8?B?SE1ZN2lyMjA4dzVzQVpHdll1ZkFFTlhzNkF1U25ib1Y5SE4vYkZHbm5JNTZj?=
+ =?utf-8?B?MGVwM1FsNjQzZFFvdEVEcUd4M2tJZTlWSGpQekpxT2d6SjJHUGlTNWpMdVZC?=
+ =?utf-8?B?bzhJaHM4aUU5clZ0NDhyVkRpWUl4bzZnZTh6dk9zMWowRFVuUjFRT045RmJi?=
+ =?utf-8?B?M0dvYTUrb2hYOHN4VW5EK0dEMW96QzlnMXo1ZUZweDNFUHJVV2NndVpkWHZG?=
+ =?utf-8?B?WEs0eFEwWXRTSTVnVGNXRHJYc3laRzRxenZxR01RRWV4cE9pNXZldkdxNmtE?=
+ =?utf-8?B?U2R1Z3hTZ3hmTjdUb1BDMDlRQ1F5TWcwRkphM1RCWkpCcW51dVlSSWdnb2di?=
+ =?utf-8?B?aEZtQ0w2N3RsZDVTN0RVbWk1MmdDdzd0enFPek9CL2VBMGFIdnEzdEkrRnA1?=
+ =?utf-8?B?VldQaWFSbHBMYjNKZjdiNEJob0hOa0tBOEkyWk9pd0NtSG1DWjgzclZQQVRt?=
+ =?utf-8?B?cnV3ZXV4Zy9ZR005d1dScFJxamlKWmFXRUxDTlV4c3B6MVQzWVB3cy9rSDRX?=
+ =?utf-8?B?YkFqOEdEaDJvQ1QwSUVqVnUvd0k5UkFPZjhaTU1MQlFJa0RxZkNFUE5FZmZP?=
+ =?utf-8?B?NnVFeEo1cEppWFNyMlg4YndiSHZmZjZMcjRzOC9OMjYrdDlFMUhGNGJyYXQ5?=
+ =?utf-8?B?SnVvalRMcXpLU2hycmdIaUU2TFBqNFZ5ZjF0QVByMVV0bytyVXJMVW9Zc0ZW?=
+ =?utf-8?B?WXVZMkxucXpjQkt4Z1JoV3dRMHQ3UzgzRHk3VVlSZTJyczcrcGdScDl5YWxa?=
+ =?utf-8?B?Y0cvNTJFNG5jYXZQcmtRbUMrQTlHcFMvYU01NTNRVnM5LzBLMDZ2Sk5RZWdR?=
+ =?utf-8?B?YlNiOEhtditpYWVsU0Mva1VTRWkyVTcvRU90aEg3Nms5RHd6YXBiZkZodUQx?=
+ =?utf-8?B?RGJUdE9vMklzQmhOYTl4MWdveHBxMlhMV0xrS2N4aDYyU1U2Q05WZWR4Ulor?=
+ =?utf-8?B?bEJGNHhFUGUrc3o5MTRDMlZBeUUrL2lrblhJZjllblRkSEovallZNFpTYU9J?=
+ =?utf-8?B?aUg5TEw3Y1I0WEl4VUx3MFgxbndMWVJnZWpmaDR6T050aGF1VjVXeEZSWFpm?=
+ =?utf-8?B?VzBBL3BEZEdQd1Vub2t6bE5pd2lkWDJlckZlTzZIOWxzUmNPNXRBRENnYVEz?=
+ =?utf-8?Q?FcR8SpRwT4iQ3jpoY9JcUqLnV?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 684d8996-502f-486e-1654-08ddc44a0c67
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6043.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d5ff05d-80dc-4670-01f0-08ddc44d0f57
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 09:20:48.2645
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 09:42:20.7687
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mxSFYjCecqDP6sfHXoBDYZnVYruJTKoLUdMgc3REcOodAPIB1oMZZiMQLwPWh2Lcw3OGQaSmCgJGnIR+XlQbKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6813
+X-MS-Exchange-CrossTenant-UserPrincipalName: BEbhK50yBT0YHJP5ohcO0ws7QWrd/bzv9JOiWhSvd2IUSuNiLj8qKIhELa0d2FGkuP1raSNT93JeLWRgqtE1zQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9564
 
 
 
 On 7/16/2025 12:57 AM, Ashish Kalra wrote:
 > From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> If SNP is enabled and initialized in the previous kernel then SNP is
-> already initialized for kdump boot and attempting SNP INIT again
-> during kdump boot causes SNP INIT failure and eventually leads to
-> IOMMU failures.
+> After a panic if SNP is enabled in the previous kernel then the kdump
+> kernel boots with IOMMU SNP enforcement still enabled.
 > 
-> Skip SNP INIT if doing kdump boot.
+> IOMMU device table register is locked and exclusive to the previous
+> kernel. Attempts to copy old device table from the previous kernel
+> fails in kdump kernel as hardware ignores writes to the locked device
+> table base address register as per AMD IOMMU spec Section 2.12.2.1.
+> 
+> This results in repeated "Completion-Wait loop timed out" errors and a
+> second kernel panic: "Kernel panic - not syncing: timer doesn't work
+> through Interrupt-remapped IO-APIC".
+> 
+> Reuse device table instead of copying device table in case of kdump
+> boot and remove all copying device table code.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  drivers/iommu/amd/init.c | 97 ++++++++++++----------------------------
+>  1 file changed, 28 insertions(+), 69 deletions(-)
+> 
+> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+> index 32295f26be1b..18bd869a82d9 100644
+> --- a/drivers/iommu/amd/init.c
+> +++ b/drivers/iommu/amd/init.c
+> @@ -406,6 +406,9 @@ static void iommu_set_device_table(struct amd_iommu *iommu)
+>  
+>  	BUG_ON(iommu->mmio_base == NULL);
+>  
+> +	if (is_kdump_kernel())
 
-Just double checking, do we need check for snp_rmptable_init()?
+This is fine.. but its becoming too many places with kdump check! I don't know
+what is the better way here.
+Is it worth to keep it like this -OR- add say iommu ops that way during init we
+check is_kdump_kernel() and adjust the ops ?
+
+@Joerg, any preference?
+
+
+> +		return;
+> +
+>  	entry = iommu_virt_to_phys(dev_table);
+>  	entry |= (dev_table_size >> 12) - 1;
+>  	memcpy_toio(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET,
+> @@ -646,7 +649,10 @@ static inline int __init alloc_dev_table(struct amd_iommu_pci_seg *pci_seg)
+>  
+>  static inline void free_dev_table(struct amd_iommu_pci_seg *pci_seg)
+>  {
+> -	iommu_free_pages(pci_seg->dev_table);
+> +	if (is_kdump_kernel())
+> +		memunmap((void *)pci_seg->dev_table);
+> +	else
+> +		iommu_free_pages(pci_seg->dev_table);
+>  	pci_seg->dev_table = NULL;
+>  }
+>  
+> @@ -1128,15 +1134,12 @@ static void set_dte_bit(struct dev_table_entry *dte, u8 bit)
+>  	dte->data[i] |= (1UL << _bit);
+>  }
+>  
+> -static bool __copy_device_table(struct amd_iommu *iommu)
+> +static bool __reuse_device_table(struct amd_iommu *iommu)
+>  {
+> -	u64 int_ctl, int_tab_len, entry = 0;
+>  	struct amd_iommu_pci_seg *pci_seg = iommu->pci_seg;
+> -	struct dev_table_entry *old_devtb = NULL;
+> -	u32 lo, hi, devid, old_devtb_size;
+> +	u32 lo, hi, old_devtb_size;
+>  	phys_addr_t old_devtb_phys;
+> -	u16 dom_id, dte_v, irq_v;
+> -	u64 tmp;
+> +	u64 entry;
+>  
+>  	/* Each IOMMU use separate device table with the same size */
+>  	lo = readl(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET);
+> @@ -1161,66 +1164,22 @@ static bool __copy_device_table(struct amd_iommu *iommu)
+>  		pr_err("The address of old device table is above 4G, not trustworthy!\n");
+>  		return false;
+>  	}
+> -	old_devtb = (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT) && is_kdump_kernel())
+> -		    ? (__force void *)ioremap_encrypted(old_devtb_phys,
+> -							pci_seg->dev_table_size)
+> -		    : memremap(old_devtb_phys, pci_seg->dev_table_size, MEMREMAP_WB);
+> -
+> -	if (!old_devtb)
+> -		return false;
+>  
+> -	pci_seg->old_dev_tbl_cpy = iommu_alloc_pages_sz(
+> -		GFP_KERNEL | GFP_DMA32, pci_seg->dev_table_size);
+> +	/*
+> +	 * IOMMU Device Table Base Address MMIO register is locked
+> +	 * if SNP is enabled during kdump, reuse the previous kernel's
+> +	 * device table.
+> +	 */
+> +	pci_seg->old_dev_tbl_cpy = iommu_memremap(old_devtb_phys, pci_seg->dev_table_size);
+>  	if (pci_seg->old_dev_tbl_cpy == NULL) {
+> -		pr_err("Failed to allocate memory for copying old device table!\n");
+> -		memunmap(old_devtb);
+> +		pr_err("Failed to remap memory for reusing old device table!\n");
+>  		return false;
+>  	}
+>  
+> -	for (devid = 0; devid <= pci_seg->last_bdf; ++devid) {
+> -		pci_seg->old_dev_tbl_cpy[devid] = old_devtb[devid];
+> -		dom_id = old_devtb[devid].data[1] & DEV_DOMID_MASK;
+> -		dte_v = old_devtb[devid].data[0] & DTE_FLAG_V;
+> -
+> -		if (dte_v && dom_id) {
+> -			pci_seg->old_dev_tbl_cpy[devid].data[0] = old_devtb[devid].data[0];
+> -			pci_seg->old_dev_tbl_cpy[devid].data[1] = old_devtb[devid].data[1];
+> -			/* Reserve the Domain IDs used by previous kernel */
+> -			if (ida_alloc_range(&pdom_ids, dom_id, dom_id, GFP_ATOMIC) != dom_id) {
+> -				pr_err("Failed to reserve domain ID 0x%x\n", dom_id);
+> -				memunmap(old_devtb);
+> -				return false;
+> -			}
+> -			/* If gcr3 table existed, mask it out */
+> -			if (old_devtb[devid].data[0] & DTE_FLAG_GV) {
+> -				tmp = (DTE_GCR3_30_15 | DTE_GCR3_51_31);
+> -				pci_seg->old_dev_tbl_cpy[devid].data[1] &= ~tmp;
+> -				tmp = (DTE_GCR3_14_12 | DTE_FLAG_GV);
+> -				pci_seg->old_dev_tbl_cpy[devid].data[0] &= ~tmp;
+> -			}
+> -		}
+> -
+> -		irq_v = old_devtb[devid].data[2] & DTE_IRQ_REMAP_ENABLE;
+> -		int_ctl = old_devtb[devid].data[2] & DTE_IRQ_REMAP_INTCTL_MASK;
+> -		int_tab_len = old_devtb[devid].data[2] & DTE_INTTABLEN_MASK;
+> -		if (irq_v && (int_ctl || int_tab_len)) {
+> -			if ((int_ctl != DTE_IRQ_REMAP_INTCTL) ||
+> -			    (int_tab_len != DTE_INTTABLEN_512 &&
+> -			     int_tab_len != DTE_INTTABLEN_2K)) {
+> -				pr_err("Wrong old irq remapping flag: %#x\n", devid);
+> -				memunmap(old_devtb);
+> -				return false;
+> -			}
+> -
+> -			pci_seg->old_dev_tbl_cpy[devid].data[2] = old_devtb[devid].data[2];
+> -		}
+> -	}
+> -	memunmap(old_devtb);
+> -
+>  	return true;
+>  }
+>  
+> -static bool copy_device_table(void)
+> +static bool reuse_device_table(void)
+>  {
+>  	struct amd_iommu *iommu;
+>  	struct amd_iommu_pci_seg *pci_seg;
+> @@ -1228,17 +1187,17 @@ static bool copy_device_table(void)
+>  	if (!amd_iommu_pre_enabled)
+>  		return false;
+>  
+> -	pr_warn("Translation is already enabled - trying to copy translation structures\n");
+> +	pr_warn("Translation is already enabled - trying to reuse translation structures\n");
+>  
+>  	/*
+>  	 * All IOMMUs within PCI segment shares common device table.
+> -	 * Hence copy device table only once per PCI segment.
+> +	 * Hence reuse device table only once per PCI segment.
+>  	 */
+>  	for_each_pci_segment(pci_seg) {
+>  		for_each_iommu(iommu) {
+>  			if (pci_seg->id != iommu->pci_seg->id)
+>  				continue;
+> -			if (!__copy_device_table(iommu))
+> +			if (!__reuse_device_table(iommu))
+>  				return false;
+>  			break;
+>  		}
+> @@ -2917,8 +2876,8 @@ static void early_enable_iommu(struct amd_iommu *iommu)
+>   * This function finally enables all IOMMUs found in the system after
+>   * they have been initialized.
+>   *
+> - * Or if in kdump kernel and IOMMUs are all pre-enabled, try to copy
+> - * the old content of device table entries. Not this case or copy failed,
+> + * Or if in kdump kernel and IOMMUs are all pre-enabled, try to reuse
+> + * the old content of device table entries. Not this case or reuse failed,
+>   * just continue as normal kernel does.
+>   */
+>  static void early_enable_iommus(void)
+> @@ -2926,18 +2885,18 @@ static void early_enable_iommus(void)
+>  	struct amd_iommu *iommu;
+>  	struct amd_iommu_pci_seg *pci_seg;
+>  
+> -	if (!copy_device_table()) {
+> +	if (!reuse_device_table()) {
+
+Hmmm. What happens if SNP enabled and reuse_device_table() couldn't setup
+previous DTE?
+In non-SNP case it works fine as we can rebuild new DTE. But in SNP case we
+should fail the kdump right?
 
 -Vasant
+
 
