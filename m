@@ -1,444 +1,421 @@
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2051.outbound.protection.outlook.com [40.107.223.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC911D554;
-	Thu, 17 Jul 2025 07:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752736577; cv=fail; b=Pv3muvNqwBHJkcnaOYuxXlsM/9HOTWBcjUSocEN7xarKMilJicX1oMuaeQRNy/dmks7Xk+KjOkLeSr9NG1hzR+JYjFMg5w4/bolnMLTxzHPnKh5BuKiAa0YBLEcL95cee0U10gKU1ewReb+fV2Svh6e0sq14eOeTH9bPZAccEW4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752736577; c=relaxed/simple;
-	bh=qI8bdIrTHlK0y94vG09JpxetwHHpM8oIjYj69ZlsFIw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EbBwcuhGDhHu+3crkt6qH13DisSz1YlI4WZkeT3oeqx2vjxl2ZYNZRZkDdobF5PTIhkCI+Es156MAOVpwrk+oVWaLecMcI79oF6cfQ/hcyXlUuoPJNQMicA9pEdb+I5MlaktHR8+d9ih7qTgxN6sshso4JNbG8lDAETC5zFWvaA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XD/QWzKT; arc=fail smtp.client-ip=40.107.223.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67AE285C8A
+	for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 08:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752740982; cv=none; b=SJZv3rp4/8hMgrW11cjTBFnG1LPXLvxQr46MiRNJgn2frmRZsSJ73pR2cJwuZJl7D2dR5VWsURhEYRi2oftxJ8KmHMgepC0IpJpaOLJS3FOO0gZs93m+F/8cjB92jCwe5Nk3m1KscpIIAq2X+veZjeqfM13lLFMm4tE87fPvtnc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752740982; c=relaxed/simple;
+	bh=UNunHUNkH+TN7AOcVml1jP+DpDLBcanyZCyw+pldQvE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=m25g90nBtEQ1CC/yE/ptOg2wdyI2a5o0qDswIQePdPPFWFKtI7OM46+9rRQLe58C9nIes/0CGovuxLJQCaDxoJqOmLClrY1fV/9yUwvM52PZFffHRoubMH4eLPu7KuXz4tSEBbhwceDmHFurZhxF/EwGIf47JA8EoPNWeNCSUyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=3zZO/bQw; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XD/QWzKT"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QBlReK63CzyX2xZUIDQu1qoOgq4Il/c6aBPGXREnUn2EXuW+VvHEGpJCDUP8rVKOol2Js2Sf5GkABzcVyoUUDRBsXm7hNC+R+VwNsjvsNpi/gglF1jjgCPd8hsA9CtkV/ZgNkkCEFwwmnp/sx7ARSEtL/5MTBRJFEpXBY4idyUoU1cV0PeStTQh7jeMXhpy2oVw+JCg2V9EVnmgPbq8VKm0H5ZeZfr373aXm3cXIGiQ4QZc0VJ3JpuSTkH4JIkrwERwroDwa5ETBaWdpxEVhumk33Oqgd9DUeVoDWYdDZz+FewcoHfaY6y1JW+TVDmHnsK5b59RstQt23z0Qr51FIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RIElyVdxZJmBQ3qU2G7ENzBqH3ZmPEdJ7Orzxl4zO68=;
- b=nrTCXfi+u9IKiJf6hvg4MQrc77ijxD7k++iSkkDeU0sq9MYYrrAxIhzVqySPum9VMh4JEzeJoySfRoqzORw03Wbe5DMece6vn+rFGtq6lQX3H2QEvJTZ33RplAWBDsYxv0UIEcY4hxpXiXnqwTjSXRJJcv4nWJunRsJHl+RfPkqhurHfY37fZ6J+bMsEcrpS2ccwaMev0RHiWwek5piimJXDX6FlbPH2oAm8X0pfP/EilRboz3QiqoBBhVztgdVIa3EfFe+s58b0MaaDM03KUpWnouYR7BWrW2SrsuQWREhmWBDFxlg4eoaUokxPuGxW/YCyA4l1hPvxw2hN4kpCmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RIElyVdxZJmBQ3qU2G7ENzBqH3ZmPEdJ7Orzxl4zO68=;
- b=XD/QWzKT2BrRV3u9ZWVOUvKnhBH8ZKDc5+WQqBRxyomwWYSgEtwNv1JWhNF1L+vpjVEhqUoGpNpsN7UI8zJ5barc/tePPMxOo1HQs/er2LdHiGkMHWwCo5w5u7pvqXHmFl5qS18KqykVz4Nc88KCsXcLZonILWIBaU55Xy1vwtg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by CY3PR12MB9653.namprd12.prod.outlook.com (2603:10b6:930:ff::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.39; Thu, 17 Jul
- 2025 07:16:13 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%6]) with mapi id 15.20.8901.024; Thu, 17 Jul 2025
- 07:16:12 +0000
-Message-ID: <4dcb8442-769c-4608-b4f9-4518d2186356@amd.com>
-Date: Thu, 17 Jul 2025 02:16:09 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/4] iommu/amd: Add support to remap/unmap IOMMU
- buffers for kdump
-To: Vasant Hegde <vasant.hegde@amd.com>, joro@8bytes.org,
- suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
- Sairaj.ArunKodilkar@amd.com, herbert@gondor.apana.org.au
-Cc: seanjc@google.com, pbonzini@redhat.com, will@kernel.org,
- robin.murphy@arm.com, john.allen@amd.com, davem@davemloft.net, bp@alien8.de,
- michael.roth@amd.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1752605725.git.ashish.kalra@amd.com>
- <7c7e241f960759934aced9a04d7620d204ad5d68.1752605725.git.ashish.kalra@amd.com>
- <e71a581f-00b2-482f-8343-c2854baeebee@amd.com>
- <84fb1f3d-1c92-4b15-8279-617046fe2b93@amd.com>
- <91572f4e-6607-41b8-91b6-146261393f07@amd.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <91572f4e-6607-41b8-91b6-146261393f07@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR11CA0139.namprd11.prod.outlook.com
- (2603:10b6:806:131::24) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="3zZO/bQw"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-612b67dcb89so145584a12.1
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 01:29:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1752740978; x=1753345778; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ry2yqY4fcB8r6JNTuIg6GJi9ZBAG4EVyeQwgDvrWgsM=;
+        b=3zZO/bQwku27icG21ERWuH7SL6EIVSr/97M3536zv5kGuN1/dmzOy026I6R+otzsH5
+         Qc3mBy9t96Arvk3yWMke97BdB7dQYwy7dLrXY+o2yzK/6TtsRMtWeuxqglzwGtjGATT2
+         6i5Pu+ZOft0LFimO+QgTH34kXDKPfwFYEF8eC9FtDDjg6+SXzK4pPC1wKrHB45rr4mxU
+         6FCzOlt1ocVWLVyHshdurd8ou39ppYsquQ4CFhYJ1b4jQT9PIzZ42DrrmZvJGF/ibyrA
+         KBDCT+kQj9g+O3Eeqnyu+IUo8l6XMTJRk6O3osvzCtGUAwwlIHSERKr9/naKhneiJ7HW
+         tgcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752740978; x=1753345778;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ry2yqY4fcB8r6JNTuIg6GJi9ZBAG4EVyeQwgDvrWgsM=;
+        b=tbZJh58AHpXyRmwJ2lhvCVJwGkXZDodiv43HvOUBbhT+vnsClN/yXZDybNzt4MKJu/
+         INP2F+Uqif94oqcNa136oCdYUbMPTCs86mWaANSmXwYXtsrzXfZK225sNoq4GUHZD/h6
+         ah/TLu5mst7oDiGTmW+NFQ8faBe5PXuv69jg99q2qMcfMIUScn+m5Og4jgcj2NGakY19
+         19eBzQyxbpDMXdP0hYU+5js4UYbr+EzaxbdNU3fCPsqLOilkcnav7m621G4nSamaDvXI
+         kTKAVN9vCQS7q1T4HP/eapoCuDAuTFDPRPewIiRH4tMqw/PfKw284/cpx4pFzH1nEL9e
+         sAJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxunuRdDT3O54bnl272qZ6ka6la6bTP3KSgO7/Jji9MJ/kNHIPphUYXMgYnZYUrYt8HcMp4ES8smoMhiw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZKKnwSl+2wfNgmnUwtZDh8xAY9Y5RRz1A+6J3x1KtxfLXGUN3
+	ai8ahTok5UdH+YGFgZqGM7dRSq5H28xQYYlyu7C94oiwzGWwbSSan36KktaVDLhNBEc=
+X-Gm-Gg: ASbGncsZiAzk71nCy6bhGvulXgeyRfaktPzq3rANSnV6EwZ9fhv21EoEUSN43TJXiK7
+	doEKPqOf3VPjEXmJ5iOcQEjFaQbkLJRo1ZIAwRscV4ECSt5xTSnOUPncHLqNnYB6utHUFXijcpo
+	Hft4RV/gseGImzk7brKDKenmvuGglgTAbGwjezQC5F9hviJY3EI8q4oby8x/p7937S7tjY9UsIY
+	ouY2ikV55++DEpJJB40/ZUeDK1KnLsC8uXeaVJtBqMNP3gSuAxGgE+3ks6DRYmWsMoBR3sqIenq
+	/kI1P7uUNRn1bHqsnJVJ8Njt7wmGHZ6U4ABUphspRffHyi4qD/k1ZzmHVqlEJApc6FvQNZ8b88X
+	Ka4uByS+MzuxZ3YtigqOnJHdRsvYuPcFpv1Qbz9rJOmHdV5xBD/+yuLpE5yZ11PHBnPQ=
+X-Google-Smtp-Source: AGHT+IE+TdhlMPh+u91g6pE8N6/1/E6+tgQ36t4anhpy9DrzlSFmbhQrj6aJo6OAcbvrAeM2GDcPYg==
+X-Received: by 2002:a05:6402:35c4:b0:608:6501:6a1f with SMTP id 4fb4d7f45d1cf-61285916635mr4613521a12.1.1752740978021;
+        Thu, 17 Jul 2025 01:29:38 -0700 (PDT)
+Received: from localhost (212095005146.public.telering.at. [212.95.5.146])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-611c9796432sm9746425a12.73.2025.07.17.01.29.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jul 2025 01:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|CY3PR12MB9653:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6bb14070-36ad-4199-a0f3-08ddc501cfb0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q212Z1cyU3ZEU091L25ZbkN0QWRMRStWY3F2RUxFRXVHU3pLa0phQlBaZ1NB?=
- =?utf-8?B?THBsWVdlSGVzVm1La2RaSHZKdHg4eUNWa3g0QnhHRENCWGNQWmNvYVUxeEdC?=
- =?utf-8?B?bE9SazYrNE83RWttRHJBWDQvdmtwaFhwNFFEdm1JNDBvUWdEVUNSdjBZM2o1?=
- =?utf-8?B?MXJOdEZxak1tNlpPNmRaNWVWTFlrN1hiOVNUbWFJNko1MUdNaWV4K3RpQ0Nm?=
- =?utf-8?B?WHYxUVFKSCtQVVAvZkp2NU9KOHZCNnhTeXpGem5hNk5xT0FLYU9nYUFIUjh1?=
- =?utf-8?B?UmdiMzd1aUxKb1dEbGZhZFlYMXFNSFhwczdaSGhmS2ZqUVFnVHdZN0RjZEJX?=
- =?utf-8?B?QnRwWGt0QWE1a01xSXV6MFI4M2o0dE9Pc0hTQ0VEN1lqeEdIeGFOMkVYZVlr?=
- =?utf-8?B?cmFMQnBsbTZ0VUN3d1l5WCtMbWd4V01GeW5CL3liVkExOTJ1QWJpeDZUWWsy?=
- =?utf-8?B?UXRRV2pHQ2Z6eFR3dVNYMXo5eHZWWWZYSlJhbzVxRHZ6MDkwS2ZqRDVYVVcw?=
- =?utf-8?B?WW9ORGxnZE1Malk4Q0ZPcmtSSGl0Q3JKR1k4MlJGUlQ2dGk4QUNnSFpqNHF4?=
- =?utf-8?B?bXg5MElPajNJSnpNRlVlcGY3SGtGZ1hsWXFWNE9Wa1JESjlXSXVEMSsrN0Uy?=
- =?utf-8?B?aS9oVlducklHTlFqeDJaMzhYT1RzU0pEOEd2WkIycWRXdU1qcXA3V3FGdldR?=
- =?utf-8?B?VFN3VVFPRWgxZ0I3OC9KSGcvRGY3ejFVeTY1Zy84YkMrZ1FhODdlcVovaElG?=
- =?utf-8?B?Z2puOXZud3VYNUM3SjRuOEtrRWhKd0hyd1VlZkIvTTFydVJ5VENYVVNsaTVt?=
- =?utf-8?B?RzQyWW95ZUNlWHhLWWI2UVZ1bXEreS9PWXFSZEJYQXo2NzkwS1hRb0hvVHNm?=
- =?utf-8?B?dFFaOTROYlNwUmpHVkJLMXJXTC9FdGlrZ01YaWFKbmthdzFiSEFOUU51ZTJm?=
- =?utf-8?B?Q3lMZm8xT3dxYUF0ODB4eldKd1gwSW9FUnpuZ0ppVmlncUpuc0lrYVFGekNK?=
- =?utf-8?B?Yk1hYlFLcWFnK3FPRWYrOUNQY0VlYzE3SmZCWnlBbnl4aGVzOUM0STM2RVlB?=
- =?utf-8?B?UFMrU3ZSc205aVJZQzZjQXlXclJiU2NxVmxBQUJEWUxzajZyVkRoTzNkY3M4?=
- =?utf-8?B?dVRzMEYyem5vakdVNzRia1pseDFDZE9Ca0crVjhXc2NJNjRROEIwbFN0NWtO?=
- =?utf-8?B?OVpITUlEa0RPemZEdmtueGVPbndzaENKQXJ2djM3NHJ2STBQRldpK0ZDOGJt?=
- =?utf-8?B?ekkxTnlkRnBqZXFQVlpYSUhXNkJKdEVXNXExdldzeEprQ2xhNWZWTmh1TDRV?=
- =?utf-8?B?RmY0Zmg1KzNjR2U1akR0QUZ1b2w0VlJIa0Q4VVAwMlJIWmplS1NOdkhhMk1x?=
- =?utf-8?B?TzBxcURhSEUzdmY5am9oTTNzMUkxMFBBbWk4dXNrNUI5TGU2ZnBjMHl0MTRL?=
- =?utf-8?B?OXdzZllwcExHOUZmUWxPNUxJWWVkWGxmSmhOZGo0QWVKVnBtOU1VYUl5bVVN?=
- =?utf-8?B?MlIrZkVNa1FNdGp3WVRRazNZalMrTHAybXBNSnlXdWJuMTNSUlJORTMraWpC?=
- =?utf-8?B?VmRWU3k1WitpWExMM0lER2Ywc1lINXV3SEI4WUtsQlZScW1ac1B5dHJ5YnE3?=
- =?utf-8?B?YmxmZ1JnV2M4M1BsUUFxRWsrc3ZYb3hBL2thQmtaUGswWXFSQW1rQy9kRzNV?=
- =?utf-8?B?cktXSG44eG1wWGFMR3RSOTlqUnRKVVBGWGpIUVc1RnN0SmlUekFBVVlpVUJo?=
- =?utf-8?B?ODU0ajJ0TDVYRGtOWjcwNWJmVG1LWjhCcUdtVGlJUHcvYVBTQ2VOLzVwU25v?=
- =?utf-8?B?RjZJRkw4dVJteDFZZVJWYnhqa1RBVTJIMUxISW41UnJCYzV5VE4wOTNyQjNE?=
- =?utf-8?B?QUgyQTlnL04wREZwc3ZzRlhtVHkwRFZsd1lnZVZjR09qaFZqbDhJc29IMGYx?=
- =?utf-8?Q?09Y7sTIa/DU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M2c5N1U3c25oYjVnUjZrN25tQmFzcFBNMFlubzVBVm91OFpPVExPV3J0VlpB?=
- =?utf-8?B?MEsvR3lQQVVoRDVMa1ZmeG1GZnlaQTdlUnk5YmhRaG9IRzJnb1ZWcVJVd0Nr?=
- =?utf-8?B?OE1Eay8vb0VLaWZvNGJUemxuZnQvajdoZk93bDVCVS85bHgxNHM1TE9yR0g1?=
- =?utf-8?B?UFZJQUFKSXJocXUzVmtGelA0Ym5Eek1FSERuT3RWZjdoME5rS0hHZk1kTVk4?=
- =?utf-8?B?a1RtTFhvaFBxd3kvdmNCMG4xMVQxR2F6UkVrNTJSM3VUK3RQODcyZFl3TG1N?=
- =?utf-8?B?Y0JrcVIya2Q0N3d1akpNUjNWV3J3ZldiTWZRd2RQdDA3YWttNVRYS0p5aFVI?=
- =?utf-8?B?bG5HMmxpeldraDYxQ0RiYWh4dG0rQVdIWGhNNlR3WHJzUGsyaVR5bndpSFRx?=
- =?utf-8?B?UFN1WFR0RGY3MXM4ek9XMURVQmhpazlqVlFUK2o3QnZ3eXF1Y0pucE85RE8x?=
- =?utf-8?B?Z1ZlZGY4QnltNGxoYTl1QVdCa0pEZGE5eFM3Nm5TSXc2ZUdtVFFvSk0xUllr?=
- =?utf-8?B?Z2FpQXh1R0tkSVY5b2V4ZEVLSVBRRkxlcWtJbDhtYm1GTE9yeFQ2c2RvZllF?=
- =?utf-8?B?UkJORHo0U2pKNzZkaGpNaWl1Y2cwbHBDL2N2NllhRFpmcEVqZVd0V2l6SVd3?=
- =?utf-8?B?eUFNSDB4ejNxaU1pMW52YjNNNFpvdVp5RWl6QjdWdzBWUy9KQmpHRDc1aXRo?=
- =?utf-8?B?T0hNYkxmcERzOFZMVmoyczBiaG1MbjJ4aXBUckE0eWEvRFUxVzdPY2pkMm1M?=
- =?utf-8?B?Z1d1UGh3Y0RET2ViT2dqWDRENlFUMkpZODRESXl1NGlLb0JEVXl0MWg5NEpu?=
- =?utf-8?B?VFczQkFORDlPcGNDMG0yVFZwakJKbDE3MUFGNnY5QXRkTUFTa2V1MWZHYW8x?=
- =?utf-8?B?MWZoZW1td1RHV0ZQTzVMQ3pmTmVLSzV0d21yRU4wRlZRS0NTNTBtU1FMWDhs?=
- =?utf-8?B?MmxKaXpSa282YXMrL1ZoYkIxK29yQ0p0QXJPOVB5dWFnYVd5NkpXU1RDdGs3?=
- =?utf-8?B?UVZHMWUzTTcxMWlSTStJc1FIa0RkTFhLSmlTNmIrUVhEMURNTVROL0JaUlg4?=
- =?utf-8?B?MU9zUTVoNDYzWHo0NUk4V1NvZ2R4anEvZFp2TjgwcG5DUWZndm4rWlYwWEtD?=
- =?utf-8?B?REphYXprQWRzdzYwMGZHdldPdEZubjJ6aWU2cjE2L1laZkw4TkRRN2hEQVVs?=
- =?utf-8?B?Ylh3QU9acCtjK2E1T0djOUdIdk8xeDlTa1VmcGloaGt1OEJVVy9aWUsrM0Zr?=
- =?utf-8?B?bHlRRytMZzgwYVZBQ3B0Ky9VK2tCS3lId3lMTDVtK1ZPcEY5ZWRvUkx6RnRZ?=
- =?utf-8?B?ZzV3KzNubWtzcHZzV3hzaTRkYnFCQ2dNbFYwMXJ4T3ozeEJtNWVpTTdUWUxU?=
- =?utf-8?B?dmpZTWw5QVg3eUkwT05vTm4ySzhqZU1ZTVNFSXhjd1JMaGVuMExKcEVnOEV2?=
- =?utf-8?B?V0hQRVVqWHVOa3NGeEVqS3kzZ29hSmgzUWwyV0wvbmV4RWdyNXVFWVA1VzBH?=
- =?utf-8?B?MUo4cml1NjdPRjR1Vm1WMUdlUkZPdnYvejlxK0kwak4rZ0hUOHp3aFp0bVFT?=
- =?utf-8?B?Mk56bkp6cWVRZ1pTZWY0djlweVNIaWJHNGtqWS9zRUNadjE1b2F4T0V6dlh0?=
- =?utf-8?B?SThEbGdmamszdXBqQ0hwa1pRQTArSmZJVFBvK1pqeGtrQTZhc3Rmd3lJdFRR?=
- =?utf-8?B?OHlsd3gwVHJoQkZmejFWcElPL3htSzRmc1U2dklzY0t6dGREMHJacWdXMUsz?=
- =?utf-8?B?S2RQL3lHa0RVOWd1QnhndEp3TWQ1L2VmSjZLTHd0M1QrUUwxTElwenNZSWlV?=
- =?utf-8?B?dm1KVUlQQXhUUzRtbm9XOThWZkpiaXFZalJyWm1NUlYvQVFaWGlza0tWUThC?=
- =?utf-8?B?R0ZjeEdmVG54ZzVXWXdmZ1REb1RaY3ZYNVFHL01wOE5pVTJkNi9TV2pPcUxu?=
- =?utf-8?B?TVFWSmRuUXcvOCtXYkdTS0M3dndzVlNiUS9KdVFUaDdlSDdjcDMwNk40Wkox?=
- =?utf-8?B?YkFuTXc2WUh0NmtvVC8vclNKcmkvTTlXcmM3WkFoSWVtdlNTT2JucC9Ga0g0?=
- =?utf-8?B?YjZoQ2NFVHkwcXhnUTcxbUp3MVNxMUh2VE1EMFdBN2lpa0pzNkZ6QTQyVGJm?=
- =?utf-8?Q?fTn48JE6S6MUQd2eORn1HbCCS?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bb14070-36ad-4199-a0f3-08ddc501cfb0
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2025 07:16:12.8632
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CASjlTILS+pFTTRKuk5afbQ+fJ1ohE//njKLUCZDIyjY36jE06NORuxxwK2RlzqHRD2X5uRdetniMHY762NwGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9653
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 17 Jul 2025 10:29:35 +0200
+Message-Id: <DBE6TK1KDOTP.IIT72I1LUN5M@fairphone.com>
+Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-pm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+ <linux-mmc@vger.kernel.org>
+Subject: Re: [PATCH v2 14/15] arm64: dts: qcom: Add initial Milos dtsi
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Konrad Dybcio" <konrad.dybcio@oss.qualcomm.com>, "Will Deacon"
+ <will@kernel.org>, "Robin Murphy" <robin.murphy@arm.com>, "Joerg Roedel"
+ <joro@8bytes.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
+ "Manivannan Sadhasivam" <mani@kernel.org>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ "Vinod Koul" <vkoul@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>,
+ "Konrad Dybcio" <konradybcio@kernel.org>, "Robert Marko"
+ <robimarko@gmail.com>, "Das Srinagesh" <quic_gurus@quicinc.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, "Jassi Brar" <jassisinghbrar@gmail.com>,
+ "Amit Kucheria" <amitk@kernel.org>, "Thara Gopinath"
+ <thara.gopinath@gmail.com>, "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+ "Zhang Rui" <rui.zhang@intel.com>, "Lukasz Luba" <lukasz.luba@arm.com>,
+ "Ulf Hansson" <ulf.hansson@linaro.org>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
+References: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
+ <20250713-sm7635-fp6-initial-v2-14-e8f9a789505b@fairphone.com>
+ <3e0299ad-766a-4876-912e-438fe2cc856d@oss.qualcomm.com>
+In-Reply-To: <3e0299ad-766a-4876-912e-438fe2cc856d@oss.qualcomm.com>
 
-
-On 7/17/2025 2:05 AM, Vasant Hegde wrote:
-> Ashish,
-> 
-> 
-> On 7/17/2025 3:25 AM, Kalra, Ashish wrote:
->> Hello Vasant,
->>
->> On 7/16/2025 4:19 AM, Vasant Hegde wrote:
->>> Hi Ashish,
->>>
->>>
->>> On 7/16/2025 12:56 AM, Ashish Kalra wrote:
->>>> From: Ashish Kalra <ashish.kalra@amd.com>
->>>>
->>>> After a panic if SNP is enabled in the previous kernel then the kdump
->>>> kernel boots with IOMMU SNP enforcement still enabled.
->>>>
->>>> IOMMU completion wait buffers (CWBs), command buffers and event buffer
->>>> registers remain locked and exclusive to the previous kernel. Attempts
->>>> to allocate and use new buffers in the kdump kernel fail, as hardware
->>>> ignores writes to the locked MMIO registers as per AMD IOMMU spec
->>>> Section 2.12.2.1.
->>>>
->>>> This results in repeated "Completion-Wait loop timed out" errors and a
->>>> second kernel panic: "Kernel panic - not syncing: timer doesn't work
->>>> through Interrupt-remapped IO-APIC"
->>>>
->>>> The following MMIO registers are locked and ignore writes after failed
->>>> SNP shutdown:
->>>> Command Buffer Base Address Register
->>>> Event Log Base Address Register
->>>> Completion Store Base Register/Exclusion Base Register
->>>> Completion Store Limit Register/Exclusion Limit Register
->>>> As a result, the kdump kernel cannot initialize the IOMMU or enable IRQ
->>>> remapping, which is required for proper operation.
->>>
->>> There are couple of other registers in locked list. Can you please rephrase
->>> above paras?  Also you don't need to callout indivisual registers here. You can
->>> just add link to IOMMU spec.
->>
->> Yes i will drop listing the individual registers here and just provide the link
->> to the IOMMU specs.
-> 
-> May be you can rephrase a bit so that its clear that there are many register
-> gets locked. This patch fixes few of them and following patches will fix
-> remaining ones.
-> 
->>
-
-Ok.
-
->>>
->>> Unrelated to this patch :
->>>   I went to some of the SNP related code in IOMMU driver. One thing confused me
->>> is in amd_iommu_snp_disable() code why Command buffer is not marked as shared?
->>> any idea?
->>>
->>
->> Yes that's interesting. 
->>
->> This is as per the SNP Firmware ABI specs: 
->>
->> from SNP_INIT_EX: 
->>
->> The firmware initializes the IOMMU to perform RMP enforcement. The firmware also transitions
->> the event log, PPR log, and completion wait buffers of the IOMMU to an RMP page state that is 
->> read only to the hypervisor and cannot be assigned to guests
->>
->> So during SNP_SHUTDOWN_EX, transitioning these same buffers back to shared state.
->>
->> But will investigate deeper and check why is command buffer not marked as FW/Reclaim state
->> by firmware ? 
-> 
-> Sure.
-> 
->>
-
-Did double check this in the SEV firmware code: 
-
-Only the IOMMU Event logs, PPR Logs and Completion Wait buffers are transitioned to FW state
-and hence the same need to be transitioned from reclaimed to shared state at SNP_SHUTDOWN_EX (iommu_snp_shutdown).
- 
->>>
->>>>
->>>> Reuse the pages of the previous kernel for completion wait buffers,
->>>> command buffers, event buffers and memremap them during kdump boot
->>>> and essentially work with an already enabled IOMMU configuration and
->>>> re-using the previous kernel’s data structures.
->>>>
->>>> Reusing of command buffers and event buffers is now done for kdump boot
->>>> irrespective of SNP being enabled during kdump.
->>>>
->>>> Re-use of completion wait buffers is only done when SNP is enabled as
->>>> the exclusion base register is used for the completion wait buffer
->>>> (CWB) address only when SNP is enabled.
->>>>
->>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->>>> ---
->>>>  drivers/iommu/amd/amd_iommu_types.h |   5 +
->>>>  drivers/iommu/amd/init.c            | 163 ++++++++++++++++++++++++++--
->>>>  drivers/iommu/amd/iommu.c           |   2 +-
->>>>  3 files changed, 157 insertions(+), 13 deletions(-)
->>>>
->>>> diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
->>>> index 9b64cd706c96..082eb1270818 100644
->>>> --- a/drivers/iommu/amd/amd_iommu_types.h
->>>> +++ b/drivers/iommu/amd/amd_iommu_types.h
->>>> @@ -791,6 +791,11 @@ struct amd_iommu {
->>>>  	u32 flags;
->>>>  	volatile u64 *cmd_sem;
->>>>  	atomic64_t cmd_sem_val;
->>>> +	/*
->>>> +	 * Track physical address to directly use it in build_completion_wait()
->>>> +	 * and avoid adding any special checks and handling for kdump.
->>>> +	 */
->>>> +	u64 cmd_sem_paddr;
->>>
->>> With this we are tracking both physical and virtual address? Is that really
->>> needed? Can we just track PA and convert it into va?
->>>
->>
->> I believe it is simpler to keep/track cmd_sem and use it directly, instead of doing
->> phys_to_virt() calls everytime before using it.
->>  
->>>>  
->>>>  #ifdef CONFIG_AMD_IOMMU_DEBUGFS
->>>>  	/* DebugFS Info */
->>>> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
->>>> index cadb2c735ffc..32295f26be1b 100644
->>>> --- a/drivers/iommu/amd/init.c
->>>> +++ b/drivers/iommu/amd/init.c
->>>> @@ -710,6 +710,23 @@ static void __init free_alias_table(struct amd_iommu_pci_seg *pci_seg)
->>>>  	pci_seg->alias_table = NULL;
->>>>  }
->>>>  
->>>> +static inline void *iommu_memremap(unsigned long paddr, size_t size)
->>>> +{
->>>> +	phys_addr_t phys;
->>>> +
->>>> +	if (!paddr)
->>>> +		return NULL;
->>>> +
->>>> +	/*
->>>> +	 * Obtain true physical address in kdump kernel when SME is enabled.
->>>> +	 * Currently, IOMMU driver does not support booting into an unencrypted
->>>> +	 * kdump kernel.
->>>
->>> You mean production kernel w/ SME and kdump kernel with non-SME is not supported?
->>>
->>
->> Yes. 
-> 
-> Then can you please rephrase above comment?
-> 
->>
-
-Ok. 
-
->>>
->>>> +	 */
->>>> +	phys = __sme_clr(paddr);
->>>> +
->>>> +	return ioremap_encrypted(phys, size);
->>>
->>> You are clearing C bit and then immediately remapping using encrypted mode. Also
->>> existing code checks for C bit before calling ioremap_encrypted(). So I am not
->>> clear why you do this.
->>>
->>>
->>
->> We need to clear the C-bit to get the correct physical address for remapping.
->>
->> Which existing code checks for C-bit before calling ioremap_encrypted() ?
->>
->> After getting the correct physical address we call ioremap_encrypted() which
->> which map it with C-bit enabled if SME is enabled or else it will map it 
->> without C-bit (so it handles both SME and non-SME cases).
->>  
->> Earlier we used to check for CC_ATTR_HOST_MEM_ENCRYPT flag and if set 
->> then call ioremap_encrypted() or otherwise call memremap(), but then
->> as mentioned above ioremap_encrypted() works for both cases - SME or
->> non-SME, hence we use that approach.
-> 
-> If you want to keep it in current way then it needs better comment. I'd say add
-> CC_ATTR_HOST_MEM_ENCRYPT check so that its easy to read.
-> 
+On Mon Jul 14, 2025 at 1:06 PM CEST, Konrad Dybcio wrote:
+> On 7/13/25 10:05 AM, Luca Weiss wrote:
+>> Add a devicetree description for the Milos SoC, which is for example
+>> Snapdragon 7s Gen 3 (SM7635).
+>>=20
+>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+>> ---
 >
-Ok, i will add back the CC_ATTR_HOST_MEM_ENCRYPT check.
+> [...]
+>
+>> +		cpu-map {
+>> +			cluster0 {
+>> +				core0 {
+>> +					cpu =3D <&cpu0>;
+>> +				};
+>> +
+>> +				core1 {
+>> +					cpu =3D <&cpu1>;
+>> +				};
+>> +
+>> +				core2 {
+>> +					cpu =3D <&cpu2>;
+>> +				};
+>> +
+>> +				core3 {
+>> +					cpu =3D <&cpu3>;
+>> +				};
+>> +			};
+>> +
+>> +			cluster1 {
+>> +				core0 {
+>> +					cpu =3D <&cpu4>;
+>> +				};
+>> +
+>> +				core1 {
+>> +					cpu =3D <&cpu5>;
+>> +				};
+>> +
+>> +				core2 {
+>> +					cpu =3D <&cpu6>;
+>> +				};
+>> +			};
+>> +
+>> +			cluster2 {
+>> +				core0 {
+>> +					cpu =3D <&cpu7>;
+>> +				};
+>> +			};
+>> +		};
+>
+> I'm getting mixed information about the core topology..=20
+>
+> What does dmesg say wrt this line?
+>
+> CPU%u: Booted secondary processor 0x%010lx [0x%08x]\n
 
-Thanks,
-Ashish
- 
->>
->>>
->>>> +}
->>>> +
->>>>  /*
->>>>   * Allocates the command buffer. This buffer is per AMD IOMMU. We can
->>>>   * write commands to that buffer later and the IOMMU will execute them
->>>> @@ -942,8 +959,105 @@ static int iommu_init_ga_log(struct amd_iommu *iommu)
->>>>  static int __init alloc_cwwb_sem(struct amd_iommu *iommu)
->>>>  {
->>>>  	iommu->cmd_sem = iommu_alloc_4k_pages(iommu, GFP_KERNEL, 1);
->>>> +	if (!iommu->cmd_sem)
->>>> +		return -ENOMEM;
->>>> +	iommu->cmd_sem_paddr = iommu_virt_to_phys((void *)iommu->cmd_sem);
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static int __init remap_event_buffer(struct amd_iommu *iommu)
->>>> +{
->>>> +	u64 paddr;
->>>> +
->>>> +	pr_info_once("Re-using event buffer from the previous kernel\n");
->>>> +	/*
->>>> +	 * Read-back the event log base address register and apply
->>>> +	 * PM_ADDR_MASK to obtain the event log base address.
->>>> +	 */
->>>> +	paddr = readq(iommu->mmio_base + MMIO_EVT_BUF_OFFSET) & PM_ADDR_MASK;
->>>> +	iommu->evt_buf = iommu_memremap(paddr, EVT_BUFFER_SIZE);
->>>> +
->>>> +	return iommu->evt_buf ? 0 : -ENOMEM;
->>>> +}
->>>> +
->>>> +static int __init remap_command_buffer(struct amd_iommu *iommu)
->>>> +{
->>>> +	u64 paddr;
->>>> +
->>>> +	pr_info_once("Re-using command buffer from the previous kernel\n");
->>>> +	/*
->>>> +	 * Read-back the command buffer base address register and apply
->>>> +	 * PM_ADDR_MASK to obtain the command buffer base address.
->>>> +	 */
->>>> +	paddr = readq(iommu->mmio_base + MMIO_CMD_BUF_OFFSET) & PM_ADDR_MASK;
->>>> +	iommu->cmd_buf = iommu_memremap(paddr, CMD_BUFFER_SIZE);
->>>> +
->>>> +	return iommu->cmd_buf ? 0 : -ENOMEM;
->>>> +}
->>>> +
->>>> +static int __init remap_cwwb_sem(struct amd_iommu *iommu)
->>>> +{
->>>> +	u64 paddr;
->>>> +
->>>> +	if (check_feature(FEATURE_SNP)) {
->>>> +		/*
->>>> +		 * When SNP is enabled, the exclusion base register is used for the
->>>> +		 * completion wait buffer (CWB) address. Read and re-use it.
->>>> +		 */
->>>> +		pr_info_once("Re-using CWB buffers from the previous kernel\n");
->>>> +		/*
->>>> +		 * Read-back the exclusion base register and apply PM_ADDR_MASK
->>>> +		 * to obtain the exclusion range base address.
->>>> +		 */
->>>> +		paddr = readq(iommu->mmio_base + MMIO_EXCL_BASE_OFFSET) & PM_ADDR_MASK;
->>>> +		iommu->cmd_sem = iommu_memremap(paddr, PAGE_SIZE);
->>>> +		if (!iommu->cmd_sem)
->>>> +			return -ENOMEM;
->>>> +		iommu->cmd_sem_paddr = paddr;
->>>> +	} else {
->>>> +		return alloc_cwwb_sem(iommu);
->>>
->>> I understand this one is different from command/event buffer. But calling
->>> function name as remap_*() and then allocating memory internally is bit odd.
->>> Also this differs from previous functions.
->>>
->>
->> Yes i agree, but then what do we name it ?
->>
->> remap_or_alloc_cwb_sem() does that sound Ok ?
-> 
-> May be.
-> 
-> 
-> -Vasant
-> 
-> 
+[    0.003570] CPU1: Booted secondary processor 0x0000000100 [0x410fd801]
+[    0.004738] CPU2: Booted secondary processor 0x0000000200 [0x410fd801]
+[    0.005783] CPU3: Booted secondary processor 0x0000000300 [0x410fd801]
+[    0.007206] CPU4: Booted secondary processor 0x0000000400 [0x410fd811]
+[    0.008206] CPU5: Booted secondary processor 0x0000000500 [0x410fd811]
+[    0.009073] CPU6: Booted secondary processor 0x0000000600 [0x410fd811]
+[    0.010406] CPU7: Booted secondary processor 0x0000000700 [0x410fd811]
+
+>
+>> +	pmu-a520 {
+>> +		compatible =3D "arm,cortex-a520-pmu";
+>> +		interrupts =3D <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
+>> +	};
+>> +
+>> +	pmu-a720 {
+>> +		compatible =3D "arm,cortex-a720-pmu";
+>> +		interrupts =3D <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
+>> +	};
+>
+> See:
+>
+> 9ce52e908bd5 ("arm64: dts: qcom: sm8650: switch to interrupt-cells 4 to a=
+dd PPI partitions")
+> 2c06e0797c32 ("arm64: dts: qcom: sm8650: add PPI interrupt partitions for=
+ the ARM PMUs")
+
+Sure, will take a look.
+
+>
+> [...]
+>
+>> +		gcc: clock-controller@100000 {
+>> +			compatible =3D "qcom,milos-gcc";
+>> +			reg =3D <0x0 0x00100000 0x0 0x1f4200>;
+>> +
+>> +			clocks =3D <&rpmhcc RPMH_CXO_CLK>,
+>> +				 <&sleep_clk>,
+>> +				 <0>, /* pcie_0_pipe_clk */
+>> +				 <0>, /* pcie_1_pipe_clk */
+>> +				 <0>, /* ufs_phy_rx_symbol_0_clk */
+>> +				 <0>, /* ufs_phy_rx_symbol_1_clk */
+>> +				 <0>, /* ufs_phy_tx_symbol_0_clk */
+>> +				 <0>; /* usb3_phy_wrapper_gcc_usb30_pipe_clk */
+>> +			protected-clocks =3D <GCC_PCIE_1_AUX_CLK>, <GCC_PCIE_1_AUX_CLK_SRC>,
+>> +					<GCC_PCIE_1_CFG_AHB_CLK>, <GCC_PCIE_1_MSTR_AXI_CLK>,
+>> +					<GCC_PCIE_1_PHY_RCHNG_CLK>, <GCC_PCIE_1_PHY_RCHNG_CLK_SRC>,
+>> +					<GCC_PCIE_1_PIPE_CLK>, <GCC_PCIE_1_PIPE_CLK_SRC>,
+>> +					<GCC_PCIE_1_PIPE_DIV2_CLK>, <GCC_PCIE_1_PIPE_DIV2_CLK_SRC>,
+>> +					<GCC_PCIE_1_SLV_AXI_CLK>, <GCC_PCIE_1_SLV_Q2A_AXI_CLK>;
+>
+> Does access control disallow accessing these on your prod-fused
+> device?
+
+Hm, taking another look, this property should probably be moved to
+device dts.
+
+Downstream has this in volcano.dtsi but volcano6i.dtsi (QCM6690?) and
+volcano6ip.dtsi (QCS6690?) have a /delete-property/ for this, because
+they have PCIe available.
+
+I don't think this has anything to do with secure boot fuses, but I
+don't think I have tried enabling these clocks on my SB-off prototype.
+
+>
+> [...]
+>
+>> +		usb_1: usb@a600000 {
+>> +			compatible =3D "qcom,milos-dwc3", "qcom,snps-dwc3";
+>> +			reg =3D <0x0 0x0a600000 0x0 0x10000>;
+>
+> size =3D 0xfc_000
+
+Ack
+
+>
+> [...]
+>
+>> +
+>> +			clocks =3D <&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
+>> +				 <&gcc GCC_USB30_PRIM_MASTER_CLK>,
+>> +				 <&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
+>> +				 <&gcc GCC_USB30_PRIM_SLEEP_CLK>,
+>> +				 <&gcc GCC_USB30_PRIM_MOCK_UTMI_CLK>,
+>> +				 <&rpmhcc RPMH_CXO_CLK>;
+>> +			clock-names =3D "cfg_noc",
+>> +				      "core",
+>> +				      "iface",
+>> +				      "sleep",
+>> +				      "mock_utmi",
+>> +				      "xo";
+>> +
+>> +			assigned-clocks =3D <&gcc GCC_USB30_PRIM_MOCK_UTMI_CLK>,
+>> +					  <&gcc GCC_USB30_PRIM_MASTER_CLK>;
+>> +			assigned-clock-rates =3D <19200000>, <133333333>;
+>
+> Set the latter to 200000000 - your device doesn't have USB3, but the
+> next person may lose their hair about tracking down why it doesn't
+> work on theirs
+
+Ah, I think I only checked the downstream reference which was patched to
+be qcom,core-clk-rate =3D <133333333>; for FP6. The original file does
+have:
+
+  qcom,core-clk-rate =3D <200000000>;
+  qcom,core-clk-rate-disconnected =3D <133333333>;
+
+>
+> [...]
+>
+>> +		pdc: interrupt-controller@b220000 {
+>> +			compatible =3D "qcom,milos-pdc", "qcom,pdc";
+>> +			reg =3D <0x0 0x0b220000 0x0 0x30000>, <0x0 0x174000f0 0x0 0x64>;
+>
+> 1 per line, please
+
+Ack
+
+>
+>> +			interrupt-parent =3D <&intc>;
+>> +
+>> +			qcom,pdc-ranges =3D <0 480 40>, <40 140 11>, <51 527 47>,
+>> +					  <98 609 31>, <129 63 1>, <130 716 12>,
+>> +					  <142 251 5>;
+>> +
+>> +			#interrupt-cells =3D <2>;
+>> +			interrupt-controller;
+>> +		};
+>> +
+>> +		tsens0: thermal-sensor@c228000 {
+>> +			compatible =3D "qcom,milos-tsens", "qcom,tsens-v2";
+>> +			reg =3D <0x0 0x0c228000 0x0 0x1ff>, /* TM */
+>> +			      <0x0 0x0c222000 0x0 0x1ff>; /* SROT */
+>
+> drop the comments
+>
+> the sizes are 0x1000 for both regions for both controllers
+
+Ack
+
+>
+>> +
+>> +			interrupts =3D <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH>,
+>
+> pdc 26
+
+You mean replace <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH> with
+<&pdc 26 IRQ_TYPE_LEVEL_HIGH> (plus interrupts-extended)?
+
+I assume you got this from internal docs, but just to mention,
+volcano-thermal.dtsi contains GIC_SPI 506 (+ 507 for tsens1).
+
+>
+>> +				     <GIC_SPI 640 IRQ_TYPE_LEVEL_HIGH>;
+>> +			interrupt-names =3D "uplow",
+>> +					  "critical";
+>> +
+>> +			#qcom,sensors =3D <15>;
+>> +
+>> +			#thermal-sensor-cells =3D <1>;
+>> +		};
+>> +
+>> +		tsens1: thermal-sensor@c229000 {
+>> +			compatible =3D "qcom,milos-tsens", "qcom,tsens-v2";
+>> +			reg =3D <0x0 0x0c229000 0x0 0x1ff>, /* TM */
+>> +			      <0x0 0x0c223000 0x0 0x1ff>; /* SROT */
+>> +
+>> +			interrupts =3D <GIC_SPI 507 IRQ_TYPE_LEVEL_HIGH>,
+>
+> pdc 27
+
+same as above
+
+>
+>> +				     <GIC_SPI 641 IRQ_TYPE_LEVEL_HIGH>;
+>> +			interrupt-names =3D "uplow",
+>> +					  "critical";
+>> +
+>> +			#qcom,sensors =3D <14>;
+>> +
+>> +			#thermal-sensor-cells =3D <1>;
+>> +		};
+>> +
+>> +		aoss_qmp: power-management@c300000 {
+>> +			compatible =3D "qcom,milos-aoss-qmp", "qcom,aoss-qmp";
+>> +			reg =3D <0x0 0x0c300000 0x0 0x400>;
+>> +
+>> +			interrupt-parent =3D <&ipcc>;
+>> +			interrupts-extended =3D <&ipcc IPCC_CLIENT_AOP IPCC_MPROC_SIGNAL_GLI=
+NK_QMP
+>> +						     IRQ_TYPE_EDGE_RISING>;
+>> +
+>> +			mboxes =3D <&ipcc IPCC_CLIENT_AOP IPCC_MPROC_SIGNAL_GLINK_QMP>;
+>> +
+>> +			#clock-cells =3D <0>;
+>> +		};
+>> +
+>> +		sram@c3f0000 {
+>> +			compatible =3D "qcom,rpmh-stats";
+>> +			reg =3D <0x0 0x0c3f0000 0x0 0x400>;
+>> +		};
+>> +
+>> +		spmi_bus: spmi@c400000 {
+>> +			compatible =3D "qcom,spmi-pmic-arb";
+>
+> There's two bus instances on this platform, check out the x1e binding
+
+Will do
+
+>
+> [...]
+>
+>> +		intc: interrupt-controller@17100000 {
+>> +			compatible =3D "arm,gic-v3";
+>> +			reg =3D <0x0 0x17100000 0x0 0x10000>,	/* GICD */
+>> +			      <0x0 0x17180000 0x0 0x200000>;	/* GICR * 8 */
+>
+> drop the comments please
+
+Ack
+
+>
+> [...]
+>
+>> +			clocks =3D <&rpmhcc RPMH_CXO_CLK>, <&gcc GCC_GPLL0>;
+>> +			clock-names =3D "xo", "alternate";
+>
+> 1 a line, please
+
+Ack
+
+>
+> [...]
+>
+>> +		cpuss0-thermal {
+>> +			thermal-sensors =3D <&tsens0 1>;
+>> +
+>> +			trips {
+>> +				cpuss0-hot {
+>> +					temperature =3D <110000>;
+>> +					hysteresis =3D <1000>;
+>> +					type =3D "hot";
+>> +				};
+>> +
+>> +				cpuss0-critical {
+>> +					temperature =3D <115000>;
+>> +					hysteresis =3D <0>;
+>> +					type =3D "critical";
+>> +				};
+>> +			};
+>> +		};
+>
+> See:
+>
+> 06eadce93697 ("arm64: dts: qcom: x1e80100: Drop unused passive thermal tr=
+ip points for CPU")
+>
+> (tldr drop non-critical trips for CPU)
+
+Will take a look.
+
+Regards
+Luca
+
+>
+> Konrad
 
