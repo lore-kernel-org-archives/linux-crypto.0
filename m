@@ -1,84 +1,79 @@
-Received: from abb.hmeau.com (unknown [180.181.231.80])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AE921421E;
-	Wed, 16 Jul 2025 22:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C45BEEC3;
+	Thu, 17 Jul 2025 01:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752706633; cv=none; b=StF2btz63agGy3J1ZCAn5y0MS8yddemY5tc2989K2TizjqJi17/IbU6U8xoKsxt6DC7fdhtodd1usfQ9TS5f06kn2CT2Dhh9xT38GaMGXKkly8BXMFs0jQVvMu3wzIHprqZ3JQAPvylDrDEC5BuA0rjh0JUJEy/NEukRPwkNSt8=
+	t=1752714932; cv=none; b=Qx75vEUkol3zDyZTB4iWf0lt/SUc78n+QaEDzaP17OgWJs5MyoJ5a6QdpGTUUP8rBAkSZZ5MqI1IXBMJaRjDDVjXH00nOXuTa63eh72xFjyFUuj0dc9sHDrEorD2QUlRmMXiHRk2ZE1ldpkQIoUC9qod/YvhoOHJ739H81EIcpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752706633; c=relaxed/simple;
-	bh=bfwtNLp5rri6UcyOSN5k7Puad1C6ABbv6kQt5HDC5/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HigJ2Vvi2d4YjEIlB+dW7Q3BPWrlkvGUuPK0nw+/eq00yOM9WCMa1woABf3D4WMy1artwtnpkChjIDyoPYg6aplm+TXelk1ESFpBfwxZTZetZgnamHE+6Psiz2wadvQ7gMzfrkMz13GuByzLXYDhXNb1YSCxHHyPqiHStIGS9q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dB+kWm+O; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dB+kWm+O"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=uZhUZJT3jmv5S3FDIUNtwbnHtugp9v+/3Itp8z/2hRA=; b=dB+kWm+OR2FLpOB3RgYbWwD+W4
-	0pdtKjURKJQPW4glHCmsoj5mQPVQy0vFaHlTflzitR7tvHOAvj8X6qtBRHamOyclMKP4jEXiKbEGM
-	AL7KQM8YhF0mvHUR7ct9Ls+0cu/sB/NQhrTEn8J6rALHrA3ISmlzQVkFJug3SBjBOpxUs56QTcnnB
-	nDXeLMPQIx55KQ7xpi7jCM08cOlPpFhdWgn+YVthcWpl0BquyBZqr0S30aFQty9zJb+eEiN3P0P3i
-	2TkHWcbM5jI8Jh/jQNWNTfl9MO12D3+d8unAdeVndcVVLwmPPPDFEYMCGVPViLf7a8Sr1FKvENkUZ
-	q/xC4yJQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ucAMY-007a3S-0X;
-	Thu, 17 Jul 2025 06:28:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Jul 2025 08:28:26 +1000
-Date: Thu, 17 Jul 2025 08:28:26 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Botcha, Mounika" <Mounika.Botcha@amd.com>,
-	"Savitala, Sarat Chand" <sarat.chand.savitala@amd.com>,
-	"Dhanawade, Mohan" <mohan.dhanawade@amd.com>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 3/3] crypto: drbg: Export CTR DRBG DF functions
-Message-ID: <aHgnilxOJxEddVr6@gondor.apana.org.au>
-References: <20250612052542.2591773-1-h.jain@amd.com>
- <20250612052542.2591773-4-h.jain@amd.com>
- <aGs8N675Fe9svGTD@gondor.apana.org.au>
- <DS0PR12MB9345C8F5A728830DD9ABB1E19754A@DS0PR12MB9345.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1752714932; c=relaxed/simple;
+	bh=hwNu+Tc53BHl2STWvfbeP6nnn8E6XstSyVDZQckXpfQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Oz85TWP3heOtwSr0YqLdSDhICMRpFrftzWxGTsjUidRLrXRXzp1GEJp1ZFHQSk03qlpzmjefEkx3UKwR3o3q3E2HRR6HCNj7Tji1m5kAmrpyrrM8ZvuX8WVQz6b6ya52uToaqjI5f+NMeVfqzPIxGtyvaJRpzA4vBtAnR/ByeUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bjFM150gNztSZP;
+	Thu, 17 Jul 2025 09:14:21 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id D55CE140132;
+	Thu, 17 Jul 2025 09:15:26 +0800 (CST)
+Received: from huawei.com (10.50.165.33) by dggpemf500015.china.huawei.com
+ (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 17 Jul
+ 2025 09:15:26 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
+	<liulongfang@huawei.com>
+Subject: [PATCH v6 0/3] update live migration configuration region
+Date: Thu, 17 Jul 2025 09:14:59 +0800
+Message-ID: <20250717011502.16050-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.24.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR12MB9345C8F5A728830DD9ABB1E19754A@DS0PR12MB9345.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On Mon, Jul 14, 2025 at 06:05:29AM +0000, Jain, Harsh (AECG-SSW) wrote:
->
-> There is hkdf.c and kdf_sp800108.c module, Both implements different NIST Specifications and DRBG derivative function represents different NIST Specification.
-> Moving it to hkdf.c may not be a best fit. How about adding new module for " crypto_drbg_ctr_df ()"?
+On the new hardware platform, the configuration register space
+of the live migration function is set on the PF, while on the
+old platform, this part is placed on the VF.
 
-A new module is fine.
+Change v5 -> v6
+	Update VF device properties
 
-> > You should also keep the drbg changes to a minimum.
-> 
-> drbg_ctr_df() needs tfm, blocklen, statelen which is currently derived from struct drbg_state.
-> If I updated structure drbg_state, It needs code changes in HMAC as well.
-> To keep code changes minimum, I added required inputs as function arguments.
-> Do you have any other idea in mind?
+Change v4 -> v5
+	Remove BAR length alignment
 
-The existing drbg_ctr_df should become a wrapper around the new
-df function and all changes should be localised to it.
+Change v3 -> v4
+	Rebase on kernel 6.15
 
-Cheers,
+Change v2 -> v3
+	Put the changes of Pre_Copy into another bugfix patchset.
+
+Change v1 -> v2
+	Delete the vf_qm_state read operation in Pre_Copy
+
+Longfang Liu (3):
+  migration: update BAR space size
+  migration: qm updates BAR configuration
+  migration: adapt to new migration configuration
+
+ drivers/crypto/hisilicon/qm.c                 |  29 +++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 200 ++++++++++++------
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+ 3 files changed, 174 insertions(+), 62 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.24.0
+
