@@ -1,195 +1,265 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AA11E1DE9
-	for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 10:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224CD2BDC2C
+	for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 12:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752747341; cv=none; b=ULnQ4t6pHzROAaUyguLHOvZRnsXPxD09wbCGvS6OTMACobCIC86/R2me85TdiG86jrnA/sFNCUka9Hf1oJxeURSf9SLmPzPOeoNWHGgeu81l99/FDrA7pK9p/nSTZRoJmTAAW8NRJYovdwKFikWIP75SrfoaAxhm9skYSA4GZ2Y=
+	t=1752755223; cv=none; b=UWqKcEG+CJXUJ8V4P9tAl9oBSpTsD1ATA1CaNOLYp4GuOiAJlLn8rcMKWgHqiN0lfy7fLvkrpLhf5lVS/lZp78CvVfAZBW1m3yk4w+limXP4zxPjUdpNx+UcTPVSNvRMqi1HRLa1uWEnJDLiBg/cIOga5w0HToV9wc7nHWu99OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752747341; c=relaxed/simple;
-	bh=Kc2TiflgLD8XqwFilb4h7Wvy43ym10UjTuvpKR/YsOY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dSwxHyAK4sYMYI+pVezOMdxdojtKDTMfiCOtG63Vih2lQcvES5AiTRHw9qjQusc6F2vC8IgJAoj1QhvaOcgn5q8ZfK28gthtwdGg3mUhM60fTiqSn+zaIaRZejDc8AUuR4sOn7kS2pg011OWqXV3sD/mWwKp1MVNjO3CkPkZs40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddbfe1fc8fso16556645ab.2
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 03:15:39 -0700 (PDT)
+	s=arc-20240116; t=1752755223; c=relaxed/simple;
+	bh=k1AU9RHb0Kl7CzIBQsz15cpKEvQJw6GvReja3qw8EDQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JWeroR+wY6+3PV1BfZqJsToWu7DDW4YN2tgsqvfLvV5MMYp7QUXVoRwMdTHY5YJd1Vgb7+/8U3NEjqzNgNpeWoOUebtCYxfeIVo1AJdai/52eq8vIiKNGxPbMugwCSt5EQtxmELiJvxY0VFONY4v4iLTPRtjP6nvcJQa1aNH0Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TE25JG2V; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="TE25JG2V"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56HBsIWZ015650
+	for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 12:26:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	IbmcROfOzVtWLlLwTUK701q3d6gz5yN28T/mfJ33MIw=; b=TE25JG2VN6qQdbFI
+	+EPMUOzIJpT9ZbN4ZIkZATeVvy4GwUPV5dCscItU/HZvCgO6zt8HQRfg2IkbcAT+
+	/bRkQgCwvhtEQkpUQScqWrWuB+LunPUpfuPEa9/YyBRJ5RWfX3dru0yV6Ck8UISD
+	QAoil+qyBsfyp0uBtBYRio7QFWo2/NrN7YMfHYntO4dGtjiBDS77+iZmAJKB8y6e
+	YY5aSsLonYn4nSw5GocPrVGB5jgSgad6gzeOGzIhTJX9yDqeuCq7Bma8SyfEsfks
+	Qfhx/IiDic3dsw1TEgmCJWQ8dpS53t20P6vudUZXZ9KFyP8FslENwvzt4Q2JV/IZ
+	SmDm4g==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5dytjjy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 12:26:59 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f539358795so3308556d6.3
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2025 05:26:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752747338; x=1753352138;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jwf4VoVCorBa5FpP7xdG1geXYjAyuoZokukQ+KjAL6Y=;
-        b=tzyGg5z6zsj1Ajx8jNWl92HFMgIPttFCt6PlN7QCWk5drhnef4qNrOFB7/Q1NbUZy4
-         nEgrd+qWrmWaPXDymmEEPaB+TUPCndHMUXG9x65X1UqOTBdOXSUhZH2rJLWXQvPT1A1d
-         LcKyIkE/ACMMsb1OvQT9Jb8DGLLDuiKoCwFxNRTfRHT7sFSgV2+aEkcKCFRGNhhIXSOa
-         2BoN2eXIjv5DuX6un/CpgvCSSKA+06Lwb2N673Hy15fdr9lUuRtdTX3AtZvpxR9LsoyV
-         l0qZgfEuyfnrwkE9mL9hT2L5eXPMisNqCCi6HyJTuCc6tMLeDK6LGQhd5jmH9rZhKXqK
-         UXzA==
-X-Forwarded-Encrypted: i=1; AJvYcCV88d7mmTEClyUG3qDt226rMulkjmTeUN620PkEezu5zTv9DuIjcD4nAFm5vJNu4yUNLZW+59AbgFpuw6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoVfqFgd6jZkysSa5849PpcnKqgKWAQFqfC5tNdHXeT4fJ/sWe
-	qPMOCGw+HUxtuHvbar2NHkqMOr0lBbNjp1Ho4uhmX3E8Ic9l86WacuLBsFq8lueJ2Ry9fWW6+Lx
-	orPv2W7w27lMl/HSXIWS4j2I0B5U8yT5d88DR8EqB4XpkN4EQZBFpFTyOnNQ=
-X-Google-Smtp-Source: AGHT+IFNF3LWrTamx8JPdOfhsYOFMQ83W3eg3F+nRozTOHBTiXIwVSVwi+Sy+8nc2ALbQwmhKr9sh9NXhcNglon3qck5mOSVh2IA
+        d=1e100.net; s=20230601; t=1752755218; x=1753360018;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IbmcROfOzVtWLlLwTUK701q3d6gz5yN28T/mfJ33MIw=;
+        b=usdRGosX5sa5eSjlkC3lR86ivnxmHnf/Fj1HVNfHr/yIQVpqXBmvj1HTxDKN1c8Vb8
+         2aS1lIZhpVVN24BbAB6eWKbcgaVAv6+5zkXLlE4X26/rtzz4HARm2Ef7RUpC/0c5G8FH
+         l+mZJU7aeuwdasHbLqKunTQDCYZnDl/tnUQbHS0YBvq68JBW3yL3dZTct7eK2MCiQA9U
+         poZCtCWCKTmanNjv+mnxt8w7Go8S/gzgVdJekslz2lkWtLZw0kxiEAIFT43CdoXrCdC+
+         yl8273xMLOP3TpvfwvZTBFfvnufbMObg/pSc5+I9GsXwnvkNYVdXrdJIhVPl9VvrJ/Tu
+         f8rw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrhQk9uno/US/5+gS8WQLsRTk+jdaYrUrcemm1B4UFQoMwrr3xlfpsT24ZEMlsUgRp6t13uiP7d4ejhBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+Hs2SPmgOKAIyWRg2CH0FRg7wI31p5T0LhH3pMz/blLlwu0vf
+	SnJfcf07fGwpM/PIV19wBm3QVQqmNaNVE3AIVEo1W7X0CbmRSHw9y4afqiUcNHOkk/IJgY/DEet
+	9WgWzyWTWyOv/oeSw303EtmxXdBkKgokctFWTiawORZEKmx9Fzjj9kyp3Qe26lmoqw5Y=
+X-Gm-Gg: ASbGncu8inOpn4RS2Qq8AeJ8pRdVzYz8qUSmxp0SbsssWYsPAK8zf7iIV27IXTxPiDz
+	7/KvwbCjqBTYCEct93U8tR1PjB5dBwxkFEOqgAMsL7TjhbjkT420A58jc06cl1/loYW0saZFRLy
+	DeCfbQlQlEaiRX37ug4VYUk4Hul2xUS2emACs0ZtZKH2ZpKcrbNneJLO0Uvyl0POxyKpIfjggoR
+	p7tGHxZAHgalWxQyrD39X1XpVy4zL7O56SqmNpC7Me7IdnSzxijhnog3dFa1iGevYyL0z4NJX7K
+	r3//ml0g6BzaRqZf3E+Z/JTQPXAWMR5OtYuAN5stZzFgE6QQ4HiDaxUI1UG+Ghhso4vcFc3wEVM
+	gDqzK1wzk1LKtv2wjCeoJ
+X-Received: by 2002:a05:620a:4093:b0:7e3:302a:3e9d with SMTP id af79cd13be357-7e342ad54e7mr401314585a.7.1752755217799;
+        Thu, 17 Jul 2025 05:26:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWMwBx+PyOHxTxgnaS5xzRvQae4iwC7dd8Cj0Sms6zoxQGp+IkrMAc/iJ+gLrK8J7XJbyIqA==
+X-Received: by 2002:a05:620a:4093:b0:7e3:302a:3e9d with SMTP id af79cd13be357-7e342ad54e7mr401311985a.7.1752755217290;
+        Thu, 17 Jul 2025 05:26:57 -0700 (PDT)
+Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e7ee8d9fsm1336084466b.46.2025.07.17.05.26.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jul 2025 05:26:56 -0700 (PDT)
+Message-ID: <d25c3f81-38c3-4559-a1e6-7b586c817d57@oss.qualcomm.com>
+Date: Thu, 17 Jul 2025 14:26:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:471a:b0:3df:154d:aa5b with SMTP id
- e9e14a558f8ab-3e2823a6c2amr71719005ab.5.1752747337872; Thu, 17 Jul 2025
- 03:15:37 -0700 (PDT)
-Date: Thu, 17 Jul 2025 03:15:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
-Subject: [syzbot] [crypto?] BUG: unable to handle kernel paging request in ieee80211_wep_encrypt
-From: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>
-To: ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, 
-	ebiggers@kernel.org, hpa@zytor.com, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 14/15] arm64: dts: qcom: Add initial Milos dtsi
+To: Luca Weiss <luca.weiss@fairphone.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Vinod Koul <vkoul@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Robert Marko <robimarko@gmail.com>,
+        Das Srinagesh <quic_gurus@quicinc.com>,
+        Thomas Gleixner
+ <tglx@linutronix.de>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+References: <20250713-sm7635-fp6-initial-v2-0-e8f9a789505b@fairphone.com>
+ <20250713-sm7635-fp6-initial-v2-14-e8f9a789505b@fairphone.com>
+ <3e0299ad-766a-4876-912e-438fe2cc856d@oss.qualcomm.com>
+ <DBE6TK1KDOTP.IIT72I1LUN5M@fairphone.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <DBE6TK1KDOTP.IIT72I1LUN5M@fairphone.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: vDdQq5jCZZ0oJhv1B59jskA5zdnWP_Dn
+X-Authority-Analysis: v=2.4 cv=RtXFLDmK c=1 sm=1 tr=0 ts=6878ec13 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=7CQSdrXTAAAA:8 a=6H0WHjuAAAAA:8
+ a=iHGpd6SFZaqAm2lpoLIA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
+ a=a-qgeE7W1pNrGK8U0ZQC:22 a=Soq9LBFxuPC4vsCAQt-j:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDEwOSBTYWx0ZWRfX1l9shB6yeLsh
+ +MRyQUl9Wu1yRp6i2ERZFBs0lSk4kDhxbnW8H5TYFnt+AsnbJd9uGyAaUgGmcHhjHMW+PKQd7PP
+ 72AxPuQYNui9Bzk+lEc83R4vFmuEfDZvLWW2FZiIDDuCMKrRa0Zj62k+369n4QPlbaEQVD/rotK
+ MED8i5xMzhmo99NvUIIg7OBFjUO5+OhIvOPvoe+iV60pObAtG8Rm85Bm2EO80bS0M7hhKTiWS4B
+ yVnuA5/QCh8bPm/iMQwQLRJBLN7U1V1EjVIFUvcGv6Hh2vxpkTKdfv1h7wwtNUP9O+uE3gMbFO6
+ cjzEMZZfnxRv07iTf4J+yZGpsN8C3kWbK7qiWt0xuEMBfVPw6V+qr3whqto1TeoncnS3Q0gbcwO
+ bmrAvN/VsdPRdfqzvA1v7M3ElHzv1vTtq/5qreRVjEM3NaGcNyGEn80FnqMsnEWhuOREqMAo
+X-Proofpoint-GUID: vDdQq5jCZZ0oJhv1B59jskA5zdnWP_Dn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-17_01,2025-07-17_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 mlxscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
+ priorityscore=1501 phishscore=0 spamscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507170109
 
-Hello,
+On 7/17/25 10:29 AM, Luca Weiss wrote:
+> On Mon Jul 14, 2025 at 1:06 PM CEST, Konrad Dybcio wrote:
+>> On 7/13/25 10:05 AM, Luca Weiss wrote:
+>>> Add a devicetree description for the Milos SoC, which is for example
+>>> Snapdragon 7s Gen 3 (SM7635).
+>>>
+>>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+>>> ---
 
-syzbot found the following issue on:
+[...]
 
-HEAD commit:    5e28d5a3f774 net/sched: sch_qfq: Fix race condition on qfq..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=146550f0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
-dashboard link: https://syzkaller.appspot.com/bug?extid=d1008c24929007591b6b
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+>>
+>> [...]
+>>
+>>> +		cpu-map {
+>>> +			cluster0 {
+>>> +				core0 {
+>>> +					cpu = <&cpu0>;
+>>> +				};
+>>> +
+>>> +				core1 {
+>>> +					cpu = <&cpu1>;
+>>> +				};
+>>> +
+>>> +				core2 {
+>>> +					cpu = <&cpu2>;
+>>> +				};
+>>> +
+>>> +				core3 {
+>>> +					cpu = <&cpu3>;
+>>> +				};
+>>> +			};
+>>> +
+>>> +			cluster1 {
+>>> +				core0 {
+>>> +					cpu = <&cpu4>;
+>>> +				};
+>>> +
+>>> +				core1 {
+>>> +					cpu = <&cpu5>;
+>>> +				};
+>>> +
+>>> +				core2 {
+>>> +					cpu = <&cpu6>;
+>>> +				};
+>>> +			};
+>>> +
+>>> +			cluster2 {
+>>> +				core0 {
+>>> +					cpu = <&cpu7>;
+>>> +				};
+>>> +			};
+>>> +		};
+>>
+>> I'm getting mixed information about the core topology.. 
+>>
+>> What does dmesg say wrt this line?
+>>
+>> CPU%u: Booted secondary processor 0x%010lx [0x%08x]\n
+> 
+> [    0.003570] CPU1: Booted secondary processor 0x0000000100 [0x410fd801]
+> [    0.004738] CPU2: Booted secondary processor 0x0000000200 [0x410fd801]
+> [    0.005783] CPU3: Booted secondary processor 0x0000000300 [0x410fd801]
+> [    0.007206] CPU4: Booted secondary processor 0x0000000400 [0x410fd811]
+> [    0.008206] CPU5: Booted secondary processor 0x0000000500 [0x410fd811]
+> [    0.009073] CPU6: Booted secondary processor 0x0000000600 [0x410fd811]
+> [    0.010406] CPU7: Booted secondary processor 0x0000000700 [0x410fd811]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Okay, so the cache topology that I can make out of docs matches your dt..
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/897daa1d604c/disk-5e28d5a3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0d5527eee75d/vmlinux-5e28d5a3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/31ee968efcd7/bzImage-5e28d5a3.xz
+As for the CPU map, we tended to simply throw all cores that are in
+the same "DSU cluster" [1] together, represented as a single CPU cluster.
+This is not what other vendors do though, it seems. And downstream has
+the same silver/gold/prime split as you did above.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com
+Looking at some docs, it seems like the prime core shares the cache
+bridge with the gold cluster so I'm not sure how separate it really is.
 
-BUG: unable to handle page fault for address: ffff8880bfffd000
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 1a201067 P4D 1a201067 PUD 23ffff067 PMD 23fffe067 PTE 0
-Oops: Oops: 0000 [#1] SMP KASAN PTI
-CPU: 1 UID: 0 PID: 8097 Comm: syz.1.594 Not tainted 6.16.0-rc5-syzkaller-00183-g5e28d5a3f774 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
-Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
-RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
-RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
-RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
-RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
-R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
-R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
-FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
- crc32_le include/linux/crc32.h:18 [inline]
- ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
- ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
- wep_encrypt_skb net/mac80211/wep.c:277 [inline]
- ieee80211_crypto_wep_encrypt+0x1f6/0x320 net/mac80211/wep.c:300
- invoke_tx_handlers_late+0x1145/0x1820 net/mac80211/tx.c:1846
- ieee80211_tx_dequeue+0x3068/0x4340 net/mac80211/tx.c:3916
- wake_tx_push_queue net/mac80211/util.c:294 [inline]
- ieee80211_handle_wake_tx_queue+0x125/0x2a0 net/mac80211/util.c:315
- drv_wake_tx_queue net/mac80211/driver-ops.h:1367 [inline]
- schedule_and_wake_txq net/mac80211/driver-ops.h:1374 [inline]
- ieee80211_queue_skb+0x19e8/0x2180 net/mac80211/tx.c:1648
- ieee80211_tx+0x297/0x420 net/mac80211/tx.c:1951
- __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6103
- ieee80211_tx_skb_tid+0x266/0x420 net/mac80211/tx.c:6131
- ieee80211_mgmt_tx+0x1c25/0x21d0 net/mac80211/offchannel.c:1023
- rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
- cfg80211_mlme_mgmt_tx+0x7f2/0x1620 net/wireless/mlme.c:938
- nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4778d8e929
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f4779be3038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f4778fb6080 RCX: 00007f4778d8e929
-RDX: 0000000024008080 RSI: 0000200000000c00 RDI: 0000000000000005
-RBP: 00007f4778e10b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f4778fb6080 R15: 00007ffff7e551c8
- </TASK>
-Modules linked in:
-CR2: ffff8880bfffd000
----[ end trace 0000000000000000 ]---
-RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
-Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
-RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
-RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
-RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
-RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
-R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
-R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
-FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	3a 44 c7 11          	cmp    0x11(%rdi,%rax,8),%al
-   4:	66 0f ef ec          	pxor   %xmm4,%xmm5
-   8:	66 0f ef c5          	pxor   %xmm5,%xmm0
-   c:	f3 0f 6f 66 10       	movdqu 0x10(%rsi),%xmm4
-  11:	66 0f 6f e9          	movdqa %xmm1,%xmm5
-  15:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
-  1b:	66 0f 3a 44 cf 11    	pclmulhqhqdq %xmm7,%xmm1
-  21:	66 0f ef ec          	pxor   %xmm4,%xmm5
-  25:	66 0f ef cd          	pxor   %xmm5,%xmm1
-* 29:	f3 0f 6f 66 20       	movdqu 0x20(%rsi),%xmm4 <-- trapping instruction
-  2e:	66 0f 6f ea          	movdqa %xmm2,%xmm5
-  32:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
-  38:	66 0f 3a 44 d7 11    	pclmulhqhqdq %xmm7,%xmm2
-  3e:	66                   	data16
+There was a time when the MIDR_EL1 register would be more helpful, but
+according to [2], it would mean that each core is in its own cluster..
+For reference exynos2200.dtsi seems to have the very same MPIDRs (though
+with cores that are a little older). One would expect the small cores
+that share the L2 to be within the same cluster [3].
 
+All in all, I don't know what to tell you for sure..
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+[1] https://developer.arm.com/documentation/100453/0401/Technical-overview/Components?lang=en
+[2] https://developer.arm.com/documentation/102517/0004/AArch64-registers/AArch64-Identification-registers-summary/MPIDR-EL1--Multiprocessor-Affinity-Register?lang=en
+[3] https://developer.arm.com/documentation/102517/0004/The-Cortex-A520--core/Cortex-A520--core-configuration-options?lang=en
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+[...]
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+>> Does access control disallow accessing these on your prod-fused
+>> device?
+> 
+> Hm, taking another look, this property should probably be moved to
+> device dts.
+> 
+> Downstream has this in volcano.dtsi but volcano6i.dtsi (QCM6690?) and
+> volcano6ip.dtsi (QCS6690?) have a /delete-property/ for this, because
+> they have PCIe available.
+> 
+> I don't think this has anything to do with secure boot fuses, but I
+> don't think I have tried enabling these clocks on my SB-off prototype.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+I wouldn't be so sure about sb-off being necessarily a difference, but
+I wouldn't object to a smoke test either ;)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+[...]
 
-If you want to undo deduplication, reply with:
-#syz undup
+>>> +			interrupts = <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH>,
+>>
+>> pdc 26
+> 
+> You mean replace <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH> with
+> <&pdc 26 IRQ_TYPE_LEVEL_HIGH> (plus interrupts-extended)?
+
+Yes
+
+> I assume you got this from internal docs, but just to mention,
+> volcano-thermal.dtsi contains GIC_SPI 506 (+ 507 for tsens1).
+
+Right, I found it in the docs (but we most likely want the device to
+wake up from sleep and try to power off if it's too hot/cold)
+
+Konrad
