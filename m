@@ -1,123 +1,82 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290382DCF73
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Jul 2025 15:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59EA26ADD;
+	Fri, 18 Jul 2025 15:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752852805; cv=none; b=hQL+qN1oXyfPosgnNQhhWIL/VQ4H1uX1vZBffuUk9WjWam63NgxgvYdYq4eUNfuAS2UjiAWgcj18tGIKxdmCbMJKHrs1kyKLEliUc/qwHcZsRBm4498f1/YLcvsceQE4pYqeqFWGC52VE5Lf7rZSoS1Y/vR0/tOF1X3w7GgM1as=
+	t=1752854260; cv=none; b=d/Ltm/BsZGwyFPZy0qRV/uwUpCy0nzKnWOJrGHHCsihl04UpijAos6/XTPjqO4Ogz7UJHgy3z3aJGvhCw6uZLr/YAxcLAckl39sAALZGcu7TNieP/3+7DG+7M5mIk/UAtXDQfAXa2bT32GkXAkPo+Q0eGLmEq+KUQ27nqrINVDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752852805; c=relaxed/simple;
-	bh=geRwiammgshPEkZTEfrGjM87emalk67t+A5KtRwbf2w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HC9BslXjBf/tPWzVz0pi4HkyGCL646Abfk8avGUNa6xOyLtch/zwk08SqsOMlv7RKXTwT993YkcTHylStGq9IwV1qazUTLQV37HzptL9Et55Z1IrzN6FS30UglYco2qjepJfQNEfqOyK/w737VNz4npBgFz/lqD8x/LFv33Lmy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I2piDDsa; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1752854260; c=relaxed/simple;
+	bh=LHLqqJFovhgxSpklvL5XVrRNk8HTcb+MZcN/GxLQd6s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fYwev+9B0UA1LQ3W7UVgfccJXErWGWx5MiHdbVhGIsZVmWApCpk01if08LgNyIRMRirV5CX0VDe9xm6r/GheRzhb9vKZ2rRUkiltopNZUFptIEkNl0fRF/j9TImWobqy4lXP2MY5EuTvZleO2ruu5oHW5lwF4gNJqEpp8TvVqBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=b2Wv6gID; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I2piDDsa"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-315af08594fso2214174a91.2
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Jul 2025 08:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752852803; x=1753457603; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5YSpj+1IV44+FVqvcifw9o0LIVQ8kEqDMxNOHmhaNXw=;
-        b=I2piDDsa4spSBus4uCh4wAsogVuhyjMfbnvbaaMFUzLRgyuRS+0BoJEVq/tvo9zL5i
-         YlITNYZyJnp0sl+MaYVaYKOZylkaspO+t1Cf1aYtCV855lGnHWSHBm0V6Dc5GJVl8aV5
-         q5K2yFsa7CBkj4WhMZwpGBAaVJCx2yipBfv1MFVeoIg8vNV5XQOJjZsXHgSxrKuhIoOl
-         XL7/89X7IPL/Q3Qex+vEf4oy846C+CGBU/P7Jfb49cgm0rdUxPA1vwV6vJtAY8F6yG+D
-         qKwpt27TMaZjznooL2me/sA3GWF7XR+bUGRisjn4Hb4d3GJ7CYzkgm1dQXmcs8/Tp7OP
-         JBaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752852803; x=1753457603;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5YSpj+1IV44+FVqvcifw9o0LIVQ8kEqDMxNOHmhaNXw=;
-        b=wuNDr9dLTzH36wMD3WliI4sBMaBUsNPbmO/uK5RXfQnsPlF+eniTdlJGJEQvxBKt3B
-         e/u59OS71qwMGaQ1WVX6X1jLRyenaV32GHDlV94lgTRiaM72cZ7CytaNsgBqoa3stH8V
-         nbbhwh0uwtsmoDOLGRNsL4GcrevyO37HJQUxXIhcShEt2CrDsGVo1BsFeLl8h9iUtKwK
-         QtlzHlVlC9EiKQ40RgvNsPpbAOR6fnoxCK5sUm1GuxNweJAt4cxMG7DQxPOUByVOFIGS
-         lSjYxD8kD5t/Kh43bKq062NYyHha+s9qHNefZcqBuIBnwBLiK4hfDB2TSVm+1TUTQ4Zj
-         F+pw==
-X-Gm-Message-State: AOJu0Ywbdi9oFw/jORgfAAmmcshuhgO+QH21sXX0SGnoczuPQStv0SWL
-	Vaxqh2c1wAL5qSArncbopNS7oQPGwvexcVTbmgIMB2kDjYh3eAbuUgpZAercJICqdIINsHExmCm
-	RStoYsw==
-X-Google-Smtp-Source: AGHT+IEucQrf6BnU8TPUHyXRYZd0lenwR3GNHW7YqoEv+LTUasMyddo4Blp0+FuBeMJX3DZ+HCVXGBvFB+4=
-X-Received: from pjbsn8.prod.google.com ([2002:a17:90b:2e88:b0:311:6040:2c7a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2ec7:b0:311:ef19:824d
- with SMTP id 98e67ed59e1d1-31c9f435537mr15265871a91.2.1752852803229; Fri, 18
- Jul 2025 08:33:23 -0700 (PDT)
-Date: Fri, 18 Jul 2025 08:33:21 -0700
-In-Reply-To: <c502a550-3856-4c21-8546-b4b1abbd0abf@amd.com>
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="b2Wv6gID"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=SulPe+WYKJoxLSlyxNtx26YPColW+wIyanOtCwJbKL8=;
+	t=1752854258; x=1754063858; b=b2Wv6gID4qx47/Ra62pddlMHvZIShPIjavkQuMNjQEMNgD5
+	/Ex43RsUFS+SodbCgD3nx29U1jDKV1Hk2aXMFKaV2v6C+y4/jg448OFq+u7tplKoFaw1dWlxbnvW2
+	luq3qouoegRSAoDOmmpqHyx97tvZaq+U9bOf1PcBsnCMB5jziLMB7pnI4tNUrSu0/Q+wegmFKi1QG
+	C9CEVRc5JDqDWt2fiQW0MJIapu4GihkEhEAX46R+Mg2W/SeJjLy/eVlFKuXyie1900wtOxW1JzLAR
+	U99JHV7WE9rf+Zn3f+fENTQW2MKV5g1f7o5FyQT9yKvWm2/M7f8PBCFO/RnA+aSg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1ucnSi-0000000CwCr-1R0U;
+	Fri, 18 Jul 2025 17:57:28 +0200
+Message-ID: <2d1a41aa000c8de8f82827bd8c06459e01f10423.camel@sipsolutions.net>
+Subject: Re: [syzbot] [wireless] BUG: unable to handle kernel paging request
+ in ieee80211_wep_encrypt
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Biggers <ebiggers@kernel.org>, linux-wireless@vger.kernel.org
+Cc: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>, 
+	ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mingo@redhat.com, 	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ tglx@linutronix.de, 	x86@kernel.org
+Date: Fri, 18 Jul 2025 17:57:27 +0200
+In-Reply-To: <20250718145049.GA1574@quark>
+References: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
+	 <20250718145049.GA1574@quark>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250630202319.56331-1-prsampat@amd.com> <20250630202319.56331-2-prsampat@amd.com>
- <aG0jxWk1eor1A_Gd@google.com> <a5dbf066-a999-42d4-8d0f-6dae66ef0b98@amd.com>
- <aHBCosztx8QWC4G0@google.com> <c502a550-3856-4c21-8546-b4b1abbd0abf@amd.com>
-Message-ID: <aHppQWM5TKPD7JpD@google.com>
-Subject: Re: [PATCH 1/1] crypto: ccp - Add the SNP_VERIFY_MITIGATION command
-From: Sean Christopherson <seanjc@google.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, bp@alien8.de, michael.roth@amd.com, aik@amd.com, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-malware-bazaar: not-scanned
 
-On Wed, Jul 16, 2025, Pratik R. Sampat wrote:
-> 
-> 
-> On 7/10/25 5:45 PM, Sean Christopherson wrote:
-> > On Wed, Jul 09, 2025, Pratik R. Sampat wrote:
-> >> Hi Sean,
-> >>
-> >> On 7/8/25 8:57 AM, Sean Christopherson wrote:
-> >>> On Mon, Jun 30, 2025, Pratik R. Sampat wrote:
-> >>>> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
-> >>>> can be used to query the status of currently supported vulnerability
-> >>>> mitigations and to initiate mitigations within the firmware.
-> >>>>
-> >>>> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
-> >>>> more details.
-> >>>
-> >>> Nothing here explains why this needs to be exposed directly to userspace.
-> >>
-> >> The general idea is that not all mitigations may/can be applied
-> >> immediately, for ex: some mitigations may require all the guest to be
-> >> shutdown before they can be applied. So a host userspace interface to
-> >> query+apply mitigations can be useful for that coordination before
-> >> attempting to apply the mitigation.
-> > 
-> > But why expose ioctls to effectively give userspace direct access to firmware?
-> > E.g. why not configure firmware mitigations via the kernel's upcoming
-> > Attack Vector Controls.
-> > 
-> > https://lore.kernel.org/all/20250707183316.1349127-1-david.kaplan@amd.com
-> 
-> Something like Attack Vector Controls may not work in our case, since
-> those are designed to protect the kernel from userspace and guests,
-> whereas SEV firmware mitigations are focused on protecting guests from
-> the hypervisor. Additionally, Attack Vector Controls are managed via
-> boot command-line parameters, but maybe we could potentially change
-> that by introducing RW interfaces for our case within
-> /sys/devices/system/cpu/vector_vulnerabilities (or what the final form
-> of this interface ends up being).
-> 
-> Another option could be to expose this functionality in a subdirectory
-> under /sys/firmware/?
-> 
-> However, with any of these approaches, we would still be giving
-> userspace the ability to access and alter the firmware, similar to
-> the interfaces that expose features such as Download Firmware EX
-> also allow, right?
+On Fri, 2025-07-18 at 07:50 -0700, Eric Biggers wrote:
+> >=20
+> > BUG: unable to handle page fault for address: ffff8880bfffd000
+[...]
+> > Call Trace:
+> >  <TASK>
+> >  crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
+> >  crc32_le include/linux/crc32.h:18 [inline]
+> >  ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
+> >  ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
+[...]
+> >  nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
+>=20
+> syzbot assigned this to the "crypto" subsystem.  However, the crash
+> happened in crc32_le() which is not part of the crypto subsystem.  Also,
+> crc32_le() is well-tested (e.g. by crc_kunit), and the bug is unlikely
+> to be there.  Rather, the calling code in ieee80211_wep_encrypt_data()
+> is passing an invalid data buffer to crc32_le().  So let's do:
 
-Not all userspace is created equal, e.g. init_ex_path is a module param, and
-(un)loading modules requires CAP_SYS_MODULE.  The expected/desired use cases also
-matter, e.g. if there's no use case for toggling mitigations after initial setup,
-then the interface presented to userspace could likely be much different than if
-there's a "need" to make mitigations fully runtime configurable.
+Agree, that makes sense, looks like we never check the frame length
+correctly. Since there's no reproducer (yet) I guess we won't be testing
+against it with syzbot though :)
+
+johannes
