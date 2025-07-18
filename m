@@ -1,94 +1,79 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480D12EAE3;
-	Fri, 18 Jul 2025 10:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC12249F9
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Jul 2025 10:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752836375; cv=none; b=Xz2ivfncc4ap5bLDC6bKnY0WSYCC2ivSbY6fPwrno6N5vOFf/Fx8iNJTeZ4SBJx+TfH8cuPPVnKH1S29ZRYyQNGJblYbzl6ls8JnGAcVcApeQXCsgBlRSdeMsuWt376Zyej45Dgf/BS3j43FebHpjsHp+XFwJV5hscDZBmTI9Pk=
+	t=1752836380; cv=none; b=hHg0JGiQtWOh+l5uh8AosCx9MgHuGWZR5bvLf+thPUaWfQeZF0qymt91wxMKRA75hG4Nw4wKI1HQnBMSuk8P4r/G5dpMDxtrhN0sJ2dUVw4qzjYe/3MaTOHIaLYC+algMLY71HxB52QtSjo/hV5foYFeM06XhJdRweJ77BvfpvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752836375; c=relaxed/simple;
-	bh=6ktc/3FSkqoCokBOcKM439kKpoMqoxB/l7mvYMJLEuo=;
+	s=arc-20240116; t=1752836380; c=relaxed/simple;
+	bh=160yC/iG6Fn/YHjE0/g00NZdRiROLH6U1vEOKJ1a830=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=riaOHrT8sE71dp63RAKlpVzPzL/ZXFOvY9LNBHV8okG6b6hIwhH4+OtIpdSOaRBqQQsn8V94fQxOiyGactFXsVpuBexFwULg6tyaJC5rM4nRRzEsPYnebofiiJkXa3zfDte2xgGoiwQYNytP+I0HkSq7RshpSuve4hjt3oyAJeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HEAgY0Rl; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=nyihIgwlTjRHB31CbcsxqCwPMzr3rArlz1Z01ts7+FAG8bGg04aJdNWZ5g6TH4Pcclw7CgEhgDd3SC+xG5UNA4EC8EVrki2i6tIHR8QFogb1BW+ywdlpCJv3p6cu9Ou0fYgX62crp16j+m1Wfgeo9ATNdbBmwUjhxi4AE10hy40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aU6NGvAR; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HEAgY0Rl"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aU6NGvAR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=rHrqihAXBWbkD+hNJe9QmyuvcRfGQMrrS8l0OHyFvmc=; b=HEAgY0Rlaa4bpR/jWfqfLLuZn3
-	M2+ATfYOBUC9Ml8x5+NSI5LHinIZtAv/YyP3GyUr/pOSmosNGnR1JThvkVtFGQfjiKKLURBEW+JIm
-	L0MKAZAtatL8cHfZSG43b+5SniVMEkXM36/5qvmdxvQKi3DtPHb5FzvW7sdITUeHv2qf4xZQ6Qyy/
-	70TQrd1VfRUzKR87JxKnzAhJYnp/nW1hqytsA9KTVfp3J2BlNrca/+M0JCDyHpGvaD/JfyizW+Vp8
-	qIyf9XJ07SECEpAO+WPd2aO7SnUNFBboMMnAODtKUX2GRwAleVuu7M9CPtBqyibSMeX+E8Sv3v646
-	FEmmY7Uw==;
+	bh=NNYAUGkwLxMNNvkNRL6DKpL8cFzSPNDlRSU1HLJ4w44=; b=aU6NGvARAUBt60/Df//dFtwCeP
+	0/SyCM8v29rEeiTjoE2Fz/Sr9ZEtT7UYP6yxsdj1YaTCD+9AsThY9cHgn+NCfEBtS6HeW/FnWoVHx
+	hHNFkpSxorMdnKNGpkJLDKc1XKiAF+NMOp7Bo45/NxO6WH1BW35gKyUJwX81PUKT6w5VeFRWb5nzQ
+	uUgimDW3T6Fqmx9bIL4MaPLcm7TXUfOC/1pQECyqcnJkJkxM9TxLwwJA5V5PbEolg48oCqP5YJQ/u
+	fbnysoNLybzEWKD1Xkxt5Fd8H3qgktE62o6wjZi40IoKIr/8cEjNr56gM6E/EI/rKEHC4/Njl4T6O
+	pJaktxUw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uciYX-007yZy-0x;
-	Fri, 18 Jul 2025 18:59:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 20:59:05 +1000
-Date: Fri, 18 Jul 2025 20:59:05 +1000
+	id 1uciZ1-007yam-1B;
+	Fri, 18 Jul 2025 18:59:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 20:59:35 +1000
+Date: Fri, 18 Jul 2025 20:59:35 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Weili Qian <qianweili@huawei.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 08/80] crypto: Remove redundant
- pm_runtime_mark_last_busy() calls
-Message-ID: <aHoo-dQpHxX-Lqbf@gondor.apana.org.au>
-References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
- <20250704075402.3217279-1-sakari.ailus@linux.intel.com>
+To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH] crypto: qat - fix virtual channel configuration for GEN6
+ devices
+Message-ID: <aHopF9cx9pP4knIZ@gondor.apana.org.au>
+References: <20250707085417.1286691-1-suman.kumar.chakraborty@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250704075402.3217279-1-sakari.ailus@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250707085417.1286691-1-suman.kumar.chakraborty@intel.com>
 
-On Fri, Jul 04, 2025 at 10:54:02AM +0300, Sakari Ailus wrote:
-> pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
-> pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
-> to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
-> pm_runtime_mark_last_busy().
+On Mon, Jul 07, 2025 at 09:54:17AM +0100, Suman Kumar Chakraborty wrote:
+> The TCVCMAP (Traffic Class to Virtual Channel Mapping) field in the
+> PVC0CTL and PVC1CTL register controls how traffic classes are mapped to
+> virtual channels in QAT GEN6 hardware.
 > 
-> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> The driver previously wrote a default TCVCMAP value to this register, but
+> this configuration was incorrect.
+> 
+> Modify the TCVCMAP configuration to explicitly enable both VC0 and VC1,
+> and map Traffic Classes 0 to 7 → VC0 and Traffic Class 8 → VC1.
+> Replace FIELD_PREP() with FIELD_MODIFY() to ensure that only the intended
+> TCVCMAP field is updated, preserving other bits in the register. This
+> prevents unintended overwrites of unrelated configuration fields when
+> modifying TC to VC mappings.
+> 
+> Fixes: 17fd7514ae68 ("crypto: qat - add qat_6xxx driver")
+> Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 > ---
-> The cover letter of the set can be found here
-> <URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
-> 
-> In brief, this patch depends on PM runtime patches adding marking the last
-> busy timestamp in autosuspend related functions. The patches are here, on
-> rc2:
-> 
->         git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
->                 pm-runtime-6.17-rc1
-> 
->  drivers/crypto/ccree/cc_pm.c      | 1 -
->  drivers/crypto/hisilicon/qm.c     | 1 -
->  drivers/crypto/omap-aes-gcm.c     | 1 -
->  drivers/crypto/omap-aes.c         | 1 -
->  drivers/crypto/omap-des.c         | 1 -
->  drivers/crypto/omap-sham.c        | 1 -
->  drivers/crypto/stm32/stm32-cryp.c | 1 -
->  drivers/crypto/stm32/stm32-hash.c | 1 -
->  8 files changed, 8 deletions(-)
+>  drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c | 10 +++++-----
+>  drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h |  2 +-
+>  2 files changed, 6 insertions(+), 6 deletions(-)
 
 Patch applied.  Thanks.
 -- 
