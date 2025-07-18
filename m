@@ -1,46 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E142BE7D5
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Jul 2025 11:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4617C2BF012;
+	Fri, 18 Jul 2025 11:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752837173; cv=none; b=KGFte/zIwp39bIK8JhzMN4DsyDIBTy0HlMeM9zCu8hshYaAYnQN5sYTGHjUB9V5+jnZwH9Bp28U4x8Tr76v53/+md0FoNZ79hsHpz0PEMZRdQ0h9jSu9LFZwjEWIq6/TVMClbmoM82i/3S0OoiJXJsLjjwt+7M99kqDecOkrlPE=
+	t=1752837197; cv=none; b=oq6WFnUzH+quKqmX0MJmTUEpSAGQql9jJtuWmGrmLUBlV+07MToVxAiZODXI9Ih0OizQmYF4pAABYLMEPunNHVrTsHQbqBKScVZCAvZNL68ome805oxN8U76/bgiOdtpOHLvffwaEKLQ7HgUUngz8qOBan3zOfe2gtCqgprxLrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752837173; c=relaxed/simple;
-	bh=CQL5OswgIXZKwyJDClLtF0Odp2YQH8GWb65HZRY3XvE=;
+	s=arc-20240116; t=1752837197; c=relaxed/simple;
+	bh=TqKyTBjFtQ3f36uvZI29BwG1FQzvYrSqzIvXDaAbO6U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mBnu75ids2A7YsZFXjESNvkn3Ygx+StJHy7xqvbYy3ohucUtGI4/7KNZmKqkB7M9QHNBTYjePpaAqjKXnajHzYIgbbJMBaPZY3xsgLHA5wYO09Q2PuMZ0qnzYiHkxYFG5JGxh4Or83sLX7giDwhTfE/CWX4WQcHFSwq/TZeSgLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=h0U4VYJK; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=j2P87eBfszgR8GQgTWo/2j0L6hqQxypR0s1g7OkUm8JC+4n4YEu2eRBPvSKnYAniS2sMw7wssVrp4dMI9J5B06Ak3QO96U8TLeR7ZVVnLqHqFgKA1GgU+1tWcN/42vpCH43/ivQJEvl6njWb4y0gfj/qLwbU4z99ZZzusm+L/IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=UKK2fcgW; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="h0U4VYJK"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="UKK2fcgW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=pZak1Mka8hh/24346CzvJaj9wYXYBpu7k0zZRYhuDz0=; b=h0U4VYJK9ykNOD7xxFt12ieKcV
-	RAE41xz8yfRUbT8qUEqvV72YJ9q/IIQ4vyujsM0iVDhIIPD2GlMluRf2MzWjlvE/yZ+xZr00ClgMg
-	4d2S/rLPCk+5KX0bhhRCIdPf84+a8xVaVnoTZGdJ/dkFQaROtXGEgTzSGul8Ge27biJ5hJ4itU43r
-	jf1jpRG1Y0OuYQ59zxbcxtumfsIUK/9k3qq3cNXYjXu2WXEXIWNTxVieINA4mi7BdUirDu/48Xrqd
-	3mDar5ZDYoI2ubfnmLfu7GHDEi673BBfzaREeUiDwNwZxBDAGqomFhHUfLeQpKUtD+2oLDRCFnkyQ
-	B+TD/e7Q==;
+	bh=bnmhsuxiBErW87nw0PaWsg41tpb0/3MqhNgyKWbDaKM=; b=UKK2fcgWSeaGOTul9H6D9DEQRl
+	nsp7hckwzEgcrHsNpyzYGVKlGUURT+/eHe49iuici7ACwYbg6/laSIDpDJcjtE87Z2fkF1IqZxMya
+	HjBoWwFnltt2GcwTW+k4KUl2jI1TglhJ3nzJZlSnAel0vvlGDs5R4WaH4WtskPx1yMuLWc+GCmb1e
+	2Ov0Ww18W8t7JcevuUwTmCuW4tKOulavEQDw6V+Glgdu+KMSwbpoAvNKUOrX4ojrrJZUmxWlrVV2h
+	zhA+khC3vLPsiLeV6GL/Rc2ADXwJE4ZU8+KuvqhpFZwbKr/klV2WSi78OhZCFvM+32DfvdJwWgvPj
+	WWBa1EHA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uciln-007ymq-1g;
-	Fri, 18 Jul 2025 19:12:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 21:12:47 +1000
-Date: Fri, 18 Jul 2025 21:12:47 +1000
+	id 1ucimB-007ynL-0v;
+	Fri, 18 Jul 2025 19:13:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 21:13:11 +1000
+Date: Fri, 18 Jul 2025 21:13:11 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-Subject: Re: [PATCH 0/8] crypto: qat - add rate limiting (RL) support for
- GEN6 devices
-Message-ID: <aHosL1deFQ0vUiLU@gondor.apana.org.au>
-References: <20250710133347.566310-1-suman.kumar.chakraborty@intel.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	stable@vger.kernel.org, Ahsan Atta <ahsan.atta@intel.com>
+Subject: Re: [PATCH] crypto: qat - flush misc workqueue during device shutdown
+Message-ID: <aHosRzM4UO63weHf@gondor.apana.org.au>
+References: <20250711122753.9824-2-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,76 +49,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250710133347.566310-1-suman.kumar.chakraborty@intel.com>
+In-Reply-To: <20250711122753.9824-2-giovanni.cabiddu@intel.com>
 
-On Thu, Jul 10, 2025 at 02:33:39PM +0100, Suman Kumar Chakraborty wrote:
-> This patch set introduces and extends the rate limiting (RL) infrastructure
-> in the Intel QAT (QuickAssist Technology) driver, with a focus on enabling
-> RL support for QAT GEN6 devices and enhancing support for decompression
-> service.
+On Fri, Jul 11, 2025 at 01:27:43PM +0100, Giovanni Cabiddu wrote:
+> Repeated loading and unloading of a device specific QAT driver, for
+> example qat_4xxx, in a tight loop can lead to a crash due to a
+> use-after-free scenario. This occurs when a power management (PM)
+> interrupt triggers just before the device-specific driver (e.g.,
+> qat_4xxx.ko) is unloaded, while the core driver (intel_qat.ko) remains
+> loaded.
 > 
-> The series begins by enforcing service validation in the RL sysfs API to
-> prevent misconfiguration. It then adds decompression (DECOMP) service,
-> including its enumeration and visibility via sysfs. Subsequently, service
-> enums are refactored and consolidated to remove duplication and clearly
-> differentiate between base and extended services.
+> Since the driver uses a shared workqueue (`qat_misc_wq`) across all
+> devices and owned by intel_qat.ko, a deferred routine from the
+> device-specific driver may still be pending in the queue. If this
+> routine executes after the driver is unloaded, it can dereference freed
+> memory, resulting in a page fault and kernel crash like the following:
 > 
-> Further patches improve modularity by relocating is_service_enabled() into
-> the appropriate C file, introduce a flexible mechanism using
-> adf_rl_get_num_svc_aes() and get_svc_slice_cnt() APIs, and implement these
-> for both GEN4 and GEN6 platforms. Additionally, the compression slice count
-> (cpr_cnt) is now cached for use within the RL infrastructure.
+>     BUG: unable to handle page fault for address: ffa000002e50a01c
+>     #PF: supervisor read access in kernel mode
+>     RIP: 0010:pm_bh_handler+0x1d2/0x250 [intel_qat]
+>     Call Trace:
+>       pm_bh_handler+0x1d2/0x250 [intel_qat]
+>       process_one_work+0x171/0x340
+>       worker_thread+0x277/0x3a0
+>       kthread+0xf0/0x120
+>       ret_from_fork+0x2d/0x50
 > 
-> Finally, the series enables full RL support for GEN6 by initializing the
-> rl_data and implementing platform-specific logic to query acceleration
-> engines and slice counts for QAT GEN6 hardware.
+> To prevent this, flush the misc workqueue during device shutdown to
+> ensure that all pending work items are completed before the driver is
+> unloaded.
 > 
-> Summary of Changes:
+> Note: This approach may slightly increase shutdown latency if the
+> workqueue contains jobs from other devices, but it ensures correctness
+> and stability.
 > 
-> Patch #1 Validates service in RL sysfs API.
-> Patch #2 Adds decompression (DECOMP) service to RL to enable SLA support for
-> 	 DECOMP where supported (e.g., GEN6).
-> Patch #3 Consolidated the service enums.
-> Patch #4 Relocates the is_service_enabled() function to improve modularity and
-> 	 aligns code structure.
-> Patch #5 Adds adf_rl_get_num_svc_aes() to enable querying number of engines per
-> 	 service.
-> Patch #6 Adds get_svc_slice_cnt() to device data to generalizes AE count lookup.
-> Patch #7 Adds compression slice count tracking.
-> Patch #8 Enables RL for GEN6.
-> 
-> Suman Kumar Chakraborty (8):
->   crypto: qat - validate service in rate limiting sysfs api
->   crypto: qat - add decompression service for rate limiting
->   crypto: qat - consolidate service enums
->   crypto: qat - relocate service related functions
->   crypto: qat - add adf_rl_get_num_svc_aes() in rate limiting
->   crypto: qat - add get_svc_slice_cnt() in device data structure
->   crypto: qat - add compression slice count for rate limiting
->   crypto: qat - enable rate limiting feature for GEN6 devices
-> 
->  Documentation/ABI/testing/sysfs-driver-qat_rl | 14 +--
->  .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |  9 +-
->  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  9 +-
->  .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     | 77 ++++++++++++++++-
->  .../intel/qat/qat_6xxx/adf_6xxx_hw_data.h     | 20 +++++
->  .../intel/qat/qat_common/adf_accel_devices.h  |  2 +
->  .../intel/qat/qat_common/adf_cfg_services.c   | 40 ++++++++-
->  .../intel/qat/qat_common/adf_cfg_services.h   | 12 ++-
->  .../intel/qat/qat_common/adf_gen4_hw_data.c   | 42 ++++++++-
->  .../intel/qat/qat_common/adf_gen4_hw_data.h   |  3 +
->  drivers/crypto/intel/qat/qat_common/adf_rl.c  | 86 ++++++-------------
->  drivers/crypto/intel/qat/qat_common/adf_rl.h  | 11 +--
->  .../intel/qat/qat_common/adf_rl_admin.c       |  1 +
->  .../intel/qat/qat_common/adf_sysfs_rl.c       | 21 +++--
->  14 files changed, 251 insertions(+), 96 deletions(-)
-> 
-> 
-> base-commit: db689623436f9f8b87c434285a4bdbf54b0f86d2
-> -- 
-> 2.40.1
+> Fixes: e5745f34113b ("crypto: qat - enable power management for QAT GEN4")
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+> ---
+>  drivers/crypto/intel/qat/qat_common/adf_common_drv.h | 1 +
+>  drivers/crypto/intel/qat/qat_common/adf_init.c       | 1 +
+>  drivers/crypto/intel/qat/qat_common/adf_isr.c        | 5 +++++
+>  3 files changed, 7 insertions(+)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
