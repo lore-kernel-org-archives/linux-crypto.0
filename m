@@ -1,46 +1,45 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3463B2D8363;
-	Fri, 18 Jul 2025 11:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273E21EF1D;
+	Fri, 18 Jul 2025 14:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752837344; cv=none; b=BszcSIAlMDMBxk2rpnxfW0lgNEIxCxLZRls9U8aaa8qQw+JQO1dsxJeIgZHM8reC9Ie5XwsqQg7faQz1nvfuUODeaj/gBhXQqFwm+uFSyNBpQMA8k17XlHcyyfcfWzbQyQRJcfxSQtlaWmqGVsBW17mUGSR+5omArYcJ4cdtym4=
+	t=1752850252; cv=none; b=N1AmkUqBzqREOB7qMn8aoO+vGGr4Rk2UcmihIdtT6fhiCDpPsnUkXc+YMwSF0EeZ85cI04m9kI5RACiRXYg/iNIEt10GDcnxUeViL2Ny9TpQprknH5ConWtO0IgPdzL5F04pLa3llyHISkaPO1Y2Iykdu3sk6srDkArbBCOK3dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752837344; c=relaxed/simple;
-	bh=L4NrF1xyhtYN1LlvrCUR/1PNtFOiU/Yqr0WRbfXHDKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=OXb2PgDErU7rnDam1FBKcJMuP4HUDNbf1K8Ddn+gZeEk3KfFsJyfUuiHcvfqb6k06Ywo9OBnUbi9c/yre8Omc5Rwj5Vrq9sxSmVltXNXm/6Wprao0cLPPa9cbNhX5XjkRWsc1Bxf+pD09oz5Pn8OHjUAFtUgRes/B/Cxvd+vFMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PbephWPs; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1752850252; c=relaxed/simple;
+	bh=C4ovz/A/Jd+4R4Tq7TDb09J4evUXnZy653mAlX63WQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B7HWNKxxLwT+DKeij8WEkCm7dQ+XhEiSa9yrMJs9FD8gbC6yw5oW7mJhU/pWeUdElVzyA27YPg6JXuPEsM4aukuDWNyQiTmNkHyL9FWQHiNa7jweLExs6dw8a7c+m+hHQoDBYmFdY+qGu9Hb4Mch1GYJWG/cIrZOBWC6twE+b2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PSM0IEi1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PbephWPs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gR7DnbvdY99tuhMKUpQMsvh86F+Ko1XHIHz6GnJsjM4=; b=PbephWPs9x4cl3Aow6OjI/KmWk
-	hoTAMnKu3gD+4VNeTcpa4lTvfW+Q+t4v3L9fsN27lYnJWz1E2Kzl9UHEWth9yXQnEDa3M2Ude++R2
-	g+zKiksRUSDQ0OUzJXttPhIENawd2QihGOj48+uikwG6a00ZqF4FRs+weDF9GbPsWtlEExMhQpP+X
-	kuFBcE4T8Y8lIW08/hYDtG2izpBV+Ij1aEBuoib2CUTZgx7+7TCQ0Cr8LEVhy0+J8sAKluaH0+jOc
-	q3y6TXrXrs+f0EI74QrxWJU1M6QfSDxJc9nOcOSKkkpSPGmaqaqd9eBYH1ljmvuqCb1z/ff0TbARZ
-	8TYOfPTQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ucioV-007ypC-1g;
-	Fri, 18 Jul 2025 19:15:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 21:15:35 +1000
-Date: Fri, 18 Jul 2025 21:15:35 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ruben Wauters <rubenru09@aol.com>
-Cc: davem@davemloft.net, rubenru09@aol.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: jitter - replace ARRAY_SIZE definition with
- header include
-Message-ID: <aHos16fgwhMRltMy@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PSM0IEi1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185B4C4CEEB;
+	Fri, 18 Jul 2025 14:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752850251;
+	bh=C4ovz/A/Jd+4R4Tq7TDb09J4evUXnZy653mAlX63WQ4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PSM0IEi1tx7bEX1qXBUFYE2caot+mxUvrFYlX/G6zRaAgn0K8MC/OnpdmD8SmCKqK
+	 1tPc03TyfgmaxLx/bouGf1xmATAUBO9bDx1NRz4/HcdYPJNxoGwWJy9YcbgpkTBCRC
+	 ON6g9KTA71XH35qHMpv8YQCNwPYxEa1EfTubmfyWs0raVfkAsoTW6nr3fmAczFbUji
+	 qaaG4VxgHaR9sqPX0y1thSTSmfXA3Dk9DUSSjSIGiFQS5yGvF+YZHBv1i9LmCgXDSm
+	 XSyS6uk3UHank53Pcol4yE6qrFWsabXHZsDQHsVEXO/L+5bQ2ZaeGz7xoEvebRO0tl
+	 0QYlI4R9uaaxA==
+Date: Fri, 18 Jul 2025 07:50:49 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>
+Cc: syzbot <syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com>,
+	ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mingo@redhat.com,
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+	tglx@linutronix.de, x86@kernel.org
+Subject: Re: [syzbot] [wireless] BUG: unable to handle kernel paging request
+ in ieee80211_wep_encrypt
+Message-ID: <20250718145049.GA1574@quark>
+References: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,23 +48,157 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250713131608.38859-1-rubenru09@aol.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <6878cd49.a70a0220.693ce.0044.GAE@google.com>
 
-Ruben Wauters <rubenru09@aol.com> wrote:
-> The ARRAY_SIZE macro is already defined in linux/array_size.h
+[+linux-wireless and Johannes for ieee80211_wep_encrypt]
+
+On Thu, Jul 17, 2025 at 03:15:37AM -0700, syzbot wrote:
+> Hello,
 > 
-> This patch replaces the ARRAY_SIZE definition in jitterentropy.c with
-> an include, to make the code cleaner, and help reduce the number of
-> duplicate ARRAY_SIZE definitions in the codebase.
+> syzbot found the following issue on:
 > 
-> Signed-off-by: Ruben Wauters <rubenru09@aol.com>
+> HEAD commit:    5e28d5a3f774 net/sched: sch_qfq: Fix race condition on qfq..
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=146550f0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
+> dashboard link: https://syzkaller.appspot.com/bug?extid=d1008c24929007591b6b
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/897daa1d604c/disk-5e28d5a3.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/0d5527eee75d/vmlinux-5e28d5a3.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/31ee968efcd7/bzImage-5e28d5a3.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+d1008c24929007591b6b@syzkaller.appspotmail.com
+> 
+> BUG: unable to handle page fault for address: ffff8880bfffd000
+> #PF: supervisor read access in kernel mode
+> #PF: error_code(0x0000) - not-present page
+> PGD 1a201067 P4D 1a201067 PUD 23ffff067 PMD 23fffe067 PTE 0
+> Oops: Oops: 0000 [#1] SMP KASAN PTI
+> CPU: 1 UID: 0 PID: 8097 Comm: syz.1.594 Not tainted 6.16.0-rc5-syzkaller-00183-g5e28d5a3f774 #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+> RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
+> Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
+> RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
+> RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
+> RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
+> RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
+> R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
+> R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
+> FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  crc32_le_arch+0x56/0xa0 arch/x86/lib/crc32.c:21
+>  crc32_le include/linux/crc32.h:18 [inline]
+>  ieee80211_wep_encrypt_data net/mac80211/wep.c:114 [inline]
+>  ieee80211_wep_encrypt+0x228/0x410 net/mac80211/wep.c:158
+>  wep_encrypt_skb net/mac80211/wep.c:277 [inline]
+>  ieee80211_crypto_wep_encrypt+0x1f6/0x320 net/mac80211/wep.c:300
+>  invoke_tx_handlers_late+0x1145/0x1820 net/mac80211/tx.c:1846
+>  ieee80211_tx_dequeue+0x3068/0x4340 net/mac80211/tx.c:3916
+>  wake_tx_push_queue net/mac80211/util.c:294 [inline]
+>  ieee80211_handle_wake_tx_queue+0x125/0x2a0 net/mac80211/util.c:315
+>  drv_wake_tx_queue net/mac80211/driver-ops.h:1367 [inline]
+>  schedule_and_wake_txq net/mac80211/driver-ops.h:1374 [inline]
+>  ieee80211_queue_skb+0x19e8/0x2180 net/mac80211/tx.c:1648
+>  ieee80211_tx+0x297/0x420 net/mac80211/tx.c:1951
+>  __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6103
+>  ieee80211_tx_skb_tid+0x266/0x420 net/mac80211/tx.c:6131
+>  ieee80211_mgmt_tx+0x1c25/0x21d0 net/mac80211/offchannel.c:1023
+>  rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
+>  cfg80211_mlme_mgmt_tx+0x7f2/0x1620 net/wireless/mlme.c:938
+>  nl80211_tx_mgmt+0x9fd/0xd50 net/wireless/nl80211.c:12921
+>  genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+>  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+>  genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+>  netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
+>  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>  netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
+>  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg+0x219/0x270 net/socket.c:727
+>  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+>  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+>  __sys_sendmsg net/socket.c:2652 [inline]
+>  __do_sys_sendmsg net/socket.c:2657 [inline]
+>  __se_sys_sendmsg net/socket.c:2655 [inline]
+>  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f4778d8e929
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f4779be3038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f4778fb6080 RCX: 00007f4778d8e929
+> RDX: 0000000024008080 RSI: 0000200000000c00 RDI: 0000000000000005
+> RBP: 00007f4778e10b39 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007f4778fb6080 R15: 00007ffff7e551c8
+>  </TASK>
+> Modules linked in:
+> CR2: ffff8880bfffd000
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:crc32_lsb_pclmul_sse+0x8f/0x220 arch/x86/lib/crc32-pclmul.S:6
+> Code: 0f 3a 44 c7 11 66 0f ef ec 66 0f ef c5 f3 0f 6f 66 10 66 0f 6f e9 66 0f 3a 44 ef 00 66 0f 3a 44 cf 11 66 0f ef ec 66 0f ef cd <f3> 0f 6f 66 20 66 0f 6f ea 66 0f 3a 44 ef 00 66 0f 3a 44 d7 11 66
+> RSP: 0018:ffffc9001bcae6f8 EFLAGS: 00010296
+> RAX: e4cc01b02de40500 RBX: fffffffffffffffe RCX: ffffffff8be53dc0
+> RDX: ffffffff7301ca7e RSI: ffff8880bfffcfde RDI: 00000000ffffffff
+> RBP: 00000000ffffffff R08: ffff88801cb09e07 R09: 1ffff110039613c0
+> R10: dffffc0000000000 R11: ffffed10039613c1 R12: fffffffffffffffe
+> R13: ffff888033019a5e R14: ffff888033019a5e R15: ffff888067eeec80
+> FS:  00007f4779be36c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: ffff8880bfffd000 CR3: 00000000671a8000 CR4: 00000000003526f0
+> ----------------
+> Code disassembly (best guess), 1 bytes skipped:
+>    0:	3a 44 c7 11          	cmp    0x11(%rdi,%rax,8),%al
+>    4:	66 0f ef ec          	pxor   %xmm4,%xmm5
+>    8:	66 0f ef c5          	pxor   %xmm5,%xmm0
+>    c:	f3 0f 6f 66 10       	movdqu 0x10(%rsi),%xmm4
+>   11:	66 0f 6f e9          	movdqa %xmm1,%xmm5
+>   15:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
+>   1b:	66 0f 3a 44 cf 11    	pclmulhqhqdq %xmm7,%xmm1
+>   21:	66 0f ef ec          	pxor   %xmm4,%xmm5
+>   25:	66 0f ef cd          	pxor   %xmm5,%xmm1
+> * 29:	f3 0f 6f 66 20       	movdqu 0x20(%rsi),%xmm4 <-- trapping instruction
+>   2e:	66 0f 6f ea          	movdqa %xmm2,%xmm5
+>   32:	66 0f 3a 44 ef 00    	pclmullqlqdq %xmm7,%xmm5
+>   38:	66 0f 3a 44 d7 11    	pclmulhqhqdq %xmm7,%xmm2
+>   3e:	66                   	data16
+> 
+> 
 > ---
-> crypto/jitterentropy.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+syzbot assigned this to the "crypto" subsystem.  However, the crash
+happened in crc32_le() which is not part of the crypto subsystem.  Also,
+crc32_le() is well-tested (e.g. by crc_kunit), and the bug is unlikely
+to be there.  Rather, the calling code in ieee80211_wep_encrypt_data()
+is passing an invalid data buffer to crc32_le().  So let's do:
+
+#syz set subsystems: wireless
