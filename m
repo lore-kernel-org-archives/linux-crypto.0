@@ -1,96 +1,78 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129C4298CCD;
-	Fri, 18 Jul 2025 10:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F21198A2F;
+	Fri, 18 Jul 2025 10:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752833108; cv=none; b=ndZGWZZ+5OoE2oyJkrzXwaKlUWQIe280KOr+M6sQXyKemx/PjAbyzI29BfwzLnMSI1RypVxiBzhrMimVwF+KrtXAm7fK8RsNYV+cto0vPGZJsnEqc8iP3zwQx9KxEZ3UXEAV9T3rKujw7/4HE48t2qcvukzpW6h8QOyst8fpuIg=
+	t=1752834687; cv=none; b=n1dsjgkinKUgc16PqBP0aMnbrt9/+cXVsKPpDagZRTGjmILtnmy8HapbIbNCTI00r/XoFOuU0syVGKeyl2bjjbSPZX6WOg08JD6zXTy7E8F3mHdEkg3f2qqnbqrsTQ6aTigfOHvjiLOAVR1h5pkI6VZb95zABjBV3J7Hoo3SJVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752833108; c=relaxed/simple;
-	bh=opzYsw8eEUMPf16qMwu4Z0WFNE3lxSAKi7KF8TfEpTk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nZtHpeq/ObsRo68FpmBN2Id8cxW00HAOXNo1E1UDTsPoY93UExBmCQhNqEyZwxMWpCbBeGmARz7WgjN5jt6cM85IEnqLYb+6q5ipLo/AXtVOoOo81TOHK2P+vsHcKLElBCS1TqsRIbsFgn/04JwmmKQZ93QxOtbELpYsqABLMFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bk5071GdnzdbyK;
-	Fri, 18 Jul 2025 18:00:55 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 548F8180B54;
-	Fri, 18 Jul 2025 18:05:03 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 18 Jul 2025 18:05:03 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 18 Jul 2025 18:05:02 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<liulongfang@huawei.com>, <qianweili@huawei.com>, <linwenkai6@hisilicon.com>,
-	<wangzhou1@hisilicon.com>, <songzhiqi1@huawei.com>
-Subject: [PATCH] crypto: hisilicon/hpre - fix dma unmap sequence
-Date: Fri, 18 Jul 2025 18:05:01 +0800
-Message-ID: <20250718100501.3281345-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1752834687; c=relaxed/simple;
+	bh=59VSGdV+1J+G46yTP2chmQXs4clXZPvyWRI+wjhGLSg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UFD2raQBdmIJkdDpQA62Pxj5motx2GEhtm6k/hDbESNTxoHR+Hxn3/08UNztmOtKfY1GtjKewUwhMkiqTHFTA0yHca5SE+qPLMRvOgbelJr2fenW4ADMwxFAZZ1zfCF5pa+5xwh1JeUoh+3OqGM+huCVUyXtvhdKuN9y0HKLrrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=rpAEHbP+; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="rpAEHbP+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=TmeP+yow1RBgKJBVVeBNniATmYMII+R0E6wQz5nLZbI=; b=rpAEHbP+kkF0IarNY+5A8dM+yJ
+	DMpUEBbVkIFB+H62c5liwl2Yiyr1uFNOH28mKTsXgv++cqlrA0CnI/NPhbAI/MwkHyZlGViKM6SFB
+	W/uxdQvhWSAfeggnjE7CgTN6zqq5XyuWEB0MOl+VXMIGMbfJHXa58K9TdpX3QsNrSK6KOUCfqlpA1
+	IfW6YTpNKb2h9e44PGzIzlxr2bUxMIecNUgWQIPhzpKTgjD9HDxoACnTJD7EKwVeZNpUnR3S9RiLt
+	5yaE/HZfIq3VYegTTWRq7m6UubdRzeQr8vnmTQEn92JI71Ii8K39f+ge1OS367qE3wKgz/9pjeitX
+	pVJfS07w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uci7T-007yBt-22;
+	Fri, 18 Jul 2025 18:31:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Jul 2025 20:31:08 +1000
+Date: Fri, 18 Jul 2025 20:31:08 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, James.Bottomley@hansenpartnership.com,
+	dhowells@redhat.com, simo@redhat.com
+Subject: Re: [PATCH v2 0/4] crypto: Add support for shake128/256 XOFs
+Message-ID: <aHoibPpl7CHM3FGd@gondor.apana.org.au>
+References: <20250630143834.2748285-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250630143834.2748285-1-stefanb@linux.ibm.com>
 
-From: Zhiqi Song <songzhiqi1@huawei.com>
+On Mon, Jun 30, 2025 at 10:38:30AM -0400, Stefan Berger wrote:
+> This series adds support for shake128/256 extended output functions (XOFs)
+> along with test cases to verify the produced digest and XOF output. A new
+> squeeze method is added to the shash_alg structure to get an arbitrary
+> number of bytes from these XOFs.
+> 
+> Regards,
+>    Stefan
+> 
+> 
+> v2:
+>  - Refactored crypto_shake_squeeze_bytes to be called for arbitrary number
+>    of bytes to return
+>  - Adjusted XOF test case parameters to better test modfied squeeze
+>    function
 
-Perform DMA unmapping operations before processing data.
-Otherwise, there may be unsynchronized data accessed by
-the CPU when the SWIOTLB is enabled.
+Please post this along with the actual user so that it can be
+evaluated in the proper context.
 
-Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 61b5e1c5d019..1550c3818383 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1491,11 +1491,13 @@ static void hpre_ecdh_cb(struct hpre_ctx *ctx, void *resp)
- 	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
- 		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
- 
-+	/* Do unmap before data processing */
-+	hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);
-+
- 	p = sg_virt(areq->dst);
- 	memmove(p, p + ctx->key_sz - curve_sz, curve_sz);
- 	memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);
- 
--	hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);
- 	kpp_request_complete(areq, ret);
- 
- 	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
-@@ -1808,9 +1810,11 @@ static void hpre_curve25519_cb(struct hpre_ctx *ctx, void *resp)
- 	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
- 		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
- 
-+	/* Do unmap before data processing */
-+	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
-+
- 	hpre_key_to_big_end(sg_virt(areq->dst), CURVE25519_KEY_SIZE);
- 
--	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
- 	kpp_request_complete(areq, ret);
- 
- 	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
+Cheers,
 -- 
-2.33.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
