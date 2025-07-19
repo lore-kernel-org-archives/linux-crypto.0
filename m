@@ -1,53 +1,67 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FACA221550
-	for <linux-crypto@vger.kernel.org>; Sat, 19 Jul 2025 21:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A6D186295;
+	Sat, 19 Jul 2025 22:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752962258; cv=none; b=Xm5ghD7Kos445e7R25xwl8//+E6vU3PFY7tc7YebAvAVbt3He+gaY3R5+0GeZvNjKZBqeLtpRtVT4otp10X2rD7rnKwfnu/C7IKQctZPSsnyhz9NtSNRa10QqEeQDLsq8eG94meYzuD7MNmhpUA1ZF+lRnA22vJ8vVBvfsckryk=
+	t=1752965456; cv=none; b=hLEDeLzKA/3LilImAPDNtV5XvzpcrJAI2vxfpgFY+kf/nbBHsU6O4K/Mq4jiYzvaxKPbV2hR69iO69ZyoBn1hIpiZdhX9IbqvYyOcI9e2jNSc8yrTMOqcKMr3bHdsQ6pb5G4bjiIqJGK3gfL0LEDspeKu5xCq8P8mBBRkwK3YDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752962258; c=relaxed/simple;
-	bh=aJsUMMJNzaMTqcwDIA8kBblsnJKcFjoDqfCZeHiosRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CS+T7sB6ktykjoFCgcWQXBDRZbIv2Sgs9zbskoKcMhA2A8TTEtYJTur2RjRvQoneDtfpOJGLGXTBSBg9Ms2t00ayvScZnnzPcCR2IkHnWLkOLiZ1QJrIXCKyWaFBiiuPeKRSucUsp6646tadG6EUfFgFzeTx7O63YE+RCoy0olQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wecO1r7D; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1752965456; c=relaxed/simple;
+	bh=ZYMP+/at8nGFRJCVR5+BvgvHsIiIuVBydrFRDsPIMss=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eNE3xB5D9RjKRAs3ZTCCZMVIGBfVDaEJvIEfVZ+bebMBY4CDLFEiX/mpkWQigJVcoCngnZYEQ3xcgjFaoOADnI1nIxqeccz1MYiqIGbc0WGbvsQ/YWcpV9XSkDnnwBBO3s8ratospRAXGMWjkoMMLSXDZ1QssNfn1C66caYoYMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ok2WjRDr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wecO1r7D"
-Date: Sat, 19 Jul 2025 17:57:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752962244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aJsUMMJNzaMTqcwDIA8kBblsnJKcFjoDqfCZeHiosRY=;
-	b=wecO1r7DNlE9nu94VItRSv2CcS4KDSNVjZk5VpsxPkHvrMFONigrWc9r5CutmLHWZJKgEI
-	YN3h/km9y/jKw3xFmKTBnIR04LmsIEnxwlZIR8hz+KJrVtAQD0LqKTFuQFxPiThBye4pPV
-	exbmlKNoT7lt91TgmV+86GUBG4PBavs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: syzbot <syzbot+9375e47164f8e9588f17@syzkaller.appspotmail.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net, 
-	herbert@gondor.apana.org.au, hpa@zytor.com, linux-bcachefs@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	mmpgouride@gmail.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	x86@kernel.org
-Subject: Re: [syzbot] [bcachefs] KASAN: slab-out-of-bounds Read in
- poly1305_update_arch
-Message-ID: <t5gf2puttghnw4ueatnh5ipr5ih32fpn3gzcaci6hbspspudnm@77shckmffc7y>
-References: <000000000000d62d530617ca4c33@google.com>
- <686415f3.a70a0220.3b7e22.1ec0.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ok2WjRDr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6846EC4CEE3;
+	Sat, 19 Jul 2025 22:50:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752965455;
+	bh=ZYMP+/at8nGFRJCVR5+BvgvHsIiIuVBydrFRDsPIMss=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ok2WjRDr+QGB1jQjfrugIls5aTrqQHkjS7lyzZ65TdJ4MrV8DbiZBEHQmA8OmQ1Oa
+	 o8yqckVKebjjYHIFNLmtb3kBonjSv0/JjK9BZbpRz/uPPEwpLdwiFhyUfmuEgGiHKR
+	 b74H9emRrel8I2MmAPD4QOO1FaPN/utaF5UgUKF9xt1OUi34PbVHo0KLZdFLtEAb0Q
+	 S6IacJqHl60rBR59WhujNejWR99Q+PDyz6ab1GiMfVqUDuXDyEgbBYLe/DHpPQyO8V
+	 BeAZtCZ8GzlBhPpC1dw6w2/S6MxVm5Bm8E07lDuTk6WsaTYGEic1ojhF3TMctSx0lw
+	 lokyAVdf9JBsQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/2] Improve crc32c() performance on newer x86_64 CPUs
+Date: Sat, 19 Jul 2025 15:49:36 -0700
+Message-ID: <20250719224938.126512-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <686415f3.a70a0220.3b7e22.1ec0.GAE@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-#syz fix: bcachefs: Move bset size check before csum check
+This series improves crc32c() performance on lengths >= 512 bytes on
+newer x86_64 CPUs by enabling the VPCLMULQDQ (vector carryless
+multiplication) optimized CRC code.
+
+This series targets crc-next.
+
+Eric Biggers (2):
+  lib/crc: x86: Reorganize crc-pclmul static_call initialization
+  lib/crc: x86/crc32c: Enable VPCLMULQDQ optimization where beneficial
+
+ lib/crc/x86/crc-pclmul-consts.h   | 47 +++++++++++++++++++++++++++++-
+ lib/crc/x86/crc-pclmul-template.h | 31 +++++++++-----------
+ lib/crc/x86/crc-t10dif.h          |  9 +++++-
+ lib/crc/x86/crc32.h               | 48 +++++++++++++++++++++++++++++--
+ lib/crc/x86/crc64.h               | 15 ++++++++--
+ 5 files changed, 127 insertions(+), 23 deletions(-)
+
+
+base-commit: 9b0236f4efb889869f7d4f3f084f508cc0433ec9
+-- 
+2.50.1
+
