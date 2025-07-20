@@ -1,56 +1,40 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C381F12F4
-	for <linux-crypto@vger.kernel.org>; Sun, 20 Jul 2025 17:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB1E382
+	for <linux-crypto@vger.kernel.org>; Sun, 20 Jul 2025 18:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753033753; cv=none; b=SUgGrIuq0IDkeVzrBMidI67UPgyhUUA0j60BrOKwIYCU8u0pTAB4XE4cRiziVBVDrU5ElVGZV/ldgtbPjiBLLMigrGNASDsOiMDHM8SfdCMI8HsUpZ/D0JWM94DPHJjXxc66jkie+LITq9Q5e6CMH+QFwvnUPZmQP+De+Eha8j4=
+	t=1753036054; cv=none; b=Jlqnv/o8QQtxDGXbTGO6rhm5DwBcTxmkDj+ORI2S12oOHR+6eJxXjrrwaEvfEh5TT3/146ajN0gDLgU0T1u4y2lzXQ9QAG/X95zFp03RU1NZoMCtEGBVNw8s7coBZe6Nnmr8iOC9918c0zFXuP37RW+C5uOy4s3CeU3buqxW8fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753033753; c=relaxed/simple;
-	bh=FxKoTTrrsa2pfKrQ7iZGKdyFN0A+OumMn143cDd4E8E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PBfmENZC8TeLVLXyBBG6FOgPugg9UTwiRchm7ipUj9nj9zQJxVG/TkjpBYCi+9Ym+DnFvW2RfbFuOAKI1cmId71jrLc1EinM/bwq7GmGjKYkAfq4CpwGNKPbkzp9K0KbkWPQgIZLF3r21cGyrDjJCY+AN9BSL0DUW1uFvRAFgBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=CLKD3ZEQ; arc=none smtp.client-ip=212.77.101.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1753036054; c=relaxed/simple;
+	bh=X5xqs1ZP4P2RhnBgNzZid0V1n/QQZPwqie8VhCKeGfg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o/3xEVxaLzzK3d2RklX0hPGsY9RScWZvTmQEZrqrXNMKKNQNs/7d1BDwT67XjUXHwM5MRw5eJ86oHfK2Jlx/c/4O0PBratT4m/eLDaQ+kuA+3yNjTTEH+Rek0hNR40HQAoR71n7t8vCsg/fo0jMX9r1dlw8gwLf7bL8o+OD3Vm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HRQHuVxZ; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="CLKD3ZEQ"
-Received: (wp-smtpd smtp.wp.pl 40373 invoked from network); 20 Jul 2025 19:49:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1753033748; bh=vCf/XlZtziyUPtDRK6OGTZ1iwHVlAnqUsHc+bCwUDB8=;
-          h=From:To:Cc:Subject;
-          b=CLKD3ZEQUKBP9sB1gdDbntbxETGrqnGz+Gt717JcKDruaQezXHFAuvaJh7LDowXTQ
-           DZYtxA2HfZ3GQ6LSwBnGu+v7CvTTCD++XCrxAPjdGSwIdK+naatvYcIiHy4wPDCp7P
-           azxQOaa+xA7hOfSz4S+VnEkXmYvEBVeJKpcrcBzZ2bcx8hsCInMnJLPxocdFYTB7/q
-           jyaG8PmX9lWxgSqC/N1bOQAEX+L0M5iGKsj7faCBjnOKAWHAQPS7zJGU52g9oBrWRt
-           Ie4eS/S8FYLChPubT9hGdElflJnCQJKgB2Nb2tjw5izSLvPf/kdLS0bRX8+IdO3SSc
-           kBpdPxzpHrkzg==
-Received: from 83.24.129.157.ipv4.supernova.orange.pl (HELO localhost.localdomain) (olek2@wp.pl@[83.24.129.157])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <herbert@gondor.apana.org.au>; 20 Jul 2025 19:49:07 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	atenart@kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HRQHuVxZ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753036040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KEkcY99JjeRt6Kj8QpuGyp3e5YKfE6FffJwx4zakCNE=;
+	b=HRQHuVxZJ56WcWGTQDyJKlDbffAoZe9YzaqooFMdD2Z/BI309pI8IDSWt33iIYpuG+ZWap
+	zS5rbkQFryiv0uXYPmVlXVl5/o2n8xqGNYK53AHwIqkivygZRoWOe1AmXdBlUSqSPEoFbz
+	ABQkYNbItNiko+dhI7z38xmnZjpF8sE=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
 	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH 2/2] arm64: dts: mediatek: add crypto offload support on MT7981
-Date: Sun, 20 Jul 2025 19:49:03 +0200
-Message-Id: <20250720174903.1321533-2-olek2@wp.pl>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250720174903.1321533-1-olek2@wp.pl>
-References: <20250720174903.1321533-1-olek2@wp.pl>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: keembay - Use min() to simplify ocs_create_linked_list_from_sg()
+Date: Sun, 20 Jul 2025 20:26:05 +0200
+Message-ID: <20250720182605.427375-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,44 +42,38 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 2451c495f819e4f25474ddb960c350f4
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000009 [IRpE]                               
+X-Migadu-Flow: FLOW_OUT
 
-The MT7981 as well as the MT7986 have a built-in EIP-97 crypto accelerator.
-This commit adds the missing entry in the dts.
+Use min() to simplify ocs_create_linked_list_from_sg() and improve its
+readability.
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/crypto/intel/keembay/ocs-aes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-index 5cbea9cd411f..ebab8dde1e70 100644
---- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-@@ -94,6 +94,20 @@ pwm@10048000 {
- 			#pwm-cells = <2>;
- 		};
+diff --git a/drivers/crypto/intel/keembay/ocs-aes.c b/drivers/crypto/intel/keembay/ocs-aes.c
+index be9f32fc8f42..b69e7bfce9cc 100644
+--- a/drivers/crypto/intel/keembay/ocs-aes.c
++++ b/drivers/crypto/intel/keembay/ocs-aes.c
+@@ -7,6 +7,7 @@
  
-+		crypto@10320000 {
-+			compatible = "inside-secure,safexcel-eip97";
-+			reg = <0 0x10320000 0 0x40000>;
-+			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "ring0", "ring1", "ring2", "ring3";
-+			clocks = <&topckgen CLK_TOP_EIP97B>;
-+			clock-names = "core";
-+			assigned-clocks = <&topckgen CLK_TOP_EIP97B_SEL>;
-+			assigned-clock-parents = <&topckgen CLK_TOP_CB_NET1_D5>;
-+		};
-+
- 		serial@11002000 {
- 			compatible = "mediatek,mt7981-uart", "mediatek,mt6577-uart";
- 			reg = <0 0x11002000 0 0x100>;
+ #include <linux/dma-mapping.h>
+ #include <linux/interrupt.h>
++#include <linux/minmax.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/swab.h>
+@@ -1473,8 +1474,7 @@ int ocs_create_linked_list_from_sg(const struct ocs_aes_dev *aes_dev,
+ 	ll = dll_desc->vaddr;
+ 	for (i = 0; i < dma_nents; i++, sg = sg_next(sg)) {
+ 		ll[i].src_addr = sg_dma_address(sg) + data_offset;
+-		ll[i].src_len = (sg_dma_len(sg) - data_offset) < data_size ?
+-				(sg_dma_len(sg) - data_offset) : data_size;
++		ll[i].src_len = min(sg_dma_len(sg) - data_offset, data_size);
+ 		data_offset = 0;
+ 		data_size -= ll[i].src_len;
+ 		/* Current element points to the DMA address of the next one. */
 -- 
-2.39.5
+2.50.1
 
