@@ -1,69 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA436AA7;
-	Mon, 21 Jul 2025 04:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95626AA7
+	for <linux-crypto@vger.kernel.org>; Mon, 21 Jul 2025 04:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753072276; cv=none; b=nfmHLf8UdU0HHoZOaSYAmTP3Va2wjhYK93P3lcfGOoW1doMp7z4qhcmKOlWSGCszGriLuQmG/EZMMLBY9s2sSHEmRBs2O6MIdf0Dp+zOBsA5IWVZ6qFr3uWVL+l4ABH5SYL1ESCoOw/0R4ipQ/HS4Ayrvx6plp/jvus5nEn1lb8=
+	t=1753072764; cv=none; b=QQjfu1BWDnYXIiWgL/kFvljzEHU7uhnSKlhuH3wn5phPI3i8eMfo4L/YXHFD5eGPPg1h7MghNOZu06ZQFcR8hx3/VS+1JsnNS7+6nQEKpzhNGJgTXUdxTPqQXO37yWgiuBS60MbgavyUftdFyNW716VoNuXBVRKfMdOA6A8jFQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753072276; c=relaxed/simple;
-	bh=tFYIKgmLi9PqdbwsUcrQoVZQbCB8C4dQeOpodg+Y494=;
+	s=arc-20240116; t=1753072764; c=relaxed/simple;
+	bh=+NBfCXOVbJTCcOUVmuXMnaKWytljkns5NLJTUzQdkT8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mD36HX/v+YCD3D/S+IlUeW2clNazrhqLgRBKJfOBpRdpaL0mBK+Ey0OErVJnO236ZMKJtprGgUaPJn9mARfQEKizv0wUJyaTN0tv3NnzdOLn1wWSuxefv/Q+DUb0+0EDbQnjvnAPrlt4IEvHBmjkAN492hL4nmBLO+iqYE0KaEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajXAUpWm; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=EpHthPCCoFxRl53TGwBtPaIA0Sn2TMBah+Jv4+XQRiG5D9QeA1XbjdFR708vdZHvBhJ3/BK7bxTIm2Wz+4nfV58mlSOWuTn3afJatYau7yI/OyUxAqhsbrAhIW4FLSdI0JRmST6+9JKr9cX7Qac+pC8kgKDafVf/hud+t7FEGlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AsAp/sva; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajXAUpWm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42AA4C4CEF6;
-	Mon, 21 Jul 2025 04:31:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AsAp/sva"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F78C4CEF7
+	for <linux-crypto@vger.kernel.org>; Mon, 21 Jul 2025 04:39:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753072276;
-	bh=tFYIKgmLi9PqdbwsUcrQoVZQbCB8C4dQeOpodg+Y494=;
+	s=k20201202; t=1753072764;
+	bh=+NBfCXOVbJTCcOUVmuXMnaKWytljkns5NLJTUzQdkT8=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ajXAUpWmVnPkyA6BD6SW9y9AkMWKNrcQoHYuXYmEcMF1gH5/xgdlT2kvow5EzmOQY
-	 ND7ssxwSg8T2euxmLIrnZTT5ZoTwZjdhRaVvZihn2w2JMN80be4kmv9DQpJvnKB3fB
-	 2Nrg+6ujdRMB/ENS+0mLPzLBdlP5+Uf/J8g8prLhUq5RX5NXJxH2MaChH2r1BacXMU
-	 W5SB3txysin6H+MBJAIeQFBjo4yIgrTVNUn8bnVDrH1Tjy9dqgL9xyGwpBYOJxeQIA
-	 OzLYE1sjmQEX36gJNRQMz4N+y1U7uwBlA2xi20rjnh0k5KHkGjIdO1g6hUei+iQ3Sh
-	 o0QXH28eJxHAw==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-55622414cf4so3386177e87.3;
-        Sun, 20 Jul 2025 21:31:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUVHWna/kpmqEpVTRwmG9Gu0OFYti5vjbeC3GaJd9y31e5NSWeIcihZbYeAUblyNzkFwrJjB/afiu3V2eU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKmuITEtMkxA6K+N2EGdv/fPGTiuHL69UBu80MTSLm14696vEY
-	DMQ3DqcqIn5DCjYyA/chE09G+xcrlREoeF+ZAITqMvNETmsdTO8ON+iRKWaufy710IS8z16H2Pi
-	BCOOlmQym7SKZjWJBirW4zMMn6sz4Y0U=
-X-Google-Smtp-Source: AGHT+IFxYrKPiFnquEFEjbXx7SinlBEd19ORgwxsoO+Qodlerja2zHOhZh9r9VefqvbLhskSgdCR3k4c2CB+uFe0kT4=
-X-Received: by 2002:ac2:5501:0:b0:553:2e37:6945 with SMTP id
- 2adb3069b0e04-55a3188ef64mr2809429e87.32.1753072274598; Sun, 20 Jul 2025
- 21:31:14 -0700 (PDT)
+	b=AsAp/svaIVEgP1VpxIVkZO33cX4wAekY+udfWkSUnSKMRlSGvLlYY2utXrHjspxFQ
+	 TCJvJyaVm6c4VaL+V8a70fPDo4NxRsgMKinWa4N+sPVZm3+CAlQ5haAt7C3GrKIYDe
+	 FF3HXRPPL7ygJFOLXt3H4BOcQW4hPs+zB94mgEPykDe+DsHv7kwWRkneqY2TLkmGSp
+	 okfpx2xChaw6ZYvbbsfKilJS/v165UiB1CVeJvuI/IgsJBrH+EOy5RtYevctmzcuUq
+	 VXaaLjI27xXWYmj9yhN1HUi7K9F8dseSNveHxmPx8M/Cit1JEX7WOqVcd3vzOP8IBo
+	 i6xAy4jnXi86w==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32ac42bb4e4so34965851fa.0
+        for <linux-crypto@vger.kernel.org>; Sun, 20 Jul 2025 21:39:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVSB/IehKWtauvqdMESEY7iqe+iRbs8hEu/R7dt582HXAeXY8jXmW1tZFW/sDEvoAdwpqLTBf1Gn0SaS7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVhI4XRWLCi32lcWbA63V5/hSX2qRESxHiTGcaumK+NuCkEMHR
+	JKl4WHgIHunLG8yqqcuezDSc7ULc1qvxmQqP34mOOZcxO/VN7FhohApWrEK5m0z71DO96CH8REh
+	uvFcfnq4/PzmTHYv1o9xH/0ScOCZwiuA=
+X-Google-Smtp-Source: AGHT+IEGeV7RQBO68+P8sQxm2CQn5VI9n6G5dpD6w9QCbCBwUCCgh9IpBbAyyug/+b7rFd+0lHZpVseIsQyv1AFi5Lk=
+X-Received: by 2002:a2e:ae18:0:10b0:32f:22f8:a7a1 with SMTP id
+ 38308e7fff4ca-3308f61c682mr40110971fa.32.1753072762733; Sun, 20 Jul 2025
+ 21:39:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250718191900.42877-1-ebiggers@kernel.org>
-In-Reply-To: <20250718191900.42877-1-ebiggers@kernel.org>
+References: <20250515142702.2592942-2-ardb+git@google.com> <20250515185254.GE1411@quark>
+ <20250718221645.GA295346@quark>
+In-Reply-To: <20250718221645.GA295346@quark>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 21 Jul 2025 14:30:57 +1000
-X-Gmail-Original-Message-ID: <CAMj1kXExtd=Kyz5yLUcAa1jt1aO6SnQLHTUy0G-vdPyG9+bwsw@mail.gmail.com>
-X-Gm-Features: Ac12FXyP6_FBA9Z1gYIv02BKDBFZ48NmSFlQa2GNf5zKCRg9wSpMfj4usDG1VNg
-Message-ID: <CAMj1kXExtd=Kyz5yLUcAa1jt1aO6SnQLHTUy0G-vdPyG9+bwsw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] sha1-ni-asm.S cleanups
+Date: Mon, 21 Jul 2025 14:39:05 +1000
+X-Gmail-Original-Message-ID: <CAMj1kXGp-643YkYko4V-L=nARY5OEMJPp+zQ+2tqzjj4MuyHQQ@mail.gmail.com>
+X-Gm-Features: Ac12FXwhjxTpeivRdfUvJzMe4UjTzvKkHRmLnAluAqeGcL4VFi4H-osOnzM-reQ
+Message-ID: <CAMj1kXGp-643YkYko4V-L=nARY5OEMJPp+zQ+2tqzjj4MuyHQQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64 - Drop asm fallback macros for older binutils
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 19 Jul 2025 at 05:20, Eric Biggers <ebiggers@kernel.org> wrote:
+On Sat, 19 Jul 2025 at 08:16, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> This series cleans up the x86_64 SHA-NI optimized SHA-1 code.
+> On Thu, May 15, 2025 at 11:52:54AM -0700, Eric Biggers wrote:
+> > On Thu, May 15, 2025 at 04:27:03PM +0200, Ard Biesheuvel wrote:
+> > > diff --git a/arch/arm64/crypto/sha512-ce-core.S b/arch/arm64/crypto/sha512-ce-core.S
+> > > index 91ef68b15fcc..deb2469ab631 100644
+> > > --- a/arch/arm64/crypto/sha512-ce-core.S
+> > > +++ b/arch/arm64/crypto/sha512-ce-core.S
+> > > @@ -12,26 +12,7 @@
+> > >  #include <linux/linkage.h>
+> > >  #include <asm/assembler.h>
+> > >
+> > > -   .irp            b,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+> > > -   .set            .Lq\b, \b
+> > > -   .set            .Lv\b\().2d, \b
+> > > -   .endr
+> > > -
+> > > -   .macro          sha512h, rd, rn, rm
+> > > -   .inst           0xce608000 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
+> > > -   .endm
+> > > -
+> > > -   .macro          sha512h2, rd, rn, rm
+> > > -   .inst           0xce608400 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
+> > > -   .endm
+> > > -
+> > > -   .macro          sha512su0, rd, rn
+> > > -   .inst           0xcec08000 | .L\rd | (.L\rn << 5)
+> > > -   .endm
+> > > -
+> > > -   .macro          sha512su1, rd, rn, rm
+> > > -   .inst           0xce608800 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
+> > > -   .endm
+> > > +   .arch   armv8-a+sha3
+> >
+> > This looked like a mistake: SHA-512 is part of SHA-2, not SHA-3.  However, the
+> > current versions of binutils and clang do indeed put it under sha3.  There
+> > should be a comment that mentions this unfortunate quirk.
+> >
+> > However, there's also the following commit which went into binutils 2.43:
+> >
+> >     commit 0aac62aa3256719c37be9e0ce6af8b190f45c928
+> >     Author: Andrew Carlotti <andrew.carlotti@arm.com>
+> >     Date:   Fri Jan 19 13:01:40 2024 +0000
+> >
+> >         aarch64: move SHA512 instructions to +sha3
+> >
+> >         SHA512 instructions were added to the architecture at the same time as SHA3
+> >         instructions, but later than the SHA1 and SHA256 instructions.  Furthermore,
+> >         implementations must support either both or neither of the SHA512 and SHA3
+> >         instruction sets.  However, SHA512 instructions were originally (and
+> >         incorrectly) added to Binutils under the +sha2 flag.
+> >
+> >         This patch moves SHA512 instructions under the +sha3 flag, which matches the
+> >         architecture constraints and existing GCC and LLVM behaviour.
+> >
+> > So probably we need ".arch armv8-a+sha2+sha3" to support binutils 2.30 through
+> > 2.42, as well as clang and the latest version of binutils?  (I didn't test it
+> > yet, but it seems likely...)
 >
-> This is targeting libcrypto-next.
+> Actually "sha2" isn't required here, since "sha3" implies "sha2".
 >
-> Eric Biggers (2):
->   lib/crypto: x86/sha1-ni: Minor optimizations and cleanup
->   lib/crypto: x86/sha1-ni: Convert to use rounds macros
+> The kernel test robot did report a build error on this series.  But it
+> was with SHA-3, because in binutils 2.40 and earlier the SHA-3
+> instructions required both "sha3" and "armv8.2-a",
+
+... even though it is part of the ARMv8.1 architecture revision ...
+
+> not just "sha3" like
+> they do in clang and in binutils 2.41 and later.
+>
+> For now, I split the SHA-512 part into a separate patch
+> https://lore.kernel.org/r/20250718220706.475240-1-ebiggers@kernel.org
 >
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+That looks fine. I'll revisit the remaining ones at some point, but
+not a priority.
