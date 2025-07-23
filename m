@@ -1,84 +1,72 @@
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E03F1A9B46;
-	Wed, 23 Jul 2025 02:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A8727FB1F;
+	Wed, 23 Jul 2025 08:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753239068; cv=none; b=gHKdeeEBYFynuwUNFnkWG+aCX8L89kUVX+534SlCboze567nfVhlxqZz6RLPwYGzibdPy59fhVal/2Cw5XzhUL1Zm6SwaparDHreNaTHq9kUEHx8s6JSDu4LryELuTQPZiZQT6wPfQxXQ638udy+hCKQwT1wFV+iT8zC+R//evM=
+	t=1753259965; cv=none; b=u7LGnjBm+nEu7xlIWeUW5oG3VdMoYY0D0ba40wG0j03+JNFcmfmET4OaRnp5byt7ztqI2vh7AyAuireegXiM267ro4IOkYPR/3xXoaepUC5n4YSXF5rsE9isGiNYMuj4D3dr/gbNszmAOJ3ZTgh7hRs6T0XM16yxkGKHLOUjtGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753239068; c=relaxed/simple;
-	bh=W7regQMFM7V9N05VQIC9KKSQsVpg98Qy0R0QwOs7kLY=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=PtVIB/GpLXsW9BWgYnJ1kDq7yQzsFMryJCJXWjKP9MVC36DCujLx6UeUXd9MVAcCbBAXXJnVqsdctpeooaMaeu45DIchk8ow3KUo273ol7itULe04k2MLV8JrzLxQL7vWDlGE50TsZIV+Rv4wzi7yiHEBfYq234f8pMAOK2hcwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bmzCn6yMmz6Fy6D;
-	Wed, 23 Jul 2025 10:51:01 +0800 (CST)
-Received: from xaxapp04.zte.com.cn ([10.99.98.157])
-	by mse-fl2.zte.com.cn with SMTP id 56N2oQGx026563;
-	Wed, 23 Jul 2025 10:50:26 +0800 (+08)
-	(envelope-from zhang.enpei@zte.com.cn)
-Received: from mapi (xaxapp04[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Wed, 23 Jul 2025 10:50:27 +0800 (CST)
-Date: Wed, 23 Jul 2025 10:50:27 +0800 (CST)
-X-Zmail-TransId: 2afb68804df32e2-c1398
-X-Mailer: Zmail v1.0
-Message-ID: <20250723105027140oF4Bwli1JuZcQ0V5-7pyK@zte.com.cn>
+	s=arc-20240116; t=1753259965; c=relaxed/simple;
+	bh=40/39jNWpR02zi+1YCzS0Yt7kRfWfNcrgO/p13pf4oQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=aRNx+De7s5/eh1B1yBqxApoecZF05hOYIZDQGqmHnDDYshelNVQfqVi3a558Cfn9AONn5umwjVu7iPBk9d9Z2jwp8b/VY4hK0KB494OjjI4Ji8EYYkeQcz/lkNo7pEQk5GQnsSEBgBNzmoGAWk4fbjHm7cPKD0arXqbD4tGwt/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jx7G0ZLc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jx7G0ZLc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA0EDC4CEE7;
+	Wed, 23 Jul 2025 08:39:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753259964;
+	bh=40/39jNWpR02zi+1YCzS0Yt7kRfWfNcrgO/p13pf4oQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=jx7G0ZLcQgFNF3ID5+WoRfdJ0/VnqdgixU/vOpXWSzkDr38afhwveEi50Wk/V7rzB
+	 G0zYV/kzhZvALf2nCNkagjKmk7uCJKcGBP/SvFQYFtelQORT/JqBz8wkBzp6TOdtDX
+	 0eJ9QFaouvAU7gIQxPxaZAo0QwaFD0WhaG4doWSMnnWHBFov1JtWHCopKZUI9XVvTh
+	 lCzqAoYty74Q8N8StWcgqy/geXz/uyUQSxcJ75Wj7Iw0Z01dcITZnEjotZ+h1hGMlx
+	 QUS+C+3ojwVVeAWIkVnkyYlNwKqkE68pfnIC1EExylfsEqVOaQvAznfgb3f1LDQFXe
+	 Zk3ca9zWN9eBw==
+From: Lee Jones <lee@kernel.org>
+To: linux@armlinux.org.uk, nicolas.ferre@microchip.com, 
+ alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
+ catalin.marinas@arm.com, will@kernel.org, olivia@selenic.com, 
+ herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+ andi.shyti@kernel.org, lee@kernel.org, broonie@kernel.org, 
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, arnd@kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, o.rempel@pengutronix.de, 
+ daniel.machon@microchip.com, Robert Marko <robert.marko@sartura.hr>
+Cc: luka.perkov@sartura.hr
+In-Reply-To: <20250702183856.1727275-5-robert.marko@sartura.hr>
+References: <20250702183856.1727275-5-robert.marko@sartura.hr>
+Subject: Re: (subset) [PATCH v8 04/10] mfd: at91-usart: Make it selectable
+ for ARCH_MICROCHIP
+Message-Id: <175325995961.1695705.8338983998485530536.b4-ty@kernel.org>
+Date: Wed, 23 Jul 2025 09:39:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <zhang.enpei@zte.com.cn>
-To: <horia.geanta@nxp.com>
-Cc: <pankaj.gupta@nxp.com>, <gaurav.jain@nxp.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <christophe.jaillet@wanadoo.fr>
-Subject: =?UTF-8?B?W1BBVENIIHYyXSBjcnlwdG86IGNhYW0gLSBzd2l0Y2ggdG8gdXNlIGRldm1fa21lbWR1cF9hcnJheSgp?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 56N2oQGx026563
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: zhang.enpei@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Wed, 23 Jul 2025 10:51:01 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 68804E15.003/4bmzCn6yMmz6Fy6D
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.15-dev-c81fc
 
-From: Zhang Enpei <zhang.enpei@zte.com.cn>
+On Wed, 02 Jul 2025 20:36:02 +0200, Robert Marko wrote:
+> LAN969x uses the Atmel USART, so make it selectable for ARCH_MICROCHIP to
+> avoid needing to update depends in future if other Microchip SoC-s use it
+> as well.
+> 
+> 
 
-Use devm_kmemdup_array() to avoid multiplication or possible overflows.
+Applied, thanks!
 
-Signed-off-by: Zhang Enpei <zhang.enpei@zte.com.cn>
----
- drivers/crypto/caam/ctrl.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+[04/10] mfd: at91-usart: Make it selectable for ARCH_MICROCHIP
+        commit: ef37a1e2485724f5287db1584d8aba48e8ba3f41
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index ce7b99019537..2250dce9c344 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -592,9 +592,9 @@ static int init_clocks(struct device *dev, const struct caam_imx_data *data)
-        int ret;
+--
+Lee Jones [李琼斯]
 
-        ctrlpriv->num_clks = data->num_clks;
--       ctrlpriv->clks = devm_kmemdup(dev, data->clks,
--                                     data->num_clks * sizeof(data->clks[0]),
--                                     GFP_KERNEL);
-+       ctrlpriv->clks = devm_kmemdup_array(dev, data->clks,
-+                                           data->num_clks, sizeof(*data->clks),
-+                                           GFP_KERNEL);
-        if (!ctrlpriv->clks)
-                return -ENOMEM;
-
--- 
-2.25.1
