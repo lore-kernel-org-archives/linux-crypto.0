@@ -1,926 +1,187 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2061.outbound.protection.outlook.com [40.107.101.61])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B74229B21;
-	Wed, 23 Jul 2025 18:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9637B2236F7;
+	Wed, 23 Jul 2025 18:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753294964; cv=fail; b=YGH5tBdCot/yllFvtyFMnhlSG3W2d1FrYTY87P/xRd7+3InvE+75dgRxeBIBo/qtrFlJIV+YFej1hXpG5zYhU+df/E1mH8ZlAYXnL78EZQYT9/HQRQ2TBhxcp6W8QTwOffSukBzZ5zMZd3DNlnOJSoQshApMVz3FAH9OvdLb3t4=
+	t=1753294992; cv=fail; b=YloEa1oqswPig2pszwqkWsDpQGD/j6NgPhbyJuaMmpjCBnWHbQMFgZolFZJKA8VrwmMy3q+yWqf78g96sTV8RaSbgvdJM2g1rRbUAD/tttPIV0ikx1puoo/vBDnXXcXm86mzT90qG0Qg4XRHhFTRzTMmuPbxr+uDyC30F416vR0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753294964; c=relaxed/simple;
-	bh=vk9BIAJlLyyoX6oV/NNmDj2ekZL++n/5kczMH61NzDU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P4GmSCeOY5GmgMp79V3eK2Ul2Unri9eBCh6z1KDQu9i7HgNop88ozSoZu0Yxp0NcqDBki1Au3lNIq3f8fIExBSsRq3kL/wT5viCdi7wgEudDcs1hCoaSgR/v3E0phGM3trdwSI0BiEH3WeZV9M419gyZWvcaSidmabM2OLTjVxo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bmgwzs09; arc=fail smtp.client-ip=40.107.101.61
+	s=arc-20240116; t=1753294992; c=relaxed/simple;
+	bh=wa/VWqXAUeH6CLyyOMpPV1kHM/39MXHxFoklA/4H3HU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z3M5bMo2UmVxLyNyQrHDKV/MCBMmr8ShI1suaxMlyiz2b7b2k+ZMPtiAYCyk1i1E+xpiu5QpZ2GIPfY8PrcZDcge4bWR+l2J3qz4nLISSfVS2gM3SXvtMhmOUQpEW5luwST0ZS5qhSBnwzE/LYZWyIzFhP4qL5eUZFO13BfGBtY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PLoxaGF2; arc=fail smtp.client-ip=40.107.237.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bmgwzs09"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PLoxaGF2"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ejfkxUdR/pgIR4nZJg9K/YpFHi5IEHmRNZlXHQLM5WWETgbcTsCIyOR+HKH7wplPXeFRrmD56zyX1ag9KMxj2Q9Hx54Pq14vOmk4beeeqrDbSlHT+mKOq/OmJ2k/PODmvitLpdyQUUwHu7296wTw2gRPxyDdnA+5fy28snxqsUoberaYhimprjiAkoewDRlRkcrpkZO2LLVNdi+Jjoi8N4F+GTkbl0r2T/q4k2GS9VN5fxuTNYaju2URN/TTeZKJVYZ35OhfbA7ZZFEIhBlyaP777aIh1gTJ6m9phZnvOZSBiHDiGyXRZgozUKOGSVUl+uIVgDsnsW/68PPj8cb8pA==
+ b=rSQsKuiPWXXMkTEHSrswEZLHXe8t90d7Nbk15p9o2Qi+5ggIi5yIaYXue7IfarWt03F7p3/QDlNOKXKMXAgalmg4bioMdnYKYaWlwhwt6JWgI1/pbIN8TtHB3H2PyDnyDgOPoG9pgzwdKeTuAwCqfgVEFFYybHenqqhpjbrMwOlMCHkFIxDadXTfX1zLeN9mFbW0kEG6nZUk6eZNBck3fPh6fksZidNmkOUxgcz9g2WoFsapPCZ0uN0dsSpGm//db7IWJTL3jpmJsBlguK1TPx/Z+eiVrh6qzxkfocCctqoMNYjlGpSzTqQP+APGFjGH/kvWh81NCghK0wPK7YCczg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wv/ZGOomO4Xp/QqNMj4QPnz7nF8mCHNpPVCpy0MXXzk=;
- b=uTrwJH+iUcb5VIdsyHFXBB9zLZo5oLYd878xOuEz0ikHw82KOHHZUZyY8TZi8oGExYMQsALGQSiQUXizAu1Ow7Y42bm3vyxbUa+VsbZCgQVUjz21nO4We7iZ7ltco57wATWr8lAlt47r7UnTcuf+F6G3nobo3nITdLcc4Ha9yXj4J6Eckvhl0NwbPaQTIzLGDOt7HK78Gy4rUvoGbhq15El54bfC+cJmW9enyZmFT92CzPdQhG16lU1iPTyUc75lyqnyCtcekZjr7m9h6flwIF3XLG/KfRUFB9g92KBdklb8ZXX0ba5XrYIiBKWRa5ZBzMH4eynJ8HR8zw6Ua3TRCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=011k+Gf10p2iRfVZET7OkhQz4iuCx9gc7wfI3Hm7OEY=;
+ b=nk+9ZUz5U83zGlx+3CqjMun9O0oPtdXA9l3+RXcBJcxQDHQ87aIbGmto0+21VVhxGvfQnEo00i1ZlJeGxp07gLuLseHEsJ3geKE0KIPfFTilsgcRx1P1Qfe/qpM7FAZ/LMZjvfsrFIs8v5aKD/riJc3xnvkfr0HRlj47ZcvSQZUuXC/1tv0HOu0jUYuZbLq+y/5y0tYYRGqqlUChIuBiLyFg31CCouL+LYppTbhUqOp9vzaYOnjRzVeBEHjVWeQoVJHQw/vZvWvyaIl0MFQMXxws22ENzuJVzN23m80Gp//az+KpBF1mttodHxL7nuNl6UBefRt9WqOpmR1IH3qAcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wv/ZGOomO4Xp/QqNMj4QPnz7nF8mCHNpPVCpy0MXXzk=;
- b=bmgwzs097Aoa/A7IApJOuybZ7Vf5pgL6JXaz+hivBrPLKA6hrVXaSvJZ2gYQdDZVDPAFoZHTWCiB1JrtQstYmBswvmL+tP0Wz06IUUQ9wZgOxaQvkjiDqsIs9wSc0hE9bLcgaSgAWwvJ73IZoWxGtOBkiZoZNVIP/QApnJeAQag=
-Received: from DS7PR05CA0046.namprd05.prod.outlook.com (2603:10b6:8:2f::14) by
- IA1PR12MB6410.namprd12.prod.outlook.com (2603:10b6:208:38a::21) with
+ bh=011k+Gf10p2iRfVZET7OkhQz4iuCx9gc7wfI3Hm7OEY=;
+ b=PLoxaGF2jgapm4hPz2lcjxmVipUXsG/eKxGGech1cyAIcKcsNorrjKXCp4yIT9x9t2xGaDk/N6S9EXohydT6Svmn+D8S5Qx1F47q72vh9+yPaMf/osHE3fGtROOtuXydpgFiXQEQaoz2MQjo3K5+CzM3xV+rp7GFK5xW4h6Cpxo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CH3PR12MB8725.namprd12.prod.outlook.com (2603:10b6:610:170::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Wed, 23 Jul
- 2025 18:22:35 +0000
-Received: from DS2PEPF00003441.namprd04.prod.outlook.com
- (2603:10b6:8:2f:cafe::74) by DS7PR05CA0046.outlook.office365.com
- (2603:10b6:8:2f::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.5 via Frontend Transport; Wed,
- 23 Jul 2025 18:22:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS2PEPF00003441.mail.protection.outlook.com (10.167.17.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8964.20 via Frontend Transport; Wed, 23 Jul 2025 18:22:34 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 23 Jul
- 2025 13:22:33 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 23 Jul
- 2025 13:22:33 -0500
-Received: from xhdharshah40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Wed, 23 Jul 2025 13:22:29 -0500
-From: Harsh Jain <h.jain@amd.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<mounika.botcha@amd.com>, <sarat.chand.savitala@amd.com>,
-	<mohan.dhanawade@amd.com>, <michal.simek@amd.com>, <smueller@chronox.de>,
-	<robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>
-CC: Harsh Jain <h.jain@amd.com>
-Subject: [PATCH v4 3/3] crypto: drbg: Export CTR DRBG DF functions
-Date: Wed, 23 Jul 2025 23:51:10 +0530
-Message-ID: <20250723182110.249547-4-h.jain@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250723182110.249547-1-h.jain@amd.com>
-References: <20250723182110.249547-1-h.jain@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Wed, 23 Jul
+ 2025 18:23:08 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%6]) with mapi id 15.20.8964.019; Wed, 23 Jul 2025
+ 18:23:07 +0000
+Message-ID: <de7c13f7-42a7-947d-0973-80ecd814aa42@amd.com>
+Date: Wed, 23 Jul 2025 13:23:05 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] crypto: ccp: reduce stack usage in ccp_run_aes_gcm_cmd
+Content-Language: en-US
+To: Arnd Bergmann <arnd@kernel.org>, John Allen <john.allen@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250714145921.699060-1-arnd@kernel.org>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250714145921.699060-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR10CA0002.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::7) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: h.jain@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003441:EE_|IA1PR12MB6410:EE_
-X-MS-Office365-Filtering-Correlation-Id: f468ccc8-92ea-4f9e-cfaf-08ddca15e518
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CH3PR12MB8725:EE_
+X-MS-Office365-Filtering-Correlation-Id: e3bd56fb-d636-4926-e38d-08ddca15f8f2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026|921020;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?pFLcjkzS7iQA8IgZJDzIEwh6YHvSxjojsd9EQJKcpEvUwX4jKiU4aPUJnAaU?=
- =?us-ascii?Q?Uq8E00LsbWYRcMjYsrJqydJZCyhMyOifTPrtxNHVYyexNf+aq7qPuRKfgigK?=
- =?us-ascii?Q?NThwCMeFjYy8Os7niKHixAt5pVCA8alX5/qeYrpsJd8s7tyj6uG9XcAUHy4T?=
- =?us-ascii?Q?frcM+KhbTRVU4nw8ReAWTS+WnP/mW8IFiEqYbLeBzNN/7rl4HFCu3nkXjLnU?=
- =?us-ascii?Q?Q/z9FRqxxd38VP9P3+XVhtyTK5tXDVwfci9UDa67pfAxRyAg3LJSyQ6HQzv/?=
- =?us-ascii?Q?CMyRqVz4B5tN6Eg549sMGyypMddfjuKePbVZCKZFc/j5d/vjJfR8bK4w9d+L?=
- =?us-ascii?Q?yjFJ6oe+Ce4RiuZKWwWn+c67I5eYxMFOB3P0foNkdb/CjErwu24a+eZlqWXK?=
- =?us-ascii?Q?cMTgk6GSxjp6C9/vAIjgLMalDSojNwW6t9mNOSOxmjixq4eP+7b4LDazqOFj?=
- =?us-ascii?Q?I90ZbUzVTjdJMAwpszqjVBMHnTjM5s6Da8EJ6wmeGOc1ZSjY02+BN+NVVvnN?=
- =?us-ascii?Q?9cDglHBSAAPNRqM386NoRwBcb9Yz9VBCCesWv3xWlAx4HRYy5uWS+KiZe5GY?=
- =?us-ascii?Q?5UDkQo2bYtiPyIq6F7z+SwDRPNcsnfdj4jvjfOUBJU7/vRLQvFq1MQdNTE1J?=
- =?us-ascii?Q?zkiR3pXowLts3SF4QbTR5rHUPA3VNtd0CJL1yjobLoRAY+UJpXBHsURKPUCD?=
- =?us-ascii?Q?OIeBB0k8GJyWGxiOadly6+uVeT7Sxy5qBXfjVqJxA2uMmM84rlVgSJadkPgO?=
- =?us-ascii?Q?i00Uuw5z0TJG3IcpaHlwGLBdvS9gc6e6DIO2BR60zi7BElN3UWp9C7SPEDIe?=
- =?us-ascii?Q?AJ3SSc0XxV8sgSuF9NALO8JqGghdIHBnVc4hFeBaTc05Fp4DueDkDoo80v5D?=
- =?us-ascii?Q?dqqWV7PoV7gUTJMAguxUAo5mXRoLIvqPB3RuEJmJNdn1xw90HAfHk3/QpWUI?=
- =?us-ascii?Q?IUyQNFaPLJPaqc/nn+q3Ccrp+slkwWkukT8nayBggtz3o30Bd5NgtyfPww57?=
- =?us-ascii?Q?+bJ7ok7TEV4ale4PgjNBv5Vd1hmnyl5gItloczYGIpSHDtnIJS4aWfd8aLXe?=
- =?us-ascii?Q?M8pErivAW25fFZaf5LqHcMq/13DO+7vRqtrcEH58MB1sQpwIOjmANFwFFaRy?=
- =?us-ascii?Q?cJgQPSHnpS5a+CBmC7fgS+XFInjhoYG3VCk9c65DXyP0/jbZQD2V2N3FOBco?=
- =?us-ascii?Q?NWuBQOnKjjSRH4v3LP7YOQ1vWhNgspo5mYXzhR0DiWQvh7DiDEioEPTDFiFf?=
- =?us-ascii?Q?+KJbQxkQ4qBQUomIoehhJHADaSPvHHpm81Yq+g1ktbx0JDC+7pw6bhyqdQk9?=
- =?us-ascii?Q?HMFwR7OpVzaWQdQnTQDBMl8xnbUrByjygrYE+9sZQKvrFz8kr7RSbOkZO/Rb?=
- =?us-ascii?Q?mlprpwGkR5wvU8Z2vyEsSeXtpJBFLjNyCyoghnBENMXUg7jn6varQjTbG6zk?=
- =?us-ascii?Q?uhpREiVjOFAWsulK/n8YKzStSw4iw3PmpSHkbWuNKYsqxBPP8eZ1Oh8m4wpP?=
- =?us-ascii?Q?23xJl80q6+SmpoNy9GkCwi68F9EXvPcoszbmzY8F1yjmwrX3p1Dt2TocOQ?=
- =?us-ascii?Q?=3D=3D?=
+	=?utf-8?B?K3FCUG82Y1dwWFJSdHMrRjUzSHMySjRnTWdoRytxcitYZWJ0cWlpa2Y5ZnpH?=
+ =?utf-8?B?Z0I5V2dGQ3Vmd1VKT0U1eXhkREhNVTJ3Rk1pc2NKcTBPNVJGczkxL2F5UHJO?=
+ =?utf-8?B?SVB5dGdCcW5sOXdWWFdub3pVVXZQQUdUN2tGTFByMFpVVCs0bmRINWlCUXlO?=
+ =?utf-8?B?eU44L0FKQ1UzbjQ5MkI3RkkrUWhaa0lBVFE0dnFQaTZpUU16QWZYQ1pJM3Bz?=
+ =?utf-8?B?QjhXWnU1dkswckJ1aWdHVjJWdGpXTnNvdnRCQ0s4QTVqdmc1aERKaWhyeXBN?=
+ =?utf-8?B?UHk4NzQ5aUlaM09aZDB3eFZQbyt0Y0h6QjBuS0dJeGtydEFpWWZaUDZhZmZT?=
+ =?utf-8?B?THlLVEhPalhtdHBqVFd3SzRVaUE1eVp1SGt2QXRRUk43UlpGSGdHMXpHV1Vx?=
+ =?utf-8?B?alNMSCtzR1FQVE5ZTWxqU1BYTVBTSysxUHBhUG82S2JZZG0zZW5maVlxZ1J2?=
+ =?utf-8?B?dDlVSEZzNWZUa2ZBSThmZnNuOXNySmxjeU9oTUwycjFyNjgyY0pHVzNpaTNl?=
+ =?utf-8?B?QWh4ckhlOFJsZSs4ZitiUVFDWkZvMUNaU2ZpSHA3a1ZxcEZYUDZXbURhVjR0?=
+ =?utf-8?B?c2Rub3lMN1g4T2RjYWdwRjNsRDFKSXZpZXE5WGVaWlhMc3AzWU5HWlprMWZX?=
+ =?utf-8?B?UXp1c2lwTTc4N3gyVzZ6UTFCT2h0R2JwZjM2SWJ3ZE0wSTRGSVlPVTdBMmZn?=
+ =?utf-8?B?cVh5bExRR0p2Ykx3a204ejNpZnBNTWVuOG5ORG1CbVlHbWN4dDJqZkVFbks5?=
+ =?utf-8?B?Qms0NW42VElnOVBMUTJKYXZ2Z0FIWUtqc1Q4eHV6clZMY1hmR2dBOVVoREpD?=
+ =?utf-8?B?YVpWTDB1MVNLRFRraUUvRzVYb3U0eGdvM2RLUDlOUXQwME1BWUlTRFFzOEN5?=
+ =?utf-8?B?L2dDVEtKYW80RDVUeEo1Q3dZZXRHaGkzNU9sSFI0REJwdjY0NUVzeEhqTE95?=
+ =?utf-8?B?bGF2eUc0aVg4bExScmpMOExlNm16R3RPUmloNzBUWUlxbzMwNS9CZ29ibFNy?=
+ =?utf-8?B?eE4zNlR2R2dlb2xtN3BIRnRjeDZKQTlCU0FOTXNvZXlCYUlML2ovRVN1SGxq?=
+ =?utf-8?B?b2g4NUt6WEFJdnFCa2ZqU2lLTnBBZW5Jd2l5RFRESEdYWE1pRGdsMmhZbWR0?=
+ =?utf-8?B?bEdmbDR4TEtHM3MvOE1adlVoWkdIbGg5ZHlDb2I5MGNvalMwR3hQM0RSckVG?=
+ =?utf-8?B?c1M5VTQyT2dnMkt3Z0pEQytzK21iQzZpb0NVSDhpWFR1UFFwYnlieDBSNWww?=
+ =?utf-8?B?OVdXSElTckd1OFF3b0htMnRZQkFpdUJmSFlWb2RMSC9acWw3eXlXcTcyRzFS?=
+ =?utf-8?B?cHh1c2pNeENQem9KRWI2Uml2bHpUYVJSRStuUTJqMy9xb1hTN3JFNFZsQXFt?=
+ =?utf-8?B?VWZqQU1TNnJibWNKNm5BdEk0M0JCVWI5c21oRHpvTGgvTXlIMmV6aWZsbHlI?=
+ =?utf-8?B?clNteHlOcmxOTmNDRG9CWENBSE05bEtQNVlHV3lYTkl0MnJVUnNPZWI2Z092?=
+ =?utf-8?B?QWlLdnRBYVQrdm5ZZ0hwWFUwWEh2US9NbGtPUjZ4VW9OM1N2RGdYVERJd016?=
+ =?utf-8?B?em9qeFgxVUFoNUFxeXlsNndObVdFZk1PZVVTWDVGRDhVRnBxc1A1VmdDRC9u?=
+ =?utf-8?B?cWFLRVJEY1pPRWdMMEptYStmNW5IWnRURG45QXR2UUo0TGZVQ2JRb29iTDZF?=
+ =?utf-8?B?MktWMXdtODJ3a2VnSjlodWh3Vm9VTXlCNDIzcVJuZWFtOUt3N3dwUDh2QTVV?=
+ =?utf-8?B?RGJPbWovZXBCek91R1lGd1BuZ3VBM1A1MjZsZ2Y2c0VXNE41K0F2cjQ2L1hG?=
+ =?utf-8?B?NnY2MnMwUFFpQU9VSjVsRlVQUFJDcFJoNlRsTGY0V2N3NGMwdUZ0Q3ludHRi?=
+ =?utf-8?B?ekMxOERZUkczTjAxZzJhQ2JSUHQ1bmNUbUptMWdEaGVtZU9qcnB0UTgvZTlS?=
+ =?utf-8?Q?CCUgpbGciP8=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Y3dpT3ZtVVhyOWpTdGQzMXFqamE2eUVMVUpmeWRqcko0M1lNUVlHck1sNFpv?=
+ =?utf-8?B?bEdXMHltNjlQTHRoRFAzUXNDdXFTbTg3SERmcXlzd3NGdkpsN1VVb2tQamNJ?=
+ =?utf-8?B?a0FrKzdNVTJUbjR1YzRLS081WXUzK01yTUYzaDJSb1hwWnh1KzlocTd1ckxQ?=
+ =?utf-8?B?YzNVajdQUS9FWVNiNncrZHYwR3NBV0xxZEdKdkhTK1NjK24zU2g2ZDBDSjRL?=
+ =?utf-8?B?OU0xV0J2WjVENUVhenpkWUY3Tk9jOE5LZzQ5ZGtGLzlkL2hLWDFPcnRLY1RZ?=
+ =?utf-8?B?YW5YbmMwNTh5NXl4YytOL0xmcEdOUFlRQzAwdWprTFpBUnk5Q3AvU2g5WTNR?=
+ =?utf-8?B?SWl0cTRKSktaVXlQUUpBRENRQVRVRHNuWVgzUEwrTFRUT3ZwcnNWZU5IRG1W?=
+ =?utf-8?B?WDlYZU1ubklyZlg1RSs4cTJLRU85UExhcVVoMGp3VEJqZHVTbU4rYjRHbFN2?=
+ =?utf-8?B?bUoraFZyVGpZUkVrL1ZaVTNpNzRUWWRqb2JuRktaWEZjUlVzMHZUdkI4NWtD?=
+ =?utf-8?B?V2ttc2JhQ0s2T3JzRnE1M3IyeW5wdSttVElLaTA4dFh1ekM2QXMyM1VjOGdv?=
+ =?utf-8?B?bXdGV09pQ283NFk4TzM1a3V3eHM3TWRUMThEL3Z2WnBXdnRWbFgxWG1IV1BU?=
+ =?utf-8?B?dnpWN1lJMDd6citKcXp5WkNSbXNoLyswWHBobjg2b3kwMjZ4L3V1SVlLUDRh?=
+ =?utf-8?B?OW9VdnRtUFBnMStGSkI5M3FZL3Z1QjlvQ255Y3ZER0V5Q3E5NU8zd2FiNE5u?=
+ =?utf-8?B?QnZpc2JDcTRJVnlVZjU3QUV4eVFEUEs4b2RLMXZGU0hHakZNbVdrZUZFam45?=
+ =?utf-8?B?TnFrK1BJTkhCRlZVNTNZS2VYOE9xN3d4N2U5Zk9UcWlJbThBbjEycElJRXp2?=
+ =?utf-8?B?MFlzYnR0ZUxrclJidSswV0FjZk1xamZzWk5aMXVPdURLVStMa3JEb2s0U1NQ?=
+ =?utf-8?B?a2Z4SGV6R3piU0pCMzhQNUVudlJZUlBaajFncXd1T3l1SW1sZ0NlWXo4TThs?=
+ =?utf-8?B?WUl2RzVrcytUeVR3YmEzbmhkTGd5dy9zWjZDREorWmZleTR1REJ6V1VyRjM5?=
+ =?utf-8?B?Zy8rMGxFVys3UnRxN3laakc4aXBJQktKR1hrbStxUTUxZld0VlFHMzVBcEdC?=
+ =?utf-8?B?OFRZVjFNVFdwRjltOG5JOFNpZGtjSmhHRkFNVGhPMDdXNnhlSEtzNzNGcFc3?=
+ =?utf-8?B?RkVzdFMyT240cG9MVkJhRUxZL2ZRbnpaekZab0ljeUdkU3d5Y2twYnAxYXVZ?=
+ =?utf-8?B?QWRZYzF1T2F6U2F1eCs5MlRxSmsrbVNkNXp1UE1KL1dyZEs1Z282SnpiMVpQ?=
+ =?utf-8?B?RlUwcDZzQzJZSVl4UjBQbFBEdkNtbm1pdEhzb2IzZWZkTi9kMTN4MkF6NHYr?=
+ =?utf-8?B?OVFuUDVMb0ZxN01KeUtId0dPTGJuRjF1dk1QWG02bTJmbE9TMytEV24wRUhn?=
+ =?utf-8?B?R3ozVVRqRUx6bzhZOHE2eHVZQnNNV0g3QkV1RUFxWEl1dHhLUG13dEpMdFpm?=
+ =?utf-8?B?T0s1RnNpaitQMFBRYWxqZnRWVUZ5dEVuQ3c0OG1oTThFcWdJeWtnemp4YjQ4?=
+ =?utf-8?B?L1ltUHAxUFZkZmVMU0VyM1pML25OTWNCVEh6OHJQTDdRS2tyN1VseEZyS2xI?=
+ =?utf-8?B?RGNiT25rZFNKd1loakV1TFc3UFVHb25aRlJNM1VGT01YWUVuL2tkb3JJQkdl?=
+ =?utf-8?B?c3RQRGdrc1JzdG1XRFJaYWhrVFdLTHBPQzdaUDZPYUx4QWJvUWREL0c3eUt1?=
+ =?utf-8?B?Z2t1TFc1M0lCL1hWM202aTdST093QkFoTTFXV1FTdHdLaFh2ZWZ1Z2VEUm90?=
+ =?utf-8?B?Vm5FU2duTXRtcWx3aTBZNTdWSFlibURTTDZmNFlRTHBVTGk2RWxHa2liWm8x?=
+ =?utf-8?B?KzZQelhFTGdVR1ZXaFpkYktTajdJQjdJV2oxNCtFOFBkYzREd1QvSzhoS0ta?=
+ =?utf-8?B?d01Kc0pMUmVZc1Z2UUlzQW5OUC9odFFwckN6OGlMMzBxMWJEYnR5UFZvUXB0?=
+ =?utf-8?B?bmpCSGh4bUZBbkU3YlFMU0hjbm9oVndiSmNmbHVmZk9LTDNJd3crcWNhQ3hN?=
+ =?utf-8?B?U01zT0F5ZzhQVmdpb3NncU5NWkpTbk9PRUVlQ1BJdXQ0aStPZ2ZuUmNVR0Fz?=
+ =?utf-8?Q?9QxGO2W2OedNIDntSmvssas5O?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2025 18:22:34.2420
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3bd56fb-d636-4926-e38d-08ddca15f8f2
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2025 18:23:07.8052
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f468ccc8-92ea-4f9e-cfaf-08ddca15e518
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003441.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6410
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: av7B/z5kFueMdAcWbxIAXETnJsr/29/ZkVqZchvfqEy4qyBFlXyyUe2jlP0YGikoLYfz4q0f4bLF46C6SZ3nbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8725
 
-Export drbg_ctr_df() derivative function to re-use it in xilinx trng
-driver. Changes has been tested by enabling CONFIG_CRYPTO_USER_API_RNG_CAVP
+On 7/14/25 09:59, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> A number of functions in this file have large structures on the stack,
+> ccp_run_aes_gcm_cmd() being the worst, in particular when KASAN
+> is enabled on gcc:
+> 
+> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_sha_cmd':
+> drivers/crypto/ccp/ccp-ops.c:1833:1: error: the frame size of 1136 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
+> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_aes_gcm_cmd':
+> drivers/crypto/ccp/ccp-ops.c:914:1: error: the frame size of 1632 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
+> 
+> Avoid the issue by using dynamic memory allocation in the worst one
+> of these.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Signed-off-by: Harsh Jain <h.jain@amd.com>
----
- crypto/Kconfig                      |   8 +-
- crypto/Makefile                     |   2 +
- crypto/df_sp80090a.c                | 243 +++++++++++++++++++++++++++
- crypto/drbg.c                       | 244 +---------------------------
- drivers/crypto/Kconfig              |   1 +
- drivers/crypto/xilinx/xilinx-trng.c |  38 ++++-
- include/crypto/df_sp80090a.h        |  27 +++
- include/crypto/drbg.h               |  18 ++
- 8 files changed, 337 insertions(+), 244 deletions(-)
- create mode 100644 crypto/df_sp80090a.c
- create mode 100644 include/crypto/df_sp80090a.h
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e9fee7818e27..ee2b84082f10 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1191,8 +1191,7 @@ config CRYPTO_DRBG_HASH
- 
- config CRYPTO_DRBG_CTR
- 	bool "CTR_DRBG"
--	select CRYPTO_AES
--	select CRYPTO_CTR
-+	select CRYPTO_DF80090A
- 	help
- 	  CTR_DRBG variant as defined in NIST SP800-90A.
- 
-@@ -1328,6 +1327,11 @@ config CRYPTO_KDF800108_CTR
- 	select CRYPTO_HMAC
- 	select CRYPTO_SHA256
- 
-+config CRYPTO_DF80090A
-+	tristate
-+	select CRYPTO_AES
-+	select CRYPTO_CTR
-+
- endmenu
- menu "Userspace interface"
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 017df3a2e4bb..1bf90ca4d3cf 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -214,4 +214,6 @@ obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
- #
- obj-$(CONFIG_CRYPTO_KDF800108_CTR) += kdf_sp800108.o
- 
-+obj-$(CONFIG_CRYPTO_DF80090A) += df_sp80090a.o
-+
- obj-$(CONFIG_CRYPTO_KRB5) += krb5/
-diff --git a/crypto/df_sp80090a.c b/crypto/df_sp80090a.c
-new file mode 100644
-index 000000000000..bde5139ba163
---- /dev/null
-+++ b/crypto/df_sp80090a.c
-@@ -0,0 +1,243 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * NIST SP800-90A DRBG derivation function
-+ *
-+ * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#include <crypto/df_sp80090a.h>
-+#include <crypto/drbg.h>
-+
-+static void drbg_kcapi_symsetkey(struct crypto_cipher *tfm,
-+				 const unsigned char *key,
-+				 u8 keylen);
-+static int drbg_kcapi_sym(struct crypto_cipher *tfm, unsigned char *outval,
-+			  const struct drbg_string *in, u8 blocklen_bytes);
-+
-+static void drbg_kcapi_symsetkey(struct crypto_cipher *tfm,
-+				 const unsigned char *key, u8 keylen)
-+{
-+	crypto_cipher_setkey(tfm, key, keylen);
-+}
-+
-+static int drbg_kcapi_sym(struct crypto_cipher *tfm, unsigned char *outval,
-+			  const struct drbg_string *in, u8 blocklen_bytes)
-+{
-+	/* there is only component in *in */
-+	BUG_ON(in->len < blocklen_bytes);
-+	crypto_cipher_encrypt_one(tfm, outval, in->buf);
-+	return 0;
-+}
-+
-+/* BCC function for CTR DRBG as defined in 10.4.3 */
-+
-+static int drbg_ctr_bcc(struct crypto_cipher *tfm,
-+			unsigned char *out, const unsigned char *key,
-+			struct list_head *in,
-+			u8 blocklen_bytes,
-+			u8 keylen)
-+{
-+	int ret = 0;
-+	struct drbg_string *curr = NULL;
-+	struct drbg_string data;
-+	short cnt = 0;
-+
-+	drbg_string_fill(&data, out, blocklen_bytes);
-+
-+	/* 10.4.3 step 2 / 4 */
-+	drbg_kcapi_symsetkey(tfm, key, keylen);
-+	list_for_each_entry(curr, in, list) {
-+		const unsigned char *pos = curr->buf;
-+		size_t len = curr->len;
-+		/* 10.4.3 step 4.1 */
-+		while (len) {
-+			/* 10.4.3 step 4.2 */
-+			if (blocklen_bytes == cnt) {
-+				cnt = 0;
-+				ret = drbg_kcapi_sym(tfm, out, &data, blocklen_bytes);
-+				if (ret)
-+					return ret;
-+			}
-+			out[cnt] ^= *pos;
-+			pos++;
-+			cnt++;
-+			len--;
-+		}
-+	}
-+	/* 10.4.3 step 4.2 for last block */
-+	if (cnt)
-+		ret = drbg_kcapi_sym(tfm, out, &data, blocklen_bytes);
-+
-+	return ret;
-+}
-+
-+/*
-+ * scratchpad usage: drbg_ctr_update is interlinked with crypto_drbg_ctr_df
-+ * (and drbg_ctr_bcc, but this function does not need any temporary buffers),
-+ * the scratchpad is used as follows:
-+ * drbg_ctr_update:
-+ *	temp
-+ *		start: drbg->scratchpad
-+ *		length: drbg_statelen(drbg) + drbg_blocklen(drbg)
-+ *			note: the cipher writing into this variable works
-+ *			blocklen-wise. Now, when the statelen is not a multiple
-+ *			of blocklen, the generateion loop below "spills over"
-+ *			by at most blocklen. Thus, we need to give sufficient
-+ *			memory.
-+ *	df_data
-+ *		start: drbg->scratchpad +
-+ *				drbg_statelen(drbg) + drbg_blocklen(drbg)
-+ *		length: drbg_statelen(drbg)
-+ *
-+ * crypto_drbg_ctr_df:
-+ *	pad
-+ *		start: df_data + drbg_statelen(drbg)
-+ *		length: drbg_blocklen(drbg)
-+ *	iv
-+ *		start: pad + drbg_blocklen(drbg)
-+ *		length: drbg_blocklen(drbg)
-+ *	temp
-+ *		start: iv + drbg_blocklen(drbg)
-+ *		length: drbg_satelen(drbg) + drbg_blocklen(drbg)
-+ *			note: temp is the buffer that the BCC function operates
-+ *			on. BCC operates blockwise. drbg_statelen(drbg)
-+ *			is sufficient when the DRBG state length is a multiple
-+ *			of the block size. For AES192 (and maybe other ciphers)
-+ *			this is not correct and the length for temp is
-+ *			insufficient (yes, that also means for such ciphers,
-+ *			the final output of all BCC rounds are truncated).
-+ *			Therefore, add drbg_blocklen(drbg) to cover all
-+ *			possibilities.
-+ * refer to crypto_drbg_ctr_df_datalen() to get required length
-+ */
-+
-+/* Derivation Function for CTR DRBG as defined in 10.4.2 */
-+int crypto_drbg_ctr_df(struct crypto_cipher *tfm,
-+		       unsigned char *df_data, size_t bytes_to_return,
-+		       struct list_head *seedlist,
-+		       u8 blocklen_bytes,
-+		       u8 statelen)
-+{
-+	int ret = -EFAULT;
-+	unsigned char L_N[8];
-+	/* S3 is input */
-+	struct drbg_string S1, S2, S4, cipherin;
-+	LIST_HEAD(bcc_list);
-+	unsigned char *pad = df_data + statelen;
-+	unsigned char *iv = pad + blocklen_bytes;
-+	unsigned char *temp = iv + blocklen_bytes;
-+	size_t padlen = 0;
-+	unsigned int templen = 0;
-+	/* 10.4.2 step 7 */
-+	unsigned int i = 0;
-+	/* 10.4.2 step 8 */
-+	const unsigned char *K = (unsigned char *)
-+			   "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			   "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-+			   "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			   "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
-+	unsigned char *X;
-+	size_t generated_len = 0;
-+	size_t inputlen = 0;
-+	struct drbg_string *seed = NULL;
-+	u8 keylen;
-+
-+	memset(pad, 0, blocklen_bytes);
-+	memset(iv, 0, blocklen_bytes);
-+	keylen = statelen - blocklen_bytes;
-+	/* 10.4.2 step 1 is implicit as we work byte-wise */
-+
-+	/* 10.4.2 step 2 */
-+	if ((512 / 8) < bytes_to_return)
-+		return -EINVAL;
-+
-+	/* 10.4.2 step 2 -- calculate the entire length of all input data */
-+	list_for_each_entry(seed, seedlist, list)
-+		inputlen += seed->len;
-+	drbg_cpu_to_be32(inputlen, &L_N[0]);
-+
-+	/* 10.4.2 step 3 */
-+	drbg_cpu_to_be32(bytes_to_return, &L_N[4]);
-+
-+	/* 10.4.2 step 5: length is L_N, input_string, one byte, padding */
-+	padlen = (inputlen + sizeof(L_N) + 1) % (blocklen_bytes);
-+	/* wrap the padlen appropriately */
-+	if (padlen)
-+		padlen = blocklen_bytes - padlen;
-+	/*
-+	 * pad / padlen contains the 0x80 byte and the following zero bytes.
-+	 * As the calculated padlen value only covers the number of zero
-+	 * bytes, this value has to be incremented by one for the 0x80 byte.
-+	 */
-+	padlen++;
-+	pad[0] = 0x80;
-+
-+	/* 10.4.2 step 4 -- first fill the linked list and then order it */
-+	drbg_string_fill(&S1, iv, blocklen_bytes);
-+	list_add_tail(&S1.list, &bcc_list);
-+	drbg_string_fill(&S2, L_N, sizeof(L_N));
-+	list_add_tail(&S2.list, &bcc_list);
-+	list_splice_tail(seedlist, &bcc_list);
-+	drbg_string_fill(&S4, pad, padlen);
-+	list_add_tail(&S4.list, &bcc_list);
-+
-+	/* 10.4.2 step 9 */
-+	while (templen < (keylen + (blocklen_bytes))) {
-+		/*
-+		 * 10.4.2 step 9.1 - the padding is implicit as the buffer
-+		 * holds zeros after allocation -- even the increment of i
-+		 * is irrelevant as the increment remains within length of i
-+		 */
-+		drbg_cpu_to_be32(i, iv);
-+		/* 10.4.2 step 9.2 -- BCC and concatenation with temp */
-+		ret = drbg_ctr_bcc(tfm, temp + templen, K, &bcc_list,
-+				   blocklen_bytes, keylen);
-+		if (ret)
-+			goto out;
-+		/* 10.4.2 step 9.3 */
-+		i++;
-+		templen += blocklen_bytes;
-+	}
-+
-+	/* 10.4.2 step 11 */
-+	X = temp + (keylen);
-+	drbg_string_fill(&cipherin, X, blocklen_bytes);
-+
-+	/* 10.4.2 step 12: overwriting of outval is implemented in next step */
-+
-+	/* 10.4.2 step 13 */
-+	drbg_kcapi_symsetkey(tfm, temp, keylen);
-+	while (generated_len < bytes_to_return) {
-+		short blocklen = 0;
-+		/*
-+		 * 10.4.2 step 13.1: the truncation of the key length is
-+		 * implicit as the key is only drbg_blocklen in size based on
-+		 * the implementation of the cipher function callback
-+		 */
-+		ret = drbg_kcapi_sym(tfm, X, &cipherin, blocklen_bytes);
-+		if (ret)
-+			goto out;
-+		blocklen = (blocklen_bytes <
-+				(bytes_to_return - generated_len)) ?
-+			    blocklen_bytes :
-+				(bytes_to_return - generated_len);
-+		/* 10.4.2 step 13.2 and 14 */
-+		memcpy(df_data + generated_len, X, blocklen);
-+		generated_len += blocklen;
-+	}
-+
-+	ret = 0;
-+
-+out:
-+	memset(iv, 0, blocklen_bytes);
-+	memset(temp, 0, statelen + blocklen_bytes);
-+	memset(pad, 0, blocklen_bytes);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_drbg_ctr_df);
-+
-+MODULE_IMPORT_NS("CRYPTO_INTERNAL");
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Derivation Function conformant to SP800-90A");
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index dbe4c8bb5ceb..bad005eef03d 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -98,6 +98,7 @@
-  */
- 
- #include <crypto/drbg.h>
-+#include <crypto/df_sp80090a.h>
- #include <crypto/internal/cipher.h>
- #include <linux/kernel.h>
- #include <linux/jiffies.h>
-@@ -261,26 +262,6 @@ static int drbg_fips_continuous_test(struct drbg_state *drbg,
- 	return 0;
- }
- 
--/*
-- * Convert an integer into a byte representation of this integer.
-- * The byte representation is big-endian
-- *
-- * @val value to be converted
-- * @buf buffer holding the converted integer -- caller must ensure that
-- *      buffer size is at least 32 bit
-- */
--#if (defined(CONFIG_CRYPTO_DRBG_HASH) || defined(CONFIG_CRYPTO_DRBG_CTR))
--static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
--{
--	struct s {
--		__be32 conv;
--	};
--	struct s *conversion = (struct s *) buf;
--
--	conversion->conv = cpu_to_be32(val);
--}
--#endif /* defined(CONFIG_CRYPTO_DRBG_HASH) || defined(CONFIG_CRYPTO_DRBG_CTR) */
--
- /******************************************************************
-  * CTR DRBG callback functions
-  ******************************************************************/
-@@ -294,10 +275,6 @@ MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes192");
- MODULE_ALIAS_CRYPTO("drbg_pr_ctr_aes128");
- MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes128");
- 
--static void drbg_kcapi_symsetkey(struct drbg_state *drbg,
--				 const unsigned char *key);
--static int drbg_kcapi_sym(struct drbg_state *drbg, unsigned char *outval,
--			  const struct drbg_string *in);
- static int drbg_init_sym_kernel(struct drbg_state *drbg);
- static int drbg_fini_sym_kernel(struct drbg_state *drbg);
- static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
-@@ -305,202 +282,12 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 			      u8 *outbuf, u32 outlen);
- #define DRBG_OUTSCRATCHLEN 256
- 
--/* BCC function for CTR DRBG as defined in 10.4.3 */
--static int drbg_ctr_bcc(struct drbg_state *drbg,
--			unsigned char *out, const unsigned char *key,
--			struct list_head *in)
--{
--	int ret = 0;
--	struct drbg_string *curr = NULL;
--	struct drbg_string data;
--	short cnt = 0;
--
--	drbg_string_fill(&data, out, drbg_blocklen(drbg));
--
--	/* 10.4.3 step 2 / 4 */
--	drbg_kcapi_symsetkey(drbg, key);
--	list_for_each_entry(curr, in, list) {
--		const unsigned char *pos = curr->buf;
--		size_t len = curr->len;
--		/* 10.4.3 step 4.1 */
--		while (len) {
--			/* 10.4.3 step 4.2 */
--			if (drbg_blocklen(drbg) == cnt) {
--				cnt = 0;
--				ret = drbg_kcapi_sym(drbg, out, &data);
--				if (ret)
--					return ret;
--			}
--			out[cnt] ^= *pos;
--			pos++;
--			cnt++;
--			len--;
--		}
--	}
--	/* 10.4.3 step 4.2 for last block */
--	if (cnt)
--		ret = drbg_kcapi_sym(drbg, out, &data);
--
--	return ret;
--}
--
--/*
-- * scratchpad usage: drbg_ctr_update is interlinked with drbg_ctr_df
-- * (and drbg_ctr_bcc, but this function does not need any temporary buffers),
-- * the scratchpad is used as follows:
-- * drbg_ctr_update:
-- *	temp
-- *		start: drbg->scratchpad
-- *		length: drbg_statelen(drbg) + drbg_blocklen(drbg)
-- *			note: the cipher writing into this variable works
-- *			blocklen-wise. Now, when the statelen is not a multiple
-- *			of blocklen, the generateion loop below "spills over"
-- *			by at most blocklen. Thus, we need to give sufficient
-- *			memory.
-- *	df_data
-- *		start: drbg->scratchpad +
-- *				drbg_statelen(drbg) + drbg_blocklen(drbg)
-- *		length: drbg_statelen(drbg)
-- *
-- * drbg_ctr_df:
-- *	pad
-- *		start: df_data + drbg_statelen(drbg)
-- *		length: drbg_blocklen(drbg)
-- *	iv
-- *		start: pad + drbg_blocklen(drbg)
-- *		length: drbg_blocklen(drbg)
-- *	temp
-- *		start: iv + drbg_blocklen(drbg)
-- *		length: drbg_satelen(drbg) + drbg_blocklen(drbg)
-- *			note: temp is the buffer that the BCC function operates
-- *			on. BCC operates blockwise. drbg_statelen(drbg)
-- *			is sufficient when the DRBG state length is a multiple
-- *			of the block size. For AES192 (and maybe other ciphers)
-- *			this is not correct and the length for temp is
-- *			insufficient (yes, that also means for such ciphers,
-- *			the final output of all BCC rounds are truncated).
-- *			Therefore, add drbg_blocklen(drbg) to cover all
-- *			possibilities.
-- */
--
--/* Derivation Function for CTR DRBG as defined in 10.4.2 */
- static int drbg_ctr_df(struct drbg_state *drbg,
- 		       unsigned char *df_data, size_t bytes_to_return,
- 		       struct list_head *seedlist)
- {
--	int ret = -EFAULT;
--	unsigned char L_N[8];
--	/* S3 is input */
--	struct drbg_string S1, S2, S4, cipherin;
--	LIST_HEAD(bcc_list);
--	unsigned char *pad = df_data + drbg_statelen(drbg);
--	unsigned char *iv = pad + drbg_blocklen(drbg);
--	unsigned char *temp = iv + drbg_blocklen(drbg);
--	size_t padlen = 0;
--	unsigned int templen = 0;
--	/* 10.4.2 step 7 */
--	unsigned int i = 0;
--	/* 10.4.2 step 8 */
--	const unsigned char *K = (unsigned char *)
--			   "\x00\x01\x02\x03\x04\x05\x06\x07"
--			   "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
--			   "\x10\x11\x12\x13\x14\x15\x16\x17"
--			   "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
--	unsigned char *X;
--	size_t generated_len = 0;
--	size_t inputlen = 0;
--	struct drbg_string *seed = NULL;
--
--	memset(pad, 0, drbg_blocklen(drbg));
--	memset(iv, 0, drbg_blocklen(drbg));
--
--	/* 10.4.2 step 1 is implicit as we work byte-wise */
--
--	/* 10.4.2 step 2 */
--	if ((512/8) < bytes_to_return)
--		return -EINVAL;
--
--	/* 10.4.2 step 2 -- calculate the entire length of all input data */
--	list_for_each_entry(seed, seedlist, list)
--		inputlen += seed->len;
--	drbg_cpu_to_be32(inputlen, &L_N[0]);
--
--	/* 10.4.2 step 3 */
--	drbg_cpu_to_be32(bytes_to_return, &L_N[4]);
--
--	/* 10.4.2 step 5: length is L_N, input_string, one byte, padding */
--	padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
--	/* wrap the padlen appropriately */
--	if (padlen)
--		padlen = drbg_blocklen(drbg) - padlen;
--	/*
--	 * pad / padlen contains the 0x80 byte and the following zero bytes.
--	 * As the calculated padlen value only covers the number of zero
--	 * bytes, this value has to be incremented by one for the 0x80 byte.
--	 */
--	padlen++;
--	pad[0] = 0x80;
--
--	/* 10.4.2 step 4 -- first fill the linked list and then order it */
--	drbg_string_fill(&S1, iv, drbg_blocklen(drbg));
--	list_add_tail(&S1.list, &bcc_list);
--	drbg_string_fill(&S2, L_N, sizeof(L_N));
--	list_add_tail(&S2.list, &bcc_list);
--	list_splice_tail(seedlist, &bcc_list);
--	drbg_string_fill(&S4, pad, padlen);
--	list_add_tail(&S4.list, &bcc_list);
--
--	/* 10.4.2 step 9 */
--	while (templen < (drbg_keylen(drbg) + (drbg_blocklen(drbg)))) {
--		/*
--		 * 10.4.2 step 9.1 - the padding is implicit as the buffer
--		 * holds zeros after allocation -- even the increment of i
--		 * is irrelevant as the increment remains within length of i
--		 */
--		drbg_cpu_to_be32(i, iv);
--		/* 10.4.2 step 9.2 -- BCC and concatenation with temp */
--		ret = drbg_ctr_bcc(drbg, temp + templen, K, &bcc_list);
--		if (ret)
--			goto out;
--		/* 10.4.2 step 9.3 */
--		i++;
--		templen += drbg_blocklen(drbg);
--	}
--
--	/* 10.4.2 step 11 */
--	X = temp + (drbg_keylen(drbg));
--	drbg_string_fill(&cipherin, X, drbg_blocklen(drbg));
--
--	/* 10.4.2 step 12: overwriting of outval is implemented in next step */
--
--	/* 10.4.2 step 13 */
--	drbg_kcapi_symsetkey(drbg, temp);
--	while (generated_len < bytes_to_return) {
--		short blocklen = 0;
--		/*
--		 * 10.4.2 step 13.1: the truncation of the key length is
--		 * implicit as the key is only drbg_blocklen in size based on
--		 * the implementation of the cipher function callback
--		 */
--		ret = drbg_kcapi_sym(drbg, X, &cipherin);
--		if (ret)
--			goto out;
--		blocklen = (drbg_blocklen(drbg) <
--				(bytes_to_return - generated_len)) ?
--			    drbg_blocklen(drbg) :
--				(bytes_to_return - generated_len);
--		/* 10.4.2 step 13.2 and 14 */
--		memcpy(df_data + generated_len, X, blocklen);
--		generated_len += blocklen;
--	}
--
--	ret = 0;
--
--out:
--	memset(iv, 0, drbg_blocklen(drbg));
--	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
--	memset(pad, 0, drbg_blocklen(drbg));
--	return ret;
-+	return crypto_drbg_ctr_df(drbg->priv_data, df_data, drbg_statelen(drbg),
-+				  seedlist, drbg_blocklen(drbg), drbg_statelen(drbg));
- }
- 
- /*
-@@ -1310,10 +1097,8 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 		sb_size = 0;
- 	else if (drbg->core->flags & DRBG_CTR)
- 		sb_size = drbg_statelen(drbg) + drbg_blocklen(drbg) + /* temp */
--			  drbg_statelen(drbg) +	/* df_data */
--			  drbg_blocklen(drbg) +	/* pad */
--			  drbg_blocklen(drbg) +	/* iv */
--			  drbg_statelen(drbg) + drbg_blocklen(drbg); /* temp */
-+			  crypto_drbg_ctr_df_datalen(drbg_statelen(drbg),
-+						     drbg_blocklen(drbg));
- 	else
- 		sb_size = drbg_statelen(drbg) + drbg_blocklen(drbg);
- 
-@@ -1800,25 +1585,6 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
- 	return alignmask;
- }
- 
--static void drbg_kcapi_symsetkey(struct drbg_state *drbg,
--				 const unsigned char *key)
--{
--	struct crypto_cipher *tfm = drbg->priv_data;
--
--	crypto_cipher_setkey(tfm, key, (drbg_keylen(drbg)));
--}
--
--static int drbg_kcapi_sym(struct drbg_state *drbg, unsigned char *outval,
--			  const struct drbg_string *in)
--{
--	struct crypto_cipher *tfm = drbg->priv_data;
--
--	/* there is only component in *in */
--	BUG_ON(in->len < drbg_blocklen(drbg));
--	crypto_cipher_encrypt_one(tfm, outval, in->buf);
--	return 0;
--}
--
- static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 			      u8 *inbuf, u32 inlen,
- 			      u8 *outbuf, u32 outlen)
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 53eedc0dea4d..78557bff0753 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -728,6 +728,7 @@ config CRYPTO_DEV_TEGRA
- config CRYPTO_DEV_XILINX_TRNG
- 	tristate "Support for Xilinx True Random Generator"
- 	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
-+	select CRYPTO_DF80090A
- 	select CRYPTO_RNG
- 	select HW_RANDOM
- 	help
-diff --git a/drivers/crypto/xilinx/xilinx-trng.c b/drivers/crypto/xilinx/xilinx-trng.c
-index 989d2dbee124..ce765a3c722e 100644
---- a/drivers/crypto/xilinx/xilinx-trng.c
-+++ b/drivers/crypto/xilinx/xilinx-trng.c
-@@ -7,6 +7,8 @@
- #include <linux/bitfield.h>
- #include <linux/clk.h>
- #include <linux/crypto.h>
-+#include <crypto/df_sp80090a.h>
-+#include <crypto/drbg.h>
- #include <linux/firmware/xlnx-zynqmp.h>
- #include <linux/hw_random.h>
- #include <linux/io.h>
-@@ -56,6 +58,8 @@
- struct xilinx_rng {
- 	void __iomem *rng_base;
- 	struct device *dev;
-+	unsigned char *scratchpadbuf;
-+	struct crypto_cipher *tfm;
- 	struct mutex lock;	/* Protect access to TRNG device */
- 	struct hwrng trng;
- };
-@@ -179,9 +183,13 @@ static void xtrng_enable_entropy(struct xilinx_rng *rng)
- static int xtrng_reseed_internal(struct xilinx_rng *rng)
- {
- 	u8 entropy[TRNG_ENTROPY_SEED_LEN_BYTES];
-+	struct drbg_string data;
-+	LIST_HEAD(seedlist);
- 	u32 val;
- 	int ret;
- 
-+	drbg_string_fill(&data, entropy, TRNG_SEED_LEN_BYTES);
-+	list_add_tail(&data.list, &seedlist);
- 	memset(entropy, 0, sizeof(entropy));
- 	xtrng_enable_entropy(rng);
- 
-@@ -189,9 +197,14 @@ static int xtrng_reseed_internal(struct xilinx_rng *rng)
- 	ret = xtrng_collect_random_data(rng, entropy, TRNG_SEED_LEN_BYTES, true);
- 	if (ret != TRNG_SEED_LEN_BYTES)
- 		return -EINVAL;
-+	ret = crypto_drbg_ctr_df(rng->tfm, rng->scratchpadbuf,
-+				 TRNG_SEED_LEN_BYTES, &seedlist, AES_BLOCK_SIZE,
-+				 TRNG_SEED_LEN_BYTES);
-+	if (ret)
-+		return ret;
- 
- 	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET,
--				       (u32 *)entropy, TRNG_NUM_INIT_REGS);
-+				       (u32 *)rng->scratchpadbuf, TRNG_NUM_INIT_REGS);
- 	/* select reseed operation */
- 	iowrite32(TRNG_CTRL_PRNGXS_MASK, rng->rng_base + TRNG_CTRL_OFFSET);
- 
-@@ -321,6 +334,7 @@ static void xtrng_hwrng_unregister(struct hwrng *trng)
- static int xtrng_probe(struct platform_device *pdev)
- {
- 	struct xilinx_rng *rng;
-+	size_t sb_size;
- 	int ret;
- 
- 	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-@@ -334,11 +348,24 @@ static int xtrng_probe(struct platform_device *pdev)
- 		return PTR_ERR(rng->rng_base);
- 	}
- 
-+	rng->tfm = crypto_alloc_cipher("aes", 0, 0);
-+	if (IS_ERR(rng->tfm)) {
-+		pr_info("DRBG: could not allocate cipher TFM handle:\n");
-+		return PTR_ERR(rng->tfm);
-+	}
-+
-+	sb_size = crypto_drbg_ctr_df_datalen(TRNG_SEED_LEN_BYTES, AES_BLOCK_SIZE);
-+	rng->scratchpadbuf = devm_kzalloc(&pdev->dev, sb_size, GFP_KERNEL);
-+	if (!rng->scratchpadbuf) {
-+		ret = -ENOMEM;
-+		goto cipher_cleanup;
-+	}
-+
- 	xtrng_trng_reset(rng->rng_base);
- 	ret = xtrng_reseed_internal(rng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "TRNG Seed fail\n");
--		return ret;
-+		goto cipher_cleanup;
- 	}
- 
- 	xilinx_rng_dev = rng;
-@@ -346,8 +373,9 @@ static int xtrng_probe(struct platform_device *pdev)
- 	ret = crypto_register_rng(&xtrng_trng_alg);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Crypto Random device registration failed: %d\n", ret);
--		return ret;
-+		goto cipher_cleanup;
- 	}
-+
- 	ret = xtrng_hwrng_register(&rng->trng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "HWRNG device registration failed: %d\n", ret);
-@@ -360,6 +388,9 @@ static int xtrng_probe(struct platform_device *pdev)
- crypto_rng_free:
- 	crypto_unregister_rng(&xtrng_trng_alg);
- 
-+cipher_cleanup:
-+	crypto_free_cipher(rng->tfm);
-+
- 	return ret;
- }
- 
-@@ -371,6 +402,7 @@ static void xtrng_remove(struct platform_device *pdev)
- 	rng = platform_get_drvdata(pdev);
- 	xtrng_hwrng_unregister(&rng->trng);
- 	crypto_unregister_rng(&xtrng_trng_alg);
-+	crypto_free_cipher(rng->tfm);
- 	xtrng_write_multiple_registers(rng->rng_base + TRNG_EXT_SEED_OFFSET, zero,
- 				       TRNG_NUM_INIT_REGS);
- 	xtrng_write_multiple_registers(rng->rng_base + TRNG_PER_STRNG_OFFSET, zero,
-diff --git a/include/crypto/df_sp80090a.h b/include/crypto/df_sp80090a.h
-new file mode 100644
-index 000000000000..182865538662
---- /dev/null
-+++ b/include/crypto/df_sp80090a.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+/*
-+ * Copyright Stephan Mueller <smueller@chronox.de>, 2014
-+ */
-+
-+#ifndef _CRYPTO_DF80090A_H
-+#define _CRYPTO_DF80090A_H
-+
-+#include <crypto/internal/cipher.h>
-+
-+static inline int crypto_drbg_ctr_df_datalen(u8 statelen, u8 blocklen)
-+{
-+	return statelen +       /* df_data */
-+		blocklen +      /* pad */
-+		blocklen +      /* iv */
-+		statelen + blocklen;  /* temp */
-+}
-+
-+int crypto_drbg_ctr_df(struct crypto_cipher *tfm,
-+		       unsigned char *df_data,
-+		       size_t bytes_to_return,
-+		       struct list_head *seedlist,
-+		       u8 blocklen_bytes,
-+		       u8 statelen);
-+
-+#endif /* _CRYPTO_DF80090A_H */
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index af5ad51d3eef..4234f15d74be 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -144,6 +144,24 @@ struct drbg_state {
- 	struct drbg_string test_data;
- };
- 
-+/*
-+ * Convert an integer into a byte representation of this integer.
-+ * The byte representation is big-endian
-+ *
-+ * @val value to be converted
-+ * @buf buffer holding the converted integer -- caller must ensure that
-+ *      buffer size is at least 32 bit
-+ */
-+static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
-+{
-+        struct s {
-+                __be32 conv;
-+        };
-+        struct s *conversion = (struct s *) buf;
-+
-+        conversion->conv = cpu_to_be32(val);
-+}
-+
- static inline __u8 drbg_statelen(struct drbg_state *drbg)
- {
- 	if (drbg && drbg->core)
--- 
-2.34.1
-
+> ---
+> I'm not overly happy with this patch myself but couldn't come up
+> with anything better either.
+> 
+> One alternative would be to turn off sanitizers here, but even without
+> those, the stack usage is fairly high, so that still feels like
+> papering over the problem.
+> ---
