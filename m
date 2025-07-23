@@ -1,77 +1,84 @@
-Received: from smtp.smtpout.orange.fr (smtp-72.smtpout.orange.fr [80.12.242.72])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63D825F7B4;
-	Tue, 22 Jul 2025 17:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E03F1A9B46;
+	Wed, 23 Jul 2025 02:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753203917; cv=none; b=US+NhSf6zaHv45gi8/xo0OrJpKkPDYfEKoc+J2l4nMwIutys88j0pvX+TJDYpqPXb+0tr1/FFfb0GmnKtFUkb6RS1yPbHg+jHssMOuY3LCKffqRzrpRtT8qnUmBkTgwAJtJuek88QO+Jaz+KUO4t7dCYUXV18iBoepxZTv+mUEU=
+	t=1753239068; cv=none; b=gHKdeeEBYFynuwUNFnkWG+aCX8L89kUVX+534SlCboze567nfVhlxqZz6RLPwYGzibdPy59fhVal/2Cw5XzhUL1Zm6SwaparDHreNaTHq9kUEHx8s6JSDu4LryELuTQPZiZQT6wPfQxXQ638udy+hCKQwT1wFV+iT8zC+R//evM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753203917; c=relaxed/simple;
-	bh=MsbOBqCdhvkmcT8garlNkx4qKXvrWtrbDvujJZN40gM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=epO3Gv1gfXFFDZjo0QJI6nR1S/rAg1UkBeYoKzj+0AuEm83EO8kPkE1JU56oPBmArEYYRwrecQuklwBBwlgBznKff6UI1SOMohUuLcO8R4wuIl1c2ey4KiH/uEUS1QhV77lEd1K9V1LwKbXq7s76wIF+bemZUcCJsN3db7rDXzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=bibkTVKv; arc=none smtp.client-ip=80.12.242.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="bibkTVKv"
-Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
- ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id eGPCuzqqs7oQQeGPCuolrN; Tue, 22 Jul 2025 19:03:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1753203839;
-	bh=1LCUcL331vbtCzLQERTjWDc5Tg4pTHQ4IJIaPEGil/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=bibkTVKvhqyulsY6SdBhylzp97cisGjwyScpE7k7Yf+TUaaP5+B0vWFPGI8XMyMR+
-	 tEuEcFpwIZ0jyD9T01jJZ5Zq3HZ/zqfdSSNewExqUp5oiQ02CpJo3RD8HNnjXpwJ7l
-	 jf0PCyZhinbPAR9q0gSKIckIk8zlYS1SJienqmdt8WkTsazwoLbbEB0Gz3w2YdSFjW
-	 3UOjV+0Jc3PbF9UvO2J+3i+08YVatQeoOLyHFUkcAYQ7PwbQspoePI1msCrf4rN9Rh
-	 UQjhZ9QUbdA5+9x99LBEfFsbMGkDNH7renvIG1NI+SWG4epBYY2LkJHpDcxORVMH+s
-	 OMgir8sKITTFQ==
-X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Tue, 22 Jul 2025 19:03:59 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-Message-ID: <ac2ace68-e88f-4055-9b01-45a2eaab50fc@wanadoo.fr>
-Date: Tue, 22 Jul 2025 19:03:54 +0200
+	s=arc-20240116; t=1753239068; c=relaxed/simple;
+	bh=W7regQMFM7V9N05VQIC9KKSQsVpg98Qy0R0QwOs7kLY=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=PtVIB/GpLXsW9BWgYnJ1kDq7yQzsFMryJCJXWjKP9MVC36DCujLx6UeUXd9MVAcCbBAXXJnVqsdctpeooaMaeu45DIchk8ow3KUo273ol7itULe04k2MLV8JrzLxQL7vWDlGE50TsZIV+Rv4wzi7yiHEBfYq234f8pMAOK2hcwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4bmzCn6yMmz6Fy6D;
+	Wed, 23 Jul 2025 10:51:01 +0800 (CST)
+Received: from xaxapp04.zte.com.cn ([10.99.98.157])
+	by mse-fl2.zte.com.cn with SMTP id 56N2oQGx026563;
+	Wed, 23 Jul 2025 10:50:26 +0800 (+08)
+	(envelope-from zhang.enpei@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Wed, 23 Jul 2025 10:50:27 +0800 (CST)
+Date: Wed, 23 Jul 2025 10:50:27 +0800 (CST)
+X-Zmail-TransId: 2afb68804df32e2-c1398
+X-Mailer: Zmail v1.0
+Message-ID: <20250723105027140oF4Bwli1JuZcQ0V5-7pyK@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: caam - switch to use devm_kmemdup_array()
-To: zhang.enpei@zte.com.cn
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
- herbert@gondor.apana.org.au, davem@davemloft.net,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <e4c297a7-1ef1-4c39-8daa-8acdade47508@wanadoo.fr>
- <20250721100618249bnR0yTtsh0IeGzAdt8Fuu@zte.com.cn>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20250721100618249bnR0yTtsh0IeGzAdt8Fuu@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+From: <zhang.enpei@zte.com.cn>
+To: <horia.geanta@nxp.com>
+Cc: <pankaj.gupta@nxp.com>, <gaurav.jain@nxp.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <christophe.jaillet@wanadoo.fr>
+Subject: =?UTF-8?B?W1BBVENIIHYyXSBjcnlwdG86IGNhYW0gLSBzd2l0Y2ggdG8gdXNlIGRldm1fa21lbWR1cF9hcnJheSgp?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 56N2oQGx026563
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: zhang.enpei@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.133 unknown Wed, 23 Jul 2025 10:51:01 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 68804E15.003/4bmzCn6yMmz6Fy6D
 
-Le 21/07/2025 à 04:06, zhang.enpei@zte.com.cn a écrit :
-> Thanks for the review!
-> devm_kmemdup_array() will call size_mul() to combine its third and fourth parameters into
-> length for devm_kmemdup(). So keep the same value sizeof(data->clks[0]) here as before.
-> 
-> 
+From: Zhang Enpei <zhang.enpei@zte.com.cn>
 
-sizeof(data->clks[0]) and sizeof(*data->clks) are the same.
+Use devm_kmemdup_array() to avoid multiplication or possible overflows.
 
-But the second version is the preferred style. See [1].
+Signed-off-by: Zhang Enpei <zhang.enpei@zte.com.cn>
+---
+ drivers/crypto/caam/ctrl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-So while touching these lines of code, updating the style looked a good 
-idea to me.
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index ce7b99019537..2250dce9c344 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -592,9 +592,9 @@ static int init_clocks(struct device *dev, const struct caam_imx_data *data)
+        int ret;
 
-CJ
+        ctrlpriv->num_clks = data->num_clks;
+-       ctrlpriv->clks = devm_kmemdup(dev, data->clks,
+-                                     data->num_clks * sizeof(data->clks[0]),
+-                                     GFP_KERNEL);
++       ctrlpriv->clks = devm_kmemdup_array(dev, data->clks,
++                                           data->num_clks, sizeof(*data->clks),
++                                           GFP_KERNEL);
+        if (!ctrlpriv->clks)
+                return -ENOMEM;
 
-
-[1]: 
-https://docs.kernel.org/6.15/process/coding-style.html#allocating-memory
+-- 
+2.25.1
