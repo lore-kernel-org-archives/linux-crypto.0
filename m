@@ -1,129 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E69277C9E;
-	Thu, 24 Jul 2025 11:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D714F2C08DD;
+	Thu, 24 Jul 2025 12:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753355975; cv=none; b=iiQsajiZJ8+OX/v8E9et1SwObRQ8IsvUC8QcWotyadFT1Ch2IWbdaDmv+aiUt+EdOoO/XStaq9lnNoQixB6+FHp4I/QifV7q9s4GP08kSmH6tVi+9q2Cw9O9H5UNI2abU9gIp+ecoN92XEdPuTR0R1g6y9Xo6oXvO+BH/R3ZR9Y=
+	t=1753358425; cv=none; b=Vqc7EtOkrUDTWK+Lps4QbcWmc1v/wVlZVWbMxP0sWD8CCYy93FreyBNOzQDTKYM0U/HuuMy9Vdit3q8oDnGw+vUckgP5KBUFhcHMVq3KyIFvPFPMcgYvpmoYFi3PkpfohcqWiKechr6yNHMY55o7zueyd2G0prdRN87IJsOXjSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753355975; c=relaxed/simple;
-	bh=xr9UfPrtsc/ykSfE3EhQN0BAiqLo6Aci+RNDYoh3hig=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=o+grxBAc9bXpzI0VDXjayK2ICY0AuSJskmhHUVy7zxyVdPZ5cSZXVO6G8mwTc2oDooV4PoZiUdAo+kCHuUKxGsMK+7zBUISDZ6ril3M3aMgHpH18bQ5xIJLowpoKIv7Dq2V8RcOjuUsZB20/MN+f3w7080VsJ1tmiYdav10OX/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtcIHEg+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753358425; c=relaxed/simple;
+	bh=E959aFyB7Fz7wM1ihx+E3PvvcL2j2BmEZFA2aVmLOhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIvqom2jDgMcY+9SlOyel/4UKeKgxK+bbVyz8nSC3rb6oh/wlZ4bYRL744ZHawP652N7vdkNP0gwT9Qdnn8rXqZuvMxItT9R2HW7wNAcNA1g25H8T7uPFfUWQWPyTbVSu2zYsTPxP6dKYE5wV2a5Kx7dJFbDrgGgJp8yu+eccsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=No4s5Z+m; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtcIHEg+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBABC4AF0B;
-	Thu, 24 Jul 2025 11:19:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753355974;
-	bh=xr9UfPrtsc/ykSfE3EhQN0BAiqLo6Aci+RNDYoh3hig=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=gtcIHEg+ph2IJp1WJwEVEk3R4hb7SfpYBo9kg5zwfeF9fN/WnQ/3g4N5KdsEraUxJ
-	 a4kPxnUb6bid5gAmKGKCF0eNsTLWvajd+kYVB4502wn7qiMsf11sjF4R9lpE6mCSR+
-	 P67vfBvqBl1xbYZsCu2vX1bxZGrZ52K4QMWbuo9F9vjdiw2jK+i6++M5BfJ5MP73Hc
-	 6kOllnuqTh9sjsC7d3K1OIsNLehSe8QcLzIASlA5D65JUPFShxhMhZJ0esq5Y2XylZ
-	 Kw+y5W5Hc6gxWxuEybtqyQNpcVHYHK+xTxB5pnUfeY2DDLHt8hF0/MdFi4v5IQxVVo
-	 BR6VL794/V8cg==
-Date: Thu, 24 Jul 2025 06:19:34 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="No4s5Z+m"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753358423; x=1784894423;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=E959aFyB7Fz7wM1ihx+E3PvvcL2j2BmEZFA2aVmLOhc=;
+  b=No4s5Z+muSMzeoJ0O9Dp2FEtkbJDVvTWxK7YSvSmcBnfzna6LO6RiHjE
+   lCMucQTcanfVIF75dXcB7lE6dmwV4Ir017eVlrADMztQtHFRkyOAn7QeE
+   0jO23TprDZW5vVrifOQcPReT66MtbjattOzdj7Am8ifoUp970YjsZ8B9e
+   DtZUwQ0HSmCYIE9hgtAGLCnJcPSvViaaNCQbgxrqG5UZeZDuoK83r6QsS
+   RV9KSrz21de+Jg3z4EOR2v6iYL3Tmi+j7CFBM/x5knfKRRimvygBMusTE
+   xqUqfybuQAozHBJDSuS1pf6h3YDEJxt0iPI2CJAFRsEpjp59HwePSJYc3
+   w==;
+X-CSE-ConnectionGUID: q3b+T8ZHSOep4WtSK2bwqA==
+X-CSE-MsgGUID: fESbx4CKTva3Wt3/d3YATA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55635948"
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="55635948"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2025 05:00:22 -0700
+X-CSE-ConnectionGUID: um94yLrvQkeieesPNbWB8Q==
+X-CSE-MsgGUID: 58mHhrkeTRuAwGrnTU6UFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,337,1744095600"; 
+   d="scan'208";a="165734118"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 24 Jul 2025 05:00:19 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ueucS-000KP7-03;
+	Thu, 24 Jul 2025 12:00:16 +0000
+Date: Thu, 24 Jul 2025 20:00:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>, joro@8bytes.org,
+	suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
+	Sairaj.ArunKodilkar@amd.com, Vasant.Hegde@amd.com,
+	herbert@gondor.apana.org.au
+Cc: oe-kbuild-all@lists.linux.dev, seanjc@google.com, pbonzini@redhat.com,
+	will@kernel.org, robin.murphy@arm.com, john.allen@amd.com,
+	davem@davemloft.net, michael.roth@amd.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v4 1/4] iommu/amd: Add support to remap/unmap IOMMU
+ buffers for kdump
+Message-ID: <202507241929.76UExdsw-lkp@intel.com>
+References: <6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: tinghan.shen@mediatek.com, linux-remoteproc@vger.kernel.org, 
- olivia.wen@mediatek.com, devicetree@vger.kernel.org, 
- linux-sound@vger.kernel.org, andy.teng@mediatek.com, 
- eugen.hristev@linaro.org, matthias.bgg@gmail.com, 
- linux-mediatek@lists.infradead.org, frank-w@public-files.de, 
- linux-phy@lists.infradead.org, mripard@kernel.org, atenart@kernel.org, 
- sean.wang@kernel.org, ck.hu@mediatek.com, fparent@baylibre.com, 
- granquet@baylibre.com, p.zabel@pengutronix.de, simona@ffwll.ch, 
- tglx@linutronix.de, dri-devel@lists.freedesktop.org, 
- linux-gpio@vger.kernel.org, chunkuang.hu@kernel.org, 
- linux-crypto@vger.kernel.org, vkoul@kernel.org, 
- maarten.lankhorst@linux.intel.com, andersson@kernel.org, 
- linux-arm-kernel@lists.infradead.org, shane.chien@mediatek.com, 
- davem@davemloft.net, herbert@gondor.apana.org.au, broonie@kernel.org, 
- houlong.wei@mediatek.com, mathieu.poirier@linaro.org, 
- linus.walleij@linaro.org, conor+dt@kernel.org, 
- kyrie.wu@mediatek.corp-partner.google.com, daniel.lezcano@linaro.org, 
- mchehab@kernel.org, tzimmermann@suse.de, chunfeng.yun@mediatek.com, 
- mwalle@kernel.org, jiaxin.yu@mediatek.com, airlied@gmail.com, 
- jassisinghbrar@gmail.com, krzk+dt@kernel.org, linux-kernel@vger.kernel.org, 
- kishon@kernel.org, arnd@arndb.de, linux-media@vger.kernel.org, 
- jieyy.yang@mediatek.com, lgirdwood@gmail.com, sam.shih@mediatek.com, 
- jitao.shi@mediatek.com
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20250724083914.61351-14-angelogioacchino.delregno@collabora.com>
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-14-angelogioacchino.delregno@collabora.com>
-Message-Id: <175335597061.1587930.6517956701582557579.robh@kernel.org>
-Subject: Re: [PATCH 13/38] dt-bindings: remoteproc: mediatek: Remove l1tcm
- MMIO from MT8188 dual
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra@amd.com>
 
+Hi Ashish,
 
-On Thu, 24 Jul 2025 10:38:49 +0200, AngeloGioacchino Del Regno wrote:
-> Even though the MT8188 SoC's Dual-Core SCP IP is practically the
-> same as the one found on MT8195, it doesn't have a dedicated L1
-> TCM and relies only on SRAM.
-> 
-> Set reg/reg-names minItems to 1 globally and override it in all of
-> the conditionals for the SoCs that require more, and then split
-> the mt8195/8188 conditionals to allow specifying only the cfg MMIO
-> on MT8188.
-> 
-> Fixes: 91e0d560b9fd ("dt-bindings: remoteproc: mediatek: Support MT8188 dual-core SCP")
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-> ---
->  .../bindings/remoteproc/mtk,scp.yaml          | 23 ++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
-> 
+kernel test robot noticed the following build warnings:
 
-My bot found errors running 'make dt_binding_check' on your patch:
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.16-rc7 next-20250724]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-yamllint warnings/errors:
+url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/iommu-amd-Add-support-to-remap-unmap-IOMMU-buffers-for-kdump/20250722-055642
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/6a48567cd99a0ef915862b3c6590d1415d287870.1753133022.git.ashish.kalra%40amd.com
+patch subject: [PATCH v4 1/4] iommu/amd: Add support to remap/unmap IOMMU buffers for kdump
+config: x86_64-randconfig-r133-20250724 (https://download.01.org/0day-ci/archive/20250724/202507241929.76UExdsw-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250724/202507241929.76UExdsw-lkp@intel.com/reproduce)
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml: allOf:1:then:properties:reg-names: 'oneOf' conditional failed, one must be fixed:
-	[{'const': 'sram'}, {'const': 'cfg'}] is too long
-	[{'const': 'sram'}, {'const': 'cfg'}] is too short
-	False schema does not allow 2
-	1 was expected
-	hint: "minItems" is only needed if less than the "items" list length
-	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml: allOf:3:then:properties:reg-names: 'oneOf' conditional failed, one must be fixed:
-	[{'const': 'cfg'}] is too short
-	False schema does not allow 1
-	hint: "minItems" is only needed if less than the "items" list length
-	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml: allOf:4:then:properties:reg-names: 'oneOf' conditional failed, one must be fixed:
-	[{'const': 'cfg'}, {'const': 'l1tcm'}] is too long
-	[{'const': 'cfg'}, {'const': 'l1tcm'}] is too short
-	False schema does not allow 2
-	1 was expected
-	hint: "minItems" is only needed if less than the "items" list length
-	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507241929.76UExdsw-lkp@intel.com/
 
-doc reference errors (make refcheckdocs):
+sparse warnings: (new ones prefixed by >>)
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
+>> drivers/iommu/amd/init.c:723:41: sparse: sparse: incorrect type in return expression (different address spaces) @@     expected void * @@     got void [noderef] __iomem * @@
+   drivers/iommu/amd/init.c:723:41: sparse:     expected void *
+   drivers/iommu/amd/init.c:723:41: sparse:     got void [noderef] __iomem *
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250724083914.61351-14-angelogioacchino.delregno@collabora.com
+vim +723 drivers/iommu/amd/init.c
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+   707	
+   708	static inline void *iommu_memremap(unsigned long paddr, size_t size)
+   709	{
+   710		phys_addr_t phys;
+   711	
+   712		if (!paddr)
+   713			return NULL;
+   714	
+   715		/*
+   716		 * Obtain true physical address in kdump kernel when SME is enabled.
+   717		 * Currently, previous kernel with SME enabled and kdump kernel
+   718		 * with SME support disabled is not supported.
+   719		 */
+   720		phys = __sme_clr(paddr);
+   721	
+   722		if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+ > 723			return ioremap_encrypted(phys, size);
+   724		else
+   725			return memremap(phys, size, MEMREMAP_WB);
+   726	}
+   727	
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
