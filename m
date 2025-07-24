@@ -1,207 +1,264 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2073.outbound.protection.outlook.com [40.107.236.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000A4253F14;
-	Thu, 24 Jul 2025 09:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753349751; cv=fail; b=LaL/+muMzqzCsRDTH+CrC/fJK6o5T4cjg2fBcO61HrjDpniEiZdUMvqISVU9Q+Zr/wFhZw9WALeJoJUZzHni+s3qoAm89H5Ajt9m5mOU0Qw5wN6JtPSpeCNIRkIRLWGDJlZd06geQlSziaKinpqt3g/nttfv4vVEsnCHCGWCo8k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753349751; c=relaxed/simple;
-	bh=Az6TtPwIcpGRvT/1q0D/DTQxCK3d4yoH2TIOdSQngjY=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JsoW4JKFH+b7Z8izbbAV5HuZdleY/3bAQUoZ+IHSeuL98Dx7AZFOMlPJaUUE6gUrKAAaxivHcgBlSM9epmf+Y57MAL2zlnZ+MPVra6MNyTVKGy1heeP0LnnkPe0S6VD39giR2PkLhgyh6sdLSfScQSr1SLyX4rrmItDwuqEixvY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dna1Vbdz; arc=fail smtp.client-ip=40.107.236.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A7E252917
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 09:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753350552; cv=none; b=mE8qHEQUm0fOwNGvQbSADi1t5w8tO0bX+usTna7IaD4j/hupR+pEdJs3+Pdykf1WGbDAghx6sKbuUIs5W+PStSfKKp4Pr3ZXWT9sihCtOnOV2JS7LiSB+xBE1bMAMwE4zCwSGX5VWfOaDMeUbvAM+TCyqp6jtEvxwVg5rTsHHcI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753350552; c=relaxed/simple;
+	bh=U+rR1HNut0ExpbrnkcfOSPx36ou1vMZ071sRdAv5Ll0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CJmVKyRNT82o+Oo6gbAmjjM2S1S3iuPtbWW2O/8pTPzv8Vigy2GcDzRFL8MD6oEOnmua22GdD97G+DFEu9YCNG61tI4o1qYfLyVcGv2PB8IXCkHN3aqUhYq8HvPAtIwk3oTH9/fptrmlX9pqGK1yyTebtJQinHuocGcAJ356p+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hAueWPVh; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dna1Vbdz"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hpsTFlDMImaX296xKc9RQMygnNXnnrT15oH/bZuwgm8NTJy2Jgs2NZBA79IUFMjVMXDeomKoEJAcVvlvBvAbuyJD5d5mRLWxOMUWSXWK5ah3LsHiszriVK1jWIjFtuJkacDbwnIDk8LggW2ItrRRw9o9WD11niTdnlhDVtHS+T/JA/thcDWidPhTwAanMg0o7dyumpwkS01hd7PN5k9mLN/iJigi+sbOLaKUet6jDLdcSrvSeaWAoztWBZzespoI8O4OdvDmGYKohVvmwdo9e3ps+G35McnxIxViLmpyECpcoPf0dIqMDB8SABx/Sc0OR5N7ZcleUsytiVNwk5sGhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tZBZ3k91KzRaST/VqKg5KnsNbebG/WdMYzyHI88RQR8=;
- b=evM9481wc6HNtKCbVD9O3f9nHPHhbqcVTu080WOR1RiHrOhQjL8VC/ku75ehV+kbnbABba+96YyNBl9tsC5gQoMP7u0wzZu1fkSu2gKRcWqJ/S4GPu08pvNkEfaTNj/U8I7DF/S4nrsVdTBKTGolTHN0UTjNNXz24880JomJWX8DsinXVbuxynzMOCRFdY/R6iajehAzdJh2Rc3KxcVme//9DecvX9UtjvQm2OrBY8O86Kp4ijaGXYyIr5pzU8EEtjiGwtGRsOUVElOlEl9Ug7naIbMhtGOXaQ5RJ2OZyntRI3mmOKaCeYcy2LGxtq8zsb/v+rcTEq/BQNB9Hxc5ZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tZBZ3k91KzRaST/VqKg5KnsNbebG/WdMYzyHI88RQR8=;
- b=Dna1VbdzoDIzPG5jgy/eVt2cUPOCp/guMAIxYCEDcNSEiST/Wt2GA0ZWZGJXJWvq9tKwii6jhmY5M1HEi9o7yMeEQHVzR0S7TBRjYcXw15i0Z0P6TxqNLBpkF97ZWiQPUAEQmbCegbr5Nq9pvgEeVa3u+8nYlUcdIqWUO06T1Vk=
-Received: from MN2PR05CA0010.namprd05.prod.outlook.com (2603:10b6:208:c0::23)
- by SA1PR12MB9489.namprd12.prod.outlook.com (2603:10b6:806:45c::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Thu, 24 Jul
- 2025 09:35:46 +0000
-Received: from BL6PEPF00022573.namprd02.prod.outlook.com
- (2603:10b6:208:c0:cafe::60) by MN2PR05CA0010.outlook.office365.com
- (2603:10b6:208:c0::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.6 via Frontend Transport; Thu,
- 24 Jul 2025 09:35:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF00022573.mail.protection.outlook.com (10.167.249.41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 09:35:46 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 24 Jul
- 2025 04:34:29 -0500
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: Arnd Bergmann <arnd@kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-CC: Arnd Bergmann <arnd@arndb.de>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ccp: reduce stack usage in ccp_run_aes_gcm_cmd
-In-Reply-To: <20250714145921.699060-1-arnd@kernel.org>
-References: <20250714145921.699060-1-arnd@kernel.org>
-Date: Thu, 24 Jul 2025 09:34:02 +0000
-Message-ID: <85frem9blh.fsf@amd.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hAueWPVh"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-553d771435fso854646e87.3
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 02:49:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1753350547; x=1753955347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L9FQ9e+6QrSgFWR/zL+SarceeBtqf3W8b4WkgK0vUaU=;
+        b=hAueWPVhBrHcHjcp7sHtqcL7blR0kQ3wezBo4znslxQY3yxLhfO9nbKIqI2zT9ghpv
+         29n+MZ9tWq5FbpOzQwKvShx0J8XSjoRsV+hmW6cKBFb5VoLO9Ge5vXeFPQmpsUjEXI2r
+         /2/+sMoZXFFBVQzQMVwe3HmJu7YMqmKR8cB50=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753350547; x=1753955347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L9FQ9e+6QrSgFWR/zL+SarceeBtqf3W8b4WkgK0vUaU=;
+        b=k7nxRu+M1CqnkMjqBuC+6BI4EIpwIvPyXqGI5T9SbZ9VtvWaJlzZIsrVmOA20ZVjo9
+         B8fBcCu4VSZFnJLqvdSeUj7GsbmGy5FJfye8dog2i7mL9i4mu8lMdPzI4ejY5L+CNWi9
+         EMx0ScNmlHAjH6kT/bMNO65numwg9BkND7p4eYSY5Pfced74kSFsrdo6hBNvorhBpeAE
+         fYnobbj5QVa5woYZAIT7yP08jkVtYNb4q61lsZ5CSjw9iJkH1/ABkSOoYre+UjGDWJEu
+         q8KmtW+NvlRs0uS9IsWNvjBcQGNdwDveZ4Wt1QWcyKI43ULBoaS8Qv/YNPEGSjlrupsC
+         eFzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWg5otwbqln6AVXO9wsqXLecllijlbERkAom0hYQpDxBkt8Ve8MyCMkY6udIsy4Yv4RJsCZuj87jUB6ZFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7XGOwgmnRs88aa3M8yt5nPgtmTzMyrce9voPmMiO0nC7Zrrmj
+	IihophzidODGgzJ4sS7AFFh4ZKtdd4v1iDn1W30RZArT6vxZmA6Jxs0X6yhjpl78J4bwqMO7TVX
+	oMLojqNr7ckJYaRZBck+9Lu3Hq53eBhpOHuhHEYsm
+X-Gm-Gg: ASbGncsLMXrBMXZFBidBoVo/F3brGQMJjg5JQO3CZIBnyreoEZmCebvk4tIollFUuqL
+	1NuCf0VpNa/GrsAdehnN2BPdZmY+LNnzGUuIR+KoG3jYAaOwFw6D3Da1AwDH5DCH9l0CMpZ9gTE
+	rxepgIMvMlsAGUTskATWIFFVwaeduZZkFvRLRZI9+lTSNAQ1XNoK+IsGw2BvuDRaKmryfaT4tY7
+	ipAuBzid3Oj6RoR9LxiRnFx9GOVigg9pKI=
+X-Google-Smtp-Source: AGHT+IGzfXywNqkl7ab0cE9pUdYYCcgre/IBfX1N5nV04X+BJ3rA6VLZb3GDp2uT00oIYqG6uR1IPA8f6Im9wahsv0o=
+X-Received: by 2002:a05:6512:3084:b0:558:f694:a65e with SMTP id
+ 2adb3069b0e04-55a513b2e09mr1933097e87.34.1753350547115; Thu, 24 Jul 2025
+ 02:49:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022573:EE_|SA1PR12MB9489:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f726351-558e-4990-9c5d-08ddca9577e1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xaP4ffAZJYP8MQW+MXHARMvqhJKLbz+Zgu3Mold9XIxVKwiGeOYmlw8MwjK8?=
- =?us-ascii?Q?B78+aK1+OAePjg+7/6MgWTRd3wss9LO9UGBznUbc4Oc1pV2k+GG7WmU9URKt?=
- =?us-ascii?Q?KF99xkLzqck4oJ94SPpVLmbl6zQhowO+d8OsFiYST0OwLCREKyibLwBu6JD3?=
- =?us-ascii?Q?RTX5p/yWpD90KVK+oXIOaJt46dwXnfkjdN41qGZQfL6QYFvNWpxNYbZDEF2O?=
- =?us-ascii?Q?0O50toL9KmVgU2WfUVmQoI6SNRwysWnhz9jQBhsJudU7NjKoT3mSSWUQ6aFg?=
- =?us-ascii?Q?Sy6ZTR2DuZkK9eMdgOJEU87XsrSsYWBWkbXDXGMtpuY4OpHE04lKu6oZrEo9?=
- =?us-ascii?Q?BHIuM9gWfPmFvbx/oz8FONvCFNk88sFLGIFA0/DptL7NcFIBnoH2697On96T?=
- =?us-ascii?Q?77gFYEvoaHS43mHmm/t2fVJDI1d3ywmHL6aR0smYZBq6WXTRrKe5dHMTNjry?=
- =?us-ascii?Q?VIe3IDdhnEOdPFFjMu3MtHBrn31mQXpfwYjecC7VbPEHLwr4JlpbF5XEbtCn?=
- =?us-ascii?Q?taOmwFhe2lx2ix3Mn6xLKYqO86plQVAEf0Am3gcxrY4aWI+liuBaPyCu1hvI?=
- =?us-ascii?Q?AcRK/6E8JYL2wEDTDyCF6NKVx8KXxA9JdWSJ/A7xAHsnLM5FYVhGQZy/5E7W?=
- =?us-ascii?Q?zcuO73lwZH3J3I7HU4ZHe6g5srcpAKxic3GFlSFJixDf61jxsIM/iR1OumtU?=
- =?us-ascii?Q?6N8T9ciccO2547AdY2vKGCVVonRaRGpPuwkhsWb47ixv035zojuAklaauOG3?=
- =?us-ascii?Q?6VFgy1ezE5gRBlOR3ww/gCkckaaRk7Gk+areqFOWzpNPJrBvWNkZU0dod7/l?=
- =?us-ascii?Q?y0rrp+GFhv3gedlCx7QX40yWHjx05npmVNZ7raW0L6gNEuJMDZn//6AwrDOo?=
- =?us-ascii?Q?zuWGgB+iQU3VR/HyUFbBjL6hWxHztNUHryxbFh+Dd22BjGmWtJI2MOUs6Wzn?=
- =?us-ascii?Q?7eK2HFJShRoebw8S1gEVp7xXKuhSWG1BUlraKu4rWzgaxXHt6ffFr1eUCcg9?=
- =?us-ascii?Q?KGcoy5dLsbFx10KHZW3xybTJp48bvaRFSliuMpp7F9XQ2n5DAg2Ho3S8/lbV?=
- =?us-ascii?Q?Rgp13cPhOFVhR4Bkad7bOfINiMIdkcC50//x/yxpTv2ysvAc2DE9UpcQjxzn?=
- =?us-ascii?Q?NdtWHfWNkxvsLP51HyI+dOUmV/TFF/kiHLM6vNwJJrxT0deQV4XTP8miNdLa?=
- =?us-ascii?Q?zEmjUnIvy3aL+P2yG9dIhFA2qxrRcD6or9wA9oao0BpjD5icMMfCmLS6ZBg+?=
- =?us-ascii?Q?2TuzbRUDCDvmYHHWp3N0wfJC3SL690TA6rBQ0j6KRjiUTYWkBZytYraWhRHh?=
- =?us-ascii?Q?FjAJ9vKsJ82aYQx0CG4s9kLBwTdiQPMTQkrX90fjVIuQCILdzritGNOoQKPL?=
- =?us-ascii?Q?NpLcAb70JC65G7kIJM1Iz6qGPORNp5pGxTTMzVn6NWBZHOR+iJJ03O2WFkZh?=
- =?us-ascii?Q?J8EEVOBXtv9YOdmNTvcjEfsNvvGhDb/WAU6pC9reGbINSxnuBrspLUWwzL2e?=
- =?us-ascii?Q?80XbPIZBtaQCTMjuYwebE8dLpws6tyaMW6An?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 09:35:46.6251
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f726351-558e-4990-9c5d-08ddca9577e1
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022573.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9489
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-29-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-29-angelogioacchino.delregno@collabora.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Thu, 24 Jul 2025 17:48:56 +0800
+X-Gm-Features: Ac12FXyvTWPQD4hmzcW0ijsxU85GUvKBlnETlBmcYtQk6_oa7dGsCrwzhdueCNE
+Message-ID: <CAGXv+5FvqKNB5Ufx65p5QnueKgEYwNW20tahVPg-kG5N3t+WGQ@mail.gmail.com>
+Subject: Re: [PATCH 28/38] arm64: dts: mediatek: mt8173: Fix pinctrl node
+ names and cleanup
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de, 
+	airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com, 
+	mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com, 
+	mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com, 
+	vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org, 
+	linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org, 
+	andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org, 
+	tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com, 
+	ck.hu@mediatek.com, houlong.wei@mediatek.com, 
+	kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com, 
+	tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com, 
+	olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org, 
+	arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com, 
+	frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Arnd Bergmann <arnd@kernel.org> writes:
-
-> From: Arnd Bergmann <arnd@arndb.de>
+On Thu, Jul 24, 2025 at 4:40=E2=80=AFPM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
 >
-> A number of functions in this file have large structures on the stack,
-> ccp_run_aes_gcm_cmd() being the worst, in particular when KASAN
-> is enabled on gcc:
+> Fix the pinctrl node names to adhere to the bindings, as the main
+> pin node is supposed to be named like "uart0-pins" and the pinmux
+> node named like "pins-bus".
 >
-> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_sha_cmd':
-> drivers/crypto/ccp/ccp-ops.c:1833:1: error: the frame size of 1136 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_aes_gcm_cmd':
-> drivers/crypto/ccp/ccp-ops.c:914:1: error: the frame size of 1632 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
+> While at it, also cleanup all of the MTK_DRIVE_(x)mA by changing
+> that to just the (x) number.
 >
-> Avoid the issue by using dynamic memory allocation in the worst one
-> of these.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
+abora.com>
 > ---
-> I'm not overly happy with this patch myself but couldn't come up
-> with anything better either.
+>  .../boot/dts/mediatek/mt8173-elm-hana.dtsi    |  34 ++---
+>  arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  | 138 +++++++++---------
+>  arch/arm64/boot/dts/mediatek/mt8173-evb.dts   |  60 ++++----
+>  arch/arm64/boot/dts/mediatek/mt8173.dtsi      |  28 ++--
+>  4 files changed, 128 insertions(+), 132 deletions(-)
 >
-> One alternative would be to turn off sanitizers here, but even without
-> those, the stack usage is fairly high, so that still feels like
-> papering over the problem.
-> ---
->  drivers/crypto/ccp/ccp-ops.c | 163 ++++++++++++++++++-----------------
->  1 file changed, 86 insertions(+), 77 deletions(-)
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8173-elm-hana.dtsi b/arch/arm=
+64/boot/dts/mediatek/mt8173-elm-hana.dtsi
+> index dfc5c2f0ddef..1004eb8ea52c 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8173-elm-hana.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8173-elm-hana.dtsi
+> @@ -5,6 +5,14 @@
 >
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 109b5aef4034..d78865d9d5f0 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -633,10 +633,16 @@ static noinline_for_stack int
->  ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  {
->  	struct ccp_aes_engine *aes = &cmd->u.aes;
-> -	struct ccp_dm_workarea key, ctx, final_wa, tag;
-> -	struct ccp_data src, dst;
-> -	struct ccp_data aad;
-> -	struct ccp_op op;
-> +	struct {
-> +		struct ccp_dm_workarea key;
-> +		struct ccp_dm_workarea ctx;
-> +		struct ccp_dm_workarea final;
-> +		struct ccp_dm_workarea tag;
-> +		struct ccp_data src;
-> +		struct ccp_data dst;
-> +		struct ccp_data aad;
-> +		struct ccp_op op;
-> +	} *wa __cleanup(kfree) = kzalloc(sizeof *wa, GFP_KERNEL);
->  	unsigned int dm_offset;
->  	unsigned int authsize;
->  	unsigned int jobid;
-> @@ -650,6 +656,9 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	struct scatterlist *p_outp, sg_outp[2];
->  	struct scatterlist *p_aad;
->  
-> +	if (!wa)
-> +		return -ENOMEM;
+>  #include "mt8173-elm.dtsi"
+>
+> +&hdmi_mux_pins {
+> +       pins-mux {
+> +               pinmux =3D <MT8173_PIN_98_URTS1__FUNC_GPIO98>;
+> +               bias-pull-up;
+> +               output-high;
+> +       };
+> +};
 > +
->  	if (!aes->iv)
->  		return -EINVAL;
->  
-> @@ -696,26 +705,26 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  
->  	jobid = CCP_NEW_JOBID(cmd_q->ccp);
->  
-> -	memset(&op, 0, sizeof(op));
-> -	op.cmd_q = cmd_q;
-> -	op.jobid = jobid;
-> -	op.sb_key = cmd_q->sb_key; /* Pre-allocated */
-> -	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
-> -	op.init = 1;
-> -	op.u.aes.type = aes->type;
-> +	memset(&wa->op, 0, sizeof(wa->op));
 
-As the memory is allocated using kzalloc, memset is not necessary here.
+Should probably mention that a duplicate path reference was fixed.
 
-Regards
-Nikunj
+>  &i2c0 {
+>         clock-frequency =3D <200000>;
+>  };
+> @@ -67,26 +75,16 @@ trackpad2: trackpad@2c {
+>         };
+>  };
+>
+> -&mmc1 {
+> -       wp-gpios =3D <&pio 42 GPIO_ACTIVE_HIGH>;
+> -};
+> -
+> -&pio {
+> -       hdmi_mux_pins: hdmi_mux_pins {
+> -               pins2 {
+> -                       pinmux =3D <MT8173_PIN_98_URTS1__FUNC_GPIO98>;
+> -                       bias-pull-up;
+> -                       output-high;
+> -               };
+> +&mmc1_pins_default {
+> +       pins-wp {
+> +               pinmux =3D <MT8173_PIN_42_DSI_TE__FUNC_GPIO42>;
+> +               input-enable;
+> +               bias-pull-up;
+>         };
+> +};
+>
+> -       mmc1_pins_default: mmc1default {
+> -               pins_wp {
+> -                       pinmux =3D <MT8173_PIN_42_DSI_TE__FUNC_GPIO42>;
+> -                       input-enable;
+> -                       bias-pull-up;
+> -               };
+> -       };
+> +&mmc1 {
+> +       wp-gpios =3D <&pio 42 GPIO_ACTIVE_HIGH>;
+>  };
+>
+>  &touchscreen {
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi b/arch/arm64/bo=
+ot/dts/mediatek/mt8173-elm.dtsi
+> index 0d995b342d46..9ec930058b92 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi
 
+[...]
+
+> -       bt_wake_pins: bt_wake_pins {
+> -               pins1 {
+> +       bt_wake_pins: bt-pins {
+
+Nit: I think the original name is better, because IIRC this is
+using the RX pin as a GPIO interrupt to wake the system from suspend.
+
+> +               pins-wake {
+>                         pinmux =3D <MT8173_PIN_119_KPROW0__FUNC_GPIO119>;
+>                         bias-pull-up;
+>                 };
+>         };
+>
+
+[...]
+
+>
+> -               pins_ds {
+> +               pins-ds {
+>                         pinmux =3D <MT8173_PIN_67_MSDC0_DSL__FUNC_MSDC0_D=
+SL>;
+>                         drive-strength =3D <MTK_DRIVE_10mA>;
+
+Missed one here.
+
+>                         bias-pull-down =3D <MTK_PUPD_SET_R1R0_01>;
+>                 };
+
+[...]
+
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8173-evb.dts b/arch/arm64/boo=
+t/dts/mediatek/mt8173-evb.dts
+> index 9fffed0ef4bf..51118a4149d8 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8173-evb.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8173-evb.dts
+
+[...]
+
+> @@ -245,20 +245,29 @@ pins_cmd_dat {
+>                         bias-pull-up =3D <MTK_PUPD_SET_R1R0_01>;
+>                 };
+>
+> -               pins_clk {
+> +               pins-clk {
+>                         pinmux =3D <MT8173_PIN_65_MSDC0_CLK__FUNC_MSDC0_C=
+LK>;
+>                         drive-strength =3D <2>;
+>                         bias-pull-down =3D <MTK_PUPD_SET_R1R0_01>;
+>                 };
+>
+> -               pins_rst {
+> +               pins-rst {
+>                         pinmux =3D <MT8173_PIN_68_MSDC0_RST___FUNC_MSDC0_=
+RSTB>;
+>                         bias-pull-up;
+>                 };
+>         };
+>
+> -       mmc1_pins_uhs: mmc1 {
+> -               pins_cmd_dat {
+> +       spi_pins_a: spi0-pins {
+> +               pins-bus {
+> +                       pinmux =3D <MT8173_PIN_69_SPI_CK__FUNC_SPI_CK_0_>=
+,
+> +                               <MT8173_PIN_70_SPI_MI__FUNC_SPI_MI_0_>,
+> +                               <MT8173_PIN_71_SPI_MO__FUNC_SPI_MO_0_>,
+> +                               <MT8173_PIN_72_SPI_CS__FUNC_SPI_CS_0_>;
+> +               };
+> +       };
+> +
+> +       mmc1_pins_uhs: mmc1-uhs-pins {
+
+Wrong order?
+
+> +               pins-cmd-dat {
+>                         pinmux =3D <MT8173_PIN_73_MSDC1_DAT0__FUNC_MSDC1_=
+DAT0>,
+>                                  <MT8173_PIN_74_MSDC1_DAT1__FUNC_MSDC1_DA=
+T1>,
+>                                  <MT8173_PIN_75_MSDC1_DAT2__FUNC_MSDC1_DA=
+T2>,
+
+[...]
+
+Once fixed,
+
+Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
