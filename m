@@ -1,300 +1,207 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2073.outbound.protection.outlook.com [40.107.236.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993AB24BD03
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 09:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753349672; cv=none; b=PdJEQe/wfPL58tTLNjAzv3/AxFSL3PbPSx3k08puK1D4Ph/dM03zXkcuKKXCB9Mh57bcrlpMO7wlU9dtJMzUju9zj0YgOt66cxbDtzNM0+T5MhEOyM47pCRtCLXL6pb6/rL7lAPsKweoDi71ceCLJSWl9io+kBHDY7yPPXHlOEE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753349672; c=relaxed/simple;
-	bh=5fM4O5mlIBXMh+83kGnKKJzdndRtAsTin43siUV5gCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rd2mzq5mVsM+YCmsmfB8Pi5++1/BJFe7td5yH+Kf9sv+WQ6Bo7Jyu+cRBJGd12lHhWJaLHzDdpwyBAJmbViEPf3F1gZEtE8NSZDyhCHSFXIeCvsx1D8BnHik7swVaQ6ySV0oIWo5msAMrMANAC9tksnhxoCcJu45dvnRcijMSeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=a5jCpCSl; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000A4253F14;
+	Thu, 24 Jul 2025 09:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753349751; cv=fail; b=LaL/+muMzqzCsRDTH+CrC/fJK6o5T4cjg2fBcO61HrjDpniEiZdUMvqISVU9Q+Zr/wFhZw9WALeJoJUZzHni+s3qoAm89H5Ajt9m5mOU0Qw5wN6JtPSpeCNIRkIRLWGDJlZd06geQlSziaKinpqt3g/nttfv4vVEsnCHCGWCo8k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753349751; c=relaxed/simple;
+	bh=Az6TtPwIcpGRvT/1q0D/DTQxCK3d4yoH2TIOdSQngjY=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JsoW4JKFH+b7Z8izbbAV5HuZdleY/3bAQUoZ+IHSeuL98Dx7AZFOMlPJaUUE6gUrKAAaxivHcgBlSM9epmf+Y57MAL2zlnZ+MPVra6MNyTVKGy1heeP0LnnkPe0S6VD39giR2PkLhgyh6sdLSfScQSr1SLyX4rrmItDwuqEixvY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dna1Vbdz; arc=fail smtp.client-ip=40.107.236.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="a5jCpCSl"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-55628eaec6cso735258e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 02:34:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1753349668; x=1753954468; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4BiDDqrD6a5pZkcMdx9/g3Y4QyPCSLekJ/xiBVz6j3w=;
-        b=a5jCpCSlmj87IOOm+0wkKsdl8ZdzFGIkwdEt9M6maV6Brhd9xM8iP4qUNktBupWN5L
-         Dqa0Bog/Jqd7oxNAPsjpWOSA6swlrkeBk1jhb9iJE07kWSTlERXrapw0nRGST5YdT/uY
-         X3hiy7tm57mI8ZXiOHw8ISXcLho2A0b91Agiw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753349668; x=1753954468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4BiDDqrD6a5pZkcMdx9/g3Y4QyPCSLekJ/xiBVz6j3w=;
-        b=RdFxgworEthMiMy9kug6CKrWP3/aqabv//lf5v6L3i6Jsn4UU2Yq/goRzrYlfpuB67
-         z6SYuKcDhbilj225mg+Ld2b2Mx5YlaOE0VVXnJV4lMaD7la/6E3iYfnbbrKrQUlKBnUB
-         xI75fkTdtomiHxcb207ZaL74rhGoYohOyJzePTPMKZhFcBmqP32snyMYskTZAY3H3QsF
-         UtmSZP854qVvn3pv1PuLNtr77tJm8o2yAWiQBuFcGEddLxJ3QihqHqp/22VCvWpSUlrj
-         GHPoJb3sKCUupsexyvk+j/GLceR577kQy9dDIWLl9TOENjfGDqU7Pz1Hw6/kovwj0Pwt
-         VI/g==
-X-Forwarded-Encrypted: i=1; AJvYcCX135IXn4Pu4aGOv0y0ddP6yU4sOi0bF0CVWVY21I7fi6cxMizTtDYT7VBcXcRBwaCo9uindUWYaAKgQ+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuwdJ/X6+uwrbbqmQMMm7qU7I9Dz49DjlktmF5Zi2XJbolIPxM
-	bWSVjuOTQuqI/Tpn0p3JXIVsu9SqgMdzmKZXk1LQUZchHHJeCU+i3cl/GREcDun5jl9HDsRUGEu
-	g9RDUdJEv+XuhreWaEL1NqRSLX6+OG5yDoQ7vjrif
-X-Gm-Gg: ASbGnctw3gEoOqGI+ka6oCirBxF1aOsPHVIYhOm4fhb5VZT0Iv+PtM1tfaz8UI30K3e
-	RbCCw9fi7bRJCjvb2Yt+i1qhFexBXRpeNs0St/kqJ9UIXNgWAemdqzpKt3BSuQaABXu5WCyewsX
-	zqx2WhcrY1ZNIqaGPvYQb6jhSytoDF8NoaB9doRPgkBhtrQdNf0L5VnEdFbBF0314MekXRPRQGT
-	JG8Cfx63UjTeHZQr8jYzetaFz/uoS6tqLQ=
-X-Google-Smtp-Source: AGHT+IGbQGAzYrZuGKb7ZyVDVB2IA3/m7/1T14ShQ1gB/s052YEW14kETsBT1/6F7qIVfTgZAU3RoBMdAKdnokA3DJc=
-X-Received: by 2002:a05:6512:2391:b0:553:65bc:4232 with SMTP id
- 2adb3069b0e04-55a513bf799mr2287118e87.31.1753349667560; Thu, 24 Jul 2025
- 02:34:27 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dna1Vbdz"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hpsTFlDMImaX296xKc9RQMygnNXnnrT15oH/bZuwgm8NTJy2Jgs2NZBA79IUFMjVMXDeomKoEJAcVvlvBvAbuyJD5d5mRLWxOMUWSXWK5ah3LsHiszriVK1jWIjFtuJkacDbwnIDk8LggW2ItrRRw9o9WD11niTdnlhDVtHS+T/JA/thcDWidPhTwAanMg0o7dyumpwkS01hd7PN5k9mLN/iJigi+sbOLaKUet6jDLdcSrvSeaWAoztWBZzespoI8O4OdvDmGYKohVvmwdo9e3ps+G35McnxIxViLmpyECpcoPf0dIqMDB8SABx/Sc0OR5N7ZcleUsytiVNwk5sGhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tZBZ3k91KzRaST/VqKg5KnsNbebG/WdMYzyHI88RQR8=;
+ b=evM9481wc6HNtKCbVD9O3f9nHPHhbqcVTu080WOR1RiHrOhQjL8VC/ku75ehV+kbnbABba+96YyNBl9tsC5gQoMP7u0wzZu1fkSu2gKRcWqJ/S4GPu08pvNkEfaTNj/U8I7DF/S4nrsVdTBKTGolTHN0UTjNNXz24880JomJWX8DsinXVbuxynzMOCRFdY/R6iajehAzdJh2Rc3KxcVme//9DecvX9UtjvQm2OrBY8O86Kp4ijaGXYyIr5pzU8EEtjiGwtGRsOUVElOlEl9Ug7naIbMhtGOXaQ5RJ2OZyntRI3mmOKaCeYcy2LGxtq8zsb/v+rcTEq/BQNB9Hxc5ZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tZBZ3k91KzRaST/VqKg5KnsNbebG/WdMYzyHI88RQR8=;
+ b=Dna1VbdzoDIzPG5jgy/eVt2cUPOCp/guMAIxYCEDcNSEiST/Wt2GA0ZWZGJXJWvq9tKwii6jhmY5M1HEi9o7yMeEQHVzR0S7TBRjYcXw15i0Z0P6TxqNLBpkF97ZWiQPUAEQmbCegbr5Nq9pvgEeVa3u+8nYlUcdIqWUO06T1Vk=
+Received: from MN2PR05CA0010.namprd05.prod.outlook.com (2603:10b6:208:c0::23)
+ by SA1PR12MB9489.namprd12.prod.outlook.com (2603:10b6:806:45c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Thu, 24 Jul
+ 2025 09:35:46 +0000
+Received: from BL6PEPF00022573.namprd02.prod.outlook.com
+ (2603:10b6:208:c0:cafe::60) by MN2PR05CA0010.outlook.office365.com
+ (2603:10b6:208:c0::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.6 via Frontend Transport; Thu,
+ 24 Jul 2025 09:35:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF00022573.mail.protection.outlook.com (10.167.249.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 09:35:46 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 24 Jul
+ 2025 04:34:29 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: Arnd Bergmann <arnd@kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+CC: Arnd Bergmann <arnd@arndb.de>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp: reduce stack usage in ccp_run_aes_gcm_cmd
+In-Reply-To: <20250714145921.699060-1-arnd@kernel.org>
+References: <20250714145921.699060-1-arnd@kernel.org>
+Date: Thu, 24 Jul 2025 09:34:02 +0000
+Message-ID: <85frem9blh.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-34-angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20250724083914.61351-34-angelogioacchino.delregno@collabora.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Thu, 24 Jul 2025 17:34:15 +0800
-X-Gm-Features: Ac12FXx-dC7GqsweL9em8IYbzr7gdu7h7TRc-hJouMaDYtIUw_U2Osb1ZV53HA8
-Message-ID: <CAGXv+5ECM53Q4ndZ49Xa71mamy=GhGqdOMQYXydH6cEeT=0EgA@mail.gmail.com>
-Subject: Re: [PATCH 33/38] arm64: dts: mediatek: mt8183-kukui: Move DSI panel
- node to machine dtsis
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de, 
-	airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com, 
-	mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com, 
-	mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com, 
-	vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org, 
-	linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org, 
-	andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org, 
-	tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com, 
-	ck.hu@mediatek.com, houlong.wei@mediatek.com, 
-	kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com, 
-	tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com, 
-	olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org, 
-	arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com, 
-	frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022573:EE_|SA1PR12MB9489:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8f726351-558e-4990-9c5d-08ddca9577e1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xaP4ffAZJYP8MQW+MXHARMvqhJKLbz+Zgu3Mold9XIxVKwiGeOYmlw8MwjK8?=
+ =?us-ascii?Q?B78+aK1+OAePjg+7/6MgWTRd3wss9LO9UGBznUbc4Oc1pV2k+GG7WmU9URKt?=
+ =?us-ascii?Q?KF99xkLzqck4oJ94SPpVLmbl6zQhowO+d8OsFiYST0OwLCREKyibLwBu6JD3?=
+ =?us-ascii?Q?RTX5p/yWpD90KVK+oXIOaJt46dwXnfkjdN41qGZQfL6QYFvNWpxNYbZDEF2O?=
+ =?us-ascii?Q?0O50toL9KmVgU2WfUVmQoI6SNRwysWnhz9jQBhsJudU7NjKoT3mSSWUQ6aFg?=
+ =?us-ascii?Q?Sy6ZTR2DuZkK9eMdgOJEU87XsrSsYWBWkbXDXGMtpuY4OpHE04lKu6oZrEo9?=
+ =?us-ascii?Q?BHIuM9gWfPmFvbx/oz8FONvCFNk88sFLGIFA0/DptL7NcFIBnoH2697On96T?=
+ =?us-ascii?Q?77gFYEvoaHS43mHmm/t2fVJDI1d3ywmHL6aR0smYZBq6WXTRrKe5dHMTNjry?=
+ =?us-ascii?Q?VIe3IDdhnEOdPFFjMu3MtHBrn31mQXpfwYjecC7VbPEHLwr4JlpbF5XEbtCn?=
+ =?us-ascii?Q?taOmwFhe2lx2ix3Mn6xLKYqO86plQVAEf0Am3gcxrY4aWI+liuBaPyCu1hvI?=
+ =?us-ascii?Q?AcRK/6E8JYL2wEDTDyCF6NKVx8KXxA9JdWSJ/A7xAHsnLM5FYVhGQZy/5E7W?=
+ =?us-ascii?Q?zcuO73lwZH3J3I7HU4ZHe6g5srcpAKxic3GFlSFJixDf61jxsIM/iR1OumtU?=
+ =?us-ascii?Q?6N8T9ciccO2547AdY2vKGCVVonRaRGpPuwkhsWb47ixv035zojuAklaauOG3?=
+ =?us-ascii?Q?6VFgy1ezE5gRBlOR3ww/gCkckaaRk7Gk+areqFOWzpNPJrBvWNkZU0dod7/l?=
+ =?us-ascii?Q?y0rrp+GFhv3gedlCx7QX40yWHjx05npmVNZ7raW0L6gNEuJMDZn//6AwrDOo?=
+ =?us-ascii?Q?zuWGgB+iQU3VR/HyUFbBjL6hWxHztNUHryxbFh+Dd22BjGmWtJI2MOUs6Wzn?=
+ =?us-ascii?Q?7eK2HFJShRoebw8S1gEVp7xXKuhSWG1BUlraKu4rWzgaxXHt6ffFr1eUCcg9?=
+ =?us-ascii?Q?KGcoy5dLsbFx10KHZW3xybTJp48bvaRFSliuMpp7F9XQ2n5DAg2Ho3S8/lbV?=
+ =?us-ascii?Q?Rgp13cPhOFVhR4Bkad7bOfINiMIdkcC50//x/yxpTv2ysvAc2DE9UpcQjxzn?=
+ =?us-ascii?Q?NdtWHfWNkxvsLP51HyI+dOUmV/TFF/kiHLM6vNwJJrxT0deQV4XTP8miNdLa?=
+ =?us-ascii?Q?zEmjUnIvy3aL+P2yG9dIhFA2qxrRcD6or9wA9oao0BpjD5icMMfCmLS6ZBg+?=
+ =?us-ascii?Q?2TuzbRUDCDvmYHHWp3N0wfJC3SL690TA6rBQ0j6KRjiUTYWkBZytYraWhRHh?=
+ =?us-ascii?Q?FjAJ9vKsJ82aYQx0CG4s9kLBwTdiQPMTQkrX90fjVIuQCILdzritGNOoQKPL?=
+ =?us-ascii?Q?NpLcAb70JC65G7kIJM1Iz6qGPORNp5pGxTTMzVn6NWBZHOR+iJJ03O2WFkZh?=
+ =?us-ascii?Q?J8EEVOBXtv9YOdmNTvcjEfsNvvGhDb/WAU6pC9reGbINSxnuBrspLUWwzL2e?=
+ =?us-ascii?Q?80XbPIZBtaQCTMjuYwebE8dLpws6tyaMW6An?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 09:35:46.6251
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f726351-558e-4990-9c5d-08ddca9577e1
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00022573.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9489
 
-On Thu, Jul 24, 2025 at 4:40=E2=80=AFPM AngeloGioacchino Del Regno
-<angelogioacchino.delregno@collabora.com> wrote:
+Arnd Bergmann <arnd@kernel.org> writes:
+
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> Not all of the kukui machines have got a real DSI panel, infact,
-> some of those have got a DSI to eDP bridge instead: this means
-> that the address and size cells are necessary in the first case
-> but unnecessary in the latter.
+> A number of functions in this file have large structures on the stack,
+> ccp_run_aes_gcm_cmd() being the worst, in particular when KASAN
+> is enabled on gcc:
 >
-> Instead of adding a bunch of /delete-node/ which would impact on
-> human readability, move the entire panel node declaration to each
-> of the relevant Kukui machine dtsi: even though this introduces
-> some duplication, the advantages in readability surclass that.
-
-This is just an artifact of the lineage. Kukui the original design
-was a tablet with MIPI DSI panels. Then the Jacuzzi clamshell design
-with eDP panels was derived from that.
-
-If we really don't like the duplication, maybe we could introduce
-a `mt8183-kukui-tablet.dtsi` file for the bits that are specific
-to the tablet design.
-
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
-abora.com>
-
-Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
-
+> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_sha_cmd':
+> drivers/crypto/ccp/ccp-ops.c:1833:1: error: the frame size of 1136 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
+> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_aes_gcm_cmd':
+> drivers/crypto/ccp/ccp-ops.c:914:1: error: the frame size of 1632 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
+>
+> Avoid the issue by using dynamic memory allocation in the worst one
+> of these.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  .../dts/mediatek/mt8183-kukui-jacuzzi.dtsi    |  5 ----
->  .../dts/mediatek/mt8183-kukui-kakadu.dtsi     | 27 ++++++++++++++++++
->  .../dts/mediatek/mt8183-kukui-kodama.dtsi     | 28 +++++++++++++++++++
->  .../boot/dts/mediatek/mt8183-kukui-krane.dtsi | 28 +++++++++++++++++++
->  .../arm64/boot/dts/mediatek/mt8183-kukui.dtsi | 23 ---------------
->  5 files changed, 83 insertions(+), 28 deletions(-)
+> I'm not overly happy with this patch myself but couldn't come up
+> with anything better either.
 >
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi b/arc=
-h/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
-> index f2afca63c75a..1b74ec171c10 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
-> @@ -93,11 +93,6 @@ cros_ec_pwm: pwm {
->         };
->  };
+> One alternative would be to turn off sanitizers here, but even without
+> those, the stack usage is fairly high, so that still feels like
+> papering over the problem.
+> ---
+>  drivers/crypto/ccp/ccp-ops.c | 163 ++++++++++++++++++-----------------
+>  1 file changed, 86 insertions(+), 77 deletions(-)
 >
-> -&dsi0 {
-> -       status =3D "okay";
-> -       /delete-node/panel@0;
-> -};
-> -
->  &dsi_out {
->         remote-endpoint =3D <&anx7625_in>;
->  };
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi b/arch=
-/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
-> index 472d4987615a..d71972c94e42 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
-> @@ -61,6 +61,33 @@ &bluetooth {
->         firmware-name =3D "nvm_00440302_i2s_eu.bin";
->  };
->
-> +&dsi0 {
-> +       #address-cells =3D <1>;
-> +       #size-cells =3D <0>;
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index 109b5aef4034..d78865d9d5f0 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -633,10 +633,16 @@ static noinline_for_stack int
+>  ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  {
+>  	struct ccp_aes_engine *aes = &cmd->u.aes;
+> -	struct ccp_dm_workarea key, ctx, final_wa, tag;
+> -	struct ccp_data src, dst;
+> -	struct ccp_data aad;
+> -	struct ccp_op op;
+> +	struct {
+> +		struct ccp_dm_workarea key;
+> +		struct ccp_dm_workarea ctx;
+> +		struct ccp_dm_workarea final;
+> +		struct ccp_dm_workarea tag;
+> +		struct ccp_data src;
+> +		struct ccp_data dst;
+> +		struct ccp_data aad;
+> +		struct ccp_op op;
+> +	} *wa __cleanup(kfree) = kzalloc(sizeof *wa, GFP_KERNEL);
+>  	unsigned int dm_offset;
+>  	unsigned int authsize;
+>  	unsigned int jobid;
+> @@ -650,6 +656,9 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  	struct scatterlist *p_outp, sg_outp[2];
+>  	struct scatterlist *p_aad;
+>  
+> +	if (!wa)
+> +		return -ENOMEM;
 > +
-> +       panel: panel@0 {
-> +               /* compatible will be set in board dts */
-> +               reg =3D <0>;
-> +               enable-gpios =3D <&pio 45 0>;
-> +               pinctrl-names =3D "default";
-> +               pinctrl-0 =3D <&panel_pins_default>;
-> +               avdd-supply =3D <&ppvarn_lcd>;
-> +               avee-supply =3D <&ppvarp_lcd>;
-> +               pp1800-supply =3D <&pp1800_lcd>;
-> +               backlight =3D <&backlight_lcd0>;
-> +               rotation =3D <270>;
-> +               port {
-> +                       panel_in: endpoint {
-> +                               remote-endpoint =3D <&dsi_out>;
-> +                       };
-> +               };
-> +       };
-> +};
-> +
-> +&dsi_out {
-> +       remote-endpoint =3D <&panel_in>;
-> +};
-> +
->  &i2c0 {
->         status =3D "okay";
->  };
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi b/arch=
-/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
-> index 1b21e3958061..b702ff066636 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
-> @@ -42,6 +42,34 @@ pp1800_lcd: pp1800-lcd {
->         };
->  };
->
-> +&dsi0 {
-> +       #address-cells =3D <1>;
-> +       #size-cells =3D <0>;
-> +       status =3D "okay";
-> +
-> +       panel: panel@0 {
-> +               /* compatible will be set in board dts */
-> +               reg =3D <0>;
-> +               enable-gpios =3D <&pio 45 0>;
-> +               pinctrl-names =3D "default";
-> +               pinctrl-0 =3D <&panel_pins_default>;
-> +               avdd-supply =3D <&ppvarn_lcd>;
-> +               avee-supply =3D <&ppvarp_lcd>;
-> +               pp1800-supply =3D <&pp1800_lcd>;
-> +               backlight =3D <&backlight_lcd0>;
-> +               rotation =3D <270>;
-> +               port {
-> +                       panel_in: endpoint {
-> +                               remote-endpoint =3D <&dsi_out>;
-> +                       };
-> +               };
-> +       };
-> +};
-> +
-> +&dsi_out {
-> +       remote-endpoint =3D <&panel_in>;
-> +};
-> +
->  &i2c0 {
->         status =3D "okay";
->
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi b/arch/=
-arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
-> index a85c73b43195..b6cfcafd8b06 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
-> @@ -45,6 +45,34 @@ &bluetooth {
->         firmware-name =3D "nvm_00440302_i2s_eu.bin";
->  };
->
-> +&dsi0 {
-> +       #address-cells =3D <1>;
-> +       #size-cells =3D <0>;
-> +       status =3D "okay";
-> +
-> +       panel: panel@0 {
-> +               /* compatible will be set in board dts */
-> +               reg =3D <0>;
-> +               enable-gpios =3D <&pio 45 0>;
-> +               pinctrl-names =3D "default";
-> +               pinctrl-0 =3D <&panel_pins_default>;
-> +               avdd-supply =3D <&ppvarn_lcd>;
-> +               avee-supply =3D <&ppvarp_lcd>;
-> +               pp1800-supply =3D <&pp1800_lcd>;
-> +               backlight =3D <&backlight_lcd0>;
-> +               rotation =3D <270>;
-> +               port {
-> +                       panel_in: endpoint {
-> +                               remote-endpoint =3D <&dsi_out>;
-> +                       };
-> +               };
-> +       };
-> +};
-> +
-> +&dsi_out {
-> +       remote-endpoint =3D <&panel_in>;
-> +};
-> +
->  &i2c0 {
->         status =3D "okay";
->
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi b/arch/arm64/=
-boot/dts/mediatek/mt8183-kukui.dtsi
-> index 8f3a0e85b4ed..4ac0a60fdd24 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
-> @@ -252,29 +252,6 @@ &cpu7 {
->
->  &dsi0 {
->         status =3D "okay";
-> -       #address-cells =3D <1>;
-> -       #size-cells =3D <0>;
-> -       panel: panel@0 {
-> -               /* compatible will be set in board dts */
-> -               reg =3D <0>;
-> -               enable-gpios =3D <&pio 45 0>;
-> -               pinctrl-names =3D "default";
-> -               pinctrl-0 =3D <&panel_pins_default>;
-> -               avdd-supply =3D <&ppvarn_lcd>;
-> -               avee-supply =3D <&ppvarp_lcd>;
-> -               pp1800-supply =3D <&pp1800_lcd>;
-> -               backlight =3D <&backlight_lcd0>;
-> -               rotation =3D <270>;
-> -               port {
-> -                       panel_in: endpoint {
-> -                               remote-endpoint =3D <&dsi_out>;
-> -                       };
-> -               };
-> -       };
-> -};
-> -
-> -&dsi_out {
-> -       remote-endpoint =3D <&panel_in>;
->  };
->
->  &gic {
-> --
-> 2.50.1
->
+>  	if (!aes->iv)
+>  		return -EINVAL;
+>  
+> @@ -696,26 +705,26 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  
+>  	jobid = CCP_NEW_JOBID(cmd_q->ccp);
+>  
+> -	memset(&op, 0, sizeof(op));
+> -	op.cmd_q = cmd_q;
+> -	op.jobid = jobid;
+> -	op.sb_key = cmd_q->sb_key; /* Pre-allocated */
+> -	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
+> -	op.init = 1;
+> -	op.u.aes.type = aes->type;
+> +	memset(&wa->op, 0, sizeof(wa->op));
+
+As the memory is allocated using kzalloc, memset is not necessary here.
+
+Regards
+Nikunj
+
