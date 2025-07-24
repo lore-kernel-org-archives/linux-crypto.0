@@ -1,102 +1,78 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF2925A2A4
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 10:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE06D24E01D;
+	Thu, 24 Jul 2025 10:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753351336; cv=none; b=P8c/PucDTZibMyNIJL3oWzDncPhhMAdFYOv/3IGjocqIF1ESTui5FgGOVUzcigbUl7FHttPCtEhYtlRRCCry3YMYOCnw8laNW2KaTC9LMyyXtQabzxJVVNO5Zl8KGwwOFqap+LKvSHcoZRc2sWjOPhDSBhD2HUG5Dh0KOW/Hh0o=
+	t=1753351490; cv=none; b=nzChat/Qd7T8yZkGejPfxEptJ507ECpiU7ld30ijRRwbHeJEmpmOHfwO1PoyiI03JpYoAq+3yrBPxoXTTxzkGMSKB1kqO/R0xkRUeyg0EGRGyDwihzvXBrDbMFKwJQJo7a7kXPVG4X8vFRQ/xh4tcAm1vZzYwe69L2NEjBpdtMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753351336; c=relaxed/simple;
-	bh=KWyqMGEUBT6sPlAYGN8ahqpDMLDIFJaLyGGzuzUqjK0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EU4gJom5MB0zpCxdWOUKvJJTVMo8u33JrZKdbsSvanCmZq4FIzfz1qgGIHCcYMyy+pQJKOTLkOepo/v8GsE2B7D2acJMS5P5BoOO5/ez/jHRc7JHKmUF1KYQypvOUlOzyh5mYLBaA3eGxgorN+p4gDErNw11UKZGWKrFFN8I+tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=V/vPM8Rb; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1753351490; c=relaxed/simple;
+	bh=dB0n0iSlVZ5AKtNK8uk2suHWKAUZYtSH8+sIis6kxPs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ki79qSLNVqYxMoDnNd4KdJo5g5CuxHBq+76ROLJ0KLfB1dIeVDkC4Lml50vJTTBwE36BzbhBigxH32bFCkmRcHjfw73hnt7/yxj0Oydr1NiWvkooRbqdDA2+uPuTZBTVYz0AkpHQYAWtd9db3PUuwxf5XBWUMZfKoMO12ffpfmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqEpHWvh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="V/vPM8Rb"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-558facbc19cso644233e87.3
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 03:02:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1753351332; x=1753956132; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KWyqMGEUBT6sPlAYGN8ahqpDMLDIFJaLyGGzuzUqjK0=;
-        b=V/vPM8Rb1cbKAv+XnKhAJOmIjhQO4tB4NYqtbMsIQL7++wi1r1fweGMRbtHgsBo/Fm
-         zYyyOLRDr8faufcUrwibj8Spaz00uUBCsmQ+qSzgCbek0JhsssboISKnyBfMp/3C/YPn
-         njKEMYZwFYlJuwY7yQU3VSUy3nc9MBGEtQqBI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753351332; x=1753956132;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KWyqMGEUBT6sPlAYGN8ahqpDMLDIFJaLyGGzuzUqjK0=;
-        b=tnmuD6MQcIIjldUEgw/zlU6qAQkEk1YeDfOVNWAgcWiaC8aca659Oi2KI3r0MG17Cr
-         qsPNVyhTcLsuHOFdITXYMhbCmzzBK6xVQpxda+evgJFjxdmECKgNtPJWBsdqzNcGKKdZ
-         haMUArfegb3a0yQL83mIp+x5iK0DoTMyz9L5vBZDV7/NUdd6M1cpprC/6oqk3WiStrQz
-         MAARSLy1TkrCsRM4vMV8ld4kkQYzOGFfz5w5RBGJBRlZghXFFetZaVM6+2ILVEOlfEV1
-         Z5NOHsjYEAp9XNsTUsrQSf9V5CShCgipdyLF3q5xWB7925PR4KmQPghtIOBAtPxFHnVb
-         hxmA==
-X-Forwarded-Encrypted: i=1; AJvYcCW64JfQizCzT04veLzxbTFb0lidlP5N302nVAP8QSmvsTVn9Zm0QuFjmPfqM1fynlm3ID2Jv8qNrpLSkYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjmHMA6XO9pyID55iW3an81ePPTemoA7suzAvRjM9qmPzI9kzM
-	6FVHKJyMrhZnuA9JqgKsEosZ3G/N/JE0SAQ8YusVDYrc6EkI+Ha01GNrF3Z7xYtBw7Twxy12yE7
-	o/j+7cx7/7dYvn1+YK8MtHNCQUvWXS0mWFkIlR2eM
-X-Gm-Gg: ASbGncstPHcXuY1l5nEt9cwLVCBAnmjSFzouX3TQr0iPrNXP8Pj7JoRNuo+LN+ofdq4
-	xjfK2BQ1AxKoj6Ueqr+nsuFn6cbrQgO8emgpgSNju6vsNYH4geF8FqXzqVUSZxA5dwVwvWyhMX1
-	NJ5/TOV2IMfli1SSoF0pHVXUi3Jpjxjz7FZ/KH2N2bRREYmPY31lugDkXOxEckfJ0drOFxMMPkj
-	qcjKFzI/s/O0SZrN+AvqdmQrloOwZyLJW4=
-X-Google-Smtp-Source: AGHT+IESUy0W5d8sN6DOxHQC9VYSfHke7csoBbtn4oiuNMESAIIOLfvRI9EoIcZqqzK+oAmlqA1BtKODIpYwZl1nk3k=
-X-Received: by 2002:a05:6512:b06:b0:55a:4b25:b33b with SMTP id
- 2adb3069b0e04-55a513879f4mr2300615e87.15.1753351331794; Thu, 24 Jul 2025
- 03:02:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqEpHWvh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2773C4CEED;
+	Thu, 24 Jul 2025 10:04:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753351489;
+	bh=dB0n0iSlVZ5AKtNK8uk2suHWKAUZYtSH8+sIis6kxPs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aqEpHWvhKPb5HP5ZjhOtxwslFq30VBcABOjHySAM/pVyUJ6thjQEXU1bWF14+ivH/
+	 rpo8sPAh7IlUvFevGMUhHewRr+36+ym1469hC2nAHX5k0vsosJt4TQSkU4bSkqhBRq
+	 RzmOLP03dBsVP7RO9ORiRrFwJxYWATBmqfASFK2aATfDnZAacb5cEBNy+GM/DYP1uD
+	 lw7iL2I9kaLr9cem28LJnw5R3MnT87C1pMyGpIdFBs9pvyxKZUEG9YJnlXUs+1YIPy
+	 v24o66zSZ6ok7ZfMp+6OKc9NCE29+3eF6CdH6HUW1xHy/EL6pdLIhKIx5KtsjQcysC
+	 3WqIDbQWfoTLA==
+Date: Thu, 24 Jul 2025 11:04:42 +0100
+From: Lee Jones <lee@kernel.org>
+To: linux@armlinux.org.uk, nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
+	catalin.marinas@arm.com, will@kernel.org, olivia@selenic.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+	andi.shyti@kernel.org, broonie@kernel.org,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, arnd@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, o.rempel@pengutronix.de,
+	daniel.machon@microchip.com, Robert Marko <robert.marko@sartura.hr>
+Cc: luka.perkov@sartura.hr
+Subject: Re: (subset) [PATCH v8 04/10] mfd: at91-usart: Make it selectable
+ for ARCH_MICROCHIP
+Message-ID: <20250724100442.GX11056@google.com>
+References: <20250702183856.1727275-5-robert.marko@sartura.hr>
+ <175325995961.1695705.8338983998485530536.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-36-angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20250724083914.61351-36-angelogioacchino.delregno@collabora.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Thu, 24 Jul 2025 18:02:00 +0800
-X-Gm-Features: Ac12FXxwmEtskk9yW4VS4U_sXrqKN7rxCsdJIjp0VaKRTEqFbUzw8Bs63nu9Nbw
-Message-ID: <CAGXv+5Gar47gRZoT6DUDpPRabjzoSE==Zi0wrR76A7g-SJL1=A@mail.gmail.com>
-Subject: Re: [PATCH 35/38] arm64: dts: mediatek: mt8195-cherry: Move
- VBAT-supply to Tomato R1/R2
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de, 
-	airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com, 
-	mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com, 
-	mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com, 
-	vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org, 
-	linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org, 
-	andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org, 
-	tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com, 
-	ck.hu@mediatek.com, houlong.wei@mediatek.com, 
-	kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com, 
-	tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com, 
-	olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org, 
-	arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com, 
-	frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <175325995961.1695705.8338983998485530536.b4-ty@kernel.org>
 
-On Thu, Jul 24, 2025 at 4:41=E2=80=AFPM AngeloGioacchino Del Regno
-<angelogioacchino.delregno@collabora.com> wrote:
->
-> Move the VBAT supply to mt8195-cherry-tomato-{r1,r2} as this power
-> supply is named like that only for the Realtek RT5682i codec.
->
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
-abora.com>
+On Wed, 23 Jul 2025, Lee Jones wrote:
 
-Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
+> On Wed, 02 Jul 2025 20:36:02 +0200, Robert Marko wrote:
+> > LAN969x uses the Atmel USART, so make it selectable for ARCH_MICROCHIP to
+> > avoid needing to update depends in future if other Microchip SoC-s use it
+> > as well.
+> > 
+> > 
+> 
+> Applied, thanks!
+> 
+> [04/10] mfd: at91-usart: Make it selectable for ARCH_MICROCHIP
+>         commit: ef37a1e2485724f5287db1584d8aba48e8ba3f41
+
+Reverted as it caused issues in -next.
+
+https://lore.kernel.org/all/20250724115409.030d0d08@canb.auug.org.au/
+
+-- 
+Lee Jones [李琼斯]
