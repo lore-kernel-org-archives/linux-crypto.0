@@ -1,227 +1,102 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A08218E91;
-	Thu, 24 Jul 2025 10:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49301D7E4A;
+	Thu, 24 Jul 2025 10:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753353373; cv=none; b=F+Nffg6mAskTvHBgNuYLQ/x0VZirE8us+ES0cXXVcrXGlnt4hZQrqSy6BMwiQH10Tx3XRjpBg/IKbKHV/KliMgZz44Xw3PEWysX9B0WL2cRJEbGIajlJITs7RefFQbKqIadCp0kQmD+qrA+tc9uaP3Vigk1YdDgYef8gnALzvoc=
+	t=1753354710; cv=none; b=SjyctXzJ7LssYAhg57g4hambSb7tlKdPgXnnb2QcoteAzy5D367V6nBI1+aONmmfIxdURh850wALV75RfqgZABdJNuxqdzHXt7AFAwBCMyLwijQumeVgTHJD4ZssnB1kWeEZZ29xLfWY4L+khRWUSyn6kqFEJXpwd55qlFBBals=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753353373; c=relaxed/simple;
-	bh=od/xtHdR76xA66uiqHmn0euNvOxFQUSMktMhwNkDo3M=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=P19+nrV6xo+SaiKJTBlQWr48gLoaKC3ccC0gr4ClEgHePb6wO00nftaCNpJWR02PCE9zJRiGhQvwIqx1XXHU5ECwwFPlSAO/m/Jtt3I4iJOjZy7joXsjhlWQzl4UURy9neHzvMyqf6+hftkX0B/Bpf0dEn5WpOFZRU+SCJL12xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=J9z+BkZj; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
+	s=arc-20240116; t=1753354710; c=relaxed/simple;
+	bh=wl+SOkF9O3gURIzsMwzVH/kEkZbhPgd5zO2cNyRnC2Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LFoyTfoclox6vk9IBF6v9Pe152tcqQwAAlgNY1rcaLU8nK9ZOXxPjKpbnT/2PDc24nFUsYD+gAMsLaKLI/fxYAqcs89ZEPicfh9DSxzYWLYDNnIHBvdnEwUvJ7gCdsRgqzDSienqQfVH5thdAw4EN5CwGvMZAA6jCYlLq29e/XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8rKGJMp; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="J9z+BkZj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1753353342; x=1753958142; i=frank-w@public-files.de;
-	bh=qwlcmLAbRr/MQRSxhxjFBqTr2CYUizJoPcZmxNDBDks=;
-	h=X-UI-Sender-Class:Date:From:To:CC:Subject:Reply-to:In-Reply-To:
-	 References:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=J9z+BkZjf/3pjoMBKQ93ZNsxGhw7Zxdh8y4xg7zbiy4DSaQ1ePRJQs2YkfcpTYnb
-	 md8nMxMdY/TMXuKoKHkEywgXE1w3+wVBUaABS2tZDmZ/YV7QRCaBfY4JnvXC9jKPi
-	 RT1tq8gcEqqjnIn/R/Bk8j1AvE0+xGYiYLVL2dnqPhYZEyAzkzu6COE0HC1y36Ulc
-	 /u9ZFI0u75euPWamsARzcyiKWc4oVSCPhLUeK0iNoZHOvZDZezygyLhA0rrvOJtfl
-	 rDmc9aAW05+fe4eC3lwaLN9Z0yxZPLdeXPoLJMUxd80i33UCjtqbV2MZ9vKeiI6BR
-	 vuJDYtLquF2SrGnqpg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [IPv6:::1] ([80.187.69.140]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MzhnN-1uSBvr1TE1-00qu8U; Thu, 24
- Jul 2025 12:35:42 +0200
-Date: Thu, 24 Jul 2025 12:35:32 +0200
-From: Frank Wunderlich <frank-w@public-files.de>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-mediatek@lists.infradead.org, robh@kernel.org
-CC: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
- conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de,
- airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com,
- mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com,
- mchehab@kernel.org, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, chunfeng.yun@mediatek.com,
- vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org,
- linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org,
- andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org,
- tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com,
- ck.hu@mediatek.com, houlong.wei@mediatek.com,
- kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com,
- tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com,
- olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org,
- arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com,
- mwalle@kernel.org, fparent@baylibre.com, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-phy@lists.infradead.org,
- linux-gpio@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-sound@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_27/38=5D_arm64=3A_dts=3A_mediatek=3A_m?=
- =?US-ASCII?Q?t7988a=3A_Fix_PCI-Express_T-PHY_node_address?=
-User-Agent: K-9 Mail for Android
-Reply-to: frank-w@public-files.de
-In-Reply-To: <20250724083914.61351-28-angelogioacchino.delregno@collabora.com>
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-28-angelogioacchino.delregno@collabora.com>
-Message-ID: <E00D9C7A-CEC6-4BB3-8568-CC54C80E1F9F@public-files.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8rKGJMp"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-455b002833bso3620025e9.0;
+        Thu, 24 Jul 2025 03:58:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753354707; x=1753959507; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RGecDSfQkRQwOHSUrTvJEbSVKAprJg4maVsG15+73gY=;
+        b=Z8rKGJMpwdy7AVJQ9sCquhdF0kPoQHzXI9PwEks1YogSQC9C0RWUl0IQcxd6lABZ+j
+         mf+NEL/ZvTxp9HlJcz4BMqWbM3IJlHRE90MunDzhWMpjg3RqzXS2ESnijjtkC1tk0PQv
+         1841zMMZHLYHMAPbJABPOwaUT67pYX/xyYI+NTW6nv9tG/QznI6hqIl8/78R4zoNHpJV
+         Xv87sIBeMc9o/Cjj8HQ3CWmhPuYv/Wy9VackRfj+PTLdI4wU1Ca++Q/nJ1bzAW2oN0Kl
+         M7KTi7CyTCJuB0/VvO+uvM302I7mUlVyqCukwj/CzdcLB+A+0yH80e5SglcIItmcFAwt
+         gzbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753354707; x=1753959507;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RGecDSfQkRQwOHSUrTvJEbSVKAprJg4maVsG15+73gY=;
+        b=IeMTLJfe2gZ58GbpztalT2fMw6Dd1iuQOIno3hW6JPy1eJFsQAEJXgwsLDE3GTb/xA
+         F0az0NvS5Zdj03qdS2rycyQkJDBE5xIvmUFswS4T6pDuNthN7yK2wbicRCJhYw1RXrBX
+         Jkp6V/qqGeSFtnjAvPYjifYfZGXkaRMDnuDlX2XI4JO31xJVvw+JOeXJOsf83S0y8mju
+         zHbDj6ArpFPmrTa6u8dnBAXaZqiLj9ZusGahsHGKQKs8Adj+9ueXunI7yK8xX6Zee94L
+         MunuileVBbv+mCu0+YmPgm6BLfB/MVnAL2YBCCE/8xRQBLVmgRLKLXpJM09w2knZqXXV
+         MBMA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvVUu/jkwPxi7U//Wh64tzg1XbDfh27cY96y+Dtfly+wB0tW6NCDLO3GYpqS3RxQkkstZQ6RyEc3mdUqM=@vger.kernel.org, AJvYcCWJhB/kaVTmkZolO1TlRzkVPKwCm0N7T3gtwtAyn0B5Ik+dZSqFsG5aYvwuzEz0l3t+H54GAnFhYtBf4kPu@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp6Z8qB4PS6kvIeDbjSoiz2MEa+TqPCqCxqlX9AJ+Wxdy6Or4e
+	B//xX7K2s6WiaYR74/5UWsTwdOmrAhL27ga8YINywvFRG97/FnXDSKya
+X-Gm-Gg: ASbGncuwOpquEBqH4hEv2hc58z/fwDfVBqYxw8pySb6O0rFDk2iu8c3+gC1nG41RENH
+	jvoD4jzHXAajLES1YFfYeSjljowjKuV2nhb+PcOaYCFAMu9DRktEq7mO0Lho811MUVd6JEvUVZI
+	Giio9ZiptCPUvSagh2Mj3lCWHbCEtga4gcDNw1bLF2uujmwMWocBzfCooGQ8WLozolciOdwPxfn
+	kPhpKAfMx6e3s5qCAeX1Jbds8eZcjktrcw+wsLqhgulz/KO37WCS/fv099EVxSX7sHJPGdSO/zJ
+	a7y3X4ojqy/Fr11BI0+VSiwV/boNgw7p1Y2Qb0s6BWVtifTD95dbZ/wiFOS8uu+WrHYN3d3VTl5
+	Rr1ss5/ZYTiNYECGymzs3
+X-Google-Smtp-Source: AGHT+IEec1gAogEhVNDlKxHHWHB5R0+lqM/g4ZlsnII2um+rpJwBJ/Nvy+vyPcI2BysN3G6ob2NnHw==
+X-Received: by 2002:a05:600c:3e83:b0:456:2000:2f3f with SMTP id 5b1f17b1804b1-45868d53693mr42892935e9.23.1753354706968;
+        Thu, 24 Jul 2025 03:58:26 -0700 (PDT)
+Received: from localhost ([87.254.0.133])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-458705ce781sm15812735e9.31.2025.07.24.03.58.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 03:58:26 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] crypto: stm32: Fix spelling mistake "STMicrolectronics" -> "STMicroelectronics"
+Date: Thu, 24 Jul 2025 11:57:54 +0100
+Message-ID: <20250724105754.140400-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:nkz0xBWOn6njT18nQoUfw6V1GVlL8WpIemZpMHLlbE8QqNvMruQ
- Dw1Pn/9vrDC5T+QE1uC+gQrBvCbuCBubKZuNY/QtmAr8uYJpemV1UWgy1GRhjhzujMe4Sno
- OFT//bgrHPOQkyWfSsQl5jIAop0RmK2bQYCM8GBsuQbZ18A3HnORU53wBCWooCm/gqkZStX
- r26BYjnhKxDQSZciDLXoQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:LqPQEsDz8IY=;vMKO03lm15WSc5MEUEg0Iky4Zzx
- 67GMJ4jf8A6By1yF5KAfkDekD+D4A+BURO1U+l8txshGsw0o4rSNVapDGS9qXZKcKlaLsxPHv
- LB53LxYrLBVIkIXkd9GRR+BYQFSuxgwF7zzK21gR4AZ94sHzSpalup/WCvB6L4E1w9OXtb+ZG
- kn6B4VJyQ97qwcfcr1LSbJux+oyZ0pCplxuLdFY13FXnJLHpRZpi7BW8KTugSYs00r2dR4Chd
- 7dQVwDh/2AUqRXHnhCo+81Nz3PM58nMOEQMG4PLDsQoDYPydc5IzuNM6ioi0axpHNsHGMxJxr
- Gw9Sh/UhwkvEByUjbd6DxqtQlPstHN3shLFJs+sENNOe9n5hasqURAe/WyI+e7eQo6UO5A5uJ
- ds9GKkTrbyb9Xk0gQtDEVIQL3pb9wxuI3fRBGsN4mLezwdqBOBrtuwV/UE64//x9P8Utpu8r/
- iWMKEmDj2+qMb6c6RA/D8XIp6GqGJ8APdXynmz6AtjNhBAW029gcS897Iz+0BfwOGIr+nd7k2
- 1XeQ1WOoXBn6xNghokVbIBmeIxQmXsIKOznVUmQiApnF90PlzY30WbS57OPfKXeyMH657BB99
- Ga0v4Cd/jue4/WRtpPjfid4rodAnMQyOX7+AZDRjvhH7Ny00eAsP2SjRglyWTKxWMssQuBInN
- 9wS9g+0xDwzRCEBPRdjMyqjdcJdaMs1QB2y/IZFz5vL53mibnxSm677nl117BIMioxT+C+2jL
- 5m5eobaX33u7WM2qN84r0gDPv/J33y4VSi4C9ja3RgTQqYqoFEakdUUVunzxLqAa1esX+YF7m
- DXwBRT4qcl2gtDOxwAIP6wfQqsQBkjEoKL2IAH0Qnc3p9ny/ihAu9wpxyRiM8i/HN/ucIaXg6
- EwvNm8ENjwRg3gsjFHjiV71J5Iatn216fX9BNDeLT0zRrAAIzmSH2oV81fawBQNrz7ZhQ3uwA
- MSYpUUykWi5U8Kj1X+hkYAJ3ZhZgEvRg43BWuF/RUf1i8dFvVzfk7LK5p8K8yFBbYcCR48+8f
- kX1DiRKdRy4xX8S4KLbC9x6S8eDt8lFucmuOzk8h32FF3/dSnqtqO/sOepUuZsj4hQT/OYmNv
- banxqOKfW35MAFkNmGiExNdP0Be8mSplGE2T7O+Moc/VQfUDVz5pDLy4WjX72+NgETAOTaBIg
- sM+NWHczKublpiGG6l2Evcr3/48fESVuSJlSEmcZBwES8PV+SWknws9yxxIXRsXfib7L8IF+9
- X7hbsVVqQhSj2G4i2qxLvM/AsSG/J37l6+SUw3jbKpTg6OT7+9DGtLiHUfmdlqlW1FaUCmGXJ
- xBjSg/QYyw+64F2L6VupI+svX7YT82plSeXPWYx+RLIh8xYqsl34JE2b7wC6W7cbBq2YhPLRV
- q8EFUqyWOBKWNfJjYNUtFJAZZK9uhIcn3d4WoNN99Wp1TzCcq+HUtGrFhtiCl/KR8bpDJuyWQ
- ppx1UFSDk4cRzDiKgkFxvsNnZTTKEep9tZhyKkM2bEW+ZVJ1CjfHQjDMP1FkrNP6NA0esbQAo
- 8OaZvzScs2DRL8dfMFoqJ3x/cF2BTs9wm7T3UXWMCwyOnqqNzVTb9jlV7qTc8WRReUAMYDec9
- SNdv9z14ES+0dBq0IDT6EIzChHigCwI5B2NNKCwzBUR9xBAAy2cA6P1gvu807xS1JTuFLtn6G
- KZc+YptAs5NKk1WVkDOpTGDLokwlOPleRIhQR3l+9bFILbqQDH3GXE9OMmWNDkKjlInDlZO9q
- lq3tDJaOEhROZKFEDcxFygO3nlIFElYewUOUv9vdWyJhV4EidpJKNQ/SY8byVyE3BZgi6jnd8
- CIy6BPcfgNjQrtlBdAgp+UX9LYXYILTSQVS2lZIglH0SbZD+8+WMGZ2aVDNc3h+jhDNYlJC2j
- YabZKAcMV5jaDu6/ciQ2oxXUNe2YowIrS2r6c+dnro/W2cghiMBttIwGhGIrVknhyl2BTp/Q0
- mTXclE0u2r8qAtLdP7attownnfY1sqLr6sBZfphNymf+sHgvMTdBaBZyatndXsi/3+QCiYem2
- VssXoC+Ct/+ELvZb1SFgpmeB1F5uF4Nc0fyIOV3o5KYkmka3UsatFs4QqGbta2zMz9ZwMLvYa
- iYDhiJbVsgxxNahs58lyCm3GxF3djYnBzEAWn0iA2T42/LqFUgZulMsOxcOkdTrQhMIAp4X9L
- YIRG4mi9VweZrU+bLt+yfdmy3q7K8aETtjkh3kOXMVC+8cLd+FYzZXDDyuTqNmWdSPYaB2jFu
- c4TUGZfttLDqTCYm6kxO0JDCZINpY6e76YA/xW+YpDuw55d6BvvyNs3Mmfx6G7MyzP86t7UPl
- 1DxQJroVY+Dxtof9siBlrqXqFJdDNE5Auw35Wfii2hwwnnLKxjc0ZsJ6k1h+HppAhn3cb09Wz
- HBRh4gRvg8hLCypZiXR3mD2n0fXuyeTjqZzvQ/NFvKekAEr6kOYTWUT2vUhrUEZQuEDf72L8b
- SW6SGTAhTXZj1F72VaV7QE+AvWdebUlAqqLQ6afQVCYHrn9sDrq3Jp5X/SFD6HAZUZk9UsHUC
- 3XmH0xc6j4hQTbmu8v8xfGfutn1QzQovFQvCuFbMpYpibYiE18IPWdXznfsaq3RAC9hwSdg4K
- DPCvlujSiUVl8rBsvh/WDtnsGLYkyLOhuTCjAYKVzB+dLj9DbtELRfaoeEl7FWprXi0Pg4r/w
- MF6CzQFk10xJubkyQ+t58e7W/NdquuS6QJVqaUFOvh/Vgb40LnE2ObVYjQyQYf6DmhaLWv/Kx
- BwK+eF7AJEWG+Hx7nh3fEkVesikjlBusjYhVn/BuZRqiH5bsKt/+cNTLIuehTzu5yUkT/cvga
- /OWjHjx7rxTjXqhbGgRi0Qobd5wDz5MrqTbd5fYQktWEAubsbBuBcjni/uQc1/ktMMTWMF5kK
- aNZ5NKcyTlnY/cXHWvWecxKmlnsZWEitg9RASgWFQGP0S5mduIfVJJ10fMgyFfO/b7QlVG0K6
- M0FigXGk75R030Pfk4bgwrX6qjUFgn7gtbfTJrrSYI9T4l0IdaTV9OS4j2h+a/U+E60SQnDWK
- oebSgsQbscb4hM+GqSoKx6r3qVfyFRAVk5noCC5n5ybYJ8Btrpp9m6LBOVzbNgEsDwszvey6G
- nA4/1OXj5Nh1LEZwi1Eg29ND5M3gJac/ErBkH3VJWazZlxMjgOWg6moeytimr1HVhUds+CUL1
- y3Y1qJRd+jtUeTCIa0R6tb8X0Ucnua0TuSq7vH2HH+DrBY/iHEkrftWGhePmaX6Ot7C8lKJfL
- Yi+0BfZxnb0qyLOKB9CPUZKeXyok2yF/yiV8lJM1B9y32NAelvXobBaPS3Phm/o88Uzc54pe9
- RKDqttzbusVtXya+BpnSkkLkn/C/AjTueLQOcmekSd2++DzUqDgLmKE34bFFaxcWDfja3Rn1j
- eKcHqyUpGZCqmJ9U0xd4veF3kZxKXiwK9TfySeIpWhww3OZ6LvJhFrqQ3oMyGIdkxs/XoAava
- 3nmMWSdZVdqRAxbdzV8anUl2I9sHm0EkBsfAJCmX5dszGBrsRIY/lyNeA+eFwYLs+9imHS7MF
- TAtSQsh97o9dGRXq/LIX4j/9Myl7bOenu8Qgodjrv6QU1E9Nrv4MNEJJOZOtDpN4P6tENplas
- 9XaFU8FhnbNgTxMsoCSImldND950E8gONp81yoF6g0BzwnsyaeLZ+upSQ==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Am 24=2E Juli 2025 10:39:03 MESZ schrieb AngeloGioacchino Del Regno <angelo=
-gioacchino=2Edelregno@collabora=2Ecom>:
->The PCIe and USB TPHYs are under the soc bus, which provides MMIO,
->and all nodes under that must use the bus, otherwise those would
->clearly be out of place=2E
->
->Add ranges to both the tphy(s) and assign the address to the main
->node to silence a dtbs_check warning, and fix the children to
->use the MMIO range of t-phy=2E
->
->Fixes: ("f693e6ba55ae arm64: dts: mediatek: mt7988: Add t-phy for ssusb1"=
-)
->Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino=2Edelregno@co=
-llabora=2Ecom>
->---
-> arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi | 28 +++++++++++------------
-> 1 file changed, 14 insertions(+), 14 deletions(-)
->
->diff --git a/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi b/arch/arm64/boo=
-t/dts/mediatek/mt7988a=2Edtsi
->index 560ec86dbec0=2E=2Ecc0d3e3f4374 100644
->--- a/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi
->+++ b/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi
->@@ -629,20 +629,20 @@ pcie_intc1: interrupt-controller {
-> 		tphy: t-phy@11c50000 {
-> 			compatible =3D "mediatek,mt7986-tphy",
-> 				     "mediatek,generic-tphy-v2";
->-			#address-cells =3D <2>;
->-			#size-cells =3D <2>;
->-			ranges;
->+			#address-cells =3D <1>;
->+			#size-cells =3D <1>;
->+			ranges =3D <0 0 0x11c50000 0x1000>;
-> 			status =3D "disabled";
->=20
->-			tphyu2port0: usb-phy@11c50000 {
->-				reg =3D <0 0x11c50000 0 0x700>;
->+			tphyu2port0: usb-phy@0 {
->+				reg =3D <0 0x700>;
-> 				clocks =3D <&infracfg CLK_INFRA_USB_UTMI_CK_P1>;
-> 				clock-names =3D "ref";
-> 				#phy-cells =3D <1>;
-> 			};
->=20
->-			tphyu3port0: usb-phy@11c50700 {
->-				reg =3D <0 0x11c50700 0 0x900>;
->+			tphyu3port0: usb-phy@700 {
->+				reg =3D <0 0x700 0 0x900>;
+There is a spelling mistake in the module description text. Fix it.
 
-This one looks wrong to me
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/crypto/stm32/stm32-cryp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I guess it should be=20
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index a89b4c5d62a0..5e82e8a1f71a 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -2781,5 +2781,5 @@ static struct platform_driver stm32_cryp_driver = {
+ module_platform_driver(stm32_cryp_driver);
+ 
+ MODULE_AUTHOR("Fabien Dessenne <fabien.dessenne@st.com>");
+-MODULE_DESCRIPTION("STMicrolectronics STM32 CRYP hardware driver");
++MODULE_DESCRIPTION("STMicroelectronics STM32 CRYP hardware driver");
+ MODULE_LICENSE("GPL");
+-- 
+2.50.0
 
-reg =3D <0x700 0x900>;
-
-> 				clocks =3D <&infracfg CLK_INFRA_USB_PIPE_CK_P1>;
-> 				clock-names =3D "ref";
-> 				#phy-cells =3D <1>;
->@@ -659,20 +659,20 @@ topmisc: system-controller@11d10084 {
-> 		xsphy: xs-phy@11e10000 {
-> 			compatible =3D "mediatek,mt7988-xsphy",
-> 				     "mediatek,xsphy";
->-			#address-cells =3D <2>;
->-			#size-cells =3D <2>;
->-			ranges;
->+			#address-cells =3D <1>;
->+			#size-cells =3D <1>;
->+			ranges =3D <0 0 0x11e10000 0x3900>;
-> 			status =3D "disabled";
->=20
->-			xphyu2port0: usb-phy@11e10000 {
->-				reg =3D <0 0x11e10000 0 0x400>;
->+			xphyu2port0: usb-phy@0 {
->+				reg =3D <0 0x400>;
-> 				clocks =3D <&infracfg CLK_INFRA_USB_UTMI>;
-> 				clock-names =3D "ref";
-> 				#phy-cells =3D <1>;
-> 			};
->=20
->-			xphyu3port0: usb-phy@11e13000 {
->-				reg =3D <0 0x11e13400 0 0x500>;
->+			xphyu3port0: usb-phy@3400 {
->+				reg =3D <0x3400 0x500>;
-> 				clocks =3D <&infracfg CLK_INFRA_USB_PIPE>;
-> 				clock-names =3D "ref";
-> 				#phy-cells =3D <1>;
-
-Hi Angelo,
-
-thanks for taking case of many of current binding errors (only wondering a=
-bout this one as i had checked it before sending upstream)=2E
-regards Frank
