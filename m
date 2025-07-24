@@ -1,102 +1,111 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49301D7E4A;
-	Thu, 24 Jul 2025 10:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC7233991;
+	Thu, 24 Jul 2025 11:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753354710; cv=none; b=SjyctXzJ7LssYAhg57g4hambSb7tlKdPgXnnb2QcoteAzy5D367V6nBI1+aONmmfIxdURh850wALV75RfqgZABdJNuxqdzHXt7AFAwBCMyLwijQumeVgTHJD4ZssnB1kWeEZZ29xLfWY4L+khRWUSyn6kqFEJXpwd55qlFBBals=
+	t=1753355972; cv=none; b=TptZZscQpBCwBl2dUi/xbub5dkWilli4VvepwWfPRnfMY52CK3Ez/58JhHAbw+mfO4QRrhCHPLKIY5iEovZMAbBZv6g4oYoscZ19kzZEn0VEPECTDnOJbs0/ea+Ey2+EnQRxBmO9QpJPHudjIPQyuquTAJJ/Lzt8/MK+6dlrUD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753354710; c=relaxed/simple;
-	bh=wl+SOkF9O3gURIzsMwzVH/kEkZbhPgd5zO2cNyRnC2Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LFoyTfoclox6vk9IBF6v9Pe152tcqQwAAlgNY1rcaLU8nK9ZOXxPjKpbnT/2PDc24nFUsYD+gAMsLaKLI/fxYAqcs89ZEPicfh9DSxzYWLYDNnIHBvdnEwUvJ7gCdsRgqzDSienqQfVH5thdAw4EN5CwGvMZAA6jCYlLq29e/XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8rKGJMp; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1753355972; c=relaxed/simple;
+	bh=s3ZnbItH7r6cLHTy+VwbS1Kg3RPe/mzeNlY5FzZW73M=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=nEbwErCeU0G0eVnF4UVDc8NSdPeFApcvjY20QO00/vlSVIU/JVq4n9juF+a89mPStWKnwO+m/B4gWo80JXf0qLmhoZr8hP4fkEzV9c6vqGV1mOeYPGOeDQppKqxk9bsIQJLtngFvtyibpftnYyn/f60Kcc5BQQZoveQHqV3068U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CStr8z/r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8rKGJMp"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-455b002833bso3620025e9.0;
-        Thu, 24 Jul 2025 03:58:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753354707; x=1753959507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGecDSfQkRQwOHSUrTvJEbSVKAprJg4maVsG15+73gY=;
-        b=Z8rKGJMpwdy7AVJQ9sCquhdF0kPoQHzXI9PwEks1YogSQC9C0RWUl0IQcxd6lABZ+j
-         mf+NEL/ZvTxp9HlJcz4BMqWbM3IJlHRE90MunDzhWMpjg3RqzXS2ESnijjtkC1tk0PQv
-         1841zMMZHLYHMAPbJABPOwaUT67pYX/xyYI+NTW6nv9tG/QznI6hqIl8/78R4zoNHpJV
-         Xv87sIBeMc9o/Cjj8HQ3CWmhPuYv/Wy9VackRfj+PTLdI4wU1Ca++Q/nJ1bzAW2oN0Kl
-         M7KTi7CyTCJuB0/VvO+uvM302I7mUlVyqCukwj/CzdcLB+A+0yH80e5SglcIItmcFAwt
-         gzbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753354707; x=1753959507;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RGecDSfQkRQwOHSUrTvJEbSVKAprJg4maVsG15+73gY=;
-        b=IeMTLJfe2gZ58GbpztalT2fMw6Dd1iuQOIno3hW6JPy1eJFsQAEJXgwsLDE3GTb/xA
-         F0az0NvS5Zdj03qdS2rycyQkJDBE5xIvmUFswS4T6pDuNthN7yK2wbicRCJhYw1RXrBX
-         Jkp6V/qqGeSFtnjAvPYjifYfZGXkaRMDnuDlX2XI4JO31xJVvw+JOeXJOsf83S0y8mju
-         zHbDj6ArpFPmrTa6u8dnBAXaZqiLj9ZusGahsHGKQKs8Adj+9ueXunI7yK8xX6Zee94L
-         MunuileVBbv+mCu0+YmPgm6BLfB/MVnAL2YBCCE/8xRQBLVmgRLKLXpJM09w2knZqXXV
-         MBMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVvVUu/jkwPxi7U//Wh64tzg1XbDfh27cY96y+Dtfly+wB0tW6NCDLO3GYpqS3RxQkkstZQ6RyEc3mdUqM=@vger.kernel.org, AJvYcCWJhB/kaVTmkZolO1TlRzkVPKwCm0N7T3gtwtAyn0B5Ik+dZSqFsG5aYvwuzEz0l3t+H54GAnFhYtBf4kPu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp6Z8qB4PS6kvIeDbjSoiz2MEa+TqPCqCxqlX9AJ+Wxdy6Or4e
-	B//xX7K2s6WiaYR74/5UWsTwdOmrAhL27ga8YINywvFRG97/FnXDSKya
-X-Gm-Gg: ASbGncuwOpquEBqH4hEv2hc58z/fwDfVBqYxw8pySb6O0rFDk2iu8c3+gC1nG41RENH
-	jvoD4jzHXAajLES1YFfYeSjljowjKuV2nhb+PcOaYCFAMu9DRktEq7mO0Lho811MUVd6JEvUVZI
-	Giio9ZiptCPUvSagh2Mj3lCWHbCEtga4gcDNw1bLF2uujmwMWocBzfCooGQ8WLozolciOdwPxfn
-	kPhpKAfMx6e3s5qCAeX1Jbds8eZcjktrcw+wsLqhgulz/KO37WCS/fv099EVxSX7sHJPGdSO/zJ
-	a7y3X4ojqy/Fr11BI0+VSiwV/boNgw7p1Y2Qb0s6BWVtifTD95dbZ/wiFOS8uu+WrHYN3d3VTl5
-	Rr1ss5/ZYTiNYECGymzs3
-X-Google-Smtp-Source: AGHT+IEec1gAogEhVNDlKxHHWHB5R0+lqM/g4ZlsnII2um+rpJwBJ/Nvy+vyPcI2BysN3G6ob2NnHw==
-X-Received: by 2002:a05:600c:3e83:b0:456:2000:2f3f with SMTP id 5b1f17b1804b1-45868d53693mr42892935e9.23.1753354706968;
-        Thu, 24 Jul 2025 03:58:26 -0700 (PDT)
-Received: from localhost ([87.254.0.133])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-458705ce781sm15812735e9.31.2025.07.24.03.58.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 03:58:26 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] crypto: stm32: Fix spelling mistake "STMicrolectronics" -> "STMicroelectronics"
-Date: Thu, 24 Jul 2025 11:57:54 +0100
-Message-ID: <20250724105754.140400-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.50.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CStr8z/r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69BD5C4CEEF;
+	Thu, 24 Jul 2025 11:19:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753355971;
+	bh=s3ZnbItH7r6cLHTy+VwbS1Kg3RPe/mzeNlY5FzZW73M=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=CStr8z/rOsij9S3z3BJm9fHa9iakjiAXVR9PdOK5taBZURJfAPAAkHbj0KuQviY7p
+	 KiL6Uvucdwz8LxwOWz7lwhX5I2qtRnTp09/USJTZHE24W+o2XT/5ls0Mo+DqJ/EQGy
+	 4vOkkwAzobpebJvh+VgDfNRDeqyhbjww7Rd7PHdXbcy0KDnMtuIOIRC83Uv6MAlwmL
+	 VYSko7BVS+mI+5gLRGV68wZS0TlpY3UDdnSSzeclWayt2BApahaiftZuAN6c9obWp0
+	 2tUwExST1V+igIM59xAHMg7CBzYem4LQ8BDzMMNqgOtJqDmA0vvctgoZdBWhL20O8G
+	 xRs89hLXeFgbA==
+Date: Thu, 24 Jul 2025 06:19:30 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: frank-w@public-files.de, herbert@gondor.apana.org.au, 
+ maarten.lankhorst@linux.intel.com, tzimmermann@suse.de, 
+ linux-phy@lists.infradead.org, krzk+dt@kernel.org, eugen.hristev@linaro.org, 
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+ jiaxin.yu@mediatek.com, jitao.shi@mediatek.com, daniel.lezcano@linaro.org, 
+ linux-remoteproc@vger.kernel.org, granquet@baylibre.com, 
+ lgirdwood@gmail.com, linux-crypto@vger.kernel.org, 
+ tinghan.shen@mediatek.com, mwalle@kernel.org, sam.shih@mediatek.com, 
+ sean.wang@kernel.org, p.zabel@pengutronix.de, matthias.bgg@gmail.com, 
+ vkoul@kernel.org, mripard@kernel.org, 
+ kyrie.wu@mediatek.corp-partner.google.com, olivia.wen@mediatek.com, 
+ dri-devel@lists.freedesktop.org, atenart@kernel.org, arnd@arndb.de, 
+ conor+dt@kernel.org, shane.chien@mediatek.com, houlong.wei@mediatek.com, 
+ devicetree@vger.kernel.org, kishon@kernel.org, fparent@baylibre.com, 
+ airlied@gmail.com, tglx@linutronix.de, linux-sound@vger.kernel.org, 
+ broonie@kernel.org, andy.teng@mediatek.com, jieyy.yang@mediatek.com, 
+ mathieu.poirier@linaro.org, chunfeng.yun@mediatek.com, 
+ linux-arm-kernel@lists.infradead.org, jassisinghbrar@gmail.com, 
+ linux-media@vger.kernel.org, davem@davemloft.net, simona@ffwll.ch, 
+ linus.walleij@linaro.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com, 
+ andersson@kernel.org, linux-mediatek@lists.infradead.org, 
+ mchehab@kernel.org
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-5-angelogioacchino.delregno@collabora.com>
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-5-angelogioacchino.delregno@collabora.com>
+Message-Id: <175335596838.1587473.6783798436849190740.robh@kernel.org>
+Subject: Re: [PATCH 04/38] ASoC: dt-bindings: mt8192-afe-pcm: Fix clocks
+ and clock-names
 
-There is a spelling mistake in the module description text. Fix it.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/crypto/stm32/stm32-cryp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, 24 Jul 2025 10:38:40 +0200, AngeloGioacchino Del Regno wrote:
+> Both clocks and clock-names are missing (a lot of) entries: add
+> all the used audio clocks and their description and also fix the
+> example node.
+> 
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> ---
+>  .../bindings/sound/mt8192-afe-pcm.yaml        | 106 +++++++++++++++++-
+>  1 file changed, 104 insertions(+), 2 deletions(-)
+> 
 
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index a89b4c5d62a0..5e82e8a1f71a 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -2781,5 +2781,5 @@ static struct platform_driver stm32_cryp_driver = {
- module_platform_driver(stm32_cryp_driver);
- 
- MODULE_AUTHOR("Fabien Dessenne <fabien.dessenne@st.com>");
--MODULE_DESCRIPTION("STMicrolectronics STM32 CRYP hardware driver");
-+MODULE_DESCRIPTION("STMicroelectronics STM32 CRYP hardware driver");
- MODULE_LICENSE("GPL");
--- 
-2.50.0
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/mt8192-afe-pcm.example.dtb: mt8192-afe-pcm (mediatek,mt8192-audio): clock-names:3: 'aud_adc_clk' was expected
+	from schema $id: http://devicetree.org/schemas/sound/mt8192-afe-pcm.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/mt8192-afe-pcm.example.dtb: mt8192-afe-pcm (mediatek,mt8192-audio): clock-names:4: 'aud_adda6_adc_clk' was expected
+	from schema $id: http://devicetree.org/schemas/sound/mt8192-afe-pcm.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/mt8192-afe-pcm.example.dtb: mt8192-afe-pcm (mediatek,mt8192-audio): clock-names: ['aud_afe_clk', 'aud_dac_clk', 'aud_dac_predis_clk', 'aud_infra_clk', 'aud_infra_26m_clk'] is too short
+	from schema $id: http://devicetree.org/schemas/sound/mt8192-afe-pcm.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/mt8192-afe-pcm.example.dtb: mt8192-afe-pcm (mediatek,mt8192-audio): clocks: [[4294967295, 0], [4294967295, 7], [4294967295, 8], [4294967295, 47], [4294967295, 58]] is too short
+	from schema $id: http://devicetree.org/schemas/sound/mt8192-afe-pcm.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250724083914.61351-5-angelogioacchino.delregno@collabora.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
