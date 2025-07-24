@@ -1,45 +1,46 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2052.outbound.protection.outlook.com [40.107.236.52])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCED0190664;
-	Thu, 24 Jul 2025 21:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACED526C383;
+	Thu, 24 Jul 2025 21:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753391774; cv=fail; b=E95mObUmwzEKXglAQkEW6H4EHeewHR8uYCG5jUIMMSWBJOmcC1bB1QE6JNAzcRy4MpRNblb5B7tB4nG55MXN/TRoMOxCfJIspr8m5RoMdQHDlmSgftjURept6A0rKyiamZ2rbcsFYTXFnHGDSskAzeacKgVlAqHGFR4/8108rhk=
+	t=1753391862; cv=fail; b=CnQ/mDZmSiBzhDVR5BRP+hOTefz+WS5LMDbpTA+yl8viwjXIu8JxuaB5KfolowSaYynLqz3x/breQ9QJtAAIbYYgaXXEFxl2e8W6N7FEzT3jlqh5P+s/dznP61mVKkeSz+7vRF7FodVhU05pujQm1fICgYaPWIIQYlKZoXoQ7Uc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753391774; c=relaxed/simple;
-	bh=qQqCfBlKjOD+VfvfESERHRzAPgRbtHXGLqr4ArsFSWA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aO2P5ryeKr8o2inaI+Dw0R9579fnXeojrYKjk/mhB+sN3/roWsBJMpLIcxcm0BjTnU4APBwftQv/h/5zljZtwxJbi5WeXTRK7jKNiC24griMO87dpB5/fnC+CyjftL2b7+qakcFTl58ruc+GqKg+UQ+2sPTuP3pzF52pZ9+V29k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IDGUNQ1d; arc=fail smtp.client-ip=40.107.236.52
+	s=arc-20240116; t=1753391862; c=relaxed/simple;
+	bh=+VSfKLp0886wdNrUY/3SLZb8ngrJWri2oKtYlR73qv0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tvRM40OipyMZVYQuYzCLi0BzvTv9X6EPF8kzKGAAiRa2q5ev6L2VYsZbK7TiHoSKE+4qkLpZYkpd/ZDczVqaGUt7/KZ4VW656cPUtVxXZqdZhLcYGmYyNBcKF2d69xlgT9K+cGvxHavAtOxTGvS9JaF5qFW5OyeDd1VXq1vaHP0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jkOybsqd; arc=fail smtp.client-ip=40.107.223.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IDGUNQ1d"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jkOybsqd"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oF1RexBSUvckOOE2BDRJi+Czn0RU0NqQOz+EBPy6fnHdvLOlqTO9tf4K5/T2dCJcc4rI5MpAqHsT1mghje6n9XBLlExeeK8ZEr7BFAX5o8xLrrKc8SpKMjEG1Q6M3haCZdUvL+9vMLKIckNBWqfiTzvJCkM3PPhD52kWh5D+vA5tLokmGzALwYv04VAnQrkAJLY+LS9PtTHur2UnQ+Qr7hdQS96dSNRsDDr/Q7F+bfZN7NRhKt6o6b1KOHrWypSXCzu/3hxb7euORA+++NSt2Fe9hIdeCjRq/B3sA28wSm9wh0vkgjnB5OQF0OzeJoDfmjGfEqWomwZ6hN/MOQDwPw==
+ b=NNteOOGD+u5Psrzj674A7/I23sT+yctkBunh7gpuaXUvez9c6S+gLOWFx8rMC1opCZoSJ6pBjO3Hlcx3GgfHHev4CP/IWgyuUU+xKoPB05y2tuCOSGjbzWG/HGjEIBUKQ3Swf2DLLDZ8Y68+KWrqD+T8x0zO5iH+Yf5izkeir8/IHZI/ItxmQIkYOQDOkz6YEBLoTLmisqG3R8ac4jDYpCJTxHSQG/1+mpubssjI4PDZvN/zs7nB7r9ybGE3X3jdWqI0GcjRO/1jzpYUDewXPLvKRDZ7+N7p3Qmd2qYJ+UdYL/8NGw3mFO6coVUbNR30FPizLJiytw+yXHaviDcecg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g1+HSXzbr9+udKeEfDdkmsDikpYyqxL7HFBmd4B2+k8=;
- b=Vy/go8bR/3p1o1J75HeCLi1D6AoG0cLeB2euOu35wy4zCM5r+o8+4PWhepLCO4x8I8GU8LT7aAtFv/1U+2VTc8TMsi1I2Sm8wRfJdzCNPyzmk3dPDkoNDyrgLcOmE71SOW1uPY9eBW4o98d1IiQ4XsBR9dFuSW9BqIKNbP40HRYr7h7yCncDX3aupYBmB/fcr3/L3kK+m4sLojxRFZtmquMlfqUsnDF/IEAz/KBb0ph3jEGJB1njU1lMZYScuaH1/sbFvGYcJvQxmCxjAYdjYkW7Oar66HqV05mqc4Yc4u9ZmUC8+rd6thxHNZZKpOmQmqfosg59o7/eerBCWJdZxQ==
+ bh=IWrz94P8mXMcKK3Y9EhmGKDrHc8poepe23xWffVOo1Y=;
+ b=pkpBORHtC5gFyJQf7N6iM8c7U5wd+Nk81uj4/mvJuq1vQLZKNA+DjiX8CNHWxjSYjzZ2L5abmn4OD6Kmk1Nf6guJfxxYtZXLQhj1PxUzRvGqGhFxUcRrSSYsYitvDavS3Y8fFeeuXhFeUN41syct9jWydR0fc5I9SddKHDPqYnJTg1vBQhVFwPZspTP6RQRvAYX1NIYyVlBjC8PrgibzVinwqd04gVGiazpjhA3Tk6lBaOpEmp2D/xTBbHMs2ZqsZ4f5EPR1yrTKcDbxhJvLeDi9D+VcOKcN2UDm3hvhFkm9DTzThbYYmA0i7NgnB4kLGyta4JB0gPOK8PZkr5sl4w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g1+HSXzbr9+udKeEfDdkmsDikpYyqxL7HFBmd4B2+k8=;
- b=IDGUNQ1d9NZULcpzVibCH2abaRJNnxtKSUudg71K0yE9xOkhM/ZllS2c7jw5LXEYexDo3ap4T0oS1tytzW6u/8H9GxhgNQ0cKyGpZ9BKgpcaH3L7eUkcRdJzHmbefTEE7F/4BEs1D2uB9uzkt4vA8/ZY7I4nRe36JML56vBmWmw=
-Received: from SJ0PR13CA0162.namprd13.prod.outlook.com (2603:10b6:a03:2c7::17)
- by CH3PR12MB8851.namprd12.prod.outlook.com (2603:10b6:610:180::11) with
+ bh=IWrz94P8mXMcKK3Y9EhmGKDrHc8poepe23xWffVOo1Y=;
+ b=jkOybsqdI0BfmzsYxkVuzPCiIfc3AVwnzIvcQonltZ2RlUyKNyfCT0MyVDZY7ni/AE31OORbuWtx5boZskLrfr8KxDmDaLREgZSTFJQBSoyNwLDhjfQeQiPsDarTtMvXI5YChJFKTl4uotPE7QkKDZ1L6umkcY3p+UIUuYCJ2bs=
+Received: from PH8PR07CA0035.namprd07.prod.outlook.com (2603:10b6:510:2cf::22)
+ by PH7PR12MB5928.namprd12.prod.outlook.com (2603:10b6:510:1db::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Thu, 24 Jul
- 2025 21:16:10 +0000
-Received: from SJ1PEPF000026C6.namprd04.prod.outlook.com
- (2603:10b6:a03:2c7:cafe::1) by SJ0PR13CA0162.outlook.office365.com
- (2603:10b6:a03:2c7::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.6 via Frontend Transport; Thu,
- 24 Jul 2025 21:16:10 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.29; Thu, 24 Jul
+ 2025 21:17:37 +0000
+Received: from SJ1PEPF000026C7.namprd04.prod.outlook.com
+ (2603:10b6:510:2cf:cafe::f1) by PH8PR07CA0035.outlook.office365.com
+ (2603:10b6:510:2cf::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.22 via Frontend Transport; Thu,
+ 24 Jul 2025 21:17:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,22 +48,24 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF000026C6.mail.protection.outlook.com (10.167.244.103) with Microsoft
+ SJ1PEPF000026C7.mail.protection.outlook.com (10.167.244.104) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 21:16:09 +0000
+ 15.20.8964.20 via Frontend Transport; Thu, 24 Jul 2025 21:17:36 +0000
 Received: from purico-ed09host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 24 Jul
- 2025 16:14:19 -0500
+ 2025 16:14:54 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <thomas.lendacky@amd.com>, <john.allen@amd.com>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <seanjc@google.com>, <pbonzini@redhat.com>, <michael.roth@amd.com>,
 	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 0/2] crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver
-Date: Thu, 24 Jul 2025 21:13:48 +0000
-Message-ID: <cover.1753389962.git.ashish.kalra@amd.com>
+Subject: [PATCH 1/2] crypto: ccp - Add new API for extending HV_Fixed Pages
+Date: Thu, 24 Jul 2025 21:14:26 +0000
+Message-ID: <a5dfa1b5e73286c2d7a2d38422577aff9de48226.1753389962.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1753389962.git.ashish.kalra@amd.com>
+References: <cover.1753389962.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,96 +78,193 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C6:EE_|CH3PR12MB8851:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5335f28-290f-40fe-0804-08ddcaf74f74
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C7:EE_|PH7PR12MB5928:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9523f015-b7c2-4821-0213-08ddcaf783ba
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?U2efmc4KO2tpUEE9Z+gqNLDo9iCq4AEbfweCMfiDJsf55J6df8dVfBhEtCRY?=
- =?us-ascii?Q?MBsoiF8Gaw74gmpoeWHNWzHgRrQURIQvW/D0XRx/33aw2DoUrCdEjxWHXs3i?=
- =?us-ascii?Q?PnaJNbTkpNpydxUGe8tL/Y9KrgMNlUUumIQskDT0vJKkTQuDlqm/vc34Vv/J?=
- =?us-ascii?Q?LsiHLuYpjDdyls9lR6HgdsYSdWfEG7qUMd5f+/cWahiob/GXxyZzv1BaV4ID?=
- =?us-ascii?Q?PmJmbTUUGinqY5lZoMTdVbxnNOOobKJSj6pvzX9xJzLzeQxUoU705qATc/Vi?=
- =?us-ascii?Q?OwrDLFracB7nrA94O2crDhQe+vUeZCgPNNgnwHX52GWn/30EuDv56wb0MFlQ?=
- =?us-ascii?Q?jKl4AuyC0LqtT0SAusK8I/7/uzMeZDfBI1ApGGI97GvNdLMBzfHHmu/n0gly?=
- =?us-ascii?Q?1MZCkFw4+XKCrT6tSQcA782DGNVYfFH4u1L/uKSCeHysCukUist7vdpDO1Xa?=
- =?us-ascii?Q?gRKlvtBPHs/axCDU0wGxo4Vr/BK7Lrst14P/s5YkAhiWg8K2soB4EVUSR9MC?=
- =?us-ascii?Q?P9WDUYjWVlUOKLNs/swv065sI+hQCmi0j1p1/IgNsz8xmm3zVsfqLG3t3udC?=
- =?us-ascii?Q?fMdrnnQYPZgLuOLle94HpbWCB25HaSxo7ISRpSUadJmbB35V5fSfjgAunG/E?=
- =?us-ascii?Q?JaKzqBL2Alvf9RO/AqQyD52TzbZvvDSo34acBL3GpQm7garXCNyQRrx0wufi?=
- =?us-ascii?Q?Q7kAVLgtUluIj4QESjZgFXyUT7UWfJCYfLp1/TFHghBBwxdGnedRHTk3+AOf?=
- =?us-ascii?Q?9pvZwVfWLn4JI6eW3jNofQjam0Cn3i/5069f0HjyuiHgY5c/RfaWuxBrgwoF?=
- =?us-ascii?Q?t1Gy20z33VBk0YKoQIjod8PStw1+LDtp9xKGbo+JTvsTvb29ziQ2+LlxIv1Y?=
- =?us-ascii?Q?PyYuZHoog8QMavOS1ZHAwuYbj5tkx9kdMmeDawF5FLTMEXn/dIqbGxTLT+zO?=
- =?us-ascii?Q?IQ4/uqfz/+g60xstMqkeXesfZl1iS2Lx+/FO/XIsj6GcKjaZ+YYogQPUfIjS?=
- =?us-ascii?Q?qq4Cn1llSFK4w6X1UE+pl9tncNg/hJirqWwHqxHDaJhQT3EvM62f1TjumQn/?=
- =?us-ascii?Q?pCmnhGmJGvuuzRNqqjdagBmNftaRZ5SgKoLGNLikXCoMGFEcvuWC83xqBhJG?=
- =?us-ascii?Q?HfbfcOgv2xxX/DDcSyUfHUupIPygs6H+njIR9K/0b2s0YeER7TsrniCUObJI?=
- =?us-ascii?Q?LQ33DMlV37vJMgRWppAfcxtNmD3/cD22Mw7QvrAzIQ5DiSTJNxpRB9Zmz4Yb?=
- =?us-ascii?Q?hZ23xykWgGDdUF2vygmST9NJUf75CkGhOGwMEVNW8TVLZeb1oFBJrFh03ZY8?=
- =?us-ascii?Q?mxjfnErp3QyCs9ZoTWbHoREVcJRt0LYAqogPBe4QKRpDc2d8MSsEVBhhmXUX?=
- =?us-ascii?Q?i3YuqqPOVHW7QvoQsQpuGhguZ7PDlYgFbf82I0eUmRfrY67y7hsSqFsDOYKt?=
- =?us-ascii?Q?H4GHNNx9TW0VOABbk4MrJWdhRGKVdSk8rVbwjliZFWvd4S3YfEicxG94edSH?=
- =?us-ascii?Q?YaRxaYkg/Y7kg68AX7SmjyiVime7/H7K/Ox0zejaiYxEN7vQkImaqkGxFA?=
- =?us-ascii?Q?=3D=3D?=
+	=?us-ascii?Q?LwQU+6XG8jVbg4pE9AO1mEwJvoqnnH/A/qpViZhN/jmsg1LGAfhwsBV4GI6V?=
+ =?us-ascii?Q?rqpxcMtQc7yY8YrieRubQUQuH45Y+2CxdFJYNz+5CDu4pWTlr3A0PtsiHHrv?=
+ =?us-ascii?Q?mTmI0MlD14knlzOyNEf1c8r0L6D2VIKD+mtPyMOGAb1kln73bS+21mQjIylS?=
+ =?us-ascii?Q?7Oflyuf58XaMXQ4FOzHsmjLWisWD0l4OKWVdJ6VJ1ckrYDCoA7ORqoFm8Nnz?=
+ =?us-ascii?Q?tWrkHaeSawOWaxm/e75pjMOeWM3lEEDAQOu0uhoSy5qQOatcRNP8d+ZPuTTy?=
+ =?us-ascii?Q?dHm5iKeusZPLw8aIlnTgo/U+vH/BzciaVPJnJ9kwq4t9kicncyVDvyMRKvDE?=
+ =?us-ascii?Q?PH2AorFjEMrlBkZfV18g0nl2GP02W1mNZA4YYXoIAxMY4+dwnEy/UIcVu8ar?=
+ =?us-ascii?Q?OUGtHfHw4VqAwWOnL3Kl8Hb4ec5n8d/R+VH5HqcfVXoYPww/4NFTh2N29Z8+?=
+ =?us-ascii?Q?+d5AiWQaW/M96pypMRmgl8H3DN4KkBQHTsK8eP/aj5K3r+e4/eC728H/20a+?=
+ =?us-ascii?Q?gxsUvuc+LZl5nFTQxr+UIV2DdZ5FL/jHjsyIg4lmabm832VYSH86yyFrAz18?=
+ =?us-ascii?Q?fyAkJbVIhK2hBLnC2Eutv+qmS04Bg95GrjATeqQE3Kz1GXy6btt61OdNi7Zr?=
+ =?us-ascii?Q?k6HrU5sBGKjwV6RQ6Lbd8WiTyk97hM6dYr+fVCHRwhfNba75BgoZIFb9owiv?=
+ =?us-ascii?Q?gaSxUCjpJGSPsYtENviT3Xksf/mh79GuGJs6HvKLgf37BRJbDwm2XMfyaDFA?=
+ =?us-ascii?Q?Pt+UL6eGef1stH1mB96Pl2IF6JoARX1qFfsrOf+gD44JBACWitfrfTwHuBhk?=
+ =?us-ascii?Q?Wfclm3kdru59+C4vU7Oy+poYqrpZk9zkcpXPUMet64LHfyjJ2V6tYJPUip3V?=
+ =?us-ascii?Q?xueJxJxyNv5T0L98rIueipga/9m9uxBdsvV2ANRi+Ab3XeYvcl+A8vvPpUi9?=
+ =?us-ascii?Q?an+P4afgQm2iHdgFOxt7PjFtINXuPZd2jMrHiTQ4C/Juxmoaifb62ux+VtT1?=
+ =?us-ascii?Q?b0CiOLNfSkWm2Ge/J6gLqPO/C4wdzf8fw5xr7Rzcv8V1Kia+U72hQcFAY4Xp?=
+ =?us-ascii?Q?m4Jq6ip78B3p2cb1qm4hPjt2TTP7m35VxoB4c7/iVDpA+6KAhC32cya7KBP2?=
+ =?us-ascii?Q?9a23Iiar8ticlLZDBpUqBpBxT7DPqSZKYzWV+YjVZDEH/bTT5b6FcnHrWpD9?=
+ =?us-ascii?Q?5bn6IYwECIEXuFr+em6YL8qkmnP13fParXMhLNWRdBcri7eOHU3HlPMwQnPl?=
+ =?us-ascii?Q?VGr3+C33/dX2CKSxH5UVU0M8617SJ5GrWyvwvPlgaBHCzJZz//m6HmQkOcNm?=
+ =?us-ascii?Q?RWoKgeiv7Z5MIM4IDBGji6H+N50BnGza+nZ6tTZ8Aal2LZ9jf7DMtWUtWA6B?=
+ =?us-ascii?Q?mdVlZJpS//sAalcFdvGaQvwWC0BqVWwwo6QQMNxTwQfEwC9qO131dh1UdjzX?=
+ =?us-ascii?Q?/aq/ZgFF6lq2Ym/2DisKL0hXHXabxYpEGzjeAdOi2GWJWruGdDkddhiv+ldA?=
+ =?us-ascii?Q?eNh3N+/sSHg63qXWUDejy6AQhhE/awpPRXjJ?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 21:16:09.3871
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2025 21:17:36.9570
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5335f28-290f-40fe-0804-08ddcaf74f74
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9523f015-b7c2-4821-0213-08ddcaf783ba
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000026C6.namprd04.prod.outlook.com
+	SJ1PEPF000026C7.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8851
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5928
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-AMD Seamless Firmware Servicing (SFS) is a secure method to allow
-non-persistent updates to running firmware and settings without
-requiring BIOS reflash and/or system reset.
+Implement new API to add support for extending the HV_Fixed pages list
+passed to SNP_INIT_EX.
 
-SFS does not address anything that runs on the x86 processors and
-it can be used to update ASP firmware, modules, register settings
-and update firmware for other microprocessors like TMPM, etc.
+Adds a simple list based interface to extend the HV_Fixed pages list
+for PSP sub-devices such as the SFS driver.
 
-SFS driver support adds ioctl support to communicate the SFS
-commands to the ASP/PSP by using the TEE mailbox interface.
+Suggested-by: Thomas.Lendacky@amd.com <Thomas.Lendacky@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 88 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h |  3 ++
+ 2 files changed, 91 insertions(+)
 
-The Seamless Firmware Servicing (SFS) driver is added as a
-PSP sub-device.
-
-Includes a pre-patch for the SEV driver to add new API interface
-to extend the hypervisor fixed pages list passed to SNP_INIT_EX
-to allow other PSP sub-devices such as the SFS driver to add 
-their HV_Fixed pages to this list.
-
-For detailed information, please look at the SFS specifications:
-https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58604.pdf
-
-Ashish Kalra (2):
-  crypto: ccp - Add new API for extending HV_Fixed Pages
-  crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver
-
- drivers/crypto/ccp/Makefile         |   3 +-
- drivers/crypto/ccp/psp-dev.c        |  20 ++
- drivers/crypto/ccp/psp-dev.h        |   8 +-
- drivers/crypto/ccp/sev-dev.c        |  88 ++++++++
- drivers/crypto/ccp/sev-dev.h        |   3 +
- drivers/crypto/ccp/sfs.c            | 316 ++++++++++++++++++++++++++++
- drivers/crypto/ccp/sfs.h            |  53 +++++
- include/linux/psp-platform-access.h |   2 +
- include/uapi/linux/psp-sfs.h        |  87 ++++++++
- 9 files changed, 578 insertions(+), 2 deletions(-)
- create mode 100644 drivers/crypto/ccp/sfs.c
- create mode 100644 drivers/crypto/ccp/sfs.h
- create mode 100644 include/uapi/linux/psp-sfs.h
-
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index e058ba027792..c3ff40cd7a96 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -82,6 +82,14 @@ MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
+ static bool psp_dead;
+ static int psp_timeout;
+ 
++struct snp_hv_fixed_pages_entry {
++	u64 base;
++	int npages;
++	struct list_head list;
++};
++static LIST_HEAD(snp_hv_fixed_pages);
++static DEFINE_SPINLOCK(snp_hv_fixed_pages_lock);
++
+ /* Trusted Memory Region (TMR):
+  *   The TMR is a 1MB area that must be 1MB aligned.  Use the page allocator
+  *   to allocate the memory, which will return aligned memory for the specified
+@@ -1073,6 +1081,76 @@ static void snp_set_hsave_pa(void *arg)
+ 	wrmsrq(MSR_VM_HSAVE_PA, 0);
+ }
+ 
++int snp_insert_hypervisor_fixed_pages_list(u64 paddr, int npages)
++{
++	struct snp_hv_fixed_pages_entry *entry;
++
++	spin_lock(&snp_hv_fixed_pages_lock);
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		spin_unlock(&snp_hv_fixed_pages_lock);
++		return -ENOMEM;
++	}
++	entry->base = paddr;
++	entry->npages = npages;
++	list_add_tail(&entry->list, &snp_hv_fixed_pages);
++
++	spin_unlock(&snp_hv_fixed_pages_lock);
++
++	return 0;
++}
++
++void snp_delete_hypervisor_fixed_pages_list(u64 paddr)
++{
++	struct snp_hv_fixed_pages_entry *entry, *nentry;
++
++	spin_lock(&snp_hv_fixed_pages_lock);
++	list_for_each_entry_safe(entry, nentry, &snp_hv_fixed_pages, list) {
++		if (entry->base == paddr) {
++			list_del(&entry->list);
++			kfree(entry);
++			break;
++		}
++	}
++	spin_unlock(&snp_hv_fixed_pages_lock);
++}
++
++static int snp_extend_hypervisor_fixed_pages(struct sev_data_range_list *range_list)
++{
++	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
++	struct snp_hv_fixed_pages_entry *entry;
++	int new_element_count, ret = 0;
++
++	spin_lock(&snp_hv_fixed_pages_lock);
++	if (list_empty(&snp_hv_fixed_pages))
++		goto out;
++
++	new_element_count = list_count_nodes(&snp_hv_fixed_pages) +
++			    range_list->num_elements;
++
++	/*
++	 * Ensure the list of HV_FIXED pages that will be passed to firmware
++	 * do not exceed the page-sized argument buffer.
++	 */
++	if (new_element_count * sizeof(struct sev_data_range) +
++	    sizeof(struct sev_data_range_list) > PAGE_SIZE) {
++		ret = -E2BIG;
++		goto out;
++	}
++
++	list_for_each_entry(entry, &snp_hv_fixed_pages, list) {
++		range->base = entry->base;
++		range->page_count = entry->npages;
++		range++;
++	}
++	range_list->num_elements = new_element_count;
++out:
++	spin_unlock(&snp_hv_fixed_pages_lock);
++
++	return ret;
++}
++
+ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ {
+ 	struct sev_data_range_list *range_list = arg;
+@@ -1163,6 +1241,16 @@ static int __sev_snp_init_locked(int *error)
+ 			return rc;
+ 		}
+ 
++		/*
++		 * Extend the HV_Fixed pages list with HV_Fixed pages added from other
++		 * PSP sub-devices such as SFS. Warn if the list can't be extended
++		 * but continue with SNP_INIT_EX.
++		 */
++		rc = snp_extend_hypervisor_fixed_pages(snp_range_list);
++		if (rc)
++			dev_warn(sev->dev,
++				 "SEV: SNP_INIT_EX extend HV_Fixed pages failed rc = %d\n", rc);
++
+ 		memset(&data, 0, sizeof(data));
+ 		data.init_rmp = 1;
+ 		data.list_paddr_en = 1;
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index 3e4e5574e88a..444d7fffd801 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -65,4 +65,7 @@ void sev_dev_destroy(struct psp_device *psp);
+ void sev_pci_init(void);
+ void sev_pci_exit(void);
+ 
++int snp_insert_hypervisor_fixed_pages_list(u64 paddr, int npages);
++void snp_delete_hypervisor_fixed_pages_list(u64 paddr);
++
+ #endif /* __SEV_DEV_H */
 -- 
 2.34.1
 
