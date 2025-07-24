@@ -1,193 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2651E9906;
-	Thu, 24 Jul 2025 09:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903C9259CAB
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 09:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753348618; cv=none; b=Cw8+2DoMU4lAj8nE52atTrgsc6IyPzXS1mmYomhOYI6N0LFrs0pu0cp9Jp6cwQxjbxr3P3TlGSFzJCukSrrCwd6PflgoLrUl2UGRWCPV6QEaepsMjK7MyyRAp/Q0nOX5/ruDJSjNovnKLJEUEvbHqB1+sAJFBizn1/eIqaFogTM=
+	t=1753348626; cv=none; b=KaQKak6db1jy/M2K7C+FwZja7VGpSFyLXXXP2OTuHhj3EWJSNYp0myDzCfbDW062jFW95bzfZkKfgScxBICbAjH+5UAWCNfNryoRIJnvpOnfyMeq79OWuNeKhNBnt95HYqR8KuTlYT/lQuKYjaF8xip5ZRoptjk8fnNN9556iT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753348618; c=relaxed/simple;
-	bh=gLORg7WAea4eN1Mqc10+yOs087nAZlxpUfDwe9l0JTQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GDxEeZngtnjIf0D0SXTsh9KvvyYe4krm/Bgm+Cgo55AYtDy7ClVZvJalNWp5y2Ebg6OsYg/ZnHbB+TAQTbJRPPkVze9utnT7ga4W24x+c4naPmdKFor5KdAAt+uvVRh6+4RyJbNPWwBNCeCXq6eSD0BB1NuyLttTIs7WYWtmD6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYUNgm7F; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753348626; c=relaxed/simple;
+	bh=PzAImXvw7ltOkAeF9aE1vYSBycD64FXcVdqDkDZASUk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VjZ0Cs9FKFD3eBulNlMV9zO3XgxYny5Vql9kCCNjrToZQasj8vYjBOfjhHt6iel03c8JKDgR0GiOfLS6L9kIUpXU2yaYkva8TqW5k5mMFDjkaoQyh831654g4xLO7HaS5WWdTe3ivmEUI0hArxWMcYl5WVEGx6iSax9m6F+zE6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CfDQOpDG; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYUNgm7F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AD75C4CEED;
-	Thu, 24 Jul 2025 09:16:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753348616;
-	bh=gLORg7WAea4eN1Mqc10+yOs087nAZlxpUfDwe9l0JTQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aYUNgm7Ff+tivpPttJxQq303eCzdTXpewStJi6yJzYUXUqMADmVdyXnbWx3SxTdbU
-	 pCzCg129TrbpPLeKSL4FOr7o5uSFjeQ6XMl82krm+kNvrE7vH8uVIv4A43oNE8xgTn
-	 LhCVjuULHrgYX/9WWq3/VGQgbdX1GthXDV0FKKDrIbAL8N7GuNKVTdxhPBTUHTnsUs
-	 cKZhrhfTP3ewRINN+Iq11x2Lu1N9ugUOtZGu2RvkMjrHuxPLgXTFrSaTkSLFb0E7ZF
-	 g1msK36kfjp28TbttN3YHdBKyNqvQw6oY18eb5v2A6+sKObOiD8LIcNfTCAaQeGS/H
-	 nAFpfaTtCbGSg==
-Message-ID: <ee525312-bde1-4724-b32f-83be32c87696@kernel.org>
-Date: Thu, 24 Jul 2025 11:16:43 +0200
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CfDQOpDG"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-558fa0b2c99so605315e87.2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2025 02:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1753348623; x=1753953423; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PzAImXvw7ltOkAeF9aE1vYSBycD64FXcVdqDkDZASUk=;
+        b=CfDQOpDG7+H+rT4gcjxVG7nzL72tk82jIG1UHBBO6Be6KGFhDBbZJ8nSvH5RpDu+4W
+         PhPhs0uFjfTJfcg3Dd/GGYRXi+YHgjZedHEcOGMbkyqaB14T4bCyZ+c26Ve1RhBXkzNJ
+         Shk5METhMqgYWQyIaU1Eg7XI8HUByzQshRM18=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753348623; x=1753953423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PzAImXvw7ltOkAeF9aE1vYSBycD64FXcVdqDkDZASUk=;
+        b=SU9BC3x/MxkLN9F1c2z58U1ZpMQKrkkm/ioVsn45+921OzXhCQkZE5ip9zu8EXcrEZ
+         zFP+HTpp02QwdS2SJhuBNnvkjg8+qk0PIXHrkD4bqJ7m5fEutGiWm7IhljL/+8Eym3CK
+         Pn3kgj/yjEMwY7bzWIFxlXBLiVihHKgFbLKd0iVOE59xAj+R+dJ4KPtTrBKI+96503mG
+         caGmWVL1wMvV7nlQRN+85ih+xLIG3QZe5RaT3d3yR2q+Z03f/WhVWrRFni2+xjOMjnC6
+         tUr6LlPRbwQvfTiQtlq8jJ4u25fFJgOmhZBmE79qV1phDog0ODmT46KT176RsIP+3/cQ
+         fX1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUBCk5iiLfeIB+536ybfa1LcdoIrjH7KwwDdhudhic9RwpjAmHQKOvOcZMhyukP8Ne0QG4MSl8m8fFiTa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3Bg+xbCzNKoHmeBHdpl4NatLwlOAo/XErow4LD2SSZKmKjIwB
+	z/AvtyGg4lz7yQOeFQDZ5MVRyTT6fpYVWHpItBr9tYhfFZDBX62UwHDA/npBNyQNDsDxr5f60Sm
+	J/2TB5WbdEdVS+JsN2xrgBHex98g2ewPFPrrgh/LN
+X-Gm-Gg: ASbGncuD9t+ny2HxtuUw/na1eWgtQrEn+TyNWZH/Fki+S9sVNz1dSRbuGnc94H82pgX
+	JDgpgbBDeDH3P+f67jT1iWBlSBgvvHjp28hnPRf12OLxqLEBnlzgEZ24bX8QgOKGfIUj0ol0b5N
+	lJgO3Pz6jzt3+irSqykXZcGpBxQJZluum4kA0TtMdEVUlBDsO5ES6cK8WOzR25hbD7duz2plysz
+	42Avze6ZZIkjJiAZzwAZ8pt7I8zLFHaxcNWB6Wh/XFleA==
+X-Google-Smtp-Source: AGHT+IGEMdfa/7pI/vtQhZpE9t+GCiAKzWTtoHMGXUrvfqlTr4xGM3G4p6O55TyjazqugJ0Dpoksr/xy8ncvPcXnu9I=
+X-Received: by 2002:a05:6512:3a84:b0:55b:57e8:16a5 with SMTP id
+ 2adb3069b0e04-55b57e81981mr94240e87.32.1753348622453; Thu, 24 Jul 2025
+ 02:17:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 15/38] dt-bindings: phy: mediatek,hdmi-phy: Fix clock
- output names for MT8195
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-mediatek@lists.infradead.org, robh@kernel.org
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
- conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de,
- airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com,
- mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com,
- mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com,
- vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org,
- linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org,
- andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org,
- tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com,
- ck.hu@mediatek.com, houlong.wei@mediatek.com,
- kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com,
- tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com,
- olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org,
- arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com,
- frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
- linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-16-angelogioacchino.delregno@collabora.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250724083914.61351-16-angelogioacchino.delregno@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-3-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-3-angelogioacchino.delregno@collabora.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Thu, 24 Jul 2025 17:16:51 +0800
+X-Gm-Features: Ac12FXxEOfXERpbm54RTrpt_sFAe6oyRhPRCsENRyO12HQ_K_abqIUXAGxmi264
+Message-ID: <CAGXv+5Exb0X-6V=bdJefaz+m=eXSrrw6_SgWY6vDF3rF1RmVBg@mail.gmail.com>
+Subject: Re: [PATCH 02/38] dt-bindings: display: mediatek, dp: Allow
+ DisplayPort AUX bus
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de, 
+	airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com, 
+	mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com, 
+	mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com, 
+	vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org, 
+	linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org, 
+	andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org, 
+	tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com, 
+	ck.hu@mediatek.com, houlong.wei@mediatek.com, 
+	kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com, 
+	tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com, 
+	olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org, 
+	arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com, 
+	frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 24/07/2025 10:38, AngeloGioacchino Del Regno wrote:
-> For all of the HDMI PHYs compatible with the one found on MT8195
-> the output clock has a different datasheet name and specifically
-> it is called "hdmi_txpll", differently from the older HDMI PHYs
-> which output block is called "hdmitx_dig_cts".
-> 
-> Add a conditional to allow the new clock output name on all of the
-> HDMI PHY IPs that are perfectly compatible with MT8195.
-> 
-> Fixes: c78fe548b062 ("dt-bindings: phy: mediatek: hdmi-phy: Add mt8195 compatible")
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+On Thu, Jul 24, 2025 at 4:39=E2=80=AFPM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
+>
+> Like others, the MediaTek DisplayPort controller provides an
+> auxiliary bus: import the common dp-aux-bus.yaml in this binding
+> to allow specifying an aux-bus subnode.
+>
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
+abora.com>
 
-
-Please organize fixes separately from this patchset. You touch here
-really too many subsystems and putting fixes in the middle of patchset
-is another issue.
-
-> ---
->  .../bindings/phy/mediatek,hdmi-phy.yaml       | 25 ++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
-> index f3a8b0b745d1..f1207aea8605 100644
-> --- a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
-> +++ b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
-> @@ -26,6 +26,10 @@ properties:
->            - enum:
->                - mediatek,mt7623-hdmi-phy
->            - const: mediatek,mt2701-hdmi-phy
-> +      - items:
-> +          - enum:
-> +              - mediatek,mt8188-hdmi-phy
-> +          - const: mediatek,mt8195-hdmi-phy
->        - const: mediatek,mt2701-hdmi-phy
->        - const: mediatek,mt8173-hdmi-phy
->        - const: mediatek,mt8195-hdmi-phy
-> @@ -41,9 +45,7 @@ properties:
->      items:
->        - const: pll_ref
->  
-> -  clock-output-names:
-> -    items:
-> -      - const: hdmitx_dig_cts
-> +  clock-output-names: true
-
-
-Instead:
-maxItems: 1
-
->  
->    "#phy-cells":
->      const: 0
-> @@ -76,6 +78,23 @@ required:
->    - "#phy-cells"
->    - "#clock-cells"
->  
-> +if:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - mediatek,mt8195-hdmi-phy
-> +then:
-> +  properties:
-> +    clock-output-names:
-> +      items:
-> +        - const: hdmi_txpll
-> +else:
-> +  properties:
-> +    clock-output-names:
-> +      items:
-> +        - const: hdmitx_dig_cts
-
-
-And drop this if:then:else. Binding should not enforce output clock
-naming, because if this is fixed, then you do not need that property at
-all. Things which are const are implied by compatible.
-
-
-Best regards,
-Krzysztof
+Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
