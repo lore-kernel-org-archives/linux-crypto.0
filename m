@@ -1,83 +1,82 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2F72E5B05
-	for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 10:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BABB230D0E
+	for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 11:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753440671; cv=none; b=MQdNHCsAkcCi7kqGICKCSVf/GPlqHMe84G5G+GxyIx6kB/xDvN711PbNJP9oMPoX2QFx73E0GnLlbW3MCH4GupmD12pQaSQPrxPyVi4eMIn26QgBojb6gAgSu5l98iI1rDfV8Yzbj0vOv8bvTxk4DvCGSqESsPrPPEg9Oe8cevw=
+	t=1753443658; cv=none; b=imS+7ER0gDN+ic2N258Yz5NN+dpNtNI6ehxD+hKUP7dtup+zht4r/1SauoZQnA6GV/q+Awmf0LzUEN2AnNK+2Xnokk8zVj7bP+FlQaVjlkGrPXE69TMoIcLubNFWbbdV0mnCWBUpcM+ofD9p4iEaoFpUMTVP+GF0cSRlbsbZGEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753440671; c=relaxed/simple;
-	bh=KqH01V/ZQOGZhBJpHb3zgphhQB1Sh25Ttt4gkVmURXc=;
+	s=arc-20240116; t=1753443658; c=relaxed/simple;
+	bh=DZf8o481vjpJ7QSUoolpwJajFBT1Vwo8xHyfUgSq//c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gBWswHOkaHmJ3hlmny0QiE0bTJilqwvAW1yrYxBurpdBn9S2hab21KJsrWt3XleXha2GXq6Ls2TObec48PMOXNFXtye8XMTwQHWLXhjzh9zjekZNMLiwwVElkiBFkER8FrpnnsWDxFHHC0buGfCGlN1UXtX2Z8ukUhXNIicmaF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hYz7Xu9K; arc=none smtp.client-ip=209.85.210.45
+	 To:Cc:Content-Type; b=eVs4RUHugceduedVS+b/bhaOmIjzMhg4cnTy9EhDlklIZUxIZfXgAqUGh9DqnZuziBfHdnhyCA+v1RHkk7cy5eM/papsUWoCbesBXdgi2sEG1yQaDR8na/a8qFYM4T0fZ9xtVKXKZFA8mFl5CKnnjGw8DwsHJGklhsTi+FbGrwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=K4HtK07+; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hYz7Xu9K"
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-73e82d2ec21so983718a34.2
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 03:51:10 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="K4HtK07+"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7e623a12701so304885885a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 04:40:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1753440669; x=1754045469; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1753443656; x=1754048456; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YfE909p8Iq119G3J/2SxiBSXlMMdz4SFa3hpgANK2k8=;
-        b=hYz7Xu9KEyKp6L2CJr4COvW4eQv87T9bO8vnO7d4laxO769bDyrvQKXadbIF66Gmry
-         3jaQtWRNw4vmVfhFjOTJK7x9RRjCiMOrnAKmmQtBvUSDLng/mCxDbozv+TiF2V6q+Wg4
-         ZNhK6G4EHiC2ThMDzKyUd/pRaw91nb4T86+Y8=
+        bh=PlkE41QL6s4x1GqYESsGC6jimQ+2xKl71+VqMJsnR/Q=;
+        b=K4HtK07+eXTJIg66Uek6OEDoo0c9x66HX5l5SmvHtgYtF/Z5Y8JYD58tmqS+Kz/0S5
+         BvLRMs9D5r/6Iaddcfpc/fRTCNE9kRkLusAnmwuvuMRF8nERAjwpypiuH1sEf/Dhldcq
+         ffvouKx29G9M/18HXSXRUqrf58pCsqXtxFYHo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753440669; x=1754045469;
+        d=1e100.net; s=20230601; t=1753443656; x=1754048456;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YfE909p8Iq119G3J/2SxiBSXlMMdz4SFa3hpgANK2k8=;
-        b=muDMoAg5KSFOqV6rlRNcrtkQCNzH2gLatBfbq7pGb1lnZARWWS9hrUSvgjBaBRrz0f
-         KlO2I3MgCTF+9Fa/aSmMVl17S3/zRmk8mt656+3RPqhm+v8AnthqP+Y5SqtnMiif94lu
-         a+BVHAsLyUF4VXlUHv6TjIvAVFfzrQVsSOR+SMz20FqiOZ+nLTjC7QUh9c3ndOQua6Hr
-         8a6fTQYMGk1XvqdkN3cUBFKBxoie2OslMA5sYBtrhO1JlDub7zvHKd+1tpOT5hh+wqdi
-         suMNsoYUkAMFcDsn7ob93urZhG9hWoeXVdkkrKe3TDIJhtoFD5qG8fFMkBqtozDR+znr
-         N8yA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3ytWjIij6/3mTJCUQBd2Mi1pJv2xp+wIApTZyFUI//mX3HNt/5aU6WF5sfiaZfTxSp64h22Bh1cvlRRA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzyKTHCw6oP/jkqIoDkdscueoJ7G7R2M5mSlHCQ7nD1aNu9poP
-	iq3ZZOZcWCIxeSkN3+PPfoCHG0l7lZkFpLWDXlzrDTmkC2S4db0QYSYsiXsaRmoiPmOO93VVvaC
-	GUr/sdA==
-X-Gm-Gg: ASbGncul49UYDbLcm8SwwU5uLbByRAZfcHMSxymFkcMujQ855ojjYgQAQBVLZ3jmihA
-	vLueiZevsqRJI+/CWDuq40g9M/LBmn7KQq6nPzb8FjCtcSxvK7Y38AG+5tmnpewazqkprw+sopO
-	GXGOsVM5BbgzXoF1tpK/+UhmvDhS1InsNC5sSRT84hoWe/rqQX9ovsjzWOFtuxpi8LMlgVW2Eho
-	e6TIN3YvRsRlhixwT/SLn5fFMeKrG1VBOKI+Sf4HF803S0h3XZ9lw7v+S7wgLKxFHTFbJ0+UNPz
-	sS0poAde3R+K0OkDepJjeEvDPRXoWgmO2C7tjRHybjFuKPridOegoSzK67GbF63NEKG6imrVXNV
-	9Xyet4T5PwGYDvQNR5OIl007o84ijF/gykKfVIb9lkTeUZN/gsf+8Gm/RMSvP3rZm5ImQ
-X-Google-Smtp-Source: AGHT+IHPyJ9ALVUIhM3XS7NN5PS95eRVed6+aypjhYo1s8N097qorF5KEQ2XeJDjNrF83hDaearkSA==
-X-Received: by 2002:a05:6830:4d8d:10b0:73c:fb75:d571 with SMTP id 46e09a7af769-7413dd42ab0mr463230a34.22.1753440669051;
-        Fri, 25 Jul 2025 03:51:09 -0700 (PDT)
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com. [209.85.210.51])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7412d2e5d83sm625127a34.40.2025.07.25.03.51.08
+        bh=PlkE41QL6s4x1GqYESsGC6jimQ+2xKl71+VqMJsnR/Q=;
+        b=lEZQFKfalytSbBg5+6+4zfNoZ943yqRP319RKO04M0pXQZtga+mBGSdGLPMY+TQKGX
+         Jp3PRg2aTuX8fAlaXqMmwlxKEhXRlMkKw42kUdwyl+xdp7biBOp4mb1qVByi8XBkbbo1
+         hMMi2gUaww/j0Zjhsekz99EedfHrkgPjrj+Jng9IlMMPmNPGVoVAP87loPMi3Jv8/7DR
+         mqc84QekHLlXR7U/7qeeIv1JDCoDIPttcY1PttqR5h4V7RMdba9woTMYWhZ0u4/mCrmS
+         QxlUID9CBzspqn4u5J1atkwiFBB1kQjDFDummsFr2NRelIhjXMxiJA1S4OsoY4BKjb4p
+         BfjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUN4/cqP51KSUgd7OmiZMU84zL0HXrFlpaSAe5ZkgqX+jv6kaPAt/jIdzlUUiIN6AhFOuRV0k1bxG+cy6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEAOoH4D7wq/hYkNSpcB2el6zCsmPWpXJvxr0JB8OWVcZZY4fb
+	MlQfBStBMBM6V5ptbj9ITlKTPofO4P9ZDeuDJbjUvSytKljMzvfVP/6NRt3a84LQq15Y1XPI4WR
+	7kY1aPEEU
+X-Gm-Gg: ASbGnctmJTJLw1XCW7MBwwYScsGerrMy9skV4F1OlsZwwlOc6FrcHm0qXxyHGhaRylb
+	WX8fiBYIkNv1oiYmvg4muWO781hBycVAJ25XdfHrMhKutXcTom/BjnbJwigRuujn+rkh0E9qqmz
+	uNiE1E4002vSV1gYmWPzwb9UFO1m728cvztEDrxmGSAf+z2LkQ6cHVrmPWyUn/pGLA8YjpL8Zb0
+	xk0HS9N2eafle5ciuYl5G0eQKlCLuIevWwd4za6thTsu+mpuoxKKM8hli/Nz3wiWn2q+6hyCp+s
+	hKYC9lr7ApAcX6e4b7gk7ZDE0Fc6+hEcJbrMjsTzXvWi1Nr6sU7DOcTogxXld1YwLlQAkuHcEmq
+	y+d4LDpZz/fGkG18bMqlq9yTnJHIouT11SdfLQy0vT+kYJyM6GXVj0i285w==
+X-Google-Smtp-Source: AGHT+IE6uc35nvs96hNAT82KBiiI2oD+Zdrrh3/4VuLkBuI6V0v+z1FGSWB/0IBm7dN8pWb6MucGJw==
+X-Received: by 2002:a05:620a:6cc3:b0:7e3:43db:d5ca with SMTP id af79cd13be357-7e63bf75f0dmr192801785a.27.1753443655700;
+        Fri, 25 Jul 2025 04:40:55 -0700 (PDT)
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com. [209.85.219.47])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e632e3881csm241200485a.75.2025.07.25.04.40.55
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 03:51:08 -0700 (PDT)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-73e810dc245so1074858a34.1
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 03:51:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXAP2Xsr61LMI9yu3jByPus5QOdylE1yPRTN14fMDTUa4G48OOqMLnm15bcI9ZwkTmPTPJcXoOxoIHVz9w=@vger.kernel.org
-X-Received: by 2002:a05:6102:3713:b0:4e9:b7e3:bdcd with SMTP id
- ada2fe7eead31-4fa3fad468amr285963137.12.1753440273293; Fri, 25 Jul 2025
- 03:44:33 -0700 (PDT)
+        Fri, 25 Jul 2025 04:40:55 -0700 (PDT)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-7072628404dso1867516d6.2
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 04:40:55 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXwvMrvoHOJcf+fgSNMFag3TdXxjJ8MFQ6QNg/IyZkPTT+UuWLphqgEEUDHIuejv+mLcqEMgo59HCzfW0I=@vger.kernel.org
+X-Received: by 2002:a05:6102:4a8f:b0:4e9:a2bd:b456 with SMTP id
+ ada2fe7eead31-4fa3feb1976mr334393137.12.1753439957846; Fri, 25 Jul 2025
+ 03:39:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-24-angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20250724083914.61351-24-angelogioacchino.delregno@collabora.com>
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-39-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-39-angelogioacchino.delregno@collabora.com>
 From: Fei Shao <fshao@chromium.org>
-Date: Fri, 25 Jul 2025 18:43:57 +0800
-X-Gmail-Original-Message-ID: <CAC=S1njhu11nHpyMULbK6PE-BLrBMq+d397pDU6gBzgo7xivXg@mail.gmail.com>
-X-Gm-Features: Ac12FXyc7RkTIKa4HnSlf_SM-GYdwIREUn6AcAkOBKhNuekdCdvFzy29o7Ufs68
-Message-ID: <CAC=S1njhu11nHpyMULbK6PE-BLrBMq+d397pDU6gBzgo7xivXg@mail.gmail.com>
-Subject: Re: [PATCH 23/38] arm64: dts: mediatek: mt7986a: Fix PCI-Express
- T-PHY node address
+Date: Fri, 25 Jul 2025 18:38:40 +0800
+X-Gmail-Original-Message-ID: <CAC=S1njc7_+EhDA_HrVsPfhYsrFEmeb5TQ55X+YOKE=NrpoCaA@mail.gmail.com>
+X-Gm-Features: Ac12FXzORC58mPF_B982fHDjnhtiL_-5O2nAq5PI4bkUJDNwvq8vw0VlaVEnRW8
+Message-ID: <CAC=S1njc7_+EhDA_HrVsPfhYsrFEmeb5TQ55X+YOKE=NrpoCaA@mail.gmail.com>
+Subject: Re: [PATCH 38/38] arm64: dts: mediatek: mt8516-pumpkin: Fix machine compatible
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
 	daniel.lezcano@linaro.org, mwalle@kernel.org, devicetree@vger.kernel.org, 
@@ -102,56 +101,37 @@ Cc: linux-mediatek@lists.infradead.org, robh@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 24, 2025 at 5:49=E2=80=AFPM AngeloGioacchino Del Regno
+On Thu, Jul 24, 2025 at 5:51=E2=80=AFPM AngeloGioacchino Del Regno
 <angelogioacchino.delregno@collabora.com> wrote:
 >
-> The PCIe TPHY is under the soc bus, which provides MMIO, and all
-> nodes under that must use the bus, otherwise those would clearly
-> be out of place.
+> This devicetree contained only the SoC compatible but lacked the
+> machine specific one: add a "mediatek,mt8516-pumpkin" compatible
+> to the list to fix dtbs_check warnings.
 >
-> Add ranges to the PCIe tphy and assign the address to the main
-> node to silence a dtbs_check warning, and fix the children to
-> use the MMIO range of t-phy.
->
-> Fixes: 963c3b0c47ec ("arm64: dts: mediatek: fix t-phy unit name")
-> Fixes: 918aed7abd2d ("arm64: dts: mt7986: add pcie related device nodes")
+> Fixes: 9983822c8cf9 ("arm64: dts: mediatek: add pumpkin board dts")
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
 abora.com>
 
 Reviewed-by: Fei Shao <fshao@chromium.org>
 
 > ---
->  arch/arm64/boot/dts/mediatek/mt7986a.dtsi | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a.dtsi b/arch/arm64/boot/=
-dts/mediatek/mt7986a.dtsi
-> index 559990dcd1d1..3211905b6f86 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt7986a.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt7986a.dtsi
-> @@ -428,16 +428,16 @@ pcie_intc: interrupt-controller {
->                         };
->                 };
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts b/arch/arm64=
+/boot/dts/mediatek/mt8516-pumpkin.dts
+> index cce642c53812..3d3db33a64dc 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts
+> @@ -11,7 +11,7 @@
 >
-> -               pcie_phy: t-phy {
-> +               pcie_phy: t-phy@11c00000 {
->                         compatible =3D "mediatek,mt7986-tphy",
->                                      "mediatek,generic-tphy-v2";
-> -                       ranges;
-> -                       #address-cells =3D <2>;
-> -                       #size-cells =3D <2>;
-> +                       ranges =3D <0 0 0x11c00000 0x20000>;
-> +                       #address-cells =3D <1>;
-> +                       #size-cells =3D <1>;
->                         status =3D "disabled";
+>  / {
+>         model =3D "Pumpkin MT8516";
+> -       compatible =3D "mediatek,mt8516";
+> +       compatible =3D "mediatek,mt8516-pumpkin", "mediatek,mt8516";
 >
-> -                       pcie_port: pcie-phy@11c00000 {
-> -                               reg =3D <0 0x11c00000 0 0x20000>;
-> +                       pcie_port: pcie-phy@0 {
-> +                               reg =3D <0 0x20000>;
->                                 clocks =3D <&clk40m>;
->                                 clock-names =3D "ref";
->                                 #phy-cells =3D <1>;
+>         memory@40000000 {
+>                 device_type =3D "memory";
 > --
 > 2.50.1
 >
