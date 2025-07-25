@@ -1,161 +1,688 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED23323A58E;
-	Fri, 25 Jul 2025 10:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753439463; cv=fail; b=co+QMtGEb0y7f/4j7m8IJugoTjSKjq3rbJY8v7K8q8eNe5MvDqXc3iLrSXNrO/b92uGhkUFhT28nfC7AzdBm0t5pX565c+ITj6c551cfvxnUAzaI4srOIo72GjpMfso/okLludmCaNnpSlNXDFl+Qk0TiMH9ZqKTCtz0pisp+yY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753439463; c=relaxed/simple;
-	bh=I4gPn7NjZOi8nTiJOwpQbnkEBoaF51p+reJgMk8h+O4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DqrlT3IEbiSoi2G4DnL1lsk4eXkUkRCl5bz/4XDjNZQLAkNLIBIkE7rhcFRJOezKbyBsw7KkWfNwS1HzlrbcDCY5Cy4l0uUMx5ID3H0u4uUKlGPVBSByjrlZS/rjWEa6vt2PYAl3gXtfhqkZMQFlFCGAGYXD74Oisil/h4nNBLk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pgixuGk3; arc=fail smtp.client-ip=40.107.93.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1600C2E2EF2
+	for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 10:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753440307; cv=none; b=bvjgPSrs2X8kg31SMw4N/jWAbZPTSJ5yFvlc5zo8eYxy++oz5hd5eHG4j4hIWcdd7nlEUyXw/oCmQiJjhAJKCMNBFsL5UXqjT4r7lIOTquy3CY0+hhdU09ZqnQTzT7MGuVk6RjCEGXCvJ0vJfI/O407Qs9FCcNpMpswCNMMDhDM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753440307; c=relaxed/simple;
+	bh=neLJ2LNFLvS6lJPQrIgKwy7onPWVY8g22J6pC1uMoyU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XvcvesJp2WUWUdbz+xUTolbGIEsPwN8Wa5joydcA0neMpTXFjB8h/PDOGGArR03Kl5fw+GDMaCgT4clqEWO/er0Cnp3FsENGonGNbNQGFlBp4WhL9zQNKz76wx8kb47jcT/6Sy3IQuM4Lat7+AEOrH5tS1UvhRrorbslM9FjbSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=SOd/vZ/Z; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pgixuGk3"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KBNLSYICEg+q9c8rVflZo5OlSbU+R5vEM1Z5MuV0sIucEEk1Fd1aGYzLQzDgWhfOci5RYQdj161aOT67cmRdGi5GKuVgGCL9cTFrHRo5RgLUJo5ehtHuLEklalZNUwl3mW4vwxPfP8qnJycDV4Sck5Ec2XnXIn3JB4ZJUuiV9MMq9g/2zWM5SYQZ0ax0oaMrUVk1rnFo5RLaaqwsoerTZQP5qdH9QMWEtTCPPzQl/zGyltpeNNOTq1wfXKGGGg2+4F+rYre4Ob3MWs+GDdjR9p01hd27SoVUuayjhqKe87ZuhI82hoETuNllgMntyK12dok19VfdsiB2XY5xgCMtJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=32UZYLywo8KH+MpROOPIKjo1og/FmFmziShXB6FNNrY=;
- b=NCs0aimk6oNqU0RC9El1ixKHoT6REUxgk0aq12OpAbfLLKZoESMObRmTydI2QNqB/wlKyf5/bppzygyNf/ChbZWsGvibuXTqiGaUP6ZX7XuBpdRzvshNnaDS3gpqPAb/TowKIHoOvW1BLFMdCyNWOP40lPMtHFa6kTDOW1meN0Xs0hDHkRBM2VGmgraBEyny6C9yPz4MFINt8G33fWRnj1pO7Onv06wRt6EzfNwY2d+2r7f01nahEEmQkfO+d4bA+PnrXgeWQVOKa1E420mrqI9f//VlHSl9raVZ7KMzYhuKWH947LtjmSSAtg5kCOGgkxzulyawVkmISXdKJ4jJnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=8bytes.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=32UZYLywo8KH+MpROOPIKjo1og/FmFmziShXB6FNNrY=;
- b=pgixuGk39a/YsiTY9mwDScNAd6/R6f9XzAF7vdmtgpbGvdddmqWYkc//RVMZJeTVKh2dPCydZ/MNPSuxWAW5/m/D3gRc2ZRZYrf6au7pKhNJXerYoLyaMjqST/auyxiqK19eipzPIr22/6g+IOTRC/GNPq5WbrqwB74B+UL6diY=
-Received: from BN9PR03CA0220.namprd03.prod.outlook.com (2603:10b6:408:f8::15)
- by DS7PR12MB8251.namprd12.prod.outlook.com (2603:10b6:8:e3::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8943.30; Fri, 25 Jul 2025 10:30:58 +0000
-Received: from BN1PEPF0000468E.namprd05.prod.outlook.com
- (2603:10b6:408:f8:cafe::15) by BN9PR03CA0220.outlook.office365.com
- (2603:10b6:408:f8::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.23 via Frontend Transport; Fri,
- 25 Jul 2025 10:30:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF0000468E.mail.protection.outlook.com (10.167.243.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8964.20 via Frontend Transport; Fri, 25 Jul 2025 10:30:58 +0000
-Received: from [10.136.41.253] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 25 Jul
- 2025 05:30:53 -0500
-Message-ID: <770f0fe1-08da-417e-9a0e-fc19d1781f51@amd.com>
-Date: Fri, 25 Jul 2025 16:00:51 +0530
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SOd/vZ/Z"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7e63adcd6d8so45330685a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 03:45:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1753440304; x=1754045104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PrirJd8VRiPqD9MKXgOuUU8KSWZo2kqc4pWOmW9YaxM=;
+        b=SOd/vZ/ZNv/ck+sS+toPSwPzQL2kUKK72v5ozrJwwai9u0zzhTx/HGnO3tgdnI204s
+         SNI7+LzlDIeOgXRDXQhJHTrG7b253GuwjutBm358jv2x/dsBAK2b/i68k1BfosEanvZi
+         KHv29DEv9pE9TeHxzD88Grk4Yw6nkHahJSMRY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753440304; x=1754045104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PrirJd8VRiPqD9MKXgOuUU8KSWZo2kqc4pWOmW9YaxM=;
+        b=H8/blsQ+d99XVxp+KhR7sT+nPWhCxDoHuT+5qqZ1gyfnuKs/RPV88sZoPDmhdQZM3u
+         v4ymmUjycG9eZijZycYT8k0fEo6TefU3BOiYu1KjfsZxAcb11LO8NGmAyK1A44K5TOG4
+         Vzkz+L6CVuXkLjMR53DJh8s40/7QnU+lwhI0ASl/tMED0iGvR5iydq27Gf16w9uJoJCE
+         g0D9uwczIP3ztLaWXO5u8/FEtLwGXQX1PGziph12qz2XZNOqzTznNgYuQny8g6BtXLvu
+         a3/iBvTJq645ktWD/yeEW3WjEgsh6NSOEwjLSgYoU6DdEjGEkuD2iuprWScN6Uaojpl/
+         DD/w==
+X-Forwarded-Encrypted: i=1; AJvYcCU+3Nd4SUyXVWitixpktmdpWR0XmdPSL+rboNvu9hsY3KnFdK/F1n+iX+CEosPglE7NTSMTpY6egQuG4Dg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNipjmm6oUXgWlm/jsr5XWFcntBONp1ep75HIpCCipEgyMvPYU
+	0RUpqPIw4biq2XRUIGlBqg6lWZP09/pAabK2aFW6VmQC7PXm/0k4sF80adJb+Go+1/maYZh+Nv/
+	4+EKjHOrm
+X-Gm-Gg: ASbGnctykln91av9IoKZM9SIhCMydP/zar5FJFvEQjO1ETQVcxnXREEet3UTQja4JDr
+	6880cZAoE5Y0l32PfJbz8R2ixZCmd76aW+pvEtvCm9uesWuhRBtgzlSy3GKiYZdDF2aOjhd3bmV
+	mw8tRrH/JIxdLu4jmbSj/ztKSARsc5awN4HPmL6Bp/V4brH2fvFFQ+vf11ApzQndfjCiVQR4X8n
+	CLAhRbLdTfn2/oYfZNmdvFqYH2gcCZIEnoIJGfzjqtBEgIgq9HxgcQUJ8dVqDm1jW+ksCRCQ5J7
+	Gm6VyvLWIkdnB1qDeRo0MlIFYFMSffDxkbPXmEVQG6kZWb66EsJ3N+obv4nMpMnXpQhOD5wjW3/
+	szUoGeTC5ACsaqTH7K3VRXshchWQ8+y2jpvZH912ocL+3zymWvn06y6osCQ==
+X-Google-Smtp-Source: AGHT+IEUhSDp4dy0Qmc72538H1bvpJtpeunOZD1BGkpmlAbd0wXk3kCJp1CrXqZJq5hIX/OMHnuEGw==
+X-Received: by 2002:a05:620a:1a19:b0:7e3:3dfa:c686 with SMTP id af79cd13be357-7e63c1f32abmr139498685a.54.1753440303520;
+        Fri, 25 Jul 2025 03:45:03 -0700 (PDT)
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com. [209.85.219.50])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e632d76a03sm233600485a.38.2025.07.25.03.45.03
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 03:45:03 -0700 (PDT)
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6fad3400ea3so14598886d6.0
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2025 03:45:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX2bHb16iCNwqPygNrlbdb1czUm/CQz3tYt1UzMmq2Oh7aoNJ0Q9ksV5edPoVR/1Zf4OehxygbcB5HKVis=@vger.kernel.org
+X-Received: by 2002:a05:6102:4189:b0:4e7:efa3:6475 with SMTP id
+ ada2fe7eead31-4fa3feec1c3mr259497137.25.1753439904300; Fri, 25 Jul 2025
+ 03:38:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/4] iommu/amd: Skip enabling command/event buffers for
- kdump
-To: Ashish Kalra <Ashish.Kalra@amd.com>, <joro@8bytes.org>,
-	<suravee.suthikulpanit@amd.com>, <thomas.lendacky@amd.com>,
-	<Sairaj.ArunKodilkar@amd.com>, <Vasant.Hegde@amd.com>,
-	<herbert@gondor.apana.org.au>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <will@kernel.org>,
-	<robin.murphy@arm.com>, <john.allen@amd.com>, <davem@davemloft.net>,
-	<michael.roth@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-References: <cover.1753133022.git.ashish.kalra@amd.com>
- <eeecb08fee542b36713769a16e31532537de0727.1753133022.git.ashish.kalra@amd.com>
-Content-Language: en-US
-From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <eeecb08fee542b36713769a16e31532537de0727.1753133022.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468E:EE_|DS7PR12MB8251:EE_
-X-MS-Office365-Filtering-Correlation-Id: 740fa15b-d13c-446c-da96-08ddcb66583c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aTN3NGNCY1NTUjZ1LzM0L0tSZFVBTnRVcVRtQlREYzFOTUpLakkxSUxWMXMr?=
- =?utf-8?B?b2JhSEdJYS9xNUp6NFVnbDhuY2FjbG9zL1BuSWNXTVkwREowZzBFams0QnV0?=
- =?utf-8?B?N2x4UjQ4dUNFazc2amVPOVQ0cW92QitvczdBaEtCRU5qZmUxYjNMeEpiaFI2?=
- =?utf-8?B?VU9ZMmwwb09zY0JXMWpIa2pWQXVFNEFicUxXQ050a0U0dkFLNi9FNm5LY0xL?=
- =?utf-8?B?ckVGR3YxQjI1YU5TclZGcG5aczdIRVFhY0JMVEt3ay9XUDhmd1hHa1QzUlNW?=
- =?utf-8?B?dlFrUk16WWExcVovNGFQUWh5K21OUEV5NklnWnNzcXlsSVp5MjJaeTdob3dW?=
- =?utf-8?B?M2M3STBGek9TZlhHNmRLc3FRTmx1blJaanNsUm9OMmgweVI3b002aFcvdVdu?=
- =?utf-8?B?N01JOWRtQlpjdWxPb3BVOGdvSEZma0RJbTRFa0JwQ0IvUmpyRmxHeDByM3Nu?=
- =?utf-8?B?djhCdnlWUlpwamFOQktlUnBlNWpSOTZMNzJPbGlYMFVlaVlGM01aQThKUlNL?=
- =?utf-8?B?VlN2WTBlOUFsOUpKU3dGSDhYQ3pHdFFnV2lkbG5ZZURVN1o1dGpzNHdtbVoz?=
- =?utf-8?B?WS96bEhra1BpRFNZbWdDdnFqRHo5TTBJRm4wck1TS0c1OEpoSTZERStuenZp?=
- =?utf-8?B?VFpDNWgzNCs2VUR3MDkyOHhaUkFnVHBLeGRITjVRb2M2RE0xa2pIWFcrSTdM?=
- =?utf-8?B?SmU5cUdzRWp0OVQwbi9JdWhyVjlUK2t2bk5qSEVnR1lXTUx2dy9WSk9OSDVz?=
- =?utf-8?B?QkQyUis4a3BJenR2M1UzT0dlOWJwbnNucjNuUHVLcW1lWVl3Mll2ZmJ2L2Nz?=
- =?utf-8?B?aDQreC9Qb3RQdmtHSlBvN1lFVWI4NFo1MWRhM1h2MEN0N0NtRUVXWjlFSFRP?=
- =?utf-8?B?LzloYitTR2Ftd3FBaGdhbjRBSnIrdHVwUkJOTEx1c2t0RTgwbUJkKzVBQUVW?=
- =?utf-8?B?OUxYSkpyZE01Q2lDbkFrRk40SngvbTlsQXBPdXhlc3YvRGF0V2pPc2RXcTg4?=
- =?utf-8?B?b1hwYmN2R2Y0N2Mva1pPVXJDMHU1dnVOODdtTFBCeUQ4Z0cxVmMxTjl1eU82?=
- =?utf-8?B?Mzkwa05XNDBReHIxM2NXdlhKN2M0U282OWxRODZNOXlwbkNtTHMrQkFvOHhu?=
- =?utf-8?B?cHdsZFg4WHVNZnQrU3A4TDMyTzY2SzFlYXdqVEpwNWh3TGNOazcyd2lONTg2?=
- =?utf-8?B?bm1mM3N5N3l3NFNSNFRwZGR2NjI1bk9mN0J2UUxCcjNHVTlBMHRya3M1a3pY?=
- =?utf-8?B?UUZmaHZKaWZ4U09aYUhpRnBkYXIzKzBTUE9jd1o1Z3lQSkRIRThOVVl1WTAw?=
- =?utf-8?B?UEo1ZHJTczlGcDQ4UUNGazRsYVoxdXFNNm00NjhRc3F2NHNWU3NRTkZWVE5T?=
- =?utf-8?B?NFZFbTl3V3RUNU53MGRpQmZvRmhISFoyMFVhVzUwSXJFNHhzZkZUNUcveE5U?=
- =?utf-8?B?UFF4RFZzd1ZmcllVdWJVY2xjbHlDMVlSMmdaZitacFRRWTlob21zOXJTTFlh?=
- =?utf-8?B?VVMrTmVBL2tSdDJXTHNlc1Nwb0l2RjN1SWlxMTNyUHRVOWY3eW1FNjBncjh2?=
- =?utf-8?B?bStGR3VqSy8wZ0d1MjVCOWc2YlMxWjVuVTM2WGJRdGFZelVnQW1RTHM0WVFL?=
- =?utf-8?B?c2tZVktqc1h0RFovdDRlQWcwRGxrZkxGdHNrbzFDV09ncVIrVUJibnVWcWsv?=
- =?utf-8?B?dU8vMGZkUm92Y2FQbmZ6Nk12SWxMZmNheEQ0aTN5QjdWeWtyS3hsbFNrOHNn?=
- =?utf-8?B?dm5ncXF5cDhJQXRidE5peVRTOFVMSE9VVzMrR0xlTVpqV3BvNlVyMGlkSEFK?=
- =?utf-8?B?Sis4QXNyUUFQQlFJOUpaRDZxQkxVbWRldGlYQWQ2YlQ4Ri8zazlYWmhoUGF4?=
- =?utf-8?B?OFdkNXJOMm1tMjJ0WHVmMEJqZ0YyRWVyTWVqcHhnbS9yazJLVWNGRnhTcWpw?=
- =?utf-8?B?ZGN5c2FieTN1aVgyZnFqS3ZucFpLcGNkTm9hOWd3T1ZValdZVHpqOHF2ekhP?=
- =?utf-8?B?aHpyZXZhT1VyclkwY2loajBPT2sySEFRSDhqR2tWcTNTQVQxSjEwenpwcWo5?=
- =?utf-8?Q?iWFSDW?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2025 10:30:58.3535
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 740fa15b-d13c-446c-da96-08ddcb66583c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468E.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8251
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com> <20250724083914.61351-30-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-30-angelogioacchino.delregno@collabora.com>
+From: Fei Shao <fshao@chromium.org>
+Date: Fri, 25 Jul 2025 18:37:48 +0800
+X-Gmail-Original-Message-ID: <CAC=S1njj09KgrNa_3VX7VeaK3nsW+jqBZF7aEg_Umv6WLSRRDw@mail.gmail.com>
+X-Gm-Features: Ac12FXxdd5uFk8-UFyXPvWwDifRa0isEQfedIYH5-7QbMGirM6GwiOfkuIBzx6U
+Message-ID: <CAC=S1njj09KgrNa_3VX7VeaK3nsW+jqBZF7aEg_Umv6WLSRRDw@mail.gmail.com>
+Subject: Re: [PATCH 29/38] arm64: dts: mediatek: mt8183: Fix pinctrl node names
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-mediatek@lists.infradead.org, robh@kernel.org, 
+	daniel.lezcano@linaro.org, mwalle@kernel.org, devicetree@vger.kernel.org, 
+	linus.walleij@linaro.org, linux-remoteproc@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	olivia.wen@mediatek.com, shane.chien@mediatek.com, linux-gpio@vger.kernel.org, 
+	linux-phy@lists.infradead.org, airlied@gmail.com, simona@ffwll.ch, 
+	herbert@gondor.apana.org.au, jassisinghbrar@gmail.com, jiaxin.yu@mediatek.com, 
+	andy.teng@mediatek.com, chunfeng.yun@mediatek.com, jieyy.yang@mediatek.com, 
+	chunkuang.hu@kernel.org, conor+dt@kernel.org, jitao.shi@mediatek.com, 
+	p.zabel@pengutronix.de, arnd@arndb.de, kishon@kernel.org, 
+	kyrie.wu@mediatek.corp-partner.google.com, maarten.lankhorst@linux.intel.com, 
+	tinghan.shen@mediatek.com, mripard@kernel.org, ck.hu@mediatek.com, 
+	broonie@kernel.org, eugen.hristev@linaro.org, houlong.wei@mediatek.com, 
+	matthias.bgg@gmail.com, tglx@linutronix.de, mchehab@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, granquet@baylibre.com, 
+	sam.shih@mediatek.com, mathieu.poirier@linaro.org, fparent@baylibre.com, 
+	andersson@kernel.org, sean.wang@kernel.org, linux-sound@vger.kernel.org, 
+	lgirdwood@gmail.com, vkoul@kernel.org, linux-crypto@vger.kernel.org, 
+	tzimmermann@suse.de, atenart@kernel.org, krzk+dt@kernel.org, 
+	linux-media@vger.kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jul 24, 2025 at 5:50=E2=80=AFPM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
+>
+> Fix the pinctrl node names to adhere to the bindings, as the main
+> pin node is supposed to be named like "uart0-pins" and the pinmux
+> node named like "pins-bus".
+>
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
+abora.com>
 
+Reviewed-by: Fei Shao <fshao@chromium.org>
 
-On 7/22/2025 3:23 AM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> After a panic if SNP is enabled in the previous kernel then the kdump
-> kernel boots with IOMMU SNP enforcement still enabled.
-> 
-> IOMMU command buffers and event buffer registers remain locked and
-> exclusive to the previous kernel. Attempts to enable command and event
-> buffers in the kdump kernel will fail, as hardware ignores writes to
-> the locked MMIO registers as per AMD IOMMU spec Section 2.12.2.1.
-> 
-> Skip enabling command buffers and event buffers for kdump boot as they
-> are already enabled in the previous kernel.
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
+> ---
+>  .../mediatek/mt8183-kukui-audio-da7219.dtsi   |  4 +-
+>  .../mediatek/mt8183-kukui-audio-ts3a227e.dtsi |  2 +-
+>  .../dts/mediatek/mt8183-kukui-jacuzzi.dtsi    | 22 +++---
+>  .../dts/mediatek/mt8183-kukui-kakadu.dtsi     | 16 ++--
+>  .../dts/mediatek/mt8183-kukui-kodama.dtsi     | 12 +--
+>  .../boot/dts/mediatek/mt8183-kukui-krane.dtsi | 12 +--
+>  .../arm64/boot/dts/mediatek/mt8183-kukui.dtsi | 78 +++++++++----------
+>  7 files changed, 73 insertions(+), 73 deletions(-)
+>
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-da7219.dtsi =
+b/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-da7219.dtsi
+> index 586eee79c73c..f69ffcb9792a 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-da7219.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-da7219.dtsi
+> @@ -39,8 +39,8 @@ da7219_aad {
+>  };
+>
+>  &pio {
+> -       da7219_pins: da7219_pins {
+> -               pins1 {
+> +       da7219_pins: da7219-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO165__FUNC_GPIO165>;
+>                         input-enable;
+>                         bias-pull-up;
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-ts3a227e.dts=
+i b/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-ts3a227e.dtsi
+> index 548e22c194a2..c4aedf8cbfcd 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-ts3a227e.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-audio-ts3a227e.dtsi
+> @@ -17,7 +17,7 @@ ts3a227e: ts3a227e@3b {
+>  };
+>
+>  &pio {
+> -       ts3a227e_pins: ts3a227e_pins {
+> +       ts3a227e_pins: ts3a227e-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO157__FUNC_GPIO157>;
+>                         input-enable;
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi b/arc=
+h/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
+> index 80888bd4ad82..f2afca63c75a 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi.dtsi
+> @@ -395,14 +395,14 @@ &pio {
+>                 "",
+>                 "";
+>
+> -       pp1000_mipibrdg_en: pp1000-mipibrdg-en {
+> +       pp1000_mipibrdg_en: pp1000-mipibrdg-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO54__FUNC_GPIO54>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       pp1800_mipibrdg_en: pp1800-mipibrdg-en {
+> +       pp1800_mipibrdg_en: pp1800-mipibrdg-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO36__FUNC_GPIO36>;
+>                         output-low;
+> @@ -410,20 +410,20 @@ pins1 {
+>         };
+>
+>         pp3300_panel_pins: pp3300-panel-pins {
+> -               panel_3v3_enable: panel-3v3-enable {
+> +               panel_3v3_enable: pins-panel-en {
+>                         pinmux =3D <PINMUX_GPIO35__FUNC_GPIO35>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       ppvarp_lcd_en: ppvarp-lcd-en {
+> +       ppvarp_lcd_en: ppvarp-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO66__FUNC_GPIO66>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       ppvarn_lcd_en: ppvarn-lcd-en {
+> +       ppvarn_lcd_en: ppvarn-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO166__FUNC_GPIO166>;
+>                         output-low;
+> @@ -444,27 +444,27 @@ pins2 {
+>         };
+>
+>         touchscreen_pins: touchscreen-pins {
+> -               touch-int-odl {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO155__FUNC_GPIO155>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>
+> -               touch-rst-l {
+> +               pins-rst {
+>                         pinmux =3D <PINMUX_GPIO156__FUNC_GPIO156>;
+>                         output-high;
+>                 };
+>         };
+>
+>         trackpad_pins: trackpad-pins {
+> -               trackpad-int {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO7__FUNC_GPIO7>;
+>                         input-enable;
+>                         bias-disable; /* pulled externally */
+>                 };
+>         };
+>
+> -       pp3300_mipibrdg_en: pp3300-mipibrdg-en {
+> +       pp3300_mipibrdg_en: pp3300-mipibrdg-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO37__FUNC_GPIO37>;
+>                         output-low;
+> @@ -472,13 +472,13 @@ pins1 {
+>         };
+>
+>         volume_button_pins: volume-button-pins {
+> -               voldn-btn-odl {
+> +               pins-voldn {
+>                         pinmux =3D <PINMUX_GPIO6__FUNC_GPIO6>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>
+> -               volup-btn-odl {
+> +               pins-volup {
+>                         pinmux =3D <PINMUX_GPIO5__FUNC_GPIO5>;
+>                         input-enable;
+>                         bias-pull-up;
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi b/arch=
+/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
+> index ff02f63bac29..472d4987615a 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
+> @@ -304,35 +304,35 @@ &pio {
+>                 "",
+>                 "";
+>
+> -       ppvarp_lcd_en: ppvarp-lcd-en {
+> +       ppvarp_lcd_en: ppvarp-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO66__FUNC_GPIO66>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       ppvarn_lcd_en: ppvarn-lcd-en {
+> +       ppvarn_lcd_en: ppvarn-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO166__FUNC_GPIO166>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       pp1800_lcd_en: pp1800-lcd-en {
+> +       pp1800_lcd_en: pp1800-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO36__FUNC_GPIO36>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       open_touch: open_touch {
+> -               irq_pin {
+> +       open_touch: opentouch-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO155__FUNC_GPIO155>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>
+> -               rst_pin {
+> +               pins-rst {
+>                         pinmux =3D <PINMUX_GPIO156__FUNC_GPIO156>;
+>
+>                         /*
+> @@ -349,8 +349,8 @@ rst_pin {
+>                 };
+>         };
+>
+> -       pen_eject: peneject {
+> -               pen_eject {
+> +       pen_eject: pen-pins {
+> +               pins-eject {
+>                         pinmux =3D <PINMUX_GPIO6__FUNC_GPIO6>;
+>                         input-enable;
+>                         /* External pull-up. */
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi b/arch=
+/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
+> index da6e767b4cee..1b21e3958061 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-kodama.dtsi
+> @@ -292,35 +292,35 @@ &pio {
+>                 "",
+>                 "";
+>
+> -       ppvarp_lcd_en: ppvarp-lcd-en {
+> +       ppvarp_lcd_en: ppvarp-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO66__FUNC_GPIO66>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       ppvarn_lcd_en: ppvarn-lcd-en {
+> +       ppvarn_lcd_en: ppvarn-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO166__FUNC_GPIO166>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       pp1800_lcd_en: pp1800-lcd-en {
+> +       pp1800_lcd_en: pp1800-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO36__FUNC_GPIO36>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       touch_default: touchdefault {
+> -               pin_irq {
+> +       touch_default: touch-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO155__FUNC_GPIO155>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>
+> -               touch_pin_reset: pin_reset {
+> +               touch_pin_reset: pins-rst {
+>                         pinmux =3D <PINMUX_GPIO156__FUNC_GPIO156>;
+>
+>                         /*
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi b/arch/=
+arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
+> index 8b56b8564ed7..a85c73b43195 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
+> @@ -296,35 +296,35 @@ &pio {
+>                 "",
+>                 "";
+>
+> -       ppvarp_lcd_en: ppvarp-lcd-en {
+> +       ppvarp_lcd_en: ppvarp-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO66__FUNC_GPIO66>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       ppvarn_lcd_en: ppvarn-lcd-en {
+> +       ppvarn_lcd_en: ppvarn-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO166__FUNC_GPIO166>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       pp1800_lcd_en: pp1800-lcd-en {
+> +       pp1800_lcd_en: pp1800-lcd-en-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO36__FUNC_GPIO36>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       open_touch: open_touch {
+> -               irq_pin {
+> +       open_touch: opentouch-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO155__FUNC_GPIO155>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>
+> -               rst_pin {
+> +               pins-rst {
+>                         pinmux =3D <PINMUX_GPIO156__FUNC_GPIO156>;
+>
+>                         /*
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi b/arch/arm64/=
+boot/dts/mediatek/mt8183-kukui.dtsi
+> index 400c61d11035..8f3a0e85b4ed 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
+> @@ -435,7 +435,7 @@ &mt6358_vsram_gpu_reg {
+>  };
+>
+>  &pio {
+> -       aud_pins_default: audiopins {
+> +       aud_pins_default: audio-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO97__FUNC_I2S2_MCK>,
+>                                 <PINMUX_GPIO98__FUNC_I2S2_BCK>,
+> @@ -457,7 +457,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       aud_pins_tdm_out_on: audiotdmouton {
+> +       aud_pins_tdm_out_on: audio-tdmout-on-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO169__FUNC_TDM_BCK_2ND>,
+>                                 <PINMUX_GPIO170__FUNC_TDM_LRCK_2ND>,
+> @@ -469,7 +469,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       aud_pins_tdm_out_off: audiotdmoutoff {
+> +       aud_pins_tdm_out_off: audio-tdmout-off-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO169__FUNC_GPIO169>,
+>                                 <PINMUX_GPIO170__FUNC_GPIO170>,
+> @@ -490,22 +490,22 @@ pins-bt-en {
+>                 };
+>         };
+>
+> -       ec_ap_int_odl: ec-ap-int-odl {
+> -               pins1 {
+> +       ec_ap_int_odl: ec-ap-int-odl-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO151__FUNC_GPIO151>;
+>                         input-enable;
+>                         bias-pull-up;
+>                 };
+>         };
+>
+> -       h1_int_od_l: h1-int-od-l {
+> -               pins1 {
+> +       h1_int_od_l: h1-int-od-l-pins {
+> +               pins-intn {
+>                         pinmux =3D <PINMUX_GPIO153__FUNC_GPIO153>;
+>                         input-enable;
+>                 };
+>         };
+>
+> -       i2c0_pins: i2c0 {
+> +       i2c0_pins: i2c0-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO82__FUNC_SDA0>,
+>                                  <PINMUX_GPIO83__FUNC_SCL0>;
+> @@ -513,7 +513,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c1_pins: i2c1 {
+> +       i2c1_pins: i2c1-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO81__FUNC_SDA1>,
+>                                  <PINMUX_GPIO84__FUNC_SCL1>;
+> @@ -521,7 +521,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c2_pins: i2c2 {
+> +       i2c2_pins: i2c2-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO103__FUNC_SCL2>,
+>                                  <PINMUX_GPIO104__FUNC_SDA2>;
+> @@ -529,7 +529,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c3_pins: i2c3 {
+> +       i2c3_pins: i2c3-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO50__FUNC_SCL3>,
+>                                  <PINMUX_GPIO51__FUNC_SDA3>;
+> @@ -537,7 +537,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c4_pins: i2c4 {
+> +       i2c4_pins: i2c4-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO105__FUNC_SCL4>,
+>                                  <PINMUX_GPIO106__FUNC_SDA4>;
+> @@ -545,7 +545,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c5_pins: i2c5 {
+> +       i2c5_pins: i2c5-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO48__FUNC_SCL5>,
+>                                  <PINMUX_GPIO49__FUNC_SDA5>;
+> @@ -553,7 +553,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       i2c6_pins: i2c6 {
+> +       i2c6_pins: i2c6-pins {
+>                 pins-bus {
+>                         pinmux =3D <PINMUX_GPIO11__FUNC_SCL6>,
+>                                  <PINMUX_GPIO12__FUNC_SDA6>;
+> @@ -561,7 +561,7 @@ pins-bus {
+>                 };
+>         };
+>
+> -       mmc0_pins_default: mmc0-pins-default {
+> +       mmc0_pins_default: mmc0-default-pins {
+>                 pins-cmd-dat {
+>                         pinmux =3D <PINMUX_GPIO123__FUNC_MSDC0_DAT0>,
+>                                  <PINMUX_GPIO128__FUNC_MSDC0_DAT1>,
+> @@ -625,7 +625,7 @@ pins-rst {
+>                 };
+>         };
+>
+> -       mmc1_pins_default: mmc1-pins-default {
+> +       mmc1_pins_default: mmc1-default-pins {
+>                 pins-cmd-dat {
+>                         pinmux =3D <PINMUX_GPIO31__FUNC_MSDC1_CMD>,
+>                                  <PINMUX_GPIO32__FUNC_MSDC1_DAT0>,
+> @@ -643,7 +643,7 @@ pins-clk {
+>                 };
+>         };
+>
+> -       mmc1_pins_uhs: mmc1-pins-uhs {
+> +       mmc1_pins_uhs: mmc1-uhs-pins {
+>                 pins-cmd-dat {
+>                         pinmux =3D <PINMUX_GPIO31__FUNC_MSDC1_CMD>,
+>                                  <PINMUX_GPIO32__FUNC_MSDC1_DAT0>,
+> @@ -663,15 +663,15 @@ pins-clk {
+>                 };
+>         };
+>
+> -       panel_pins_default: panel-pins-default {
+> -               panel-reset {
+> +       panel_pins_default: panel-pins {
+> +               pins-panel-reset {
+>                         pinmux =3D <PINMUX_GPIO45__FUNC_GPIO45>;
+>                         output-low;
+>                         bias-pull-up;
+>                 };
+>         };
+>
+> -       pwm0_pin_default: pwm0-pin-default {
+> +       pwm0_pin_default: pwm0-pins {
+>                 pins1 {
+>                         pinmux =3D <PINMUX_GPIO176__FUNC_GPIO176>;
+>                         output-high;
+> @@ -682,15 +682,15 @@ pins2 {
+>                 };
+>         };
+>
+> -       scp_pins: scp {
+> +       scp_pins: scp-pins {
+>                 pins-scp-uart {
+>                         pinmux =3D <PINMUX_GPIO110__FUNC_TP_URXD1_AO>,
+>                                  <PINMUX_GPIO112__FUNC_TP_UTXD1_AO>;
+>                 };
+>         };
+>
+> -       spi0_pins: spi0 {
+> -               pins-spi {
+> +       spi0_pins: spi0-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO85__FUNC_SPI0_MI>,
+>                                  <PINMUX_GPIO86__FUNC_GPIO86>,
+>                                  <PINMUX_GPIO87__FUNC_SPI0_MO>,
+> @@ -699,8 +699,8 @@ pins-spi {
+>                 };
+>         };
+>
+> -       spi1_pins: spi1 {
+> -               pins-spi {
+> +       spi1_pins: spi1-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO161__FUNC_SPI1_A_MI>,
+>                                  <PINMUX_GPIO162__FUNC_SPI1_A_CSB>,
+>                                  <PINMUX_GPIO163__FUNC_SPI1_A_MO>,
+> @@ -709,21 +709,21 @@ pins-spi {
+>                 };
+>         };
+>
+> -       spi2_pins: spi2 {
+> -               pins-spi {
+> +       spi2_pins: spi2-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO0__FUNC_SPI2_CSB>,
+>                                  <PINMUX_GPIO1__FUNC_SPI2_MO>,
+>                                  <PINMUX_GPIO2__FUNC_SPI2_CLK>;
+>                         bias-disable;
+>                 };
+> -               pins-spi-mi {
+> +               pins-miso {
+>                         pinmux =3D <PINMUX_GPIO94__FUNC_SPI2_MI>;
+>                         mediatek,pull-down-adv =3D <00>;
+>                 };
+>         };
+>
+> -       spi3_pins: spi3 {
+> -               pins-spi {
+> +       spi3_pins: spi3-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO21__FUNC_SPI3_MI>,
+>                                  <PINMUX_GPIO22__FUNC_SPI3_CSB>,
+>                                  <PINMUX_GPIO23__FUNC_SPI3_MO>,
+> @@ -732,8 +732,8 @@ pins-spi {
+>                 };
+>         };
+>
+> -       spi4_pins: spi4 {
+> -               pins-spi {
+> +       spi4_pins: spi4-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO17__FUNC_SPI4_MI>,
+>                                  <PINMUX_GPIO18__FUNC_SPI4_CSB>,
+>                                  <PINMUX_GPIO19__FUNC_SPI4_MO>,
+> @@ -742,8 +742,8 @@ pins-spi {
+>                 };
+>         };
+>
+> -       spi5_pins: spi5 {
+> -               pins-spi {
+> +       spi5_pins: spi5-pins {
+> +               pins-bus {
+>                         pinmux =3D <PINMUX_GPIO13__FUNC_SPI5_MI>,
+>                                  <PINMUX_GPIO14__FUNC_SPI5_CSB>,
+>                                  <PINMUX_GPIO15__FUNC_SPI5_MO>,
+> @@ -752,7 +752,7 @@ pins-spi {
+>                 };
+>         };
+>
+> -       uart0_pins_default: uart0-pins-default {
+> +       uart0_pins_default: uart0-pins {
+>                 pins-rx {
+>                         pinmux =3D <PINMUX_GPIO95__FUNC_URXD0>;
+>                         input-enable;
+> @@ -763,7 +763,7 @@ pins-tx {
+>                 };
+>         };
+>
+> -       uart1_pins_default: uart1-pins-default {
+> +       uart1_pins_default: uart1-pins {
+>                 pins-rx {
+>                         pinmux =3D <PINMUX_GPIO121__FUNC_URXD1>;
+>                         input-enable;
+> @@ -781,7 +781,7 @@ pins-cts {
+>                 };
+>         };
+>
+> -       uart1_pins_sleep: uart1-pins-sleep {
+> +       uart1_pins_sleep: uart1-sleep-pins {
+>                 pins-rx {
+>                         pinmux =3D <PINMUX_GPIO121__FUNC_GPIO121>;
+>                         input-enable;
+> @@ -799,14 +799,14 @@ pins-cts {
+>                 };
+>         };
+>
+> -       wifi_pins_pwrseq: wifi-pins-pwrseq {
+> +       wifi_pins_pwrseq: wifi-pwr-pins {
+>                 pins-wifi-enable {
+>                         pinmux =3D <PINMUX_GPIO119__FUNC_GPIO119>;
+>                         output-low;
+>                 };
+>         };
+>
+> -       wifi_pins_wakeup: wifi-pins-wakeup {
+> +       wifi_pins_wakeup: wifi-wake-pins {
+>                 pins-wifi-wakeup {
+>                         pinmux =3D <PINMUX_GPIO113__FUNC_GPIO113>;
+>                         input-enable;
+> --
+> 2.50.1
+>
+>
