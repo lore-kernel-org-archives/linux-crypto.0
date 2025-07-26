@@ -1,311 +1,302 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA5C28682;
-	Sat, 26 Jul 2025 06:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0C12E36F9;
+	Sat, 26 Jul 2025 07:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753511114; cv=none; b=b7tX1G7OWYTAeIIbOl6Q55DdtnMfSZzJQ50IbwqNA2e0m4iY/Z5N1XHGOKiuLyqdT85oSfj4Rzmk7lAhbDGX7YqkmGvMQ+QQtCEnItPHJSpY43aohpujc5t5OKzh3z7oMdKlYNHBPQEw0tjJ87X6Aa+nX2FEWWtxIbXV7HO2he0=
+	t=1753513557; cv=none; b=fg4JQu5QcBiW40FwE1+i7Jf82MvtL2NhB+H0Akcq2LYWnm/OENGuMxj/4cnY0KU6chnLz2DpPM0kQFTuzeshHVLHBTnHVzLLndhTHiNcOX2YIW01qJNGBLqIb5/w+CKE3R4VZCVk6Wx3LBit7UNLN1keKBZ7EJ1aqggRASB4jGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753511114; c=relaxed/simple;
-	bh=Qq5s3zN4DcvfK6LHyBQWTHsmzWycy5QWLM7q9gjdyew=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=L7R5BMGZZrgqPHw6D0omWFOx/TRifKKusXCh+s9+IDhMYgkfxuIK3ZZHUQznA/XETDSe5P3n/cROWDZ6stFaWj2Sc2Ex8xmqjBBYohUnUVkHqc3DZk6gb6XCxSL1vaGG6Qp7v1+iNEy/+/uN42FV2RNWB1fYkzgSY0fu0rZCdWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bpvjk5SwWz14M16;
-	Sat, 26 Jul 2025 14:20:10 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0440514010D;
-	Sat, 26 Jul 2025 14:25:02 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 26 Jul 2025 14:25:01 +0800
-Subject: Re: [PATCH v6 3/3] migration: adapt to new migration configuration
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-References: <20250717011502.16050-1-liulongfang@huawei.com>
- <20250717011502.16050-4-liulongfang@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <c3e74996-6188-12c6-b0c5-58d2188c0609@huawei.com>
-Date: Sat, 26 Jul 2025 14:25:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1753513557; c=relaxed/simple;
+	bh=iMLOG1TLsp617YE0ZKwoqjSE4WMgddafpxWT/XuYUAw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Ra9q0l4pBradNwgxSeuy97Wc1OTH28P+6zCVSRELmXV8unUlXqv2E/lgstfzH9D615XPIf82IX9EWVPorzsdxVb0M8Is9r3crEwo+2TLqX2ci86jLD+AiWWiCplRza92k0O+oSSS6kp5FdDRoVtOMatmBkJbZKo+/XGr4JRbK98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8CxNHBIfoRoymcyAQ--.35492S3;
+	Sat, 26 Jul 2025 15:05:44 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowJCxrsNEfoRo8IcnAA--.23180S2;
+	Sat, 26 Jul 2025 15:05:43 +0800 (CST)
+Subject: Re: [PATCH v12 3/4] tpm: Add a driver for Loongson TPM device
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, jarkko@kernel.org,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ davem@davemloft.net, linux-crypto@vger.kernel.org, peterhuewe@gmx.de,
+ jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+ Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
+References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
+ <20250705072045.1067-4-zhaoqunqin@loongson.cn>
+ <4uhbqaq6obk626r6dk27opaksuwezizx5bpq4eacqjogrdk6as@sinmwzhfjrsn>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <322d4564-b188-64b9-13b3-7a91d3887643@loongson.cn>
+Date: Sat, 26 Jul 2025 15:05:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250717011502.16050-4-liulongfang@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+In-Reply-To: <4uhbqaq6obk626r6dk27opaksuwezizx5bpq4eacqjogrdk6as@sinmwzhfjrsn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJCxrsNEfoRo8IcnAA--.23180S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3XF1rWr4kWw1UtF4ktFW7WrX_yoWfJrW7pF
+	Z5AayUCrW5Jr18Grs8trW5ZFy3ZryrJa4DKan7Xa47AF1qyw1FgryUXrnFgr47Ar4kGr1j
+	qrWkWrs7uF15urXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUU
+	UU=
 
-On 2025/7/17 9:15, Longfang Liu wrote:
-> On new platforms greater than QM_HW_V3, the migration region has been
-> relocated from the VF to the PF. The driver must also be modified
-> accordingly to adapt to the new hardware device.
-> 
-> Utilize the PF's I/O base directly on the new hardware platform,
-> and no mmap operation is required. If it is on an old platform,
-> the driver needs to be compatible with the old solution.
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
->  2 files changed, 118 insertions(+), 53 deletions(-)
+
+在 2025/7/7 下午5:48, Stefano Garzarella 写道:
+> On Sat, Jul 05, 2025 at 03:20:44PM +0800, Qunqin Zhao wrote:
+>> Loongson Security Engine supports random number generation, hash,
+>> symmetric encryption and asymmetric encryption. Based on these
+>> encryption functions, TPM2 have been implemented in the Loongson
+>> Security Engine firmware. This driver is responsible for copying data
+>> into the memory visible to the firmware and receiving data from the
+>> firmware.
+>>
+>> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+>> ---
+>> drivers/char/tpm/Kconfig        |  9 ++++
+>> drivers/char/tpm/Makefile       |  1 +
+>> drivers/char/tpm/tpm_loongson.c | 84 +++++++++++++++++++++++++++++++++
+>> 3 files changed, 94 insertions(+)
+>> create mode 100644 drivers/char/tpm/tpm_loongson.c
 >
+> TPM_CHIP_FLAG_SYNC support is now merged in linux-tpmdd/next tree, so 
+> IMHO this driver can also set it and implement a synchronous send() in 
+> this way (untested):
+>
+> diff --git a/drivers/char/tpm/tpm_loongson.c 
+> b/drivers/char/tpm/tpm_loongson.c
 
-Hi Alex:
-Please take a look at this set of patches!
-Thank you.
+Thank you very much, but I prefer send()+recv().
 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 515ff87f9ed9..bf4a7468bca0 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
->  	return 0;
->  }
->  
-> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> +			   struct acc_vf_data *vf_data)
-> +{
-> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-> +	struct device *dev = &qm->pdev->dev;
-> +	u32 eqc_addr, aeqc_addr;
-> +	int ret;
-> +
-> +	if (qm->ver == QM_HW_V3) {
-> +		eqc_addr = QM_EQC_DW0;
-> +		aeqc_addr = QM_AEQC_DW0;
-> +	} else {
-> +		eqc_addr = QM_EQC_PF_DW0;
-> +		aeqc_addr = QM_AEQC_PF_DW0;
-> +	}
-> +
-> +	/* QM_EQC_DW has 7 regs */
-> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-> +	if (ret) {
-> +		dev_err(dev, "failed to read QM_EQC_DW\n");
-> +		return ret;
-> +	}
-> +
-> +	/* QM_AEQC_DW has 7 regs */
-> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-> +	if (ret) {
-> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> +			   struct acc_vf_data *vf_data)
-> +{
-> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-> +	struct device *dev = &qm->pdev->dev;
-> +	u32 eqc_addr, aeqc_addr;
-> +	int ret;
-> +
-> +	if (qm->ver == QM_HW_V3) {
-> +		eqc_addr = QM_EQC_DW0;
-> +		aeqc_addr = QM_AEQC_DW0;
-> +	} else {
-> +		eqc_addr = QM_EQC_PF_DW0;
-> +		aeqc_addr = QM_AEQC_PF_DW0;
-> +	}
-> +
-> +	/* QM_EQC_DW has 7 regs */
-> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-> +	if (ret) {
-> +		dev_err(dev, "failed to write QM_EQC_DW\n");
-> +		return ret;
-> +	}
-> +
-> +	/* QM_AEQC_DW has 7 regs */
-> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-> +	if (ret) {
-> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->  {
->  	struct device *dev = &qm->pdev->dev;
-> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->  		return ret;
->  	}
->  
-> -	/* QM_EQC_DW has 7 regs */
-> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
-> -	if (ret) {
-> -		dev_err(dev, "failed to read QM_EQC_DW\n");
-> -		return ret;
-> -	}
+Qunqin.
+
+> index a4ec23639911..0e8eb8cee13c 100644
+> --- a/drivers/char/tpm/tpm_loongson.c
+> +++ b/drivers/char/tpm/tpm_loongson.c
+> @@ -15,36 +15,35 @@ struct tpm_loongson_cmd {
+>      u32 pad[5];
+>  };
+>
+> -static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t 
+> count)
+> +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
+> bufsiz,
+> +                 size_t cmd_len)
+>  {
+>      struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+> -    struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
 > -
-> -	/* QM_AEQC_DW has 7 regs */
-> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
-> -	if (ret) {
-> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
-> -		return ret;
-> -	}
-> -
->  	return 0;
->  }
->  
-> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
->  		return ret;
->  	}
->  
-> -	/* QM_EQC_DW has 7 regs */
-> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
-> -	if (ret) {
-> -		dev_err(dev, "failed to write QM_EQC_DW\n");
-> -		return ret;
-> -	}
-> -
-> -	/* QM_AEQC_DW has 7 regs */
-> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
-> -	if (ret) {
-> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
-> -		return ret;
-> -	}
-> -
->  	return 0;
->  }
->  
-> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  		return ret;
->  	}
->  
-> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
-> +	if (ret)
-> +		return ret;
-> +
->  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
->  	if (ret) {
->  		dev_err(dev, "set sqc failed\n");
-> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	vf_data->vf_qm_state = QM_READY;
->  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
->  
-> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
-> +	if (ret)
-> +		return ret;
-> +
->  	ret = vf_qm_read_data(vf_qm, vf_data);
->  	if (ret)
->  		return ret;
-> @@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->  {
->  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
->  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
->  	struct pci_dev *vf_dev = vdev->pdev;
->  
-> -	/*
-> -	 * ACC VF dev BAR2 region consists of both functional register space
-> -	 * and migration control register space. For migration to work, we
-> -	 * need access to both. Hence, we map the entire BAR2 region here.
-> -	 * But unnecessarily exposing the migration BAR region to the Guest
-> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
-> -	 * we restrict access to the migration control space from
-> -	 * Guest(Please see mmap/ioctl/read/write override functions).
-> -	 *
-> -	 * Please note that it is OK to expose the entire VF BAR if migration
-> -	 * is not supported or required as this cannot affect the ACC PF
-> -	 * configurations.
-> -	 *
-> -	 * Also the HiSilicon ACC VF devices supported by this driver on
-> -	 * HiSilicon hardware platforms are integrated end point devices
-> -	 * and the platform lacks the capability to perform any PCIe P2P
-> -	 * between these devices.
-> -	 */
-> -
-> -	vf_qm->io_base =
-> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-> -	if (!vf_qm->io_base)
-> -		return -EIO;
-> +	if (pf_qm->ver == QM_HW_V3) {
-> +		/*
-> +		 * ACC VF dev BAR2 region consists of both functional register space
-> +		 * and migration control register space. For migration to work, we
-> +		 * need access to both. Hence, we map the entire BAR2 region here.
-> +		 * But unnecessarily exposing the migration BAR region to the Guest
-> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
-> +		 * we restrict access to the migration control space from
-> +		 * Guest(Please see mmap/ioctl/read/write override functions).
-> +		 *
-> +		 * Please note that it is OK to expose the entire VF BAR if migration
-> +		 * is not supported or required as this cannot affect the ACC PF
-> +		 * configurations.
-> +		 *
-> +		 * Also the HiSilicon ACC VF devices supported by this driver on
-> +		 * HiSilicon hardware platforms are integrated end point devices
-> +		 * and the platform lacks the capability to perform any PCIe P2P
-> +		 * between these devices.
-> +		 */
->  
-> +		vf_qm->io_base =
-> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-> +		if (!vf_qm->io_base)
-> +			return -EIO;
-> +	} else {
-> +		/*
-> +		 * On hardware platforms greater than QM_HW_V3, the migration function
-> +		 * register is placed in the BAR2 configuration region of the PF,
-> +		 * and each VF device occupies 8KB of configuration space.
-> +		 */
-> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-> +	}
->  	vf_qm->fun_type = QM_HW_VF;
-> +	vf_qm->ver = pf_qm->ver;
->  	vf_qm->pdev = vf_dev;
->  	mutex_init(&vf_qm->mailbox_lock);
->  
-> @@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
->  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
->  	mutex_lock(&hisi_acc_vdev->open_mutex);
->  	hisi_acc_vdev->dev_opened = false;
-> -	iounmap(vf_qm->io_base);
-> +	if (vf_qm->ver == QM_HW_V3)
-> +		iounmap(vf_qm->io_base);
->  	mutex_unlock(&hisi_acc_vdev->open_mutex);
->  	vfio_pci_core_close_device(core_vdev);
->  }
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> index 91002ceeebc1..348f8bb5b42c 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> @@ -59,6 +59,13 @@
->  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
->  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
->  
-> +#define QM_MIG_REGION_OFFSET		0x180000
-> +#define QM_MIG_REGION_SIZE		0x2000
-> +
-> +#define QM_SUB_VERSION_ID		0x100210
-> +#define QM_EQC_PF_DW0			0x1c00
-> +#define QM_AEQC_PF_DW0			0x1c20
-> +
->  struct acc_vf_data {
->  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
->  	/* QM match information */
-> 
+> -    if (cmd_ret->data_len > count)
+> -        return -EIO;
+> +    struct tpm_loongson_cmd *cmd = tpm_engine->command;
+> +    struct tpm_loongson_cmd *cmd_ret;
+> +    int ret;
+>
+> -    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
+> +    if (cmd_len > tpm_engine->buffer_size)
+> +        return -E2BIG;
+>
+> -    return cmd_ret->data_len;
+> -}
+> +    cmd->data_len = cmd_len;
+> +    memcpy(tpm_engine->data_buffer, buf, cmd_len);
+>
+> -static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
+> count)
+> -{
+> -    struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+> -    struct tpm_loongson_cmd *cmd = tpm_engine->command;
+> +    ret = loongson_se_send_engine_cmd(tpm_engine);
+> +    if (ret)
+> +        return ret;
+>
+> -    if (count > tpm_engine->buffer_size)
+> -        return -E2BIG;
+> +    cmd_ret = tpm_engine->command_ret;
+> +    if (cmd_ret->data_len > bufsiz)
+> +        return -EIO;
+>
+> -    cmd->data_len = count;
+> -    memcpy(tpm_engine->data_buffer, buf, count);
+> +    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
+>
+> -    return loongson_se_send_engine_cmd(tpm_engine);
+> +    return cmd_ret->data_len;
+>  }
+>
+>  static const struct tpm_class_ops tpm_loongson_ops = {
+>      .flags = TPM_OPS_AUTO_STARTUP,
+> -    .recv = tpm_loongson_recv,
+>      .send = tpm_loongson_send,
+>  };
+>
+> @@ -65,7 +64,7 @@ static int tpm_loongson_probe(struct platform_device 
+> *pdev)
+>      chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+>      if (IS_ERR(chip))
+>          return PTR_ERR(chip);
+> -    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+> +    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_SYNC;
+>      dev_set_drvdata(&chip->dev, tpm_engine);
+>
+>      return tpm_chip_register(chip);
+>
+> Thanks,
+> Stefano
+>
+>>
+>> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+>> index dddd702b2..ba3924eb1 100644
+>> --- a/drivers/char/tpm/Kconfig
+>> +++ b/drivers/char/tpm/Kconfig
+>> @@ -189,6 +189,15 @@ config TCG_IBMVTPM
+>>       will be accessible from within Linux.  To compile this driver
+>>       as a module, choose M here; the module will be called tpm_ibmvtpm.
+>>
+>> +config TCG_LOONGSON
+>> +    tristate "Loongson TPM Interface"
+>> +    depends on MFD_LOONGSON_SE
+>> +    help
+>> +      If you want to make Loongson TPM support available, say Yes and
+>> +      it will be accessible from within Linux. To compile this
+>> +      driver as a module, choose M here; the module will be called
+>> +      tpm_loongson.
+>> +
+>> config TCG_XEN
+>>     tristate "XEN TPM Interface"
+>>     depends on TCG_TPM && XEN
+>> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+>> index 9de1b3ea3..5b5cdc0d3 100644
+>> --- a/drivers/char/tpm/Makefile
+>> +++ b/drivers/char/tpm/Makefile
+>> @@ -46,3 +46,4 @@ obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
+>> obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+>> obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+>> obj-$(CONFIG_TCG_SVSM) += tpm_svsm.o
+>> +obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
+>> diff --git a/drivers/char/tpm/tpm_loongson.c 
+>> b/drivers/char/tpm/tpm_loongson.c
+>> new file mode 100644
+>> index 000000000..a4ec23639
+>> --- /dev/null
+>> +++ b/drivers/char/tpm/tpm_loongson.c
+>> @@ -0,0 +1,84 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+>> +
+>> +#include <linux/device.h>
+>> +#include <linux/mfd/loongson-se.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/wait.h>
+>> +
+>> +#include "tpm.h"
+>> +
+>> +struct tpm_loongson_cmd {
+>> +    u32 cmd_id;
+>> +    u32 data_off;
+>> +    u32 data_len;
+>> +    u32 pad[5];
+>> +};
+>> +
+>> +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t 
+>> count)
+>> +{
+>> +    struct loongson_se_engine *tpm_engine = 
+>> dev_get_drvdata(&chip->dev);
+>> +    struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
+>> +
+>> +    if (cmd_ret->data_len > count)
+>> +        return -EIO;
+>> +
+>> +    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
+>> +
+>> +    return cmd_ret->data_len;
+>> +}
+>> +
+>> +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
+>> count)
+>> +{
+>> +    struct loongson_se_engine *tpm_engine = 
+>> dev_get_drvdata(&chip->dev);
+>> +    struct tpm_loongson_cmd *cmd = tpm_engine->command;
+>> +
+>> +    if (count > tpm_engine->buffer_size)
+>> +        return -E2BIG;
+>> +
+>> +    cmd->data_len = count;
+>> +    memcpy(tpm_engine->data_buffer, buf, count);
+>> +
+>> +    return loongson_se_send_engine_cmd(tpm_engine);
+>> +}
+>> +
+>> +static const struct tpm_class_ops tpm_loongson_ops = {
+>> +    .flags = TPM_OPS_AUTO_STARTUP,
+>> +    .recv = tpm_loongson_recv,
+>> +    .send = tpm_loongson_send,
+>> +};
+>> +
+>> +static int tpm_loongson_probe(struct platform_device *pdev)
+>> +{
+>> +    struct loongson_se_engine *tpm_engine;
+>> +    struct device *dev = &pdev->dev;
+>> +    struct tpm_loongson_cmd *cmd;
+>> +    struct tpm_chip *chip;
+>> +
+>> +    tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
+>> +    if (!tpm_engine)
+>> +        return -ENODEV;
+>> +    cmd = tpm_engine->command;
+>> +    cmd->cmd_id = SE_CMD_TPM;
+>> +    cmd->data_off = tpm_engine->buffer_off;
+>> +
+>> +    chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
+>> +    if (IS_ERR(chip))
+>> +        return PTR_ERR(chip);
+>> +    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+>> +    dev_set_drvdata(&chip->dev, tpm_engine);
+>> +
+>> +    return tpm_chip_register(chip);
+>> +}
+>> +
+>> +static struct platform_driver tpm_loongson = {
+>> +    .probe   = tpm_loongson_probe,
+>> +    .driver  = {
+>> +        .name  = "tpm_loongson",
+>> +    },
+>> +};
+>> +module_platform_driver(tpm_loongson);
+>> +
+>> +MODULE_ALIAS("platform:tpm_loongson");
+>> +MODULE_LICENSE("GPL");
+>> +MODULE_DESCRIPTION("Loongson TPM driver");
+>> -- 
+>> 2.45.2
+>>
+>>
+
