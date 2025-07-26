@@ -1,302 +1,357 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0C12E36F9;
-	Sat, 26 Jul 2025 07:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB202264A0
+	for <linux-crypto@vger.kernel.org>; Sat, 26 Jul 2025 13:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753513557; cv=none; b=fg4JQu5QcBiW40FwE1+i7Jf82MvtL2NhB+H0Akcq2LYWnm/OENGuMxj/4cnY0KU6chnLz2DpPM0kQFTuzeshHVLHBTnHVzLLndhTHiNcOX2YIW01qJNGBLqIb5/w+CKE3R4VZCVk6Wx3LBit7UNLN1keKBZ7EJ1aqggRASB4jGI=
+	t=1753535080; cv=none; b=CrAly8H/3Sq4LTTryOIBc1s46ucRUczLQuW/QwvZP6oK4ykIhBAxw+M8/+4aMPO+kVbX3T8NUbWHBVZz1j/HRMtGexqhGpSQgnCRoj4qM2sApJ917EHBFIiXbRww4Z2KkpxK0EU3614ZjZJog1vjVYwlVmXymbmjbptHx7nMfvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753513557; c=relaxed/simple;
-	bh=iMLOG1TLsp617YE0ZKwoqjSE4WMgddafpxWT/XuYUAw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ra9q0l4pBradNwgxSeuy97Wc1OTH28P+6zCVSRELmXV8unUlXqv2E/lgstfzH9D615XPIf82IX9EWVPorzsdxVb0M8Is9r3crEwo+2TLqX2ci86jLD+AiWWiCplRza92k0O+oSSS6kp5FdDRoVtOMatmBkJbZKo+/XGr4JRbK98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8CxNHBIfoRoymcyAQ--.35492S3;
-	Sat, 26 Jul 2025 15:05:44 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowJCxrsNEfoRo8IcnAA--.23180S2;
-	Sat, 26 Jul 2025 15:05:43 +0800 (CST)
-Subject: Re: [PATCH v12 3/4] tpm: Add a driver for Loongson TPM device
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, jarkko@kernel.org,
- linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
- davem@davemloft.net, linux-crypto@vger.kernel.org, peterhuewe@gmx.de,
- jgg@ziepe.ca, linux-integrity@vger.kernel.org,
- Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@loongson.cn>
-References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
- <20250705072045.1067-4-zhaoqunqin@loongson.cn>
- <4uhbqaq6obk626r6dk27opaksuwezizx5bpq4eacqjogrdk6as@sinmwzhfjrsn>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <322d4564-b188-64b9-13b3-7a91d3887643@loongson.cn>
-Date: Sat, 26 Jul 2025 15:05:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1753535080; c=relaxed/simple;
+	bh=+WCKhO0xxSZVgfZ4pR01ydAPWP0h8Pmblu+CxS2RSuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J14qkAUij9bB3l7UlWWqrCljui67NRrTlQOOit4WxN7aQiB4B2sGUOatS2GZkSLQm+U7k1zFw7jNg39qcwWsvDC6aAp4QOcMqlMOb3UXIPTyKaxKEYZH8mZingkwFFP5Sh6zvYiXfIoV2fR+lZV7R7NeviB17QQZr4uRi3/gCbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XdEO+h87; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdEO+h87"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753535077;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i720ap6kdUBqik09+1lrBx0BIuk68h/nSwK8xDWBR2Y=;
+	b=XdEO+h87iTVeT+UIBwZ82u43PSMN0wDYh1DuS6GfzYVPHcNOP5TpK1zXu4SriC1U3vTrhL
+	tOlA6U7Ev9WfZteuXAxwmOqW+7rTkvudskvXsV7S6cGwgc2g20o/ijyK6DaVi0CTTfC0Fo
+	4SQeqL2Llvnze+Agmg6u1lxzfNZwLQE=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-230-oI3yaMHhO8WO6i3D4N3zmg-1; Sat, 26 Jul 2025 09:04:35 -0400
+X-MC-Unique: oI3yaMHhO8WO6i3D4N3zmg-1
+X-Mimecast-MFC-AGG-ID: oI3yaMHhO8WO6i3D4N3zmg_1753535075
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3de1974b665so3804315ab.1
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Jul 2025 06:04:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753535075; x=1754139875;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i720ap6kdUBqik09+1lrBx0BIuk68h/nSwK8xDWBR2Y=;
+        b=idNALdAs2tNEVc0RTE7KPWN81ik5UNXerwotWQzTLuieq9uaaIwzDee6TtajQLIx2g
+         ITwr29btm0qvPsyttA3K6/isSGDZyUk3PcJL6T21d2qe0OPjSPNEqfAoZ2rz52mt2vIc
+         s8vkUxuzx5xdib8RQA3ugJzEZ+ubcxzB54FmFHjiEt/k+F0Xg6nGxDdoBVbyVa1HR3oy
+         vzgv4wQiwsESTV2+oV/tdINEQrW0mGWUMH18mlpxvu+IUa92bFPnD8FEhJPAyzZHq/zA
+         L+2XjatevcWj8a/eb6qG2kqqzmO25kN9gdJCBSBZQr/eRl36Bmphzwahhig5o8MU7EWV
+         /Sgw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhlMWUyHbPvUvSGr8oMhO76XEpvdGPGd2AI4Hx0HJra0RbH5WrXLyKvV3gd4g22aJ+eytcbLwu4h6ZDs8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJp3i1o3EHJZ1R6Y0S8DXKWsFOn7+hr7n6NEMDJi744F+BpxAe
+	AVUSPUYQ9O/HuFGacf1tfh4OpY5Cwpt+7KfgdWkz353nagjwAeQqZoLaiBop7w+CElobaayecIP
+	g5/A4ee4FOOTisS+A3K9fvQMoxYoIA3Hj0VQzrmwRDcn19plCGrlFHE/pAP1SmfHAdA==
+X-Gm-Gg: ASbGnctQ5hujB4hvdW03Gg6jDa3MKnnJTy9jprAz2JmQB1Cg8ofdPfGumLWPWPsRndC
+	Yq4VYZbZPTJI+z4uGWVKAuxlmOd5FTk7HFIl+Ykhyot19W5Nih6HYnn2ny+8VlJbNwlvGIcDmrN
+	KdITW8dMg0T7Q7MZUTe4C4ZvpYUcz1OO24qJPdCwOGrKVeuynjvBVxZsX1Voia4Nqo0Hs8jFkrV
+	Tkl0M0U5FPTl08s3KNq2lKVefPDRO6nBGNoLdoV7NHtrOkbTROI2f4sLFa1j8ucvO3ivdl95C7L
+	8wYM0/axRYEQALT1d7hVnQRyvFZatzZoE5TmAsW5tWA=
+X-Received: by 2002:a05:6e02:170d:b0:3e0:4f66:30f8 with SMTP id e9e14a558f8ab-3e3c537e94fmr23717625ab.6.1753535074647;
+        Sat, 26 Jul 2025 06:04:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGu8vtNW1zTW3HOQJAAdIxiUr9MeNm579wLk0c07M544lOuVtrYydnLz/DLDXAPlWg9cAR8Zw==
+X-Received: by 2002:a05:6e02:170d:b0:3e0:4f66:30f8 with SMTP id e9e14a558f8ab-3e3c537e94fmr23717415ab.6.1753535074164;
+        Sat, 26 Jul 2025 06:04:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e3cacd7c18sm8109645ab.49.2025.07.26.06.04.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Jul 2025 06:04:32 -0700 (PDT)
+Date: Sat, 26 Jul 2025 07:04:27 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: liulongfang <liulongfang@huawei.com>
+Cc: <jgg@nvidia.com>, <herbert@gondor.apana.org.au>,
+ <shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>,
+ <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+Subject: Re: [PATCH v6 3/3] migration: adapt to new migration configuration
+Message-ID: <20250726070427.2a75c54f.alex.williamson@redhat.com>
+In-Reply-To: <c3e74996-6188-12c6-b0c5-58d2188c0609@huawei.com>
+References: <20250717011502.16050-1-liulongfang@huawei.com>
+	<20250717011502.16050-4-liulongfang@huawei.com>
+	<c3e74996-6188-12c6-b0c5-58d2188c0609@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4uhbqaq6obk626r6dk27opaksuwezizx5bpq4eacqjogrdk6as@sinmwzhfjrsn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowJCxrsNEfoRo8IcnAA--.23180S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3XF1rWr4kWw1UtF4ktFW7WrX_yoWfJrW7pF
-	Z5AayUCrW5Jr18Grs8trW5ZFy3ZryrJa4DKan7Xa47AF1qyw1FgryUXrnFgr47Ar4kGr1j
-	qrWkWrs7uF15urXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUU
-	UU=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Sat, 26 Jul 2025 14:25:00 +0800
+liulongfang <liulongfang@huawei.com> wrote:
 
-在 2025/7/7 下午5:48, Stefano Garzarella 写道:
-> On Sat, Jul 05, 2025 at 03:20:44PM +0800, Qunqin Zhao wrote:
->> Loongson Security Engine supports random number generation, hash,
->> symmetric encryption and asymmetric encryption. Based on these
->> encryption functions, TPM2 have been implemented in the Loongson
->> Security Engine firmware. This driver is responsible for copying data
->> into the memory visible to the firmware and receiving data from the
->> firmware.
->>
->> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
->> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
->> ---
->> drivers/char/tpm/Kconfig        |  9 ++++
->> drivers/char/tpm/Makefile       |  1 +
->> drivers/char/tpm/tpm_loongson.c | 84 +++++++++++++++++++++++++++++++++
->> 3 files changed, 94 insertions(+)
->> create mode 100644 drivers/char/tpm/tpm_loongson.c
->
-> TPM_CHIP_FLAG_SYNC support is now merged in linux-tpmdd/next tree, so 
-> IMHO this driver can also set it and implement a synchronous send() in 
-> this way (untested):
->
-> diff --git a/drivers/char/tpm/tpm_loongson.c 
-> b/drivers/char/tpm/tpm_loongson.c
+> On 2025/7/17 9:15, Longfang Liu wrote:
+> > On new platforms greater than QM_HW_V3, the migration region has been
+> > relocated from the VF to the PF. The driver must also be modified
+> > accordingly to adapt to the new hardware device.
+> > 
+> > Utilize the PF's I/O base directly on the new hardware platform,
+> > and no mmap operation is required. If it is on an old platform,
+> > the driver needs to be compatible with the old solution.
+> > 
+> > Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> > ---
+> >  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
+> >  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+> >  2 files changed, 118 insertions(+), 53 deletions(-)
+> >  
+> 
+> Hi Alex:
+> Please take a look at this set of patches!
 
-Thank you very much, but I prefer send()+recv().
+I've been waiting for Shameer's review of this one.  Thanks,
 
-Qunqin.
-
-> index a4ec23639911..0e8eb8cee13c 100644
-> --- a/drivers/char/tpm/tpm_loongson.c
-> +++ b/drivers/char/tpm/tpm_loongson.c
-> @@ -15,36 +15,35 @@ struct tpm_loongson_cmd {
->      u32 pad[5];
->  };
->
-> -static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t 
-> count)
-> +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
-> bufsiz,
-> +                 size_t cmd_len)
->  {
->      struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> -    struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
-> -
-> -    if (cmd_ret->data_len > count)
-> -        return -EIO;
-> +    struct tpm_loongson_cmd *cmd = tpm_engine->command;
-> +    struct tpm_loongson_cmd *cmd_ret;
-> +    int ret;
->
-> -    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
-> +    if (cmd_len > tpm_engine->buffer_size)
-> +        return -E2BIG;
->
-> -    return cmd_ret->data_len;
-> -}
-> +    cmd->data_len = cmd_len;
-> +    memcpy(tpm_engine->data_buffer, buf, cmd_len);
->
-> -static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
-> count)
-> -{
-> -    struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> -    struct tpm_loongson_cmd *cmd = tpm_engine->command;
-> +    ret = loongson_se_send_engine_cmd(tpm_engine);
-> +    if (ret)
-> +        return ret;
->
-> -    if (count > tpm_engine->buffer_size)
-> -        return -E2BIG;
-> +    cmd_ret = tpm_engine->command_ret;
-> +    if (cmd_ret->data_len > bufsiz)
-> +        return -EIO;
->
-> -    cmd->data_len = count;
-> -    memcpy(tpm_engine->data_buffer, buf, count);
-> +    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
->
-> -    return loongson_se_send_engine_cmd(tpm_engine);
-> +    return cmd_ret->data_len;
->  }
->
->  static const struct tpm_class_ops tpm_loongson_ops = {
->      .flags = TPM_OPS_AUTO_STARTUP,
-> -    .recv = tpm_loongson_recv,
->      .send = tpm_loongson_send,
->  };
->
-> @@ -65,7 +64,7 @@ static int tpm_loongson_probe(struct platform_device 
-> *pdev)
->      chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
->      if (IS_ERR(chip))
->          return PTR_ERR(chip);
-> -    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
-> +    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_SYNC;
->      dev_set_drvdata(&chip->dev, tpm_engine);
->
->      return tpm_chip_register(chip);
->
-> Thanks,
-> Stefano
->
->>
->> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
->> index dddd702b2..ba3924eb1 100644
->> --- a/drivers/char/tpm/Kconfig
->> +++ b/drivers/char/tpm/Kconfig
->> @@ -189,6 +189,15 @@ config TCG_IBMVTPM
->>       will be accessible from within Linux.  To compile this driver
->>       as a module, choose M here; the module will be called tpm_ibmvtpm.
->>
->> +config TCG_LOONGSON
->> +    tristate "Loongson TPM Interface"
->> +    depends on MFD_LOONGSON_SE
->> +    help
->> +      If you want to make Loongson TPM support available, say Yes and
->> +      it will be accessible from within Linux. To compile this
->> +      driver as a module, choose M here; the module will be called
->> +      tpm_loongson.
->> +
->> config TCG_XEN
->>     tristate "XEN TPM Interface"
->>     depends on TCG_TPM && XEN
->> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
->> index 9de1b3ea3..5b5cdc0d3 100644
->> --- a/drivers/char/tpm/Makefile
->> +++ b/drivers/char/tpm/Makefile
->> @@ -46,3 +46,4 @@ obj-$(CONFIG_TCG_ARM_CRB_FFA) += tpm_crb_ffa.o
->> obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
->> obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
->> obj-$(CONFIG_TCG_SVSM) += tpm_svsm.o
->> +obj-$(CONFIG_TCG_LOONGSON) += tpm_loongson.o
->> diff --git a/drivers/char/tpm/tpm_loongson.c 
->> b/drivers/char/tpm/tpm_loongson.c
->> new file mode 100644
->> index 000000000..a4ec23639
->> --- /dev/null
->> +++ b/drivers/char/tpm/tpm_loongson.c
->> @@ -0,0 +1,84 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
->> +
->> +#include <linux/device.h>
->> +#include <linux/mfd/loongson-se.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/wait.h>
->> +
->> +#include "tpm.h"
->> +
->> +struct tpm_loongson_cmd {
->> +    u32 cmd_id;
->> +    u32 data_off;
->> +    u32 data_len;
->> +    u32 pad[5];
->> +};
->> +
->> +static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t 
->> count)
->> +{
->> +    struct loongson_se_engine *tpm_engine = 
->> dev_get_drvdata(&chip->dev);
->> +    struct tpm_loongson_cmd *cmd_ret = tpm_engine->command_ret;
->> +
->> +    if (cmd_ret->data_len > count)
->> +        return -EIO;
->> +
->> +    memcpy(buf, tpm_engine->data_buffer, cmd_ret->data_len);
->> +
->> +    return cmd_ret->data_len;
->> +}
->> +
->> +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t 
->> count)
->> +{
->> +    struct loongson_se_engine *tpm_engine = 
->> dev_get_drvdata(&chip->dev);
->> +    struct tpm_loongson_cmd *cmd = tpm_engine->command;
->> +
->> +    if (count > tpm_engine->buffer_size)
->> +        return -E2BIG;
->> +
->> +    cmd->data_len = count;
->> +    memcpy(tpm_engine->data_buffer, buf, count);
->> +
->> +    return loongson_se_send_engine_cmd(tpm_engine);
->> +}
->> +
->> +static const struct tpm_class_ops tpm_loongson_ops = {
->> +    .flags = TPM_OPS_AUTO_STARTUP,
->> +    .recv = tpm_loongson_recv,
->> +    .send = tpm_loongson_send,
->> +};
->> +
->> +static int tpm_loongson_probe(struct platform_device *pdev)
->> +{
->> +    struct loongson_se_engine *tpm_engine;
->> +    struct device *dev = &pdev->dev;
->> +    struct tpm_loongson_cmd *cmd;
->> +    struct tpm_chip *chip;
->> +
->> +    tpm_engine = loongson_se_init_engine(dev->parent, SE_ENGINE_TPM);
->> +    if (!tpm_engine)
->> +        return -ENODEV;
->> +    cmd = tpm_engine->command;
->> +    cmd->cmd_id = SE_CMD_TPM;
->> +    cmd->data_off = tpm_engine->buffer_off;
->> +
->> +    chip = tpmm_chip_alloc(dev, &tpm_loongson_ops);
->> +    if (IS_ERR(chip))
->> +        return PTR_ERR(chip);
->> +    chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
->> +    dev_set_drvdata(&chip->dev, tpm_engine);
->> +
->> +    return tpm_chip_register(chip);
->> +}
->> +
->> +static struct platform_driver tpm_loongson = {
->> +    .probe   = tpm_loongson_probe,
->> +    .driver  = {
->> +        .name  = "tpm_loongson",
->> +    },
->> +};
->> +module_platform_driver(tpm_loongson);
->> +
->> +MODULE_ALIAS("platform:tpm_loongson");
->> +MODULE_LICENSE("GPL");
->> +MODULE_DESCRIPTION("Loongson TPM driver");
->> -- 
->> 2.45.2
->>
->>
+Alex
+ 
+> > diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> > index 515ff87f9ed9..bf4a7468bca0 100644
+> > --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> > +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> > @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+> >  	return 0;
+> >  }
+> >  
+> > +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> > +			   struct acc_vf_data *vf_data)
+> > +{
+> > +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> > +	struct device *dev = &qm->pdev->dev;
+> > +	u32 eqc_addr, aeqc_addr;
+> > +	int ret;
+> > +
+> > +	if (qm->ver == QM_HW_V3) {
+> > +		eqc_addr = QM_EQC_DW0;
+> > +		aeqc_addr = QM_AEQC_DW0;
+> > +	} else {
+> > +		eqc_addr = QM_EQC_PF_DW0;
+> > +		aeqc_addr = QM_AEQC_PF_DW0;
+> > +	}
+> > +
+> > +	/* QM_EQC_DW has 7 regs */
+> > +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> > +	if (ret) {
+> > +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	/* QM_AEQC_DW has 7 regs */
+> > +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> > +	if (ret) {
+> > +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> > +			   struct acc_vf_data *vf_data)
+> > +{
+> > +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> > +	struct device *dev = &qm->pdev->dev;
+> > +	u32 eqc_addr, aeqc_addr;
+> > +	int ret;
+> > +
+> > +	if (qm->ver == QM_HW_V3) {
+> > +		eqc_addr = QM_EQC_DW0;
+> > +		aeqc_addr = QM_AEQC_DW0;
+> > +	} else {
+> > +		eqc_addr = QM_EQC_PF_DW0;
+> > +		aeqc_addr = QM_AEQC_PF_DW0;
+> > +	}
+> > +
+> > +	/* QM_EQC_DW has 7 regs */
+> > +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> > +	if (ret) {
+> > +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	/* QM_AEQC_DW has 7 regs */
+> > +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> > +	if (ret) {
+> > +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >  {
+> >  	struct device *dev = &qm->pdev->dev;
+> > @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >  		return ret;
+> >  	}
+> >  
+> > -	/* QM_EQC_DW has 7 regs */
+> > -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> > -	if (ret) {
+> > -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> > -		return ret;
+> > -	}
+> > -
+> > -	/* QM_AEQC_DW has 7 regs */
+> > -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> > -	if (ret) {
+> > -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> > -		return ret;
+> > -	}
+> > -
+> >  	return 0;
+> >  }
+> >  
+> > @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+> >  		return ret;
+> >  	}
+> >  
+> > -	/* QM_EQC_DW has 7 regs */
+> > -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> > -	if (ret) {
+> > -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> > -		return ret;
+> > -	}
+> > -
+> > -	/* QM_AEQC_DW has 7 regs */
+> > -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> > -	if (ret) {
+> > -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> > -		return ret;
+> > -	}
+> > -
+> >  	return 0;
+> >  }
+> >  
+> > @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >  		return ret;
+> >  	}
+> >  
+> > +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+> >  	if (ret) {
+> >  		dev_err(dev, "set sqc failed\n");
+> > @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> >  	vf_data->vf_qm_state = QM_READY;
+> >  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+> >  
+> > +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >  	ret = vf_qm_read_data(vf_qm, vf_data);
+> >  	if (ret)
+> >  		return ret;
+> > @@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >  {
+> >  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+> >  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> > +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+> >  	struct pci_dev *vf_dev = vdev->pdev;
+> >  
+> > -	/*
+> > -	 * ACC VF dev BAR2 region consists of both functional register space
+> > -	 * and migration control register space. For migration to work, we
+> > -	 * need access to both. Hence, we map the entire BAR2 region here.
+> > -	 * But unnecessarily exposing the migration BAR region to the Guest
+> > -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> > -	 * we restrict access to the migration control space from
+> > -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> > -	 *
+> > -	 * Please note that it is OK to expose the entire VF BAR if migration
+> > -	 * is not supported or required as this cannot affect the ACC PF
+> > -	 * configurations.
+> > -	 *
+> > -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> > -	 * HiSilicon hardware platforms are integrated end point devices
+> > -	 * and the platform lacks the capability to perform any PCIe P2P
+> > -	 * between these devices.
+> > -	 */
+> > -
+> > -	vf_qm->io_base =
+> > -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> > -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> > -	if (!vf_qm->io_base)
+> > -		return -EIO;
+> > +	if (pf_qm->ver == QM_HW_V3) {
+> > +		/*
+> > +		 * ACC VF dev BAR2 region consists of both functional register space
+> > +		 * and migration control register space. For migration to work, we
+> > +		 * need access to both. Hence, we map the entire BAR2 region here.
+> > +		 * But unnecessarily exposing the migration BAR region to the Guest
+> > +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+> > +		 * we restrict access to the migration control space from
+> > +		 * Guest(Please see mmap/ioctl/read/write override functions).
+> > +		 *
+> > +		 * Please note that it is OK to expose the entire VF BAR if migration
+> > +		 * is not supported or required as this cannot affect the ACC PF
+> > +		 * configurations.
+> > +		 *
+> > +		 * Also the HiSilicon ACC VF devices supported by this driver on
+> > +		 * HiSilicon hardware platforms are integrated end point devices
+> > +		 * and the platform lacks the capability to perform any PCIe P2P
+> > +		 * between these devices.
+> > +		 */
+> >  
+> > +		vf_qm->io_base =
+> > +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> > +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> > +		if (!vf_qm->io_base)
+> > +			return -EIO;
+> > +	} else {
+> > +		/*
+> > +		 * On hardware platforms greater than QM_HW_V3, the migration function
+> > +		 * register is placed in the BAR2 configuration region of the PF,
+> > +		 * and each VF device occupies 8KB of configuration space.
+> > +		 */
+> > +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+> > +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+> > +	}
+> >  	vf_qm->fun_type = QM_HW_VF;
+> > +	vf_qm->ver = pf_qm->ver;
+> >  	vf_qm->pdev = vf_dev;
+> >  	mutex_init(&vf_qm->mailbox_lock);
+> >  
+> > @@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+> >  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+> >  	mutex_lock(&hisi_acc_vdev->open_mutex);
+> >  	hisi_acc_vdev->dev_opened = false;
+> > -	iounmap(vf_qm->io_base);
+> > +	if (vf_qm->ver == QM_HW_V3)
+> > +		iounmap(vf_qm->io_base);
+> >  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+> >  	vfio_pci_core_close_device(core_vdev);
+> >  }
+> > diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> > index 91002ceeebc1..348f8bb5b42c 100644
+> > --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> > +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> > @@ -59,6 +59,13 @@
+> >  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+> >  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+> >  
+> > +#define QM_MIG_REGION_OFFSET		0x180000
+> > +#define QM_MIG_REGION_SIZE		0x2000
+> > +
+> > +#define QM_SUB_VERSION_ID		0x100210
+> > +#define QM_EQC_PF_DW0			0x1c00
+> > +#define QM_AEQC_PF_DW0			0x1c20
+> > +
+> >  struct acc_vf_data {
+> >  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+> >  	/* QM match information */
+> >   
+> 
 
