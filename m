@@ -1,209 +1,377 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A45236A9F;
-	Mon, 28 Jul 2025 06:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E0919E97A;
+	Mon, 28 Jul 2025 07:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753682889; cv=none; b=jad6r4hcmbE7hE7vt1173qktXTy+zS/VfgxWTnYzSETZnRApJLmqA5P8+8obzCZHVnKMpZwPhYnjILj2DoVr2gvlfxSXXdS+m6RFjq7YOSeCYlhSsHwQS0WruSAQY8GchT39IFzQWUiGqC4YHgRGGXxu4kzd6lQ9ext+XYWCf0Y=
+	t=1753687596; cv=none; b=FUTU+iv2x/ItyCNd95z90JtdGfNpmAGWy6s26L1L/vbZmfiSag500XjYukwxOXJ8pIAVK8XFHZz1jLR548UXJuj6B1yQUMIofZ6d/JdfMAM+rgitlYuEyutvub/LHtyTmITAicTkPprpzcfBhou2BparFyUmXN68Ut1z+tCnI0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753682889; c=relaxed/simple;
-	bh=J9ebtys+gOadsS+t9/vBdipuMTDeR7aQZjcVU3lSpuI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=skxjnnguncRxbHusmA8Iev9rirY0+SOovoPu5N3hw0WU17y2lmrFdyPzdQ4EoW21WPiImqvBMO/4MLbJeb5TKuWAtZm/bPcVpBcnC2uIBQ4NQxXeStM8/uVif/SNyRbAr5ktFPNXdujVtJWgiHSr7BCjQ7y5ZnK7XvUzAEu2T+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sj/pNWho; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sj/pNWho"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a4ef2c2ef3so3439245f8f.2;
-        Sun, 27 Jul 2025 23:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753682886; x=1754287686; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5OquH3bzsfHd+3HPbbgh3jCNSZfVC5bnpDs/2otunY4=;
-        b=Sj/pNWhoMVk/1aeBH+clcLoqbD+ho2P9m0r3U7cL2qBhNzkwq6NqATt+5sFMSqwr2C
-         bgzp8H5e1Jsr/3QrSVuZdqbdSbXnPIjiMFLtZ/BFwq1H1FMDcXvodYZdbidybmPcQb1x
-         z3m/tpDdJNpmSRcnWkvDa4gV+sLSUJjrPNRIxmXLhDcxnvsprimW05Zw7slsgwFoAhLX
-         38VgavtSCXmfQDNOlGOHy6XupncQdg0h+p1viGrsEEcObmjUP0B6mWU3mVx8zt31awZo
-         G18IEgC5s6w2rx8Ty+iIVGAauUHp+NBCwFhZVHADGtuMmlMNBo7QyGXZsY0Edg1UDfxt
-         3u0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753682886; x=1754287686;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5OquH3bzsfHd+3HPbbgh3jCNSZfVC5bnpDs/2otunY4=;
-        b=R0yQ7+2hAug1nFgcSyChddqQkeIm06zxnOmC4VXbaBLtZdCFwP/n0LhmkiUyvt+T8i
-         v7GdHF4quTCDWwXWW0O8MllM7hQrd/5GzaAlWVm54sdkRuh7FyIwFF8NuCtk1sEMyaok
-         LBHpE9tz97g7iZ4XGde8PvYbc2zdCaXKhoPwLBsi+hoOE+NKRXytcXs+aYbj8ivogY4P
-         nMjHEDTJSwnKP6VKjvIIXjC3FPvxnMoRooeBFuwjRvk5/lDgwoswo3ByYvmiKFF4w6us
-         iqMt2O5j0mp+Mq+onfjnI/Ej+7PEg/RtDFCkZIXlLWatZ5QzOWd45QUKKMgcx4jy8wtv
-         l1hA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnE+lT+6yU5Tux2Bl67k0r878XOhJ1coWNbwtlhAfsBXv7GJhgEHOrTmifckjNm7HbApW0ZLsxzQ7HBcaE@vger.kernel.org, AJvYcCVnKdQ9y3YxGyP94srIZOTYZwbncPG4BFhIpR7YEFs7KURz9f/GidLQsp2Jm8vYOyCNIjg9X1A8iwmdBM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDE9CW3b5q3eQs0i3Foa/9AIFmTgCTdJKoMQzZRlJKVBipb5FV
-	6D4f7WVwtbjF+3uGI3p/intdb3fZydPKYE+7PrGnW38AsnGbdprPOcfD
-X-Gm-Gg: ASbGnctMn9PQmF6Op/JJR0ODVG7X/Q2NEV7KBuiRWUS9/7po/JwmumdaLsW0aa1c5tg
-	5ZB0zthOsf7L10JE+9SMhGs92NLwhAnirYMgY41cxy5xyzUWFD1oKgYiFd+UF/vRVDFzC4BfQM9
-	nVEw92gCRpMuAeG8ugCEkpTEbsF3/h6bELvNGM6kA174Qv9EyreN/iGk4Scao5W6P1YWaRrnzIL
-	oIg9dqmzP1hbrjOH/pusII/lxwfg7INA/PtRsuLRyvCSuJMY/YkSm08DO9acHfKJ7mgV6wrajYE
-	RXOi4GLu8Wxdbiq3xKjBMgVGMoTLp4Apku0OlitNLJn86qY2SWp97XQQhN0PxgGBNJQSV2C4czS
-	24S3Wul7Pkvy5tciuokBDgWMP1QR1pq25fA==
-X-Google-Smtp-Source: AGHT+IGmdqX9IZttVYna5BJ5xmHOnuGw9/sYW7r7das3xWFHBQfvmW7jivr0ZkUOFKLeiH33vIEMqw==
-X-Received: by 2002:a05:6000:2011:b0:3b7:88a1:19f4 with SMTP id ffacd0b85a97d-3b788a11e12mr1371642f8f.27.1753682885748;
-        Sun, 27 Jul 2025 23:08:05 -0700 (PDT)
-Received: from ws-linux01 ([2a02:2f0e:ca0d:f700:1210:b727:adc8:716])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4587abe6ba0sm86195215e9.9.2025.07.27.23.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 23:08:05 -0700 (PDT)
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-To: clabbe.montjoie@gmail.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Cc: wens@csie.org,
-	jernej.skrabec@gmail.com,
-	samuel@sholland.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 9/9] crytpo: sun8i-ce - factor out prepare/unprepare from sun8i_ce_hash_run()
-Date: Mon, 28 Jul 2025 09:07:01 +0300
-Message-ID: <20250728060701.1787607-10-ovidiu.panait.oss@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250728060701.1787607-1-ovidiu.panait.oss@gmail.com>
-References: <20250728060701.1787607-1-ovidiu.panait.oss@gmail.com>
+	s=arc-20240116; t=1753687596; c=relaxed/simple;
+	bh=DI/TklvRx1ZccXYyvk2scaM+StFxj/zSOalnC6Sy3EQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OtPx+Jz2b5YG5/USAUK5Fh1ktl8FgEb/AG0THOyqa8acFmS4iNq2oj5z9IUIx3kv99OoxulQRiuS30zyaGFsPkzLPhoYB9aaK1dPfA86x4znR8wMXbnKUhkC1uQ9flzcEyvDfiJrgBW1lExTyGaZv9pEPyIZcPrb95m3L2FOY+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4br93R0K10z6M4gc;
+	Mon, 28 Jul 2025 15:24:51 +0800 (CST)
+Received: from frapeml100005.china.huawei.com (unknown [7.182.85.132])
+	by mail.maildlp.com (Postfix) with ESMTPS id B16ED140372;
+	Mon, 28 Jul 2025 15:26:23 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml100005.china.huawei.com (7.182.85.132) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 28 Jul 2025 09:26:23 +0200
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Mon, 28 Jul 2025 09:26:23 +0200
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, Jonathan Cameron
+	<jonathan.cameron@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linuxarm@openeuler.org"
+	<linuxarm@openeuler.org>
+Subject: RE: [PATCH v6 3/3] migration: adapt to new migration configuration
+Thread-Topic: [PATCH v6 3/3] migration: adapt to new migration configuration
+Thread-Index: AQHb9rh/ED7hV1YtCkOP0jA0WVvs+bRHMQtA
+Date: Mon, 28 Jul 2025 07:26:23 +0000
+Message-ID: <7f0d6c18a299436d85e10ed41e72e59d@huawei.com>
+References: <20250717011502.16050-1-liulongfang@huawei.com>
+ <20250717011502.16050-4-liulongfang@huawei.com>
+In-Reply-To: <20250717011502.16050-4-liulongfang@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-In order to make the ahash code more clear and modular, split the
-monolithic sun8i_ce_hash_run() callback into two parts, prepare and
-unprepare (therefore aligning it with the sun8i-ce skcipher code).
 
-Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
----
- .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 62 ++++++++++++++-----
- 1 file changed, 46 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index e28100c07b86..70c761baf847 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -312,18 +312,15 @@ static u64 hash_pad(__le32 *buf, unsigned int bufsize, u64 padi, u64 byte_count,
- 	return j;
- }
- 
--int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
-+static int sun8i_ce_hash_prepare(struct ahash_request *areq, struct ce_task *cet)
- {
--	struct ahash_request *areq = container_of(breq, struct ahash_request, base);
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
- 	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
- 	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
- 	struct sun8i_ce_alg_template *algt;
- 	struct sun8i_ce_dev *ce;
--	struct sun8i_ce_flow *chan;
--	struct ce_task *cet;
- 	struct scatterlist *sg;
--	int nr_sgs, flow, err;
-+	int nr_sgs, err;
- 	unsigned int len;
- 	u32 common;
- 	u64 byte_count;
-@@ -344,18 +341,14 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 
- 	bf = (__le32 *)rctx->pad;
- 
--	flow = rctx->flow;
--	chan = &ce->chanlist[flow];
--
- 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG))
- 		algt->stat_req++;
- 
- 	dev_dbg(ce->dev, "%s %s len=%d\n", __func__, crypto_tfm_alg_name(areq->base.tfm), areq->nbytes);
- 
--	cet = chan->tl;
- 	memset(cet, 0, sizeof(struct ce_task));
- 
--	cet->t_id = cpu_to_le32(flow);
-+	cet->t_id = cpu_to_le32(rctx->flow);
- 	common = ce->variant->alg_hash[algt->ce_algo_id];
- 	common |= CE_COMM_INT;
- 	cet->t_common_ctl = cpu_to_le32(common);
-@@ -433,22 +426,59 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 	else
- 		cet->t_dlen = cpu_to_le32(areq->nbytes / 4 + j);
- 
--	err = sun8i_ce_run_task(ce, flow, crypto_ahash_alg_name(tfm));
--
--	dma_unmap_single(ce->dev, rctx->addr_pad, rctx->pad_len, DMA_TO_DEVICE);
-+	return 0;
- 
- err_unmap_result:
- 	dma_unmap_single(ce->dev, rctx->addr_res, rctx->result_len,
- 			 DMA_FROM_DEVICE);
--	if (!err)
--		memcpy(areq->result, rctx->result, crypto_ahash_digestsize(tfm));
- 
- err_unmap_src:
- 	dma_unmap_sg(ce->dev, areq->src, rctx->nr_sgs, DMA_TO_DEVICE);
- 
- err_out:
-+	return err;
-+}
-+
-+static void sun8i_ce_hash_unprepare(struct ahash_request *areq,
-+				    struct ce_task *cet)
-+{
-+	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct sun8i_ce_hash_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct sun8i_ce_dev *ce = ctx->ce;
-+
-+	dma_unmap_single(ce->dev, rctx->addr_pad, rctx->pad_len, DMA_TO_DEVICE);
-+	dma_unmap_single(ce->dev, rctx->addr_res, rctx->result_len,
-+			 DMA_FROM_DEVICE);
-+	dma_unmap_sg(ce->dev, areq->src, rctx->nr_sgs, DMA_TO_DEVICE);
-+}
-+
-+int sun8i_ce_hash_run(struct crypto_engine *engine, void *async_req)
-+{
-+	struct ahash_request *areq = ahash_request_cast(async_req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct sun8i_ce_hash_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-+	struct sun8i_ce_dev *ce = ctx->ce;
-+	struct sun8i_ce_flow *chan;
-+	int err;
-+
-+	chan = &ce->chanlist[rctx->flow];
-+
-+	err = sun8i_ce_hash_prepare(areq, chan->tl);
-+	if (err)
-+		return err;
-+
-+	err = sun8i_ce_run_task(ce, rctx->flow, crypto_ahash_alg_name(tfm));
-+
-+	sun8i_ce_hash_unprepare(areq, chan->tl);
-+
-+	if (!err)
-+		memcpy(areq->result, rctx->result,
-+		       crypto_ahash_digestsize(tfm));
-+
- 	local_bh_disable();
--	crypto_finalize_hash_request(engine, breq, err);
-+	crypto_finalize_hash_request(engine, async_req, err);
- 	local_bh_enable();
- 
- 	return 0;
--- 
-2.50.0
+> -----Original Message-----
+> From: liulongfang <liulongfang@huawei.com>
+> Sent: Thursday, July 17, 2025 2:15 AM
+> To: alex.williamson@redhat.com; jgg@nvidia.com;
+> herbert@gondor.apana.org.au; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>
+> Cc: linux-crypto@vger.kernel.org; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linuxarm@openeuler.org; liulongfang
+> <liulongfang@huawei.com>
+> Subject: [PATCH v6 3/3] migration: adapt to new migration configuration
+>=20
+> On new platforms greater than QM_HW_V3, the migration region has been
+> relocated from the VF to the PF. The driver must also be modified
+> accordingly to adapt to the new hardware device.
+>=20
+> Utilize the PF's I/O base directly on the new hardware platform,
+> and no mmap operation is required. If it is on an old platform,
+> the driver needs to be compatible with the old solution.
+
+I think it's good to clarify here how the new hardware platform will
+continue to work with the existing driver. From our off-list discussions,
+my understanding is that the QM_HW_V4 hardware is backward compatible
+and will function identically to QM_HW_V3 as long as the PF is not
+configured to enable the migration region, as introduced in patch #2.
+This backward compatibility is the reason we are not preventing migration
+from older kernels to the new one.
+
+With that in place:
+
+Reviewed-by: Shameer Kolothum shameerali.kolothum.thodi@huawei.com
+
+Thanks,
+Shameer
+
+>=20
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>  2 files changed, 118 insertions(+), 53 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index 515ff87f9ed9..bf4a7468bca0 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64
+> *addr)
+>  	return 0;
+>  }
+>=20
+> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev=
+,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm =3D &hisi_acc_vdev->vf_qm;
+> +	struct device *dev =3D &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (qm->ver =3D=3D QM_HW_V3) {
+> +		eqc_addr =3D QM_EQC_DW0;
+> +		aeqc_addr =3D QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr =3D QM_EQC_PF_DW0;
+> +		aeqc_addr =3D QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret =3D qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret =3D qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev=
+,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm =3D &hisi_acc_vdev->vf_qm;
+> +	struct device *dev =3D &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (qm->ver =3D=3D QM_HW_V3) {
+> +		eqc_addr =3D QM_EQC_DW0;
+> +		aeqc_addr =3D QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr =3D QM_EQC_PF_DW0;
+> +		aeqc_addr =3D QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret =3D qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret =3D qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  {
+>  	struct device *dev =3D &qm->pdev->dev;
+> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct
+> acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>=20
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret =3D qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret =3D qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+> 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>=20
+> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct
+> acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>=20
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret =3D qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret =3D qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+> 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>=20
+> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return ret;
+>  	}
+>=20
+> +	ret =3D qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret =3D hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>  	if (ret) {
+>  		dev_err(dev, "set sqc failed\n");
+> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev,
+>  	vf_data->vf_qm_state =3D QM_READY;
+>  	hisi_acc_vdev->vf_qm_state =3D vf_data->vf_qm_state;
+>=20
+> +	ret =3D qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret =3D vf_qm_read_data(vf_qm, vf_data);
+>  	if (ret)
+>  		return ret;
+> @@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev =3D &hisi_acc_vdev->core_device;
+>  	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
+> +	struct hisi_qm *pf_qm =3D hisi_acc_vdev->pf_qm;
+>  	struct pci_dev *vf_dev =3D vdev->pdev;
+>=20
+> -	/*
+> -	 * ACC VF dev BAR2 region consists of both functional register space
+> -	 * and migration control register space. For migration to work, we
+> -	 * need access to both. Hence, we map the entire BAR2 region here.
+> -	 * But unnecessarily exposing the migration BAR region to the Guest
+> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> -	 * we restrict access to the migration control space from
+> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> -	 *
+> -	 * Please note that it is OK to expose the entire VF BAR if migration
+> -	 * is not supported or required as this cannot affect the ACC PF
+> -	 * configurations.
+> -	 *
+> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> -	 * HiSilicon hardware platforms are integrated end point devices
+> -	 * and the platform lacks the capability to perform any PCIe P2P
+> -	 * between these devices.
+> -	 */
+> -
+> -	vf_qm->io_base =3D
+> -		ioremap(pci_resource_start(vf_dev,
+> VFIO_PCI_BAR2_REGION_INDEX),
+> -			pci_resource_len(vf_dev,
+> VFIO_PCI_BAR2_REGION_INDEX));
+> -	if (!vf_qm->io_base)
+> -		return -EIO;
+> +	if (pf_qm->ver =3D=3D QM_HW_V3) {
+> +		/*
+> +		 * ACC VF dev BAR2 region consists of both functional
+> register space
+> +		 * and migration control register space. For migration to
+> work, we
+> +		 * need access to both. Hence, we map the entire BAR2
+> region here.
+> +		 * But unnecessarily exposing the migration BAR region to
+> the Guest
+> +		 * has the potential to prevent/corrupt the Guest migration.
+> Hence,
+> +		 * we restrict access to the migration control space from
+> +		 * Guest(Please see mmap/ioctl/read/write override
+> functions).
+> +		 *
+> +		 * Please note that it is OK to expose the entire VF BAR if
+> migration
+> +		 * is not supported or required as this cannot affect the ACC
+> PF
+> +		 * configurations.
+> +		 *
+> +		 * Also the HiSilicon ACC VF devices supported by this driver
+> on
+> +		 * HiSilicon hardware platforms are integrated end point
+> devices
+> +		 * and the platform lacks the capability to perform any PCIe
+> P2P
+> +		 * between these devices.
+> +		 */
+>=20
+> +		vf_qm->io_base =3D
+> +			ioremap(pci_resource_start(vf_dev,
+> VFIO_PCI_BAR2_REGION_INDEX),
+> +				pci_resource_len(vf_dev,
+> VFIO_PCI_BAR2_REGION_INDEX));
+> +		if (!vf_qm->io_base)
+> +			return -EIO;
+> +	} else {
+> +		/*
+> +		 * On hardware platforms greater than QM_HW_V3, the
+> migration function
+> +		 * register is placed in the BAR2 configuration region of the
+> PF,
+> +		 * and each VF device occupies 8KB of configuration space.
+> +		 */
+> +		vf_qm->io_base =3D pf_qm->io_base +
+> QM_MIG_REGION_OFFSET +
+> +				 hisi_acc_vdev->vf_id *
+> QM_MIG_REGION_SIZE;
+> +	}
+>  	vf_qm->fun_type =3D QM_HW_VF;
+> +	vf_qm->ver =3D pf_qm->ver;
+>  	vf_qm->pdev =3D vf_dev;
+>  	mutex_init(&vf_qm->mailbox_lock);
+>=20
+> @@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct
+> vfio_device *core_vdev)
+>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>  	hisi_acc_vdev->dev_opened =3D false;
+> -	iounmap(vf_qm->io_base);
+> +	if (vf_qm->ver =3D=3D QM_HW_V3)
+> +		iounmap(vf_qm->io_base);
+>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 91002ceeebc1..348f8bb5b42c 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -59,6 +59,13 @@
+>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>=20
+> +#define QM_MIG_REGION_OFFSET		0x180000
+> +#define QM_MIG_REGION_SIZE		0x2000
+> +
+> +#define QM_SUB_VERSION_ID		0x100210
+> +#define QM_EQC_PF_DW0			0x1c00
+> +#define QM_AEQC_PF_DW0			0x1c20
+> +
+>  struct acc_vf_data {
+>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>  	/* QM match information */
+> --
+> 2.24.0
 
