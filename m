@@ -1,63 +1,63 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9270221FC4;
-	Mon, 28 Jul 2025 06:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C73224896;
+	Mon, 28 Jul 2025 06:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753682881; cv=none; b=TG7HPDGtnqxkkCUqVKeHBJvX/VWau+GFqnosPFoMq3pGOveLswvjK6eWvGb700xE9qu4dvTkNVEbSA1JVREbEJZL6fXX22DZ/8OkLtYEbRbILXC1rBJXpGsHqObCal8hJTonDtbDQfmMI9tNvvMZtA8UEv6zNJY5XNMoMPIQVIk=
+	t=1753682882; cv=none; b=WHr1lyFeW+O7r4WCT4r84OO1JsNBNZLcWOMMFUDW4ikCGQ+vLtWpb8aBKY5fiy4Txc9l85f5I9GxHJlCVnAuyxI1iEulnuLKseQJDPrcMHas3nCRtNEXErLv1XFjS/mP6I/QywiLgy+BYCbDRGyblMRXEO9q7EH84cFkutx8RNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753682881; c=relaxed/simple;
-	bh=4zJMhQ+VcPBQ76ASBvFai/gasWQveJW54RMGe/zEYD0=;
+	s=arc-20240116; t=1753682882; c=relaxed/simple;
+	bh=b3yfadSxlQTuuUjecZzGWQXT1ppEt7Mr1bmdx41N2Jk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CW9S8SIGF+xVgzgs2qsHg315m06tEqcplIWR+zIvcKzculXSky4LiAd5DQQM2FtGK2lRFuYHfBRRJ8cqPnvBHjbqOJO8h4C9ME1e6RWpNw1gp57L20njLHubr1AAIDO0EHwydj1560Se6PHc3BONvvzt/YsNc7EfT3j5JqlJow4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LGpgnINZ; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=IPVrt7a6zJkt+WxNoLpSXOHaS9WJ4T/4XHQlzCvdZYLI9L+pgAlTvUjSVTOielcRzfz+LOvMr+gtp6b6GO7rwqJytzZtRG+PmvyQKH/sv4/KNsZeskem5xvoWrknzd2avb+MOt7YNDAKZzX+JoHjmtWulquHoisur3HldaySOr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MBYQyu/b; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LGpgnINZ"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-456108bf94bso22401055e9.0;
-        Sun, 27 Jul 2025 23:07:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MBYQyu/b"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-451d3f72391so37785145e9.3;
+        Sun, 27 Jul 2025 23:08:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753682878; x=1754287678; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753682879; x=1754287679; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j2K/bAbM7b4hD+UZ1sY7e2X2nlDeVKcJvl2Epy7suEc=;
-        b=LGpgnINZeihBfuUzyvGWLniXRs5uPRfuRZpwiNZUscJSv3u7GAUApG7UMnkRQlPlVO
-         SzR50DAnGo1/37/ABTT/bBRZMwi12grgr2J91RBLNFcxtnp8m7ppxPeNAHndlDbKW6Pu
-         SHAzLO2GQSQ5X9NO46OQKk6yS3dFQCyZwg6uElMZbx00C3ENquyXpfgo0j1e3stWpnB6
-         SYaufPGeaIxwU8QckXqAd8woanoAQYWOkSb5ynnE7iYZhhHhRgcyTMPhaumsxxoNxWgs
-         5LYJE8T4adL/FoInJYuv12KI7GA3BSu1V+P1Xx639sI6GCgcwmEs09KctkPEBQrYGMEx
-         NCeQ==
+        bh=eJtO1nuKB/731gs+IWxyxQBo+tSaie/TO/30jHleAGw=;
+        b=MBYQyu/bqp7TAna6nI9G0OnOZ2s81LZqkaHu6ZMJ4p+Vuf8scFcSqDUoH5dMW9clS1
+         hwPiImKz+uBd8rNr9qcJoOOYLfj3UFpq7rHPXUxvsT50iYFaeY6MYNsmZ6XpxIHOQnCZ
+         Chz10e34Ty9pP49aa7+9D7d7DxpMaLCqSgh/A1XTwzcmeTay3Kiq/ykN1auhX0kWqyFA
+         GE7VSuZJcgt8QpIoM/x6EkhBCGCj+KVgrdelrN7Gfr/LDHuENyHqEgqFGQCuykQvJXee
+         bq4tqo/WK+JxMpz617tjUC836wL0Y633O20TsZSglVR9tN8OhOBx2yR1D7QU1KMJNm/w
+         2hsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753682878; x=1754287678;
+        d=1e100.net; s=20230601; t=1753682879; x=1754287679;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j2K/bAbM7b4hD+UZ1sY7e2X2nlDeVKcJvl2Epy7suEc=;
-        b=ht/kcx4xwBtok4km8v+7L5lGc7RPp5QlXtRgdGXZjntOvFIbGLe6t1QbD9yhBbe8VH
-         7uEgElgZl1unyb/dKgbQM34Vl9SM4cMxNyRwuIdNPZ3arsHLtWjQWu4oTK4QjgdcUeWG
-         2Y+z9KsRw2F5sFwr1ihFvl9hh3KFFjgBpS/8GmVFP7AWld3J6KfE8KJqBHybPPiEgYIt
-         bd1VGnj6v0YDoY6Q2QUGwRBRJ661YmEQx58SDO0w14pzRwexSl17Pd35PiCQ41wlChm/
-         GplYxrV0NDsjoz0GX+S2M4E+kaTBpeI4BK+zgCsELlFXOdqKLi+ljoJvnn2mrJd/1AJ7
-         /SNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURD/mvzyrTsckDmXHkSBoe+K6Vxu5fQ55lgQ630KCZVZM+cIyQ6/8YOd/e9Bl7SgkjDVFAwDl8cXIc32Q=@vger.kernel.org, AJvYcCV5XWUaMWB6SChnI3c/zwfQmNgFGznNxOI81o0RNhlITXE6jalxDQB/3LWr9TSl/kC7EDAwwfzJt0/uEdup@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2XzCq1nsfOFRFS8GE8onQxtTOmYLAV2miCRRIhcxFeSExRzlW
-	uvxYlSoD4LHw041rNrKP4AEgblgdyOX1INTDshzQ3fUqfImQbx4ginxD
-X-Gm-Gg: ASbGncvELjrZn8Jj4EK8lAWMq9MLQNba0j1AnYX8S3USrj9Oru8PZXVHVt2JO1hi9pu
-	3lWEsxXl1WsDplngZNYEWUaS4jrm0SNz5d0YrrE5sQc6BdH46PVx3eWmnk3khUPtBpHo6ZQGRZ/
-	Bh4HsmEy+2YENO98pCRTsGB6ZPSIwMRKEGAu2lt9W+AJD1ehJcGO21/uvwEXK/gStju1c/3nYKA
-	BnJou6EvKXCLTvT7hiEH0YKIiWNWbZTYCTRA8I7vxSkj/BtZVnpVSbzeLr5/cP3I5POg8I1ULye
-	i6X8pgEYsl+iEzcrTHBRpa1w4rcWgvBPB2bKjkQULaBrrOPCJ7sG13/iC/uVIgQUbyEDmZFPRlS
-	RSG/azfczwLWlHbqLqVlQJfp9WEGzA0Stcg==
-X-Google-Smtp-Source: AGHT+IES0WVeYiOQzgvF9uZ/F/ZuRvB9DCBVa5KoIGMgW6lVQFOUgMPsAT/Es0z6LGY/i4jb9SI8lQ==
-X-Received: by 2002:a05:600c:1d1e:b0:456:3b21:ad1e with SMTP id 5b1f17b1804b1-45876442799mr90886165e9.17.1753682877810;
-        Sun, 27 Jul 2025 23:07:57 -0700 (PDT)
+        bh=eJtO1nuKB/731gs+IWxyxQBo+tSaie/TO/30jHleAGw=;
+        b=TBhgfmD3YBe0up9XnI+dtjDCr2pIQ81iN9WYWgiBEvk8Az39igrsTdWgkpzEca3Q8Q
+         YeeltbnuSAzJpB6Qn1r+KU+Vv1E97XKRMQcZ74X02TKWA3pa/FFocFAge9YSPNdtfnwv
+         pHJZkkoXlzmX2FPLRAas/M5DJyW7mQkMUHB8k+G7dQvUA3OxHjD7tMQkUpaKJ4OaYBMm
+         bIky8etN/+MmxAuH7twrRmV2MCcRO9XO1GQD1Ua35g7vobACOz3SgIy+hUOFu6k4GV43
+         XLDcKbFZz+JFc1tSwZJ6L8p3N2VrzZNwCqoYiHGGffKvdhji70q0xoWss3TcC/isXue2
+         EdXg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9/Pamz81o3FT5bgDV29WfoEf8/E//B+/rXllXziOZaDYyK0J/URxaicsCzcsQCx4wdhltWSRjmVZ0okU=@vger.kernel.org, AJvYcCXj5Yz991y1eQqizhJvWCjTk5XH9qv/nLbn9odYoPqdhCIQDb5q8ZvP0jmk0aJ+ct8tsUDYyhuSHYHmatgK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yydagn+K3b6QRQ0C6xSkb2NU6C70aG65Nk7kreD2L8v1sEgqxoq
+	/bbgRKpQwo+05LP5zsajIZwoYjmqKyMWzKNwYLMEIn+9bQHPG8hzpIHKSvU5Lg==
+X-Gm-Gg: ASbGncv3cioIVQcrVyBHuA8d5zzW2V5RJOmiXGOQ4tBMuYzIeiuk6E7sK3rs359LKuy
+	JcKCuAcpmgE+hSE4TXy2Go3Ruy7TNpD4SnHNkS3+i+JLEXdaSiu/I64oQi5FOiSpXl3rOJ7W6Wn
+	Or0RFtpxqkPqzogcvEeC/kNFw+uQ5b4t/hR1W1NiEXlhtZcvmPykTIB8IbDHYsbjqWv/YJINLVA
+	CYp+PNlczdWAQjYN6uMu+4T8NP4UBsDShsJ01STDv5BjjDSI0k4Q7HRlB5sBI6SFikFsw37mFBb
+	XKyhyo2nWx/iLJ5ZwNJfMDShyx3plw9Kbyaj6rfUZdqTyE0QEsRC2351S0oBb8yCncNYmDIxiz5
+	HzqRhUJBB+nC1+hJbSUtheVifYm4L/4Ga+JjAU0vPDWhV
+X-Google-Smtp-Source: AGHT+IHcuqZDSycBlmjS65wGUlNSERplHlPi6V2vucApJV8xzGnmPFaJnpc/De5ZHaB9MzmHrkvGag==
+X-Received: by 2002:a05:600c:4590:b0:43c:f8fe:dd82 with SMTP id 5b1f17b1804b1-4587643ec92mr86897145e9.18.1753682879129;
+        Sun, 27 Jul 2025 23:07:59 -0700 (PDT)
 Received: from ws-linux01 ([2a02:2f0e:ca0d:f700:1210:b727:adc8:716])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4587abe6ba0sm86195215e9.9.2025.07.27.23.07.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4587abe6ba0sm86195215e9.9.2025.07.27.23.07.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 23:07:57 -0700 (PDT)
+        Sun, 27 Jul 2025 23:07:58 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -70,9 +70,9 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH 3/9] crypto: sun8i-ce - remove unnecessary __maybe_unused annotations
-Date: Mon, 28 Jul 2025 09:06:55 +0300
-Message-ID: <20250728060701.1787607-4-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH 4/9] crypto: sun8i-ce - add a new function for dumping task descriptors
+Date: Mon, 28 Jul 2025 09:06:56 +0300
+Message-ID: <20250728060701.1787607-5-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250728060701.1787607-1-ovidiu.panait.oss@gmail.com>
 References: <20250728060701.1787607-1-ovidiu.panait.oss@gmail.com>
@@ -84,57 +84,72 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are 4 instances of '__maybe_unused' annotations that are not needed,
-as the variables are always used, so remove them.
+In order to remove code duplication, factor out task descriptor dumping to
+a new function sun8i_ce_dump_task_descriptors().
 
 Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 4 ++--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c    | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index 113a1100f2ae..c57c64a1a388 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -111,7 +111,7 @@ static int sun8i_ce_cipher_fallback(struct skcipher_request *areq)
- 
- 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
- 		struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
--		struct sun8i_ce_alg_template *algt __maybe_unused;
-+		struct sun8i_ce_alg_template *algt;
- 
- 		algt = container_of(alg, struct sun8i_ce_alg_template,
- 				    alg.skcipher.base);
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 79ec172e5c99..326d9c988bb1 100644
+index 326d9c988bb1..d94304a439d3 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -1062,8 +1062,8 @@ static int sun8i_ce_probe(struct platform_device *pdev)
- 	pm_runtime_put_sync(ce->dev);
+@@ -169,6 +169,12 @@ static const struct ce_variant ce_r40_variant = {
+ 	.trng = CE_ID_NOTSUPP,
+ };
  
- 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
--		struct dentry *dbgfs_dir __maybe_unused;
--		struct dentry *dbgfs_stats __maybe_unused;
-+		struct dentry *dbgfs_dir;
-+		struct dentry *dbgfs_stats;
- 
- 		/* Ignore error of debugfs */
- 		dbgfs_dir = debugfs_create_dir("sun8i-ce", NULL);
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index 61e8d968fdcc..df2acef9c679 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -26,7 +26,7 @@
- static void sun8i_ce_hash_stat_fb_inc(struct crypto_ahash *tfm)
++static void sun8i_ce_dump_task_descriptors(struct sun8i_ce_flow *chan)
++{
++	print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
++		       chan->tl, sizeof(struct ce_task), false);
++}
++
+ /*
+  * sun8i_ce_get_engine_number() get the next channel slot
+  * This is a simple round-robin way of getting the next channel
+@@ -183,7 +189,6 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
  {
- 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
--		struct sun8i_ce_alg_template *algt __maybe_unused;
-+		struct sun8i_ce_alg_template *algt;
- 		struct ahash_alg *alg = crypto_ahash_alg(tfm);
+ 	u32 v;
+ 	int err = 0;
+-	struct ce_task *cet = ce->chanlist[flow].tl;
  
- 		algt = container_of(alg, struct sun8i_ce_alg_template,
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+ 	ce->chanlist[flow].stat_req++;
+@@ -225,9 +230,8 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
+ 		/* Sadly, the error bit is not per flow */
+ 		if (v) {
+ 			dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
++			sun8i_ce_dump_task_descriptors(&ce->chanlist[flow]);
+ 			err = -EFAULT;
+-			print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+-				       cet, sizeof(struct ce_task), false);
+ 		}
+ 		if (v & CE_ERR_ALGO_NOTSUP)
+ 			dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
+@@ -244,9 +248,8 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
+ 		v &= 0xF;
+ 		if (v) {
+ 			dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
++			sun8i_ce_dump_task_descriptors(&ce->chanlist[flow]);
+ 			err = -EFAULT;
+-			print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+-				       cet, sizeof(struct ce_task), false);
+ 		}
+ 		if (v & CE_ERR_ALGO_NOTSUP)
+ 			dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
+@@ -260,9 +263,8 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
+ 		v &= 0xFF;
+ 		if (v) {
+ 			dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
++			sun8i_ce_dump_task_descriptors(&ce->chanlist[flow]);
+ 			err = -EFAULT;
+-			print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+-				       cet, sizeof(struct ce_task), false);
+ 		}
+ 		if (v & CE_ERR_ALGO_NOTSUP)
+ 			dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
 -- 
 2.50.0
 
