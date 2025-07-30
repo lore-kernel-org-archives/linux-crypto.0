@@ -1,59 +1,117 @@
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C921DA60D;
-	Wed, 30 Jul 2025 14:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6EA2D8DD0;
+	Wed, 30 Jul 2025 16:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753884192; cv=none; b=ejaQq1ZwLSphNzv+VfAGI4jvBmI53Dq7+xjbg2vCFQa64H67KfMo5+32wWvqzhNL1v6XQzoYg17GEB+5UKlv7fS92eGF3BFJJwCebWaT2TxJEVT4aJIPWJpREZu52GDgyb8HjCcK1AOR4xWnZkmVpl5lf8zf2CyfxkfBG3Kc/bI=
+	t=1753891963; cv=none; b=ifh+KdnXXmzcoEDFSFOuGx0J1pQp6W/u4UrVYSqacwA+XdaibjmrUTbx6r6maOUeOQcILhN6efHJm3Q+LeYbujdmyfR75F6UwZttTKVZd+E4zSGnLAc7JPhBCk24U/R+D7g8VY06X32/3Fa4KbencSwwHcLL2g6HiYd0+ZT1kCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753884192; c=relaxed/simple;
-	bh=1NEGKQ/LM0y7ZaQHjmjPcE0qDG3GSP3wZLpeB0YVfpk=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pqoVuErLI5drD6n87D3ujFeXmkIRucl2cUMqeO1QxaTtjyI34O5+KU8rRNqjL7K2fHLnqQz+QRUthHB40rSIQ9svaQ1zQenSEjFg+hgY2LcRxh3ZER1AqD3h+W6E+9avMB52Y+/9mg3T4ECPfG5/prhXNtWFApPlSZHKAjrz73k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=hA25UO3B; arc=none smtp.client-ip=51.77.79.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1753891963; c=relaxed/simple;
+	bh=aHfuhbgPN8slZRgKZ6sa4dHmZTF2eaTUTZxss+yKVjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jr2WWmRnw2hkNcvxhuExt+Dz/pria+1+HwcRhLqK9J1jEg5psrbuPqQ7bpiA5WroAXP8gepmkiw7OoHHNn/RDViQuOK/KncDi/7ERmc8d8hd2i2mTsJrPmKMaIfdA+ySskm57/9tgwT0cs36Y7vGzQDj0wdzFWtheyKv/nX7+QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AhSRgKtP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="hA25UO3B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1753884180; x=1754143380;
-	bh=0+nuwECbZBoAOPJXsyfoPI9NziWmRZTaVHbqneD7ZOA=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=hA25UO3BEGmbmQPuAAvRhFy91fzzcc1YETs/ejHTlblfKbPZYmzoL3u5Y8DoQjCEW
-	 WdgSFJ+d1NpZbLq+7Bz3gd9H41SpEbPem5y3mJZh+/qiBKBOkzM27kULJeVt2xo7Pa
-	 dxOaHplpmHvh9/Poa5FFMGie7vzxKWb+0ed2/55NAeLmZ37YL9BI5evS73pUymQapr
-	 hkRnCB71AhuGIEnn7Gih7OvNGmjB7gb5uS0e6pGbqMM80WpXh0vJE6FwQS4OH08Z4C
-	 NGW9Nm0l9MuNSc8rYTGEEIyg2i3BQbQrNs1nuoCKyvv7fhQdDiaVH+kKMXMCcDr67O
-	 rkXQsTyiR7lOg==
-Date: Wed, 30 Jul 2025 14:02:54 +0000
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From: Jari Ruusu <jariruusu@protonmail.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Announce loop-AES-v3.8g file/swap crypto package
-Message-ID: <EgWAx-u0h-QtLng0b2TNkEkTvUnzayuJpMBB-AYnaEIaJxcCUYEtWzFPJhfiGS2y2ngMTszoB7Catm9paVsA12JpWy8E6Tf87_OQxuST5ww=@protonmail.com>
-Feedback-ID: 22639318:user:proton
-X-Pm-Message-ID: 98f53528c5a1fa3aa7791d36086d3d188ed8d8ad
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AhSRgKtP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6337FC4CEE3;
+	Wed, 30 Jul 2025 16:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753891962;
+	bh=aHfuhbgPN8slZRgKZ6sa4dHmZTF2eaTUTZxss+yKVjY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AhSRgKtPFGjtjO5mv7+geQdueZ4Hr5pupEEI6I303KGy1fcRAGkPrzv+NEJTiBysN
+	 BWW88kTJhIZT5X5FpHHF3dp8xKA74p4jL8699LdRcbgvfrTixMvWjLYmHy02emn0hY
+	 xeBjQn5SmDuJhYsAZ++OEsbs9PpbZ6cxYlcT7tow9WtAApGNe8idhUW8MgXWY8+Cmx
+	 lKYfSRRQEqaBy6U2kllOsq0czGTxBVrPISNJ2aHBftZSrTIYK5IbUqe/gxjZnMzYJy
+	 ZnnYd4PKPHfRCzq62S40XNA759CREYaDXQB3kTx4kyS7K6fzSD/n9I24aw5IGS6Hff
+	 usTLN/vaGsP+g==
+Date: Wed, 30 Jul 2025 09:11:49 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ingo Franzki <ifranzki@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>, linux-s390@vger.kernel.org
+Subject: Re: Regression: hmac(sha3-224) is missing in newer kernels on s390?
+Message-ID: <20250730161149.GA1162@sol>
+References: <8b954aa1-ce73-4f3a-9c8a-5667fac602c9@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b954aa1-ce73-4f3a-9c8a-5667fac602c9@linux.ibm.com>
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 6.16 kernels.
+On Wed, Jul 30, 2025 at 10:11:47AM +0200, Ingo Franzki wrote:
+> Hi Eric, Herbert,
+> 
+> I just noticed that the algorithm 'hmac(sha3-224)' is not supported anymore.
+> This is at least on yesterday's 6.17 as well as on linux-next.
+> On earlier kernels 'hmac(sha3-224)' was available. I don't exactly know when it started to be missing. 
+> I can't tell if the same is true on other archs. 
+> 
+> 'sha3-224' as digest is there, but 'hmac(sha3-224)' is not. All the other sha3 and all sha2 variants are there as well (digest and hmac).
+> 
+> # grep "sha3-" /proc/crypto
+> name         : hmac(sha3-512)
+> driver       : hmac(sha3-512-s390)
+> name         : hmac(sha3-384)
+> driver       : hmac(sha3-384-s390)
+> name         : hmac(sha3-256)
+> driver       : hmac(sha3-256-s390)
+> name         : sha3-384
+> driver       : sha3-384-s390
+> name         : sha3-512
+> driver       : sha3-512-s390
+> name         : sha3-224
+> driver       : sha3-224-s390   
+> name         : sha3-256
+> driver       : sha3-256-s390
+> name         : sha3-512
+> driver       : sha3-512-generic
+> name         : sha3-384
+> driver       : sha3-384-generic
+> name         : sha3-256
+> driver       : sha3-256-generic
+> name         : sha3-224
+> driver       : sha3-224-generic
+> 
+> On a 6.11 kernel:
+> 
+> # grep "sha3-" /proc/crypto
+> name         : sha3-384
+> driver       : sha3-384-s390
+> name         : sha3-512
+> driver       : sha3-512-s390
+> name         : sha3-224           <---- its there
+> driver       : sha3-224-s390
+> name         : sha3-256
+> driver       : sha3-256-s390
+> name         : sha3-512
+> driver       : sha3-512-generic
+> name         : sha3-384
+> driver       : sha3-384-generic
+> name         : sha3-256
+> driver       : sha3-256-generic
+> name         : sha3-224
+> driver       : sha3-224-generic
 
-bzip2 compressed tarball is here:
+I haven't touched SHA-3 yet.  This is a bug from the following commit:
 
-    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8g.tar.bz2
-    md5sum 7e48c0659deb6c5b8086c1601cad5533
+    commit 6f90ba7065515d69b24729cf85c45b2add99e638
+    Author: Herbert Xu <herbert@gondor.apana.org.au>
+    Date:   Fri Apr 18 11:00:13 2025 +0800
 
-    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8g.tar.bz2.sign
+        crypto: s390/sha3 - Use API partial block handling
 
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
+        Use the Crypto API partial block handling.
 
+        Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+That increased the descsize of hmac(sha3-224-s390) from 368 to 369,
+which made it exceed HASH_MAX_DESCSIZE, causing it to fail to register.
+
+- Eric
