@@ -1,82 +1,63 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EA9229B15
-	for <linux-crypto@vger.kernel.org>; Thu, 31 Jul 2025 12:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019BE23C514;
+	Thu, 31 Jul 2025 17:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753966351; cv=none; b=OlY8FoL4rwLTrKt4tFrRE/C54f5eHqgB5pD+r+CWQQQqL/u5bM1A17HbAy45g7GH/vCyD4SaYUKvwDJ828MonD3yxUviHWuvmAERCj1cZ0pzmbzv5rIg3aSWLZ5TaMTOnlpXGT/WzYw14T1STlE6mCPwdp2nCi+Ecpa46cE5rss=
+	t=1753984484; cv=none; b=OGBsAVyn51EJFsFFPb94q8maV/RViSxSIJMIZdiiQC3Hfpdk6mUWyYTGU2ik346rkn/7M56hJcEf/ck0ZeT8MqZ78c9vNoslENqNO8MC1eNARhJVuejbDcVlZeljapJ818dXu7PtGHK7viZK2+SFzZXIghInjMFoCTUIjafrL5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753966351; c=relaxed/simple;
-	bh=yHicCcL9U3t0KFPKavAanflT0YgueRr+UiCNnvr87e8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qKUVYSmJve03hKgT9kJSZM+4U5GmtNwrAqcsMZdwFpTaFP6kKSRSzbv8MDMQF+3HlljYIOpWGw0u0XUFrKxQ+9cfsezP14Tbdv0Si27p37uLa8g3HvrUXB6tbSaLUwV/69OBaWqDj6JBnrFOJq9JUjIP02kgAbDSt5IUaVpO/Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e3ecc7278bso21669045ab.1
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Jul 2025 05:52:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753966349; x=1754571149;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=399+Wb0FRaCeSxFUAh8KUSIXMYbZIz9r7Bc+x+aJ+F0=;
-        b=LWO1A9Grd3GVH9qhe7RGUe8+QcJL9wEuJ2j08buFT6InV79J4Ebaw3gi6XGy77AtgM
-         csozS9/Exvbp+qxrY38MfbR75LjZbN4bayGII0cHfwVIHj25WmAyZjbpQ+yDxMBcku2B
-         X2i6RqvzsMHRBuztOEPa6v6g2WordJNwXlsZmYmQOWxUbWnEb3BsSXBnrukp/qVpbEuS
-         P1kLuZBmAJO5bjQuvEz7RKps0+fangzLhMheo3oXp5Pe3wdHlj6gHQXTdf9IwlEjRMGO
-         BVedfpTvDjnhxIDcZnZwezjSw9rQUM0MfRmEi86PI3sXuIvubYqihMMB3Ti5fzbtT46C
-         lB4g==
-X-Gm-Message-State: AOJu0Yw04SShBCo35BcYuFq/WBkE5LnTSdx2m16+s4Q3Ico5cxGfMcx6
-	pcpQbFaG0ZiUd6HHaiqw5qi/naQojv5fErgnfrRcbsq5gn3JPizpsrrChni0a4/4JTlLDgVTTWD
-	CK9jMFU3iTGxBTFAlSWcdbFLEW2SWyzOuvV6sejuVzMAQx8AOcZqz+i4e/zg=
-X-Google-Smtp-Source: AGHT+IElHCqOHqATHCpjNZ/+BdTbd4ngNPmX+IeQ2w6ywYQCGYxz8WLyPy3MuNQfBqirGD1x0L6eXNNwH/5zL/1uo19FpGrx/VxM
+	s=arc-20240116; t=1753984484; c=relaxed/simple;
+	bh=g47yNcPQpCnCSVUUixwXkPIBomFsYfFHI96DXpo6QJ4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=KwMAmEFPBUMS3vyWXE6ctBpAon5cQssMW7YVy1JDP7JY+RiE0v3xpDFg27g+V3RJ1Lyk/jsuca6k60R+KtoqtzwuD6WilNhozKcWl4Pzy4bzsn3TmQwfeTTPHO2gRRK2f3BQn0t2G35Eg44vE5axgc2FJi88a6Vw6tuvcZ9gKFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P43DjPEL; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P43DjPEL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FB1C4CEEF;
+	Thu, 31 Jul 2025 17:54:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753984482;
+	bh=g47yNcPQpCnCSVUUixwXkPIBomFsYfFHI96DXpo6QJ4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=P43DjPEL2s3x6RtJPc3riTif6rYzkVBr/MrRKMi66YbWCeUtuR0nVHNM+2WGuLYl4
+	 M1S0yN7FFirJJl+4UDtteQbbuzgwtdl/RPxRDAYKz5Z62w2+x9m1Yhj2a+CINDECpq
+	 02v1NfqKahZBPn6FDI3wGnDEsLlxLgJUhc5Ix2ZGVOS5ET2VxWg8m8yPmK2FCvwknx
+	 XmeYB4kglf2axz3s4uWmaoOhqCHQ+V8/jT+XwSle0n5DGFQbWGq08MCfK3SKQc8+km
+	 Q2owPrIYlFc6FAHakxUgC1gFam5Ou8MM7BUiZ3Ti3xU4WGDbE93OkS3mkmdAWjP318
+	 +ItM0YLJaxnQA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D84383BF51;
+	Thu, 31 Jul 2025 17:54:59 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 6.17
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+References: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.17-p1
+X-PR-Tracked-Commit-Id: bf24d64268544379d9a9b5b8efc2bb03967703b3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 44a8c96edd0ee9320a1ad87afc7b10f38e55d5ec
+Message-Id: <175398449814.3232013.3906313623073112970.pr-tracker-bot@kernel.org>
+Date: Thu, 31 Jul 2025 17:54:58 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1749:b0:3e2:a749:252e with SMTP id
- e9e14a558f8ab-3e3f60c392fmr117815645ab.4.1753966348159; Thu, 31 Jul 2025
- 05:52:28 -0700 (PDT)
-Date: Thu, 31 Jul 2025 05:52:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <688b670c.a00a0220.26d0e1.0040.GAE@google.com>
-Subject: [syzbot] Monthly crypto report (Jul 2025)
-From: syzbot <syzbot+list563953ef1f0201d6545a@syzkaller.appspotmail.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello crypto maintainers/developers,
+The pull request you sent on Tue, 29 Jul 2025 19:07:51 +0800:
 
-This is a 31-day syzbot report for the crypto subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/crypto
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.17-p1
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 110 have already been fixed.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/44a8c96edd0ee9320a1ad87afc7b10f38e55d5ec
 
-Some of the still happening issues:
+Thank you!
 
-Ref Crashes Repro Title
-<1> 52      No    possible deadlock in padata_do_serial
-                  https://syzkaller.appspot.com/bug?extid=bd936ccd4339cea66e6b
-<2> 11      No    KMSAN: uninit-value in sw842_decompress (2)
-                  https://syzkaller.appspot.com/bug?extid=8f77ff6144a73f0cf71b
-<3> 4       Yes   KASAN: slab-out-of-bounds Read in xlog_cksum
-                  https://syzkaller.appspot.com/bug?extid=9f6d080dece587cfdd4c
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
