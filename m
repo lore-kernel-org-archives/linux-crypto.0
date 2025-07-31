@@ -1,40 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402531E2858
-	for <linux-crypto@vger.kernel.org>; Thu, 31 Jul 2025 22:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B6421CFF6
+	for <linux-crypto@vger.kernel.org>; Thu, 31 Jul 2025 22:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754001445; cv=none; b=MK0zwD/LbNb5qMJy72tVPVsLJv4ZjowJmv1VbOt/dKNx/lKfOB6hT/FW+qNXGQWo+qHl7mCtB9XWGOYoEhQRMChtOetlOeyDm/s7YyGc3xUKLz3ubFtsTIjuGWZqfn9LGLoyID7uOlhVh9u1xXHR4NomMch7T30kg9prJXsXWAo=
+	t=1754001766; cv=none; b=Eq9Fyt0hyuz5T8j3QoDct7dh6QcA6MGhF4zzh69gQNNF8nZrg9LZWpcX2wNEKSxLzwrh386Zp4bGyeOIlyFLg5CMrkUdNLBovv6W78smUIjE2qa2/fsPqU/8kQ63frc7k739/NgQzmjBiH9HsrlFMqV4mfY3XhfuNIWFsaOrz20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754001445; c=relaxed/simple;
-	bh=CauOauOILBwmnNP8cXVBP+lwt1iK/V6xZqh8kjU0UhY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KcniH1h0ai1RbrLm5zIsy/xmWKTdZODvG6Uln5UQ9OEpGaDjCg7IvtQK/I8XIrqIoknM+e+ureW2FDpdndUAp17yX3MrrG3XNiy667ay/5jYPbFQHVAHk7uBdfB8cE5OoFLwm5waoiVIQVz+N7PxQ7C72XVX43cxAcJSUcrmovc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7+tEwTj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754001766; c=relaxed/simple;
+	bh=YtZsExNZ7skwTG/8FgKCjQfn5ajiDRGF++thUzSw4Dg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s3rNh1LQuaaP6zQcnCK5D3Ij6JUI6Rb4331LL9rrcfGFAjbLYdewrqwQBTBqNPcSLxfPs655wZWK/YYaNYsOx1xCAd08VWtKGKlzs4fQCvEwowwzgpb5+ku5fK59V4ENe2jjVLpkmIqLUtnFtrXi4tVlSDA7UmIGYIN3xg+fWEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oas7Djum; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K7+tEwTj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD620C4CEEF;
-	Thu, 31 Jul 2025 22:37:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oas7Djum"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA09C4CEEF;
+	Thu, 31 Jul 2025 22:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754001445;
-	bh=CauOauOILBwmnNP8cXVBP+lwt1iK/V6xZqh8kjU0UhY=;
+	s=k20201202; t=1754001765;
+	bh=YtZsExNZ7skwTG/8FgKCjQfn5ajiDRGF++thUzSw4Dg=;
 	h=From:To:Cc:Subject:Date:From;
-	b=K7+tEwTjZMEZG8u1bUe43JKuXAPk8C7uvzSGis06SCONoivnAX+iU9vBG9VWKA6yo
-	 76s7ibUlhEJf8FPGHfIYf3huexhfVdib84EEVgA9zW7/TtQ2Z6HPJIbES4n0GgHroW
-	 8gduKeDV+TDV+2KgSbcA1IHCmJvOGhhEpankhj6//vxgD447Yq2pq0fggZd9z1L/ze
-	 LNaQdiQQ/oo5xUy0bQDpNBsSSt1IxTltpspkzNi012n9NGvB4bNiCHXvelKTfcoU4r
-	 HQVRt1o0Dy6cvTWhx8T5Kyi5qe9sDmFqfaZp9S0Mv+4MHEQpz3fnV7OiOmowZn2fBw
-	 FUmtF3Mghm9qQ==
+	b=oas7DjumlHFPwzcRdjG9WtAHFMS4y+4+xmsQ/BwxVStQqQTwoRKAfe1o3biY82Qpg
+	 wgAw7tg3epvyWhEVWinNoIFTyuspf6C2OZylOzlzGEaif/0alc3F0ua+pZClMCoGAQ
+	 E4z9iTogVn6+N03GuoegeQ9LvkcQSS3CecCos3CnzpXbug0FqttTqlZmoFZHKU27z/
+	 5ptc/A9x2ZI9bamnzBuh/P+RQrVe1XFJsjlWZ7SwTZ4p3iO4fjKYEEFoG8T0uIWbBC
+	 6BkRG4x3MRKtxgv6XeIUcaFI5vbQpz/BPnlq12CeqKd8m8SoHvGY9hhEp9YO1bYA+/
+	 NqRFFdxRjFO5w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: sha512: Use underlying functions instead of crypto_simd_usable()
-Date: Thu, 31 Jul 2025 15:36:51 -0700
-Message-ID: <20250731223651.136939-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: sha: Update Kconfig help for SHA1 and SHA256
+Date: Thu, 31 Jul 2025 15:42:18 -0700
+Message-ID: <20250731224218.137947-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -44,141 +42,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since sha512_kunit tests the fallback code paths without using
-crypto_simd_disabled_for_test, make the SHA-512 code just use the
-underlying may_use_simd() and irq_fpu_usable() functions directly
-instead of crypto_simd_usable().  This eliminates an unnecessary layer.
+Update the help text for CRYPTO_LIB_SHA1 and CRYPTO_LIB_SHA256 to
+reflect the addition of HMAC support, and to be consistent with
+CRYPTO_LIB_SHA512.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/arm/sha512.h   | 5 ++---
- lib/crypto/arm64/sha512.h | 5 ++---
- lib/crypto/riscv/sha512.h | 4 +---
- lib/crypto/x86/sha512.h   | 4 +---
- 4 files changed, 6 insertions(+), 12 deletions(-)
+ lib/crypto/Kconfig | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/lib/crypto/arm/sha512.h b/lib/crypto/arm/sha512.h
-index f147b6490d6cd..cc2447acd5621 100644
---- a/lib/crypto/arm/sha512.h
-+++ b/lib/crypto/arm/sha512.h
-@@ -2,13 +2,12 @@
- /*
-  * arm32-optimized SHA-512 block function
-  *
-  * Copyright 2025 Google LLC
-  */
--
- #include <asm/neon.h>
--#include <crypto/internal/simd.h>
-+#include <asm/simd.h>
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index c2b65b6a9bb6f..1e6b008f8fca4 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -138,12 +138,12 @@ config CRYPTO_LIB_CHACHA20POLY1305
+ 	select CRYPTO_LIB_UTILS
  
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+ config CRYPTO_LIB_SHA1
+ 	tristate
+ 	help
+-	  The SHA-1 library functions.  Select this if your module uses any of
+-	  the functions from <crypto/sha1.h>.
++	  The SHA-1 and HMAC-SHA1 library functions.  Select this if your module
++	  uses any of the functions from <crypto/sha1.h>.
  
- asmlinkage void sha512_block_data_order(struct sha512_block_state *state,
- 					const u8 *data, size_t nblocks);
-@@ -17,11 +16,11 @@ asmlinkage void sha512_block_data_order_neon(struct sha512_block_state *state,
+ config CRYPTO_LIB_SHA1_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_SHA1 && !UML
+ 	default y if ARM
+@@ -155,13 +155,13 @@ config CRYPTO_LIB_SHA1_ARCH
+ 	default y if X86_64
  
- static void sha512_blocks(struct sha512_block_state *state,
- 			  const u8 *data, size_t nblocks)
- {
- 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
--	    static_branch_likely(&have_neon) && likely(crypto_simd_usable())) {
-+	    static_branch_likely(&have_neon) && likely(may_use_simd())) {
- 		kernel_neon_begin();
- 		sha512_block_data_order_neon(state, data, nblocks);
- 		kernel_neon_end();
- 	} else {
- 		sha512_block_data_order(state, data, nblocks);
-diff --git a/lib/crypto/arm64/sha512.h b/lib/crypto/arm64/sha512.h
-index 6abb40b467f2e..7539ea3fef10d 100644
---- a/lib/crypto/arm64/sha512.h
-+++ b/lib/crypto/arm64/sha512.h
-@@ -2,13 +2,12 @@
- /*
-  * arm64-optimized SHA-512 block function
-  *
-  * Copyright 2025 Google LLC
-  */
--
- #include <asm/neon.h>
--#include <crypto/internal/simd.h>
-+#include <asm/simd.h>
- #include <linux/cpufeature.h>
+ config CRYPTO_LIB_SHA256
+ 	tristate
+ 	help
+-	  Enable the SHA-256 library interface. This interface may be fulfilled
+-	  by either the generic implementation or an arch-specific one, if one
+-	  is available and enabled.
++	  The SHA-224, SHA-256, HMAC-SHA224, and HMAC-SHA256 library functions.
++	  Select this if your module uses any of these functions from
++	  <crypto/sha2.h>.
  
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_sha512_insns);
- 
- asmlinkage void sha512_block_data_order(struct sha512_block_state *state,
-@@ -19,11 +18,11 @@ asmlinkage size_t __sha512_ce_transform(struct sha512_block_state *state,
- static void sha512_blocks(struct sha512_block_state *state,
- 			  const u8 *data, size_t nblocks)
- {
- 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
- 	    static_branch_likely(&have_sha512_insns) &&
--	    likely(crypto_simd_usable())) {
-+	    likely(may_use_simd())) {
- 		do {
- 			size_t rem;
- 
- 			kernel_neon_begin();
- 			rem = __sha512_ce_transform(state, data, nblocks);
-diff --git a/lib/crypto/riscv/sha512.h b/lib/crypto/riscv/sha512.h
-index 9d0abede322f7..59dc0294a9a7e 100644
---- a/lib/crypto/riscv/sha512.h
-+++ b/lib/crypto/riscv/sha512.h
-@@ -9,22 +9,20 @@
-  * Author: Jerry Shih <jerry.shih@sifive.com>
-  */
- 
- #include <asm/simd.h>
- #include <asm/vector.h>
--#include <crypto/internal/simd.h>
- 
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_extensions);
- 
- asmlinkage void sha512_transform_zvknhb_zvkb(struct sha512_block_state *state,
- 					     const u8 *data, size_t nblocks);
- 
- static void sha512_blocks(struct sha512_block_state *state,
- 			  const u8 *data, size_t nblocks)
- {
--	if (static_branch_likely(&have_extensions) &&
--	    likely(crypto_simd_usable())) {
-+	if (static_branch_likely(&have_extensions) && likely(may_use_simd())) {
- 		kernel_vector_begin();
- 		sha512_transform_zvknhb_zvkb(state, data, nblocks);
- 		kernel_vector_end();
- 	} else {
- 		sha512_blocks_generic(state, data, nblocks);
-diff --git a/lib/crypto/x86/sha512.h b/lib/crypto/x86/sha512.h
-index c13503d9d57d9..be2c8fc122469 100644
---- a/lib/crypto/x86/sha512.h
-+++ b/lib/crypto/x86/sha512.h
-@@ -2,24 +2,22 @@
- /*
-  * x86-optimized SHA-512 block function
-  *
-  * Copyright 2025 Google LLC
-  */
--
- #include <asm/fpu/api.h>
--#include <crypto/internal/simd.h>
- #include <linux/static_call.h>
- 
- DEFINE_STATIC_CALL(sha512_blocks_x86, sha512_blocks_generic);
- 
- #define DEFINE_X86_SHA512_FN(c_fn, asm_fn)                                 \
- 	asmlinkage void asm_fn(struct sha512_block_state *state,           \
- 			       const u8 *data, size_t nblocks);            \
- 	static void c_fn(struct sha512_block_state *state, const u8 *data, \
- 			 size_t nblocks)                                   \
- 	{                                                                  \
--		if (likely(crypto_simd_usable())) {                        \
-+		if (likely(irq_fpu_usable())) {                            \
- 			kernel_fpu_begin();                                \
- 			asm_fn(state, data, nblocks);                      \
- 			kernel_fpu_end();                                  \
- 		} else {                                                   \
- 			sha512_blocks_generic(state, data, nblocks);       \
+ config CRYPTO_LIB_SHA256_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_SHA256 && !UML
+ 	default y if ARM && !CPU_V7M
 
 base-commit: d6084bb815c453de27af8071a23163a711586a6c
 -- 
