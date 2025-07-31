@@ -1,341 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F03267B02;
-	Thu, 31 Jul 2025 21:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9598A23ABB1;
+	Thu, 31 Jul 2025 21:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753997049; cv=none; b=Vg9/MFMB9aHxcw0VXp1HstAPXGjveXdtCkMgAxtN3YZsS/YtngTiEzCARIoSEFW6BMb+ehC8XRul8Er0VwhRJ0R1DroRN+Kr85VFWrGy0P+8GAeLNRXGPv2Q5vkjswMbGmIX9N5MzArg6Bs7P535bB+/XsqZ69f07KfEqhPi4/k=
+	t=1753997276; cv=none; b=XIWGb3n5EsTrcxxJRjsKVuiuOa2dDC12WvOt1c5sgfhlWNZlgqwJ0g4dse9WBfos8JxQgLySwHGSgnQPIj240Jr0Brhf7N729qrALZe6OAsHp/cW0dSecOevy4ORUIih0+7W2m/TySPKLdCBUzowZ4jBybissDuvwM5E1qRkUyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753997049; c=relaxed/simple;
-	bh=id3V7RxYJTcnGfXIIJnRAXsAif9WQHqpKirnW70demk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kNhYnyDr1tzeKKaVnZvwqx5yDwVIVYsC0xCSozFp39Uqjqvmg5w5HFMDQNJbyqWzirU4lNpJ8yqewtRTTx4T4lx8za+VofhGaAr1EMgzc5OFV/clJCH70Au6tcjALRUUn3WniFyQob3gIKuEjoywlaNcs1ghj9Y0mv8IC1Ejes0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8DDK6b0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753997276; c=relaxed/simple;
+	bh=Ohks9ny5wTu0IIUS/H9f6kcUZQkWYlZIorfQk3HF37w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BlHo0S83cywoNGmrmx7z7tFY3PzgEnEtL8YaXq3IKx8hbdCG/dJQcYAS2/eQcsPxlwdUy/Os6OTCZcwSchhz17OFruou2Oe8DhxJBMP21sOqMFkztptxaFhked+NKdRoiUrORFq1nCOvuE+7d+N1YmHUYyXqo++Aps41jNe5WTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRWZiV/t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8DDK6b0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F30C4CEFB;
-	Thu, 31 Jul 2025 21:24:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRWZiV/t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83D7EC4CEEF;
+	Thu, 31 Jul 2025 21:27:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753997048;
-	bh=id3V7RxYJTcnGfXIIJnRAXsAif9WQHqpKirnW70demk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N8DDK6b0Lxk6raiZe8GB3/QF75JSmrMdB7lqerDKw02F5yDdkH3tu9h1d/8Hpzy7l
-	 70244D3ymGED/SP9a7BwKzhQEcHKWEVrb5zZiP+qGbxbYS069P6hoOJVKVa54F5nBX
-	 8NcWcyIHm0Sqjyq+SQfmqVhGq5o7zJbttyt425ku6O7tJqjxbIIWfc/tT0shptsSNV
-	 YjZzjovn2erdjgEO7yGWxvJ1amQ6keaZ5wGEv9iFwFah8cdLRVsscKl0BIZTyWelW3
-	 OoeYTAd0WqRPxX4ACl3VvfhMjKUX7e7dC10sdZR9iSYh612wUWo9oP5H6DIDsIEvnJ
-	 L7G1V2hO8k41w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	keyrings@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	linux-integrity@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 3/3] KEYS: trusted_tpm1: Move private functionality out of public header
-Date: Thu, 31 Jul 2025 14:23:54 -0700
-Message-ID: <20250731212354.105044-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250731212354.105044-1-ebiggers@kernel.org>
-References: <20250731212354.105044-1-ebiggers@kernel.org>
+	s=k20201202; t=1753997276;
+	bh=Ohks9ny5wTu0IIUS/H9f6kcUZQkWYlZIorfQk3HF37w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WRWZiV/tWaejbsWdGwz1kmHEiGStvjFDFmBivFqHbggn6zCAm6s8+ypy9OCru/ILx
+	 MO1dCrewOQ+aUh66Wun4azYI2YV1Dcm560wk/9vIYV4AYDyFYpg9v0lJ89NKX8m6TH
+	 YpUg+ZaN1oPwXj5Y559D/pcm5P4Yfy85xqisdJWp7BjSq2XxojK1kYC6MuFUKFnT8L
+	 5ZwBaGf8/wTOxca81+02ewSyDVeD861gF51qgoWUWYph+yYRkucLfsRk16eSx5Bgsl
+	 d7LoAaN3KgFsacTZXOQlmRcpIgdmiPPlEgL+Hl3cYrIo+HvPwmoH+gDroI8PwDS7mr
+	 ZOhOzLVoiC0+A==
+Message-ID: <245ef75d-44d5-4b66-9f28-68182f177fad@kernel.org>
+Date: Thu, 31 Jul 2025 23:27:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] mptcp: use HMAC-SHA256 library instead of open-coded
+ HMAC
+Content-Language: en-GB, fr-BE
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev
+References: <20250731195054.84119-1-ebiggers@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250731195054.84119-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Move functionality used only by trusted_tpm1.c out of the public header
-<keys/trusted_tpm.h>.  Specifically, change the exported functions into
-static functions, since they are not used outside trusted_tpm1.c, and
-move various other definitions and inline functions to trusted_tpm1.c.
+Hi Eric,
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- include/keys/trusted_tpm.h                | 79 ----------------------
- security/keys/trusted-keys/trusted_tpm1.c | 80 ++++++++++++++++++++---
- 2 files changed, 72 insertions(+), 87 deletions(-)
+On 31/07/2025 21:50, Eric Biggers wrote:
+> Now that there are easy-to-use HMAC-SHA256 library functions, use these
+> in net/mptcp/crypto.c instead of open-coding the HMAC algorithm.
+> 
+> Remove the WARN_ON_ONCE() for messages longer than SHA256_DIGEST_SIZE.
+> The new implementation handles all message lengths correctly.
+> 
+> The mptcp-crypto KUnit test still passes after this change.
 
-diff --git a/include/keys/trusted_tpm.h b/include/keys/trusted_tpm.h
-index a088b33fd0e3b..0fadc6a4f1663 100644
---- a/include/keys/trusted_tpm.h
-+++ b/include/keys/trusted_tpm.h
-@@ -3,94 +3,15 @@
- #define __TRUSTED_TPM_H
- 
- #include <keys/trusted-type.h>
- #include <linux/tpm_command.h>
- 
--/* implementation specific TPM constants */
--#define TPM_SIZE_OFFSET			2
--#define TPM_RETURN_OFFSET		6
--#define TPM_DATA_OFFSET			10
--
--#define LOAD32(buffer, offset)	(ntohl(*(uint32_t *)&buffer[offset]))
--#define LOAD32N(buffer, offset)	(*(uint32_t *)&buffer[offset])
--#define LOAD16(buffer, offset)	(ntohs(*(uint16_t *)&buffer[offset]))
--
- extern struct trusted_key_ops trusted_key_tpm_ops;
- 
--struct osapsess {
--	uint32_t handle;
--	unsigned char secret[SHA1_DIGEST_SIZE];
--	unsigned char enonce[TPM_NONCE_SIZE];
--};
--
--/* discrete values, but have to store in uint16_t for TPM use */
--enum {
--	SEAL_keytype = 1,
--	SRK_keytype = 4
--};
--
--int TSS_authhmac(unsigned char *digest, const unsigned char *key,
--			unsigned int keylen, unsigned char *h1,
--			unsigned char *h2, unsigned int h3, ...);
--int TSS_checkhmac1(unsigned char *buffer,
--			  const uint32_t command,
--			  const unsigned char *ononce,
--			  const unsigned char *key,
--			  unsigned int keylen, ...);
--
--int trusted_tpm_send(unsigned char *cmd, size_t buflen);
--int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce);
--
- int tpm2_seal_trusted(struct tpm_chip *chip,
- 		      struct trusted_key_payload *payload,
- 		      struct trusted_key_options *options);
- int tpm2_unseal_trusted(struct tpm_chip *chip,
- 			struct trusted_key_payload *payload,
- 			struct trusted_key_options *options);
- 
--#define TPM_DEBUG 0
--
--#if TPM_DEBUG
--static inline void dump_options(struct trusted_key_options *o)
--{
--	pr_info("sealing key type %d\n", o->keytype);
--	pr_info("sealing key handle %0X\n", o->keyhandle);
--	pr_info("pcrlock %d\n", o->pcrlock);
--	pr_info("pcrinfo %d\n", o->pcrinfo_len);
--	print_hex_dump(KERN_INFO, "pcrinfo ", DUMP_PREFIX_NONE,
--		       16, 1, o->pcrinfo, o->pcrinfo_len, 0);
--}
--
--static inline void dump_sess(struct osapsess *s)
--{
--	print_hex_dump(KERN_INFO, "trusted-key: handle ", DUMP_PREFIX_NONE,
--		       16, 1, &s->handle, 4, 0);
--	pr_info("secret:\n");
--	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE,
--		       16, 1, &s->secret, SHA1_DIGEST_SIZE, 0);
--	pr_info("trusted-key: enonce:\n");
--	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE,
--		       16, 1, &s->enonce, SHA1_DIGEST_SIZE, 0);
--}
--
--static inline void dump_tpm_buf(unsigned char *buf)
--{
--	int len;
--
--	pr_info("\ntpm buffer\n");
--	len = LOAD32(buf, TPM_SIZE_OFFSET);
--	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE, 16, 1, buf, len, 0);
--}
--#else
--static inline void dump_options(struct trusted_key_options *o)
--{
--}
--
--static inline void dump_sess(struct osapsess *s)
--{
--}
--
--static inline void dump_tpm_buf(unsigned char *buf)
--{
--}
--#endif
- #endif
-diff --git a/security/keys/trusted-keys/trusted_tpm1.c b/security/keys/trusted-keys/trusted_tpm1.c
-index 126437459a74d..636acb66a4f69 100644
---- a/security/keys/trusted-keys/trusted_tpm1.c
-+++ b/security/keys/trusted-keys/trusted_tpm1.c
-@@ -22,10 +22,78 @@
- #include <keys/trusted_tpm.h>
- 
- static struct tpm_chip *chip;
- static struct tpm_digest *digests;
- 
-+/* implementation specific TPM constants */
-+#define TPM_SIZE_OFFSET			2
-+#define TPM_RETURN_OFFSET		6
-+#define TPM_DATA_OFFSET			10
-+
-+#define LOAD32(buffer, offset)	(ntohl(*(uint32_t *)&buffer[offset]))
-+#define LOAD32N(buffer, offset)	(*(uint32_t *)&buffer[offset])
-+#define LOAD16(buffer, offset)	(ntohs(*(uint16_t *)&buffer[offset]))
-+
-+struct osapsess {
-+	uint32_t handle;
-+	unsigned char secret[SHA1_DIGEST_SIZE];
-+	unsigned char enonce[TPM_NONCE_SIZE];
-+};
-+
-+/* discrete values, but have to store in uint16_t for TPM use */
-+enum {
-+	SEAL_keytype = 1,
-+	SRK_keytype = 4
-+};
-+
-+#define TPM_DEBUG 0
-+
-+#if TPM_DEBUG
-+static inline void dump_options(struct trusted_key_options *o)
-+{
-+	pr_info("sealing key type %d\n", o->keytype);
-+	pr_info("sealing key handle %0X\n", o->keyhandle);
-+	pr_info("pcrlock %d\n", o->pcrlock);
-+	pr_info("pcrinfo %d\n", o->pcrinfo_len);
-+	print_hex_dump(KERN_INFO, "pcrinfo ", DUMP_PREFIX_NONE,
-+		       16, 1, o->pcrinfo, o->pcrinfo_len, 0);
-+}
-+
-+static inline void dump_sess(struct osapsess *s)
-+{
-+	print_hex_dump(KERN_INFO, "trusted-key: handle ", DUMP_PREFIX_NONE,
-+		       16, 1, &s->handle, 4, 0);
-+	pr_info("secret:\n");
-+	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE,
-+		       16, 1, &s->secret, SHA1_DIGEST_SIZE, 0);
-+	pr_info("trusted-key: enonce:\n");
-+	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE,
-+		       16, 1, &s->enonce, SHA1_DIGEST_SIZE, 0);
-+}
-+
-+static inline void dump_tpm_buf(unsigned char *buf)
-+{
-+	int len;
-+
-+	pr_info("\ntpm buffer\n");
-+	len = LOAD32(buf, TPM_SIZE_OFFSET);
-+	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE, 16, 1, buf, len, 0);
-+}
-+#else
-+static inline void dump_options(struct trusted_key_options *o)
-+{
-+}
-+
-+static inline void dump_sess(struct osapsess *s)
-+{
-+}
-+
-+static inline void dump_tpm_buf(unsigned char *buf)
-+{
-+}
-+#endif
-+
- static int TSS_rawhmac(unsigned char *digest, const unsigned char *key,
- 		       unsigned int keylen, ...)
- {
- 	struct hmac_sha1_ctx hmac_ctx;
- 	va_list argp;
-@@ -54,11 +122,11 @@ static int TSS_rawhmac(unsigned char *digest, const unsigned char *key,
- }
- 
- /*
-  * calculate authorization info fields to send to TPM
-  */
--int TSS_authhmac(unsigned char *digest, const unsigned char *key,
-+static int TSS_authhmac(unsigned char *digest, const unsigned char *key,
- 			unsigned int keylen, unsigned char *h1,
- 			unsigned char *h2, unsigned int h3, ...)
- {
- 	unsigned char paramdigest[SHA1_DIGEST_SIZE];
- 	struct sha1_ctx sha_ctx;
-@@ -92,16 +160,15 @@ int TSS_authhmac(unsigned char *digest, const unsigned char *key,
- 		ret = TSS_rawhmac(digest, key, keylen, SHA1_DIGEST_SIZE,
- 				  paramdigest, TPM_NONCE_SIZE, h1,
- 				  TPM_NONCE_SIZE, h2, 1, &c, 0, 0);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(TSS_authhmac);
- 
- /*
-  * verify the AUTH1_COMMAND (Seal) result from TPM
-  */
--int TSS_checkhmac1(unsigned char *buffer,
-+static int TSS_checkhmac1(unsigned char *buffer,
- 			  const uint32_t command,
- 			  const unsigned char *ononce,
- 			  const unsigned char *key,
- 			  unsigned int keylen, ...)
- {
-@@ -157,11 +224,10 @@ int TSS_checkhmac1(unsigned char *buffer,
- 
- 	if (crypto_memneq(testhmac, authdata, SHA1_DIGEST_SIZE))
- 		return -EINVAL;
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(TSS_checkhmac1);
- 
- /*
-  * verify the AUTH2_COMMAND (unseal) result from TPM
-  */
- static int TSS_checkhmac2(unsigned char *buffer,
-@@ -242,11 +308,11 @@ static int TSS_checkhmac2(unsigned char *buffer,
- 
- /*
-  * For key specific tpm requests, we will generate and send our
-  * own TPM command packets using the drivers send function.
-  */
--int trusted_tpm_send(unsigned char *cmd, size_t buflen)
-+static int trusted_tpm_send(unsigned char *cmd, size_t buflen)
- {
- 	struct tpm_buf buf;
- 	int rc;
- 
- 	if (!chip)
-@@ -268,11 +334,10 @@ int trusted_tpm_send(unsigned char *cmd, size_t buflen)
- 		rc = -EPERM;
- 
- 	tpm_put_ops(chip);
- 	return rc;
- }
--EXPORT_SYMBOL_GPL(trusted_tpm_send);
- 
- /*
-  * Lock a trusted key, by extending a selected PCR.
-  *
-  * Prevents a trusted key that is sealed to PCRs from being accessed.
-@@ -322,11 +387,11 @@ static int osap(struct tpm_buf *tb, struct osapsess *s,
- }
- 
- /*
-  * Create an object independent authorisation protocol (oiap) session
-  */
--int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
-+static int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
- {
- 	int ret;
- 
- 	if (!chip)
- 		return -ENODEV;
-@@ -339,11 +404,10 @@ int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
- 	*handle = LOAD32(tb->data, TPM_DATA_OFFSET);
- 	memcpy(nonce, &tb->data[TPM_DATA_OFFSET + sizeof(uint32_t)],
- 	       TPM_NONCE_SIZE);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(oiap);
- 
- struct tpm_digests {
- 	unsigned char encauth[SHA1_DIGEST_SIZE];
- 	unsigned char pubauth[SHA1_DIGEST_SIZE];
- 	unsigned char xorwork[SHA1_DIGEST_SIZE * 2];
+Thank you for this patch! It is a good idea, and it looks good to me!
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+One small detail: net-next is currently closed [1], and I don't think
+this patch can be applied in -net. So except if you plan to take it in
+the libcrypto tree for 6.17 -- but that's probably strange -- what I can
+do is to apply it in the MPTCP tree, and send it to net-next later on.
+Is this OK for you?
+
+[1] https://patchwork.hopto.org/net-next.html
+
+Cheers,
+Matt
+--
+pw-bot: defer
 -- 
-2.50.1
+Sponsored by the NGI0 Core fund.
 
