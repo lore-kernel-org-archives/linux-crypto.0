@@ -1,452 +1,394 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF7A22DA08;
-	Fri,  1 Aug 2025 04:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7B01FF1B2;
+	Fri,  1 Aug 2025 07:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754023027; cv=none; b=bPOox4IWBgs4WeexgCmy2O8Cz4O9WVsz86hmym3+bT7mXcqzNIngABPoqmHUxD/Q2EQx9MStTKteTZfAAiI9Kwoxu4MM+ltEtP6He/fCNd4ZVLwpTHyMMuWGxYPfK5rReVcvrl4wT44c+KRjge4e0+190+YxgpBveO7hljptn2w=
+	t=1754035107; cv=none; b=sS80QqH69KyrP30lG2FfCZI50JoTupyK3GbYmZnLgXYikNqfZksr2OxhfYFP0WAMvYfGH6HnYykmhMxrZxadV8o/C3kUTGMGEw8HUeJ3qXjX+G6q8EU1EtmscFVvhhpYPPCvgW6u2Bvx414zZW2P8XKJmP4MJceCfq+liiIoVCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754023027; c=relaxed/simple;
-	bh=g5Ej89LMPS7m5JDnhI4NSrMWhFLn48yRW8zCEEpUZGg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NG1IYbk5rB8Yb+/UAU+gd2H0jc3/m7pRa53x923o/5XKbb6luXuQgkLpNcRifKNmBQtBJVkreYvnBH9sxdgf9M2QKjU0y0LnQeltrNauxRKVMGZHQx4nCSqx/azHgSiAlcY2ZJp9LxVqJJ323cFSNzV8Aeqh3bViAvp6EIrAWqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cxp/nmsA; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cxp/nmsA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754023024; x=1785559024;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=g5Ej89LMPS7m5JDnhI4NSrMWhFLn48yRW8zCEEpUZGg=;
-  b=cxp/nmsAZGHdPhUZtHPRR8hQMb50zksESm1jXBz6hLnVD7C6F0QMWRyW
-   +oJ3ZNoFi788bDkx4NE9JSbaWKi2wND/U9AGRrbyO8UE1CTgzoSVUmEM9
-   SsW0qSX1GXkvhWiUsJ5Msh20TItyVhBcLir33s+0Fnjkubn//XRAcFuvA
-   rRmKoP09lvkWnEOdYY152QJ5aXtC9K8iMIKxCfSbAroBym45pxN5og0fl
-   09jeciuLXvJeJkaxMZ+LSChC9KMgfl7boCO+S/E3sr/SL0XFutDw1QzuT
-   mcPn1Wdk/nfZJHDeDKf1Hw3MnhzvDd8Oi+/jFi3byS/i+J7brW95HnBgM
-   Q==;
-X-CSE-ConnectionGUID: CBEB15mNQyqJa/wJ7L59cg==
-X-CSE-MsgGUID: WdG1zi4lSHeoPCay6JM3zA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="73820458"
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="73820458"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 21:36:48 -0700
-X-CSE-ConnectionGUID: bmW99LcuTd2pRzTWlY8jEg==
-X-CSE-MsgGUID: XoctdswHTkqdKO8xNSQp8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="163796321"
-Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by orviesa008.jf.intel.com with ESMTP; 31 Jul 2025 21:36:47 -0700
-From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-To: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	yosry.ahmed@linux.dev,
-	nphamcs@gmail.com,
-	chengming.zhou@linux.dev,
-	usamaarif642@gmail.com,
-	ryan.roberts@arm.com,
-	21cnbao@gmail.com,
-	ying.huang@linux.alibaba.com,
-	akpm@linux-foundation.org,
-	senozhatsky@chromium.org,
-	linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	clabbe@baylibre.com,
-	ardb@kernel.org,
-	ebiggers@google.com,
-	surenb@google.com,
-	kristen.c.accardi@intel.com,
-	vinicius.gomes@intel.com
-Cc: wajdi.k.feghali@intel.com,
-	vinodh.gopal@intel.com,
-	kanchana.p.sridhar@intel.com
-Subject: [PATCH v11 24/24] mm: zswap: Batched zswap_compress() with compress batching of large folios.
-Date: Thu, 31 Jul 2025 21:36:42 -0700
-Message-Id: <20250801043642.8103-25-kanchana.p.sridhar@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
+	s=arc-20240116; t=1754035107; c=relaxed/simple;
+	bh=ZCy8pSmM9TPNowjW2Huv532OJdcjJ5aOKs6gy8emOSY=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=eHfJJzFm/H2K75wKRyepGWWJzN4WT+PuNpW92mhq26B3hosqBi8UALx0Ids83DZ6+tDMAsD33RLkKd/HtPJzXZdYNLFiBGudlkT3EdwD4qj8bWISdKYe/tDSuab46m04dehQMrVLcTfbTXayAFcqukLimXMyDmBe7OWrAdkblIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4btdXx71Lrz1R7j7;
+	Fri,  1 Aug 2025 15:55:29 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 80E5414027A;
+	Fri,  1 Aug 2025 15:58:14 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 1 Aug 2025 15:58:13 +0800
+Subject: Re: [PATCH v6 3/3] migration: adapt to new migration configuration
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linuxarm@openeuler.org"
+	<linuxarm@openeuler.org>
+References: <20250717011502.16050-1-liulongfang@huawei.com>
+ <20250717011502.16050-4-liulongfang@huawei.com>
+ <7f0d6c18a299436d85e10ed41e72e59d@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <93822be8-b1c1-e7bf-4adc-0bcd716d4a5e@huawei.com>
+Date: Fri, 1 Aug 2025 15:58:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <7f0d6c18a299436d85e10ed41e72e59d@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-This patch introduces a new unified implementation of zswap_compress()
-for compressors that do and do not support batching. This eliminates
-code duplication and facilitates maintainability of the code with the
-introduction of compress batching.
+On 2025/7/28 15:26, Shameerali Kolothum Thodi wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Thursday, July 17, 2025 2:15 AM
+>> To: alex.williamson@redhat.com; jgg@nvidia.com;
+>> herbert@gondor.apana.org.au; Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>
+>> Cc: linux-crypto@vger.kernel.org; kvm@vger.kernel.org; linux-
+>> kernel@vger.kernel.org; linuxarm@openeuler.org; liulongfang
+>> <liulongfang@huawei.com>
+>> Subject: [PATCH v6 3/3] migration: adapt to new migration configuration
+>>
+>> On new platforms greater than QM_HW_V3, the migration region has been
+>> relocated from the VF to the PF. The driver must also be modified
+>> accordingly to adapt to the new hardware device.
+>>
+>> Utilize the PF's I/O base directly on the new hardware platform,
+>> and no mmap operation is required. If it is on an old platform,
+>> the driver needs to be compatible with the old solution.
+> 
+> I think it's good to clarify here how the new hardware platform will
+> continue to work with the existing driver. From our off-list discussions,
+> my understanding is that the QM_HW_V4 hardware is backward compatible
+> and will function identically to QM_HW_V3 as long as the PF is not
+> configured to enable the migration region, as introduced in patch #2.
+> This backward compatibility is the reason we are not preventing migration
+> from older kernels to the new one.
+>
 
-The vectorized implementation of calling the earlier zswap_compress()
-sequentially, one page at a time in zswap_store_pages(), is replaced
-with this new version of zswap_compress() that accepts multiple pages to
-compress as a batch.
+On the older hardware platform QM_HW_V3, the live migration configuration region
+is placed in the latter 32K portion of the VF's BAR2 configuration space. On the
+new hardware platform QM_HW_V4, the live migration configuration region also
+exists in the same 32K area immediately following the VF's BAR2, just like on
+QM_HW_V3. However, access to this region is now controlled by hardware.
+Additionally, a copy of the live migration configuration region is present in
+the PF's BAR2 configuration space. On the new hardware platform QM_HW_V4, when
+an older version of the driver is loaded, it behaves like QM_HW_V3 and uses the
+configuration region in the VF, ensuring that the live migration function continues
+to work normally. When the new version of the driver is loaded, it directly uses the
+configuration region in the PF. Meanwhile, hardware configuration disables the live
+migration configuration region in the VF's BAR2: reads return all 0xF values, and
+writes are silently ignored.
 
-If the compressor does not support batching, each page in the batch is
-compressed and stored sequentially.
+I will add this description in the next version.
 
-If the compressor supports batching, for e.g., 'deflate-iaa', the Intel
-IAA hardware accelerator, the batch is compressed in parallel in
-hardware by setting the acomp_ctx->req->kernel_data to contain the
-necessary batching data before calling crypto_acomp_compress(). If all
-requests in the batch are compressed without errors, the compressed
-buffers are then stored in zpool.
+Thanks.
+Longfang.
 
-Another important change this patch makes is with the acomp_ctx mutex
-locking in zswap_compress(). Earlier, the mutex was held per page's
-compression. With the new code, [un]locking the mutex per page caused
-regressions for software compressors when testing with usemem
-(30 processes) and also kernel compilation with 'allmod' config. The
-regressions were more eggregious when PMD folios were stored. The
-implementation in this commit locks/unlocks the mutex once per batch,
-that resolves the regression.
-
-The use of prefetchw() for zswap entries and likely()/unlikely()
-annotations prevent regressions with software compressors like zstd, and
-generally improve non-batching compressors' performance with the
-batching code by ~3%.
-
-Architectural considerations for the zswap batching framework:
-==============================================================
-We have designed the zswap batching framework to be
-hardware-agnostic. It has no dependencies on Intel-specific features and
-can be leveraged by any hardware accelerator or software-based
-compressor. In other words, the framework is open and inclusive by
-design.
-
-Other ongoing work that can use batching:
-=========================================
-This patch-series demonstrates the performance benefits of compress
-batching when used in zswap_store() of large folios. shrink_folio_list()
-"reclaim batching" of any-order folios is the major next work that uses
-the zswap compress batching framework: our testing of kernel_compilation
-with writeback and the zswap shrinker indicates 10X fewer pages get
-written back when we reclaim 32 folios as a batch, as compared to one
-folio at a time: this is with deflate-iaa and with zstd. We expect to
-submit a patch-series with this data and the resulting performance
-improvements shortly. Reclaim batching relieves memory pressure faster
-than reclaiming one folio at a time, hence alleviates the need to scan
-slab memory for writeback.
-
-Nhat has given ideas on using batching with the ongoing kcompressd work,
-as well as beneficially using decompression batching & block IO batching
-to improve zswap writeback efficiency.
-
-Experiments that combine zswap compress batching, reclaim batching,
-swapin_readahead() decompression batching of prefetched pages, and
-writeback batching show that 0 pages are written back with deflate-iaa
-and zstd. For comparison, the baselines for these compressors see
-200K-800K pages written to disk (kernel compilation 'allmod' config).
-
-To summarize, these are future clients of the batching framework:
-
-   - shrink_folio_list() reclaim batching of multiple folios:
-       Implemented, will submit patch-series.
-   - zswap writeback with decompress batching:
-       Implemented, will submit patch-series.
-   - zram:
-       Implemented, will submit patch-series.
-   - kcompressd:
-       Not yet implemented.
-   - file systems:
-       Not yet implemented.
-   - swapin_readahead() decompression batching of prefetched pages:
-       Implemented, will submit patch-series.
-
-Additionally, any place we have folios that need to be compressed, can
-potentially be parallelized.
-
-Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
----
- mm/swap.h  |  23 ++++++
- mm/zswap.c | 201 ++++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 168 insertions(+), 56 deletions(-)
-
-diff --git a/mm/swap.h b/mm/swap.h
-index 911ad5ff0f89f..2afbf00f59fea 100644
---- a/mm/swap.h
-+++ b/mm/swap.h
-@@ -11,6 +11,29 @@ extern int page_cluster;
- #include <linux/swapops.h> /* for swp_offset */
- #include <linux/blk_types.h> /* for bio_end_io_t */
- 
-+/* linux/mm/zswap.c */
-+/*
-+ * A compression algorithm that wants to batch compressions/decompressions
-+ * must define its own internal data structures that exactly mirror
-+ * @struct swap_batch_comp_data and @struct swap_batch_decomp_data.
-+ */
-+struct swap_batch_comp_data {
-+	struct page **pages;
-+	u8 **dsts;
-+	unsigned int *dlens;
-+	int *errors;
-+	u8 nr_comps;
-+};
-+
-+struct swap_batch_decomp_data {
-+	u8 **srcs;
-+	struct page **pages;
-+	unsigned int *slens;
-+	unsigned int *dlens;
-+	int *errors;
-+	u8 nr_decomps;
-+};
-+
- /* linux/mm/page_io.c */
- int sio_pool_init(void);
- struct swap_iocb;
-diff --git a/mm/zswap.c b/mm/zswap.c
-index 8ca69c3f30df2..c30c1f325f573 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -35,6 +35,7 @@
- #include <linux/pagemap.h>
- #include <linux/workqueue.h>
- #include <linux/list_lru.h>
-+#include <linux/prefetch.h>
- 
- #include "swap.h"
- #include "internal.h"
-@@ -988,71 +989,163 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
- 	return ret;
- }
- 
--static bool zswap_compress(struct page *page, struct zswap_entry *entry,
--			   struct zswap_pool *pool)
-+/*
-+ * Unified code path for compressors that do and do not support batching. This
-+ * procedure will compress multiple @nr_pages in @folio starting from the
-+ * @start index.
-+ *
-+ * It is assumed that @nr_pages <= ZSWAP_MAX_BATCH_SIZE. zswap_store() makes
-+ * sure of this by design.
-+ *
-+ * @nr_pages can be in (1, ZSWAP_MAX_BATCH_SIZE] even if the compressor does not
-+ * support batching.
-+ *
-+ * If @pool->compr_batch_size is 1, each page is processed sequentially.
-+ *
-+ * If @pool->compr_batch_size is > 1, compression batching is invoked, except if
-+ * @nr_pages is 1: if so, we call the fully synchronous non-batching
-+ * crypto_acomp API.
-+ *
-+ * In both cases, if all compressions are successful, the compressed buffers
-+ * are stored in zpool.
-+ *
-+ * A few important changes made to not regress and in fact improve
-+ * compression performance with non-batching software compressors, using this
-+ * new/batching code:
-+ *
-+ * 1) acomp_ctx mutex locking:
-+ *    Earlier, the mutex was held per page compression. With the new code,
-+ *    [un]locking the mutex per page caused regressions for software
-+ *    compressors. We now lock the mutex once per batch, which resolves the
-+ *    regression.
-+ *
-+ * 2) The prefetchw() and likely()/unlikely() annotations prevent
-+ *    regressions with software compressors like zstd, and generally improve
-+ *    non-batching compressors' performance with the batching code by ~3%.
-+ */
-+static bool zswap_compress(struct folio *folio, long start, unsigned int nr_pages,
-+			   struct zswap_entry *entries[], struct zswap_pool *pool,
-+			   int node_id)
- {
- 	struct crypto_acomp_ctx *acomp_ctx;
- 	struct scatterlist input, output;
--	int comp_ret = 0, alloc_ret = 0;
--	unsigned int dlen = PAGE_SIZE;
--	unsigned long handle;
--	struct zpool *zpool;
-+	struct zpool *zpool = pool->zpool;
-+
-+	unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
-+	int errors[ZSWAP_MAX_BATCH_SIZE];
-+
-+	unsigned int nr_comps = min(nr_pages, pool->compr_batch_size);
-+	unsigned int i, j;
-+	int err;
- 	gfp_t gfp;
--	u8 *dst;
-+
-+	gfp = GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM | __GFP_MOVABLE;
- 
- 	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
- 
- 	mutex_lock(&acomp_ctx->mutex);
- 
--	dst = acomp_ctx->buffers[0];
--	sg_init_table(&input, 1);
--	sg_set_page(&input, page, PAGE_SIZE, 0);
--
- 	/*
--	 * We need PAGE_SIZE * 2 here since there maybe over-compression case,
--	 * and hardware-accelerators may won't check the dst buffer size, so
--	 * giving the dst buffer with enough length to avoid buffer overflow.
-+	 * Note:
-+	 * [i] refers to the incoming batch space and is used to
-+	 *     index into the folio pages, @entries and @errors.
- 	 */
--	sg_init_one(&output, dst, PAGE_SIZE * 2);
--	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
-+	for (i = 0; i < nr_pages; i += nr_comps) {
-+		if (nr_comps == 1) {
-+			sg_init_table(&input, 1);
-+			sg_set_page(&input, folio_page(folio, start + i), PAGE_SIZE, 0);
- 
--	/*
--	 * it maybe looks a little bit silly that we send an asynchronous request,
--	 * then wait for its completion synchronously. This makes the process look
--	 * synchronous in fact.
--	 * Theoretically, acomp supports users send multiple acomp requests in one
--	 * acomp instance, then get those requests done simultaneously. but in this
--	 * case, zswap actually does store and load page by page, there is no
--	 * existing method to send the second page before the first page is done
--	 * in one thread doing zwap.
--	 * but in different threads running on different cpu, we have different
--	 * acomp instance, so multiple threads can do (de)compression in parallel.
--	 */
--	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
--	dlen = acomp_ctx->req->dlen;
--	if (comp_ret)
--		goto unlock;
-+			/*
-+			 * We need PAGE_SIZE * 2 here since there maybe over-compression case,
-+			 * and hardware-accelerators may won't check the dst buffer size, so
-+			 * giving the dst buffer with enough length to avoid buffer overflow.
-+			 */
-+			sg_init_one(&output, acomp_ctx->buffers[0], PAGE_SIZE * 2);
-+			acomp_request_set_params(acomp_ctx->req, &input,
-+						 &output, PAGE_SIZE, PAGE_SIZE);
-+
-+			errors[i] = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req),
-+						    &acomp_ctx->wait);
-+			if (unlikely(errors[i]))
-+				goto compress_error;
-+
-+			dlens[i] = acomp_ctx->req->dlen;
-+		} else {
-+			struct page *pages[ZSWAP_MAX_BATCH_SIZE];
-+			unsigned int k;
-+
-+			for (k = 0; k < nr_pages; ++k)
-+				pages[k] = folio_page(folio, start + k);
-+
-+			struct swap_batch_comp_data batch_comp_data = {
-+				.pages = pages,
-+				.dsts = acomp_ctx->buffers,
-+				.dlens = dlens,
-+				.errors = errors,
-+				.nr_comps = nr_pages,
-+			};
-+
-+			acomp_ctx->req->kernel_data = &batch_comp_data;
-+
-+			if (unlikely(crypto_acomp_compress(acomp_ctx->req)))
-+				goto compress_error;
-+		}
- 
--	zpool = pool->zpool;
--	gfp = GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM | __GFP_MOVABLE;
--	alloc_ret = zpool_malloc(zpool, dlen, gfp, &handle, page_to_nid(page));
--	if (alloc_ret)
--		goto unlock;
--
--	zpool_obj_write(zpool, handle, dst, dlen);
--	entry->handle = handle;
--	entry->length = dlen;
--
--unlock:
--	if (comp_ret == -ENOSPC || alloc_ret == -ENOSPC)
--		zswap_reject_compress_poor++;
--	else if (comp_ret)
--		zswap_reject_compress_fail++;
--	else if (alloc_ret)
--		zswap_reject_alloc_fail++;
-+		/*
-+		 * All @nr_comps pages were successfully compressed.
-+		 * Store the pages in zpool.
-+		 *
-+		 * Note:
-+		 * [j] refers to the incoming batch space and is used to
-+		 *     index into the folio pages, @entries, @dlens and @errors.
-+		 * [k] refers to the @acomp_ctx space, as determined by
-+		 *     @pool->compr_batch_size, and is used to index into
-+		 *     @acomp_ctx->buffers.
-+		 */
-+		for (j = i; j < i + nr_comps; ++j) {
-+			unsigned int k = j - i;
-+			unsigned long handle;
-+
-+			/*
-+			 * prefetchw() minimizes cache-miss latency by
-+			 * moving the zswap entry to the cache before it
-+			 * is written to; reducing sys time by ~1.5% for
-+			 * non-batching software compressors.
-+			 */
-+			prefetchw(entries[j]);
-+			err = zpool_malloc(zpool, dlens[j], gfp, &handle, node_id);
-+
-+			if (unlikely(err)) {
-+				if (err == -ENOSPC)
-+					zswap_reject_compress_poor++;
-+				else
-+					zswap_reject_alloc_fail++;
-+
-+				goto err_unlock;
-+			}
-+
-+			zpool_obj_write(zpool, handle, acomp_ctx->buffers[k], dlens[j]);
-+			entries[j]->handle = handle;
-+			entries[j]->length = dlens[j];
-+		}
-+	} /* finished compress and store nr_pages. */
- 
- 	mutex_unlock(&acomp_ctx->mutex);
--	return comp_ret == 0 && alloc_ret == 0;
-+	return true;
-+
-+compress_error:
-+	for (j = i; j < i + nr_comps; ++j) {
-+		if (errors[j]) {
-+			if (errors[j] == -ENOSPC)
-+				zswap_reject_compress_poor++;
-+			else
-+				zswap_reject_compress_fail++;
-+		}
-+	}
-+
-+err_unlock:
-+	mutex_unlock(&acomp_ctx->mutex);
-+	return false;
- }
- 
- static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
-@@ -1590,12 +1683,8 @@ static bool zswap_store_pages(struct folio *folio,
- 		INIT_LIST_HEAD(&entries[i]->lru);
- 	}
- 
--	for (i = 0; i < nr_pages; ++i) {
--		struct page *page = folio_page(folio, start + i);
--
--		if (!zswap_compress(page, entries[i], pool))
--			goto store_pages_failed;
--	}
-+	if (unlikely(!zswap_compress(folio, start, nr_pages, entries, pool, node_id)))
-+		goto store_pages_failed;
- 
- 	for (i = 0; i < nr_pages; ++i) {
- 		struct zswap_entry *old, *entry = entries[i];
--- 
-2.27.0
-
+> With that in place:
+> 
+> Reviewed-by: Shameer Kolothum shameerali.kolothum.thodi@huawei.com
+> 
+> Thanks,
+> Shameer
+> 
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 164 ++++++++++++------
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>>  2 files changed, 118 insertions(+), 53 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 515ff87f9ed9..bf4a7468bca0 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64
+>> *addr)
+>>  	return 0;
+>>  }
+>>
+>> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> +			   struct acc_vf_data *vf_data)
+>> +{
+>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>> +	struct device *dev = &qm->pdev->dev;
+>> +	u32 eqc_addr, aeqc_addr;
+>> +	int ret;
+>> +
+>> +	if (qm->ver == QM_HW_V3) {
+>> +		eqc_addr = QM_EQC_DW0;
+>> +		aeqc_addr = QM_AEQC_DW0;
+>> +	} else {
+>> +		eqc_addr = QM_EQC_PF_DW0;
+>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>> +	}
+>> +
+>> +	/* QM_EQC_DW has 7 regs */
+>> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* QM_AEQC_DW has 7 regs */
+>> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> +			   struct acc_vf_data *vf_data)
+>> +{
+>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>> +	struct device *dev = &qm->pdev->dev;
+>> +	u32 eqc_addr, aeqc_addr;
+>> +	int ret;
+>> +
+>> +	if (qm->ver == QM_HW_V3) {
+>> +		eqc_addr = QM_EQC_DW0;
+>> +		aeqc_addr = QM_AEQC_DW0;
+>> +	} else {
+>> +		eqc_addr = QM_EQC_PF_DW0;
+>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>> +	}
+>> +
+>> +	/* QM_EQC_DW has 7 regs */
+>> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* QM_AEQC_DW has 7 regs */
+>> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>>  {
+>>  	struct device *dev = &qm->pdev->dev;
+>> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct
+>> acc_vf_data *vf_data)
+>>  		return ret;
+>>  	}
+>>
+>> -	/* QM_EQC_DW has 7 regs */
+>> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>> -	/* QM_AEQC_DW has 7 regs */
+>> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+>> 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>>  	return 0;
+>>  }
+>>
+>> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct
+>> acc_vf_data *vf_data)
+>>  		return ret;
+>>  	}
+>>
+>> -	/* QM_EQC_DW has 7 regs */
+>> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>> -	/* QM_AEQC_DW has 7 regs */
+>> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw,
+>> 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>>  	return 0;
+>>  }
+>>
+>> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  		return ret;
+>>  	}
+>>
+>> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>>  	if (ret) {
+>>  		dev_err(dev, "set sqc failed\n");
+>> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	vf_data->vf_qm_state = QM_READY;
+>>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>>
+>> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>>  	if (ret)
+>>  		return ret;
+>> @@ -1186,34 +1232,45 @@ static int hisi_acc_vf_qm_init(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev)
+>>  {
+>>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>>  	struct pci_dev *vf_dev = vdev->pdev;
+>>
+>> -	/*
+>> -	 * ACC VF dev BAR2 region consists of both functional register space
+>> -	 * and migration control register space. For migration to work, we
+>> -	 * need access to both. Hence, we map the entire BAR2 region here.
+>> -	 * But unnecessarily exposing the migration BAR region to the Guest
+>> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+>> -	 * we restrict access to the migration control space from
+>> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+>> -	 *
+>> -	 * Please note that it is OK to expose the entire VF BAR if migration
+>> -	 * is not supported or required as this cannot affect the ACC PF
+>> -	 * configurations.
+>> -	 *
+>> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+>> -	 * HiSilicon hardware platforms are integrated end point devices
+>> -	 * and the platform lacks the capability to perform any PCIe P2P
+>> -	 * between these devices.
+>> -	 */
+>> -
+>> -	vf_qm->io_base =
+>> -		ioremap(pci_resource_start(vf_dev,
+>> VFIO_PCI_BAR2_REGION_INDEX),
+>> -			pci_resource_len(vf_dev,
+>> VFIO_PCI_BAR2_REGION_INDEX));
+>> -	if (!vf_qm->io_base)
+>> -		return -EIO;
+>> +	if (pf_qm->ver == QM_HW_V3) {
+>> +		/*
+>> +		 * ACC VF dev BAR2 region consists of both functional
+>> register space
+>> +		 * and migration control register space. For migration to
+>> work, we
+>> +		 * need access to both. Hence, we map the entire BAR2
+>> region here.
+>> +		 * But unnecessarily exposing the migration BAR region to
+>> the Guest
+>> +		 * has the potential to prevent/corrupt the Guest migration.
+>> Hence,
+>> +		 * we restrict access to the migration control space from
+>> +		 * Guest(Please see mmap/ioctl/read/write override
+>> functions).
+>> +		 *
+>> +		 * Please note that it is OK to expose the entire VF BAR if
+>> migration
+>> +		 * is not supported or required as this cannot affect the ACC
+>> PF
+>> +		 * configurations.
+>> +		 *
+>> +		 * Also the HiSilicon ACC VF devices supported by this driver
+>> on
+>> +		 * HiSilicon hardware platforms are integrated end point
+>> devices
+>> +		 * and the platform lacks the capability to perform any PCIe
+>> P2P
+>> +		 * between these devices.
+>> +		 */
+>>
+>> +		vf_qm->io_base =
+>> +			ioremap(pci_resource_start(vf_dev,
+>> VFIO_PCI_BAR2_REGION_INDEX),
+>> +				pci_resource_len(vf_dev,
+>> VFIO_PCI_BAR2_REGION_INDEX));
+>> +		if (!vf_qm->io_base)
+>> +			return -EIO;
+>> +	} else {
+>> +		/*
+>> +		 * On hardware platforms greater than QM_HW_V3, the
+>> migration function
+>> +		 * register is placed in the BAR2 configuration region of the
+>> PF,
+>> +		 * and each VF device occupies 8KB of configuration space.
+>> +		 */
+>> +		vf_qm->io_base = pf_qm->io_base +
+>> QM_MIG_REGION_OFFSET +
+>> +				 hisi_acc_vdev->vf_id *
+>> QM_MIG_REGION_SIZE;
+>> +	}
+>>  	vf_qm->fun_type = QM_HW_VF;
+>> +	vf_qm->ver = pf_qm->ver;
+>>  	vf_qm->pdev = vf_dev;
+>>  	mutex_init(&vf_qm->mailbox_lock);
+>>
+>> @@ -1539,7 +1596,8 @@ static void hisi_acc_vfio_pci_close_device(struct
+>> vfio_device *core_vdev)
+>>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>  	hisi_acc_vdev->dev_opened = false;
+>> -	iounmap(vf_qm->io_base);
+>> +	if (vf_qm->ver == QM_HW_V3)
+>> +		iounmap(vf_qm->io_base);
+>>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>  	vfio_pci_core_close_device(core_vdev);
+>>  }
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 91002ceeebc1..348f8bb5b42c 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -59,6 +59,13 @@
+>>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>>
+>> +#define QM_MIG_REGION_OFFSET		0x180000
+>> +#define QM_MIG_REGION_SIZE		0x2000
+>> +
+>> +#define QM_SUB_VERSION_ID		0x100210
+>> +#define QM_EQC_PF_DW0			0x1c00
+>> +#define QM_AEQC_PF_DW0			0x1c20
+>> +
+>>  struct acc_vf_data {
+>>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>>  	/* QM match information */
+>> --
+>> 2.24.0
+> 
+> .
+> 
