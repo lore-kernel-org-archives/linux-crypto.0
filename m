@@ -1,147 +1,98 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF808239E82;
-	Fri,  1 Aug 2025 11:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1757153598;
+	Fri,  1 Aug 2025 11:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754046836; cv=none; b=Uf1H+p3alu9yROMeB5ZbuccK8hEsmzCafHBvEq9uj1vjRNeRQFdMOUFfm6g8kz3WEpaAehcLtPLUnnZLqy4xmlJPKQX1+mKtSyzv+QGc8eK/auG561qyV6YKbi4kBNObavWfBk60+jX0J5rQJw5VCE4f9Jxn1XeI2CzXRU7wDTo=
+	t=1754048167; cv=none; b=HEdwSf1BlUNH9//Fu6wgT2vP6rBT09NXl3o30FjAjD2aX5S+RGiOhfP6mFsPN5Dx1t/l1ocDRKWoj1h+Ls21v2YKRityUNlgofM3+tZMoTUGXyb8uzMcLqHoaAVmT7Z+CLbHcCHiwWfVpZyg7nTRfLJSen/vNsN93nJ7wQhq24Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754046836; c=relaxed/simple;
-	bh=I1NEtaBSLXjt4L5r/ip7ZdHNXrCDf2F9jSdM65XNUdc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mprmr7GpEu8BIrfFPZkZ9aB/ms62lfIHsvTxuO5P1+DeloIbOemov5t8TYCHIR3kRXZzagR9JNLSo0kOd4fLr1E98OWmmjJP8I2vxqw+ZD87+F8L/31t4atD9YXQZl5uxSgInvDEnt4J3TJ9I7u3NQmSa3Esoxjl+1GS7XZQBHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTHuNHaB; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1754048167; c=relaxed/simple;
+	bh=RzOp+Cgdi84+OkyH84IiDbQFTpRjJQue6u/n1F/JBxM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=G90yeFMDFdwX7SQ2Bexf7cfLWaJz/P0G4btLF7VymD7NS5UY21YHr9aZCZNexzQ0XGoSbor/CqTTYaGIehnLGW4pv3vSKH7kDHAW2TPCF++Z3F/Z/apI0V1vj1BoNxfEs9NtwHCsEYmPElpFUH3e0V7OtZheDuU8gIGEdxToGoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=QF2I5S88; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTHuNHaB"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b3bdab4bf19so1599276a12.2;
-        Fri, 01 Aug 2025 04:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754046834; x=1754651634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D2pJWIW2ffJA6mnDRFk1GyVzqLmZytM15VpbVSAxTPo=;
-        b=JTHuNHaB4ynIYbMGybJb0RGd1ZAYNEd0cye//5VhRoWTHwiBP/nlvs3yuOT/bAX5WC
-         NygUGTwxX4rBwImtRV/FMZW3E3TUhcnQFyHZJ5MKZ3skPCxvJyXlI5In3ToE02b7yuAF
-         7Cwy6AjSni3S+LRRLdTjG29Yiy0PWmcKxvApBbTi3v4FEC7+8iuRf35lJHpZgsRD+tgk
-         cGWgwg1g4SE3lGrJxR50fW8pHs706O49njTT9PoMVTLeG5XTEILu8PjnHVle2HwniiiF
-         LgMbIYu0aIVIBW/lqW6zpweKZM+AG29DoOviR6v24d6sU7LybPyfjCVwMnfCmmB1t5/9
-         ykWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754046834; x=1754651634;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D2pJWIW2ffJA6mnDRFk1GyVzqLmZytM15VpbVSAxTPo=;
-        b=qe7fnsM8y7HEHBuC6/EJwWy0Pi7NRTe8y3nniHMRHigd0azzI4yaKuIXuf+BmmNyDP
-         /XLQRNz7sO4rvcHxtqzOKpEdPQCX1QFUgTN3FAW6XdlcamYhqGE8yYmspDn3dUi4lNPY
-         +Bt3OnQk3DJ7Og0R9ahkmcbTmgU2t/M1NDB87UIkM5Swhq7ndPjs5JpS243RPMhc6Fis
-         hPCp+vPTXArawgpb5E6ifw1/VGlaNtYfcJ9gdlOxepIdCAArazyVqeGrbEVYyPNAdaFT
-         PpbtSZGTHXziXpDbtNIuOQ9AeTlPJ+9O2mbWa6GUPj1nfw+JAWbNcsmiP4o1JxVM8Csf
-         L6VA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPXNUNnjpBmw1KABSQXAmdm/qHmP9gPh3dbFIAQ1a/BkeAzbnpgM15f+vm1g6BVK/A9JxQFg7E6ZXia6ja@vger.kernel.org, AJvYcCWeANkSnyc3KGoPXH+3e/88OP2NWu0CSn0sC/tHcp2NSZz0bsAssMP1NrFWHN125yM/Iv2fQpQayDPeCoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfkoqo+aR6RWwbk17PvRoB2oHNyQ3Aqz2IPlHWJZP9uYfDW1MB
-	XBwBqGuCvGwFOa2mhp8/Wo7SAuXrV2yDHWDz0v3H9ja0LZ2KcaLLrFv1T9dLRI9MAdjjEg==
-X-Gm-Gg: ASbGncvTl1w5lLOLEn/tevLqbiGIpUQjad2QAEpxCEC3xwKZbnQodTwR2XnRxK7bHFu
-	1BCDBzwwECnc1fywogNMsrvHeNUE9+rPEXbEt2+/UTcns31R94Xl2LoXzivS4cTCpychWfoWhIe
-	KfP1NdwznntEA2pRsyPtDTTDxaBmszxbY/FZ1+XH8Ee3JD5l041fG+zjEdkVeaRTh+Nlm4QA7TK
-	eDRzC6Lk25pShd6N4cydeoe2KhRuy04sWPzB6C+cm7kh9SVZEg7JY8Q3LzBdVB30l5hC+g5WfB0
-	inYJSE0ivEUGeMdst3ayB4XcIvFHzi+qNv+9HOqaufutiCMnXohMZY/zeyBmMukyBjUrbHhwjNA
-	XnXNBoHoPdp5We/kkOg0Rb8MbtLgko1fUhY/YvHluTNRx7X5h
-X-Google-Smtp-Source: AGHT+IE6ke9mTSfy66z+INYMD++cBNLZ1ztgTYwduR+cIIG6VHegxybaCmAYJwJMFxrWLY7jKwYDMA==
-X-Received: by 2002:a17:903:3bcb:b0:240:b28:22a3 with SMTP id d9443c01a7336-24096ae5760mr186428355ad.29.1754046834059;
-        Fri, 01 Aug 2025 04:13:54 -0700 (PDT)
-Received: from localhost.localdomain ([2401:4900:1c80:a6e0:3232:35a4:62e3:6fd8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8ab3d9dsm40649845ad.182.2025.08.01.04.13.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 04:13:53 -0700 (PDT)
-From: darshanrathod475@gmail.com
-To: herbert@gondor.apana.org.au
-Cc: davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Darshan Rathod <darshanrathod475@gmail.com>
-Subject: [PATCH] crypto: padlock: fix assignment in if condition and minor style issues
-Date: Fri,  1 Aug 2025 16:43:45 +0530
-Message-Id: <20250801111345.1849656-1-darshanrathod475@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="QF2I5S88"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1754048163;
+	bh=RzOp+Cgdi84+OkyH84IiDbQFTpRjJQue6u/n1F/JBxM=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=QF2I5S88OB2pf/NHaUThhhIDLZKKOhmTYkOl99EV+63KuUZGxxruptVPxqp90RYmg
+	 JtNXfWaZlwENH9k7ZiioH16VxJtvo/qfwle36EIZVPTEqPQsIQx6fGLpm76IHGflGn
+	 PazOe3wHhRqfcHb4MYnYdFLx76cHzLna9W9JRL9o=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 4C17A1C0360;
+	Fri, 01 Aug 2025 07:36:03 -0400 (EDT)
+Message-ID: <ca85bbe8a3235102707da3b24dba07a8649c3771.camel@HansenPartnership.com>
+Subject: Re: [PATCH 1/2] tpm: Compare HMAC values in constant time
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	linux-integrity@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Date: Fri, 01 Aug 2025 07:36:02 -0400
+In-Reply-To: <20250801030210.GA1495@sol>
+References: <20250731215255.113897-1-ebiggers@kernel.org>
+	 <20250731215255.113897-2-ebiggers@kernel.org>
+	 <3ed1ae7e7f52afe53ce2ff00f362ed153b3eec20.camel@HansenPartnership.com>
+	 <20250801030210.GA1495@sol>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Darshan Rathod <darshanrathod475@gmail.com>
+On Thu, 2025-07-31 at 20:02 -0700, Eric Biggers wrote:
+> On Thu, Jul 31, 2025 at 10:28:49PM -0400, James Bottomley wrote:
+> > On Thu, 2025-07-31 at 14:52 -0700, Eric Biggers wrote:
+> > > To prevent timing attacks, HMAC value comparison needs to be
+> > > constant time.=C2=A0 Replace the memcmp() with the correct function,
+> > > crypto_memneq().
+> >=20
+> > Um, OK, I'm all for more security but how could there possibly be a
+> > timing attack in the hmac final comparison code?=C2=A0 All it's doing i=
+s
+> > seeing if the HMAC the TPM returns matches the calculated one.=C2=A0
+> > Beyond this calculation, there's nothing secret about the HMAC key.
+>=20
+> I'm not sure I understand your question.=C2=A0 Timing attacks on MAC
+> validation are a well-known issue that can allow a valid MAC to be
+> guessed without knowing the key.=C2=A0 Whether it's practical in this
+> particular case for some architecture+compiler+kconfig combination is
+> another question, but there's no reason not to use the constant-time
+> comparison function that solves this problem.
+>=20
+> Is your claim that in this case the key is public, so the MAC really
+> just serves as a checksum (and thus the wrong primitive is being
+> used)?
 
-Refactor to remove assignments from inside if conditions, as required
-by kernel coding style. This improves code readability and resolves
-checkpatch.pl warnings:
+The keys used for TPM HMAC calculations are all derived from a shared
+secret and updating parameters making them one time ones which are
+never reused, so there's no benefit to an attacker working out after
+the fact what the key was.
 
-   ERROR: do not use assignment in if condition
+Regards,
 
-While at it, also cleaned up minor style issues:
-- Removed extra whitespace in a multi-line comment.
-- Fixed parameter indentation in cbc_crypt_copy() for consistency.
-
-Signed-off-by: Darshan Rathod <darshanrathod475@gmail.com>
----
- drivers/crypto/padlock-aes.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index 1be549a07a21..f5db0442a422 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/* 
-+/*
-  * Cryptographic API.
-  *
-  * Support for VIA PadLock hardware crypto engine.
-@@ -77,8 +77,8 @@ static inline int
- aes_hw_extkey_available(uint8_t key_len)
- {
- 	/* TODO: We should check the actual CPU model/stepping
--	         as it's possible that the capability will be
--	         added in the next CPU revisions. */
-+		 as it's possible that the capability will be
-+		 added in the next CPU revisions. */
- 	if (key_len == 16)
- 		return 1;
- 	return 0;
-@@ -223,7 +223,7 @@ static void ecb_crypt_copy(const u8 *in, u8 *out, u32 *key,
- }
- 
- static u8 *cbc_crypt_copy(const u8 *in, u8 *out, u32 *key,
--			   u8 *iv, struct cword *cword, int count)
-+			  u8 *iv, struct cword *cword, int count)
- {
- 	/*
- 	 * Padlock prefetches extra data so we must provide mapped input buffers.
-@@ -493,13 +493,16 @@ static int __init padlock_init(void)
- 		return -ENODEV;
- 	}
- 
--	if ((ret = crypto_register_alg(&aes_alg)) != 0)
-+	ret = crypto_register_alg(&aes_alg);
-+	if (ret != 0)
- 		goto aes_err;
- 
--	if ((ret = crypto_register_skcipher(&ecb_aes_alg)) != 0)
-+	ret = crypto_register_skcipher(&ecb_aes_alg);
-+	if (ret != 0)
- 		goto ecb_aes_err;
- 
--	if ((ret = crypto_register_skcipher(&cbc_aes_alg)) != 0)
-+	ret = crypto_register_skcipher(&cbc_aes_alg);
-+	if (ret != 0)
- 		goto cbc_aes_err;
- 
- 	printk(KERN_NOTICE PFX "Using VIA PadLock ACE for AES algorithm.\n");
--- 
-2.25.1
+James
 
