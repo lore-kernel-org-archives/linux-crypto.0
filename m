@@ -1,46 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B2D28DF3C;
-	Fri,  1 Aug 2025 21:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09E1B644;
+	Fri,  1 Aug 2025 23:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754083579; cv=none; b=lBdbFUgn+tUgUZ3/zAyvccwUlfVd8UTT54v/HZf2p8ru4GBGhAf28BvzSLcAXzERz7fyVzDej4L6yYEruU7nshPhELhO6awlJChYLjII7tfF3YbQAk443+NNkQu4nWG6/mE1ylVHdMF3yx8XEdhcUcS2IJgwpQAVtfSmfQfm3Qs=
+	t=1754092566; cv=none; b=q8T+wnY4IAu/xqrcEcFjx5zQkxoXgMJMwmUdQ+EQSQ9lPX6bL5rWcSpmJJsyYyOMZ4ueApOOdvvdb4DdxmaEWZi/AB8XVq8k1DBJwKU+9LxR5cPwoHm55S3oiIBt85Fjmv8yipoxOa1TQMEo+UnKz9rJJa6xAkIRjDAOSmTAMCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754083579; c=relaxed/simple;
-	bh=FGVWbDM46/kQ8Qx86FzpGFJNytKs5fhu9qmULAUtmiQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W18jL0dSB63GQi3teQhnAHh0qZc++w3J9R0dtHq1gyOL/DjXRZej6cIRZPYnmoNnru9PTslNrgClwzojfFHSkfRb3Tqpiil6EcvoDMlRFl4qnAXOyeul0R7za/E0OY2BNYkMhM7cqSdl+djZJ9Vi+btQ5f2b6pK7KZ69g2vPpg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aAA04uNB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754092566; c=relaxed/simple;
+	bh=dbaFLzCG/5EkHTeHj907dORnHsrShX2dlh1BlaIdXok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPOPklhs/VYV/G4HNrxDaEuBr4cM+10WmaUV1rGeLkrfVKQUqe49GttbjAtYtMTpT3a1dtCgZiQnFuK5AbOZFFJhu+KPSeo4E48RrZE6D5OrzYUeyNINzvTvdZez8hrW9g7Ce8reHf1N8qNJESibDYYWrpUW60iFUcLIMWh3CCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8a1t5NY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAA04uNB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D63FC4CEF4;
-	Fri,  1 Aug 2025 21:26:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8a1t5NY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D4A3C4CEE7;
+	Fri,  1 Aug 2025 23:56:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754083579;
-	bh=FGVWbDM46/kQ8Qx86FzpGFJNytKs5fhu9qmULAUtmiQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aAA04uNBey7sQ0XVGfzni3JsLFmCU0J4cfoODJINtsNA3YWURaImVWIMY1e7CsUb8
-	 UKZ/T5u1Y5RpvmPrXZiFnB8R0tt0G4phorQA1agypLhu5jgd8VguxCI0I1azwnHNaW
-	 REdG7WHhCiCxcjMEohqThx9bwi/q4+e8/y/kuRLgr79nzqyM+ONV7BqmLaFbv5OVm+
-	 X8lAOAt967SAo19FDHsHvorKul1GFpz8FZJ8ROshDtJj/J1SkKgDJMtRU16jBiCfY4
-	 OdhG70vKt6RH40DNYiA9+8h1N8JHR2cylp5omzzSnM87VKt4hxioRLfkhWrTxl6CUf
-	 ixM+4ODKVf5Rg==
+	s=k20201202; t=1754092566;
+	bh=dbaFLzCG/5EkHTeHj907dORnHsrShX2dlh1BlaIdXok=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p8a1t5NYG6c2K+OI6nAVg88FYPTy/1li6BCKUEzy4rRRTpg8B/6Y3zLka/U7RjFgy
+	 PKKbeziwCQJh3gPrHoWMyrlM/WixH/isi29k61/aNlTAuS+zMdqawoZhNaacTq4FsH
+	 NqKEF81yw2JuzXpKrB3R6Pu1MVawZmdyYyRMpTP7TEDeCp9n77VwvyWi2Tvzsk+xXT
+	 LLfYahxLDKgyGxeV3uPf9NrBt7sscnMCw9wZeWboYTaNA622HT+d5qc5Rr7p46AtVh
+	 Emvs0Ir8MuMTUPxCuIgCmsBwfCasaCsiPbzIzKbyslliw7+6Abto6e6tEp0F0Rbmx1
+	 DwCTYmtLjSOKQ==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	linux-integrity@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	linux-crypto@vger.kernel.org,
+To: Jens Wiklander <jens.wiklander@linaro.org>,
+	Sumit Garg <sumit.garg@kernel.org>,
+	op-tee@lists.trustedfirmware.org
+Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 2/2] tpm: Use HMAC-SHA256 library instead of open-coded HMAC
-Date: Fri,  1 Aug 2025 14:24:22 -0700
-Message-ID: <20250801212422.9590-3-ebiggers@kernel.org>
+Subject: [PATCH] tee: Use SHA-1 library instead of crypto_shash
+Date: Fri,  1 Aug 2025 16:55:41 -0700
+Message-ID: <20250801235541.14050-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250801212422.9590-1-ebiggers@kernel.org>
-References: <20250801212422.9590-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,200 +44,151 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that there are easy-to-use HMAC-SHA256 library functions, use these
-in tpm2-sessions.c instead of open-coding the HMAC algorithm.
+Use the SHA-1 library functions instead of crypto_shash.  This is
+simpler and faster.
 
-Note that the new implementation correctly handles keys longer than 64
-bytes (SHA256_BLOCK_SIZE), whereas the old implementation handled such
-keys incorrectly.  But it doesn't appear that such keys were being used.
+Change uuid_v5() to return void, since it can no longer fail.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/char/tpm/tpm2-sessions.c | 98 +++++++++-----------------------
- 1 file changed, 27 insertions(+), 71 deletions(-)
 
-diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-index 5fbd62ee50903..6d03c224e6b21 100644
---- a/drivers/char/tpm/tpm2-sessions.c
-+++ b/drivers/char/tpm/tpm2-sessions.c
-@@ -67,12 +67,11 @@
- #include <linux/random.h>
- #include <linux/scatterlist.h>
- #include <linux/unaligned.h>
- #include <crypto/kpp.h>
- #include <crypto/ecdh.h>
+Note: this patch depends on the SHA-1 library functions that were merged
+in v6.17-rc1.
+
+ drivers/tee/Kconfig    |  3 +--
+ drivers/tee/tee_core.c | 55 +++++++-----------------------------------
+ 2 files changed, 10 insertions(+), 48 deletions(-)
+
+diff --git a/drivers/tee/Kconfig b/drivers/tee/Kconfig
+index 61b507c187801..a84767940fbfc 100644
+--- a/drivers/tee/Kconfig
++++ b/drivers/tee/Kconfig
+@@ -1,12 +1,11 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ # Generic Trusted Execution Environment Configuration
+ menuconfig TEE
+ 	tristate "Trusted Execution Environment support"
+ 	depends on HAVE_ARM_SMCCC || COMPILE_TEST || CPU_SUP_AMD
+-	select CRYPTO
+-	select CRYPTO_SHA1
++	select CRYPTO_LIB_SHA1
+ 	select DMA_SHARED_BUFFER
+ 	select GENERIC_ALLOCATOR
+ 	help
+ 	  This implements a generic interface towards a Trusted Execution
+ 	  Environment (TEE).
+diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+index acc7998758ad8..d079aeee0690a 100644
+--- a/drivers/tee/tee_core.c
++++ b/drivers/tee/tee_core.c
+@@ -12,11 +12,10 @@
+ #include <linux/module.h>
+ #include <linux/overflow.h>
+ #include <linux/slab.h>
+ #include <linux/tee_core.h>
+ #include <linux/uaccess.h>
 -#include <crypto/hash.h>
--#include <crypto/hmac.h>
-+#include <crypto/sha2.h>
- #include <crypto/utils.h>
+ #include <crypto/sha1.h>
+ #include "tee_private.h"
  
- /* maximum number of names the TPM must remember for authorization */
- #define AUTH_MAX_NAMES	3
+ #define TEE_NUM_DEVICES	32
  
-@@ -383,55 +382,10 @@ EXPORT_SYMBOL_GPL(tpm_buf_append_hmac_session);
- #ifdef CONFIG_TCG_TPM2_HMAC
- 
- static int tpm2_create_primary(struct tpm_chip *chip, u32 hierarchy,
- 			       u32 *handle, u8 *name);
- 
--/*
-- * It turns out the crypto hmac(sha256) is hard for us to consume
-- * because it assumes a fixed key and the TPM seems to change the key
-- * on every operation, so we weld the hmac init and final functions in
-- * here to give it the same usage characteristics as a regular hash
-- */
--static void tpm2_hmac_init(struct sha256_ctx *sctx, u8 *key, u32 key_len)
--{
--	u8 pad[SHA256_BLOCK_SIZE];
--	int i;
--
--	sha256_init(sctx);
--	for (i = 0; i < sizeof(pad); i++) {
--		if (i < key_len)
--			pad[i] = key[i];
--		else
--			pad[i] = 0;
--		pad[i] ^= HMAC_IPAD_VALUE;
--	}
--	sha256_update(sctx, pad, sizeof(pad));
--}
--
--static void tpm2_hmac_final(struct sha256_ctx *sctx, u8 *key, u32 key_len,
--			    u8 *out)
--{
--	u8 pad[SHA256_BLOCK_SIZE];
--	int i;
--
--	for (i = 0; i < sizeof(pad); i++) {
--		if (i < key_len)
--			pad[i] = key[i];
--		else
--			pad[i] = 0;
--		pad[i] ^= HMAC_OPAD_VALUE;
--	}
--
--	/* collect the final hash;  use out as temporary storage */
--	sha256_final(sctx, out);
--
--	sha256_init(sctx);
--	sha256_update(sctx, pad, sizeof(pad));
--	sha256_update(sctx, out, SHA256_DIGEST_SIZE);
--	sha256_final(sctx, out);
--}
--
- /*
-  * assume hash sha256 and nonces u, v of size SHA256_DIGEST_SIZE but
-  * otherwise standard tpm2_KDFa.  Note output is in bytes not bits.
+@@ -140,72 +139,36 @@ static int tee_release(struct inode *inode, struct file *filp)
+  * UUIDv5 is specific in RFC 4122.
+  *
+  * This implements section (for SHA-1):
+  * 4.3.  Algorithm for Creating a Name-Based UUID
   */
- static void tpm2_KDFa(u8 *key, u32 key_len, const char *label, u8 *u,
-@@ -439,20 +393,20 @@ static void tpm2_KDFa(u8 *key, u32 key_len, const char *label, u8 *u,
+-static int uuid_v5(uuid_t *uuid, const uuid_t *ns, const void *name,
+-		   size_t size)
++static void uuid_v5(uuid_t *uuid, const uuid_t *ns, const void *name,
++		    size_t size)
  {
- 	u32 counter = 1;
- 	const __be32 bits = cpu_to_be32(bytes * 8);
+ 	unsigned char hash[SHA1_DIGEST_SIZE];
+-	struct crypto_shash *shash = NULL;
+-	struct shash_desc *desc = NULL;
+-	int rc;
+-
+-	shash = crypto_alloc_shash("sha1", 0, 0);
+-	if (IS_ERR(shash)) {
+-		rc = PTR_ERR(shash);
+-		pr_err("shash(sha1) allocation failed\n");
+-		return rc;
+-	}
+-
+-	desc = kzalloc(sizeof(*desc) + crypto_shash_descsize(shash),
+-		       GFP_KERNEL);
+-	if (!desc) {
+-		rc = -ENOMEM;
+-		goto out_free_shash;
+-	}
+-
+-	desc->tfm = shash;
++	struct sha1_ctx ctx;
  
- 	while (bytes > 0) {
--		struct sha256_ctx sctx;
-+		struct hmac_sha256_ctx hctx;
- 		__be32 c = cpu_to_be32(counter);
+-	rc = crypto_shash_init(desc);
+-	if (rc < 0)
+-		goto out_free_desc;
+-
+-	rc = crypto_shash_update(desc, (const u8 *)ns, sizeof(*ns));
+-	if (rc < 0)
+-		goto out_free_desc;
+-
+-	rc = crypto_shash_update(desc, (const u8 *)name, size);
+-	if (rc < 0)
+-		goto out_free_desc;
+-
+-	rc = crypto_shash_final(desc, hash);
+-	if (rc < 0)
+-		goto out_free_desc;
++	sha1_init(&ctx);
++	sha1_update(&ctx, (const u8 *)ns, sizeof(*ns));
++	sha1_update(&ctx, (const u8 *)name, size);
++	sha1_final(&ctx, hash);
  
--		tpm2_hmac_init(&sctx, key, key_len);
--		sha256_update(&sctx, (u8 *)&c, sizeof(c));
--		sha256_update(&sctx, label, strlen(label)+1);
--		sha256_update(&sctx, u, SHA256_DIGEST_SIZE);
--		sha256_update(&sctx, v, SHA256_DIGEST_SIZE);
--		sha256_update(&sctx, (u8 *)&bits, sizeof(bits));
--		tpm2_hmac_final(&sctx, key, key_len, out);
-+		hmac_sha256_init_usingrawkey(&hctx, key, key_len);
-+		hmac_sha256_update(&hctx, (u8 *)&c, sizeof(c));
-+		hmac_sha256_update(&hctx, label, strlen(label) + 1);
-+		hmac_sha256_update(&hctx, u, SHA256_DIGEST_SIZE);
-+		hmac_sha256_update(&hctx, v, SHA256_DIGEST_SIZE);
-+		hmac_sha256_update(&hctx, (u8 *)&bits, sizeof(bits));
-+		hmac_sha256_final(&hctx, out);
+ 	memcpy(uuid->b, hash, UUID_SIZE);
  
- 		bytes -= SHA256_DIGEST_SIZE;
- 		counter++;
- 		out += SHA256_DIGEST_SIZE;
- 	}
-@@ -592,10 +546,11 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
- 	off_t offset_s = TPM_HEADER_SIZE, offset_p;
- 	u8 *hmac = NULL;
- 	u32 attrs;
- 	u8 cphash[SHA256_DIGEST_SIZE];
- 	struct sha256_ctx sctx;
-+	struct hmac_sha256_ctx hctx;
- 
- 	if (!auth)
- 		return;
- 
- 	/* save the command code in BE format */
-@@ -703,18 +658,18 @@ void tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
- 		sha256_update(&sctx, &buf->data[offset_s],
- 			      tpm_buf_length(buf) - offset_s);
- 	sha256_final(&sctx, cphash);
- 
- 	/* now calculate the hmac */
--	tpm2_hmac_init(&sctx, auth->session_key, sizeof(auth->session_key)
--		       + auth->passphrase_len);
--	sha256_update(&sctx, cphash, sizeof(cphash));
--	sha256_update(&sctx, auth->our_nonce, sizeof(auth->our_nonce));
--	sha256_update(&sctx, auth->tpm_nonce, sizeof(auth->tpm_nonce));
--	sha256_update(&sctx, &auth->attrs, 1);
--	tpm2_hmac_final(&sctx, auth->session_key, sizeof(auth->session_key)
--			+ auth->passphrase_len, hmac);
-+	hmac_sha256_init_usingrawkey(&hctx, auth->session_key,
-+				     sizeof(auth->session_key) +
-+					     auth->passphrase_len);
-+	hmac_sha256_update(&hctx, cphash, sizeof(cphash));
-+	hmac_sha256_update(&hctx, auth->our_nonce, sizeof(auth->our_nonce));
-+	hmac_sha256_update(&hctx, auth->tpm_nonce, sizeof(auth->tpm_nonce));
-+	hmac_sha256_update(&hctx, &auth->attrs, 1);
-+	hmac_sha256_final(&hctx, hmac);
+ 	/* Tag for version 5 */
+ 	uuid->b[6] = (hash[6] & 0x0F) | 0x50;
+ 	uuid->b[8] = (hash[8] & 0x3F) | 0x80;
+-
+-out_free_desc:
+-	kfree(desc);
+-
+-out_free_shash:
+-	crypto_free_shash(shash);
+-	return rc;
  }
- EXPORT_SYMBOL(tpm_buf_fill_hmac_session);
  
- /**
-  * tpm_buf_check_hmac_response() - check the TPM return HMAC for correctness
-@@ -750,10 +705,11 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
- 	struct tpm2_auth *auth = chip->auth;
- 	off_t offset_s, offset_p;
- 	u8 rphash[SHA256_DIGEST_SIZE];
- 	u32 attrs, cc;
- 	struct sha256_ctx sctx;
-+	struct hmac_sha256_ctx hctx;
- 	u16 tag = be16_to_cpu(head->tag);
- 	int parm_len, len, i, handles;
+ int tee_session_calc_client_uuid(uuid_t *uuid, u32 connection_method,
+ 				 const u8 connection_data[TEE_IOCTL_UUID_LEN])
+ {
+ 	gid_t ns_grp = (gid_t)-1;
+ 	kgid_t grp = INVALID_GID;
+ 	char *name = NULL;
+ 	int name_len;
+-	int rc;
++	int rc = 0;
  
- 	if (!auth)
- 		return rc;
-@@ -819,19 +775,19 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
- 	sha256_update(&sctx, (u8 *)&auth->ordinal, sizeof(auth->ordinal));
- 	sha256_update(&sctx, &buf->data[offset_p], parm_len);
- 	sha256_final(&sctx, rphash);
- 
- 	/* now calculate the hmac */
--	tpm2_hmac_init(&sctx, auth->session_key, sizeof(auth->session_key)
--		       + auth->passphrase_len);
--	sha256_update(&sctx, rphash, sizeof(rphash));
--	sha256_update(&sctx, auth->tpm_nonce, sizeof(auth->tpm_nonce));
--	sha256_update(&sctx, auth->our_nonce, sizeof(auth->our_nonce));
--	sha256_update(&sctx, &auth->attrs, 1);
-+	hmac_sha256_init_usingrawkey(&hctx, auth->session_key,
-+				     sizeof(auth->session_key) +
-+					     auth->passphrase_len);
-+	hmac_sha256_update(&hctx, rphash, sizeof(rphash));
-+	hmac_sha256_update(&hctx, auth->tpm_nonce, sizeof(auth->tpm_nonce));
-+	hmac_sha256_update(&hctx, auth->our_nonce, sizeof(auth->our_nonce));
-+	hmac_sha256_update(&hctx, &auth->attrs, 1);
- 	/* we're done with the rphash, so put our idea of the hmac there */
--	tpm2_hmac_final(&sctx, auth->session_key, sizeof(auth->session_key)
--			+ auth->passphrase_len, rphash);
-+	hmac_sha256_final(&hctx, rphash);
- 	if (crypto_memneq(rphash, &buf->data[offset_s], SHA256_DIGEST_SIZE)) {
- 		dev_err(&chip->dev, "TPM: HMAC check failed\n");
- 		goto out;
+ 	if (connection_method == TEE_IOCTL_LOGIN_PUBLIC ||
+ 	    connection_method == TEE_IOCTL_LOGIN_REE_KERNEL) {
+ 		/* Nil UUID to be passed to TEE environment */
+ 		uuid_copy(uuid, &uuid_null);
+@@ -258,11 +221,11 @@ int tee_session_calc_client_uuid(uuid_t *uuid, u32 connection_method,
+ 	default:
+ 		rc = -EINVAL;
+ 		goto out_free_name;
  	}
- 	rc = 0;
+ 
+-	rc = uuid_v5(uuid, &tee_client_uuid_ns, name, name_len);
++	uuid_v5(uuid, &tee_client_uuid_ns, name, name_len);
+ out_free_name:
+ 	kfree(name);
+ 
+ 	return rc;
+ }
+
+base-commit: 0905809b38bda1fa0b206986c44d846e46f13c1d
 -- 
 2.50.1
 
