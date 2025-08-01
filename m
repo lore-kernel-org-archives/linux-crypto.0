@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2049520C004;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436EA20D4FF;
 	Fri,  1 Aug 2025 04:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754023019; cv=none; b=MB0MnfhemFw3K/kE/elRL6gyhz/VqDZV+fGNHAMVJaKV63C17RjY9ifcInUA+KZG2EWJn5M8W0gnaErNEI0gfrLo3P/8eFgl4FgtABjXiiA+vNOpq79xjVQAhMMUddB1zA9GILcBiCBLOmTJGR5wvy+C/4RkVsn8g/6ed2Reu8I=
+	t=1754023019; cv=none; b=ZMISsl8GkSOychEeOz9KtoI3UzaPvr+rX5vLRxnsC/8o8QQoxcxJf+dP6J72f6CcpIzp+rhjpI/RYfDUZcqPayAfOpih1eSWlezVJisp7/Esq7j4R2S/TFejvu/PBQK6oMjj2RkYyPRYnetGOmhyv2wLl9wSJggtrc4hFxH2KoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754023019; c=relaxed/simple;
-	bh=Gx3K9nc7SbqS7yUYzPYGDFgIwtQFFxvIkExs4HbX0c8=;
+	bh=FnlvHyECT2St8FSdBB0bYZMpc5C8/71XEdNgjsZBPcA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=psinCIA4C0CECSlaJmIk3xdB4067LB6YEHlkDOzYMk6t2P2OTurui1Gv36ipvR22Hxz92pvJJtENUTXx5i1O1MVUpBktJc6HoN3tKXDGru1zKfwxcQDV4ndRKGZu6oX4Lkreijo93JNTWXPCDk0FpPrwtecRSUoWIXP5N/67MgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c3HzmmkU; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=OK84jL8tT0S7rEY/WYvmtkhfjtrJMIPA7wsfDIxAcn8JssqdvubiTdYjkFVjt3hGSdEUCrkg7PV+wjKwIMifn89JvTmXyJ26fjfI/c98vCRPGjvknORK70sleqUMLBpJCORXijLdVzy0aYMKcrSfMWap5r9UhbJIyqoyT3gTaPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZAQ/sEmB; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c3HzmmkU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZAQ/sEmB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1754023017; x=1785559017;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Gx3K9nc7SbqS7yUYzPYGDFgIwtQFFxvIkExs4HbX0c8=;
-  b=c3HzmmkU/Uy5QRe7kCTD6Mjjz473Tp5pL4Khwok+Vuw5XKPLGjJxVUX7
-   ptLhnCtdfijFT9DbewyTRtavi9WNbCxqYP4Y/HRcozb1hFQ58QWtlHslc
-   FFRxaSGh+8zRu0RIz6IP20G/3NlVFQ4sLLzGPNKvvwAIQCUejdfClrSNZ
-   fVBKgMkRX3b7yhHw+nwlGQiLrs7r7WMr3QLAG5JGUewl0KxWp7V/ndUd8
-   csqkh2ledytQ15/Ehyy7ksYCZs/GxMj6bUyWppOE9odLaxxVpWQVCJ/JK
-   udfypegLjkvm/h051G/W/3fu0bT3KAYSbTUlYAXcikFd9WHmqIJl0Rg7C
-   g==;
-X-CSE-ConnectionGUID: WInnkyTSQGqx/GzvFunTow==
-X-CSE-MsgGUID: omCITIyqS5On8sOCw8pzaw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="73820318"
+  bh=FnlvHyECT2St8FSdBB0bYZMpc5C8/71XEdNgjsZBPcA=;
+  b=ZAQ/sEmBRZeIjA9PeHZ7/7knB6dAiP/DQFIKruyBVNN2RQ1wS3bnSFwG
+   EKdRzwN3g17K7cR/gyaVNNFYlD1a2t/uiTPbQvhZdsdduSQ7ZdLpaEygm
+   u2WfLioXq74NHsVSzk7FY9TF6lQ4Itj+CanXoW48rtv/fjlu+Pn806BkT
+   HcOqvB9zi93ExJVJ24WzevB17L18AlvwaXT9BQeF4Q3Aoshuel8dn27JA
+   B/1p/33KtIP6BtQvsWGvXz+rXCQZjT/+Es+xEz+lR8E/OEiLM60K5MXsP
+   IGu2X5NFzfSNvSeVSqDYlZICxCKTmrsR52YSffmecpR3cGO403fWJ1w6v
+   w==;
+X-CSE-ConnectionGUID: bIsZNp5sQU+68G65y0z+Pw==
+X-CSE-MsgGUID: No4qvMK1TQ+ztsAQT/B3ng==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="73820332"
 X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="73820318"
+   d="scan'208";a="73820332"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 21:36:46 -0700
-X-CSE-ConnectionGUID: XWPtbTfHQgu+DgyqPU6tlg==
-X-CSE-MsgGUID: 11JsMHtRTsenZH6/gt4+cQ==
+X-CSE-ConnectionGUID: jHJ3MayyQP2+4e8ADCap6A==
+X-CSE-MsgGUID: gZpWz8pbQ1OwreRsJkAjyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="163796277"
+   d="scan'208";a="163796283"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
   by orviesa008.jf.intel.com with ESMTP; 31 Jul 2025 21:36:45 -0700
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -68,9 +68,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v11 14/24] crypto: iaa - Enable async mode and make it the default.
-Date: Thu, 31 Jul 2025 21:36:32 -0700
-Message-Id: <20250801043642.8103-15-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v11 15/24] crypto: iaa - Disable iaa_verify_compress by default.
+Date: Thu, 31 Jul 2025 21:36:33 -0700
+Message-Id: <20250801043642.8103-16-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
 References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
@@ -82,84 +82,55 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch enables the 'async' sync_mode in the driver. Further, it sets
-the default sync_mode to 'async', which makes it easier for IAA hardware
-acceleration in the iaa_crypto driver to be loaded by default in the most
-efficient/recommended 'async' mode for parallel
-compressions/decompressions, namely, asynchronous submission of
-descriptors, followed by polling for job completions. Earlier, the
-"sync" mode used to be the default.
+This patch makes it easier for IAA hardware acceleration in the iaa_crypto
+driver to be loaded by default with "iaa_verify_compress" disabled, to
+facilitate performance comparisons with software compressors (which also
+do not run compress verification by default). Earlier, iaa_crypto compress
+verification used to be enabled by default.
 
-The iaa_crypto driver documentation has been updated with these
-changes.
+The iaa_crypto driver documentation has been updated with this change.
 
-This way, anyone who wants to use IAA for zswap/zram can do so after
-building the kernel, and without having to go through these steps to use
-async mode:
+With this patch, if users want to enable compress verification, they can do
+so with these steps:
 
   1) disable all the IAA device/wq bindings that happen at boot time
   2) rmmod iaa_crypto
   3) modprobe iaa_crypto
-  4) echo async > /sys/bus/dsa/drivers/crypto/sync_mode
+  4) echo 1 > /sys/bus/dsa/drivers/crypto/verify_compress
   5) re-run initialization of the IAA devices and wqs
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- Documentation/driver-api/crypto/iaa/iaa-crypto.rst | 11 ++---------
- drivers/crypto/intel/iaa/iaa_crypto_main.c         |  4 ++--
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ Documentation/driver-api/crypto/iaa/iaa-crypto.rst | 2 +-
+ drivers/crypto/intel/iaa/iaa_crypto_main.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-index 1c4c25f0dc5e4..4c235bf769824 100644
+index 4c235bf769824..9d2f3f895bdd8 100644
 --- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
 +++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-@@ -272,7 +272,7 @@ The available attributes are:
-       echo async_irq > /sys/bus/dsa/drivers/crypto/sync_mode
+@@ -239,7 +239,7 @@ The available attributes are:
  
-     Async mode without interrupts (caller must poll) can be enabled by
--    writing 'async' to it (please see Caveat)::
-+    writing 'async' to it::
+       echo 0 > /sys/bus/dsa/drivers/crypto/verify_compress
  
-       echo async > /sys/bus/dsa/drivers/crypto/sync_mode
+-    The default setting is '1' - verify all compresses.
++    The default setting is '0' - to not verify compresses.
  
-@@ -281,14 +281,7 @@ The available attributes are:
- 
-       echo sync > /sys/bus/dsa/drivers/crypto/sync_mode
- 
--    The default mode is 'sync'.
--
--    Caveat: since the only mechanism that iaa_crypto currently implements
--    for async polling without interrupts is via the 'sync' mode as
--    described earlier, writing 'async' to
--    '/sys/bus/dsa/drivers/crypto/sync_mode' will internally enable the
--    'sync' mode. This is to ensure correct iaa_crypto behavior until true
--    async polling without interrupts is enabled in iaa_crypto.
-+    The default mode is 'async'.
- 
-   - g_comp_wqs_per_iaa
+   - sync_mode
  
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 19f87923e2466..7b5b202a8021a 100644
+index 7b5b202a8021a..1166077900522 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -152,7 +152,7 @@ static bool iaa_verify_compress = true;
-  */
+@@ -120,7 +120,7 @@ static bool iaa_distribute_decomps;
+ static bool iaa_distribute_comps = true;
  
- /* Use async mode */
--static bool async_mode;
-+static bool async_mode = true;
- /* Use interrupts */
- static bool use_irq;
+ /* Verify results of IAA compress or not */
+-static bool iaa_verify_compress = true;
++static bool iaa_verify_compress;
  
-@@ -206,7 +206,7 @@ static int set_iaa_sync_mode(const char *name)
- 		async_mode = false;
- 		use_irq = false;
- 	} else if (sysfs_streq(name, "async")) {
--		async_mode = false;
-+		async_mode = true;
- 		use_irq = false;
- 	} else if (sysfs_streq(name, "async_irq")) {
- 		async_mode = true;
+ /*
+  * The iaa crypto driver supports three 'sync' methods determining how
 -- 
 2.27.0
 
