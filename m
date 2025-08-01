@@ -1,39 +1,32 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m93179.xmail.ntesmail.com (mail-m93179.xmail.ntesmail.com [103.126.93.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B6421CFF6
-	for <linux-crypto@vger.kernel.org>; Thu, 31 Jul 2025 22:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB6A3398A;
+	Fri,  1 Aug 2025 01:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.126.93.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754001766; cv=none; b=Eq9Fyt0hyuz5T8j3QoDct7dh6QcA6MGhF4zzh69gQNNF8nZrg9LZWpcX2wNEKSxLzwrh386Zp4bGyeOIlyFLg5CMrkUdNLBovv6W78smUIjE2qa2/fsPqU/8kQ63frc7k739/NgQzmjBiH9HsrlFMqV4mfY3XhfuNIWFsaOrz20=
+	t=1754013481; cv=none; b=YgctYZTRgy3608eJBclwQs23mVTuMDl+4H1Cg9e9BAsP04cNf6LXFla/F6U5C9ldIr5slH2GfJtq4LNdcheXVFkqszHJOlPqmFqUrzN59c0cClDTeRfMGRn/zqtPWjRm1L/gOsY4z+mtI0EPcU5nHsechxQGqNy4lbzwCxP7m9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754001766; c=relaxed/simple;
-	bh=YtZsExNZ7skwTG/8FgKCjQfn5ajiDRGF++thUzSw4Dg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s3rNh1LQuaaP6zQcnCK5D3Ij6JUI6Rb4331LL9rrcfGFAjbLYdewrqwQBTBqNPcSLxfPs655wZWK/YYaNYsOx1xCAd08VWtKGKlzs4fQCvEwowwzgpb5+ku5fK59V4ENe2jjVLpkmIqLUtnFtrXi4tVlSDA7UmIGYIN3xg+fWEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oas7Djum; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oas7Djum"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA09C4CEEF;
-	Thu, 31 Jul 2025 22:42:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754001765;
-	bh=YtZsExNZ7skwTG/8FgKCjQfn5ajiDRGF++thUzSw4Dg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oas7DjumlHFPwzcRdjG9WtAHFMS4y+4+xmsQ/BwxVStQqQTwoRKAfe1o3biY82Qpg
-	 wgAw7tg3epvyWhEVWinNoIFTyuspf6C2OZylOzlzGEaif/0alc3F0ua+pZClMCoGAQ
-	 E4z9iTogVn6+N03GuoegeQ9LvkcQSS3CecCos3CnzpXbug0FqttTqlZmoFZHKU27z/
-	 5ptc/A9x2ZI9bamnzBuh/P+RQrVe1XFJsjlWZ7SwTZ4p3iO4fjKYEEFoG8T0uIWbBC
-	 6BkRG4x3MRKtxgv6XeIUcaFI5vbQpz/BPnlq12CeqKd8m8SoHvGY9hhEp9YO1bYA+/
-	 NqRFFdxRjFO5w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: sha: Update Kconfig help for SHA1 and SHA256
-Date: Thu, 31 Jul 2025 15:42:18 -0700
-Message-ID: <20250731224218.137947-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1754013481; c=relaxed/simple;
+	bh=UgPYaQwlWJc9Zen37DK75P/yQXewXknsnjFDmjKxJWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RxiGIy/A72FkKpbxhnQLRGsyKiczX4/1EmCspOy7z0NFVOtc7SIWjbeYzs3/4j9Li9rli01C/ByUpUXdIeie96cbGS4OWOMgDE7sszmaZtI7UM2dJQf5HR/nnKyyl8Z+suEiKoKJ8VDJwwpbS9OjdNaNyGGuz21/9Pf2hJpMgUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ustc.edu; spf=pass smtp.mailfrom=ustc.edu; arc=none smtp.client-ip=103.126.93.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ustc.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ustc.edu
+Received: from localhost (unknown [14.116.239.35])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 1dec532e3;
+	Fri, 1 Aug 2025 09:57:51 +0800 (GMT+08:00)
+From: Chunsheng Luo <luochunsheng@ustc.edu>
+To: olivia@selenic.com,
+	herbert@gondor.apana.org.au
+Cc: rubini@unipv.it,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Chunsheng Luo <luochunsheng@ustc.edu>
+Subject: [PATCH] hw_random: nomadik: add missing dependency on ARM_AMBA
+Date: Fri,  1 Aug 2025 09:57:49 +0800
+Message-ID: <20250801015749.20-1-luochunsheng@ustc.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,54 +34,46 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a986359932d03a2kunm2aeeb72939b53
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZHU8fVkJKSUpPT0IeQ0NIQ1YeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlKT1VKSk1VSUhCVUhOWVdZFhoPEhUdFFlBWUtVS1VLVUtZBg++
 
-Update the help text for CRYPTO_LIB_SHA1 and CRYPTO_LIB_SHA256 to
-reflect the addition of HMAC support, and to be consistent with
-CRYPTO_LIB_SHA512.
+Compiling without CONFIG_ARM_AMBA causes undefined reference errors:
+ ld: vmlinux.o: in function `nmk_rng_remove':
+ nomadik-rng.c:(.text+0x6f64917): undefined reference to `amba_release_regions'
+ ld: vmlinux.o: in function `nmk_rng_probe':
+ nomadik-rng.c:(.text+0x6f649ee): undefined reference to `amba_request_regions'
+ nomadik-rng.c:(.text+0x6f64aba): undefined reference to `amba_release_regions'
+ nomadik-rng.c:(.text+0x6f64ae0): undefined reference to `amba_release_regions'
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+The Nomadik RNG driver uses AMBA bus interfaces (amba_request_regions/amba_release_regions)
+which are only available when CONFIG_ARM_AMBA is enabled. The existing dependency
+on ARCH_NOMADIK implicitly selects ARM_AMBA, but when building with COMPILE_TEST
+on non-ARM platforms, this dependency breaks.
+
+Fix by explicitly adding dependency on ARM_AMBA to Kconfig, ensuring the driver
+only compiles when AMBA support is available.
+
+Signed-off-by: Chunsheng Luo <luochunsheng@ustc.edu>
 ---
- lib/crypto/Kconfig | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index c2b65b6a9bb6f..1e6b008f8fca4 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -138,12 +138,12 @@ config CRYPTO_LIB_CHACHA20POLY1305
- 	select CRYPTO_LIB_UTILS
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index c85827843447..09abd1acb99f 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -311,7 +311,7 @@ config HW_RANDOM_INGENIC_TRNG
  
- config CRYPTO_LIB_SHA1
- 	tristate
+ config HW_RANDOM_NOMADIK
+ 	tristate "ST-Ericsson Nomadik Random Number Generator support"
+-	depends on ARCH_NOMADIK || COMPILE_TEST
++	depends on ARM_AMBA && (ARCH_NOMADIK || COMPILE_TEST)
+ 	default HW_RANDOM
  	help
--	  The SHA-1 library functions.  Select this if your module uses any of
--	  the functions from <crypto/sha1.h>.
-+	  The SHA-1 and HMAC-SHA1 library functions.  Select this if your module
-+	  uses any of the functions from <crypto/sha1.h>.
- 
- config CRYPTO_LIB_SHA1_ARCH
- 	bool
- 	depends on CRYPTO_LIB_SHA1 && !UML
- 	default y if ARM
-@@ -155,13 +155,13 @@ config CRYPTO_LIB_SHA1_ARCH
- 	default y if X86_64
- 
- config CRYPTO_LIB_SHA256
- 	tristate
- 	help
--	  Enable the SHA-256 library interface. This interface may be fulfilled
--	  by either the generic implementation or an arch-specific one, if one
--	  is available and enabled.
-+	  The SHA-224, SHA-256, HMAC-SHA224, and HMAC-SHA256 library functions.
-+	  Select this if your module uses any of these functions from
-+	  <crypto/sha2.h>.
- 
- config CRYPTO_LIB_SHA256_ARCH
- 	bool
- 	depends on CRYPTO_LIB_SHA256 && !UML
- 	default y if ARM && !CPU_V7M
-
-base-commit: d6084bb815c453de27af8071a23163a711586a6c
+ 	  This driver provides kernel-side support for the Random Number
 -- 
-2.50.1
+2.43.0
 
