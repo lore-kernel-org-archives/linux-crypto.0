@@ -1,61 +1,63 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8712F14A4DB;
-	Sun,  3 Aug 2025 19:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45791DE8B5;
+	Sun,  3 Aug 2025 19:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754248265; cv=none; b=ojpXWlB+TkXkAxbmkgNwFgEIXGuvTuG+Lh9XjBbwcWZ9TlOsKK7SYe/1jqHWsp8oboE6cOXgi0J3+ylCFQV8IsQSqXQIX/mpHrwGD/VI4JIf1vprPQKbwIDSqNseH6gUAo2jWrow+an/SiG/RXvVyLADBC72NhmA+9TUZxUCDAQ=
+	t=1754248266; cv=none; b=l23t5src95ocrMbgb8akoa2/E1/yFEUDCm83aPmQjfgJGZoPGfeiGPumCqHdltugVRegk7bIOFnMyv3vAEcZYkJMHhOe5jyb5Z3IwjU0rsXPtNfhrn//XiWEXzDghCHQDrJLajT1+5gMXSikQcI//R7FVH2CUylb3z3XuPOJlcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754248265; c=relaxed/simple;
-	bh=9mZm4KHicNT9tn8BitXSK+UbAoZ+f+Nh02nlpXVqkn8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TTUjlYBcch2XA0LqfW6RiivIz9eMLp87KyT6/6STrGWFgNZoRwmYiXnlJtViqb+om7OeXQ4uhQ1l7Te9OPF/FGiLDBR8s0bTuVxaKpxDwQVh9OzCS3nxThDAEJHyM41G70gOEu0v6V9VdG+CpEUIgrDndu1y/95GHJYapORekA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLneQcWD; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1754248266; c=relaxed/simple;
+	bh=JhryCQPIHZMBHN4Dh3iGOODDbabwR0S+i4gukSM6ud0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iWL0ECy5WUyF7A7Dy0R6R1y4XpSD3HGqehJ6tYCu+H7LXR+icbET2PFpEAS9wGPi0LNSVBw23Dy69Q4TOhCMCchR9O+LmRJXSq7g/a3eDsdehGp6vCJQlSsxzhtovotB3jMVzNSBgGNlxopnGi/YPQeDniB/vXbZVtmvnFbjBpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKhFhjIm; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLneQcWD"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-451d41e1ad1so25803345e9.1;
-        Sun, 03 Aug 2025 12:11:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKhFhjIm"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b77b8750acso2313595f8f.0;
+        Sun, 03 Aug 2025 12:11:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754248262; x=1754853062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZGoofDL/+Drlf7goUQdD7nprWB1U8kykjfu61KEsJM=;
-        b=cLneQcWDOXADGLh/KMpRgoRfRG3zU+Nu4LrReqxeidapZdB9bgBB6lrINAcqtkCJwu
-         m+8DkVn0+lm1jS5x2FwSm5Cc68rHhXUrWd8ZQNZLK/Qb1j6FH+BfF/Gh4F+5zxH/Uidy
-         +1BrDrerhPva5CCHWBsZqfdDymvtF4/LNkGPuyxiXstiqhbMr79jHoHVDHcrPlXmV0TO
-         8aumXwBy1Or+Hm8JDIkdGx5y6tC07Zl7IngE7LswcM0wtmY5Bwgj4Ky57yaQEwxFHsIf
-         QqjFIfqx/2Zm3JTUm0f1jgZLpwQgTEMaqW96ipkbR8qtQA6hvbnH+ndtWoxj2wM8QXe4
-         uAzA==
+        d=gmail.com; s=20230601; t=1754248263; x=1754853063; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yzXOYoDcw0s4gQ4w74V4qvU2nwkX5U7En2+CKV1FmvU=;
+        b=EKhFhjImTQFy/j+toRRyW8x2T7oe7KVpsl9vLpJZ8uTgZa5VQKhDGetzkGzveAvtYn
+         qZtyj/gel3JYKYDsHeccID/F4Sln128RsBboc4PwpngcT8W7E81zce+e39GTMe8BJc3L
+         bSRZ9S2OrMpV3TR3K7UVU0oWqUZgSVpKc0vREPh745TOJMxDLmxKy3pUI2SbLzhbsJOh
+         UiH03SVlim5MD+LOG0Acrx0mb2qR58YVO7YPiSJuvB4+IrnLj8ivWVPYpe4OEagPDk5d
+         rD2iTpcOdF3YUS8vVcPoQkrr4E/D0f8VRasj0p6LiAbd5H9JtL6NVHJksbPurge8F9xZ
+         1Clw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754248262; x=1754853062;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DZGoofDL/+Drlf7goUQdD7nprWB1U8kykjfu61KEsJM=;
-        b=Qh09qieZZPDpo14CSayTqMZduGlkpgW2bGIxUmYRVx43jeBLRczuhvUFvobRJCX6QR
-         4H+3fnoC4uZLF67gHLwP+TXEB5Y5dbJJo/JUionAm0Z+3HoQ1EuxclReqVnE9+WPC/6P
-         d+Mi7SLM8nRo/HnGvBGP2U7r5a2ea8Mmq2H3X3WCWhYPDGaGaSlJUeu/i11kLmdAL+BM
-         +c3Ve6E7yxsKD3IwMtrWBsseRv6e+7mBl3gTdyJplixffebMDpndhp7723buxuuFLYQK
-         cmstV9XkDT7v7nJXzJqLKZZYvwFlScWaj7vunyFa8Do+qiYjGmgr2TAEqJAXRcaV54Lo
-         Njeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUX2r9zI3RN9Lild6iXwht5RTdxOonz/5CwrsJTvv/HkNZR1YZc6K0KCeHE9MeY+L9oFTZlCd2mfhd7yyew@vger.kernel.org, AJvYcCVqe2yED0ISA9Daj1B5dkBRBwyZxnnHUd/UaTlTTz0EhBzGypltXd/09nucR95P4aR5/olR3iGdttH4OwA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH2MjbiTeImkDftbdlXoqcJ1D8bBMMLRWs/5njlcf5hEiWkAuO
-	rkQ5Isirpa1vs+UJUsDMD2hEzdoLFxjd9+l5HKGgi4tR/vG8wkS+JGsK
-X-Gm-Gg: ASbGncutMTj3tQ3ufGhRNQRatqwHBdn+t30WfboJl9hMMULLrEaCAHpn2+70ooXxmUp
-	e3zqyCw3GmzUpDUMh2o097U78KthMHKpnwdmtwuwMOvXLWzOzd3ema22XBh5vbgB6g4BYbiKuRl
-	XlBEB0ghALpoHqc42q2/+BC5I1BNKprzCnPAcIhrRDOnK755WNq3hQrttf2Kp+6uQrOC6nDlBTQ
-	HO28YkIWu1SMXovQPjRzBbLbW65ir2OdglRF1kgZJz5Ot0lvSicMvSXR6qjEJMTOMuvLndaQHLo
-	eVLkXbSP9/YMd/G/SDiyeN3lzsg4xv4gldK8Q+OtpNUsZ6ieqS9k1bkOINkg82DRSijDAKZe/gH
-	vkx1HKLJsv5R57KyT58g3hm8MeD5Sk2clQqon8huwP0+3
-X-Google-Smtp-Source: AGHT+IGgUWvSHp1oHsFPRY5vogFzYlPyb+X50JGskmXxHEZQ3UsSNv66GsiHuM+9cfxnrA490qRp1w==
-X-Received: by 2002:a05:600c:4703:b0:456:1560:7c5f with SMTP id 5b1f17b1804b1-458b69dd754mr58643285e9.14.1754248261562;
-        Sun, 03 Aug 2025 12:11:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754248263; x=1754853063;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yzXOYoDcw0s4gQ4w74V4qvU2nwkX5U7En2+CKV1FmvU=;
+        b=ol2PnyN3NLGu8LGAew9VVmuv2gutSp+uoko1DHkIbsTr8cH4unF5CsZQ2lRU6cECXf
+         7qmiMNNQziAKTGLVSM4hExv5b5lxUN9wl1OBCgrI1aFzaeku26jvAaTOVN4f85SfTADf
+         weNzQK/kQGIS6iRvCeO6rk7txgHUIhQiNKMoenkV4MuE2q8ObXHNCL+5SYBRcGHFFN9/
+         HfySOUCdS5t3HV+jWfn6VHF1oKbPZqaUd6m80d+oQxJziXPPoPNmW5ivxwoLvV0Xd7dF
+         QUpwqWmL5cDNUK9AZ0lc6OnyW6sl5v+S0vVjBzK32hPkUADkQ0vAQRyyRd+i58VTbBT9
+         R5iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXWe+q1eYXxGkzPCp4+1fj8qEVZucWMv10qs65FXjM3o+0QtdO538E8/NK+geke1CGo909G5ML7qF3I1ln@vger.kernel.org, AJvYcCWQ/9+rSTr6XTkEutAE8hYz+QZcjyP5IKdQrPL0S//dvW3wY+Kn6w616LsDbwLwAqai15InbxML/V6vzNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBx8yLMuQYq/Kv+5KGe3xDKS7GETI/z1fFaEHFSVSYW1SQyA0P
+	r/+I7bgaX4gsQsMywXRJOgvE2oTXjKnvcymLrRHTo/U7FlCDrZOllIQr
+X-Gm-Gg: ASbGncvFNRxpiWN5Vk/+ik7chqPoaCbMudEhz/wjw30iFsQCm+xRgUqcgXsV2+rtWqw
+	lOYhHhclyWojxtFoGskT8IazWC6MbXqjQVH13W+qNEyJ2+ma8QH3fsdJmJ7/re3b4gbVkXZrOeW
+	z+Sv9wkXKm7PlRXmfFHr/3ev9lmhykt4W0Tcu4rprGhjqcLWUxCd/K4LBvTEzBW1BvaZGsBIVVg
+	PvLTxsPZ4/e4yL4SP2kjRXRxrY5SWmZVnc0rApWOhHmLeS2Xtwp57A9iIIINQ7+0nO1HD9B5rvc
+	t8NMRDbPPditWK3Jt3u8H0izDc6a6vlJeP+hXIDG5LSX9Fwtllx6kjcA8ipuHxkG1LdZTXkQDDx
+	/+R0NnekCChJHt95ewCPxROfnpC+roDv942LcSVENrmjE
+X-Google-Smtp-Source: AGHT+IG9wEYs4+lgjHCzhOPCxH3cmlxe163baafRUi6P07GZhQb6rgYttNhQt1qtCDkr7AuXCuEO3g==
+X-Received: by 2002:a05:6000:420d:b0:3a4:f7dd:6fad with SMTP id ffacd0b85a97d-3b8d959d43cmr5579015f8f.14.1754248262831;
+        Sun, 03 Aug 2025 12:11:02 -0700 (PDT)
 Received: from ws-linux01 ([2a02:2f0e:ca0d:f700:1210:b727:adc8:716])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c45346asm13099210f8f.39.2025.08.03.12.11.00
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c45346asm13099210f8f.39.2025.08.03.12.11.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Aug 2025 12:11:01 -0700 (PDT)
+        Sun, 03 Aug 2025 12:11:02 -0700 (PDT)
 From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 To: clabbe.montjoie@gmail.com,
 	herbert@gondor.apana.org.au,
@@ -68,10 +70,12 @@ Cc: wens@csie.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Subject: [PATCH v2 0/9] sun8i-ce: small cleanups/refactoring
-Date: Sun,  3 Aug 2025 22:10:20 +0300
-Message-ID: <20250803191029.3592987-1-ovidiu.panait.oss@gmail.com>
+Subject: [PATCH v2 1/9] crypto: sun8i-ce - remove channel timeout field
+Date: Sun,  3 Aug 2025 22:10:21 +0300
+Message-ID: <20250803191029.3592987-2-ovidiu.panait.oss@gmail.com>
 X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250803191029.3592987-1-ovidiu.panait.oss@gmail.com>
+References: <20250803191029.3592987-1-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,43 +84,112 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series includes only the refactoring commits from [1]. The batching
-related changes were dropped since they are no longer relevant (batching
-support in crypto_engine was retired in [2]).
+Using the number of bytes in the request as DMA timeout is really
+inconsistent, as large requests could possibly set a timeout of
+hundreds of seconds.
 
-This series includes various small cleanups and refactoring:
-- move request-specific skcipher and hash data to request context,
-  eliminating the need to allocate extra memory in the digest path
-- make the hashing code more clear and modular
-- reduce a bit of boilerplate/duplicated code
+Remove the per-channel timeout field and use a single, static DMA
+timeout of 3 seconds for all requests.
 
-Changes in v2:
-   - fixed [-Wunused-but-set-variable] warning reported by kernel test robot
+Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+Reviewed-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 1 -
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 5 ++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 --
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c   | 1 -
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c   | 1 -
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        | 2 +-
+ 6 files changed, 3 insertions(+), 9 deletions(-)
 
-[1] https://lore.kernel.org/linux-crypto/20250626095813.83963-1-ovidiu.panait.oss@gmail.com/
-[2] c470ffa6f486 ("crypto: engine - remove request batching support")
-
-Ovidiu Panait (9):
-  crypto: sun8i-ce - remove channel timeout field
-  crypto: sun8i-ce - remove boilerplate in sun8i_ce_hash_digest()
-  crypto: sun8i-ce - remove unnecessary __maybe_unused annotations
-  crypto: sun8i-ce - add a new function for dumping task descriptors
-  crypto: sun8i-ce - move bounce_iv and backup_iv to request context
-  crypto: sun8i-ce - fold sun8i_ce_cipher_run() into
-    sun8i_ce_cipher_do_one()
-  crypto: sun8i-ce - pass task descriptor to cipher prepare/unprepare
-  crypto: sun8i-ce - save hash buffers and dma info to request context
-  crytpo: sun8i-ce - factor out prepare/unprepare from
-    sun8i_ce_hash_run()
-
- .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |  85 +++++-------
- .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  35 ++---
- .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 124 ++++++++++--------
- .../crypto/allwinner/sun8i-ce/sun8i-ce-prng.c |   1 -
- .../crypto/allwinner/sun8i-ce/sun8i-ce-trng.c |   1 -
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  27 +++-
- 6 files changed, 136 insertions(+), 137 deletions(-)
-
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 5663df49dd81..113a1100f2ae 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -276,7 +276,6 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 		goto theend_sgs;
+ 	}
+ 
+-	chan->timeout = areq->cryptlen;
+ 	rctx->nr_sgs = ns;
+ 	rctx->nr_sgd = nd;
+ 	return 0;
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 658f520cee0c..79ec172e5c99 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -210,11 +210,10 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
+ 	mutex_unlock(&ce->mlock);
+ 
+ 	wait_for_completion_interruptible_timeout(&ce->chanlist[flow].complete,
+-			msecs_to_jiffies(ce->chanlist[flow].timeout));
++			msecs_to_jiffies(CE_DMA_TIMEOUT_MS));
+ 
+ 	if (ce->chanlist[flow].status == 0) {
+-		dev_err(ce->dev, "DMA timeout for %s (tm=%d) on flow %d\n", name,
+-			ce->chanlist[flow].timeout, flow);
++		dev_err(ce->dev, "DMA timeout for %s on flow %d\n", name, flow);
+ 		err = -EFAULT;
+ 	}
+ 	/* No need to lock for this read, the channel is locked so
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index 13bdfb8a2c62..b26f5427c1e0 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -446,8 +446,6 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	else
+ 		cet->t_dlen = cpu_to_le32(areq->nbytes / 4 + j);
+ 
+-	chan->timeout = areq->nbytes;
+-
+ 	err = sun8i_ce_run_task(ce, flow, crypto_ahash_alg_name(tfm));
+ 
+ 	dma_unmap_single(ce->dev, addr_pad, j * 4, DMA_TO_DEVICE);
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+index 762459867b6c..d0a1ac66738b 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+@@ -137,7 +137,6 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 
+ 	cet->t_dst[0].addr = desc_addr_val_le32(ce, dma_dst);
+ 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
+-	ce->chanlist[flow].timeout = 2000;
+ 
+ 	err = sun8i_ce_run_task(ce, 3, "PRNG");
+ 	mutex_unlock(&ce->rnglock);
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+index e1e8bc15202e..244529bf0616 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+@@ -79,7 +79,6 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wa
+ 
+ 	cet->t_dst[0].addr = desc_addr_val_le32(ce, dma_dst);
+ 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
+-	ce->chanlist[flow].timeout = todo;
+ 
+ 	err = sun8i_ce_run_task(ce, 3, "TRNG");
+ 	mutex_unlock(&ce->rnglock);
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 0f9a89067016..f12c32d1843f 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -106,6 +106,7 @@
+ #define MAX_SG 8
+ 
+ #define CE_MAX_CLOCKS 4
++#define CE_DMA_TIMEOUT_MS	3000
+ 
+ #define MAXFLOW 4
+ 
+@@ -196,7 +197,6 @@ struct sun8i_ce_flow {
+ 	struct completion complete;
+ 	int status;
+ 	dma_addr_t t_phy;
+-	int timeout;
+ 	struct ce_task *tl;
+ 	void *backup_iv;
+ 	void *bounce_iv;
 -- 
 2.50.0
 
