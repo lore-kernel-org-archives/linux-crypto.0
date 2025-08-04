@@ -1,101 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCA72E36F4;
-	Mon,  4 Aug 2025 06:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C89241679;
+	Mon,  4 Aug 2025 09:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754287735; cv=none; b=G4RNQv2jXKfx4DT+kZvKfpTtM45YkK0NNtTvasemcsEyqtF0u0xJtQYLJVddB1YevEXPX9lxeYz/sHIgYp/FnTYfAoTeNzqysKyi6ZZkH/mSWwmM9xpa6uz11XseNTAvhnNNFqZdA6e6libqSH52xdmrxsXst+p9OVCMGJxlrSI=
+	t=1754298174; cv=none; b=TrXHogezkPFzWLkRsB2czqdKZqjokmw9/CawRMpyxRYkhDuakmgmJqJs3VeUhuKJPACaHw5T9Q/0kMLByIGs3+ccI6osNjKKCBsSGSjUwoYWogU6MBbzniuXi2QzAEqghpPmACn5CzorPQeRrO85AxesLut1NgFLZNubm65WqTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754287735; c=relaxed/simple;
-	bh=ipRZKPKGvZYye+NbUN1kZp7BEdItabd5U7NljxzHgfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0Hi5BuYN2toJLIzGd6t3p+614XozpVMlPU+4uKB93NGOrG52oBAx/tWSBl34sVgruWb1VM7FvFAS+mRk+Cqel6MeLb698S+dFWZfxJTJJ8iBg/RdUc5R+iWcGiieMGyIoxW5ruwi4vnLEaAbVlB96NTlRVohTRmRXwOTVnybrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WB5Ojvzz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754298174; c=relaxed/simple;
+	bh=8C3vrohJCMkNz48Npe0D4JIHwbn6kl862AvU60VY+nc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HMVehV/L/Q9xRZUvcDzKhhStFUAuiqtQPDPVRrllI3giknIVxzA1pRiL9XKAg9l0nSWCN98EpB1Q/dxFO1bDl8prODD7j1uupPPxuXj4nYjWPNnTj1xN40lZXUutIBXvdWUMnCWtqE7m1OVyTbUDcbahT+i0PZsc3+uGsVWVP3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JLhO9L5B; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WB5Ojvzz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F8CC4CEE7;
-	Mon,  4 Aug 2025 06:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754287734;
-	bh=ipRZKPKGvZYye+NbUN1kZp7BEdItabd5U7NljxzHgfU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WB5OjvzzZ9vAddGUmIgd58d+GXAOhK71sgg1sPjKZ2V4EdqoOJbqAVclrdZTG/XGi
-	 Rv4OLHjfwhr7v2ooiI/Y5m0mdTZlLU2yegwzf+bUDcd7s6iwcEdBh06+6nVz8/Wa/O
-	 +nBnfaXt4XJKLaoT1RHqMmETX8rjF2Kmy/dnJIcDEMFfT32WMoSpIh/T72/QhtzayO
-	 wodMKqYXABzuIYri2XMu2dcy12w6CtEODa+LxF9rvgQZnWzVvzu9RJJN6NHZ3iDIfB
-	 stPKSSjzPiUTU8EaLaIBQafQgp2iiOYNb0jxbpJZIqI9VBJDNEZXHdhqUN4pmoXW8a
-	 x2CW/8wn0ESAQ==
-Date: Sun, 3 Aug 2025 23:07:58 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org
-Subject: Re: [PATCH 4/7] crypto: sparc/md5 - Remove SPARC64 optimized MD5 code
-Message-ID: <20250804060758.GA108924@sol>
-References: <20250803204433.75703-1-ebiggers@kernel.org>
- <20250803204433.75703-5-ebiggers@kernel.org>
- <3de7cc4d-cb88-4107-9265-066cbedd4561@hogyros.de>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JLhO9L5B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1754298166;
+	bh=8C3vrohJCMkNz48Npe0D4JIHwbn6kl862AvU60VY+nc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JLhO9L5BrmEQq9pumRV6CfhrlnygeF7jd5jsfvnwprETB0viNvn+WVgy4x+oprZNy
+	 NZMHKJ5FUGdpXtd/Z91veR88ZNZxnRiWy8gzUpM4VD3Bp1+ZMGJqkHlVDnltCmoX77
+	 pEC0B9HdhIbwF0CXCerXL5yvMdtg6lc/MykiJ5GtAdNMH6gFfi+lYx/xupQv3RbuJ0
+	 NJv4suYr1gAPIRqj1dlB/qP3+0QaKx3IJNkcXs/mM23ZuHvaqBDEZUS58CU+kpHguY
+	 UFnQcc/YiVj/hwrJ2+LpHeezdF7hUj7DmtnENhEATscLQJ5rLRzsOuY/8U3nY2X7ZL
+	 NL5nQ/VDDluIg==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6AF9917E04DA;
+	Mon,  4 Aug 2025 11:02:44 +0200 (CEST)
+Message-ID: <72934f23-08eb-4214-a946-7aa7a432352e@collabora.com>
+Date: Mon, 4 Aug 2025 11:02:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3de7cc4d-cb88-4107-9265-066cbedd4561@hogyros.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/38] dt-bindings: media: mediatek,mt8195-jpeg: Allow
+ range number in node address
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ linux-mediatek@lists.infradead.org, robh@kernel.org
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
+ conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de,
+ airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com,
+ mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com,
+ mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com,
+ vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org,
+ linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org,
+ andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org,
+ tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com,
+ ck.hu@mediatek.com, houlong.wei@mediatek.com,
+ kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com,
+ tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com,
+ olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org,
+ arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com,
+ frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-15-angelogioacchino.delregno@collabora.com>
+ <70ae6787-ee0b-43a0-851e-1fb6c82f6c31@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <70ae6787-ee0b-43a0-851e-1fb6c82f6c31@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 04, 2025 at 01:44:21PM +0900, Simon Richter wrote:
-> Hi,
+Il 24/07/25 11:14, Krzysztof Kozlowski ha scritto:
+> On 24/07/2025 10:38, AngeloGioacchino Del Regno wrote:
+>> The dual and triple core jpeg encoder and decoder (respectively)
+>> on MT8195 are far apart: the only way to have this to make sense
+>> is to split those in multiple address ranges in device trees as
+>> one big range would overlap with other IP in at least the MT8195
+>> SoC.
+>>
+>> Change both the jpegdec and jpegenc bindings to allow specifying
+>> children nodes such as "jpegdec@0,10000", "jpegdec@1,0" or for
+>> encoder "jpegenc@0,0", "jpegenc@1,0" to resolve dtbs_check issues.
 > 
-> On 8/4/25 05:44, Eric Biggers wrote:
 > 
-> > Taken together, it's clear that it's time to retire these additional MD5
-> > implementations, and focus maintenance on the MD5 generic C code.
+> This should not be needed for standard MMIO/simple-bus nodes. I think
+> DTS is wrong here.
 > 
-> [...]
+> Which cases really need the ','?
 > 
-> > -	ldd	[%o1 + 0x00], %f8
-> > -	ldd	[%o1 + 0x08], %f10
-> > -	ldd	[%o1 + 0x10], %f12
-> > -	ldd	[%o1 + 0x18], %f14
-> > -	ldd	[%o1 + 0x20], %f16
-> > -	ldd	[%o1 + 0x28], %f18
-> > -	ldd	[%o1 + 0x30], %f20
-> > -	ldd	[%o1 + 0x38], %f22
-> > -
-> > -	MD5
-> 
-> This is a literal CPU instruction that ingests sixteen registers (f8 to f23)
-> and updates the hash state in f0 to f3.
 
-Note that QEMU doesn't support this instruction.  I don't actually know
-whether the SPARC64 MD5 code even works, especially after (presumably
-untested) refactoring like commit cc1f5bbe428c91.  I don't think anyone
-does, TBH.  No one seems to be running the crypto tests on SPARC64.
+All of the multi-core JPEG enc/decoders on MT8195 (and newer).
 
-> I can see the point of removing hand-optimized assembler code when a
-> compiler can generate something that runs just as well from generic code,
-> but this here is using CPU extensions that were made for this specific
-> purpose.
+The DT changes are included in the same series as this commit; check:
 
-You do realize this is MD5, right?  And also SPARC64?
+20250724083914.61351-35-angelogioacchino.delregno@collabora.com
 
-I'm confused why people are so attached to still having MD5 assembly
-code in 2025, and *only for rare platforms*.  It's illogical.
+Cheers,
+Angelo
 
-We should just treat MD5 like the other legacy algorithms MD4 and RC4,
-for which the kernel just has generic C code.  That works perfectly fine
-for the few users that still need those algorithms for compatibility
-reasons.
-
-> This is exactly the kind of thing you would point to as an argument why
-> asynchronous hardware offload support is unnecessary.
-
-For an algorithm that is actually worthwhile to accelerate, sure.  For
-MD5, it's not worthwhile anyway.
-
-- Eric
