@@ -1,75 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A5F2E36E8;
-	Sun,  3 Aug 2025 22:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA4D2135D1;
+	Mon,  4 Aug 2025 04:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754261816; cv=none; b=oiSZ3ynt78JsC9etKx1rJEYlffXj4w/V3N1vGH3lU+ei09KppcAKKBptO9+ZdyCM+0kXn3KbhXN4UiGdMwxmYR5fy1NkTWVXHUxKIQkuXZcME9dhbnc6IVSXPSIyar3xUb52CeJIvtWIlwwVgL+rxsmDJV1Edjn7ZDPXVy97Bp0=
+	t=1754282680; cv=none; b=sZU0a7tNEfRgoXa9cva7qqMxoejewJQF1l1c3yx55hEo688CTzCZCpSPzH6g/SzeY3CP6Jx0eBvgKwdDEtN7aO9bLSIz48zNk6/DL5/3Bj2+MotMTQN12lfxrl6aUtMy9bx6i4faJ665ckGUEXY5eYOIDwlS3urpG/MwHWFt+uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754261816; c=relaxed/simple;
-	bh=Ym+yYLpWdX2ByNjDG8czIJWJsK5Au9w7AVSJSphPKIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D2Sj4Bn/+FWtHuIOrAiOVPeC1KE6zHHjweNIyLs8vi8PpocJUetjOExMDsQo2ED0GcZjFnpTFgjRdo4l/ioEEfEAUcYl0wGYSmV/VYwj1EaHQat/gXCcJdOvK66CqzRRrepRLZwo61SsB8Ro9YLizlmBpMC4BwIWWxUiennDjss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3CbHS0X; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3CbHS0X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B364DC4CEEB;
-	Sun,  3 Aug 2025 22:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754261815;
-	bh=Ym+yYLpWdX2ByNjDG8czIJWJsK5Au9w7AVSJSphPKIQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s3CbHS0XgKSoVBKeaq8ORC8nEoU8TGYQCUhn4dkm3IQ7qpZseRsaF/CV47bAjRD+4
-	 LkCXnI0DjDXZLL47aQj8eD6nH6cRBCENJDu+v/d2acAR7+92ZEHJdI8VtnXCtODMs3
-	 QvvbNAKDRsp3w4IUGSnJ40fuzuKi1LYomogzDOXYraSnfQaqXU/bFiMRifoptpwONT
-	 ZEG+lTQrQZsoIWbKBToO18Z6Vi0JwTGZ/ds+weGh46QwIJl1/yYQetRrMFjhTYsjvT
-	 Y4wTg4MbzPl2V3/0HZ5ZV/AQ0v7e+0yU2zdXSfZnxS4GJr9of1s9xg05GbUuCeogPl
-	 XZLvSH8Bw1dDQ==
-Date: Sun, 3 Aug 2025 15:56:52 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org
-Subject: Re: [PATCH 3/7] crypto: powerpc/md5 - Remove PowerPC optimized MD5
- code
-Message-ID: <20250803225652.GA2142@quark>
-References: <20250803204433.75703-1-ebiggers@kernel.org>
- <20250803204433.75703-4-ebiggers@kernel.org>
- <aI_djr4v-3nQqG9E@gate>
- <20250803221438.GA119835@quark>
- <aI_iNQXxU6wKPEN8@gate>
+	s=arc-20240116; t=1754282680; c=relaxed/simple;
+	bh=/fK2AvQOoffITyYjdaMvldvMBIUtdVYOpA6/1XEkmFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YWMjQXiJezJTY3pWz/jmE/eZvV2RPlWdvrijFN8ZAKVP2QUnkMzJuJf3XZo/YXI9ubKtDi9UdqynbUxn0p28rGhAIN+uEtBYeMnXHTBOo95CH/4i3uirnZxxfh9LVj5r/o5688ZeW4NPOoGIl5Wf8FBUAYqV8M426oGWotHMdnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [IPV6:2400:2410:b120:f200:a1f3:73da:3a04:160d] (unknown [IPv6:2400:2410:b120:f200:a1f3:73da:3a04:160d])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id 8D25B3F108;
+	Mon,  4 Aug 2025 06:44:24 +0200 (CEST)
+Message-ID: <3de7cc4d-cb88-4107-9265-066cbedd4561@hogyros.de>
+Date: Mon, 4 Aug 2025 13:44:21 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aI_iNQXxU6wKPEN8@gate>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/7] crypto: sparc/md5 - Remove SPARC64 optimized MD5 code
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org
+References: <20250803204433.75703-1-ebiggers@kernel.org>
+ <20250803204433.75703-5-ebiggers@kernel.org>
+Content-Language: en-US
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <20250803204433.75703-5-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 03, 2025 at 05:27:01PM -0500, Segher Boessenkool wrote:
-> You are replacing a known-working target implementation by a lower
-> performance generic implementation.
+Hi,
 
-That's probably correct, though FWIW there have been quite a few cases
-where optimized assembly code in the kernel actually turned out to be
-slower than the C code.  (That primarily happens when the assembly code
-doesn't take advantage of any special CPU features, which was the case
-for this PowerPC code.)  I don't have PowerPC hardware to check the
-exact performance differential here, but IMO even if there was a
-slowdown the factors still weigh strongly in favor of retiring this.
+On 8/4/25 05:44, Eric Biggers wrote:
 
-> But is that one known-working at all?  Does it come with tests?  Was
-> it tested to have the same outputs as the existing thing, maybe?  Just
-> on a few inputs maybe.
+> Taken together, it's clear that it's time to retire these additional MD5
+> implementations, and focus maintenance on the MD5 generic C code.
 
-Of course.  Patch 7 adds a KUnit test suite for MD5, and there are still
-the older tests in crypto/testmgr.c.  And of course generic code is much
-easier to test than arch-specific code.  So not only is it tested, but
-the test coverage is much better than it was before.
+[...]
 
-- Eric
+> -	ldd	[%o1 + 0x00], %f8
+> -	ldd	[%o1 + 0x08], %f10
+> -	ldd	[%o1 + 0x10], %f12
+> -	ldd	[%o1 + 0x18], %f14
+> -	ldd	[%o1 + 0x20], %f16
+> -	ldd	[%o1 + 0x28], %f18
+> -	ldd	[%o1 + 0x30], %f20
+> -	ldd	[%o1 + 0x38], %f22
+> -
+> -	MD5
+
+This is a literal CPU instruction that ingests sixteen registers (f8 to 
+f23) and updates the hash state in f0 to f3.
+
+I can see the point of removing hand-optimized assembler code when a 
+compiler can generate something that runs just as well from generic 
+code, but this here is using CPU extensions that were made for this 
+specific purpose.
+
+This is exactly the kind of thing you would point to as an argument why 
+asynchronous hardware offload support is unnecessary.
+
+    Simon
