@@ -1,98 +1,187 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD7E23CB;
-	Tue,  5 Aug 2025 07:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DDC2749DF;
+	Tue,  5 Aug 2025 13:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754378281; cv=none; b=V8Mtle+rwkL8AWsH3K23vauZD5x3LSrXmMfB7S7fTBrGEsWulPrcoy8Ky/KgKYQFNa1mpBORi+tBsLk8XADwgBP0DUCrNhQLeWlR0HVkQqP9j2sXJdJbLd4Wqtgf7sTkqNv9Ekr6s7O08Buk25EBtkPdQHcjOkAXYSWgzC6IYuI=
+	t=1754399409; cv=none; b=rTKLtWX2of9IjN6j/+yEul4wCa2lTNX38XcOBOqIfs5zrxoECp5qcuqdyzz/VpkdZEOYxI3Fw1NaxCe9zG80VrB6T8PyyzBTi7FfRwu++mx8MSBdADhX2wkHmWgB+gLAZB27s3wyYzKypmzpSLhknMCYz5VrWPfVwvoA2zqhCJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754378281; c=relaxed/simple;
-	bh=JWpkPDMP/XcbYXBGzgFW382I6Op+l3UeEugKQkfmymY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jPQTkY/jAdA1Mf3eQTX8kFGDBZ7xg4/Ab0UcAyZhNOutwBmR/DVVULdSuMbW83NsNxaLPWGKb6bJYqD7ocAxcJ17Ekifuhx5F+R2JvKXXqUh+I1kMTrKV0nAGZr3bP/LiOv9eyYmwV8ixmATMfRS5CJagA6XaPFQ4xWVmVVzwbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [IPV6:2400:2410:b120:f200:a1f3:73da:3a04:160d] (unknown [IPv6:2400:2410:b120:f200:a1f3:73da:3a04:160d])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id AE0C53F1DF;
-	Tue,  5 Aug 2025 09:17:52 +0200 (CEST)
-Message-ID: <854efc41-c40f-46c9-b8ae-84bda9d17faa@hogyros.de>
-Date: Tue, 5 Aug 2025 16:17:49 +0900
+	s=arc-20240116; t=1754399409; c=relaxed/simple;
+	bh=bP8A5HC3XzwMZvbd9AW/OCXUgb7BGmbP61vbl4smCKI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DOP5LAa6pkSgbKa0uqLvGhvglrqQwUTvBi285tfXnPhy0N9WZbQWzVrIVqxnfURRVgfEt3e58+4rLGtY2Of0gQQ/uQf3Vtm0B9AKF9M5PGYKpOX0NUjGCxs5IKPRbYHH6bTt+auRwmZsxsHCuupkTT/197w17zjhKQRMq3CMXPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VuU6Ttpu; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VuU6Ttpu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1893C4CEF4;
+	Tue,  5 Aug 2025 13:10:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754399409;
+	bh=bP8A5HC3XzwMZvbd9AW/OCXUgb7BGmbP61vbl4smCKI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VuU6TtpuMqScl+idpC+L99AxRHnlt0cYVSdPw9CV8BMwyThdZ9URw6fZmSQYJLbqE
+	 1EB0ogcYE46TToaapVhxCrM/9UkSTEF0TQWcBH6bi7ZX9kyeOM576GTsjWKkFR4UP+
+	 1UgTAYU3kim9/GzeL7T/q50YMudEsn11waq17fQS18AO9iLY3P/KstzgSkc1aDbTjk
+	 9IecUxH5tHgVHmIcbf3ZenrVPAaDj2KANAR/Fqk83T7fq9xr8rnOpLiT0Bsj+cdWQT
+	 XJTJQSiUJ55b31UeZRS1DPPdehuTLiI7wVA6eGWdQiSPE/1KFda2ooMqVMFGTycv4s
+	 8ROAABjTJjubw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Zhiqi Song <songzhiqi1@huawei.com>,
+	Chenghai Huang <huangchenghai2@huawei.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Sasha Levin <sashal@kernel.org>,
+	liulongfang@huawei.com,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.16-5.15] crypto: hisilicon/hpre - fix dma unmap sequence
+Date: Tue,  5 Aug 2025 09:08:45 -0400
+Message-Id: <20250805130945.471732-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250805130945.471732-1-sashal@kernel.org>
+References: <20250805130945.471732-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Crypto use cases
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- sparclinux@vger.kernel.org
-References: <20250803204433.75703-1-ebiggers@kernel.org>
- <20250803204433.75703-4-ebiggers@kernel.org>
- <593b6997-9da4-439c-ba82-84e8bb2ed980@csgroup.eu>
- <20250804180923.GA54248@google.com>
- <187412bd-3ae0-4fe8-b526-f96af6bea6dc@csgroup.eu>
- <20250804225901.GC54248@google.com>
- <913e23f9-d039-4de1-a0d3-d1067dcda8ac@hogyros.de>
- <20250805045846.GA10695@sol>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <20250805045846.GA10695@sol>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.16
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Zhiqi Song <songzhiqi1@huawei.com>
 
-On 8/5/25 13:58, Eric Biggers wrote:
+[ Upstream commit 982fd1a74de63c388c060e4fa6f7fbd088d6d02e ]
 
-> What does this have to do with this thread, which is about the PowerPC
-> optimized MD5 code?
+Perform DMA unmapping operations before processing data.
+Otherwise, there may be unsynchronized data accessed by
+the CPU when the SWIOTLB is enabled.
 
-Hence the new subject. It is still related to removal of code, but asks 
-about the bigger picture.
+Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-The code removal changes you've been pushing lately absolutely make 
-sense in the context of "the crypto subsystem is for internal use by the 
-kernel, and all known users will only ever submit small work items."
+LLM Generated explanations, may be completely bogus:
 
-However, there is also the userspace API, and hardware accelerators also 
-register with the crypto subsystem, so it is *also* the way for 
-userspace to use specialized hardware.
+**Backport Status: YES**
 
-If these are separate, then it makes sense to acknowledge that the 
-kernel will never use asynchronous transforms for anything, simplify the 
-internal API, and move all the hardware support to a separate registry 
-that is for userspace applications only.
+This commit should be backported to stable kernel trees. Here's my
+extensive analysis:
 
-However if we don't want separate registries, then it makes no sense for 
-the kernel to set policy for userspace here; it should offer all the 
-alternatives. The kernel can, and should, define policy for itself, and 
-I wholeheartedly agree that offloading small requests does not make 
-sense, unless we're on battery power.
+## Critical Bug Fix Nature
 
-I'm also not convinced that fscrypt cannot ever learn to submit a single 
-large request or a large batch of small requests if it is asked to 
-decrypt a large file, so in my opinion the common registry makes more sense.
+This commit fixes a critical **data coherency bug** that occurs when
+SWIOTLB (Software I/O Translation Lookaside Buffer) is enabled. The bug
+involves accessing DMA-mapped memory after processing data but before
+unmapping it, which violates DMA API usage rules and can lead to:
 
-Making sure that hardware support actually works and is tested is the 
-responsibility of the driver and port maintainers. We understand that 
-subsystem maintainers do not have all the hardware available, but the 
-same goes for all the other subsystems -- the DRM maintainers routinely 
-merge drivers for hardware they do not own, because the changes come 
-from people who *do* own the hardware, and have tested the changes.
+1. **Data corruption** - CPU may access stale/unsynchronized data
+2. **Security implications** - Potential exposure of sensitive
+   cryptographic material
+3. **System instability** - Especially on systems with IOMMU or SWIOTLB
+   enabled
 
-The latter is a project management issue, mostly: if there is a lack of 
-working relationships with driver and port maintainers, then that needs 
-to be fixed, not assumed to be an unchangeable part of the environment 
-that technical decisions are made in.
+## Specific Code Analysis
 
-    Simon
+### In `hpre_ecdh_cb()` (lines 1476-1502):
+
+**Before the fix:**
+```c
+p = sg_virt(areq->dst);  // Line 1494 - Accessing DMA-mapped memory
+memmove(p, p + ctx->key_sz - curve_sz, curve_sz);  // Line 1495 -
+Processing data
+memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);  // Line
+1496
+
+hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);  // Line 1498
+- DMA unmap happens here
+```
+
+**After the fix:**
+```c
+/* Do unmap before data processing */
+hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);  // DMA unmap
+first
+
+p = sg_virt(areq->dst);  // Now safe to access memory
+memmove(p, p + ctx->key_sz - curve_sz, curve_sz);
+memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);
+```
+
+### In `hpre_curve25519_cb()` (lines 1795-1820):
+
+Similar issue where `hpre_key_to_big_end(sg_virt(areq->dst),
+CURVE25519_KEY_SIZE)` was called before DMA unmapping.
+
+## Why This Qualifies for Stable
+
+1. **Clear Bug Fix**: This fixes a definitive bug in DMA API usage that
+   violates kernel DMA coherency rules
+2. **Small and Contained**: The fix is minimal - just reordering
+   function calls in two callback functions
+3. **No New Features**: Pure bug fix with no feature additions
+4. **Low Risk**: Simple reordering of operations with no algorithmic
+   changes
+5. **Affects Real Users**: Systems with SWIOTLB enabled (common in
+   virtualized environments and systems with >4GB RAM on 32-bit
+   architectures)
+6. **Subsystem Impact**: Confined to HiSilicon HPRE crypto driver
+   callbacks
+
+## Technical Severity
+
+The bug is particularly severe because:
+- SWIOTLB bounce buffers may contain stale data when accessed before DMA
+  unmapping
+- This affects cryptographic operations (ECDH and Curve25519), where
+  data integrity is critical
+- The issue manifests silently as data corruption rather than crashes,
+  making it hard to detect
+
+The fix follows proper DMA API usage patterns by ensuring DMA unmapping
+(which includes cache synchronization) occurs before CPU accesses the
+memory, preventing any coherency issues.
+
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 61b5e1c5d019..1550c3818383 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1491,11 +1491,13 @@ static void hpre_ecdh_cb(struct hpre_ctx *ctx, void *resp)
+ 	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
+ 		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
+ 
++	/* Do unmap before data processing */
++	hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);
++
+ 	p = sg_virt(areq->dst);
+ 	memmove(p, p + ctx->key_sz - curve_sz, curve_sz);
+ 	memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);
+ 
+-	hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);
+ 	kpp_request_complete(areq, ret);
+ 
+ 	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
+@@ -1808,9 +1810,11 @@ static void hpre_curve25519_cb(struct hpre_ctx *ctx, void *resp)
+ 	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
+ 		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
+ 
++	/* Do unmap before data processing */
++	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
++
+ 	hpre_key_to_big_end(sg_virt(areq->dst), CURVE25519_KEY_SIZE);
+ 
+-	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
+ 	kpp_request_complete(areq, ret);
+ 
+ 	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
+-- 
+2.39.5
+
