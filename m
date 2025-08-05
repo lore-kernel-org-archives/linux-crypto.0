@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5B5274651;
-	Tue,  5 Aug 2025 13:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0894274FEB;
+	Tue,  5 Aug 2025 13:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754399442; cv=none; b=T510GORqXWDd34krazf4844ThuGz9FnegH2rQF0yeRooDo7HQEMnw8dzRjgw9EUuF9aAMDRq/P0/3ST+R5Q/j6nojRmIhQRctTElH219+KTaxZEXEyj2oX07QaLLSxr+npNdAV1g93CGqsF6w1od4rhvyq445plOppgRuaKySy4=
+	t=1754399465; cv=none; b=aw0/+UnHQCvCciApddAQcI/4i2VMT5z+EXrpxmrlc2mQaAc33YJaIl+Hdzg6q3mSZVPIN3zvh/mioYasnuxBuNLw7CQ6ZYKUWQkwfnKV9LfKvj2MrZJOMYbWch9nrZTk2xRaQ6De9tM9JTcbGayvKzj6TtJCAjuJoqvAqG1lslw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754399442; c=relaxed/simple;
-	bh=rw1CbOROrUo0a/gRwjMVLMl3CRMzauKxKnYJSoi6CsA=;
+	s=arc-20240116; t=1754399465; c=relaxed/simple;
+	bh=X0gOUKeAzbeMAL2QL4SnN2/yOMfwzAbHB8kdOdPSVuA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KyBRNxnPKkAcKhzpYoqZCGUWTfsm0mFXPRc1tyWzTq0ce0nQVI+eyjulLXYR7+M5ktBlrB4Ombt8w7QVAtNat4JCYFYNTxb4jDTwRyfEFTstGGbQqlswBqmK35DUqgjX2LwxjTH3bGx3TVO8xSmUABeVO/AamLwhQSm2OL9EFc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4iwD3TG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=n4dVxL/wUoJQly51oKxrlhvXOekY7HB1V3niPg9dpy/eFtF2Y1EzXNHjP/bhckuOxGyO7ZUO8bZjnVsmqGnrC9DqyqRfRCqMfafmXyRMJ9C0smzXO1ehH+gCR+lPOKRh3nWTNSl8sZxfWGCRPH+zd+U8xQ/rvAgTvSS27jtEpHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFzTL3+t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4iwD3TG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B2E6C4CEF0;
-	Tue,  5 Aug 2025 13:10:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFzTL3+t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D3B0C4CEF4;
+	Tue,  5 Aug 2025 13:11:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754399442;
-	bh=rw1CbOROrUo0a/gRwjMVLMl3CRMzauKxKnYJSoi6CsA=;
+	s=k20201202; t=1754399465;
+	bh=X0gOUKeAzbeMAL2QL4SnN2/yOMfwzAbHB8kdOdPSVuA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H4iwD3TGQ8Vl/aFBh6icG50OrR7ku8VscVB37Uab09pECoI9jMHxSd4G8nMp/Ytet
-	 ciXxoxLAT0TyiPtHNaa4s+/YQPFyrD9NhFQ0n8H+XWm2lp97JICUttnRqn1n6RS7aS
-	 1ucyAYF8YZjCtdTqj6CEI5IW5+UDf6XF45AVLegEGkQOQe45FsEPYDGGSlmXmGoN/7
-	 mRVJkpg32udVDySjXNSivnvFKNHOJFjpMZ4O0FrURL4BSGouk2MsTgIjzFYQhp7b85
-	 Lj5HZCRUVh3tkugNayo5crtLgDiQc6LJ7lxca4iHQLxqp07nBkLw3SiCBIWHEQG/Z1
-	 SArRROkMkUtLQ==
+	b=ZFzTL3+tRzgXHGqfMgCOoi8jQXgTuGI8u3NzLFH+9EfdYII1rZpwFhn5E5ZjoY2Tt
+	 cbk+AXBXDwjG9O+ai2P9xwfVIr8Q1iZ+UsDCzl/Nz+P+cTqWshRYb07bihnRC7LkeA
+	 j0GACb7PXr7GXOD4n/DjSxp58R+RqmCoCDn1UUQxhokXZIyaIakI1LDj3I/LUZZT2D
+	 G5l0vz81ov5tJxI2Kjl0iVuELHQ1OYiCdWzdwZu2itcUiO2P0li5Wr287q19Yvy26L
+	 8wgEK7rFhPyB5S8JtK7qSgoacixfzn05vMnCYWgwfbor0t+VR/VPG1KFxCP6K3tHm4
+	 /EWb4y8pe2GXA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Mario Limonciello <mario.limonciello@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
+Cc: Markus Theil <theil.markus@gmail.com>,
+	Stephan Mueller <smueller@chronox.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	john.allen@amd.com,
+	davem@davemloft.net,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.16-6.12] crypto: ccp - Add missing bootloader info reg for pspv6
-Date: Tue,  5 Aug 2025 09:09:00 -0400
-Message-Id: <20250805130945.471732-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.16-6.6] crypto: jitter - fix intermediary handling
+Date: Tue,  5 Aug 2025 09:09:11 -0400
+Message-Id: <20250805130945.471732-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250805130945.471732-1-sashal@kernel.org>
 References: <20250805130945.471732-1-sashal@kernel.org>
@@ -52,87 +52,121 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.16
 Content-Transfer-Encoding: 8bit
 
-From: Mario Limonciello <mario.limonciello@amd.com>
+From: Markus Theil <theil.markus@gmail.com>
 
-[ Upstream commit aaeff14688d0254b39731d9bb303c79bfd610f7d ]
+[ Upstream commit 735b72568c73875269a6b73ab9543a70f6ac8a9f ]
 
-The bootloader info reg for pspv6 is the same as pspv4 and pspv5.
+The intermediary value was included in the wrong
+hash state. While there, adapt to user-space by
+setting the timestamp to 0 if stuck and inserting
+the values nevertheless.
 
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+Acked-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Markus Theil <theil.markus@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I understand the full picture. The pspv6 structure was added
-initially without the cmdresp registers and bootloader_info_reg. The
-cmdresp registers were added later in commit 949a0c8dd3c2, but the
-bootloader_info_reg was still missing. This current commit adds the
-missing bootloader_info_reg.
+## Backport Status: **YES**
 
-**Backport Status: YES**
+This commit should be backported to stable kernel trees. Here's the
+detailed analysis:
 
-This commit should be backported to stable kernel trees for the
-following reasons:
+### Bug Analysis
 
-1. **Bug Fix**: This is a clear bug fix that adds a missing register
-   definition (`bootloader_info_reg = 0x109ec`) for the pspv6 hardware
-   variant. Without this register, the bootloader version sysfs
-   attribute would not work correctly for PSPv6 devices (PCI IDs 0x156E
-   and 0x17D8).
+1. **Critical Bug Fix**: The commit fixes a bug where the intermediary
+   hash value was being updated to the wrong hash state descriptor.
+   Looking at line 147 in the original code (before the fix):
+  ```c
+  ret = crypto_shash_update(desc, intermediary, sizeof(intermediary));
+  ```
+  This was updating the temporary `desc` instead of `hash_state_desc`.
+  The fix correctly changes this to:
+  ```c
+  ret = crypto_shash_update(hash_state_desc, intermediary,
+  sizeof(intermediary));
+  ```
 
-2. **Minimal and Contained Change**: The fix is a single-line addition
-   that adds the missing register offset. It's extremely low risk with
-   no architectural changes or new features - just adding a missing
-   hardware register definition that already exists in pspv2, pspv3,
-   pspv4, and pspv5.
+2. **Security Impact**: This is in the jitterentropy random number
+   generator, which is a critical security component used for entropy
+   collection in the kernel's crypto subsystem. Using the wrong hash
+   descriptor means the intermediary values weren't being properly mixed
+   into the entropy pool, potentially reducing the quality of
+   randomness.
 
-3. **Functionality Regression**: The missing register causes a
-   functionality regression where users cannot query the bootloader
-   version through the `/sys` interface on PSPv6 hardware. The code at
-   line 78-80 in sp-pci.c checks for `psp->vdata->bootloader_info_reg`
-   and reads from it to expose the bootloader version. Without this
-   register defined, the sysfs attribute would not be visible or would
-   return invalid data.
+3. **SP800-90B Compliance**: The second part of the fix addresses
+   SP800-90B compliance (NIST standard for entropy sources). The
+   original code would skip inserting the timestamp when stuck:
+  ```c
+  if (!stuck) {
+  ret = crypto_shash_update(hash_state_desc, (u8 *)&time,
+  sizeof(__u64));
+  }
+  ```
+  The fix changes this to always insert a value (0 when stuck) to
+  maintain consistent input data size as required by SP800-90B section
+  3.1.5:
+  ```c
+  if (stuck) {
+  time = 0;
+  }
+  ret = crypto_shash_update(hash_state_desc, (u8 *)&time,
+  sizeof(__u64));
+  ```
 
-4. **Consistency with Previous Fixes**: A nearly identical fix was
-   already made for pspv5 in commit 52e8ae868a82 ("crypto: ccp - Add
-   missing bootloader info reg for pspv5"), demonstrating this is a
-   known pattern of missing register definitions that need correction.
+### Backport Criteria Met
 
-5. **Hardware Support Completeness**: PSPv6 support was added in kernel
-   5.20 (commit bb4185e595e4), and the cmdresp registers were added
-   later (commit 949a0c8dd3c2). This commit completes the hardware
-   support by adding the final missing register, ensuring PSPv6 devices
-   have feature parity with earlier PSP versions.
+1. **Fixes a real bug**: Yes - incorrect hash state usage affecting
+   entropy pool quality
+2. **Small and contained**: Yes - only 5 lines changed in a single
+   function
+3. **No architectural changes**: Yes - simple logic fix, no API changes
+4. **Critical subsystem**: Yes - affects kernel crypto/RNG subsystem
+5. **Low regression risk**: Yes - straightforward fix with clear
+   correctness
+6. **Security relevance**: Yes - fixes entropy generation which is
+   security-critical
+7. **Standards compliance**: Yes - fixes SP800-90B compliance issue
 
-6. **No Side Effects**: The change only affects PSPv6 devices and has no
-   impact on other PSP versions or any other kernel subsystems. It
-   simply enables existing functionality to work correctly on newer
-   hardware.
+The bug could potentially lead to weaker random number generation, which
+is a serious security concern. The fix is minimal, clearly correct, and
+has been acked by the subsystem maintainer (Stephan Mueller). This makes
+it an excellent candidate for stable backporting.
 
-The commit follows stable kernel rules perfectly - it's a targeted bug
-fix with minimal risk that restores expected functionality on specific
-hardware without introducing new features or making architectural
-changes.
+ crypto/jitterentropy-kcapi.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
- drivers/crypto/ccp/sp-pci.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index e1be2072d680..e7bb803912a6 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -453,6 +453,7 @@ static const struct psp_vdata pspv6 = {
- 	.cmdresp_reg		= 0x10944,	/* C2PMSG_17 */
- 	.cmdbuff_addr_lo_reg	= 0x10948,	/* C2PMSG_18 */
- 	.cmdbuff_addr_hi_reg	= 0x1094c,	/* C2PMSG_19 */
-+	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
- 	.feature_reg            = 0x109fc,	/* C2PMSG_63 */
- 	.inten_reg              = 0x10510,	/* P2CMSG_INTEN */
- 	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index c24d4ff2b4a8..1266eb790708 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -144,7 +144,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
+ 	 * Inject the data from the previous loop into the pool. This data is
+ 	 * not considered to contain any entropy, but it stirs the pool a bit.
+ 	 */
+-	ret = crypto_shash_update(desc, intermediary, sizeof(intermediary));
++	ret = crypto_shash_update(hash_state_desc, intermediary, sizeof(intermediary));
+ 	if (ret)
+ 		goto err;
+ 
+@@ -157,11 +157,12 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
+ 	 * conditioning operation to have an identical amount of input data
+ 	 * according to section 3.1.5.
+ 	 */
+-	if (!stuck) {
+-		ret = crypto_shash_update(hash_state_desc, (u8 *)&time,
+-					  sizeof(__u64));
++	if (stuck) {
++		time = 0;
+ 	}
+ 
++	ret = crypto_shash_update(hash_state_desc, (u8 *)&time, sizeof(__u64));
++
+ err:
+ 	shash_desc_zero(desc);
+ 	memzero_explicit(intermediary, sizeof(intermediary));
 -- 
 2.39.5
 
