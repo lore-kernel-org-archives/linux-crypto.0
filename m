@@ -1,46 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD91F274651;
-	Tue,  5 Aug 2025 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5B5274651;
+	Tue,  5 Aug 2025 13:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754399440; cv=none; b=dv5pwDDUaGd3LCDQcwRBAbc6lTKx8XVq9rGOGS9Ebx0NxO9JuMJjsUm4u/VS5e/yDhvAMqY0lMS8j3tLCdKyHnm4MjSgzhoIXM7nr7cr9d1e3filusVZPh7Slc+8qgA5AKaPWxKIedN+89Kbl6p4JhE026tEfJT7lYx1jPoCCgo=
+	t=1754399442; cv=none; b=T510GORqXWDd34krazf4844ThuGz9FnegH2rQF0yeRooDo7HQEMnw8dzRjgw9EUuF9aAMDRq/P0/3ST+R5Q/j6nojRmIhQRctTElH219+KTaxZEXEyj2oX07QaLLSxr+npNdAV1g93CGqsF6w1od4rhvyq445plOppgRuaKySy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754399440; c=relaxed/simple;
-	bh=1LBmXEsIk7i9eIwYyb7QaDcW9pHu4+ceXg9aRHN09jo=;
+	s=arc-20240116; t=1754399442; c=relaxed/simple;
+	bh=rw1CbOROrUo0a/gRwjMVLMl3CRMzauKxKnYJSoi6CsA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=j8mkrMufSB+lBfDEzwJoM6afTvJAuBBFIXsILNAy4FW//C6Jp+5V2N8XYbWwDeQ2rPDoe1LNATNHvwOzCMFWx7Yh1D/x0KSD+vABDzwvQrj63gFCWAAXBsnaCsZ8rmckF6+jqfRj+fWkVTrG/aBpF7oZMlHg0r+kvp4qu739e8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7LGdBaO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KyBRNxnPKkAcKhzpYoqZCGUWTfsm0mFXPRc1tyWzTq0ce0nQVI+eyjulLXYR7+M5ktBlrB4Ombt8w7QVAtNat4JCYFYNTxb4jDTwRyfEFTstGGbQqlswBqmK35DUqgjX2LwxjTH3bGx3TVO8xSmUABeVO/AamLwhQSm2OL9EFc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4iwD3TG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7LGdBaO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8E77C4CEF0;
-	Tue,  5 Aug 2025 13:10:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4iwD3TG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B2E6C4CEF0;
+	Tue,  5 Aug 2025 13:10:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754399440;
-	bh=1LBmXEsIk7i9eIwYyb7QaDcW9pHu4+ceXg9aRHN09jo=;
+	s=k20201202; t=1754399442;
+	bh=rw1CbOROrUo0a/gRwjMVLMl3CRMzauKxKnYJSoi6CsA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g7LGdBaOvL0ycDUg+3IlqV2BbwBYo7NINcocrmgbIHPZ+wCr+A7GgWl7BcDWoWrbk
-	 OPHKAPtETB+yod/au8inzw84m910dFKIrFD15dSU/70h8b/KorORjNEcEz2c/e1Q0I
-	 tJ7DVJ8wE1oaevylN4l+eNI3lTT8OV4uWIvKk3Br7inFM5SltpoWFXWT4PrbqFviQV
-	 1pKIsCeNn8xCV7gdJmkoXX8tj0+/n3JtZUtFjHFOXy9XA4JnEXjnl0D9wvGl2ZE8U4
-	 psH+6X+KgH9Ojm94/HcR3Vzy9XdA6JDo8u1D4FUJcfj9tmXLWXphwX0F0eYdqeUzyJ
-	 YdlwHnizKx3Xw==
+	b=H4iwD3TGQ8Vl/aFBh6icG50OrR7ku8VscVB37Uab09pECoI9jMHxSd4G8nMp/Ytet
+	 ciXxoxLAT0TyiPtHNaa4s+/YQPFyrD9NhFQ0n8H+XWm2lp97JICUttnRqn1n6RS7aS
+	 1ucyAYF8YZjCtdTqj6CEI5IW5+UDf6XF45AVLegEGkQOQe45FsEPYDGGSlmXmGoN/7
+	 mRVJkpg32udVDySjXNSivnvFKNHOJFjpMZ4O0FrURL4BSGouk2MsTgIjzFYQhp7b85
+	 Lj5HZCRUVh3tkugNayo5crtLgDiQc6LJ7lxca4iHQLxqp07nBkLw3SiCBIWHEQG/Z1
+	 SArRROkMkUtLQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: John Ernberg <john.ernberg@actia.se>,
-	Frank Li <Frank.Li@nxp.com>,
-	Peng Fan <peng.fan@nxp.com>,
+Cc: Mario Limonciello <mario.limonciello@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	horia.geanta@nxp.com,
-	pankaj.gupta@nxp.com,
-	gaurav.jain@nxp.com,
+	john.allen@amd.com,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.16] crypto: caam - Support iMX8QXP and variants thereof
-Date: Tue,  5 Aug 2025 09:08:59 -0400
-Message-Id: <20250805130945.471732-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.16-6.12] crypto: ccp - Add missing bootloader info reg for pspv6
+Date: Tue,  5 Aug 2025 09:09:00 -0400
+Message-Id: <20250805130945.471732-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250805130945.471732-1-sashal@kernel.org>
 References: <20250805130945.471732-1-sashal@kernel.org>
@@ -55,116 +52,87 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.16
 Content-Transfer-Encoding: 8bit
 
-From: John Ernberg <john.ernberg@actia.se>
+From: Mario Limonciello <mario.limonciello@amd.com>
 
-[ Upstream commit ac8aff0035fa58e53b39bd565ad6422a90ccdc87 ]
+[ Upstream commit aaeff14688d0254b39731d9bb303c79bfd610f7d ]
 
-The iMX8QXP (and variants such as the QX, DX, DXP) all identify as iMX8QXP.
+The bootloader info reg for pspv6 is the same as pspv4 and pspv5.
 
-They have the exact same restrictions as the supported iMX8QM introduced
-at commit 61bb8db6f682 ("crypto: caam - Add support for i.MX8QM")
-
-Loosen the check a little bit with a wildcard to also match the iMX8QXP
-and its variants.
-
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-Reviewed-by: Peng Fan <peng.fan@nxp.com>
+Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Great! The code uses `glob_match()` for pattern matching, which means
-wildcards like `*` are supported. Now I have all the information needed
-to analyze this commit.
-
-## Analysis Summary:
+Now I understand the full picture. The pspv6 structure was added
+initially without the cmdresp registers and bootloader_info_reg. The
+cmdresp registers were added later in commit 949a0c8dd3c2, but the
+bootloader_info_reg was still missing. This current commit adds the
+missing bootloader_info_reg.
 
 **Backport Status: YES**
-
-## Extensive Explanation:
 
 This commit should be backported to stable kernel trees for the
 following reasons:
 
-### 1. **Bug Fix Nature**
-This is clearly a bug fix, not a new feature. The iMX8QXP and its
-variants (QX, DX, DXP) are existing hardware that should have been
-supported but weren't due to an overly restrictive string matching
-pattern. The commit message explicitly states these variants "all
-identify as iMX8QXP" but were not being recognized by the CAAM driver.
+1. **Bug Fix**: This is a clear bug fix that adds a missing register
+   definition (`bootloader_info_reg = 0x109ec`) for the pspv6 hardware
+   variant. Without this register, the bootloader version sysfs
+   attribute would not work correctly for PSPv6 devices (PCI IDs 0x156E
+   and 0x17D8).
 
-### 2. **Small and Contained Change**
-The change is minimal - only a single line modification from:
-```c
-{ .soc_id = "i.MX8QM", .data = &caam_imx8ulp_data },
-```
-to:
-```c
-{ .soc_id = "i.MX8Q*", .data = &caam_imx8ulp_data },
-```
+2. **Minimal and Contained Change**: The fix is a single-line addition
+   that adds the missing register offset. It's extremely low risk with
+   no architectural changes or new features - just adding a missing
+   hardware register definition that already exists in pspv2, pspv3,
+   pspv4, and pspv5.
 
-This is a low-risk change that only affects the pattern matching for SoC
-identification.
+3. **Functionality Regression**: The missing register causes a
+   functionality regression where users cannot query the bootloader
+   version through the `/sys` interface on PSPv6 hardware. The code at
+   line 78-80 in sp-pci.c checks for `psp->vdata->bootloader_info_reg`
+   and reads from it to expose the bootloader version. Without this
+   register defined, the sysfs attribute would not be visible or would
+   return invalid data.
 
-### 3. **Hardware Enablement Fix**
-Looking at the firmware driver code
-(`/home/sasha/linux/drivers/firmware/imx/imx-scu-soc.c`), we can see
-that iMX8QXP is identified with ID 0x2 and returns the string
-"i.MX8QXP". Without this fix, CAAM crypto hardware acceleration is
-completely non-functional on these SoCs because the driver fails to
-match the SoC ID.
+4. **Consistency with Previous Fixes**: A nearly identical fix was
+   already made for pspv5 in commit 52e8ae868a82 ("crypto: ccp - Add
+   missing bootloader info reg for pspv5"), demonstrating this is a
+   known pattern of missing register definitions that need correction.
 
-### 4. **Same Configuration as iMX8QM**
-The commit correctly reuses `caam_imx8ulp_data` which is an empty
-structure, meaning these SoCs have special handling where:
-- CAAM clocks are managed automatically by hardware (not by Linux)
-- Linux doesn't have access to the CAAM controller's register page
-This is the same configuration used for iMX8QM (added in commit
-61bb8db6f682), confirming that iMX8QXP variants have identical
-requirements.
+5. **Hardware Support Completeness**: PSPv6 support was added in kernel
+   5.20 (commit bb4185e595e4), and the cmdresp registers were added
+   later (commit 949a0c8dd3c2). This commit completes the hardware
+   support by adding the final missing register, ensuring PSPv6 devices
+   have feature parity with earlier PSP versions.
 
-### 5. **No Architectural Changes**
-The change doesn't introduce any new functionality, APIs, or
-architectural modifications. It simply extends existing pattern matching
-to include variants that should have been supported from the beginning.
+6. **No Side Effects**: The change only affects PSPv6 devices and has no
+   impact on other PSP versions or any other kernel subsystems. It
+   simply enables existing functionality to work correctly on newer
+   hardware.
 
-### 6. **User Impact**
-Without this fix, users of iMX8QXP, iMX8QX, iMX8DX, and iMX8DXP SoCs
-cannot use hardware crypto acceleration through CAAM, which is a
-significant functionality loss for these platforms. The crypto subsystem
-would fall back to software implementations, resulting in degraded
-performance for cryptographic operations.
+The commit follows stable kernel rules perfectly - it's a targeted bug
+fix with minimal risk that restores expected functionality on specific
+hardware without introducing new features or making architectural
+changes.
 
-### 7. **Wildcard Pattern is Safe**
-The use of "i.MX8Q*" wildcard is appropriate here because:
-- It matches both iMX8QM (existing) and iMX8QXP variants (new)
-- The glob_match() function in the kernel properly handles this pattern
-- Both SoC families have identical CAAM requirements (no clock control,
-  no register page access)
+ drivers/crypto/ccp/sp-pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-This is a textbook example of a stable-appropriate fix: it corrects a
-clear oversight that prevents hardware from working properly, with
-minimal code change and risk.
-
- drivers/crypto/caam/ctrl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 38ff931059b4..9cd5e3d54d9d 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -573,7 +573,7 @@ static const struct soc_device_attribute caam_imx_soc_table[] = {
- 	{ .soc_id = "i.MX7*",  .data = &caam_imx7_data },
- 	{ .soc_id = "i.MX8M*", .data = &caam_imx7_data },
- 	{ .soc_id = "i.MX8ULP", .data = &caam_imx8ulp_data },
--	{ .soc_id = "i.MX8QM", .data = &caam_imx8ulp_data },
-+	{ .soc_id = "i.MX8Q*", .data = &caam_imx8ulp_data },
- 	{ .soc_id = "VF*",     .data = &caam_vf610_data },
- 	{ .family = "Freescale i.MX" },
- 	{ /* sentinel */ }
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index e1be2072d680..e7bb803912a6 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -453,6 +453,7 @@ static const struct psp_vdata pspv6 = {
+ 	.cmdresp_reg		= 0x10944,	/* C2PMSG_17 */
+ 	.cmdbuff_addr_lo_reg	= 0x10948,	/* C2PMSG_18 */
+ 	.cmdbuff_addr_hi_reg	= 0x1094c,	/* C2PMSG_19 */
++	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
+ 	.feature_reg            = 0x109fc,	/* C2PMSG_63 */
+ 	.inten_reg              = 0x10510,	/* P2CMSG_INTEN */
+ 	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
 -- 
 2.39.5
 
