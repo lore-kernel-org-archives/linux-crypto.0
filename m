@@ -1,133 +1,82 @@
-Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8773F1C861A;
-	Tue,  5 Aug 2025 06:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FA821CC47;
+	Tue,  5 Aug 2025 06:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754376645; cv=none; b=G12cWLg81s4+ho1jv6HOANoQapKPX2AArvw68rgbJtLQnJEUW4jPgw7aplFbOAsO+7v5B+HFGcvEKaip5CH+uqgUGZQEVJOAP55ACrn4xb/ErC4iahGgRhFLizdEjQVd222n3CPFr9JCN8jp8rf32KnOkL21+zbwaQpOUoKjbpc=
+	t=1754376682; cv=none; b=NqdqPtAh6COdSbM09iFLeQeieYEm/baW3mCOA1nn5KvyiU+ZB2hnlGcR6MgfzSbgj71DDFLayCaD9PO/TJ5c/reQ2cWxp1ghMrDyQZ+pCu5BwSZ+hFLUdiJtgdgGHNpS7mUTHGB4noqzMoMVJOmcZeGViyqXZwGvFsC28bavqgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754376645; c=relaxed/simple;
-	bh=GlMP83qOoRkreWYcN68itbSBxtM6loXtd7T4zZW7mQs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ioejTzPt8r0rAVO6QorjarqoX51mgna8QqYAxpaDn48fv5wr1gel6JtZeGJUrWGG9oYgkVuNvzWMoWrgOhgPd0ux3ZgzjApDrqhT21TQTi9Gqjn/NPwYZ9xJG43T1Vm7EPd+4+0Lykih5aj2M17JS2MH9/6NnXCzgKGdFFBqErs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-	by localhost (Postfix) with ESMTP id 4bx3PH42tYz9sRp;
-	Tue,  5 Aug 2025 08:27:15 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MOt6ej6e3T4G; Tue,  5 Aug 2025 08:27:15 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase1.c-s.fr (Postfix) with ESMTP id 4bx3PH34F3z9sHR;
-	Tue,  5 Aug 2025 08:27:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 62F0C8B765;
-	Tue,  5 Aug 2025 08:27:15 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id yZAG-jS96Z85; Tue,  5 Aug 2025 08:27:15 +0200 (CEST)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id F07C08B763;
-	Tue,  5 Aug 2025 08:27:14 +0200 (CEST)
-Message-ID: <c4191597-341d-4fd7-bc3d-13daf7666c41@csgroup.eu>
-Date: Tue, 5 Aug 2025 08:27:14 +0200
+	s=arc-20240116; t=1754376682; c=relaxed/simple;
+	bh=rRXZvOTPP/mv1eWkRviMR2VrGNPbtuhMiK8LYtopuLI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ca6g7LU247PBlwcnWaRySa1C2ZHgbVeBcbto91zNSvvpaMMbOqMSqu8C7oZa7gvt6Z2tqOdQCkjzLLiQHTxJFxAPegAvnlaSR6+HRj54jrdQjEI4eqPvpT6TuGrrZvifcGObNvzBqrsKjOiu10Qq3TknB2yWEnnNfSJqumcuG4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bx3vf5SxqztT2j;
+	Tue,  5 Aug 2025 14:50:06 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6F5F91401F3;
+	Tue,  5 Aug 2025 14:51:08 +0800 (CST)
+Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
+ (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 5 Aug
+ 2025 14:51:07 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
+	<liulongfang@huawei.com>
+Subject: [PATCH v7 0/3] update live migration configuration region
+Date: Tue, 5 Aug 2025 14:51:03 +0800
+Message-ID: <20250805065106.898298-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/7] crypto: powerpc/md5 - Remove PowerPC optimized MD5
- code
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- sparclinux@vger.kernel.org
-References: <20250803204433.75703-1-ebiggers@kernel.org>
- <20250803204433.75703-4-ebiggers@kernel.org>
- <593b6997-9da4-439c-ba82-84e8bb2ed980@csgroup.eu>
- <20250804180923.GA54248@google.com>
- <187412bd-3ae0-4fe8-b526-f96af6bea6dc@csgroup.eu>
- <20250804225901.GC54248@google.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <20250804225901.GC54248@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
+On the new hardware platform, the configuration register space
+of the live migration function is set on the PF, while on the
+old platform, this part is placed on the VF.
 
+Change v6 -> v7
+	Update the comment of the live migration configuration scheme.
 
-Le 05/08/2025 à 00:59, Eric Biggers a écrit :
-> On Mon, Aug 04, 2025 at 09:02:27PM +0200, Christophe Leroy wrote:
->>
->>
->> Le 04/08/2025 à 20:09, Eric Biggers a écrit :
->>> On Mon, Aug 04, 2025 at 07:42:15PM +0200, Christophe Leroy wrote:
->>>>
->>>>
->>>> Le 03/08/2025 à 22:44, Eric Biggers a écrit :
->>>>> MD5 is insecure, is no longer commonly used, and has never been
->>>>> optimized for the most common architectures in the kernel.  Only mips,
->>>>> powerpc, and sparc have optimized MD5 code in the kernel.  Of these,
->>>>> only the powerpc one is actually testable in QEMU.  The mips one works
->>>>> only on Cavium Octeon SoCs.
->>>>>
->>>>> Taken together, it's clear that it's time to retire these additional MD5
->>>>> implementations, and focus maintenance on the MD5 generic C code.
->>>>
->>>> Sorry, for me it is not that clear. Even if MD5 is depracated we still have
->>>> several applications that use MD5 for various reasons on our boards.
->>>>
->>>> I ran the test on kernel v6.16 with following file:
->>>>
->>>> # ls -l avion.au
->>>> -rw-------    1 root     root      12130159 Jan  1  1970 avion.au
->>>>
->>>> With CONFIG_CRYPTO_MD5_PPC:
->>>>
->>>> # time md5sum avion.au
->>>> 6513851d6109d42477b20cd56bf57f28  avion.au
->>>> real    0m 1.02s
->>>> user    0m 0.01s
->>>> sys     0m 1.01s
->>>>
->>>> Without CONFIG_CRYPTO_MD5_PPC:
->>>>
->>>> # time md5sum avion.au
->>>> 6513851d6109d42477b20cd56bf57f28  avion.au
->>>> real    0m 1.35s
->>>> user    0m 0.01s
->>>> sys     0m 1.34s
->>>>
->>>> I think the difference is big enough to consider keeping optimised MD5 code.
->>>
->>> But md5sum doesn't use the kernel's MD5 code.  So it's implausible that
->>> it has any effect on md5sum.  The difference you saw must be due to an
->>> unrelated reason like I/O caching, CPU frequency, etc.  Try running your
->>> test multiple times to eliminate other sources of variation.
->>
->> md5sum uses the kernel's MD5 code:
-> 
-> What?  That's crazy.  Userspace MD5 code would be faster and more
-> reliable.  No need to make syscalls, transfer data to and from the
-> kernel, have an external dependency, etc.  Is this the coreutils md5sum?
-> We need to get this reported and fixed.
+Change v5 -> v6
+	Update VF device properties
 
+Change v4 -> v5
+	Remove BAR length alignment
 
-Content of files is already buffered inside the kernel. likcapi doesn't 
-tranfer data, it uses splice().
+Change v3 -> v4
+	Rebase on kernel 6.15
 
-As far as I know, coreutil is not able to use the TALITOS Security 
-engine we have on the mpc885 and mpc8321 microcontroleurs. We primarily 
-use libkcapi for that.
+Change v2 -> v3
+	Put the changes of Pre_Copy into another bugfix patchset.
 
-In order to keep things consistant, we use the same userspace on boards 
-which don't have a security engine, ie the mpc866, we rely on the kernel 
-providing an optimised software implementation fallback.
+Change v1 -> v2
+	Delete the vf_qm_state read operation in Pre_Copy
 
-Christophe
+Longfang Liu (3):
+  migration: update BAR space size
+  migration: qm updates BAR configuration
+  migration: adapt to new migration configuration
+
+ drivers/crypto/hisilicon/qm.c                 |  29 +++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 200 ++++++++++++------
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+ 3 files changed, 174 insertions(+), 62 deletions(-)
+
+-- 
+2.24.0
+
