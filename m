@@ -1,334 +1,206 @@
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2B225A2A5
-	for <linux-crypto@vger.kernel.org>; Fri,  8 Aug 2025 08:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9E0277CA0
+	for <linux-crypto@vger.kernel.org>; Fri,  8 Aug 2025 12:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754640452; cv=none; b=uygGCo0rGb7moLulegLZ5oRWtcPntXHhdyIqVtjHdjxA8d+FP6o7mGcCrXSZj/2nbTC08fm5jIHjFnNhDkC75FnNR2JnwlzLS1Cy/ssCzwNyVXcvgLHsSFyz73u1Vc3jRb2ZE+Qn87Y0VViAqePjFVv8GYAl6thGUWJrAM1XwQ4=
+	t=1754656026; cv=none; b=pUvgeYTJzZrhikw1pAI8w8x/TMOlUAFPKoiizxaXvoCktGfVGCkH8mLdidEVEtOQGuRT79/X8NEcurdvF11GXmG5n1BDGrJLWcs8nGGi6e1z3OCUm1+IzhzDABv0lUNinBEO97/8K5lRG8AzNDLq+cOY3as5oBxWaKZnkEIoOqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754640452; c=relaxed/simple;
-	bh=fbhjfatAP3UDLcg89AE5gW6OGazgFABaG9YaWCmdDwI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bc4oEbptFM+UZbnNp6R/47/UpBxmXbdYakcB4CGPzK7A6hpBwLDn2nfxhsvoAOLO/jp5KDqqAfRqfiiUHbqIaMwmdTfOkIdOrbKtJ64g9G3x8gIRcVfLZnavrgNQ684k15kxO51s0OQBfz3ENwZbBCrFJ9OIhiC1FkV00DjOvU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-88177d99950so171963539f.1
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Aug 2025 01:07:30 -0700 (PDT)
+	s=arc-20240116; t=1754656026; c=relaxed/simple;
+	bh=OKFjF1Bfnuf8ky87YXofFFua4f1JQFfaJXtPqeH77Fc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JEEwxdb3LTePEy5IyB686hz9icVYioGFcuZCo2iebafQouCG7bGkt0rPFBaljwKPxmvakgXMRWl8cG71s0O5D41CvM0sAmYikPfeAf0tsNMrCarVt3+IGAioVrKPDtXOgtNqXFzKshSrlhcP/w0FTCELM5vP0i2fn5IF13BrLNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=EX1gAw/p; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="EX1gAw/p"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-24003ed822cso11972015ad.1
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Aug 2025 05:27:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1754656023; x=1755260823; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PIrQA2x5lCe6wDOB4syEAlQhMjLSjkTfPyXDtA9t/Q4=;
+        b=EX1gAw/pFTb3JECWBw7OHbIMoenduDYovtHunGUzfd1XEj47Hr5W1+YZB8E+wyqRH2
+         0qTOoV/nwwzJ9EZ+2qBYrpKQr8ToMmPumoZlsUoagjL85/ba39O6w61EBSjPv4gbtWc7
+         7mlKlFBZqgO7kpsnenJf8XKNGrFehxsIh/7R8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754640449; x=1755245249;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4o3EjIAGgZerIrIiZtS4b2/wTHTz4tnKJgIo3bTtmqw=;
-        b=xEJ6TS5OYPgD5y0MRNFoSauil0fnjowroXATfWzVCGgLqo/CDh9nhufeErp119cIgK
-         Q0z+Y4fQ7+dbKovYy1aV4NpiuOtfR71cqaAqqJOwbsMfBIOsSokfd+1I6U1TCQS30Ce4
-         i0QRO6UAd/+AYPFNq2ERXQT1nReDjVl7HQzWTiJU25yghTgpenXgbL3D9xmD90TLn+RH
-         nKxjccHUH9neCfBOTHtXsBXIWB5mQUQyuUJsdGDLZy6vThDRE7n/YHBqZVzLTAqVxwAI
-         xj89fKm+AofdT4JWd47HNj89fyCPtJFl9qkxFv7B0CgTOY9dtX9IBdrRMuSgJvzHlRLX
-         naNw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTTQzQIYLKKp/1OeJ8vQWvemoORN/5XMQ6ETsr3Wbvg6YbQs8yKVg0jw1ReK7PXHKQZC0FdJ0+HHsHGD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9fWYUgTFZwebbFFhn8eAfnyLOMse2Ci6HcSYd/awPYXKuRgYn
-	EAl48hE+t9CsJZbUxGLo/BpPveK/KVy/JYOzzhOiiQyAQmKvcvD/Q9UgFQD3B++pYBBi7VOg543
-	BPB2uh+VuIZVOlXV59pfbl5pQ+pMdr+vGkIpVrqwhbceBYA+egBU76Zc+d2g=
-X-Google-Smtp-Source: AGHT+IH0YDeLMTECHnwk9kv4pYhwXKCIGHWgYukumAYPidEEnCYvOLmfKds+k7C3Zma8Gm5sqk627a66+RtBwkkjADSlKIRdR1ou
+        d=1e100.net; s=20230601; t=1754656023; x=1755260823;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PIrQA2x5lCe6wDOB4syEAlQhMjLSjkTfPyXDtA9t/Q4=;
+        b=uJiXteR5BLvMpl3bjGZKzdSzDg+uCpRpRy+KclvAQB4y6n1bjL62rGr4+ZIFh3LLgY
+         HdMuULtb13SYTxfzhvWdlULxbWz1IVNBCDAIie9pInFJjz//wdONjVzqMyGt3vXuN4Tj
+         ujW33TFkzLLijocIz5MhjvZr9vjOdTr3dYLYgliQXnFgZvOmxg4yDOc8R+lw7FB7CTM9
+         qQJj9Pjs6HKDBSFJplCm0q3KJxFYFzUGRLo6vSa0FAIktv4dGP994LL2Ur/PBA1vG1sW
+         EQvQBtvZ6Dhwl6pCLHYSAaNANp5qEk/oAaP7auM+xgREZxK/i9+/r787ol6GMPBfh1Kb
+         u3EQ==
+X-Gm-Message-State: AOJu0YzasDT5s+YJ2eB5SHO33KQ24O3H9P3LGAjYP++YINkeonLnqoBn
+	kFOlkQMQJoHdhKMHByskWdDYITNBS2mY3laqpnt9e/BT0l7ua2TzhaMUXWjf8+22THlH4uhXjwK
+	bB/y3
+X-Gm-Gg: ASbGnctMVuGw+lAK7nxzmAycs/PSsQP1aUoNoLTJl9Nmw2Igxoe9GlYlkDDAJPJo/bL
+	tCCr8HjI4LjIAQRxX/xuwSrTImGXMYUKX5agjsWZRaym08tuo+/tJ9oo/2iKyxA+pG9C7KWQZQP
+	kgsWdKp6EcyD8m353F8QrVydEZKTY/bGz0EJYK1RHW2SPJiBJXqfNLzxsVVz0t5ZMovJlQoyi49
+	N/suq53EgAzdH5qZL/zHlsYSgqtbG1gGNyTIyXcAiFhbWYxOGVTadtz2gxb2k9v1tu4dHI50l0Q
+	ozR814IOk5LvD/VXu9QtcmeW3AbRSJr9ckN0wis91B17Mw7GLv6nSbD1A2QR8XarnlV7FFZ1aOD
+	7f0Fh/mhZxTR3Ej8JB+cFbgKgiKZd3yubQRGLfEIUl2vhcDET8s1jHo73
+X-Google-Smtp-Source: AGHT+IEPWSAwHTSc8ABL9LCu2I6T6WODoVF4DZm55wdkaEYX0gM2Xc13ez3clxRybEyqcPrMyMs6Rw==
+X-Received: by 2002:a17:902:f78e:b0:240:1831:eede with SMTP id d9443c01a7336-242c21e043dmr54100225ad.32.1754656023573;
+        Fri, 08 Aug 2025 05:27:03 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e899a8cdsm208296665ad.121.2025.08.08.05.27.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Aug 2025 05:27:03 -0700 (PDT)
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+To: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	robh@kernel.org
+Cc: krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com,
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v4 0/6] Add SPAcc Crypto Driver
+Date: Fri,  8 Aug 2025 17:56:25 +0530
+Message-Id: <20250808122631.697421-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1584:b0:87c:30c6:a7cf with SMTP id
- ca18e2360f4ac-883f10de3e3mr400689239f.0.1754640449618; Fri, 08 Aug 2025
- 01:07:29 -0700 (PDT)
-Date: Fri, 08 Aug 2025 01:07:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6895b041.050a0220.7f033.0058.GAE@google.com>
-Subject: [syzbot] [crypto?] KMSAN: kernel-infoleak in rng_recvmsg
-From: syzbot <syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Add the driver for SPAcc(Security Protocol Accelerator), which is a             
+crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,      
+hashes and AEAD algorithms with various modes. The driver currently supports    
+below                                                                           
 
-syzbot found the following issue on:
+AEAD:                                                                           
+- ccm(sm4)                                                                      
+- ccm(aes)                                                                      
+- gcm(sm4)                                                                      
+- gcm(aes)                                                                      
+- rfc7539(chacha20,poly1305)                                                    
+                                                                                
+cipher:                                                                         
+- cbc(sm4)                                                                      
+- ecb(sm4)                                                                      
+- ctr(sm4)                                                                      
+- xts(sm4)                                                                      
+- cts(cbc(sm4))                                                                 
+- cbc(aes)                                                                      
+- ecb(aes)                                                                      
+- xts(aes)                                                                      
+- cts(cbc(aes))                                                                 
+- ctr(aes)                                                                      
+- chacha20                                                                      
+- ecb(des)                                                                      
+- cbc(des)                                                                      
+- ecb(des3_ede)                                                                 
+- cbc(des3_ede)                                                                 
+                                                                                
+hash:                                                                           
+- cmac(aes)                                                                     
+- xcbc(aes)                                                                     
+- cmac(sm4)                                                                     
+- xcbc(sm4)                                                                     
+- hmac(md5)                                                                     
+- md5                                                                           
+- hmac(sha1)                                                                    
+- sha1                                                                          
+- sha224
+- sha256                                                                        
+- sha384                                                                        
+- sha512                                                                        
+- hmac(sha224)                                                                  
+- hmac(sha256)                                                                  
+- hmac(sha384)                                                                  
+- hmac(sha512)                                                                  
+- sha3-224                                                                      
+- sha3-256                                                                      
+- sha3-384                                                                      
+- sha3-512                                                                      
+- hmac(sm3)                                                                     
+- sm3                                                                           
+- michael_mic                                              
 
-HEAD commit:    6e64f4580381 Merge tag 'input-for-v6.17-rc0' of git://git...
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a181a2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b6003cf8ecb92ff2
-dashboard link: https://syzkaller.appspot.com/bug?extid=e8bcd7ee3db6cb5cb875
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=117fa1a2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105e9058580000
+Pavitrakumar Managutte (6):
+  dt-bindings: crypto: Document support for SPAcc
+  Add SPAcc Skcipher support
+  Add SPAcc AUTODETECT Support
+  Add SPAcc ahash support
+  Add SPAcc AEAD support
+  Add SPAcc Kconfig and Makefile
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3d9a1192a7cc/disk-6e64f458.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8f363fe8f54a/vmlinux-6e64f458.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/10b73833a575/bzImage-6e64f458.xz
+changelog:
+  v1->v2 changes:
+    - Added local_bh_disable() and local_bh_enable() for the below calls.
+      a. for ciphers skcipher_request_complete()
+      b. for aead aead_request_complete()
+      c. for hash ahash_request_complete()
+    - dt-bindings updates
+      a. removed snps,vspacc-priority and made it into config option
+      b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
+      c. Added description to all properties
+    - Updated corresponding dt-binding changes to code 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
+  v2->v3 changes:
+    - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
+    - removed mutex_lock/unlock for spacc_skcipher_fallback call
+    - dt-bindings updates
+     a. updated SOC related information
+     b. renamed compatible string as per SOC.
+   - Updated corresponding dt-binding changes to code 
 
-=====================================================
-BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:30 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:300 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:328 [inline]
-BUG: KMSAN: kernel-infoleak in _copy_to_iter+0xf0e/0x33f0 lib/iov_iter.c:185
- instrument_copy_to_user include/linux/instrumented.h:114 [inline]
- copy_to_user_iter lib/iov_iter.c:24 [inline]
- iterate_ubuf include/linux/iov_iter.h:30 [inline]
- iterate_and_advance2 include/linux/iov_iter.h:300 [inline]
- iterate_and_advance include/linux/iov_iter.h:328 [inline]
- _copy_to_iter+0xf0e/0x33f0 lib/iov_iter.c:185
- copy_to_iter include/linux/uio.h:220 [inline]
- memcpy_to_msg include/linux/skbuff.h:4202 [inline]
- _rng_recvmsg crypto/algif_rng.c:101 [inline]
- rng_recvmsg+0x1af/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  v3->v4 changes:
+   - removed snps,vspacc-id from the dt-bindings 
+   - removed mutex_lock from ciphers
+   - replaced magic numbers with macros
+   - removed sw_fb variable from struct mode_tab and associated code from the
+     hashes
+   - polling code is replaced by wait_event_interruptible
 
-<Zero or more stacks not recorded to save memory>
-
-Uninit was stored to memory at:
- crypto_sha3_finup+0x136/0xe00 crypto/sha3_generic.c:202
- crypto_shash_op_and_zero crypto/shash.c:105 [inline]
- crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
- jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- crypto_shash_finup+0xc5a/0xe80 crypto/shash.c:162
- crypto_shash_update include/crypto/hash.h:994 [inline]
- jent_hash_time+0x1de/0x590 crypto/jitterentropy-kcapi.c:136
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- put_unaligned_le64 include/linux/unaligned.h:43 [inline]
- crypto_sha3_finup+0xc98/0xe00 crypto/sha3_generic.c:213
- crypto_shash_op_and_zero crypto/shash.c:105 [inline]
- crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
- jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- keccakf_round crypto/sha3_generic.c:-1 [inline]
- keccakf+0x1efb/0x2110 crypto/sha3_generic.c:155
- crypto_sha3_finup+0x772/0xe00 crypto/sha3_generic.c:210
- crypto_shash_op_and_zero crypto/shash.c:105 [inline]
- crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
- jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- crypto_sha3_finup+0x5be/0xe00 crypto/sha3_generic.c:207
- crypto_shash_op_and_zero crypto/shash.c:105 [inline]
- crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
- jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- crypto_sha3_finup+0x136/0xe00 crypto/sha3_generic.c:202
- crypto_shash_op_and_zero crypto/shash.c:105 [inline]
- crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
- jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- crypto_shash_finup+0xc5a/0xe80 crypto/shash.c:162
- crypto_shash_update include/crypto/hash.h:994 [inline]
- jent_hash_time+0x1de/0x590 crypto/jitterentropy-kcapi.c:136
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
- jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
- jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
- jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
- jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
- crypto_rng_generate include/crypto/rng.h:144 [inline]
- _rng_recvmsg crypto/algif_rng.c:97 [inline]
- rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1087
- sock_read_iter+0x2c8/0x360 net/socket.c:1157
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x857/0xf00 fs/read_write.c:572
- ksys_read fs/read_write.c:715 [inline]
- __do_sys_read fs/read_write.c:724 [inline]
- __se_sys_read fs/read_write.c:722 [inline]
- __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
- x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Local variable intermediary created at:
- jent_hash_time+0x9b/0x590 crypto/jitterentropy-kcapi.c:110
- jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
-
-Bytes 0-23 of 24 are uninitialized
-Memory access of size 24 starts at ffff88811855fb70
-Data copied to user address 00002000000001c0
-
-CPU: 1 UID: 0 PID: 5820 Comm: syz-executor170 Not tainted 6.16.0-syzkaller-11952-g6e64f4580381 #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-=====================================================
+ .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |  114 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1297 +++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        |  968 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2452 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  832 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  275 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  230 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  374 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  114 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  330 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  611 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  752 +++++
+ 16 files changed, 8417 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+base-commit: 9d9b193ed73a65ec47cf1fd39925b09da8216461
+-- 
+2.25.1
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
