@@ -1,165 +1,334 @@
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11013005.outbound.protection.outlook.com [40.107.44.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F094623535A;
-	Fri,  8 Aug 2025 07:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.5
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754639084; cv=fail; b=rxKDAr1igzgWWywaJaFUKTnd9p6pXXNbdxKKQ/tZT07ageDc6wCUYQMQEF4GgaY2QP0DMP9J18hlweEoXS7kCYbFfVE649Bmuw8uHjxq8WqJRcyxwOCXduvuMuLrsdIk0EsfBFoMRfdXpByAu80ZLIdmY4f9UtPQB20y4NWGVQI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754639084; c=relaxed/simple;
-	bh=Z+lBi37p8yNBg9PkEvSdQYD/4QSQ0wROMuRot39/zFY=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=I1wuutxACy6xCaYzPNvYIfMaVOsgdJet/SM1a6PeQ1Kv6+4A0Z+zgyOEFEKLIJ2r3On1xMMs+b5q91+0jFIkM8PEpudQpff3qgIGrFKEcT06nSGBbE4khNxSCquE9CAG2828WdA6SAKOhPSPFktqDNpU5gF6+8Q30HrgnNdzmzs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=qI062VP4; arc=fail smtp.client-ip=40.107.44.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="qI062VP4"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IYiQ33OvNtsE/KJajIgPYeuuDi8INdq3LOsc7lauuCEJrl3JlG88aKIBAVAGcj52hBu6ZoULk8t4HrJCx1IQb3LnPtu+4LHUDf+z8EdvlLU5LCfuA3jtTZDp8dQXHGw40pyfRpAobQ+VRPloKEd+02jsbZxAbn6Bazi3RgojimWpNoLsLTYaALxappjz9OMlmGOuCcj/eEjSpDYlz4Ul8Kl6xZWPXi5r7SZuAwVS516lVQaV0UDQNaDIac3QhcHmDUNSLgmqlRO3SAsbNKC3HGhNJT+uVWI+UZjrnwpP/7LQGJayYbda+gSLM3hspHZ7RWNficf4YXHUFUVmH261DQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zCTOPHWicUN+8Pmp/1HydmWWgQMonRb7E6VG8pthaLs=;
- b=BrMnOjhUaqL0jVdWK4JJjcO8SKFwK0FSlIOSIYBg8Zah4hwWrwYFhLTT+jpQvyqcrq5Q0DZrQ59iosZa+MKSU6jPVL65yuHegf0zPilShyUwl2M/MpOpA3CAnsY6bKBk4vbtjPkA5sPYGMfq/bIM5jhKViYJeW2n1RDwGHTVw9BzdFMyfyM7XMBhrVUkZN60gGa4zg92rquGbbTK+VFDEPwG44DlPEgZh+6uStCocetJVeeuDWwHZGFy0gBqZGcZrZ4UXOdsP10aPNytPAxa9D7V1z1dmML9yqBOjN9HfAVSrUbnENNyxntEyniLsb1wNtLRcXW4y9aFPA/KWFlXiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zCTOPHWicUN+8Pmp/1HydmWWgQMonRb7E6VG8pthaLs=;
- b=qI062VP4QzhVYWjJaOIv/Iv2jdJBFIDw/yFjv35XD40Tls84fPU6wKfcQANrEhL26G8SL9kKLQxJ4gc5NVEbu2c4rrrYcZbCv429t8hcD+caNGcBtT4pbYEh3utTvwSlS5km+iiZxGaNeNPfTpFPf7NPZEHeOUMjggVxoTQw35sqKIKz0Ko7Zi41oOubhB6N3ha7awSI5ckTpJGs3AZfm+6AYQEe2YzP6WC7aZ6x6Q2qNj1jgSL1Z9RPtOQSy/7pEpLItpqfqIzS+nPNh6jqEL09LOcBGWcJRh2C/uPO3vsKiP6nyLJkyTx6BEoFxQ1JBj2oS7d1P9e7Fd2Gd+9qrQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
- PUZPR06MB5586.apcprd06.prod.outlook.com (2603:1096:301:e8::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9009.18; Fri, 8 Aug 2025 07:44:37 +0000
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.9009.013; Fri, 8 Aug 2025
- 07:44:36 +0000
-From: Qianfeng Rong <rongqianfeng@vivo.com>
-To: Mario Limonciello <mario.limonciello@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Qianfeng Rong <rongqianfeng@vivo.com>
-Subject: [PATCH] crypto: ccp - Remove redundant __GFP_ZERO
-Date: Fri,  8 Aug 2025 15:44:26 +0800
-Message-Id: <20250808074426.214726-1-rongqianfeng@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR01CA0002.apcprd01.prod.exchangelabs.com
- (2603:1096:4:191::21) To SI2PR06MB5140.apcprd06.prod.outlook.com
- (2603:1096:4:1af::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2B225A2A5
+	for <linux-crypto@vger.kernel.org>; Fri,  8 Aug 2025 08:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754640452; cv=none; b=uygGCo0rGb7moLulegLZ5oRWtcPntXHhdyIqVtjHdjxA8d+FP6o7mGcCrXSZj/2nbTC08fm5jIHjFnNhDkC75FnNR2JnwlzLS1Cy/ssCzwNyVXcvgLHsSFyz73u1Vc3jRb2ZE+Qn87Y0VViAqePjFVv8GYAl6thGUWJrAM1XwQ4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754640452; c=relaxed/simple;
+	bh=fbhjfatAP3UDLcg89AE5gW6OGazgFABaG9YaWCmdDwI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bc4oEbptFM+UZbnNp6R/47/UpBxmXbdYakcB4CGPzK7A6hpBwLDn2nfxhsvoAOLO/jp5KDqqAfRqfiiUHbqIaMwmdTfOkIdOrbKtJ64g9G3x8gIRcVfLZnavrgNQ684k15kxO51s0OQBfz3ENwZbBCrFJ9OIhiC1FkV00DjOvU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-88177d99950so171963539f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Aug 2025 01:07:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754640449; x=1755245249;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4o3EjIAGgZerIrIiZtS4b2/wTHTz4tnKJgIo3bTtmqw=;
+        b=xEJ6TS5OYPgD5y0MRNFoSauil0fnjowroXATfWzVCGgLqo/CDh9nhufeErp119cIgK
+         Q0z+Y4fQ7+dbKovYy1aV4NpiuOtfR71cqaAqqJOwbsMfBIOsSokfd+1I6U1TCQS30Ce4
+         i0QRO6UAd/+AYPFNq2ERXQT1nReDjVl7HQzWTiJU25yghTgpenXgbL3D9xmD90TLn+RH
+         nKxjccHUH9neCfBOTHtXsBXIWB5mQUQyuUJsdGDLZy6vThDRE7n/YHBqZVzLTAqVxwAI
+         xj89fKm+AofdT4JWd47HNj89fyCPtJFl9qkxFv7B0CgTOY9dtX9IBdrRMuSgJvzHlRLX
+         naNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXTTQzQIYLKKp/1OeJ8vQWvemoORN/5XMQ6ETsr3Wbvg6YbQs8yKVg0jw1ReK7PXHKQZC0FdJ0+HHsHGD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9fWYUgTFZwebbFFhn8eAfnyLOMse2Ci6HcSYd/awPYXKuRgYn
+	EAl48hE+t9CsJZbUxGLo/BpPveK/KVy/JYOzzhOiiQyAQmKvcvD/Q9UgFQD3B++pYBBi7VOg543
+	BPB2uh+VuIZVOlXV59pfbl5pQ+pMdr+vGkIpVrqwhbceBYA+egBU76Zc+d2g=
+X-Google-Smtp-Source: AGHT+IH0YDeLMTECHnwk9kv4pYhwXKCIGHWgYukumAYPidEEnCYvOLmfKds+k7C3Zma8Gm5sqk627a66+RtBwkkjADSlKIRdR1ou
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|PUZPR06MB5586:EE_
-X-MS-Office365-Filtering-Correlation-Id: d198c397-f318-462a-f1e4-08ddd64f6c3b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|52116014|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?M6rshcDeNGEL61IW34Mt+uKRwHY/RVxe3ZQKuCLLjPwWsAYuMi+QobdHzSfT?=
- =?us-ascii?Q?RQxX5/wOpBOjX5ftQ2mtCwyp5DP+KXIXDWzba900saBlLhwt7W+XoB0hDshH?=
- =?us-ascii?Q?TgzGSpz6KjlqCY78lzzYvfomtkBwaShVrK3ywirZJ9w6Wh8hLi0KV/ap5nBT?=
- =?us-ascii?Q?w0EkbNHdYqQUKgaEVzTYRtgSzpTCuLxYS81uf/NkAdtgjy2QcQ9mxq2mphWC?=
- =?us-ascii?Q?vjoaEfds0mWpN26/i1lneLk60KVHYdRPijRFKVzg9NWkusRiOQVm7wlWdBtd?=
- =?us-ascii?Q?ugyz+ST8ncDWZUB20Ve6Z/15hr5ZmN0ORAspH7ds5Q6Eh8Swpn/bM+1GAKqm?=
- =?us-ascii?Q?qTseHA+ek8tLiP+kJzZMTKE68jjke4dmynpHiW8qoyHoq0W0q7ZHZtL3M3wD?=
- =?us-ascii?Q?Tbx5ZuymnxEcMhROriyQ7HHxwKEuILDDDa4/PfhercGXA0G3aXh2vpoySjY3?=
- =?us-ascii?Q?CywtO/7loazvGEyl7U73UGphXJJ3GcQld5nvVIcZoYdBp4bpU0/uyUwSPm+W?=
- =?us-ascii?Q?SWf5Uelah3ZLUSus5f6GBAhM7QECi4kdc5aNhBlwhFCX0vVvnOvH/D1KlyUH?=
- =?us-ascii?Q?q/fb9Kz27uqAJhqCHTTDNHqr+WkHg54wOUb9KIKFJioz7Zs2MGoAbc9JesLX?=
- =?us-ascii?Q?LhfliVbi2doX9f0wa+OAK8rdHEF41OMu5UO4bIwWU+hWW50GrAnkoUh5G8f8?=
- =?us-ascii?Q?MMz+x27Rq2g7tIgMtKpuG6df57VxdgOcuRWN9CHEb6YF5qW0d9wNVe4eZXX+?=
- =?us-ascii?Q?kCqNz2azzcZhkFDucgpwhEraSXs5/FNKkz5S8BKDq2eMsyYrjoqA9E+lyIDI?=
- =?us-ascii?Q?h7WkCaF85tcq5Z7B8p8VC24QqErA3ua0WsYhC09GOUBQdCLdRmhTcaI899JT?=
- =?us-ascii?Q?NvaBUIugiRc8ZdAl8LXHVGyIovnAMCUZsWf3cKv/qfGDQHnjh+GJUeLFJJgq?=
- =?us-ascii?Q?0v9uzkbKckfl7n4sVDy15mUgEKyF0vI8gETVoIbqgK4sSgytiquTqHjDk8T9?=
- =?us-ascii?Q?9szn2DJvJLUo47+t0+xuSRzWCPMNf0/8dioN6Kum9RkOfdMPhgSOUV7qXt7v?=
- =?us-ascii?Q?4apPXSLoKLN0bE875WK/xhmODXBjdvc/DDiMAolPjw5XcPyavMo5ZyquyuIr?=
- =?us-ascii?Q?Nt/OkZBuFaC8pEY+jxK/pvSOh+IUlgzVNpVIWuDdFdonbgAr2h6/v9M3iXCy?=
- =?us-ascii?Q?aDl8hIFtX4v3TOD6xdJ5hA+nQqJzFKMXyNE2ndzCmsKQCaGWbl+IqWzCY99y?=
- =?us-ascii?Q?9BvdAtoFBvkh/l2x3+TI3NHRJ9SmIFxbJ7K1uB040f0jxOHQx6IM8b/RgdEZ?=
- =?us-ascii?Q?/g5cAh48ovv+2gdROdO/Yaf8GjZR/m3HxMRYBK08zH2JksmNHjYyUEBEltDE?=
- =?us-ascii?Q?cOWRpil5mtJKi4qnV0wIaFlKkCm8Ayg7qwcZqNcG/+VX/S9vcgS7uaoWR3p2?=
- =?us-ascii?Q?WV6lVw1PXo/wB8BEXmJtwMSRNy0DR+JZaX31o2FeJmlOAP3U4dsEZA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?y0sF3Iutd9A936ZxpsKmubC4foQcRbLdyxpFeOMonNcsxUXGxI/dvu+Zmuxz?=
- =?us-ascii?Q?F46lqrODVQwHWL13ZQssCkpwAt1PRDGdSmbqrzWGZUOKSVfJdQduErMBwkG0?=
- =?us-ascii?Q?wNYucQEJWdXqL2/teCT80xFKAOoQsFuuFfYuHPTdagTM6VzTf478MaONIOA5?=
- =?us-ascii?Q?A7oea1Xy2/zDil/F92w1qo3Hv5hpXXEWGdmMD8v73zpcF/dBzU0qmXndTjs0?=
- =?us-ascii?Q?Ya7l0V7xF4qWZj6caNN6negJC1f7qyncZ3n2/yY4JNHUs+KXO0daTzavMlLI?=
- =?us-ascii?Q?TaO00donHnB+45Rsuvf9tZ+3KPUq7kyLP9p9acjYsTWhN9IFDKcBmFJ/OwzU?=
- =?us-ascii?Q?IDoLGDQz0OodXiWrSUt4Sn+h1nP2DztBEBBolEQGMq3TQcVOKe+t4Y18iOWZ?=
- =?us-ascii?Q?I9VkGJZnmd/IK7SIpLnXMBSdKeeDlsmKvv40wBlK5QFM+VHAtuNWgTTfSAXj?=
- =?us-ascii?Q?7FI7rngHETBvr28SutOjyLliPW94Lf+mrntD/JRKT7DvFNPlRymMFXFtkYw1?=
- =?us-ascii?Q?qqKjoyWA6NNzcyM+eqKz182YV5thrqPxMu1C6ClzfnvwwwZJfyCwM31dki6P?=
- =?us-ascii?Q?JdXQnzROkH6YUnZm/OnIOuXOySAgXVlx7GuZyH3IjzOE+Bl7QTmpu/+E0Ixh?=
- =?us-ascii?Q?Gn//J3HOWdziUNtnVwtwomWGXGla/l5zxObPIDNIQ37chHLOi6GOVhXXtIW2?=
- =?us-ascii?Q?Ub3lvJljLR82fPN/Q88n2CZW5AqV11Kj5knwqGEqXO7XBkAkafHw15ZS3JUW?=
- =?us-ascii?Q?VFn+tNFEZNnPFSBfpIJ+ogM3uj31gKxZWCGy0tLJO3Y3GZqwARchK0QGiJ83?=
- =?us-ascii?Q?B69SqSDPpGKD4BdjoeFRoPQRajs+myJJcU0fnw0FtLiniXk/5sTkmcql12my?=
- =?us-ascii?Q?o0yLruH4kASsDel2R80hRdscqd14c7CvG/BhjjdzX3LNZhqzHI2s+SvGCt/a?=
- =?us-ascii?Q?SCrhDXXzh8OuYd8DH5XY9LssxhFNRReKh2SQeOk6t5KrSRKYfkdv+Zl3rK4q?=
- =?us-ascii?Q?C2wyEDy5nDlq0/6bg/v4lzDjLd2LA4cQtfi6AcNFkobYtBf2y4zcXblaxnnj?=
- =?us-ascii?Q?wlJYTta1ioj3dDJrPOxRL17DCuVMc7i82mOtw7Ux+aqmKZr86uvpeVcmKwoO?=
- =?us-ascii?Q?hUXFCE3FLWFFJDpLW1Sk21PDAMYoOuusQyp1c7JKSUI+Afja+iLMR+xOzyjq?=
- =?us-ascii?Q?8sTrFU6g0rubA9rKuqtfcO2bMrMQj5ADdqbvirf5UoOTED3CPLqeDecvoPJm?=
- =?us-ascii?Q?bhMLXXKw+iL0+6ssMsocOxStViYsHpkso1kUTsJXD1xypA0QXehcRM1vy6DW?=
- =?us-ascii?Q?7hTgaTm4Oj+xv2AxHlEp9ysxhklXxWFP7tABjjEhbJCuscCw8Cx2SjsuzuAw?=
- =?us-ascii?Q?UaS3l6Mjb3/l/GPZjXP4vQyMS11CvKmFXFv65ZFPZhAm+rNoMsr80Qnew0yj?=
- =?us-ascii?Q?dyLbL4r1ygzeWPfqlO1e36b0JzxRqUwx6desDzquEAP5GDSSABk7/1/0HI61?=
- =?us-ascii?Q?VEqdFzdhQNam1EqAPVG81YcOU8wZzlmyXYuU7vrDkCOkIGkvlUtZZ2x3FEx4?=
- =?us-ascii?Q?MXBZ4kxmYZoDQ2G0DYPRqCiwwvVaJb7a/JuCuJ+Z?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d198c397-f318-462a-f1e4-08ddd64f6c3b
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2025 07:44:36.5583
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QTvomBeLScGXg7qcDRT876B0LqVD6wTj/IftSDnyDOvSeiT8TbROYoTjIoWiAEqCp4aGlx+NoAg0Tc1FvRngvw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5586
+X-Received: by 2002:a05:6602:1584:b0:87c:30c6:a7cf with SMTP id
+ ca18e2360f4ac-883f10de3e3mr400689239f.0.1754640449618; Fri, 08 Aug 2025
+ 01:07:29 -0700 (PDT)
+Date: Fri, 08 Aug 2025 01:07:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6895b041.050a0220.7f033.0058.GAE@google.com>
+Subject: [syzbot] [crypto?] KMSAN: kernel-infoleak in rng_recvmsg
+From: syzbot <syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Remove the redundant __GFP_ZERO flag from kzalloc() since kzalloc()
-inherently zeroes memory.
+Hello,
 
-Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+syzbot found the following issue on:
+
+HEAD commit:    6e64f4580381 Merge tag 'input-for-v6.17-rc0' of git://git...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a181a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b6003cf8ecb92ff2
+dashboard link: https://syzkaller.appspot.com/bug?extid=e8bcd7ee3db6cb5cb875
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=117fa1a2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105e9058580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3d9a1192a7cc/disk-6e64f458.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8f363fe8f54a/vmlinux-6e64f458.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/10b73833a575/bzImage-6e64f458.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:30 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:300 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:328 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0xf0e/0x33f0 lib/iov_iter.c:185
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ copy_to_user_iter lib/iov_iter.c:24 [inline]
+ iterate_ubuf include/linux/iov_iter.h:30 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:300 [inline]
+ iterate_and_advance include/linux/iov_iter.h:328 [inline]
+ _copy_to_iter+0xf0e/0x33f0 lib/iov_iter.c:185
+ copy_to_iter include/linux/uio.h:220 [inline]
+ memcpy_to_msg include/linux/skbuff.h:4202 [inline]
+ _rng_recvmsg crypto/algif_rng.c:101 [inline]
+ rng_recvmsg+0x1af/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+<Zero or more stacks not recorded to save memory>
+
+Uninit was stored to memory at:
+ crypto_sha3_finup+0x136/0xe00 crypto/sha3_generic.c:202
+ crypto_shash_op_and_zero crypto/shash.c:105 [inline]
+ crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
+ jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ crypto_shash_finup+0xc5a/0xe80 crypto/shash.c:162
+ crypto_shash_update include/crypto/hash.h:994 [inline]
+ jent_hash_time+0x1de/0x590 crypto/jitterentropy-kcapi.c:136
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ put_unaligned_le64 include/linux/unaligned.h:43 [inline]
+ crypto_sha3_finup+0xc98/0xe00 crypto/sha3_generic.c:213
+ crypto_shash_op_and_zero crypto/shash.c:105 [inline]
+ crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
+ jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ keccakf_round crypto/sha3_generic.c:-1 [inline]
+ keccakf+0x1efb/0x2110 crypto/sha3_generic.c:155
+ crypto_sha3_finup+0x772/0xe00 crypto/sha3_generic.c:210
+ crypto_shash_op_and_zero crypto/shash.c:105 [inline]
+ crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
+ jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ crypto_sha3_finup+0x5be/0xe00 crypto/sha3_generic.c:207
+ crypto_shash_op_and_zero crypto/shash.c:105 [inline]
+ crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
+ jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ crypto_sha3_finup+0x136/0xe00 crypto/sha3_generic.c:202
+ crypto_shash_op_and_zero crypto/shash.c:105 [inline]
+ crypto_shash_finup+0x327/0xe80 crypto/shash.c:171
+ jent_hash_time+0x247/0x590 crypto/jitterentropy-kcapi.c:138
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ crypto_shash_finup+0xc5a/0xe80 crypto/shash.c:162
+ crypto_shash_update include/crypto/hash.h:994 [inline]
+ jent_hash_time+0x1de/0x590 crypto/jitterentropy-kcapi.c:136
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+ jent_measure_jitter+0x547/0x770 crypto/jitterentropy.c:541
+ jent_gen_entropy+0x209/0x450 crypto/jitterentropy.c:569
+ jent_read_entropy+0x353/0xeb0 crypto/jitterentropy.c:615
+ jent_kcapi_random+0x6c/0x250 crypto/jitterentropy-kcapi.c:284
+ crypto_rng_generate include/crypto/rng.h:144 [inline]
+ _rng_recvmsg crypto/algif_rng.c:97 [inline]
+ rng_recvmsg+0x149/0x2d0 crypto/algif_rng.c:114
+ sock_recvmsg_nosec net/socket.c:1065 [inline]
+ sock_recvmsg+0x2df/0x390 net/socket.c:1087
+ sock_read_iter+0x2c8/0x360 net/socket.c:1157
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x857/0xf00 fs/read_write.c:572
+ ksys_read fs/read_write.c:715 [inline]
+ __do_sys_read fs/read_write.c:724 [inline]
+ __se_sys_read fs/read_write.c:722 [inline]
+ __x64_sys_read+0x1fb/0x4d0 fs/read_write.c:722
+ x64_sys_call+0x2f9c/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:1
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Local variable intermediary created at:
+ jent_hash_time+0x9b/0x590 crypto/jitterentropy-kcapi.c:110
+ jent_condition_data+0x4f0/0x510 crypto/jitterentropy.c:438
+
+Bytes 0-23 of 24 are uninitialized
+Memory access of size 24 starts at ffff88811855fb70
+Data copied to user address 00002000000001c0
+
+CPU: 1 UID: 0 PID: 5820 Comm: syz-executor170 Not tainted 6.16.0-syzkaller-11952-g6e64f4580381 #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+=====================================================
+
+
 ---
- drivers/crypto/ccp/hsti.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/crypto/ccp/hsti.c b/drivers/crypto/ccp/hsti.c
-index 1b39a4fb55c0..0ab3708951af 100644
---- a/drivers/crypto/ccp/hsti.c
-+++ b/drivers/crypto/ccp/hsti.c
-@@ -84,7 +84,7 @@ static int psp_poulate_hsti(struct psp_device *psp)
- 		return 0;
- 
- 	/* Allocate command-response buffer */
--	req = kzalloc(sizeof(*req), GFP_KERNEL | __GFP_ZERO);
-+	req = kzalloc(sizeof(*req), GFP_KERNEL);
- 	if (!req)
- 		return -ENOMEM;
- 
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
