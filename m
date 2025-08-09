@@ -1,92 +1,66 @@
-Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0EC146A72;
-	Sat,  9 Aug 2025 10:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.242
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D393F17BBF;
+	Sat,  9 Aug 2025 10:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754733910; cv=none; b=HTYpn0UHEdReDJ9wjvug4m4i6ao9/o80QyOwImI/7y9HJm9LuRRnvQpoEdDLGIZZONX3Q3c0V/rtGh8DEe2s38eS1PjEi+pJbPO6Q4TNXfhTCjgtgb7V+WMjZhmy6nER5lNb23Jpr20Zk99CMbu8BI4chTjN0rwBxRaDDOpb4JA=
+	t=1754735810; cv=none; b=QJc7cQOWJfxICV9ZVxHWHTy/wkNsB2LOvpzQgib8eb7LlN/CBNEvaYpOdrKthOYrmU0FMw6jrNu/hB5v0H0HEUpU6gJSIR/wuzNCgMIH2axEculbRpkLviWHt4ney1ZocMwaADr87xWWqtfjuvRbED5Ze4HjESwLVN6Qd382beE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754733910; c=relaxed/simple;
-	bh=lVNZ6Vs+ZMKKXx3J6Dt8FT9hY4HAY8MLWksoD2tTOyc=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=XR1PrbYmQrfzyO859uFcd3dIpOy9flVvTJnyfgr853Y/f4YL06mebhu3WTkSUF3nfPC6lUfQ2ly+GXin5GhwZlYefaZfLIU1816NY7daKWOZCo7AUSIrel6Nn0iPcQ/E9ZkK4Im0xE2DnodJiIiSv80Iq5p6CjGwEJdmRGcqx6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=SSE1jwF8; arc=none smtp.client-ip=203.205.221.242
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1754735810; c=relaxed/simple;
+	bh=irkFrpvguBFdjMkE8ph+mR64/d+gfVlxX7KDzV2t3yk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ms3tvf9eKMcZx0b7OKsAa0RBb2YyrC4DZYfe1Vw15UbX7Ous95whx9sRuRFEJQ6SF6PWtaGO8XYg1tHQuCZEL+Sv+GAo+oG/T8eI4noIKgJxSR9PHQukPEV3bHt94xdq3mPIAf02VutGjtSUkDD8lbj3ivi5m6UOPWSYMdMP3Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9xXoNJX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="SSE1jwF8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1754733592; bh=DKmkljtQB7ro0+vyMCwEguJAv66dTk4iG4899l3s0Hk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=SSE1jwF8KMOM2lDmI1YxfLGGaZz0loe6UXyS5+LmKFo9/Ojzs0KkCdXlR3271eIGN
-	 LtIhnVsaT8QaWBBsrDGVGrFnl5mLPdJdhr/Q2ygtCvlrdXO7Bvv4VTeaCP5AizeW+l
-	 ZYVB4RfSu99orLrKp/ZZbaJFMsnjlluzKTfmA13M=
-Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.231.14])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id EF2BB6B8; Sat, 09 Aug 2025 17:59:50 +0800
-X-QQ-mid: xmsmtpt1754733590tuxu8ia6i
-Message-ID: <tencent_B406618996EEF22ED6CC8EA7DF46FD92D206@qq.com>
-X-QQ-XMAILINFO: Nq1uWKlIb9DMQ2GdnJ6K2hM4AFeSO37h50FFuFrT75jNbtFnBYc6FpF0W1e1vg
-	 PrCTGKPDOx3GqJ/cVM8LtZK1AsEEhbTs5UCXF0l1OBQUPKHr2jo7CHG2NQlntLcjzeAes93MJ78u
-	 kqmKFSD8SfVrRFaz0EwQwlBPcBJXZFh22LRhJ67ZUiLS0gtk8rlY95qjeHiMeheDr8jOGnv+knVW
-	 L9ZPfB0c2WWvlHL5/VYAmxJ4CgQ51jnL5sIRmgbzQ6jBU7+r8S3PhqB9nDtwvMmNcPfkeIiwuRDn
-	 9VK4Pp6W/qbdw6VyGQoH4XlfGBQWGWOUntpnZrJ3514ILthisC0vhZX6axH4VaHRPvOs0FtExgZ1
-	 J9dke9Sl5WPdYbPP/e8wLNvWCDIAXruhDlCVLlv2IE75F7oIFdPCGKLNIekOfOFjZ9bZnrMGW7La
-	 +WrU9OAbQdFrKaVyLHwu7nQUd6xlNoX/Tces3gCQGhGnVHiofQ8Vc+UlzVTpKfSHoYiWCgm25wTA
-	 IcbTG9q/P+s7N+S9F9wrUS6wsLmMs47TcK/mW00BBfIHoe85NpJVxrJ1dQ9VwslLAp+ahyUvbTt8
-	 qxn/zKa1HOyeYTCbjdex9MiBJeol3IyC8hsFnC2wisW1LY45ul7+JC7uZx5nDWpkbJ7+9iIFcRj1
-	 GPo74O1ixPkLCFDU79UJKU2xKbYdT5xNoyG4fkR+ijBojdsgNvn/a3kJjHxFi9pWQhNyQ2kVzKIC
-	 6ss5PL/GZR1qeYS7kIFICoiAq+MRbZcLE/JNnCDJCRCJvQ4RHXnWyD6Ci/aV50L9WofNRDwLJXRA
-	 Bpn2I059PgpBNlNdnV7y/6Wn+nbArATixGUE+yz4crleJ4QotStesgoQMYauOwhIabFuhcqdhUKK
-	 CIRAQNts1ZaDEj3jafTWXnPUREk6t4hcTa2HwKZXDv/PzUAWJYUA7ORve8KPsANY7QZpe7Ph9niA
-	 Xw+ZmpLGRSA0ry7tEOZ63FM3SNp7Mg
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] crypto: Prevent kernel-infoleak in rng_recvmsg
-Date: Sat,  9 Aug 2025 17:59:43 +0800
-X-OQ-MSGID: <20250809095942.310397-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <6895b041.050a0220.7f033.0058.GAE@google.com>
-References: <6895b041.050a0220.7f033.0058.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9xXoNJX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 019A6C4CEE7;
+	Sat,  9 Aug 2025 10:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754735810;
+	bh=irkFrpvguBFdjMkE8ph+mR64/d+gfVlxX7KDzV2t3yk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s9xXoNJXOHYgRiemWRZfdeU0oAObyeUNBfBDclo4M0XzhgDVNpi12+OxBRQZJq0IX
+	 c8jciddohCZtCwRIYoO2NNIRaDuzJkDDSTiDc2d5sv8F8XMmo2+5qN6+5va8BncJtI
+	 Kne+ccbWNjuCXoPnSAwQaJkd0ihA3hFWaU5B4cmUQogJ4rV7ninqzbzhWLnBQtWbzG
+	 PViWYdeJFYBSWt6bp+eztUJIbeEX4EStSLax6/ZSG7yx/Hi8zL07v+U4J4t4erri27
+	 SJ2weEtmpg8hxEmZ3VARhpZv+3HZ5ebRnsNTUNZ71dXCALc7iOr3LXG6SQIoGlMPJ9
+	 pvN1Bs21QSGDw==
+Date: Sat, 9 Aug 2025 13:36:46 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Peter Huewe <peterhuewe@gmx.de>, linux-integrity@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] tpm: Compare HMAC values in constant time
+Message-ID: <aJckvs9mIO_BscPQ@kernel.org>
+References: <20250801212422.9590-1-ebiggers@kernel.org>
+ <20250801212422.9590-2-ebiggers@kernel.org>
+ <aJIMGWFDZejNwAVP@kernel.org>
+ <20250805160740.GA1286@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805160740.GA1286@sol>
 
-Initialize the intermediary array member to 0 to prevent the kernel from
-leaking uninitialized data to user space.
+On Tue, Aug 05, 2025 at 09:07:40AM -0700, Eric Biggers wrote:
+> On Tue, Aug 05, 2025 at 04:50:17PM +0300, Jarkko Sakkinen wrote:
+> > 
+> > I think we might want to also backport this to stables.
+> > 
+> 
+> That's what I did originally, but on v1 James complained about it being
+> characterized as a fix.
 
-Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e8bcd7ee3db6cb5cb875
-Tested-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- crypto/jitterentropy-kcapi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please put out v3 with backporting shenanigans and I can apply these.
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index c24d4ff2b4a8..9e9e069f55af 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -107,7 +107,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
- {
- 	struct shash_desc *hash_state_desc = (struct shash_desc *)hash_state;
- 	SHASH_DESC_ON_STACK(desc, hash_state_desc->tfm);
--	u8 intermediary[SHA3_256_DIGEST_SIZE];
-+	u8 intermediary[SHA3_256_DIGEST_SIZE] = { 0 };
- 	__u64 j = 0;
- 	int ret;
- 
--- 
-2.43.0
+> 
+> - Eric
 
+BR, Jarkko
