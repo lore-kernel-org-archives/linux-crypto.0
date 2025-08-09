@@ -1,100 +1,63 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7FC22087
-	for <linux-crypto@vger.kernel.org>; Sat,  9 Aug 2025 04:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43B41BD035;
+	Sat,  9 Aug 2025 05:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754713981; cv=none; b=tjFCMgMhhNG1dQecy4att+2ztrC8snu0Zxnny5Ftnt2hvo+FPwv3Q+UoORdZ6A9pgo3RYgvXsfPUEtPHkjpMK54Ipoek44yKX7/ITjsMV1hmx6N0lLRud/gzanYPG/p0ghkUGtgi9GjA2KhX+AeejkGjf9nX2+VJvlQWuWKKESg=
+	t=1754716782; cv=none; b=p5JIl8S2S9c9H+PKCw9u1qQeU4OtL83FhiDizNh1ZvDqA91JxYF2p7ydelyTY8nJk55zrlFP1M+8FluX7Da5XzDLxXbzvIKJMIOlbf147XE5Xdu9HbiSYyw9JyIldUTXJgHQ6OchDm0dKGKc0UQoCOB+0O8378boAsVbTwB5yyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754713981; c=relaxed/simple;
-	bh=3j2f3Q3qaDiwQ77M/AgMn60ASwYucXL52DAzl2u5P+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bFQ1ncX5Wy4Do1O/Uz88RaNq0DXZ38dXFIFt4rhevm4/2vXr+s0E5crR1MXNCwVkVxflec3P2ZpIIasVHUs5OkbKkzvMrv/OpTyrVCM31xgXJ4qiQWBDU1eELKkqqI+SWUNMeXkeEtI8xJfuZU8qbGzod6qoKkmyowccyPJ6xHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=EDPaMow3; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1754716782; c=relaxed/simple;
+	bh=o/Q6oXK95eojTB5aBs10Ti5Dfs4qZbnilecSrMHqIp4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=VeM4VxxK5jLWTic8lNrfmFEc/EhXlZElrpZ1WW3O2ly3jJoMUdO01vJo1X11x2S56SAEV6L9gALlLXRRhyOxbFuQJ/1CTXQ8SyjWDBPtA9LIzcetXtaXtiJDSqz3acKfuJNOokDSxl6dxsoJGJ1ytSP4efm0J6QnZ+3ESzSzOTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcBQoWzx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="EDPaMow3"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-af95ecfbd5bso482750366b.1
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Aug 2025 21:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754713978; x=1755318778; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkD+P2y+y39hXD0Pcj8Lfy9t0SWSXpSEsHCRhG/IbnI=;
-        b=EDPaMow3X+v9RQcxn/+Tj7QkOEeJWcLfMEtg81qEJu/vXwhwqqQAYURrZfMlaUY9fR
-         39UMQ2qs0zSMxLIDiywMgoOLXI7oMQfty8NZ5JpG/uyEoBfDw6Ye5zUrLzQWXwfyp807
-         V0ApGMQWokysshd0i/7XhM+mUbcxySslS2Ms4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754713978; x=1755318778;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pkD+P2y+y39hXD0Pcj8Lfy9t0SWSXpSEsHCRhG/IbnI=;
-        b=FvOLD5fsVmaaSHr2uKV+kpASggpj8J1bbA/cumVyfHOR+svBntsnpkkS9cfBwu1BJY
-         FGOEUwpxEbiEsbp0P0ehNYlUKDILAcpdl8vJr4WIEgVc6A+d/xzrU7nyMteeQyGy8H4U
-         +/UVSAapL+VZAkvMqyFYumMdLUGnl/gEoBiZtAnes1wUuc9dlGZhIP56FXq+APZm2HwC
-         6cP9Cv6AbCVaVbH/BJ15lFRWqGAAQeUHSO7RQ56mCAxza7RxBWID9YwBwHHRgrM+z3G0
-         +TYczS8/TY6hp6swej3AkyCTuMJEHlvNZisYm9zSdcDjt0rI8ZluAUq1tN5KmIY/WHZo
-         +Qag==
-X-Forwarded-Encrypted: i=1; AJvYcCUzR7n5ZNNbG6mAmRCYJBNMJHsjxWGdhrn2kJULJD6WdFL2Slh84tMHQd6G1hSx0pDbQ0MqYN8lrYOY0m8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybm5CbQyJU6GkltaApZ3dj0/SnzUndMZmwz+/nWsyk64Eq0lzu
-	bDDrxrstMIZhVTJaizGK4PfJNIML42KgETT8BBG3yemKme6J8uP27wjPqe2UQlVNYIERkUAjWDM
-	nrUNA32JeQw==
-X-Gm-Gg: ASbGncvz67ayb9CXa1wBnmALWSawiH8rwTVRKfDta1ISEnDgEMAnl4VVQjHCvkFx2ky
-	ToBDwQQ4mcBnAaoPYuc2kGiMLLZaDfhL1WqeE4QPJ1+Nz/CRU0yBFzLPQFdORjULovVpBcAYw2A
-	Q96x4VD/iXu9OBhwbVR12UA/PLA229xCyLBOk1dYkogD27kRLV6DoimYDnlXa7bMuBbB9ZzLvxt
-	LHnzzpjnYKg5FmpPG6noOdNPR9cTtP2F+qDVdHx6fFoEXDMlokI+JTzcB6uM1fCXd0/OhxQ6AXf
-	Dl+bVKCwhMrbveRIW3Q+YunbBETg/bvI+wQFMVRpanYp61P7XR3FQRsX1uPWMS8hwlDWdnsQ0Ct
-	kp48Cc5gs8XuqRBXxCUEM5k5gEsrCrywfWPG1LkViqPyxWWc7knpS9LhPZkRt+2vz7JRPEVbh
-X-Google-Smtp-Source: AGHT+IFdZ5W0sM/esT6S+qxKV0A1PpwZrfJ6SjuGSJ/Gx6tk74oKvfC8NgrPKySfDtixxzqobE/ttg==
-X-Received: by 2002:a17:907:2689:b0:af9:14cf:d827 with SMTP id a640c23a62f3a-af9c645f8dcmr449630466b.18.1754713977809;
-        Fri, 08 Aug 2025 21:32:57 -0700 (PDT)
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com. [209.85.218.54])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a0a3e80sm1615483566b.47.2025.08.08.21.32.56
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Aug 2025 21:32:56 -0700 (PDT)
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-af97c0290dcso510468266b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Aug 2025 21:32:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVd04TRohZ3khBK3ITlDFVY1ol1+0zpCsk5+qbNs6lC3DYfbYMvWDPM1AaAxVLoZilmN+gaiZqGvXd5MPg=@vger.kernel.org
-X-Received: by 2002:a17:907:948a:b0:af9:69d1:9c6d with SMTP id
- a640c23a62f3a-af9c65b02d8mr501213966b.40.1754713976386; Fri, 08 Aug 2025
- 21:32:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcBQoWzx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95EBDC4CEF1;
+	Sat,  9 Aug 2025 05:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754716782;
+	bh=o/Q6oXK95eojTB5aBs10Ti5Dfs4qZbnilecSrMHqIp4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=qcBQoWzxO463OUOFf4JyOkfzmo2ILvcHIcMMWedMPirZU71B3SkrlO68/yqV/mgAP
+	 PO8aYhyU+C9wQaD4ER8JNHHfedoFjfMxTZUb1JA3avbZ9su+2oXFLs5/S+Um9/5gn+
+	 uYjwjsdxuY+vBX1gXf8OIy6ocbpqCE2s2sf0cBSFVj4kFlYvRNgtEdeaHO6C5F46m6
+	 9oTWsd9izy3UqZnx0pYghRUxTF0iLfbwqweLbjcd0loT4BNYPV2xA9+rasRUkVeJKp
+	 i6OQZ2pTtx5nDjzCsLBqWba1Zz1PoZM6y38aNDNUaFiRDRcRmFUY0OTGtcCdbwxdbk
+	 Sqtn9ZGp+TMtQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF96383BF5A;
+	Sat,  9 Aug 2025 05:19:56 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.17
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
+References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.17-p2
+X-PR-Tracked-Commit-Id: 9d9b193ed73a65ec47cf1fd39925b09da8216461
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 01b6ba6b097a0ceeef1975ae37c1660fed1b560c
+Message-Id: <175471679557.380510.9903755724887042086.pr-tracker-bot@kernel.org>
+Date: Sat, 09 Aug 2025 05:19:55 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
-In-Reply-To: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 9 Aug 2025 07:32:39 +0300
-X-Gmail-Original-Message-ID: <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
-X-Gm-Features: Ac12FXzvZx-Q2z8j9r1ZnqxMDu_VuBdhbV9giLfb4eCGbjAuOV9Pm09Va7WqOBU
-Message-ID: <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
-Subject: Re: [GIT PULL] Crypto Fixes for 6.17
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 8 Aug 2025 at 08:42, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> This push fixes a regression that breaks hmac(sha3-224-s390).
+The pull request you sent on Fri, 8 Aug 2025 13:41:51 +0800:
 
-_Please_ describe the completely random strange constants, and why they changed.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.17-p2
 
-What is "361", and why did 360 use to work but no longer does?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/01b6ba6b097a0ceeef1975ae37c1660fed1b560c
 
-I've pulled this, because I'm sure it fixes a bug, but neither the
-pull message nor the commit have acceptable explanations.
+Thank you!
 
-And honestly, the code should be fixed too. Having a random constant
-like that with no explanation for the completely random value is not
-ok.
-
-             Linus
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
