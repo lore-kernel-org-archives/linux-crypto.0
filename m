@@ -1,112 +1,152 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F05D1BDCF
-	for <linux-crypto@vger.kernel.org>; Sun, 10 Aug 2025 04:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CAF82866;
+	Mon, 11 Aug 2025 04:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754801538; cv=none; b=uvmQsKa7f5fHeOKFcA6cl4ICLqnlkQHJr4pt5mNVul7yTVMmX0KV6EY3JpsBNAYGqn3g+26UthFliQiYUXWl2VZBOPRNYuSiEX8fkOA7PMxqutfrEd619/GYjlcuxcih12uBCS3QcKWydVntEphcTf1FAzWcSP08MKCh1Natb9U=
+	t=1754887464; cv=none; b=LP9a0SRSkGaYWpkw/L4EDna3m10FbN3pUPQMEyLU1S/R4DuWBm3BAFUVAn04ZgfYKurlVEdKPJS2lKdbp3zB5auZDRWqGYzY5+Cv1xX28hK3LF7mg9YZKPfKGSVmLGRRXUnDs5u8tpN1rgf9dLYgXxsvdVaIOlhgWhdkNVfjot0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754801538; c=relaxed/simple;
-	bh=QpYrr5zdwL4EQJjR8CXyru7YDcS9YlE8WhSGCct7Gdg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JtTPdHwwaVpeHacqPvn/JM4/RybwyXDLcjoAj85NaP0CDN4M5SfQMfx0VBhsRZnPMlaSIym8cf8xRhikGRYI26QD6hlaVSVaCu2BaPcup4XkSenhkNdMFZQ6LKAURU3PLobiao8sT368bQLjUIDt2rgQ/ivOydbNRaUHNcp4c+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=JM2tldaL; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1754887464; c=relaxed/simple;
+	bh=+ogcbn7WVMG/PvGlTt/wjuGzB5rBKNTwr6kc7CDcgVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gQGHqcHw6C6pHDo4S4zM7nxZnzhAwQ2x1wUqgPnEgC4BSJFovoS/mesFlbhezOAiT0poVKhQHwU4mtisOjhvfGIXl41MsCYM35Nrq5H+AliuUVjUZnLDRCvfe+FzKkL9irvXE596BKnuGARYr21HztZN2pTIqDpyUnjOiPZSkJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TZ6w8zbi; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="JM2tldaL"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-af66d49daffso574619566b.1
-        for <linux-crypto@vger.kernel.org>; Sat, 09 Aug 2025 21:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754801534; x=1755406334; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DIOvpfcvfL+aB8v7AdDV+E3Zb8xwZqXo/sST33XUOtA=;
-        b=JM2tldaLWs8QLoU1fDkbpAoGdgIQte0tWo9yubBNV+ajPKaJUR7XCUzHMGOTZI1T2M
-         wTAaEW707Tv15E3GSYxQpEL1rN3bv2QO5XnCJz2uhnFGt0813K2BW2TXB7F1n1GWTkMn
-         mW0k+hSze/Mi/BrFPQDX7R4iU8hfeG04rjQx8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754801534; x=1755406334;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DIOvpfcvfL+aB8v7AdDV+E3Zb8xwZqXo/sST33XUOtA=;
-        b=ustNvy2k1aQXHzpT4CG8UfCux9oYMULLv9PHG/5Wcn0MdiCUIL28Jk+6bQEmVFhUoG
-         JTzUD3lRkswPsqnRMVQ+CkJtMQ+3H2e2WYbSGLAtXvpkrg/x6qInZvO5PNNuoqJ72AlP
-         XnTqfRQ7AyEU5YcV/s7hocQF2PUe/+csOHQj7YlUE07vkM2bB/hsAZDME4l31qcUhdJ0
-         M5RYK8JKq9kiLfKf3NV/Kim7cw5iF8s9mFR31Vamyg1fq3Wqj9ba5466FPjxAGLGFFnj
-         aMSwDUxyfO7eAwFt+8P2vQvwbnqEE7vQKZbxs6kZFybePzoL6wW4GwHnWjgHGABCEJ53
-         7UYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUovDt/0+B+uZjii+VNPU4n20+UJa7Nzl2eEy537XdZmpy7QSw5W07Rw0fHAGAKbZex/7NV06jGGlBU0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3OzAiDsqpmqaXZhKVa8zojFO6eRqQPzhw25YVjiZfhuu66la9
-	IAcR2xwHbCHk2nnNM+PAt8iuOpoAOXLyJDETT2CUYF5ryATX0DgT2frlAfH1YcK6boE37pGWQKP
-	9BYvDb3diAQ==
-X-Gm-Gg: ASbGncvDqDfhsloLZJjcqKHrABxzVGVbWStcuk5n1LMfuVtWSPncuX88ozd2v2kD0Gs
-	fUGOe6LKsqq3KTFbokYo130ZZKe0CzVsDYLgrCksiScEVEhEK7+DtqEke0Yo6AaWfpLyQWiBE9M
-	oZXGqPw7ZMCejdeaiwyXHw1rFflid7Ysd7l0Ni0fouMCh3jAL73+NFSfmwZYxjkwZ7uY5pAR3ka
-	tgFKIFQSZyRmPr/UxCyQPKXqIYSCbRjx3DYjM+hEdzZ15DDhz0BmiK5jLmwQw10Xvv5E38FryGd
-	+TsBwS8ZssBo1lPr5fQgfkG68wURik3T19H86/ZVeUGqv0KmPn10xfA3QHedk+mUdtJvLRDPfTz
-	vbwfoLEEOaBIrgjYe9y+fCSVj/SUbU8QPAo7UMpJHPAq9+ocsAiNcdrb5vku2KriACabqsEHr
-X-Google-Smtp-Source: AGHT+IE9qw3MbhwdIZXI1Xx6VdMieQe+4LZj26KxN6xWgna/n0YqCcssYAwEFp5J95LXKba+BlLOhQ==
-X-Received: by 2002:a17:907:3d0f:b0:ae6:a8c1:c633 with SMTP id a640c23a62f3a-af9c64f9025mr734428866b.34.1754801534503;
-        Sat, 09 Aug 2025 21:52:14 -0700 (PDT)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a078cbasm1784922666b.5.2025.08.09.21.52.13
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Aug 2025 21:52:13 -0700 (PDT)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-61521cd7be2so4649099a12.3
-        for <linux-crypto@vger.kernel.org>; Sat, 09 Aug 2025 21:52:13 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV6sbJ+wSDVPQnM/FgCBN+tv7WJQB98XE6BwMIm65K6VI6EfM8Ft9n2Y0jroXYOSD+XAEg8OwQiw0tV2XY=@vger.kernel.org
-X-Received: by 2002:a05:6402:34c8:b0:618:1cc6:af45 with SMTP id
- 4fb4d7f45d1cf-6181cc6b72fmr1142596a12.0.1754801533357; Sat, 09 Aug 2025
- 21:52:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TZ6w8zbi"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=b0fN4uf5VCDuNIofpn3efSpVjQSYV/g6PlfcXcjDpmI=; b=TZ6w8zbi5RzYY8Ry8U6jlZNATe
+	4bUteLaVjA+bOMLT+JQ1Eh97xdLrG/JxlIzfNpr8wEPVpD5Qi/MiS3hpWx0Dq41L7Lb4pqhFJ5JX5
+	9qUu/60K3VqBR28IwbOBx4UeKWORoc93x/58oo8Pg5HLB2PQ4ftrqG5IzRKCfgfxwN8ZcB0Tzguct
+	DSO/oBLLu5fU2U86n1M/B+mKBVs7dWygYwaIYOE4IR7VEKjy5P0Fsp/8zULyrWG4lHAzHeudFoxH2
+	kRz42fgLdNpPZk1kD2ZyZLRPz+v1fK8jlZgN08hmIBUgYv99hW9qpI+1UNbxPJH6TYL6//Txo4gb9
+	koQWzYuw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1ulK8h-00D9Tm-2j;
+	Mon, 11 Aug 2025 12:44:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 11 Aug 2025 12:44:00 +0800
+Date: Mon, 11 Aug 2025 12:44:00 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Vegard Nossum <vegard.nossum@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: hash - Make HASH_MAX_DESCSIZE a bit more obvious
+Message-ID: <aJl1EIoSHnZRIQNO@gondor.apana.org.au>
+References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
+ <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
+ <72186af9-50c4-461a-bf61-f659935106cc@oracle.com>
+ <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au> <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
- <72186af9-50c4-461a-bf61-f659935106cc@oracle.com>
-In-Reply-To: <72186af9-50c4-461a-bf61-f659935106cc@oracle.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 10 Aug 2025 07:51:56 +0300
-X-Gmail-Original-Message-ID: <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
-X-Gm-Features: Ac12FXyrsiG5csXTsT8XML7TTrnPvAVkGUcnHQ2aFJ6MSlHxgwl1oOGUIedHDGs
-Message-ID: <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
-Subject: Re: [GIT PULL] Crypto Fixes for 6.17
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
 
-On Sat, 9 Aug 2025 at 21:22, Vegard Nossum <vegard.nossum@oracle.com> wrote:
+On Sun, Aug 10, 2025 at 07:51:56AM +0300, Linus Torvalds wrote:
 >
-> The actual explanation is given in the email here:
+> Yeah, that should have been in the commit message somewhere.
+> 
+> And honestly, it should have been in the code too. Having very random
+> constants in header files with no explanation for them is not great.
 
-Yeah, that should have been in the commit message somewhere.
+The patch below should make the constant a bit more obvious.
+ 
+> The dynamic check may be the right thing to do regardless, but when
+> fixing outright bugs, at least document what went wrong and why. Not
+> just "360 was too small for X, so it is now 361".
 
-And honestly, it should have been in the code too. Having very random
-constants in header files with no explanation for them is not great.
+The dynamic check has always been there (see commit b68a7ec1e9a3).
 
-> This is an anti-pattern of the crypto code that AFAICT ultimately stems
-> from the removal of VLAs:
+So this fix wasn't about a buffer overflow, rather it was to make
+s390 sha3-224 work again as it got caught by the dynamic check.
 
-I'd say that it stems from using random sizes with no logic and the
-VLAs were just the *previous* problem case of the same issue.
+Cheers,
 
-> As a minimal future-proofing fix, maybe we could add something like
->
-> BUILD_BUG_ON(sizeof(struct md5_state) <= HASH_MAX_DESCSIZE);
->
-> to every hashing algorithm, and/or a dynamic check in the crypto API
-> (completely untested):
+---8<---
+Move S390_SHA_CTX_SIZE into crypto/hash.h so that the derivation
+of HASH_MAX_DESCSIZE is less cryptic.
 
-The dynamic check may be the right thing to do regardless, but when
-fixing outright bugs, at least document what went wrong and why. Not
-just "360 was too small for X, so it is now 361".
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-                Linus
+diff --git a/arch/s390/crypto/sha.h b/arch/s390/crypto/sha.h
+index cadb4b13622a..b9cd9572dd35 100644
+--- a/arch/s390/crypto/sha.h
++++ b/arch/s390/crypto/sha.h
+@@ -10,14 +10,15 @@
+ #ifndef _CRYPTO_ARCH_S390_SHA_H
+ #define _CRYPTO_ARCH_S390_SHA_H
+ 
++#include <crypto/hash.h>
+ #include <crypto/sha2.h>
+ #include <crypto/sha3.h>
++#include <linux/build_bug.h>
+ #include <linux/types.h>
+ 
+ /* must be big enough for the largest SHA variant */
+ #define CPACF_MAX_PARMBLOCK_SIZE	SHA3_STATE_SIZE
+ #define SHA_MAX_BLOCK_SIZE		SHA3_224_BLOCK_SIZE
+-#define S390_SHA_CTX_SIZE		sizeof(struct s390_sha_ctx)
+ 
+ struct s390_sha_ctx {
+ 	u64 count;		/* message length in bytes */
+@@ -42,4 +43,9 @@ int s390_sha_update_blocks(struct shash_desc *desc, const u8 *data,
+ int s390_sha_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
+ 		   u8 *out);
+ 
++static inline void __check_s390_sha_ctx_size(void)
++{
++	BUILD_BUG_ON(S390_SHA_CTX_SIZE != sizeof(struct s390_sha_ctx));
++}
++
+ #endif
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index ed63b904837d..44d407cb0c90 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -177,14 +177,26 @@ struct shash_desc {
+ 
+ #define HASH_MAX_DIGESTSIZE	 64
+ 
++/*
++ * The size of a core hash state and a partial block.  The final byte
++ * is the length of the partial block.
++ */
++#define HASH_STATE_AND_BLOCK(state, block) ((state) + (block) + 1)
++
++
+ /* Worst case is sha3-224. */
+-#define HASH_MAX_STATESIZE	 200 + 144 + 1
++#define HASH_MAX_STATESIZE	 HASH_STATE_AND_BLOCK(200, 144)
++
++/* This needs to match arch/s390/crypto/sha.h. */
++#define S390_SHA_CTX_SIZE	216
+ 
+ /*
+  * Worst case is hmac(sha3-224-s390).  Its context is a nested 'shash_desc'
+  * containing a 'struct s390_sha_ctx'.
+  */
+-#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 361)
++#define SHA3_224_S390_DESCSIZE	HASH_STATE_AND_BLOCK(S390_SHA_CTX_SIZE, 144)
++#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + \
++				 SHA3_224_S390_DESCSIZE)
+ #define MAX_SYNC_HASH_REQSIZE	(sizeof(struct ahash_request) + \
+ 				 HASH_MAX_DESCSIZE)
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
