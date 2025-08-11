@@ -1,152 +1,82 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CAF82866;
-	Mon, 11 Aug 2025 04:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C243F26FA77;
+	Mon, 11 Aug 2025 05:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754887464; cv=none; b=LP9a0SRSkGaYWpkw/L4EDna3m10FbN3pUPQMEyLU1S/R4DuWBm3BAFUVAn04ZgfYKurlVEdKPJS2lKdbp3zB5auZDRWqGYzY5+Cv1xX28hK3LF7mg9YZKPfKGSVmLGRRXUnDs5u8tpN1rgf9dLYgXxsvdVaIOlhgWhdkNVfjot0=
+	t=1754891927; cv=none; b=H/5/8++vQguBWpbcteGzjqIO/MwWdtcjRaqQLAoOZJfPx9zhcVB0OQO2rBAneJBq+HQWZCG0NliVWjwY5hxSDuIHxnuQuyFiJ1lpph8MQeKyhmCVWhIBtRMTbwDQO9fcyDUg40BESkbVNQTNxW6jjdnyRfEfCxpwXpi/3bZ8XBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754887464; c=relaxed/simple;
-	bh=+ogcbn7WVMG/PvGlTt/wjuGzB5rBKNTwr6kc7CDcgVo=;
+	s=arc-20240116; t=1754891927; c=relaxed/simple;
+	bh=8iMvpF/6ZCtyrpqM9G7xHRgnKPg2HV2n/Pokozp/QNk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQGHqcHw6C6pHDo4S4zM7nxZnzhAwQ2x1wUqgPnEgC4BSJFovoS/mesFlbhezOAiT0poVKhQHwU4mtisOjhvfGIXl41MsCYM35Nrq5H+AliuUVjUZnLDRCvfe+FzKkL9irvXE596BKnuGARYr21HztZN2pTIqDpyUnjOiPZSkJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TZ6w8zbi; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=VbUG1ViIpadUB3FVqvmSNZGQFlJzkKkR7/ig+RHbWvVQ19gy7Zf3VoUR9QKYAj6lSq9ZeNP5XQOmz6bKxZ6JbVRbf6OBOTEDeBfGXqbf8O7tVqr9/TEl/ze9RaaNHEAYjUu9Idty4qDN+nKmJSU2LDfoXjEQQf1FKSmDP37AqOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kHwpit0u; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TZ6w8zbi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=b0fN4uf5VCDuNIofpn3efSpVjQSYV/g6PlfcXcjDpmI=; b=TZ6w8zbi5RzYY8Ry8U6jlZNATe
-	4bUteLaVjA+bOMLT+JQ1Eh97xdLrG/JxlIzfNpr8wEPVpD5Qi/MiS3hpWx0Dq41L7Lb4pqhFJ5JX5
-	9qUu/60K3VqBR28IwbOBx4UeKWORoc93x/58oo8Pg5HLB2PQ4ftrqG5IzRKCfgfxwN8ZcB0Tzguct
-	DSO/oBLLu5fU2U86n1M/B+mKBVs7dWygYwaIYOE4IR7VEKjy5P0Fsp/8zULyrWG4lHAzHeudFoxH2
-	kRz42fgLdNpPZk1kD2ZyZLRPz+v1fK8jlZgN08hmIBUgYv99hW9qpI+1UNbxPJH6TYL6//Txo4gb9
-	koQWzYuw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ulK8h-00D9Tm-2j;
-	Mon, 11 Aug 2025 12:44:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 11 Aug 2025 12:44:00 +0800
-Date: Mon, 11 Aug 2025 12:44:00 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Vegard Nossum <vegard.nossum@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: hash - Make HASH_MAX_DESCSIZE a bit more obvious
-Message-ID: <aJl1EIoSHnZRIQNO@gondor.apana.org.au>
-References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
- <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
- <72186af9-50c4-461a-bf61-f659935106cc@oracle.com>
- <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kHwpit0u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754891926; x=1786427926;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8iMvpF/6ZCtyrpqM9G7xHRgnKPg2HV2n/Pokozp/QNk=;
+  b=kHwpit0u532/aqcz6GXKiz4wS62B2yx5EKJo8yQkdM3cplBCtiM0bsXK
+   LNxwhQ2UftPho4tARKA3/GsRyvd4bNRdV2AkfzmbnCrGi+PiJOHgZExkh
+   Kz1HXcxhgvIc+gTytXr04Qlnl09+sjXeKw+ewwNUrFEFiiGYqihEpbDyG
+   nqFETZSzaCRLnb0kJwp18/+UEgkTffN9x4rnz/19zLeVoqx6wTaOeqrwm
+   iI0APHDymv4uAN6F4ebibrG+MKQhJeOfKGi25epOokFTK3xmZWt0NJdMx
+   JQYqI3/twpgyfpfCBjo+CcP8BWzCJKFCLXYBDKt0gRoAzuaieQX7Xcenz
+   Q==;
+X-CSE-ConnectionGUID: 7psi+W/mSjKzvHriKx08Lg==
+X-CSE-MsgGUID: no5DXc2rSJKFVpuqIlNQ/g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="44722634"
+X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
+   d="scan'208";a="44722634"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2025 22:58:45 -0700
+X-CSE-ConnectionGUID: 1QrqDLT2TNm0pMRnd1YSiw==
+X-CSE-MsgGUID: 7h0fH+iEQfOAodnLKRosBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
+   d="scan'208";a="169935705"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa003.fm.intel.com with ESMTP; 10 Aug 2025 22:58:43 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id EE91493; Mon, 11 Aug 2025 07:58:41 +0200 (CEST)
+Date: Mon, 11 Aug 2025 07:58:41 +0200
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-usb@vger.kernel.org, Andreas Noever <andreas.noever@gmail.com>,
+	Michael Jamet <michael.jamet@intel.com>,
+	Mika Westerberg <westeri@kernel.org>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] thunderbolt: HMAC fix and cleanup
+Message-ID: <20250811055841.GR476609@black.igk.intel.com>
+References: <20250731192545.29869-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
+In-Reply-To: <20250731192545.29869-1-ebiggers@kernel.org>
 
-On Sun, Aug 10, 2025 at 07:51:56AM +0300, Linus Torvalds wrote:
->
-> Yeah, that should have been in the commit message somewhere.
+On Thu, Jul 31, 2025 at 12:25:43PM -0700, Eric Biggers wrote:
+> Patch 1 fixes the HMAC comparison in the thunderbolt driver to be
+> constant-time.
 > 
-> And honestly, it should have been in the code too. Having very random
-> constants in header files with no explanation for them is not great.
+> Patch 2 simplifies the HMAC computation in the thunderbolt driver by
+> using the library API instead of crypto_shash.  Note that this depends
+> on the HMAC-SHA256 library API that was merged for v6.17-rc1.
+> 
+> Eric Biggers (2):
+>   thunderbolt: Compare HMAC values in constant time
+>   thunderbolt: Use HMAC-SHA256 library instead of crypto_shash
 
-The patch below should make the constant a bit more obvious.
- 
-> The dynamic check may be the right thing to do regardless, but when
-> fixing outright bugs, at least document what went wrong and why. Not
-> just "360 was too small for X, so it is now 361".
-
-The dynamic check has always been there (see commit b68a7ec1e9a3).
-
-So this fix wasn't about a buffer overflow, rather it was to make
-s390 sha3-224 work again as it got caught by the dynamic check.
-
-Cheers,
-
----8<---
-Move S390_SHA_CTX_SIZE into crypto/hash.h so that the derivation
-of HASH_MAX_DESCSIZE is less cryptic.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/s390/crypto/sha.h b/arch/s390/crypto/sha.h
-index cadb4b13622a..b9cd9572dd35 100644
---- a/arch/s390/crypto/sha.h
-+++ b/arch/s390/crypto/sha.h
-@@ -10,14 +10,15 @@
- #ifndef _CRYPTO_ARCH_S390_SHA_H
- #define _CRYPTO_ARCH_S390_SHA_H
- 
-+#include <crypto/hash.h>
- #include <crypto/sha2.h>
- #include <crypto/sha3.h>
-+#include <linux/build_bug.h>
- #include <linux/types.h>
- 
- /* must be big enough for the largest SHA variant */
- #define CPACF_MAX_PARMBLOCK_SIZE	SHA3_STATE_SIZE
- #define SHA_MAX_BLOCK_SIZE		SHA3_224_BLOCK_SIZE
--#define S390_SHA_CTX_SIZE		sizeof(struct s390_sha_ctx)
- 
- struct s390_sha_ctx {
- 	u64 count;		/* message length in bytes */
-@@ -42,4 +43,9 @@ int s390_sha_update_blocks(struct shash_desc *desc, const u8 *data,
- int s390_sha_finup(struct shash_desc *desc, const u8 *src, unsigned int len,
- 		   u8 *out);
- 
-+static inline void __check_s390_sha_ctx_size(void)
-+{
-+	BUILD_BUG_ON(S390_SHA_CTX_SIZE != sizeof(struct s390_sha_ctx));
-+}
-+
- #endif
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index ed63b904837d..44d407cb0c90 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -177,14 +177,26 @@ struct shash_desc {
- 
- #define HASH_MAX_DIGESTSIZE	 64
- 
-+/*
-+ * The size of a core hash state and a partial block.  The final byte
-+ * is the length of the partial block.
-+ */
-+#define HASH_STATE_AND_BLOCK(state, block) ((state) + (block) + 1)
-+
-+
- /* Worst case is sha3-224. */
--#define HASH_MAX_STATESIZE	 200 + 144 + 1
-+#define HASH_MAX_STATESIZE	 HASH_STATE_AND_BLOCK(200, 144)
-+
-+/* This needs to match arch/s390/crypto/sha.h. */
-+#define S390_SHA_CTX_SIZE	216
- 
- /*
-  * Worst case is hmac(sha3-224-s390).  Its context is a nested 'shash_desc'
-  * containing a 'struct s390_sha_ctx'.
-  */
--#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 361)
-+#define SHA3_224_S390_DESCSIZE	HASH_STATE_AND_BLOCK(S390_SHA_CTX_SIZE, 144)
-+#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + \
-+				 SHA3_224_S390_DESCSIZE)
- #define MAX_SYNC_HASH_REQSIZE	(sizeof(struct ahash_request) + \
- 				 HASH_MAX_DESCSIZE)
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Both applied to thunderbolt.git/next, thanks!
