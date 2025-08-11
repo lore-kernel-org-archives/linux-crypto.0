@@ -1,47 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C991A9F9D;
-	Mon, 11 Aug 2025 16:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77722D6E7C
+	for <linux-crypto@vger.kernel.org>; Mon, 11 Aug 2025 17:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754931494; cv=none; b=EiPOWCG0k12r+LffznYHCIYS2axAqvHoqIulCGsXdViMIkjaHCfQpwK076ml5j2Paw0EBAxx2SeTW2xw0cPV1hHhKSpLAAANnOUgwfCtAQMeW7MeTwY6mnkJbGpa41b1Nesh7B45aXuFoidRippjLSU6P0GMleWW1jvHMMtTN0I=
+	t=1754935154; cv=none; b=Nvz6y1bhzIJygxjo/7y4L88n6+hAkjvTnXjetp8+y9TSetkVEG+FG6ZV99uIzfPT9GjB4kjDomFcylU2mCo9XTTosbNvlp+NZop95mw+u3Pl3ZLlO2ERHxpIXvwUAP+iQdOQ99c4vc2WUCaQb8UVqqwmSxBRgdJoBjAsqMtpPNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754931494; c=relaxed/simple;
-	bh=vhIWkMe9xZuLR1MCYOu+lScCuk2ix+fF30y3C/lLH/M=;
+	s=arc-20240116; t=1754935154; c=relaxed/simple;
+	bh=uqajirfVkosPqsyAnl2TQotZWsCGCpVhDDWKXxPHx5k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NuhD4yKmCA+fAXAsCA5nlKwLIesSO/Vb73lZhMtIyb1sYp6NymU0nNndOEUnqnV0JuVyDoBVTrcxeAEGdW/USQe2JyfHgV/zHaIY6PmR9ZAOwHJrOfAVmR+cO9kTJEAbEdC3s0g1cBmOJ7GbVGGaKN/bS7d4bHT/ern0DO06e74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sONXsW60; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=HhdZOF1vPKvSwjUILCFxBkHjqGzsDaCLqfd7fJAroZqhR7ZQrnEI808gMIVaoyVlsp9TNxF1CTQswag7GaNEfU5KnDeCdL9SW+Ioul6tyHmYCVJb5g2kE+RuBEmMdLWoj8JNnic0/9uu8xjsKtDXsjGToHmvmR+dWnpgbQoeaz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2GY8ySa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sONXsW60"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 848D1C4CEED;
-	Mon, 11 Aug 2025 16:58:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2GY8ySa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22D66C4CEF5;
+	Mon, 11 Aug 2025 17:59:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754931493;
-	bh=vhIWkMe9xZuLR1MCYOu+lScCuk2ix+fF30y3C/lLH/M=;
+	s=k20201202; t=1754935154;
+	bh=uqajirfVkosPqsyAnl2TQotZWsCGCpVhDDWKXxPHx5k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sONXsW60pwmGh8AZKW4mmEi7e4WghqFXFlxWHF8TGVs8W3gwzUPjzArztRizMzZrN
-	 jAVTegyaKXUArPPiwydGWhN3U884GH1bCbff/RPDrDHwpZ1nXu1Qx1Iq7jsPvI9HWH
-	 0nNX86+ZqnViDgiyuBL6nXYOQTd9ZDwrVx4WTRlwY7aBNUz2hrRmKmTiSGLMJVTPqV
-	 6fsrh7byLck/KEc6bR4FwEmXxRzamAJS4h+ekTnQUQQhTJZSHVpYKrrl8gv6OEKYRg
-	 Q9LI5UrBOw7mkDMjW7pbAh7DcE/wwcE6zmPNYkibYyirqhu6vdoF8yju52Rb8Z1OIm
-	 8HffxoUxwr2lQ==
-Date: Mon, 11 Aug 2025 09:57:12 -0700
+	b=F2GY8ySa60AHv9ZWT5uKZeq6nwk6WvzbPDxjHNX9XIk2dFrzkqD0ghNuXxQPboKqL
+	 k2vcW7Jzr+1z3plDkBpynUIsL4rx2IK+RI0D8ih+wTjktbHJZcSFkrTYUp7LzZ4pJl
+	 UYVPJ8lvbp5g8H/Nr19JLXUsAfBCWdQ6RT9cn9KTqk44YMj20uMdpA3Nkg/J2YRX6m
+	 XelId7JrxDwDMwXKGQkl0t3kCYQVPz6XYEAw7J3mab909H0x5vMEhdZ907dzS2tJxX
+	 rbMv0zLkymEVyDgw8WdJr7DkWfHVvWceNtILJInGIjZ7Xd5+aplbYHhLK3HJokXS+c
+	 bBXDmQNs4bAJg==
+Date: Mon, 11 Aug 2025 10:58:12 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Vegard Nossum <vegard.nossum@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: hash - Make HASH_MAX_DESCSIZE a bit more obvious
-Message-ID: <20250811165712.GB1268@sol>
-References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au>
- <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
- <72186af9-50c4-461a-bf61-f659935106cc@oracle.com>
- <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
- <aJl1EIoSHnZRIQNO@gondor.apana.org.au>
- <CAHk-=wg1okLMc41jaxS+WRXigw7Fu+OUc6QsnL+BbvYAGTdZYA@mail.gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org
+Subject: Re: [PATCH] lib/crypto: sha256: Use underlying functions instead of
+ crypto_simd_usable()
+Message-ID: <20250811175812.GD1268@sol>
+References: <20250731223510.136650-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,38 +44,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wg1okLMc41jaxS+WRXigw7Fu+OUc6QsnL+BbvYAGTdZYA@mail.gmail.com>
+In-Reply-To: <20250731223510.136650-1-ebiggers@kernel.org>
 
-On Mon, Aug 11, 2025 at 10:10:44AM +0300, Linus Torvalds wrote:
-> On Mon, 11 Aug 2025 at 07:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > The patch below should make the constant a bit more obvious.
+On Thu, Jul 31, 2025 at 03:35:10PM -0700, Eric Biggers wrote:
+> Since sha256_kunit tests the fallback code paths without using
+> crypto_simd_disabled_for_test, make the SHA-256 code just use the
+> underlying may_use_simd() and irq_fpu_usable() functions directly
+> instead of crypto_simd_usable().  This eliminates an unnecessary layer.
 > 
-> Indeed.
+> While doing this, also add likely() annotations, and fix a minor
+> inconsistency where the static keys in the sha256.h files were in a
+> different place than in the corresponding sha1.h and sha512.h files.
 > 
-> It would be good to maybe minimize the on-stack max-sized allocations,
-> but that's a separate issue. Several hundred bytes is a noticeable
-> part of the stack, and it's not always clear that it's a shallow stack
-> with not a lot else going on..
-> 
-> (I just randomly picked the btrfs csum hash to look at, which can
-> apparently be one of crc32c / xxhash64 / sha256 or blake2b, and which
-> is then used at bio submission time, and I wouldn't be surprised if it
-> probably has a pretty deep stack at that point already).
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/arm/sha256.h   | 10 +++++-----
+>  lib/crypto/arm64/sha256.h | 10 +++++-----
+>  lib/crypto/riscv/sha256.h |  8 ++++----
+>  lib/crypto/x86/sha256.h   |  3 +--
+>  4 files changed, 15 insertions(+), 16 deletions(-)
 
-HASH_MAX_DESCSIZE has to be enough for *any* algorithm accessible via
-the crypto_shash API, which makes HMAC-SHA3-224 be the limiting factor.
-By converting users to use the library APIs instead, they will instead
-use strongly-typed contexts that are sized correctly for the algorithms
-actually being used.  In the btrfs csum case, the applicable sizes are:
-
-    shash_desc + HASH_MAX_DESCSIZE: 377
-    blake2b: 232
-    sha256: 104
-    xxhash64: 76
-    crc32c: 4
-
-So the reduction for btrfs will be 377 => 232.  But blake2b is missing a
-library API, so I need to add that first.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
 - Eric
