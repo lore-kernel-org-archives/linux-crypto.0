@@ -1,203 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4785657C9F;
-	Mon, 11 Aug 2025 06:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09655200132
+	for <linux-crypto@vger.kernel.org>; Mon, 11 Aug 2025 07:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754892826; cv=none; b=VzSc8aRBo9mk5G9zFwnsWdvmLEmbIHmlC2W0fYBg19OiTsW5/GWiGDMh16x1JTiUwEPaoY0bMjIcjfuCTiq5gYtzrW7FoEeB9aNIzfI0EHFNhA9Xx9dSeqkH8yb0MUwbjuTQbE/Smxr5DN29edaqqj2js4iq0qBpk46Gahg0vbQ=
+	t=1754896267; cv=none; b=rf89sSUMW7gSoC9IOOC21U1hTYPwfRvowxQeX92qfIWzQs5pA661NQWSyN310bWx6PI9qNwtPPyzLjP3Lf5TiVFQuj90jsVtOBST+JDx81ihd+4/WgYLAEin74usKsLaBZyE/X8V8AWDAGD9IVEk6WIFDl+mEGd2u5Zpz9QNBPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754892826; c=relaxed/simple;
-	bh=LnPCD5wQWfe5ewQuYs5Ji2os16OC0uw92HZs4chNN6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uuUEjLy6mCiO0uQSNkNcrBml5eAayAfoZzVT00+fvenC42KgM8shSG1xipg438tL+dsj3bVhYZtpuWchcm71becEt7bzGnzUQ1JvpzSoZrTEnmRE3IpNa/GrQ1TfQ8ws3jUrezs7h4wKMglVHd8qjMo5DXH5MoTLyyekPyxgIWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XdExNfS8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754896267; c=relaxed/simple;
+	bh=tB/gqdCF6EzsFjXXwaRDV/pGeOQa0F5FLdXW4OQTyEc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jq/rdyvsAihhpDYzdoVG31tLDSL1C98qsh3A8Gldd27gLuiWKWHqIBGsERl4ffK4hjYe9H1O2QFjTqcVvUyvhNACIxNtz/c4eYgjXeFQcnl4rcFTcIMSM8gBfeVH5cVfiefD2S9ChXPHw8TkjLxbkgP+6VdzaEQuGpTmsbW4Dvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=aiGG4bCR; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XdExNfS8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB26DC4CEED;
-	Mon, 11 Aug 2025 06:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754892822;
-	bh=LnPCD5wQWfe5ewQuYs5Ji2os16OC0uw92HZs4chNN6Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XdExNfS82bYgbvYkazYD5Uca3vV525KEhs2Ec9BJUVqX9itC+3aNzhRqI0Na5Q+ym
-	 Cna1s1ttn1b/iAFMF5AK8f8uXlPrvEIogzcVxTbyzYY5bNxtYW5u03kY2NHC2QK6Lj
-	 D0ad0rPk5i/9ilAtjvCynVZkD46ucAXWSJQ7krj3/gw1FNPg5ibNqX0fQnKx/vWYWI
-	 skmBqB7HKQMPq0sopiAHlRXbqAyg27nqBkMNc5QXihGtcPpLCI5PiFeZwqelbHxvmp
-	 w97tZxlrXGimx55YtNHf39NI1kKnOLo1qfXeFmuv7zrrbeIoEiJDq5IKDVsXH9+TxF
-	 KS+INLsfOw17w==
-Date: Mon, 11 Aug 2025 11:43:35 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jens Wiklander <jens.wiklander@linaro.org>,
-	op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] tee: Use SHA-1 library instead of crypto_shash
-Message-ID: <aJmKDyD4weX9bR0U@sumit-X1>
-References: <20250801235541.14050-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="aiGG4bCR"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6154d14d6f6so4701095a12.2
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Aug 2025 00:11:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1754896263; x=1755501063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+tkggMO6AT5LolMfVDkxblD5g/qWfLNlR97dm1yJTPs=;
+        b=aiGG4bCRN8uTntvJY8QLE+UdquE8Wr93l0CqtGxTOtBCux5AAyxfsqT7JMw3np+Sf/
+         43x6Klh3weHz4Ut3Zch2DCWRI8naxLUhduRI+bror4NONOPfPuQYbPvBeRZkA+Bvwby0
+         9ZzxmBxtUeSo1dH8l8KCjDc2yCojJxxHdv92g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754896263; x=1755501063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+tkggMO6AT5LolMfVDkxblD5g/qWfLNlR97dm1yJTPs=;
+        b=s50HL/z6YEyVA9a24DhlxzcHh+aSeQWyLim49Lx2aWr1nffAqqyP5RgVRh39S/Yt5R
+         Kop6Iuapneonn4pPMMGKfYXQLpgT8m+G7XM8WNi6ueDSYBzIVyVCjGbbdb1WHsdRd6Vq
+         QmEYhVsrA45LoAMsOL/rzdm8LWfE5YaIc4Erjbf+hpvLCM6ObsyD7OmIK/8YAPL8ukYO
+         ID9ZrNk31pSNCv6giDCa1frB35gTTFMYZ9meicXT3RCIeKRszFRH4m2EvvCCaRBXPFC5
+         FEgidOA2MHTPj93s2wPjJm43OfEUHN+U8TIzllSt+Y+/aUdp1gMolhnaJZnmnwt5pdIz
+         oVBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaKEBv34EBah2l0uTnKLXr091qc5KmW9esj2jzUjzLSExxhMfNpGQTz7CxLuDQMqJSympOU2HPzhGLb/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPV8CfPg2JBhxyPB7Ae1QpWu5Qwj3ZB9d8k4lecGjy2Grr0wgH
+	ZwDhUqCmvGdPKWZJl3IDItu1uKJfPBcOKQ/+8z+g/c4iQyjrsU8I8qXtjERUk3IEEdGmvdDwtmn
+	/+I66dOIOAw==
+X-Gm-Gg: ASbGncsJPJgsY7rwMVzMEqhxtmr66rSeYURM1KD+/3zsEeeSsQtCmMTvvCHYvsEq53S
+	3OqNp18b/6L4Kha5IE9VFjpuEWTjaxcMqEIolSRF7c7AQ7B0+Gts8m2+SFYUKOz3nNPcKPljDOy
+	hYCtUP7SA6sZjgBT8UpVUai9obRsxJahQx5aV1Kw/cYSPvXGVANVNVr5JlLjMJ1S73+rnbrFDKu
+	+7hTw6WkMWde2l05g4aL4T/K3Z/grj8q7Vul+LjHVg4VWJoXdtCguUG31QquKIStzlapatbDqbF
+	4uZKB4LLNl0N8bo++Cl+EkPwAvMKQnTngYKMDXByCF1Wf/CDu2QTo7Ue2N0ku/IiGiCvAC55lND
+	yZK9rEfS8jdSaGEfkvJ0sg34+5G7b+EWGdgoEwWWOspwtgULKP1/ix0SzaUZQVqQubDmvCLv4qy
+	5gkm9MFwk=
+X-Google-Smtp-Source: AGHT+IH2sYWjau6ISXMXvsCb8JwV3mf7993Sac7uSAri0xHVhCNQp491qTW6XJ2rlRDIsF7D9fuQSQ==
+X-Received: by 2002:a05:6402:4308:b0:617:e75d:3d04 with SMTP id 4fb4d7f45d1cf-617e75d436fmr10439434a12.15.1754896263098;
+        Mon, 11 Aug 2025 00:11:03 -0700 (PDT)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-617f648789dsm4526757a12.53.2025.08.11.00.11.01
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Aug 2025 00:11:01 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-615d1865b2dso5940890a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Aug 2025 00:11:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVq4mrZfKTgMCMWwJ5/wb7bONE6p9CDG3a6bhEf/h/i2MgQFhIUUN39tN4GBVniT1h/m+oQbV078wTsFG8=@vger.kernel.org
+X-Received: by 2002:a05:6402:2106:b0:617:b28c:e134 with SMTP id
+ 4fb4d7f45d1cf-617e288cb4cmr9911954a12.0.1754896261462; Mon, 11 Aug 2025
+ 00:11:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801235541.14050-1-ebiggers@kernel.org>
+References: <aJWOH9GgXhoJsHp6@gondor.apana.org.au> <CAHk-=wgE=tX+Bv5y0nWwLKLjrmUTx4NrMs4Qx84Y78YpNqFGBA@mail.gmail.com>
+ <72186af9-50c4-461a-bf61-f659935106cc@oracle.com> <CAHk-=wjn5AtuNixX36qDGWumG4LiSDuuqfbaGH2RZu2ThXzV-A@mail.gmail.com>
+ <aJl1EIoSHnZRIQNO@gondor.apana.org.au>
+In-Reply-To: <aJl1EIoSHnZRIQNO@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 11 Aug 2025 10:10:44 +0300
+X-Gmail-Original-Message-ID: <CAHk-=wg1okLMc41jaxS+WRXigw7Fu+OUc6QsnL+BbvYAGTdZYA@mail.gmail.com>
+X-Gm-Features: Ac12FXxbcSB6uQKYwcexAGQP5Eo2dNnigj0KMH9nSHSa5SpTRmBr-egHpRbH9DM
+Message-ID: <CAHk-=wg1okLMc41jaxS+WRXigw7Fu+OUc6QsnL+BbvYAGTdZYA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: hash - Make HASH_MAX_DESCSIZE a bit more obvious
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Vegard Nossum <vegard.nossum@oracle.com>, "David S. Miller" <davem@davemloft.net>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 01, 2025 at 04:55:41PM -0700, Eric Biggers wrote:
-> Use the SHA-1 library functions instead of crypto_shash.  This is
-> simpler and faster.
-> 
-> Change uuid_v5() to return void, since it can no longer fail.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> Note: this patch depends on the SHA-1 library functions that were merged
-> in v6.17-rc1.
-> 
->  drivers/tee/Kconfig    |  3 +--
->  drivers/tee/tee_core.c | 55 +++++++-----------------------------------
->  2 files changed, 10 insertions(+), 48 deletions(-)
+On Mon, 11 Aug 2025 at 07:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> The patch below should make the constant a bit more obvious.
 
-Nice cleanup, FWIW:
+Indeed.
 
-Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+It would be good to maybe minimize the on-stack max-sized allocations,
+but that's a separate issue. Several hundred bytes is a noticeable
+part of the stack, and it's not always clear that it's a shallow stack
+with not a lot else going on..
 
--Sumit
+(I just randomly picked the btrfs csum hash to look at, which can
+apparently be one of crc32c / xxhash64 / sha256 or blake2b, and which
+is then used at bio submission time, and I wouldn't be surprised if it
+probably has a pretty deep stack at that point already).
 
-> 
-> diff --git a/drivers/tee/Kconfig b/drivers/tee/Kconfig
-> index 61b507c187801..a84767940fbfc 100644
-> --- a/drivers/tee/Kconfig
-> +++ b/drivers/tee/Kconfig
-> @@ -1,12 +1,11 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  # Generic Trusted Execution Environment Configuration
->  menuconfig TEE
->  	tristate "Trusted Execution Environment support"
->  	depends on HAVE_ARM_SMCCC || COMPILE_TEST || CPU_SUP_AMD
-> -	select CRYPTO
-> -	select CRYPTO_SHA1
-> +	select CRYPTO_LIB_SHA1
->  	select DMA_SHARED_BUFFER
->  	select GENERIC_ALLOCATOR
->  	help
->  	  This implements a generic interface towards a Trusted Execution
->  	  Environment (TEE).
-> diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-> index acc7998758ad8..d079aeee0690a 100644
-> --- a/drivers/tee/tee_core.c
-> +++ b/drivers/tee/tee_core.c
-> @@ -12,11 +12,10 @@
->  #include <linux/module.h>
->  #include <linux/overflow.h>
->  #include <linux/slab.h>
->  #include <linux/tee_core.h>
->  #include <linux/uaccess.h>
-> -#include <crypto/hash.h>
->  #include <crypto/sha1.h>
->  #include "tee_private.h"
->  
->  #define TEE_NUM_DEVICES	32
->  
-> @@ -140,72 +139,36 @@ static int tee_release(struct inode *inode, struct file *filp)
->   * UUIDv5 is specific in RFC 4122.
->   *
->   * This implements section (for SHA-1):
->   * 4.3.  Algorithm for Creating a Name-Based UUID
->   */
-> -static int uuid_v5(uuid_t *uuid, const uuid_t *ns, const void *name,
-> -		   size_t size)
-> +static void uuid_v5(uuid_t *uuid, const uuid_t *ns, const void *name,
-> +		    size_t size)
->  {
->  	unsigned char hash[SHA1_DIGEST_SIZE];
-> -	struct crypto_shash *shash = NULL;
-> -	struct shash_desc *desc = NULL;
-> -	int rc;
-> -
-> -	shash = crypto_alloc_shash("sha1", 0, 0);
-> -	if (IS_ERR(shash)) {
-> -		rc = PTR_ERR(shash);
-> -		pr_err("shash(sha1) allocation failed\n");
-> -		return rc;
-> -	}
-> -
-> -	desc = kzalloc(sizeof(*desc) + crypto_shash_descsize(shash),
-> -		       GFP_KERNEL);
-> -	if (!desc) {
-> -		rc = -ENOMEM;
-> -		goto out_free_shash;
-> -	}
-> -
-> -	desc->tfm = shash;
-> +	struct sha1_ctx ctx;
->  
-> -	rc = crypto_shash_init(desc);
-> -	if (rc < 0)
-> -		goto out_free_desc;
-> -
-> -	rc = crypto_shash_update(desc, (const u8 *)ns, sizeof(*ns));
-> -	if (rc < 0)
-> -		goto out_free_desc;
-> -
-> -	rc = crypto_shash_update(desc, (const u8 *)name, size);
-> -	if (rc < 0)
-> -		goto out_free_desc;
-> -
-> -	rc = crypto_shash_final(desc, hash);
-> -	if (rc < 0)
-> -		goto out_free_desc;
-> +	sha1_init(&ctx);
-> +	sha1_update(&ctx, (const u8 *)ns, sizeof(*ns));
-> +	sha1_update(&ctx, (const u8 *)name, size);
-> +	sha1_final(&ctx, hash);
->  
->  	memcpy(uuid->b, hash, UUID_SIZE);
->  
->  	/* Tag for version 5 */
->  	uuid->b[6] = (hash[6] & 0x0F) | 0x50;
->  	uuid->b[8] = (hash[8] & 0x3F) | 0x80;
-> -
-> -out_free_desc:
-> -	kfree(desc);
-> -
-> -out_free_shash:
-> -	crypto_free_shash(shash);
-> -	return rc;
->  }
->  
->  int tee_session_calc_client_uuid(uuid_t *uuid, u32 connection_method,
->  				 const u8 connection_data[TEE_IOCTL_UUID_LEN])
->  {
->  	gid_t ns_grp = (gid_t)-1;
->  	kgid_t grp = INVALID_GID;
->  	char *name = NULL;
->  	int name_len;
-> -	int rc;
-> +	int rc = 0;
->  
->  	if (connection_method == TEE_IOCTL_LOGIN_PUBLIC ||
->  	    connection_method == TEE_IOCTL_LOGIN_REE_KERNEL) {
->  		/* Nil UUID to be passed to TEE environment */
->  		uuid_copy(uuid, &uuid_null);
-> @@ -258,11 +221,11 @@ int tee_session_calc_client_uuid(uuid_t *uuid, u32 connection_method,
->  	default:
->  		rc = -EINVAL;
->  		goto out_free_name;
->  	}
->  
-> -	rc = uuid_v5(uuid, &tee_client_uuid_ns, name, name_len);
-> +	uuid_v5(uuid, &tee_client_uuid_ns, name, name_len);
->  out_free_name:
->  	kfree(name);
->  
->  	return rc;
->  }
-> 
-> base-commit: 0905809b38bda1fa0b206986c44d846e46f13c1d
-> -- 
-> 2.50.1
-> 
+Oh well.
+
+          Linus
