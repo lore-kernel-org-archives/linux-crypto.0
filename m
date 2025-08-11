@@ -1,79 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA52138DD3;
-	Mon, 11 Aug 2025 18:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839422E0B64;
+	Mon, 11 Aug 2025 18:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754935288; cv=none; b=OGb2gzIvHZUyBVloJIji2ziNtC1KbZsTX2J8Zp7GMTKI6COps0zlIZ5NuianP7T61L0NkXKtgiNvDr+cFYWGjjBbObvkyFrRSeDogeC2ye/xLyFzUe/bFvKbbTJwI8rzcWQ2b6RGPNFG+9QjUtuuHLg2pbKwnl+r/f+Tclaw9+0=
+	t=1754936895; cv=none; b=UjXypbWJB1PXBzhI9ot+yic5IB87kE3NUhO9sQwaJFIuBRHcCwiobXkLsj9j8j5Cc2hHUWDsZzhF/T9O8yMAj1nDmOcKX7tbP8v07khQcTNICQUQ8wY0QRcgP6+FyCSchwYShtmw8YsEhhrMGHBgMHJ2SJjkvxYRjZkCVFaymxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754935288; c=relaxed/simple;
-	bh=oaStqyeej7yqSzgI8HKKqj00CWEPmn5WsFskP+XUK+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ixF3yV8c1+uFQKpo1XeDVT8436m9N0na0rNr8t63L6QR5SwzgBVdFAYRmFkSofKMxteFzge3klU0/GEr+mxbK3OAIHSP76gVYc1SFBUlmT2zJ+MC64uThsPfQy1HgJ5posL11RvSENhH5quPiTYn4367GsRalWzyCWJPMMM82T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5EXUN2p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754936895; c=relaxed/simple;
+	bh=IVrFmgYuMdiDJL93cZGS1SPLtlUDB68qHGDJJcuGWDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sFf8/OLtsRd1o5OCTSbD7KReDtK3875QIVcS1b3NKDUSSUBUrRK263q3Ffyyj9h9ud0e8dgF5U2bZ4R/EYzAu1QIyGX2NYaogOX7HLcaSBxIEiwGS1h/J95mFYD5f25xcwY7snYYKBoMw41WlppNcTIFeiAuOMfGA3U6GSa9C2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0qNMgoB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5EXUN2p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A15AC4CEED;
-	Mon, 11 Aug 2025 18:01:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0qNMgoB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF737C4CEED;
+	Mon, 11 Aug 2025 18:28:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754935288;
-	bh=oaStqyeej7yqSzgI8HKKqj00CWEPmn5WsFskP+XUK+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X5EXUN2pGcp6CPXoxCDazABPuA3K/Ss0elSgvoV3BfFwp7d5jrU5QSyxDUELmOMd2
-	 sM4EMfjt4Zp80NM2W42zzXwNk38urPB/VDMqcB99ruw2QxEIbE/jt9IAHtqC9Y84Rh
-	 6MEfDvxGuyyB8BbiiRsZBcdtxQkMZnyFQl/XLxG56uNmacJ7XAeKWk76tzsp/j0PUl
-	 PYb5DK6m3mxfYIAjxvof4AFHKCQ0Bf/ULogD17GOdSH64J65XFTdvKKiG2IUr1XE5l
-	 VUozKpvR83OAufVEPGOiRtZxoMi2WQQrV3lVogX3uzxXDfbhqBKBfe9L88ohsPpeQ3
-	 CC+YdkmSomrYQ==
-Date: Mon, 11 Aug 2025 11:00:26 -0700
+	s=k20201202; t=1754936895;
+	bh=IVrFmgYuMdiDJL93cZGS1SPLtlUDB68qHGDJJcuGWDs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T0qNMgoBNnGFDwzgTPKdXv+ECGpbdSQBb4DNCA0JyfImiL0rmlNZtWlDv/dU5tICW
+	 QWNMp71VFI9K+mxSp7YSLRBuepSzWWM/og3v4g0f3y9ce7JOGS1pepVwxbrhKjbogH
+	 S/8oM8ZlRu//VZLB1VcWs/6xwvQKG7alewkTMu7wsv8lynXUExtERWm4/uqke7SXIV
+	 mVzH/LBLmy7KJml+tFHJhDJaJJ7pSiNZteY8GFPfsZTJHsM94Tkn7bEN4zuPHiugeB
+	 e/l4ckF2kG/j32Ayp7KmKnmbk3SQ7qC+rCCUmlwsJAgY2a3AtR9XxZRDru+DTRQTwe
+	 xpt5DZ8KU5ghw==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org
-Subject: Re: [PATCH v2 0/7] MD5 library functions
-Message-ID: <20250811180026.GG1268@sol>
-References: <20250805222855.10362-1-ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/3] Test CRC computation in interrupt contexts
+Date: Mon, 11 Aug 2025 11:26:28 -0700
+Message-ID: <20250811182631.376302-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250805222855.10362-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 05, 2025 at 03:28:48PM -0700, Eric Biggers wrote:
-> This series is targeting libcrypto-next and can also be retrieved from:
-> 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git md5-lib-v2
-> 
-> This series introduces a library API for MD5 and HMAC-MD5 and
-> reimplements the crypto_shash "md5" and "hmac(md5)" on top of it.
-> 
-> The library API will also be usable directly by various in-kernel users
-> that are stuck with MD5 due to having to implement legacy protocols.
-> 
-> This should again look quite boring and familiar, as it mirrors the
-> SHA-1 and SHA-2 changes closely.
-> 
-> Changed in v2:
->   - Kept the architecture-optimized MD5 code, since unfortunately there
->     were objections to removing it.
-> 
-> Eric Biggers (7):
->   lib/crypto: md5: Add MD5 and HMAC-MD5 library functions
->   lib/crypto: mips/md5: Migrate optimized code into library
->   mips: cavium-octeon: Move octeon-crypto.c into parent dir
->   lib/crypto: powerpc/md5: Migrate optimized code into library
->   lib/crypto: sparc/md5: Migrate optimized code into library
->   crypto: md5 - Wrap library and add HMAC support
->   lib/crypto: tests: Add KUnit tests for MD5 and HMAC-MD5
+This series updates crc_kunit to use the same interrupt context testing
+strategy that I used in the crypto KUnit tests.  I.e., test CRC
+computation in hardirq, softirq, and task context concurrently.  This
+detect issues related to use of the FPU/SIMD/vector registers.
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+To allow lib/crc/tests/ and lib/crypto/tests/ to share code, move the
+needed helper function to include/kunit/run-in-irq-context.h.
+include/kunit/ seems like the most relevant location for this sort of
+thing, but let me know if there is any other preference.
 
-Reviews and acks still greatly appreciated, of course!
+The third patch replaces the calls to crypto_simd_usable() in lib/crc/
+with calls to the underlying functions, now that we have a better
+solution that doesn't rely on the test injecting values.  (Note that
+crc_kunit wasn't actually using the injection solution, anyway.)
 
-- Eric
+I'd like to take this series via crc-next.
+
+Eric Biggers (3):
+  kunit, lib/crypto: Move run_irq_test() to common header
+  lib/crc: crc_kunit: Test CRC computation in interrupt contexts
+  lib/crc: Use underlying functions instead of crypto_simd_usable()
+
+ include/kunit/run-in-irq-context.h    | 129 ++++++++++++++++++++++++++
+ lib/crc/arm/crc-t10dif.h              |   6 +-
+ lib/crc/arm/crc32.h                   |   6 +-
+ lib/crc/arm64/crc-t10dif.h            |   6 +-
+ lib/crc/arm64/crc32.h                 |  11 ++-
+ lib/crc/powerpc/crc-t10dif.h          |   5 +-
+ lib/crc/powerpc/crc32.h               |   5 +-
+ lib/crc/tests/crc_kunit.c             |  62 +++++++++++--
+ lib/crc/x86/crc-pclmul-template.h     |   3 +-
+ lib/crc/x86/crc32.h                   |   2 +-
+ lib/crypto/tests/hash-test-template.h | 123 +-----------------------
+ 11 files changed, 206 insertions(+), 152 deletions(-)
+ create mode 100644 include/kunit/run-in-irq-context.h
+
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+-- 
+2.50.1
+
