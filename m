@@ -1,85 +1,190 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611DD2DCF6B
-	for <linux-crypto@vger.kernel.org>; Mon, 11 Aug 2025 09:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EB120297C;
+	Mon, 11 Aug 2025 12:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754904332; cv=none; b=EddAiKBMOKdbh9RgRYhKhMjFtqvIild9GDQ8cdVHWsReUfVDWYaSK1te9pxAsoV4+E6S3TUYtzwkG9VdLNr7c3FwmO9Q9v82V1j2H+/boxnzePeRgAtWxaiNTk1joF7G+43jEZFRu6ZyBEL6xGu1ffJ8JEmoC9hZTPQAY3T/Das=
+	t=1754914899; cv=none; b=N7yIdtto8H7RttXuXZZG91RZQaPIHvmReq+0B5ywaIb1yw2c1vIEn45aSwWzQyeai2UXUQsxxGyJj16pPR5C+LEAmoikS25D5bIZCqNcjErSRx82Ei3G45NcoVNAYktPqMgjuVdHFQ9ys2JFqUx6cwl6bllG6KQ08mKTrEX4/Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754904332; c=relaxed/simple;
-	bh=/Y+j5nnBZmfosDIt5AA2wiHFd+B/n8jBcY8XVbUbILc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jg8NIuraL3TjU9GNNsA8EC4WXJBfv+25dVcVGKdkctnj9pS4OCdkSOYwfQWaWp4br+ErMhcXKMfrtLUs3YEGDoR8lyOPVXCF9N5fey7mfreG+52Szp7p2ECtpF1YAq1H/CHWK6Q7BALgWCu6NarI8V/sEYRXXDEy00ZRcDXjo+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W2x4wT1p; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1754914899; c=relaxed/simple;
+	bh=Ql1JCgnCHCe7QLdED93B26Cg21+RnnwnTV77huzWi0s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qs5yb3LZ9T9r1boC0kmChmGGQgCnOnAYtFC4/872CQZE4MAiL3vP3sNNWHqVosQzV6q5oXKWultRfdNEUgN7ZmidAmoFvz0LQcOyhw8gkRDkdDaiCYKukmP06UCTnEq5bvtXODAzHrLAdWZxiDy44bmwhhGNNYXipg67V3XSw9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Gpl0cloj; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W2x4wT1p"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754904327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nvZPeHoZUGv8yiunX9lwcunwG1NgaTC2loxZhPTUEvY=;
-	b=W2x4wT1pGl+/zjamyP4eVKDX08Acuv/skkrSNde8nC2qSwGaKpnfQLeQSNUo3UnyUR9ONe
-	unQKSK+kNlKpywrG3vts4cHDOSo9NBMaTB0m1HW+pEytyWZCwO45CmoIu81QJe6E+1Ci88
-	fD05Jh4G5EvE6ARCpMhHSjyQcMnPpc0=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Sai Krishna <saikrishnag@marvell.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Shijith Thotton <sthotton@marvell.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - Call strscpy() with correct size argument
-Date: Mon, 11 Aug 2025 11:24:57 +0200
-Message-ID: <20250811092459.4833-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Gpl0cloj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1754914898; x=1786450898;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Ql1JCgnCHCe7QLdED93B26Cg21+RnnwnTV77huzWi0s=;
+  b=Gpl0clojgNadKcllAmuS5qeyr7U61wJHDZdoNrUpvQXfyYR/YcdiLIZZ
+   T/jJBrCdcFKKzgbl3tGf/K1pgZlnW+Wc2VVlRfjOgsTxTC0nXKo4JeT24
+   w6mnq55pqVRBeHTtrE7glPy239HLTPGbZokXHQdr1TeRPb5L4wjt9cgTH
+   BItjbrQ7jbkciy1t/uzQKgEoxZuQhBrpLN2wBn/Wz+MJZCOtQh+n47bpU
+   ELZLDE0f7x2RiAzlNQpwJj/qDLJv2+YdqJX7tCm/sRGy3Sbr1qWmGjXa7
+   kvztThpDlB8CDVKa6CkdGzraZDppxs/7+5hxV7+cCLmBt84aUAVnNWAhV
+   w==;
+X-CSE-ConnectionGUID: wyxru+5XTMK+lbiHaXZ4+w==
+X-CSE-MsgGUID: 5Wwrm8/ITrONPZG1z6ylXA==
+X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
+   d="scan'208";a="45644208"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Aug 2025 05:21:28 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 11 Aug 2025 05:20:58 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Mon, 11 Aug 2025 05:20:53 -0700
+Date: Mon, 11 Aug 2025 12:20:53 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Robert Marko <robert.marko@sartura.hr>
+CC: Nicolas Ferre <nicolas.ferre@microchip.com>, Arnd Bergmann
+	<arnd@kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	"Russell King" <linux@armlinux.org.uk>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Olivia Mackall <olivia@selenic.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Vinod Koul <vkoul@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, Lee Jones
+	<lee@kernel.org>, Mark Brown <broonie@kernel.org>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+	<luka.perkov@sartura.hr>, Conor Dooley <Conor.Dooley@microchip.com>, "Lars
+ Povlsen - M31675" <Lars.Povlsen@microchip.com>
+Subject: Re: [PATCH v8 01/10] arm64: Add config for Microchip SoC platforms
+Message-ID: <20250811122053.4bfyoefln7wpz2a4@DEN-DL-M70577>
+References: <20250702183856.1727275-1-robert.marko@sartura.hr>
+ <20250702183856.1727275-2-robert.marko@sartura.hr>
+ <ea353170-6e03-4231-afc2-3dc45253931d@app.fastmail.com>
+ <CA+HBbNHxiU5+xVJTyPQFuCJLyEs5_MpybSBEgxi25bzaGfiVHA@mail.gmail.com>
+ <421d61db-27eb-4ad2-bd98-eb187fd14b1e@microchip.com>
+ <CA+HBbNEiKWS71jtF_jqV9bdX9HVroaZSGMaeD-xFM8sm0kLtCw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CA+HBbNEiKWS71jtF_jqV9bdX9HVroaZSGMaeD-xFM8sm0kLtCw@mail.gmail.com>
 
-In otx2_cpt_dl_custom_egrp_create(), strscpy() is called with the length
-of the source string rather than the size of the destination buffer.
+On Fri, Jul 04, 2025 at 07:36:06PM +0200, Robert Marko wrote:
+> 
+> On Thu, Jul 3, 2025 at 3:56 PM Nicolas Ferre
+> <nicolas.ferre@microchip.com> wrote:
+> >
+> > Robert, Arnd,
+> >
+> > On 03/07/2025 at 14:25, Robert Marko wrote:
+> > > On Wed, Jul 2, 2025 at 9:57 PM Arnd Bergmann <arnd@kernel.org> wrote:
+> > >>
+> > >> On Wed, Jul 2, 2025, at 20:35, Robert Marko wrote:
+> > >>> Currently, Microchip SparX-5 SoC is supported and it has its own symbol.
+> > >>>
+> > >>> However, this means that new Microchip platforms that share drivers need
+> > >>> to constantly keep updating depends on various drivers.
+> > >>>
+> > >>> So, to try and reduce this lets add ARCH_MICROCHIP symbol that drivers
+> > >>> could instead depend on.
+> > >>
+> > >> Thanks for updating the series to my suggestion!
+> > >>
+> > >>> @@ -174,6 +160,27 @@ config ARCH_MESON
+> > >>>          This enables support for the arm64 based Amlogic SoCs
+> > >>>          such as the s905, S905X/D, S912, A113X/D or S905X/D2
+> > >>>
+> > >>> +menuconfig ARCH_MICROCHIP
+> > >>> +     bool "Microchip SoC support"
+> > >>> +
+> > >>> +if ARCH_MICROCHIP
+> > >>> +
+> > >>> +config ARCH_SPARX5
+> > >>> +     bool "Microchip Sparx5 SoC family"
+> > >>
+> > >> This part is the one bit I'm not sure about: The user-visible
+> > >> arm64 CONFIG_ARCH_* symbols are usually a little higher-level,
+> > >> so I don't think we want both ARCH_MICROCHIP /and/ ARCH_SPARX5
+> > >> here, or more generally speaking any of the nested ARCH_*
+> > >> symbols.
+> >
+> > Well, having a look at arch/arm64/Kconfig.platforms, I like how NXP is
+> > organized.
+> >
+> > SPARX5, LAN969x or other MPU platforms, even if they share some common
+> > IPs, are fairly different in terms of internal architecture or feature set.
+> > So, to me, different ARCH_SPARX5, ARCH_LAN969X (as Robert proposed) or
+> > future ones make a lot sense.
+> > It will help in selecting not only different device drivers but
+> > different PM architectures, cores or TrustZone implementation...
+> >
+> > >> This version of your patch is going to be slightly annoying
+> > >> to existing sparx5 users because updating an old .config
+> > >> breaks when ARCH_MICROCHIP is not enabled.
+> >
+> > Oh, yeah, indeed. Even if I find Robert's proposal ideal.
+> >
+> > Alexandre, Lars, can you evaluate this level of annoyance?
+> >
+> > >> The two options that I would prefer here are
+> > >>
+> > >> a) make ARCH_SPARX5 a hidden symbol in order to keep the
+> > >>     series bisectable, remove it entirely once all references
+> > >>     are moved over to ARCH_MICROCHIP
+> > >>
+> > >> b) Make ARCH_MICROCHIP a hidden symbol that is selected by
+> > >>     ARCH_SPARX5 but keep the menu unchanged.
+> > >
+> > > Hi Arnd,
+> > > Ok, I see the issue, and I would prefer to go with option b and do
+> > > what I did for
+> > > AT91 with the hidden ARCH_MICROCHIP symbol to avoid breaking current configs.
+> >
+> > Yep, but at the cost of multiple entries for Microchip arm64 SoCs at the
+> > "Platform selection" menu level. Nuvoton or Cavium have this already, so
+> > it's probably fine.
+> 
+> Yes, this is why I went with a menu instead, to me it is much cleaner.
+> 
+> So, how would you guys want me to proceed?
+> 
+> a) Keep the menu-based config symbol
+> or
+> b) Like for AT91, add a hidden symbol and keep the individual SoC-s in
+> the top level
+> platform menu?
+> 
+> Regards,
+> Robert
 
-This is fine as long as the destination buffer is larger than the source
-string, but we should still use the destination buffer size instead to
-call strscpy() as intended. And since 'tmp_buf' is a fixed-size buffer,
-we can safely omit the size argument and let strscpy() infer it using
-sizeof().
+Hi Robert,
 
-Fixes: d9d7749773e8 ("crypto: octeontx2 - add apis for custom engine groups")
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry for the late reply.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index cc47e361089a..ebdf4efa09d4 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -1615,7 +1615,7 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
- 		return -EINVAL;
- 	}
- 	err_msg = "Invalid engine group format";
--	strscpy(tmp_buf, ctx->val.vstr, strlen(ctx->val.vstr) + 1);
-+	strscpy(tmp_buf, ctx->val.vstr);
- 	start = tmp_buf;
- 
- 	has_se = has_ie = has_ae = false;
--- 
-2.50.1
+I appreciate the effort to make the addition of future symbols easier by using
+a common ARCH_MICROCHIP symbol — that makes sense to me.
+
+Regarding the actual symbols, I’m certainly no expert, but I agree with
+Nicolas, that having more granular control with separate ARCH_SPARX5 and
+ARCH_LAN969X could make sense, as opposed to only having ARCH_MICROCHIP, as
+Arnd mentioned.
+
+As for the goal of using a common symbol for drivers to depend on,  while not
+breaking existing configs (are there any unwritten rules or practices about
+breaking existing configs?), I think option B will work fine. I dont mind the
+symbols being top-level.
+
+/Daniel
+
 
