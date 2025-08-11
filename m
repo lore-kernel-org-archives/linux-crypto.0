@@ -1,190 +1,69 @@
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EB120297C;
-	Mon, 11 Aug 2025 12:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1151624DD;
+	Mon, 11 Aug 2025 14:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754914899; cv=none; b=N7yIdtto8H7RttXuXZZG91RZQaPIHvmReq+0B5ywaIb1yw2c1vIEn45aSwWzQyeai2UXUQsxxGyJj16pPR5C+LEAmoikS25D5bIZCqNcjErSRx82Ei3G45NcoVNAYktPqMgjuVdHFQ9ys2JFqUx6cwl6bllG6KQ08mKTrEX4/Jk=
+	t=1754923733; cv=none; b=KgYSuvhjxtcgnIoShTsVGak2tvhZpkR1MLgQ0Mp/xh6Oslopv862PuI9/lOMsW+r4AUg+lL5c02H//87KOEYHZJWijNXVHiJQdLx83LjulMxmZj9sK6N3U4b6ZKGf65WfyszqkMGb70s28rAq7m2wbFnIjJdXGjpC9qU4Tuspg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754914899; c=relaxed/simple;
-	bh=Ql1JCgnCHCe7QLdED93B26Cg21+RnnwnTV77huzWi0s=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qs5yb3LZ9T9r1boC0kmChmGGQgCnOnAYtFC4/872CQZE4MAiL3vP3sNNWHqVosQzV6q5oXKWultRfdNEUgN7ZmidAmoFvz0LQcOyhw8gkRDkdDaiCYKukmP06UCTnEq5bvtXODAzHrLAdWZxiDy44bmwhhGNNYXipg67V3XSw9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Gpl0cloj; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1754923733; c=relaxed/simple;
+	bh=mQt2w0ZG//S0B9hwWMBwKv6N4PiPTQi9ryZgGoj07es=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cFSl8bNhZhEoYWc4JMviXX0sFGqaKPBmO4OqNDYhXJS/rmA6OqAqBaQxo5gnC5w8p/nihTdgpj5r7yw/YyWfORLL+yBodKohMLgf0zCvjkTBjjeXmVGg6XDXpEzQDGRzH6DPfxC1bYi4/F+wIMJpf3XCK3LP44/bt4A/tlSI1Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oX4elPmP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Gpl0cloj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1754914898; x=1786450898;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Ql1JCgnCHCe7QLdED93B26Cg21+RnnwnTV77huzWi0s=;
-  b=Gpl0clojgNadKcllAmuS5qeyr7U61wJHDZdoNrUpvQXfyYR/YcdiLIZZ
-   T/jJBrCdcFKKzgbl3tGf/K1pgZlnW+Wc2VVlRfjOgsTxTC0nXKo4JeT24
-   w6mnq55pqVRBeHTtrE7glPy239HLTPGbZokXHQdr1TeRPb5L4wjt9cgTH
-   BItjbrQ7jbkciy1t/uzQKgEoxZuQhBrpLN2wBn/Wz+MJZCOtQh+n47bpU
-   ELZLDE0f7x2RiAzlNQpwJj/qDLJv2+YdqJX7tCm/sRGy3Sbr1qWmGjXa7
-   kvztThpDlB8CDVKa6CkdGzraZDppxs/7+5hxV7+cCLmBt84aUAVnNWAhV
-   w==;
-X-CSE-ConnectionGUID: wyxru+5XTMK+lbiHaXZ4+w==
-X-CSE-MsgGUID: 5Wwrm8/ITrONPZG1z6ylXA==
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="45644208"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Aug 2025 05:21:28 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 11 Aug 2025 05:20:58 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 11 Aug 2025 05:20:53 -0700
-Date: Mon, 11 Aug 2025 12:20:53 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Robert Marko <robert.marko@sartura.hr>
-CC: Nicolas Ferre <nicolas.ferre@microchip.com>, Arnd Bergmann
-	<arnd@kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	"Russell King" <linux@armlinux.org.uk>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Olivia Mackall <olivia@selenic.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, Lee Jones
-	<lee@kernel.org>, Mark Brown <broonie@kernel.org>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-	<linux-i2c@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-	<linux-serial@vger.kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
-	<luka.perkov@sartura.hr>, Conor Dooley <Conor.Dooley@microchip.com>, "Lars
- Povlsen - M31675" <Lars.Povlsen@microchip.com>
-Subject: Re: [PATCH v8 01/10] arm64: Add config for Microchip SoC platforms
-Message-ID: <20250811122053.4bfyoefln7wpz2a4@DEN-DL-M70577>
-References: <20250702183856.1727275-1-robert.marko@sartura.hr>
- <20250702183856.1727275-2-robert.marko@sartura.hr>
- <ea353170-6e03-4231-afc2-3dc45253931d@app.fastmail.com>
- <CA+HBbNHxiU5+xVJTyPQFuCJLyEs5_MpybSBEgxi25bzaGfiVHA@mail.gmail.com>
- <421d61db-27eb-4ad2-bd98-eb187fd14b1e@microchip.com>
- <CA+HBbNEiKWS71jtF_jqV9bdX9HVroaZSGMaeD-xFM8sm0kLtCw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oX4elPmP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45D0C4CEF4;
+	Mon, 11 Aug 2025 14:48:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754923732;
+	bh=mQt2w0ZG//S0B9hwWMBwKv6N4PiPTQi9ryZgGoj07es=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oX4elPmPIOpeD2XHzeEW/jupl0j9mCSkrh987KVB6Ut30cFt59YanHU8ZKErzKcnm
+	 0en0nPALWJt6UyraIHambC3cfku8+9AKMnBP9h/b5iRnaeVNuecWViz07qW4MNYmj4
+	 ktRYMMWGIMLQoGTw/RVPKx/RXiPa7PJ4sl19nQE52N2qLNhqN4BDtceir16gR9QMqz
+	 i7SfwFsHY1ypJzkB+Gh3i2dCcjf2kBSztnYE6ROSPk5dtyi8HPE7LGlNtRRjgallQD
+	 ozmQMHzMqojk4U9iDwFHwT4kW/1OxcF7OhIr//oS3zxVI0w6is95bZWz7LoSOIuJv3
+	 Sgn/pGPp8JIMQ==
+Date: Mon, 11 Aug 2025 09:48:51 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, conor+dt@kernel.org,
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>,
+	adityak@vayavyalabs.com, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com
+Subject: Re: [PATCH v4 1/6] dt-bindings: crypto: Document support for SPAcc
+Message-ID: <175492373105.3051979.16817613723067435625.robh@kernel.org>
+References: <20250808122631.697421-1-pavitrakumarm@vayavyalabs.com>
+ <20250808122631.697421-2-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+HBbNEiKWS71jtF_jqV9bdX9HVroaZSGMaeD-xFM8sm0kLtCw@mail.gmail.com>
+In-Reply-To: <20250808122631.697421-2-pavitrakumarm@vayavyalabs.com>
 
-On Fri, Jul 04, 2025 at 07:36:06PM +0200, Robert Marko wrote:
+
+On Fri, 08 Aug 2025 17:56:26 +0530, Pavitrakumar Managutte wrote:
+> Add DT bindings related to the SPAcc driver for Documentation.
+> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+> Engine is a crypto IP designed by Synopsys.
 > 
-> On Thu, Jul 3, 2025 at 3:56 PM Nicolas Ferre
-> <nicolas.ferre@microchip.com> wrote:
-> >
-> > Robert, Arnd,
-> >
-> > On 03/07/2025 at 14:25, Robert Marko wrote:
-> > > On Wed, Jul 2, 2025 at 9:57 PM Arnd Bergmann <arnd@kernel.org> wrote:
-> > >>
-> > >> On Wed, Jul 2, 2025, at 20:35, Robert Marko wrote:
-> > >>> Currently, Microchip SparX-5 SoC is supported and it has its own symbol.
-> > >>>
-> > >>> However, this means that new Microchip platforms that share drivers need
-> > >>> to constantly keep updating depends on various drivers.
-> > >>>
-> > >>> So, to try and reduce this lets add ARCH_MICROCHIP symbol that drivers
-> > >>> could instead depend on.
-> > >>
-> > >> Thanks for updating the series to my suggestion!
-> > >>
-> > >>> @@ -174,6 +160,27 @@ config ARCH_MESON
-> > >>>          This enables support for the arm64 based Amlogic SoCs
-> > >>>          such as the s905, S905X/D, S912, A113X/D or S905X/D2
-> > >>>
-> > >>> +menuconfig ARCH_MICROCHIP
-> > >>> +     bool "Microchip SoC support"
-> > >>> +
-> > >>> +if ARCH_MICROCHIP
-> > >>> +
-> > >>> +config ARCH_SPARX5
-> > >>> +     bool "Microchip Sparx5 SoC family"
-> > >>
-> > >> This part is the one bit I'm not sure about: The user-visible
-> > >> arm64 CONFIG_ARCH_* symbols are usually a little higher-level,
-> > >> so I don't think we want both ARCH_MICROCHIP /and/ ARCH_SPARX5
-> > >> here, or more generally speaking any of the nested ARCH_*
-> > >> symbols.
-> >
-> > Well, having a look at arch/arm64/Kconfig.platforms, I like how NXP is
-> > organized.
-> >
-> > SPARX5, LAN969x or other MPU platforms, even if they share some common
-> > IPs, are fairly different in terms of internal architecture or feature set.
-> > So, to me, different ARCH_SPARX5, ARCH_LAN969X (as Robert proposed) or
-> > future ones make a lot sense.
-> > It will help in selecting not only different device drivers but
-> > different PM architectures, cores or TrustZone implementation...
-> >
-> > >> This version of your patch is going to be slightly annoying
-> > >> to existing sparx5 users because updating an old .config
-> > >> breaks when ARCH_MICROCHIP is not enabled.
-> >
-> > Oh, yeah, indeed. Even if I find Robert's proposal ideal.
-> >
-> > Alexandre, Lars, can you evaluate this level of annoyance?
-> >
-> > >> The two options that I would prefer here are
-> > >>
-> > >> a) make ARCH_SPARX5 a hidden symbol in order to keep the
-> > >>     series bisectable, remove it entirely once all references
-> > >>     are moved over to ARCH_MICROCHIP
-> > >>
-> > >> b) Make ARCH_MICROCHIP a hidden symbol that is selected by
-> > >>     ARCH_SPARX5 but keep the menu unchanged.
-> > >
-> > > Hi Arnd,
-> > > Ok, I see the issue, and I would prefer to go with option b and do
-> > > what I did for
-> > > AT91 with the hidden ARCH_MICROCHIP symbol to avoid breaking current configs.
-> >
-> > Yep, but at the cost of multiple entries for Microchip arm64 SoCs at the
-> > "Platform selection" menu level. Nuvoton or Cavium have this already, so
-> > it's probably fine.
+> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> ---
+>  .../bindings/crypto/snps,dwc-spacc.yaml       | 50 +++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
 > 
-> Yes, this is why I went with a menu instead, to me it is much cleaner.
-> 
-> So, how would you guys want me to proceed?
-> 
-> a) Keep the menu-based config symbol
-> or
-> b) Like for AT91, add a hidden symbol and keep the individual SoC-s in
-> the top level
-> platform menu?
-> 
-> Regards,
-> Robert
 
-Hi Robert,
-
-Sorry for the late reply.
-
-I appreciate the effort to make the addition of future symbols easier by using
-a common ARCH_MICROCHIP symbol — that makes sense to me.
-
-Regarding the actual symbols, I’m certainly no expert, but I agree with
-Nicolas, that having more granular control with separate ARCH_SPARX5 and
-ARCH_LAN969X could make sense, as opposed to only having ARCH_MICROCHIP, as
-Arnd mentioned.
-
-As for the goal of using a common symbol for drivers to depend on,  while not
-breaking existing configs (are there any unwritten rules or practices about
-breaking existing configs?), I think option B will work fine. I dont mind the
-symbols being top-level.
-
-/Daniel
-
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
