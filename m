@@ -1,99 +1,88 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F4417E4;
-	Mon, 11 Aug 2025 22:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8593581724;
+	Tue, 12 Aug 2025 00:58:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754950590; cv=none; b=F8KCX1MjuOFfVJE2Jps6yEkwdqe7JrinlW8xnpeGe8snmaXDP4xLKLJXIi9qopWs4BfvudnEkjvvGhkzpINyO88Z8XWVVRPUnHzJvM+bmW1Tp4PYutQO8ngR4nVqTiFWwNQNbEzi3C6nyaXvTaN5dRvWTmlgfbWFNZzaYrtvQkI=
+	t=1754960291; cv=none; b=rCiL8iRTz9Yx1XZzGSk0GqZUTbPbHTkVMf5U8yvKEfeQp0g7oDG3ySUa78xkH9SnnKohcb7vJ9C3zxecpxDeGs9KJ9Vt0wvDF9awhGh3UeNXvQ8ffMRGgXy3oGSW6ysgpruJAgRmvgCAeBFbYWZmCxaUiFokR09J0q+/4HWGaR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754950590; c=relaxed/simple;
-	bh=M2D1VRoQ3zn0PyM1FfBVHiFGryUV41iVco7i4VJJfmQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OQDDc6uAgMcX+TdkV4LwvrMkq0EgdPEA7YI3hCMNeOedJBRIA2DPHbUD8poe+i7+VoAbAOA93I4xocJZjoRGDQx7iz1viWwHrJ7eFdz3oYqV8FntlZf135a4pg6yhQg3WlSD+8OfjnZ/GKyOuDA3yiduyvsTmTGWH4eUJ658AM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXv0raRc; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1754960291; c=relaxed/simple;
+	bh=IQPA4PqoRW2lue3aGTTtEd5Syy5gper/GRhKNnpr7Ic=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AL/7FZpTSOQIXMm6A5ZxWIEiKW7uRgNIuYEHDbvcQhZr5VKfpBp5yFuDixHyhtTPVCWJH0cISqSwEi8+ncE5CZVg2ZsjwCUMLlAGtXEIPKXUhOGLkpxxzS2gymH2wHVsCaftHkDe1bX6NxftGAEDFql5QKZxwL+VcPVj2DuRW3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEBhl12M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXv0raRc"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-76bdc73f363so4294129b3a.3;
-        Mon, 11 Aug 2025 15:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754950578; x=1755555378; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WoTD4n8WjzNT/Sh1Fmja4gNj3IizNwY61c8ct39qSv0=;
-        b=EXv0raRc8RgVmS+oXEozzbmlv8s5XtRuu1Sq6ZacytwQfPM2chgj+v4bUUup3Bw28+
-         DvRRxBYMe3K1fmrsEgFmmzKnnpc2takm7jISmjh2yLljtLmcKYPJhzR2qHrYyeb6HwuE
-         dRNPS4j+Y3A+t+h7YKywB0J1InrwO85qhruIl/1K/33g8+vRKTBp2CaYRglv+U8vBNNc
-         IFQO9MuZbxq17yFJtALJBa/FrDT9gewmueYIp/8fmpXzIoqIaBa3NsxnuycjVCmRddj/
-         cebn4mnF0alhrMssVUKYlS/iQPAk6ik5GWO1Z8BgQcSzIwFuTpacSzk1IbG+q7mXlEkz
-         Uf/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754950579; x=1755555379;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WoTD4n8WjzNT/Sh1Fmja4gNj3IizNwY61c8ct39qSv0=;
-        b=As2c95YrvpQsxb4xPRl+Y7G/XjhWdTiMZuFeRPxota5nvbeb5JddqbcxA9IIphcoUD
-         iDKVyJeAFzAzp+Zlcqt0pkWbwKkzrqt3YOPWkscU+6LZVHGCa6s5nqZHWTAAOreKmJi/
-         Yig5euWnsDCce27j5rTPkBLlSOddcdL7ZedfGookVfNQU1nddpTKwArySG6pSelXvN6/
-         FU8rSgBr3rUREtKrLGrI1O7wP9k2VeTyjEoLUX6siwLulrNbgfJCeqks40U2kZ7oMns5
-         MoRWXdiTzHO0m29jtQEPzFFP3yB8+MA5+BQ7K3y7Q3el0kNWbrLelUb4FByFY9I8cwCq
-         nrMw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/am33Ld7IxVc4gOrmc0L0LdvfW3gNCs/1jLo91jHYPTp9DsnAqwma80gm9LuVgirc1h4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyigTRgwKlAat/gzVjmrtj4E+OiVCYE+lMl0PxIiWokq46kWbDM
-	OF4rS+ekJc/1yH23FkatTRSEhJnm0pwn4WOXjGpVfOoayEqGondQRlH2
-X-Gm-Gg: ASbGncs8YamUrTzBvNbmmx/Ace8hScq81qy7kBS7XkPzu/in4tdIUSNOEG2/fL6vhXW
-	u3w28kPS1HX6Uyg3LeFC5/3w4RS8fQviQMsySx6TLNcQtWwt3P/KKj94vuQfVOq1BwEiGeRehbx
-	JOOidPDx7b5lNFKYPpbLwgjl+ye4XBdN4bBctjg9urtkdK8GdjLW1CJkJTiSrqNKvqHQLcxZILy
-	MbtgyIK50JbPrWV5XNvyHnne8wPOQLeep+nxdsbXyfoJpVorH6KGNMs9NNwa+R4mVk7GW8WnYH3
-	kY1xYWhDUlIkRrgF9geSwWEFnXT9XARQRV/+Ah5cRtOzmAZaxto/3nBStu6TpwnkNzFje6a8u+b
-	ErKtmPqE1sonL3yqwh9mL9Apdvu568ZxhbXZsE04LfVh5
-X-Google-Smtp-Source: AGHT+IEl0lxbbSVaV2tH4whp5zAdZvYxAUsCl+JBfkoAVSjYRB35BOEKaBR9mmB/TFhF358zEX9eUA==
-X-Received: by 2002:a05:6a20:7d86:b0:240:1a3a:d7ec with SMTP id adf61e73a8af0-2409a880f54mr1574435637.4.1754950578552;
-        Mon, 11 Aug 2025 15:16:18 -0700 (PDT)
-Received: from ?IPv6:2a03:83e0:115c:1:129e:4a5c:ec89:efc? ([2620:10d:c090:500::5:43c])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4384baf139sm5887003a12.36.2025.08.11.15.16.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 15:16:18 -0700 (PDT)
-Message-ID: <efc1618c4d24e6c80aa51f61981bf6a24912cd97.camel@gmail.com>
-Subject: Re: [PATCH bpf-next] bpf: Use sha1() instead of sha1_transform() in
- bpf_prog_calc_tag()
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>, bpf@vger.kernel.org, Alexei
- Starovoitov	 <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: linux-crypto@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
-  Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>
-Date: Mon, 11 Aug 2025 15:16:15 -0700
-In-Reply-To: <20250811201615.564461-1-ebiggers@kernel.org>
-References: <20250811201615.564461-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEBhl12M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093AFC4CEF6;
+	Tue, 12 Aug 2025 00:58:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754960291;
+	bh=IQPA4PqoRW2lue3aGTTtEd5Syy5gper/GRhKNnpr7Ic=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oEBhl12MTmdK8WgC980x4gbQetlFSmGty4vnbKzlzHr5xWiLOVQYLCDe1VShfqWvn
+	 6AE52zN1OEicO5EXR/hPXhWHRS4Bvhi2ziXjmOltvylR57ZInstgdEi0y6ep3GNVqI
+	 7ENQkq7BVtMhM+nacIoZDdCm6EVuV2IYdovSh+pHVBEERtG4DMCyE1vj6Z4OJVkI3a
+	 /EZWaCS8Qo5qZKA1SYqKib98O3+y1DcIWR/QhKfqVxAI1URQQHhnlI1r/oHkm0tWXT
+	 GwJDvOrbVARUpMlD3YDajZGaz0eEJ6YcSDfmVUXUK+pDI5HvFnJdBGMTCqUHS8qnV+
+	 e0vENkZKAGcuw==
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7e8248b3f1cso614816685a.0;
+        Mon, 11 Aug 2025 17:58:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVdeSDIoIl3fmaZlyzYjP06GZNikWIASZKwL+CUn/QhdzKN+nACt9vQ1C8ElSL9/3bkjKlWUcCKQwtsvh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhamo6pqG0pJjZG/SVvhLWQ1M57MD9nnjCz6HK7i7wzun7BDuV
+	NHqt78y7LJUU5JwRfHQjybRsnvdK4ca9sKgO0i9H+0Cie9++fPfGnQbGZ4JF7SwhIWk+tDGPf2U
+	uRui/A3VGjdtcVoACZygivJKtITGrXzc=
+X-Google-Smtp-Source: AGHT+IHuem+tu1DHmNMrs6L4pJy33dn1LHNBWVMghsuduFVvSdwfz2smuBjVYx592Sb/2XmGENiRYWhvsYzb1SVWkSA=
+X-Received: by 2002:a05:620a:4543:b0:7e8:1ff1:a9b0 with SMTP id
+ af79cd13be357-7e85883b820mr287226185a.8.1754960290152; Mon, 11 Aug 2025
+ 17:58:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250811201615.564461-1-ebiggers@kernel.org>
+In-Reply-To: <20250811201615.564461-1-ebiggers@kernel.org>
+From: Song Liu <song@kernel.org>
+Date: Mon, 11 Aug 2025 17:57:58 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW7shC-cN7nGLiaVcAAtxbmet45R0XZ8zRS2P2H5Bom+dw@mail.gmail.com>
+X-Gm-Features: Ac12FXzia7PZgTp-FjBuljQe215ugPnhOF7m1j93G1blG3H6fFz6axKVrzHIKLs
+Message-ID: <CAPhsuW7shC-cN7nGLiaVcAAtxbmet45R0XZ8zRS2P2H5Bom+dw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf: Use sha1() instead of sha1_transform() in bpf_prog_calc_tag()
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, linux-crypto@vger.kernel.org, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-08-11 at 13:16 -0700, Eric Biggers wrote:
+On Mon, Aug 11, 2025 at 1:17=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
 > Now that there's a proper SHA-1 library API, just use that instead of
 > the low-level SHA-1 compression function.  This eliminates the need for
 > bpf_prog_calc_tag() to implement the SHA-1 padding itself.  No
 > functional change; the computed tags remain the same.
->=20
+>
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
+>  include/linux/filter.h |  6 -----
+>  kernel/bpf/core.c      | 50 ++++++++----------------------------------
+>  2 files changed, 9 insertions(+), 47 deletions(-)
 
-The logic seem to unchanged.
+Nice clean up!
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+It appears this patch changes the sha1 of some programs, but not
+some other programs. For example, sha1 of program
+test_task_kfunc_flavor_relo_not_found from task_kfunc_success.bpf.o
+stays the same before and after the patch, while other programs from
+task_kfunc_success.bpf.o have different sha1 after the patch.
 
-[...]
+Is this expected?
+
+Thanks,
+Song
