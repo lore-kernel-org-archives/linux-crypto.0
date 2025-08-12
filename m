@@ -1,60 +1,81 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B971DF27F;
-	Tue, 12 Aug 2025 18:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EE22FD1AD;
+	Tue, 12 Aug 2025 18:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755023365; cv=fail; b=XuDgaMzv8Ipct8V4Jy6S8KCGWUsMFQVXBY8WvMwHeS+o3wBlTRyNV2LaSgRyVehxAL1o6m5j42rKqOdghEgx8Dk6WCE1YfBs2wm5SUdJ1zDSdM0Dx5UUJxABd+spMrRmoE5XUgR4dQ7eFvtGw7lkMzV8SQt2LjAfsy78ZyT/svE=
+	t=1755024023; cv=fail; b=Hh/0nXjOFjRU/o/SX+tJYXp6dfsC3TttMp03RvqtGNHy0vb6vxdHJMv4dAgjrR3i5FmABMRUCZAu31ICbfgDhzewjasEItPcSDSBAoSbpqEhIdKVvBAucWaU2cx+Uz2r4NmvT69Ig+cdayWqDi2Sb0KBu1mG6RB5EGVP8q/mhfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755023365; c=relaxed/simple;
-	bh=V1FrrP2bX4955sbscIMb4p+9d84fY+tH/wG9yXvuLDs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=biuUU0zwJHlRRDqs3OlFxE+ggx63UztO+YTvJ9WFClnbKl04Fx2VNJnlwMb80owxT7TxvuIxfgBii1hVi/BhQ4mKS41sK/r1W/PWkk1/jkosWpPIguKyVQg6tJJNdwVbEzkcmtwnGun7txfNUPtE6Az7A2ZCZH66N8xPyx1hWAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Lk+sbGPy; arc=fail smtp.client-ip=40.107.243.86
+	s=arc-20240116; t=1755024023; c=relaxed/simple;
+	bh=achMz8D6QeR2l0ydNYjAHBALzyvn7kI7+L08PVdZftM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NbZuR8L3JViGCrULrKfr0sicBXGyf5vERDn3Wi6d0eEp8hQ0XxSxA8JicnoqmOJNppfI1Hy3ju/KA3/t/4Z/6Uvix+chIE+DZ7VCQwkWfsOmgNCV98EK3Ia1Isr+gA0gTFMXEk323I8Xzby1ypBWXA8JnmRahP5V52Q7qwxDiIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=qr1/vcov; arc=fail smtp.client-ip=40.107.94.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Lk+sbGPy"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="qr1/vcov"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MLVL1W5muIalw6zxoeBMa39bpmzLA5c4aNyPVskAUhFv4NVJB4HDy2nrDKAkcSb1+Tpe5cVR5Cx1OF4oGFgDFrdvCNjz+1mEWEldtSVmzJY+SNALghqTPn+pqFZ0CK7Z0rIJ7xfQVEKb/1M7Z/AbCvDbgZun9xpUqewE2in6utrRqPasw6zJ9OeKi3inUo9dYmfNZvDfzNtIbmUgojMMmWZlMf+U674O5TyRXvUSfB8Ty3f7Q1U4IlANjZtfZRHeTX/cvYlekNqqVMfVgDmixyzVPArCLRQraUwdIRC6IpfDinNY0uvRE2pzDvUsk9KQbCiyL2QpkzMKD4sDuWAyxQ==
+ b=M1j0UGUl/PjW204CWlfa1+o0ks/UKPR2oBhZ+BPWfFZPeUsiClpkPnOhO1MjkFHRUUjArmNyRU93ys045cVH4crZnQ1Cpfun1BGKGw7YHX2/S2Hw2d4utwxzrg956uvSkufVHon9U3YWQYGbTnCtLi683C7YfmKmr4ab6LMm5cX34UnbicVxVuqforPAQE4Il60Vd0/LNgXt3fwhVDbBqEurIvOWZzlh1OgxGtgSLfBa+6vBPNslc9Se7WyDCh7H2SclXWPN+w2ZFUNmLHGeSMBH6rfKRqdsQvda2sVUWlxS8EKc1RbJsMSdj9ghf7XQh8RtQFrBwdPEgmAIxI9fGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mP80PWgkZT2GrZcNnNtM4g0gD8l1EmxjRUCEk2b3JW4=;
- b=LhvvfIDS/sbb7wQ1g1Y6LfTSfr9cgb1MY3gMgqqXQWeZ6fQ9DNAyXvIu1fxOtT2qbdWQipAIooOxp+1Vq1CG1qlB8I9xLg+RRFdebsk5dj9OauhgPx9kjWNpmSNzcZe+wljzRg00GHqg6rzeIwNnMUpsTqUWKa4UT48264vAvsPex1ABo3JZr5TRa0jA4mocPAY/0FiabC58hC6aZAXWxfMDyaqoxRBlFIxz370jlrVN6u4CBITgLCNBp3c4fbPTNiv64IdEyW7O6ipk1KylPt/65jYS3YFNlm16rHwmUuYzVpUjR1CfCpfJPiTHnYPjXL7fr1DsfWYI1my3aGzETQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=Hi49HjYht3VdRzedYQdw5Rfxd2KL7qE4My2LjFtAii8=;
+ b=Hgvpm19l0MgY4NmO7b+lseszol+7HftNBDXQ5LqxKq0OobCa3udqebu/hArtgz6WSMFjo9nDM5jBmB7govjrD8sdWugFm75+DZAK5pnBbK9E/TbnKopqApr5ZTtLvPtWF3s2o9wyNOA6Iys/Umo2FhaFTvA8nEg3dNsFN6NugnpTGymzuuVTBIHmf3YmX0DYVOh0nE1E5sJSc3dQ/5KW7xR/vGpMysoFxzG+CK9z75vcG6UxcublAORZt4TpgIiq34dKbZ5S/D51w/FZLWBBmEbH2jt3U9PFd+FMQg2P/CGQDerVjLn+3SIWJp1D0B7W+bttv/5j9wbTeAoy3G/soA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lwn.net smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mP80PWgkZT2GrZcNnNtM4g0gD8l1EmxjRUCEk2b3JW4=;
- b=Lk+sbGPyro7L+rLorKBDRdgB31hZa3z96tKhkZVFtQq9Xa16KXWgB28wjae3BnopCXysX0oOyJsyqOI+B5qZ4zT0WIz7+qvtZQ68PngJYF2toU+tPKWsmUK63bwLfYaq2rcg6OqndpvCESVjQOsGqNsmy4KWak0fUKAu7BfFQmQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by PH7PR12MB7138.namprd12.prod.outlook.com (2603:10b6:510:1ee::11) with
+ bh=Hi49HjYht3VdRzedYQdw5Rfxd2KL7qE4My2LjFtAii8=;
+ b=qr1/vcovgprsTMtBPiVK2dkacJRKUhKh05VnCmL+EASXeMiD7JC6xGDKd8cXvZDeaNdi/Kh7Nhq9np1p4HysUt/rbpCSYgYpPX7FnHKcMzv05aHdffB4+mZfyYPjpmvMj78Bn+Icv/eAXgGMqEbyHeYJR0jheoSN5GEgdoK7FCg=
+Received: from SN7P220CA0022.NAMP220.PROD.OUTLOOK.COM (2603:10b6:806:123::27)
+ by LV2PR12MB5750.namprd12.prod.outlook.com (2603:10b6:408:17e::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Tue, 12 Aug
- 2025 18:29:20 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f%4]) with mapi id 15.20.8989.018; Tue, 12 Aug 2025
- 18:29:19 +0000
-Message-ID: <9b0f1a56-7b8f-45ce-9219-3489faedb06c@amd.com>
-Date: Tue, 12 Aug 2025 13:29:13 -0500
+ 2025 18:40:16 +0000
+Received: from SA2PEPF00003F64.namprd04.prod.outlook.com
+ (2603:10b6:806:123:cafe::10) by SN7P220CA0022.outlook.office365.com
+ (2603:10b6:806:123::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.22 via Frontend Transport; Tue,
+ 12 Aug 2025 18:40:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00003F64.mail.protection.outlook.com (10.167.248.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9031.11 via Frontend Transport; Tue, 12 Aug 2025 18:40:15 +0000
+Received: from [10.236.30.53] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 12 Aug
+ 2025 13:40:13 -0500
+Message-ID: <96022875-5a6f-4192-b1eb-40f389b4859f@amd.com>
+Date: Tue, 12 Aug 2025 13:40:13 -0500
+Precedence: bulk
+X-Mailing-List: linux-crypto@vger.kernel.org
+List-Id: <linux-crypto.vger.kernel.org>
+List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v7 7/7] KVM: SEV: Add SEV-SNP CipherTextHiding support
-To: Kim Phillips <kim.phillips@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, corbet@lwn.net, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- akpm@linux-foundation.org, rostedt@goodmis.org, paulmck@kernel.org
-Cc: nikunj@amd.com, Neeraj.Upadhyay@amd.com, aik@amd.com, ardb@kernel.org,
- michael.roth@amd.com, arnd@arndb.de, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, <corbet@lwn.net>, <seanjc@google.com>,
+	<pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <john.allen@amd.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <akpm@linux-foundation.org>, <rostedt@goodmis.org>,
+	<paulmck@kernel.org>
+CC: <nikunj@amd.com>, <Neeraj.Upadhyay@amd.com>, <aik@amd.com>,
+	<ardb@kernel.org>, <michael.roth@amd.com>, <arnd@arndb.de>,
+	<linux-doc@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
 References: <cover.1752869333.git.ashish.kalra@amd.com>
  <44866a07107f2b43d99ab640680eec8a08e66ee1.1752869333.git.ashish.kalra@amd.com>
  <9132edc0-1bc2-440a-ac90-64ed13d3c30c@amd.com>
@@ -63,298 +84,182 @@ References: <cover.1752869333.git.ashish.kalra@amd.com>
  <29bff13f-5926-49bb-af54-d4966ff3be96@amd.com>
  <5a207fe7-9553-4458-b702-ab34b21861da@amd.com>
  <a6864a2c-b88f-4639-bf66-0b0cfbc5b20c@amd.com>
+ <9b0f1a56-7b8f-45ce-9219-3489faedb06c@amd.com>
+From: Kim Phillips <kim.phillips@amd.com>
 Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <a6864a2c-b88f-4639-bf66-0b0cfbc5b20c@amd.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <9b0f1a56-7b8f-45ce-9219-3489faedb06c@amd.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA9P221CA0022.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:806:25::27) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
-Precedence: bulk
-X-Mailing-List: linux-crypto@vger.kernel.org
-List-Id: <linux-crypto.vger.kernel.org>
-List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|PH7PR12MB7138:EE_
-X-MS-Office365-Filtering-Correlation-Id: e6144bb7-c108-423d-86ad-08ddd9ce25ef
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F64:EE_|LV2PR12MB5750:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8803186-5972-444e-33c2-08ddd9cfadfa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OUUvWG9FcEJWc2dLQW9XM3pyUnNYcjJqa3J1MGZEOWV6M0ZqSHF0QUhkb0RR?=
- =?utf-8?B?ZldIazdsUHhZcExvMjJDZWZPNjZYR213SmpvdXdKcDEzbDRaT0VLNlA2TTV0?=
- =?utf-8?B?dG43WDFMK0dRUzF2TlJxZForQ0RzaS8vS2hJMWt6NXZCM3RLZFVodXZuU0NR?=
- =?utf-8?B?aHpITkdlNTFYRGN5SUhYY0VkbGFid1Z3UkhhN2hTeEVFSDl3Uk52S3gvV1VD?=
- =?utf-8?B?QzMzblgvUWc0dTIvUW9makpxa0JyU210M0t0aWRoL2JlSXBCUUtxS1Q5a1RD?=
- =?utf-8?B?b3IrQlJQK2RmTTNmZWkzN2c1L2FEWjhzWm9ubW4xbDM1UXdrUExiU1hCWjBX?=
- =?utf-8?B?aFZhS2pTUDNpK3BZNkk0U2ZtTXJDdFFpOS9rSmJXK1lwclpFV1hmekdFbUk5?=
- =?utf-8?B?NGR0OHRTUEdYaDRzTGtRT09Tekd6N0xEUUwyajh5REVsNUM4aHVnRi84UC9m?=
- =?utf-8?B?dTkwdlNIQ0N2R1NDMW5KRjdaaUlxY0xRYzlnc1RHOGEwU3ZIa3E4Q1ErNG14?=
- =?utf-8?B?OHZ1TkdtQkJNempwUVVqcDF0VllMSDFlVFFJMjN2SjVobXpuYkVuMmZCZFM0?=
- =?utf-8?B?UExENVNkZFJzYUhjWUFLRzBQODVtNmZ6MHF1ZXRGNGxoV2orenNwRnpoeFRu?=
- =?utf-8?B?UU1hM0g2YU9IWXgxL3ZBemlXUkVYZ0tHallkRnpuSG1ISzZaa1ZlSmRtbzU5?=
- =?utf-8?B?cWRMQ0RpZUUxV3dqM3RVRVNpc1lDck5WY0svUm9ZSjdSNzBueTJMYkdTdHoy?=
- =?utf-8?B?Qit0UXBuT282dmZzcnYraG14QStwQVR6RlJudDA4MCtWR1dGc2UrOHZtbEdl?=
- =?utf-8?B?Rm9qU04va2RNYS91UVpvNTAwTXU1Q1JCUFhTSFZ2R1RsTExUdDRZVFEzSThH?=
- =?utf-8?B?UVdHREdNN2RBOS82U2s3aG54QURzL2gyeklBWWlCempaMDRQRGpnT08zdjk5?=
- =?utf-8?B?ckRBMFFHdy9VYUlTcG8xSjhFaGNlTGp4KzJmZ21UbXVQeUZWbGh0d2ltYWlv?=
- =?utf-8?B?QTM5ZkRzdW1EMVBTUk00MHljTzhiZ0EvSjlmRk5Zc2FaS2d4dytodFVkYUJP?=
- =?utf-8?B?Z0JSTWVoQnRDU0NrS2puQzN0ZDNQc3pJNmRjN1pBQ2hHNG5vTzZ3amhjVWx0?=
- =?utf-8?B?WDNma0o3eFN6NmIrdENVYUZETDUxS0JReFc2ZjE2RlB4azhKNWhNYkZRblpq?=
- =?utf-8?B?ZXp2UGlKTGJkbFFGcWRKYUhwTGhDZExsOXpUY0tpMEJ1aUtUNzkxNFdkM01K?=
- =?utf-8?B?clpOblpjdlVvWlBHZWZoN3Rvd2pka21XQVprWHFFc2NqTkd0T2ZxWVlVc29B?=
- =?utf-8?B?MzRuNnNBMTdEZVIwRkJOSzZZUTloeW9WajBzZlhlN2JQb0tDaG4vTENZVDVz?=
- =?utf-8?B?SU1wd0tXZ0cvVzZnazNsU0lsNlZpWStIL01ubXVKa0hic2tYU0pOQTB3SUFL?=
- =?utf-8?B?TUdsb083NllzNlJ3ZHk4RW5iaVdRejNDMUxEM2lrZnhmaFloMGJFSlJKSmYy?=
- =?utf-8?B?QmdQVUtBMytleEhkcFlsMWQxMzljUGNkNXRNM0NVNlc2SHZ6WTdNVjBsTlAy?=
- =?utf-8?B?S0kvMWZ4LzRxaUJrY3ZzM29KbHBGdktubXRiRWN3emE5OXZVM2pudkt5TGVJ?=
- =?utf-8?B?MXlMVTd0emsvVTlHS3lrTlFWZzlFclZlSWVnRzh1Tytaa3BLTVJldTR4NUJN?=
- =?utf-8?B?VUtobmhaU1RTYlpXcHZvcjl0L3JIaFI0aHhpcUJOYzJ3Snp6SmhFdXFrTUJ5?=
- =?utf-8?B?cVE3RFZsM0FJVWw3K0Q0TmZ3UzhrMXdBRUV6T05pNXJGT1VuMkFDT0wwVEMy?=
- =?utf-8?B?U2haQTY2Z2IwVWYyUDJPQjFOYlMwMFFlK1pVdk1nOHB1azE1Sk9sbHl5UDdC?=
- =?utf-8?B?M1gxcG1KVjV6RDdTZHZJeSsrNEJoamFLMDdpSXpGWVFmL2JTTklKVURORnVK?=
- =?utf-8?B?RkVUc29yK2prdi85dVlCYXd5c2RGaFl4Vk1NRWZ5SUM2TElucFdqQ3dRK1By?=
- =?utf-8?B?NjN6bjQ4a0VBPT0=?=
+	=?utf-8?B?R1dkcnFGMTZYdDNNRVJDSzg4dExoaHk4cVFjWnhnRXVmZk1iODRYRVZraTlu?=
+ =?utf-8?B?ak9RTEtsQWJrT1BxVCtndVE0aTBFbHIwZDg2OVBIaktQTzhZODhhWEhQcVR4?=
+ =?utf-8?B?UmFLMFRtby9sVCsvM2F4VXZ1VExzbFprbzJod1pqeEhva0RndlF6cm1Scjl5?=
+ =?utf-8?B?VzhpKzJCTzRIOVhKbHFhaDdWSzR2WlgrRGRNZGhYQ3RCT3kwRFlHU20xSkMx?=
+ =?utf-8?B?K3Q0YVlqSU1PMERZOTVodVdEVlRPWXVPSXo2NzdETTJCcG5NSGFXZFA3dDBC?=
+ =?utf-8?B?Y2JuWTN6SFlvb2x4UUtLL2ZMQXZzTUY5MmVpQmZBVERLRzEzTU4vblZDbWMr?=
+ =?utf-8?B?dGV2MTduVEZkZDNCQkNCVk5GcER6ZGFKeDN5M1d4WENqQkI5UHBkN2tNemZB?=
+ =?utf-8?B?MzBDb25CbWJwL0srTjQvcXJYd3k0bUwraEovbCt6amlhZFB3QXJnTUp1Tit4?=
+ =?utf-8?B?YlE1amVCR2dqYnJ4WktGYzVNUm81UU1HeXNNTi9nQUNsOGFPMjVsVlRoQ1VW?=
+ =?utf-8?B?blROaDV2VEpCeEJ2Z2UrRm8zOEtjQUVmamlzYVB0TmRkYWRLREpuZDlNVHl3?=
+ =?utf-8?B?WnlvS3VxZTcyeC9NbEJCZnBocmc0d1ZxNGtoeTZvZW9jbFBvNWtSRmw4ci9Z?=
+ =?utf-8?B?aU95aFlodWZWVzdRUzUzWTZTNWpETTFGWmJaZ2JtN3dZT05zOGsweEcySGNG?=
+ =?utf-8?B?ZnhpQXRscUVkNjZvU3NKNG8yNXlpcjNlZVJ4eVIrZ3VLQkwwR0lwYXE0NWVQ?=
+ =?utf-8?B?ZnhvTXd4M3BSTkVGU1phU09EdFE5WWwxbkZid0dpQXQwODdzOGI4Tkl2UGds?=
+ =?utf-8?B?azBlUjhBTTA1WjVMQnJReDFuUlcwOElhNUY3ZWljMWp3Qm93RzV0Z1dqTUZL?=
+ =?utf-8?B?ZDZYTVVjdG4rL25VMi9ZeEFjZU5STWdBcmo3RVJpbE9hUzlCYnpRazRkRWl2?=
+ =?utf-8?B?MHNZaVhrTGlXOUVvTlRweThuU0ljYVp2Yko5WWk2aEE4TExMUnRqK29PVkdt?=
+ =?utf-8?B?WEFEL2pWNFhxUCtpVUoyaDhEQWZkUmR0Wk9oK3pBNzBqdm5kKzBwY0NqREl0?=
+ =?utf-8?B?c1lxLzYxaUNUTnZCT3Q2WnNDNi9LYjE5VnQ4bDJSdmVHd0dsYUxKLzAwL05T?=
+ =?utf-8?B?WmYyVzM2U2dIc3ZHbU1RTjl3bG5EZVZpNlhiSG9BWmwrcWc5VVFRY2NoenFp?=
+ =?utf-8?B?OXFpUnE1Tkl2WDYwWGQzNEhoWEhLeEhMeU1yYlZpMitXdzhxU1U2MEtuaE9r?=
+ =?utf-8?B?cURoWXFwUkJYaTBQTU5UdkpUdm9vYnJXK2FrWHFRNXQ1b3diZVhkYTg0aURz?=
+ =?utf-8?B?UzFuaGJaMXJYblRxM1k1NzJSVi8zNHNTT2xONVJBc3NhcGM3ZmpIaUwxcUx2?=
+ =?utf-8?B?SVIzY1hWTVpZOHU0Nkp0TTBoTFpWQmpXQ3JjaEk4TlBaZDZHTzB3SXdzS3Zu?=
+ =?utf-8?B?YTJHTnhoM2pieVQvN00vRlU2ejU0ZzV5VWsxTDZ1eWVhbGFwdmg5TGFWM3dV?=
+ =?utf-8?B?THdpU2JKbHpPNG1DdkE5bWp3ZlI4QkJvV3NkNzM5cVVOemticHdMQnQ1djFS?=
+ =?utf-8?B?SEp2V3pyVVRQTW5ub1liR0pzclNkN0E1NGhId2Fzcm9SbWo3dkRiVHM2eUVS?=
+ =?utf-8?B?bnovbyt5NUlsdVMyYklUNDI4c2c4RTN2ZGg4RGsybHp1cXNSZks2OTVqVUxT?=
+ =?utf-8?B?WVF3THZuV3UydENlVG9mVmxiRXQ0bFBQdFlObFZ3aUdLN05PVVQxdkV2UTlr?=
+ =?utf-8?B?S0RZQ3FMK0phd29vSHVHekRBMmYxNWU5UWZLTE1jdzhET2VWcjlCbkxQMlZ2?=
+ =?utf-8?B?RnZEYXJjV1pWWlllQ1dxQVF3SFp4UEl3czlnYkR2OUZvU3pLa2RXRllLc25O?=
+ =?utf-8?B?ZjBEbFREdzBvencvNW41VWg3c0l2NXZWZnVnV2hIWHVOQlQzbFpHeDdGb1Rr?=
+ =?utf-8?B?UUZhVGJTMlRjWktaQno2OUR2SmdlTExjMUVVM0xacjlQcGJtVFdIOGc4cnNN?=
+ =?utf-8?B?Zkl0WGxPSmdMQy80TzNUS0ZLc2dBRXJJWDJQTVkvOERvb0xQRFptU2lwMFdZ?=
+ =?utf-8?B?UStvQVB4TGxSdjYyWm9KNm9hV2RoNmNFQXhwQT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M0Y2MHlXTXFmYXhBbzc1V0J4NStPbkphbjlCb1VPY3BreG0yWjBIMCtPUytP?=
- =?utf-8?B?RVBYaUtwQkRFODJNVlNtdTdvUlkxUVpNUEhwbDN6UEd2RUUrdElkZUg1a0RG?=
- =?utf-8?B?MTJyUmJIc3dQbGF0NXM1WERMQWlYUXczU0FKTXNYdWFkRnNza1FIbEc1WGgx?=
- =?utf-8?B?L0V3RlNIMFZTcXpFcjBwTVIzdTBESjhlWm1HN1NzSFI4ZU8vT3J3SmYwc3Y5?=
- =?utf-8?B?LzEwMjBDbEZhc3ZtS2p6Mnp5TFNQSGczdzhRbThqMHJUVytyR296cEliaEwv?=
- =?utf-8?B?OGl5UGw0TXRob3BQQ1pmK09DVnFsYTcxdHdqcmJqZ3Y4eG5xL2J4QUFsWXJ2?=
- =?utf-8?B?Q05Jc3Jka2JETTJ2U2dCdjhJRktneHR6azUrSkZKcXIzTmxlYzB0djBRb3dX?=
- =?utf-8?B?dnZBL24zQ2luS01ERUJNclVoUzdTa05ERlRPY0Z3Mkx2TC9EYWxrWWJNWTBw?=
- =?utf-8?B?d1dGOFk0eU00QnVuSXRBYmZsTEpIR3dhOFBjMDU5VDA4YStnc1hmRUpkdFBJ?=
- =?utf-8?B?R3VyRklhSjVUT0lodDdEN0UxSThMT0dPUk1iemNJclBsMlBZQzRKRHFleGtM?=
- =?utf-8?B?TFcvTnF2OGZuelU4emxpbGtxaEpJRDlBUE5XRWZ6Z3BGNnhOVGdNSmUyTXg4?=
- =?utf-8?B?OW90SDZKSXJYU2tFaDRsVUhCVHNMWDhuMG5sYVlQWUZndStuUDJjTisxNEZH?=
- =?utf-8?B?ZDlBWHV2Y1owNFI4ZmpGeFc4dzdVUWg5MFlNOFhHLzhUcGFwbU5UK2YxcGNF?=
- =?utf-8?B?ME03bXBValgrU3JXZmZkZG82aFYvb09CRkF6K1FtUXQ2N3hsOE9VN3VGZE5s?=
- =?utf-8?B?blF3dzMrSERFNlJZdXFlZVVxdnpUK3ZmMnZUcjZWaXZyWnBIVm1NTVVDYXhD?=
- =?utf-8?B?WS9jU29tZTV3T3Uva0FtZzJhRUJxSHJiZ3NVMkNUSTRGUkFjSlpqR0Y3SWhS?=
- =?utf-8?B?TmVXU1YwaktRd0EwRkp3K0IxcmRNY1hESmZGOGNWWWkzLzh2WmVscmVoMDdB?=
- =?utf-8?B?SDNOcGdOYlFJQW0rUWpBMlN5ME45Y1FpNTg4WDc3cnNPa2cvLzVTeVhBMkJp?=
- =?utf-8?B?MUtjMVgvaWRvemhOTEx0dEFpWlUyOUwwT3g2WURNZHd6ZHJISlFycjNXU0Nm?=
- =?utf-8?B?MDBseGQwV0JmMVZ4SVMvY1J1Zit3UFIzaldvVk1QdEVSNjVVWWhRQnNXQUdn?=
- =?utf-8?B?dW1OeTVJdElzTWU3alI0eDVielU2RjA5QTNHYlUzb3FVN1BkZmhUbE13ZHpo?=
- =?utf-8?B?TFROY3N0Znl2MStKem45WlFjcWZEZWFQeHdPNkdHYzdKVVNBMFFZZTQvTGdU?=
- =?utf-8?B?QU9aTmRuRnJIbGQ1ek5wendRZ2wxaUVYMFZiUi9mM2cvQlFWYkxLdkVoWDdl?=
- =?utf-8?B?a2hLS0tIQ3ZSMXFvdHMxcUkzM0dDd2ZzOXp2RGxVdHFjTzQ3KzFrdWNOajQ1?=
- =?utf-8?B?b1VMbENhYUY5Tjljb0ZSY0Mxb3BIZ0NxUmk2bk0xZHhoZ0JCRGxNenk0WS95?=
- =?utf-8?B?NDU3bEZWUDBOOVU2YkpFQnBYWU9Cai90bllCU3FGNE9UdEpTQ1ZFVWVCalhh?=
- =?utf-8?B?ckRCckNiOFI5UVNNWmRkdVJmUjA4ckFFd1R5WGRITUlGTS8wMVVUcG1SRVo2?=
- =?utf-8?B?YjhGbTNhQUZ5YlN2eUdHOCt4V0RUdTR6NzNnRjZneHNjMy9DZGt6VyswRkJ0?=
- =?utf-8?B?L1ZYS1puQ0pUSTQ4ZWRtejVHcWNGcmYrYTloRWo0cWF2bVoyUWk5VlVNbGp2?=
- =?utf-8?B?NlJOWkM5VEh4R0c1TVZnQVNzd3FNSTdGTTlZUW9IVkZualV4Nk5SZzZMWlFj?=
- =?utf-8?B?VzdLa1gyZmtzKzVONHlxZHdzM29HMXV0RytnaG52eXpjSmFPdllId0R3eGVk?=
- =?utf-8?B?SWIwL0dqNktqdDJrSVZMeEpvbTl1YnYvYThQdm9lWnBackJrcUZscWFzT29m?=
- =?utf-8?B?UFZXVGpqdzl0b3pUWldrbjB6aHZXdzAyUHpCdmlLQTFWSUR0SGMvUk5LcDJT?=
- =?utf-8?B?dFdMSXZtSHYzVTk0QnJMc1RzbDRaemlOZkNzaEFCbHFpVHVYcWdyS3pEVWhr?=
- =?utf-8?B?ZW8wWHZFRU9KYnlHQmlaVXNKbW5ZeGtwNVZNenVxNGFXaml2ZnhLOXBEWjNa?=
- =?utf-8?Q?IuJGcjBJGFDVhCRYxusK4JfdZ?=
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6144bb7-c108-423d-86ad-08ddd9ce25ef
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 18:29:18.1605
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 18:40:15.6068
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8803186-5972-444e-33c2-08ddd9cfadfa
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZjNipJbERubIgBRUzFUUsjGPTkXzX4N+Rtt3Sc9FJWDvgiC1M2FsplS1vRygrC2fcESXA7P7+40c/+vLwLFj8Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7138
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003F64.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5750
 
-
-
-On 8/12/2025 11:45 AM, Kim Phillips wrote:
-> On 8/12/25 9:40 AM, Kalra, Ashish wrote:
->> On 8/12/2025 7:06 AM, Kim Phillips wrote:
->>>   arch/x86/kvm/svm/sev.c | 47 ++++++++++++++++++-----------------------------
->>>   1 file changed, 18 insertions(+), 29 deletions(-)
+On 8/12/25 1:29 PM, Kalra, Ashish wrote:
+>
+> On 8/12/2025 11:45 AM, Kim Phillips wrote:
+>> On 8/12/25 9:40 AM, Kalra, Ashish wrote:
+>>> On 8/12/2025 7:06 AM, Kim Phillips wrote:
+>>>>    arch/x86/kvm/svm/sev.c | 47 ++++++++++++++++++-----------------------------
+>>>>    1 file changed, 18 insertions(+), 29 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>> index 7ac0f0f25e68..57c6e4717e51 100644
+>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>> @@ -2970,42 +2970,29 @@ static bool is_sev_snp_initialized(void)
+>>>>
+>>>>    static bool check_and_enable_sev_snp_ciphertext_hiding(void)
+>>>>    {
+>>>> -       unsigned int ciphertext_hiding_asid_nr = 0;
+>>>> -
+>>>> -       if (!ciphertext_hiding_asids[0])
+>>>> -               return false;
+>>>> -
+>>>> -       if (!sev_is_snp_ciphertext_hiding_supported()) {
+>>>> +       if (ciphertext_hiding_asids[0] && !sev_is_snp_ciphertext_hiding_supported()) {
+>>>>                   pr_warn("Module parameter ciphertext_hiding_asids specified but ciphertext hiding not supported\n");
+>>>>                   return false;
+>>>>           }
+>>>>
+>>> This is incorrect, if ciphertext_hiding_asids module parameter is never specified, user will always
+>>> get a warning of an invalid ciphertext_hiding_asids module parameter.
 >>>
->>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>> index 7ac0f0f25e68..57c6e4717e51 100644
->>> --- a/arch/x86/kvm/svm/sev.c
->>> +++ b/arch/x86/kvm/svm/sev.c
->>> @@ -2970,42 +2970,29 @@ static bool is_sev_snp_initialized(void)
+>>> When this module parameter is optional why should the user get a warning about an invalid module parameter.
+>> Ack, sorry, new diff below that fixes this.
+>>
+>>> Again, why do we want to do all these checks below if this module parameter has not been specified by
+>>> the user ?
+>> Not sure what you mean by 'below' here (assuming in the resulting code), but, in general, there are less checks with this diff than the original v7 code.
+>>
+>>>> -       if (isdigit(ciphertext_hiding_asids[0])) {
+>>>> -               if (kstrtoint(ciphertext_hiding_asids, 10, &ciphertext_hiding_asid_nr))
+>>>> -                       goto invalid_parameter;
+>>>> -
+>>>> -               /* Do sanity check on user-defined ciphertext_hiding_asids */
+>>>> -               if (ciphertext_hiding_asid_nr >= min_sev_asid) {
+>>>> -                       pr_warn("Module parameter ciphertext_hiding_asids (%u) exceeds or equals minimum SEV ASID (%u)\n",
+>>>> -                               ciphertext_hiding_asid_nr, min_sev_asid);
+>>> A *combined* error message such as this:
+>>> "invalid ciphertext_hiding_asids XXX or !(0 < XXX < minimum SEV ASID 100)"
 >>>
->>>   static bool check_and_enable_sev_snp_ciphertext_hiding(void)
->>>   {
->>> -       unsigned int ciphertext_hiding_asid_nr = 0;
->>> -
->>> -       if (!ciphertext_hiding_asids[0])
->>> -               return false;
->>> -
->>> -       if (!sev_is_snp_ciphertext_hiding_supported()) {
->>> +       if (ciphertext_hiding_asids[0] && !sev_is_snp_ciphertext_hiding_supported()) {
->>>                  pr_warn("Module parameter ciphertext_hiding_asids specified but ciphertext hiding not supported\n");
->>>                  return false;
->>>          }
+>>> is going to be really confusing to the user.
 >>>
->> This is incorrect, if ciphertext_hiding_asids module parameter is never specified, user will always
->> get a warning of an invalid ciphertext_hiding_asids module parameter.
+>>> It is much simpler for user to understand if the error/warning is:
+>>> "Module parameter ciphertext_hiding_asids XXX exceeds or equals minimum SEV ASID YYY"
+>>> OR
+>>> "Module parameter ciphertext_hiding_asids XXX invalid"
+>> I tend to disagree. If, e.g., the user sets ciphertext_hiding_asids=100, they see:
 >>
->> When this module parameter is optional why should the user get a warning about an invalid module parameter.
-> 
-> Ack, sorry, new diff below that fixes this.
-> 
->> Again, why do we want to do all these checks below if this module parameter has not been specified by
->> the user ?
-> 
-> Not sure what you mean by 'below' here (assuming in the resulting code), but, in general, there are less checks with this diff than the original v7 code.
-> 
->>> -       if (isdigit(ciphertext_hiding_asids[0])) {
->>> -               if (kstrtoint(ciphertext_hiding_asids, 10, &ciphertext_hiding_asid_nr))
->>> -                       goto invalid_parameter;
->>> -
->>> -               /* Do sanity check on user-defined ciphertext_hiding_asids */
->>> -               if (ciphertext_hiding_asid_nr >= min_sev_asid) {
->>> -                       pr_warn("Module parameter ciphertext_hiding_asids (%u) exceeds or equals minimum SEV ASID (%u)\n",
->>> -                               ciphertext_hiding_asid_nr, min_sev_asid);
->> A *combined* error message such as this:
->> "invalid ciphertext_hiding_asids XXX or !(0 < XXX < minimum SEV ASID 100)"
+>>       kvm_amd: invalid ciphertext_hiding_asids "100" or !(0 < 100 < minimum SEV ASID 100)
 >>
->> is going to be really confusing to the user.
+>> which the user can easily unmistakably and quickly deduce that the problem is the latter - not the former - condition that has the problem.
 >>
->> It is much simpler for user to understand if the error/warning is:
->> "Module parameter ciphertext_hiding_asids XXX exceeds or equals minimum SEV ASID YYY"
->> OR
->> "Module parameter ciphertext_hiding_asids XXX invalid"
-> 
-> I tend to disagree. If, e.g., the user sets ciphertext_hiding_asids=100, they see:
-> 
->      kvm_amd: invalid ciphertext_hiding_asids "100" or !(0 < 100 < minimum SEV ASID 100)
-> 
-> which the user can easily unmistakably and quickly deduce that the problem is the latter - not the former - condition that has the problem.
-> 
-> The original v7 code in that same case would emit:
-> 
-> kvm_amd: Module parameter ciphertext_hiding_asids (100) exceeds or equals minimum SEV ASID (100)
-> 
-> ...to which the user would ask themselves "What's wrong with equalling the minimum SEV ASID (100)"?
+>> The original v7 code in that same case would emit:
+>>
+>> kvm_amd: Module parameter ciphertext_hiding_asids (100) exceeds or equals minimum SEV ASID (100)
+>>
+>> ...to which the user would ask themselves "What's wrong with equalling the minimum SEV ASID (100)"?
+> I disagree, the documentation mentions clearly that:
+> For SEV-ES/SEV-SNP guests the maximum ASID available is MIN_SEV_ASID - 1.
+>
+> Which the above message conveys quite clearly.
 
-I disagree, the documentation mentions clearly that: 
-For SEV-ES/SEV-SNP guests the maximum ASID available is MIN_SEV_ASID - 1.
+The point of clear error messaging is to avoid the user having to 
+(re-)read the documentation.
 
-Which the above message conveys quite clearly.
+>
+>> It's not as immediately obvious that it needs to (0 < x < minimum SEV ASID 100).
+>> OTOH, if the user inputs "ciphertext_hiding_asids=0x1", they now see:
+>>
+>>       kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 99 < minimum SEV ASID 100)
+>>
+>> which - unlike the original v7 code - shows the user that the '0x1' was not interpreted as a number at all: thus the 99 in the latter condition.
+> This is incorrect, as 0 < 99 < minimum SEV ASID 100 is a valid condition!
 
-> 
-> It's not as immediately obvious that it needs to (0 < x < minimum SEV ASID 100).
+Precisely, meaning it's the '0x' in '0x1' that's the "invalid" part.
 
-> 
-> OTOH, if the user inputs "ciphertext_hiding_asids=0x1", they now see:
-> 
->      kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 99 < minimum SEV ASID 100)
-> 
-> which - unlike the original v7 code - shows the user that the '0x1' was not interpreted as a number at all: thus the 99 in the latter condition.
+> And how can user input of 0x1, result in max_snp_asid == 99 ?
 
-This is incorrect, as 0 < 99 < minimum SEV ASID 100 is a valid condition!
+It doesn't, again, the 0x is the invalid part.
 
-And how can user input of 0x1, result in max_snp_asid == 99 ?
+> This is the issue with combining the checks and emitting a combined error message:
+>
+> Here, kstroint(0x1) fails with -EINVAL and so, max_snp_asid remains set to 99 and then the combined error conveys a wrong information :
+> !(0 < 99 < minimum SEV ASID 100)
 
-This is the issue with combining the checks and emitting a combined error message:
+It's not, it says it's *OR* that condition.
 
-Here, kstroint(0x1) fails with -EINVAL and so, max_snp_asid remains set to 99 and then the combined error conveys a wrong information : 
-!(0 < 99 < minimum SEV ASID 100)
+> The original message is much simpler to understand and correct too:
+> Module parameter ciphertext_hiding_asids (-1) invalid
 
-The original message is much simpler to understand and correct too: 
-Module parameter ciphertext_hiding_asids (-1) invalid
+Which is wildly different from any possible derivation of 0x1.
 
-> 
-> But all this is nothing compared to the added simplicity resulting from making the change to the original v7 code.
+>> But all this is nothing compared to the added simplicity resulting from making the change to the original v7 code.
+> I disagree, combining checks and emitting a combined error message is going to be more confusing to the user as the above case of (ciphertext_hiding_asids=0x1) shows.
 
-I disagree, combining checks and emitting a combined error message is going to be more confusing to the user as the above case of (ciphertext_hiding_asids=0x1) shows.
+I don't, but nevertheless, it can still be differentiated and still be 
+cleaner code than the original v7...
+
+> Thanks,
+> Ashish
 
 Thanks,
-Ashish
 
-> 
-> New diff from original v7 below:
-> 
->  arch/x86/kvm/svm/sev.c | 42 +++++++++++++++++-------------------------
->  1 file changed, 17 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 7ac0f0f25e68..a879ea5f53f2 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2970,8 +2970,6 @@ static bool is_sev_snp_initialized(void)
-> 
->  static bool check_and_enable_sev_snp_ciphertext_hiding(void)
->  {
-> -       unsigned int ciphertext_hiding_asid_nr = 0;
-> -
->         if (!ciphertext_hiding_asids[0])
->                 return false;
-> 
-> @@ -2980,32 +2978,24 @@ static bool check_and_enable_sev_snp_ciphertext_hiding(void)
->                 return false;
->         }
-> 
-> -       if (isdigit(ciphertext_hiding_asids[0])) {
-> -               if (kstrtoint(ciphertext_hiding_asids, 10, &ciphertext_hiding_asid_nr))
-> -                       goto invalid_parameter;
-> -
-> -               /* Do sanity check on user-defined ciphertext_hiding_asids */
-> -               if (ciphertext_hiding_asid_nr >= min_sev_asid) {
-> -                       pr_warn("Module parameter ciphertext_hiding_asids (%u) exceeds or equals minimum SEV ASID (%u)\n",
-> -                               ciphertext_hiding_asid_nr, min_sev_asid);
-> -                       return false;
-> -               }
-> -       } else if (!strcmp(ciphertext_hiding_asids, "max")) {
-> -               ciphertext_hiding_asid_nr = min_sev_asid - 1;
-> -       }
-> -
-> -       if (ciphertext_hiding_asid_nr) {
-> -               max_snp_asid = ciphertext_hiding_asid_nr;
-> +       if (!strcmp(ciphertext_hiding_asids, "max")) {
-> +               max_snp_asid = min_sev_asid - 1;
->                 min_sev_es_asid = max_snp_asid + 1;
-> -               pr_info("SEV-SNP ciphertext hiding enabled\n");
-> -
->                 return true;
->         }
-> 
-> -invalid_parameter:
-> -       pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
-> -               ciphertext_hiding_asids);
-> -       return false;
-> +       /* Do sanity check on user-defined ciphertext_hiding_asids */
-> +       if (kstrtoint(ciphertext_hiding_asids, 10, &max_snp_asid) ||
-> +           !max_snp_asid || max_snp_asid >= min_sev_asid) {
-> +               pr_warn("invalid ciphertext_hiding_asids \"%s\" or !(0 < %u < minimum SEV ASID %u)\n",
-> +                       ciphertext_hiding_asids, max_snp_asid, min_sev_asid);
-> +               max_snp_asid = min_sev_asid - 1;
-> +               return false;
-> +       }
-> +
-> +       min_sev_es_asid = max_snp_asid + 1;
-> +
-> +       return true;
->  }
-> 
->  void __init sev_hardware_setup(void)
-> @@ -3122,8 +3112,10 @@ void __init sev_hardware_setup(void)
->                  * ASID range into separate SEV-ES and SEV-SNP ASID ranges with
->                  * the SEV-SNP ASID starting at 1.
->                  */
-> -               if (check_and_enable_sev_snp_ciphertext_hiding())
-> +               if (check_and_enable_sev_snp_ciphertext_hiding()) {
-> +                       pr_info("SEV-SNP ciphertext hiding enabled\n");
->                         init_args.max_snp_asid = max_snp_asid;
-> +               }
->                 if (sev_platform_init(&init_args))
->                         sev_supported = sev_es_supported = sev_snp_supported = false;
->                 else if (sev_snp_supported)
-> 
-> Thanks,
-> 
-> Kim
-> 
+Kim
+
