@@ -1,63 +1,63 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA7429B226
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 17:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786C729B8E1
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 17:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755107274; cv=none; b=pi2JQ0RZS45LptUIMBt4lRfNdMg8C6CvgFMoJDycDOvWLZCBFlydaFG8PZ27pKoVTZ246O6O/Pp280t61QNigFNoN4mVxWkiREjSgi/y0RtPhuiAla2juPPj2HMjpLSsbIhQUcYaLQk+u6cFQQ7ujTmCkTbZJ6+2B9n4FMl4UaY=
+	t=1755107279; cv=none; b=pbg6AiwzGLOkWGCtZl2I8oHCdLrZoRQTRN4SuNOZqP6GamB/7tkIo0JufUHw/z7vuMKuO4tS6f3N6dLBBbc43lzhyKXbXFHO+d+QD+kOT8YKRM+WlzdKWuHRtJc0Ge4D7dWEKyH8rpQmxyyIbyak60FIo8ktWHVdVPkjZK3uVS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755107274; c=relaxed/simple;
-	bh=/+oZqZHI1h9WgghpCqBvJzy9LGRR42vTOm/KVnlDk38=;
+	s=arc-20240116; t=1755107279; c=relaxed/simple;
+	bh=QybKy29Ct2YiEDYuui7hJlz/0jLfGcDQxytYrS02m+c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pgsJS6wSxrglLBUqE7dMwBWF91hjER8WI9BDC4Juzxx0Se0z4hkebJ5enUpVaMj7Y+K4FnDgiWkq/tuALOyRBl4t6OTxuURaV4/keTtQk+WePgouIH2jQMWSDvxRTVQ5fUizSN7OOMrnKttB41QUPe7jkelsPrGx0ncsAte/QE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=kFW7/Cap; arc=none smtp.client-ip=209.85.222.182
+	 MIME-Version; b=u6HzJy+gqn2QYV1rbHWUqK9L1d4S8hrN0aog2ieqTzy/FydHFqZRxaufzGeG8huyv/AhE6HHtOBCRqjLI/w+BiJkrwz9deaXdC4EXczNd3tAX8kfDLvTZCdCb1ktqZFTNbROq3C3DnrcIemDP/XAJftw2JakM9jNRp1L4m8D0H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=YbS57CMR; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="kFW7/Cap"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7e8706ac44eso8366185a.3
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 10:47:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="YbS57CMR"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7e87050b077so8370585a.1
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 10:47:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1755107272; x=1755712072; darn=vger.kernel.org;
+        d=sartura.hr; s=sartura; t=1755107276; x=1755712076; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KHeBX+bcrAsO9afYXWyPr7+HVV+gOxB4ZyOYt9ZHb8s=;
-        b=kFW7/CapgBjqXy0radKy0GWHUNIVOiivw2/rsDNMRsE3FQ8/ZQsZgmwWXPi+eTFNES
-         x659WxQMaAe1C6C7XMajkIdnQEU8QWR/cR++KYKluRQxkNqwpR3PxG2WFSLzDsdphcP7
-         6jxGxViOSo7w0vwxP3U+GEjPpK1m0NfSD/0huhESrALNBYcLgAmp5DRelfFTwVp4VwsX
-         dUsrv6C52NWSNFQjopefpKwbANhUU4nzRUmnyOu0XlmWV6BQYqQGmuYDGwykI3VKOcWU
-         uJzqCWcGbGnZQ94hNMtn8+8cetmvqgMPKJEX+yCX4Ftt/SUxA1RFdsbDEklI4ILZ3nQZ
-         eP0w==
+        bh=aikCCzA4JV8uW58QUohJldBg0J+53SfENsyjedVm5m4=;
+        b=YbS57CMR18b+LaQ/349rUeuLORIqWyYCBiNaUxmyPAe2kJmv74oEyzD7eUQ8gcpGlU
+         nkKDAxdLMCURsZ2G10y4R2bSRHGUv1u+7j2x3bmKx13scTNjmEk9aH2KP8EL/UVOsPrF
+         OMhUqGSpbctUVkMvHULzpLvLNnZZxw5KlSQTFga1y7V8d47iI+ZwjR2YoLqds5HBpv7/
+         KH+9ggyq8YKwZn0yz8cH4yfSYw5KCLpQCiNdHkfnYVvxswBoXGKXkFDC3vb7/R1h6wct
+         7nQJAi0Ll6O4pcBmcYv4oJbb7hn65hq2THBB0JUABzbX2XZ6bq0SsxoGGYsKJ2x6pTxe
+         PKIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755107272; x=1755712072;
+        d=1e100.net; s=20230601; t=1755107276; x=1755712076;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KHeBX+bcrAsO9afYXWyPr7+HVV+gOxB4ZyOYt9ZHb8s=;
-        b=lb7A9y1SOLxMXoS7JaHYK/G6xuapInTbBEZ7iGGTHBsHEyzm1BVc1QR2hbt4kq8Gn/
-         vDRg7aTVOEnrgznxJaFcEdz/28QayJV9hSGUsC651gtewJjW5fMJpUBUAhhZ8DIyQPT3
-         eW3BztyJnDIQhr7Aeiec4jwBYJzrn/G+6mjiNOPSKeXGsmvFkx3Mn7xXQaiI5HBOrJSe
-         ku0n//u4DkDa2l51/h0O5I1i1Ix92TE/954CQ91Lm0cHtqeKizUQq3dtSBcuMi8MQZ8T
-         GyKubD5ebJM2RyMCoPYqoWtFuCS3hsPUCuLPQJu2CS1VuuFVLcZYiFp7fTQBvkrnWh3a
-         VYlA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaJiIJ0KVc8ISy6bxkFFJbPU+SSszGlgtXnpBTfxYcjC08aoSi87RMw32KQ6WoN2l+uDRqQc+T0bFd22c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtA4MJLoEpD/DEbWU4va3dtMxsXz+2Cvl4VuVi9tlhG7p1AgY+
-	4d1bnlc8G+3tk5GrypZ5rcUugL+/0Ln6ETl0p55QtLaacRknomlp3anCO371Lcw6tmI=
-X-Gm-Gg: ASbGncted/ATMzt8Tl9ZMMPrI4HWz35O9A1Jyc8mHur69AL6+AYXChSHRIZtfbPb7Qr
-	DIbM3Zx6CjrVljO8QqQCQzVaoXgLCHDK8FfBSm+8pY4V1C5Mh4U7yd5Tjxr1mWx0DjYaIxKjQnR
-	GuBAmGIHslav5gEee+nGkLKCC6NbssxlJbsj77K01DxQuZELXnLZW64Fg8qfWWYF/AK7HQufbKy
-	F2VCF/tnavw3Mdbk5doJR0PCw3mlYRd9TprA0zUEjYQKuHkhpQlWa+REYS6flzHYZTWnGfa0o+W
-	nHadwbAR0rt9ErY0FKg2+no63R/JC2xVmGjZss5btpheIcSnxfKum4qh3cRfXlE1HylwU+stvVn
-	KM90fMUoS5F6gmjKi3CnzCh10U/yRIXC57l0AWm2dOECNHPpiPbVrgNw45tE51/g=
-X-Google-Smtp-Source: AGHT+IFBbRD05COD+4uOC97ucvpHyx0jBQqfnQDIsz8+GmCzNdE1TPU770o9CrOuegUdmCbSDq2ITA==
-X-Received: by 2002:a37:f50d:0:b0:7e6:5ef5:c7e4 with SMTP id af79cd13be357-7e8705d2e04mr26126585a.64.1755107272247;
-        Wed, 13 Aug 2025 10:47:52 -0700 (PDT)
+        bh=aikCCzA4JV8uW58QUohJldBg0J+53SfENsyjedVm5m4=;
+        b=YAF5uZnMK009AG0y34dbxzjUnYGg2MxEjXSsxFV9rJzdRYWjvcd2qz9VaUik2IFj9T
+         o2XyA69nJo4WpVstfoBrqvosf4PA67COAL9fqJG7ghCQm0s+aY+Ua0wWGIqdg2D4kurY
+         nbc//CGYOU5q7utiOLysAEhOGjYngwlXk8d2xYxkocIZrsL0qd8gKacUllh+QSlRssoH
+         tuCP349ymItyKGihHBnWpRDfr92RgZdHS27nLQ0IdFzMoCtaMIYv0ftO8vimIm1y9sbb
+         OqaIp3seUR4P8WH2m/g6El9q3AhbJq93JO6uekBQN5DUu6p/gG8Uwy3ypo5J5Jzhp2gV
+         7OGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjGPu+Kl7vChY06tvG5Rz57HPDHLGw5xdgZ4Pdimtv/zoChWCP8BvIKd/BSPHcvRVhmVb5YxVNXCgcrzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6E7EmI2ribVmzh5h60f0eg+Jiang3TD4/3u/NNcU95xwyv+O9
+	rbSZzyBJ08TwIWL+XpJDj0XTwya/1WwpXvwO+cKkSXq2Cd0LmrUWW5+RUfB/NPY8V1A=
+X-Gm-Gg: ASbGnctJo71okVNPRqsv2AJcA/YoIUgMNcG1nIHnmflq3+MTtHDgmfEnMLs6zRNfJXO
+	Y4HUI06i9Qv4bSLpTIWSh8qTxqcehpcfVdZYqJceH3LdN1C0XM/RePfKyfxvhgKK1pN93+Zw+gt
+	LdgCszCBt93v4pxZ9YeoXG2Ytxo1HGaFlLLQcOh3xSZvjpf9T4lQS/Zk8OsgIxBcugu6C0z8TxQ
+	9dbytfRWxRx1cfzRiNDG5w1NwNPilr6ktn9gipItNMfRjkQ1aQ9qEv08LQy4q+WHEKmpxzQT3D3
+	BYIbjpApzhtKZ+uP0GeTlcc3ui7MVntO703gQtFHVnN4OAv1bnQRlLuhxF3ulLdagisNmyPEvUh
+	bLoy0OTltv9feyVKDl00NipcjyKIpCFNYyipKphGb2vV6f1NJsBAC
+X-Google-Smtp-Source: AGHT+IEg3SSFyFBuMzj7VtB0BXbM4b6FpFJkYNn6QJWw/Ig9p6dazfZbmEC4UpkoJX3lIwDtCnuVhw==
+X-Received: by 2002:a05:620a:201d:b0:7e8:6a84:e82e with SMTP id af79cd13be357-7e8705753c2mr21068085a.32.1755107276240;
+        Wed, 13 Aug 2025 10:47:56 -0700 (PDT)
 Received: from fedora (d-zg2-251.globalnet.hr. [213.149.37.251])
-        by smtp.googlemail.com with ESMTPSA id af79cd13be357-7e7fa87e7d0sm1627122385a.82.2025.08.13.10.47.48
+        by smtp.googlemail.com with ESMTPSA id af79cd13be357-7e7fa87e7d0sm1627122385a.82.2025.08.13.10.47.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 10:47:51 -0700 (PDT)
+        Wed, 13 Aug 2025 10:47:55 -0700 (PDT)
 From: Robert Marko <robert.marko@sartura.hr>
 To: linux@armlinux.org.uk,
 	nicolas.ferre@microchip.com,
@@ -84,9 +84,9 @@ To: linux@armlinux.org.uk,
 	daniel.machon@microchip.com
 Cc: luka.perkov@sartura.hr,
 	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH v9 5/9] tty: serial: atmel: make it selectable for ARCH_MICROCHIP
-Date: Wed, 13 Aug 2025 19:44:41 +0200
-Message-ID: <20250813174720.540015-6-robert.marko@sartura.hr>
+Subject: [PATCH v9 6/9] spi: atmel: make it selectable for ARCH_MICROCHIP
+Date: Wed, 13 Aug 2025 19:44:42 +0200
+Message-ID: <20250813174720.540015-7-robert.marko@sartura.hr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250813174720.540015-1-robert.marko@sartura.hr>
 References: <20250813174720.540015-1-robert.marko@sartura.hr>
@@ -98,28 +98,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-LAN969x uses the Atmel USART serial, so make it selectable for
-ARCH_MICROCHIP to avoid needing to update depends in future if other
-Microchip SoC-s use it as well.
+LAN969x uses the Atmel SPI, so make it selectable for ARCH_MICROCHIP to
+avoid needing to update depends in future if other Microchip SoC-s use it
+as well.
 
 Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 ---
- drivers/tty/serial/Kconfig | 2 +-
+Changes in v8:
+* Use ARCH_MICROCHIP for depends as its now selected by both ARM and ARM64
+Microchip SoC-s
+
+ drivers/spi/Kconfig | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
-index 44427415a80d..724ad4f3cbee 100644
---- a/drivers/tty/serial/Kconfig
-+++ b/drivers/tty/serial/Kconfig
-@@ -128,7 +128,7 @@ config SERIAL_SB1250_DUART_CONSOLE
- config SERIAL_ATMEL
- 	bool "AT91 on-chip serial port support"
- 	depends on COMMON_CLK
--	depends on ARCH_AT91 || ARCH_LAN969X || COMPILE_TEST
+diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
+index 891729c9c564..320b23e92cbd 100644
+--- a/drivers/spi/Kconfig
++++ b/drivers/spi/Kconfig
+@@ -154,7 +154,7 @@ config SPI_ASPEED_SMC
+ 
+ config SPI_ATMEL
+ 	tristate "Atmel SPI Controller"
+-	depends on ARCH_AT91 || COMPILE_TEST
 +	depends on ARCH_MICROCHIP || COMPILE_TEST
- 	select SERIAL_CORE
- 	select SERIAL_MCTRL_GPIO if GPIOLIB
- 	select MFD_AT91_USART
+ 	depends on OF
+ 	help
+ 	  This selects a driver for the Atmel SPI Controller, present on
 -- 
 2.50.1
 
