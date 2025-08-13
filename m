@@ -1,63 +1,63 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1267128C2BC
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 17:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4395929992E
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 17:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755107262; cv=none; b=ipMdy8HumOfymePmeEbVbmdkpwnkb7aPYZ6tziaDqVZURLOpLI9vGPjmTPQJTx76ZlmljgvLCkAqJs/Nacqsov6I7DW4+3NRAojBISqLDK9qjWPFNS0npLuouX0pbA26Sq01MebXa6iTeEymqdy4v860ElxFN5KkZLARgnUPKgY=
+	t=1755107267; cv=none; b=i3CJVjg3Eo7vCwqxSiflo71uhoN47zM/8BrPYqVSuIkIvBuNKvQmfvjSHBwbMH9PxCyrlczz3x2YQ9BK7Ud7VCMzleKRF7nnGXN6xuXnqH6oApLfKb/udxXVmg14HUHbR4ySFcFuTzxDXyFRU/KNOgO7RdmpsNQDWeNRlm0Tp7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755107262; c=relaxed/simple;
-	bh=RL3Rsz0aJlOWFxlh2UakRKpVFid+fQ5BHQzpFq6zABI=;
+	s=arc-20240116; t=1755107267; c=relaxed/simple;
+	bh=gPMtN6w+Ex6/DTpmDnipaDUce4Mx3+FsbyqPZQrCYoI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r04TUQSuM0zg0mKMF9gwS56tmF6fvfQobkMFVjSEpilcLEmdpOLWx5M+cUwPD4D98f34NRtUhcApqRSu2v1R7IyYFJKrg7sGmA4yRUV1rWdPGUQlNPi2MMS7GZ/QIizPl3V0ef5tzNlTBMszduVkAVb7aMHfcvoOR/F+dV9zMcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=fw7/ZPTF; arc=none smtp.client-ip=209.85.222.179
+	 MIME-Version; b=XkMm4n3IbF49WxyKJ44F/W9O6k4ipGcIe+EeSv0pW8Sco6A+YY4QcIpkJ1dcsAgUGX9MbCOuNoI2h/E6+Kogh1Jcv+/2EPacycekUB+4oJ+heTJf8twzQ9Av7sXteWhprWqfBaUirhkJspzNYm/Mrq+NL/gzp33jyV9kceazJzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=QZAmmWeL; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="fw7/ZPTF"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e87030df79so8940585a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 10:47:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="QZAmmWeL"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7e870689dedso4240085a.3
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Aug 2025 10:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1755107260; x=1755712060; darn=vger.kernel.org;
+        d=sartura.hr; s=sartura; t=1755107264; x=1755712064; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mtMzSO7UPmjR47X20+ZqBD1uhyLdG+1s/Zrtcgs7erg=;
-        b=fw7/ZPTF6jxg1uaCEZj4Aq29AqS+wxQkqaLK6z57NRPX2Jkxw6qzH8icX8ROKctnTO
-         YHRR50dsGuEO1nkXZhGbWBFX5XoDqZXabtWFi7m6eKgl6a43mz5J5yHsMPvA2sRUOU2S
-         tXblc2C4heR+M9IKeVxDBaljPVUYF7x/NYNpNl3HSGQISa9Xd7rVTbbMuoiGZzkI06Wr
-         TEf2I0eP2jZ9CiRgIp/hmYufKsv9v/HeWlfCW27vFuPD4objIAhvi3ZJJ+LZyQKgLusb
-         P2GwwiX9qeu4ZjYZrwIDEnjNb0CTR12lJr9bA+kqTfY9YJNykzYZSSe+NZPf5CDU57k8
-         ctRQ==
+        bh=BOqtWGRnguTuSIsC5EGTanl0XgtE1XRc/qnGhyYka2w=;
+        b=QZAmmWeLRLMQhIuqHu/KvJDEJNjLk1Uhjp9KNU6Rv48HTqXR9Gi19PZdaAXnUSCUnd
+         7nFtowisJIqJ/XLwX4ozYgLg/AS3OvJFFct8eTAPJIBvcy+kLgSwSKARMITt1GuRzOsE
+         9gMEfS8p0PbnGIBvapoZMPO4IeDf2iDCvNs3zZ0G9FxVvIbL/EnE2JMCwMZhgcDqUNli
+         VkepSqY5ARwJS9Ev9IbMI62wlC8Wd29ao7jcFAkulBHCA3cIoxRrDEwe8dAG72wh5KTX
+         VpTkmOjUfXsoaYHn0xGWTVTe+k/HfAuyikK1SqdX0xgq0Ts/Ss/a3V0ikJpyzN6QTyMt
+         W6iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755107260; x=1755712060;
+        d=1e100.net; s=20230601; t=1755107264; x=1755712064;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mtMzSO7UPmjR47X20+ZqBD1uhyLdG+1s/Zrtcgs7erg=;
-        b=U0rKK/VBEHJtRjl7UXBLGN4oCSOQIHXYvwP9DbQrIXlyElvceVxORhMUJZG3bbNToz
-         i2vwXGVfLoosTzCxotI07u932fwATzLLl8X6l/jg9WyGkCWVyb6cZvM4AmLG3/y4f4d5
-         vyyLsH/IBjDJ4IppcxLC1d8sr42unxwkul+7jL8ghuDjIQK1k2WLMgZ2q82RZ2p25ktN
-         fM6ju+RST+FzKH3dfYXUfzFtgtmjGY5CfCw3EGcpAKKZyTjSPIXv3BrXQ+CGVPFbfXTG
-         ujP4JmNXmc713ujXGmnCULnuLFyRF7bGue8wG3LT3W8wGtjWQPzQilC1X8wJl9Uqze8c
-         IiGA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Csuj/tqlL5rvOBhosdFeAezO7aP3u6nqCfBhfTLoc2+4EXbMmqM3UVmDr2n4Oy8XnlOmaoHgqsWVz3A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi9D8pjDSunp+J9rL9pMbg5GJ9FAnsSJZ/tElm8YMFhT3WHHWr
-	Gl6lwFMwpRLDft6ah2ZwM0Rq3JR+SttrUQopKlLPSWHGLuyrksfelIWyvgI0EGQOqvc=
-X-Gm-Gg: ASbGnctuc9YsqKkroJuqvE5VQl3i62/v+u9XLLyDnEvZOciqpoloK0StiTkJnRXuY0g
-	pjEFqqAdYGi7e1NH0ULMqhE8eNZ9iuO1Ddc5PhCh3r9fMQxsG6E+Jk7eOu8BjBPaEyJ392JcB3M
-	Wux+UZ5518hmakDs0qE85UZF0SQB+C/cz7z7pKgwmo+kpcKwmSe7enBhY3Wp1KXx7CZKsf9mMS1
-	dC+ZgQgF6fSiwG0TcasnQU9Z9PLY32BysIwPi16KEf8knKhNPL/lq8vNMs8SfKE0iTl8wGsJcSb
-	o7fOiOTPpTjKp8B//VjuByZkdJw7rOSJG/lxLnt7HN08e0gmtJbXalo3hz2AAZ5Secmek/EpmK8
-	qwFBU7EPdDpJsltorxw8cYfkxAO7xQWPiAHqekp8oXPqtTycKj+zr
-X-Google-Smtp-Source: AGHT+IEOA4KVOCs5eFfidLnPllBwbdP8If2rCIZC+fPOPK1dPvbgpwik/9+siLqevJw3jKgUeh5nYA==
-X-Received: by 2002:a05:620a:bc3:b0:7e3:60cf:c037 with SMTP id af79cd13be357-7e870593e0amr23464085a.34.1755107260046;
-        Wed, 13 Aug 2025 10:47:40 -0700 (PDT)
+        bh=BOqtWGRnguTuSIsC5EGTanl0XgtE1XRc/qnGhyYka2w=;
+        b=f8hStzqoc9FbVj2ga3lDl4Y5WRWTCZkcTvAHr3uyz1PwN06VEIP/ZR2Cmkfwd30s7q
+         xf+nT1OXZhJ3ASiBFIuCC6OLiM6hJSYjqnYr7BwZwneOESc7lcLojOdKrO+LWbQCSsKR
+         G2YU9nB6NL7jH0hn7lS98AGpjkS9TGbXAE92J5RggRD3AWxw1AUgLwtu5uVcV7KpGdMm
+         GRoS4EXjRN1nBgRs7ZcwkfffXkaa8tiingOFEj46c31kYY3Ff/DN6QcnERbftl3u4GcU
+         LMl1SFd4vPXQw7z43CjBFatMCG1slc/qM1PTP16VSratE3FnXXrBfOaI8eU9Gd4r6er6
+         y+fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWjSMHFRvmtD2gZQcbf5gNER3DJl5IUqfcCtcPGv2UZD+z5tt1vlVJeYgnD1b9Labw6ztHJuPYCQn/xZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL1Nluwn//zvbuasIZ1iNFdBOH172e2zpozHrulac+IC7mSI9c
+	LEz1cGmZ3EcotzdBqx3AWWvZY2Y0gN8hVfEGIlzD9tON+NMfPf4mmiZuHu5A+ver7Uc=
+X-Gm-Gg: ASbGncu7UZrWauhi9ltvb3vVQThSfMlFBFlRVA/HwFpa5KbT7PrzKxk0T6mxrQUSGUe
+	dp3RwQI20+x4lLYCJ9yoNa4hA2b+IAMkFB+0H/iq92ZfIs1EfMibjgn8lhpq0lRBPTrC9GZWYA+
+	/8+n+aEN1ZsOsMnZcQg6TjWASI86ot2SKJ2pgglWCiWiHlQdKggC5H+f05r9cjRViJXMsrF9R4u
+	4deAumOQzRcomsDzQKa26kI5ZgZfqbdzZ9in7dCEXSa19V77yCNY6TmOlO4RXeDHg/ptGav2ZxP
+	nZkxw104wEfMqZoZ85WqUdExY1Vrl8BFuTp6hiEX3MUC5CJUPWcR9dEwyfYX4b6+obtVBTpzB41
+	KY/V6uUNKLld8z+Lp9lZkQqeagZE7STxK/UQhYgBoIw==
+X-Google-Smtp-Source: AGHT+IHM8gqvwU0dp99AsCx2aJSW6E+YiETEDgm//P8elY9qJZZswfVzec82j6i0ynh7rzsSjnHxBQ==
+X-Received: by 2002:a05:620a:31a:b0:7e8:20cc:64a2 with SMTP id af79cd13be357-7e87035636bmr30883285a.26.1755107264026;
+        Wed, 13 Aug 2025 10:47:44 -0700 (PDT)
 Received: from fedora (d-zg2-251.globalnet.hr. [213.149.37.251])
-        by smtp.googlemail.com with ESMTPSA id af79cd13be357-7e7fa87e7d0sm1627122385a.82.2025.08.13.10.47.36
+        by smtp.googlemail.com with ESMTPSA id af79cd13be357-7e7fa87e7d0sm1627122385a.82.2025.08.13.10.47.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 10:47:39 -0700 (PDT)
+        Wed, 13 Aug 2025 10:47:43 -0700 (PDT)
 From: Robert Marko <robert.marko@sartura.hr>
 To: linux@armlinux.org.uk,
 	nicolas.ferre@microchip.com,
@@ -84,9 +84,9 @@ To: linux@armlinux.org.uk,
 	daniel.machon@microchip.com
 Cc: luka.perkov@sartura.hr,
 	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH v9 2/9] ARM: at91: select ARCH_MICROCHIP
-Date: Wed, 13 Aug 2025 19:44:38 +0200
-Message-ID: <20250813174720.540015-3-robert.marko@sartura.hr>
+Subject: [PATCH v9 3/9] arm64: lan969x: Add support for Microchip LAN969x SoC
+Date: Wed, 13 Aug 2025 19:44:39 +0200
+Message-ID: <20250813174720.540015-4-robert.marko@sartura.hr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250813174720.540015-1-robert.marko@sartura.hr>
 References: <20250813174720.540015-1-robert.marko@sartura.hr>
@@ -98,36 +98,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Like with the ARM64 Microchip platforms, lets add a generic ARCH_MICROCHIP
-symbol and select it so that drivers that are reused for multiple product
-generation or lines, can just depend on it instead of adding each SoC
-symbol as their dependencies.
+This adds support for the Microchip LAN969x ARMv8-based SoC switch family.
 
 Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 ---
- arch/arm/mach-at91/Kconfig | 4 ++++
- 1 file changed, 4 insertions(+)
+Changes in v9:
+* Select ARCH_MICROCHIP when ARCH_LAN969X is selected as its now hidden
 
-diff --git a/arch/arm/mach-at91/Kconfig b/arch/arm/mach-at91/Kconfig
-index 04bd91c72521..c5ef27e3cd8f 100644
---- a/arch/arm/mach-at91/Kconfig
-+++ b/arch/arm/mach-at91/Kconfig
-@@ -1,4 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+config ARCH_MICROCHIP
-+	bool
-+
- menuconfig ARCH_AT91
- 	bool "AT91/Microchip SoCs"
- 	depends on (CPU_LITTLE_ENDIAN && (ARCH_MULTI_V4T || ARCH_MULTI_V5)) || \
-@@ -8,6 +11,7 @@ menuconfig ARCH_AT91
- 	select GPIOLIB
- 	select PINCTRL
- 	select SOC_BUS
-+	select ARCH_MICROCHIP
+Changes in v8:
+* Place LAN969x under ARCH_MICROCHIP as suggested by Arnd and drop review
+tags due to this
+
+ arch/arm64/Kconfig.platforms | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+index bfea380100a6..31bddd1a17de 100644
+--- a/arch/arm64/Kconfig.platforms
++++ b/arch/arm64/Kconfig.platforms
+@@ -177,6 +177,21 @@ menu "Microchip SoC support"
+ config ARCH_MICROCHIP
+ 	bool
  
- if ARCH_AT91
- config SOC_SAMV7
++config ARCH_LAN969X
++	bool "Microchip LAN969X SoC family"
++	select PINCTRL
++	select DW_APB_TIMER_OF
++	select ARCH_MICROCHIP
++	help
++	  This enables support for the Microchip LAN969X ARMv8-based
++	  SoC family of TSN-capable gigabit switches.
++
++	  The LAN969X Ethernet switch family provides a rich set of
++	  switching features such as advanced TCAM-based VLAN and QoS
++	  processing enabling delivery of differentiated services, and
++	  security through TCAM-based frame processing using versatile
++	  content aware processor (VCAP).
++
+ config ARCH_SPARX5
+ 	bool "Microchip Sparx5 SoC family"
+ 	select PINCTRL
 -- 
 2.50.1
 
