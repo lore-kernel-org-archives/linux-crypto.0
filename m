@@ -1,520 +1,458 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EDD26A087;
-	Thu, 14 Aug 2025 21:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755206092; cv=none; b=oxm6ajgB+50p22r/Wh7IetuQkHUDdJvy9L0zCFJzHLggBy1yhyE2pxEwu7rfphxq+fCKFbuO63FTc3KanjKI0DVzpujqwmF4JqbXNRDjtGQS+QxtMzlRaQV3ED3nwIBu6jPZIbGZWIV4Xibja2TwwJ7BVXya9Go8XwKym7Z6vic=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755206092; c=relaxed/simple;
-	bh=ORTsZcImNIqVApE/0mXB58oc2paub55uPJ1TFxN08J8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XhvFJ54mOYGY8zX2588Q0VYn7r7rBDXkuRUlsJcCG77hFWoaFN1XllPSBSoKt58O03lAuohua7c/lYe1V1fZ9P7SoBfeKEf/jf8X1+hXRXuJoBGqUB1d+ZisTbKtLTGlZ1GnsRUjHT0cQzNS24O67RVpJ7ApB1XBpkobcIc81yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6H5eKqQ; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E94B78F4B;
+	Thu, 14 Aug 2025 22:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755209137; cv=fail; b=jh1CfsaXT0UmLui2njczAbbDylxmz84bpnuDsZ1ygVzYQMYNVZONrQOFWQgn+WVfZ/bd3vsXCCUNtZ/ovrxcU45GAO/yiRpuKyto4CLjKb/2n77ses8YgVUXKQdn6Cp3MZ/CiqLkwM4M5329viPGlTbaH0x6N2m9vuj8o6AMrEM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755209137; c=relaxed/simple;
+	bh=48SDEP0/ejsJ91ueru+WAVNHmq/BdhWHmB3S4jzp+Js=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=b42cuPsLNzmgtbEodj6/DCfBjch/SS1jHx0qzdt+s0iina34pY04sU2SPXrVksO5JRN1zP10+Di38ErArcOhDJeH374MInODTNrlrPFOYQyVN5Dr7ShCcWKjXRTekJQdzDu/PgIpbxt7ZdhQ8zzIPq7urkm1G9mZv+4QLuqV730=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XBkSUmxc; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6H5eKqQ"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3e57376f57dso3864565ab.1;
-        Thu, 14 Aug 2025 14:14:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755206089; x=1755810889; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nOrS6aLPf1tvEjb+Rue+seVuAm04v8ANeD/QhOmLFrU=;
-        b=J6H5eKqQkAYwroErOLfis6//5LifneBR4H0tF4NUP9jvW1LKm7Kdkhsxz8IgNWGA/U
-         k0uhAy089F75s/uw5UC9T/KDMAmsL1ujpl6F7HsKJUCH5FCnDOJ4Xd7p+Nuulr82ne4s
-         4D2U298ETrOlDqAR8mkADfBIHhuprP6888DfRlpo6Tn93IaAw3vkUX7O6SzsbMu13H1a
-         Y+4HVaUYecSXUSOVdtp4Yo2q3gv4ieZ2W6IbYy0N5254rjGTlXsN4UdZLs+9EPWf/yDD
-         HEBm1nsZvg6bdATmWdiKh6DY+nTtK4Yb3pYtehMPQfDf8O/o1SOrA4M6WocIAqzNzHMn
-         aFSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755206089; x=1755810889;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nOrS6aLPf1tvEjb+Rue+seVuAm04v8ANeD/QhOmLFrU=;
-        b=ZGsvQ+iKoxyadcltjzvGeWDGn805cdIQee84bLmciKUgIcMeINpHx2dfy5mNggxv/4
-         Xd64bF23AjE0ZHn0KcaWipzZIhe+enKRpFl7u+1cHVvCImii3N6ddSJ0wZVBPPdyjnCq
-         DZWE3A7VpChgfaJKFRZcwVJY5ySQ8+NVBP5KJXNqfns5DznjSz4uanB8WMRWxsjFxOjA
-         syr6TylcYp4R/eMx+5kANk7DY+JHj7HiE/8JXa8ts+u12yQDI2n1pB3DrKH2gKbU699W
-         m8mT5JItuDAluo/QCZQpBt9uO93MgtG+P4ES3Dp3DGGOxhFXS8wK+3iANjQz4zzumwg1
-         4EwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxkQBwF+lQhYPtrVrCT7zioO2vTC3ytDWjjwBC1wO8WEYRcbH1ipkjw+e9Y5m9huo+qhddB6tp/vq6NGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvUFqzbtIL1Ex0k2PmlxdSR1XKhmSuTNaJauOGPPRaqccFYGRr
-	StJfNYPJ96WGsK3q43gBI64f3JjtCyHnV8NRuFg9ncCbXGwTzsb8RoOiBVjgBmuD3pK7a+c1YVI
-	LA4/GwBtHiV6zrid3RLnikQN8R0h0m8g=
-X-Gm-Gg: ASbGncvBA+xFr8dOYnPEduk385ECrFCkjaQ2XS/mU+2473Gew6cPQggMR4ah60f/SaA
-	umsdIY4Y7v7oCFjcLjSZQRqar1/rELCxBSTsMkXP87l3IDF3mdF7HBk9veRPXn7u5OyiqUehWzr
-	3mMcHrIFerzyRL6psvCr6Ha1IFgJSCYxPhxwmKuZ3ANHhA8kcG+QaXELPbNSjN7Km9h22/9Bzlj
-	YpEy31AKvoeqPXRAPva1/E=
-X-Google-Smtp-Source: AGHT+IH9LzsXBhMNG39CJXE77FKK/CUXMa7NCbJejHcNb51cZTQHxBbIXUUnPqGxzipm380lMhIOCfqdiEdXyuBdPmo=
-X-Received: by 2002:a05:6e02:1d9c:b0:3e5:5722:2433 with SMTP id
- e9e14a558f8ab-3e5708ea016mr94779085ab.21.1755206088860; Thu, 14 Aug 2025
- 14:14:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XBkSUmxc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755209135; x=1786745135;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=48SDEP0/ejsJ91ueru+WAVNHmq/BdhWHmB3S4jzp+Js=;
+  b=XBkSUmxcLoLcmfCQAwS0Ht1nxC3OFKVLJKW0w2JdQA4X+BE1OYz1zw5L
+   amBcYsMGpuUi/A812BB1k4H6n2if6CKZjb0FSDQk9pBa8/+gqj+Lq1rLf
+   tMhNPdOM4D3aBXFpbGpH2ZYjLHOfvxVp5ZtIYu89e1Gm5dq1U+h5qeb4t
+   wdXdtRa5geUhs9GRpt9v0TO0vcW8jBlKwZ0bCSfBycJn2veFweOuZrLhG
+   Yf80A+yghq+YHVkLw5NpmPckAq+JxKByKFT3ix5n+4/5r9b1xna9pIiMP
+   8ELmyE6xBtMKpVKlxM7do6rVZZQt5IetUteEk6+AKGWPzj1FaiMoIIiFR
+   A==;
+X-CSE-ConnectionGUID: 6W35bEC0RUeDNgKG8Mk2RA==
+X-CSE-MsgGUID: OPLTgiiPTB6N+/1nFr6r+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11522"; a="61169365"
+X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
+   d="scan'208";a="61169365"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 15:05:34 -0700
+X-CSE-ConnectionGUID: LoSpUlo0SxaBAo7AX8zQLg==
+X-CSE-MsgGUID: oE17Dyk5QXa/EZ+oggqOBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
+   d="scan'208";a="170998546"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2025 15:05:34 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 14 Aug 2025 15:05:33 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Thu, 14 Aug 2025 15:05:33 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.57)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 14 Aug 2025 15:05:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qoagHXvJUPg7gMIN4KsZ9TNOUgFG7xY7NHVlCekB+qXsu6ehD9TbQaBuAzodbiSle3ZCN3S7Z+aHPIVZ6swWBnSPP6ts1AUqDvdZjDWZbrjmY9JpQZeTJgBIhswHgmBTIr4hxIuxUYCe4i76gNiKCFoUXEB4WORVNEOcmCkhzJJKCCuFMSFQ5nDeEu9B0xcZtjmeeW4jv9fAJvn+CYqd+Tc/UAoKSHNv4jefWvs7q7U0KJaBX5VSpfGCW1kfDdetw1jR9RJrysHm1I0QHgMBln/gnt9d2BgCJsmWwN1RN5GPrDEugTj7PqecMv5PJ7ssulnYdHviUkB8V8Ziv8ALXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=48SDEP0/ejsJ91ueru+WAVNHmq/BdhWHmB3S4jzp+Js=;
+ b=ChcDqihi8bzs2uysX7i9z1e3MjGFblLFzcadEIBgjQ5S9P9ohSu0xEvkpW2EynJr6y7MdWc4TmZ/nAxZVIYiB6uunF2RkQy/H4HN1gcV3KOXCx+4A9zwdrAlkEHlbmodtutIskJpskrnxCGlri1TtIa+o/XvbsCOOJHvAKSoji4H+MlqzwEwGYkpDVRwbK2QfFHLwXJhUs6wY0gpwheCT+vD861kYV+tFU5q6Jf7/Xz4Glnp1a2vxTy050cNhI4biE+6h1RjZjgwEmlp5vyZhRGlNUB4QT+gGsRXhzuaXEV6Fl8g82Pp9Goi018ClIMFXvWks8QnRyc0fTKhIaPHzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB8121.namprd11.prod.outlook.com (2603:10b6:510:234::14)
+ by CYXPR11MB8711.namprd11.prod.outlook.com (2603:10b6:930:d7::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.16; Thu, 14 Aug
+ 2025 22:05:31 +0000
+Received: from PH7PR11MB8121.namprd11.prod.outlook.com
+ ([fe80::ec4e:64cf:cf1f:daab]) by PH7PR11MB8121.namprd11.prod.outlook.com
+ ([fe80::ec4e:64cf:cf1f:daab%7]) with mapi id 15.20.9031.014; Thu, 14 Aug 2025
+ 22:05:31 +0000
+From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+To: Nhat Pham <nphamcs@gmail.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
+	<clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
+	<surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>, "Feghali, Wajdi K"
+	<wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>,
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Subject: RE: [PATCH v11 22/24] mm: zswap: Allocate pool batching resources if
+ the compressor supports batching.
+Thread-Topic: [PATCH v11 22/24] mm: zswap: Allocate pool batching resources if
+ the compressor supports batching.
+Thread-Index: AQHcAp3rCQGkKHFe602Ahq9v7LnzVLRitxeAgAAOuHA=
+Date: Thu, 14 Aug 2025 22:05:31 +0000
+Message-ID: <PH7PR11MB81218E8E057D481FDB93981EC935A@PH7PR11MB8121.namprd11.prod.outlook.com>
+References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
+ <20250801043642.8103-23-kanchana.p.sridhar@intel.com>
+ <CAKEwX=PV9-QhQaSBGd67s=CVMVJne=fzajRn3=Vf+7OXVuNFmA@mail.gmail.com>
+In-Reply-To: <CAKEwX=PV9-QhQaSBGd67s=CVMVJne=fzajRn3=Vf+7OXVuNFmA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB8121:EE_|CYXPR11MB8711:EE_
+x-ms-office365-filtering-correlation-id: caec829b-a7b6-4399-a626-08dddb7eaf96
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?M2Zpa0dPNHpUQ2xGcjB6Mko2OCtEY2htc3JRVG5rRXdRUGtSeU1ZeC9kc0tU?=
+ =?utf-8?B?TWl1YzdtMjZIMUdzWEp2ZUs1Rm13Z3ZVRTRIZms2VVRrQVhuRWcxUTBRdlBL?=
+ =?utf-8?B?amh6MDRPRGl5aE1hTGttWjZVKzFBSEhpMjVHenRUWU1UQk9nRUs2SENFZG1M?=
+ =?utf-8?B?QmRpay9lVi9BSDZIc2x0RTNLY3RiKzdHaVR4SUhUZlJxTnBzeVRrRmg0VHZk?=
+ =?utf-8?B?N0lKbEVpZ3pidTVja3lIWlc2VnNKK3d6THZia0g4aTdPL3JVdU9EYXlrY0w1?=
+ =?utf-8?B?SkZlYW56RENRenAxbTNsVFMrY0FWQm80S0hpSmVuQjJ2ZjRBc08ycldZckla?=
+ =?utf-8?B?QnhrQ0lLRldjOStiVzRHanEyQ2hrdy9oa25Dby9kQlhPRTBCay9GNW1zRnRP?=
+ =?utf-8?B?QlFJc2U3QW4rZ0h5cTVpdWRZVlhydVVsS0JPL2g1bEVBSDk5NW44WkZjb2U2?=
+ =?utf-8?B?K0tyY1g2N3d5MGpJNWl5ZlY1WkhxV1ExQWU2N1ljWXgxMHFuemhYdEt6SXRU?=
+ =?utf-8?B?bjdsMXk5OXJKaGR4dEZWUXhKY2JEcVVsbERRRmovNXFQTUVpZ2lhL3ZpNjd0?=
+ =?utf-8?B?MnhHaERPeU5BSldkMTE2MUhuYTJSQUNQQ296Y0U0VzFxejVCSUQ3Wmw0STZH?=
+ =?utf-8?B?YXVUZzRWYm11ODJtQndndzNIQ01UWUlmVGdBVWRJOVJsK2s2SC9DOUYyc0Vj?=
+ =?utf-8?B?SEZMUXJYS1MvdE9wRnlEd3NrdWNHMFdHSFhNd3FPZ0FndmxRNjBabjJTNU1j?=
+ =?utf-8?B?TmQrT0tSWjlhK0tIcWF2ZnRvYlhucmVaVmRkVDdDQXErSUxsc0xLSDBVejV2?=
+ =?utf-8?B?N2FBTTVuUUZiMGI3YU05Y0NqZ1c0L1RvRXJUU1BsbWVjYlFubWhxTkJBL0hm?=
+ =?utf-8?B?TlU3c2JLVDZrNHl1NEF5aWVwTklzVi9lcExqakIva2k3WS91L0NkVW4xb0x2?=
+ =?utf-8?B?Tlo5Z08ySGxBNHl5Q00zYVhETm1kem9TQkNmUlBNUFVFMVlqZjNZbGcwSW1z?=
+ =?utf-8?B?YzFaOUlwUmgvb3VwZVEzSGN2MSs2SjBTVk50aWZ5bHpLalRVODJvSlFyZFZI?=
+ =?utf-8?B?c2JnMUhHTXlQQmxQNUFWUmxKeGM3RkxoNXV3OW5YQzNGY2c0U0RNV1gvZVZF?=
+ =?utf-8?B?b2NEaU9QeE85NkVJTlNSa0lDamJnNU5Ybm1tQzVNMXhabXFpdXcwUnFnYkRR?=
+ =?utf-8?B?RW4xOG9zL3J5Z1hzRjB0amJFOHNVdU5rUWVjMnMzazh1dGNmQXdmWVhsWkxU?=
+ =?utf-8?B?WWhnV1JoQllQekhIRVNsTzgram00TFNzVkIzUWdrejFmZWhvMzhnUWljTEpp?=
+ =?utf-8?B?ZzBYYitLU0NidkhrUkJ3cmhHNmtHckNCQjI5NEk2S3BOSkxBQ2o1U1F1bWw0?=
+ =?utf-8?B?b21oSGc0YmR6cFh1N1VYbURtejhoVFM4azFNczV1TS93dDFkV2tZTHFxL3dj?=
+ =?utf-8?B?K0gvRVhtNHJ5NWV6cGxHQVYwbzkvM2NWdzhqZGRMUy9sK0Fhc3Y5OHBSWHFj?=
+ =?utf-8?B?TGlFaHU0b1U2LzY2STBQNmRjR1VmYnFUM0FtcDJjSmRLSTdhS2ZKSVBtS2Ro?=
+ =?utf-8?B?MFZ1OEM0dlZadC9TbEo0enVzbSt2bU80Q1ltNmZXTC9KU3VIZWpZQTNyYXJl?=
+ =?utf-8?B?WG5TQlNybnRjSmZaU2xDeHIxMHJLdkxrLytBY3FkQ2YwdlpQQ3BOKzFDSWRh?=
+ =?utf-8?B?WmhwMk1vUDRTSjZjVEZ3Y01qWnFUaEw2Z3ZZK0xnWERIdVZzMmV2eXNMRzVL?=
+ =?utf-8?B?WVlyVGNGMElDSnhZVENtWGVTeXRhbWwwL20xQUo0S3F2a3VMbytqTUhabm9R?=
+ =?utf-8?B?dG85RHc1b1M3bDVPUWJoQWdmZU55Ym1CbHVUdW9jZFJsUkt2ZVF4UVVqR2FO?=
+ =?utf-8?B?djNvYzBRRWZ3WmlMdjZHczNXSk5jUTVYNGxjZkhjNzNETGNjU2NkRDNXanQv?=
+ =?utf-8?B?MmhwdEZaWnQxL3k3ZFFaVm5kSVpkQlJteEZlVStKWlEyRGpCaVIybVZqUnpS?=
+ =?utf-8?Q?IjZYmF8dJgungCC+YacBNVqc7FJbWM=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8121.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MHdQZ2s3SFVid09WaVk5RG13Z2hGZ1JYS1FSbllGVVUrMG5ZRXJiYUhxcmZX?=
+ =?utf-8?B?Z1RhNkxwWHlpMWFsWTIwYUNIRmZ0ay83UkFWM0kzZzBFbGt2VVA4ZlpVQzkx?=
+ =?utf-8?B?SUw3dC9nUkgrNUNsV2Iyb21wOXlsR2FDcFo0ZDlaNWJXSFlQMUZWYVBhSVk4?=
+ =?utf-8?B?YUlYOEdLS3RlZzY1YW00N1RMZC9ublhrZUdHM3VhT3RGenJkOVcwZFluN2RE?=
+ =?utf-8?B?Z0hoeEthWS83L0lIdHdlRk9hRW9IMW85WmpYWlZlWmZFU0MxankxUVpGSzQx?=
+ =?utf-8?B?Z1hubXFLQndzbnpwVk9VMUI2NUVab0FVektWdFBYVW0wTktZM2ZSM1ZwTUhX?=
+ =?utf-8?B?bjJKZER0UDVkS3BLY3h4L3NuM1g3S0UvTjhoeWZUdTFDQUlTcFFSM3VpcDM2?=
+ =?utf-8?B?Z2o3VzRKMXVtRWdDZm41eGFmZjlnMHZtd1VOM1JXRHJMYUVZdjNaUTgzNWZ4?=
+ =?utf-8?B?dE5uK1RSamVYUEdkZW9LY2lNUTEzVUdmZ29kbWloTHJXNUFpMzFxSnkvQ0hG?=
+ =?utf-8?B?bElzMG9GRTFJamh5YWVYcU8xaHdiOHlzRE9CZy85VEs4TmI1Q0kxblJZWTZq?=
+ =?utf-8?B?R1pFZFhMQ05JelJ2aU43V0RBMlZVeTg3WjdJUnk0S1NzdFVOUVBYQVdLWklm?=
+ =?utf-8?B?RksrMjlMQ1hDNThiSUgvZ2EybnZma2MrbXdaWVNuTDhsVzNSNmV5dmRlc3h2?=
+ =?utf-8?B?Q0hqczAvVnpKRTVVakpJWHNaMkZLM0d4Q0YxUlYvZWZ2OXRWM05KbEhtbWd6?=
+ =?utf-8?B?a0lkK1Npby92eEpidGp0ZGpuR0hmV1ZEZEgrbVNKMkxseUtIS1h3VHBUWlB4?=
+ =?utf-8?B?Ni9kaDhnWm5FQnVQQ1BwSnR6M0tDQjJoeVB6MkloR1RHNHB2KzJJT24xUFBv?=
+ =?utf-8?B?cVNNUS9GU3hKS0h6ajFLUEVlaDhrUUs2RW5FSGZsQVZZTXFYRFdIUDN5VkU4?=
+ =?utf-8?B?VHJMMnFKOVZEVFNFaXRscGxyODB3cUgzRjZPQ3NBelZBamd2RUQxUkNkRTk1?=
+ =?utf-8?B?OVVkYkM4ckUrVGE0V2p1MElQaWhVc24rb280L2x1aFYxYTFpU1BTSjlDRmFp?=
+ =?utf-8?B?Mkp6MUVmOXJoLytSR3ZZMUpIU2JySTRUNDlNRGZ4dTNjM001U0tOYkVUOFMx?=
+ =?utf-8?B?Smp1bnFoUFpYVTRiQlFZbzZwUDNjYlZXOUhBQTRxT3VmeE1WNHlHb2ZYakkw?=
+ =?utf-8?B?dStGWDJteHdtcXZ0MEk4ak03WVQ5elNucm1BSVVoaXV0Mm03YUZrTDFwQktK?=
+ =?utf-8?B?YTREdXV1TlVhNHprWk9VYklJMjNNRmJkOThLTDVoZGxFWEhSV0V2bWVuMmcz?=
+ =?utf-8?B?MUxlV0N2VDFjTlY5dzV3SXdyaWJyQ3lFekdUZDhya3d2ZEk0UXVJWWk0QklO?=
+ =?utf-8?B?NWtSZE5lcXFrYlJUdkhTNDE0czNlbms5S1JXRFYybUlsaVhhU3kwdlBaNGhr?=
+ =?utf-8?B?ZjIvQkpGNFgzLzJ3WlR4dzhlNHNFYkN5d0VMZXJWd1BZNXJzTmlEOW5NZlBt?=
+ =?utf-8?B?enZpOG96a0hjVUkzTHBuQkd4Rkg5U2VFb3l1czFxaHBhdTBVV1Vya1RmanM4?=
+ =?utf-8?B?K0tJZzZ4S1QrU2svY1c0aEtNdElKdWlQSi9xQU9ydFU5RmtVYkN5ZW00OW9F?=
+ =?utf-8?B?NTBvV0hYWmo2WlJzMlUyMVpEdHljODNqejV1Y3pvWlA5YlFUdVYzMW95ZFpE?=
+ =?utf-8?B?akgvUFRZSlBQZ1NYbENnRmlLbGRyOUZ5QlhrVkhkNlVTYTJDdTU2RzFaOFE1?=
+ =?utf-8?B?UzJTWFpxY2h6RzdhblFheUJ5MmY5eDdlQWViOTZHU1NuRThjek1vSVMrWk1s?=
+ =?utf-8?B?dlhCcE9DaHFLNFBwK1l2SmpEODBheWZLZmhtL1FIMENWdEpWRGY4clRWVHYw?=
+ =?utf-8?B?czgrOXpyUWl6RWJvNVNJSi8vYnU3M08zTUtmS1dDZ1h1K3BQNzRMOURHUVps?=
+ =?utf-8?B?QS9LbXZXWXJySzhBS2ZzVU1RTk5hdERCblM4dUFVNFhtemxjbXJnbThtODVk?=
+ =?utf-8?B?Uy9MQ2NGelVMTElZK1YxQ2ZZSUU3TitTdjBwL2VQZnpiN05ZVTBHN3VvZGtF?=
+ =?utf-8?B?UzRrYlMyTWJDeThKS1hjM1VwTGVNeVpOaWJBV21nNEVEeGpoZ3ZXZERqRTM5?=
+ =?utf-8?B?WmJTUm9PbXZkN1pMRlFJbWlKK3lzbGcrTnBBbm92UEQ5OXlTZHJ0VjFHeS9x?=
+ =?utf-8?B?dmc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com> <20250801043642.8103-25-kanchana.p.sridhar@intel.com>
-In-Reply-To: <20250801043642.8103-25-kanchana.p.sridhar@intel.com>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Thu, 14 Aug 2025 14:14:37 -0700
-X-Gm-Features: Ac12FXwHDTmM1wGQdgSMQOtLg0XPGNdtLZ7myFUgkvMOPfRa3YqjUxNck3lWUP4
-Message-ID: <CAKEwX=NpZ5gjSUJ93BN1c8x1Qfmac6-gKcRxRdAztME2snyCaQ@mail.gmail.com>
-Subject: Re: [PATCH v11 24/24] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
-	yosry.ahmed@linux.dev, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
-	ryan.roberts@arm.com, 21cnbao@gmail.com, ying.huang@linux.alibaba.com, 
-	akpm@linux-foundation.org, senozhatsky@chromium.org, 
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org, 
-	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com, 
-	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8121.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: caec829b-a7b6-4399-a626-08dddb7eaf96
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2025 22:05:31.4400
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Qdspfcq+SEkNqihE0esqFupMk0loDC9M/OziVe5oN+DiTLSJii0eyEEEf+9/WwHrG6JKogsG/0IemjG8UZYx0A9uHjxi2VtthAXsIMjQxdw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8711
+X-OriginatorOrg: intel.com
 
-On Thu, Jul 31, 2025 at 9:36=E2=80=AFPM Kanchana P Sridhar
-<kanchana.p.sridhar@intel.com> wrote:
->
-> This patch introduces a new unified implementation of zswap_compress()
-> for compressors that do and do not support batching. This eliminates
-> code duplication and facilitates maintainability of the code with the
-> introduction of compress batching.
->
-> The vectorized implementation of calling the earlier zswap_compress()
-> sequentially, one page at a time in zswap_store_pages(), is replaced
-> with this new version of zswap_compress() that accepts multiple pages to
-> compress as a batch.
->
-> If the compressor does not support batching, each page in the batch is
-> compressed and stored sequentially.
->
-> If the compressor supports batching, for e.g., 'deflate-iaa', the Intel
-> IAA hardware accelerator, the batch is compressed in parallel in
-> hardware by setting the acomp_ctx->req->kernel_data to contain the
-> necessary batching data before calling crypto_acomp_compress(). If all
-> requests in the batch are compressed without errors, the compressed
-> buffers are then stored in zpool.
->
-> Another important change this patch makes is with the acomp_ctx mutex
-> locking in zswap_compress(). Earlier, the mutex was held per page's
-> compression. With the new code, [un]locking the mutex per page caused
-> regressions for software compressors when testing with usemem
-> (30 processes) and also kernel compilation with 'allmod' config. The
-> regressions were more eggregious when PMD folios were stored. The
-> implementation in this commit locks/unlocks the mutex once per batch,
-> that resolves the regression.
->
-> The use of prefetchw() for zswap entries and likely()/unlikely()
-> annotations prevent regressions with software compressors like zstd, and
-> generally improve non-batching compressors' performance with the
-> batching code by ~3%.
->
-> Architectural considerations for the zswap batching framework:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> We have designed the zswap batching framework to be
-> hardware-agnostic. It has no dependencies on Intel-specific features and
-> can be leveraged by any hardware accelerator or software-based
-> compressor. In other words, the framework is open and inclusive by
-> design.
->
-> Other ongoing work that can use batching:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> This patch-series demonstrates the performance benefits of compress
-> batching when used in zswap_store() of large folios. shrink_folio_list()
-> "reclaim batching" of any-order folios is the major next work that uses
-> the zswap compress batching framework: our testing of kernel_compilation
-> with writeback and the zswap shrinker indicates 10X fewer pages get
-> written back when we reclaim 32 folios as a batch, as compared to one
-> folio at a time: this is with deflate-iaa and with zstd. We expect to
-> submit a patch-series with this data and the resulting performance
-> improvements shortly. Reclaim batching relieves memory pressure faster
-> than reclaiming one folio at a time, hence alleviates the need to scan
-> slab memory for writeback.
->
-> Nhat has given ideas on using batching with the ongoing kcompressd work,
-> as well as beneficially using decompression batching & block IO batching
-> to improve zswap writeback efficiency.
->
-> Experiments that combine zswap compress batching, reclaim batching,
-> swapin_readahead() decompression batching of prefetched pages, and
-> writeback batching show that 0 pages are written back with deflate-iaa
-> and zstd. For comparison, the baselines for these compressors see
-> 200K-800K pages written to disk (kernel compilation 'allmod' config).
->
-> To summarize, these are future clients of the batching framework:
->
->    - shrink_folio_list() reclaim batching of multiple folios:
->        Implemented, will submit patch-series.
->    - zswap writeback with decompress batching:
->        Implemented, will submit patch-series.
->    - zram:
->        Implemented, will submit patch-series.
->    - kcompressd:
->        Not yet implemented.
->    - file systems:
->        Not yet implemented.
->    - swapin_readahead() decompression batching of prefetched pages:
->        Implemented, will submit patch-series.
->
-> Additionally, any place we have folios that need to be compressed, can
-> potentially be parallelized.
->
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> ---
->  mm/swap.h  |  23 ++++++
->  mm/zswap.c | 201 ++++++++++++++++++++++++++++++++++++++---------------
->  2 files changed, 168 insertions(+), 56 deletions(-)
->
-> diff --git a/mm/swap.h b/mm/swap.h
-> index 911ad5ff0f89f..2afbf00f59fea 100644
-> --- a/mm/swap.h
-> +++ b/mm/swap.h
-> @@ -11,6 +11,29 @@ extern int page_cluster;
->  #include <linux/swapops.h> /* for swp_offset */
->  #include <linux/blk_types.h> /* for bio_end_io_t */
->
-> +/* linux/mm/zswap.c */
-> +/*
-> + * A compression algorithm that wants to batch compressions/decompressio=
-ns
-> + * must define its own internal data structures that exactly mirror
-> + * @struct swap_batch_comp_data and @struct swap_batch_decomp_data.
-> + */
-> +struct swap_batch_comp_data {
-> +       struct page **pages;
-> +       u8 **dsts;
-> +       unsigned int *dlens;
-> +       int *errors;
-> +       u8 nr_comps;
-> +};
-> +
-> +struct swap_batch_decomp_data {
-> +       u8 **srcs;
-> +       struct page **pages;
-> +       unsigned int *slens;
-> +       unsigned int *dlens;
-> +       int *errors;
-> +       u8 nr_decomps;
-> +};
-
-This struct is not being used yet right? I assume this is used for
-batch zswap load and writeback etc.
-
-Can we introduce them when those series are sent out? Just to limit
-the amount of reviewing here :)
-
-> +
->  /* linux/mm/page_io.c */
->  int sio_pool_init(void);
->  struct swap_iocb;
-> diff --git a/mm/zswap.c b/mm/zswap.c
-> index 8ca69c3f30df2..c30c1f325f573 100644
-> --- a/mm/zswap.c
-> +++ b/mm/zswap.c
-> @@ -35,6 +35,7 @@
->  #include <linux/pagemap.h>
->  #include <linux/workqueue.h>
->  #include <linux/list_lru.h>
-> +#include <linux/prefetch.h>
->
->  #include "swap.h"
->  #include "internal.h"
-> @@ -988,71 +989,163 @@ static int zswap_cpu_comp_prepare(unsigned int cpu=
-, struct hlist_node *node)
->         return ret;
->  }
->
-> -static bool zswap_compress(struct page *page, struct zswap_entry *entry,
-> -                          struct zswap_pool *pool)
-> +/*
-> + * Unified code path for compressors that do and do not support batching=
-. This
-> + * procedure will compress multiple @nr_pages in @folio starting from th=
-e
-> + * @start index.
-> + *
-> + * It is assumed that @nr_pages <=3D ZSWAP_MAX_BATCH_SIZE. zswap_store()=
- makes
-> + * sure of this by design.
-
-Maybe add a VM_WARN_ON_ONCE(nr_pages <=3D ZSWAP_MAX_BATCH_SIZE); in
-zswap_store_pages() to codify this design choice?
-
-> + *
-> + * @nr_pages can be in (1, ZSWAP_MAX_BATCH_SIZE] even if the compressor =
-does not
-> + * support batching.
-> + *
-> + * If @pool->compr_batch_size is 1, each page is processed sequentially.
-> + *
-> + * If @pool->compr_batch_size is > 1, compression batching is invoked, e=
-xcept if
-> + * @nr_pages is 1: if so, we call the fully synchronous non-batching
-> + * crypto_acomp API.
-> + *
-> + * In both cases, if all compressions are successful, the compressed buf=
-fers
-> + * are stored in zpool.
-> + *
-> + * A few important changes made to not regress and in fact improve
-> + * compression performance with non-batching software compressors, using=
- this
-> + * new/batching code:
-> + *
-> + * 1) acomp_ctx mutex locking:
-> + *    Earlier, the mutex was held per page compression. With the new cod=
-e,
-> + *    [un]locking the mutex per page caused regressions for software
-> + *    compressors. We now lock the mutex once per batch, which resolves =
-the
-> + *    regression.
-
-Makes sense, yeah.
-
-> + *
-> + * 2) The prefetchw() and likely()/unlikely() annotations prevent
-> + *    regressions with software compressors like zstd, and generally imp=
-rove
-> + *    non-batching compressors' performance with the batching code by ~3=
-%.
-> + */
-> +static bool zswap_compress(struct folio *folio, long start, unsigned int=
- nr_pages,
-> +                          struct zswap_entry *entries[], struct zswap_po=
-ol *pool,
-> +                          int node_id)
->  {
->         struct crypto_acomp_ctx *acomp_ctx;
->         struct scatterlist input, output;
-> -       int comp_ret =3D 0, alloc_ret =3D 0;
-> -       unsigned int dlen =3D PAGE_SIZE;
-> -       unsigned long handle;
-> -       struct zpool *zpool;
-> +       struct zpool *zpool =3D pool->zpool;
-> +
-> +       unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
-> +       int errors[ZSWAP_MAX_BATCH_SIZE];
-> +
-> +       unsigned int nr_comps =3D min(nr_pages, pool->compr_batch_size);
-> +       unsigned int i, j;
-> +       int err;
->         gfp_t gfp;
-> -       u8 *dst;
-> +
-> +       gfp =3D GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM | __GFP_MOVABL=
-E;
->
->         acomp_ctx =3D raw_cpu_ptr(pool->acomp_ctx);
->
->         mutex_lock(&acomp_ctx->mutex);
->
-> -       dst =3D acomp_ctx->buffers[0];
-> -       sg_init_table(&input, 1);
-> -       sg_set_page(&input, page, PAGE_SIZE, 0);
-> -
->         /*
-> -        * We need PAGE_SIZE * 2 here since there maybe over-compression =
-case,
-> -        * and hardware-accelerators may won't check the dst buffer size,=
- so
-> -        * giving the dst buffer with enough length to avoid buffer overf=
-low.
-> +        * Note:
-> +        * [i] refers to the incoming batch space and is used to
-> +        *     index into the folio pages, @entries and @errors.
->          */
-> -       sg_init_one(&output, dst, PAGE_SIZE * 2);
-> -       acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SI=
-ZE, dlen);
-> +       for (i =3D 0; i < nr_pages; i +=3D nr_comps) {
-> +               if (nr_comps =3D=3D 1) {
-> +                       sg_init_table(&input, 1);
-> +                       sg_set_page(&input, folio_page(folio, start + i),=
- PAGE_SIZE, 0);
->
-> -       /*
-> -        * it maybe looks a little bit silly that we send an asynchronous=
- request,
-> -        * then wait for its completion synchronously. This makes the pro=
-cess look
-> -        * synchronous in fact.
-> -        * Theoretically, acomp supports users send multiple acomp reques=
-ts in one
-> -        * acomp instance, then get those requests done simultaneously. b=
-ut in this
-> -        * case, zswap actually does store and load page by page, there i=
-s no
-> -        * existing method to send the second page before the first page =
-is done
-> -        * in one thread doing zwap.
-> -        * but in different threads running on different cpu, we have dif=
-ferent
-> -        * acomp instance, so multiple threads can do (de)compression in =
-parallel.
-> -        */
-> -       comp_ret =3D crypto_wait_req(crypto_acomp_compress(acomp_ctx->req=
-), &acomp_ctx->wait);
-> -       dlen =3D acomp_ctx->req->dlen;
-> -       if (comp_ret)
-> -               goto unlock;
-> +                       /*
-> +                        * We need PAGE_SIZE * 2 here since there maybe o=
-ver-compression case,
-> +                        * and hardware-accelerators may won't check the =
-dst buffer size, so
-> +                        * giving the dst buffer with enough length to av=
-oid buffer overflow.
-> +                        */
-> +                       sg_init_one(&output, acomp_ctx->buffers[0], PAGE_=
-SIZE * 2);
-> +                       acomp_request_set_params(acomp_ctx->req, &input,
-> +                                                &output, PAGE_SIZE, PAGE=
-_SIZE);
-> +
-> +                       errors[i] =3D crypto_wait_req(crypto_acomp_compre=
-ss(acomp_ctx->req),
-> +                                                   &acomp_ctx->wait);
-> +                       if (unlikely(errors[i]))
-> +                               goto compress_error;
-> +
-> +                       dlens[i] =3D acomp_ctx->req->dlen;
-> +               } else {
-> +                       struct page *pages[ZSWAP_MAX_BATCH_SIZE];
-> +                       unsigned int k;
-> +
-> +                       for (k =3D 0; k < nr_pages; ++k)
-> +                               pages[k] =3D folio_page(folio, start + k)=
-;
-> +
-> +                       struct swap_batch_comp_data batch_comp_data =3D {
-> +                               .pages =3D pages,
-> +                               .dsts =3D acomp_ctx->buffers,
-> +                               .dlens =3D dlens,
-> +                               .errors =3D errors,
-> +                               .nr_comps =3D nr_pages,
-> +                       };
-> +
-> +                       acomp_ctx->req->kernel_data =3D &batch_comp_data;
-> +
-> +                       if (unlikely(crypto_acomp_compress(acomp_ctx->req=
-)))
-> +                               goto compress_error;
-
-I assume this is a new crypto API?
-
-I'll let Herbert decide whether this makes sense :)
-
-> +               }
->
-> -       zpool =3D pool->zpool;
-> -       gfp =3D GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM | __GFP_MOVABL=
-E;
-> -       alloc_ret =3D zpool_malloc(zpool, dlen, gfp, &handle, page_to_nid=
-(page));
-> -       if (alloc_ret)
-> -               goto unlock;
-> -
-> -       zpool_obj_write(zpool, handle, dst, dlen);
-> -       entry->handle =3D handle;
-> -       entry->length =3D dlen;
-> -
-> -unlock:
-> -       if (comp_ret =3D=3D -ENOSPC || alloc_ret =3D=3D -ENOSPC)
-> -               zswap_reject_compress_poor++;
-> -       else if (comp_ret)
-> -               zswap_reject_compress_fail++;
-> -       else if (alloc_ret)
-> -               zswap_reject_alloc_fail++;
-> +               /*
-> +                * All @nr_comps pages were successfully compressed.
-> +                * Store the pages in zpool.
-> +                *
-> +                * Note:
-> +                * [j] refers to the incoming batch space and is used to
-> +                *     index into the folio pages, @entries, @dlens and @=
-errors.
-> +                * [k] refers to the @acomp_ctx space, as determined by
-> +                *     @pool->compr_batch_size, and is used to index into
-> +                *     @acomp_ctx->buffers.
-> +                */
-> +               for (j =3D i; j < i + nr_comps; ++j) {
-> +                       unsigned int k =3D j - i;
-> +                       unsigned long handle;
-> +
-> +                       /*
-> +                        * prefetchw() minimizes cache-miss latency by
-> +                        * moving the zswap entry to the cache before it
-> +                        * is written to; reducing sys time by ~1.5% for
-> +                        * non-batching software compressors.
-> +                        */
-> +                       prefetchw(entries[j]);
-> +                       err =3D zpool_malloc(zpool, dlens[j], gfp, &handl=
-e, node_id);
-> +
-> +                       if (unlikely(err)) {
-> +                               if (err =3D=3D -ENOSPC)
-> +                                       zswap_reject_compress_poor++;
-> +                               else
-> +                                       zswap_reject_alloc_fail++;
-> +
-> +                               goto err_unlock;
-> +                       }
-> +
-> +                       zpool_obj_write(zpool, handle, acomp_ctx->buffers=
-[k], dlens[j]);
-> +                       entries[j]->handle =3D handle;
-> +                       entries[j]->length =3D dlens[j];
-> +               }
-> +       } /* finished compress and store nr_pages. */
->
->         mutex_unlock(&acomp_ctx->mutex);
-> -       return comp_ret =3D=3D 0 && alloc_ret =3D=3D 0;
-> +       return true;
-> +
-> +compress_error:
-> +       for (j =3D i; j < i + nr_comps; ++j) {
-> +               if (errors[j]) {
-> +                       if (errors[j] =3D=3D -ENOSPC)
-> +                               zswap_reject_compress_poor++;
-> +                       else
-> +                               zswap_reject_compress_fail++;
-> +               }
-> +       }
-> +
-> +err_unlock:
-> +       mutex_unlock(&acomp_ctx->mutex);
-> +       return false;
->  }
->
->  static bool zswap_decompress(struct zswap_entry *entry, struct folio *fo=
-lio)
-> @@ -1590,12 +1683,8 @@ static bool zswap_store_pages(struct folio *folio,
->                 INIT_LIST_HEAD(&entries[i]->lru);
->         }
->
-> -       for (i =3D 0; i < nr_pages; ++i) {
-> -               struct page *page =3D folio_page(folio, start + i);
-> -
-> -               if (!zswap_compress(page, entries[i], pool))
-> -                       goto store_pages_failed;
-> -       }
-> +       if (unlikely(!zswap_compress(folio, start, nr_pages, entries, poo=
-l, node_id)))
-> +               goto store_pages_failed;
->
->         for (i =3D 0; i < nr_pages; ++i) {
->                 struct zswap_entry *old, *entry =3D entries[i];
-> --
-> 2.27.0
->
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE5oYXQgUGhhbSA8bnBoYW1j
+c0BnbWFpbC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBBdWd1c3QgMTQsIDIwMjUgMTo1OCBQTQ0K
+PiBUbzogU3JpZGhhciwgS2FuY2hhbmEgUCA8a2FuY2hhbmEucC5zcmlkaGFyQGludGVsLmNvbT4N
+Cj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LW1tQGt2YWNrLm9yZzsN
+Cj4gaGFubmVzQGNtcHhjaGcub3JnOyB5b3NyeS5haG1lZEBsaW51eC5kZXY7IGNoZW5nbWluZy56
+aG91QGxpbnV4LmRldjsNCj4gdXNhbWFhcmlmNjQyQGdtYWlsLmNvbTsgcnlhbi5yb2JlcnRzQGFy
+bS5jb207IDIxY25iYW9AZ21haWwuY29tOw0KPiB5aW5nLmh1YW5nQGxpbnV4LmFsaWJhYmEuY29t
+OyBha3BtQGxpbnV4LWZvdW5kYXRpb24ub3JnOw0KPiBzZW5vemhhdHNreUBjaHJvbWl1bS5vcmc7
+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7DQo+IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9y
+Zy5hdTsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsNCj4gY2xhYmJlQGJheWxpYnJlLmNvbTsgYXJkYkBr
+ZXJuZWwub3JnOyBlYmlnZ2Vyc0Bnb29nbGUuY29tOw0KPiBzdXJlbmJAZ29vZ2xlLmNvbTsgQWNj
+YXJkaSwgS3Jpc3RlbiBDIDxrcmlzdGVuLmMuYWNjYXJkaUBpbnRlbC5jb20+Ow0KPiBHb21lcywg
+VmluaWNpdXMgPHZpbmljaXVzLmdvbWVzQGludGVsLmNvbT47IEZlZ2hhbGksIFdhamRpIEsNCj4g
+PHdhamRpLmsuZmVnaGFsaUBpbnRlbC5jb20+OyBHb3BhbCwgVmlub2RoIDx2aW5vZGguZ29wYWxA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxMSAyMi8yNF0gbW06IHpzd2FwOiBB
+bGxvY2F0ZSBwb29sIGJhdGNoaW5nIHJlc291cmNlcw0KPiBpZiB0aGUgY29tcHJlc3NvciBzdXBw
+b3J0cyBiYXRjaGluZy4NCj4gDQo+IE9uIFRodSwgSnVsIDMxLCAyMDI1IGF0IDk6MzbigK9QTSBL
+YW5jaGFuYSBQIFNyaWRoYXINCj4gPGthbmNoYW5hLnAuc3JpZGhhckBpbnRlbC5jb20+IHdyb3Rl
+Og0KPiA+DQo+ID4gVGhpcyBwYXRjaCBzZXRzIHVwIHpzd2FwIGZvciBhbGxvY2F0aW5nIHBlci1D
+UFUgcmVzb3VyY2VzIG9wdGltYWxseSBmb3INCj4gPiBub24tYmF0Y2hpbmcgYW5kIGJhdGNoaW5n
+IGNvbXByZXNzb3JzLg0KPiA+DQo+ID4gQSBuZXcgWlNXQVBfTUFYX0JBVENIX1NJWkUgY29uc3Rh
+bnQgaXMgZGVmaW5lZCBhcyA4VSwgdG8gc2V0IGFuIHVwcGVyDQo+ID4gbGltaXQgb24gdGhlIG51
+bWJlciBvZiBwYWdlcyBpbiBsYXJnZSBmb2xpb3MgdGhhdCB3aWxsIGJlIGJhdGNoDQo+ID4gY29t
+cHJlc3NlZC4NCj4gPg0KPiA+IEFzIHBlciBIZXJiZXJ0J3MgY29tbWVudHMgaW4gWzJdIGluIHJl
+c3BvbnNlIHRvIHRoZQ0KPiA+IGNyeXB0b19hY29tcF9iYXRjaF9jb21wcmVzcygpIGFuZCBjcnlw
+dG9fYWNvbXBfYmF0Y2hfZGVjb21wcmVzcygpDQo+IEFQSQ0KPiA+IHByb3Bvc2VkIGluIFsxXSwg
+dGhpcyBzZXJpZXMgZG9lcyBub3QgY3JlYXRlIG5ldyBjcnlwdG9fYWNvbXAgYmF0Y2hpbmcNCj4g
+PiBBUEkuIEluc3RlYWQsIHpzd2FwIGNvbXByZXNzaW9uIGJhdGNoaW5nIHVzZXMgdGhlIGV4aXN0
+aW5nDQo+ID4gY3J5cHRvX2Fjb21wX2NvbXByZXNzKCkgQVBJIGluIGNvbWJpbmF0aW9uIHdpdGgg
+dGhlICJ2b2lkICprZXJuZWxfZGF0YSINCj4gPiBtZW1iZXIgYWRkZWQgdG8gInN0cnVjdCBhY29t
+cF9yZXEiIGVhcmxpZXIgaW4gdGhpcyBzZXJpZXMuDQo+ID4NCj4gPiBJdCBpcyB1cCB0byB0aGUg
+Y29tcHJlc3NvciB0byBtYW5hZ2UgbXVsdGlwbGUgcmVxdWVzdHMsIGFzIG5lZWRlZCwgdG8NCj4g
+PiBhY2NvbXBsaXNoIGJhdGNoIHBhcmFsbGVsaXNtLiB6c3dhcCBvbmx5IG5lZWRzIHRvIGFsbG9j
+YXRlIHRoZSBwZXItQ1BVDQo+ID4gZHN0IGJ1ZmZlcnMgYWNjb3JkaW5nIHRvIHRoZSBiYXRjaCBz
+aXplIHN1cHBvcnRlZCBieSB0aGUgY29tcHJlc3Nvci4NCj4gPg0KPiA+IEEgInU4IGNvbXByX2Jh
+dGNoX3NpemUiIG1lbWJlciBpcyBhZGRlZCB0byAic3RydWN0IHpzd2FwX3Bvb2wiLCBhcyBwZXIN
+Cj4gPiBZb3NyeSdzIHN1Z2dlc3Rpb24uIHBvb2wtPmNvbXByX2JhdGNoX3NpemUgaXMgc2V0IGFz
+IHRoZSBtaW5pbXVtIG9mIHRoZQ0KPiA+IGNvbXByZXNzb3IncyBtYXggYmF0Y2gtc2l6ZSBhbmQg
+WlNXQVBfTUFYX0JBVENIX1NJWkUuIEFjY29yZGluZ2x5LCBpdA0KPiA+IHByb2NlZWRzIHRvIGFs
+bG9jYXRlIHRoZSBuZWNlc3NhcnkgY29tcHJlc3Npb24gZHN0IGJ1ZmZlcnMgaW4gdGhlDQo+ID4g
+cGVyLUNQVSBhY29tcF9jdHguDQo+ID4NCj4gPiBBbm90aGVyICJ1OCBiYXRjaF9zaXplIiBtZW1i
+ZXIgaXMgYWRkZWQgdG8gInN0cnVjdCB6c3dhcF9wb29sIiB0byBzdG9yZQ0KPiA+IHRoZSB1bml0
+IGZvciBiYXRjaGluZyBsYXJnZSBmb2xpbyBzdG9yZXM6IGZvciBiYXRjaGluZyBjb21wcmVzc29y
+cywgdGhpcw0KPiA+IGlzIHRoZSBwb29sLT5jb21wcl9iYXRjaF9zaXplLiBGb3Igbm9uLWJhdGNo
+aW5nIGNvbXByZXNzb3JzLCB0aGlzIGlzDQo+ID4gWlNXQVBfTUFYX0JBVENIX1NJWkUuDQo+ID4N
+Cj4gPiB6c3dhcCBkb2VzIG5vdCB1c2UgbW9yZSB0aGFuIG9uZSBkc3QgYnVmZmVyIHlldC4gRm9s
+bG93LXVwIHBhdGNoZXMgd2lsbA0KPiA+IGFjdHVhbGx5IHV0aWxpemUgdGhlIG11bHRpcGxlIGFj
+b21wX2N0eCBidWZmZXJzIGZvciBiYXRjaA0KPiA+IGNvbXByZXNzaW9uL2RlY29tcHJlc3Npb24g
+b2YgbXVsdGlwbGUgcGFnZXMuDQo+ID4NCj4gPiBUaHVzLCBaU1dBUF9NQVhfQkFUQ0hfU0laRSBs
+aW1pdHMgdGhlIGFtb3VudCBvZiBleHRyYSBtZW1vcnkgdXNlZA0KPiBmb3INCj4gPiBiYXRjaGlu
+Zy4gVGhlcmUgaXMgYSBzbWFsbCBleHRyYSBtZW1vcnkgb3ZlcmhlYWQgb2YgYWxsb2NhdGluZw0K
+PiA+IHRoZSBhY29tcF9jdHgtPmJ1ZmZlcnMgYXJyYXkgZm9yIGNvbXByZXNzb3JzIHRoYXQgZG8g
+bm90IHN1cHBvcnQNCj4gPiBiYXRjaGluZzogT24geDg2XzY0LCB0aGUgb3ZlcmhlYWQgaXMgMSBw
+b2ludGVyIHBlci1DUFUgKGkuZS4gOCBieXRlcykuDQo+ID4NCj4gPiBbMV06IGh0dHBzOi8vcGF0
+Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC0NCj4gbW0vcGF0Y2gvMjAyNTA1MDgxOTQx
+MzQuMjgzOTItMTEta2FuY2hhbmEucC5zcmlkaGFyQGludGVsLmNvbS8NCj4gPiBbMl06IGh0dHBz
+Oi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvY29tbWVudC8yNjM4MjYxMA0KPiA+DQo+ID4gU2lnbmVk
+LW9mZi1ieTogS2FuY2hhbmEgUCBTcmlkaGFyIDxrYW5jaGFuYS5wLnNyaWRoYXJAaW50ZWwuY29t
+Pg0KPiANCj4gTW9zdGx5IExHVE0uIEp1c3QgYSBjb3VwbGUgb2YgcXVlc3Rpb25zIGJlbG93Og0K
+DQpIaSBOaGF0LA0KDQpUaGFua3MgZm9yIHRha2luZyB0aGUgdGltZSB0byByZXZpZXcgdGhlIHBh
+dGNoZXMhIFN1cmUsIHRoZXNlIGFyZQ0KZ3JlYXQgcXVlc3Rpb25zLCByZXNwb25zZXMgYXJlIGlu
+bGluZS4NCg0KPiANCj4gPiAtLS0NCj4gPiAgbW0venN3YXAuYyB8IDgyICsrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLQ0KPiAtLS0tLS0NCj4gPiAgMSBmaWxl
+IGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL21tL3pzd2FwLmMgYi9tbS96c3dhcC5jDQo+ID4gaW5kZXggZWZkNTAxYTdmZTI5
+NC4uNjNhOTk3Yjk5OTUzNyAxMDA2NDQNCj4gPiAtLS0gYS9tbS96c3dhcC5jDQo+ID4gKysrIGIv
+bW0venN3YXAuYw0KPiA+IEBAIC04MCw2ICs4MCw5IEBAIHN0YXRpYyBib29sIHpzd2FwX3Bvb2xf
+cmVhY2hlZF9mdWxsOw0KPiA+DQo+ID4gICNkZWZpbmUgWlNXQVBfUEFSQU1fVU5TRVQgIiINCj4g
+Pg0KPiA+ICsvKiBMaW1pdCB0aGUgYmF0Y2ggc2l6ZSB0byBsaW1pdCBwZXItQ1BVIG1lbW9yeSB1
+c2FnZSBmb3IgZHN0IGJ1ZmZlcnMuICovDQo+ID4gKyNkZWZpbmUgWlNXQVBfTUFYX0JBVENIX1NJ
+WkUgOFUNCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQgenN3YXBfc2V0dXAodm9pZCk7DQo+ID4NCj4g
+PiAgLyogRW5hYmxlL2Rpc2FibGUgenN3YXAgKi8NCj4gPiBAQCAtMTQ3LDcgKzE1MCw3IEBAIHN0
+cnVjdCBjcnlwdG9fYWNvbXBfY3R4IHsNCj4gPiAgICAgICAgIHN0cnVjdCBjcnlwdG9fYWNvbXAg
+KmFjb21wOw0KPiA+ICAgICAgICAgc3RydWN0IGFjb21wX3JlcSAqcmVxOw0KPiA+ICAgICAgICAg
+c3RydWN0IGNyeXB0b193YWl0IHdhaXQ7DQo+ID4gLSAgICAgICB1OCAqYnVmZmVyOw0KPiA+ICsg
+ICAgICAgdTggKipidWZmZXJzOw0KPiA+ICAgICAgICAgc3RydWN0IG11dGV4IG11dGV4Ow0KPiA+
+ICAgICAgICAgYm9vbCBpc19zbGVlcGFibGU7DQo+ID4gIH07DQo+ID4gQEAgLTE2Niw2ICsxNjks
+OCBAQCBzdHJ1Y3QgenN3YXBfcG9vbCB7DQo+ID4gICAgICAgICBzdHJ1Y3Qgd29ya19zdHJ1Y3Qg
+cmVsZWFzZV93b3JrOw0KPiA+ICAgICAgICAgc3RydWN0IGhsaXN0X25vZGUgbm9kZTsNCj4gPiAg
+ICAgICAgIGNoYXIgdGZtX25hbWVbQ1JZUFRPX01BWF9BTEdfTkFNRV07DQo+ID4gKyAgICAgICB1
+OCBjb21wcl9iYXRjaF9zaXplOw0KPiA+ICsgICAgICAgdTggYmF0Y2hfc2l6ZTsNCj4gDQo+IEFw
+b2xvZ2llcyBpZiB0aGlzIGlzIGV4cGxhaW5lZCBlbHNld2hlcmUsIGJ1dCBJJ20gdmVyeSBjb25m
+dXNlZCAtIHdoeQ0KPiBkbyB3ZSBuZWVkIGJvdGggb2YgdGhlc2UgdHdvIGZpZWxkcz8NCg0KTm8g
+d29ycmllcy4gVGhpcyB3YXMgbXkgdGhpbmtpbmcgaW4ga2VlcGluZyB0aGVzZSBzZXBhcmF0ZToN
+Cg0KICAiY29tcHJfYmF0Y2hfc2l6ZSIgaXMgaW5kaWNhdGl2ZSBvZiB0aGUgbnVtYmVyIG9mIGJh
+dGNoaW5nIHJlc291cmNlcw0KICBhbGxvY2F0ZWQgcGVyLUNQVS4gSGVuY2UsIHpzd2FwX2NvbXBy
+ZXNzKCkgdXNlcyB0aGlzIHRvIGRldGVybWluZSBpZg0KICB3ZSBuZWVkIHRvIGNvbXByZXNzIG9u
+ZSBwYWdlIGF0IGEgdGltZSBpbiB0aGUgaW5wdXQgYmF0Y2ggb2YgcGFnZXMuDQoNCiAgImJhdGNo
+X3NpemUiIHJlcHJlc2VudHMgdGhlIG51bWJlciBvZiBwYWdlcyB0aGF0IHdpbGwgYmUgc2VudCB0
+bw0KICB6c3dhcF9jb21wcmVzcygpIGFzIGEgYmF0Y2guDQoNCj4gDQo+IFNlZW1zIGxpa2UgYmF0
+Y2hfc2l6ZSBpcyBkZWZpbmVkIGJlbG93LCBhbmQgbmV2ZXIgY2hhbmdlZDoNCj4gDQo+ICAgICAg
+IHBvb2wtPmJhdGNoX3NpemUgPSAocG9vbC0+Y29tcHJfYmF0Y2hfc2l6ZSA+IDEpID8NCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHBvb2wtPmNvbXByX2JhdGNoX3NpemUgOiBaU1dBUF9N
+QVhfQkFUQ0hfU0laRTsNCj4gDQo+IENhbiB3ZSBqdXN0IGRldGVybWluZSB0aGlzIGluIHpzd2Fw
+X3N0b3JlKCkgYXMgYSBsb2NhbCB2YXJpYWJsZT8NCg0KSSBmaWd1cmVkIHNpbmNlIHRoZSBudW1i
+ZXIgb2YgenN3YXBfcG9vbHMgYXQgYW55IGdpdmVuIHRpbWUgaXMgbGVzcyB0aGFuDQpvciBlcXVh
+bCB0byAyIChJSVJDKSwgaXQgc2hvdWxkIGJlIGEgZ29vZCBjb21wcm9taXNlIHRvIGFkZCB0aGVz
+ZSB0d28NCnU4IG1lbWJlcnMgZm9yIGxhdGVuY3kgcmVhc29ucywgc28gdGhhdCB0aGlzIGRvZXNu
+J3QgaGF2ZSB0byBiZQ0KY29tcHV0ZWQgcGVyIGNhbGwgdG8genN3YXBfc3RvcmUoKS4gDQoNCj4g
+DQo+IA0KPiA+ICB9Ow0KPiA+DQo+ID4gIC8qIEdsb2JhbCBMUlUgbGlzdHMgc2hhcmVkIGJ5IGFs
+bCB6c3dhcCBwb29scy4gKi8NCj4gPiBAQCAtMjU4LDggKzI2MywxMCBAQCBzdGF0aWMgdm9pZCBf
+X3pzd2FwX3Bvb2xfZW1wdHkoc3RydWN0DQo+IHBlcmNwdV9yZWYgKnJlZik7DQo+ID4gICAqICAg
+enN3YXBfY3B1X2NvbXBfcHJlcGFyZSgpLCBub3Qgb3RoZXJzLg0KPiA+ICAgKiAtIENsZWFudXAg
+YWNvbXBfY3R4IHJlc291cmNlcyBvbiBhbGwgY29yZXMgaW4genN3YXBfcG9vbF9kZXN0cm95KCku
+DQo+ID4gICAqLw0KPiA+IC1zdGF0aWMgdm9pZCBhY29tcF9jdHhfZGVhbGxvYyhzdHJ1Y3QgY3J5
+cHRvX2Fjb21wX2N0eCAqYWNvbXBfY3R4KQ0KPiA+ICtzdGF0aWMgdm9pZCBhY29tcF9jdHhfZGVh
+bGxvYyhzdHJ1Y3QgY3J5cHRvX2Fjb21wX2N0eCAqYWNvbXBfY3R4LCB1OA0KPiBucl9idWZmZXJz
+KQ0KPiA+ICB7DQo+ID4gKyAgICAgICB1OCBpOw0KPiA+ICsNCj4gPiAgICAgICAgIGlmIChJU19F
+UlJfT1JfTlVMTChhY29tcF9jdHgpKQ0KPiA+ICAgICAgICAgICAgICAgICByZXR1cm47DQo+ID4N
+Cj4gPiBAQCAtMjY5LDcgKzI3NiwxMSBAQCBzdGF0aWMgdm9pZCBhY29tcF9jdHhfZGVhbGxvYyhz
+dHJ1Y3QNCj4gY3J5cHRvX2Fjb21wX2N0eCAqYWNvbXBfY3R4KQ0KPiA+ICAgICAgICAgaWYgKCFJ
+U19FUlJfT1JfTlVMTChhY29tcF9jdHgtPmFjb21wKSkNCj4gPiAgICAgICAgICAgICAgICAgY3J5
+cHRvX2ZyZWVfYWNvbXAoYWNvbXBfY3R4LT5hY29tcCk7DQo+ID4NCj4gPiAtICAgICAgIGtmcmVl
+KGFjb21wX2N0eC0+YnVmZmVyKTsNCj4gPiArICAgICAgIGlmIChhY29tcF9jdHgtPmJ1ZmZlcnMp
+IHsNCj4gPiArICAgICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IG5yX2J1ZmZlcnM7ICsraSkN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICBrZnJlZShhY29tcF9jdHgtPmJ1ZmZlcnNbaV0p
+Ow0KPiA+ICsgICAgICAgICAgICAgICBrZnJlZShhY29tcF9jdHgtPmJ1ZmZlcnMpOw0KPiA+ICsg
+ICAgICAgfQ0KPiA+ICB9DQo+ID4NCj4gPiAgc3RhdGljIHN0cnVjdCB6c3dhcF9wb29sICp6c3dh
+cF9wb29sX2NyZWF0ZShjaGFyICp0eXBlLCBjaGFyDQo+ICpjb21wcmVzc29yKQ0KPiA+IEBAIC0y
+OTAsNiArMzAxLDcgQEAgc3RhdGljIHN0cnVjdCB6c3dhcF9wb29sICp6c3dhcF9wb29sX2NyZWF0
+ZShjaGFyDQo+ICp0eXBlLCBjaGFyICpjb21wcmVzc29yKQ0KPiA+ICAgICAgICAgICAgICAgICAg
+ICAgICAgIHJldHVybiBOVUxMOw0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gKyAgICAgICAvKiBN
+YW55IHRoaW5ncyByZWx5IG9uIHRoZSB6ZXJvLWluaXRpYWxpemF0aW9uLiAqLw0KPiA+ICAgICAg
+ICAgcG9vbCA9IGt6YWxsb2Moc2l6ZW9mKCpwb29sKSwgR0ZQX0tFUk5FTCk7DQo+ID4gICAgICAg
+ICBpZiAoIXBvb2wpDQo+ID4gICAgICAgICAgICAgICAgIHJldHVybiBOVUxMOw0KPiA+IEBAIC0z
+NTIsMTMgKzM2NCwyOCBAQCBzdGF0aWMgc3RydWN0IHpzd2FwX3Bvb2wNCj4gKnpzd2FwX3Bvb2xf
+Y3JlYXRlKGNoYXIgKnR5cGUsIGNoYXIgKmNvbXByZXNzb3IpDQo+ID4gICAgICAgICAgICAgICAg
+IGdvdG8gcmVmX2ZhaWw7DQo+ID4gICAgICAgICBJTklUX0xJU1RfSEVBRCgmcG9vbC0+bGlzdCk7
+DQo+ID4NCj4gPiArICAgICAgIC8qDQo+ID4gKyAgICAgICAgKiBTZXQgdGhlIHVuaXQgb2YgY29t
+cHJlc3MgYmF0Y2hpbmcgZm9yIGxhcmdlIGZvbGlvcywgZm9yIHF1aWNrDQo+ID4gKyAgICAgICAg
+KiByZXRyaWV2YWwgaW4gdGhlIHpzd2FwX2NvbXByZXNzKCkgZmFzdCBwYXRoOg0KPiA+ICsgICAg
+ICAgICogSWYgdGhlIGNvbXByZXNzb3IgaXMgc2VxdWVudGlhbCAoQHBvb2wtPmNvbXByX2JhdGNo
+X3NpemUgaXMgMSksDQo+ID4gKyAgICAgICAgKiBsYXJnZSBmb2xpb3Mgd2lsbCBiZSBjb21wcmVz
+c2VkIGluIGJhdGNoZXMgb2YNCj4gWlNXQVBfTUFYX0JBVENIX1NJWkUNCj4gPiArICAgICAgICAq
+IHBhZ2VzLCB3aGVyZSBlYWNoIHBhZ2UgaW4gdGhlIGJhdGNoIGlzIGNvbXByZXNzZWQgc2VxdWVu
+dGlhbGx5Lg0KPiA+ICsgICAgICAgICogV2Ugc2VlIGJldHRlciBwZXJmb3JtYW5jZSBieSBwcm9j
+ZXNzaW5nIHRoZSBmb2xpbyBpbiBiYXRjaGVzIG9mDQo+ID4gKyAgICAgICAgKiBaU1dBUF9NQVhf
+QkFUQ0hfU0laRSwgZHVlIHRvIGNhY2hlIGxvY2FsaXR5IG9mIHdvcmtpbmcgc2V0DQo+ID4gKyAg
+ICAgICAgKiBzdHJ1Y3R1cmVzLg0KPiA+ICsgICAgICAgICovDQo+ID4gKyAgICAgICBwb29sLT5i
+YXRjaF9zaXplID0gKHBvb2wtPmNvbXByX2JhdGNoX3NpemUgPiAxKSA/DQo+ID4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBwb29sLT5jb21wcl9iYXRjaF9zaXplIDogWlNXQVBfTUFY
+X0JBVENIX1NJWkU7DQo+ID4gKw0KPiA+ICAgICAgICAgenN3YXBfcG9vbF9kZWJ1ZygiY3JlYXRl
+ZCIsIHBvb2wpOw0KPiA+DQo+ID4gICAgICAgICByZXR1cm4gcG9vbDsNCj4gPg0KPiA+ICByZWZf
+ZmFpbDoNCj4gPiAgICAgICAgIGZvcl9lYWNoX3Bvc3NpYmxlX2NwdShjcHUpDQo+ID4gLSAgICAg
+ICAgICAgICAgIGFjb21wX2N0eF9kZWFsbG9jKHBlcl9jcHVfcHRyKHBvb2wtPmFjb21wX2N0eCwg
+Y3B1KSk7DQo+ID4gKyAgICAgICAgICAgICAgIGFjb21wX2N0eF9kZWFsbG9jKHBlcl9jcHVfcHRy
+KHBvb2wtPmFjb21wX2N0eCwgY3B1KSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgcG9vbC0+Y29tcHJfYmF0Y2hfc2l6ZSk7DQo+ID4gKw0KPiA+ICBlcnJvcjoNCj4gPiAg
+ICAgICAgIGlmIChwb29sLT5hY29tcF9jdHgpDQo+ID4gICAgICAgICAgICAgICAgIGZyZWVfcGVy
+Y3B1KHBvb2wtPmFjb21wX2N0eCk7DQo+ID4gQEAgLTQxNyw3ICs0NDQsOCBAQCBzdGF0aWMgdm9p
+ZCB6c3dhcF9wb29sX2Rlc3Ryb3koc3RydWN0IHpzd2FwX3Bvb2wNCj4gKnBvb2wpDQo+ID4gICAg
+ICAgICB6c3dhcF9wb29sX2RlYnVnKCJkZXN0cm95aW5nIiwgcG9vbCk7DQo+ID4NCj4gPiAgICAg
+ICAgIGZvcl9lYWNoX3Bvc3NpYmxlX2NwdShjcHUpDQo+ID4gLSAgICAgICAgICAgICAgIGFjb21w
+X2N0eF9kZWFsbG9jKHBlcl9jcHVfcHRyKHBvb2wtPmFjb21wX2N0eCwgY3B1KSk7DQo+ID4gKyAg
+ICAgICAgICAgICAgIGFjb21wX2N0eF9kZWFsbG9jKHBlcl9jcHVfcHRyKHBvb2wtPmFjb21wX2N0
+eCwgY3B1KSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcG9vbC0+Y29t
+cHJfYmF0Y2hfc2l6ZSk7DQo+ID4NCj4gPiAgICAgICAgIGZyZWVfcGVyY3B1KHBvb2wtPmFjb21w
+X2N0eCk7DQo+ID4NCj4gPiBAQCAtODc2LDYgKzkwNCw3IEBAIHN0YXRpYyBpbnQgenN3YXBfY3B1
+X2NvbXBfcHJlcGFyZSh1bnNpZ25lZCBpbnQNCj4gY3B1LCBzdHJ1Y3QgaGxpc3Rfbm9kZSAqbm9k
+ZSkNCj4gPiAgICAgICAgIHN0cnVjdCB6c3dhcF9wb29sICpwb29sID0gaGxpc3RfZW50cnkobm9k
+ZSwgc3RydWN0IHpzd2FwX3Bvb2wsIG5vZGUpOw0KPiA+ICAgICAgICAgc3RydWN0IGNyeXB0b19h
+Y29tcF9jdHggKmFjb21wX2N0eCA9IHBlcl9jcHVfcHRyKHBvb2wtPmFjb21wX2N0eCwNCj4gY3B1
+KTsNCj4gPiAgICAgICAgIGludCByZXQgPSAtRU5PTUVNOw0KPiA+ICsgICAgICAgdTggaTsNCj4g
+Pg0KPiA+ICAgICAgICAgLyoNCj4gPiAgICAgICAgICAqIFRoZSBwZXItQ1BVIHBvb2wtPmFjb21w
+X2N0eCBpcyB6ZXJvLWluaXRpYWxpemVkIG9uIGFsbG9jYXRpb24uDQo+ID4gQEAgLTg4OCwxMCAr
+OTE3LDYgQEAgc3RhdGljIGludCB6c3dhcF9jcHVfY29tcF9wcmVwYXJlKHVuc2lnbmVkIGludA0K
+PiBjcHUsIHN0cnVjdCBobGlzdF9ub2RlICpub2RlKQ0KPiA+ICAgICAgICAgaWYgKCFJU19FUlJf
+T1JfTlVMTChhY29tcF9jdHgtPmFjb21wKSkNCj4gPiAgICAgICAgICAgICAgICAgcmV0dXJuIDA7
+DQo+ID4NCj4gPiAtICAgICAgIGFjb21wX2N0eC0+YnVmZmVyID0ga21hbGxvY19ub2RlKFBBR0Vf
+U0laRSAqIDIsIEdGUF9LRVJORUwsDQo+IGNwdV90b19ub2RlKGNwdSkpOw0KPiA+IC0gICAgICAg
+aWYgKCFhY29tcF9jdHgtPmJ1ZmZlcikNCj4gPiAtICAgICAgICAgICAgICAgcmV0dXJuIHJldDsN
+Cj4gPiAtDQo+ID4gICAgICAgICBhY29tcF9jdHgtPmFjb21wID0gY3J5cHRvX2FsbG9jX2Fjb21w
+X25vZGUocG9vbC0+dGZtX25hbWUsIDAsIDAsDQo+IGNwdV90b19ub2RlKGNwdSkpOw0KPiA+ICAg
+ICAgICAgaWYgKElTX0VSUl9PUl9OVUxMKGFjb21wX2N0eC0+YWNvbXApKSB7DQo+ID4gICAgICAg
+ICAgICAgICAgIHByX2VycigiY291bGQgbm90IGFsbG9jIGNyeXB0byBhY29tcCAlcyA6ICVsZFxu
+IiwNCj4gPiBAQCAtOTA0LDE3ICs5MjksMzYgQEAgc3RhdGljIGludCB6c3dhcF9jcHVfY29tcF9w
+cmVwYXJlKHVuc2lnbmVkIGludA0KPiBjcHUsIHN0cnVjdCBobGlzdF9ub2RlICpub2RlKQ0KPiA+
+ICAgICAgICAgYWNvbXBfY3R4LT5yZXEgPSBhY29tcF9yZXF1ZXN0X2FsbG9jKGFjb21wX2N0eC0+
+YWNvbXApOw0KPiA+ICAgICAgICAgaWYgKElTX0VSUl9PUl9OVUxMKGFjb21wX2N0eC0+cmVxKSkg
+ew0KPiA+ICAgICAgICAgICAgICAgICBwcl9lcnIoImNvdWxkIG5vdCBhbGxvYyBjcnlwdG8gYWNv
+bXBfcmVxdWVzdCAlc1xuIiwNCj4gPiAtICAgICAgICAgICAgICAgICAgICAgIHBvb2wtPnRmbV9u
+YW1lKTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBwb29sLT50Zm1fbmFtZSk7DQo+IA0K
+PiBJcyB0aGlzIGludGVudGlvbmFsPyA6KQ0KDQpZZXMsIGl0IGlzIGluZGVlZCA6KS4gTm8gaXNz
+dWUgaWYgSSBzaG91bGQgcmV2ZXJ0Lg0KDQpUaGFua3MsDQpLYW5jaGFuYQ0KDQo+IA0KPiA+ICAg
+ICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ID4gICAgICAgICB9DQo+ID4NCj4gPiAtICAgICAg
+IGNyeXB0b19pbml0X3dhaXQoJmFjb21wX2N0eC0+d2FpdCk7DQo+ID4gKyAgICAgICAvKg0KPiA+
+ICsgICAgICAgICogQWxsb2NhdGUgdXAgdG8gWlNXQVBfTUFYX0JBVENIX1NJWkUgZHN0IGJ1ZmZl
+cnMgaWYgdGhlDQo+ID4gKyAgICAgICAgKiBjb21wcmVzc29yIHN1cHBvcnRzIGJhdGNoaW5nLg0K
+PiA+ICsgICAgICAgICovDQo+ID4gKyAgICAgICBwb29sLT5jb21wcl9iYXRjaF9zaXplID0gbWlu
+KFpTV0FQX01BWF9CQVRDSF9TSVpFLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBjcnlwdG9fYWNvbXBfYmF0Y2hfc2l6ZShhY29tcF9jdHgtPmFjb21wKSk7DQo+ID4g
+Kw0KPiA+ICsgICAgICAgYWNvbXBfY3R4LT5idWZmZXJzID0ga2NhbGxvY19ub2RlKHBvb2wtPmNv
+bXByX2JhdGNoX3NpemUsIHNpemVvZih1OA0KPiAqKSwNCj4gPiArICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBHRlBfS0VSTkVMLCBjcHVfdG9fbm9kZShjcHUpKTsNCj4g
+PiArICAgICAgIGlmICghYWNvbXBfY3R4LT5idWZmZXJzKQ0KPiA+ICsgICAgICAgICAgICAgICBn
+b3RvIGZhaWw7DQo+ID4gKw0KPiA+ICsgICAgICAgZm9yIChpID0gMDsgaSA8IHBvb2wtPmNvbXBy
+X2JhdGNoX3NpemU7ICsraSkgew0KPiA+ICsgICAgICAgICAgICAgICBhY29tcF9jdHgtPmJ1ZmZl
+cnNbaV0gPSBrbWFsbG9jX25vZGUoUEFHRV9TSVpFICogMiwNCj4gR0ZQX0tFUk5FTCwNCj4gPiAr
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNwdV90
+b19ub2RlKGNwdSkpOw0KPiA+ICsgICAgICAgICAgICAgICBpZiAoIWFjb21wX2N0eC0+YnVmZmVy
+c1tpXSkNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ID4gKyAgICAg
+ICB9DQo+ID4NCj4gPiAgICAgICAgIC8qDQo+ID4gICAgICAgICAgKiBpZiB0aGUgYmFja2VuZCBv
+ZiBhY29tcCBpcyBhc3luYyB6aXAsIGNyeXB0b19yZXFfZG9uZSgpIHdpbGwgd2FrZXVwDQo+ID4g
+ICAgICAgICAgKiBjcnlwdG9fd2FpdF9yZXEoKTsgaWYgdGhlIGJhY2tlbmQgb2YgYWNvbXAgaXMg
+c2NvbXAsIHRoZSBjYWxsYmFjaw0KPiA+ICAgICAgICAgICogd29uJ3QgYmUgY2FsbGVkLCBjcnlw
+dG9fd2FpdF9yZXEoKSB3aWxsIHJldHVybiB3aXRob3V0IGJsb2NraW5nLg0KPiA+ICAgICAgICAg
+ICovDQo+ID4gKyAgICAgICBjcnlwdG9faW5pdF93YWl0KCZhY29tcF9jdHgtPndhaXQpOw0KPiA+
+ICsNCj4gPiAgICAgICAgIGFjb21wX3JlcXVlc3Rfc2V0X2NhbGxiYWNrKGFjb21wX2N0eC0+cmVx
+LA0KPiBDUllQVE9fVEZNX1JFUV9NQVlfQkFDS0xPRywNCj4gPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIGNyeXB0b19yZXFfZG9uZSwgJmFjb21wX2N0eC0+d2FpdCk7DQo+ID4N
+Cj4gPiBAQCAtOTIyLDcgKzk2Niw3IEBAIHN0YXRpYyBpbnQgenN3YXBfY3B1X2NvbXBfcHJlcGFy
+ZSh1bnNpZ25lZCBpbnQNCj4gY3B1LCBzdHJ1Y3QgaGxpc3Rfbm9kZSAqbm9kZSkNCj4gPiAgICAg
+ICAgIHJldHVybiAwOw0KPiA+DQo+ID4gIGZhaWw6DQo+ID4gLSAgICAgICBhY29tcF9jdHhfZGVh
+bGxvYyhhY29tcF9jdHgpOw0KPiA+ICsgICAgICAgYWNvbXBfY3R4X2RlYWxsb2MoYWNvbXBfY3R4
+LCBwb29sLT5jb21wcl9iYXRjaF9zaXplKTsNCj4gPiAgICAgICAgIHJldHVybiByZXQ7DQo+ID4g
+IH0NCj4gPg0KPiA+IEBAIC05NDIsNyArOTg2LDcgQEAgc3RhdGljIGJvb2wgenN3YXBfY29tcHJl
+c3Moc3RydWN0IHBhZ2UgKnBhZ2UsDQo+IHN0cnVjdCB6c3dhcF9lbnRyeSAqZW50cnksDQo+ID4N
+Cj4gPiAgICAgICAgIG11dGV4X2xvY2soJmFjb21wX2N0eC0+bXV0ZXgpOw0KPiA+DQo+ID4gLSAg
+ICAgICBkc3QgPSBhY29tcF9jdHgtPmJ1ZmZlcjsNCj4gPiArICAgICAgIGRzdCA9IGFjb21wX2N0
+eC0+YnVmZmVyc1swXTsNCj4gPiAgICAgICAgIHNnX2luaXRfdGFibGUoJmlucHV0LCAxKTsNCj4g
+PiAgICAgICAgIHNnX3NldF9wYWdlKCZpbnB1dCwgcGFnZSwgUEFHRV9TSVpFLCAwKTsNCj4gPg0K
+PiA+IEBAIC0xMDAzLDE5ICsxMDQ3LDE5IEBAIHN0YXRpYyBib29sIHpzd2FwX2RlY29tcHJlc3Mo
+c3RydWN0DQo+IHpzd2FwX2VudHJ5ICplbnRyeSwgc3RydWN0IGZvbGlvICpmb2xpbykNCj4gPg0K
+PiA+ICAgICAgICAgYWNvbXBfY3R4ID0gcmF3X2NwdV9wdHIoZW50cnktPnBvb2wtPmFjb21wX2N0
+eCk7DQo+ID4gICAgICAgICBtdXRleF9sb2NrKCZhY29tcF9jdHgtPm11dGV4KTsNCj4gPiAtICAg
+ICAgIG9iaiA9IHpwb29sX29ial9yZWFkX2JlZ2luKHpwb29sLCBlbnRyeS0+aGFuZGxlLCBhY29t
+cF9jdHgtPmJ1ZmZlcik7DQo+ID4gKyAgICAgICBvYmogPSB6cG9vbF9vYmpfcmVhZF9iZWdpbih6
+cG9vbCwgZW50cnktPmhhbmRsZSwgYWNvbXBfY3R4LQ0KPiA+YnVmZmVyc1swXSk7DQo+ID4NCj4g
+PiAgICAgICAgIC8qDQo+ID4gICAgICAgICAgKiB6cG9vbF9vYmpfcmVhZF9iZWdpbigpIG1pZ2h0
+IHJldHVybiBhIGttYXAgYWRkcmVzcyBvZiBoaWdobWVtDQo+IHdoZW4NCj4gPiAtICAgICAgICAq
+IGFjb21wX2N0eC0+YnVmZmVyIGlzIG5vdCB1c2VkLiAgSG93ZXZlciwgc2dfaW5pdF9vbmUoKSBk
+b2VzIG5vdA0KPiA+IC0gICAgICAgICogaGFuZGxlIGhpZ2htZW0gYWRkcmVzc2VzLCBzbyBjb3B5
+IHRoZSBvYmplY3QgdG8gYWNvbXBfY3R4LQ0KPiA+YnVmZmVyLg0KPiA+ICsgICAgICAgICogYWNv
+bXBfY3R4LT5idWZmZXJzWzBdIGlzIG5vdCB1c2VkLiAgSG93ZXZlciwgc2dfaW5pdF9vbmUoKSBk
+b2VzIG5vdA0KPiA+ICsgICAgICAgICogaGFuZGxlIGhpZ2htZW0gYWRkcmVzc2VzLCBzbyBjb3B5
+IHRoZSBvYmplY3QgdG8gYWNvbXBfY3R4LQ0KPiA+YnVmZmVyc1swXS4NCj4gPiAgICAgICAgICAq
+Lw0KPiA+ICAgICAgICAgaWYgKHZpcnRfYWRkcl92YWxpZChvYmopKSB7DQo+ID4gICAgICAgICAg
+ICAgICAgIHNyYyA9IG9iajsNCj4gPiAgICAgICAgIH0gZWxzZSB7DQo+ID4gLSAgICAgICAgICAg
+ICAgIFdBUk5fT05fT05DRShvYmogPT0gYWNvbXBfY3R4LT5idWZmZXIpOw0KPiA+IC0gICAgICAg
+ICAgICAgICBtZW1jcHkoYWNvbXBfY3R4LT5idWZmZXIsIG9iaiwgZW50cnktPmxlbmd0aCk7DQo+
+ID4gLSAgICAgICAgICAgICAgIHNyYyA9IGFjb21wX2N0eC0+YnVmZmVyOw0KPiA+ICsgICAgICAg
+ICAgICAgICBXQVJOX09OX09OQ0Uob2JqID09IGFjb21wX2N0eC0+YnVmZmVyc1swXSk7DQo+ID4g
+KyAgICAgICAgICAgICAgIG1lbWNweShhY29tcF9jdHgtPmJ1ZmZlcnNbMF0sIG9iaiwgZW50cnkt
+Pmxlbmd0aCk7DQo+ID4gKyAgICAgICAgICAgICAgIHNyYyA9IGFjb21wX2N0eC0+YnVmZmVyc1sw
+XTsNCj4gPiAgICAgICAgIH0NCj4gPg0KPiA+ICAgICAgICAgc2dfaW5pdF9vbmUoJmlucHV0LCBz
+cmMsIGVudHJ5LT5sZW5ndGgpOw0KPiA+IC0tDQo+ID4gMi4yNy4wDQo+ID4NCg==
