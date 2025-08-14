@@ -1,323 +1,242 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2047.outbound.protection.outlook.com [40.107.236.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AF51EF39E;
-	Thu, 14 Aug 2025 11:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755172458; cv=fail; b=YqIQZntckHxtctRE1giNBg6TTQQ23CTSxXTsJGiaAZTkwO/50Ps4Ctt/kNs5YUulhcruHhUwEhAkkw83C5413qMW9G7A/BPeqUUv+pJXSsm+L/pFTJD1lVARCUTTahjcd/m9Jbp5rZdtq6dmDYu55H4LDAKX6GFdBHOxxVyzaec=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755172458; c=relaxed/simple;
-	bh=o0AyGzig3ZIEJW3H+D/rGLve7duWvkFSAA1n6xO6C0E=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=O1RzBpFH5dKNwCpNLGs7Ol4bWYwY4iX3JMkBsaPw4KD9/49o0rpy2LZS5IMWTMVxzPeIQXslzzqTA5f0sLWgB56zuIry0vpX9Rc0VAQeQokZ4vCbc6YLDtGjXTRDdxcc8UWF7Smbnu+EH0yqNr+kjCLmvNGA3sGxvX5XP8yAtQI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DkVQwwI7; arc=fail smtp.client-ip=40.107.236.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8E215062
+	for <linux-crypto@vger.kernel.org>; Thu, 14 Aug 2025 15:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755185309; cv=none; b=MVvbWE1qrKJ9MbNJCYJd9o0ZOSaq0jRkyWJmoJxR5eBCG02V6Mzsh+/0MPNjxwAIB15QlMmIxZ4uR/8s/lAQ1gSQVfCE33UNPOQphQAStp3N02bUNQjCDAEQgn1BE8vu59lFcCTHKXmr1KCEm3irT1sGPA0nm9V0RIINyjGlIow=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755185309; c=relaxed/simple;
+	bh=9rAIQ4jp40wbs/EmvOWCpMFpnbWDf9zKOV8Ck/+NJDE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CP8K9Jtc4syUwsCF8mYb/quRv5b6e2W6KogwSsBWFA44NqR3UkK8gGOxqKOMyiOqYa4jQhxY300K/LEmRH8CiYh2EQQTD33jbjDGg0IF6zklc0/dMapKd4FS/BolSqt29mRabQhEC4cnniL84fLP/Qc+3Sa6qfecM0zLFbKcjyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OGzbRqeX; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DkVQwwI7"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sXJMn2dNMBPsyCSobuhlSyzDin9v1DJhnUbjJpBaKm+62wiYNMM1xbyxoM4UrhPY/o9w/xS+AADsFiPW8tciCjHpWvpiTK/+4j4yNws7hC2WEhbJNiNDdvOrAcF2dV1hzYh221ZjnOFgQf2FOtgOLs694lPMV8lHFoZSaWry8EM2PQNdoIzF9mF/j/VFgkS0m4zCvp202XeevqhJ0tzCasneBOIOIPrpwuB5dR0zEknzsCVHSacr8ylFsIOO0tB+m51voNrNHpID/1ldDECkX3IBZiHObWrHlIC0y9nFgHJ0AjW43pTLEO5izxRmSwXdPY4wf3StR2Or5oK3daNmLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O70hckIml9NhwQQH2EYZR3a6VcWYdEmeK/wMML9xIwc=;
- b=oO7UK+eCaHw05s8fg9yTW705oMLrLpOtKzkr0pLCOa6uVL3rgchY5TtGXsxVsPtyFAXgH1GIQpH9YGiLuLRG26uwukBFh4wc82ipla6HnS0TWGbIdywEfWnpQNaoZ9B0exJF1CW27H3dxApzEatvH8KXQyM2DXjNMDmqmPRBi2GLZDzb+zrmP7dgHqS0kWfO/bnDUDQw2LYyj4DqUN9i2nI8FkexohDJB3S4SmqrLx70GGtVAZV97EpVYU1EoATDYc7qVGrJ9J9YMgHE6fV+EKdEOFYJFVHLnLFK86IkzsW5MaeLyqyhtzUDWI0LXe8avaQ8FkK/KbD3b65H7A9y7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lwn.net smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O70hckIml9NhwQQH2EYZR3a6VcWYdEmeK/wMML9xIwc=;
- b=DkVQwwI7X53DxPY8FhouTcKsPbin2qtqC4zOEjLfTNJbLZTlB8dtTY1EoG2DUFml5uGCQFkIup1mKLduR/jMC/JuorHLPUlYE0xAX8y8pGAT04X5hSSUJR+57c2YoKyVGuyDSme2GOfgaE2SdxAEOs5bWahZC6lGd1gIra9qsMk=
-Received: from CH2PR04CA0007.namprd04.prod.outlook.com (2603:10b6:610:52::17)
- by SJ1PR12MB6148.namprd12.prod.outlook.com (2603:10b6:a03:459::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.16; Thu, 14 Aug
- 2025 11:54:13 +0000
-Received: from CH1PEPF0000AD76.namprd04.prod.outlook.com
- (2603:10b6:610:52:cafe::22) by CH2PR04CA0007.outlook.office365.com
- (2603:10b6:610:52::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9031.17 via Frontend Transport; Thu,
- 14 Aug 2025 11:54:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000AD76.mail.protection.outlook.com (10.167.244.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9031.11 via Frontend Transport; Thu, 14 Aug 2025 11:54:12 +0000
-Received: from [10.236.30.53] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 14 Aug
- 2025 06:54:10 -0500
-Message-ID: <e32a48dc-a8f7-4770-9e2f-1f3721872a63@amd.com>
-Date: Thu, 14 Aug 2025 06:54:10 -0500
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OGzbRqeX"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55ce52ab898so1168613e87.3
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Aug 2025 08:28:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1755185306; x=1755790106; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CNZq1Plf7qYhg3FaQgA7s7d5l7vZ/mBnFNpSg0zUHLI=;
+        b=OGzbRqeXeyswGQ2LE41uMDBipfEQQyVVhiZhOuvUZJ+DWnae0PayBAbDqWjYgjdvbz
+         RoC0ntri0Jsk3JIeq7Zny5m+1qP50zUPkx1MM3SdDyKkKp5bnsyZAI9+YvCJPx/HpkEW
+         XAvHGd8S9hJgJICFd5JQtbZscx+f2YKN2Bm3JqS4M9qbuGWqNogalbsqjbkcgO/FWBZ8
+         t2M1vpFP0LmNopr/F86NsaQyNPp5nDVreMEt4JzedLnkXj5+FfD6VaMaERa8HBXivvIW
+         Z1hNLXbLlMwK6igIJJLF1YIpPHQm0b9ZWJQish+xTLR74GZ7Fj65FgjtuZD89v02H+xA
+         GyQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755185306; x=1755790106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CNZq1Plf7qYhg3FaQgA7s7d5l7vZ/mBnFNpSg0zUHLI=;
+        b=SCDV3SV+EQXjCVwGO3hk1YfE7gvbfjPFyyI0NS7DWMt+RSrDoBQU4PTaQS0Xm1SaK1
+         FLFXt/hx0snCYfxPKsrIAIf8TwGXvaUODO1U7AqvbTlMpCJ6WRAOFEsXf03YL95l25PI
+         qHtloKqQbk2Me+OuDRNTH9EF8Nd+zXuoBOleKe4G/BcrOn2R+B2vtNUk0q2edTn9xNJW
+         AL70NPnJzz+tpo0Q5i9hyZaJlqjqv50br//rb2KRdIgIowLSanR/jL6yzgtKmFAW7mIH
+         E+xn4rWaPOJc34tS/9kHvy89608iSLO0GB1SSw3rnsdAEoGJusIVkRNCMY9dZQxkoDhV
+         bDvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWrCT5VCVCKceYK5oh9JvUgi9venr5gERWlKfzkCzup9x8L9ufZnMHRi8JQLn9oSd7qtNufLBgXmP1D8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxUfMc0kF9WsE4uRjRUSIPP+pDrUfQEL38n+xIlRXDjL0DYBtz
+	UIKeSNdhvM+BC7tnkHtEjKYQIt0BoU+eBcRn+i8nInpm0fKOQj/FntQ5RQfLtWtM/l6brjK0uO4
+	p3DnGVqGqMtexmG8C+bHC/HambuTRBJnXbOuWBfHMpw==
+X-Gm-Gg: ASbGncv1LyjDTfxsflOPdAill78quGNGeMckgOuXDPXNWomxZ/aoU0ULZzJB2MaMROP
+	P5900+NdHClNwPBgQJKo9lVuRlyJiZ8ky20nEz4/e1R/vqSd31Qza9t/nNkl1BZpzNk2OtQHD/C
+	FwkEj1QPSm102/PwwjaH78hS0Qo++/EwHRU18VLviNE7/RPiu2cSFqIdErs5WEbOg0DRXDUV4Lb
+	mwFkFvNhItWkrY3piuGGn1PQQ==
+X-Google-Smtp-Source: AGHT+IHQ8F3iADMu1+UWrg73CrYiGwX8UpQYUYOvtGC+LP7TmJAAopR8WHzWm3NU2ztOeAgz1cMRk77sbhDWFguLt2c=
+X-Received: by 2002:ac2:4e16:0:b0:55b:8540:da24 with SMTP id
+ 2adb3069b0e04-55ce50133c8mr1226637e87.20.1755185305657; Thu, 14 Aug 2025
+ 08:28:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 7/7] KVM: SEV: Add SEV-SNP CipherTextHiding support
-From: Kim Phillips <kim.phillips@amd.com>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, <corbet@lwn.net>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-	<hpa@zytor.com>, <john.allen@amd.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <akpm@linux-foundation.org>, <rostedt@goodmis.org>,
-	<paulmck@kernel.org>
-CC: <nikunj@amd.com>, <Neeraj.Upadhyay@amd.com>, <aik@amd.com>,
-	<ardb@kernel.org>, <michael.roth@amd.com>, <arnd@arndb.de>,
-	<linux-doc@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-References: <cover.1752869333.git.ashish.kalra@amd.com>
- <44866a07107f2b43d99ab640680eec8a08e66ee1.1752869333.git.ashish.kalra@amd.com>
- <9132edc0-1bc2-440a-ac90-64ed13d3c30c@amd.com>
- <03068367-fb6e-4f97-9910-4cf7271eae15@amd.com>
- <b063801d-af60-461d-8112-2614ebb3ac26@amd.com>
- <29bff13f-5926-49bb-af54-d4966ff3be96@amd.com>
- <5a207fe7-9553-4458-b702-ab34b21861da@amd.com>
- <a6864a2c-b88f-4639-bf66-0b0cfbc5b20c@amd.com>
- <9b0f1a56-7b8f-45ce-9219-3489faedb06c@amd.com>
- <96022875-5a6f-4192-b1eb-40f389b4859f@amd.com>
- <5eed047b-c0c1-4e89-87e9-5105cfbb578e@amd.com>
- <506de534-d4dd-4dda-b537-77964aea01b9@amd.com>
- <47783816-ff18-4ae0-a1c8-b81df6d2f4ef@amd.com>
- <a747227c-c194-47c4-89be-ba509c0633e4@amd.com>
-Content-Language: en-US
-In-Reply-To: <a747227c-c194-47c4-89be-ba509c0633e4@amd.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD76:EE_|SJ1PR12MB6148:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99b99215-85d6-4286-5d30-08dddb294972
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q0Jlb1NlTVNMSEE5WEk2eG81M0VrSUY3dUx4ZC9nVEJucTJmNHdOZUNXY3ly?=
- =?utf-8?B?RCtHME5iQmRtbUNGSXd1ZGVuWVQycFJTY00xTCt0MEc0Z0JyaWwxcEtJMmZw?=
- =?utf-8?B?bjdxS2RUbm9PUmVSTWNCSTRJOEZtaTQ1THNoWTNYUUJ6WjRsdWNyZTNucWJa?=
- =?utf-8?B?dkMvVzk0OU04SHA5U0taZjBqazlpZ0NPdXVvdGZ2SmxYN1NIOU0zTmxyblN6?=
- =?utf-8?B?VHlIQ3pTWVlsMHc3THo1a1JoTG9wV29SazRyZ0txRERXWkNPazFXRk9vbVJG?=
- =?utf-8?B?anBGUVBRNUJ2QVIzb0kwZ0VwVXhoMDFPTzh4SzBxUnpuMGVVOEpXOG0ySTJQ?=
- =?utf-8?B?ZnNLVUl1bStEdlB4dE5EUkJVKzkzd25UaEJWaGRTUnVLbHlHMytycUlReUxX?=
- =?utf-8?B?bVRNZVd4WElDNHlPdlVjaUQ5UkhnUkZvb3pZZjNxZDVhTGhIWTV5Z1lQbXBo?=
- =?utf-8?B?dXhsWFNCa25NRWVFSnRNVW5LY2RYZ0tNN3J2eXQxaVR1c2pRa0JOZEMrMjhi?=
- =?utf-8?B?bisxZW1MMGk1OUpyMmM1VEwycllwd0lPSzRhcGc1c2FzYWo3Nll6cEdlNjdX?=
- =?utf-8?B?Z2hKTk13dExCSGZFaXZlV1dJdmg4Q1ZiTnNyQk5xMU5iRk1wWUlhak5OSVJi?=
- =?utf-8?B?c1piL2docmZsMGxyU2tMN3Bybytxc0lBeFpMUlZYMWUvZGhNeisydjNEQXdk?=
- =?utf-8?B?eERlUW13eEZCM1JPUDExaVYwbXpNL2dQdFI0bHFtV0tISllzVUk2c2ppOFg3?=
- =?utf-8?B?UE1mdlRRb1ZHTEpXZ0dNdGRkcW92NmY2M3hXR0Q1ZjlWdkpET2lBT2oyQkNL?=
- =?utf-8?B?aURwS2p2eGovMjlsRVNCcWIvVmpQSFNETU1Vc3U1ZzljakVyVUZCWXpkS0RS?=
- =?utf-8?B?YnhHNG0xNGFkcGhzU2ljTUVzRTlTV0c4RWJFNTlwME55VlozVWR2d3F4S1dW?=
- =?utf-8?B?bVJ5TFpKdjJpWE00UkZzZUwrQmRWby9qSEo0d0J1M2REWnBqck9oY2UvelRK?=
- =?utf-8?B?Uzc0UDhESU94Y3FqZk9kZnpBR2FzQnBjbjJaTUpOSFF6RjFHSXVPRnBySENL?=
- =?utf-8?B?UllyZ3ZXQWd2K1BiWDlhVUNDdUtoTTdqTUhGNUFBcHpJZHc4ZjlkUzVnbFBT?=
- =?utf-8?B?ZDFTQVJabm9SSlRrZ0x6ajZ6L2hRYUYzL0pvT20vcUpkZTF3S1R5WkVtNDB0?=
- =?utf-8?B?SERha2ZxL203Y2tYeFQ1dlVSOHVKUHgvcHdBMDdXRDZObHB5ZEc2ZGVyekNF?=
- =?utf-8?B?WFM2bDhwMUxRa0ZEcUI4cFp1dmMzeU45blhIUDNwTi9nYkY0N3pkcHVoeDla?=
- =?utf-8?B?bFhwU01yVXlFdDUraFBpcGJkbjJnQjluY2lYMk1vdG9ENjJVakZBR1hTdy94?=
- =?utf-8?B?cDlOTFdHL1cwV3dOL2tXWks3QWxqZFFnS3JkZDB0NldPWU84YnFNZjE1aWh5?=
- =?utf-8?B?c0hZaXFjc0ZpWEY2SXkvbHE2UUtKU25Bek9SajZaa1dPRjUya25kQzFvMDJs?=
- =?utf-8?B?RG5TdEYrUHc2bU5zVDFwbWhBeldpUTg0K3BGV3M4MzJ5bDlCb0VLNzRzYmZm?=
- =?utf-8?B?VG1oUTZLTXZ5UG0rQldsekhPajZobDd0ZDVseHNSSmN0V0lxUEtGcUUzYVdE?=
- =?utf-8?B?WENzSnQyQ1BHZDU0Q3JOWUxwY0l4cFlLamIzRTRZTEM1VFRzRnRtcTR6clpE?=
- =?utf-8?B?bkpyVUJlcXRpVHg2eSt4UWpEOXBKVEwvTFJUUmhibngxRS9tUGxHdHBOQ01E?=
- =?utf-8?B?UE5XS2x4R1ByY0JCTkpFT2Q5cHFaVHJlaC9Oeklma25VOUtOMHpOYWtFc2pm?=
- =?utf-8?B?cjVTWERNRnd5a2ZqTVZOMnV6ZEZicm80cjRwL1dMSHZvOGwzTDNuVTJvWVRD?=
- =?utf-8?B?bXlkUzVoR1UrSE9SeUlRM0pCYU04OGdKQkY2ZmxydVhTNW5CMHZHRW12WGNK?=
- =?utf-8?B?SW1ibjQ0VGlMcFl6N25ZZ3V6bmdibDJPMHVESkpuVlhQbTBWWWxsdDdPVVhh?=
- =?utf-8?B?U1BzclpHZUpOcUxWQm1Kc2owTWFGd1RKTDZZRjRISldNZzBqTyt6dnBTVmh2?=
- =?utf-8?B?ZkZCUFYwVFQyZUNrTG1hWW5kaFRYd0VONmlMQT09?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2025 11:54:12.8293
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99b99215-85d6-4286-5d30-08dddb294972
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD76.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6148
+References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
+ <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
+In-Reply-To: <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Thu, 14 Aug 2025 16:28:13 +0100
+X-Gm-Features: Ac12FXx9I9MrbtuwHaesyssft3AApB1lCQVaDorKwBHz1btfjTXbPnGjfwlVOBI
+Message-ID: <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com>
+Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
+ and RSA parsing
+To: Marco Elver <elver@google.com>, Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com
+Cc: glider@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
+	davidgow@google.com, dvyukov@google.com, jannh@google.com, rmoar@google.com, 
+	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/12/25 6:30 PM, Kim Phillips wrote:
-> On 8/12/25 2:38 PM, Kalra, Ashish wrote:
->> On 8/12/2025 2:11 PM, Kim Phillips wrote:
->>> On 8/12/25 1:52 PM, Kalra, Ashish wrote:
->>>> On 8/12/2025 1:40 PM, Kim Phillips wrote:
->>>>>>> It's not as immediately obvious that it needs to (0 < x < 
->>>>>>> minimum SEV ASID 100).
->>>>>>> OTOH, if the user inputs "ciphertext_hiding_asids=0x1", they now 
->>>>>>> see:
->>>>>>>
->>>>>>>         kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 
->>>>>>> 99 < minimum SEV ASID 100)
->>>>>>>
->>>>>>> which - unlike the original v7 code - shows the user that the 
->>>>>>> '0x1' was not interpreted as a number at all: thus the 99 in the 
->>>>>>> latter condition.
->>>>>> This is incorrect, as 0 < 99 < minimum SEV ASID 100 is a valid 
->>>>>> condition!
->>>>> Precisely, meaning it's the '0x' in '0x1' that's the "invalid" part.
->>>>>> And how can user input of 0x1, result in max_snp_asid == 99 ?
->>>>> It doesn't, again, the 0x is the invalid part.
->>>>>
->>>>>> This is the issue with combining the checks and emitting a 
->>>>>> combined error message:
->>>>>>
->>>>>> Here, kstroint(0x1) fails with -EINVAL and so, max_snp_asid 
->>>>>> remains set to 99 and then the combined error conveys a wrong 
->>>>>> information :
->>>>>> !(0 < 99 < minimum SEV ASID 100)
->>>>> It's not, it says it's *OR* that condition.
->>>> To me this is wrong as
->>>> !(0 < 99 < minimum SEV ASID 100) is simply not a correct statement!
->>> The diff I provided emits exactly this:
->>>
->>> kvm_amd: invalid ciphertext_hiding_asids "0x1" or !(0 < 99 < minimum 
->>> SEV ASID 100)
->>>
->>>
->>> which means *EITHER*:
->>>
->>> invalid ciphertext_hiding_asids "0x1"
->>>
->>> *OR*
->>>
->>> !(0 < 99 < minimum SEV ASID 100)
->>>
->>> but since the latter is 'true', the user is pointed to the former
->>> "0x1" as being the interpretation problem.
->>>
->>> Would adding the word "Either" help?:
->>>
->>> kvm_amd: Either invalid ciphertext_hiding_asids "0x1", or !(0 < 99 < 
->>> minimum SEV ASID 100)
->>>
->>> ?
->> No, i simply won't put an invalid expression out there:
->>
->> !(0 < 99 < minimum SEV ASID 100)
+On Wed, Aug 13, 2025 at 7:14=E2=80=AFPM Marco Elver <elver@google.com> wrot=
+e:
 >
-> When not quoted out of context, it's not an invalid expression (in the 
-> 99 case) because it's preceded with the word "or:"
+> [+Cc crypto maintainers]
 >
-> ..., or !(0 < 99 < minimum SEV ASID 100)
+> On Wed, 13 Aug 2025 at 15:38, Ethan Graham <ethan.w.s.graham@gmail.com> w=
+rote:
+> >
+> > From: Ethan Graham <ethangraham@google.com>
 >
->>> If not, feel free to separate them: the code is still much cleaner.
->> Separating the checks will make the code not very different from the 
->> original function, so i am going to keep the original code.
+> Should also Cc crypto maintainers, as they'll be the ones giving
+
+Thanks Marco!
+
+> feedback on how interesting this is to them. Use
+> ./scripts/get_maintainer.pl for that in the next round, and either add
+> the Cc list below your Signed-off-by so that git send-email picks it
+> up only for this patch, or just for the whole series (normally
+> preferred, so maintainers get context of the full series).
 >
-> Take a look at the example diff below, then.  It's still less, simpler 
-> code because it eliminates:
->
-> 1. the unnecessary ciphertext_hiding_asid_nr variable
->
-> 2. the redundant isdigit(ciphertext_hiding_asids[0])) check
-> and 3. the 'invalid_parameter:' label referenced by only one goto 
-> statement. 
+> > Add KFuzzTest targets for pkcs7_parse_message, rsa_parse_pub_key, and
+> > rsa_parse_priv_key to serve as real-world examples of how the framework=
+ is used.
+> >
+> > These functions are ideal candidates for KFuzzTest as they perform comp=
+lex
+> > parsing of user-controlled data but are not directly exposed at the sys=
+call
+> > boundary. This makes them difficult to exercise with traditional fuzzin=
+g tools
+> > and showcases the primary strength of the KFuzzTest framework: providin=
+g an
+> > interface to fuzz internal, non-exported kernel functions.
+> >
+> > The targets are defined directly within the source files of the functio=
+ns they
+> > test, demonstrating how to colocate fuzz tests with the code under test=
+.
+> >
+> > Signed-off-by: Ethan Graham <ethangraham@google.com>
+> > ---
+> >  crypto/asymmetric_keys/pkcs7_parser.c | 15 ++++++++++++++
+> >  crypto/rsa_helper.c                   | 29 +++++++++++++++++++++++++++
+> >  2 files changed, 44 insertions(+)
+> >
+> > diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_=
+keys/pkcs7_parser.c
+> > index 423d13c47545..e8477f8b0eaf 100644
+> > --- a/crypto/asymmetric_keys/pkcs7_parser.c
+> > +++ b/crypto/asymmetric_keys/pkcs7_parser.c
+> > @@ -13,6 +13,7 @@
+> >  #include <linux/err.h>
+> >  #include <linux/oid_registry.h>
+> >  #include <crypto/public_key.h>
+> > +#include <linux/kfuzztest.h>
+> >  #include "pkcs7_parser.h"
+> >  #include "pkcs7.asn1.h"
+> >
+> > @@ -169,6 +170,20 @@ struct pkcs7_message *pkcs7_parse_message(const vo=
+id *data, size_t datalen)
+> >  }
+> >  EXPORT_SYMBOL_GPL(pkcs7_parse_message);
+> >
+> > +struct pkcs7_parse_message_arg {
+> > +       const void *data;
+> > +       size_t datalen;
+> > +};
+> > +
+> > +FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
 
-Re-posting, since I believe the previous email's diff got mangled:
+Not sure if it has been mentioned elsewhere, but one thing I already
+don't like about it is that these definitions "pollute" the actual
+source files. Might not be such a big deal here, but kernel source
+files for core subsystems tend to become quite large and complex
+already, so not a great idea to make them even larger and harder to
+follow with fuzz definitions.
 
-  arch/x86/kvm/svm/sev.c | 44 ++++++++++++++++++++------------------------
-  1 file changed, 20 insertions(+), 24 deletions(-)
+As far as I'm aware, for the same reason KUnit [1] is not that popular
+(or at least less popular than other approaches, like selftests [2]).
+Is it possible to make it that these definitions live in separate
+files or even closer to selftests?
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7ac0f0f25e68..1b9702500c73 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2970,8 +2970,6 @@ static bool is_sev_snp_initialized(void)
+Ignat
 
-  static bool check_and_enable_sev_snp_ciphertext_hiding(void)
-  {
--       unsigned int ciphertext_hiding_asid_nr = 0;
--
-         if (!ciphertext_hiding_asids[0])
-                 return false;
+> > +{
+> > +       KFUZZTEST_EXPECT_NOT_NULL(pkcs7_parse_message_arg, data);
+> > +       KFUZZTEST_ANNOTATE_LEN(pkcs7_parse_message_arg, datalen, data);
+> > +       KFUZZTEST_EXPECT_LE(pkcs7_parse_message_arg, datalen, 16 * PAGE=
+_SIZE);
+> > +
+> > +       pkcs7_parse_message(arg->data, arg->datalen);
+> > +}
+> > +
+> >  /**
+> >   * pkcs7_get_content_data - Get access to the PKCS#7 content
+> >   * @pkcs7: The preparsed PKCS#7 message to access
+> > diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
+> > index 94266f29049c..79b7ddc7c48d 100644
+> > --- a/crypto/rsa_helper.c
+> > +++ b/crypto/rsa_helper.c
+> > @@ -9,6 +9,7 @@
+> >  #include <linux/export.h>
+> >  #include <linux/err.h>
+> >  #include <linux/fips.h>
+> > +#include <linux/kfuzztest.h>
+> >  #include <crypto/internal/rsa.h>
+> >  #include "rsapubkey.asn1.h"
+> >  #include "rsaprivkey.asn1.h"
+> > @@ -166,6 +167,20 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, con=
+st void *key,
+> >  }
+> >  EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
+> >
+> > +struct rsa_parse_pub_key_arg {
+> > +       const void *key;
+> > +       size_t key_len;
+> > +};
+> > +
+> > +FUZZ_TEST(test_rsa_parse_pub_key, struct rsa_parse_pub_key_arg)
+> > +{
+> > +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_pub_key_arg, key);
+> > +       KFUZZTEST_EXPECT_LE(rsa_parse_pub_key_arg, key_len, 16 * PAGE_S=
+IZE);
+> > +
+> > +       struct rsa_key out;
+> > +       rsa_parse_pub_key(&out, arg->key, arg->key_len);
+> > +}
+> > +
+> >  /**
+> >   * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in=
+ the
+> >   *                        provided struct rsa_key, pointers to the raw=
+ key
+> > @@ -184,3 +199,17 @@ int rsa_parse_priv_key(struct rsa_key *rsa_key, co=
+nst void *key,
+> >         return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_=
+len);
+> >  }
+> >  EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
+> > +
+> > +struct rsa_parse_priv_key_arg {
+> > +       const void *key;
+> > +       size_t key_len;
+> > +};
+> > +
+> > +FUZZ_TEST(test_rsa_parse_priv_key, struct rsa_parse_priv_key_arg)
+> > +{
+> > +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_priv_key_arg, key);
+> > +       KFUZZTEST_EXPECT_LE(rsa_parse_priv_key_arg, key_len, 16 * PAGE_=
+SIZE);
+> > +
+> > +       struct rsa_key out;
+> > +       rsa_parse_priv_key(&out, arg->key, arg->key_len);
+> > +}
+> > --
+> > 2.51.0.rc0.205.g4a044479a3-goog
+> >
 
-@@ -2980,32 +2978,28 @@ static bool 
-check_and_enable_sev_snp_ciphertext_hiding(void)
-                 return false;
-         }
-
--       if (isdigit(ciphertext_hiding_asids[0])) {
--               if (kstrtoint(ciphertext_hiding_asids, 10, 
-&ciphertext_hiding_asid_nr))
--                       goto invalid_parameter;
--
--               /* Do sanity check on user-defined 
-ciphertext_hiding_asids */
--               if (ciphertext_hiding_asid_nr >= min_sev_asid) {
--                       pr_warn("Module parameter 
-ciphertext_hiding_asids (%u) exceeds or equals minimum SEV ASID (%u)\n",
--                               ciphertext_hiding_asid_nr, min_sev_asid);
--                       return false;
--               }
--       } else if (!strcmp(ciphertext_hiding_asids, "max")) {
--               ciphertext_hiding_asid_nr = min_sev_asid - 1;
-+       if (!strcmp(ciphertext_hiding_asids, "max")) {
-+               max_snp_asid = min_sev_asid - 1;
-+               min_sev_es_asid = max_snp_asid + 1;
-+               return true;
-         }
-
--       if (ciphertext_hiding_asid_nr) {
--               max_snp_asid = ciphertext_hiding_asid_nr;
--               min_sev_es_asid = max_snp_asid + 1;
--               pr_info("SEV-SNP ciphertext hiding enabled\n");
-+       if (kstrtoint(ciphertext_hiding_asids, 10, &max_snp_asid)) {
-+               pr_warn("ciphertext_hiding_asids \"%s\" is not an 
-integer or 'max'\n", ciphertext_hiding_asids);
-+               return false;
-+       }
-
--               return true;
-+       /* Do sanity check on user-defined ciphertext_hiding_asids */
-+       if (max_snp_asid < 1 || max_snp_asid >= min_sev_asid) {
-+               pr_warn("!(0 < ciphertext_hiding_asids %u < minimum SEV 
-ASID %u)\n",
-+                       max_snp_asid, min_sev_asid);
-+               max_snp_asid = min_sev_asid - 1;
-+               return false;
-         }
-
--invalid_parameter:
--       pr_warn("Module parameter ciphertext_hiding_asids (%s) invalid\n",
--               ciphertext_hiding_asids);
--       return false;
-+       min_sev_es_asid = max_snp_asid + 1;
-+
-+       return true;
-  }
-
-  void __init sev_hardware_setup(void)
-@@ -3122,8 +3116,10 @@ void __init sev_hardware_setup(void)
-                  * ASID range into separate SEV-ES and SEV-SNP ASID 
-ranges with
-                  * the SEV-SNP ASID starting at 1.
-                  */
--               if (check_and_enable_sev_snp_ciphertext_hiding())
-+               if (check_and_enable_sev_snp_ciphertext_hiding()) {
-+                       pr_info("SEV-SNP ciphertext hiding enabled\n");
-                         init_args.max_snp_asid = max_snp_asid;
-+               }
-                 if (sev_platform_init(&init_args))
-                         sev_supported = sev_es_supported = 
-sev_snp_supported = false;
-                 else if (sev_snp_supported)
-
+[1]: https://docs.kernel.org/dev-tools/kunit/index.html
+[2]: https://docs.kernel.org/dev-tools/kselftest.html
