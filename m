@@ -1,242 +1,397 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8E215062
-	for <linux-crypto@vger.kernel.org>; Thu, 14 Aug 2025 15:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557CE244662;
+	Thu, 14 Aug 2025 20:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755185309; cv=none; b=MVvbWE1qrKJ9MbNJCYJd9o0ZOSaq0jRkyWJmoJxR5eBCG02V6Mzsh+/0MPNjxwAIB15QlMmIxZ4uR/8s/lAQ1gSQVfCE33UNPOQphQAStp3N02bUNQjCDAEQgn1BE8vu59lFcCTHKXmr1KCEm3irT1sGPA0nm9V0RIINyjGlIow=
+	t=1755205114; cv=none; b=fsxSA9kBe44cU3xNmmAhORG04cPTvCkJ4qMFYOOTdlTZbelOwY+zzmhCpJLvIydzcv/s+LmOvFdP5bhGZY+4D/So6UB8tADVxXjoYav+ODowG8d5oRS7M1ZX5uzqsJtFA4F67g8ufdqKBnk4vnGGeYySVYV3FO8o8ZL8eftScKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755185309; c=relaxed/simple;
-	bh=9rAIQ4jp40wbs/EmvOWCpMFpnbWDf9zKOV8Ck/+NJDE=;
+	s=arc-20240116; t=1755205114; c=relaxed/simple;
+	bh=k1OBbRSMU8xXelrytHGhkT8sGA1CqLRuo1xDC/AdDtY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CP8K9Jtc4syUwsCF8mYb/quRv5b6e2W6KogwSsBWFA44NqR3UkK8gGOxqKOMyiOqYa4jQhxY300K/LEmRH8CiYh2EQQTD33jbjDGg0IF6zklc0/dMapKd4FS/BolSqt29mRabQhEC4cnniL84fLP/Qc+3Sa6qfecM0zLFbKcjyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OGzbRqeX; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	 To:Cc:Content-Type; b=hHkBadSyLCmzA96mFoY/aiknaoxC0lu88b1as1Ed3pxw+02oweD6OkOpSWAPMO/ZWcP30bz8WPlqfBmUdQwSyYgm06sCCuHixs1kHiWGzDqptAeBlIfS2w2XiI+0SDnAaRnB1O9/uv3QCAMbLLZLStsYiuo+fpInBdhaPozCmXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dgGQKZgZ; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OGzbRqeX"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55ce52ab898so1168613e87.3
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Aug 2025 08:28:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgGQKZgZ"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e57003ee3fso6680655ab.2;
+        Thu, 14 Aug 2025 13:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1755185306; x=1755790106; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755205111; x=1755809911; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CNZq1Plf7qYhg3FaQgA7s7d5l7vZ/mBnFNpSg0zUHLI=;
-        b=OGzbRqeXeyswGQ2LE41uMDBipfEQQyVVhiZhOuvUZJ+DWnae0PayBAbDqWjYgjdvbz
-         RoC0ntri0Jsk3JIeq7Zny5m+1qP50zUPkx1MM3SdDyKkKp5bnsyZAI9+YvCJPx/HpkEW
-         XAvHGd8S9hJgJICFd5JQtbZscx+f2YKN2Bm3JqS4M9qbuGWqNogalbsqjbkcgO/FWBZ8
-         t2M1vpFP0LmNopr/F86NsaQyNPp5nDVreMEt4JzedLnkXj5+FfD6VaMaERa8HBXivvIW
-         Z1hNLXbLlMwK6igIJJLF1YIpPHQm0b9ZWJQish+xTLR74GZ7Fj65FgjtuZD89v02H+xA
-         GyQw==
+        bh=B/DvcecNfaCyZ/2dBsbFRg7Z15sklMK4MZS2CFAwCmU=;
+        b=dgGQKZgZUpqEUtk7GgjfU3i0u6eVXY7iigFZ2tkknZ9hGZVpFQ4GAtyz/Ppu8Vgf9h
+         YUgRARdmiWgUnoQ54ULWPZLCqWmE4CVTBcwjVrFu+06im0RwKhEAMiSBjAsxRVLHxFe3
+         UmclwTU5SctTDiwmOgB/wOunNUO1BCd3E2bhkL60W9UtXO11S/L2smhMWsSNJwYSk9Pz
+         jf2C/HHkaV3wTXY+XPSuFnmHeo6M/z8j3Fhh11FVSXGE9mlYXxW11vtwLOs0PoXvAkBG
+         Kcdp7l8/QqAW5f0CvEQyq1FCEJ6sxc0nFgkaDLL28CA2lPqG9eWMePHh8Vdj0i6O9IvY
+         /xag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755185306; x=1755790106;
+        d=1e100.net; s=20230601; t=1755205111; x=1755809911;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CNZq1Plf7qYhg3FaQgA7s7d5l7vZ/mBnFNpSg0zUHLI=;
-        b=SCDV3SV+EQXjCVwGO3hk1YfE7gvbfjPFyyI0NS7DWMt+RSrDoBQU4PTaQS0Xm1SaK1
-         FLFXt/hx0snCYfxPKsrIAIf8TwGXvaUODO1U7AqvbTlMpCJ6WRAOFEsXf03YL95l25PI
-         qHtloKqQbk2Me+OuDRNTH9EF8Nd+zXuoBOleKe4G/BcrOn2R+B2vtNUk0q2edTn9xNJW
-         AL70NPnJzz+tpo0Q5i9hyZaJlqjqv50br//rb2KRdIgIowLSanR/jL6yzgtKmFAW7mIH
-         E+xn4rWaPOJc34tS/9kHvy89608iSLO0GB1SSw3rnsdAEoGJusIVkRNCMY9dZQxkoDhV
-         bDvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWrCT5VCVCKceYK5oh9JvUgi9venr5gERWlKfzkCzup9x8L9ufZnMHRi8JQLn9oSd7qtNufLBgXmP1D8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxUfMc0kF9WsE4uRjRUSIPP+pDrUfQEL38n+xIlRXDjL0DYBtz
-	UIKeSNdhvM+BC7tnkHtEjKYQIt0BoU+eBcRn+i8nInpm0fKOQj/FntQ5RQfLtWtM/l6brjK0uO4
-	p3DnGVqGqMtexmG8C+bHC/HambuTRBJnXbOuWBfHMpw==
-X-Gm-Gg: ASbGncv1LyjDTfxsflOPdAill78quGNGeMckgOuXDPXNWomxZ/aoU0ULZzJB2MaMROP
-	P5900+NdHClNwPBgQJKo9lVuRlyJiZ8ky20nEz4/e1R/vqSd31Qza9t/nNkl1BZpzNk2OtQHD/C
-	FwkEj1QPSm102/PwwjaH78hS0Qo++/EwHRU18VLviNE7/RPiu2cSFqIdErs5WEbOg0DRXDUV4Lb
-	mwFkFvNhItWkrY3piuGGn1PQQ==
-X-Google-Smtp-Source: AGHT+IHQ8F3iADMu1+UWrg73CrYiGwX8UpQYUYOvtGC+LP7TmJAAopR8WHzWm3NU2ztOeAgz1cMRk77sbhDWFguLt2c=
-X-Received: by 2002:ac2:4e16:0:b0:55b:8540:da24 with SMTP id
- 2adb3069b0e04-55ce50133c8mr1226637e87.20.1755185305657; Thu, 14 Aug 2025
- 08:28:25 -0700 (PDT)
+        bh=B/DvcecNfaCyZ/2dBsbFRg7Z15sklMK4MZS2CFAwCmU=;
+        b=JoWm/LEiJlMzo1bnyNUK1UwHTDE76J1k9kO7E83vkZZW37oHtRADLtAI2QquYYJSgj
+         iYXF+L42uVtI/743Qk/j/LajQVF4+yirmzyylIxP7Q038BsALHCoK6wxlqN9zhnKWOUs
+         duGM+Be1JEYqlmWuYNNEj3K5w1eAq0NY/LaQ+cQKQLy804Q4+ynrcZXMDrVfxCFjCvG+
+         HOhMcvTFqStNKviA77BXbng7+9t9uK+ViQiT7huXw6hjebDiKZnWTPglCfDe2kvcb9U0
+         WG26sYcF0ZFgFzvz+it8TWhlM4OOwpxHh9rh4cEZQ2MhG2Z0xELrkBjvj6It7EIyQArt
+         71yA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDGDU/C6LnFJRaLZLZNoAn4t5AjcqRd0t0uaZ6YeB/gtPOo/edk7e4DzpBdLbCqimJQYQ2A9m6cUWRHE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz4NpYtxt6NBRyySduqYnbcpINUAcN57lvsTRMTcm0Bana0Sqz
+	xejzTi+0yaA2TojUuVydFKh4UvSldyJbGHE97NkV6AeZDQWL7heNAboe2ZBeJlrLtvTGphBUD6j
+	ZLlsuIH6mYBZyNRd+mpZJiBAcJx/llV0=
+X-Gm-Gg: ASbGnctWpLD9Tr4bYPjjQCuEaNkh8hfTwnvWUw4FmMyn5nUHCuzs/px2qOHeCHlginO
+	rFMOizq6kqwW6/RDsFb7OYLu7hYq+PPwZn3NMFIz/lU5BcmE6FtkkX1MRxq1wQZO8d8qY8SFSFD
+	ERCqCbFCo6YE/oyK96GSC1XqyNIBacku2ECioMsaD83mclt6PpMq1FplBPKbVZewVX3J4iVa69+
+	k15XIIGLMeJc8HFfzSKJ6Q=
+X-Google-Smtp-Source: AGHT+IFgFZhJs9UqzM/o4QK5/KKQVO4RuxrGKNaiXRMHhQRYN59D+ji06hiSpUfPH25P/9nSatfEHqOb68pCzsUmkQA=
+X-Received: by 2002:a05:6e02:278a:b0:3e5:3a15:93b6 with SMTP id
+ e9e14a558f8ab-3e57b9d0151mr10609915ab.8.1755205111077; Thu, 14 Aug 2025
+ 13:58:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
- <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
-In-Reply-To: <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Thu, 14 Aug 2025 16:28:13 +0100
-X-Gm-Features: Ac12FXx9I9MrbtuwHaesyssft3AApB1lCQVaDorKwBHz1btfjTXbPnGjfwlVOBI
-Message-ID: <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com>
-Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
-To: Marco Elver <elver@google.com>, Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com
-Cc: glider@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
-	davidgow@google.com, dvyukov@google.com, jannh@google.com, rmoar@google.com, 
-	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
+References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com> <20250801043642.8103-23-kanchana.p.sridhar@intel.com>
+In-Reply-To: <20250801043642.8103-23-kanchana.p.sridhar@intel.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Thu, 14 Aug 2025 13:58:19 -0700
+X-Gm-Features: Ac12FXyONKGeDobAX5KFBeSfqGfnUrGztv8b4uIaiXScw_41fTc1M5FIYAMcooo
+Message-ID: <CAKEwX=PV9-QhQaSBGd67s=CVMVJne=fzajRn3=Vf+7OXVuNFmA@mail.gmail.com>
+Subject: Re: [PATCH v11 22/24] mm: zswap: Allocate pool batching resources if
+ the compressor supports batching.
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
+	yosry.ahmed@linux.dev, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
+	ryan.roberts@arm.com, 21cnbao@gmail.com, ying.huang@linux.alibaba.com, 
+	akpm@linux-foundation.org, senozhatsky@chromium.org, 
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org, 
+	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com, 
+	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 13, 2025 at 7:14=E2=80=AFPM Marco Elver <elver@google.com> wrot=
-e:
+On Thu, Jul 31, 2025 at 9:36=E2=80=AFPM Kanchana P Sridhar
+<kanchana.p.sridhar@intel.com> wrote:
 >
-> [+Cc crypto maintainers]
+> This patch sets up zswap for allocating per-CPU resources optimally for
+> non-batching and batching compressors.
 >
-> On Wed, 13 Aug 2025 at 15:38, Ethan Graham <ethan.w.s.graham@gmail.com> w=
-rote:
-> >
-> > From: Ethan Graham <ethangraham@google.com>
+> A new ZSWAP_MAX_BATCH_SIZE constant is defined as 8U, to set an upper
+> limit on the number of pages in large folios that will be batch
+> compressed.
 >
-> Should also Cc crypto maintainers, as they'll be the ones giving
+> As per Herbert's comments in [2] in response to the
+> crypto_acomp_batch_compress() and crypto_acomp_batch_decompress() API
+> proposed in [1], this series does not create new crypto_acomp batching
+> API. Instead, zswap compression batching uses the existing
+> crypto_acomp_compress() API in combination with the "void *kernel_data"
+> member added to "struct acomp_req" earlier in this series.
+>
+> It is up to the compressor to manage multiple requests, as needed, to
+> accomplish batch parallelism. zswap only needs to allocate the per-CPU
+> dst buffers according to the batch size supported by the compressor.
+>
+> A "u8 compr_batch_size" member is added to "struct zswap_pool", as per
+> Yosry's suggestion. pool->compr_batch_size is set as the minimum of the
+> compressor's max batch-size and ZSWAP_MAX_BATCH_SIZE. Accordingly, it
+> proceeds to allocate the necessary compression dst buffers in the
+> per-CPU acomp_ctx.
+>
+> Another "u8 batch_size" member is added to "struct zswap_pool" to store
+> the unit for batching large folio stores: for batching compressors, this
+> is the pool->compr_batch_size. For non-batching compressors, this is
+> ZSWAP_MAX_BATCH_SIZE.
+>
+> zswap does not use more than one dst buffer yet. Follow-up patches will
+> actually utilize the multiple acomp_ctx buffers for batch
+> compression/decompression of multiple pages.
+>
+> Thus, ZSWAP_MAX_BATCH_SIZE limits the amount of extra memory used for
+> batching. There is a small extra memory overhead of allocating
+> the acomp_ctx->buffers array for compressors that do not support
+> batching: On x86_64, the overhead is 1 pointer per-CPU (i.e. 8 bytes).
+>
+> [1]: https://patchwork.kernel.org/project/linux-mm/patch/20250508194134.2=
+8392-11-kanchana.p.sridhar@intel.com/
+> [2]: https://patchwork.kernel.org/comment/26382610
+>
+> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 
-Thanks Marco!
+Mostly LGTM. Just a couple of questions below:
 
-> feedback on how interesting this is to them. Use
-> ./scripts/get_maintainer.pl for that in the next round, and either add
-> the Cc list below your Signed-off-by so that git send-email picks it
-> up only for this patch, or just for the whole series (normally
-> preferred, so maintainers get context of the full series).
+> ---
+>  mm/zswap.c | 82 +++++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 63 insertions(+), 19 deletions(-)
 >
-> > Add KFuzzTest targets for pkcs7_parse_message, rsa_parse_pub_key, and
-> > rsa_parse_priv_key to serve as real-world examples of how the framework=
- is used.
-> >
-> > These functions are ideal candidates for KFuzzTest as they perform comp=
-lex
-> > parsing of user-controlled data but are not directly exposed at the sys=
-call
-> > boundary. This makes them difficult to exercise with traditional fuzzin=
-g tools
-> > and showcases the primary strength of the KFuzzTest framework: providin=
-g an
-> > interface to fuzz internal, non-exported kernel functions.
-> >
-> > The targets are defined directly within the source files of the functio=
-ns they
-> > test, demonstrating how to colocate fuzz tests with the code under test=
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index efd501a7fe294..63a997b999537 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -80,6 +80,9 @@ static bool zswap_pool_reached_full;
+>
+>  #define ZSWAP_PARAM_UNSET ""
+>
+> +/* Limit the batch size to limit per-CPU memory usage for dst buffers. *=
+/
+> +#define ZSWAP_MAX_BATCH_SIZE 8U
+> +
+>  static int zswap_setup(void);
+>
+>  /* Enable/disable zswap */
+> @@ -147,7 +150,7 @@ struct crypto_acomp_ctx {
+>         struct crypto_acomp *acomp;
+>         struct acomp_req *req;
+>         struct crypto_wait wait;
+> -       u8 *buffer;
+> +       u8 **buffers;
+>         struct mutex mutex;
+>         bool is_sleepable;
+>  };
+> @@ -166,6 +169,8 @@ struct zswap_pool {
+>         struct work_struct release_work;
+>         struct hlist_node node;
+>         char tfm_name[CRYPTO_MAX_ALG_NAME];
+> +       u8 compr_batch_size;
+> +       u8 batch_size;
+
+Apologies if this is explained elsewhere, but I'm very confused - why
+do we need both of these two fields?
+
+Seems like batch_size is defined below, and never changed:
+
+      pool->batch_size =3D (pool->compr_batch_size > 1) ?
+                            pool->compr_batch_size : ZSWAP_MAX_BATCH_SIZE;
+
+Can we just determine this in zswap_store() as a local variable?
+
+
+>  };
+>
+>  /* Global LRU lists shared by all zswap pools. */
+> @@ -258,8 +263,10 @@ static void __zswap_pool_empty(struct percpu_ref *re=
+f);
+>   *   zswap_cpu_comp_prepare(), not others.
+>   * - Cleanup acomp_ctx resources on all cores in zswap_pool_destroy().
+>   */
+> -static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx)
+> +static void acomp_ctx_dealloc(struct crypto_acomp_ctx *acomp_ctx, u8 nr_=
+buffers)
+>  {
+> +       u8 i;
+> +
+>         if (IS_ERR_OR_NULL(acomp_ctx))
+>                 return;
+>
+> @@ -269,7 +276,11 @@ static void acomp_ctx_dealloc(struct crypto_acomp_ct=
+x *acomp_ctx)
+>         if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+>                 crypto_free_acomp(acomp_ctx->acomp);
+>
+> -       kfree(acomp_ctx->buffer);
+> +       if (acomp_ctx->buffers) {
+> +               for (i =3D 0; i < nr_buffers; ++i)
+> +                       kfree(acomp_ctx->buffers[i]);
+> +               kfree(acomp_ctx->buffers);
+> +       }
+>  }
+>
+>  static struct zswap_pool *zswap_pool_create(char *type, char *compressor=
+)
+> @@ -290,6 +301,7 @@ static struct zswap_pool *zswap_pool_create(char *typ=
+e, char *compressor)
+>                         return NULL;
+>         }
+>
+> +       /* Many things rely on the zero-initialization. */
+>         pool =3D kzalloc(sizeof(*pool), GFP_KERNEL);
+>         if (!pool)
+>                 return NULL;
+> @@ -352,13 +364,28 @@ static struct zswap_pool *zswap_pool_create(char *t=
+ype, char *compressor)
+>                 goto ref_fail;
+>         INIT_LIST_HEAD(&pool->list);
+>
+> +       /*
+> +        * Set the unit of compress batching for large folios, for quick
+> +        * retrieval in the zswap_compress() fast path:
+> +        * If the compressor is sequential (@pool->compr_batch_size is 1)=
+,
+> +        * large folios will be compressed in batches of ZSWAP_MAX_BATCH_=
+SIZE
+> +        * pages, where each page in the batch is compressed sequentially=
 .
-> >
-> > Signed-off-by: Ethan Graham <ethangraham@google.com>
-> > ---
-> >  crypto/asymmetric_keys/pkcs7_parser.c | 15 ++++++++++++++
-> >  crypto/rsa_helper.c                   | 29 +++++++++++++++++++++++++++
-> >  2 files changed, 44 insertions(+)
-> >
-> > diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_=
-keys/pkcs7_parser.c
-> > index 423d13c47545..e8477f8b0eaf 100644
-> > --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> > +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> > @@ -13,6 +13,7 @@
-> >  #include <linux/err.h>
-> >  #include <linux/oid_registry.h>
-> >  #include <crypto/public_key.h>
-> > +#include <linux/kfuzztest.h>
-> >  #include "pkcs7_parser.h"
-> >  #include "pkcs7.asn1.h"
-> >
-> > @@ -169,6 +170,20 @@ struct pkcs7_message *pkcs7_parse_message(const vo=
-id *data, size_t datalen)
-> >  }
-> >  EXPORT_SYMBOL_GPL(pkcs7_parse_message);
-> >
-> > +struct pkcs7_parse_message_arg {
-> > +       const void *data;
-> > +       size_t datalen;
-> > +};
-> > +
-> > +FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
+> +        * We see better performance by processing the folio in batches o=
+f
+> +        * ZSWAP_MAX_BATCH_SIZE, due to cache locality of working set
+> +        * structures.
+> +        */
+> +       pool->batch_size =3D (pool->compr_batch_size > 1) ?
+> +                               pool->compr_batch_size : ZSWAP_MAX_BATCH_=
+SIZE;
+> +
+>         zswap_pool_debug("created", pool);
+>
+>         return pool;
+>
+>  ref_fail:
+>         for_each_possible_cpu(cpu)
+> -               acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
+> +               acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu),
+> +                                 pool->compr_batch_size);
+> +
+>  error:
+>         if (pool->acomp_ctx)
+>                 free_percpu(pool->acomp_ctx);
+> @@ -417,7 +444,8 @@ static void zswap_pool_destroy(struct zswap_pool *poo=
+l)
+>         zswap_pool_debug("destroying", pool);
+>
+>         for_each_possible_cpu(cpu)
+> -               acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu));
+> +               acomp_ctx_dealloc(per_cpu_ptr(pool->acomp_ctx, cpu),
+> +                                 pool->compr_batch_size);
+>
+>         free_percpu(pool->acomp_ctx);
+>
+> @@ -876,6 +904,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, s=
+truct hlist_node *node)
+>         struct zswap_pool *pool =3D hlist_entry(node, struct zswap_pool, =
+node);
+>         struct crypto_acomp_ctx *acomp_ctx =3D per_cpu_ptr(pool->acomp_ct=
+x, cpu);
+>         int ret =3D -ENOMEM;
+> +       u8 i;
+>
+>         /*
+>          * The per-CPU pool->acomp_ctx is zero-initialized on allocation.
+> @@ -888,10 +917,6 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, =
+struct hlist_node *node)
+>         if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+>                 return 0;
+>
+> -       acomp_ctx->buffer =3D kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu=
+_to_node(cpu));
+> -       if (!acomp_ctx->buffer)
+> -               return ret;
+> -
+>         acomp_ctx->acomp =3D crypto_alloc_acomp_node(pool->tfm_name, 0, 0=
+, cpu_to_node(cpu));
+>         if (IS_ERR_OR_NULL(acomp_ctx->acomp)) {
+>                 pr_err("could not alloc crypto acomp %s : %ld\n",
+> @@ -904,17 +929,36 @@ static int zswap_cpu_comp_prepare(unsigned int cpu,=
+ struct hlist_node *node)
+>         acomp_ctx->req =3D acomp_request_alloc(acomp_ctx->acomp);
+>         if (IS_ERR_OR_NULL(acomp_ctx->req)) {
+>                 pr_err("could not alloc crypto acomp_request %s\n",
+> -                      pool->tfm_name);
+> +                       pool->tfm_name);
 
-Not sure if it has been mentioned elsewhere, but one thing I already
-don't like about it is that these definitions "pollute" the actual
-source files. Might not be such a big deal here, but kernel source
-files for core subsystems tend to become quite large and complex
-already, so not a great idea to make them even larger and harder to
-follow with fuzz definitions.
+Is this intentional? :)
 
-As far as I'm aware, for the same reason KUnit [1] is not that popular
-(or at least less popular than other approaches, like selftests [2]).
-Is it possible to make it that these definitions live in separate
-files or even closer to selftests?
-
-Ignat
-
-> > +{
-> > +       KFUZZTEST_EXPECT_NOT_NULL(pkcs7_parse_message_arg, data);
-> > +       KFUZZTEST_ANNOTATE_LEN(pkcs7_parse_message_arg, datalen, data);
-> > +       KFUZZTEST_EXPECT_LE(pkcs7_parse_message_arg, datalen, 16 * PAGE=
-_SIZE);
-> > +
-> > +       pkcs7_parse_message(arg->data, arg->datalen);
-> > +}
-> > +
-> >  /**
-> >   * pkcs7_get_content_data - Get access to the PKCS#7 content
-> >   * @pkcs7: The preparsed PKCS#7 message to access
-> > diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-> > index 94266f29049c..79b7ddc7c48d 100644
-> > --- a/crypto/rsa_helper.c
-> > +++ b/crypto/rsa_helper.c
-> > @@ -9,6 +9,7 @@
-> >  #include <linux/export.h>
-> >  #include <linux/err.h>
-> >  #include <linux/fips.h>
-> > +#include <linux/kfuzztest.h>
-> >  #include <crypto/internal/rsa.h>
-> >  #include "rsapubkey.asn1.h"
-> >  #include "rsaprivkey.asn1.h"
-> > @@ -166,6 +167,20 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, con=
-st void *key,
-> >  }
-> >  EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
-> >
-> > +struct rsa_parse_pub_key_arg {
-> > +       const void *key;
-> > +       size_t key_len;
-> > +};
-> > +
-> > +FUZZ_TEST(test_rsa_parse_pub_key, struct rsa_parse_pub_key_arg)
-> > +{
-> > +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_pub_key_arg, key);
-> > +       KFUZZTEST_EXPECT_LE(rsa_parse_pub_key_arg, key_len, 16 * PAGE_S=
-IZE);
-> > +
-> > +       struct rsa_key out;
-> > +       rsa_parse_pub_key(&out, arg->key, arg->key_len);
-> > +}
-> > +
-> >  /**
-> >   * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in=
- the
-> >   *                        provided struct rsa_key, pointers to the raw=
- key
-> > @@ -184,3 +199,17 @@ int rsa_parse_priv_key(struct rsa_key *rsa_key, co=
-nst void *key,
-> >         return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_=
-len);
-> >  }
-> >  EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
-> > +
-> > +struct rsa_parse_priv_key_arg {
-> > +       const void *key;
-> > +       size_t key_len;
-> > +};
-> > +
-> > +FUZZ_TEST(test_rsa_parse_priv_key, struct rsa_parse_priv_key_arg)
-> > +{
-> > +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_priv_key_arg, key);
-> > +       KFUZZTEST_EXPECT_LE(rsa_parse_priv_key_arg, key_len, 16 * PAGE_=
-SIZE);
-> > +
-> > +       struct rsa_key out;
-> > +       rsa_parse_priv_key(&out, arg->key, arg->key_len);
-> > +}
-> > --
-> > 2.51.0.rc0.205.g4a044479a3-goog
-> >
-
-[1]: https://docs.kernel.org/dev-tools/kunit/index.html
-[2]: https://docs.kernel.org/dev-tools/kselftest.html
+>                 goto fail;
+>         }
+>
+> -       crypto_init_wait(&acomp_ctx->wait);
+> +       /*
+> +        * Allocate up to ZSWAP_MAX_BATCH_SIZE dst buffers if the
+> +        * compressor supports batching.
+> +        */
+> +       pool->compr_batch_size =3D min(ZSWAP_MAX_BATCH_SIZE,
+> +                                    crypto_acomp_batch_size(acomp_ctx->a=
+comp));
+> +
+> +       acomp_ctx->buffers =3D kcalloc_node(pool->compr_batch_size, sizeo=
+f(u8 *),
+> +                                         GFP_KERNEL, cpu_to_node(cpu));
+> +       if (!acomp_ctx->buffers)
+> +               goto fail;
+> +
+> +       for (i =3D 0; i < pool->compr_batch_size; ++i) {
+> +               acomp_ctx->buffers[i] =3D kmalloc_node(PAGE_SIZE * 2, GFP=
+_KERNEL,
+> +                                                    cpu_to_node(cpu));
+> +               if (!acomp_ctx->buffers[i])
+> +                       goto fail;
+> +       }
+>
+>         /*
+>          * if the backend of acomp is async zip, crypto_req_done() will w=
+akeup
+>          * crypto_wait_req(); if the backend of acomp is scomp, the callb=
+ack
+>          * won't be called, crypto_wait_req() will return without blockin=
+g.
+>          */
+> +       crypto_init_wait(&acomp_ctx->wait);
+> +
+>         acomp_request_set_callback(acomp_ctx->req, CRYPTO_TFM_REQ_MAY_BAC=
+KLOG,
+>                                    crypto_req_done, &acomp_ctx->wait);
+>
+> @@ -922,7 +966,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, s=
+truct hlist_node *node)
+>         return 0;
+>
+>  fail:
+> -       acomp_ctx_dealloc(acomp_ctx);
+> +       acomp_ctx_dealloc(acomp_ctx, pool->compr_batch_size);
+>         return ret;
+>  }
+>
+> @@ -942,7 +986,7 @@ static bool zswap_compress(struct page *page, struct =
+zswap_entry *entry,
+>
+>         mutex_lock(&acomp_ctx->mutex);
+>
+> -       dst =3D acomp_ctx->buffer;
+> +       dst =3D acomp_ctx->buffers[0];
+>         sg_init_table(&input, 1);
+>         sg_set_page(&input, page, PAGE_SIZE, 0);
+>
+> @@ -1003,19 +1047,19 @@ static bool zswap_decompress(struct zswap_entry *=
+entry, struct folio *folio)
+>
+>         acomp_ctx =3D raw_cpu_ptr(entry->pool->acomp_ctx);
+>         mutex_lock(&acomp_ctx->mutex);
+> -       obj =3D zpool_obj_read_begin(zpool, entry->handle, acomp_ctx->buf=
+fer);
+> +       obj =3D zpool_obj_read_begin(zpool, entry->handle, acomp_ctx->buf=
+fers[0]);
+>
+>         /*
+>          * zpool_obj_read_begin() might return a kmap address of highmem =
+when
+> -        * acomp_ctx->buffer is not used.  However, sg_init_one() does no=
+t
+> -        * handle highmem addresses, so copy the object to acomp_ctx->buf=
+fer.
+> +        * acomp_ctx->buffers[0] is not used.  However, sg_init_one() doe=
+s not
+> +        * handle highmem addresses, so copy the object to acomp_ctx->buf=
+fers[0].
+>          */
+>         if (virt_addr_valid(obj)) {
+>                 src =3D obj;
+>         } else {
+> -               WARN_ON_ONCE(obj =3D=3D acomp_ctx->buffer);
+> -               memcpy(acomp_ctx->buffer, obj, entry->length);
+> -               src =3D acomp_ctx->buffer;
+> +               WARN_ON_ONCE(obj =3D=3D acomp_ctx->buffers[0]);
+> +               memcpy(acomp_ctx->buffers[0], obj, entry->length);
+> +               src =3D acomp_ctx->buffers[0];
+>         }
+>
+>         sg_init_one(&input, src, entry->length);
+> --
+> 2.27.0
+>
