@@ -1,91 +1,117 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6637210E3;
-	Fri, 15 Aug 2025 05:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31183019CF
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Aug 2025 13:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755235756; cv=none; b=Y+AGgnPsRVcCqI4dE6sXH1rhr/8agWIqY0F4OUVr+GGKAqQi0xC5R/T9cUCQ9gEXgFx9M5ihw03cjNezBDYQH+YbwmrJj1dg08FRxSlcbQ0XddgQiimc1+0xLGLz/FOk4yYc6nnTCQ18a+06BgLJe5aZmvgTVaAcUYb/sUaD2+Q=
+	t=1755262852; cv=none; b=mBNytiWmXKZc/cUuaKQAjw5mHYhiqEA1oe9xJgJ+IjS/1EAf8a6MqZrvUhTC0pHI4ztoJ5ihzx6ZnqtVYZZGKzTVyijOwk29L1Dn4mEEVE3byH67yNlBMiPtSBzWvQFajJeGUUu/VPEcjcU4tnRe5y/jFKK2Jpo1zz0GekUpyZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755235756; c=relaxed/simple;
-	bh=/XAYOv4onJR62PLBFNvd8hre+c7yJYiQS/IDb5Nx+J4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oMYZDaUTDrt1Yhg0lFb7jtHKqMMOR97pJLynsedYDLO+t6ZE6G0fN8hfaD+DwtpRiAtYHMmVK1nmQWG1c239xlJRJeIFUYQck8tuwIMEXSMUr8CkZEIbqMYtFTUkiepnDNFS/mjB0kcDwgBRpFlt7LoD6Xsf/OXHQPEBQaGmv/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=g4qYgRzm; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1755262852; c=relaxed/simple;
+	bh=x9Yq5jrTzPbpV71DQp/TR2V6uI5f2sCjN5+3E/ZJ8KI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HEVF+jcn/A6U+XfZVNDvJWfUUJUWwzh4gmjLFDnVt9q+3f0FW7VEZaTjyY3HC9P/egLRwsd7jvT8rrleg0Bv/FLRu0Cnwan4uOXgYVWBMEHqEzj6Ut+UDG/8FptkZAjxmIi3FNt/sHAM9za+p3w8aVWaxqvWjFV70gBVj5z6n6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ZKhBZYzU; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="g4qYgRzm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=KolVN+Kf+xjXZURWyuqMGoPAKUXu62zPPtuevoWeXKo=; b=g4qYgRzmEMeOBNMTs2dTafhchU
-	zcaAwE8qDO3V7gNpW9AV1hB34p2tr8XGtw9HhFuD4R0eYHKnVIAqKNwx5oGARv300JgHLDogSkrFh
-	vEJ09EJm8Hd6SmpMk6NLUr+YCaEtPpDxgo8w/jODnDgUQGjPdNcmf2geGRXHaTPSjZGM9MPZo6oXg
-	FVzs8tbagZh/JFxeENUzlhKqAvXnNwNFIfPCQuq4nXXAfzPPJPXOiSMnOXjzkjNJi8VsGeiAqHapl
-	k9nU2Jh5+0lrMCLcjixa0HKMEWg1h0eXK+a3Fkn0f8LquW9bG17qqsWYylQX/IIvNHAkc2TG9XoZE
-	u3GQBFSA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ummkJ-00ETYr-1X;
-	Fri, 15 Aug 2025 13:28:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Aug 2025 13:28:51 +0800
-Date: Fri, 15 Aug 2025 13:28:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
-	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev,
-	usamaarif642@gmail.com, ryan.roberts@arm.com, 21cnbao@gmail.com,
-	ying.huang@linux.alibaba.com, akpm@linux-foundation.org,
-	senozhatsky@chromium.org, linux-crypto@vger.kernel.org,
-	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org,
-	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com,
-	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com,
-	vinodh.gopal@intel.com
-Subject: Re: [PATCH v11 18/24] crypto: acomp - Add crypto_acomp_batch_size()
- to get an algorithm's batch-size.
-Message-ID: <aJ7Fk6RpNc815Ivd@gondor.apana.org.au>
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
- <20250801043642.8103-19-kanchana.p.sridhar@intel.com>
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ZKhBZYzU"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-55ce52ab898so2264329e87.3
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Aug 2025 06:00:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1755262849; x=1755867649; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M5aKJ6EuhxrNInhVNv1lAb8m/GnY8B+pF9rLGMgta08=;
+        b=ZKhBZYzU8cv61f1f36n0BFanIeal+DPFqIbffjOOjmW+d4z8Pr51LY4zAzCuL76Zsp
+         T+PpN1vt0JFd4gJwjJqemhSYr4d708J3GOKFcbQk2D1Nc+ESUrjIQE5q2GNlrycU4+je
+         dfrDHGDtZeUc893U263PYLn0TvsKfuzZlRJhmNEHvdZ8Fp/HXFF0xxltQEa9hT8HvRUo
+         NAJI51XmYno2ITvVuTnInyFkR3T8tOHzecCiXtMvPJe4TrIJBxqa63qtPItfjL4OfAuS
+         85NmKrQk6DROcX5n0qeWlQ3Akf0vUO2AGZNQYEJR0SidLBT9s8vQYyjhBvdfSKmUtQ7T
+         aw2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755262849; x=1755867649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M5aKJ6EuhxrNInhVNv1lAb8m/GnY8B+pF9rLGMgta08=;
+        b=AMQOBhI/OPzUJjVQgGzpaUOZ029v78G6wv/5xhdMvn+a8Bp2XkoXE7rzvwnVpG46XJ
+         sas8BsxkEGVnR1ZmayTd2earHd9t9LNAKim8fnfWeFN7BkdWTwqDyz/c6QpgLvfnjnWJ
+         Bp1ILaPb2/YoTbslqKeP8A6z9sVt2QfNhEOXrZCOAiWGW+r+h7qoATDcZ0CLThSmvGti
+         kJyZHkmqqsbRmIKgq/WKgffWeMMdAt4uSyJ9qrS/PJb1vzG1DNf0b0qctIBBW02zODhb
+         O3aPr2yUWnOPwRBRlk9gvvAL4bQ6Uzm99IQSp3OEYvX3BXCM0fDTRtOxLTwQvPFoVtt1
+         w0sg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLX1O0xZi+koLSAoY/vKgtXDqDDD3eZNMQnOvoe4B5YtI9dcYPmq2h9QlTAwlqMlVKBcx0MzfZfsB6AiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYEH7WN+885cSZQpSbp689WGtJahca3yilNk7hQk7vqHfYwdIX
+	uNNLsL623jtXYwwM+03Z3GTRj9ZZetcOQGhSIK8KIMlO9cCKT8xKn/0Q2V51LzK/OigzugAWwYf
+	dGlXJ5v2YCPLqyi6MnEcpvYXW8cyagN/5jrtvklk3vA==
+X-Gm-Gg: ASbGncugelB+6GdxS+t3cM15IDno8WnAAsZrhw+z1UANNMnKEi3VlTQZ1YjVQ47Fpt8
+	0W4zHlXGANcbFay5HmXb6lvxd/ok9Wi6L6XJgyVgl2SbSX6VTBr8fxU7IdPCeDCTucbwvNRMZdh
+	/yBCcpt9ehvZvfhyBC+sFD0JW1V5lGIdFVgxAbFw8uGTft+5mxtP5XctE/Q1Bfaj5+CpAmKqKEP
+	gAceZB6pZsu4EMmRMOHF4cZQQ==
+X-Google-Smtp-Source: AGHT+IFNKOB1rrD+w7VKvQTDOwyeOYLz2abWlq0iGeI3es8w5nvcHLIOmT4MUBEah/yIuNYyhBR1ZRVJ1G+8nKdddYc=
+X-Received: by 2002:a05:6512:3c81:b0:55b:8e2e:8cc9 with SMTP id
+ 2adb3069b0e04-55ceeb2d2c4mr585014e87.33.1755262848871; Fri, 15 Aug 2025
+ 06:00:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801043642.8103-19-kanchana.p.sridhar@intel.com>
+References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
+ <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
+ <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com> <20250815011744.GB1302@sol>
+In-Reply-To: <20250815011744.GB1302@sol>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Fri, 15 Aug 2025 14:00:37 +0100
+X-Gm-Features: Ac12FXxJSZN0OfDcjS8s6OFmiOlXF2SG0blAOcgASCk44-lWBGEmHN2xDuaUJKY
+Message-ID: <CALrw=nHcpDNwOV6ROGsXq8TtaPNGC4kGf_5YDTfVs2U1+wjRhg@mail.gmail.com>
+Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
+ and RSA parsing
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Marco Elver <elver@google.com>, Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com, 
+	glider@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
+	davidgow@google.com, dvyukov@google.com, jannh@google.com, rmoar@google.com, 
+	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 31, 2025 at 09:36:36PM -0700, Kanchana P Sridhar wrote:
+On Fri, Aug 15, 2025 at 2:18=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 >
-> diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-> index ffffd88bbbad3..2325ee18e7a10 100644
-> --- a/include/crypto/internal/acompress.h
-> +++ b/include/crypto/internal/acompress.h
-> @@ -28,6 +28,8 @@
->   *
->   * @compress:	Function performs a compress operation
->   * @decompress:	Function performs a de-compress operation
-> + * @get_batch_size:	Maximum batch-size for batching compress/decompress
-> + *			operations.
->   * @init:	Initialize the cryptographic transformation object.
->   *		This function is used to initialize the cryptographic
->   *		transformation object. This function is called only once at
-> @@ -46,6 +48,7 @@
->  struct acomp_alg {
->  	int (*compress)(struct acomp_req *req);
->  	int (*decompress)(struct acomp_req *req);
-> +	unsigned int (*get_batch_size)(void);
+> On Thu, Aug 14, 2025 at 04:28:13PM +0100, Ignat Korchagin wrote:
+> > Not sure if it has been mentioned elsewhere, but one thing I already
+> > don't like about it is that these definitions "pollute" the actual
+> > source files. Might not be such a big deal here, but kernel source
+> > files for core subsystems tend to become quite large and complex
+> > already, so not a great idea to make them even larger and harder to
+> > follow with fuzz definitions.
+> >
+> > As far as I'm aware, for the same reason KUnit [1] is not that popular
+> > (or at least less popular than other approaches, like selftests [2]).
+> > Is it possible to make it that these definitions live in separate
+> > files or even closer to selftests?
+>
+> That's not the impression I get.  KUnit suites are normally defined in
+> separate files, and KUnit seems to be increasing in popularity.
 
-I can't imagine a situation where this needs to be dynamic.
-Please just make it a static value rather than a callback function.
+Great! Either I was wrong from the start or it changed and I haven't
+looked there recently.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> KFuzzTest can use separate files too, it looks like?
+>
+> Would it make any sense for fuzz tests to be a special type of KUnit
+> test, instead of a separate framework?
+
+I think so, if possible. There is always some hurdles adopting new
+framework, but if it would be a new feature of an existing one (either
+KUnit or selftests - whatever fits better semantically), the existing
+users of that framework are more likely to pick it up.
+
+> - Eric
