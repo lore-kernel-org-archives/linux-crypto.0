@@ -1,117 +1,89 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31183019CF
-	for <linux-crypto@vger.kernel.org>; Fri, 15 Aug 2025 13:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0339B2E5D2A;
+	Fri, 15 Aug 2025 16:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755262852; cv=none; b=mBNytiWmXKZc/cUuaKQAjw5mHYhiqEA1oe9xJgJ+IjS/1EAf8a6MqZrvUhTC0pHI4ztoJ5ihzx6ZnqtVYZZGKzTVyijOwk29L1Dn4mEEVE3byH67yNlBMiPtSBzWvQFajJeGUUu/VPEcjcU4tnRe5y/jFKK2Jpo1zz0GekUpyZU=
+	t=1755276523; cv=none; b=PBEPiJTkwhvoTw80PaAK0D6mI1P7uiAl/W+TSbHnQCap1mMam3SABgw/UBZhATPPOycd7CrT3jnoZ+ekuYzlip8yJcc5BimFDH3IRxQzcE/W1UcRfeaSSyVcTBK5bPj24i/93OOdTr6V5958hNfiGr2EU2TtUyTs1h8/oWwSXKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755262852; c=relaxed/simple;
-	bh=x9Yq5jrTzPbpV71DQp/TR2V6uI5f2sCjN5+3E/ZJ8KI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HEVF+jcn/A6U+XfZVNDvJWfUUJUWwzh4gmjLFDnVt9q+3f0FW7VEZaTjyY3HC9P/egLRwsd7jvT8rrleg0Bv/FLRu0Cnwan4uOXgYVWBMEHqEzj6Ut+UDG/8FptkZAjxmIi3FNt/sHAM9za+p3w8aVWaxqvWjFV70gBVj5z6n6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ZKhBZYzU; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ZKhBZYzU"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-55ce52ab898so2264329e87.3
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Aug 2025 06:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1755262849; x=1755867649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M5aKJ6EuhxrNInhVNv1lAb8m/GnY8B+pF9rLGMgta08=;
-        b=ZKhBZYzU8cv61f1f36n0BFanIeal+DPFqIbffjOOjmW+d4z8Pr51LY4zAzCuL76Zsp
-         T+PpN1vt0JFd4gJwjJqemhSYr4d708J3GOKFcbQk2D1Nc+ESUrjIQE5q2GNlrycU4+je
-         dfrDHGDtZeUc893U263PYLn0TvsKfuzZlRJhmNEHvdZ8Fp/HXFF0xxltQEa9hT8HvRUo
-         NAJI51XmYno2ITvVuTnInyFkR3T8tOHzecCiXtMvPJe4TrIJBxqa63qtPItfjL4OfAuS
-         85NmKrQk6DROcX5n0qeWlQ3Akf0vUO2AGZNQYEJR0SidLBT9s8vQYyjhBvdfSKmUtQ7T
-         aw2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755262849; x=1755867649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M5aKJ6EuhxrNInhVNv1lAb8m/GnY8B+pF9rLGMgta08=;
-        b=AMQOBhI/OPzUJjVQgGzpaUOZ029v78G6wv/5xhdMvn+a8Bp2XkoXE7rzvwnVpG46XJ
-         sas8BsxkEGVnR1ZmayTd2earHd9t9LNAKim8fnfWeFN7BkdWTwqDyz/c6QpgLvfnjnWJ
-         Bp1ILaPb2/YoTbslqKeP8A6z9sVt2QfNhEOXrZCOAiWGW+r+h7qoATDcZ0CLThSmvGti
-         kJyZHkmqqsbRmIKgq/WKgffWeMMdAt4uSyJ9qrS/PJb1vzG1DNf0b0qctIBBW02zODhb
-         O3aPr2yUWnOPwRBRlk9gvvAL4bQ6Uzm99IQSp3OEYvX3BXCM0fDTRtOxLTwQvPFoVtt1
-         w0sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWLX1O0xZi+koLSAoY/vKgtXDqDDD3eZNMQnOvoe4B5YtI9dcYPmq2h9QlTAwlqMlVKBcx0MzfZfsB6AiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYEH7WN+885cSZQpSbp689WGtJahca3yilNk7hQk7vqHfYwdIX
-	uNNLsL623jtXYwwM+03Z3GTRj9ZZetcOQGhSIK8KIMlO9cCKT8xKn/0Q2V51LzK/OigzugAWwYf
-	dGlXJ5v2YCPLqyi6MnEcpvYXW8cyagN/5jrtvklk3vA==
-X-Gm-Gg: ASbGncugelB+6GdxS+t3cM15IDno8WnAAsZrhw+z1UANNMnKEi3VlTQZ1YjVQ47Fpt8
-	0W4zHlXGANcbFay5HmXb6lvxd/ok9Wi6L6XJgyVgl2SbSX6VTBr8fxU7IdPCeDCTucbwvNRMZdh
-	/yBCcpt9ehvZvfhyBC+sFD0JW1V5lGIdFVgxAbFw8uGTft+5mxtP5XctE/Q1Bfaj5+CpAmKqKEP
-	gAceZB6pZsu4EMmRMOHF4cZQQ==
-X-Google-Smtp-Source: AGHT+IFNKOB1rrD+w7VKvQTDOwyeOYLz2abWlq0iGeI3es8w5nvcHLIOmT4MUBEah/yIuNYyhBR1ZRVJ1G+8nKdddYc=
-X-Received: by 2002:a05:6512:3c81:b0:55b:8e2e:8cc9 with SMTP id
- 2adb3069b0e04-55ceeb2d2c4mr585014e87.33.1755262848871; Fri, 15 Aug 2025
- 06:00:48 -0700 (PDT)
+	s=arc-20240116; t=1755276523; c=relaxed/simple;
+	bh=Jx25eL5AwH+8t2BvKxysBZMJgaSoE/lJB5CQzo6yEgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DgOCmIp4ImkUc7TQHUl9U2jg8ntPVKVZbf4/f2ubGF0uVMHKKsciBv8iAieMBhiIb7ByFvWU5bdCeoin9rgs5mh3rlSOl835ufG9aecQXFpZXa3GqN3PyUWvMqHslLWGCiKxXiXEG0I1VYRbIzJMQjyMKTmGBpCUcUjelztRfR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [100.72.154.47] (unknown [185.109.152.19])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4D35B60213AC6;
+	Fri, 15 Aug 2025 18:48:05 +0200 (CEST)
+Message-ID: <f65c230b-7d90-482f-b3c6-592aa7b6d0a2@molgen.mpg.de>
+Date: Fri, 15 Aug 2025 18:48:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
- <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
- <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com> <20250815011744.GB1302@sol>
-In-Reply-To: <20250815011744.GB1302@sol>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Fri, 15 Aug 2025 14:00:37 +0100
-X-Gm-Features: Ac12FXxJSZN0OfDcjS8s6OFmiOlXF2SG0blAOcgASCk44-lWBGEmHN2xDuaUJKY
-Message-ID: <CALrw=nHcpDNwOV6ROGsXq8TtaPNGC4kGf_5YDTfVs2U1+wjRhg@mail.gmail.com>
-Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] integrity: Select CRYPTO from
+ INTEGRITY_ASYMMETRIC_KEYS
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Marco Elver <elver@google.com>, Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com, 
-	glider@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
-	davidgow@google.com, dvyukov@google.com, jannh@google.com, rmoar@google.com, 
-	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: linux-integrity@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>,
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+ Eric Snowberg <eric.snowberg@oracle.com>, linux-crypto@vger.kernel.org
+References: <20250815021733.25689-1-ebiggers@kernel.org>
+ <20250815021733.25689-2-ebiggers@kernel.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250815021733.25689-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 15, 2025 at 2:18=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> On Thu, Aug 14, 2025 at 04:28:13PM +0100, Ignat Korchagin wrote:
-> > Not sure if it has been mentioned elsewhere, but one thing I already
-> > don't like about it is that these definitions "pollute" the actual
-> > source files. Might not be such a big deal here, but kernel source
-> > files for core subsystems tend to become quite large and complex
-> > already, so not a great idea to make them even larger and harder to
-> > follow with fuzz definitions.
-> >
-> > As far as I'm aware, for the same reason KUnit [1] is not that popular
-> > (or at least less popular than other approaches, like selftests [2]).
-> > Is it possible to make it that these definitions live in separate
-> > files or even closer to selftests?
->
-> That's not the impression I get.  KUnit suites are normally defined in
-> separate files, and KUnit seems to be increasing in popularity.
+Dear Eric,
 
-Great! Either I was wrong from the start or it changed and I haven't
-looked there recently.
 
-> KFuzzTest can use separate files too, it looks like?
->
-> Would it make any sense for fuzz tests to be a special type of KUnit
-> test, instead of a separate framework?
+Thank you for your patch.
 
-I think so, if possible. There is always some hurdles adopting new
-framework, but if it would be a new feature of an existing one (either
-KUnit or selftests - whatever fits better semantically), the existing
-users of that framework are more likely to pick it up.
+Am 15.08.25 um 04:17 schrieb Eric Biggers:
+> Select CRYPTO from INTEGRITY_ASYMMETRIC_KEYS, since
+> INTEGRITY_ASYMMETRIC_KEYS selects several options that depend on CRYPTO.
+> 
+> This unblocks the removal of the CRYPTO selection from SIGNATURE.
+> SIGNATURE (lib/digsig.c) itself will no longer need CRYPTO, but
+> INTEGRITY_ASYMMETRIC_KEYS was depending on it indirectly via the chain
+> SIGNATURE => INTEGRITY_SIGNATURE => INTEGRITY_ASYMMETRIC_KEYS.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>   security/integrity/Kconfig | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+> index 3c45f4f3455fb..916d4f2bfc441 100644
+> --- a/security/integrity/Kconfig
+> +++ b/security/integrity/Kconfig
+> @@ -34,10 +34,11 @@ config INTEGRITY_ASYMMETRIC_KEYS
+>   	bool "Enable asymmetric keys support"
+>   	depends on INTEGRITY_SIGNATURE
+>   	default n
+>   	select ASYMMETRIC_KEY_TYPE
+>   	select ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+> +	select CRYPTO
+>   	select CRYPTO_RSA
+>   	select X509_CERTIFICATE_PARSER
+>   	help
+>   	  This option enables digital signature verification using
+>   	  asymmetric keys.
 
-> - Eric
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
