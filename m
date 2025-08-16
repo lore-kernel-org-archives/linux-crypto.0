@@ -1,61 +1,71 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F0313C8E8;
-	Sat, 16 Aug 2025 14:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B596638F9C;
+	Sat, 16 Aug 2025 16:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755354679; cv=none; b=evLZUvsPC02uCHDdM9oJI7S6CwPzOhjz5K1RFFlIc6iWsliESXcray7kvo2zQE3sMVU+qntlaFyu8noAQ1L/Bl7jjh95XoT+gFrOLzU57mQ4D4tX/yOJ5Oiy0KZEayqmdhcDGTpjju+KOQLdpNuKnrhMVv2wFWeaklZzM0yyQFY=
+	t=1755361836; cv=none; b=FHOK6oEo1UYcXZ684x9g35cDLALF5FhcQiO83ukDIDE5SntxFrrx7eUNCrB3vjsSb7Fi6acPgw0c5cSz35nF3qdeDY8Sx1CTjHTyYWhiaGP+lLIxI2fBwI+8l4UpqbQqjphNmO3B2eOzTHKXGjaFhKNpIH67A0j4Fy3nCRzSwuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755354679; c=relaxed/simple;
-	bh=HhguPHUJKvVYAfS+9cBX+7KbT3KNe62nChxhs2XLHqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WAR9pSqeFe8VLjTF8EqmvzT2E837JyKVRQWmUYlCWiNwq2ac/vADyev7xgoPCFYm8GUU2FrKm/JK5sitYj4CMX6WB24/XSAGj61B3vYxGAATHha/FfATW11GAzdW2pCiiLKh2NCo1x9P7E1yyWVuXarJ/8VK+v0FQjfJv8ZOXXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
+	s=arc-20240116; t=1755361836; c=relaxed/simple;
+	bh=hndPGv2wdnGaAp+U8k81L2oZ/U9gw0TgClsOE/aLPCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uqCdPMf9iXS2PoTyVu/fTFGMlGvVLdj8KZkzux/yF67cob3+DbHiUz2F5HsYFT1gvhmXZwwtrSGmhTr7Cbu6l4cvoJl2nw5vKgaWepxJR0uXFgrfBdQJTv3jbnKzBuY64mgveWbnPZ51EyATlfbdbV2k7TY6Dexixpy1/UBJplw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTE9ObEk; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3234f8df749so27040a91.1;
-        Sat, 16 Aug 2025 07:31:17 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTE9ObEk"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-32326e09f58so3251971a91.2;
+        Sat, 16 Aug 2025 09:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755361834; x=1755966634; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfDPs/ifotx8nej6O4Kf3zetz5WIEYRWWHBMLRI1GI8=;
+        b=aTE9ObEkRvMtGeboRAAjnpJLESSwo4x+vVw/uqHO1xN1vXWcCNY/VxJkyc8MJnBme4
+         8XWMM5R8DsyW7LyiUv5dEl2WGl5JMr+rZsBI3YN0x+tWeErvdQS+wzm6WWLKTh/OC113
+         iWiarPizP4RxMomJtrYORZTBQFy1QGxUt8QfYXbyDaws9Ys7JH6nuo70rqumvRLaMpLo
+         7GcycoVLDb3PJH2xCEsXX6TrnTd8BfK7pRlLevEUW56TUDuLcTTlNMqVfX0izyBpUVUC
+         Rtj7Q1igOf/PBpSSNnrdIGzRrmpYPOLVzV7MndAZf07jlOw5JCIGREk2ntEfOskauw8C
+         ItcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755354677; x=1755959477;
+        d=1e100.net; s=20230601; t=1755361834; x=1755966634;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fbXVKmwTmBle6WieiA86XD5ok5iCzQaoBjx5FPM18ck=;
-        b=oDPTPKORPkhEUXRihvam7fNywuZVcfVDrHxW7Pmoinc9euFgm1c49bk9muZyxfX0MT
-         qRO42AJ81rT59qOQFdyKqszCpbNKU7gXM8hSDwFA4qu/6Q2b+Iij/oKbw4g9S0J9a/8X
-         2sebwI44Q3DN4owcepicq/RX/bslMNmk1/sVJ0MMJwriViJuKvnropIXZSfoXVagSA77
-         hssOqhRPydHO+lsDCZ5fIQWXW5+C4EbvHrRKk2ulKBVtTQNZP/ob4s8PrNxcubhLiuUr
-         e3RQDQcYKcw374+QopnthK2TFlDPwsoSgrNWGhIQNm11gLSdGiDUh4Aivo7Ln5wB1UiM
-         1nKg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgB/NoyYfAkeUInS2mfJJkG4wFMUc3ajkz1aL/fMWeGYUjVruSRCX/7Upe8FnpRBzWKO0m1GaYaF9GLYs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNJ4tEhPPdM0EQZ8rb7xcKDzmDnk+s147OUceOcBO6eZFFs9bM
-	yxJ3/dgaKiS3sU8sQpff4uahrYx7nL/kw++oaOUAmi/3AqkQv8G/rNzi
-X-Gm-Gg: ASbGncunX3ZhA99xpc4XBCJRPsErpazPeEjr/r4dGq3+amchceqbYQirjoT1S4mkoro
-	pzpxOh7jkDmWiwGcJL0mEFo86gihT8tJpDYdKxmAPMzvGhtQMCZZssXTGMrH1Yz+JL4iP2SlnV/
-	3GrFiomFR3sYFf0g6NmVwf7SYFgTU3gGMWfhFysGWE6kaLeuRJLXzPFVRA+njwyxmnpkNEKhjD2
-	kRG6Dh9vDLQawUZMZBD4I2hrbbDGox9euSZQMm7YyNQ5v3eXL3eXhdAVTrPMmgLzVjtohMhDiPj
-	lfOIudejw8hZiSRSlKAzasQkXvbwW+Ei3nD57Dc/PnGNofsc6o38Np9RkE7azZFr9IOmIQPkuQd
-	oZlxGZ3Y5sUX3
-X-Google-Smtp-Source: AGHT+IG45Q4pGe721l1Jsgta++LAwyguEs1Lmoh/PbZ/rv/gnomUeuiTX6XE1tVsV8m9R25Ztin6jA==
-X-Received: by 2002:a17:90b:4c42:b0:31f:28ae:870f with SMTP id 98e67ed59e1d1-32342107d32mr3875895a91.8.1755354676809;
-        Sat, 16 Aug 2025 07:31:16 -0700 (PDT)
-Received: from localhost ([218.152.98.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32331124b2fsm6597977a91.16.2025.08.16.07.31.14
+        bh=YfDPs/ifotx8nej6O4Kf3zetz5WIEYRWWHBMLRI1GI8=;
+        b=W5CJzgC/hKFbQsOOejKSXT+XvcLY1dF1Et/ZOqzv3V6ld4Kel8rAEQJT4vqWyFMy7+
+         Fq8OaHOncJEYj2nG2R6AGBjN47Lc8BwPX/xioQax606BoKZdrZvWRZniOzmV69QOvFBd
+         cAN66UlyV9mkHUZc7qcYqIU0VzLlwa6RZXDZ+LnWZMTGS/gwee30f5x4SDBbc3tLK+Am
+         vya6kmFOE9ITgjI8bDPTcoyDsdRyrPibwiiKjvw0RgiQ1y9xGb/LhX01Nec8F8YsRN0k
+         4hdrZLESSXL8P2uBZYzqa0nSpKlUD69SeL77bzvg1FGYaqQl2oG/3op9w7z06tZiR6np
+         2ooQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW39WggErK4ltA8AktJWPJvfNykic2ULUYaCZJD2babTHpEsj5NxJO3vWeTlz11X/xP7jtrcd0zdie9Of0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDR6t+1/gnAKD/+cRNTIgEmc8vDDa4I1qjROegRKPUSuv9nA8w
+	XWYq+uDxUTsRUUtoXG03lutf8rdio/Jnz/jisNCsxl8HLvl8hgQIRLSe
+X-Gm-Gg: ASbGncvOdKCmUJPMy5mn7tB9PQ+5BwlEcYaZV8FOPqdBMpXSi6OV84qKIUTtMkxajSs
+	G0p4EAf4KcbWFzHp4ZdUzpvsoW4w92oqyGbdJfuHOD2++kmObmFMMS51H+AhwoP1HQBPe0fulJd
+	EbCQX/a19AIVPBjzUQRvcGCoByVrwds/2PiCY2TE4017/Jk4mXwuB+n2lYV+BC7ATGbQSWab5eo
+	tcYrR7zw89xOrFr8Wca0qtc82krYaBZtOKyJ1m7tqgJrUH+U9sBUBIRBBlLo/EayPWXX86w5ZxV
+	cI5TyCs001R9DWkO/ZurI97Ne833w/slbCBLMTFBuZWiU3DEuWMAvAoeKwrI9MumWFQXz7ghezw
+	UUO7kvAyDAA==
+X-Google-Smtp-Source: AGHT+IExilKHuwfg07ydhMDm+4UcwYtz8LgwCY2xQg6+6o4mVcZ6auOnXR5yUfYe+WTxwta9g7WjDw==
+X-Received: by 2002:a17:90b:5663:b0:320:f718:8e63 with SMTP id 98e67ed59e1d1-32341ebf894mr7086204a91.9.1755361833870;
+        Sat, 16 Aug 2025 09:30:33 -0700 (PDT)
+Received: from ws ([103.167.140.17])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3233116f46fsm6992892a91.28.2025.08.16.09.30.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Aug 2025 07:31:16 -0700 (PDT)
-From: Yunseong Kim <ysk@kzalloc.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	"David S. Miller" <davem@davemloft.net>
+        Sat, 16 Aug 2025 09:30:33 -0700 (PDT)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yunseong Kim <ysk@kzalloc.com>
-Subject: [PATCH] crypto: ccp: Fix typo in psp_populate_hsti function name
-Date: Sat, 16 Aug 2025 14:30:29 +0000
-Message-ID: <20250816143028.1111603-2-ysk@kzalloc.com>
-X-Mailer: git-send-email 2.50.0
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] padata: Reset next CPU when reorder sequence wraps around
+Date: Sun, 17 Aug 2025 00:30:15 +0800
+Message-ID: <20250816163017.75098-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,37 +74,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function "psp_poulate_hsti" was misspelled. This patch corrects
-the typo to "psp_populate_hsti" in both the function definition and
-its call site within psp_init_hsti().
+When seq_nr wraps around, the next reorder job with seq 0 is hashed to
+the first CPU in padata_do_serial(). Correspondingly, need reset pd->cpu
+to the first one when pd->processed wraps around. Otherwise, if the
+number of used CPUs is not a power of 2, padata_find_next() will be
+checking a wrong list, hence deadlock.
 
-Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
+Fixes: 6fc4dbcf0276 ("padata: Replace delayed timer with immediate workqueue in padata_reorder")
+Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
 ---
- drivers/crypto/ccp/hsti.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ kernel/padata.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/hsti.c b/drivers/crypto/ccp/hsti.c
-index 1b39a4fb55c0..2e23ff7f3b18 100644
---- a/drivers/crypto/ccp/hsti.c
-+++ b/drivers/crypto/ccp/hsti.c
-@@ -74,7 +74,7 @@ struct attribute_group psp_security_attr_group = {
- 	.is_visible = psp_security_is_visible,
- };
+diff --git a/kernel/padata.c b/kernel/padata.c
+index f85f8bd788d0..833740d75483 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -291,8 +291,12 @@ static void padata_reorder(struct padata_priv *padata)
+ 		struct padata_serial_queue *squeue;
+ 		int cb_cpu;
  
--static int psp_poulate_hsti(struct psp_device *psp)
-+static int psp_populate_hsti(struct psp_device *psp)
- {
- 	struct hsti_request *req;
- 	int ret;
-@@ -114,7 +114,7 @@ int psp_init_hsti(struct psp_device *psp)
- 	int ret;
+-		cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
+ 		processed++;
++		/* When sequence wraps around, reset to the first CPU. */
++		if (unlikely(processed == 0))
++			cpu = cpumask_first(pd->cpumask.pcpu);
++		else
++			cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
  
- 	if (PSP_FEATURE(psp, HSTI)) {
--		ret = psp_poulate_hsti(psp);
-+		ret = psp_populate_hsti(psp);
- 		if (ret)
- 			return ret;
- 	}
+ 		cb_cpu = padata->cb_cpu;
+ 		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
 -- 
-2.50.0
+2.50.1
 
