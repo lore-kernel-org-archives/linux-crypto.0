@@ -1,109 +1,125 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B596638F9C;
-	Sat, 16 Aug 2025 16:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8251CAA79;
+	Sat, 16 Aug 2025 17:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755361836; cv=none; b=FHOK6oEo1UYcXZ684x9g35cDLALF5FhcQiO83ukDIDE5SntxFrrx7eUNCrB3vjsSb7Fi6acPgw0c5cSz35nF3qdeDY8Sx1CTjHTyYWhiaGP+lLIxI2fBwI+8l4UpqbQqjphNmO3B2eOzTHKXGjaFhKNpIH67A0j4Fy3nCRzSwuI=
+	t=1755364526; cv=none; b=sVyXWLWUOFtexZkIFbCf5604Bo92ufdGz85PBIu16bhM4lrLoq4DLOLol+bsFKsymGv5kh5mFteC5rbQ5lADnX3umwO/8ZeqsTSD0wt6XopN94Gx9yJVcgeaM/9TqpjTO1/iRWRhKJnKTFk+wWGeDQlosEtSzHC1RzRPgYDN9aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755361836; c=relaxed/simple;
-	bh=hndPGv2wdnGaAp+U8k81L2oZ/U9gw0TgClsOE/aLPCg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uqCdPMf9iXS2PoTyVu/fTFGMlGvVLdj8KZkzux/yF67cob3+DbHiUz2F5HsYFT1gvhmXZwwtrSGmhTr7Cbu6l4cvoJl2nw5vKgaWepxJR0uXFgrfBdQJTv3jbnKzBuY64mgveWbnPZ51EyATlfbdbV2k7TY6Dexixpy1/UBJplw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTE9ObEk; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1755364526; c=relaxed/simple;
+	bh=K4A4fEFG9zaHp8aUB7/gVYJy4yr57+8iIHrrHhGBZyI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ii7iYmA7DTsIy4vnpNuMGMfnjgSxFyVBtV6i/9f98R5jRjAK9S/V5549W1ZTKg4LIUXOGB8tEu8LtCImTsXnD7C3XGKgnEqB5OuN9G/OPSSrLd1erBDvWsKbPUbq65YvkC5QSKT25uvO+/U995CxrJQYA6YzoevcN4lbq7pucOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YmuuzcEQ; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTE9ObEk"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-32326e09f58so3251971a91.2;
-        Sat, 16 Aug 2025 09:30:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YmuuzcEQ"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e57003ee3fso15091225ab.2;
+        Sat, 16 Aug 2025 10:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755361834; x=1755966634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YfDPs/ifotx8nej6O4Kf3zetz5WIEYRWWHBMLRI1GI8=;
-        b=aTE9ObEkRvMtGeboRAAjnpJLESSwo4x+vVw/uqHO1xN1vXWcCNY/VxJkyc8MJnBme4
-         8XWMM5R8DsyW7LyiUv5dEl2WGl5JMr+rZsBI3YN0x+tWeErvdQS+wzm6WWLKTh/OC113
-         iWiarPizP4RxMomJtrYORZTBQFy1QGxUt8QfYXbyDaws9Ys7JH6nuo70rqumvRLaMpLo
-         7GcycoVLDb3PJH2xCEsXX6TrnTd8BfK7pRlLevEUW56TUDuLcTTlNMqVfX0izyBpUVUC
-         Rtj7Q1igOf/PBpSSNnrdIGzRrmpYPOLVzV7MndAZf07jlOw5JCIGREk2ntEfOskauw8C
-         ItcA==
+        d=gmail.com; s=20230601; t=1755364524; x=1755969324; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f4Fcpgrewxt/uUiQmxZHN0QNTKqCvB9kxme0FcY+XSg=;
+        b=YmuuzcEQJwcj2DigZkC05TQ0xJNiscpotsg7+bkOG14QxsDD6YPAwN9wFiOYaiSNOr
+         YbCqFsqaFjDGQpz7rYBZPmmjgXup1EToY/h7WDt8y20ga5MjD2n1Ak8CKofW58rTxyjJ
+         ele/3EC/Trm6Fh95E2Of5hdIRqOyYEuXtHg6/Gw0BItTirEPzA8NcJ48ibG+DuvWMghR
+         LAl7HvP9kal6PEAMLzLrEa2bVq/w7385IOZokrmm/N/xsUZ0/GSnsxz21YyxCSD/HJdB
+         r02qHKBmRVd7gYa3ZKPGO+mXNs2K/twKTSmShMTxwNq0TLygFD0pwpf4AKGH9csR6p9o
+         WqUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755361834; x=1755966634;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YfDPs/ifotx8nej6O4Kf3zetz5WIEYRWWHBMLRI1GI8=;
-        b=W5CJzgC/hKFbQsOOejKSXT+XvcLY1dF1Et/ZOqzv3V6ld4Kel8rAEQJT4vqWyFMy7+
-         Fq8OaHOncJEYj2nG2R6AGBjN47Lc8BwPX/xioQax606BoKZdrZvWRZniOzmV69QOvFBd
-         cAN66UlyV9mkHUZc7qcYqIU0VzLlwa6RZXDZ+LnWZMTGS/gwee30f5x4SDBbc3tLK+Am
-         vya6kmFOE9ITgjI8bDPTcoyDsdRyrPibwiiKjvw0RgiQ1y9xGb/LhX01Nec8F8YsRN0k
-         4hdrZLESSXL8P2uBZYzqa0nSpKlUD69SeL77bzvg1FGYaqQl2oG/3op9w7z06tZiR6np
-         2ooQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW39WggErK4ltA8AktJWPJvfNykic2ULUYaCZJD2babTHpEsj5NxJO3vWeTlz11X/xP7jtrcd0zdie9Of0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDR6t+1/gnAKD/+cRNTIgEmc8vDDa4I1qjROegRKPUSuv9nA8w
-	XWYq+uDxUTsRUUtoXG03lutf8rdio/Jnz/jisNCsxl8HLvl8hgQIRLSe
-X-Gm-Gg: ASbGncvOdKCmUJPMy5mn7tB9PQ+5BwlEcYaZV8FOPqdBMpXSi6OV84qKIUTtMkxajSs
-	G0p4EAf4KcbWFzHp4ZdUzpvsoW4w92oqyGbdJfuHOD2++kmObmFMMS51H+AhwoP1HQBPe0fulJd
-	EbCQX/a19AIVPBjzUQRvcGCoByVrwds/2PiCY2TE4017/Jk4mXwuB+n2lYV+BC7ATGbQSWab5eo
-	tcYrR7zw89xOrFr8Wca0qtc82krYaBZtOKyJ1m7tqgJrUH+U9sBUBIRBBlLo/EayPWXX86w5ZxV
-	cI5TyCs001R9DWkO/ZurI97Ne833w/slbCBLMTFBuZWiU3DEuWMAvAoeKwrI9MumWFQXz7ghezw
-	UUO7kvAyDAA==
-X-Google-Smtp-Source: AGHT+IExilKHuwfg07ydhMDm+4UcwYtz8LgwCY2xQg6+6o4mVcZ6auOnXR5yUfYe+WTxwta9g7WjDw==
-X-Received: by 2002:a17:90b:5663:b0:320:f718:8e63 with SMTP id 98e67ed59e1d1-32341ebf894mr7086204a91.9.1755361833870;
-        Sat, 16 Aug 2025 09:30:33 -0700 (PDT)
-Received: from ws ([103.167.140.17])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3233116f46fsm6992892a91.28.2025.08.16.09.30.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Aug 2025 09:30:33 -0700 (PDT)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] padata: Reset next CPU when reorder sequence wraps around
-Date: Sun, 17 Aug 2025 00:30:15 +0800
-Message-ID: <20250816163017.75098-1-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20230601; t=1755364524; x=1755969324;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f4Fcpgrewxt/uUiQmxZHN0QNTKqCvB9kxme0FcY+XSg=;
+        b=cuKk8mUrdPNthCXKKGmsGCEYXwoqoUpzWGeU/PxqUi+6eO4ZYMAcFrrjcycc+Qy0Oj
+         n8NsMdKuEfexRW8n3UQSJHd58S4Sde0mfW26C429p6orAOXeSQ3pNMbTVnr/Q27GTnlU
+         mFWF5FO0KreSgjr0VeMKrsqXks+Aw8WfPa0Qz05MeQM9hVsULsg/VBvRz7Tu/F6cC+B9
+         470Yj2+WZK4A0McI4gA+fcbSfhR9bRrMy8DsEsV6ULcOn91IKDt7cjZIZgZU8JeiiWwP
+         bL2wDko8lYN9lhFNLw5i0jhjaUPTMkqCAHAEkILthMcVvH+0W1DMd+oU5B8D4T62a0ob
+         0v1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVeyPgSFIyjcN0TDFKfxV+j1jZi8R1ciT3QxiqlmUfHEYX8y2x2vgzxxVFSUym5fqTqPge1rtjCoCqLq2I=@vger.kernel.org, AJvYcCWt54np1JQQGeaCqaLWzHF3uIlfhlse/PAvp+Ow0XLTWe90TRaMnKrLire5rlb5hcKmCvEeEGMsWllrig==@vger.kernel.org, AJvYcCX7lhCykQ9d9kcwJ4WZtotsi9cify/k8I8VPCdUcpoD/qBUvQytWWyhLMMAOgZr6Ltbsxkto3MW@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLd0x5Pi+YDFzXb9Y+qZvyHfElktV4u1GhEk5g6tesDu91ljfx
+	lYaK8NyXes3C/5OKWumFtG6S52je0dQUmZnNCo0s6ajHLpcieYodoryB7cbqM/tJEG4mMlYdTQJ
+	FsxcOsNeDb0AairpFbWXIUhPLtcWug1c=
+X-Gm-Gg: ASbGncsTr3FawJE1bk1BewhTEJK3SfJUmtQnwTCqHH278Lm2obO7i27Du1h5wrWrpQJ
+	XXsw40BXroxjsgbWVX87LU6WNY8wC63C00vlwwOzAgZhy/dDSh1I/01F1w/qRNaKsslacx5EHBl
+	OQITg1H0AxCZQAc0fQ+GeEHvdJJfuT0A2pV51HFQgvB7UgPJd6RBgoZanL1SZVagvCNciz/DCkN
+	FwcBbLGqQ==
+X-Google-Smtp-Source: AGHT+IFcT5ydlVbC3qjs6NpHcmiDBFj87k2/+lOTsyRL2Q9YmskIV1nfiYDGe0NN02mH7PFvU+P/c/hT2bV+052gXbY=
+X-Received: by 2002:a05:6e02:1521:b0:3e5:58d7:98f6 with SMTP id
+ e9e14a558f8ab-3e57e9c8c85mr93758295ab.14.1755364523704; Sat, 16 Aug 2025
+ 10:15:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250813040121.90609-1-ebiggers@kernel.org> <20250813040121.90609-4-ebiggers@kernel.org>
+ <20250815120910.1b65fbd6@kernel.org> <CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
+ <20250815215009.GA2041@quark> <20250815180617.0bc1b974@kernel.org>
+In-Reply-To: <20250815180617.0bc1b974@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sat, 16 Aug 2025 13:15:12 -0400
+X-Gm-Features: Ac12FXzEtqXxiDHsQLDzUx9WImMji4xRJnYnA1AWHKFaHYslPCywFMD3NJk13V4
+Message-ID: <CADvbK_fmCRARc8VznH8cQa-QKaCOQZ6yFbF=1-VDK=zRqv_cXw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] sctp: Convert cookie authentication to
+ use HMAC-SHA256
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-sctp@vger.kernel.org, 
+	netdev@vger.kernel.org, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When seq_nr wraps around, the next reorder job with seq 0 is hashed to
-the first CPU in padata_do_serial(). Correspondingly, need reset pd->cpu
-to the first one when pd->processed wraps around. Otherwise, if the
-number of used CPUs is not a power of 2, padata_find_next() will be
-checking a wrong list, hence deadlock.
+On Fri, Aug 15, 2025 at 9:06=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 15 Aug 2025 14:50:09 -0700 Eric Biggers wrote:
+> > > > It'd be great to get an ack / review from SCTP maintainers, otherwi=
+se
+> > > > we'll apply by Monday..
+> > > Other than that, LGTM.
+> > > Sorry for the late reply, I was running some SCTP-auth related tests
+> > > against the patchset.
+> >
+> > Ideally we'd just fail the write and remove the last mentions of md5 an=
+d
+> > sha1 from the code.  But I'm concerned there could be a case where
+> > userspace is enabling cookie authentication by setting
+> > cookie_hmac_alg=3Dmd5 or cookie_hmac_alg=3Dsha1, and by just failing th=
+e
+> > write the system would end up with cookie authentication not enabled.
+> >
+> > It would have been nice if this sysctl had just been a boolean toggle.
+> >
+> > A deprecation warning might be a good idea.  How about the following on
+> > top of this patch:
+>
+> No strong opinion but I find the deprecation warnings futile.
+> Chances are we'll be printing this until the end of time.
+> Either someone hard-cares and we'll need to revert, or nobody
+> does and we can deprecate today.
+Reviewing past network sysctl changes, several commits have simply
+removed or renamed parameters:
 
-Fixes: 6fc4dbcf0276 ("padata: Replace delayed timer with immediate workqueue in padata_reorder")
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
----
- kernel/padata.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+4a7f60094411 ("tcp: remove thin_dupack feature")
+4396e46187ca ("tcp: remove tcp_tw_recycle")
+d8b81175e412 ("tcp: remove sk_{tr}x_skb_cache")
+3e0b8f529c10 ("net/ipv6: Expand and rename accept_unsolicited_na to
+accept_untracked_na")
+5027d54a9c30 ("net: change accept_ra_min_rtr_lft to affect all RA lifetimes=
+")
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index f85f8bd788d0..833740d75483 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -291,8 +291,12 @@ static void padata_reorder(struct padata_priv *padata)
- 		struct padata_serial_queue *squeue;
- 		int cb_cpu;
- 
--		cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
- 		processed++;
-+		/* When sequence wraps around, reset to the first CPU. */
-+		if (unlikely(processed == 0))
-+			cpu = cpumask_first(pd->cpumask.pcpu);
-+		else
-+			cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu);
- 
- 		cb_cpu = padata->cb_cpu;
- 		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
--- 
-2.50.1
+It seems to me that if we deprecate something, it's okay to change the
+sysctls, so I would prefer rejecting writes with md5 or sha1, or even
+better following Eric=E2=80=99s suggestion and turn this into a simple bool=
+ean
+toggle.
 
+Thanks.
