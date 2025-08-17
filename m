@@ -1,106 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD82A945;
-	Sun, 17 Aug 2025 08:12:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B2D1991C9;
+	Sun, 17 Aug 2025 08:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755418365; cv=none; b=Al2xzlgZKCrElepr9BjzUc5hll8t6mqGch6wKaXKrIZJcKCX6NNmsKMbAbzUgO/5hKSVkyDIQ9Sa2k06D0jkgEAfM3s5Gn+LMrvsOwUZ0+5SfxFIqZKK7o+J/f3TZ2qsXxCkziC3MOQu0nCUfYDwSkylOwbDx1xjdQJsozXz35w=
+	t=1755420725; cv=none; b=YbY11hx4C7wcgm+P0aClfbLgeLQ4HUfPk+P1TmiY04YwBssZqhdIf6M+vLJXuNJA2cPW0vGSH2kEs0cJph0rLcS7sUKYvA8UiiEJs/E+2IjjX7l6hEUWbQT+Dr2Enee+TpKrQqC9rZBtssnj9eV5aLr4pdM3h2/CICA2q++IMpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755418365; c=relaxed/simple;
-	bh=3ogXhEmizaAUsLyP8gBBwxZlw+Leo/hHTvDxWG9rwN0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pJDw0TMkJ2HAffrZCniS1i7HVqoe0Yob1obbbZv6mQk7ZMHvhDaWvfiramZhtkCoSYF++YUs10s2zNInFFWKrr6qVYYQ/k58OJFeTW5EHN/s6QNbYAaRUPkw7knhKPPe5L3pg7oNx9Y9hudt1TAYKf2DKOagpoMSpOTYTOPP+jY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vNgK/nBu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755420725; c=relaxed/simple;
+	bh=i72uNQ60IspHwSU4CFmSpIeEOXO2aaAsRUmU2eA3Qpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JWn6yWeNup8dOliuMpXIvUH/pN4llP0tPwLWiYZi1VdZsRu/Bku+Dkiy/rToD0FVVIj09EaIjZwcy9wHVPjwdeGYPSw//mu6f+sPNAAlaLfsZ0jMN2xKvUlNbJHEByV/cpB3pLKl11rQtc+2IWDXQolhGziZopZlkfFK2gzkzj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gxp74j9X; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNgK/nBu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D2FC4CEEB;
-	Sun, 17 Aug 2025 08:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755418364;
-	bh=3ogXhEmizaAUsLyP8gBBwxZlw+Leo/hHTvDxWG9rwN0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vNgK/nBu66g+/TEivXA24x2CkykDm0dh7UOUYnX5w+yIZwCLF33tTXWxHEy0+KBpX
-	 eGafPFmqTueJaLcbr3vPIZsqLmijJzCuKb8g2HOD5LffSxuDMHVg23gwlhbc4+ecVu
-	 TZ7sFN8x2mfprl+3knY19VihVZhk1eJBPonBKJ23tyaRdGo7k2OJ1X3rEHfFVjWsyq
-	 T9OiN2aGwYg4uMwReqM+iNyQNZTz5m4q60619Ws9fePfU3s4OE58sOJ4XevH+Mj9lW
-	 mpK7pPTq/0MMvh1+tcBkG2hgAiHLQ8c8dUVLPpo5m717LAnjJi/wgMtsl1j6Wcg7n6
-	 XtLYJZZQUesqg==
-Message-ID: <18290017-fd9b-499c-be34-55b49efad95a@kernel.org>
-Date: Sun, 17 Aug 2025 10:12:41 +0200
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gxp74j9X"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ucjuMVr22C0HzjXRvmtLnsZY82iQWU4h8AL1Wo79MjI=; b=gxp74j9XkZvQUcL17iFD4Ge/pi
+	drF9JAlsIlPhsjrQo04Ua3ghv/0Q9CiFZWrMKKvodx8bLzEP13xN/W2bKzMin6oNPHXDfHPl4XFcq
+	optBxJtSU0wuoJ0ngyc5q30OjzhoVd17UvUpvYyCP7t9j5OE7s5hzQOV2lo+uCa9Dmg0IeuYP9LPQ
+	m4EMmnEqxKQKOcIAudAw+ZjoDAhOY6dLHj7Tb+Ldn3FnHQ2GFwqRIjt7qIlC9tUU3yt2ImGKOxAnu
+	RhYcbXgQ15usYs93Ixop91cYXEV5ciC/VdOdr6bNB3MFugU2F2gxOHCm2eseoiVoRrhzNxCsZOCqu
+	4vZ+4GLw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1unYrj-00ExbK-11;
+	Sun, 17 Aug 2025 16:51:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 17 Aug 2025 16:51:43 +0800
+Date: Sun, 17 Aug 2025 16:51:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] crypto: Prevent kernel-infoleak in rng_recvmsg
+Message-ID: <aKGYHwT31OaGzc5Z@gondor.apana.org.au>
+References: <6895b041.050a0220.7f033.0058.GAE@google.com>
+ <tencent_B406618996EEF22ED6CC8EA7DF46FD92D206@qq.com>
+ <aKBMjQpA9P70EA0z@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] nfc: s3fwrn5: Use SHA-1 library instead of
- crypto_shash
-To: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250815022329.28672-1-ebiggers@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250815022329.28672-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKBMjQpA9P70EA0z@gondor.apana.org.au>
 
-On 15/08/2025 04:23, Eric Biggers wrote:
-> Now that a SHA-1 library API is available, use it instead of
-> crypto_shash.  This is simpler and faster.
+On Sat, Aug 16, 2025 at 05:17:01PM +0800, Herbert Xu wrote:
+> On Sat, Aug 09, 2025 at 05:59:43PM +0800, Edward Adam Davis wrote:
+>
+> > diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> > index c24d4ff2b4a8..9e9e069f55af 100644
+> > --- a/crypto/jitterentropy-kcapi.c
+> > +++ b/crypto/jitterentropy-kcapi.c
+> > @@ -107,7 +107,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
+> >  {
+> >  	struct shash_desc *hash_state_desc = (struct shash_desc *)hash_state;
+> >  	SHASH_DESC_ON_STACK(desc, hash_state_desc->tfm);
+> > -	u8 intermediary[SHA3_256_DIGEST_SIZE];
+> > +	u8 intermediary[SHA3_256_DIGEST_SIZE] = { 0 };
 > 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  drivers/nfc/s3fwrn5/Kconfig    |  3 +--
->  drivers/nfc/s3fwrn5/firmware.c | 17 +----------------
->  2 files changed, 2 insertions(+), 18 deletions(-)
+> This is not a leak! The stack memroy is hashed and fed into the
+> entropy pool.  If you can recover the original kernel memory from
+> the result, then we have much bigger problems :)
 > 
+> Please find a way to mark this as a false positive.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+I think kmsan_unpoison_memory is the function that you should call.
 
-Best regards,
-Krzysztof
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
