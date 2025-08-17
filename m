@@ -1,93 +1,115 @@
-Received: from out203-205-221-190.mail.qq.com (out203-205-221-190.mail.qq.com [203.205.221.190])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955B51C862B;
-	Sun, 17 Aug 2025 11:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBB13176FD;
+	Sun, 17 Aug 2025 11:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755428736; cv=none; b=dqshMNx9z1B74asa6yAbcKyBa9Dor8VLDoduLTpLofIm4GRhWgInvYh3QR+IzvCGYjmPR2NCWBrMqgw9rV55bBvyHz48EzCmHZz+fI3gKDGNcxMkVeZxRED4HZxnQO8NCocdXy+576dEDdLy1et7oOhBRo2UK4mU7sWsEZG/RBE=
+	t=1755430834; cv=none; b=BO7cs2CUDRGFiS8XsQEF4khmw83M+vLaw5quPkFM87JP5zREslvJwqkI5rtNq75s9oNc/AyIfLsSKVr7SMb2whT7AsbwvNmmC4kkIQ675IDrlK4X4kwGY+jTBuBvq9KEjwopcz5TQgZgppF7g2y71Rw+Vqc/H50dIBhShPlASlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755428736; c=relaxed/simple;
-	bh=A+sLc0Z2QzPFdW2jsm+Jm9m+mMCPBnli1/PZvtzk2Ro=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=BUxiCE/h1wbkJG9HPA563iwIBa7yPREIvVVa6hpRlfONzOCIPFsD4ixbqlrQY7ejTSu6PF4qu7H9622khaQoevQztsXcCH/Yy+D2Aeuz0MW4txmHw+8TrXlpSpd7u4KdE5W7BRVgUCyaOnTYcyq9YOF8Tn69guXqPjfRIcaH+M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=tQASYCgO; arc=none smtp.client-ip=203.205.221.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1755430834; c=relaxed/simple;
+	bh=wSKGngVMiU6SpjdKxTXG1q+SE13GTgAOMD26yhQZlwg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KrclhnlHDYp56a7zxtfI/xwPVyTzGwMIxy5Ht1su1onIyXF0KZNt7b//LeaxlacbeWvyLlgX25zhWwx5z4CvtTdylSz/f4sNv8TtBCr5U5R207p/eT4FkaESPB5z4+YAZ61EI0apM1+b6eHMS7IU/FBSolf8XPFi9u4BDV9/ukw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dD6/3GLx; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="tQASYCgO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1755428730; bh=S+OOyZCkxFA0z+ofS7rk1Y077krAVqkdrfirLeMW+Bg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=tQASYCgOcPDR3cwn5cUg7L2s1WgbyJT7s/5p2SJWnTa/9cWfAwvkg103opW49EJdY
-	 T4TZeafgBzhKUK4+6dSw2JdHE/KN+rNWAVt+1C/XvOhYW7lf6CKgeQwklORCy8FNpR
-	 NYSol6ZuOJirxgYQGHZBrNVq0FCHhWXu9EeiU8JM=
-Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.230.220])
-	by newxmesmtplogicsvrszb20-0.qq.com (NewEsmtp) with SMTP
-	id ECE30023; Sun, 17 Aug 2025 18:59:14 +0800
-X-QQ-mid: xmsmtpt1755428354tmhsx2fzl
-Message-ID: <tencent_73E16EBC9654E89EECD6CEC4786A6C4C2D0A@qq.com>
-X-QQ-XMAILINFO: NNoVXaH09J176/5h/iQ0jfRyMU9mwW6gLwkUzPyz6XJX+pr5Mjr6Lne0PenVWH
-	 9aEqtFfUu4WEkuC8NUfIWSePcgZodkzia8eOXrcscy2ymwskoRDcWkGAng/rO0y3WR5T9x/Jn/tg
-	 ArnMVZCft2y/9xCfCEpr9pz/X6yJmNESR8UAw9G2sevyd4uTdn+pV7jsz2x+pQ3Mshk3jxk/He7b
-	 x35cihDSc1ouxYJFs2XtRkmBoMeL5YYCYBhVCFxbeGP/UW+nxBF8PhBTRo+RMtgqtS5DXKRsR4xq
-	 svUlM0bjAX2FoftZPTgOLsjv7kpymNwRs+ge/EMY0ppcy15XxqllSe8Bw7CzjxeNeWSn2bItxWLa
-	 xHSFpWUeoBr5g6ImOiVmFwpbyQswhzoiFq1Et/Om4xTt4eGBv5EyrUHx6L7dSY2I4sjooZiaDmUk
-	 ps4bT/PZPI20F6GhOjmhwAjgbtjt19/WslKfE+SJZ0AZd4zDAYXZq+laPC8exwkH72xGI3tdMB3E
-	 BHr5p9qyEf46e8L3hkKxudoI4W0wJDw8qQZS6JvYOQji5p6Dtr8G2pHmuEA2Cv9dETRW0AbKHyTm
-	 gAWoSl+59YnUoFaTZr82Xcp/auV1UxkZJVLufjkfXAOpxcUfqIkrlHSVP0T+HFV7SC6GWvg8+S+r
-	 EBkrHK/LL/wqWP+9puV7Q9BLalkb3zo/tpQ66nl/kugbVQNyb2jr4GN6mbA1v9WyppSn6wuz/Dzp
-	 g7kYNoyl80YzOvyHl7+qWSAg/nH673udlQjdtmcaeJpqfUxk11FfCzeolLlK6iYyQXAdTkkieibd
-	 h0POGLM07jJj6HI3Vk09dFhLOPMTUA/IgvtS5oPGCoy5OOputqJeMwbYVVy+rGet8S+SVGMBeGZ0
-	 O49nrLqKiUP19+TpC8F/NDYYK9UV+Ae9E5E+YFoqi8bI8EEEDgkizUBCaOdEbNCpa07fHgMPQLNl
-	 JsFEHD6xAKMqvYerfiKcxXRdYt0YBWvdn4Kn1+V14ErF78F+xNBDjvVLkvsX+a
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: herbert@gondor.apana.org.au
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH V2] crypto: Mark intermediary memory as clean
-Date: Sun, 17 Aug 2025 18:59:15 +0800
-X-OQ-MSGID: <20250817105914.245810-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <aKGYHwT31OaGzc5Z@gondor.apana.org.au>
-References: <aKGYHwT31OaGzc5Z@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dD6/3GLx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=QCcwWZtPpfCOfSJRlJ3ifzODTcu4UNcUTX/FCaRv9j8=; b=dD6/3GLxEuz7hps+mxNbboTcfQ
+	99BTaVnuzdyt0bibflc+Er827RADVFDVPt3x2BKssRxYoCst6Y/tKnbWvjiBr6kcUaZX1klPcYwPF
+	fScrbJOy0h7Vy8B9AMQM/n4Zf00dDGJXxSFAdCDwf/S2OjtpQZkprt0UI4hI9uTNlkRPk0MyBYhNk
+	LRUq0Alqhws14w5sYBcCBrieou6z3Ub+G2bfct/mAB6YGIKsexnGGNVZCDdz+IcyfnFYypSpM/w9N
+	sp5/eCPa3LtGUFrSHnjxODYB5iE6LKMeJrwYZ116oaLizTGZhXrKRrvHzVHKIZUSAe0SxT1rqEesM
+	Lqd29hkA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1unbUy-00Ez5Z-0I;
+	Sun, 17 Aug 2025 19:40:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 17 Aug 2025 19:40:24 +0800
+Date: Sun, 17 Aug 2025 19:40:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harsh Jain <h.jain@amd.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, mounika.botcha@amd.com,
+	sarat.chand.savitala@amd.com, mohan.dhanawade@amd.com,
+	michal.simek@amd.com, smueller@chronox.de, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org
+Subject: Re: [PATCH V5 3/3] crypto: drbg: Export CTR DRBG DF functions
+Message-ID: <aKG_qHTkmvQynXQ8@gondor.apana.org.au>
+References: <20250817105349.1113807-1-h.jain@amd.com>
+ <20250817105349.1113807-4-h.jain@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250817105349.1113807-4-h.jain@amd.com>
 
-This is not a leak! The stack memroy is hashed and fed into the
-entropy pool. We can't recover the original kernel memory from it.
+On Sun, Aug 17, 2025 at 04:23:49PM +0530, Harsh Jain wrote:
+>
+> diff --git a/crypto/df_sp80090a.c b/crypto/df_sp80090a.c
+> new file mode 100644
+> index 000000000000..bde5139ba163
+> --- /dev/null
+> +++ b/crypto/df_sp80090a.c
+> @@ -0,0 +1,243 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +/*
+> + * NIST SP800-90A DRBG derivation function
+> + *
+> + * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
+> + */
+> +
+> +#include <crypto/df_sp80090a.h>
+> +#include <crypto/drbg.h>
 
-Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e8bcd7ee3db6cb5cb875
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-V1 -> V2: mark it as unpoison
+The header files are still missing.
 
- crypto/jitterentropy-kcapi.c | 1 +
- 1 file changed, 1 insertion(+)
+> diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+> index af5ad51d3eef..4234f15d74be 100644
+> --- a/include/crypto/drbg.h
+> +++ b/include/crypto/drbg.h
+> @@ -144,6 +144,24 @@ struct drbg_state {
+>  	struct drbg_string test_data;
+>  };
+>  
+> +/*
+> + * Convert an integer into a byte representation of this integer.
+> + * The byte representation is big-endian
+> + *
+> + * @val value to be converted
+> + * @buf buffer holding the converted integer -- caller must ensure that
+> + *      buffer size is at least 32 bit
+> + */
+> +static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
+> +{
+> +        struct s {
+> +                __be32 conv;
+> +        };
+> +        struct s *conversion = (struct s *) buf;
+> +
+> +        conversion->conv = cpu_to_be32(val);
+> +}
+> +
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index 1266eb790708..4020a6e41b0e 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -117,6 +117,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
- 		pr_warn_ratelimited("Unexpected digest size\n");
- 		return -EINVAL;
- 	}
-+	kmsan_unpoison_memory(intermediary, SHA3_256_DIGEST_SIZE);
- 
- 	/*
- 	 * This loop fills a buffer which is injected into the entropy pool.
+Part of the problem is that this header file includes an insane
+amount of stuff that it doesn't even need.  How about moving this
+function into a new header file crypto/internal/drbg.h that includes
+just the bare minimum?
+
+Thanks,
 -- 
-2.43.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
