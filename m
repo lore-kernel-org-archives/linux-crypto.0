@@ -1,93 +1,94 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74F9224249;
-	Mon, 18 Aug 2025 20:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77CE225A29;
+	Mon, 18 Aug 2025 20:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755548821; cv=none; b=ncsYmFGoomvGo3goWV0WnCJ81L9oMcQrbiPYIwjf+V96HMxHRkOECbJ1DmjpKLOvhJWo+QlEvmC9BpOLzOeT2lREcZHvEJp2nA5fPaFGTQjJyB/8AkPIs9Y+t75k+uIQy0gL28Q7IdnxaTUr/KNmqpqi29AW7IviFrUtgTgEtrc=
+	t=1755548927; cv=none; b=adKpB+UHR3kMCacnyWP/RGPUsXj5b8UFykAlQQdE6GYs94mCvz/kE0kGMQNjeIJr9eeVrVpoerrMHuUBPCVI1MEouIidusDPjDTqrWXpF+iQ6slY03yWLGBFiorXZkI5zyOWApy/ozcuqb5S7gpZyNZBcZAW/HDdU2IL13kSBbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755548821; c=relaxed/simple;
-	bh=uJHM7zqualHncQ2D/N60mSa5yjpVHHhYO1mWjPe3lSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XO9zkVOX4NkdjiRKrovyoK2yNALHx6156TF2SOE3g8Pqoee6r2mk4fMMnyUr/CaDK+zChh5Pkpq0+yyXmyTvoUF++y/vnpvohFWcVcWFivKXK4hfcZfl1sGZnJZ0oExsilgNEYSxHIxULgFHk13EIjPhcqb6tO8RBMMx42d0d5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MK0ijr+d; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1755548927; c=relaxed/simple;
+	bh=KiWZ/EiIDY+ilEC4IXfdyN/LdSTVyd3z4Jo9QiKYDtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fuum3r7iGZviRZtkrCJ+JFIlvBVLYPVjj7d3Zrfl5TK9t1s6Kl4fTwF3/KtqLJDijalPfXGKApfVTDmKbbNvOJXMaBFcb7JQrFpWGFua0QDF5p0HboBFe19c2X3fU2Jc8XrYJtQV0Gl3qin2kjD86TNIfHdLUc1iU2EPjw+Thn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ha6rnbEc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MK0ijr+d"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 555F240E0206;
-	Mon, 18 Aug 2025 20:26:55 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id pTj2BnPgEFZ6; Mon, 18 Aug 2025 20:26:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1755548810; bh=0nIMB7ikC6ejc5RbpVtflEInq4HoCk8mbrbVxRKRxN4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MK0ijr+dG3B5akrOWciMqtdcN6dTfNUMNmuAnneRc315ifM4q7m8d98GORCaGwv3W
-	 TcvLgIN2EkxAlmMP7rgg4QQwIIcJF49qdk/qV0em0yCasDzUqH8s4e7f6SrUXPnJlX
-	 BrnQ0zDnArKfXpoKNalX+0H4oI5bz/1UmlE5OqplPcGSvdjrhXLEpbkLyClNy27xaX
-	 npmPRXovMCCOHj7eP0E9rUrKYUAaMMYZMBRJjIpkYKCImmS26ifCthObFntFd3fRhd
-	 4GrVmiGYOsvrRTzJxwKAzrji4IChXwkzzxsIAVRnsH6UHXq4miDmCzQS6LlHGWCSIp
-	 FKWwC7ImxYfCo+l5wWT+bH4j777LYiVTMGP4BtGx5qnovtr6prlh9QaBdhqFaE8XPx
-	 9xx2Bb62xrUSvu0HJ+C9oBv0LKwc/c0tCpDBRzmxlcOq4TLnKPbcKb6lyHJnr9lPTg
-	 TEJGD2ffre1QOkR8i1nNNkv3g8exl5d4PA9xcldVwoQcTTa6B5ZFeknakUBsp7/LBO
-	 XjkHCnTAXwyJS4AqDIVV4Q+8p3DcgWUQ26cfBQYkp5qqU2SP3uySIETrkTAKK55NNh
-	 LtUM03WhYeFnhsh6PVBSkdAf1YcHpg9jVPESLxods3QfrTnvNUGjMT1hsYN27dxfpW
-	 pPnukvGBtNdYGLetLoqI4i1s=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6178F40E0217;
-	Mon, 18 Aug 2025 20:26:31 +0000 (UTC)
-Date: Mon, 18 Aug 2025 22:26:25 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
-	aik@amd.com, ardb@kernel.org, michael.roth@amd.com,
-	Neeraj.Upadhyay@amd.com, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RESEND PATCH v2 0/3] crypto: ccp - Add AMD Seamless Firmware
- Servicing (SFS) driver
-Message-ID: <20250818202625.GOaKOMcWWfaknAeynd@fat_crate.local>
-References: <cover.1755548015.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ha6rnbEc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21579C4CEF1;
+	Mon, 18 Aug 2025 20:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755548927;
+	bh=KiWZ/EiIDY+ilEC4IXfdyN/LdSTVyd3z4Jo9QiKYDtA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ha6rnbEcOVvvtzAFK09Tdm0Qn6g6Yz45E3AsPi1F+28h3vY6yT1+pxzyqUjD7n8iG
+	 O2QEcjqOxXJHbTl2gtLRT+/6Y0OXygyXNzm45ixBoUkj4wU1rH2lf0EKQrUXc3+nb8
+	 uyqpQlD2cWQLUk2mGP1yZjciTuk9NOFN8RS1YB32+yyV6YFuAkTOY0qjerVsBZSoMN
+	 82HdRq8NPlFw1sQtVUH1R6QFipQmIHnPs3yu26dhSW/SzYTOucHTcPpnFfrlZ/XAY8
+	 5SDYeq1Fea6+9JO/gTJH5pF+IWXdZQM7I0P7YdLT0ceUq9rVqaw5ZMmy+y3s7I9oOt
+	 KUWMgvtasce5A==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: linux-crypto@vger.kernel.org,
+	David Lebrun <dlebrun@google.com>,
+	Minhong He <heminhong@kylinos.cn>,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] ipv6: sr: Fix MAC comparison to be constant-time
+Date: Mon, 18 Aug 2025 13:27:24 -0700
+Message-ID: <20250818202724.15713-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cover.1755548015.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 08:18:12PM +0000, Ashish Kalra wrote:
-> Ashish Kalra (3):
->   x86/sev: Add new quiet parameter to snp_leak_pages() API
->   crypto: ccp - Add new HV-Fixed page allocation/free API.
->   crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver
+To prevent timing attacks, MACs need to be compared in constant time.
+Use the appropriate helper function for this.
 
-I'm guessing this "RESEND" is supposed to invalidate the one you sent earlier:
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-https://lore.kernel.org/all/cover.1755545773.git.ashish.kalra@amd.com/
+v2: sent as standalone patch targeting net instead of net-next.
 
-?
+ net/ipv6/seg6_hmac.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-In the future, please explain when you resend so that people do not get
-confused by multiple patchsets.
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index f78ecb6ad8383..5dae892bbc73b 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -33,10 +33,11 @@
+ #include <net/ip6_route.h>
+ #include <net/addrconf.h>
+ #include <net/xfrm.h>
+ 
+ #include <crypto/hash.h>
++#include <crypto/utils.h>
+ #include <net/seg6.h>
+ #include <net/genetlink.h>
+ #include <net/seg6_hmac.h>
+ #include <linux/random.h>
+ 
+@@ -278,11 +279,11 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+ 		return false;
+ 
+ 	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
+ 		return false;
+ 
+-	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
++	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
+ 		return false;
+ 
+ 	return true;
+ }
+ EXPORT_SYMBOL(seg6_hmac_validate_skb);
 
-Thx.
-
+base-commit: 715c7a36d59f54162a26fac1d1ed8dc087a24cf1
 -- 
-Regards/Gruss,
-    Boris.
+2.50.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
