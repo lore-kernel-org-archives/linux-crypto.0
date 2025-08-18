@@ -1,157 +1,94 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F95335BC6;
-	Mon, 18 Aug 2025 13:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.167
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755525052; cv=pass; b=llgMwrBbzJVbaHrsISYLL7/dpl1P3BKlMfZuhqdO/V3/0LQQl4jgg4gfTZPOiJs1JlHLDllmrtiuYe9ViAIoF/MIXGA3h0V7/woXcO5yueFk4dr4SlTbMC7ynDg389DOuO5l/fVmXYiMrktNeHdZgllMwXLXWSPGnWffCK9nLic=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755525052; c=relaxed/simple;
-	bh=+s0IBbOlIkEqcYFWxsJGtno7Sqd4WsfU8DnxSquCTv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z5U9bWHhVP4va4mqGqCSyVn09Ns0qLepAGSv2yRgQbQalDgM1/JB3e0zUeqCNc5idqQn4KqTIMc7mtnOZW/PD/v52VQufz94VhYfEPGkEWHbc+BEQbWCG4/e0FJRUIFpPdQYg9ehyshnY2IpY1X1S8fDV12b5xKE7su9Asv8XlI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=AL/uq1mr; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=NBiBZgxu; arc=pass smtp.client-ip=81.169.146.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD01255F28;
+	Mon, 18 Aug 2025 15:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755531826; cv=none; b=MxDadK4ZYWKI0rqWDHePpK5U9MrSEWmngf+1ubR2yypZkPsB1ikAH9VTBLrrLvQQmqj+nfpS4ooh5ESoM4MQLlDXClBvt0oFVsuN7wfEC4NRuIhEEOgQAy+x3OZt4YFDkPy76CLEhoe8VYBowmY7KzJrrjYMqRKBjT/AamyK2fE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755531826; c=relaxed/simple;
+	bh=VlQ//odG4TiaTTWUSfqhxg//RcOSrv0QF+ehSYeOgdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b2X5zNute9ffrDOQtlWVTWGuQGm//QxwYQWrwDKwn+j6YI6LTz1JWlMpQ9iOtLBoRmonVVLNeJkE1+NYze7q6c5qQ39/lMY+vDH9LK207PN9iqKhZ2KM/Xe6pr2ArI11r9l1TqCHqUyoKQfKnHzhCCYg/i2wNgMHLGakLzHU5mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8wqW9o6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="AL/uq1mr";
-	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="NBiBZgxu"
-ARC-Seal: i=1; a=rsa-sha256; t=1755523964; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Jtr5V/JwOkXxjJaG+T0rUgAXc+RSUFrkY2pWe9AKT3T0QpFh+DAg1XXH0JVbS6UKci
-    kG/UxzaPkcuhnr3cFPDT7ahaukeObsnd8KBft8cPPPDPIGBeYxCd8alekxircIib8nQl
-    EGVDao6ySslTyo57RseqCidI6pHcuVYSxSdBrSV4VMaDrqJxqpEZHXRiKw13aL5pSUe8
-    q08jyI/xW7Is1FOVZ94YqWitiSfi1YRhOOkM13N8EqJhxdWvI/juVCXGyO2Up5qxBFgK
-    B0adMjzHcof+Rt++i3x42zUc0+ZOhj44Fwy4/xCnIUv/I21jReHHp8unULn417NFLo1c
-    uJvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1755523964;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=bGPJDDIK0A+1nB5ACwSZqwTY1dyeSldR3vEYMiGGouA=;
-    b=a9q/MUKj+/I3h8s4gD0cHNiTVX4Gdj44mEbqRLx5yzXcuoV3zfKgbl/4B8EtBwSvLM
-    nIP+otzpRd/MSS68sekjwiCOznAZ55DMD5eeRiEAh3PaWxMwc3cBu+4scU/IJvFe23DH
-    lnqf2xjRYOgsojDhWcheyz517oLXK7wEOrsbI46lK1gKRqkLs7upRuMbPUQgMFYKGXfl
-    7zVYkO6Aatb0ZBT0Ig/EKBkJx3rqXNEuGsNe7iE03sVCGhE8LOhFjqv+IS0MELoMoBbZ
-    ptnU4liA/qnvqWqhuf/TwaBjQDk+tFQrQ2l+cP0pxBuv1w0u5aRIhWvBktP51xF/2+cT
-    RE8w==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1755523964;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=bGPJDDIK0A+1nB5ACwSZqwTY1dyeSldR3vEYMiGGouA=;
-    b=AL/uq1mrJxcb5au+Qz0F8RIBE41VqvlA/bs+WGQlMnwDSpY49etWrX6TiDVPT5sEyI
-    QOqd2tCvwhM1KoZYiq/gencxdljJeB8dIcuX/rSTlMdMofIk41+8ldush/62ylxxHf4e
-    G0ORiGARmHu0Sm72qTfEfr+xbxL3tpT30VFF//RPKV+wG2W+a8JIV5TQnE0ZXKWUQfKT
-    +XDbUwm4lBeYYmQwu1H5WNnI/KYlYsb9Cs8v/Arnn3hixVBjfpbjyqoatbhZVHbDrXw6
-    1KxOnkzGG7m9vbJzGDyx/Qv4m0h2GVApvmE0g6JqCWaOdzT6I77jiTx2DmZ2ED6fgZ+k
-    KPXA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1755523964;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=bGPJDDIK0A+1nB5ACwSZqwTY1dyeSldR3vEYMiGGouA=;
-    b=NBiBZgxueyqwXBCxmgVlQeK/iebqkrsTDo/syadgWKGfRJH7kMjb7td4HGOl1AYW8b
-    wopu6MWR+LTRqpkjDNBw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJPSciIGX"
-Received: from tauon.localnet
-    by smtp.strato.de (RZmta 52.1.2 DYNA|AUTH)
-    with ESMTPSA id f5f78e17IDWhySG
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 18 Aug 2025 15:32:43 +0200 (CEST)
-From: Stephan Mueller <smueller@chronox.de>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, eadavis@qq.com, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V3] crypto: Mark intermediary memory as clean
-Date: Mon, 18 Aug 2025 15:32:43 +0200
-Message-ID: <2401599.22IY78Rhhi@tauon>
-In-Reply-To: <tencent_65C6578989EEED6EE78C8B67E586DE92EB06@qq.com>
-References:
- <7740195.jRhZ6ZUK3Y@tauon>
- <tencent_65C6578989EEED6EE78C8B67E586DE92EB06@qq.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8wqW9o6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63055C4CEEB;
+	Mon, 18 Aug 2025 15:43:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755531826;
+	bh=VlQ//odG4TiaTTWUSfqhxg//RcOSrv0QF+ehSYeOgdo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=g8wqW9o6KU+Bd2HAfhnp6cNx+d92eM893fCVda3iZD4yNK78i579DGXb0uebMXaaM
+	 xkDD58RsnPtrv8Vw7ruAYHY2lla44YIh+B+8oC1CQTmJxQW/5eS3Pg7AHN4sh1gHA7
+	 7LIBWUxhJn1wJDiG/mr9WAahqVQ8GCwoLJLabKxEZzk9uC9qLLxuvp0R+ObBxpGBsL
+	 4gC8kaYNBrTNl5srelFH+bEIBjDXIS7CcB2n/qItqM6WL9M42QZjJnme7srsWFCnyq
+	 JkCtyVk03SXACQKeHtD88wcRvciUt+ga4NvghXZmGStgewd4DTpTLXcipgs3aogP3k
+	 HdtVNFGcP5cww==
+Date: Mon, 18 Aug 2025 08:43:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org, Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] sctp: Convert cookie authentication to
+ use HMAC-SHA256
+Message-ID: <20250818084345.708ac796@kernel.org>
+In-Reply-To: <CADvbK_fmCRARc8VznH8cQa-QKaCOQZ6yFbF=1-VDK=zRqv_cXw@mail.gmail.com>
+References: <20250813040121.90609-1-ebiggers@kernel.org>
+	<20250813040121.90609-4-ebiggers@kernel.org>
+	<20250815120910.1b65fbd6@kernel.org>
+	<CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
+	<20250815215009.GA2041@quark>
+	<20250815180617.0bc1b974@kernel.org>
+	<CADvbK_fmCRARc8VznH8cQa-QKaCOQZ6yFbF=1-VDK=zRqv_cXw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
 
-Am Montag, 18. August 2025, 15:24:17 Mitteleurop=C3=A4ische Sommerzeit schr=
-ieb=20
-Edward Adam Davis:
-
-Hi Edward,
-
-> This is not a leak! The stack memroy is hashed and fed into the
-> entropy pool. We can't recover the original kernel memory from it.
+On Sat, 16 Aug 2025 13:15:12 -0400 Xin Long wrote:
+> > > Ideally we'd just fail the write and remove the last mentions of md5 =
+and
+> > > sha1 from the code.  But I'm concerned there could be a case where
+> > > userspace is enabling cookie authentication by setting
+> > > cookie_hmac_alg=3Dmd5 or cookie_hmac_alg=3Dsha1, and by just failing =
+the
+> > > write the system would end up with cookie authentication not enabled.
+> > >
+> > > It would have been nice if this sysctl had just been a boolean toggle.
+> > >
+> > > A deprecation warning might be a good idea.  How about the following =
+on
+> > > top of this patch: =20
+> >
+> > No strong opinion but I find the deprecation warnings futile.
+> > Chances are we'll be printing this until the end of time.
+> > Either someone hard-cares and we'll need to revert, or nobody
+> > does and we can deprecate today. =20
+> Reviewing past network sysctl changes, several commits have simply
+> removed or renamed parameters:
 >=20
-> Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3De8bcd7ee3db6cb5cb875
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-
-Thank you for the patch. Just for the records:
-
-=2D the intermediary buffer could be initialized to 0 without any effect on=
- the=20
-Jitter RNG, because all it wants is actually the execution of the Keccak=20
-operation as part of crypto_shhash_finup.
-
-=2D the intermediary buffer is inserted into the Jitter RNG state to ensure=
- that=20
-the compiler cannot optimize away the loop if the intermediary buffer would=
-=20
-not be used at all
-
-=2D the intermediary buffer is not credited with any entropy as we only wan=
-t the=20
-Keccak operation
-
-=2D by keeping the intermediary uninitialized, the Jitter RNG may get some=
-=20
-variations from the uninitialized buffer so that its internal state may=20
-benefit from it
-
-That said, I am fine with this current patch. But if there is still lingeri=
-ng=20
-concern, I am equally fine to have it initialized to zero.
-
-Thanks a lot
-Stephan
-
-> ---
-> V1 -> V2: mark it as unpoison
-> V2 -> V3: replace to sizeof, minimize the possibilities where
-> inconsistencies can occur
+> 4a7f60094411 ("tcp: remove thin_dupack feature")
+> 4396e46187ca ("tcp: remove tcp_tw_recycle")
+> d8b81175e412 ("tcp: remove sk_{tr}x_skb_cache")
+> 3e0b8f529c10 ("net/ipv6: Expand and rename accept_unsolicited_na to
+> accept_untracked_na")
+> 5027d54a9c30 ("net: change accept_ra_min_rtr_lft to affect all RA lifetim=
+es")
 >=20
->  crypto/jitterentropy-kcapi.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-> index 1266eb790708..4020a6e41b0e 100644
-> --- a/crypto/jitterentropy-kcapi.c
-> +++ b/crypto/jitterentropy-kcapi.c
-> @@ -117,6 +117,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8
-> *addtl, pr_warn_ratelimited("Unexpected digest size\n");
->  		return -EINVAL;
->  	}
-> +	kmsan_unpoison_memory(intermediary, sizeof(intermediary));
->=20
->  	/*
->  	 * This loop fills a buffer which is injected into the entropy pool.
+> It seems to me that if we deprecate something, it's okay to change the
+> sysctls, so I would prefer rejecting writes with md5 or sha1, or even
+> better following Eric=E2=80=99s suggestion and turn this into a simple bo=
+olean
+> toggle.
 
-
-Ciao
-Stephan
-
-
+Slight preference towards reject. bool is worse in case we need to
+revert (if it takes a few releases for the regression report to appear
+we may have to maintain backward compat with both string and bool
+formats going forward).
