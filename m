@@ -1,71 +1,76 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A983731A063;
-	Mon, 18 Aug 2025 12:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B5E3218D7;
+	Mon, 18 Aug 2025 12:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755520249; cv=none; b=NSIc6dTB3NGFU9cqs3KZnA6/+UwZEEtAX+uecwi4EcJxek4VCSe4GlK6wiIQUxDJmTM8EiTC9QJjb8nEf7fcq96IvNmYDkgNLQxhT7vCv8gXuG1borlZtqs1DZLobc1719MVAZppQCfE4hfazQq5eILFLQpA1lTBAt39e4Uo5q0=
+	t=1755521331; cv=none; b=Voss9xX+jmMostUtqxG0cH0StlKTxS0ae8dFO+WJbveNu17GCz/e8FmNoWbZCLnCerey2+Ng4gAEuAa0kJN1466H3hlTq9ODkiIs/IAyRXFzjYM+ZfHol+44zmf+5pFa/JRvTV17g+TdeC+u6GKTke1WBx9VNU7BBaAyr5N4to8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755520249; c=relaxed/simple;
-	bh=he/ljGrtl93Ludn/QUGKRnusEDCM9jmrsquCb1fyWww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nL0httdLaBOJvvkYtYpyouleQv268CR8lrChTEqr8wOMJg//5EvEccwydZmfZfrg+e00wV7Dnmye+TYKrIVCrbxw41SqrWV88glWOiMoc28JV2+umJgOSjblBDZZ9D6+QqJZLZGkbfQ+6HdQck8OP9+IOkHUYFEnJGK0hQ6mrs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=irRzVi5n; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1755521331; c=relaxed/simple;
+	bh=4IB1tgKEiqeCPz5V53tVO/SIhyw2+to9wxscoO9Kil0=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=h4rtRuiSiWJaD6ddu3IyU82Cs7i4RbJeTfjgV85sYDdtE/QYeolFFTl1mldhOPmwPLC64HfDDj8w1qZ/T1coZCGWIQ648mBf+7x2xOx0DaHOw+Piksd/uh4JdwYBkEq0ozbuNooBPqUULDK/f/OJ1O+HWpGLYau11J1i7eY4CsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=mfJ49oK/; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="irRzVi5n"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=HoV2JW1l/9JIS8upGKcdO9HzBqFT431DsZjG7S4TAb0=; b=irRzVi5nu1LDRtpsSMbXHC1Aqx
-	bPxDy/W9QshUan54BgDxGLNzsKTCHnhZpXtdc7rbHgdnR9P7SAzEiuDyFN8NJcOWGiPQ8Fbs/H7Se
-	MUCRDKtVx3DA9bYVALWSFYUIeq/Nvp1bLRYlz0RLBwfnV0z+5YmZwuSLReK/nI8oWYeQcRgjpncYQ
-	7zjHctUZM8x2350RiqxgasUChRfrOpBurGaMllfm3bt8IwrqFkIPRX4q5apCCeuqD0DY2QhXex/eG
-	M5l8YWfZd39rYmeDTqiLmGyQsk6ubVi11/wk4XGMhSJFRD7zUhn9q0EtoxJMKVP9yvQLHwZYgpVy+
-	eSsWrf7A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1unykz-00FDEr-08;
-	Mon, 18 Aug 2025 20:30:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 18 Aug 2025 20:30:29 +0800
-Date: Mon, 18 Aug 2025 20:30:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="mfJ49oK/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1755521018; bh=4IB1tgKEiqeCPz5V53tVO/SIhyw2+to9wxscoO9Kil0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=mfJ49oK/cZuA+Cv9Vq2xNGKj2ggr0bH+LkY1IUxF54LmK7xHwChKuHI2jQBUuCgSo
+	 1FSfPGb7eySG4GHYSmBWmYED3qybBsuiuz+Veyp+zAWON//DAQB8nv1z0FqwLpCSl5
+	 sbwQgqZdMJfwbuDtFOObdwgwgo+5EujSMxE7GJiI=
+Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.230.220])
+	by newxmesmtplogicsvrsza56-0.qq.com (NewEsmtp) with SMTP
+	id AE3B12E0; Mon, 18 Aug 2025 20:43:35 +0800
+X-QQ-mid: xmsmtpt1755521015t8giv81oj
+Message-ID: <tencent_F8BAB8BB23338A9E2C1B4F4BD11BD9252E08@qq.com>
+X-QQ-XMAILINFO: MyirvGjpKb1jvIfe0ZQPtffA1xM9u7Fz9RjGgPhMazjFVb/oLtXmsu2uu/1Ir2
+	 2mnRWGly+vnIqATp/Wo2B8NM6MegoMfCpUzG7CBCvg4u4nyRPuYCciaohTOTKPudln5uxf/V6mV4
+	 LeSv3Tz2FDY6sYfveRZUlfkMYTXaRO1yoyVuZJ77mf8q26ys2h8h70Yagjdlgm3nxgFApV9KoqzR
+	 5bFFoKq7HT07X5JIHf7fbElT66SPPOCEPwU4NlmV3mvGz7ikmBJECiUNZCKdUvdMQX3+YZ8MSfO7
+	 TRvcSp5TPyIUG12o6zb9GM7qiV/u9rH7Cly8PK9dQtYxPHw3wJ6D+jy9xBYSSetVD3+nroW5gVhG
+	 hFdVttLMNgEo98y6ysN3IW4Q4QV4mRKuNEal/VOtVCIq7mpUFTWMhKZ93N9jYp216iXNGI88nKA/
+	 5QSy7Pmoqo050a+R3X/4L2fMxi/8CU3ReHnj2S1cgrqY0XuXdR3H13U05nXCB6kH6Vsq0eJMUqJn
+	 5SBB7y3EOjRXbYZmbEiIevM04MUuDfOD2+keFK44omLueTovYXYYW3ivg5EWFxZJXkK/U78Hp2vp
+	 P1+EqWK9wjiZ3tg5ODZ7QKmoUElU+qMt+l86jZ+C0qIlMqAk/7Cs9gxHuB+wfi5ZmckPY3KXQ/3w
+	 cxXfufgEpDdDiVlhewt5HwqDOkbaboqL+xQN9EUBAO2Y4p4x89Q1fYdapgzXnAhOapVvp5GFwynv
+	 tIZOGEcShygCzAAknr/q8xxCs0vs2B36lRG/kNj4Oi4sobhFLQmxKuiFWLTLdiZrE0ukAeyhCOOw
+	 W5x8M3J3zXUjSBhvrQ2TL4FhMya7RBkARDvcOJEd95yzhGCUuPUHk36cdrF5/rny6GgDBmtUv25N
+	 KPef0OxvZkWb/fZTn98019xv4+GM2fo8kZKfwTnnOQeRR5U23crNMrtSfVgVSMez3kZ0RJ2vT54H
+	 R9DLwNhTWGlo2orfyQY2vHmEC3iezR0WRdSxpUwGj7GX/ThIQA0WJFjHJxHviI
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: Edward Adam Davis <eadavis@qq.com>
+To: smueller@chronox.de
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	eadavis@qq.com,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com,
 	syzkaller-bugs@googlegroups.com
 Subject: Re: [PATCH V2] crypto: Mark intermediary memory as clean
-Message-ID: <aKMc5amKH9CLbKL8@gondor.apana.org.au>
-References: <aKG_yEuG6F4cqFjf@gondor.apana.org.au>
- <tencent_50604BE61B0A2525BA07BB9033239E401B08@qq.com>
+Date: Mon, 18 Aug 2025 20:43:36 +0800
+X-OQ-MSGID: <20250818124335.470340-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <aKMc5amKH9CLbKL8@gondor.apana.org.au>
+References: <aKMc5amKH9CLbKL8@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_50604BE61B0A2525BA07BB9033239E401B08@qq.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 08:17:17PM +0800, Edward Adam Davis wrote:
->
+On Mon, 18 Aug 2025 20:30:29 +0800, Herbert Xu wrote:
 > Their values are equal, so why use sizeof to calculate?
 > Similarly, "if (sizeof(intermediary) != crypto_shash_digestsize(desc->tfm)) {",
 > why not just use SHA3_256_DIGEST_SIZE?
+Hi Stephan Mueller, can you explain it?
 
-Please be consistent with the existing code, every other place
-in the function uses sizeof(intermediary) so your patch is the
-odd one out.
+BR,
+Edward
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
