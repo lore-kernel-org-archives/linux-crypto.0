@@ -1,140 +1,172 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5207421765B;
-	Tue, 19 Aug 2025 12:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E3B2C2372;
+	Tue, 19 Aug 2025 16:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755608124; cv=none; b=cne76+bK98/1BpAPIYl79CJimnVjEdROAAbsGLff0cnsuWVQ2/FRecnfGVRJ06dAq8u7TJdEmejBnXi7Ym9glAAE0dFuQV1e9f2WVxD6su2cDaNYHOPrEVh37VhR3AwT91M8Mza7t6ziA/IHNeiDYNETFKD1shGC7w+UbQcFi/Y=
+	t=1755619902; cv=none; b=HgYH2grUgGN+LLbZWeJeDMPuPN5qXA8b7lUJcAuSYyk0dc7YG5R4Pf8Sh4ccG97JPfD810vQihUBXNPBrQ71jr9Pw+0AcUpfuD+crNK5F9zr6UI/O3P1l1bjdEZ8sWu+DUldTc+O9hYq1e0+DFdAUGt8I5x563CxbEwx7koCorc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755608124; c=relaxed/simple;
-	bh=+1/10nzw4Yf4yiVjA7ztc1dX3OYsmM9+0qlQA3cpdSg=;
+	s=arc-20240116; t=1755619902; c=relaxed/simple;
+	bh=87YZPJZ5q3Sgkr3avnsaQR4tYHWxRSrg1im7qSOpZtY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bmmysCGMOOBgDYaicuwibIjas56QYSxSKU54MO4uy7pCD2ZGaA+hZT/A1DgSqN46CE1Z1ud8sHMF3vMqCXLPDW/07IG5hUOeFNQG8qz6SEFFmQeVzL8GVuxf+ZVlNwHLGqUWJduGCOzTgxB3ENtZwXcObU9ti1xMl+PSZ7bDqHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Op6q3UE7; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gm7JZaSto38sBgJExJdoarnqNtbl7KWAp0vSo0T+xrINfYRvH8TN7SSr23JL4HI1jfGfZC3rElb8zAcNG02/KpV1z1Y1dWhuQO2cxNFLn8ppOZVNsk47crzTdqB1IGrOyaEos0MkhY8/1iX2pRWiZU9XD8YA3+QajrYc5rzWe1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TG//Cigf; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Op6q3UE7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D705C4CEF1;
-	Tue, 19 Aug 2025 12:55:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755608123;
-	bh=+1/10nzw4Yf4yiVjA7ztc1dX3OYsmM9+0qlQA3cpdSg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Op6q3UE7eKv7xYk37W//xhzKMUL2XvdoNTa45dNkDlSf/a0dqxSKLzGkTFjy1ODhC
-	 gOfaNm1m5FpSsq0WGgFhmbTi11oQ5UT2a6utUz25TkBRkYfHfmjB6l9AGbaGLtX5Lg
-	 M9le2ylpxoFrce1kmFrMqwbieVaCIdyb8z0IkNZWiulgV8tw1HqujTHFV4m9QI/fh9
-	 NfJDeVggrWmvGUreyIo4UrBCejq9BOWTOlTae3A4VDfGZWzgGTQKZ/DUNuebOPnlsN
-	 oCL2ady6yZfisD5j5SWcqRBG0XxGb2koSMhhWKBDolwocwJl6wkrI31vjuyARtpBae
-	 yNmxj40rSPOiQ==
-Date: Tue, 19 Aug 2025 13:55:18 +0100
-From: Lee Jones <lee@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: herbert@gondor.apana.org.au, jarkko@kernel.org,
-	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	peterhuewe@gmx.de, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH v12 2/4] crypto: loongson - add Loongson RNG driver
- support
-Message-ID: <20250819125518.GF7508@google.com>
-References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
- <20250705072045.1067-3-zhaoqunqin@loongson.cn>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TG//Cigf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755619901; x=1787155901;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=87YZPJZ5q3Sgkr3avnsaQR4tYHWxRSrg1im7qSOpZtY=;
+  b=TG//CigfKBL12ftbw48o4fcXIVYKd+nY7XkuV6/bFr93veWLXFV1yWMk
+   9vg/3dRsa9ZLHZCEYnZTai9y3WDQ2Ou7CujtcGkS0YLrbqoetLxAsGZnJ
+   ZGJuYcVSjqhoetG1g19b27OtcsrY9HQLNQXD/1D30KzRexafQLomFd+w6
+   +qjzmjCQ66zUnK+qsnP+W8eWNbJgNAnutwFzVvwGTCQjUy5rS1pZeBVFL
+   97HMWd6HW3sLvDyBOWTXYupKqejEaAyw8hLWZGw4LEh24fvL59rIKggQy
+   SrgFZ1p1XsiLrCRL/wXmydPVDkJtMS++iGlRaY7nMU8ESjH4QCorElXZL
+   A==;
+X-CSE-ConnectionGUID: Y/cY2dolQvCDa06moCZWfA==
+X-CSE-MsgGUID: jxvFz/oBQAWREiUamROkcA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57726009"
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="57726009"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 09:11:40 -0700
+X-CSE-ConnectionGUID: Ja443f0+T+Scnc8/lwfoOA==
+X-CSE-MsgGUID: Gxr3e9e9RRSzCPklatT/iA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="167069883"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 19 Aug 2025 09:11:38 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uoOvv-000H6R-2n;
+	Tue, 19 Aug 2025 16:11:35 +0000
+Date: Wed, 20 Aug 2025 00:10:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tanmay Jagdale <tanmay@marvell.com>, davem@davemloft.net,
+	leon@kernel.org, horms@kernel.org, sgoutham@marvell.com,
+	bbhushan2@marvell.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, Tanmay Jagdale <tanmay@marvell.com>
+Subject: Re: [PATCH net-next v4 13/14] octeontx2-pf: ipsec: Manage NPC rules
+ and SPI-to-SA table entries
+Message-ID: <202508200056.n3gONjJD-lkp@intel.com>
+References: <20250819021507.323752-14-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250705072045.1067-3-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250819021507.323752-14-tanmay@marvell.com>
 
-On Sat, 05 Jul 2025, Qunqin Zhao wrote:
+Hi Tanmay,
 
-> Loongson's Random Number Generator is found inside Loongson Security
-> Engine chip.
-> 
-> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
-> ---
->  drivers/crypto/Kconfig                 |   1 +
->  drivers/crypto/Makefile                |   1 +
->  drivers/crypto/loongson/Kconfig        |   5 +
->  drivers/crypto/loongson/Makefile       |   1 +
->  drivers/crypto/loongson/loongson-rng.c | 209 +++++++++++++++++++++++++
->  5 files changed, 217 insertions(+)
->  create mode 100644 drivers/crypto/loongson/Kconfig
->  create mode 100644 drivers/crypto/loongson/Makefile
->  create mode 100644 drivers/crypto/loongson/loongson-rng.c
-> 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 9f8a3a5be..f6117bc77 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -827,6 +827,7 @@ config CRYPTO_DEV_CCREE
->  	  If unsure say Y.
->  
->  source "drivers/crypto/hisilicon/Kconfig"
-> +source "drivers/crypto/loongson/Kconfig"
->  
->  source "drivers/crypto/amlogic/Kconfig"
->  
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index 22eadcc8f..125b99b24 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -44,6 +44,7 @@ obj-y += inside-secure/
->  obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
->  obj-y += xilinx/
->  obj-y += hisilicon/
-> +obj-y += loongson/
->  obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
->  obj-y += intel/
->  obj-y += starfive/
-> diff --git a/drivers/crypto/loongson/Kconfig b/drivers/crypto/loongson/Kconfig
-> new file mode 100644
-> index 000000000..15475da8f
-> --- /dev/null
-> +++ b/drivers/crypto/loongson/Kconfig
-> @@ -0,0 +1,5 @@
-> +config CRYPTO_DEV_LOONGSON_RNG
-> +	tristate "Support for Loongson RNG Driver"
-> +	depends on MFD_LOONGSON_SE
-> +	help
-> +	  Support for Loongson RNG Driver.
-> diff --git a/drivers/crypto/loongson/Makefile b/drivers/crypto/loongson/Makefile
-> new file mode 100644
-> index 000000000..1ce5ec32b
-> --- /dev/null
-> +++ b/drivers/crypto/loongson/Makefile
-> @@ -0,0 +1 @@
-> +obj-$(CONFIG_CRYPTO_DEV_LOONGSON_RNG)  += loongson-rng.o
-> diff --git a/drivers/crypto/loongson/loongson-rng.c b/drivers/crypto/loongson/loongson-rng.c
-> new file mode 100644
-> index 000000000..3a4940260
-> --- /dev/null
-> +++ b/drivers/crypto/loongson/loongson-rng.c
-> @@ -0,0 +1,209 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2019 HiSilicon Limited. */
-> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
-> +
-> +#include <linux/crypto.h>
-> +#include <linux/err.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/io.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/kernel.h>
-> +#include <linux/list.h>
-> +#include <linux/mfd/loongson-se.h>
+kernel test robot noticed the following build errors:
 
-This depends on the first patch in the series.
+[auto build test ERROR on net-next/main]
 
-Does this one have an Ack?
+url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250819-103300
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250819021507.323752-14-tanmay%40marvell.com
+patch subject: [PATCH net-next v4 13/14] octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+config: sparc64-randconfig-002-20250819 (https://download.01.org/0day-ci/archive/20250820/202508200056.n3gONjJD-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250820/202508200056.n3gONjJD-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508200056.n3gONjJD-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_free_hw_resources':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1809:3: error: implicit declaration of function 'cn10k_ipsec_inb_disable_flows'; did you mean 'cn10k_ipsec_inb_delete_flows'? [-Werror=implicit-function-declaration]
+      cn10k_ipsec_inb_disable_flows(pf);
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      cn10k_ipsec_inb_delete_flows
+   cc1: some warnings being treated as errors
+
+
+vim +1809 drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+
+  1772	
+  1773		if (!otx2_rep_dev(pf->pdev))
+  1774			otx2_clean_qos_queues(pf);
+  1775	
+  1776		mutex_lock(&mbox->lock);
+  1777		/* Disable backpressure */
+  1778		if (!is_otx2_lbkvf(pf->pdev))
+  1779			otx2_nix_config_bp(pf, false);
+  1780		mutex_unlock(&mbox->lock);
+  1781	
+  1782		/* Disable RQs */
+  1783		otx2_ctx_disable(mbox, NIX_AQ_CTYPE_RQ, false);
+  1784	
+  1785		/*Dequeue all CQEs */
+  1786		for (qidx = 0; qidx < qset->cq_cnt; qidx++) {
+  1787			cq = &qset->cq[qidx];
+  1788			if (cq->cq_type == CQ_RX)
+  1789				otx2_cleanup_rx_cqes(pf, cq, qidx);
+  1790			else
+  1791				otx2_cleanup_tx_cqes(pf, cq);
+  1792		}
+  1793		otx2_free_pending_sqe(pf);
+  1794	
+  1795		otx2_free_sq_res(pf);
+  1796	
+  1797		/* Free RQ buffer pointers*/
+  1798		otx2_free_aura_ptr(pf, AURA_NIX_RQ);
+  1799		cn10k_ipsec_free_aura_ptrs(pf);
+  1800	
+  1801		otx2_free_cq_res(pf);
+  1802	
+  1803		/* Free all ingress bandwidth profiles allocated */
+  1804		if (!otx2_rep_dev(pf->pdev))
+  1805			cn10k_free_all_ipolicers(pf);
+  1806	
+  1807		/* Delete Inbound IPSec flows if any SA's are installed */
+  1808		if (!list_empty(&pf->ipsec.inb_sw_ctx_list))
+> 1809			cn10k_ipsec_inb_disable_flows(pf);
+  1810	
+  1811		mutex_lock(&mbox->lock);
+  1812		/* Reset NIX LF */
+  1813		free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
+  1814		if (free_req) {
+  1815			free_req->flags = NIX_LF_DISABLE_FLOWS;
+  1816			if (!(pf->flags & OTX2_FLAG_PF_SHUTDOWN))
+  1817				free_req->flags |= NIX_LF_DONT_FREE_TX_VTAG;
+  1818			if (otx2_sync_mbox_msg(mbox))
+  1819				dev_err(pf->dev, "%s failed to free nixlf\n", __func__);
+  1820		}
+  1821		mutex_unlock(&mbox->lock);
+  1822	
+  1823		/* Disable NPA Pool and Aura hw context */
+  1824		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_POOL, true);
+  1825		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_AURA, true);
+  1826		otx2_aura_pool_free(pf);
+  1827	
+  1828		mutex_lock(&mbox->lock);
+  1829		/* Reset NPA LF */
+  1830		req = otx2_mbox_alloc_msg_npa_lf_free(mbox);
+  1831		if (req) {
+  1832			if (otx2_sync_mbox_msg(mbox))
+  1833				dev_err(pf->dev, "%s failed to free npalf\n", __func__);
+  1834		}
+  1835		mutex_unlock(&mbox->lock);
+  1836	}
+  1837	EXPORT_SYMBOL(otx2_free_hw_resources);
+  1838	
 
 -- 
-Lee Jones [李琼斯]
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
