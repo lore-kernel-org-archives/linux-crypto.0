@@ -1,214 +1,135 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3908B1E5207;
-	Tue, 19 Aug 2025 09:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D76C315762
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Aug 2025 10:08:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755597415; cv=none; b=p1H0lgNUL1obwWHdrHHYqz1KktIlQovPzn7frIKjTnoG63bo91qsdW6Bl6h4v7v9pr7ggbpZyKQxwSLfsM60w+n7uVBGiRNX4pCVZOfY7oZOp2cHS52SRyLaaxeLTQlIGXASMC/1ka2+e5GXjfURCyZRmswZCr1e4k0zwQhtesU=
+	t=1755598126; cv=none; b=Cwt015srHh1XBQ9xtW1ViZNltS6xzMIWg0hcOLoWmUWzcV2m3WXsIKlDUHe6Tk/epTGPe5+hILNx4ZDeZuKeYdIXovBnVVsSSISnjmQno55QixiaCn2jwx38yP6epv/k8PB+YXYqE7Ec+3FYnLS35MO5sN2s15fd56cEbCiXJw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755597415; c=relaxed/simple;
-	bh=0zy3VasTvDkGYKh2MdkeeuI2WFPOfWq4rFwh0kf6R20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Exy1n4XF0I45wNPpl2Y91uYZFysFBp+bnaopvv34V/tH2+AocKH/W1fRzOfXHrXiCxFdikA6uF0Aekxcc40hlXqgVLGonLa/vLzEeCh6APj7tundDhxYhaizVa1WTLZ+L6sPAiMSOsR7L21zP8IMy1srAYdGQsR/94QvrbA3Njk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmlCtNop; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755598126; c=relaxed/simple;
+	bh=fs4MefNTbsID2g1I7hGNRD2yN0nT/An+4QBFuSPLrsY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fRHRU5E+w7EsfGu9oJ0J08PnCuiy2QYPeoPYPIKEtGsbZrzsLtb1nPcRqkA/hn6bqsepPFPklP8PWU0DhM2qKHmrFsxIQ1fUY2pCfI6OnaU7Kh+QMO7CRsD7AJL5w6T4g6fDLNb6dJEfW3wmIZ65YQv9xQaCFZRWdYT5kjNKP3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LuubKR6z; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmlCtNop"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-afcb78da8a7so829274666b.1;
-        Tue, 19 Aug 2025 02:56:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LuubKR6z"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b47173a7e52so3199785a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Aug 2025 03:08:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755597412; x=1756202212; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g0bVAF8WDQqarUcJ5Cxhh/tMUtZzqgjbTmQW+l2gxzk=;
-        b=jmlCtNop8rM18KIAQqLxFBu/Oh1zJR1TSfJNeLabLdcv6PyPJvgEi2mfpq7aRuf/ql
-         NFDwujxtukOO8bXjtECb8BRMTBIqtUI0GJes5eQFJsp+S/9WDGIC87sWdn2yaG2wdH9g
-         E42hamsabVBIvYyCSGVqrMkRtIgV7+2eWFg6xbJWUAwS/JYBIDdbULSmz8SJWwxJgX/1
-         nGhh/qFb8ew3pikC21AcrKoJU9zw1Imq0qmr0yulFPtGqhCZMJYRFqKvce8MBnV5oe00
-         GEOR1mPSYhJQLARBQ+Kxye7CdnLt8oEciewW5HzUMRW3tpvUodswcZuYcA1a8feCoF4k
-         aeZQ==
+        d=google.com; s=20230601; t=1755598124; x=1756202924; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xtwFnGhPjZbaJZhKpnnfvoiBniYG8b/g2aN0jXq3ohM=;
+        b=LuubKR6zF60ZGwUhYrSyVWyJDb2IFDSEONfiIpZWNwe3Q4YP+XotpKDWWtxBXUgp89
+         lEZqlQoxlTAl8onfknG3h15sdiRu536Rz4T/YJ4DOJSd5iXwUXZnFGvGv1XaFnHoMe1d
+         NqdwHZIIRBbAQhtKiCAs1yw02tVf2XGtPYwvgeYUcYdSBZm5B8grClPuJOTcQrKSws6j
+         N1Vqtr7xZY/ef6w+ZBu88zVxvyehmp2RB/F2B3fMdKB0JybNcgq4llocyd6UwCf9cRKK
+         n1Mv864vKOeetXJu9K2RGY1gcvH9JrMXASabQansbavrsYlpmSt7S+aJR5pcFYiOt2hQ
+         c+Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755597412; x=1756202212;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g0bVAF8WDQqarUcJ5Cxhh/tMUtZzqgjbTmQW+l2gxzk=;
-        b=udk0yrzvjt0banuwD/cIoyugD6E2gItvJGvYUeqgFeabYoFAVo92FH/IridpMe3XgQ
-         k2FxMFWMfqVqJQGpk6igkdM6+i6TZsg00cHvb1iK7Anbqzg6yUMxCXwqdhA4Oa67vtPO
-         CfGyWybAeo2dagKWGPN2lu15UCHkPG6mmoIOaUjNC0YkWDrOT2s1rgKJllg3+cXbLt1a
-         ZB4kbGZfGvjWJ2GLHu8E5KTLtAO4ArGcMbOrdQOgVH48nAuyWXqZi0NczOTq01zqj3oh
-         WWdhrA+dMkUlsApR/GAEAGlUCPbP2t0pt9dUPGwfWinYeVaobS8FxT2P4kyf3xe+EivL
-         yL+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXXhoqTpY+jlz30JXR0bzAEnI4n8/MBHSvWKajEHjYVFqJynh+gcMYglDLRyw19TfWusQhqD3ea0I/a6fc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSxnY8Klrd4sGuTG08H5esEcpSoRVqYon7NhAfHpvZgbdX7G0C
-	BVfvol3EOPLlbY3Wi6hcDxXChQ254JncAzYL0CsxsVACbhursZN3QBXyCeKjiw==
-X-Gm-Gg: ASbGncvdHnAgCTdqwv7EQs45X4skYhiP7BAB6OWi6tuUANoAXb142/lwNiQimT/EQIW
-	1bj3ap1fWse8HeP3zoyW2vd1ixNMzhKMNfQikjOC+9yivwFR/2D7nRg+cK+JgeDexbuhaFG6Pco
-	vX9XUW2hyz5fTRn2Io7G8k41t4JSHuEfqlqyW/miruuDbTa0Rg7/y5ehSGs5I+Js3NTSzNg5UsB
-	KgVF3x8wX2ycepgKPL05WWLO7ahEz9DrlpsP0HbVM9Ozb9bL4Sfhz4pDQ3Z3NkSClAonUAvBrmO
-	bXZQq77V1Iu/0+CHGTKwHcmH/YXIzyMmr8ftgV9z7Ny0oY1SmaMpNMGuP3X0Bajk8gmJZH+Fh2I
-	QwCyHXnbs6+M1+x5yFYvCMt+9pSSA+/ee/5OD5Q2M+kpI5J0n06h7C/jFBURD1lVecMKKnLg/Vq
-	zEaiw7
-X-Google-Smtp-Source: AGHT+IEcppJNVG91ZVqZDy4Z08DCNt+xy4s8G+9ZqhzqBRbSTCDZF6ZxqhVeNiqJS850WRXpPuZhVQ==
-X-Received: by 2002:a17:906:c103:b0:ae0:e065:ddfb with SMTP id a640c23a62f3a-afddcb8a329mr192086366b.18.1755597412348;
-        Tue, 19 Aug 2025 02:56:52 -0700 (PDT)
-Received: from ?IPV6:2a02:2f0e:c207:b600:978:f6fa:583e:b091? ([2a02:2f0e:c207:b600:978:f6fa:583e:b091])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdd04e0c5sm973562966b.117.2025.08.19.02.56.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Aug 2025 02:56:51 -0700 (PDT)
-Message-ID: <e40d056b-731d-4e33-9347-20c0a7665ede@gmail.com>
-Date: Tue, 19 Aug 2025 12:56:50 +0300
+        d=1e100.net; s=20230601; t=1755598124; x=1756202924;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xtwFnGhPjZbaJZhKpnnfvoiBniYG8b/g2aN0jXq3ohM=;
+        b=mIrno+iV7RFWGnfWLFtEVSC0L/NheU2Fgh7YrzEa2cy7iSglxa75c79wU7QsiuJHNq
+         0yBjaGPBdzp6QJGuuNmrwTuhkglI4UEuM3OE1rQoNCpSAqOoQLnmc6+8WsCoRLfl3KnS
+         dXxTfrtovs+Y4J2JL+BNWU7BMk7WI90yEvghG8wW3cBp2+dQMaaigAGwPDx/HZN6rlWP
+         IwZ6o8NnaiTKIxQBmBDyT2S+Bg0HMePmVap9+AMkFNOhpf8b++MU7eZUrWQMB8kR7/Fr
+         ydULA58Ewb+bLrceAPQ2hn4gf7TLl9gGlqNdxQvdrp0tmfTlFSlOFAxI8yp3hclrWtAa
+         9rcg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/IBUfBo+2m793spznzxEzrJLwgmqfJUJoEiCuAJQ/SZnLG4+4ZShpEn26rXaZv2OesJBACMkPaTWEcCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmMeJKVgZk3uox8O2vhJmkJfOScaVKnlRXCBvMbrcQDX8FWjwx
+	EQrB6wuyEjABM7cVyaE6RSNGSS1R0rkAj3/JIxc7peZqUJ7u6qiAZ3+MeN4bkXoJGcXN3vKqUyP
+	+YP36yHetQAFUjii6HkuZUcXSGvotqfqKLA54Fz5V
+X-Gm-Gg: ASbGncu2ULXvFIAfMkw7H0xSWO3GeA/ams2v05yyksRFvoax+M5hSRMqu1KKpPzNZ29
+	qjSgdWTM1+Akv141JkzShs2i+0duqCA1HkMtJZ1qw/YV1KaAh9vw96kjzrfpyg+W2AdZOppoo9i
+	y840u+IG1JSZRKPGqgrKaltF0NBDxavSIiA/T3nxuiCDOkUXfXZXVdS5cnh0t8dI4tGIZYJ2X7Y
+	Q4VRDXsdgcWkea8kqvTlRQxJCvKFzhhLQpj/i52aFP6Z9UJDeMynuGh
+X-Google-Smtp-Source: AGHT+IFfS3hoyBOLwpuKJXoUxE2vzo2ehfwwl1HfDsRL4hlNcLRt9FGWFqIWmbr8FvaOXyY0AViqmicQfnfpexeRIec=
+X-Received: by 2002:a17:902:da92:b0:242:eb33:96a0 with SMTP id
+ d9443c01a7336-245e0328fc4mr25769245ad.25.1755598124032; Tue, 19 Aug 2025
+ 03:08:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
- (ECB, CBC)
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- Kamlesh Gurudasani <kamlesh@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>,
- Vignesh Raghavendra <vigneshr@ti.com>, Praneeth Bajjuri <praneeth@ti.com>,
- Vishal Mahaveer <vishalm@ti.com>, Kavitha Malarvizhi <k-malarvizhi@ti.com>
-References: <20250819065844.3337101-1-t-pratham@ti.com>
- <20250819065844.3337101-3-t-pratham@ti.com>
-Content-Language: en-US
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-In-Reply-To: <20250819065844.3337101-3-t-pratham@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
+ <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
+ <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com>
+ <20250815011744.GB1302@sol> <CALrw=nHcpDNwOV6ROGsXq8TtaPNGC4kGf_5YDTfVs2U1+wjRhg@mail.gmail.com>
+In-Reply-To: <CALrw=nHcpDNwOV6ROGsXq8TtaPNGC4kGf_5YDTfVs2U1+wjRhg@mail.gmail.com>
+From: Marco Elver <elver@google.com>
+Date: Tue, 19 Aug 2025 12:08:07 +0200
+X-Gm-Features: Ac12FXytHPioqIN3_h6-8LrUsWB3kDPFRbJegFs6XnxZaSOjKS1ectEm86g1kAE
+Message-ID: <CANpmjNOdq9iwuS9u6NhCrZ+AsM+_pAfZXZsTmpXMPacjRjV80g@mail.gmail.com>
+Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
+ and RSA parsing
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Ethan Graham <ethan.w.s.graham@gmail.com>, 
+	ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
+	brendan.higgins@linux.dev, davidgow@google.com, dvyukov@google.com, 
+	jannh@google.com, rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
+	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On 8/19/25 9:12 AM, T Pratham wrote:
-> Add support for ECB and CBC modes in the AES Engine of the DTHE V2
-> hardware cryptography engine.
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
-> ---
->  MAINTAINERS                       |   1 +
->  drivers/crypto/Kconfig            |   1 +
->  drivers/crypto/Makefile           |   1 +
->  drivers/crypto/ti/Kconfig         |  14 +
->  drivers/crypto/ti/Makefile        |   3 +
->  drivers/crypto/ti/dthev2-aes.c    | 411 ++++++++++++++++++++++++++++++
->  drivers/crypto/ti/dthev2-common.c | 220 ++++++++++++++++
->  drivers/crypto/ti/dthev2-common.h | 101 ++++++++
->  8 files changed, 752 insertions(+)
->  create mode 100644 drivers/crypto/ti/Kconfig
->  create mode 100644 drivers/crypto/ti/Makefile
->  create mode 100644 drivers/crypto/ti/dthev2-aes.c
->  create mode 100644 drivers/crypto/ti/dthev2-common.c
->  create mode 100644 drivers/crypto/ti/dthev2-common.h
+On Fri, 15 Aug 2025 at 15:00, Ignat Korchagin <ignat@cloudflare.com> wrote:
 >
+> On Fri, Aug 15, 2025 at 2:18=E2=80=AFAM Eric Biggers <ebiggers@kernel.org=
+> wrote:
+> >
+> > On Thu, Aug 14, 2025 at 04:28:13PM +0100, Ignat Korchagin wrote:
+> > > Not sure if it has been mentioned elsewhere, but one thing I already
+> > > don't like about it is that these definitions "pollute" the actual
+> > > source files. Might not be such a big deal here, but kernel source
+> > > files for core subsystems tend to become quite large and complex
+> > > already, so not a great idea to make them even larger and harder to
+> > > follow with fuzz definitions.
+> > >
+> > > As far as I'm aware, for the same reason KUnit [1] is not that popula=
+r
+> > > (or at least less popular than other approaches, like selftests [2]).
+> > > Is it possible to make it that these definitions live in separate
+> > > files or even closer to selftests?
+> >
+> > That's not the impression I get.  KUnit suites are normally defined in
+> > separate files, and KUnit seems to be increasing in popularity.
+>
+> Great! Either I was wrong from the start or it changed and I haven't
+> looked there recently.
+>
+> > KFuzzTest can use separate files too, it looks like?
+> >
+> > Would it make any sense for fuzz tests to be a special type of KUnit
+> > test, instead of a separate framework?
+>
+> I think so, if possible. There is always some hurdles adopting new
+> framework, but if it would be a new feature of an existing one (either
+> KUnit or selftests - whatever fits better semantically), the existing
+> users of that framework are more likely to pick it up.
 
-[...]
+The dependency would be in name only (i.e. "branding"). Right now it's
+possible to use KFuzzTest without the KUnit dependency. So there is
+technical merit to decouple.
 
-> +static int dthe_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct dthe_data *dev_data;
-> +	int ret;
-> +
-> +	dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
-> +	if (!dev_data)
-> +		return -ENOMEM;
-> +
-> +	dev_data->dev = dev;
-> +	dev_data->regs = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(dev_data->regs))
-> +		return PTR_ERR(dev_data->regs);
-> +
-> +	platform_set_drvdata(pdev, dev_data);
-> +
-> +	spin_lock(&dthe_dev_list.lock);
-> +	list_add(&dev_data->list, &dthe_dev_list.dev_list);
-> +	spin_unlock(&dthe_dev_list.lock);
-> +
-> +	ret = dthe_dma_init(dev_data);
-> +	if (ret)
-> +		goto probe_dma_err;
-> +
-> +	dev_data->engine = crypto_engine_alloc_init(dev, 1);
-> +	if (!dev_data->engine) {
-> +		ret = -ENOMEM;
-> +		goto probe_engine_err;
-> +	}
-> +
-> +	ret = crypto_engine_start(dev_data->engine);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to start crypto engine\n");
-> +		goto probe_engine_start_err;
-> +	}
-> +
-> +	ret = dthe_register_algs();
-> +	if (ret) {
-> +		dev_err(dev, "Failed to register algs\n");
-> +		goto probe_reg_err;
-> +	}
-> +
-> +	return 0;
-> +
-> +probe_reg_err:
-> +	crypto_engine_stop(dev_data->engine);
-> +probe_engine_start_err:
-> +	crypto_engine_exit(dev_data->engine);
+Would sufficient documentation, and perhaps suggesting separate files
+to be the canonical way of defining KFuzzTests, improve the situation?
 
-crypto_engine_exit() calls crypto_engine_stop() internally, so there is
-no need to call both functions here. Just use crypto_engine_exit().
+For example something like:
+For subsystem foo.c, define a KFuzzTest in foo_kfuzz.c, and then in
+the Makfile add "obj-$(CONFIG_KFUZZTEST) +=3D foo_kfuzz.o".
+Alternatively, to test internal static functions, place the KFuzzTest
+harness in a file foo_kfuzz.h, and include at the bottom of foo.c.
 
-/**
- * crypto_engine_exit - free the resources of hardware engine when exit
- * @engine: the hardware engine need to be freed
- */
-void crypto_engine_exit(struct crypto_engine *engine)
-{
-	int ret;
-
-	ret = crypto_engine_stop(engine);
-	if (ret)
-		return;
-
-	kthread_destroy_worker(engine->kworker);
-}
-
-> +probe_engine_err:
-> +	dma_release_channel(dev_data->dma_aes_rx);
-> +	dma_release_channel(dev_data->dma_aes_tx);
-> +	dma_release_channel(dev_data->dma_sha_tx);
-> +probe_dma_err:
-> +	spin_lock(&dthe_dev_list.lock);
-> +	list_del(&dev_data->list);
-> +	spin_unlock(&dthe_dev_list.lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static void dthe_remove(struct platform_device *pdev)
-> +{
-> +	struct dthe_data *dev_data = platform_get_drvdata(pdev);
-> +
-> +	spin_lock(&dthe_dev_list.lock);
-> +	list_del(&dev_data->list);
-> +	spin_unlock(&dthe_dev_list.lock);
-> +
-> +	dthe_unregister_algs();
-> +
-> +	crypto_engine_stop(dev_data->engine);
-> +	crypto_engine_exit(dev_data->engine);
-> +
-
-Same here.
-
-> +	dma_release_channel(dev_data->dma_aes_rx);
-> +	dma_release_channel(dev_data->dma_aes_tx);
-> +	dma_release_channel(dev_data->dma_sha_tx);
-> +}
-
-Ovidiu
+Alex, Ethan, and KUnit folks: What's your preference?
