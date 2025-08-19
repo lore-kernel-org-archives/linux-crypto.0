@@ -1,172 +1,116 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E3B2C2372;
-	Tue, 19 Aug 2025 16:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBE030BF71;
+	Tue, 19 Aug 2025 18:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755619902; cv=none; b=HgYH2grUgGN+LLbZWeJeDMPuPN5qXA8b7lUJcAuSYyk0dc7YG5R4Pf8Sh4ccG97JPfD810vQihUBXNPBrQ71jr9Pw+0AcUpfuD+crNK5F9zr6UI/O3P1l1bjdEZ8sWu+DUldTc+O9hYq1e0+DFdAUGt8I5x563CxbEwx7koCorc=
+	t=1755627080; cv=none; b=gLhzqITuwckP5Zn7cYLYEOmBM2lzOx/XV8Cyfn08ZgdvyK27fo9ULogqKwozkG7kzWrcKIANPa6ixri2G7IM8yo1KpUGj7QQkHOY6ppQxZZOEG7LpD+tXiOa6/y693WA1ne6cREnD/akiysrKjtoBeHfE5yWOeZHTDp7bPll1yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755619902; c=relaxed/simple;
-	bh=87YZPJZ5q3Sgkr3avnsaQR4tYHWxRSrg1im7qSOpZtY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gm7JZaSto38sBgJExJdoarnqNtbl7KWAp0vSo0T+xrINfYRvH8TN7SSr23JL4HI1jfGfZC3rElb8zAcNG02/KpV1z1Y1dWhuQO2cxNFLn8ppOZVNsk47crzTdqB1IGrOyaEos0MkhY8/1iX2pRWiZU9XD8YA3+QajrYc5rzWe1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TG//Cigf; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1755627080; c=relaxed/simple;
+	bh=xUQemggxCTkPmlVeF7uoN2wIhAxQRgSnHSp8j1ZtmlI=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=APklvTUCJVp1y6m9v+YuTSRHJjgmv//lPgDVMC5W6sqY66jBeSsxxfygKJtE8RmAYxQdrPo4B/wU6YjWxKCHovGCY8I+13j6t8YoGVGkMQIm5J4lzxHfaghGLvqXuWKJWQT0A3nXG6Fcc8wwuSRJkQLMX8iK/Uv+Am6CymLNTaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Z9Rwj5bt; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TG//Cigf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755619901; x=1787155901;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=87YZPJZ5q3Sgkr3avnsaQR4tYHWxRSrg1im7qSOpZtY=;
-  b=TG//CigfKBL12ftbw48o4fcXIVYKd+nY7XkuV6/bFr93veWLXFV1yWMk
-   9vg/3dRsa9ZLHZCEYnZTai9y3WDQ2Ou7CujtcGkS0YLrbqoetLxAsGZnJ
-   ZGJuYcVSjqhoetG1g19b27OtcsrY9HQLNQXD/1D30KzRexafQLomFd+w6
-   +qjzmjCQ66zUnK+qsnP+W8eWNbJgNAnutwFzVvwGTCQjUy5rS1pZeBVFL
-   97HMWd6HW3sLvDyBOWTXYupKqejEaAyw8hLWZGw4LEh24fvL59rIKggQy
-   SrgFZ1p1XsiLrCRL/wXmydPVDkJtMS++iGlRaY7nMU8ESjH4QCorElXZL
-   A==;
-X-CSE-ConnectionGUID: Y/cY2dolQvCDa06moCZWfA==
-X-CSE-MsgGUID: jxvFz/oBQAWREiUamROkcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57726009"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="57726009"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 09:11:40 -0700
-X-CSE-ConnectionGUID: Ja443f0+T+Scnc8/lwfoOA==
-X-CSE-MsgGUID: Gxr3e9e9RRSzCPklatT/iA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="167069883"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 19 Aug 2025 09:11:38 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uoOvv-000H6R-2n;
-	Tue, 19 Aug 2025 16:11:35 +0000
-Date: Wed, 20 Aug 2025 00:10:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tanmay Jagdale <tanmay@marvell.com>, davem@davemloft.net,
-	leon@kernel.org, horms@kernel.org, sgoutham@marvell.com,
-	bbhushan2@marvell.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, Tanmay Jagdale <tanmay@marvell.com>
-Subject: Re: [PATCH net-next v4 13/14] octeontx2-pf: ipsec: Manage NPC rules
- and SPI-to-SA table entries
-Message-ID: <202508200056.n3gONjJD-lkp@intel.com>
-References: <20250819021507.323752-14-tanmay@marvell.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Z9Rwj5bt"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57JAPYtG009349;
+	Tue, 19 Aug 2025 18:11:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=xUQemg
+	gxCTkPmlVeF7uoN2wIhAxQRgSnHSp8j1ZtmlI=; b=Z9Rwj5btOzFAwHzMS1bNzY
+	FPWem4usLyc5Mop59BftvHg9HiHmY98qtBAb2zV/7uilPb4T/Jy1Y1epyUka41aY
+	YnqgmmEq0PHqifeHvslXAZnK6uR5ondczmu8uoOKsDmphVFy90Z42fpxajjx2qi8
+	dHgy8YUUB9wdfI+o2iCgYNYRruNG9MbeCIPDgeZS1pEhbUjWWdxJKtMLS3g0nmX5
+	WMbSS5j4NQwepL1rGroh9KInqBYvvOEz0TdIyCYqs52+ARkFaSxSTESG2PGyHiKa
+	AuDS/YgmnXQhRdQbVPSWK0nzOJ5ns0yUE6y2kS68IyM2T+u9bKHxOAFIraO81a1g
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48jfds0b3w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Aug 2025 18:11:05 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57JI06O3010006;
+	Tue, 19 Aug 2025 18:11:05 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48jfds0b3q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Aug 2025 18:11:05 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57JHkjiD011683;
+	Tue, 19 Aug 2025 18:11:04 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48k4aubmf9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Aug 2025 18:11:04 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57JIB30p60096982
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Aug 2025 18:11:03 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4A9F158062;
+	Tue, 19 Aug 2025 18:11:03 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1C8D5805D;
+	Tue, 19 Aug 2025 18:11:02 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.31.96.173])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 19 Aug 2025 18:11:02 +0000 (GMT)
+Message-ID: <0725dc50a83b82dfe8cedbcffb7529152f37a26a.camel@linux.ibm.com>
+Subject: Re: [PATCH 0/2] Convert lib/digsig.c to SHA-1 library
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>, linux-integrity@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        Dmitry Kasatkin
+ <dmitry.kasatkin@gmail.com>
+Cc: Eric Snowberg <eric.snowberg@oracle.com>, linux-crypto@vger.kernel.org
+In-Reply-To: <20250815021733.25689-1-ebiggers@kernel.org>
+References: <20250815021733.25689-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Aug 2025 14:11:02 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250819021507.323752-14-tanmay@marvell.com>
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Hp7Od9TYyCrfRhL2qVChjfzmXJJcCiJb
+X-Proofpoint-GUID: mQvzuh_mLaP2uUPW3QWaExIG4yOhwGIi
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE2MDAwMSBTYWx0ZWRfXwJzdD/HB3HdE
+ UeDopDh6698OOJKjEcZdNEzFMH/OZ6bSKn15YfFhNZEgAUUphsalZ0OzJ4lso4I93+nIRmanvrT
+ chz47eBof5CUb0TL914Q462qylkVGTCbqjacebq96kP7xwkuSq/VXYDrLXhoTn0RJytC3Si7GqC
+ G5Y2c5+Gd8xpqgCLWgJm7Ea4ZVZGTz7q5mkLDMiWTnB2VVVS9YIG5fCkjmtz09m/nM+/2sgBycd
+ 2z5zzkiInSYUAiiwr57RNwCs6I7epg5M2QBI83Ryu28GPuwp07+aVJu/7tgMAPD6Rbgt2cFiiDn
+ DhO+oIh9vAsgzTxTPoT/bx5b9An3KCIvH5Mw8Uwlrhc0WdfsRuakOrQrRQTzXnYug7ZhnDAHBcw
+ awGfvPSX
+X-Authority-Analysis: v=2.4 cv=GotC+l1C c=1 sm=1 tr=0 ts=68a4be39 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=iQxIiCT5EglVh45UXwYA:9
+ a=QEXdDO2ut3YA:10 a=0lgtpPvCYYIA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-19_02,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 spamscore=0 adultscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508160001
 
-Hi Tanmay,
+On Thu, 2025-08-14 at 19:17 -0700, Eric Biggers wrote:
+> This series converts lib/digsig.c to use the SHA-1 library API.
+>=20
+> Please consider taking this series through the integrity tree.
+>=20
+> Eric Biggers (2):
 
-kernel test robot noticed the following build errors:
+Thanks, Eric.
 
-[auto build test ERROR on net-next/main]
+Mimi
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250819-103300
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250819021507.323752-14-tanmay%40marvell.com
-patch subject: [PATCH net-next v4 13/14] octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
-config: sparc64-randconfig-002-20250819 (https://download.01.org/0day-ci/archive/20250820/202508200056.n3gONjJD-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250820/202508200056.n3gONjJD-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508200056.n3gONjJD-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_free_hw_resources':
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1809:3: error: implicit declaration of function 'cn10k_ipsec_inb_disable_flows'; did you mean 'cn10k_ipsec_inb_delete_flows'? [-Werror=implicit-function-declaration]
-      cn10k_ipsec_inb_disable_flows(pf);
-      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      cn10k_ipsec_inb_delete_flows
-   cc1: some warnings being treated as errors
-
-
-vim +1809 drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-
-  1772	
-  1773		if (!otx2_rep_dev(pf->pdev))
-  1774			otx2_clean_qos_queues(pf);
-  1775	
-  1776		mutex_lock(&mbox->lock);
-  1777		/* Disable backpressure */
-  1778		if (!is_otx2_lbkvf(pf->pdev))
-  1779			otx2_nix_config_bp(pf, false);
-  1780		mutex_unlock(&mbox->lock);
-  1781	
-  1782		/* Disable RQs */
-  1783		otx2_ctx_disable(mbox, NIX_AQ_CTYPE_RQ, false);
-  1784	
-  1785		/*Dequeue all CQEs */
-  1786		for (qidx = 0; qidx < qset->cq_cnt; qidx++) {
-  1787			cq = &qset->cq[qidx];
-  1788			if (cq->cq_type == CQ_RX)
-  1789				otx2_cleanup_rx_cqes(pf, cq, qidx);
-  1790			else
-  1791				otx2_cleanup_tx_cqes(pf, cq);
-  1792		}
-  1793		otx2_free_pending_sqe(pf);
-  1794	
-  1795		otx2_free_sq_res(pf);
-  1796	
-  1797		/* Free RQ buffer pointers*/
-  1798		otx2_free_aura_ptr(pf, AURA_NIX_RQ);
-  1799		cn10k_ipsec_free_aura_ptrs(pf);
-  1800	
-  1801		otx2_free_cq_res(pf);
-  1802	
-  1803		/* Free all ingress bandwidth profiles allocated */
-  1804		if (!otx2_rep_dev(pf->pdev))
-  1805			cn10k_free_all_ipolicers(pf);
-  1806	
-  1807		/* Delete Inbound IPSec flows if any SA's are installed */
-  1808		if (!list_empty(&pf->ipsec.inb_sw_ctx_list))
-> 1809			cn10k_ipsec_inb_disable_flows(pf);
-  1810	
-  1811		mutex_lock(&mbox->lock);
-  1812		/* Reset NIX LF */
-  1813		free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
-  1814		if (free_req) {
-  1815			free_req->flags = NIX_LF_DISABLE_FLOWS;
-  1816			if (!(pf->flags & OTX2_FLAG_PF_SHUTDOWN))
-  1817				free_req->flags |= NIX_LF_DONT_FREE_TX_VTAG;
-  1818			if (otx2_sync_mbox_msg(mbox))
-  1819				dev_err(pf->dev, "%s failed to free nixlf\n", __func__);
-  1820		}
-  1821		mutex_unlock(&mbox->lock);
-  1822	
-  1823		/* Disable NPA Pool and Aura hw context */
-  1824		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_POOL, true);
-  1825		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_AURA, true);
-  1826		otx2_aura_pool_free(pf);
-  1827	
-  1828		mutex_lock(&mbox->lock);
-  1829		/* Reset NPA LF */
-  1830		req = otx2_mbox_alloc_msg_npa_lf_free(mbox);
-  1831		if (req) {
-  1832			if (otx2_sync_mbox_msg(mbox))
-  1833				dev_err(pf->dev, "%s failed to free npalf\n", __func__);
-  1834		}
-  1835		mutex_unlock(&mbox->lock);
-  1836	}
-  1837	EXPORT_SYMBOL(otx2_free_hw_resources);
-  1838	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
