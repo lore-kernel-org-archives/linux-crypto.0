@@ -1,55 +1,66 @@
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6930D287519;
-	Tue, 19 Aug 2025 02:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE37F1990C7;
+	Tue, 19 Aug 2025 06:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755570663; cv=none; b=k1Yqjbt83c11K/5Td0+wQ8EC3vLevGlH5bVlY2E5B75Sb2j1LcMqpG6D583D/edTlp6/q+IvwvbyRv4XLKLqe4Rjw7pPiwVB9hJL8KOMmoxzjlcBVrm8h3dKBuidSUnOICVKSGhznIZxj+nqQa6kuiDHtke5p+1n8GTiNQuw/fE=
+	t=1755586766; cv=none; b=Eeh+gI/Ue+vXka8isNzFkT47ZBMa48wpl3Bis7CIu6B4mUPv/495wJLoIPX1MdHaXJ1gAfFKaOVFsNMPP6GMEBQir7HCqcnl+JRI3cv8ZuuXsUDZbNdOLeMWRnYyjeGG44wDwOmxLk7aEIJslHZ07zSNAL/dqyH4kVNR8zwkwGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755570663; c=relaxed/simple;
-	bh=cnJ0ywBARICzJ9Lft0hAuWFhnk5YlqCCmzKE/ASnBcE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jLd1fLyekD8QJSyO8fCZsXYTKbcm05cugbBUwNZh6JEGfxEL1CEb06WMw7jk9jL+DFSXm3PL0PaOEbnrPiVWBi/vWPTnRRnANKZgJFnTJT9SHkaJgWsv3nGCnUlkD6w2NbyGBStUSJvvbi9gFbbnuCHzlLyzwin8XjHuYPtKY20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CADVwbiC; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+	s=arc-20240116; t=1755586766; c=relaxed/simple;
+	bh=75RkLqnNhDcq7id9uQWAunD22njATN34YA6N620o9co=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G5h6fR6LL1PDP4Xnh8UmSUrkkLxr+dQJh2AwTlACQEJckqKcNpkHWZfiqdEzUzdzwVo6nhxqw1IJbpxtKp7hYxaOpB9/sV2sTEbPKW9s9diXuJkv7xMhkMTTj9mohoYpMSkpmIwD24nEBHP2goloSAdxhwl6JfSeW82xmbquYMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=MgMTtsbZ; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CADVwbiC"
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57IMlaZj000347;
-	Mon, 18 Aug 2025 19:15:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=phNq7khW8PFXPVCUnlbCBks
-	UuJk/61w/L9up8WjJ2YA=; b=CADVwbiCE0xoTnjEodu7kFfbVpw7w4R2ZAypcNx
-	hUnsBuPmPJJR5vfMW1VbxH+UVu1cDy8ICUen5z1Sy1dp8MsYJYSqlMeUBnQyqH6h
-	WM67IBZbaf3o+f22g5WvzKIbrCS4+zkN04NGMjvjO+UpH9zleOudqNNDGvPStwc6
-	2wlkIKIi57F/yPziwVqi4E3Ra3xFEVpk+nI53hlsPpTjn+RiVIwcjCsY5nqu2mLa
-	4EZ+xC7Z8fLpRkpAJYD6bwtNYDghD/2E552sTIL7cRqdTUMR8RyFSSeahHdzgEZr
-	TCpe7fWdv0QzWmfCtli45fZE1Ys3wOcUTx3fV8/aQ/OBpsA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 48md9ggccw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Aug 2025 19:15:16 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 18 Aug 2025 19:15:20 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 18 Aug 2025 19:15:20 -0700
-Received: from optiplex.marvell.com (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with ESMTP id 0A7033F7078;
-	Mon, 18 Aug 2025 19:15:12 -0700 (PDT)
-From: Tanmay Jagdale <tanmay@marvell.com>
-To: <davem@davemloft.net>, <leon@kernel.org>, <horms@kernel.org>,
-        <sgoutham@marvell.com>, <bbhushan2@marvell.com>
-CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Tanmay Jagdale
-	<tanmay@marvell.com>
-Subject: [PATCH net-next v4 00/14] Enable Inbound IPsec offload on Marvell CN10K SoC
-Date: Tue, 19 Aug 2025 07:44:51 +0530
-Message-ID: <20250819021507.323752-1-tanmay@marvell.com>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MgMTtsbZ"
+Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57J6xD8m3342625;
+	Tue, 19 Aug 2025 01:59:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1755586753;
+	bh=vZ4TP7cS8iNEl5xCsSOk3ODpY5HuA/rh6Ke2a4K7Gbw=;
+	h=From:To:CC:Subject:Date;
+	b=MgMTtsbZCjpjL/VsqUk1rLzVqsd//L0KyLG6hygzzWuai07R2VTnoiiHy047wbgcA
+	 wBookMJy8IYqSbt4xCjIfVz3PmzdmvH+19qfGVvuGYOfD0nEWml2eZJIF+kxNzu62q
+	 ERnWgkD7KlhJG5RXmk3Efoe8yX6jdxqW1T8pXq7o=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57J6xDVN857503
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 19 Aug 2025 01:59:13 -0500
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 19
+ Aug 2025 01:59:12 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Tue, 19 Aug 2025 01:59:12 -0500
+Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57J6xBRB2593378;
+	Tue, 19 Aug 2025 01:59:11 -0500
+From: T Pratham <t-pratham@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+CC: T Pratham <t-pratham@ti.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Kamlesh
+ Gurudasani <kamlesh@ti.com>,
+        Manorit Chawdhry <m-chawdhry@ti.com>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>, Vishal
+ Mahaveer <vishalm@ti.com>,
+        Kavitha Malarvizhi <k-malarvizhi@ti.com>
+Subject: [PATCH v6 0/2] Add support for Texas Instruments DTHEv2 Crypto Engine
+Date: Tue, 19 Aug 2025 11:42:43 +0530
+Message-ID: <20250819065844.3337101-1-t-pratham@ti.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,95 +70,106 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=PN8P+eqC c=1 sm=1 tr=0 ts=68a3de34 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=2OwXVqhp2XgA:10 a=OTBs_5SviU20kZL2kjsA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDAyMCBTYWx0ZWRfX0fRyAT/9cIvu f51sgw9XJtW/w9WOfTwZeA8H//a1PJYXxDMuhLl0ig7a3OspgqygkwW+dLZQ+jljWRaBI5wWQJ+ MU1Bv9b1uj8xe3RfMejmkmuR7yz2bQ/X75/VHHf4qtsaUFZ3aIM0IJSJui0yZsj8iLymmPyuT/p
- GkzpMENEgppFlxUbUM9C+EDtrmmpHulrLvKG//mwcsQYNOFNG2K2q1JfhP/zaMGdtei5anxacDt sGC78Sj6YOJgoKXfVCMvSM+YO8UI8wjCCpwvS8d9ZDjoUF1FY6brO/iClBiukwEjaNEpEs3+YTq Czs+wq3DQJ0hAhv1wPXByHyrz/ZnCRCek+BAwYgMEFJUIrkKa2MxZoeo9Rz3Abwnf3O8Pmmv4Pl
- ihg3qNHAnTbh28sAnwHzjvJIe5eVl87Pslo8KZr88wCjEzANcrX1fwL/6kHgtc6Qs9zP/YfU
-X-Proofpoint-GUID: SOFXTo22oKhkMOiI_bnsIwiQzQWCvcNc
-X-Proofpoint-ORIG-GUID: SOFXTo22oKhkMOiI_bnsIwiQzQWCvcNc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-This patch series adds support for IPsec packet offload for the
-Marvell CN10K SoC.
+Data Transform and Hashing Engine (DTHE) v2 is a new cryptography engine
+introduced i TI AM62L SoC. DTHEv2 consists of multiple crypto IPs[1] (such
+as AES Engine, hashing engine, TRNG, etc.) which can be used for
+offloading cryptographic operations off of the CPU. The primary benefit
+of DTHEv2 is enhanced side-channel attack resistance, with AES and PKE
+engine being DPA and EMA resistant. These side-channel resistances are
+the underlying requirement for various certifications like SESIP, PSA,
+and IEC62443 (lvl 3+). Thus, DTHEv2 provides critical security benefits
+for embedded systems that require protection against passive physical
+attacks.
 
-The packet flow
----------------
-An encrypted IPSec packet goes through two passes in the RVU hardware
-before reaching the CPU.
-First Pass:
-  The first pass involves identifying the packet as IPSec, assigning an RQ,
-  allocating a buffer from the Aura pool and then send it to CPT for decryption.
+The AES Engine of DTHEv2 supports multiple AES modes (ECB, CBC, CTR,
+CFB, f8), several protocols (GCM, CCM, XTS) and authentication modes
+(CBC-MAC and f9). The hashing engine supports MD5, SHA1, and SHA2 (224,
+256, 384, 512) algorithms along with HMAC. This patch series introduces
+basic driver support for DTHEv2 engine, beginning with suporting AES-ECB
+and AES-CBC algorithms. Other algorithms are planned to be added
+gradually in phases after initial suppport is added.
 
-Second Pass:
-  After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
-  bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
-  bytes of the decrypted packet which would help NIXRX in classification.
-  CPT also sets BIT(11) of channel number to further help in identifcation.
-  NIXRX allocates a new buffer for this packet and submits it to the CPU.
+The driver is tested using full kernel crypto selftests (CRYPTO_SELFTESTS)
+which all pass successfully [2].
 
-Once the decrypted metapacket packet is delivered to the CPU, get the WQE
-pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
-complete decrypted packet. We create an skb using this, set the relevant
-XFRM packet mode flags to indicate successful decryption, and submit it
-to the network stack.
+Signed-off-by: T Pratham <t-pratham@ti.com>
+---
+[1]: Section 14.6.3 (DMA Control Registers -> DMASS_DTHE)
+Link: https://www.ti.com/lit/ug/sprujb4/sprujb4.pdf
 
-Bharat Bhushan (4):
-  crypto: octeontx2: Share engine group info with AF driver
-  octeontx2-af: Configure crypto hardware for inline ipsec
-  octeontx2-af: Setup Large Memory Transaction for crypto
-  octeontx2-af: Handle inbound inline ipsec config in AF
+[2]: DTHEv2 AES-ECB and AES-CBC kernel self-tests logs
+Link: https://gist.github.com/Pratham-T/aaa499cf50d20310cb27266a645bfd60
 
-Geetha sowjanya (1):
-  octeontx2-af: Add mbox to alloc/free BPIDs
+Change log:
+v6:
+ - Reworded the cover letter and commit messages to name DTHEv2 as a
+   crypto engine instead of crypto accelerator.
+ - Reworded the cover letter completely to emphasise more on the utility
+   of DTHEv2 as better resistance against physical attacks
+ - Reworded DTHEv2 description (help text) in KConfig
+ - Added dma_terminate_sync calls to ensure DMA requests are removed in
+   case when completion times-out.
+ - Some rearrangement of fields between dthe_tfm_ctx and dthe_aes_req_ctx
+   struct, so that per tfm members are correctly placed in tfm_ctx and per
+   request members are in req_ctx. Subsequently setkey, encrypt and
+   decrypt functions are also changed.
+ - Removed exit_tfm function which was useless and not required.
+ - Removed unnecessary zeroing of tfm_ctx object in init_tfm.
+ - Corrected return value in dthe_aes_run function.
+ - Reduced cra_priority of DTHEv2 algorithms.
+v5:
+ - Simplified tfm ctx struct
+ - Set cra_reqsize instead of using crypto_skcipher_set_reqsize()
+ - Move setting sysconfig and irqenable registers to dthe_aes_run
+v4:
+ - Corrected dt-bindings example indentation
+ - Simplified dt-bindings example, removing the node surrounding crypto
+ - Fixed typo in dthev2-common.h header guard
+ - Removed unused ctx field in dev_data struct
+ - Moved per-op data into request context
+v3:
+ - Corrected dt-bindings reg length is too long error
+ - Converted AES driver code to use crypto_engine APIs for using
+   internal crypto queue instead of mutex.
+ - Removed calls to skcipher_request_complete in paths not returning
+   -EINPROGRESS before.
+ - Added missing KConfig import, which was accidentally removed in v2.
 
-Kiran Kumar K (1):
-  octeontx2-af: Add support for SPI to SA index translation
+v2:
+ - Corrected dt-bindings syntax errors and other review comments in v1.
+ - Completely changed driver code structure, splitting code into
+   multiple files
 
-Rakesh Kudurumalla (1):
-  octeontx2-af: Add support for CPT second pass
+Link to previous versions:
+v5: https://lore.kernel.org/all/20250603124217.957116-1-t-pratham@ti.com/
+v4: https://lore.kernel.org/all/20250508101723.846210-2-t-pratham@ti.com/
+v3: https://lore.kernel.org/all/20250502121253.456974-2-t-pratham@ti.com/
+v2: https://lore.kernel.org/all/20250411091321.2925308-1-t-pratham@ti.com/
+v1: https://lore.kernel.org/all/20250206-dthe-v2-aes-v1-0-1e86cf683928@ti.com/
+---
 
-Tanmay Jagdale (7):
-  octeontx2-pf: ipsec: Allocate Ingress SA table
-  octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
-  octeontx2-pf: ipsec: Handle NPA threshold interrupt
-  octeontx2-pf: ipsec: Initialize ingress IPsec
-  octeontx2-pf: ipsec: Process CPT metapackets
-  octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
-  octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+T Pratham (2):
+  dt-bindings: crypto: Add binding for TI DTHE V2
+  crypto: ti: Add driver for DTHE V2 AES Engine (ECB, CBC)
 
- .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
- .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
- .../marvell/octeontx2/otx2_cptpf_mbox.c       |  282 +---
- .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
- .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
- .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
- .../ethernet/marvell/octeontx2/af/common.h    |    1 +
- .../net/ethernet/marvell/octeontx2/af/mbox.c  |    3 -
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
- .../net/ethernet/marvell/octeontx2/af/rvu.c   |    8 +-
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
- .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
- .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  707 +++++++++-
- .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  235 +++-
- .../marvell/octeontx2/af/rvu_nix_spi.c        |  211 +++
- .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   40 +
- .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1208 ++++++++++++++++-
- .../marvell/octeontx2/nic/cn10k_ipsec.h       |  136 ++
- .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
- .../marvell/octeontx2/nic/otx2_common.h       |   16 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
- .../ethernet/marvell/octeontx2/nic/otx2_reg.h |    5 +
- .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
- .../marvell/octeontx2/nic/otx2_txrx.c         |   27 +-
- .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
- 28 files changed, 2940 insertions(+), 464 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+ .../bindings/crypto/ti,am62l-dthev2.yaml      |  50 +++
+ MAINTAINERS                                   |   7 +
+ drivers/crypto/Kconfig                        |   1 +
+ drivers/crypto/Makefile                       |   1 +
+ drivers/crypto/ti/Kconfig                     |  14 +
+ drivers/crypto/ti/Makefile                    |   3 +
+ drivers/crypto/ti/dthev2-aes.c                | 411 ++++++++++++++++++
+ drivers/crypto/ti/dthev2-common.c             | 220 ++++++++++
+ drivers/crypto/ti/dthev2-common.h             | 101 +++++
+ 9 files changed, 808 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/ti,am62l-dthev2.yaml
+ create mode 100644 drivers/crypto/ti/Kconfig
+ create mode 100644 drivers/crypto/ti/Makefile
+ create mode 100644 drivers/crypto/ti/dthev2-aes.c
+ create mode 100644 drivers/crypto/ti/dthev2-common.c
+ create mode 100644 drivers/crypto/ti/dthev2-common.h
 
 -- 
 2.43.0
