@@ -1,148 +1,140 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C82305078;
-	Tue, 19 Aug 2025 12:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5207421765B;
+	Tue, 19 Aug 2025 12:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755606240; cv=none; b=Hns+nqUAbeu+pQ++PPoP7fTS10Min8F1hyMsIy7lQW6987CCUOdc2Xb6X7koSf0woG2Hh2dItAvI2aMC4CoPtZd5BK56gZCxBuR/R1SRblzp944l2HbrDqMjmgu5y9F8liZZoLtqU8ECj3naYrlw1Fw3E49crZcKuk9PwwNht5A=
+	t=1755608124; cv=none; b=cne76+bK98/1BpAPIYl79CJimnVjEdROAAbsGLff0cnsuWVQ2/FRecnfGVRJ06dAq8u7TJdEmejBnXi7Ym9glAAE0dFuQV1e9f2WVxD6su2cDaNYHOPrEVh37VhR3AwT91M8Mza7t6ziA/IHNeiDYNETFKD1shGC7w+UbQcFi/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755606240; c=relaxed/simple;
-	bh=fI4hT8CuNMb2bjEOBw/jySCX58PyHsr/5lyNM6n1Y/M=;
+	s=arc-20240116; t=1755608124; c=relaxed/simple;
+	bh=+1/10nzw4Yf4yiVjA7ztc1dX3OYsmM9+0qlQA3cpdSg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSgrPapZuOKmzug1fb8ygYkdbicXOh0JUqGM1/8OdbhFOXdZk3nmsSztBnDT2ogPwaQA+4ahAylLtur55zxelvJpvFD20YTostyWjwfQyvBcSf58qjSWZAd1b6wdRyaIXLCOeGEEVHfr8TkOhznmzm72HE364MT1qP/aCZdWttY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iV/dvY8z; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=bmmysCGMOOBgDYaicuwibIjas56QYSxSKU54MO4uy7pCD2ZGaA+hZT/A1DgSqN46CE1Z1ud8sHMF3vMqCXLPDW/07IG5hUOeFNQG8qz6SEFFmQeVzL8GVuxf+ZVlNwHLGqUWJduGCOzTgxB3ENtZwXcObU9ti1xMl+PSZ7bDqHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Op6q3UE7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iV/dvY8z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755606238; x=1787142238;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fI4hT8CuNMb2bjEOBw/jySCX58PyHsr/5lyNM6n1Y/M=;
-  b=iV/dvY8zESFhi7jwblHd4om2A637rKYwuMCbyS262ion8sEB1xc8xSxm
-   bMx4hHiSW5Ap/GArYiy6jxcqu4kTGl7bu7mxv6AFMfr0XVqVL81R+SjJe
-   CCOMc4T7UeZZcum7K7w8YK1TIrwx6VDT04W+OExnnfa/oEcWvO1tF5tfA
-   KH/H+HKtWNkyUMoYPUNMFvnJklotU0/1YK2bFVbfuwI+Td/l2GxyMA+ct
-   YgOmcYyc8mKxR7NtxL0euK8zfnMbEGayDkz1+V7pKxuG5BWrJK/+az+Yi
-   VDrW9RiR0R6Ap6KrPTFypLkrhMM6vSlBEdeJA7Ffc0UJ9lJamUU6WIGA7
-   g==;
-X-CSE-ConnectionGUID: QmVrevXMTTOZXADd7xp30A==
-X-CSE-MsgGUID: UAH4kCtwTF2Z0XWhqVFaVg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="68556133"
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="68556133"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 05:23:58 -0700
-X-CSE-ConnectionGUID: kQGhHvgmRhy3OwX7KAoInA==
-X-CSE-MsgGUID: UMzsUuHOSzqhndiWOT2Drg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="204987164"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 19 Aug 2025 05:23:52 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uoLMb-000Gqh-0m;
-	Tue, 19 Aug 2025 12:23:28 +0000
-Date: Tue, 19 Aug 2025 20:22:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, nikunj@amd.com,
-	davem@davemloft.net, aik@amd.com, ardb@kernel.org,
-	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [RESEND PATCH v2 3/3] crypto: ccp - Add AMD Seamless Firmware
- Servicing (SFS) driver
-Message-ID: <202508192016.ZlSGEWUC-lkp@intel.com>
-References: <1f3398c19eab6701566f4044c2c1059114d9bc48.1755548015.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Op6q3UE7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D705C4CEF1;
+	Tue, 19 Aug 2025 12:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755608123;
+	bh=+1/10nzw4Yf4yiVjA7ztc1dX3OYsmM9+0qlQA3cpdSg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Op6q3UE7eKv7xYk37W//xhzKMUL2XvdoNTa45dNkDlSf/a0dqxSKLzGkTFjy1ODhC
+	 gOfaNm1m5FpSsq0WGgFhmbTi11oQ5UT2a6utUz25TkBRkYfHfmjB6l9AGbaGLtX5Lg
+	 M9le2ylpxoFrce1kmFrMqwbieVaCIdyb8z0IkNZWiulgV8tw1HqujTHFV4m9QI/fh9
+	 NfJDeVggrWmvGUreyIo4UrBCejq9BOWTOlTae3A4VDfGZWzgGTQKZ/DUNuebOPnlsN
+	 oCL2ady6yZfisD5j5SWcqRBG0XxGb2koSMhhWKBDolwocwJl6wkrI31vjuyARtpBae
+	 yNmxj40rSPOiQ==
+Date: Tue, 19 Aug 2025 13:55:18 +0100
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: herbert@gondor.apana.org.au, jarkko@kernel.org,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	peterhuewe@gmx.de, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH v12 2/4] crypto: loongson - add Loongson RNG driver
+ support
+Message-ID: <20250819125518.GF7508@google.com>
+References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
+ <20250705072045.1067-3-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1f3398c19eab6701566f4044c2c1059114d9bc48.1755548015.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250705072045.1067-3-zhaoqunqin@loongson.cn>
 
-Hi Ashish,
+On Sat, 05 Jul 2025, Qunqin Zhao wrote:
 
-kernel test robot noticed the following build warnings:
+> Loongson's Random Number Generator is found inside Loongson Security
+> Engine chip.
+> 
+> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+>  drivers/crypto/Kconfig                 |   1 +
+>  drivers/crypto/Makefile                |   1 +
+>  drivers/crypto/loongson/Kconfig        |   5 +
+>  drivers/crypto/loongson/Makefile       |   1 +
+>  drivers/crypto/loongson/loongson-rng.c | 209 +++++++++++++++++++++++++
+>  5 files changed, 217 insertions(+)
+>  create mode 100644 drivers/crypto/loongson/Kconfig
+>  create mode 100644 drivers/crypto/loongson/Makefile
+>  create mode 100644 drivers/crypto/loongson/loongson-rng.c
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 9f8a3a5be..f6117bc77 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -827,6 +827,7 @@ config CRYPTO_DEV_CCREE
+>  	  If unsure say Y.
+>  
+>  source "drivers/crypto/hisilicon/Kconfig"
+> +source "drivers/crypto/loongson/Kconfig"
+>  
+>  source "drivers/crypto/amlogic/Kconfig"
+>  
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index 22eadcc8f..125b99b24 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -44,6 +44,7 @@ obj-y += inside-secure/
+>  obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+>  obj-y += xilinx/
+>  obj-y += hisilicon/
+> +obj-y += loongson/
+>  obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
+>  obj-y += intel/
+>  obj-y += starfive/
+> diff --git a/drivers/crypto/loongson/Kconfig b/drivers/crypto/loongson/Kconfig
+> new file mode 100644
+> index 000000000..15475da8f
+> --- /dev/null
+> +++ b/drivers/crypto/loongson/Kconfig
+> @@ -0,0 +1,5 @@
+> +config CRYPTO_DEV_LOONGSON_RNG
+> +	tristate "Support for Loongson RNG Driver"
+> +	depends on MFD_LOONGSON_SE
+> +	help
+> +	  Support for Loongson RNG Driver.
+> diff --git a/drivers/crypto/loongson/Makefile b/drivers/crypto/loongson/Makefile
+> new file mode 100644
+> index 000000000..1ce5ec32b
+> --- /dev/null
+> +++ b/drivers/crypto/loongson/Makefile
+> @@ -0,0 +1 @@
+> +obj-$(CONFIG_CRYPTO_DEV_LOONGSON_RNG)  += loongson-rng.o
+> diff --git a/drivers/crypto/loongson/loongson-rng.c b/drivers/crypto/loongson/loongson-rng.c
+> new file mode 100644
+> index 000000000..3a4940260
+> --- /dev/null
+> +++ b/drivers/crypto/loongson/loongson-rng.c
+> @@ -0,0 +1,209 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2019 HiSilicon Limited. */
+> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+> +
+> +#include <linux/crypto.h>
+> +#include <linux/err.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/io.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/kernel.h>
+> +#include <linux/list.h>
+> +#include <linux/mfd/loongson-se.h>
 
-[auto build test WARNING on next-20250818]
-[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master tip/x86/core tip/master linus/master tip/auto-latest v6.17-rc2 v6.17-rc1 v6.16 v6.17-rc2]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This depends on the first patch in the series.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/x86-sev-Add-new-quiet-parameter-to-snp_leak_pages-API/20250819-042220
-base:   next-20250818
-patch link:    https://lore.kernel.org/r/1f3398c19eab6701566f4044c2c1059114d9bc48.1755548015.git.ashish.kalra%40amd.com
-patch subject: [RESEND PATCH v2 3/3] crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250819/202508192016.ZlSGEWUC-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250819/202508192016.ZlSGEWUC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508192016.ZlSGEWUC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/crypto/ccp/sfs.c:262:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     262 |         if (!page) {
-         |             ^~~~~
-   drivers/crypto/ccp/sfs.c:301:9: note: uninitialized use occurs here
-     301 |         return ret;
-         |                ^~~
-   drivers/crypto/ccp/sfs.c:262:2: note: remove the 'if' if its condition is always false
-     262 |         if (!page) {
-         |         ^~~~~~~~~~~~
-     263 |                 dev_dbg(dev, "Command Buffer HV-Fixed page allocation failed\n");
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     264 |                 goto cleanup_dev;
-         |                 ~~~~~~~~~~~~~~~~~
-     265 |         }
-         |         ~
-   drivers/crypto/ccp/sfs.c:250:9: note: initialize the variable 'ret' to silence this warning
-     250 |         int ret;
-         |                ^
-         |                 = 0
-   1 warning generated.
-
-
-vim +262 drivers/crypto/ccp/sfs.c
-
-   244	
-   245	int sfs_dev_init(struct psp_device *psp)
-   246	{
-   247		struct device *dev = psp->dev;
-   248		struct sfs_device *sfs_dev;
-   249		struct page *page;
-   250		int ret;
-   251	
-   252		sfs_dev = devm_kzalloc(dev, sizeof(*sfs_dev), GFP_KERNEL);
-   253		if (!sfs_dev)
-   254			return -ENOMEM;
-   255	
-   256		/*
-   257		 * Pre-allocate 2MB command buffer for all SFS commands using
-   258		 * SNP HV_Fixed page allocator which also transitions the
-   259		 * SFS command buffer to HV_Fixed page state if SNP is enabled.
-   260		 */
-   261		page = snp_alloc_hv_fixed_pages(SFS_NUM_2MB_PAGES_CMDBUF);
- > 262		if (!page) {
+Does this one have an Ack?
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Lee Jones [李琼斯]
