@@ -1,142 +1,77 @@
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0185D35962;
-	Wed, 20 Aug 2025 08:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7538B2D6E72
+	for <linux-crypto@vger.kernel.org>; Wed, 20 Aug 2025 09:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755680328; cv=none; b=m5Uv0Xjy4kXZUtGgxq5Y/V3WLxP1x6y26u8PaqxYQf58sJFrir9stAHtq+kzz+yxqUFKQAOVkJt5VccWjy4UJyG3h0dxE3irOpl/BNwAdbcqkCWphxGdPjRdfIay2cJRMdtASFNAovpp3OqysQZ5LYMUfaGwLn9MQ4FWtn7aLLw=
+	t=1755681141; cv=none; b=fX00p5TRwmCnA1qI8MiMMH9k8/FD73+3Y3D9AasY3/D/EIT3YEyMufcU79usyCCMGoxkqf6CtEXB65vEctI/veCLOpwPaqyz1aYOn0Q4N1+sbgznzdX63NVnEDwW1XH2Baw7tHsgLal6U6HrhTX0y2yPE/4Y8XsybPzQJdnmIA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755680328; c=relaxed/simple;
-	bh=r0C3Mk1B5D3Cv+GP4pImhjTeqYVCdUTLE5Mmes7Xwd4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=r7Wnx96MZw/xuVHoHAFMdOg+kmHzdi59ZmKPVmxfmUpSTTYgcCO5UYXB0C73kQffv5mWNSFF2Iab9tBr/zSeDxa9+wafuktPCexks2BRBjVPj4t3Dhctu0hmpd0B0JJiJQtAmMle2CsAkPG0xKRTIwhjni/Hk9RUsVSgsbQQmcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=JdeMVuSl; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1755681141; c=relaxed/simple;
+	bh=YKPdEoNUAkUaX4oZOPkIhdN8Mk15rJBAZJUdHjNcAWs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rdGuIag/wm+t3BJ3FlCmLaZ02okSUrJbvQDklGMhUlzVNz1fu3R/oSkURCq+GcJoED98QAEAbiCaioZTb7tdkyzHKG18bAPigBGI2NMQp80AE3d9zxiDZkAHvZdcgSMO4iEw24FCLkOtRt4v/X7kWE0IJ+Wx6pNp5UG2YqfdAkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tii0W23y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JdeMVuSl"
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57K8wd1W212703;
-	Wed, 20 Aug 2025 03:58:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755680319;
-	bh=JFLgPoqrC3YAfSg6/noYnK5qJLb/uF0fn468QJqqtzY=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=JdeMVuSlb23fPfXRJaibQ2wu0t7ytqpcXFHWmERcN8I5Hy9iVn9ouVSv4AKGGNm4f
-	 7sNgkHrn4fBqQsTQNNPyQHCNZLJ5SUKIAV7VpUv/Mr/OPZPbUUv+hxpax2xE9Ejbcd
-	 eROhwJgJAsz2mVT3ixvL08sn5SpE1FY14yrYT2F0=
-Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57K8wdvX1674115
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 20 Aug 2025 03:58:39 -0500
-Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 20
- Aug 2025 03:58:39 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 20 Aug 2025 03:58:39 -0500
-Received: from [10.24.69.191] (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57K8wZTf257008;
-	Wed, 20 Aug 2025 03:58:36 -0500
-Message-ID: <d1d70f62-fb3d-4af5-936e-b59491ee1c34@ti.com>
-Date: Wed, 20 Aug 2025 14:28:35 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tii0W23y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17BC2C4CEEB;
+	Wed, 20 Aug 2025 09:12:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755681141;
+	bh=YKPdEoNUAkUaX4oZOPkIhdN8Mk15rJBAZJUdHjNcAWs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Tii0W23ypvWKu0EXkd3rRRtIhpUMBc3K9TciAboWFiLABZov7ETeLSsyYv7w4xQPJ
+	 S+7Z/PdDZfUTxid9GYTA9ljhlszQeWL5jQHR33PMxKTFddyHlY10T1XXpefpWT9Rx3
+	 lo+7YtYwVMLktCLq+afuaVPYxSdktzA5moDyT/BBr490k4v1XQz+20gpoBRPIO/rb3
+	 pC4xxfqUDlJlxBF6EBVJjqfiX8Dfbib7OE8spntxo5ykIOdAdVx0ANLIwZen8USMNf
+	 vTm+8pju+yRZztZ5nQka0o7leB+56LwXD103bf4XJHYloFitU5hWnkLpRqOjL49V+x
+	 Q9+XZlwb5Dibg==
+From: hare@kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chris Leech <cleech@redhat.com>,
+	linux-nvme@lists.infradead.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Hannes Reinecke <hare@kernel.org>
+Subject: [PATCH 0/2] crypto,nvme: fixup HKDF-Expand-Label implementation
+Date: Wed, 20 Aug 2025 11:12:09 +0200
+Message-ID: <20250820091211.25368-1-hare@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] crypto: ti: Add driver for DTHE V2 AES Engine
- (ECB, CBC)
-To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        Kamlesh
- Gurudasani <kamlesh@ti.com>,
-        Manorit Chawdhry <m-chawdhry@ti.com>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>, Vishal
- Mahaveer <vishalm@ti.com>,
-        Kavitha Malarvizhi <k-malarvizhi@ti.com>
-References: <20250819065844.3337101-1-t-pratham@ti.com>
- <20250819065844.3337101-3-t-pratham@ti.com>
- <e40d056b-731d-4e33-9347-20c0a7665ede@gmail.com>
-Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <e40d056b-731d-4e33-9347-20c0a7665ede@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-On 19/08/25 15:26, Ovidiu Panait wrote:
-> Hi,
-> 
-> On 8/19/25 9:12 AM, T Pratham wrote:
->> Add support for ECB and CBC modes in the AES Engine of the DTHE V2
->> hardware cryptography engine.
->>
->> Signed-off-by: T Pratham <t-pratham@ti.com>
->> ---
->>  MAINTAINERS                       |   1 +
->>  drivers/crypto/Kconfig            |   1 +
->>  drivers/crypto/Makefile           |   1 +
->>  drivers/crypto/ti/Kconfig         |  14 +
->>  drivers/crypto/ti/Makefile        |   3 +
->>  drivers/crypto/ti/dthev2-aes.c    | 411 ++++++++++++++++++++++++++++++
->>  drivers/crypto/ti/dthev2-common.c | 220 ++++++++++++++++
->>  drivers/crypto/ti/dthev2-common.h | 101 ++++++++
->>  8 files changed, 752 insertions(+)
->>  create mode 100644 drivers/crypto/ti/Kconfig
->>  create mode 100644 drivers/crypto/ti/Makefile
->>  create mode 100644 drivers/crypto/ti/dthev2-aes.c
->>  create mode 100644 drivers/crypto/ti/dthev2-common.c
->>  create mode 100644 drivers/crypto/ti/dthev2-common.h
->>
-> 
-> [...]
-> 
+From: Hannes Reinecke <hare@kernel.org>
 
-[...]
+As per RFC 8446 (TLS 1.3) the HKDF-Expand-Label function is using vectors
+for the 'label' and 'context' field, but defines these vectors as a string
+prefixed with the string length (in binary). The implementation in nvme
+is missing the length prefix which was causing interoperability issues
+with spec-conformant implementations.
 
->> +
->> +probe_reg_err:
->> +	crypto_engine_stop(dev_data->engine);
->> +probe_engine_start_err:
->> +	crypto_engine_exit(dev_data->engine);
-> 
-> crypto_engine_exit() calls crypto_engine_stop() internally, so there is
-> no need to call both functions here. Just use crypto_engine_exit().
-> 
-> /**
->  * crypto_engine_exit - free the resources of hardware engine when exit
->  * @engine: the hardware engine need to be freed
->  */
-> void crypto_engine_exit(struct crypto_engine *engine)
-> {
-> 	int ret;
-> 
-> 	ret = crypto_engine_stop(engine);
-> 	if (ret)
-> 		return;
-> 
-> 	kthread_destroy_worker(engine->kworker);
-> }
-> 
+This patchset adds a function 'hkdf_expand_label()' to correctly implement
+the HKDF-Expand-Label functionality and modifies the nvme driver to utilize
+this function instead of the open-coded implementation.
 
-Thanks for this insight! Will correct this.
+As usual, comments and reviews are welcome.
 
-[...]
+Chris Leech (1):
+  crypto: hkdf: add hkdf_expand_label()
 
-> 
-> Ovidiu
+Hannes Reinecke (1):
+  nvme-auth: use hkdf_expand_label()
 
-Regards
-T Pratham
+ crypto/hkdf.c              | 55 ++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/common/auth.c | 33 +++++++++--------------
+ include/crypto/hkdf.h      |  4 +++
+ 3 files changed, 72 insertions(+), 20 deletions(-)
+
+-- 
+2.43.0
 
