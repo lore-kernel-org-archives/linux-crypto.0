@@ -1,60 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC568285CBF
-	for <linux-crypto@vger.kernel.org>; Wed, 20 Aug 2025 19:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE5E33470A
+	for <linux-crypto@vger.kernel.org>; Wed, 20 Aug 2025 21:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755719317; cv=none; b=AKgck/EiSSJgjM5DCsPR04f1gvEpXY48VCJqxj8G6AyY0l5mGVYDqV3zL7iN04G8a7zEtHMgzyuEoQ9dYKQXtTMSvaIBIJdV/cF6FVFRSGnX+Q3h98lXa5ELrUrCJaMenBGU5OitZrZ6TlChcjd5LCpNvVMsne1LjIrf3GH1U64=
+	t=1755726653; cv=none; b=mLBXZOU/HP7sSU6xSQzMvjYy+n964T6crWQEe8P5w6rBP/98m/ejyqB3EK311NY4FNr8yvpk7j//3FVEdAHVH1ggjRBA3JWdBT2M0n/nHtKYHeKEAWkn5kZ/Rjk6E7VmRgumF5j8k8A2M7Q6UdYswj2pRdgDdwhNln3HkfFJhVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755719317; c=relaxed/simple;
-	bh=NfzpI+SMe9ZTxpeL+VOCRjfMcPKGvbbKwrbxQG+wWh4=;
+	s=arc-20240116; t=1755726653; c=relaxed/simple;
+	bh=QAJM2vtk+jQErQJw0BJQHZUwsFbRTuLCCthqPSR+ct4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewJiUfnIM3MEvTN3t+ZGfh8t8h6DfndFcBDd2p5J66jYANGjyiZLTrALmOouLzQEADCMJ42EFQjx160xJWLAMu8ZBw6yXiPoGS6rYR86MziN1v+anzHRVbg35M9LvT5agxAkqRCwV8PG0+bQvJg//h55M1gb0v4dyNEgs5pzfuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bXBEpZxw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=W9yAvNI/cQJMu0NexBNasQSCvdc984YZMnAWRDUlegnVxwOyviBM3Puq/JSyOtedwEaMQhWhmTmL6UayHK/DBbaEhui8N881N3SgAC6WT2Ge2Vgw9wPVqn16S9PRFOuwBbOCeHk0VIoGLqvm9DPWDoP+YbZKuuOBLRVGkdgjm70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UsIStoaz; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXBEpZxw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755719313;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Oqta/QAQSbFTF1U9PBrhEbnw+rAYvkf7fG5BApOHix4=;
-	b=bXBEpZxwjM5skWuzoNZJWGMzB19BfDSR2QVIBrgr6vLOnYLtl1eSyOXZYZTFxsyiht31Yo
-	uMuEMONcTjXg9NRtOOIvkc2oDgAkskubpC+umw7d8xtDbjtol6ff/2WlONKMwnc627lpGJ
-	1JQWYgKLeBfnMm0Re2GFYMAy9vT1A0Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-657-8jsqZYneM8inZW7HC5ma9A-1; Wed,
- 20 Aug 2025 15:48:32 -0400
-X-MC-Unique: 8jsqZYneM8inZW7HC5ma9A-1
-X-Mimecast-MFC-AGG-ID: 8jsqZYneM8inZW7HC5ma9A_1755719310
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B5621954236;
-	Wed, 20 Aug 2025 19:48:29 +0000 (UTC)
-Received: from my-developer-toolbox-latest (unknown [10.2.16.247])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00675180044F;
-	Wed, 20 Aug 2025 19:48:25 +0000 (UTC)
-Date: Wed, 20 Aug 2025 12:48:22 -0700
-From: Chris Leech <cleech@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: hare@kernel.org, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UsIStoaz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755726651; x=1787262651;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QAJM2vtk+jQErQJw0BJQHZUwsFbRTuLCCthqPSR+ct4=;
+  b=UsIStoazprPMSHmDL0i5YvheLKoEbZb6T48MRRNgQ+mkGILEVi0ox1wl
+   RL8USOA2onOwvWExpvyNNs4rsJvPO+YQMLlfIvaG5FBuK34V91gwuTXxQ
+   fLSNmfGX/F1R30kT74acXIF6S/g6Rbp/bfqoxoH7p2O9APW7XBpEfU46C
+   VeJKYg0A6YjzyqObBa7yxEiY8emsw1SNyGFECsPMKIF88sRNcXcTb/jI7
+   +IEbgq29SWEoktTFH5sXJnBfNJtSrfACxJqO2zfeR3p0Q1iQw9OuYN6Cb
+   WSA+zpRkUDQOnKwAn61psAGOqDDwTQqZwETOGXGgnIIj25JkFSqNIFFfk
+   Q==;
+X-CSE-ConnectionGUID: LUmSmtN8TSSHSlX4bGKFBQ==
+X-CSE-MsgGUID: tUnVXKG/SaqqVsW93NXqnw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="45581465"
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="45581465"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 14:50:51 -0700
+X-CSE-ConnectionGUID: 3i776o2vQP6XTmlLlTM4UA==
+X-CSE-MsgGUID: t/8RawfnQS2cb3n5GuBCEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="169024566"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 20 Aug 2025 14:50:48 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uoqhc-000JhX-0J;
+	Wed, 20 Aug 2025 21:50:42 +0000
+Date: Thu, 21 Aug 2025 05:50:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: hare@kernel.org, Christoph Hellwig <hch@lst.de>
+Cc: oe-kbuild-all@lists.linux.dev, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Chris Leech <cleech@redhat.com>,
 	linux-nvme@lists.infradead.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+	Hannes Reinecke <hare@kernel.org>
 Subject: Re: [PATCH 1/2] crypto: hkdf: add hkdf_expand_label()
-Message-ID: <aKYmhusP6povB_TU@my-developer-toolbox-latest>
-References: <20250820091211.25368-1-hare@kernel.org>
- <20250820091211.25368-2-hare@kernel.org>
- <20250820184633.GB1838@quark>
+Message-ID: <202508210523.p8BdHsR7-lkp@intel.com>
+References: <20250820091211.25368-2-hare@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,36 +68,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250820184633.GB1838@quark>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250820091211.25368-2-hare@kernel.org>
 
-On Wed, Aug 20, 2025 at 11:46:33AM -0700, Eric Biggers wrote:
-> On Wed, Aug 20, 2025 at 11:12:10AM +0200, hare@kernel.org wrote:
-> > From: Chris Leech <cleech@redhat.com>
-> > 
-> > Provide an implementation of RFC 8446 (TLS 1.3) HKDF-Expand-Label
-> > 
-> > Cc: Eric Biggers <ebiggers@kernel.org>
-> > Signed-off-by: Chris Leech <cleech@redhat.com>
-> > Signed-off-by: Hannes Reinecke <hare@kernel.org>
-> > ---
-> >  crypto/hkdf.c         | 55 +++++++++++++++++++++++++++++++++++++++++++
-> >  include/crypto/hkdf.h |  4 ++++
-> >  2 files changed, 59 insertions(+)
-> > 
-> > ...
->
-> Does this belong in crypto/hkdf.c?  It seems to be specific to a
-> particular user of HKDF.
+Hi,
 
-While this is needed for NVMe/TLS, it's a case of the NVMe
-specifications referencing a function defined in the TLS 1.3 RFC to be
-used.  I though it would be clearest to fix the open-coded implemenation
-by creating an RFC complient function, which is now no-longer specific
-to NVMe so I moved it out to crypto/hkdf.c
+kernel test robot noticed the following build warnings:
 
-I don't know that there will be other users, it just seemed to make the
-most sense there.
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.17-rc2 next-20250820]
+[cannot apply to hch-configfs/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-- Chris
+url:    https://github.com/intel-lab-lkp/linux/commits/hare-kernel-org/crypto-hkdf-add-hkdf_expand_label/20250820-172750
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250820091211.25368-2-hare%40kernel.org
+patch subject: [PATCH 1/2] crypto: hkdf: add hkdf_expand_label()
+config: loongarch-randconfig-001-20250821 (https://download.01.org/0day-ci/archive/20250821/202508210523.p8BdHsR7-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250821/202508210523.p8BdHsR7-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508210523.p8BdHsR7-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: crypto/hkdf.c:151 function parameter 'labellen' not described in 'hkdf_expand_label'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
