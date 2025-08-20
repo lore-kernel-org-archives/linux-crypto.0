@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC592DC340
-	for <linux-crypto@vger.kernel.org>; Wed, 20 Aug 2025 09:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D342DC340
+	for <linux-crypto@vger.kernel.org>; Wed, 20 Aug 2025 09:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755681144; cv=none; b=uAVK7QH7vgDIl3eX6vjkug2st8muVNLN5gD+NqreSfHcigaS7eWCCoil72Z9AlkzOi+c7sp53+n6vhXRe2JMA9JQS1skdvzRGuW6wqoauxgiuExN3oQB1NPqn/SDlcxsDpXRDtJoO7jDet8WuEzeimWeJz3u+XkSOoZlMAv+hJ8=
+	t=1755681148; cv=none; b=W1W1o3IWAexBE1H1skw8+Ublff+q6S24pEr8b5EdrUnX35lQL8uPsnldoYa8rLJwZdH+fltHy85Ssizjj/xnmDJcZcOXkgHJ3216/l7VgNr5ERn1yaOgTu2h4g8llFvRnfgPIp5I+x8Vrjs+kOGvX82OvjdbcQ2Le6ZFw2qw8ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755681144; c=relaxed/simple;
-	bh=slj9QhQUoQ7qyERxsfyBXkhjpEIA2RFzqHogMhfjn6I=;
+	s=arc-20240116; t=1755681148; c=relaxed/simple;
+	bh=pMfSvaExQHHkwM3rVWhpbkvPdA+fq4O1VYkNwpioE2A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rlbm6T/LHl/S1tbmRz2KiinWVsRrt2GXifi7jljs1o7Zc6JnLMN73MLtNv12ogKM2D1l5q6z/rGLoC+2keqB8FdarSPhYNb+1WF5ThC6fk26IeNnN3pTgdHXUlvvT8R4oGdSJnEwvF/UP6rprva8qa/aB8AA3tNMZV7YnSR6AFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Te8ewG0Q; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aWzDsHNtb60kCP7sd7cEIfcSSBcDFvugFpw5LkKMpwS4g5VnAMauI7LvyNWFsKdm3nW5F0uTffc97ObjuU5zpnHWpNTe2bvcvVMOhJCalw3IJRH49v0g07cROc9iBmjpZ2EDUWX4KYN38SZkR3Z4qPqNjhmJnw/pYKlJfJ6Xmsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QXL05qEg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Te8ewG0Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6BABC4CEEB;
-	Wed, 20 Aug 2025 09:12:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QXL05qEg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D96DC116B1;
+	Wed, 20 Aug 2025 09:12:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755681144;
-	bh=slj9QhQUoQ7qyERxsfyBXkhjpEIA2RFzqHogMhfjn6I=;
+	s=k20201202; t=1755681146;
+	bh=pMfSvaExQHHkwM3rVWhpbkvPdA+fq4O1VYkNwpioE2A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Te8ewG0QHg0EBLd726x3Qfx0nVowU6yjcMFla1nkzspfl/OJRygLF+ymqG0/hq2wj
-	 PjrisjLVFl2B4ezuPZcAJf658vQa0rUXb6Up3D8D9R/g7T4fGu2+hzu6uEAG73S/Gh
-	 eWZ5H1x43jHDtoiK6Dn/mHAkhJbtF6P9MuJ/Ens2tgRumYHaymK3E3sLfiSV4xg9v/
-	 Es7NWn7IaDcASKIetpjKFRveNxoncaHz3f1HTOiggfNrGa6gcJrYR0cmC4nlhbUC6T
-	 sgEJ6bTB+VRXRpUhgBaYFdVQb2GNfsA1a91Cb2ZHEyDogKGY6+5cIvjCTZeLrwRQqC
-	 3Wuqy1q+ek0zw==
+	b=QXL05qEgwqPke6/6Dq1D9ySgcSua1cKaQFZ91coRY5q//tD+4DF1MPtANddJIiYB9
+	 QLaLKTusLyvkaLpfIJkwPf2U0Ohy7zYF3djHa+QNA/0lv1VWkram24gm++Uy4R4E4A
+	 PVy7lBl8v//iekOMaYSVHOCMrdA68Ibe8nXB2mNy6ZT2O90wBYwk43XI14HuVXVHXf
+	 x/R0jFEjsfTB3cPD/oTPGErhwVrowHNjZqDZuULYX5qaqP/QKhlfaPnW8tzcFXiZdy
+	 2jCYoN27CkWIEP2ZaQnu2zw1qIcHRejm96faKXmfSFb8IH0AOyB9M+VCATtStwxRGA
+	 YwzCxyNDXkAwQ==
 From: hare@kernel.org
 To: Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -35,11 +35,10 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S . Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
 	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH 1/2] crypto: hkdf: add hkdf_expand_label()
-Date: Wed, 20 Aug 2025 11:12:10 +0200
-Message-ID: <20250820091211.25368-2-hare@kernel.org>
+Subject: [PATCH 2/2] nvme-auth: use hkdf_expand_label()
+Date: Wed, 20 Aug 2025 11:12:11 +0200
+Message-ID: <20250820091211.25368-3-hare@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250820091211.25368-1-hare@kernel.org>
 References: <20250820091211.25368-1-hare@kernel.org>
@@ -51,104 +50,89 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Chris Leech <cleech@redhat.com>
+From: Hannes Reinecke <hare@kernel.org>
 
-Provide an implementation of RFC 8446 (TLS 1.3) HKDF-Expand-Label
+When generating keying material during an authentication transaction
+(secure channel concatenation), the HKDF-Expand-Label function is part
+of the specified key derivation process.
 
-Cc: Eric Biggers <ebiggers@kernel.org>
+The current open-coded implementation misses the length prefix
+requirements on the HkdfLabel label and context variable-length vectors
+(RFC 8446 Section 3.4).
+
+Instead, use the hkdf_expand_label() function.
+
 Signed-off-by: Chris Leech <cleech@redhat.com>
 Signed-off-by: Hannes Reinecke <hare@kernel.org>
 ---
- crypto/hkdf.c         | 55 +++++++++++++++++++++++++++++++++++++++++++
- include/crypto/hkdf.h |  4 ++++
- 2 files changed, 59 insertions(+)
+ drivers/nvme/common/auth.c | 33 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/crypto/hkdf.c b/crypto/hkdf.c
-index 82d1b32ca6ce..465bad6e6c93 100644
---- a/crypto/hkdf.c
-+++ b/crypto/hkdf.c
-@@ -11,6 +11,7 @@
- #include <crypto/sha2.h>
- #include <crypto/hkdf.h>
- #include <linux/module.h>
-+#include <linux/unaligned.h>
+diff --git a/drivers/nvme/common/auth.c b/drivers/nvme/common/auth.c
+index 91e273b89fea..5ea4d6d9a394 100644
+--- a/drivers/nvme/common/auth.c
++++ b/drivers/nvme/common/auth.c
+@@ -715,10 +715,10 @@ int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
+ {
+ 	struct crypto_shash *hmac_tfm;
+ 	const char *hmac_name;
+-	const char *psk_prefix = "tls13 nvme-tls-psk";
++	const char *label = "nvme-tls-psk";
+ 	static const char default_salt[HKDF_MAX_HASHLEN];
+-	size_t info_len, prk_len;
+-	char *info;
++	size_t prk_len;
++	const char *ctx;
+ 	unsigned char *prk, *tls_key;
+ 	int ret;
  
- /*
-  * HKDF consists of two steps:
-@@ -129,6 +130,60 @@ int hkdf_expand(struct crypto_shash *hmac_tfm,
- }
- EXPORT_SYMBOL_GPL(hkdf_expand);
+@@ -758,36 +758,29 @@ int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
+ 	if (ret)
+ 		goto out_free_prk;
  
-+/**
-+ * hkdf_expand_label - HKDF-Expand-Label (RFC 8846 section 7.1)
-+ * @hmac_tfm: hash context keyed with pseudorandom key
-+ * @label: ASCII label without "tls13 " prefix
-+ * @label_len: length of @label
-+ * @context: context bytes
-+ * @contextlen: length of @context
-+ * @okm: output keying material
-+ * @okmlen: length of @okm
-+ *
-+ * Build the TLS 1.3 HkdfLabel structure and invoke hkdf_expand().
-+ *
-+ * Returns 0 on success with output keying material stored in @okm,
-+ * or a negative errno value otherwise.
-+ */
-+int hkdf_expand_label(struct crypto_shash *hmac_tfm,
-+		const u8 *label, unsigned int labellen,
-+		const u8 *context, unsigned int contextlen,
-+		u8 *okm, unsigned int okmlen)
-+{
-+	int err;
-+	u8 *info;
-+	unsigned int infolen;
-+	static const char tls13_prefix[] = "tls13 ";
-+	unsigned int prefixlen = sizeof(tls13_prefix) - 1; /* exclude NUL */
-+
-+	if (WARN_ON(labellen > (255 - prefixlen)))
-+		return -EINVAL;
-+	if (WARN_ON(contextlen > 255))
-+		return -EINVAL;
-+
-+	infolen = 2 + (1 + prefixlen + labellen) + (1 + contextlen);
-+	info = kzalloc(infolen, GFP_KERNEL);
-+	if (!info)
-+		return -ENOMEM;
-+
-+	/* HkdfLabel.Length */
-+	put_unaligned_be16(okmlen, info);
-+
-+	/* HkdfLabel.Label */
-+	info[2] = prefixlen + labellen;
-+	memcpy(info + 3, tls13_prefix, prefixlen);
-+	memcpy(info + 3 + prefixlen, label, labellen);
-+
-+	/* HkdfLabel.Context */
-+	info[3 + prefixlen + labellen] = contextlen;
-+	memcpy(info + 4 + prefixlen + labellen, context, contextlen);
-+
-+	err = hkdf_expand(hmac_tfm, info, infolen, okm, okmlen);
-+	kfree_sensitive(info);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(hkdf_expand_label);
-+
- struct hkdf_testvec {
- 	const char *test;
- 	const u8 *ikm;
-diff --git a/include/crypto/hkdf.h b/include/crypto/hkdf.h
-index 6a9678f508f5..5e75d17a58ab 100644
---- a/include/crypto/hkdf.h
-+++ b/include/crypto/hkdf.h
-@@ -17,4 +17,8 @@ int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
- int hkdf_expand(struct crypto_shash *hmac_tfm,
- 		const u8 *info, unsigned int infolen,
- 		u8 *okm, unsigned int okmlen);
-+int hkdf_expand_label(struct crypto_shash *hmac_tfm,
-+		const u8 *label, unsigned int labellen,
-+		const u8 *context, unsigned int contextlen,
-+		u8 *okm, unsigned int okmlen);
- #endif
+-	/*
+-	 * 2 additional bytes for the length field from HDKF-Expand-Label,
+-	 * 2 additional bytes for the HMAC ID, and one byte for the space
+-	 * separator.
+-	 */
+-	info_len = strlen(psk_digest) + strlen(psk_prefix) + 5;
+-	info = kzalloc(info_len + 1, GFP_KERNEL);
+-	if (!info) {
++	ctx = kasprintf(GFP_KERNEL, "%02d %s", hmac_id, psk_digest);
++	if (!ctx) {
+ 		ret = -ENOMEM;
+ 		goto out_free_prk;
+ 	}
+ 
+-	put_unaligned_be16(psk_len, info);
+-	memcpy(info + 2, psk_prefix, strlen(psk_prefix));
+-	sprintf(info + 2 + strlen(psk_prefix), "%02d %s", hmac_id, psk_digest);
+-
+ 	tls_key = kzalloc(psk_len, GFP_KERNEL);
+ 	if (!tls_key) {
+ 		ret = -ENOMEM;
+-		goto out_free_info;
++		goto out_free_ctx;
+ 	}
+-	ret = hkdf_expand(hmac_tfm, info, info_len, tls_key, psk_len);
++	ret = hkdf_expand_label(hmac_tfm,
++				label, strlen(label),
++				ctx, strlen(ctx),
++				tls_key, psk_len);
+ 	if (ret) {
+ 		kfree(tls_key);
+-		goto out_free_info;
++		goto out_free_ctx;
+ 	}
+ 	*ret_psk = tls_key;
+ 
+-out_free_info:
+-	kfree(info);
++out_free_ctx:
++	kfree(ctx);
+ out_free_prk:
+ 	kfree(prk);
+ out_free_shash:
 -- 
 2.43.0
 
