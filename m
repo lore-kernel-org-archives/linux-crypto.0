@@ -1,44 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D2F275B06
-	for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 17:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B810F2E972E
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 20:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755799017; cv=none; b=uiqBaRgypdg5sd4j2Lc8BssCrNGWn72ZQxQOUHvN/nrkjcaOEBmEmSFcg9zW2VW9vBiEja52gsSLO5NlUswvvA07wzI5HMQeKF6ErsCRv7uU3epSzrjyXlyHsX39AWcpI2kaCl+SG97o0C+KadkYYDZ5RnnVEjbduziTecJUKT0=
+	t=1755806835; cv=none; b=dTZMJjtifX3lhQdlZMfT39EuGyPJDVEGCuz2FxDkEkcgfEkGpdP/IbBbJOeRFWU6FYOwq5s1NUfgs0agkWpvtUzSkugKQiVEcvi8rdbUgHGdVLE0O7kTV28DvCNAON/VTFOtnOMrV+lNEtkKJXS83dpOTakjcHJL6Aag2b49mik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755799017; c=relaxed/simple;
-	bh=EHhqZaGmBIk8T1QKYgSmI0yThNrkSktwkJwZ+KdpEac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=axDd2E/dCNVDrMGJViBJk5LhqxXJHfO0uOX2XFLPKt9S+pgN5SYXZ/oU+RHxKL1JLYe6zwL10LzyKYTL4Z4O0v+TpdF+X700C44gAZysPYDOEg06PvOY7LG4GcEXq2RFrhJHcEA2W5GxXIz1ADCcSx4T+rRMGNImK+vaaWt2h1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfBfj9/W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755806835; c=relaxed/simple;
+	bh=1aX6aTG8s6ax1CtK3pZ1UQ/TXpBX5+Ze6lBjUUjUQPw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P/BgYx5rVchX0Kxq8RU/h72nevlzwqc4MjiJFUjMqRB4e+ibgvA7fmntPY2pIUnecyeKEaMkjhKzMj6hLznQvRh2tLqjAbkyoqPQDW7sK1/9p3ykYsOMowjU4XoRkqHU1htGZWMycMd+yprqd5YRaN5PhAs0t5ssitj759IFHpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TyvButBN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfBfj9/W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD8AC4CEEB;
-	Thu, 21 Aug 2025 17:56:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755799016;
-	bh=EHhqZaGmBIk8T1QKYgSmI0yThNrkSktwkJwZ+KdpEac=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qfBfj9/W6gg0glCpOThRbIMj6pG6Nh+pqoaKAiBP5f2Iy3/eUkSAnmG09o4e4Byje
-	 eoLD6vlxUWBBEVrwiWJH/9ebUbypAfe+gVP3d2r1g8PMm8lypQp6AM7aEwDrGjaIPs
-	 4oCxF2nXY3YZop95lBvwz8lM/jGaYAMJZ/J9+5EKk+cKuFxqeQCQHGVuWJuR6IeU8J
-	 3j9S6Wo9NoF438Lohc6X7IsAYvaruRRtp3MoizvvWREymrNTEeGx+pq/qgr5zT7Cli
-	 zwN05loHDUG21jD/cCk+r6VpEuK3Ki8oDPv3rvwwpGV/kfu1GaT8squVe/OeHFGlY3
-	 SOE1aKhF+1osw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: dri-devel@lists.freedesktop.org,
-	Chen-Yu Tsai <wenst@chromium.org>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>
-Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TyvButBN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755806831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LLdMjSHtv+zm1bY5U2c0p8D/d+U3cemLYeHBKaj7voE=;
+	b=TyvButBNSzALOml1tau2KagepWSsZjQd3ZXyE9noQ995Hnsw9dCBh0PyvUrAf8loI+PI7g
+	WYLGNAtozVq8iRC73goomianLwE1THMMAvdZFX45LdBmlC2lxDTb6ROKsjSnsaQVBUm2W/
+	iJ92wi7olta3AcDgh/iN/aU5AUXKz/E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368--hl1-ea_Pp6EhpZZDtVUxA-1; Thu, 21 Aug 2025 16:07:07 -0400
+X-MC-Unique: -hl1-ea_Pp6EhpZZDtVUxA-1
+X-Mimecast-MFC-AGG-ID: -hl1-ea_Pp6EhpZZDtVUxA_1755806827
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b51411839so818815e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 13:07:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755806826; x=1756411626;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LLdMjSHtv+zm1bY5U2c0p8D/d+U3cemLYeHBKaj7voE=;
+        b=FiMTNDhmDxCCRt+IGqJ239trxCNui5g5gkkbkGq5jJQ5RJUA66IJgy4GiprFg0Fsxb
+         pojdoiYl9KBudFSB/3XrxjxpVyOKW+afEyprUj/iBqvRMIDEpCQtmr47WPUj8SulnwQk
+         keCpLU0tueB2dYdE841LU3F1GXdZ9Fsovkb86S5Vjtjw3lrdFdAbnIw8OszOp69HNa+c
+         VpyozRGGlY1HIwi7tuUEs8dxcdpAQh9bye0a7Vj8QiCDBSWW7b0M/J44/f/6z465Zr5x
+         pH0U0x30TJkAGz2XzH6UePSnwhoZSqnMsfdVMf2OeTVs+C4kYY10imF3AHffFBjBJagN
+         F0SA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiU7VjqEGpqsf0iq8KjhcyzMWeljo8gilZUdt8RY8VCauzp0gnJA7i9a6nLM22+suFnuBrh4Vz0c6Qah4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye4i1duqPbDacovRumxRp/pcl+zy77wlMGdkHTjNglN1JvGCWo
+	emWIUT6reeHbzeo6YG8ziN/oDo3Ddzu/bs80Pw4xTqph4SPmT9dfQVV2dBQzQjPGx7+HDL+4Gzr
+	22DiMH+f7EDePLQ8ByvcKUfWnDJZpnDFwSe79uhL61mrTpLvdcRD4wl/OOjvpjpv8tw==
+X-Gm-Gg: ASbGncv8rdrk2r1iVb4QbgrIr/97q+hwwJQhwN0RXvxkdEVYrT/Qb2ZFwQhaOy7KrAc
+	gAri15zbkD7JvyrUq82QCKu8TB6ob9imrHnTAY0mbC7MSjJ/LDKSWWpXOi2F15Z6JwjCPiMNSj+
+	35HEvoOitajBJFe9J8B2Ldmd6rbEF6SbTznbFhbhXE2mYJ893lpif06K4fxwxCLS5lPMXJOzI0A
+	Qus3uv7OH5DCKsfd1t+OgFrbIujY2hhMI1Af6SiN+WbV46B1vVedfIDyLAtjprFm1NufGKS8vkG
+	r/TASUin0yZkk3KAEAahj4rJC4SLkByUZ1z5FCGALs6+qnEuKctrv2NHLdvI9nT1GNLL+MXW3am
+	0qeoMM3EIMQZdgndezP0mIA==
+X-Received: by 2002:a05:600c:4506:b0:456:1bae:5470 with SMTP id 5b1f17b1804b1-45b5179b6camr3190895e9.8.1755806826435;
+        Thu, 21 Aug 2025 13:07:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG7XEacdneicK9OezeDu7E6BzvwjamEpx7+RbUEh0t7qSo20kryXdXhBwYQdhu2/m95zw+e6A==
+X-Received: by 2002:a05:600c:4506:b0:456:1bae:5470 with SMTP id 5b1f17b1804b1-45b5179b6camr3190665e9.8.1755806825859;
+        Thu, 21 Aug 2025 13:07:05 -0700 (PDT)
+Received: from localhost (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c077788df7sm12764142f8f.48.2025.08.21.13.07.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 13:07:05 -0700 (PDT)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Peter Xu <peterx@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Zi Yan <ziy@nvidia.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH drm-next v2] drm/bridge: it6505: Use SHA-1 library instead of crypto_shash
-Date: Thu, 21 Aug 2025 13:56:13 -0400
-Message-ID: <20250821175613.14717-1-ebiggers@kernel.org>
+	linux-ide@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	linux-mmc@vger.kernel.org,
+	linux-arm-kernel@axis.com,
+	linux-scsi@vger.kernel.org,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-mm@kvack.org,
+	io-uring@vger.kernel.org,
+	iommu@lists.linux.dev,
+	kasan-dev@googlegroups.com,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alex Dubov <oakad@yahoo.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Airlie <airlied@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Lars Persson <lars.persson@axis.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Simona Vetter <simona@ffwll.ch>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Will Deacon <will@kernel.org>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: [PATCH RFC 00/35] mm: remove nth_page()
+Date: Thu, 21 Aug 2025 22:06:26 +0200
+Message-ID: <20250821200701.1329277-1-david@redhat.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -48,108 +173,194 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of using the "sha1" crypto_shash, simply call the sha1() library
-function.  This is simpler and faster.
+This is based on mm-unstable and was cross-compiled heavily.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+I should probably have already dropped the RFC label but I want to hear
+first if I ignored some corner case (SG entries?) and I need to do
+at least a bit more testing.
+
+I will only CC non-MM folks on the cover letter and the respective patch
+to not flood too many inboxes (the lists receive all patches).
+
 ---
 
-v2: rebased onto drm-next to resolve conflict in the Kconfig file
+As discussed recently with Linus, nth_page() is just nasty and we would
+like to remove it.
 
- drivers/gpu/drm/bridge/Kconfig      |  3 +--
- drivers/gpu/drm/bridge/ite-it6505.c | 33 ++---------------------------
- 2 files changed, 3 insertions(+), 33 deletions(-)
+To recap, the reason we currently need nth_page() within a folio is because
+on some kernel configs (SPARSEMEM without SPARSEMEM_VMEMMAP), the
+memmap is allocated per memory section.
 
-diff --git a/drivers/gpu/drm/bridge/Kconfig b/drivers/gpu/drm/bridge/Kconfig
-index 6945029b35929..a250afd8d6622 100644
---- a/drivers/gpu/drm/bridge/Kconfig
-+++ b/drivers/gpu/drm/bridge/Kconfig
-@@ -118,12 +118,11 @@ config DRM_ITE_IT6505
- 	select DRM_DISPLAY_HDCP_HELPER
- 	select DRM_DISPLAY_HELPER
- 	select DRM_DISPLAY_DP_AUX_BUS
- 	select DRM_KMS_HELPER
- 	select EXTCON
--	select CRYPTO
--	select CRYPTO_HASH
-+	select CRYPTO_LIB_SHA1
- 	select REGMAP_I2C
- 	help
- 	  ITE IT6505 DisplayPort bridge chip driver.
- 
- config DRM_LONTIUM_LT8912B
-diff --git a/drivers/gpu/drm/bridge/ite-it6505.c b/drivers/gpu/drm/bridge/ite-it6505.c
-index 89649c17ffad9..a094803ba7aa4 100644
---- a/drivers/gpu/drm/bridge/ite-it6505.c
-+++ b/drivers/gpu/drm/bridge/ite-it6505.c
-@@ -19,11 +19,11 @@
- #include <linux/regulator/consumer.h>
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <linux/bitfield.h>
- 
--#include <crypto/hash.h>
-+#include <crypto/sha1.h>
- 
- #include <drm/display/drm_dp_helper.h>
- #include <drm/display/drm_hdcp_helper.h>
- #include <drm/drm_atomic_helper.h>
- #include <drm/drm_bridge.h>
-@@ -2105,39 +2105,10 @@ static void it6505_hdcp_part1_auth(struct it6505 *it6505)
- 			HDCP_TRIGGER_START);
- 
- 	it6505->hdcp_status = HDCP_AUTH_GOING;
- }
- 
--static int it6505_sha1_digest(struct it6505 *it6505, u8 *sha1_input,
--			      unsigned int size, u8 *output_av)
--{
--	struct shash_desc *desc;
--	struct crypto_shash *tfm;
--	int err;
--	struct device *dev = it6505->dev;
--
--	tfm = crypto_alloc_shash("sha1", 0, 0);
--	if (IS_ERR(tfm)) {
--		dev_err(dev, "crypto_alloc_shash sha1 failed");
--		return PTR_ERR(tfm);
--	}
--	desc = kzalloc(sizeof(*desc) + crypto_shash_descsize(tfm), GFP_KERNEL);
--	if (!desc) {
--		crypto_free_shash(tfm);
--		return -ENOMEM;
--	}
--
--	desc->tfm = tfm;
--	err = crypto_shash_digest(desc, sha1_input, size, output_av);
--	if (err)
--		dev_err(dev, "crypto_shash_digest sha1 failed");
--
--	crypto_free_shash(tfm);
--	kfree(desc);
--	return err;
--}
--
- static int it6505_setup_sha1_input(struct it6505 *it6505, u8 *sha1_input)
- {
- 	struct device *dev = it6505->dev;
- 	u8 binfo[2];
- 	int down_stream_count, err, msg_count = 0;
-@@ -2203,11 +2174,11 @@ static bool it6505_hdcp_part2_ksvlist_check(struct it6505 *it6505)
- 	if (i <= 0) {
- 		dev_err(dev, "SHA-1 Input length error %d", i);
- 		return false;
- 	}
- 
--	it6505_sha1_digest(it6505, it6505->sha1_input, i, (u8 *)av);
-+	sha1(it6505->sha1_input, i, (u8 *)av);
- 	/*1B-05 V' must retry 3 times */
- 	for (retry = 0; retry < 3; retry++) {
- 		err = it6505_get_dpcd(it6505, DP_AUX_HDCP_V_PRIME(0), (u8 *)bv,
- 				      sizeof(bv));
- 
+While buddy allocations cannot cross memory section boundaries, hugetlb
+and dax folios can.
 
-base-commit: dd489c01c3971778c417630f328460021fc8fc61
+So crossing a memory section means that "page++" could do the wrong thing.
+Instead, nth_page() on these problematic configs always goes from
+page->pfn, to the go from (++pfn)->page, which is rather nasty.
+
+Likely, many people have no idea when nth_page() is required and when
+it might be dropped.
+
+We refer to such problematic PFN ranges and "non-contiguous pages".
+If we only deal with "contiguous pages", there is not need for nth_page().
+
+Besides that "obvious" folio case, we might end up using nth_page()
+within CMA allocations (again, could span memory sections), and in
+one corner case (kfence) when processing memblock allocations (again,
+could span memory sections).
+
+So let's handle all that, add sanity checks, and remove nth_page().
+
+Patch #1 -> #5   : stop making SPARSEMEM_VMEMMAP user-selectable + cleanups
+Patch #6 -> #12  : disallow folios to have non-contiguous pages
+Patch #13 -> #20 : remove nth_page() usage within folios
+Patch #21        : disallow CMA allocations of non-contiguous pages
+Patch #22 -> #31 : sanity+check + remove nth_page() usage within SG entry
+Patch #32        : sanity-check + remove nth_page() usage in
+                   unpin_user_page_range_dirty_lock()
+Patch #33        : remove nth_page() in kfence
+Patch #34        : adjust stale comment regarding nth_page
+Patch #35        : mm: remove nth_page()
+
+A lot of this is inspired from the discussion at [1] between Linus, Jason
+and me, so cudos to them.
+
+[1] https://lore.kernel.org/all/CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com/T/#u
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Suren Baghdasaryan <surenb@google.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>
+Cc: Marco Elver <elver@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Brendan Jackman <jackmanb@google.com>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Zi Yan <ziy@nvidia.com>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@gentwo.org>
+Cc: Muchun Song <muchun.song@linux.dev>
+Cc: Oscar Salvador <osalvador@suse.de>
+Cc: x86@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: intel-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-arm-kernel@axis.com
+Cc: linux-scsi@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: linux-mm@kvack.org
+Cc: io-uring@vger.kernel.org
+Cc: iommu@lists.linux.dev
+Cc: kasan-dev@googlegroups.com
+Cc: wireguard@lists.zx2c4.com
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+
+David Hildenbrand (35):
+  mm: stop making SPARSEMEM_VMEMMAP user-selectable
+  arm64: Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  s390/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  x86/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu
+    kernel config
+  mm/page_alloc: reject unreasonable folio/compound page sizes in
+    alloc_contig_range_noprof()
+  mm/memremap: reject unreasonable folio/compound page sizes in
+    memremap_pages()
+  mm/hugetlb: check for unreasonable folio sizes when registering hstate
+  mm/mm_init: make memmap_init_compound() look more like
+    prep_compound_page()
+  mm/hugetlb: cleanup hugetlb_folio_init_tail_vmemmap()
+  mm: sanity-check maximum folio size in folio_set_order()
+  mm: limit folio/compound page sizes in problematic kernel configs
+  mm: simplify folio_page() and folio_page_idx()
+  mm/mm/percpu-km: drop nth_page() usage within single allocation
+  fs: hugetlbfs: remove nth_page() usage within folio in
+    adjust_range_hwpoison()
+  mm/pagewalk: drop nth_page() usage within folio in folio_walk_start()
+  mm/gup: drop nth_page() usage within folio when recording subpages
+  io_uring/zcrx: remove "struct io_copy_cache" and one nth_page() usage
+  io_uring/zcrx: remove nth_page() usage within folio
+  mips: mm: convert __flush_dcache_pages() to
+    __flush_dcache_folio_pages()
+  mm/cma: refuse handing out non-contiguous page ranges
+  dma-remap: drop nth_page() in dma_common_contiguous_remap()
+  scatterlist: disallow non-contigous page ranges in a single SG entry
+  ata: libata-eh: drop nth_page() usage within SG entry
+  drm/i915/gem: drop nth_page() usage within SG entry
+  mspro_block: drop nth_page() usage within SG entry
+  memstick: drop nth_page() usage within SG entry
+  mmc: drop nth_page() usage within SG entry
+  scsi: core: drop nth_page() usage within SG entry
+  vfio/pci: drop nth_page() usage within SG entry
+  crypto: remove nth_page() usage within SG entry
+  mm/gup: drop nth_page() usage in unpin_user_page_range_dirty_lock()
+  kfence: drop nth_page() usage
+  block: update comment of "struct bio_vec" regarding nth_page()
+  mm: remove nth_page()
+
+ arch/arm64/Kconfig                            |  1 -
+ arch/mips/include/asm/cacheflush.h            | 11 +++--
+ arch/mips/mm/cache.c                          |  8 ++--
+ arch/s390/Kconfig                             |  1 -
+ arch/x86/Kconfig                              |  1 -
+ crypto/ahash.c                                |  4 +-
+ crypto/scompress.c                            |  8 ++--
+ drivers/ata/libata-sff.c                      |  6 +--
+ drivers/gpu/drm/i915/gem/i915_gem_pages.c     |  2 +-
+ drivers/memstick/core/mspro_block.c           |  3 +-
+ drivers/memstick/host/jmb38x_ms.c             |  3 +-
+ drivers/memstick/host/tifm_ms.c               |  3 +-
+ drivers/mmc/host/tifm_sd.c                    |  4 +-
+ drivers/mmc/host/usdhi6rol0.c                 |  4 +-
+ drivers/scsi/scsi_lib.c                       |  3 +-
+ drivers/scsi/sg.c                             |  3 +-
+ drivers/vfio/pci/pds/lm.c                     |  3 +-
+ drivers/vfio/pci/virtio/migrate.c             |  3 +-
+ fs/hugetlbfs/inode.c                          | 25 ++++------
+ include/crypto/scatterwalk.h                  |  4 +-
+ include/linux/bvec.h                          |  7 +--
+ include/linux/mm.h                            | 48 +++++++++++++++----
+ include/linux/page-flags.h                    |  5 +-
+ include/linux/scatterlist.h                   |  4 +-
+ io_uring/zcrx.c                               | 34 ++++---------
+ kernel/dma/remap.c                            |  2 +-
+ mm/Kconfig                                    |  3 +-
+ mm/cma.c                                      | 36 +++++++++-----
+ mm/gup.c                                      | 13 +++--
+ mm/hugetlb.c                                  | 23 ++++-----
+ mm/internal.h                                 |  1 +
+ mm/kfence/core.c                              | 17 ++++---
+ mm/memremap.c                                 |  3 ++
+ mm/mm_init.c                                  | 13 ++---
+ mm/page_alloc.c                               |  5 +-
+ mm/pagewalk.c                                 |  2 +-
+ mm/percpu-km.c                                |  2 +-
+ mm/util.c                                     | 33 +++++++++++++
+ tools/testing/scatterlist/linux/mm.h          |  1 -
+ .../selftests/wireguard/qemu/kernel.config    |  1 -
+ 40 files changed, 203 insertions(+), 150 deletions(-)
+
+
+base-commit: c0e3b3f33ba7b767368de4afabaf7c1ddfdc3872
 -- 
 2.50.1
 
