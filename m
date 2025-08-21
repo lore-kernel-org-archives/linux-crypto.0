@@ -1,82 +1,80 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC02137E8F2
-	for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 20:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E671237F208
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 20:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755806922; cv=none; b=qBs1vuhdD3VHGRcn3iFIBf7IhH+BpGoHFmifMafdBjuFTMbs2l3OZ0vXKK9NSFPn2o6xPJYMZz2JazLsnQfcBvPtop30qO3gI0XJGnPBxdC5LDaNslD1nWMrFC9UIWnWqeiUeYrHdi5iKoyoJ9bE/bdAy75Rfbeiz3actTqJUpg=
+	t=1755806926; cv=none; b=OG8y4XLTKg/2Qp+1AlA0eW9sgoKoBhTcwevLVA3gYT7fML+VtF3OXYyaKYdeRd6Pwvdc41NMqgIdxWYNu3nDJKfaMkI9HLiqs25SjGnKsOmzfewdZXKFx5iXxMct4dpB9UVSlqD3opIgaqNO9vqhgq1TDrf2T3aZYd5jhDOJo8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755806922; c=relaxed/simple;
-	bh=nQnlX0DDaNxbga/DhB7JLie8Amiy5HfSv4XT65Hn/xQ=;
+	s=arc-20240116; t=1755806926; c=relaxed/simple;
+	bh=+AkJ4dNPQE9q5oho0ySkYtQ5iyrBmFIRoWrlEu7Fgds=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GrbZ2L9HQ6stuEEy1PoFrpZcEhRhgTJetE19QGijEPkAD0cMhosOWPyWfO3aRIIsCWD8agUgssrOslbpnWPIG4GrFzPfiCl7RcsuYuYRYRgJtglajdhe2wPzrMGnTxld+t5iOdazxqEOFSPLu/nWB9jcp7etd0kVX6BnVX/8Hk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ijNGEasJ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=tymbjWuAnoO3hbU0wrKrsa07CYJHCanSh2v4M7u4srZXespcA1cFOW9ND7PIFh12favs4nq4LZUNuZkKwvCKQgBYPhZDmEetQRHz1damfQzOCSey+LHeB3YtHhWX1+McUBYiCIWl3x/IBgx3bN+/oWGa7qn9e8cVwXsMFhLyGHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MNGPJu8i; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijNGEasJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNGPJu8i"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755806918;
+	s=mimecast20190719; t=1755806922;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6kuJ+10C4pYxyWPcGDJkWqMBAcRGmXje5KFYns7NWu0=;
-	b=ijNGEasJqJWBfKGxcuNNH0MJqUynORXh35VydRaH7Vl3/hgrrAYGO65MvvqGMpeziVefOt
-	orKLZPIp2m1XnV1s+JApWZ+cg6BMejP7Xf6pYfpjfM2YZrxC0oys7vy1Ipmgs/rO8+ovjt
-	votS2ghUfsPFD1cHrdqQc6vMLOV+odw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OnKBChYNBt6k7pWFZ1VK2zlCQ3hhOdGhc0x5VCAB6rA=;
+	b=MNGPJu8iTcM7AFqcPxSU7k89kw8yUjYmPnj/0ZTdp1dgCbA3tR8zbZ1oeBqvZAEYM6p6Mc
+	rFaGyEDYwlxsl4wh3l7Cz+/uVi+BhcqGy7jP3ao08kfnXZEuczpTjT9BgcB2QaxaU06iKL
+	6n8z1MW6+cNg4eVAoj3detMG+tECnPU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-ojeiaFPNNeaF0wI8rlAq7g-1; Thu, 21 Aug 2025 16:08:33 -0400
-X-MC-Unique: ojeiaFPNNeaF0wI8rlAq7g-1
-X-Mimecast-MFC-AGG-ID: ojeiaFPNNeaF0wI8rlAq7g_1755806909
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3c380aa19c1so770631f8f.1
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 13:08:33 -0700 (PDT)
+ us-mta-507-3ynn_bePOo6VauEOGqngfg-1; Thu, 21 Aug 2025 16:08:41 -0400
+X-MC-Unique: 3ynn_bePOo6VauEOGqngfg-1
+X-Mimecast-MFC-AGG-ID: 3ynn_bePOo6VauEOGqngfg_1755806920
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1b0511b3so8304155e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 13:08:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755806909; x=1756411709;
+        d=1e100.net; s=20230601; t=1755806920; x=1756411720;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6kuJ+10C4pYxyWPcGDJkWqMBAcRGmXje5KFYns7NWu0=;
-        b=mRKJCNvw2D/PSmsgBbWcFWEQGJeoPmwIo+VFUn+SwTFPJhS827iRXVQIvJ8mZJv+i1
-         TWqqMMdat/e+MC5D3VMN1FqKSIlvfghKPB5Gzlq4G32D97vzDjTM+N6O7BvGWF3QHEkJ
-         l9W2NHrNrInwen6l8/BzP84zgzKIJ32MkhRBBpMYMjgpeyIeSyTkAooooeXF3R54tMrt
-         hJRfcwHTBBn5aXesThezKLO4FyTpcWCXJEwekILYtOW0jQ76vpFgwq1K9Hr906A4KLME
-         5zLxztL4UJXgtK6KB2PsuB71bSyKRmGaNC8NXePLfTCup6d+0zKPj++JNACGSyPHh+qJ
-         agfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCrwwUWGT7olQyZFFGiY6/mRs53U8kgAJVX/SdYFfRiKeOElm8hN0LTFvk9i8yXT5EgYYx6SaYPnIgEO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDERx067j5clhfWWK/GQnFB3y/e5mzoXdKef8XF/mGz7o2bkIa
-	WyWLuIUBdqV9jYcEyeHbdI6XbekEIJbMXbsZY6n54pFq0PlA9803E23m2scJebpI6nOHZ4+1c6V
-	1/yK4eGWE+W3oXsxGzTn2/4qtEENSilIxHtsxwRKETO9B1JuGNYyTK6G9FTtth+ydyQ==
-X-Gm-Gg: ASbGncvkhk2M8wI3XHqhl8qwZVM2Yf+z3HaqxIV2UBi0W1BQtWglfdQ6qNsNPbV3ybf
-	W8quOXz2NTQeGaqnulzhqNcycGEIthGk4LfWnQK6Dy7LifG/IF9KYmFWOW4mCxYz5Wy1Wd+pgER
-	/XaVau3mCrRTGIABVmCK4TQmuYfcFfZ2cr4kh4i73WxNS3bIuLhZ3WP5jJAt/C7GyOTnrcbyDh9
-	dIugr714RGJoRYk9juXGN8ROpoj7/us409dNmWNqyYYmwZHZ26PfGyShFyadyY94RRvzIx/PEzE
-	qC3y8d9rLMmtc4Xp3ZxgGtkCGboRqfkONl9pxJFRni3VG37u6ct8jCfE32PZrOd0npdDijon3EW
-	Hz7k9C/wm9x54KLpSB3v7pA==
-X-Received: by 2002:a05:6000:18a6:b0:3b9:48f:4967 with SMTP id ffacd0b85a97d-3c5dd6bbb33mr155500f8f.56.1755806909397;
-        Thu, 21 Aug 2025 13:08:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRykwWh31JVJGBkobbD9YNZEskJV981iF0h0FASAg1XfgxaqZA4MQnDyPntA4/emfIOpWurA==
-X-Received: by 2002:a05:6000:18a6:b0:3b9:48f:4967 with SMTP id ffacd0b85a97d-3c5dd6bbb33mr155476f8f.56.1755806908930;
-        Thu, 21 Aug 2025 13:08:28 -0700 (PDT)
+        bh=OnKBChYNBt6k7pWFZ1VK2zlCQ3hhOdGhc0x5VCAB6rA=;
+        b=BnRpwuLW0zSgcZXqb+WhLNZvN7OIL5tT8qeI3GUTxyniXXVwfNV85ILOoeyu6tvP2x
+         StHyjeKmJKQXgAmXljQfL7cPyBFnNglmK7mtAEvga8I2KArusjKdRLC82oIp+VWRIxUH
+         TuulmyvSqP10/HoHAkn8lV9tH2qqNiAdjgHik4X20leZzVN2+BpY85FpsOoie+cYTRwv
+         CzdRlGKnPPFAAgmBwYnt5dUTEwEo8a3kW/wfoDkY9Kn+JEKQ/+AU4L8tK+A/+RP0EHGY
+         CBHIXj25UeJw49TzeJ+DBegNJhDIOkDn+9Joy0BGy1LiLnGhAX3QR5HSffAKaP4wv6t1
+         hl4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXVa0SwQoU0ZG8RiGB7OKe2pKLo/1rxH3mD2rmxsKuTTax+AdNsS7p7uzJ0Fc7ZeYe0j5C7b/RIUQLBO7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9+wWS4Xu4jFhR+QHCCHFP/iz9lmVUNycz4/ZjCcuaqGkEOu4e
+	1o+ZJzSZQEm8P8TJgf0erTuOBCmOvEMiEuocN1WXf/0+aIdB8ros9Z2V9Yw9S2soVlhNh8ib6p5
+	1+4VJ/6nARbOXKkmE5vxxHaA7a2EeT1sWhAhNGhHavr0JGjijCXfUOtS7TlP9ITFjHQ==
+X-Gm-Gg: ASbGncseV3wDCZcBd6uEsOdJPyXCvngd/ieSM/7ZHUoZF4iSEArRY+DyBaMR4nKG/aW
+	udLOsvaApPoWaZMsdD8esz4aoA4TaZbK5IR0rkCPTXTLEB5QpfEG7pE9QMwP1UKnjEyeak/IgvC
+	iL/TS6iKnwELK4uK02QLPCxKNkTfZp12GVu3rAYC7Vlf19X52QV/ohA7G5zVEH5AL3l4xSxr7Sh
+	V+XySGyhTopvZEBG/ih06AT7o8FaRuAg/3Mcsj6F3+tRdVbE9VZyXJhS2wlxS04EwZ5Y5mL3iSL
+	2VPFv0DvoSNXlkHuhinVQWKsrxizDa5F7EzmkBfekdNTgzwL3J2lC+gxJcyLHFoKoTquz0JGyMj
+	Cqr1Qv2b1D3tMhl8N7TnlIw==
+X-Received: by 2002:a05:6000:2405:b0:3a4:e841:b236 with SMTP id ffacd0b85a97d-3c5dc735246mr192355f8f.33.1755806920376;
+        Thu, 21 Aug 2025 13:08:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFrWn9aM0C/1GZBHvF1UL+fKz7WhllpDdsBGpm2GmVOIF4Yc/dULhABMcTdk4u9sLFplZdR3g==
+X-Received: by 2002:a05:6000:2405:b0:3a4:e841:b236 with SMTP id ffacd0b85a97d-3c5dc735246mr192328f8f.33.1755806919917;
+        Thu, 21 Aug 2025 13:08:39 -0700 (PDT)
 Received: from localhost (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c5317abe83sm2432791f8f.40.2025.08.21.13.08.27
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c0771c166bsm12920369f8f.33.2025.08.21.13.08.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 13:08:28 -0700 (PDT)
+        Thu, 21 Aug 2025 13:08:39 -0700 (PDT)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Doug Gilbert <dgilbert@interlog.com>,
 	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Brendan Jackman <jackmanb@google.com>,
 	Christoph Lameter <cl@gentwo.org>,
 	Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>,
 	dri-devel@lists.freedesktop.org,
 	intel-gfx@lists.freedesktop.org,
 	iommu@lists.linux.dev,
@@ -101,7 +99,6 @@ Cc: David Hildenbrand <david@redhat.com>,
 	linux-s390@vger.kernel.org,
 	linux-scsi@vger.kernel.org,
 	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
 	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Michal Hocko <mhocko@suse.com>,
 	Mike Rapoport <rppt@kernel.org>,
@@ -117,9 +114,9 @@ Cc: David Hildenbrand <david@redhat.com>,
 	wireguard@lists.zx2c4.com,
 	x86@kernel.org,
 	Zi Yan <ziy@nvidia.com>
-Subject: [PATCH RFC 29/35] scsi: core: drop nth_page() usage within SG entry
-Date: Thu, 21 Aug 2025 22:06:55 +0200
-Message-ID: <20250821200701.1329277-30-david@redhat.com>
+Subject: [PATCH RFC 33/35] kfence: drop nth_page() usage
+Date: Thu, 21 Aug 2025 22:06:59 +0200
+Message-ID: <20250821200701.1329277-34-david@redhat.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250821200701.1329277-1-david@redhat.com>
 References: <20250821200701.1329277-1-david@redhat.com>
@@ -131,46 +128,82 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's no longer required to use nth_page() when iterating pages within a
-single SG entry, so let's drop the nth_page() usage.
+We want to get rid of nth_page(), and kfence init code is the last user.
 
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Doug Gilbert <dgilbert@interlog.com>
+Unfortunately, we might actually walk a PFN range where the pages are
+not contiguous, because we might be allocating an area from memblock
+that could span memory sections in problematic kernel configs (SPARSEMEM
+without SPARSEMEM_VMEMMAP).
+
+We could check whether the page range is contiguous
+using page_range_contiguous() and failing kfence init, or making kfence
+incompatible these problemtic kernel configs.
+
+Let's keep it simple and simply use pfn_to_page() by iterating PFNs.
+
+Cc: Alexander Potapenko <glider@google.com>
+Cc: Marco Elver <elver@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- drivers/scsi/scsi_lib.c | 3 +--
- drivers/scsi/sg.c       | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ mm/kfence/core.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 0c65ecfedfbd6..f523f85828b89 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -3148,8 +3148,7 @@ void *scsi_kmap_atomic_sg(struct scatterlist *sgl, int sg_count,
- 	/* Offset starting from the beginning of first page in this sg-entry */
- 	*offset = *offset - len_complete + sg->offset;
+diff --git a/mm/kfence/core.c b/mm/kfence/core.c
+index 0ed3be100963a..793507c77f9e8 100644
+--- a/mm/kfence/core.c
++++ b/mm/kfence/core.c
+@@ -594,15 +594,15 @@ static void rcu_guarded_free(struct rcu_head *h)
+  */
+ static unsigned long kfence_init_pool(void)
+ {
+-	unsigned long addr;
+-	struct page *pages;
++	unsigned long addr, pfn, start_pfn, end_pfn;
+ 	int i;
  
--	/* Assumption: contiguous pages can be accessed as "page + i" */
--	page = nth_page(sg_page(sg), (*offset >> PAGE_SHIFT));
-+	page = sg_page(sg) + *offset / PAGE_SIZE;
- 	*offset &= ~PAGE_MASK;
+ 	if (!arch_kfence_init_pool())
+ 		return (unsigned long)__kfence_pool;
  
- 	/* Bytes in this sg-entry from *offset to the end of the page */
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 3c02a5f7b5f39..2c653f2b21133 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1235,8 +1235,7 @@ sg_vma_fault(struct vm_fault *vmf)
- 		len = vma->vm_end - sa;
- 		len = (len < length) ? len : length;
- 		if (offset < len) {
--			struct page *page = nth_page(rsv_schp->pages[k],
--						     offset >> PAGE_SHIFT);
-+			struct page *page = rsv_schp->pages[k] + offset / PAGE_SIZE;
- 			get_page(page);	/* increment page count */
- 			vmf->page = page;
- 			return 0; /* success */
+ 	addr = (unsigned long)__kfence_pool;
+-	pages = virt_to_page(__kfence_pool);
++	start_pfn = PHYS_PFN(virt_to_phys(__kfence_pool));
++	end_pfn = start_pfn + KFENCE_POOL_SIZE / PAGE_SIZE;
+ 
+ 	/*
+ 	 * Set up object pages: they must have PGTY_slab set to avoid freeing
+@@ -612,12 +612,13 @@ static unsigned long kfence_init_pool(void)
+ 	 * fast-path in SLUB, and therefore need to ensure kfree() correctly
+ 	 * enters __slab_free() slow-path.
+ 	 */
+-	for (i = 0; i < KFENCE_POOL_SIZE / PAGE_SIZE; i++) {
+-		struct slab *slab = page_slab(nth_page(pages, i));
++	for (pfn = start_pfn; pfn != end_pfn; pfn++) {
++		struct slab *slab;
+ 
+ 		if (!i || (i % 2))
+ 			continue;
+ 
++		slab = page_slab(pfn_to_page(pfn));
+ 		__folio_set_slab(slab_folio(slab));
+ #ifdef CONFIG_MEMCG
+ 		slab->obj_exts = (unsigned long)&kfence_metadata_init[i / 2 - 1].obj_exts |
+@@ -664,11 +665,13 @@ static unsigned long kfence_init_pool(void)
+ 	return 0;
+ 
+ reset_slab:
+-	for (i = 0; i < KFENCE_POOL_SIZE / PAGE_SIZE; i++) {
+-		struct slab *slab = page_slab(nth_page(pages, i));
++	for (pfn = start_pfn; pfn != end_pfn; pfn++) {
++		struct slab *slab;
+ 
+ 		if (!i || (i % 2))
+ 			continue;
++
++		slab = page_slab(pfn_to_page(pfn));
+ #ifdef CONFIG_MEMCG
+ 		slab->obj_exts = 0;
+ #endif
 -- 
 2.50.1
 
