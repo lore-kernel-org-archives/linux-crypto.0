@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CE5217F24;
-	Thu, 21 Aug 2025 03:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB56922A4CC;
+	Thu, 21 Aug 2025 04:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755748756; cv=none; b=PZG5GQ58xVa7SPechQXe0RKEHoe7pfW6pXFehZZQ8Bvsm03TszuczG+MIo+/qhTuNZMWxoM+o7aGEWJ59tWobVIAKuKeQTKSOdAawYfhtNUgmEFMfLwPr8v6WdBsGYEl2/RMx6YMVoDmG4TkGVld+Td//dZ2z42z8O0pdNwAgY4=
+	t=1755749687; cv=none; b=cujerLYmlG/e5WxNPDajReUjWFhT94+Wcy1IdRLO+LyeykfAMDWx/7rYtRTyme4iTflNMZdFLkj2Ku9mBCc9gdIfIwufXpluPLmDUUikidWRlrFdcf+2HBMprbdyQqDroMAcXnkOWxRQQQ1xOfPSQf0ehqWN2hyDKvZCNfXY5Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755748756; c=relaxed/simple;
-	bh=wlPvbixKsFivuJ/uCAGwERK9ERg3cDoDU73Rw68oQZg=;
+	s=arc-20240116; t=1755749687; c=relaxed/simple;
+	bh=hDZ1R2E7fbfif2kjuuzEAtl7LiGxOezeEPUlLY8P5eY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=frLLG25FPSloqB0wEQdwVRqbftGvHANPG8YnbISNrklDi/FTy74+lSzo20BEMiFXZtpYM7jbIbgJy6qGuVgTV67py3pzPAFqAAxkA0Z/EZfg6u4hXZSF/bIW3i0E7rZApvFXAsLopnvU6Y+iYpBcwMFsWbKtdP5LmznHt1orweI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMwcQWRM; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWzmX4B6udEyGu0Jea05TlHjLI9q+33/5Sk1TJKd6/yx6KgF+wn4JDU7nBBMXW/3d82QNJA/OZK1XYOGF3bINRhgX1ikDvV/7iwotbe2gGpNAnDKnVkW3oU5qIDTX4Hyypeaj85A732CJ0HJiZ+EJHN+t0+e8rbKFLAnpX/SDQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tDtBK0OA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMwcQWRM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F8EC4CEF4;
-	Thu, 21 Aug 2025 03:59:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tDtBK0OA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C15D2C4CEF4;
+	Thu, 21 Aug 2025 04:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755748756;
-	bh=wlPvbixKsFivuJ/uCAGwERK9ERg3cDoDU73Rw68oQZg=;
+	s=k20201202; t=1755749687;
+	bh=hDZ1R2E7fbfif2kjuuzEAtl7LiGxOezeEPUlLY8P5eY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vMwcQWRMwZTBZxKoKPwiy8DIy8hOQNxeZ2k2NxO1AG86P1Izv9gAzrHwhl8dcZ9X3
-	 sMYxrShEmUIpA4u+rUuhQpbeMN8vmse3mSoyFzwA2iymU2nAeWWTFPVHBMM7XMWCPx
-	 akJFOAq6Mi6dt9PDtSo19qm09sRvt6iQeBr0A3k1dqtpn7EmRygmeoIW6/2hxLzzUN
-	 4l2heOzrxJzrodyTdy4Fi3atNFi2OaKtR12KD0oaIE3YTf6KFjhTRtIquPdz0mqphG
-	 A7IA5bKphrVvN/sGVds1Ij1lI+oSqPCzg2Hew58Aw7ADkyZFvIjL+Bh+tT2u68KJld
-	 VWp1RaM1ivriQ==
-Date: Wed, 20 Aug 2025 23:59:13 -0400
+	b=tDtBK0OA2hidz+zRDp+Lzd7q+vsvGhiDhCOTEl6FVGZ5Sjc+ArDwwvy78jLeQVxqQ
+	 Wn9gNueIyH1E6lckoWVStJmRdMNjJlyBV/3lNW6NVcRJHHpxVmYadg2BBiSqjqlS3q
+	 YOVOjAyscT0CW/VHx/NZrUQsVYGay3sFeRzYBf+FMM5cQxQF8mwND8p34aCP81GVfU
+	 EGWXPq38PhcfhW66mnx+IlJiE9eaLg0lrKVxxoWFOOv8NrpVztrWU4sYoOtRYyq0jO
+	 YyPN+MJczKxVMYyyHb5H9HJjr50WxEQs7bMaoog/ODM/VIDHZtG9ngBZEsovco+Bo3
+	 M8/LehzcRDgWQ==
+Date: Thu, 21 Aug 2025 00:14:45 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: Rakuram Eswaran <rakuram.e96@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	ardb@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] Documentation/staging: Fix typo and incorrect citation
- in crc32.rst
-Message-ID: <20250821035913.GG185832@quark>
-References: <20250820162615.6942-1-rakuram.e96@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Subject: Re: [PATCH 2/3] lib/crypto: poly1305: Consolidate into single module
+Message-ID: <20250821041445.GH185832@quark>
+References: <20250816194353.562491-1-ebiggers@kernel.org>
+ <20250816194353.562491-3-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,26 +44,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250820162615.6942-1-rakuram.e96@gmail.com>
+In-Reply-To: <20250816194353.562491-3-ebiggers@kernel.org>
 
-On Wed, Aug 20, 2025 at 09:56:13PM +0530, Rakuram Eswaran wrote:
-> In Documentation/staging/crc32.rst, below errors have been corrected:
-> 
-> 1. Line 37: from "to being" to "to bring"
-> 
-> 2. Line 119:  Incorrect citation date:
->    It must be August 1988 instead of August 1998
-> 
-> Signed-off-by: Rakuram Eswaran <rakuram.e96@gmail.com>
-> ---
->  Documentation/staging/crc32.rst | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Sat, Aug 16, 2025 at 12:43:52PM -0700, Eric Biggers wrote:
+> -perlasm-flavour-$(CONFIG_32BIT) := o32
+> -perlasm-flavour-$(CONFIG_64BIT) := 64
+> -
+> -quiet_cmd_perlasm = PERLASM $@
+> -      cmd_perlasm = $(PERL) $(<) $(perlasm-flavour-y) $(@)
+> -
+> -$(obj)/poly1305-core.S: $(src)/poly1305-mips.pl FORCE
+> -	$(call if_changed,perlasm)
+[...]
+> +ifeq ($(CONFIG_MIPS),y)
+> +libpoly1305-y += mips/poly1305-core.o
+> +poly1305-perlasm-flavour-$(CONFIG_32BIT) := o32
+> +poly1305-perlasm-flavour-$(CONFIG_64BIT) := 64
+> +quiet_cmd_perlasm_poly1305 = PERLASM $@
+> +      cmd_perlasm_poly1305 = $(PERL) $< $(poly1305-perlasm-flavour-y) $@
+> +$(obj)/mips/poly1305-core.S: $(src)/mips/poly1305-mips.pl
+> +	$(call if_changed,perlasm_poly1305)
+> +endif
 
-Sure, why not.  Applied to
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+Small issue that I noticed: I removed the "FORCE" from the rule for
+poly1305-core.S since none of the other perlasm rules had it.  But it's
+actually needed because, unlike the other perlasm rules, this one uses
+'if_changed' instead of 'cmd'.  'if_changed' requires FORCE.  And I
+believe it does need to use 'if_changed', since the contents of the
+generated .S file depends on the perlasm-flavour passed as an argument
+to the perl script.  That can change when the kernel config changes.
 
-Note that this file is somewhat dated and is due for a rewrite.  It
-doesn't describe how most of the optimized CRC code actually works these
-days, using carryless multiplication or dedicated instructions.
+So, TLDR: I'll restore the FORCE to the rule, and add a comment.
+
+The RISC-V optimized Poly1305 code added by the third patch will need
+if_changed and FORCE for the same reason.
+
+Of course, it's unfortunate that these are written in Perl at all.  But
+that is the convention used by Andy / CRYPTOGAMS, so that is what we'll
+use unless someone wants to rewrite it...
 
 - Eric
