@@ -1,42 +1,42 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7CD2417E0;
-	Thu, 21 Aug 2025 01:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B90242D62;
+	Thu, 21 Aug 2025 01:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755740297; cv=none; b=ojeJGMhHcZtuUrL5o4kiiEVMejKJTvv+rY0Ke9efTCIQWDal0LI8/FvBuOCQ1dOmnV06/jxeUm1rKaHR+Er4XRd4m4+ukDnC3vb/sesLzJoy4vwbQ8zPEzpnNfkDgrlRUO1jZEznxaA+jk/6/SYxl+k8KJJ7jvLOkJUr4NFAMDc=
+	t=1755740297; cv=none; b=UaEhMSiTVKFMZj7z2rFoq7otsBLvc58LQ//Tua7qCzGGwkxTEPBVKEgVmetysOnOLfdpFCZPyD1IBlkAC+QTOvD6OWtp2WyLNZYFTbRIH/cZuO7ctcP0W6ZaQZAW0T0V8OqjjyGSCRRVl29NBrl92VY7Qvt0i0iaVnwW7CJuM68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755740297; c=relaxed/simple;
-	bh=MlHqMVnU07GH6ssx63UQwR8prdxAqb6ytrZHvNp0N2s=;
+	bh=xf8WH8RCUDuZrcaSE24CIkhh+Cz+7tz+HvYj0wY3rmc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MzXr8T2YiERTK9eGHWkqun3yl7Mre3aGCKD8UnioNTVtrvF5nVkJOWRZmppNViVE4BrVoQmaeH6ueoio4EhjHbMJEo3ph3wnYXmmTj8UHjZLlzfI8z3/nhxrbYWk7IUeN+FGAGyAmaSBq0/3APnGuIaAMwI4wWxj9UEFPYpCwR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=CygOtObTXfp0kDu1kRKQlOvEn4V0hEQu+qHqDz1sP5IrttspfFLd24Hd7gxpMR13YjSTi74Vr9PHsxuQnWsLnlGazafbQdIeblj6neLX8nNH2KqsngXDf8pHcyU2LXSzRpFxnOFrmUkx1THxBOvOcfh4p38ziwbZHuZCmYNpthU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4c6m915pzCz2gLGY;
-	Thu, 21 Aug 2025 09:35:17 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4c6m964dx6z2TTH7;
+	Thu, 21 Aug 2025 09:35:22 +0800 (CST)
 Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3B163140148;
-	Thu, 21 Aug 2025 09:38:11 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 9BF331A016C;
+	Thu, 21 Aug 2025 09:38:12 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
  dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 21 Aug 2025 09:38:10 +0800
+ 15.2.1544.11; Thu, 21 Aug 2025 09:38:12 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 21 Aug 2025 09:38:10 +0800
+ 15.2.1544.11; Thu, 21 Aug 2025 09:38:11 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<linuxarm@openeuler.org>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
 	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>,
 	<yinzhushuai@huawei.com>
-Subject: [PATCH v2 2/6] crypto: hisilicon - re-enable address prefetch after device resuming
-Date: Thu, 21 Aug 2025 09:38:05 +0800
-Message-ID: <20250821013809.4016506-3-huangchenghai2@huawei.com>
+Subject: [PATCH v2 5/6] crypto: hisilicon/qm - request reserved interrupt for virtual function
+Date: Thu, 21 Aug 2025 09:38:08 +0800
+Message-ID: <20250821013809.4016506-6-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250821013809.4016506-1-huangchenghai2@huawei.com>
 References: <20250821013809.4016506-1-huangchenghai2@huawei.com>
@@ -51,192 +51,106 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-When the device resumes from a suspended state, it will revert to its
-initial state and requires re-enabling. Currently, the address prefetch
-function is not re-enabled after device resuming. Move the address prefetch
-enable to the initialization process. In this way, the address prefetch
-can be enabled when the device resumes by calling the initialization
-process.
+From: Weili Qian <qianweili@huawei.com>
 
-Fixes: 607c191b371d ("crypto: hisilicon - support runtime PM for accelerator device")
+The device interrupt vector 3 is an error interrupt for
+physical function and a reserved interrupt for virtual function.
+However, the driver has not registered the reserved interrupt for
+virtual function. When allocating interrupts, the number of interrupts
+is allocated based on powers of two, which includes this interrupt.
+When the system enables GICv4 and the virtual function passthrough
+to the virtual machine, releasing the interrupt in the driver
+triggers a warning.
+
+The WARNING report is:
+WARNING: CPU: 62 PID: 14889 at arch/arm64/kvm/vgic/vgic-its.c:852 its_free_ite+0x94/0xb4
+
+Therefore, register a reserved interrupt for VF and set the
+IRQF_NO_AUTOEN flag to avoid that warning.
+
+Fixes: 3536cc55cada ("crypto: hisilicon/qm - support get device irq information from hardware registers")
+Signed-off-by: Weili Qian <qianweili@huawei.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c |  3 +-
- drivers/crypto/hisilicon/qm.c             |  3 -
- drivers/crypto/hisilicon/sec2/sec_main.c  | 80 +++++++++++------------
- drivers/crypto/hisilicon/zip/zip_main.c   |  5 +-
- 4 files changed, 43 insertions(+), 48 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 38 +++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index f5b47e5ff48a..34f84978180f 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -721,6 +721,7 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 
- 	/* Config data buffer pasid needed by Kunpeng 920 */
- 	hpre_config_pasid(qm);
-+	hpre_open_sva_prefetch(qm);
- 
- 	hpre_enable_clock_gate(qm);
- 
-@@ -1450,8 +1451,6 @@ static int hpre_pf_probe_init(struct hpre *hpre)
- 	if (ret)
- 		return ret;
- 
--	hpre_open_sva_prefetch(qm);
--
- 	hisi_qm_dev_err_init(qm);
- 	ret = hpre_show_last_regs_init(qm);
- 	if (ret)
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 8d45febb98dd..9bbbfff759a9 100644
+index 408e201a7af2..3a12d291c086 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -4447,9 +4447,6 @@ static void qm_restart_prepare(struct hisi_qm *qm)
- {
- 	u32 value;
+@@ -4732,6 +4732,15 @@ void hisi_qm_reset_done(struct pci_dev *pdev)
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_reset_done);
  
--	if (qm->err_ini->open_sva_prefetch)
--		qm->err_ini->open_sva_prefetch(qm);
--
- 	if (qm->ver >= QM_HW_V3)
++static irqreturn_t qm_rsvd_irq(int irq, void *data)
++{
++	struct hisi_qm *qm = data;
++
++	dev_info(&qm->pdev->dev, "Reserved interrupt, ignore!\n");
++
++	return IRQ_HANDLED;
++}
++
+ static irqreturn_t qm_abnormal_irq(int irq, void *data)
+ {
+ 	struct hisi_qm *qm = data;
+@@ -5015,7 +5024,7 @@ static void qm_unregister_abnormal_irq(struct hisi_qm *qm)
+ 	struct pci_dev *pdev = qm->pdev;
+ 	u32 irq_vector, val;
+ 
+-	if (qm->fun_type == QM_HW_VF)
++	if (qm->fun_type == QM_HW_VF && qm->ver < QM_HW_V3)
  		return;
  
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 72cf48d1f3ab..ddb20f380b54 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -464,6 +464,45 @@ static void sec_set_endian(struct hisi_qm *qm)
- 	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
- }
+ 	val = qm->cap_tables.qm_cap_table[QM_ABNORMAL_IRQ].cap_val;
+@@ -5032,17 +5041,28 @@ static int qm_register_abnormal_irq(struct hisi_qm *qm)
+ 	u32 irq_vector, val;
+ 	int ret;
  
-+static void sec_close_sva_prefetch(struct hisi_qm *qm)
-+{
-+	u32 val;
-+	int ret;
-+
-+	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
-+		return;
-+
-+	val = readl_relaxed(qm->io_base + SEC_PREFETCH_CFG);
-+	val |= SEC_PREFETCH_DISABLE;
-+	writel(val, qm->io_base + SEC_PREFETCH_CFG);
-+
-+	ret = readl_relaxed_poll_timeout(qm->io_base + SEC_SVA_TRANS,
-+					 val, !(val & SEC_SVA_DISABLE_READY),
-+					 SEC_DELAY_10_US, SEC_POLL_TIMEOUT_US);
-+	if (ret)
-+		pci_err(qm->pdev, "failed to close sva prefetch\n");
-+}
-+
-+static void sec_open_sva_prefetch(struct hisi_qm *qm)
-+{
-+	u32 val;
-+	int ret;
-+
-+	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
-+		return;
-+
-+	/* Enable prefetch */
-+	val = readl_relaxed(qm->io_base + SEC_PREFETCH_CFG);
-+	val &= SEC_PREFETCH_ENABLE;
-+	writel(val, qm->io_base + SEC_PREFETCH_CFG);
-+
-+	ret = readl_relaxed_poll_timeout(qm->io_base + SEC_PREFETCH_CFG,
-+					 val, !(val & SEC_PREFETCH_DISABLE),
-+					 SEC_DELAY_10_US, SEC_POLL_TIMEOUT_US);
-+	if (ret)
-+		pci_err(qm->pdev, "failed to open sva prefetch\n");
-+}
-+
- static void sec_engine_sva_config(struct hisi_qm *qm)
- {
- 	u32 reg;
-@@ -497,45 +536,7 @@ static void sec_engine_sva_config(struct hisi_qm *qm)
- 		writel_relaxed(reg, qm->io_base +
- 				SEC_INTERFACE_USER_CTRL1_REG);
- 	}
--}
+-	if (qm->fun_type == QM_HW_VF)
+-		return 0;
 -
--static void sec_open_sva_prefetch(struct hisi_qm *qm)
--{
--	u32 val;
--	int ret;
+ 	val = qm->cap_tables.qm_cap_table[QM_ABNORMAL_IRQ].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_ABN_IRQ_TYPE_MASK))
+ 		return 0;
 -
--	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
--		return;
--
--	/* Enable prefetch */
--	val = readl_relaxed(qm->io_base + SEC_PREFETCH_CFG);
--	val &= SEC_PREFETCH_ENABLE;
--	writel(val, qm->io_base + SEC_PREFETCH_CFG);
--
--	ret = readl_relaxed_poll_timeout(qm->io_base + SEC_PREFETCH_CFG,
--					 val, !(val & SEC_PREFETCH_DISABLE),
--					 SEC_DELAY_10_US, SEC_POLL_TIMEOUT_US);
--	if (ret)
--		pci_err(qm->pdev, "failed to open sva prefetch\n");
--}
--
--static void sec_close_sva_prefetch(struct hisi_qm *qm)
--{
--	u32 val;
--	int ret;
--
--	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
--		return;
--
--	val = readl_relaxed(qm->io_base + SEC_PREFETCH_CFG);
--	val |= SEC_PREFETCH_DISABLE;
--	writel(val, qm->io_base + SEC_PREFETCH_CFG);
--
--	ret = readl_relaxed_poll_timeout(qm->io_base + SEC_SVA_TRANS,
--					 val, !(val & SEC_SVA_DISABLE_READY),
--					 SEC_DELAY_10_US, SEC_POLL_TIMEOUT_US);
--	if (ret)
--		pci_err(qm->pdev, "failed to close sva prefetch\n");
-+	sec_open_sva_prefetch(qm);
- }
- 
- static void sec_enable_clock_gate(struct hisi_qm *qm)
-@@ -1152,7 +1153,6 @@ static int sec_pf_probe_init(struct sec_dev *sec)
+ 	irq_vector = val & QM_IRQ_VECTOR_MASK;
++
++	/* For VF, this is a reserved interrupt in V3 version. */
++	if (qm->fun_type == QM_HW_VF) {
++		if (qm->ver < QM_HW_V3)
++			return 0;
++
++		ret = request_irq(pci_irq_vector(pdev, irq_vector), qm_rsvd_irq,
++				  IRQF_NO_AUTOEN, qm->dev_name, qm);
++		if (ret) {
++			dev_err(&pdev->dev, "failed to request reserved irq, ret = %d!\n", ret);
++			return ret;
++		}
++		return 0;
++	}
++
+ 	ret = request_irq(pci_irq_vector(pdev, irq_vector), qm_abnormal_irq, 0, qm->dev_name, qm);
  	if (ret)
- 		return ret;
+-		dev_err(&qm->pdev->dev, "failed to request abnormal irq, ret = %d", ret);
++		dev_err(&qm->pdev->dev, "failed to request abnormal irq, ret = %d!\n", ret);
  
--	sec_open_sva_prefetch(qm);
- 	hisi_qm_dev_err_init(qm);
- 	sec_debug_regs_clear(qm);
- 	ret = sec_show_last_regs_init(qm);
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index fb7b19927dd3..480fa590664a 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -557,6 +557,7 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
- 		writel(AXUSER_BASE, base + HZIP_DATA_WUSER_32_63);
- 		writel(AXUSER_BASE, base + HZIP_SGL_RUSER_32_63);
- 	}
-+	hisi_zip_open_sva_prefetch(qm);
+ 	return ret;
+ }
+@@ -5408,6 +5428,12 @@ static int hisi_qm_pci_init(struct hisi_qm *qm)
+ 	pci_set_master(pdev);
  
- 	/* let's open all compression/decompression cores */
- 
-@@ -572,6 +573,7 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
- 	       CQC_CACHE_WB_ENABLE | FIELD_PREP(SQC_CACHE_WB_THRD, 1) |
- 	       FIELD_PREP(CQC_CACHE_WB_THRD, 1), base + QM_CACHE_CTL);
- 
-+	hisi_zip_set_high_perf(qm);
- 	hisi_zip_enable_clock_gate(qm);
- 
- 	return hisi_dae_set_user_domain(qm);
-@@ -1243,9 +1245,6 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
- 	if (ret)
- 		return ret;
- 
--	hisi_zip_set_high_perf(qm);
--
--	hisi_zip_open_sva_prefetch(qm);
- 	hisi_qm_dev_err_init(qm);
- 	hisi_zip_debug_regs_clear(qm);
- 
+ 	num_vec = qm_get_irq_num(qm);
++	if (!num_vec) {
++		dev_err(dev, "Device irq num is zero!\n");
++		ret = -EINVAL;
++		goto err_get_pci_res;
++	}
++	num_vec = roundup_pow_of_two(num_vec);
+ 	ret = pci_alloc_irq_vectors(pdev, num_vec, num_vec, PCI_IRQ_MSI);
+ 	if (ret < 0) {
+ 		dev_err(dev, "Failed to enable MSI vectors!\n");
 -- 
 2.33.0
 
