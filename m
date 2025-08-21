@@ -1,40 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65714281353;
-	Thu, 21 Aug 2025 03:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661292E7F3F;
+	Thu, 21 Aug 2025 03:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755747263; cv=none; b=pBmtNKfAZggALZc6kmwI1wds+1UmoorIl9A6JLjsebv/D6HGDdIQ3813ZRMd7wi+XM3xrqP/a5fE2TfsPxJLJyIB5LfNL1g4rfjZLebjSly1OU9BC7HveskkcI4/frj3N0qbEeNuGs/DPUJV3Tyv84Ay4tLv2beSnnAgggjpFWY=
+	t=1755747430; cv=none; b=f4iYSHTlI8iurPoCh28oZ4Cs9widIhIgW3n0nkTXlxfw9gx9gT8l8/M6WDZOL0VEw4aLQdxDJJbLAhJlkFUnZixUO05BdU8cKBbRGWoxELB6BymAmt2IFlDtwgwE7mwsQttH9fCT4KFcnZ1iqGSyqRACB3fIF0mjFZ+YTez7+t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755747263; c=relaxed/simple;
-	bh=WDmmYdxvpq2UMvNH7SzTCIRj2nfQH92lBEKnLvaAGk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=m1xbV1LH1HYBzllqXdx5LgdgwklzsuhVfPo0zOeEWIKrhHA1vbchN9eSKhTtKrOAXEkSb54PNms1wk+X+LT3B//0wSXeL04yzRHE/e4fr5Q8+HauCMvJOLdFt/N79hK+BGuzSs0+btgfVOmGC1MOg9vmDviw4DjGf4gPhbRIFwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KMn4M4m6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755747430; c=relaxed/simple;
+	bh=nh9dDQLLLpxkYOKYMlE9tT0MxIxgkUC+bSrwomTGalw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTRYMSRe8oYdeeCzxw2hN5E2B11T21wUaPC4GBWjfwyAWBK+veoLpt95pdgMq5G9D/NESfOwmkRCw6HLvj825nvTtbqIWU2lQjsoSzebaTctZDJLDI0osTgYAZxjXclqNujcYJ5SJnBU07fCnELS1ckMCDGu0+tfZghkDxNz4m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ql/ChiIf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KMn4M4m6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CA99C4CEF4;
-	Thu, 21 Aug 2025 03:34:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ql/ChiIf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75E12C16AAE;
+	Thu, 21 Aug 2025 03:37:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755747262;
-	bh=WDmmYdxvpq2UMvNH7SzTCIRj2nfQH92lBEKnLvaAGk8=;
-	h=Date:From:To:Cc:Subject:From;
-	b=KMn4M4m6IgA3HJtyfu11vJmaSkHDPPZzFbEgiFiAQUoGzHw88PRtqmeSs4K7F8WxE
-	 tPo7/XaWU2mRDgaZyvR9vmQUje8miKXqu33Jglw1lXidfZ8Aexm29keEl9VKTx4LBo
-	 svmaKQ9vH0oLUarBfZNXedoULr+5IdWt1eJPDlxKS5YBpdmCTopVS+UWUPGEKVWh7T
-	 etD+Q3C5l3ZqIl05I9dM/FUnEICgWgP65+0DYme0tsD8AbM4y2+iMOJcAHZXi5ibcp
-	 Wpj91iENUhMwmvpbyObYtyaKn8Ha8OI6XV8LOf4FY5sOHsddWnJE5rbaDG2zT8JWaA
-	 S0Af+zBd5vZDQ==
-Date: Wed, 20 Aug 2025 23:34:20 -0400
+	s=k20201202; t=1755747428;
+	bh=nh9dDQLLLpxkYOKYMlE9tT0MxIxgkUC+bSrwomTGalw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ql/ChiIf7DDKz9dZAhyNamU0dmZ8E4W3kGhPHD0Xu/NNd7kTL2tC9cvE9WGNz/Ixd
+	 P6i7h104+bTxc9magHj2UBS6EPhgKcjpVobpjzl7jQIoAzr33OKDrcD3cREqvLMZM5
+	 9kqYWCJe6JMuzAjevUQODATp4nuc4H64Az9au+INw+2NScXyQkQXY/VvxHdX4FXA3z
+	 WiSxR6bAsuEJnWo+BZe428O2zcXkxh4gcAsdtbrhDqVjwFCjCP6dkrmJ0RR1CzjlEv
+	 yrbDRORArsGkEhtwCJlQXLzduUzkB8K1w16tvRFGuvLflcVKxh9/x1iYysHgdUM8Ss
+	 r9KY6GDhk2zzQ==
+Date: Wed, 20 Aug 2025 23:37:06 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Tal Zussman <tz2294@columbia.edu>
-Subject: [GIT PULL] Crypto library fixes for v6.17-rc3
-Message-ID: <20250821033420.GB185832@quark>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com
+Subject: Re: [PATCH 0/3] Test CRC computation in interrupt contexts
+Message-ID: <20250821033706.GC185832@quark>
+References: <20250811182631.376302-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,31 +42,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250811182631.376302-1-ebiggers@kernel.org>
 
-The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+On Mon, Aug 11, 2025 at 11:26:28AM -0700, Eric Biggers wrote:
+> This series updates crc_kunit to use the same interrupt context testing
+> strategy that I used in the crypto KUnit tests.  I.e., test CRC
+> computation in hardirq, softirq, and task context concurrently.  This
+> detect issues related to use of the FPU/SIMD/vector registers.
+> 
+> To allow lib/crc/tests/ and lib/crypto/tests/ to share code, move the
+> needed helper function to include/kunit/run-in-irq-context.h.
+> include/kunit/ seems like the most relevant location for this sort of
+> thing, but let me know if there is any other preference.
+> 
+> The third patch replaces the calls to crypto_simd_usable() in lib/crc/
+> with calls to the underlying functions, now that we have a better
+> solution that doesn't rely on the test injecting values.  (Note that
+> crc_kunit wasn't actually using the injection solution, anyway.)
+> 
+> I'd like to take this series via crc-next.
+> 
+> Eric Biggers (3):
+>   kunit, lib/crypto: Move run_irq_test() to common header
+>   lib/crc: crc_kunit: Test CRC computation in interrupt contexts
+>   lib/crc: Use underlying functions instead of crypto_simd_usable()
+> 
+>  include/kunit/run-in-irq-context.h    | 129 ++++++++++++++++++++++++++
+>  lib/crc/arm/crc-t10dif.h              |   6 +-
+>  lib/crc/arm/crc32.h                   |   6 +-
+>  lib/crc/arm64/crc-t10dif.h            |   6 +-
+>  lib/crc/arm64/crc32.h                 |  11 ++-
+>  lib/crc/powerpc/crc-t10dif.h          |   5 +-
+>  lib/crc/powerpc/crc32.h               |   5 +-
+>  lib/crc/tests/crc_kunit.c             |  62 +++++++++++--
+>  lib/crc/x86/crc-pclmul-template.h     |   3 +-
+>  lib/crc/x86/crc32.h                   |   2 +-
+>  lib/crypto/tests/hash-test-template.h | 123 +-----------------------
+>  11 files changed, 206 insertions(+), 152 deletions(-)
+>  create mode 100644 include/kunit/run-in-irq-context.h
 
-  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
 
-are available in the Git repository at:
+But, reviews and acks would be greatly appreciated!
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-
-for you to fetch changes up to fd7e5de4b2eddd34e3567cd419812d8869ef4f13:
-
-  lib/crypto: ensure generated *.S files are removed on make clean (2025-08-14 18:01:03 -0700)
-
-----------------------------------------------------------------
-
-Fix a regression where 'make clean' stopped removing some of the
-generated assembly files on arm and arm64.
-
-----------------------------------------------------------------
-Eric Biggers (1):
-      lib/crypto: sha: Update Kconfig help for SHA1 and SHA256
-
-Tal Zussman (1):
-      lib/crypto: ensure generated *.S files are removed on make clean
-
- lib/crypto/Kconfig  | 10 +++++-----
- lib/crypto/Makefile |  8 ++++----
- 2 files changed, 9 insertions(+), 9 deletions(-)
+- Eric
