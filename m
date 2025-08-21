@@ -1,92 +1,155 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677232E2F0E;
-	Thu, 21 Aug 2025 15:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D2F275B06
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Aug 2025 17:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755790853; cv=none; b=BNN8a2egn+VIvunZ9taH6j6ir4WwDziaklS2lfoRqpcR6beVwTziiw6XUsl4/942TfcGptAx3WpZW4E5FIGaCUj4elW9qNGpl4fjAlMT+yW0rxR7NuFfp2wJXzARhYC82BRISLDz9leLRezchka3vMVzrUOlWOSshKQtoxmY5rY=
+	t=1755799017; cv=none; b=uiqBaRgypdg5sd4j2Lc8BssCrNGWn72ZQxQOUHvN/nrkjcaOEBmEmSFcg9zW2VW9vBiEja52gsSLO5NlUswvvA07wzI5HMQeKF6ErsCRv7uU3epSzrjyXlyHsX39AWcpI2kaCl+SG97o0C+KadkYYDZ5RnnVEjbduziTecJUKT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755790853; c=relaxed/simple;
-	bh=yuP5NjNY6ORzDi4IxT8giX54EGDttf6YI229VJ4Axnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U2k/MilulsQFMyq2/jQxsAdKaACV4KvIQQNdhP8MWl/PJmVzXBklWYlvWZxHS1vHFZSlQN0iYWvgrh2XeCEh/lSmKpIWYG0Y/e1QtAxKN23C7t3VYfE38QL0eJsrOJQX2NvWG4L8MvFRgpCarHgcYBZ0nwR50Slv9VIdyjToED4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QMDIBxQ4; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1755799017; c=relaxed/simple;
+	bh=EHhqZaGmBIk8T1QKYgSmI0yThNrkSktwkJwZ+KdpEac=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=axDd2E/dCNVDrMGJViBJk5LhqxXJHfO0uOX2XFLPKt9S+pgN5SYXZ/oU+RHxKL1JLYe6zwL10LzyKYTL4Z4O0v+TpdF+X700C44gAZysPYDOEg06PvOY7LG4GcEXq2RFrhJHcEA2W5GxXIz1ADCcSx4T+rRMGNImK+vaaWt2h1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfBfj9/W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QMDIBxQ4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755790851; x=1787326851;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yuP5NjNY6ORzDi4IxT8giX54EGDttf6YI229VJ4Axnk=;
-  b=QMDIBxQ4ECZjUKz4Mz4DUr/jPY6ZVqZe1ngMMpvFJ3zbBDU5zpgDPAB1
-   li5IwmohgKDPeA7z9ZRd1pVKKAsM7yUT1eJT0KDwWU86cMcLQRR/qGRMb
-   S7UU3uvOCAzpE5x5po8uhXBgcHilmqVc/w1pLHYko2CV6spTb6Py41ps9
-   p4wS18sHAmwtBFX1mj4EVrBs5Ts1xgSR2aLeK8eDIWbLlIXqg3RUDDLC+
-   N6Wo5h1TRVcxRvMbP1iS/hJvrRk3FS0DyShkxoNYCMBVXrzC2U9wXrCLf
-   yLAP2s/f1v0cN3xmyrFc24kzI8dFGqaC3HNaZHGrAjC7ciX5szDDSpTSS
-   w==;
-X-CSE-ConnectionGUID: 7HdqX8c7Sd6oo3aUpplb4A==
-X-CSE-MsgGUID: DVgeBHEJRnioTP/v+eiNFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="58182657"
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="58182657"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 08:40:36 -0700
-X-CSE-ConnectionGUID: 3extm1kgS9yZL4W7U6g66w==
-X-CSE-MsgGUID: LZPTUFqjQ6+3alyt9nWXkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="172699000"
-Received: from smile.fi.intel.com ([10.237.72.52])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 08:40:33 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1up7Ow-00000007H61-2Zmh;
-	Thu, 21 Aug 2025 18:40:30 +0300
-Date: Thu, 21 Aug 2025 18:40:30 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Qianfeng Rong <rongqianfeng@vivo.com>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jack Xu <jack.xu@intel.com>,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Colin Ian King <colin.i.king@gmail.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: qat - use kcalloc() in
- qat_uclo_map_objs_from_mof()
-Message-ID: <aKc97iuDAiIacRiL@smile.fi.intel.com>
-References: <20250821142028.33256-1-rongqianfeng@vivo.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfBfj9/W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD8AC4CEEB;
+	Thu, 21 Aug 2025 17:56:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755799016;
+	bh=EHhqZaGmBIk8T1QKYgSmI0yThNrkSktwkJwZ+KdpEac=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qfBfj9/W6gg0glCpOThRbIMj6pG6Nh+pqoaKAiBP5f2Iy3/eUkSAnmG09o4e4Byje
+	 eoLD6vlxUWBBEVrwiWJH/9ebUbypAfe+gVP3d2r1g8PMm8lypQp6AM7aEwDrGjaIPs
+	 4oCxF2nXY3YZop95lBvwz8lM/jGaYAMJZ/J9+5EKk+cKuFxqeQCQHGVuWJuR6IeU8J
+	 3j9S6Wo9NoF438Lohc6X7IsAYvaruRRtp3MoizvvWREymrNTEeGx+pq/qgr5zT7Cli
+	 zwN05loHDUG21jD/cCk+r6VpEuK3Ki8oDPv3rvwwpGV/kfu1GaT8squVe/OeHFGlY3
+	 SOE1aKhF+1osw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: dri-devel@lists.freedesktop.org,
+	Chen-Yu Tsai <wenst@chromium.org>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Robert Foss <rfoss@kernel.org>
+Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH drm-next v2] drm/bridge: it6505: Use SHA-1 library instead of crypto_shash
+Date: Thu, 21 Aug 2025 13:56:13 -0400
+Message-ID: <20250821175613.14717-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821142028.33256-1-rongqianfeng@vivo.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 21, 2025 at 10:20:26PM +0800, Qianfeng Rong wrote:
-> As noted in the kernel documentation [1], open-coded multiplication in
-> allocator arguments is discouraged because it can lead to integer overflow.
-> 
-> Use kcalloc() to gain built-in overflow protection, making memory
-> allocation safer when calculating allocation size compared to explicit
-> multiplication.  Similarly, use size_add() instead of explicit addition
-> for 'uobj_chunk_num + sobj_chunk_num'.
+Instead of using the "sha1" crypto_shash, simply call the sha1() library
+function.  This is simpler and faster.
 
-FWIW,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
+v2: rebased onto drm-next to resolve conflict in the Kconfig file
+
+ drivers/gpu/drm/bridge/Kconfig      |  3 +--
+ drivers/gpu/drm/bridge/ite-it6505.c | 33 ++---------------------------
+ 2 files changed, 3 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/Kconfig b/drivers/gpu/drm/bridge/Kconfig
+index 6945029b35929..a250afd8d6622 100644
+--- a/drivers/gpu/drm/bridge/Kconfig
++++ b/drivers/gpu/drm/bridge/Kconfig
+@@ -118,12 +118,11 @@ config DRM_ITE_IT6505
+ 	select DRM_DISPLAY_HDCP_HELPER
+ 	select DRM_DISPLAY_HELPER
+ 	select DRM_DISPLAY_DP_AUX_BUS
+ 	select DRM_KMS_HELPER
+ 	select EXTCON
+-	select CRYPTO
+-	select CRYPTO_HASH
++	select CRYPTO_LIB_SHA1
+ 	select REGMAP_I2C
+ 	help
+ 	  ITE IT6505 DisplayPort bridge chip driver.
+ 
+ config DRM_LONTIUM_LT8912B
+diff --git a/drivers/gpu/drm/bridge/ite-it6505.c b/drivers/gpu/drm/bridge/ite-it6505.c
+index 89649c17ffad9..a094803ba7aa4 100644
+--- a/drivers/gpu/drm/bridge/ite-it6505.c
++++ b/drivers/gpu/drm/bridge/ite-it6505.c
+@@ -19,11 +19,11 @@
+ #include <linux/regulator/consumer.h>
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <linux/bitfield.h>
+ 
+-#include <crypto/hash.h>
++#include <crypto/sha1.h>
+ 
+ #include <drm/display/drm_dp_helper.h>
+ #include <drm/display/drm_hdcp_helper.h>
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_bridge.h>
+@@ -2105,39 +2105,10 @@ static void it6505_hdcp_part1_auth(struct it6505 *it6505)
+ 			HDCP_TRIGGER_START);
+ 
+ 	it6505->hdcp_status = HDCP_AUTH_GOING;
+ }
+ 
+-static int it6505_sha1_digest(struct it6505 *it6505, u8 *sha1_input,
+-			      unsigned int size, u8 *output_av)
+-{
+-	struct shash_desc *desc;
+-	struct crypto_shash *tfm;
+-	int err;
+-	struct device *dev = it6505->dev;
+-
+-	tfm = crypto_alloc_shash("sha1", 0, 0);
+-	if (IS_ERR(tfm)) {
+-		dev_err(dev, "crypto_alloc_shash sha1 failed");
+-		return PTR_ERR(tfm);
+-	}
+-	desc = kzalloc(sizeof(*desc) + crypto_shash_descsize(tfm), GFP_KERNEL);
+-	if (!desc) {
+-		crypto_free_shash(tfm);
+-		return -ENOMEM;
+-	}
+-
+-	desc->tfm = tfm;
+-	err = crypto_shash_digest(desc, sha1_input, size, output_av);
+-	if (err)
+-		dev_err(dev, "crypto_shash_digest sha1 failed");
+-
+-	crypto_free_shash(tfm);
+-	kfree(desc);
+-	return err;
+-}
+-
+ static int it6505_setup_sha1_input(struct it6505 *it6505, u8 *sha1_input)
+ {
+ 	struct device *dev = it6505->dev;
+ 	u8 binfo[2];
+ 	int down_stream_count, err, msg_count = 0;
+@@ -2203,11 +2174,11 @@ static bool it6505_hdcp_part2_ksvlist_check(struct it6505 *it6505)
+ 	if (i <= 0) {
+ 		dev_err(dev, "SHA-1 Input length error %d", i);
+ 		return false;
+ 	}
+ 
+-	it6505_sha1_digest(it6505, it6505->sha1_input, i, (u8 *)av);
++	sha1(it6505->sha1_input, i, (u8 *)av);
+ 	/*1B-05 V' must retry 3 times */
+ 	for (retry = 0; retry < 3; retry++) {
+ 		err = it6505_get_dpcd(it6505, DP_AUX_HDCP_V_PRIME(0), (u8 *)bv,
+ 				      sizeof(bv));
+ 
+
+base-commit: dd489c01c3971778c417630f328460021fc8fc61
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.50.1
 
