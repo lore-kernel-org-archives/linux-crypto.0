@@ -1,105 +1,116 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51762222580;
-	Fri, 22 Aug 2025 08:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07728393DE7;
+	Fri, 22 Aug 2025 08:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755850566; cv=none; b=FU0TeEizz5qy1B8wAgMRWpdOzdVTYqvv9wNvq8/wfxQv8m1u6zE2UZAP1S2u7gmW8lZgBaN5UQ4p6mk3mVRO3vl184ih8Tugxx3eTHYP5TJFB6d5+uSU4Pa73gPGplrgaVkGdn5UQCnNg6SG/0AjyaD4vzNvBk03Ot3DwS6JbDg=
+	t=1755852890; cv=none; b=P7rGgm1kmdIKY9JDHw8BcZukFSylN9xwYo/Utu/zp6VVJLdezY28qjudLMAmazrCRhWvRHIubn0GW6L04BdgyOcgUjLKbwKo7RShurfv/6MJecNrPxuPwKBLKEccAjnpfj3ig8iyjODzwDhutgDcHnjb8WRH8j7v/s44PW2PDiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755850566; c=relaxed/simple;
-	bh=YVeh8OFS3+/IlZrjuSBDy6MWR0SMYXgiYrxYee0SPuc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iNKNQBiiSoWnxiyvuDsCmwVUMyKVhXFw+8HGkGRwhnpBnY1+mNcSyv/39OvBt4fUyGY+58Xj9Sulijt6hFzH0jzyLoaH0wnn1dGRVCU716ilJIk7/yuZcwJXEjoSggWVz7BNUa4dAsBGM0sD4mn80cLwvX6ixfy2QI2Kdpw5kj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9izoHwo; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755852890; c=relaxed/simple;
+	bh=7DRLTvUN8Oydnr7V2W/N7Sny8gya5mniJ0/+hxJRsNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SazuCz4eBtB8pDVuv/B+No2n8uaIhPgCmJrRFfWg8bYDM1ub58iZRboipXglKUlc2RxiSr3AIn8ds03UDZb0waNWqyrQdVUJJEzGN/++m0WBj2FjeFana8VN0+Le8T3XFTyi/pV+wHhHuXoHp+cg/5zAEqSrbWSxFvYLM+IwRqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=rjOIvWTe; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9izoHwo"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-244581c3b43so17467305ad.2;
-        Fri, 22 Aug 2025 01:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755850564; x=1756455364; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YVeh8OFS3+/IlZrjuSBDy6MWR0SMYXgiYrxYee0SPuc=;
-        b=f9izoHwoATqPAclHEW+SDq1PPnSCSPhFVf8UZOzkmC7OhDtZHEqzWBbUF1VXiNTwV6
-         +Vqf0pPylE7n5SF3ow1APQRHnPG0irSR7s53ENtGEJfxT+Ph6jKo1sE81zjLfPyTy2XH
-         2u+ilPhhBs2/2AvQkqDy0RA05tkwf+5MCo0vm0jyBCBpBvHJdSkwm+ra27mkcYXV3ygf
-         OCCKU3loL+SNaNL/DhHmHS1EHhTOGhJAbbXjgGpLi1w4iqWqv6QWpBM1lFnrb0vlzAGU
-         ZtZcHSp5VqegEvRe7U5J1s8jkpFNkgUsTXMyvr6QhMw68NKCqiPMscwyNfqJGLZmPM2Z
-         pGUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755850564; x=1756455364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YVeh8OFS3+/IlZrjuSBDy6MWR0SMYXgiYrxYee0SPuc=;
-        b=YdbeL8+gIkO5hbztIxwVuv3epEe7pLtzGAIzu/Xf7iFY7+ZYFqJP2Qlgpgd+lTqgDH
-         rNxojky6f39B3TPt0l8fTcAzrVmvvkhNmAnvr8aMPR4lmbCDBMlhBirRQTLquzXGGuG4
-         NqYV2HQKfBGUgxlgcv6PM+TvdiDU4nlyGMB2ksiISyDyRiJdBvL0V9QmPxCghpCA53X/
-         yNSMnVKYz++hPpoJhuVFR1ybw06mGLD2ZWSH5bxy9HJq143dk87aytEQXEKE6HA276wX
-         CmTPmGYkj0DlvqydKAFZq0sVc+xuAbYuMw/7UDGQ353P7Z1HdyEvBoRIf3hqoOcw/KX0
-         0HKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJc8V3wUNmr3DUgYkbsRgPXcVP9Za4M0l8FCrWKi+s7Ip3S0rJGyppT2mYlHfmhPLZuffuPzPpeV3/B68=@vger.kernel.org, AJvYcCXsz5vCwOnM+Ij4auPg7Lp4Uxqg/RBMtKUAGMszNGbE4XJuEfKD4ViZavQy1oAkjSHdqBg2u+6UfTpOmpl8@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQUtA/Rg7x+LUK801sRoC1NQl3NbziA3m6Lyr/1XOrvuvq9PKb
-	M73ML9jq/Z8c2CZMnowe3RnGnl0y6nlgrfb6mXlDZtcLRnCcQw4ixUci+CmuXxUshL5SeUQ7Gb/
-	dEeIbtNfrDFhvLaOVwgHjrkKvMjfavTA=
-X-Gm-Gg: ASbGncsS7OuRCSuBLnqvnBVP1wKoYPtOVQ8arG9zNCzpZCxg6UAc7hXuG+cc11vz8CV
-	g5+KX+RFegMB0XJ5EebJA3s46dS5ullp30521zHf7f2x5LJeTa01z4cicLEcg3SQqkxbqmGuyU2
-	YuQGBtrRLnmZf0qYAlyO+7/kD1PPVekM3XkBPYj6BBKFOIPmYRZ5+cOpo+6pfgn58TMlgy1alWu
-	mpF5S3Wi5I7D2dI/X8vTxT6qBeCy90P3ZK+
-X-Google-Smtp-Source: AGHT+IEOJXf+AeVA8GJXSwtIVDCbutsD9QgyfyAJ5PaMZOWfwJZDQTuqMWKOpwuzJZN4EkQir8nz/hEMiI5zBLDIKNU=
-X-Received: by 2002:a17:902:ea01:b0:245:f5b8:87ab with SMTP id
- d9443c01a7336-2462edd7d9dmr29942155ad.3.1755850564406; Fri, 22 Aug 2025
- 01:16:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="rjOIvWTe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=W7WLQSNz7B5RmfHyRA2ZmCbMpTFkCh7ouhNUUgwN4UU=; b=rjOIvWTeS1BXXRyaEyOUnuiorc
+	C4wzdLdyBnQEvOi0ZOUsO9KJxrtDxGelvwWby72cJjAYpJzmcaXEzl3ExPqaOSqdpoR6OnDJyk7Nf
+	rWpB2acr68Liz0u97C8ZQVlMIGIdIA4fsv6O/Oi8If9FMV3YjfYDYgtn0LowvAoDkQ4Ai+XIBiCCq
+	/ziMG5MJl8y6tgCM+vyLQrOv7iEaGKycKr1rgTt+7gXRqCVz/RRUc8PWr9LHivVB2dIyKt/ydKNaS
+	my+6SsvHYrqZ1A9gqGXSmdqpVN3oUKXrj8uE+hXg5xipSPtFMr6ByeipDAjHYMTVKm1lHTYkWI2ll
+	0ECLA+kQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1upNIM-00GMNJ-2C;
+	Fri, 22 Aug 2025 16:54:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Aug 2025 16:54:43 +0800
+Date: Fri, 22 Aug 2025 16:54:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
+	Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+Subject: Re: [PATCH v4 4/6] Add SPAcc ahash support
+Message-ID: <aKgwU4sVZrAHZ05s@gondor.apana.org.au>
+References: <20250808122631.697421-1-pavitrakumarm@vayavyalabs.com>
+ <20250808122631.697421-5-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250813133812.926145-1-ethan.w.s.graham@gmail.com>
- <20250813133812.926145-7-ethan.w.s.graham@gmail.com> <CANpmjNMXnXf879XZc-skhbv17sjppwzr0VGYPrrWokCejfOT1A@mail.gmail.com>
- <CALrw=nFKv9ORN=w26UZB1qEi904DP1V5oqDsQv7mt8QGVhPW1A@mail.gmail.com>
- <20250815011744.GB1302@sol> <CALrw=nHcpDNwOV6ROGsXq8TtaPNGC4kGf_5YDTfVs2U1+wjRhg@mail.gmail.com>
- <CANpmjNOdq9iwuS9u6NhCrZ+AsM+_pAfZXZsTmpXMPacjRjV80g@mail.gmail.com>
-In-Reply-To: <CANpmjNOdq9iwuS9u6NhCrZ+AsM+_pAfZXZsTmpXMPacjRjV80g@mail.gmail.com>
-From: Ethan Graham <ethan.w.s.graham@gmail.com>
-Date: Fri, 22 Aug 2025 10:15:51 +0200
-X-Gm-Features: Ac12FXwnoEYMnSaKSxMxoYPh7b4TsxXD4qJ__w-NoWUUMjPmRTgOxfHSPEf4r3U
-Message-ID: <CANgxf6xCYE4dQQ9=UDotB351wxs46=ZUhWz4zfrROH5nNsSBRg@mail.gmail.com>
-Subject: Re: [PATCH v1 RFC 6/6] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
-To: Marco Elver <elver@google.com>
-Cc: Ignat Korchagin <ignat@cloudflare.com>, Eric Biggers <ebiggers@kernel.org>, ethangraham@google.com, 
-	glider@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
-	davidgow@google.com, dvyukov@google.com, jannh@google.com, rmoar@google.com, 
-	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250808122631.697421-5-pavitrakumarm@vayavyalabs.com>
 
-On Tue, Aug 19, 2025 at 12:08=E2=80=AFPM Marco Elver <elver@google.com> wro=
-te:
-> For example something like:
-> For subsystem foo.c, define a KFuzzTest in foo_kfuzz.c, and then in
-> the Makfile add "obj-$(CONFIG_KFUZZTEST) +=3D foo_kfuzz.o".
-
-I agree that fuzz targets should only be built if CONFIG_KFUZZTEST is
-enabled. Building a separate foo_kfuzz.o is probably ideal, but will
-need to think about how to cleanly handle static functions.
-
-> Alternatively, to test internal static functions, place the KFuzzTest
-> harness in a file foo_kfuzz.h, and include at the bottom of foo.c.
+On Fri, Aug 08, 2025 at 05:56:29PM +0530, Pavitrakumar Managutte wrote:
 >
-> Alex, Ethan, and KUnit folks: What's your preference?
+> +static int spacc_hash_digest(struct ahash_request *req)
+> +{
+> +	int rc = 0;
+> +	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
+> +	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
+> +	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
+> +	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
+> +	const struct spacc_alg *salg = spacc_tfm_ahash(&reqtfm->base);
+> +
+> +	/* direct single shot digest call */
+> +	ctx->single_shot = 1;
+> +	ctx->total_nents = sg_nents(req->src);
+> +
+> +	/* alloc tmp_sgl */
+> +	tctx->tmp_sgl = kmalloc(sizeof(*tctx->tmp_sgl) * 2, GFP_KERNEL);
+> +
+> +	if (!tctx->tmp_sgl)
+> +		return -ENOMEM;
 
-I think placing fuzz targets in separate files is a step in the right
-direction. Including a foo_kfuzz.h file inside of the source does still
-pollute the file to some extent but certainly less than having one or
-more KFuzzTest targets defined alongside the code.
+You should use a software fallback to handle the failure case.
+
+Also GFP_KERNEL cannot be used because this path may be called
+from softirqs.  Please use GFP_ATOMIC.
+
+> +	sg_init_table(tctx->tmp_sgl, 2);
+> +	tctx->tmp_sgl[0].length = 0;
+> +
+> +	if (tctx->handle < 0 || !tctx->ctx_valid) {
+> +		priv = NULL;
+> +		priv = dev_get_drvdata(salg->dev);
+> +		tctx->dev = get_device(salg->dev);
+> +
+> +		rc = spacc_is_mode_keysize_supported(&priv->spacc,
+> +						     salg->mode->id, 0, 1);
+> +		if (rc)
+> +			tctx->handle = spacc_open(&priv->spacc,
+> +						  CRYPTO_MODE_NULL,
+> +						  salg->mode->id, -1, 0,
+> +						  spacc_digest_cb,
+> +						  reqtfm);
+
+This thing needs to be redesigned.  The digest function can be
+called from softirq context, so it must never sleep.  The function
+spacc_open tries to obtain a mutex and this cannot possibly work.
+
+I think you should hook this up to crypto_engine which would allow
+your driver to sleep.
+
+Another request is that your driver is too big to review.  Please
+submit one functionality at a time so that it's easier for me.  Perhaps
+start with just skcipher since that's where spacc_open is currently.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
