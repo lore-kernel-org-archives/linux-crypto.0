@@ -1,63 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8AA21255D;
-	Fri, 22 Aug 2025 11:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF0B24CEE8;
+	Fri, 22 Aug 2025 13:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755863171; cv=none; b=cTrDOcwywOjEkLIhyC4yqvQknmKXDUGRlUFQACn/2rjcooTFb9oySLGCk95r8qQTodUV5TV8ZiqO8COIb873+2//T7vPTkH1J0RO+F+Lcwx/wNTnu222E+La3iUFlfr5W9oqI9Ao0wHQUuwPtcE9dpZvrV2IUemRPLKXjVyJ1AI=
+	t=1755869399; cv=none; b=ZiesLgchjYKxvoquf4mqZf8PUvPeMJKjKzY7//ATSiyXzbAOA/OT53oLJnTAIA6MYDuhqgkBROtT4FMeAraU6ir6+yCxnyilpcNVze9tl/MbiEgQKjvYWSPyla07rptESg4yRMRJjwI20qw/6vUT99JLKGS8ELO3APJX4CIEfvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755863171; c=relaxed/simple;
-	bh=AIARX0YENOFc2FlWerL+nadOCvhdnZEf8W7BMc8W2ag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Npe1vU3r8lkS56mmD6bJMrO1XblXESENHlOLYVAZjRCZ55C7XE28Z6V6R3D5IAq+S69t5XuYiuq/4qNSl+COXPjB9IhLWu3QKimtNmep1P0lIC9pwrsuD2Yy1I1EFEN6znDoUsN57hJdvNHRNmJm2HdLy4PiSOmss0Ql7fUt6nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=jxZyNUTA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755869399; c=relaxed/simple;
+	bh=JmipXnXVqs0bo7rBOQEowa8CcQd7VSNge6eEHRVSm0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YodWyMcBOyypHUwvI2maHuKicbj8Xta83Ipzbes5sE6gSf6aNxxC+zVKZeWpGpg2OZQ1Xxo0aoCpZGIlCxlCR+wKlL5vOh9Vb6AHGSpeIe+CCbEU9pI9d8BpaRKPKP8AiUER1VF665o+2fGoarwdWlVl2KhgIJ1wkTDgv31Pl70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CoN1EBNR; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="jxZyNUTA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5C9EC4CEED;
-	Fri, 22 Aug 2025 11:46:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755863171;
-	bh=AIARX0YENOFc2FlWerL+nadOCvhdnZEf8W7BMc8W2ag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jxZyNUTANHNe+LLw1XjsZbVLAAvXAr1atgSnwtyRHg7jiMGl9hgI94G7iV20FRaZz
-	 4nSTTXhdbxmfe1cnQHTqhFC252Lp7vzK6a2tn9IKqzCL4LrWpUBAJxaVAuhIIC3rOA
-	 hqhrjrhAO0mjxhCVBRJpUWoo6mKN7k43TZD3m+70=
-Date: Fri, 22 Aug 2025 13:46:07 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: zhangfei.gao@linaro.org, wangzhou1@hisilicon.com,
-	linux-kernel@vger.kernel.org, linuxarm@huawei.com,
-	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
-	shenyang39@huawei.com, qianweili@huawei.com,
-	linwenkai6@hisilicon.com, liulongfang@huawei.com
-Subject: Re: [PATCH 3/4] uacce: implement mremap in uacce_vm_ops to return
- -EPERM
-Message-ID: <2025082208-coauthor-pagan-e72c@gregkh>
-References: <20250822103904.3776304-1-huangchenghai2@huawei.com>
- <20250822103904.3776304-4-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CoN1EBNR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755869398; x=1787405398;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JmipXnXVqs0bo7rBOQEowa8CcQd7VSNge6eEHRVSm0g=;
+  b=CoN1EBNRuApjOIBGwSTCqkl0wNtrGw5KGLH8BQQhSyf7HzfoA13gq6Bq
+   3qvKZR4tJAl0/24VteAr6ZVutVUDi62aYUiOfD/MmRnfA8yqGTX7IKPrx
+   LXXZoVMra8Rc4papdCtciEOdx1RpfOGvgQdgfyty3LCfnexTlyX6ZT5Uv
+   d67Z3HJDSNRHU96bl/lhDyYocJ2QzrPVQCNstHiXo0+X9o13UWBiUUKpT
+   SnVPiqinPAPWD0c8ibXWjuu2eAsUf38ykGjmIRz4+abD3RTcIH1pZloxr
+   NWiQITEk+GyYO0gylzJL91Je+MZ/hb1MkjMcLZdDJL+2SCApMnqdsY8Ok
+   Q==;
+X-CSE-ConnectionGUID: dttGCdfnRrSwT0WQldL3yA==
+X-CSE-MsgGUID: AeSCvjSPQYS0LsPuRv0RiQ==
+X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
+   d="scan'208";a="276925274"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2025 06:29:56 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 22 Aug 2025 06:29:25 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Fri, 22 Aug 2025 06:29:21 -0700
+Message-ID: <76b1062f-a4e3-4392-9549-86d63616a5ca@microchip.com>
+Date: Fri, 22 Aug 2025 15:29:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250822103904.3776304-4-huangchenghai2@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 1/9] arm64: Add config for Microchip SoC platforms
+To: Robert Marko <robert.marko@sartura.hr>, <linux@armlinux.org.uk>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<andi.shyti@kernel.org>, <lee@kernel.org>, <broonie@kernel.org>,
+	<gregkh@linuxfoundation.org>, <jirislaby@kernel.org>, <arnd@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+	<o.rempel@pengutronix.de>, <daniel.machon@microchip.com>
+CC: <luka.perkov@sartura.hr>
+References: <20250813174720.540015-1-robert.marko@sartura.hr>
+ <20250813174720.540015-2-robert.marko@sartura.hr>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20250813174720.540015-2-robert.marko@sartura.hr>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 22, 2025 at 06:39:03PM +0800, Chenghai Huang wrote:
-> From: Yang Shen <shenyang39@huawei.com>
+On 13/08/2025 at 19:44, Robert Marko wrote:
+> Currently, Microchip SparX-5 SoC is supported and it has its own symbol.
 > 
-> The current uacce_vm_ops does not support the mremap operation of
-> vm_operations_struct. Implement .mremap to return -EPERM to remind
-> users
+> However, this means that new Microchip platforms that share drivers need
+> to constantly keep updating depends on various drivers.
+> 
+> So, to try and reduce this lets add ARCH_MICROCHIP symbol that drivers
+> could instead depend on.
+> 
+> LAN969x is being worked on and it will be added under ARCH_MICROCHIP.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 
-Why is this needed?  If mremap is not set, what is the value returned?
+Ok, according to the compromise that we discussed during v8 that's fine 
+with me:
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 
-And why is -EPERM the correct value to return here?  That's not what the
-man pages say is valid :(
+Thanks Robert! Regards,
+   Nicolas
 
-thanks,
+> ---
+> Changes in v9:
+> * Make ARCH_MICROCHIP hidden symbol that is selected by SparX-5 directly,
+> this avoids breaking existing configs with ARCH_SPARX5
+> 
+>   arch/arm64/Kconfig.platforms | 36 ++++++++++++++++++++++--------------
+>   1 file changed, 22 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+> index a88f5ad9328c..bfea380100a6 100644
+> --- a/arch/arm64/Kconfig.platforms
+> +++ b/arch/arm64/Kconfig.platforms
+> @@ -131,20 +131,6 @@ config ARCH_EXYNOS
+>          help
+>            This enables support for ARMv8 based Samsung Exynos SoC family.
+> 
+> -config ARCH_SPARX5
+> -       bool "Microchip Sparx5 SoC family"
+> -       select PINCTRL
+> -       select DW_APB_TIMER_OF
+> -       help
+> -         This enables support for the Microchip Sparx5 ARMv8-based
+> -         SoC family of TSN-capable gigabit switches.
+> -
+> -         The SparX-5 Ethernet switch family provides a rich set of
+> -         switching features such as advanced TCAM-based VLAN and QoS
+> -         processing enabling delivery of differentiated services, and
+> -         security through TCAM-based frame processing using versatile
+> -         content aware processor (VCAP).
+> -
+>   config ARCH_K3
+>          bool "Texas Instruments Inc. K3 multicore SoC architecture"
+>          select SOC_TI
+> @@ -186,6 +172,28 @@ config ARCH_MESON
+>            This enables support for the arm64 based Amlogic SoCs
+>            such as the s905, S905X/D, S912, A113X/D or S905X/D2
+> 
+> +menu "Microchip SoC support"
+> +
+> +config ARCH_MICROCHIP
+> +       bool
+> +
+> +config ARCH_SPARX5
+> +       bool "Microchip Sparx5 SoC family"
+> +       select PINCTRL
+> +       select DW_APB_TIMER_OF
+> +       select ARCH_MICROCHIP
+> +       help
+> +         This enables support for the Microchip Sparx5 ARMv8-based
+> +         SoC family of TSN-capable gigabit switches.
+> +
+> +         The SparX-5 Ethernet switch family provides a rich set of
+> +         switching features such as advanced TCAM-based VLAN and QoS
+> +         processing enabling delivery of differentiated services, and
+> +         security through TCAM-based frame processing using versatile
+> +         content aware processor (VCAP).
+> +
+> +endmenu
+> +
+>   config ARCH_MMP
+>          bool "Marvell MMP SoC Family"
+>          select PINCTRL
+> --
+> 2.50.1
+> 
 
-greg k-h
