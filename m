@@ -1,258 +1,173 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C254A1A;
-	Fri, 22 Aug 2025 19:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F1027B335;
+	Fri, 22 Aug 2025 21:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755891079; cv=fail; b=oXUZnVHH+zFWA0ZUYPwtO02OjqVQeKo9ukyQHut2EYzYQu/lXV0RwgmYu8We7rujnLsd1Rwn+DFq8sYI4U1O7rnazA+CiJ1zIG0CvhQJLHUTsGGGbzW4NYRh8WnDXn6/5+i3643N2TfWL1GnyCiJYEzgT7tfouyUjvY+BO8zjqo=
+	t=1755897952; cv=fail; b=RuBlJGa3ZO9MJB87v4vkgSKskKcTiQ8FOQ287B+3I/tWNR+mngeD5UKFwngWZFabZfOxmj/8inySVB7JlHttb06Rhvz3/bof+mTOzCeY1t7TK+lNGGlAymXUzl+mvN5xkvo6GUZsPe7HMg2ATIZJrZIH6hqFJ3TWPg9KKTOrPQ0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755891079; c=relaxed/simple;
-	bh=A9clVWcAQKJnwV+R6evPQ3utHns8yhx/+Gsy1/UcAyM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QcVyUtrfMbUlkHJmpxaJ5LRQ+TWtDzhd/Gzq62c7XpQpg3E1Lp9Tnp48Bhu+8hY2d4n3bfx0ZFacb+jaUB1o140mT35xSddwuiyxH+jkSIlw/ocuFxzPjJxdEu9FboRSjyPZmSQgICms5DG6JWfIjSoBOXJPPvjj5z4PWedW2lY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h04nVnz6; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1755897952; c=relaxed/simple;
+	bh=ByERF7iTPQTTnu4iA4iw2cljYlr7djOWvmGdzeJlzEU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XzLglFSBnnO9nDXceW3xAjN6DFwz/lKeZJ6eVjEKTk8mzuslJhg9/hek0vwikwGmrmDMM+7e3rVM/qJWE2FoKuDe8+0rb1/5CKhF0tVGJ8UhUWVFgqEtWezCyrG8b+KInPvdF8Qzp3PAKZ3mh0zIra1kvkm/sxt7PigEOHJJCks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lNAMPZCc; arc=fail smtp.client-ip=40.107.244.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h04nVnz6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755891078; x=1787427078;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=A9clVWcAQKJnwV+R6evPQ3utHns8yhx/+Gsy1/UcAyM=;
-  b=h04nVnz6zoXo3xCviOlWyZpUDCy3I6umLFRiiat2KI09LTbGRDcxK5GQ
-   BiEMhVBL2lyw5t+FtJCGOBd/lD5Sc43sqGaCsftWLKDm43Y7nh+6WQ5Av
-   b/GoEqc34OzJuAF03VgGBWnymzvui3Z1D1cEm2t8pMPBKXtfR33OOXgV5
-   AGD6iO8jCVi9MJsQZIOHvlbMc0pMchhNejHYSLCvlNwOKgQbImwIwKOYc
-   l92iYGIv+rOSYdzCww/P4Vv8EVqc1Hl7sahOZWlRymMe9Gf91RvE4y/M3
-   9cQN4EO4mmOmFHVY6jO5lPUy5lWM0yxzYQfQMt9gAWtl2kWjtV1rQWLYl
-   Q==;
-X-CSE-ConnectionGUID: OATXmv62S/ejq7IST7Hs0w==
-X-CSE-MsgGUID: 5Nw72txlT16IZaj3JPv4EQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="57222550"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="57222550"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 12:31:16 -0700
-X-CSE-ConnectionGUID: RBzr7ndrR2ycMrhbr+A2pw==
-X-CSE-MsgGUID: uVT2FEDOROeWfy++Q3WmwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="168288356"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 12:31:16 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 22 Aug 2025 12:31:16 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 22 Aug 2025 12:31:16 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.49)
- by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 22 Aug 2025 12:31:14 -0700
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lNAMPZCc"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=czDGYL/w8yF3agQo7URJyRQbTYEm/Tw6Z66GxxaGFniAIoV5mLZ3an3LTb42lE5CRFMHndaxJESwqoj7grMe9xtSxQ1ezZr3pJpwlcPnn96p+heyrdGkSLarSoDULxrdNZ+Rjo+fu4BzTkWM06+3dFEMLaA6yF7tUMSkeH/eAz8Oo9QuSfXYwKy5+x0kKqYVIkzFsnuIlfvxN9RTwUQifa94R9WSRbdEVwGeziZj/2tBtahYfek+2AsNhVOtJVfxyV8JyZjvITdvg2OFYvhS4fSu9oDr8f/XfVdg63/7AwtZ3MQU+3HnHWE1OX4e4odiW7jC07mwygvLYy2BjDWs0Q==
+ b=NKLsMY4ouIDJLaltD627VWuqNNbI18Kw2cOpbXoAC5VNTBql5d8g9zbVbKWa+7Igef+FpN4uvR+dv6sAuhTxUmpzE2vvTJ0LOdJgoJImbKNKFzNTzuZ5/kafGpje4PM48yYuxHMmx/Jw61lZPBFXzzk5W4PxHaJY0TW0msdZjYd/zB1lnary3En06S4DQk/0oJZhj8ruHHksZzYCTLap8liNSZXOeIXk2PJoFb59RyTqtuSvu2gLR3eXfDgcrk5TwpXtMD0u96xAXRkLRArxjumN6uZ6qGe5IzRRvQtV55lsSvKRkie72bq7D4woasp9839soBoiI8ozh++2mfihig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EogltnJsfrYws4jCg9kwgB9d8kK83skSPQ+wGLpSGfY=;
- b=idQRM/QQUJEsh8XMnOZm/knunL2utOmXMCJfhRAeRo2LtF3zMvg/X6tuAM67c12IN8ajWr6VXZKT+uYtbbfk/O9AyoTXWHcbQRLKYriPNbrYCHwWUP0NwY8mLObv1yjhWEgXGiZR+gfkK67h7J96H7nR/b4bVyKscidB55g7kPVV1X7ODf4yaPnqUVqkw8dtjal9yRL4eXGTBFgtHDGq8wqI/4ulImYQHoI/nsoSLbhkUcecy2/zfd78tIvQvACLl1Z+B4WxAk6Y9uhT3/AloPWy2pTHGBCdFp1ziY7RA8vtokK0QQPQOxjElx/+o/OSf4PHX2GWw6oXn5Ck9KU1Jg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH7PR11MB8121.namprd11.prod.outlook.com (2603:10b6:510:234::14)
- by DM6PR11MB4563.namprd11.prod.outlook.com (2603:10b6:5:28e::23) with
+ bh=OBqpCKZ2tyL/LOW79yl6DsruDwzsuqQttQZ8pE/5/yI=;
+ b=tJZYUCq9ubADUGSenSi0vxlFpI+9c1MUTNKBlqStz80b2nxNF9URH0G8w7FbYcXUed4TqUehkop02qGtiqOFsKQD5Q+KZNbakRGS/Ns0P8Y/SXyog9QDJYg7N86Ydz/8Dds+jPneXAoc8nMvUpxWsLU33OowyAG8qKVDkPCfbYqsjuk/iZcbHICXL1ChWjRepVy8gtDlz3X7hj4jS+qz5GF4BqBT4KjySlPs8w3vs1tIVPw/QmYjUtdLIx+ijfHZzmO/kazkR63hcewfDi94gWhQRu2YvwZDitrpSRcEdZieryFmwg/1nXPzLVoCojpFVn2qjJjZWSw1ZLBnggP1XQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OBqpCKZ2tyL/LOW79yl6DsruDwzsuqQttQZ8pE/5/yI=;
+ b=lNAMPZCcyi4Y/4AsVt+4XvtXfd9qKI/6AZVNoLBnbg32AOTxWPzNkXxa2/Q8nhLmC8H+cuT1IAP54vkaI8QVvkCggdKI/BI3cg8Ii30cul9gpwbkAufj5Y/EvzjeE4bqNl7n82JZZIfzaJWPLN+1/HE7EOc8UMRyy1PmzKcpcsI=
+Received: from BYAPR21CA0003.namprd21.prod.outlook.com (2603:10b6:a03:114::13)
+ by BY5PR12MB4305.namprd12.prod.outlook.com (2603:10b6:a03:213::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.15; Fri, 22 Aug
- 2025 19:31:12 +0000
-Received: from PH7PR11MB8121.namprd11.prod.outlook.com
- ([fe80::ec4e:64cf:cf1f:daab]) by PH7PR11MB8121.namprd11.prod.outlook.com
- ([fe80::ec4e:64cf:cf1f:daab%7]) with mapi id 15.20.9052.017; Fri, 22 Aug 2025
- 19:31:11 +0000
-From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
-	<hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev"
-	<chengming.zhou@linux.dev>, "usamaarif642@gmail.com"
-	<usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com"
-	<ying.huang@linux.alibaba.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "senozhatsky@chromium.org"
-	<senozhatsky@chromium.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org"
-	<ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C"
-	<kristen.c.accardi@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
-	<vinodh.gopal@intel.com>, "Sridhar, Kanchana P"
-	<kanchana.p.sridhar@intel.com>
-Subject: RE: [PATCH v11 18/24] crypto: acomp - Add crypto_acomp_batch_size()
- to get an algorithm's batch-size.
-Thread-Topic: [PATCH v11 18/24] crypto: acomp - Add crypto_acomp_batch_size()
- to get an algorithm's batch-size.
-Thread-Index: AQHcAp3rrlgug3tz+EGLnem5m/WFabRjRbuAgAvqfqA=
-Date: Fri, 22 Aug 2025 19:31:11 +0000
-Message-ID: <PH7PR11MB81210ABFD0BF9F73214080E8C93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
- <20250801043642.8103-19-kanchana.p.sridhar@intel.com>
- <aJ7Fk6RpNc815Ivd@gondor.apana.org.au>
-In-Reply-To: <aJ7Fk6RpNc815Ivd@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8121:EE_|DM6PR11MB4563:EE_
-x-ms-office365-filtering-correlation-id: c4111a2f-c4b6-41df-f44e-08dde1b273c7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?qT3gCF3jER/nM9wb4WgjybFt0QBM3YnMLaYh3hXrd9ACeF6UDWDS0ITL2cmU?=
- =?us-ascii?Q?30i57WICaJDDoADkW/BYLw8pwPneAK/ljH1OhOkmuVUNJyyqYen/xrstIg1n?=
- =?us-ascii?Q?kP0VP/nXByrxSjX0ACzeSAhRpr1Hz70UzRsDnmkwUuoCbqE50PRgqNhH5nKi?=
- =?us-ascii?Q?Zp60eB4xA5AhkmKtnjJ3CEA4u80jjv0UMWtAPOmtcF16Q2M7/Ma1QF6L0U5p?=
- =?us-ascii?Q?vEai0XdKQl4hzkmR8LraEgEx4ExN5yqeCbsBGp6qpcOV1vjmjt9Lut69SWkJ?=
- =?us-ascii?Q?wiIftvzYSoIjqVne3r64ybhH21PxTDTBi9ohTeoQrqZGrWvI7YOnniP2/zxS?=
- =?us-ascii?Q?CvWJo/YR7VeSAGDDuSVe0/DUM5nfX9kWl6Ufup2q3TQRMAXne93BpPCUIfy8?=
- =?us-ascii?Q?aC3TwUPVT6kOYWFnWr90N9TYp0AADqcFvvZnn5LxAd0amklquFbpF3cWjHaG?=
- =?us-ascii?Q?XZHX+nn/rChm3slBpUtNb4nUmnwRTWVjQcHXCD/R4B+gXIRJlwx5gl91IL82?=
- =?us-ascii?Q?a5+EmIbTQq331tThhz7IBL1qBIQrIWMf4E2DbOU20gGw3udhS58gkXLF6PPQ?=
- =?us-ascii?Q?uqDtL0H3+XJKOvaLgnQ4OIICoG5WNxPetPlPoaLBG8IaubZYwjm/QNbeYhYx?=
- =?us-ascii?Q?94tJOXITjwJXt9/YYw37C0iG08geGlTKwd3+iPlTIXBz4Yn67xi1NsbGEP2N?=
- =?us-ascii?Q?G6lfZrYA1wEIZLc1o9mLGqRgA/gMBO+AkhT8ZCLcDjuV6vWmW6uAmsUiavOh?=
- =?us-ascii?Q?6NLkCq26N1OTSaBh9rfGCdjXHwSZcOAIQ6+9Hk0Gleospobzy0yxZd/1OFsX?=
- =?us-ascii?Q?1baIucIcwTd+eK+odHbbg1iv7EWw6Ec15O8uDoy4RBtqWbKe/QYH9Z+wHw12?=
- =?us-ascii?Q?VeGAE259WP32/I0mULM5b447MVButwlHqgmg0o37F5HfKeF36vZlqMJP6O8k?=
- =?us-ascii?Q?C1kLWxS2spFpxXWRMMIIgIQqyWDkK/nFFYKPP861LDb+1UgKmxU+fW0wZzBS?=
- =?us-ascii?Q?RmZJNFmEofmgKQKCky2/fCMRkGFBDoETKNg2SozbbHr9X7Y4fYQYCV04b1EQ?=
- =?us-ascii?Q?d+Qoarkr5ZrPStqwKeuQVySSl5LncKg9MNzTevS7rb8dblZwFVcwn5FH/fOF?=
- =?us-ascii?Q?cAlujD07L4s+Ga1xx5e6wQywnUCpOpgLDUWL6iwS/gZTIkBlefXLldsXrDkJ?=
- =?us-ascii?Q?Dy54Q8oAIMK90mtTIOWYoU+7l5l81HtzavNCsXPFYzm/bj1u1dr9b8SI6jH/?=
- =?us-ascii?Q?oWti48Kzxuz9s7w03l5vB8bbVrc+DLJsb6Ky5mYGr5a/0j58GqJ32trRCmnB?=
- =?us-ascii?Q?Ds4AB9AxPIBLmSru76ObZWGIJaGC4jtkTy8CEQoK1smN/3VC16u4lvOy+pi6?=
- =?us-ascii?Q?A2BLER2kr28qnHjQmJYaf4mXDQCEePJi5lD2OMpBK49G6IDh0xcSk49Kd6BG?=
- =?us-ascii?Q?dklGNs1i7gM=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8121.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mPn+QOPsKwNr8CJsbND1QZ+REL75knUtHGGeKv6CZnJqx6A+4GDl7GwCfHNG?=
- =?us-ascii?Q?ecOH+VsWtU79dNfHSPNV1e3ZiItU/ZMnytrSgOV2PrXT+ram35ESfN8HgdL0?=
- =?us-ascii?Q?SyWJ7WBXgiDIc7H1c+81Dq9g7UgprtzTsHjBMRf3RAwKbsKYHJ64rXuKbi85?=
- =?us-ascii?Q?025W53EhwUhPLYDvrEVo2WVDWG2b5b+ty92kEgwSeC0nfgGa2pQqCozapQnM?=
- =?us-ascii?Q?AfVThKHhz70vq4UBSeaBNf7qlnTZzdmhvpCkQ1hLodMHFMUZoZud0iMnp4q6?=
- =?us-ascii?Q?zFFvFTWbrvuIiT7grEskNqYhjr7Lu55ZI21fkD1mJsYFbkD8w1zxrh9G3zxO?=
- =?us-ascii?Q?0EmBDSXV+BSeEK57nAo90Ni2R9Egrf7ecKxBktrfJiz4NNXOrm9i6E9sS7uV?=
- =?us-ascii?Q?XT1fwfPF9KD8LDU7ASrrlcBi2f/1RrtOhZTmClEowgsbMOGsgnKLjSfSx7oG?=
- =?us-ascii?Q?StOsAd14Fy+stKYCP5paMiiV4rye6L2FRJoNSPasBAO4pmW4zfgihoUJDE9Z?=
- =?us-ascii?Q?A3GiZspryD96u9qZTjhvTwpwjT2SAfptTbRjIyG+7cq68QbYBHDnmzkKwPk2?=
- =?us-ascii?Q?pRfzRuVt5dVA1OcGkoDV64JcKG1zzqXCSJj8+T8hIH5Fw21S4dGFgcNtxlKj?=
- =?us-ascii?Q?Q8QSMNo//z/OX7NeFKEcAF+IklDW0t11LaRkF/6dFH4cZHiR1AkTmY44Y6+L?=
- =?us-ascii?Q?GMAwMCzsXpOKN3btmlMM0SQcheT2d2o61YmcgN6JI+sczS/Qh96a8NHjMRK0?=
- =?us-ascii?Q?U64uiwdtEy1qqi51h1EjiO4t57nSf4/5kVe/BzMauV5utl1aNgvRIpG/K0HG?=
- =?us-ascii?Q?aXxvsuQiOy4aizcdbhSp6nZw/LZ9K42e7pLSstrBDTuNvIvsPEl1mRTfcH71?=
- =?us-ascii?Q?ymoz2ZrsiOuN1EiFxGPAr4YIvfTDXaZENkMBIn0CfpUcUOSSOkEDcWnT0H3i?=
- =?us-ascii?Q?qypI4G7gZIjHpptwa7lWOAJvWAoEJAx7gdF931pmoZAqfJHt5lc4zjvsdY5k?=
- =?us-ascii?Q?FqUZlIkzp30ZRsuIx7e0qpTo6OOIYvds40ppvQUvF2RkdBx1m2GmiBw7xEF/?=
- =?us-ascii?Q?vrzfTXwVlh9W+QTeR1qA+Kpa6JjHlV+pQk6kwsGFaR8aDXrkUnoC3np+5hpG?=
- =?us-ascii?Q?DXXsiywjflatqqFx0v9odCF7Ksxr5rm73E0apVIiRDJqd9nrhdQYN3tyNwR8?=
- =?us-ascii?Q?fvCFN7twhuXDz5cs3cJd8y68pWXzL3BvJ2v38LH7j6YKXF9Cual7owhjlwNZ?=
- =?us-ascii?Q?x7F+XGy3z2aEo5Pk90OvYgaeYZCNOqeghv+XJVyOcMd3mIfW6wlLke58+Eel?=
- =?us-ascii?Q?PeIt/jph0mwjQAUMwUWjqwApvK3AakT7gA4w7jNwi6uZozNES5KiqTRN2lph?=
- =?us-ascii?Q?rbFziv6Ple72vprnj+KYMwUHBrWICd398iiREuUJxr50PnLYd6l8IL2cJSd5?=
- =?us-ascii?Q?itc9DLydyojPTsRWOK+lgPF9OS8kX3X3/+N73aYXt3OkYNPEgsOPthmX3KZz?=
- =?us-ascii?Q?GriOzKeEGre1D7J2V8IIRaiCSs+UCH+maNI0AvF6CsQh3cR/gnnSkEpHwTyr?=
- =?us-ascii?Q?qhBRZe4m5BG1W5KP8e/AcGaPPk9brvqyDqgIUqhrcApdRJu1hBa2nzgb3Q1Z?=
- =?us-ascii?Q?Jg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Fri, 22 Aug
+ 2025 21:25:48 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:a03:114:cafe::9d) by BYAPR21CA0003.outlook.office365.com
+ (2603:10b6:a03:114::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.10 via Frontend Transport; Fri,
+ 22 Aug 2025 21:25:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9052.8 via Frontend Transport; Fri, 22 Aug 2025 21:25:48 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 22 Aug
+ 2025 16:25:47 -0500
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-crypto@vger.kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
+ Kalra" <ashish.kalra@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David Miller" <davem@davemloft.net>
+Subject: [RFC PATCH 0/4] SEV-SNP guest policy bit support updates
+Date: Fri, 22 Aug 2025 16:25:30 -0500
+Message-ID: <cover.1755897933.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8121.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4111a2f-c4b6-41df-f44e-08dde1b273c7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2025 19:31:11.8875
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|BY5PR12MB4305:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c78e744-26ba-427c-1abf-08dde1c27682
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|7416014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?lfV8Fc15FhIKk0yYwZPn3i0azaoNtWUM40oefoP6XqJsky2/mn2+6hvX/jCC?=
+ =?us-ascii?Q?3oU/ruy+wehrhJCvz2dj6caHRvoEowACxHFL+rA+D4FfNWxWDNGCCd5O/axX?=
+ =?us-ascii?Q?HB1lF53FksyKdGkm8BMkhlsuwbUVZhT7AMngadxc+GDJanEWPIgtvKT/RCi4?=
+ =?us-ascii?Q?lpqDQGcg+fVwnjqKYGwDufMDuFr4zsoUDB6ymxZkG5PM2bzo7SG1GlJZyfYf?=
+ =?us-ascii?Q?PoS2L68KGIIQlNHhP/x4vz311ZZDq4Gy1ph9u/5K6mxflXUHMkorbmKmDkgJ?=
+ =?us-ascii?Q?n4XaZ8KPZKtfEva6qrZbsRZyNtRbpclbV6OK5fhipn+Oms2H7hidQ91htOwA?=
+ =?us-ascii?Q?ezWTvFCQ+YOZLxxg03gNugc62iwx5sw2BZW7zkZRpLw4x2A63+ZrJznmp6XY?=
+ =?us-ascii?Q?8r+dKyfWpeWQM7hQKPRyKOmaDIkVrDPCB+/cRF/srtCFTfK/B5rJ/VEk0V1Y?=
+ =?us-ascii?Q?hMv9X6a4dAF/I3Zla8DnAlj622ljCFGOt6qJEf9YM/2dHgINS9G4pPK/A5Tr?=
+ =?us-ascii?Q?Aj82eWjvqZ7/MC9IxfkJ7RrUFD/07ca7B6YvnPK0JbBeVt3o4j5WOLdo4CpP?=
+ =?us-ascii?Q?Mo2C7NfbHvSDy5d7qBayjA0Zc5pdUK/fDRAarRXtdRN4WXyQHTqlmg0H4SIF?=
+ =?us-ascii?Q?xYw0+RitsAF1HPyYZEe1EH+qpi8l92p/NJ3LpOMAl9ovCWnrZzpTXcih/TI7?=
+ =?us-ascii?Q?QCuWENl3QejFaw1VN2nh/sTwTnUb8aXYN24kDKJD17pkNwLPmaWmAvoTOx/J?=
+ =?us-ascii?Q?8wnJ+7/yrkkJZQP30YZ0nyzj9WtyKqJREsaC6IJa3GGLtzyy+UgsPyOSpF4R?=
+ =?us-ascii?Q?rVLkt2/3sua6UYeUCGZaLt3PhzYQrGQjju6Va0z2uOZT8AVD54W8JSqLME13?=
+ =?us-ascii?Q?fumRYGpGUzxmKHBLRQrh4m2VuxR7Ft7ekCmDjfiwNKMwgY4laam7E/GQiGfI?=
+ =?us-ascii?Q?Rv1Ni3FVnSVvq6UqflgiFB1h/sbCwpiojfqI571WjqjYBZe1gE2+57gWmsLP?=
+ =?us-ascii?Q?gueZATCZmdTBwSnyiIPJtKV7uP0fvfXoP9lR/FGEuH7laKsxLcZc0Qog6bcM?=
+ =?us-ascii?Q?2nb4S+aKENh49crYu6WtkwnI7rgWxkVFRZVGfBV6DrBO8Rw+W2WXiZwiBybL?=
+ =?us-ascii?Q?6MX2oTnN+d+pyo9ArI90ncv9lwKVoeGjf7lCMiwGG61UduZEkdot41zIgQyD?=
+ =?us-ascii?Q?TjM1KG/64HKp44O0anwu7r/xht0JJiLwUUVJB+FyTMUVht/kOqCx5hE8TGUK?=
+ =?us-ascii?Q?5OHPIlIgG+DfiJL9tuyiyb0MSFFPzkWfo6vBENOB+hNJgN3mE2wZb5d1wHsj?=
+ =?us-ascii?Q?Sc6GvNLlASyv2VPJGynpGbe4TEMln2BopHNne7rHu0QhV9rsPFMoo3A+5zI0?=
+ =?us-ascii?Q?x3l6S6vn+tQHQkzZt8o+mR6OYib/mOffzKk/GDq/Nx0Ct+DK+ywEdBOA7O2v?=
+ =?us-ascii?Q?DoAoN09IRnb5Th+hneBu/a1y8OiWt9QF9CMKmrkkVOjcPtBROVOaT99CmH6H?=
+ =?us-ascii?Q?Psqcs0oFjJKL4f8zcm4dv5cA1ODq+0qYbgDy?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(7416014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2025 21:25:48.3725
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TNXNei5DRet0VjGDnf5pt8EJ5CBpJDqHXrLi1YnIFBJ77pEWIoLwbGH8zXg6Pl6bXo38HrCiL/Dekch5yWQwQeRarp7QozcjsIHU3RGg4lY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4563
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c78e744-26ba-427c-1abf-08dde1c27682
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4305
+
+This series aims to allow more flexibility in specifying SEV-SNP policy
+bits by improving discoverability of supported policy bits from userspace
+and enabling support for newer policy bits.
+
+- The first patch adds a new KVM_X86_GRP_SEV attribute group,
+  KVM_X86_SNP_POLICY_BITS, that can be used to return the supported
+  SEV-SNP policy bits. The initial support for this attribute will return
+  the current KVM supported policy bitmask.
+
+- The next 3 patches provide for adding to the known SEV-SNP policy
+  bits. Since some policy bits are dependent on specific levels of SEV
+  firmware support, the CCP driver is updated to provide an API to return
+  the supported policy bits.
+
+  The supported policy bits bitmask used by KVM is generated by taking the
+  policy bitmask returned by the CCP driver and ANDing it with the KVM
+  supported policy bits. KVM supported policy bits are policy bits that
+  do not require any specific implementation support from KVM to allow.
+
+This series has a prereq against the ciphertext hiding patches that were
+recently accepted into the cryptodev tree.
+
+The series is based off of:
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
+
+  with the added the ciphertext hiding patches
+
+Tom Lendacky (4):
+  KVM: SEV: Publish supported SEV-SNP policy bits
+  KVM: SEV: Consolidate the SEV policy bits in a single header file
+  crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+  KVM: SEV: Add known supported SEV-SNP policy bits
+
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 45 +++++++++++++++++++++------------
+ arch/x86/kvm/svm/svm.h          |  3 ---
+ drivers/crypto/ccp/sev-dev.c    | 37 +++++++++++++++++++++++++++
+ include/linux/psp-sev.h         | 39 ++++++++++++++++++++++++++++
+ 5 files changed, 106 insertions(+), 19 deletions(-)
 
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Thursday, August 14, 2025 10:29 PM
-> To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> hannes@cmpxchg.org; yosry.ahmed@linux.dev; nphamcs@gmail.com;
-> chengming.zhou@linux.dev; usamaarif642@gmail.com;
-> ryan.roberts@arm.com; 21cnbao@gmail.com;
-> ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> senozhatsky@chromium.org; linux-crypto@vger.kernel.org;
-> davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>=
-;
-> Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> <vinodh.gopal@intel.com>
-> Subject: Re: [PATCH v11 18/24] crypto: acomp - Add
-> crypto_acomp_batch_size() to get an algorithm's batch-size.
->=20
-> On Thu, Jul 31, 2025 at 09:36:36PM -0700, Kanchana P Sridhar wrote:
-> >
-> > diff --git a/include/crypto/internal/acompress.h
-> b/include/crypto/internal/acompress.h
-> > index ffffd88bbbad3..2325ee18e7a10 100644
-> > --- a/include/crypto/internal/acompress.h
-> > +++ b/include/crypto/internal/acompress.h
-> > @@ -28,6 +28,8 @@
-> >   *
-> >   * @compress:	Function performs a compress operation
-> >   * @decompress:	Function performs a de-compress operation
-> > + * @get_batch_size:	Maximum batch-size for batching
-> compress/decompress
-> > + *			operations.
-> >   * @init:	Initialize the cryptographic transformation object.
-> >   *		This function is used to initialize the cryptographic
-> >   *		transformation object. This function is called only once at
-> > @@ -46,6 +48,7 @@
-> >  struct acomp_alg {
-> >  	int (*compress)(struct acomp_req *req);
-> >  	int (*decompress)(struct acomp_req *req);
-> > +	unsigned int (*get_batch_size)(void);
->=20
-> I can't imagine a situation where this needs to be dynamic.
-> Please just make it a static value rather than a callback function.
+base-commit: 82a56258ec2d48f9bb1e9ce8f26b14c161dfe4fb
+-- 
+2.46.2
 
-Hi Herbert,
-
-I am not sure I understand.. Kernel users such as zswap/zram need to query
-the algorithm to get the maximum supported batch-size so they can allocate
-resources for dst buffers. The get_batch_size() callback and associated
-crypto_acomp_batch_size() wrapper help accomplish this.
-
-Can you please clarify what you mean by "static value"?
-
-Thanks,
-Kanchana
-
->=20
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
