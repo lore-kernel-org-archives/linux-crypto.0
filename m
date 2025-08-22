@@ -1,67 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F76019C54B
-	for <linux-crypto@vger.kernel.org>; Fri, 22 Aug 2025 01:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99ED1B4156;
+	Fri, 22 Aug 2025 01:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755824967; cv=none; b=ozFhefaQWETgtKxhQ7XblaovSsb/q3DeTKHQEP36lv+c2881PuRio28lDr2c5I7f8cdFH7rn0EWl5J0ISD77Iy60TgfTBwOZsUawxf3Rktvju42sXG7eYsZ6HekE5Im7A/Qlg3IUfjBYmCFWmfIqeZewl1K0h36eRljgZcxHFFY=
+	t=1755827965; cv=none; b=gOloCEIf5slDyB0nq4UiZBmIR+SZtKD80AVFfc1aKwVXZuk7Nc25/rcT0EehgxZUmLFslDIDK/Fv1swc6kXvDDQM+cQCnDSaDv5zLa3eCcV29bhiUT86c8tjzjvB5mwEg2X7/bJ9PYv6hcnDLE6nkkWfbe9ALgBCDME2OdF16ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755824967; c=relaxed/simple;
-	bh=k4PCsDsUCHvA5vPL5ktK42szk/ObKfJNjwQcew+ZCiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHm0KlvdoXOHQvnM9PQdsBg+ygaD4SVTmWBdKNWhMl2cQkD1fLrM1EgrxhBWsDO2FqDosCe+s4ii0i3AjhP7Xwto4AM4XMtzx3NHjv15MiFYMpa3jtxoiefDPAJ7SZN8+tMXxcJk4L4dpCgXXQtvOM6sU12+Voibu6Gh/dVbvy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LY7Ljr7S; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755827965; c=relaxed/simple;
+	bh=hEGBgFk9rer7lwQXMpzjj4FPsIa17LEhE/UyLSIHv80=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c7mw/MYtK8gw5msnfyOehRtMPC8qkxC4SG+uYmQUopL000ai/rTcVLEmSODQeFN+lzRAqUQxzGUaBKqxxBtj7dN1aAQzBAV+oFg9ztcBhF07G7wniQa9/o+coSt3qaBTjwTL8UkoAgoOgDbUq9sSObT3yf35UiEDZC76BEsJlS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fwCb0/jz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LY7Ljr7S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9512FC4CEEB;
-	Fri, 22 Aug 2025 01:09:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwCb0/jz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0940C4CEEB;
+	Fri, 22 Aug 2025 01:59:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755824967;
-	bh=k4PCsDsUCHvA5vPL5ktK42szk/ObKfJNjwQcew+ZCiU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LY7Ljr7SWfiZgHl2xEOrdQRdp7fR1j/52QnLDlgmH86R4OsL0SW2T/qQ+cXRTV2wL
-	 ICLa4H5AvNrQVebj5lMylebpnq3Y/6YjYLmZ4jTcArBlJb+jR1LTTtMDMlmOd378jS
-	 fri+m6P2Z2xxa+NnOf7Rc8EsvAGdmULpz7+xpiUGhgxCpoMyzByhAw4XgtG99/YEO5
-	 tooV3andRzQZqj4M0FrPGJnKgkWW5d+gQtxeS9v4tzzbvtclT/U5k991hQoPHk8VMM
-	 PlwCCUERNDoYCP3fhaaIbxKVL6bqzdFLUyt62GPH8XBqouFKAtzzjyXp1h+ZHtzn2v
-	 JYMA8ntH5W8Vw==
-Date: Thu, 21 Aug 2025 21:09:23 -0400
-From: Eric Biggers <ebiggers@kernel.org>
-To: Chris Leech <cleech@redhat.com>
-Cc: linux-nvme@lists.infradead.org, Hannes Reinecke <hare@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] nvme: fixup HKDF-Expand-Label implementation
-Message-ID: <20250822010923.GA2458@quark>
-References: <20250821204816.2091293-1-cleech@redhat.com>
+	s=k20201202; t=1755827964;
+	bh=hEGBgFk9rer7lwQXMpzjj4FPsIa17LEhE/UyLSIHv80=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fwCb0/jzIQkNPwEVBU6dtHyOVey66bf/HcR/iNP6aS0AhxrgrvMe34HD6vjnkGUZf
+	 z1O8tLkMNZpr+UzcBZV9dLBbBCwOaf+NQwl5ntySvGabL1KCpUaRFv+wfDydW+poVi
+	 X5XvF2zmqSX16ZKS+hqRP+DFJCxEdKcM7wYo6L7tOqHJI3XrYsnweALvOp8+KSqJnD
+	 2bWhxr7953gGHvjXyBJUoUfk/Lgb2omKSw1C8cEO/Qv3yAqSEKl2XaKQVhYluUWO/h
+	 UsLkNxPauxpS9RjmwleNolFzOVx4bdRBpqA+ZD7ACyej3l0Oe7T142W2dhwsBnQaC9
+	 DSd2Q1+ARL+Zw==
+Message-ID: <3812ed9e-2a47-4c1c-bd69-f37768e62ad3@kernel.org>
+Date: Fri, 22 Aug 2025 10:59:15 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821204816.2091293-1-cleech@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 24/35] ata: libata-eh: drop nth_page() usage within SG
+ entry
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Niklas Cassel <cassel@kernel.org>, Alexander Potapenko
+ <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-25-david@redhat.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20250821200701.1329277-25-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 21, 2025 at 01:48:14PM -0700, Chris Leech wrote:
-> As per RFC 8446 (TLS 1.3) the HKDF-Expand-Label function is using vectors
-> for the 'label' and 'context' field, but defines these vectors as a string
-> prefixed with the string length (in binary). The implementation in nvme
-> is missing the length prefix which was causing interoperability issues
-> with spec-conformant implementations.
+On 8/22/25 05:06, David Hildenbrand wrote:
+> It's no longer required to use nth_page() when iterating pages within a
+> single SG entry, so let's drop the nth_page() usage.
 > 
-> This patchset adds a function 'hkdf_expand_label()' to correctly implement
-> the HKDF-Expand-Label functionality and modifies the nvme driver to utilize
-> this function instead of the open-coded implementation.
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Niklas Cassel <cassel@kernel.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  drivers/ata/libata-sff.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> As usual, comments and reviews are welcome.
+> diff --git a/drivers/ata/libata-sff.c b/drivers/ata/libata-sff.c
+> index 7fc407255eb46..9f5d0f9f6d686 100644
+> --- a/drivers/ata/libata-sff.c
+> +++ b/drivers/ata/libata-sff.c
+> @@ -614,7 +614,7 @@ static void ata_pio_sector(struct ata_queued_cmd *qc)
+>  	offset = qc->cursg->offset + qc->cursg_ofs;
+>  
+>  	/* get the current page and offset */
+> -	page = nth_page(page, (offset >> PAGE_SHIFT));
+> +	page += offset / PAGE_SHIFT;
 
-Well, it's nice that my review comment from last year is finally being
-addressed: https://lore.kernel.org/r/20240723014715.GB2319848@google.com
+Shouldn't this be "offset >> PAGE_SHIFT" ?
 
-- Eric
+>  	offset %= PAGE_SIZE;
+>  
+>  	/* don't overrun current sg */
+> @@ -631,7 +631,7 @@ static void ata_pio_sector(struct ata_queued_cmd *qc)
+>  		unsigned int split_len = PAGE_SIZE - offset;
+>  
+>  		ata_pio_xfer(qc, page, offset, split_len);
+> -		ata_pio_xfer(qc, nth_page(page, 1), 0, count - split_len);
+> +		ata_pio_xfer(qc, page + 1, 0, count - split_len);
+>  	} else {
+>  		ata_pio_xfer(qc, page, offset, count);
+>  	}
+> @@ -751,7 +751,7 @@ static int __atapi_pio_bytes(struct ata_queued_cmd *qc, unsigned int bytes)
+>  	offset = sg->offset + qc->cursg_ofs;
+>  
+>  	/* get the current page and offset */
+> -	page = nth_page(page, (offset >> PAGE_SHIFT));
+> +	page += offset / PAGE_SIZE;
+
+Same here, though this seems correct too.
+
+>  	offset %= PAGE_SIZE;
+>  
+>  	/* don't overrun current sg */
+
+
+-- 
+Damien Le Moal
+Western Digital Research
