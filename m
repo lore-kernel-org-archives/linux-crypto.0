@@ -1,113 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDE02AC17;
-	Sun, 24 Aug 2025 01:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F59393DD5;
+	Sun, 24 Aug 2025 02:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756000101; cv=none; b=IVOlxLrHvH1MRQH6qPUQ0XivYNYXwOuDP9dhGIAi1CDVzHdh5DKrj1Tk2S/ymi1x2qKK23t9GnqtaWsly27K8rgqSS+cp1FNdjZCfEYbeYMWJjDUoUu48gayldcmO8qx6a13BOJIqjlWHr3AGzCVxsPu1GmzGvwPwljishQ4WyU=
+	t=1756002986; cv=none; b=QFGsP+gAY1QDLyzCMnmop6DoHR7goMTwoJbSeGFf9SVP4jq0BJmarx7iJFA0+TrcANhrctR78WEhoOpglmnNeI6ZyaRi1BOHR9x5HBRISrP7kSTAG04aLbu7AZFx8qBFwtV/GJl1VbsDE07TRygoVmzUIezrF56/khJlDSAIRVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756000101; c=relaxed/simple;
-	bh=D+ocbRPEs0ajigDumGXUtQ5Yb6ngRIeK+zntHOyq2fQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ggG/MNLVSyXWF5TLGauTv5PwUI7Oq1HazVkdf0wM/E5Fh69Yas6PWi72wgMEuhlEib4fgXlN13zH5ciHRQfbQs7lcEJQ1ARk8QmWVW4BVLN8fq3Eb6xvyf9xLyY20ZVOmkFHBeZgdQcDqLT+4DXPqN3In4i4/Elrk3839iVUHbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUcZ/RED; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756002986; c=relaxed/simple;
+	bh=Ee7IK4jW8L9Rr7h9gFwUO7lmCezFG8TwbC+ekvHphIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBpLAeUuXBm0PFbkdrGIT9o7EAUCAousjbMBG3DHSLaIWPZhPrf7eesGto/DP8fNBUn50QAHz7oJTU6oupx/IcLrtuahsFQOa7eQRmVp1oGlfYuQlI3Zb5RmCUV5F7FpZATBaFjKVS9rLyAqhcyH8bSS7OBCYTdLIGveaUwaqMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oT8agj29; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUcZ/RED"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431A6C4CEE7;
-	Sun, 24 Aug 2025 01:48:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oT8agj29"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A08C4CEE7;
+	Sun, 24 Aug 2025 02:36:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756000100;
-	bh=D+ocbRPEs0ajigDumGXUtQ5Yb6ngRIeK+zntHOyq2fQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RUcZ/RED6yyZX7DA4uKVuXmtC4eQ7RsbM8CzORM0mOkQBbcoHxjGDAYO11BDfw5+6
-	 fRd/8XA/Gk07eCh1f3JNA1NDtYaUX01qpwm8t5xmYj8tvuuJAMpKMaMrvHX7qv8IBe
-	 P/+BEGrOTyCZxTOQym6EcRfN3PHBjhhqnpNiA7rVHIszK9z6LQAZW0p5UajdrE8wIR
-	 7SWNOnmOtDnJXEQK2CIKM4HxylNz77dDnukaVhvAKdRBfBDvVbqCZ991ONpansYhKO
-	 MRd+zVrWUsAI9MSbWu8DL1OuMBbv7ZYKUN4rtRlxj7HQPbj/1G13GjeqZDX+maDwD8
-	 JXDrRcxaeDZ2w==
+	s=k20201202; t=1756002985;
+	bh=Ee7IK4jW8L9Rr7h9gFwUO7lmCezFG8TwbC+ekvHphIs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oT8agj295bcFUDXmOLhDaFoNQOaClYtjl7QgKtrH2ric3ltGN6QFg8QQaTySeeK8k
+	 DsIWMANVET8qQeKgoq8uR94bs4W/0NqVq7XtdpbeCfShVQZ6YnZ17fC8OY0LlZir1e
+	 Pg8DFqy/du2E/T6A46w/wZKQfcw88+gcoxBNZBfHCFj7+6imH3lpnUK0QzRrJ8C9CP
+	 PRo3SayjrzVWPYUHi+GbwYm8ns+ERuq8zdkbYxWmqIDf8wCo73vya98KvfNYu97yDD
+	 f2z4BiZCfmXTAZg/KVoBcyuYZeZ+PsM62c6JNe1d+aSrbUjDcGpuyQCMTDpBTafPEQ
+	 +GTePIwcN4Org==
+Date: Sat, 23 Aug 2025 22:36:23 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org,
-	David Ahern <dsahern@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>,
-	David Lebrun <dlebrun@google.com>,
-	linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH iproute2-next v3] man8: ip-sr: Document that passphrase must be high-entropy
-Date: Sat, 23 Aug 2025 21:47:21 -0400
-Message-ID: <20250824014721.72689-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+To: Rakuram Eswaran <rakuram.e96@gmail.com>
+Cc: ardb@kernel.org, corbet@lwn.net, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH] Documentation/staging: Fix typo and incorrect citation
+ in crc32.rst
+Message-ID: <20250824023623.GB12644@quark>
+References: <20250821035913.GG185832@quark>
+ <20250823091837.5037-1-rakuram.e96@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250823091837.5037-1-rakuram.e96@gmail.com>
 
-'ip sr hmac set' takes a newline-terminated "passphrase", but it fails
-to stretch it.  The "passphrase" actually gets used directly as the key.
-This makes it difficult to use securely.
+Hi Rakuram,
 
-I recommend deprecating this command and replacing it with a command
-that either stretches the passphrase or explicitly takes a key instead
-of a passphrase.  But for now, let's at least document this pitfall.
+On Sat, Aug 23, 2025 at 02:48:32PM +0530, Rakuram Eswaran wrote:
+> Thanks for applying my patch!
+> 
+> I noticed your comment about the file being dated. 
+> I’d be interested in helping to update it to cover the more modern 
+> CRC implementations — things like carryless multiplication and 
+> hardware CRC instructions on x86, ARM, etc.
+> 
+> Since I’m not very familiar yet with these optimized approaches. 
+> Could you suggest a good starting point for exploring this in the kernel 
+> (or any references you recommend)? 
+> 
+> I was planning to look at lib/crc32.c and the arch-specific 
+> implementations, but would appreciate your guidance.
+> 
+> Best Regards,
+> Rakuram 
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+https://www.corsix.org/content/alternative-exposition-crc32_4k_pclmulqdq
+has a fairly good explanation.
 
-Changed in v3:
-- Dropped the update of the man page date
-- Use /dev/random instead of /dev/urandom in the example
-Changed in v2:
-- Use better example commmand for key generation
+In the kernel, x86 uses crc32 instructions for crc32c(), and arm64 uses
+crc32 instructions for crc32c(), crc32_le(), and crc32_be().
 
- man/man8/ip-sr.8 | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+x86, arm, arm64, powerpc, s390, and riscv all have CRC implementations
+using carryless multiplication instructions.  The riscv one might be the
+easiest to read since it is mostly written in C, rather than assembly.
+See: lib/crc/riscv/crc-clmul-template.h
 
-diff --git a/man/man8/ip-sr.8 b/man/man8/ip-sr.8
-index 6be1cc54..962fb0d1 100644
---- a/man/man8/ip-sr.8
-+++ b/man/man8/ip-sr.8
-@@ -32,13 +32,21 @@ internal parameters.
- .PP
- Those parameters include the mapping between an HMAC key ID and its associated
- hashing algorithm and secret, and the IPv6 address to use as source for encapsulated
- packets.
- .PP
--The \fBip sr hmac set\fR command prompts for a passphrase that will be used as the
--HMAC secret for the corresponding key ID. A blank passphrase removes the mapping.
--The currently supported algorithms for \fIALGO\fR are \fBsha1\fR and \fBsha256\fR.
-+The \fBip sr hmac set\fR command prompts for a newline-terminated "passphrase"
-+that will be used as the HMAC secret for the corresponding key ID. This
-+"passphrase" is \fInot\fR stretched, and it is used directly as the HMAC key.
-+Therefore it \fImust\fR have enough entropy to be used as a key. For example, a
-+correct use would be to use a passphrase that was generated using
-+\fBhead\~-c\~32\~/dev/random\~|\~base64\~-w\~0\fR.
-+.PP
-+A blank "passphrase" removes the mapping.
-+.PP
-+The currently supported algorithms for \fIALGO\fR are \fBsha1\fR and
-+\fBsha256\fR.
- .PP
- If the tunnel source is set to the address :: (which is the default), then an address
- of the egress interface will be selected. As this operation may hinder performances,
- it is recommended to set a non-default address.
- 
-@@ -52,7 +60,11 @@ it is recommended to set a non-default address.
- .nf
- # ip sr tunsrc set 2001:db8::1
- .SH SEE ALSO
- .br
- .BR ip-route (8)
-+
-+.SH BUGS
-+\fBip sr hmac set\fR does not stretch the passphrase.
-+
- .SH AUTHOR
- David Lebrun <david.lebrun@uclouvain.be>
-
-base-commit: 0ad8fef322365b7bafd052f416fc972bea49d362
--- 
-2.50.1
-
+- Eric
