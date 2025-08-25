@@ -1,49 +1,70 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6634523D288;
-	Mon, 25 Aug 2025 04:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4877619309C;
+	Mon, 25 Aug 2025 05:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756096590; cv=none; b=LIXI14++qV/BM8yymGx+1p+w9GipTrIL0aRpjeEWISd9dbCX9cQbvVHZ1o+mNSicOXTTX2MtL/GXaanxgYmD/YH0bETwG1DmLqLFupzZppdoNgQ4W3WQ2ZR8NLpZ393eLR4QAhwvBs3XEzjHkeMmafiO0/oPyZpS+wfOcbsO/Lc=
+	t=1756100369; cv=none; b=SBDC/dWpoFbd9BVcCKqXoztc45YvlPL7YCtoxLalmwNiBtuvQJyp5YkN1LgWGhyFFDK2guWPGQ+I+hnz8XljSybuCWqcH2omZN69+xQu8TnFqG6r38sxhxQXBkeonwFtBHrN1Cd0YNRQ+AwJJdXFmlFZQXpgl1XHV3+2DkZ+1MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756096590; c=relaxed/simple;
-	bh=sTunfMCq4/E9IlV0C2VSUlNM33ne8GOa5NtUxLEAanA=;
+	s=arc-20240116; t=1756100369; c=relaxed/simple;
+	bh=WSJ4Gse9ryeEUTdsZ6WZfUn3IxNCRlYwK27R0occaRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BYLUHM+4T0ryby+KPjJy4gn+0RDskP25CZVj5V4K1hSK2hDw/wiLpA03qZ+97WoiE1/2glwiqa8VxHjd0eUgg2U5KnhtQyZwpuDLk6jUh9GMygRx88tP3GNobjfhu31Qppl0NbOzJwMpE/RWmTUM8m/c6utmJoUNq/gWz/3JSK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WDEOiJz5; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=SxZ6tOO0F9V/Q/znJwyO3LMiwX5JJdl0Tp3UtLgrpH7B1R55PdILrXhytZ0pyMMolIlsKKM6qE50gtvLzLcgZB+5D/9P4ouD3RyApt2/1xuhV4d7huxX1axQq0x+bU/knmcV5ol36rrMkWgV6DRXdcKMNaauHC7hmZc+Eedf8W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fafnno6i; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WDEOiJz5"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fafnno6i"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=CAAF7pgkMZz/jA5UL8kzFkhd0KBcVmgKgcH+O4+CyTM=; b=WDEOiJz581vzbKXVFX10mc6NpP
-	E2f33ybgUXFgTEvInxeMlodeSZEK5LLXRZH0kBhlj+LLzMDpdxwjzSVozBt7BGTB78Kdsc0cXJM/1
-	jvvjARE7nd/ddUuwRHNvh89EMIhbO4hD9p1fHpc51ICqXCqW4+y84KWDV7cGYvTdpKt+yHjKDB9fe
-	o34Dge1KhGDIO5QBUU5Lv/+/a94VaZmuzOdzrYbjO/IPADJrCVjOTm5UBTFyWUJ0C+6yk3zBv1dG2
-	ZkO1JIIz2qa68a5VG5I48RNlFEK53xr9QqeKFY8dzg2/Pk+V3RDRS4VEEj8KBMaIskQMdY3LzOd6g
-	ZFNURwsw==;
+	bh=LE7zGxWMAH8njov+JwT71yg831S+C58Rr2jhVSVOVZg=; b=fafnno6izLAUTtnGjIhzUHVapl
+	NMFmtyRJEWADdP5q2HvCBsDGi5VuS0pqxt11KxOCtG1S9nE9DeZAn9iihgZGvynS7VToAf2XJqild
+	HL4Tq64QcDzT8Fa3y56csOcpC4XttkiO87m404Mk6jKTxkEHBdqq1Dr78IS6JKJGM2aVZl4VgEfCW
+	NTJABJNNeusue/cCD4qEfnc9mfgluYbCvFGrY6ZoHiWPIy7HtEMH3Eihlt7yXrlRaO9krQEXOG3wR
+	3OEwb+xFdwIKzbFOs804ccj+CjpL/t4+NXOdlwEw4veKkUYMTLWLeYU7m2Qo9TpU2CdFmz3AAAMyi
+	cAQ0hYWQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uqOgs-00GzL2-26;
-	Mon, 25 Aug 2025 12:36:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Aug 2025 12:36:15 +0800
-Date: Mon, 25 Aug 2025 12:36:15 +0800
+	id 1uqPfZ-00H0c1-1Z;
+	Mon, 25 Aug 2025 13:38:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Aug 2025 13:38:57 +0800
+Date: Mon, 25 Aug 2025 13:38:57 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, qianweili@huawei.com,
-	linwenkai6@hisilicon.com, wangzhou1@hisilicon.com,
-	taoqi10@huawei.com
-Subject: Re: [PATCH v2 0/3] crypto: hisilicon - add fallback function for
- hisilicon accelerater driver
-Message-ID: <aKvoPwhKyoVz8Yta@gondor.apana.org.au>
-References: <20250818065714.1916898-1-huangchenghai2@huawei.com>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: Nhat Pham <nphamcs@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v11 00/24] zswap compression batching with optimized
+ iaa_crypto driver
+Message-ID: <aKv28XTvAITuq-p8@gondor.apana.org.au>
+References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
+ <CAKEwX=Pj30Zymib2fEoDW9UyD1vAwxRKO3p28RPtK9DZWAdv8w@mail.gmail.com>
+ <aJ7FSUdvxtZyiHBq@gondor.apana.org.au>
+ <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,36 +73,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250818065714.1916898-1-huangchenghai2@huawei.com>
+In-Reply-To: <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
 
-On Mon, Aug 18, 2025 at 02:57:11PM +0800, Chenghai Huang wrote:
-> Support fallback for zip/sec2/hpre when device is busy.
-> 
-> V1: https://lore.kernel.org/all/20250809070829.47204-1-huangchenghai2@huawei.com/
-> Updates:
-> - Remove unnecessary callback completions.
-> - Add CRYPTO_ALG_NEED_FALLBACK to hisi_zip's cra_flags.
-> 
-> Chenghai Huang (1):
->   crypto: hisilicon/zip - support fallback for zip
-> 
-> Qi Tao (1):
->   crypto: hisilicon/sec2 - support skcipher/aead fallback for hardware
->     queue unavailable
-> 
-> Weili Qian (1):
->   crypto: hisilicon/hpre - support the hpre algorithm fallback
-> 
->  drivers/crypto/hisilicon/Kconfig            |   1 +
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 314 +++++++++++++++++---
->  drivers/crypto/hisilicon/qm.c               |   4 +-
->  drivers/crypto/hisilicon/sec2/sec_crypto.c  |  62 +++-
->  drivers/crypto/hisilicon/zip/zip_crypto.c   |  52 +++-
->  5 files changed, 360 insertions(+), 73 deletions(-)
+On Fri, Aug 22, 2025 at 07:26:34PM +0000, Sridhar, Kanchana P wrote:
+>
+> 1) The zswap per-CPU acomp_ctx has two sg_tables added, one each for
+>    inputs/outputs, with nents set to the pool->compr_batch_size (1 for software
+>    compressors). This per-CPU data incurs additional memory overhead per-CPU,
+>    however this is memory that will anyway be allocated on the stack in
+>    zswap_compress(); and less memory overhead than the latter because we know
+>    exactly how many sg_table scatterlists to allocate for the given pool
+>    (assuming we don't kmalloc in zswap_compress()). I will make sure to quantify
+>    the overhead in v12's commit logs.
 
-Are you mapping one hardware queue to a single tfm object?
+There is no need for any SG lists for the source.  The folio should
+be submitted as the source.
 
-Hardware queues should be shared between tfm objects.
+So only the destination requires an SG list.
+
+> 6) "For the source, nothing needs to be done because the folio could be passed
+>    in as is.". As far as I know, this cannot be accomplished without
+>    modifications to the crypto API for software compressors, because compressed
+>    buffers need to be stored in the zswap/zram zs_pools at PAGE_SIZE
+>    granularity.
+
+Sure.  But all it needs is one central fallback path in the acompress
+API.  I can do this for you.
 
 Cheers,
 -- 
