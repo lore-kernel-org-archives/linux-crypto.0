@@ -1,107 +1,116 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4877619309C;
-	Mon, 25 Aug 2025 05:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE6219C569;
+	Mon, 25 Aug 2025 06:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756100369; cv=none; b=SBDC/dWpoFbd9BVcCKqXoztc45YvlPL7YCtoxLalmwNiBtuvQJyp5YkN1LgWGhyFFDK2guWPGQ+I+hnz8XljSybuCWqcH2omZN69+xQu8TnFqG6r38sxhxQXBkeonwFtBHrN1Cd0YNRQ+AwJJdXFmlFZQXpgl1XHV3+2DkZ+1MM=
+	t=1756103301; cv=none; b=IzCm9igTqcFiyncPpae5KFUqy0jl5XqmeP3T+dkTM4cg/SfV4UeGgHsK6nZ1B3osn/OCe1+mGEE5nTU+XGNEsKUDS7nTRcycMDcdeG2xyPlFctzH2HAl8hAMl51e/M6WdKsKtIN310bTgd9EnGrDDvDbKYWGphbWtRNsWXaDYaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756100369; c=relaxed/simple;
-	bh=WSJ4Gse9ryeEUTdsZ6WZfUn3IxNCRlYwK27R0occaRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SxZ6tOO0F9V/Q/znJwyO3LMiwX5JJdl0Tp3UtLgrpH7B1R55PdILrXhytZ0pyMMolIlsKKM6qE50gtvLzLcgZB+5D/9P4ouD3RyApt2/1xuhV4d7huxX1axQq0x+bU/knmcV5ol36rrMkWgV6DRXdcKMNaauHC7hmZc+Eedf8W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fafnno6i; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1756103301; c=relaxed/simple;
+	bh=WQVylS92T3jgMm7p84Z04xb25P92PYQug7wH3/uzZMA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1Vp+CXST8Tyoau3lRnM42AAmiRKrA9V6XMG8WwpirBK7pVjqisabFh2W++6Nagj8oYiVOdTgjJrPhRaDngCqEGH3BJKAFcXb4ciUADdmSkEWb7Tw2Z9J+4ZJJrN6v0iq5QRXQqMndyQp7bd6Z9uk3MS0BsnSYi5lQMGLK6YvTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=akjIn+wG; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fafnno6i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=LE7zGxWMAH8njov+JwT71yg831S+C58Rr2jhVSVOVZg=; b=fafnno6izLAUTtnGjIhzUHVapl
-	NMFmtyRJEWADdP5q2HvCBsDGi5VuS0pqxt11KxOCtG1S9nE9DeZAn9iihgZGvynS7VToAf2XJqild
-	HL4Tq64QcDzT8Fa3y56csOcpC4XttkiO87m404Mk6jKTxkEHBdqq1Dr78IS6JKJGM2aVZl4VgEfCW
-	NTJABJNNeusue/cCD4qEfnc9mfgluYbCvFGrY6ZoHiWPIy7HtEMH3Eihlt7yXrlRaO9krQEXOG3wR
-	3OEwb+xFdwIKzbFOs804ccj+CjpL/t4+NXOdlwEw4veKkUYMTLWLeYU7m2Qo9TpU2CdFmz3AAAMyi
-	cAQ0hYWQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uqPfZ-00H0c1-1Z;
-	Mon, 25 Aug 2025 13:38:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Aug 2025 13:38:57 +0800
-Date: Mon, 25 Aug 2025 13:38:57 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v11 00/24] zswap compression batching with optimized
- iaa_crypto driver
-Message-ID: <aKv28XTvAITuq-p8@gondor.apana.org.au>
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
- <CAKEwX=Pj30Zymib2fEoDW9UyD1vAwxRKO3p28RPtK9DZWAdv8w@mail.gmail.com>
- <aJ7FSUdvxtZyiHBq@gondor.apana.org.au>
- <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="akjIn+wG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756103300; x=1787639300;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WQVylS92T3jgMm7p84Z04xb25P92PYQug7wH3/uzZMA=;
+  b=akjIn+wG15LcV1BxG1NwXrF7tftD289/QyhmevycNxc7Ap+TTq27TFgv
+   G2wNjzRchclfr8fXicwA+HuEVRcPBkxm0cfccYhRd+h4nUSaWIibrZKx5
+   t8dvzwa5fILD+FkPxQfok7GfhXpCsT/o4Hryl5DLELchCDLMwdrtZkRIE
+   vzBWaq0ubNayr9kC18v5WbyCMHJDISNdR+493djgNxdyQ+SorYXyEIbr5
+   xk9K7UD7lcQWP8cVp19zYqHYSUl9S26a0y+vDC78V/90lems+gWPB1qfJ
+   QWOkZL4+OhjfL9u9gXK7g3DPL2cxDsPFOPWQHCgEbnQsxFD/vMDClVCCY
+   A==;
+X-CSE-ConnectionGUID: E7GoUgAnRxqBfYFECdyUSQ==
+X-CSE-MsgGUID: 5apMjYN7Q+GTJVOEPqfVXw==
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="45594060"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Aug 2025 23:28:14 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sun, 24 Aug 2025 23:27:54 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Sun, 24 Aug 2025 23:27:50 -0700
+Date: Mon, 25 Aug 2025 06:27:49 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Robert Marko <robert.marko@sartura.hr>
+CC: <linux@armlinux.org.uk>, <nicolas.ferre@microchip.com>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<andi.shyti@kernel.org>, <lee@kernel.org>, <broonie@kernel.org>,
+	<gregkh@linuxfoundation.org>, <jirislaby@kernel.org>, <arnd@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+	<o.rempel@pengutronix.de>, <luka.perkov@sartura.hr>
+Subject: Re: [PATCH v9 0/9] arm64: lan969x: Add support for Microchip LAN969x
+ SoC
+Message-ID: <20250825062749.5hjcxwlbmagccqgj@DEN-DL-M70577>
+References: <20250813174720.540015-1-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
+In-Reply-To: <20250813174720.540015-1-robert.marko@sartura.hr>
 
-On Fri, Aug 22, 2025 at 07:26:34PM +0000, Sridhar, Kanchana P wrote:
+> This patch series adds basic support for Microchip LAN969x SoC.
+> 
+> It introduces the SoC ARCH symbol itself under the ARCH_MICROCHIP symbol
+> which allows to avoid the need to change dependencies of the drivers that
+> are shared for Microchip SoC-s in the future.
+> 
+> DTS and further driver will be added in follow-up series.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> ---
+> Changes in v9:
+> * Make ARCH_MICROCHIP hidden symbol that is selected by SparX-5 and LAN969x
+> directly, this avoids breaking existing configs with ARCH_SPARX5
+> 
+> Changes in v8:
+> * Move to using ARCH_MICROCHIP as suggested by Arnd
+> * Dropped any review tags due to changes
+> 
+> Robert Marko (9):
+>   arm64: Add config for Microchip SoC platforms
+>   ARM: at91: select ARCH_MICROCHIP
+>   arm64: lan969x: Add support for Microchip LAN969x SoC
+>   mfd: at91-usart: Make it selectable for ARCH_MICROCHIP
+>   tty: serial: atmel: make it selectable for ARCH_MICROCHIP
+>   spi: atmel: make it selectable for ARCH_MICROCHIP
+>   i2c: at91: make it selectable for ARCH_MICROCHIP
+>   char: hw_random: atmel: make it selectable for ARCH_MICROCHIP
+>   crypto: atmel-aes: make it selectable for ARCH_MICROCHIP
+> 
+>  arch/arm/mach-at91/Kconfig     |  4 +++
+>  arch/arm64/Kconfig.platforms   | 51 ++++++++++++++++++++++++----------
+>  drivers/char/hw_random/Kconfig |  2 +-
+>  drivers/crypto/Kconfig         |  2 +-
+>  drivers/i2c/busses/Kconfig     |  2 +-
+>  drivers/mfd/Kconfig            |  2 +-
+>  drivers/spi/Kconfig            |  2 +-
+>  drivers/tty/serial/Kconfig     |  2 +-
+>  8 files changed, 47 insertions(+), 20 deletions(-)
+> 
+> --
+> 2.50.1
 >
-> 1) The zswap per-CPU acomp_ctx has two sg_tables added, one each for
->    inputs/outputs, with nents set to the pool->compr_batch_size (1 for software
->    compressors). This per-CPU data incurs additional memory overhead per-CPU,
->    however this is memory that will anyway be allocated on the stack in
->    zswap_compress(); and less memory overhead than the latter because we know
->    exactly how many sg_table scatterlists to allocate for the given pool
->    (assuming we don't kmalloc in zswap_compress()). I will make sure to quantify
->    the overhead in v12's commit logs.
 
-There is no need for any SG lists for the source.  The folio should
-be submitted as the source.
-
-So only the destination requires an SG list.
-
-> 6) "For the source, nothing needs to be done because the folio could be passed
->    in as is.". As far as I know, this cannot be accomplished without
->    modifications to the crypto API for software compressors, because compressed
->    buffers need to be stored in the zswap/zram zs_pools at PAGE_SIZE
->    granularity.
-
-Sure.  But all it needs is one central fallback path in the acompress
-API.  I can do this for you.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Daniel Machon <daniel.machon@microchip.com> 
