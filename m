@@ -1,231 +1,232 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FA2301029
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Aug 2025 18:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756146758; cv=none; b=gDsChCPerl0sZYTKFJOY7WMJQD/V50YSvkbmiUZkyv/mpHnN8IJirpVfCK2OZv7AP0/2sGOrAx7z5TlI+ChzrUFxPWCZ0/Fjen78mKJ4Q39KcasCu+snWIA8kbMp7tJ2b9zpSDkcg83hQHqPclZ+ApFx7FoRcryOUPhulb6hocI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756146758; c=relaxed/simple;
-	bh=5gSbG4LawMNJ/PWjEAWfSVGPawomJWAQkNEyrTBhXtk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GVpEB4do+ab2TQLZyk7xO3nm4ouJxgTMptGWAX8KV047hMstxuyoPP85jiTRXFFLi3TOa0EyF5rqEAgT+TBdMiy2XbaqL0FMTAAcdoaeqzcsajbaDixOoHXbiCgcJ2HaffhCQKO0n5iOPpRUghEeYlvFEX91SFO4pJ0sSY+MP0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RhYXThG3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD5526290;
+	Mon, 25 Aug 2025 21:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756158365; cv=fail; b=mdiv4VveC17YzT9qGhN+RXQikk59MjNHT4D3HjB28ytqpvJMnfCQhmTX6tEIQ5fAkKYV0vUmQ24I/ITPm/yweo4B5kEV/f8c4rDxuoyr5xxmtCGJCqSV1HugotiFr64Nc1jNidgUB4OtiJBvlgGMhv4uzHOmPEpDDzpMjgVsK7k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756158365; c=relaxed/simple;
+	bh=XGu0MhTQ+Wwe1YePTz5kEeP43rKaDVB7nVT3mFvTZoY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lujEW1eDu6Cmcht6+ByA1gvohjdzuIAF7Zmu9qvNzDUxNpeDifVs4qWq3teImJqbQhOXwikrUT167ZB95ksFgyDtoYbNjJHhEeX3dDxrxlwVmBh2jiciZXlON5cnHcJOPQPGXvrLf94rZeU3GG4AopJIh9oApXGdhoyHbmgAmZg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iiU/tSOJ; arc=fail smtp.client-ip=40.107.92.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhYXThG3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756146755;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
-	b=RhYXThG3+tIFnfqzLIr9RPKxUxwraFl7lO2IPNcEbTyPNdKbVpERSCLZuCs+WhDSSPQMox
-	8AF8QwnYsxJ1QrHDYmS40C5kdt7ZdyEuAeCyVZfTk/DGGnAgMs5zVwdFTws8tKK4Jgeq82
-	8aePnOuj3pRFAfo75YAYdTeDDGMLxcE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-SInFAoZ1Mleh6Ar40fsByQ-1; Mon, 25 Aug 2025 14:32:33 -0400
-X-MC-Unique: SInFAoZ1Mleh6Ar40fsByQ-1
-X-Mimecast-MFC-AGG-ID: SInFAoZ1Mleh6Ar40fsByQ_1756146752
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1b05d251so26422305e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Aug 2025 11:32:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756146752; x=1756751552;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
-        b=ppO6EF7k7D3Xph7F+1Y8HLjTI125yKXIPpDcKCq24mXb7HkUWRbKkbSdg0XKe4THzv
-         FBG5Zv0b3773rqMWzXSqdrZonjm454IzoDiBGJClt8QsOPhVxIPfwnmIVCOWz9mABOlm
-         eGmwVdJsYR0oPSO80qDF3WIU9GrYzJ8FWNgZmHCJ+X/yIDTPa3x2pbo6p7JcllD2gdGe
-         27djeyjSFzCbk1yjzme4wIACfi5K2dMDk6v931bK74yDF+8f1Hb/NAbGTRyKEZzWJ4j0
-         i11uc/Elvtmp6ef5jyMM7ZwBVM0AtzwrkHl2+pkw5AH1kNDN81hZT8rehp9EvZOqp8Sj
-         eCqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDZi5VY0LAksD0v/+/cFUQdL/0lxdvYp60uXMIK7SdfNV70o35V/RVvAkvb0SYVhxQcqkVkGDKF3fLer4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJjIh6hccCkO5RbNQJMTWU2ASG4tRcQRbTpCu4uzfbcn+cO8t4
-	4TDpOqFR0BImaI/k0iCacyrA8CHGSZbNHGAy4vfCBwhdK4ZoSw4nV5C1GRxgCIL8HRek1mKIl/H
-	ZpQJ1Vp1dfL1+57V13UtakZLtmb18jT0s4n+PoXns++/i5F4YVPbEagH1XNsMqqXBWg==
-X-Gm-Gg: ASbGncsB06oZMpgCBbK85Jqu/6+gySQuBKluPa66mm1sm0U0aJ31nld5+zgmQSkfw2B
-	PBadLHYqpOLoOy7hgqbwjckgLO5q5d7Wd1pcATgFaWswtyprZo7U1vAaz2OQyMdbCF4RpTZsn0T
-	6TKvruIVv2d8LaXfZsx+SeS8f+KdjwPa9k8gW+WjZkm5Zixz5nbaUYj7LeMQNXLTXHS+/+gloHm
-	5jdsj+tHRepHT+kOSNOZf2ou0QEJrs1AaqPW2hp1u1BhdgjdWUOLty7SwT3qGmdLwdaG68y7upj
-	yHzbSBKTuSpl88kTPExdyRtaiV9bn3TAdxUXI7OusHOw1qkrj/we7O4Sb/z+cBmwEXR8s0dzT6k
-	VWH/mpiwc53d6vBVY2KDUyjTmRdFiAA92Q0xjPY/iF+K/NzRWWsXF0L+A5LsmUZzTc0U=
-X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710435e9.18.1756146752213;
-        Mon, 25 Aug 2025 11:32:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxuQzAylX90vNEmmjxyPSaWFpv8tCbOTWCm8WazHqaDOnMAPM4HK8CKvM3oYkR/BEIZaOMIA==
-X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710235e9.18.1756146751795;
-        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76? (p200300d82f4f130042f198e5ddf83a76.dip0.t-ipconnect.de. [2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c7119c4200sm12481975f8f.53.2025.08.25.11.32.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
-Message-ID: <7ffd0abd-27a1-40a8-b538-9a01e21abb29@redhat.com>
-Date: Mon, 25 Aug 2025 20:32:27 +0200
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iiU/tSOJ"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JpBs3ziziqBQIGtIDQkvK1KRWwWib2+A5HSo6ODDZriFHFpd7WIpjK6roqmF/07JvLqC1y4k+RW447NWqVd1997+XTeSot3bcx3TaiwLNshSw/AW4RDfBry/2BsByuuM29XHsyRRH/V1bQvbuazExC3YKm9wbYJLSqJ+A29mskF9wb0DjBT1gX13cSGZFmnELrConRAjS4pg/4VgHQbzNsxuoFJUh60C/044LYOtCuxnl6BEIc4xJISDY6d1PAjcJhjMFQg7T8DXHx3uxxfF2rZz3pdA36/DyisKa0g6jvf/BIFYM2JCzFaMykzWHo/JiLzdLL9IXLjZsgfeHWPhbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BflZxWQPbfJqbZBR8mWDYrsXErnjGit1972mUlJhDWs=;
+ b=EXMFrfxCvRNCsWdLykGJlPfMG2t4MW/8LxYmGmeCrXbf8u1pnc8yMRLDKDj5yKw3A0SWgtD22eVmZ++s91ZBCg1J3S0oJiFd1JeURHyiMk+twg4m/jpmGtP2yi+4MDrOPXucwzIitLQkKIuv6CaIDd7suASP7UnMfHIXGYz9Rvpkp7t2Aj0QwRkGGkzozUEsN0QktPxK6EHmxG0Iw+OlZh/rm9k5pD88gcKNf4RYwkqAIIW5J8iIKQHj0jHDXpsae80sF3iY+qZkTnTYKKCeUHuVvsjdss7JR1lepheR5FjCkmVcAhVAdmgs+hg8+MiFuIxey5AvlalzGLzMssyGQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=8bytes.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BflZxWQPbfJqbZBR8mWDYrsXErnjGit1972mUlJhDWs=;
+ b=iiU/tSOJ7Bcwxi4aRyTC9IuyGSKDe8ANS/Dyv0YJIB/wgNZ2ZcBS7YkGqW7o/EgKoa30nrS6BT1GC/fUMU/yBbWE3kYJDtgRkobdP0U9gQZkN78A9wuM+Q+xSO3mrCnGpH0hG6liccqDseZjn+p1EIIq2b4YMDI38jx42m9NUlo=
+Received: from MN2PR05CA0047.namprd05.prod.outlook.com (2603:10b6:208:236::16)
+ by DS7PR12MB8231.namprd12.prod.outlook.com (2603:10b6:8:db::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Mon, 25 Aug
+ 2025 21:45:55 +0000
+Received: from BN3PEPF0000B370.namprd21.prod.outlook.com
+ (2603:10b6:208:236:cafe::42) by MN2PR05CA0047.outlook.office365.com
+ (2603:10b6:208:236::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.13 via Frontend Transport; Mon,
+ 25 Aug 2025 21:45:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B370.mail.protection.outlook.com (10.167.243.167) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9094.0 via Frontend Transport; Mon, 25 Aug 2025 21:45:55 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
+ 2025 16:45:54 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
+	<thomas.lendacky@amd.com>, <Sairaj.ArunKodilkar@amd.com>,
+	<Vasant.Hegde@amd.com>, <herbert@gondor.apana.org.au>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <will@kernel.org>,
+	<robin.murphy@arm.com>, <john.allen@amd.com>, <davem@davemloft.net>,
+	<michael.roth@amd.com>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<kvm@vger.kernel.org>
+Subject: [PATCH v6 0/4] Add host kdump support for SNP
+Date: Mon, 25 Aug 2025 21:45:45 +0000
+Message-ID: <cover.1756157913.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: update kernel-doc for MEMBLOCK_RSRV_NOINIT
-To: Mike Rapoport <rppt@kernel.org>
-Cc: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>,
- linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
- <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
- <aKmDBobyvEX7ZUWL@kernel.org>
- <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
- <aKxz9HLQTflFNYEu@kernel.org>
- <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
- <aKx6SlYrj_hiPXBB@kernel.org>
- <f8140a17-c4ec-489b-b314-d45abe48bf36@redhat.com>
- <aKyMfvWe8JetkbRL@kernel.org>
- <dbd2ec55-0e7f-407a-a8bd-e1ac83ac2a0a@redhat.com>
- <aKyWIriZ1bmnIrBW@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <aKyWIriZ1bmnIrBW@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B370:EE_|DS7PR12MB8231:EE_
+X-MS-Office365-Filtering-Correlation-Id: e93be029-53e9-4800-4267-08dde420c537
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VjZMcThqWlhEamc0ajY5NFN4cHo4dlB3cnVjSjh4NnJZMHVteGd3Y0lHaW9Q?=
+ =?utf-8?B?VlVvc3MvcHlvV0dRQ1RpU3F5ZWlnbXY1NnBjUnR3Z1ZpMC9uSmZoaTcrS3hD?=
+ =?utf-8?B?NGVueWRFMjhJU3RoMk0yVm9FRjc3QU9xL3F5M2VESDlzeTRDc0VEc2VSNjFG?=
+ =?utf-8?B?MC9qSTFua1piYzlOcTJyTDdCWnpnMExVWXZTcWxyRlFmNzdHT0NTRWl5RzVZ?=
+ =?utf-8?B?RGZ0Q3FHL0NGY1F3cEdjczB0ZENKZTdDbFNvdzFjSTl3aUlZV2Vhay9zQ3Ay?=
+ =?utf-8?B?cC8zMytCWDNDYzQ4WHN1OWYxYWlZYW45eTVCbXpWUnFTdXNrVGJPTHluWlRE?=
+ =?utf-8?B?VmlBemd4Z1pUZWo5WmdRbENaRnJhYlVkd3FDTFRiOEwwb2NOYmdMb2YvWVFq?=
+ =?utf-8?B?Tnp3MVZKVTlZZlV0WXBaTzZwU1dLa21tNUZ2dExNUnBUT24vZlI0aFNGREhJ?=
+ =?utf-8?B?c3pMRUp4amZBZldHWFhXaXFSN0o5cmdKUEJ4ZWpVWWp5UUlzZnBJWmZQQlVJ?=
+ =?utf-8?B?MEhuTXFrS0ZuZkFxYUVUSERHMW05b3Vkd0E0Tlc1RnllT1lzdExWT2NkRjVZ?=
+ =?utf-8?B?bkxkUitnOHQ3YWJyL1l0ejNwTnhMQjZYTzI0MFQwZUw5dUNCWnhGdUU2S0Np?=
+ =?utf-8?B?dkhTMXhNb3QxcEJKenlURmpzS2VsMW1KNzVlMmR1T0t2bWFialVNek5ndjMz?=
+ =?utf-8?B?enl2cmFQaWhNYllDMklnMEtxNEV2ZUtwVG03SUd0dWVHTHFvUnBiTEJjc3ZU?=
+ =?utf-8?B?OWd5VE5yNHJxL3BZcllic3R5YURkVTRjMUpncUw3dDRqemNaWjFCazk5WGkw?=
+ =?utf-8?B?NVlpTzBZcld4eWduUnk1WS9PRHpxUnRHMmE3MkF2ZVRWZExCU1kvcFdzWWJE?=
+ =?utf-8?B?cElTZDVMeUhtZjlKOUhXUWl0cUxuWHZnTW9NM2FTZTczMEErUlByeFd1MGNk?=
+ =?utf-8?B?WE5IMTh1VlI3bFNrclhCT1dlR3VGSjBlTlpwQmhUSlNtaDMva0dKUE9INEYy?=
+ =?utf-8?B?VTVidnFpRE1XMnhqeWxDcFJieWVoLzVVU0d3L1ArMHlNSnJCTmVXRGpJVXFZ?=
+ =?utf-8?B?Q3FxS2h3emFDaEx4bzhvNW1pZ3RIVGJxdklLV1J2dWpYdkhnQUhUQitOOTJw?=
+ =?utf-8?B?SkcxMUNLMEFPWDF3bHlwQURoNlpOQ0F6OERMMzlJTXV4VFk1ZVhFVEhBRW5a?=
+ =?utf-8?B?MEJwWmg5U0t6RTI4RmZBODdSTkpvMnZtcGg4TGk1L2hNM1JEdEtHbDJjcVFS?=
+ =?utf-8?B?Slc0VUEwYm5vdkhoSzFjcXVUWjRhUE9Gd0JUV1p3UFVtRjFzUDJ6YVhZWHNR?=
+ =?utf-8?B?UkRZY3VwS3hxdERNalJoUXUyNHo3YkJ0ZEZLZHJUYWtjWEtzNWFwY1ljMWw4?=
+ =?utf-8?B?R3I5bnltZFFxRXh3cGNsYmsrUmYyL2cwRkxuM0FJVXgzMWxxd3hhRVZXSHV3?=
+ =?utf-8?B?eEtIc1lUc1BmZFVHWDVFdEtNdzJ1QzA2L3pLVmkvS2N0Tm1DT3R1NkhMVGJ1?=
+ =?utf-8?B?OTBHY2cyMGpLRkNreWhyd0VINEpyVWUvZHc0VkJvd1Z1cXhsL3lhK3RtQjZ6?=
+ =?utf-8?B?TFNlaTVVKzA5YWpOZHh3RjdxQ1dzUWgyZjg2Q0NKQ3luSkFYMlVvQW1wVzQw?=
+ =?utf-8?B?TEEvK1J2a2JKb0QvY3pTSFkzczIxakZRV29iMFhWVk5FYmFiQTM3VFdZNks1?=
+ =?utf-8?B?VDNKL2VVZVVpbEV6MXAveWY0N3NNWkpoNWMwanptVzVqVDR1RVlpb2hUNUto?=
+ =?utf-8?B?T2tmc0swcTM3bFM3SmhFRzE1WE1MOHlBMzZVQm5aV29MUFJpNmpodVdnRTNT?=
+ =?utf-8?B?eWVZaGJYSG5oS0psQ0FhVHZyeHRBbnk5MnFjOWhwNGxLRk5WeUN4UUFtWEc5?=
+ =?utf-8?B?S2ZwR3A1WXJSTVNSTDJTNk5FN1JmSjl4cGZTQVFFSFBzZ3VkRzhBZ2Rxa0kw?=
+ =?utf-8?B?eTJxaHI2c05TUG1kdVJQOTZwNDRUUUtpVVF6SmpTWG1iOUVzbGtBcmQ3Szdk?=
+ =?utf-8?B?TU15ckdqc3g1L1orUE01aWQ0aDRnYmJ0NGtQYTNqK2xhd21CMHVySnFQOXVr?=
+ =?utf-8?B?U1prVWZ1YkFMUGNTZTc5K0dHN1ViZ1ZYRmpDZz09?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:45:55.4876
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e93be029-53e9-4800-4267-08dde420c537
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B370.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8231
 
-On 25.08.25 18:58, Mike Rapoport wrote:
-> On Mon, Aug 25, 2025 at 06:23:48PM +0200, David Hildenbrand wrote:
->>
->> I don't quite understand the interaction with PG_Reserved and why anybody
->> using this function should care.
->>
->> So maybe you can rephrase in a way that is easier to digest, and rather
->> focuses on what callers of this function are supposed to do vs. have the
->> liberty of not doing?
-> 
-> How about
->   
-> diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-> index b96746376e17..fcda8481de9a 100644
-> --- a/include/linux/memblock.h
-> +++ b/include/linux/memblock.h
-> @@ -40,8 +40,9 @@ extern unsigned long long max_possible_pfn;
->    * via a driver, and never indicated in the firmware-provided memory map as
->    * system RAM. This corresponds to IORESOURCE_SYSRAM_DRIVER_MANAGED in the
->    * kernel resource tree.
-> - * @MEMBLOCK_RSRV_NOINIT: memory region for which struct pages are
-> - * not initialized (only for reserved regions).
-> + * @MEMBLOCK_RSRV_NOINIT: reserved memory region for which struct pages are not
-> + * fully initialized. Users of this flag are responsible to properly initialize
-> + * struct pages of this region
->    * @MEMBLOCK_RSRV_KERN: memory region that is reserved for kernel use,
->    * either explictitly with memblock_reserve_kern() or via memblock
->    * allocation APIs. All memblock allocations set this flag.
-> diff --git a/mm/memblock.c b/mm/memblock.c
-> index 154f1d73b61f..46b411fb3630 100644
-> --- a/mm/memblock.c
-> +++ b/mm/memblock.c
-> @@ -1091,13 +1091,20 @@ int __init_memblock memblock_clear_nomap(phys_addr_t base, phys_addr_t size)
->   
->   /**
->    * memblock_reserved_mark_noinit - Mark a reserved memory region with flag
-> - * MEMBLOCK_RSRV_NOINIT which results in the struct pages not being initialized
-> - * for this region.
-> + * MEMBLOCK_RSRV_NOINIT
-> + *
->    * @base: the base phys addr of the region
->    * @size: the size of the region
->    *
-> - * struct pages will not be initialized for reserved memory regions marked with
-> - * %MEMBLOCK_RSRV_NOINIT.
-> + * The struct pages for the reserved regions marked %MEMBLOCK_RSRV_NOINIT will
-> + * not be fully initialized to allow the caller optimize their initialization.
-> + *
-> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled, setting this flag
-> + * completely bypasses the initialization of struct pages for such region.
-> + *
-> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled, struct pages in this
-> + * region will be initialized with default values but won't be marked as
-> + * reserved.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Sounds good.
+When a crash is triggered the kernel attempts to shut down SEV-SNP
+using the SNP_SHUTDOWN_EX command. If active SNP VMs are present,
+SNP_SHUTDOWN_EX fails as firmware checks all encryption-capable ASIDs
+to ensure none are in use and that a DF_FLUSH is not required. 
 
-I am surprised regarding "reserved", but I guess that's because we don't 
-end up calling "reserve_bootmem_region()" on these regions in 
-memmap_init_reserved_pages().
+This casues the kdump kernel to boot with IOMMU SNP enforcement still
+enabled and IOMMU completion wait buffers (CWBs), command buffers,
+device tables and event buffer registers remain locked and exclusive
+to the previous kernel. Attempts to allocate and use new buffers in
+the kdump kernel fail, as the hardware ignores writes to the locked
+MMIO registers (per AMD IOMMU spec Section 2.12.2.1).
 
+As a result, the kdump kernel cannot initialize the IOMMU or enable IRQ
+remapping which is required for proper operation.
+
+This results in repeated "Completion-Wait loop timed out" errors and a
+second kernel panic: "Kernel panic - not syncing: timer doesn't work
+through Interrupt-remapped IO-APIC"
+
+The list of MMIO registers locked and which ignore writes after failed
+SNP shutdown are mentioned in the AMD IOMMU specifications below:
+
+Section 2.12.2.1.
+https://docs.amd.com/v/u/en-US/48882_3.10_PUB
+
+Instead of allocating new buffers, re-use the previous kernel’s pages
+for completion wait buffers, command buffers, event buffers and device
+tables and operate with the already enabled SNP configuration and
+existing data structures.
+
+This approach is now used for kdump boot regardless of whether SNP is
+enabled during kdump.
+
+The patch-series enables successful crashkernel/kdump operation on SNP
+hosts even when SNP_SHUTDOWN_EX fails.
+
+v6:
+- Fix commit logs and inline comments.
+- Add Reviewed-by tags.
+
+v5:
+- Fix sparse build warnings, use (__force void *) for
+  fixing cast return of (void __iomem *) to (void *) from ioremap_encrypted()
+  in iommu_memremap().
+- Add Tested-by tags.
+
+v4:
+- Fix commit logs.
+- Explicitly call ioremap_encrypted() if SME is enabled and memremap()
+otherwise if SME is not enabled in iommu_memremap().
+- Rename remap_cwwb_sem() to remap_or_alloc_cwwb_sem().
+- Fix inline comments.
+- Skip both SEV and SNP INIT for kdump boot.
+- Add a BUG_ON() if reuse_device_table() fails in case of SNP enabled.
+- Drop "Fixes:" tag as this patch-series enables host kdump for SNP.
+
+v3:
+- Moving to AMD IOMMU driver fix so that there is no need to do SNP_DECOMMISSION
+during panic() and kdump kernel boot will be more agnostic to 
+whether or not SNP_SHUTDOWN is done properly (or even done at all),
+i.e., even with active SNP guests. Fixing crashkernel/kdump boot with IOMMU SNP/RMP
+enforcement still enabled prior to kdump boot by reusing the pages of the previous 
+kernel for IOMMU completion wait buffers, command buffer and device table and
+memremap them during kdump boot.
+- Rebased on linux-next.
+- Split the original patch into smaller patches and prepare separate
+patches for adding iommu_memremap() helper and remapping/unmapping of 
+IOMMU buffers for kdump, Reusing device table for kdump and skip the
+enabling of IOMMU buffers for kdump.
+- Add new functions for remapping/unmapping IOMMU buffers and call
+them from alloc_iommu_buffers/free_iommu_buffers in case of kdump boot
+else call the exisiting alloc/free variants of CWB, command and event buffers.
+- Skip SNP INIT in case of kdump boot.
+- The final patch skips enabling IOMMU command buffer and event buffer
+for kdump boot which fixes kdump on SNP host.
+- Add comment that completion wait buffers are only re-used when SNP is
+enabled.
+
+Ashish Kalra (4):
+  iommu/amd: Add support to remap/unmap IOMMU buffers for kdump
+  iommu/amd: Reuse device table for kdump
+  crypto: ccp: Skip SEV and SNP INIT for kdump boot
+  iommu/amd: Skip enabling command/event buffers for kdump
+
+ drivers/crypto/ccp/sev-dev.c        |  10 +
+ drivers/iommu/amd/amd_iommu_types.h |   5 +
+ drivers/iommu/amd/init.c            | 284 +++++++++++++++++++---------
+ drivers/iommu/amd/iommu.c           |   2 +-
+ 4 files changed, 209 insertions(+), 92 deletions(-)
 
 -- 
-Cheers
-
-David / dhildenb
+2.34.1
 
