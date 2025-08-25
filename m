@@ -1,287 +1,231 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E0A25949A;
-	Mon, 25 Aug 2025 18:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756145554; cv=fail; b=JDXMbMDZMvFvPBf5x6X+plpY6bMUm5ojg2fdoQWnEJVwARpI4GVT81rRY/Pzorcf0dzPbV/rMIlPlzMOioZ6yeXkyamPMfFKBrsb7otjYgVz928jxDhwUVevy4aKxuUJM4exP+G00h9ooABManPf5EdlDf3wsCbI5TBtUgGI4S8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756145554; c=relaxed/simple;
-	bh=4Zyj6S4yJTSrDRu2FP8ykglFXirBg/ppB1oTY8mpLeE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gZPs/gLtOMycAmCaOSgL6Xt/g2NOI1TglzDKpd14grLL0K02oI8MyKkqp3xS0izoQwasYMjzAeOiQH/ICNjkcCTTIIZ6cjQ6SZHI2xE0J8vsnP2ewV1Se2FYPhf6clp6FcdYsRk1y/pUO1b0bd161UB1bAwWLLWtOAMKhB6Mz7A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bnO7jqau; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FA2301029
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Aug 2025 18:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756146758; cv=none; b=gDsChCPerl0sZYTKFJOY7WMJQD/V50YSvkbmiUZkyv/mpHnN8IJirpVfCK2OZv7AP0/2sGOrAx7z5TlI+ChzrUFxPWCZ0/Fjen78mKJ4Q39KcasCu+snWIA8kbMp7tJ2b9zpSDkcg83hQHqPclZ+ApFx7FoRcryOUPhulb6hocI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756146758; c=relaxed/simple;
+	bh=5gSbG4LawMNJ/PWjEAWfSVGPawomJWAQkNEyrTBhXtk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GVpEB4do+ab2TQLZyk7xO3nm4ouJxgTMptGWAX8KV047hMstxuyoPP85jiTRXFFLi3TOa0EyF5rqEAgT+TBdMiy2XbaqL0FMTAAcdoaeqzcsajbaDixOoHXbiCgcJ2HaffhCQKO0n5iOPpRUghEeYlvFEX91SFO4pJ0sSY+MP0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RhYXThG3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bnO7jqau"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756145552; x=1787681552;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=4Zyj6S4yJTSrDRu2FP8ykglFXirBg/ppB1oTY8mpLeE=;
-  b=bnO7jqau6z7zkGkBWfqiHuV42ZjXJctVl4pk20IKIgQUskIFXlBw/Fvm
-   rT8CX88WK2hZIKpBrghrESGWRKmp8bG5R7YpZiJWe57vKVJYHsXj8KFv9
-   0IIQZxnDDVxSoJohoqhupezChC8MUl4YyXItyJS41F9pecxdMEY8Bz+2r
-   AnE6THoZaD7F3+II1395hsfRXGvDkd62yT6Oe6artuJmTBSAYoLj51biw
-   rLnRUFfSA4bWuZ5tRWoXhtPFwhBoe1sdTnIGb85jDhTPvBPryPhf1yuI9
-   H3xoHXLBpj32ChxNOYQR6/YKWAq9pHyRvqhfcXpmOgoV4jFbonDkcD7p/
-   g==;
-X-CSE-ConnectionGUID: 5mpG5dQmRua6mD6ZpkKDsw==
-X-CSE-MsgGUID: chXlfY2bSd6/2tuFdTsWvA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="58467553"
-X-IronPort-AV: E=Sophos;i="6.18,213,1751266800"; 
-   d="scan'208";a="58467553"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 11:12:31 -0700
-X-CSE-ConnectionGUID: mDz/Vm+lQUqZj8g8VwOFhA==
-X-CSE-MsgGUID: 8YjCdpxPSzOF9ax2YLx6pQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,213,1751266800"; 
-   d="scan'208";a="200254149"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 11:12:30 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 11:12:30 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 11:12:30 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.75)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 11:12:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OLIj5hRyMNkENifJnwefpvyfSq/KVSKWcmuzpA85kYPjsm+RUozI/xT6fEIePF2x4W9ttEGamawFHBUiMUchbYS05wc42ce++pk7ppEhlkTzBdE0ZK83caHO0QE626pHUvJAIzWIzVYQWIujD8X/Z8yjOxpLqB7Ici42m+VgBzf9CaHju9NSOn6ujYX/i5zfEib0HJn1VNKmaoqUVPwM0h8nzvpD5xzy/1sC9XBx44YEpqwOJW0eGsviL1Nae8G1BKzTmfRXokJBP3uJiJT7w+WDbggdw//Y/epjAVNkrMG9TeG+NYupcuhfnuYo88CpTfGDARKv1xSioviFBKUcKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mz4I9EJ/5OrrYdnRzLgbMsjuGlrAARIfXbsbsSnpMgM=;
- b=eXpAppjFw7Xq7yxZTmUVPCvzy4ToxrN/2wcz0Y6mlb5lbVcLww6oK3klHwQTyzvOoqCwypnvfH+i+HQdghcnzLsJYyENGIckCSyCvP0lvf+T+7HsAYvlUOSviLPFrprkeFbRjLrottFcxGXRVo69/+/y/42ehqENm/i3soZz0f+H06sWKZ7FzSy20K5uA19zIRmK8GPTaXAg8DGorqpnIuaLIyQokSFAYCN2iRg0TDWpcvQ/NcqKa1KIu2S0iLbREBjzMLWAAIDCFbfiCjeQdO5cMahLzOsWscy929hw1HNfq9c9KKq1ytonj5oynYW2DPwJ6w4dU0Fu78QiG7Xehw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH7PR11MB8121.namprd11.prod.outlook.com (2603:10b6:510:234::14)
- by SA1PR11MB8811.namprd11.prod.outlook.com (2603:10b6:806:467::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Mon, 25 Aug
- 2025 18:12:19 +0000
-Received: from PH7PR11MB8121.namprd11.prod.outlook.com
- ([fe80::ec4e:64cf:cf1f:daab]) by PH7PR11MB8121.namprd11.prod.outlook.com
- ([fe80::ec4e:64cf:cf1f:daab%7]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
- 18:12:19 +0000
-From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Nhat Pham <nphamcs@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "yosry.ahmed@linux.dev"
-	<yosry.ahmed@linux.dev>, "chengming.zhou@linux.dev"
-	<chengming.zhou@linux.dev>, "usamaarif642@gmail.com"
-	<usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com"
-	<ying.huang@linux.alibaba.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "senozhatsky@chromium.org"
-	<senozhatsky@chromium.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org"
-	<ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C"
-	<kristen.c.accardi@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
-	<vinodh.gopal@intel.com>, "Sridhar, Kanchana P"
-	<kanchana.p.sridhar@intel.com>
-Subject: RE: [PATCH v11 00/24] zswap compression batching with optimized
- iaa_crypto driver
-Thread-Topic: [PATCH v11 00/24] zswap compression batching with optimized
- iaa_crypto driver
-Thread-Index: AQHcAp3n35LtSdVMgUSnKQGImY3Y0LRZeWoAgAnL+YCAC+jI8IAD0bOAgADL1oA=
-Date: Mon, 25 Aug 2025 18:12:19 +0000
-Message-ID: <PH7PR11MB812163C97D4C533F0302FA20C93EA@PH7PR11MB8121.namprd11.prod.outlook.com>
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
- <CAKEwX=Pj30Zymib2fEoDW9UyD1vAwxRKO3p28RPtK9DZWAdv8w@mail.gmail.com>
- <aJ7FSUdvxtZyiHBq@gondor.apana.org.au>
- <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
- <aKv28XTvAITuq-p8@gondor.apana.org.au>
-In-Reply-To: <aKv28XTvAITuq-p8@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8121:EE_|SA1PR11MB8811:EE_
-x-ms-office365-filtering-correlation-id: 02ddd78b-30cd-4493-924a-08dde402ee5b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?gmYonN21m9CGAOGU1jRz3OLPqE0XxqvezMSlzSZP5iwHDrKrTotPrbTVv8V0?=
- =?us-ascii?Q?RejdAVYmCCMn50ZS32CgAtgXvpiDOKFTFxNQcUE1qwyxyndOJKAbZcA1/GNJ?=
- =?us-ascii?Q?z4rg12G9PGCrSqb98xqdSOWr2Q0jmFWTfri3A/bmokjoMRnnFckWntAonB9H?=
- =?us-ascii?Q?I1i7I9syvpQRG3sqvTaYihcrq+pD257opGzeE+6td033vRF5d4bF+Enq0C5N?=
- =?us-ascii?Q?t4K/LFy2Y2mM7k82yah1SxRAX0zpxBlXsNaLSmNNLnMajo49/rOgT+hfK2Uu?=
- =?us-ascii?Q?NfzajZ0vqDe9KNWc6zgp8BUNewWVDEZrIIUbN6rYlFOcKDVXxQZGckvG8kgW?=
- =?us-ascii?Q?jpK7hgP1TQfvkhhGNm63A9vHJ5wTl46LP2Ze5TN27t9jrBbI4ShZjHpZcEE9?=
- =?us-ascii?Q?broIHH3Ic7XjVzvYEgvuBA2Osd80drjZskZCKYVKu+36EJLcgIoZ82mPrupT?=
- =?us-ascii?Q?zRqamnkoTEA+Xd3Eh+eJAIEQdAibISUmGGxADsQl9ior1ECAFP2Z29jkbUOr?=
- =?us-ascii?Q?ArLe2GKxEzpH3OZWwIfGgBpCiXm5QZK9rnRA1EOi6Mjax/EubphUx8RDMwTJ?=
- =?us-ascii?Q?/MElhzgRjaQGIBz1x3k0PuySGTAz6PRzmVfAMqDe0a13mmVxld80EXecRBNA?=
- =?us-ascii?Q?7fqfKyiz2eQB5hUzqlqaX90ENRuIZNG4o5uk+9+UcY6tJbQe7rGiMB/kKo/V?=
- =?us-ascii?Q?rgJ/vm/IAlNACsXPNgeFF8BDydFSyRG9Zdnm/33Nftx7ycvSNFvTNLasaTlS?=
- =?us-ascii?Q?Hc3ghZt0DEsY2BOg4gJ0litrQ/eo/qanZDC+0zSBQQmkWMyIidvdXO9DuHZa?=
- =?us-ascii?Q?HQVSr+2exth5JROM59JYZ14R+kEF/bluqsnXSpt1EfokP2bQRxg0hsLUGGE6?=
- =?us-ascii?Q?IMpgH0YMQVcyX8wvdR1g8JbihxX4vOzfkOjQivMb1rAeJtJeXKJA4EohM1lp?=
- =?us-ascii?Q?3LIO/xMS97LO/Jr+NG2WyYu3RaAM4HRyrn5Xry14Loe7aBBzLqRkiOdx2Uhb?=
- =?us-ascii?Q?nU6QyVrNvscVBp196q9hxexNhooPRek/V+vi7CFBIX7zn5ofHpmPQ6hmNajx?=
- =?us-ascii?Q?N+JY9hXBuAMJ/5wlfiQ9codXMpAd8HpXdfAs8f/YkiMDAMr0VE66zhzq1RXd?=
- =?us-ascii?Q?vJiCSaQmEz5AGjeTpJmwbJdCnA7LN4G0TbYF/tYg9OWfOrm03XBMaPTpd9fP?=
- =?us-ascii?Q?kkd3gBS/fceVxUOLfnbVjdBwd0FdIBVVFBhu4/S7/zH7+e+gUiROF+HiLLmI?=
- =?us-ascii?Q?vHAv+EWS9iDbPo9wKTnFNt6TCQq1IRpmUq0SaWFKHONMoJlvVBFE87sgWfAR?=
- =?us-ascii?Q?NtPO7iK0EgyRXYAm97roZQBpO3i6GfpZNIr2WAmHWnvr8OqzooCZOj70PbNp?=
- =?us-ascii?Q?6WL7IOU9s4soBAvOzeW7jon19FQ/k3XL1d4O18crbwhPdiZ1n4eKX2GfSwhb?=
- =?us-ascii?Q?7V6+DEEnbt0=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8121.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oqCsUcF5x5RTKVJaalSj0hMQZrrNcPrUZeZbz6LfPxWbTnvgP7t+PjnHrLxi?=
- =?us-ascii?Q?UHum5GweLlL2XVS+SU8bZgLse3AB/V0K57p3drHPrNx389RKe/u8VVJbc94z?=
- =?us-ascii?Q?gLNXXDYhl6tfqllaXBMn8W6+a8JcWcBF2gPzzOUxUYPKXbXYrZVAIkjf8Wml?=
- =?us-ascii?Q?GTffXLQYpy3Znmvr2Zz7c3NjHQQ/WxOwEm0jpGrO7c4RqeeDcZJouEyVZWJr?=
- =?us-ascii?Q?XGr1xAhIh2a9K6iLBRRW6hJoquYXioBlxzXf+QNjyJQmnBgGbnk2R7lXP17s?=
- =?us-ascii?Q?C7cbCDGhQXr64BgtYOJNFfzr1aizs7paPL/RfTWXCTJEeonrtwLKjQdRtMOb?=
- =?us-ascii?Q?p1oL7XpNEh9f8Ejsx0+yVWEnuNYBwVgiMFKlgxRsiaAbVXiO9AA2Ff1bAY7V?=
- =?us-ascii?Q?52Inyr6q2p2Ij+5nHQYOmnM/p48N4Jj9lZxgDnqBraKgKj+bhrvw171+YNjY?=
- =?us-ascii?Q?UACgZyWxgihE1VkkbKx8YHvjfkqbBpgjE/uRvboyslxKW1zo5RaPeVavDOyW?=
- =?us-ascii?Q?4Kzbpy/0+jx1KDTQcTuVKh4UOxhBpoLkXg3KOd529yF0Wp7c5nnjcOcMVdtD?=
- =?us-ascii?Q?kSE3WkoozUgzxdigKbf2UUWLOebN82sqRK+bZAXx33ZC2ndMcnGWQaUB4hA/?=
- =?us-ascii?Q?NuN/m5u5RjEHz4VJihJvv8dk77TdlPLkJDKN/2y3spuBsjPuepNek5Mf7awG?=
- =?us-ascii?Q?zUHpfpC0AgifHyBDpVqeI92/j6ArYibhhPY4j5KwQ8bgXNDeB/yPIWDWg/qo?=
- =?us-ascii?Q?GUcmdm2HL3oaS2dd/eQBQGFAhPfSjBx+gW0w1vhsqNzST48ZfHYHiEWUFxkK?=
- =?us-ascii?Q?PtR89rFWRh50rNnQNcWScanGE5uvfmyY2GrhQwp6bNA8wyGtI5Lqmc0QeItX?=
- =?us-ascii?Q?Qlz+SaLpXbvqcldjPLDRMaAdpQdWJLNLs5pv3F3UZpzqVS7OQQGZsNKyrmMR?=
- =?us-ascii?Q?cum9VNXl13tdWvZz/W41ZQnxpDM1afBHK06TgdjyASG57xJDvx3E1a+xXkp7?=
- =?us-ascii?Q?GNRGgHb1ot+WF/wgXpBoOlGg+XehhCZysQ3YPIS5uhYqDZr0TabQD6hcno+r?=
- =?us-ascii?Q?oVKTkfBc3EsXbm+CB9HkOubDS0AMSRMOdMKL7/pEJJtwmn7ZXZGWGpzdJUTZ?=
- =?us-ascii?Q?lzL9J/W/KeGuc5OFAZGRqeGL0Tr0l9XudxIYbtoIuytYGvVgSTxqc+PFEsIZ?=
- =?us-ascii?Q?qy/gYl+LvHZ3oKIE22Lm0OX5Yvp4AV7l2F/LRvzM7oHdQWr6/HdWdtIXcwdM?=
- =?us-ascii?Q?0JUbu4UIKvJkNt/H4jwFPVmZbbM1WENs4lrYUyADofRdvDQEf5dEuY5nOCDW?=
- =?us-ascii?Q?MHSf5hvPUmCsqtOoRPMxaejJG5T3zPG/hmAHfuLBTDpn0a8OIwI6Vv1uwJwN?=
- =?us-ascii?Q?I0yhbt298xEP8LnnEiuqqz1ww6rtVqrVqVPIi0L7KBBi2F1ly7L8qU8cQKt4?=
- =?us-ascii?Q?H6Vxu3y4T4kXktrARNy/YRkqZ6CQtIuh4RPPjGJ6rXpAv/R9TztIE1H4hUps?=
- =?us-ascii?Q?iwE2IxiiGNtjxyXnGot5Sn4EFuFaK4irXBkDQYo9cpHoBkg/grfT6EqAttE5?=
- =?us-ascii?Q?EG9cbIHeKGRLGIbtYG2Og6KLrY8r/B4stVupkhEUOV7Lg7P2eKAzH1aA4m8Z?=
- =?us-ascii?Q?TQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhYXThG3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756146755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
+	b=RhYXThG3+tIFnfqzLIr9RPKxUxwraFl7lO2IPNcEbTyPNdKbVpERSCLZuCs+WhDSSPQMox
+	8AF8QwnYsxJ1QrHDYmS40C5kdt7ZdyEuAeCyVZfTk/DGGnAgMs5zVwdFTws8tKK4Jgeq82
+	8aePnOuj3pRFAfo75YAYdTeDDGMLxcE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-SInFAoZ1Mleh6Ar40fsByQ-1; Mon, 25 Aug 2025 14:32:33 -0400
+X-MC-Unique: SInFAoZ1Mleh6Ar40fsByQ-1
+X-Mimecast-MFC-AGG-ID: SInFAoZ1Mleh6Ar40fsByQ_1756146752
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1b05d251so26422305e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Aug 2025 11:32:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756146752; x=1756751552;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
+        b=ppO6EF7k7D3Xph7F+1Y8HLjTI125yKXIPpDcKCq24mXb7HkUWRbKkbSdg0XKe4THzv
+         FBG5Zv0b3773rqMWzXSqdrZonjm454IzoDiBGJClt8QsOPhVxIPfwnmIVCOWz9mABOlm
+         eGmwVdJsYR0oPSO80qDF3WIU9GrYzJ8FWNgZmHCJ+X/yIDTPa3x2pbo6p7JcllD2gdGe
+         27djeyjSFzCbk1yjzme4wIACfi5K2dMDk6v931bK74yDF+8f1Hb/NAbGTRyKEZzWJ4j0
+         i11uc/Elvtmp6ef5jyMM7ZwBVM0AtzwrkHl2+pkw5AH1kNDN81hZT8rehp9EvZOqp8Sj
+         eCqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVDZi5VY0LAksD0v/+/cFUQdL/0lxdvYp60uXMIK7SdfNV70o35V/RVvAkvb0SYVhxQcqkVkGDKF3fLer4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJjIh6hccCkO5RbNQJMTWU2ASG4tRcQRbTpCu4uzfbcn+cO8t4
+	4TDpOqFR0BImaI/k0iCacyrA8CHGSZbNHGAy4vfCBwhdK4ZoSw4nV5C1GRxgCIL8HRek1mKIl/H
+	ZpQJ1Vp1dfL1+57V13UtakZLtmb18jT0s4n+PoXns++/i5F4YVPbEagH1XNsMqqXBWg==
+X-Gm-Gg: ASbGncsB06oZMpgCBbK85Jqu/6+gySQuBKluPa66mm1sm0U0aJ31nld5+zgmQSkfw2B
+	PBadLHYqpOLoOy7hgqbwjckgLO5q5d7Wd1pcATgFaWswtyprZo7U1vAaz2OQyMdbCF4RpTZsn0T
+	6TKvruIVv2d8LaXfZsx+SeS8f+KdjwPa9k8gW+WjZkm5Zixz5nbaUYj7LeMQNXLTXHS+/+gloHm
+	5jdsj+tHRepHT+kOSNOZf2ou0QEJrs1AaqPW2hp1u1BhdgjdWUOLty7SwT3qGmdLwdaG68y7upj
+	yHzbSBKTuSpl88kTPExdyRtaiV9bn3TAdxUXI7OusHOw1qkrj/we7O4Sb/z+cBmwEXR8s0dzT6k
+	VWH/mpiwc53d6vBVY2KDUyjTmRdFiAA92Q0xjPY/iF+K/NzRWWsXF0L+A5LsmUZzTc0U=
+X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710435e9.18.1756146752213;
+        Mon, 25 Aug 2025 11:32:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxuQzAylX90vNEmmjxyPSaWFpv8tCbOTWCm8WazHqaDOnMAPM4HK8CKvM3oYkR/BEIZaOMIA==
+X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710235e9.18.1756146751795;
+        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76? (p200300d82f4f130042f198e5ddf83a76.dip0.t-ipconnect.de. [2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c7119c4200sm12481975f8f.53.2025.08.25.11.32.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
+Message-ID: <7ffd0abd-27a1-40a8-b538-9a01e21abb29@redhat.com>
+Date: Mon, 25 Aug 2025 20:32:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8121.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02ddd78b-30cd-4493-924a-08dde402ee5b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2025 18:12:19.6073
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oOEeH7QMHgd4SvpWEsahAAuzAdWMNFY3Mx5x+NaV5ZsIxF/WUzHJM0n0kw5qpZzVETd7RQfoHGnM2WrseYM/p/ee7vpTYdiYDL/Ptgml9MI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8811
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: update kernel-doc for MEMBLOCK_RSRV_NOINIT
+To: Mike Rapoport <rppt@kernel.org>
+Cc: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>,
+ linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
+ <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
+ <aKmDBobyvEX7ZUWL@kernel.org>
+ <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
+ <aKxz9HLQTflFNYEu@kernel.org>
+ <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
+ <aKx6SlYrj_hiPXBB@kernel.org>
+ <f8140a17-c4ec-489b-b314-d45abe48bf36@redhat.com>
+ <aKyMfvWe8JetkbRL@kernel.org>
+ <dbd2ec55-0e7f-407a-a8bd-e1ac83ac2a0a@redhat.com>
+ <aKyWIriZ1bmnIrBW@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aKyWIriZ1bmnIrBW@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 25.08.25 18:58, Mike Rapoport wrote:
+> On Mon, Aug 25, 2025 at 06:23:48PM +0200, David Hildenbrand wrote:
+>>
+>> I don't quite understand the interaction with PG_Reserved and why anybody
+>> using this function should care.
+>>
+>> So maybe you can rephrase in a way that is easier to digest, and rather
+>> focuses on what callers of this function are supposed to do vs. have the
+>> liberty of not doing?
+> 
+> How about
+>   
+> diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> index b96746376e17..fcda8481de9a 100644
+> --- a/include/linux/memblock.h
+> +++ b/include/linux/memblock.h
+> @@ -40,8 +40,9 @@ extern unsigned long long max_possible_pfn;
+>    * via a driver, and never indicated in the firmware-provided memory map as
+>    * system RAM. This corresponds to IORESOURCE_SYSRAM_DRIVER_MANAGED in the
+>    * kernel resource tree.
+> - * @MEMBLOCK_RSRV_NOINIT: memory region for which struct pages are
+> - * not initialized (only for reserved regions).
+> + * @MEMBLOCK_RSRV_NOINIT: reserved memory region for which struct pages are not
+> + * fully initialized. Users of this flag are responsible to properly initialize
+> + * struct pages of this region
+>    * @MEMBLOCK_RSRV_KERN: memory region that is reserved for kernel use,
+>    * either explictitly with memblock_reserve_kern() or via memblock
+>    * allocation APIs. All memblock allocations set this flag.
+> diff --git a/mm/memblock.c b/mm/memblock.c
+> index 154f1d73b61f..46b411fb3630 100644
+> --- a/mm/memblock.c
+> +++ b/mm/memblock.c
+> @@ -1091,13 +1091,20 @@ int __init_memblock memblock_clear_nomap(phys_addr_t base, phys_addr_t size)
+>   
+>   /**
+>    * memblock_reserved_mark_noinit - Mark a reserved memory region with flag
+> - * MEMBLOCK_RSRV_NOINIT which results in the struct pages not being initialized
+> - * for this region.
+> + * MEMBLOCK_RSRV_NOINIT
+> + *
+>    * @base: the base phys addr of the region
+>    * @size: the size of the region
+>    *
+> - * struct pages will not be initialized for reserved memory regions marked with
+> - * %MEMBLOCK_RSRV_NOINIT.
+> + * The struct pages for the reserved regions marked %MEMBLOCK_RSRV_NOINIT will
+> + * not be fully initialized to allow the caller optimize their initialization.
+> + *
+> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled, setting this flag
+> + * completely bypasses the initialization of struct pages for such region.
+> + *
+> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled, struct pages in this
+> + * region will be initialized with default values but won't be marked as
+> + * reserved.
+
+Sounds good.
+
+I am surprised regarding "reserved", but I guess that's because we don't 
+end up calling "reserve_bootmem_region()" on these regions in 
+memmap_init_reserved_pages().
 
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Sunday, August 24, 2025 10:39 PM
-> To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> Cc: Nhat Pham <nphamcs@gmail.com>; linux-kernel@vger.kernel.org; linux-
-> mm@kvack.org; hannes@cmpxchg.org; yosry.ahmed@linux.dev;
-> chengming.zhou@linux.dev; usamaarif642@gmail.com;
-> ryan.roberts@arm.com; 21cnbao@gmail.com;
-> ying.huang@linux.alibaba.com; akpm@linux-foundation.org;
-> senozhatsky@chromium.org; linux-crypto@vger.kernel.org;
-> davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
-> ebiggers@google.com; surenb@google.com; Accardi, Kristen C
-> <kristen.c.accardi@intel.com>; Gomes, Vinicius <vinicius.gomes@intel.com>=
-;
-> Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> <vinodh.gopal@intel.com>
-> Subject: Re: [PATCH v11 00/24] zswap compression batching with optimized
-> iaa_crypto driver
->=20
-> On Fri, Aug 22, 2025 at 07:26:34PM +0000, Sridhar, Kanchana P wrote:
-> >
-> > 1) The zswap per-CPU acomp_ctx has two sg_tables added, one each for
-> >    inputs/outputs, with nents set to the pool->compr_batch_size (1 for
-> software
-> >    compressors). This per-CPU data incurs additional memory overhead pe=
-r-
-> CPU,
-> >    however this is memory that will anyway be allocated on the stack in
-> >    zswap_compress(); and less memory overhead than the latter because w=
-e
-> know
-> >    exactly how many sg_table scatterlists to allocate for the given poo=
-l
-> >    (assuming we don't kmalloc in zswap_compress()). I will make sure to
-> quantify
-> >    the overhead in v12's commit logs.
->=20
-> There is no need for any SG lists for the source.  The folio should
-> be submitted as the source.
->=20
-> So only the destination requires an SG list.
->=20
-> > 6) "For the source, nothing needs to be done because the folio could be
-> passed
-> >    in as is.". As far as I know, this cannot be accomplished without
-> >    modifications to the crypto API for software compressors, because
-> compressed
-> >    buffers need to be stored in the zswap/zram zs_pools at PAGE_SIZE
-> >    granularity.
->=20
-> Sure.  But all it needs is one central fallback path in the acompress
-> API.  I can do this for you.
+-- 
+Cheers
 
-Thanks Herbert, for reviewing the approach. IIUC, we should follow
-these constraints:
+David / dhildenb
 
-1) The folio should be submitted as the source.
-
-2) For the destination, construct an SG list for them and pass that in.
-    The rule should be that the SG list must contain a sufficient number
-    of pages for the compression output based on the given unit size
-    (PAGE_SIZE for zswap).
-
-For PMD folios, there would be 512 compression outputs. In this case,
-would we need to pass in an SG list that can contain 512 compression
-outputs after calling the acompress API once?
-
-If so, this might not be feasible for zswap since there are only "batch-siz=
-e"
-number of pre-allocated per-CPU output buffers, where "batch_size" is the
-max number of pages that can be compressed in one call to the algorithm
-(1 for software compressors). Hence, gathering all 512 compression outputs
-may not be possible in a single invocation to crypto_acomp_compress().
-
-Is the suggestion to allocate 512 per-CPU output buffers to overcome
-this? This could be memory-wise very expensive. Please let me know if
-I am missing something.
-
-Thanks for offering to make the necessary changes to the acompress API.
-Hoping we can sync on the approach!
-
-Best regards,
-Kanchana
-
->=20
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
