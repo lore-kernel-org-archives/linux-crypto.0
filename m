@@ -1,111 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78069268C40;
-	Tue, 26 Aug 2025 13:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C91A2FFDEB;
+	Tue, 26 Aug 2025 13:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756213907; cv=none; b=CWw58cRYt3KhGuBAmyGe0ej5N0Uobsfe9VJ+JbLq3U2uLHuG1Q3NcYFItyxKKEZvKjBEPCIpMMaTPK6S7X5MmRr1dV4cEEt9emRUHdJHAOPeCULy4mJCGAe2OLQA6OfTsNjMkbyKg9fNaXYsdXSh3VsLrL0Zo3aNmkFi8Brb0RY=
+	t=1756216278; cv=none; b=M0IMAvxctzFhu8NItdC58hNpv8+RGk1xed1xS87GPGj1eRLkTwOJtQmpUrPEqkUYm97qerG8vnGkv4+nEX4lINBkAg0Fuf8Zk3GY3iSmtIL7fg+aVnSCSqqDAyMEXW5HW5TNqwIPK5pDGZV0BlLXcZ1RjUTIHeXul5xgmwWVE40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756213907; c=relaxed/simple;
-	bh=r4P1fcbNrMFnG8T5p3u4dMJamruaFASdwNbmXce96jM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6grDa1aR3QZkWBsvSGDnCL7tfbQP8dhNLUDMb19LemWKdTEjBOq72cfFmZR1Mqs8Md/zjPHgK1/8DF15lB16+tyS2LPhRkmihg+XFZYtQMXi0jCGNyPerA9Yr8aPY48Shi9z7nQHj5LNSZj0KmrKe10799+LmQmDWo4+TgI2rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C1B82BF2;
-	Tue, 26 Aug 2025 06:11:36 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B7A13F63F;
-	Tue, 26 Aug 2025 06:11:36 -0700 (PDT)
-Date: Tue, 26 Aug 2025 14:11:34 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
- ranges
-Message-ID: <aK2yhtQ0M_0hqQHh@raptor>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-22-david@redhat.com>
- <aK2QZnzS1ErHK5tP@raptor>
- <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
- <aK2wlGYvCaFQXzBm@raptor>
- <ecc599ee-4175-4356-ab66-1d76a75f44f7@redhat.com>
+	s=arc-20240116; t=1756216278; c=relaxed/simple;
+	bh=E+JdUlZSCoxiieHGl3mpSbH/9mo3TqI95VAZ0RUIIHY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VsNmn8MwtlHWuUtXYcGmqUgx5Nt7TPEM/SjeRSY49Elu9qJXDHkA9/TT1towbR71A+w8BhRpVJ7Xrb7V42I3Vf9TCTd3BMYhUr2ydvIrI1pS5pZ1KzWy1TaWa6ZD9Z1XF7rg7WLm6H3yURONy+BvEjAmOKpc0aMUwul6QyAfC38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sc6wMYRh; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sc6wMYRh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D55BC116B1;
+	Tue, 26 Aug 2025 13:51:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756216278;
+	bh=E+JdUlZSCoxiieHGl3mpSbH/9mo3TqI95VAZ0RUIIHY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Sc6wMYRhwe+2yFmHtb/sAK74i+xU1B1QCVabPKnc4HdJUZPUad0EoQHVzV9d8wrko
+	 9DAt558o6l7RIDXP6iXPGhFJXhcemyvrn7gm5c9J88VmLZhyfujInCNedCBn64rWRU
+	 j3zU2uysz2bSSFTj1Zg60hyApBBgvY9hW45zRYYPHG/WA1sBXyf52y0lbV51P9X+n9
+	 abOYZ4+laK94Y7LugwyC3JdwajQGKDUH1rH7PSMzonlrzgR/m6dWJNzwpscCt4N18I
+	 npmbRUem2eIDEMTC7CWqwBMKtcfu6cry855rU1YjlJM4s9nOC5yizxqjUw7hyDCYxC
+	 8mrtLed+qYRAA==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-55f527db6f6so69708e87.2;
+        Tue, 26 Aug 2025 06:51:18 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVvayU37+ZNT7cPmYGE2CliiTUXMWa4lFotuIFeJrznvSBzaWWeGJ+bw8+CsoHNqgACz+BY/OafYeACC63U@vger.kernel.org, AJvYcCWLk9pN2e3LXzv6Q3WUaKDOrbB1JxsTQwKd69X1kKZOu6gCyU8p+a3feMWDFUhpgIgZbFmcDx2BQeESopA=@vger.kernel.org, AJvYcCWss/OtD0niIEsgReoaDjWXn6v1xWFhcVg+A/GvemnD11tJrNyBELp5A55LtETreHGOb8apz8NJrPKxMxmALALb@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFn/LCKuAYZid+2uqS6XaCLnXHnDh9T6Un6KhTBNZqsIP6cTLD
+	YPRJa5ThdLgusGD1SeZHvVxTZYVhGESUme6fK+JGokGAC4A71MnlvPcOo5Js0DspK+s4o041Ht6
+	DGTIabvZ61wCUl75QB2nuIOYVKUBMehk=
+X-Google-Smtp-Source: AGHT+IEyERKJpY0dTTeTMtR+lCc7K9/yDgg91XPe10BR+4CJOA+0bojzARWxfItbUWZV8G72TOeEw7wifxB7E0hNJWU=
+X-Received: by 2002:ac2:51c9:0:b0:55f:445d:e47f with SMTP id
+ 2adb3069b0e04-55f445de605mr2110419e87.45.1756216276581; Tue, 26 Aug 2025
+ 06:51:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ecc599ee-4175-4356-ab66-1d76a75f44f7@redhat.com>
+References: <6895b041.050a0220.7f033.0058.GAE@google.com> <tencent_B406618996EEF22ED6CC8EA7DF46FD92D206@qq.com>
+ <aKBMjQpA9P70EA0z@gondor.apana.org.au>
+In-Reply-To: <aKBMjQpA9P70EA0z@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 26 Aug 2025 15:51:04 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXF4aRL02CKnO5T9kKnvSV=BcMDiD=mDW7CKQx5t_HmaHw@mail.gmail.com>
+X-Gm-Features: Ac12FXxgukB0I0sVPP_wpsET2YYNjVapHKDPsCvg_1qYbfuYo-T1sYScgpJ45do
+Message-ID: <CAMj1kXF4aRL02CKnO5T9kKnvSV=BcMDiD=mDW7CKQx5t_HmaHw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: Prevent kernel-infoleak in rng_recvmsg
+To: Herbert Xu <herbert@gondor.apana.org.au>, linux-hardening@vger.kernel.org, 
+	Kees Cook <kees@kernel.org>
+Cc: Edward Adam Davis <eadavis@qq.com>, syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi David,
+(cc Kees)
 
-On Tue, Aug 26, 2025 at 03:08:08PM +0200, David Hildenbrand wrote:
-> On 26.08.25 15:03, Alexandru Elisei wrote:
-> > Hi David,
-> > 
-> > On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
-> > ..
-> > > > Just so I can better understand the problem being fixed, I guess you can have
-> > > > two consecutive pfns with non-consecutive associated struct page if you have two
-> > > > adjacent memory sections spanning the same physical memory region, is that
-> > > > correct?
-> > > 
-> > > Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
-> > > guaranteed that
-> > > 
-> > > 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
-> > > 
-> > > when we cross memory section boundaries.
-> > > 
-> > > It can be the case for early boot memory if we allocated consecutive areas
-> > > from memblock when allocating the memmap (struct pages) per memory section,
-> > > but it's not guaranteed.
-> > 
-> > Thank you for the explanation, but I'm a bit confused by the last paragraph. I
-> > think what you're saying is that we can also have the reverse problem, where
-> > consecutive struct page * represent non-consecutive pfns, because memmap
-> > allocations happened to return consecutive virtual addresses, is that right?
-> 
-> Exactly, that's something we have to deal with elsewhere [1]. For this code,
-> it's not a problem because we always allocate a contiguous PFN range.
-> 
-> > 
-> > If that's correct, I don't think that's the case for CMA, which deals out
-> > contiguous physical memory. Or were you just trying to explain the other side of
-> > the problem, and I'm just overthinking it?
-> 
-> The latter :)
+On Sat, 16 Aug 2025 at 11:17, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Sat, Aug 09, 2025 at 05:59:43PM +0800, Edward Adam Davis wrote:
+> > Initialize the intermediary array member to 0 to prevent the kernel from
+> > leaking uninitialized data to user space.
+> >
+> > Reported-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=e8bcd7ee3db6cb5cb875
+> > Tested-by: syzbot+e8bcd7ee3db6cb5cb875@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> >  crypto/jitterentropy-kcapi.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> > index c24d4ff2b4a8..9e9e069f55af 100644
+> > --- a/crypto/jitterentropy-kcapi.c
+> > +++ b/crypto/jitterentropy-kcapi.c
+> > @@ -107,7 +107,7 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
+> >  {
+> >       struct shash_desc *hash_state_desc = (struct shash_desc *)hash_state;
+> >       SHASH_DESC_ON_STACK(desc, hash_state_desc->tfm);
+> > -     u8 intermediary[SHA3_256_DIGEST_SIZE];
+> > +     u8 intermediary[SHA3_256_DIGEST_SIZE] = { 0 };
+>
+> This is not a leak! The stack memroy is hashed and fed into the
+> entropy pool.
 
-Ok, sorry for the noise then, and thank you for educating me.
-
-Alex
+Is there still a point to doing this now that the compiler
+zero-initializes automatic variables? Or does that not apply to u8
+arrays? (asking Kees)
