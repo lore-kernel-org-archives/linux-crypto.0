@@ -1,199 +1,107 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2041.outbound.protection.outlook.com [40.107.237.41])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAB01DAC95;
-	Mon, 25 Aug 2025 21:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756158432; cv=fail; b=SyriHHufSN+jPL3zJ3YemlFAkUXQh/EEZ9FsyidEtfa70gQC4ZrKTXRKDhwp5OwIZ+6JLnvwkaSiGzZUOjJjR54ihlcgrvhtpoNVswykUdTOHeoIAmMq411UCw2kAOujOe5VZbZ0H9uNAn4wF6D/oUVkIugQ0II84thyLw+Rsew=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756158432; c=relaxed/simple;
-	bh=jU6ilVy6u8K8SUIYY7ppKZLxuoTh1NpfKfa6E5gkpMw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rf/Q94QlRgbM1kPxuIja340rTnog5oFg+c3l60CQyDxnqV2YGNZduawiEA9uvtACVKIt0Zi1abrSGPbuKElQqmZV9YW0O+h9a+GmoatC3nzcqp/BN8FdKiS+oVRPUY34bR1S7u/n7B2/Fr1S7SxI5H6rNY4DsV+Pfx4D8xm4k/k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DuCKwCRG; arc=fail smtp.client-ip=40.107.237.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E0CEEB3;
+	Tue, 26 Aug 2025 01:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756170840; cv=none; b=Gw4aSk5S+VPG6t1iZjo7qqHi6mVq0PknvYpJ/b5WorjoztWCSSAH9AThQVWbOYHByEGOTVpRXf1A7IZ/JYVmyHA60tSpXMUoWtbpBYlDmEs2ZGlgrsHBWplX+nYnO9Mga7AoFyt6PmwFNKlJLJ2/FgZsucQLnaTAScccYNtTDRQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756170840; c=relaxed/simple;
+	bh=DSnkrlQap2de5NIIN1j1Qu/t9WNnkMruYXQFGkYVJ30=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g7WcffHqWr2hamLGzuB2dnzheR/DgqjQFrkH92zOwc9QrJMJqA4PxddvIg6CIP9iqBJmQ58usSAPg3QYwGfgiKQg9SbbCk/Q6pmdfzhCd7foQ+96u/gYHJqdo1x/Md65IFD6QAnrPVbCpPhw6NJJmgrYWfySDwyv0z5KFMC51WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=T6hjPgwa; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DuCKwCRG"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tApWvmzkYY/+6QYANS4rzR59GuqSGmQiqdIRiEbMtlSUIibk9mRvfHGwpWQeswwJXNaFUs9ZTObPZaCMi3Uy3HKdxDA+iVm12H2Y0V8g9gF0RKgFNP33SUTdVxCYY9DICGVbh/7kaDGoX4ivoy7icIMT/tTW1sRw8zF8LN7r0olC7gwPOdUq6KJNEjwv9kx50Gq02/jDXV5cfKVkQQZwxnwY/eBZ/R88nYDwmJ787uYyDSL0Fw40BiO+RU8cnIu7FElPeXXB3+NXH0J0uBg0PsUe4ncn97sdJ+q+Av5zRzzSPg6YWMdUUhkYsdjx/NFXRVbcsTfgaITRmofd2W8MVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KKYujyeim6mX/Yjhu9jaa3uLsemTTTcDM1y/3XuCPX8=;
- b=prsI8cNU+taQ05DuoAy9U542YiZBgMGdOiECO+nfpd9QE6PSzVzajkS1nJS4XXk+DZoaeBE1cLFuwRHYxhXPeluEbO6mxRAusO2wYpKsEPloOUzmDykoeLQydMxs+LqqDkEPfteHBEaYS2Q8N4hkKMut2UBT9HbOFjNr74rbcLIl4RC6t+kBitBuPa5lP3/MvspfXW8fItr4MVMM59+zeaxK7c1n6uD6SE5qM+0oYakfK32PZZgH4uMufjoZ2zcqw5ESn52ib+PIEMUS9sH/itJprJuKXFB6alfywB8HOwsp0bUVd8bYFkPWsDAvmQ9BVh46wLZGZYYo0T5CCA2bRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=8bytes.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KKYujyeim6mX/Yjhu9jaa3uLsemTTTcDM1y/3XuCPX8=;
- b=DuCKwCRGZGVtxh6t0HuHsq8Yzhj1cZPdlIg+jhiMMkSefGihuQuCyd6+h/1nIHGIlCmLaWsOGegYvShjniayNdBFe3VnVjnQS7TOKa21Qb4b7DdDfIloSx7o6o9U52PvFMGG/s9zwqX05iHoFAb1X3GI0ooE8xk1Qa48bcGozmU=
-Received: from MN2PR05CA0063.namprd05.prod.outlook.com (2603:10b6:208:236::32)
- by DS7PR12MB5886.namprd12.prod.outlook.com (2603:10b6:8:79::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.21; Mon, 25 Aug 2025 21:47:06 +0000
-Received: from BN3PEPF0000B370.namprd21.prod.outlook.com
- (2603:10b6:208:236:cafe::f5) by MN2PR05CA0063.outlook.office365.com
- (2603:10b6:208:236::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.13 via Frontend Transport; Mon,
- 25 Aug 2025 21:47:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B370.mail.protection.outlook.com (10.167.243.167) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.0 via Frontend Transport; Mon, 25 Aug 2025 21:47:06 +0000
-Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
- 2025 16:47:03 -0500
-From: Ashish Kalra <Ashish.Kalra@amd.com>
-To: <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
-	<thomas.lendacky@amd.com>, <Sairaj.ArunKodilkar@amd.com>,
-	<Vasant.Hegde@amd.com>, <herbert@gondor.apana.org.au>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <will@kernel.org>,
-	<robin.murphy@arm.com>, <john.allen@amd.com>, <davem@davemloft.net>,
-	<michael.roth@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-Subject: [PATCH v6 4/4] iommu/amd: Skip enabling command/event buffers for kdump
-Date: Mon, 25 Aug 2025 21:46:53 +0000
-Message-ID: <576445eb4f168b467b0fc789079b650ca7c5b037.1756157913.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1756157913.git.ashish.kalra@amd.com>
-References: <cover.1756157913.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="T6hjPgwa"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=GahGKMyDDWWgzcOoacVh1GqObdQHZAFm0vAPse1Lvgc=; b=T6hjPgwauSAvz2ezFKh/PyMHbd
+	/zvg0/xfZQcNOwdWxylETa7s3AVJSbxho0c2nTbmk34LaHMzeXj+1mldn2Mp6d2f0uBLuxkzAiepb
+	R0icvWn6tUqu+kxWUy655QEiqVk0WnjrwO6toSvK1qNYVU+svqBBQy5q+jvAUYW5b4KMPFyGelNhf
+	xGqE6u+jzP8xGZRJeUfUyL3R9AKfTNTtjGGz9AmnH9u3iH0fFAFTjDBtQa5CqV1WJtaBe63hi9J2w
+	DqxRidDI/ZOFLHYIPazSG25R8Ax0kq1blnQpxcMBiUemYX94HtY8a7ShYZO8WJoqY2bOnwWibi2uH
+	xuVIpBog==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uqi08-00HGCY-0J;
+	Tue, 26 Aug 2025 09:13:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 26 Aug 2025 09:13:24 +0800
+Date: Tue, 26 Aug 2025 09:13:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: Nhat Pham <nphamcs@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v11 00/24] zswap compression batching with optimized
+ iaa_crypto driver
+Message-ID: <aK0KNAmQh_JVgnML@gondor.apana.org.au>
+References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
+ <CAKEwX=Pj30Zymib2fEoDW9UyD1vAwxRKO3p28RPtK9DZWAdv8w@mail.gmail.com>
+ <aJ7FSUdvxtZyiHBq@gondor.apana.org.au>
+ <PH7PR11MB812143269E98B00ED4E5BE4DC93DA@PH7PR11MB8121.namprd11.prod.outlook.com>
+ <aKv28XTvAITuq-p8@gondor.apana.org.au>
+ <PH7PR11MB812163C97D4C533F0302FA20C93EA@PH7PR11MB8121.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B370:EE_|DS7PR12MB5886:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86d8131e-90a7-43d0-ec8f-08dde420ef90
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sZKjWWJUncN0GeBQ8tH3ugFzvtzfy4Dm8kDjO+Ie5Omdd8GL4aStLhyBeeXY?=
- =?us-ascii?Q?yTLSsz6afBtUhiePmTTF5j0oMnTWEZGP1rAgdx8lQdOiNYJrIUz/SBsML9pv?=
- =?us-ascii?Q?AsnfJ+MoK51GpNjXDBsuJwFAbyFFm6b73bMKN2bGwgfvg8JpHQvtt5IGSJ5A?=
- =?us-ascii?Q?fzdFy8UMYdA+ed+UvLECl7ZxrMp2+0LRRTLSpXs0IcA0puevcEEZ43Q3IxUl?=
- =?us-ascii?Q?wclO/KWwDReqHaTTJeYcWCJfLRh322Fi6QI5ew5ZQpxgaxbsyg0SrxI9pLJL?=
- =?us-ascii?Q?4y+OgVbir+ubmmxHuDCMmphasNQdM7O2VjnccqymqJkuus9k45aS7FRSllvt?=
- =?us-ascii?Q?bYATobIld6yXqkIbMYUT8I0wBrwhfkIdVePmoiD3FKdd3iedaC89WCY6ze9F?=
- =?us-ascii?Q?+ZHe5F0t8tmoFSZBMSfGCpK1E3Nk+csgtPkh3qScJkUjmW1Vka1vmA6MMweQ?=
- =?us-ascii?Q?rsoQ5OBMyYFBDlzzGici0tqFAZ0DkmRVgDZtu6E+pmRJZZX43nxg7v3wW88Y?=
- =?us-ascii?Q?LdRfQ35R6xOOSLcf5hYZ+On2/aoBO9A8GNWNVHnF83DCA+fPMB5KheD1LxqR?=
- =?us-ascii?Q?yG67T8yRodZraqQr31kbEGNVTkc03PjRy8+skvy0YmkWKovqWrrlbrFOxaAU?=
- =?us-ascii?Q?V9Zw2Nd9+1zzjdnKUtHvsPNGGZWgfKHzTDTHCqLdRCiHGWRWqKvdcqwa11BX?=
- =?us-ascii?Q?tLraEPWV+qqb4sLqLEBWrDAXev3cjt9zLul+D6qyTMeIEZQPISw3MSwp8qrS?=
- =?us-ascii?Q?BnCvcRVZ6suEwO/HQdtevcbXIy7f3Ajc7G/I5Ej5LjKykNzG79j9Nv/mb0V9?=
- =?us-ascii?Q?68GwYWGbOow4V3amO2LnH+2KPfTpYZ08rAHfeWeeYUjkA22CbUt0/ymFugNu?=
- =?us-ascii?Q?nTFw6VeewOUrJ9GucHXxdWO23wr+6yR+R87+WiQZH20xKajqe+ziSPQ4GWsH?=
- =?us-ascii?Q?4TCiiDj6Mo9VL4iu1M96Q9iiNsGZMGj7A/mJMWydFkPUHheqQOws3z69uVOI?=
- =?us-ascii?Q?OsoVUzCKPzrIX1VVFfaypGWE7agqh8bBRmCIq5pQm03oUpFaqAILl+kOucqf?=
- =?us-ascii?Q?SpBSFB+as/xn4oNnQLLWh/Qx2jIjXVoCu14QxEooixf82LzHGq31xC7FSJJ2?=
- =?us-ascii?Q?AvHnvV/xDiuJN2ajjkQoXfcCqybGDce8P3YAvkCteGn5eMtdflqyzycbnuDt?=
- =?us-ascii?Q?tmWHtj4FdV5upQjD/I2R9Ad4qvmd7PWhvLj7ZHvMojPl0THGupv5mv3KdGCR?=
- =?us-ascii?Q?iksTo7x3WQb35WRiWuwMDGoUVVXnctUYyNXguNjh2agS54msuT+30qCLXCZJ?=
- =?us-ascii?Q?pkNkyYdbMRahdLr4f6pLB5u8cj6d19Nzl04xe7D3NYjFjFS6BEftnxsz9Omo?=
- =?us-ascii?Q?/axYjgHNmBm8FM70YJipLsRwUEqbAAw2/CUcFd7aO5hsQItYJjcnbpDMizIt?=
- =?us-ascii?Q?MLafc0RkJwwnf1ZkfuYVBDqtr3UhzjuiE+THeAIPFU/TU9Ipz/Yj9gNl50mS?=
- =?us-ascii?Q?/GfboX+NPUjWRg874WNWU0Y/36Rn7/LrjA1X?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:47:06.5387
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86d8131e-90a7-43d0-ec8f-08dde420ef90
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B370.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5886
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR11MB812163C97D4C533F0302FA20C93EA@PH7PR11MB8121.namprd11.prod.outlook.com>
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Mon, Aug 25, 2025 at 06:12:19PM +0000, Sridhar, Kanchana P wrote:
+>
+> Thanks Herbert, for reviewing the approach. IIUC, we should follow
+> these constraints:
+> 
+> 1) The folio should be submitted as the source.
+> 
+> 2) For the destination, construct an SG list for them and pass that in.
+>     The rule should be that the SG list must contain a sufficient number
+>     of pages for the compression output based on the given unit size
+>     (PAGE_SIZE for zswap).
+> 
+> For PMD folios, there would be 512 compression outputs. In this case,
+> would we need to pass in an SG list that can contain 512 compression
+> outputs after calling the acompress API once?
 
-After a panic if SNP is enabled in the previous kernel then the kdump
-kernel boots with IOMMU SNP enforcement still enabled.
+Eventually yes :)
 
-IOMMU command buffers and event buffer registers remain locked and
-exclusive to the previous kernel. Attempts to enable command and event
-buffers in the kdump kernel will fail, as hardware ignores writes to
-the locked MMIO registers as per AMD IOMMU spec Section 2.12.2.1.
+But for now we're just replicating your current patch-set, so
+the folio should come with an offset and a length restriction,
+and correspondingly the destination SG list should contain the
+same number of pages as there are in your current patch-set.
 
-Skip enabling command buffers and event buffers for kdump boot as they
-are already enabled in the previous kernel.
-
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
-Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- drivers/iommu/amd/init.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index dac6282675da..d179344ad598 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -821,11 +821,16 @@ static void iommu_enable_command_buffer(struct amd_iommu *iommu)
- 
- 	BUG_ON(iommu->cmd_buf == NULL);
- 
--	entry = iommu_virt_to_phys(iommu->cmd_buf);
--	entry |= MMIO_CMD_SIZE_512;
--
--	memcpy_toio(iommu->mmio_base + MMIO_CMD_BUF_OFFSET,
--		    &entry, sizeof(entry));
-+	if (!is_kdump_kernel()) {
-+		/*
-+		 * Command buffer is re-used for kdump kernel and setting
-+		 * of MMIO register is not required.
-+		 */
-+		entry = iommu_virt_to_phys(iommu->cmd_buf);
-+		entry |= MMIO_CMD_SIZE_512;
-+		memcpy_toio(iommu->mmio_base + MMIO_CMD_BUF_OFFSET,
-+			    &entry, sizeof(entry));
-+	}
- 
- 	amd_iommu_reset_cmd_buffer(iommu);
- }
-@@ -876,10 +881,15 @@ static void iommu_enable_event_buffer(struct amd_iommu *iommu)
- 
- 	BUG_ON(iommu->evt_buf == NULL);
- 
--	entry = iommu_virt_to_phys(iommu->evt_buf) | EVT_LEN_MASK;
--
--	memcpy_toio(iommu->mmio_base + MMIO_EVT_BUF_OFFSET,
--		    &entry, sizeof(entry));
-+	if (!is_kdump_kernel()) {
-+		/*
-+		 * Event buffer is re-used for kdump kernel and setting
-+		 * of MMIO register is not required.
-+		 */
-+		entry = iommu_virt_to_phys(iommu->evt_buf) | EVT_LEN_MASK;
-+		memcpy_toio(iommu->mmio_base + MMIO_EVT_BUF_OFFSET,
-+			    &entry, sizeof(entry));
-+	}
- 
- 	/* set head and tail to zero manually */
- 	writel(0x00, iommu->mmio_base + MMIO_EVT_HEAD_OFFSET);
+Cheers,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
