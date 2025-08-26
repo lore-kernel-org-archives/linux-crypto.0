@@ -1,218 +1,337 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B55283FDF
-	for <linux-crypto@vger.kernel.org>; Tue, 26 Aug 2025 11:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5C9199935;
+	Tue, 26 Aug 2025 11:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756206284; cv=none; b=t6ptFpiapneis02ddx4Njn0wSmgGRSTbmI8n8iKvvnrXq4M/kv3QKTDfFFVWnFmVmBLxIP/0+QihhMtZE/TBY5peAi/ngfPh3WfB4Tg6qn90Be/JE+F6vwZcK5ERHkTJic/L47j044zvtao6Yu2p62RcweKTcxAhVnrQtN8583M=
+	t=1756206594; cv=none; b=e7ml7PzhRsUX725bScvciZ3HkA2HodlQOaAdt6FU8OwinruyJp27lpEf3OydOsRi9t5CLJ16fIcdGSnjyHGVN0RHxepB7B8/FWjz3yW6l0byd4srVM/ABirfOjeFsiuxCpPsA0bU0Ot7tdxTipGTX+5mnWxriI3t1IC0CrlK6Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756206284; c=relaxed/simple;
-	bh=IQ5LDCs/IEmTXiQ4zdkXIkPVxNBQzfU++k5VF/Ufz7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JdScisA8Y8LJFH+xjGF/mycYWWEgbKMMJOW7LotCpmFPWz5YdL7OTFibT3nEkZuNpojYdIbgYfQrTKkKTi04pmshALuHlemFOI83fAOEq5PZVDJqpgWk0M0ggWQE3Dz1SnvA8lSKV+C1TDIOGatvasoUG51dYtKlYDvlX53Aqv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=canFekNU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1756206594; c=relaxed/simple;
+	bh=CkeQv8JCpXRiBeQmeJclVsjkmIRNHeTxVyCEIZHQ8rQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DCElgWg0vkI5zMe0OOvr3EUG4SgBQe/Q0XmVPfPOsBBex1cRdEPBEEZ5PTlPxyLQxdJ3LOM76SUU9K7/MZ3bdGXMyMjT1lgiu2LThS7v0Kk7pz4KNYiCFvkQYh+d5oieJISxKNvArz2GqIIioIHzK/Woq3NRzMdHn/xWnqNB7vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MNUnQ5X3; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="canFekNU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756206281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jhHf33zPn8FMTc4V2Pm10xsHI1Kc6Z2Rv/ZWcei/RDk=;
-	b=canFekNUPR0xC+PH5766rAfjaS0A7rpG1sWfH1J24eV5gKUCCWPn2aUpkG4g9qA1q3pFUO
-	iIoqLx8q4zCIO3X3IjKKbYuFGh6tMbuPP1kyOrXOH7KsOHmYV19I8wZA535Sa1ICe7jDJk
-	Jc2rsDjPQJVQqkYZSG4eDlCUiNq9oe8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-303-gPww6TU_O1O9Qw_lg6e-bA-1; Tue, 26 Aug 2025 07:04:39 -0400
-X-MC-Unique: gPww6TU_O1O9Qw_lg6e-bA-1
-X-Mimecast-MFC-AGG-ID: gPww6TU_O1O9Qw_lg6e-bA_1756206279
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-61c37f38c7eso3941626a12.2
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Aug 2025 04:04:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756206278; x=1756811078;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jhHf33zPn8FMTc4V2Pm10xsHI1Kc6Z2Rv/ZWcei/RDk=;
-        b=Q/m+XCmaL+HxspYON8kzsCgXEZGzLf5a6wzSb6DBHcTj9y5ox4bNUwkgmvycMXQDXN
-         dopX0/C5luyssljjELZZpeZQ0CW0Ea4VHq9VGAlTthgQtstyKigIP7jpRFv/7nozUjgU
-         sk0emXMKXSJLpbsZoyuu1UmthU5hK6QXyWPBogGDGnw48j4oPkeAW5LweFrH+XVoZZTy
-         hliO68cjvX18/6k5Mpgiigu5mVFIe6/m+/Z7rvRVngnAbQExqErPvS5r2x1iIMexvH+o
-         nmsg9v+Z/G6nzq7pTPgtH/H5vaUK0xZUAg99PKlg5ym3SnRBXZs6SJaBF6DG2SRGR+q+
-         HY/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUcYfc6AS+GsXsnuIH/7c5iL2XJP3JEfpkfs1dbDnUaSy8/JgpxulKtbGwWoLfFJwEY93sDRh1ncvY+IXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyROP1Q/l1/qj220hh6XT1Wwo5b8cy6lauB+mMcrw5ZKGmktrjo
-	QcPTbOxWjTTqCPQCrvHuROiCzIF4APe/gQYPqaNYQi+RrugQfhSsyBawoIqMQLyetmdURPN6ra6
-	3MPu7LKKg9Q5reeA5xkqyvO5pQF/ZUpxMk63saYR1/U+kNoh9w3Vrb9QbAqL6GqgplA==
-X-Gm-Gg: ASbGncsiK/PFPg8r5djjIYs97cjtmnuHyOTEKZ3PiyhmLoE2g8BCM42zKIqNEeeqdbX
-	OxzQl3vOTu4AJ7wYByzD35GpaC3kwK+Ufyn0gZuMIjq8kqEN4ZJabXO9M1+LtAJ/Z7XyvKQ0I8Z
-	SbXTGXubmdFw42ON/LDYFsM/ld4wKpDKzz7aSKKOv7yKogrrIPCqqndmpVFX87i/SroU3a0TDUO
-	9+n8wKmEtwYKfiJzbL8p7YATC9y1lY5DMGTUAOKK7FoswTkN7I68dUcIgCDsee7+RXMJ1m7BHR5
-	NqD8w5thxfKz3r/6geutYSI2WQflIbIR/2cdecgLuRj3ZP9qzYBb/xkHJUXZULm/14BCNcQktA=
-	=
-X-Received: by 2002:a05:6402:510e:b0:61c:a1a6:52a2 with SMTP id 4fb4d7f45d1cf-61ca1a65d0amr110513a12.28.1756206278315;
-        Tue, 26 Aug 2025 04:04:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJfWOpyeYnJbaHVglB9KfY+PTnQ4jI93qRAexOTMKIRVofYBVmmLclF7ZKvry/r0B75eD1FQ==
-X-Received: by 2002:a05:6402:510e:b0:61c:a1a6:52a2 with SMTP id 4fb4d7f45d1cf-61ca1a65d0amr110409a12.28.1756206276561;
-        Tue, 26 Aug 2025 04:04:36 -0700 (PDT)
-Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61c3172bf4csm6850118a12.38.2025.08.26.04.04.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Aug 2025 04:04:36 -0700 (PDT)
-Message-ID: <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
-Date: Tue, 26 Aug 2025 13:04:33 +0200
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MNUnQ5X3"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57Q5QUxZ013270;
+	Tue, 26 Aug 2025 11:09:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=09+H95LC1jngBr5AC9iW5D
+	m3V6CiAv4To8aTiQJrTxI=; b=MNUnQ5X3rp/xo8H82qRgjQ5/x57h+2rnX3kuUC
+	/8B4pVwZ1k6g3HhpKuXENJ1M4kOLq/ac5Fe4E2DQFcv6VlZxZSrSJSElYDfVSYrr
+	onJgslfjRePHFxixLF1gIZO3nHvNI1GL82+QaaK5B5dmtuDu+ypdscaEmWwHCmRp
+	X478Enjh83ZbCkZfLHJmkJidqVL9hcwNb1TuPcqZxEtEJRG8GG8f0UShrM2GZ4Je
+	olPy/n/Cjgi+F17tGWEOhrUJ3gxccLjPE0k5GjrjBMwQC7JFxAHd1q27LDTz2nAa
+	GnmKEPqdv3fcE4SBsvgL3ATJkOLBO2ul4Ep7w8oErPl6T9eA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48q5xprphh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 11:09:45 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57QB9j1t012202
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 11:09:45 GMT
+Received: from hu-utiwari-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.24; Tue, 26 Aug 2025 04:09:42 -0700
+From: <quic_utiwari@quicinc.com>
+To: <herbert@gondor.apana.org.au>, <thara.gopinath@gmail.com>,
+        <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_neersoni@quicinc.com>,
+        <quic_kuldsing@quicinc.com>, <quic_gaurkash@quicinc.com>
+Subject: [PATCH v2] crypto: qce - Add runtime PM and interconnect bandwidth scaling support
+Date: Tue, 26 Aug 2025 16:39:17 +0530
+Message-ID: <20250826110917.3383061-1-quic_utiwari@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
- ranges
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-22-david@redhat.com> <aK2QZnzS1ErHK5tP@raptor>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <aK2QZnzS1ErHK5tP@raptor>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=KOlaDEFo c=1 sm=1 tr=0 ts=68ad95f9 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=gfq5eMhS0q4ALXmgQ6sA:9 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: 2ztlS_nzhQaM33PpZ_r-n1R9_lc-9BQn
+X-Proofpoint-ORIG-GUID: 2ztlS_nzhQaM33PpZ_r-n1R9_lc-9BQn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMyBTYWx0ZWRfX64+Q3TqHQmz1
+ X3o10Q8C6eQCiZNDbYTRF2/KdM8W/0SMSSOoq2x3heea+8ZVkr9vXw0C1a9YbaFaxNmeLyv/Kly
+ QdzAD/ZzmxM0ZHXSvDyWPtB0hd3dsg4ZaocbaYbcAAA3RIpq0tzQfTNWMPJACCh5GY/8rr/FqOG
+ hTjccLMEp8CnzWukqkzD+1Qv7iK6POi0O8rfnmPSJL9GonN3VfmNuwOIUx6sN9o4fTXR2KasfOT
+ Wlj2idq+yGe7OR9GmHzTnIrDohOu8fdm8EC8zCyRnF4WEO7MNIg/Ae3GqCk7KtL5apLdz5kaP8f
+ om5l3kIcm09hrg/vIDu2m3TyLH9Ht157RpADN4aqDPTWGxTw/+nmQUQKxO7LZkg4ir/lBxv9WWA
+ TnMMtIis
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1011 bulkscore=0 adultscore=0 phishscore=0
+ impostorscore=0 spamscore=0 suspectscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508230033
 
->>   
->>   		pr_debug("%s(): memory range at pfn 0x%lx %p is busy, retrying\n",
->> -			 __func__, pfn, pfn_to_page(pfn));
->> +			 __func__, pfn, page);
->>   
->>   		trace_cma_alloc_busy_retry(cma->name, pfn, pfn_to_page(pfn),
-> 
-> Nitpick: I think you already have the page here.
+From: Udit Tiwari <quic_utiwari@quicinc.com>
 
-Indeed, forgot to clean that up as well.
+The Qualcomm Crypto Engine (QCE) driver currently lacks support for
+runtime power management (PM) and interconnect bandwidth control.
+As a result, the hardware remains fully powered and clocks stay
+enabled even when the device is idle. Additionally, static
+interconnect bandwidth votes are held indefinitely, preventing the
+system from reclaiming unused bandwidth.
 
-> 
->>   					   count, align);
->> -		/* try again with a bit different memory target */
->> -		start = bitmap_no + mask + 1;
->>   	}
->>   out:
->> -	*pagep = page;
->> +	if (!ret)
->> +		*pagep = page;
->>   	return ret;
->>   }
->>   
->> @@ -882,7 +892,7 @@ static struct page *__cma_alloc(struct cma *cma, unsigned long count,
->>   	 */
->>   	if (page) {
->>   		for (i = 0; i < count; i++)
->> -			page_kasan_tag_reset(nth_page(page, i));
->> +			page_kasan_tag_reset(page + i);
-> 
-> Had a look at it, not very familiar with CMA, but the changes look equivalent to
-> what was before. Not sure that's worth a Reviewed-by tag, but here it in case
-> you want to add it:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Address this by enabling runtime PM and dynamic interconnect
+bandwidth scaling to allow the system to suspend the device when idle
+and scale interconnect usage based on actual demand. Improve overall
+system efficiency by reducing power usage and optimizing interconnect
+resource allocation.
 
-Thanks!
+Make the following changes as part of this integration:
 
-> 
-> Just so I can better understand the problem being fixed, I guess you can have
-> two consecutive pfns with non-consecutive associated struct page if you have two
-> adjacent memory sections spanning the same physical memory region, is that
-> correct?
+- Add support for pm_runtime APIs to manage device power state
+  transitions.
+- Implement runtime_suspend() and runtime_resume() callbacks to gate
+  clocks and vote for interconnect bandwidth only when needed.
+- Replace devm_clk_get_optional_enabled() with
+  devm_clk_get_optional() and move clock enabling to the resume path.
+- Register dev_pm_ops with the platform driver to hook into the PM
+  framework.
 
-Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not 
-guaranteed that
+Tested:
 
-	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
+- Verify that ICC votes drop to zero after probe and upon request
+  completion.
+- Confirm that runtime PM usage count increments during active
+  requests and decrements afterward.
+- Observe that the device correctly enters the suspended state when
+  idle.
 
-when we cross memory section boundaries.
+Signed-off-by: Udit Tiwari <quic_utiwari@quicinc.com>
+---
+Changes in v2:
+- Extend suspend/resume support to include runtime PM and ICC scaling.
+- Register dev_pm_ops and implement runtime_suspend/resume callbacks.
+- Link to v1: https://lore.kernel.org/lkml/20250606105808.2119280-1-quic_utiwari@quicinc.com/
+---
+ drivers/crypto/qce/core.c | 120 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 108 insertions(+), 12 deletions(-)
 
-It can be the case for early boot memory if we allocated consecutive 
-areas from memblock when allocating the memmap (struct pages) per memory 
-section, but it's not guaranteed.
-
-So we rule out that case.
-
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index e95e84486d9a..70b9d9e739be 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -12,6 +12,7 @@
+ #include <linux/module.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
++#include <linux/pm_runtime.h>
+ #include <linux/types.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
+@@ -91,22 +92,28 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	struct crypto_async_request *async_req, *backlog;
+ 	int ret = 0, err;
+ 
++	ret = pm_runtime_get_sync(qce->dev);
++	if (ret < 0) {
++		pr_err("error with pm_runtime_get_sync");
++		pm_runtime_put_noidle(qce->dev);
++		return ret;
++	}
++
+ 	scoped_guard(mutex, &qce->lock) {
+ 		if (req)
+ 			ret = crypto_enqueue_request(&qce->queue, req);
+ 
+ 		/* busy, do not dequeue request */
+ 		if (qce->req)
+-			return ret;
++			goto qce_suspend;
+ 
+ 		backlog = crypto_get_backlog(&qce->queue);
+ 		async_req = crypto_dequeue_request(&qce->queue);
+ 		if (async_req)
+ 			qce->req = async_req;
+ 	}
+-
+ 	if (!async_req)
+-		return ret;
++		goto qce_suspend;
+ 
+ 	if (backlog) {
+ 		scoped_guard(mutex, &qce->lock)
+@@ -119,6 +126,8 @@ static int qce_handle_queue(struct qce_device *qce,
+ 		schedule_work(&qce->done_work);
+ 	}
+ 
++qce_suspend:
++	pm_runtime_put_autosuspend(qce->dev);
+ 	return ret;
+ }
+ 
+@@ -208,37 +217,43 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	qce->core = devm_clk_get_optional_enabled(qce->dev, "core");
++	qce->core = devm_clk_get_optional(dev, "core");
+ 	if (IS_ERR(qce->core))
+ 		return PTR_ERR(qce->core);
+ 
+-	qce->iface = devm_clk_get_optional_enabled(qce->dev, "iface");
++	qce->iface = devm_clk_get_optional(dev, "iface");
+ 	if (IS_ERR(qce->iface))
+ 		return PTR_ERR(qce->iface);
+ 
+-	qce->bus = devm_clk_get_optional_enabled(qce->dev, "bus");
++	qce->bus = devm_clk_get_optional(dev, "bus");
+ 	if (IS_ERR(qce->bus))
+ 		return PTR_ERR(qce->bus);
+ 
+-	qce->mem_path = devm_of_icc_get(qce->dev, "memory");
++	qce->mem_path = devm_of_icc_get(dev, "memory");
+ 	if (IS_ERR(qce->mem_path))
+ 		return PTR_ERR(qce->mem_path);
+ 
+-	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	/* Enable runtime PM after clocks and ICC are acquired */
++
++	ret = devm_pm_runtime_enable(dev);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	ret = pm_runtime_resume_and_get(dev);
+ 	if (ret)
+ 		return ret;
+ 
++	ret = devm_qce_dma_request(qce->dev, &qce->dma);
++	if (ret)
++		goto err_pm;
++
+ 	ret = qce_check_version(qce);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	ret = devm_mutex_init(qce->dev, &qce->lock);
+ 	if (ret)
+-		return ret;
++		goto err_pm;
+ 
+ 	INIT_WORK(&qce->done_work, qce_req_done_work);
+ 	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
+@@ -246,9 +261,89 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 	qce->async_req_enqueue = qce_async_request_enqueue;
+ 	qce->async_req_done = qce_async_request_done;
+ 
+-	return devm_qce_register_algs(qce);
++	ret = devm_qce_register_algs(qce);
++	if (ret)
++		goto err_pm;
++
++	/* Configure autosuspend after successful init */
++	pm_runtime_set_autosuspend_delay(dev, 100);
++	pm_runtime_use_autosuspend(dev);
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
++
++	return 0;
++
++err_pm:
++	pm_runtime_put(dev);
++
++	return ret;
++}
++
++static int qce_runtime_suspend(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++
++	clk_disable_unprepare(qce->bus);
++	clk_disable_unprepare(qce->iface);
++	clk_disable_unprepare(qce->core);
++	icc_disable(qce->mem_path);
++
++	return 0;
++}
++
++static int qce_runtime_resume(struct device *dev)
++{
++	struct qce_device *qce = dev_get_drvdata(dev);
++	int ret = 0;
++
++	ret = icc_enable(qce->mem_path);
++	if (ret)
++		return ret;
++
++	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
++	if (ret)
++		goto err_icc;
++
++	ret = clk_prepare_enable(qce->core);
++	if (ret)
++		goto err_icc;
++
++	ret = clk_prepare_enable(qce->iface);
++	if (ret)
++		goto err_core;
++
++	ret = clk_prepare_enable(qce->bus);
++	if (ret)
++		goto err_iface;
++
++	return 0;
++
++err_iface:
++	clk_disable_unprepare(qce->iface);
++err_core:
++	clk_disable_unprepare(qce->core);
++err_icc:
++	icc_disable(qce->mem_path);
++	return ret;
+ }
+ 
++static int qce_suspend(struct device *dev)
++{
++	return qce_runtime_suspend(dev);
++}
++
++static int qce_resume(struct device *dev)
++{
++	return qce_runtime_resume(dev);
++}
++
++static const struct dev_pm_ops qce_crypto_pm_ops = {
++	.runtime_suspend = qce_runtime_suspend,
++	.runtime_resume  = qce_runtime_resume,
++	.suspend         = qce_suspend,
++	.resume          = qce_resume,
++};
++
+ static const struct of_device_id qce_crypto_of_match[] = {
+ 	{ .compatible = "qcom,crypto-v5.1", },
+ 	{ .compatible = "qcom,crypto-v5.4", },
+@@ -262,6 +357,7 @@ static struct platform_driver qce_crypto_driver = {
+ 	.driver = {
+ 		.name = KBUILD_MODNAME,
+ 		.of_match_table = qce_crypto_of_match,
++		.pm = &qce_crypto_pm_ops,
+ 	},
+ };
+ module_platform_driver(qce_crypto_driver);
 -- 
-Cheers
-
-David / dhildenb
+2.34.1
 
