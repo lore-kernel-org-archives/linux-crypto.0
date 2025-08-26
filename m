@@ -1,86 +1,98 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D9C286D57;
-	Tue, 26 Aug 2025 11:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338221FBE9B;
+	Tue, 26 Aug 2025 13:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756209144; cv=none; b=JtIWK3OGwgLFZ7mlOJjSdSPugAvFcvWQme9+JEVV7lOYCBZb5h9QWz/SAdaaeV8mXawISt7m1YABwq1hLTW46RpfUFzXP4baQFL3U6DH4njE3tQi5uaMGYum52oeBqVextbmEu7DdvPk8AS8iZHCK6jiOIUt2n2IghYYujnv48w=
+	t=1756213409; cv=none; b=YYKLJLgtX0P9ZjVxnyH1jr/DA9TrgfmLqLlgKF5LQ2rN/gLduE9IYFP4OradlZQpgn5kXXpxUp1aqDTnoYlvMXes78XIapXm7WU4ej4p9fh4ybcIlTYvtAGlLtzZwwqRLSIf39rfmTd+d6n21knZcBq3ZAT3un2F2JFGOlvuE8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756209144; c=relaxed/simple;
-	bh=UxRslV8N+IUjhGxl2xF2jciS+lDT2rf6CQKBBq7NsTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BzLSYio4U23xwgBeW0O0lRSvCyX/l8/Ecx1cBk4gzT0M2+gNFNDsVpXteFaWGyfaQ8MHeTkwr0Yp6gg4YTTHWerIjHQX8IFr9iN/ehgKKM5ltulGQztAfXvwEszQP3SVA3x2O6rRHU7kqd4U8SXxzm2pWuw2P8jKEMOcwYOWQMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cB5WK60VdzPqh3;
-	Tue, 26 Aug 2025 19:47:41 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 054C61400CD;
-	Tue, 26 Aug 2025 19:52:18 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Aug 2025 19:52:17 +0800
-Received: from [10.67.120.171] (10.67.120.171) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Aug 2025 19:52:17 +0800
-Message-ID: <422b6648-6668-4f40-b79e-4611936576c6@huawei.com>
-Date: Tue, 26 Aug 2025 19:52:16 +0800
+	s=arc-20240116; t=1756213409; c=relaxed/simple;
+	bh=T9Gkxrj+Jbh4BEF2Xoy+VopdtFjdz7eGQjhjbYkar1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtWmARSB3t93ksPeigFaw03FdIV/swq5lerGJxmziRLiCNXa0zyBPkEaQWZ3t1w1Mocd65b8S6Sc2Nd2zoqZbMjQ5Ob/pZ/nqcbk9y/jNbYv53T+nMo1uBRbzckOyruxf53xPKi457Iy+G41tDbMn+Rrp2YFKqoKUBSqPUqQ6i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 025E02C23;
+	Tue, 26 Aug 2025 06:03:18 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5B423F63F;
+	Tue, 26 Aug 2025 06:03:19 -0700 (PDT)
+Date: Tue, 26 Aug 2025 14:03:16 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
+ ranges
+Message-ID: <aK2wlGYvCaFQXzBm@raptor>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-22-david@redhat.com>
+ <aK2QZnzS1ErHK5tP@raptor>
+ <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] crypto: hisilicon - add fallback function for
- hisilicon accelerater driver
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <qianweili@huawei.com>,
-	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>, <taoqi10@huawei.com>
-References: <20250818065714.1916898-1-huangchenghai2@huawei.com>
- <aKvoPwhKyoVz8Yta@gondor.apana.org.au>
- <8896482c-c447-45f1-a59c-998a13119ece@huawei.com>
- <aK0VAaqSLUVgMpbJ@gondor.apana.org.au>
-From: huangchenghai <huangchenghai2@huawei.com>
-In-Reply-To: <aK0VAaqSLUVgMpbJ@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 
+Hi David,
 
-On Tue, Aug 26, 2025 at 09:59 AM +0800, Herbert Xu wrote:
-> On Mon, Aug 25, 2025 at 09:00:37PM +0800, huangchenghai wrote:
->> We currently do not support sharing hardware queues between tfm
->> objects. Our rationale is as follows:
->> a) Queue multiplexing (allowing multiple tfms to share a queue)
->> theoretically improves resource utilization. However, hardware
->> resources are shared among all queues, and performance is also
->> shared. Once the hardware reaches its physical limits, all new
->> services can only queue up in the queue. Therefore, reuse will only
->> make the queue longer, not increase processing speed, and instead
->> increase business waiting latency. In cases of insufficient queues,
->> it is better to directly fallback to software processing.
->>
->> In benchmark tests, only 16 queues or tfms are needed to achieve
->> full hardware bandwidth performance.
->>
->> b) After a queue is initialized by a tfm, if a new tfm has a
->> different algorithm from the original queue, it cannot share the
->> queue. Queue reuse is limited by the type of tfm algorithm.
-> Sorry but this is not acceptable.  The number of tfms are meant
-> to be large.  If your driver isn't able to support that then it
-> should be just deleted.
->
-> Thanks,
-Okay, we will decouple the hardware queue constraints from the
-number of tfm to adapt to Crypto.
+On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
+..
+> > Just so I can better understand the problem being fixed, I guess you can have
+> > two consecutive pfns with non-consecutive associated struct page if you have two
+> > adjacent memory sections spanning the same physical memory region, is that
+> > correct?
+> 
+> Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
+> guaranteed that
+> 
+> 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
+> 
+> when we cross memory section boundaries.
+> 
+> It can be the case for early boot memory if we allocated consecutive areas
+> from memblock when allocating the memmap (struct pages) per memory section,
+> but it's not guaranteed.
 
-Thanks
-Chenghai
+Thank you for the explanation, but I'm a bit confused by the last paragraph. I
+think what you're saying is that we can also have the reverse problem, where
+consecutive struct page * represent non-consecutive pfns, because memmap
+allocations happened to return consecutive virtual addresses, is that right?
+
+If that's correct, I don't think that's the case for CMA, which deals out
+contiguous physical memory. Or were you just trying to explain the other side of
+the problem, and I'm just overthinking it?
+
+Thanks,
+Alex
