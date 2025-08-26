@@ -1,192 +1,138 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6C511CA9;
-	Tue, 26 Aug 2025 05:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248892AE8D;
+	Tue, 26 Aug 2025 08:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756185462; cv=none; b=qiYAmJjFC0T6/3W/Iirf5eCqOKHeCe3EDlVICMwgnOi6j9XcgHy6ihhP4r8d0d7w7s7q0tv8LXA7K+8myKO/vGYS5FtA2WYrm9ngbp5EhIq2XuV2ieqKGNd6Yba0wFIClJLP01xDBdNYQdPUAxrr/JyucTr0AjptdHHRAoz5Yds=
+	t=1756196729; cv=none; b=Peqqe+TKLsl0op5KN0KKYJ5+jrUA19mEg/BciFtDiOvfefOyuXTJGpflokYmlFqx6lGZDVVMsshO30rP6jo1dl6CBgzwySic9uQO2jcgPLCp+ajb6cM3t8RghR3B7OlVnFK20iPSy13smAPcZuuaM33iIN9pQIBoAXK9yP3JKRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756185462; c=relaxed/simple;
-	bh=HN4WVMsoJ6aT/HrCyH4VdROYVrIDQAJ31til/XsQxTU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPPf1s80Vy2FnSlohHedG84rQtGeJLHapOgGcMXEa9S6pPACiQAkYIOKDGNVtzK9t9+VbZz7/myM+TRzIKPoyKHD/pS1xj5IJqIprSv5KKMj5R2hfrKo8E/JKVxq8xN6RVt6RkOXZDJCl7+CIZu9+8CLfuUYgpCt4FZGjMB42YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RcOxXkVa; arc=none smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756196729; c=relaxed/simple;
+	bh=VkeszMZY1ksdwbOs73xgWaFT2kBLSssyVgThE5cmC1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AsGk6KVALGLQly6syq0a5kf608D4+mjc1bW509WHW2VNNcN1G7iQvmYEmhSpkPu/Ewq1Mr5zUtQE4wOJCb2nxVPx1zokp1e/ygt+Yx1lvl+xKEhzzPb7TPW3nzeeQHYIJBvV7ck1o21j7GnSSyiKrLVHoxrjWKDNeHiYmx0ZW1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=usCqbP7u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RcOxXkVa"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-53b174f7cf0so3992226e0c.2;
-        Mon, 25 Aug 2025 22:17:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756185459; x=1756790259; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R6KCkaaGO+9Jn63lszeHqOHrKxFsF7u4XrLjmhxlKN4=;
-        b=RcOxXkVagIG6ExyE1gVgeyWtz970qXVAhotkXKvANEy7M3sKkAUplN3464r0+HkrJG
-         ZLZ7yu0fIMgZ3YNdJskRSl6E+S/SCcX2061aSFrF2ZhhDNLnE2fMoGhGGnr2t88SAn4c
-         hxOPHPoj89PSB2mlhbegNqfyosWaJ7jkaoh7OvMR5onxWr0AmW+6tfpPLsOolJ/zYVOB
-         LcbcjKYaRngHQstQ9NmrDLuAPDNSZQ3BJEP+5NXEFlhhsuo9RtWxJs30O6pKEefmKeHQ
-         TRDcsH4AdkB2XzbyBKgcD58rk+/a3c+weZ3jWxuK+P4kYoIk6wWaPoRzjbz2sEcCCfSO
-         MyxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756185459; x=1756790259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R6KCkaaGO+9Jn63lszeHqOHrKxFsF7u4XrLjmhxlKN4=;
-        b=BUuVePDReYQ7GQ7gEU/i69HOpk1j+GazVOOsEPEgzABZB9lKKZf6TEIjqhXdHCwMuB
-         rRzzYiBWUnC3xMZ3ofAkvIFze6CoRQ1dyJWvp5Fz+EKodeBRTwJTuO5N1u8W2GVb5RQA
-         2SriK5Ra88xgek/X+8nAlc2Me5lptsLG+uKT3BVuh3VG/NU11Gq/kaPK84TUHNP7pZfV
-         0qFu3ba60ZVcxUrEwosJ1tDem+xptijqBPIq5IUMctUk2xbAq52Z11gxOk1fFoFCG8WK
-         8Ya8A1SPVYKgCR9EeqcjURrDuXAf5DIN9DpoTDPifvpVAHVYq3ue1OK+Mkm9+2HdjxEV
-         ZRKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvdH1TLC18TFyvXI0RxJCHG0+WUFTFYU1LVFuEQ8IpBVHmvlvabFQ5sdBunDGPx/jriyzHur9qJKQeXj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxweJ+HjCtsob+neb2o4i33NBuIp7Rm+nSHO//dEbND45jHU9EA
-	tRIRTBZ8OUNDHrfoBv/mk+u1e6ERoftgEWeR4AXCFy2CYE/L6R9yahm8kYLTJVY6oeQ52GHdd3q
-	df5NREc+W9v24r31A0ixYwCi8CXqlRlo=
-X-Gm-Gg: ASbGncvb9YGQTxTZQKy+vTS9YUhR9I7noaWDWXzNtqzDwUi4RzHziHuusVIDymA/PBL
-	3Tzhx6NwCR/uMUTnAl00jMNwxgHTlRnUI25ioSqpXw6bXZVcpeJTyxJb52KjWPFrZP1bAowEKNu
-	Sx5zMF+SZSCjGEkfoLDQHm6NO3XwQBfkCjLpB+3PXGbWAAOdmIalPahuGhMcmlDwb/npiXoZsqv
-	u49nk5AaAA4rl8kOg==
-X-Google-Smtp-Source: AGHT+IHW8PFR8+zVJx+H1F//I5Djns1GfxpRAjFWm2T8ulatbw+PZth3H+Z/Iuy2+xO6mHlBSstorcd9X74Q7lUd+ls=
-X-Received: by 2002:a05:6122:3c51:b0:53b:174d:98f2 with SMTP id
- 71dfb90a1353d-53c8a2afd87mr4059919e0c.3.1756185459220; Mon, 25 Aug 2025
- 22:17:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="usCqbP7u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2586BC4CEF1;
+	Tue, 26 Aug 2025 08:25:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756196728;
+	bh=VkeszMZY1ksdwbOs73xgWaFT2kBLSssyVgThE5cmC1k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=usCqbP7uRNQ13YBhnWf1Zp3LRYsBKqu9s5ZGGYDjRlye9lEVBvycZ/a1VLH9/QqAS
+	 05y4bWzLtoV7x+7zQ88isnbgga89Ei82D+NnIk/gGnB7BeADgNPnPxGCRw1jIRSpOo
+	 j96cUSDlXjWNJs/al4euZUYjJccKcrQoy9M4N9Ith4QrHWkE9qkuPv2yq7S7JNU0Fb
+	 j/3bUpJMDW4zlVcHH/qfntY4p6sSgDiW8WAoE0Bfv7/mvx4wCpGxqPJNJckF+DfrdW
+	 aaQRM5QUzqmwP4hc2YpG+q+A5UJpgTgZYAtCDoDMlFZRKSE5GL1Tig5J6VAmC48TM3
+	 UDprsaBEvhw4Q==
+Date: Tue, 26 Aug 2025 11:25:24 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+	Andreas.Fuchs@infineon.com, James Prestwood <prestwoj@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-crypto@vger.kernel.org, Stefan Berger <stefanb@linux.ibm.com>,
+	Lennart Poettering <lennart@poettering.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	open list <linux-kernel@vger.kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: Re: [PATCH v7 4/5] keys: asymmetric: Add tpm2_key_rsa
+Message-ID: <aK1vdEcuN_xjhjyY@kernel.org>
+References: <20240528210823.28798-1-jarkko@kernel.org>
+ <20240528210823.28798-5-jarkko@kernel.org>
+ <ZmLnyp9j_QoPgj7W@gondor.apana.org.au>
+ <D24EZPFV6DBS.1LZVHIVPITE83@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com>
- <20250801043642.8103-23-kanchana.p.sridhar@intel.com> <CAGsJ_4xRij-Vz_-dmL44YLvaQrYLKKnw7O_Skedrxj_YxuaT5Q@mail.gmail.com>
- <PH7PR11MB8121532CE4368DF5BAA6D46DC939A@PH7PR11MB8121.namprd11.prod.outlook.com>
- <CAGsJ_4xMuLPy3+mAxzOj6SfnFZaDf+B=WkmbrCNqv8gvK080Fw@mail.gmail.com> <PH7PR11MB8121B86E65349F5CF854CA57C939A@PH7PR11MB8121.namprd11.prod.outlook.com>
-In-Reply-To: <PH7PR11MB8121B86E65349F5CF854CA57C939A@PH7PR11MB8121.namprd11.prod.outlook.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 26 Aug 2025 13:17:26 +0800
-X-Gm-Features: Ac12FXwFLemTCGqls7xpPBf9Ugl5TECSEyLNR8RUZl5ccfrj7g2jmoWvOleOPpM
-Message-ID: <CAGsJ_4zt9zQFh1mz6gpQOCWBOjz1osN9jTd62uKGf865vRwuLA@mail.gmail.com>
-Subject: Re: [PATCH v11 22/24] mm: zswap: Allocate pool batching resources if
- the compressor supports batching.
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>, 
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D24EZPFV6DBS.1LZVHIVPITE83@kernel.org>
 
-> > > > [...]
-> > > > >
-> > > > > +       /*
-> > > > > +        * Set the unit of compress batching for large folios, fo=
-r quick
-> > > > > +        * retrieval in the zswap_compress() fast path:
-> > > > > +        * If the compressor is sequential (@pool->compr_batch_si=
-ze is 1),
-> > > > > +        * large folios will be compressed in batches of
-> > > > ZSWAP_MAX_BATCH_SIZE
-> > > > > +        * pages, where each page in the batch is compressed sequ=
-entially.
-> > > > > +        * We see better performance by processing the folio in b=
-atches of
-> > > > > +        * ZSWAP_MAX_BATCH_SIZE, due to cache locality of working=
- set
-> > > > > +        * structures.
-> > > > > +        */
-> > > > > +       pool->batch_size =3D (pool->compr_batch_size > 1) ?
-> > > > > +                               pool->compr_batch_size : ZSWAP_MA=
-X_BATCH_SIZE;
-> > > > > +
-> > > > >         zswap_pool_debug("created", pool);
-> > > > >
-> > > > >         return pool;
-> > > > >
-> > > >
-> > > > It=E2=80=99s hard to follow =E2=80=94 you add batch_size and compr_=
-batch_size in this
-> > > > patch, but only use them in another. Could we merge the related cha=
-nges
-> > > > into one patch instead of splitting them into several that don=E2=
-=80=99t work
-> > > > independently?
+On Thu, Jun 20, 2024 at 03:23:20AM +0300, Jarkko Sakkinen wrote:
+> On Fri Jun 7, 2024 at 1:58 PM EEST, Herbert Xu wrote:
+> > On Wed, May 29, 2024 at 12:08:09AM +0300, Jarkko Sakkinen wrote:
 > > >
-> > > Hi Barry,
-> > >
-> > > Thanks for reviewing the code and for your comments! Sure, I can merg=
-e
-> > > this patch with the next one. I was trying to keep the changes modula=
-rized
-> > > to a) zswap_cpu_comp_prepare(), b) zswap_store() and c)
-> > zswap_compress()
-> > > so the changes are broken into smaller parts, but I can see how this =
-can
-> > > make the changes appear disjointed.
-> > >
-> > > One thing though: the commit logs for each of the patches will
-> > > also probably need to be merged, since I have tried to explain the
-> > > changes in detail.
+> > > +/*
+> > > + * Sign operation is an encryption using the TPM's private key. With RSA the
+> > > + * only difference between encryption and decryption is where the padding goes.
+> > > + * Since own padding can be used, TPM2_RSA_Decrypt can be repurposed to do
+> > > + * encryption.
+> > > + */
+> > > +static int tpm2_key_rsa_sign(struct tpm_chip *chip, struct tpm2_key *key,
+> > > +			     struct kernel_pkey_params *params,
+> > > +			     const void *in, void *out)
+> > > +{
+> > > +	const off_t o = key->priv_len + 2 + sizeof(*key->desc);
+> > > +	const struct tpm2_rsa_parms *p =
+> > > +		(const struct tpm2_rsa_parms *)&key->data[o];
+> > > +	const u16 mod_size = be16_to_cpu(p->modulus_size);
+> > > +	const struct rsa_asn1_template *asn1;
+> > > +	u32 in_len = params->in_len;
+> > > +	void *asn1_wrapped = NULL;
+> > > +	u8 *padded;
+> > > +	int ret;
+> > > +
+> > > +	if (strcmp(params->encoding, "pkcs1") != 0) {
+> > > +		ret = -ENOPKG;
+> > > +		goto err;
+> > > +	}
+> > > +
+> > > +	if (params->hash_algo) {
+> > > +		asn1 = rsa_lookup_asn1(params->hash_algo);
 > >
-> > It=E2=80=99s fine to merge the changelog and present the story as a who=
-le. Do we
->
-> Sure.
->
-> > really need both pool->batch_size and pool->compr_batch_size? I assume
-> > pool->batch_size =3D pool->compr_batch_size if HW supports batch; other=
-wise
-> > pool->compr_batch_size =3D 1.
->
-> Actually not exactly. We have found value in compressing in batches of
-> ZSWAP_MAX_BATCH_SIZE even for software compressors. Latency benefits
-> from cache locality of working-set data. Hence the approach that we have
-> settled on is pool->batch_size =3D ZSWAP_MAX_BATCH_SIZE if
-> the compressor does not support batching (i.e., if pool->compr_batch_size=
- is 1).
-> If it does, then pool->batch_size =3D pool->compr_batch_size.
+> > Could you please explain why this can't be done through pkcs1pad
+> > instead of going to raw RSA?
+> 
+> Sorry was away couple of weeks from here. I replace this with TPM2_Sign
+> as is done already in the ECDSA module, so I guess that is a "yes".
 
-I understand that even without a hardware batch, you can still
-have some software batching that excludes compression.
+Time travelling back to 2024 ;-)
 
-However, based on the code below, it looks like
-pool->compr_batch_size is almost always either equal to
-pool->batch_size or 1:
+I can't recall what I was thining here butI'm glad that I did not put
+the patch set further as now I have much more sane angle to this.
 
-+       pool->compr_batch_size =3D min(ZSWAP_MAX_BATCH_SIZE,
-+                                    crypto_acomp_batch_size(acomp_ctx->aco=
-mp));
+I realized while working on [1] that I'm better of making this to work
+as API on rsapubkey.asn1 and rsaprivkey.asn1 and matching files for
+ECC and do all steps inside kernel from this:
 
-+       pool->batch_size =3D (pool->compr_batch_size > 1) ?
-+                               pool->compr_batch_size : ZSWAP_MAX_BATCH_SI=
-ZE;
+tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
+tpm2_evictcontrol -c owner.txt 0x81000001
+tpm2_getcap handles-persistent
+openssl genrsa -out private.pem 2048
+tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
+tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
+openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
 
+I.e. my test tool does everything else except
 
-It seems one of these two variables may be redundant.
-For instance, no matter if pool->compr_batch_size > 1, could we always trea=
-t
-batch_size as ZSWAP_MAX_BATCH_SIZE?  if we remove
-pool->batch_size, could we just use pool->compr_batch_size as the
-step size for compression no matter if pool->compr_batch_size > 1.
+openssl genrsa -out private.pem 2048
 
-for example:
-       pool->compr_batch_size =3D min(ZSWAP_MAX_BATCH_SIZE,
-                                    crypto_acomp_batch_size(acomp_ctx->acom=
-p));
+Im now pretty familiar with import procedure and how to prepare data
+for TPM2_Import and is like the "spirit" of it i.e., take external
+key and store it inside TPM2. That as side effect removes all the
+use of tpm2key.asn1 from the patch set and simplifies flows
+greatly.
 
-Then batch the zswap store using ZSWAP_MAX_BATCH_SIZE, but set the
-compression step to pool->compr_batch_size.
+And my Rust works help to get the preparation procedure exactly
+right and none of those crazy tools and commands will be needed.
 
-Thanks
-Barry
+The matching C code following TCG Architecture spec  I'll first write in
+user space and then port that kernel crypto APIs
+
+That spans a question tho: should it be its own key type (as it is
+right now or would it be better idea to have parameter/option for
+hardware pre-existing RSA key types, or what would be the best
+direction API wise to approach this?
+
+[1] https://lore.kernel.org/tpm2/aKzaTYCI2GO_UPRB@kernel.org/T/#u
+
+BR, Jarkko
