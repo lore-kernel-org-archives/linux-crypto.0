@@ -1,45 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E7A2D2384;
-	Wed, 27 Aug 2025 15:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E482080C8
+	for <linux-crypto@vger.kernel.org>; Wed, 27 Aug 2025 22:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756307702; cv=none; b=Cy0KX1CE7+W9n/AIq+mzcbpQpyG8WYOTMXj4cMDhud9HdVuNkoDy99LAuzG6WAcK972CG1GSf4u03GZ7GqpKJ6UkiUyKsfilWiqm7GYuX418Cm87wBsfQcZG4Bv5FUMd7vHe1+Fd/WICqHJEl2Xe2Q/gCRA0/euwiXKUMiIh0cc=
+	t=1756332151; cv=none; b=DEIzsN0DaH7LZDNQfu1QqJVBtnzpbL/HGO7gWC+ENEQU1bh38Ojlcr2LToQiaGNAVV4EHFeiQ/HRvqSERwjeZc6Y6aYR4Lmeln7YYDaM6lg7ZO3r2UWu64JWGKpwGntWCmimnn+Hb1/fFjKe1RP+vhfCrmHHmoL9DV2ouVJbv9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756307702; c=relaxed/simple;
-	bh=1qgaGsrCssucR1umbiIEhm9E7Chqg0rg24h/vOyJeL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fXFFBs8T0XmgCbehraGG+lelg1Pf2xA3EoQ4Xj498BtbJJGo9aI898W+vx/lS5eNm18OfZDoY1KDoAkjlRs+DN+qU+36Vv0w4JpD46Mq1o3/MVB/SPH6Ddve6ofQUVndgv8Fddp2d6+Nf2nmx5+i0VCO60Lupq2ZtoBGl54WbrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnQf9eW6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756332151; c=relaxed/simple;
+	bh=Pby6qgYBnR2otkF5H5Ih41dk4WANChiWpDseM73+CH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lUaJL5OqHOQhAhb5krUOXqppnte+mQl3ll3YrSq8DEQsgIMD7j416AxVjNRTd9d9ff7P5dfREsKYO0hEsQUkAZOepEaFlWGnCO7dREWksbzX18JOtnzoQNuvgprWCU6RDwaWuoqI9vf6usJJ2dx+YmZx3BLJaXHXP4G5jtb+5Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ChrmnK9v; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnQf9eW6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB062C4CEF0;
-	Wed, 27 Aug 2025 15:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756307702;
-	bh=1qgaGsrCssucR1umbiIEhm9E7Chqg0rg24h/vOyJeL0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WnQf9eW6/q0WqMUAq3qefEoD22TolFa6J4vbJCvrOsqe5vfeBN4rgBTogvzaUu9Xc
-	 K5pT08f0fM3QtdCxYh2prk75RcbPjcm+7/NnaY60tSl4nKAWDtyXGpJDbORZRY2O9L
-	 CbpISfeYabjhtHkP0VRl5KsQi/y9YE3BdkOKMKmNMZVlN04AkpZC2UrNjlUCalIsgK
-	 uywXCeDZ1B+ePxD1x3f1yebCHUenKQyfGpbw/Zr7UePDGhCg2ZdlyozJmm4VoZ1BkF
-	 52eqCaFQqajyEg8DtyJD3Bz1mkBtb2anViaa2pXPxG4WXzh5aH0sTXeQfl11/FvVkI
-	 Bs/air38RLOTw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ChrmnK9v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756332148;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=f98zaxrJvycSnAQcu/39hCOw4ptNGiOoTMWM+eDqoaw=;
+	b=ChrmnK9vKcLyfTZkS+yk0L/9ofoTnAeVvlxCFn3dZecSeTLtthLrCbDK8jaaUUnZ5St2gU
+	tubUSyZl3BRgSy0XsTLLHRvZ0w3UWnYrUHE00UzDJLbv7HYkrRmKaICzvA18F553YLBYaj
+	QfbTwx5fgczju4BSFhDY4ypL2VzYG4o=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-20-1LbWQP2kMBGXOP4ayV8mdA-1; Wed,
+ 27 Aug 2025 18:02:25 -0400
+X-MC-Unique: 1LbWQP2kMBGXOP4ayV8mdA-1
+X-Mimecast-MFC-AGG-ID: 1LbWQP2kMBGXOP4ayV8mdA_1756332140
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64F29180035D;
+	Wed, 27 Aug 2025 22:02:18 +0000 (UTC)
+Received: from t14s.redhat.com (unknown [10.22.80.195])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E90FC30001A5;
+	Wed, 27 Aug 2025 22:01:42 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Peter Xu <peterx@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Zi Yan <ziy@nvidia.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
 	x86@kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 12/12] lib/crypto: tests: Add KUnit tests for BLAKE2s
-Date: Wed, 27 Aug 2025 08:11:31 -0700
-Message-ID: <20250827151131.27733-13-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250827151131.27733-1-ebiggers@kernel.org>
-References: <20250827151131.27733-1-ebiggers@kernel.org>
+	linux-mips@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	linux-mmc@vger.kernel.org,
+	linux-arm-kernel@axis.com,
+	linux-scsi@vger.kernel.org,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-mm@kvack.org,
+	io-uring@vger.kernel.org,
+	iommu@lists.linux.dev,
+	kasan-dev@googlegroups.com,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Alex Dubov <oakad@yahoo.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Airlie <airlied@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Lars Persson <lars.persson@axis.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	SeongJae Park <sj@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Simona Vetter <simona@ffwll.ch>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Will Deacon <will@kernel.org>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: [PATCH v1 00/36] mm: remove nth_page()
+Date: Thu, 28 Aug 2025 00:01:04 +0200
+Message-ID: <20250827220141.262669-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,524 +152,235 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add a KUnit test suite for BLAKE2s.  Most of the core test logic is in
-the previously-added hash-test-template.h.  This commit just adds the
-actual KUnit suite, commits the generated test vectors to the tree so
-that gen-hash-testvecs.py won't have to be run at build time, and adds a
-few BLAKE2s-specific test cases.
+This is based on mm-unstable.
 
-This is the replacement for blake2s-selftest, which an earlier commit
-removed.  Improvements over blake2s-selftest include integration with
-KUnit, more comprehensive test cases, and support for benchmarking.
+I will only CC non-MM folks on the cover letter and the respective patch
+to not flood too many inboxes (the lists receive all patches).
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/crypto/tests/Kconfig            |  10 ++
- lib/crypto/tests/Makefile           |   1 +
- lib/crypto/tests/blake2s-testvecs.h | 238 ++++++++++++++++++++++++++++
- lib/crypto/tests/blake2s_kunit.c    | 134 ++++++++++++++++
- scripts/crypto/gen-hash-testvecs.py |  27 +++-
- 5 files changed, 407 insertions(+), 3 deletions(-)
- create mode 100644 lib/crypto/tests/blake2s-testvecs.h
- create mode 100644 lib/crypto/tests/blake2s_kunit.c
+--
 
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index c21d53fd4b0ce..fd341aa12f157 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -1,7 +1,17 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
-+config CRYPTO_LIB_BLAKE2S_KUNIT_TEST
-+	tristate "KUnit tests for BLAKE2s" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	# No need to select CRYPTO_LIB_BLAKE2S here, as that option doesn't
-+	# exist; the BLAKE2s code is always built-in for the /dev/random driver.
-+	help
-+	  KUnit tests for the BLAKE2s cryptographic hash function.
-+
- config CRYPTO_LIB_MD5_KUNIT_TEST
- 	tristate "KUnit tests for MD5" if !KUNIT_ALL_TESTS
- 	depends on KUNIT
- 	default KUNIT_ALL_TESTS || CRYPTO_SELFTESTS
- 	select CRYPTO_LIB_BENCHMARK_VISIBLE
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index f6f82c6f9cb5d..be7de929af2cc 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -1,7 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
-+obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_MD5_KUNIT_TEST) += md5_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_POLY1305_KUNIT_TEST) += poly1305_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA1_KUNIT_TEST) += sha1_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA256_KUNIT_TEST) += sha224_kunit.o sha256_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_SHA512_KUNIT_TEST) += sha384_kunit.o sha512_kunit.o
-diff --git a/lib/crypto/tests/blake2s-testvecs.h b/lib/crypto/tests/blake2s-testvecs.h
-new file mode 100644
-index 0000000000000..6f978b79a59b0
---- /dev/null
-+++ b/lib/crypto/tests/blake2s-testvecs.h
-@@ -0,0 +1,238 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* This file was generated by: ./scripts/crypto/gen-hash-testvecs.py blake2s */
-+
-+static const struct {
-+	size_t data_len;
-+	u8 digest[BLAKE2S_HASH_SIZE];
-+} hash_testvecs[] = {
-+	{
-+		.data_len = 0,
-+		.digest = {
-+			0x69, 0x21, 0x7a, 0x30, 0x79, 0x90, 0x80, 0x94,
-+			0xe1, 0x11, 0x21, 0xd0, 0x42, 0x35, 0x4a, 0x7c,
-+			0x1f, 0x55, 0xb6, 0x48, 0x2c, 0xa1, 0xa5, 0x1e,
-+			0x1b, 0x25, 0x0d, 0xfd, 0x1e, 0xd0, 0xee, 0xf9,
-+		},
-+	},
-+	{
-+		.data_len = 1,
-+		.digest = {
-+			0x7c, 0xab, 0x53, 0xe2, 0x48, 0x87, 0xdf, 0x64,
-+			0x98, 0x6a, 0xc1, 0x7e, 0xf0, 0x01, 0x4d, 0xc9,
-+			0x07, 0x4f, 0xb8, 0x2f, 0x46, 0xd7, 0xee, 0xa9,
-+			0xad, 0xe5, 0xf8, 0x21, 0xac, 0xfe, 0x17, 0x58,
-+		},
-+	},
-+	{
-+		.data_len = 2,
-+		.digest = {
-+			0x5e, 0x63, 0x2c, 0xd0, 0xf8, 0x7b, 0xf5, 0xae,
-+			0x61, 0x97, 0x94, 0x57, 0xc8, 0x76, 0x22, 0xd9,
-+			0x8b, 0x04, 0x5e, 0xf1, 0x5d, 0xd0, 0xfc, 0xd9,
-+			0x0c, 0x19, 0x2e, 0xe2, 0xc5, 0xd9, 0x73, 0x51,
-+		},
-+	},
-+	{
-+		.data_len = 3,
-+		.digest = {
-+			0x33, 0x65, 0xa6, 0x37, 0xbf, 0xf8, 0x4f, 0x15,
-+			0x4c, 0xac, 0x9e, 0xa4, 0x3b, 0x02, 0x07, 0x0c,
-+			0x80, 0x86, 0x0d, 0x6c, 0xe4, 0xaf, 0x1c, 0xbc,
-+			0x0b, 0x9c, 0x0a, 0x98, 0xc2, 0x99, 0x71, 0xcd,
-+		},
-+	},
-+	{
-+		.data_len = 16,
-+		.digest = {
-+			0x59, 0xd2, 0x10, 0xd3, 0x75, 0xac, 0x48, 0x32,
-+			0xb1, 0xea, 0xee, 0xcf, 0x0a, 0xd2, 0x8b, 0x15,
-+			0x5d, 0x72, 0x71, 0x4c, 0xa7, 0x29, 0xb0, 0x7a,
-+			0x44, 0x48, 0x8a, 0x54, 0x54, 0x54, 0x41, 0xf5,
-+		},
-+	},
-+	{
-+		.data_len = 32,
-+		.digest = {
-+			0xdc, 0xfc, 0x46, 0x81, 0xc6, 0x1b, 0x2b, 0x47,
-+			0x8b, 0xed, 0xe0, 0x73, 0x34, 0x38, 0x53, 0x92,
-+			0x97, 0x2f, 0xfb, 0x51, 0xab, 0x4f, 0x2d, 0x9d,
-+			0x69, 0x04, 0xa9, 0x5d, 0x33, 0xef, 0xcb, 0x1c,
-+		},
-+	},
-+	{
-+		.data_len = 48,
-+		.digest = {
-+			0xd6, 0x2a, 0x7f, 0x96, 0x04, 0x4d, 0x16, 0xc8,
-+			0x49, 0xe0, 0x37, 0x33, 0xe3, 0x7b, 0x34, 0x56,
-+			0x99, 0xc5, 0x78, 0x57, 0x06, 0x02, 0xb4, 0xea,
-+			0x80, 0xc4, 0xf8, 0x8f, 0x8d, 0x2b, 0xe4, 0x05,
-+		},
-+	},
-+	{
-+		.data_len = 49,
-+		.digest = {
-+			0x8b, 0x58, 0x62, 0xb5, 0x85, 0xf6, 0x83, 0x36,
-+			0xf5, 0x34, 0xb8, 0xd4, 0xbc, 0x5c, 0x8b, 0x38,
-+			0xfd, 0x15, 0xcd, 0x44, 0x83, 0x25, 0x71, 0xe1,
-+			0xd5, 0xe8, 0xa1, 0xa4, 0x36, 0x98, 0x7e, 0x68,
-+		},
-+	},
-+	{
-+		.data_len = 63,
-+		.digest = {
-+			0x7e, 0xeb, 0x06, 0x87, 0xdf, 0x1a, 0xdc, 0xe5,
-+			0xfb, 0x64, 0xd4, 0xd1, 0x5d, 0x9e, 0x75, 0xc0,
-+			0xb9, 0xad, 0x55, 0x6c, 0xe6, 0xba, 0x4d, 0x98,
-+			0x2f, 0xbf, 0x72, 0xad, 0x61, 0x37, 0xf6, 0x11,
-+		},
-+	},
-+	{
-+		.data_len = 64,
-+		.digest = {
-+			0x72, 0xdb, 0x43, 0x16, 0x57, 0x8e, 0x3a, 0x96,
-+			0xf3, 0x98, 0x19, 0x24, 0x17, 0x3b, 0xe8, 0xad,
-+			0xa1, 0x9b, 0xa4, 0x1b, 0x74, 0x85, 0x2e, 0x24,
-+			0x70, 0xea, 0x31, 0x5a, 0x1c, 0xbe, 0x43, 0xb5,
-+		},
-+	},
-+	{
-+		.data_len = 65,
-+		.digest = {
-+			0x32, 0x48, 0xb0, 0xf0, 0x3f, 0xbb, 0xd2, 0xa3,
-+			0xfd, 0xf6, 0x28, 0x4a, 0x2a, 0xc5, 0xbe, 0x4b,
-+			0x73, 0x50, 0x63, 0xd6, 0x16, 0x00, 0xef, 0xed,
-+			0xfe, 0x97, 0x41, 0x29, 0xb2, 0x84, 0xc4, 0xa3,
-+		},
-+	},
-+	{
-+		.data_len = 127,
-+		.digest = {
-+			0x17, 0xda, 0x6b, 0x96, 0x6a, 0xa6, 0xa4, 0xa6,
-+			0xa6, 0xf3, 0x9d, 0x18, 0x19, 0x8d, 0x98, 0x7c,
-+			0x66, 0x38, 0xe8, 0x99, 0xe7, 0x0a, 0x50, 0x92,
-+			0xaf, 0x11, 0x80, 0x05, 0x66, 0xed, 0xab, 0x74,
-+		},
-+	},
-+	{
-+		.data_len = 128,
-+		.digest = {
-+			0x13, 0xd5, 0x8b, 0x22, 0xae, 0x90, 0x7b, 0x67,
-+			0x87, 0x4e, 0x3c, 0x35, 0x4e, 0x01, 0xf0, 0xb1,
-+			0xd3, 0xd1, 0x67, 0xbb, 0x43, 0xdb, 0x7c, 0x75,
-+			0xa4, 0xc7, 0x64, 0x83, 0x1e, 0x9b, 0x98, 0xad,
-+		},
-+	},
-+	{
-+		.data_len = 129,
-+		.digest = {
-+			0x6f, 0xe0, 0x5d, 0x9d, 0xd5, 0x78, 0x29, 0xfb,
-+			0xd0, 0x77, 0xd1, 0x8a, 0xf0, 0x80, 0xcb, 0x81,
-+			0x71, 0x9e, 0x4d, 0x49, 0xde, 0x74, 0x2a, 0x37,
-+			0xc0, 0xd5, 0xf0, 0xfa, 0x50, 0xe6, 0x23, 0xfe,
-+		},
-+	},
-+	{
-+		.data_len = 256,
-+		.digest = {
-+			0x89, 0xac, 0xf6, 0xe7, 0x5e, 0xba, 0x53, 0xf4,
-+			0x92, 0x32, 0xd5, 0x64, 0xfb, 0xc4, 0x08, 0xac,
-+			0x2c, 0x19, 0x6e, 0x63, 0x13, 0x75, 0xd0, 0x60,
-+			0x54, 0x35, 0x82, 0xc4, 0x6d, 0x03, 0x1a, 0x05,
-+		},
-+	},
-+	{
-+		.data_len = 511,
-+		.digest = {
-+			0x1c, 0xaf, 0x94, 0x7d, 0x9c, 0xce, 0x57, 0x64,
-+			0xf8, 0xa8, 0x25, 0x45, 0x32, 0x86, 0x2b, 0x04,
-+			0xb3, 0x2e, 0x67, 0xca, 0x73, 0x04, 0x2f, 0xab,
-+			0xcc, 0xda, 0x9e, 0x42, 0xa1, 0xaf, 0x83, 0x5a,
-+		},
-+	},
-+	{
-+		.data_len = 513,
-+		.digest = {
-+			0x21, 0xdf, 0xdc, 0x29, 0xd9, 0xfc, 0x7b, 0xe7,
-+			0x3a, 0xc4, 0xe1, 0x61, 0xc5, 0xb5, 0xe1, 0xee,
-+			0x7a, 0x9d, 0x0c, 0x66, 0x36, 0x63, 0xe4, 0x12,
-+			0x62, 0xe2, 0xf5, 0x68, 0x72, 0xfc, 0x1e, 0x18,
-+		},
-+	},
-+	{
-+		.data_len = 1000,
-+		.digest = {
-+			0x6e, 0xc7, 0x2e, 0xac, 0xd0, 0xbb, 0x22, 0xe0,
-+			0xc2, 0x40, 0xb2, 0xfe, 0x8c, 0xaf, 0x9e, 0xcf,
-+			0x32, 0x06, 0xc6, 0x45, 0x29, 0xbd, 0xe0, 0x7f,
-+			0x53, 0x32, 0xc3, 0x2b, 0x2f, 0x68, 0x12, 0xcd,
-+		},
-+	},
-+	{
-+		.data_len = 3333,
-+		.digest = {
-+			0x76, 0xba, 0x52, 0xb5, 0x09, 0xf5, 0x19, 0x09,
-+			0x70, 0x1c, 0x09, 0x28, 0xb4, 0xaa, 0x98, 0x6a,
-+			0x79, 0xe7, 0x5e, 0xcd, 0xe8, 0xa4, 0x73, 0x69,
-+			0x1f, 0xf8, 0x05, 0x0a, 0xb4, 0xfe, 0xf9, 0x63,
-+		},
-+	},
-+	{
-+		.data_len = 4096,
-+		.digest = {
-+			0xf7, 0xad, 0xf9, 0xc8, 0x0e, 0x04, 0x2f, 0xdf,
-+			0xbe, 0x39, 0x79, 0x07, 0x0d, 0xd8, 0x1b, 0x06,
-+			0x42, 0x3a, 0x43, 0x93, 0xf6, 0x7c, 0xc4, 0xe5,
-+			0xc2, 0xd5, 0xd0, 0xa6, 0x35, 0x6c, 0xbd, 0x17,
-+		},
-+	},
-+	{
-+		.data_len = 4128,
-+		.digest = {
-+			0x38, 0xd7, 0xab, 0x7e, 0x08, 0xdc, 0x1e, 0xab,
-+			0x55, 0xbb, 0x3b, 0x7b, 0x6a, 0x17, 0xcc, 0x79,
-+			0xa7, 0x02, 0x62, 0x66, 0x9b, 0xca, 0xee, 0xc0,
-+			0x3d, 0x75, 0x34, 0x2e, 0x55, 0x82, 0x26, 0x3c,
-+		},
-+	},
-+	{
-+		.data_len = 4160,
-+		.digest = {
-+			0xf7, 0xeb, 0x2f, 0x24, 0x98, 0x54, 0x04, 0x5a,
-+			0x19, 0xe4, 0x12, 0x9d, 0x97, 0xbc, 0x87, 0xa5,
-+			0x0b, 0x85, 0x29, 0xa1, 0x36, 0x89, 0xc9, 0xba,
-+			0xa0, 0xe0, 0xac, 0x99, 0x7d, 0xa4, 0x51, 0x9f,
-+		},
-+	},
-+	{
-+		.data_len = 4224,
-+		.digest = {
-+			0x8f, 0xe8, 0xa7, 0x79, 0x02, 0xbb, 0x4a, 0x56,
-+			0x66, 0x91, 0xef, 0x22, 0xd1, 0x09, 0x26, 0x6c,
-+			0xa9, 0x13, 0xd7, 0x44, 0xc7, 0x19, 0x9c, 0x0b,
-+			0xfb, 0x4f, 0xca, 0x72, 0x8f, 0x34, 0xf7, 0x82,
-+		},
-+	},
-+	{
-+		.data_len = 16384,
-+		.digest = {
-+			0xaa, 0x21, 0xbb, 0x25, 0x4b, 0x66, 0x6e, 0x29,
-+			0x71, 0xc1, 0x44, 0x67, 0x19, 0xed, 0xe6, 0xe6,
-+			0x61, 0x13, 0xf4, 0xb7, 0x02, 0x94, 0x81, 0x0f,
-+			0xa7, 0x4d, 0xbb, 0x2c, 0xb8, 0xeb, 0x41, 0x0e,
-+		},
-+	},
-+};
-+
-+static const u8 hash_testvec_consolidated[BLAKE2S_HASH_SIZE] = {
-+	0x84, 0x21, 0xbb, 0x73, 0x64, 0x47, 0x45, 0xe0,
-+	0xc1, 0x83, 0x78, 0xf1, 0xea, 0xe5, 0xfd, 0xdb,
-+	0x01, 0xda, 0xb7, 0x86, 0x70, 0x3b, 0x83, 0xb3,
-+	0xbc, 0xd9, 0xfd, 0x96, 0xbd, 0x50, 0x06, 0x67,
-+};
-+
-+static const u8 blake2s_keyed_testvec_consolidated[BLAKE2S_HASH_SIZE] = {
-+	0xa6, 0xad, 0xcd, 0xb8, 0xd9, 0xdd, 0xc7, 0x70,
-+	0x07, 0x09, 0x7f, 0x9f, 0x41, 0xa9, 0x70, 0xa4,
-+	0x1c, 0xca, 0x61, 0xbb, 0x58, 0xb5, 0xb2, 0x1d,
-+	0xd1, 0x71, 0x16, 0xb0, 0x49, 0x4f, 0x9e, 0x1b,
-+};
-diff --git a/lib/crypto/tests/blake2s_kunit.c b/lib/crypto/tests/blake2s_kunit.c
-new file mode 100644
-index 0000000000000..057c40132246f
---- /dev/null
-+++ b/lib/crypto/tests/blake2s_kunit.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright 2025 Google LLC
-+ */
-+#include <crypto/blake2s.h>
-+#include "blake2s-testvecs.h"
-+
-+/*
-+ * The following are compatibility functions that present BLAKE2s as an unkeyed
-+ * hash function that produces hashes of fixed length BLAKE2S_HASH_SIZE, so that
-+ * hash-test-template.h can be reused to test it.
-+ */
-+
-+static void blake2s_default(const u8 *data, size_t len,
-+			    u8 out[BLAKE2S_HASH_SIZE])
-+{
-+	blake2s(out, data, NULL, BLAKE2S_HASH_SIZE, len, 0);
-+}
-+
-+static void blake2s_init_default(struct blake2s_state *state)
-+{
-+	blake2s_init(state, BLAKE2S_HASH_SIZE);
-+}
-+
-+/*
-+ * Generate the HASH_KUNIT_CASES using hash-test-template.h.  These test BLAKE2s
-+ * with a key length of 0 and a hash length of BLAKE2S_HASH_SIZE.
-+ */
-+#define HASH blake2s_default
-+#define HASH_CTX blake2s_state
-+#define HASH_SIZE BLAKE2S_HASH_SIZE
-+#define HASH_INIT blake2s_init_default
-+#define HASH_UPDATE blake2s_update
-+#define HASH_FINAL blake2s_final
-+#include "hash-test-template.h"
-+
-+/*
-+ * BLAKE2s specific test case which tests all possible combinations of key
-+ * length and hash length.
-+ */
-+static void test_blake2s_all_key_and_hash_lens(struct kunit *test)
-+{
-+	const size_t data_len = 100;
-+	u8 *data = &test_buf[0];
-+	u8 *key = data + data_len;
-+	u8 *hash = key + BLAKE2S_KEY_SIZE;
-+	struct blake2s_state main_state;
-+	u8 main_hash[BLAKE2S_HASH_SIZE];
-+
-+	rand_bytes_seeded_from_len(data, data_len);
-+	blake2s_init(&main_state, BLAKE2S_HASH_SIZE);
-+	for (int key_len = 0; key_len <= BLAKE2S_KEY_SIZE; key_len++) {
-+		rand_bytes_seeded_from_len(key, key_len);
-+		for (int out_len = 1; out_len <= BLAKE2S_HASH_SIZE; out_len++) {
-+			blake2s(hash, data, key, out_len, data_len, key_len);
-+			blake2s_update(&main_state, hash, out_len);
-+		}
-+	}
-+	blake2s_final(&main_state, main_hash);
-+	KUNIT_ASSERT_MEMEQ(test, main_hash, blake2s_keyed_testvec_consolidated,
-+			   BLAKE2S_HASH_SIZE);
-+}
-+
-+/*
-+ * BLAKE2s specific test case which tests using a guarded buffer for all allowed
-+ * key lengths.  Also tests both blake2s() and blake2s_init_key().
-+ */
-+static void test_blake2s_with_guarded_key_buf(struct kunit *test)
-+{
-+	const size_t data_len = 100;
-+
-+	rand_bytes(test_buf, data_len);
-+	for (int key_len = 0; key_len <= BLAKE2S_KEY_SIZE; key_len++) {
-+		u8 key[BLAKE2S_KEY_SIZE];
-+		u8 *guarded_key = &test_buf[TEST_BUF_LEN - key_len];
-+		u8 hash1[BLAKE2S_HASH_SIZE];
-+		u8 hash2[BLAKE2S_HASH_SIZE];
-+		struct blake2s_state state;
-+
-+		rand_bytes(key, key_len);
-+		memcpy(guarded_key, key, key_len);
-+
-+		blake2s(hash1, test_buf, key,
-+			BLAKE2S_HASH_SIZE, data_len, key_len);
-+		blake2s(hash2, test_buf, guarded_key,
-+			BLAKE2S_HASH_SIZE, data_len, key_len);
-+		KUNIT_ASSERT_MEMEQ(test, hash1, hash2, BLAKE2S_HASH_SIZE);
-+
-+		blake2s_init_key(&state, BLAKE2S_HASH_SIZE,
-+				 guarded_key, key_len);
-+		blake2s_update(&state, test_buf, data_len);
-+		blake2s_final(&state, hash2);
-+		KUNIT_ASSERT_MEMEQ(test, hash1, hash2, BLAKE2S_HASH_SIZE);
-+	}
-+}
-+
-+/*
-+ * BLAKE2s specific test case which tests using a guarded output buffer for all
-+ * allowed output lengths.
-+ */
-+static void test_blake2s_with_guarded_out_buf(struct kunit *test)
-+{
-+	const size_t data_len = 100;
-+
-+	rand_bytes(test_buf, data_len);
-+	for (int out_len = 1; out_len <= BLAKE2S_HASH_SIZE; out_len++) {
-+		u8 hash[BLAKE2S_HASH_SIZE];
-+		u8 *guarded_hash = &test_buf[TEST_BUF_LEN - out_len];
-+
-+		blake2s(hash, test_buf, NULL, out_len, data_len, 0);
-+		blake2s(guarded_hash, test_buf, NULL, out_len, data_len, 0);
-+		KUNIT_ASSERT_MEMEQ(test, hash, guarded_hash, out_len);
-+	}
-+}
-+
-+static struct kunit_case blake2s_test_cases[] = {
-+	HASH_KUNIT_CASES,
-+	KUNIT_CASE(test_blake2s_all_key_and_hash_lens),
-+	KUNIT_CASE(test_blake2s_with_guarded_key_buf),
-+	KUNIT_CASE(test_blake2s_with_guarded_out_buf),
-+	KUNIT_CASE(benchmark_hash),
-+	{},
-+};
-+
-+static struct kunit_suite blake2s_test_suite = {
-+	.name = "blake2s",
-+	.test_cases = blake2s_test_cases,
-+	.suite_init = hash_suite_init,
-+	.suite_exit = hash_suite_exit,
-+};
-+kunit_test_suite(blake2s_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for BLAKE2s");
-+MODULE_LICENSE("GPL");
-diff --git a/scripts/crypto/gen-hash-testvecs.py b/scripts/crypto/gen-hash-testvecs.py
-index 4ac927d40cf5c..fc063f2ee95f1 100755
---- a/scripts/crypto/gen-hash-testvecs.py
-+++ b/scripts/crypto/gen-hash-testvecs.py
-@@ -82,15 +82,20 @@ def print_static_u8_array_definition(name, value):
- def print_c_struct_u8_array_field(name, value):
-     print(f'\t\t.{name} = {{')
-     print_bytes('\t\t\t', value, 8)
-     print('\t\t},')
- 
-+def alg_digest_size_const(alg):
-+    if alg == 'blake2s':
-+        return 'BLAKE2S_HASH_SIZE'
-+    return f'{alg.upper()}_DIGEST_SIZE'
-+
- def gen_unkeyed_testvecs(alg):
-     print('')
-     print('static const struct {')
-     print('\tsize_t data_len;')
--    print(f'\tu8 digest[{alg.upper()}_DIGEST_SIZE];')
-+    print(f'\tu8 digest[{alg_digest_size_const(alg)}];')
-     print('} hash_testvecs[] = {')
-     for data_len in DATA_LENS:
-         data = rand_bytes(data_len)
-         print('\t{')
-         print(f'\t\t.data_len = {data_len},')
-@@ -101,11 +106,11 @@ def gen_unkeyed_testvecs(alg):
-     data = rand_bytes(4096)
-     ctx = hash_init(alg)
-     for data_len in range(len(data) + 1):
-         hash_update(ctx, compute_hash(alg, data[:data_len]))
-     print_static_u8_array_definition(
--            f'hash_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
-+            f'hash_testvec_consolidated[{alg_digest_size_const(alg)}]',
-             hash_final(ctx))
- 
- def gen_hmac_testvecs(alg):
-     ctx = hmac.new(rand_bytes(32), digestmod=alg)
-     data = rand_bytes(4096)
-@@ -117,10 +122,24 @@ def gen_hmac_testvecs(alg):
-         ctx.update(mac)
-     print_static_u8_array_definition(
-             f'hmac_testvec_consolidated[{alg.upper()}_DIGEST_SIZE]',
-             ctx.digest())
- 
-+BLAKE2S_KEY_SIZE = 32
-+BLAKE2S_HASH_SIZE = 32
-+
-+def gen_additional_blake2s_testvecs():
-+    hashes = b''
-+    for key_len in range(BLAKE2S_KEY_SIZE + 1):
-+        for out_len in range(1, BLAKE2S_HASH_SIZE + 1):
-+            h = hashlib.blake2s(digest_size=out_len, key=rand_bytes(key_len))
-+            h.update(rand_bytes(100))
-+            hashes += h.digest()
-+    print_static_u8_array_definition(
-+            'blake2s_keyed_testvec_consolidated[BLAKE2S_HASH_SIZE]',
-+            compute_hash('blake2s', hashes))
-+
- def gen_additional_poly1305_testvecs():
-     key = b'\xff' * POLY1305_KEY_SIZE
-     data = b''
-     ctx = Poly1305(key)
-     for _ in range(32):
-@@ -139,9 +158,11 @@ if len(sys.argv) != 2:
- 
- alg = sys.argv[1]
- print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
- print(f'/* This file was generated by: {sys.argv[0]} {" ".join(sys.argv[1:])} */')
- gen_unkeyed_testvecs(alg)
--if alg == 'poly1305':
-+if alg == 'blake2s':
-+    gen_additional_blake2s_testvecs()
-+elif alg == 'poly1305':
-     gen_additional_poly1305_testvecs()
- else:
-     gen_hmac_testvecs(alg)
+As discussed recently with Linus, nth_page() is just nasty and we would
+like to remove it.
+
+To recap, the reason we currently need nth_page() within a folio is because
+on some kernel configs (SPARSEMEM without SPARSEMEM_VMEMMAP), the
+memmap is allocated per memory section.
+
+While buddy allocations cannot cross memory section boundaries, hugetlb
+and dax folios can.
+
+So crossing a memory section means that "page++" could do the wrong thing.
+Instead, nth_page() on these problematic configs always goes from
+page->pfn, to the go from (++pfn)->page, which is rather nasty.
+
+Likely, many people have no idea when nth_page() is required and when
+it might be dropped.
+
+We refer to such problematic PFN ranges and "non-contiguous pages".
+If we only deal with "contiguous pages", there is not need for nth_page().
+
+Besides that "obvious" folio case, we might end up using nth_page()
+within CMA allocations (again, could span memory sections), and in
+one corner case (kfence) when processing memblock allocations (again,
+could span memory sections).
+
+So let's handle all that, add sanity checks, and remove nth_page().
+
+Patch #1 -> #5   : stop making SPARSEMEM_VMEMMAP user-selectable + cleanups
+Patch #6 -> #13  : disallow folios to have non-contiguous pages
+Patch #14 -> #20 : remove nth_page() usage within folios
+Patch #21        : disallow CMA allocations of non-contiguous pages
+Patch #22 -> #32 : sanity+check + remove nth_page() usage within SG entry
+Patch #33        : sanity-check + remove nth_page() usage in
+                   unpin_user_page_range_dirty_lock()
+Patch #34        : remove nth_page() in kfence
+Patch #35        : adjust stale comment regarding nth_page
+Patch #36        : mm: remove nth_page()
+
+A lot of this is inspired from the discussion at [1] between Linus, Jason
+and me, so cudos to them.
+
+[1] https://lore.kernel.org/all/CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com/T/#u
+
+RFC -> v1:
+* "wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu kernel
+   config"
+ -> Mention that it was never really relevant for the test
+* "mm/mm_init: make memmap_init_compound() look more like
+   prep_compound_page()"
+ -> Mention the setup of page links
+* "mm: limit folio/compound page sizes in problematic kernel configs"
+ -> Improve comment for PUD handling, mentioning hugetlb and dax
+* "mm: simplify folio_page() and folio_page_idx()"
+ -> Call variable "n"
+* "mm/hugetlb: cleanup hugetlb_folio_init_tail_vmemmap()"
+ -> Keep __init_single_page() and refer to the usage of
+    memblock_reserved_mark_noinit()
+* "fs: hugetlbfs: cleanup folio in adjust_range_hwpoison()"
+* "fs: hugetlbfs: remove nth_page() usage within folio in
+   adjust_range_hwpoison()"
+ -> Separate nth_page() removal from cleanups
+ -> Further improve cleanups
+* "io_uring/zcrx: remove nth_page() usage within folio"
+ -> Keep the io_copy_cache for now and limit to nth_page() removal
+* "mm/gup: drop nth_page() usage within folio when recording subpages"
+ -> Cleanup record_subpages as bit
+* "mm/cma: refuse handing out non-contiguous page ranges"
+ -> Replace another instance of "pfn_to_page(pfn)" where we already have
+    the page
+* "scatterlist: disallow non-contigous page ranges in a single SG entry"
+ -> We have to EXPORT the symbol. I thought about moving it to mm_inline.h,
+    but I really don't want to include that in include/linux/scatterlist.h
+* "ata: libata-eh: drop nth_page() usage within SG entry"
+* "mspro_block: drop nth_page() usage within SG entry"
+* "memstick: drop nth_page() usage within SG entry"
+* "mmc: drop nth_page() usage within SG entry"
+ -> Keep PAGE_SHIFT
+* "scsi: scsi_lib: drop nth_page() usage within SG entry"
+* "scsi: sg: drop nth_page() usage within SG entry"
+ -> Split patches, Keep PAGE_SHIFT
+* "crypto: remove nth_page() usage within SG entry"
+ -> Keep PAGE_SHIFT
+* "kfence: drop nth_page() usage"
+ -> Keep modifying i and use "start_pfn" only instead
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Suren Baghdasaryan <surenb@google.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>
+Cc: Marco Elver <elver@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Brendan Jackman <jackmanb@google.com>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Zi Yan <ziy@nvidia.com>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@gentwo.org>
+Cc: Muchun Song <muchun.song@linux.dev>
+Cc: Oscar Salvador <osalvador@suse.de>
+Cc: x86@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: intel-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-arm-kernel@axis.com
+Cc: linux-scsi@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: linux-mm@kvack.org
+Cc: io-uring@vger.kernel.org
+Cc: iommu@lists.linux.dev
+Cc: kasan-dev@googlegroups.com
+Cc: wireguard@lists.zx2c4.com
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+
+David Hildenbrand (36):
+  mm: stop making SPARSEMEM_VMEMMAP user-selectable
+  arm64: Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  s390/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  x86/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu
+    kernel config
+  mm/page_alloc: reject unreasonable folio/compound page sizes in
+    alloc_contig_range_noprof()
+  mm/memremap: reject unreasonable folio/compound page sizes in
+    memremap_pages()
+  mm/hugetlb: check for unreasonable folio sizes when registering hstate
+  mm/mm_init: make memmap_init_compound() look more like
+    prep_compound_page()
+  mm: sanity-check maximum folio size in folio_set_order()
+  mm: limit folio/compound page sizes in problematic kernel configs
+  mm: simplify folio_page() and folio_page_idx()
+  mm/hugetlb: cleanup hugetlb_folio_init_tail_vmemmap()
+  mm/mm/percpu-km: drop nth_page() usage within single allocation
+  fs: hugetlbfs: remove nth_page() usage within folio in
+    adjust_range_hwpoison()
+  fs: hugetlbfs: cleanup folio in adjust_range_hwpoison()
+  mm/pagewalk: drop nth_page() usage within folio in folio_walk_start()
+  mm/gup: drop nth_page() usage within folio when recording subpages
+  io_uring/zcrx: remove nth_page() usage within folio
+  mips: mm: convert __flush_dcache_pages() to
+    __flush_dcache_folio_pages()
+  mm/cma: refuse handing out non-contiguous page ranges
+  dma-remap: drop nth_page() in dma_common_contiguous_remap()
+  scatterlist: disallow non-contigous page ranges in a single SG entry
+  ata: libata-eh: drop nth_page() usage within SG entry
+  drm/i915/gem: drop nth_page() usage within SG entry
+  mspro_block: drop nth_page() usage within SG entry
+  memstick: drop nth_page() usage within SG entry
+  mmc: drop nth_page() usage within SG entry
+  scsi: scsi_lib: drop nth_page() usage within SG entry
+  scsi: sg: drop nth_page() usage within SG entry
+  vfio/pci: drop nth_page() usage within SG entry
+  crypto: remove nth_page() usage within SG entry
+  mm/gup: drop nth_page() usage in unpin_user_page_range_dirty_lock()
+  kfence: drop nth_page() usage
+  block: update comment of "struct bio_vec" regarding nth_page()
+  mm: remove nth_page()
+
+ arch/arm64/Kconfig                            |  1 -
+ arch/mips/include/asm/cacheflush.h            | 11 +++--
+ arch/mips/mm/cache.c                          |  8 ++--
+ arch/s390/Kconfig                             |  1 -
+ arch/x86/Kconfig                              |  1 -
+ crypto/ahash.c                                |  4 +-
+ crypto/scompress.c                            |  8 ++--
+ drivers/ata/libata-sff.c                      |  6 +--
+ drivers/gpu/drm/i915/gem/i915_gem_pages.c     |  2 +-
+ drivers/memstick/core/mspro_block.c           |  3 +-
+ drivers/memstick/host/jmb38x_ms.c             |  3 +-
+ drivers/memstick/host/tifm_ms.c               |  3 +-
+ drivers/mmc/host/tifm_sd.c                    |  4 +-
+ drivers/mmc/host/usdhi6rol0.c                 |  4 +-
+ drivers/scsi/scsi_lib.c                       |  3 +-
+ drivers/scsi/sg.c                             |  3 +-
+ drivers/vfio/pci/pds/lm.c                     |  3 +-
+ drivers/vfio/pci/virtio/migrate.c             |  3 +-
+ fs/hugetlbfs/inode.c                          | 33 +++++--------
+ include/crypto/scatterwalk.h                  |  4 +-
+ include/linux/bvec.h                          |  7 +--
+ include/linux/mm.h                            | 48 +++++++++++++++----
+ include/linux/page-flags.h                    |  5 +-
+ include/linux/scatterlist.h                   |  3 +-
+ io_uring/zcrx.c                               |  4 +-
+ kernel/dma/remap.c                            |  2 +-
+ mm/Kconfig                                    |  3 +-
+ mm/cma.c                                      | 39 +++++++++------
+ mm/gup.c                                      | 14 ++++--
+ mm/hugetlb.c                                  | 22 +++++----
+ mm/internal.h                                 |  1 +
+ mm/kfence/core.c                              | 12 +++--
+ mm/memremap.c                                 |  3 ++
+ mm/mm_init.c                                  | 15 +++---
+ mm/page_alloc.c                               |  5 +-
+ mm/pagewalk.c                                 |  2 +-
+ mm/percpu-km.c                                |  2 +-
+ mm/util.c                                     | 34 +++++++++++++
+ tools/testing/scatterlist/linux/mm.h          |  1 -
+ .../selftests/wireguard/qemu/kernel.config    |  1 -
+ 40 files changed, 202 insertions(+), 129 deletions(-)
+
+
+base-commit: efa7612003b44c220551fd02466bfbad5180fc83
 -- 
 2.50.1
 
