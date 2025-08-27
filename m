@@ -1,79 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F0019E82A;
-	Wed, 27 Aug 2025 01:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DEB25557;
+	Wed, 27 Aug 2025 02:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756257608; cv=none; b=rE6lbFHqqLoLOdFqUwye0jYCs7XbVVUcdhCHGzfWynh5dnQtyYjqj8G2I0qSTWiuIE6Esg/s6aqnnC2TPaAt3+ayedoOkepSBHfGsMSjFD7lhAEjDVXBR22Ew7U540rYG75dDkBCdXToI4atAkIhjQknhotLr4VthSinLS/9dOo=
+	t=1756261011; cv=none; b=jcgvsfZrIbH/hKfiRXKM2Y6IdvpK4Q6dfVxeJq1bM7w53u8b4m763zl0Ds5SoYFsbMjZKKy+knA4CzyBu0mmy9mBnqeiYo4yaPTfVi/deJBaVqF8sua4icTgkeJIo1yJJ2qVw2eOd/qo+Xz2BCVgzOru09RiGwA5ZusX58kfBmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756257608; c=relaxed/simple;
-	bh=YHfWEdHcLHm56xupCmMjwJq7/hCAgWaJ2vfBNRx/Fa8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fyxxW5uPCHld5I49gmSGJ8BqwXumz9+CB2Ary6m2yhJDKvCxjUW80gyfBzHrpcpMJ8cuV0IDT87uME4V6uv3ARtAMyJtdbf0BI2jZuxb0PdX/wrovwbVQcAU5Ev9ZpHZl89xEnyOGTz7CNeGTaQyhfAhpI9vVtGaohYWkLibl5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqJsE03r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756261011; c=relaxed/simple;
+	bh=eDcnJCa93Xe3vxBW0ZfBX8WQI8Q3WYp0DM/g3zZt1X0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuLuMf5iWpiWzthBesAfFl2BwY+LfYWJMmWr1c0wn0moWmCg4phuzVHOAcHR5ZQt3gke04k5jwwEjp8ZqmyE8C86N5ivrh60a8KRYufra3RPdoGTehSy4cDfK1TWbwlMsTnPzRf9gSzrB/lbhWuEyQRpVvHfwFnCd8rmB63wJGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMrdH3wQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqJsE03r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ED54C113D0;
-	Wed, 27 Aug 2025 01:20:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMrdH3wQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1FA1C4CEF1;
+	Wed, 27 Aug 2025 02:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756257608;
-	bh=YHfWEdHcLHm56xupCmMjwJq7/hCAgWaJ2vfBNRx/Fa8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fqJsE03rQ2q4ZAUa/gCfZk8bSGv/wd7YMsgBgd03W0M7n8jylJdh9kvJA6Wp1qKJj
-	 Wuh9ZEp97dH0wYYoixl1rjKjDSbh65WH2gM5UeF7rLbIm8xclVw8MDKNIT9mqMCpEL
-	 Gr5wMKUqV01wn8nJZ5oQzwRp9WHhSAM+qAV1zx9HbeRNb89v6JTdg0o1vCpik6T7jw
-	 OCMPNsybYQG46DmWPSVla9vaV0reI3XozpZcw43frLW3hu5d4koWk6V9RFN0tRW+SP
-	 2epSbtQWWI4CTQuv627H6ZPSZj0Cq+eqSaqlHEomCaMu9hsDfAsGMeFH4h8WrSZI62
-	 X303ed0ViWIjQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB071383BF70;
-	Wed, 27 Aug 2025 01:20:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756261011;
+	bh=eDcnJCa93Xe3vxBW0ZfBX8WQI8Q3WYp0DM/g3zZt1X0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vMrdH3wQ73KH16B2mWQKpADZU9EJelPjqrVz8uwbk1UXIqcjU3eZLTUtQc9YSV/cw
+	 8yfTYJsdTcwfAgie0JzfQ/v72kcAcuEIk1CwhprXAsl7qoICZ2fsu05rGgKMasYr8L
+	 hVlxymar9e0J9SiHHpk7gq4sCx0YdPe42OTFPPiOKZ3sGexuVULTW3MI0Tmdr2bcFk
+	 lsIDAJ+QxCSEKNpiXG2w4zHg9iVODxbqRvucvgucw1Du6bZhSa7Kwp5BXoNQlMu4Lm
+	 1Adqp8bed4u6GC+aPwrCl4gEo1iH3KmF0EBFyz7c5hT+r2JdqV04dnZZ1bA8/mgmUf
+	 gMpNSm0rhFRSQ==
+Date: Tue, 26 Aug 2025 20:16:46 -0600
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Zhihang Shao <zhihang.shao.iscas@gmail.com>,
+	Andy Polyakov <appro@cryptogams.org>
+Subject: Re: [PATCH v2 0/3] Consolidate Poly1305 code and add RISC-V
+ optimization
+Message-ID: <20250827021646.GA62136@quark>
+References: <20250824025736.148576-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] ipv6: sr: Simplify and optimize HMAC
- calculations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175625761549.160020.15897047289309076377.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Aug 2025 01:20:15 +0000
-References: <20250824013644.71928-1-ebiggers@kernel.org>
-In-Reply-To: <20250824013644.71928-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, andrea.mayer@uniroma2.it, dlebrun@google.com,
- heminhong@kylinos.cn, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250824025736.148576-1-ebiggers@kernel.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 23 Aug 2025 21:36:42 -0400 you wrote:
-> This series simplifies and optimizes the HMAC calculations in
-> IPv6 Segment Routing.
+On Sat, Aug 23, 2025 at 10:57:33PM -0400, Eric Biggers wrote:
+> This series is targeting libcrypto-next.  It can also be retrieved from:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git poly1305-v2
+> 
+> This series simplifies and optimizes the organization of the Poly1305
+> code by consolidating it into a single module.  This follows the example
+> of SHA-1, SHA-256, SHA-512, CRC32, etc.
+> 
+> Since the RISC-V Poly1305 patch has had a moving target, I also rebased
+> it on top of this series and included it as patch 3.
 > 
 > Changed in v2:
-> - Rebased on top of latest net-next.  Dropped "ipv6: sr: Fix MAC
->   comparison to be constant-time" since it was upstreamed already.
->   Moved key preparation to seg6_hmac_info_add().
+> - Added missing 'FORCE' to the make rules for mips/poly1305-core.S
+>   and riscv/poly1305-core.S
 > 
-> [...]
+> Eric Biggers (2):
+>   lib/crypto: poly1305: Remove unused function
+>     poly1305_is_arch_optimized()
+>   lib/crypto: poly1305: Consolidate into single module
+> 
+> Zhihang Shao (1):
+>   lib/crypto: riscv/poly1305: Import OpenSSL/CRYPTOGAMS implementation
 
-Here is the summary with links:
-  - [net-next,v2,1/2] ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256 library functions
-    https://git.kernel.org/netdev/net-next/c/095928e7d801
-  - [net-next,v2,2/2] ipv6: sr: Prepare HMAC key ahead of time
-    https://git.kernel.org/netdev/net-next/c/fe6006568904
+FYI, I applied this series to
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+But as always, reviews and acks would be greatly appreciated!
 
-
+- Eric
