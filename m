@@ -1,73 +1,73 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD28634;
-	Thu, 28 Aug 2025 23:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C32634;
+	Thu, 28 Aug 2025 23:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756425273; cv=none; b=omO6E8aUrkrH4y85W4zMlarKqEjK9pm7M0Hz5gNCehT3Y/02JauXRYFBYmoGUVBUZBrYOC0OXRoaiyP+LDV8qXSTw+M7VLDgvr/iV0X5vJKBxyZKTlWAhVF66h3Zf7/i5Fg+xr5U6oALYXzffHhGXoCBWP9kVo/PHDZJ0Os+Q/0=
+	t=1756425597; cv=none; b=RXp3RAXxJz1m0hhVShgiwBDthloJ5XNOonMtJk8p0H9OESn3IrcBy7T8/pnvHOCPspZmQuYXue5Eo0FSqMGdXJSnjgVapH/9rBHkvd1mGvu0N5liY2bq7ephD4LV/s7CqVEeuhqDzjnWyXX0Te6cTFVOMnIwi47LWmkyJn06HdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756425273; c=relaxed/simple;
-	bh=lCuDXGa8ikg2WC8GEmfWNaHgmgrl9ey+9nIbr+f+2bk=;
+	s=arc-20240116; t=1756425597; c=relaxed/simple;
+	bh=ziHLgutJ6Jzb9aA7gEl3JFJBYePIq6WyCFN9tsQbgmg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uOaGSar2NsHCW+CU1IsKOaYfN6CTB/tj9n3wPTcxElGbUCMg47UTwVOp8vXCv7wiszHW1tXgDr+BJ8MRxuttiPBk35CTNj4jRU8Ims3xtGlQfkDssa83scTI2/pJT1k/w5kseYPZu7T6ltO/nI51c+vPZLiTvoLw4bQQxuSliZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d2wZc1Nh; arc=none smtp.client-ip=209.85.222.181
+	 To:Cc:Content-Type; b=YWymnQLTMW9tvLKTp1YunVzolUWTpI4ydFcyqN7aT7TebK3tItwjo/PxozEBE1YCQlI5vE8MtrG7OBG96BjNHGitkSsM1V+68zZNIlXCvyvIHiIjy7zIPaRmlN5oljIQM0yJIHi8cE//5NWb1hpjzOZZPqmi1oI/p3t+3oGiPQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoGAcm9m; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d2wZc1Nh"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7f0481658ceso159815385a.2;
-        Thu, 28 Aug 2025 16:54:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoGAcm9m"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b109c59dc9so18369091cf.3;
+        Thu, 28 Aug 2025 16:59:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756425271; x=1757030071; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756425595; x=1757030395; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ywp5khp3KpGpdpq9ocHmTVlcpn3e5Ai0bpi4D2HSbEA=;
-        b=d2wZc1NhnTlSXVrDpKdeBMn+Kj8Zc+TtFdUxKGaqZfztBPb4wh/5zpIz+n5V5UrrNk
-         zeBNYmYsMFVKneo6FX0MaS/tCVzl3mjXXtMKNfjiMxwnb2nc/KBBXY142serBjQ9+UJQ
-         GelQcokvrhtHE5hZpL68z6oonQVEn3v1KHzmXt+vSAJAg6Q73VBtKPBA9JhiEaUkaaR3
-         qhz/wWP+YKE2vM8WB4ooepmYEOAac1/IXg32fWNKxs6yc3DZJeIl/oIK6lkSdtbfC2Vn
-         mIeRUwKxqVYiPD2G2Up4ObWrnjdE2Fmn8j9QlOWEASa1pQpqes7i7FRyDil6f+wxbJI8
-         MLSg==
+        bh=yItl692DyhuDS6W/wEpu2bIzdUK1IZAYDHXcH2tTSMs=;
+        b=IoGAcm9mQ1SPpJGmLNgXtNikzPY9ehOdTa9lXZ4fr2BVvdgAH2TA4evPkomlO9VjW9
+         6pKAd7FXxGoEOcbgvPh+TVv9FbX9nO343rSZ4N4AMoBMySfuJYsMUwaj/mzJkFvdV6hA
+         gnXgZ4qLldhGvWKyQzEsHiSWhOva7YFvsmqdJn8l1rvsp7rp4xK3SxkJo+mjDWg9zQWd
+         NX/Q0L+XPkhm1R3zZHLPoX4ABQ3+JlYEWn4DPQFXXj2IBhnWX9gA44C+pO5EW6pfwDaC
+         mpWRy62p4aO4kL5wDfuuUutFTojUtzqE2mrN4l0d+sg+q5QOUNP3/monkl0gyDgFXglZ
+         Qpkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756425271; x=1757030071;
+        d=1e100.net; s=20230601; t=1756425595; x=1757030395;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ywp5khp3KpGpdpq9ocHmTVlcpn3e5Ai0bpi4D2HSbEA=;
-        b=k8JZQ95XPpJj9yprjsEVrkVzost6xDiNqt4gTDsWfGZMjEsDklledVDIMWIbPzd+67
-         vtp+Es+bCo+hOmH2MisoCZkb2/1UljAvkUqj8hmhTIeWwh32351xWSCqWIBe0wW7cWo2
-         mIW048Qb3Yjq7TqECU23WLM29i+g2gGd4Aouora3Li/NbwKRUyw+XkIrTvq9jVZg0iOk
-         mm3pZTB1b3M/dK/eSsETWW498cQB597iSKNnNfo35bYPoNp7uAKpDAmE9xhXBjoAmCuZ
-         QaVRWDHaGcMqqnBc4GxjXrVaeKx1PBJ6xLX4vTKxywIvIeKXcRl9Fzex4HoI0cxncyM+
-         CS2g==
-X-Forwarded-Encrypted: i=1; AJvYcCU7n7naPWOZ7t7gVQlxb2JOynScglGWuJmm9ez7nLfrmmnxyz+8XQ4SNFlDLLW86nnZ9xeRR040596G73g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynpYiiTUzxLaORyZrSbVP/60W+NtpZEND4Fv4xzoJXGvFXUWy/
-	MeKXHqa8PEEVQ1hAGrAbWSEzVGccxroygR0FErv7Ia7T7hPCVfd2gSYMvSrK5B5DrnySnjoY5BT
-	Zkj/q3Ff12CMDdQLXqnVr+wKG1dh7hSM=
-X-Gm-Gg: ASbGnctvRcXJk87gbCdhG++iaqgXWY1jIaIxt4n+3iS+lkcS2mJXH8enLYCDV6RWGjJ
-	+luNQB9fJcipx43bDeaHxMbKDdBKayqsBAdwEm0SZTk6CyV04qKX/Ro9ZOaeJpetvECldL0Heu2
-	5EmBpVXxBGMWDOlqanNo5KhKHbpeUO4ixMHnsXFl/v+TVNnPrQZGmv0gIcciB8gYFk/WHxGmiLY
-	5DVDznZBqeQSDb5Tg==
-X-Google-Smtp-Source: AGHT+IFx1bCdet3TXgM/yuGL1gCygeo78sYjNJ6iHciVjPmaRNEDp0QbZjfxfvz+2gGiwjHgQPA9Qv79Bjp1hQIzq1I=
-X-Received: by 2002:a05:620a:a201:b0:7e9:fb98:f27e with SMTP id
- af79cd13be357-7ea1107f044mr3049024585a.58.1756425270808; Thu, 28 Aug 2025
- 16:54:30 -0700 (PDT)
+        bh=yItl692DyhuDS6W/wEpu2bIzdUK1IZAYDHXcH2tTSMs=;
+        b=cO4t7eRmE5dp3/z6C02x0vxFAoMH/hBlkxEnClT9mcKJPiNUmZjqPAq/v4I1YJ95e9
+         chnPr3vPYTV1KkrXVTrv8eJNraOb5NeBWkBgxc54XzHNOEtYmYWJs7/cOnLYouQgMCTz
+         Ztz2q8CndGpaiiaZo3CyBB656GIVgLL/xYa+m0jOp304hf5p3Wx7byUs7d5Rhyb70N6p
+         8efVEPkCFnlEErut5gfIvoRbxt4BjBoW5RbkKDOiTxGYR94c5eOnr2OgsbfG+oRs6FzJ
+         KgwChTdMTzCRqq0oaNYu0/YxVMLTJ+pujexscMLKRAm87UgRjnmVy3m2GnTG6r0JQNkg
+         3j6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXfrCvAuVHTtoVU2zfqBp2MSlY+66Y5s4qnfBQAO6lPaQHFu+bKJD63/hgjdPBt6pkMSbrHX8yxTIHMWDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoC3WUaoqjqDMci3ZrhOHSmfBLV+LbrYswPdQpha8Sq5C8b4Yz
+	K1AtvdhQ5qp98zhW/OXi3Ccjk7GmHtSX25KgKJ2G5aBnneu6FV5rRqP17z7FkLxbt8RJp581e1/
+	ywjUte6awotIJ/voqcZ12CPDb+PnOhw4=
+X-Gm-Gg: ASbGncvjEvm5GEwR2PoolKk/G49JXyiGDEVRn0XpcukQRNTANCpwCjD6FUTbtPoY8VB
+	XReThy/ByAZPFEQ4DttZOo7f+BZx9nsZ8SymFRfD/NyN2Kte8ZHx3qPuyackmXxD1Rd54sbTCa9
+	Equoag5h4htVkL/RMJ+Q0C7KwnMVNRlu9rCr+n1g67sNALWwUeB971k5n5xejCPmZ3Yo1vu9I0y
+	ax9Bl74CM696Y9cuw==
+X-Google-Smtp-Source: AGHT+IF7fCSXabW657dVKAGS/GF509K9twPmo/AHrq8NDU0U6tCuf/HScs7K1Azgv7V+H4gdMTsEESUZ6v1fcRS+ldg=
+X-Received: by 2002:a05:622a:4c9:b0:4b2:a8d9:8683 with SMTP id
+ d75a77b69052e-4b2aaad2aecmr307254751cf.53.1756425594653; Thu, 28 Aug 2025
+ 16:59:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com> <20250801043642.8103-25-kanchana.p.sridhar@intel.com>
-In-Reply-To: <20250801043642.8103-25-kanchana.p.sridhar@intel.com>
+References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com> <20250801043642.8103-24-kanchana.p.sridhar@intel.com>
+In-Reply-To: <20250801043642.8103-24-kanchana.p.sridhar@intel.com>
 From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 29 Aug 2025 11:54:19 +1200
-X-Gm-Features: Ac12FXxu-APcLv8VU8AYKc0OPlj6u_0o-Gu5UmAhfYadfpGbK1JQlq4O_4nF6-Y
-Message-ID: <CAGsJ_4xMYUHo_SRc=1jgP6jMNosA_NP3HCitSMKwx=5ScJ0Cng@mail.gmail.com>
-Subject: Re: [PATCH v11 24/24] mm: zswap: Batched zswap_compress() with
- compress batching of large folios.
+Date: Fri, 29 Aug 2025 11:59:43 +1200
+X-Gm-Features: Ac12FXzBq7J1whHqez1tkCmNGbSGiqJOevhIX7mUkGKttCKRWOFATlZ2WVnzLG4
+Message-ID: <CAGsJ_4zFXzXKVKu9M2_R1Nqqt6FBEktT1YBGAFPRgjTxv=+1_Q@mail.gmail.com>
+Subject: Re: [PATCH v11 23/24] mm: zswap: zswap_store() will process a large
+ folio in batches.
 To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
 	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev, 
@@ -80,147 +80,48 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> +static bool zswap_compress(struct folio *folio, long start, unsigned int=
- nr_pages,
-> +                          struct zswap_entry *entries[], struct zswap_po=
-ol *pool,
-> +                          int node_id)
->  {
->         struct crypto_acomp_ctx *acomp_ctx;
->         struct scatterlist input, output;
-> -       int comp_ret =3D 0, alloc_ret =3D 0;
-> -       unsigned int dlen =3D PAGE_SIZE;
-> -       unsigned long handle;
-> -       struct zpool *zpool;
-> +       struct zpool *zpool =3D pool->zpool;
-> +
-> +       unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
-> +       int errors[ZSWAP_MAX_BATCH_SIZE];
-> +
-> +       unsigned int nr_comps =3D min(nr_pages, pool->compr_batch_size);
-> +       unsigned int i, j;
-> +       int err;
->         gfp_t gfp;
-> -       u8 *dst;
-> +
-> +       gfp =3D GFP_NOWAIT | __GFP_NORETRY | __GFP_HIGHMEM | __GFP_MOVABL=
-E;
+On Fri, Aug 1, 2025 at 4:36=E2=80=AFPM Kanchana P Sridhar
+<kanchana.p.sridhar@intel.com> wrote:
 >
->         acomp_ctx =3D raw_cpu_ptr(pool->acomp_ctx);
+> This patch modifies zswap_store() to store a batch of pages in large
+> folios at a time, instead of storing one page at a time. It does this by
+> calling a new procedure zswap_store_pages() with a range of
+> "pool->batch_size" indices in the folio.
 >
->         mutex_lock(&acomp_ctx->mutex);
+> zswap_store_pages() implements all the computes done earlier in
+> zswap_store_page() for a single-page, for multiple pages in a folio,
+> namely the "batch":
 >
-> -       dst =3D acomp_ctx->buffers[0];
-> -       sg_init_table(&input, 1);
-> -       sg_set_page(&input, page, PAGE_SIZE, 0);
-> -
->         /*
-> -        * We need PAGE_SIZE * 2 here since there maybe over-compression =
-case,
-> -        * and hardware-accelerators may won't check the dst buffer size,=
- so
-> -        * giving the dst buffer with enough length to avoid buffer overf=
-low.
-> +        * Note:
-> +        * [i] refers to the incoming batch space and is used to
-> +        *     index into the folio pages, @entries and @errors.
->          */
-> -       sg_init_one(&output, dst, PAGE_SIZE * 2);
-> -       acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SI=
-ZE, dlen);
-> +       for (i =3D 0; i < nr_pages; i +=3D nr_comps) {
-> +               if (nr_comps =3D=3D 1) {
-> +                       sg_init_table(&input, 1);
-> +                       sg_set_page(&input, folio_page(folio, start + i),=
- PAGE_SIZE, 0);
+> 1) It starts by allocating all zswap entries required to store the
+>    batch. New procedures, zswap_entries_cache_alloc_batch() and
+>    zswap_entries_cache_free_batch() call kmem_cache_[free]alloc_bulk()
+>    to optimize the performance of this step.
 >
-> -       /*
-> -        * it maybe looks a little bit silly that we send an asynchronous=
- request,
-> -        * then wait for its completion synchronously. This makes the pro=
-cess look
-> -        * synchronous in fact.
-> -        * Theoretically, acomp supports users send multiple acomp reques=
-ts in one
-> -        * acomp instance, then get those requests done simultaneously. b=
-ut in this
-> -        * case, zswap actually does store and load page by page, there i=
-s no
-> -        * existing method to send the second page before the first page =
-is done
-> -        * in one thread doing zwap.
-> -        * but in different threads running on different cpu, we have dif=
-ferent
-> -        * acomp instance, so multiple threads can do (de)compression in =
-parallel.
-> -        */
-> -       comp_ret =3D crypto_wait_req(crypto_acomp_compress(acomp_ctx->req=
-), &acomp_ctx->wait);
-> -       dlen =3D acomp_ctx->req->dlen;
-> -       if (comp_ret)
-> -               goto unlock;
-> +                       /*
-> +                        * We need PAGE_SIZE * 2 here since there maybe o=
-ver-compression case,
-> +                        * and hardware-accelerators may won't check the =
-dst buffer size, so
-> +                        * giving the dst buffer with enough length to av=
-oid buffer overflow.
-> +                        */
-> +                       sg_init_one(&output, acomp_ctx->buffers[0], PAGE_=
-SIZE * 2);
-> +                       acomp_request_set_params(acomp_ctx->req, &input,
-> +                                                &output, PAGE_SIZE, PAGE=
-_SIZE);
-> +
-> +                       errors[i] =3D crypto_wait_req(crypto_acomp_compre=
-ss(acomp_ctx->req),
-> +                                                   &acomp_ctx->wait);
-> +                       if (unlikely(errors[i]))
-> +                               goto compress_error;
-> +
-> +                       dlens[i] =3D acomp_ctx->req->dlen;
-> +               } else {
-> +                       struct page *pages[ZSWAP_MAX_BATCH_SIZE];
-> +                       unsigned int k;
-> +
-> +                       for (k =3D 0; k < nr_pages; ++k)
-> +                               pages[k] =3D folio_page(folio, start + k)=
-;
-> +
-> +                       struct swap_batch_comp_data batch_comp_data =3D {
-> +                               .pages =3D pages,
-> +                               .dsts =3D acomp_ctx->buffers,
-> +                               .dlens =3D dlens,
-> +                               .errors =3D errors,
-> +                               .nr_comps =3D nr_pages,
-> +                       };
+> 2) Next, the entries fields are written, computes that need to be happen
+>    anyway, without modifying the zswap xarray/LRU publishing order. This
+>    improves latency by avoiding having the bring the entries into the
+>    cache for writing in different code blocks within this procedure.
+>
+> 3) Next, it calls zswap_compress() to sequentially compress each page in
+>    the batch.
+>
+> 4) Finally, it adds the batch's zswap entries to the xarray and LRU,
+>    charges zswap memory and increments zswap stats.
+>
+> 5) The error handling and cleanup required for all failure scenarios
+>    that can occur while storing a batch in zswap are consolidated to a
+>    single "store_pages_failed" label in zswap_store_pages(). Here again,
+>    we optimize performance by calling kmem_cache_free_bulk().
+>
+> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> ---
+>  mm/zswap.c | 218 ++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 149 insertions(+), 69 deletions(-)
 
-Why would this work given that nr_pages might be larger than
-pool->compr_batch_size?
-
-unsigned int nr_comps =3D min(nr_pages, pool->compr_batch_size);
-
-So this actually doesn=E2=80=99t happen unless pool->compr_batch_size =3D=
-=3D 1,
-but the code is confusing, right?
-
-> +
-> +                       acomp_ctx->req->kernel_data =3D &batch_comp_data;
-
-Can you actually pass a request larger than pool->compr_batch_size
-to the crypto driver?
-
-By the way, swap_batch_comp_data seems like a poor name. Why should
-crypto drivers know anything about swap_? kernel_data isn=E2=80=99t ideal e=
-ither;
-maybe batch_data would be better ?
-
-> +
-> +                       if (unlikely(crypto_acomp_compress(acomp_ctx->req=
-)))
-> +                               goto compress_error;
-> +               }
+This seems fine overall. However, could we pull some data from the
+cover letter. For example, even with hardware batching, we are still
+improving performance. Since your cover letter is very long, readers
+might fail to connect this data with the patches.
 
 Thanks
 Barry
