@@ -1,131 +1,97 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BC979CD;
-	Fri, 29 Aug 2025 00:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AADEACD;
+	Fri, 29 Aug 2025 00:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756426625; cv=none; b=QAYrFMbOyfgC+JLnKp0R6p+E96ybC8dhHUkmNtL7mz7NutfcgYtTugi/NnnEcOXZdLL/Ti5VhpHsDnD5S4DfL/bxkz7Zgouwxbn0uYSn8vyVQ4fC+dYD+D378NlwCxVoAzOlpLoLKUrRR4j6C5c+dBViahT9IfvzUDfWBOPE/2A=
+	t=1756427133; cv=none; b=Y3OidowYLlk2UhQr4G3JgTclFGT2Uy/c7KsgdrIKNNctU8F1o8owmoPRKlswwhiPpu3qh4Y9Zf+468RWcRxH/zZ93srcEbcwIhyqGX84MEnOAAFcGpYQYU9XTao/NUx5Q/7oO9ozYg+hbr5xLMk3U8dRPZjxGs8G65AuyfSnXi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756426625; c=relaxed/simple;
-	bh=Dix/X/pXNlEG3e3/O4VfYbF8CXaRGSDW+QAdAmVL7L0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g1NqxUjTQHSuVGRqZi14td75JTgawTT1Kz/6dEkrtELrAqoKjJJZgnAupCd/tDcQYZhSB8UJbMVltSCez3OCksINEQ2AEcy3SzSXcw4hxOFhnvlKcjZ5Er9H5knBk6t3+cAetjrGj/2Zp3qgmP5YvgdcWrfdt+XAow0qZotO1X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kxe7LfZM; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756427133; c=relaxed/simple;
+	bh=mcyLCjBm9bl4ZY6mSMuRJ2uZCphNIYGX7Xvto/pbXbA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C+FPksBdPDa7bFW3G9Qpj3IFIleRxE6UbFgngfVNN+KLFaiiRp3uL2NdJt0xRx7Mch7YuN7Kw2TCBvlGMs8j26+fY2OY2ITh2cPCgOl3TkAfYvba/XU40a0LwIQ/N2xiHNOr8edHTTwbCiWE58yDq7wcTrb+GlSc+OhR/vSHVaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/oWKLrG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kxe7LfZM"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7f04816589bso151093985a.3;
-        Thu, 28 Aug 2025 17:17:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756426622; x=1757031422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wb1jMUXGb6/ItBoZsFy9z50zNJdJkY6b2JpW/rUsSoo=;
-        b=Kxe7LfZM7hoTSwUAWAxT8yqdePT5lQr3Xra40b4L8WgQUljF+NsPN2bEC1jkyLxiCT
-         PMR+Ifq9c0nAKJnZpeSoFx13fMKvgOK5DDYlHTRhKWPXa9bPECOf3YTwbi7kPdYvzrrQ
-         AP8XkVth4puZeP5uZ/wU3WUM3j2kIxy3QG531hFfA3nSZ7NjBhq+e11n29JHgM7+rRWw
-         HoBOLffM3brqUpsKQNkL5K4476YvzyFZQwaXfzXKbknHIGAMQWC6f3ncmmryx756n2t/
-         bHtd+YqL0ryvYi6Nq8uMhFSRmqToKx3NBmmWjxVM3EGtO7s5hfHi1LAr7slbY82qY3U3
-         IB1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756426622; x=1757031422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wb1jMUXGb6/ItBoZsFy9z50zNJdJkY6b2JpW/rUsSoo=;
-        b=l/dYvJyHGY9leavxzi20mdcuxFm1Km8mqmLG2i7TDVXThyN5Upw+Zp6q7uereKkFkq
-         mfksFIP1AWReeFRBc1e25fVNLTbdsLdPT8/0pgPSaYehaUG2XLAP0HqeJT/A73gqMKy9
-         wvuu9j+IJUwd1lVvPSJexQ/ik9xg3EWcusK+5xmfBY1I5o9krteBAnNhz+shvpZwl7fE
-         2POlEOVbu/AZmjROhM0V1QlGnsQ0XbsLmcqGtVfDboQcXtZY2LXtN4cFF85nN22G8/4+
-         pFXvPXNTSWc5fIdboOUONopJs26WF7Zb76I+GaDICkSWLoXZifS47OA8IhqaYAaKAAJo
-         lVAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcVdftRSkmUinDKBQMP1UaunVFW6yMDHZ3jLdCcioZ8QMFADXqCTBOksnTNKAGI1XsTAH27VhtZEO20Io=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweyKkEGu6LdG5s8CMY7e+nGSvNEkW25acuisK+y2B/Rsj0GrpK
-	k2SabtQBJ5OABELHFjOPDSD7S/t3b9+ZYPFmzbAlZQYyuHPJ7C9mBvxqzOUlDtO83l9nhwiyPuU
-	vb4Ld6EiF1TT7uwqC+spa1z1M5znVEIfidocy
-X-Gm-Gg: ASbGncvjfOTdE/lF6BHq9lqd8hCN6bxqJhyBj4Y69MUI8anxc3N+6t1MYqQAiSoJgb0
-	pv9fvGB/oGKQbhcOBunGoKPWTOSaGqxuGYgmRSVbZAEceKRa8ZTzh2UaYmvYw6CMB65ltPC0ce5
-	JE+youpcXnOYJw3bwNY3UdCnW6/6nhL3nhCeL+2hLgEsTrMkPqmJ5FD870R2LmWzk72k9ITDjdd
-	bseBIk=
-X-Google-Smtp-Source: AGHT+IGQKl+/zd12XCaC1+Qms5ixirA4oJqGGhDKEW/cxCJbRtH8rakdEL2CHuZDPUKYY+4Tla1xYBAgtFyzgH1jJxo=
-X-Received: by 2002:a05:620a:4410:b0:7f1:7f01:9a3e with SMTP id
- af79cd13be357-7f17f019ca5mr1925740985a.72.1756426622000; Thu, 28 Aug 2025
- 17:17:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/oWKLrG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12DD3C4CEEB;
+	Fri, 29 Aug 2025 00:25:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756427131;
+	bh=mcyLCjBm9bl4ZY6mSMuRJ2uZCphNIYGX7Xvto/pbXbA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=u/oWKLrG9w8tVTD1fZ8iHMCTnvOpAvWDeHA6QKVbOxI5z3EsWkKOYpx+/EqygyXxT
+	 JfsI9TgIRVHKumF8STASk0xFgWojfw7Ae2CzWwD/2Q2uuHXJXzQ2WP0cdMy2yD417H
+	 CsBjZQp1WYO2XyxCtl17k56mMmCMHv9CfhW9EaopZS9VGhmJpwlMecnpjR6PhtJ/fj
+	 GrN7kYbeVhnoRdeSLtAXW1b3kHoiS9DAKmAaknHskX5SZxQCo9ZS9tNyBpYomI4Vyl
+	 stc7Srggmoj/YULxsLdMf7tTageVur4W6TC/Wx9ff7SP+zxWQrvIoTZdLNEPK/uv1q
+	 9GQe8IoL25fMw==
+Message-ID: <423566a0-5967-488d-a62a-4f825ae6f227@kernel.org>
+Date: Fri, 29 Aug 2025 09:22:30 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801043642.8103-1-kanchana.p.sridhar@intel.com> <20250801043642.8103-20-kanchana.p.sridhar@intel.com>
-In-Reply-To: <20250801043642.8103-20-kanchana.p.sridhar@intel.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 29 Aug 2025 12:16:51 +1200
-X-Gm-Features: Ac12FXwfAjOO-4JtlTJ0PGYlVUAWZtUILQp063i-tfGCeSFeBU9jVKtn_v69wSg
-Message-ID: <CAGsJ_4xuMEDzX0z-oEyPQyb+jhnytfrfyASKxwR+5XRzxayJPQ@mail.gmail.com>
-Subject: Re: [PATCH v11 19/24] crypto: iaa - IAA acomp_algs register the
- get_batch_size() interface.
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
-	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev, 
-	usamaarif642@gmail.com, ryan.roberts@arm.com, ying.huang@linux.alibaba.com, 
-	akpm@linux-foundation.org, senozhatsky@chromium.org, 
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org, 
-	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com, 
-	vinicius.gomes@intel.com, wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 24/36] ata: libata-eh: drop nth_page() usage within SG
+ entry
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Niklas Cassel <cassel@kernel.org>,
+ Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-25-david@redhat.com>
+ <7612fdc2-97ff-4b89-a532-90c5de56acdc@lucifer.local>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <7612fdc2-97ff-4b89-a532-90c5de56acdc@lucifer.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 1, 2025 at 4:36=E2=80=AFPM Kanchana P Sridhar
-<kanchana.p.sridhar@intel.com> wrote:
->
-> The Fixed ("deflate-iaa") and Dynamic ("deflate-iaa-dynamic") IAA
-> acomp_algs register an implementation for get_batch_size(). zswap can
-> query crypto_acomp_batch_size() to get the maximum number of requests
-> that can be batch [de]compressed. zswap can use the minimum of this, and
-> any zswap-specific upper limits for batch-size to allocate batching
-> resources.
->
-> This enables zswap to compress/decompress pages in parallel in the IAA
-> hardware accelerator to improve swapout/swapin performance and memory
-> savings.
->
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> ---
->  drivers/crypto/intel/iaa/iaa_crypto_main.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/=
-intel/iaa/iaa_crypto_main.c
-> index 480e12c1d77a5..b7c6fc334dae7 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> @@ -2785,6 +2785,7 @@ static struct acomp_alg iaa_acomp_fixed_deflate =3D=
- {
->         .init                   =3D iaa_comp_init_fixed,
->         .compress               =3D iaa_comp_acompress_main,
->         .decompress             =3D iaa_comp_adecompress_main,
-> +       .get_batch_size         =3D iaa_comp_get_max_batch_size,
->         .base                   =3D {
->                 .cra_name               =3D "deflate",
->                 .cra_driver_name        =3D "deflate-iaa",
-> @@ -2810,6 +2811,7 @@ static struct acomp_alg iaa_acomp_dynamic_deflate =
-=3D {
->         .init                   =3D iaa_comp_init_dynamic,
->         .compress               =3D iaa_comp_acompress_main,
->         .decompress             =3D iaa_comp_adecompress_main,
-> +       .get_batch_size         =3D iaa_comp_get_max_batch_size,
+On 8/29/25 2:53 AM, Lorenzo Stoakes wrote:
+> On Thu, Aug 28, 2025 at 12:01:28AM +0200, David Hildenbrand wrote:
+>> It's no longer required to use nth_page() when iterating pages within a
+>> single SG entry, so let's drop the nth_page() usage.
+>>
+>> Cc: Damien Le Moal <dlemoal@kernel.org>
+>> Cc: Niklas Cassel <cassel@kernel.org>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> LGTM, so:
+> 
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-I feel the patches are being split too finely and are not fully
-self-contained. You added iaa_comp_get_max_batch_size in the previous
-patch, but the callback appears in this one. Why not combine them
-together? Anyway, since you are moving to a static field, this patch
-will be removed automatically. Could you reconsider organizing v12
-to make it easier for everyone to follow? :-)
+Just noticed this:
 
-Thanks
-Barry
+s/libata-eh/libata-sff
+
+in the commit title please.
+
+-- 
+Damien Le Moal
+Western Digital Research
