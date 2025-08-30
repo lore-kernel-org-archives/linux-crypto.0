@@ -1,38 +1,41 @@
-Received: from outbound.mr.icloud.com (p-west2-cluster4-host8-snip4-2.eps.apple.com [57.103.69.223])
+Received: from outbound.mr.icloud.com (p-west2-cluster5-host5-snip4-1.eps.apple.com [57.103.71.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D955274668
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Aug 2025 03:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.69.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E532741CD
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Aug 2025 03:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.71.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756524537; cv=none; b=CE4VHjYJwWevZKlHjy+woVqbHfb/sQw0GJ61lXq83qX+dCywOZi+Q+AOzUUBvEYCx2rexjwQkH+HPaH3jzFHiQnFJE4EzY6x55aR7oQSgZDxAT8tApcs7a0+ZJFNLsxcmsTL2pR/UksPKaRT3NWG08Ilj/v7CibI0cJL0Uy+ItU=
+	t=1756524541; cv=none; b=oVBVpFONkJo4WXQFaMBioP+k5sbQecSwAgNTKgnG6x6KOpxX8T5JbBDQShK84JRuxTv1riv6thlDqXFjHByCYu72Px7ZT7YlGOMwLHW/GpGOboyIoBK8tdpGafRAek7QHCohxOfMH+Cao35TlvMaShgzESM2HrgI6fZ4yjatuJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756524537; c=relaxed/simple;
-	bh=oAJaJdqcidptvzmYMl2IOWbM7fLuPhubxk7so3LFLPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GexTIeH1m91G5JuJKltu3XhAT4lJP2sedA/Oo80nVKyEE3KQFd9jfkfOHja4raKyB1wEyVEfd1NvsbSGz28eOii7exgqVCNK0K9T2kSSGb/Z2mSgbv0XlRUlxNS/YugQsrRYkpsphdmL8Rkmk1FnPGDFRqav6gOVkmzgoDV4k2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net; spf=pass smtp.mailfrom=danm.net; dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b=vkpzfyxa; arc=none smtp.client-ip=57.103.69.223
+	s=arc-20240116; t=1756524541; c=relaxed/simple;
+	bh=Kv8ytpJJ2MlubAQx9O7o5Oh6t5cUs6yXV1nK9y4WAMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bO/MdICTTwwUsAKnsA/SrYrp93M/++GVRsj2uqCxiTzBFSkwLbtn+YBsXLGWH5qHVY1oC0Oi7/gU6Pf3IypV/BTuha8mOcJrGbCJihajjTGhf20Ts8Aa/SmiXZWjRc7iEpczd+2kroeej0FY1ykBjqgt1e7P4HYte4jUhSi0PnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net; spf=pass smtp.mailfrom=danm.net; dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b=cm4fzOks; arc=none smtp.client-ip=57.103.71.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="vkpzfyxa"
+	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="cm4fzOks"
 Received: from outbound.mr.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-2a-100-percent-0 (Postfix) with ESMTPS id 950041800174;
-	Sat, 30 Aug 2025 03:28:51 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1; bh=1IpNM/gXHPSSSkkDpJXK8IZa6rUz5T5Ra5Vu8zrL17c=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=vkpzfyxawFwl6wzlx3oLzUk+ZPU3p8NoMtsx8naW5iO2uCNZOYPyjupY6K7cbww1qGRvsyz/wvHFTMU4/Wc0KP/kOdaxM7kBgKiOZ3JZDW+zF3FJhC0jb/mVbulix9IrmaO4Eq7cXBsUcSyRQcc/ysTIu8sIeZg2S032K9x9R/oZ2aXDRNcx9hOl+QOGz2L/PZJ8atuA9nS90j+ppKEZ1kZEeOBatKZnQlLA8GdbBJB4em4OSOS6yiFZHjAXofIu5rp8BtTdyE6Ri5Up1nGHc7bZWAcbmO4lCW+YL/tYuQwvOuEdV+gNOPpJq53NxA51uqs4K2sdhYVCAWulZoA7Yw==
+	by p00-icloudmta-asmtp-us-west-2a-100-percent-0 (Postfix) with ESMTPS id A71011800142;
+	Sat, 30 Aug 2025 03:28:55 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1; bh=K3l72D9OEFk6r0bJCcEkDxxtbu8Qo3PZyVykPgZWxzo=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=cm4fzOksbICYuPwzOoau1hcj3utB6noovTrDg0QjXQR3Xpo/v5aZoCRRL2zJEZ8369tSVaG4LYxxRnU2lbiTuglXfc/iOPL1Oz4FYpVnoysK9fm/xm0EZLsZR99yV63hD/Bx/l4/3l7H4KXdSbHzZMGlpqWufOMEhMHXuTOZg0ZJuYakk+aHb3N6onl0kun4wiMuqcqA5d5BHleXcJVdUsmEv7mX2mIlajgRlMFks+usDHQYiuY6bu+si8ghdNpt8Kq0uLTkNzsaRZup7R65iXFHuthBHUT8thSUO6mGGWT55YazomZocxTAMNNogxnSp91jTF6Sd99/FJSjjS1SHw==
 mail-alias-created-date: 1632196724000
 Received: from hitch.danm.net (mr-asmtp-me-k8s.p00.prod.me.com [17.57.152.38])
-	by p00-icloudmta-asmtp-us-west-2a-100-percent-0 (Postfix) with ESMTPSA id B6FDF1800143;
-	Sat, 30 Aug 2025 03:28:50 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-west-2a-100-percent-0 (Postfix) with ESMTPSA id 6C8AF1800697;
+	Sat, 30 Aug 2025 03:28:54 +0000 (UTC)
 From: Dan Moulding <dan@danm.net>
 To: linux-crypto@vger.kernel.org
 Cc: dan@danm.net,
 	herbert@gondor.apana.org.au,
 	davem@davemloft.net,
 	regressions@lists.linux.dev
-Subject: [REGRESSION][BISECTED][PATCH 0/1] v6.16 panic/hang in zswap
-Date: Fri, 29 Aug 2025 21:28:38 -0600
-Message-ID: <20250830032839.11005-1-dan@danm.net>
+Subject: [PATCH 1/1] crypto: acomp: Use shared struct for context alloc and free ops
+Date: Fri, 29 Aug 2025 21:28:39 -0600
+Message-ID: <20250830032839.11005-2-dan@danm.net>
 X-Mailer: git-send-email 2.49.1
+In-Reply-To: <20250830032839.11005-1-dan@danm.net>
+References: <20250830032839.11005-1-dan@danm.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,82 +43,136 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMiBTYWx0ZWRfX+Lts1DYLmsza
- yZieEJw/u+LvJf89P7CPh3Y7XlU1DL2tV9hpzdJZGfBqUUnMQP2tiR13z/3IAtV8Q3Box+qolNF
- n8TfXII46P6Md9BColk+sZ7SVoNeE9MkwjrCQnfD3UU6Wi7bzBpcShLK8o294fTI81NsGg8klBW
- e1wr4FVcs51dk+lVq3/Fk4Ds8djuBPg1yApv+fgxIllnmNetlo98KB/hHToQrSRVFUJ2bS1qF9d
- zIO1vunjPOkmvtM4WQlqtspWGy7s4pETO6e1pXtJsyYc+ZgnNngCq41ZExDynHUnBODsi3g6Y=
-X-Proofpoint-GUID: iVIHFsv660FxQ85KPsH7ixBo8Q0awJwa
-X-Proofpoint-ORIG-GUID: iVIHFsv660FxQ85KPsH7ixBo8Q0awJwa
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMiBTYWx0ZWRfX2b1M8qUNyz24
+ j0iddFHbW/BH9Uc8pJIX4ZJdLS3PSapvTENl5GjGW944AcFU7xof9rTTVrukOGaap45iTMJBsot
+ GQYJL0h+SsuamJFLW8kAGeimqCJCCqgw4z/N8PL+DNhpXqU/6d6Q/gCA3rZGPsf41fgx146TBvA
+ hszNtDV0CckTP+uWeKJDbcEqLBfhT76lxV2+zsppmP54A8AfBF5J9ubub2WQFNWvYIEIpQFxuHe
+ rZay8zfZEZMVqWNLv9IEJTcWV5RvAXMZzKn+Amhp07BCzNNL6JrjKDFPuRdE810GTU1OhxDiU=
+X-Proofpoint-GUID: YQXePvSDcBGobr6tX7QZb4sQNaXpBU-V
+X-Proofpoint-ORIG-GUID: YQXePvSDcBGobr6tX7QZb4sQNaXpBU-V
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-30_01,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxlogscore=999 clxscore=1030 adultscore=0 bulkscore=0 mlxscore=0
- suspectscore=0 spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ clxscore=1030 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
+ adultscore=0 malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.22.0-2506270000 definitions=main-2508300032
-X-JNJ: AAAAAAABq91JXbT91Y9sZnoI8YmqcEVjaAPZme6LZOS+Vfv0o2QP4pelurMzGb2FBlh7+09Hv3fEnE7+y0kVnbmCchI0WJbWTIjh87zzNlnMal2O2Em6uCSpu7eCxJejIm2/PGNn10fp8d7+jg0IOpSxQB8AnCFJ1+jtmsn9M+IdtiH5yuqaVvnaGSnqeNqjN4ztalpyuts+YXAU/9dE1e6OBVlsT7LCXwEujdSst8LNi2+dFhJJWxXDU8DzxNbYTKxK+cB2jWbIQNY6nlPFjHKbTAAActRNUqR+tBn1ci5biyKMY10fqDoXyMIAt+NqVJjUjHHjI2onZMvwqiITbw4i8yfBzFLEyq9z4d1pq/faSyb+KjzSEByo10U5stNGMjAMUACWOKXFhq+QgkzPcjicVbUWuplLGdBbHG1tLmzUcEOHK3SMZVUTmSe6xCP8ekQlqh/j1Y48uwx8Dhe8E+5V/PGFQpIS80gwaTUqlLlyuKHxG81F16t/srr58iBab0WGurG2edAVW9F4yh7mgPBn5VRksC2bofvkHF3n70oOdfPHz4VTYLoBdDnJBKL6cknga96w78Zawy+aKBHxX9RC71PwSkm2K5zF9SQNdR13NmO2Jg==
+X-JNJ: AAAAAAABmTpYvWmuAogj5MhAhIV/c1QqHgJ3YxmmZHlwYOOWrRC8+Fg0MUOVp+TlTrQV9LOmDZc3ItduxqKA6b3k3gg8KqQ43Qx9wI/0ly/puTmNjnN41rEHEF/BuKj0umVmPS9DUW2m1GCmpiTclVOABIAGb3fx10GgdUk2Z8RRfXY+WhlAqX4GTJmpVvgSs2I2PEjw9IqBNtGgFmOXAuLQQmBgDG2OpleP8n9Se/kMN9k+TOfFj0z9Y55Dwl6m5Pf0GYZE4qUKsEwurcGBJGwksDdHba1Bk+cJL43sw6rzhYY5edhXZhOdOe5jK/mY3LmYe9WTjHc5JsGzgwDhOE5vdvQUr8ecsa9feFUYSBnIltZXxElRjrbfg/ws3To++H5zog/hxySKGuRo/UiLbV25iqDHgdgRx/LGhnatLxV3HARa2a/3vK5VKyUqoecHhRFtI4YRtod8R7wmU3v+yZHMootldYMQvENIpqdUIvggBZJmA2mAelFeD0B3Yelw9OEs6VCIeXnoAsB/Y6AC5uymM82oUIe4iRfcL3sMXJRkADG3iidzi6b8n/QWy+Y3D1b7O6ZkG3ki1SniWWxsIEnSrknBGCS+1Q==
 
-Hello crypto folks,
+In commit 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation
+code into acomp"), the crypto_acomp_streams struct was made to rely on
+having the alloc_ctx and free_ctx operations defined in the same order
+as the scomp_alg struct. But in that same commit, the alloc_ctx and
+free_ctx members of scomp_alg may be randomized by structure layout
+randomization, since they are contained in a pure ops structure
+(containing only function pointers). If the pointers within scomp_alg
+are randomized, but those in crypto_acomp_streams are not, then
+the order may no longer match. This fixes the problem by defining a
+shared structure that both crypto_acomp_streams and scomp_alg share:
+acomp_ctx_ops. This new pure ops structure may now be randomized,
+while still allowing both crypto_acomp_streams and scomp_alg to have
+matching layout.
 
-For some time now I've been battling a system hang that has been
-sporadically affecting some of my machines. It seemed to be introduced
-sometime during the v6.16 rc releases, but I couldn't quite pin it
-down because it was reproducible (though not very easily) in some of
-the versions I built, but not in others. The problem seemed to come
-and go. At one point I thought I had bisected it to a netfilter fix,
-but that ended up being wrong and led nowhere[1], and I was about
-ready to give up on it. Then just yesterday one of the machines that
-had been sporadically encountering the issue finally produced a panic
-instead of just hanging. The panic indicated the problem was in swapd
-in the LZ4 compression code (all of my machines that have been
-affected use zswap).
-
-Armed with the knowledge that it's a swap problem, I tried to find an
-easier and more reliable method to reproduce the problem to try to
-better bisect it. I found that I can use the stress-ng[2] tool's page
-swapping stressor to immediately and reliably reproduce the
-panic. Then, on another affected machine, I ran the page swapping
-stressor and also immediately reproduced the hang (so I was fairly
-confident that the hang and panic were both caused by the same
-regression).
-
-Then I tried bisecting the problem and immediately hit a new snag,
-which was that suddenly on a new build of v6.16.0 I couldn't reproduce
-the problem, even though I'd reproduced it on that version
-before. Eventually I began to suspect that structure layout
-randomization was causing the non-reproducibility (and was the reason
-my previous attempt to bisect it failed). Using the randstruct.seed
-file from one of the known bad kernel builds I had, I was able to
-confirm that randstruct does indeed affect the issue. Now with a
-"known bad" randstruct.seed I was able to successfully bisect it to
-commit 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation
-code into acomp"). Instead of just reverting that commit, I tried to
-understand why this change would be affected by randstruct, and I
-believe I found the problem. Two related structs require the same
-ordering of a couple of fields but one of the structs is new and would
-be automatically randomized by randstruct (because it only contains
-function pointers). I put together the following patch which resolves
-the issue. It works by making the two related structs use a shared
-struct which can be randomized and still ensure both of the structs
-end up with the same layout.
-
--- Dan
-
-[1] https://lore.kernel.org/regressions/20250731194901.7156-1-dan@danm.net/
-[2] https://github.com/ColinIanKing/stress-ng
-
-#regzbot introduced: 42d9f6c77479
-
-Dan Moulding (1):
-  crypto: acomp: Use shared struct for context alloc and free ops
-
+Signed-off-by: Dan Moulding <dan@danm.net>
+Fixes: 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation code into acomp")
+---
  crypto/acompress.c                  |  6 +++---
  crypto/lz4.c                        |  6 ++++--
  include/crypto/internal/acompress.h | 10 +++++++---
  include/crypto/internal/scompress.h |  5 +----
  4 files changed, 15 insertions(+), 12 deletions(-)
 
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index be28cbfd22e3..ff910035ee42 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -375,7 +375,7 @@ static void acomp_stream_workfn(struct work_struct *work)
+ 		if (ps->ctx)
+ 			continue;
+ 
+-		ctx = s->alloc_ctx();
++		ctx = s->ctx_ops.alloc_ctx();
+ 		if (IS_ERR(ctx))
+ 			break;
+ 
+@@ -398,7 +398,7 @@ void crypto_acomp_free_streams(struct crypto_acomp_streams *s)
+ 		return;
+ 
+ 	cancel_work_sync(&s->stream_work);
+-	free_ctx = s->free_ctx;
++	free_ctx = s->ctx_ops.free_ctx;
+ 
+ 	for_each_possible_cpu(i) {
+ 		struct crypto_acomp_stream *ps = per_cpu_ptr(streams, i);
+@@ -427,7 +427,7 @@ int crypto_acomp_alloc_streams(struct crypto_acomp_streams *s)
+ 	if (!streams)
+ 		return -ENOMEM;
+ 
+-	ctx = s->alloc_ctx();
++	ctx = s->ctx_ops.alloc_ctx();
+ 	if (IS_ERR(ctx)) {
+ 		free_percpu(streams);
+ 		return PTR_ERR(ctx);
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 7a984ae5ae52..c16c0d936708 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -68,8 +68,10 @@ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+ }
+ 
+ static struct scomp_alg scomp = {
+-	.alloc_ctx		= lz4_alloc_ctx,
+-	.free_ctx		= lz4_free_ctx,
++	.ctx_ops                = {
++		.alloc_ctx	= lz4_alloc_ctx,
++		.free_ctx       = lz4_free_ctx,
++	},
+ 	.compress		= lz4_scompress,
+ 	.decompress		= lz4_sdecompress,
+ 	.base			= {
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 2d97440028ff..c84a17ac26ca 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -55,15 +55,19 @@ struct acomp_alg {
+ 	};
+ };
+ 
++struct acomp_ctx_ops {
++	void *(*alloc_ctx)(void);
++	void (*free_ctx)(void *);
++};
++
+ struct crypto_acomp_stream {
+ 	spinlock_t lock;
+ 	void *ctx;
+ };
+ 
+ struct crypto_acomp_streams {
+-	/* These must come first because of struct scomp_alg. */
+-	void *(*alloc_ctx)(void);
+-	void (*free_ctx)(void *);
++	/* This must come first because of struct scomp_alg. */
++	struct acomp_ctx_ops ctx_ops;
+ 
+ 	struct crypto_acomp_stream __percpu *streams;
+ 	struct work_struct stream_work;
+diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
+index 533d6c16a491..1d807a15aef2 100644
+--- a/include/crypto/internal/scompress.h
++++ b/include/crypto/internal/scompress.h
+@@ -35,10 +35,7 @@ struct scomp_alg {
+ 			  void *ctx);
+ 
+ 	union {
+-		struct {
+-			void *(*alloc_ctx)(void);
+-			void (*free_ctx)(void *ctx);
+-		};
++		struct acomp_ctx_ops ctx_ops;
+ 		struct crypto_acomp_streams streams;
+ 	};
+ 
 -- 
 2.49.1
 
