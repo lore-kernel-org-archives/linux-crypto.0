@@ -1,244 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CA53128D6;
-	Mon,  1 Sep 2025 16:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845032D5939
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Sep 2025 17:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756745560; cv=none; b=biXLpKwGNL+8oSrbeIUIW9l/yeol8nz6uBKHzBBmycLPbjw8iy1Bp0ITAkaVi45Z/ii5UWz76qUz71vejdC3X6VMl3Jc9ErEtBRBluANuQB+KgnOcCeXSaX70WAtoIaRIvpp8Uz+f9o9/EOqW/lvSHsoEouveuMu/vZNnUz12wE=
+	t=1756746772; cv=none; b=t73MlFCZ6Y4VG2At99tER07IpcSkugVEjurNLzg2pGaCXnrgCNkPopUbfCB6WWeUy4ovf17KoT9GKnnEStn2bOBJXMkbPa1jvfTd5bYj1FoGzqmBCsuzw6LWexKbOvVlqHEz3R4ZQIHp5dGBx/lIHb59Y/vubHXLK9J5ShI+1i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756745560; c=relaxed/simple;
-	bh=BFnBbraOCacTgsat4VNzLx3wIcLl5nbM95+AHTdP3Hc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mSfQQEdcwzsBVN0aAAJP/DBzAo2Sawr84uQtbH72w1shyA5U2pJAEbRY3Tv1pD9YGC0zOurWsyAGQKKEvmk9eNGT7+pC058O8zO4HUtuDCQrG+0Hs0A8kXFAOYROuTZUXAl517SeRM93CtN2sb0tE7IyRRVsEYjDMSVSZM7UCd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pgaSIIbJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756746772; c=relaxed/simple;
+	bh=NgweoeNuvkJcA+MM/dILXJxOoDFdSGj1qjkhxKKs9AQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3RyEHvyMXudRPu0XhBVEESN4IgyvYb4TYiK0KvFekk8hSxbx3egzNW7svQYlJxUEc/XVYHehb3zHS7/rj+1+iyRvdmCC8N9gdlwuQ3rYPji+HAebwzA326tpu3ys12MnCxQZgA2SFhz5Rq9V6vtawUASkPPrkuF3JdtY5vfOww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6lawVoZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pgaSIIbJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E2FDC4CEF1;
-	Mon,  1 Sep 2025 16:52:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6lawVoZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8AF4C4CEF0;
+	Mon,  1 Sep 2025 17:12:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756745560;
-	bh=BFnBbraOCacTgsat4VNzLx3wIcLl5nbM95+AHTdP3Hc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pgaSIIbJXnOTds5upAgyOGSLpTsayVHNwR2jip8DUB7QKUhF5AZiipmakyvV95EoX
-	 KHf/lSBet2gthLiaGRRONcSdZ/fCCqhHVAWlRhWKQcci8fJgxtY9tfRHUX528fWpNG
-	 TIOTOYot99i0iLe4bBhzPWIRYysPlMNB6lvAR3bZNeNC8Vw3PU/WnNXp7wKsUpvlu0
-	 6JyHT01IaMmNHKjxHu5XDMRqIcn73Drs/WJkcBWmyiePWS+KVljXOVdNmGFllByFMw
-	 BYWqj0OuvLTmvsEiCnSHVnBDu/4Ml7QMCd+hHDul5AAq/UtKWV83keQ67IWSWgh8Ao
-	 UJn4rM+3OZcCw==
+	s=k20201202; t=1756746772;
+	bh=NgweoeNuvkJcA+MM/dILXJxOoDFdSGj1qjkhxKKs9AQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U6lawVoZDG9J4x4wsR1DyvfDZ2Mt2vbMafW1dhWssjoypTMsZnE+i2A4DqS7loDq4
+	 N+4fx/5z3dgGd8zN52EY+cess0zCORN2q8JTjZSmzaNZCF0yfwnW0Yb9pkRUgpy8kL
+	 ZGRQ4HJcFpOYQ9rNIglPpef4VReGx/hceES7/WX9gKOBBOZfRh8u6zZQaLZGco3C64
+	 srh0JKGKjZzJJzQJFodJERyvXJP7Fuu3IONvrMoixfR4g7VRu4C+AnvErjUBkyzui7
+	 yJpsy79rEuBNVOkQEudmV0v/V/Gvxgw4pNgQ81RHUqnieatWur5VOGoFLlOSGVM9KD
+	 TqnZ6gVoWUs5g==
+Date: Mon, 1 Sep 2025 10:11:44 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 3/3] crypto: sha512 - Implement export_core() and import_core()
-Date: Mon,  1 Sep 2025 09:50:13 -0700
-Message-ID: <20250901165013.48649-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250901165013.48649-1-ebiggers@kernel.org>
-References: <20250901165013.48649-1-ebiggers@kernel.org>
+To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+Subject: Re: [BUG] crypto: shash =?utf-8?B?4oCTIGNy?=
+ =?utf-8?Q?ypto=5Fshash=5Fexport=5Fcore=28?= =?utf-8?Q?=29?= fails with
+ -ENOSYS after libcrypto updates merge
+Message-ID: <20250901171144.GA1350@sol>
+References: <aLSnCc9Ws5L9y+8X@gcabiddu-mobl.ger.corp.intel.com>
+ <17bee9ab-7a39-4968-8778-ab2484ff58f7@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <17bee9ab-7a39-4968-8778-ab2484ff58f7@gmail.com>
 
-Since commit 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in
-API"), the recently-added export_core() and import_core() methods in
-struct shash_alg have effectively become mandatory (even though it is
-not tested or enforced), since legacy drivers that need a fallback
-depend on them.  Make crypto/sha512.c compatible with these legacy
-drivers by adding export_core() and import_core() methods to it.
+On Mon, Sep 01, 2025 at 09:20:20AM +0300, Ovidiu Panait wrote:
+> Hi,
+> 
+> On 8/31/25 10:48 PM, Giovanni Cabiddu wrote:
+> > After commit 13150742b09e ("Merge tag 'libcrypto-updates-for-linus' of
+> > git://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux"),
+> > crypto_shash_export_core() fails with -ENOSYS for all SHA algorithms
+> > registered via shash.
+> > 
+> > The failure originates from shash_default_export_core(), which is now
+> > being used as the default export function. However, this function is not
+> > implemented, resulting in -ENOSYS.
+> > 
+> > Before the merge, SHA shash implementations were setting the
+> > CRYPTO_AHASH_ALG_BLOCK_ONLY flag. This caused alg->export_core to be
+> > assigned to alg->export, enabling proper state export. It seems the
+> > removal of CRYPTO_AHASH_ALG_BLOCK_ONLY from the SHA implementations was
+> > intentional, is this correct?
+> > 
+> > This issue breaks all aead implementations in the QAT driver, which
+> > since commit ccafe2821cfa ("crypto: qat – Use crypto_shash_export_core")
+> > rely on crypto_shash_export_core() to retrieve the initial state for
+> > HMAC (i.e., H(K' xor opad) and H(K' xor ipad)).
+> > 
+> > It’s likely that the Chelsio driver is also affected, as it uses the
+> > same API.
+> > 
+> 
+> It seems that all legacy ahash drivers that set the
+> CRYPTO_ALG_NEED_FALLBACK flag are also affected.
+> 
+> I tested sha256 with the sun8i-ce driver and since commit e0cd37169103
+> ("crypto: sha256 - Wrap library and add HMAC support"),
+> crypto_alloc_ahash("sha256-sun8i-ce", 0, 0) calls fail with -ENOSYS.
+> 
+> The issue seems to be that drivers that set the CRYPTO_ALG_NEED_FALLBACK
+> flag fail to allocate a fallback because now the sha256-lib shash
+> wrappers are marked as CRYPTO_AHASH_ALG_NO_EXPORT_CORE (because they
+> lack an import_core()/export_core() implementation), so they can no
+> longer be used as fallback.
+> 
+> In crypto/ahash.c, crypto_ahash_init_tfm() specifically asks for
+> fallbacks that do not have the CRYPTO_AHASH_ALG_NO_EXPORT_CORE flag set:
+> 
+>     if (crypto_ahash_need_fallback(hash)) {
+>         fb = crypto_alloc_ahash(crypto_ahash_alg_name(hash),
+>                                 CRYPTO_ALG_REQ_VIRT,
+>                                 CRYPTO_ALG_ASYNC |
+>                                 CRYPTO_ALG_REQ_VIRT |
+>                                 CRYPTO_AHASH_ALG_NO_EXPORT_CORE);
+>     ...
+> 
+> The import_core()/export_core() functionality seems to be used by the
+> ahash Crypto API to support CRYPTO_AHASH_ALG_BLOCK_ONLY drivers (such as
+> padlock and aspeed drivers, that make use of use
+> crypto_ahash_import_core()/crypto_ahash_export_core()). Unless it can be
+> reimplemented to use the software library directly, I think the shash
+> sha library wrappers need to implement import_core() and export_core()
+> hooks so that shaX-lib can be used again as fallback.
+> 
+> Thanks,
+> Ovidiu
 
-Reported-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reported-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Closes: https://lore.kernel.org/r/aLSnCc9Ws5L9y+8X@gcabiddu-mobl.ger.corp.intel.com
-Fixes: 4bc7f7b687a2 ("crypto: sha512 - Use same state format as legacy drivers")
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- crypto/sha512.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+Hmm, that is annoying.  So the export_core and import_core methods
+(which were added in 6.16) seems to have been fairly deeply baked into
+the old-school crypto API already, even though they have no tests and
+only four drivers actually call them.
 
-diff --git a/crypto/sha512.c b/crypto/sha512.c
-index fb1c520978ef3..d320fe53913fa 100644
---- a/crypto/sha512.c
-+++ b/crypto/sha512.c
-@@ -48,10 +48,23 @@ static int __crypto_sha512_import(struct __sha512_ctx *ctx, const void *in)
- 	p += sizeof(*ctx);
- 	ctx->bytecount_lo += *p;
- 	return 0;
- }
- 
-+static int __crypto_sha512_export_core(const struct __sha512_ctx *ctx,
-+				       void *out)
-+{
-+	memcpy(out, ctx, offsetof(struct __sha512_ctx, buf));
-+	return 0;
-+}
-+
-+static int __crypto_sha512_import_core(struct __sha512_ctx *ctx, const void *in)
-+{
-+	memcpy(ctx, in, offsetof(struct __sha512_ctx, buf));
-+	return 0;
-+}
-+
- /* SHA-384 */
- 
- const u8 sha384_zero_message_hash[SHA384_DIGEST_SIZE] = {
- 	0x38, 0xb0, 0x60, 0xa7, 0x51, 0xac, 0x96, 0x38,
- 	0x4c, 0xd9, 0x32, 0x7e, 0xb1, 0xb1, 0xe3, 0x6a,
-@@ -98,10 +111,20 @@ static int crypto_sha384_export(struct shash_desc *desc, void *out)
- static int crypto_sha384_import(struct shash_desc *desc, const void *in)
- {
- 	return __crypto_sha512_import(&SHA384_CTX(desc)->ctx, in);
- }
- 
-+static int crypto_sha384_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_sha512_export_core(&SHA384_CTX(desc)->ctx, out);
-+}
-+
-+static int crypto_sha384_import_core(struct shash_desc *desc, const void *in)
-+{
-+	return __crypto_sha512_import_core(&SHA384_CTX(desc)->ctx, in);
-+}
-+
- /* SHA-512 */
- 
- const u8 sha512_zero_message_hash[SHA512_DIGEST_SIZE] = {
- 	0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd,
- 	0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80, 0x07,
-@@ -150,10 +173,20 @@ static int crypto_sha512_export(struct shash_desc *desc, void *out)
- static int crypto_sha512_import(struct shash_desc *desc, const void *in)
- {
- 	return __crypto_sha512_import(&SHA512_CTX(desc)->ctx, in);
- }
- 
-+static int crypto_sha512_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_sha512_export_core(&SHA512_CTX(desc)->ctx, out);
-+}
-+
-+static int crypto_sha512_import_core(struct shash_desc *desc, const void *in)
-+{
-+	return __crypto_sha512_import_core(&SHA512_CTX(desc)->ctx, in);
-+}
-+
- /* HMAC-SHA384 */
- 
- #define HMAC_SHA384_KEY(tfm) ((struct hmac_sha384_key *)crypto_shash_ctx(tfm))
- #define HMAC_SHA384_CTX(desc) ((struct hmac_sha384_ctx *)shash_desc_ctx(desc))
- 
-@@ -202,10 +235,25 @@ static int crypto_hmac_sha384_import(struct shash_desc *desc, const void *in)
- 
- 	ctx->ctx.ostate = HMAC_SHA384_KEY(desc->tfm)->key.ostate;
- 	return __crypto_sha512_import(&ctx->ctx.sha_ctx, in);
- }
- 
-+static int crypto_hmac_sha384_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_sha512_export_core(&HMAC_SHA384_CTX(desc)->ctx.sha_ctx,
-+					   out);
-+}
-+
-+static int crypto_hmac_sha384_import_core(struct shash_desc *desc,
-+					  const void *in)
-+{
-+	struct hmac_sha384_ctx *ctx = HMAC_SHA384_CTX(desc);
-+
-+	ctx->ctx.ostate = HMAC_SHA384_KEY(desc->tfm)->key.ostate;
-+	return __crypto_sha512_import_core(&ctx->ctx.sha_ctx, in);
-+}
-+
- /* HMAC-SHA512 */
- 
- #define HMAC_SHA512_KEY(tfm) ((struct hmac_sha512_key *)crypto_shash_ctx(tfm))
- #define HMAC_SHA512_CTX(desc) ((struct hmac_sha512_ctx *)shash_desc_ctx(desc))
- 
-@@ -254,10 +302,25 @@ static int crypto_hmac_sha512_import(struct shash_desc *desc, const void *in)
- 
- 	ctx->ctx.ostate = HMAC_SHA512_KEY(desc->tfm)->key.ostate;
- 	return __crypto_sha512_import(&ctx->ctx.sha_ctx, in);
- }
- 
-+static int crypto_hmac_sha512_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_sha512_export_core(&HMAC_SHA512_CTX(desc)->ctx.sha_ctx,
-+					   out);
-+}
-+
-+static int crypto_hmac_sha512_import_core(struct shash_desc *desc,
-+					  const void *in)
-+{
-+	struct hmac_sha512_ctx *ctx = HMAC_SHA512_CTX(desc);
-+
-+	ctx->ctx.ostate = HMAC_SHA512_KEY(desc->tfm)->key.ostate;
-+	return __crypto_sha512_import_core(&ctx->ctx.sha_ctx, in);
-+}
-+
- /* Algorithm definitions */
- 
- static struct shash_alg algs[] = {
- 	{
- 		.base.cra_name		= "sha384",
-@@ -270,10 +333,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_sha384_update,
- 		.final			= crypto_sha384_final,
- 		.digest			= crypto_sha384_digest,
- 		.export			= crypto_sha384_export,
- 		.import			= crypto_sha384_import,
-+		.export_core		= crypto_sha384_export_core,
-+		.import_core		= crypto_sha384_import_core,
- 		.descsize		= sizeof(struct sha384_ctx),
- 		.statesize		= SHA512_SHASH_STATE_SIZE,
- 	},
- 	{
- 		.base.cra_name		= "sha512",
-@@ -286,10 +351,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_sha512_update,
- 		.final			= crypto_sha512_final,
- 		.digest			= crypto_sha512_digest,
- 		.export			= crypto_sha512_export,
- 		.import			= crypto_sha512_import,
-+		.export_core		= crypto_sha512_export_core,
-+		.import_core		= crypto_sha512_import_core,
- 		.descsize		= sizeof(struct sha512_ctx),
- 		.statesize		= SHA512_SHASH_STATE_SIZE,
- 	},
- 	{
- 		.base.cra_name		= "hmac(sha384)",
-@@ -304,10 +371,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_hmac_sha384_update,
- 		.final			= crypto_hmac_sha384_final,
- 		.digest			= crypto_hmac_sha384_digest,
- 		.export			= crypto_hmac_sha384_export,
- 		.import			= crypto_hmac_sha384_import,
-+		.export_core		= crypto_hmac_sha384_export_core,
-+		.import_core		= crypto_hmac_sha384_import_core,
- 		.descsize		= sizeof(struct hmac_sha384_ctx),
- 		.statesize		= SHA512_SHASH_STATE_SIZE,
- 	},
- 	{
- 		.base.cra_name		= "hmac(sha512)",
-@@ -322,10 +391,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_hmac_sha512_update,
- 		.final			= crypto_hmac_sha512_final,
- 		.digest			= crypto_hmac_sha512_digest,
- 		.export			= crypto_hmac_sha512_export,
- 		.import			= crypto_hmac_sha512_import,
-+		.export_core		= crypto_hmac_sha512_export_core,
-+		.import_core		= crypto_hmac_sha512_import_core,
- 		.descsize		= sizeof(struct hmac_sha512_ctx),
- 		.statesize		= SHA512_SHASH_STATE_SIZE,
- 	},
- };
- 
--- 
-2.50.1
+For 6.17, maybe we should just go with a series that adds export_core
+and import_core support to crypto/sha*.c for now?  I've sent that out.
 
+For later, we should fix these legacy drivers to just use the library
+APIs instead, then remove export_core and import_core.  I already sent
+patches for qat and chelsio.  But it looks like the padlock and aspeed
+drivers will need an update too.
+
+- Eric
