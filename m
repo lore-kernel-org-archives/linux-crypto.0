@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EC132ED49
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Sep 2025 15:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DEB34320D
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Sep 2025 15:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756739651; cv=none; b=MLrK8BFt8qf7N3I5C28wCMvmNJQHO23RtcAJjqAdd7zXR1ZKzt1H6NOqkyriT3Gg7zttY2aJYAsFwq8jeAJAQ5vL0x2HZrtx1XU//pdZUx6xVr/BDaFTPPOwB17EddiOFlOSvbGPYNy4dIL6NepkeqKww7flEUbEKo5sY2HRQoY=
+	t=1756739664; cv=none; b=g1UzmAUfhOOwgjo9oEy8Ms5Bx/wq2D/vsrOursUIwf8NbXh4U4NtlR73G+EIfFQImTMOowOoymVv7RGti51Xiu3GmiWUYZJOjvpWnaMErCg0CTsNgtK3pdcWcjjdWm/LEExiLWJh/XF6ITmaMo8adw4KWjqp/B14y7ABibutGYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756739651; c=relaxed/simple;
-	bh=lkfnJeOsbpjrko/66wFH6LMYiPIP144D6/HWY57mN1U=;
+	s=arc-20240116; t=1756739664; c=relaxed/simple;
+	bh=zya2jX1ju8PFLzjz5KOjevcN0aBNFGgRJKTCFWl9v0o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ciyTGzXLPcqoSEpdY2nFTBR4I05pm5jKStELIJ9NTm6pw/cCbCJ5DvzSauDWo3NjBIb67a+4Nu5W5PEhrDV6/Xak6dZaod4dT1SLCPQoMrDEaVi+VMR/qfhX7/KQKM1kzSNE408F8c5wNYfK7hBeULVTuOu1RNhBB5LweUGOHw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AACSIOcU; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=lP/Cl80S9z9BykCd9q4baYi9rF78K73H/rgOmiMWBvjKK43zS/L3qamT1t/27HMYQcdrDzJ2FL1niG+qaXRYIov4w2HOpe2w7nhY4x3EwPlLrNo7rc0mqn+fmXtl8ivyphffklt/IYwQPCyEsip3LokJYH+bwagEOSExfoibjGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y3K7eFpS; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AACSIOcU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3K7eFpS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756739648;
+	s=mimecast20190719; t=1756739662;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZB8VenTnhwuJsxCOtg12iGGVlRBSxMcM5zW2W1CE+LA=;
-	b=AACSIOcUE1rw7cmE081RreF1Qs/jJnIFEVW9/bkxaQoKuG40GYxy2XwR4nMq48W/96iDdn
-	dbOFqAjE92zgOKzTmV+yu7J/oR2E1asdWdQsWado17JkXGxVRxy9dVJdAy9lhJqlPmd07q
-	3kdJUmonU9izJOt2B/G+ZjCwmIrfss0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=wgq8t08BL7RNfQ5mX4qRFuahvfg5EKXwRMG9Zf68USY=;
+	b=Y3K7eFpSsagOC5YH6LnIgJqT3UEHSZuT0fXnkQcjZbIWzQJjYa/9+f9krtcK/9erwBWVpf
+	jJG/yI62SWyTMyi/R8tD1zVsWFflkW1XyZ9wPh2xiNKui7rthv855B+qKgl2nqqRrMJmGp
+	yKx/W+DQDj4FyOwzqCEgy+IxfPZJLfA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-160-CInaJEnEOsyAhyUHiabiVw-1; Mon,
- 01 Sep 2025 11:14:05 -0400
-X-MC-Unique: CInaJEnEOsyAhyUHiabiVw-1
-X-Mimecast-MFC-AGG-ID: CInaJEnEOsyAhyUHiabiVw_1756739640
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-GxSXaOqMOKWCp_wVKjXAog-1; Mon,
+ 01 Sep 2025 11:14:20 -0400
+X-MC-Unique: GxSXaOqMOKWCp_wVKjXAog-1
+X-Mimecast-MFC-AGG-ID: GxSXaOqMOKWCp_wVKjXAog_1756739656
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DCC31800342;
-	Mon,  1 Sep 2025 15:14:00 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C598B1800366;
+	Mon,  1 Sep 2025 15:14:15 +0000 (UTC)
 Received: from t14s.fritz.box (unknown [10.22.88.45])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C0BF81800447;
-	Mon,  1 Sep 2025 15:13:45 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A0B1180044F;
+	Mon,  1 Sep 2025 15:14:00 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
@@ -91,9 +91,9 @@ Cc: David Hildenbrand <david@redhat.com>,
 	wireguard@lists.zx2c4.com,
 	x86@kernel.org,
 	Zi Yan <ziy@nvidia.com>
-Subject: [PATCH v2 36/37] block: update comment of "struct bio_vec" regarding nth_page()
-Date: Mon,  1 Sep 2025 17:03:57 +0200
-Message-ID: <20250901150359.867252-37-david@redhat.com>
+Subject: [PATCH v2 37/37] mm: remove nth_page()
+Date: Mon,  1 Sep 2025 17:03:58 +0200
+Message-ID: <20250901150359.867252-38-david@redhat.com>
 In-Reply-To: <20250901150359.867252-1-david@redhat.com>
 References: <20250901150359.867252-1-david@redhat.com>
 Precedence: bulk
@@ -105,35 +105,41 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Ever since commit 858c708d9efb ("block: move the bi_size update out of
-__bio_try_merge_page"), page_is_mergeable() no longer exists, and the
-logic in bvec_try_merge_page() is now a simple page pointer
-comparison.
+Now that all users are gone, let's remove it.
 
 Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/linux/bvec.h | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ include/linux/mm.h                   | 2 --
+ tools/testing/scatterlist/linux/mm.h | 1 -
+ 2 files changed, 3 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 0a80e1f9aa201..3fc0efa0825b1 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -22,11 +22,8 @@ struct page;
-  * @bv_len:    Number of bytes in the address range.
-  * @bv_offset: Start of the address range relative to the start of @bv_page.
-  *
-- * The following holds for a bvec if n * PAGE_SIZE < bv_offset + bv_len:
-- *
-- *   nth_page(@bv_page, n) == @bv_page + n
-- *
-- * This holds because page_is_mergeable() checks the above property.
-+ * All pages within a bio_vec starting from @bv_page are contiguous and
-+ * can simply be iterated (see bvec_advance()).
-  */
- struct bio_vec {
- 	struct page	*bv_page;
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 2ca1eb2db63ec..b26ca8b2162d9 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -210,9 +210,7 @@ extern unsigned long sysctl_admin_reserve_kbytes;
+ 
+ #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+ bool page_range_contiguous(const struct page *page, unsigned long nr_pages);
+-#define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
+ #else
+-#define nth_page(page,n) ((page) + (n))
+ static inline bool page_range_contiguous(const struct page *page,
+ 		unsigned long nr_pages)
+ {
+diff --git a/tools/testing/scatterlist/linux/mm.h b/tools/testing/scatterlist/linux/mm.h
+index 5bd9e6e806254..121ae78d6e885 100644
+--- a/tools/testing/scatterlist/linux/mm.h
++++ b/tools/testing/scatterlist/linux/mm.h
+@@ -51,7 +51,6 @@ static inline unsigned long page_to_phys(struct page *page)
+ 
+ #define page_to_pfn(page) ((unsigned long)(page) / PAGE_SIZE)
+ #define pfn_to_page(pfn) (void *)((pfn) * PAGE_SIZE)
+-#define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
+ 
+ #define __min(t1, t2, min1, min2, x, y) ({              \
+ 	t1 min1 = (x);                                  \
 -- 
 2.50.1
 
