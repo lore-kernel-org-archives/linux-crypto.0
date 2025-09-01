@@ -1,153 +1,167 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90CEB663
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Sep 2025 06:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A9B2EDD7C;
+	Mon,  1 Sep 2025 08:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756707625; cv=none; b=N9p2EnNc3YkECRCgyDKUYRQwv4b3YDBDV1vJ/SYY/mziT6X5NHX6ewXMBKe0eXhDcYedMjTUdBVL4b3zfVXZYAA7WoSKIOc80UMkf1a3e4qORL3Tkl3z0YIWVusY9SQ5VXDVNKewmAuOTuVFXFwdEPUlTtVwtNCwfbPNPi2a9nw=
+	t=1756714020; cv=none; b=svzsJMiYyF/HJPRQ8lXaXV3S7/Nk1sf7JAXlYtDfG3f6gw3BjTQjUziJ81dlzowuZwfr5bFpSypooQ0D1f905KG427ckmqpn+hZJQVD4iWA59DDIou8ZWajpLhTFqx6F8I7ycrBYK2fyFF0T4DLwLERpWn/bv4m8SV9VPlgxWYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756707625; c=relaxed/simple;
-	bh=zEw56TQKLGr0Y3WkeD2bIN2naB4CJkL1H9Om+s3CJuM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NIoyYW28bpe8F8jMm6HwJQXdkOX19HMlZbKEU+zlBjEl4y2xJbgWM2Jgz+xDDh5OrVDmEAXI5RvdnMYOhoTu2wBD54JwXomKP4ZDlU31khWEqh6zHJzH+Me6J7jdlXEPBGbGEgl2mluFl45+AuhwQLIKhNUuio9Yw/pUhcqeC1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRX/91zB; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756714020; c=relaxed/simple;
+	bh=VLpNS+bUWt279KK8jGyWrJFiwF8KwIr7Y32Y2kKXe9I=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=sOwIXvcqWNLwEN2tNtyntwQQ3MtdTjDhbfSkMb+QuGzbSxsEe2oqy8EvV55fi9yqjBJPwD1YGAx9MoX1kikDThNVvYv3ieeBXKWfdA99x9AubjRf/4GUF8IIURkg4iajO8TQjH2t32W1kQ/c8DMpHT7ISInjEy6VsAMcDafjRbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGt8xmJO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRX/91zB"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3cf991e8bb8so1557981f8f.2
-        for <linux-crypto@vger.kernel.org>; Sun, 31 Aug 2025 23:20:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756707622; x=1757312422; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QxCqpsdXk+aJA7X9N6VWwefDW8+28K76YuJxIrwtnCk=;
-        b=NRX/91zB6X08cFPu/rqeQWL1mQ6Iuss2mFNnrvCwGVKzS5ezxRhbA8ArkZywT/kKpW
-         dE/995Ah9zZvu9u9WE8WmwtqqbnuHaruNmEknA3trhRaa574EiQvYWD9gn6Ro9M5Dkjt
-         ESfjie9s52ni1O488jo2iulF/pC90h1GLpUgtDaRMbxkcRrJDkdxpGb75HCvftm69E0V
-         z1rf4zAUbf0fp2hQD5KKyCzhW6yHlB8XXcWNlxq39AssuuCDY65lohhDYcm/YrCZsIKV
-         iojZxPXtiW/xZbceqHkV8kCnRw9HAMZlgH7wm0qvEpG5JSTosHxO6Bj9PgXZePtlXqYT
-         SiSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756707622; x=1757312422;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QxCqpsdXk+aJA7X9N6VWwefDW8+28K76YuJxIrwtnCk=;
-        b=RMI5KErNIrOnSosKvxKj4L238bTbOMNOOuWZ1kgPPU/nT7NMuTWHKJjeYZms5pW+r7
-         7i/YQ9DPB+3cXbGg1dT4PixljAAPtjQF4AUecCv/me7Dyeq3tDtcpxyCvhTLUnXmjW1b
-         kNNzAXAlLF/KS4E11or46PIM2oWqdd2GDSgO6KeaGTQTZ7kl9xB7qn/AcijNut/i35Cr
-         6DMJflQsqfFFVtwu3Afx1U7UM5jVfAcu7yLmqnyqiLb48SXCtJ9mct2WoUD69awCutQ2
-         2qgF91Jq333+7z7wprbWgkBRpJMxzBsEF+CZwglxPcab0wbfmDaufp/e2Zcsl23ynXUw
-         Pn9A==
-X-Gm-Message-State: AOJu0Yx1f9FFtck7wVv9nhNO6ES8KycCn4tqZl38bxv5MY2OUj9G5wyH
-	Nc6c/lQyHBiubgGQehm7oKZYXSF7YcEilzTCB9T8B4HYFajC74Z94ZI2
-X-Gm-Gg: ASbGncuJbPDQBuztRgg0arWG1DKDU1Y31ByVJOwmgBccdhToDHjLOlKs3rGvY3g+hGD
-	7BhY+BeH+ZaSQzcvlscrzDHDMjKBpkGyfy+5g5dpvcbJRTIGhNT5xZyU3Oti2LPWCTZmnmvj3Nc
-	JBdpXDEw3OWLp2hgm3bMWzvX15T52fn/XmWBAOddAGg+YWvz1pDLM1yzwkULoTvsQJRh9UE/N02
-	v6Kv6WWGRfiV2QjT1/Diq5rftMddqX+BdJLDaIzyGaRfKDPkkfHVmzL98rI6wIt6Zlv9v22xmyo
-	zuyBrx4xGKxP41+4tCfs/WWkmA7qZnhMTpuCeRN22th+hv5E45Dy7NLfprKBrbTS1fJX5uPORVl
-	Hf0E3dx6sX0HaOuWt2sqV8WMJCbCn34lkGTOyJtA9k6w42V/P1o8PGasN9+YIC3s4Xxk6J76Mkw
-	K/76h8
-X-Google-Smtp-Source: AGHT+IGzkxP0bB/QY+KUJ3DWQPfE/rzycScZhofPAt1vXBqyoiVSt93G5FecSYBKTnMtcpZyBZv0gQ==
-X-Received: by 2002:a05:6000:4203:b0:3c8:7fbf:2d6d with SMTP id ffacd0b85a97d-3d1def61f35mr5082980f8f.50.1756707621679;
-        Sun, 31 Aug 2025 23:20:21 -0700 (PDT)
-Received: from ?IPV6:2a02:2f0e:c207:b600:978:f6fa:583e:b091? ([2a02:2f0e:c207:b600:978:f6fa:583e:b091])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b66f2041fsm134998655e9.5.2025.08.31.23.20.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Aug 2025 23:20:21 -0700 (PDT)
-Message-ID: <17bee9ab-7a39-4968-8778-ab2484ff58f7@gmail.com>
-Date: Mon, 1 Sep 2025 09:20:20 +0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGt8xmJO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C78DC4CEF0;
+	Mon,  1 Sep 2025 08:06:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756714019;
+	bh=VLpNS+bUWt279KK8jGyWrJFiwF8KwIr7Y32Y2kKXe9I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dGt8xmJOTDfXL69BWi4P5wTdsZoYcC3mBi8hYyPJW074UCn9Tm0f4Rcm6dswzScl6
+	 ZZcSNn9v7JdNMB+7opPjArafXDpgDaWucvRE3mv9BfUnFDneaptU5GWAiji+IIxIrd
+	 /oq2sDDR4/T9k8qj8Uvi1fgLJ2oVEtRiEGQXrknA04Fnx19SDyg2pBkUpqMlLiYi9N
+	 ULzqxUsEyr7dGL5G0Xw8zoxQtaFdu7qh5nkdps/GqMuElJ2EQqRR2Y6bzdJMJmv+cF
+	 Vw6FrugYoSfUjlAHNQhoDEo0l/Lu0xXhIHmVkvvk3Umv1NKGEtzkySA+V3J4cjCG91
+	 K+HBB/uBBd3nw==
+Date: Mon, 1 Sep 2025 17:06:55 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: paulmck@kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>, Menglong Dong
+ <dongml2@chinatelecom.cn>, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, kernel test robot
+ <oliver.sang@intel.com>, tgraf@suug.ch, herbert@gondor.apana.org.au,
+ linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] tracing: fprobe: fix suspicious rcu usage in
+ fprobe_entry
+Message-Id: <20250901170655.0757884ad7c2afb63ced3230@kernel.org>
+In-Reply-To: <d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
+References: <20250829021436.19982-1-dongml2@chinatelecom.cn>
+	<20250828222357.55fab4c2@batman.local.home>
+	<d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?UmU6IFtCVUddIGNyeXB0bzogc2hhc2gg4oCTIGNyeXB0b19zaGFzaF9l?=
- =?UTF-8?Q?xport=5Fcore=28=29_fails_with_-ENOSYS_after_libcrypto_updates_mer?=
- =?UTF-8?Q?ge?=
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- herbert@gondor.apana.org.au, ebiggers@kernel.org
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-References: <aLSnCc9Ws5L9y+8X@gcabiddu-mobl.ger.corp.intel.com>
-Content-Language: en-US
-From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-In-Reply-To: <aLSnCc9Ws5L9y+8X@gcabiddu-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Fri, 29 Aug 2025 04:11:02 -0700
+"Paul E. McKenney" <paulmck@kernel.org> wrote:
 
-On 8/31/25 10:48 PM, Giovanni Cabiddu wrote:
-> After commit 13150742b09e ("Merge tag 'libcrypto-updates-for-linus' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux"),
-> crypto_shash_export_core() fails with -ENOSYS for all SHA algorithms
-> registered via shash.
+> On Thu, Aug 28, 2025 at 10:23:57PM -0400, Steven Rostedt wrote:
+> > On Fri, 29 Aug 2025 10:14:36 +0800
+> > Menglong Dong <dongml2@chinatelecom.cn> wrote:
+> > 
+> > > rcu_read_lock() is not needed in fprobe_entry, but rcu_dereference_check()
+> > > is used in rhltable_lookup(), which causes suspicious RCU usage warning:
+> > > 
+> > >   WARNING: suspicious RCU usage
+> > >   6.17.0-rc1-00001-gdfe0d675df82 #1 Tainted: G S
+> > >   -----------------------------
+> > >   include/linux/rhashtable.h:602 suspicious rcu_dereference_check() usage!
+> > >   ......
+> > >   stack backtrace:
+> > >   CPU: 1 UID: 0 PID: 4652 Comm: ftracetest Tainted: G S
+> > >   Tainted: [S]=CPU_OUT_OF_SPEC, [I]=FIRMWARE_WORKAROUND
+> > >   Hardware name: Dell Inc. OptiPlex 7040/0Y7WYT, BIOS 1.1.1 10/07/2015
+> > >   Call Trace:
+> > >    <TASK>
+> > >    dump_stack_lvl+0x7c/0x90
+> > >    lockdep_rcu_suspicious+0x14f/0x1c0
+> > >    __rhashtable_lookup+0x1e0/0x260
+> > >    ? __pfx_kernel_clone+0x10/0x10
+> > >    fprobe_entry+0x9a/0x450
+> > >    ? __lock_acquire+0x6b0/0xca0
+> > >    ? find_held_lock+0x2b/0x80
+> > >    ? __pfx_fprobe_entry+0x10/0x10
+> > >    ? __pfx_kernel_clone+0x10/0x10
+> > >    ? lock_acquire+0x14c/0x2d0
+> > >    ? __might_fault+0x74/0xc0
+> > >    function_graph_enter_regs+0x2a0/0x550
+> > >    ? __do_sys_clone+0xb5/0x100
+> > >    ? __pfx_function_graph_enter_regs+0x10/0x10
+> > >    ? _copy_to_user+0x58/0x70
+> > >    ? __pfx_kernel_clone+0x10/0x10
+> > >    ? __x64_sys_rt_sigprocmask+0x114/0x180
+> > >    ? __pfx___x64_sys_rt_sigprocmask+0x10/0x10
+> > >    ? __pfx_kernel_clone+0x10/0x10
+> > >    ftrace_graph_func+0x87/0xb0
+> > > 
+> > > Fix this by using rcu_read_lock() for rhltable_lookup(). Alternatively, we
+> > > can use rcu_lock_acquire(&rcu_lock_map) here to obtain better performance.
+> > > However, it's not a common usage :/
+> > 
+> > So this is needed even though it's called under preempt_disable().
+> > 
+> > Paul, do we need to add an rcu_read_lock() because the code in rht
+> > (rhashtable) requires RCU read lock?
+> > 
+> > I thought that rcu_read_lock() and preempt_disable() have been merged?
 > 
-> The failure originates from shash_default_export_core(), which is now
-> being used as the default export function. However, this function is not
-> implemented, resulting in -ENOSYS.
+> Yes, preempt_disable() does indeed start an RCU read-side critical section,
+> just as surely as rcu_read_lock() does.
 > 
-> Before the merge, SHA shash implementations were setting the
-> CRYPTO_AHASH_ALG_BLOCK_ONLY flag. This caused alg->export_core to be
-> assigned to alg->export, enabling proper state export. It seems the
-> removal of CRYPTO_AHASH_ALG_BLOCK_ONLY from the SHA implementations was
-> intentional, is this correct?
+> However, this is a lockdep check inside of __rhashtable_lookup():
 > 
-> This issue breaks all aead implementations in the QAT driver, which
-> since commit ccafe2821cfa ("crypto: qat – Use crypto_shash_export_core")
-> rely on crypto_shash_export_core() to retrieve the initial state for
-> HMAC (i.e., H(K' xor opad) and H(K' xor ipad)).
+> 	rht_dereference_rcu(ht->tbl, ht)
 > 
-> It’s likely that the Chelsio driver is also affected, as it uses the
-> same API.
+> Which is defined as:
 > 
-
-It seems that all legacy ahash drivers that set the
-CRYPTO_ALG_NEED_FALLBACK flag are also affected.
-
-I tested sha256 with the sun8i-ce driver and since commit e0cd37169103
-("crypto: sha256 - Wrap library and add HMAC support"),
-crypto_alloc_ahash("sha256-sun8i-ce", 0, 0) calls fail with -ENOSYS.
-
-The issue seems to be that drivers that set the CRYPTO_ALG_NEED_FALLBACK
-flag fail to allocate a fallback because now the sha256-lib shash
-wrappers are marked as CRYPTO_AHASH_ALG_NO_EXPORT_CORE (because they
-lack an import_core()/export_core() implementation), so they can no
-longer be used as fallback.
-
-In crypto/ahash.c, crypto_ahash_init_tfm() specifically asks for
-fallbacks that do not have the CRYPTO_AHASH_ALG_NO_EXPORT_CORE flag set:
-
-    if (crypto_ahash_need_fallback(hash)) {
-        fb = crypto_alloc_ahash(crypto_ahash_alg_name(hash),
-                                CRYPTO_ALG_REQ_VIRT,
-                                CRYPTO_ALG_ASYNC |
-                                CRYPTO_ALG_REQ_VIRT |
-                                CRYPTO_AHASH_ALG_NO_EXPORT_CORE);
-    ...
-
-The import_core()/export_core() functionality seems to be used by the
-ahash Crypto API to support CRYPTO_AHASH_ALG_BLOCK_ONLY drivers (such as
-padlock and aspeed drivers, that make use of use
-crypto_ahash_import_core()/crypto_ahash_export_core()). Unless it can be
-reimplemented to use the software library directly, I think the shash
-sha library wrappers need to implement import_core() and export_core()
-hooks so that shaX-lib can be used again as fallback.
-
-Thanks,
-Ovidiu
-
-> What is the recommended way to move forward?  Should the SHA
-> implementations reintroduce CRYPTO_AHASH_ALG_BLOCK_ONLY?  Should
-> shash_default_export_core() be properly implemented?  Should drivers
-> like QAT switch to using the software library directly to export the SHA
-> state?  Or is there another preferred approach?
+> 	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht));
 > 
-> Thanks,
-> 
+> This is explicitly telling lockdep that rcu_read_lock() is OK and
+> holding ht->mutex is OK, but nothing else is.
 
+That is similar to the kprobes, which also allows accessing in
+rcu critical section or under mutex.
+
+> 
+> So an alternative way to fix this is to declare it to be a false positive,
+> and then avoid that false positive by adding a check that preemption
+> is disabled.  Adding the rhashtable maintainers for their perspective.
+
+What about changing it alloing it with preempt disabled flag?
+
+Thank you,
+
+> 
+> 							Thanx, Paul
+> 
+> > -- Steve
+> > 
+> > 
+> > > 
+> > > Reported-by: kernel test robot <oliver.sang@intel.com>
+> > > Closes: https://lore.kernel.org/oe-lkp/202508281655.54c87330-lkp@intel.com
+> > > Fixes: dfe0d675df82 ("tracing: fprobe: use rhltable for fprobe_ip_table")
+> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > > ---
+> > >  kernel/trace/fprobe.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/kernel/trace/fprobe.c b/kernel/trace/fprobe.c
+> > > index fb127fa95f21..fece0f849c1c 100644
+> > > --- a/kernel/trace/fprobe.c
+> > > +++ b/kernel/trace/fprobe.c
+> > > @@ -269,7 +269,9 @@ static int fprobe_entry(struct ftrace_graph_ent *trace, struct fgraph_ops *gops,
+> > >  	if (WARN_ON_ONCE(!fregs))
+> > >  		return 0;
+> > >  
+> > > +	rcu_read_lock();
+> > >  	head = rhltable_lookup(&fprobe_ip_table, &func, fprobe_rht_params);
+> > > +	rcu_read_unlock();
+> > >  	reserved_words = 0;
+> > >  	rhl_for_each_entry_rcu(node, pos, head, hlist) {
+> > >  		if (node->addr != func)
+> > 
+
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
