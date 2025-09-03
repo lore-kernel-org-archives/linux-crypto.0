@@ -1,105 +1,111 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FCD2FAC12
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Sep 2025 11:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6FF2E4257;
+	Wed,  3 Sep 2025 13:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756899382; cv=none; b=GdGJ6YjfzhAvRI092dqMWcqPnyGNSvp1vheXtFZ9plhbwYUBEIqEZZusMkwKelnC1HzUmBAL7pv6d3gFdxVnh3sJBQcnVMQwwTuYHRU5cpptrnPvIdi4u9vm/NQ5mY55A29yGIPPSkcIcodYB3W7v7AFljsEM/mAmusFQXVmkAU=
+	t=1756905398; cv=none; b=tTGXlf4/fgkDEDKn144ePxoxrjo4WAQjcRHw87aFliG9/ngrvwOI3W2BThmI6yLonxabVTiuDATMgu5mKvyBZ8SDcMlePAAXhmZSj9UxtpRfCrylA/LAiXk/YXAN9uYPMXRqY7IOGKGw8LYXqBJsN1Gk3MTgUdgK7u2y3DJP+wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756899382; c=relaxed/simple;
-	bh=1S0oCNu8oF/vMuMeRiEdBUA7z3A55yPQtE9fmoNeTcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XjgA0l1SFziRQG+NpKsovl0gElh+jZl0e6jmxsAxXgc8TKmITJcBJKd9qYCwQ9JkY5A+q9JODH/bKZeHiKFJDvtxeTG9rhhwoYTOoSZVfQ/rKCUqSMUwr3/haim/AwbQrycadok6EcM4I6yqjk9niBX37zB6ck0GmZ6oGxkzAas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gyhv/EF+; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1756905398; c=relaxed/simple;
+	bh=nh/Jvj+3PfiFDjRFpwIMNEZfJ4VoTazjot8RleOlFQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KbjbBLawTWlEFjEt1hvXjnszJibpQKISg+76OkGxyFv8GLX477kyTwWXFFx+CgMgvd3SPSNmF3s8a3mtjWbZrEDUZw++2hKtdsNfx+xf0bA1aXlf/+WfYvQba+smGnlCceipagfZva5sgbHOm1dOdAtwVQJO3s1zNq9968z/OT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=Mi40bUy3; arc=none smtp.client-ip=217.92.40.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gyhv/EF+"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-722e079fa1aso8080106d6.3
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Sep 2025 04:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756899380; x=1757504180; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=a3IW4gClMpsxg8pegPHxJ+hydJ79H7ht+ce7OmUzWyQ=;
-        b=Gyhv/EF+fGymevRyCu0EVkNBMQvLeQdRcexx1ZShr+sy0ozKNfLVd4thU1m/VRsY7d
-         fqczt8DKt1DxNSeb3b4QesHHzmBDZ3dUA1mYWprJvOGM4PrXoeJj88b/Ym76oEF27bT4
-         KIEUAPdr8UyuqEI5tO3ur3RSoipl9SMeEhbZnVGqxCkrKo0LIgV1BzCO+8eUij/ZKWrT
-         Y2MkmxH9XwG6LzhFCNpmhIZ52lqdx2V6EEBrm4lYK+aw87/An+rAbP7qDm9HtzybwA+7
-         DDLV7Z5AbnimY9uUOE7ZVcsWU964mrlWd3lPM+sKZBbN40Kxj8c+SHNXWdQzhJ9UIujr
-         5Lpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756899380; x=1757504180;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a3IW4gClMpsxg8pegPHxJ+hydJ79H7ht+ce7OmUzWyQ=;
-        b=Oi+RlLFeTIJvvC9CApaP4bvos/FBM+q89gx87q1YIms1r421xGsZe0EMGYBJ6BtbbL
-         KaNW09rCiHDy1VnbV1rXWg32e/WNJ90LABbQ+G1YMwxoTzsN25hd8DiQDXbse56BdPkv
-         yvFvmzhQrX7tUXjxhUlscXSnjmFmlfKblMpGD+SwtJm8gi0z3r8A52PoOnXIkeRyEl8S
-         +j3bLT2YLbKMlxKszUDaZMO6fVch1i7OaV6KNDLEDR9H6D/wQMLaBmhXdIK/o3cVm1EZ
-         lMnFb5+kaYv4d7dqsxYEsVOnVuqKckADcge5ZnVBpsMmnKXKAlGerLNU1Y3PV0t0kgGT
-         9IKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXaIflt7wwNUCcmjU6q6V0taDraXF+nOjAFrnVO7Ran2+w3woen1LXEn7aNvvWd/j8ZEid4JXTP+HMRxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc8AKYHLbmchIZKtyMjh0sBcxpd2Z9dElTQefxxlmTtmKaUVlx
-	uZkryzFaWTyWh7D++d+CZJV8LepTYQziZBBqhvUvw6lbMJThL4AOOccmHrVWReAzlJIjwc9h2Zq
-	K4bgYfz0lC2BGHGSprb8X2ofgYm6pf4avtfnHIQnf
-X-Gm-Gg: ASbGncu+xG4lFAFYs8OkKbeyBVGr1hFodVSC4dgw9VdInrC1Ohs4eyJUlFSgWiVg8dV
-	q0h3G6GNpF0qk00BNNKwXRw8D63LGpAFehbYdInRy9gZVA9v/TC2USuH/aPpw3oh2a9QsqXJ5M3
-	QUngVm5HJ/lRCHnUVYBFGAnSAKPKh5XD6P/zDwqqU5OqLzQ2sc1lCQ8H/M+Yzb/xqTPFZUU2L2R
-	47gh1PfKpfXP8r/SiEBNHjcAT00xpKgYH+8m0btVsI=
-X-Google-Smtp-Source: AGHT+IHt5Uf7f9hHKKGO4y+S7XWf9ByCdyBez8I/gMbmDbS05z3pOWgerpBal3i6mcnzy0T4lRXiKY79hwA2pscstuA=
-X-Received: by 2002:ad4:5aaf:0:b0:725:1fb:a6b6 with SMTP id
- 6a1803df08f44-72501fbac03mr16948666d6.31.1756899379536; Wed, 03 Sep 2025
- 04:36:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="Mi40bUy3"
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C4D4D1487E25;
+	Wed,  3 Sep 2025 15:16:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
+	t=1756905386; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=aHqRa8jsx4scxQoHsogOHYRV2hwQ6tQgcKa606SaBXY=;
+	b=Mi40bUy3Qk6XWegkRfPM2jnv4dDk/bMr2lj8J/pF4Gri48WBAkFX2c8VfueH8QqgCf2Ng8
+	j5AcfYSFfVjl6qZmg4jeiz3c6SMpf4oy8SG4v5oJmU7JXVKjlUK0bGcYIOJWNDqUGyZcms
+	Sff7vKAfUKeT6nvfJzbKbjFGimAEMj1wL7WqwQ3CZM5jPi07ldAlfZilQmSE3wtlrNL8Gv
+	OYP7T1CFZSdYRfuoHH7n6uRcTI+N6s7ysLFA6qazlJP/eibZT1JQi7uKBLnEPtQqfcfvvh
+	qz6NHVk6ppVZmLyBYDYcwkHh/+haGNIMfW6/g/QOTfw6wH67NV3Kug8C4llwIQ==
+Date: Wed, 3 Sep 2025 15:16:10 +0200
+From: Alexander Dahl <ada@thorsis.com>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Vinod Koul <vkoul@kernel.org>, linux@armlinux.org.uk,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	catalin.marinas@arm.com, will@kernel.org, olivia@selenic.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	andi.shyti@kernel.org, lee@kernel.org, broonie@kernel.org,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, arnd@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, o.rempel@pengutronix.de,
+	daniel.machon@microchip.com, Robert Marko <robert.marko@sartura.hr>,
+	luka.perkov@sartura.hr
+Subject: Re: (subset) [PATCH v8 00/10] arm64: lan969x: Add support for
+ Microchip LAN969x SoC
+Message-ID: <20250903-gratify-sustained-9acc011bc3c9@thorsis.com>
+Mail-Followup-To: Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Vinod Koul <vkoul@kernel.org>, linux@armlinux.org.uk,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	catalin.marinas@arm.com, will@kernel.org, olivia@selenic.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	andi.shyti@kernel.org, lee@kernel.org, broonie@kernel.org,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, arnd@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, o.rempel@pengutronix.de,
+	daniel.machon@microchip.com, Robert Marko <robert.marko@sartura.hr>,
+	luka.perkov@sartura.hr
+References: <20250702183856.1727275-1-robert.marko@sartura.hr>
+ <175327377884.189941.15214972441246653208.b4-ty@kernel.org>
+ <bac5390f-725a-43db-a2b6-17a68d0d733c@tuxon.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com> <20250901164212.460229-3-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250901164212.460229-3-ethan.w.s.graham@gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Wed, 3 Sep 2025 13:35:41 +0200
-X-Gm-Features: Ac12FXyA87fTSQv-blZ3tbQBrKQAAZ9Bwbod18tXQa26iNm899ybg0GqU8LYCbA
-Message-ID: <CAG_fn=U+xi3zjr+g+PaT_41JHSca1W6J72xd5=c0dVrSy75XpA@mail.gmail.com>
-Subject: Re: [PATCH v2 RFC 2/7] kfuzztest: add user-facing API and data structures
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
-	davidgow@google.com, dvyukov@google.com, jannh@google.com, elver@google.com, 
-	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
-	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
-	lukas@wunner.de, ignat@cloudflare.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bac5390f-725a-43db-a2b6-17a68d0d733c@tuxon.dev>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Last-TLS-Session-Version: TLSv1.3
 
-> +       static ssize_t kfuzztest_write_cb_##test_name(struct file *filp, const char __user *buf, size_t len, \
-> +                                                     loff_t *off)                                           \
-> +       {                                                                                                    \
-> +               test_arg_type *arg;                                                                          \
-> +               void *buffer;                                                                                \
-> +               int ret;                                                                                     \
-> +                                                                                                             \
-> +               buffer = kmalloc(len, GFP_KERNEL);                                                           \
-> +               if (!buffer)                                                                                 \
-> +                       return -ENOMEM;                                                                      \
-> +               ret = simple_write_to_buffer(buffer, len, off, buf, len);                                    \
-> +               if (ret < 0)                                                                                 \
-> +                       goto out;                                                                            \
-> +               ret = kfuzztest_parse_and_relocate(buffer, len, (void **)&arg);                              \
-> +               if (ret < 0)                                                                                 \
-> +                       goto out;                                                                            \
-> +               kfuzztest_logic_##test_name(arg);                                                            \
-> +               ret = len;                                                                                   \
-> +out:                                                                                                         \
-> +               kfree(buffer);                                                                               \
-> +               return ret;                                                                                  \
-> +       }                                                                                                    \
-> +       static void kfuzztest_logic_##test_name(test_arg_type *arg)
+Hello,
 
-simple_write_to_buffer() may write less than len bytes if it hits a
-protected page.
-You should check that `ret == len` and return -EFAULT if they differ.
+Am Thu, Jul 31, 2025 at 11:05:07AM +0300 schrieb Claudiu Beznea:
+> Hi, Vinod,
+> 
+> On 23.07.2025 15:29, Vinod Koul wrote:
+> > 
+> > On Wed, 02 Jul 2025 20:35:58 +0200, Robert Marko wrote:
+> >> This patch series adds basic support for Microchip LAN969x SoC.
+> >>
+> >> It introduces the SoC ARCH symbol itself under the ARCH_MICROCHIP symbol
+> >> which allows to avoid the need to change dependencies of the drivers that
+> >> are shared for Microchip SoC-s in the future.
+> >>
+> >> DTS and further driver will be added in follow-up series.
+> >>
+> >> [...]
+> > 
+> > Applied, thanks!
+> > 
+> > [08/10] dma: xdmac: make it selectable for ARCH_MICROCHIP
+> >         commit: e56982021f5303b2523ac247e3c79b063459d012
+> 
+> As this one depends, as well, on the first 3 patches in the series (Robert,
+> please correct me if I'm wrong), and there are still discussions ongoing,
+> can you please drop it until all is clear on the first 3 patches?
+> 
+> Otherwise, applying only this patch will lead to AT91 XDMAC driver not
+> being built for SAMA5{D2, D3, D4}, SAMA7{G5, D65} SoCs. Linux is not
+> booting on SAMA7G5 SoC only with this patch applied.
+
+Second that.  Just tested v6.17-rc4 on sam9x60 and DMA is not working
+at all because this driver can not be selected anymore.  This must be
+fixed before v6.17 release please!
+
+Greets
+Alex
