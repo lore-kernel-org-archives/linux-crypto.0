@@ -1,264 +1,95 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAA781749
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Sep 2025 08:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D721A2EC54B;
+	Wed,  3 Sep 2025 09:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756889917; cv=none; b=suN9Fw3i+nMfHWZI1r7PEd8B1l6xeUK8qhlQxnQ5xlh+QO4mWyK/DdZ8kObGw12dqhG1664MFL+f6B6lIoW+bvsiYo9P+Nr/iOeF7FdsMBrmWnHkbYxXofKc5hvEfyKsYH9BZgKb1bGnmzhIw7P7NbWVM0PmagNwDe98gVUYch4=
+	t=1756892625; cv=none; b=pHM5gsvKQZZ2ijHTjD2FgFvuqXIN8uqVbYfS+SL6sYzD6xuUh799lfxVDybYrnRRXmI45Vp534poMhaplDwis9YNH7kGPhSEffnUwIzVlbv1ZcAS2FqlyUK5TTX5S8BjsSqIDWRoJYE/VqOL+cbWibAb7B4mhXIiWNsqAjfThmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756889917; c=relaxed/simple;
-	bh=cWss5KSr5baYEsadUndMGJzvEYEA64szR0XEJUk+TrQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sb/IlLRREKgJlavzIMYBoMcI4MRzxUTmBi51SyuZNXgAfFJIWt31VkyKuADj4g8jxDBto5oPc5wXbtlPGURUNqWH/DiUElHi/2cC54kjKuGPH8I6IhlcA2t0KS3HWhzIg4Q2TxEY47/LQZToDt65aRoGLa2MhTLCjAXpFPVcN1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=brUcCgje; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1756892625; c=relaxed/simple;
+	bh=OQ+vrx681tl71W0sH3I5ZAXi5loKlF7ExWzTgxUxM7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pR8pFufyRZimgJcYztGTtdXX8rbj9t2oM/WM7dZzWiiOgMqtajFzkRaNmjTEESXxGM4rVwUi9gvXrE+T+c3Zgxj/CP3xIenkdkGO+TYAdGNhZ0KWoYBA2ZgQ5TIIe6hordOxC6+hc6jaU/3wmCsSvKrvzPRgKZum1CwfIanlnfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dIi62obN; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="brUcCgje"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-337e5daf5f5so6248301fa.0
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Sep 2025 01:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1756889914; x=1757494714; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o7DZbr5IPE7KPqwr8CmuJ7G0mqK+7ozrUki3YjXg8lg=;
-        b=brUcCgje0/7vA+VOeg+MNxlx4i3uSr2kCH5vMSBGVG9SKTU8NUhEMt8WJDq5Iti3dt
-         b3aWlsTkot282PQRdX1I0/tnvLQJNrl3671ijUUDlyevAeaZ3i4vTukHB99sR4azVqdG
-         9AL0+aH1JICxBz2SuZrii2BHwnClmt/A5lJhB3oU3LAWVQYQXl2erj9J96VetAICUJBe
-         VzrHjV21uwfuDGDFoj33Rm4BkKksyuQGSVt3gR1TMxfKnA1Ym8N0QgcZbhl0HYPT87Fu
-         uCzuCOrrEPrTwB4KQ3ApkY8KvxYMWLPm5Ax1XnaNrdSXKRXEXdaCpTYZnRLTx6HNJRCi
-         CMrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756889914; x=1757494714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o7DZbr5IPE7KPqwr8CmuJ7G0mqK+7ozrUki3YjXg8lg=;
-        b=t9oRl8I9/t+mtFuWK+2pQXNj4U50dI6+GiMuxNRauutR4wY9WWDhMi8amqRYqIDQdc
-         qkVQBU67iVKkg7o57BCiZDxukUvelTtn9jYBTMeWj9UUkZCsd50pdn5bkmEjuZOk+ZpV
-         eRQaT5LmzpnqGoV0i6QttJc9A4Uysd5hPS2DBDtINMe0Z+++6ej3x0pFOTFvE/aUSM2x
-         lfDCoK//Thkv18+yZ3P+C5NtAUU3ZA5NtG8t9fjsKkdW07OkmRkyS/TA2mhxBCqKLl+c
-         pzzd2f2dl7+7rOPMIAhcQ6/aYlGliiXpCo1yzUeN9K34Iv4i/ZRZLXeYrghuf4IwrR8d
-         wAXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHDJEBx2zM/NlR/7Hak0/KNAISGRecOWYqUDNc9v+/Jg5QXPkluOQf0hC68/6Ny0sWRMKQOuAXHyL9H4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw27IfO9//uFwM907cQq8Vb0Yy/d7Z9qNLVHAR5XOj0ylgcW/l3
-	WGi/movcDR1eWP9q6jUw8gC1TMshauxXF4AbdyL0jH/MlNRMlg/fU+DjHs742msa8ltEpLQmCRg
-	Qjheqv1ICiDZjR/SZPDm2NuPNPNgz3tb/6iIfsyiJ2A==
-X-Gm-Gg: ASbGnctRjklTtasOjjvYC8NMbMZRC/ceCjrXyQAb/aa4r7C0BAp/AIZkvKpcU/20b1E
-	WqQ15aPoBiUgmNXRFZQ3+MoHx0vt4r0J4gvekQPpz33uN2md8Ey2m/mu1H8f19b0E99gEk/1xGO
-	OhGaQMJnOfagbUxf9Pkduh0V6A8sBpCMYSq/O+JPhNlBUNX948ZjielUIYe8YNyEruBTiid4eRH
-	RDDEEhHErg/pvikQNonWOsEwdLEMlCOGPzv
-X-Google-Smtp-Source: AGHT+IFWZ1KRHLT58ws0GLUyYgsxqndwv00B/CVuSizWtD5TQIXhe4G2nzXHLgGunu2r8TYG1KYxHIJpaIS7aNOjkHw=
-X-Received: by 2002:a05:651c:410c:b0:337:f40b:ceff with SMTP id
- 38308e7fff4ca-337f40bd6b0mr10888081fa.0.1756889913537; Wed, 03 Sep 2025
- 01:58:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dIi62obN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=9d+/WbJg6wj+VAm0aoql4nUkSVy5cPH3NRVopYML9gc=; b=dIi62obN5xJX1j9ka4sKZiPa6u
+	11938ggborukj0RLrNk9t8fyxuz5BIt37F5gKZ2/wC5a8V3AJQv5xXket2LLv6QBA3BP5b92VBVzV
+	y2n3St7BEiQE12b3dmF6Y+y95jegZQP0DKLixs5POz7oTGj+Q8is9uNYdVFqFFjQ3f7PGl9DdflG1
+	Rpcta2RxqeZmltueLi649ACvix1X3kvKQ0vc20881nkizo2zM5palovMyqY2vlUCx3fs/t8KV/RQs
+	q5lMpiOIL/ETeIIyGrUlA9CFrimYl46n6lZM7Kd0Y/nbdQb47t2txRUf+jpGpC9OTki6VgfGCM1Zf
+	A7kLMdsA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1utjm3-002Gp8-2s;
+	Wed, 03 Sep 2025 17:43:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 Sep 2025 17:43:24 +0800
+Date: Wed, 3 Sep 2025 17:43:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Menglong Dong <dongml2@chinatelecom.cn>,
+	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kernel test robot <oliver.sang@intel.com>, tgraf@suug.ch,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] tracing: fprobe: fix suspicious rcu usage in fprobe_entry
+Message-ID: <aLgNvJ3vBtgD9Mq0@gondor.apana.org.au>
+References: <20250829021436.19982-1-dongml2@chinatelecom.cn>
+ <20250828222357.55fab4c2@batman.local.home>
+ <d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
+ <20250901170655.0757884ad7c2afb63ced3230@kernel.org>
+ <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com> <20250901164212.460229-8-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250901164212.460229-8-ethan.w.s.graham@gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Wed, 3 Sep 2025 09:58:22 +0100
-X-Gm-Features: Ac12FXzBn0vfVPWXT-oRg7YFxfn5ZjyJ_zA4MQI9Ke7h9u6mEjL9U6otTFUfOcM
-Message-ID: <CALrw=nGkk01xXG7S68FggsWQXygTXnXGz8AvseQuRE9K-OE0uA@mail.gmail.com>
-Subject: Re: [PATCH v2 RFC 7/7] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
-	brendan.higgins@linux.dev, davidgow@google.com, dvyukov@google.com, 
-	jannh@google.com, elver@google.com, rmoar@google.com, shuah@kernel.org, 
-	tarasmadan@google.com, kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
-	lukas@wunner.de, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
 
-On Mon, Sep 1, 2025 at 5:43=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
-.com> wrote:
+On Mon, Sep 01, 2025 at 08:00:15AM -0700, Paul E. McKenney wrote:
 >
-> From: Ethan Graham <ethangraham@google.com>
->
-> Add KFuzzTest targets for pkcs7_parse_message, rsa_parse_pub_key, and
-> rsa_parse_priv_key to serve as real-world examples of how the framework i=
-s used.
->
-> These functions are ideal candidates for KFuzzTest as they perform comple=
-x
-> parsing of user-controlled data but are not directly exposed at the sysca=
-ll
-> boundary. This makes them difficult to exercise with traditional fuzzing =
-tools
-> and showcases the primary strength of the KFuzzTest framework: providing =
-an
-> interface to fuzz internal functions.
+> If this is happening often enough, it would be easy for me to create an
+> rcu_dereference_all_check() that allows all forms of vanilla RCU readers
+> (but not, for example, SRCU readers), but with only two use cases,
+> it is not clear to me that this is an overall win.
 
-nit: can I ask for another real example? AFAIK this subsystem is
-rarely used (at least directly by users). However, one user-controlled
-widely used parser terrifies me: load_script() function from
-binfmt_script.c, which parses the shebang line for scripts. I would
-really like to see what this framework can do to fuzz that.
+Hi Paul:
 
-> The targets are defined within /lib/tests, alongside existing KUnit
-> tests.
->
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
->
-> ---
-> v2:
-> - Move KFuzzTest targets outside of the source files into dedicated
->   _kfuzz.c files under /crypto/asymmetric_keys/tests/ as suggested by
->   Ignat Korchagin and Eric Biggers.
-> ---
-> ---
->  crypto/asymmetric_keys/Kconfig                | 15 ++++++++
->  crypto/asymmetric_keys/Makefile               |  2 +
->  crypto/asymmetric_keys/tests/Makefile         |  2 +
->  crypto/asymmetric_keys/tests/pkcs7_kfuzz.c    | 22 +++++++++++
->  .../asymmetric_keys/tests/rsa_helper_kfuzz.c  | 38 +++++++++++++++++++
->  5 files changed, 79 insertions(+)
->  create mode 100644 crypto/asymmetric_keys/tests/Makefile
->  create mode 100644 crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
->  create mode 100644 crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
->
-> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kcon=
-fig
-> index e1345b8f39f1..7a4c5eb18624 100644
-> --- a/crypto/asymmetric_keys/Kconfig
-> +++ b/crypto/asymmetric_keys/Kconfig
-> @@ -104,3 +104,18 @@ config FIPS_SIGNATURE_SELFTEST_ECDSA
->         depends on CRYPTO_ECDSA=3Dy || CRYPTO_ECDSA=3DFIPS_SIGNATURE_SELF=
-TEST
->
->  endif # ASYMMETRIC_KEY_TYPE
-> +
-> +config PKCS7_MESSAGE_PARSER_KFUZZ
+Please create such a helper.  Because the alternative is for me
+to do something like this in rhashtable:
 
-I'm a bit worried about the scalability of defining one (visible)
-config option per fuzz file/module. Is there a use-case, where a user
-would want to enable some targets, but not the others? Can it be
-unconditionally enabled and compiled only if CONFIG_KFUZZTEST=3Dy?
+#define rht_dereference_rcu(p, ht) \
+	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht) || \
+				 rcu_read_lock_any_held())
 
-> +       bool "Build fuzz target for PKCS#7 parser"
-> +       depends on KFUZZTEST
-> +       depends on PKCS7_MESSAGE_PARSER
-> +       default y
-> +       help
-> +         Builds the KFuzzTest targets for PKCS#7.
-> +
-> +config RSA_HELPER_KFUZZ
-> +       bool "Build fuzz targets for RSA helpers"
-> +       depends on KFUZZTEST
-> +       default y
-> +       help
-> +         Builds the KFuzzTest targets for RSA helper functions.
-> diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Mak=
-efile
-> index bc65d3b98dcb..77b825aee6b2 100644
-> --- a/crypto/asymmetric_keys/Makefile
-> +++ b/crypto/asymmetric_keys/Makefile
-> @@ -67,6 +67,8 @@ obj-$(CONFIG_PKCS7_TEST_KEY) +=3D pkcs7_test_key.o
->  pkcs7_test_key-y :=3D \
->         pkcs7_key_type.o
->
-> +obj-y +=3D tests/
-> +
->  #
->  # Signed PE binary-wrapped key handling
->  #
-> diff --git a/crypto/asymmetric_keys/tests/Makefile b/crypto/asymmetric_ke=
-ys/tests/Makefile
-> new file mode 100644
-> index 000000000000..42a779c9042a
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/Makefile
-> @@ -0,0 +1,2 @@
-> +obj-$(CONFIG_PKCS7_MESSAGE_PARSER_KFUZZ) +=3D pkcs7_kfuzz.o
-> +obj-$(CONFIG_RSA_HELPER_KFUZZ) +=3D rsa_helper_kfuzz.o
-> diff --git a/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c b/crypto/asymmetr=
-ic_keys/tests/pkcs7_kfuzz.c
-> new file mode 100644
-> index 000000000000..84d0b0d8d0eb
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
-> @@ -0,0 +1,22 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * PKCS#7 parser KFuzzTest target
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#include <crypto/pkcs7.h>
-> +#include <linux/kfuzztest.h>
-> +
-> +struct pkcs7_parse_message_arg {
-> +       const void *data;
-> +       size_t datalen;
-> +};
-> +
-> +FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(pkcs7_parse_message_arg, data);
-> +       KFUZZTEST_ANNOTATE_LEN(pkcs7_parse_message_arg, datalen, data);
-> +       KFUZZTEST_EXPECT_LE(pkcs7_parse_message_arg, datalen, 16 * PAGE_S=
-IZE);
-> +
-> +       pkcs7_parse_message(arg->data, arg->datalen);
-> +}
-> diff --git a/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c b/crypto/asy=
-mmetric_keys/tests/rsa_helper_kfuzz.c
-> new file mode 100644
-> index 000000000000..5877e54cb75a
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
-> @@ -0,0 +1,38 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * RSA key extract helper KFuzzTest targets
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#include <linux/kfuzztest.h>
-> +#include <crypto/internal/rsa.h>
-> +
-> +struct rsa_parse_pub_key_arg {
-> +       const void *key;
-> +       size_t key_len;
-> +};
-> +
-> +FUZZ_TEST(test_rsa_parse_pub_key, struct rsa_parse_pub_key_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_pub_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_pub_key_arg, key_len, key);
-> +       KFUZZTEST_EXPECT_LE(rsa_parse_pub_key_arg, key_len, 16 * PAGE_SIZ=
-E);
-> +
-> +       struct rsa_key out;
-> +       rsa_parse_pub_key(&out, arg->key, arg->key_len);
-> +}
-> +
-> +struct rsa_parse_priv_key_arg {
-> +       const void *key;
-> +       size_t key_len;
-> +};
-> +
-> +FUZZ_TEST(test_rsa_parse_priv_key, struct rsa_parse_priv_key_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_priv_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_priv_key_arg, key_len, key);
-> +       KFUZZTEST_EXPECT_LE(rsa_parse_priv_key_arg, key_len, 16 * PAGE_SI=
-ZE);
-> +
-> +       struct rsa_key out;
-> +       rsa_parse_priv_key(&out, arg->key, arg->key_len);
-> +}
-> --
-> 2.51.0.318.gd7df087d1a-goog
->
+This really makes no sense because rcu_read_lock_any_held is an
+internal RCU implementation detail and has nothing to do with
+rhashtable.
 
-Ignat
+rhashtable is just a middle-man like RCU.  The actual context
+(be it vanilla, bh or sched RCU) used is entirely up to the user.
+
+Actually what puzzles me is why can't we just get rid of the
+bh and sched variants of rcu_dereference? After all, there is
+only one synchronize_rcu/call_rcu and it supports all three
+variants.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
