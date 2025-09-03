@@ -1,116 +1,120 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB9530E848;
-	Wed,  3 Sep 2025 13:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26102F7441;
+	Wed,  3 Sep 2025 14:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756907888; cv=none; b=lLQ9oYCM9ZgCelvJOA43mo/feEldFRBIT49yl76IwruPyww1PudreF+7vXfIysKHQbrWtXQZ7FkLNmZ1/LDJ8bG71TfZIfjEk4kxxYuv/9zCoJMNwUurdubBzjaz/z9y0qL9EMxQOV9M6X7azVoNgOJAVztoRbQH6TPfDoXUUCE=
+	t=1756908177; cv=none; b=GhvhDcUwulzJqXbV3X54YusDQZYCKq976Z8B2p0MNfKb2w5uscWW3WKkgtfbLbfqoXM6kAjSq7H8RVjoCKjU0Sla++Y6f4rCpPDtDwnueqpABI4afBuIBzWr6bfJMsznxPUskDG7DT7BkMouHAMc6CTbMTRVykrTFLOPYX0Wz6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756907888; c=relaxed/simple;
-	bh=Cg+cy/lnJVTJNsMBnsyb2jSqgWGsEaA2DBFAw5Fw3xI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JGTPnCWadFKNHISx8ZSgUJynwxpUQlh0UcxQHyM7awYXWSLIeIZpwoidT+UUd2sZ5XyQMfxxq3ePharl84TgjxV79Rvx3qIeh5IopgK15GN8nyVIN3BeqJ12kIcJwws18DqU5iVWPzSMeTyLQ7YOE4c6rNUfpgFHFGXwwR4cpUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-76e2e8d14a5so379454b3a.1;
-        Wed, 03 Sep 2025 06:58:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756907886; x=1757512686;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9032Jz/PsnxJvtA1xEMwXw5STUoeplAEmM12lWCypOQ=;
-        b=IY6xJAxORzIuxaHxSnHL85cjS0gMd7JpeqCmbABS6rhSpApKs+oExr7VLu0cEqzqA/
-         mOLIeE4hSvQpCy57Iac97/b0cFSa7QMzUrt/0eQH0lhYSOwmXamkOsE2hQdUHUGpwX8+
-         V5OeZUwtz6oURbmXE+PHQaqr1yQCxsLgbpsKLjit/5iTeVIZ69THa8KP5Y3AYF7nslBv
-         MCtZdhyj19fUDrIinjaO5/qjD/3uPLGPzPSsVDDX31QsIXQSPWBmeS0PaFhCbGG93OqX
-         Eft6/eX2moWmQB59t7T/RcQnrHHTXVGGfxRgRNpoFPBuEDYnVbJOpZsK5HHn/npqfMRT
-         9+bQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtrrZoEYlevcMBU+Cgip7ckJ2/a00JuQuo5pU0JCdzg2ClTqzoePZNpobJNSHG0Iir7Q/lgke3R4jyJcs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBu3/YkwU9iWBLbDC+yZTn2e9iee5WN7B/bKCG5jvwd+D9u9QP
-	iM4HKPWWOBNBO/k8+CU/4cAcToF+gPMkgkYfh3BJ4SjP8ToPROU4Tq8s
-X-Gm-Gg: ASbGncs5FN08WTP5xO+BUkzffsn/IHrbRPEN9626Pn7CyW7pUCDMLhFb4GiAgVYuPhA
-	DHatSFmUhTPQmSpEjYiDsZoo5qK4GvxRDcCLYnD0h5e+jRwBl9WvDq8kwn3O6Dd7B+cyI9ETa4a
-	O5ZHV900t3Joazs1yl6e0pHatsaKpMdMd2iw3KXRxvRVSXZINx1vUe0OslekX5unwpFTvI8t/SP
-	mFdQmmcocbdIkj+To4VzCU/Vy+whBAfVox+P7YYJPAb2Lr0gX0Yo8S6BykiVYQDnl5WCp9TwHsx
-	jcIOUtOMQDV7mIl63QxxumBtmmKOc1EIkr7ctWRhk2ntb6MpIYHfCW8w9GrjIupWxqtbiKVovBH
-	/QPF3w8v4kSxcoLuhW8KMwIpPxZHmj/GKZvRkhEZKCNGwGqA6dVkpClcHd8QqXiN/lWkksraxn1
-	vM
-X-Google-Smtp-Source: AGHT+IG/Nc6usOhV9GI3heocP5VFgPcAb7FV56GLt+q4kD+TNRvrfxROfbqTjWdNs6cMI+8gqFeLmQ==
-X-Received: by 2002:a05:6a21:3391:b0:203:cb2e:7a08 with SMTP id adf61e73a8af0-243c8457780mr12685594637.5.1756907885661;
-        Wed, 03 Sep 2025 06:58:05 -0700 (PDT)
-Received: from Mac ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a2b7d10sm16947130b3a.33.2025.09.03.06.58.02
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 03 Sep 2025 06:58:05 -0700 (PDT)
-From: Yunseong Kim <ysk@kzalloc.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yunseong Kim <ysk@kzalloc.com>
-Subject: [PATCH] crypto: ccp: Fix incorrect return type for psp_get_capability()
-Date: Wed,  3 Sep 2025 22:55:48 +0900
-Message-ID: <20250903135547.19617-2-ysk@kzalloc.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756908177; c=relaxed/simple;
+	bh=+Ou7/TJXaHnviKBEr5ILfWD+oVZwfeeOf3QKT9caAkE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MEM9EDYXLAK0MnHSXz1I/pArB1ui+oN1N8UXJBSnZIr89BDUHpugwpc8pY7+JDK+qWnUUULCwyFeeL3w4xbSNRDqhBCGGsiK5GBOU7x4mmesIxFLMxyh+QW9A1sMk8l22V4XFcuvVLoktPmafLH1FQjntlP5dgJ6pgdg9UIcTHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kuddoeeB; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kuddoeeB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756908175; x=1788444175;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=+Ou7/TJXaHnviKBEr5ILfWD+oVZwfeeOf3QKT9caAkE=;
+  b=kuddoeeB7GToGKL1LyvBq/d4T/ZZAafpK8vfzgitgpd5zSsvaDnqWlNC
+   /oYEQuLQwVqp6pMkko5Fc7XMJiDBWwijHcljKRowRNe+w4RJ/gyD3GOCV
+   veXb6sgqF3gSAgl5NTS7QC/sFdh7vBgzuxkw7ZQGj4NlQKmpq1tlIHHa1
+   PcFgQq4fLz+WkeMJkJoTG6L01uIwFwkZj7K4FojdaDeYgMG49yZlneMGI
+   rZrCLf4BmswAFtxUH/WMj4dkbcrTXjgL7lbLg9wHKTwrUW0zMpoSAZyfa
+   Ln+K5zuvEUllL9KkUPvV1B1/UjrCTE116DpdFcld6y5xFa0s725N8DkRI
+   w==;
+X-CSE-ConnectionGUID: v8Jh6wOIR5q2UVBlaHd94g==
+X-CSE-MsgGUID: Ky7Vg2BiRuyQ5qmJAKasTw==
+X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
+   d="scan'208";a="46572767"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Sep 2025 07:01:44 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 3 Sep 2025 07:01:14 -0700
+Received: from [10.150.206.75] (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Wed, 3 Sep 2025 07:01:09 -0700
+Message-ID: <50ca5062-5bbd-4c72-83c6-1d9abc6bde2e@microchip.com>
+Date: Wed, 3 Sep 2025 16:01:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: (subset) [PATCH v8 00/10] arm64: lan969x: Add support for
+ Microchip LAN969x SoC
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>, Vinod Koul <vkoul@kernel.org>,
+	<linux@armlinux.org.uk>, <alexandre.belloni@bootlin.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<andi.shyti@kernel.org>, <lee@kernel.org>, <broonie@kernel.org>,
+	<gregkh@linuxfoundation.org>, <jirislaby@kernel.org>, <arnd@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <o.rempel@pengutronix.de>,
+	<daniel.machon@microchip.com>, Robert Marko <robert.marko@sartura.hr>,
+	<luka.perkov@sartura.hr>, Vinod Koul <vinod.koul@intel.com>
+References: <20250702183856.1727275-1-robert.marko@sartura.hr>
+ <175327377884.189941.15214972441246653208.b4-ty@kernel.org>
+ <bac5390f-725a-43db-a2b6-17a68d0d733c@tuxon.dev>
+ <20250903-gratify-sustained-9acc011bc3c9@thorsis.com>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20250903-gratify-sustained-9acc011bc3c9@thorsis.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-psp_get_capability() is declared as returning an 'unsigned int'. However,
-it returns -ENODEV on failure when it cannot access the device registers
-(i.e., when ioread32 returns 0xffffffff).
+On 03/09/2025 at 15:16, Alexander Dahl wrote:
+> Hello,
+> 
+> Am Thu, Jul 31, 2025 at 11:05:07AM +0300 schrieb Claudiu Beznea:
+>> Hi, Vinod,
+>>
+>> On 23.07.2025 15:29, Vinod Koul wrote:
+>>>
+>>> On Wed, 02 Jul 2025 20:35:58 +0200, Robert Marko wrote:
+>>>> This patch series adds basic support for Microchip LAN969x SoC.
+>>>>
+>>>> It introduces the SoC ARCH symbol itself under the ARCH_MICROCHIP symbol
+>>>> which allows to avoid the need to change dependencies of the drivers that
+>>>> are shared for Microchip SoC-s in the future.
+>>>>
+>>>> DTS and further driver will be added in follow-up series.
+>>>>
+>>>> [...]
+>>>
+>>> Applied, thanks!
+>>>
+>>> [08/10] dma: xdmac: make it selectable for ARCH_MICROCHIP
+>>>          commit: e56982021f5303b2523ac247e3c79b063459d012
+>>
+>> As this one depends, as well, on the first 3 patches in the series (Robert,
+>> please correct me if I'm wrong), and there are still discussions ongoing,
+>> can you please drop it until all is clear on the first 3 patches?
+>>
+>> Otherwise, applying only this patch will lead to AT91 XDMAC driver not
+>> being built for SAMA5{D2, D3, D4}, SAMA7{G5, D65} SoCs. Linux is not
+>> booting on SAMA7G5 SoC only with this patch applied.
+> 
+> Second that.  Just tested v6.17-rc4 on sam9x60 and DMA is not working
+> at all because this driver can not be selected anymore.  This must be
+> fixed before v6.17 release please!
 
-Since -ENODEV is a negative value, returning it from a function declared as
-'unsigned int' results in an implicit cast to a large positive integer.
-This prevents the caller psp_dev_init() from correctly detecting the
-error condition, leading to improper error handling.
+Yep, I'll try to fast forward patch 02 of this series before 6.17-final 
+(this instead of reverting XDMA patch).
 
-Fix this by changing the return type of psp_get_capability() to 'int'.
-
-Additionally, change the type of the local variable 'val' to 'u32', which
-is more appropriate for register access, and reformat the long dev_notice
-line to adhere to kernel coding style guidelines.
-
-Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
----
- drivers/crypto/ccp/psp-dev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 1c5a7189631e..84dde53db25b 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -140,9 +140,9 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static unsigned int psp_get_capability(struct psp_device *psp)
-+static int psp_get_capability(struct psp_device *psp)
- {
--	unsigned int val = ioread32(psp->io_regs + psp->vdata->feature_reg);
-+	u32 val = ioread32(psp->io_regs + psp->vdata->feature_reg);
- 
- 	/*
- 	 * Check for a access to the registers.  If this read returns
-@@ -152,7 +152,8 @@ static unsigned int psp_get_capability(struct psp_device *psp)
- 	 * could get properly initialized).
- 	 */
- 	if (val == 0xffffffff) {
--		dev_notice(psp->dev, "psp: unable to access the device: you might be running a broken BIOS.\n");
-+		dev_notice(psp->dev,
-+			"psp: unable to access the device: you might be running a broken BIOS.\n");
- 		return -ENODEV;
- 	}
- 	psp->capability.raw = val;
--- 
-2.51.0
-
+Regards,
+   Nicolas
