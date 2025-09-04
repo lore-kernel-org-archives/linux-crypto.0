@@ -1,51 +1,51 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F02B28724C;
-	Thu,  4 Sep 2025 15:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74666280A5A;
+	Thu,  4 Sep 2025 15:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001456; cv=none; b=Gc+IB6RPfl1yi2Oaoax2mz+D/skzCWOxSLcSl4R3JBTUoueGrDDD7RhtqzDd9GDe6EpfzfkcFpXuBirdBt09qEw/L+Cpjq8R63RcPJI7PA1XF+WMon1rPh7r4hNwE13RAhjfom6yuWoelf3jyOdhlXfzZ4Eq47t+m/xbWhmU/8E=
+	t=1757001459; cv=none; b=b2gh8PhZYNDUhRXNc8cJ2kc73e4EH8ynR/WSzAY0DASLnf1kswO+LvBHNDEUGjp5v6+RnB4XdkRor9Wnqz0o7NBWIDf5+pnAXn2ypNv2ZE3KpWSEuSJ5qfqq9WlEQDh8r+nv+n6mkBU5xL3neGBLgp33Elx7dXHJ7q69NBI6G+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001456; c=relaxed/simple;
-	bh=YQvB6JIXPzeOEs7reZRr7tzz7EQQaWP/IQD+Qmvgn6M=;
+	s=arc-20240116; t=1757001459; c=relaxed/simple;
+	bh=6vn7VMUPicd7gEbOjN7MMZWuX2O1HyXsJuLzxaxVyrI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R828+37xfdQcaNnknoUyu0t6SF9xmlwDQZWhcZXQ5Mgv/ys2MQdm1qqsdHGtBg35rex40RGVDHB12GutunJwJX3GPoLYr/jIuLQ1fYPiciGVcyDW4hcn8Mr3dvSUHqx4Esq4+ZEUtloEVV8WjrhYzXq1iNXGqoU2KeuAkWbICuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=niBAsmXQ; arc=none smtp.client-ip=205.220.165.32
+	 MIME-Version; b=qOIYRlYdJwyq3yqrQl07F6i8PtWfYtz75FCJep5CHrfG+SeRu93JSt916CViMNzcseQoX3DuveWmpEvuQFQi6PKJzExTCyTIyHWJfdFFMZEIVGvTd+ALIyg3WeSvWJibo1horgVVTHkhuzlh9lmg0ow3QshC4i+3zpqHN5zx+XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sZ9JEvyi; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="niBAsmXQ"
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtkRt014867;
-	Thu, 4 Sep 2025 15:57:22 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sZ9JEvyi"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Ftrap010582;
+	Thu, 4 Sep 2025 15:57:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=2u/EW
-	EdO16lLfAtnJItU0jjHlM4UCZqXqAWzVrGi2gI=; b=niBAsmXQvAOr0V6dcutoP
-	fu7NjDx8ZfV6VBBXf76pHlAhBII8lqfqZMBBdZYl7ja4yO4UD5Vsy5AE0Nmbp7Xr
-	7di8xED+JSK5hp1wdam2WbnWqZZIJU9pVqHBJx3Th/aP7kRfGyTKpNhBHJ1TfDbC
-	Ecsr4w07ZovZ6VQ1axNVOzi0BX4t9IqjXS53jNSz25wvpXszllJ8//3yuFh32N+7
-	5gdm0Lim33XBwEzgsE2Pj1/PGdHypKU/VSi0D3cEPuQ0JfZB3J1Z/a774a+ATUgH
-	voxVsQTy2Kgz+Uq8k+zXxyDz75QEoFPPV48AJog1F3U52rqADd0TXGnCrHiOSHjt
-	A==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=gTbwO
+	QyRuniWF/nb0Mc3HvCrIicWzIL+Zrpq+Csca9k=; b=sZ9JEvyiv92I9CvQmuyY7
+	irvoCu/dj5nrkzJhUHCBqpzQ/eh+4zTX8tOx8yasPxjnxd8IwmMzbO8lkjq0eTCP
+	RiUMgf4TT7f7cHRSJ+yDyj5sUPTVs0dl2ODpOYNGUk6kYD/K7Gfx75f5rvqpY/7c
+	yGEBEDl5WZNL2dDXaEj5Jlx/TlyIY+9Q3Ww9JgSgj8pXMz25MkDarjz8ceVcDtH7
+	NZbsO3/5JFgh/9DCiQ7s3Wrwhz/XbmrFuh+907mrAaOblMePhvoV6d8uPvpfjw8T
+	qSXDvG9LP22lyAIXX5Izog7xDsdXvVm3ZKU7RN8DH5+X5p9JspQGqclf9r5Irwdu
+	w==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ybmh0ca6-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydacr2rx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:57:22 +0000 (GMT)
+	Thu, 04 Sep 2025 15:57:25 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fedoi040082;
-	Thu, 4 Sep 2025 15:57:20 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584EPF14040051;
+	Thu, 4 Sep 2025 15:57:24 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtnwk-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtnyp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:57:20 +0000
+	Thu, 04 Sep 2025 15:57:24 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx64000707;
-	Thu, 4 Sep 2025 15:57:20 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx66000707;
+	Thu, 4 Sep 2025 15:57:23 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-39;
-	Thu, 04 Sep 2025 15:57:19 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-40;
+	Thu, 04 Sep 2025 15:57:23 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 038/104] crypto: fips140: convert crypto/cbc.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:51:10 +0200
-Message-Id: <20250904155216.460962-39-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 039/104] crypto: fips140: convert crypto/ccm.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:51:11 +0200
+Message-Id: <20250904155216.460962-40-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,47 +79,47 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDEzMiBTYWx0ZWRfX4iYp4zj4nLN8
- cyFgWxayhKt9mE9WCZuyUltdsjVaqWpvKBtMSEGWMvAEef0yvSXp/GIuqQXS7I6jP5Is/VZsrht
- s5tIiWsxXxj9K9Lv5r9Gf3j3CcgnncpNq4xFh6ljZlpzm6zTgut9+I0gRu7ve2s4DaAIbKadeWn
- ttEEwxwbkgOuY7MNTmzAvqOn9dETafEJKcqwu1949pWqKaUQti9NF/5tyuPdnO0Xrr2fxmE1EgY
- SsP9q6AjEHr27AJLLd0xOucBcz3D3rrwF9gjdZW0ohAPpMzkofWyodpA3FIrCB8Cnq00X+IJ523
- BK4S5dzruqON+Zv3FmEEGPCudrDwjETc0U7Szzhraj4U3b5IDjKqbZ9d3MGjUAfnWEWv9ioK1o5
- MSllB365Sg7Wp4Fm9xgaSVYtL+a61g==
-X-Authority-Analysis: v=2.4 cv=Z8PsHGRA c=1 sm=1 tr=0 ts=68b9b6e2 b=1 cx=c_pps
+X-Proofpoint-GUID: 4ICKX1V2Sh8Nmlf-89tM81JXdz32UVmV
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MCBTYWx0ZWRfX0stGwTF8BY35
+ ePTocUQ/ODG1dqY7oNCEnFiHfaD7z24V7XrULbSulA4gNbR3lF18OkzN9pOWsQlH3Fp2iIgP4M2
+ eOvIvJBagrFCgEpz+xn4f5niPz5QWgTEkU6De41sa9AxYKpbIpThPVjd/PqhEIDGuYEJVnE4rJj
+ 03nTv0bYoKBSwypXZy/WGj70r3p6c8wsbgvQ0hYioBBcEYBX25gYj54N0GSok1lruPAjc0oWv+9
+ yT51vyfKAmwgnGtTc3W09XUmD0OMvXsmsrLxviL3ZAoQJsZNYGh+v+zbPeQQ0NvS753/mRQ/d/8
+ IPb9iBtoRyuwpfGp4YXAJ70t2I5Mb3eDTvFtxOVdcsaPoQIIO8TaaT5ARzVnbPDtAm/q0k+PvuQ
+ sNfZFk5BpsltfBXaaJQAkA3rtkLqZw==
+X-Proofpoint-ORIG-GUID: 4ICKX1V2Sh8Nmlf-89tM81JXdz32UVmV
+X-Authority-Analysis: v=2.4 cv=TuTmhCXh c=1 sm=1 tr=0 ts=68b9b6e5 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=bWW0iiC1QYcRXQsiE8UA:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=PeKeWH23CQtElG552NwA:9 cc=ntf
  awl=host:12068
-X-Proofpoint-GUID: lRnl8MMQPmrElBRUUlhBmR-1W6UJn7-m
-X-Proofpoint-ORIG-GUID: lRnl8MMQPmrElBRUUlhBmR-1W6UJn7-m
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_CRYPTO_CBC --source crypto/cbc.c
+  ./fipsify.py --config CONFIG_CRYPTO_CCM --source crypto/ccm.c
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/cbc.c | 4 ++--
+ crypto/ccm.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index ed3df6246765..03ee7008ab12 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -179,8 +179,8 @@ static void __exit crypto_cbc_module_exit(void)
- 	crypto_unregister_template(&crypto_cbc_tmpl);
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 2ae929ffdef8..e76946e05b5e 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -929,8 +929,8 @@ static void __exit crypto_ccm_module_exit(void)
+ 				    ARRAY_SIZE(crypto_ccm_tmpls));
  }
  
--module_init(crypto_cbc_module_init);
--module_exit(crypto_cbc_module_exit);
-+crypto_module_init(crypto_cbc_module_init);
-+crypto_module_exit(crypto_cbc_module_exit);
+-module_init(crypto_ccm_module_init);
+-module_exit(crypto_ccm_module_exit);
++crypto_module_init(crypto_ccm_module_init);
++crypto_module_exit(crypto_ccm_module_exit);
  
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("CBC block cipher mode of operation");
+ MODULE_DESCRIPTION("Counter with CBC MAC");
 -- 
 2.39.3
 
