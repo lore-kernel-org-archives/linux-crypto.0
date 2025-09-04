@@ -1,51 +1,51 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF40284696;
-	Thu,  4 Sep 2025 15:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022AA27D770;
+	Thu,  4 Sep 2025 15:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001399; cv=none; b=QVTcrrWEcqhCnjtbEUq8Qc+J5O08M4g5YtRtNcdcA4eqZQIpP7Xx7CWRbwEoIVb+oCP30FqQLIQfFSa0iaPf8fdLu3R+ca6gQnRxogRaF4yvlAClGjg9/CGBTi9iizDWJwm6NsSB4WB0qEgichVwEzWBRDItnaTj2/wzAZcRsQ4=
+	t=1757001405; cv=none; b=TKZlzOCCHbXgjxmyEqMPss39V4hBje4zUTOlny0D7x7jg+zWFb9zEc4jmeex416o5ylIqEnWp2Gj0wljTW5eENVekdH13BuVx/0I30EyDtvUhlHW7dBI49kH9oZMBL/UEtsJO29z7ahTB6NlpVptaWR3WvhoblXFP5LlBRqlJKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001399; c=relaxed/simple;
-	bh=5bMoslryKYUHNSLWM5dQ8ZVrJKrm7x5CgJRd2Xde+5c=;
+	s=arc-20240116; t=1757001405; c=relaxed/simple;
+	bh=GlE/LyD1WFiFaLTfhEom12wAqKe+ReNomUqxX1JcDYU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=i/RedKBwHmfOCD56O0FV0yUh+TCkfk5EfY2eAAzF8SS242UIPPOgmK0JQ46PUPixFrvHU2ZslkUoAfX05hg7tX7TOrkIQMGVmMmz+mLzDj2uJ14T4YWSDxIEQ65FYirtSGQi3ySKN68MPsWS+bY/K2OqHuOEsooV35fBSCza9Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oZbU6Vdc; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=NeKIDEAxPp6iUZkLIyzDdM3M7Q/bC8BbwsFNU3TPEJjdHlRsJzxPrJbtRKK7xT6gppSU6a+2m59Vt3pt6JDRZFi9KnMLG4eFD0pL0ieTfJjLyf3Thn8ClLiYaSAWpd2v6PwrAOVBtqtVIjbY+nQ6G91fy3PtkyLRlxyz4k0gxJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VEOfsDgn; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oZbU6Vdc"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtiGK026687;
-	Thu, 4 Sep 2025 15:56:26 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VEOfsDgn"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtjJh010465;
+	Thu, 4 Sep 2025 15:56:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=Kfir0
-	tywxLHkdEOQpdZUroz7ASjmJgIXwjC4GNJQW1k=; b=oZbU6Vdcm8xf//7QGixGT
-	mpR6PxdehX/8iuc2grKVxIrsv1roY6CN8claOfQ2GwRbViauN95n6IndHv71F1WY
-	6w8Y9tCHmxd7f1wiyMpuBhumiN65rYK4x8wCWg6TO7zjARRe5dJeT7b48SOnWHwx
-	DEvGkS2LZgmNJyU7btCfMUECyFzHPAZwi1wedIC3rHOiko6wzLnf0JVpB/uCqYm5
-	qNcsecPYEnR9vBSAokfB0ZILhvspJFCVKZRet0Fh8fFVN8ptTGoVxQ/blBpjAAzQ
-	7D/qHH+5HpODCiOt1kFTHu8lmgcqW9BvtJ6JJJCR34NIzxrDlgw1umm+6moT+OVa
-	A==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=DsL1H
+	KveutpUKfoHRAEKaXT0Rlje4juQV4XUyoT3D7Y=; b=VEOfsDgn9bn1bXmlztg0m
+	Y9HWsshHlGvEstfJhut80snLuQQ3ztnLG7R/iT6yyv4N/yqFxOmScPA8rVXliYM9
+	11DWUVmF5rIJa1L32tL4cHqguS/d7a4pfvqC2//Mlp5wZOhhIiA98MA0gK7buHli
+	/gJyspEnY8MbPqrHipH8gXrrVMXYge3WQgBY+bm2IwD0w9GEWfqnhD2ZioxtQt1H
+	Of4XUDfTgczI6DIXC8aafrU6uCJioUZW3KwVarvqISfn13MkBXXfxj7PAoHM4ZHq
+	krJ5l3tuq+5ifUgvxE/McQqlagHr2pwOb8JguF41SON4Wbs2paqAYhLm/M0Wxrw9
+	g==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48yd1004vf-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydacr2pe-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:26 +0000 (GMT)
+	Thu, 04 Sep 2025 15:56:30 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FPlVG040063;
-	Thu, 4 Sep 2025 15:56:25 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FjIUl040126;
+	Thu, 4 Sep 2025 15:56:29 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtn1m-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtn3t-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:25 +0000
+	Thu, 04 Sep 2025 15:56:29 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5W000707;
-	Thu, 4 Sep 2025 15:56:25 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5Y000707;
+	Thu, 4 Sep 2025 15:56:28 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-23;
-	Thu, 04 Sep 2025 15:56:24 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-24;
+	Thu, 04 Sep 2025 15:56:28 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 022/104] crypto: fips140: convert lib/crypto/aes.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:50:54 +0200
-Message-Id: <20250904155216.460962-23-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 023/104] crypto: fips140: convert lib/crypto/aesgcm.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:50:55 +0200
+Message-Id: <20250904155216.460962-24-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,166 +79,164 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE0OCBTYWx0ZWRfX5ggwbz+Z2yIT
- XghmkJ5fM+5Bt+pwMiVg6UbGEpMEv8bktl0omt/cO/U6Za1t4mi0ShBCZIPN2L8FJbt+/oNfOue
- X/Sfwipq+EamhdwnU+dg75PYdg+wNWdOvajQMtwrp0zPxUiGq1sCCIZhIQUq0LnJGKJ+NVwvvzC
- TKcg658zX3KZKU0G4HCzOy4j1qC3erSV2TeLOoMXAolNEBXfz44OEui/71eHFcxh/J2cHzdIFGl
- N2vcQs11Tfuud5kBWGQfyN5TgmOnRYWd7qUBI1OXK4bvL7XEwRB8ZRhv9yTeBCsUvD/Iq3AG2IR
- S+imWCp47FQ65nxTd7oKnuXog00pXA0mNaeiNKlqrfTIsrFNgul9fwonvkFgstRKBCkSxbasBb+
- 1dDiRl1uTVXymzEoYqQKu52tziYHww==
-X-Authority-Analysis: v=2.4 cv=CbkI5Krl c=1 sm=1 tr=0 ts=68b9b6aa b=1 cx=c_pps
+X-Proofpoint-GUID: nH-lKFz1GpD2q91R46WWPiIwXFapNZYt
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MCBTYWx0ZWRfX+d2XeUxGDCaV
+ xdwCmi57At1R9rnfn7WeCOUlC54BxlgQv51jOxTuu45q/QOsvGFRMSCtagYyt4ZvdZGQkppCMEG
+ pyKNNg8kwvPXhwaqKGpzMDDvzGrhx6sTMDbaaz8CPxRPe8HGLBoxepw5wdS3zDMiJ1/ZCd1FNE4
+ 36O5ODFLzt9ntZ1habFRTWbVdekDvkdpCPHb5we2g7WZ+HvRP/H5SGy/qheAi0n4Cq/cCq/QBlj
+ gWeaonyoU5nuzG19yX143bIfUv7mO6CklHxkVbbFKv+ChhpdGMxmN3qqlM9kAvHtUduseKhnrbk
+ Rd82LIv4stXvYL9NstGSpZo9JwlpTMgva5Oz36FpaZtoClOvb0AQFh+dEdNhg87uSopcNSqQMco
+ Vg4MQANnfL0Cb2ONL7aXWEzyIaYkxg==
+X-Proofpoint-ORIG-GUID: nH-lKFz1GpD2q91R46WWPiIwXFapNZYt
+X-Authority-Analysis: v=2.4 cv=TuTmhCXh c=1 sm=1 tr=0 ts=68b9b6ae b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=KKAkSRfTAAAA:8 a=lP6ErJPjkfyAI_jvGEoA:9
- a=cvBusfyB2V15izCimMoJ:22 cc=ntf awl=host:12068
-X-Proofpoint-ORIG-GUID: B7rAfRzMOkmkNPSobvy1v5dZWWhifTYU
-X-Proofpoint-GUID: B7rAfRzMOkmkNPSobvy1v5dZWWhifTYU
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8 a=opW2vFFDzM6jMY83o74A:9
+ cc=ntf awl=host:12068
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_CRYPTO_LIB_AES --source lib/crypto/aes.c --header include/crypto/aes.h --vars crypto_aes_sbox crypto_aes_inv_sbox
+  ./fipsify.py --config CONFIG_CRYPTO_LIB_AESGCM --source lib/crypto/aesgcm.c --header include/crypto/gcm.h
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/fips140-api.c | 21 +++++++++++++++++++++
- include/crypto/aes.h | 14 ++++++++++----
- lib/crypto/aes.c     | 12 ++++++------
- 3 files changed, 37 insertions(+), 10 deletions(-)
- create mode 100644 crypto/fips140-api.c
+ crypto/fips140-api.c | 13 +++++++++++++
+ include/crypto/gcm.h | 19 ++++++++++---------
+ lib/crypto/aesgcm.c  | 16 ++++++++--------
+ 3 files changed, 31 insertions(+), 17 deletions(-)
 
 diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
-new file mode 100644
-index 000000000000..029d06763f5a
---- /dev/null
+index 029d06763f5a..4924b11ec592 100644
+--- a/crypto/fips140-api.c
 +++ b/crypto/fips140-api.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
+@@ -19,3 +19,16 @@ DEFINE_CRYPTO_API_STUB(aes_decrypt);
+ 
+ #endif
+ 
 +/*
-+ * Define static call keys for any functions which are part of the crypto
-+ * API and used by the standalone FIPS module but which are not built into
-+ * vmlinux.
++ * lib/crypto/aesgcm.c
 + */
++#if !IS_BUILTIN(CONFIG_CRYPTO_LIB_AESGCM)
 +
-+/*
-+ * lib/crypto/aes.c
-+ */
-+#if !IS_BUILTIN(CONFIG_CRYPTO_LIB_AES)
++#include <crypto/gcm.h>
 +
-+#include <crypto/aes.h>
-+
-+DEFINE_CRYPTO_API_STUB(aes_expandkey);
-+DEFINE_CRYPTO_API_STUB(aes_encrypt);
-+DEFINE_CRYPTO_API_STUB(aes_decrypt);
++DEFINE_CRYPTO_API_STUB(aesgcm_expandkey);
++DEFINE_CRYPTO_API_STUB(aesgcm_encrypt);
++DEFINE_CRYPTO_API_STUB(aesgcm_decrypt);
 +
 +#endif
 +
-diff --git a/include/crypto/aes.h b/include/crypto/aes.h
-index 9339da7c20a8..a72621f552d8 100644
---- a/include/crypto/aes.h
-+++ b/include/crypto/aes.h
-@@ -6,6 +6,7 @@
- #ifndef _CRYPTO_AES_H
- #define _CRYPTO_AES_H
+diff --git a/include/crypto/gcm.h b/include/crypto/gcm.h
+index fd9df607a836..7275507b3689 100644
+--- a/include/crypto/gcm.h
++++ b/include/crypto/gcm.h
+@@ -1,6 +1,7 @@
+ #ifndef _CRYPTO_GCM_H
+ #define _CRYPTO_GCM_H
  
 +#include <crypto/api.h>
- #include <linux/types.h>
- #include <linux/crypto.h>
+ #include <linux/errno.h>
  
-@@ -65,8 +66,9 @@ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-  * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
-  * for the initial combination, the second slot for the first round and so on.
-  */
--int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
--		  unsigned int key_len);
-+DECLARE_CRYPTO_API(aes_expandkey, int,
-+	(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len),
-+	(ctx, in_key, key_len));
+ #include <crypto/aes.h>
+@@ -70,16 +71,16 @@ struct aesgcm_ctx {
+ 	unsigned int		authsize;
+ };
  
- /**
-  * aes_encrypt - Encrypt a single AES block
-@@ -74,7 +76,9 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
-  * @out:	Buffer to store the ciphertext
-  * @in:		Buffer containing the plaintext
-  */
--void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
-+DECLARE_CRYPTO_API(aes_encrypt, void,
-+	(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in),
-+	(ctx, out, in));
+-int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
+-		     unsigned int keysize, unsigned int authsize);
++DECLARE_CRYPTO_API(aesgcm_expandkey, int,
++	(struct aesgcm_ctx *ctx, const u8 *key, unsigned int keysize, unsigned int authsize),
++	(ctx, key, keysize, authsize));
  
- /**
-  * aes_decrypt - Decrypt a single AES block
-@@ -82,7 +86,9 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
-  * @out:	Buffer to store the plaintext
-  * @in:		Buffer containing the ciphertext
-  */
--void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
-+DECLARE_CRYPTO_API(aes_decrypt, void,
-+	(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in),
-+	(ctx, out, in));
+-void aesgcm_encrypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
+-		    int crypt_len, const u8 *assoc, int assoc_len,
+-		    const u8 iv[GCM_AES_IV_SIZE], u8 *authtag);
++DECLARE_CRYPTO_API(aesgcm_encrypt, void,
++	(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src, int crypt_len, const u8 *assoc, int assoc_len, const u8 iv[GCM_AES_IV_SIZE], u8 *authtag),
++	(ctx, dst, src, crypt_len, assoc, assoc_len, iv, authtag));
  
- extern const u8 crypto_aes_sbox[];
- extern const u8 crypto_aes_inv_sbox[];
-diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index b57fda3460f1..ece5ce36a305 100644
---- a/lib/crypto/aes.c
-+++ b/lib/crypto/aes.c
-@@ -183,7 +183,7 @@ static u32 subw(u32 in)
-  * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
-  * for the initial combination, the second slot for the first round and so on.
+-bool __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,
+-				 const u8 *src, int crypt_len, const u8 *assoc,
+-				 int assoc_len, const u8 iv[GCM_AES_IV_SIZE],
+-				 const u8 *authtag);
++DECLARE_CRYPTO_API(aesgcm_decrypt, bool __must_check,
++	(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src, int crypt_len, const u8 *assoc, int assoc_len, const u8 iv[GCM_AES_IV_SIZE], const u8 *authtag),
++	(ctx, dst, src, crypt_len, assoc, assoc_len, iv, authtag));
+ 
+ #endif
+diff --git a/lib/crypto/aesgcm.c b/lib/crypto/aesgcm.c
+index ac0b2fcfd606..1fe4333c0335 100644
+--- a/lib/crypto/aesgcm.c
++++ b/lib/crypto/aesgcm.c
+@@ -42,7 +42,7 @@ static void aesgcm_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
+  * Returns: 0 on success, or -EINVAL if @keysize or @authsize contain values
+  * that are not permitted by the GCM specification.
   */
--int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+int CRYPTO_API(aes_expandkey)(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 		  unsigned int key_len)
+-int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
++int CRYPTO_API(aesgcm_expandkey)(struct aesgcm_ctx *ctx, const u8 *key,
+ 		     unsigned int keysize, unsigned int authsize)
  {
- 	u32 kwords = key_len / sizeof(u32);
-@@ -248,7 +248,7 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+ 	u8 kin[AES_BLOCK_SIZE] = {};
+@@ -58,7 +58,7 @@ int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
  
  	return 0;
  }
--EXPORT_SYMBOL(aes_expandkey);
-+DEFINE_CRYPTO_API(aes_expandkey);
+-EXPORT_SYMBOL(aesgcm_expandkey);
++DEFINE_CRYPTO_API(aesgcm_expandkey);
+ 
+ static void aesgcm_ghash(be128 *ghash, const be128 *key, const void *src,
+ 			 int len)
+@@ -144,7 +144,7 @@ static void aesgcm_crypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
+  *		tag should be stored. The buffer is assumed to have space for
+  *		@ctx->authsize bytes.
+  */
+-void aesgcm_encrypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
++void CRYPTO_API(aesgcm_encrypt)(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
+ 		    int crypt_len, const u8 *assoc, int assoc_len,
+ 		    const u8 iv[GCM_AES_IV_SIZE], u8 *authtag)
+ {
+@@ -155,7 +155,7 @@ void aesgcm_encrypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
+ 	aesgcm_crypt(ctx, dst, src, crypt_len, ctr);
+ 	aesgcm_mac(ctx, dst, crypt_len, assoc, assoc_len, ctr, authtag);
+ }
+-EXPORT_SYMBOL(aesgcm_encrypt);
++DEFINE_CRYPTO_API(aesgcm_encrypt);
  
  /**
-  * aes_encrypt - Encrypt a single AES block
-@@ -256,7 +256,7 @@ EXPORT_SYMBOL(aes_expandkey);
-  * @out:	Buffer to store the ciphertext
-  * @in:		Buffer containing the plaintext
+  * aesgcm_decrypt - Perform AES-GCM decryption on a block of data
+@@ -174,7 +174,7 @@ EXPORT_SYMBOL(aesgcm_encrypt);
+  * Returns: true on success, or false if the ciphertext failed authentication.
+  * On failure, no plaintext will be returned.
   */
--void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
-+void CRYPTO_API(aes_encrypt)(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
- {
- 	const u32 *rkp = ctx->key_enc + 4;
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -299,7 +299,7 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
- 	put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
- 	put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
+-bool __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,
++bool __must_check CRYPTO_API(aesgcm_decrypt)(const struct aesgcm_ctx *ctx, u8 *dst,
+ 				 const u8 *src, int crypt_len, const u8 *assoc,
+ 				 int assoc_len, const u8 iv[GCM_AES_IV_SIZE],
+ 				 const u8 *authtag)
+@@ -192,7 +192,7 @@ bool __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,
+ 	aesgcm_crypt(ctx, dst, src, crypt_len, ctr);
+ 	return true;
  }
--EXPORT_SYMBOL(aes_encrypt);
-+DEFINE_CRYPTO_API(aes_encrypt);
+-EXPORT_SYMBOL(aesgcm_decrypt);
++DEFINE_CRYPTO_API(aesgcm_decrypt);
  
- /**
-  * aes_decrypt - Decrypt a single AES block
-@@ -307,7 +307,7 @@ EXPORT_SYMBOL(aes_encrypt);
-  * @out:	Buffer to store the plaintext
-  * @in:		Buffer containing the ciphertext
-  */
--void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
-+void CRYPTO_API(aes_decrypt)(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
- {
- 	const u32 *rkp = ctx->key_dec + 4;
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -350,7 +350,7 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
- 	put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
- 	put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
+ MODULE_DESCRIPTION("Generic AES-GCM library");
+ MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
+@@ -730,10 +730,10 @@ static int __init libaesgcm_init(void)
+ 	}
+ 	return 0;
  }
--EXPORT_SYMBOL(aes_decrypt);
-+DEFINE_CRYPTO_API(aes_decrypt);
+-module_init(libaesgcm_init);
++crypto_module_init(libaesgcm_init);
  
- MODULE_DESCRIPTION("Generic AES library");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ static void __exit libaesgcm_exit(void)
+ {
+ }
+-module_exit(libaesgcm_exit);
++crypto_module_exit(libaesgcm_exit);
+ #endif
 -- 
 2.39.3
 
