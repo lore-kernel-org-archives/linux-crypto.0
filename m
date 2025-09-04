@@ -1,51 +1,51 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309F82F3627;
-	Thu,  4 Sep 2025 15:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7062C21F9;
+	Thu,  4 Sep 2025 15:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001594; cv=none; b=LFE5OfA2HOtlzD8B76pv1EaYsyNxJTHZOReCSJv2wwz6iW0YbmmFvqFeTNW+Oin+Liy+6OM3X89/3QxCQHta9LUoiwA3K0NctdZpQU4cc8/6m6vs3I/hN0cuDJ8hLM8fhydW/2nq6HKD3JlCcNEqYM/PbNxxVFMR9X6oHaHCVQU=
+	t=1757001597; cv=none; b=LgWOvBpRG55Tzof++MGWmp7gNvi2Kwt3WMOcqOBelMLGadpDKs8NRLoOLkTVaC4GOxl0gHB20qrYcG47E4WbPP3liWbEk87buZjBjflWYbYOghP/Gkj4pfOSIfcXbS5/6bjjvshTJ9ZudlAi5XfobX1j3DlNoztaO2ZPPzw1V6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001594; c=relaxed/simple;
-	bh=CgPZkp+FoaTTLNdrQqm1gpEMooyF5LD3otEF4J0DnbA=;
+	s=arc-20240116; t=1757001597; c=relaxed/simple;
+	bh=3chTI+iaRKsWWyIV0KBa7Nq8xEZwFDgEqkV+/IR8Of4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rzrnzI/nkkoqq2/bDJ878tKCjv/vlnmi+s2zkG8aTOK5bDktCcdUG7VDG18KM5AInZF1P486Fn0k7S/aBFw0mgJd0BpG2+E5DYnGqWyhPYSt7ynLUd0x32K8BRugX+tnko8jS/unc2NQO2Ewa98GawU+GjQOvE//lg2vWorpFCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lDDsKDGQ; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=ER9GTWnlx/aKosOruwQVL1KQ23uF7HlfWuwfBNmaGQCOYxrjZqxTBZKSTUqlNKgVWSqGwe2YCBh2CNxs3gno9MWZvrFkv6HXShsf5hXeZ/ZL01THZ5i8uHM6pEHO+kIyr+kOKDB+JLYyEmoQWeajQqYjay5wLGOZibz0pWN4+nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=NIgFhbwW; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lDDsKDGQ"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fuk7s004100;
-	Thu, 4 Sep 2025 15:59:41 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NIgFhbwW"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtiWp023800;
+	Thu, 4 Sep 2025 15:59:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=sHiqj
-	szYSkt3sF1YoZyjRARxduAMRN5LCvZo04unzF8=; b=lDDsKDGQ3K5uUJJs9n9Ks
-	Bh8RobgKzEITvevOH9swD7RYb8f/cjz/bYCPE97WtZAYrsdWLBKDqQBuObeJtKvz
-	7aW3CgtJoSfZAgrOoA9o/16c6UsSPwcXY8J+Ucza3YyIjKNCyugOISo2qpMJyZjB
-	aiSxXOH30xGOUG2Hi+JrGXb72BX2jgFvnWN7kKncSerTuSzVvtCA+thauGHA3O0U
-	NZS70nVONuUMHFRhtA3XotUeSyahl9hIc+jpiB+2Aii0F44mUZ8ttREqbmbAqfvL
-	gD0SA+8y97+qgZnERWnf4sb70uVmVcSkwZnJEtnkF/3EgSxu5YbzxwaNUKCC2TWC
-	g==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=kS1gU
+	9d3pVWKcVWOPDI1w1qkImnLQ4Z/nKiBmhIoFQ8=; b=NIgFhbwWcLqSiDZVGa2wz
+	27qUGJaLI/a0PD+ARncjCtrQm3VpXy+NsoQr7awCLOL25o9wS7Moa2n6ts2n/53M
+	/51PDrvrFOSkHST1rcMufXVefJk2U6B8g4kanDT5tdyvsvrTJFbZKajF2+r5vRj3
+	dlGpbY4p8rLxm9LwM0HgmftAwNj4oUY5pQt4rtIk1dF+GU1oRS68w/v0LdpOq4Ec
+	ibc3QnwtHO+6W69KR6w8mWOKj7TZOytHTMthNZObWJT1pTfdUfzQ2dHSqjtA1J3s
+	SgPxFYAYIAeOSWSQmShiWNrYFVCMMqHw3kdCFSShE3h1fJSr0tTYi5P3Q8lsi+UB
+	Q==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydun006y-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydhd02b9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:41 +0000 (GMT)
+	Thu, 04 Sep 2025 15:59:44 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FELub040036;
-	Thu, 4 Sep 2025 15:59:40 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FELue040036;
+	Thu, 4 Sep 2025 15:59:44 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtqwv-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtqyh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:40 +0000
+	Thu, 04 Sep 2025 15:59:43 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7A000707;
-	Thu, 4 Sep 2025 15:59:39 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7C000707;
+	Thu, 4 Sep 2025 15:59:43 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-72;
-	Thu, 04 Sep 2025 15:59:39 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-73;
+	Thu, 04 Sep 2025 15:59:43 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 071/104] crypto: fips140: convert crypto/sig.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:51:43 +0200
-Message-Id: <20250904155216.460962-72-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 072/104] crypto: fips140: convert crypto/simd.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:51:44 +0200
+Message-Id: <20250904155216.460962-73-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,204 +79,202 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040157
-X-Proofpoint-ORIG-GUID: GAdsR9k7rhbFtNv0ZQ2EQiMqDsZ6D1ba
-X-Proofpoint-GUID: GAdsR9k7rhbFtNv0ZQ2EQiMqDsZ6D1ba
-X-Authority-Analysis: v=2.4 cv=cfXSrmDM c=1 sm=1 tr=0 ts=68b9b76d b=1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MyBTYWx0ZWRfX2APGZWnUeDem
+ lWHqSUDkzInze3THRWMX+qewAo8+n787gyFjO3iX6f9e2N8tJBFE7VKc/yAM1oAV1j+3Gs5q3cJ
+ TffSL7N7CFjsEtoO5CIAl0IphqsupiIltdXwOzAX2d1P+P46Xxrc0qsjHHZdKYb4yljmFnV0F6R
+ wN0KvQ6qSFEV+Fg6F6P++rqC4xvTsFJ60OfdTKlapdWakLEg6l3p6I1hHgogmDaA13+l99U57ca
+ FREynV9izygpOHI62gQdDNsHYw7jACHi4NOXKeeSNJDF8OltXSTkqi99T3Rl0RfPpm+9jdQDiFd
+ 2LtMvGVIKcWRf4Uw/AmK3t5Ljuxg8iOpW2RjXx5eVJtwZhy093xn1WwleFtAUkpRFwq2UI9dZD0
+ gloA5wO/6QxB/scqUZBfcR9D2DinBQ==
+X-Proofpoint-GUID: G6d-oFm1kh4PwktU3ke734hKp2haqOOh
+X-Proofpoint-ORIG-GUID: G6d-oFm1kh4PwktU3ke734hKp2haqOOh
+X-Authority-Analysis: v=2.4 cv=QoZe3Uyd c=1 sm=1 tr=0 ts=68b9b770 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=8Ie_MMoHnmXKMj9mU8sA:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=CYsGSl3Qh4rxA5LVBUoA:9 cc=ntf
  awl=host:12068
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1NyBTYWx0ZWRfX9uVha5NQ6lu/
- bB0Sk1/VMDKozTyylVYtGwgE6p2/DaeukTH8ae57COdXBcl9TsCjGg5S3GkPoDp2wrzAFQ2E+FB
- XSRNCynfo4taDCBCfZVmvTvr3OzHj/YAmLShRFvwLecXNXh2qA5O3eRLTBScW0WQv2iZ5TPDOc0
- pqWQGZZDyamDW+1RMnsXTMPTK/eKvlkqZU0juxp1wkBX3JbwmSFULKn0okTAurlyAs0JQq0x0eD
- 7LenojIGbEzKztpG5PUl/KWjYGcfCT+uSPMU/Lqqe5+BiTlvqgt0pEC6VSzrrPrJYpbRA5phJuO
- 9yIzbwM3IVKkh9DCdSJ+/Ps+BUP2XafHMNteKxiY1X5HAbdnT3JtfuW1vmDvM/5r4IsAren0Uo8
- kP19wV/xuUoidkOV40ev1DTAWsF7ZQ==
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_CRYPTO_SIG2 --source crypto/sig.c --header include/crypto/sig.h include/crypto/internal/sig.h
+  ./fipsify.py --config CONFIG_CRYPTO_SIMD --source crypto/simd.c --header include/crypto/internal/simd.h
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/fips140-api.c          | 18 ++++++++++++++++++
- crypto/sig.c                  | 20 ++++++++++----------
- include/crypto/internal/sig.h | 20 +++++++++++++-------
- include/crypto/sig.h          |  5 ++++-
- 4 files changed, 45 insertions(+), 18 deletions(-)
+ crypto/fips140-api.c           | 16 ++++++++++++++++
+ crypto/simd.c                  | 24 ++++++++++++------------
+ include/crypto/internal/simd.h | 32 +++++++++++++++++++-------------
+ 3 files changed, 47 insertions(+), 25 deletions(-)
 
 diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
-index eec551e120e2..c4e66d008be2 100644
+index c4e66d008be2..112212b32d6d 100644
 --- a/crypto/fips140-api.c
 +++ b/crypto/fips140-api.c
-@@ -544,3 +544,21 @@ DEFINE_CRYPTO_API_STUB(crypto_shash_import_core);
+@@ -562,3 +562,19 @@ DEFINE_CRYPTO_API_STUB(crypto_grab_sig);
  
  #endif
  
 +/*
-+ * crypto/sig.c
++ * crypto/simd.c
 + */
-+#if !IS_BUILTIN(CONFIG_CRYPTO_SIG2)
++#if !IS_BUILTIN(CONFIG_CRYPTO_SIMD)
 +
-+#include <crypto/sig.h>
++#include <crypto/internal/simd.h>
 +
-+DEFINE_CRYPTO_API_STUB(crypto_alloc_sig);
-+
-+#include <crypto/internal/sig.h>
-+
-+DEFINE_CRYPTO_API_STUB(crypto_register_sig);
-+DEFINE_CRYPTO_API_STUB(crypto_unregister_sig);
-+DEFINE_CRYPTO_API_STUB(sig_register_instance);
-+DEFINE_CRYPTO_API_STUB(crypto_grab_sig);
++DEFINE_CRYPTO_API_STUB(simd_skcipher_create_compat);
++DEFINE_CRYPTO_API_STUB(simd_skcipher_free);
++DEFINE_CRYPTO_API_STUB(simd_register_skciphers_compat);
++DEFINE_CRYPTO_API_STUB(simd_unregister_skciphers);
++DEFINE_CRYPTO_API_STUB(simd_register_aeads_compat);
++DEFINE_CRYPTO_API_STUB(simd_unregister_aeads);
 +
 +#endif
 +
-diff --git a/crypto/sig.c b/crypto/sig.c
-index beba745b6405..c0217bd437f6 100644
---- a/crypto/sig.c
-+++ b/crypto/sig.c
-@@ -77,11 +77,11 @@ static const struct crypto_type crypto_sig_type = {
- 	.algsize = offsetof(struct sig_alg, base),
- };
- 
--struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask)
-+struct crypto_sig *CRYPTO_API(crypto_alloc_sig)(const char *alg_name, u32 type, u32 mask)
- {
- 	return crypto_alloc_tfm(alg_name, &crypto_sig_type, type, mask);
- }
--EXPORT_SYMBOL_GPL(crypto_alloc_sig);
-+DEFINE_CRYPTO_API(crypto_alloc_sig);
- 
- static int sig_default_sign(struct crypto_sig *tfm,
- 			    const void *src, unsigned int slen,
-@@ -134,7 +134,7 @@ static int sig_prepare_alg(struct sig_alg *alg)
+diff --git a/crypto/simd.c b/crypto/simd.c
+index b07721d1f3f6..32e3eb04462c 100644
+--- a/crypto/simd.c
++++ b/crypto/simd.c
+@@ -136,7 +136,7 @@ static int simd_skcipher_init(struct crypto_skcipher *tfm)
  	return 0;
  }
  
--int crypto_register_sig(struct sig_alg *alg)
-+int CRYPTO_API(crypto_register_sig)(struct sig_alg *alg)
+-struct simd_skcipher_alg *simd_skcipher_create_compat(struct skcipher_alg *ialg,
++struct simd_skcipher_alg *CRYPTO_API(simd_skcipher_create_compat)(struct skcipher_alg *ialg,
+ 						      const char *algname,
+ 						      const char *drvname,
+ 						      const char *basename)
+@@ -195,16 +195,16 @@ struct simd_skcipher_alg *simd_skcipher_create_compat(struct skcipher_alg *ialg,
+ 	salg = ERR_PTR(err);
+ 	goto out;
+ }
+-EXPORT_SYMBOL_GPL(simd_skcipher_create_compat);
++DEFINE_CRYPTO_API(simd_skcipher_create_compat);
+ 
+-void simd_skcipher_free(struct simd_skcipher_alg *salg)
++void CRYPTO_API(simd_skcipher_free)(struct simd_skcipher_alg *salg)
  {
- 	struct crypto_alg *base = &alg->base;
+ 	crypto_unregister_skcipher(&salg->alg);
+ 	kfree(salg);
+ }
+-EXPORT_SYMBOL_GPL(simd_skcipher_free);
++DEFINE_CRYPTO_API(simd_skcipher_free);
+ 
+-int simd_register_skciphers_compat(struct skcipher_alg *algs, int count,
++int CRYPTO_API(simd_register_skciphers_compat)(struct skcipher_alg *algs, int count,
+ 				   struct simd_skcipher_alg **simd_algs)
+ {
  	int err;
-@@ -145,15 +145,15 @@ int crypto_register_sig(struct sig_alg *alg)
- 
- 	return crypto_register_alg(base);
+@@ -236,9 +236,9 @@ int simd_register_skciphers_compat(struct skcipher_alg *algs, int count,
+ 	simd_unregister_skciphers(algs, count, simd_algs);
+ 	return err;
  }
--EXPORT_SYMBOL_GPL(crypto_register_sig);
-+DEFINE_CRYPTO_API(crypto_register_sig);
+-EXPORT_SYMBOL_GPL(simd_register_skciphers_compat);
++DEFINE_CRYPTO_API(simd_register_skciphers_compat);
  
--void crypto_unregister_sig(struct sig_alg *alg)
-+void CRYPTO_API(crypto_unregister_sig)(struct sig_alg *alg)
+-void simd_unregister_skciphers(struct skcipher_alg *algs, int count,
++void CRYPTO_API(simd_unregister_skciphers)(struct skcipher_alg *algs, int count,
+ 			       struct simd_skcipher_alg **simd_algs)
  {
- 	crypto_unregister_alg(&alg->base);
+ 	int i;
+@@ -252,7 +252,7 @@ void simd_unregister_skciphers(struct skcipher_alg *algs, int count,
+ 		}
+ 	}
  }
--EXPORT_SYMBOL_GPL(crypto_unregister_sig);
-+DEFINE_CRYPTO_API(crypto_unregister_sig);
+-EXPORT_SYMBOL_GPL(simd_unregister_skciphers);
++DEFINE_CRYPTO_API(simd_unregister_skciphers);
  
--int sig_register_instance(struct crypto_template *tmpl,
-+int CRYPTO_API(sig_register_instance)(struct crypto_template *tmpl,
- 			  struct sig_instance *inst)
+ /* AEAD support */
+ 
+@@ -427,7 +427,7 @@ static void simd_aead_free(struct simd_aead_alg *salg)
+ 	kfree(salg);
+ }
+ 
+-int simd_register_aeads_compat(struct aead_alg *algs, int count,
++int CRYPTO_API(simd_register_aeads_compat)(struct aead_alg *algs, int count,
+ 			       struct simd_aead_alg **simd_algs)
  {
  	int err;
-@@ -167,16 +167,16 @@ int sig_register_instance(struct crypto_template *tmpl,
- 
- 	return crypto_register_instance(tmpl, sig_crypto_instance(inst));
+@@ -459,9 +459,9 @@ int simd_register_aeads_compat(struct aead_alg *algs, int count,
+ 	simd_unregister_aeads(algs, count, simd_algs);
+ 	return err;
  }
--EXPORT_SYMBOL_GPL(sig_register_instance);
-+DEFINE_CRYPTO_API(sig_register_instance);
+-EXPORT_SYMBOL_GPL(simd_register_aeads_compat);
++DEFINE_CRYPTO_API(simd_register_aeads_compat);
  
--int crypto_grab_sig(struct crypto_sig_spawn *spawn,
-+int CRYPTO_API(crypto_grab_sig)(struct crypto_sig_spawn *spawn,
- 		    struct crypto_instance *inst,
- 		    const char *name, u32 type, u32 mask)
+-void simd_unregister_aeads(struct aead_alg *algs, int count,
++void CRYPTO_API(simd_unregister_aeads)(struct aead_alg *algs, int count,
+ 			   struct simd_aead_alg **simd_algs)
  {
- 	spawn->base.frontend = &crypto_sig_type;
- 	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+ 	int i;
+@@ -475,7 +475,7 @@ void simd_unregister_aeads(struct aead_alg *algs, int count,
+ 		}
+ 	}
  }
--EXPORT_SYMBOL_GPL(crypto_grab_sig);
-+DEFINE_CRYPTO_API(crypto_grab_sig);
+-EXPORT_SYMBOL_GPL(simd_unregister_aeads);
++DEFINE_CRYPTO_API(simd_unregister_aeads);
  
+ MODULE_DESCRIPTION("Shared crypto SIMD helpers");
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Public Key Signature Algorithms");
-diff --git a/include/crypto/internal/sig.h b/include/crypto/internal/sig.h
-index b16648c1a986..8efee2dfba72 100644
---- a/include/crypto/internal/sig.h
-+++ b/include/crypto/internal/sig.h
-@@ -7,6 +7,7 @@
- #ifndef _CRYPTO_INTERNAL_SIG_H
- #define _CRYPTO_INTERNAL_SIG_H
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+index 9e338e7aafbd..a1a419f7fd57 100644
+--- a/include/crypto/internal/simd.h
++++ b/include/crypto/internal/simd.h
+@@ -6,6 +6,7 @@
+ #ifndef _CRYPTO_INTERNAL_SIMD_H
+ #define _CRYPTO_INTERNAL_SIMD_H
  
 +#include <crypto/api.h>
- #include <crypto/algapi.h>
- #include <crypto/sig.h>
+ #include <asm/simd.h>
+ #include <linux/percpu.h>
+ #include <linux/types.h>
+@@ -15,28 +16,33 @@
+ struct simd_skcipher_alg;
+ struct skcipher_alg;
  
-@@ -39,7 +40,9 @@ static inline void *crypto_sig_ctx(struct crypto_sig *tfm)
-  *
-  * Return: zero on success; error code in case of error
-  */
--int crypto_register_sig(struct sig_alg *alg);
-+DECLARE_CRYPTO_API(crypto_register_sig, int,
-+	(struct sig_alg *alg),
+-struct simd_skcipher_alg *simd_skcipher_create_compat(struct skcipher_alg *ialg,
+-						      const char *algname,
+-						      const char *drvname,
+-						      const char *basename);
+-void simd_skcipher_free(struct simd_skcipher_alg *alg);
++DECLARE_CRYPTO_API(simd_skcipher_create_compat, struct simd_skcipher_alg *,
++	(struct skcipher_alg *ialg, const char *algname, const char *drvname, const char *basename),
++	(ialg, algname, drvname, basename));
++DECLARE_CRYPTO_API(simd_skcipher_free, void,
++	(struct simd_skcipher_alg *alg),
 +	(alg));
  
- /**
-  * crypto_unregister_sig() -- Unregister public key signature algorithm
-@@ -48,10 +51,13 @@ int crypto_register_sig(struct sig_alg *alg);
-  *
-  * @alg:	algorithm definition
-  */
--void crypto_unregister_sig(struct sig_alg *alg);
-+DECLARE_CRYPTO_API(crypto_unregister_sig, void,
-+	(struct sig_alg *alg),
-+	(alg));
+-int simd_register_skciphers_compat(struct skcipher_alg *algs, int count,
+-				   struct simd_skcipher_alg **simd_algs);
++DECLARE_CRYPTO_API(simd_register_skciphers_compat, int,
++	(struct skcipher_alg *algs, int count, struct simd_skcipher_alg **simd_algs),
++	(algs, count, simd_algs));
  
--int sig_register_instance(struct crypto_template *tmpl,
--			  struct sig_instance *inst);
-+DECLARE_CRYPTO_API(sig_register_instance, int,
-+	(struct crypto_template *tmpl, struct sig_instance *inst),
-+	(tmpl, inst));
+-void simd_unregister_skciphers(struct skcipher_alg *algs, int count,
+-			       struct simd_skcipher_alg **simd_algs);
++DECLARE_CRYPTO_API(simd_unregister_skciphers, void,
++	(struct skcipher_alg *algs, int count, struct simd_skcipher_alg **simd_algs),
++	(algs, count, simd_algs));
  
- static inline struct sig_instance *sig_instance(struct crypto_instance *inst)
- {
-@@ -74,9 +80,9 @@ static inline void *sig_instance_ctx(struct sig_instance *inst)
- 	return crypto_instance_ctx(sig_crypto_instance(inst));
- }
+ /* AEAD support */
  
--int crypto_grab_sig(struct crypto_sig_spawn *spawn,
--		    struct crypto_instance *inst,
--		    const char *name, u32 type, u32 mask);
-+DECLARE_CRYPTO_API(crypto_grab_sig, int,
-+	(struct crypto_sig_spawn *spawn, struct crypto_instance *inst, const char *name, u32 type, u32 mask),
-+	(spawn, inst, name, type, mask));
+ struct simd_aead_alg;
+ struct aead_alg;
  
- static inline struct crypto_sig *crypto_spawn_sig(struct crypto_sig_spawn
- 								   *spawn)
-diff --git a/include/crypto/sig.h b/include/crypto/sig.h
-index fa6dafafab3f..d6da8df9fd28 100644
---- a/include/crypto/sig.h
-+++ b/include/crypto/sig.h
-@@ -7,6 +7,7 @@
- #ifndef _CRYPTO_SIG_H
- #define _CRYPTO_SIG_H
+-int simd_register_aeads_compat(struct aead_alg *algs, int count,
+-			       struct simd_aead_alg **simd_algs);
++DECLARE_CRYPTO_API(simd_register_aeads_compat, int,
++	(struct aead_alg *algs, int count, struct simd_aead_alg **simd_algs),
++	(algs, count, simd_algs));
  
-+#include <crypto/api.h>
- #include <linux/crypto.h>
+-void simd_unregister_aeads(struct aead_alg *algs, int count,
+-			   struct simd_aead_alg **simd_algs);
++DECLARE_CRYPTO_API(simd_unregister_aeads, void,
++	(struct aead_alg *algs, int count, struct simd_aead_alg **simd_algs),
++	(algs, count, simd_algs));
  
- /**
-@@ -91,7 +92,9 @@ struct sig_alg {
-  * Return: allocated handle in case of success; IS_ERR() is true in case
-  *	   of an error, PTR_ERR() returns the error code.
-  */
--struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask);
-+DECLARE_CRYPTO_API(crypto_alloc_sig, struct crypto_sig *,
-+	(const char *alg_name, u32 type, u32 mask),
-+	(alg_name, type, mask));
- 
- static inline struct crypto_tfm *crypto_sig_tfm(struct crypto_sig *tfm)
- {
+ /*
+  * crypto_simd_usable() - is it allowed at this time to use SIMD instructions or
 -- 
 2.39.3
 
