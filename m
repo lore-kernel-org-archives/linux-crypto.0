@@ -1,194 +1,229 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF53F2DFA5C
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 09:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1449F2F90E6;
+	Thu,  4 Sep 2025 09:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756977106; cv=none; b=SwlHAcaZYOMDrvY+AXdoYaYk/s1y11Xh21FhRPbHabbgNtApH9dsz+Y2eq6HIf8a74x6l40pdl6Sv0amHtm0EGdmeO4+K7Ea4km0heTsIINFh6/DJHh99Pc/lbC8eCPMSGkbtgx8/KXl6EpPPsx89p6wRxb2vlDQSBgUYhBMFUQ=
+	t=1756979117; cv=none; b=qaGeqJOwozinFX0tmSvSn7IOotJs5E0IPBnEJNFCDvyvlPkUtygoKXmta2kZ+/HGS+rq2i0nKrBkiE4678Hml30zH8IVcLCqd6/LqRRhXS93w9O6N7lUuoWRaQ6WHvlZXHzyQfY6iWNeBaPMaZ/sk8IaxZ66w8/ZQLWjGtlCJPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756977106; c=relaxed/simple;
-	bh=q6GMFvLMIx4ZMmHgQIZ7JoZYDm4z4PXO1qkMil/wUEs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WU42sRR7ToJuWnkyXf9nUSDrcmKsriacsIJ3ipfVK7CggEaVhtPXZtKMoIYxgBxzH0NkGJcrm8NNtmHJuRdbzPaZAljWP59L93LfAC++TdaGcZXmSXelE6wmu0FFBvaL6i7VoMZyOpdE35c0Kj5QNpQK1WNjEwhQdL+zcXMMHQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YdvzOCcV; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1756979117; c=relaxed/simple;
+	bh=XHPvdKbjG5ka9RaObhQu+o1XhqKNYZRUilx9t5/3HlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E22afEdyuE0OBdbcEdUypLMF4OFB0D5fLJkBS5+5LwswksRIcscSu1yUNqiNBq3zt5TWC3wFO8isaS9Ioi/xbx8rAvEpnRF+dDgokfwYYDhY/Y5NZwNZsIhKIcBTi4JzfVZf3/kRNpXoV1PbQ2bywHC00k8USwJW3Qdg1fom3LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=KKgGORZe; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YdvzOCcV"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-726549f81a6so8077296d6.2
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 02:11:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756977104; x=1757581904; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OiBL4xUOfg7gCGVbKRZ2miCXhQoK6jtoEjlt5pZuFFU=;
-        b=YdvzOCcV/LQKJwVTqk78eNBBOzUF9nHSiYvBoUGEm/E31K9V9bDpp4EoKstoLhwo5Y
-         Csh+Dcb/GVyOdlLBQtX4eEQtkKI3Zm1LNKUGSH+4AQld5WZ5cFYNyaHpomww+FBi0wS6
-         +Kh/VW+nsRqf37Pe9F+hfRGLXQd4DPafxEKlxeKjMkRi7z7uVr5CE3L0gqgKns9yyWeE
-         LW/WSf7jqlYolwjmZAThTx72osQQfpisj4GTPk6+0H80+UT22ptSGBiaFFT+CtReW1Hf
-         w+813V2YA4iIbhBV1o+JerEuF6m4L2AXhkfH7yaTvr83rZSkG1Ii2rbIrX5ErdsFD6NB
-         yowg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756977104; x=1757581904;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OiBL4xUOfg7gCGVbKRZ2miCXhQoK6jtoEjlt5pZuFFU=;
-        b=B4+JDN1ZmKerUz7d4i4cjznbFPnBvHnN+AklBnOCqgMmybPCHMF6XJk/bGpsiOthhb
-         Kr12q3YmzmyRqoDFXP45XuuDCWMpNFwyVquQqJ4g2rlIpxPdmQU1Diu/KZRE2ykKHP0u
-         JkrHhtKLyedGOoAm3y9XpYEQdtNvnFdPAtkAyBxqXrSnIim1nXQNBNJ/32h1lFmMKGwi
-         kLB+M4QrlhHM+G2O073cQ9gR5phiY/u/+HK9V2r1GXNYTMBr/FdxtjFhnwTxMM9ZKEPf
-         qS+fZSas+cf08ylr0h/fAR+S+R+88zNEJ+nYVjMdL7DFx7sxzlyd9ylPQgiUazqZ8GV8
-         kBdw==
-X-Forwarded-Encrypted: i=1; AJvYcCURByZBRK2tq1lCgyJvL7CXvtJ1gBP4gPGVfwB/i8WqnHGR/jIx4bzSacckhDOZpO82rVjLjbplqXTo7rM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnBvuklGtJcbvvyL9QBPt32Z9sDuujV/ylAeZj26DiVlfc2aM8
-	qGLKYq5iIQwbY1UHzJK2Vak312TBu+yK6cL6lqWvAknj7kKguyInx9b/JtxGLtbmGdvrkZ7C1Zo
-	zYDut2mAXJhAIKlp+R3PwcXmDHkIWjHw68oaV4cwt
-X-Gm-Gg: ASbGnctnnOOIdgcX9UT9lw6BBXCpruQAZMirNGVkfEbm0yYZNq+4rGn70dZCNhsoSG7
-	0gVQseoq4UaMMSbJseP5P52goS4NV5PbbJRUweBVHSFxZ/wRspbxxKVW1gRwS/FE/kv8XAd77Mu
-	caivgMTvChh0uMHI21JQWeKWuDMletZWB7gwxzOrJSKAjniwpOj9oZhAE79bjtwShvjb9JRVqSv
-	dRB++fqw9V+fWCL9an6LKw=
-X-Google-Smtp-Source: AGHT+IFYlGXJ486TQ9EK/95uU3SyFcsBM0z1rBaAV0ho3WsC4leYY3WLao7HT7YaJJ2NIcq6dX8hgE65KVC5TnV8Eb4=
-X-Received: by 2002:a05:620a:284c:b0:7e6:572d:abe9 with SMTP id
- af79cd13be357-7ff2869bd22mr2202626385a.37.1756977103394; Thu, 04 Sep 2025
- 02:11:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="KKgGORZe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=+EgLYPOzr2Seya9sjkwg+xKsIVeQv5IYNgfp7NTJIiw=; b=KKgGORZejla2hVwlTXeP8DUBX2
+	UjtFEy9nX3hpfKCoAG3teGS/OU516sAxK6BwMLDQFJ+bXPMRAPxTqvxbRFoELKYQGvfUkQdEIW1E5
+	g9pc1bEX6O8d32UvrdLom2K0zv3yOzNvKNVcEoTRQkZMj7WVN82fq8tJBUlcSHvF53qZ38zzWTAC4
+	hS8Kw8v9IvX/I7wLZA/6blnhVw1Zib3giZt8A/xwY3VSdemkFVmqOGYtgzYXSbWf+PjGRpOHhEO33
+	MXcf4K7kim/QHyxEPDCdGq+a81hWw6RmdANlfEgiLpDeqzkPjAFPUksHjApAsSfnWCcpSqWsPw9vs
+	aYoWiHtA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uu6H3-002ZQx-1d;
+	Thu, 04 Sep 2025 17:44:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Sep 2025 17:44:53 +0800
+Date: Thu, 4 Sep 2025 17:44:53 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Menglong Dong <dongml2@chinatelecom.cn>,
+	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kernel test robot <oliver.sang@intel.com>, tgraf@suug.ch,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] rhashtable: Use rcu_dereference_all and
+ rcu_dereference_all_check
+Message-ID: <aLlflTV_SDwMB7mq@gondor.apana.org.au>
+References: <20250829021436.19982-1-dongml2@chinatelecom.cn>
+ <20250828222357.55fab4c2@batman.local.home>
+ <d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
+ <20250901170655.0757884ad7c2afb63ced3230@kernel.org>
+ <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
-From: David Gow <davidgow@google.com>
-Date: Thu, 4 Sep 2025 17:11:31 +0800
-X-Gm-Features: Ac12FXxFg-YSHUgrBqJ-5TrzXWGp5KCpZbo80fhtQ-VWPd3R1wCW9QCV-W4F-oA
-Message-ID: <CABVgOSmZffGSX3f3-+hvberF9VK6_FZYQE_g2jOB7zSMvVuDQw@mail.gmail.com>
-Subject: Re: [PATCH v2 RFC 0/7] KFuzzTest: a new kernel fuzzing framework
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
-	brendan.higgins@linux.dev, dvyukov@google.com, jannh@google.com, 
-	elver@google.com, rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
-	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
-	lukas@wunner.de, ignat@cloudflare.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
 
-On Tue, 2 Sept 2025 at 00:43, Ethan Graham <ethan.w.s.graham@gmail.com> wrote:
+On Mon, Sep 01, 2025 at 08:00:15AM -0700, Paul E. McKenney wrote:
 >
-> From: Ethan Graham <ethangraham@google.com>
->
-> This patch series introduces KFuzzTest, a lightweight framework for
-> creating in-kernel fuzz targets for internal kernel functions.
->
-> The primary motivation for KFuzzTest is to simplify the fuzzing of
-> low-level, relatively stateless functions (e.g., data parsers, format
-> converters) that are difficult to exercise effectively from the syscall
-> boundary. It is intended for in-situ fuzzing of kernel code without
-> requiring that it be built as a separate userspace library or that its
-> dependencies be stubbed out. Using a simple macro-based API, developers
-> can add a new fuzz target with minimal boilerplate code.
->
-> The core design consists of three main parts:
-> 1. A `FUZZ_TEST(name, struct_type)` macro that allows developers to
->    easily define a fuzz test.
-> 2. A binary input format that allows a userspace fuzzer to serialize
->    complex, pointer-rich C structures into a single buffer.
-> 3. Metadata for test targets, constraints, and annotations, which is
->    emitted into dedicated ELF sections to allow for discovery and
->    inspection by userspace tools. These are found in
->    ".kfuzztest_{targets, constraints, annotations}".
->
-> To demonstrate this framework's viability, support for KFuzzTest has been
-> prototyped in a development fork of syzkaller, enabling coverage-guided
-> fuzzing. To validate its end-to-end effectiveness, we performed an
-> experiment by manually introducing an off-by-one buffer over-read into
-> pkcs7_parse_message, like so:
->
-> -ret = asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen);
-> +ret = asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen + 1);
->
-> A syzkaller instance fuzzing the new test_pkcs7_parse_message target
-> introduced in patch 7 successfully triggered the bug inside of
-> asn1_ber_decoder in under a 30 seconds from a cold start.
->
-> This RFC continues to seek feedback on the overall design of KFuzzTest
-> and the minor changes made in V2. We are particularly interested in
-> comments on:
-> - The ergonomics of the API for defining fuzz targets.
-> - The overall workflow and usability for a developer adding and running
->   a new in-kernel fuzz target.
-> - The high-level architecture.
->
-> The patch series is structured as follows:
-> - Patch 1 adds and exposes a new KASAN function needed by KFuzzTest.
-> - Patch 2 introduces the core KFuzzTest API and data structures.
-> - Patch 3 adds the runtime implementation for the framework.
-> - Patch 4 adds a tool for sending structured inputs into a fuzz target.
-> - Patch 5 adds documentation.
-> - Patch 6 provides example fuzz targets.
-> - Patch 7 defines fuzz targets for real kernel functions.
->
-> Changes in v2:
-> - Per feedback from Eric Biggers and Ignat Korchagin, move the /crypto
->   fuzz target samples into a new /crypto/tests directory to separate
->   them from the functional source code.
-> - Per feedback from David Gow and Marco Elver, add the kfuzztest-bridge
->   tool to generate structured inputs for fuzz targets. The tool can
->   populate parts of the input structure with data from a file, enabling
->   both simple randomized fuzzing (e.g, using /dev/urandom) and
->   targeted testing with file-based inputs.
->
-> We would like to thank David Gow for his detailed feedback regarding the
-> potential integration with KUnit. The v1 discussion highlighted three
-> potential paths: making KFuzzTests a special case of KUnit tests, sharing
-> implementation details in a common library, or keeping the frameworks
-> separate while ensuring API familiarity.
->
-> Following a productive conversation with David, we are moving forward
-> with the third option for now. While tighter integration is an
-> attractive long-term goal, we believe the most practical first step is
-> to establish KFuzzTest as a valuable, standalone framework. This avoids
-> premature abstraction (e.g., creating a shared library with only one
-> user) and allows KFuzzTest's design to stabilize based on its specific
-> focus: fuzzing with complex, structured inputs.
->
+> However, another option for the the above rcu_dereference_check() to
+> become something like this:
+> 
+> 	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht) ||
+> 				 rcu_read_lock_any_held());
+> 
+> This would be happy with any RCU reader, including rcu_read_lock(),
+> preempt_disable(), local_irq_disable(), local_bh_disable(), and various
+> handler contexts.  One downside is that this would *always* be happy in
+> a kernel built with CONFIG_PREEMPT_{NONE,VOLUNTARY}=y.
 
-Thanks, Ethan. I've had a bit of a play around with the
-kfuzztest-bridge tool, and it seems to work pretty well here. I'm
-definitely looking forward to trying out
+Why is that a problem? Assuming that it is always safe to perform
+an rcu_dereference_all() on such a kernel, not warning would appear
+to be the right thing to do.
 
-The only real feature I'd find useful would be to have a
-human-readable way of describing the data (as well as the structure),
-which could be useful when passing around reproducers, and could make
-it possible to hand-craft or adapt cases to work cross-architecture,
-if that's a future goal. But I don't think that it's worth holding up
-an initial version for.
+> If this is happening often enough, it would be easy for me to create an
+> rcu_dereference_all_check() that allows all forms of vanilla RCU readers
+> (but not, for example, SRCU readers), but with only two use cases,
+> it is not clear to me that this is an overall win.
+> 
+> Or am I missing a turn in here somewhere?
 
-On the subject of architecture support, I don't see anything
-particularly x86_64-specific in here (or at least, nothing that
-couldn't be relatively easily fixed). While I don't think you need to
-support lots of architectures immediately, it'd be nice to use
-architecture-independant things (like the shared
-include/asm-generic/vmlinux.lds.h) where possible. And even if you're
-focusing on x86_64, supporting UML -- which is still x86
-under-the-hood, but has its own linker scripts -- would be a nice
-bonus if it's easy. Other things, like supporting 32-bit or big-endian
-setups are nice-to-have, but definitely not worth spending too much
-time on immediately (though if we start using some of the
-formats/features here for KUnit, we'll want to support them).
+As I said rhashtable is just a middle-man, while it does some
+RCU actions internally, in the end the user is free to choose
+the RCU variant (vanilla, bh, sched).  So I'm faced with the
+choice of using only rcu_dereference_all in rhashtable code,
+or splitting the rhashtable API into three variants just like
+RCU.  I'd rather not do this especially because it appears RCU
+itself has essentially morphed into a single variant because
+call_rcu etc. always waits for all three variants.
 
-Finally, while I like the samples and documentation, I think it'd be
-nice to include a working example of using kfuzztest-bridge alongside
-the samples, even if it's something as simple as including a line
-like:
-./kfuzztest-bridge "some_buffer { ptr[buf] len[buf, u64]}; buf {
-arr[u8, 128] };"  "test_underflow_on_buffer" /dev/urandom
+So how about this patch?
 
-Regardless, this is very neat, and I can't wait (with some
-apprehension) to see what it finds!
+---8<---
+Add rcu_dereference_all and rcu_dereference_all_check so that
+library code such as rhashtable can be used with any RCU variant.
+
+As it stands rcu_dereference is used within rashtable, which
+creates false-positive warnings if the user calls it from another
+RCU variant context, such as preempt_disable().
+
+Use the rcu_dereference_all and rcu_dereference_all_check calls
+in rhashtable to suppress these warnings.
+
+Also replace the rcu_dereference_raw calls in the list iterators
+with rcu_dereference_all to uncover buggy calls.
+
+Reported-by: Menglong Dong <dongml2@chinatelecom.cn>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+index 120536f4c6eb..b4261a0498f0 100644
+--- a/include/linux/rcupdate.h
++++ b/include/linux/rcupdate.h
+@@ -713,6 +713,23 @@ do {									      \
+ 				(c) || rcu_read_lock_sched_held(), \
+ 				__rcu)
+ 
++/**
++ * rcu_dereference_all_check() - rcu_dereference_all with debug checking
++ * @p: The pointer to read, prior to dereferencing
++ * @c: The conditions under which the dereference will take place
++ *
++ * This is the RCU-all counterpart to rcu_dereference_check().
++ * However, please note that starting in v5.0 kernels, vanilla RCU grace
++ * periods wait for preempt_disable() regions of code in addition to
++ * regions of code demarked by rcu_read_lock() and rcu_read_unlock().
++ * This means that synchronize_rcu(), call_rcu, and friends all take not
++ * only rcu_read_lock() but also rcu_read_lock_*() into account.
++ */
++#define rcu_dereference_all_check(p, c) \
++	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
++				(c) || rcu_read_lock_any_held(), \
++				__rcu)
++
+ /*
+  * The tracing infrastructure traces RCU (we want that), but unfortunately
+  * some of the RCU checks causes tracing to lock up the system.
+@@ -767,6 +784,14 @@ do {									      \
+  */
+ #define rcu_dereference_sched(p) rcu_dereference_sched_check(p, 0)
+ 
++/**
++ * rcu_dereference_all() - fetch RCU-all-protected pointer for dereferencing
++ * @p: The pointer to read, prior to dereferencing
++ *
++ * Makes rcu_dereference_check() do the dirty work.
++ */
++#define rcu_dereference_all(p) rcu_dereference_all_check(p, 0)
++
+ /**
+  * rcu_pointer_handoff() - Hand off a pointer from RCU to other mechanism
+  * @p: The pointer to hand off
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 6c85b28ea30b..e9b5ac26b42d 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -272,13 +272,13 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
+ 	rcu_dereference_protected(p, lockdep_rht_mutex_is_held(ht))
+ 
+ #define rht_dereference_rcu(p, ht) \
+-	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht))
++	rcu_dereference_all_check(p, lockdep_rht_mutex_is_held(ht))
+ 
+ #define rht_dereference_bucket(p, tbl, hash) \
+ 	rcu_dereference_protected(p, lockdep_rht_bucket_is_held(tbl, hash))
+ 
+ #define rht_dereference_bucket_rcu(p, tbl, hash) \
+-	rcu_dereference_check(p, lockdep_rht_bucket_is_held(tbl, hash))
++	rcu_dereference_all_check(p, lockdep_rht_bucket_is_held(tbl, hash))
+ 
+ #define rht_entry(tpos, pos, member) \
+ 	({ tpos = container_of(pos, typeof(*tpos), member); 1; })
+@@ -373,7 +373,7 @@ static inline struct rhash_head *__rht_ptr(
+ static inline struct rhash_head *rht_ptr_rcu(
+ 	struct rhash_lock_head __rcu *const *bkt)
+ {
+-	return __rht_ptr(rcu_dereference(*bkt), bkt);
++	return __rht_ptr(rcu_dereference_all(*bkt), bkt);
+ }
+ 
+ static inline struct rhash_head *rht_ptr(
+@@ -497,7 +497,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+ 	for (({barrier(); }),						\
+ 	     pos = head;						\
+ 	     !rht_is_a_nulls(pos);					\
+-	     pos = rcu_dereference_raw(pos->next))
++	     pos = rcu_dereference_all(pos->next))
+ 
+ /**
+  * rht_for_each_rcu - iterate over rcu hash chain
+@@ -513,7 +513,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+ 	for (({barrier(); }),					\
+ 	     pos = rht_ptr_rcu(rht_bucket(tbl, hash));		\
+ 	     !rht_is_a_nulls(pos);				\
+-	     pos = rcu_dereference_raw(pos->next))
++	     pos = rcu_dereference_all(pos->next))
+ 
+ /**
+  * rht_for_each_entry_rcu_from - iterated over rcu hash chain from given head
+@@ -560,7 +560,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+  * list returned by rhltable_lookup.
+  */
+ #define rhl_for_each_rcu(pos, list)					\
+-	for (pos = list; pos; pos = rcu_dereference_raw(pos->next))
++	for (pos = list; pos; pos = rcu_dereference_all(pos->next))
+ 
+ /**
+  * rhl_for_each_entry_rcu - iterate over rcu hash table list of given type
+@@ -574,7 +574,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+  */
+ #define rhl_for_each_entry_rcu(tpos, pos, list, member)			\
+ 	for (pos = list; pos && rht_entry(tpos, pos, member);		\
+-	     pos = rcu_dereference_raw(pos->next))
++	     pos = rcu_dereference_all(pos->next))
+ 
+ static inline int rhashtable_compare(struct rhashtable_compare_arg *arg,
+ 				     const void *obj)
 
 Cheers,
--- David
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
