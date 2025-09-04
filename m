@@ -1,103 +1,113 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DC027A123;
-	Thu,  4 Sep 2025 20:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C4227F18F
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 20:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757017270; cv=none; b=ihCeBKsjDRTwQ9QYY+7SOZEpf8AnOeUmASbTQsJFZB5e4D2ZdmgicMXPolYwY27DoxjFSDN+Ufv1VwlvwESSlDN3jhQawZH0IJV2HvFFcfP4g6zjm56ZVY9hPuIAVMhXa4z2rYtxJDf6KpJDYZnACxuZXIeTTDHjnzFmxxbtP/Y=
+	t=1757017376; cv=none; b=poioyV4LrainDwDpH0kV9KGwSm4c2klDg0fPuk9WVyxbgLutWqVEAHCOWQlL6P0BR67ZZkqbioYLTbyuDTHTVr7zLH9vlFXwVHvkSMgM1Zp+f9Y9b+fMl6HwOtbvQXILEeSbE35YMmeEnhA0biF8JjSdQZwCVEFNhyrXui7ltT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757017270; c=relaxed/simple;
-	bh=5R73QwFGpxpwtcDAq2/wRoOXZRZTM7agVtz97/zJueA=;
+	s=arc-20240116; t=1757017376; c=relaxed/simple;
+	bh=pOSe9LCUGXl4HpI1pu1/gQtGF+5rfV27KrUR5t1T8RE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nhmEGHTIy1ODw3bwWFsetLXhmxHS/ZjFvNi/MxtCCr5u+cm3pQnTPCo7AJXAOfz51eZcEiuGJ/S5sUj7iZp8HYr3MS/nyEBc3D5hYuXRalpZ/pnjPUpRkrtsZ7+tA+UpFzfjgtG/ZGa+1XfIk+nqxYxDdnFMnXjXQwytJeG/xn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3hoLTL5; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=c3R9ZJm6q8CCVDIB18Ymd4jTZF9jD73qXeCyyZzD/xObNeahXqiCRiHQsrL1ExJZKAkiWYMriv0ZIfoTf2XspZwOLx6Sqcq6azitS9TrwEcssKipWPxqbjN4DrNLdkrIqkB68oNrGPiWcE2S+YUfmWi/gCkbPKIeewn6d5x2YvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=D1sIot58; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3hoLTL5"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-244580523a0so15873715ad.1;
-        Thu, 04 Sep 2025 13:21:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="D1sIot58"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-61a8c134533so2573346a12.3
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 13:22:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757017268; x=1757622068; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5R73QwFGpxpwtcDAq2/wRoOXZRZTM7agVtz97/zJueA=;
-        b=g3hoLTL5uZOcJoIhsYn24yK6DXqOn8KmSzdUqmdNkep4ymDHncDMFQWefi9rPyn09i
-         Bhn3pW7W7C7MsqVA6Y/Q8YKcniG4NCQiCQ4F872rHXPAYbQuhLDfaw9WZhrQL77a82wL
-         2ACU0xhCY62TiP9PGPPAbbQBbb/VdM0GxsQLvaUTpPp8EDZSPCjLKWyJhm8RuRP7Ti5H
-         MOm8nr3FYtLeyGgNGg2HdeeUn2x1bKkkYUVNHi5by6MKB5UFYOmijbAxNgVM/+i7OBzn
-         PmCndNtksdFRrOy35Mip+j+zYZsedQ2iBPYUf4pDxvVNMfEyvDApANkpxJNQgdKyjN82
-         ptvw==
+        d=linux-foundation.org; s=google; t=1757017372; x=1757622172; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EFjbiB4m/eIhgkbRs/v135oy1P6+1az87mWyaXYnAmg=;
+        b=D1sIot58XQ031mTgRCPm+Ic98putP0IabQZcY+oQW0XsiKTMYl3cq+TeRKnPD9TsQP
+         y8DCUSFqpByFRmXJQfxH5+tBGhwfcnAvm286zIrran6O0VUGHa1l1PIluvvA2r+Ca2uZ
+         sN/oei58AIGjwpO5nbccmAjs4RzoUIR8euyts=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757017268; x=1757622068;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5R73QwFGpxpwtcDAq2/wRoOXZRZTM7agVtz97/zJueA=;
-        b=vL14za3BQQQ8pooI5ffghBSrKX2NL6gzZXqyC1p87g9RyeBOR0EiZcRldlpvrTK2bM
-         IVdiBmyRW4riARSzDLqUONsKDb56eP6xsUFuaTTLZhr9R/Kd4PJKBM+hVbIYKSeO5JHx
-         EllWyVAr59DozxyFqEBLO1xwRyyvSWeUUOUGfFT+zAyyLP28bCV2c8YWX3QfCjiQiT07
-         zSYkWT3qo4hpOHp9fXcQb6NA/2qOVddKZwBDlayv78WcPLLBLhritriBs7vWd2gDykoY
-         vlxydwKNvQudXM7nX/Y0AKpfG9hk0q74EhHEWxez1y60WOzOGq3gyiWOhDvGuCZ13tv+
-         4XHw==
-X-Forwarded-Encrypted: i=1; AJvYcCW83128OGmXPXV1xtW5ZPmaRQgUyCKTN4pnXcsIMkPljl0SpyPgNUybu8A4GWyJ8nPBV4C1pa9B6Vn1ufI=@vger.kernel.org, AJvYcCXmZNiycOkQm4g0bNm8O+kaOtcuLwZit8NpqoKy5vyq11bH/qIRkfuOmlR2VHo+M/soQ2N9w25y9kHF0Hkk@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvrWPLdAYTzkUT57uyF4qNdIEFe3sa6mE7QmGvQSxjF+SUeESA
-	S/dU+N6XmoBBfS4sr70epua25aa3riPf8Vp/8KqV1kFGLf2BCA/wKIrRK3UPZKvG62gh/Lsj2UZ
-	/RRa5OiuR/sHKuzSAVdzyJmnQAugFhiU=
-X-Gm-Gg: ASbGncuxTzNLFOHiHnOndnkbK/RYvs3tOMl62NCztxa7bsDfduR8q6VtgOA5D0wQLh3
-	G7U6ZlGOzfdgDJ96fM4QO5cjthuvvdeSAyUnCgXKGsEmrD5IfGLshGxllHmM44spLmpGtfCWl7+
-	+BNDk6/FcC4KHqBcMdsqAAkQUzzRA31YLSfYejUJptd/QtFRBae3h6Ra9Usx8mSfcpXEaycdC3j
-	JyXzOfJ7M/RrjSea0hTEF7w6rAdbxUg5BI9+w==
-X-Google-Smtp-Source: AGHT+IEI0YtwNUP5Ckeu7lnXmy0Rk28H9EZkLvS0yGrAkAdCynjENqi0zkQG7ZR9KNGK7GfDI0Z/fifzp2eGgX7XZqI=
-X-Received: by 2002:a17:903:37cb:b0:242:9bc6:6bc0 with SMTP id
- d9443c01a7336-24944b73618mr268496855ad.55.1757017268482; Thu, 04 Sep 2025
- 13:21:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757017372; x=1757622172;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EFjbiB4m/eIhgkbRs/v135oy1P6+1az87mWyaXYnAmg=;
+        b=HEy2lDBXQtOu/F8eTclqKDWufym6JtFk4mAhvhVqpqABBiyb93lpoxKjxFGntMyNI7
+         wNj1SqhgTpHeZcM6t6Rv4iZxBtI043ZishP0GSNZpgWI/VacuKNXrzdaUiF8L2bDCaPD
+         7J6mOAXEq3GMQPyXM/FWxrlULqDJ/DizuriDRGlxrN+YEsyc5bsnsJOT7P/0gTpppZ6T
+         HO1K0CGtZrI/Wrd2bPEpKQQNFt+YCIUYx+onKL2g1vtazaYYTM3aZxoL49CQdIQYfmcx
+         cSi3W9/OeiGsDOaUSAxoYeOmOSBaHxumimEXi/pgM/LdPWk/eLvH3gJyelQDTvBFmGNk
+         99lA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIe+wwGs9PDwYnL60w8Pu72ftTADx020JmbUP/ZHYyM+FC/PiQe3i8pah4LK166HaE/pS+OdW9H60tk3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeT35Ysg5S19hSKLfJ6fGIk+H9SfIbTujbrfqn+yrGw/XIbNc2
+	Bd4+aN/yhPYPTK1J5mPhbdbiSkCW5ZfMDJC7TmAeD6EDlKw+tzSNz79o+4baoLYKJGcLMO3gz1b
+	1XaBVWeA=
+X-Gm-Gg: ASbGncvH699vWibmMZNRgyWtlCkRno3xhxTP0bAtWnT88SnGa+Zgko4zMei11xC3RCG
+	WIuU08i5KyIYmElNRkWIM8RhlEmB/rKuz7z5vDkTP80V0gjm2P1tGQxk5mBx57DiCLi4Bni7uS1
+	uD511w6GmWQNo6U7Spa5ViT0PuksPfB5IuyQOFjdqhpvzqnSRy5M+eAljwYxEzS+4aPwtDq2kMX
+	CHWuARNJLnNAA1CgmBwkGMKF+Jp101qMUIVElWsTs5JwgzQ26NvVbGtRf8XjUjVE5RLP6jwhK87
+	HSKup5v0c8BqAS8V948H5QxQ8750vyfocAilJSCXY5tP6wpmLVMR1s0eDdPboqXcbAA5loj2gE6
+	HVHmQ3LoblZcdzbQxO0DbJiAoH+DCIeEn/jdI1hVrG7rqSteDD6cY2VV2/FYgtHQhjSb/YWJ1
+X-Google-Smtp-Source: AGHT+IEb+eHK7XijzEynU8835ML/0mYxWxGxt+EH0Bx6MLzivYZohDtglnDyAyojGy6ADwhapUlkgA==
+X-Received: by 2002:a05:6402:50d4:b0:61d:1d36:a7d5 with SMTP id 4fb4d7f45d1cf-61d26fd0b47mr18846242a12.19.1757017371936;
+        Thu, 04 Sep 2025 13:22:51 -0700 (PDT)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc1c7848sm15623881a12.2.2025.09.04.13.22.49
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Sep 2025 13:22:49 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b047f28a83dso201732966b.2
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 13:22:49 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWdw0GhKfCq1XaFrxYGwH6fYueUzbFeud6/nnd/EoBabjQyafODN0DJgJQZB8HqvXaSmBvFbPV2dqnKBjQ=@vger.kernel.org
+X-Received: by 2002:a17:907:2da8:b0:b04:23e0:5c0a with SMTP id
+ a640c23a62f3a-b0423e07281mr1768814666b.20.1757017369118; Thu, 04 Sep 2025
+ 13:22:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
- <20250901164212.460229-8-ethan.w.s.graham@gmail.com> <CALrw=nGkk01xXG7S68FggsWQXygTXnXGz8AvseQuRE9K-OE0uA@mail.gmail.com>
-In-Reply-To: <CALrw=nGkk01xXG7S68FggsWQXygTXnXGz8AvseQuRE9K-OE0uA@mail.gmail.com>
-From: Ethan Graham <ethan.w.s.graham@gmail.com>
-Date: Thu, 4 Sep 2025 22:20:56 +0200
-X-Gm-Features: Ac12FXyXqZdTxVG6TdzkdqBvv0Mcwr4nVECn24stQHwKcyWRqz_jVg7upfdtHW8
-Message-ID: <CANgxf6xCfk9uDsGgqWqociv0Q2Ngu0_GBR0vzWHwOAowsO+CVw@mail.gmail.com>
-Subject: Re: [PATCH v2 RFC 7/7] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
-	brendan.higgins@linux.dev, davidgow@google.com, dvyukov@google.com, 
-	jannh@google.com, elver@google.com, rmoar@google.com, shuah@kernel.org, 
-	tarasmadan@google.com, kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
-	lukas@wunner.de, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org
+References: <20250904155216.460962-1-vegard.nossum@oracle.com> <20250904155216.460962-7-vegard.nossum@oracle.com>
+In-Reply-To: <20250904155216.460962-7-vegard.nossum@oracle.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 4 Sep 2025 13:22:32 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wizcBV_yos1SZW9Zty7960TCeEE1t2qE_Wmm8CMoim60Q@mail.gmail.com>
+X-Gm-Features: Ac12FXxMTxemNqEb5J5AwGTntJrW-uSyt3_5duZoquFOFuM4JPaOvQtYu2LKoHk
+Message-ID: <CAHk-=wizcBV_yos1SZW9Zty7960TCeEE1t2qE_Wmm8CMoim60Q@mail.gmail.com>
+Subject: Re: [PATCH RFC 006/104] KEYS: trusted: eat -ENOENT from the crypto API
+To: Vegard Nossum <vegard.nossum@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	linux-crypto@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>, 
+	Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Wang, Jay" <wanjay@amazon.com>, Nicolai Stange <nstange@suse.com>, Vladis Dronov <vdronov@redhat.com>, 
+	Stephan Mueller <smueller@chronox.de>, Sami Tolvanen <samitolvanen@google.com>, 
+	linux-modules@vger.kernel.org, Vijaykumar Hegde <vijaykumar.hegde@oracle.com>, 
+	Sriharsha Yadagudde <sriharsha.devdas@oracle.com>, Sumit Garg <sumit.garg@linaro.org>, 
+	Jarkko Sakkinen <jarkko@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 3, 2025 at 10:58=E2=80=AFAM Ignat Korchagin <ignat@cloudflare.c=
-om> wrote:
-> nit: can I ask for another real example? AFAIK this subsystem is
-> rarely used (at least directly by users). However, one user-controlled
-> widely used parser terrifies me: load_script() function from
-> binfmt_script.c, which parses the shebang line for scripts. I would
-> really like to see what this framework can do to fuzz that.
+On Thu, 4 Sept 2025 at 13:05, Vegard Nossum <vegard.nossum@oracle.com> wrote:
+>
+> However, since commit 9d50a25eeb05c ("crypto: testmgr - desupport SHA-1
+> for FIPS 140") when booting with fips=1, the SHA-1 algorithm (or anything
+> that uses it, like HMAC-SHA-1) will be unavailable.
+>
+> security/keys/trusted-keys/trusted_tpm1.c is hard-coded to use SHA-1 and
+> will fail with -ENOENT when attempting to initialize the hash instance
+> using the crypto API _if_ the hardware is available. This in turn causes
+> the entire trusted.ko to fail to load.
 
-Thanks for the suggestion! It looks like a promising target.
+Oh Christ.
 
-> I'm a bit worried about the scalability of defining one (visible)
-> config option per fuzz file/module. Is there a use-case, where a user
-> would want to enable some targets, but not the others? Can it be
-> unconditionally enabled and compiled only if CONFIG_KFUZZTEST=3Dy?
+Can we please just make that trusted_tpm1.c code use the sha1 library
+code directly instead of going through the crypto layer to get it?
+That would presumably neatly avoid the whole issue.
 
-That's a good point. I agree it's best to enable them all by default if
-CONFIG_KFUZZTEST=3Dy. A fuzzer can pick and choose which targets
-it wants to fuzz so there's no downside there. My original thought was
-to maintain consistency with how KUnit tests are built, but since
-KFuzzTest targets aren't executed directly it makes sense to diverge
-here.
+Eric - I haven't looked at how painful it is to just do conversions
+like that - I assume it's a boilerplate thing and trivial to do if
+you've one one. Please?
+
+             Linus
