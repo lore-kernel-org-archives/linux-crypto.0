@@ -1,51 +1,51 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8160D283FF8;
-	Thu,  4 Sep 2025 15:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309F82F3627;
+	Thu,  4 Sep 2025 15:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001591; cv=none; b=T7eSgTo3P2FrjARz7BHDTadN9jr09Ha4mxro16nLCd+3x134zHA0epdBhmO8P7hBMKwI/2cyFgHV2OCVmgz1FnnzmqAB1ZG7N4w7avJ/jsaXCmUg5r/CGxR5ZYaYopmNBGRTDbQuOWudmcqdgc78DSJS4IbT5GjGHmydZz5kp/I=
+	t=1757001594; cv=none; b=LFE5OfA2HOtlzD8B76pv1EaYsyNxJTHZOReCSJv2wwz6iW0YbmmFvqFeTNW+Oin+Liy+6OM3X89/3QxCQHta9LUoiwA3K0NctdZpQU4cc8/6m6vs3I/hN0cuDJ8hLM8fhydW/2nq6HKD3JlCcNEqYM/PbNxxVFMR9X6oHaHCVQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001591; c=relaxed/simple;
-	bh=5EnhCOB6fkRetWN4iWekzV5LdKjtzd7nLYJk48PFhLc=;
+	s=arc-20240116; t=1757001594; c=relaxed/simple;
+	bh=CgPZkp+FoaTTLNdrQqm1gpEMooyF5LD3otEF4J0DnbA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HyeGAsFPIUHRRHVSifGqdaO6doIcihvCgsxVtMOu5SXAcX4RYblMWg9bzLnRgWdARipaFlxawMJD94EC5IU4qK+E7KdEIDMrcAJx5ALlJj2z3dHaioCz6JQLnTJKkq2O7MIhCbsAhJ5q+fJd3spxonLRssw1nqeeo4Nql6TGBxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=S1maYJF8; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=rzrnzI/nkkoqq2/bDJ878tKCjv/vlnmi+s2zkG8aTOK5bDktCcdUG7VDG18KM5AInZF1P486Fn0k7S/aBFw0mgJd0BpG2+E5DYnGqWyhPYSt7ynLUd0x32K8BRugX+tnko8jS/unc2NQO2Ewa98GawU+GjQOvE//lg2vWorpFCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lDDsKDGQ; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S1maYJF8"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtonZ009162;
-	Thu, 4 Sep 2025 15:59:38 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lDDsKDGQ"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fuk7s004100;
+	Thu, 4 Sep 2025 15:59:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=0WjDf
-	9ISjXaXnA1vvRtJvFrbmb7pUfWX7Q7fKv5iVn4=; b=S1maYJF8LN1cRwTIwPxq7
-	LGlVeteoeIRUIGvN365M6jxSfDv3MmnoiNEy5Law7/Tuc8+slLSeO8yy7wSNb8sz
-	aHLvP5d6dUyAENZblhsb4ZSFJLqQcu1y2UtQ5S/6cXxEuErb4UvAdQYupT37gF4d
-	jSK/NjESApmFA5uT7M+1jd0j+wm03fXQ1O7PRWepn6phpHsWMPHtB7oS+KyfupTH
-	bmcYItd2RSI6rlR9zDhm0Z4a56W6nFdKTIg6ZRfqfvtdmS0X1YLnLqhCPZeQjgUM
-	Od10U+m5Aht2dygU92iiiFaC/9FgeZmSkre2ypNkn1BQgaA+c7SZy1PCySgxyWxX
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=sHiqj
+	szYSkt3sF1YoZyjRARxduAMRN5LCvZo04unzF8=; b=lDDsKDGQ3K5uUJJs9n9Ks
+	Bh8RobgKzEITvevOH9swD7RYb8f/cjz/bYCPE97WtZAYrsdWLBKDqQBuObeJtKvz
+	7aW3CgtJoSfZAgrOoA9o/16c6UsSPwcXY8J+Ucza3YyIjKNCyugOISo2qpMJyZjB
+	aiSxXOH30xGOUG2Hi+JrGXb72BX2jgFvnWN7kKncSerTuSzVvtCA+thauGHA3O0U
+	NZS70nVONuUMHFRhtA3XotUeSyahl9hIc+jpiB+2Aii0F44mUZ8ttREqbmbAqfvL
+	gD0SA+8y97+qgZnERWnf4sb70uVmVcSkwZnJEtnkF/3EgSxu5YbzxwaNUKCC2TWC
 	g==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydtt00d1-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydun006y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:38 +0000 (GMT)
+	Thu, 04 Sep 2025 15:59:41 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FDegY040212;
-	Thu, 4 Sep 2025 15:59:37 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FELub040036;
+	Thu, 4 Sep 2025 15:59:40 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtqvj-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtqwv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:37 +0000
+	Thu, 04 Sep 2025 15:59:40 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx78000707;
-	Thu, 4 Sep 2025 15:59:36 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7A000707;
+	Thu, 4 Sep 2025 15:59:39 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-71;
-	Thu, 04 Sep 2025 15:59:36 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-72;
+	Thu, 04 Sep 2025 15:59:39 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 070/104] crypto: fips140: convert crypto/shash.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:51:42 +0200
-Message-Id: <20250904155216.460962-71-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 071/104] crypto: fips140: convert crypto/sig.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:51:43 +0200
+Message-Id: <20250904155216.460962-72-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,529 +79,204 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040157
-X-Proofpoint-ORIG-GUID: vw9u5Eno4J1cQtrvdqnUwz2bWUVU_yj1
-X-Authority-Analysis: v=2.4 cv=NeDm13D4 c=1 sm=1 tr=0 ts=68b9b76a b=1 cx=c_pps
+X-Proofpoint-ORIG-GUID: GAdsR9k7rhbFtNv0ZQ2EQiMqDsZ6D1ba
+X-Proofpoint-GUID: GAdsR9k7rhbFtNv0ZQ2EQiMqDsZ6D1ba
+X-Authority-Analysis: v=2.4 cv=cfXSrmDM c=1 sm=1 tr=0 ts=68b9b76d b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=4GdsGrEFWVkbR4aBJNEA:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=8Ie_MMoHnmXKMj9mU8sA:9 cc=ntf
  awl=host:12068
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1NyBTYWx0ZWRfX5Fzj9T/AiFGH
- HSCa+Dpa3PoZY7qbbzUNyS0CQVoPEBCr3i2gmTmUh/84hHyWLvHTSQygVyHS3Y7ihA0AyEHi0gG
- r8RhHPBqYDb3VuVOvZ0ZtyVR2ZcDVPgcP9ryK1iaWumW3nmwGynqEy+2hbBUUd+F3UZsAlbJmue
- bHwUhLY5d2uOYQeSdtamWr0agoQSLINXPGx8tkMOARclEVPzFEc6O2+UaqbcDJ9bhxWrx1elasC
- hWUj6cQ4tayQFnnZcTZlwWG6pSccKJL6GdKVGcNp+xyHo8ZSigsqix6b2r2w441iSr6ISO7eXRV
- NMbT1SmCWihoE3kaw1Cu8PEUiyhEN4zHpFdJ/8vBrGOha5Xu2pKgeCQVTxXbTMuzALRQ9/bVHhR
- W3oAA6RcYeoGReTu1T9P6C7ZPVsQAA==
-X-Proofpoint-GUID: vw9u5Eno4J1cQtrvdqnUwz2bWUVU_yj1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1NyBTYWx0ZWRfX9uVha5NQ6lu/
+ bB0Sk1/VMDKozTyylVYtGwgE6p2/DaeukTH8ae57COdXBcl9TsCjGg5S3GkPoDp2wrzAFQ2E+FB
+ XSRNCynfo4taDCBCfZVmvTvr3OzHj/YAmLShRFvwLecXNXh2qA5O3eRLTBScW0WQv2iZ5TPDOc0
+ pqWQGZZDyamDW+1RMnsXTMPTK/eKvlkqZU0juxp1wkBX3JbwmSFULKn0okTAurlyAs0JQq0x0eD
+ 7LenojIGbEzKztpG5PUl/KWjYGcfCT+uSPMU/Lqqe5+BiTlvqgt0pEC6VSzrrPrJYpbRA5phJuO
+ 9yIzbwM3IVKkh9DCdSJ+/Ps+BUP2XafHMNteKxiY1X5HAbdnT3JtfuW1vmDvM/5r4IsAren0Uo8
+ kP19wV/xuUoidkOV40ev1DTAWsF7ZQ==
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_CRYPTO_HASH2 --source crypto/shash.c --header include/crypto/hash.h include/crypto/internal/hash.h
+  ./fipsify.py --config CONFIG_CRYPTO_SIG2 --source crypto/sig.c --header include/crypto/sig.h include/crypto/internal/sig.h
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/fips140-api.c           | 33 ++++++++++++++
- crypto/shash.c                 | 80 +++++++++++++++++-----------------
- include/crypto/hash.h          | 45 ++++++++++++-------
- include/crypto/internal/hash.h | 43 ++++++++++++------
- 4 files changed, 133 insertions(+), 68 deletions(-)
+ crypto/fips140-api.c          | 18 ++++++++++++++++++
+ crypto/sig.c                  | 20 ++++++++++----------
+ include/crypto/internal/sig.h | 20 +++++++++++++-------
+ include/crypto/sig.h          |  5 ++++-
+ 4 files changed, 45 insertions(+), 18 deletions(-)
 
 diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
-index 2567c6d6622f..eec551e120e2 100644
+index eec551e120e2..c4e66d008be2 100644
 --- a/crypto/fips140-api.c
 +++ b/crypto/fips140-api.c
-@@ -511,3 +511,36 @@ DEFINE_CRYPTO_API_STUB(crypto_sha3_init);
+@@ -544,3 +544,21 @@ DEFINE_CRYPTO_API_STUB(crypto_shash_import_core);
  
  #endif
  
 +/*
-+ * crypto/shash.c
++ * crypto/sig.c
 + */
-+#if !IS_BUILTIN(CONFIG_CRYPTO_HASH2)
++#if !IS_BUILTIN(CONFIG_CRYPTO_SIG2)
 +
-+#include <crypto/hash.h>
++#include <crypto/sig.h>
 +
-+DEFINE_CRYPTO_API_STUB(crypto_alloc_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_clone_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_has_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_setkey);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_digest);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_tfm_digest);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_export);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_import);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_init);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_finup);
++DEFINE_CRYPTO_API_STUB(crypto_alloc_sig);
 +
-+#include <crypto/internal/hash.h>
++#include <crypto/internal/sig.h>
 +
-+DEFINE_CRYPTO_API_STUB(crypto_shash_alg_has_setkey);
-+DEFINE_CRYPTO_API_STUB(crypto_register_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_unregister_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_register_shashes);
-+DEFINE_CRYPTO_API_STUB(crypto_unregister_shashes);
-+DEFINE_CRYPTO_API_STUB(shash_register_instance);
-+DEFINE_CRYPTO_API_STUB(shash_free_singlespawn_instance);
-+DEFINE_CRYPTO_API_STUB(crypto_grab_shash);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_export_core);
-+DEFINE_CRYPTO_API_STUB(crypto_shash_import_core);
++DEFINE_CRYPTO_API_STUB(crypto_register_sig);
++DEFINE_CRYPTO_API_STUB(crypto_unregister_sig);
++DEFINE_CRYPTO_API_STUB(sig_register_instance);
++DEFINE_CRYPTO_API_STUB(crypto_grab_sig);
 +
 +#endif
 +
-diff --git a/crypto/shash.c b/crypto/shash.c
-index d45d7ec83a8c..9f154cebbb95 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -47,11 +47,11 @@ static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
-  * when CFI is enabled, modules won't get the same address for shash_no_setkey
-  * (if it were exported, which inlining would require) as the core kernel will.
-  */
--bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
-+bool CRYPTO_API(crypto_shash_alg_has_setkey)(struct shash_alg *alg)
- {
- 	return alg->setkey != shash_no_setkey;
- }
--EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
-+DEFINE_CRYPTO_API(crypto_shash_alg_has_setkey);
- 
- static void shash_set_needkey(struct crypto_shash *tfm, struct shash_alg *alg)
- {
-@@ -59,7 +59,7 @@ static void shash_set_needkey(struct crypto_shash *tfm, struct shash_alg *alg)
- 		crypto_shash_set_flags(tfm, CRYPTO_TFM_NEED_KEY);
- }
- 
--int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
-+int CRYPTO_API(crypto_shash_setkey)(struct crypto_shash *tfm, const u8 *key,
- 			unsigned int keylen)
- {
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
-@@ -74,7 +74,7 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- 	crypto_shash_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(crypto_shash_setkey);
-+DEFINE_CRYPTO_API(crypto_shash_setkey);
- 
- static int __crypto_shash_init(struct shash_desc *desc)
- {
-@@ -90,13 +90,13 @@ static int __crypto_shash_init(struct shash_desc *desc)
- 	return crypto_shash_alg(tfm)->init(desc);
- }
- 
--int crypto_shash_init(struct shash_desc *desc)
-+int CRYPTO_API(crypto_shash_init)(struct shash_desc *desc)
- {
- 	if (crypto_shash_get_flags(desc->tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
- 	return __crypto_shash_init(desc);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_init);
-+DEFINE_CRYPTO_API(crypto_shash_init);
- 
- static int shash_default_finup(struct shash_desc *desc, const u8 *data,
- 			       unsigned int len, u8 *out)
-@@ -119,7 +119,7 @@ static int crypto_shash_op_and_zero(
- 	return err;
- }
- 
--int crypto_shash_finup(struct shash_desc *restrict desc, const u8 *data,
-+int CRYPTO_API(crypto_shash_finup)(struct shash_desc *restrict desc, const u8 *data,
- 		       unsigned int len, u8 *restrict out)
- {
- 	struct crypto_shash *tfm = desc->tfm;
-@@ -183,7 +183,7 @@ int crypto_shash_finup(struct shash_desc *restrict desc, const u8 *data,
- 	return crypto_shash_op_and_zero(crypto_shash_alg(tfm)->finup, desc,
- 					data, len, out);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_finup);
-+DEFINE_CRYPTO_API(crypto_shash_finup);
- 
- static int shash_default_digest(struct shash_desc *desc, const u8 *data,
- 				unsigned int len, u8 *out)
-@@ -192,7 +192,7 @@ static int shash_default_digest(struct shash_desc *desc, const u8 *data,
- 	       crypto_shash_finup(desc, data, len, out);
- }
- 
--int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
-+int CRYPTO_API(crypto_shash_digest)(struct shash_desc *desc, const u8 *data,
- 			unsigned int len, u8 *out)
- {
- 	struct crypto_shash *tfm = desc->tfm;
-@@ -203,9 +203,9 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
- 	return crypto_shash_op_and_zero(crypto_shash_alg(tfm)->digest, desc,
- 					data, len, out);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_digest);
-+DEFINE_CRYPTO_API(crypto_shash_digest);
- 
--int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
-+int CRYPTO_API(crypto_shash_tfm_digest)(struct crypto_shash *tfm, const u8 *data,
- 			    unsigned int len, u8 *out)
- {
- 	SHASH_DESC_ON_STACK(desc, tfm);
-@@ -213,7 +213,7 @@ int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
- 	desc->tfm = tfm;
- 	return crypto_shash_digest(desc, data, len, out);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_tfm_digest);
-+DEFINE_CRYPTO_API(crypto_shash_tfm_digest);
- 
- static int __crypto_shash_export(struct shash_desc *desc, void *out,
- 				 int (*export)(struct shash_desc *desc,
-@@ -235,14 +235,14 @@ static int __crypto_shash_export(struct shash_desc *desc, void *out,
- 	return export(desc, out);
- }
- 
--int crypto_shash_export_core(struct shash_desc *desc, void *out)
-+int CRYPTO_API(crypto_shash_export_core)(struct shash_desc *desc, void *out)
- {
- 	return __crypto_shash_export(desc, out,
- 				     crypto_shash_alg(desc->tfm)->export_core);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_export_core);
-+DEFINE_CRYPTO_API(crypto_shash_export_core);
- 
--int crypto_shash_export(struct shash_desc *desc, void *out)
-+int CRYPTO_API(crypto_shash_export)(struct shash_desc *desc, void *out)
- {
- 	struct crypto_shash *tfm = desc->tfm;
- 
-@@ -256,7 +256,7 @@ int crypto_shash_export(struct shash_desc *desc, void *out)
- 	}
- 	return __crypto_shash_export(desc, out, crypto_shash_alg(tfm)->export);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_export);
-+DEFINE_CRYPTO_API(crypto_shash_export);
- 
- static int __crypto_shash_import(struct shash_desc *desc, const void *in,
- 				 int (*import)(struct shash_desc *desc,
-@@ -284,14 +284,14 @@ static int __crypto_shash_import(struct shash_desc *desc, const void *in,
- 	return import(desc, in);
- }
- 
--int crypto_shash_import_core(struct shash_desc *desc, const void *in)
-+int CRYPTO_API(crypto_shash_import_core)(struct shash_desc *desc, const void *in)
- {
- 	return __crypto_shash_import(desc, in,
- 				     crypto_shash_alg(desc->tfm)->import_core);
- }
--EXPORT_SYMBOL_GPL(crypto_shash_import_core);
-+DEFINE_CRYPTO_API(crypto_shash_import_core);
- 
--int crypto_shash_import(struct shash_desc *desc, const void *in)
-+int CRYPTO_API(crypto_shash_import)(struct shash_desc *desc, const void *in)
- {
- 	struct crypto_shash *tfm = desc->tfm;
- 	int err;
-@@ -309,7 +309,7 @@ int crypto_shash_import(struct shash_desc *desc, const void *in)
- 	}
- 	return err;
- }
--EXPORT_SYMBOL_GPL(crypto_shash_import);
-+DEFINE_CRYPTO_API(crypto_shash_import);
- 
- static void crypto_shash_exit_tfm(struct crypto_tfm *tfm)
- {
-@@ -386,29 +386,29 @@ const struct crypto_type crypto_shash_type = {
- 	.algsize = offsetof(struct shash_alg, base),
+diff --git a/crypto/sig.c b/crypto/sig.c
+index beba745b6405..c0217bd437f6 100644
+--- a/crypto/sig.c
++++ b/crypto/sig.c
+@@ -77,11 +77,11 @@ static const struct crypto_type crypto_sig_type = {
+ 	.algsize = offsetof(struct sig_alg, base),
  };
  
--int crypto_grab_shash(struct crypto_shash_spawn *spawn,
-+int CRYPTO_API(crypto_grab_shash)(struct crypto_shash_spawn *spawn,
- 		      struct crypto_instance *inst,
- 		      const char *name, u32 type, u32 mask)
+-struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask)
++struct crypto_sig *CRYPTO_API(crypto_alloc_sig)(const char *alg_name, u32 type, u32 mask)
  {
- 	spawn->base.frontend = &crypto_shash_type;
- 	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+ 	return crypto_alloc_tfm(alg_name, &crypto_sig_type, type, mask);
  }
--EXPORT_SYMBOL_GPL(crypto_grab_shash);
-+DEFINE_CRYPTO_API(crypto_grab_shash);
+-EXPORT_SYMBOL_GPL(crypto_alloc_sig);
++DEFINE_CRYPTO_API(crypto_alloc_sig);
  
--struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
-+struct crypto_shash *CRYPTO_API(crypto_alloc_shash)(const char *alg_name, u32 type,
- 					u32 mask)
- {
- 	return crypto_alloc_tfm(alg_name, &crypto_shash_type, type, mask);
- }
--EXPORT_SYMBOL_GPL(crypto_alloc_shash);
-+DEFINE_CRYPTO_API(crypto_alloc_shash);
- 
--int crypto_has_shash(const char *alg_name, u32 type, u32 mask)
-+int CRYPTO_API(crypto_has_shash)(const char *alg_name, u32 type, u32 mask)
- {
- 	return crypto_type_has_alg(alg_name, &crypto_shash_type, type, mask);
- }
--EXPORT_SYMBOL_GPL(crypto_has_shash);
-+DEFINE_CRYPTO_API(crypto_has_shash);
- 
--struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
-+struct crypto_shash *CRYPTO_API(crypto_clone_shash)(struct crypto_shash *hash)
- {
- 	struct crypto_tfm *tfm = crypto_shash_tfm(hash);
- 	struct shash_alg *alg = crypto_shash_alg(hash);
-@@ -443,7 +443,7 @@ struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
- 
- 	return nhash;
- }
--EXPORT_SYMBOL_GPL(crypto_clone_shash);
-+DEFINE_CRYPTO_API(crypto_clone_shash);
- 
- int hash_prepare_alg(struct hash_alg_common *alg)
- {
-@@ -529,7 +529,7 @@ static int shash_prepare_alg(struct shash_alg *alg)
+ static int sig_default_sign(struct crypto_sig *tfm,
+ 			    const void *src, unsigned int slen,
+@@ -134,7 +134,7 @@ static int sig_prepare_alg(struct sig_alg *alg)
  	return 0;
  }
  
--int crypto_register_shash(struct shash_alg *alg)
-+int CRYPTO_API(crypto_register_shash)(struct shash_alg *alg)
+-int crypto_register_sig(struct sig_alg *alg)
++int CRYPTO_API(crypto_register_sig)(struct sig_alg *alg)
  {
  	struct crypto_alg *base = &alg->base;
  	int err;
-@@ -540,15 +540,15 @@ int crypto_register_shash(struct shash_alg *alg)
+@@ -145,15 +145,15 @@ int crypto_register_sig(struct sig_alg *alg)
  
  	return crypto_register_alg(base);
  }
--EXPORT_SYMBOL_GPL(crypto_register_shash);
-+DEFINE_CRYPTO_API(crypto_register_shash);
+-EXPORT_SYMBOL_GPL(crypto_register_sig);
++DEFINE_CRYPTO_API(crypto_register_sig);
  
--void crypto_unregister_shash(struct shash_alg *alg)
-+void CRYPTO_API(crypto_unregister_shash)(struct shash_alg *alg)
+-void crypto_unregister_sig(struct sig_alg *alg)
++void CRYPTO_API(crypto_unregister_sig)(struct sig_alg *alg)
  {
  	crypto_unregister_alg(&alg->base);
  }
--EXPORT_SYMBOL_GPL(crypto_unregister_shash);
-+DEFINE_CRYPTO_API(crypto_unregister_shash);
+-EXPORT_SYMBOL_GPL(crypto_unregister_sig);
++DEFINE_CRYPTO_API(crypto_unregister_sig);
  
--int crypto_register_shashes(struct shash_alg *algs, int count)
-+int CRYPTO_API(crypto_register_shashes)(struct shash_alg *algs, int count)
- {
- 	int i, ret;
- 
-@@ -566,18 +566,18 @@ int crypto_register_shashes(struct shash_alg *algs, int count)
- 
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(crypto_register_shashes);
-+DEFINE_CRYPTO_API(crypto_register_shashes);
- 
--void crypto_unregister_shashes(struct shash_alg *algs, int count)
-+void CRYPTO_API(crypto_unregister_shashes)(struct shash_alg *algs, int count)
- {
- 	int i;
- 
- 	for (i = count - 1; i >= 0; --i)
- 		crypto_unregister_shash(&algs[i]);
- }
--EXPORT_SYMBOL_GPL(crypto_unregister_shashes);
-+DEFINE_CRYPTO_API(crypto_unregister_shashes);
- 
--int shash_register_instance(struct crypto_template *tmpl,
-+int CRYPTO_API(shash_register_instance)(struct crypto_template *tmpl,
- 			    struct shash_instance *inst)
+-int sig_register_instance(struct crypto_template *tmpl,
++int CRYPTO_API(sig_register_instance)(struct crypto_template *tmpl,
+ 			  struct sig_instance *inst)
  {
  	int err;
-@@ -591,14 +591,14 @@ int shash_register_instance(struct crypto_template *tmpl,
+@@ -167,16 +167,16 @@ int sig_register_instance(struct crypto_template *tmpl,
  
- 	return crypto_register_instance(tmpl, shash_crypto_instance(inst));
+ 	return crypto_register_instance(tmpl, sig_crypto_instance(inst));
  }
--EXPORT_SYMBOL_GPL(shash_register_instance);
-+DEFINE_CRYPTO_API(shash_register_instance);
+-EXPORT_SYMBOL_GPL(sig_register_instance);
++DEFINE_CRYPTO_API(sig_register_instance);
  
--void shash_free_singlespawn_instance(struct shash_instance *inst)
-+void CRYPTO_API(shash_free_singlespawn_instance)(struct shash_instance *inst)
+-int crypto_grab_sig(struct crypto_sig_spawn *spawn,
++int CRYPTO_API(crypto_grab_sig)(struct crypto_sig_spawn *spawn,
+ 		    struct crypto_instance *inst,
+ 		    const char *name, u32 type, u32 mask)
  {
- 	crypto_drop_spawn(shash_instance_ctx(inst));
- 	kfree(inst);
+ 	spawn->base.frontend = &crypto_sig_type;
+ 	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
  }
--EXPORT_SYMBOL_GPL(shash_free_singlespawn_instance);
-+DEFINE_CRYPTO_API(shash_free_singlespawn_instance);
+-EXPORT_SYMBOL_GPL(crypto_grab_sig);
++DEFINE_CRYPTO_API(crypto_grab_sig);
  
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Synchronous cryptographic hash type");
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index c9d6ee97360e..3476f6209a22 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -765,12 +765,17 @@ static inline void ahash_request_set_virt(struct ahash_request *req,
-  * Return: allocated cipher handle in case of success; IS_ERR() is true in case
-  *	   of an error, PTR_ERR() returns the error code.
+ MODULE_DESCRIPTION("Public Key Signature Algorithms");
+diff --git a/include/crypto/internal/sig.h b/include/crypto/internal/sig.h
+index b16648c1a986..8efee2dfba72 100644
+--- a/include/crypto/internal/sig.h
++++ b/include/crypto/internal/sig.h
+@@ -7,6 +7,7 @@
+ #ifndef _CRYPTO_INTERNAL_SIG_H
+ #define _CRYPTO_INTERNAL_SIG_H
+ 
++#include <crypto/api.h>
+ #include <crypto/algapi.h>
+ #include <crypto/sig.h>
+ 
+@@ -39,7 +40,9 @@ static inline void *crypto_sig_ctx(struct crypto_sig *tfm)
+  *
+  * Return: zero on success; error code in case of error
   */
--struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
--					u32 mask);
-+DECLARE_CRYPTO_API(crypto_alloc_shash, struct crypto_shash *,
-+	(const char *alg_name, u32 type, u32 mask),
-+	(alg_name, type, mask));
- 
--struct crypto_shash *crypto_clone_shash(struct crypto_shash *tfm);
-+DECLARE_CRYPTO_API(crypto_clone_shash, struct crypto_shash *,
-+	(struct crypto_shash *tfm),
-+	(tfm));
- 
--int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
-+DECLARE_CRYPTO_API(crypto_has_shash, int,
-+	(const char *alg_name, u32 type, u32 mask),
-+	(alg_name, type, mask));
- 
- static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
- {
-@@ -894,8 +899,9 @@ static inline void *shash_desc_ctx(struct shash_desc *desc)
-  * Context: Softirq or process context.
-  * Return: 0 if the setting of the key was successful; < 0 if an error occurred
-  */
--int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
--			unsigned int keylen);
-+DECLARE_CRYPTO_API(crypto_shash_setkey, int,
-+	(struct crypto_shash *tfm, const u8 *key, unsigned int keylen),
-+	(tfm, key, keylen));
- 
- /**
-  * crypto_shash_digest() - calculate message digest for buffer
-@@ -912,8 +918,9 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
-  * Return: 0 if the message digest creation was successful; < 0 if an error
-  *	   occurred
-  */
--int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
--			unsigned int len, u8 *out);
-+DECLARE_CRYPTO_API(crypto_shash_digest, int,
-+	(struct shash_desc *desc, const u8 *data, unsigned int len, u8 *out),
-+	(desc, data, len, out));
- 
- /**
-  * crypto_shash_tfm_digest() - calculate message digest for buffer
-@@ -931,8 +938,9 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
-  * Context: Softirq or process context.
-  * Return: 0 on success; < 0 if an error occurred.
-  */
--int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
--			    unsigned int len, u8 *out);
-+DECLARE_CRYPTO_API(crypto_shash_tfm_digest, int,
-+	(struct crypto_shash *tfm, const u8 *data, unsigned int len, u8 *out),
-+	(tfm, data, len, out));
- 
- DECLARE_CRYPTO_API(crypto_hash_digest, int,
- 	(struct crypto_ahash *tfm, const u8 *data, unsigned int len, u8 *out),
-@@ -950,7 +958,9 @@ DECLARE_CRYPTO_API(crypto_hash_digest, int,
-  * Context: Softirq or process context.
-  * Return: 0 if the export creation was successful; < 0 if an error occurred
-  */
--int crypto_shash_export(struct shash_desc *desc, void *out);
-+DECLARE_CRYPTO_API(crypto_shash_export, int,
-+	(struct shash_desc *desc, void *out),
-+	(desc, out));
- 
- /**
-  * crypto_shash_import() - import operational state
-@@ -964,7 +974,9 @@ int crypto_shash_export(struct shash_desc *desc, void *out);
-  * Context: Softirq or process context.
-  * Return: 0 if the import was successful; < 0 if an error occurred
-  */
--int crypto_shash_import(struct shash_desc *desc, const void *in);
-+DECLARE_CRYPTO_API(crypto_shash_import, int,
-+	(struct shash_desc *desc, const void *in),
-+	(desc, in));
- 
- /**
-  * crypto_shash_init() - (re)initialize message digest
-@@ -978,7 +990,9 @@ int crypto_shash_import(struct shash_desc *desc, const void *in);
-  * Return: 0 if the message digest initialization was successful; < 0 if an
-  *	   error occurred
-  */
--int crypto_shash_init(struct shash_desc *desc);
-+DECLARE_CRYPTO_API(crypto_shash_init, int,
-+	(struct shash_desc *desc),
-+	(desc));
- 
- /**
-  * crypto_shash_finup() - calculate message digest of buffer
-@@ -995,8 +1009,9 @@ int crypto_shash_init(struct shash_desc *desc);
-  * Return: 0 if the message digest creation was successful; < 0 if an error
-  *	   occurred
-  */
--int crypto_shash_finup(struct shash_desc *desc, const u8 *data,
--		       unsigned int len, u8 *out);
-+DECLARE_CRYPTO_API(crypto_shash_finup, int,
-+	(struct shash_desc *desc, const u8 *data, unsigned int len, u8 *out),
-+	(desc, data, len, out));
- 
- /**
-  * crypto_shash_update() - add data to message digest for processing
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index c3f9ca511cf5..29b51abc1bad 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -107,7 +107,9 @@ DECLARE_CRYPTO_API(ahash_free_singlespawn_instance, void,
- 	(struct ahash_instance *inst),
- 	(inst));
- 
--bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
-+DECLARE_CRYPTO_API(crypto_shash_alg_has_setkey, bool,
-+	(struct shash_alg *alg),
+-int crypto_register_sig(struct sig_alg *alg);
++DECLARE_CRYPTO_API(crypto_register_sig, int,
++	(struct sig_alg *alg),
 +	(alg));
  
- DECLARE_CRYPTO_API(crypto_hash_alg_has_setkey, bool,
- 	(struct hash_alg_common *halg),
-@@ -146,17 +148,28 @@ static inline struct hash_alg_common *crypto_spawn_ahash_alg(
- 	return __crypto_hash_alg_common(spawn->base.alg);
+ /**
+  * crypto_unregister_sig() -- Unregister public key signature algorithm
+@@ -48,10 +51,13 @@ int crypto_register_sig(struct sig_alg *alg);
+  *
+  * @alg:	algorithm definition
+  */
+-void crypto_unregister_sig(struct sig_alg *alg);
++DECLARE_CRYPTO_API(crypto_unregister_sig, void,
++	(struct sig_alg *alg),
++	(alg));
+ 
+-int sig_register_instance(struct crypto_template *tmpl,
+-			  struct sig_instance *inst);
++DECLARE_CRYPTO_API(sig_register_instance, int,
++	(struct crypto_template *tmpl, struct sig_instance *inst),
++	(tmpl, inst));
+ 
+ static inline struct sig_instance *sig_instance(struct crypto_instance *inst)
+ {
+@@ -74,9 +80,9 @@ static inline void *sig_instance_ctx(struct sig_instance *inst)
+ 	return crypto_instance_ctx(sig_crypto_instance(inst));
  }
  
--int crypto_register_shash(struct shash_alg *alg);
--void crypto_unregister_shash(struct shash_alg *alg);
--int crypto_register_shashes(struct shash_alg *algs, int count);
--void crypto_unregister_shashes(struct shash_alg *algs, int count);
--int shash_register_instance(struct crypto_template *tmpl,
--			    struct shash_instance *inst);
--void shash_free_singlespawn_instance(struct shash_instance *inst);
-+DECLARE_CRYPTO_API(crypto_register_shash, int,
-+	(struct shash_alg *alg),
-+	(alg));
-+DECLARE_CRYPTO_API(crypto_unregister_shash, void,
-+	(struct shash_alg *alg),
-+	(alg));
-+DECLARE_CRYPTO_API(crypto_register_shashes, int,
-+	(struct shash_alg *algs, int count),
-+	(algs, count));
-+DECLARE_CRYPTO_API(crypto_unregister_shashes, void,
-+	(struct shash_alg *algs, int count),
-+	(algs, count));
-+DECLARE_CRYPTO_API(shash_register_instance, int,
-+	(struct crypto_template *tmpl, struct shash_instance *inst),
-+	(tmpl, inst));
-+DECLARE_CRYPTO_API(shash_free_singlespawn_instance, void,
-+	(struct shash_instance *inst),
-+	(inst));
- 
--int crypto_grab_shash(struct crypto_shash_spawn *spawn,
--		      struct crypto_instance *inst,
--		      const char *name, u32 type, u32 mask);
-+DECLARE_CRYPTO_API(crypto_grab_shash, int,
-+	(struct crypto_shash_spawn *spawn, struct crypto_instance *inst, const char *name, u32 type, u32 mask),
+-int crypto_grab_sig(struct crypto_sig_spawn *spawn,
+-		    struct crypto_instance *inst,
+-		    const char *name, u32 type, u32 mask);
++DECLARE_CRYPTO_API(crypto_grab_sig, int,
++	(struct crypto_sig_spawn *spawn, struct crypto_instance *inst, const char *name, u32 type, u32 mask),
 +	(spawn, inst, name, type, mask));
  
- static inline void crypto_drop_shash(struct crypto_shash_spawn *spawn)
- {
-@@ -408,7 +421,9 @@ DECLARE_CRYPTO_API(crypto_ahash_import_core, int,
-  * Context: Softirq or process context.
-  * Return: 0 if the export creation was successful; < 0 if an error occurred
-  */
--int crypto_shash_export_core(struct shash_desc *desc, void *out);
-+DECLARE_CRYPTO_API(crypto_shash_export_core, int,
-+	(struct shash_desc *desc, void *out),
-+	(desc, out));
+ static inline struct crypto_sig *crypto_spawn_sig(struct crypto_sig_spawn
+ 								   *spawn)
+diff --git a/include/crypto/sig.h b/include/crypto/sig.h
+index fa6dafafab3f..d6da8df9fd28 100644
+--- a/include/crypto/sig.h
++++ b/include/crypto/sig.h
+@@ -7,6 +7,7 @@
+ #ifndef _CRYPTO_SIG_H
+ #define _CRYPTO_SIG_H
+ 
++#include <crypto/api.h>
+ #include <linux/crypto.h>
  
  /**
-  * crypto_shash_import_core() - import core state
-@@ -420,7 +435,9 @@ int crypto_shash_export_core(struct shash_desc *desc, void *out);
-  * Context: Softirq or process context.
-  * Return: 0 if the import was successful; < 0 if an error occurred
+@@ -91,7 +92,9 @@ struct sig_alg {
+  * Return: allocated handle in case of success; IS_ERR() is true in case
+  *	   of an error, PTR_ERR() returns the error code.
   */
--int crypto_shash_import_core(struct shash_desc *desc, const void *in);
-+DECLARE_CRYPTO_API(crypto_shash_import_core, int,
-+	(struct shash_desc *desc, const void *in),
-+	(desc, in));
+-struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask);
++DECLARE_CRYPTO_API(crypto_alloc_sig, struct crypto_sig *,
++	(const char *alg_name, u32 type, u32 mask),
++	(alg_name, type, mask));
  
- #endif	/* _CRYPTO_INTERNAL_HASH_H */
- 
+ static inline struct crypto_tfm *crypto_sig_tfm(struct crypto_sig *tfm)
+ {
 -- 
 2.39.3
 
