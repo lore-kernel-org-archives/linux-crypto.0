@@ -1,51 +1,51 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406762EFDA5;
-	Thu,  4 Sep 2025 16:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5921F4262;
+	Thu,  4 Sep 2025 16:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001609; cv=none; b=riMoe4+4LiRfOan+wGrh1OfBrqCUcQQGAWM+o429s1jj4rYMl2sbivxmhXTOBsPmWHbrUfIJ8sGD/DTRbkWbezURITaL4XLc4+6jjWOVkLEncQX38KMky+qqBrlNLr9zF0NoSMwMWzxdQvHuX46jpHGXPTmbunaMsTcSx5kRn/I=
+	t=1757001612; cv=none; b=pGBMo6PDATs5bK8oBA12vFa4mVhRVft74hkXFz9R/Ajc/lKMsEHkRVz6U/DyXkkRs6fIvyZrd8WWr8kKWQv0vhMU8b82G1eyrYpSXt1S+uc0QoHidg6Xb9FX8MJaDpPiLffMZvs2nSZfYTlda6ToIRb7921ntM+MNT5IYA3o8fM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001609; c=relaxed/simple;
-	bh=8hC08At/IEipd0Gtkwz+lI4pWRRtS2/sViKY1mldPto=;
+	s=arc-20240116; t=1757001612; c=relaxed/simple;
+	bh=eMONE7VLA8vQb8qdFCm+/Y5K7ID2uUgrjxlan2CH6HE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jyCAeif/Nw4evBFMXiIKYoUsC49GxaWeN0ju5yaU46tg8O1ebfhlYZtUGVkfi53xeqTGbZrLXzxYvv7Bjxovp6MuA/KxE4R3InmCEkTwTX6ZhO4dCEOFOSwYe7q4ZkSXMed3h/Vp1vJMxn3tHphK3gpQ08jVJtLcoiXYyWTl+eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XXWOQMcT; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=UD73KLYUFhnhtjcEW56zIb7+4rL27PLQzMLrEqEDQUk0Gemv4p7w2wwzmcgUgrVBKNKWwEiTJMHCzIJGuLx+azX8VxPaMR3QxJdsckmkoaVUIFn7NtiNxngzLtANwAn7ZYYbvdR47YSZPB5NWr44I1ZtYQmcacxmBzPut/U6Elk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cYdIDDCv; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XXWOQMcT"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cYdIDDCv"
 Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FthoK009040;
-	Thu, 4 Sep 2025 15:59:56 GMT
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtnQP009150;
+	Thu, 4 Sep 2025 16:00:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=N9Jf+
-	nn6pSM6Fwasj822KHB8CTTaOJMAysblnqdCD8Q=; b=XXWOQMcT2WJ1lp87T9DWV
-	XH5iydcqxtrePkI8spWKR5wwKDnNjIRAleo3zzbRRZ53xIVgRSBq9FvRiiFZ0f7o
-	Eoj236t/kgUZI6hqrMT52N6+do8nrcKN1nGVKhJgTfPeNOdeIlsc0+fM+vXXLmNG
-	UuD+UtW1h/vjRhPo5+/qSMu7jwS0RZ2IB3GsNwvKx9jniSqgeYtg5nzt6scMGkxT
-	kwM4X5OSIfRK+w3dZpXndeI990yaJlzPxuUya/QOuCHLD1m7CBOd6McTrZMJYQP8
-	ZiDvK/DMzxTeEUsy+24DHZ76ljYOY2Kg9dWij5OkzF4aL0pE/rap3oT3v09s/2aK
-	w==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=vmXNx
+	DXxwa8x1unrbNGDK8lrrmw8OOkdnfEH51g8J0s=; b=cYdIDDCvb3h+aLy40bo64
+	vPLTzZVTcIfOq1i52SBZdvYGbP+tL4dmyB+w3ompA/B4pJf9+00c/LjlaVIj8JnN
+	DZloPO2G1qGCihvLmgq+q8PtusL89kFSLl0MZqnv1luwaG4GKfZtwDIK4Mf1kISE
+	WPHuQKLmghPYgIho53l/3rpGzRCxts7ePQi13pPy5Hvt9i3skqk88ZDD8dsOhMsq
+	G2Hny911Nuy9ce0NhICrIZyYl+kHtw4iPigjjKy0HNVq9n2PhSjYEYfaqWtchSki
+	1NbI39lfGw+Zb8nadeS9UMvNZ3adgLpDzOCe6QJEAt54vB6vbV2ictTuBoJdhlzo
+	A==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydtt00df-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydtt00dn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:56 +0000 (GMT)
+	Thu, 04 Sep 2025 16:00:00 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FLHeR040062;
-	Thu, 4 Sep 2025 15:59:56 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fedpg040082;
+	Thu, 4 Sep 2025 15:59:59 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtr5a-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtr7b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:59:56 +0000
+	Thu, 04 Sep 2025 15:59:59 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7I000707;
-	Thu, 4 Sep 2025 15:59:55 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7K000707;
+	Thu, 4 Sep 2025 15:59:59 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-76;
-	Thu, 04 Sep 2025 15:59:55 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-77;
+	Thu, 04 Sep 2025 15:59:58 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 075/104] crypto: fips140: convert crypto/testmgr.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:51:47 +0200
-Message-Id: <20250904155216.460962-76-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 076/104] crypto: fips140: convert crypto/xts.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:51:48 +0200
+Message-Id: <20250904155216.460962-77-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,96 +79,47 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040157
-X-Proofpoint-ORIG-GUID: LRpXXAuR3kyd9HZSvjyVMw1G97cXMT9b
-X-Authority-Analysis: v=2.4 cv=NeDm13D4 c=1 sm=1 tr=0 ts=68b9b77c b=1 cx=c_pps
+X-Proofpoint-ORIG-GUID: BImWm17MA5dhsB8hYC30XqlAd79aBoJL
+X-Authority-Analysis: v=2.4 cv=NeDm13D4 c=1 sm=1 tr=0 ts=68b9b780 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=0EPD4FprRVkn1_r9_xkA:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=_y4oYdxVqIphRF2WvzQA:9 cc=ntf
  awl=host:12068
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1NyBTYWx0ZWRfX+RwgZKJE8kyd
- +xHk93aSP0iQNqYKh9Ncw6N4dstWuZOV2ea/EXjbONqugureT49SNDP/6GkG3SQ3CJmTreyTj0/
- HpFG+Uvtr66afbW5i65pm2IBMNqChZsDGrzj9+z1cOdGLIzkY+r5o8MwenGpDhtHnRi8c/8n04O
- DLXHpvGZMuxzupcmbVVuFgs35v4aVEI3W1Y6ew1J9e6I4G7tbJarrL83IL4vs683AwthjfEaSFW
- BkJxs2RZ4OUk2SPneey3j6pwfLT6Rm95uP5FIQ2/oHKmpvSEE8edmuXw7fOfm05+GHacTmQagCB
- 2SVZG43keg0A1mlP0yx2Z4c9M0gmH8i5T412z8QTYRGEk4iNmDtPiDJU9YBd1nhUoDTfwHO+zXN
- q1W6HNoCSu9C6I1OluWEOsrhJnXaaA==
-X-Proofpoint-GUID: LRpXXAuR3kyd9HZSvjyVMw1G97cXMT9b
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1NyBTYWx0ZWRfX0eX5Wds9IvyR
+ nB+vINa3g3Tb+CCBYoF0pLPl7VFMVtAkAW/zVDqSY77Lo8H1OQrdMyoe0iSeYfQib61EUR2zOuw
+ /ow16MS3iw1oGfSPgZ0RcsQo7vNTaPTjEOfnrGEpDC/GQ80YsKaCiNpRtUOTuHSaGyxoOCU1Bpi
+ oWl9pduUZI1UlxB8ImgHFaFo9rmAYFgxJ3OWdjlVi1ZcuT6e7oXFHAUXmV9Jr8Tr3ygZ9IOgBlg
+ cGqTwujaWee1FnQgpdzBO1WH85wgZND3uV6Zba0DGfMoHmWfanrUcTWXjXKsEmt96D2zGWS/ulM
+ ObmhhzhAoFkhOCDtBDU2CGgzMd09em3B1HdS30X/NniirTBJr8osfSNcx1XvNrxp3oW6m28aNhV
+ mEprnG46rQ81d5yKVs1pCypKCgATdQ==
+X-Proofpoint-GUID: BImWm17MA5dhsB8hYC30XqlAd79aBoJL
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_CRYPTO_MANAGER2 --source crypto/testmgr.c --header crypto/internal.h
+  ./fipsify.py --config CONFIG_CRYPTO_XTS --source crypto/xts.c
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/fips140-api.c | 11 +++++++++++
- crypto/internal.h    |  4 +++-
- crypto/testmgr.c     |  6 +++---
- 3 files changed, 17 insertions(+), 4 deletions(-)
+ crypto/xts.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
-index 115a0fc99e31..5599cfa963d8 100644
---- a/crypto/fips140-api.c
-+++ b/crypto/fips140-api.c
-@@ -609,3 +609,14 @@ DEFINE_CRYPTO_API_STUB(skcipher_alloc_instance_simple);
- 
- #endif
- 
-+/*
-+ * crypto/testmgr.c
-+ */
-+#if !IS_BUILTIN(CONFIG_CRYPTO_MANAGER2)
-+
-+#include <crypto/internal.h>
-+
-+DEFINE_CRYPTO_API_STUB(alg_test);
-+
-+#endif
-+
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 700280457bf6..f4b12863d922 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -66,7 +66,9 @@ extern struct list_head crypto_alg_list;
- extern struct rw_semaphore crypto_alg_sem;
- extern struct blocking_notifier_head crypto_chain;
- 
--int alg_test(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask);
-+DECLARE_CRYPTO_API(alg_test, int,
-+	(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask),
-+	(alg, driver, name, type, mask));
- 
- #if !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) || !IS_ENABLED(CONFIG_CRYPTO_SELFTESTS)
- static inline bool crypto_boot_test_finished(void)
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 35626ae18c60..54560f3431ca 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -61,7 +61,7 @@ MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
- #ifndef CONFIG_CRYPTO_SELFTESTS
- 
- /* a perfect nop */
--int alg_test(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask)
-+int CRYPTO_API(alg_test)(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask)
- {
- 	return 0;
- }
-@@ -5864,7 +5864,7 @@ static int alg_test_fips_disabled(const struct crypto_alg *alg, const struct alg
- 	return !(desc->fips_allowed & FIPS_NON_CRYPTOGRAPHIC);
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 3da8f5e053d6..97e499893292 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -466,8 +466,8 @@ static void __exit xts_module_exit(void)
+ 	crypto_unregister_template(&xts_tmpl);
  }
  
--int alg_test(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask)
-+int CRYPTO_API(alg_test)(struct crypto_alg *alg, const char *driver, const char *name, u32 type, u32 mask)
- {
- 	int i;
- 	int j;
-@@ -5967,4 +5967,4 @@ int alg_test(struct crypto_alg *alg, const char *driver, const char *name, u32 t
+-module_init(xts_module_init);
+-module_exit(xts_module_exit);
++crypto_module_init(xts_module_init);
++crypto_module_exit(xts_module_exit);
  
- #endif /* CONFIG_CRYPTO_SELFTESTS */
- 
--EXPORT_SYMBOL_GPL(alg_test);
-+DEFINE_CRYPTO_API(alg_test);
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("XTS block cipher mode");
 -- 
 2.39.3
 
