@@ -1,51 +1,51 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D676B280CFB;
-	Thu,  4 Sep 2025 15:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937D5283C9C;
+	Thu,  4 Sep 2025 15:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001387; cv=none; b=hX5ZPQX6/gkdYLEFgpqrH8YGdlq6ySXt+LNzbZQdRsdz9VByVxNggh9oCfmm6VSYHHVZ5i012b3w3CZskXHDFc12GzyH8RosUo6hx8eBxd1hXL+SWRDNQkVPod4avvQjMZD7MefLGqO4AXy52JIHSMuQPxKeQCrMSrxALI0QemI=
+	t=1757001392; cv=none; b=QMBe85KwXIyKBO0kx+p1rWYKm8hjAilauUWnEY2Q6u7oGBJ2L2nvHowOHweTQD5+5HCWXBk9rLRA0g0UB331zXcTBwSKxxJ1ZOQi2AUlVjk2NJivRYvDaxvUyHhb741JJGIxDJFPovPpaq0hAYnz1E/V8yRfCb/zimwqmIB7TN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001387; c=relaxed/simple;
-	bh=JH7QRoUIKTw5WJa31Oior7c8W9brUxgnAHD5Jkuy/vo=;
+	s=arc-20240116; t=1757001392; c=relaxed/simple;
+	bh=If/Ktn/fyjCx3TTaMq+zxZ7n5HRzvmz1drhgs8Q1CcQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GQJ8YUKpAnGreFhCFtr51lzK705SW3kjvVNlOMgq818vri/PGtP023kAIGyGCyCdLFW4i/b4memT+Og/siQhJZx/GgNTdXJ6gAS8EFN9fho0WeYQ3tRcEgqTaCjebHYr6VRhHIYnKFV1ifn5tyTortonO4xVMLGeq9+AfmV4ofU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sCHJWnNm; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=SVrWcTfG0r1cyjI7dKewZXGyG+yqVaU+ieCpUn//6qAYEfXqRhSFCM3Q3e8Ub8UDgxP2ac9+cha8kxUQXzqKrqs7Ll/pkCHlTArDBPZiKzCA84pUlpLj28+kjlI2GTagNwCTS7QjsxBuG0iF46ake/WuLYJG8JOoqZjvc8PBJ7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=YHCZ+eYN; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sCHJWnNm"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FthmP026658;
-	Thu, 4 Sep 2025 15:56:15 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YHCZ+eYN"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Ftraf010582;
+	Thu, 4 Sep 2025 15:56:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=0Nwdf
-	vXf+Yw/18Fx1Fr1S6MRVHogy/JyYzlk1LKb69o=; b=sCHJWnNme2nPj/T55UEt4
-	ZloDlglve7bvrgTP8Bvp0bNk540dN4VD2eyNogdejbgNxk1kKt1fnXXXAao98YP7
-	RQVpQoL2GdXkr+xCJobjsqqsIiVYsAm3JjWhAqWYxFQ7XVDRwBQS7IV4ElYP0oyW
-	bHz0h4sE3OW+80duA66erYO2xpOZrdklYmEFWJfG1H1h7UUSGwDukrAuHHSzKiK+
-	Z+C4+d87yZcvrQLTgpTSM+j1QV17BSLqmEJs/aHw7B7pV+ghxRCcQxMuAjRaOZYq
-	RLjbHkrGap5JfU56WlGVYOiMls2pSP7PahKd0L3BJE11A14p8xWdiwxTQLQK4mQ5
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=hKuvR
+	esbxtkHaAsLnL9mxpsn6drufyF6NQ5VtwGtPwI=; b=YHCZ+eYN2M4E/esCweDvU
+	Ra+A/yF+aJlsBLucJgJirMXWit69h81MIEVS/NN6n2evgGCKiEhzoRtl/tq01bnG
+	OX+dBUojJT4pYMm6IGtDXOdQh7ZRn8CKqlBKiSbNCOS+O+sPZAwzD+F4eNKPWcBc
+	OInnhuzvsM1fFZgKeyNDfOxkZlI/3ZhwvDiABouvSM0gl03lAgowgb7zgx7xNYES
+	lL7nGuuRvtEv8I8shm5N58+X0DA/WzoUxt3ZoN7d9PBYwFT9zQWSOLhC1P6I5WCn
+	YrLTeuXPV01qOOdIXyqqhZ7CuIpkOdGxOHI+UqiCuaxbjsFvZUuHe2FCsqrrF5yo
 	g==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48yd1004uq-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydacr2np-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:14 +0000 (GMT)
+	Thu, 04 Sep 2025 15:56:18 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FV71Z040033;
-	Thu, 4 Sep 2025 15:56:14 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584F0DRT040089;
+	Thu, 4 Sep 2025 15:56:17 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtmrm-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtmuj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:14 +0000
+	Thu, 04 Sep 2025 15:56:17 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5Q000707;
-	Thu, 4 Sep 2025 15:56:13 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5S000707;
+	Thu, 4 Sep 2025 15:56:16 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-20;
-	Thu, 04 Sep 2025 15:56:13 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-21;
+	Thu, 04 Sep 2025 15:56:16 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -58,11 +58,10 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Vladis Dronov <vdronov@redhat.com>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
-        Vegard Nossum <vegard.nossum@oracle.com>,
-        Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
-Subject: [PATCH RFC 019/104] module: add load_module_mem() helper
-Date: Thu,  4 Sep 2025 17:50:51 +0200
-Message-Id: <20250904155216.460962-20-vegard.nossum@oracle.com>
+        Vegard Nossum <vegard.nossum@oracle.com>
+Subject: [PATCH RFC 020/104] module: add a mechanism for pluggable crypto APIs
+Date: Thu,  4 Sep 2025 17:50:52 +0200
+Message-Id: <20250904155216.460962-21-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -80,256 +79,323 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE0OCBTYWx0ZWRfXwvxjZ5l6S4n9
- vdG49F/Ld4jnLjTFqq196B3EkdRhjmYByN2cdG7CeEvP0cG67Q0lAXpCOzUfivjjZo2RdjRWaR2
- cwVPFQIl9wnSxPs93hzGd5vwF66APSTaUCN1gBYQROwL5fMyWG/awf5wDQ5DyG+4qyOLT6WsF+N
- MsLYxVk42WJ9HNkBjP+CBB8U5gQStAmqQivV94DCpOwkmclwojzdPG51fQnrjFYibihb24ysIYB
- x5FxwROlD0NXZsCSz5+cQdKz3pgGOGhNN8FTlZiLaZ2PdzeD+Brvmwj2ewXfEnnHmYYhfcIHeNK
- D78zSZxNfKw4mPzOvpR/9ctZVoyiKfGjsPK4zWz7dlB+EN58VA9/o3+TvUDwxUuE9gIaeMo7N3R
- 0UiRW0oBtki1+TBnzUkmu/E71W/t0g==
-X-Authority-Analysis: v=2.4 cv=CbkI5Krl c=1 sm=1 tr=0 ts=68b9b69e b=1 cx=c_pps
+X-Proofpoint-GUID: blcpdRT0oNlQuVLIoqDHdeizGcJpR1__
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MCBTYWx0ZWRfX3hpAmHzSP0Eu
+ bhMjoU6zTYEAf+r5+ks8LUjbt0Hd+INCamtt+VhXObOt7qHgmdRXjIpY0QtJLzAyA9+mf/hKMhJ
+ TKLFZirPsJDkuKCf50/j5lcTfd+4Yzp1Golf3hGw7edyzMVUZfaoZHv/tIehGriUKNdkfGAK9gq
+ bThfRwQByoppphQTC3jaQqcsDOYXg8tHVaPPY9xSxWwILyfxBghSiq8Fur5IbvcSaf/Jl4UD8sU
+ wcNphPVFrplY8jTqBxBvJ7IQJxROFuUm3KAX2MfbS7SdCAGAo14gifiuz4nL8e6ML5mheNuZCp+
+ HUcUrvpz/x2fFHrX3MBSotD7XHJPDQ9RPGM/DSbJqfPzaQ60eHIdu0LX8dtZW4C1pKnCWtMStWe
+ feMtdaTIarvcD+HcqRvjwkYFjuklzQ==
+X-Proofpoint-ORIG-GUID: blcpdRT0oNlQuVLIoqDHdeizGcJpR1__
+X-Authority-Analysis: v=2.4 cv=TuTmhCXh c=1 sm=1 tr=0 ts=68b9b6a3 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=W6LH72ydn0wR1v8s0j8A:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=M_qoDd663mMjffw2gU8A:9 cc=ntf
  awl=host:12068
-X-Proofpoint-ORIG-GUID: 426m5ym5C43mbckbaazOCLiet9cIpjfO
-X-Proofpoint-GUID: 426m5ym5C43mbckbaazOCLiet9cIpjfO
 
-Add a new helper function, load_module_mem(), which can load a kernel
-module from a byte array in memory.
+For FIPS certification of a standalone FIPS module we need to be able
+to switch out the entire kernel crypto API during boot (if booting with
+fips=1 on the kernel command line).
 
-Also add a new module loader flag, MODULE_INIT_MEM, signalling that a
-module was loaded in this way.
+This is not easy, as it requires all users/callers of the crypto API
+to be updated.
 
-When a module is loaded with load_module_mem(), we do a few things
-differently:
+We've settled on using the "static call" functionality for this.
+Benefits include no speculative attack gadgets and no performance impact
+from indirect calls.
 
-- don't do signature verification
-- ignore vermagic
-- don't taint the kernel
-- keep the initial reference to the module until the caller wants to
-  drop it
+The way it works is that all exported crypto API functions need to be
+annotated with DECLARE_CRYPTO_API() in headers and DEFINE_CRYPTO_API()
+in the implementations. This will essentially allocate a static call key
+for the given function and a static inline wrapper with the actual
+static call itself -- any references to the crypto API functions will be
+dynamically patched when the FIPS module is enabled.
 
-These changes are necessary for having a bundled (but separately
-compiled) FIPS module.
+The static calls are recorded in a new ELF section, __crypto_api_keys,
+and are automatically updated when a module providing their targets is
+loaded.
 
-We may want to let distros carry patches to disable tainting separately
-so this information is not lost in case somebody builds a non-distro
-kernel using a FIPS module compiled for an incompatible version.
+The macro FIPS_MODULE is not yet defined anywhere, but will be defined
+in a future patch for any code compiled as part of the FIPS module.
 
-Co-developed-by: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+Also define wrappers for things like module_init() so that we can record
+these in .fips_initcall and link what would usually be a bunch of
+modules together without running into errors because the resulting
+module has more than one init function.
+
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- include/linux/module.h      |  2 +
- include/uapi/linux/module.h |  5 ++
- kernel/module/main.c        | 99 ++++++++++++++++++++++++++-----------
- 3 files changed, 77 insertions(+), 29 deletions(-)
+ crypto/Kconfig                    |  16 ++++
+ include/asm-generic/vmlinux.lds.h |   1 +
+ include/crypto/api.h              | 154 ++++++++++++++++++++++++++++++
+ kernel/module/main.c              |  26 ++++-
+ 4 files changed, 195 insertions(+), 2 deletions(-)
+ create mode 100644 include/crypto/api.h
 
-diff --git a/include/linux/module.h b/include/linux/module.h
-index 3319a5269d28..00d85602fb6a 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -586,6 +586,8 @@ struct module {
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 23bd98981ae8..a2696ea30bde 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -54,6 +54,22 @@ config CRYPTO_FIPS_VERSION
+ 	  This option provides the ability to override the FIPS Module Version.
+ 	  By default the KERNELRELEASE value is used.
  
- #ifdef CONFIG_MODULES
- 
-+extern int load_module_mem(const char *mem, size_t size);
++config CRYPTO_FIPS140_EXTMOD
++	bool "FIPS 140-3 external module"
++	depends on CRYPTO_FIPS
++	help
++	  Support loading a prebuilt FIPS 140-3 cryptographic module.
 +
- /* Get/put a kernel symbol (calls must be symmetric) */
- void *__symbol_get(const char *symbol);
- void *__symbol_get_gpl(const char *symbol);
-diff --git a/include/uapi/linux/module.h b/include/uapi/linux/module.h
-index 03a33ffffcba..5dcd24018be7 100644
---- a/include/uapi/linux/module.h
-+++ b/include/uapi/linux/module.h
-@@ -7,4 +7,9 @@
- #define MODULE_INIT_IGNORE_VERMAGIC	2
- #define MODULE_INIT_COMPRESSED_FILE	4
- 
-+#ifdef __KERNEL__
-+/* Internal flags */
-+#define MODULE_INIT_MEM			30
-+#endif
++config CRYPTO_FIPS140_HMAC_KEY
++	string "FIPS 140-3 external module HMAC key"
++	depends on CRYPTO_FIPS140_EXTMOD
++	default "Sphinx of black quartz, judge my vow"
++	help
++	  This is the HMAC key used to build and verify the integrity of
++	  the FIPS module.
 +
- #endif /* _UAPI_LINUX_MODULE_H */
++	  Must be at least 14 characters.
++
+ config CRYPTO_ALGAPI
+ 	tristate
+ 	select CRYPTO_ALGAPI2
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index ae2d2359b79e..1881d9b6b3ae 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -707,6 +707,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
+ 	KERNEL_CTORS()							\
+ 	MCOUNT_REC()							\
+ 	*(.init.rodata .init.rodata.*)					\
++	BOUNDED_SECTION(__crypto_api_keys)				\
+ 	FTRACE_EVENTS()							\
+ 	TRACE_SYSCALLS()						\
+ 	KPROBE_BLACKLIST()						\
+diff --git a/include/crypto/api.h b/include/crypto/api.h
+new file mode 100644
+index 000000000000..cda29e71ebef
+--- /dev/null
++++ b/include/crypto/api.h
+@@ -0,0 +1,154 @@
++#ifndef _CRYPTO_API_H
++#define _CRYPTO_API_H
++
++#include <linux/static_call.h>
++
++#if !defined(CONFIG_CRYPTO_FIPS140_EXTMOD)
++
++#define CRYPTO_API(name) name
++
++/*
++ * These are the definitions that get used when no standalone FIPS module
++ * is used: we simply forward everything to normal functions and function
++ * calls.
++ */
++
++#define DECLARE_CRYPTO_API(name, ret_type, args_decl, args_call) \
++	ret_type name args_decl;
++
++#define DEFINE_CRYPTO_API(name) \
++	EXPORT_SYMBOL_GPL(name)
++
++#define crypto_module_init(fn) module_init(fn)
++#define crypto_module_exit(fn) module_exit(fn)
++
++#define crypto_arch_initcall(fn)	arch_initcall(fn)
++#define crypto_subsys_initcall(fn)	subsys_initcall(fn)
++#define crypto_late_initcall(fn)	late_initcall(fn)
++
++#define CRYPTO_MODULE_DEVICE_TABLE(type, name) MODULE_DEVICE_TABLE(type, name)
++
++#define crypto_module_cpu_feature_match(x, __initfunc) \
++	module_cpu_feature_match(x, __initfunc)
++
++#else
++
++struct crypto_api_key {
++	struct static_call_key *key;
++	void *tramp;
++	void *func;
++};
++
++#ifndef FIPS_MODULE
++
++/*
++ * These are the definitions that get used for vmlinux and in-tree
++ * kernel modules.
++ *
++ * In this case, all references to the kernel crypto API functions will
++ * be replaced by wrappers that perform a call using the kernel's static_call
++ * functionality.
++ */
++
++#define CRYPTO_API(name) nonfips_##name
++
++/* Consolidated version of different DECLARE_CRYPTO_API versions */
++#define DECLARE_CRYPTO_API(name, ret_type, args_decl, args_call)	\
++	ret_type nonfips_##name args_decl;				\
++	DECLARE_STATIC_CALL(crypto_##name##_key, nonfips_##name);	\
++	static inline ret_type name args_decl				\
++	{								\
++		return static_call(crypto_##name##_key) args_call;	\
++	}
++
++#define DEFINE_CRYPTO_API(name) \
++	DEFINE_STATIC_CALL(crypto_##name##_key, nonfips_##name); \
++	EXPORT_STATIC_CALL(crypto_##name##_key)
++
++#define DEFINE_CRYPTO_API_STUB(name) \
++	DEFINE_STATIC_CALL_NULL(crypto_##name##_key, name); \
++	EXPORT_STATIC_CALL(crypto_##name##_key)
++
++#define crypto_module_init(fn) module_init(fn)
++#define crypto_module_exit(fn) module_exit(fn)
++
++#define crypto_arch_initcall(fn)	arch_initcall(fn)
++#define crypto_subsys_initcall(fn)	subsys_initcall(fn)
++#define crypto_late_initcall(fn)	late_initcall(fn)
++
++#define CRYPTO_MODULE_DEVICE_TABLE(type, name) MODULE_DEVICE_TABLE(type, name)
++
++#define crypto_module_cpu_feature_match(x, __initfunc) \
++	module_cpu_feature_match(x, __initfunc)
++
++#else /* defined(FIPS_MODULE) */
++
++/*
++ * These are the definitions that get used for the FIPS module and
++ * its kernel modules.
++ *
++ * In this case, all crypto API functions resolve directly to their
++ * implementations, since they are all part of the FIPS module.
++ *
++ * We still need to declare the static call keys so we can update
++ * them when the FIPS modules have all been loaded.
++ */
++
++#define CRYPTO_API(name) fips_##name
++
++/* Consolidated version of different DECLARE_CRYPTO_API versions */
++#define DECLARE_CRYPTO_API(name, ret_type, args_decl, args_call)	\
++	ret_type fips_##name args_decl;					\
++	DECLARE_STATIC_CALL(crypto_##name##_key, fips_##name);		\
++	static inline ret_type name args_decl				\
++	{								\
++		return fips_##name args_call;				\
++	}
++
++/*
++ * Create an entry for the static call key so we can initialize it
++ * in the FIPS module.
++ */
++// TODO: make this const initdata, probably
++#define DEFINE_CRYPTO_API(name) \
++	EXPORT_SYMBOL_GPL(fips_##name); \
++	static struct crypto_api_key __##name##_key \
++		__used \
++		__section("__crypto_api_keys") \
++		__aligned(__alignof__(struct crypto_api_key)) = \
++	{ \
++		.key = &STATIC_CALL_KEY(crypto_##name##_key), \
++		.tramp = STATIC_CALL_TRAMP_ADDR(crypto_##name##_key), \
++		.func = &fips_##name, \
++	};
++
++#define crypto_module_init(fn) \
++	static unsigned long __used __section(".fips_initcall") \
++		__fips_##fn = (unsigned long) &fn;
++#define crypto_module_exit(fn) \
++	static unsigned long __used __section(".fips_exitcall") \
++		__fips_##fn = (unsigned long) &fn;
++
++#define crypto_arch_initcall(fn)	crypto_module_init(fn)
++#define crypto_subsys_initcall(fn)	crypto_module_init(fn)
++#define crypto_late_initcall(fn)	crypto_module_init(fn)
++
++/*
++ * We don't need to emit device tables or module aliases for the FIPS module,
++ * since it will all be loaded at once anyway.
++ */
++#define CRYPTO_MODULE_DEVICE_TABLE(type, name)
++
++#define crypto_module_cpu_feature_match(x, __initfunc) \
++static int __init cpu_feature_match_ ## x ## _init(void)	\
++{								\
++	if (!cpu_have_feature(cpu_feature(x)))			\
++		return -ENODEV;					\
++	return __initfunc();					\
++}								\
++crypto_module_init(cpu_feature_match_ ## x ## _init)
++
++#endif /* defined(FIPS_MODULE) */
++#endif /* defined(CONFIG_CRYPTO_FIPS140_EXTMOD) */
++
++#endif /* !_CRYPTO_API_H */
 diff --git a/kernel/module/main.c b/kernel/module/main.c
-index c66b26184936..12ce4bad29ca 100644
+index 12ce4bad29ca..19a03c8659e2 100644
 --- a/kernel/module/main.c
 +++ b/kernel/module/main.c
-@@ -2572,11 +2572,14 @@ static void module_augment_kernel_taints(struct module *mod, struct load_info *i
+@@ -7,6 +7,7 @@
  
- static int check_modinfo(struct module *mod, struct load_info *info, int flags)
- {
--	const char *modmagic = get_modinfo(info, "vermagic");
-+	const char *modmagic = NULL;
- 	int err;
+ #define INCLUDE_VERMAGIC
  
--	if (flags & MODULE_INIT_IGNORE_VERMAGIC)
--		modmagic = NULL;
-+	if (flags & MODULE_INIT_MEM)
-+		return 0;
++#include <crypto/api.h>
+ #include <linux/export.h>
+ #include <linux/extable.h>
+ #include <linux/moduleloader.h>
+@@ -2956,6 +2957,24 @@ static int post_relocation(struct module *mod, const struct load_info *info)
+ 	return module_finalize(info->hdr, info->sechdrs, mod);
+ }
+ 
++static void do_crypto_api(struct load_info *info)
++{
++#ifdef CONFIG_CRYPTO_FIPS140_EXTMOD
++	struct crypto_api_key *crypto_api_keys;
++	unsigned int num_crypto_api_keys;
 +
-+	if (!(flags & MODULE_INIT_IGNORE_VERMAGIC))
-+		modmagic = get_modinfo(info, "vermagic");
- 
- 	/* This is allowed: modprobe --force will invalidate it. */
- 	if (!modmagic) {
-@@ -3007,7 +3010,7 @@ module_param(async_probe, bool, 0644);
++	unsigned int i;
++
++	crypto_api_keys = section_objs(info, "__crypto_api_keys",
++		sizeof(*crypto_api_keys), &num_crypto_api_keys);
++
++	for (i = 0; i < num_crypto_api_keys; ++i) {
++		struct crypto_api_key *key = &crypto_api_keys[i];
++		__static_call_update(key->key, key->tramp, key->func);
++	}
++#endif
++}
++
+ /* Call module constructors. */
+ static void do_mod_ctors(struct module *mod)
+ {
+@@ -3010,7 +3029,7 @@ module_param(async_probe, bool, 0644);
   * Keep it uninlined to provide a reliable breakpoint target, e.g. for the gdb
   * helper command 'lx-symbols'.
   */
--static noinline int do_init_module(struct module *mod)
-+static noinline int do_init_module(struct module *mod, int flags)
+-static noinline int do_init_module(struct module *mod, int flags)
++static noinline int do_init_module(struct load_info *info, struct module *mod, int flags)
  {
  	int ret = 0;
  	struct mod_initfree *freeinit;
-@@ -3071,7 +3074,8 @@ static noinline int do_init_module(struct module *mod)
- 			mod->mem[MOD_INIT_TEXT].base + mod->mem[MOD_INIT_TEXT].size);
- 	mutex_lock(&module_mutex);
- 	/* Drop initial reference. */
--	module_put(mod);
-+	if (!(flags & MODULE_INIT_MEM))
-+		module_put(mod);
- 	trim_init_extable(mod);
- #ifdef CONFIG_KALLSYMS
- 	/* Switch to core kallsyms now init is done: kallsyms may be walking! */
-@@ -3347,31 +3351,17 @@ static int early_mod_check(struct load_info *info, int flags)
- /*
-  * Allocate and load the module: note that size of section 0 is always
-  * zero, and we rely on this for optional sections.
-+ *
-+ * NOTE: module signature verification must have been done already.
-  */
--static int load_module(struct load_info *info, const char __user *uargs,
--		       int flags)
-+static int _load_module(struct load_info *info, const char __user *uargs,
-+			int flags)
- {
- 	struct module *mod;
- 	bool module_allocated = false;
- 	long err = 0;
- 	char *after_dashes;
+@@ -3036,6 +3055,9 @@ static noinline int do_init_module(struct module *mod, int flags)
+ 	freeinit->init_data = mod->mem[MOD_INIT_DATA].base;
+ 	freeinit->init_rodata = mod->mem[MOD_INIT_RODATA].base;
  
--	/*
--	 * Do the signature check (if any) first. All that
--	 * the signature check needs is info->len, it does
--	 * not need any of the section info. That can be
--	 * set up later. This will minimize the chances
--	 * of a corrupt module causing problems before
--	 * we even get to the signature check.
--	 *
--	 * The check will also adjust info->len by stripping
--	 * off the sig length at the end of the module, making
--	 * checks against info->len more correct.
--	 */
--	err = module_sig_check(info, flags);
--	if (err)
--		goto free_copy;
--
- 	/*
- 	 * Do basic sanity checks against the ELF header and
- 	 * sections. Cache useful sections and set the
-@@ -3405,7 +3395,8 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 	 * We are tainting your kernel if your module gets into
- 	 * the modules linked list somehow.
- 	 */
--	module_augment_kernel_taints(mod, info);
-+	if (!(flags & MODULE_INIT_MEM))
-+		module_augment_kernel_taints(mod, info);
- 
- 	/* To avoid stressing percpu allocator, do this once we're unique. */
- 	err = percpu_modalloc(mod, info);
-@@ -3452,7 +3443,11 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 	flush_module_icache(mod);
- 
- 	/* Now copy in args */
--	mod->args = strndup_user(uargs, ~0UL >> 1);
-+	if ((flags & MODULE_INIT_MEM))
-+		mod->args = kstrdup("", GFP_KERNEL);
-+	else
-+		mod->args = strndup_user(uargs, ~0UL >> 1);
++	if (flags & MODULE_INIT_MEM)
++		do_crypto_api(info);
 +
- 	if (IS_ERR(mod->args)) {
- 		err = PTR_ERR(mod->args);
- 		goto free_arch_cleanup;
-@@ -3500,13 +3495,10 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 	if (codetag_load_module(mod))
- 		goto sysfs_cleanup;
- 
--	/* Get rid of temporary copy. */
--	free_copy(info, flags);
--
+ 	do_mod_ctors(mod);
+ 	/* Start the module */
+ 	if (mod->init != NULL)
+@@ -3498,7 +3520,7 @@ static int _load_module(struct load_info *info, const char __user *uargs,
  	/* Done! */
  	trace_module_load(mod);
  
--	return do_init_module(mod);
-+	return do_init_module(mod, flags);
+-	return do_init_module(mod, flags);
++	return do_init_module(info, mod, flags);
  
   sysfs_cleanup:
  	mod_sysfs_teardown(mod);
-@@ -3562,7 +3554,52 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 		audit_log_kern_module(info->name ? info->name : "?");
- 		mod_stat_bump_becoming(info, flags);
- 	}
-+	return err;
-+}
-+
-+/*
-+ * Load module from kernel memory without signature check.
-+ */
-+int load_module_mem(const char *mem, size_t size)
-+{
-+	int err;
-+	struct load_info info = { };
-+
-+	info.sig_ok = true;
-+	info.hdr = (Elf64_Ehdr *) mem;
-+	info.len = size;
-+
-+	err = _load_module(&info, NULL, MODULE_INIT_MEM);
-+	if (0)
-+		free_copy(&info, 0);
-+
-+	return err;
-+}
-+
-+static int load_module(struct load_info *info, const char __user *uargs,
-+		       int flags)
-+{
-+	int err;
-+
-+	/*
-+	 * Do the signature check (if any) first. All that
-+	 * the signature check needs is info->len, it does
-+	 * not need any of the section info. That can be
-+	 * set up later. This will minimize the chances
-+	 * of a corrupt module causing problems before
-+	 * we even get to the signature check.
-+	 *
-+	 * The check will also adjust info->len by stripping
-+	 * off the sig length at the end of the module, making
-+	 * checks against info->len more correct.
-+	 */
-+	err = module_sig_check(info, flags);
-+	if (!err)
-+		err = _load_module(info, uargs, flags);
-+
-+	/* Get rid of temporary copy. */
- 	free_copy(info, flags);
-+
- 	return err;
- }
- 
-@@ -3728,6 +3765,10 @@ SYSCALL_DEFINE3(finit_module, int, fd, const char __user *, uargs, int, flags)
- 
- 	pr_debug("finit_module: fd=%d, uargs=%p, flags=%i\n", fd, uargs, flags);
- 
-+	/*
-+	 * Deliberately omitting MODULE_INIT_MEM as it is for internal use
-+	 * only.
-+	 */
- 	if (flags & ~(MODULE_INIT_IGNORE_MODVERSIONS
- 		      |MODULE_INIT_IGNORE_VERMAGIC
- 		      |MODULE_INIT_COMPRESSED_FILE))
 -- 
 2.39.3
 
