@@ -1,229 +1,101 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1449F2F90E6;
-	Thu,  4 Sep 2025 09:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2EC2D12E3
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 09:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756979117; cv=none; b=qaGeqJOwozinFX0tmSvSn7IOotJs5E0IPBnEJNFCDvyvlPkUtygoKXmta2kZ+/HGS+rq2i0nKrBkiE4678Hml30zH8IVcLCqd6/LqRRhXS93w9O6N7lUuoWRaQ6WHvlZXHzyQfY6iWNeBaPMaZ/sk8IaxZ66w8/ZQLWjGtlCJPY=
+	t=1756979990; cv=none; b=GjgD+1I5AY82LPQyJb4/uYpFu5xoRP4Rsygzz1lT/pMmvKNIaroEdW9GYVcMSnSw/8zkD4VzwQQHh2/EYL1b8ie7FmH8L3xdj4H2SEsBxJBSnyGaCmTFUgBWwc6Z4JxkGBwi3JR+Vl2Q66A91TIjuklv4rCdj6kQZV4WnOnjtvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756979117; c=relaxed/simple;
-	bh=XHPvdKbjG5ka9RaObhQu+o1XhqKNYZRUilx9t5/3HlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E22afEdyuE0OBdbcEdUypLMF4OFB0D5fLJkBS5+5LwswksRIcscSu1yUNqiNBq3zt5TWC3wFO8isaS9Ioi/xbx8rAvEpnRF+dDgokfwYYDhY/Y5NZwNZsIhKIcBTi4JzfVZf3/kRNpXoV1PbQ2bywHC00k8USwJW3Qdg1fom3LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=KKgGORZe; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1756979990; c=relaxed/simple;
+	bh=MHOpn0x1n+X9bJMJ6KJ/yl+og8/86ttoBXUy6mB0ey0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ULBH93UnYtlFnSF61gFU1Hg+7eM+Jkdxm7/mEYFgvFMhmc8BxMER458il/zT+tpq7Yq2q0+ssqtqonkf1nDoJL5tSlRa5jQXxm0KSgiHJBqWkuw1498WJqmDxosb3qNs4cquwUZweCkS3T2HI5u36G/R3h8F+fneR/KoTK8b8tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BOBrub+T; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="KKgGORZe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=+EgLYPOzr2Seya9sjkwg+xKsIVeQv5IYNgfp7NTJIiw=; b=KKgGORZejla2hVwlTXeP8DUBX2
-	UjtFEy9nX3hpfKCoAG3teGS/OU516sAxK6BwMLDQFJ+bXPMRAPxTqvxbRFoELKYQGvfUkQdEIW1E5
-	g9pc1bEX6O8d32UvrdLom2K0zv3yOzNvKNVcEoTRQkZMj7WVN82fq8tJBUlcSHvF53qZ38zzWTAC4
-	hS8Kw8v9IvX/I7wLZA/6blnhVw1Zib3giZt8A/xwY3VSdemkFVmqOGYtgzYXSbWf+PjGRpOHhEO33
-	MXcf4K7kim/QHyxEPDCdGq+a81hWw6RmdANlfEgiLpDeqzkPjAFPUksHjApAsSfnWCcpSqWsPw9vs
-	aYoWiHtA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uu6H3-002ZQx-1d;
-	Thu, 04 Sep 2025 17:44:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Sep 2025 17:44:53 +0800
-Date: Thu, 4 Sep 2025 17:44:53 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Menglong Dong <dongml2@chinatelecom.cn>,
-	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kernel test robot <oliver.sang@intel.com>, tgraf@suug.ch,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH] rhashtable: Use rcu_dereference_all and
- rcu_dereference_all_check
-Message-ID: <aLlflTV_SDwMB7mq@gondor.apana.org.au>
-References: <20250829021436.19982-1-dongml2@chinatelecom.cn>
- <20250828222357.55fab4c2@batman.local.home>
- <d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
- <20250901170655.0757884ad7c2afb63ced3230@kernel.org>
- <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BOBrub+T"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-72631c2c2fbso9551996d6.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 02:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756979987; x=1757584787; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MHOpn0x1n+X9bJMJ6KJ/yl+og8/86ttoBXUy6mB0ey0=;
+        b=BOBrub+TZH5c0OUCABsKHFUkeq5pzsdHdC9K/lhEN4bUf1YJ1uuDMpE2pICrQfZEIO
+         2fxvd9Olpa8eKI+vJAOwYereBVW6Rvbwn8uvHmNr8AzowOzqvKwlkrsZ3qPHrO3O1lzq
+         W3YHwCx6Iu94jTdm/nHN1Hbv4Um0xBlHeUidptcmPHhBorNOUZlK0rlLkcCAfocK8ElO
+         cxnjU0vpglG7bR13fyBq0fYw4waiWVMQa6psOhFgxo4dsyMAOeliQWpTs/nFtNxnQt6O
+         lE0to02yF9DYQ5pbu30E+gBb4MNo0XsYS3j0pOqIA3Jwt9fE46BTfeEc/7Syva+J8Jex
+         KLtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756979987; x=1757584787;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MHOpn0x1n+X9bJMJ6KJ/yl+og8/86ttoBXUy6mB0ey0=;
+        b=rzoufmqUAuDuwV83q40QS6zG5CMfgDxZXKCT4w5gebqumEAkzeXqDiGVYiJs6X5pRC
+         r1U0CSQPaxBnbY/KYMdcfOekA1MqM8UFylmWN8d0Axcl6wRmnIAHw153ljFHjEJCQqzS
+         QWryBJ6r4AV+YXdboVgHNRQZYx16nmcNZj6Fe/1pKjVYJh6AZC6UzRE9uDOAL713Em1c
+         KK0TaKEHBeqkZ448HU+HWRpWVyWLcoNcBScnk2mYIvcPGr7Zf7oL9eClUUWTMiwjFseA
+         4Zp9xgj6ianGGmkOQwRGTJirl9Vj4X/lmv42ZTniq23WTKlcIgiVnxOKG6edSfqb5upf
+         XbWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXyzYLSGQjuWZRg2JUNqcfT+yUqK5iUvoo4p6rjeQz57oUVq2ZF5EcM1giJu2ODuctMlGR+vJ4/5fDrBro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyuVRoC2hXyFbuozvdtm9Ge4MqdQsup4IEUIvUYnog7FzBun6o
+	CMyiEEt8Z6dlRt10Ghfg4e0spF4JB1Arg+DTbOKHQbmHcUk5psNJm9rQ+6iBzlKjAohMooQga8y
+	lnWTjzNJFtUjVYxM9Ue9pJPNM2dXCYy0ZyXPd7IC1
+X-Gm-Gg: ASbGncvJTR+PsgO5piz00eFh8dJsgfyB3Z/a1c8ImrWUqxvGhx9rs4NHxmSctzdOIdg
+	Q3b7v5V1FKfrCwH03CpzvGq0AWti1idCYTx3ia3i0NaODiKUaF2Rk3jrhKvSab1CrGnp1vLq3Sg
+	a6ruBYX8+Hmgh/LsJ4K5g9JBFer2zr+hJlTYXyHJlDnSKs9F/FM7WuyQAMJhdOFa3JHk0MoM/Bv
+	dgf3X7Zs+QwsPCVepAZgs3rWnEyQ07f67MhfyTnwmVJl+eJlDKuAg==
+X-Google-Smtp-Source: AGHT+IGT4Lm1UEnlQ2bizwHe4ELvu4hzuE9iFObagSCtHAbdLbsZpQZ4v6gnTYWZ5T4wkKXfEhUwpiekj7TMD6WN37U=
+X-Received: by 2002:a05:6214:e41:b0:709:c7de:ce70 with SMTP id
+ 6a1803df08f44-70fac700db8mr222215406d6.10.1756979986529; Thu, 04 Sep 2025
+ 02:59:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
+References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com> <20250901164212.460229-7-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250901164212.460229-7-ethan.w.s.graham@gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Thu, 4 Sep 2025 11:59:09 +0200
+X-Gm-Features: Ac12FXzQlIV_NpJ1rduhtC1FclDh1AxIHe380g_TpXDcw3vnB7j2ZNk2kb8WbdI
+Message-ID: <CAG_fn=WJrdSr_6u770ke3TxyFimuMXXeTSQhsDR73POy4U8iug@mail.gmail.com>
+Subject: Re: [PATCH v2 RFC 6/7] kfuzztest: add KFuzzTest sample fuzz targets
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: ethangraham@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
+	davidgow@google.com, dvyukov@google.com, jannh@google.com, elver@google.com, 
+	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
+	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
+	lukas@wunner.de, ignat@cloudflare.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 01, 2025 at 08:00:15AM -0700, Paul E. McKenney wrote:
+On Mon, Sep 1, 2025 at 6:43=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
+.com> wrote:
 >
-> However, another option for the the above rcu_dereference_check() to
-> become something like this:
-> 
-> 	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht) ||
-> 				 rcu_read_lock_any_held());
-> 
-> This would be happy with any RCU reader, including rcu_read_lock(),
-> preempt_disable(), local_irq_disable(), local_bh_disable(), and various
-> handler contexts.  One downside is that this would *always* be happy in
-> a kernel built with CONFIG_PREEMPT_{NONE,VOLUNTARY}=y.
-
-Why is that a problem? Assuming that it is always safe to perform
-an rcu_dereference_all() on such a kernel, not warning would appear
-to be the right thing to do.
-
-> If this is happening often enough, it would be easy for me to create an
-> rcu_dereference_all_check() that allows all forms of vanilla RCU readers
-> (but not, for example, SRCU readers), but with only two use cases,
-> it is not clear to me that this is an overall win.
-> 
-> Or am I missing a turn in here somewhere?
-
-As I said rhashtable is just a middle-man, while it does some
-RCU actions internally, in the end the user is free to choose
-the RCU variant (vanilla, bh, sched).  So I'm faced with the
-choice of using only rcu_dereference_all in rhashtable code,
-or splitting the rhashtable API into three variants just like
-RCU.  I'd rather not do this especially because it appears RCU
-itself has essentially morphed into a single variant because
-call_rcu etc. always waits for all three variants.
-
-So how about this patch?
-
----8<---
-Add rcu_dereference_all and rcu_dereference_all_check so that
-library code such as rhashtable can be used with any RCU variant.
-
-As it stands rcu_dereference is used within rashtable, which
-creates false-positive warnings if the user calls it from another
-RCU variant context, such as preempt_disable().
-
-Use the rcu_dereference_all and rcu_dereference_all_check calls
-in rhashtable to suppress these warnings.
-
-Also replace the rcu_dereference_raw calls in the list iterators
-with rcu_dereference_all to uncover buggy calls.
-
-Reported-by: Menglong Dong <dongml2@chinatelecom.cn>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
-index 120536f4c6eb..b4261a0498f0 100644
---- a/include/linux/rcupdate.h
-+++ b/include/linux/rcupdate.h
-@@ -713,6 +713,23 @@ do {									      \
- 				(c) || rcu_read_lock_sched_held(), \
- 				__rcu)
- 
-+/**
-+ * rcu_dereference_all_check() - rcu_dereference_all with debug checking
-+ * @p: The pointer to read, prior to dereferencing
-+ * @c: The conditions under which the dereference will take place
-+ *
-+ * This is the RCU-all counterpart to rcu_dereference_check().
-+ * However, please note that starting in v5.0 kernels, vanilla RCU grace
-+ * periods wait for preempt_disable() regions of code in addition to
-+ * regions of code demarked by rcu_read_lock() and rcu_read_unlock().
-+ * This means that synchronize_rcu(), call_rcu, and friends all take not
-+ * only rcu_read_lock() but also rcu_read_lock_*() into account.
-+ */
-+#define rcu_dereference_all_check(p, c) \
-+	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
-+				(c) || rcu_read_lock_any_held(), \
-+				__rcu)
-+
- /*
-  * The tracing infrastructure traces RCU (we want that), but unfortunately
-  * some of the RCU checks causes tracing to lock up the system.
-@@ -767,6 +784,14 @@ do {									      \
-  */
- #define rcu_dereference_sched(p) rcu_dereference_sched_check(p, 0)
- 
-+/**
-+ * rcu_dereference_all() - fetch RCU-all-protected pointer for dereferencing
-+ * @p: The pointer to read, prior to dereferencing
-+ *
-+ * Makes rcu_dereference_check() do the dirty work.
-+ */
-+#define rcu_dereference_all(p) rcu_dereference_all_check(p, 0)
-+
- /**
-  * rcu_pointer_handoff() - Hand off a pointer from RCU to other mechanism
-  * @p: The pointer to hand off
-diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-index 6c85b28ea30b..e9b5ac26b42d 100644
---- a/include/linux/rhashtable.h
-+++ b/include/linux/rhashtable.h
-@@ -272,13 +272,13 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
- 	rcu_dereference_protected(p, lockdep_rht_mutex_is_held(ht))
- 
- #define rht_dereference_rcu(p, ht) \
--	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht))
-+	rcu_dereference_all_check(p, lockdep_rht_mutex_is_held(ht))
- 
- #define rht_dereference_bucket(p, tbl, hash) \
- 	rcu_dereference_protected(p, lockdep_rht_bucket_is_held(tbl, hash))
- 
- #define rht_dereference_bucket_rcu(p, tbl, hash) \
--	rcu_dereference_check(p, lockdep_rht_bucket_is_held(tbl, hash))
-+	rcu_dereference_all_check(p, lockdep_rht_bucket_is_held(tbl, hash))
- 
- #define rht_entry(tpos, pos, member) \
- 	({ tpos = container_of(pos, typeof(*tpos), member); 1; })
-@@ -373,7 +373,7 @@ static inline struct rhash_head *__rht_ptr(
- static inline struct rhash_head *rht_ptr_rcu(
- 	struct rhash_lock_head __rcu *const *bkt)
- {
--	return __rht_ptr(rcu_dereference(*bkt), bkt);
-+	return __rht_ptr(rcu_dereference_all(*bkt), bkt);
- }
- 
- static inline struct rhash_head *rht_ptr(
-@@ -497,7 +497,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
- 	for (({barrier(); }),						\
- 	     pos = head;						\
- 	     !rht_is_a_nulls(pos);					\
--	     pos = rcu_dereference_raw(pos->next))
-+	     pos = rcu_dereference_all(pos->next))
- 
- /**
-  * rht_for_each_rcu - iterate over rcu hash chain
-@@ -513,7 +513,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
- 	for (({barrier(); }),					\
- 	     pos = rht_ptr_rcu(rht_bucket(tbl, hash));		\
- 	     !rht_is_a_nulls(pos);				\
--	     pos = rcu_dereference_raw(pos->next))
-+	     pos = rcu_dereference_all(pos->next))
- 
- /**
-  * rht_for_each_entry_rcu_from - iterated over rcu hash chain from given head
-@@ -560,7 +560,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
-  * list returned by rhltable_lookup.
-  */
- #define rhl_for_each_rcu(pos, list)					\
--	for (pos = list; pos; pos = rcu_dereference_raw(pos->next))
-+	for (pos = list; pos; pos = rcu_dereference_all(pos->next))
- 
- /**
-  * rhl_for_each_entry_rcu - iterate over rcu hash table list of given type
-@@ -574,7 +574,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
-  */
- #define rhl_for_each_entry_rcu(tpos, pos, list, member)			\
- 	for (pos = list; pos && rht_entry(tpos, pos, member);		\
--	     pos = rcu_dereference_raw(pos->next))
-+	     pos = rcu_dereference_all(pos->next))
- 
- static inline int rhashtable_compare(struct rhashtable_compare_arg *arg,
- 				     const void *obj)
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> From: Ethan Graham <ethangraham@google.com>
+>
+> Add two simple fuzz target samples to demonstrate the KFuzzTest API and
+> provide basic self-tests for the framework.
+>
+> These examples showcase how a developer can define a fuzz target using
+> the FUZZ_TEST(), constraint, and annotation macros, and serve as runtime
+> sanity checks for the core logic. For example, they test that out-of-boun=
+ds
+> memory accesses into poisoned padding regions are correctly detected in a
+> KASAN build.
+>
+> These have been tested by writing syzkaller-generated inputs into their
+> debugfs 'input' files and verifying that the correct KASAN reports were
+> triggered.
+>
+> Signed-off-by: Ethan Graham <ethangraham@google.com>
+Acked-by: Alexander Potapenko <glider@google.com>
