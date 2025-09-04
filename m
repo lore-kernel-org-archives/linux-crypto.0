@@ -1,173 +1,194 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3962264B1
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 08:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF53F2DFA5C
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 09:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756976053; cv=none; b=dH7I+Vz0U9u0cnPYeRuWL/yuh9V8Cr5DmzBf9A3TtUWUveFS1P4rpwOgz1D5PGxJBEzcS/9fUfRTUM2kEO5ZnHT3MfcglGwhefQGISrDQjyoGGfhHnTYUKEOPNH2JoGvbTPTDX0+JJ+2ed5lsvLZnnCeXDBzHI43tapRIHCxI7g=
+	t=1756977106; cv=none; b=SwlHAcaZYOMDrvY+AXdoYaYk/s1y11Xh21FhRPbHabbgNtApH9dsz+Y2eq6HIf8a74x6l40pdl6Sv0amHtm0EGdmeO4+K7Ea4km0heTsIINFh6/DJHh99Pc/lbC8eCPMSGkbtgx8/KXl6EpPPsx89p6wRxb2vlDQSBgUYhBMFUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756976053; c=relaxed/simple;
-	bh=mqwfnzwdPC+2dqnEr2ojVooFfW44hUm7NW1fZIerdNs=;
+	s=arc-20240116; t=1756977106; c=relaxed/simple;
+	bh=q6GMFvLMIx4ZMmHgQIZ7JoZYDm4z4PXO1qkMil/wUEs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l3bCNeFEsMM0G+5S1Yx0QZdpm2uvK4xu+9pYh+s6FJXWhFt5hH7C3FiMvRStV9WlxCVTTMx7fqGou9NosEFsC1D8HBvK818yIcZIxBpJluh5H/pVvoHwhwEDF1H4BY3CIYkLg21tT/9Ucz+wSRazd0OfSeSvk/TVNjAWaUEx5tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bj9GJCC/; arc=none smtp.client-ip=209.85.219.46
+	 To:Cc:Content-Type; b=WU42sRR7ToJuWnkyXf9nUSDrcmKsriacsIJ3ipfVK7CggEaVhtPXZtKMoIYxgBxzH0NkGJcrm8NNtmHJuRdbzPaZAljWP59L93LfAC++TdaGcZXmSXelE6wmu0FFBvaL6i7VoMZyOpdE35c0Kj5QNpQK1WNjEwhQdL+zcXMMHQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YdvzOCcV; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bj9GJCC/"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-70ba7aa131fso8262496d6.2
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 01:54:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YdvzOCcV"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-726549f81a6so8077296d6.2
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 02:11:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756976051; x=1757580851; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9VicjXT4pdNAgXdUSH6UsBDRLh+o/JYSTnI74S8PEYQ=;
-        b=Bj9GJCC/CAdL5wyTDFY9eemfix8LX6IxXPKVm0pv9hGApoZzca9QcM4YpkMwV9xla9
-         GjMnjGS95D2vIjMYmhxgRjsIVbWNEFFwL0pGO2wJ27myvV186qoVT8CJQp4D8snLmuVC
-         8YAtQjPrNEe8c6CH8ZJNz+mLfvQhZOJKltF5p5qFtigv23oo3vgTGzxcWKx74dX8NRua
-         G6QnEq9w3zpiziIz0ZDyz0CbuHmNGHiWjZFZemPOyY4RZbdJLKvMejJ5r1Atx6PqsXdj
-         EnvGlwtzTEjnI8i7I97+m/W5eFKECJyMjJ49Bl+jquYZQcYalX9YcF0tzLcMa0gt6KHQ
-         bWqQ==
+        d=google.com; s=20230601; t=1756977104; x=1757581904; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OiBL4xUOfg7gCGVbKRZ2miCXhQoK6jtoEjlt5pZuFFU=;
+        b=YdvzOCcV/LQKJwVTqk78eNBBOzUF9nHSiYvBoUGEm/E31K9V9bDpp4EoKstoLhwo5Y
+         Csh+Dcb/GVyOdlLBQtX4eEQtkKI3Zm1LNKUGSH+4AQld5WZ5cFYNyaHpomww+FBi0wS6
+         +Kh/VW+nsRqf37Pe9F+hfRGLXQd4DPafxEKlxeKjMkRi7z7uVr5CE3L0gqgKns9yyWeE
+         LW/WSf7jqlYolwjmZAThTx72osQQfpisj4GTPk6+0H80+UT22ptSGBiaFFT+CtReW1Hf
+         w+813V2YA4iIbhBV1o+JerEuF6m4L2AXhkfH7yaTvr83rZSkG1Ii2rbIrX5ErdsFD6NB
+         yowg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756976051; x=1757580851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9VicjXT4pdNAgXdUSH6UsBDRLh+o/JYSTnI74S8PEYQ=;
-        b=T4Zp9icZTrEcl6NVV0alACziYaC3tNTYcwCObNHTStF/JRYrvg643CfNPwcKNAiDYT
-         CIrQorlJIrq2VMa1XJ4gy3SKX0NIlpM1jv68kPGXVhjafLctHRgJhhHJlV9AU4Q0YAHM
-         4oWgsdqB0UVP9bc/Zgw1LPxng+AV0TDmvrAj+6JmovBs13nh29rPTsSFl7wKW/vRaLC5
-         nlmWO4hBA1gQS9g3ihCEUJiEvAbjMkPiDLDtswJ8BcuDkfBzCxZO7D6HHDsVTjJRIykB
-         whKygvPx717f/VD3lTVT2oLnVTyQoPmFZVCdhLTFSPDDkSnNHDVWas0hseOWrRDhKzrI
-         fJLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMsyRe8vz/SIYTsfwPjXg9s58vOtNK9Hp1Cy+RGZBMsM8hkRjJxN3R8RiF09jzkb9BZHk+33h+TMJSRQY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXnI62HYx6kE+w4DtwQopjMcBunxOz7sTriugdFgcyei+a18/z
-	kOV93rVnaG1k2zTYVlFBNNa13lhu8JeHFr0WZeWbmnyJTIiYUEWnfNPRKbToisAbVc+nnvz6pL4
-	jzaqvItO7WVQSQQ+Yzf4CS5QyCFTqgv2uMUxLGfys
-X-Gm-Gg: ASbGncv5Hr1zn9iiJxNSDOW+h1SC3gapQjmesSWZNSJg61KsJrMqE6dTYkVttF19X/S
-	bSVQW96qPM/Dvo0MmY/xSTbfe2TZZJRQWoil34IuU5HP7zr6mwy1lXSbEX0AfUTlJeT+F8+fQW8
-	CZcMeE/3XQymLffZ2Q9HqvzMPPAGs5W+SW8Et/2ncWWwsHEyrWjvBUbbvZKVDUReo77o/hDAuf7
-	Mz8wcRMVVxVvZLeK5qMtH7UgA7MJNIoDFyN4u7oTrQ=
-X-Google-Smtp-Source: AGHT+IGe+3QGfd9IKV2sPPBcSKIkB+warv0bCWnhX474CyKZjMxan/mTdhVbYwwEQVkV0lnKX5ceY3UjV6CSO+x3hLI=
-X-Received: by 2002:a05:6214:19eb:b0:723:255a:9168 with SMTP id
- 6a1803df08f44-7232569d525mr82498246d6.4.1756976050489; Thu, 04 Sep 2025
- 01:54:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756977104; x=1757581904;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OiBL4xUOfg7gCGVbKRZ2miCXhQoK6jtoEjlt5pZuFFU=;
+        b=B4+JDN1ZmKerUz7d4i4cjznbFPnBvHnN+AklBnOCqgMmybPCHMF6XJk/bGpsiOthhb
+         Kr12q3YmzmyRqoDFXP45XuuDCWMpNFwyVquQqJ4g2rlIpxPdmQU1Diu/KZRE2ykKHP0u
+         JkrHhtKLyedGOoAm3y9XpYEQdtNvnFdPAtkAyBxqXrSnIim1nXQNBNJ/32h1lFmMKGwi
+         kLB+M4QrlhHM+G2O073cQ9gR5phiY/u/+HK9V2r1GXNYTMBr/FdxtjFhnwTxMM9ZKEPf
+         qS+fZSas+cf08ylr0h/fAR+S+R+88zNEJ+nYVjMdL7DFx7sxzlyd9ylPQgiUazqZ8GV8
+         kBdw==
+X-Forwarded-Encrypted: i=1; AJvYcCURByZBRK2tq1lCgyJvL7CXvtJ1gBP4gPGVfwB/i8WqnHGR/jIx4bzSacckhDOZpO82rVjLjbplqXTo7rM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnBvuklGtJcbvvyL9QBPt32Z9sDuujV/ylAeZj26DiVlfc2aM8
+	qGLKYq5iIQwbY1UHzJK2Vak312TBu+yK6cL6lqWvAknj7kKguyInx9b/JtxGLtbmGdvrkZ7C1Zo
+	zYDut2mAXJhAIKlp+R3PwcXmDHkIWjHw68oaV4cwt
+X-Gm-Gg: ASbGnctnnOOIdgcX9UT9lw6BBXCpruQAZMirNGVkfEbm0yYZNq+4rGn70dZCNhsoSG7
+	0gVQseoq4UaMMSbJseP5P52goS4NV5PbbJRUweBVHSFxZ/wRspbxxKVW1gRwS/FE/kv8XAd77Mu
+	caivgMTvChh0uMHI21JQWeKWuDMletZWB7gwxzOrJSKAjniwpOj9oZhAE79bjtwShvjb9JRVqSv
+	dRB++fqw9V+fWCL9an6LKw=
+X-Google-Smtp-Source: AGHT+IFYlGXJ486TQ9EK/95uU3SyFcsBM0z1rBaAV0ho3WsC4leYY3WLao7HT7YaJJ2NIcq6dX8hgE65KVC5TnV8Eb4=
+X-Received: by 2002:a05:620a:284c:b0:7e6:572d:abe9 with SMTP id
+ af79cd13be357-7ff2869bd22mr2202626385a.37.1756977103394; Thu, 04 Sep 2025
+ 02:11:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com> <20250901164212.460229-6-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250901164212.460229-6-ethan.w.s.graham@gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Thu, 4 Sep 2025 10:53:32 +0200
-X-Gm-Features: Ac12FXzGXGcfd1LWU7AL2P0uHHVI9Cjfbatglasugt3XjpaIrqiLrO1UVJEntQs
-Message-ID: <CAG_fn=VBbSqb07-pbbEw7F=SP5_t74Re7ki0+ZS=mBm2S9BehA@mail.gmail.com>
-Subject: Re: [PATCH v2 RFC 5/7] kfuzztest: add ReST documentation
+References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
+From: David Gow <davidgow@google.com>
+Date: Thu, 4 Sep 2025 17:11:31 +0800
+X-Gm-Features: Ac12FXxFg-YSHUgrBqJ-5TrzXWGp5KCpZbo80fhtQ-VWPd3R1wCW9QCV-W4F-oA
+Message-ID: <CABVgOSmZffGSX3f3-+hvberF9VK6_FZYQE_g2jOB7zSMvVuDQw@mail.gmail.com>
+Subject: Re: [PATCH v2 RFC 0/7] KFuzzTest: a new kernel fuzzing framework
 To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
-	davidgow@google.com, dvyukov@google.com, jannh@google.com, elver@google.com, 
-	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
+Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
+	brendan.higgins@linux.dev, dvyukov@google.com, jannh@google.com, 
+	elver@google.com, rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
 	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
 	lukas@wunner.de, ignat@cloudflare.com, herbert@gondor.apana.org.au, 
 	davem@davemloft.net, linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 1, 2025 at 6:43=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
-.com> wrote:
+On Tue, 2 Sept 2025 at 00:43, Ethan Graham <ethan.w.s.graham@gmail.com> wrote:
 >
 > From: Ethan Graham <ethangraham@google.com>
 >
-> Add Documentation/dev-tools/kfuzztest.rst and reference it in the
-> dev-tools index.
+> This patch series introduces KFuzzTest, a lightweight framework for
+> creating in-kernel fuzz targets for internal kernel functions.
 >
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
-Acked-by: Alexander Potapenko <glider@google.com>
+> The primary motivation for KFuzzTest is to simplify the fuzzing of
+> low-level, relatively stateless functions (e.g., data parsers, format
+> converters) that are difficult to exercise effectively from the syscall
+> boundary. It is intended for in-situ fuzzing of kernel code without
+> requiring that it be built as a separate userspace library or that its
+> dependencies be stubbed out. Using a simple macro-based API, developers
+> can add a new fuzz target with minimal boilerplate code.
+>
+> The core design consists of three main parts:
+> 1. A `FUZZ_TEST(name, struct_type)` macro that allows developers to
+>    easily define a fuzz test.
+> 2. A binary input format that allows a userspace fuzzer to serialize
+>    complex, pointer-rich C structures into a single buffer.
+> 3. Metadata for test targets, constraints, and annotations, which is
+>    emitted into dedicated ELF sections to allow for discovery and
+>    inspection by userspace tools. These are found in
+>    ".kfuzztest_{targets, constraints, annotations}".
+>
+> To demonstrate this framework's viability, support for KFuzzTest has been
+> prototyped in a development fork of syzkaller, enabling coverage-guided
+> fuzzing. To validate its end-to-end effectiveness, we performed an
+> experiment by manually introducing an off-by-one buffer over-read into
+> pkcs7_parse_message, like so:
+>
+> -ret = asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen);
+> +ret = asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen + 1);
+>
+> A syzkaller instance fuzzing the new test_pkcs7_parse_message target
+> introduced in patch 7 successfully triggered the bug inside of
+> asn1_ber_decoder in under a 30 seconds from a cold start.
+>
+> This RFC continues to seek feedback on the overall design of KFuzzTest
+> and the minor changes made in V2. We are particularly interested in
+> comments on:
+> - The ergonomics of the API for defining fuzz targets.
+> - The overall workflow and usability for a developer adding and running
+>   a new in-kernel fuzz target.
+> - The high-level architecture.
+>
+> The patch series is structured as follows:
+> - Patch 1 adds and exposes a new KASAN function needed by KFuzzTest.
+> - Patch 2 introduces the core KFuzzTest API and data structures.
+> - Patch 3 adds the runtime implementation for the framework.
+> - Patch 4 adds a tool for sending structured inputs into a fuzz target.
+> - Patch 5 adds documentation.
+> - Patch 6 provides example fuzz targets.
+> - Patch 7 defines fuzz targets for real kernel functions.
+>
+> Changes in v2:
+> - Per feedback from Eric Biggers and Ignat Korchagin, move the /crypto
+>   fuzz target samples into a new /crypto/tests directory to separate
+>   them from the functional source code.
+> - Per feedback from David Gow and Marco Elver, add the kfuzztest-bridge
+>   tool to generate structured inputs for fuzz targets. The tool can
+>   populate parts of the input structure with data from a file, enabling
+>   both simple randomized fuzzing (e.g, using /dev/urandom) and
+>   targeted testing with file-based inputs.
+>
+> We would like to thank David Gow for his detailed feedback regarding the
+> potential integration with KUnit. The v1 discussion highlighted three
+> potential paths: making KFuzzTests a special case of KUnit tests, sharing
+> implementation details in a common library, or keeping the frameworks
+> separate while ensuring API familiarity.
+>
+> Following a productive conversation with David, we are moving forward
+> with the third option for now. While tighter integration is an
+> attractive long-term goal, we believe the most practical first step is
+> to establish KFuzzTest as a valuable, standalone framework. This avoids
+> premature abstraction (e.g., creating a shared library with only one
+> user) and allows KFuzzTest's design to stabilize based on its specific
+> focus: fuzzing with complex, structured inputs.
+>
 
-Some nits below.
+Thanks, Ethan. I've had a bit of a play around with the
+kfuzztest-bridge tool, and it seems to work pretty well here. I'm
+definitely looking forward to trying out
 
-> +Macros ``FUZZ_TEST``, `KFUZZTEST_EXPECT_*`` and ``KFUZZTEST_ANNOTATE_*``=
- embed
+The only real feature I'd find useful would be to have a
+human-readable way of describing the data (as well as the structure),
+which could be useful when passing around reproducers, and could make
+it possible to hand-craft or adapt cases to work cross-architecture,
+if that's a future goal. But I don't think that it's worth holding up
+an initial version for.
 
-Nit: missing second backtick before KFUZZTEST_EXPECT_
+On the subject of architecture support, I don't see anything
+particularly x86_64-specific in here (or at least, nothing that
+couldn't be relatively easily fixed). While I don't think you need to
+support lots of architectures immediately, it'd be nice to use
+architecture-independant things (like the shared
+include/asm-generic/vmlinux.lds.h) where possible. And even if you're
+focusing on x86_64, supporting UML -- which is still x86
+under-the-hood, but has its own linker scripts -- would be a nice
+bonus if it's easy. Other things, like supporting 32-bit or big-endian
+setups are nice-to-have, but definitely not worth spending too much
+time on immediately (though if we start using some of the
+formats/features here for KUnit, we'll want to support them).
 
+Finally, while I like the samples and documentation, I think it'd be
+nice to include a working example of using kfuzztest-bridge alongside
+the samples, even if it's something as simple as including a line
+like:
+./kfuzztest-bridge "some_buffer { ptr[buf] len[buf, u64]}; buf {
+arr[u8, 128] };"  "test_underflow_on_buffer" /dev/urandom
 
-> +Input Format
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +KFuzzTest targets receive their inputs from userspace via a write to a d=
-edicated
-> +debugfs ``/sys/kernel/debug/kfuzztest/<test-name>/input``.
+Regardless, this is very neat, and I can't wait (with some
+apprehension) to see what it finds!
 
-Nit: "debugfs file"?
-
-> +- Padding and Poisoning: The space between the end of one region's data =
-and the
-> +  beginning of the next must be sufficient for padding. In KASAN builds,
-> +  KFuzzTest poisons this unused padding, allowing for precise detection =
-of
-> +  out-of-bounds memory accesses between adjacent buffers. This padding s=
-hould
-> +  be at least ``KFUZZTEST_POISON_SIZE`` bytes as defined in
-> +  `include/linux/kfuzztest.h``.
-
-Nit: missing leading backtick.
-
-> +
-> +KFuzzTest Bridge Tool
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The kfuzztest-bridge program is a userspace utility that encodes a rando=
-m byte
-
-Nit: do we need backticks around kfuzztest-bridge?
-
-> +This tool is intended to be simple, both in usage and implementation. It=
-s
-> +structure and DSL are sufficient for simpler use-cases. For more advance=
-d
-> +coverage-guided fuzzing it is recommended to use syzkaller which impleme=
-nts
-> +deeper support for KFuzzTest targets.
-
-Nit: please add a link to syzkaller.
-
-> +
-> +The textual format is a human-readable representation of the region-base=
-d binary
-> +format used by KFuzzTest. It is described by the following grammar:
-> +
-> +.. code-block:: text
-> +
-> +       schema     ::=3D region ( ";" region )* [";"]
-> +       region     ::=3D identifier "{" type+ "}"
-
-Don't types need to be separated with spaces?
-
-> +       type       ::=3D primitive | pointer | array | length | string
-> +       primitive  ::=3D "u8" | "u16" | "u32" | "u64"
-> +       pointer    ::=3D "ptr" "[" identifier "]"
-> +       array      ::=3D "arr" "[" primitive "," integer "]"
-> +       length     ::=3D "len" "[" identifier "," primitive "]"
-> +       string     ::=3D "str" "[" integer "]"
-> +       identifier ::=3D [a-zA-Z_][a-zA-Z1-9_]*
-> +       integer    ::=3D [0-9]+
-> +
-> +Pointers must reference a named region. To fuzz a raw buffer, the buffer=
- must be
-
-Maybe insert a paragraph break between these two sentences?
-
-> +.. code-block:: text
-> +
-> +       my_struct { ptr[buf] len[buf, u64] }; buf { arr[u8, n] };
-> +
-> +Where ``n`` is some integer value defining the size of the byte array in=
-side of
-
-s/Where/, where/ ?
+Cheers,
+-- David
