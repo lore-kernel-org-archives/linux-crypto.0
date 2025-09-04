@@ -1,51 +1,51 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFB22F3C21;
-	Thu,  4 Sep 2025 16:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA5432F764;
+	Thu,  4 Sep 2025 16:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001660; cv=none; b=g5Rvcp1tsm4rsEb8xWe76HeGuxKyKrbldEd1T8TYLsLByXJv9Hj7/lzvaS7S1+KKY3PwTqLuam+1mHppRIeqW2bTuf5/TBYFapZ1yHThSLOexYp6OLhKoF7RE9xk69n0AhWzS+TdgUI6utNgsdFVAaagGxEQ5//eGe8CdFSLk8g=
+	t=1757001664; cv=none; b=ZwGLBbDKg9khrLNsIzpUHVfucJn14CBspDPlNjqjbQBxhelLMAVMoROtNClmqtp0Lz/yNOd3Umoi7YcFrWzHbESTbM1Z2XfDdC8OLUlyOpu2EO0o6ji3+F5xUAPjKrZagpRBgMr4bOlQrllugBn67uXKgcW+hr/siZ/wQg0Kbpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001660; c=relaxed/simple;
-	bh=9TPIzMzB5jaE1EtJ+R30ZOltUM6YKx4lC36pNRirqTQ=;
+	s=arc-20240116; t=1757001664; c=relaxed/simple;
+	bh=RWLxEu3okD/86K9IzH6hCwooSrGUDF64kKZOgFxsNbw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D4w73N/5UKCLv38culFUPDCTr0pHYm7y36AJlDQrl0DGDyxuRFOvaPeSMVFJlroV5bMJw7c1CuYU6ivwO9ZL/P7DDkm/XbnetYztIHYHUD0EFdz76D3pxnis0MLh/WkzKfWZDlKntW82EesqOxi/Wd1Q9ODrtsqOyXVxAmLIHow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=SSlgyfAL; arc=none smtp.client-ip=205.220.165.32
+	 MIME-Version; b=dxbOk9dVKAZD1+mHS+v8n3wI70vmt5GhCrYjxLO32M+Y8xPZVOhzPTFVUZvqv8fqbGV9FMg8hbvmjc1bWcV07tdDV74wcr5P/YerBmz/l2jidHMKAPA+aFZxQ+Hrw65V3NtNOcNPiEsO+2rtEnpu78WeV0FP9In5AFdHrSJwmdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ePCiWMJJ; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SSlgyfAL"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtppK010552;
-	Thu, 4 Sep 2025 16:00:45 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ePCiWMJJ"
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtjKW014848;
+	Thu, 4 Sep 2025 16:00:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=KyTlK
-	dOlWb+d7YvycBFYFRYqHwMqbv06iolppBpHRXc=; b=SSlgyfAL+BSt9/xJIChfE
-	DsXSZ1Ia+mFamiAIocGyhrKDs5A/MtaEGcPc4oS6kDJBaom7jArYFAGQBHoLNyZ2
-	2NLJGNPnZqxhNo4kNCuMSYN9FzMjb5/WwvWkQT/Qb3d8jfryjdZVY8JJOUNUCsu8
-	aBfYwXoHnbsnbn+OLfnB7XrbCbQ2eG8//6jsOaoBl3GxTCgbXklha2YA9QT5Aiid
-	rTmOaQ9H4Ihs/SBJMV2J+V67EQhNDJDi7vl76MBN9Og4jZnYdN9zUKJXP7p1uZhU
-	Yij15ioIKPznI61cpkJ6oZzna7zsIOkTYiyNLegPb3VwHplkND0WVzZqjDiFCGxW
-	A==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=oa/de
+	I0rhZ13wFSfVxs7qnpnOm7Bf6BzpoIGyAvk5Ks=; b=ePCiWMJJDwKqBnzynfBDK
+	GO5NHvFk8sRnObWmGreIFjybjP3qLWvsyIyfyEzY+NPm2UKEy5D24Bfun/N+EgX0
+	7OgZWNWZRYkaTyWja99Ofq3kwpasxFiaHJbVkqgLSxsjsvG2Wr/M4OSQtWt1/gEW
+	gPyt+07l/FTm4DQ5LKD/EhYhrcO5bBERDNwjRz9G8QesuZmKn0WkycdiM7DL3h6x
+	XW+/Ii+mhBDq6T9haS90acBt7l95Il4NnMgtjtUhonNCvdmM2/fkBYgTKJFTDC7K
+	3yG+T7adUsMsiVSQRNWrTtiMFVPNGvqA23SvnLF7Y7RUrmQClMxPNAXjE1f1hV9v
+	g==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydacr31j-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ybmh0cjv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 16:00:45 +0000 (GMT)
+	Thu, 04 Sep 2025 16:00:49 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FgNXM040151;
-	Thu, 4 Sep 2025 16:00:43 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FTLSY040133;
+	Thu, 4 Sep 2025 16:00:48 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtt0e-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtt33-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 16:00:43 +0000
+	Thu, 04 Sep 2025 16:00:48 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7g000707;
-	Thu, 4 Sep 2025 16:00:42 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7i000707;
+	Thu, 4 Sep 2025 16:00:47 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-88;
-	Thu, 04 Sep 2025 16:00:42 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-89;
+	Thu, 04 Sep 2025 16:00:47 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 087/104] crypto: fips140: convert crypto/asymmetric_keys/x509_loader.c to using crypto API wrappers
-Date: Thu,  4 Sep 2025 17:51:59 +0200
-Message-Id: <20250904155216.460962-88-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 088/104] crypto: fips140: convert crypto/asymmetric_keys/x509_public_key.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:52:00 +0200
+Message-Id: <20250904155216.460962-89-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,88 +79,47 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040157
-X-Proofpoint-GUID: UfYPGMkj51-vXFWvZkCW8ZgBHrDOxAZa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MCBTYWx0ZWRfX4hwNt1UVxkN9
- 2evvq6bezOQ9wbT6POIATyE9bCQYW8gHznCWLeKoW5anuYuEKLlCC5bPWCaoshPoS8Sy90oKIPr
- BjvrQOE5MUaOnfMs7UpTUgfleKuabTKaD8/3wvu7HpvzGiIqYFr2ODpHWI+LPX1ksWg2WiXbeeG
- on6pQ7gqWJaaZc2LELLLyEBd+dvMjczq2o6Jt/tvaT85UiIwvlWmS8it0YOsQUINncokuC0DVX4
- +Kp1IFkrOMO8BB+ksdt0zSlVXeb3S37TWUQ9FzicySyPt3sejwqkPVbdocLWH7aBdCV2FUorOcM
- Qx43PjQK6qt+j0fF35zDl56taDmDNjyaTdlLi0eVAIii/TWVipJFcOmRVEynOfHraLxSwFwqcK5
- Xl8qk9JEZwfGXfT+FZEV8AaJoD9DWw==
-X-Proofpoint-ORIG-GUID: UfYPGMkj51-vXFWvZkCW8ZgBHrDOxAZa
-X-Authority-Analysis: v=2.4 cv=TuTmhCXh c=1 sm=1 tr=0 ts=68b9b7ad b=1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDEzMiBTYWx0ZWRfXylHnpFtJQzML
+ 0kLEpAD+PO43adOJxDzgLr9Vtjjty4TYhkHPYJ9MAqHUbTBOVlpVPfR7VMBB/HgjXc4zXzkP+B1
+ fZuJzJvjyjwPO8/QLP2a2rvNk0fAH+dUdHnGU9SQ7ENjF0/Iuaav8L7gGB4AGh1tiOpUD5rl5O+
+ zVdi8OP4ivdesIA2rUvsvEE7aXcSV5IYInwqjKm/SQk4tAZN+2F/P3CJB8n4N8QL8fUDCoW5xFC
+ +kE/wgrMIMNWE8Cn/3oS84HP26kqGx8ei3FZ8entlvAJzH8G8W86lCtaNdgVJFc1Fyz/4m0fnnk
+ gNy0IWnnxMGr/XbhtKJ2YXXMizxhsrTXIcFCWN/QtC8mODek1CDNEj72cS+1hFSnzvEeFjlrGN8
+ NXzhxC3UwhqIByMwurHelgssP1v7Yw==
+X-Authority-Analysis: v=2.4 cv=Z8PsHGRA c=1 sm=1 tr=0 ts=68b9b7b2 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=eiX3Vj3_IqpN7uzC1f8A:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=9LomtPCryUeiOyqmeTwA:9 cc=ntf
  awl=host:12068
+X-Proofpoint-GUID: IWHIkxLSBLC_4Eifmybc3qE3olxmp8m2
+X-Proofpoint-ORIG-GUID: IWHIkxLSBLC_4Eifmybc3qE3olxmp8m2
 
 Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
 compilation as part of support for FIPS 140 standalone modules.
 
 Generated using:
 
-  ./fipsify.py --config CONFIG_X509_CERTIFICATE_PARSER --source crypto/asymmetric_keys/x509_loader.c --header include/keys/asymmetric-type.h
+  ./fipsify.py --config CONFIG_X509_CERTIFICATE_PARSER --source crypto/asymmetric_keys/x509_public_key.c
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/asymmetric_keys/x509_loader.c |  4 ++--
- crypto/fips140-api.c                 | 11 +++++++++++
- include/keys/asymmetric-type.h       |  5 +++--
- 3 files changed, 16 insertions(+), 4 deletions(-)
+ crypto/asymmetric_keys/x509_public_key.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/x509_loader.c b/crypto/asymmetric_keys/x509_loader.c
-index a41741326998..a480763b1649 100644
---- a/crypto/asymmetric_keys/x509_loader.c
-+++ b/crypto/asymmetric_keys/x509_loader.c
-@@ -4,7 +4,7 @@
- #include <linux/key.h>
- #include <keys/asymmetric-type.h>
- 
--int x509_load_certificate_list(const u8 cert_list[],
-+int CRYPTO_API(x509_load_certificate_list)(const u8 cert_list[],
- 			       const unsigned long list_size,
- 			       const struct key *keyring)
- {
-@@ -55,4 +55,4 @@ int x509_load_certificate_list(const u8 cert_list[],
- 	pr_err("Problem parsing in-kernel X.509 certificate list\n");
- 	return 0;
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 8409d7d36cb4..2f76b7b855de 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -246,8 +246,8 @@ static void __exit x509_key_exit(void)
+ 	unregister_asymmetric_key_parser(&x509_key_parser);
  }
--EXPORT_SYMBOL_GPL(x509_load_certificate_list);
-+DEFINE_CRYPTO_API(x509_load_certificate_list);
-diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
-index db5b142e21df..91812ed74f8a 100644
---- a/crypto/fips140-api.c
-+++ b/crypto/fips140-api.c
-@@ -713,3 +713,14 @@ DEFINE_CRYPTO_API_STUB(x509_decode_time);
  
- #endif
+-module_init(x509_key_init);
+-module_exit(x509_key_exit);
++crypto_module_init(x509_key_init);
++crypto_module_exit(x509_key_exit);
  
-+/*
-+ * crypto/asymmetric_keys/x509_loader.c
-+ */
-+#if !IS_BUILTIN(CONFIG_X509_CERTIFICATE_PARSER)
-+
-+#include <keys/asymmetric-type.h>
-+
-+DEFINE_CRYPTO_API_STUB(x509_load_certificate_list);
-+
-+#endif
-+
-diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
-index fb7f82527978..ee1bf9b28bfd 100644
---- a/include/keys/asymmetric-type.h
-+++ b/include/keys/asymmetric-type.h
-@@ -84,8 +84,9 @@ DECLARE_CRYPTO_API(find_asymmetric_key, struct key *,
- 	(struct key *keyring, const struct asymmetric_key_id *id_0, const struct asymmetric_key_id *id_1, const struct asymmetric_key_id *id_2, bool partial),
- 	(keyring, id_0, id_1, id_2, partial));
- 
--int x509_load_certificate_list(const u8 cert_list[], const unsigned long list_size,
--			       const struct key *keyring);
-+DECLARE_CRYPTO_API(x509_load_certificate_list, int,
-+	(const u8 cert_list[], const unsigned long list_size, const struct key *keyring),
-+	(cert_list, list_size, keyring));
- 
- /*
-  * The payload is at the discretion of the subtype.
+ MODULE_DESCRIPTION("X.509 certificate parser");
+ MODULE_AUTHOR("Red Hat, Inc.");
 -- 
 2.39.3
 
