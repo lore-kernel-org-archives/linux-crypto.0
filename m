@@ -1,51 +1,51 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A278E286427;
-	Thu,  4 Sep 2025 15:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF40284696;
+	Thu,  4 Sep 2025 15:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001396; cv=none; b=Pc+DRALYZFO78wh4cS4B2oeGJMxjlhfxv1ES5h4/CN5Nbi5uU6bXAdxr8kA0fkOTxmaK0zVet8lGIJ816kaldZ/a5cKTFaVViR7sVdFrWjazl4PSWwwBryWOrTpuCcbfYDZKxwt22rHnVbsvLPjfBUJbxVoDqAfi9WGhUO3HxVo=
+	t=1757001399; cv=none; b=QVTcrrWEcqhCnjtbEUq8Qc+J5O08M4g5YtRtNcdcA4eqZQIpP7Xx7CWRbwEoIVb+oCP30FqQLIQfFSa0iaPf8fdLu3R+ca6gQnRxogRaF4yvlAClGjg9/CGBTi9iizDWJwm6NsSB4WB0qEgichVwEzWBRDItnaTj2/wzAZcRsQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001396; c=relaxed/simple;
-	bh=cyNFWsmdUo4TJ2/tN5ziOKqdHWZBUIC7nAT84SJ5+TE=;
+	s=arc-20240116; t=1757001399; c=relaxed/simple;
+	bh=5bMoslryKYUHNSLWM5dQ8ZVrJKrm7x5CgJRd2Xde+5c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KWlc9A7vFMr+fjK8PbAfRHh433kH0nGcjHy3/2jcah/YOVivn+XuXoR5mxA5WS3hafnQarZSEFZ+vtmGiIRy9LcwynnlSaUFb5ChxTf8DftB2kH9W/k1aI6HsvPpCylcHwsRFAaHagac0wM3n6mSfGyivQfxi2Co+LC/U6YchPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=PK7tm5zz; arc=none smtp.client-ip=205.220.165.32
+	 MIME-Version; b=i/RedKBwHmfOCD56O0FV0yUh+TCkfk5EfY2eAAzF8SS242UIPPOgmK0JQ46PUPixFrvHU2ZslkUoAfX05hg7tX7TOrkIQMGVmMmz+mLzDj2uJ14T4YWSDxIEQ65FYirtSGQi3ySKN68MPsWS+bY/K2OqHuOEsooV35fBSCza9Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oZbU6Vdc; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PK7tm5zz"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Ftp7p010553;
-	Thu, 4 Sep 2025 15:56:22 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oZbU6Vdc"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtiGK026687;
+	Thu, 4 Sep 2025 15:56:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=uJ/XO
-	wAElMUJrPClxAhrnCl0Ulx64YaIRTlvRa5KgzE=; b=PK7tm5zzMVqLIP8il8CtJ
-	VajneRrR+hg6moMnQ3GI7lle2OLCT1c75TZfzUljweyPle3sSON7I+ZEP73XE5T0
-	x1mgVJxGfaQA2u0HnVwXNi3eOoVBTysN5VMj1QeOI+UIvbyEpWqGoyZH1ikHdsET
-	NgYUQJCkatSFdR8Ul+/WEajKQ8kBgty8jBhYsU8wes8ueabtKYySbov46nN48mfd
-	CxhcRTAHl/XryssVpXQvB7rx5Wsne1+LbKlrh5UksnxdhmcZzBSsY8ksa07UgHD5
-	/E3s/ngqk6GOmYk/RhRiXG+YiwU/YvQ5Buo73ZITaqURToj0iXoNUy8gC2Zl6tjA
-	Q==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=Kfir0
+	tywxLHkdEOQpdZUroz7ASjmJgIXwjC4GNJQW1k=; b=oZbU6Vdcm8xf//7QGixGT
+	mpR6PxdehX/8iuc2grKVxIrsv1roY6CN8claOfQ2GwRbViauN95n6IndHv71F1WY
+	6w8Y9tCHmxd7f1wiyMpuBhumiN65rYK4x8wCWg6TO7zjARRe5dJeT7b48SOnWHwx
+	DEvGkS2LZgmNJyU7btCfMUECyFzHPAZwi1wedIC3rHOiko6wzLnf0JVpB/uCqYm5
+	qNcsecPYEnR9vBSAokfB0ZILhvspJFCVKZRet0Fh8fFVN8ptTGoVxQ/blBpjAAzQ
+	7D/qHH+5HpODCiOt1kFTHu8lmgcqW9BvtJ6JJJCR34NIzxrDlgw1umm+6moT+OVa
+	A==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydacr2nv-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48yd1004vf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:22 +0000 (GMT)
+	Thu, 04 Sep 2025 15:56:26 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584EuWCm040230;
-	Thu, 4 Sep 2025 15:56:21 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FPlVG040063;
+	Thu, 4 Sep 2025 15:56:25 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtmxf-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtn1m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:56:21 +0000
+	Thu, 04 Sep 2025 15:56:25 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5U000707;
-	Thu, 4 Sep 2025 15:56:20 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx5W000707;
+	Thu, 4 Sep 2025 15:56:25 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-22;
-	Thu, 04 Sep 2025 15:56:20 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-23;
+	Thu, 04 Sep 2025 15:56:24 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 021/104] crypto: fips140: include crypto/api.h in a few places
-Date: Thu,  4 Sep 2025 17:50:53 +0200
-Message-Id: <20250904155216.460962-22-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 022/104] crypto: fips140: convert lib/crypto/aes.c to using crypto API wrappers
+Date: Thu,  4 Sep 2025 17:50:54 +0200
+Message-Id: <20250904155216.460962-23-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,70 +79,166 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040156
-X-Proofpoint-GUID: 46z7tf8xlF-J9nthnwSNea5ftDxqnUAY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MCBTYWx0ZWRfX0wkjVvJkCERi
- lUZimhISZbNnzl3ZBo5vfcfwCinvCZoy5yeoPD+tN+pgqGMzjKv1LUH1XQNPIKEY5YOUj4SLctC
- i9N5jy3jybCPbLmBipWUrjfYEFsZ5vh13kixi5o54UZoXcK4F4vWJLJLw4tWil/OAfl7qnw2CTm
- IE8zyWOo9J3VKpzpWF01YvULErL55/Y9iTqiF8gEbBGTOctvHw+NgSQc49bLFMBFJkXZ9y/8gNy
- Kn0obvnvExwtp+Pj92AV1OJASaZA8c+Qr4vw2prpfP4M5UzFbPWpQBEq56fu+8rSsBwQwnt9FE7
- kPA8XAmg3dv3cFA8tgP4RpEKMCYrdTfSDfqOGuwwwBJFHGQbENvaIsfLwkxSNXRuZQrG0honN4R
- oGzxCd2WfGP2mlhRN7xVAD+2Srqo+A==
-X-Proofpoint-ORIG-GUID: 46z7tf8xlF-J9nthnwSNea5ftDxqnUAY
-X-Authority-Analysis: v=2.4 cv=TuTmhCXh c=1 sm=1 tr=0 ts=68b9b6a6 b=1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE0OCBTYWx0ZWRfX5ggwbz+Z2yIT
+ XghmkJ5fM+5Bt+pwMiVg6UbGEpMEv8bktl0omt/cO/U6Za1t4mi0ShBCZIPN2L8FJbt+/oNfOue
+ X/Sfwipq+EamhdwnU+dg75PYdg+wNWdOvajQMtwrp0zPxUiGq1sCCIZhIQUq0LnJGKJ+NVwvvzC
+ TKcg658zX3KZKU0G4HCzOy4j1qC3erSV2TeLOoMXAolNEBXfz44OEui/71eHFcxh/J2cHzdIFGl
+ N2vcQs11Tfuud5kBWGQfyN5TgmOnRYWd7qUBI1OXK4bvL7XEwRB8ZRhv9yTeBCsUvD/Iq3AG2IR
+ S+imWCp47FQ65nxTd7oKnuXog00pXA0mNaeiNKlqrfTIsrFNgul9fwonvkFgstRKBCkSxbasBb+
+ 1dDiRl1uTVXymzEoYqQKu52tziYHww==
+X-Authority-Analysis: v=2.4 cv=CbkI5Krl c=1 sm=1 tr=0 ts=68b9b6aa b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=yiOFjC3WA3SV1473uhQA:9 cc=ntf
- awl=host:12068
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=KKAkSRfTAAAA:8 a=lP6ErJPjkfyAI_jvGEoA:9
+ a=cvBusfyB2V15izCimMoJ:22 cc=ntf awl=host:12068
+X-Proofpoint-ORIG-GUID: B7rAfRzMOkmkNPSobvy1v5dZWWhifTYU
+X-Proofpoint-GUID: B7rAfRzMOkmkNPSobvy1v5dZWWhifTYU
 
-This is preparatory for the subsequent patches which mostly manage to
-add in the necessary includes automatically but will miss these files.
-I could have chosen to squash this into those commits, but it's nicer
-not to mix manual changes with scripted changes.
+Use CRYPTO_API() etc. from include/crypto/api.h in preparation for
+compilation as part of support for FIPS 140 standalone modules.
+
+Generated using:
+
+  ./fipsify.py --config CONFIG_CRYPTO_LIB_AES --source lib/crypto/aes.c --header include/crypto/aes.h --vars crypto_aes_sbox crypto_aes_inv_sbox
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/asymmetric_keys/pkcs7_key_type.c | 1 +
- include/crypto/dh.h                     | 2 ++
- include/crypto/ecdh.h                   | 2 ++
- 3 files changed, 5 insertions(+)
+ crypto/fips140-api.c | 21 +++++++++++++++++++++
+ include/crypto/aes.h | 14 ++++++++++----
+ lib/crypto/aes.c     | 12 ++++++------
+ 3 files changed, 37 insertions(+), 10 deletions(-)
+ create mode 100644 crypto/fips140-api.c
 
-diff --git a/crypto/asymmetric_keys/pkcs7_key_type.c b/crypto/asymmetric_keys/pkcs7_key_type.c
-index b930d3bbf1af..e71be8b5b0f2 100644
---- a/crypto/asymmetric_keys/pkcs7_key_type.c
-+++ b/crypto/asymmetric_keys/pkcs7_key_type.c
+diff --git a/crypto/fips140-api.c b/crypto/fips140-api.c
+new file mode 100644
+index 000000000000..029d06763f5a
+--- /dev/null
++++ b/crypto/fips140-api.c
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++/*
++ * Define static call keys for any functions which are part of the crypto
++ * API and used by the standalone FIPS module but which are not built into
++ * vmlinux.
++ */
++
++/*
++ * lib/crypto/aes.c
++ */
++#if !IS_BUILTIN(CONFIG_CRYPTO_LIB_AES)
++
++#include <crypto/aes.h>
++
++DEFINE_CRYPTO_API_STUB(aes_expandkey);
++DEFINE_CRYPTO_API_STUB(aes_encrypt);
++DEFINE_CRYPTO_API_STUB(aes_decrypt);
++
++#endif
++
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 9339da7c20a8..a72621f552d8 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
 @@ -6,6 +6,7 @@
+ #ifndef _CRYPTO_AES_H
+ #define _CRYPTO_AES_H
+ 
++#include <crypto/api.h>
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ 
+@@ -65,8 +66,9 @@ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+  * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
+  * for the initial combination, the second slot for the first round and so on.
   */
+-int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+-		  unsigned int key_len);
++DECLARE_CRYPTO_API(aes_expandkey, int,
++	(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len),
++	(ctx, in_key, key_len));
  
- #define pr_fmt(fmt) "PKCS7key: "fmt
-+#include <crypto/api.h>
- #include <linux/key.h>
- #include <linux/err.h>
- #include <linux/module.h>
-diff --git a/include/crypto/dh.h b/include/crypto/dh.h
-index 7b863e911cb4..b5891c21cfe0 100644
---- a/include/crypto/dh.h
-+++ b/include/crypto/dh.h
-@@ -8,6 +8,8 @@
- #ifndef _CRYPTO_DH_
- #define _CRYPTO_DH_
- 
-+#include <crypto/api.h>
-+
  /**
-  * DOC: DH Helper Functions
-  *
-diff --git a/include/crypto/ecdh.h b/include/crypto/ecdh.h
-index 9784ecdd2fb4..aa09f880c0d3 100644
---- a/include/crypto/ecdh.h
-+++ b/include/crypto/ecdh.h
-@@ -8,6 +8,8 @@
- #ifndef _CRYPTO_ECDH_
- #define _CRYPTO_ECDH_
+  * aes_encrypt - Encrypt a single AES block
+@@ -74,7 +76,9 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+  * @out:	Buffer to store the ciphertext
+  * @in:		Buffer containing the plaintext
+  */
+-void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
++DECLARE_CRYPTO_API(aes_encrypt, void,
++	(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in),
++	(ctx, out, in));
  
-+#include <crypto/api.h>
-+
  /**
-  * DOC: ECDH Helper Functions
-  *
+  * aes_decrypt - Decrypt a single AES block
+@@ -82,7 +86,9 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
+  * @out:	Buffer to store the plaintext
+  * @in:		Buffer containing the ciphertext
+  */
+-void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
++DECLARE_CRYPTO_API(aes_decrypt, void,
++	(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in),
++	(ctx, out, in));
+ 
+ extern const u8 crypto_aes_sbox[];
+ extern const u8 crypto_aes_inv_sbox[];
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index b57fda3460f1..ece5ce36a305 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -183,7 +183,7 @@ static u32 subw(u32 in)
+  * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
+  * for the initial combination, the second slot for the first round and so on.
+  */
+-int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
++int CRYPTO_API(aes_expandkey)(struct crypto_aes_ctx *ctx, const u8 *in_key,
+ 		  unsigned int key_len)
+ {
+ 	u32 kwords = key_len / sizeof(u32);
+@@ -248,7 +248,7 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL(aes_expandkey);
++DEFINE_CRYPTO_API(aes_expandkey);
+ 
+ /**
+  * aes_encrypt - Encrypt a single AES block
+@@ -256,7 +256,7 @@ EXPORT_SYMBOL(aes_expandkey);
+  * @out:	Buffer to store the ciphertext
+  * @in:		Buffer containing the plaintext
+  */
+-void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
++void CRYPTO_API(aes_encrypt)(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
+ {
+ 	const u32 *rkp = ctx->key_enc + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+@@ -299,7 +299,7 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
+ 	put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
+ }
+-EXPORT_SYMBOL(aes_encrypt);
++DEFINE_CRYPTO_API(aes_encrypt);
+ 
+ /**
+  * aes_decrypt - Decrypt a single AES block
+@@ -307,7 +307,7 @@ EXPORT_SYMBOL(aes_encrypt);
+  * @out:	Buffer to store the plaintext
+  * @in:		Buffer containing the ciphertext
+  */
+-void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
++void CRYPTO_API(aes_decrypt)(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
+ {
+ 	const u32 *rkp = ctx->key_dec + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+@@ -350,7 +350,7 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
+ 	put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
+ }
+-EXPORT_SYMBOL(aes_decrypt);
++DEFINE_CRYPTO_API(aes_decrypt);
+ 
+ MODULE_DESCRIPTION("Generic AES library");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 -- 
 2.39.3
 
