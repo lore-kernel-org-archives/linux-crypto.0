@@ -1,51 +1,51 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFC827280E;
-	Thu,  4 Sep 2025 15:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D774228150A;
+	Thu,  4 Sep 2025 15:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001336; cv=none; b=gI3KceN7h5kZMf6BTmCgths/IxPV7NYPRPj4MGBMLHz4xqAkx49a2wLSw4+ryIehgoPSn093M179uCP+qMbA4+oEdYHpzNWnm+Mo1w3EKJZCf+hjkIMlXNGNeCLPSA43KjQsIZQs18Sj/S2x+b88/tqjP1HBSnmPSa9/QzE66Ho=
+	t=1757001340; cv=none; b=jTEERqroQKPk9w5BvZ78TjBEg12IFe6Daoggcj7bss2YSAmt1KmvaXOkW3rY8k6LCZ+hNBa7kP7+M4OaV0vLR2ZXTtm2ygCxiv2rh3R9a4ZnqzZ/ugYPaJH1RxMiZVmsDu6Z2/UtcQWPEx1DL/xsnlAJGFTjZ0nDrb+5+VFWrB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001336; c=relaxed/simple;
-	bh=rUCDzmgc+UMXnc8egbB+yLEBW3HVtk5KnKKOBBo/5w4=;
+	s=arc-20240116; t=1757001340; c=relaxed/simple;
+	bh=ssTs8u/Ft3vHFLoH91wA5CuPYIuRe8S9etsV7jUBwuE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Any3m+lwNjhCmMi+2CDaAF/MQ15Pu64EbFhxnnT6X9XumR7YBGO7Kvr/nuM9LNxXaWZwyAiK/ZXOzZ0t0+CtK4ky2eXIkFt+A+9anc5dyRibSjDI+OuWof6uPaZEsbwsSZpHIJ535Wcu9+8AcMX6lsNMinISIaqUfNYz5AWmF8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=iOHGg+ve; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=mLhDYFDobrIVwJvPesPzYjlAt8eR51QmWuJTLAHg04ChlOxpcmLK8CWNmYvI/EARBbkD82YPhXctBHZ0XO3nsaHH1l9/IH2DlHdUNtSOjRCR7TeY2XWNwPAiWb//aX2ryfXsQt4kgOZPgCr8hGRr4qX8by9TORdqGNhiL/fh5Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=la7kpfMU; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iOHGg+ve"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="la7kpfMU"
 Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FjxLY006551;
-	Thu, 4 Sep 2025 15:55:22 GMT
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fk4Xx006697;
+	Thu, 4 Sep 2025 15:55:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=YduG+
-	Y3SwSKkqrMmxImLmq2DLrYFGDbKxWh+DfVsj6Q=; b=iOHGg+veSwizoq7RaaGzO
-	/bPu7CQakGJUOzsuz4OPFmoAiw7l2Y2C3Kqyd8Acjhv9gMkmn7OkFJxLbL2JAO+q
-	qznxDixzGksFajE6focbdXbGGOt7ycoe8G2BhcJ8moZlpTqBmiuyZnDkfK9TCwHk
-	Mk4SAmLS0bbuSmpbSoPrNtXg4Mew46+038EFo1lpQGY9Su8STa6GfzNmcsuSUUEL
-	32Ykm6uDmY3jpU6Rmdd9m0zP+wSdk6hpSEYIcQIK42ZCQtuWAkIdlHZLMJW4qjg/
-	uSCeVOMXsfA1+99FwNJW4u/CYfa8hYf75/so6yaP3tU1khx3hd20wcHLhyj+OeuA
-	w==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=v92fQ
+	JAX3c3QLypWGkL7xA0bX40waTou9VBWkKDkE+E=; b=la7kpfMUx584nd4OkEuzU
+	NYv6vcb/yICG2Gien1Y260hdgZ+iSJ/LpAUZ9t4GILRSodC8U+kwwxTB5yBtgLUG
+	pSKNckRiECYCVAF9Kux9knD6FR0Qy4j91A8kczTmOZ6stCWFrtJ9x4d3+o2pOybH
+	s74aJzLrH3KFz43Fo4q82IXZ5LZBrcmPMk/oF1jUAe6EQvMhSVUAquVAO7Bkp7z8
+	/qcxbvTaJWErZWpItsEU9xuv9s9b+tGIHraW6pdHIbB4Ma61YE/OcJdkB+6LWUPH
+	ALWqyn99ZkMB9LsT79Ms0nJHnNsze5w8T748UvRmgzdBolghz5pAhRtSgNpFvS6a
+	Q==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydhd01ye-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ydhd01yq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:55:22 +0000 (GMT)
+	Thu, 04 Sep 2025 15:55:26 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fednu040082;
-	Thu, 4 Sep 2025 15:55:21 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584FQ1YE040081;
+	Thu, 4 Sep 2025 15:55:25 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtm1m-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhtm3a-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:55:21 +0000
+	Thu, 04 Sep 2025 15:55:25 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx4u000707;
-	Thu, 4 Sep 2025 15:55:20 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx4w000707;
+	Thu, 4 Sep 2025 15:55:24 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-6;
-	Thu, 04 Sep 2025 15:55:20 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-7;
+	Thu, 04 Sep 2025 15:55:24 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,10 +59,14 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>,
-        Sriharsha Yadagudde <sriharsha.devdas@oracle.com>
-Subject: [PATCH RFC 005/104] crypto: hide crypto_default_rng variable
-Date: Thu,  4 Sep 2025 17:50:37 +0200
-Message-Id: <20250904155216.460962-6-vegard.nossum@oracle.com>
+        Vijaykumar Hegde <vijaykumar.hegde@oracle.com>,
+        Sriharsha Yadagudde <sriharsha.devdas@oracle.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH RFC 006/104] KEYS: trusted: eat -ENOENT from the crypto API
+Date: Thu,  4 Sep 2025 17:50:38 +0200
+Message-Id: <20250904155216.460962-7-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -80,284 +84,110 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MyBTYWx0ZWRfX4PfWiDDP7+K3
- KipDHtqqtXtcAmVk+jhPqua1euk1C+CsY89BWj6VCe+mpoQEISFd3+i1PsnBY44xX2tvwg0ZYLF
- UPbeFsaKSIokJ1vheDnUPVUGAcHb8t4bvzYNjuB8m+MFnt3f0sMNif1pBM6KPBMYIFbYCqQSf0F
- Z8AUMlve1Dm9SZkCL2N+CjbLU4VMOrYa/hjh8VO+7Lml9lJERfRzY2/R53Awy4TVdJ79cQ2a3LM
- +0f52LuW70oO0mwTj57UzU1Wnb8UDipztMMps8ox/NeKoajrnD5yuLdRBhYc88D58i/tNLxWrbk
- JC9VuWEGicRTmegP9FHvQ0qT94iOtZABXDYh+Bbyb4y12HzQDSpNZ6mVihfvZUo0RX4vNsn7fnk
- G2yF0vDaxy0gS62vL1akcvl9+IvZLg==
-X-Proofpoint-GUID: HH0BmzD_i7xk0WVBM2mQPTgOXpueE-nA
-X-Proofpoint-ORIG-GUID: HH0BmzD_i7xk0WVBM2mQPTgOXpueE-nA
-X-Authority-Analysis: v=2.4 cv=QoZe3Uyd c=1 sm=1 tr=0 ts=68b9b66a b=1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE1MyBTYWx0ZWRfX0k9/anH3iohw
+ pfprgFr6s2up8R0Txvu9U76rfbLZtC7VH44Pv1d6jsly+TNPMuLc4sqzzWTCC+UDDgDkw9Lmp/Z
+ 6QBXUMj0FwEIJ9w7cricWrL+Gl2p8rzno1tDQ0Ye2Z8CGLivejoSBwfVzdAeqTgQmpXWTJ2C423
+ g7IAyPk/0Eokask0ta1XyOzPg3OkqNqButfLRg217qy/EDMi6QT1RzGGKXtrM3b2ufHUzE94fjJ
+ YqRvs5m91FdjO1G4jO4T+Ke8zCSXAR9HEU6+C7q1tm0xHKMNf9xZviILNcEf9LVhHmHYquBmoBo
+ P0BDrxJ4fZexTXpmqOrLXmkGCwLpe4EAAcrw9il0/G+CkPyBY0Dsqgr8QHj4bWI1GYoT4hmWiD5
+ JVWfVkl2b/4595I/haUz+4TsIS3B/A==
+X-Proofpoint-GUID: rsNx-o0acR0QKGTJeP503egy0sHfNTL2
+X-Proofpoint-ORIG-GUID: rsNx-o0acR0QKGTJeP503egy0sHfNTL2
+X-Authority-Analysis: v=2.4 cv=QoZe3Uyd c=1 sm=1 tr=0 ts=68b9b66e b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=TLK7jzU0I5Iz9611FlwA:9 cc=ntf
- awl=host:12068
+ a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=yPCof4ZbAAAA:8
+ a=KKAkSRfTAAAA:8 a=FNyBlpCuAAAA:8 a=Z4Rwk6OoAAAA:8 a=Bx8krx5fFIaEeihWbnsA:9
+ a=cvBusfyB2V15izCimMoJ:22 a=RlW-AWeGUCXs_Nkyno-6:22 a=HkZW87K1Qel5hWWM3VKY:22
+ cc=ntf awl=host:12068
 
-De-globalize crypto_default_rng and make it accessible only through the
-crypto_get_default_rng()/crypto_put_default_rng() API instead. The users
-need to call these functions anyway so there is really no point in
-having it as a global.
+If we have a config with:
 
-I opted to take double pointers as arguments (and return an error code)
-so we can do basic API misuse checking.
+CONFIG_TRUSTED_KEYS=m
+CONFIG_TRUSTED_KEYS_TPM=y
+CONFIG_DM_CRYPT=m
 
+then dm-crypt.ko will depend on trusted.ko (due to using the exported
+symbol 'key_type_trusted'), meaning trusted.ko will need to successfully
+load before dm-crypt.ko can load.
+
+However, since commit 9d50a25eeb05c ("crypto: testmgr - desupport SHA-1
+for FIPS 140") when booting with fips=1, the SHA-1 algorithm (or anything
+that uses it, like HMAC-SHA-1) will be unavailable.
+
+security/keys/trusted-keys/trusted_tpm1.c is hard-coded to use SHA-1 and
+will fail with -ENOENT when attempting to initialize the hash instance
+using the crypto API _if_ the hardware is available. This in turn causes
+the entire trusted.ko to fail to load.
+
+(If TPM1 hardware is not available, trusted_tpm1.c will fail to load with
+-ENODEV, which is handled in init_trusted() to allow the module to load
+anyway.)
+
+Long story short, having TPM1 hardware and booting with fips=1 will cause
+dm-crypt to fail loading, even though SHA-1 may not actually be used or
+needed at any point.
+
+There's already some history of fiddling with the module init/exit code
+and the return values here, but I think we can simplify the code somewhat:
+
+- return immediately on success; there is no point in breaking out of the
+  loop and rechecking the return value
+
+- return immediately on non-ENODEV/ENOENT errors; again, no point in
+  rechecking the return value
+
+We could even consider retrying other trusted key sources regardless of
+the exact error value, but that would change the semantics too much for
+my comfort here.
+
+Reported-by: Vijaykumar Hegde <vijaykumar.hegde@oracle.com>
 Reported-by: Sriharsha Yadagudde <sriharsha.devdas@oracle.com>
+Fixes: 9d50a25eeb05c ("crypto: testmgr - desupport SHA-1 for FIPS 140")
+Cc: Sumit Garg <sumit.garg@linaro.org>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/linux-integrity/CAHk-=whOPoLaWM8S8GgoOPT7a2+nMH5h3TLKtn=R_3w4R1_Uvg@mail.gmail.com/
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- crypto/dh.c                                    |  8 ++++----
- crypto/ecc.c                                   |  8 ++++----
- crypto/geniv.c                                 |  8 ++++----
- crypto/rng.c                                   |  9 +++++----
- drivers/crypto/hisilicon/hpre/hpre_crypto.c    |  8 ++++----
- drivers/crypto/intel/keembay/keembay-ocs-ecc.c | 14 ++++++++------
- include/crypto/rng.h                           |  6 ++----
- net/tipc/crypto.c                              |  8 ++++----
- 8 files changed, 35 insertions(+), 34 deletions(-)
+ security/keys/trusted-keys/trusted_core.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 8250eeeebd0f..1d80213574b3 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -352,6 +352,7 @@ static void *dh_safe_prime_gen_privkey(const struct dh_safe_prime *safe_prime,
- {
- 	unsigned int n, oversampling_size;
- 	__be64 *key;
-+	struct crypto_rng *rng;
- 	int err;
- 	u64 h, o;
+diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
+index e2d9644efde1..152832735bac 100644
+--- a/security/keys/trusted-keys/trusted_core.c
++++ b/security/keys/trusted-keys/trusted_core.c
+@@ -370,20 +370,22 @@ static int __init init_trusted(void)
  
-@@ -389,12 +390,11 @@ static void *dh_safe_prime_gen_privkey(const struct dh_safe_prime *safe_prime,
- 	 * random bits and interpret them as a big endian integer.
- 	 */
- 	err = -EFAULT;
--	if (crypto_get_default_rng())
-+	if (crypto_get_default_rng(&rng))
- 		goto out_err;
+ 			trusted_key_exit = trusted_key_sources[i].ops->exit;
+ 			migratable = trusted_key_sources[i].ops->migratable;
++			return 0;
+ 		}
  
--	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)key,
--				   oversampling_size);
--	crypto_put_default_rng();
-+	err = crypto_rng_get_bytes(rng, (u8 *)key, oversampling_size);
-+	crypto_put_default_rng(&rng);
- 	if (err)
- 		goto out_err;
- 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 6cf9a945fc6c..c9f82626177b 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -1525,6 +1525,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
- 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
- 	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 	unsigned int nbits = vli_num_bits(curve->n, ndigits);
-+	struct crypto_rng *rng;
- 	int err;
+-		if (!ret || ret != -ENODEV)
+-			break;
++		/*
++		 * The crypto API returns -ENOENT if it doesn't support a
++		 * given hashing algorithm (e.g. SHA1 in FIPS mode).
++		 */
++		if (ret != -ENODEV && ret != -ENOENT)
++			return ret;
+ 	}
  
  	/*
-@@ -1545,13 +1546,12 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
- 	 * This condition is met by the default RNG because it selects a favored
- 	 * DRBG with a security strength of 256.
+-	 * encrypted_keys.ko depends on successful load of this module even if
+-	 * trusted key implementation is not found.
++	 * encrypted_keys.ko and dm-crypt depend on successful load of
++	 * this module even if trusted key implementation is not found.
  	 */
--	if (crypto_get_default_rng())
-+	if (crypto_get_default_rng(&rng))
- 		return -EFAULT;
- 
- 	/* Step 3: obtain N returned_bits from the DRBG. */
--	err = crypto_rng_get_bytes(crypto_default_rng,
--				   (u8 *)private_key, nbytes);
--	crypto_put_default_rng();
-+	err = crypto_rng_get_bytes(rng, (u8 *)private_key, nbytes);
-+	crypto_put_default_rng(&rng);
- 	if (err)
- 		return err;
- 
-diff --git a/crypto/geniv.c b/crypto/geniv.c
-index 42eff6a7387c..0b18240ac813 100644
---- a/crypto/geniv.c
-+++ b/crypto/geniv.c
-@@ -109,18 +109,18 @@ int aead_init_geniv(struct crypto_aead *aead)
- {
- 	struct aead_geniv_ctx *ctx = crypto_aead_ctx(aead);
- 	struct aead_instance *inst = aead_alg_instance(aead);
-+	struct crypto_rng *rng;
- 	struct crypto_aead *child;
- 	int err;
- 
- 	spin_lock_init(&ctx->lock);
- 
--	err = crypto_get_default_rng();
-+	err = crypto_get_default_rng(&rng);
- 	if (err)
- 		goto out;
- 
--	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
--				   crypto_aead_ivsize(aead));
--	crypto_put_default_rng();
-+	err = crypto_rng_get_bytes(rng, ctx->salt, crypto_aead_ivsize(aead));
-+	crypto_put_default_rng(&rng);
- 	if (err)
- 		goto out;
- 
-diff --git a/crypto/rng.c b/crypto/rng.c
-index b8ae6ebc091d..2a246e1a0918 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -24,8 +24,7 @@
- #include "internal.h"
- 
- static DEFINE_MUTEX(crypto_default_rng_lock);
--struct crypto_rng *crypto_default_rng;
--EXPORT_SYMBOL_GPL(crypto_default_rng);
-+static struct crypto_rng *crypto_default_rng;
- static int crypto_default_rng_refcnt;
- 
- int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
-@@ -107,7 +106,7 @@ struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask)
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_rng);
- 
--int crypto_get_default_rng(void)
-+int crypto_get_default_rng(struct crypto_rng **result)
- {
- 	struct crypto_rng *rng;
- 	int err;
-@@ -128,6 +127,7 @@ int crypto_get_default_rng(void)
- 		crypto_default_rng = rng;
- 	}
- 
-+	*result = crypto_default_rng;
- 	crypto_default_rng_refcnt++;
- 	err = 0;
- 
-@@ -138,9 +138,10 @@ int crypto_get_default_rng(void)
- }
- EXPORT_SYMBOL_GPL(crypto_get_default_rng);
- 
--void crypto_put_default_rng(void)
-+void crypto_put_default_rng(struct crypto_rng **rng)
- {
- 	mutex_lock(&crypto_default_rng_lock);
-+	*rng = NULL;
- 	crypto_default_rng_refcnt--;
- 	mutex_unlock(&crypto_default_rng_lock);
- }
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 1550c3818383..48872721214c 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1380,17 +1380,17 @@ static bool hpre_key_is_zero(char *key, unsigned short key_sz)
- static int ecdh_gen_privkey(struct hpre_ctx *ctx, struct ecdh *params)
- {
- 	struct device *dev = ctx->dev;
-+	struct crypto_rng *rng;
- 	int ret;
- 
--	ret = crypto_get_default_rng();
-+	ret = crypto_get_default_rng(&rng);
- 	if (ret) {
- 		dev_err(dev, "failed to get default rng, ret = %d!\n", ret);
- 		return ret;
- 	}
- 
--	ret = crypto_rng_get_bytes(crypto_default_rng, (u8 *)params->key,
--				   params->key_size);
--	crypto_put_default_rng();
-+	ret = crypto_rng_get_bytes(rng, (u8 *)params->key, params->key_size);
-+	crypto_put_default_rng(&rng);
- 	if (ret)
- 		dev_err(dev, "failed to get rng, ret = %d!\n", ret);
- 
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-index 59308926399d..a79e6549740f 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-@@ -223,6 +223,7 @@ static int kmb_ecc_point_mult(struct ocs_ecc_dev *ecc_dev,
- 			      u64 *scalar,
- 			      const struct ecc_curve *curve)
- {
-+	struct crypto_rng *rng;
- 	u8 sca[KMB_ECC_VLI_MAX_BYTES]; /* Use the maximum data size. */
- 	u32 op_size = (curve->g.ndigits > ECC_CURVE_NIST_P256_DIGITS) ?
- 		      OCS_ECC_OP_SIZE_384 : OCS_ECC_OP_SIZE_256;
-@@ -230,12 +231,12 @@ static int kmb_ecc_point_mult(struct ocs_ecc_dev *ecc_dev,
- 	int rc = 0;
- 
- 	/* Generate random nbytes for Simple and Differential SCA protection. */
--	rc = crypto_get_default_rng();
-+	rc = crypto_get_default_rng(&rng);
- 	if (rc)
- 		return rc;
- 
--	rc = crypto_rng_get_bytes(crypto_default_rng, sca, nbytes);
--	crypto_put_default_rng();
-+	rc = crypto_rng_get_bytes(rng, sca, nbytes);
-+	crypto_put_default_rng(&rng);
- 	if (rc)
- 		return rc;
- 
-@@ -490,6 +491,7 @@ static int kmb_ecc_is_key_valid(const struct ecc_curve *curve,
-  */
- static int kmb_ecc_gen_privkey(const struct ecc_curve *curve, u64 *privkey)
- {
-+	struct crypto_rng *rng;
- 	size_t nbytes = digits_to_bytes(curve->g.ndigits);
- 	u64 priv[KMB_ECC_VLI_MAX_DIGITS];
- 	size_t nbits;
-@@ -512,11 +514,11 @@ static int kmb_ecc_gen_privkey(const struct ecc_curve *curve, u64 *privkey)
- 	 * This condition is met by the default RNG because it selects a favored
- 	 * DRBG with a security strength of 256.
- 	 */
--	if (crypto_get_default_rng())
-+	if (crypto_get_default_rng(&rng))
- 		return -EFAULT;
- 
--	rc = crypto_rng_get_bytes(crypto_default_rng, (u8 *)priv, nbytes);
--	crypto_put_default_rng();
-+	rc = crypto_rng_get_bytes(rng, (u8 *)priv, nbytes);
-+	crypto_put_default_rng(&rng);
- 	if (rc)
- 		goto cleanup;
- 
-diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index f8224cc390f8..816f255adcd3 100644
---- a/include/crypto/rng.h
-+++ b/include/crypto/rng.h
-@@ -57,10 +57,8 @@ struct crypto_rng {
- 	struct crypto_tfm base;
- };
- 
--extern struct crypto_rng *crypto_default_rng;
+-	if (ret == -ENODEV)
+-		return 0;
 -
--int crypto_get_default_rng(void);
--void crypto_put_default_rng(void);
-+int crypto_get_default_rng(struct crypto_rng **rng);
-+void crypto_put_default_rng(struct crypto_rng **rng);
+-	return ret;
++	return 0;
+ }
  
- /**
-  * DOC: Random number generator API
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index ea5bb131ebd0..6b085fd383b0 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -368,13 +368,13 @@ int tipc_aead_key_validate(struct tipc_aead_key *ukey, struct genl_info *info)
- static int tipc_aead_key_generate(struct tipc_aead_key *skey)
- {
- 	int rc = 0;
-+	struct crypto_rng *rng;
- 
- 	/* Fill the key's content with a random value via RNG cipher */
--	rc = crypto_get_default_rng();
-+	rc = crypto_get_default_rng(&rng);
- 	if (likely(!rc)) {
--		rc = crypto_rng_get_bytes(crypto_default_rng, skey->key,
--					  skey->keylen);
--		crypto_put_default_rng();
-+		rc = crypto_rng_get_bytes(rng, skey->key, skey->keylen);
-+		crypto_put_default_rng(&rng);
- 	}
- 
- 	return rc;
+ static void __exit cleanup_trusted(void)
 -- 
 2.39.3
 
