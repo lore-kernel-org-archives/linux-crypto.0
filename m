@@ -1,98 +1,115 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A3D225A3B
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Sep 2025 03:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416D22AE68;
+	Thu,  4 Sep 2025 08:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756958317; cv=none; b=ZD4QO/Y9/JLix9sWWtUwd3LLCYXsgqvgS5O5wtkNhjLBS8B0V07l9ZdrlnlGnJSjAeTc0y7XaU26y3VoLMgZu5xc5gis1VBD+e5T1MVrQLHqWpbmyATgR3263tJWhobNBC2eRqOQbG071hQdKCNURpa5tRRf4i4v6/2fNq5MQUA=
+	t=1756973450; cv=none; b=gH5ApFHrNridUXM5VTmRC1g5N+tJGnwRcl+qiQN1lBZPTNlCj/p8QfTViq3RSlsWwJLM2W2DTHGcPzREC/AFTT8/5XXMHYwKYdraEdJ4UEkd/JzX4CamNfBIVtesWKm/3+VNqbwCBtOeG/C1PSCNErD8EiVi2JwO/Lk/hdnhYJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756958317; c=relaxed/simple;
-	bh=6/Qaj+NgmUC/lhSw+pl11U983W+hD+qO4SvaZZK4NJo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hKEtJi4s+LIrTy5+96J5+t/IoRT50dtuEsY8IhCqatp7opvnNnBIn58OOuJ6cBKCht6ctv6XwF9kLvtizSK6/Im4OqxSojiTQYtCohbxxYSl0cl1u75F4MY7Ole3PgL/53Ds0GTOXC+vlaab41QDyZgq6a0h8OvpZdHvnztlCXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jlS0kHZG; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jlS0kHZG"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-248cb0b37dfso5903515ad.3
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Sep 2025 20:58:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1756958316; x=1757563116; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vdcVC7EGsc3p5AhbAck6hSHkD/WxcPvPTOs/rsi4Pyk=;
-        b=jlS0kHZGxaaKZ+BzehSYhZ5BH+G0/kF/FkzvCFjK1RrU9bCEeFjHGw+Uwjc+ODVV0S
-         0MjqW9s6YtNYItvmvJ0XaKGykfPJdNl5DCH7vcbhKjvqv1xw6pvfC/PXoEDyfll4tckn
-         IYQS5EYUiRYplkldr/+UvdZ43Beki9H4GK/pk=
+	s=arc-20240116; t=1756973450; c=relaxed/simple;
+	bh=GreBThaaJNG4I9m75dU7MzXAx9mEa3TvxYUIF2X5gMk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mSIoTt7dZI9utZ7iziXIjxZOzLIRk+txzURmjI2RAW0HKGu+a3atzNqC51TKLPWpwuw19PLy9Ldfa4+NIQQHBxWEILscmkNkGU1IEcqv3UxRTzPqgYcheApf5hbePM5QMrjQUcB1X6TLMssE/ux9DxMBhqD2Fj5nwdmw4ECFXFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-544a59e1e87so206238e0c.1;
+        Thu, 04 Sep 2025 01:10:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756958316; x=1757563116;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vdcVC7EGsc3p5AhbAck6hSHkD/WxcPvPTOs/rsi4Pyk=;
-        b=eqSnBL+9R4RqHX2YqppK730iwnVRzkfZ0gQmgF7+ubUXa2dVxdmAO9SamGyLccS5IR
-         jyTyEXCdCKPXA/6wmFu7knyBP8ntVGuSmYBwMo4TtJQzj6AQwc/5DcKQXrRWAp9D2lo5
-         3Tm1LtUcHVjpNkBgN5kwfRnHBDjb1TDkpRTqvge1AiARvyEj6GdAzVvz4EoAy7ePKFci
-         iTgtAxTmtn2KTXIVzPHzeBq83vQQr2cdNpoF85bEv/MTMX58wFHRXJXpdI83HygW9u+f
-         UzFm/QUp+GZlRJJFb9eKP4tVssBl75VcRXOv9gPWW0EzO6f+vd+hMVfb5xY9f+ghCv7S
-         wYqg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgPO3i9G4x8uZONTozSErjcrIjT+1pLVSTVvx4EnoNUZucfxDkHu86NhGZIKP3CuxII5LWAP46GMRhFOs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc4jEzRy9itdH72NAGa+HT8yOL3Rcao+jFa5ydlQBey54YAE6s
-	p8oeHZ9NmDprokPTCC0fAcv46k6AL7v4jRPuXxPEWj+cgYsig1FNRqF8Iddc0o3Gug==
-X-Gm-Gg: ASbGncv8EDe1yb2pxZ+G7dsWTHD70EmBz89LTglm+dc6Mf61360KLwv2lcYOjg10fT7
-	/tXa5D8vgOzeVPLBpy7BCpePhKg99ygKca+Q1cObZRNv5WuefX5afIZxjYMvalvH25dTXrNcElP
-	xYE4IOufPcuv2xTJDIoJnxn4vDSxalmB7PKy5weC3LtJnNxQ6FuOdc+fizrpuJfzdwRs8qJCnv5
-	yj189JudinizooiEzlEk68yJBsv17hEHvk74y5JzyUGf3TMe9+blbpBOGrkidlRBWlfdFZ/+kSI
-	tt8nrm4G523OSVUD+qu4IzBMvyjveiY8e5dWqxLTzc7+wzUqttNNhKxYRCCaKB9Z22ZLfJRA2GW
-	ok4WXKqUbwfvy5xZfbHRDFferQE+ZblB9crKQhNgW3GpCez4ldvjKNMYlLxXrRDmF5py37wv5Z1
-	IjG8Td2pp3j1BnEA==
-X-Google-Smtp-Source: AGHT+IFqjpDEL+NZxw/zBYdqqN1met/cuuCeIu/YOCgUar+yk4gMXjjK8G9vvtXW5yAKilSqQDIh9Q==
-X-Received: by 2002:a17:903:37c4:b0:246:cb10:6e2f with SMTP id d9443c01a7336-24944907804mr238303175ad.26.1756958315783;
-        Wed, 03 Sep 2025 20:58:35 -0700 (PDT)
-Received: from wenstp920.tpe.corp.google.com ([2a00:79e0:201d:8:3c2b:f8f3:78fe:d80f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24cb28c3126sm16707405ad.65.2025.09.03.20.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 20:58:35 -0700 (PDT)
-From: Chen-Yu Tsai <wenst@chromium.org>
-To: dri-devel@lists.freedesktop.org, 
- Andrzej Hajda <andrzej.hajda@intel.com>, 
- Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>, 
- Eric Biggers <ebiggers@kernel.org>
-Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>, 
- Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
- linux-crypto@vger.kernel.org
-In-Reply-To: <20250821175613.14717-1-ebiggers@kernel.org>
-References: <20250821175613.14717-1-ebiggers@kernel.org>
-Subject: Re: [PATCH drm-next v2] drm/bridge: it6505: Use SHA-1 library
- instead of crypto_shash
-Message-Id: <175695831382.1322876.17900015503262535191.b4-ty@chromium.org>
-Date: Thu, 04 Sep 2025 11:58:33 +0800
+        d=1e100.net; s=20230601; t=1756973446; x=1757578246;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HoP5rZhN/wcN0s5V5G96zFIhY9AxyhN0FPTyV5jomNA=;
+        b=Y00fhzU9Ydfs0E8C7K8rLwVzbvILuORDY8y30NYJafWCxPIuaEW0mq3Vn1mSJdJrnQ
+         7wa9pVync8gKyF0SptOAZp4vKf23IU6XMl4DtXS+fpCsdOVo4/M+xR1oR/Mp1AsZ5cOy
+         aiugj5z4ICNLPHYlnPcl8lO7Q2frh1s5cOZ26VDWeUHPFMaDsy8WG0TWhfNZeEkr2wvh
+         tjatb+91takph1UXhxFMWU9QkX+pRxfngoknHSK8x27aUzOGBvK0mfP3Yz8c6DI8qFgq
+         3onSzRVKliew7rFcwJnaBkc4yQ+Qw7hmoOQYFhU7/qeaNyiTHGIFZ6C3evjR3ONDhmJ8
+         dS2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXauks20qAfRgRadiK6QinqMIwWohc0Cxvdkj9wnLaYher4X1TpNCgapTO/QuKJ7xmgftGUUXWTg77gjt4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1r/LdDLUrki84xjLpljJHg17CMePbyH9hjZZYhJ93Grziak2y
+	1L5t00Is2q0hq0K0oLSvHXmxwHtDvc76FSJeHVX+s6ujyBgQOfhcn3iJn7dVLahr
+X-Gm-Gg: ASbGncskNaqkd7Bif/w5n0SUuG+LI+of/szZF5UwDXb8FZWCHGmL0trS2dQLpB55NTO
+	OiD2q4FRxM6+BuTCxH7/viBcOOFo8h9qc+9JYjoXvA1mc2mwsZuqV5sMuAqIicpApeoBa4F29+G
+	tJMfIVq9ZgGgqvsdPI7KJ9kH1Oz/gKXtACUdVisb5X3t1+2jsIHFtKD34HvZoprH1E8qwgv2zaL
+	4D04R2ETIqoKcwKYpA2tiZrmmVUpIMX9v+pw8S5ryzNmLiqlu2ysUiPGQU99mhoBSYr1m9R6NJE
+	QqgSrgveqtz+X5EEZQ9yHvrzut0LMDGOw4rM/lfCFappJ5dqnjeINx76Mf2gWNLn023Jw/QFRNK
+	QB/IxMFUKSCO9Mi/uw59K+12MhP8i3iym3bRn/pzM3OOPjW2Z6mGCQ3mTdDM5c9Y1WJE29VE=
+X-Google-Smtp-Source: AGHT+IE8bz3pQyC7Ta82XBrfbrleOuTEj9QuF0xfx40Gxej43eFchhQ/xU9vLXwrRFFAv2V4Imh5iQ==
+X-Received: by 2002:a05:6122:458b:b0:544:8830:8e15 with SMTP id 71dfb90a1353d-544a02beb7fmr5635765e0c.12.1756973445931;
+        Thu, 04 Sep 2025 01:10:45 -0700 (PDT)
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com. [209.85.217.50])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-54493cf3f24sm7557601e0c.26.2025.09.04.01.10.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Sep 2025 01:10:45 -0700 (PDT)
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-52dec008261so234500137.0;
+        Thu, 04 Sep 2025 01:10:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXTvFEHehI68wymZ38+vW+lYeu0RFaVxqtlhyEKAb0XAdmOCy514I/JKqt66k2GVoY+nQBp5Kh8cRc2Ui0=@vger.kernel.org
+X-Received: by 2002:a05:6102:4613:b0:530:f657:c5d with SMTP id
+ ada2fe7eead31-530f666561bmr2551182137.20.1756973445172; Thu, 04 Sep 2025
+ 01:10:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+References: <20250901201815.594177-1-ebiggers@kernel.org> <20250901201815.594177-2-ebiggers@kernel.org>
+In-Reply-To: <20250901201815.594177-2-ebiggers@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 4 Sep 2025 10:10:33 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWrJmj9jHJp5CEtzBJk6jiN81ZwmTAogc07U_P9KgyEjA@mail.gmail.com>
+X-Gm-Features: Ac12FXxrq9L6kDoaKUhsApHE-2MwPE4zmKHFkt6Jn14vX0EwMHLrIbnzAnxY_AA
+Message-ID: <CAMuHMdWrJmj9jHJp5CEtzBJk6jiN81ZwmTAogc07U_P9KgyEjA@mail.gmail.com>
+Subject: Re: [PATCH 1/6] crypto: curve25519 - Remove kpp support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Zhiqi Song <songzhiqi1@huawei.com>, 
+	Longfang Liu <liulongfang@huawei.com>, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Mon, 1 Sept 2025 at 22:29, Eric Biggers <ebiggers@kernel.org> wrote:
+> Currently, Curve25519 has both a library API and a crypto_kpp API.
+> However, the crypto_kpp API to Curve25519 has no users outside
+> crypto/testmgr.c.  I.e., no non-test code ever passes "curve25519" to
+> crypto_alloc_kpp().  And the crypto/testmgr.c test coverage for
+> Curve25519 isn't particularly useful either, since it just runs the same
+> list of test vectors that curve25519-selftest uses.
+>
+> Therefore, all the crypto_kpp support for Curve25519 is unnecessary.
+>
+> Remove it.  We'll instead focus on the Curve25519 library API, which is
+> the API that is actually being used.  Curve25519 remains fully supported
+> for in-kernel users via the library API (crypto/curve25519.h).
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-On Thu, 21 Aug 2025 13:56:13 -0400, Eric Biggers wrote:
-> Instead of using the "sha1" crypto_shash, simply call the sha1() library
-> function.  This is simpler and faster.
-> 
-> 
+>  arch/m68k/configs/amiga_defconfig             |    1 -
+>  arch/m68k/configs/apollo_defconfig            |    1 -
+>  arch/m68k/configs/atari_defconfig             |    1 -
+>  arch/m68k/configs/bvme6000_defconfig          |    1 -
+>  arch/m68k/configs/hp300_defconfig             |    1 -
+>  arch/m68k/configs/mac_defconfig               |    1 -
+>  arch/m68k/configs/multi_defconfig             |    1 -
+>  arch/m68k/configs/mvme147_defconfig           |    1 -
+>  arch/m68k/configs/mvme16x_defconfig           |    1 -
+>  arch/m68k/configs/q40_defconfig               |    1 -
+>  arch/m68k/configs/sun3_defconfig              |    1 -
+>  arch/m68k/configs/sun3x_defconfig             |    1 -
 
-Applied, thanks!
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+(although this would be handled during the regular defconfig refresh anyway)
 
-[1/1] drm/bridge: it6505: Use SHA-1 library instead of crypto_shash
-      commit: e339a73737d365dc88e1994d561112ef2c21ad88
+Gr{oetje,eeting}s,
 
-Best regards,
+                        Geert
+
 -- 
-Chen-Yu Tsai <wenst@chromium.org>
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
