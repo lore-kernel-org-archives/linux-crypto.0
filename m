@@ -1,51 +1,51 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3A71F4262;
-	Thu,  4 Sep 2025 16:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838EA26C399;
+	Thu,  4 Sep 2025 16:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001687; cv=none; b=oOO7jCMdXRPhfHUBBBb2XyOn5A7z3s7TnmU/I28VMrJlaWWQuZHbI8E+UzwsWdq+HkMfrWE6AKeeBmAlDcYxxsYGerywwoBV44hLG0k71JnIBmVQFaVI43Yr8r0XLvuKV41yMcP9gSIFUsSnQw2bZ4louWdaavotHQVwDCNmPLI=
+	t=1757001688; cv=none; b=rmF1V3OGYAoCHkgsK32ZNm6L8zuj0xg70NGtX1UxLZhrVwWc6ng3PpbgvfpIdaOttSh/jyVN6XT69PhH/n3oQU7zJph/kZmJuDte3mN8TpJlgL29ezr+phB/6CqVCLyMz+b3vXwrGHErx8sbNeIIC8X+wZ183SopmAflZiDdf+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001687; c=relaxed/simple;
-	bh=e8/1lKAX5PwC8X/GG4Qv3sf+PyzbO7WoAvolSFIupno=;
+	s=arc-20240116; t=1757001688; c=relaxed/simple;
+	bh=nLTC1tyVRXr5Dq2jjaZccIP82GMSakarfb8N3XXq8sw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OLNqpqPSTbFeNS5FcY7Q1wmCskzsZZ4VEnvuAQEpTC8HZOxWkEZcRw3+LH0w1CelS/d5jaPySU7czpaW8Rfz9tRjc5y0poAdDADE2w/xdB64wIiqPv3q6jKoIUwBpEzvhm2L2SG2qX21uSD527uTFtZa1YldKNPnXkFHg5gyIjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=mSGe59N3; arc=none smtp.client-ip=205.220.165.32
+	 MIME-Version; b=koybn58NplehbZk6VyXHzHZrKM90+e3Vpd7YDNinW70esXxolua0ts+N4xjvBedb+uS7BxAuy7KRrzSCB6yxPIAOfZiaM5El6OSF/bpHNGluDgdyFe+OlHd4ZDaqXC7EWeUccJF3XvzVWsuYvFcSHwUgfdx5EUAIVm4odJswjj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jJ5svsPQ; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mSGe59N3"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jJ5svsPQ"
 Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtoTU014940;
-	Thu, 4 Sep 2025 16:01:12 GMT
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584FtmVV014916;
+	Thu, 4 Sep 2025 16:01:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=SY+zp
-	2xvWqe+FN4HwyudqiMZ1e/IblXQfzDCIeFM/nA=; b=mSGe59N32AIFCZMU8VMyN
-	UEsLA8xUuXKPiZSwqdHj3BSNLZ5QK7npOaqisyxHFCr7fX2vDvz1i3C4P1cbpUFh
-	tkjGsJQMj075XxHsswi9j1EScp47TXcmA2awDemJG4v4GFrjRHAay4FlYhuBdDys
-	4q2J716Pre8bd2PqEC+Pp+a3BWrGc+3ZXH/ur0gUzl9EBxatS1IsM5mZMWlvYaF7
-	+8TO+7Pw6PnHaVyQrZbS8EK65NSFrRQCn6JH/VCI7bts/knennyNWk5sgDDlaoTQ
-	+lRbo96/3Db7osZ9xxDSnLlkMKoFlVRmfDiNwkLjXHYCvmRL8eIWxVru8Byb8hkK
-	g==
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=xXnun
+	SrrK4iKpA0jKPK1eww6Bwl6ptTzDQXgOIGDOzs=; b=jJ5svsPQUY5x/ljkvg6tS
+	MYZtLAZ4K6x8k3QtKjwqPCED/9OD9y3q6+bkDi6CQ31b633/RDtrmfAQi6SMVYno
+	cRDAgUb3+t41Pihmtn1UJMc1gzzvMC20otU8M22FV2Ap6izSqtsrr/Gl3z/fxRH2
+	WLD+f5Rj58BGErl8Jvet9Bc18fCA2k3aKXmSN/b5/vUjkdzHNJ74NCp2zD+/TB/J
+	Y+TX+Gyoxb8Fr9y2WjuVWksgn8EgV4drfWzmWgd0x4dNTjJe9rJLGSwAS5FsP+y3
+	OzimUAtLMiOhNU08dlsyNWTacBa2A7buKS6ky7dvhtkub/oYZL9iqL/LmQT+/d5I
+	w==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ybmh0cmc-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ybmh0cm7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 16:01:12 +0000 (GMT)
+	Thu, 04 Sep 2025 16:01:08 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584EwZUi040037;
-	Thu, 4 Sep 2025 16:01:10 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584Fedqi040082;
+	Thu, 4 Sep 2025 16:01:06 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhttcr-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrhttb3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 16:01:09 +0000
+	Thu, 04 Sep 2025 16:01:06 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7u000707;
-	Thu, 4 Sep 2025 16:01:09 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584Fsx7s000707;
+	Thu, 4 Sep 2025 16:01:05 GMT
 Received: from localhost.localdomain (dhcp-10-154-122-161.vpn.oracle.com [10.154.122.161])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-95;
-	Thu, 04 Sep 2025 16:01:09 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrhtkds-94;
+	Thu, 04 Sep 2025 16:01:05 +0000
 From: Vegard Nossum <vegard.nossum@oracle.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Sami Tolvanen <samitolvanen@google.com>, linux-modules@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH RFC 094/104] crypto: fips140: manual fixups for include/crypto/internal/ecc.h
-Date: Thu,  4 Sep 2025 17:52:06 +0200
-Message-Id: <20250904155216.460962-95-vegard.nossum@oracle.com>
+Subject: [PATCH RFC 093/104] crypto: fips140: manual fixups for crypto/internal.h
+Date: Thu,  4 Sep 2025 17:52:05 +0200
+Message-Id: <20250904155216.460962-94-vegard.nossum@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904155216.460962-1-vegard.nossum@oracle.com>
 References: <20250904155216.460962-1-vegard.nossum@oracle.com>
@@ -79,49 +79,51 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 ph
  adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
  definitions=main-2509040157
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDEzMiBTYWx0ZWRfX/rQnCS9ab5Yo
- qAuJZt31lzJln72FBaAwRAV7EMs6mHjrU3ccKTm0yShs8h5zlju4Pqx/OS3qTSQNP04E0D0H5rx
- rc69lCbZ5eBteXLHU5qSFKpkA7o1tH7LDuyqBlR7REG5Y54JIc/JROowVW8FRevN1JoCT0ir8JO
- HaD4Tbhhw8ru+au1SsNUN25pKnHmLRmgbLqmzEGOG/YySsjGR1YjfwqI9TcBRDHY7E2QYO0oyp9
- N1xlW+InODrbNhyhlPzkte7w0Em4cARDOdVo+p5C8DmxAyA1ncL/ASgzgBhgtojLWiqXZxsCxll
- dwmxOFi3wqt5oAcfFuoDRZa+ObEcz7UHdUb3RIcHOEhc5mGvtcFhb+vk5OduZ4qtOJPVrtUjzmk
- gXasweHNkMtDGtwJwb8ebn6zvmObTA==
-X-Authority-Analysis: v=2.4 cv=Z8PsHGRA c=1 sm=1 tr=0 ts=68b9b7c8 b=1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDEzMiBTYWx0ZWRfX/8h7MElbz5LW
+ qy/6FL0tvQjSfSnJedMrKZsm9yex20dxYmk4WehMI19ybsOEZuDdFPHRt2t1H1nH40QVIBoG8eV
+ ykniQ4xI6dMMzroqdXMJ2w8aAGLUo/bHBCVfY+3dZT56Zx5xoLjh9EVLHR5GFVF0P+P3wUga/ko
+ v0xAwQQxKFiWBrti4iUbVbTgA7xBMtxmWjRawPyEqxtd2fuqoew5Hmafm86aMJn3eSeIFrVCNBY
+ cBTeaLOTM95z4Mh4BzNARMLUUDX319lOIYCjfHIqfv0bYRIGV10VYhF9GstJwQT3o/bx1yI/wVT
+ pFAW2nRGIRBbNKIXNfhQM8mNjPwcnnVoJPl5aU3GMI80Ei8Cre9Zi/qiYEengG5z869dd8A6XnV
+ /uEKlsW2zcrYjHSxYC6XcYZ7mfDy5A==
+X-Authority-Analysis: v=2.4 cv=Z8PsHGRA c=1 sm=1 tr=0 ts=68b9b7c4 b=1 cx=c_pps
  a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=7mo2PKruRViNE_zVYmoA:9 cc=ntf
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=DB-_GfZPeZJ4hgePeuEA:9 cc=ntf
  awl=host:12068
-X-Proofpoint-GUID: 41InMUD2Il3Tm1mcUOwiMZKC10rScQEO
-X-Proofpoint-ORIG-GUID: 41InMUD2Il3Tm1mcUOwiMZKC10rScQEO
+X-Proofpoint-GUID: zZUI7vqT-xLeArusDKPJeGZQrn_NiUy-
+X-Proofpoint-ORIG-GUID: zZUI7vqT-xLeArusDKPJeGZQrn_NiUy-
 
-Define fips_/nonfips_ variants of ecdsa_*_tmpl when the kernel is
-configured to use a standalone FIPS module.
+Define fips_/nonfips_ variants of cryoto_{alg_list,alg_sem,chain} when
+the kernel is configured to use a standalone FIPS module.
 
 Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
 ---
- include/crypto/internal/ecc.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ crypto/internal.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
-index 906d1443de96..b8ce202530de 100644
---- a/include/crypto/internal/ecc.h
-+++ b/include/crypto/internal/ecc.h
-@@ -30,6 +30,16 @@
- #include <crypto/ecc_curve.h>
- #include <linux/unaligned.h>
+diff --git a/crypto/internal.h b/crypto/internal.h
+index f4b12863d922..08f2f04b010d 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -62,6 +62,18 @@ enum {
+ /* Maximum number of (rtattr) parameters for each template. */
+ #define CRYPTO_MAX_ATTRS 32
  
 +#ifdef CONFIG_CRYPTO_FIPS140_EXTMOD
 +#ifdef FIPS_MODULE
-+#define ecdsa_x962_tmpl fips_ecdsa_x962_tmpl
-+#define ecdsa_p1363_tmpl fips_ecdsa_p1363_tmpl
++#define crypto_alg_list fips_crypto_alg_list
++#define crypto_alg_sem fips_crypto_alg_sem
++#define crypto_chain fips_crypto_chain
 +#else
-+#define ecdsa_x962_tmpl nonfips_ecdsa_x962_tmpl
-+#define ecdsa_p1363_tmpl nonfips_ecdsa_p1363_tmpl
++#define crypto_alg_list nonfips_crypto_alg_list
++#define crypto_alg_sem nonfips_crypto_alg_sem
++#define crypto_chain nonfips_crypto_chain
 +#endif
 +#endif
 +
- /* One digit is u64 qword. */
- #define ECC_CURVE_NIST_P192_DIGITS  3
- #define ECC_CURVE_NIST_P256_DIGITS  4
+ extern struct list_head crypto_alg_list;
+ extern struct rw_semaphore crypto_alg_sem;
+ extern struct blocking_notifier_head crypto_chain;
 -- 
 2.39.3
 
