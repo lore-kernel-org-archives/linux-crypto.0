@@ -1,275 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AC22C0F91
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Sep 2025 06:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9356F27F171
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Sep 2025 08:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757054493; cv=none; b=bVscYG0dMoCOiOQRkveXkLImUi2rII/EPGvEmm5tw7YdMQUn5PVjz3oCMcPZU3Fb8nmDHixjJ879f2h8q4NAuSKSwpLvvlR6/dBHtoWD0/eWPu30MFCJnpTyqrFihEhXocWzlB2ZqJrndtLrVLC/CtKy870/08/nU1Qv/Mnb0LI=
+	t=1757061207; cv=none; b=QQvM4J5oqkTeNNtGczfNwbfsTZB+voUFL/z/5iRK6XWPcOExerOoLDXHXK8thPSAC/YZelHoSMAMZqeqBERL4tC8ZvHHLle4p8W2IUsR9OuC+Oi2E3gEhhD7UHCZ/XJV3AD1rfrXb+MSR6SyDHosBA0jLHt1FmGlsG+3uE9n4Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757054493; c=relaxed/simple;
-	bh=5PP9Qy2JI0RylA8NM1X5jhoGp1Vq+k7r7Qo0XW9WsLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t1hxt39eYjUbcNyKQIlJKFMcDwAHncCQ3l3EV9fpNqQAUESomE5WT/tF2HR3+yLZEd16tI0Xn94yb5W++H1+84mf0wsrWOdW63ZyuTN4+ld9sMKRZ5dZE5I2mkyAPyyGdQozHJOHcTQlQ9yaypf/5/1ZiSboBXlmOFcxJKUSQ2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EpW1p9MM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757061207; c=relaxed/simple;
+	bh=sERTmrMS6SUba8UigigIzKHhTfdo+49rlFbT2cdDBVI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tm1/Q2bUOA68OX7h+NYjlOuFf7jtJrnz3LnsbR6sgN1QdGJNvjRGTTLU8GaF4QBZVfNHrvgKqirj/7jsFV199kFqTiuaTBZUiXFictMdht1IRqhvQ/COdM6B36dYCIwEGexAcRQOUwyF2bkrH5fUiABefyZeLeXM5D44o3hDGJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UYNJMWU3; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EpW1p9MM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757054490;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=oF3HN1Q6ZNxZN3c5DymWi4LgFv8yUurotu5FuTflls4=;
-	b=EpW1p9MMbSDUi+SxAEcAL7HZbTLcxXjgKuaRcCee2TDI+3yZ8eGcUiDWKX1LvVr1KMVCwy
-	T7qi/fNDlIqPoU6ENhlQYJskkfhBCl2fSkz8yo+wadhzWXbqUY27ziyTlMA8I3rIjIU15r
-	IVbvW8HRUhpw8oXoa+xYLYjM4qDzqN4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-sNSzeDDeNB2JLAxloIcJPw-1; Fri, 05 Sep 2025 02:41:29 -0400
-X-MC-Unique: sNSzeDDeNB2JLAxloIcJPw-1
-X-Mimecast-MFC-AGG-ID: sNSzeDDeNB2JLAxloIcJPw_1757054488
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45b9a856d58so12845865e9.0
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Sep 2025 23:41:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UYNJMWU3"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-7211b09f649so15807526d6.3
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Sep 2025 01:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757061204; x=1757666004; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NiGQFhCM+75MKVgSkB143RjF35qXTjKYNYENw01ZAOY=;
+        b=UYNJMWU3aTT+J+nDdU0k9/sT+M6oUdTQkqj8Cg5zUYFpELsJtQRouF3rF+yQRSWqy6
+         yVdGepR/mPVt1eTaGa4UfkKbswfq1yXoGu/q2NFLj5jlXDhdHwabWnz9XlYMSmAYHiiP
+         J4aCOLDoAMoUenPUNkn196OHeaFuuNVIsXbxKCteZK6I065gLmHNHnG/JzgPkIRLx4CC
+         tXl/OpJlycwGfuG4MgP+gy6FEiBjm3wJPDBfmRaYLD5rX0EDIjZoPYz0te7YSqPMR3hU
+         xooHe96DAAfoa8ip1ne9YtECE3KO2SthqnY2WOS7v29V6MvFkaGj+D5ORb50d0gX7HPW
+         obig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757054488; x=1757659288;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oF3HN1Q6ZNxZN3c5DymWi4LgFv8yUurotu5FuTflls4=;
-        b=klmE0e9fUwILvdipGkcXNTZtHBhda0rOrnaI1819gRavxM90vDL+QVzhtSKo0PHhON
-         3dIXNv9Nc2mj5OJDENTrpApDqP+jt5EV0f1SWHDoKXQgG3kB77Rf43jh1klSwl5Umuiu
-         OoQecCs7zZPrE0Sq+bG3EbHjCR2wz4vJKeFRX6VzKfINE/beb990fGQXofkM6eiuXg5f
-         r99x/P+KtX6/gpHA3UzCoegKK77Lvr7kVPZoNg68LZtU+zVgulZc47xqW5gRrYsMGFdq
-         TyP+n/3zo7v+/FJifdWQ9bTTtFoFLMyVfBb93yYiRDwtscnsxXF+u2uFT8cZ5xWA1RWI
-         TvyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWOVaPcwyA5COL4wbR6qOb4dOKxxH/YhkeqH53ZZfRyvW9cqCn80263PAyB8xf4lAbmF6etLfS1VVBiLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrRjnTs5WBvwB5UTYVMKBh1Eqiuo1kZVuOiZlt2wcszDJV0CWC
-	5BElnCnYQBhjHOyRSbla+FgpWAyvSDPlfskCXZ6FFsooRDvFiXesKivtgo+5ZgLvM3+OOsB4aFz
-	wV6H4juJhTLTo37cLpK9OU0rTgZf++QuTEHEh4U9oyZotquGvGPfXFQX40Kv7PeB4Qg==
-X-Gm-Gg: ASbGncsaEIy9w5/RrC/9wwV/eYeky5i2yqJl3OWcV2QFRx2bAJB+cMnl/pETVeWAhae
-	9qXp6vw9Jg8RBE69NCsJCca8w6MhlmRT5YgQKZrs/glI7txSn8SN/KVSWEdviquVPJmeXzRsfVg
-	b2PdCHYIDthFe6PZ3+2hdvKKv3nM5hhBBB+pAHd5qEaWKBdJWUW0mx1HGxDllR9LARha1vQwzUD
-	M4Bfx0ZWB9y53xxtRSM2BNarroLed9X94XoFmrVWOhDQMuQLCkdA6BmDNTDfatf8yr0dUL+hxWL
-	V7z+Fq3xYoN7ut5VjJMSY4Wx37GE79dyJVGTOmAr1fotxfsgjKaJ04c9ydizE7JFswNj4NUkXH4
-	MHZcwD7eO0m0aMMDxuS9BZRtHTjggXP1y56F0XtxZODTUDXOAsgBJvwiG
-X-Received: by 2002:a05:600c:4ec9:b0:45b:7ffa:1bf8 with SMTP id 5b1f17b1804b1-45b934f6a56mr114232885e9.23.1757054487726;
-        Thu, 04 Sep 2025 23:41:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEj1Q4ueRZg61r58J+1sq7/RpmSeqvAcWabr/Sq37OcVKAf1elh8/EonCz3Jhepl0SBZP4Cg==
-X-Received: by 2002:a05:600c:4ec9:b0:45b:7ffa:1bf8 with SMTP id 5b1f17b1804b1-45b934f6a56mr114232615e9.23.1757054487185;
-        Thu, 04 Sep 2025 23:41:27 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4d:e00:298:59cc:2514:52? (p200300d82f4d0e00029859cc25140052.dip0.t-ipconnect.de. [2003:d8:2f4d:e00:298:59cc:2514:52])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e8879cesm316420125e9.12.2025.09.04.23.41.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Sep 2025 23:41:26 -0700 (PDT)
-Message-ID: <5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
-Date: Fri, 5 Sep 2025 08:41:23 +0200
+        d=1e100.net; s=20230601; t=1757061204; x=1757666004;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NiGQFhCM+75MKVgSkB143RjF35qXTjKYNYENw01ZAOY=;
+        b=lY4ojvP798TI0yd4Nnjya6+tdYcWMyG09MKVQ09pR6rkR4zYKrEygCuS8n97t3EEBL
+         FVZQF0A6+aIpJlQZAOHrqUA8O5KvVaK6Vd8v8A7O/u44hljqbUkNQCFrXiVXoKLmCTzA
+         7K9m+CsWn276Jds/gFLrHz8rGBxi/kxNpFs3WGAQqHMFxpKM+3Dh7+6gPpWm3LT2P7ZJ
+         AchdewvFLM7eKu0MQrcTtmVz3/EH9/+BIeTzZDtS25dSFawI8K4R8ChyWPna+ewsW95K
+         GvFJ9DTYhxCysZv0pOHTSngX669z7p9sP/7Zo6uxuzfXldW3YTq9kWclLJIYSx2Aj1h7
+         LuDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVK5JVAlAn6SkEplrkwz8mzNvLw241Bxv4dwY4aJGMyopHb11B8Ov80IG2acn7MswIl5UaxohNgQhr+gEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxWZEMStmXq9clat2T+2gDMTL9Bo2PCHS38fB4oT0xid0hUcU6
+	wHRXDxTzPaLNStlK8CtXYi/yVno7SVcuvXA+39jVs+5+uBi3eiduKWxdMKfb6Wu7seUHugZO7Bu
+	GDshrckheA89HuSstXnzDwPWRFLZ3ATBOWR1wBWcd
+X-Gm-Gg: ASbGnctwC1k3gFMMS+Wn33d7gib1M5S7OULoxmivgGy53+mLoMZeRPfx1IIF/BXOYi+
+	0pVO3VbQltaNANbxFVKYPnWjt2/n9vTEQHEm0ur2seFbG9Svruv3ZWAuY+rxdQM+f4IYwEMb+8a
+	/+qce6U7d9SH8peUOFfuKuLuCNnMyizVcSy06MtW/GitTEEKQKx/oZu0DtvfHpkKl55OW70CW0A
+	pso6mcKkUOOaPn2m9uuV2tVV/Zj8LP76r1cdpvfMcTU
+X-Google-Smtp-Source: AGHT+IH/DBAwk6CJl0zPHvkvyybbJDJwRBFvtKF7fuH7ZxC/t8JRFTJCkN03HH9959f/gxZEw9kh5A4knxtTV8AylRs=
+X-Received: by 2002:ad4:5c8d:0:b0:729:4be4:7fdb with SMTP id
+ 6a1803df08f44-7294be484d2mr55718806d6.52.1757061204289; Fri, 05 Sep 2025
+ 01:33:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>, Jens Axboe <axboe@kernel.dk>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-20-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250901150359.867252-20-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com> <20250901164212.460229-2-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250901164212.460229-2-ethan.w.s.graham@gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Fri, 5 Sep 2025 10:32:46 +0200
+X-Gm-Features: Ac12FXwF_nrqiRF1QRwe4SEL1LOgGhI7gT4sYUe3e0eDMXNCPS7Bt_KSLOk4LK4
+Message-ID: <CAG_fn=UfKBSxgcNp5dB3DDoNAnCpDbYoV8HC4BhS7LbgQSpwQw@mail.gmail.com>
+Subject: Re: [PATCH v2 RFC 1/7] mm/kasan: implement kasan_poison_range
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: ethangraham@google.com, andreyknvl@gmail.com, brendan.higgins@linux.dev, 
+	davidgow@google.com, dvyukov@google.com, jannh@google.com, elver@google.com, 
+	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com, 
+	kasan-dev@googlegroups.com, kunit-dev@googlegroups.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, dhowells@redhat.com, 
+	lukas@wunner.de, ignat@cloudflare.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 01.09.25 17:03, David Hildenbrand wrote:
-> We can just cleanup the code by calculating the #refs earlier,
-> so we can just inline what remains of record_subpages().
-> 
-> Calculate the number of references/pages ahead of times, and record them
-> only once all our tests passed.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Mon, Sep 1, 2025 at 6:43=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmail=
+.com> wrote:
+>
+> From: Ethan Graham <ethangraham@google.com>
+>
+> Introduce a new helper function, kasan_poison_range(), to encapsulate
+> the logic for poisoning an arbitrary memory range of a given size, and
+> expose it publically in <include/linux/kasan.h>.
+>
+> This is a preparatory change for the upcoming KFuzzTest patches, which
+> requires the ability to poison the inter-region padding in its input
+> buffers.
+>
+> No functional change to any other subsystem is intended by this commit.
+>
+> Signed-off-by: Ethan Graham <ethangraham@google.com>
 > ---
->   mm/gup.c | 25 ++++++++-----------------
->   1 file changed, 8 insertions(+), 17 deletions(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index c10cd969c1a3b..f0f4d1a68e094 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
->   #ifdef CONFIG_MMU
->   
->   #ifdef CONFIG_HAVE_GUP_FAST
-> -static int record_subpages(struct page *page, unsigned long sz,
-> -			   unsigned long addr, unsigned long end,
-> -			   struct page **pages)
-> -{
-> -	int nr;
-> -
-> -	page += (addr & (sz - 1)) >> PAGE_SHIFT;
-> -	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
-> -		pages[nr] = page++;
-> -
-> -	return nr;
-> -}
-> -
->   /**
->    * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
->    * @page:  pointer to page to be grabbed
-> @@ -2967,8 +2954,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
->   	if (pmd_special(orig))
->   		return 0;
->   
-> -	page = pmd_page(orig);
-> -	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
-> +	refs = (end - addr) >> PAGE_SHIFT;
-> +	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
->   
->   	folio = try_grab_folio_fast(page, refs, flags);
->   	if (!folio)
-> @@ -2989,6 +2976,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
->   	}
->   
->   	*nr += refs;
-> +	for (; refs; refs--)
-> +		*(pages++) = page++;
->   	folio_set_referenced(folio);
->   	return 1;
->   }
-> @@ -3007,8 +2996,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
->   	if (pud_special(orig))
->   		return 0;
->   
-> -	page = pud_page(orig);
-> -	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
-> +	refs = (end - addr) >> PAGE_SHIFT;
-> +	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
->   
->   	folio = try_grab_folio_fast(page, refs, flags);
->   	if (!folio)
-> @@ -3030,6 +3019,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
->   	}
->   
->   	*nr += refs;
-> +	for (; refs; refs--)
-> +		*(pages++) = page++;
->   	folio_set_referenced(folio);
->   	return 1;
->   }
+>  include/linux/kasan.h | 16 ++++++++++++++++
+>  mm/kasan/shadow.c     | 31 +++++++++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
+>
+> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+> index 890011071f2b..09baeb6c9f4d 100644
+> --- a/include/linux/kasan.h
+> +++ b/include/linux/kasan.h
+> @@ -102,6 +102,21 @@ static inline bool kasan_has_integrated_init(void)
+>  }
+>
+>  #ifdef CONFIG_KASAN
+> +
+> +/**
+> + * kasan_poison_range - poison the memory range [start, start + size)
+> + *
+> + * The exact behavior is subject to alignment with KASAN_GRANULE_SIZE, d=
+efined
+> + * in <mm/kasan/kasan.h>.
+> + *
+> + * - If @start is unaligned, the initial partial granule at the beginnin=
+g
+> + *     of the range is only poisoned if CONFIG_KASAN_GENERIC is enabled.
 
-Okay, this code is nasty. We should rework this code to just return the nr and receive a the proper
-pages pointer, getting rid of the "*nr" parameter.
+Nit: for consistency with other functions in this header, can we
+change @start to @addr?
 
-For the time being, the following should do the trick:
+> + * - The poisoning of the range only extends up to the last full granule=
+ before
+> + *     the end of the range. Any remaining bytes in a final partial gran=
+ule are
+> + *     ignored.
 
-commit bfd07c995814354f6b66c5b6a72e96a7aa9fb73b (HEAD -> nth_page)
-Author: David Hildenbrand <david@redhat.com>
-Date:   Fri Sep 5 08:38:43 2025 +0200
+Maybe we should require that the end of the range is aligned, as we do
+for e.g. kasan_unpoison()?
+Are there cases in which we want to call it for non-aligned addresses?
 
-     fixup: mm/gup: remove record_subpages()
-     
-     pages is not adjusted by the caller, but idnexed by existing *nr.
-     
-     Signed-off-by: David Hildenbrand <david@redhat.com>
+>
+> +void kasan_poison_range(const void *start, size_t size)
+> +{
+> +       void *end =3D (char *)start + size;
 
-diff --git a/mm/gup.c b/mm/gup.c
-index 010fe56f6e132..22420f2069ee1 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -2981,6 +2981,7 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-                 return 0;
-         }
-  
-+       pages += *nr;
-         *nr += refs;
-         for (; refs; refs--)
-                 *(pages++) = page++;
-@@ -3024,6 +3025,7 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
-                 return 0;
-         }
-  
-+       pages += *nr;
-         *nr += refs;
-         for (; refs; refs--)
-                 *(pages++) = page++;
+There's only a single use of `end` below, so maybe drop this variable
+altogether?
 
+> +       uintptr_t start_addr =3D (uintptr_t)start;
+> +       uintptr_t head_granule_start;
+> +       uintptr_t poison_body_start;
+> +       uintptr_t poison_body_end;
+> +       size_t head_prefix_size;
+> +       uintptr_t end_addr;
+> +
+> +       end_addr =3D ALIGN_DOWN((uintptr_t)end, KASAN_GRANULE_SIZE);
 
--- 
-
-Cheers
-
-David / dhildenb
-
+I suggest making it
+       end_addr =3D ALIGN_DOWN((uintptr_t)start + size, KASAN_GRANULE_SIZE)=
+;
+instead.
