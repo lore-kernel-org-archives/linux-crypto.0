@@ -1,63 +1,181 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4922FB097;
-	Fri,  5 Sep 2025 17:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D534072639;
+	Fri,  5 Sep 2025 23:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757091976; cv=none; b=mN0CHxWCfrUmbrM3c8PxfmlM/wZo+LxhQhrOrmgL7OBQdOjAgQ/e/u66WXQ31gwLolIL9UBHbfMfcxkYqZ5bnnSiNFrEeelA3OwDQdRl+a0XE8hNC52YsDkj7Wgkf4IF6LvWandsPOskcPuCnG5JUFztPnAN/5aOjwzPcIemb9M=
+	t=1757113283; cv=none; b=STHTwbkIUVyVc7/Lt3KdXJswKeeXO6ub4oO/A4fn/hio24PmAXQ4j33bZlZeIH4/EKkF1ydvJyWKcoiZL/hsxI2S6XTK5sfeeH6rQSy+d/V0WUS52Dr+w4Ga30z3Ey9QMdboVM8/bPPo7tSb/lionQYM2sHQjvtVNXMwc+y1ZZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757091976; c=relaxed/simple;
-	bh=LPcsLD/N8LOoBFBUKHVatP2lR1A4EFh3Ug8KaV6BhZc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=C9es8gJ1quiz/hyGSu8+vSgWv+ygEIfycn4p0rrR3DzkTFWzeRKgK3RMV1YuVeATnFQ/vXmWAoMPCf6qqbdtEy3VnKsnnoRH22aXCUVWBNUDOzMLTvI7Bsgj063e2OvWqcQDNtjBSJzUBALYW61yCmcEXTWXk12HFeVPCwWi0c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0wKsBZd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757113283; c=relaxed/simple;
+	bh=+lhopyxIHPkimkHLqjBagKsowbxPduHdhl1alB5XIHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N75cZXP1uVrHhIJ9EPjB03JXuyOgr/DVmBetbhnxkc2jy5WGQHWzf3CfpoeeT+fOsJzUEx47wPpgyN43SxU3d62W5Po1LCgxkA2EyKIY3vTV+zpKEov7n98vGiJUbFohpyvKvli9clGo6PdRHczPUuzF/vel7BmS57mz0Q44AUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKhh4N0Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0wKsBZd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD08DC4CEF1;
-	Fri,  5 Sep 2025 17:06:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKhh4N0Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2CEDC4CEF1;
+	Fri,  5 Sep 2025 23:01:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757091976;
-	bh=LPcsLD/N8LOoBFBUKHVatP2lR1A4EFh3Ug8KaV6BhZc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=J0wKsBZdWrrsVkKmhujNGaLiKUFjW82k6S8R/Af9h8VrYFGiSCJsroKKwcNa3uxQ0
-	 BbboC4rnyezmpdREIp4xN+zkBOiqTGcKPQtoINezsEBHapvPgUbJey56+sBnh7+u5D
-	 H8BlHAXKOdhNAIPvJNVu/OxWrIK78DKAIbaN89ihtFZEc8WAypl0HLacuTGFETnI/O
-	 +ITpK32XVSJKbhZU4ffWVH82/6+NB5a+mvtCSFTQJH+gCtOD11SLbaiBj3ssYB+E72
-	 6yNBRJ445Rqhf08wt3c8HMvoLniGJIWiXziARZMzQIhOtXPo4FLVa2pOOOrdvyIFMe
-	 u9GLWM6zXnw3A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715E5383BF69;
-	Fri,  5 Sep 2025 17:06:22 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto library fixes for v6.17-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250905034148.GA26307@sol>
-References: <20250905034148.GA26307@sol>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250905034148.GA26307@sol>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-fixes-for-linus
-X-PR-Tracked-Commit-Id: cdb03b6d1896c2d23f9c47dc779edba0a9241115
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 01c93aa01c75e7a43f7f53229bcbecffac75eb84
-Message-Id: <175709198091.2623294.1074796665519896961.pr-tracker-bot@kernel.org>
-Date: Fri, 05 Sep 2025 17:06:20 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+	s=k20201202; t=1757113280;
+	bh=+lhopyxIHPkimkHLqjBagKsowbxPduHdhl1alB5XIHw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FKhh4N0YC7rktiPdXEfXclWanEDKYne9TN6cdcuCjqPCtcq4Rn0r96yLuECJbiw+4
+	 LjwCnjQtLBAm0edveUnCZZYiNonj/7aqKLJr2wGtnUHH+scBK/7r7JUigttXLAScDm
+	 pXeFnpIPvL1/rZKX9LdznwwDYBYkDL4/X0Q74Dlpx/NmySnEYO46ImCPWzvWXVlUfn
+	 7nKQ1fERSefzbF0N9pUOtT2Ew99OpHStRZ+01KHKpecJw2kFIukduhp+K3hQulq8o0
+	 47VhyxuU+d72ralUlgkhIgcgxiZyD9aQX9YFUuu3Ep7hq8BTDKfbNp6DFssdME8qWg
+	 uTEId8/MJZDQg==
+Date: Fri, 5 Sep 2025 16:00:06 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+Message-ID: <20250905230006.GA1776@sol>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
 
-The pull request you sent on Thu, 4 Sep 2025 20:41:48 -0700:
+On Fri, Sep 05, 2025 at 08:41:23AM +0200, David Hildenbrand wrote:
+> On 01.09.25 17:03, David Hildenbrand wrote:
+> > We can just cleanup the code by calculating the #refs earlier,
+> > so we can just inline what remains of record_subpages().
+> > 
+> > Calculate the number of references/pages ahead of times, and record them
+> > only once all our tests passed.
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >   mm/gup.c | 25 ++++++++-----------------
+> >   1 file changed, 8 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index c10cd969c1a3b..f0f4d1a68e094 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
+> >   #ifdef CONFIG_MMU
+> >   #ifdef CONFIG_HAVE_GUP_FAST
+> > -static int record_subpages(struct page *page, unsigned long sz,
+> > -			   unsigned long addr, unsigned long end,
+> > -			   struct page **pages)
+> > -{
+> > -	int nr;
+> > -
+> > -	page += (addr & (sz - 1)) >> PAGE_SHIFT;
+> > -	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+> > -		pages[nr] = page++;
+> > -
+> > -	return nr;
+> > -}
+> > -
+> >   /**
+> >    * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
+> >    * @page:  pointer to page to be grabbed
+> > @@ -2967,8 +2954,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> >   	if (pmd_special(orig))
+> >   		return 0;
+> > -	page = pmd_page(orig);
+> > -	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
+> > +	refs = (end - addr) >> PAGE_SHIFT;
+> > +	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+> >   	folio = try_grab_folio_fast(page, refs, flags);
+> >   	if (!folio)
+> > @@ -2989,6 +2976,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> >   	}
+> >   	*nr += refs;
+> > +	for (; refs; refs--)
+> > +		*(pages++) = page++;
+> >   	folio_set_referenced(folio);
+> >   	return 1;
+> >   }
+> > @@ -3007,8 +2996,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+> >   	if (pud_special(orig))
+> >   		return 0;
+> > -	page = pud_page(orig);
+> > -	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
+> > +	refs = (end - addr) >> PAGE_SHIFT;
+> > +	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+> >   	folio = try_grab_folio_fast(page, refs, flags);
+> >   	if (!folio)
+> > @@ -3030,6 +3019,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+> >   	}
+> >   	*nr += refs;
+> > +	for (; refs; refs--)
+> > +		*(pages++) = page++;
+> >   	folio_set_referenced(folio);
+> >   	return 1;
+> >   }
+> 
+> Okay, this code is nasty. We should rework this code to just return the nr and receive a the proper
+> pages pointer, getting rid of the "*nr" parameter.
+> 
+> For the time being, the following should do the trick:
+> 
+> commit bfd07c995814354f6b66c5b6a72e96a7aa9fb73b (HEAD -> nth_page)
+> Author: David Hildenbrand <david@redhat.com>
+> Date:   Fri Sep 5 08:38:43 2025 +0200
+> 
+>     fixup: mm/gup: remove record_subpages()
+>     pages is not adjusted by the caller, but idnexed by existing *nr.
+>     Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 010fe56f6e132..22420f2069ee1 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2981,6 +2981,7 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>                 return 0;
+>         }
+> +       pages += *nr;
+>         *nr += refs;
+>         for (; refs; refs--)
+>                 *(pages++) = page++;
+> @@ -3024,6 +3025,7 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>                 return 0;
+>         }
+> +       pages += *nr;
+>         *nr += refs;
+>         for (; refs; refs--)
+>                 *(pages++) = page++;
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-fixes-for-linus
+Can this get folded in soon?  This bug is causing crashes in AF_ALG too.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/01c93aa01c75e7a43f7f53229bcbecffac75eb84
+Thanks,
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+- Eric
