@@ -1,42 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7472628D;
-	Fri,  5 Sep 2025 03:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCB92628D;
+	Fri,  5 Sep 2025 03:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757041430; cv=none; b=aawS8DVLgRwfVg67Kx8ichORkkj2Nx1lC+BBqfeuKh4/0+di8Xx38HPo3cxRM27e48pv+XfstNjv0MdHz4G9wRqj36XySIJCP2sVp0e+gkcXuoKTQN2xVDHt/Ug0FAfJydM/H4ZaeaLEPPORuTTYVt2r8A9bcZr6NS56JjhTXgs=
+	t=1757041586; cv=none; b=MsRObuZIYEByJnL39S+kgHVoI17TkwSRW7eV9rjbFEWNre2R7wf3BQAKu7Mb3XFV262Fh5PEMW2HppAGIwFblhY/XivVmnBda2v+oiXvw/x39Yuo4DETNPmDVEr3Pxfxgc+qccw950v6wOh0md0uMfP5fsvBR7MAvg38fnUyZtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757041430; c=relaxed/simple;
-	bh=AjJrp8RvVHOfXJ/GebGXhT+LXhkOcwYs8UByks1Eg/0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aEu4qGKaYS0THr6GNYLiGgD2tSBlFVgP853Ev4VrKjChevMU3HbrCxKIPbjdZ0ac6x0Z1m96VEMQMVIMI1kfYm4VHK1au1X9mnF8E2pNydDQHF3LxoRUpStWjWJ8CEwlYO3K4+LP6VlE/MgQGC3JEekD/B2NG1TF6M9jooiJO48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2YTisTA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757041586; c=relaxed/simple;
+	bh=Xc9Y8UmFeW4BhH5F3M94AxgXrG6Fci8OHdvSofPMl9s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NZinMuerCfYvciRQjs9/2xbG+x3EjSwLlUwRHG7AErWe+9ThNRPr2YWHD1yARQiICtqxnRD1XDa3g5r8kgRm+TjUg33BsTUTzdjFknFyyyjwjoQCe0aw4NGj11eQFfzvRyrmYMi3sHrZyl4d8Vf8Vzo9wPE/+VETOtggegKw6OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGqffFU8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2YTisTA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74AD5C4CEF0;
-	Fri,  5 Sep 2025 03:03:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGqffFU8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97015C4CEF0;
+	Fri,  5 Sep 2025 03:06:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757041429;
-	bh=AjJrp8RvVHOfXJ/GebGXhT+LXhkOcwYs8UByks1Eg/0=;
+	s=k20201202; t=1757041585;
+	bh=Xc9Y8UmFeW4BhH5F3M94AxgXrG6Fci8OHdvSofPMl9s=;
 	h=From:To:Cc:Subject:Date:From;
-	b=o2YTisTAqEyqUJZbd4swinp8rq5Ea4t0cwp1pzF/POHKbnttNDJCZ6sjuOq6m5IZ/
-	 ZbsPEBRJsp3oWn46WIo7IPHXs9fjc7HMGKJnPp90VJuFf2djvq1BpVQxqdMQSBOsLt
-	 v/7zqnodX0x/cmynNGIWXDnl5apUA7/gC4Z4nAUHA3XoTav1S/LmkWH9DIDnsORcyi
-	 yeV8Lje8yvuhIAte/dpGThp5BBpHk+R4Zb6lUtPlnvtEI9ttQWY6x/yzn5LatKDd30
-	 B1/5F+U6PdQYK+eoyuo/hGDFlmd2Rc3uQPAJJ8uycrmv14b4VQOWz0EaMbKQd3ZDms
-	 iEzhIMLX2qfpQ==
+	b=nGqffFU8zZILNV4bHjtGEjZ6hwOosKqhuZpzhV6T2F9gIWNVW7yxevbu896TSkoar
+	 hV8LufANcQV+QEOgcnRWZ7MwFrJ0j+Zx+3CuhPMVlztlm60DuAFqhHTNrAyaQdHyya
+	 hgNmIeJ5HytwMGIwKoo3200OWkoEh+1kR6PF+XyZjiWy9w9ryLlnSGLPzqNDN0JLzI
+	 JS1+t97ZVVdpAQRsPRfWepBQqsOCpRL6+OQKGKPIoTnct1GvXlzjhQ2pF1gphzH720
+	 jEtVzogl90idQ7UnJ6jbgcl1ed2EnPo2y5hbZOYXdbDU7jit3RfC8ncZj0/5a9B919
+	 cY8g8w4N0M0gw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2] crypto: qat - Use library to prepare HMAC keys
-Date: Thu,  4 Sep 2025 20:01:53 -0700
-Message-ID: <20250905030153.11892-1-ebiggers@kernel.org>
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2] crypto: chelsio - Use library to prepare HMAC keys
+Date: Thu,  4 Sep 2025 20:04:28 -0700
+Message-ID: <20250905030428.21790-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -50,7 +49,6 @@ To prepare HMAC keys, just use the library functions instead of
 crypto_shash.  This is much simpler, avoids depending on the fragile
 export_core and import_core methods, and is faster too.
 
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
 
@@ -63,359 +61,431 @@ conversion and not a fix per se.  If needed I'd be glad to take this
 through libcrypto-next instead, but usually these conversions have been
 going through subsystem trees (which is Herbert's in this case).
 
- drivers/crypto/intel/qat/Kconfig              |   7 +-
- .../crypto/intel/qat/qat_common/qat_algs.c    | 191 ++++++------------
- 2 files changed, 61 insertions(+), 137 deletions(-)
+ drivers/crypto/chelsio/Kconfig       |   6 +-
+ drivers/crypto/chelsio/chcr_algo.c   | 259 +++++++--------------------
+ drivers/crypto/chelsio/chcr_crypto.h |   1 -
+ 3 files changed, 63 insertions(+), 203 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/Kconfig b/drivers/crypto/intel/qat/Kconfig
-index 359c61f0c8a13..4b4861460dd4e 100644
---- a/drivers/crypto/intel/qat/Kconfig
-+++ b/drivers/crypto/intel/qat/Kconfig
-@@ -4,16 +4,15 @@ config CRYPTO_DEV_QAT
- 	select CRYPTO_AEAD
- 	select CRYPTO_AUTHENC
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_DH
--	select CRYPTO_HMAC
- 	select CRYPTO_RSA
+diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
+index 5dd3f6a4781a2..37294bb740031 100644
+--- a/drivers/crypto/chelsio/Kconfig
++++ b/drivers/crypto/chelsio/Kconfig
+@@ -2,13 +2,13 @@
+ config CRYPTO_DEV_CHELSIO
+ 	tristate "Chelsio Crypto Co-processor Driver"
+ 	depends on CHELSIO_T4
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_GF128MUL
 -	select CRYPTO_SHA1
 -	select CRYPTO_SHA256
 -	select CRYPTO_SHA512
- 	select CRYPTO_LIB_AES
 +	select CRYPTO_LIB_SHA1
 +	select CRYPTO_LIB_SHA256
 +	select CRYPTO_LIB_SHA512
- 	select FW_LOADER
- 	select CRC8
+ 	select CRYPTO_AUTHENC
+ 	help
+ 	  The Chelsio Crypto Co-processor driver for T6 adapters.
  
- config CRYPTO_DEV_QAT_DH895xCC
- 	tristate "Support for Intel(R) DH895xCC"
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-index 43e6dd9b77b7d..7f638a62e3ade 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-@@ -3,16 +3,14 @@
- #include <linux/module.h>
- #include <linux/slab.h>
- #include <linux/crypto.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/cipher.h>
--#include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
+ 	  For general information about Chelsio and our products, visit
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index be21e4e2016c5..22cbc343198aa 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -49,11 +49,10 @@
+ #include <linux/highmem.h>
+ #include <linux/scatterlist.h>
+ 
  #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+-#include <crypto/hash.h>
+ #include <crypto/gcm.h>
  #include <crypto/sha1.h>
  #include <crypto/sha2.h>
--#include <crypto/hmac.h>
- #include <crypto/algapi.h>
  #include <crypto/authenc.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/xts.h>
- #include <linux/dma-mapping.h>
-@@ -66,20 +64,14 @@ struct qat_alg_aead_ctx {
- 	struct qat_alg_cd *dec_cd;
- 	dma_addr_t enc_cd_paddr;
- 	dma_addr_t dec_cd_paddr;
- 	struct icp_qat_fw_la_bulk_req enc_fw_req;
- 	struct icp_qat_fw_la_bulk_req dec_fw_req;
--	struct crypto_shash *hash_tfm;
- 	enum icp_qat_hw_auth_algo qat_hash_alg;
-+	unsigned int hash_digestsize;
-+	unsigned int hash_blocksize;
- 	struct qat_crypto_instance *inst;
--	union {
--		struct sha1_state sha1;
--		struct sha256_state sha256;
--		struct sha512_state sha512;
--	};
--	char ipad[SHA512_BLOCK_SIZE]; /* sufficient for SHA-1/SHA-256 as well */
--	char opad[SHA512_BLOCK_SIZE];
- };
+ #include <crypto/ctr.h>
+@@ -275,92 +274,64 @@ static void get_aes_decrypt_key(unsigned char *dec_key,
+ 		if (j < 0)
+ 			j += nk;
+ 	}
+ }
  
- struct qat_alg_skcipher_ctx {
- 	struct icp_qat_hw_cipher_algo_blk *enc_cd;
- 	struct icp_qat_hw_cipher_algo_blk *dec_cd;
-@@ -92,129 +84,61 @@ struct qat_alg_skcipher_ctx {
- 	struct crypto_cipher *tweak;
- 	bool fallback;
- 	int mode;
- };
- 
--static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
--{
--	switch (qat_hash_alg) {
--	case ICP_QAT_HW_AUTH_ALGO_SHA1:
--		return ICP_QAT_HW_SHA1_STATE1_SZ;
--	case ICP_QAT_HW_AUTH_ALGO_SHA256:
--		return ICP_QAT_HW_SHA256_STATE1_SZ;
--	case ICP_QAT_HW_AUTH_ALGO_SHA512:
--		return ICP_QAT_HW_SHA512_STATE1_SZ;
--	default:
--		return -EFAULT;
--	}
+-static struct crypto_shash *chcr_alloc_shash(unsigned int ds)
++static int chcr_prepare_hmac_key(const u8 *raw_key, unsigned int raw_key_len,
++				 int digestsize, void *istate, void *ostate)
+ {
+-	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
+-
+-	switch (ds) {
++	__be32 *istate32 = istate, *ostate32 = ostate;
++	__be64 *istate64 = istate, *ostate64 = ostate;
++	union {
++		struct hmac_sha1_key sha1;
++		struct hmac_sha224_key sha224;
++		struct hmac_sha256_key sha256;
++		struct hmac_sha384_key sha384;
++		struct hmac_sha512_key sha512;
++	} k;
++
++	switch (digestsize) {
+ 	case SHA1_DIGEST_SIZE:
+-		base_hash = crypto_alloc_shash("sha1", 0, 0);
++		hmac_sha1_preparekey(&k.sha1, raw_key, raw_key_len);
++		for (int i = 0; i < ARRAY_SIZE(k.sha1.istate.h); i++) {
++			istate32[i] = cpu_to_be32(k.sha1.istate.h[i]);
++			ostate32[i] = cpu_to_be32(k.sha1.ostate.h[i]);
++		}
+ 		break;
+ 	case SHA224_DIGEST_SIZE:
+-		base_hash = crypto_alloc_shash("sha224", 0, 0);
++		hmac_sha224_preparekey(&k.sha224, raw_key, raw_key_len);
++		for (int i = 0; i < ARRAY_SIZE(k.sha224.key.istate.h); i++) {
++			istate32[i] = cpu_to_be32(k.sha224.key.istate.h[i]);
++			ostate32[i] = cpu_to_be32(k.sha224.key.ostate.h[i]);
++		}
+ 		break;
+ 	case SHA256_DIGEST_SIZE:
+-		base_hash = crypto_alloc_shash("sha256", 0, 0);
++		hmac_sha256_preparekey(&k.sha256, raw_key, raw_key_len);
++		for (int i = 0; i < ARRAY_SIZE(k.sha256.key.istate.h); i++) {
++			istate32[i] = cpu_to_be32(k.sha256.key.istate.h[i]);
++			ostate32[i] = cpu_to_be32(k.sha256.key.ostate.h[i]);
++		}
+ 		break;
+ 	case SHA384_DIGEST_SIZE:
+-		base_hash = crypto_alloc_shash("sha384", 0, 0);
++		hmac_sha384_preparekey(&k.sha384, raw_key, raw_key_len);
++		for (int i = 0; i < ARRAY_SIZE(k.sha384.key.istate.h); i++) {
++			istate64[i] = cpu_to_be64(k.sha384.key.istate.h[i]);
++			ostate64[i] = cpu_to_be64(k.sha384.key.ostate.h[i]);
++		}
+ 		break;
+ 	case SHA512_DIGEST_SIZE:
+-		base_hash = crypto_alloc_shash("sha512", 0, 0);
++		hmac_sha512_preparekey(&k.sha512, raw_key, raw_key_len);
++		for (int i = 0; i < ARRAY_SIZE(k.sha512.key.istate.h); i++) {
++			istate64[i] = cpu_to_be64(k.sha512.key.istate.h[i]);
++			ostate64[i] = cpu_to_be64(k.sha512.key.ostate.h[i]);
++		}
+ 		break;
++	default:
++		return -EINVAL;
+ 	}
+-
+-	return base_hash;
 -}
 -
- static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
- 				  struct qat_alg_aead_ctx *ctx,
- 				  const u8 *auth_key,
- 				  unsigned int auth_keylen)
- {
--	SHASH_DESC_ON_STACK(shash, ctx->hash_tfm);
--	int block_size = crypto_shash_blocksize(ctx->hash_tfm);
--	int digest_size = crypto_shash_digestsize(ctx->hash_tfm);
--	__be32 *hash_state_out;
--	__be64 *hash512_state_out;
--	int i, offset;
+-static int chcr_compute_partial_hash(struct shash_desc *desc,
+-				     char *iopad, char *result_hash,
+-				     int digest_size)
+-{
+-	struct sha1_state sha1_st;
+-	struct sha256_state sha256_st;
+-	struct sha512_state sha512_st;
+-	int error;
 -
--	memset(ctx->ipad, 0, block_size);
--	memset(ctx->opad, 0, block_size);
--	shash->tfm = ctx->hash_tfm;
+-	if (digest_size == SHA1_DIGEST_SIZE) {
+-		error = crypto_shash_init(desc) ?:
+-			crypto_shash_update(desc, iopad, SHA1_BLOCK_SIZE) ?:
+-			crypto_shash_export_core(desc, &sha1_st);
+-		memcpy(result_hash, sha1_st.state, SHA1_DIGEST_SIZE);
+-	} else if (digest_size == SHA224_DIGEST_SIZE) {
+-		error = crypto_shash_init(desc) ?:
+-			crypto_shash_update(desc, iopad, SHA256_BLOCK_SIZE) ?:
+-			crypto_shash_export_core(desc, &sha256_st);
+-		memcpy(result_hash, sha256_st.state, SHA256_DIGEST_SIZE);
 -
--	if (auth_keylen > block_size) {
--		int ret = crypto_shash_digest(shash, auth_key,
--					      auth_keylen, ctx->ipad);
--		if (ret)
--			return ret;
+-	} else if (digest_size == SHA256_DIGEST_SIZE) {
+-		error = crypto_shash_init(desc) ?:
+-			crypto_shash_update(desc, iopad, SHA256_BLOCK_SIZE) ?:
+-			crypto_shash_export_core(desc, &sha256_st);
+-		memcpy(result_hash, sha256_st.state, SHA256_DIGEST_SIZE);
 -
--		memcpy(ctx->opad, ctx->ipad, digest_size);
+-	} else if (digest_size == SHA384_DIGEST_SIZE) {
+-		error = crypto_shash_init(desc) ?:
+-			crypto_shash_update(desc, iopad, SHA512_BLOCK_SIZE) ?:
+-			crypto_shash_export_core(desc, &sha512_st);
+-		memcpy(result_hash, sha512_st.state, SHA512_DIGEST_SIZE);
+-
+-	} else if (digest_size == SHA512_DIGEST_SIZE) {
+-		error = crypto_shash_init(desc) ?:
+-			crypto_shash_update(desc, iopad, SHA512_BLOCK_SIZE) ?:
+-			crypto_shash_export_core(desc, &sha512_st);
+-		memcpy(result_hash, sha512_st.state, SHA512_DIGEST_SIZE);
 -	} else {
--		memcpy(ctx->ipad, auth_key, auth_keylen);
--		memcpy(ctx->opad, auth_key, auth_keylen);
-+	switch (ctx->qat_hash_alg) {
-+	case ICP_QAT_HW_AUTH_ALGO_SHA1: {
-+		struct hmac_sha1_key key;
-+		__be32 *istate = (__be32 *)hash->sha.state1;
-+		__be32 *ostate = (__be32 *)(hash->sha.state1 +
-+					    round_up(sizeof(key.istate.h), 8));
-+
-+		hmac_sha1_preparekey(&key, auth_key, auth_keylen);
-+		for (int i = 0; i < ARRAY_SIZE(key.istate.h); i++) {
-+			istate[i] = cpu_to_be32(key.istate.h[i]);
-+			ostate[i] = cpu_to_be32(key.ostate.h[i]);
-+		}
-+		memzero_explicit(&key, sizeof(key));
-+		return 0;
- 	}
+-		error = -EINVAL;
+-		pr_err("Unknown digest size %d\n", digest_size);
+-	}
+-	return error;
+-}
 -
--	for (i = 0; i < block_size; i++) {
--		char *ipad_ptr = ctx->ipad + i;
--		char *opad_ptr = ctx->opad + i;
--		*ipad_ptr ^= HMAC_IPAD_VALUE;
--		*opad_ptr ^= HMAC_OPAD_VALUE;
-+	case ICP_QAT_HW_AUTH_ALGO_SHA256: {
-+		struct hmac_sha256_key key;
-+		__be32 *istate = (__be32 *)hash->sha.state1;
-+		__be32 *ostate = (__be32 *)(hash->sha.state1 +
-+					    sizeof(key.key.istate.h));
-+
-+		hmac_sha256_preparekey(&key, auth_key, auth_keylen);
-+		for (int i = 0; i < ARRAY_SIZE(key.key.istate.h); i++) {
-+			istate[i] = cpu_to_be32(key.key.istate.h[i]);
-+			ostate[i] = cpu_to_be32(key.key.ostate.h[i]);
-+		}
-+		memzero_explicit(&key, sizeof(key));
-+		return 0;
- 	}
+-static void chcr_change_order(char *buf, int ds)
+-{
+-	int i;
 -
--	if (crypto_shash_init(shash))
--		return -EFAULT;
--
--	if (crypto_shash_update(shash, ctx->ipad, block_size))
--		return -EFAULT;
--
--	hash_state_out = (__be32 *)hash->sha.state1;
--	hash512_state_out = (__be64 *)hash_state_out;
--
--	switch (ctx->qat_hash_alg) {
--	case ICP_QAT_HW_AUTH_ALGO_SHA1:
--		if (crypto_shash_export_core(shash, &ctx->sha1))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
--			*hash_state_out = cpu_to_be32(ctx->sha1.state[i]);
--		break;
--	case ICP_QAT_HW_AUTH_ALGO_SHA256:
--		if (crypto_shash_export_core(shash, &ctx->sha256))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
--			*hash_state_out = cpu_to_be32(ctx->sha256.state[i]);
--		break;
--	case ICP_QAT_HW_AUTH_ALGO_SHA512:
--		if (crypto_shash_export_core(shash, &ctx->sha512))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 3; i++, hash512_state_out++)
--			*hash512_state_out = cpu_to_be64(ctx->sha512.state[i]);
--		break;
--	default:
--		return -EFAULT;
-+	case ICP_QAT_HW_AUTH_ALGO_SHA512: {
-+		struct hmac_sha512_key key;
-+		__be64 *istate = (__be64 *)hash->sha.state1;
-+		__be64 *ostate = (__be64 *)(hash->sha.state1 +
-+					    sizeof(key.key.istate.h));
-+
-+		hmac_sha512_preparekey(&key, auth_key, auth_keylen);
-+		for (int i = 0; i < ARRAY_SIZE(key.key.istate.h); i++) {
-+			istate[i] = cpu_to_be64(key.key.istate.h[i]);
-+			ostate[i] = cpu_to_be64(key.key.ostate.h[i]);
-+		}
-+		memzero_explicit(&key, sizeof(key));
-+		return 0;
- 	}
--
--	if (crypto_shash_init(shash))
--		return -EFAULT;
--
--	if (crypto_shash_update(shash, ctx->opad, block_size))
--		return -EFAULT;
--
--	offset = round_up(qat_get_inter_state_size(ctx->qat_hash_alg), 8);
--	if (offset < 0)
--		return -EFAULT;
--
--	hash_state_out = (__be32 *)(hash->sha.state1 + offset);
--	hash512_state_out = (__be64 *)hash_state_out;
--
--	switch (ctx->qat_hash_alg) {
--	case ICP_QAT_HW_AUTH_ALGO_SHA1:
--		if (crypto_shash_export_core(shash, &ctx->sha1))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
--			*hash_state_out = cpu_to_be32(ctx->sha1.state[i]);
--		break;
--	case ICP_QAT_HW_AUTH_ALGO_SHA256:
--		if (crypto_shash_export_core(shash, &ctx->sha256))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
--			*hash_state_out = cpu_to_be32(ctx->sha256.state[i]);
--		break;
--	case ICP_QAT_HW_AUTH_ALGO_SHA512:
--		if (crypto_shash_export_core(shash, &ctx->sha512))
--			return -EFAULT;
--		for (i = 0; i < digest_size >> 3; i++, hash512_state_out++)
--			*hash512_state_out = cpu_to_be64(ctx->sha512.state[i]);
--		break;
- 	default:
- 		return -EFAULT;
- 	}
--	memzero_explicit(ctx->ipad, block_size);
--	memzero_explicit(ctx->opad, block_size);
--	return 0;
+-	if (ds == SHA512_DIGEST_SIZE) {
+-		for (i = 0; i < (ds / sizeof(u64)); i++)
+-			*((__be64 *)buf + i) =
+-				cpu_to_be64(*((u64 *)buf + i));
+-	} else {
+-		for (i = 0; i < (ds / sizeof(u32)); i++)
+-			*((__be32 *)buf + i) =
+-				cpu_to_be32(*((u32 *)buf + i));
+-	}
++	memzero_explicit(&k, sizeof(k));
++	return 0;
  }
  
- static void qat_alg_init_common_hdr(struct icp_qat_fw_comn_req_hdr *header)
+ static inline int is_hmac(struct crypto_tfm *tfm)
  {
- 	header->hdr_flags =
-@@ -257,11 +181,11 @@ static int qat_alg_aead_init_enc_session(struct crypto_aead *aead_tfm,
- 	memcpy(cipher->aes.key, keys->enckey, keys->enckeylen);
- 	hash->sha.inner_setup.auth_config.config =
- 		ICP_QAT_HW_AUTH_CONFIG_BUILD(ICP_QAT_HW_AUTH_MODE1,
- 					     ctx->qat_hash_alg, digestsize);
- 	hash->sha.inner_setup.auth_counter.counter =
--		cpu_to_be32(crypto_shash_blocksize(ctx->hash_tfm));
-+		cpu_to_be32(ctx->hash_blocksize);
- 
- 	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen))
- 		return -EFAULT;
- 
- 	/* Request setup */
-@@ -324,11 +248,11 @@ static int qat_alg_aead_init_dec_session(struct crypto_aead *aead_tfm,
- 	struct qat_dec *dec_ctx = &ctx->dec_cd->qat_dec_cd;
- 	struct icp_qat_hw_auth_algo_blk *hash = &dec_ctx->hash;
- 	struct icp_qat_hw_cipher_algo_blk *cipher =
- 		(struct icp_qat_hw_cipher_algo_blk *)((char *)dec_ctx +
- 		sizeof(struct icp_qat_hw_auth_setup) +
--		roundup(crypto_shash_digestsize(ctx->hash_tfm), 8) * 2);
-+		roundup(ctx->hash_digestsize, 8) * 2);
- 	struct icp_qat_fw_la_bulk_req *req_tmpl = &ctx->dec_fw_req;
- 	struct icp_qat_fw_comn_req_hdr_cd_pars *cd_pars = &req_tmpl->cd_pars;
- 	struct icp_qat_fw_comn_req_hdr *header = &req_tmpl->comn_hdr;
- 	void *ptr = &req_tmpl->cd_ctrl;
- 	struct icp_qat_fw_cipher_cd_ctrl_hdr *cipher_cd_ctrl = ptr;
-@@ -344,11 +268,11 @@ static int qat_alg_aead_init_dec_session(struct crypto_aead *aead_tfm,
- 	hash->sha.inner_setup.auth_config.config =
- 		ICP_QAT_HW_AUTH_CONFIG_BUILD(ICP_QAT_HW_AUTH_MODE1,
- 					     ctx->qat_hash_alg,
- 					     digestsize);
- 	hash->sha.inner_setup.auth_counter.counter =
--		cpu_to_be32(crypto_shash_blocksize(ctx->hash_tfm));
-+		cpu_to_be32(ctx->hash_blocksize);
- 
- 	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen))
- 		return -EFAULT;
- 
- 	/* Request setup */
-@@ -366,11 +290,11 @@ static int qat_alg_aead_init_dec_session(struct crypto_aead *aead_tfm,
- 	/* Cipher CD config setup */
- 	cipher_cd_ctrl->cipher_key_sz = keys->enckeylen >> 3;
- 	cipher_cd_ctrl->cipher_state_sz = AES_BLOCK_SIZE >> 3;
- 	cipher_cd_ctrl->cipher_cfg_offset =
- 		(sizeof(struct icp_qat_hw_auth_setup) +
--		 roundup(crypto_shash_digestsize(ctx->hash_tfm), 8) * 2) >> 3;
-+		 roundup(ctx->hash_digestsize, 8) * 2) >> 3;
- 	ICP_QAT_FW_COMN_CURR_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_CIPHER);
- 	ICP_QAT_FW_COMN_NEXT_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_DRAM_WR);
- 
- 	/* Auth CD config setup */
- 	hash_cd_ctrl->hash_cfg_offset = 0;
-@@ -1148,46 +1072,47 @@ static int qat_alg_skcipher_xts_decrypt(struct skcipher_request *req)
- 
- 	return qat_alg_skcipher_decrypt(req);
- }
- 
- static int qat_alg_aead_init(struct crypto_aead *tfm,
--			     enum icp_qat_hw_auth_algo hash,
--			     const char *hash_name)
-+			     enum icp_qat_hw_auth_algo hash_alg,
-+			     unsigned int hash_digestsize,
-+			     unsigned int hash_blocksize)
- {
- 	struct qat_alg_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 
--	ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
--	if (IS_ERR(ctx->hash_tfm))
--		return PTR_ERR(ctx->hash_tfm);
--	ctx->qat_hash_alg = hash;
-+	ctx->qat_hash_alg = hash_alg;
-+	ctx->hash_digestsize = hash_digestsize;
-+	ctx->hash_blocksize = hash_blocksize;
- 	crypto_aead_set_reqsize(tfm, sizeof(struct qat_crypto_request));
+ 	struct crypto_alg *alg = tfm->__crt_alg;
+@@ -1545,15 +1516,10 @@ static int get_alg_config(struct algo_param *params,
+ 		return -EINVAL;
+ 	}
  	return 0;
  }
  
- static int qat_alg_aead_sha1_init(struct crypto_aead *tfm)
- {
--	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA1, "sha1");
-+	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA1,
-+				 SHA1_DIGEST_SIZE, SHA1_BLOCK_SIZE);
- }
- 
- static int qat_alg_aead_sha256_init(struct crypto_aead *tfm)
- {
--	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA256, "sha256");
-+	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA256,
-+				 SHA256_DIGEST_SIZE, SHA256_BLOCK_SIZE);
- }
- 
- static int qat_alg_aead_sha512_init(struct crypto_aead *tfm)
- {
--	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA512, "sha512");
-+	return qat_alg_aead_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA512,
-+				 SHA512_DIGEST_SIZE, SHA512_BLOCK_SIZE);
- }
- 
- static void qat_alg_aead_exit(struct crypto_aead *tfm)
- {
- 	struct qat_alg_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct qat_crypto_instance *inst = ctx->inst;
- 	struct device *dev;
- 
--	crypto_free_shash(ctx->hash_tfm);
+-static inline void chcr_free_shash(struct crypto_shash *base_hash)
+-{
+-		crypto_free_shash(base_hash);
+-}
 -
- 	if (!inst)
- 		return;
+ /**
+  *	create_hash_wr - Create hash work request
+  *	@req: Cipher req base
+  *	@param: Container for create_hash_wr()'s parameters
+  */
+@@ -2200,57 +2166,17 @@ static int chcr_ahash_import(struct ahash_request *areq, const void *in)
  
- 	dev = &GET_DEV(inst->accel_dev);
- 	if (ctx->enc_cd) {
+ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 			     unsigned int keylen)
+ {
+ 	struct hmac_ctx *hmacctx = HMAC_CTX(h_ctx(tfm));
+-	unsigned int digestsize = crypto_ahash_digestsize(tfm);
+-	unsigned int bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
+-	unsigned int i, err = 0, updated_digestsize;
+-
+-	SHASH_DESC_ON_STACK(shash, hmacctx->base_hash);
+ 
+ 	/* use the key to calculate the ipad and opad. ipad will sent with the
+ 	 * first request's data. opad will be sent with the final hash result
+ 	 * ipad in hmacctx->ipad and opad in hmacctx->opad location
+ 	 */
+-	shash->tfm = hmacctx->base_hash;
+-	if (keylen > bs) {
+-		err = crypto_shash_digest(shash, key, keylen,
+-					  hmacctx->ipad);
+-		if (err)
+-			goto out;
+-		keylen = digestsize;
+-	} else {
+-		memcpy(hmacctx->ipad, key, keylen);
+-	}
+-	memset(hmacctx->ipad + keylen, 0, bs - keylen);
+-	unsafe_memcpy(hmacctx->opad, hmacctx->ipad, bs,
+-		      "fortified memcpy causes -Wrestrict warning");
+-
+-	for (i = 0; i < bs / sizeof(int); i++) {
+-		*((unsigned int *)(&hmacctx->ipad) + i) ^= IPAD_DATA;
+-		*((unsigned int *)(&hmacctx->opad) + i) ^= OPAD_DATA;
+-	}
+-
+-	updated_digestsize = digestsize;
+-	if (digestsize == SHA224_DIGEST_SIZE)
+-		updated_digestsize = SHA256_DIGEST_SIZE;
+-	else if (digestsize == SHA384_DIGEST_SIZE)
+-		updated_digestsize = SHA512_DIGEST_SIZE;
+-	err = chcr_compute_partial_hash(shash, hmacctx->ipad,
+-					hmacctx->ipad, digestsize);
+-	if (err)
+-		goto out;
+-	chcr_change_order(hmacctx->ipad, updated_digestsize);
+-
+-	err = chcr_compute_partial_hash(shash, hmacctx->opad,
+-					hmacctx->opad, digestsize);
+-	if (err)
+-		goto out;
+-	chcr_change_order(hmacctx->opad, updated_digestsize);
+-out:
+-	return err;
++	return chcr_prepare_hmac_key(key, keylen, crypto_ahash_digestsize(tfm),
++				     hmacctx->ipad, hmacctx->opad);
+ }
+ 
+ static int chcr_aes_xts_setkey(struct crypto_skcipher *cipher, const u8 *key,
+ 			       unsigned int key_len)
+ {
+@@ -2342,34 +2268,15 @@ static int chcr_hmac_init(struct ahash_request *areq)
+ 	return 0;
+ }
+ 
+ static int chcr_hmac_cra_init(struct crypto_tfm *tfm)
+ {
+-	struct chcr_context *ctx = crypto_tfm_ctx(tfm);
+-	struct hmac_ctx *hmacctx = HMAC_CTX(ctx);
+-	unsigned int digestsize =
+-		crypto_ahash_digestsize(__crypto_ahash_cast(tfm));
+-
+ 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+ 				 sizeof(struct chcr_ahash_req_ctx));
+-	hmacctx->base_hash = chcr_alloc_shash(digestsize);
+-	if (IS_ERR(hmacctx->base_hash))
+-		return PTR_ERR(hmacctx->base_hash);
+ 	return chcr_device_init(crypto_tfm_ctx(tfm));
+ }
+ 
+-static void chcr_hmac_cra_exit(struct crypto_tfm *tfm)
+-{
+-	struct chcr_context *ctx = crypto_tfm_ctx(tfm);
+-	struct hmac_ctx *hmacctx = HMAC_CTX(ctx);
+-
+-	if (hmacctx->base_hash) {
+-		chcr_free_shash(hmacctx->base_hash);
+-		hmacctx->base_hash = NULL;
+-	}
+-}
+-
+ inline void chcr_aead_common_exit(struct aead_request *req)
+ {
+ 	struct chcr_aead_reqctx *reqctx = aead_request_ctx_dma(req);
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct uld_ctx *u_ctx = ULD_CTX(a_ctx(tfm));
+@@ -3555,19 +3462,16 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ {
+ 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(a_ctx(authenc));
+ 	struct chcr_authenc_ctx *actx = AUTHENC_CTX(aeadctx);
+ 	/* it contains auth and cipher key both*/
+ 	struct crypto_authenc_keys keys;
+-	unsigned int bs, subtype;
++	unsigned int subtype;
+ 	unsigned int max_authsize = crypto_aead_alg(authenc)->maxauthsize;
+-	int err = 0, i, key_ctx_len = 0;
++	int err = 0, key_ctx_len = 0;
+ 	unsigned char ck_size = 0;
+-	unsigned char pad[CHCR_HASH_MAX_BLOCK_SIZE_128] = { 0 };
+-	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
+ 	struct algo_param param;
+ 	int align;
+-	u8 *o_ptr = NULL;
+ 
+ 	crypto_aead_clear_flags(aeadctx->sw_cipher, CRYPTO_TFM_REQ_MASK);
+ 	crypto_aead_set_flags(aeadctx->sw_cipher, crypto_aead_get_flags(authenc)
+ 			      & CRYPTO_TFM_REQ_MASK);
+ 	err = crypto_aead_setkey(aeadctx->sw_cipher, key, keylen);
+@@ -3611,72 +3515,30 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ 		subtype == CRYPTO_ALG_SUB_TYPE_CBC_NULL) {
+ 
+ 		get_aes_decrypt_key(actx->dec_rrkey, aeadctx->key,
+ 			    aeadctx->enckey_len << 3);
+ 	}
+-	base_hash  = chcr_alloc_shash(max_authsize);
+-	if (IS_ERR(base_hash)) {
+-		pr_err("Base driver cannot be loaded\n");
++
++	align = KEYCTX_ALIGN_PAD(max_authsize);
++	err = chcr_prepare_hmac_key(keys.authkey, keys.authkeylen, max_authsize,
++				    actx->h_iopad,
++				    actx->h_iopad + param.result_size + align);
++	if (err)
+ 		goto out;
+-	}
+-	{
+-		SHASH_DESC_ON_STACK(shash, base_hash);
+-
+-		shash->tfm = base_hash;
+-		bs = crypto_shash_blocksize(base_hash);
+-		align = KEYCTX_ALIGN_PAD(max_authsize);
+-		o_ptr =  actx->h_iopad + param.result_size + align;
+-
+-		if (keys.authkeylen > bs) {
+-			err = crypto_shash_digest(shash, keys.authkey,
+-						  keys.authkeylen,
+-						  o_ptr);
+-			if (err) {
+-				pr_err("Base driver cannot be loaded\n");
+-				goto out;
+-			}
+-			keys.authkeylen = max_authsize;
+-		} else
+-			memcpy(o_ptr, keys.authkey, keys.authkeylen);
+-
+-		/* Compute the ipad-digest*/
+-		memset(pad + keys.authkeylen, 0, bs - keys.authkeylen);
+-		memcpy(pad, o_ptr, keys.authkeylen);
+-		for (i = 0; i < bs >> 2; i++)
+-			*((unsigned int *)pad + i) ^= IPAD_DATA;
+-
+-		if (chcr_compute_partial_hash(shash, pad, actx->h_iopad,
+-					      max_authsize))
+-			goto out;
+-		/* Compute the opad-digest */
+-		memset(pad + keys.authkeylen, 0, bs - keys.authkeylen);
+-		memcpy(pad, o_ptr, keys.authkeylen);
+-		for (i = 0; i < bs >> 2; i++)
+-			*((unsigned int *)pad + i) ^= OPAD_DATA;
+ 
+-		if (chcr_compute_partial_hash(shash, pad, o_ptr, max_authsize))
+-			goto out;
++	key_ctx_len = sizeof(struct _key_ctx) + roundup(keys.enckeylen, 16) +
++		      (param.result_size + align) * 2;
++	aeadctx->key_ctx_hdr = FILL_KEY_CTX_HDR(ck_size, param.mk_size, 0, 1,
++						key_ctx_len >> 4);
++	actx->auth_mode = param.auth_mode;
++
++	memzero_explicit(&keys, sizeof(keys));
++	return 0;
+ 
+-		/* convert the ipad and opad digest to network order */
+-		chcr_change_order(actx->h_iopad, param.result_size);
+-		chcr_change_order(o_ptr, param.result_size);
+-		key_ctx_len = sizeof(struct _key_ctx) +
+-			roundup(keys.enckeylen, 16) +
+-			(param.result_size + align) * 2;
+-		aeadctx->key_ctx_hdr = FILL_KEY_CTX_HDR(ck_size, param.mk_size,
+-						0, 1, key_ctx_len >> 4);
+-		actx->auth_mode = param.auth_mode;
+-		chcr_free_shash(base_hash);
+-
+-		memzero_explicit(&keys, sizeof(keys));
+-		return 0;
+-	}
+ out:
+ 	aeadctx->enckey_len = 0;
+ 	memzero_explicit(&keys, sizeof(keys));
+-	if (!IS_ERR(base_hash))
+-		chcr_free_shash(base_hash);
+ 	return -EINVAL;
+ }
+ 
+ static int chcr_aead_digest_null_setkey(struct crypto_aead *authenc,
+ 					const u8 *key, unsigned int keylen)
+@@ -4488,11 +4350,10 @@ static int chcr_register_alg(void)
+ 			a_hash->halg.base.cra_alignmask = 0;
+ 			a_hash->halg.base.cra_exit = NULL;
+ 
+ 			if (driver_algs[i].type == CRYPTO_ALG_TYPE_HMAC) {
+ 				a_hash->halg.base.cra_init = chcr_hmac_cra_init;
+-				a_hash->halg.base.cra_exit = chcr_hmac_cra_exit;
+ 				a_hash->init = chcr_hmac_init;
+ 				a_hash->setkey = chcr_ahash_setkey;
+ 				a_hash->halg.base.cra_ctxsize = SZ_AHASH_H_CTX;
+ 			} else {
+ 				a_hash->init = chcr_sha_init;
+diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
+index 1d693b8436e6f..e1e79e5f01e75 100644
+--- a/drivers/crypto/chelsio/chcr_crypto.h
++++ b/drivers/crypto/chelsio/chcr_crypto.h
+@@ -239,11 +239,10 @@ struct chcr_aead_ctx {
+ 	u16 mayverify;
+ 	struct	__aead_ctx ctx[];
+ };
+ 
+ struct hmac_ctx {
+-	struct crypto_shash *base_hash;
+ 	u8 ipad[CHCR_HASH_MAX_BLOCK_SIZE_128];
+ 	u8 opad[CHCR_HASH_MAX_BLOCK_SIZE_128];
+ };
+ 
+ struct __crypto_ctx {
 
 base-commit: 41eab2a95950682cdc9c5e60cb3457e29f186540
 -- 
