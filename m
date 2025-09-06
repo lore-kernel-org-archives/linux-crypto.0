@@ -1,649 +1,502 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39B929A2;
-	Sat,  6 Sep 2025 04:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AFF2C0F60
+	for <linux-crypto@vger.kernel.org>; Sat,  6 Sep 2025 06:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757131291; cv=none; b=mSgXYkt9lw1TWXOuGq3hGW2+fGGc7ITuXGe/7Q9xhSBypUHQvjc48Y8V0h5NCpNB6jB6gnHaoumJnEJ70arrn4NM0xuzr1mJFV3Su+dkBSk3t7zqp8vLNbKjkMJB38T/qAyb/0rfR5KVdo0wy7VGxpWp6pCxSAmhpNMKORPH2rM=
+	t=1757141826; cv=none; b=kFNUfXrQwPabYVa7Y9agbkGZ97qOnlsrm0ozwXnwspAG6IS52wlq3qtj8nLhS7Nn5gOLApix9ZPCC1e9UniWrrMS0LyOxk416j7lBNnvga8mvtd+nvg0GzL2F4MwL5V4tMg5Fa3T0FUkl0+jWFC9m5XUAhoQ6YfUr7QUVoEe4mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757131291; c=relaxed/simple;
-	bh=xwekRgQSywTMnK1CtYUK8taqbmueVBFI5LjESUWHNC4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ES8d0GHGGhYQl9op9MzycVgtw9vL9c0mAqYwuw6r3hrRRQ8AzJ/goV6N2uvs2zidiGETLXxMREJOF+cmY1Kn5+jDaRj5DjkXjkh79mjsETqxreBTocUXGhbi/0QIcycf47KfH76oj77bASkR1eQav8sNTcSaxUzjH0rtKQZJ61k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tgjULxB1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757141826; c=relaxed/simple;
+	bh=H4cboKSHmECFnU5K4/gQjk7rcYgLqRH4rpzK17nUKB4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hf6Yehs0mP1doOKgxM2H3b7yGGDZH60Hpky3mYsucVkgsh00vz6+8MwyF7o8ww9oth4GJlUdHHA8RIwjlvaEI44f4ixJOzbF+ih9/quTB+/E681M/wAG06IR2aZRwIUgi3sL42yp9dIcfWmNbbg/AJrTaRQUtrP3Mb8Kism7eJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XZrKF99G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tgjULxB1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4897C4CEE7;
-	Sat,  6 Sep 2025 04:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757131291;
-	bh=xwekRgQSywTMnK1CtYUK8taqbmueVBFI5LjESUWHNC4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tgjULxB13JNObZim5olsnXfFi7t2BTGPBtEw4JQo9FUrLedDfJOBwzwR1Ivo6uPhr
-	 sInMBCGAaXPgOnXHVitMJ37rW207TVjIiqtM5yGKqylAvULDmgMoNmVUU/uRS8qwvf
-	 RvcoO54fnXWHwZRFGoxzL2GZCbmp7nI9PDbNIuJUL9ugGBZnDaq+75XMbGBa4wR59s
-	 ETVD/7g3bNQWTGbYdYAn+ukRkSzWdCqJNrbbGb5GysU/p3aevHMNukF7dtRteHG0Mx
-	 FLuJwPJjmoaXtCFW6fH6mQqBLGSVZ1Pt1jLHpm2yKd32sq92pcm8g6aGzHY2QEeLp/
-	 BKWJEbsyO02NA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-fscrypt@vger.kernel.org
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Hannes Reinecke <hare@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] fscrypt: use HMAC-SHA512 library for HKDF
-Date: Fri,  5 Sep 2025 20:59:13 -0700
-Message-ID: <20250906035913.1141532-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZrKF99G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757141822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Vne0EVwrnVHw6NJLJyd+zZpE6+oJG9x8TCUx1n8W1nw=;
+	b=XZrKF99GR2ORuvxthwEW6Te6I+RhSBG9EHHS5WwDFEcQq8J5QRB4kwTnzrOkXA9o+xUypv
+	u7dNGFdkieAhqh2eP6izMCtqALK+LgiMQJFrHALnnsPoDSUUcmVi4d9cRhIGkHfK2BCwvU
+	JsVu5NwtKFMWr2k85iws3GSeqEr90kI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-1mFt3lifOsqiXc5aP4H5oA-1; Sat, 06 Sep 2025 02:56:59 -0400
+X-MC-Unique: 1mFt3lifOsqiXc5aP4H5oA-1
+X-Mimecast-MFC-AGG-ID: 1mFt3lifOsqiXc5aP4H5oA_1757141819
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45dd5c1b67dso11069235e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Sep 2025 23:56:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757141819; x=1757746619;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vne0EVwrnVHw6NJLJyd+zZpE6+oJG9x8TCUx1n8W1nw=;
+        b=nbBR4ce4bUinRla6ix1BNImzL6DRysKRcrAbaNpF0uCteyW1ZDIi4mgzXouBEM9kf6
+         lki+gI2J39Uu4b34rCvlswUhg5IH3w1pd3tfqqhxvv0tHfunePdvkk//KqAiRwmsY9FU
+         bnrHy8n5tr+9IF3rMN5O0fe8kbmazYqH30q0rpNcnotVrtzdUrE7u+WxUKLM0N2pZNyD
+         ccLWB1iskUVpgdY3HtLh+IkYHzJF2JAo2vYmOO8CMNNDOuEJ8UlsuUZsZh4/58CmfwkH
+         6hpAPPGia2qbJjwnJLgSwYYeqeV6nwNSZV5fKO6vo7DOwVRPvjdpAFCB0WTPjksg8F9x
+         Ke+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUCAYpTea4+qSDm4+Y+OuT3zPgXkXxW3mXCVLctplv+8ucmeexhQP5W9dNmCgvvf8p84bRxli24e4DUCiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXuHp1FcFVCCXoXSfAxGOcFYEpZRxqBecAcTWFr7hyyIsHWK3j
+	KUBOkBU6alDELbuG3fFnGGGYtu40EjQsN6QqGYi9+uvfD9Xoj2F1GPCWFd+xzVHQHkzrPh2AI8J
+	uDxsTCy3ZNaSNb/QM1O2YcXOioL1YtuHnO4Ubw32M+i/bcpjRcO7FN/x3E+6P/B2rwA==
+X-Gm-Gg: ASbGncsq497vIjT13Q6yWCc9jd+E6gYzh2nF4v8e0dAUYY5tDGCDnmOdp10Qq9sq3x/
+	3DziWCP4xatD4mTcnAHvf+fKI0vzrbbgRlxz5QirsmnnhzYvRnI1oIu66iWckTXX+0acO7GVihP
+	klVrU7Ac76brGCD/CwUXxBten5IE8JDXuma1DJiAm+LSUtbNdE20v3hNbnIuGhBMMSlB76vBlRH
+	g1QjMJN9a2OhJeEcjW/mM4VQk5F8VBil1WlG026m3VANIJ13KtIdGW7/GtCuclyfMeu8megPJ0f
+	k09eottco01uoJPDXjyFzV6+/zSaXNXGGIuUxn9w3IG4JLwNK4ysVTafoRHGdKliVj0lfgZQFvf
+	X1U9mxZtzS+7X1c6Ahr5YFcXfW4/DMvKj/CR5a/Y3yZWj62K2G2f6ioEnizfxozegMzM=
+X-Received: by 2002:a05:6000:4406:b0:3e7:404f:6b9 with SMTP id ffacd0b85a97d-3e7404f0ad9mr25507f8f.24.1757141818663;
+        Fri, 05 Sep 2025 23:56:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTOe1nfTlzU6tKtOOERnuEGL0krwza2F9vwEf5QifLuwYgeR9BVKfnULAEyM/P+fsTi5oZpw==
+X-Received: by 2002:a05:6000:4406:b0:3e7:404f:6b9 with SMTP id ffacd0b85a97d-3e7404f0ad9mr25486f8f.24.1757141818148;
+        Fri, 05 Sep 2025 23:56:58 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f30:de00:8132:f6dc:cba2:9134? (p200300d82f30de008132f6dccba29134.dip0.t-ipconnect.de. [2003:d8:2f30:de00:8132:f6dc:cba2:9134])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3df4fd372ccsm11959114f8f.32.2025.09.05.23.56.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Sep 2025 23:56:53 -0700 (PDT)
+Message-ID: <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
+Date: Sat, 6 Sep 2025 08:56:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+To: John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, kasan-dev@googlegroups.com,
+ kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-For the HKDF-SHA512 key derivation needed by fscrypt, just use the
-HMAC-SHA512 library functions directly.  These functions were introduced
-in v6.17, and they provide simple and efficient direct support for
-HMAC-SHA512.  This ends up being quite a bit simpler and more efficient
-than using crypto/hkdf.c, as it avoids the generic crypto layer:
+On 06.09.25 03:05, John Hubbard wrote:
+> On 9/1/25 8:03 AM, David Hildenbrand wrote:
+>> We can just cleanup the code by calculating the #refs earlier,
+>> so we can just inline what remains of record_subpages().
+>>
+>> Calculate the number of references/pages ahead of times, and record them
+>> only once all our tests passed.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>   mm/gup.c | 25 ++++++++-----------------
+>>   1 file changed, 8 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index c10cd969c1a3b..f0f4d1a68e094 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>> @@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
+>>   #ifdef CONFIG_MMU
+>>   
+>>   #ifdef CONFIG_HAVE_GUP_FAST
+>> -static int record_subpages(struct page *page, unsigned long sz,
+>> -			   unsigned long addr, unsigned long end,
+>> -			   struct page **pages)
+>> -{
+>> -	int nr;
+>> -
+>> -	page += (addr & (sz - 1)) >> PAGE_SHIFT;
+>> -	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+>> -		pages[nr] = page++;
+>> -
+>> -	return nr;
+>> -}
+>> -
+>>   /**
+>>    * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
+>>    * @page:  pointer to page to be grabbed
+>> @@ -2967,8 +2954,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>>   	if (pmd_special(orig))
+>>   		return 0;
+>>   
+>> -	page = pmd_page(orig);
+>> -	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
+>> +	refs = (end - addr) >> PAGE_SHIFT;
+>> +	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+>>   
+>>   	folio = try_grab_folio_fast(page, refs, flags);
+>>   	if (!folio)
+>> @@ -2989,6 +2976,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>>   	}
+>>   
+>>   	*nr += refs;
+>> +	for (; refs; refs--)
+>> +		*(pages++) = page++;
+>>   	folio_set_referenced(folio);
+>>   	return 1;
+>>   }
+>> @@ -3007,8 +2996,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>>   	if (pud_special(orig))
+>>   		return 0;
+>>   
+>> -	page = pud_page(orig);
+>> -	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
+>> +	refs = (end - addr) >> PAGE_SHIFT;
+>> +	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+>>   
+>>   	folio = try_grab_folio_fast(page, refs, flags);
+>>   	if (!folio)
+>> @@ -3030,6 +3019,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>>   	}
+>>   
+>>   	*nr += refs;
+>> +	for (; refs; refs--)
+>> +		*(pages++) = page++;
+> 
+> Hi David,
 
-- The HMAC library can't fail, so callers don't need to handle errors
-- No inefficient indirect calls
-- No inefficient and error-prone dynamic allocations
-- No inefficient and error-prone loading of algorithm by name
-- Less stack usage
+Hi!
 
-Benchmarks on x86_64 show that deriving a per-file key gets about 30%
-faster, and FS_IOC_ADD_ENCRYPTION_KEY gets nearly twice as fast.
+> 
+> Probably a similar sentiment as Lorenzo here...the above diffs make the code
+> *worse* to read. In fact, I recall adding record_subpages() here long ago,
+> specifically to help clarify what was going on.
 
-The only small downside is the HKDF-Expand logic gets duplicated again.
-Then again, even considering that, the new fscrypt_hkdf_expand() is only
-7 lines longer than the version that called hkdf_expand().  Later we
-could add HKDF support to lib/crypto/, but for now let's just do this.
+Well, there is a lot I dislike about record_subpages() to go back there.
+Starting with "as Willy keeps explaining, the concept of subpages do
+not exist and ending with "why do we fill out the array even on failure".
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+:)
+
+> 
+> Now it's been returned to it's original, cryptic form.
+> 
+
+The code in the caller was so uncryptic that both me and Lorenzo missed
+that magical addition. :P
+
+> Just my take on it, for whatever that's worth. :)
+
+As always, appreciated.
+
+I could of course keep the simple loop in some "record_folio_pages"
+function and clean up what I dislike about record_subpages().
+
+But I much rather want the call chain to be cleaned up instead, if possible.
+
+
+Roughly, what I am thinking (limiting it to pte+pmd case) about is the following:
+
+
+ From d6d6d21dbf435d8030782a627175e36e6c7b2dfb Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Sat, 6 Sep 2025 08:33:42 +0200
+Subject: [PATCH] tmp
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
+  mm/gup.c | 79 ++++++++++++++++++++++++++------------------------------
+  1 file changed, 36 insertions(+), 43 deletions(-)
 
-This patch is targeting fscrypt/for-next
-
- fs/crypto/Kconfig           |   5 +-
- fs/crypto/fname.c           |   1 -
- fs/crypto/fscrypt_private.h |  26 ++++-----
- fs/crypto/hkdf.c            | 109 +++++++++++++-----------------------
- fs/crypto/hooks.c           |   2 +-
- fs/crypto/keyring.c         |  30 +++-------
- fs/crypto/keysetup.c        |  65 +++++++--------------
- fs/crypto/policy.c          |   4 +-
- 8 files changed, 82 insertions(+), 160 deletions(-)
-
-diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-index b5dfb0aa405ab..464b54610fd34 100644
---- a/fs/crypto/Kconfig
-+++ b/fs/crypto/Kconfig
-@@ -1,13 +1,12 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config FS_ENCRYPTION
- 	bool "FS Encryption (Per-file encryption)"
- 	select CRYPTO
--	select CRYPTO_HASH
--	select CRYPTO_HKDF
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_SHA256
-+	select CRYPTO_LIB_SHA512
- 	select KEYS
- 	help
- 	  Enable encryption of files and directories.  This
- 	  feature is similar to ecryptfs, but it is more memory
- 	  efficient since it avoids caching the encrypted and
-@@ -30,12 +29,10 @@ config FS_ENCRYPTION_ALGS
- 	tristate
- 	select CRYPTO_AES
- 	select CRYPTO_CBC
- 	select CRYPTO_CTS
- 	select CRYPTO_ECB
--	select CRYPTO_HMAC
--	select CRYPTO_SHA512
- 	select CRYPTO_XTS
- 
- config FS_ENCRYPTION_INLINE_CRYPT
- 	bool "Enable fscrypt to use inline crypto"
- 	depends on FS_ENCRYPTION && BLK_INLINE_ENCRYPTION
-diff --git a/fs/crypto/fname.c b/fs/crypto/fname.c
-index f9f6713e144f7..5fa1eb58bb1d5 100644
---- a/fs/crypto/fname.c
-+++ b/fs/crypto/fname.c
-@@ -9,11 +9,10 @@
-  * Modified by Jaegeuk Kim, 2015.
-  *
-  * This has not yet undergone a rigorous security audit.
-  */
- 
--#include <crypto/hash.h>
- #include <crypto/sha2.h>
- #include <crypto/skcipher.h>
- #include <linux/export.h>
- #include <linux/namei.h>
- #include <linux/scatterlist.h>
-diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-index d8b485b9881c5..3a09f45887a47 100644
---- a/fs/crypto/fscrypt_private.h
-+++ b/fs/crypto/fscrypt_private.h
-@@ -9,14 +9,14 @@
-  */
- 
- #ifndef _FSCRYPT_PRIVATE_H
- #define _FSCRYPT_PRIVATE_H
- 
-+#include <crypto/sha2.h>
- #include <linux/fscrypt.h>
- #include <linux/minmax.h>
- #include <linux/siphash.h>
--#include <crypto/hash.h>
- #include <linux/blk-crypto.h>
- 
- #define CONST_STRLEN(str)	(sizeof(str) - 1)
- 
- #define FSCRYPT_FILE_NONCE_SIZE	16
-@@ -379,16 +379,12 @@ fscrypt_max_file_dun_bits(const struct super_block *sb, int du_bits)
- bool __fscrypt_fname_encrypted_size(const union fscrypt_policy *policy,
- 				    u32 orig_len, u32 max_len,
- 				    u32 *encrypted_len_ret);
- 
- /* hkdf.c */
--struct fscrypt_hkdf {
--	struct crypto_shash *hmac_tfm;
--};
+diff --git a/mm/gup.c b/mm/gup.c
+index 22420f2069ee1..98907ead749c0 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -2845,12 +2845,11 @@ static void __maybe_unused gup_fast_undo_dev_pagemap(int *nr, int nr_start,
+   * also check pmd here to make sure pmd doesn't change (corresponds to
+   * pmdp_collapse_flush() in the THP collapse code path).
+   */
+-static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+-		unsigned long end, unsigned int flags, struct page **pages,
+-		int *nr)
++static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
++		unsigned long end, unsigned int flags, struct page **pages)
+  {
+  	struct dev_pagemap *pgmap = NULL;
+-	int ret = 0;
++	unsigned long nr_pages = 0;
+  	pte_t *ptep, *ptem;
+  
+  	ptem = ptep = pte_offset_map(&pmd, addr);
+@@ -2908,24 +2907,20 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+  		 * details.
+  		 */
+  		if (flags & FOLL_PIN) {
+-			ret = arch_make_folio_accessible(folio);
+-			if (ret) {
++			if (arch_make_folio_accessible(folio)) {
+  				gup_put_folio(folio, 1, flags);
+  				goto pte_unmap;
+  			}
+  		}
+  		folio_set_referenced(folio);
+-		pages[*nr] = page;
+-		(*nr)++;
++		pages[nr_pages++] = page;
+  	} while (ptep++, addr += PAGE_SIZE, addr != end);
+  
+-	ret = 1;
 -
--int fscrypt_init_hkdf(struct fscrypt_hkdf *hkdf, const u8 *master_key,
--		      unsigned int master_key_size);
-+void fscrypt_init_hkdf(struct hmac_sha512_key *hkdf, const u8 *master_key,
-+		       unsigned int master_key_size);
- 
- /*
-  * The list of contexts in which fscrypt uses HKDF.  These values are used as
-  * the first byte of the HKDF application-specific info string to guarantee that
-  * info strings are never repeated between contexts.  This ensures that all HKDF
-@@ -403,15 +399,13 @@ int fscrypt_init_hkdf(struct fscrypt_hkdf *hkdf, const u8 *master_key,
- #define HKDF_CONTEXT_IV_INO_LBLK_32_KEY	6 /* info=mode_num||fs_uuid	*/
- #define HKDF_CONTEXT_INODE_HASH_KEY	7 /* info=<empty>		*/
- #define HKDF_CONTEXT_KEY_IDENTIFIER_FOR_HW_WRAPPED_KEY \
- 					8 /* info=<empty>		*/
- 
--int fscrypt_hkdf_expand(const struct fscrypt_hkdf *hkdf, u8 context,
--			const u8 *info, unsigned int infolen,
--			u8 *okm, unsigned int okmlen);
--
--void fscrypt_destroy_hkdf(struct fscrypt_hkdf *hkdf);
-+void fscrypt_hkdf_expand(const struct hmac_sha512_key *hkdf, u8 context,
-+			 const u8 *info, unsigned int infolen,
-+			 u8 *okm, unsigned int okmlen);
- 
- /* inline_crypt.c */
- #ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
- int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci,
- 				   bool is_hw_wrapped_key);
-@@ -515,11 +509,11 @@ struct fscrypt_master_key_secret {
- 	 * For v1 policy keys, this isn't applicable and won't be set.
- 	 * Otherwise, this KDF will be keyed by this master key if
- 	 * ->is_hw_wrapped=false, or by the "software secret" that hardware
- 	 * derived from this master key if ->is_hw_wrapped=true.
- 	 */
--	struct fscrypt_hkdf	hkdf;
-+	struct hmac_sha512_key	hkdf;
- 
- 	/*
- 	 * True if this key is a hardware-wrapped key; false if this key is a
- 	 * raw key (i.e. a "software key").  For v1 policy keys this will always
- 	 * be false, as v1 policy support is a legacy feature which doesn't
-@@ -694,11 +688,11 @@ void fscrypt_put_master_key_activeref(struct super_block *sb,
- 
- struct fscrypt_master_key *
- fscrypt_find_master_key(struct super_block *sb,
- 			const struct fscrypt_key_specifier *mk_spec);
- 
--int fscrypt_get_test_dummy_key_identifier(
-+void fscrypt_get_test_dummy_key_identifier(
- 			  u8 key_identifier[FSCRYPT_KEY_IDENTIFIER_SIZE]);
- 
- int fscrypt_add_test_dummy_key(struct super_block *sb,
- 			       struct fscrypt_key_specifier *key_spec);
- 
-@@ -730,12 +724,12 @@ void fscrypt_destroy_prepared_key(struct super_block *sb,
- 				  struct fscrypt_prepared_key *prep_key);
- 
- int fscrypt_set_per_file_enc_key(struct fscrypt_inode_info *ci,
- 				 const u8 *raw_key);
- 
--int fscrypt_derive_dirhash_key(struct fscrypt_inode_info *ci,
--			       const struct fscrypt_master_key *mk);
-+void fscrypt_derive_dirhash_key(struct fscrypt_inode_info *ci,
-+				const struct fscrypt_master_key *mk);
- 
- void fscrypt_hash_inode_number(struct fscrypt_inode_info *ci,
- 			       const struct fscrypt_master_key *mk);
- 
- int fscrypt_get_encryption_info(struct inode *inode, bool allow_unsupported);
-diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
-index b1ef506cd341d..706f56d0076ee 100644
---- a/fs/crypto/hkdf.c
-+++ b/fs/crypto/hkdf.c
-@@ -1,18 +1,18 @@
- // SPDX-License-Identifier: GPL-2.0
- /*
-+ * Implementation of HKDF ("HMAC-based Extract-and-Expand Key Derivation
-+ * Function"), aka RFC 5869.  See also the original paper (Krawczyk 2010):
-+ * "Cryptographic Extraction and Key Derivation: The HKDF Scheme".
-+ *
-  * This is used to derive keys from the fscrypt master keys (or from the
-  * "software secrets" which hardware derives from the fscrypt master keys, in
-  * the case that the fscrypt master keys are hardware-wrapped keys).
-  *
-  * Copyright 2019 Google LLC
-  */
- 
--#include <crypto/hash.h>
--#include <crypto/hkdf.h>
--#include <crypto/sha2.h>
--
- #include "fscrypt_private.h"
- 
- /*
-  * HKDF supports any unkeyed cryptographic hash algorithm, but fscrypt uses
-  * SHA-512 because it is well-established, secure, and reasonably efficient.
-@@ -22,11 +22,10 @@
-  * Also, on 64-bit CPUs, SHA-512 is usually just as fast as SHA-256.  In the
-  * common case of deriving an AES-256-XTS key (512 bits), that can result in
-  * HKDF-SHA512 being much faster than HKDF-SHA256, as the longer digest size of
-  * SHA-512 causes HKDF-Expand to only need to do one iteration rather than two.
-  */
--#define HKDF_HMAC_ALG		"hmac(sha512)"
- #define HKDF_HASHLEN		SHA512_DIGEST_SIZE
- 
- /*
-  * HKDF consists of two steps:
-  *
-@@ -42,88 +41,60 @@
-  * salt is used, since fscrypt master keys should already be pseudorandom and
-  * there's no way to persist a random salt per master key from kernel mode.
-  */
- 
- /*
-- * Compute HKDF-Extract using the given master key as the input keying material,
-- * and prepare an HMAC transform object keyed by the resulting pseudorandom key.
-- *
-- * Afterwards, the keyed HMAC transform object can be used for HKDF-Expand many
-- * times without having to recompute HKDF-Extract each time.
-+ * Compute HKDF-Extract using 'master_key' as the input keying material, and
-+ * prepare the resulting HMAC key in 'hkdf'.  Afterwards, 'hkdf' can be used for
-+ * HKDF-Expand many times without having to recompute HKDF-Extract each time.
-  */
--int fscrypt_init_hkdf(struct fscrypt_hkdf *hkdf, const u8 *master_key,
--		      unsigned int master_key_size)
-+void fscrypt_init_hkdf(struct hmac_sha512_key *hkdf, const u8 *master_key,
-+		       unsigned int master_key_size)
- {
--	struct crypto_shash *hmac_tfm;
- 	static const u8 default_salt[HKDF_HASHLEN];
- 	u8 prk[HKDF_HASHLEN];
--	int err;
--
--	hmac_tfm = crypto_alloc_shash(HKDF_HMAC_ALG, 0, FSCRYPT_CRYPTOAPI_MASK);
--	if (IS_ERR(hmac_tfm)) {
--		fscrypt_err(NULL, "Error allocating " HKDF_HMAC_ALG ": %ld",
--			    PTR_ERR(hmac_tfm));
--		return PTR_ERR(hmac_tfm);
--	}
--
--	if (WARN_ON_ONCE(crypto_shash_digestsize(hmac_tfm) != sizeof(prk))) {
--		err = -EINVAL;
--		goto err_free_tfm;
--	}
--
--	err = hkdf_extract(hmac_tfm, master_key, master_key_size,
--			   default_salt, HKDF_HASHLEN, prk);
--	if (err)
--		goto err_free_tfm;
--
--	err = crypto_shash_setkey(hmac_tfm, prk, sizeof(prk));
--	if (err)
--		goto err_free_tfm;
- 
--	hkdf->hmac_tfm = hmac_tfm;
--	goto out;
--
--err_free_tfm:
--	crypto_free_shash(hmac_tfm);
--out:
-+	hmac_sha512_usingrawkey(default_salt, sizeof(default_salt),
-+				master_key, master_key_size, prk);
-+	hmac_sha512_preparekey(hkdf, prk, sizeof(prk));
- 	memzero_explicit(prk, sizeof(prk));
--	return err;
- }
- 
- /*
-- * HKDF-Expand (RFC 5869 section 2.3).  This expands the pseudorandom key, which
-- * was already keyed into 'hkdf->hmac_tfm' by fscrypt_init_hkdf(), into 'okmlen'
-+ * HKDF-Expand (RFC 5869 section 2.3).  Expand the HMAC key 'hkdf' into 'okmlen'
-  * bytes of output keying material parameterized by the application-specific
-  * 'info' of length 'infolen' bytes, prefixed by "fscrypt\0" and the 'context'
-  * byte.  This is thread-safe and may be called by multiple threads in parallel.
-  *
-  * ('context' isn't part of the HKDF specification; it's just a prefix fscrypt
-  * adds to its application-specific info strings to guarantee that it doesn't
-  * accidentally repeat an info string when using HKDF for different purposes.)
-  */
--int fscrypt_hkdf_expand(const struct fscrypt_hkdf *hkdf, u8 context,
--			const u8 *info, unsigned int infolen,
--			u8 *okm, unsigned int okmlen)
--{
--	SHASH_DESC_ON_STACK(desc, hkdf->hmac_tfm);
--	u8 *full_info;
--	int err;
--
--	full_info = kzalloc(infolen + 9, GFP_KERNEL);
--	if (!full_info)
--		return -ENOMEM;
--	desc->tfm = hkdf->hmac_tfm;
--
--	memcpy(full_info, "fscrypt\0", 8);
--	full_info[8] = context;
--	memcpy(full_info + 9, info, infolen);
--
--	err = hkdf_expand(hkdf->hmac_tfm, full_info, infolen + 9,
--			  okm, okmlen);
--	kfree_sensitive(full_info);
--	return err;
--}
--
--void fscrypt_destroy_hkdf(struct fscrypt_hkdf *hkdf)
-+void fscrypt_hkdf_expand(const struct hmac_sha512_key *hkdf, u8 context,
-+			 const u8 *info, unsigned int infolen,
-+			 u8 *okm, unsigned int okmlen)
- {
--	crypto_free_shash(hkdf->hmac_tfm);
-+	struct hmac_sha512_ctx ctx;
-+	u8 counter = 1;
-+	u8 tmp[HKDF_HASHLEN];
+  pte_unmap:
+  	if (pgmap)
+  		put_dev_pagemap(pgmap);
+  	pte_unmap(ptem);
+-	return ret;
++	return nr_pages;
+  }
+  #else
+  
+@@ -2938,21 +2933,24 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+   * get_user_pages_fast_only implementation that can pin pages. Thus it's still
+   * useful to have gup_fast_pmd_leaf even if we can't operate on ptes.
+   */
+-static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+-		unsigned long end, unsigned int flags, struct page **pages,
+-		int *nr)
++static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
++		unsigned long end, unsigned int flags, struct page **pages)
+  {
+  	return 0;
+  }
+  #endif /* CONFIG_ARCH_HAS_PTE_SPECIAL */
+  
+-static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+-		unsigned long end, unsigned int flags, struct page **pages,
+-		int *nr)
++static unsigned long gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
++		unsigned long end, unsigned int flags, struct page **pages)
+  {
++	const unsigned long nr_pages = (end - addr) >> PAGE_SHIFT;
+  	struct page *page;
+  	struct folio *folio;
+-	int refs;
++	unsigned long i;
 +
-+	WARN_ON_ONCE(okmlen > 255 * HKDF_HASHLEN);
-+
-+	for (unsigned int i = 0; i < okmlen; i += HKDF_HASHLEN) {
-+		hmac_sha512_init(&ctx, hkdf);
-+		if (i != 0)
-+			hmac_sha512_update(&ctx, &okm[i - HKDF_HASHLEN],
-+					   HKDF_HASHLEN);
-+		hmac_sha512_update(&ctx, "fscrypt\0", 8);
-+		hmac_sha512_update(&ctx, &context, 1);
-+		hmac_sha512_update(&ctx, info, infolen);
-+		hmac_sha512_update(&ctx, &counter, 1);
-+		if (okmlen - i < HKDF_HASHLEN) {
-+			hmac_sha512_final(&ctx, tmp);
-+			memcpy(&okm[i], tmp, okmlen - i);
-+			memzero_explicit(tmp, sizeof(tmp));
-+		} else {
-+			hmac_sha512_final(&ctx, &okm[i]);
-+		}
-+		counter++;
-+	}
- }
-diff --git a/fs/crypto/hooks.c b/fs/crypto/hooks.c
-index e0b32ac841f76..0fb3496551b94 100644
---- a/fs/crypto/hooks.c
-+++ b/fs/crypto/hooks.c
-@@ -203,11 +203,11 @@ int fscrypt_prepare_setflags(struct inode *inode,
- 		if (ci->ci_policy.version != FSCRYPT_POLICY_V2)
- 			return -EINVAL;
- 		mk = ci->ci_master_key;
- 		down_read(&mk->mk_sem);
- 		if (mk->mk_present)
--			err = fscrypt_derive_dirhash_key(ci, mk);
-+			fscrypt_derive_dirhash_key(ci, mk);
- 		else
- 			err = -ENOKEY;
- 		up_read(&mk->mk_sem);
- 		return err;
- 	}
-diff --git a/fs/crypto/keyring.c b/fs/crypto/keyring.c
-index 7557f6a88b8f3..3adbd7167055a 100644
---- a/fs/crypto/keyring.c
-+++ b/fs/crypto/keyring.c
-@@ -40,11 +40,10 @@ struct fscrypt_keyring {
- 	struct hlist_head key_hashtable[128];
- };
- 
- static void wipe_master_key_secret(struct fscrypt_master_key_secret *secret)
- {
--	fscrypt_destroy_hkdf(&secret->hkdf);
- 	memzero_explicit(secret, sizeof(*secret));
- }
- 
- static void move_master_key_secret(struct fscrypt_master_key_secret *dst,
- 				   struct fscrypt_master_key_secret *src)
-@@ -585,25 +584,21 @@ static int add_master_key(struct super_block *sb,
- 			 * identifiers using different KDF contexts.
- 			 */
- 			keyid_kdf_ctx =
- 				HKDF_CONTEXT_KEY_IDENTIFIER_FOR_HW_WRAPPED_KEY;
- 		}
--		err = fscrypt_init_hkdf(&secret->hkdf, kdf_key, kdf_key_size);
-+		fscrypt_init_hkdf(&secret->hkdf, kdf_key, kdf_key_size);
- 		/*
- 		 * Now that the KDF context is initialized, the raw KDF key is
- 		 * no longer needed.
- 		 */
- 		memzero_explicit(kdf_key, kdf_key_size);
--		if (err)
--			return err;
- 
- 		/* Calculate the key identifier */
--		err = fscrypt_hkdf_expand(&secret->hkdf, keyid_kdf_ctx, NULL, 0,
--					  key_spec->u.identifier,
--					  FSCRYPT_KEY_IDENTIFIER_SIZE);
--		if (err)
--			return err;
-+		fscrypt_hkdf_expand(&secret->hkdf, keyid_kdf_ctx, NULL, 0,
-+				    key_spec->u.identifier,
-+				    FSCRYPT_KEY_IDENTIFIER_SIZE);
- 	}
- 	return do_add_master_key(sb, secret, key_spec);
- }
- 
- /*
-@@ -833,28 +828,21 @@ fscrypt_get_test_dummy_secret(struct fscrypt_master_key_secret *secret)
- 	memset(secret, 0, sizeof(*secret));
- 	secret->size = sizeof(test_key);
- 	memcpy(secret->bytes, test_key, sizeof(test_key));
- }
- 
--int fscrypt_get_test_dummy_key_identifier(
-+void fscrypt_get_test_dummy_key_identifier(
- 				u8 key_identifier[FSCRYPT_KEY_IDENTIFIER_SIZE])
- {
- 	struct fscrypt_master_key_secret secret;
--	int err;
- 
- 	fscrypt_get_test_dummy_secret(&secret);
--
--	err = fscrypt_init_hkdf(&secret.hkdf, secret.bytes, secret.size);
--	if (err)
--		goto out;
--	err = fscrypt_hkdf_expand(&secret.hkdf,
--				  HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY,
--				  NULL, 0, key_identifier,
--				  FSCRYPT_KEY_IDENTIFIER_SIZE);
--out:
-+	fscrypt_init_hkdf(&secret.hkdf, secret.bytes, secret.size);
-+	fscrypt_hkdf_expand(&secret.hkdf,
-+			    HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY, NULL, 0,
-+			    key_identifier, FSCRYPT_KEY_IDENTIFIER_SIZE);
- 	wipe_master_key_secret(&secret);
--	return err;
- }
- 
- /**
-  * fscrypt_add_test_dummy_key() - add the test dummy encryption key
-  * @sb: the filesystem instance to add the key to
-diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-index 4f3b9ecbfe4e6..a3ed96eaebc85 100644
---- a/fs/crypto/keysetup.c
-+++ b/fs/crypto/keysetup.c
-@@ -251,15 +251,12 @@ static int setup_per_mode_enc_key(struct fscrypt_inode_info *ci,
- 	if (include_fs_uuid) {
- 		memcpy(&hkdf_info[hkdf_infolen], &sb->s_uuid,
- 		       sizeof(sb->s_uuid));
- 		hkdf_infolen += sizeof(sb->s_uuid);
- 	}
--	err = fscrypt_hkdf_expand(&mk->mk_secret.hkdf,
--				  hkdf_context, hkdf_info, hkdf_infolen,
--				  mode_key, mode->keysize);
--	if (err)
--		goto out_unlock;
-+	fscrypt_hkdf_expand(&mk->mk_secret.hkdf, hkdf_context, hkdf_info,
-+			    hkdf_infolen, mode_key, mode->keysize);
- 	err = fscrypt_prepare_key(prep_key, mode_key, ci);
- 	memzero_explicit(mode_key, mode->keysize);
- 	if (err)
- 		goto out_unlock;
- done_unlock:
-@@ -276,40 +273,29 @@ static int setup_per_mode_enc_key(struct fscrypt_inode_info *ci,
-  *
-  * Note that the KDF produces a byte array, but the SipHash APIs expect the key
-  * as a pair of 64-bit words.  Therefore, on big endian CPUs we have to do an
-  * endianness swap in order to get the same results as on little endian CPUs.
-  */
--static int fscrypt_derive_siphash_key(const struct fscrypt_master_key *mk,
--				      u8 context, const u8 *info,
--				      unsigned int infolen, siphash_key_t *key)
-+static void fscrypt_derive_siphash_key(const struct fscrypt_master_key *mk,
-+				       u8 context, const u8 *info,
-+				       unsigned int infolen, siphash_key_t *key)
- {
--	int err;
--
--	err = fscrypt_hkdf_expand(&mk->mk_secret.hkdf, context, info, infolen,
--				  (u8 *)key, sizeof(*key));
--	if (err)
--		return err;
--
-+	fscrypt_hkdf_expand(&mk->mk_secret.hkdf, context, info, infolen,
-+			    (u8 *)key, sizeof(*key));
- 	BUILD_BUG_ON(sizeof(*key) != 16);
- 	BUILD_BUG_ON(ARRAY_SIZE(key->key) != 2);
- 	le64_to_cpus(&key->key[0]);
- 	le64_to_cpus(&key->key[1]);
--	return 0;
- }
- 
--int fscrypt_derive_dirhash_key(struct fscrypt_inode_info *ci,
--			       const struct fscrypt_master_key *mk)
-+void fscrypt_derive_dirhash_key(struct fscrypt_inode_info *ci,
-+				const struct fscrypt_master_key *mk)
- {
--	int err;
--
--	err = fscrypt_derive_siphash_key(mk, HKDF_CONTEXT_DIRHASH_KEY,
--					 ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE,
--					 &ci->ci_dirhash_key);
--	if (err)
--		return err;
-+	fscrypt_derive_siphash_key(mk, HKDF_CONTEXT_DIRHASH_KEY,
-+				   ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE,
-+				   &ci->ci_dirhash_key);
- 	ci->ci_dirhash_key_initialized = true;
--	return 0;
- }
- 
- void fscrypt_hash_inode_number(struct fscrypt_inode_info *ci,
- 			       const struct fscrypt_master_key *mk)
- {
-@@ -336,21 +322,16 @@ static int fscrypt_setup_iv_ino_lblk_32_key(struct fscrypt_inode_info *ci,
- 		mutex_lock(&fscrypt_mode_key_setup_mutex);
- 
- 		if (mk->mk_ino_hash_key_initialized)
- 			goto unlock;
- 
--		err = fscrypt_derive_siphash_key(mk,
--						 HKDF_CONTEXT_INODE_HASH_KEY,
--						 NULL, 0, &mk->mk_ino_hash_key);
--		if (err)
--			goto unlock;
-+		fscrypt_derive_siphash_key(mk, HKDF_CONTEXT_INODE_HASH_KEY,
-+					   NULL, 0, &mk->mk_ino_hash_key);
- 		/* pairs with smp_load_acquire() above */
- 		smp_store_release(&mk->mk_ino_hash_key_initialized, true);
- unlock:
- 		mutex_unlock(&fscrypt_mode_key_setup_mutex);
--		if (err)
--			return err;
- 	}
- 
- 	/*
- 	 * New inodes may not have an inode number assigned yet.
- 	 * Hashing their inode number is delayed until later.
-@@ -400,29 +381,23 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
- 		   FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32) {
- 		err = fscrypt_setup_iv_ino_lblk_32_key(ci, mk);
- 	} else {
- 		u8 derived_key[FSCRYPT_MAX_RAW_KEY_SIZE];
- 
--		err = fscrypt_hkdf_expand(&mk->mk_secret.hkdf,
--					  HKDF_CONTEXT_PER_FILE_ENC_KEY,
--					  ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE,
--					  derived_key, ci->ci_mode->keysize);
--		if (err)
--			return err;
--
-+		fscrypt_hkdf_expand(&mk->mk_secret.hkdf,
-+				    HKDF_CONTEXT_PER_FILE_ENC_KEY,
-+				    ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE,
-+				    derived_key, ci->ci_mode->keysize);
- 		err = fscrypt_set_per_file_enc_key(ci, derived_key);
- 		memzero_explicit(derived_key, ci->ci_mode->keysize);
- 	}
- 	if (err)
- 		return err;
- 
- 	/* Derive a secret dirhash key for directories that need it. */
--	if (need_dirhash_key) {
--		err = fscrypt_derive_dirhash_key(ci, mk);
--		if (err)
--			return err;
--	}
-+	if (need_dirhash_key)
-+		fscrypt_derive_dirhash_key(ci, mk);
- 
- 	return 0;
- }
- 
- /*
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index 6ad30ae07c065..cf38b36d7bdfd 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -824,14 +824,12 @@ int fscrypt_parse_test_dummy_encryption(const struct fs_parameter *param,
- 		       FSCRYPT_KEY_DESCRIPTOR_SIZE);
- 	} else if (!strcmp(arg, "v2")) {
- 		policy->version = FSCRYPT_POLICY_V2;
- 		policy->v2.contents_encryption_mode = FSCRYPT_MODE_AES_256_XTS;
- 		policy->v2.filenames_encryption_mode = FSCRYPT_MODE_AES_256_CTS;
--		err = fscrypt_get_test_dummy_key_identifier(
-+		fscrypt_get_test_dummy_key_identifier(
- 				policy->v2.master_key_identifier);
--		if (err)
--			goto out;
- 	} else {
- 		err = -EINVAL;
- 		goto out;
- 	}
- 
-
-base-commit: 0e6608d4938eb209616e8673c95364bb2a7d55bd
++	/* See gup_fast_pte_range() */
++	if (pmd_protnone(orig))
++		return 0;
+  
+  	if (!pmd_access_permitted(orig, flags & FOLL_WRITE))
+  		return 0;
+@@ -2960,33 +2958,30 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+  	if (pmd_special(orig))
+  		return 0;
+  
+-	refs = (end - addr) >> PAGE_SHIFT;
+  	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+  
+-	folio = try_grab_folio_fast(page, refs, flags);
++	folio = try_grab_folio_fast(page, nr_pages, flags);
+  	if (!folio)
+  		return 0;
+  
+  	if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
+-		gup_put_folio(folio, refs, flags);
++		gup_put_folio(folio, nr_pages, flags);
+  		return 0;
+  	}
+  
+  	if (!gup_fast_folio_allowed(folio, flags)) {
+-		gup_put_folio(folio, refs, flags);
++		gup_put_folio(folio, nr_pages, flags);
+  		return 0;
+  	}
+  	if (!pmd_write(orig) && gup_must_unshare(NULL, flags, &folio->page)) {
+-		gup_put_folio(folio, refs, flags);
++		gup_put_folio(folio, nr_pages, flags);
+  		return 0;
+  	}
+  
+-	pages += *nr;
+-	*nr += refs;
+-	for (; refs; refs--)
++	for (i = 0; i < nr_pages; i++)
+  		*(pages++) = page++;
+  	folio_set_referenced(folio);
+-	return 1;
++	return nr_pages;
+  }
+  
+  static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+@@ -3033,11 +3028,11 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+  	return 1;
+  }
+  
+-static int gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
+-		unsigned long end, unsigned int flags, struct page **pages,
+-		int *nr)
++static unsigned long gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
++		unsigned long end, unsigned int flags, struct page **pages)
+  {
+-	unsigned long next;
++	unsigned long cur_nr_pages, next;
++	unsigned long nr_pages = 0;
+  	pmd_t *pmdp;
+  
+  	pmdp = pmd_offset_lockless(pudp, pud, addr);
+@@ -3046,23 +3041,21 @@ static int gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
+  
+  		next = pmd_addr_end(addr, end);
+  		if (!pmd_present(pmd))
+-			return 0;
++			break;
+  
+-		if (unlikely(pmd_leaf(pmd))) {
+-			/* See gup_fast_pte_range() */
+-			if (pmd_protnone(pmd))
+-				return 0;
++		if (unlikely(pmd_leaf(pmd)))
++			cur_nr_pages = gup_fast_pmd_leaf(pmd, pmdp, addr, next, flags, pages);
++		else
++			cur_nr_pages = gup_fast_pte_range(pmd, pmdp, addr, next, flags, pages);
+  
+-			if (!gup_fast_pmd_leaf(pmd, pmdp, addr, next, flags,
+-				pages, nr))
+-				return 0;
++		nr_pages += cur_nr_pages;
++		pages += cur_nr_pages;
+  
+-		} else if (!gup_fast_pte_range(pmd, pmdp, addr, next, flags,
+-					       pages, nr))
+-			return 0;
++		if (nr_pages != (next - addr) >> PAGE_SIZE)
++			break;
+  	} while (pmdp++, addr = next, addr != end);
+  
+-	return 1;
++	return nr_pages;
+  }
+  
+  static int gup_fast_pud_range(p4d_t *p4dp, p4d_t p4d, unsigned long addr,
 -- 
 2.50.1
+
+
+
+Oh, I might even have found a bug moving away from that questionable
+"ret==1 means success" handling in gup_fast_pte_range()? Will
+have to double-check, but likely the following is the right thing to do.
+
+
+
+ From 8f48b25ef93e7ef98611fd58ec89384ad5171782 Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Sat, 6 Sep 2025 08:46:45 +0200
+Subject: [PATCH] mm/gup: fix handling of errors from
+  arch_make_folio_accessible() in follow_page_pte()
+
+In case we call arch_make_folio_accessible() and it fails, we would
+incorrectly return a value that is "!= 0" to the caller, indicating that
+we pinned all requested pages and that the caller can keep going.
+
+follow_page_pte() is not supposed to return error values, but instead
+0 on failure and 1 on success.
+
+That is of course wrong, because the caller will just keep going pinning
+more pages. If we happen to pin a page afterwards, we're in trouble,
+because we essentially skipped some pages.
+
+Fixes: f28d43636d6f ("mm/gup/writeback: add callbacks for inaccessible pages")
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+  mm/gup.c | 3 +--
+  1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/mm/gup.c b/mm/gup.c
+index 22420f2069ee1..cff226ec0ee7d 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -2908,8 +2908,7 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+  		 * details.
+  		 */
+  		if (flags & FOLL_PIN) {
+-			ret = arch_make_folio_accessible(folio);
+-			if (ret) {
++			if (arch_make_folio_accessible(folio)) {
+  				gup_put_folio(folio, 1, flags);
+  				goto pte_unmap;
+  			}
+-- 
+2.50.1
+
+
+-- 
+Cheers
+
+David / dhildenb
 
