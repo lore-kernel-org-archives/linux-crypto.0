@@ -1,114 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475A42D130A;
-	Sat,  6 Sep 2025 21:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDAD1C84B8;
+	Sat,  6 Sep 2025 21:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757194628; cv=none; b=hOF/0KhpbHT1xZqE6UdbNj1vhNRW9FWwCzt5ICsY1r6R+Enq5tztFMNkBQHR62+6zaLtZLx5URMzGpcAlXM7uFLkewPVBkAr5UOhtvnZ3645SUrP17u1FsmljvA3H6FohCsSYULQsQEZ5EYr5GjWIDsu2ugZey8X6OJ/QR8YmV8=
+	t=1757195082; cv=none; b=iHM+2tFhz/KDntuVyTCfdntV4fJN3syRI/PIzPtBrsp5bLuWt5VB5q0z0O9PL1tzkfjLVVdIr4/JrZ2rJAC5lK1P1olunEwN726dMUg8Aeoh0t4lxaUPq+o3X7dxL+wsh+WQgXxAT446BNTOtNbuv/n3eUvpKSoaUNlQz7Q3Vpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757194628; c=relaxed/simple;
-	bh=JTwVCxO7VQKt0pRSCgeHeHvmX5quhsNXXzZV2f26Bs0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=soG70zQYBtjrnTbPRgmDCCBjRNHJbnsHWTQkW3J12Xiuu1c4EZHM5n8j/WAbM+/8Y8A1T3ZkMpcFFTt37Nck8gtFro9CHuSxLHJEQlsdAeZoTFpraCRBqi3mQe33U0DKwXxBy9R6DpG+L2uvBzKorJ5YcWhiKiEH++CJdAB/9dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIjnKxH0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757195082; c=relaxed/simple;
+	bh=gwfh68oMkRTSH1R3N9Af4GojEV1OW8M+fSIxaenodpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KAToHgMvFWG4Ha+c5utc9+9whVhF3yNhKZvXvCTfUGLUAmIRI/mnh42rnUoZGU3kIDFgUxSrzfxy6xnhUbEI7cfcEygNXJg1TTcqQfSZgU5X5R+jmq0YBNWH5zlrd5oe0ftpVnnW2yKVCeKhhv8qQV6a6grnmCxz9XKrR8h+rOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDvStL0M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIjnKxH0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D6FC4CEE7;
-	Sat,  6 Sep 2025 21:37:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDvStL0M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B986C4CEE7;
+	Sat,  6 Sep 2025 21:44:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757194628;
-	bh=JTwVCxO7VQKt0pRSCgeHeHvmX5quhsNXXzZV2f26Bs0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eIjnKxH09OTN1s3TO5OkyZTYLxVqeC7VxU8nQKQBpGN/Fp3rPUrW0n+2bbZB8zzHO
-	 AM3Jbi3sTFeW+TtxRT/DDlpUtp2nU3AsNxgqi3J9QOr95cH4ApNZisj4U8uyWcTX9J
-	 oIUv1b9OFpCv+lF6lcDbX7MRLUeU9QQQf3jMAwVmuUuVNZ4nBBi2E9UrIgfPoWqKks
-	 rp25asjGBdt0WoQPVjykGqKwMURs6fc94N8vFJE6fVqLvc6WjT4BBmwHtxgcDe8YcQ
-	 6/frNrko95cghzRkUomIuPn5fGIpDZcwvymzk8m+EMawZ4vDT4WQb8PO0vmvXDURHL
-	 twswbfGWpHfKw==
+	s=k20201202; t=1757195081;
+	bh=gwfh68oMkRTSH1R3N9Af4GojEV1OW8M+fSIxaenodpY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MDvStL0MkcXoDiDngrcrLj3boAtY+1gBPvlYqJQ0Rn9NlZEIQs3ZZTSv6KOH8n/rU
+	 PXYZd8KRklvq9m8m0v6RphoTy9CxCw4aBz1WAhnqzOvIIGiklHNxOqESf+AfuXvUQA
+	 Rye3yextOdB7pwDioAIyTNWZoP8sIbJL2EY1G4Uzy6ayiopkGIm8typPw+k3aCCs2a
+	 tyDNhKhPoZK3yoc8/fRg/usd8PtEPVCoMzocdBB4EL8PQroxJigerVE5QRwvNDW4rN
+	 sqT57q5JDP0/ycdkeZb6ArspBA/lJJlDsiiMVEMkbFmwCJRH/Hgw52ApU3yI6jNLET
+	 oAFi1XpStfsDg==
+Date: Sat, 6 Sep 2025 14:44:39 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Zhiqi Song <songzhiqi1@huawei.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 12/12] wireguard: kconfig: Simplify crypto kconfig selections
-Date: Sat,  6 Sep 2025 14:35:23 -0700
-Message-ID: <20250906213523.84915-13-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250906213523.84915-1-ebiggers@kernel.org>
-References: <20250906213523.84915-1-ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 00/12] ChaCha and BLAKE2s cleanups
+Message-ID: <20250906214439.GA47837@quark>
+References: <20250827151131.27733-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827151131.27733-1-ebiggers@kernel.org>
 
-Simplify the kconfig entry for WIREGUARD:
+On Wed, Aug 27, 2025 at 08:11:19AM -0700, Eric Biggers wrote:
+> This series is targeting libcrypto-next.  It can also be retrieved from:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git chacha-blake2s-v1
+> 
+> This series consolidates how the ChaCha and BLAKE2s code is organized.
+> This is essentially the same change that I made to the other algorithms,
+> so this should be fairly boring by now.
+> 
+> These algorithms were the last two users of
+> lib/crypto/$(SRCARCH)/{Makefile,Kconfig}.  So this series removes all
+> those files, finishing the transition to the centralized build process
+> (at least for the algorithms supported by lib/crypto/ so far).
+> 
+> This series also makes the arch-optimized BLAKE2s code start being
+> enabled by default, again following the pattern of the other algorithms.
+> 
+> Finally, it adds a KUnit test suite for BLAKE2s and deletes the older
+> blake2s-selftest.
+> 
+> Eric Biggers (12):
+>   arm: configs: Remove obsolete assignments to CRYPTO_CHACHA20_NEON
+>   crypto: chacha - register only "-lib" drivers
+>   lib/crypto: chacha: Remove unused function chacha_is_arch_optimized()
+>   lib/crypto: chacha: Rename chacha.c to chacha-block-generic.c
+>   lib/crypto: chacha: Rename libchacha.c to chacha.c
+>   lib/crypto: chacha: Consolidate into single module
+>   lib/crypto: x86/blake2s: Reduce size of BLAKE2S_SIGMA2
+>   lib/crypto: blake2s: Remove obsolete self-test
+>   lib/crypto: blake2s: Always enable arch-optimized BLAKE2s code
+>   lib/crypto: blake2s: Move generic code into blake2s.c
+>   lib/crypto: blake2s: Consolidate into single C translation unit
+>   lib/crypto: tests: Add KUnit tests for BLAKE2s
 
-- Drop the selections of the arch-optimized ChaCha20, Poly1305, BLAKE2s,
-  and Curve25519 code.  These options no longer exist, as lib/crypto/
-  now enables the arch-optimized code automatically.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-- Drop the selection of CRYPTO.  This was needed only to make the
-  arch-optimized options visible.  lib/crypto/ now handles these options
-  internally, without any dependency on CRYPTO.
-
-- Drop the dependency on !KMSAN.  This was needed only to avoid
-  selecting arch-optimized code that isn't compatible with KMSAN.
-  lib/crypto/ now handles the !KMSAN dependencies internally.
-
-- Add a selection of CRYPTO_LIB_UTILS, since WireGuard directly calls
-  crypto_memneq().  This gets selected indirectly by
-  CRYPTO_LIB_CURVE25519 and CRYPTO_LIB_CHACHA20POLY1305 anyway, but it's
-  best to make this dependency explicit.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- drivers/net/Kconfig | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
-
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index b29628d46be9b..ac12eaf11755d 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -74,28 +74,15 @@ config DUMMY
- 
- config WIREGUARD
- 	tristate "WireGuard secure network tunnel"
- 	depends on NET && INET
- 	depends on IPV6 || !IPV6
--	depends on !KMSAN # KMSAN doesn't support the crypto configs below
- 	select NET_UDP_TUNNEL
- 	select DST_CACHE
--	select CRYPTO
- 	select CRYPTO_LIB_CURVE25519
- 	select CRYPTO_LIB_CHACHA20POLY1305
--	select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
--	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
--	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
--	select CRYPTO_CURVE25519_X86 if X86 && 64BIT
--	select CRYPTO_CHACHA20_NEON if ARM || (ARM64 && KERNEL_MODE_NEON)
--	select CRYPTO_POLY1305_NEON if ARM64 && KERNEL_MODE_NEON
--	select CRYPTO_POLY1305_ARM if ARM
--	select CRYPTO_BLAKE2S_ARM if ARM
--	select CRYPTO_CURVE25519_NEON if ARM && KERNEL_MODE_NEON
--	select CRYPTO_CHACHA_MIPS if CPU_MIPS32_R2
--	select CRYPTO_POLY1305_MIPS if MIPS
--	select CRYPTO_CHACHA_S390 if S390
-+	select CRYPTO_LIB_UTILS
- 	help
- 	  WireGuard is a secure, fast, and easy to use replacement for IPSec
- 	  that uses modern cryptography and clever networking tricks. It's
- 	  designed to be fairly general purpose and abstract enough to fit most
- 	  use cases, while at the same time remaining extremely simple to
--- 
-2.50.1
-
+- Eric
