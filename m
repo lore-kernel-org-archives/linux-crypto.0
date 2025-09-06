@@ -1,88 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE16A1C32FF;
-	Sat,  6 Sep 2025 23:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B2019049B;
+	Sat,  6 Sep 2025 23:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757199657; cv=none; b=FTy5BAXoftStgUG+Q69/5e1lVCPhdvM9ouDnWdFmBVwqcOtkM20tUPpVtVC1qppDrr1ti748f0Fm/0ygLJmXG+uyiSg75cfR74OF1J14BGypSRyKSOZfjtxTmo1Jmd2jirRGaCABq6uB3A8k7NtUxDnRYWxOenFbSnwy4GXUVos=
+	t=1757201451; cv=none; b=bejrdVwRZJ1DpAQQL1WcwJAVBQ0YG6q01+G8vGEi16lNbV1JkLm/jamhb0Y4fRCw+7XQtREkgoWCGJY1XQRRtqyxam0R44knyip/nyipeovToCeENq1w/ksB2DhP+PKa3mRYMkUnpbR+OKHeQqwfHbRNx195pnJxAVjC1wkQxd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757199657; c=relaxed/simple;
-	bh=W4crxD5ZxD9MobQp2TG9BZxgFUpS+HqHgA3HF060leA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rv174z/rilIU10O5z0wupDcbScVE7K++fgrQBk5Y65yjOZ5UNaATf7El7ij4W9sk9UqMNu+ssMy2Qp4LUBQ0g7oc9H0HlLA6y1GRv1OeC+JLJoFWmFQUKZxhhMr4a1LeO0z99M72TKPLlyP9vUNw14M6BiwWVC7V93RL1163ruU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnhowdjX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757201451; c=relaxed/simple;
+	bh=q1iTThsw7oKpa0zcQPp1lbL8O39eXWUFrfG8Gq7JLkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p16SHmtLHHHOF5NKJbDC341MD+gLliLsZFCXh3HgpC9q88pXsxwYV2cOO8ssfcOCbvyCxlYf2JIXWmgqYy4rrYeNXd4cOPjVjfIpR6X88779ZNfbQe33pKfqH9dnlDuDanJmEs/BG+MvFsFTZOxqy2g8JTGh+l+HF8IBinH1SkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxUu0HkE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnhowdjX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E12D1C4CEE7;
-	Sat,  6 Sep 2025 23:00:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxUu0HkE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 413B8C4CEE7;
+	Sat,  6 Sep 2025 23:30:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757199657;
-	bh=W4crxD5ZxD9MobQp2TG9BZxgFUpS+HqHgA3HF060leA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SnhowdjXGNVO5C4W4Wye/UURz2Lm8s7jvues26ODSli++I1VMazfpDGLZKW3/KXQU
-	 abVahEzvqZDFmTl+++5hMX3zhFrR8Nd7M89M6+14MEH1nDpnar1KsRu6C9nybmgiUc
-	 YBjWsl3K1CYzT3VPoEKl+C0TfKFkTtnlAu2dOcXFxuxnZYlWsa2JL3yh5YqXnphyxK
-	 AcmWEHq4YgAVtsYd6PqbNyxr/ccdabP5coUJj33UPLzNaRRDitMy5/JEg5LZ3Dxi0U
-	 YlSerdaNowu/zw6eGzLAEKI4nJS1zSj3dAq0hfZXGHlyNsRRUh6jznTRhYNhwCgeUF
-	 LnQzuQWO+mmNg==
+	s=k20201202; t=1757201450;
+	bh=q1iTThsw7oKpa0zcQPp1lbL8O39eXWUFrfG8Gq7JLkI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LxUu0HkE0H8avOiTvooj1Fk/dhVtoRl4Q5BJPmUo6coiGIpXS6RA++E+vyWuiIjI4
+	 L55/6QXlwlNPzafdqyJ7tTIlwAZHQU9PqiixX04vyP+5hWCqout9j2LZcphH4BEd86
+	 TTdRhs/xeUGOQwpo0GLSjDHlAVShMWNfYe3jVuYYCmc/CRAFmNrM3XcyxISCAO2Pih
+	 sFMnCpATcCPr87LzBvkVjd/LUfa5YnRCPpFck68LgJ0JppDpzCBzAsTe5yGmovA8rY
+	 pYFEJyDkwNb30v/YpGdYH68O+7CHyW/L+o7wqjjevHsIhEbzCLyZ5fQ3T+PFCIQKwN
+	 bJMqX/vv6aTVQ==
+Date: Sat, 6 Sep 2025 16:30:48 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-nfs@vger.kernel.org,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] SUNRPC: Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it
-Date: Sat,  6 Sep 2025 16:00:19 -0700
-Message-ID: <20250906230019.94569-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Zhiqi Song <songzhiqi1@huawei.com>,
+	Longfang Liu <liulongfang@huawei.com>, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v2 07/12] lib/crypto: tests: Migrate Curve25519 self-test
+ to KUnit
+Message-ID: <20250906233048.GA109599@quark>
+References: <20250906213523.84915-1-ebiggers@kernel.org>
+ <20250906213523.84915-8-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250906213523.84915-8-ebiggers@kernel.org>
 
-Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it.  This
-unblocks the eventual removal of the selection of CRYPTO from NFSD_V4,
-which will no longer be needed by nfsd itself due to switching to the
-crypto library functions.  But NFSD_V4 selects RPCSEC_GSS_KRB5, which
-still needs CRYPTO.  It makes more sense for RPCSEC_GSS_KRB5 to select
-CRYPTO itself, like most other kconfig options that need CRYPTO do.
+On Sat, Sep 06, 2025 at 02:35:18PM -0700, Eric Biggers wrote:
+> +static struct kunit_case curve25519_test_cases[] = {
+> +	KUNIT_CASE(test_curve25519),
+> +	KUNIT_CASE(test_curve25519_basepoint),
+> +	{},
+> +};
+> +
+> +static struct kunit_suite curve25519_test_suite = {
+> +	.name = "curve25519",
+> +	.test_cases = curve25519_test_cases,
+> +};
+> +kunit_test_suite(curve25519_test_suite);
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- net/sunrpc/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Correction: there should be a module description and license here.
 
-diff --git a/net/sunrpc/Kconfig b/net/sunrpc/Kconfig
-index 2d8b67dac7b5b..33aafdc8392e3 100644
---- a/net/sunrpc/Kconfig
-+++ b/net/sunrpc/Kconfig
-@@ -16,13 +16,14 @@ config SUNRPC_SWAP
- 	bool
- 	depends on SUNRPC
- 
- config RPCSEC_GSS_KRB5
- 	tristate "Secure RPC: Kerberos V mechanism"
--	depends on SUNRPC && CRYPTO
-+	depends on SUNRPC
- 	default y
- 	select SUNRPC_GSS
-+	select CRYPTO
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_HASH
- 	help
- 	  Choose Y here to enable Secure RPC using the Kerberos version 5
- 	  GSS-API mechanism (RFC 1964).
+MODULE_DESCRIPTION("KUnit tests and benchmark for Curve25519");
+MODULE_LICENSE("GPL");
 
-base-commit: 4a0de50a44bb11ea67bb3ca961844b55ac57cf05
--- 
-2.50.1
-
+- Eric
