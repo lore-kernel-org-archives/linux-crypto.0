@@ -1,39 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17CEB27EFE7;
-	Sat,  6 Sep 2025 21:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE16A1C32FF;
+	Sat,  6 Sep 2025 23:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757195676; cv=none; b=QVzRzDT3Pec+uowLzn8lngE4jDcSRpmpIAmmix/DuZJbsotVZYQhQnlCvypCUau3IKyZDzlstiJWjb9+Cn1Z+Gi40n5zN9AUhI/bbN5iGUJwTSD/ECB/BhSvdRZn00wGXxW27UKF8EUDsNxjpmiRV3J9ZLDQxg9L2V+z9jozNOg=
+	t=1757199657; cv=none; b=FTy5BAXoftStgUG+Q69/5e1lVCPhdvM9ouDnWdFmBVwqcOtkM20tUPpVtVC1qppDrr1ti748f0Fm/0ygLJmXG+uyiSg75cfR74OF1J14BGypSRyKSOZfjtxTmo1Jmd2jirRGaCABq6uB3A8k7NtUxDnRYWxOenFbSnwy4GXUVos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757195676; c=relaxed/simple;
-	bh=h53jvfFCwXYylbb7aps6yXM2yBvyZd6YfS28Nu7Gzmg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vEf7lW0va2K6VSZA2kgHrdlB5jrXFIoZu7cyDaCiRAUcbKoKnt/33VOf2PHg3BmEql5QH5oOIfNJffE6jr/6srrPmmKhOXLTv2uTX7NosRYSNKE7bWadiAuQobPzZ0cEOVcqw2r+RKaGfo3JeKGA4/v1rxG7wxMhWV1uIamGN6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPf7pw8h; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757199657; c=relaxed/simple;
+	bh=W4crxD5ZxD9MobQp2TG9BZxgFUpS+HqHgA3HF060leA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rv174z/rilIU10O5z0wupDcbScVE7K++fgrQBk5Y65yjOZ5UNaATf7El7ij4W9sk9UqMNu+ssMy2Qp4LUBQ0g7oc9H0HlLA6y1GRv1OeC+JLJoFWmFQUKZxhhMr4a1LeO0z99M72TKPLlyP9vUNw14M6BiwWVC7V93RL1163ruU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnhowdjX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPf7pw8h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376AEC4CEE7;
-	Sat,  6 Sep 2025 21:54:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnhowdjX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E12D1C4CEE7;
+	Sat,  6 Sep 2025 23:00:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757195675;
-	bh=h53jvfFCwXYylbb7aps6yXM2yBvyZd6YfS28Nu7Gzmg=;
+	s=k20201202; t=1757199657;
+	bh=W4crxD5ZxD9MobQp2TG9BZxgFUpS+HqHgA3HF060leA=;
 	h=From:To:Cc:Subject:Date:From;
-	b=DPf7pw8hUJnfXl+EPhEt9uuBOZtbYn18iPBvd40fkJT3pr53UD3J+6O+a3pNxw994
-	 cSQoCPHVAscanaGxQZ/BIb5m/49LbAvOX8jofQLhzlDSNUsVoJJ2hNCObJT5ryMArE
-	 uXkmuOs04JGpMe6a9IJbZGJ6jDu0Ma1Cle47XuzYY9FyRR52bWaPSNY0q8PrjTKVvz
-	 /8bBSidglaoVFBACQcPwUnbdNlFrGPv/GLwbd/pllQ+TunbuMGFHP9RPT/D+Y8gjyn
-	 TNNEjMNepwQL+HbfCty41Q5YMPImugQsvErhFITLUv4MTYiuLpabk4c6lTIxGP4Dbh
-	 p7dDyWtIRSOxA==
+	b=SnhowdjXGNVO5C4W4Wye/UURz2Lm8s7jvues26ODSli++I1VMazfpDGLZKW3/KXQU
+	 abVahEzvqZDFmTl+++5hMX3zhFrR8Nd7M89M6+14MEH1nDpnar1KsRu6C9nybmgiUc
+	 YBjWsl3K1CYzT3VPoEKl+C0TfKFkTtnlAu2dOcXFxuxnZYlWsa2JL3yh5YqXnphyxK
+	 AcmWEHq4YgAVtsYd6PqbNyxr/ccdabP5coUJj33UPLzNaRRDitMy5/JEg5LZ3Dxi0U
+	 YlSerdaNowu/zw6eGzLAEKI4nJS1zSj3dAq0hfZXGHlyNsRRUh6jznTRhYNhwCgeUF
+	 LnQzuQWO+mmNg==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+To: linux-nfs@vger.kernel.org,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] crypto: md5 - Implement export_core() and import_core()
-Date: Sat,  6 Sep 2025 14:54:17 -0700
-Message-ID: <20250906215417.89584-1-ebiggers@kernel.org>
+Subject: [PATCH] SUNRPC: Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it
+Date: Sat,  6 Sep 2025 16:00:19 -0700
+Message-ID: <20250906230019.94569-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -43,122 +49,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since commit 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in
-API"), the recently-added export_core() and import_core() methods in
-struct shash_alg have effectively become mandatory (even though it is
-not tested or enforced), since legacy drivers that need a fallback
-depend on them.  Make crypto/md5.c compatible with these legacy drivers
-by adding export_core() and import_core() methods to it.
+Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it.  This
+unblocks the eventual removal of the selection of CRYPTO from NFSD_V4,
+which will no longer be needed by nfsd itself due to switching to the
+crypto library functions.  But NFSD_V4 selects RPCSEC_GSS_KRB5, which
+still needs CRYPTO.  It makes more sense for RPCSEC_GSS_KRB5 to select
+CRYPTO itself, like most other kconfig options that need CRYPTO do.
 
-Fixes: ba8ee22a7f92 ("crypto: md5 - Wrap library and add HMAC support")
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
+ net/sunrpc/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-This patch is targeting libcrypto-next
+diff --git a/net/sunrpc/Kconfig b/net/sunrpc/Kconfig
+index 2d8b67dac7b5b..33aafdc8392e3 100644
+--- a/net/sunrpc/Kconfig
++++ b/net/sunrpc/Kconfig
+@@ -16,13 +16,14 @@ config SUNRPC_SWAP
+ 	bool
+ 	depends on SUNRPC
+ 
+ config RPCSEC_GSS_KRB5
+ 	tristate "Secure RPC: Kerberos V mechanism"
+-	depends on SUNRPC && CRYPTO
++	depends on SUNRPC
+ 	default y
+ 	select SUNRPC_GSS
++	select CRYPTO
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_HASH
+ 	help
+ 	  Choose Y here to enable Secure RPC using the Kerberos version 5
+ 	  GSS-API mechanism (RFC 1964).
 
- crypto/md5.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
-
-diff --git a/crypto/md5.c b/crypto/md5.c
-index d05c53e6f3c2c..c167d203c710a 100644
---- a/crypto/md5.c
-+++ b/crypto/md5.c
-@@ -44,10 +44,22 @@ static int __crypto_md5_import(struct md5_ctx *ctx, const void *in)
- 	p += sizeof(*ctx);
- 	ctx->bytecount += *p;
- 	return 0;
- }
- 
-+static int __crypto_md5_export_core(const struct md5_ctx *ctx, void *out)
-+{
-+	memcpy(out, ctx, offsetof(struct md5_ctx, buf));
-+	return 0;
-+}
-+
-+static int __crypto_md5_import_core(struct md5_ctx *ctx, const void *in)
-+{
-+	memcpy(ctx, in, offsetof(struct md5_ctx, buf));
-+	return 0;
-+}
-+
- const u8 md5_zero_message_hash[MD5_DIGEST_SIZE] = {
- 	0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
- 	0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e,
- };
- EXPORT_SYMBOL_GPL(md5_zero_message_hash);
-@@ -88,10 +100,20 @@ static int crypto_md5_export(struct shash_desc *desc, void *out)
- static int crypto_md5_import(struct shash_desc *desc, const void *in)
- {
- 	return __crypto_md5_import(MD5_CTX(desc), in);
- }
- 
-+static int crypto_md5_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_md5_export_core(MD5_CTX(desc), out);
-+}
-+
-+static int crypto_md5_import_core(struct shash_desc *desc, const void *in)
-+{
-+	return __crypto_md5_import_core(MD5_CTX(desc), in);
-+}
-+
- #define HMAC_MD5_KEY(tfm) ((struct hmac_md5_key *)crypto_shash_ctx(tfm))
- #define HMAC_MD5_CTX(desc) ((struct hmac_md5_ctx *)shash_desc_ctx(desc))
- 
- static int crypto_hmac_md5_setkey(struct crypto_shash *tfm,
- 				  const u8 *raw_key, unsigned int keylen)
-@@ -137,10 +159,23 @@ static int crypto_hmac_md5_import(struct shash_desc *desc, const void *in)
- 
- 	ctx->ostate = HMAC_MD5_KEY(desc->tfm)->ostate;
- 	return __crypto_md5_import(&ctx->hash_ctx, in);
- }
- 
-+static int crypto_hmac_md5_export_core(struct shash_desc *desc, void *out)
-+{
-+	return __crypto_md5_export_core(&HMAC_MD5_CTX(desc)->hash_ctx, out);
-+}
-+
-+static int crypto_hmac_md5_import_core(struct shash_desc *desc, const void *in)
-+{
-+	struct hmac_md5_ctx *ctx = HMAC_MD5_CTX(desc);
-+
-+	ctx->ostate = HMAC_MD5_KEY(desc->tfm)->ostate;
-+	return __crypto_md5_import_core(&ctx->hash_ctx, in);
-+}
-+
- static struct shash_alg algs[] = {
- 	{
- 		.base.cra_name		= "md5",
- 		.base.cra_driver_name	= "md5-lib",
- 		.base.cra_priority	= 300,
-@@ -151,10 +186,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_md5_update,
- 		.final			= crypto_md5_final,
- 		.digest			= crypto_md5_digest,
- 		.export			= crypto_md5_export,
- 		.import			= crypto_md5_import,
-+		.export_core		= crypto_md5_export_core,
-+		.import_core		= crypto_md5_import_core,
- 		.descsize		= sizeof(struct md5_ctx),
- 		.statesize		= MD5_SHASH_STATE_SIZE,
- 	},
- 	{
- 		.base.cra_name		= "hmac(md5)",
-@@ -169,10 +206,12 @@ static struct shash_alg algs[] = {
- 		.update			= crypto_hmac_md5_update,
- 		.final			= crypto_hmac_md5_final,
- 		.digest			= crypto_hmac_md5_digest,
- 		.export			= crypto_hmac_md5_export,
- 		.import			= crypto_hmac_md5_import,
-+		.export_core		= crypto_hmac_md5_export_core,
-+		.import_core		= crypto_hmac_md5_import_core,
- 		.descsize		= sizeof(struct hmac_md5_ctx),
- 		.statesize		= MD5_SHASH_STATE_SIZE,
- 	},
- };
- 
-
-base-commit: 8d2702c5dc96bc441879b83becbccedeb2bd4476
+base-commit: 4a0de50a44bb11ea67bb3ca961844b55ac57cf05
 -- 
 2.50.1
 
