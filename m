@@ -1,426 +1,313 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060.outbound.protection.outlook.com [40.107.243.60])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0688B15E97;
-	Sun,  7 Sep 2025 05:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757222073; cv=fail; b=AcJa5xcUiBNXEvt4LoQBF/E7ysDbnM2ZXj0zbCzAyrYvCd4nh7mn2JBtrcQsrcEtRs/pw7EOCNBq0z6QvlP7/30wznU8PkDQn0xFk8eVYEf808Mp5IW7uOCuqs+V7XPwAOsgFnQ8GosIPsOdkK8AeeBwgbHAfm3m9bvphV5k/oQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757222073; c=relaxed/simple;
-	bh=SHJz0LEfuLGtD4Td4sbFzxd3lMl+hj4GwUs2BOP5cVk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BnyS8NuwY7rLm0imEx2FTSg+QcimJZpuvStcfcKjzqeDAweiCl4KzMBxHA8PhKzzQPaqHAmDhXykmi0tVnjAfJoAP41hh1VJPU13gcxyL8YzRqfUSSEuWdxVCvvjraCE8964VbsZZU2vC6YXzN1PQ85RSxLeWorv5267V8PwyWk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GJCW+3DS; arc=fail smtp.client-ip=40.107.243.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48DF258EC3;
+	Sun,  7 Sep 2025 11:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757245934; cv=none; b=G6gIGapiRn2Wu7Z9oq+upWPXQAFFao3pOGTuX5x5jJ6pvvAIbIi4yjT1prbgy+kpUamUYHRLYNfuKGrX4HX2hnGRW7t7yKti8yvP1337d7fYrNpTLE4OTx+jFr+0VfPuMugiJycE0KAUWFHQAHDtHA23l8hkjx1bEAraKnrZCP8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757245934; c=relaxed/simple;
+	bh=FuS492IWtRlzgeCDKXwwXovLPB2YaHTzcyK3rbaCATQ=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=ix7UeKDUDzL6OYKZ2WGgitmQ6QV5ViEVNlY4WzvyW7JR92PaZYPDHq7mpNZW9ls180ThTzZXUWncGbraD2y9m3cY8UBnpFlX61e/y/znBo8oMs/v9JisJ5KjVgepe4OHx3ROgjGHnCOxfkBnJ1Mag2LcAe14k6ApAXiL2icwJxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lZJ9Zdt4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GJCW+3DS"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yUBsZoa48ubr5UfQCm1JGG4S8RpaYQuK3qinFtfTVoIyblstuFvs1UtepWrL6qmhVxym1pIpbEsbMAvn8OLpFtnGKLdFRogzsXju1CrLLfxBypz+Hkszu+T6TOwyetB17oSLAcgJzki+fDcVYN+oiTtl/ehsF6gZlXmpmGbHNSDpgD44y8PNgeLafTwUoVPHuULARbhwZIgo3c8tKzUiTcLIbjk9SxJ0Ts4DKpyC1PPtY5Ts15C7DoSWyHHrOZcmwjhmNkBgLbdBHDWKr41d/hH0Iq4wl03K3165j0jxtSFnMsVtfLQLsKI5Op+VEBMmGm8nEPF6cEUtHrz9CFbJvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZBp52V91Gxr27f7RudT0aNk9Xj8vFIecZ5YmKsPh8yA=;
- b=GGSMAlpnRrdP4a44ktU29+KpniQMk+UW6Gda+8KCQog3qwPiGbBpp73s+/BJXgR5l5bJpq0nocNaVsitWzZ27gkvAs7+LxMqwmYUV2xlKVIBVq5LtnfXWkMzSe/DZQIkP8OYzgKltBhzt4+fC0FDtL1N5BxRrHQ6eiPyq6WPHX7Mw70yooOKJZYN8RX93Z/eXOoJCFvUeMmcLM1q/RmGzGzlKZ0t8Hie845b//12OtmTUXi4bBsLE8ZzjltETh8kwzNO/DLMfeCGMi39ZmzVvGlWny5kJms7IhwCe7n+ssvUIfmauKp8Nas/sp0t4pEIwgYbDOC5YTUN1q3j61eICw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZBp52V91Gxr27f7RudT0aNk9Xj8vFIecZ5YmKsPh8yA=;
- b=GJCW+3DSmriH1MADLp7VlsqRk2CVBWqYaaZCnkrNj9TbrTt6BEgQdv1kl/bPCLxxWONcA5b3HSE64EHr5tjCu6yjJpMegbjJgswtpzQdoqLvQOiiujYIZT3K0YBRTycLIXZ6Ou7WG3XMLHyTM/e0/txaULr9tJCar2wjSGunmmp/paDLnohvQsoxjL2yYEpwgWaCnYt3R61pMuTiBf7SZU14mP6PbMIiMe96MNr5AzKQ1lYjYeivnO3lExo92w7ONdvD0naIzzrKG43FmjQU26Y1sHC7eistWEzdn2W5ldnyprC9DRSDIom6a/g/qJD3t2BQfO6vC9HdWZQheuBdjg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5968.namprd12.prod.outlook.com (2603:10b6:408:14f::7)
- by DS5PPFDF2DDE6CD.namprd12.prod.outlook.com (2603:10b6:f:fc00::665) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Sun, 7 Sep
- 2025 05:14:26 +0000
-Received: from LV2PR12MB5968.namprd12.prod.outlook.com
- ([fe80::e6dd:1206:6677:f9c4]) by LV2PR12MB5968.namprd12.prod.outlook.com
- ([fe80::e6dd:1206:6677:f9c4%6]) with mapi id 15.20.9094.016; Sun, 7 Sep 2025
- 05:14:25 +0000
-Message-ID: <0a28adde-acaf-4d55-96ba-c32d6113285f@nvidia.com>
-Date: Sat, 6 Sep 2025 22:14:19 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, kasan-dev@googlegroups.com,
- kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-20-david@redhat.com>
- <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
- <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR05CA0048.namprd05.prod.outlook.com
- (2603:10b6:a03:33f::23) To LV2PR12MB5968.namprd12.prod.outlook.com
- (2603:10b6:408:14f::7)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lZJ9Zdt4"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5878fKYx026934;
+	Sun, 7 Sep 2025 11:51:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=FsVALi
+	RRAllNFGirPGtkrvOmCUeOWcqA9YceqJMGQaE=; b=lZJ9Zdt4ZLYkuPrbu7FQ25
+	WI76Cj1C5QT38p/Y65ruEvIZlmujZA2jhvRvU6Ek+phEJVS+eYKNZ81UyoZDq+M5
+	upWKURyMIzC2I/FOZjOvXGKsECGb4OruSQxLZFnY/BGxP2TO9ISoylRmVpb32ed8
+	aoxVnxmqKcYvCCAnL8BninITbxNo2bJ+ae7HI+ok677d/cxgIG65E2x+dCmdPaZ+
+	ME3QfxPx7jlE+wmBI/W8vmasjrkLxgpyIdj28xxsgWfUvme0oSI1Ncp9fzXczAbp
+	YvKNIXlOBiJYZZU6YyF9pamSCpEc5fFRfQ4XwYRKmbetyau03QxOsH2/9Votr83Q
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwck84-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 07 Sep 2025 11:51:57 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5878rr04001177;
+	Sun, 7 Sep 2025 11:51:56 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49120318yj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 07 Sep 2025 11:51:56 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 587BptN052953582
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 7 Sep 2025 11:51:55 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D1EE458065;
+	Sun,  7 Sep 2025 11:51:55 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1EC705804B;
+	Sun,  7 Sep 2025 11:51:55 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.145.73])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sun,  7 Sep 2025 11:51:55 +0000 (GMT)
+Message-ID: <e38f203a4bd95c9728cc04745a82d174e18fa208.camel@linux.ibm.com>
+Subject: Re: [PATCH] KEYS: encrypted: Use SHA-256 library instead of
+ crypto_shash
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>, keyrings@vger.kernel.org,
+        David
+ Howells	 <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20250731184747.12335-1-ebiggers@kernel.org>
+References: <20250731184747.12335-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 07 Sep 2025 07:51:54 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5968:EE_|DS5PPFDF2DDE6CD:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89b9ab1e-80e3-48bd-897d-08ddedcd6976
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|1800799024|376014|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?N3VhS0huWjQ4a3lsVHYzQ0ZwUFpBUjlPQjE2VXV6aS8zdmFuZzZLajVkaXpz?=
- =?utf-8?B?bEpMMWxBZ1BOWVU3QjZRaVpkNFA2dFdMTXJ0VmJCc0tSYmJTd1ZSQjhWS0NR?=
- =?utf-8?B?L2JCYU5wYXhNU2tweXhzcFUwQlVkSTgwQjRaSCsxUWdwSHpvU1NqYWo3eWlN?=
- =?utf-8?B?YWphSzhUcWxUU1dsY2VtdDdvZmRHRC92Sk1nSmZCeW1tTFQ3YUVia0pxZGtv?=
- =?utf-8?B?aTRMa2hmMEYzVEZTejRBck5nSXdWb2tHbnNaOWkyMDNmV1FTWUNYNVRHMmFw?=
- =?utf-8?B?cUJmdGM5WmJDTk1SWkREeTlUR2E5cFpRTjFDTHdkSFRLZ3FNNFVXQmtyMnZY?=
- =?utf-8?B?MlZCS1JScTJPWWNjaWRnYSt3STA1Nm94bGorSHlkZ05iM1RrQmNVaFRzRjM2?=
- =?utf-8?B?b0s5MnUwV0w4RVArdXVLcmFtUW9JT0VORFpqbEFOYnROZDQ0Uk1idHNnSnZQ?=
- =?utf-8?B?TzdIVHZpRExrMFRjV2Y0YUtKU0NJRnRxR3hhbHIxQ0RmNG1rczd1NWtDWVZs?=
- =?utf-8?B?ZTdJQTZGSmFHczhaWHRCVjVQWjdiVnA3MW9wdXNPQVp6djJVU3lFTTcybFNo?=
- =?utf-8?B?UFNHTkg3Z2RCZEYyTVVFSUVna2thM3Jwd3hZYkFuUm1oZlFtUDRnRTZxVGVq?=
- =?utf-8?B?N1ZDVjk0UE9seTRvTmxDTVYrUFJ0Uy9yV2xROEliWk51eEtDdXU0Z3pYWXJp?=
- =?utf-8?B?anBGUkt5bnRwSFo2a2ljNmVxTEIwKys2T2lQSFhwTkQrdkVvY2hxU0VUWThS?=
- =?utf-8?B?OHgweUV2elJuR2VmYU1kb0VBRHNnYXpyODFueFEzSktNQUNMTnRzTkRKbDdP?=
- =?utf-8?B?RlBvWGVvMm1uV0tlcmc4cTlRMllKTGYvUEpmMmVVTTNnWFJrMjhMSlRtNzBG?=
- =?utf-8?B?ZDArTVhwaHJZdXVoOXhFYXA1QVJRWFRJd1NkTnBmdngrWGxnVWNhUUVSUmov?=
- =?utf-8?B?K1RLQnNvQUM2NzM0WE1ONzNjUzdFeUl2RjB1NmFVRDR6VlJLTHpMdTNlOHNB?=
- =?utf-8?B?SVNXa05oOUw2UDhkWWZmZmpLd215c3lubnphcWUrMHpKSkxSR21MOEJDMllY?=
- =?utf-8?B?aWFVbEd2cnc4WGhkcEdMTnJKaVFBNHl0YVBVV0FxclZEb0JoVjlEV1AxNHFh?=
- =?utf-8?B?Kzh5d1JQcmNoRmlpalRrc2ljTGtKQVc2aUJJdlZML1pGVVVCZTByTGFFWW5N?=
- =?utf-8?B?eTRIOE5Nb2Y3OGFucVZSVGtMaW5xeHdwV0tad1E4cE9GUk12MDJOU0w1U25N?=
- =?utf-8?B?dDgrdzZWbUd4VjFXZTk1OFZMZmxMbi93cXp5c0Z2UHBWOXc3OHpJUEhCOHFQ?=
- =?utf-8?B?MUk5RG5DeWs1MXVLOHE5TTRCMkl3cXFTRHA0WWxxNWhVV0gwa3phRitqTlNC?=
- =?utf-8?B?c2pTdlpFdW9wblI3c3AyYmQrNDFvNWFYT0dzM3YwRnZXUk9SUHFEUTJqM1pp?=
- =?utf-8?B?M1FJRUVVOWpEd1hTOWYwUjAzVjJpcnlNZkhWTnhIdGJ4NzhlTGJIK2NabTgv?=
- =?utf-8?B?OGxGNUQ0cU43UTZuNXErdGVnanJuTEd2M0VFaTlDNzJOZXQwOTVYQ2tkWnlO?=
- =?utf-8?B?K0cyMEFKUGFzL1R2ZXlYLzVRbWpTNUZMeU5qSGVVYXpCOTV5OFcrdlFrL0JT?=
- =?utf-8?B?cEFROEViM1JtN3FySDd4b0xJbXpyemgyN0x6QmkxYWpZUlprU3VMR0oyYlVQ?=
- =?utf-8?B?M1FNY1lpVjhhYmlhVVl3U1JBTUJ4SjFVOUdURFZDVm1RdFB2Q1hMS0lCeEY4?=
- =?utf-8?B?NUtsMjNRa0NQUHJHU1MvMURkK3BEcEEzY0ZUcDBjR1N1Qit6RTJHU1kreEVr?=
- =?utf-8?B?MUxxZW11V1JCSGR2R0w0RTRzNENkeEc5dGtFWDZKanBZaGNGVDBsL0VjdzQy?=
- =?utf-8?B?U0FKMWs2N3lqR2txMkI0Sm5kMEdkeGpSN3U1dDhHZzg4Qnc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5968.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Z2FmbGhrTlFWREJvWjdCU1VYNHgya0haRTlqdUtTa0c0Z2VPbG4rS3NOQ3VP?=
- =?utf-8?B?aTc3dURUbGo5WXg3ZXNRWEJQVWdabGRxOWw4R2RUS3UwczltdmtmdnZlUlRz?=
- =?utf-8?B?OVp6R3NaazB0RXVzZUxHTld4Ny9jU3BxMWd2ZVF6YlFhV2lYQnVrK3orK2pZ?=
- =?utf-8?B?aWMvOFN2UG1DTDVZaDFtUVVkQ3pRV08yTVNYRTdkMTIvbTB1OWh0Sm1HMCs3?=
- =?utf-8?B?WUpNTnVkSytmdHZmOVZvR2tVbTNxQjlkb29xZnB1bzhObzliaU84UG92RW9E?=
- =?utf-8?B?M0lzeXUvYnpkelJiQk1zLzhWazN1dThSN0JnRzkyQWZMSVdnMjY3cnViQjhZ?=
- =?utf-8?B?QkhxUVpFZHpGRDRObnkzbTA5QnJlMlhnaXYrSCtWMXBQZ0V2MktGVTJhbTRn?=
- =?utf-8?B?bGJFeU5EUlpPVGwyd3hxc0JSa3ZOUTh3NmxZdkkrOUZRVUR4ck0zVTh4dzlY?=
- =?utf-8?B?YTdUTXBtZHhMdUQxRzJwdDB1YmFiRUQ0YzFCa0JjQ08zU1V4N0tVUGJjTmVo?=
- =?utf-8?B?RE5JTUV5VFlOaVlTMEFzaU03UitTVnprSXZoOWxwU0doN0ZsK0JCRlJMaitY?=
- =?utf-8?B?UmFHeXV0ekg3QVZoNENJaEc2QjQ5WUpaMWp5bTBwMnllTGs1Z20xZ0x3a0Fs?=
- =?utf-8?B?Q2NKblU2NUVEV0lqQjZBUUYzN0w0RE9kUk9ySlM2eDVqTG1ERzlTOWUzMjJj?=
- =?utf-8?B?M0JrZXN1MmxoU1RLNFZMK0pwLzA3NHdCUTNmazZJM01zYTcrNGsrYXNIZWVM?=
- =?utf-8?B?TlBlT245aDZ1VHlVcVlDdUxEMWw2QXRNU1BFVW5UajduclBnenMrNXBRNUMr?=
- =?utf-8?B?NWFyQ3FsVzhuNGNmSnY1Mi9ISndPWjliWW0rS0xJc2V5QzVKSTRvalA2aFUw?=
- =?utf-8?B?SE1KTkVpTEVFQmtKUTg2VmkvbXF2L1NLdFBMRzNDS1I2MDAwKzZuZmtzd1FV?=
- =?utf-8?B?TjhreGszMlJkdFJyK3RRbnpQZ0RxVzEranZVNS9kRmNQUHIzNzBNNWVOUHVi?=
- =?utf-8?B?RGYyVU9qVStQQXUzR0lYaXlKOENCV0RWOFVDT1dOZ01tRGNRdHhVazNKKzdB?=
- =?utf-8?B?Q25OT3FaNThIV3RWVmVDV0paV2FJU01sb3IwTTVrRzZEaWRzY3pBUmJlRit1?=
- =?utf-8?B?MmhJbmp4ajI5OENiYTNra2RlaEZjRmhiRmFPVDZZdGN6YUFyc1N1MDlrVlJ2?=
- =?utf-8?B?TnpqdWJpVWxyRTFXN09MSDMvUUdjZ1lrdGZhN2xEeldEQjRGRjA1RWV4cGdS?=
- =?utf-8?B?eTBMZWRFU3NLMnYrTXdTMGFEbXI2V2M1SU1KZVVIVGF0dFkxV0xMNmdWNWhF?=
- =?utf-8?B?dDBUZ0l1Mm4zU3Y1UWR0dnVsWExuL0Z2bHVEQ21ML09TWlgwQXJRTzhaQTJr?=
- =?utf-8?B?SDVvQ001cFV1NmdNaGF0ZUJneEFlam1zWlAwY0lzTWVjelEzNnFscGhZbGtv?=
- =?utf-8?B?S0crbnF2MDc3U1QxLy9WS1ZvSUdqc0cyK2wyWk9mRnZXWGIxaGE5WWFwbWlZ?=
- =?utf-8?B?UjNMT0hIQTRhUHV3MFNVVFNjSEtmbklKamVzMDZpOVdNRGdnNG8wbVpKakdo?=
- =?utf-8?B?eXpGaDZobXM5NWVTZnY2VUcvN1dJek1YT0w1UFduazVqOUR2RjVHQ3lZOG5E?=
- =?utf-8?B?cHhzSHpmeXBQYmEvTHNEdWlFVjVtdTFoMzZpVVVZaGxQc2oxNUt4bFBIT0do?=
- =?utf-8?B?SEhDMDRJK2NHOUZpaVNqWkxxNFF1WkNRTlZ5amJhcXBIS1BDYzVhcnVVNUI0?=
- =?utf-8?B?Vy9vOWFWWG1HcHNOWEtCRHR5L2JqM2drU2pFSHZmcVJ0Wm53Q1NGdktNMDl1?=
- =?utf-8?B?dU9VUUdMaldtdkQyVTJRLysvR3ZKZHZmem85alRmUGtzSlQxZlFOdkZHVlJy?=
- =?utf-8?B?OHBkYTZ4OWdia2tXTXk5dE5EZkdTQVNrSmc5QXlDNUdDU1BQbmo2c3ZaNEY1?=
- =?utf-8?B?YTBlelUxU0F3Z2h5alpQNUdkM3pwNDFwSHRkV2lUbWIrTUVscVljeUVlbUsy?=
- =?utf-8?B?eWkwdDF1Vk5uUDB6N1pDU2UzSVVoZXUvU2JWRjhTK0NMZFppUzhLbEgrTkUy?=
- =?utf-8?B?NXo3KzBPdkFPNXpTSUZaY0R4Z2hMbkZpaXhpeWxCbzVhWExlZUtxUmM5T0Ri?=
- =?utf-8?B?NmNoNmZJdXZTRU04OGRJWjhMU1FDZTZDUGlhVHRxYm8zZzRVQWtQamFCdm41?=
- =?utf-8?B?a1E9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89b9ab1e-80e3-48bd-897d-08ddedcd6976
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5968.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2025 05:14:25.2162
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nMH9E6FIAuGh537ODX0TA1FL8Y+H+9s2oVS0wOHG+o0yolAQXZ6PgvaRmfySFg15SGYvEm2Bjkc1N1v56jE8Fw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPFDF2DDE6CD
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QAzx-Pck9uJgk_peDD6_6Mz6rQNYUflT
+X-Proofpoint-ORIG-GUID: QAzx-Pck9uJgk_peDD6_6Mz6rQNYUflT
+X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68bd71dd cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=8Xp7l_ZNKlO8CDZGx5MA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXzmuLCisRhC+M
+ E1tkEPdpjRH2qAee5MN79m9sjh/1npUVvigBEyaX5ZTuQtiK144ak0T2/y1XNLEOv7Bpih6IJfp
+ O00NurX0WDpJlRowJInSgH/gQuFgZlDITQJE329fO9woL0D5IBtaC0So4UWc9jMOmrgEExmaZX7
+ kViFjOiHUcnqfR5I4nikV/SFpVjgN7w6Pea2DnFvJz0OAhq+CRJykxsfuGhL8EH1Za8wW0ozp+t
+ x+fCQw8q7GqWrKXaC5wFdJXHUTGW7eJ2SHpzsp8BKgQAtHLYp/Y1tihIeedp/9VBxYVEx4jI0R5
+ hVYsMOWO2KOh1t20HQbZrKASvpIL1wh4oI44Jp0uah5mu0GK+eVPcUVsYZK8FFxRuf4gw8iEvjg
+ nBVSimG7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-07_04,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
 
-On 9/5/25 11:56 PM, David Hildenbrand wrote:
-> On 06.09.25 03:05, John Hubbard wrote:
->> On 9/1/25 8:03 AM, David Hildenbrand wrote:
-...> Well, there is a lot I dislike about record_subpages() to go back 
-there.
-> Starting with "as Willy keeps explaining, the concept of subpages do
-> not exist and ending with "why do we fill out the array even on failure".
-> 
-> :)
+On Thu, 2025-07-31 at 11:47 -0700, Eric Biggers wrote:
+> Instead of the "sha256" crypto_shash, just use sha256().  Similarly,
+> instead of the "hmac(sha256)" crypto_shash, just use
+> hmac_sha256_usingrawkey().  This is simpler and faster.
+>=20
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-I am also very glad to see the entire concept of subpages disappear.
+Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
 
->>
->> Now it's been returned to it's original, cryptic form.
->>
-> 
-> The code in the caller was so uncryptic that both me and Lorenzo missed
-> that magical addition. :P
-> 
->> Just my take on it, for whatever that's worth. :)
-> 
-> As always, appreciated.
-> 
-> I could of course keep the simple loop in some "record_folio_pages"
-> function and clean up what I dislike about record_subpages().
-> 
-> But I much rather want the call chain to be cleaned up instead, if 
-> possible.
-> 
-
-Right! The primary way that record_subpages() helped was in showing
-what was going on: a function call helps a lot to self-document,
-sometimes.
-
-> 
-> Roughly, what I am thinking (limiting it to pte+pmd case) about is the 
-> following:
-
-The code below looks much cleaner, that's great!
-
-thanks,
--- 
-John Hubbard
-
-> 
-> 
->  From d6d6d21dbf435d8030782a627175e36e6c7b2dfb Mon Sep 17 00:00:00 2001
-> From: David Hildenbrand <david@redhat.com>
-> Date: Sat, 6 Sep 2025 08:33:42 +0200
-> Subject: [PATCH] tmp
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->   mm/gup.c | 79 ++++++++++++++++++++++++++------------------------------
->   1 file changed, 36 insertions(+), 43 deletions(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 22420f2069ee1..98907ead749c0 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -2845,12 +2845,11 @@ static void __maybe_unused 
-> gup_fast_undo_dev_pagemap(int *nr, int nr_start,
->    * also check pmd here to make sure pmd doesn't change (corresponds to
->    * pmdp_collapse_flush() in the THP collapse code path).
->    */
-> -static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
-> -        unsigned long end, unsigned int flags, struct page **pages,
-> -        int *nr)
-> +static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, 
-> unsigned long addr,
-> +        unsigned long end, unsigned int flags, struct page **pages)
->   {
->       struct dev_pagemap *pgmap = NULL;
-> -    int ret = 0;
-> +    unsigned long nr_pages = 0;
->       pte_t *ptep, *ptem;
-> 
->       ptem = ptep = pte_offset_map(&pmd, addr);
-> @@ -2908,24 +2907,20 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t 
-> *pmdp, unsigned long addr,
->            * details.
->            */
->           if (flags & FOLL_PIN) {
-> -            ret = arch_make_folio_accessible(folio);
-> -            if (ret) {
-> +            if (arch_make_folio_accessible(folio)) {
->                   gup_put_folio(folio, 1, flags);
->                   goto pte_unmap;
->               }
->           }
->           folio_set_referenced(folio);
-> -        pages[*nr] = page;
-> -        (*nr)++;
-> +        pages[nr_pages++] = page;
->       } while (ptep++, addr += PAGE_SIZE, addr != end);
-> 
-> -    ret = 1;
+>  security/keys/Kconfig                    |  3 +-
+>  security/keys/encrypted-keys/encrypted.c | 63 ++++--------------------
+>  2 files changed, 11 insertions(+), 55 deletions(-)
+>=20
+> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+> index d4f5fc1e72638..64477e2c4a212 100644
+> --- a/security/keys/Kconfig
+> +++ b/security/keys/Kconfig
+> @@ -85,14 +85,13 @@ endif
+> =20
+>  config ENCRYPTED_KEYS
+>  	tristate "ENCRYPTED KEYS"
+>  	depends on KEYS
+>  	select CRYPTO
+> -	select CRYPTO_HMAC
+>  	select CRYPTO_AES
+>  	select CRYPTO_CBC
+> -	select CRYPTO_SHA256
+> +	select CRYPTO_LIB_SHA256
+>  	select CRYPTO_RNG
+>  	help
+>  	  This option provides support for create/encrypting/decrypting keys
+>  	  in the kernel.  Encrypted keys are instantiated using kernel
+>  	  generated random numbers or provided decrypted data, and are
+> diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/enc=
+rypted-keys/encrypted.c
+> index 831cb84fd75a1..513c09e2b01cf 100644
+> --- a/security/keys/encrypted-keys/encrypted.c
+> +++ b/security/keys/encrypted-keys/encrypted.c
+> @@ -25,22 +25,19 @@
+>  #include <linux/random.h>
+>  #include <linux/rcupdate.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/ctype.h>
+>  #include <crypto/aes.h>
+> -#include <crypto/hash.h>
+>  #include <crypto/sha2.h>
+>  #include <crypto/skcipher.h>
+>  #include <crypto/utils.h>
+> =20
+>  #include "encrypted.h"
+>  #include "ecryptfs_format.h"
+> =20
+>  static const char KEY_TRUSTED_PREFIX[] =3D "trusted:";
+>  static const char KEY_USER_PREFIX[] =3D "user:";
+> -static const char hash_alg[] =3D "sha256";
+> -static const char hmac_alg[] =3D "hmac(sha256)";
+>  static const char blkcipher_alg[] =3D "cbc(aes)";
+>  static const char key_format_default[] =3D "default";
+>  static const char key_format_ecryptfs[] =3D "ecryptfs";
+>  static const char key_format_enc32[] =3D "enc32";
+>  static unsigned int ivsize;
+> @@ -52,12 +49,10 @@ static int blksize;
+>  #define HASH_SIZE SHA256_DIGEST_SIZE
+>  #define MAX_DATA_SIZE 4096
+>  #define MIN_DATA_SIZE  20
+>  #define KEY_ENC32_PAYLOAD_LEN 32
+> =20
+> -static struct crypto_shash *hash_tfm;
 > -
->   pte_unmap:
->       if (pgmap)
->           put_dev_pagemap(pgmap);
->       pte_unmap(ptem);
-> -    return ret;
-> +    return nr_pages;
->   }
->   #else
-> 
-> @@ -2938,21 +2933,24 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t 
-> *pmdp, unsigned long addr,
->    * get_user_pages_fast_only implementation that can pin pages. Thus 
-> it's still
->    * useful to have gup_fast_pmd_leaf even if we can't operate on ptes.
->    */
-> -static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
-> -        unsigned long end, unsigned int flags, struct page **pages,
-> -        int *nr)
-> +static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, 
-> unsigned long addr,
-> +        unsigned long end, unsigned int flags, struct page **pages)
->   {
->       return 0;
->   }
->   #endif /* CONFIG_ARCH_HAS_PTE_SPECIAL */
-> 
-> -static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-> -        unsigned long end, unsigned int flags, struct page **pages,
-> -        int *nr)
-> +static unsigned long gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, 
-> unsigned long addr,
-> +        unsigned long end, unsigned int flags, struct page **pages)
->   {
-> +    const unsigned long nr_pages = (end - addr) >> PAGE_SHIFT;
->       struct page *page;
->       struct folio *folio;
-> -    int refs;
-> +    unsigned long i;
-> +
-> +    /* See gup_fast_pte_range() */
-> +    if (pmd_protnone(orig))
-> +        return 0;
-> 
->       if (!pmd_access_permitted(orig, flags & FOLL_WRITE))
->           return 0;
-> @@ -2960,33 +2958,30 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t 
-> *pmdp, unsigned long addr,
->       if (pmd_special(orig))
->           return 0;
-> 
-> -    refs = (end - addr) >> PAGE_SHIFT;
->       page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
-> 
-> -    folio = try_grab_folio_fast(page, refs, flags);
-> +    folio = try_grab_folio_fast(page, nr_pages, flags);
->       if (!folio)
->           return 0;
-> 
->       if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
-> -        gup_put_folio(folio, refs, flags);
-> +        gup_put_folio(folio, nr_pages, flags);
->           return 0;
->       }
-> 
->       if (!gup_fast_folio_allowed(folio, flags)) {
-> -        gup_put_folio(folio, refs, flags);
-> +        gup_put_folio(folio, nr_pages, flags);
->           return 0;
->       }
->       if (!pmd_write(orig) && gup_must_unshare(NULL, flags, &folio- 
->  >page)) {
-> -        gup_put_folio(folio, refs, flags);
-> +        gup_put_folio(folio, nr_pages, flags);
->           return 0;
->       }
-> 
-> -    pages += *nr;
-> -    *nr += refs;
-> -    for (; refs; refs--)
-> +    for (i = 0; i < nr_pages; i++)
->           *(pages++) = page++;
->       folio_set_referenced(folio);
-> -    return 1;
-> +    return nr_pages;
->   }
-> 
->   static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
-> @@ -3033,11 +3028,11 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t 
-> *pudp, unsigned long addr,
->       return 1;
->   }
-> 
-> -static int gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
-> -        unsigned long end, unsigned int flags, struct page **pages,
-> -        int *nr)
-> +static unsigned long gup_fast_pmd_range(pud_t *pudp, pud_t pud, 
-> unsigned long addr,
-> +        unsigned long end, unsigned int flags, struct page **pages)
->   {
-> -    unsigned long next;
-> +    unsigned long cur_nr_pages, next;
-> +    unsigned long nr_pages = 0;
->       pmd_t *pmdp;
-> 
->       pmdp = pmd_offset_lockless(pudp, pud, addr);
-> @@ -3046,23 +3041,21 @@ static int gup_fast_pmd_range(pud_t *pudp, pud_t 
-> pud, unsigned long addr,
-> 
->           next = pmd_addr_end(addr, end);
->           if (!pmd_present(pmd))
-> -            return 0;
-> +            break;
-> 
-> -        if (unlikely(pmd_leaf(pmd))) {
-> -            /* See gup_fast_pte_range() */
-> -            if (pmd_protnone(pmd))
-> -                return 0;
-> +        if (unlikely(pmd_leaf(pmd)))
-> +            cur_nr_pages = gup_fast_pmd_leaf(pmd, pmdp, addr, next, 
-> flags, pages);
-> +        else
-> +            cur_nr_pages = gup_fast_pte_range(pmd, pmdp, addr, next, 
-> flags, pages);
-> 
-> -            if (!gup_fast_pmd_leaf(pmd, pmdp, addr, next, flags,
-> -                pages, nr))
-> -                return 0;
-> +        nr_pages += cur_nr_pages;
-> +        pages += cur_nr_pages;
-> 
-> -        } else if (!gup_fast_pte_range(pmd, pmdp, addr, next, flags,
-> -                           pages, nr))
-> -            return 0;
-> +        if (nr_pages != (next - addr) >> PAGE_SIZE)
-> +            break;
->       } while (pmdp++, addr = next, addr != end);
-> 
-> -    return 1;
-> +    return nr_pages;
->   }
-> 
->   static int gup_fast_pud_range(p4d_t *p4dp, p4d_t p4d, unsigned long addr,
-
-
+>  enum {
+>  	Opt_new, Opt_load, Opt_update, Opt_err
+>  };
+> =20
+>  enum {
+> @@ -327,39 +322,18 @@ static struct key *request_user_key(const char *mas=
+ter_desc, const u8 **master_k
+>  	*master_keylen =3D upayload->datalen;
+>  error:
+>  	return ukey;
+>  }
+> =20
+> -static int calc_hmac(u8 *digest, const u8 *key, unsigned int keylen,
+> -		     const u8 *buf, unsigned int buflen)
+> -{
+> -	struct crypto_shash *tfm;
+> -	int err;
+> -
+> -	tfm =3D crypto_alloc_shash(hmac_alg, 0, 0);
+> -	if (IS_ERR(tfm)) {
+> -		pr_err("encrypted_key: can't alloc %s transform: %ld\n",
+> -		       hmac_alg, PTR_ERR(tfm));
+> -		return PTR_ERR(tfm);
+> -	}
+> -
+> -	err =3D crypto_shash_setkey(tfm, key, keylen);
+> -	if (!err)
+> -		err =3D crypto_shash_tfm_digest(tfm, buf, buflen, digest);
+> -	crypto_free_shash(tfm);
+> -	return err;
+> -}
+> -
+>  enum derived_key_type { ENC_KEY, AUTH_KEY };
+> =20
+>  /* Derive authentication/encryption key from trusted key */
+>  static int get_derived_key(u8 *derived_key, enum derived_key_type key_ty=
+pe,
+>  			   const u8 *master_key, size_t master_keylen)
+>  {
+>  	u8 *derived_buf;
+>  	unsigned int derived_buf_len;
+> -	int ret;
+> =20
+>  	derived_buf_len =3D strlen("AUTH_KEY") + 1 + master_keylen;
+>  	if (derived_buf_len < HASH_SIZE)
+>  		derived_buf_len =3D HASH_SIZE;
+> =20
+> @@ -372,14 +346,13 @@ static int get_derived_key(u8 *derived_key, enum de=
+rived_key_type key_type,
+>  	else
+>  		strcpy(derived_buf, "ENC_KEY");
+> =20
+>  	memcpy(derived_buf + strlen(derived_buf) + 1, master_key,
+>  	       master_keylen);
+> -	ret =3D crypto_shash_tfm_digest(hash_tfm, derived_buf, derived_buf_len,
+> -				      derived_key);
+> +	sha256(derived_buf, derived_buf_len, derived_key);
+>  	kfree_sensitive(derived_buf);
+> -	return ret;
+> +	return 0;
+>  }
+> =20
+>  static struct skcipher_request *init_skcipher_req(const u8 *key,
+>  						  unsigned int key_len)
+>  {
+> @@ -501,14 +474,14 @@ static int datablob_hmac_append(struct encrypted_ke=
+y_payload *epayload,
+>  	ret =3D get_derived_key(derived_key, AUTH_KEY, master_key, master_keyle=
+n);
+>  	if (ret < 0)
+>  		goto out;
+> =20
+>  	digest =3D epayload->format + epayload->datablob_len;
+> -	ret =3D calc_hmac(digest, derived_key, sizeof derived_key,
+> -			epayload->format, epayload->datablob_len);
+> -	if (!ret)
+> -		dump_hmac(NULL, digest, HASH_SIZE);
+> +	hmac_sha256_usingrawkey(derived_key, sizeof(derived_key),
+> +				epayload->format, epayload->datablob_len,
+> +				digest);
+> +	dump_hmac(NULL, digest, HASH_SIZE);
+>  out:
+>  	memzero_explicit(derived_key, sizeof(derived_key));
+>  	return ret;
+>  }
+> =20
+> @@ -532,13 +505,12 @@ static int datablob_hmac_verify(struct encrypted_ke=
+y_payload *epayload,
+>  		p =3D epayload->master_desc;
+>  		len -=3D strlen(epayload->format) + 1;
+>  	} else
+>  		p =3D epayload->format;
+> =20
+> -	ret =3D calc_hmac(digest, derived_key, sizeof derived_key, p, len);
+> -	if (ret < 0)
+> -		goto out;
+> +	hmac_sha256_usingrawkey(derived_key, sizeof(derived_key), p, len,
+> +				digest);
+>  	ret =3D crypto_memneq(digest, epayload->format + epayload->datablob_len=
+,
+>  			    sizeof(digest));
+>  	if (ret) {
+>  		ret =3D -EINVAL;
+>  		dump_hmac("datablob",
+> @@ -1009,33 +981,18 @@ EXPORT_SYMBOL_GPL(key_type_encrypted);
+> =20
+>  static int __init init_encrypted(void)
+>  {
+>  	int ret;
+> =20
+> -	hash_tfm =3D crypto_alloc_shash(hash_alg, 0, 0);
+> -	if (IS_ERR(hash_tfm)) {
+> -		pr_err("encrypted_key: can't allocate %s transform: %ld\n",
+> -		       hash_alg, PTR_ERR(hash_tfm));
+> -		return PTR_ERR(hash_tfm);
+> -	}
+> -
+>  	ret =3D aes_get_sizes();
+>  	if (ret < 0)
+> -		goto out;
+> -	ret =3D register_key_type(&key_type_encrypted);
+> -	if (ret < 0)
+> -		goto out;
+> -	return 0;
+> -out:
+> -	crypto_free_shash(hash_tfm);
+> -	return ret;
+> -
+> +		return ret;
+> +	return register_key_type(&key_type_encrypted);
+>  }
+> =20
+>  static void __exit cleanup_encrypted(void)
+>  {
+> -	crypto_free_shash(hash_tfm);
+>  	unregister_key_type(&key_type_encrypted);
+>  }
+> =20
+>  late_initcall(init_encrypted);
+>  module_exit(cleanup_encrypted);
+>=20
+> base-commit: d6084bb815c453de27af8071a23163a711586a6c
 
