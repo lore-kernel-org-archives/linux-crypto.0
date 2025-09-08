@@ -1,104 +1,75 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD787082A;
-	Mon,  8 Sep 2025 14:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894F530DD32;
+	Mon,  8 Sep 2025 14:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757341001; cv=none; b=PpO9mNCdfkO6kNoNmbPzZN7ykgp5Yhr4k4fR3yMdS4vnfr67Av0s0QGA68J+SIYKwIwdMhuKTtRA8EwA+Kjub166b+EJkZvxznu/T35ucskpRXH+f9bVoU3YXqy2/Q9mflGXP0Ib7w4Uwuqi4OQJ9kGTF5WfwZ++stf0iaCdq4M=
+	t=1757342173; cv=none; b=l0T4A0z62KDwSUOpC1zcLTGL+oQzXjyorNH5p4P/lQFVfgsg6VKzIBc97fPkfo6WgA7Lqs5xKk0DR4fI9ujVSfeJicw47xWxgaiA3uxGGOFtQaSMQ4KTzbJfSvoDv9Vo4bF94NCAYCrsUHqsnnOLdPDZ1QzWGAIC5JBd9NsSCVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757341001; c=relaxed/simple;
-	bh=CBI4suASODhHBC14sipB186eMW1r9Bxk7k0WFgqClrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OufGSy2yjhyiRfREbVACUZjryM1S1om7wIWWchsemGJLkuAXzejd70CNqvnETDEv7wkGeNoN5OYcISAXTTnLqHssi902h0nM1QtI2bzipHZutIYGZai4nQXNimJaNKejdBeO148s3Rkj4qetSr3MnjU/A6ZmStBptvTzN5QHPmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmPa1gkq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757342173; c=relaxed/simple;
+	bh=IcHaFmYPIwn2IjYx1XVFrnQPvNfMRP5HLn1n+kgrdik=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eZe9r0Xz4tBuL0Am1h4GD1T/wjU/01rL2nPqI0dJDLWxD9K61He6ONzqMu/7JbnwI65HKnDxtLIXGtyvlEJv+vIg1iZdi4jtlkDFehGxLza/tYB5Gp5OEo73SGk87ibtOl/0LGFQWoB1BgRhVyjlERZJXPL3Aa3ef28yk6MfVjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GecvrKCr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmPa1gkq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB51C4CEF7;
-	Mon,  8 Sep 2025 14:16:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GecvrKCr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 477EBC4CEF1;
+	Mon,  8 Sep 2025 14:36:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757341001;
-	bh=CBI4suASODhHBC14sipB186eMW1r9Bxk7k0WFgqClrU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tmPa1gkqzuRx5RyBxCqHbzAfV5G4d4nmjTy6s6i+bt8myOEAOvu9tsR0PlDNaoEHs
-	 sST9fnnK7DNwNwUqjeW5R0YMOuZQPBrj7IDVOInuWfqw122jHn7oe+ryNfpvECbpT8
-	 QGOooXhdorgU/mWM3v6eZG5p0MbFRl7IM4VZVzmhwtupIt/tVZYx/y6bFRkpsf5kLb
-	 jNyXLVEg3krWoHqiJAJeueQguSgXgV502xPIwfMKDsJBq5oTKUw644aWNHdDZ4c4Ui
-	 edKOg88t//Hhs8IVxDpQPqbLQlkysNMXo9z37pCYTNLvn+zGjV6Vip71Pe++vy/BIc
-	 A5EjILmOauKQQ==
-Date: Mon, 8 Sep 2025 15:16:33 +0100
-From: Lee Jones <lee@kernel.org>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Robert Marko <robert.marko@sartura.hr>, linux@armlinux.org.uk,
-	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
-	catalin.marinas@arm.com, will@kernel.org, olivia@selenic.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	andi.shyti@kernel.org, broonie@kernel.org,
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, arnd@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-	o.rempel@pengutronix.de, daniel.machon@microchip.com,
-	luka.perkov@sartura.hr
-Subject: Re: [PATCH v9 4/9] mfd: at91-usart: Make it selectable for
- ARCH_MICROCHIP
-Message-ID: <20250908141633.GB9224@google.com>
-References: <20250813174720.540015-1-robert.marko@sartura.hr>
- <20250813174720.540015-5-robert.marko@sartura.hr>
- <20250902100254.GD2163762@google.com>
- <769c8dc4-4db6-4d2e-aa2f-f86aa7ccaf78@microchip.com>
+	s=k20201202; t=1757342173;
+	bh=IcHaFmYPIwn2IjYx1XVFrnQPvNfMRP5HLn1n+kgrdik=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GecvrKCr0Tmzm3aYoURkGXvH2U3BtKdFTgwWqy9WfYm4IVOoAIC4EfbbknwlNOnYi
+	 Q4OzJ98IWggOFXkRv0GcKU/uyqbieDWZKtu1M2m8RRw2pqYcYv3zct9IlUCjOvb3pt
+	 TNfxQPpuyU5LR5BU3r325hBrlRUTg7ydJejFs2o1spim6PStF50EacJQApCykaZwTQ
+	 eHqWOxFGITzHTm2/HlnOGNjUw2ZqkyZfoEYCyS9kdm7yzDHrhQPyE4T3LMvSHYkBZ1
+	 p7jfNANvURMfsz/X/9nMNpygL251zNhuOHWX6qQ8NEUcSdheN3DM4lxxKy7ExcOr7V
+	 MqzUMVkDyG5Nw==
+From: Chuck Lever <cel@kernel.org>
+To: linux-nfs@vger.kernel.org,
+	Jeff Layton <jlayton@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	linux-crypto@vger.kernel.org,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>
+Subject: Re: [PATCH] SUNRPC: Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it
+Date: Mon,  8 Sep 2025 10:36:04 -0400
+Message-ID: <175734214897.12169.10475464910212519496.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250906230019.94569-1-ebiggers@kernel.org>
+References: <20250906230019.94569-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <769c8dc4-4db6-4d2e-aa2f-f86aa7ccaf78@microchip.com>
 
-On Thu, 04 Sep 2025, Nicolas Ferre wrote:
+From: Chuck Lever <chuck.lever@oracle.com>
 
-> On 02/09/2025 at 12:02, Lee Jones wrote:
-> > On Wed, 13 Aug 2025, Robert Marko wrote:
-> > 
-> > > LAN969x uses the Atmel USART, so make it selectable for ARCH_MICROCHIP to
-> > > avoid needing to update depends in future if other Microchip SoC-s use it
-> > > as well.
-> > > 
-> > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > > ---
-> > >   drivers/mfd/Kconfig | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-> > > index 425c5fba6cb1..8f11b2df1470 100644
-> > > --- a/drivers/mfd/Kconfig
-> > > +++ b/drivers/mfd/Kconfig
-> > > @@ -138,7 +138,7 @@ config MFD_AAT2870_CORE
-> > >   config MFD_AT91_USART
-> > >        tristate "AT91 USART Driver"
-> > >        select MFD_CORE
-> > > -     depends on ARCH_AT91 || ARCH_LAN969X || COMPILE_TEST
-> > > +     depends on ARCH_MICROCHIP || COMPILE_TEST
-> > >        help
-> > >          Select this to get support for AT91 USART IP. This is a wrapper
-> > >          over at91-usart-serial driver and usart-spi-driver. Only one function
-> > 
-> > Let me know when the deps are in Mainline.
+On Sat, 06 Sep 2025 16:00:19 -0700, Eric Biggers wrote:
+> Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it.  This
+> unblocks the eventual removal of the selection of CRYPTO from NFSD_V4,
+> which will no longer be needed by nfsd itself due to switching to the
+> crypto library functions.  But NFSD_V4 selects RPCSEC_GSS_KRB5, which
+> still needs CRYPTO.  It makes more sense for RPCSEC_GSS_KRB5 to select
+> CRYPTO itself, like most other kconfig options that need CRYPTO do.
 > 
-> Hi Lee,
-> 
-> I have tags from other maintainers, how about you give us your and we make
+> [...]
 
-My?  AB?
+Applied to nfsd-testing, thanks!
 
-> this patch travel through arm-soc like the other ones?
+[1/1] SUNRPC: Make RPCSEC_GSS_KRB5 select CRYPTO instead of depending on it
+      commit: b3560ad8e52b87cdbd858ec279429276695c1e48
 
-Sure.
+--
+Chuck Lever
 
-Acked-by: Lee Jones <lee@kernel.org>
-
--- 
-Lee Jones [李琼斯]
