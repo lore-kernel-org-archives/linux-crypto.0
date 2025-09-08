@@ -1,103 +1,140 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2670828371;
-	Mon,  8 Sep 2025 09:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE80AA55
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Sep 2025 10:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757323968; cv=none; b=uUg/3KykRLe58QoUbgqsXYBGLtoLkBiCB3PeECMrA2MHYJpERC9ZhT+EuRegTJJk61NV1PDzamk2YSElfrxtQlfsdy7VZ9zn8zvvtaNbxUgIPtfcZzxpSKzyEOMp6/R6W3i5GLNcxXSIYPXRZMYWD/cru9NbWI7y5bn6pMcFJj0=
+	t=1757327490; cv=none; b=opdmLrx57nFEnJL3DD6Bh/tO4RDW9JdLFARjCgJ6Ib9+e6QgfXRQQV45LOX/Av1TUQsPqNsnertPnSTzgLEbvQIfAwOKnmwDhymzXsjdhxuICyXx0Xs///1S0Kt6r+ykmQqppJIJygSNUgTzGovQzEpKvakFEoVB4Cf/Goc0syI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757323968; c=relaxed/simple;
-	bh=+Pz7YkO46IdueWY2ZlJ9XrXqxlWSnyPj4XKKpBVqIf8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fdoyFVyzMrZgHCDiCp409bW2i1vuUYsY62AMJiXSakua1ovIXKsOXkuaYZ+QzVPB7NRr0G1UHD13qaMJKtvbH7vpAsc/dDZ39rfGRCOpbhTr/hV5R5URe8xq0zDJkMggkT4Ca57dGukqUqUt2fCRHEK40o1eAqbIdRxr+RwyVnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1EayQX1; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1EayQX1"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-244580523a0so43190735ad.1;
-        Mon, 08 Sep 2025 02:32:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757323966; x=1757928766; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xUPhDujEwhIwtnferG2DkQfBY8cKDI03hizB52EofeM=;
-        b=m1EayQX1mGHq9kijDtnRd9SDnIEVO7nf/nUCnSw7deDBovBucuf401X2nKXEf48muS
-         ex3mpUssCHDuzXYqFk0pPWQlnjZU7bsV8gtwImKTg0Y0pbA5Wt0Q5IseZx2l40N1QWg+
-         BiwNvo03LSzEfX5aKhRMsQF7W4C0cxt0HeldnAQ7whhSl+IZyBYRTtJjZT/jWwz1QKCF
-         Tu7+yf7YApExOoAaMojA78waqVFKz2yCwzsHvp4Cp09KSRmyLeWqm8Mwnea+WBF3xiiZ
-         oLcABAy9PxLpCy0OTVinaVFNeCSrlfVE2+FBJsktv5tuaWL4CqRZgJw3NPZ0EShJluxT
-         2isA==
+	s=arc-20240116; t=1757327490; c=relaxed/simple;
+	bh=jKcAUYY51A7KTMimnZdCvOaqDwEfhuPg++4X0pDGJWo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sZKzlAc+lltICdzaO6qV+Ay+H5CEtweABkccrxfM5WkB56j19C3wR/KpE7oJ+HhD5yMspfwtZJPyejk9UouMYncJlERMI7qYephR8eJWpaF7Q3ys6Eo4yrEwwWmpGpDcgXCdMC0r0sJ3WwZDntr+8La8KdktTUl4+L+wlbeUoXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-889b8d8b6b7so98023939f.1
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Sep 2025 03:31:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757323966; x=1757928766;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xUPhDujEwhIwtnferG2DkQfBY8cKDI03hizB52EofeM=;
-        b=pRVixiYYVwhn+Ye5UYzMurjK+fRN0ckjHt927b5rW6m3IKY3L4wiEepS3vtDx5yE2z
-         wjSDd6JcjxcUeS4BitWys0qE/A1C95L/yRnAqYAMprFtyD2v4o8E6K9MnzOm8+z/yX+7
-         iJ29JsZ+rx3v9Id3RyfL0MOAUV8sw9yj/HJkIg4bQMuDD4riT9/lDZ2d+V7RBW6VEx1r
-         tukpQuLg/munn3mxsBiNn3jvxe13QJqUAZ/MIXfYj/+zDS46CAzKGInVKJtA+yE9wfUQ
-         R6ngtpBBzddgCDIWxHIrLC5NolHXMbsCI/9fCwx28pmK/j/4j48SJjTv/kViydLlrZEH
-         3yBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOQAxY9wYKiQKfDjs3MDaFKGSgVm3ERFxee9nOa8hz9wrnKA2tDnFhnVIrAyQMsleyLLt8XMeAN3FoCorB@vger.kernel.org, AJvYcCUdvdN1Wle222EySM5DVfIq26VwFIF0u5whHF9ZyQgoSxFqa6INGNCPOFys82OxURNHlXivMHvIOEHPH8c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8eHDpwdz94EJa1Vuv32cbrfarAIi7lUgsFpRnn6pfrc37x/uQ
-	QY/k0XUbo5d13uDEG/9Ud5qP0IuDjP7umpMlhT2mQ33YF2spchaJ2Hi4VLmHNdJnBGE9WUb2zdK
-	aLhIOAWnKxYdtEUvUzUBtn8gJz1sN/hw=
-X-Gm-Gg: ASbGncvoItmerI3kzzzd2oVy80sllhF+3JIS2YUvHkVo/2hG8Aem3Q8AbTJljskFFHx
-	jJAM+dt4MwAe8rt+8asvCnm7D3UPh9stTeAvf5z1JiNaV+e76sBX8tXnC5grloXtTTMgzGBIoA2
-	C1WtSsPSY9z3UDL+uFbyaWyJ9zJMLiSFHefmH4oe1dQPki/W4T2A5UbNT0yzGHOon8+/C7/FV7p
-	phE4GYHIpXhBs6CVw==
-X-Google-Smtp-Source: AGHT+IE3dYnmkmEZ9lVXzHrTwi3LW3qAVqQrqJtINr0Ph6peALIMf/dG/dCmGmq4ODNYwmIJkGVwFcL82GHy2zRvaGM=
-X-Received: by 2002:a17:903:2286:b0:24e:6362:8c97 with SMTP id
- d9443c01a7336-2516ce60405mr73974355ad.9.1757323966359; Mon, 08 Sep 2025
- 02:32:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757327488; x=1757932288;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lHq6t1W+owY0uHXSp5L2X1n6+Wjuo05wcsZyezt8tOU=;
+        b=dtLHfFHDAlzus2nhlk/CRV5jWT8jOtCjpCe2ImAD5JXP+JpF0BLhIMIwJcpR7IRRG/
+         3aXulSPRz3HQVQfcmHmvKglXi4CJZMOBfB/rJrs1sQkwcw1AgUPaC9rAh2qMhatUN4f6
+         bAT+RKO10PmDDoOHAZrDpduPUbZds5RbB5xNM1rQxvcHpI0nf7HqkoqlM9zvFKSjKP5A
+         /q9UcbGJtmd4CQU/oIAnHSllo4nCumJDRBmAgKOAeWvZK98LKHzGOiIqOoqyJD465FhB
+         EN4TRgswlUb30wUpkPD06uZC/gWA1qMJCdIT9wUNPhvZK4OAC/Ej/1Wmw7lSQDJO1PRa
+         oxPA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKD3ImZfZKMsbUlzZbGRI61NL8S370QcN4biHgn2RIzEYR8GAVaz3uKaex5Byc53vADgv2uDFFvNSEb9Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJtcRSQzeKYAehG//o2/hRKC5qZ0+XbJ0BGtvY8ukUsWIli5rq
+	wmjlLS+LjlnjU470N2ZFZXCxij8ADVeP8uHOnoEUeJHpgFnkg+eV4dxhn2N89dwU03ECAABTEHj
+	8VcLZEGY0b/n/qukXMfAuzW2JRM29SpTsy2L61GXsyS6bMxOMdNWLoYU9pQ0=
+X-Google-Smtp-Source: AGHT+IFxlEq1fsiVslmGm2GTL/gNo/Ik8p/l8iqEaw5p/Ls+vWb8UgpnsIv3pKbvrEnsxMnLd1FLG0/+htpOawUkZ7g4ZVkM8zvQ
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250731190227.16187-1-ebiggers@kernel.org> <CAOi1vP9QRWKoQuYHynTXuupJ=VHhLLtN3s2FE6a+gG6gvrA6SQ@mail.gmail.com>
- <20250904172558.GA854551@google.com>
-In-Reply-To: <20250904172558.GA854551@google.com>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Mon, 8 Sep 2025 11:32:34 +0200
-X-Gm-Features: Ac12FXyt88t5mUdH3bQ8VdW9m3S1OAwUoiJg0zeZiVzYQiXfTpzPJpAgykQw6xM
-Message-ID: <CAOi1vP8DuaVr=A7gg54RutSgoudOjnH70n9Q4=gLukRWJ5OHiA@mail.gmail.com>
-Subject: Re: [PATCH] libceph: Use HMAC-SHA256 library instead of crypto_shash
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: ceph-devel@vger.kernel.org, Xiubo Li <xiubli@redhat.com>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6e02:17c9:b0:3f6:5b66:b5cd with SMTP id
+ e9e14a558f8ab-3fdfdb2e2a2mr95939465ab.6.1757327487967; Mon, 08 Sep 2025
+ 03:31:27 -0700 (PDT)
+Date: Mon, 08 Sep 2025 03:31:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68beb07f.050a0220.192772.086a.GAE@google.com>
+Subject: [syzbot] [crypto?] KASAN: wild-memory-access Read in __sha512_update
+From: syzbot <syzbot+e37eedd918576774ec80@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 4, 2025 at 7:26=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> w=
-rote:
->
-> On Thu, Sep 04, 2025 at 12:24:08PM +0200, Ilya Dryomov wrote:
-> > > -       if (con->v2.hmac_tfm) {
-> > > -               crypto_free_shash(con->v2.hmac_tfm);
-> > > -               con->v2.hmac_tfm =3D NULL;
-> > > -       }
-> > > +       memzero_explicit(&con->v2.hmac_key, sizeof(con->v2.hmac_key))=
-;
-> > > +       con->v2.hmac_key_set =3D false;
-> >
-> > Hi Eric,
-> >
-> > Since we have hmac_key_set anyway, could the call to memzero_explicit()
-> > be conditioned on it?
->
-> If you want.  It's less code to just do it unconditionally.
+Hello,
 
-Double checking the surrounding code, the only case where hmac_key_set
-would remain false is auth_none protocol (i.e. no authentication at the
-Ceph level at all).  This is extremely rare, so I'm leaving the patch
-as is.
+syzbot found the following issue on:
 
-Thanks,
+HEAD commit:    4ac65880ebca Add linux-next specific files for 20250904
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11136312580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1220fefb3f11f346
+dashboard link: https://syzkaller.appspot.com/bug?extid=e37eedd918576774ec80
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15136312580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16e23e62580000
 
-                Ilya
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/17aafe2d8f53/disk-4ac65880.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/09caead80fb0/vmlinux-4ac65880.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b33c041f8dc2/bzImage-4ac65880.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e37eedd918576774ec80@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: wild-memory-access in __sha512_update+0x10d/0x1d0 lib/crypto/sha512.c:175
+Read of size 2 at addr 0005088000000000 by task syz.0.17/6022
+
+CPU: 0 UID: 0 PID: 6022 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ check_region_inline mm/kasan/generic.c:-1 [inline]
+ kasan_check_range+0x2b0/0x2c0 mm/kasan/generic.c:200
+ __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
+ __sha512_update+0x10d/0x1d0 lib/crypto/sha512.c:175
+ sha512_update include/crypto/sha2.h:734 [inline]
+ crypto_sha512_update+0x27/0x40 crypto/sha512.c:151
+ crypto_shash_update include/crypto/hash.h:1006 [inline]
+ shash_ahash_update+0x213/0x2f0 crypto/ahash.c:178
+ hash_sendmsg+0x96b/0x11d0 crypto/algif_hash.c:149
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:729
+ ____sys_sendmsg+0x52d/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmmsg+0x227/0x430 net/socket.c:2757
+ __do_sys_sendmmsg net/socket.c:2784 [inline]
+ __se_sys_sendmmsg net/socket.c:2781 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2781
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9e1df8ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd2b583528 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f9e1e1c5fa0 RCX: 00007f9e1df8ebe9
+RDX: 0000000000000001 RSI: 0000200000000640 RDI: 0000000000000004
+RBP: 00007f9e1e011e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f9e1e1c5fa0 R14: 00007f9e1e1c5fa0 R15: 0000000000000004
+ </TASK>
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
