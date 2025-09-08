@@ -1,117 +1,121 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A28530ACF6;
-	Mon,  8 Sep 2025 13:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE1A13A265;
+	Mon,  8 Sep 2025 14:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757337093; cv=none; b=Yv0igB/qnM7QABYAOtsE49CwJyNizHnA+LpxzeykOO8GKfavd4ABU2MYwG2RpxwxQFzIRBbcQshL6bRgpuhbafQuKSpaRnTb+9TmpPUHBdoEWZPpt8Fl9W/C0ruKpkaKLOwN+N3OST/LLALhHtBoIawQgmXuAWlPNVx7aLO0m5U=
+	t=1757340597; cv=none; b=jVBTTXGqRS9k8gi9L5wJAZD14J9aAZ3kItZTfp0B3vxzRvH3BdnkVHFZLZmwBq+AabJfV+t/o9b0sLXnu51oe/MsE65esFN9dNhpzSaoRJOq7wivQWlXQ5hyv+APUTgONtHaDSFyzp01pkcqzaJu3i9vyCZv/V5p6MnmsjvNftg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757337093; c=relaxed/simple;
-	bh=neVpymBMp3ra0hu16F/8V5PEhWaFXO1FE/6JZS7zy8w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uO2acorL5AsEoGinZQdTJxRZpi81SszUHaJj0auwox9hTxUtSDJz/XdKXbES32H4KbpZR027K+xNGuPS8XZlBKc+tvoRN00ptz6mn/loYSHuz+/lBfGzRgOuYTVIz30u5oyi5p3nVOEnR74UCfx22m4Ul5BQdF+GCS85TPy7zOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=up2dWAf4; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1757340597; c=relaxed/simple;
+	bh=YW+xAgdLVyCk99Eihf1XRUWln1sdB+Hmcsil+FRwzfo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e+Z//UQw+bL9VDyEeFn7yVACpnEB1QgY7VQ2KX8llYoCTDD5TX2BB9D5gXJG4JvyMDVEr7jxbvYvVZr2pbpuGqAYNYeqj50xlTNDMMvLfc7TQe46HW4ZJwnxDBtUVOW0jaaS4NMfngxrkB5OpJ6JgFOX1xxIr1rXaz3EVUrMmYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=qYWqVTXN; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="up2dWAf4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=NkcpqsNtIfH0/2T4tzf3ihFLKwziOQ6MGxZZ1TVH8gc=;
-	t=1757337092; x=1758546692; b=up2dWAf4YkkTq9nTdsnNLP3pkBaPrfxMReZNlF9VI5fn8AX
-	7ppjX12KTFUeP22VBKMNETjs8zGhbZrXh3uF5WrlzN2QR3aVImuNPC5XafKa4MefkBL2Yr3QNK7rY
-	FZArlPcvFShayPmOdcBO9yuWPcEEx5Dc5DScsAe/sj9BML0Loqa50CfnWm2kqT5V+7Uy/f/dgZrrJ
-	FsaoFwRu7YFifZUHuZc0YRe3zJiUTZuy+sx6a2TV8y9pQdr4z0LUxi9p0ev/UZeigldSzXNCNYh4x
-	Vp4vb3QXPGENNrX/v4Z74ADjUUVoGSSLjvwQq/HAH6FNzYxn3SuQGyv9waB/gvGQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uvbeH-00000007aGR-1hXH;
-	Mon, 08 Sep 2025 15:11:09 +0200
-Message-ID: <513c854db04a727a20ad1fb01423497b3428eea6.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 RFC 0/7] KFuzzTest: a new kernel fuzzing framework
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com, 
-	glider@google.com
-Cc: andreyknvl@gmail.com, brendan.higgins@linux.dev, davidgow@google.com, 
-	dvyukov@google.com, jannh@google.com, elver@google.com, rmoar@google.com, 
-	shuah@kernel.org, tarasmadan@google.com, kasan-dev@googlegroups.com, 
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, 	dhowells@redhat.com, lukas@wunner.de,
- ignat@cloudflare.com, 	herbert@gondor.apana.org.au, davem@davemloft.net,
- linux-crypto@vger.kernel.org
-Date: Mon, 08 Sep 2025 15:11:08 +0200
-In-Reply-To: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
-References: <20250901164212.460229-1-ethan.w.s.graham@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="qYWqVTXN"
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 588E9jYO3879893;
+	Mon, 8 Sep 2025 09:09:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1757340585;
+	bh=/I/ByhsHvnoWmzLYIldv0FWBH08ruQzyjUzN4XwE4lc=;
+	h=From:To:CC:Subject:Date;
+	b=qYWqVTXNDBFzonMpgjJP5SmmpmBH4UwU8fc6QxbrYRZSbmMkbVIMjMyWf6Bp6JSTk
+	 NihMzJBiHYJGFk/mYXHQ+kmcVF3/DIOqGp5NjvpPqueLt/bnN0mU1OHoElBc8Qlyfc
+	 zQne0AQzIA81lZOCM7HKgvmkouL/O8mKkerHTrA0=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 588E9irZ3052648
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 8 Sep 2025 09:09:44 -0500
+Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 8
+ Sep 2025 09:09:44 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Mon, 8 Sep 2025 09:09:44 -0500
+Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 588E9g8L718225;
+	Mon, 8 Sep 2025 09:09:43 -0500
+From: T Pratham <t-pratham@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>
+CC: T Pratham <t-pratham@ti.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Kamlesh Gurudasani <kamlesh@ti.com>,
+        Manorit
+ Chawdhry <m-chawdhry@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Praneeth
+ Bajjuri <praneeth@ti.com>, Vishal Mahaveer <vishalm@ti.com>,
+        Kavitha
+ Malarvizhi <k-malarvizhi@ti.com>
+Subject: [PATCH v2 0/4] Add support for more AES modes in TI DTHEv2
+Date: Mon, 8 Sep 2025 19:28:12 +0530
+Message-ID: <20250908140928.2801062-1-t-pratham@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Ethan,
+DTHEv2 is a new cryptography engine introduced in TI AM62L SoC. The
+features of DTHEv2 and details of AES modes supported were detailed in
+[1]. Additional hardware details available in SoC TRM [2].
 
-Since I'm looking at some WiFi fuzzing just now ...
+This patch series adds support for the following AES modes:
+ - AES-XTS
+ - AES-CTR
+ - AES-GCM
+ - AES-CCM
 
-> The primary motivation for KFuzzTest is to simplify the fuzzing of
-> low-level, relatively stateless functions (e.g., data parsers, format
-> converters)
+The driver is tested using full kernel crypto selftests
+(CRYPTO_SELFTESTS) which all pass successfully [3].
 
-Could you clarify what you mean by "relatively" here? It seems to me
-that if you let this fuzz say something like
-cfg80211_inform_bss_frame_data(), which parses a frame and registers it
-in the global scan list, you might quickly run into the 1000 limit of
-the list, etc. since these functions are not stateless. OTOH, it's
-obviously possible to just receive a lot of such frames over the air
-even, or over simulated air like in syzbot today already.
+Signed-off-by: T Pratham <t-pratham@ti.com>
+---
+[1]: [PATCH v7 0/2] Add support for Texas Instruments DTHEv2 Crypto Engine
+Link: https://lore.kernel.org/all/20250820092710.3510788-1-t-pratham@ti.com/
 
-> This RFC continues to seek feedback on the overall design of KFuzzTest
-> and the minor changes made in V2. We are particularly interested in
-> comments on:
-> - The ergonomics of the API for defining fuzz targets.
-> - The overall workflow and usability for a developer adding and running
->   a new in-kernel fuzz target.
-> - The high-level architecture.
+[2]: Section 14.6.3 (DMA Control Registers -> DMASS_DTHE)
+Link: https://www.ti.com/lit/ug/sprujb4/sprujb4.pdf
 
-As far as the architecture is concerned, I'm reading this is built
-around syzkaller (like) architecture, in that the fuzzer lives in the
-fuzzed kernel's userspace, right?
+[3]: DTHEv2 AES Engine kernel self-tests logs
+Link: https://gist.github.com/Pratham-T/aaa499cf50d20310cb27266a645bfd60
 
-> We would like to thank David Gow for his detailed feedback regarding the
-> potential integration with KUnit. The v1 discussion highlighted three
-> potential paths: making KFuzzTests a special case of KUnit tests, sharing
-> implementation details in a common library, or keeping the frameworks
-> separate while ensuring API familiarity.
->=20
-> Following a productive conversation with David, we are moving forward
-> with the third option for now. While tighter integration is an
-> attractive long-term goal, we believe the most practical first step is
-> to establish KFuzzTest as a valuable, standalone framework.
+Change log:
+v2:
+ - Corrected assignment of variable unpadded_cryptlen in dthe_aead_run.
+ - Removed some if conditions which are always false, and documented the
+   cases in comments.
+ - Moved polling of TAG ready register to a separate function and
+   returning -ETIMEDOUT on poll timeout.
+ - Corrected comments to adhere to kernel coding guidelines.
 
-I have been wondering about this from another perspective - with kunit
-often running in ARCH=3Dum, and there the kernel being "just" a userspace
-process, we should be able to do a "classic" afl-style fork approach to
-fuzzing. That way, state doesn't really (have to) matter at all. This is
-of course both an advantage (reproducing any issue found is just the
-right test with a single input) and disadvantage (the fuzzer won't
-modify state first and then find an issue on a later round.)
+Link to previous version:
+v1: https://lore.kernel.org/all/20250905133504.2348972-4-t-pratham@ti.com/
+---
 
-I was just looking at what external state (such as the physical memory
-mapped) UML has and that would need to be disentangled, and it's not
-_that_ much if we can have specific configurations, and maybe mostly
-shut down the userspace that's running inside UML (and/or have kunit
-execute before init/pid 1 when builtin.)
+T Pratham (4):
+  crypto: ti: Add support for AES-XTS in DTHEv2 driver
+  crypto: ti: Add support for AES-CTR in DTHEv2 driver
+  crypto: ti: Add support for AES-GCM in DTHEv2 driver
+  crypto: ti: Add support for AES-CCM in DTHEv2 driver
 
-Did you consider such a model at all, and have specific reasons for not
-going in this direction, or simply didn't consider because you're coming
-from the syzkaller side anyway?
+ drivers/crypto/ti/Kconfig         |   5 +
+ drivers/crypto/ti/dthev2-aes.c    | 818 +++++++++++++++++++++++++++++-
+ drivers/crypto/ti/dthev2-common.c |  19 +
+ drivers/crypto/ti/dthev2-common.h |  30 +-
+ 4 files changed, 864 insertions(+), 8 deletions(-)
 
-johannes
+-- 
+2.43.0
+
