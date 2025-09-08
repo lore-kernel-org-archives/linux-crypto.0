@@ -1,255 +1,249 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC41320CA4;
-	Mon,  8 Sep 2025 21:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757367152; cv=fail; b=kHrTsiK5Jdo5hfaxDgqZ+3xOg06AJ8LN0b8w7ewXwINFrpZzVBEuWIAms4ldMo6CQH8DQT76QeabnjfyiqVFXnNiNAUJzc7yDXfCezVlH2uaw7bs2TRlbWYKeIqOv5tjIHs7B/wcX8SJrstRizrzjPzH7JowJXUQ/48lGvpbX0I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757367152; c=relaxed/simple;
-	bh=9H/V1p5oSejuqClYYlp2VftGw2AqCVLG09NJ3sGJ+vY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=APbfo0GMfLbEU/JowUmg1qyvpTvpLFLcMQekZtyRU+7i44NKmR3A34fH9uhKRRYlOpH3cIZyZq/HwSZXOZTDPEWksxV7FmYVz0qpIbvkLPSb5GvUb9yJIQlX6dbufak6ENFIRf52nn6i7NzHN1tas/QHpXaaHjJk+9mfsC5tLZc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aimBWGB7; arc=fail smtp.client-ip=40.107.220.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBEE156661;
+	Tue,  9 Sep 2025 00:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757376994; cv=none; b=rjRkN0pZjIA3R9hf4/8pu0bdHiMm2kuFy/cj65Z3QzGUIWDCUYCfZaw280u/knTRSKTxAj36yffgUvSU8enNcFXHiftYFzUo3xIIKLqLe88uvym+H2n2gkqgCfuRtdpxyMC0YqkLTougWuyRC8j2yEOa3SmYRaVDnist8xjIV8E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757376994; c=relaxed/simple;
+	bh=osMPwhOdxvEooa9TveT0ao7PJ6xzGtdzl+dHmx/w2XY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qohT7g5Vwl5NY3O6fu3AMcjd6Fw6ACAxAwwhedrLnPbHJ1FeZryroz8gRPKeBTU6Cc4Ic7SyA30xpfd6NCebvu2NxcvmFJPh70XzzwEC2z0ZKibS0lfN6pHa+iB5JhempfjwpbLFAyfYKUDGhee5ycxBnvTm8u0brQ/1eQg8DZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EBJkD7pn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aimBWGB7"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RZm8QgPcJm3k7Uo9q5QRb5n+QmntcgtriCTOge+xFhdvBs6+Tj1b+bL6d5K4vsjrrdViHcv4bppBCEgx85wVEFGGnGbygZnMX6X6UmKjNS0KE6+OBdv0Gq5JcMStFqzYXUEuuN+MS8WIlQc5xllmcJGWLX6mnHmvFbdHahDM4I9iygmgHdmM9sbdsJJdZjdV1lTOZsQ+NuRY9d/osxt/tv6MeRKIyCp5x4AJBJjKk1y59ED8GN9QdLsOQYDWvrfnYheQrLFHmex5K42MU6aKVikc6H8qFG5dItw9emJpJ92pEeO5nFlDWJDBZBpMoT5jlTJJZ72PYZBSW+Ezv4JXnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tjcZrAKcaciGQWYfFekrs5/P39C4A+gBNwi8ynoOiq0=;
- b=V7EL7H+doJlXrj4Bvk42Y9KI83hrjmciPAewy9V9eCNV599aXWiB4pwp+hNdEgEgzjmDI4AdvKk+JXc2luwAmblhCX09GKokyaEczXtUA2S2HrWepXqCZVjyF12rUiYnJpdyS13gHBwGYafSTBDu0kk+rTS7HMO9dzo6cUzx/pbiZi8qUo2/YrfZnSePJja5UflbwoQo22U1lmQdNnyVLLS8d6NLnsh67dD0+umX/tL673hDZONYzKeRc0WUj5953f5ygSriOnKRd601tdszsCeDaXd/cN0mhf1pkqTTJqM25S2+1WT9+R7AOQjedIqNYy/Lcm8OlJjGd1tqIJvU7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tjcZrAKcaciGQWYfFekrs5/P39C4A+gBNwi8ynoOiq0=;
- b=aimBWGB7sf6uq8moMT1Pma5rutysuVdXptSQZD5uIrauIkKf5PN84i8qN1NRBuRKK1l8MAnNXSlHmXPZ77h4x9ZPEuaxWXubC1C0HFrW5H+XSJML+KhgC9qY5hyelQ7Vi6Na/Bb3qqZaAfbSY+Q0WBRNjvn13vJHQ15PnCNiiwU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by DM3PR12MB9390.namprd12.prod.outlook.com (2603:10b6:0:42::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Mon, 8 Sep
- 2025 21:32:28 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f%6]) with mapi id 15.20.9094.016; Mon, 8 Sep 2025
- 21:32:27 +0000
-Message-ID: <e32770ac-2bc8-4e09-aad2-0fc219abfc8b@amd.com>
-Date: Mon, 8 Sep 2025 16:32:24 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] crypto: ccp - Add AMD Seamless Firmware Servicing
- (SFS) driver
-To: Tom Lendacky <thomas.lendacky@amd.com>, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
- herbert@gondor.apana.org.au
-Cc: nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
- john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1755727173.git.ashish.kalra@amd.com>
- <5228c35436be214bd51dd8f141afad311606972f.1755727173.git.ashish.kalra@amd.com>
- <3c96491c-dceb-2a6d-9c7c-b5faf663a184@amd.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <3c96491c-dceb-2a6d-9c7c-b5faf663a184@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0153.namprd11.prod.outlook.com
- (2603:10b6:806:1bb::8) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EBJkD7pn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01B0C4CEF7;
+	Tue,  9 Sep 2025 00:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757376993;
+	bh=osMPwhOdxvEooa9TveT0ao7PJ6xzGtdzl+dHmx/w2XY=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=EBJkD7pnnsm9Aa1UeTaty8KHYgwEkywYjSpL1Dy/Z3L8dey21RsuKoHUZVyYTAd5I
+	 y2PaaS/CVtFccLDIT8iqzQpv0/njab+IUcrbUbqgEoKFe884Mzbw9lzX+LMEXgwm3F
+	 6FOCNMFnR50zct+bqwQkLMoJEGXLv/+ASGnBVejaInHkEJyZtnjrhqBU1XZcD3MFYB
+	 ZXxD+vKy795VTZ0joAaX7zHrT8Fbotl3EFYI4VnixFNSriDw0h3ltwP/0NPynNcKfC
+	 p/U6aN1GSB9WBDTjHEXqTp46i60uWt9ZkgSk9b9kfVP69WWB8L9COSnlteAhgT9j/H
+	 URf1knLD/UMyw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 50CD7CE0F1B; Mon,  8 Sep 2025 08:23:27 -0700 (PDT)
+Date: Mon, 8 Sep 2025 08:23:27 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Menglong Dong <dongml2@chinatelecom.cn>,
+	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kernel test robot <oliver.sang@intel.com>, tgraf@suug.ch,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Use rcu_dereference_all and
+ rcu_dereference_all_check
+Message-ID: <c3ada9ab-0676-4d73-9feb-9f401a031a4e@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250829021436.19982-1-dongml2@chinatelecom.cn>
+ <20250828222357.55fab4c2@batman.local.home>
+ <d1da3939-62e6-4ad1-afcc-5710ce3f6cbd@paulmck-laptop>
+ <20250901170655.0757884ad7c2afb63ced3230@kernel.org>
+ <615da75d-cb2f-4e7e-9e11-6b19f03fea6c@paulmck-laptop>
+ <aLlflTV_SDwMB7mq@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|DM3PR12MB9390:EE_
-X-MS-Office365-Filtering-Correlation-Id: 72881576-1220-4833-6b6d-08ddef1f3544
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QkdEM0NhZ3lPQ3ZEb1NOcGpKalZYRWMxbjRiYUx6dGVNQ05LbVpEUUZBMklB?=
- =?utf-8?B?eGE3WjNwVGk5MitzT09NSkIxR3BzczJhWWRFYXE5V1hReGh6b0xJZ1NNbXpH?=
- =?utf-8?B?VG1wbFRnUFdYS0FmQTBqQzUzV0dkV3F3cHFZNFVEN2Y3Q3lxS08wVkkwY2F0?=
- =?utf-8?B?VnpFWmo3bnRxcHdvb1MrVVU4WjJYVmNSNlNQL0ZOWHJZc3VwKzZ1TFRnRXI1?=
- =?utf-8?B?ZW9tQzNyOWpYWWtxUGptMkFYTkNKZnpGUGYrekI1Y3hjenEwWjI5VzVTcWt4?=
- =?utf-8?B?OVdBLzR6ZmFvS1FYalJDb0ZSSmRCL1EzNlBnaDZDNUJIQ3d5dXgrL3pCUVhq?=
- =?utf-8?B?MmYvZ2o2b0Ricm5qY3dDUnNTYmY5NmdzOWpHcTBRUHBjbXJscHppSi9wNkRW?=
- =?utf-8?B?VHBYalJQY3JJSEllREdFRWRjNUxadUMzTWRDaktZU00xczN1OXRxQkRQYitK?=
- =?utf-8?B?dm13UkhPbzRweE9LZVA3YkxJYnk2S2ozeEdONzdxR2V1cHJ0N01xZnFlOGdB?=
- =?utf-8?B?TTBxQUQyN05xdFp5OFhGZFp0a0I0dGtMRTdZSHg3bUxIMkZ5dTRqeHRtVGJO?=
- =?utf-8?B?UXM0NWU5OW50eldPZGxWZXZCRHR2b0FGRG1rak5oSTBBb2trditHRnpub2Q2?=
- =?utf-8?B?OUg2cHo5VUdvKy85bWVYQnNZM3pjdU9ZeVhIZWZGcFJORmsvbWVsRGVBQThi?=
- =?utf-8?B?M3RWL0xDQy9YK2srbENCMStUU2FkUEROWExLTFY4Y2VIeWtsYmJnUjNIbEhl?=
- =?utf-8?B?b1F4Uno1cFVGSjhrUFYwTUQrSERHZjRrQlhxZ0pHWTJvdDV6cVg3blZ6akd2?=
- =?utf-8?B?TS9JUGpJTUs5SzhLdDNBSUlZNXhleFlkZHhJdUxEa3FvSG9tbTMxcTh4RERG?=
- =?utf-8?B?alp2TkIxQVdRdmp2K3FCNVllT2ZVeFA0a01mbnFxMTMwa3NLUlBGV1QvTGR0?=
- =?utf-8?B?WTlGcjdzeFoyMzFjdit1bTJQeHB1OXo0K1VkMlFlQUJmZ2tGSGhBYzgrUE9v?=
- =?utf-8?B?VXN1enZrd1VNeFc2c2tMb0tuMkg2WHVLbnpNTkFubE5vZlg1WENlU2luODhu?=
- =?utf-8?B?endJZW9pdDRtRVNIY1VBWEJERTdoaWpQWEFzQmZxa2IrL2lYT0xKREZsYk9U?=
- =?utf-8?B?TDNyOHg1OEZuOWs0b2tCbHFGQ3psY28vZ205LzVpZDVPaUZLRkFuc1hLc25i?=
- =?utf-8?B?Y3BKRTJNUTh0alBQdWZPanRoTis3NmhXZndTd0NId2wzSHBUdVRzVXQrYmM4?=
- =?utf-8?B?WkVGS2dJRkpKeHN2S2FlVGtJYjhsTzVkSkJsOSt0MDhyVXFmV0lCbTYyd0NU?=
- =?utf-8?B?UGJDdE94aE9zbFhDZlR5ZCtUL25JR1B3NittRHVjUFZ2MjBwRkgrVEQrUUU3?=
- =?utf-8?B?cUtNQXB3VWdSN1RiVDVWQ3BWTy9VRnhDT0FjUzFDdUZ3VDJZZlQrNmY1ZC83?=
- =?utf-8?B?elNOSVhQMWMrNy9oMXpDczFDMFZWcTlRMThLbk5seTZERmhjViszd0QxN2Fr?=
- =?utf-8?B?eTZhN2ptUlpxS3NyS0RJWWJEZTNhdnJ6N1JzV2J3RGtBL3N6VXY0NlRTVFdT?=
- =?utf-8?B?RkRMSE5nc2RXLzRrckFTa1g1REpFL2JFNGRzSFlwaGNnSkFydFBKaWs5U0Ew?=
- =?utf-8?B?Q1ZteCtrRmV0OGVZVHFMRmtiNW1xUzFhOE03V1RTZ3lXUi9tMzNLWUVpOVd0?=
- =?utf-8?B?K2JNd21ueDkyb3RGNmNFQTBwVm9xRkp0YmNQNVpYVXNDSTBLUW4vMHpFdy9k?=
- =?utf-8?B?UVhUWE1sN3l1R25yU2Z4eTA1TE9HOE9QVDhINGFTZkc0ZjBsVGxZeEYzS0VP?=
- =?utf-8?B?Nm1ReEhGREVmMUZpRXFXV0JPd3VYOENtSWhadUZHWEdYTDRBcHJBeVFhTlht?=
- =?utf-8?B?R2lMNDI4cVZKeVc1ZnNoWXpIUlZMcE1iK3lKQTNGaHlWbVNtU25HWjkxZWdQ?=
- =?utf-8?B?NUpnaEdaM21vVDErWWs2ZmlMSWU3VlFEYlNqQ0ZNT2hqMUxDQnNZTzQ2Um1M?=
- =?utf-8?B?ZFpFV3FEZ1FnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RFF6NnBKOEMyMWhubzBUOHhjcFFuWnh1amR5aWVsYzJsNm4xNEE3THBIMzhR?=
- =?utf-8?B?Y0MydFcyWGFXc2VFeEtlMkRwcGd0Nms4dXdybnhsaU9ONlo3cnRxWE9HQWMy?=
- =?utf-8?B?MElFNVhLdFB4RHVteit3ZE1ncmhuY01pMGwwRkF5R2plMDN3M09MRnIyTzBE?=
- =?utf-8?B?ak5FS2x4ck1GRkpLNVhmWG5abmp3ZytUQW5aT1hvbEdTeEovMXVaZnljUGpq?=
- =?utf-8?B?OGNTb09uWENnSElQN1p1YUxHYTk2UXYwb2o3RVdBS2hDRW9scnpUVTNURVcy?=
- =?utf-8?B?QVBROGtXbUpaWGRGUUVaQkdWZVZDZWN3eTJQTlpUWVZXenQydkdOa252S0xh?=
- =?utf-8?B?UzZsWERFb1czVnF5ZDNUYzU1dnR1b3psUHlCSTA1YjA3TkJwVGs2RTZPSFVQ?=
- =?utf-8?B?d0hoeUxHNkZodUFVK1Z6a3ZEV0RoVU9DK1Z3c3lTVHNtM2lYVk00bTVETDdT?=
- =?utf-8?B?Vy9qVFVUN29IaE1FbXhVR2NnblBUd0gxTFBNYzltYnJUcDJhR0huSTgxZHdO?=
- =?utf-8?B?bW1DZTE3czBLWWZLeEVuNUV6NmdPMEozWkVWN0RKUGtwbExyb0RpKy9wL3FT?=
- =?utf-8?B?QjJSSnBVSFJLN01pQ0IveDdxcHFzZ3JRM1ZIdSt3NW1CeVpJL2V5bHplT1Fn?=
- =?utf-8?B?aFVhTkU4R3phaTlCL1NwdFRsTDNXR21sNzVhTEpKMnBCdzUxejBPcThJN0xv?=
- =?utf-8?B?cWp4czRLRW04Mi9hbTR0bzl6bUlZZjJsZ3hUNVIwVU92ekhXam5JUzZMMGhC?=
- =?utf-8?B?Z0tNSjlhdE9NeTVSdHpWVTZCcmFIYmlCUzQ3RDk0ZWhobGdZMTREbkQzeG5E?=
- =?utf-8?B?YTRBTW9jWkhUb1NHMjVQYlVtVUdFTjNlOURYcVpjSlkvTlZxSDFtbElmNDd0?=
- =?utf-8?B?UXpDUWZUNTh2ajRGd1QzOWRYK0JuVDVCRmFJYk1VZXRxTm4vdDVVbTNKSDVy?=
- =?utf-8?B?TjNZSjlibHAycUwxNk0wVHplZGE4N2R5N2NpUGdNdE5RcVk3R3ZjVFd4YmpC?=
- =?utf-8?B?a0FacE9UdHV4UWJxK1lQSG9DT2tabWlWd0xQcnNrbkphVTY4aDZUMXBrRWdC?=
- =?utf-8?B?WFlPZWluaHBLTDVsQ28yS1dDMGFRV3VLK2ZXdWVXK0wyd0dRZFF4Mkd3eXh3?=
- =?utf-8?B?anNNKytzbE02U0YxdDRBTkpNMGtjUGdNbDMzSnpTaTZWQjN0dGVQYzRqK0ox?=
- =?utf-8?B?WDUvREZGSFlPelh4ZU5admdNaXJrc0JjYXowakpXK3N4Zjcyd0xaZG9QOFFn?=
- =?utf-8?B?UVFWaFRwaFVyWkhMVkt6REhmOVN1aytNcGdUOEp5cXl5eEhKZjBvZkQvejhW?=
- =?utf-8?B?U0VXSjhMSm9RYlBqM3Vsc0I4ZmtWdVhrR2VTek1FOUg5VUNsWnRKbjM0TTQw?=
- =?utf-8?B?NThPSk1RVitNNno4YzRQVHczaHlTdXAyd2Z6anNFQndwaklaRXA2UjhZVnh3?=
- =?utf-8?B?WUpSRlZyU1krRkJvdERVQXFDN0VLaFpWWisvTEFpZENuTjFLNnFyTUhmTGJ5?=
- =?utf-8?B?UitlaUZQOVFpTGExZmdzUjNKaDNuVVZQS3dSeGZOWDlBb1RIMXh6M1c3ZkE4?=
- =?utf-8?B?N05sT1BaZ0NCbU9MaVExdTNNaHYzb2s4MmppdVk4Zk9tbVFxMWpnaXRqbGZt?=
- =?utf-8?B?Q3NxQnVmbEpoMktKNllnak1SNkJpMDhIOUh3ZnNEMDBUdm5ZQk5ZaW5Sbi9i?=
- =?utf-8?B?b1F3Y0U5ZHNTUVgrSjJ5a2h0Rm1lcUpENWE0V2V3L3FERURDSjVxNjlWQVpQ?=
- =?utf-8?B?aS9kSkRrUzlTYkxTZGR1azBvQnc4bjdRQ2RjblpsTCtCNlNZQ25YSGhoTnUv?=
- =?utf-8?B?TmpYeThyalJ6TkNWSGw3Z29Wa1ZCRTJReHhPOFZXUDRxVEtuMEZYbjNOTFFz?=
- =?utf-8?B?bTJPdUFhZHl4U3pRS0ptYjJZY2xNTGtveXJyR0J2UE14UWQzdGR0KzNLdWZY?=
- =?utf-8?B?Q2pMREh5SzJLWG9FSkw3NktKOHNkWEZabGhZUkxmc0hQbi9VT0lTbDhVN0Jt?=
- =?utf-8?B?V2xpekRzbUVCWGMvOU9CL0UyM3Boc2p3VUwxZmt5cW5UM2lTQmVKRHZCZjVm?=
- =?utf-8?B?UUlWNGVZUC9nQ3VnUVFrc3owdzRCd0hXQnYyeEtSbnFtQ1VYK2lmdzRFWGhq?=
- =?utf-8?Q?+lwGZ2mNcSPcyPq5Sv/THihbj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72881576-1220-4833-6b6d-08ddef1f3544
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 21:32:27.6820
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F+MU0E7rWHgx7tp88YVQbXHfdDFAO9FeIGWRfkoQkEX7QvSDc4j1kNmmUKdWi2eW0SK1UScAtZ7vgjdTUdCluA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9390
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aLlflTV_SDwMB7mq@gondor.apana.org.au>
 
-Hello Tom,
-
-On 9/8/2025 4:18 PM, Tom Lendacky wrote:
-> On 8/20/25 17:19, Ashish Kalra wrote:
->> From: Ashish Kalra <ashish.kalra@amd.com>
->>
->> AMD Seamless Firmware Servicing (SFS) is a secure method to allow
->> non-persistent updates to running firmware and settings without
->> requiring BIOS reflash and/or system reset.
->>
->> SFS does not address anything that runs on the x86 processors and
->> it can be used to update ASP firmware, modules, register settings
->> and update firmware for other microprocessors like TMPM, etc.
->>
->> SFS driver support adds ioctl support to communicate the SFS
->> commands to the ASP/PSP by using the TEE mailbox interface.
->>
->> The Seamless Firmware Servicing (SFS) driver is added as a
->> PSP sub-device.
->>
->> For detailed information, please look at the SFS specifications:
->> https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58604.pdf
->>
->> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> ---
->>  drivers/crypto/ccp/Makefile         |   3 +-
->>  drivers/crypto/ccp/psp-dev.c        |  20 ++
->>  drivers/crypto/ccp/psp-dev.h        |   8 +-
->>  drivers/crypto/ccp/sfs.c            | 302 ++++++++++++++++++++++++++++
->>  drivers/crypto/ccp/sfs.h            |  47 +++++
->>  include/linux/psp-platform-access.h |   2 +
->>  include/uapi/linux/psp-sfs.h        |  87 ++++++++
->>  7 files changed, 467 insertions(+), 2 deletions(-)
->>  create mode 100644 drivers/crypto/ccp/sfs.c
->>  create mode 100644 drivers/crypto/ccp/sfs.h
->>  create mode 100644 include/uapi/linux/psp-sfs.h
->>
+On Thu, Sep 04, 2025 at 05:44:53PM +0800, Herbert Xu wrote:
+> On Mon, Sep 01, 2025 at 08:00:15AM -0700, Paul E. McKenney wrote:
+> >
+> > However, another option for the the above rcu_dereference_check() to
+> > become something like this:
+> > 
+> > 	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht) ||
+> > 				 rcu_read_lock_any_held());
+> > 
+> > This would be happy with any RCU reader, including rcu_read_lock(),
+> > preempt_disable(), local_irq_disable(), local_bh_disable(), and various
+> > handler contexts.  One downside is that this would *always* be happy in
+> > a kernel built with CONFIG_PREEMPT_{NONE,VOLUNTARY}=y.
 > 
->> +
->> +	/*
->> +	 * SFS command buffer must be mapped as non-cacheable.
->> +	 */
->> +	ret = set_memory_uc((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
->> +	if (ret) {
->> +		dev_dbg(dev, "Set memory uc failed\n");
->> +		goto cleanup_cmd_buf;
->> +	}
+> Why is that a problem? Assuming that it is always safe to perform
+> an rcu_dereference_all() on such a kernel, not warning would appear
+> to be the right thing to do.
 > 
-
-Yes, i was restoring the memory attribute before freeing, but then i realized that if the buffer
-is transitioned to HV_Fixed and can't be freed but can still potentially be re-used then who will
-setup the buffer to Uncacheable again, but i guess that should not be an issue as SFS driver will 
-do that setup again after being unloaded/reloaded again, so i will go ahead and restore the memory
-attribute here and in sfs_dev_destroy().
-
-Thanks,
-Ashish
-
-> You should restore the memory attribute before freeing it in
-> sfs_dev_destroy() and below in the cleanup.
+> > If this is happening often enough, it would be easy for me to create an
+> > rcu_dereference_all_check() that allows all forms of vanilla RCU readers
+> > (but not, for example, SRCU readers), but with only two use cases,
+> > it is not clear to me that this is an overall win.
+> > 
+> > Or am I missing a turn in here somewhere?
 > 
-> Thanks,
-> Tom
+> As I said rhashtable is just a middle-man, while it does some
+> RCU actions internally, in the end the user is free to choose
+> the RCU variant (vanilla, bh, sched).  So I'm faced with the
+> choice of using only rcu_dereference_all in rhashtable code,
+> or splitting the rhashtable API into three variants just like
+> RCU.  I'd rather not do this especially because it appears RCU
+> itself has essentially morphed into a single variant because
+> call_rcu etc. always waits for all three variants.
 > 
->> +
->> +	dev_dbg(dev, "Command buffer 0x%px marked uncacheable\n", sfs_dev->command_buf);
->> +
->> +	psp->sfs_data = sfs_dev;
->> +	sfs_dev->dev = dev;
->> +	sfs_dev->psp = psp;
->> +
->> +	ret = sfs_misc_init(sfs_dev);
->> +	if (ret)
->> +		goto cleanup_cmd_buf;
->> +
->> +	dev_notice(sfs_dev->dev, "SFS support is available\n");
->> +
->> +	return 0;
->> +
->> +cleanup_cmd_buf:
->> +	snp_free_hv_fixed_pages(page);
->> +
->> +cleanup_dev:
->> +	psp->sfs_data = NULL;
->> +	devm_kfree(dev, sfs_dev);
->> +
->> +	return ret;
->> +}
+> So how about this patch?
+> 
+> ---8<---
+> Add rcu_dereference_all and rcu_dereference_all_check so that
+> library code such as rhashtable can be used with any RCU variant.
+> 
+> As it stands rcu_dereference is used within rashtable, which
+> creates false-positive warnings if the user calls it from another
+> RCU variant context, such as preempt_disable().
+> 
+> Use the rcu_dereference_all and rcu_dereference_all_check calls
+> in rhashtable to suppress these warnings.
+> 
+> Also replace the rcu_dereference_raw calls in the list iterators
+> with rcu_dereference_all to uncover buggy calls.
+> 
+> Reported-by: Menglong Dong <dongml2@chinatelecom.cn>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+I am guessing that you want to send this up via the rhashtable path.
+
+> diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+> index 120536f4c6eb..b4261a0498f0 100644
+> --- a/include/linux/rcupdate.h
+> +++ b/include/linux/rcupdate.h
+> @@ -713,6 +713,23 @@ do {									      \
+>  				(c) || rcu_read_lock_sched_held(), \
+>  				__rcu)
+>  
+> +/**
+> + * rcu_dereference_all_check() - rcu_dereference_all with debug checking
+> + * @p: The pointer to read, prior to dereferencing
+> + * @c: The conditions under which the dereference will take place
+> + *
+> + * This is the RCU-all counterpart to rcu_dereference_check().
+> + * However, please note that starting in v5.0 kernels, vanilla RCU grace
+> + * periods wait for preempt_disable() regions of code in addition to
+> + * regions of code demarked by rcu_read_lock() and rcu_read_unlock().
+> + * This means that synchronize_rcu(), call_rcu, and friends all take not
+> + * only rcu_read_lock() but also rcu_read_lock_*() into account.
+
+How about something like this?
+
+ * This is similar to rcu_dereference_check(), but allows protection
+ * by all forms of vanilla RCU readers, including preemption disabled,
+ * bh-disabled, and interrupt-disabled regions of code.  Note that "vanilla
+ * RCU" excludes SRCU and the various Tasks RCU flavors.  Please note
+ * that this macro should not be backported to any Linux-kernel version
+ * preceding v5.0 due to changes in synchronize_rcu() semantics prior
+ * to that version.
+
+The "should not" vs. "can not" accounts for the possibility of people
+using synchronize_rcu_mult(), but someone wanting to do that best know
+what they are doing.  ;-)
+
+> + */
+> +#define rcu_dereference_all_check(p, c) \
+> +	__rcu_dereference_check((p), __UNIQUE_ID(rcu), \
+> +				(c) || rcu_read_lock_any_held(), \
+> +				__rcu)
+> +
+>  /*
+>   * The tracing infrastructure traces RCU (we want that), but unfortunately
+>   * some of the RCU checks causes tracing to lock up the system.
+> @@ -767,6 +784,14 @@ do {									      \
+>   */
+>  #define rcu_dereference_sched(p) rcu_dereference_sched_check(p, 0)
+>  
+> +/**
+> + * rcu_dereference_all() - fetch RCU-all-protected pointer for dereferencing
+> + * @p: The pointer to read, prior to dereferencing
+> + *
+> + * Makes rcu_dereference_check() do the dirty work.
+> + */
+> +#define rcu_dereference_all(p) rcu_dereference_all_check(p, 0)
+> +
+
+With some comment-header change similar to the above:
+
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+
+>  /**
+>   * rcu_pointer_handoff() - Hand off a pointer from RCU to other mechanism
+>   * @p: The pointer to hand off
+> diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+> index 6c85b28ea30b..e9b5ac26b42d 100644
+> --- a/include/linux/rhashtable.h
+> +++ b/include/linux/rhashtable.h
+> @@ -272,13 +272,13 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
+>  	rcu_dereference_protected(p, lockdep_rht_mutex_is_held(ht))
+>  
+>  #define rht_dereference_rcu(p, ht) \
+> -	rcu_dereference_check(p, lockdep_rht_mutex_is_held(ht))
+> +	rcu_dereference_all_check(p, lockdep_rht_mutex_is_held(ht))
+>  
+>  #define rht_dereference_bucket(p, tbl, hash) \
+>  	rcu_dereference_protected(p, lockdep_rht_bucket_is_held(tbl, hash))
+>  
+>  #define rht_dereference_bucket_rcu(p, tbl, hash) \
+> -	rcu_dereference_check(p, lockdep_rht_bucket_is_held(tbl, hash))
+> +	rcu_dereference_all_check(p, lockdep_rht_bucket_is_held(tbl, hash))
+>  
+>  #define rht_entry(tpos, pos, member) \
+>  	({ tpos = container_of(pos, typeof(*tpos), member); 1; })
+> @@ -373,7 +373,7 @@ static inline struct rhash_head *__rht_ptr(
+>  static inline struct rhash_head *rht_ptr_rcu(
+>  	struct rhash_lock_head __rcu *const *bkt)
+>  {
+> -	return __rht_ptr(rcu_dereference(*bkt), bkt);
+> +	return __rht_ptr(rcu_dereference_all(*bkt), bkt);
+>  }
+>  
+>  static inline struct rhash_head *rht_ptr(
+> @@ -497,7 +497,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+>  	for (({barrier(); }),						\
+>  	     pos = head;						\
+>  	     !rht_is_a_nulls(pos);					\
+> -	     pos = rcu_dereference_raw(pos->next))
+> +	     pos = rcu_dereference_all(pos->next))
+>  
+>  /**
+>   * rht_for_each_rcu - iterate over rcu hash chain
+> @@ -513,7 +513,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+>  	for (({barrier(); }),					\
+>  	     pos = rht_ptr_rcu(rht_bucket(tbl, hash));		\
+>  	     !rht_is_a_nulls(pos);				\
+> -	     pos = rcu_dereference_raw(pos->next))
+> +	     pos = rcu_dereference_all(pos->next))
+>  
+>  /**
+>   * rht_for_each_entry_rcu_from - iterated over rcu hash chain from given head
+> @@ -560,7 +560,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+>   * list returned by rhltable_lookup.
+>   */
+>  #define rhl_for_each_rcu(pos, list)					\
+> -	for (pos = list; pos; pos = rcu_dereference_raw(pos->next))
+> +	for (pos = list; pos; pos = rcu_dereference_all(pos->next))
+>  
+>  /**
+>   * rhl_for_each_entry_rcu - iterate over rcu hash table list of given type
+> @@ -574,7 +574,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
+>   */
+>  #define rhl_for_each_entry_rcu(tpos, pos, list, member)			\
+>  	for (pos = list; pos && rht_entry(tpos, pos, member);		\
+> -	     pos = rcu_dereference_raw(pos->next))
+> +	     pos = rcu_dereference_all(pos->next))
+>  
+>  static inline int rhashtable_compare(struct rhashtable_compare_arg *arg,
+>  				     const void *obj)
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
