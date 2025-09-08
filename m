@@ -1,103 +1,168 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA62E22BF
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Sep 2025 06:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40A72E9ED2
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Sep 2025 08:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757314599; cv=none; b=jr4LBjmBc7I+PJKuBIAYfZPtlkiM5MudtIVQCcQYS4Gv/3MLnJIvFxi7YerWb/PURQ9q3ySrI6QJc39J815LAefT48ut/hZaXfADv1yf6JEvlsKvi+d/FYoUroAIdbY58PfPVkhspFbcD6pUGF4pPdUtQoMQsjmJnwVliXW+Zr4=
+	t=1757318419; cv=none; b=DqjboNF2wvddjZnKqfwsJK297fj/6mejWwb7c568cWDl4jJfwBf28z6oSDrBTpuaUUR5W3l6ziNSrAV0QF7Njt1VwqegGYO+7mSFoPMeOyzrZ0/cQUdn3Uj6IWL7136xEWo84zQ9iK/cQ0GNoKCy5O9Btc9Gmv8s5fLRvWTkrJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757314599; c=relaxed/simple;
-	bh=Csq17eCLJmv7/7QqayNfbYw3ZtrTeNIABT5r2MMdoUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a2RZQ91pn96Yor0r/4AiPxWz89suTNtF5kqqGIo+7HuLGV++NGdNmELzy0IunA/WUuS4vcGQ8It2h0ESy1qMFI/iZbU7y07d+EEMpt37J5MdfZY0txavcuvKH/vDv3Rvc4Iubo9kYDzeNpZPj7Q+XM3CXZuZt4VEv5THnasqVTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mCDATx/3; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1757318419; c=relaxed/simple;
+	bh=+YwpdcGwlF5pvdpd2It9H4VZTjzT37L3k9Tc+m9Is7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NA7X8xdmvMIfTKmqfFyjSnsF8cxUXgwwceGueZPIs028bTAH3JBWO4eN9yQedkeztAFBxXYetVrDjmz/FYIQ5IX04b/4vM/y2o7J0Iyo4hyIEO2qqKVs9dDipPOdLn8SQAzecgZCwB8zsqlFg2jDDRiw9zQWjF7R4PsW1lohAt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ho9ocCGb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mCDATx/3"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-24458272c00so46545545ad.3
-        for <linux-crypto@vger.kernel.org>; Sun, 07 Sep 2025 23:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757314597; x=1757919397; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vfO9YzOQHvlcLzI/Oqj9hLG6esUOkytAkeiwFxmfpUM=;
-        b=mCDATx/3yiX1K5qsI/04JjsJivHS4KLolpgblY0iOgK/9Zq+BSieBrZtQLVO0Je/ke
-         McavgOlHN+BUVOpD+oxZjjwEymV9gaD0mMBDdCr85p3TrUJlFjmbOdK43DBycCFsI3ZD
-         Vjj23N7CES8gSNHEl8PutjuSWBoaZ+JbxFm6UhdF8X72cpLYI/vnxcgvsx/1/lBw7pb/
-         lz0Y7BJmn9JPQj82NBmoxl79rKYZMoYbA/kMcfHGPLVCG8Mbzx7LisyXKuTPbn80mSzC
-         cCgSLUMCPr0VFZZTUL0uTs0dBqjD6sNcvpCaz2GeEXb5q6aqBwrY9AmJ8NIJbaCr74bd
-         QOFw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ho9ocCGb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757318416;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6ZtGxzPBBhWZb8TdeGEHePc9lnXNDI+6sWWhJSedy84=;
+	b=Ho9ocCGb+cCU05U1CfrQ62MWazalBVSH91WGyOQoeF1gNdD8ZFYA4ppK8mp5z9IeVZFIkw
+	j/6Ioige7zDj1oip84lp/2mPRqwshuhJ77Xf6zPXQy5wMoIvLMblI3Zlb8aJgPJ7GrGkzx
+	9FqYHym6WUL31xlNfTvLTxDsxRRXNyc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-307-WMONLYimOX2nP1HDvfckAA-1; Mon, 08 Sep 2025 04:00:12 -0400
+X-MC-Unique: WMONLYimOX2nP1HDvfckAA-1
+X-Mimecast-MFC-AGG-ID: WMONLYimOX2nP1HDvfckAA_1757318409
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45d6c770066so20770495e9.0
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Sep 2025 01:00:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757314597; x=1757919397;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vfO9YzOQHvlcLzI/Oqj9hLG6esUOkytAkeiwFxmfpUM=;
-        b=d5+2/W7BXwXDcs29cljOjxBogyVcttRMDzhl0noy0HKNIzk1dHWwNwFiKm4MeI/uz5
-         ydjP7wsakyoIrCc/RdilGqT88aKv0z5WaU16yk1p3oxjvZi0mruOP1eRLaHR24eAGr1D
-         Dpqxn8zKWFenJ8PRrbki7kCwqZCImF5eXRyiO3OMko+EE69qPXBQyoh3ku2GkFp/wbKn
-         gnD6itDZUL6gyIs8Zy7Uufx3PF6e67QN0J4mCHSZgCiOK7Tq5WzE4AORqNCHaG57xSnV
-         nXO+rLWWtd6CCb+EBre4h35vL6ywiwAijPYuzAOr5P+96klvRZamAxmJSNdJBVbCISIp
-         dGXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXCPqE1w/WRHYcIe1l+2wRnCLs06sjeq8gLWH1uhUsZTAbX3yHPgfhRLibfslpazwi6rffZeOPncaL9Vb4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/OAGyLHDXHmvdrZH1+ZXaGkpun6+A5jdg+b894JFgfhls30qa
-	E79Xu6YFdzz+opbvZGyXubMDfcuGRKL2FPgSJYWDphoAVJbVugj+b669MHOKzjMTvJE=
-X-Gm-Gg: ASbGncv32dmLm99H/iOS6wKW8Urk7U8OyVcW/UaHv4Djf35ijnFE0ZW6JV9hZh3rzFq
-	KlaMZMVuoRXGo6bjbGvCAMpW3cLy/oZ8GZLDVRmChHBZ3qMQNsQMMT7wepX7YRRBZBzgPUdKmkL
-	dEjiwFzahCBmXz0VjrvfVg8f9Rne3Eze7ru2fP1t1B37P65ri9HA1aNIdK2RsKQxBkXvaBVBT73
-	WGj4O27HiiBTZckMG4ruScxOr0TGQo7sTrQy/weRxeenULxtRdgv/lq8XvI1Vqb3B9PFDMPOajC
-	2blMAV21zaBZbZoGutG0oqxDROjtpw0DQqOa98dRTgz4pl2dOiltQEkxKK6wPtpMtqaxhwS3EFe
-	VvyYS0bsCaQtiUDenOLyXVOvPNFCNt871aHg=
-X-Google-Smtp-Source: AGHT+IEqN3OfxLAXjoh0BbnNn+jKgNAUzLVPIjM7aPLqTsUdL89FPCgDXAlE/ux9DfFsh6AFqBW7Pg==
-X-Received: by 2002:a17:903:3805:b0:24a:9b12:5248 with SMTP id d9443c01a7336-25173ea1a3emr108269335ad.54.1757314597217;
-        Sun, 07 Sep 2025 23:56:37 -0700 (PDT)
-Received: from localhost ([122.172.87.183])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b905689d1sm150907355ad.64.2025.09.07.23.56.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Sep 2025 23:56:36 -0700 (PDT)
-Date: Mon, 8 Sep 2025 12:26:34 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 1/7] dt-bindings: cpufreq: qcom-hw: document Milos
- CPUFREQ Hardware
-Message-ID: <20250908065634.m4p4tmjyb7h5bcfq@vireshk-i7>
-References: <20250905-sm7635-fp6-initial-v3-0-0117c2eff1b7@fairphone.com>
- <20250905-sm7635-fp6-initial-v3-1-0117c2eff1b7@fairphone.com>
+        d=1e100.net; s=20230601; t=1757318409; x=1757923209;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6ZtGxzPBBhWZb8TdeGEHePc9lnXNDI+6sWWhJSedy84=;
+        b=GfvfbE8pE2Tzjp4RvqGqQeUR1pT3C+IqcbaFnYnk8c/qd+i+MexYwQPEQ5QOr7nVR8
+         FGg2c1z/1vDpdET2TRVJMNjVZCt1h0JEcy4x9zthmSJBHvgV0niWT3ZHD2W3oZp2icvP
+         GUg1RhEmN+oGsp65bAJUqqGQjh/mnrCeVkdv9MkDC6fzZMHClpPqSW1Q3K6yWy7I+2R5
+         2QWM1fZFXwiEygh7VdE8b0Cg6D12OuMs1F/0K9eB+tWxTJuVocYSgP8jHoJ/2WLK8OOh
+         q5CViQMXi7FQ3m0NTfuU1CRP8OLC/nNg9ZtEyePyvzIVO7XpSsSl84zoaaRHkaAkAZwF
+         cVtw==
+X-Forwarded-Encrypted: i=1; AJvYcCWl05ygkPrxpICRaKJCaFA+5V2umvtHK4WooT3qRLMPVmBt8X0l999IpEX8S2fzx80uTzw/H6r1stvn0xU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxxp6PxkHkprRRzJAMNK07MU34FKgCRPCrpUVv/FNjz2EkmL13O
+	rdBBIRTIZ8UlvwUEq3gccBH4xbjE7GuA0Z0JRPxKB1c4Vb1oM/UrehmvnkfO9SY6GTMDfh1eTXC
+	ryIf5CQx/JwrGVIqiR78PCdAD1eaNjCeBW+cMnKI61/ZNuks+sDOFoUzKy9vJ7n4Iow==
+X-Gm-Gg: ASbGnctd1g8XIbaUNrnS2S6ZN/6C2piuAj4FFpQQ0G85IdKZ5LlRlZg9awtOXP+1DII
+	9KzjNCzIdJTEcee4KBXklpiOTvId/Ao//3m2QwuS2pjb5LOWyFo+sudXzSBI0zxUpYflqMa2obN
+	0yhMOe20lrBik8NjwP5fF+xDxPhswcGGhb4TedMS/Jn06nyJ21Lg55gRoQHg9Q6A2uM8Oy8ZK0/
+	WGPsIUIPtBEXpeF1kq9HanmS34ToPoJmazpmZPlKdTT4pP3v68+KHvHasOAJ+1r3kU1Fc2rsEYB
+	v8G2vlkHn0Bk5E/dFeNp4dLdCp3LOvZVICYvx/bvqNaIuBu9mvnB/E1KLj099h5d1/LchJQ=
+X-Received: by 2002:a05:6000:26cd:b0:3e0:2a95:dc9e with SMTP id ffacd0b85a97d-3e64ce50347mr4840562f8f.57.1757318409202;
+        Mon, 08 Sep 2025 01:00:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+e2xgTQYe5kT3rV+uD8LRSVafVXIklNJL7Am05EAxkn8s4rPl3yNNJ7oQs/EOmF2miaT83w==
+X-Received: by 2002:a05:6000:26cd:b0:3e0:2a95:dc9e with SMTP id ffacd0b85a97d-3e64ce50347mr4840495f8f.57.1757318408663;
+        Mon, 08 Sep 2025 01:00:08 -0700 (PDT)
+Received: from [192.168.3.141] (p57a1ae98.dip0.t-ipconnect.de. [87.161.174.152])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e740369f1esm6798834f8f.11.2025.09.08.01.00.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Sep 2025 01:00:08 -0700 (PDT)
+Message-ID: <28fc8fb3-f16b-4efb-b8e3-24081f035c73@redhat.com>
+Date: Mon, 8 Sep 2025 10:00:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905-sm7635-fp6-initial-v3-1-0117c2eff1b7@fairphone.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+To: John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, kasan-dev@googlegroups.com,
+ kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>, Aristeu Rozanski <aris@redhat.com>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
+ <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
+ <0a28adde-acaf-4d55-96ba-c32d6113285f@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <0a28adde-acaf-4d55-96ba-c32d6113285f@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 05-09-25, 12:40, Luca Weiss wrote:
-> Document the CPUFREQ Hardware on the Milos SoC.
+>> Roughly, what I am thinking (limiting it to pte+pmd case) about is the
+>> following:
 > 
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml | 2 ++
->  1 file changed, 2 insertions(+)
+> The code below looks much cleaner, that's great!
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+Great, I (or Aristeu if he has capacity) will clean this all up soon.
 
 -- 
-viresh
+Cheers
+
+David / dhildenb
+
