@@ -1,276 +1,196 @@
-Received: from outbound.mr.icloud.com (p-west2-cluster4-host5-snip4-10.eps.apple.com [57.103.69.161])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2056.outbound.protection.outlook.com [40.107.92.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764272FFDDB
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Sep 2025 16:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.69.161
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757347223; cv=none; b=R5Z+GSsZH3D3U/crwORKsHTzozBwtHtE6EcvmunvJYrnhymGfV543BL4aBiV/xD0tf4aTa3V/GdDkPe8QkxEA4PCblfJbvYeAm+gh3i7yNObUWuwXhpeV1bceJArC4yBb3jAR7ZaDn4nZ0jp/fNuXLOm6ZEHMocZMiw5M2KJwsc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757347223; c=relaxed/simple;
-	bh=nl1kADrvQmF1grDqtsvY60ihALanrqXaHtIrW05R8Yk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ub046ONJCMczMAUeQ/euBRksPl0YFvrf+sz6/ubZ1vNtL6iovinZnJL263sIRICOIcOSlSVw1QPm8vIuTFJaBOxkU7qJQ2XgoCuEpV26Lkm7zed83Nd0vo5yPSDk/C8dWh7Ydg7s1G4s/R1DTdO4wNZmJCKLAG8LQ/zlRxbL8kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net; spf=pass smtp.mailfrom=danm.net; dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b=gshDRdkq; arc=none smtp.client-ip=57.103.69.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2C030B52F;
+	Mon,  8 Sep 2025 16:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757347255; cv=fail; b=kW8va4btDCdPqxR7eMbEVVpwHrh6LcSayYDgWvonWSgPduup1/Y9LC5thl1RcDU/aPKJEF4hMzjGCOoe4qCs56GIUIUMxWk4HNDN8BOT2089XXLO+AKsq5lFJw7lsHzo8SSLpJSjrHHeOP9P4x8GHpu/uBRwldafbZndaYbYONA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757347255; c=relaxed/simple;
+	bh=GMsExVf2SJ6eUDUSNQq2gwyUgNXqpknz6U9+ZPDDjM0=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KbsxdAv+F1tf31CQnY/quVgvJo+RgPOFvVAk6DguvIjk2VRYJpiWUFJjqONoQ7Fy89qj/Cm1GH2/HATPiUISstgzup+EvOhFg7zZRq9iYdq0gKBq4Aivmlap7tT/xiVJwwtWxBXGnV4M3umODHHgNm5BX3LsT4nIeqiut1s7hjQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XXeD8Qko; arc=fail smtp.client-ip=40.107.92.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="gshDRdkq"
-Received: from outbound.mr.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-2a-20-percent-1 (Postfix) with ESMTPS id 95AAB180011F;
-	Mon,  8 Sep 2025 16:00:18 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1; bh=143GXK4f81n8UgBLDB+Lfcxek6oM+4KOhRh1gnXFQKQ=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=gshDRdkqLbckpjU+hdgdH3d1Q15fVfUbvryGTw36HPLJCTk9JZdqjPh2IjMGHlwQoDb4x1DzNTYc+gpek3ycOB3PGuQZJt3/2up5XBUMnLdvS6TsC/p4vGq7cZmqpTwn6ITxmRxueO/cAmhn7VJ/8uiQYsDulXVLW9bj9cFF4pSU96lWhe2vLEpzz1Twkxkhqh48noifwu5X9oAq3lVIOe5apjXepwGdkGckIFfljReXkRFxfybw8tiR5FImYwha1aZ+ZaaWD6MUZT5suXX8koPwSeth2sXKjlcsh4eDZ4Hq/SWy1y9Gv5FEe/7SoWVys6kNGIyfESLcA6ms9LYxbw==
-mail-alias-created-date: 1632196724000
-Received: from hitch.danm.net (mr-asmtp-me-k8s.p00.prod.me.com [17.57.152.38])
-	by p00-icloudmta-asmtp-us-west-2a-20-percent-1 (Postfix) with ESMTPSA id DDC0A180037F;
-	Mon,  8 Sep 2025 16:00:17 +0000 (UTC)
-From: Dan Moulding <dan@danm.net>
-To: dan@danm.net
-Cc: davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	regressions@lists.linux.dev
-Subject: [PATCH v4] crypto: acomp/scomp: Use same definition of context alloc and free ops
-Date: Mon,  8 Sep 2025 10:00:02 -0600
-Message-ID: <20250908160002.26673-1-dan@danm.net>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250907203615.7299-1-dan@danm.net>
-References: <20250907203615.7299-1-dan@danm.net>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XXeD8Qko"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VbBzvegRV95+kUuVID2Z1dmCBeADE940Kc/XRXj3wrjTTpgw77t/cRqnbFoQpWJdAt2A8xMbnOT8paCdyPZu/itFvZMrUAU60k8xwSRVFICc9Ahj9kkgP2w3EEul/Z9uhhjUZymk20fhHiTZuJJSAi20P6D00CLS+j0NE40XMld1+SS3eva97FwPxeuraV8c8fQjSpE0AYDbvAdBW4tCNW2F+2Uti31BJc73Ye6g71haXrJpF2lbpanBup2wwPWX7GPzkel75fSoq/FAKfBoGpc4AkV50eufBbznSyG0/lSFs0sJxLNClqspkmqao9EiWz+jTJi33yO6NiM2w3TWjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uKIr68tKyZZrc//MHV2ntcH7u4JfrnokhIqG0muz5+E=;
+ b=aaJRKrf7tTCN+3Lnjf9kQXk6Uv9LzwVQId+kzCuVbPTur7berczxGIkB6U1FO1/5fsivcIoGAbhq3Jdt3+fwanbN3Qz6xXVL4o62w/120A3pfwLtQL4Ckqn35SVrDT29kN/lRFSquftEjKA3EqPtZgIB/IiUNjJnX2YgRfqgHjF7TUTW6kA2HY6R40cKWmJBlL96szCy6bUvJ/r9MU1mAs8YmKi1175yC62yh4YYyvvkv+tZz4wVLzCP2/Uq9sfjwPqxGYHSHYULqalIP2pFhIsgUQkk2tADBLMurPjyaUnWjhHj6No5rUmpl5bGK9SY+Ff+X3H+mbyH8/PcyP6ihg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uKIr68tKyZZrc//MHV2ntcH7u4JfrnokhIqG0muz5+E=;
+ b=XXeD8Qkody+hUgc88epE4mtm8lp/2lGM+zeeoDDTTLYO34QK5zrRtVkr+OZjAxS9MYWDIz1dvpeP0cNHLAVDjkHyYw2ofPVfwjWemsP12OFJkbbPjkiaML9X4RDq6BqaYeE75v7kaBcxURf5ylGGNPRDFtyvWJiSnNc6r5H1ZiE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CY5PR12MB6081.namprd12.prod.outlook.com (2603:10b6:930:2b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
+ 2025 16:00:50 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%3]) with mapi id 15.20.9094.021; Mon, 8 Sep 2025
+ 16:00:50 +0000
+Message-ID: <cdd5f593-0ed7-099e-1a72-9a190edbf02c@amd.com>
+Date: Mon, 8 Sep 2025 11:00:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 1/3] crypto: ccp - Use int type to store negative error
+ codes
+To: Qianfeng Rong <rongqianfeng@vivo.com>, Ashish Kalra
+ <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..."
+ <linux-crypto@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20250903132539.416439-1-rongqianfeng@vivo.com>
+ <20250903132539.416439-2-rongqianfeng@vivo.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250903132539.416439-2-rongqianfeng@vivo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0003.namprd11.prod.outlook.com
+ (2603:10b6:806:d3::8) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE1NyBTYWx0ZWRfX5Ni4oTJNapmT
- DQa4MKTTfnBMKG0/6E4PjgLD0nJD/jJA8Cngvda1JBf6A1gUbWB1kDea+mNWWOgko2UapHEKaE7
- /fjsUq1zJW03k9Pqke6VCf5aGyqc8Rf5EMz5/PWMH4Bk3lGLPOMMdeEdiG/svCI3KJcPrNIYDN3
- HuJir8IVinKox9wq7YbiC+SkrKit4adnbrqKH+3JPQ9rlyhkKN21YdDWXq5eBKZXwAODIizrJhH
- aB+AvPdVkK9GqDQqzoIPwctcRRJB0MZCgHjrJklpiEI/KjGK4s1JOGOQjeSWCcq1023S0xEEA=
-X-Proofpoint-GUID: vdTYWVQ6lEzAN35Ksh0TN9BbKjPJIm6v
-X-Proofpoint-ORIG-GUID: vdTYWVQ6lEzAN35Ksh0TN9BbKjPJIm6v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-08_05,2025-09-08_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 bulkscore=0 malwarescore=0 adultscore=0
- clxscore=1030 spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506270000 definitions=main-2509080157
-X-JNJ: AAAAAAABubPFun+tW33USlyNh70lf7oICSeFgPhNzHcYAlO0CgbDCMOIYIDvLWQWgJUbT5pe+1MjMT07OezvZz/2wIz/nCQoNpU6AF3/RnMzrEj9OCaeF4mbNj2QphahhiFxuoF7KsOc1zdEd0UZwEYmocRfyJ88+j0UnfdQJ5JjiF/acfdFiUWPY40seFu4zarbsg7oD+ryXcXGcKTZW0iJato+qpIIF9Hkax1LcVj+DdpuLUwQsrx56be9k/YL0+t+G6J64t0bBjqDhUSD3OLBHUnoUCdq7dGp/kLClCpwxQXeRUqC9L9Yps7WmElzhEpKG8JLymnddjzGdQUIptzjcNskMM99E9ete0c3FeyPFnTDgJbXCdNca3kG9c/9JUuUU2+Fp5iPBhXST2sgDdwVvWlm6/I5kYXyFDEIgK4qfmoHmmH6TyRj+jW7jGZxzxYtOrGyXg3sL9SMgAEiwKrpBL52/rMcFay7bKJzwWn4Nqa0/5xmBl/IIBn9Ordui68o0pETynlZkz+REmE5fM6HoByoKL0PKb/pc0fbPyOT1ffFZErHtVY0ZZ8cios/avFrstdCEzX1mhBLfAfDEOwJG5JTINcBl2emnf8ehjs8THx8Jn1j4VdllT0DQrgskIVGxMKkof5f1MRl
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CY5PR12MB6081:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54ba8a3a-c76d-496c-db12-08ddeef0e18f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q1EyV0xRaTRhWTJyeDRDcm0ybEs2MEN4aTk2ZmpXL1V1WmhzUmZ4ZmdNYTNv?=
+ =?utf-8?B?V2UwK1YxZlRibG9JNjNvRHhaWjBkRUlvQnVDdGNUOW5ZdUxSc2RLcGgyb1Fx?=
+ =?utf-8?B?ZWM0cndLZTByL3JXUmZsMXhpNXV3MUt1dnc5Si80RG9TVnJaNlg1YnFacVZO?=
+ =?utf-8?B?Y2laMzVCTmdnM0FMMTg5Y2wxeEJ6MkJlaEtzQmRtN0VzZGsxNzJ3QkVGZzhW?=
+ =?utf-8?B?Wm1yclFoeFpIeW8vYitRUFVUdXhEYjhGMi81SFNNRUg2QWZQdFVxcGQya1Nq?=
+ =?utf-8?B?SnFVVnpUWXZqVUNJQWp6em0zVEwvVE1rZmtKOFdvVUhtd2ZXTUxvcDZHU1Vt?=
+ =?utf-8?B?eDN6dkdrdWRaUVBQRU9HYW8yS3JuNnZYbDYzWnl3OE1HbVE3WlpUWS92MGlV?=
+ =?utf-8?B?YkVVclA0S09HL0lsVHlCSUYvMEhOTWkxTzVOQTJWZ0xCenhacm1WeUNBRzRR?=
+ =?utf-8?B?QkpabHJsMUNZK0U2QXZPQXFSeHdxbGxRS1k4SzJkZzBaZlRwV2lSWDB2eU52?=
+ =?utf-8?B?ZzB3NndoVURtTXE4SVdVaTIvWll0bHExQTJMM3BNeDc0aFNjYWxaMHJ1d3ox?=
+ =?utf-8?B?Rk1QRkJLL2h5TWF2REpCa0wyV3hNT0FsZE03MWRsRWJPVURCZWRxTjI3aTR2?=
+ =?utf-8?B?bm5ZTjE5K3EzSUdJcTNGMnlpUGZEclRFeXdqcnZBZGdQb1h2bGo0ZExWVTF2?=
+ =?utf-8?B?cHB3ZW9Pakt0ZjM4cmdhQnNwMHlPZWRpNzhkeVBOMTMwZmt4YmFaaUF4M3Q1?=
+ =?utf-8?B?UmxvaFVyUmJyWjY2dWlXR1hjQ0MxZWh5S0tKZ256cGtKNnZ1UGhhTDY2NE9p?=
+ =?utf-8?B?MFJzZ2RYV0loNFdxbld2OG9oaFg4endMZ09tNEVBZWgrdUllNklXODdna1Yr?=
+ =?utf-8?B?dmV4RU9Td2JmcFZBMCtvZFlxbE5DbVBYWWZtem5Ka3RXSnFjRW9ZU3p6TzVa?=
+ =?utf-8?B?ZkNlRC9YZ0FCWFVwd3Z2dWc5b080eHNZNlo4eWM2MXEyUTQzRDJFcEUwUlBJ?=
+ =?utf-8?B?QUROWlN2dW5LVDRHR1dRSEpnUkJSQkZWdllRRlJMZTdWdCtwNUk3M0ZqUHla?=
+ =?utf-8?B?eVZyZEhCbE5aWVoyaWxtVFhKbXR6K1paWmZQWnl4My9iVTZDVGk4OFdMRjhN?=
+ =?utf-8?B?QzNtSjJ6dFNlUEhaTkZKalUwTlpBM1RzWmMvTHZsdXRnZVB2MlZONldTbFBv?=
+ =?utf-8?B?WGdNUHorWHZxdFhuQnd1VUVoa2xpVFJPSmNDNWtyUllOVUo1RG5GQnVPTFZV?=
+ =?utf-8?B?bkZXalFraWJBQ2hrSytTUjc3aVN3NHUweEJaTlZGMmZld2E5VUZ3bXZ6ZHNK?=
+ =?utf-8?B?Sm85ZFdneHZqZ1R3Y2cvbURsb3lkaXhnWVMrUGRkakUwdzM0RzdqQXQ5dkNU?=
+ =?utf-8?B?RThMdyt5aG8yRzg4U0pWMUdhSXhBNTFKNUx1VmR1VGY5bHdvTTg5QjJJQmtU?=
+ =?utf-8?B?RzRETitKVEd4MElCTHF2SWRmU1lHc3oyQTJJY0tGeUhyU1ZZQkdaczZEYTNs?=
+ =?utf-8?B?WmVjT05IajNTeENSanV1dE15Rm1ZVHBsVFY3c3VIWElxSFF1Q29jVnNuMWJZ?=
+ =?utf-8?B?K3o5WC9HNm01VFRkWkh5MGRuMUhJd2xYYUdkelFuZ2d3Lzd4LzJXS0E1cnBF?=
+ =?utf-8?B?RUw0Z2ZLa1Zid1h3WlZFaHRvUEhGRWR3bHpGWGlmR1dLaHJTbGM5YXJ3VXRS?=
+ =?utf-8?B?M2hjYXBPNjMvRmpTM20yU1lmNEVCQ0d5eGQ3NEI5SHI5UW83VnFQVldXd0xG?=
+ =?utf-8?B?TTUyTE50aitHWWFDSGpscmdSeVcyRjE0V1NTVmZDY0lUeHRFNU5ETjJHeEU3?=
+ =?utf-8?B?RnhsMzkyWjZiSUJLZFdTQzRoL1FVOWtJWm52d29KS1lFN1c5V0JoRVhTa2VD?=
+ =?utf-8?B?cStFN2tQZnhUUVUveUFYNTE2SWJmNzVKS2RJOFo5cFZqaGt2Q2Q1RnIya3dH?=
+ =?utf-8?Q?ShuCMwqoGL4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RzhDd3AxUm90YjFMOHdlb3FiWlp6VDlZbkFaWkF1aU5BdnBmbkpJbElVWFBn?=
+ =?utf-8?B?MWR3S040NHc1ZFRET2NwWVZuZ0hPaEhkQ25GVW9MYmw0bGplSDZCbjkzbXVB?=
+ =?utf-8?B?dHFXeTkyUlRNKy9Nb1A3cVFUSnc2QUFHQlk5UEQ3RmxzV3FoWWYrWGF3U3Fk?=
+ =?utf-8?B?NUZ2aFJuMGt3eDFyeWJGa1VLeFo5aFNyQ3RGcWNFcytST2E1cm8xQ2dLMXRJ?=
+ =?utf-8?B?TnVSSFZ0cCtHdzE4VWVWQTJIa0xaOTRjQmtoU2xvbG84bG50QkloZXArL3RU?=
+ =?utf-8?B?a0doOUJTR0w5d3dmRDNSbDZOaDlFZFdXQllMSkNLZk9yc1hUTEtLeXhhbEV0?=
+ =?utf-8?B?eitNbklLL2huVVVtelV2c0R5c09IeXhCTjJOME91NEJWMzQ1VWtmb1VWV1Fj?=
+ =?utf-8?B?WGFidEVtNVduZG0xQnp2Vkh3S2tTa1BmYko2UXBXd0lFRmtzcDVlL1h1Y0pq?=
+ =?utf-8?B?VisyYTJTQUpZLzBLRHNKYk1RWnBGZmJ2UHVSd3J4eFNRNTl5cmdtM3hnMlgz?=
+ =?utf-8?B?aEFwb3dKVUVrdVdNNjV6TGpSOFlxdHI3MFdVcHhCajlIMkRZa295Y2xCODQ4?=
+ =?utf-8?B?dVdaNnBxNnQvZ3pORmJSQldXSU42dk1tL0czM0tLUDlMNmYwQW4xcWZnSTZq?=
+ =?utf-8?B?UllRQ094ZWoyUUczU01zLzRQcUxnY3lEVDJXbXZBZFBjRDhNc2swTERrcXhm?=
+ =?utf-8?B?bWdRVGs5N09ab1VNa0JHQkdaMGVycjhzL253WjRWcTlJaDc3RDNsZ2w2UFZL?=
+ =?utf-8?B?cWxLZEpha2s4c1B4eFpJdmU4UjIzRW9sdHFEUC9DMzhiZ2ZRbW1hQ2lJd3ho?=
+ =?utf-8?B?NEFZZm5sRFFtcVdWVFAzNU1OWUg0MHA5SnZTTDlpbDE3NTBIVlJOWXdyMjh0?=
+ =?utf-8?B?QU5HN0lWaXZOT3Rpei9ENGpTb095WjZaWCs1MTdnTEZJd2xUQXJPQ1JMci82?=
+ =?utf-8?B?bGE3OTdEckxOS1dzY05QQk5KdG1ybTY1Wk9MQ1ltRDVKeTc0eGpUWnppbWFQ?=
+ =?utf-8?B?YzE3bVBqMGZCODBlZ1h4WGJwV2psTUh0V1lCM0ltaXM1d0ExaDRSbk9kS2NZ?=
+ =?utf-8?B?eWJRa1gybEVrenR0dS9yU0Ewek02ZjZXTWd3Nm1qUmQ5dWRScWUrVkdDdm1s?=
+ =?utf-8?B?aVJzcW9XVFJzK2R3WnFiMlRaUmttb0d5UTlRbVdUWEdMdkJUdFNVU1dkbVRw?=
+ =?utf-8?B?MExWTFR4d3VtVnorcE1Ta1NDSEpNRGtTbWNvbG9Vc2pWMGdRWTIrajYycTZB?=
+ =?utf-8?B?WExNT1A2RDBmUWk2TklQZWd5R01vSWR4MlE1Tmh0RnBIMkdVeHJTeDVmemVw?=
+ =?utf-8?B?Wk5OTEVuWWhMalQ4ZERodVRva2YrTGlVakRxNi9LUjlxL2E0R1ppbG14L0ZD?=
+ =?utf-8?B?V1ZJZlVOdWJNOGMwSzlpaG5YdjBvY0hUQmpLTWZMT2ZxdzY1YkU2RUhpRkJl?=
+ =?utf-8?B?WFRZbEp6TzBCRFdCbW1xeHg2Y0NvU09zODNtOFNOWXBmanB0YnlkWHBMZ1Bp?=
+ =?utf-8?B?cDZIck5LekZsN0ZEUWNjSDJnbm9RRnRSZWo5MDVQdGNhbFR4MDBna1lKbGkw?=
+ =?utf-8?B?TDNyOEZtOTNZaWtVemppUnBqQjJVcGx2QzczRFNoWGRPMUJWVWtXZ1BVc1ZL?=
+ =?utf-8?B?SVNNUFhIUElxUDBTS3A4Q3RiTFd4Z3BqRHlPa2VkcUpXc3FTTUlKZ3cwWXlQ?=
+ =?utf-8?B?ZmYyRUpQVE44OWEyNHNYdStiRk5JT3IvV0pNWGs3QkJjN1RSd3ZLUUxqWUxO?=
+ =?utf-8?B?TGJVOWdRSWswYktnU3NzN0tCM3VvTm9lakI0QUVUbThnTVVrOTlNZTlQQ0w0?=
+ =?utf-8?B?eDFNa3piMUlzM3Z0L3B5OHdnb2VBNllBSnlma1FPd3hSYjhFNVJjQXJ5K3l2?=
+ =?utf-8?B?NHQ1aDk0RFJDU21OcXNjbENvSXc5Y1FURlJhYmRBejViQTN4RXdmd2xkb0Qr?=
+ =?utf-8?B?NXJBQjJlb0hhTkhBRldkSDEzTDVHMzVVbG5FQjVtaHdHVXlaZzhSTG9PalJD?=
+ =?utf-8?B?R0ZETDUxcGQwNEFOZFJKd1JpMm1WNGdYS09zaGlxOEo5U2ZPNlBHRTIrR3NL?=
+ =?utf-8?B?bjc5TmQ5Mk9Hcjg1UjQ5bUJsWnRSL1NET2E2cTdjbVZ0alVJeUx4Rk1sOTQw?=
+ =?utf-8?Q?td/1ZszEgddv1HXqbL6TEV2yt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54ba8a3a-c76d-496c-db12-08ddeef0e18f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 16:00:50.2557
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B+bG2rfL5rgvNmImlEb7E/UNM2CsRzNPjm7RxTMBVluSQ+XRtNRgZfQ+OO79V8hYIMfoM6d5//DCcWp9bZVrvg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6081
 
-In commit 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation
-code into acomp"), the crypto_acomp_streams struct was made to rely on
-having the alloc_ctx and free_ctx operations defined in the same order
-as the scomp_alg struct. But in that same commit, the alloc_ctx and
-free_ctx members of scomp_alg may be randomized by structure layout
-randomization, since they are contained in a pure ops structure
-(containing only function pointers). If the pointers within scomp_alg
-are randomized, but those in crypto_acomp_streams are not, then
-the order may no longer match. This fixes the problem by removing the
-union from scomp_alg so that both crypto_acomp_streams and scomp_alg
-will share the same definition of alloc_ctx and free_ctx, ensuring
-they will always have the same layout.
+On 9/3/25 08:25, Qianfeng Rong wrote:
+> Change the 'ret' variable in __sev_do_cmd_locked() from unsigned int to
+> int, as it needs to store negative error codes.
+> 
+> No effect on runtime.
+> 
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
 
-Signed-off-by: Dan Moulding <dan@danm.net>
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Fixes: 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation code into acomp")
----
-Changes in v4:
-  * Rebased on crypto-2.6/master (previous versions were based on
-    stable v6.16).
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Changes in v3:
-  * Intead of adding a new struct containing alloc and free function
-    pointers, which both crypto_acomp_streams and scomp_alg can share,
-    simply remove the union that was added to scomp_alg, forcing it to
-    share the same definition of the function pointers from
-    crypto_acomp_streams. The pointers won't be randomized in this
-    version (since there is no pure ops struct any longer), but
-    overall the structure layout is simpler and more sensible this
-    way. This change was suggested by Herbert Xu.
+Not sure it needs to be initialized either, but not worth changing that
+as part of this patch.
 
-Changes in v2:
-  * Also patch all other crypto algorithms that use struct scomp_alg
-    (v1 patch only patched LZ4).
-  * Fix whitespace errors.
-
- crypto/842.c                          |  6 ++++--
- crypto/deflate.c                      |  4 ++--
- crypto/lz4.c                          |  6 ++++--
- crypto/lz4hc.c                        |  6 ++++--
- crypto/lzo-rle.c                      |  6 ++++--
- crypto/lzo.c                          |  6 ++++--
- drivers/crypto/nx/nx-common-powernv.c |  6 ++++--
- drivers/crypto/nx/nx-common-pseries.c |  6 ++++--
- include/crypto/internal/scompress.h   | 11 +----------
- 9 files changed, 31 insertions(+), 26 deletions(-)
-
-diff --git a/crypto/842.c b/crypto/842.c
-index 8c257c40e2b9..4007e87bed80 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -54,8 +54,10 @@ static int crypto842_sdecompress(struct crypto_scomp *tfm,
- }
- 
- static struct scomp_alg scomp = {
--	.alloc_ctx		= crypto842_alloc_ctx,
--	.free_ctx		= crypto842_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= crypto842_alloc_ctx,
-+		.free_ctx	= crypto842_free_ctx,
-+	},
- 	.compress		= crypto842_scompress,
- 	.decompress		= crypto842_sdecompress,
- 	.base			= {
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index 21404515dc77..f602ea038bb7 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -54,8 +54,8 @@ static void deflate_free_stream(void *ctx)
- }
- 
- static struct crypto_acomp_streams deflate_streams = {
--	.alloc_ctx = deflate_alloc_stream,
--	.free_ctx = deflate_free_stream,
-+	.alloc_ctx	= deflate_alloc_stream,
-+	.free_ctx	= deflate_free_stream,
- };
- 
- static int deflate_compress_one(struct acomp_req *req,
-diff --git a/crypto/lz4.c b/crypto/lz4.c
-index 7a984ae5ae52..57b713516aef 100644
---- a/crypto/lz4.c
-+++ b/crypto/lz4.c
-@@ -68,8 +68,10 @@ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- }
- 
- static struct scomp_alg scomp = {
--	.alloc_ctx		= lz4_alloc_ctx,
--	.free_ctx		= lz4_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= lz4_alloc_ctx,
-+		.free_ctx	= lz4_free_ctx,
-+	},
- 	.compress		= lz4_scompress,
- 	.decompress		= lz4_sdecompress,
- 	.base			= {
-diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
-index 9c61d05b6214..bb84f8a68cb5 100644
---- a/crypto/lz4hc.c
-+++ b/crypto/lz4hc.c
-@@ -66,8 +66,10 @@ static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- }
- 
- static struct scomp_alg scomp = {
--	.alloc_ctx		= lz4hc_alloc_ctx,
--	.free_ctx		= lz4hc_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= lz4hc_alloc_ctx,
-+		.free_ctx	= lz4hc_free_ctx,
-+	},
- 	.compress		= lz4hc_scompress,
- 	.decompress		= lz4hc_sdecompress,
- 	.base			= {
-diff --git a/crypto/lzo-rle.c b/crypto/lzo-rle.c
-index ba013f2d5090..794e7ec49536 100644
---- a/crypto/lzo-rle.c
-+++ b/crypto/lzo-rle.c
-@@ -70,8 +70,10 @@ static int lzorle_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- }
- 
- static struct scomp_alg scomp = {
--	.alloc_ctx		= lzorle_alloc_ctx,
--	.free_ctx		= lzorle_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= lzorle_alloc_ctx,
-+		.free_ctx	= lzorle_free_ctx,
-+	},
- 	.compress		= lzorle_scompress,
- 	.decompress		= lzorle_sdecompress,
- 	.base			= {
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index 7867e2c67c4e..d43242b24b4e 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -70,8 +70,10 @@ static int lzo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- }
- 
- static struct scomp_alg scomp = {
--	.alloc_ctx		= lzo_alloc_ctx,
--	.free_ctx		= lzo_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= lzo_alloc_ctx,
-+		.free_ctx	= lzo_free_ctx,
-+	},
- 	.compress		= lzo_scompress,
- 	.decompress		= lzo_sdecompress,
- 	.base			= {
-diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
-index fd0a98b2fb1b..0493041ea088 100644
---- a/drivers/crypto/nx/nx-common-powernv.c
-+++ b/drivers/crypto/nx/nx-common-powernv.c
-@@ -1043,8 +1043,10 @@ static struct scomp_alg nx842_powernv_alg = {
- 	.base.cra_priority	= 300,
- 	.base.cra_module	= THIS_MODULE,
- 
--	.alloc_ctx		= nx842_powernv_crypto_alloc_ctx,
--	.free_ctx		= nx842_crypto_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= nx842_powernv_crypto_alloc_ctx,
-+		.free_ctx	= nx842_crypto_free_ctx,
-+	},
- 	.compress		= nx842_crypto_compress,
- 	.decompress		= nx842_crypto_decompress,
- };
-diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-index f528e072494a..fc0222ebe807 100644
---- a/drivers/crypto/nx/nx-common-pseries.c
-+++ b/drivers/crypto/nx/nx-common-pseries.c
-@@ -1020,8 +1020,10 @@ static struct scomp_alg nx842_pseries_alg = {
- 	.base.cra_priority	= 300,
- 	.base.cra_module	= THIS_MODULE,
- 
--	.alloc_ctx		= nx842_pseries_crypto_alloc_ctx,
--	.free_ctx		= nx842_crypto_free_ctx,
-+	.streams		= {
-+		.alloc_ctx	= nx842_pseries_crypto_alloc_ctx,
-+		.free_ctx	= nx842_crypto_free_ctx,
-+	},
- 	.compress		= nx842_crypto_compress,
- 	.decompress		= nx842_crypto_decompress,
- };
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 533d6c16a491..6a2c5f2e90f9 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -18,11 +18,8 @@ struct crypto_scomp {
- /**
-  * struct scomp_alg - synchronous compression algorithm
-  *
-- * @alloc_ctx:	Function allocates algorithm specific context
-- * @free_ctx:	Function frees context allocated with alloc_ctx
-  * @compress:	Function performs a compress operation
-  * @decompress:	Function performs a de-compress operation
-- * @base:	Common crypto API algorithm data structure
-  * @streams:	Per-cpu memory for algorithm
-  * @calg:	Cmonn algorithm data structure shared with acomp
-  */
-@@ -34,13 +31,7 @@ struct scomp_alg {
- 			  unsigned int slen, u8 *dst, unsigned int *dlen,
- 			  void *ctx);
- 
--	union {
--		struct {
--			void *(*alloc_ctx)(void);
--			void (*free_ctx)(void *ctx);
--		};
--		struct crypto_acomp_streams streams;
--	};
-+	struct crypto_acomp_streams streams;
- 
- 	union {
- 		struct COMP_ALG_COMMON;
--- 
-2.49.1
-
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 4f000dc2e639..6c116f6f9b79 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -848,9 +848,10 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  	struct sev_device *sev;
+>  	unsigned int cmdbuff_hi, cmdbuff_lo;
+>  	unsigned int phys_lsb, phys_msb;
+> -	unsigned int reg, ret = 0;
+> +	unsigned int reg;
+>  	void *cmd_buf;
+>  	int buf_len;
+> +	int ret = 0;
+>  
+>  	if (!psp || !psp->sev_data)
+>  		return -ENODEV;
