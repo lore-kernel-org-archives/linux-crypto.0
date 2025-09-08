@@ -1,175 +1,495 @@
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11ED433C8
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Sep 2025 11:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757330790; cv=none; b=F+OyFPtlmjCUw3L0Jna3T5Ubd+UNE7sMOV6B0pBsvY67Ev4kqgOHa0aiecpacwONLAyuzQbqsHSiCUlrdkiv3KSW0+zBHwVqpTFoI3eHN44uRsk8CsB4T1tpJt7j0Bf1Ubflf8UDsXhwN9yK3Y5CpqSPUcbV7OoWE1I6ti1hxXE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757330790; c=relaxed/simple;
-	bh=y2Q1tyz1O1/FbRgYYErmhgG5y9eSQQK+NEfphOXmKMI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oaejz6O9uHf06yZFvVnWmluICO3JYYPFc6oNTQ1eYN7WQJYz6KLq7eBVOT3Xgmgbg+FqqefXSW/moIL71rrWFrYlz9znRamL4nLNhBXErKo0Z5OQkA3mjWViaXyzhPuAAndTUOc3ApgX2FtltmT5ZERQaKV7k9kT0xdwF7gGgHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-886e347d2afso395153439f.3
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Sep 2025 04:26:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757330788; x=1757935588;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9UGwP574UR8mluSEnTzhQ/L6kwzTH2koLeZ6O/JgxFM=;
-        b=qogWuRn2e3ioZRrW2ZpnaCBnbpzErcHdpykjFnOmxK6uWDJ5k2qVSY2aOhhIq9of5E
-         Hdt3tyrUqG4yPqutpwYpkWe/jDw2CwETStXEem6BSv4lIAzcUjr3xuOsWRrTPCO9c36K
-         wBNaUFQMGzVZLtEA12YXMInSVzhXQiCMFURbwI/oHlHXAogzVboZca4RsfHrxvwyR4Ig
-         FeM8Z27hVWHRcBcOG4RorLsobinqPPpPbydAdCrrX0vg4DLSj5G8M2iUZqO2ZBMayGPB
-         rTF7YOahFPfVdhonrLIr1vUCb0YhNIDtUyBD9LHdLzJ+yT7P9NASfehGtn3XFTpOCPcO
-         LsiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuaa08tW13278d1pdfRnjKtT6mYcKuDphVuWft0u3C+3zrhdNJxK9PkX0EWou9umK38yHmmVnVheknwBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/Wx0NLpFgo9yVVGSBaajgET82NoOa/tFSOrwXzt3rJDqfA2Mp
-	fRWAnfnj8ywSfNZEskCsclVBHivw5+FBBUY0X08A2WaMQLDnDud0r9TNRcHG33lVuljHfsHcfT1
-	HXfNFMPMbv1F7cizF17ugwS2/tjlSz1a980spyFOMyCLGhmVxCkC9xJpL50Q=
-X-Google-Smtp-Source: AGHT+IGKO8iHWWTlpQIUCgDx0UeoGo92b/QAvIGmkZTq4yu2iMtPbYy4Zd/fmdshQWMoIEEtVzBn2Hm22Tlklb9+/OLXlxUVTe5M
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761DC2FE584;
+	Mon,  8 Sep 2025 12:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757334384; cv=fail; b=pK5Kd/MolQUce/LhTL3NSnPtU3Tdan2ddCaG7T/CvwPdv2YlAaRQq3pRBKE7Ux68a7L3YYl5c1oKkSQn317lnE5m/Pyy9gsCY9EdH3Ut0RvAyY4KtBeSm0pcGCQL1AKhaeifAGScH0Cppxfb9XmYZ/eQgZkfM1HTprbfWj7Iyes=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757334384; c=relaxed/simple;
+	bh=PWlTAucxPAVOlCCmlL++NYWvuDpxDBKY5O4JQx9gP/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=o02whl7tDyGkVFZTvLciEsNUN433yl+FUu16A3V2AWawG2tQlNv+s2eJoHdfLFHFC5bEMO6JBIWsP2htvKS3TAnVeg8xqjZ6XCz+o2mIxvoCsa2IEYfBAeGuJSCnogjlCRQyon3gl6ma0jJ2SvZDHak9yqO3XRAP+pEDx3+MeME=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Yq9X96wx; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=IqeccymP; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Yq9X96wx";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="IqeccymP"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588CP7jD014784;
+	Mon, 8 Sep 2025 12:25:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=53wKw2g6VGPUuZaRHC
+	vrwdm1JFezKOAM+wGnQSwVruc=; b=Yq9X96wxA3CfzTABtseWQzsGSSeUCoft9q
+	t6iAjhGycVuKAQULuJuZ2DYhI9WsQ7Z6oW3gel4eUbIEAc+5RRsx3xuJV+x4oy2W
+	Eq5H6jFHKxisAyIlZqdCEFIUSOuovJ93u7YbREMZSAnHomJaGBHqQIBjsgYWJQMo
+	i+d05KrG8kOPEyn7kuH2qeByDm0jKB5uz5CLDeBR4OmCB5anvniT/oGsudFftPyI
+	npxKe6j5/R6Uam9Wr++GUkgRvAIMaiWS4F7+1agb02r4RtfQyaEo76flw0BGgXZl
+	b7sw5sRo+7XD0P8yte4tHu2FNTDEhZHgDTCzaHP6udZBGg+ANRRA==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 491y4br012-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Sep 2025 12:25:40 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 588C2iqE030831;
+	Mon, 8 Sep 2025 12:25:40 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 490bd83vx3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Sep 2025 12:25:40 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=S2vDSYtXzyy/PPVJV60nIIDwcGTR8dzrbX2ADuOHUjcl+27+H2xUPowgm+VdbFPpTbNEoUR5sR7TSI0ILciU3BSchDAZJ7PAwlHX/sTUTNs98tGFWsSr/BHdMh/5fxX9HqvepaL+xHzjPZTmy/ka5tLrj6xWUYHCLmnYsbQQKy36Ax2KPRhj36pf2Rv7gMAFXT7qouwJmJvhBGT+lSppR+g7ec/7E5w5HyYVR4Lb3Ej2R6VcQYquky4nRHtaOfjqG28kpZ7UqglYjSNMERfW4kKxxP0xjORBwUmtaU6hZWB9I70K4Ydv2yj/CZvlaTscr9+aRa8Vlzx0J/9eCjbYFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=53wKw2g6VGPUuZaRHCvrwdm1JFezKOAM+wGnQSwVruc=;
+ b=btkcrvhgapf9qsqCKrZVb9F67sQeQpZFaCRLtU4JrUKFWGOmub6MgNNyeXafmINNLbtNiVmwALTh2x2L5JZQacTDpy858FV2sPwB+m/5IIFI5Vn7VCZ5nRImz0bU6eOCMPubmxGlJ9tRGi/Pu4Nf09eQSdZlsKsiBOn/fm7uFJCpuHB3CCybl46ifQwQttDTZ+9zRNs1LS+pe4ZICntFf4KfKyYjYk1N9T9Msa4ki5AHYiaEy4WrSKa5R6F8vMYXIHupbFij+lekPT7BxITqxN1Bj8BzhKQvUJMotPxYB22LTLicsQgtAr3FqNCsFKnMox87SgHs0eUsomN6Y66M7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=53wKw2g6VGPUuZaRHCvrwdm1JFezKOAM+wGnQSwVruc=;
+ b=IqeccymP58NxisIPZgsqinUw307nLpl2tVa6MYTpliL3sf7cqvj+JDiRW4eu2XiT0QdLjl2CgDWFPJ4HXWfYcjD8s//tBDuL/F/2ExV806Yy4sUCaNoWqiT3it8QpX5f5fOy8PllwrLPwGncvEtmW4XCUcHF3vfqllcCdh7gbxM=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by CYYPR10MB7673.namprd10.prod.outlook.com (2603:10b6:930:cb::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.25; Mon, 8 Sep
+ 2025 12:25:34 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2%5]) with mapi id 15.20.9094.018; Mon, 8 Sep 2025
+ 12:25:34 +0000
+Date: Mon, 8 Sep 2025 13:25:29 +0100
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
+        Alexander Potapenko <glider@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brendan Jackman <jackmanb@google.com>,
+        Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+        io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+        Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+        kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+        Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+        virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+        wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+Message-ID: <727cabec-5ee8-4793-926b-8d78febcd623@lucifer.local>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
+ <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
+X-ClientProxiedBy: GV2PEPF0000662E.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:158:401::3c4) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:378f:b0:402:c6fe:be8e with SMTP id
- e9e14a558f8ab-402c6fec001mr73417885ab.30.1757330787926; Mon, 08 Sep 2025
- 04:26:27 -0700 (PDT)
-Date: Mon, 08 Sep 2025 04:26:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68bebd63.050a0220.192772.086e.GAE@google.com>
-Subject: [syzbot] [crypto?] general protection fault in xxh64_update
-From: syzbot <syzbot+14c6a89d5f47cd26ea7a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|CYYPR10MB7673:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5750c2a8-fab2-4063-4113-08ddeed2cefd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?3tTs0cj4xXVauyOIAm2253fzIqp28Yom061AjUaHEoKmODlbhitru8APc/dw?=
+ =?us-ascii?Q?W1XUYzMzUBaVB5uUSA6GGSlal5NOLjmgZCsDNs2sBcEFoqUIZvfTxzuObUem?=
+ =?us-ascii?Q?I4Ubr5mNXhc6SHZzVthJBgPpZHs+JmWItvXnSwtGZCTtyKJCX74QlEsdfH8G?=
+ =?us-ascii?Q?+lS2ccdYvladrZzKIEDIm9SkL0nOKqNWbItyfG3qTKkNbDGY0ox3bkhjgAVI?=
+ =?us-ascii?Q?777l82kHfPGVGPmkuU7WQLyHw/Lm7cKkZlehYm9+SxrJY98B4meIQvzI1aQj?=
+ =?us-ascii?Q?Md589xJBkG6pVXemkMVmiBUIROETa+D12vjdEd2AXGXPrIQduAfL3tFSlOiO?=
+ =?us-ascii?Q?O/cEBlOnnQnXmbn9XjTblznxE+/TJ1J1PGLAbfQ648HsSqclGDKqltZd9q3A?=
+ =?us-ascii?Q?N2wI1kcog3MrbJ3ramVuKDudOsvky+0NIOEDWwb0FpqcASGULsd5pX4Wh229?=
+ =?us-ascii?Q?1EMJc9eO6fk44J0QCaYL2QyavuxTCibus4ESJcioiCtDXnIZ+yEKV5TopxK1?=
+ =?us-ascii?Q?0jvoVgjM5YRfK+QZF1SfFAzG2HQ8AfO6ruwy4Y5AkmSVDNvxKRVLGYiSRA7/?=
+ =?us-ascii?Q?nvT6nqsAq9worJWTaokgn64UNmNzHH+79y+ysLvLHU1QeLUwl7R0/Z2SlMEA?=
+ =?us-ascii?Q?Gk/NjVfuHQgGWaPZUvAz/CyvI4JH1sDy7EPlRdZGs8Qut/L4Gn/USVB0AGT0?=
+ =?us-ascii?Q?b7cLyO0qeK6hl6WagN17LOfqBAXKWmQvKCcuqca2U1qZr+1Z1RCPfMTdCAwH?=
+ =?us-ascii?Q?Kv/h+UppwB4DfVqdYikcqk9/nxNFdBrJWqOVcaDoQKdEnBGm7+c62UifMCx7?=
+ =?us-ascii?Q?qC3qZbGR7fEtVDKlUXuwrsPDJTCwEUX0wEEq7ZuuP8RDg8/lL1fvrUhel0Dc?=
+ =?us-ascii?Q?2QkqkkQ5ek2yW5N84Ana/CRNSysizexaGpYK810xN8kaD9vOxgBis6TFf3tj?=
+ =?us-ascii?Q?1U8IfMW4coeClTCPYve02bn3MXCEQo/3+Si2F1FQnm1bxchqS2uXrf7KZfyD?=
+ =?us-ascii?Q?fRIwkjTH/2nTzso0t7cmYyFaK3xc7odmBngkb45HPrFBFboMyunlr4sgIbLl?=
+ =?us-ascii?Q?J12+G9uCLOQHjh0B+D6+3bVjnPbRUV5hFcH8nmQCuWMZsZtUbkkyrdAnOZsQ?=
+ =?us-ascii?Q?6UBoCAYNj3eYiA4z86w47LcP0wrjxoPB0W6hHkbv/d9rk40nPYTevnGNQ3vw?=
+ =?us-ascii?Q?GiHC6zVs2wjQwD77cmUeGxPUeYkDsdzSuhaKy2HmG7tYZkzrXA7yfmeiMPZY?=
+ =?us-ascii?Q?ZEfTyBlzktuRt0hNapf1fie866BGrtL4Z5zmfNdmtBHEOV70XXK5iCusvSgS?=
+ =?us-ascii?Q?5ntrBjxiApLlCvZDtW9u8CgPofoZ71q9GUOa+OZ4daRvW/NnX81GRGboF2/7?=
+ =?us-ascii?Q?BN0gHFyprod+a0k+60UYyr1B39BxRnt+I5TeYnxQPpkAJp11S+wbfVO5VSrB?=
+ =?us-ascii?Q?O1XsXFT+ut8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?H7coq9Mqpm+ZLzgV+GEnc5CzkOphc6zI7U7YExlG3nPLk1l4Mpuv8BKTCdvg?=
+ =?us-ascii?Q?CIdkfiYJONceg/JjQWy8mWPXlSPqRly2q6GlZsSFwKWzCpUwdmuPlCusHWyo?=
+ =?us-ascii?Q?eLgk2BVjHfY1h8wh+umWuiFSjATmh9sDSzPmNhDa/ogA1RliA5ByYjXpAaHX?=
+ =?us-ascii?Q?RRnyHqm46zaPOsVjeXW2MLk9/n4/WVFlsw+mt0Vkw14HTMeTbK8mpZjQvNLB?=
+ =?us-ascii?Q?J8EQQ+y+6qyIghf87eQvIwl2JD31hABYQwFg9cM5ZKGxWwGs+dxlVsez1GGb?=
+ =?us-ascii?Q?a1WAK+eWQL8zg1O7yjtBxbzxFmGnPMU2Ol6DKe2XZZFcpuIlWiMoSpZZV0ji?=
+ =?us-ascii?Q?n/thfzusPMv4IMg6/TprXD0rQbdunFmdNIDh15z1ibCT0+uuR0OHYDh57FCN?=
+ =?us-ascii?Q?P8CW+9xp9cmcNGkdsknaO+rgjqWl/8GzlCxr2zJVTlHmUOgvFDBlQf0V+end?=
+ =?us-ascii?Q?byIxBPUmkpq6424KOS3KD66qbHO43iU5pQixvl6spAAJWeWnh9cL4U8MS6tY?=
+ =?us-ascii?Q?1HzfSc5jCvnR3SE4mzfp5UH0OcPAUKfIiJQJA1SvgZ7f5qTBONRDhMh4zSv1?=
+ =?us-ascii?Q?JXnw8c3MIClcGkBJCfEBISR086t5UGNQmp3ALqqEHf5yubGcnhxuPYh+pKUe?=
+ =?us-ascii?Q?yyn0APYtVu8zqp5dujtwblN4g786G7YmuUdtgxo23kS0YRQwR8ovITegfRKO?=
+ =?us-ascii?Q?3E0l4s+0/SnhOTzQZQglQcUS4xGRkPtAINKIQqmF0bggxWGF/j7C/Hb+QN4m?=
+ =?us-ascii?Q?k6P19jpUF8Zz8QoMr6OSK7+AMPd/ERWYhooE/ypEW3rSTSgfxiVlhshhCzXV?=
+ =?us-ascii?Q?ZNlWMfO5cyvbGFFmCSNl+HkIZcN2bIGoAjOp0qK/Vfs1rwyKg/W1GNDY4lxP?=
+ =?us-ascii?Q?u/nwuL/lk4DxTQj9V4cjG9tOPOjzXnew6XR82yO6EInNvXkzBv73VoPvlMEP?=
+ =?us-ascii?Q?05fCPQzLFkX9+q0SNoXDqZI8h/mddK0v5p95c81Bf2EX/5RbOnbXj+2CuNA/?=
+ =?us-ascii?Q?pBPaGmBZiypz+owiyHFP/KcOEUWbnWbgnA5IST6bkIowdqfqYnaMSTtzdAzH?=
+ =?us-ascii?Q?X7rWbwPoDI1Pcs8bBzDcS1i4V4+P8F+GIP6kcYOfGWI8/tSw3mRLdq7FiCz2?=
+ =?us-ascii?Q?cNbOkQ8HVgDYT7Epr0wAVfmm5MLVzpkQjb6/XAul01xfli15LGhZmsJCJQ73?=
+ =?us-ascii?Q?Aw34nkRdO0KT8srwhl4FobaC/0uABN25livuLqtXyB+SUAgCsDNb1xJqcoqi?=
+ =?us-ascii?Q?NIf/dJ4C89xFvqlEzknu4VRZqoK07njyPyTOOxADI6rX0iGZH0jK0xdsis17?=
+ =?us-ascii?Q?XWGVGQ9scDhsZMnqX7Rppq3yfzn2ORlb6s55lSa+RCY792XbM20ipwG/yROy?=
+ =?us-ascii?Q?xQK5MiY6+2gYNh5YBbfsnty0CNDcOA9l9aLf92NVOe736HBrJihfWL9jivu4?=
+ =?us-ascii?Q?S3ixDsYlzpmWr/Zw/nD1KeM/1/qvgEB3YtUql7k+YB+5x69Jni8AH9+pcQ2u?=
+ =?us-ascii?Q?sxPs6amuFsCArO4wgWN72nGtKQh2didbfZCgciyj0FMnUTIKpxn+WhrJIZY9?=
+ =?us-ascii?Q?hN2uafv8E8zNa+kWlbQQF5vHHs4LzsmhHtn/gN8CdhrvkHSZy7qaGBoKLXCK?=
+ =?us-ascii?Q?uQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	ac10MGhiqySDHa33095kp8FasLvKLi2Dj17881A2xt8O5ZvM2MvGoZMxGKvtvKsvQS66pZKg/i91VX12ZVulBvnLFZMzaFqL6RnR0+Jn4VBjIgFWYt4O1m/sFwuGrbBVTfUStp+wzx6a4jKnQ29f76k8hgmwHwfxn+dlOMWS8OzZxOkrmb+ZWaRZYzY3sMzYzJMGJc4n7lFlOgo/GS96ndQPuyKeI6BE53acI7FOb8xx/tKk5OcQnZySWy3XG4NdyawGFmuyOaAgzBMLF16muoJomFu1jIwQystGCRTgX5gWZSZZdyupK5JRwypZ6gMYvjIocdyqLIbM+CcREdBdxQhjVhu8CKrB0GofEliXnOLsiWGYtNqlNvXtyKoSbFpl3BriHkcwI0hxY7BPYs8qx2bkgxaM8oU8TGrb8VQPmhFpWFWqceNASrLBGsEOt5E/cSui1UVxoQqqNvO37w2z+SReWUkZiN4MFEiDPFwoEIJKdzFoBqgDlqW96k2u9uqL/dBm+p7eRVfe+sGKd6xZSGGvZ5nVyBg1U2+r8nvInyHYwdw2vTccL/uH0c8yM3y10xiIYEuOc0Bx7pkgehWOXoSya4KYzi0xfx0ggklSoG8=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5750c2a8-fab2-4063-4113-08ddeed2cefd
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 12:25:34.1779
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sWGwxNqZpbEJ+4UAeXbj9YDKxHxK1P+ilMEvD+x1SMdvVH1ZyUqDj4AuTMNjyjU6WRWkFhDi28+WeJZy48q00NsI+gV2GLV0Pb2ke3xKNgk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR10MB7673
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-08_04,2025-09-08_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2509080124
+X-Proofpoint-ORIG-GUID: YgmznCMtqbhv5Z0yqJFXbP7wAIF2jrsu
+X-Authority-Analysis: v=2.4 cv=ILACChvG c=1 sm=1 tr=0 ts=68becb44 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=yJojWOMRYYMA:10 a=GoEa3M9JfhUA:10 a=20KFwNOVAAAA:8 a=cfmsvUbG8TYeAjVIuM4A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDEyNCBTYWx0ZWRfX3gj54xl72R9c
+ 1Z2J0Fb7AC1lcJ9ITlao5qJf78fO1Jlg2+odNQgvSB6p+FvqK+4283VeDxDbaa9O1enI48v0FVQ
+ ZDcs4VTkmoLj4JcGd9lbj80i7gTE3Ynsn9Ie55Q+5Syon01JjIo419OeGQsyLVcACCuQVeUBaIH
+ lurM7RbxkElHeySN/GAAvsOWrfSkLu2vFJ1YJlx31G7WO6z5DjKhZKm2QZTRm9+vBlq+XWH5Wwm
+ n8sditDcdPt4EXj448RPVUqtE1vKPf3S84Aso605cuu2NATX2bwECGJQVdoYVUJUPky2Sm0GCVI
+ iLFv7xBxbWWMguBB45CmtVhNmPfTasztxoZQEVctCZsglRX0M9hvKSG98IiBtMYUsmbdAb5gvuK
+ bzGm+Nv+
+X-Proofpoint-GUID: YgmznCMtqbhv5Z0yqJFXbP7wAIF2jrsu
 
-Hello,
+On Sat, Sep 06, 2025 at 08:56:48AM +0200, David Hildenbrand wrote:
+> On 06.09.25 03:05, John Hubbard wrote:
+> >
+> > Probably a similar sentiment as Lorenzo here...the above diffs make the code
+> > *worse* to read. In fact, I recall adding record_subpages() here long ago,
+> > specifically to help clarify what was going on.
+>
+> Well, there is a lot I dislike about record_subpages() to go back there.
+> Starting with "as Willy keeps explaining, the concept of subpages do
+> not exist and ending with "why do we fill out the array even on failure".
 
-syzbot found the following issue on:
+Yes
 
-HEAD commit:    4ac65880ebca Add linux-next specific files for 20250904
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12951312580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fbc16d9faf3a88a4
-dashboard link: https://syzkaller.appspot.com/bug?extid=14c6a89d5f47cd26ea7a
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16951312580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10b8e962580000
+>
+> :)
+>
+> >
+> > Now it's been returned to it's original, cryptic form.
+> >
+>
+> The code in the caller was so uncryptic that both me and Lorenzo missed
+> that magical addition. :P
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/36645a51612c/disk-4ac65880.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bba80d634bef/vmlinux-4ac65880.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e58dd70dfd0f/bzImage-4ac65880.xz
+:'(
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+14c6a89d5f47cd26ea7a@syzkaller.appspotmail.com
+>
+> > Just my take on it, for whatever that's worth. :)
+>
+> As always, appreciated.
+>
+> I could of course keep the simple loop in some "record_folio_pages"
+> function and clean up what I dislike about record_subpages().
+>
+> But I much rather want the call chain to be cleaned up instead, if possible.
+>
+>
+> Roughly, what I am thinking (limiting it to pte+pmd case) about is the following:
 
-Oops: general protection fault, probably for non-canonical address 0xe0009d1000000000: 0000 [#1] SMP KASAN PTI
-KASAN: maybe wild-memory-access in range [0x0005088000000000-0x0005088000000007]
-CPU: 0 UID: 0 PID: 6069 Comm: syz.0.32 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:get_unaligned_le64 include/linux/unaligned.h:28 [inline]
-RIP: 0010:xxh64_update+0x55b/0xcf0 lib/xxhash.c:312
-Code: 00 00 00 fc ff df 48 8b 44 24 30 48 83 c0 e0 48 89 44 24 18 48 89 5c 24 68 48 8b 1b 45 31 ff 4e 8d 0c 3e 4c 89 c8 48 c1 e8 03 <0f> b6 04 10 84 c0 0f 85 4a 01 00 00 4a 8d 3c 3e 48 83 c7 07 48 89
-RSP: 0018:ffffc900039c7778 EFLAGS: 00010206
-RAX: 0000a11000000000 RBX: 7a8f95a9137c12d5 RCX: ffff88802af8bc00
-RDX: dffffc0000000000 RSI: 0005088000000000 RDI: 0000000000000000
-RBP: 8c2c5b2336b29570 R08: c2b2ae3d27d4eb4f R09: 0005088000000000
-R10: 0000000000000000 R11: ffffffff849f4de0 R12: bcfbe54b88bf1c85
-R13: ffff88807c933360 R14: 128d621f73d40218 R15: 0000000000000000
-FS:  00007fa7a7e826c0(0000) GS:ffff8881259fa000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa7a7e60f98 CR3: 0000000075c6c000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- xxhash64_update+0x27/0x40 crypto/xxhash_generic.c:46
- crypto_shash_update include/crypto/hash.h:1006 [inline]
- shash_ahash_update+0x213/0x2f0 crypto/ahash.c:178
- hash_sendmsg+0x96b/0x11d0 crypto/algif_hash.c:149
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa7a6f8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa7a7e82038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fa7a71c5fa0 RCX: 00007fa7a6f8ebe9
-RDX: 0000000000000000 RSI: 0000200000001080 RDI: 0000000000000004
-RBP: 00007fa7a7011e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fa7a71c6038 R14: 00007fa7a71c5fa0 R15: 00007ffc0c907ff8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:get_unaligned_le64 include/linux/unaligned.h:28 [inline]
-RIP: 0010:xxh64_update+0x55b/0xcf0 lib/xxhash.c:312
-Code: 00 00 00 fc ff df 48 8b 44 24 30 48 83 c0 e0 48 89 44 24 18 48 89 5c 24 68 48 8b 1b 45 31 ff 4e 8d 0c 3e 4c 89 c8 48 c1 e8 03 <0f> b6 04 10 84 c0 0f 85 4a 01 00 00 4a 8d 3c 3e 48 83 c7 07 48 89
-RSP: 0018:ffffc900039c7778 EFLAGS: 00010206
-RAX: 0000a11000000000 RBX: 7a8f95a9137c12d5 RCX: ffff88802af8bc00
-RDX: dffffc0000000000 RSI: 0005088000000000 RDI: 0000000000000000
-RBP: 8c2c5b2336b29570 R08: c2b2ae3d27d4eb4f R09: 0005088000000000
-R10: 0000000000000000 R11: ffffffff849f4de0 R12: bcfbe54b88bf1c85
-R13: ffff88807c933360 R14: 128d621f73d40218 R15: 0000000000000000
-FS:  00007fa7a7e826c0(0000) GS:ffff8881259fa000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa7a7e60f98 CR3: 0000000075c6c000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess), 5 bytes skipped:
-   0:	df 48 8b             	fisttps -0x75(%rax)
-   3:	44 24 30             	rex.R and $0x30,%al
-   6:	48 83 c0 e0          	add    $0xffffffffffffffe0,%rax
-   a:	48 89 44 24 18       	mov    %rax,0x18(%rsp)
-   f:	48 89 5c 24 68       	mov    %rbx,0x68(%rsp)
-  14:	48 8b 1b             	mov    (%rbx),%rbx
-  17:	45 31 ff             	xor    %r15d,%r15d
-  1a:	4e 8d 0c 3e          	lea    (%rsi,%r15,1),%r9
-  1e:	4c 89 c8             	mov    %r9,%rax
-  21:	48 c1 e8 03          	shr    $0x3,%rax
-* 25:	0f b6 04 10          	movzbl (%rax,%rdx,1),%eax <-- trapping instruction
-  29:	84 c0                	test   %al,%al
-  2b:	0f 85 4a 01 00 00    	jne    0x17b
-  31:	4a 8d 3c 3e          	lea    (%rsi,%r15,1),%rdi
-  35:	48 83 c7 07          	add    $0x7,%rdi
-  39:	48                   	rex.W
-  3a:	89                   	.byte 0x89
+I cannot get the below to apply even with the original patch here applied + fix.
+
+It looks like (in mm-new :) commit e73f43a66d5f ("mm/gup: remove dead pgmap
+refcounting code") by Alastair has conflicted here, but even then I can't make
+it apply, with/without your fix...!
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+>
+> From d6d6d21dbf435d8030782a627175e36e6c7b2dfb Mon Sep 17 00:00:00 2001
+> From: David Hildenbrand <david@redhat.com>
+> Date: Sat, 6 Sep 2025 08:33:42 +0200
+> Subject: [PATCH] tmp
+>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  mm/gup.c | 79 ++++++++++++++++++++++++++------------------------------
+>  1 file changed, 36 insertions(+), 43 deletions(-)
+>
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 22420f2069ee1..98907ead749c0 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2845,12 +2845,11 @@ static void __maybe_unused gup_fast_undo_dev_pagemap(int *nr, int nr_start,
+>   * also check pmd here to make sure pmd doesn't change (corresponds to
+>   * pmdp_collapse_flush() in the THP collapse code path).
+>   */
+> -static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+> -		unsigned long end, unsigned int flags, struct page **pages,
+> -		int *nr)
+> +static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+> +		unsigned long end, unsigned int flags, struct page **pages)
+>  {
+>  	struct dev_pagemap *pgmap = NULL;
+> -	int ret = 0;
+> +	unsigned long nr_pages = 0;
+>  	pte_t *ptep, *ptem;
+>  	ptem = ptep = pte_offset_map(&pmd, addr);
+> @@ -2908,24 +2907,20 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+>  		 * details.
+>  		 */
+>  		if (flags & FOLL_PIN) {
+> -			ret = arch_make_folio_accessible(folio);
+> -			if (ret) {
+> +			if (arch_make_folio_accessible(folio)) {
+>  				gup_put_folio(folio, 1, flags);
+>  				goto pte_unmap;
+>  			}
+>  		}
+>  		folio_set_referenced(folio);
+> -		pages[*nr] = page;
+> -		(*nr)++;
+> +		pages[nr_pages++] = page;
+>  	} while (ptep++, addr += PAGE_SIZE, addr != end);
+> -	ret = 1;
+> -
+>  pte_unmap:
+>  	if (pgmap)
+>  		put_dev_pagemap(pgmap);
+>  	pte_unmap(ptem);
+> -	return ret;
+> +	return nr_pages;
+>  }
+>  #else
+> @@ -2938,21 +2933,24 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+>   * get_user_pages_fast_only implementation that can pin pages. Thus it's still
+>   * useful to have gup_fast_pmd_leaf even if we can't operate on ptes.
+>   */
+> -static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+> -		unsigned long end, unsigned int flags, struct page **pages,
+> -		int *nr)
+> +static unsigned long gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+> +		unsigned long end, unsigned int flags, struct page **pages)
+>  {
+>  	return 0;
+>  }
+>  #endif /* CONFIG_ARCH_HAS_PTE_SPECIAL */
+> -static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> -		unsigned long end, unsigned int flags, struct page **pages,
+> -		int *nr)
+> +static unsigned long gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> +		unsigned long end, unsigned int flags, struct page **pages)
+>  {
+> +	const unsigned long nr_pages = (end - addr) >> PAGE_SHIFT;
+>  	struct page *page;
+>  	struct folio *folio;
+> -	int refs;
+> +	unsigned long i;
+> +
+> +	/* See gup_fast_pte_range() */
+> +	if (pmd_protnone(orig))
+> +		return 0;
+>  	if (!pmd_access_permitted(orig, flags & FOLL_WRITE))
+>  		return 0;
+> @@ -2960,33 +2958,30 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>  	if (pmd_special(orig))
+>  		return 0;
+> -	refs = (end - addr) >> PAGE_SHIFT;
+>  	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+> -	folio = try_grab_folio_fast(page, refs, flags);
+> +	folio = try_grab_folio_fast(page, nr_pages, flags);
+>  	if (!folio)
+>  		return 0;
+>  	if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
+> -		gup_put_folio(folio, refs, flags);
+> +		gup_put_folio(folio, nr_pages, flags);
+>  		return 0;
+>  	}
+>  	if (!gup_fast_folio_allowed(folio, flags)) {
+> -		gup_put_folio(folio, refs, flags);
+> +		gup_put_folio(folio, nr_pages, flags);
+>  		return 0;
+>  	}
+>  	if (!pmd_write(orig) && gup_must_unshare(NULL, flags, &folio->page)) {
+> -		gup_put_folio(folio, refs, flags);
+> +		gup_put_folio(folio, nr_pages, flags);
+>  		return 0;
+>  	}
+> -	pages += *nr;
+> -	*nr += refs;
+> -	for (; refs; refs--)
+> +	for (i = 0; i < nr_pages; i++)
+>  		*(pages++) = page++;
+>  	folio_set_referenced(folio);
+> -	return 1;
+> +	return nr_pages;
+>  }
+>  static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+> @@ -3033,11 +3028,11 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>  	return 1;
+>  }
+> -static int gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
+> -		unsigned long end, unsigned int flags, struct page **pages,
+> -		int *nr)
+> +static unsigned long gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
+> +		unsigned long end, unsigned int flags, struct page **pages)
+>  {
+> -	unsigned long next;
+> +	unsigned long cur_nr_pages, next;
+> +	unsigned long nr_pages = 0;
+>  	pmd_t *pmdp;
+>  	pmdp = pmd_offset_lockless(pudp, pud, addr);
+> @@ -3046,23 +3041,21 @@ static int gup_fast_pmd_range(pud_t *pudp, pud_t pud, unsigned long addr,
+>  		next = pmd_addr_end(addr, end);
+>  		if (!pmd_present(pmd))
+> -			return 0;
+> +			break;
+> -		if (unlikely(pmd_leaf(pmd))) {
+> -			/* See gup_fast_pte_range() */
+> -			if (pmd_protnone(pmd))
+> -				return 0;
+> +		if (unlikely(pmd_leaf(pmd)))
+> +			cur_nr_pages = gup_fast_pmd_leaf(pmd, pmdp, addr, next, flags, pages);
+> +		else
+> +			cur_nr_pages = gup_fast_pte_range(pmd, pmdp, addr, next, flags, pages);
+> -			if (!gup_fast_pmd_leaf(pmd, pmdp, addr, next, flags,
+> -				pages, nr))
+> -				return 0;
+> +		nr_pages += cur_nr_pages;
+> +		pages += cur_nr_pages;
+> -		} else if (!gup_fast_pte_range(pmd, pmdp, addr, next, flags,
+> -					       pages, nr))
+> -			return 0;
+> +		if (nr_pages != (next - addr) >> PAGE_SIZE)
+> +			break;
+>  	} while (pmdp++, addr = next, addr != end);
+> -	return 1;
+> +	return nr_pages;
+>  }
+>  static int gup_fast_pud_range(p4d_t *p4dp, p4d_t p4d, unsigned long addr,
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+OK I guess you intentionally left the rest as a TODO :)
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+So I'll wait for you to post it before reviewing in-depth.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+This generally LGTM as an approach, getting rid of *nr is important that's
+really horrible.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> --
+> 2.50.1
+>
+>
+>
+> Oh, I might even have found a bug moving away from that questionable
+> "ret==1 means success" handling in gup_fast_pte_range()? Will
+> have to double-check, but likely the following is the right thing to do.
+>
+>
+>
+> From 8f48b25ef93e7ef98611fd58ec89384ad5171782 Mon Sep 17 00:00:00 2001
+> From: David Hildenbrand <david@redhat.com>
+> Date: Sat, 6 Sep 2025 08:46:45 +0200
+> Subject: [PATCH] mm/gup: fix handling of errors from
+>  arch_make_folio_accessible() in follow_page_pte()
+>
+> In case we call arch_make_folio_accessible() and it fails, we would
+> incorrectly return a value that is "!= 0" to the caller, indicating that
+> we pinned all requested pages and that the caller can keep going.
+>
+> follow_page_pte() is not supposed to return error values, but instead
+> 0 on failure and 1 on success.
+>
+> That is of course wrong, because the caller will just keep going pinning
+> more pages. If we happen to pin a page afterwards, we're in trouble,
+> because we essentially skipped some pages.
+>
+> Fixes: f28d43636d6f ("mm/gup/writeback: add callbacks for inaccessible pages")
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  mm/gup.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 22420f2069ee1..cff226ec0ee7d 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2908,8 +2908,7 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
+>  		 * details.
+>  		 */
+>  		if (flags & FOLL_PIN) {
+> -			ret = arch_make_folio_accessible(folio);
+> -			if (ret) {
+> +			if (arch_make_folio_accessible(folio)) {
 
-If you want to undo deduplication, reply with:
-#syz undup
+Oh Lord above. Lol. Yikes.
+
+Yeah I think your fix is valid...
+
+>  				gup_put_folio(folio, 1, flags);
+>  				goto pte_unmap;
+>  			}
+> --
+> 2.50.1
+>
+>
+> --
+> Cheers
+>
+> David / dhildenb
+>
