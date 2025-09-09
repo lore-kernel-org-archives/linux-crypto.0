@@ -1,70 +1,131 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8419A302CC0
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Sep 2025 05:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC91B22157F;
+	Tue,  9 Sep 2025 08:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757396505; cv=none; b=eaAzU2VTnXjtPLJyYXSGvvuf5/5NbotPlVOWzCCK7BLdB7KGv06KtvI4V/t+pQC2oWp2+okctljFD7rdvhDjV1gysm87sqiUYZ6kSL8ovrYXlWPoYuR4RwUV5dp7z963+vFbO2XVFN172MdPMj4QIQIODPl11PmgWdMV9crIk/U=
+	t=1757406951; cv=none; b=bSuGEMZJ6GlJwcA3VUMIy7VssJrQtrIJC5b7fPdteMm6wZyMiiySw85jusgRVEdGqJrijlXW/BrzdFXoKteqHaJDwTNuOo5PskUpoq241OqYb90FcwIn7CAXfxreVBd4tVAjQD+O+1cP2aYE7NeRvdTNF0snAIJW8xFJ4bCb0XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757396505; c=relaxed/simple;
-	bh=Aj4O1Tao+kHw4JPDIbAZzTselS6LUgve5hYNNtupXJ8=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=hA9DhZmELAco9ddd3RFxt7/8oWJCOFquYD/fDgaXNnD8VZtWmqxiblCn1uxj9Bx/vr/CQNgpvguC7hf+tRmqRbrIkeUDSey2kxprTCFwuQVfNHLAPOO/uDE6yQYSq9MD3iAnJN6Q2kUQ9nP6g35SvIThUYDxhJG05oj1f09n1IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=B4KlkBS1; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1757406951; c=relaxed/simple;
+	bh=CXgkJ6vcEYUjaoEsiVysUMOuZtwcZBJNVprV2+pEVls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WrG83Qhuot1OtQ+KyT76Rnb5zEBeA0leWyUBHpPWTYNZwgwagZ/4Gzjki9Gbr73XQ+pim9W/T4Ilbu/TUYAu8EdxTRU1SJWIR1vxse9zXc3FHANF4l7eIRrCZxzktOf8TfjeoeFN9iClf01wxMs3PwdzVXuYapd3CgZnA54lBlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lYFfQQ0e; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="B4KlkBS1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zDJ9retK5NLagDdDPvqJydfHh2cXm/XRBfTcrLgRz0E=; b=B4KlkBS1JlFpbrqz6IiE6c5Qch
-	aMQesqzWuHmP/C5qNRpQbASfBZJvpIZc92GMaQ0b0K0B/SBPC5lKjSGzwbbDmhzsybpFMYp/QuYh6
-	cTAUtiuwutgwBCjj9KUrRnLtuHTLcPMmrhptkX66AeENjwYFLom5SaXMqxO9ISXerbjXcxejMhG9Z
-	FV9ciCJZlcLAxtBC94v7LQ+u0EEHEjKNWsmFJ3gWjGvfy90zYYuBFM6DXTicc1gRoKXz+sX/WbmK3
-	DRqjuQiiteoJmtD2jL3slQ0tyC//327vpl9UJyqRP0PTM6gak6EDLD2DeH72oFQCDOOZMrTuSoouv
-	eAmFgKrg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uvqrL-003qIx-2C;
-	Tue, 09 Sep 2025 13:41:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Sep 2025 13:41:36 +0800
-Date: Tue, 09 Sep 2025 13:41:36 +0800
-Message-Id: <6ed112d75481f607c80f3e7131ea43cd64828b52.1757396389.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1757396389.git.herbert@gondor.apana.org.au>
-References: <cover.1757396389.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 2/2] crypto: s390/phmac - Allow stack requests
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lYFfQQ0e"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1757406949; x=1788942949;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CXgkJ6vcEYUjaoEsiVysUMOuZtwcZBJNVprV2+pEVls=;
+  b=lYFfQQ0eYOik+ZNPJYNR53dEizwBJwMaR8aBXcnrDhtIESlu/NTJUgK8
+   soNDonOzblOjqiGnJaXDk3xlbtbydBDdNB94jvcCS7fooSIHaS83QtvH5
+   pZvVNFIS3olsFqhHXbibIVCsc382bQ0tuOaYUgxWsgQrdrsGehbw1xL3x
+   G87EAWKnBa0RetC9fBWwmmlBQ2Q9xH9WPVzcr9Fs9l5lLIiAgnCbMzD2r
+   m0TZGeM2EP3tOctGBZ6y5WsyExTST47WxNg5eaUGD1mOr82BJVQKqO9OR
+   qZvWkmcDkPt65xo6GnabHW3k2OfmCFnLnOazkDraRX888bcS8qvoCpq1J
+   w==;
+X-CSE-ConnectionGUID: ofTAqQfWT8OQ6lC0/N7q+g==
+X-CSE-MsgGUID: xuRAfyugTWW04SVqJa9bTQ==
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="213640830"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Sep 2025 01:35:42 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 9 Sep 2025 01:35:17 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 9 Sep 2025 01:35:13 -0700
+Message-ID: <1e1b3cbe-ee39-4813-8f17-1844fc9d45f7@microchip.com>
+Date: Tue, 9 Sep 2025 10:35:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 4/9] mfd: at91-usart: Make it selectable for
+ ARCH_MICROCHIP
+To: Lee Jones <lee@kernel.org>
+CC: Robert Marko <robert.marko@sartura.hr>, <linux@armlinux.org.uk>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<andi.shyti@kernel.org>, <broonie@kernel.org>, <gregkh@linuxfoundation.org>,
+	<jirislaby@kernel.org>, <arnd@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+	<o.rempel@pengutronix.de>, <daniel.machon@microchip.com>,
+	<luka.perkov@sartura.hr>
+References: <20250813174720.540015-1-robert.marko@sartura.hr>
+ <20250813174720.540015-5-robert.marko@sartura.hr>
+ <20250902100254.GD2163762@google.com>
+ <769c8dc4-4db6-4d2e-aa2f-f86aa7ccaf78@microchip.com>
+ <20250908141633.GB9224@google.com>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20250908141633.GB9224@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-As phmac does not perform DMA, it can support stack requests.
+On 08/09/2025 at 16:16, Lee Jones wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> 
+> On Thu, 04 Sep 2025, Nicolas Ferre wrote:
+> 
+>> On 02/09/2025 at 12:02, Lee Jones wrote:
+>>> On Wed, 13 Aug 2025, Robert Marko wrote:
+>>>
+>>>> LAN969x uses the Atmel USART, so make it selectable for ARCH_MICROCHIP to
+>>>> avoid needing to update depends in future if other Microchip SoC-s use it
+>>>> as well.
+>>>>
+>>>> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+>>>> ---
+>>>>    drivers/mfd/Kconfig | 2 +-
+>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+>>>> index 425c5fba6cb1..8f11b2df1470 100644
+>>>> --- a/drivers/mfd/Kconfig
+>>>> +++ b/drivers/mfd/Kconfig
+>>>> @@ -138,7 +138,7 @@ config MFD_AAT2870_CORE
+>>>>    config MFD_AT91_USART
+>>>>         tristate "AT91 USART Driver"
+>>>>         select MFD_CORE
+>>>> -     depends on ARCH_AT91 || ARCH_LAN969X || COMPILE_TEST
+>>>> +     depends on ARCH_MICROCHIP || COMPILE_TEST
+>>>>         help
+>>>>           Select this to get support for AT91 USART IP. This is a wrapper
+>>>>           over at91-usart-serial driver and usart-spi-driver. Only one function
+>>>
+>>> Let me know when the deps are in Mainline.
+>>
+>> Hi Lee,
+>>
+>> I have tags from other maintainers, how about you give us your and we make
+> 
+> My?  AB?
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- arch/s390/crypto/phmac_s390.c | 1 +
- 1 file changed, 1 insertion(+)
+Yep ;-)
 
-diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
-index 7ecfdc4fba2d..ead4c0d3523e 100644
---- a/arch/s390/crypto/phmac_s390.c
-+++ b/arch/s390/crypto/phmac_s390.c
-@@ -932,6 +932,7 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
- 				.cra_blocksize = SHA##x##_BLOCK_SIZE,	\
- 				.cra_priority = 400,			\
- 				.cra_flags = CRYPTO_ALG_ASYNC |		\
-+					     CRYPTO_AHASH_ALG_STACK_REQ |\
- 					     CRYPTO_ALG_NO_FALLBACK,	\
- 				.cra_ctxsize = sizeof(struct phmac_tfm_ctx), \
- 				.cra_module = THIS_MODULE,		\
--- 
-2.39.5
+>> this patch travel through arm-soc like the other ones?
+> 
+> Sure.
+> 
+> Acked-by: Lee Jones <lee@kernel.org>
 
+Thanks Lee. Queued for at91 PR to arm-soc.
+
+Regards,
+   Nicolas
