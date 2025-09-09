@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6723002B4
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Sep 2025 05:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8419A302CC0
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Sep 2025 05:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757396499; cv=none; b=eUul5ZkqtnMydVR+JUfC23xXTXpI54/kXJTFEWFwji90PHS0vgLQzbG8+gRBqt2UiKSi74FBYfMSna4hKvlyjWZhMYz4/hPaQJhfjtlmtj8zkTtEgqT7V2/spPpkey3xUHzk4lE1texKxacvaVCMZFg9LJxK7u/uokCR37BJiN4=
+	t=1757396505; cv=none; b=eaAzU2VTnXjtPLJyYXSGvvuf5/5NbotPlVOWzCCK7BLdB7KGv06KtvI4V/t+pQC2oWp2+okctljFD7rdvhDjV1gysm87sqiUYZ6kSL8ovrYXlWPoYuR4RwUV5dp7z963+vFbO2XVFN172MdPMj4QIQIODPl11PmgWdMV9crIk/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757396499; c=relaxed/simple;
-	bh=11rhQ21v25YcSMrMLPGPZPvFpP/gz92iU0ETiw38GCQ=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=uLMtm8R+3O/K/D+Xo+BCZfSNVudaRmZwC/A2+3UDCP9XCjrDCcoX9kgH0k3wVOAWK5e+KMreb/vTvRCZT31mesrXTcb74k+cEDWiIXlItxSzmSRqUwqyOAT1SCo6jZ4M+wK/ytmKxy2ObeZ7hR9BL6Sj2hFvPQMtV4z2+xFoaK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=bjA8Dn3Q; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1757396505; c=relaxed/simple;
+	bh=Aj4O1Tao+kHw4JPDIbAZzTselS6LUgve5hYNNtupXJ8=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=hA9DhZmELAco9ddd3RFxt7/8oWJCOFquYD/fDgaXNnD8VZtWmqxiblCn1uxj9Bx/vr/CQNgpvguC7hf+tRmqRbrIkeUDSey2kxprTCFwuQVfNHLAPOO/uDE6yQYSq9MD3iAnJN6Q2kUQ9nP6g35SvIThUYDxhJG05oj1f09n1IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=B4KlkBS1; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="bjA8Dn3Q"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="B4KlkBS1"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YsC7FJS9aSojp1vve+F03nKLz99HpGeDwHbcvUPsRzo=; b=bjA8Dn3QZCVE1NASvBEcJtSuxv
-	h9h+2RRhkBPvpnEy1g1Nx3IF77pRITy0BoD5ddsO/10XHQsJOcfgGDESMsa+BdoReJXOy4JIS1KtW
-	l5mdNTbPogVYMKrgyrR6ai/5Y/2SyRmeNBjrhLC2Yyxer5dZ+1C+xILDauM5pOOyMlXIfhpBq2580
-	JFwJi+DkF/Ut7eSk2Iz7Y/5OZ8m3aONQ295FdF4t7YxY7LUq2APFlzY87OcGZ6eaz8iWvTMGbyzNm
-	wb1lRdpOjavRUMxF0YWXiz6xwmbv+rjsC/AsqJHWoBW+vuVX8WzUM3ftuJhYhjuRTh3qXN1XgBoXY
-	dQBvJavA==;
+	bh=zDJ9retK5NLagDdDPvqJydfHh2cXm/XRBfTcrLgRz0E=; b=B4KlkBS1JlFpbrqz6IiE6c5Qch
+	aMQesqzWuHmP/C5qNRpQbASfBZJvpIZc92GMaQ0b0K0B/SBPC5lKjSGzwbbDmhzsybpFMYp/QuYh6
+	cTAUtiuwutgwBCjj9KUrRnLtuHTLcPMmrhptkX66AeENjwYFLom5SaXMqxO9ISXerbjXcxejMhG9Z
+	FV9ciCJZlcLAxtBC94v7LQ+u0EEHEjKNWsmFJ3gWjGvfy90zYYuBFM6DXTicc1gRoKXz+sX/WbmK3
+	DRqjuQiiteoJmtD2jL3slQ0tyC//327vpl9UJyqRP0PTM6gak6EDLD2DeH72oFQCDOOZMrTuSoouv
+	eAmFgKrg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uvqrJ-003qIm-1J;
-	Tue, 09 Sep 2025 13:41:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Sep 2025 13:41:33 +0800
-Date: Tue, 09 Sep 2025 13:41:33 +0800
-Message-Id: <9d6b10c1405137ab1d09471897536f830649364f.1757396389.git.herbert@gondor.apana.org.au>
+	id 1uvqrL-003qIx-2C;
+	Tue, 09 Sep 2025 13:41:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Sep 2025 13:41:36 +0800
+Date: Tue, 09 Sep 2025 13:41:36 +0800
+Message-Id: <6ed112d75481f607c80f3e7131ea43cd64828b52.1757396389.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1757396389.git.herbert@gondor.apana.org.au>
 References: <cover.1757396389.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 1/2] crypto: ahash - Allow async stack requests when
- specified
+Subject: [v2 PATCH 2/2] crypto: s390/phmac - Allow stack requests
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Mikulas Patocka <mpatocka@redhat.com>
 Precedence: bulk
@@ -47,95 +46,25 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-As it stands stack requests are forbidden for async algorithms
-because of the inability to perform DMA on stack memory.
-
-However, some async algorithms do not perform DMA and are able
-to handle stack requests.  Allow such uses by addnig a new type
-bit CRYPTO_AHASH_ALG_STACK_REQ.  When it is set on the algorithm
-stack requests will be allowed even if the algorithm is asynchronous.
+As phmac does not perform DMA, it can support stack requests.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/ahash.c                 | 22 ++++++++++++++++++----
- include/crypto/internal/hash.h |  3 +++
- 2 files changed, 21 insertions(+), 4 deletions(-)
+ arch/s390/crypto/phmac_s390.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index a227793d2c5b..33b2a19169f1 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -49,6 +49,20 @@ static inline bool crypto_ahash_need_fallback(struct crypto_ahash *tfm)
- 	       CRYPTO_ALG_NEED_FALLBACK;
- }
- 
-+static inline bool crypto_ahash_stack_req_ok(struct ahash_request *req)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+
-+	if (!ahash_req_on_stack(req))
-+		return true;
-+
-+	if (!ahash_is_async(tfm))
-+		return true;
-+
-+	return crypto_ahash_alg(tfm)->halg.base.cra_flags &
-+	       CRYPTO_AHASH_ALG_STACK_REQ;
-+}
-+
- static inline void ahash_op_done(void *data, int err,
- 				 int (*finish)(struct ahash_request *, int))
- {
-@@ -376,7 +390,7 @@ int crypto_ahash_init(struct ahash_request *req)
- 		return crypto_shash_init(prepare_shash_desc(req, tfm));
- 	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
--	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-+	if (!crypto_ahash_stack_req_ok(req))
- 		return -EAGAIN;
- 	if (crypto_ahash_block_only(tfm)) {
- 		u8 *buf = ahash_request_ctx(req);
-@@ -451,7 +465,7 @@ int crypto_ahash_update(struct ahash_request *req)
- 
- 	if (likely(tfm->using_shash))
- 		return shash_ahash_update(req, ahash_request_ctx(req));
--	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-+	if (!crypto_ahash_stack_req_ok(req))
- 		return -EAGAIN;
- 	if (!crypto_ahash_block_only(tfm))
- 		return ahash_do_req_chain(req, &crypto_ahash_alg(tfm)->update);
-@@ -531,7 +545,7 @@ int crypto_ahash_finup(struct ahash_request *req)
- 
- 	if (likely(tfm->using_shash))
- 		return shash_ahash_finup(req, ahash_request_ctx(req));
--	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-+	if (!crypto_ahash_stack_req_ok(req))
- 		return -EAGAIN;
- 	if (!crypto_ahash_alg(tfm)->finup)
- 		return ahash_def_finup(req);
-@@ -569,7 +583,7 @@ int crypto_ahash_digest(struct ahash_request *req)
- 
- 	if (likely(tfm->using_shash))
- 		return shash_ahash_digest(req, prepare_shash_desc(req, tfm));
--	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-+	if (!crypto_ahash_stack_req_ok(req))
- 		return -EAGAIN;
- 	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 6ec5f2f37ccb..79899d36032b 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -23,6 +23,9 @@
- /* This bit is set by the Crypto API if export_core is not supported. */
- #define CRYPTO_AHASH_ALG_NO_EXPORT_CORE	0x08000000
- 
-+/* This bit is set by the Crypto API if stack requests are supported. */
-+#define CRYPTO_AHASH_ALG_STACK_REQ	0x10000000
-+
- #define HASH_FBREQ_ON_STACK(name, req) \
-         char __##name##_req[sizeof(struct ahash_request) + \
-                             MAX_SYNC_HASH_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+index 7ecfdc4fba2d..ead4c0d3523e 100644
+--- a/arch/s390/crypto/phmac_s390.c
++++ b/arch/s390/crypto/phmac_s390.c
+@@ -932,6 +932,7 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 				.cra_blocksize = SHA##x##_BLOCK_SIZE,	\
+ 				.cra_priority = 400,			\
+ 				.cra_flags = CRYPTO_ALG_ASYNC |		\
++					     CRYPTO_AHASH_ALG_STACK_REQ |\
+ 					     CRYPTO_ALG_NO_FALLBACK,	\
+ 				.cra_ctxsize = sizeof(struct phmac_tfm_ctx), \
+ 				.cra_module = THIS_MODULE,		\
 -- 
 2.39.5
 
