@@ -1,201 +1,149 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A953A28AAEB;
-	Tue,  9 Sep 2025 10:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BD53D6F
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Sep 2025 14:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757415354; cv=none; b=Sxm3B5kadhOJwDt+ahvQAa0aXDiUu9b4GMRF3pdvOh0Em/CHgjG0yoBAk6EAxg5NLNRtw+h8yFYf0wTggXI5rBbU3IBmYstqufikpO8KQtU8MntJTJwse8tyF1hUR9KHTmr1F4SoWhBBHYKt0vYQm0AoV8f6C4cQPc51TzkFtTc=
+	t=1757426517; cv=none; b=h4Rt06kySVbydIWvavNHy/7kxjzxBCyLtaSsTp0DmmLGe4dGA2NrChAJ9+QZOibksHQsl125fGANzGBqJsTbokqs7vQtoFVtHpM1O/XbGjaJIddPgNnW0MrkDvG7tBeufrosD6enOzzqUfp9K+8aGtNOwDc81M8Ijc2+WpOZtBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757415354; c=relaxed/simple;
-	bh=t4xjMCmtXze7NBEqy2auJC+EDzUCTi7i/+obAuFDZtc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipKQp1d4V6KiltAqtZFJ4kLf5dH2k419YwjEa3ZVrwgfQFBnEteqC2ZapCwLQi3AfkerEgayM2rkmagQ/7U/9Fq4aeRw/Gp60Y2nD0FeNIuVt5IXJ0HSlKyT3+Uep64PQA/rfhvl7121QX7HO7MxcvXjGal+Q0i+nQ5G2XvMZBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fEUsxDew; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1757426517; c=relaxed/simple;
+	bh=6C8ElmIub2k6lXzmOHY17p3WD3C4rHjaFNGjotn9Iys=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=AOU76A+eqKdw1+wyBGyaHI5vJlbo1J9bBm3vcaEUYD87F/YIMgCK8m83ICxLbXXFA75KuYMtBiUZ7ZgQx0VADSH5z22rRiA0oAMli5SCKyDlEoLj5DYAu5nM6fiaTB2rqKqNbe5BiyOBLZezYSGorza6PP4a8/TbTAaaF0pBc80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Szr7zFLT; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fEUsxDew"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757415352; x=1788951352;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=t4xjMCmtXze7NBEqy2auJC+EDzUCTi7i/+obAuFDZtc=;
-  b=fEUsxDewbuGSKmR83j07gqdb0qz9g8yoF4IkpapI8iA5i8a5QeuxW+E9
-   puraN9cUS9LmqNEBM3UN+Hn+zz/49yYel1Wb1Xnb06q1M01vdbHqfDh8a
-   qJ5Oyp5uT6D0pLyU3dl43taXVZoLasciwaAWcthJaxqcWiPVxG+biasMl
-   z5h8/z6UcEju3la49lh0g3VnkLnHhJy+NlIuqmBo6GyDJR34WRpVlrewe
-   VPWH1ePqD1MYkuBNugW2oiQeV8z0PlXPUOtebP5GtBVLsH19mPF8bgsJm
-   8F5e5JSC6lipyEqrfw3CbQaW5q52AFpJ6BpsFdX3zM13CNj8HtLwpotok
-   A==;
-X-CSE-ConnectionGUID: BMPUfVFJRIqYQfiWE5fZvg==
-X-CSE-MsgGUID: 70ubjb2GRw++4RPvbkmrmw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="59553004"
-X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="59553004"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 03:55:50 -0700
-X-CSE-ConnectionGUID: I8OU58cNS9GpVw+prZJQBw==
-X-CSE-MsgGUID: KUHdfZS4T2iTfjVtSyQe1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="177405867"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 09 Sep 2025 03:55:47 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uvw0n-0004lT-1g;
-	Tue, 09 Sep 2025 10:55:45 +0000
-Date: Tue, 9 Sep 2025 18:55:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] crypto: ti: Add support for AES-CCM in DTHEv2
- driver
-Message-ID: <202509091806.ibkQZYuz-lkp@intel.com>
-References: <20250908140928.2801062-5-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Szr7zFLT"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 589A5L2S024558;
+	Tue, 9 Sep 2025 14:01:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
+	 bh=1oB99sJa5huwmIPGBsMPYS4KUtbgh5PZNH5HS+WEX84=; b=Szr7zFLTqw+6
+	QXaZtWVn0jyCkKeO20+TXfEBa2n9T7FbdF+PG+e0How8UlKbLRaDepw0uUQVImJC
+	6JCJeiSTC43U+a/6+4He+uMk7Mpgs/cPfuC6RbDJXE+gck7HQnj/Wl+9e3kz86Sw
+	2i1xHtI+OoeJoQPk64BHWIAkJHOUKr0h0lUNI8wACLRlKYTOQW833jAQHJWJ64Gw
+	4kaTvYQ+N12i7buzdeSs0vnXnezFrWi2MCa1aUiQh2BGHzDP6r9nDU8n8oWD8pzX
+	xujYs/uRKpqd4noZa433XjKzUQXyLQs9QDCibUIh/xX8PCEO90m4Ym9bD6jIJDO/
+	8Du70zLPdA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwr82j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 14:01:49 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 589Cr7IG011428;
+	Tue, 9 Sep 2025 14:01:47 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9ubpnu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 14:01:47 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589E1ktx29622880
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 9 Sep 2025 14:01:46 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 492A658065;
+	Tue,  9 Sep 2025 14:01:46 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 02F1658055;
+	Tue,  9 Sep 2025 14:01:46 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  9 Sep 2025 14:01:45 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250908140928.2801062-5-t-pratham@ti.com>
+Date: Tue, 09 Sep 2025 16:01:45 +0200
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+ <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+        dm-devel@lists.linux.dev
+Subject: Re: crypto ahash requests on the stack
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <94b8648b-5613-d161-3351-fee1f217c866@redhat.com>
+References: <94b8648b-5613-d161-3351-fee1f217c866@redhat.com>
+Message-ID: <b20529cc85868607dbec25489daa0404@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -cGbKbW65Ijn3sOW-2H-PdPXwUu7De5y
+X-Proofpoint-ORIG-GUID: -cGbKbW65Ijn3sOW-2H-PdPXwUu7De5y
+X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68c0334d cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=QsnAe65qxYrXraXQVr8A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXxSXhp31a0PP6
+ FvfupsUrAhsrXseEdbgfxKlJCYJH5/oKv2ltqNyHbdOZ867ikbGg4wVR5igiBwl8DG2cLE1iT2A
+ 3zoo9Mg4zCqo7Fc3mU614U0eiGITYeFAAmTbCEESjh5jJ3Hcqwk6QOOTH+9CK/uB/R1arAGEpTd
+ bGI3Ffw1FQstYYjEII4DblPFVhTqtGtVFFJqyzmZfsc2hNqF8LEAi+8Vmz7uXPukQv2CDFkXNDa
+ lJ5Mbm6kqNCk37FBCN6e6ge0ueezDzUUXp2jpGkwjxG/Qhy5zxAoE68HITp0E56cAJt+CbhQ9Yc
+ hMMnT4N4PkDlCqUkC7zC710gXhO/W/29jOwTlGaYrcmCSg9NC1+pmWAn3w/p8q/sweW0129TeO0
+ lVCXbAnH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-09_02,2025-09-08_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1011 suspectscore=0 spamscore=0 phishscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
 
-Hi Pratham,
+On 2025-08-25 16:23, Mikulas Patocka wrote:
+> Hi
+> 
+> I'd like to ask about this condition in crypto_ahash_digest:
+> 	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
+> 		return -EAGAIN;
+> 
+> Can it be removed? Or, is there some reason why you can't have
+> asynchronous requests on the stack (such as inability of doing DMA to
+> virtually mapped stack)?
+> 
+> Or, should I just clear the flag CRYPTO_TFM_REQ_ON_STACK in my code?
+> 
+> I'm modifying dm-integrity to use asynchronous API so that Harald
+> Freudenberger can use it on mainframes (the reason is that his
+> implementation only provides asynchronous API) and I would prefer to 
+> place
+> ahash requests on the stack (and wait for them before the function 
+> exits).
+> 
+> The commit 04bfa4c7d5119ca38f8133bfdae7957a60c8b221 says that we should
+> clone the request with HASH_REQUEST_CLONE, but that is not usable in
+> dm-integrity, because dm-integrity must work even when the system is 
+> out
+> of memory.
+> 
+> Mikulas
 
-kernel test robot noticed the following build errors:
+The problem with this 'on the stack' is also with the buffer addresses.
+The asynch implementations get scatterlists. By playing around there,
+I found out that the addresses in scatterlists are checked:
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on next-20250909]
-[cannot apply to herbert-crypto-2.6/master linus/master v6.17-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+scatterlist.h:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20250908-221357
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250908140928.2801062-5-t-pratham%40ti.com
-patch subject: [PATCH v2 4/4] crypto: ti: Add support for AES-CCM in DTHEv2 driver
-config: xtensa-allyesconfig (https://download.01.org/0day-ci/archive/20250909/202509091806.ibkQZYuz-lkp@intel.com/config)
-compiler: xtensa-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250909/202509091806.ibkQZYuz-lkp@intel.com/reproduce)
+static inline void sg_set_buf(struct scatterlist *sg, const void *buf,
+			      unsigned int buflen)
+{
+#ifdef CONFIG_DEBUG_SG
+	BUG_ON(!virt_addr_valid(buf));
+#endif
+	sg_set_page(sg, virt_to_page(buf), buflen, offset_in_page(buf));
+}
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509091806.ibkQZYuz-lkp@intel.com/
+and virt_addr_valid(x) fails on stack addresses (!). I talked with the
+s390 subsystem maintainer and he confirms this. So stack addresses can't
+be used for scatterlists even when there is no DMA involved.
 
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aes_set_ctrl_key':
->> drivers/crypto/ti/dthev2-aes.c:258:29: error: implicit declaration of function 'FIELD_PREP' [-Wimplicit-function-declaration]
-     258 |                 ctrl_val |= FIELD_PREP(DTHE_AES_CTRL_CCM_L_MASK,
-         |                             ^~~~~~~~~~
-
-
-vim +/FIELD_PREP +258 drivers/crypto/ti/dthev2-aes.c
-
-   186	
-   187	static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
-   188					  struct dthe_aes_req_ctx *rctx,
-   189					  u32 *iv_in)
-   190	{
-   191		struct dthe_data *dev_data = dthe_get_dev(ctx);
-   192		void __iomem *aes_base_reg = dev_data->regs + DTHE_P_AES_BASE;
-   193		u32 ctrl_val = 0;
-   194	
-   195		writel_relaxed(ctx->key[0], aes_base_reg + DTHE_P_AES_KEY1_0);
-   196		writel_relaxed(ctx->key[1], aes_base_reg + DTHE_P_AES_KEY1_1);
-   197		writel_relaxed(ctx->key[2], aes_base_reg + DTHE_P_AES_KEY1_2);
-   198		writel_relaxed(ctx->key[3], aes_base_reg + DTHE_P_AES_KEY1_3);
-   199	
-   200		if (ctx->keylen > AES_KEYSIZE_128) {
-   201			writel_relaxed(ctx->key[4], aes_base_reg + DTHE_P_AES_KEY1_4);
-   202			writel_relaxed(ctx->key[5], aes_base_reg + DTHE_P_AES_KEY1_5);
-   203		}
-   204		if (ctx->keylen == AES_KEYSIZE_256) {
-   205			writel_relaxed(ctx->key[6], aes_base_reg + DTHE_P_AES_KEY1_6);
-   206			writel_relaxed(ctx->key[7], aes_base_reg + DTHE_P_AES_KEY1_7);
-   207		}
-   208	
-   209		if (ctx->aes_mode == DTHE_AES_XTS) {
-   210			size_t key2_offset = ctx->keylen / sizeof(u32);
-   211	
-   212			writel_relaxed(ctx->key[key2_offset + 0], aes_base_reg + DTHE_P_AES_KEY2_0);
-   213			writel_relaxed(ctx->key[key2_offset + 1], aes_base_reg + DTHE_P_AES_KEY2_1);
-   214			writel_relaxed(ctx->key[key2_offset + 2], aes_base_reg + DTHE_P_AES_KEY2_2);
-   215			writel_relaxed(ctx->key[key2_offset + 3], aes_base_reg + DTHE_P_AES_KEY2_3);
-   216	
-   217			if (ctx->keylen > AES_KEYSIZE_128) {
-   218				writel_relaxed(ctx->key[key2_offset + 4], aes_base_reg + DTHE_P_AES_KEY2_4);
-   219				writel_relaxed(ctx->key[key2_offset + 5], aes_base_reg + DTHE_P_AES_KEY2_5);
-   220			}
-   221			if (ctx->keylen == AES_KEYSIZE_256) {
-   222				writel_relaxed(ctx->key[key2_offset + 6], aes_base_reg + DTHE_P_AES_KEY2_6);
-   223				writel_relaxed(ctx->key[key2_offset + 7], aes_base_reg + DTHE_P_AES_KEY2_7);
-   224			}
-   225		}
-   226	
-   227		if (rctx->enc)
-   228			ctrl_val |= DTHE_AES_CTRL_DIR_ENC;
-   229	
-   230		if (ctx->keylen == AES_KEYSIZE_128)
-   231			ctrl_val |= DTHE_AES_CTRL_KEYSIZE_16B;
-   232		else if (ctx->keylen == AES_KEYSIZE_192)
-   233			ctrl_val |= DTHE_AES_CTRL_KEYSIZE_24B;
-   234		else
-   235			ctrl_val |= DTHE_AES_CTRL_KEYSIZE_32B;
-   236	
-   237		// Write AES mode
-   238		ctrl_val &= DTHE_AES_CTRL_MODE_CLEAR_MASK;
-   239		switch (ctx->aes_mode) {
-   240		case DTHE_AES_ECB:
-   241			ctrl_val |= AES_CTRL_ECB_MASK;
-   242			break;
-   243		case DTHE_AES_CBC:
-   244			ctrl_val |= AES_CTRL_CBC_MASK;
-   245			break;
-   246		case DTHE_AES_CTR:
-   247			ctrl_val |= AES_CTRL_CTR_MASK;
-   248			ctrl_val |= DTHE_AES_CTRL_CTR_WIDTH_128B;
-   249			break;
-   250		case DTHE_AES_XTS:
-   251			ctrl_val |= AES_CTRL_XTS_MASK;
-   252			break;
-   253		case DTHE_AES_GCM:
-   254			ctrl_val |= AES_CTRL_GCM_MASK;
-   255			break;
-   256		case DTHE_AES_CCM:
-   257			ctrl_val |= AES_CTRL_CCM_MASK;
- > 258			ctrl_val |= FIELD_PREP(DTHE_AES_CTRL_CCM_L_MASK,
-   259					       (iv_in[0] & DTHE_AES_CCM_L_FROM_IV_MASK));
-   260			ctrl_val |= DTHE_AES_CTRL_CCM_M_MAXVAL;
-   261			break;
-   262		}
-   263	
-   264		if (iv_in) {
-   265			ctrl_val |= DTHE_AES_CTRL_SAVE_CTX_SET;
-   266			for (int i = 0; i < AES_IV_WORDS; ++i)
-   267				writel_relaxed(iv_in[i],
-   268					       aes_base_reg + DTHE_P_AES_IV_IN_0 + (DTHE_REG_SIZE * i));
-   269		}
-   270	
-   271		writel_relaxed(ctrl_val, aes_base_reg + DTHE_P_AES_CTRL);
-   272	}
-   273	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Harald Freudenberger
