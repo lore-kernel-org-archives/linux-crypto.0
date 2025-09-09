@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF4D286885;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1FA287255;
 	Tue,  9 Sep 2025 23:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757459787; cv=none; b=TA9/5OQC2hzqgqyhcpVnYHOx7vLkrGaeekr4VAjX0YflazmGwJpSMS/SyzSs6KDFzbp2MzsK/Y7bkDxMcKoL30hpX6dIUFkgsuO1xnY1zDtvwgrxGbbxGbI/kkPyohQVvTMHlvn4b3Vvu7mDYcwUJkYkp6YkxjE7qoqi3dQg/gM=
+	t=1757459787; cv=none; b=lWcYk2QJBW/Kn3CUXxP08MSNPt9f4qyeX+qK9XTgtMH5k2Yj5OLEAmFWk9mwbVr7GTF9/Ls/QIIb2tkTwKSSKT4a8f33oiPK1mTghcos7GbAcAcW8Lq7dUjM5yuYJH5DUABRVu6kGOlyfNQt/gfRrgZ9PAb+fgOcht7k/jwLiAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757459787; c=relaxed/simple;
-	bh=Zhg+v5tmcuxlFgfMaL5bgOzM8gmZljJLV/XULlh6+uo=;
+	bh=S6D1yNE1Syyh365j61OFnP89O+T3sxGXw/t1oEMSH+M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kbwIANrTdAhz/ypAvmu9pYdNopXW3EmBlTn5DjRfeX7E+mN38lkbx16ZW23W6IbowBwEgzpv16HzGxnasX6raSr4f3/2HEZCUY0Q39engo2IMxe9sB7lcimCKNfpvMbw38KJMUUIoaqS6ust53pivBcNhVglAXYxiBHSgDoy+5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s0hdHVZy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LjBk+d8SrvSbsxNWHqDTjQ59p1f+7fGcTll8yahn9gNusqeAfrCjPqmh3ngIVAlE0NaMQ6PEEOMBgV9vWO/JRrs15KNCcNO2e94k2/YavAGrFBAhpgsaA4ard7YBIaRmwo5F3cVYr2j6iUMFfLq3yFqEr7YKZXZTdPZ7zdkwtwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PlKnfh9F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s0hdHVZy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A159C4CEFD;
-	Tue,  9 Sep 2025 23:16:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlKnfh9F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16069C4CEFA;
+	Tue,  9 Sep 2025 23:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757459786;
-	bh=Zhg+v5tmcuxlFgfMaL5bgOzM8gmZljJLV/XULlh6+uo=;
+	s=k20201202; t=1757459787;
+	bh=S6D1yNE1Syyh365j61OFnP89O+T3sxGXw/t1oEMSH+M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s0hdHVZyzWWP8OkN+Nkj9Jst52w+40y2KIUuo+BT4hiZBNhrLWMKXC2j085IVs4Fo
-	 AflHIBu/z6wuLac9qVL6DQdfP33ooDGGQtho1DVB8hgZb3JGCpDb0yNnBHbElSbTqv
-	 Rg2IArCGpL94YsQt3Fkguy3DXq6qJ+MkrlRDg6ljB3m5TpiRzvmQj8U6LTuXRckJjq
-	 2B1GsEB2N0y3drc0iSqp9ZlEDD6gzyUOoEa/2eVyzWZpJajBI638h+nvunPBRJIezw
-	 Q/f/uS58HXyc8EDD4xR0JYw5yBTs/yW3uIRp2QearSYm+gF2xeOmer5GAI+KglMRPB
-	 OrNOI12DGPOPw==
+	b=PlKnfh9F1ri+fH5JlMG64WG6iqYd9iiXy1jRm25czW9mthAY39+49oIyeZIu+bDNN
+	 wYmD+vmIvyDrXQwTQcBX1t1HRAvmHK+I9HLp/xLt7CeMqis2ZkHLf5Hw8CSmnvOvEi
+	 fDsc7HjJ87pXtHhx6ZOVdxa0RY48X4Y4bL2J+ppxfNHgHgQ0kpOF7+ZX6z2x4igQAB
+	 vUAIsJJZGsoruIetffDm9ERFA/WrcuUDf5dYy/8KRwLwrXTuJ9UjuCjWbFy/vpPGTj
+	 ROAOdBZyamLgS1wZ/xHVEdZzpXPIgAZ16uqK9P4CvafDhf/X5AanlSC+Fec7nF6DoW
+	 D4zUNhoxc10CA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Mikulas Patocka <mpatocka@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/6] lib/crypto: arm64/sha256: Add support for 2-way interleaved hashing
-Date: Tue,  9 Sep 2025 16:13:22 -0700
-Message-ID: <20250909231326.1074672-3-ebiggers@kernel.org>
+Subject: [PATCH 3/6] lib/crypto: x86/sha256: Add support for 2-way interleaved hashing
+Date: Tue,  9 Sep 2025 16:13:23 -0700
+Message-ID: <20250909231326.1074672-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250909231326.1074672-1-ebiggers@kernel.org>
 References: <20250909231326.1074672-1-ebiggers@kernel.org>
@@ -51,162 +51,145 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add an implementation of sha256_finup_2x_arch() for arm64.  It
-interleaves the computation of two SHA-256 hashes using the ARMv8
-SHA-256 instructions.  dm-verity and fs-verity will take advantage of
-this for greatly improved performance on capable CPUs.
+Add an implementation of sha256_finup_2x_arch() for x86_64.  It
+interleaves the computation of two SHA-256 hashes using the x86 SHA-256
+instructions.  dm-verity and fs-verity will take advantage of this for
+greatly improved performance on capable CPUs.
 
 This increases the throughput of SHA-256 hashing 4096-byte messages by
 the following amounts on the following CPUs:
 
-    ARM Cortex-X1: 70%
-    ARM Cortex-X3: 68%
-    ARM Cortex-A76: 65%
-    ARM Cortex-A715: 43%
-    ARM Cortex-A510: 25%
-    ARM Cortex-A55: 8%
+    Intel Ice Lake (server):        4%
+    Intel Sapphire Rapids:          38%
+    Intel Emerald Rapids:           38%
+    AMD Zen 1 (Threadripper 1950X): 84%
+    AMD Zen 4 (EPYC 9B14):          98%
+    AMD Zen 5 (Ryzen 9 9950X):      64%
+
+For now, this seems to benefit AMD more than Intel.  This seems to be
+because current AMD CPUs support concurrent execution of the SHA-NI
+instructions, but unfortunately current Intel CPUs don't, except for the
+sha256msg2 instruction.  Hopefully future Intel CPUs will support SHA-NI
+on more execution ports.  Zen 1 supports 2 concurrent sha256rnds2, and
+Zen 4 supports 4 concurrent sha256rnds2, which suggests that even better
+performance may be achievable on Zen 4 by interleaving more than two
+hashes.  However, doing so poses a number of trade-offs, and furthermore
+Zen 5 goes back to supporting "only" 2 concurrent sha256rnds2.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/arm64/sha256-ce.S | 281 ++++++++++++++++++++++++++++++++++-
- lib/crypto/arm64/sha256.h    |  37 +++++
- 2 files changed, 312 insertions(+), 6 deletions(-)
+ lib/crypto/x86/sha256-ni-asm.S | 368 +++++++++++++++++++++++++++++++++
+ lib/crypto/x86/sha256.h        |  39 ++++
+ 2 files changed, 407 insertions(+)
 
-diff --git a/lib/crypto/arm64/sha256-ce.S b/lib/crypto/arm64/sha256-ce.S
-index b99d9589c4217..ba0b32e3ad60e 100644
---- a/lib/crypto/arm64/sha256-ce.S
-+++ b/lib/crypto/arm64/sha256-ce.S
-@@ -68,22 +68,26 @@
- 	.word		0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5
- 	.word		0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3
- 	.word		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208
- 	.word		0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+diff --git a/lib/crypto/x86/sha256-ni-asm.S b/lib/crypto/x86/sha256-ni-asm.S
+index 4bd9490ffc662..de5f707e7ef71 100644
+--- a/lib/crypto/x86/sha256-ni-asm.S
++++ b/lib/crypto/x86/sha256-ni-asm.S
+@@ -163,10 +163,378 @@ SYM_FUNC_START(sha256_ni_transform)
+ 	movdqu		STATE0, 1*16(STATE_PTR)
  
-+	.macro load_round_constants	tmp
-+	adr_l		\tmp, .Lsha2_rcon
-+	ld1		{ v0.4s- v3.4s}, [\tmp], #64
-+	ld1		{ v4.4s- v7.4s}, [\tmp], #64
-+	ld1		{ v8.4s-v11.4s}, [\tmp], #64
-+	ld1		{v12.4s-v15.4s}, [\tmp]
-+	.endm
-+
- 	/*
- 	 * size_t __sha256_ce_transform(struct sha256_block_state *state,
- 	 *				const u8 *data, size_t nblocks);
- 	 */
- 	.text
- SYM_FUNC_START(__sha256_ce_transform)
--	/* load round constants */
--	adr_l		x8, .Lsha2_rcon
--	ld1		{ v0.4s- v3.4s}, [x8], #64
--	ld1		{ v4.4s- v7.4s}, [x8], #64
--	ld1		{ v8.4s-v11.4s}, [x8], #64
--	ld1		{v12.4s-v15.4s}, [x8]
-+
-+	load_round_constants	x8
+ 	RET
+ SYM_FUNC_END(sha256_ni_transform)
  
- 	/* load state */
- 	ld1		{dgav.4s, dgbv.4s}, [x0]
- 
- 	/* load input */
-@@ -132,5 +136,270 @@ CPU_LE(	rev32		v19.16b, v19.16b	)
- 	/* store new state */
- 1:	st1		{dgav.4s, dgbv.4s}, [x0]
- 	mov		x0, x2
- 	ret
- SYM_FUNC_END(__sha256_ce_transform)
++#undef DIGEST_PTR
++#undef DATA_PTR
++#undef NUM_BLKS
++#undef SHA256CONSTANTS
++#undef MSG
++#undef STATE0
++#undef STATE1
++#undef MSG0
++#undef MSG1
++#undef MSG2
++#undef MSG3
++#undef TMP
++#undef SHUF_MASK
++#undef ABEF_SAVE
++#undef CDGH_SAVE
 +
-+	.unreq dga
-+	.unreq dgav
-+	.unreq dgb
-+	.unreq dgbv
-+	.unreq t0
-+	.unreq t1
-+	.unreq dg0q
-+	.unreq dg0v
-+	.unreq dg1q
-+	.unreq dg1v
-+	.unreq dg2q
-+	.unreq dg2v
++// parameters for sha256_ni_finup2x()
++#define CTX		%rdi
++#define DATA1		%rsi
++#define DATA2		%rdx
++#define LEN		%ecx
++#define LEN8		%cl
++#define LEN64		%rcx
++#define OUT1		%r8
++#define OUT2		%r9
 +
-+	// parameters for sha256_ce_finup2x()
-+	ctx		.req	x0
-+	data1		.req	x1
-+	data2		.req	x2
-+	len		.req	w3
-+	out1		.req	x4
-+	out2		.req	x5
++// other scalar variables
++#define SHA256CONSTANTS	%rax
++#define COUNT		%r10
++#define COUNT32		%r10d
++#define FINAL_STEP	%r11d
 +
-+	// other scalar variables
-+	count		.req	x6
-+	final_step	.req	w7
++// rbx is used as a temporary.
 +
-+	// x8-x9 are used as temporaries.
++#define MSG		%xmm0	// sha256rnds2 implicit operand
++#define STATE0_A	%xmm1
++#define STATE1_A	%xmm2
++#define STATE0_B	%xmm3
++#define STATE1_B	%xmm4
++#define TMP_A		%xmm5
++#define TMP_B		%xmm6
++#define MSG0_A		%xmm7
++#define MSG1_A		%xmm8
++#define MSG2_A		%xmm9
++#define MSG3_A		%xmm10
++#define MSG0_B		%xmm11
++#define MSG1_B		%xmm12
++#define MSG2_B		%xmm13
++#define MSG3_B		%xmm14
++#define SHUF_MASK	%xmm15
 +
-+	// v0-v15 are used to cache the SHA-256 round constants.
-+	// v16-v19 are used for the message schedule for the first message.
-+	// v20-v23 are used for the message schedule for the second message.
-+	// v24-v31 are used for the state and temporaries as given below.
-+	// *_a are for the first message and *_b for the second.
-+	state0_a_q	.req	q24
-+	state0_a	.req	v24
-+	state1_a_q	.req	q25
-+	state1_a	.req	v25
-+	state0_b_q	.req	q26
-+	state0_b	.req	v26
-+	state1_b_q	.req	q27
-+	state1_b	.req	v27
-+	t0_a		.req	v28
-+	t0_b		.req	v29
-+	t1_a_q		.req	q30
-+	t1_a		.req	v30
-+	t1_b_q		.req	q31
-+	t1_b		.req	v31
-+
++#define OFFSETOF_STATE		0  // offsetof(struct __sha256_ctx, state)
 +#define OFFSETOF_BYTECOUNT	32 // offsetof(struct __sha256_ctx, bytecount)
 +#define OFFSETOF_BUF		40 // offsetof(struct __sha256_ctx, buf)
-+// offsetof(struct __sha256_ctx, state) is assumed to be 0.
 +
-+	// Do 4 rounds of SHA-256 for each of two messages (interleaved).  m0_a
-+	// and m0_b contain the current 4 message schedule words for the first
-+	// and second message respectively.
-+	//
-+	// If not all the message schedule words have been computed yet, then
-+	// this also computes 4 more message schedule words for each message.
-+	// m1_a-m3_a contain the next 3 groups of 4 message schedule words for
-+	// the first message, and likewise m1_b-m3_b for the second.  After
-+	// consuming the current value of m0_a, this macro computes the group
-+	// after m3_a and writes it to m0_a, and likewise for *_b.  This means
-+	// that the next (m0_a, m1_a, m2_a, m3_a) is the current (m1_a, m2_a,
-+	// m3_a, m0_a), and likewise for *_b, so the caller must cycle through
-+	// the registers accordingly.
-+	.macro	do_4rounds_2x	i, k,  m0_a, m1_a, m2_a, m3_a,  \
-+				       m0_b, m1_b, m2_b, m3_b
-+	add		t0_a\().4s, \m0_a\().4s, \k\().4s
-+	add		t0_b\().4s, \m0_b\().4s, \k\().4s
-+	.if \i < 48
-+	sha256su0	\m0_a\().4s, \m1_a\().4s
-+	sha256su0	\m0_b\().4s, \m1_b\().4s
-+	sha256su1	\m0_a\().4s, \m2_a\().4s, \m3_a\().4s
-+	sha256su1	\m0_b\().4s, \m2_b\().4s, \m3_b\().4s
-+	.endif
-+	mov		t1_a.16b, state0_a.16b
-+	mov		t1_b.16b, state0_b.16b
-+	sha256h		state0_a_q, state1_a_q, t0_a\().4s
-+	sha256h		state0_b_q, state1_b_q, t0_b\().4s
-+	sha256h2	state1_a_q, t1_a_q, t0_a\().4s
-+	sha256h2	state1_b_q, t1_b_q, t0_b\().4s
-+	.endm
-+
-+	.macro	do_16rounds_2x	i, k0, k1, k2, k3
-+	do_4rounds_2x	\i + 0,  \k0,  v16, v17, v18, v19,  v20, v21, v22, v23
-+	do_4rounds_2x	\i + 4,  \k1,  v17, v18, v19, v16,  v21, v22, v23, v20
-+	do_4rounds_2x	\i + 8,  \k2,  v18, v19, v16, v17,  v22, v23, v20, v21
-+	do_4rounds_2x	\i + 12, \k3,  v19, v16, v17, v18,  v23, v20, v21, v22
-+	.endm
++// Do 4 rounds of SHA-256 for each of two messages (interleaved).  m0_a and m0_b
++// contain the current 4 message schedule words for the first and second message
++// respectively.
++//
++// If not all the message schedule words have been computed yet, then this also
++// computes 4 more message schedule words for each message.  m1_a-m3_a contain
++// the next 3 groups of 4 message schedule words for the first message, and
++// likewise m1_b-m3_b for the second.  After consuming the current value of
++// m0_a, this macro computes the group after m3_a and writes it to m0_a, and
++// likewise for *_b.  This means that the next (m0_a, m1_a, m2_a, m3_a) is the
++// current (m1_a, m2_a, m3_a, m0_a), and likewise for *_b, so the caller must
++// cycle through the registers accordingly.
++.macro	do_4rounds_2x	i, m0_a, m1_a, m2_a, m3_a,  m0_b, m1_b, m2_b, m3_b
++	movdqa		(\i-32)*4(SHA256CONSTANTS), TMP_A
++	movdqa		TMP_A, TMP_B
++	paddd		\m0_a, TMP_A
++	paddd		\m0_b, TMP_B
++.if \i < 48
++	sha256msg1	\m1_a, \m0_a
++	sha256msg1	\m1_b, \m0_b
++.endif
++	movdqa		TMP_A, MSG
++	sha256rnds2	STATE0_A, STATE1_A
++	movdqa		TMP_B, MSG
++	sha256rnds2	STATE0_B, STATE1_B
++	pshufd 		$0x0E, TMP_A, MSG
++	sha256rnds2	STATE1_A, STATE0_A
++	pshufd 		$0x0E, TMP_B, MSG
++	sha256rnds2	STATE1_B, STATE0_B
++.if \i < 48
++	movdqa		\m3_a, TMP_A
++	movdqa		\m3_b, TMP_B
++	palignr		$4, \m2_a, TMP_A
++	palignr		$4, \m2_b, TMP_B
++	paddd		TMP_A, \m0_a
++	paddd		TMP_B, \m0_b
++	sha256msg2	\m3_a, \m0_a
++	sha256msg2	\m3_b, \m0_b
++.endif
++.endm
 +
 +//
-+// void sha256_ce_finup2x(const struct __sha256_ctx *ctx,
++// void sha256_ni_finup2x(const struct __sha256_ctx *ctx,
 +//			  const u8 *data1, const u8 *data2, int len,
 +//			  u8 out1[SHA256_DIGEST_SIZE],
 +//			  u8 out2[SHA256_DIGEST_SIZE]);
@@ -219,127 +202,207 @@ index b99d9589c4217..ba0b32e3ad60e 100644
 +// CPUs, this is almost twice as fast as hashing each message individually due
 +// to taking better advantage of the CPU's SHA-256 and SIMD throughput.
 +//
-+SYM_FUNC_START(sha256_ce_finup2x)
-+	sub		sp, sp, #128
-+	mov		final_step, #0
-+	load_round_constants	x8
++SYM_FUNC_START(sha256_ni_finup2x)
++	// Allocate 128 bytes of stack space, 16-byte aligned.
++	push		%rbx
++	push		%rbp
++	mov		%rsp, %rbp
++	sub		$128, %rsp
++	and		$~15, %rsp
++
++	// Load the shuffle mask for swapping the endianness of 32-bit words.
++	movdqa		PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
++
++	// Set up pointer to the round constants.
++	lea		K256+32*4(%rip), SHA256CONSTANTS
++
++	// Initially we're not processing the final blocks.
++	xor		FINAL_STEP, FINAL_STEP
 +
 +	// Load the initial state from ctx->state.
-+	ld1		{state0_a.4s-state1_a.4s}, [ctx]
++	movdqu		OFFSETOF_STATE+0*16(CTX), STATE0_A	// DCBA
++	movdqu		OFFSETOF_STATE+1*16(CTX), STATE1_A	// HGFE
++	movdqa		STATE0_A, TMP_A
++	punpcklqdq	STATE1_A, STATE0_A			// FEBA
++	punpckhqdq	TMP_A, STATE1_A				// DCHG
++	pshufd		$0x1B, STATE0_A, STATE0_A		// ABEF
++	pshufd		$0xB1, STATE1_A, STATE1_A		// CDGH
 +
 +	// Load ctx->bytecount.  Take the mod 64 of it to get the number of
 +	// bytes that are buffered in ctx->buf.  Also save it in a register with
-+	// len added to it.
-+	ldr		x8, [ctx, #OFFSETOF_BYTECOUNT]
-+	add		count, x8, len, sxtw
-+	and		x8, x8, #63
-+	cbz		x8, .Lfinup2x_enter_loop	// No bytes buffered?
++	// LEN added to it.
++	mov		LEN, LEN
++	mov		OFFSETOF_BYTECOUNT(CTX), %rbx
++	lea		(%rbx, LEN64, 1), COUNT
++	and		$63, %ebx
++	jz		.Lfinup2x_enter_loop	// No bytes buffered?
 +
-+	// x8 bytes (1 to 63) are currently buffered in ctx->buf.  Load them
-+	// followed by the first 64 - x8 bytes of data.  Since len >= 64, we
-+	// just load 64 bytes from each of ctx->buf, data1, and data2
++	// %ebx bytes (1 to 63) are currently buffered in ctx->buf.  Load them
++	// followed by the first 64 - %ebx bytes of data.  Since LEN >= 64, we
++	// just load 64 bytes from each of ctx->buf, DATA1, and DATA2
 +	// unconditionally and rearrange the data as needed.
-+	add		x9, ctx, #OFFSETOF_BUF
-+	ld1		{v16.16b-v19.16b}, [x9]
-+	st1		{v16.16b-v19.16b}, [sp]
 +
-+	ld1		{v16.16b-v19.16b}, [data1], #64
-+	add		x9, sp, x8
-+	st1		{v16.16b-v19.16b}, [x9]
-+	ld1		{v16.4s-v19.4s}, [sp]
++	movdqu		OFFSETOF_BUF+0*16(CTX), MSG0_A
++	movdqu		OFFSETOF_BUF+1*16(CTX), MSG1_A
++	movdqu		OFFSETOF_BUF+2*16(CTX), MSG2_A
++	movdqu		OFFSETOF_BUF+3*16(CTX), MSG3_A
++	movdqa		MSG0_A, 0*16(%rsp)
++	movdqa		MSG1_A, 1*16(%rsp)
++	movdqa		MSG2_A, 2*16(%rsp)
++	movdqa		MSG3_A, 3*16(%rsp)
 +
-+	ld1		{v20.16b-v23.16b}, [data2], #64
-+	st1		{v20.16b-v23.16b}, [x9]
-+	ld1		{v20.4s-v23.4s}, [sp]
++	movdqu		0*16(DATA1), MSG0_A
++	movdqu		1*16(DATA1), MSG1_A
++	movdqu		2*16(DATA1), MSG2_A
++	movdqu		3*16(DATA1), MSG3_A
++	movdqu		MSG0_A, 0*16(%rsp,%rbx)
++	movdqu		MSG1_A, 1*16(%rsp,%rbx)
++	movdqu		MSG2_A, 2*16(%rsp,%rbx)
++	movdqu		MSG3_A, 3*16(%rsp,%rbx)
++	movdqa		0*16(%rsp), MSG0_A
++	movdqa		1*16(%rsp), MSG1_A
++	movdqa		2*16(%rsp), MSG2_A
++	movdqa		3*16(%rsp), MSG3_A
 +
-+	sub		len, len, #64
-+	sub		data1, data1, x8
-+	sub		data2, data2, x8
-+	add		len, len, w8
-+	mov		state0_b.16b, state0_a.16b
-+	mov		state1_b.16b, state1_a.16b
-+	b		.Lfinup2x_loop_have_data
++	movdqu		0*16(DATA2), MSG0_B
++	movdqu		1*16(DATA2), MSG1_B
++	movdqu		2*16(DATA2), MSG2_B
++	movdqu		3*16(DATA2), MSG3_B
++	movdqu		MSG0_B, 0*16(%rsp,%rbx)
++	movdqu		MSG1_B, 1*16(%rsp,%rbx)
++	movdqu		MSG2_B, 2*16(%rsp,%rbx)
++	movdqu		MSG3_B, 3*16(%rsp,%rbx)
++	movdqa		0*16(%rsp), MSG0_B
++	movdqa		1*16(%rsp), MSG1_B
++	movdqa		2*16(%rsp), MSG2_B
++	movdqa		3*16(%rsp), MSG3_B
++
++	sub		$64, %rbx 	// rbx = buffered - 64
++	sub		%rbx, DATA1	// DATA1 += 64 - buffered
++	sub		%rbx, DATA2	// DATA2 += 64 - buffered
++	add		%ebx, LEN	// LEN += buffered - 64
++	movdqa		STATE0_A, STATE0_B
++	movdqa		STATE1_A, STATE1_B
++	jmp		.Lfinup2x_loop_have_data
 +
 +.Lfinup2x_enter_loop:
-+	sub		len, len, #64
-+	mov		state0_b.16b, state0_a.16b
-+	mov		state1_b.16b, state1_a.16b
++	sub		$64, LEN
++	movdqa		STATE0_A, STATE0_B
++	movdqa		STATE1_A, STATE1_B
 +.Lfinup2x_loop:
 +	// Load the next two data blocks.
-+	ld1		{v16.4s-v19.4s}, [data1], #64
-+	ld1		{v20.4s-v23.4s}, [data2], #64
++	movdqu		0*16(DATA1), MSG0_A
++	movdqu		0*16(DATA2), MSG0_B
++	movdqu		1*16(DATA1), MSG1_A
++	movdqu		1*16(DATA2), MSG1_B
++	movdqu		2*16(DATA1), MSG2_A
++	movdqu		2*16(DATA2), MSG2_B
++	movdqu		3*16(DATA1), MSG3_A
++	movdqu		3*16(DATA2), MSG3_B
++	add		$64, DATA1
++	add		$64, DATA2
 +.Lfinup2x_loop_have_data:
 +	// Convert the words of the data blocks from big endian.
-+CPU_LE(	rev32		v16.16b, v16.16b	)
-+CPU_LE(	rev32		v17.16b, v17.16b	)
-+CPU_LE(	rev32		v18.16b, v18.16b	)
-+CPU_LE(	rev32		v19.16b, v19.16b	)
-+CPU_LE(	rev32		v20.16b, v20.16b	)
-+CPU_LE(	rev32		v21.16b, v21.16b	)
-+CPU_LE(	rev32		v22.16b, v22.16b	)
-+CPU_LE(	rev32		v23.16b, v23.16b	)
++	pshufb		SHUF_MASK, MSG0_A
++	pshufb		SHUF_MASK, MSG0_B
++	pshufb		SHUF_MASK, MSG1_A
++	pshufb		SHUF_MASK, MSG1_B
++	pshufb		SHUF_MASK, MSG2_A
++	pshufb		SHUF_MASK, MSG2_B
++	pshufb		SHUF_MASK, MSG3_A
++	pshufb		SHUF_MASK, MSG3_B
 +.Lfinup2x_loop_have_bswapped_data:
 +
 +	// Save the original state for each block.
-+	st1		{state0_a.4s-state1_b.4s}, [sp]
++	movdqa		STATE0_A, 0*16(%rsp)
++	movdqa		STATE0_B, 1*16(%rsp)
++	movdqa		STATE1_A, 2*16(%rsp)
++	movdqa		STATE1_B, 3*16(%rsp)
 +
 +	// Do the SHA-256 rounds on each block.
-+	do_16rounds_2x	0,  v0, v1, v2, v3
-+	do_16rounds_2x	16, v4, v5, v6, v7
-+	do_16rounds_2x	32, v8, v9, v10, v11
-+	do_16rounds_2x	48, v12, v13, v14, v15
++.irp i, 0, 16, 32, 48
++	do_4rounds_2x	(\i + 0),  MSG0_A, MSG1_A, MSG2_A, MSG3_A, \
++				   MSG0_B, MSG1_B, MSG2_B, MSG3_B
++	do_4rounds_2x	(\i + 4),  MSG1_A, MSG2_A, MSG3_A, MSG0_A, \
++				   MSG1_B, MSG2_B, MSG3_B, MSG0_B
++	do_4rounds_2x	(\i + 8),  MSG2_A, MSG3_A, MSG0_A, MSG1_A, \
++				   MSG2_B, MSG3_B, MSG0_B, MSG1_B
++	do_4rounds_2x	(\i + 12), MSG3_A, MSG0_A, MSG1_A, MSG2_A, \
++				   MSG3_B, MSG0_B, MSG1_B, MSG2_B
++.endr
 +
 +	// Add the original state for each block.
-+	ld1		{v16.4s-v19.4s}, [sp]
-+	add		state0_a.4s, state0_a.4s, v16.4s
-+	add		state1_a.4s, state1_a.4s, v17.4s
-+	add		state0_b.4s, state0_b.4s, v18.4s
-+	add		state1_b.4s, state1_b.4s, v19.4s
++	paddd		0*16(%rsp), STATE0_A
++	paddd		1*16(%rsp), STATE0_B
++	paddd		2*16(%rsp), STATE1_A
++	paddd		3*16(%rsp), STATE1_B
 +
-+	// Update len and loop back if more blocks remain.
-+	sub		len, len, #64
-+	tbz		len, #31, .Lfinup2x_loop	// len >= 0?
++	// Update LEN and loop back if more blocks remain.
++	sub		$64, LEN
++	jge		.Lfinup2x_loop
 +
 +	// Check if any final blocks need to be handled.
-+	// final_step = 2: all done
-+	// final_step = 1: need to do count-only padding block
-+	// final_step = 0: need to do the block with 0x80 padding byte
-+	tbnz		final_step, #1, .Lfinup2x_done
-+	tbnz		final_step, #0, .Lfinup2x_finalize_countonly
-+	add		len, len, #64
-+	cbz		len, .Lfinup2x_finalize_blockaligned
++	// FINAL_STEP = 2: all done
++	// FINAL_STEP = 1: need to do count-only padding block
++	// FINAL_STEP = 0: need to do the block with 0x80 padding byte
++	cmp		$1, FINAL_STEP
++	jg		.Lfinup2x_done
++	je		.Lfinup2x_finalize_countonly
++	add		$64, LEN
++	jz		.Lfinup2x_finalize_blockaligned
 +
-+	// Not block-aligned; 1 <= len <= 63 data bytes remain.  Pad the block.
++	// Not block-aligned; 1 <= LEN <= 63 data bytes remain.  Pad the block.
 +	// To do this, write the padding starting with the 0x80 byte to
 +	// &sp[64].  Then for each message, copy the last 64 data bytes to sp
-+	// and load from &sp[64 - len] to get the needed padding block.  This
++	// and load from &sp[64 - LEN] to get the needed padding block.  This
 +	// code relies on the data buffers being >= 64 bytes in length.
-+	sub		w8, len, #64		// w8 = len - 64
-+	add		data1, data1, w8, sxtw	// data1 += len - 64
-+	add		data2, data2, w8, sxtw	// data2 += len - 64
-+	mov		x9, 0x80
-+	fmov		d16, x9
-+	movi		v17.16b, #0
-+	stp		q16, q17, [sp, #64]
-+	stp		q17, q17, [sp, #96]
-+	sub		x9, sp, w8, sxtw	// x9 = &sp[64 - len]
-+	cmp		len, #56
-+	b.ge		1f		// will count spill into its own block?
-+	lsl		count, count, #3
-+	rev		count, count
-+	str		count, [x9, #56]
-+	mov		final_step, #2	// won't need count-only block
-+	b		2f
++	mov		$64, %ebx
++	sub		LEN, %ebx		// ebx = 64 - LEN
++	sub		%rbx, DATA1		// DATA1 -= 64 - LEN
++	sub		%rbx, DATA2		// DATA2 -= 64 - LEN
++	mov		$0x80, FINAL_STEP   // using FINAL_STEP as a temporary
++	movd		FINAL_STEP, MSG0_A
++	pxor		MSG1_A, MSG1_A
++	movdqa		MSG0_A, 4*16(%rsp)
++	movdqa		MSG1_A, 5*16(%rsp)
++	movdqa		MSG1_A, 6*16(%rsp)
++	movdqa		MSG1_A, 7*16(%rsp)
++	cmp		$56, LEN
++	jge		1f	// will COUNT spill into its own block?
++	shl		$3, COUNT
++	bswap		COUNT
++	mov		COUNT, 56(%rsp,%rbx)
++	mov		$2, FINAL_STEP	// won't need count-only block
++	jmp		2f
 +1:
-+	mov		final_step, #1	// will need count-only block
++	mov		$1, FINAL_STEP	// will need count-only block
 +2:
-+	ld1		{v16.16b-v19.16b}, [data1]
-+	st1		{v16.16b-v19.16b}, [sp]
-+	ld1		{v16.4s-v19.4s}, [x9]
-+	ld1		{v20.16b-v23.16b}, [data2]
-+	st1		{v20.16b-v23.16b}, [sp]
-+	ld1		{v20.4s-v23.4s}, [x9]
-+	b		.Lfinup2x_loop_have_data
++	movdqu		0*16(DATA1), MSG0_A
++	movdqu		1*16(DATA1), MSG1_A
++	movdqu		2*16(DATA1), MSG2_A
++	movdqu		3*16(DATA1), MSG3_A
++	movdqa		MSG0_A, 0*16(%rsp)
++	movdqa		MSG1_A, 1*16(%rsp)
++	movdqa		MSG2_A, 2*16(%rsp)
++	movdqa		MSG3_A, 3*16(%rsp)
++	movdqu		0*16(%rsp,%rbx), MSG0_A
++	movdqu		1*16(%rsp,%rbx), MSG1_A
++	movdqu		2*16(%rsp,%rbx), MSG2_A
++	movdqu		3*16(%rsp,%rbx), MSG3_A
++
++	movdqu		0*16(DATA2), MSG0_B
++	movdqu		1*16(DATA2), MSG1_B
++	movdqu		2*16(DATA2), MSG2_B
++	movdqu		3*16(DATA2), MSG3_B
++	movdqa		MSG0_B, 0*16(%rsp)
++	movdqa		MSG1_B, 1*16(%rsp)
++	movdqa		MSG2_B, 2*16(%rsp)
++	movdqa		MSG3_B, 3*16(%rsp)
++	movdqu		0*16(%rsp,%rbx), MSG0_B
++	movdqu		1*16(%rsp,%rbx), MSG1_B
++	movdqu		2*16(%rsp,%rbx), MSG2_B
++	movdqu		3*16(%rsp,%rbx), MSG3_B
++	jmp		.Lfinup2x_loop_have_data
 +
 +	// Prepare a padding block, either:
 +	//
@@ -351,49 +414,84 @@ index b99d9589c4217..ba0b32e3ad60e 100644
 +	//
 +	// Pre-swap the endianness of the words.
 +.Lfinup2x_finalize_countonly:
-+	movi		v16.2d, #0
-+	b		1f
++	pxor		MSG0_A, MSG0_A
++	jmp		1f
++
 +.Lfinup2x_finalize_blockaligned:
-+	mov		x8, #0x80000000
-+	fmov		d16, x8
++	mov		$0x80000000, %ebx
++	movd		%ebx, MSG0_A
 +1:
-+	movi		v17.2d, #0
-+	movi		v18.2d, #0
-+	ror		count, count, #29	// ror(lsl(count, 3), 32)
-+	mov		v19.d[0], xzr
-+	mov		v19.d[1], count
-+	mov		v20.16b, v16.16b
-+	movi		v21.2d, #0
-+	movi		v22.2d, #0
-+	mov		v23.16b, v19.16b
-+	mov		final_step, #2
-+	b		.Lfinup2x_loop_have_bswapped_data
++	pxor		MSG1_A, MSG1_A
++	pxor		MSG2_A, MSG2_A
++	ror		$29, COUNT
++	movq		COUNT, MSG3_A
++	pslldq		$8, MSG3_A
++	movdqa		MSG0_A, MSG0_B
++	pxor		MSG1_B, MSG1_B
++	pxor		MSG2_B, MSG2_B
++	movdqa		MSG3_A, MSG3_B
++	mov		$2, FINAL_STEP
++	jmp		.Lfinup2x_loop_have_bswapped_data
 +
 +.Lfinup2x_done:
 +	// Write the two digests with all bytes in the correct order.
-+CPU_LE(	rev32		state0_a.16b, state0_a.16b	)
-+CPU_LE(	rev32		state1_a.16b, state1_a.16b	)
-+CPU_LE(	rev32		state0_b.16b, state0_b.16b	)
-+CPU_LE(	rev32		state1_b.16b, state1_b.16b	)
-+	st1		{state0_a.4s-state1_a.4s}, [out1]
-+	st1		{state0_b.4s-state1_b.4s}, [out2]
-+	add		sp, sp, #128
-+	ret
-+SYM_FUNC_END(sha256_ce_finup2x)
-diff --git a/lib/crypto/arm64/sha256.h b/lib/crypto/arm64/sha256.h
-index be4aeda9d0e6e..80d06df27d3a3 100644
---- a/lib/crypto/arm64/sha256.h
-+++ b/lib/crypto/arm64/sha256.h
-@@ -42,10 +42,47 @@ static void sha256_blocks(struct sha256_block_state *state,
- 	} else {
- 		sha256_block_data_order(state, data, nblocks);
- 	}
++	movdqa		STATE0_A, TMP_A
++	movdqa		STATE0_B, TMP_B
++	punpcklqdq	STATE1_A, STATE0_A		// GHEF
++	punpcklqdq	STATE1_B, STATE0_B
++	punpckhqdq	TMP_A, STATE1_A			// ABCD
++	punpckhqdq	TMP_B, STATE1_B
++	pshufd		$0xB1, STATE0_A, STATE0_A	// HGFE
++	pshufd		$0xB1, STATE0_B, STATE0_B
++	pshufd		$0x1B, STATE1_A, STATE1_A	// DCBA
++	pshufd		$0x1B, STATE1_B, STATE1_B
++	pshufb		SHUF_MASK, STATE0_A
++	pshufb		SHUF_MASK, STATE0_B
++	pshufb		SHUF_MASK, STATE1_A
++	pshufb		SHUF_MASK, STATE1_B
++	movdqu		STATE0_A, 1*16(OUT1)
++	movdqu		STATE0_B, 1*16(OUT2)
++	movdqu		STATE1_A, 0*16(OUT1)
++	movdqu		STATE1_B, 0*16(OUT2)
++
++	mov		%rbp, %rsp
++	pop		%rbp
++	pop		%rbx
++	RET
++SYM_FUNC_END(sha256_ni_finup2x)
++
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+ K256:
+ 	.long	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5
+ 	.long	0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5
+diff --git a/lib/crypto/x86/sha256.h b/lib/crypto/x86/sha256.h
+index 41fa95fbc3bf8..38e33b22a0927 100644
+--- a/lib/crypto/x86/sha256.h
++++ b/lib/crypto/x86/sha256.h
+@@ -5,10 +5,12 @@
+  * Copyright 2025 Google LLC
+  */
+ #include <asm/fpu/api.h>
+ #include <linux/static_call.h>
+ 
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_sha_ni);
++
+ DEFINE_STATIC_CALL(sha256_blocks_x86, sha256_blocks_generic);
+ 
+ #define DEFINE_X86_SHA256_FN(c_fn, asm_fn)                                 \
+ 	asmlinkage void asm_fn(struct sha256_block_state *state,           \
+ 			       const u8 *data, size_t nblocks);            \
+@@ -33,15 +35,52 @@ static void sha256_blocks(struct sha256_block_state *state,
+ 			  const u8 *data, size_t nblocks)
+ {
+ 	static_call(sha256_blocks_x86)(state, data, nblocks);
  }
  
 +static_assert(offsetof(struct __sha256_ctx, state) == 0);
 +static_assert(offsetof(struct __sha256_ctx, bytecount) == 32);
 +static_assert(offsetof(struct __sha256_ctx, buf) == 40);
-+asmlinkage void sha256_ce_finup2x(const struct __sha256_ctx *ctx,
++asmlinkage void sha256_ni_finup2x(const struct __sha256_ctx *ctx,
 +				  const u8 *data1, const u8 *data2, int len,
 +				  u8 out1[SHA256_DIGEST_SIZE],
 +				  u8 out2[SHA256_DIGEST_SIZE]);
@@ -409,12 +507,11 @@ index be4aeda9d0e6e..80d06df27d3a3 100644
 +	 * Further limit len to 65536 to avoid spending too long with preemption
 +	 * disabled.  (Of course, in practice len is nearly always 4096 anyway.)
 +	 */
-+	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
-+	    static_branch_likely(&have_ce) && len >= SHA256_BLOCK_SIZE &&
-+	    len <= 65536 && likely(may_use_simd())) {
-+		kernel_neon_begin();
-+		sha256_ce_finup2x(ctx, data1, data2, len, out1, out2);
-+		kernel_neon_end();
++	if (static_branch_likely(&have_sha_ni) && len >= SHA256_BLOCK_SIZE &&
++	    len <= 65536 && likely(irq_fpu_usable())) {
++		kernel_fpu_begin();
++		sha256_ni_finup2x(ctx, data1, data2, len, out1, out2);
++		kernel_fpu_end();
 +		kmsan_unpoison_memory(out1, SHA256_DIGEST_SIZE);
 +		kmsan_unpoison_memory(out2, SHA256_DIGEST_SIZE);
 +		return true;
@@ -424,14 +521,20 @@ index be4aeda9d0e6e..80d06df27d3a3 100644
 +
 +static bool sha256_finup_2x_is_optimized_arch(void)
 +{
-+	return static_key_enabled(&have_ce);
++	return static_key_enabled(&have_sha_ni);
 +}
 +
- #ifdef CONFIG_KERNEL_MODE_NEON
  #define sha256_mod_init_arch sha256_mod_init_arch
  static void sha256_mod_init_arch(void)
  {
- 	if (cpu_have_named_feature(ASIMD)) {
+ 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+ 		static_call_update(sha256_blocks_x86, sha256_blocks_ni);
++		static_branch_enable(&have_sha_ni);
+ 	} else if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				     NULL) &&
+ 		   boot_cpu_has(X86_FEATURE_AVX)) {
+ 		if (boot_cpu_has(X86_FEATURE_AVX2) &&
+ 		    boot_cpu_has(X86_FEATURE_BMI2))
 -- 
 2.50.1
 
