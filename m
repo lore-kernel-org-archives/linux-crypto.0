@@ -1,87 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B151A314F;
-	Tue,  9 Sep 2025 04:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8341A42AA9
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Sep 2025 05:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757391923; cv=none; b=SofwvnAlRbCl3ihwkHIUHG/ZBfaayEOoRYV7LpfYFi8sa+yqXynx0BnQmEcVBvz8Vd25YuWfahxjagaUmUUd1a8Zke5SVrc6GLzypi+fEdmeiS+RQ/5e76ryv3R5O+equ3z+tJ6zMHeAUrXmiZFb9kKWh/3FM4Q4wLg8DiLyL1E=
+	t=1757394057; cv=none; b=qi9p3NvSgKZoUo3a3jvY9HHMRSMn15/lJj/8tukZIvsjDA+34Ae7MOMA0OYkHPGYlvtR37Lzp3iRUGY7U+Kl2dKB4NeX2Vg+eQReKRrGBnKLfRPVaiR7yVFKUXmgKPYK1RjAenFq7jJB22jLW9m3fDdR+VAD/MpSutbUqzy/JDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757391923; c=relaxed/simple;
-	bh=RrzY4SDc18Ci2TyOyhCgyGYX7hmnnBCU2e/pxbH8zRw=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=cUW0WCiRKcepZh5XwvNunFtpOtrgHBbW/VBNMJBSlAOJT7V/truq5opGB6R77PuEFHLv8G12bdOvtlhhkFAhhAZqGtdgMQyC1dU+0hNwJGnJ3fI0p+9G0IuCiPiyX54SO2JoHD8jXuhcW+zy3rlY9eVdm6ZLB2v/d+4Ly7W1y0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=i9pJ18PL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757394057; c=relaxed/simple;
+	bh=QPzBbB0C73iHiFf36sBz2yrUB/CVsdOMl0qXdXJeuP8=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=UukaDU05KIKxUa2YM4e8QmBeY7FMTGvXv3WJTuMbGsAw+ZOdb0Odim8wbHqfR7tEWh+H2U2HYf2o3jYS7eDr8X8PlC6M3RmhhY95blP+TN9KqI+IpWO4f5FK/GALnrQlxmFm1fHYWB7yR52MRuQ0rsIRK0ye05DXs7SU0jtcRZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HiBbySLF; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="i9pJ18PL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F9D2C4CEF4;
-	Tue,  9 Sep 2025 04:25:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1757391922;
-	bh=RrzY4SDc18Ci2TyOyhCgyGYX7hmnnBCU2e/pxbH8zRw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i9pJ18PLXuxKbzs/Iruw3PpLBgKXy9ssEffV+i7Q9gMAvoRB7kzd+iGGYRZ4Vjd4z
-	 nsdDoX1b8RjqFfB2U020ZMoVgWz32DH/3KHr9yu4W24HNyAdp4ShFmw5Gwb3/8dyxq
-	 YI0F046jfWbWEKO92OxW3X9LzuK+WjtFkn1xH7Gk=
-Date: Mon, 8 Sep 2025 21:25:18 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
- Alexander Potapenko <glider@google.com>, Brendan Jackman
- <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>, Dennis Zhou
- <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org, Jason Gunthorpe
- <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>, Johannes Weiner
- <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org, "Liam R. Howlett"
- <Liam.Howlett@oracle.com>, Linus Torvalds <torvalds@linux-foundation.org>,
- linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski
- <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>, Mike Rapoport
- <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>, Peter Xu
- <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>, Suren
- Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
-Message-Id: <20250908212518.77671b31aaad2832c17eab07@linux-foundation.org>
-In-Reply-To: <64fe4c61-f9cc-4a5a-9c33-07bd0f089e94@redhat.com>
-References: <20250901150359.867252-1-david@redhat.com>
-	<20250901150359.867252-20-david@redhat.com>
-	<5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
-	<20250905230006.GA1776@sol>
-	<64fe4c61-f9cc-4a5a-9c33-07bd0f089e94@redhat.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HiBbySLF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=TMf2aiIEPOzElp4Gjidav8LjKtJsVPDYMEaSDkIqgfg=; b=HiBbySLF1mlPWnBLVSIFaqY5Ap
+	9dG/s2MFN1rFz7p7hhCPf6JNQFHsf3bYjj1aw9R1OQ8WVGFB8YR0DUIeT9nLuAEala4qFUZO2MczS
+	NtVtxV885xLKyhWsCMDnxEONQ5TyVZbxMC/H4RHizgdor/Wg/e9Jyv7Vk7Znf1+9H0N3dqKOVlTNm
+	eb6pareRX5TIFYOK8nYqcZtHgV2x+tnysN9+6Wl79nvQVhTGm1Xd4B5e+/wX9t5F6LRGhxvjXnKkX
+	WinRiW4pcJisfMhg85/OXDEWgtpDvbPnPyIE831Ozcyo2g6SekJKpcUovO7NccVu8vts7VHwu/QUH
+	jlBl6d7A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uvpo0-003pnJ-0G;
+	Tue, 09 Sep 2025 12:34:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Sep 2025 12:34:04 +0800
+Date: Tue, 09 Sep 2025 12:34:04 +0800
+Message-Id: <cover.1757392363.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/2] crypto: ahash - Allow async stack requests when specified
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Sat, 6 Sep 2025 08:57:37 +0200 David Hildenbrand <david@redhat.com> wrote:
+This patch series adds support for passing stack requests down
+to algorithms that do not do DMA on the request context, e.g.,
+phmac.
 
-> >> @@ -3024,6 +3025,7 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
-> >>                  return 0;
-> >>          }
-> >> +       pages += *nr;
-> >>          *nr += refs;
-> >>          for (; refs; refs--)
-> >>                  *(pages++) = page++;
-> > 
-> > Can this get folded in soon?  This bug is causing crashes in AF_ALG too.
-> 
-> Andrew immediately dropped the original patch, so it's gone from 
-> mm-unstable and should be gone from next soon (today?).
+Herbert Xu (2):
+  crypto: ahash - Allow async stack requests when specified
+  crypto: s390/phmac - Allow stack requests
 
-I restored it once you sent out the fix.  It doesn't seem to be in
-present -next but it should be there in the next one.
+ arch/s390/crypto/phmac_s390.c  |  1 +
+ crypto/ahash.c                 | 22 ++++++++++++++++++----
+ include/crypto/internal/hash.h |  3 +++
+ 3 files changed, 22 insertions(+), 4 deletions(-)
+
+-- 
+2.39.5
+
