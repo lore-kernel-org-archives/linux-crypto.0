@@ -1,46 +1,46 @@
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B86C2C21D5;
-	Wed, 10 Sep 2025 10:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4B830E0DA;
+	Wed, 10 Sep 2025 10:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757498902; cv=none; b=SZOaFcHdXOXWmNfLC86171bIxkMt2Zbg9SJmeoc4vJaNDbQbeGLIBKFXBGBJIBzx7E3i5CV0k4Tuqs6iClzbi7bsc9XHw011BOqrWxRotkMwMFjcxJjeNvWbAcWfkjGSe/LJYFRzLXSENNpouztIJBqJohBfPE8HjWkoioXgTPg=
+	t=1757498904; cv=none; b=IZfh9rjtddwm/vIaVBywmLR9re9TqenlUMdRcbAARFmn31CK143ZMA1jJZImeNOjwtKQYvHAm3xYkV//Yef2+gA4uXqS3XbMpHfQH5kOugex4ee4TD8qnsJpFl0F84ildyomXHhSPu+BUlsK5GOMhv10rUpEOMcNgbpJvtrjdlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757498902; c=relaxed/simple;
-	bh=5lagy10vP+ElfLNZ4XPQUjfGJpMlZht7fVKsoNotb30=;
+	s=arc-20240116; t=1757498904; c=relaxed/simple;
+	bh=X06+KYf7g5G3DpMRgGYFx2n380X1Eq8wDc0QXAPf2Lc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ixHB5oFuc2yJiYYq1OEI55ZRauqvwr6N5n9sXyq31Hct/V91p+P+jF8FP8lN6XVZ5W1lmRnoOgTMP5LI30NIaZit7lll34dGQ2a73dOKdBRZCWJiNkNqPRpNfqmyysh/4nO9/ZfR2VhxK41S1lYn/y2vcSrMq8Fa/YbCXBwPxP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CxbR5Gje; arc=none smtp.client-ip=198.47.19.246
+	 MIME-Version:Content-Type; b=LbcSk+uFwhTccSv2Z/yClP7Gs3X6N+IzvTctpFeFBjRdgrn1NU6a+rNlH/wk90XO4qHaSw/GiXP1hYWjijX401i4zqpXUbcBM9MJQ2L9DgXic3oGuWL5b+7jBBipBOSNULN2PHLSfGcOOjXR1jLfWUqeuJlOXc6pu8G9uUwoGoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=iVJI66rE; arc=none smtp.client-ip=198.47.23.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CxbR5Gje"
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58AA8GeN492673;
-	Wed, 10 Sep 2025 05:08:16 -0500
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="iVJI66rE"
+Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58AA8AI2545506;
+	Wed, 10 Sep 2025 05:08:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1757498896;
-	bh=LRS0GaO8Vw+EmQvBRmovB7EJCsf65v1b7tdlOx4p+hY=;
+	s=ti-com-17Q1; t=1757498890;
+	bh=dNtpkaHyN6srN/vq/VvKfgni3NKEArpz7XSJccCF30M=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=CxbR5GjeJwBqoSpnFomKRev2Cy1DcH/NTiyAYsW8hhCrXno6UzbYBGRFJ4ZnblCwb
-	 DkkiO3QitWP6beKsp/C6TlJqRlbHJ2WsCwsPcl3hhPAkgt5wHkqUPbpn4TUdrODNmN
-	 LJuc0AqZ0652it2HcPDJCcbx2z55Nv6b2p/2Lj1g=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58AA8Gsm293226
+	b=iVJI66rEQh7pPvsmIhzt7rEMPjUM3OMOtDvJp1o2YbTnEZyPEDTtQNNL/bWVF2yP6
+	 VPyMX2eLbvSfzVe7tKNuc1GV8VX5vfVMXFNTkNfK9JAAPm9luKgwc88HLzVhjfnwBK
+	 UR0XBjWIaIslGJKFkYSs7Ha5a+ldyXR0667eM2cY=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58AA8A3Q210354
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 10 Sep 2025 05:08:16 -0500
-Received: from DFLE204.ent.ti.com (10.64.6.62) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+	Wed, 10 Sep 2025 05:08:10 -0500
+Received: from DFLE204.ent.ti.com (10.64.6.62) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 10
- Sep 2025 05:08:16 -0500
+ Sep 2025 05:08:10 -0500
 Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE204.ent.ti.com
  (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 10 Sep 2025 05:08:16 -0500
+ Transport; Wed, 10 Sep 2025 05:08:10 -0500
 Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58AA8EMi318012;
-	Wed, 10 Sep 2025 05:08:15 -0500
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58AA88KC317927;
+	Wed, 10 Sep 2025 05:08:09 -0500
 From: T Pratham <t-pratham@ti.com>
 To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -49,9 +49,9 @@ CC: Kamlesh Gurudasani <kamlesh@ti.com>, Manorit Chawdhry <m-chawdhry@ti.com>,
         Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer <vishalm@ti.com>,
         Kavitha Malarvizhi <k-malarvizhi@ti.com>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 2/4] crypto: ti: Add support for AES-CTR in DTHEv2 driver
-Date: Wed, 10 Sep 2025 14:46:54 +0530
-Message-ID: <20250910100742.3747614-3-t-pratham@ti.com>
+Subject: [PATCH v3 1/4] crypto: ti: Add support for AES-XTS in DTHEv2 driver
+Date: Wed, 10 Sep 2025 14:46:53 +0530
+Message-ID: <20250910100742.3747614-2-t-pratham@ti.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250910100742.3747614-1-t-pratham@ti.com>
 References: <20250910100742.3747614-1-t-pratham@ti.com>
@@ -65,257 +65,183 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add support for CTR mode of operation for AES algorithm in the AES
+Add support for XTS mode of operation for AES algorithm in the AES
 Engine of the DTHEv2 hardware cryptographic engine.
 
 Signed-off-by: T Pratham <t-pratham@ti.com>
 ---
  drivers/crypto/ti/Kconfig         |  1 +
- drivers/crypto/ti/dthev2-aes.c    | 80 +++++++++++++++++++++++++++++--
- drivers/crypto/ti/dthev2-common.c | 19 ++++++++
- drivers/crypto/ti/dthev2-common.h | 15 ++++++
- 4 files changed, 110 insertions(+), 5 deletions(-)
+ drivers/crypto/ti/dthev2-aes.c    | 73 ++++++++++++++++++++++++++++++-
+ drivers/crypto/ti/dthev2-common.h |  8 +++-
+ 3 files changed, 80 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/ti/Kconfig b/drivers/crypto/ti/Kconfig
-index bdb7f652e093..b36733a8c734 100644
+index 38d22cab05a9..bdb7f652e093 100644
 --- a/drivers/crypto/ti/Kconfig
 +++ b/drivers/crypto/ti/Kconfig
 @@ -6,6 +6,7 @@ config CRYPTO_DEV_TI_DTHEV2
  	select CRYPTO_SKCIPHER
  	select CRYPTO_ECB
  	select CRYPTO_CBC
-+	select CRYPTO_CTR
- 	select CRYPTO_XTS
++	select CRYPTO_XTS
  	help
  	  This enables support for the TI DTHE V2 hw cryptography engine
+ 	  which can be found on TI K3 SOCs. Selecting this enables use
 diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index 21e7e5b8d6da..07787f0ae4fd 100644
+index 0431a36d8c4a..21e7e5b8d6da 100644
 --- a/drivers/crypto/ti/dthev2-aes.c
 +++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -63,6 +63,7 @@
+@@ -25,6 +25,7 @@
+ 
+ // AES Engine
+ #define DTHE_P_AES_BASE		0x7000
++
+ #define DTHE_P_AES_KEY1_0	0x0038
+ #define DTHE_P_AES_KEY1_1	0x003C
+ #define DTHE_P_AES_KEY1_2	0x0030
+@@ -33,6 +34,16 @@
+ #define DTHE_P_AES_KEY1_5	0x002C
+ #define DTHE_P_AES_KEY1_6	0x0020
+ #define DTHE_P_AES_KEY1_7	0x0024
++
++#define DTHE_P_AES_KEY2_0	0x0018
++#define DTHE_P_AES_KEY2_1	0x001C
++#define DTHE_P_AES_KEY2_2	0x0010
++#define DTHE_P_AES_KEY2_3	0x0014
++#define DTHE_P_AES_KEY2_4	0x0008
++#define DTHE_P_AES_KEY2_5	0x000C
++#define DTHE_P_AES_KEY2_6	0x0000
++#define DTHE_P_AES_KEY2_7	0x0004
++
+ #define DTHE_P_AES_IV_IN_0	0x0040
+ #define DTHE_P_AES_IV_IN_1	0x0044
+ #define DTHE_P_AES_IV_IN_2	0x0048
+@@ -52,6 +63,7 @@
  enum aes_ctrl_mode_masks {
  	AES_CTRL_ECB_MASK = 0x00,
  	AES_CTRL_CBC_MASK = BIT(5),
-+	AES_CTRL_CTR_MASK = BIT(6),
- 	AES_CTRL_XTS_MASK = BIT(12) | BIT(11),
++	AES_CTRL_XTS_MASK = BIT(12) | BIT(11),
  };
  
-@@ -74,6 +75,8 @@ enum aes_ctrl_mode_masks {
- #define DTHE_AES_CTRL_KEYSIZE_24B		BIT(4)
- #define DTHE_AES_CTRL_KEYSIZE_32B		(BIT(3) | BIT(4))
- 
-+#define DTHE_AES_CTRL_CTR_WIDTH_128B		(BIT(7) | BIT(8))
-+
- #define DTHE_AES_CTRL_SAVE_CTX_SET		BIT(29)
- 
- #define DTHE_AES_CTRL_OUTPUT_READY		BIT_MASK(0)
-@@ -131,6 +134,15 @@ static int dthe_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key, unsig
+ #define DTHE_AES_CTRL_MODE_CLEAR_MASK		~GENMASK(28, 5)
+@@ -119,6 +131,22 @@ static int dthe_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key, unsig
  	return dthe_aes_setkey(tfm, key, keylen);
  }
  
-+static int dthe_aes_ctr_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
++static int dthe_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
 +{
 +	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
 +
-+	ctx->aes_mode = DTHE_AES_CTR;
++	if (keylen != 2 * AES_KEYSIZE_128 &&
++	    keylen != 2 * AES_KEYSIZE_192 &&
++	    keylen != 2 * AES_KEYSIZE_256)
++		return -EINVAL;
 +
-+	return dthe_aes_setkey(tfm, key, keylen);
++	ctx->aes_mode = DTHE_AES_XTS;
++	ctx->keylen = keylen / 2;
++	memcpy(ctx->key, key, keylen);
++
++	return 0;
 +}
 +
- static int dthe_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -206,6 +218,10 @@ static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
- 	case DTHE_AES_CBC:
- 		ctrl_val |= AES_CTRL_CBC_MASK;
- 		break;
-+	case DTHE_AES_CTR:
-+		ctrl_val |= AES_CTRL_CTR_MASK;
-+		ctrl_val |= DTHE_AES_CTRL_CTR_WIDTH_128B;
-+		break;
- 	case DTHE_AES_XTS:
- 		ctrl_val |= AES_CTRL_XTS_MASK;
- 		break;
-@@ -246,6 +262,9 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
- 	int src_mapped_nents;
- 	int dst_mapped_nents;
+ static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
+ 				  struct dthe_aes_req_ctx *rctx,
+ 				  u32 *iv_in)
+@@ -141,6 +169,24 @@ static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
+ 		writel_relaxed(ctx->key[7], aes_base_reg + DTHE_P_AES_KEY1_7);
+ 	}
  
-+	u8 pad_buf[AES_BLOCK_SIZE] = {0};
-+	int pad_len = 0;
++	if (ctx->aes_mode == DTHE_AES_XTS) {
++		size_t key2_offset = ctx->keylen / sizeof(u32);
 +
- 	bool diff_dst;
- 	enum dma_data_direction src_dir, dst_dir;
- 
-@@ -265,6 +284,29 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
- 	aes_irqenable_val |= DTHE_AES_IRQENABLE_EN_ALL;
- 	writel_relaxed(aes_irqenable_val, aes_base_reg + DTHE_P_AES_IRQENABLE);
- 
-+	if (ctx->aes_mode == DTHE_AES_CTR) {
-+		/*
-+		 * CTR mode can operate on any input length, but the hardware
-+		 * requires input length to be a multiple of the block size.
-+		 * We need to handle the padding in the driver.
-+		 */
-+		if (req->cryptlen % AES_BLOCK_SIZE) {
-+			/* Need to create a new SG list with padding */
-+			pad_len = ALIGN(req->cryptlen, AES_BLOCK_SIZE) - req->cryptlen;
-+			struct scatterlist *sg;
++		writel_relaxed(ctx->key[key2_offset + 0], aes_base_reg + DTHE_P_AES_KEY2_0);
++		writel_relaxed(ctx->key[key2_offset + 1], aes_base_reg + DTHE_P_AES_KEY2_1);
++		writel_relaxed(ctx->key[key2_offset + 2], aes_base_reg + DTHE_P_AES_KEY2_2);
++		writel_relaxed(ctx->key[key2_offset + 3], aes_base_reg + DTHE_P_AES_KEY2_3);
 +
-+			src = kmalloc_array((src_nents + 1), sizeof(*src), GFP_KERNEL);
-+			if (!src) {
-+				ret = -ENOMEM;
-+				goto aes_alloc_err;
-+			}
-+			sg_init_table(src, src_nents + 1);
-+			sg = dthe_copy_sg(src, req->src, req->cryptlen);
-+			sg_set_buf(sg, pad_buf, pad_len);
-+			src_nents++;
++		if (ctx->keylen > AES_KEYSIZE_128) {
++			writel_relaxed(ctx->key[key2_offset + 4], aes_base_reg + DTHE_P_AES_KEY2_4);
++			writel_relaxed(ctx->key[key2_offset + 5], aes_base_reg + DTHE_P_AES_KEY2_5);
++		}
++		if (ctx->keylen == AES_KEYSIZE_256) {
++			writel_relaxed(ctx->key[key2_offset + 6], aes_base_reg + DTHE_P_AES_KEY2_6);
++			writel_relaxed(ctx->key[key2_offset + 7], aes_base_reg + DTHE_P_AES_KEY2_7);
 +		}
 +	}
 +
- 	if (src == dst) {
- 		diff_dst = false;
- 		src_dir = DMA_BIDIRECTIONAL;
-@@ -281,7 +323,7 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
- 	src_mapped_nents = dma_map_sg(tx_dev, src, src_nents, src_dir);
- 	if (src_mapped_nents == 0) {
- 		ret = -EINVAL;
--		goto aes_err;
-+		goto aes_map_src_err;
+ 	if (rctx->enc)
+ 		ctrl_val |= DTHE_AES_CTRL_DIR_ENC;
+ 
+@@ -160,6 +206,9 @@ static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
+ 	case DTHE_AES_CBC:
+ 		ctrl_val |= AES_CTRL_CBC_MASK;
+ 		break;
++	case DTHE_AES_XTS:
++		ctrl_val |= AES_CTRL_XTS_MASK;
++		break;
  	}
  
- 	if (!diff_dst) {
-@@ -293,7 +335,7 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
- 		if (dst_mapped_nents == 0) {
- 			dma_unmap_sg(tx_dev, src, src_nents, src_dir);
- 			ret = -EINVAL;
--			goto aes_err;
-+			goto aes_map_dst_err;
- 		}
- 	}
- 
-@@ -356,11 +398,16 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
- 	}
- 
- aes_prep_err:
--	dma_unmap_sg(tx_dev, src, src_nents, src_dir);
- 	if (dst_dir != DMA_BIDIRECTIONAL)
- 		dma_unmap_sg(rx_dev, dst, dst_nents, dst_dir);
-+aes_map_dst_err:
-+	dma_unmap_sg(tx_dev, src, src_nents, src_dir);
- 
--aes_err:
-+aes_map_src_err:
-+	if (ctx->aes_mode == DTHE_AES_CTR && req->cryptlen % AES_BLOCK_SIZE)
-+		kfree(src);
-+
-+aes_alloc_err:
- 	local_bh_disable();
- 	crypto_finalize_skcipher_request(dev_data->engine, req, ret);
- 	local_bh_enable();
-@@ -375,9 +422,10 @@ static int dthe_aes_crypt(struct skcipher_request *req)
- 
- 	/*
- 	 * If data is not a multiple of AES_BLOCK_SIZE, need to return -EINVAL
-+	 * except in CTR mode, where any length is supported.
- 	 * If data length input is zero, no need to do any operation.
- 	 */
--	if (req->cryptlen % AES_BLOCK_SIZE)
-+	if (req->cryptlen % AES_BLOCK_SIZE && ctx->aes_mode != DTHE_AES_CTR)
- 		return -EINVAL;
- 
- 	if (req->cryptlen == 0)
-@@ -447,6 +495,28 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 	if (iv_in) {
+@@ -397,7 +446,29 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 			.cra_module		= THIS_MODULE,
  		},
  		.op.do_one_request = dthe_aes_run,
- 	}, /* CBC AES */
+-	} /* CBC AES */
++	}, /* CBC AES */
 +	{
 +		.base.init			= dthe_cipher_init_tfm,
-+		.base.setkey			= dthe_aes_ctr_setkey,
++		.base.setkey			= dthe_aes_xts_setkey,
 +		.base.encrypt			= dthe_aes_encrypt,
 +		.base.decrypt			= dthe_aes_decrypt,
-+		.base.min_keysize		= AES_MIN_KEY_SIZE,
-+		.base.max_keysize		= AES_MAX_KEY_SIZE,
++		.base.min_keysize		= AES_MIN_KEY_SIZE * 2,
++		.base.max_keysize		= AES_MAX_KEY_SIZE * 2,
 +		.base.ivsize			= AES_IV_SIZE,
 +		.base.base = {
-+			.cra_name		= "ctr(aes)",
-+			.cra_driver_name	= "ctr-aes-dthev2",
++			.cra_name		= "xts(aes)",
++			.cra_driver_name	= "xts-aes-dthev2",
 +			.cra_priority		= 299,
 +			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
 +						  CRYPTO_ALG_KERN_DRIVER_ONLY,
 +			.cra_alignmask		= AES_BLOCK_SIZE - 1,
-+			.cra_blocksize		= 1,
++			.cra_blocksize		= AES_BLOCK_SIZE,
 +			.cra_ctxsize		= sizeof(struct dthe_tfm_ctx),
 +			.cra_reqsize		= sizeof(struct dthe_aes_req_ctx),
 +			.cra_module		= THIS_MODULE,
 +		},
 +		.op.do_one_request = dthe_aes_run,
-+	}, /* CTR AES */
- 	{
- 		.base.init			= dthe_cipher_init_tfm,
- 		.base.setkey			= dthe_aes_xts_setkey,
-diff --git a/drivers/crypto/ti/dthev2-common.c b/drivers/crypto/ti/dthev2-common.c
-index c39d37933b9e..a2ad79bec105 100644
---- a/drivers/crypto/ti/dthev2-common.c
-+++ b/drivers/crypto/ti/dthev2-common.c
-@@ -48,6 +48,25 @@ struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx)
- 	return dev_data;
- }
++	}, /* XTS AES */
+ };
  
-+struct scatterlist *dthe_copy_sg(struct scatterlist *dst,
-+				 struct scatterlist *src,
-+				 int buflen)
-+{
-+	struct scatterlist *from_sg, *to_sg;
-+	int sglen;
-+
-+	for (to_sg = dst, from_sg = src; buflen && from_sg; buflen -= sglen) {
-+		sglen = from_sg->length;
-+		if (sglen > buflen)
-+			sglen = buflen;
-+		sg_set_buf(to_sg, sg_virt(from_sg), sglen);
-+		from_sg = sg_next(from_sg);
-+		to_sg = sg_next(to_sg);
-+	}
-+
-+	return to_sg;
-+}
-+
- static int dthe_dma_init(struct dthe_data *dev_data)
- {
- 	int ret;
+ int dthe_register_aes_algs(void)
 diff --git a/drivers/crypto/ti/dthev2-common.h b/drivers/crypto/ti/dthev2-common.h
-index e2d901e70fcc..629f45a3ab33 100644
+index 68c94acda8aa..e2d901e70fcc 100644
 --- a/drivers/crypto/ti/dthev2-common.h
 +++ b/drivers/crypto/ti/dthev2-common.h
-@@ -36,6 +36,7 @@
+@@ -27,10 +27,16 @@
+ 
+ #define DTHE_REG_SIZE		4
+ #define DTHE_DMA_TIMEOUT_MS	2000
++/*
++ * Size of largest possible key (of all algorithms) to be stored in dthe_tfm_ctx
++ * This is currently the keysize of XTS-AES-256 which is 512 bits (64 bytes)
++ */
++#define DTHE_MAX_KEYSIZE	(AES_KEYSIZE_256 * 2)
+ 
  enum dthe_aes_mode {
  	DTHE_AES_ECB = 0,
  	DTHE_AES_CBC,
-+	DTHE_AES_CTR,
- 	DTHE_AES_XTS,
++	DTHE_AES_XTS,
  };
  
-@@ -101,6 +102,20 @@ struct dthe_aes_req_ctx {
- 
- struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx);
- 
-+/**
-+ * dthe_copy_sg - Copy sg entries from src to dst
-+ * @dst: Destination sg to be filled
-+ * @src: Source sg to be copied from
-+ * @buflen: Number of bytes to be copied
-+ *
-+ * Description:
-+ *   Copy buflen bytes of data from src to dst.
-+ *
-+ **/
-+struct scatterlist *dthe_copy_sg(struct scatterlist *dst,
-+				 struct scatterlist *src,
-+				 int buflen);
-+
- int dthe_register_aes_algs(void);
- void dthe_unregister_aes_algs(void);
+ /* Driver specific struct definitions */
+@@ -77,7 +83,7 @@ struct dthe_list {
+ struct dthe_tfm_ctx {
+ 	struct dthe_data *dev_data;
+ 	unsigned int keylen;
+-	u32 key[AES_KEYSIZE_256 / sizeof(u32)];
++	u32 key[DTHE_MAX_KEYSIZE / sizeof(u32)];
+ 	enum dthe_aes_mode aes_mode;
+ };
  
 -- 
 2.43.0
