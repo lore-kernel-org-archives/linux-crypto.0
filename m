@@ -1,65 +1,66 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301B62D7394
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 19:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3513325B69F
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 19:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757531987; cv=none; b=d4iX0RK8rhyZ8oW5elYtpLXvPX+itvBzinptD8C/HUG2rkCEqLZ5LvOa6DKO+ImEU7JgAANoMsyK36gcKnI5NeIr/4XB8gggcDCGhowmm+6YiaYMS3mLv8D71xvoRKLxyCwux1nthUgPHDvXYkskGzpwxKRuiLA5GS4Ml8pCtdg=
+	t=1757532136; cv=none; b=XiCqdLGTeDxsekdfjtzlXRVzVSJSBdSUVL1t2k8SSt/+04p4LMl4jMwtZOkbm+LBm7FcK042U8G6zDinUhPzkOY4I6csLDaDw8zk13dhfl3OBkk2aCT+IBprzyNeNZ0nhuV8Vnyu18y5SeNxIESV2gajhL/hbDpLragbggTAXXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757531987; c=relaxed/simple;
-	bh=qWueF42qwhO9/d4nulib23wqx9pkPXKoj4m8Enmbuag=;
+	s=arc-20240116; t=1757532136; c=relaxed/simple;
+	bh=WwPKx+F4nZMQQvbxZ+yQ8ep3mrkTsl/KPllHb3TKExM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HzbbMa6+JBC2B5KuI1rc2FmY+MGP2OQIoLcu0RqCzW3TrgBN2l77P6FnfHfZzdAjFY8gjOr+06vo7e7+icZ2FQE+2h2MuU8en1rwCeHLoOtLOSCD7kq8XzxVk5hszFNIN8skkkT3cAEq1VvYjVDz2wbkLBSfgnCgB+690/rBlY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RfNgrym+; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=u0NTVpwbeaud6cDa0UU5PRyOrVaXgugjZv+jTFYi00GWYPzj4Dz4xqlumKbkeb61T2TYlJwQTuDyYmhoueM+q7NvJle5f81AWC+9L+q2jl/ECSLLAKS9ZuhaGZX/7V2ApFcMWuaftFbYB8BeUzIYmAmTHl0QqVyh4CKPbIJxLok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qcRnjS9M; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RfNgrym+"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4fbb90b453so11285248a12.2
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 12:19:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qcRnjS9M"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e6e71f7c6so7413807b3a.0
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 12:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757531985; x=1758136785; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757532134; x=1758136934; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VN/rggrH4digs9qBWZB1KbUoy16EnGUVMJIJH5xmr7E=;
-        b=RfNgrym+tYbAWnYqtJTcZU17SPyOHkyDR4Q5WilKy+MgLEmjCxARjXZRNEeDw+nTOf
-         XiRqj5L1LiJ6rHiYlXRxQfeo8paRSrLdnZWx848T7JO1535Dct1jL/7p6+jX+XpFmbxt
-         pGgHzWt1iMMUOq/j5hSyN689xrDHYz/vMzvnnEhJZ7Dsu82dCCiVrGidifWSBC25Vr+O
-         TBqUqz36L1+1uP9nRnWVP34biDAZdDmV27rEoWKOpRc1jNArTsL6X4FgriH3ZMDTuS1E
-         pZnl3LOgiLhyIqFIOf+7OaSnvnVCvcPEVM7JS4LBoU/mvKWpgvgwJCR349lplWoE2/q9
-         /WvA==
+        bh=F4vLrrazh5OqKjK4hFSlEDxoFcTPUg28TR1gqdyw1Q0=;
+        b=qcRnjS9MJqZEViulTai0j6vXBzSS0GrLbHGqMizQNiHxQSwrind1D0bCdB39sOEpgq
+         k70KqIOer3dUHPDM5gXP0XG90WyxaNMZ+yMMLw2C1D9kdCzEsvZ7YGQk7TMmS76t7K9h
+         72MfqjO1K3Nf4FIFcQPuKn8xvj/mEtNTzzb9FYm1nw4anMUMa9ldctsi5Sbw0fTrvdap
+         550h6kff1tTOeXBcrU3mg4xZq99rfjYe8U0ANHSBVjYU6mDdseVL+JEz+oY/FtuGCGXe
+         WTzmrpHUjcxAWPhY2ZNbdNTLFDAlwI44PCUPqYRdCb2N1aKIEEOcwnPfe/j50myvDwsa
+         cLWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757531985; x=1758136785;
+        d=1e100.net; s=20230601; t=1757532134; x=1758136934;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VN/rggrH4digs9qBWZB1KbUoy16EnGUVMJIJH5xmr7E=;
-        b=hkKF1c0kiipUzOFBWHfrMiCLgUf7pfvSYeTmkiRsPQ69oU6r6NAnFtzQv9JnuiiGgK
-         3w6+GpyixmhlniYABfhkMJrYohT84wnw/PKaxeq2725MR+cYkMmefVkCemSoLKQOzbwX
-         3/QKBZ/+U07vdfV/n9DLjmYuSfzKbgZUvWnTYXyv54KCra+jUbjALkImMvXe5k1wo/tB
-         Z2BwZXMdspHr0QTjGicQYfpyXqi5+PDCxbb+ZT8MApqHOUPTwMtnvbbqSZ2VVUAYreWO
-         nKIXVHSuAHGkCecrVwDz2NO/tZZEKGODtfFRDs81efPS54wL7bpaX42ywEqEpy4Rs9ft
-         fjsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVymwemwAOq4pNd/j6G3T+lwwElM0DDZ67CRtIkQtkykLYBjymSb+6SjNMXkXNIUjSKw6mSYq6GpsBp7J0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIW/OjiD7YHu/Rg2TDcOulu7J5MJiU/SifZeAyptkXN+sSffbG
-	4hZbUQfD71jXy8yMosuUbU0Gu75bdyMzPDO4CnWWPm2aoCkOuPaWxp8UsI8m7JXLdrEP0gU4aHV
-	H2WdlbQ==
-X-Google-Smtp-Source: AGHT+IHX7UynOVRpi3If/F9N5K/tO9bGneP/KTRE0HxApIqGpBDwKgUOwjvsvvWc3ktK/GVAM4OFjpZif2s=
-X-Received: from pfqr14.prod.google.com ([2002:aa7:9ece:0:b0:772:750f:4e23])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d9c:b0:245:fdeb:d264
- with SMTP id adf61e73a8af0-2533e576707mr26771465637.12.1757531985441; Wed, 10
- Sep 2025 12:19:45 -0700 (PDT)
-Date: Wed, 10 Sep 2025 12:19:43 -0700
-In-Reply-To: <ad3dfe758bdd63256a32d9c626b8fbcb2390f26e.1755897933.git.thomas.lendacky@amd.com>
+        bh=F4vLrrazh5OqKjK4hFSlEDxoFcTPUg28TR1gqdyw1Q0=;
+        b=k0E6QjVZ4Endu7qyVpZOtbT8z44wD4Pl+KvWrPm1Z4ExdMUt7Krxanf4fm3faBEQDE
+         NQpGLPyZTT8gZdOg3qXtFncYVgDBdSUJMCQLRfUTHPo9O8DdH5Icr+qgDYQLtmuXK5VE
+         zcoNU2/gf4EXksjD7VB17hiCFqgRx+xJEGDha0fm+uWDguoBHctAnBEJ+htlhu6WHt8L
+         C37QgxjkqA6vrAQ/HeFKdbGBrchJvmS/HirMdw+qzSQePlPggfql4AKCxup4ZASl73l4
+         +Bej0HgyxECaeiuBx5goIl290fgWIcm+FGSMNc8v0xexuq4/0A02/O5K7I4DMjaCjlzd
+         NX8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUqqmRz9b1wdzp2oMKtruamnKmTkzK7uoM6AlxnhRHgjYlSbt62QrNz8F+5Bjq70iW8wBXAWrmMRC9WBus=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA/jhRt9fvEz2cvBk5Mg+YjZv+/+vjKWygd0Latloksd50Jhuy
+	RPO+ja6ytaupiA1k+gs2jEQNeqMaQa1outA3/5f4QMhkz3pmr0Uxjp044xdzz0TcWhMXl2GPpt4
+	L0yx4Tw==
+X-Google-Smtp-Source: AGHT+IGnPIfSXQ9s+kXYoHDkwl7tzKe5qzsmRWKh5g9jlXevcrlzn/w3fY5nOgrSlDdLhh33sh8KTyaeSf4=
+X-Received: from pgcy10.prod.google.com ([2002:a63:7d0a:0:b0:b4c:7355:9e4b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7f8f:b0:247:f6ab:69cc
+ with SMTP id adf61e73a8af0-2534054a415mr21214365637.26.1757532134403; Wed, 10
+ Sep 2025 12:22:14 -0700 (PDT)
+Date: Wed, 10 Sep 2025 12:22:12 -0700
+In-Reply-To: <e9014e7dfd7f7c040c5d0eefb1f6c20a3c35d9e5.1755897933.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1755897933.git.thomas.lendacky@amd.com> <ad3dfe758bdd63256a32d9c626b8fbcb2390f26e.1755897933.git.thomas.lendacky@amd.com>
-Message-ID: <aMHPT4AbJrGRNv05@google.com>
-Subject: Re: [RFC PATCH 1/4] KVM: SEV: Publish supported SEV-SNP policy bits
+References: <cover.1755897933.git.thomas.lendacky@amd.com> <e9014e7dfd7f7c040c5d0eefb1f6c20a3c35d9e5.1755897933.git.thomas.lendacky@amd.com>
+Message-ID: <aMHP5EO-ucJGdHXz@google.com>
+Subject: Re: [RFC PATCH 3/4] crypto: ccp - Add an API to return the supported
+ SEV-SNP policy bits
 From: Sean Christopherson <seanjc@google.com>
 To: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
@@ -71,39 +72,21 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Aug 22, 2025, Tom Lendacky wrote:
-> Define the set of policy bits that KVM currently knows as not requiring
-> any implementation support within KVM. Provide this value to userspace
-> via the KVM_GET_DEVICE_ATTR ioctl.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/svm/sev.c          | 11 ++++++++++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 0f15d683817d..90e9c4551fa6 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -468,6 +468,7 @@ struct kvm_sync_regs {
->  /* vendor-specific groups and attributes for system fd */
->  #define KVM_X86_GRP_SEV			1
->  #  define KVM_X86_SEV_VMSA_FEATURES	0
-> +#  define KVM_X86_SNP_POLICY_BITS	1
+> @@ -1014,6 +1031,7 @@ void *snp_alloc_firmware_page(gfp_t mask);
+>  void snp_free_firmware_page(void *addr);
+>  void sev_platform_shutdown(void);
+>  bool sev_is_snp_ciphertext_hiding_supported(void);
+> +u64 sev_get_snp_policy_bits(void);
 >  
->  struct kvm_vmx_nested_state_data {
->  	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 2fbdebf79fbb..7e6ce092628a 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -78,6 +78,8 @@ static u64 sev_supported_vmsa_features;
->  					 SNP_POLICY_MASK_DEBUG		| \
->  					 SNP_POLICY_MASK_SINGLE_SOCKET)
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
 >  
-> +static u64 snp_supported_policy_bits;
+> @@ -1052,6 +1070,8 @@ static inline void sev_platform_shutdown(void) { }
+>  
+>  static inline bool sev_is_snp_ciphertext_hiding_supported(void) { return false; }
+>  
+> +static inline u64 sev_get_snp_policy_bits(void) { return 0; }
 
-This can be __ro_after_init.  Hmm, off topic, but I bet we can give most of the
-variables confifugred by sev_hardware_setup() the same treatment.  And really
-off topic, I have a patch somewhere to convert a bunch of KVM variables from
-__read_mostly to __ro_after_init...
+I don't think you need a stub (the ciphertext hiding one should have been omitted
+too).  arch/x86/kvm/svm/sev.c depends on CONFIG_KVM_AMD_SEV=y, which in turn
+depends on CRYPTO_DEV_SP_PSP=y, so nothing will ever actually need the stub.  I
+bet the same holds true for the majority of these stubs.
