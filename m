@@ -1,165 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BCF30FC3D
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 18:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301B62D7394
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 19:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757527629; cv=none; b=sTNcIOTBdhhxoaZJ4jS/pEn1f//JD/vhL+VVRhKQYVcXU+W7XQnHt3f+vl0BgQ+OtC59qZOTFyiZo536V04J4yPB71E9uGxpCnP/dtyjDALULRRpsMBRSdEKkAqoZwQyCDVQgTiWs+Aw0ZO/WcLsul+2Fzme8Q+FgmCSwJ+6630=
+	t=1757531987; cv=none; b=d4iX0RK8rhyZ8oW5elYtpLXvPX+itvBzinptD8C/HUG2rkCEqLZ5LvOa6DKO+ImEU7JgAANoMsyK36gcKnI5NeIr/4XB8gggcDCGhowmm+6YiaYMS3mLv8D71xvoRKLxyCwux1nthUgPHDvXYkskGzpwxKRuiLA5GS4Ml8pCtdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757527629; c=relaxed/simple;
-	bh=cIbwctSJfT99Cq2+n4aveUZUbtagwWAT91PLR5ehZqQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SgroYC44F9jk18qZRQRlGji6Qe1e7/EN6fiFb05TshB5rn5RyJdn2aTxVFus9/1+WlXWELN1oTRB+au4eDUOXJuLBZEYjKbsd/YHyvs3w/5KYtwSLkk2KYylA7AxYrlIRqmywzcOz3fAib6pZgELg1B0tGr69AZRMi44gXqR8yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtVywVRS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757531987; c=relaxed/simple;
+	bh=qWueF42qwhO9/d4nulib23wqx9pkPXKoj4m8Enmbuag=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HzbbMa6+JBC2B5KuI1rc2FmY+MGP2OQIoLcu0RqCzW3TrgBN2l77P6FnfHfZzdAjFY8gjOr+06vo7e7+icZ2FQE+2h2MuU8en1rwCeHLoOtLOSCD7kq8XzxVk5hszFNIN8skkkT3cAEq1VvYjVDz2wbkLBSfgnCgB+690/rBlY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RfNgrym+; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtVywVRS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3661DC4CEF0
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 18:07:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757527629;
-	bh=cIbwctSJfT99Cq2+n4aveUZUbtagwWAT91PLR5ehZqQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=KtVywVRSHXQlziZxuY5FyagmrxIEkI+04T1qajkMmTFFWZa1AEwkThBXnEuxujUjF
-	 8Eu1daQJCkradPMFolFRDbHAbkLhGhi2wUzt2qtMAGqbicKLopgYZYx2ubgsjD1Cih
-	 eEYcxMSAeJb2na61BNldSNnP1k7YUbMKoZAwg88b0nA/VsigrLBo26TsIAXwVsD7wu
-	 xxnWDH8G1JNnOXlKgnO5z/96w2zgCqQ3hj0Y+XfhN0kP0TsIndNnjWtU5gb0M89IB7
-	 51wmc6MiUnfP51SgU/CHKLNBJ2i0Jiasf2xfrx3BwAZY2c6HKy9bFzOHSi11d/OGSy
-	 vFcQs/giWUr2A==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-33730e1cda7so65358881fa.3
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 11:07:09 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxkidZaj+VW2CR9aFGhOLkXLHI2E7QoGrLEs9xeJOgR5A+Ux+TX
-	09mvbVRS97snkVQd6TNxRsVQGBCU0S9IP7mV6p38IWTDak/8n63xe3N8CD0NX/KqC+AkeZ1UrWu
-	RPPYjWX7CPWTnO3WJs+miQs7bsQ4w/to=
-X-Google-Smtp-Source: AGHT+IHdTkLkZuoNfpN7V1ggtjfQwJwdDYEJZA0njYUunjF9mvsn9P/subhzLpQwCDwPO1WtGamKFAi40PeZPGEiVRY=
-X-Received: by 2002:a05:651c:208e:b0:338:53d:3518 with SMTP id
- 38308e7fff4ca-33b58cc0944mr33835321fa.39.1757527627519; Wed, 10 Sep 2025
- 11:07:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RfNgrym+"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4fbb90b453so11285248a12.2
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2025 12:19:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757531985; x=1758136785; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VN/rggrH4digs9qBWZB1KbUoy16EnGUVMJIJH5xmr7E=;
+        b=RfNgrym+tYbAWnYqtJTcZU17SPyOHkyDR4Q5WilKy+MgLEmjCxARjXZRNEeDw+nTOf
+         XiRqj5L1LiJ6rHiYlXRxQfeo8paRSrLdnZWx848T7JO1535Dct1jL/7p6+jX+XpFmbxt
+         pGgHzWt1iMMUOq/j5hSyN689xrDHYz/vMzvnnEhJZ7Dsu82dCCiVrGidifWSBC25Vr+O
+         TBqUqz36L1+1uP9nRnWVP34biDAZdDmV27rEoWKOpRc1jNArTsL6X4FgriH3ZMDTuS1E
+         pZnl3LOgiLhyIqFIOf+7OaSnvnVCvcPEVM7JS4LBoU/mvKWpgvgwJCR349lplWoE2/q9
+         /WvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757531985; x=1758136785;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VN/rggrH4digs9qBWZB1KbUoy16EnGUVMJIJH5xmr7E=;
+        b=hkKF1c0kiipUzOFBWHfrMiCLgUf7pfvSYeTmkiRsPQ69oU6r6NAnFtzQv9JnuiiGgK
+         3w6+GpyixmhlniYABfhkMJrYohT84wnw/PKaxeq2725MR+cYkMmefVkCemSoLKQOzbwX
+         3/QKBZ/+U07vdfV/n9DLjmYuSfzKbgZUvWnTYXyv54KCra+jUbjALkImMvXe5k1wo/tB
+         Z2BwZXMdspHr0QTjGicQYfpyXqi5+PDCxbb+ZT8MApqHOUPTwMtnvbbqSZ2VVUAYreWO
+         nKIXVHSuAHGkCecrVwDz2NO/tZZEKGODtfFRDs81efPS54wL7bpaX42ywEqEpy4Rs9ft
+         fjsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVymwemwAOq4pNd/j6G3T+lwwElM0DDZ67CRtIkQtkykLYBjymSb+6SjNMXkXNIUjSKw6mSYq6GpsBp7J0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIW/OjiD7YHu/Rg2TDcOulu7J5MJiU/SifZeAyptkXN+sSffbG
+	4hZbUQfD71jXy8yMosuUbU0Gu75bdyMzPDO4CnWWPm2aoCkOuPaWxp8UsI8m7JXLdrEP0gU4aHV
+	H2WdlbQ==
+X-Google-Smtp-Source: AGHT+IHX7UynOVRpi3If/F9N5K/tO9bGneP/KTRE0HxApIqGpBDwKgUOwjvsvvWc3ktK/GVAM4OFjpZif2s=
+X-Received: from pfqr14.prod.google.com ([2002:aa7:9ece:0:b0:772:750f:4e23])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d9c:b0:245:fdeb:d264
+ with SMTP id adf61e73a8af0-2533e576707mr26771465637.12.1757531985441; Wed, 10
+ Sep 2025 12:19:45 -0700 (PDT)
+Date: Wed, 10 Sep 2025 12:19:43 -0700
+In-Reply-To: <ad3dfe758bdd63256a32d9c626b8fbcb2390f26e.1755897933.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1757392363.git.herbert@gondor.apana.org.au> <45f65a569f76a7212057f65ca800206d8f76b2e1.1757392363.git.herbert@gondor.apana.org.au>
-In-Reply-To: <45f65a569f76a7212057f65ca800206d8f76b2e1.1757392363.git.herbert@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 10 Sep 2025 20:06:56 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXG1ES-vvUWfJz9Kefp84vCDcT+H0=RP5a8tRq5nrhddmg@mail.gmail.com>
-X-Gm-Features: Ac12FXxfncSDw6BNlfbqbOSjahzO8h3gGGvPf9GmpRrrzj8WLLVEUlNm44giz3U
-Message-ID: <CAMj1kXG1ES-vvUWfJz9Kefp84vCDcT+H0=RP5a8tRq5nrhddmg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] crypto: ahash - Allow async stack requests when specified
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <cover.1755897933.git.thomas.lendacky@amd.com> <ad3dfe758bdd63256a32d9c626b8fbcb2390f26e.1755897933.git.thomas.lendacky@amd.com>
+Message-ID: <aMHPT4AbJrGRNv05@google.com>
+Subject: Re: [RFC PATCH 1/4] KVM: SEV: Publish supported SEV-SNP policy bits
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-crypto@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 9 Sept 2025 at 07:01, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> As it stands stack requests are forbidden for async algorithms
-> because of the inability to perform DMA on stack memory.
->
-
-That is not the only reason.
-
-> However, some async algorithms do not perform DMA and are able
-> to handle stack requests.  Allow such uses by addnig a new type
-> bit CRYPTO_AHASH_ALG_STACK_REQ.  When it is set on the algorithm
-> stack requests will be allowed even if the algorithm is asynchronous.
->
-
-If the algorithm is asynchronous, it may return -EINPROGRESS to the
-caller, and proceed to access the request structure after that. So
-this only works if the caller waits on the completion, and does not
-return (and release its stack frame) before the request is completed.
-
-This makes this feature rather limited in usefulness imo - truly async
-hashes are only performant (if they ever are) if many requests can be
-in flight at the same time, and using stack requests makes that
-impossible.
-
-
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Fri, Aug 22, 2025, Tom Lendacky wrote:
+> Define the set of policy bits that KVM currently knows as not requiring
+> any implementation support within KVM. Provide this value to userspace
+> via the KVM_GET_DEVICE_ATTR ioctl.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  crypto/ahash.c                 | 22 ++++++++++++++++++----
->  include/crypto/internal/hash.h |  3 +++
->  2 files changed, 21 insertions(+), 4 deletions(-)
->
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index a227793d2c5b..5ea72eb2ea91 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -49,6 +49,20 @@ static inline bool crypto_ahash_need_fallback(struct crypto_ahash *tfm)
->                CRYPTO_ALG_NEED_FALLBACK;
->  }
->
-> +static inline bool crypto_ahash_stack_req_ok(struct ahash_request *req)
-> +{
-> +       struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-> +
-> +       if (!ahash_req_on_stack(req))
-> +               return true;
-> +
-> +       if (!ahash_is_async(tfm))
-> +               return true;
-> +
-> +       return crypto_ahash_alg(tfm)->halg.base.cra_flags &
-> +              CRYPTO_AHASH_ALG_STACK_REQ;
-> +}
-> +
->  static inline void ahash_op_done(void *data, int err,
->                                  int (*finish)(struct ahash_request *, int))
->  {
-> @@ -376,7 +390,7 @@ int crypto_ahash_init(struct ahash_request *req)
->                 return crypto_shash_init(prepare_shash_desc(req, tfm));
->         if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->                 return -ENOKEY;
-> -       if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +       if (crypto_ahash_stack_req_ok(req))
->                 return -EAGAIN;
->         if (crypto_ahash_block_only(tfm)) {
->                 u8 *buf = ahash_request_ctx(req);
-> @@ -451,7 +465,7 @@ int crypto_ahash_update(struct ahash_request *req)
->
->         if (likely(tfm->using_shash))
->                 return shash_ahash_update(req, ahash_request_ctx(req));
-> -       if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +       if (crypto_ahash_stack_req_ok(req))
->                 return -EAGAIN;
->         if (!crypto_ahash_block_only(tfm))
->                 return ahash_do_req_chain(req, &crypto_ahash_alg(tfm)->update);
-> @@ -531,7 +545,7 @@ int crypto_ahash_finup(struct ahash_request *req)
->
->         if (likely(tfm->using_shash))
->                 return shash_ahash_finup(req, ahash_request_ctx(req));
-> -       if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +       if (crypto_ahash_stack_req_ok(req))
->                 return -EAGAIN;
->         if (!crypto_ahash_alg(tfm)->finup)
->                 return ahash_def_finup(req);
-> @@ -569,7 +583,7 @@ int crypto_ahash_digest(struct ahash_request *req)
->
->         if (likely(tfm->using_shash))
->                 return shash_ahash_digest(req, prepare_shash_desc(req, tfm));
-> -       if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +       if (crypto_ahash_stack_req_ok(req))
->                 return -EAGAIN;
->         if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->                 return -ENOKEY;
-> diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-> index 6ec5f2f37ccb..79899d36032b 100644
-> --- a/include/crypto/internal/hash.h
-> +++ b/include/crypto/internal/hash.h
-> @@ -23,6 +23,9 @@
->  /* This bit is set by the Crypto API if export_core is not supported. */
->  #define CRYPTO_AHASH_ALG_NO_EXPORT_CORE        0x08000000
->
-> +/* This bit is set by the Crypto API if stack requests are supported. */
-> +#define CRYPTO_AHASH_ALG_STACK_REQ     0x10000000
-> +
->  #define HASH_FBREQ_ON_STACK(name, req) \
->          char __##name##_req[sizeof(struct ahash_request) + \
->                              MAX_SYNC_HASH_REQSIZE] CRYPTO_MINALIGN_ATTR; \
-> --
-> 2.39.5
->
->
+>  arch/x86/include/uapi/asm/kvm.h |  1 +
+>  arch/x86/kvm/svm/sev.c          | 11 ++++++++++-
+>  2 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 0f15d683817d..90e9c4551fa6 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -468,6 +468,7 @@ struct kvm_sync_regs {
+>  /* vendor-specific groups and attributes for system fd */
+>  #define KVM_X86_GRP_SEV			1
+>  #  define KVM_X86_SEV_VMSA_FEATURES	0
+> +#  define KVM_X86_SNP_POLICY_BITS	1
+>  
+>  struct kvm_vmx_nested_state_data {
+>  	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 2fbdebf79fbb..7e6ce092628a 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -78,6 +78,8 @@ static u64 sev_supported_vmsa_features;
+>  					 SNP_POLICY_MASK_DEBUG		| \
+>  					 SNP_POLICY_MASK_SINGLE_SOCKET)
+>  
+> +static u64 snp_supported_policy_bits;
+
+This can be __ro_after_init.  Hmm, off topic, but I bet we can give most of the
+variables confifugred by sev_hardware_setup() the same treatment.  And really
+off topic, I have a patch somewhere to convert a bunch of KVM variables from
+__read_mostly to __ro_after_init...
