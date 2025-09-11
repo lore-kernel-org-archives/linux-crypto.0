@@ -1,195 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDA22F5B;
-	Thu, 11 Sep 2025 20:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5AB21D5BC
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Sep 2025 21:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757620884; cv=none; b=HD3rDiYHEUqu6fDDtk1LnqurZ5RYyMBiwGoHHgmb1swHZDWiLk7Jhttf03rU59ogWFKaVWbGkUAJXdI+4uxPYOvUYmrin/XcuIqRQod7U2z1LaBvM7NRSMPI34EapBWKGEyx5kB5Um1GW/XeL+uwOAQBjZXwUCUyFwLNyikJjrU=
+	t=1757626706; cv=none; b=ml0py7gPskwb5xWpYXKlGEK0iP25FfP/YRYuwIb+pXFfRxgBS27otcWe0zQ14Rff3dpC6oLl+7wfrzPEYbm62T4Fetatta/LhrGUicU45FEE2itmsB7yy3+98ENkebCPLOepraZ0c5wEQahe9S0E58jfCuq1SFCiTHI0mle3l6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757620884; c=relaxed/simple;
-	bh=Qzr8/A76jVpLTPp7Q8t0kpdacUM2Z39JWFofjP91B14=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bp9+DDJtBqtTLwgTfN0Rlh8QaRkYqr43XqrWnE68Zgg9rLspp+JizoE63c7W2DP9LLXQW0I7qo8BFeINBL4/RYu8cBZsHO/pavtB5t7f8BPY3zRkx8QjnUXxC56AsyYjW6AC8fSaqzwp3OC3S/gGBuVbJ9Fpy+Um/YLM5bv+Huo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewFZ9qag; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewFZ9qag"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD03C4CEF0;
-	Thu, 11 Sep 2025 20:01:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757620884;
-	bh=Qzr8/A76jVpLTPp7Q8t0kpdacUM2Z39JWFofjP91B14=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ewFZ9qagCkWWOHKPaGk6FaTxU5ux9FIoq6PyNr8Fy6dPmX9Plw+T+vEF0IKs2Yk21
-	 FwwZK3n1I1YgZ4ads7hk4DkckZABdgaO5XH36n/HGWnejFWMxAe/Mb9bnCgtDkPL6p
-	 np1pp99COBJ126YsrmYi+16heXaWI2WG5aDeF5jOJN7RRrACiIcOmKPwoWTpIA+kyF
-	 a62IfYq6Nsa/IoelpYUTHQRBJdRJPSI9ICwPOsYP9PVy4GqP1zq9qhg7jlJ3i1pDSD
-	 VQ0syg/ISBnCURXztv8dh3/qAfsUzkRmaqahJOKEnwzmq3d5cdpm3KF+QpYDyja32y
-	 5Z6xup9Vn60Gw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: Alexander Potapenko <glider@google.com>,
-	Marco Elver <elver@google.com>,
-	kasan-dev@googlegroups.com
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] kmsan: Fix out-of-bounds access to shadow memory
-Date: Thu, 11 Sep 2025 12:58:58 -0700
-Message-ID: <20250911195858.394235-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757626706; c=relaxed/simple;
+	bh=IZbaO6g6SAscLT4vUqffFhHnBdMEV4zjAbkOHPMt+uE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=S5WJx6X9IdyRJYn98pVAzgIjtFcVhgNNTJ1QFxrnsMHaFMVbL1KxpcXBeR0+3zSq6IEZuP2wY9mPGUGSdwNxxbaeWndsjGZCPAYBvnFnFrQZMva/TgejjVYdZ6RKDCN5cNzbYi+PYNjPYiWPxuhLhOabqis2AH3bRmH6qbFRziI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-40194dd544eso15997425ab.2
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Sep 2025 14:38:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757626704; x=1758231504;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xUMF+4VQq9rzXdYWjwLdgCiiF7EYCYCawpQEVgSeP2g=;
+        b=ma7o3/wogiVDiVKwvIfVC+SDtuuu+67Bnt7WvsFQBcEoCecHTLCIOILsRHZlpfWIR4
+         4sixA7K6+0b2nCXgf8sSnvqftP3euJULeF4zFEFw8+IMCKGShCayEAkP7uQvxwUgbIZi
+         m64ovbBgvbTkIhZ1u8mtdeB7wAUEncmeHmQMepGAdd23Q8LWlXxjsJw3g3zIO+sv6izs
+         dRy6TOOx74jzi7+HB+a1jKbjczdtFDlqRM1PuTBH4duF4rAKy2acs3z6BEQaFZ5wgIxc
+         YYMmYMmqFnJNRH9YUd9sjhA0AHTR77m89ax/2dR7WwZn6gJHWExp91nObCHCWDcvqDN8
+         Lzkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtS5hfYdAZjQ3sc1YR1RM0deAuwO0yebfP2FpOaqgI1oIcDGik12dTD2VZEglg0A1/pXZGk2cxjBGXV7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgBWY3P53UGTBRGMR6Mu3K+TXDzg+IhkZOlz0rVXHG52/sTVzz
+	H6Seqitvfpt54h0UOsIbduYauUSITRsMQb3uBue32uJ9uVBF2Uw/w3ASkHGK9EQAnxkH2VkOSzT
+	Lu5QnQXxup4A9OtYgNN8fDINzd4UJx9zoLNgGQPw0T1Bq6jSCLq9/7E5Ja24=
+X-Google-Smtp-Source: AGHT+IG8Sx0rNbrDTIEYkb3uBm+qNubemryNApZ2m8Lif56ufjYH44PRgREVlBtdedBFy226ib9AcAl0mvnEKFZ5cYbcg+J5kshg
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:3783:b0:41f:6b74:e245 with SMTP id
+ e9e14a558f8ab-420a4268885mr16635975ab.23.1757626704173; Thu, 11 Sep 2025
+ 14:38:24 -0700 (PDT)
+Date: Thu, 11 Sep 2025 14:38:24 -0700
+In-Reply-To: <6860c5d3.a00a0220.c1739.0009.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c34150.050a0220.3c6139.0045.GAE@google.com>
+Subject: Re: [syzbot] [crypto?] possible deadlock in padata_do_serial
+From: syzbot <syzbot+bd936ccd4339cea66e6b@syzkaller.appspotmail.com>
+To: daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Running sha224_kunit on a KMSAN-enabled kernel results in a crash in
-kmsan_internal_set_shadow_origin():
+syzbot has found a reproducer for the following issue on:
 
-    BUG: unable to handle page fault for address: ffffbc3840291000
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 1810067 P4D 1810067 PUD 192d067 PMD 3c17067 PTE 0
-    Oops: 0000 [#1] SMP NOPTI
-    CPU: 0 UID: 0 PID: 81 Comm: kunit_try_catch Tainted: G                 N  6.17.0-rc3 #10 PREEMPT(voluntary)
-    Tainted: [N]=TEST
-    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-    RIP: 0010:kmsan_internal_set_shadow_origin+0x91/0x100
-    [...]
-    Call Trace:
-    <TASK>
-    __msan_memset+0xee/0x1a0
-    sha224_final+0x9e/0x350
-    test_hash_buffer_overruns+0x46f/0x5f0
-    ? kmsan_get_shadow_origin_ptr+0x46/0xa0
-    ? __pfx_test_hash_buffer_overruns+0x10/0x10
-    kunit_try_run_case+0x198/0xa00
+HEAD commit:    02ffd6f89c50 Merge tag 'bpf-fixes' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=124f6934580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c1f4909b95fa1ed
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd936ccd4339cea66e6b
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12e46b12580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1598a47c580000
 
-This occurs when memset() is called on a buffer that is not 4-byte
-aligned and extends to the end of a guard page, i.e. the next page is
-unmapped.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-02ffd6f8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/56f3c676fa83/vmlinux-02ffd6f8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b17e95e57bfa/bzImage-02ffd6f8.xz
 
-The bug is that the loop at the end of
-kmsan_internal_set_shadow_origin() accesses the wrong shadow memory
-bytes when the address is not 4-byte aligned.  Since each 4 bytes are
-associated with an origin, it rounds the address and size so that it can
-access all the origins that contain the buffer.  However, when it checks
-the corresponding shadow bytes for a particular origin, it incorrectly
-uses the original unrounded shadow address.  This results in reads from
-shadow memory beyond the end of the buffer's shadow memory, which
-crashes when that memory is not mapped.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bd936ccd4339cea66e6b@syzkaller.appspotmail.com
 
-To fix this, correctly align the shadow address before accessing the 4
-shadow bytes corresponding to each origin.
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+kworker/u32:5/96 is trying to acquire lock:
+ffffe8fefc53dbc8 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffe8fefc53dbc8 (&pd_list->lock){+...}-{3:3}, at: padata_find_next kernel/padata.c:256 [inline]
+ffffe8fefc53dbc8 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:309 [inline]
+ffffe8fefc53dbc8 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x7bd/0xd20 kernel/padata.c:379
 
-Fixes: 2ef3cec44c60 ("kmsan: do not wipe out origin when doing partial unpoisoning")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+but task is already holding lock:
+ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:300 [inline]
+ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x697/0xd20 kernel/padata.c:379
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&pd_list->lock);
+  lock(&pd_list->lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+3 locks held by kworker/u32:5/96:
+ #0: ffff888022495148 ((wq_completion)pdecrypt_parallel){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3211
+ #1: ffffc9000167fd10 ((work_completion)(&pw->pw_work)){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3212
+ #2: ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #2: ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: padata_reorder kernel/padata.c:300 [inline]
+ #2: ffffe8fefc53dc18 (&pd_list->lock){+...}-{3:3}, at: padata_do_serial+0x697/0xd20 kernel/padata.c:379
+
+stack backtrace:
+CPU: 2 UID: 0 PID: 96 Comm: kworker/u32:5 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: pdecrypt_parallel padata_parallel_worker
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_deadlock_bug+0x1e9/0x240 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain kernel/locking/lockdep.c:3895 [inline]
+ __lock_acquire+0x1133/0x1ce0 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ padata_find_next kernel/padata.c:256 [inline]
+ padata_reorder kernel/padata.c:309 [inline]
+ padata_do_serial+0x7bd/0xd20 kernel/padata.c:379
+ pcrypt_aead_dec+0x5b/0x70 crypto/pcrypt.c:140
+ padata_parallel_worker+0x62/0xb0 kernel/padata.c:157
+ process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3236
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c2/0x780 kernel/kthread.c:463
+ ret_from_fork+0x56a/0x730 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
-
-v2: Added test case to kmsan_test.
-
- mm/kmsan/core.c       | 10 +++++++---
- mm/kmsan/kmsan_test.c | 16 ++++++++++++++++
- 2 files changed, 23 insertions(+), 3 deletions(-)
-
-diff --git a/mm/kmsan/core.c b/mm/kmsan/core.c
-index 1ea711786c522..8bca7fece47f0 100644
---- a/mm/kmsan/core.c
-+++ b/mm/kmsan/core.c
-@@ -193,11 +193,12 @@ depot_stack_handle_t kmsan_internal_chain_origin(depot_stack_handle_t id)
- 
- void kmsan_internal_set_shadow_origin(void *addr, size_t size, int b,
- 				      u32 origin, bool checked)
- {
- 	u64 address = (u64)addr;
--	u32 *shadow_start, *origin_start;
-+	void *shadow_start;
-+	u32 *aligned_shadow, *origin_start;
- 	size_t pad = 0;
- 
- 	KMSAN_WARN_ON(!kmsan_metadata_is_contiguous(addr, size));
- 	shadow_start = kmsan_get_metadata(addr, KMSAN_META_SHADOW);
- 	if (!shadow_start) {
-@@ -212,13 +213,16 @@ void kmsan_internal_set_shadow_origin(void *addr, size_t size, int b,
- 		}
- 		return;
- 	}
- 	__memset(shadow_start, b, size);
- 
--	if (!IS_ALIGNED(address, KMSAN_ORIGIN_SIZE)) {
-+	if (IS_ALIGNED(address, KMSAN_ORIGIN_SIZE)) {
-+		aligned_shadow = shadow_start;
-+	} else {
- 		pad = address % KMSAN_ORIGIN_SIZE;
- 		address -= pad;
-+		aligned_shadow = shadow_start - pad;
- 		size += pad;
- 	}
- 	size = ALIGN(size, KMSAN_ORIGIN_SIZE);
- 	origin_start =
- 		(u32 *)kmsan_get_metadata((void *)address, KMSAN_META_ORIGIN);
-@@ -228,11 +232,11 @@ void kmsan_internal_set_shadow_origin(void *addr, size_t size, int b,
- 	 * and unconditionally overwrite the old origin slot.
- 	 * If the new origin is zero, overwrite the old origin slot iff the
- 	 * corresponding shadow slot is zero.
- 	 */
- 	for (int i = 0; i < size / KMSAN_ORIGIN_SIZE; i++) {
--		if (origin || !shadow_start[i])
-+		if (origin || !aligned_shadow[i])
- 			origin_start[i] = origin;
- 	}
- }
- 
- struct page *kmsan_vmalloc_to_page_or_null(void *vaddr)
-diff --git a/mm/kmsan/kmsan_test.c b/mm/kmsan/kmsan_test.c
-index c6c5b2bbede0c..902ec48b1e3e6 100644
---- a/mm/kmsan/kmsan_test.c
-+++ b/mm/kmsan/kmsan_test.c
-@@ -554,10 +554,25 @@ static void test_memcpy_initialized_gap(struct kunit *test)
- 
- DEFINE_TEST_MEMSETXX(16)
- DEFINE_TEST_MEMSETXX(32)
- DEFINE_TEST_MEMSETXX(64)
- 
-+/* Test case: ensure that KMSAN does not access shadow memory out of bounds. */
-+static void test_memset_on_guarded_buffer(struct kunit *test)
-+{
-+	void *buf = vmalloc(PAGE_SIZE);
-+
-+	kunit_info(test,
-+		   "memset() on ends of guarded buffer should not crash\n");
-+
-+	for (size_t size = 0; size <= 128; size++) {
-+		memset(buf, 0xff, size);
-+		memset(buf + PAGE_SIZE - size, 0xff, size);
-+	}
-+	vfree(buf);
-+}
-+
- static noinline void fibonacci(int *array, int size, int start)
- {
- 	if (start < 2 || (start == size))
- 		return;
- 	array[start] = array[start - 1] + array[start - 2];
-@@ -675,10 +690,11 @@ static struct kunit_case kmsan_test_cases[] = {
- 	KUNIT_CASE(test_memcpy_aligned_to_unaligned),
- 	KUNIT_CASE(test_memcpy_initialized_gap),
- 	KUNIT_CASE(test_memset16),
- 	KUNIT_CASE(test_memset32),
- 	KUNIT_CASE(test_memset64),
-+	KUNIT_CASE(test_memset_on_guarded_buffer),
- 	KUNIT_CASE(test_long_origin_chain),
- 	KUNIT_CASE(test_stackdepot_roundtrip),
- 	KUNIT_CASE(test_unpoison_memory),
- 	KUNIT_CASE(test_copy_from_kernel_nofault),
- 	{},
-
-base-commit: e59a039119c3ec241228adf12dca0dd4398104d0
--- 
-2.51.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
