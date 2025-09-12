@@ -1,66 +1,66 @@
 Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA19311944
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71839311C20
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757686836; cv=none; b=aLZwUHhyerg+A0B3UJqI3ifIs99BXafX4n5pZNO2EYJpD/RrDDpoX6nqE1Kx6YukJuEw9N5UPZ6GBHcDFBem+E8FM5m6GhLyEjD+kASKjfqEWCOedSKNkUVUuNuKITC9TZp9o9bQdeAHvOnYb25+TaaYHvh8jskRhGzHqX6PoqM=
+	t=1757686847; cv=none; b=clMJZdI3GmUUXvTV1Ia0wFauWadk//ANUSUttW6NtIXoqfzGuSNZ0vHVpQn/iSYekw2eaGsevCz89NXkpg9tHXtIQNYtbY17iBn0XnmRihAq6+ouHLWT1dMx7rrqpxUaTA1s9kbNtN5AUUOT+WXng81wQoVKviXl4bOIqQy6DnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757686836; c=relaxed/simple;
-	bh=2w0FFD+KJCS9EuSPd15eTcwD4ELNwuxCIigJRl2uqjo=;
+	s=arc-20240116; t=1757686847; c=relaxed/simple;
+	bh=jr9vPW7mvkeyuX3NZoS0Z1cuJUAyUe184FUn8+qt+kA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=agr9PWTSPvOUOHIKyG7HtDpY8NtZCu6hKyPRhIM+RC1TyWqT9ZQfLel9fd7zVWtKj3Cu7r5YdgDH1w1AF97XuQptAdV9abgBuzEiR862uBexo5mTODhfG+IMpgYpEndbV1/72b/sC+pUN5Y2nR1deyIEkOFZtM6v2q+CEo2p+Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2Q/sAge; arc=none smtp.client-ip=209.85.128.42
+	 In-Reply-To:Content-Type; b=feqSyUa35uPmt9qFqlFPd991Z3Xae5mCqbRimq73q9kJfr12/7uNUFoAf69wkdRi8JWXlKSWyEpGXqR59wKcpTpDO27aX9tYOvRUstAMeH00EU2lqiIkJVlbl8zKInqaNPf9eUARHoNsd80AGj+lkqNIIQtviUWLbtPBQyvTsJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dJxTEXYv; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2Q/sAge"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45ddc7d5731so14373825e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:20:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dJxTEXYv"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45df7dc1b98so12255525e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:20:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757686833; x=1758291633; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757686844; x=1758291644; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tdtO58sGe5Xc/wBa6IQvluyE3D0fIIRJts8BH3BBGAI=;
-        b=g2Q/sAgeX/npTzDfUj9TbfuFC2yQ1zZ+ZgmI1dpq8xP8e3O2FzekiAH+bOXeivWvR9
-         nXUrs4bPe9KBSXM1XpCcsBV7RU6+9mOYmIFepibvjkJkVZfaY2gEGmEDRmABABaFonqg
-         RVWXzNWRcJpUljg/MiNHIOzmlZVAmX9mIrtMH3x6TI5A9STjj14DC1aSE7Jlp4GjwloZ
-         7TtInFbwlXxoEqucvu6t2Wzex6xSwaW8YApqosCvM577758ooeD8m6VTOkH0ZitKH6RR
-         6drxdX5MwaTh6MZ8w60FFlgJXCohwBoqdzNOIiZVK+dr3JL0OwRAi1841lzf9XzKrxQR
-         9XiA==
+        bh=lthXnEjSvsHbapckxRc04Ei+riXtEdUUKc9+Bt6m9I4=;
+        b=dJxTEXYv9qM45gz9E4H1eXJZh1H+7cmokkEtN25rupjfnViARND4C7m9jB1SGRSg8w
+         sPPM6aFtzdADEqEPOKsHRkI6F4Z/KLnMw+OYAQftQVNWoEDD3ks8ILT88tbuN4votYIh
+         ED2ICF1MCr09JjU7+fkd0/YrjwWC8Tn7d45ezt7NHPkwV0D7aPuXNrh+DK8XNaeYAjYl
+         5Nse31W9gFH9v6N+G+77+QTANe365aVZw7awvoFsOcPN2yN3V10L/HqQDK0hXvRuRkEA
+         cang+PoStY9SHwW4pAoQurdb7X8E9WkmvTWkyrnHY9JybvPHnc4NGc/PnlKhfbBDZXVJ
+         HADw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757686833; x=1758291633;
+        d=1e100.net; s=20230601; t=1757686844; x=1758291644;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tdtO58sGe5Xc/wBa6IQvluyE3D0fIIRJts8BH3BBGAI=;
-        b=f1FGjsVBJdVG5WFNB6y/lTPsGFnQU/Ek56qR2X+34Q2+ftE07qX1z6pZo+P13KoFW+
-         prVuzB+xVv6QLdru9o/5UHaDAJ+En94NYLXBuhoKiW8P8YmC2u21uZBhLJDPuas16VIf
-         aq0kkqjlNFJl6EsXgGf2bt8eC+SRTdWJBwCxeM1jpGF8HMFUyxAGLVqYZR3F1agjMEuh
-         dJHgYQOFHtWQXHqvW+WZoTV7IK6cdkOoOFDDYCRZHeedyuXaP4mHzmHIr8jIJzTQtTrY
-         kY4brE2gMbqd/Ecywt8l80aG0wmW9O4jQ185nNsNGgpjQhuSNKAOWz3B9ho8K40ubSX+
-         ZwRw==
-X-Forwarded-Encrypted: i=1; AJvYcCViik8pGRanV+NCFm1SL9zY962UrqE9B1t4NmJplKzUqPqL5SSuAj7qOYjcrjBAl0PMhpgyjtWOkQrdmik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwHJrF1hdCe5/8HLI4bwzRuXZ/TJNIi78PXxM/aV6brw5Ob7OY
-	uJNTDFAIFTzMs86zFr9QMgTcq/+Ky0853HQ4/jaJZK/2JCt4eHd82GRw
-X-Gm-Gg: ASbGncv/DcJPvojkkYAFpRrV2jUgXqkVL13lpiST9z0ZJ3jg0ZyagWH/CgDgX07CC69
-	WXm+9mvOqBvVwb11GjcbgdEfLPWSR423ZoAr9WLnUucIbutKoHXHewcF0ZCS2Nn+OmfcuOIhi8W
-	jkNDzEm1KPo8RPBRE3KTgUcTHzaI1m+SWVFDnBWGzmNBk5fTGSqMmXiyuBBtgyxnvey7Ea0e2bA
-	fwLZFS0T2S70Rs2AlPn0YqPmGopFPXb2skmKe2scvCwVYx0r8DNuuz3RfELPtT/fkiv1V1UJ4k2
-	vuo0WGEHHERziUpi48HgX1klHDc1xofsivROep0hHrgupnRaCGGCsE+TwnoYL+Mp+Xc1WG4hLB2
-	KYTgxxCDLHnVjxYzkjCydFP4OlV+LA9XmJlU2nFQ/gg==
-X-Google-Smtp-Source: AGHT+IFyYXkkR4g3z3IADJ2sI1GciXV959gj5Co89s2pEoz3DeE+MIgrxhl6XFjG4+ecyKdiYbDvCw==
-X-Received: by 2002:a05:600c:4454:b0:45b:97d9:4127 with SMTP id 5b1f17b1804b1-45f211e53femr32589265e9.1.1757686832393;
-        Fri, 12 Sep 2025 07:20:32 -0700 (PDT)
+        bh=lthXnEjSvsHbapckxRc04Ei+riXtEdUUKc9+Bt6m9I4=;
+        b=ZkHA2HMTEfLrXnFQHDvLp0MKL6mcCR3lpi8lopFfE7k6zCvzOQezeGeKTe1YzidCk0
+         ZnrMbsfSMEDiRek0ha71drViNdAB7HPzqcDK6ct+Lkr+qjmtgE24ekg08Eyuat2pYGNw
+         JfkdkLGvPnTMWpEMWzB7jNK/iA8rkPk7D6EoGSh3kbpxJoO6UVt61yNsxy5keSiGHp6M
+         g83UMk9BMEBoXeZjkogOw8Me6kcQ6cj4358Eh/yWw/WBRpdJCY8WZ5aBVvNCVzzjZiR4
+         N9yJD/SHZl/YVA2/DiKpBYywgYn3nrQZZgS0lx3IbbOLt/x9lIQ/q18ymSdk4H+6yWmS
+         A9kw==
+X-Forwarded-Encrypted: i=1; AJvYcCXMNdPK2EYnfb/Y2BP7718LplCN0pW0RG5ykPMRXeHydpipjIdrM6BjqcVJhjIeTdY2874o2k/WOZtoiOw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWgUOU+CyKeJ7CyCXdz2SpKSayknRb452aOmgwi33dJy1/My/R
+	SdoSxOJV7KQ2Idyp6M5diuMdO9ikMTgR0ABL1MWywllyxy5AGGB13MSx
+X-Gm-Gg: ASbGnct594wCGaAxgyNfzmhnLt9Fca0Gcqh8ja2tsOyqhh617VzakbSBPiIyi0Xx4HB
+	Ewkx4DAJHPuGSydV8g53F1w4V0NB5R2DSosmes2Lj0HQhEMjenVucEeVQT6oI+8MisSlfF4u+ja
+	XbIPQqZz/4DHqG9dNa64DxXgeCpq3PCND89ZH9ML3M3OSsBiOc0UkRSoFCGFxBSDIPiRu2YKaot
+	U4i7bXSiuwjhFKGequ/cZZBiLLgBazWGcv/0OSzC6SIlWNg1mvIhVgECQVKRsmWYNpEIKsW13xx
+	qylqqbjypsyzgKeRXnYOUNo4Kp2DWDk+ZiL4neoisNFDdcYlLbAql6ID1cDM+EHHlT2Rkvnwr1S
+	+hpn5J0IykSUbYYir0FSFdA6+8wRCHb0oCIPuMdrfzsbIt7BPbK48
+X-Google-Smtp-Source: AGHT+IFqrxlW5v3Vy46wYJ2sE/wtXVC2vb0Byrr7NgxSOjj9QTmCoTJsKTMUA+e1n+AH0Kve613Tyw==
+X-Received: by 2002:a05:600c:6b06:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-45f211d0795mr28833695e9.10.1757686842371;
+        Fri, 12 Sep 2025 07:20:42 -0700 (PDT)
 Received: from [192.168.2.177] ([91.116.220.47])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e03729c76sm64384065e9.6.2025.09.12.07.20.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037d7595sm63116405e9.24.2025.09.12.07.20.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 07:20:31 -0700 (PDT)
-Message-ID: <947b1c19-e218-4478-bb9e-8b6174815f05@gmail.com>
-Date: Fri, 12 Sep 2025 16:12:55 +0200
+        Fri, 12 Sep 2025 07:20:41 -0700 (PDT)
+Message-ID: <3b3197b7-3e60-4a1a-b6bb-3a0a0ef1fdd4@gmail.com>
+Date: Fri, 12 Sep 2025 16:13:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 23/38] arm64: dts: mediatek: mt7986a: Fix PCI-Express
- T-PHY node address
+Subject: Re: [PATCH 24/38] arm64: dts: mediatek: mt7986a-bpi-r3: Fix SFP I2C
+ node names
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  linux-mediatek@lists.infradead.org, robh@kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
@@ -93,7 +93,7 @@ Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
  linux-gpio@vger.kernel.org, linux-remoteproc@vger.kernel.org,
  linux-sound@vger.kernel.org
 References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-24-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-25-angelogioacchino.delregno@collabora.com>
 Content-Language: en-US, ca-ES, es-ES
 From: Matthias Brugger <matthias.bgg@gmail.com>
 Autocrypt: addr=matthias.bgg@gmail.com; keydata=
@@ -139,56 +139,55 @@ Autocrypt: addr=matthias.bgg@gmail.com; keydata=
  +zFJv9fVUpo/bjePOL4PMP1y+PYrp4PmPmRwoklBpy1ep8m8XURv46fGUHUEIsTwPWs2Q87k
  7vjYyrcyAOarX2X5pvMQvpAMADGf2Z3wrCsDdG25w2HztweUNd9QEprtJG8GNNzMOD4cQ82T
  a7eGvPWPeXauWJDLVR9jHtWT9Ot3BQgmApLxACvwvD1a69jaFKov28SPHxUCQ9Y1Y/Ct
-In-Reply-To: <20250724083914.61351-24-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-25-angelogioacchino.delregno@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 24/07/2025 10:38, AngeloGioacchino Del Regno wrote:
-> The PCIe TPHY is under the soc bus, which provides MMIO, and all
-> nodes under that must use the bus, otherwise those would clearly
-> be out of place.
+On 24/07/2025 10:39, AngeloGioacchino Del Regno wrote:
+> The binding wants the node to be named "i2c-number", alternatively
+> "i2c@address", but those are named "i2c-gpio-number" instead.
 > 
-> Add ranges to the PCIe tphy and assign the address to the main
-> node to silence a dtbs_check warning, and fix the children to
-> use the MMIO range of t-phy.
+> Rename those to i2c-0, i2c-1 to adhere to the binding and suppress
+> dtbs_check warnings.
 > 
-> Fixes: 963c3b0c47ec ("arm64: dts: mediatek: fix t-phy unit name")
-> Fixes: 918aed7abd2d ("arm64: dts: mt7986: add pcie related device nodes")
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 Applied, thanks
 
 > ---
->   arch/arm64/boot/dts/mediatek/mt7986a.dtsi | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
+>   arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts | 8 ++------
+>   1 file changed, 2 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a.dtsi b/arch/arm64/boot/dts/mediatek/mt7986a.dtsi
-> index 559990dcd1d1..3211905b6f86 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt7986a.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt7986a.dtsi
-> @@ -428,16 +428,16 @@ pcie_intc: interrupt-controller {
->   			};
->   		};
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts
+> index ed79ad1ae871..6d2762866a1a 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts
+> @@ -64,23 +64,19 @@ wps-key {
+>   	};
 >   
-> -		pcie_phy: t-phy {
-> +		pcie_phy: t-phy@11c00000 {
->   			compatible = "mediatek,mt7986-tphy",
->   				     "mediatek,generic-tphy-v2";
-> -			ranges;
-> -			#address-cells = <2>;
-> -			#size-cells = <2>;
-> +			ranges = <0 0 0x11c00000 0x20000>;
-> +			#address-cells = <1>;
-> +			#size-cells = <1>;
->   			status = "disabled";
+>   	/* i2c of the left SFP cage (wan) */
+> -	i2c_sfp1: i2c-gpio-0 {
+> +	i2c_sfp1: i2c-0 {
+>   		compatible = "i2c-gpio";
+>   		sda-gpios = <&pio 16 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+>   		scl-gpios = <&pio 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+>   		i2c-gpio,delay-us = <2>;
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>   	};
 >   
-> -			pcie_port: pcie-phy@11c00000 {
-> -				reg = <0 0x11c00000 0 0x20000>;
-> +			pcie_port: pcie-phy@0 {
-> +				reg = <0 0x20000>;
->   				clocks = <&clk40m>;
->   				clock-names = "ref";
->   				#phy-cells = <1>;
+>   	/* i2c of the right SFP cage (lan) */
+> -	i2c_sfp2: i2c-gpio-1 {
+> +	i2c_sfp2: i2c-1 {
+>   		compatible = "i2c-gpio";
+>   		sda-gpios = <&pio 18 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+>   		scl-gpios = <&pio 19 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+>   		i2c-gpio,delay-us = <2>;
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>   	};
+>   
+>   	leds {
 
