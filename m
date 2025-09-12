@@ -1,108 +1,160 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB444188580;
-	Fri, 12 Sep 2025 15:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081D3314A94
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 18:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757692770; cv=none; b=PP3yLMDV7wuouHW37F6GDwxgcF1JUvldSjtluGHd0D3WGHHG8/5aYUpzOaaUW6p5Kmzsyxn/W+HHX/73YsCS4CWPhsCpT7G9Np0xHqrb9hevHHL3EJ4cDJfo9mcziHah6kPZwJo0kQPFFatd8mWXPkWJous2fPEs9OsTI+qKe04=
+	t=1757702048; cv=none; b=hrJApEdVRDuimWde4I+tVveP+MHXhfSgODAP2J/JQHvCqM+FHxgv96MOIgmxtyxHPNxsol5C7xg4CQ40s+ma7Sf9QZAHWSmVXbWRiBhRgeJd3KkCDVR6QQ1sFs6sg2aTKKYf4bSGpGrH13aHyiO9cHK4Oj35j3biY1p3w4cY51I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757692770; c=relaxed/simple;
-	bh=GEBOk8PUOnHvSZXyPwd6N6SN/rdmFnYyQYQiSGsy8bE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNqYZX0vFBcq/ZO9Gd8N3BheEy7vWqIADigjRyj3t8OkIbU+AmtTK3P626vqmLf68z2ci67mbSTAywrW6hXSTnMsB9rTP+cZGK9uabrXPg1NTyViwdy6ipwQXO9E/brmX9oZdffyKzt+YVIFM5oht3opAZY5YsiXY+3J3j4D5Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=gsbdA/Oy; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1757702048; c=relaxed/simple;
+	bh=v5FVcC8hgZ/p+a0lbHORb4niU4q1wCJsNavaGkYebHY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FVjJxDS5PiokVakmp2P8TI9NxhbRDh3kaOrloXuH1byH9uNodDxYvaoIgXXcChuwZKLIedgoYjzygpjwhdFfrR4QG+yw+1Bw7FloARcSsbPomWruXQc4D5X6Q21ShX4TFiMS3kXbGumjbKrBN8w7AGx/xAwhmi3b3rH+iKdiBAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ta+7Z07a; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gsbdA/Oy"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2A48140E015C;
-	Fri, 12 Sep 2025 15:59:24 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id mifj5-GIQUtb; Fri, 12 Sep 2025 15:59:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1757692758; bh=Q7C0QzXqcbpFCbjIXqNbLP6tXQLFqk1MBSz9ZcxW/ag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gsbdA/OyMeaHLRBJCvpAZ2lYcfA+fT16HkNZShvgfymNgHta6fOp31XGfLoR4i2ij
-	 xi0rPSNAkwo7fvvVjiJ+7spgzg2oHvBaPTe0MsHXp/Ed/vRFBo2xENZezn25DgLfVh
-	 GbeS1KnDanVL0KeferUm19BagZi626XZ8GroPjWrc2CClpysWa00z+ChbEvrqsomzP
-	 FtWRQtoZC1o0KydH/WCfOB5nX0PVPLHxGvzJNWYnz5VAV7+KIP8fiPZhhs2k4+NXGG
-	 W+oXUFM84PA+1qciZS62ysQPhWcnKEt1e/WKIZ92AOIUMh+bfDGi4Fh5OcX03LTQ0E
-	 nSxW9g4Yuu5G8kxxOMDmsjFVrWwWh4+fOFcrzHVmFJBmFwTyG9e0AUtU9Qp3bhdu8F
-	 +L4gNQo0Y7jWT5YVRV8OyNWtJLDBZYwVDRsz725mpv8AzmDCaaUGsnKbi1tUyWitif
-	 SDhhaMJwo93yDt//a8jT5ghwZQONztKPe2dgaYikwOTo+r4+6mwkfBUQ7UP0I3Qnu0
-	 R+G0wZQPwUrI9pAW7WVz3RLFOvu8w7ZFHaxlL921I4HUzz0dCcBBMZ2WZiaozGIfql
-	 unPAvbmsN2Opc1jIFA4dlknstZMEko62GdxXK1kbk01IN47TzFdD1v6K0v4pEX93vu
-	 GwMabEI3lf+258cLMzN4Vwh0=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 3032640E0140;
-	Fri, 12 Sep 2025 15:58:58 +0000 (UTC)
-Date: Fri, 12 Sep 2025 17:58:52 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: seanjc@google.com
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
-	aik@amd.com, ardb@kernel.org, john.allen@amd.com,
-	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
- snp_leak_pages() API
-Message-ID: <20250912155852.GBaMRDPEhr2hbAXavs@fat_crate.local>
-References: <cover.1757543774.git.ashish.kalra@amd.com>
- <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ta+7Z07a"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-25c7a4859e0so16165715ad.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 11:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757702046; x=1758306846; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tlhPWLmUue00CiOxFvUNznMlr4ctvmMFViLBjGFh5aE=;
+        b=Ta+7Z07aX/XmKlaS6kgQniPSXSSse7gK2/vyNkgTaWHah41wCHrEypIOaGH3StoYQR
+         4+Dv8bw+Vdbo70b0smLqk7DIxK2b0KDi95R4TIEC1cthWlKz61nW2fj0vvbcbvAauDby
+         vR8v2nj3YcNejqWmbIsu07JLa+WUtNiQIRsLo23bBAC5BUQSHfweiUFg8vHLwdo9x4sZ
+         weMWSl07D1p72GoDxRi626LBielC8B52iLRp0yNemMIkOzl6/ZeOvjKhDOEH/hNkwmDf
+         bJimQQst9X6jarSlcgRrDoTMwPllvsSoa21HH/6Nh3hkT4qBQAuIJI2HQsrvLCa2YGWU
+         dlFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757702046; x=1758306846;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tlhPWLmUue00CiOxFvUNznMlr4ctvmMFViLBjGFh5aE=;
+        b=wY4763HuZg81vD5XL4QuJoV6NLw2xvPm2B42Qo5CsoRIv9nQ3XcAJNgjekzp1KAnlF
+         +ZEH07U077VfzqRxOSxP+yUvJYzlq8lorQp0AwXsuO+e2LfJaD4HV+9vKstzWY3Tcloq
+         IK1PNw/3XFw1F5xlCMglnlnTk4KkJe2rg7If2wKUwPzfEToyXCvnvqwGcf+3I9tqbjuB
+         T8AK7qItUaphyC0UkN8QiYOQh6nYPwlQO60221ViWigGrrk5Y9wYnqr+JiN701moki4g
+         rtcgOjW0wsrfikgdn/XK2SpcFL9GDXIXdVv7nAdlXGEUtjloymyvkNExy1y9EthBDjUC
+         qmyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsbJrT8p8pi5uJ6m8FrDs/ba/0h6DI6Pv6jbp0ZhS8s8s1HE4Tdpto2l9dggZNuapTVV0tVNTttLT9T6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxipADgTX0CDZnmLKOpT2zBG5lRFUSZeKgetSFDWL7kp8mZP4BI
+	QsdrshBzRTwPluX4HwXe5EdVHeVtWthHrnMLUj7ns/ONcpW3jlBkW2Y/7Oc2N3iCY7dDun4By/a
+	JFu1PYA==
+X-Google-Smtp-Source: AGHT+IFkjA4Yytqm3FFtm5CKt77K8SX2eP0ZGGmXPW8IcXnFSSTQ7TlT5fqN5rSSfLmzpZPc20T/4sMe+jo=
+X-Received: from pjbsu16.prod.google.com ([2002:a17:90b:5350:b0:32d:f25c:6a58])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3851:b0:329:8520:cee7
+ with SMTP id 98e67ed59e1d1-32de4c44ae9mr4236965a91.14.1757702046207; Fri, 12
+ Sep 2025 11:34:06 -0700 (PDT)
+Date: Fri, 12 Sep 2025 11:34:04 -0700
+In-Reply-To: <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+Mime-Version: 1.0
+References: <cover.1757543774.git.ashish.kalra@amd.com> <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+Message-ID: <aMRnnNVYBrasJnZF@google.com>
+Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	pbonzini@redhat.com, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org, 
+	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 10:55:24PM +0000, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> When leaking certain page types, such as Hypervisor Fixed (HV_FIXED)
-> pages, it does not make sense to dump RMP contents for the 2MB range of
-> the page(s) being leaked. In the case of HV_FIXED pages, this is not an
-> error situation where the surrounding 2MB page RMP entries can provide
-> debug information.
-> 
-> Add new __snp_leak_pages() API with dump_rmp bool parameter to support
-> continue adding pages to the snp_leaked_pages_list but not issue
-> dump_rmpentry().
-> 
-> Make snp_leak_pages() a wrapper for the common case which also allows
-> existing users to continue to dump RMP entries.
-> 
-> Suggested-by: Thomas Lendacky <Thomas.Lendacky@amd.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/include/asm/sev.h | 8 +++++++-
->  arch/x86/virt/svm/sev.c    | 7 ++++---
->  2 files changed, 11 insertions(+), 4 deletions(-)
+On Wed, Sep 10, 2025, Ashish Kalra wrote:
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 00475b814ac4..7a1ae990b15f 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -635,10 +635,15 @@ void snp_dump_hva_rmpentry(unsigned long address);
+>  int psmash(u64 pfn);
+>  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 asid, bo=
+ol immutable);
+>  int rmp_make_shared(u64 pfn, enum pg_level level);
+> -void snp_leak_pages(u64 pfn, unsigned int npages);
+> +void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp);
+>  void kdump_sev_callback(void);
+>  void snp_fixup_e820_tables(void);
+> =20
+> +static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+> +{
+> +	__snp_leak_pages(pfn, pages, true);
+> +}
+> +
+>  static inline void sev_evict_cache(void *va, int npages)
+>  {
+>  	volatile u8 val __always_unused;
+> @@ -668,6 +673,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, =
+enum pg_level level, u32 as
+>  	return -ENODEV;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return=
+ -ENODEV; }
+> +static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool d=
+ump_rmp) {}
 
-Sean, lemme know if I should carry this through tip.
+This stub is unnecessary.  As pointed out elsewhere[*], I'm pretty sure all=
+ these
+stubs are unnecessary.
 
-Or, if you wanna take it:
+Oof.  Even worse, the stubs appear to be actively hiding bugs.  The APIs ar=
+e
+guarded with CONFIG_KVM_AMD_SEV=3Dy, but **KVM** doesn't call any of these =
+outside
+of SEV code.  I.e. if *KVM* were the only user, the stubs would just be dea=
+d code.
 
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+But the below build failures show that they aren't dead code, which means t=
+hat
+kernels with CONFIG_KVM_AMD_SEV=3Dn will silently (until something explodes=
+) do the
+wrong thing, because the stubs are hiding the missing dependencies.
 
--- 
-Regards/Gruss,
-    Boris.
+arch/x86/boot/startup/sev-shared.c: In function =E2=80=98pvalidate_4k_page=
+=E2=80=99:
+arch/x86/boot/startup/sev-shared.c:820:17: error: implicit declaration of f=
+unction =E2=80=98sev_evict_cache=E2=80=99 [-Wimplicit-function-declaration]
+  820 |                 sev_evict_cache((void *)vaddr, 1);
+      |                 ^~~~~~~~~~~~~~~
+  AR      arch/x86/realmode/built-in.a
+arch/x86/coco/sev/core.c: In function =E2=80=98pvalidate_pages=E2=80=99:
+arch/x86/coco/sev/core.c:386:25: error: implicit declaration of function =
+=E2=80=98sev_evict_cache=E2=80=99 [-Wimplicit-function-declaration]
+  386 |                         sev_evict_cache(pfn_to_kaddr(e->gfn), e->pa=
+gesize ? 512 : 1);
+      |                         ^~~~~~~~~~~~~~~
+arch/x86/mm/mem_encrypt.c: In function =E2=80=98mem_encrypt_setup_arch=E2=
+=80=99:
+arch/x86/mm/mem_encrypt.c:112:17: error: implicit declaration of function =
+=E2=80=98snp_fixup_e820_tables=E2=80=99 [-Wimplicit-function-declaration]
+  112 |                 snp_fixup_e820_tables();
+      |                 ^~~~~~~~~~~~~~~~~~~~~
+arch/x86/mm/fault.c: In function =E2=80=98show_fault_oops=E2=80=99:
+arch/x86/mm/fault.c:587:17: error: implicit declaration of function =E2=80=
+=98snp_dump_hva_rmpentry=E2=80=99 [-Wimplicit-function-declaration]
+  587 |                 snp_dump_hva_rmpentry(address);
+      |                 ^~~~~~~~~~~~~~~~~~~~~
+arch/x86/kernel/cpu/amd.c: In function =E2=80=98bsp_determine_snp=E2=80=99:
+arch/x86/kernel/cpu/amd.c:370:21: error: implicit declaration of function =
+=E2=80=98snp_probe_rmptable_info=E2=80=99 [-Wimplicit-function-declaration]
+  370 |                     snp_probe_rmptable_info()) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~
+  AR      drivers/iommu/amd/built-in.a
+  AR      drivers/iommu/built-in.a
+  AR      drivers/built-in.a
 
-https://people.kernel.org/tglx/notes-about-netiquette
+[*] https://lore.kernel.org/all/aMHP5EO-ucJGdHXz@google.com
