@@ -1,51 +1,51 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2043.outbound.protection.outlook.com [40.107.93.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A3F1B21BF;
-	Fri, 12 Sep 2025 14:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BB9247281;
+	Fri, 12 Sep 2025 15:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757689069; cv=fail; b=EI1vYizM399U/pPEzql36LTL2gJW4Nmitgi1RrlbCCX6sKLSDJ5thpxSH4G5fKtGMYeIKZkztG3Nn4GtlhmmgQ5kvusInIkXxQXKR6blSbiApFPApgLd6tzrTcfa4D6XSzVtHGx+Ig/XzT+STKJP5x35+5x+FzXvlHY6YtX0UNs=
+	t=1757692149; cv=fail; b=akikFL1T3xAPJMFDrev5muhgSLPRAtf0H+KCY6fjW3ekJ+LOpMQVTSwi7EmsdmecrUteyQXPoi/zKRHn78g6GPt1TIezJ5ZRapp6IAE0+V8KecQiSoulPB16Mcv1FMF+qRHnYnIXcsmdXjjSoiOjkJjhx63cob8LdVgDMgOJxss=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757689069; c=relaxed/simple;
-	bh=bP2Ou1WWFKc2DDhJmpfkbrW4eEe7zeovcFND+XiHip8=;
+	s=arc-20240116; t=1757692149; c=relaxed/simple;
+	bh=W34LS5/mn2ZAk1wxfLaXMVbO/C5iPvcE+WqVm62M4cU=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YZ71CRIbVshSsIQNg/3svq+Wr2Q0h2RcgwB/kJ8FN4UnkRWd9SimD53JVkbaAB2WSBGBlaBLdDv3925jCqeP57DIgRZdncMZaJWHDkonD4ATszN9X/h3OOz2RgABSsSL5f56khZHo7uxO7D2yk4SXYM1kzgOvIr5oUqjbMSMEeM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1fdtExs8; arc=fail smtp.client-ip=40.107.243.62
+	 Content-Type:MIME-Version; b=hu6ztd/hpk/x0ZGEyW9YLkoeH1N56zpNf6/vzYC0WoGF8rrheHcrbLG/KwRxCXOzeTif/89F/rYCCs2SRzJ3vbpC0f7S4gsdIRBVFo3Cb80CmLS/fDOUmt2x0vWZMEZgVZfZrWv3fIOo9PGWIXr+9pW4Xm0iMPJAyG0KYRJxdcc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PXzP+ZBH; arc=fail smtp.client-ip=40.107.93.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1fdtExs8"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PXzP+ZBH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QiHwf+Ts9ObZ5hdDaTcXbAQtC7uczs7gHYeCoorYZ3bPnmLJyJ0K3ZsqymKsk2HrWMBezuKI7WuVD/h8MijJKI2YGtz/JDrS+TihSWZ3CKL9BoKZEgPmGLVwlCgT6QO+KEzpAFJsp66CdgZxxCWHCgy/rAAFAJ7kMMKUoLV0uiHoksoDpESgLhfk+zMXtigku87/wePP18wCQLiCU2fnlyMoBmiMNqxRBhs8kmCKkgzssld63DQSJwx/abI+xQCk05jnz1Zhryp/x5u2TFnTEvP3azTLt/3bEpNoamc1Dt2t9qwTfRa8aeMorusGT+c4oGVABE92bq0FL4gpl7KoUQ==
+ b=IgdoMaB3FTEVOjouMQS5Y3k8XU8m+aB2k/BQkIIqBebjmxHkBHWDq060ka7j/ksPUr5XYMf6bQXxodfxFnxdsxXlUTEK30wqW6ew9nX69jRHev9+m+n0PADmv6Y1lmRrYFI3gZeEE8uk9hoiCYkPwuGvMCliIxUWF2HpuBV+JtK5f+f36Enw2YUPJ0tNmd5aMmOrdSe7NJU05HQJmUBiylR0m3HOl2IF+kaNJzHhiWaQgq0xv0/6owoSQqSZ1f6P6q2V07JR85C1RnW/FuccYHkzqPGsuTuwAIVtJeYvN9rOU5pVguqamSZHNOLNyeh7nqKlG6RwjkX5UacNtAmH6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L+4cSmprEGaLIfoCpri8SRQh5RadlrLugmkXHjvjpEs=;
- b=Fm12RVLzvmgvdN3L2oc2mRC0fJIDYT+AheDb/QBFG3QamvktrWL3Fz6ajqLIsslwWvEYWxallktqjeBp2DxoUNEGN6LJi0FWQIFZBZ7f3eWUcSzbNccjnC5oOXyZtM3nIhirygZ4fVNAKrwpkkMEQ6UeYRZJW9Nw8Aeqw6SwKlmk3/nClZS9QusRyZgS6rsGewIxweDLSBiCffUsdaAItUwnSTPsSRkBsZZ8g+Y1lBh8ngXVbjOv2/9G/5z+oKc7BLnZtV5f3nXRjvXVVjNqfRfhCogm5uUBHDN6UiHKuE6rXUOoPx5STsjuxzaKX3jkxRnJ0mBZxk7EwKXssvP99w==
+ bh=EbtGH/5Bi/ucZW6eL+zTRB+vBHe1xOzlGMU9mQWvEzU=;
+ b=xDyHMqtbW7p0k5TGKIKgp47xkPqIAE6Bz0/XNEKgeLWfSqNyeFnfHdHomo/G7Xezz82Gg9JYkO73ECkpRx/EDZ9jvYLkY4p3NhLT7UaacMz4zcV3xdQlgYqhANKzPJU2gfuLi5lNkjJ1cr3Krl3mmhd0keKsIAG15MxuohgsVgyV94jJPawrR3H2gxxv0j7ATS1KYwsuJznRoXKX9Jty01AXcOhHSr4jRPh9VJeVaxBAZ0YV3ZYRQX8DOR51JPc4a35txjO/5WnOaz7QextYSTxs8q7O/tVenSvegmDTSF5m94ReOrBrKCVTTz45VFC94BCDMdzLVPikPeqyhX8Mmg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L+4cSmprEGaLIfoCpri8SRQh5RadlrLugmkXHjvjpEs=;
- b=1fdtExs8ymgBS/KlxwFnFKlU+UVHQjIPklMRB1Y46oqz404VIRHQivPGyn7LOmcp67hiylHol64sXLeC9+x75r1CcjXWZaSb82s3RSClcJnXB/3XaoJYLjWtVn72jCKjkbpmUjWjJ8m6+/W49tEyOShUD5+y3STwzFLfh/1o/sk=
+ bh=EbtGH/5Bi/ucZW6eL+zTRB+vBHe1xOzlGMU9mQWvEzU=;
+ b=PXzP+ZBHsdSCBoO+z+tJtY1PHWX4BVBlZ2qszfTrqSxvjYVk672PYVKBbf2YZ3Kb1zvHraMWVMhyHYUa/sovwwX0uVjosTHwoDhHHs+6hXZi/4nt6wYcGtYpFlVrttyCGNz+iLMUoupA8gi7kBSwMirhE6UKeYkPP8BvpscLQyo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BL1PR12MB5062.namprd12.prod.outlook.com (2603:10b6:208:313::6)
- by SA1PR12MB7248.namprd12.prod.outlook.com (2603:10b6:806:2be::12) with
+ by BL1PR12MB5804.namprd12.prod.outlook.com (2603:10b6:208:394::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Fri, 12 Sep
- 2025 14:57:44 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.18; Fri, 12 Sep
+ 2025 15:49:03 +0000
 Received: from BL1PR12MB5062.namprd12.prod.outlook.com
  ([fe80::fe03:ef1f:3fee:9d4a]) by BL1PR12MB5062.namprd12.prod.outlook.com
  ([fe80::fe03:ef1f:3fee:9d4a%7]) with mapi id 15.20.9094.021; Fri, 12 Sep 2025
- 14:57:43 +0000
-Message-ID: <c36a12f6-33bd-4430-92b2-5fd2939d9b24@amd.com>
-Date: Fri, 12 Sep 2025 09:57:37 -0500
+ 15:49:03 +0000
+Message-ID: <2b099228-56d1-4092-9626-6aecd7ace9d0@amd.com>
+Date: Fri, 12 Sep 2025 10:49:00 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/3] crypto: ccp - Add new HV-Fixed page
- allocation/free API.
+Subject: Re: [PATCH v4 3/3] crypto: ccp - Add AMD Seamless Firmware Servicing
+ (SFS) driver
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
  mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
  hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
@@ -55,7 +55,7 @@ Cc: nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  linux-crypto@vger.kernel.org
 References: <cover.1757543774.git.ashish.kalra@amd.com>
- <e7807012187bdda8d76ab408b87f15631461993d.1757543774.git.ashish.kalra@amd.com>
+ <7be1accd4c0968fe04d6efe6ebb0185d77bed129.1757543774.git.ashish.kalra@amd.com>
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Content-Language: en-US
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -102,11 +102,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  y46PmDPicLjX/srgemvLtHoeVRplL9ATAkmQ7yxXc6wBSwf1BYs9gAiwXbU1vMod0AXXRBym
  0qhojoaSdRP5XTShfvOYdDozraaKx5Wx8X+oZvvjbbHhHGPL2seq97fp3nZ9h8TIQXRhO+aY
  vFkWitqCJg==
-In-Reply-To: <e7807012187bdda8d76ab408b87f15631461993d.1757543774.git.ashish.kalra@amd.com>
+In-Reply-To: <7be1accd4c0968fe04d6efe6ebb0185d77bed129.1757543774.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR03CA0007.namprd03.prod.outlook.com
- (2603:10b6:5:40::20) To BL1PR12MB5062.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM6PR08CA0023.namprd08.prod.outlook.com
+ (2603:10b6:5:80::36) To BL1PR12MB5062.namprd12.prod.outlook.com
  (2603:10b6:208:313::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -115,365 +115,728 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5062:EE_|SA1PR12MB7248:EE_
-X-MS-Office365-Filtering-Correlation-Id: 975d5b5b-b3e8-4347-f732-08ddf20cb857
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5062:EE_|BL1PR12MB5804:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c05ac37-5527-4f66-7f40-08ddf213e5bc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?N2I0NXlEQzFQd2NiYmdWWFJ0NG01WUpWM2M3eHpJWmI4ZDlpSUpKb0ptQUdI?=
- =?utf-8?B?aGhIWDhWSW5td1F3TUxMdHlSdjMrRWtCMXJSU09pY2FXOVQ3Tk1ZMEMwMHVy?=
- =?utf-8?B?S1lYZkt3dWs1TDlSWm82RUFmcjB1UWlRSkZjS0cxRVMyMWRhWkV3ZWQxZkJO?=
- =?utf-8?B?ZWszazZLdU1ZYlRtYjI3Z1RHUENvNGxVSGE0dUozalRJV2IzSXJ6U2JSRGRx?=
- =?utf-8?B?K3RKNmxkMTZNa3hFWm5Tb0laRDBTaFBPcXZrZVo1NmdxdDgvTFVTV3lzdWdK?=
- =?utf-8?B?OVBiaVR4Ujg4NnNlTXMvMkZuNm04Y1lDTGYwOGd1THFYa0dwMlNkT09ackFH?=
- =?utf-8?B?VEdVS0dHamZqbS9oeVc0MkVLdDdBSGsvbzQrbTJPTkVRWVRvNE9jYTlmc3pB?=
- =?utf-8?B?dVIrOG8xOEE3bVliL0F0Y1E2S3R4ZE8yL251S21WUW1YWnd2c2JwYS9TOG5J?=
- =?utf-8?B?SWpSUEtlOFI3SktmVHVxaVFTaCtGeVMyeGF6Y2hVODR4SlprU3IxNzk5S3Vn?=
- =?utf-8?B?dmxFbjJJcHJUd1JaQ0cxbmNTY211WkI0T0FNSFZ5cTFCNEx5a1lIQUJaOW1k?=
- =?utf-8?B?dWE2cGgyVU5DY3YxL1FMWTYxSTErdkNQcm50U09oSU5wZzU5MmNBZ3YwLzl0?=
- =?utf-8?B?bjRuVTBNWHNjbEMrN2RrZmkzN24vV0VESXEyMHo4Z0E3cGkramhXZjNtUFBQ?=
- =?utf-8?B?SlN6dXV0eVNKbkRMSVZ0Y0VaMkxydEpXTkVjTmVFUG9RM09qYjNqb1A0MWh4?=
- =?utf-8?B?Y082clB4anhlYUZmT21tK1dtamdOQnRvc3hzV3J2ekpIem9nRFBVUElUemNP?=
- =?utf-8?B?NVVuWjlhQ1hSZ0lUVXltS0l5aTJyTWxRWURIV05kbklMa1JZeU9PVUV5QTl4?=
- =?utf-8?B?Q09lZkllT1JVaXJmS2hGSzBrT0gzbFlIMWJVTlhGenIxVEhBWU91UzBOWG9S?=
- =?utf-8?B?cG80TnRSYSttdjFUUUgzejFmMWNBY1hnaW43Y1ZGMjlzbGsyUDR1dFlGempJ?=
- =?utf-8?B?bHhhWk9VMGdHQ3lsMDRwNnM0TDNHUE1VenU1R2IrM2g0eFRQSlZZV0dOTnhV?=
- =?utf-8?B?ekZYdUhuSC9qRldKSkNCSW1wRGxxeFhPNWYybEt4THBMaitxRlVqb25MeStY?=
- =?utf-8?B?VFMvZ3ZOWk1lbVA4VmdsWlJHUkdBUjlxVm03N1MrSUFaSEt2V2tkbnFKa0Fy?=
- =?utf-8?B?RjZhWVpYZnd6a1NPNzFJdEhGNzdJSlhydmtqcnZGOS9IZkVFSXFpUHA2OTJh?=
- =?utf-8?B?ZXNLeTFFMnhCYkJqL3lwSG9nNFYyaU5ldWR1VGJUYitEVStLdTRVclFzSU1y?=
- =?utf-8?B?Ym4rOHBmOG42bmxodjlFR0NIdlBFY3FKTFVJL2xUcVFxRXg1blZiWDRMc3J6?=
- =?utf-8?B?S1gvRnNHbjJ4SjZkUzVEU1EwZmd2bjQ5RWRWbldmdG5DSitSaGRPczY5TzR6?=
- =?utf-8?B?STJvQkZhaFlLbnZvUzVXK3lrRXltQWYyZ2pNZmpsQXFiOGk0THVkMm5ITjJh?=
- =?utf-8?B?Yk9hMDZETTQxS1dNSDFQTE4vbUUwcittRWRpOGtsWG5iaml5eG9VRVVuYmt1?=
- =?utf-8?B?VVdnQjEyVXV3cTNzVnBEYkpiRWxJWWNXS1ZGN29ZN1pFMm41QXRtWkN2RlI0?=
- =?utf-8?B?MzVoWDQzRE5RUFpOK1p3NXAvaTVSQlJxcVNlMGRtRXFpeUpkS1RaNTEyM1Jw?=
- =?utf-8?B?enl2TmJVTUw0TytrT2tINm9ncjdxajhtNE1qRjhmbFJJU0tveW5ET1VadElL?=
- =?utf-8?B?OE4wejVkOWlKSGRucjJiL1UzT29lOExhb0JwVmdBc01scmNBbkFjMkRUTGY4?=
- =?utf-8?B?ZjVKQmZlWkNzTCtWQS95dkdRTFArM2huenE4TERSaVNqdm5mVVFTQ3ZIRjhV?=
- =?utf-8?B?NTZjc3hERnl5dG5QWDUxZ1VsR1A5alI5ZFZYVjNFWDVubmk5NUo3Mmd5aEdt?=
- =?utf-8?B?bzZEWmY2TWp2TTJiRUhRdkthNnFmME1pUW5naTRZeHI4blRMVU5oRUdpTGpW?=
- =?utf-8?B?ekpNTVJsV3d3PT0=?=
+	=?utf-8?B?U0ZUVGdRcmN6MHE3N2RCcWJxVEdnclYxWTY5emxxN0dtVnhtcklLZHJTUVdF?=
+ =?utf-8?B?c2dGYWQ1SEtEU3dKK3FLVTZYWVVsZWtOOEk4aGhEcm9Ua2ZwaVVPZzRXYjdH?=
+ =?utf-8?B?U0RmTk92akk4ZTdyeFI2NjlUZGRDeEJBQkFxNGZuU044Z3BkbmJYWC9GQXRZ?=
+ =?utf-8?B?eEEzVkF1b2xwNWtxaG44bUk4KzV5aDFERlNxTlhQRzJwVzl6QlNTdXdyYTNx?=
+ =?utf-8?B?N3RMdW5lRU9Wc2lGckRsVCtIT2RFOFZoZDZCSGkvNmhjOU1YUndUcENzM3Rn?=
+ =?utf-8?B?TUhKNTNlMThSa2pCUDBMeDRMbWc0OUlxSUZnbHlsL211eG9RaGdqdkMzV05i?=
+ =?utf-8?B?MDNuS0EzZVJwR013ZUM1VlBxbStQRVNBQTMzbWxGZFVKQjNGTjlDRjFWb0g5?=
+ =?utf-8?B?Vi9rcFRrY1BIUUF2MUVQL0dWVXNtL0wxYlhFOXp0U29vNXR4ZjRadnJSQmRR?=
+ =?utf-8?B?MnpTME1MU3ExbmVYdWUxMWY1R0UwdFllclJ3NnU1MWlycUV6Q1BsT2RlWk0z?=
+ =?utf-8?B?NS9leXBQazFtZ0RlY1hrVTZmeUlMSG1McEtHckJsL3EwK016WklsTC9Vc3g2?=
+ =?utf-8?B?OU1xTzlHS0hwQ3o0UnJyNDRDcmREVUVRNUl3MW94d212cS9sWExXQjkvc1JO?=
+ =?utf-8?B?V0RYbjRsMkl0QW9udHM2NjAwL2owK1Q5dWF5aDZMTGRhdFdzMC95bHRmQTZQ?=
+ =?utf-8?B?VWlrV1hvbHRYclJ5Wkt4MG9ySldKQ0pxNHBUdFJKeXJRTlFsRUxTUUdWckQ0?=
+ =?utf-8?B?MFJkSm56L1VRZWFhSDFTVnplOFZDUWJzbjIvL29IWm5oOFJabTdqT2JicHJk?=
+ =?utf-8?B?akZHanFVWEx3dXNmYXpqeGVXNkt5dVFrTVM3TnpFeFJrUjlZR0h1N29WN0lj?=
+ =?utf-8?B?RGxSa2V5aHVGTHBXbzVHMUJtQjRHREZwU1ZGOVF2cW9sUWVIV2RVaHpUQkNR?=
+ =?utf-8?B?UWxzUTdseUwrbmViTWZESVNoRXRxZGR1aHhOSCt2czdEYUlpUGp4NlRMOHo5?=
+ =?utf-8?B?TnN2UXZHWklUbHZOcGNxNVFLL3U0YjExMEhIS3JMaFpCd29Qb2ZmY3BuTkhX?=
+ =?utf-8?B?WElmZ053NVNXWUJRb0ZiTERqS0dRc2U5NmJncHRFc0U5YjFMb3czZ2plaEph?=
+ =?utf-8?B?K2RoU0cvdWNzZFJadmFkaGlTZ1JKNGZuZ29XZEVuQzlSMG9HbmhVUytvM3JX?=
+ =?utf-8?B?ME00TXQ5djZ2QjFhV1Y0OUE5L09oM2RBc2tsNExTQi9SMlVKanZCM0N0MDFt?=
+ =?utf-8?B?blNGcGJUczBkb0JYSnNpMFlxdUU4M25vME9lcmJic2lDU2dnTE9qRlZlUjIv?=
+ =?utf-8?B?V2NWcGpZQVlnYzd1dUM1RTFBSy8wRlFHTGMzUk8rUEg2TU1JUk44dFFLdlk3?=
+ =?utf-8?B?OHJvYUpMa0tPbGp4bkN0dnVaYjMyRnZ0R0h6ZEZIZm5VdXhNODlVZU9UWmRG?=
+ =?utf-8?B?clFuT09FTUx6S3QwdFNySnZCUy90QTF5NmVzdVUramJJNTZSNVE1YThzZUxl?=
+ =?utf-8?B?bzBuTkU3cjJ0RVF4VGFTTngvQ0pyRUw5cjd3UjhTWHRPWlZnWXM5bGZNaEcz?=
+ =?utf-8?B?MHlCTzFNeGxNQVovQnc3M3p6bEZDUG1NZE50d2dXc21scnIzNlAwYVZGQ3RK?=
+ =?utf-8?B?bzVyR2Zxejl6TFhMNFVlTndpSnh1RGFNTnJiYVR5a0VYZmh3Tmd1N0RMMDIw?=
+ =?utf-8?B?eTFUYmc2dXdDKzNKU1pBVVY0b2loc3ZBeUFYZGVZOWhnSVJRSkdYdUx0MW5h?=
+ =?utf-8?B?bGVWRW84aTJFNW01dDRTemxNblpNWnd1aFFDckZweXExY2NSUFUzUDRoSlll?=
+ =?utf-8?B?ekhha2lJWnp1ZUxHOERsWlJlT3NsWjdpLzFnNk8zOWE4aGVuTURFdW9ySDB6?=
+ =?utf-8?B?ZmxkallXR1psa3VLZllVVDN6VTRkR3FvbkhoV1JTVnI0SXFPZEYyWmxiako4?=
+ =?utf-8?B?MUhDeUJIZ1Q0bHlGZkZXeG44dUN4UXA4VFJldFJ2UUFKSmJhRGdjby9OeW1R?=
+ =?utf-8?B?MmczV3VGWEl3PT0=?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5062.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5062.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aFlEWllDK1J5dWxnbzFrRGZtNFB5bVhGTDArTUVJWitJZUtVNnpxSkJ0UHRh?=
- =?utf-8?B?VG9TZTRmSjBLTHNTTW96eExiNW1EUVhIWWpZVzd4ZnJKNSt3U2JSbGtSVkh4?=
- =?utf-8?B?NUYyRkhRbW5FTVUwVDhqam5PQ1FZbVdDU24vQ25QSS9kRjFhVXMyc2J5b3BY?=
- =?utf-8?B?L2VtT2huUy9CTDNBU2FlZU9WQURrNHZGaklJYm8yaTF3NlB0bDRUYU9PWjhH?=
- =?utf-8?B?c2xGZGxVR3ZPRVFwNW1TYndsUUNpOFM0L0N0VFJxK0dTVDBjTWh4N0Z0dEpz?=
- =?utf-8?B?TTQ4NHBQNzQ0VkZMMlFuZk5yd0NGTzh1Um5qR3ZCb2JvMEdoMzlLczdSaGRB?=
- =?utf-8?B?UzdMd3ZFTWdLMG1xN0FMT21QdFhCeVVPbFZXV0hwczFkTklVNFdGazZmem5O?=
- =?utf-8?B?N3pDeGh0Tk1ETVpOenN0M3hDaEM3c01CMnNHMDNKWFMrcVZYN0tURkY3MHc5?=
- =?utf-8?B?VW52dEh6NEY1eEIwdHZNUW4xaW9vWnJWMjdkZnBPNHhyVk9mdUhOemk0Qy84?=
- =?utf-8?B?ZXNuMUkwQzdpem54R3lJUDY2ZmZ0bDMvamcweXBmZXBWKzBsVDhPVXp0K29G?=
- =?utf-8?B?Q2ZTOTZuTzJiOVlEbk9QVEhTSExibEgrdGY4bHdndUFqU3hQRUp6cE5TSjVi?=
- =?utf-8?B?cDJGYks0eSt0OUw3MGJ3UzdZUzBsV1lCbDR1K2crSzB3aklLM05MZEFpNmts?=
- =?utf-8?B?UityeVRGVkt3M1Z3Q0dMWFJMNHVrZkVRU0ZBQTQwTnRISVJGNkY4azVoMGhU?=
- =?utf-8?B?bFlZVXNzNFFaNERVaVlQQysraUVhSVJUMVFUbS9GeU9yeXpKYmxZNUZ6bVlJ?=
- =?utf-8?B?WjM4Sml1aEFYNTRvZExTNTJGYjZhWHhSdVhIcUVtNytUOWYwR2xpNnRwdTVh?=
- =?utf-8?B?Zk1KSmd5K0hQdkNsL05Cdmt0VU0zZXZ3cEZCOUI3VTdWWE5kaUxDMTRKamxj?=
- =?utf-8?B?M0QvbTdMZUg2MHFBZzlrRnM3VkowOEdER2MrbzZZZ3JNUTlVV0NvdTFmZEl2?=
- =?utf-8?B?YTNVbHYxNXQ0d0FPUUNraHdKUU9tRUpyL3BUUjJNTENPU2M3ZkNUYTNuTUEr?=
- =?utf-8?B?d2tvZEJLUHJaN0lQZytyeXd4RDdoZ09reFpRZ3RvajN2VE9MaFNuSEVqaVNN?=
- =?utf-8?B?czd6R3dOZitVWHRyU0tCVlhWbXAydzBtWTZreVdaMnBKR2w5LzdkbVI1bCt3?=
- =?utf-8?B?RXM0Q1I3VDZUQ3pOeHRxUWZjc2JXZ0E3Q1dKendxQjNrOERWL2pGR25uQmRQ?=
- =?utf-8?B?Uk5RZDhPUEd2MkhMMjdkUzE2Z3dmYmFUWmhiVUR2SDNvVGdmRmxTcXVObmlo?=
- =?utf-8?B?ZnZxejNkSzhPN3NEakZlRzRIV0p2aGpUZDN3b2k1cFZLdWx2RzAvSmtOQ1Vk?=
- =?utf-8?B?dzNpanFFaERkVG9OVjdyemR4S0dWM3BRTytodFBYTHJUblJITmR5cVlSY0Js?=
- =?utf-8?B?Vk5UMWhsZEJrTEpKVkhJbHBqUWhUSVVnSkNFWFRkMmJyUUtscUJVd3JEVnJO?=
- =?utf-8?B?dUtnaGdhV1I1RFpDL2MwNi9KKytxN0U1MS9mS0dyeUkxZVB0MzRCbStaWTJl?=
- =?utf-8?B?dXhLNVByakE4S05zV01sVzdhNi9JZ2JQcWs2dUVETThqd3lMVnlNZ1pRZkMz?=
- =?utf-8?B?d1lzZDcxU0diVjJvMkp5OUh6NmYvUXppKy84ZXRjRmoyNm5KZGcvaDRDSDkw?=
- =?utf-8?B?NUlOaU56Y2pQaVIvVS9ZWGRrWDVGdG1kb2tkazZTVVBXbkYyU20wblVMeGc4?=
- =?utf-8?B?Szk1QThSOUdYdmdpWXZlOXhlcmdQRGpiMW1FNEQ3YWhzOXhwNEV5SnBBSWg0?=
- =?utf-8?B?R29YMzVWRStpajZrbTdQQ3lqaVV2dEZBZGo5TVpIOWlCQ0ZCdDFLa1pKb3pn?=
- =?utf-8?B?YytCQTRNNUtSUTZ6NE5CM2o5ZXZQdFlkT2dtcFIyN3BFVnJyb0pzNzd2N3I2?=
- =?utf-8?B?b3JEN0Q1STJ2N2lzRU5SZmRHeVBDMHlFN1pWVFRUbTc4MERLVm5XTnlUYk1t?=
- =?utf-8?B?Skszd2hVWEpWYkV1S01BTDErOE9zdmpGa1g4Wm82Y3lrZFVNbGo3bGRIUXpZ?=
- =?utf-8?B?dVlYSnlXUk1MOXVOQ3J3K29SdzR3Y3JpdE5raERURnR5NW4vMXNuTXZnSWRQ?=
- =?utf-8?Q?oH8puVdvdGY3OEAPZVlGbYQ9M?=
+	=?utf-8?B?a3hpZXlhWnpUenlZN1JjRWtpblNMWHZmeHpvRmYvalVEVzI3TXF5TENCUGFO?=
+ =?utf-8?B?Sk9PeTJQQjB4YTFTc3ZydjVURHN0UFhIWkp1dGlqU1Jja1VYY0ZQeGt0OUNK?=
+ =?utf-8?B?cnNoT2tEelJMVTdWZENjNDRVakdIMktmTTVKN1pWVGtGdjNjWnZmaVJDRXVO?=
+ =?utf-8?B?U3FFMGJkdWdVajZXY09KVGNJNlh3MmxPMitUYnQza0JxL2UrWm03QWJRbTlr?=
+ =?utf-8?B?QzRQUXlxN3VlMkt4VjJCQkhkaHd2a2MzenNTY0ZwS0xyQmhZanlGZkpGb0kr?=
+ =?utf-8?B?TmJuaGxqREEwSUFvKzBYVWVUZFp2SGN5bzVwRSsydTMxbWRTTitxUUJNT3Bq?=
+ =?utf-8?B?YThQUHIyUGRDdEFwSTFVSlZPSndscWx0WkF2SGl3OVJCdmVrenZwMzNNZEor?=
+ =?utf-8?B?ejVhTFlIVGFNa1BsNXJkdlpkMUhMVmRFQWluN2RLRDNmQmx0Y0F0MENRcFdH?=
+ =?utf-8?B?VVUyeE95U3BMT1ZjWFVEb3RsS2FVekxYeUlHRVdWNklQeE5rVm9ET3ZvZGpB?=
+ =?utf-8?B?WUlleWpIaXJUL01ibDh3N0VCRnkrdmoxenk0bzQrWDE1V2NqRU5FSGZyVnpK?=
+ =?utf-8?B?Skc1cXFvYk5uODZjSmFPU1FhQk1OMWErMkVNN0lSRzEwK0NqaTcyYUNadFBI?=
+ =?utf-8?B?ZUROQVppeWpXenFyc3BwamhKMG1sOHJoRW90UDR5MWRNREFOdll4enl0bjNQ?=
+ =?utf-8?B?QjBWNkI5dUZjdmVibk5LTE4zd2FqSTdIMG11UGt5QWJOcldIUGhFUTBMTnNR?=
+ =?utf-8?B?R04xd1ZhVVBoMkQxWVQzZktYSVNaRFlwSU9xc0Ztc1dTSTJhTk9qVzdyUGRI?=
+ =?utf-8?B?NUlIbEttZHY3dDFGcGs5N0l1MCtSZ2NacWxKTVhjTzBIRElKTjR4QW9sN3Ry?=
+ =?utf-8?B?dTZscEZ3Nnp1U2hVeUEwSXhjdDE1Wm9OTmhOZkpNTU1CVzNYbGxKR1VWYm5I?=
+ =?utf-8?B?NHViamFKZmxNWnV6bTdwaDlUT0hVeFRXTEJnZUZBaWcxbElJSmlaUlNZUDM4?=
+ =?utf-8?B?N3UveEhJRHlzVmFSNFREcDRVVmJxQm41Q0dwU2hkMkNMWkdIeHJRYXhKMjhn?=
+ =?utf-8?B?WkhHMXhDbXFaMERrQzk5RXhJRVplMkFtcjVPMUVJUVhtMmVxaFhxYk9UeWFx?=
+ =?utf-8?B?anJSb25NcE11MmkwOUpNdVBwTGUydjBEUzZKRGFOdFMrOGxEWWhlRDl5K01l?=
+ =?utf-8?B?V0czMlBFWCs0ZXdNSGRoYTdscElVVUNVQ2NHMnBhNnA0ejMwZFpTWkNZVlRl?=
+ =?utf-8?B?M0psQjdvMkVlS3pMTUtLU1NldkRKd1Vwd014NkdyYWpubzZnNGxNMHdhbUFI?=
+ =?utf-8?B?bGU1MEV4ZHNHMG1vcnhnVVYzeHhQQ25qM0labWhwVDlDSWlGdk5oeHkvQU1F?=
+ =?utf-8?B?WnVnM2dlNWVYWjZoellSMjhhRjRNbXgvbWVwQnhyM1hXaWpicDU4b0MxcjUx?=
+ =?utf-8?B?UEN2Mmt6SFVSbjRDa0hycEtKMFVTVWhMRDZqMHJXS3RIeEtQVndRRjhMKzhk?=
+ =?utf-8?B?MGs2aHNTR0pid29qL21peVYwSGVZd3NTdXVLeTdVSk1tWjBYU3lUOXhOWERj?=
+ =?utf-8?B?TFNBVlNNSHA5WHdhcGRSK2NUWlJxeFZPMm85VlFOQzBacnhPOElvb21jVU1V?=
+ =?utf-8?B?Q21NTnFBVnlmODYwS0lUeU1kNmhmMkVUZk1Pa2cyUEtqc3lwMWdTQ2RmeFZV?=
+ =?utf-8?B?UGlia3hMTUJ3NGkvMThsSnF1QzljY1F4akJMNDJXRkdkb2Rpdi85dzZmUlkz?=
+ =?utf-8?B?OHNWbkxpNmxqMVJNeFN3NmcrS1RKUS9YNUxOTExmbXJqVm44NTJ1M0J6VWhX?=
+ =?utf-8?B?ckg4UmxHbVNlRFpNaE9wK3VKZFBzUy8zWkVRQVJRNUNHZW5CaXEvVjRYRjlO?=
+ =?utf-8?B?Zm5kbU5TUUM0Zlh2TTdyUGc4RlZmZXMxUFlwZU9xMDZLR3B0RHFMTFBJbm16?=
+ =?utf-8?B?YnFqVFQyVzRBUVlxQ3BTZityVUcxTkpEaXMxbE1nYVluZzhtZXA4ZlBjb1lV?=
+ =?utf-8?B?S0hZY3JtaWFROHZaQmtHTWV0VEZ3TzV4bHhBdy9ReXBDYjhsZUVKREdsUk1p?=
+ =?utf-8?B?WlV0a2pvQmJ5VEpNaW0rN0laUW5kKzdodFM2TGt4OGFNc3lpK0VVMENmeTNT?=
+ =?utf-8?Q?T04jKsBc0bwpLKatlF74RDKZ/?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 975d5b5b-b3e8-4347-f732-08ddf20cb857
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c05ac37-5527-4f66-7f40-08ddf213e5bc
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5062.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2025 14:57:43.8608
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2025 15:49:03.1482
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uoBb9Ng4u8gDFaqwNf1xxFnH05wZo+YosbE5rxoQ6T+s4sypQWtdlrxuO5GEjpamLJSB+zDivm88yIJurY+4Uw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7248
+X-MS-Exchange-CrossTenant-UserPrincipalName: jQF7Pq0XfdbEPhOSotawajwmA2LQVR9Q1uF031buRR9rEIeyQxaRV0YbOT1NDoen129c+oSzZdU4ZeAA00tWcw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5804
 
 On 9/10/25 17:55, Ashish Kalra wrote:
 > From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> When SEV-SNP is active, the TEE extended command header page and
-> all output buffers for TEE extended commands (such as used by Seamless
-> Firmware servicing support) must be in hypervisor-fixed state,
-> assigned to the hypervisor and marked immutable in the RMP entrie(s).
+> AMD Seamless Firmware Servicing (SFS) is a secure method to allow
+> non-persistent updates to running firmware and settings without
+> requiring BIOS reflash and/or system reset.
 > 
-> Add a new generic SEV API interface to allocate/free hypervisor fixed
-> pages which abstracts hypervisor fixed page allocation/free for PSP
-> sub devices. The API internally uses SNP_INIT_EX to transition pages
-> to HV-Fixed page state.
+> SFS does not address anything that runs on the x86 processors and
+> it can be used to update ASP firmware, modules, register settings
+> and update firmware for other microprocessors like TMPM, etc.
 > 
-> If SNP is not enabled then the allocator is simply a wrapper over
-> alloc_pages() and __free_pages().
+> SFS driver support adds ioctl support to communicate the SFS
+> commands to the ASP/PSP by using the TEE mailbox interface.
 > 
-> When the sub device free the pages, they are put on a free list
-> and future allocation requests will try to re-use the freed pages from
-> this list. But this list is not preserved across PSP driver load/unload
-> hence this free/reuse support is only supported while PSP driver is
-> loaded. As HV_FIXED page state is only changed at reboot, these pages
-> are leaked as they cannot be returned back to the page allocator and
-> then potentially allocated to guests, which will cause SEV-SNP guests
-> to fail to start or terminate when accessing the HV_FIXED page.
+> The Seamless Firmware Servicing (SFS) driver is added as a
+> PSP sub-device.
 > 
-> Suggested-by: Thomas Lendacky <Thomas.Lendacky@amd.com>
+> For detailed information, please look at the SFS specifications:
+> https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58604.pdf
+> 
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+
+With the comments below addressed:
 
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
 > ---
->  drivers/crypto/ccp/sev-dev.c | 182 +++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev.h |   3 +
->  2 files changed, 185 insertions(+)
+>  drivers/crypto/ccp/Makefile         |   3 +-
+>  drivers/crypto/ccp/psp-dev.c        |  20 ++
+>  drivers/crypto/ccp/psp-dev.h        |   8 +-
+>  drivers/crypto/ccp/sfs.c            | 310 ++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/sfs.h            |  47 +++++
+>  include/linux/psp-platform-access.h |   2 +
+>  include/uapi/linux/psp-sfs.h        |  87 ++++++++
+>  7 files changed, 475 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/crypto/ccp/sfs.c
+>  create mode 100644 drivers/crypto/ccp/sfs.h
+>  create mode 100644 include/uapi/linux/psp-sfs.h
 > 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 9e797cbdf038..2300673c6683 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -83,6 +83,21 @@ MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
->  static bool psp_dead;
->  static int psp_timeout;
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 394484929dae..a9626b30044a 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -13,7 +13,8 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
+>                                     tee-dev.o \
+>                                     platform-access.o \
+>                                     dbc.o \
+> -                                   hsti.o
+> +                                   hsti.o \
+> +                                   sfs.o
 >  
-> +enum snp_hv_fixed_pages_state {
-> +	ALLOCATED,
-> +	HV_FIXED,
-> +};
-> +
-> +struct snp_hv_fixed_pages_entry {
-> +	struct list_head list;
-> +	struct page *page;
-> +	unsigned int order;
-> +	bool free;
-> +	enum snp_hv_fixed_pages_state page_state;
-> +};
-> +
-> +static LIST_HEAD(snp_hv_fixed_pages);
-> +
->  /* Trusted Memory Region (TMR):
->   *   The TMR is a 1MB area that must be 1MB aligned.  Use the page allocator
->   *   to allocate the memory, which will return aligned memory for the specified
-> @@ -1158,6 +1173,165 @@ static int snp_get_platform_data(struct sev_device *sev, int *error)
->  	return rc;
+>  obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+>  ccp-crypto-objs := ccp-crypto-main.o \
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index 1c5a7189631e..9e21da0e298a 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -17,6 +17,7 @@
+>  #include "psp-dev.h"
+>  #include "sev-dev.h"
+>  #include "tee-dev.h"
+> +#include "sfs.h"
+>  #include "platform-access.h"
+>  #include "dbc.h"
+>  #include "hsti.h"
+> @@ -182,6 +183,17 @@ static int psp_check_tee_support(struct psp_device *psp)
+>  	return 0;
 >  }
 >  
-> +/* Hypervisor Fixed pages API interface */
-> +static void snp_hv_fixed_pages_state_update(struct sev_device *sev,
-> +					    enum snp_hv_fixed_pages_state page_state)
+> +static int psp_check_sfs_support(struct psp_device *psp)
 > +{
-> +	struct snp_hv_fixed_pages_entry *entry;
-> +
-> +	/* List is protected by sev_cmd_mutex */
-> +	lockdep_assert_held(&sev_cmd_mutex);
-> +
-> +	if (list_empty(&snp_hv_fixed_pages))
-> +		return;
-> +
-> +	list_for_each_entry(entry, &snp_hv_fixed_pages, list)
-> +		entry->page_state = page_state;
-> +}
-> +
-> +/*
-> + * Allocate HV_FIXED pages in 2MB aligned sizes to ensure the whole
-> + * 2MB pages are marked as HV_FIXED.
-> + */
-> +struct page *snp_alloc_hv_fixed_pages(unsigned int num_2mb_pages)
-> +{
-> +	struct psp_device *psp_master = psp_get_master_device();
-> +	struct snp_hv_fixed_pages_entry *entry;
-> +	struct sev_device *sev;
-> +	unsigned int order;
-> +	struct page *page;
-> +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return NULL;
-> +
-> +	sev = psp_master->sev_data;
-> +
-> +	order = get_order(PMD_SIZE * num_2mb_pages);
-> +
-> +	/*
-> +	 * SNP_INIT_EX is protected by sev_cmd_mutex, therefore this list
-> +	 * also needs to be protected using the same mutex.
-> +	 */
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
-> +	/*
-> +	 * This API uses SNP_INIT_EX to transition allocated pages to HV_Fixed
-> +	 * page state, fail if SNP is already initialized.
-> +	 */
-> +	if (sev->snp_initialized)
-> +		return NULL;
-> +
-> +	/* Re-use freed pages that match the request */
-> +	list_for_each_entry(entry, &snp_hv_fixed_pages, list) {
-> +		/* Hypervisor fixed page allocator implements exact fit policy */
-> +		if (entry->order == order && entry->free) {
-> +			entry->free = false;
-> +			memset(page_address(entry->page), 0,
-> +			       (1 << entry->order) * PAGE_SIZE);
-> +			return entry->page;
-> +		}
+> +	/* Check if device supports SFS feature */
+> +	if (!psp->capability.sfs) {
+> +		dev_dbg(psp->dev, "psp does not support SFS\n");
+> +		return -ENODEV;
 > +	}
 > +
-> +	page = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
-> +	if (!page)
-> +		return NULL;
-> +
-> +	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-> +	if (!entry) {
-> +		__free_pages(page, order);
-> +		return NULL;
-> +	}
-> +
-> +	entry->page = page;
-> +	entry->order = order;
-> +	list_add_tail(&entry->list, &snp_hv_fixed_pages);
-> +
-> +	return page;
+> +	return 0;
 > +}
 > +
-> +void snp_free_hv_fixed_pages(struct page *page)
-> +{
-> +	struct psp_device *psp_master = psp_get_master_device();
-> +	struct snp_hv_fixed_pages_entry *entry, *nentry;
-> +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return;
-> +
-> +	/*
-> +	 * SNP_INIT_EX is protected by sev_cmd_mutex, therefore this list
-> +	 * also needs to be protected using the same mutex.
-> +	 */
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
-> +	list_for_each_entry_safe(entry, nentry, &snp_hv_fixed_pages, list) {
-> +		if (entry->page != page)
-> +			continue;
-> +
-> +		/*
-> +		 * HV_FIXED page state cannot be changed until reboot
-> +		 * and they cannot be used by an SNP guest, so they cannot
-> +		 * be returned back to the page allocator.
-> +		 * Mark the pages as free internally to allow possible re-use.
-> +		 */
-> +		if (entry->page_state == HV_FIXED) {
-> +			entry->free = true;
-> +		} else {
-> +			__free_pages(page, entry->order);
-> +			list_del(&entry->list);
-> +			kfree(entry);
-> +		}
-> +		return;
-> +	}
-> +}
-> +
-> +static void snp_add_hv_fixed_pages(struct sev_device *sev, struct sev_data_range_list *range_list)
-> +{
-> +	struct snp_hv_fixed_pages_entry *entry;
-> +	struct sev_data_range *range;
-> +	int num_elements;
-> +
-> +	lockdep_assert_held(&sev_cmd_mutex);
-> +
-> +	if (list_empty(&snp_hv_fixed_pages))
-> +		return;
-> +
-> +	num_elements = list_count_nodes(&snp_hv_fixed_pages) +
-> +		       range_list->num_elements;
-> +
-> +	/*
-> +	 * Ensure the list of HV_FIXED pages that will be passed to firmware
-> +	 * do not exceed the page-sized argument buffer.
-> +	 */
-> +	if (num_elements * sizeof(*range) + sizeof(*range_list) > PAGE_SIZE) {
-> +		dev_warn(sev->dev, "Additional HV_Fixed pages cannot be accommodated, omitting\n");
-> +		return;
-> +	}
-> +
-> +	range = &range_list->ranges[range_list->num_elements];
-> +	list_for_each_entry(entry, &snp_hv_fixed_pages, list) {
-> +		range->base = page_to_pfn(entry->page) << PAGE_SHIFT;
-> +		range->page_count = 1 << entry->order;
-> +		range++;
-> +	}
-> +	range_list->num_elements = num_elements;
-> +}
-> +
-> +static void snp_leak_hv_fixed_pages(void)
-> +{
-> +	struct snp_hv_fixed_pages_entry *entry;
-> +
-> +	/* List is protected by sev_cmd_mutex */
-> +	lockdep_assert_held(&sev_cmd_mutex);
-> +
-> +	if (list_empty(&snp_hv_fixed_pages))
-> +		return;
-> +
-> +	list_for_each_entry(entry, &snp_hv_fixed_pages, list)
-> +		if (entry->page_state == HV_FIXED)
-> +			__snp_leak_pages(page_to_pfn(entry->page),
-> +					 1 << entry->order, false);
-> +}
-> +
->  static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+>  static int psp_init(struct psp_device *psp)
 >  {
->  	struct sev_data_range_list *range_list = arg;
-> @@ -1248,6 +1422,12 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->  			return rc;
->  		}
+>  	int ret;
+> @@ -198,6 +210,12 @@ static int psp_init(struct psp_device *psp)
+>  			return ret;
+>  	}
 >  
+> +	if (!psp_check_sfs_support(psp)) {
+> +		ret = sfs_dev_init(psp);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	if (psp->vdata->platform_access) {
+>  		ret = platform_access_dev_init(psp);
+>  		if (ret)
+> @@ -302,6 +320,8 @@ void psp_dev_destroy(struct sp_device *sp)
+>  
+>  	tee_dev_destroy(psp);
+>  
+> +	sfs_dev_destroy(psp);
+> +
+>  	dbc_dev_destroy(psp);
+>  
+>  	platform_access_dev_destroy(psp);
+> diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+> index e43ce87ede76..268c83f298cb 100644
+> --- a/drivers/crypto/ccp/psp-dev.h
+> +++ b/drivers/crypto/ccp/psp-dev.h
+> @@ -32,7 +32,8 @@ union psp_cap_register {
+>  		unsigned int sev			:1,
+>  			     tee			:1,
+>  			     dbc_thru_ext		:1,
+> -			     rsvd1			:4,
+> +			     sfs			:1,
+> +			     rsvd1			:3,
+>  			     security_reporting		:1,
+>  			     fused_part			:1,
+>  			     rsvd2			:1,
+> @@ -68,6 +69,7 @@ struct psp_device {
+>  	void *tee_data;
+>  	void *platform_access_data;
+>  	void *dbc_data;
+> +	void *sfs_data;
+>  
+>  	union psp_cap_register capability;
+>  };
+> @@ -118,12 +120,16 @@ struct psp_ext_request {
+>   * @PSP_SUB_CMD_DBC_SET_UID:		Set UID for DBC
+>   * @PSP_SUB_CMD_DBC_GET_PARAMETER:	Get parameter from DBC
+>   * @PSP_SUB_CMD_DBC_SET_PARAMETER:	Set parameter for DBC
+> + * @PSP_SUB_CMD_SFS_GET_FW_VERS:	Get firmware versions for ASP and other MP
+> + * @PSP_SUB_CMD_SFS_UPDATE:		Command to load, verify and execute SFS package
+>   */
+>  enum psp_sub_cmd {
+>  	PSP_SUB_CMD_DBC_GET_NONCE	= PSP_DYNAMIC_BOOST_GET_NONCE,
+>  	PSP_SUB_CMD_DBC_SET_UID		= PSP_DYNAMIC_BOOST_SET_UID,
+>  	PSP_SUB_CMD_DBC_GET_PARAMETER	= PSP_DYNAMIC_BOOST_GET_PARAMETER,
+>  	PSP_SUB_CMD_DBC_SET_PARAMETER	= PSP_DYNAMIC_BOOST_SET_PARAMETER,
+> +	PSP_SUB_CMD_SFS_GET_FW_VERS	= PSP_SFS_GET_FW_VERSIONS,
+> +	PSP_SUB_CMD_SFS_UPDATE		= PSP_SFS_UPDATE,
+>  };
+>  
+>  int psp_extended_mailbox_cmd(struct psp_device *psp, unsigned int timeout_msecs,
+> diff --git a/drivers/crypto/ccp/sfs.c b/drivers/crypto/ccp/sfs.c
+> new file mode 100644
+> index 000000000000..d56412f24669
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sfs.c
+> @@ -0,0 +1,310 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * AMD Secure Processor Seamless Firmware Servicing support.
+> + *
+> + * Copyright (C) 2025 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Ashish Kalra <ashish.kalra@amd.com>
+> + */
+> +
+> +#include <linux/firmware.h>
+> +
+> +#include "sfs.h"
+> +#include "sev-dev.h"
+> +
+> +#define SFS_DEFAULT_TIMEOUT		(10 * MSEC_PER_SEC)
+> +#define SFS_MAX_PAYLOAD_SIZE		(2 * 1024 * 1024)
+> +#define SFS_NUM_2MB_PAGES_CMDBUF	(SFS_MAX_PAYLOAD_SIZE / PMD_SIZE)
+> +#define SFS_NUM_PAGES_CMDBUF		(SFS_MAX_PAYLOAD_SIZE / PAGE_SIZE)
+> +
+> +static DEFINE_MUTEX(sfs_ioctl_mutex);
+> +
+> +static struct sfs_misc_dev *misc_dev;
+> +
+> +static int send_sfs_cmd(struct sfs_device *sfs_dev, int msg)
+> +{
+> +	int ret;
+> +
+> +	sfs_dev->command_buf->hdr.status = 0;
+> +	sfs_dev->command_buf->hdr.sub_cmd_id = msg;
+> +
+> +	ret = psp_extended_mailbox_cmd(sfs_dev->psp,
+> +				       SFS_DEFAULT_TIMEOUT,
+> +				       (struct psp_ext_request *)sfs_dev->command_buf);
+> +	if (ret == -EIO) {
+> +		dev_dbg(sfs_dev->dev,
+> +			 "msg 0x%x failed with PSP error: 0x%x, extended status: 0x%x\n",
+> +			 msg, sfs_dev->command_buf->hdr.status,
+> +			 *(u32 *)sfs_dev->command_buf->buf);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int send_sfs_get_fw_versions(struct sfs_device *sfs_dev)
+> +{
+> +	/*
+> +	 * SFS_GET_FW_VERSIONS command needs the output buffer to be
+> +	 * initialized to 0xC7 in every byte.
+> +	 */
+> +	memset(sfs_dev->command_buf->sfs_buffer, 0xc7, PAGE_SIZE);
+> +	sfs_dev->command_buf->hdr.payload_size = 2 * PAGE_SIZE;
+> +
+> +	return send_sfs_cmd(sfs_dev, PSP_SFS_GET_FW_VERSIONS);
+> +}
+> +
+> +static int send_sfs_update_package(struct sfs_device *sfs_dev, const char *payload_name)
+> +{
+> +	char payload_path[PAYLOAD_NAME_SIZE + sizeof("amd/")];
+> +	const struct firmware *firmware;
+> +	unsigned long package_size;
+> +	int ret;
+> +
+> +	/* Sanitize userspace provided payload name */
+> +	if (!strnchr(payload_name, PAYLOAD_NAME_SIZE, '\0'))
+> +		return -EINVAL;
+> +
+> +	snprintf(payload_path, sizeof(payload_path), "amd/%s", payload_name);
+> +
+> +	ret = firmware_request_nowarn(&firmware, payload_path, sfs_dev->dev);
+> +	if (ret < 0) {
+> +		dev_warn(sfs_dev->dev, "firmware request fail %d\n", ret);
+
+This should include the filename, something like:
+
+	"firmware request failed for %s (%d)\n", ...
+
+Also, since this is a userspace request, this and all other messages
+possible through the ioctl() should be ratelimited, i.e.,
+dev_warn_ratelimited().
+
+Thanks,
+Tom
+
+> +		return -ENOENT;
+> +	}
+> +
+> +	/*
+> +	 * SFS Update Package command's input buffer contains TEE_EXT_CMD_BUFFER
+> +	 * followed by the Update Package and it should be 64KB aligned.
+> +	 */
+> +	package_size = ALIGN(firmware->size + PAGE_SIZE, 0x10000U);
+> +
+> +	/*
+> +	 * SFS command buffer is a pre-allocated 2MB buffer, fail update package
+> +	 * if SFS payload is larger than the pre-allocated command buffer.
+> +	 */
+> +	if (package_size > SFS_MAX_PAYLOAD_SIZE) {
+> +		dev_warn(sfs_dev->dev,
+> +			 "SFS payload size %ld larger than maximum supported payload size of %u\n",
+> +			 package_size, SFS_MAX_PAYLOAD_SIZE);
+> +		release_firmware(firmware);
+> +		return -E2BIG;
+> +	}
+> +
+> +	/*
+> +	 * Copy firmware data to a HV_Fixed memory region.
+> +	 */
+> +	memcpy(sfs_dev->command_buf->sfs_buffer, firmware->data, firmware->size);
+> +	sfs_dev->command_buf->hdr.payload_size = package_size;
+> +
+> +	release_firmware(firmware);
+> +
+> +	return send_sfs_cmd(sfs_dev, PSP_SFS_UPDATE);
+> +}
+> +
+> +static long sfs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+> +{
+> +	struct sfs_user_get_fw_versions __user *sfs_get_fw_versions;
+> +	struct sfs_user_update_package __user *sfs_update_package;
+> +	struct psp_device *psp_master = psp_get_master_device();
+> +	char payload_name[PAYLOAD_NAME_SIZE];
+> +	struct sfs_device *sfs_dev;
+> +	int ret = 0;
+> +
+> +	if (!psp_master || !psp_master->sfs_data)
+> +		return -ENODEV;
+> +
+> +	sfs_dev = psp_master->sfs_data;
+> +
+> +	guard(mutex)(&sfs_ioctl_mutex);
+> +
+> +	switch (cmd) {
+> +	case SFSIOCFWVERS:
+> +		dev_dbg(sfs_dev->dev, "in SFSIOCFWVERS\n");
+> +
+> +		sfs_get_fw_versions = (struct sfs_user_get_fw_versions __user *)arg;
+> +
+> +		ret = send_sfs_get_fw_versions(sfs_dev);
+> +		if (ret && ret != -EIO)
+> +			return ret;
+> +
 > +		/*
-> +		 * Add HV_Fixed pages from other PSP sub-devices, such as SFS to the
-> +		 * HV_Fixed page list.
+> +		 * Return SFS status and extended status back to userspace
+> +		 * if PSP status indicated success or command error.
 > +		 */
-> +		snp_add_hv_fixed_pages(sev, snp_range_list);
+> +		if (copy_to_user(&sfs_get_fw_versions->blob, sfs_dev->command_buf->sfs_buffer,
+> +				 PAGE_SIZE))
+> +			return -EFAULT;
+> +		if (copy_to_user(&sfs_get_fw_versions->sfs_status,
+> +				 &sfs_dev->command_buf->hdr.status,
+> +				 sizeof(sfs_get_fw_versions->sfs_status)))
+> +			return -EFAULT;
+> +		if (copy_to_user(&sfs_get_fw_versions->sfs_extended_status,
+> +				 &sfs_dev->command_buf->buf,
+> +				 sizeof(sfs_get_fw_versions->sfs_extended_status)))
+> +			return -EFAULT;
+> +		break;
+> +	case SFSIOCUPDATEPKG:
+> +		dev_dbg(sfs_dev->dev, "in SFSIOCUPDATEPKG\n");
 > +
->  		memset(&data, 0, sizeof(data));
->  
->  		if (max_snp_asid) {
-> @@ -1293,6 +1473,7 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->  		return rc;
->  	}
->  
-> +	snp_hv_fixed_pages_state_update(sev, HV_FIXED);
->  	sev->snp_initialized = true;
->  	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
->  
-> @@ -1896,6 +2077,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
->  		return ret;
->  	}
->  
-> +	snp_leak_hv_fixed_pages();
->  	sev->snp_initialized = false;
->  	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
->  
-> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-> index 5aed2595c9ae..ac03bd0848f7 100644
-> --- a/drivers/crypto/ccp/sev-dev.h
-> +++ b/drivers/crypto/ccp/sev-dev.h
-> @@ -69,4 +69,7 @@ void sev_dev_destroy(struct psp_device *psp);
->  void sev_pci_init(void);
->  void sev_pci_exit(void);
->  
-> +struct page *snp_alloc_hv_fixed_pages(unsigned int num_2mb_pages);
-> +void snp_free_hv_fixed_pages(struct page *page);
+> +		sfs_update_package = (struct sfs_user_update_package __user *)arg;
 > +
->  #endif /* __SEV_DEV_H */
+> +		if (copy_from_user(payload_name, sfs_update_package->payload_name,
+> +				   PAYLOAD_NAME_SIZE))
+> +			return -EFAULT;
+> +
+> +		ret = send_sfs_update_package(sfs_dev, payload_name);
+> +		if (ret && ret != -EIO)
+> +			return ret;
+> +
+> +		/*
+> +		 * Return SFS status and extended status back to userspace
+> +		 * if PSP status indicated success or command error.
+> +		 */
+> +		if (copy_to_user(&sfs_update_package->sfs_status,
+> +				 &sfs_dev->command_buf->hdr.status,
+> +				 sizeof(sfs_update_package->sfs_status)))
+> +			return -EFAULT;
+> +		if (copy_to_user(&sfs_update_package->sfs_extended_status,
+> +				 &sfs_dev->command_buf->buf,
+> +				 sizeof(sfs_update_package->sfs_extended_status)))
+> +			return -EFAULT;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations sfs_fops = {
+> +	.owner	= THIS_MODULE,
+> +	.unlocked_ioctl = sfs_ioctl,
+> +};
+> +
+> +static void sfs_exit(struct kref *ref)
+> +{
+> +	misc_deregister(&misc_dev->misc);
+> +	kfree(misc_dev);
+> +	misc_dev = NULL;
+> +}
+> +
+> +void sfs_dev_destroy(struct psp_device *psp)
+> +{
+> +	struct sfs_device *sfs_dev = psp->sfs_data;
+> +
+> +	if (!sfs_dev)
+> +		return;
+> +
+> +	/*
+> +	 * Change SFS command buffer back to the default "Write-Back" type.
+> +	 */
+> +	set_memory_wb((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
+> +
+> +	snp_free_hv_fixed_pages(sfs_dev->page);
+> +
+> +	if (sfs_dev->misc)
+> +		kref_put(&misc_dev->refcount, sfs_exit);
+> +
+> +	psp->sfs_data = NULL;
+> +}
+> +
+> +/* Based on sev_misc_init() */
+> +static int sfs_misc_init(struct sfs_device *sfs)
+> +{
+> +	struct device *dev = sfs->dev;
+> +	int ret;
+> +
+> +	/*
+> +	 * SFS feature support can be detected on multiple devices but the SFS
+> +	 * FW commands must be issued on the master. During probe, we do not
+> +	 * know the master hence we create /dev/sfs on the first device probe.
+> +	 */
+> +	if (!misc_dev) {
+> +		struct miscdevice *misc;
+> +
+> +		misc_dev = kzalloc(sizeof(*misc_dev), GFP_KERNEL);
+> +		if (!misc_dev)
+> +			return -ENOMEM;
+> +
+> +		misc = &misc_dev->misc;
+> +		misc->minor = MISC_DYNAMIC_MINOR;
+> +		misc->name = "sfs";
+> +		misc->fops = &sfs_fops;
+> +		misc->mode = 0600;
+> +
+> +		ret = misc_register(misc);
+> +		if (ret)
+> +			return ret;
+> +
+> +		kref_init(&misc_dev->refcount);
+> +	} else {
+> +		kref_get(&misc_dev->refcount);
+> +	}
+> +
+> +	sfs->misc = misc_dev;
+> +	dev_dbg(dev, "registered SFS device\n");
+> +
+> +	return 0;
+> +}
+> +
+> +int sfs_dev_init(struct psp_device *psp)
+> +{
+> +	struct device *dev = psp->dev;
+> +	struct sfs_device *sfs_dev;
+> +	struct page *page;
+> +	int ret = -ENOMEM;
+> +
+> +	sfs_dev = devm_kzalloc(dev, sizeof(*sfs_dev), GFP_KERNEL);
+> +	if (!sfs_dev)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * Pre-allocate 2MB command buffer for all SFS commands using
+> +	 * SNP HV_Fixed page allocator which also transitions the
+> +	 * SFS command buffer to HV_Fixed page state if SNP is enabled.
+> +	 */
+> +	page = snp_alloc_hv_fixed_pages(SFS_NUM_2MB_PAGES_CMDBUF);
+> +	if (!page) {
+> +		dev_dbg(dev, "Command Buffer HV-Fixed page allocation failed\n");
+> +		goto cleanup_dev;
+> +	}
+> +	sfs_dev->page = page;
+> +	sfs_dev->command_buf = page_address(page);
+> +
+> +	dev_dbg(dev, "Command buffer 0x%px to be marked as HV_Fixed\n", sfs_dev->command_buf);
+> +
+> +	/*
+> +	 * SFS command buffer must be mapped as non-cacheable.
+> +	 */
+> +	ret = set_memory_uc((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
+> +	if (ret) {
+> +		dev_dbg(dev, "Set memory uc failed\n");
+> +		goto cleanup_cmd_buf;
+> +	}
+> +
+> +	dev_dbg(dev, "Command buffer 0x%px marked uncacheable\n", sfs_dev->command_buf);
+> +
+> +	psp->sfs_data = sfs_dev;
+> +	sfs_dev->dev = dev;
+> +	sfs_dev->psp = psp;
+> +
+> +	ret = sfs_misc_init(sfs_dev);
+> +	if (ret)
+> +		goto cleanup_mem_attr;
+> +
+> +	dev_notice(sfs_dev->dev, "SFS support is available\n");
+> +
+> +	return 0;
+> +
+> +cleanup_mem_attr:
+> +	set_memory_wb((unsigned long)sfs_dev->command_buf, SFS_NUM_PAGES_CMDBUF);
+> +
+> +cleanup_cmd_buf:
+> +	snp_free_hv_fixed_pages(page);
+> +
+> +cleanup_dev:
+> +	psp->sfs_data = NULL;
+> +	devm_kfree(dev, sfs_dev);
+> +
+> +	return ret;
+> +}
+> diff --git a/drivers/crypto/ccp/sfs.h b/drivers/crypto/ccp/sfs.h
+> new file mode 100644
+> index 000000000000..97704c210efd
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sfs.h
+> @@ -0,0 +1,47 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * AMD Platform Security Processor (PSP) Seamless Firmware (SFS) Support.
+> + *
+> + * Copyright (C) 2025 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Ashish Kalra <ashish.kalra@amd.com>
+> + */
+> +
+> +#ifndef __SFS_H__
+> +#define __SFS_H__
+> +
+> +#include <uapi/linux/psp-sfs.h>
+> +
+> +#include <linux/device.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/psp-sev.h>
+> +#include <linux/psp-platform-access.h>
+> +#include <linux/set_memory.h>
+> +
+> +#include "psp-dev.h"
+> +
+> +struct sfs_misc_dev {
+> +	struct kref refcount;
+> +	struct miscdevice misc;
+> +};
+> +
+> +struct sfs_command {
+> +	struct psp_ext_req_buffer_hdr hdr;
+> +	u8 buf[PAGE_SIZE - sizeof(struct psp_ext_req_buffer_hdr)];
+> +	u8 sfs_buffer[];
+> +} __packed;
+> +
+> +struct sfs_device {
+> +	struct device *dev;
+> +	struct psp_device *psp;
+> +
+> +	struct page *page;
+> +	struct sfs_command *command_buf;
+> +
+> +	struct sfs_misc_dev *misc;
+> +};
+> +
+> +void sfs_dev_destroy(struct psp_device *psp);
+> +int sfs_dev_init(struct psp_device *psp);
+> +
+> +#endif /* __SFS_H__ */
+> diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
+> index 1504fb012c05..540abf7de048 100644
+> --- a/include/linux/psp-platform-access.h
+> +++ b/include/linux/psp-platform-access.h
+> @@ -7,6 +7,8 @@
+>  
+>  enum psp_platform_access_msg {
+>  	PSP_CMD_NONE			= 0x0,
+> +	PSP_SFS_GET_FW_VERSIONS,
+> +	PSP_SFS_UPDATE,
+>  	PSP_CMD_HSTI_QUERY		= 0x14,
+>  	PSP_I2C_REQ_BUS_CMD		= 0x64,
+>  	PSP_DYNAMIC_BOOST_GET_NONCE,
+> diff --git a/include/uapi/linux/psp-sfs.h b/include/uapi/linux/psp-sfs.h
+> new file mode 100644
+> index 000000000000..94e51670383c
+> --- /dev/null
+> +++ b/include/uapi/linux/psp-sfs.h
+> @@ -0,0 +1,87 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
+> +/*
+> + * Userspace interface for AMD Seamless Firmware Servicing (SFS)
+> + *
+> + * Copyright (C) 2025 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Ashish Kalra <ashish.kalra@amd.com>
+> + */
+> +
+> +#ifndef __PSP_SFS_USER_H__
+> +#define __PSP_SFS_USER_H__
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * SFS: AMD Seamless Firmware Support (SFS) interface
+> + */
+> +
+> +#define PAYLOAD_NAME_SIZE	64
+> +#define TEE_EXT_CMD_BUFFER_SIZE	4096
+> +
+> +/**
+> + * struct sfs_user_get_fw_versions - get current level of base firmware (output).
+> + * @blob:                  current level of base firmware for ASP and patch levels (input/output).
+> + * @sfs_status:            32-bit SFS status value (output).
+> + * @sfs_extended_status:   32-bit SFS extended status value (output).
+> + */
+> +struct sfs_user_get_fw_versions {
+> +	__u8	blob[TEE_EXT_CMD_BUFFER_SIZE];
+> +	__u32	sfs_status;
+> +	__u32	sfs_extended_status;
+> +} __packed;
+> +
+> +/**
+> + * struct sfs_user_update_package - update SFS package (input).
+> + * @payload_name:          name of SFS package to load, verify and execute (input).
+> + * @sfs_status:            32-bit SFS status value (output).
+> + * @sfs_extended_status:   32-bit SFS extended status value (output).
+> + */
+> +struct sfs_user_update_package {
+> +	char	payload_name[PAYLOAD_NAME_SIZE];
+> +	__u32	sfs_status;
+> +	__u32	sfs_extended_status;
+> +} __packed;
+> +
+> +/**
+> + * Seamless Firmware Support (SFS) IOC
+> + *
+> + * possible return codes for all SFS IOCTLs:
+> + *  0:          success
+> + *  -EINVAL:    invalid input
+> + *  -E2BIG:     excess data passed
+> + *  -EFAULT:    failed to copy to/from userspace
+> + *  -EBUSY:     mailbox in recovery or in use
+> + *  -ENODEV:    driver not bound with PSP device
+> + *  -EACCES:    request isn't authorized
+> + *  -EINVAL:    invalid parameter
+> + *  -ETIMEDOUT: request timed out
+> + *  -EAGAIN:    invalid request for state machine
+> + *  -ENOENT:    not implemented
+> + *  -ENFILE:    overflow
+> + *  -EPERM:     invalid signature
+> + *  -EIO:       PSP I/O error
+> + */
+> +#define SFS_IOC_TYPE	'S'
+> +
+> +/**
+> + * SFSIOCFWVERS - returns blob containing FW versions
+> + *                ASP provides the current level of Base Firmware for the ASP
+> + *                and the other microprocessors as well as current patch
+> + *                level(s).
+> + */
+> +#define SFSIOCFWVERS	_IOWR(SFS_IOC_TYPE, 0x1, struct sfs_user_get_fw_versions)
+> +
+> +/**
+> + * SFSIOCUPDATEPKG - updates package/payload
+> + *                   ASP loads, verifies and executes the SFS package.
+> + *                   By default, the SFS package/payload is loaded from
+> + *                   /lib/firmware/amd, but alternative firmware loading
+> + *                   path can be specified using kernel parameter
+> + *                   firmware_class.path or the firmware loading path
+> + *                   can be customized using sysfs file:
+> + *                   /sys/module/firmware_class/parameters/path.
+> + */
+> +#define SFSIOCUPDATEPKG	_IOWR(SFS_IOC_TYPE, 0x2, struct sfs_user_update_package)
+> +
+> +#endif /* __PSP_SFS_USER_H__ */
 
