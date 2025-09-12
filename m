@@ -1,103 +1,155 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CB230DEBC;
-	Fri, 12 Sep 2025 13:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227B0308F2D;
+	Fri, 12 Sep 2025 13:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757682858; cv=none; b=dmfmCJ6sKLkXyRDGXKtz8e+t5ppaLacqzBVvCqSyoGx3rzO/lXQNaOHLaAzkUIKo1hohld+a35razu+H2Mnc3RzKEiNR2/Zv27hd/35rwHNIZ7aVHMpxufD2XaJCnONQnhEtG4K/DyGOWXeMlJy9rqaskVNZAgH9WVB45U7stqo=
+	t=1757683388; cv=none; b=nW4tE1e8M2+f8RrT7jOqNktvU7w2Xypj9D1Izs5QUi0x9jXBN99p/TLb0r77MEOXscOSa/05x3WVgxAQLgV8gkpvSi7gJMKt2va81BoxvCA5BEWBUWZJpz5e/ycmlpcVcY70U9GJyTllHFIrBafkkMzsBQUGKANSucLzg8Xg/hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757682858; c=relaxed/simple;
-	bh=6e+sVle9MifWvb6/53/ryU72tPHkEfNKBpFNkBJjL+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzDhU4ce0Xm+6bskW9P3PjdCtiVvTQwHTo4vp2RApnCuj+C9tMiomilP7psWzWLGj9CRzt/G5ubD1ieTji84XNdw8MqzzreSv8inrJiAmy3ea2V+h+hdT1OvoOvrOSRTPqBoqW/ekjrOrYAdB77njyORgpu4N2Uzkm0xjYAUKR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id D57E32C09E2B;
-	Fri, 12 Sep 2025 15:14:06 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id ABA63121533; Fri, 12 Sep 2025 15:14:06 +0200 (CEST)
-Date: Fri, 12 Sep 2025 15:14:06 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: wufan@kernel.org
-Cc: dhowells@redhat.com, ignat@cloudflare.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, jarkko@kernel.org, zohar@linux.ibm.com,
-	eric.snowberg@oracle.com, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KEYS: X.509: Fix Basic Constraints CA flag parsing
-Message-ID: <aMQcnoETIt4t4Tqz@wunner.de>
-References: <20250911225356.2678-1-wufan@kernel.org>
+	s=arc-20240116; t=1757683388; c=relaxed/simple;
+	bh=c9p9bPrxSi+sJWVsWiSYSAd6dX2DEW2af6xw4qih9Jw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0ZtaX0/CCLBY5XK09EqTi1Htg4tzPkVt3d41g+lUhNb8rUF7Xxb58gXp784CXsOTX8p87mrtrQP3v8zlBRObnsKvKi3yAZ6xMBF/lGl6i2VkfVL9OA0PqDvp6efs4eqd6/IFle5af+RGMHKz1GFFLcs7ZXG2a/mjMbXjIQOvak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvXyZIi8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvXyZIi8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D6B4C4CEF1;
+	Fri, 12 Sep 2025 13:22:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757683387;
+	bh=c9p9bPrxSi+sJWVsWiSYSAd6dX2DEW2af6xw4qih9Jw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AvXyZIi8lDfAalXgF1WdETnPgZZ8RM/3fqPD7soAGpkwubprAipGOV6yOoTY3OHSk
+	 yLXY4Sb2YO/3+SqgiF7wj7VGLz9j0uKOmb/GGgy4yndBEsWYvpN5dZma3c60ozNQjC
+	 zG6jkUFWEpkmUpJsBq3cIF3+Hkmtat4QYo+4SuWmEgfIpTAhP/EdrRrE7+MW6ktgiP
+	 sfM2z8ccxdfOJDSOxatKj3UU3+RNd90XT8NCn4Pmwy2G9TD8BXnb2X5PFl8d+ef8oP
+	 MS/OfpRkXMSwF9yOSsOYwPTssnDsx74nkFfSmqUcMqNSlQrdT9mzuIu9ED/Is4y8wJ
+	 KD26QXnW1JVXw==
+Message-ID: <bcad01be-fd00-4789-ae83-b855e495fab9@kernel.org>
+Date: Fri, 12 Sep 2025 15:22:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250911225356.2678-1-wufan@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/38] dt-bindings: media: mediatek,mt8195-jpeg: Allow
+ range number in node address
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ linux-mediatek@lists.infradead.org, robh@kernel.org
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
+ conor+dt@kernel.org, chunkuang.hu@kernel.org, p.zabel@pengutronix.de,
+ airlied@gmail.com, simona@ffwll.ch, maarten.lankhorst@linux.intel.com,
+ mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com,
+ mchehab@kernel.org, matthias.bgg@gmail.com, chunfeng.yun@mediatek.com,
+ vkoul@kernel.org, kishon@kernel.org, sean.wang@kernel.org,
+ linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org,
+ andersson@kernel.org, mathieu.poirier@linaro.org, daniel.lezcano@linaro.org,
+ tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com,
+ ck.hu@mediatek.com, houlong.wei@mediatek.com,
+ kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com,
+ tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com, shane.chien@mediatek.com,
+ olivia.wen@mediatek.com, granquet@baylibre.com, eugen.hristev@linaro.org,
+ arnd@arndb.de, sam.shih@mediatek.com, jieyy.yang@mediatek.com,
+ frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-15-angelogioacchino.delregno@collabora.com>
+ <70ae6787-ee0b-43a0-851e-1fb6c82f6c31@kernel.org>
+ <72934f23-08eb-4214-a946-7aa7a432352e@collabora.com>
+ <56380fe5-8358-4341-9478-ba4ce52daeed@collabora.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <56380fe5-8358-4341-9478-ba4ce52daeed@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 11, 2025 at 10:53:56PM +0000, wufan@kernel.org wrote:
-> Fix the X.509 Basic Constraints CA flag parsing to correctly handle
-> the ASN.1 DER encoded structure. The parser was incorrectly treating
-> the length field as the boolean value.
+On 12/09/2025 11:00, AngeloGioacchino Del Regno wrote:
+> Il 04/08/25 11:02, AngeloGioacchino Del Regno ha scritto:
+>> Il 24/07/25 11:14, Krzysztof Kozlowski ha scritto:
+>>> On 24/07/2025 10:38, AngeloGioacchino Del Regno wrote:
+>>>> The dual and triple core jpeg encoder and decoder (respectively)
+>>>> on MT8195 are far apart: the only way to have this to make sense
+>>>> is to split those in multiple address ranges in device trees as
+>>>> one big range would overlap with other IP in at least the MT8195
+>>>> SoC.
+>>>>
+>>>> Change both the jpegdec and jpegenc bindings to allow specifying
+>>>> children nodes such as "jpegdec@0,10000", "jpegdec@1,0" or for
+>>>> encoder "jpegenc@0,0", "jpegenc@1,0" to resolve dtbs_check issues.
+>>>
+>>>
+>>> This should not be needed for standard MMIO/simple-bus nodes. I think
+>>> DTS is wrong here.
+>>>
+>>> Which cases really need the ','?
+>>>
+>>
+>> All of the multi-core JPEG enc/decoders on MT8195 (and newer).
+>>
+>> The DT changes are included in the same series as this commit; check:
+>>
+>> 20250724083914.61351-35-angelogioacchino.delregno@collabora.com
+>>
+>> Cheers,
+>> Angelo
+>>
 > 
-> According to ITU-T X.690 section 8.2, a BOOLEAN is encoded as:
-> 
-> Tag (0x01), Length (0x01), Value (0x00 for FALSE, non-zero for TRUE)
-> 
-> The basicConstraints extension with CA:TRUE is encoded as:
-> 
->   SEQUENCE (0x30) | Length | BOOLEAN (0x01) | Length (0x01) | Value (0xFF)
->                              ^-- v[2]         ^-- v[3]        ^-- v[4]
-> 
-> The parser was checking v[3] (the length field, always 0x01) instead
-> of v[4] (the actual boolean value, 0xFF for TRUE).
+> Any further comments on this?
 
-Excellent catch!  How did you find it?
+Well yeah, that's still wrong. These are simple MMIO, so comma is not
+correct. Rob already commented on this at v1 of Ariel's patchset. It was
+BTW the same device - mt8195 jpeg!
 
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -623,7 +625,7 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
->  			return -EBADMSG;
->  		if (vlen < 2)
->  			return -EBADMSG;
->  		if (v[1] != vlen - 2)
->  			return -EBADMSG;
-> -		if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
-> +		if (vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1 && v[4] != 0)
->  			ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
->  		return 0;
->  	}
 
-Your patch is correct, however the conditions ...
-
-  vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1
-
-... all check well-formedness of the BasicConstraints object,
-so it seems if any of those checks fails, -EBADMSG should be returned.
-
-The check "if (vlen < 2)" could be changed to "if (vlen < 5)" because
-5 bytes seems to be the minimum size of a well-formed BasicConstraints
-object.  Then the "vlen >= 5" and "v[1] != 0" checks can be dropped.
-
-Up to you whether to respin this patch or make those changes in
-a separate patch on top.  And up to Herbert whether to take this
-patch as is or wait for a respin.
-
-Reviewed-by: Lukas Wunner <lukas@wunner.de>
-
-I note that parsing the v[] array is quite error-prone and it
-might have been better to either declare a packed struct for the
-BasicConstraints object with human-readable member names,
-or create a separate ASN.1 module for it.
-
-Thanks,
-
-Lukas
+Best regards,
+Krzysztof
