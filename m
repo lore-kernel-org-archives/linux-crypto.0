@@ -1,140 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE27334375
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 21:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176352BAF4;
+	Fri, 12 Sep 2025 21:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757711702; cv=none; b=neQBKSxlqEs2yk4pMflF35ywlRDS/227xQS9FlRz/5n1zdUnqAN54wME5N/vYVIbCcV54JUmB4nEG0AilUpsgbDu6bAEAOUZ/OHYKVxAX92ao3qgKNRLKOCJy+bwQE0yXv6dkvXJO2UVdrFRcZvfiIxeQr0T18co/CxTQM3VYrs=
+	t=1757712782; cv=none; b=CIbrIWDu3EGDx7Trijs1+znL4ZXnA1fnx5bIHkR+dlrmXKwvW2ULJ8blCeN9kWJkEUNpnt5QCe/vahvUDl6gqMaRpz//FzTn5Qr1Zalqhjrx9IrmazCl83LAmtmc01v/aMGVUWymeJ+bEV+FkZW44SanDGwQ+7w8p/+Or6h1ITY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757711702; c=relaxed/simple;
-	bh=BOVUAiC7L7uGyMy4Htrs40wCLw+QaPe8irlE0apVa9U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V+YYcWnbnOWpA29WKZhxeuQYBQK3I+sxvGVXUwcePDY+80SeGbXcHVBUInW0u7tHllI139L5zBpLMwJ2ifYmTAS6/P6NSZphMD18An9Fp1ib1axglINgCtaEicq3aqUIpRaytwlTzpx5XQsJXq2/zBawhv9O18ZRpg1ZOZGw7U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsBvyikR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757712782; c=relaxed/simple;
+	bh=Fa1ZYSxyvToVhEv9NrlVYdvmGvyVBS7zdoogcGQu6K8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NcNc/mZfYh8UhTkjA9oZqPLO07ln+i+SbRid1CunaIT8T7v49vHf8sebuGVEmB7TLWCT9VhU4Gfumcq2y7RTp3eqiqL61tArmsKjxK2YK+MxZfKBYQzGodRXyIRXmB9qEe9qJhh5NByxFPOC8mp57lv+NgdDZYGcgDG37514mdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlg3Ik6Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsBvyikR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 391CAC4CEF8
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 21:15:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlg3Ik6Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 688B3C4CEF1;
+	Fri, 12 Sep 2025 21:32:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757711702;
-	bh=BOVUAiC7L7uGyMy4Htrs40wCLw+QaPe8irlE0apVa9U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MsBvyikRsC+miKr3CmrqnwECIOEcD0UZH5TnHHxoJUxOckPcez/BmSzwXKKVu0j5u
-	 /lSDVerL0o9rZbhBUO/pKQsM1Lh0y2v7Z8pFr8r61gn23F9jV+nKIOXgpzxQaS2HFH
-	 /Qu+Afsz6LnVvMIrrO0/p620TvvRHTLRwLS0UT/odmncXNT9HTBgy+CQXC8kd7eLiy
-	 siganrcB1Zc1/qCnzvX89+smGSOMYsAPZLOxTHcUFPBl2DF08+pX/pF1rRR/gXhXSB
-	 ZGz70oaHkjyMBC2TK9eJGYhxKD6gozk/mG3AiSk9UrP48/bto7mXnorRgHGTa2N0Kk
-	 7glevfNj2907A==
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-25669596955so22538155ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:15:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWXdgwmSc4zVyLFT5jzB/0dG2bIcfNaHD6eVMxLIZ05yqWeDzedtHJ5vv7SPJefv86hCf3mAIygBx0aAvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQGLtMLoNLPrQT26wAPDD/NR2sbuiWR2GILTOVSGHWfr5KFJGG
-	aR58C/SuLMgdTRhH1XpvcCr6lQVKbdvIW5QrgIrTcyNiitv1D5zjSQVXwXUguSWtBhvbl4cxeWW
-	ly2Za+WDK4M8B71Wi7Qv3BOxRYqyEfeo=
-X-Google-Smtp-Source: AGHT+IH4TSct/tSPvFi34kJ8hocuL2dt5tlTyPL3ZHZsH2MAnZSz8HbOd7xFLua8gGaJCt//qTp1JX8U63ahSfWq/xU=
-X-Received: by 2002:a17:902:e806:b0:24d:9c86:5e53 with SMTP id
- d9443c01a7336-25d2528c33fmr66417755ad.2.1757711701856; Fri, 12 Sep 2025
- 14:15:01 -0700 (PDT)
+	s=k20201202; t=1757712781;
+	bh=Fa1ZYSxyvToVhEv9NrlVYdvmGvyVBS7zdoogcGQu6K8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qlg3Ik6YJQLRToqhk65gPTvTWAqKzPKLpqlPYg11Yq2+28+n5ZzxnRVnZ7BKTTfVs
+	 a6wjOGdVttmVndkHti7ibC9ut03i6qZ1BU72QM8NS+oyrKLmYlgq4YsEjuxyAysWVZ
+	 B22Raaf0/Nilxq0hdrzLMZSOeC4YbjnKPvgilKGUudzvZxsSE5a/VF2SEe0cVexRJT
+	 J5kVvL4qKRh50sFWtZsd6waWZNNixwntAzMBW9+2lSJ6dmuB5e3nxZM9Dwg21juXhn
+	 xBkS42tFwUjK4djCIiGKwlV81GON04CGAXgBHU1Yo6WGQntuL7D8FhBcgdDKpN27nn
+	 EAg1n1tYtDieg==
+Date: Fri, 12 Sep 2025 14:32:56 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Lee Jones <lee@kernel.org>
+Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
+	jarkko@kernel.org, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org
+Subject: Re: [GIT PULL] Immutable branch between MFD, Char and Crypto due for
+ the v6.18 merge window
+Message-ID: <20250912213256.GA3062565@ax162>
+References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
+ <20250902124205.GL2163762@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911225356.2678-1-wufan@kernel.org> <aMQcnoETIt4t4Tqz@wunner.de>
-In-Reply-To: <aMQcnoETIt4t4Tqz@wunner.de>
-From: Fan Wu <wufan@kernel.org>
-Date: Fri, 12 Sep 2025 14:14:49 -0700
-X-Gmail-Original-Message-ID: <CAKtyLkExV9dqMWa5j9O5n8oTHXh8McwVbjjCm6L9L=eFsH3HNw@mail.gmail.com>
-X-Gm-Features: Ac12FXwPTvg-iY8dF1E-xu7is_6OF3tOvQMHMmC3HmDvvM293tyy6qI799494CQ
-Message-ID: <CAKtyLkExV9dqMWa5j9O5n8oTHXh8McwVbjjCm6L9L=eFsH3HNw@mail.gmail.com>
-Subject: Re: [PATCH] KEYS: X.509: Fix Basic Constraints CA flag parsing
-To: Lukas Wunner <lukas@wunner.de>
-Cc: wufan@kernel.org, dhowells@redhat.com, ignat@cloudflare.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, jarkko@kernel.org, 
-	zohar@linux.ibm.com, eric.snowberg@oracle.com, keyrings@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902124205.GL2163762@google.com>
 
-On Fri, Sep 12, 2025 at 6:14=E2=80=AFAM Lukas Wunner <lukas@wunner.de> wrot=
-e:
->
-> On Thu, Sep 11, 2025 at 10:53:56PM +0000, wufan@kernel.org wrote:
-> > Fix the X.509 Basic Constraints CA flag parsing to correctly handle
-> > the ASN.1 DER encoded structure. The parser was incorrectly treating
-> > the length field as the boolean value.
-> >
-> > According to ITU-T X.690 section 8.2, a BOOLEAN is encoded as:
-> >
-> > Tag (0x01), Length (0x01), Value (0x00 for FALSE, non-zero for TRUE)
-> >
-> > The basicConstraints extension with CA:TRUE is encoded as:
-> >
-> >   SEQUENCE (0x30) | Length | BOOLEAN (0x01) | Length (0x01) | Value (0x=
-FF)
-> >                              ^-- v[2]         ^-- v[3]        ^-- v[4]
-> >
-> > The parser was checking v[3] (the length field, always 0x01) instead
-> > of v[4] (the actual boolean value, 0xFF for TRUE).
->
-> Excellent catch!  How did you find it?
->
+Hi Lee,
 
-Unrelated context, I was exploring the possibility of adding Extended
-Key Usage (EKU) support and noticed this code didn't look quite right.
+On Tue, Sep 02, 2025 at 01:42:05PM +0100, Lee Jones wrote:
+> Enjoy!
+> 
+> The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+> 
+>   Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git ib-mfd-char-crypto-v6.18
+> 
+> for you to fetch changes up to 74fddd5fbab879a7d039d9fb49af923927a64811:
+> 
+>   MAINTAINERS: Add entry for Loongson Security Engine drivers (2025-09-02 12:29:57 +0100)
+> 
+> ----------------------------------------------------------------
+> Immutable branch between MFD, Char and Crypto due for the v6.18 merge window
+> 
+> ----------------------------------------------------------------
+> Qunqin Zhao (4):
+...
+>       tpm: Add a driver for Loongson TPM device
 
-> > +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> > @@ -623,7 +625,7 @@ int x509_process_extension(void *context, size_t hd=
-rlen,
-> >               if (v[0] !=3D (ASN1_CONS_BIT | ASN1_SEQ))
-> >                       return -EBADMSG;
-> >               if (vlen < 2)
-> >                       return -EBADMSG;
-> >               if (v[1] !=3D vlen - 2)
-> >                       return -EBADMSG;
-> > -             if (vlen >=3D 4 && v[1] !=3D 0 && v[2] =3D=3D ASN1_BOOL &=
-& v[3] =3D=3D 1)
-> > +             if (vlen >=3D 5 && v[1] !=3D 0 && v[2] =3D=3D ASN1_BOOL &=
-& v[3] =3D=3D 1 && v[4] !=3D 0)
-> >                       ctx->cert->pub->key_eflags |=3D 1 << KEY_EFLAG_CA=
-;
-> >               return 0;
-> >       }
->
-> Your patch is correct, however the conditions ...
->
->   vlen >=3D 5 && v[1] !=3D 0 && v[2] =3D=3D ASN1_BOOL && v[3] =3D=3D 1
->
-> ... all check well-formedness of the BasicConstraints object,
-> so it seems if any of those checks fails, -EBADMSG should be returned.
->
-> The check "if (vlen < 2)" could be changed to "if (vlen < 5)" because
-> 5 bytes seems to be the minimum size of a well-formed BasicConstraints
-> object.  Then the "vlen >=3D 5" and "v[1] !=3D 0" checks can be dropped.
->
+This one needs a fix up due to commit 07d8004d6fb9 ("tpm: add bufsiz
+parameter in the .send callback") in 6.17-rc1, as I am seeing the
+following error in next-20250912.
 
-Actually, we need to be careful here. OpenSSL produces
-BasicConstraints with CA:FALSE as just an empty SEQUENCE:
+  drivers/char/tpm/tpm_loongson.c:48:17: error: initialization of 'int (*)(struct tpm_chip *, u8 *, size_t,  size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int,  long unsigned int)'} from incompatible pointer type 'int (*)(struct tpm_chip *, u8 *, size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int)'} [-Wincompatible-pointer-types]
+     48 |         .send = tpm_loongson_send,
+        |                 ^~~~~~~~~~~~~~~~~
+  drivers/char/tpm/tpm_loongson.c:48:17: note: (near initialization for 'tpm_loongson_ops.send')
+  drivers/char/tpm/tpm_loongson.c:31:12: note: 'tpm_loongson_send' declared here
+     31 | static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+        |            ^~~~~~~~~~~~~~~~~
 
-06 03 55 1d 13 | 01 01 ff | 04 02 | 30 00
-[----OID------] [critical] [OCTET] [empty SEQ]
+Can you squash it or do you want a separate patch?
 
--Fan
+Cheers,
+Nathan
 
-> Up to you whether to respin this patch or make those changes in
-> a separate patch on top.  And up to Herbert whether to take this
-> patch as is or wait for a respin.
->
-> Reviewed-by: Lukas Wunner <lukas@wunner.de>
->
-> I note that parsing the v[] array is quite error-prone and it
-> might have been better to either declare a packed struct for the
-> BasicConstraints object with human-readable member names,
-> or create a separate ASN.1 module for it.
->
-> Thanks,
->
-> Lukas
->
+diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
+index a4ec23639911..9e50250763d1 100644
+--- a/drivers/char/tpm/tpm_loongson.c
++++ b/drivers/char/tpm/tpm_loongson.c
+@@ -28,7 +28,7 @@ static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+ 	return cmd_ret->data_len;
+ }
+ 
+-static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
++static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz, size_t count)
+ {
+ 	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+ 	struct tpm_loongson_cmd *cmd = tpm_engine->command;
