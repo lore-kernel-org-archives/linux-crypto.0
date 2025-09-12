@@ -1,66 +1,66 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8A731A058
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A358322DCB
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757687022; cv=none; b=JTeviU1QezlcDjU1GIziBlswOTgCn02lJ5Q02mfrOeDq8pM811zseYf2dFFXO+2BbjuN7s63gbzwlZN39fzp7JVvUbbAJ3ORWbnX8+NUXmJ8mOeEJ4wYOysLmOocWcxssmqMff+88XFxDOPXrnlSGNEL9psjC78bUZM/gKMC/Xc=
+	t=1757687292; cv=none; b=ROi/xRa6Sgpa3AWJatbsnnZKd9TE3GBsxl4r9atlMa63wblATR8wPxIc948l6fGv1CEQ1kL0IWny4wsngixNUfXePTHzJ4Ujjo1n6Ubh5l9qkW1r49TmVBc9lBGmaTUhzJEHfPl9qSNmmBd53MOiCcgBJN+4czxYHIuNfvtRU5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757687022; c=relaxed/simple;
-	bh=tW3dD0f9mh8+C6/rT/zFdbcRv73mdEmEtYeki1+tjR8=;
+	s=arc-20240116; t=1757687292; c=relaxed/simple;
+	bh=JFOg5p1iJ5KxXp0KyBvJj/giFbvKAa15YFCa02d2BZ8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uUTkjtyK5Z2dBl2HSV774UdFoZsDcE2OuyaEpfZ+Cnsftgt8tLjgUdWAcjOG431InayAbrfCGuMH408i1wpLEAiSLFlP/UdgvOsoJkAcLymqefnAX99mHET2n4GvrQLP6/DN0y4l1BJ35WCclXrVjAQ1/rEy2jK6+IHT4m01Tag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iPTq0sfr; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=np17OtUUhf4bLOcvl/VAilMRJwniYuXfzxxiGSaPgKJjYuyNnVCzQ+1qFsITWuKFwIiR+3hhbl0FfvTScshMjFI+ZPhN/OxwAd1HPTbxGuToj/G1+Zxh6am/7Uir0MALIw7MYzhXrlvJu4cLeymLPDwxz/I++NC06oa3cPPyAoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MaTESpGq; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPTq0sfr"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45dfb8e986aso20782095e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:23:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MaTESpGq"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45df09c7128so16421825e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757687019; x=1758291819; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757687288; x=1758292088; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=N4l5zcHW0vFYm8FJd3A+gQjJTt3Y7IkPRU+Kv8jpny4=;
-        b=iPTq0sfrw17USnREcvrpqPmDPcArTqXrmPfohEYoWLm50L5PCPMVD0nQE+g+z69e1K
-         kVkWy8+TFNxpT4hCKWIacYdQCF778GOXMXvfSKN5pHBbBEVoxdcUf6hYtaMrtrYyk+t3
-         wdm0cz4UMIrivGV7bwvG+fVa6VRnsFKgqkm78ClRooJX6C147BF0A0vj9wkYiQeQzUNl
-         0IjrTSNEuAZMqqtTwaB7Flms36UiiZHU+fKKayQsxXdxHCNjETtBOpBaobK5lEEOFboB
-         qgiY8zr4JrEu629ZVM3jQPeetLQO0jp55XQ9vA5g+MG+05jAKRxhrb0VvqBKs3Z59iWw
-         NpzA==
+        bh=jnkM+AnZyhps3qygpz2dIT80TKNeLfoU88kbfoaXJwA=;
+        b=MaTESpGqpTMpTxS5eQvECHwzZqQxvguH81IoIjAdnY6Iuon/s97rA4MgR7ETN4ig4W
+         ZB4kYLAIl5NCHpNeQhKXG2zUbFj4D2hD2Gr8oZV5LTseZWBSFCjCwfxSwTtS87WAwzPa
+         vDF2+G3vWpzq8FbfUpruZSNWV2Nr5Yw4vuEhmyeC4C6qPwjRXq+892caanXthJfzsT5I
+         ofNQi44GhPK9gBRN2TikmfEwn9zuQ1w/6iDiKIn43duVCQJMDlP9fO3qXW6WJBh+w/AR
+         FmItq8OgX7XQln6LAuxWFtzcuITtmn0IsoDUsVwJ3inhv7zLTKjaamm4hsDU2sNgDLTY
+         YTiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757687019; x=1758291819;
+        d=1e100.net; s=20230601; t=1757687288; x=1758292088;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N4l5zcHW0vFYm8FJd3A+gQjJTt3Y7IkPRU+Kv8jpny4=;
-        b=Yg96Y2zZQ/2Yv64bBX/MPG2ySjelcXf3VSnuhj5C3rkEgtn6FQdrKNp2vaaF8IsVsJ
-         4U2VXstOTNUvx5z2N4B6Tlzw6dWBGm4YjxmTnCBZ7IxWoW8RRydJHRLZiSKNG0VYbeyB
-         xkMz+u3r4UxRqX/wBUA0eGAf4c3JKXkE4IxHSe4wXQ6FpK11uUKtDhzRx/Vs+q/px0WF
-         h4ok+y1yrLJAhS6YP8Amy7wKTE5Q6LqP2yV/gIfLocXBVj280+pJot7qtJDlmxurNq0P
-         ppI3ON38ZNewlmGFZAMDEmOYKR8ssMB0fA+EZOdbwn6yuIRrZOYBG5DuYiIFcbnzraTx
-         8uPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUiifiK6TJCsz7FFEOMu3vD79Jxrerzis5TqD9zJyg6Z9G1v1RaCvcgQi85C4+X5F9iIGZix0z/XACbAmw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnzlGjp0FYkTvp4Hl959eB5TU3rLcQAaw2g2Gqj4tCYl/JhhI+
-	YiPGgnCBUg0AQ6Rmdunn/S9RBF0wrveOtjRrBgFHzWZKwGgDI/d7njc1
-X-Gm-Gg: ASbGncsMBb4k1g3zVlSFeY8PA0fP4lOUHdDLpoeXnvUZlE8Dj6F3cLP+i6mK48Txjsr
-	w0qFBRnCt/B4j+lQFSr/pBf1j4FeO4q2qSeDON0g5Ifp0Ek7AQdy2TkbNtPZwo8BFD/74JGujzb
-	d6mwVPTUc5fRNcno32+33FPHUs0sYvPQGpgZzKYo5XqS3xO5Myi4Um5msTKTKYCZt6FLf1Aj3e9
-	F1XLmb/BTQt76NRrYlsaNuxbTWlBPLju5TYlYNB8+RgfxWiLN3DU28V4N9YWONwUf8nrV3JMr0b
-	x3Y+LsbazFzlpyGntjVi9+TUGfdi+NjN+g4JLS+HbqgWytGSDGle6QT67Y1dbyoQItbFUjNqDJ0
-	PLCRlPsRtT48EOw4TqfhLn2bXB/sc9WY=
-X-Google-Smtp-Source: AGHT+IEmlb8djEP9UynDPDjjLEk8BahcV4jQiKIO9mchkJOf8JIm0XRWhLHxnVD8kQdDLWFmpvT50A==
-X-Received: by 2002:a05:600c:1d2a:b0:45b:9c93:d21d with SMTP id 5b1f17b1804b1-45f24ef20d0mr17392095e9.8.1757687018297;
-        Fri, 12 Sep 2025 07:23:38 -0700 (PDT)
+        bh=jnkM+AnZyhps3qygpz2dIT80TKNeLfoU88kbfoaXJwA=;
+        b=tFT1b1TQ6Ug/T+Kfk/6mGSbdQu2c3Jbo5/+qKDRIiHp91ITzw2rM/WREHO5jktxemE
+         5G1fqYQT9/q9Uf15VSIoWZlcYeIDkCpZBTOJ0iqh7XuGmg2t7Q/gEuk840wGC4czsec8
+         5y+zWtMRAXbvSVraYubqysh/rLaiixGSYd9EOlNV+J91JmOof7qmaQ4AVrkebLquxP7X
+         nfUkQaleoC92N5rGhPnG2MSzmnv3eASL5Po5W0ZqC6seYMKgAOaEpQ028R4Y9ZiJ1hPF
+         OIAEyG0NjqsObhJfSWYfxdnKi9bxM38t29XWXjFzneGC6Z3xPmf6rAt1Kwc/l6OiuOVB
+         mFdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRTZOPOZgQvJAwielbdzS+fJTMOpDlt/ZL5nu2Oy2LNiL8BqiE1QCLolr6R/gXTz5bPmVBUZeRRK6NNe0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJTZ3AQLqn8RpqQ8mEQVXzq4rkC6111VgdDEvk0ThIWu4FZWzh
+	R33axVaB4l1stnj7xTNZWfzNYquwz0M2IO1w4qfnrgLBJmpH7POgvMVi
+X-Gm-Gg: ASbGncvIYncu+rtgTb6CnuB5zhA4H35S3GcQLZJJ6bM4dkdZmPeE/0JI1aNhhPtthxw
+	FxsZNFgL3OANiOBoz9Dg3/aMWO+23j1Z863kE1uaN46bBzo0cbJ0Mlt2eLUZbD5yFTHdf2xXSvg
+	cdfVbUJQossus9MrtpZPaNhImzPE8g40+s9JYfPaUbKDTRZjB7Gb9AIFs9s3xPgIz3F8W6TJaJ2
+	GpasiFDk24PPrrVdk3MG8ZFPtyfso/GGni7EvRL7ImjC6NPtptZHwkLMLPLm8Kwz4lnIPCcu46X
+	aUNOVcxR1n+K5DliZ8DBBCbaP6z/9Y7pFEzpGFoiNg64CyVC4SwKZlg9mr9bvLD/b2B+5CfXwFy
+	fVOGNthAWfiDz8OOWy95Jj0rzWn3KPGCIL79cM8x9qQ==
+X-Google-Smtp-Source: AGHT+IGDvV53/LNE/OpdCCjsAZPEbICrc+wJ2bgnqrFTzigP/wpDBOWh7QRU2BBuWo1pqbgZm/YfGQ==
+X-Received: by 2002:a05:600c:1c19:b0:45d:d259:9a48 with SMTP id 5b1f17b1804b1-45f2128cba7mr31759255e9.9.1757687287618;
+        Fri, 12 Sep 2025 07:28:07 -0700 (PDT)
 Received: from [192.168.2.177] ([91.116.220.47])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037c9d91sm62800735e9.20.2025.09.12.07.23.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017b27b6sm67769045e9.16.2025.09.12.07.27.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 07:23:36 -0700 (PDT)
-Message-ID: <6ae96168-7066-4881-a228-16e57d0f6e27@gmail.com>
-Date: Fri, 12 Sep 2025 16:23:32 +0200
+        Fri, 12 Sep 2025 07:28:06 -0700 (PDT)
+Message-ID: <3de4b03d-4940-4d96-bf20-5bb45f1cc5a5@gmail.com>
+Date: Fri, 12 Sep 2025 16:13:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 38/38] arm64: dts: mediatek: mt8516-pumpkin: Fix machine
- compatible
+Subject: Re: [PATCH 26/38] arm64: dts: mediatek: acelink-ew-7886cax: Remove
+ unnecessary cells in spi-nand
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  linux-mediatek@lists.infradead.org, robh@kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
@@ -93,7 +93,7 @@ Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
  linux-gpio@vger.kernel.org, linux-remoteproc@vger.kernel.org,
  linux-sound@vger.kernel.org
 References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-39-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-27-angelogioacchino.delregno@collabora.com>
 Content-Language: en-US, ca-ES, es-ES
 From: Matthias Brugger <matthias.bgg@gmail.com>
 Autocrypt: addr=matthias.bgg@gmail.com; keydata=
@@ -139,37 +139,39 @@ Autocrypt: addr=matthias.bgg@gmail.com; keydata=
  +zFJv9fVUpo/bjePOL4PMP1y+PYrp4PmPmRwoklBpy1ep8m8XURv46fGUHUEIsTwPWs2Q87k
  7vjYyrcyAOarX2X5pvMQvpAMADGf2Z3wrCsDdG25w2HztweUNd9QEprtJG8GNNzMOD4cQ82T
  a7eGvPWPeXauWJDLVR9jHtWT9Ot3BQgmApLxACvwvD1a69jaFKov28SPHxUCQ9Y1Y/Ct
-In-Reply-To: <20250724083914.61351-39-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-27-angelogioacchino.delregno@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 24/07/2025 10:39, AngeloGioacchino Del Regno wrote:
-> This devicetree contained only the SoC compatible but lacked the
-> machine specific one: add a "mediatek,mt8516-pumpkin" compatible
-> to the list to fix dtbs_check warnings.
+> There is no need to specify #address-cells and #size-cells in a
+> node that has only one non-addressable subnode, and this is the
+> case of the flash@0 node in this devicetree, as it has only one
+> "partitions" subnode.
 > 
-> Fixes: 9983822c8cf9 ("arm64: dts: mediatek: add pumpkin board dts")
+> Remove those to suppress an avoid_unnecessary_addr_size warning.
+> 
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 Applied, thanks
 
 > ---
->   arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/arm64/boot/dts/mediatek/mt7986a-acelink-ew-7886cax.dts | 2 --
+>   1 file changed, 2 deletions(-)
 > 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts b/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts
-> index cce642c53812..3d3db33a64dc 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts
-> +++ b/arch/arm64/boot/dts/mediatek/mt8516-pumpkin.dts
-> @@ -11,7 +11,7 @@
->   
->   / {
->   	model = "Pumpkin MT8516";
-> -	compatible = "mediatek,mt8516";
-> +	compatible = "mediatek,mt8516-pumpkin", "mediatek,mt8516";
->   
->   	memory@40000000 {
->   		device_type = "memory";
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-acelink-ew-7886cax.dts b/arch/arm64/boot/dts/mediatek/mt7986a-acelink-ew-7886cax.dts
+> index 08b3b0827436..30805a610262 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7986a-acelink-ew-7886cax.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt7986a-acelink-ew-7886cax.dts
+> @@ -98,8 +98,6 @@ &spi0 {
+>   	flash@0 {
+>   		compatible = "spi-nand";
+>   		reg = <0>;
+> -		#address-cells = <1>;
+> -		#size-cells = <1>;
+>   		spi-max-frequency = <52000000>;
+>   		spi-rx-bus-width = <4>;
+>   		spi-tx-bus-width = <4>;
 
