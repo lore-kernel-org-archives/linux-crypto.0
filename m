@@ -1,82 +1,103 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C50A3009CB
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 12:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CB230DEBC;
+	Fri, 12 Sep 2025 13:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757681432; cv=none; b=KKxipQSmiasVfoplZScQhahV/EF6zQxxMpYHHp11OFV+mU/wf/zINQ4+1Mu87ijYqNSS3Skf1ItTM6QCvfGZxSK9Sk+NIwcSWd2if8RA+gHe3xxBHkvZ8nsbT/kw9YwCw1QHwjRzOnClFGDZe4kpBzSBASONqsFRtYQxJh/ls3M=
+	t=1757682858; cv=none; b=dmfmCJ6sKLkXyRDGXKtz8e+t5ppaLacqzBVvCqSyoGx3rzO/lXQNaOHLaAzkUIKo1hohld+a35razu+H2Mnc3RzKEiNR2/Zv27hd/35rwHNIZ7aVHMpxufD2XaJCnONQnhEtG4K/DyGOWXeMlJy9rqaskVNZAgH9WVB45U7stqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757681432; c=relaxed/simple;
-	bh=WaupZNManUqNcqnsFHmxD7OEwZG42QqbQmAYHworjNU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Be4Ql8d7kzpWXAmR+mUOvsrgEfM/OUx6+VINf34zDjxyV2E1tmkux0DR241CkoyVETFQb9tryFt90JBE6OoJ5+X/P+jftl/eT3ayc8H6CLzp7JW3cqG8/u9XPKz/aJRc6v6CKFMgIB4oUPGXtxY5Ey1pUwNmEzLwLfK8gd/vpgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3f6f0058e9aso55427975ab.3
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 05:50:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757681430; x=1758286230;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CrYY5yU99KJVXopcDS+1qbxSnA+64IIqInr0fnqZVEY=;
-        b=RrRdTPpzASMcBtYSl+t+CrFDOF17UtmGirc88+fNi84mCvZY8XfB2gjqjLPr880doN
-         P605Wtis0ApOginnAggpBYd82JSxzp9CBIlQHWxAreMwv2wcE9+pqR0oeK3HFR1O2XNv
-         kEmeKiQ36gdDRlnOFNPXQ/X3L7CpyTvUiLKjnbP0/Ga1cJli8sj4QMTpT/rOzLc5CaA0
-         7+E7feCSwDokk+yKMkbcL1DmIArD/AobBapvtgPwHe6A49wBZijuIvqfDSZOg/di8rA3
-         DGBFGBffN2uxmH6BYGP5sc2JdzBiBY2ruQA80vjL98InYGBKmA7ZRlxwqC86ckiWaCrc
-         kLhQ==
-X-Gm-Message-State: AOJu0YxkVRYGOuqT0iXJKGUMr4XTMINLo1itM0Nyd+WpTgssNxlbw+oG
-	e4Rs5mScE37/K5kIAgPGnn2G6S+oFNO0uikrdXV68x5z1XM0l/bHJsAZsQNSNOZYuIaf2KrsdCl
-	ctGOZDH4OjktS0fxPw0JAyb77SXGpkSKpcO6fUKSdAJ3TUN7yQNOC2cyX8xs=
-X-Google-Smtp-Source: AGHT+IE2qh/2GCKU6BVMPASYLvG4vM/fF0wwnb1ckwYJaxtlUMlxDLBY9UK3FlpTNIcvXMVA0c4lcaUF0EG+xP5Jtax8fQlP9i6w
+	s=arc-20240116; t=1757682858; c=relaxed/simple;
+	bh=6e+sVle9MifWvb6/53/ryU72tPHkEfNKBpFNkBJjL+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JzDhU4ce0Xm+6bskW9P3PjdCtiVvTQwHTo4vp2RApnCuj+C9tMiomilP7psWzWLGj9CRzt/G5ubD1ieTji84XNdw8MqzzreSv8inrJiAmy3ea2V+h+hdT1OvoOvrOSRTPqBoqW/ekjrOrYAdB77njyORgpu4N2Uzkm0xjYAUKR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id D57E32C09E2B;
+	Fri, 12 Sep 2025 15:14:06 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id ABA63121533; Fri, 12 Sep 2025 15:14:06 +0200 (CEST)
+Date: Fri, 12 Sep 2025 15:14:06 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: wufan@kernel.org
+Cc: dhowells@redhat.com, ignat@cloudflare.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, jarkko@kernel.org, zohar@linux.ibm.com,
+	eric.snowberg@oracle.com, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KEYS: X.509: Fix Basic Constraints CA flag parsing
+Message-ID: <aMQcnoETIt4t4Tqz@wunner.de>
+References: <20250911225356.2678-1-wufan@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:19ce:b0:416:75eb:265e with SMTP id
- e9e14a558f8ab-420a4ee1eb0mr45949005ab.23.1757681430239; Fri, 12 Sep 2025
- 05:50:30 -0700 (PDT)
-Date: Fri, 12 Sep 2025 05:50:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68c41716.050a0220.2ff435.035d.GAE@google.com>
-Subject: [syzbot] Monthly crypto report (Sep 2025)
-From: syzbot <syzbot+listfbe8ca840699475b61f2@syzkaller.appspotmail.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250911225356.2678-1-wufan@kernel.org>
 
-Hello crypto maintainers/developers,
+On Thu, Sep 11, 2025 at 10:53:56PM +0000, wufan@kernel.org wrote:
+> Fix the X.509 Basic Constraints CA flag parsing to correctly handle
+> the ASN.1 DER encoded structure. The parser was incorrectly treating
+> the length field as the boolean value.
+> 
+> According to ITU-T X.690 section 8.2, a BOOLEAN is encoded as:
+> 
+> Tag (0x01), Length (0x01), Value (0x00 for FALSE, non-zero for TRUE)
+> 
+> The basicConstraints extension with CA:TRUE is encoded as:
+> 
+>   SEQUENCE (0x30) | Length | BOOLEAN (0x01) | Length (0x01) | Value (0xFF)
+>                              ^-- v[2]         ^-- v[3]        ^-- v[4]
+> 
+> The parser was checking v[3] (the length field, always 0x01) instead
+> of v[4] (the actual boolean value, 0xFF for TRUE).
 
-This is a 31-day syzbot report for the crypto subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/crypto
+Excellent catch!  How did you find it?
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 110 have already been fixed.
+> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
+> @@ -623,7 +625,7 @@ int x509_process_extension(void *context, size_t hdrlen,
+>  		if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
+>  			return -EBADMSG;
+>  		if (vlen < 2)
+>  			return -EBADMSG;
+>  		if (v[1] != vlen - 2)
+>  			return -EBADMSG;
+> -		if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
+> +		if (vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1 && v[4] != 0)
+>  			ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
+>  		return 0;
+>  	}
 
-Some of the still happening issues:
+Your patch is correct, however the conditions ...
 
-Ref Crashes Repro Title
-<1> 271     Yes   possible deadlock in padata_do_serial
-                  https://syzkaller.appspot.com/bug?extid=bd936ccd4339cea66e6b
-<2> 18      No    KMSAN: uninit-value in sw842_decompress (2)
-                  https://syzkaller.appspot.com/bug?extid=8f77ff6144a73f0cf71b
-<3> 7       Yes   KASAN: slab-out-of-bounds Read in xlog_cksum
-                  https://syzkaller.appspot.com/bug?extid=9f6d080dece587cfdd4c
+  vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+... all check well-formedness of the BasicConstraints object,
+so it seems if any of those checks fails, -EBADMSG should be returned.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+The check "if (vlen < 2)" could be changed to "if (vlen < 5)" because
+5 bytes seems to be the minimum size of a well-formed BasicConstraints
+object.  Then the "vlen >= 5" and "v[1] != 0" checks can be dropped.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Up to you whether to respin this patch or make those changes in
+a separate patch on top.  And up to Herbert whether to take this
+patch as is or wait for a respin.
 
-You may send multiple commands in a single email message.
+Reviewed-by: Lukas Wunner <lukas@wunner.de>
+
+I note that parsing the v[] array is quite error-prone and it
+might have been better to either declare a packed struct for the
+BasicConstraints object with human-readable member names,
+or create a separate ASN.1 module for it.
+
+Thanks,
+
+Lukas
