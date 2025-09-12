@@ -1,66 +1,66 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11E631076D
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DA5311C35
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757686809; cv=none; b=cNXqQFqyofhldYj3ropkYAbDt5b/6IghQFdY6wI+J6eifyFGZ8xd4Khf2OQ996VGgjRGtFsKAM5/wy0VhtyjRkf2Ha5YFMVKxqF0UVtQ6FI6nUUXp0nZFnzyT5Ur3nCY1kZ2iC2R0jkM4ZVemvwWamO36QFg+NLqo5j6u7UvUrU=
+	t=1757686817; cv=none; b=XolNSWRz1YCWqcUMtke0H05kU21mUKfch7G5eY7WfYlOJsx7L0VjfGCFNjuEDa0Jflkmd41h5nSqcLWTLPnI7bK0+S4tC+Qn9QOeJlVrBxWvERnR8SW7uff9l13zwKcTKOqS9Z6VoG0bbtyzHFJnLsArBpVozcGBKxMBKpmD890=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757686809; c=relaxed/simple;
-	bh=3l449HK5NMkexamVRNEtGUCkmphtfcrXtQXq+LiZQeY=;
+	s=arc-20240116; t=1757686817; c=relaxed/simple;
+	bh=EVbOp99sPb6YaiW0/j7yT/7PlojN9LZSWPvpHmas4ao=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FU3GhsSh3NPnfrvSY/EJpODs/TRxjiuEIQNB9R5omIqBKaTDes6Llfs2ajkCIlzWhL0DmK7kp0z8CimL9cjMj5TVGlLAAjxqQ4c66BrjXrg/yAeqn26kz7tg1k4UhSR9zHhsJflsJ4B/EpXEUAilLYAKiH6ZcdQcnLXTLMUY394=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gmEeiPsu; arc=none smtp.client-ip=209.85.128.46
+	 In-Reply-To:Content-Type; b=RfO05dI81EddJLezzmowBumGVxGcgrVbKXcTFnzegb3bW5hP0SdeSmnQes7v9tBwyas/GHjtRoTPl98kTEAyZ2nibyfGTxJeNHiq+PgBGbqRQzlOSg9mbOZ6Re+jdFkAEfcgqEleFPq3Fi8OCJ+chofwacnWFOaD7XDGmS6S5Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AIeJEpVu; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gmEeiPsu"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45dcfecdc0fso19229475e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:20:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AIeJEpVu"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45dd7b15a64so17719395e9.0
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757686805; x=1758291605; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757686813; x=1758291613; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SmChZKjhh7WfaCiO6qYrnubA4AUjkq4py7dLEKKsD0M=;
-        b=gmEeiPsu0A2ECPHnslD6nMU7a8HpEImCAT2kADomDXZ3Qo0/HU3Lhwxx/c8r3Ir2UF
-         PDKiQMvH/UiMi6sQx0+kQxaOLMqLA4V5z/Ejv6DUUnE6LEv0+NO4X2K1A1ndc0MkKJ+j
-         ZnyxeHzoU1W2d75gU95FC1LTAxxayDbhtf/77BsniFKx7aQTho9bMvYcYbyhNa9/g9nQ
-         abkQFvttfvr++m8W7unHXUviB6UJ81GaLg/fF+lw8MfptZnanIemXWo4/w34CC+/mUSA
-         nCjkfQ3z80/EOK5bpe4Dw+ghV4HTkb6XAevsL2MYPzbezhXc02TrzJmm5RRW3oRt+bxh
-         LHZg==
+        bh=Zo6qWVc0jZZmv8jDaeRnPGtja64w2ge7orZf47CFJn8=;
+        b=AIeJEpVuhdfEU02IC7XuGXzI037Wc9g59ptXd5n5XQxKAR6P8FZ3WxxvDiiRyPccM3
+         95+zGxtWVQPAcyt39cCFlJwgTksIQr7tB6cc0XKMAEatPNNfErY2YHKFxnyIKUzxe4rc
+         WdJdlJusv5CZt/I4+VBaJ//EwCEFE9Y0S5kXu9764DjiONUXV1iR8lzzRy+zptbkKIY5
+         KESI3BvUIvlL9Ch7i5JFRCrluQaUTAK6s9WL1VDp7V58SlsfsDOSn4uW2v6+2A/flOQP
+         W+7t7NzxGq4LzsqPItg1htrmzTsaQpal5alyeLct40DAQiiQScrUSQUUccCkDmQTFE++
+         QHZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757686805; x=1758291605;
+        d=1e100.net; s=20230601; t=1757686813; x=1758291613;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SmChZKjhh7WfaCiO6qYrnubA4AUjkq4py7dLEKKsD0M=;
-        b=oUpxABWU92NDqyCX6bSYKtCSyuIYAHxeyRnUtjFrv+5ff96XWk8Cm4dDltrcq7mLdR
-         4wSO+jy5uacKHwb64a4zh7MbSGZKwnqw67F9rU5Ka+gNHcsmrAYEFdaodDipwTMql0n3
-         0iUwvhqLpSs77ryaEc1JKtSTpHggg+mll8Jlzq2gsoSIdkgOKQL6ZKvIkyLb2oFSYkUP
-         tk9cCKs+7qmxKCYV5I3HTkVAPUOR3EfM1ZYWG6Mx9gRxiy4wnoL8jZEBDbe7byU3Q/gd
-         gR94byK4r6c966WLn9o0nYBTGY5+QOhlz2XqoWr94jTnBSgrSi0vGdmcceSXP7BaDqMD
-         v1mg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbIzUu0sjAp1nBUL+aVfqInDQLUyTcv9POST/3erSBabhSCnHw/4wPxzFeb0ho0yyL2e36cSdakYW2OTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxgVnfCLfkYL1t36LSzHGJzEqaH7tlzt0ZUmTEHl7qUInQNY7Q
-	PH8BHKx6C5Y4riPGnNaWrcNor7flnKqo6RfwwAqXeH5nTof/2vPTPyTC
-X-Gm-Gg: ASbGnctaIFr/C19obz+HcMeUMR8BiOQyxeKDA2uQMTL1TJHuOG8yHhus9uqh4SzH9q4
-	2pD+C81yoef8krpBy1Q+UKwjLM+gvz+5L+b5127f65bpcqTbxoGDGuZ7nfXujOCjduJUZZAEEIv
-	3s6O+rYGYpMykgjtwoQKEReQLQG7q+oGWM1r6EyO1+76JJy/OrSXAakeqpTfSNOU2KlA8SDj5Ce
-	VyMh6rrVBIxQ74e4O4YZlJFGhuw5SwByG3sm49ayGjp1BuFxeroyv6L0HEpouJlrazEioBv151q
-	OyVIwJ1PlF2JkiaNnxjYMwHIsSdZXvnTuHxg7C8nSFcO0Poh6bgDwnt6LMwdK8UtzBgwmWNa0f3
-	w/llb+K5JTFtsGFQsKbRGYzYRfqCa3hTCambRvl//og==
-X-Google-Smtp-Source: AGHT+IEKyinmwbN3yHvqC2TBvEPXOSoCWcr50U1b0sgHZon43u3EkY1RVzIl5661xTla3PsOT681zA==
-X-Received: by 2002:a05:600c:5254:b0:45d:f55d:3478 with SMTP id 5b1f17b1804b1-45f211e610fmr36884815e9.17.1757686804707;
-        Fri, 12 Sep 2025 07:20:04 -0700 (PDT)
+        bh=Zo6qWVc0jZZmv8jDaeRnPGtja64w2ge7orZf47CFJn8=;
+        b=mclgkZCMfXYm4DyNWqhEqVaveVb2Ztfaq+FfvnUHXr3jDQGPtU48JCxBcXLj4BGk0R
+         A9M2d/DpGjJiQ1er1gz3UZ6cClwUi+N3o+VEKunh8b0LYbaRhZi9PSRZ3ZQnhRJ4QdLS
+         vxOcI4oarKdo1SdFScIjmPSAzQmAl+l2llMDUO1hh7wTv6i+24K4PuCMD1bmMXJAUJAw
+         Y5nbnoxY04oFQFSIwnkvQLv/d9opOzorOaKEEi9GmSMFz2M9rvpkv//WNqTy4GSqrRjC
+         N924C/BO89MWeMlvq9kc+pdrQFGqIikmCs7aqzvabtIsJqFfNZ5MgGBY8C9ANQ4DuBMX
+         aNcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUpWMT7sIEOYlkljQxR0xQqytYL4MzL6YUw7QZVijvUKYWoq/Or6zJm9OYXNqH9156BbNi6DT8s0CPnMQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd3G0YnL7wI3FhfsZDAJtTSJY7ofGnDrHk8Mq149vQOh6BN4tB
+	Pv9aDGyE2uIJj4UEKuDT8CuXl7P+zwiBtMmtH90fw70p66DSyXDwwrXH
+X-Gm-Gg: ASbGnctFO9+qYCOiN3NcaBJfrIarQbFcLs8fSpktEuSZf7AP4d2QIDhMHxNHpmDCi8+
+	AwspkahfA8vU9TIpjrkcA7uPfz+Ygyz/YStCEYkOk447JONZkb74oV8lfmAzlvhx/EORmatcvMu
+	cwfjRSD2VJT1Hp305cVWfw07eCr7sJHrq17rL3bH++aFWPNWbt6/V+ZOIQ0bSUkcok+SX02QfEd
+	kxoe/g9wPQ2fyxN/hi91B6pMnw+UtXQzkvdGCDPQqIIxFGMh2rRpsT0VzIfCSSULzq9Ie2sLsBK
+	vkYGqMVbOeXF6K9Il9Ns2djZxoo0I1vxHRQ4CAUkEBaCoK1wD2si+mL7KszGtGODcbVAkc1bGTe
+	oYtV3vEFOy8QOXSbMZ08APePGrJQwrHQ=
+X-Google-Smtp-Source: AGHT+IEYiPOKWB+0nvhix6TOxrJpFoMyLdNoRjDPkAz1Qots2CwSj1hz+7mDLBhL/v2fign1H2JEQQ==
+X-Received: by 2002:a05:600c:6610:b0:45d:cfa4:ce10 with SMTP id 5b1f17b1804b1-45f2128d4c1mr29424165e9.10.1757686813242;
+        Fri, 12 Sep 2025 07:20:13 -0700 (PDT)
 Received: from [192.168.2.177] ([91.116.220.47])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0372b983sm63475385e9.9.2025.09.12.07.20.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0372b983sm63475385e9.9.2025.09.12.07.20.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 07:20:03 -0700 (PDT)
-Message-ID: <c3d9cdfb-6cfe-41ea-830b-3ab0f6ebcd5f@gmail.com>
-Date: Fri, 12 Sep 2025 16:08:14 +0200
+        Fri, 12 Sep 2025 07:20:12 -0700 (PDT)
+Message-ID: <bde30144-0c57-4d34-b6cd-2a53dc099bdf@gmail.com>
+Date: Fri, 12 Sep 2025 16:12:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/38] arm64: dts: mediatek: mt6795-xperia-m5: Fix mmc0
- latch-ck value
+Subject: Re: [PATCH 21/38] arm64: dts: mediatek: mt6795-sony-xperia-m5: Add
+ pinctrl for mmc1/mmc2
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  linux-mediatek@lists.infradead.org, robh@kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
@@ -93,7 +93,7 @@ Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
  linux-gpio@vger.kernel.org, linux-remoteproc@vger.kernel.org,
  linux-sound@vger.kernel.org
 References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-21-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-22-angelogioacchino.delregno@collabora.com>
 Content-Language: en-US, ca-ES, es-ES
 From: Matthias Brugger <matthias.bgg@gmail.com>
 Autocrypt: addr=matthias.bgg@gmail.com; keydata=
@@ -139,39 +139,88 @@ Autocrypt: addr=matthias.bgg@gmail.com; keydata=
  +zFJv9fVUpo/bjePOL4PMP1y+PYrp4PmPmRwoklBpy1ep8m8XURv46fGUHUEIsTwPWs2Q87k
  7vjYyrcyAOarX2X5pvMQvpAMADGf2Z3wrCsDdG25w2HztweUNd9QEprtJG8GNNzMOD4cQ82T
  a7eGvPWPeXauWJDLVR9jHtWT9Ot3BQgmApLxACvwvD1a69jaFKov28SPHxUCQ9Y1Y/Ct
-In-Reply-To: <20250724083914.61351-21-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-22-angelogioacchino.delregno@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 24/07/2025 10:38, AngeloGioacchino Del Regno wrote:
-> Change the latch-ck value from 0x14 to 4: as only bits [0-3] are
-> actually used, the final value that gets written to the register
-> field for DAT_LATCH_CK_SEL is just 0x4.
+> Add pinctrl nodes for the MicroSD slot on mmc1 and SDIO Controller
+> on mmc2 and assign those to the respective controller nodes.
+> This makes sure that all of the pins are muxed in the right state
+> and with the right pullup/down(s) before trying to use the mmc
+> controllers.
 > 
-> This also fixes dtbs_check warnings.
-> 
-> Fixes: 5a65dcccf483 ("arm64: dts: mediatek: mt6795-xperia-m5: Add eMMC, MicroSD slot, SDIO")
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 Applied, thanks
 
 > ---
->   arch/arm64/boot/dts/mediatek/mt6795-sony-xperia-m5.dts | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   .../dts/mediatek/mt6795-sony-xperia-m5.dts    | 38 +++++++++++++++++++
+>   1 file changed, 38 insertions(+)
 > 
 > diff --git a/arch/arm64/boot/dts/mediatek/mt6795-sony-xperia-m5.dts b/arch/arm64/boot/dts/mediatek/mt6795-sony-xperia-m5.dts
-> index 91de920c2245..03cc48321a3f 100644
+> index 03cc48321a3f..fccb948cfa45 100644
 > --- a/arch/arm64/boot/dts/mediatek/mt6795-sony-xperia-m5.dts
 > +++ b/arch/arm64/boot/dts/mediatek/mt6795-sony-xperia-m5.dts
-> @@ -212,7 +212,7 @@ proximity@48 {
+> @@ -227,6 +227,8 @@ &mmc0 {
 >   
->   &mmc0 {
->   	/* eMMC controller */
-> -	mediatek,latch-ck = <0x14>; /* hs400 */
-> +	mediatek,latch-ck = <4>; /* hs400 */
->   	mediatek,hs200-cmd-int-delay = <1>;
->   	mediatek,hs400-cmd-int-delay = <1>;
->   	mediatek,hs400-ds-dly3 = <0x1a>;
+>   &mmc1 {
+>   	/* MicroSD card slot */
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&mmc1_pins_default>;
+>   	vmmc-supply = <&mt6331_vmc_reg>;
+>   	vqmmc-supply = <&mt6331_vmch_reg>;
+>   	status = "okay";
+> @@ -234,6 +236,8 @@ &mmc1 {
+>   
+>   &mmc2 {
+>   	/* SDIO WiFi on MMC2 */
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&mmc2_pins_default>;
+>   	vmmc-supply = <&mt6331_vmc_reg>;
+>   	vqmmc-supply = <&mt6331_vmch_reg>;
+>   	status = "okay";
+> @@ -311,6 +315,40 @@ pins-ds {
+>   		};
+>   	};
+>   
+> +	mmc1_pins_default: microsd-pins {
+> +		pins-cmd-dat {
+> +			pinmux = <PINMUX_GPIO171__FUNC_MSDC1_DAT0>,
+> +				 <PINMUX_GPIO172__FUNC_MSDC1_DAT1>,
+> +				 <PINMUX_GPIO173__FUNC_MSDC1_DAT2>,
+> +				 <PINMUX_GPIO174__FUNC_MSDC1_DAT3>,
+> +				 <PINMUX_GPIO170__FUNC_MSDC1_CMD>;
+> +			input-enable;
+> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+> +		};
+> +
+> +		pins-clk {
+> +			pinmux = <PINMUX_GPIO175__FUNC_MSDC1_CLK>;
+> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+> +		};
+> +	};
+> +
+> +	mmc2_pins_default: sdio-pins {
+> +		pins-cmd-dat {
+> +			pinmux = <PINMUX_GPIO100__FUNC_MSDC2_DAT0>,
+> +				 <PINMUX_GPIO101__FUNC_MSDC2_DAT1>,
+> +				 <PINMUX_GPIO102__FUNC_MSDC2_DAT2>,
+> +				 <PINMUX_GPIO103__FUNC_MSDC2_DAT3>,
+> +				 <PINMUX_GPIO105__FUNC_MSDC2_CMD>;
+> +			input-enable;
+> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+> +		};
+> +
+> +		pins-clk {
+> +			pinmux = <PINMUX_GPIO104__FUNC_MSDC2_CLK>;
+> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+> +		};
+> +	};
+> +
+>   	nfc_pins: nfc-pins {
+>   		pins-irq {
+>   			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
 
