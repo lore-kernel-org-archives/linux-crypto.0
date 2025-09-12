@@ -1,66 +1,66 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF32E31DD83
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80B83164D1
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 14:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757686919; cv=none; b=LkP6Pk/8MbKA09omdV4ULjiW1D5RsjngWhah+woCIdslUBojvxUz2uP+imSiGE+fbBmvPBivQy3BtiUxtZuQQp+DrgTWGkSUjxj1fS/nB9DOUIkwh4dv0vpR86L0UyMwkwpHFzBr3JMwjUQCsozDgRvAIs+yYNysMSceOPQWv8A=
+	t=1757686965; cv=none; b=iLG/SutZ2BLKruYPGRqOCduTGR94vWBrhMzG62BxOzQYRReG/Fok4Km0XO2xduYdjkS09sqtGoRGP6dBWieZYLFTD1m5v4fH3QTDaA2EPWrSVvsbRLG9Z2JS668HGByCSjcya7gYGB5gmacJ89X58gr70sLO4hql192PEDxK2Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757686919; c=relaxed/simple;
-	bh=siDtpOyPHlJogKpoK1uQHvD+1Dw/J9WYVT9JVE2rw54=;
+	s=arc-20240116; t=1757686965; c=relaxed/simple;
+	bh=t5l/naQj3nmZrrosN65ssHKsRcpoZMY4WQY0oZATpMQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FPulmoe3AXugcxfbVEROEuF93X4Kt9F0syjU12K/Aq2+raDYFSpS0BkHW3ZRGLoOqRSXDylmje4CvXVYib3XG8GyCokheQIDpWc1dXusf3QR5zboM4Dz7EduCbrkjCCHjoqrgX181SKRpnW5LcnhTsCuYx7xcQ9DFMHJ71wlZ7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLCKDDoI; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:Content-Type; b=ap/Cq/iARz15GwBA29I3rTKP+2RYXm5hsPoF/xcB4BOSpQfBG5ecEg/DVMSmJm3163CQoFesZi2VimgZZHhP7r6JTu/W8L8kNLPynLr2VReQCpVzgPvtbmYKnnKDvYuJcXX+oNMc92vg6Ts3OiUrL7Ym9k3qNc3or0JWUTqjxx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNQ02lqS; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLCKDDoI"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3e7636aa65fso1383846f8f.1
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:21:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNQ02lqS"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3e34dbc38easo1155424f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Sep 2025 07:22:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757686915; x=1758291715; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757686962; x=1758291762; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zESS1ySkymLTPY0hw83hB8DWQtQJQL+KqOm/xeYktnM=;
-        b=XLCKDDoIa/CBBQnI483eoj+HaFcMyv4s5BjclVw20aOWf9TFWhm/qDv3QJF1+7/GAo
-         Tekvh2vDNARcV2ByjJ30Vnba1OiSxjbH2X0D5sHTJ8VdsQ/KCyfLCzu8FLUYWldRbGq5
-         YlO0ywhaFQ8AQWmR/n981kOBrX8LOtDy2LEdqdER70rXenWnswNdSC6L8SViG+FjSe6M
-         398t/hc2YQXWPvN5MBuv3hPMj8AIQGePEyICSIPn1CqkkxjjVE0EEr5sX9TqXZJPtEiU
-         t7Cq8HClqk+5zmURXZWb56mHvBj0/RZc6c9fi01I1+FUVfBNglZUwR+BXx0R5YtGAZtv
-         hM0A==
+        bh=VymCpN9fDyNm7QOg2yye26PyPlP5MnwUCjdKp/JISyg=;
+        b=BNQ02lqSuqirbnxTe2NFyyhmcOufy2yu2NRTUkrDQcJukAkwxwk9Nhyrextlnm8rUD
+         he5z2XsPFh7qL5wOWZoBdKfJFuJ/2VEVD0pIh6o54ifZ+BEDWdc3FETVuUI2ZPZaeGIx
+         qyZFjZtZs6dVVonYBWBH7IcNJB9zeo/qn0ikHV9JVin6qrKTcO27Wd8lkiuzgsXbpsRe
+         vRLzyKfRYh3itLF+sC4/3B7DarGOYKTfZBBPv1MUAvdCEdfM4gIDvPLS/VAEx2xhg3fN
+         fwnhIfThBa4B+MZ1Zbll1aLDwQEZcJFUbum27eIUNMYsIPf3t6pxUhmUYLnoGzPrBdau
+         Slig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757686915; x=1758291715;
+        d=1e100.net; s=20230601; t=1757686962; x=1758291762;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zESS1ySkymLTPY0hw83hB8DWQtQJQL+KqOm/xeYktnM=;
-        b=Ne/38aeou4lF7ISJ3OVS/DlTXGAPbruTBiX/LAsyVMnDNB5CdvJ0SX/4YscpvuezWZ
-         ncUo8XUVKeQK6TFXoUE5T0aAdZ3s/b1RTxb18q2Y5eYYa8bZm3z451QVWLkgS1iq+6QD
-         XUahKrau8bWGYIZDPgIbdmFXt+G1/K4lzkIXqpj8KGpdU/29OSM7ym8PUP8QaScbdT+v
-         swdi6MNyINppmShFONyXZr9BxeLgOZSCehgeKvQvDRLYAdFB+kZRACe9iPpTzY6UbdrN
-         BjeuP9EhEH3CzjXJqPRKxmVRV8x6g+6E25cJyYI1kuxpH8JS8NGz85ne6GgMEsyez2b6
-         f7Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVwiUiMEmXngyXT7cgNexZGBpYJAYSKv8BW96fhbXYW9g2JGUaCT2yhAiO30eWLuyHDpMK0ei99Yn/Mmgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO+HZHXYzGpp1OfW2clQcdlwwxP0MSALQXUpE1qHSvougV9SqH
-	3E4ICwgJYPWBPKqdsXr2NIM/nNhxDZ/s3KWeZtkSCcqnzZK/TqTZqxHe
-X-Gm-Gg: ASbGncsoxhsE1bhdGLRztPstf2e2+SRpMBcOGRMJYufP1ebIAgzaGpcrzQxvi+YAE3/
-	0ftobQjd5gvJXuWpEM4YUA4bEjbq17BYAcqa6aRk9XoqGdpwMRNPaoftb7etlCA8zQEQHwo0upQ
-	UMEHEjCbuNxkkcTWIcdeSldNKdzbiAjJ6FHWKQ7MBzxKp+adO/0kVrcf5XJd8qZ5tAD6M9sU+fI
-	ALV9yy6P1pIfTEXguZxGTKECxtk3E+hieXu7KGsJEh9zkM/MZ1hmceJqGBhGSpf8lbKWgQt25Hm
-	zbpN0oSvAPsgsRbOet8SA7lxVkUJfTrr3yqOCp5o/+Bv+kZ1C7z5UMQaalfnzbbrer5NpIRi8MX
-	K8WGBGVr5P+rWAcPKsmkMbcxZbS7lXI7kUAtgykvBHg==
-X-Google-Smtp-Source: AGHT+IH9tJVloCbXIz91BDgTphPMX9koCByRsNlQtJ6Ob3jZPlH+RpEgqZOqPbkwhlkvGUM18ooTpQ==
-X-Received: by 2002:a05:6000:40cb:b0:3da:d015:bf84 with SMTP id ffacd0b85a97d-3e7659cc7e2mr3361179f8f.25.1757686915029;
-        Fri, 12 Sep 2025 07:21:55 -0700 (PDT)
+        bh=VymCpN9fDyNm7QOg2yye26PyPlP5MnwUCjdKp/JISyg=;
+        b=Ay68+HNILRgnKlROqSw0EwngA41ZuQS46Z8mjHkR/k7G+urDYD8cRBm/L/Kh2nrqq3
+         cjxHZ/7fliQjVkROHlbhdo+PSyxUAueq0tn2FkKznJmCU6MKXI/c7Jwpx9aYTktOuF7h
+         552cn0Y8HPe3Cjl1gr0A0Jm2hvC8uraqqlm+M9lwN9ND3J6la73t8EAN08OJzNHlmNHo
+         6spLw7y573QACYSgysvYUt5dT/lN1bwFE6HQwV0A+IK6/bv5g7tJAEg6ADYQMWxA3fd6
+         ypKIgeqsz8TbM2P2f4vBjDQF0rryWggSd4F48xA1pAR/FmljvwzSRP6agn9YRn2j5cIJ
+         02Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCUA4w/frxUXaat1O1qz6L/wWoIvdh4a44B5+f5p8rMGEPMh5i/q1zomtB1BkNKheXVtBfqlOxAUIZlauPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVCGbmXPbkGwqz1WBihhDCCfSjNfGQgZ6AcD0e4x9jWne5H0D0
+	gmmfeaUGBtXcc2SQpaMKhybOUhd6b42NjywWQ5Zvag1rzd/zL6x19PMr
+X-Gm-Gg: ASbGncv6chcc9z4ou4CeQOxICN0jpPx67TkVJDUlERWqEitw/TFAdj/1USYhTOOO50u
+	j/rDyWPo6IaKrVTfKL+Fos7sTbPBsq0QD647OY8Eayhmu/dtjd5UXkYRaXcXLPKI4kUB0755ykV
+	dJsly8sVWvJPfSY6s8FYjylnuBppVynIR4CKpsfZ33EsRUemiD65My9CMUbeZU8/d5wEaaL3XmP
+	9Zt/5VxmKrckM8DxGy4KukqxdcozfWgxlAr713EnIB4KnlROg7hyP8RyGy3ple7cmg66xQ7U1B/
+	BHNr4t20168L1DFhM9wZC3t57WZy4NgmQNEpA2c8uuwx0Dci+0YJURr2xieOiTj66J7LUN3ijyZ
+	2Q8Q7rQj1e/mKvLJfB8iRNXPAetwOcrI=
+X-Google-Smtp-Source: AGHT+IGS/ldf5VzaTVStAjlJrTC/ggG5z3uMdvDlNsP8I8AfAyjYBZwViC4ftI3Cml1zaAZD0YLmkg==
+X-Received: by 2002:a05:6000:2509:b0:3d9:70cc:6dd0 with SMTP id ffacd0b85a97d-3e765a05342mr3225811f8f.33.1757686962105;
+        Fri, 12 Sep 2025 07:22:42 -0700 (PDT)
 Received: from [192.168.2.177] ([91.116.220.47])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7607878c9sm6750010f8f.26.2025.09.12.07.21.50
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e016b5a16sm67350635e9.12.2025.09.12.07.22.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 07:21:54 -0700 (PDT)
-Message-ID: <78130188-62b4-4206-abd7-7d50157a6b76@gmail.com>
-Date: Fri, 12 Sep 2025 16:19:35 +0200
+        Fri, 12 Sep 2025 07:22:40 -0700 (PDT)
+Message-ID: <b28210f7-8154-406e-b2c5-70de85deffb7@gmail.com>
+Date: Fri, 12 Sep 2025 16:22:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 34/38] arm64: dts: mediatek: mt8195: Fix ranges for jpeg
- enc/decoder nodes
+Subject: Re: [PATCH 35/38] arm64: dts: mediatek: mt8195-cherry: Move
+ VBAT-supply to Tomato R1/R2
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  linux-mediatek@lists.infradead.org, robh@kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
@@ -93,7 +93,7 @@ Cc: herbert@gondor.apana.org.au, davem@davemloft.net, krzk+dt@kernel.org,
  linux-gpio@vger.kernel.org, linux-remoteproc@vger.kernel.org,
  linux-sound@vger.kernel.org
 References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
- <20250724083914.61351-35-angelogioacchino.delregno@collabora.com>
+ <20250724083914.61351-36-angelogioacchino.delregno@collabora.com>
 Content-Language: en-US, ca-ES, es-ES
 From: Matthias Brugger <matthias.bgg@gmail.com>
 Autocrypt: addr=matthias.bgg@gmail.com; keydata=
@@ -139,119 +139,60 @@ Autocrypt: addr=matthias.bgg@gmail.com; keydata=
  +zFJv9fVUpo/bjePOL4PMP1y+PYrp4PmPmRwoklBpy1ep8m8XURv46fGUHUEIsTwPWs2Q87k
  7vjYyrcyAOarX2X5pvMQvpAMADGf2Z3wrCsDdG25w2HztweUNd9QEprtJG8GNNzMOD4cQ82T
  a7eGvPWPeXauWJDLVR9jHtWT9Ot3BQgmApLxACvwvD1a69jaFKov28SPHxUCQ9Y1Y/Ct
-In-Reply-To: <20250724083914.61351-35-angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20250724083914.61351-36-angelogioacchino.delregno@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 24/07/2025 10:39, AngeloGioacchino Del Regno wrote:
-> The jpeg decoder main node is under the soc bus but currently has
-> no ranges or reg specified, while the children do, and this is
-> wrong in multiple aspects.
-> 
-> The very same is also valid for the jpeg encoder node.
-> 
-> Rename the decoder and encoder nodes to "jpeg-decoder@1a040000"
-> and to "jpeg-encoder@1a030000" respectively, and change their
-> children to use the newly defined ranges.
+> Move the VBAT supply to mt8195-cherry-tomato-{r1,r2} as this power
+> supply is named like that only for the Realtek RT5682i codec.
 > 
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 Applied, thanks
 
 > ---
->   arch/arm64/boot/dts/mediatek/mt8195.dtsi | 30 +++++++++++++-----------
->   1 file changed, 16 insertions(+), 14 deletions(-)
+>   arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r1.dts | 1 +
+>   arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r2.dts | 1 +
+>   arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi          | 1 -
+>   3 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt8195.dtsi b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
-> index dd065b1bf94a..35b10082bb89 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt8195.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
-> @@ -3014,7 +3014,7 @@ venc: video-codec@1a020000 {
->   			#size-cells = <2>;
->   		};
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r1.dts b/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r1.dts
+> index a82d716f10d4..a50b4e8efaba 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r1.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r1.dts
+> @@ -13,6 +13,7 @@ / {
+>   &audio_codec {
+>   	compatible = "realtek,rt5682i";
+>   	realtek,btndet-delay = <16>;
+> +	VBAT-supply = <&pp3300_z5>;
+>   };
 >   
-> -		jpgdec-master {
-> +		jpeg-decoder@1a040000 {
->   			compatible = "mediatek,mt8195-jpgdec";
->   			power-domains = <&spm MT8195_POWER_DOMAIN_VDEC1>;
->   			iommus = <&iommu_vdo M4U_PORT_L19_JPGDEC_WDMA0>,
-> @@ -3025,11 +3025,12 @@ jpgdec-master {
->   				 <&iommu_vdo M4U_PORT_L19_JPGDEC_BUFF_OFFSET0>;
->   			#address-cells = <2>;
->   			#size-cells = <2>;
-> -			ranges;
-> +			ranges = <0 0 0 0x1a040000 0 0x20000>,
-> +				 <1 0 0 0x1b040000 0 0x10000>;
+>   &sound {
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r2.dts b/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r2.dts
+> index 2d6522c144b7..a8657c0068d5 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r2.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8195-cherry-tomato-r2.dts
+> @@ -13,6 +13,7 @@ / {
+>   &audio_codec {
+>   	compatible = "realtek,rt5682i";
+>   	realtek,btndet-delay = <16>;
+> +	VBAT-supply = <&pp3300_z5>;
+>   };
 >   
-> -			jpgdec@1a040000 {
-> +			jpgdec@0,0 {
->   				compatible = "mediatek,mt8195-jpgdec-hw";
-> -				reg = <0 0x1a040000 0 0x10000>;/* JPGDEC_C0 */
-> +				reg = <0 0 0 0x10000>;/* JPGDEC_C0 */
->   				iommus = <&iommu_vdo M4U_PORT_L19_JPGDEC_WDMA0>,
->   					 <&iommu_vdo M4U_PORT_L19_JPGDEC_BSDMA0>,
->   					 <&iommu_vdo M4U_PORT_L19_JPGDEC_WDMA1>,
-> @@ -3042,9 +3043,9 @@ jpgdec@1a040000 {
->   				power-domains = <&spm MT8195_POWER_DOMAIN_VDEC0>;
->   			};
+>   &pio_default {
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi b/arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi
+> index e70599807bb1..d40f4c1b9766 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi
+> @@ -535,7 +535,6 @@ audio_codec: codec@1a {
 >   
-> -			jpgdec@1a050000 {
-> +			jpgdec@0,10000 {
->   				compatible = "mediatek,mt8195-jpgdec-hw";
-> -				reg = <0 0x1a050000 0 0x10000>;/* JPGDEC_C1 */
-> +				reg = <0 0 0x10000 0x10000>;/* JPGDEC_C1 */
->   				iommus = <&iommu_vdo M4U_PORT_L19_JPGDEC_WDMA0>,
->   					 <&iommu_vdo M4U_PORT_L19_JPGDEC_BSDMA0>,
->   					 <&iommu_vdo M4U_PORT_L19_JPGDEC_WDMA1>,
-> @@ -3057,9 +3058,9 @@ jpgdec@1a050000 {
->   				power-domains = <&spm MT8195_POWER_DOMAIN_VDEC1>;
->   			};
+>   		AVDD-supply = <&mt6359_vio18_ldo_reg>;
+>   		MICVDD-supply = <&pp3300_z2>;
+> -		VBAT-supply = <&pp3300_z5>;
+>   	};
+>   };
 >   
-> -			jpgdec@1b040000 {
-> +			jpgdec@1,0 {
->   				compatible = "mediatek,mt8195-jpgdec-hw";
-> -				reg = <0 0x1b040000 0 0x10000>;/* JPGDEC_C2 */
-> +				reg = <1 0 0 0x10000>;/* JPGDEC_C2 */
->   				iommus = <&iommu_vpp M4U_PORT_L20_JPGDEC_WDMA0>,
->   					 <&iommu_vpp M4U_PORT_L20_JPGDEC_BSDMA0>,
->   					 <&iommu_vpp M4U_PORT_L20_JPGDEC_WDMA1>,
-> @@ -3088,7 +3089,7 @@ vdosys0: syscon@1c01a000 {
->   		};
->   
->   
-> -		jpgenc-master {
-> +		jpeg-encoder@1a030000 {
->   			compatible = "mediatek,mt8195-jpgenc";
->   			power-domains = <&spm MT8195_POWER_DOMAIN_VENC_CORE1>;
->   			iommus = <&iommu_vpp M4U_PORT_L20_JPGENC_Y_RDMA>,
-> @@ -3097,11 +3098,12 @@ jpgenc-master {
->   					<&iommu_vpp M4U_PORT_L20_JPGENC_BSDMA>;
->   			#address-cells = <2>;
->   			#size-cells = <2>;
-> -			ranges;
-> +			ranges = <0 0 0 0x1a030000 0 0x10000>,
-> +				 <1 0 0 0x1b030000 0 0x10000>;
->   
-> -			jpgenc@1a030000 {
-> +			jpgenc@0,0 {
->   				compatible = "mediatek,mt8195-jpgenc-hw";
-> -				reg = <0 0x1a030000 0 0x10000>;
-> +				reg = <0 0 0 0x10000>;
->   				iommus = <&iommu_vdo M4U_PORT_L19_JPGENC_Y_RDMA>,
->   						<&iommu_vdo M4U_PORT_L19_JPGENC_C_RDMA>,
->   						<&iommu_vdo M4U_PORT_L19_JPGENC_Q_TABLE>,
-> @@ -3112,9 +3114,9 @@ jpgenc@1a030000 {
->   				power-domains = <&spm MT8195_POWER_DOMAIN_VENC>;
->   			};
->   
-> -			jpgenc@1b030000 {
-> +			jpgenc@1,0 {
->   				compatible = "mediatek,mt8195-jpgenc-hw";
-> -				reg = <0 0x1b030000 0 0x10000>;
-> +				reg = <1 0 0 0x10000>;
->   				iommus = <&iommu_vpp M4U_PORT_L20_JPGENC_Y_RDMA>,
->   						<&iommu_vpp M4U_PORT_L20_JPGENC_C_RDMA>,
->   						<&iommu_vpp M4U_PORT_L20_JPGENC_Q_TABLE>,
 
