@@ -1,46 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEF326290;
-	Sat, 13 Sep 2025 03:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D841DED5B;
+	Sat, 13 Sep 2025 04:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757735806; cv=none; b=rHPB5JgrSe4nd62Zm1GaeyT5t8bGh7gEAqtKA7N9xBgZk/h+6vyPfHvTSgKUJ/1CwtyQ3yGWvQQB5Cu03nkQPj35YcZeAGGXeLuJS7qVwseQUlMadmIiWxDh1r8Ya0zhK1RYM9vf0hSX1X5FsSZvlUPdfOFd/gxa9n2kxmNjeHk=
+	t=1757736019; cv=none; b=r4vmghADACsn/VdqdcVCZfjRGBwBIMo3QJHAzvhhXu7IJs5xs+eJhKEgzhEzkdtNafmeF4zBD6EwbpiRmZNaN8z8/95a9LQGX9yKg8icY8QKrU5iccBUBNBqlo+kkBPpHZnEMf4Wx3vxPSDdmUK8+ke/kbtC03za29alBIrIc4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757735806; c=relaxed/simple;
-	bh=mYvWyyZaBbGor0A60kVcHbc38K2M2ajjYNslJyZmHEQ=;
+	s=arc-20240116; t=1757736019; c=relaxed/simple;
+	bh=StjCYRKjxo+/uNGUMp4u2Q/MThjN6is5yTdKHAtUacc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tb+us7TIM2sRH3ojHZw2qZgRGcHFcesL5hMOlRPqk2OhTCIZIApr8qfr6wIPUgi60axqm4lQ7vBYSdvRUHOHdlfghjpOXKI4P3feKQXZmkk3gk9y8GJTevPYOOw9sDnLGtJyZItkjqyBdSlUHOZq2y4uqFcksNHxtNM1qu08fjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=QPtKmzZM; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=BGfpbXKullzSs9il21pUtpxA0Nma2d36S06M+Kqw+468PeZ+evzZP3u5abqorUnXigumG8HfF6jMAJy5yjnUzNQJKkbh7wyvBsMC58GR2ja0oyPftd0ObhAOYZwiVVegAZ+DfEaPLBEXiOzQhwsHu2fZBAhTeK8FaVpg1tAJj3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NSetxOan; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="QPtKmzZM"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NSetxOan"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=WLmYVqGmFrzsHw7vn69TnalxcG7p2lkJTyh4HjR608k=; b=QPtKmzZMTomvBoL+huYUQ7vFRO
-	V7x9T1qiHnWamZseWJAqZ1SznQnB+WATCOGcMpDNZIkpyX51EK/LPrHrBk/x/tuHnpehEB7J9aj25
-	Cc7v+m/aDBnT0t7UQFQcWrDh+5OFKSFk5tq2W3yXhfHmbrT88yQtD1xHUxwnvX5cxUrZD7tkqPafF
-	LagX0eZyF7+Ti27hN4qjpPclZiiFyzCe9BoHp7wJKxayShGoow8ja7GqP1uaRGouLdYxil7sE0xuY
-	HsJ1xXQjR2B6uXraxNtqdqgrrZ9yogZf22h+dJafcYYyPz9J9nKOCSlGreRLACdjVLErmyC7Mz5fE
-	lr0g1NIA==;
+	bh=z83lnUz437zAhQCp3R6e8kZDrrmry8SzUSHt/UweV2w=; b=NSetxOanypfCNDYPOlDCHDZJjO
+	U+DY2i8GR8nCcDZxsnahzGvKop0yR+KeNrtE/Ff7lGozeN2VW0Or7wLa7p6E9M6G+f6O0RUYeTPFe
+	Zj7/ItcUpqv6p1jqDK2yD8S3ljiuTOhKWnLvpuGO8vcY6+R7MmmSePaO0uc3fy3P0xioEUnInaq6W
+	r0+ySGtNlE5NB7HqeLPzFKHKnVXcvetS+UmA12+NhdIlakLZmQgXwD6NG58dak4JoQGCLhvi+/boP
+	fgheH2gV+/Jif/8tRdEi+2ogfCXPiLGrXhlUEW7whPTT1W+BBqIF20l7ccVH5OBt5RmoYvZn4TlTV
+	zdPNXo9w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uxH7m-0053bQ-2q;
-	Sat, 13 Sep 2025 11:56:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 11:56:27 +0800
-Date: Sat, 13 Sep 2025 11:56:27 +0800
+	id 1uxHBH-0053eK-2M;
+	Sat, 13 Sep 2025 12:00:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 12:00:04 +0800
+Date: Sat, 13 Sep 2025 12:00:04 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH] hwrng: core - Allow runtime disabling of the HW RNG
-Message-ID: <aMTra7C-CayEcaCY@gondor.apana.org.au>
-References: <aLWltVMmuYQn8Pwa@earth.li>
+To: meenakshi.aggarwal@nxp.com
+Cc: horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Meenakshi Aggarwal <nxa07556@lsv05950.swis.nl-cdc01.nxp.com>
+Subject: Re: [PATCH] drivers: crypto: caam: Add CRYPTO_ALG_NO_FALLBACK
+Message-ID: <aMTsRIxG44TmqOnp@gondor.apana.org.au>
+References: <20250904112615.4050572-1-meenakshi.aggarwal@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,75 +51,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aLWltVMmuYQn8Pwa@earth.li>
+In-Reply-To: <20250904112615.4050572-1-meenakshi.aggarwal@nxp.com>
 
-On Mon, Sep 01, 2025 at 02:55:01PM +0100, Jonathan McDowell wrote:
-> From: Jonathan McDowell <noodles@meta.com>
+On Thu, Sep 04, 2025 at 01:26:15PM +0200, meenakshi.aggarwal@nxp.com wrote:
+> From: Meenakshi Aggarwal <nxa07556@lsv05950.swis.nl-cdc01.nxp.com>
 > 
-> The HW RNG core allows for manual selection of which RNG device to use,
-> but does not allow for no device to be enabled. It may be desirable to
-> do this on systems with only a single suitable hardware RNG, where we
-> need exclusive access to other functionality on this device. In
-> particular when performing TPM firmware upgrades this lets us ensure the
-> kernel does not try to access the device.
+> Add CRYPTO_ALG_NO_FALLBACK cra_flag for hash algorithms.
 > 
-> Before:
+> Fixes: 4ccd065a69df ("crypto: ahash - Add support for drivers with no fallback")
 > 
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
-> 
-> After:
-> 
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
-> 
-> root@debian-qemu-efi:~# echo none > /sys/devices/virtual/misc/hw_random/rng_current
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:none
-> grep: /sys/devices/virtual/misc/hw_random/rng_quality: No such device
-> /sys/devices/virtual/misc/hw_random/rng_selected:1
-> 
-> (Observe using bpftrace no calls to TPM being made)
-> 
-> root@debian-qemu-efi:~# echo "" > /sys/devices/virtual/misc/hw_random/rng_current
-> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-> /sys/devices/virtual/misc/hw_random/rng_quality:1024
-> /sys/devices/virtual/misc/hw_random/rng_selected:0
-> 
-> (Observe using bpftrace that calls to the TPM resume)
-> 
-> Signed-off-by: Jonathan McDowell <noodles@meta.com>
+> Signed-off-by: Meenakshi Aggarwal <nxa07556@lsv05950.swis.nl-cdc01.nxp.com>
 > ---
->  drivers/char/hw_random/core.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  drivers/crypto/caam/caamhash.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 018316f54621..11c8077b792b 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -341,6 +341,10 @@ static ssize_t rng_current_store(struct device *dev,
->  
->  	if (sysfs_streq(buf, "")) {
->  		err = enable_best_rng();
-> +	} else if (sysfs_streq(buf, "none")) {
-> +		if (current_rng)
-> +			cur_rng_set_by_user = 1;
-> +		drop_current_rng();
+> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+> index 25c02e267258..90aecefdce01 100644
+> --- a/drivers/crypto/caam/caamhash.c
+> +++ b/drivers/crypto/caam/caamhash.c
+> @@ -1933,7 +1933,8 @@ caam_hash_alloc(struct caam_hash_template *template,
+>  	alg->cra_priority = CAAM_CRA_PRIORITY;
+>  	alg->cra_blocksize = template->blocksize;
+>  	alg->cra_alignmask = 0;
+> -	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
+> +	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
+> +			 CRYPTO_ALG_NO_FALLBACK;
 
-Is this setting supposed to be sticky?
-
-Because as it stands, if another HWRNG is registered after setting
-it to none, it would still become the default RNG which seems to be
-surprising.
+All hardware drivers are meant to have fallbacks.  The only exception
+would be phmac where the key is inaccessible to the software fallback.
 
 Cheers,
 -- 
