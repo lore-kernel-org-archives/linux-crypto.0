@@ -1,29 +1,29 @@
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64EA2EC54D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65582EC54F;
 	Sat, 13 Sep 2025 10:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757761082; cv=none; b=dMaHN/TFwko4h2iDK5TXpp3AxLQ/7YjvBOGuat2fkUpW4CEA7dKGurhgghc9USayIOyaB1HC9rz7h+2EBK3+5+pSQyJtUvi4tQDC1hl0mpBFTRXecIGzbEXQqYNoITL8mNHxgvIXEDnlcz9JWvtl4vAGCM8KRQIuWH8r6rxSFOU=
+	t=1757761082; cv=none; b=CvOnYM4ZeC41nbX7t78XXm54OwH7Aegy8Qvxhk6vmrcS00mvegMYEzVyPoAERudhoiT7/uw0KmtF1FnxptE30d/W09+vAJDUqFO/5J3grhKWLqgIgf47a7ZuqATCfosrL/7npLQGdYDh0EcFvGacDGOvb1Pd3mjhzhh0OhOjCd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757761082; c=relaxed/simple;
-	bh=cBrRkrLOprRgl4NO7olFm1/41uXD8pUTyvxgNXSdZ3s=;
+	bh=tEoULR4TQVGBD33ZC7ngTEi1MtuRNy9fMIZTkALJd3w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OEgJbnB1syOenR35brLpYahTyVn0TJ11u0j9b5nFtr+HlJLbWSST0cFUExktPibA/CJ4H3peoKxHSXQ4zs4g1dj4AUer31pWTWB5Scch4BIcO+/d03nKUbEvCOkn9iPE1QS0wXC/1BwnZP2S7RS7GGEiZ6J56hq2RXTta3uZ+xU=
+	 MIME-Version:Content-Type; b=Q8/7ky5zNjgHOQ21wqI76VtFWL+tU3iYrL+gEOlcTRatPPRzlmAFLCbqibQLev4gSrvRIALQZgU4Sf5E6J/r+lSZrLkc/q0ZskTIRFNRUSdeja+skZ23yjNTjUeMu/jtlOaaCHEquo75pVS5+kw2yGFtoTP+77QGv51IKjrTSQk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cP7Tp1cLqz2VRfD;
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cP7Tp50KSz2VRgc;
 	Sat, 13 Sep 2025 18:54:38 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0FCC71A016C;
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 84037180042;
 	Sat, 13 Sep 2025 18:57:58 +0800 (CST)
 Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 13 Sep 2025 18:57:57 +0800
+ 15.2.1544.11; Sat, 13 Sep 2025 18:57:58 +0800
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -33,9 +33,9 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<linuxarm@openeuler.org>, <fanghao11@huawei.com>, <liulongfang@huawei.com>,
 	<qianweili@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 4/5] crypto: hisilicon/qm - clear all VF configurations in the hardware
-Date: Sat, 13 Sep 2025 18:57:53 +0800
-Message-ID: <20250913105754.3862444-5-huangchenghai2@huawei.com>
+Subject: [PATCH 5/5] crypto: hisilicon/qm - set NULL to qm->debug.qm_diff_regs
+Date: Sat, 13 Sep 2025 18:57:54 +0800
+Message-ID: <20250913105754.3862444-6-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250913105754.3862444-1-huangchenghai2@huawei.com>
 References: <20250913105754.3862444-1-huangchenghai2@huawei.com>
@@ -50,80 +50,29 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
  kwepemq200001.china.huawei.com (7.202.195.16)
 
-From: Weili Qian <qianweili@huawei.com>
+When the initialization of qm->debug.acc_diff_reg fails,
+the probe process does not exit. However, after qm->debug.qm_diff_regs is
+freed, it is not set to NULL. This can lead to a double free when the
+remove process attempts to free it again. Therefore, qm->debug.qm_diff_regs
+should be set to NULL after it is freed.
 
-When disabling SR-IOV, clear the configuration of each VF
-in the hardware. Do not exit the configuration clearing process
-due to the failure of a single VF. Additionally, Clear the VF
-configurations before decrementing the PM counter.
-
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+Fixes: 8be091338971 ("crypto: hisilicon/debugfs - Fix debugfs uninit process issue")
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ drivers/crypto/hisilicon/debugfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 32dd755e1867..1721528d7c68 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3645,19 +3645,19 @@ static int qm_vf_q_assign(struct hisi_qm *qm, u32 num_vfs)
- 	return 0;
- }
- 
--static int qm_clear_vft_config(struct hisi_qm *qm)
-+static void qm_clear_vft_config(struct hisi_qm *qm)
- {
--	int ret;
- 	u32 i;
- 
--	for (i = 1; i <= qm->vfs_num; i++) {
--		ret = hisi_qm_set_vft(qm, i, 0, 0);
--		if (ret)
--			return ret;
--	}
--	qm->vfs_num = 0;
-+	/*
-+	 * When disabling SR-IOV, clear the configuration of each VF in the hardware
-+	 * sequentially. Failure to clear a single VF should not affect the clearing
-+	 * operation of other VFs.
-+	 */
-+	for (i = 1; i <= qm->vfs_num; i++)
-+		(void)hisi_qm_set_vft(qm, i, 0, 0);
- 
--	return 0;
-+	qm->vfs_num = 0;
- }
- 
- static int qm_func_shaper_enable(struct hisi_qm *qm, u32 fun_index, u32 qos)
-@@ -3992,13 +3992,13 @@ int hisi_qm_sriov_enable(struct pci_dev *pdev, int max_vfs)
- 		goto err_put_sync;
+diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
+index 45e130b901eb..17eb236e9ee4 100644
+--- a/drivers/crypto/hisilicon/debugfs.c
++++ b/drivers/crypto/hisilicon/debugfs.c
+@@ -888,6 +888,7 @@ static int qm_diff_regs_init(struct hisi_qm *qm,
+ 		dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
+ 		ret = PTR_ERR(qm->debug.acc_diff_regs);
+ 		qm->debug.acc_diff_regs = NULL;
++		qm->debug.qm_diff_regs = NULL;
+ 		return ret;
  	}
- 
-+	qm->vfs_num = num_vfs;
- 	ret = pci_enable_sriov(pdev, num_vfs);
- 	if (ret) {
- 		pci_err(pdev, "Can't enable VF!\n");
- 		qm_clear_vft_config(qm);
- 		goto err_put_sync;
- 	}
--	qm->vfs_num = num_vfs;
- 
- 	pci_info(pdev, "VF enabled, vfs_num(=%d)!\n", num_vfs);
- 
-@@ -4033,11 +4033,10 @@ int hisi_qm_sriov_disable(struct pci_dev *pdev, bool is_frozen)
- 	}
- 
- 	pci_disable_sriov(pdev);
--
--	qm->vfs_num = 0;
-+	qm_clear_vft_config(qm);
- 	qm_pm_put_sync(qm);
- 
--	return qm_clear_vft_config(qm);
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(hisi_qm_sriov_disable);
  
 -- 
 2.43.0
