@@ -1,111 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from the.earth.li (the.earth.li [93.93.131.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660B8246788;
-	Sat, 13 Sep 2025 11:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E2C1C8FBA;
+	Sat, 13 Sep 2025 14:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757761581; cv=none; b=gTiif43BRkSkRUqSkbtyDnBRQu8pErgh8bbee1L4KR+Q9dkV4JWNhWCkOCfWPnQ5jfQ8PX82MjYImWq3PEDKUPyTbkfa3fXBp88oUqnVT0M1hPzelAR77CDjZld4QNrIOqw+KxKyNNq17xM0lXEyDNSzozU+9jTRtAr+/TQAKlg=
+	t=1757774000; cv=none; b=qi4Sq3OWhEj1eLCRrGN6sD/9KxN4lkrd88tEXwpPtq8eFW5HV36MS1nOGKIzKZM2aAczJ+3XmEXl3vDbXTR+IS5ydFtzFPS6sAurvCMpIbI4QggZqMF+t57yKzXrCfOd0RLmNY2qBIrdF7CIz9iGt/g67xOMpPdDw0JEPbmCfsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757761581; c=relaxed/simple;
-	bh=szFTrZp5S9Oy4p7ylGbdzdMqQBAOQWe3AlXIIsUOjWQ=;
+	s=arc-20240116; t=1757774000; c=relaxed/simple;
+	bh=j2QM2aw7mGhSmWHCXRRe7ymcvibhXUOQnnNuy1bwWt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIJzCoDQBXNLS1GSOzie9rFvUKWVhAgX2aBdRTmOwQwtXMWwj5OLubl++Sg+LWO0Uje2872PQCnp3VupDw0Vn/6biYjK6MWgbJ2l6KN7D6/vg4lHK5+vAO0FbgQNshJ0/uxZ0kf9byihsZ/99da4QKKQ2tLadqA5TkCzpKOHrc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Ctkjdq05; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ncOLKGhOxtfj84WkQpTQl4CjEpoTZy1IYVeaBzv5CGt0n4YPItKI96hV2FxW0ACNRIkOry3/cjIesUroFWPt4iw9aB4yyoWl3dSsGm3ZvwjySdRYO135o0nThDafuknaVUXghmmopuXcCcR91EH57Dz39RkEZqDT2rgMf6VOdjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=v/z5Pf4f; arc=none smtp.client-ip=93.93.131.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Ctkjdq05"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 873B8C4CEEB;
-	Sat, 13 Sep 2025 11:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1757761579;
-	bh=szFTrZp5S9Oy4p7ylGbdzdMqQBAOQWe3AlXIIsUOjWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ctkjdq05sdDXthTlFmPEY/dXi1Z23yu9NNw4emWqkHw4ot8Fbuo0HQ8wQ7lkhcaw3
-	 QhCAbNhFAIg1qdY+VsqVNCIU7CoUGuKuUd3tqTob2p5wd7yTEAH3ej7PxbAj/BCsDt
-	 pzqkP85QR6r7WIUYRcmfSK5TeSt7nRHXidg7p09k=
-Date: Sat, 13 Sep 2025 13:06:15 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: huangchenghai <huangchenghai2@huawei.com>
-Cc: Zhangfei Gao <zhangfei.gao@linaro.org>, wangzhou1@hisilicon.com,
-	linux-kernel@vger.kernel.org, linuxarm@huawei.com,
-	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
-	shenyang39@huawei.com, qianweili@huawei.com,
-	linwenkai6@hisilicon.com, liulongfang@huawei.com
-Subject: Re: [PATCH 3/4] uacce: implement mremap in uacce_vm_ops to return
- -EPERM
-Message-ID: <2025091358-doornail-underpaid-35ca@gregkh>
-References: <20250822103904.3776304-1-huangchenghai2@huawei.com>
- <20250822103904.3776304-4-huangchenghai2@huawei.com>
- <2025082208-coauthor-pagan-e72c@gregkh>
- <CABQgh9GEZSasZq5bDthQrTZnJ_Uo8G-swDsrM_gWCecWbtTKgA@mail.gmail.com>
- <2025090608-afloat-grumbling-e729@gregkh>
- <868ceb0e-f4ba-4495-a1e1-0e387049281a@huawei.com>
+	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="v/z5Pf4f"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
+	s=the; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:
+	Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1n+QzLWlRDA0aVwcLcZsmd3RKgAIHsT4SqseR68tHQw=; b=v/z5Pf4fO/v9/6pnVSlfLxYlNu
+	VvXEyApHvJ9tTy3ns2198rDsufr4MuK8Uf4+5aO8n+5LwG+vVq8bYPqJQfR9PkdCUhMbz6xOaaNBS
+	f3hZi2QA5VBGlEjEORy4HlS+y/GY2g0OT157KsbrJeTh+Hgiz5P+N4YxQRWAOQlHFlx9kpx781CAj
+	by7+K43WCkAEtrpDDDcvOyh6+PQqmharGMQWihy6CZgN0kTx/vx6AffDowKhmETWB3wweWn2y+2yM
+	cuaSCEnbyn2EQDE/x1d5GuQj3IxFFAg3aYFSgjxK4fmdem78qADUgKpD+wlg+vdQnKgVYWVveiIyk
+	B/i9Zotw==;
+Received: from noodles by the.earth.li with local (Exim 4.96)
+	(envelope-from <noodles@earth.li>)
+	id 1uxQvv-00CwjW-2K;
+	Sat, 13 Sep 2025 15:08:55 +0100
+Date: Sat, 13 Sep 2025 15:08:55 +0100
+From: Jonathan McDowell <noodles@earth.li>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
+Subject: Re: [PATCH] hwrng: core - Allow runtime disabling of the HW RNG
+Message-ID: <aMV690M9WOS6rtWX@earth.li>
+References: <aLWltVMmuYQn8Pwa@earth.li>
+ <aMTra7C-CayEcaCY@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <868ceb0e-f4ba-4495-a1e1-0e387049281a@huawei.com>
+In-Reply-To: <aMTra7C-CayEcaCY@gondor.apana.org.au>
 
-On Sat, Sep 13, 2025 at 06:40:23PM +0800, huangchenghai wrote:
-> 
-> On Sat, 6 Sept 2025 at 20:03, Greg KH wrote:
-> > On Thu, Aug 28, 2025 at 01:59:48PM +0800, Zhangfei Gao wrote:
-> > > Hi, Greg
-> > > 
-> > > On Fri, 22 Aug 2025 at 19:46, Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > On Fri, Aug 22, 2025 at 06:39:03PM +0800, Chenghai Huang wrote:
-> > > > > From: Yang Shen <shenyang39@huawei.com>
-> > > > > 
-> > > > > The current uacce_vm_ops does not support the mremap operation of
-> > > > > vm_operations_struct. Implement .mremap to return -EPERM to remind
-> > > > > users
-> > > > Why is this needed?  If mremap is not set, what is the value returned?
-> > > Did some debug locally.
-> > > 
-> > > By default, mremap is permitted.
-> > > 
-> > > With mremap, the original vma is released,
-> > > The vma_close is called and free resources, including q->qfr.
-> > > 
-> > > However, vma->vm_private_data (q) is copied to the new vma.
-> > > When the new vma is closed, vma_close will get q and q->qft=0.
-> > > 
-> > > So disable mremap here looks safer.
-> > > 
-> > > > And why is -EPERM the correct value to return here?  That's not what the
-> > > > man pages say is valid :(
-> > > if disable mremap, -1 is returned as MAP_FAILED.
-> > > The errno is decided by the return value, -EPERM (-1) or -EINVAL (-22).
-> > > man mremap only lists -EINVAL.
-> > > 
-> > > However, here the driver wants to disable mremap, looks -EPERM is more suitable.
-> > Disabling mremap is not a permission issue, it's more of an invalid
-> > call?  I don't know, what do other drivers do?
-> > 
-> > thanks,
-> > 
-> > greg k-h
-> Hi Greg,
-> 
-> Thank you for your feedback.
-> 
-> The reason we need to explicitly disable mremap is that when the
-> driver does not implement .mremap, it uses the default mremap
-> method. This could lead to a risk scenario:
-> 
-> An application might first mmap address p1, then mremap to p2,
-> followed by munmap(p1), and finally munmap(p2). Since the default
-> mremap copies the original vma's vm_private_data (i.e., q) to the
-> new vma, both munmap operations would trigger vma_close, causing
-> q->qfr to be freed twice(qfr will be set to null here, so repeated release
-> is ok).
+On Sat, Sep 13, 2025 at 11:56:27AM +0800, Herbert Xu wrote:
+>On Mon, Sep 01, 2025 at 02:55:01PM +0100, Jonathan McDowell wrote:
+>> From: Jonathan McDowell <noodles@meta.com>
+>>
+>> The HW RNG core allows for manual selection of which RNG device to use,
+>> but does not allow for no device to be enabled. It may be desirable to
+>> do this on systems with only a single suitable hardware RNG, where we
+>> need exclusive access to other functionality on this device. In
+>> particular when performing TPM firmware upgrades this lets us ensure the
+>> kernel does not try to access the device.
+>>
+>> Before:
+>>
+>> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+>> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0
+>> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+>> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+>> /sys/devices/virtual/misc/hw_random/rng_selected:0
+>>
+>> After:
+>>
+>> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+>> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+>> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+>> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+>> /sys/devices/virtual/misc/hw_random/rng_selected:0
+>>
+>> root@debian-qemu-efi:~# echo none > /sys/devices/virtual/misc/hw_random/rng_current
+>> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+>> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+>> /sys/devices/virtual/misc/hw_random/rng_current:none
+>> grep: /sys/devices/virtual/misc/hw_random/rng_quality: No such device
+>> /sys/devices/virtual/misc/hw_random/rng_selected:1
+>>
+>> (Observe using bpftrace no calls to TPM being made)
+>>
+>> root@debian-qemu-efi:~# echo "" > /sys/devices/virtual/misc/hw_random/rng_current
+>> root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
+>> /sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
+>> /sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
+>> /sys/devices/virtual/misc/hw_random/rng_quality:1024
+>> /sys/devices/virtual/misc/hw_random/rng_selected:0
+>>
+>> (Observe using bpftrace that calls to the TPM resume)
+>>
+>> Signed-off-by: Jonathan McDowell <noodles@meta.com>
+>> ---
+>>  drivers/char/hw_random/core.c | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+>> index 018316f54621..11c8077b792b 100644
+>> --- a/drivers/char/hw_random/core.c
+>> +++ b/drivers/char/hw_random/core.c
+>> @@ -341,6 +341,10 @@ static ssize_t rng_current_store(struct device *dev,
+>>
+>>  	if (sysfs_streq(buf, "")) {
+>>  		err = enable_best_rng();
+>> +	} else if (sysfs_streq(buf, "none")) {
+>> +		if (current_rng)
+>> +			cur_rng_set_by_user = 1;
+>> +		drop_current_rng();
+>
+>Is this setting supposed to be sticky?
+>
+>Because as it stands, if another HWRNG is registered after setting
+>it to none, it would still become the default RNG which seems to be
+>surprising.
 
-Great, can you please include that in the changelog text?
+Good point, I'd missed that (it's not likely to be an issue in my 
+situation), but I'll spin a v2 that fixes up hwrng_register() too.
 
-thanks,
+J.
 
-greg k-h
+-- 
+I'm an atheist myself - there is no Greg Hill.
