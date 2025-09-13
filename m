@@ -1,140 +1,127 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D0C28489B;
-	Sat, 13 Sep 2025 10:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B836926AA93;
+	Sat, 13 Sep 2025 10:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757760213; cv=none; b=NDwvfw+Dov22IBUNGyZ1+oPvXf85DUVPWOnntyeb1JqkJFfbElGVRy3DRb3veWgNWS/Ka9jHlj0TcpqgMu3FnB9Uh6l3NPb5lPx/UjxQB5x9Yr1rEBApj0NvYs1j3AM6T44g/X2IqU/2eF1tLJqFGf1X7Aksa/I4/OJgDKJzK7Q=
+	t=1757760969; cv=none; b=K9V7s9ahZ7HQWS+jQjtmXetuRmdKh8sGPYkw5xU3yMHNUAqUE9TdINw4bQrpCCM2gu0NIut1Coa+SLSvLdI4KJ3/y+kAWU58bAx+FBpIiCrqvk4urKjvRlhIg/lRCGqsVPSip6QKtwB9vp9P2Tiylo+4wPl8ys9cuRjF6U7ECN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757760213; c=relaxed/simple;
-	bh=mjrxhUFNG4wgKg6PgXTBGwlhEzgkPgfMJ1pkJuCQzaI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UkGNOfb3m9S0+mBdEX2bp5ry9JcVTj7q2nI3ezGFFeGF37b0WPx1v+RCFZEd8SaQXHWARXCvxG3y3WsLHY2kdcAV14RC4ca/5oQh1X0wmq/fyAoMxS+ku/Yu0lH42qlvi00OO/etidrZHtn0dIRihKAhT9VGNGm5DF01E+cYN1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cP7Cr1XjwztTRf;
-	Sat, 13 Sep 2025 18:42:32 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id C9059140137;
-	Sat, 13 Sep 2025 18:43:26 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 13 Sep 2025 18:43:26 +0800
-Received: from [10.67.120.171] (10.67.120.171) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 13 Sep 2025 18:43:25 +0800
-Message-ID: <44a1dfc6-7432-4a6d-9739-4ff0b6271c77@huawei.com>
-Date: Sat, 13 Sep 2025 18:43:25 +0800
+	s=arc-20240116; t=1757760969; c=relaxed/simple;
+	bh=StEO0JBxtKDi5amum5PC55LRvUuZuDitKv2SKv0kuaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ukh1LBhd9CpW5eB18JjN9U1ddGE+1dEvKFTBh6RqiAPU0/qybsQFJELthRSegAFvkf6h+VqSh5+svIk3q36MFFFEXz7XM3ze54DcbnemqwSQls0NxWRX0SvoWrgZhRtEV8umy3hcT9Cb+kvORJFJ6WJAVf+JI8idH/blGq3C2oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=cz+p4A04; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="cz+p4A04"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E27ED40E00DE;
+	Sat, 13 Sep 2025 10:56:04 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Zvm0Fs6JS_mw; Sat, 13 Sep 2025 10:55:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1757760958; bh=336e6boM42p2fnauyw2slmKIpvfDhufaTO4hMI5mBnw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cz+p4A04BVqH5BbXIWSMPwE8GxsN0+ojBdJxYyXUBlt7LFdEGfzmBXfXpJKxigdhy
+	 XT2CXTV2GlucEzz3tYerXBL85HUBRGyvQL64jIevoIHcz9JNYF5FHCdR5Vm89XJOfS
+	 z9R1jZs/7cfWfCKXNlyR70sMuxFeLgGQjsXEXXzBfIRHDt9+Ls2yIuqvhURa51hzVZ
+	 gCgrJgdXtCIVVAmJ8RLM+R3AWokKt+r4+35lkgwkE3vSPYhU9XxaiJYOnm2nysyiZK
+	 0PMUZOD/xNEYwGbaZuD7gDX0RaOgQcJcabmdwfVZTfmcyBQ0GYM+WMoV9BduIYqRQK
+	 p7SWgNoLIfhBvKuCaeJMAGKWrzB7WXCZu3mRoZaNZl+/y+EhZVmc6eq634TuSp5wj2
+	 hPCLBePRlff3VzWS2svPFLXPXHzkjRrm+QjFMVsP0FBEgCgW1aehRi4nVheGP5cAdc
+	 7K/UdrRgmVuB1hguGq9tExcNM6iNTQeujwYq8fjPVaZmYvWfoiKy6nrkldcjB2TZgv
+	 IrBCbr7FyT3C+JGsoJRXTMyHcFpwoJEXukeAX3HQuXa/lYRJ3UQGCUgUDCN12ZIoHp
+	 7n+EXfMW8Ij3/8+sN+WjIEGgrbq5g6tJn3GHxcAxmoTFMiwHQKR0oUljatnlbpJXhv
+	 fcw+boHoYrpPDMRMjzITBxYI=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 8D1F940E015C;
+	Sat, 13 Sep 2025 10:55:38 +0000 (UTC)
+Date: Sat, 13 Sep 2025 12:55:28 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: herbert@gondor.apana.org.au
+Cc: Sean Christopherson <seanjc@google.com>,
+	Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+	nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
+	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+Message-ID: <20250913105528.GAaMVNoJ1_Qwq8cfos@fat_crate.local>
+References: <cover.1757543774.git.ashish.kalra@amd.com>
+ <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+ <20250912155852.GBaMRDPEhr2hbAXavs@fat_crate.local>
+ <aMRnxb68UTzId7zz@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] uacce: fix for cdev memory leak
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <zhangfei.gao@linaro.org>, <wangzhou1@hisilicon.com>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-	<linux-crypto@vger.kernel.org>, <fanghao11@huawei.com>,
-	<shenyang39@huawei.com>, <qianweili@huawei.com>, <linwenkai6@hisilicon.com>,
-	<liulongfang@huawei.com>
-References: <20250822103904.3776304-1-huangchenghai2@huawei.com>
- <20250822103904.3776304-2-huangchenghai2@huawei.com>
- <2025082225-gooey-paralyses-5f24@gregkh>
-From: huangchenghai <huangchenghai2@huawei.com>
-In-Reply-To: <2025082225-gooey-paralyses-5f24@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aMRnxb68UTzId7zz@google.com>
 
+On Fri, Sep 12, 2025 at 11:34:45AM -0700, Sean Christopherson wrote:
+> On Fri, Sep 12, 2025, Borislav Petkov wrote:
+> > On Wed, Sep 10, 2025 at 10:55:24PM +0000, Ashish Kalra wrote:
+> > > From: Ashish Kalra <ashish.kalra@amd.com>
+> > > 
+> > > When leaking certain page types, such as Hypervisor Fixed (HV_FIXED)
+> > > pages, it does not make sense to dump RMP contents for the 2MB range of
+> > > the page(s) being leaked. In the case of HV_FIXED pages, this is not an
+> > > error situation where the surrounding 2MB page RMP entries can provide
+> > > debug information.
+> > > 
+> > > Add new __snp_leak_pages() API with dump_rmp bool parameter to support
+> > > continue adding pages to the snp_leaked_pages_list but not issue
+> > > dump_rmpentry().
+> > > 
+> > > Make snp_leak_pages() a wrapper for the common case which also allows
+> > > existing users to continue to dump RMP entries.
+> > > 
+> > > Suggested-by: Thomas Lendacky <Thomas.Lendacky@amd.com>
+> > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > ---
+> > >  arch/x86/include/asm/sev.h | 8 +++++++-
+> > >  arch/x86/virt/svm/sev.c    | 7 ++++---
+> > >  2 files changed, 11 insertions(+), 4 deletions(-)
+> > 
+> > Sean, lemme know if I should carry this through tip.
+> 
+> Take them through tip, but the stubs mess in sev.h really needs to be cleaned up
+> (doesn't have to block this series, but should be done sooner than later).
 
-On Thu, Aug 22, 2025 at 07:27 PM +0800, Greg KH wrote:
-> On Fri, Aug 22, 2025 at 06:39:01PM +0800, Chenghai Huang wrote:
->> From: Wenkai Lin <linwenkai6@hisilicon.com>
->>
->> If adding uacce cdev to the system fails, it could be due to two
->> reasons: either the device's devt exists when the failure occurs,
->> or the device_add operation fails. In the latter case, cdev_del
->> will be executed, but in the former case, it will not, leading to a
->> resource leak. Therefore, it is necessary to perform the cdev_del
->> action during abnormal exit.
->>
->> Fixes: 015d239ac014 ("uacce: add uacce driver")
->> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
->> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
->> ---
->>   drivers/misc/uacce/uacce.c | 11 ++++++++++-
->>   1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
->> index 42e7d2a2a90c..3604f722ed60 100644
->> --- a/drivers/misc/uacce/uacce.c
->> +++ b/drivers/misc/uacce/uacce.c
->> @@ -519,6 +519,8 @@ EXPORT_SYMBOL_GPL(uacce_alloc);
->>    */
->>   int uacce_register(struct uacce_device *uacce)
->>   {
->> +	int ret;
->> +
->>   	if (!uacce)
->>   		return -ENODEV;
->>   
->> @@ -529,7 +531,14 @@ int uacce_register(struct uacce_device *uacce)
->>   	uacce->cdev->ops = &uacce_fops;
->>   	uacce->cdev->owner = THIS_MODULE;
->>   
->> -	return cdev_device_add(uacce->cdev, &uacce->dev);
->> +	ret = cdev_device_add(uacce->cdev, &uacce->dev);
->> +	if (ret) {
->> +		cdev_del(uacce->cdev);
->> +		uacce->cdev = NULL;
->> +		return ret;
->> +	}
->> +
->> +	return 0;
->>   }
->>   EXPORT_SYMBOL_GPL(uacce_register);
->>   
->> -- 
->> 2.33.0
->>
-> Hi,
->
-> This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-> a patch that has triggered this response.  He used to manually respond
-> to these common problems, but in order to save his sanity (he kept
-> writing the same thing over and over, yet to different people), I was
-> created.  Hopefully you will not take offence and will fix the problem
-> in your patch and resubmit it so that it can be accepted into the Linux
-> kernel tree.
->
-> You are receiving this message because of the following common error(s)
-> as indicated below:
->
-> - You have marked a patch with a "Fixes:" tag for a commit that is in an
->    older released kernel, yet you do not have a cc: stable line in the
->    signed-off-by area at all, which means that the patch will not be
->    applied to any older kernel releases.  To properly fix this, please
->    follow the documented rules in the
->    Documentation/process/stable-kernel-rules.rst file for how to resolve
->    this.
->
-> If you wish to discuss this problem further, or you have questions about
-> how to resolve this issue, please feel free to respond to this email and
-> Greg will reply once he has dug out from the pending patches received
-> from other developers.
->
-> thanks,
->
-> greg k-h's patch email bot
-Okay，I will add it in v2.
+Right, I guess Tom's on that one...
 
-Thanks,
-ChengHai
+As to the other two:
+
+https://lore.kernel.org/r/e7807012187bdda8d76ab408b87f15631461993d.1757543774.git.ashish.kalra@amd.com
+https://lore.kernel.org/r/7be1accd4c0968fe04d6efe6ebb0185d77bed129.1757543774.git.ashish.kalra@amd.com
+
+Herbert, how do you want to proceed here?
+
+Do you want me to give you an immutable branch with the first patch and you
+can base the other two ontop or should I carry all three through tip?
+
+Yeah, it is time for patch tetris again... :-P
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
