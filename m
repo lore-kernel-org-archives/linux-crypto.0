@@ -1,49 +1,40 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D672222A0;
-	Sat, 13 Sep 2025 04:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8162D7DC7;
+	Sat, 13 Sep 2025 04:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757737917; cv=none; b=t1nY7Um7umcV5mECE0ch93AFyAE9rQOx3eD94sA0NZ4xV2uSQ5AIisEKA3+jF1BrYZsoxfFr0Bgc1SQA15/Mw66YF+/J9ywvrs8QjZ4nFvGfT46A7hdxlLXREErWJIi+0kpfcYMNVQyY4bw//wcsCyWbgw0HuLpfToj1HbgMNyo=
+	t=1757738306; cv=none; b=DDjJaNgT9Cn3b57v3cnmIRkGqu8gXY4QGzCsgdZatctaezx2dTY7x4OAw54dH8hKuM9f7TuV2ULhtzb8vdFhMnIocrKvxkLkUkMXbtHDEkmesodYMZU9ynjT5BPdfGbn1augMSRsGhpU4D8kjn2amL81hrmlz37ZVtdtZhHBtPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757737917; c=relaxed/simple;
-	bh=V56UNnycCpEU3b1FiaU5+wDTmPXfctVwOtoh59m++mI=;
+	s=arc-20240116; t=1757738306; c=relaxed/simple;
+	bh=75761QhkuOh+OYz3o1aRpc1dOJzZbG0KgGq7fc0wlmw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I99lBmWIPCl9YN/7IK2Ptf6rkE2Sf/DlEqziBN0741ZfcwZGmShLK6BIDchr0mjp6hkKcPIZUHDIh31OwLoWcoY2+1f8nqNWZeRe8sJYXnQiAdD0T9nYlf8A/gxJu6AzkEzv8DFf2wyiuQw2kjfEoqb2LfzOoXq33WpTXAMn3N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mLnFba/M; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mLnFba/M"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=WpcYeZLZ6FwItSXc1AYhFvi6A4ewnyUtqBGNZ/33+/Y=; b=mLnFba/MaGJhz1DOCUu9AA/Ssk
-	HcrXW6zi4TFJTLSydTqMPuhhB3j1+kazpBePqUrlqLWfegPRevUB8PEWqXihpU024hJyl3i0QC5Iv
-	ASILGAYLOOkapFUX9F3Sgr83VsSg8FJ+cy6QVcMPuUxGP6Oaq45+6fEdatZhRIWNfR6G+udmb3gAk
-	LGq3nTTuMmfRp3esFlZxWqfZ79n93pVDQhmYYQBwyrB4CNjknG+fSHf4FsyTld5RvzU5Rj/jiaObu
-	0U7I98tzfBJOFSytyMs98eUjgNib6Adczhg5nERyK544QVZHrrSJS7ku5+8hMUoeX776Od1pQ+Ev4
-	Ce9GbK9A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uxHg1-0053xO-0U;
-	Sat, 13 Sep 2025 12:31:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 12:31:49 +0800
-Date: Sat, 13 Sep 2025 12:31:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Borislav Petkov <bp@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	"Borislav Petkov (AMD)" <bp@alien8.de>, stable@kernel.org
-Subject: Re: [PATCH] crypto: ccp - Always pass in an error pointer to
- __sev_platform_shutdown_locked()
-Message-ID: <aMTztcNPqtQkZ4DI@gondor.apana.org.au>
-References: <20250906122145.29784-1-bp@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dp04ZN0zkcSnCi1Y9m8orB/Y9zpKAr9mGve4lT9I1bkaHYZU+NQHmvQDPiotwzQSpJcX+zUF9JwqAtAuior7/csQjrF1PLfyEn1cI5WTbEZwqlqQmchsUxsAEG+owL4t+dNikUq46jzi7sVP6oycLgkOYNVFWrxCwoWwCCtlh8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 8616020212B6;
+	Sat, 13 Sep 2025 06:38:19 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 7F09D120C6B; Sat, 13 Sep 2025 06:38:19 +0200 (CEST)
+Date: Sat, 13 Sep 2025 06:38:19 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Fan Wu <wufan@kernel.org>
+Cc: dhowells@redhat.com, ignat@cloudflare.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, jarkko@kernel.org, zohar@linux.ibm.com,
+	eric.snowberg@oracle.com, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KEYS: X.509: Fix Basic Constraints CA flag parsing
+Message-ID: <aMT1O9PPhLHT-MZJ@wunner.de>
+References: <20250911225356.2678-1-wufan@kernel.org>
+ <aMQcnoETIt4t4Tqz@wunner.de>
+ <CAKtyLkExV9dqMWa5j9O5n8oTHXh8McwVbjjCm6L9L=eFsH3HNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,86 +43,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250906122145.29784-1-bp@kernel.org>
+In-Reply-To: <CAKtyLkExV9dqMWa5j9O5n8oTHXh8McwVbjjCm6L9L=eFsH3HNw@mail.gmail.com>
 
-On Sat, Sep 06, 2025 at 02:21:45PM +0200, Borislav Petkov wrote:
-> From: "Borislav Petkov (AMD)" <bp@alien8.de>
+On Fri, Sep 12, 2025 at 02:14:49PM -0700, Fan Wu wrote:
+> On Fri, Sep 12, 2025 at 6:14 AM Lukas Wunner <lukas@wunner.de> wrote:
+> > On Thu, Sep 11, 2025 at 10:53:56PM +0000, wufan@kernel.org wrote:
+> > > +++ b/crypto/asymmetric_keys/x509_cert_parser.c
+> > > @@ -623,7 +625,7 @@ int x509_process_extension(void *context, size_t hdrlen,
+> > >               if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
+> > >                       return -EBADMSG;
+> > >               if (vlen < 2)
+> > >                       return -EBADMSG;
+> > >               if (v[1] != vlen - 2)
+> > >                       return -EBADMSG;
+> > > -             if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
+> > > +             if (vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1 && v[4] != 0)
+> > >                       ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
+> > >               return 0;
+> > >       }
+> >
+> > Your patch is correct, however the conditions ...
+> >
+> >   vlen >= 5 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1
+> >
+> > ... all check well-formedness of the BasicConstraints object,
+> > so it seems if any of those checks fails, -EBADMSG should be returned.
+> >
+> > The check "if (vlen < 2)" could be changed to "if (vlen < 5)" because
+> > 5 bytes seems to be the minimum size of a well-formed BasicConstraints
+> > object.  Then the "vlen >= 5" and "v[1] != 0" checks can be dropped.
 > 
-> When
+> Actually, we need to be careful here. OpenSSL produces
+> BasicConstraints with CA:FALSE as just an empty SEQUENCE:
 > 
->   9770b428b1a2 ("crypto: ccp - Move dev_info/err messages for SEV/SNP init and shutdown")
-> 
-> moved the error messages dumping so that they don't need to be issued by
-> the callers, it missed the case where __sev_firmware_shutdown() calls
-> __sev_platform_shutdown_locked() with a NULL argument which leads to
-> a NULL ptr deref on the shutdown path, during suspend to disk:
-> 
->   #PF: supervisor read access in kernel mode
->   #PF: error_code(0x0000) - not-present page
->   PGD 0 P4D 0
->   Oops: Oops: 0000 [#1] SMP NOPTI
->   CPU: 0 UID: 0 PID: 983 Comm: hib.sh Not tainted 6.17.0-rc4+ #1 PREEMPT(voluntary)
->   Hardware name: Supermicro Super Server/H12SSL-i, BIOS 2.5 09/08/2022
->   RIP: 0010:__sev_platform_shutdown_locked.cold+0x0/0x21 [ccp]
-> 
-> That rIP is:
-> 
->   00000000000006fd <__sev_platform_shutdown_locked.cold>:
->    6fd:   8b 13                   mov    (%rbx),%edx
->    6ff:   48 8b 7d 00             mov    0x0(%rbp),%rdi
->    703:   89 c1                   mov    %eax,%ecx
-> 
->   Code: 74 05 31 ff 41 89 3f 49 8b 3e 89 ea 48 c7 c6 a0 8e 54 a0 41 bf 92 ff ff ff e8 e5 2e 09 e1 c6 05 2a d4 38 00 01 e9 26 af ff ff <8b> 13 48 8b 7d 00 89 c1 48 c7 c6 18 90 54 a0 89 44 24 04 e8 c1 2e
->   RSP: 0018:ffffc90005467d00 EFLAGS: 00010282
->   RAX: 00000000ffffff92 RBX: 0000000000000000 RCX: 0000000000000000
->   			     ^^^^^^^^^^^^^^^^
-> and %rbx is nice and clean.
-> 
->   Call Trace:
->    <TASK>
->    __sev_firmware_shutdown.isra.0
->    sev_dev_destroy
->    psp_dev_destroy
->    sp_destroy
->    pci_device_shutdown
->    device_shutdown
->    kernel_power_off
->    hibernate.cold
->    state_store
->    kernfs_fop_write_iter
->    vfs_write
->    ksys_write
->    do_syscall_64
->    entry_SYSCALL_64_after_hwframe
-> 
-> Pass in a pointer to the function-local error var in the caller.
-> 
-> With that addressed, suspending the ccp shows the error properly at
-> least:
-> 
->   ccp 0000:47:00.1: sev command 0x2 timed out, disabling PSP
->   ccp 0000:47:00.1: SEV: failed to SHUTDOWN error 0x0, rc -110
->   SEV-SNP: Leaking PFN range 0x146800-0x146a00
->   SEV-SNP: PFN 0x146800 unassigned, dumping non-zero entries in 2M PFN region: [0x146800 - 0x146a00]
->   ...
->   ccp 0000:47:00.1: SEV-SNP firmware shutdown failed, rc -16, error 0x0
->   ACPI: PM: Preparing to enter system sleep state S5
->   kvm: exiting hardware virtualization
->   reboot: Power down
-> 
-> Btw, this driver is crying to be cleaned up to pass in a proper I/O
-> struct which can be used to store information between the different
-> functions, otherwise stuff like that will happen in the future again.
-> 
-> Fixes: 9770b428b1a2 ("crypto: ccp - Move dev_info/err messages for SEV/SNP init and shutdown")
-> Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Cc: <stable@kernel.org>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 06 03 55 1d 13 | 01 01 ff | 04 02 | 30 00
+> [----OID------] [critical] [OCTET] [empty SEQ]
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I see, thanks for the explanation.
+
+This behavior of OpenSSL doesn't seem spec-compliant, or is it?
+RFC 5280 sec 4.2.1.9 says the pathLenConstraint is optional,
+but the cA boolean is not optional.  Is there a rule that booleans
+need not be rendered if they are false?
+
+BTW, I note that X.690 sec 11.1 says that for DER encoding,
+all bits of a "true" boolean must be set, hence the 0xff value.
+But I'm fine with your more permissive approach which checks for
+a non-zero value, hence also allows BER encoding per X.690 sec 8.2.2.
+
+Thanks!
+
+Lukas
