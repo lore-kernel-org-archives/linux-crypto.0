@@ -1,75 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEA92DC78E
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2025 21:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094A426AE4;
+	Mon, 15 Sep 2025 21:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757970021; cv=none; b=aEGIJNXv3Go7lhSDO/FM8bhUWcXbzV/tsHzyhWfHyX5i1NN8VZUyuvpnUIYuVS1TaD08mdtqskMFBe4Cdmw/Kfw2MurXQtXqfxmgRJQaybKxIVFKJWKyPb9C0vT6BQ9Gxvus9tU4w4EWVsT1LMODX2HOzRR/Riu1fsfrHR30wcQ=
+	t=1757970999; cv=none; b=ckmFlZU2f6VkdxQ6FIyIzFlUXWI5bRbQi22xJq2WZWnVMClt4OCNGOQxguUaBWUFt6ZIWoeEr600SSaDHni0gqGjLln+168n+Vpz5BgPfWn7poq6U44ZDvZu9Z/wgOYENPOBc5GCSzQE1AnJgF6vZMds0HoZNhxhPnwNTBwB+Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757970021; c=relaxed/simple;
-	bh=fqdc2EFV86H/A95UsUPbKZnLUdXfMtMQtDfPyajjOqw=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=rDWifw2qNkBBcJsYF3NiiDYtFmha/ir0VRyyMzQmqrxnl44vHk0+An/ftxYFby410J/BnDYGC8oc55DJbB3QoHlToKNZgrvRhul1JxuSsarGzGA9KnDHyMiAHhlvStl2HRzblMIglr/j2jwJ5EENyjZjpTgtZTUHhEZA46NB53Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPhFjKVM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757970999; c=relaxed/simple;
+	bh=eltE4P4dGi9OeQFvkpIcUPIWX78LRp5Hn4UZH+xTuB4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=p6POaRV5KV37Y7emQsppafMbFJ8TbHECsfcIaDPaU2wkUwjrvUrLkXagdAANFfFjYvj1KeRtEkM5CGZ3eyitwevg2M3/FBHfdI5v6IyI35sYa4aWriC5kFAGF8ozfe6HryVwWoFMtfG5MW+gY7JyAXoyNjK+TYaBYHF3tEBtBYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmYh6a6S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPhFjKVM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757970018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DtWps7cAiYSsFmoldNAmWgksz7e8574zj6HjeTlmwiM=;
-	b=GPhFjKVMfwXbZ8qmMbsrLV4xzgbIbR5RlGPeEwoWdF4bwDGjAjrw7oLVG2ITa9D8mcrSWO
-	+zuncOYd0gO23ea4nYK7sHaaJEirNrpoE9YNtqYFI7yoLXzfQNVdNn8hA3Bn57G5hvaIYE
-	trHPzJmBWjIWGG6VaV1kVZIqdHeCSGk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-Ce0LpF8gNE-tI9hsDqBHpg-1; Mon,
- 15 Sep 2025 17:00:16 -0400
-X-MC-Unique: Ce0LpF8gNE-tI9hsDqBHpg-1
-X-Mimecast-MFC-AGG-ID: Ce0LpF8gNE-tI9hsDqBHpg_1757970016
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9F291800451;
-	Mon, 15 Sep 2025 21:00:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.155])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F29BA1800451;
-	Mon, 15 Sep 2025 21:00:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <2767539.1757969506@warthog.procyon.org.uk>
-References: <2767539.1757969506@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    linux-crypto@vger.kernel.org
-Subject: Re: SHAKE256 support
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmYh6a6S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D01AC4CEF1;
+	Mon, 15 Sep 2025 21:16:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757970998;
+	bh=eltE4P4dGi9OeQFvkpIcUPIWX78LRp5Hn4UZH+xTuB4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VmYh6a6SLAD437UzaOyJhyQJpHwIcArEnICrIsFykXuoJ/k7UQnMA5WIwb3Okxl7v
+	 6Z9P2JKATfY0912taRYgzTjHi848lZA2MXnFAqSm2J8v6v4A4Ee3BUT6Um2Hj/b19F
+	 l1g+BKU9KPIFHMAUTZF5Zu1dg8gjRvoT61s1dkP4XVatk5d1IGQRFHtWV6jCUV8XPx
+	 x2dN7Wt4wp5BKG2Z9eiKjYg+aeBNEr7GfO4ensalT+mvKKz8Ir6hPf5yztTkWrC4p3
+	 EgCbmswmmPA+LPqUjdXRQgXLB7aM/aEHA1hQSeZNvYAGBSdvSuZNswtLwZj/2eykZn
+	 dedI3W4XpCxGw==
+From: wufan@kernel.org
+To: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dhowells@redhat.com,
+	lukas@wunner.de,
+	ignat@cloudflare.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	jarkko@kernel.org,
+	zohar@linux.ibm.com,
+	eric.snowberg@oracle.com,
+	Fan Wu <wufan@kernel.org>
+Subject: [PATCH v2] KEYS: X.509: Fix Basic Constraints CA flag parsing
+Date: Mon, 15 Sep 2025 21:15:50 +0000
+Message-Id: <20250915211550.2610-1-wufan@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250911225356.2678-1-wufan@kernel.org>
+References: <20250911225356.2678-1-wufan@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2768234.1757970013.1@warthog.procyon.org.uk>
-Date: Mon, 15 Sep 2025 22:00:13 +0100
-Message-ID: <2768235.1757970013@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-David Howells <dhowells@redhat.com> wrote:
+From: Fan Wu <wufan@kernel.org>
 
-> I don't suppose you happen to have SHAKE128 and SHAKE256 support lurking up
-> your sleeve for lib/crypto/sha512.c?
+Fix the X.509 Basic Constraints CA flag parsing to correctly handle
+the ASN.1 DER encoded structure. The parser was incorrectly treating
+the length field as the boolean value.
 
-Actually, I assuming that lib/crypto/sha512.c is SHA-3, but I guess it might
-actually be SHA-2.  I don't think it actually says in the file.
+Per RFC 5280 section 4.1, X.509 certificates must use ASN.1 DER encoding.
+According to ITU-T X.690, a DER-encoded BOOLEAN is represented as:
 
-David
+Tag (0x01), Length (0x01), Value (0x00 for FALSE, 0xFF for TRUE)
+
+The basicConstraints extension with CA:TRUE is encoded as:
+
+  SEQUENCE (0x30) | Length | BOOLEAN (0x01) | Length (0x01) | Value (0xFF)
+                             ^-- v[2]         ^-- v[3]        ^-- v[4]
+
+The parser was checking v[3] (the length field, always 0x01) instead
+of v[4] (the actual boolean value, 0xFF for TRUE in DER encoding).
+
+Also handle the case where the extension is an empty SEQUENCE (30 00),
+which is valid for CA:FALSE when the default value is omitted as
+required by DER encoding rules (X.690 section 11.5).
+
+Per ITU-T X.690-0207:
+- Section 11.5: Default values must be omitted in DER
+- Section 11.1: DER requires TRUE to be encoded as 0xFF
+
+Link: https://datatracker.ietf.org/doc/html/rfc5280
+Link: https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf
+Fixes: 30eae2b037af ("KEYS: X.509: Parse Basic Constraints for CA")
+Signed-off-by: Fan Wu <wufan@kernel.org>
+---
+ crypto/asymmetric_keys/x509_cert_parser.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 2ffe4ae90bea..8df3fa60a44f 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -610,11 +610,14 @@ int x509_process_extension(void *context, size_t hdrlen,
+ 		/*
+ 		 * Get hold of the basicConstraints
+ 		 * v[1] is the encoding size
+-		 *	(Expect 0x2 or greater, making it 1 or more bytes)
++		 *	(Expect 0x00 for empty SEQUENCE with CA:FALSE, or
++		 *	0x03 or greater for non-empty SEQUENCE)
+ 		 * v[2] is the encoding type
+ 		 *	(Expect an ASN1_BOOL for the CA)
+-		 * v[3] is the contents of the ASN1_BOOL
+-		 *      (Expect 1 if the CA is TRUE)
++		 * v[3] is the length of the ASN1_BOOL
++		 *	(Expect 1 for a single byte boolean)
++		 * v[4] is the contents of the ASN1_BOOL
++		 *	(Expect 0xFF if the CA is TRUE)
+ 		 * vlen should match the entire extension size
+ 		 */
+ 		if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
+@@ -623,8 +626,13 @@ int x509_process_extension(void *context, size_t hdrlen,
+ 			return -EBADMSG;
+ 		if (v[1] != vlen - 2)
+ 			return -EBADMSG;
+-		if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
++		/* Empty SEQUENCE means CA:FALSE (default value omitted per DER) */
++		if (v[1] == 0)
++			return 0;
++		if (vlen >= 5 && v[2] == ASN1_BOOL && v[3] == 1 && v[4] == 0xFF)
+ 			ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
++		else
++			return -EBADMSG;
+ 		return 0;
+ 	}
+ 
+-- 
+2.51.0
 
