@@ -1,171 +1,165 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpcmd0642.aruba.it (smtpcmd0642.aruba.it [62.149.156.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7043F3375B5
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2025 15:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1854C221FB2
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2025 15:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.156.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757948824; cv=none; b=VIWs8tPy1o6EpBktqVOtJYt8oMRtRTwiLHVWkK859dPPDRCMWpR5zouxPDqUpnSk5L4OcqMaDsSQY1Gewq77lQv9pDt4gmQwjuRPM8AbQJNFLWC9x11SOXUNTpeneRbM/509glMlS2ued8mYbZ1tfhEKJ4OpGSkFIJOW+yd/D5g=
+	t=1757951285; cv=none; b=E1SxuuMyb0p4qQDX5KuH6HdQpYTkziAiGZKdc1f4eLRm6fKtqjLHN69v9Pn0ti/tSndL/KF0l5YXC/PuJt5w43eCKfIsQdtAljD+ckIZIbcDIE8mCOo4JUg/pYSwVQbKUGZagl3Z1YbSLDb6Wh139KZiEYpwSetxQoufTcdJdt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757948824; c=relaxed/simple;
-	bh=kvUGKctGtLYjY9XMJNeZKVXbWPPgK2fUvUR6RhO5KeM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=k57Ewt94hBanqSU1OidZ8QQEXQwuDjQkoMrH/y45rMffC4MO/fBGrffiB3bKoTq43U2B/kkI9+QKmE6IoVA/xxpd0iNV6uFfouRGub8Yf5UFhVQiYjnTMTi4jM8ivOX/NBq9ympghRp5R0DeF5jlJ0CaSQ6bGi4JsOExxipwD8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LI+Wdc5/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757951285; c=relaxed/simple;
+	bh=Y5CHTpGWpxHiIpghft6ThGk3RIITD3fo1Y++9qn/Vo8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z2egpCXDgJz5yVbHnOaPMxH7Xtaym3os+Jl37nQrUXZdk2cF0U7yS2hERhtX79Fb1TNh5v4+rN4E0m9VQrH7AMfxgKO2ywWP8XkxLgRVBF9H6zG2NT+djs4Y68Zk/9ZVTCdO5oe9CKXz0aaNtQ40yKr1CoMkjVVzp5lHdt/iTTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=l+BGA/tU; arc=none smtp.client-ip=62.149.156.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LI+Wdc5/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757948821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l1G5ZFpGDVqxSTUfZeOxzFFZ03jobsF1A2PQq6aEw1Q=;
-	b=LI+Wdc5/Hk8OP1+CezT7nmONZvvAuq4++pMxY1IqXJZzEr2RTCHkMNRcJuLc9EjFmix08k
-	6uPge4TroJA4Q4FsGuQmUk7oXOqFMBkt3FO4AEdec7oQk4yMxAIEVXnsjbj9X55If9tAw0
-	HJTjPixZzf11JPCQoWfPTr+Jpe9gw4M=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-6UIl3k_jOJSkELByYPt6fQ-1; Mon,
- 15 Sep 2025 11:06:58 -0400
-X-MC-Unique: 6UIl3k_jOJSkELByYPt6fQ-1
-X-Mimecast-MFC-AGG-ID: 6UIl3k_jOJSkELByYPt6fQ_1757948818
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF7941955E9A;
-	Mon, 15 Sep 2025 15:06:57 +0000 (UTC)
-Received: from [10.45.225.219] (unknown [10.45.225.219])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E33919560A2;
-	Mon, 15 Sep 2025 15:06:56 +0000 (UTC)
-Date: Mon, 15 Sep 2025 17:06:51 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-    dm-devel@lists.linux.dev
-Subject: Re: [v2 PATCH 1/2] crypto: ahash - Allow async stack requests when
- specified
-In-Reply-To: <9d6b10c1405137ab1d09471897536f830649364f.1757396389.git.herbert@gondor.apana.org.au>
-Message-ID: <f1b90764-b2f4-ff90-f4c4-a3ddc04a15f6@redhat.com>
-References: <cover.1757396389.git.herbert@gondor.apana.org.au> <9d6b10c1405137ab1d09471897536f830649364f.1757396389.git.herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="l+BGA/tU"
+Received: from [192.168.1.58] ([79.0.204.227])
+	by Aruba SMTP with ESMTPSA
+	id yBQqusQyaL0IyyBQrun1wO; Mon, 15 Sep 2025 17:47:57 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1757951277; bh=Y5CHTpGWpxHiIpghft6ThGk3RIITD3fo1Y++9qn/Vo8=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=l+BGA/tU0GGUwBGnt1EUlHe7awPcyxtRIJc3o26Izixca3mf6yAc4g0cCioChCd5S
+	 SQ7kTDuAP7nkUrmAwlfaM1u1dEWx/sAvdEQfMUQDu8kYkZdme121QOWmIAHmTXFBlb
+	 hFbp25CbMh5TepRFV/kN/18ywPkZCHurPmsuoBFtL85VdaomP3avYn5klC3/n1QuV/
+	 m5FkWUyfdwH8EvgsvzyLd2scZat4mfQ0E+LncftVwFWsd+vOgLLV54b1REtbp4Msna
+	 L7Gsf8D/I2GnXXa6diYRVnNOdOi1IwJB0+9hSSFR0AUaiFqdhOymLq3jPzev9R72Rm
+	 xLnEB1jWQR0jg==
+Message-ID: <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
+Date: Mon, 15 Sep 2025 17:47:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [V1 0/4] User API for KPP
+Content-Language: en-US
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>
+References: <20250915084039.2848952-1-giometti@enneenne.com>
+ <20250915145059.GC1993@quark>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <20250915145059.GC1993@quark>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfAk7i3p/xdGbM3PK3OF15MTgsaOjtVxM4NoT+/SgOgtlMdzs9AhcBN6bkohqeAsUJ99ruKZEg5K68DR9bwLJtiCaqlM/tTJcSYploRVO8eVfnrJo2F2J
+ Y+B3nH21M/zVb86Xu8DfiDgsCcKMPW6SJZ8wZMmmp5r0nJiItmaZj7kSOqqS/pKazhBi+UhgXvSa/0Dw+dGbihHJblwD5YJ3QwFfGjYn9/QhBm+0sG46CeXs
+ W7pstqdu9ozl8qT6vT+ivi5LDQiJ1wbztWcqUlaCFPksBFC1yrGs2ntEOPxoa5AfVb2RRM6Oo2kfrIvXZwfBVQ==
 
-Hi
-
-Would it be possible to export the function crypto_ahash_stack_req_ok, so 
-that I could know up-front whether having a request on the stack will 
-succeed or not?
-
-Perhaps the function crypto_ahash_stack_req_ok could take "struct 
-crypto_ahash *" argument rather than "struct ahash_request, *" so that I 
-would know in advance whether it makes sense to try to build the request 
-on the stack or not.
-
-Mikulas
-
-
-On Tue, 9 Sep 2025, Herbert Xu wrote:
-
-> As it stands stack requests are forbidden for async algorithms
-> because of the inability to perform DMA on stack memory.
+On 15/09/25 16:50, Eric Biggers wrote:
+> On Mon, Sep 15, 2025 at 10:40:35AM +0200, Rodolfo Giometti wrote:
+>> This patchset adds a dedicated user interface for the Key-agreement
+>> Protocol Primitive (KPP).
+>>
+>>  From user applications, we can now use the following specification for
+>> AF_ALG sockets:
+>>
+>>      struct sockaddr_alg sa = {
+>>              .salg_family = AF_ALG,
+>>              .salg_type = "kpp",
+>>              .salg_name = "ecdh-nist-p256",
+>>      };
+>>
+>> Once the private key is set with ALG_SET_KEY or (preferably)
+>> ALG_SET_KEY_BY_KEY_SERIAL, the user program reads its public key from
+>> the socket and then writes the peer's public key to the socket.
+>>
+>> The shared secret calculated by the selected kernel algorithm is then
+>> available for reading.
+>>
+>> For example, if we create a trusted key like this:
+>>
+>>      kpriv_id=$(keyctl add trusted kpriv "new 32" @u)
+>>
+>> A simple example code is as follows:
+>>
+>>      key_serial_t key_id;
+>>
+>>      /* Generate the socket for KPP operation */
+>>      sk_fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+>>      bind(sk_fd, (struct sockaddr *)&sa, sizeof(sa));
+>>
+>>      /* kpriv_id holds the trusted key ID */
+>>      setsockopt(sk_fd, SOL_ALG, ALG_SET_KEY_BY_KEY_SERIAL,
+>>                 &key_id, sizeof(key_id));
+>>
+>>      /* Get the operational socket */
+>>      op_fd = accept(sk_fd, NULL, 0);
+>>
+>>      /* Read our public key */
+>>      recv(op_fd, pubkey, pubkey_len, 0);
+>>
+>>      /* Write the peer's public key */
+>>      send(op_fd, peer_pubkey, peer_pubkey_len, 0);
+>>
+>>      /* Read the shared secret */
+>>      len = recv(op_fd, secret, secret_len, 0);
+>>
+>> Each time we write a peer's public key, we can read a different shared
+>> secret.
+>>
+>> Rodolfo Giometti (4):
+>>    crypto ecdh.h: set key memory region as const
+>>    crypto kpp.h: add new method set_secret_raw in struct kpp_alg
+>>    crypto ecdh.c: define the ECDH set_secret_raw method
+>>    crypto: add user-space interface for KPP algorithms
+>>
+>>   crypto/Kconfig        |   8 ++
+>>   crypto/Makefile       |   1 +
+>>   crypto/algif_kpp.c    | 286 ++++++++++++++++++++++++++++++++++++++++++
+>>   crypto/ecdh.c         |  31 +++++
+>>   include/crypto/ecdh.h |   2 +-
+>>   include/crypto/kpp.h  |  29 +++++
+>>   6 files changed, 356 insertions(+), 1 deletion(-)
+>>   create mode 100644 crypto/algif_kpp.c
 > 
-> However, some async algorithms do not perform DMA and are able
-> to handle stack requests.  Allow such uses by addnig a new type
-> bit CRYPTO_AHASH_ALG_STACK_REQ.  When it is set on the algorithm
-> stack requests will be allowed even if the algorithm is asynchronous.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  crypto/ahash.c                 | 22 ++++++++++++++++++----
->  include/crypto/internal/hash.h |  3 +++
->  2 files changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index a227793d2c5b..33b2a19169f1 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -49,6 +49,20 @@ static inline bool crypto_ahash_need_fallback(struct crypto_ahash *tfm)
->  	       CRYPTO_ALG_NEED_FALLBACK;
->  }
->  
-> +static inline bool crypto_ahash_stack_req_ok(struct ahash_request *req)
-> +{
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-> +
-> +	if (!ahash_req_on_stack(req))
-> +		return true;
-> +
-> +	if (!ahash_is_async(tfm))
-> +		return true;
-> +
-> +	return crypto_ahash_alg(tfm)->halg.base.cra_flags &
-> +	       CRYPTO_AHASH_ALG_STACK_REQ;
-> +}
-> +
->  static inline void ahash_op_done(void *data, int err,
->  				 int (*finish)(struct ahash_request *, int))
->  {
-> @@ -376,7 +390,7 @@ int crypto_ahash_init(struct ahash_request *req)
->  		return crypto_shash_init(prepare_shash_desc(req, tfm));
->  	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->  		return -ENOKEY;
-> -	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +	if (!crypto_ahash_stack_req_ok(req))
->  		return -EAGAIN;
->  	if (crypto_ahash_block_only(tfm)) {
->  		u8 *buf = ahash_request_ctx(req);
-> @@ -451,7 +465,7 @@ int crypto_ahash_update(struct ahash_request *req)
->  
->  	if (likely(tfm->using_shash))
->  		return shash_ahash_update(req, ahash_request_ctx(req));
-> -	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +	if (!crypto_ahash_stack_req_ok(req))
->  		return -EAGAIN;
->  	if (!crypto_ahash_block_only(tfm))
->  		return ahash_do_req_chain(req, &crypto_ahash_alg(tfm)->update);
-> @@ -531,7 +545,7 @@ int crypto_ahash_finup(struct ahash_request *req)
->  
->  	if (likely(tfm->using_shash))
->  		return shash_ahash_finup(req, ahash_request_ctx(req));
-> -	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +	if (!crypto_ahash_stack_req_ok(req))
->  		return -EAGAIN;
->  	if (!crypto_ahash_alg(tfm)->finup)
->  		return ahash_def_finup(req);
-> @@ -569,7 +583,7 @@ int crypto_ahash_digest(struct ahash_request *req)
->  
->  	if (likely(tfm->using_shash))
->  		return shash_ahash_digest(req, prepare_shash_desc(req, tfm));
-> -	if (ahash_req_on_stack(req) && ahash_is_async(tfm))
-> +	if (!crypto_ahash_stack_req_ok(req))
->  		return -EAGAIN;
->  	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->  		return -ENOKEY;
-> diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-> index 6ec5f2f37ccb..79899d36032b 100644
-> --- a/include/crypto/internal/hash.h
-> +++ b/include/crypto/internal/hash.h
-> @@ -23,6 +23,9 @@
->  /* This bit is set by the Crypto API if export_core is not supported. */
->  #define CRYPTO_AHASH_ALG_NO_EXPORT_CORE	0x08000000
->  
-> +/* This bit is set by the Crypto API if stack requests are supported. */
-> +#define CRYPTO_AHASH_ALG_STACK_REQ	0x10000000
-> +
->  #define HASH_FBREQ_ON_STACK(name, req) \
->          char __##name##_req[sizeof(struct ahash_request) + \
->                              MAX_SYNC_HASH_REQSIZE] CRYPTO_MINALIGN_ATTR; \
-> -- 
-> 2.39.5
-> 
+> First, this lacks any description of a use case.
 
+The main purpose of using this implementation is to be able to use the kernel's 
+trusted keys as private keys. Trusted keys are protected by a TPM or other 
+hardware device, and being able to generate private keys that can only be 
+(de)encapsulated within them is (IMHO) a very useful and secure mechanism for 
+storing a private key.
+
+> Second, *if* this is done at all, then it must give access to hardware
+> drivers *only*.  We've had way too many problems with userspace software
+> inappropriately depending on the in-kernel software crypto code via
+> AF_ALG, when it should just be doing the crypto in userspace.
+
+I see, but in userspace there is no better way to protect a private key than 
+using trusted keys.
+
+> The asymmetric algorithms are especially bad because the in-kernel
+> implementations of most of them (all except Curve25519, I think) have
+> known timing attack vulnerabilities.  Implementing these algorithms is
+> really hard, and the in-kernel implementations just haven't had the same
+> level of care applied to them as userspace implementations.
+
+I think this is true when talking about kernel software implementations, but is 
+it the same when we consider possible hardware implementations?
+
+> We've seen time and time again that if a UAPI is offered, then userspace
+> will use it, even when it's not the appropriate solution.  Then it can't
+> be fixed, and everyone ends up worse off.
+
+I understand your point, so please let me know if I have any chance of this 
+patch set (once fixed and revised) being merged into the kernel; otherwise, I'll 
+give up right away. :)
+
+Thanks for your considerations.
+
+Ciao,
+
+Rodolfo
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
