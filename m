@@ -1,73 +1,127 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81297304BCE
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2025 12:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819730B525;
+	Mon, 15 Sep 2025 12:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757937639; cv=none; b=bDdO8w/h2DGOeaTqb8tslR777tnHOR8SkoxsLjoFrTfIYRUuopEBZPzTeTlDUxZKpExEXWhxtKeAP/9SgpbiENB8Ux8xFDTryOdjYZL2xgob8S5IDKkmzkN0iwHaYIEybHDw03d8COrCrFj3rh6plUbLAsRCIZGlp+uJomXIyoo=
+	t=1757940135; cv=none; b=IT4hILUY0K/94BnSgaFmx15Mxj0V4Pa2Oxmq8UfsjO7rPr98AjMQA+Mdj5lizbNtHtzqXtWUnuTucI9yIBRUgy6GpmpVouB4F7ARNMCoVyKE8YAKcfZkVio4sjMPtr0afuWdKCOewVk54GlahS7loxN/Wsbi/18dZN6RppUqf3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757937639; c=relaxed/simple;
-	bh=x2wXx2H1X3WaeJaSo9KcFYK70RCRrudIMLrwFmdQMnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=biVqdPAgrzC1Ui2CmcsE0xqTnQoPZcenEIaRIW/dC9hSioZN5mq3imL9iG+mpZ0xVxga3O10TJQ4TQX+fOjSqbPRwQ1IJXXHqxFZeNdsFCZLG47WxUEtlmBDg7HUKVM8UpeoxoaLLiwMkVBHPXjEZ9ARV7wTBsQU2rK1zA3jK8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=stEoMpHY; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1757940135; c=relaxed/simple;
+	bh=wabpa/Bn/zIBSd7p273qDFAlQ7rd9ElIYVr2tgBU9nE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=A8cgHes+kNznqBsztvjDICfhwGGIRPU0L3WX4jwjVpG3aXRZcQ+oW6RgQF9oHszu+sfZUwUMZw0pR7F6ZMd1ovP4cJ0LJ3iNho5lxnMdkLWeu/QI6IsZLgSQA8XY5POkWp52pQ5YsDlgnvUNVfsfYyvCPFPiVYjZ0ySHT3OBSPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pANP/ZnS; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="stEoMpHY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=yIEuqdO8a/w1qUP+xBMaNU5x5A5tYd0xmQXVDWJg/Eg=; b=stEoMpHYlBNwmN8R/aH38RxwVM
-	rQ/yU3t10TjMaTwOlIUkX5PqDQQ7wbIS8MaGX2ncSuZVOskxHy5EQeMJtXSOH5mszVrjjaq+KPCpt
-	uayJjKwsOGdQsjyNv6k0/p2VBSaHExE7n0ym89Kl0uAmyZoZPQ25n9oo0QZAVAqrfqb7vvuAMQR/q
-	eZYRTxYWs5hD930vb7co5yv6cnqzu5F1K7jivWkC5XtSX1QgEPYMP0dEsYgndBlr7f8oPg9CwrWdx
-	dZhwZ6NXv41lc6gLSnO5yIAYpwnqPWUCuIqVvrvIQBQ5KqHWdx30vj+UYkIbP9d6ORA4ZII5muumx
-	abqyYvug==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uy7d9-005ZBd-1k;
-	Mon, 15 Sep 2025 20:00:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 15 Sep 2025 20:00:19 +0800
-Date: Mon, 15 Sep 2025 20:00:19 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
-Subject: Re: Adding SHAKE hash algorithms to SHA-3
-Message-ID: <aMf_0xkJtcPQlYiI@gondor.apana.org.au>
-References: <2552917.1757925000@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pANP/ZnS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1757940132; x=1789476132;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wabpa/Bn/zIBSd7p273qDFAlQ7rd9ElIYVr2tgBU9nE=;
+  b=pANP/ZnS8DHj4/bcCyYyHr17EUVbO+x5ioirkkOIpBk2qhIh1Hsrj7EW
+   KlEjrlOXxb0gJeH6qUVvHGxFVs3kil2La27LTP1loxXLDC6RUiubqfm8A
+   JzSgZK7ykyFOkHrIYC78zygyUqBm5oDjtoS5q9/Xtu9bJxh1wvXDaRSmQ
+   4NKxV9U4Kt1YGqUfGv8uSrZBzDzrY6m/ckYRAC+os20OfDFxDLwQy12Zd
+   LuP1CezRxIkhWX4rupGJ4bjd/gAF1FhxdDwwTVZxGi+uyeEKbVEA+cYPz
+   GqszM6Z9wEeO/se2hYXKikoONQ/Hb1vdmFaogemwI314hWclkgwTHiXtl
+   g==;
+X-CSE-ConnectionGUID: 1DTnD4bHR5G9Cvo21y5Mrg==
+X-CSE-MsgGUID: Ytig52/fSJiTzZ/2C8AsWQ==
+X-IronPort-AV: E=Sophos;i="6.18,266,1751266800"; 
+   d="scan'208";a="52326574"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Sep 2025 05:42:11 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Mon, 15 Sep 2025 05:42:06 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Mon, 15 Sep 2025 05:42:02 -0700
+Message-ID: <22f61953-e63f-4bfd-b129-52224cb0d122@microchip.com>
+Date: Mon, 15 Sep 2025 14:42:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2552917.1757925000@warthog.procyon.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 0/9] arm64: lan969x: Add support for Microchip LAN969x
+ SoC
+To: Robert Marko <robert.marko@sartura.hr>, <linux@armlinux.org.uk>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<andi.shyti@kernel.org>, <lee@kernel.org>, <broonie@kernel.org>,
+	<gregkh@linuxfoundation.org>, <jirislaby@kernel.org>, <arnd@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+	<o.rempel@pengutronix.de>, <daniel.machon@microchip.com>, Conor Dooley
+	<conor@kernel.org>
+CC: <luka.perkov@sartura.hr>
+References: <20250813174720.540015-1-robert.marko@sartura.hr>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20250813174720.540015-1-robert.marko@sartura.hr>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 15, 2025 at 09:30:00AM +0100, David Howells wrote:
-> Hi Herbert,
+On 13/08/2025 at 19:44, Robert Marko wrote:
+> This patch series adds basic support for Microchip LAN969x SoC.
 > 
-> I'm looking at adding ML-DSA from leancrypto to the kernel to support PQC
-> module signing.  This requires some SHAKE algorithms, however.  Leancrypto
-> comes with its own SHA-3 implementation that also implements these, but I'd
-> rather use the already existing kernel one.
+> It introduces the SoC ARCH symbol itself under the ARCH_MICROCHIP symbol
+> which allows to avoid the need to change dependencies of the drivers that
+> are shared for Microchip SoC-s in the future.
 > 
-> The problem is that struct shash_alg expects the digestsize to be fixed - but
-> with SHAKE this isn't the case.  If it's okay with you, I'll replace the
-> digestsize field with a set_digestsize and a get_digestsize function as
-> leancrypto does.
+> DTS and further driver will be added in follow-up series.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 
-I presume the algorithm choice is fixed, right? If so you should be
-using lib/crypto.
+In linux-next for a few days and pull requests sent to arm-soc.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks Robert and all that reviewed.
+Best regards,
+   Nicolas
+
+> ---
+> Changes in v9:
+> * Make ARCH_MICROCHIP hidden symbol that is selected by SparX-5 and LAN969x
+> directly, this avoids breaking existing configs with ARCH_SPARX5
+> 
+> Changes in v8:
+> * Move to using ARCH_MICROCHIP as suggested by Arnd
+> * Dropped any review tags due to changes
+> 
+> Robert Marko (9):
+>    arm64: Add config for Microchip SoC platforms
+>    ARM: at91: select ARCH_MICROCHIP
+>    arm64: lan969x: Add support for Microchip LAN969x SoC
+>    mfd: at91-usart: Make it selectable for ARCH_MICROCHIP
+>    tty: serial: atmel: make it selectable for ARCH_MICROCHIP
+>    spi: atmel: make it selectable for ARCH_MICROCHIP
+>    i2c: at91: make it selectable for ARCH_MICROCHIP
+>    char: hw_random: atmel: make it selectable for ARCH_MICROCHIP
+>    crypto: atmel-aes: make it selectable for ARCH_MICROCHIP
+> 
+>   arch/arm/mach-at91/Kconfig     |  4 +++
+>   arch/arm64/Kconfig.platforms   | 51 ++++++++++++++++++++++++----------
+>   drivers/char/hw_random/Kconfig |  2 +-
+>   drivers/crypto/Kconfig         |  2 +-
+>   drivers/i2c/busses/Kconfig     |  2 +-
+>   drivers/mfd/Kconfig            |  2 +-
+>   drivers/spi/Kconfig            |  2 +-
+>   drivers/tty/serial/Kconfig     |  2 +-
+>   8 files changed, 47 insertions(+), 20 deletions(-)
+> 
+> --
+> 2.50.1
+> 
+
