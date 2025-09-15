@@ -1,142 +1,91 @@
-Received: from the.earth.li (the.earth.li [93.93.131.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07460EAD7;
-	Mon, 15 Sep 2025 16:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B8A248F68;
+	Mon, 15 Sep 2025 16:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757952149; cv=none; b=I5IGTlu0qwJ9HeEHpO/N0wQDN7pe2r3g8sJyv6P37ZGTFF4wLVos/ChKHOBtij1+QUuBGvwk3uHcPvS/IPJUwf5ZXNDLHAr7HkOD0EZ9YWcPOcsPAwjK9XkivSQBiw7cFzMrqz60d6/WZ6r3+5nF200brUTZT2j4tyLH17CIma8=
+	t=1757952552; cv=none; b=VP9KoWAH2sDIhz3rWkg5qpRUhRGbZtuo6QuZioGQsUxZzcw7IvZxiI9py/IAK50blUj5mZFKhX9j2+VBDlpOYva1Ri/sSZKWXDWBw8DP+x4sZ/9Gz/jYhu+3BpOM0kufZ7UU6r9n5iFCZMsgkx/5QmFM/+9ltINg1FWvSxaqo9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757952149; c=relaxed/simple;
-	bh=ZavVOFy7p+aHN0BEwnntQn4rJME9Ova625rXkE4ZN0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xae6Bws0xS18qPMPf40d58QVdGrknpi5ovmlMg9BY5E5x6vW+9zleLrUzLbyGF2cxPGPjJfiedA+10usSWblj0eRW9PXtt0G5k9Vk/8B4DiRkVxRGRx5KyG1bKoL5k8siqtVBsInwoazO+aWfnQWbznmtXouaEY0lzTuZ2yGynI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=VjUeatuy; arc=none smtp.client-ip=93.93.131.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
+	s=arc-20240116; t=1757952552; c=relaxed/simple;
+	bh=2kwD057UDVqZKek/SB4FkUZbEOXrXs53qNd/kRtu9fI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iIuUIEPIn8z73LuuUS/GxP+DtNC+KyXfII//w7nV4tB2UW6+ncANIvv2lXornnudCdmAfiwdH4MpraR5GNvjsm0A9nlSiORJaRzvNeGj4/D9w2oT0DxWycuHn0wd8ChOYi8wDb1j92j5dmEpFOqqadwtEj2RIEAyObIQUaggrsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A1eJrgHS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="VjUeatuy"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
-	s=the; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:
-	Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=D7IggKGhPyJUcmIjxEeQlKJOLgaxFMcl0GgywU9PiEM=; b=VjUeatuyBytE5yZDdsZ66OeJtZ
-	bQ7I0FmfIYBuxaqKWSCqEtCwSoYRB06jOaued2BkwLAHjU+AzMx9cHHQC/1pR17hq6iDC/xay7Muc
-	0qdjjK4uNSUGqNCHNtYMAgCHCBcPl7asCXl0MvFiGieojYF/7q83lqCTimfjl/nq7YFdhpFkKM7nq
-	TlzlP/MqK1eK8IJAUycdXi74T6ktB8JM6Tprnq4pDFr4VfRIn89c+Md/OY7a9qMkkoWVyX//j8yHp
-	aEyuH4Nf0fO/1hrtcTKHgAS//lvldpEjgAmgCLK91jgGMJgcEViGQ43XYclkaGB+3ogbvaVQ1KVur
-	cTRjzomQ==;
-Received: from noodles by the.earth.li with local (Exim 4.96)
-	(envelope-from <noodles@earth.li>)
-	id 1uyBeh-0045wj-2f;
-	Mon, 15 Sep 2025 17:02:15 +0100
-Date: Mon, 15 Sep 2025 17:02:15 +0100
-From: Jonathan McDowell <noodles@earth.li>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org
-Subject: [PATCH v2] hwrng: core - Allow runtime disabling of the HW RNG
-Message-ID: <aMg4h_WeJb9bHeNb@earth.li>
-References: <aLWltVMmuYQn8Pwa@earth.li>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A1eJrgHS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B2DC4CEF1;
+	Mon, 15 Sep 2025 16:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757952551;
+	bh=2kwD057UDVqZKek/SB4FkUZbEOXrXs53qNd/kRtu9fI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=A1eJrgHSDSoCFgRMCcpY1lhPLcxXCBJbstJDNVMAHCDPETpIIFCEhyuIZ3XMhzlSg
+	 SzuOXgNl0q+HTBftEyyTm1KFQA9QuLp1xkWKicOFvhD5C5qynGI8PGhBe/1Vvhtzfh
+	 eN5t7Vh93GEkq8280+VaE98UhxN2VOmGeje+PNyB+eKvchw9Xf/tkSN9okVMXRQoWq
+	 xj3OWyTAew62N8YUndxfOhlkHK9HMH8aeKubZpVtr0G/nxFRZizt6uTiKlyGLqGHfZ
+	 HLc07DPkIC7zXndV+80NYS6lgQVRnO6vJJE6gwLVFfFnitlaWd3GbOou0Ew2nW+GCF
+	 Ipu7HjzCJNskA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	x86@kernel.org,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 0/6] Optimize fsverity using 2-way interleaved SHA-256 hashing
+Date: Mon, 15 Sep 2025 11:08:13 -0500
+Message-ID: <20250915160819.140019-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aLWltVMmuYQn8Pwa@earth.li>
+Content-Transfer-Encoding: 8bit
 
-From: Jonathan McDowell <noodles@meta.com>
+This series is targeting libcrypto-next.  It can also be retrieved from:
 
-The HW RNG core allows for manual selection of which RNG device to use,
-but does not allow for no device to be enabled. It may be desirable to
-do this on systems with only a single suitable hardware RNG, where we
-need exclusive access to other functionality on this device. In
-particular when performing TPM firmware upgrades this lets us ensure the
-kernel does not try to access the device.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git sha256_finup_2x-v2
 
-Before:
+This series adds support for 2-way interleaved SHA-256 hashing to
+lib/crypto/, implements it for arm64 and x86_64, and makes fsverity use
+it.  This significantly improves fsverity performance on many CPUs.
 
-root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-/sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0
-/sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-/sys/devices/virtual/misc/hw_random/rng_quality:1024
-/sys/devices/virtual/misc/hw_random/rng_selected:0
+Later patches will make dm-verity use this optimization as well.
 
-After:
+Changed in v2:
+- Made the new arm64 assembly compatible with CONFIG_CPU_BIG_ENDIAN=y.
+- Omitted sha256_finup_2x() from pre-boot environments.
+- Made alloc_guarded_buf() assert that the allocation succeeded.
+- Minor tweaks to comments and whitespace.
 
-root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-/sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-/sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-/sys/devices/virtual/misc/hw_random/rng_quality:1024
-/sys/devices/virtual/misc/hw_random/rng_selected:0
+Eric Biggers (6):
+  lib/crypto: sha256: Add support for 2-way interleaved hashing
+  lib/crypto: arm64/sha256: Add support for 2-way interleaved hashing
+  lib/crypto: x86/sha256: Add support for 2-way interleaved hashing
+  lib/crypto: tests: Add tests and benchmark for sha256_finup_2x()
+  fsverity: Remove inode parameter from fsverity_hash_block()
+  fsverity: Use 2-way interleaved SHA-256 hashing when supported
 
-root@debian-qemu-efi:~# echo none > /sys/devices/virtual/misc/hw_random/rng_current
-root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-/sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-/sys/devices/virtual/misc/hw_random/rng_current:none
-grep: /sys/devices/virtual/misc/hw_random/rng_quality: No such device
-/sys/devices/virtual/misc/hw_random/rng_selected:1
+ fs/verity/enable.c              |  12 +-
+ fs/verity/fsverity_private.h    |   2 +-
+ fs/verity/hash_algs.c           |   3 +-
+ fs/verity/verify.c              | 175 ++++++++++++---
+ include/crypto/sha2.h           |  28 +++
+ lib/crypto/arm64/sha256-ce.S    | 284 +++++++++++++++++++++++-
+ lib/crypto/arm64/sha256.h       |  37 ++++
+ lib/crypto/sha256.c             |  71 +++++-
+ lib/crypto/tests/sha256_kunit.c | 184 ++++++++++++++++
+ lib/crypto/x86/sha256-ni-asm.S  | 368 ++++++++++++++++++++++++++++++++
+ lib/crypto/x86/sha256.h         |  39 ++++
+ 11 files changed, 1147 insertions(+), 56 deletions(-)
 
-(Observe using bpftrace no calls to TPM being made)
-
-root@debian-qemu-efi:~# echo "" > /sys/devices/virtual/misc/hw_random/rng_current
-root@debian-qemu-efi:~# grep "" /sys/devices/virtual/misc/hw_random/rng_*
-/sys/devices/virtual/misc/hw_random/rng_available:tpm-rng-0 none
-/sys/devices/virtual/misc/hw_random/rng_current:tpm-rng-0
-/sys/devices/virtual/misc/hw_random/rng_quality:1024
-/sys/devices/virtual/misc/hw_random/rng_selected:0
-
-(Observe using bpftrace that calls to the TPM resume)
-
-Signed-off-by: Jonathan McDowell <noodles@meta.com>
----
-v2: If the user manually forces the HWRNG to none do not override this
-     when a new driver is loaded. Pointed out by Herbert Xu.
-
-  drivers/char/hw_random/core.c | 10 +++++++---
-  1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 018316f54621..1682a9f1b28c 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -341,6 +341,10 @@ static ssize_t rng_current_store(struct device *dev,
-  
-  	if (sysfs_streq(buf, "")) {
-  		err = enable_best_rng();
-+	} else if (sysfs_streq(buf, "none")) {
-+		if (current_rng)
-+			cur_rng_set_by_user = 1;
-+		drop_current_rng();
-  	} else {
-  		list_for_each_entry(rng, &rng_list, list) {
-  			if (sysfs_streq(rng->name, buf)) {
-@@ -392,7 +396,7 @@ static ssize_t rng_available_show(struct device *dev,
-  		strlcat(buf, rng->name, PAGE_SIZE);
-  		strlcat(buf, " ", PAGE_SIZE);
-  	}
--	strlcat(buf, "\n", PAGE_SIZE);
-+	strlcat(buf, "none\n", PAGE_SIZE);
-  	mutex_unlock(&rng_mutex);
-  
-  	return strlen(buf);
-@@ -544,8 +548,8 @@ int hwrng_register(struct hwrng *rng)
-  	/* Adjust quality field to always have a proper value */
-  	rng->quality = min_t(u16, min_t(u16, default_quality, 1024), rng->quality ?: 1024);
-  
--	if (!current_rng ||
--	    (!cur_rng_set_by_user && rng->quality > current_rng->quality)) {
-+	if (!cur_rng_set_by_user &&
-+	    (!current_rng || rng->quality > current_rng->quality)) {
-  		/*
-  		 * Set new rng as current as the new rng source
-  		 * provides better entropy quality and was not
+base-commit: 54e7bb6ade8acd3fb1c486c9f3e2c0dfdc18f84e
 -- 
 2.51.0
 
