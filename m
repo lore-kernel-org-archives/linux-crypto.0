@@ -1,94 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46551E51EC;
-	Mon, 15 Sep 2025 18:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649F9EAC7
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2025 20:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757960193; cv=none; b=o+IO2yRI58K/hySnq9N1jKa8I3Gd1NGhu6eOaPSkpqAJW7LeYHgEryYY56qFAJcj0esBHXMTe5JjrPb4mGwGKxQdPcc5otLEVS7MN4R83p2pVzc/GJ68RX5Wd/BXVSr5P1M7MbliPApnxylBmaTH4CfZzWC37M6K/ilqDiHdt74=
+	t=1757969305; cv=none; b=K2/47dPACGbAC8IlvWb9cwlgBcGPD7GAZ6l/ZRvY2ajMZsCuB8u/R/xsRG1dHYgk6vRcV7d40ThLl+YUCExmh8wsjEkOtCOn/MP/8JcqL5TjkfzVaK0wSgka8lAp9OxaFlafPRYO2Z5BQH2ebo9L6flUTTBhlahOaWmX8wRAFFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757960193; c=relaxed/simple;
-	bh=VRl/CmbCbalaTrdIPZ+G9ZHaZWrzBwmSCJ6/X7SgXR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ckjx1j2jdkrN4W7RevG5eoxAh1Xpz0Fs/tRMLSa8fbycO5n7y+h4s6C7hv5fdFkb7Go/sjjN6/AH0Pabq4EZCmrQcqUuJFA9mOq+z5A1aalXMmEaXfu0F854ZH7ZQiRHJvVR/Tzv48TrBoCeNS8NnQZbGTmgr0pVqFwhdqtvqdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNMDsYc+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757969305; c=relaxed/simple;
+	bh=wZSl5s8fmWFNvlmOaBeDn77E8Lb/THdWbXDu9Gttew0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fWFFFEcwrSED/AKWJRHEhLZCCLlxZ3d681XOI86RtJnC++1yPfhPgP3gPNso4cdO7UFeh9T/SFT+h8PSSLrE4F/2qSfop9eQlqbRodV6KmokfMzuMiKvTuPNzvsodXEJG2gr2gHaAPCo7KrmXb/yrs1T88drQjO9DJNei8zSJbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FNXtmHsD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNMDsYc+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACA67C4CEFA;
-	Mon, 15 Sep 2025 18:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757960192;
-	bh=VRl/CmbCbalaTrdIPZ+G9ZHaZWrzBwmSCJ6/X7SgXR0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rNMDsYc+iKHhlj2InEo4fd0/M7jJoU622P5ezNFnbm3Coc0uo/KQv34ZPvZijuVmh
-	 2NlTA56OOYUL7Nd1INCycFBCxHxuWBdeFVtnwl4vJndc+EX/Rta3WNLFQ7SbODXMH1
-	 9N0vtoLlatlhCuhAgiWXt9YKwQEaoBT8XUkrXadYzr2qo+iNz9A1zFNb3xgPHCiKqb
-	 jSMjQamQLmHdJvCMz8eYUwu4dWuzAROkLofxbbGIKLd6QnTs4s6gr5TFgV6FZconXr
-	 oXvlYXBEJ+/lWIfOb7etJolSQapmh2ydXnX2Pzany/WDBC1WlEI5gJLxDqRguvnYJ0
-	 OG7nZhczPdpow==
-Date: Mon, 15 Sep 2025 21:16:27 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Mimi Zohar <zohar@linux.ibm.com>, keyrings@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KEYS: encrypted: Use SHA-256 library instead of
- crypto_shash
-Message-ID: <aMhX-6jTkaLo-HsG@kernel.org>
-References: <20250731184747.12335-1-ebiggers@kernel.org>
- <aJIKH3-fRizRV8fi@kernel.org>
- <e8fff5a1607ce2d98c5999d522202e1104f0a12d.camel@linux.ibm.com>
- <20250915163949.GF1993@quark>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FNXtmHsD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757969302;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jEwxOkoJSJLNtHFeqRXzGgQ6PFGPRRqIWHEFFXTsfY0=;
+	b=FNXtmHsDg+2Q0wE+C4fcZvIoa9H8Z8hVV14tH01yMqUXB6+gdptZsT4C3q6peEJm2xLip0
+	EcX8cufDVjnsvScA26r4jHVgYvXSYfdkQ3MepHFI77FoU7GD569PwK5VVzVpW7ONDal5YU
+	D4CTVY8ZljIdvX71lTz8gZu3xhnt4Xo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-m8zK1Jm0OyeJk1OFHjfSPw-1; Mon,
+ 15 Sep 2025 16:48:19 -0400
+X-MC-Unique: m8zK1Jm0OyeJk1OFHjfSPw-1
+X-Mimecast-MFC-AGG-ID: m8zK1Jm0OyeJk1OFHjfSPw_1757969298
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84C051800378;
+	Mon, 15 Sep 2025 20:48:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.155])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0C03719560A2;
+	Mon, 15 Sep 2025 20:48:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <aMf_0xkJtcPQlYiI@gondor.apana.org.au>
+References: <aMf_0xkJtcPQlYiI@gondor.apana.org.au> <2552917.1757925000@warthog.procyon.org.uk>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dhowells@redhat.com, Stephan Mueller <smueller@chronox.de>,
+    linux-crypto@vger.kernel.org
+Subject: Re: Adding SHAKE hash algorithms to SHA-3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915163949.GF1993@quark>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2767451.1757969294.1@warthog.procyon.org.uk>
+Date: Mon, 15 Sep 2025 21:48:14 +0100
+Message-ID: <2767452.1757969294@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Sep 15, 2025 at 11:39:49AM -0500, Eric Biggers wrote:
-> On Sun, Sep 07, 2025 at 07:57:12AM -0400, Mimi Zohar wrote:
-> > On Tue, 2025-08-05 at 16:41 +0300, Jarkko Sakkinen wrote:
-> > > On Thu, Jul 31, 2025 at 11:47:47AM -0700, Eric Biggers wrote:
-> > > > Instead of the "sha256" crypto_shash, just use sha256().  Similarly,
-> > > > instead of the "hmac(sha256)" crypto_shash, just use
-> > > > hmac_sha256_usingrawkey().  This is simpler and faster.
-> > > > 
-> > > > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > > 
-> > > Yeah, fully agree.
-> > > 
-> > > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > 
-> > > David, will you pick this?
-> > > 
-> > 
-> > Do you want this patch being upstreamed with "[PATCH 0/2] Convert lib/digsig.c
-> > to SHA-1 library" patch set?
-> > 
-> > thanks,
-> > 
-> > Mimi
-> 
-> If someone could apply this for v6.18, that would be great.  It's
-> independent of my other patches.  It looks like Mimi has been taking
-> changes to this file most recently.  If David or Jarkko wants to take it
-> instead, that's fine too.  As long as someone does it.
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-I did it and I'm sorry that I didn't do this earlier!
+> I presume the algorithm choice is fixed, right?
 
-df8f189a0d3e (HEAD -> next, origin/next) KEYS: encrypted: Use SHA-256 library instead of crypto_shash
-72f6cd8ad0db (origin/master, origin/HEAD, master) tpm: Use HMAC-SHA256 library instead of open-coded HMAC
+I think so.
 
-Somehow my head did ticks after applying patch below and thought that
-everything is ok :-) I actually had plan to apply this one too but now
-it is there ready for PR.
+> If so you should be using lib/crypto.
 
-> 
-> - Eric
+Okay.  That will automatically use CPU-optimised versions if available?
 
-BR, Jarkko
+Btw, are the algorithms under crypto/ going to be switched to use the
+implementations under lib/crypto/?
+
+David
+
