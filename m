@@ -1,64 +1,64 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C427E27B505
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B4928CF4A
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758013285; cv=none; b=l/XPfq5g0RPDOhcM4zjYRXUM0W4zL4F8AI3i6IdkacgyHn8DhTLqQts46JZuzmpp3TyfdnQhfTnag88fQKe5+v/TywzvDmOLfzHpews0X7JbxAv2AzfuRmO7tkcUkr9FwG9cWR6SdDiIkWfu0+U6bNQ6LW36QgRbYsqB4fqASG8=
+	t=1758013286; cv=none; b=YdvYRDjUnts3N0Q9JKBgmg5YrbBZaP5f6gNGggKHq1uCAyRRXDNA99/RpalbjeosJ4OF0rrR0qAR7gXEGWdcDo+dRzdcKExgN1QFftCvKrM4EgXezxalY496Do4RQn2YqOuLGcDpmPpauK1RNrxTJVzHqTbIe2Brko+5puw6vm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758013285; c=relaxed/simple;
-	bh=rHdXcW4hedzb4INGLcyaJMDJVb1fKtNcoMkamsRR8fA=;
+	s=arc-20240116; t=1758013286; c=relaxed/simple;
+	bh=q+j3e9qQ0xdI5ayuaKhLRkZEBF+baMYDLf8IyvIPcVM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nWT0QjcNiIgLOLgxLtK9tN2w6gmdgHAat6fpX72qdVqNH9mqcI9vc/i2PJTuDG4WE/FjVPJqHbJXlufpVzAuePgioWiyUdjTeKXtzIb2Aax7HcpNoHeZYRAMmZDK114iuwxxa2w87QlEidrEXHwHt+Q/YYt5bnGNoyoZFQcZvog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZhEbVx/; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=OGrW4BmRZd7Wa8m6DbBlCn/nrqGXIHjBbukraHM0ZabCnfQfleOUTL8Pm/fylRppLmBqBp3ADrCk/+LIxCrC2TEE6zIw3iep1N4z+jPpBhOVsBA+XWSliZsr8ld9VJn5GLVkaAhlj9x4ZUwDGdrj/jjlwc5pSzNcrtQTFKxqQUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bF8xsKkJ; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZhEbVx/"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45dde353b47so31202655e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bF8xsKkJ"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3ec4d6ba12eso454159f8f.1
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758013281; x=1758618081; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758013282; x=1758618082; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fs/Mkvp1THxRdctoJn4ZALLS8uDDfar/BAPXGx8Q6Zo=;
-        b=iZhEbVx/gw9x8hm2gPPJ6OEudM0fkNsIefpEZ4R7/tFk3/0dXr4uU7q3KpPylMVok2
-         uM8XHTMr+xjzIiMP1qHb5GmvaDNT1RA9DV/egloI9IqEi2c1GSkmZJ3hCFHTJHgymYm2
-         13vDGaGWKJxvLVQVOb1MibJn61EKXqNmIEeza+Wy/qd64wVp1pb07l4G4jsQp6SRQNb0
-         YiItijAFTlDXSemu9KD4X0pa8JhG/3W2C7aLhM5mATIRkbJnkYCGdhmD1Dnzy//42oF1
-         1d5gwI0U6eNSOJ6ibJgFTPsw7/MvU5F9Bd8pTUB9VBQ0NFEsLbulijVOefAYarqmpxQO
-         Qelg==
+        bh=wAOqPYvSWVeN9/yE7pImb3Dnjd/YBm0aGHPiEL/y/Dw=;
+        b=bF8xsKkJcOZPO5A3I/eV3UYL0ivMUVStZFiw8TOpkwCwprebOymsmT4SjRNYePOsl/
+         nlKe8fyhNuomb8XGiZ3oDBqG8I/8cemR3b1ss0nnJEjOABUNHM148ILjQaAaKGMPvhfz
+         3j/wDGsWFywHc4hTvd+xOU2IZoztS+tPJ2ikbaWJKQP3dKPogfkYSy/OEeV3sAy3JpcC
+         qajXz3lurxhJzo5J5pXKh9A+KBAxZCPg4/Ux91EXS+MfJ9Fmnrt2I/DFsBDs3xrJrkXr
+         QBgMokmteLiTKNtlqtA1uBuCZR13ImjA01cR425JB+dAhRzjOcN2GdXj4MFe4oQ8oXDF
+         woew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758013281; x=1758618081;
+        d=1e100.net; s=20230601; t=1758013282; x=1758618082;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fs/Mkvp1THxRdctoJn4ZALLS8uDDfar/BAPXGx8Q6Zo=;
-        b=ZoGlq8Zq28PLpaMPCCa1JCUFlbAh9NNXl+zXVqw+xX0DEgygyaU/Mi3Vf3xYZ7SNX6
-         tXNcry99n34sZsQvNKWVi4+xTsjTKorkC7Zxz4PnKo/wE6M801bpT5qYS3IP5YkyaZKs
-         OcehfFRf57StKJZFTvNGC+GNb2QeH7t18Lch8irBX6SY5ZPDBN8DebqJiKTbp/KRFQZy
-         Ei3c1aeKFwkoKUEvM6qX/dpF7lSe5XRXOZJkOZ0Fm/Wit/q4/0l8frnU15NxK+GD8jFC
-         uZRePbKdCwlJigYwgtfkPooKETQCCSKFz/h/etCzQn8ipN3eWQ5Ws/SxLGa/6FTyNuAo
-         R0zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9qcVz8lrOiROOoSBOTJYm5naJmF1IO86WneuKcpgQ908lNLKOqpwhZL0FGbtbm7x7p4IJ5rCOnHIwd+A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsfOGK+qhw3KEPSLHqUD5qevz8js2wcUY9Al62G0QZRDrpFQa3
-	QHkPaTFTPS9N2WmWLPrSlDFSvo2Fm0LWBqMQat5ySwcZiDc7BvoXTHKI
-X-Gm-Gg: ASbGncvG0pkz0JLSDvPrpqHKzSm77USMkv8wjnaL5bwHREoNNLL+LgPbsGLDo+em9kt
-	YmauIqqbhYypIS656p/OocfZ1qif7myzd9Y7CkQ3UazRwfSQcAX3rP4Pg/amizkGJkkx7qbCeqQ
-	C0vv99YcPDtLJxQNaBZT0JrF6WYJTnjflNxouDzl18d0tP49gqe6WQjh1dnXVtvmJ+eQOxM0Cqq
-	T7KZ8Mw7fyou1RFWR5rbXwx+boWvv2wE/vilqQTunZZ2Gm2ph6HHiGiogYnPbdtBJfvKKydskxe
-	lCJwREiwfGEJewxi9UCsp8bPOBh/ew/5PTmmcz+DdweZxu/Byi8bugFCf5CH14rzzbAihJNSghU
-	2q0sBewHL7DWXjdIhq1NO0bV+LwIwD+OyilwzAIMm3EUpTqDAPu05VHY+gXWGJzWDcYRCumaar1
-	eu6xFY4xV2gLR731nsH6J+wSs=
-X-Google-Smtp-Source: AGHT+IHwQoGXKySunnNfE/yk4Lj1m+tend1dwCc17kn/aqDyL3pKFJsdM1voo4KacgQC1QzpZx8uDQ==
-X-Received: by 2002:a7b:c04b:0:b0:456:43c:dcdc with SMTP id 5b1f17b1804b1-45f212050femr102155175e9.33.1758013280425;
-        Tue, 16 Sep 2025 02:01:20 -0700 (PDT)
+        bh=wAOqPYvSWVeN9/yE7pImb3Dnjd/YBm0aGHPiEL/y/Dw=;
+        b=tZ0rhwnXyaW7wi2gXuQTB27Vs2777IXs9v//LwOT9rNHG+YNTnUNT9hSeggdYe+zuI
+         000tp2VvbcQctr9xOANHUk7XbVjGLvoM2/+FcLE/ne2z8zkZ3ix4+d+DBFJsDJL/3ws9
+         i7PBpw+r2YP056uFQs6fzjvakKlkzI+XxNlNM/MwzidzGvH63uXvC/nN6W244Ob7sDYd
+         JvH/pbRzqsMfYQ7OypbK1U9lbqxLsDQ8tas2XUJF7+dfteZG8yfGW0OtYnUY6Wm2xWsx
+         MwrrxPINeKWCTUSfUEywCbhFAhVKlLevYJAtL9bP+FbH3xIS44SAthQNE5BC/GF4A4rZ
+         1JEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlFsDjgPcGBsnFDPeRxJT0rUAITemwD+K0OJWbOZ0hgPBPJzpbhhLnt9CYsqswWytgzube3U7vneTQpSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy87EPv76gcZxfLWZHP2rBTHaJB55oPsbMgILg3L58mY+Pdov0m
+	UGCaEcom59qRZkuwgvlkW8mmRFK9URootpvfA8WKKaiWcjAgnrn0ytH/
+X-Gm-Gg: ASbGnctt/al20e70AtlZFZCJ0PkIH9/XfTGucju+PaxEdDl7UQAISZGmrOq3XX6iNw2
+	Baf3RBOjjo3YQkGF+fhBZv/qtjb3WoVI9z1smDBu7A+Xbq1ZkRrA5LGxklewi6vGPE2Rs0y00Rg
+	p8AGZXrnnxM7HVW7ORMkZAJ//xrRV2Xv1WFEyBULGZt9iDYDRBj9ANIlHgPW/WgaYVBkNa2kp+Y
+	CmpWLoXEMXC+Njr3tOUVItrm5uO4Pyf07AjtMvsnbJ6W0d3AWRqr1G1+OhgGAhBpugMwNZF3wqJ
+	voPetf+34+LI6ZqBbvvDhgLFL0CUZNjRYrGGPWTjwqTBD6v1fkVroHpWYmpx40eonzLoK4q3L0y
+	uX57KG4ll4RYjbOeLuXBQ0lfF+G/pZ8fN0YGGOaRMsI7ZMVa3TilkvuKNoKhySvcefZSp1tCDov
+	Y+X/npWYQG49jA
+X-Google-Smtp-Source: AGHT+IFaIHSJprd+d+0qq0jjdQAZm5Tx31BeDOIeQBVXABUXuuSsnl2Hqjdm092XL0xM7tasNHavOw==
+X-Received: by 2002:a5d:5f53:0:b0:3ec:9a32:3642 with SMTP id ffacd0b85a97d-3ec9a323866mr1190593f8f.62.1758013281461;
+        Tue, 16 Sep 2025 02:01:21 -0700 (PDT)
 Received: from xl-nested.c.googlers.com.com (42.16.79.34.bc.googleusercontent.com. [34.79.16.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 02:01:19 -0700 (PDT)
+        Tue, 16 Sep 2025 02:01:20 -0700 (PDT)
 From: Ethan Graham <ethan.w.s.graham@gmail.com>
 To: ethangraham@google.com,
 	glider@google.com
@@ -86,9 +86,9 @@ Cc: andreyknvl@gmail.com,
 	rmoar@google.com,
 	shuah@kernel.org,
 	tarasmadan@google.com
-Subject: [PATCH v1 02/10] kfuzztest: add user-facing API and data structures
-Date: Tue, 16 Sep 2025 09:01:01 +0000
-Message-ID: <20250916090109.91132-3-ethan.w.s.graham@gmail.com>
+Subject: [PATCH v1 03/10] kfuzztest: implement core module and input processing
+Date: Tue, 16 Sep 2025 09:01:02 +0000
+Message-ID: <20250916090109.91132-4-ethan.w.s.graham@gmail.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
 In-Reply-To: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
 References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
@@ -102,629 +102,553 @@ Content-Transfer-Encoding: 8bit
 
 From: Ethan Graham <ethangraham@google.com>
 
-Add the foundational user-facing components for the KFuzzTest framework.
-This includes the main API header <linux/kfuzztest.h>, the Kconfig
-option to enable the feature, and the required linker script changes
-which introduce three new ELF sections in vmlinux.
+Add the core runtime implementation for KFuzzTest. This includes the
+module initialization, and the logic for receiving and processing
+user-provided inputs through debugfs.
 
-Note that KFuzzTest is intended strictly for debug builds only, and
-should never be enabled in a production build. The fact that it exposes
-internal kernel functions and state directly to userspace may constitute
-a serious security vulnerability if used for any reason other than
-testing.
+On module load, the framework discovers all test targets by iterating
+over the .kfuzztest_target section, creating a corresponding debugfs
+directory with a write-only 'input' file for each of them.
 
-The header defines:
-- The FUZZ_TEST() macro for creating test targets.
-- The data structures required for the binary serialization format,
-  which allows passing complex inputs from userspace.
-- The metadata structures for test targets, constraints and annotations,
-  which are placed in dedicated ELF sections (.kfuzztest_*) for
-  discovery.
+Writing to an 'input' file triggers the main fuzzing sequence:
+1. The serialized input is copied from userspace into a kernel buffer.
+2. The buffer is parsed to validate the region array and relocation
+   table.
+3. Pointers are patched based on the relocation entries, and in KASAN
+   builds the inter-region padding is poisoned.
+4. The resulting struct is passed to the user-defined test logic.
 
-This patch only adds the public interface and build integration; no
-runtime logic is included.
+Signed-off-by: Ethan Graham <ethangraham@google.com>
 
 ---
 v3:
-- Move KFuzzTest metadata definitions to generic vmlinux linkage so that
-  the framework isn't bound to x86_64.
-- Return -EFAULT when simple_write_to_buffer returns a value not equal
-  to the input length in the main FUZZ_TEST macro.
-- Enforce a maximum input size of 64KiB in the main FUZZ_TEST macro,
-  returning -EINVAL when it isn't respected.
-- Refactor KFUZZTEST_ANNOTATION_* macros.
-- Taint the kernel with TAINT_TEST inside the FUZZ_TEST macro when a
-  fuzz target is invoked for the first time.
+- Update kfuzztest/parse.c interfaces to take `unsigned char *` instead
+  of `void *`, reducing the number of pointer casts.
+- Expose minimum region alignment via a new debugfs file.
+- Expose number of successful invocations via a new debugfs file.
+- Refactor module init function, add _config directory with entries
+  containing KFuzzTest state information.
+- Account for kasan_poison_range() return value in input parsing logic.
+- Validate alignment of payload end.
+- Move static sizeof assertions into /lib/kfuzztest/main.c.
+- Remove the taint in kfuzztest/main.c. We instead taint the kernel as
+  soon as a fuzz test is invoked for the first time, which is done in
+  the primary FUZZ_TEST macro.
+v2:
+- The module's init function now taints the kernel with TAINT_TEST.
 ---
-
-Signed-off-by: Ethan Graham <ethangraham@google.com>
 ---
- include/asm-generic/vmlinux.lds.h |  22 +-
- include/linux/kfuzztest.h         | 494 ++++++++++++++++++++++++++++++
- lib/Kconfig.debug                 |   1 +
- lib/kfuzztest/Kconfig             |  20 ++
- 4 files changed, 536 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/kfuzztest.h
- create mode 100644 lib/kfuzztest/Kconfig
+ include/linux/kfuzztest.h |   4 +
+ lib/Makefile              |   2 +
+ lib/kfuzztest/Makefile    |   4 +
+ lib/kfuzztest/main.c      | 240 ++++++++++++++++++++++++++++++++++++++
+ lib/kfuzztest/parse.c     | 204 ++++++++++++++++++++++++++++++++
+ 5 files changed, 454 insertions(+)
+ create mode 100644 lib/kfuzztest/Makefile
+ create mode 100644 lib/kfuzztest/main.c
+ create mode 100644 lib/kfuzztest/parse.c
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index ae2d2359b79e..9afe569d013b 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -373,7 +373,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
- 	TRACE_PRINTKS()							\
- 	BPF_RAW_TP()							\
- 	TRACEPOINT_STR()						\
--	KUNIT_TABLE()
-+	KUNIT_TABLE()							\
-+	KFUZZTEST_TABLE()
- 
- /*
-  * Data section helpers
-@@ -966,6 +967,25 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
- 		BOUNDED_SECTION_POST_LABEL(.kunit_init_test_suites, \
- 				__kunit_init_suites, _start, _end)
- 
-+#ifdef CONFIG_KFUZZTEST
-+#define KFUZZTEST_TABLE()						\
-+	. = ALIGN(PAGE_SIZE);						\
-+	__kfuzztest_targets_start = .;					\
-+	KEEP(*(.kfuzztest_target));					\
-+	__kfuzztest_targets_end = .;					\
-+	. = ALIGN(PAGE_SIZE);						\
-+	__kfuzztest_constraints_start = .;				\
-+	KEEP(*(.kfuzztest_constraint));					\
-+	__kfuzztest_constraints_end = .;				\
-+	. = ALIGN(PAGE_SIZE);						\
-+	__kfuzztest_annotations_start = .;				\
-+	KEEP(*(.kfuzztest_annotation));					\
-+	__kfuzztest_annotations_end = .;
-+
-+#else /* CONFIG_KFUZZTEST */
-+#define KFUZZTEST_TABLE()
-+#endif /* CONFIG_KFUZZTEST */
-+
- #ifdef CONFIG_BLK_DEV_INITRD
- #define INIT_RAM_FS							\
- 	. = ALIGN(4);							\
 diff --git a/include/linux/kfuzztest.h b/include/linux/kfuzztest.h
-new file mode 100644
-index 000000000000..1e5ed517f291
---- /dev/null
+index 1e5ed517f291..d90dabba23c4 100644
+--- a/include/linux/kfuzztest.h
 +++ b/include/linux/kfuzztest.h
-@@ -0,0 +1,494 @@
+@@ -150,6 +150,9 @@ struct kfuzztest_target {
+ 
+ #define KFUZZTEST_MAX_INPUT_SIZE (PAGE_SIZE * 16)
+ 
++/* Increments a global counter after a successful invocation. */
++void record_invocation(void);
++
+ /**
+  * FUZZ_TEST - defines a KFuzzTest target
+  *
+@@ -243,6 +246,7 @@ struct kfuzztest_target {
+ 		if (ret < 0)											\
+ 			goto out;										\
+ 		kfuzztest_logic_##test_name(arg);								\
++		record_invocation();										\
+ 		ret = len;											\
+ out:														\
+ 		kfree(buffer);											\
+diff --git a/lib/Makefile b/lib/Makefile
+index 392ff808c9b9..02789bf88499 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -325,6 +325,8 @@ obj-$(CONFIG_GENERIC_LIB_CMPDI2) += cmpdi2.o
+ obj-$(CONFIG_GENERIC_LIB_UCMPDI2) += ucmpdi2.o
+ obj-$(CONFIG_OBJAGG) += objagg.o
+ 
++obj-$(CONFIG_KFUZZTEST) += kfuzztest/
++
+ # pldmfw library
+ obj-$(CONFIG_PLDMFW) += pldmfw/
+ 
+diff --git a/lib/kfuzztest/Makefile b/lib/kfuzztest/Makefile
+new file mode 100644
+index 000000000000..142d16007eea
+--- /dev/null
++++ b/lib/kfuzztest/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_KFUZZTEST) += kfuzztest.o
++kfuzztest-objs := main.o parse.o
+diff --git a/lib/kfuzztest/main.c b/lib/kfuzztest/main.c
+new file mode 100644
+index 000000000000..06f4e3c3c9b2
+--- /dev/null
++++ b/lib/kfuzztest/main.c
+@@ -0,0 +1,240 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * The Kernel Fuzz Testing Framework (KFuzzTest) API for defining fuzz targets
-+ * for internal kernel functions.
-+ *
-+ * For more information please see Documentation/dev-tools/kfuzztest.rst.
++ * KFuzzTest core module initialization and debugfs interface.
 + *
 + * Copyright 2025 Google LLC
 + */
-+#ifndef KFUZZTEST_H
-+#define KFUZZTEST_H
-+
++#include <linux/atomic.h>
++#include <linux/debugfs.h>
 +#include <linux/fs.h>
++#include <linux/kfuzztest.h>
++#include <linux/module.h>
 +#include <linux/printk.h>
-+#include <linux/types.h>
++#include <linux/kasan.h>
 +
-+#define KFUZZTEST_HEADER_MAGIC (0xBFACE)
-+#define KFUZZTEST_V0 (0)
-+
-+/**
-+ * @brief The KFuzzTest Input Serialization Format
-+ *
-+ * KFuzzTest receives its input from userspace as a single binary blob. This
-+ * format allows for the serialization of complex, pointer-rich C structures
-+ * into a flat buffer that can be safely passed into the kernel. This format
-+ * requires only a single copy from userspace into a kernel buffer, and no
-+ * further kernel allocations. Pointers are patched internally using a "region"
-+ * system where each region corresponds to some pointed-to data.
-+ *
-+ * Regions should be padded to respect alignment constraints of their underlying
-+ * types, and should be followed by at least 8 bytes of padding. These padded
-+ * regions are poisoned by KFuzzTest to ensure that KASAN catches OOB accesses.
-+ *
-+ * The format consists of a header and three main components:
-+ * 1. An 8-byte header: Contains KFUZZTEST_MAGIC in the first 4 bytes, and the
-+ *	version number in the subsequent 4 bytes. This ensures backwards
-+ *	compatibility in the event of future format changes.
-+ * 2. A reloc_region_array: Defines the memory layout of the target structure
-+ *	by partitioning the payload into logical regions. Each logical region
-+ *	should contain the byte representation of the type that it represents,
-+ *	including any necessary padding. The region descriptors should be
-+ *	ordered by offset ascending.
-+ * 3. A reloc_table: Provides "linking" instructions that tell the kernel how
-+ *	to patch pointer fields to point to the correct regions. By design,
-+ *	the first region (index 0) is passed as input into a FUZZ_TEST.
-+ * 4. A Payload: The raw binary data for the target structure and its associated
-+ *	buffers. This should be aligned to the maximum alignment of all
-+ *	regions to satisfy alignment requirements of the input types, but this
-+ *	isn't checked by the parser.
-+ *
-+ * For a detailed specification of the binary layout see the full documentation
-+ * at: Documentation/dev-tools/kfuzztest.rst
-+ */
-+
-+/**
-+ * struct reloc_region - single contiguous memory region in the payload
-+ *
-+ * @offset: The byte offset of this region from the start of the payload, which
-+ *	should be aligned to the alignment requirements of the region's
-+ *	underlying type.
-+ * @size: The size of this region in bytes.
-+ */
-+struct reloc_region {
-+	uint32_t offset;
-+	uint32_t size;
-+};
-+
-+/**
-+ * struct reloc_region_array - array of regions in an input
-+ *
-+ * @num_regions: The total number of regions defined.
-+ * @regions: A flexible array of `num_regions` region descriptors.
-+ */
-+struct reloc_region_array {
-+	uint32_t num_regions;
-+	struct reloc_region regions[];
-+};
-+
-+/**
-+ * struct reloc_entry - a single pointer to be patched in an input
-+ *
-+ * @region_id: The index of the region in the `reloc_region_array` that
-+ *	contains the pointer.
-+ * @region_offset: The start offset of the pointer inside of the region.
-+ * @value: contains the index of the pointee region, or KFUZZTEST_REGIONID_NULL
-+ *	if the pointer is NULL.
-+ */
-+struct reloc_entry {
-+	uint32_t region_id;
-+	uint32_t region_offset;
-+	uint32_t value;
-+};
-+
-+/**
-+ * struct reloc_entry - array of relocations required by an input
-+ *
-+ * @num_entries: the number of pointer relocations.
-+ * @padding_size: the number of padded bytes between the last relocation in
-+ *	entries, and the start of the payload data. This should be at least
-+ *	8 bytes, as it is used for poisoning.
-+ * @entries: array of relocations.
-+ */
-+struct reloc_table {
-+	uint32_t num_entries;
-+	uint32_t padding_size;
-+	struct reloc_entry entries[];
-+};
-+
-+/**
-+ * kfuzztest_parse_and_relocate - validate and relocate a KFuzzTest input
-+ *
-+ * @input: A buffer containing the serialized input for a fuzz target.
-+ * @input_size: the size in bytes of the @input buffer.
-+ * @arg_ret: return pointer for the test case's input structure.
-+ */
-+int kfuzztest_parse_and_relocate(void *input, size_t input_size, void **arg_ret);
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Ethan Graham <ethangraham@google.com>");
++MODULE_DESCRIPTION("Kernel Fuzz Testing Framework (KFuzzTest)");
 +
 +/*
-+ * Dump some information on the parsed headers and payload. Can be useful for
-+ * debugging inputs when writing an encoder for the KFuzzTest input format.
++ * Enforce a fixed struct size to ensure a consistent stride when iterating over
++ * the array of these structs in the dedicated ELF section.
 + */
-+__attribute__((unused)) static inline void kfuzztest_debug_header(struct reloc_region_array *regions,
-+								  struct reloc_table *rt, void *payload_start,
-+								  void *payload_end)
++static_assert(sizeof(struct kfuzztest_target) == 32, "struct kfuzztest_target should have size 32");
++static_assert(sizeof(struct kfuzztest_constraint) == 64, "struct kfuzztest_constraint should have size 64");
++static_assert(sizeof(struct kfuzztest_annotation) == 32, "struct kfuzztest_annotation should have size 32");
++
++extern const struct kfuzztest_target __kfuzztest_targets_start[];
++extern const struct kfuzztest_target __kfuzztest_targets_end[];
++
++/**
++ * struct kfuzztest_state - global state for the KFuzzTest module
++ *
++ * @kfuzztest_dir: The root debugfs directory, /sys/kernel/debug/kfuzztest/.
++ * @num_targets: number of registered KFuzzTest targets.
++ * @target_fops: array of file operations for each registered target.
++ * @minalign_fops: file operations for the /_config/minalign file.
++ * @num_invocations_fops: file operations for the /_config/num_invocations file.
++ */
++struct kfuzztest_state {
++	struct dentry *kfuzztest_dir;
++	atomic_t num_invocations;
++	size_t num_targets;
++
++	struct file_operations *target_fops;
++	struct file_operations minalign_fops;
++	struct file_operations num_invocations_fops;
++};
++
++static struct kfuzztest_state state;
++
++void record_invocation(void)
 +{
-+	uint32_t i;
-+
-+	pr_info("regions: { num_regions = %u } @ %px", regions->num_regions, regions);
-+	for (i = 0; i < regions->num_regions; i++) {
-+		pr_info("  region_%u: { start: 0x%x, size: 0x%x }", i, regions->regions[i].offset,
-+			regions->regions[i].size);
-+	}
-+
-+	pr_info("reloc_table: { num_entries = %u, padding = %u } @ offset 0x%lx", rt->num_entries, rt->padding_size,
-+		(char *)rt - (char *)regions);
-+	for (i = 0; i < rt->num_entries; i++) {
-+		pr_info("  reloc_%u: { src: %u, offset: 0x%x, dst: %u }", i, rt->entries[i].region_id,
-+			rt->entries[i].region_offset, rt->entries[i].value);
-+	}
-+
-+	pr_info("payload: [0x%lx, 0x%lx)", (char *)payload_start - (char *)regions,
-+		(char *)payload_end - (char *)regions);
++	atomic_inc(&state.num_invocations);
 +}
 +
-+struct kfuzztest_target {
-+	const char *name;
-+	const char *arg_type_name;
-+	ssize_t (*write_input_cb)(struct file *filp, const char __user *buf, size_t len, loff_t *off);
-+} __aligned(32);
++static void cleanup_kfuzztest_state(struct kfuzztest_state *st)
++{
++	debugfs_remove_recursive(st->kfuzztest_dir);
++	st->num_targets = 0;
++	st->num_invocations = (atomic_t)ATOMIC_INIT(0);
++	kfree(st->target_fops);
++	st->target_fops = NULL;
++}
 +
-+#define KFUZZTEST_MAX_INPUT_SIZE (PAGE_SIZE * 16)
++const umode_t KFUZZTEST_INPUT_PERMS = 0222;
++const umode_t KFUZZTEST_MINALIGN_PERMS = 0444;
++
++static ssize_t read_cb_integer(struct file *filp, char __user *buf, size_t count, loff_t *f_pos, size_t value)
++{
++	char buffer[64];
++	int len;
++
++	len = scnprintf(buffer, sizeof(buffer), "%zu\n", value);
++	return simple_read_from_buffer(buf, count, f_pos, buffer, len);
++}
++
++/*
++ * Callback for /sys/kernel/debug/kfuzztest/_config/minalign. Minalign
++ * corresponds to the minimum alignment that regions in a KFuzzTest input must
++ * satisfy. This callback returns that value in string format.
++ */
++static ssize_t minalign_read_cb(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
++{
++	int minalign = MAX(KFUZZTEST_POISON_SIZE, ARCH_KMALLOC_MINALIGN);
++	return read_cb_integer(filp, buf, count, f_pos, minalign);
++}
++
++/*
++ * Callback for /sys/kernel/debug/kfuzztest/_config/num_targets, which returns
++ * the value in string format.
++ */
++static ssize_t num_invocations_read_cb(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
++{
++	return read_cb_integer(filp, buf, count, f_pos, atomic_read(&state.num_invocations));
++}
++
++static int create_read_only_file(struct dentry *parent, const char *name, struct file_operations *fops)
++{
++	struct dentry *file;
++	int err = 0;
++
++	file = debugfs_create_file(name, KFUZZTEST_MINALIGN_PERMS, parent, NULL, fops);
++	if (!file)
++		err = -ENOMEM;
++	else if (IS_ERR(file))
++		err = PTR_ERR(file);
++	return err;
++}
++
++static int initialize_config_dir(struct kfuzztest_state *st)
++{
++	struct dentry *dir;
++	int err = 0;
++
++	dir = debugfs_create_dir("_config", st->kfuzztest_dir);
++	if (!dir)
++		err = -ENOMEM;
++	else if (IS_ERR(dir))
++		err = PTR_ERR(dir);
++	if (err) {
++		pr_info("kfuzztest: failed to create /_config dir");
++		goto out;
++	}
++
++	st->minalign_fops = (struct file_operations){
++		.owner = THIS_MODULE,
++		.read = minalign_read_cb,
++	};
++	err = create_read_only_file(dir, "minalign", &st->minalign_fops);
++	if (err) {
++		pr_info("kfuzztest: failed to create /_config/minalign");
++		goto out;
++	}
++
++	st->num_invocations_fops = (struct file_operations){
++		.owner = THIS_MODULE,
++		.read = num_invocations_read_cb,
++	};
++	err = create_read_only_file(dir, "num_invocations", &st->num_invocations_fops);
++	if (err)
++		pr_info("kfuzztest: failed to create /_config/num_invocations");
++out:
++	return err;
++}
++
++static int initialize_target_dir(struct kfuzztest_state *st, const struct kfuzztest_target *targ,
++				 struct file_operations *fops)
++{
++	struct dentry *dir, *input;
++	int err = 0;
++
++	dir = debugfs_create_dir(targ->name, st->kfuzztest_dir);
++	if (!dir)
++		err = -ENOMEM;
++	else if (IS_ERR(dir))
++		err = PTR_ERR(dir);
++	if (err) {
++		pr_info("kfuzztest: failed to create /kfuzztest/%s dir", targ->name);
++		goto out;
++	}
++
++	input = debugfs_create_file("input", KFUZZTEST_INPUT_PERMS, dir, NULL, fops);
++	if (!input)
++		err = -ENOMEM;
++	else if (IS_ERR(input))
++		err = PTR_ERR(input);
++	if (err)
++		pr_info("kfuzztest: failed to create /kfuzztest/%s/input", targ->name);
++out:
++	return err;
++}
 +
 +/**
-+ * FUZZ_TEST - defines a KFuzzTest target
++ * kfuzztest_init - initializes the debug filesystem for KFuzzTest
 + *
-+ * @test_name: The unique identifier for the fuzz test, which is used to name
-+ *	the debugfs entry, e.g., /sys/kernel/debug/kfuzztest/@test_name.
-+ * @test_arg_type: The struct type that defines the inputs for the test. This
-+ *	must be the full struct type (e.g., "struct my_inputs"), not a typedef.
++ * Each registered target in the ".kfuzztest_targets" section gets its own
++ * subdirectory under "/sys/kernel/debug/kfuzztest/<test-name>" containing one
++ * write-only "input" file used for receiving inputs from userspace.
++ * Furthermore, a directory "/sys/kernel/debug/kfuzztest/_config" is created,
++ * containing two read-only files "minalign" and "num_targets", that return
++ * the minimum required region alignment and number of targets respectively.
 + *
-+ * Context:
-+ * This macro is the primary entry point for the KFuzzTest framework. It
-+ * generates all the necessary boilerplate for a fuzz test, including:
-+ *   - A static `struct kfuzztest_target` instance that is placed in a
-+ *	dedicated ELF section for discovery by userspace tools.
-+ *   - A `debugfs` write callback that handles receiving serialized data from
-+ *	a fuzzer, parsing it, and "hydrating" it into a valid C struct.
-+ *   - A function stub where the developer places the test logic.
-+ *
-+ * User-Provided Logic:
-+ * The developer must provide the body of the fuzz test logic within the curly
-+ * braces following the macro invocation. Within this scope, the framework
-+ * provides the `arg` variable, which is a pointer of type `@test_arg_type *` 
-+ * to the fully hydrated input structure. All pointer fields within this struct
-+ * have been relocated and are valid kernel pointers. This is the primary
-+ * variable to use for accessing fuzzing inputs.
-+ *
-+ * Example Usage:
-+ *
-+ * // 1. The kernel function we want to fuzz.
-+ * int process_data(const char *data, size_t len);
-+ *
-+ * // 2. Define a struct to hold all inputs for the function.
-+ * struct process_data_inputs {
-+ *	const char *data;
-+ *	size_t len;
-+ * };
-+ *
-+ * // 3. Define the fuzz test using the FUZZ_TEST macro.
-+ * FUZZ_TEST(process_data_fuzzer, struct process_data_inputs)
-+ * {
-+ *	int ret;
-+ *	// Use KFUZZTEST_EXPECT_* to enforce preconditions.
-+ *	// The test will exit early if data is NULL.
-+ *	KFUZZTEST_EXPECT_NOT_NULL(process_data_inputs, data);
-+ *
-+ *	// Use KFUZZTEST_ANNOTATE_* to provide hints to the fuzzer.
-+ *	// This links the 'len' field to the 'data' buffer.
-+ *	KFUZZTEST_ANNOTATE_LEN(process_data_inputs, len, data);
-+ *
-+ *	// Call the function under test using the 'arg' variable. OOB memory
-+ *	// accesses will be caught by KASAN, but the user can also choose to
-+ *	// validate the return value and log any failures.
-+ *	ret = process_data(arg->data, arg->len);
-+ * }
++ * @return 0 on success or an error
 + */
-+#define FUZZ_TEST(test_name, test_arg_type)									\
-+	static ssize_t kfuzztest_write_cb_##test_name(struct file *filp, const char __user *buf, size_t len,	\
-+						      loff_t *off);						\
-+	static void kfuzztest_logic_##test_name(test_arg_type *arg);						\
-+	const struct kfuzztest_target __fuzz_test__##test_name __section(".kfuzztest_target") __used = {	\
-+		.name = #test_name,										\
-+		.arg_type_name = #test_arg_type,								\
-+		.write_input_cb = kfuzztest_write_cb_##test_name,						\
-+	};													\
-+	static ssize_t kfuzztest_write_cb_##test_name(struct file *filp, const char __user *buf, size_t len,	\
-+						      loff_t *off)						\
-+	{													\
-+		test_arg_type *arg;										\
-+		void *buffer;											\
-+		int ret;											\
-+														\
-+		/*
-+		 * Taint the kernel on the first fuzzing invocation. The debugfs
-+		 * interface provides a high-risk entry point for userspace to
-+		 * call kernel functions with untrusted input.
-+		 */												\
-+		if (!test_taint(TAINT_TEST))									\
-+			add_taint(TAINT_TEST, LOCKDEP_STILL_OK);						\
-+		if (len >= KFUZZTEST_MAX_INPUT_SIZE) {								\
-+			pr_warn(#test_name ": user input of size %zu is too large", len);			\
-+			return -EINVAL;										\
-+		}												\
-+		buffer = kmalloc(len, GFP_KERNEL);								\
-+		if (!buffer)											\
-+			return -ENOMEM;										\
-+		ret = simple_write_to_buffer(buffer, len, off, buf, len);					\
-+		if (ret != len){										\
-+			ret = -EFAULT;										\
-+			goto out;										\
-+		};												\
-+		ret = kfuzztest_parse_and_relocate(buffer, len, (void **)&arg);					\
-+		if (ret < 0)											\
-+			goto out;										\
-+		kfuzztest_logic_##test_name(arg);								\
-+		ret = len;											\
-+out:														\
-+		kfree(buffer);											\
-+		return ret;											\
-+	}													\
-+	static void kfuzztest_logic_##test_name(test_arg_type *arg)
++static int __init kfuzztest_init(void)
++{
++	const struct kfuzztest_target *targ;
++	int err = 0;
++	int i = 0;
 +
-+enum kfuzztest_constraint_type {
-+	EXPECT_EQ,
-+	EXPECT_NE,
-+	EXPECT_LT,
-+	EXPECT_LE,
-+	EXPECT_GT,
-+	EXPECT_GE,
-+	EXPECT_IN_RANGE,
-+};
++	state.num_targets = __kfuzztest_targets_end - __kfuzztest_targets_start;
++	state.target_fops = kzalloc(sizeof(struct file_operations) * state.num_targets, GFP_KERNEL);
++	if (!state.target_fops)
++		return -ENOMEM;
 +
-+/**
-+ * struct kfuzztest_constraint - a metadata record for a domain constraint
-+ *
-+ * Domain constraints are rules about the input data that must be satisfied for
-+ * a fuzz test to proceed. While they are enforced in the kernel with a runtime
-+ * check, they are primarily intended as a discoverable contract for userspace
-+ * fuzzers.
-+ *
-+ * Instances of this struct are generated by the KFUZZTEST_EXPECT_* macros
-+ * and placed into the read-only ".kfuzztest_constraint" ELF section of the
-+ * vmlinux binary. A fuzzer can parse this section to learn about the
-+ * constraints and generate valid inputs more intelligently.
-+ *
-+ * For an example of how these constraints are used within a fuzz test, see the
-+ * documentation for the FUZZ_TEST() macro.
-+ *
-+ * @input_type: The name of the input struct type, without the leading
-+ *	"struct ".
-+ * @field_name: The name of the field within the struct that this constraint
-+ *	applies to.
-+ * @value1: The primary value used in the comparison (e.g., the upper
-+ *	bound for EXPECT_LE).
-+ * @value2: The secondary value, used only for multi-value comparisons
-+ *	(e.g., the upper bound for EXPECT_IN_RANGE).
-+ * @type: The type of the constraint.
-+ */
-+struct kfuzztest_constraint {
-+	const char *input_type;
-+	const char *field_name;
-+	uintptr_t value1;
-+	uintptr_t value2;
-+	enum kfuzztest_constraint_type type;
-+} __aligned(64);
++	/* Create the main "kfuzztest" directory in /sys/kernel/debug. */
++	state.kfuzztest_dir = debugfs_create_dir("kfuzztest", NULL);
++	if (!state.kfuzztest_dir) {
++		pr_warn("kfuzztest: could not create 'kfuzztest' debugfs directory");
++		return -ENOMEM;
++	}
++	if (IS_ERR(state.kfuzztest_dir)) {
++		pr_warn("kfuzztest: could not create 'kfuzztest' debugfs directory");
++		err = PTR_ERR(state.kfuzztest_dir);
++		state.kfuzztest_dir = NULL;
++		return err;
++	}
 +
-+#define __KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val1, val2, tpe, predicate)				\
-+	do {													\
-+		static struct kfuzztest_constraint __constraint_##arg_type##_##field				\
-+			__section(".kfuzztest_constraint") __used = {						\
-+				.input_type = "struct " #arg_type,						\
-+				.field_name = #field,								\
-+				.value1 = (uintptr_t)val1,							\
-+				.value2 = (uintptr_t)val2,							\
-+				.type = tpe,									\
-+			};											\
-+		if (!(predicate))										\
-+			return;											\
-+	} while (0)
++	err = initialize_config_dir(&state);
++	if (err)
++		goto cleanup_failure;
 +
-+/**
-+ * KFUZZTEST_EXPECT_EQ - constrain a field to be equal to a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable
-+ * @val: a value of the same type as @arg_type.@field
-+ */
-+#define KFUZZTEST_EXPECT_EQ(arg_type, field, val)	\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_EQ, arg->field == val);
++	for (targ = __kfuzztest_targets_start; targ < __kfuzztest_targets_end; targ++, i++) {
++		state.target_fops[i] = (struct file_operations){
++			.owner = THIS_MODULE,
++			.write = targ->write_input_cb,
++		};
++		err = initialize_target_dir(&state, targ, &state.target_fops[i]);
++		/* Bail out if a single target fails to initialize. This avoids
++		 * partial setup, and a failure here likely indicates an issue
++		 * with debugfs. */
++		if (err)
++			goto cleanup_failure;
++		pr_info("kfuzztest: registered target %s", targ->name);
++	}
++	return 0;
 +
-+/**
-+ * KFUZZTEST_EXPECT_NE - constrain a field to be not equal to a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_NE(arg_type, field, val)	\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_NE, arg->field != val);
++cleanup_failure:
++	cleanup_kfuzztest_state(&state);
++	return err;
++}
 +
-+/**
-+ * KFUZZTEST_EXPECT_LT - constrain a field to be less than a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_LT(arg_type, field, val)	\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_LT, arg->field < val);
++static void __exit kfuzztest_exit(void)
++{
++	pr_info("kfuzztest: exiting");
++	cleanup_kfuzztest_state(&state);
++}
 +
-+/**
-+ * KFUZZTEST_EXPECT_LE - constrain a field to be less than or equal to a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_LE(arg_type, field, val)	\
-+		__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_LE, arg->field <= val);
-+
-+/**
-+ * KFUZZTEST_EXPECT_GT - constrain a field to be greater than a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_GT(arg_type, field, val)	\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_GT, arg->field > val);
-+
-+/**
-+ * KFUZZTEST_EXPECT_GE - constrain a field to be greater than or equal to a value
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_GE(arg_type, field, val)	\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_GE, arg->field >= val);
-+
-+/**
-+ * KFUZZTEST_EXPECT_GE - constrain a pointer field to be non-NULL
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @val: a value of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_NOT_NULL(arg_type, field) KFUZZTEST_EXPECT_NE(arg_type, field, NULL)
-+
-+/**
-+ * KFUZZTEST_EXPECT_IN_RANGE - constrain a field to be within a range
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: some field that is comparable.
-+ * @lower_bound: a lower bound of the same type as @arg_type.@field.
-+ * @upper_bound: an upper bound of the same type as @arg_type.@field.
-+ */
-+#define KFUZZTEST_EXPECT_IN_RANGE(arg_type, field, lower_bound, upper_bound)		\
-+	__KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, lower_bound, upper_bound,	\
-+			EXPECT_IN_RANGE, arg->field >= lower_bound && arg->field <= upper_bound);
-+
-+/**
-+ * Annotations express attributes about structure fields that can't be easily
-+ * or safely verified at runtime. They are intended as hints to the fuzzing
-+ * engine to help it generate more semantically correct and effective inputs.
-+ * Unlike constraints, annotations do not add any runtime checks and do not
-+ * cause a test to exit early.
-+ *
-+ * For example, a `char *` field could be a raw byte buffer or a C-style
-+ * null-terminated string. A fuzzer that is aware of this distinction can avoid
-+ * creating inputs that would cause trivial, uninteresting crashes from reading
-+ * past the end of a non-null-terminated buffer.
-+ */
-+enum kfuzztest_annotation_attribute {
-+	ATTRIBUTE_LEN,
-+	ATTRIBUTE_STRING,
-+	ATTRIBUTE_ARRAY,
-+};
-+
-+/**
-+ * struct kfuzztest_annotation - a metadata record for a fuzzer hint
-+ *
-+ * This struct captures a single hint about a field in the input structure.
-+ * Instances are generated by the KFUZZTEST_ANNOTATE_* macros and are placed
-+ * into the read-only ".kfuzztest_annotation" ELF section of the vmlinux binary.
-+ *
-+ * A userspace fuzzer can parse this section to understand the semantic
-+ * relationships between fields (e.g., which field is a length for which
-+ * buffer) and the expected format of the data (e.g., a null-terminated
-+ * string). This allows the fuzzer to be much more intelligent during input
-+ * generation and mutation.
-+ *
-+ * For an example of how annotations are used within a fuzz test, see the
-+ * documentation for the FUZZ_TEST() macro.
-+ *
-+ * @input_type: The name of the input struct type.
-+ * @field_name: The name of the field being annotated (e.g., the data
-+ *	buffer field).
-+ * @linked_field_name: For annotations that link two fields (like
-+ *	ATTRIBUTE_LEN), this is the name of the related field (e.g., the
-+ *	length field). For others, this may be unused.
-+ * @attrib: The type of the annotation hint.
-+ */
-+struct kfuzztest_annotation {
-+	const char *input_type;
-+	const char *field_name;
-+	const char *linked_field_name;
-+	enum kfuzztest_annotation_attribute attrib;
-+} __aligned(32);
-+
-+#define __KFUZZTEST_ANNOTATE(arg_type, field, linked_field, attribute)						\
-+	static struct kfuzztest_annotation __annotation_##arg_type##_##field __section(".kfuzztest_annotation")	\
-+		__used = {											\
-+			.input_type = "struct " #arg_type,							\
-+			.field_name = #field,									\
-+			.linked_field_name = #linked_field,							\
-+			.attrib = attribute,									\
-+		}
-+
-+/**
-+ * KFUZZTEST_ANNOTATE_STRING - annotate a char* field as a C string
-+ *
-+ * We define a C string as a sequence of non-zero characters followed by exactly
-+ * one null terminator.
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: the name of the field to annotate.
-+ */
-+#define KFUZZTEST_ANNOTATE_STRING(arg_type, field) __KFUZZTEST_ANNOTATE(arg_type, field, NULL, ATTRIBUTE_STRING)
-+
-+/**
-+ * KFUZZTEST_ANNOTATE_ARRAY - annotate a pointer as an array
-+ *
-+ * We define an array as a contiguous memory region containing zero or more
-+ * elements of the same type.
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: the name of the field to annotate.
-+ */
-+#define KFUZZTEST_ANNOTATE_ARRAY(arg_type, field) __KFUZZTEST_ANNOTATE(arg_type, field, NULL, ATTRIBUTE_ARRAY)
-+
-+/**
-+ * KFUZZTEST_ANNOTATE_LEN - annotate a field as the length of another
-+ *
-+ * This expresses the relationship `arg_type.field == len(linked_field)`, where
-+ * `linked_field` is an array.
-+ *
-+ * @arg_type: name of the input structure, without the leading "struct ".
-+ * @field: the name of the field to annotate.
-+ * @linked_field: the name of an array field with length @field.
-+ */
-+#define KFUZZTEST_ANNOTATE_LEN(arg_type, field, linked_field) \
-+	__KFUZZTEST_ANNOTATE(arg_type, field, linked_field, ATTRIBUTE_LEN)
-+
-+#define KFUZZTEST_REGIONID_NULL U32_MAX
-+
-+/**
-+ * The end of the input should be padded by at least this number of bytes as
-+ * it is poisoned to detect out of bounds accesses at the end of the last
-+ * region.
-+ */
-+#define KFUZZTEST_POISON_SIZE 0x8
-+
-+#endif /* KFUZZTEST_H */
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index dc0e0c6ed075..49a1748b9f24 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1947,6 +1947,7 @@ endmenu
- menu "Kernel Testing and Coverage"
- 
- source "lib/kunit/Kconfig"
-+source "lib/kfuzztest/Kconfig"
- 
- config NOTIFIER_ERROR_INJECTION
- 	tristate "Notifier error injection"
-diff --git a/lib/kfuzztest/Kconfig b/lib/kfuzztest/Kconfig
++module_init(kfuzztest_init);
++module_exit(kfuzztest_exit);
+diff --git a/lib/kfuzztest/parse.c b/lib/kfuzztest/parse.c
 new file mode 100644
-index 000000000000..f9fb5abf8d27
+index 000000000000..5aaeca6a7fde
 --- /dev/null
-+++ b/lib/kfuzztest/Kconfig
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0-only
++++ b/lib/kfuzztest/parse.c
+@@ -0,0 +1,204 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * KFuzzTest input parsing and validation.
++ *
++ * Copyright 2025 Google LLC
++ */
++#include <linux/kfuzztest.h>
++#include <linux/kasan.h>
 +
-+config KFUZZTEST
-+	bool "KFuzzTest - enable support for internal fuzz targets"
-+	depends on DEBUG_FS && DEBUG_KERNEL
-+	help
-+	  Enables support for the kernel fuzz testing framework (KFuzzTest), an
-+	  interface for exposing internal kernel functions to a userspace fuzzing
-+	  engine. KFuzzTest targets are exposed via a debugfs interface that
-+	  accepts serialized userspace inputs, and is designed to make it easier
-+	  to fuzz deeply nested kernel code that is hard to reach from the system
-+	  call boundary. Using a simple macro-based API, developers can add a new
-+	  fuzz target with minimal boilerplate code.
++static int kfuzztest_relocate_v0(struct reloc_region_array *regions, struct reloc_table *rt,
++				 unsigned char *payload_start, unsigned char *payload_end)
++{
++	unsigned char *poison_start, *poison_end;
++	struct reloc_region reg, src, dst;
++	uintptr_t *ptr_location;
++	struct reloc_entry re;
++	size_t i;
++	int ret;
 +
-+	  It is strongly recommended to also enable CONFIG_KASAN for byte-accurate
-+	  out-of-bounds detection, as KFuzzTest was designed with this in mind. It
-+	  is also recommended to enable CONFIG_KCOV for coverage guided fuzzing.
++	/* Patch pointers. */
++	for (i = 0; i < rt->num_entries; i++) {
++		re = rt->entries[i];
++		src = regions->regions[re.region_id];
++		ptr_location = (uintptr_t *)(payload_start + src.offset + re.region_offset);
++		if (re.value == KFUZZTEST_REGIONID_NULL)
++			*ptr_location = (uintptr_t)NULL;
++		else if (re.value < regions->num_regions) {
++			dst = regions->regions[re.value];
++			*ptr_location = (uintptr_t)(payload_start + dst.offset);
++		} else {
++			return -EINVAL;
++		}
++	}
 +
-+	  WARNING: This exposes internal kernel functions directly to userspace
-+	  and must NEVER be enabled in production builds.
++	/* Poison the padding between regions. */
++	for (i = 0; i < regions->num_regions; i++) {
++		reg = regions->regions[i];
++
++		/* Points to the beginning of the inter-region padding */
++		poison_start = payload_start + reg.offset + reg.size;
++		if (i < regions->num_regions - 1)
++			poison_end = payload_start + regions->regions[i + 1].offset;
++		else
++			poison_end = payload_end;
++
++		if (poison_end > payload_end)
++			return -EINVAL;
++
++		ret = kasan_poison_range(poison_start, poison_end - poison_start);
++		if (ret)
++			return ret;
++	}
++
++	/* Poison the padded area preceding the payload. */
++	return kasan_poison_range(payload_start - rt->padding_size, rt->padding_size);
++}
++
++static bool kfuzztest_input_is_valid(struct reloc_region_array *regions, struct reloc_table *rt,
++				     unsigned char *payload_start, unsigned char *payload_end)
++{
++	size_t payload_size = payload_end - payload_start;
++	struct reloc_region reg, next_reg;
++	size_t usable_payload_size;
++	uint32_t region_end_offset;
++	struct reloc_entry reloc;
++	uint32_t i;
++
++	if (payload_start > payload_end)
++		return false;
++	if (payload_size < KFUZZTEST_POISON_SIZE)
++		return false;
++	if ((uintptr_t)payload_end % KFUZZTEST_POISON_SIZE)
++		return false;
++	usable_payload_size = payload_size - KFUZZTEST_POISON_SIZE;
++
++	for (i = 0; i < regions->num_regions; i++) {
++		reg = regions->regions[i];
++		if (check_add_overflow(reg.offset, reg.size, &region_end_offset))
++			return false;
++		if ((size_t)region_end_offset > usable_payload_size)
++			return false;
++
++		if (i < regions->num_regions - 1) {
++			next_reg = regions->regions[i + 1];
++			if (reg.offset > next_reg.offset)
++				return false;
++			/* Enforce the minimum poisonable gap between
++			 * consecutive regions. */
++			if (reg.offset + reg.size + KFUZZTEST_POISON_SIZE > next_reg.offset)
++				return false;
++		}
++	}
++
++	if (rt->padding_size < KFUZZTEST_POISON_SIZE) {
++		pr_info("validation failed because rt->padding_size = %u", rt->padding_size);
++		return false;
++	}
++
++	for (i = 0; i < rt->num_entries; i++) {
++		reloc = rt->entries[i];
++		if (reloc.region_id >= regions->num_regions)
++			return false;
++		if (reloc.value != KFUZZTEST_REGIONID_NULL && reloc.value >= regions->num_regions)
++			return false;
++
++		reg = regions->regions[reloc.region_id];
++		if (reloc.region_offset % (sizeof(uintptr_t)) || reloc.region_offset + sizeof(uintptr_t) > reg.size)
++			return false;
++	}
++
++	return true;
++}
++
++static int kfuzztest_parse_input_v0(unsigned char *input, size_t input_size, struct reloc_region_array **ret_regions,
++				    struct reloc_table **ret_reloc_table, unsigned char **ret_payload_start,
++				    unsigned char **ret_payload_end)
++{
++	size_t reloc_entries_size, reloc_regions_size;
++	unsigned char *payload_end, *payload_start;
++	size_t reloc_table_size, regions_size;
++	struct reloc_region_array *regions;
++	struct reloc_table *rt;
++	size_t curr_offset = 0;
++
++	if (input_size < sizeof(struct reloc_region_array) + sizeof(struct reloc_table))
++		return -EINVAL;
++
++	regions = (struct reloc_region_array *)input;
++	if (check_mul_overflow(regions->num_regions, sizeof(struct reloc_region), &reloc_regions_size))
++		return -EINVAL;
++	if (check_add_overflow(sizeof(*regions), reloc_regions_size, &regions_size))
++		return -EINVAL;
++
++	curr_offset = regions_size;
++	if (curr_offset > input_size)
++		return -EINVAL;
++	if (input_size - curr_offset < sizeof(struct reloc_table))
++		return -EINVAL;
++
++	rt = (struct reloc_table *)(input + curr_offset);
++
++	if (check_mul_overflow((size_t)rt->num_entries, sizeof(struct reloc_entry), &reloc_entries_size))
++		return -EINVAL;
++	if (check_add_overflow(sizeof(*rt), reloc_entries_size, &reloc_table_size))
++		return -EINVAL;
++	if (check_add_overflow(reloc_table_size, rt->padding_size, &reloc_table_size))
++		return -EINVAL;
++
++	if (check_add_overflow(curr_offset, reloc_table_size, &curr_offset))
++		return -EINVAL;
++	if (curr_offset > input_size)
++		return -EINVAL;
++
++	payload_start = input + curr_offset;
++	payload_end = input + input_size;
++
++	if (!kfuzztest_input_is_valid(regions, rt, payload_start, payload_end))
++		return -EINVAL;
++
++	*ret_regions = regions;
++	*ret_reloc_table = rt;
++	*ret_payload_start = payload_start;
++	*ret_payload_end = payload_end;
++	return 0;
++}
++
++static int kfuzztest_parse_and_relocate_v0(unsigned char *input, size_t input_size, void **arg_ret)
++{
++	unsigned char *payload_start, *payload_end;
++	struct reloc_region_array *regions;
++	struct reloc_table *reloc_table;
++	int ret;
++
++	ret = kfuzztest_parse_input_v0(input, input_size, &regions, &reloc_table, &payload_start, &payload_end);
++	if (ret < 0)
++		return ret;
++
++	ret = kfuzztest_relocate_v0(regions, reloc_table, payload_start, payload_end);
++	if (ret < 0)
++		return ret;
++	*arg_ret = (void *)payload_start;
++	return 0;
++}
++
++int kfuzztest_parse_and_relocate(void *input, size_t input_size, void **arg_ret)
++{
++	size_t header_size = 2 * sizeof(u32);
++	u32 version, magic;
++
++	if (input_size < sizeof(u32) + sizeof(u32))
++		return -EINVAL;
++
++	magic = *(u32 *)input;
++	if (magic != KFUZZTEST_HEADER_MAGIC)
++		return -EINVAL;
++
++	version = *(u32 *)(input + sizeof(u32));
++	switch (version) {
++	case KFUZZTEST_V0:
++		return kfuzztest_parse_and_relocate_v0(input + header_size, input_size - header_size, arg_ret);
++	}
++
++	return -EINVAL;
++}
 -- 
 2.51.0.384.g4c02a37b29-goog
 
