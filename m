@@ -1,135 +1,82 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FDA34DCC9;
-	Tue, 16 Sep 2025 14:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA58309DB0;
+	Tue, 16 Sep 2025 14:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758034104; cv=none; b=LDH4QmwqFHLxCHs4ckDzgiaq/O+LnMXjYFcHm4ipR12pofXCgOcPYSym7+wW8nDkTnapEOFc1nF7VC3G2qTlEjWgrwUFHJjKyqGccdUMqbVlxWfsB3xaY9/GjXYFeRQVLzxGvwuKFSaxT4ziRlMU4gdi/hV6lbWGk1lZOe7CjNQ=
+	t=1758034377; cv=none; b=uI4k5yiRqYdfUlt6/AO3BpicFhxMWJ3W7c+vWqKTIFlWtIJ/1Mwu8MUV7G/vB85S8BD3v5oyXLRXICaPcoCr7elE0JH5Vb2tutwXtc2lMXeuQmRgG9WogOx3xi/uz6v4Jf2gmY6SOkOqNBTe4b6VGB+Yx5QIYqwuWDHTYjjWFfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758034104; c=relaxed/simple;
-	bh=w0w79QuH03O5fJNpf4eWNB1b0fET3TvDehwPRJX1QCU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G6xPz36LDThgR7YYVAt+7UOfknf0zBbiy0o0nkDHntvjOhU+veOdN0sPsARBPf5aByZPw6lMJPVhTeaFDK25/mz+LzrcO2yLEFJpi0OaAoc3JTbyZbuEmWClgAb3vg9KMN5ebcgsymfm7IYbZywBhNXFDkbh/UXeST1InEvwfK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cR4S34TD2z24jCw;
-	Tue, 16 Sep 2025 22:44:51 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 105EE140275;
-	Tue, 16 Sep 2025 22:48:15 +0800 (CST)
-Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 16 Sep 2025 22:48:14 +0800
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 16 Sep 2025 22:48:14 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
-	<wangzhou1@hisilicon.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <fanghao11@huawei.com>, <shenyang39@huawei.com>,
-	<liulongfang@huawei.com>, <qianweili@huawei.com>
-Subject: [PATCH v2 4/4] uacce: ensure safe queue release with state management
-Date: Tue, 16 Sep 2025 22:48:11 +0800
-Message-ID: <20250916144811.1799687-5-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250916144811.1799687-1-huangchenghai2@huawei.com>
-References: <20250916144811.1799687-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1758034377; c=relaxed/simple;
+	bh=uWFwdCKgY4KtJCBw76nmYl/luYzpUeAdJ6G3lD0fkpk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HF1bKk+DEVOfY1y108l1wH5dP0wsW2iScF1d5RhnlC8NAIQKtBTUN3d1SlJOAYhpfFYbHQJZA6/pZPLJoA3q0iEkefD15oWUyECj5eXMcSRE7HaJeWBCM88uqrnyvA8zAmfyy+2Q897hdBjvAr+89/bRB/EAei97KN2Hkh9gkDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id E5F862C06649;
+	Tue, 16 Sep 2025 16:52:44 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id D6FE235A08; Tue, 16 Sep 2025 16:52:44 +0200 (CEST)
+Date: Tue, 16 Sep 2025 16:52:44 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: wufan@kernel.org
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dhowells@redhat.com,
+	ignat@cloudflare.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, jarkko@kernel.org, zohar@linux.ibm.com,
+	eric.snowberg@oracle.com
+Subject: Re: [PATCH v2] KEYS: X.509: Fix Basic Constraints CA flag parsing
+Message-ID: <aMl5vAB1qmRw6eZT@wunner.de>
+References: <20250911225356.2678-1-wufan@kernel.org>
+ <20250915211550.2610-1-wufan@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200001.china.huawei.com (7.202.195.16)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250915211550.2610-1-wufan@kernel.org>
 
-Directly calling `put_queue` carries risks since it cannot
-guarantee that resources of `uacce_queue` have been fully released
-beforehand. So adding a `stop_queue` operation for the
-UACCE_CMD_PUT_Q command and leaving the `put_queue` operation to
-the final resource release ensures safety.
+On Mon, Sep 15, 2025 at 09:15:50PM +0000, wufan@kernel.org wrote:
+> Fix the X.509 Basic Constraints CA flag parsing to correctly handle
+> the ASN.1 DER encoded structure. The parser was incorrectly treating
+> the length field as the boolean value.
+[...]
+> Link: https://datatracker.ietf.org/doc/html/rfc5280
+> Link: https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf
+> Fixes: 30eae2b037af ("KEYS: X.509: Parse Basic Constraints for CA")
+> Signed-off-by: Fan Wu <wufan@kernel.org>
 
-Queue states are defined as follows:
-- UACCE_Q_ZOMBIE: Initial state
-- UACCE_Q_INIT: After opening `uacce`
-- UACCE_Q_STARTED: After `start` is issued via `ioctl`
+Reviewed-by: Lukas Wunner <lukas@wunner.de>
 
-When executing `poweroff -f` in virt while accelerator are still
-working, `uacce_fops_release` and `uacce_remove` may execute
-concurrently. This can cause `uacce_put_queue` within
-`uacce_fops_release` to access a NULL `ops` pointer. Therefore, add
-state checks to prevent accessing freed pointers.
+> @@ -623,8 +626,13 @@ int x509_process_extension(void *context, size_t hdrlen,
+>  			return -EBADMSG;
+>  		if (v[1] != vlen - 2)
+>  			return -EBADMSG;
+> -		if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
+> +		/* Empty SEQUENCE means CA:FALSE (default value omitted per DER) */
+> +		if (v[1] == 0)
+> +			return 0;
+> +		if (vlen >= 5 && v[2] == ASN1_BOOL && v[3] == 1 && v[4] == 0xFF)
+>  			ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
+> +		else
+> +			return -EBADMSG;
+>  		return 0;
+>  	}
 
-Fixes: 015d239ac014 ("uacce: add uacce driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
----
- drivers/misc/uacce/uacce.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+For anyone who didn't follow the discussion and/or isn't familiar
+with ASN.1, the patch first checks for a well-formed "CA:FALSE",
+then checks for a well-formed "CA:TRUE", finally rejects anything
+else as malformed.
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index dda71492874d..ff9c515ac289 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -40,20 +40,34 @@ static int uacce_start_queue(struct uacce_queue *q)
- 	return 0;
- }
- 
--static int uacce_put_queue(struct uacce_queue *q)
-+static int uacce_stop_queue(struct uacce_queue *q)
- {
- 	struct uacce_device *uacce = q->uacce;
- 
--	if ((q->state == UACCE_Q_STARTED) && uacce->ops->stop_queue)
-+	if (q->state != UACCE_Q_STARTED)
-+		return 0;
-+
-+	if (uacce->ops->stop_queue)
- 		uacce->ops->stop_queue(q);
- 
--	if ((q->state == UACCE_Q_INIT || q->state == UACCE_Q_STARTED) &&
--	     uacce->ops->put_queue)
-+	q->state = UACCE_Q_INIT;
-+
-+	return 0;
-+}
-+
-+static void uacce_put_queue(struct uacce_queue *q)
-+{
-+	struct uacce_device *uacce = q->uacce;
-+
-+	uacce_stop_queue(q);
-+
-+	if (q->state != UACCE_Q_INIT)
-+		return;
-+
-+	if (uacce->ops->put_queue)
- 		uacce->ops->put_queue(q);
- 
- 	q->state = UACCE_Q_ZOMBIE;
--
--	return 0;
- }
- 
- static long uacce_fops_unl_ioctl(struct file *filep,
-@@ -80,7 +94,7 @@ static long uacce_fops_unl_ioctl(struct file *filep,
- 		ret = uacce_start_queue(q);
- 		break;
- 	case UACCE_CMD_PUT_Q:
--		ret = uacce_put_queue(q);
-+		ret = uacce_stop_queue(q);
- 		break;
- 	default:
- 		if (uacce->ops->ioctl)
--- 
-2.33.0
+Thanks,
 
+Lukas
