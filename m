@@ -1,186 +1,135 @@
-Received: from smtpcmd02102.aruba.it (smtpcmd02102.aruba.it [62.149.158.102])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6621D7E41
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 13:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.158.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579132DC32C;
+	Tue, 16 Sep 2025 13:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758028063; cv=none; b=nZ3BqfxN4fU9VgWq1s79TRt6A4YhuLABp5IH3HWsVpsrJ6FL5yzzhtwb11cx8gOMg0jkPr5ecpFJxfv1tpqEU9iGFvAFXaAfR+jMQEH8LBGnWo7NoI3odI1jmJz9QO2X9nLnIt+NbCUhoqqysERIeiY8bmyWfJCC9iXSN9VuS8w=
+	t=1758028379; cv=none; b=CBMkfvA+fHTy0csEHT7QbuOLpa4Sa1o5nwo/lCQGhzC+/F3axBYFHLa4DnRG+aQmJSdpy+P1YfFPUH3TbBJS5cGC9Ut/fuUjx5xuOusj+qnS0sTsXWCa59C2IU+6fwbV//AOP3caSZ5JIJ7Rt9dNtr98RFjrwlUisBvFSJuOv5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758028063; c=relaxed/simple;
-	bh=G5i6Vvy9Us+7ePSgpZfFSxHW56ndonX+dXYe3XEyFUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EYsGQh9m0nwCBVA0Zur5l/FyvdmO+4ZcbK3MXiBNqhsTrAvciPu5UGJuPlQ/8mAH2gnmRiVaw6QgCJbKx68V5kS9TX39Ynzc2Qz/ZbNFNJKFhatJMIvRMHSDN1MFrwo+Li2lkxFZoF7u8NSQwhK/OCNiz9GTitULOi+CYJRpAZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=Hg1hyFGx; arc=none smtp.client-ip=62.149.158.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
+	s=arc-20240116; t=1758028379; c=relaxed/simple;
+	bh=ik/Ise1iswo7LmVkd0oG8YoqIncJ668v/g3g8ti6nAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ekzN1S1bl/rGFrsOdr7g6DlfS808jh22/qyTPUzajUYqO86ZcJsiogE1ccLB5N9Ob7o+1AqMrMe/4yG1HNhA56UGnRB+IVMXytLUYp/ahLyr06Ee5HvfeWNczkLsf4Nl0b4obHV+iiFqZrawgvX63efZdnNweHKRUPluZi6npzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=gmjf/lXN reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="Hg1hyFGx"
-Received: from [192.168.1.58] ([79.0.204.227])
-	by Aruba SMTP with ESMTPSA
-	id yVPFuIXUKloieyVPFudIGY; Tue, 16 Sep 2025 15:07:38 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1758028058; bh=G5i6Vvy9Us+7ePSgpZfFSxHW56ndonX+dXYe3XEyFUE=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=Hg1hyFGxh/Q0sGpNzWccC79Ukk2PSoGEK3j/c5OSEVw0Kw4OKQ0JUBRmQg6KJaJrd
-	 Ca36xy21lzAfIzfQJBHQCNnNgxkCKyEZK2kQCvcZipQ7eNcE91/bL5GHXGkqrze8Ko
-	 vM6+AYK5LNpnfrxUJIxqfvI3bXBbkiSqszx95zzYuHZV/GR0EDVfbKBVw9i7LxOGrn
-	 f+1rY/9dehvoWRyJI4M66n5C7cOV35zGBPvZ9Jj9fsr4foV+e00E1Bv0IuUgs0b3Mm
-	 axJZ8U/BXe3vH2ryeZMdROOLFWJUnhNgCSKbLTYzbl5O5mbm8Fssyj3bCkf31ERcN1
-	 RGjO4hrm9qQKA==
-Message-ID: <6eccae32-7340-4950-9454-2f6323146126@enneenne.com>
-Date: Tue, 16 Sep 2025 15:07:37 +0200
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gmjf/lXN"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5ACC740E01A2;
+	Tue, 16 Sep 2025 13:12:52 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ttVk2Mn4Jhig; Tue, 16 Sep 2025 13:12:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1758028368; bh=NnBsyV+YEsnQMd6sc1QNEhxEPfHuUEo9ekvsKqyRBYs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gmjf/lXNIcIJDLPQtdWfx1fRSmvkzzEwQ8vP/zezZ0107I0vRCVnG8vzblIbimzMR
+	 X8ETN1ek9FNo+qVkh+/2kent5aIyRKV/zWvBbCrNCBDoB1AXeGBkOIlpUivWdiRLXj
+	 iUP+ygZFwUqH5m9N4GvEUDckKHUleCf6g7oaOUN6gmKJSrxOI9YeLtPZBZvl6j/EX6
+	 yNJtQXvYC84ewbNYlQYYrU1d0VptsrTwFY9MRkbqFBzPYcmbcX8cvfm8ssVzo1k7BK
+	 RykS64aDoG7iOgzYnx4AbOpH7vos50ko+AmHylvqYhjmM6iEqTlvh/B29arKI4r8gu
+	 Wqk2frZPZ1r0Wru0/phS3SK5BpjpaRerTe8cGME0SVAyfFxg44RbdZu8O3lB4TLQe5
+	 idvZGgm4/qG6c1RzzI7Ut2C7gX0/INOEnYVQhs7MSsv7ICThwyxa4lXvtWVyrqLUW8
+	 YffMmMXAVKXLfk7e7fOFb4p5LEAvEKi10B+cZz7Tpcwrhl3ko4vgmPgeb2fkwzhEiP
+	 0MaTLQ2cBd6+uVUfY66JBtSf/ezJEqLFQb78Mk0BBQ/yHE6hgSupPxKmCUmllpJJza
+	 RRQU/O1S0Tbod9G5uXfYCvXO2jcypjQIDUaUAiVuU+os+ZfYfLdSMJ/LEZS9b4YatR
+	 2sAel0TbLh/0/kKOVDBUSZjk=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 3E68F40E00DD;
+	Tue, 16 Sep 2025 13:12:28 +0000 (UTC)
+Date: Tue, 16 Sep 2025 15:12:21 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
+	aik@amd.com, ardb@kernel.org, john.allen@amd.com,
+	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v5 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+Message-ID: <20250916131221.GCaMliNe3NVmOwzHEN@fat_crate.local>
+References: <cover.1757969371.git.ashish.kalra@amd.com>
+ <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [V1 0/4] User API for KPP
-Content-Language: en-US
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
- David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>
-References: <20250915084039.2848952-1-giometti@enneenne.com>
- <20250915145059.GC1993@quark>
- <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
- <aMjjPV21x2M_Joi1@gondor.apana.org.au>
- <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
- <CALrw=nEadhZVifwy-SrFdEcrjrBxufVpTr0BSnnCJOODioE1WA@mail.gmail.com>
- <ef47b718-8c6b-4711-9062-cc8b6c7dc004@enneenne.com>
- <CALrw=nGHDW=FZcVG94GuuX9AOBC-N5OC2aXiybfAro6E8VNzPQ@mail.gmail.com>
- <ca36a11e-ca2e-41ee-b0d3-f56586d50fd4@enneenne.com>
- <CALrw=nFSsFYtz0vo7fGyBFCZ+HGHPGSVvoDECiSWfSVbPz4OeA@mail.gmail.com>
-From: Rodolfo Giometti <giometti@enneenne.com>
-In-Reply-To: <CALrw=nFSsFYtz0vo7fGyBFCZ+HGHPGSVvoDECiSWfSVbPz4OeA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfCB8eFyvvfwc7y7iIsQLKydmRwqCWj3aU7EZ2ebFMMjKUR6TZhAHZRzCNxDpnIFP5YPPjss2eYgtw9mBSuINRLWf00yTBSl/A5FXEbuhyuIrIv7/sn3+
- LMkLxkDSE0UKIFQXgzGggate+knJkyX2ngzOTX6GRUoiA2PYZOSesuniTWU40RTIYEQe1jWs8FFvv7lmxeyCZpyUM3UAytLZFqfcaLe6VkfHKy0BMXkvF2rp
- NZDaO21f4ThJTh4p5jGkyZQ74jTm99hfxVizxra1lRoD+5KfljlR43GrR6yEt6tCBn61qJsueVxUlp+rLXxpUBfX/+wKK3hgVEdqeRzSsbAD1rX2mZXwit/7
- 9giMVoWgsuRitvzJ/H2ldzPwSTTii+Peiy9yzeqKMKJeZoED4RYys27aDFHea31GxGFpafp+
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On 16/09/25 14:43, Ignat Korchagin wrote:
-> On Tue, Sep 16, 2025 at 1:33 PM Rodolfo Giometti <giometti@enneenne.com> wrote:
->>
->> On 16/09/25 13:56, Ignat Korchagin wrote:
->>> On Tue, Sep 16, 2025 at 12:21 PM Rodolfo Giometti <giometti@enneenne.com> wrote:
->>>>
->>>> On 16/09/25 12:21, Ignat Korchagin wrote:
->>>>> On Tue, Sep 16, 2025 at 9:22 AM Rodolfo Giometti <giometti@enneenne.com> wrote:
->>>>>>
->>>>>> On 16/09/25 06:10, Herbert Xu wrote:
->>>>>>> On Mon, Sep 15, 2025 at 05:47:56PM +0200, Rodolfo Giometti wrote:
->>>>>>>>
->>>>>>>> The main purpose of using this implementation is to be able to use the
->>>>>>>> kernel's trusted keys as private keys. Trusted keys are protected by a TPM
->>>>>>>> or other hardware device, and being able to generate private keys that can
->>>>>>>> only be (de)encapsulated within them is (IMHO) a very useful and secure
->>>>>>>> mechanism for storing a private key.
->>>>>>>
->>>>>>> If the issue is key management then you should be working with
->>>>>>> David Howell on creating an interface that sits on top of the
->>>>>>> keyring subsystem.
->>>>>>>
->>>>>>> The Crypto API doesn't care about keys.
->>>>>>
->>>>>> No, the problem concerns the use of the Linux keyring (specifically, trusted
->>>>>> keys and other hardware-managed keys) with cryptographic algorithms.
->>>>>>
->>>>>>     From a security standpoint, AF_ALG and keyctl's trusted keys are a perfect
->>>>>> match to manage secure encryption and decryption, so why not do the same with
->>>>>> KPP operations (or other cryptographic operations)?
->>>>>
->>>>> I generally find the AF_ALG API ugly to use, but I can see the use
->>>>> case for symmetric algorithms, where one needs to encrypt/decrypt a
->>>>> large stream in chunks. For asymmetric operations, like signing and
->>>>> KPP it doesn't make much sense to go through the socket API. In fact
->>>>> we already have an established interface through keyctl(2).
->>>>
->>>> I see, but if we consider shared secret support, for example, keyctl doesn't
->>>> support ECDH, while AF_ALG allows you to choose whether to use DH or ECDH.
->>>
->>> But this is exactly the point: unlike symmetric algorithms, where you
->>> can just use any blob with any algorithm, you can't use an RSA key for
->>> ECDH for example. That is, you cannot arbitrarily select an algorithm
->>> for any key and the algorithm is a property attached to the key
->>> itself. So if you "cast" a blob to an EC key, you would need to select
->>> the algorithm at cast time and the implementation should validate if
->>> the blob actually represents a valid EC key (with all the proper
->>> checks, like if the key is an a big in and is less than the order
->>> group etc).
->>
->> I understand your point; however, I believe that allowing the AF_ALG developer
->> to use a generic data blob (of the appropriate size, of course) as a key is more
->> versatile and allows for easier implementation of future extensions.
->>
->>> With AF_ALG you would need to do this validation for every
->>> crypto operation, which is not very efficient at the very least.
->>
->> I think this might be acceptable if we consider the security we gain compared to
->> using any existing user-space implementation!
-> 
-> I don't think the alternative approach I proposed compromises on
-> security. That is it has the same security level (using a trusted key
-> to do ECDH without exposing it to userspace). Unless I'm missing
-> something?
+On Mon, Sep 15, 2025 at 09:21:58PM +0000, Ashish Kalra wrote:
+> @@ -668,6 +673,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa=
+, enum pg_level level, u32 as
+>  	return -ENODEV;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { retu=
+rn -ENODEV; }
+> +static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool=
+ dump_rmp) {}
+>  static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
 
-Sorry, my bad. I wasn't referring to your suggestion but to any other user-space 
-only KPP (or signature) implementation that doesn't use trusted keys (e.g., 
-OpenSSL, etc.).
+I basically don't even have to build your patch to see that this can't bu=
+ild.
+See below.
 
->>>> Furthermore, AF_ALG allows us to choose which driver actually performs the
->>>> encryption operation!
->>>
->>> This is indeed a limitation of the current keyctl interface, but again
->>> - we probably should not select the algorithm here, but we should
->>> consider extending it so the user can specify a particular crypto
->>> driver/implementation.
->>
->> Furthermore, I think one solution isn't mutually exclusive. So, why not give the
->> developer the freedom to choose which interface to use? ;)
->>
->> Furthermore, there's nothing stopping us from strengthening the current AF_ALG
->> support so that it can also be used well with asymmetric keys.
->>
->>>> In my opinion, keyctl is excellent for managing key generation and access, but
->>>> using AF_ALG for using them isn't entirely wrong even in the case of asymmetric
->>>> keys and, in my opinion, is much more versatile.
->>>>
->>>>> Now, in my opinion, the fundamental problem here is that we want to
->>>>> use trusted keys as asymmetric keys, where currently they are just
->>>>> binary blobs from a kernel perspective (so suitable only for symmetric
->>>>> use). So instead of the AF_ALG extension we need a way to "cast" a
->>>>> trusted key to an asymmetric key and once it is "cast" (or type
->>>>> changed somehow) - we can use the established keyring interfaces both
->>>>> for signatures and KPP.
->>>>
->>>> IMHO the fact that trusted keys are binary blobs is perfect for use with AF_ALG,
->>>> where we can specify different algorithms to operate on. :)
->>>>
->>>> Ciao,
->>>>
->>>> Rodolfo
->>>>
->>>> --
->>>> GNU/Linux Solutions                  e-mail: giometti@enneenne.com
->>>> Linux Device Driver                          giometti@linux.it
->>>> Embedded Systems                     phone:  +39 349 2432127
->>>> UNIX programming
->>
->>
->> --
->> GNU/Linux Solutions                  e-mail: giometti@enneenne.com
->> Linux Device Driver                          giometti@linux.it
->> Embedded Systems                     phone:  +39 349 2432127
->> UNIX programming
+When your patch touches code behind different CONFIG_ items, you must mak=
+e
+sure it builds with both settings of each CONFIG_ item.
 
+In file included from arch/x86/boot/startup/gdt_idt.c:9:
+./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
+leak_pages=E2=80=99
+  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+      |                    ^~~~~~~~~~~~~~
+./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
+snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
+=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
+  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
+}
+      |                    ^~~~~~~~~~~~~~
+make[4]: *** [scripts/Makefile.build:287: arch/x86/boot/startup/gdt_idt.o=
+] Error 1
+make[3]: *** [scripts/Makefile.build:556: arch/x86/boot/startup] Error 2
+make[2]: *** [scripts/Makefile.build:556: arch/x86] Error 2
+make[2]: *** Waiting for unfinished jobs....
+In file included from drivers/iommu/amd/init.c:32:
+./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
+leak_pages=E2=80=99
+  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+      |                    ^~~~~~~~~~~~~~
+./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
+snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
+=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
+  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
+}
+      |                    ^~~~~~~~~~~~~~
+make[5]: *** [scripts/Makefile.build:287: drivers/iommu/amd/init.o] Error=
+ 1
+make[4]: *** [scripts/Makefile.build:556: drivers/iommu/amd] Error 2
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:556: drivers/iommu] Error 2
+make[3]: *** Waiting for unfinished jobs....
+make[2]: *** [scripts/Makefile.build:556: drivers] Error 2
+make[1]: *** [/mnt/kernel/kernel/linux/Makefile:2011: .] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
 
--- 
-GNU/Linux Solutions                  e-mail: giometti@enneenne.com
-Linux Device Driver                          giometti@linux.it
-Embedded Systems                     phone:  +39 349 2432127
-UNIX programming
+--=20
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
