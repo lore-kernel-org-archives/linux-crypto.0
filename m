@@ -1,149 +1,155 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77EA2BE034
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCE4283FD8
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 10:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758016743; cv=none; b=dZ0xaqBF2SNwe8W/KxojarLo50LQqlGSzKEldJfhEY+h1D9ldcMqrVrZfjNNCX/pd/q6ZDeL0F+sluF6wChLPpBFOy8v9mpOO+/pScgqeXm00DWm65ibHIXcweuEnUP85NjAn/sJ6t8e8yQXW6ygWNR2lBBQwyF6v5y1cjqlLsU=
+	t=1758018094; cv=none; b=qaBtOYvagzMKOiXndeWt63VGHL39tC94kXttvOuCyri3nvCfLIQx2gpASe7qNWxGrtZ+idC4ou9jSN/VajIgKEZJQsqDIPT56m9c2cgabsrK1DcioellVkuorjC2m97fSLeyzGre3+4fqdeqQ4b8q5XriesEALo0esrLfbuuXYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758016743; c=relaxed/simple;
-	bh=Qlj3Irf759RURMTstGjX6Hrvn0DetfaZAAndpsTHlfQ=;
+	s=arc-20240116; t=1758018094; c=relaxed/simple;
+	bh=+pHfAIinNV2odKqBFFjt35fFvhndrYbaBa5T8z2tI5k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ud2I4yNvN5FsPmt/WKQGEMqvidRcu9PFcKA1VJQ4wL0LF7GCRbmrrAwqaNBCAptUDpLWa9ccp7c2zAe4sIU5pn7UQ/Jw3kjAJMQOKfniWivqpURq7tMoUd7koxQpfgNFDZPGkzCJx6Ybc+c4T+7epH7EhEwbwBkrURfxsMpneNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4S6RwJSw; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=ChPUKYJynnzICi7M4SpxDBhpKD+/JkCiLLSi2z6xC/h5krNmN7XpJjZ4oHe2toz5CaeG32umJ0Pyh47lIbhIIq0w14hKbZVzd1p7aNEBeb7q7/eyTiD/A7alBYkjHYwlhP+nhmMsjQeqR/zRd1FWKCHmqc4QU9ZyNoATfAj8L/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=NeIIJPvd; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4S6RwJSw"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-776aee67e8dso15346366d6.3
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:59:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="NeIIJPvd"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-55f7b6e4145so5700041e87.1
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 03:21:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758016741; x=1758621541; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ihmf+x196EH8nuZxldOMUKvsTYF5JZyh/dMEPXLM1AA=;
-        b=4S6RwJSw5Z14tJmY+hPq1KbIjSiPtKHi+GAK3GT+Y1IrqiXj7v+GCN/3UuWFIyXXSF
-         IHaDSNajtZgLqF1pCjtUnvParoSsJEuYcsuzIu+NWHwSC3jr9pae/45JedKY6Ezs4mg8
-         bmzow9s7TWDj5Gk8dCGFNhdtddjttLJJ3iI0Z0mYVbGj0uxdLvK+ZK9RFeb0HmjKFcZ4
-         b47uBRYUps4T1Szs0dlhKdbeQvidTZZKH4qQOy4s9W8u7KvpvhNjGEiwzf5fiv2NnLWd
-         /m1dwvj9typEbMzzxrvtkdER+ft67qLGTNvBXexq7CEEOvlEwJHUxQjQ4KKeKpDmPsfm
-         /ffQ==
+        d=cloudflare.com; s=google09082023; t=1758018090; x=1758622890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Re0vwBhFoYzxGBDIw019v96czr5mGdxB5qY8UUQnmFA=;
+        b=NeIIJPvdRwBDzTNRbp5+M8urTZCthFRR/Lwqd/XQ9kRzI7bM2bEyq4NEhcaY+7vuZY
+         nCqersycL14wCUpndQ1T0HSoJMJhWa/rMK8g438jAbQjCrNuPgx/omU+iaP4o90Hqks1
+         tGUQORUyF6gRngUkxFnmufECBSAyO9K1i6DydvBKr7ru6vo4n9C0gMzxZrSjQk8lb+KD
+         yjMEzS1Qy51R8Bc9ouYornlDaoaH7/SufVgDYg13gPAWKpOfAvV6hL93s6f4a37KEV1F
+         8xZqfUTxvH/+7BLeVfb0EBnpl1UQtLZJ9wQ43CCA6Qf7p33924obgvDV5hSzYI+rri4Y
+         rLNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758016741; x=1758621541;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ihmf+x196EH8nuZxldOMUKvsTYF5JZyh/dMEPXLM1AA=;
-        b=lSwk6K0q8LN3cM+O7DcXPn4cKCIM1NQp4TY+YU8qxGm0ssgvuO2GIYZi59nEd95xEE
-         2DwH8xdg5hSXTBKzSMYhZEepM3bGWrwBV0ajF/i7LkqC4Vue/nnewtrWSxJdwgbs/WDk
-         0GLyLwYdlEegpa1TQPzB8TNtfYCErJfHniK3ySevKOIs2OlEENucugN1QVOWtowbpQEk
-         QzaWSWTS7EpyweiKqCqIgRd6NeTwQEGq3xFE5ArfA+xrwlrqo5JPMQkcMcIdvIkRJafj
-         OL8SuDgJaPPzTKPasELxw7FOSV+XTDsdXa5ehLGo5Ax24fWXBdxJBUvBPWpBBqmE6Qu/
-         p7Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCX65hON7/wR9bOONx9SiSltvxjDj4PO/GiR4mBLdsJfzLK2v+WvWHX4uGUgX3pvvf87tJ97vcQ00LtOE70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9CHkFKLSJXberj+ZjMjPkepJ5zi1P+1+gErnmY0ZpBF/f03la
-	Ais4Whtr5Hv1EWk71Yi3W00Q+WoBiYqNP5FrPXmAZOpkJ3b7X6pZd5NYkW2ige2DmjABedIgY0r
-	uMe5YuxuDIbq/U7wMFnRpPM9fHZVg9uOIFADjFA5N
-X-Gm-Gg: ASbGnct3Lv9gkwUpl/Y5DZ8OQy1tOqOu66+F8MniXegPQymffmETaM0GGYrAHhZXUtr
-	oKm06LwYDj0Z9ALhl/19hdBVpp3/2O23yjqytCaqyahdqkG3ySzL8VEeKeRGI6hftJfUVfydaL4
-	5EKio0KgxNNqLe4r6VlAh8aLPRm0GgOW+wNcvZkZkVGCgS1cjPLZaMzAPBVnCfhK5+YcnRWA1ZW
-	ddtpWS6Wmsx8fm/Gz7t87eUAPRJlTCWdIMjB3aW5JQT
-X-Google-Smtp-Source: AGHT+IFwGoXQKXa3T3Q3VSrPol5k75GVxiDe8CoLpO3guc9BwwyrOEWBkMhzdh4JyC+tSurxuiqJK5Hw+XiDhw5FhJ4=
-X-Received: by 2002:ad4:5e8e:0:b0:723:e1c6:8d7 with SMTP id
- 6a1803df08f44-767c5aebad5mr178831206d6.64.1758016740321; Tue, 16 Sep 2025
- 02:59:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758018090; x=1758622890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Re0vwBhFoYzxGBDIw019v96czr5mGdxB5qY8UUQnmFA=;
+        b=qyjRMwez/+aQuvrc/K9mzEaZ5BOoFt8Sj9+0GXFonnx3uhu9VWjfWJ7R1/g1XkLw+z
+         uAHcOpCe7eU2U7fPHqMPSHXIZDfdA2+KgeC7cBVmGWoIkgqiuVqugsGR7t/vd8y4E5Pi
+         OA/W7W2O4Mo1HBotV47wCPSnUM641dzUVAGfpq3sQdBLNb3fHFRmO8tRY/L4wpR+vrAj
+         9gfIF4E+ehIjblBHIF1XfwmVgJqPrZTLKMav3CnduyvirMJ4+PUMpk8WaqGvNXSMerVY
+         I9qC0vcVNN9dY9yEuTwdqkFtBzgYHV3bj5e/ALdTnPuhgwuaffe759wmsrH+AO5owgIv
+         QyyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVY/BWNA1ZRC3AKiVB7mvlKpBm0H3w41hMtae+0vNSxH2NbEtjTbIlusYsEd27H7+yJ1u2pIOXGEmHHY7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLWD/weQvVD1M0lqUOBT3IauEO92UldD26hftgiZPH+Kp6x6kp
+	pmy9UOI1uBGaBr7783KdipLT9KOJz28SWbdpKTLpJSg5Blgs/d7JuaTXIzvCUDKlQPYgKJs5BPa
+	8YTHH+sm3hSHtGF9ok2wVaF9xIRlnE//OUkdPc1RGUQ==
+X-Gm-Gg: ASbGnctzPt12RziNmR7xJpzEzx5k3A9CsSpv2Qbfg38oLulICvP+klukDcxR+JEyYBi
+	oA6h2+DYAdWtrYHEApWUYo4C7BMyRnq812F6GizvSXhH4AEj7B2H5+hWAX0d/wf31DD1hhsKehP
+	fWyapgY2kWgG2PVhGwx5+hGSxwUxyEw2BxIfMltdv2i3NWpCyjrFVM8CdRPhThfnznT85WCz8+L
+	gwtCqe0Ud/u8fFxA0L54Bs=
+X-Google-Smtp-Source: AGHT+IHx4EFlvcoVm7IMS1KvyL2kcDkAM0OviNxHR5HnisZyh1I5tiFqYMpL8ereFr3MwguOvUPsE04E9UaKNDFFdWE=
+X-Received: by 2002:a05:6512:4381:b0:571:ed63:2efa with SMTP id
+ 2adb3069b0e04-571ed63315emr3282580e87.19.1758018090344; Tue, 16 Sep 2025
+ 03:21:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com> <20250916090109.91132-3-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250916090109.91132-3-ethan.w.s.graham@gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Tue, 16 Sep 2025 11:58:23 +0200
-X-Gm-Features: AS18NWDFgZtzDhBG5IKRN3iWsXFMSPZcawD_BvUUYRoHSVWInp6fN2JP63m3d4s
-Message-ID: <CAG_fn=U8Y=WNTNnP35uwQqxmFOnOV7ptdG0i1VjsaYUe3wfRuw@mail.gmail.com>
-Subject: Re: [PATCH v1 02/10] kfuzztest: add user-facing API and data structures
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
-	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
-	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com, 
-	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
-	tarasmadan@google.com
+References: <20250915084039.2848952-1-giometti@enneenne.com>
+ <20250915145059.GC1993@quark> <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
+ <aMjjPV21x2M_Joi1@gondor.apana.org.au> <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
+In-Reply-To: <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Tue, 16 Sep 2025 11:21:19 +0100
+X-Gm-Features: AS18NWAFt1NkpGOxkt8CegfptpF0EMO4UxObNAn5Ipr_oFC3pDr1b8wfuP2uwPo
+Message-ID: <CALrw=nEadhZVifwy-SrFdEcrjrBxufVpTr0BSnnCJOODioE1WA@mail.gmail.com>
+Subject: Re: [V1 0/4] User API for KPP
+To: Rodolfo Giometti <giometti@enneenne.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, 
+	linux-crypto@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
+	keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>, 
+	Lukas Wunner <lukas@wunner.de>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +
-> +/**
-> + * struct reloc_entry - a single pointer to be patched in an input
-> + *
-> + * @region_id: The index of the region in the `reloc_region_array` that
-> + *     contains the pointer.
-> + * @region_offset: The start offset of the pointer inside of the region.
-> + * @value: contains the index of the pointee region, or KFUZZTEST_REGIONID_NULL
-> + *     if the pointer is NULL.
-> + */
-> +struct reloc_entry {
-> +       uint32_t region_id;
-> +       uint32_t region_offset;
-> +       uint32_t value;
-> +};
-> +
-> +/**
-> + * struct reloc_entry - array of relocations required by an input
+On Tue, Sep 16, 2025 at 9:22=E2=80=AFAM Rodolfo Giometti <giometti@enneenne=
+.com> wrote:
+>
+> On 16/09/25 06:10, Herbert Xu wrote:
+> > On Mon, Sep 15, 2025 at 05:47:56PM +0200, Rodolfo Giometti wrote:
+> >>
+> >> The main purpose of using this implementation is to be able to use the
+> >> kernel's trusted keys as private keys. Trusted keys are protected by a=
+ TPM
+> >> or other hardware device, and being able to generate private keys that=
+ can
+> >> only be (de)encapsulated within them is (IMHO) a very useful and secur=
+e
+> >> mechanism for storing a private key.
+> >
+> > If the issue is key management then you should be working with
+> > David Howell on creating an interface that sits on top of the
+> > keyring subsystem.
+> >
+> > The Crypto API doesn't care about keys.
+>
+> No, the problem concerns the use of the Linux keyring (specifically, trus=
+ted
+> keys and other hardware-managed keys) with cryptographic algorithms.
+>
+>  From a security standpoint, AF_ALG and keyctl's trusted keys are a perfe=
+ct
+> match to manage secure encryption and decryption, so why not do the same =
+with
+> KPP operations (or other cryptographic operations)?
 
-Should be `struct reloc_table`.
+I generally find the AF_ALG API ugly to use, but I can see the use
+case for symmetric algorithms, where one needs to encrypt/decrypt a
+large stream in chunks. For asymmetric operations, like signing and
+KPP it doesn't make much sense to go through the socket API. In fact
+we already have an established interface through keyctl(2).
 
-> + *
-> + * @num_entries: the number of pointer relocations.
-> + * @padding_size: the number of padded bytes between the last relocation in
-> + *     entries, and the start of the payload data. This should be at least
-> + *     8 bytes, as it is used for poisoning.
-> + * @entries: array of relocations.
-> + */
-> +struct reloc_table {
-> +       uint32_t num_entries;
-> +       uint32_t padding_size;
-> +       struct reloc_entry entries[];
-> +};
+Now, in my opinion, the fundamental problem here is that we want to
+use trusted keys as asymmetric keys, where currently they are just
+binary blobs from a kernel perspective (so suitable only for symmetric
+use). So instead of the AF_ALG extension we need a way to "cast" a
+trusted key to an asymmetric key and once it is "cast" (or type
+changed somehow) - we can use the established keyring interfaces both
+for signatures and KPP. For example, what if we somehow extend the
+add_key(2)/request_key(2) syscalls to be able to initialise an
+asymmetric key from a trusted key payload instead of providing the
+payload directly via a buffer (similar to how
+ALG_SET_KEY_BY_KEY_SERIAL does it for symmetric keys for socket crypto
+API)?
 
-> +
-> +/**
-> + * KFUZZTEST_EXPECT_EQ - constrain a field to be equal to a value
-> + *
-> + * @arg_type: name of the input structure, without the leading "struct ".
-> + * @field: some field that is comparable
-> + * @val: a value of the same type as @arg_type.@field
-> + */
-> +#define KFUZZTEST_EXPECT_EQ(arg_type, field, val)      \
-> +       __KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_EQ, arg->field == val);
+Ignat
 
-Nit: you don't need a semicolon here (also in similar cases below).
-
-
-> +/**
-> + * KFUZZTEST_EXPECT_GE - constrain a field to be greater than or equal to a value
-> + *
-> + * @arg_type: name of the input structure, without the leading "struct ".
-> + * @field: some field that is comparable.
-> + * @val: a value of the same type as @arg_type.@field.
-> + */
-> +#define KFUZZTEST_EXPECT_GE(arg_type, field, val)      \
-> +       __KFUZZTEST_DEFINE_CONSTRAINT(arg_type, field, val, 0x0, EXPECT_GE, arg->field >= val);
-> +
-> +/**
-> + * KFUZZTEST_EXPECT_GE - constrain a pointer field to be non-NULL
-
-This should be KFUZZTEST_EXPECT_NOT_NULL.
-
-> + *
-> + * @arg_type: name of the input structure, without the leading "struct ".
-> + * @field: some field that is comparable.
-> + * @val: a value of the same type as @arg_type.@field.
-
-Make sure to fix the parameters as well.
+> I know there might be issues with allowing user space to use this interfa=
+ce, but:
+>
+> 1) I think this mechanism can get its best when implemented in hardware, =
+and
+>
+> 2) (hey!) we're developers who know what they're doing! :)
+>
+> This patch series is just a sample of the improvements I'd like to make o=
+n this
+> front. Please tell me if you don't intend to add these mechanisms to the =
+kernel
+> at all, or if I have any chances, so I can decide whether to proceed or s=
+top here.
+>
+> Ciao,
+>
+> Rodolfo
+>
+> --
+> GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+> Linux Device Driver                          giometti@linux.it
+> Embedded Systems                     phone:  +39 349 2432127
+> UNIX programming
