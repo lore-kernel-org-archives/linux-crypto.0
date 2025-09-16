@@ -1,64 +1,64 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0A429B77C
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADADA29B233
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758013293; cv=none; b=nzpMpVB5Zq3NViaPcYzy9Fi1pfxxUQk2rdFGy7FG87UojoAWOv/0Uvf9TAY9inss9pYFqMqkLsSzFIURN0HtXdfY08raNhCWFE5+EJxlFXoZuV7ynKCjYQ0ddMuYYl0bdNXHLSFIrPbeUsC6Reia3rntGfYODetrFxgisG3d/3w=
+	t=1758013293; cv=none; b=PXHijfRN36p4OScUYNTOgy3CUop4XMT1I0YF9fevtC+AyBydjmd0yyzQBvMBGA1Bz+Y8nexC4AHTVR8Pt3rUEF/EYIrhpofc7AyytY4/LC0FwkRe1Tgt9Vv7ZUt/DhggxK8n1AeJlEtmFPqh6DyPyirKdu5AGo+UpBekxtnV8bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758013293; c=relaxed/simple;
-	bh=JJCw6mv16EeG+3BtXxjY/l2oWcIXNWBdkiWvUlFHp88=;
+	bh=b4STATL0Uju972ND8+fFwA9UTCoZh60N0y2XfSf6TNk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b16/3LwzlyjkZGnaSV97V7VuFLHNWJQ9W0yducZ3/1STS5Ptlz27GvuEUnPgVrpyp5V64O8cl8NuAnBzU/EOwJuu0n6uvZ684W0z1frBdDinqdvsB/vx0HUtdlNTswyj/D9Ml8BO+1wrHSXL0+XQIi6I3+f/Cgqm3igRhgTXkZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N58pLXJ6; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version; b=PqPw45jeW7cJnGpLc0ckwgDrnW8U8PAuRBoafAS6VS4B5M9BdTP5d0LOBwLkCi787ljKycls3jyxJQnEBy1czOH2zNDCtTskzrjI5Ds1OcNz3LxFdidFLTU/5GlEzCrJshhSxnfcIC0/jrbfCC28WChZjRVk3gAtQDEtnx/fkMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8IoFben; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N58pLXJ6"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45e03730f83so23923565e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8IoFben"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45de1084868so28103005e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758013288; x=1758618088; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758013290; x=1758618090; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DO9AFhAl9ilu83R9AZsAc7oWiIru4g9kqtmWSFQA0xE=;
-        b=N58pLXJ6T0qHU3h2Zwf7fuXi6gHhTD6H1TRqgoxFYisWjb8hZg+7Mkeg0e4cMlY5FH
-         PZuZo9hYshBC83rNwd0WYy6b+AtaFa9GrHZklM+8cdQXec15oatowoCs9l3MjheAaz9f
-         57sNME+3wnVwYHgcnR3LBfkAoDqGswjRbONRx3c5pYxpKJzOtNKbIUlczKwsi6PSCUZI
-         aCNhd4HaJ8cllZnffPrOQUabKK9AhOq4/Z3YHRHUb+hQu7XdBcLwGIPSHWQALuzEbpli
-         tlcUsUycnugwmAcW47dzMwul7hjxjYim29OQEHK5My0ddYRjfBlmxuzhTSoBbR/hyRGK
-         F07w==
+        bh=54a6vrNAUJqXpuCeRFEgTKA2RP5sTalC0x0PuLBwSM4=;
+        b=U8IoFbenmzVYutBdqet8d9Ceo8HAGhVzkmj3bYsgqUZbOsbCpQgR8SXa36jpm8kmcg
+         vBeBRCjDmwKisWBHwVKafk58CX5FnBKWO2qggwnm5SsPoMdRWHtf8KKgyAKs53Q5HIUA
+         lsLqiLezkGPLY/keh6uhm0MdYECBt3UVpFhHKmJz0FKrEXvuHK5zFOFMCPV1ZtOn96HY
+         Zwu/twwxnaXEyH9gLqlKxRVLSzmACRCuNiLW7q68p9NF4lSB0fH5GHTc1I+1B+s/Mc8M
+         zFDWMy9PHoMbr/zmfj9s5n3nTpDVqCU6rQQ39dLrL03cGWF1GOI5d9e2J2kEYC8qZ8o4
+         PHhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758013288; x=1758618088;
+        d=1e100.net; s=20230601; t=1758013290; x=1758618090;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DO9AFhAl9ilu83R9AZsAc7oWiIru4g9kqtmWSFQA0xE=;
-        b=neTgf2q5NmU5tYclhUqnibqc6hzLw1ZGSROeIIMYBiYFRFuRl3zN/uSjAa2+aK7Yux
-         tKT2oSNUTCKk7dcxpmwYF6hwtPhgJIyKSICJI34WM/id9GwwEj0g89bfZgJZ7z3OXzwf
-         uZiJHmfDhUT9gOY7JUPV9RRE7iIO7pQYr/YnyxsAAyYrJTQF5MwQ3n6vQSuSmMrRVdt5
-         z8LPl7H85VYVprlzMlrc2OGLb7JwoI7qudwZeZtlmN3DBoIA0eRAG6bUmostsAmIzLFK
-         C+6iVr7tG4bpIqkM5OYiWHhCShf5Gw6kfXUFuGma7tLBnfbbam9jD+OhOLtVl0cSazKz
-         16jA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1FSiQVlh2YH4qpqRC7x4TQUwqZikev+AxzSmarawrnDft5MH1lKjFKFCAz5G/7aFDO8+vNMR3cU+BP44=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2RD5CZqVafqgS2Y2TBnNL36moQXuim0UwMLJsHlBzMqylPlNP
-	EPBtgP7HRLYmMm5s64fWB8D1BoC3iBmg4ap1X6rl+nC/gaQ3LugeLpIm
-X-Gm-Gg: ASbGncuJ9q1ih3j2ujZdjZgRtuRD+ml0TOetAkc6vDhIhxeFVGB0nCGAc2pBLvJx2do
-	NkY0zsqw7c3yCEZnxprbIq9qsoRH/kv92DMTNLTfEd6E6EkCh3IUlSCcRCZux0VP993iexIbWz2
-	PsMzZSJGQgcKKThb769iX9lEeTqZGABOEBlBY0M8/WjRWCdJI5N/ofJ1V9wFNAbVZLEZniApX0F
-	uYgw72rD6SB9va25ixbjVDOdKMI4rZmNjLg5sEfxI2qNSkuusL9V0afp8Bj4a62AOjQmJxH8E0d
-	DMpJ/YfCfZK1Y0xDP3UIte5YhC6PU3cdPg4jYLS0Xaj8jwI0Dmm+ubJGkvXUBJ1T4+OS0jQ/PyD
-	U+eSojMMOOcPmNUsnnukNSBMqtKyjLyVMrZ1M7Uhq4dOO87E9lv21XzRp5rlCrhzAcUdC+ojrnl
-	9gez0Y0BU3xsxGzqmPuPLEMsw=
-X-Google-Smtp-Source: AGHT+IGotFF9hMuk2BHhjmZio101NvNZ9u1/TzQ6HKksgBv+fiil5SUdoiHKC9mTRtqP9GooBIX06A==
-X-Received: by 2002:a05:600c:3b87:b0:45f:2cd5:5086 with SMTP id 5b1f17b1804b1-45f2d345de3mr59942395e9.3.1758013288120;
-        Tue, 16 Sep 2025 02:01:28 -0700 (PDT)
+        bh=54a6vrNAUJqXpuCeRFEgTKA2RP5sTalC0x0PuLBwSM4=;
+        b=NM2iAze3PYtnScKEyZp+wefmIhvRo5j5AYQ/pJu/YvGbmbznfw0npwtBYaB58sm9Wx
+         wOmA4EyxUB9q6qTEPC5ADb6jPhzAZpfBmmsJtey2i3W0Msgm3nHeVcxTvzMXgJ8v+OjC
+         N2ya33/vHOP9d7m3jrRrj+fpZJWDbwvHPiGoNEYPnUhS2UN3ebDfT3Ec4Z83T8vVznUN
+         r7puNIuBmoC5NL2+4ha94kgq34VtP90E2zEKeBdoIITnlOC65fJfjysn4htSvXUk+TdX
+         4FRLjsT8pssS01QaK8y+cjuwNkKwvdGI4AohJ6HB8ddPFnFucM3jSwxfjNtWoTbLqaIm
+         TdiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW1luEewAYS2bgk1XXKjpd4IYk232HVyxyZwSEnlJGhN/w3dcasg7JY8VK8Pd+V/4hdgZvDEA8awKNERTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykYCvCnB4TQFHFxI2PLN33l3SOOQYbSGMx0i3qFAuc3emfLgdt
+	UPkgEwwK3s8FZzdDhG6tOEp2n7OI8imwbwM1627hT8si8mW7LevwHTJX
+X-Gm-Gg: ASbGncucTEWpUR61V9rAULqbb/i4Vv9JOyq4cuhgqBUXUngajNyAfEw9QrWh8eqstzO
+	AeeBuQej6RxBpiGlDGGYHoga9NiKW3dTgz2b5pEKphA2+gYx2iKUgv64YQjigfj3iCDzMSpaxwW
+	miyuAV5135HUXz8qLA4VYwfEGBuLROAT8eMV5Q8JVa8NdWS2cA66ulYX6WQ/FwpTzeBg41qs3Kn
+	TBt/1BCk4gGalFbOQAbopVXP938m81DdvOwLBX4xoKsJO+Jz0U0PBlnky2jkIyFmLMFoUUnfjaq
+	3W13oH8NSZDe8cEzvn6jpOV49/RqWuUZhZJej/guFNRMNgigl56IurAkb7j5itr6+FCijiWFNkZ
+	lu9wfAd8UayVR8PLcV7TZ9zyC97mNwAwACiGBNzFYNFzcn9N8O6w0TpCQG/3THbCYWRV5hzq7Zf
+	T3DmKymcX0a3hB
+X-Google-Smtp-Source: AGHT+IGQ/nVkVKJ3q2nqGsYpu+DG+PZAA8Y4Ac4hVZt9d7cPYhzkDVimhmHreOcxPfvEMqJ6F549CQ==
+X-Received: by 2002:a05:600c:4446:b0:45d:f7e4:bf61 with SMTP id 5b1f17b1804b1-45f27ceb2f2mr101342565e9.4.1758013289608;
+        Tue, 16 Sep 2025 02:01:29 -0700 (PDT)
 Received: from xl-nested.c.googlers.com.com (42.16.79.34.bc.googleusercontent.com. [34.79.16.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.27
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 02:01:27 -0700 (PDT)
+        Tue, 16 Sep 2025 02:01:28 -0700 (PDT)
 From: Ethan Graham <ethan.w.s.graham@gmail.com>
 To: ethangraham@google.com,
 	glider@google.com
@@ -86,9 +86,9 @@ Cc: andreyknvl@gmail.com,
 	rmoar@google.com,
 	shuah@kernel.org,
 	tarasmadan@google.com
-Subject: [PATCH v1 08/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
-Date: Tue, 16 Sep 2025 09:01:07 +0000
-Message-ID: <20250916090109.91132-9-ethan.w.s.graham@gmail.com>
+Subject: [PATCH v1 09/10] fs/binfmt_script: add KFuzzTest target for load_script
+Date: Tue, 16 Sep 2025 09:01:08 +0000
+Message-ID: <20250916090109.91132-10-ethan.w.s.graham@gmail.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
 In-Reply-To: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
 References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
@@ -102,34 +102,49 @@ Content-Transfer-Encoding: 8bit
 
 From: Ethan Graham <ethangraham@google.com>
 
-Add a KFuzzTest fuzzer for the parse_xy() function, located in a new
-file under /drivers/auxdisplay/tests.
+Add a KFuzzTest target for the load_script function to serve as a
+real-world example of the framework's usage.
 
-To validate the correctness and effectiveness of this KFuzzTest target,
-a bug was injected into parse_xy() like so:
+The load_script function is responsible for parsing the shebang line
+(`#!`) of script files. This makes it an excellent candidate for
+KFuzzTest, as it involves parsing user-controlled data within the
+binary loading path, which is not directly exposed as a system call.
 
-drivers/auxdisplay/charlcd.c:179
-- s = p;
-+ s = p + 1;
+The provided fuzz target in fs/tests/binfmt_script_kfuzz.c illustrates
+how to fuzz a function that requires more involved setup - here, we only
+let the fuzzer generate input for the `buf` field of struct linux_bprm,
+and manually set the other fields with sensible values inside of the
+FUZZ_TEST body.
 
-Although a simple off-by-one bug, it requires a specific input sequence
-in order to trigger it, thus demonstrating the power of pairing
-KFuzzTest with a coverage-guided fuzzer like syzkaller.
+To demonstrate the effectiveness of the fuzz target, a buffer overflow
+bug was injected in the load_script function like so:
+
+- buf_end = bprm->buf + sizeof(bprm->buf) - 1;
++ buf_end = bprm->buf + sizeof(bprm->buf) + 1;
+
+Which was caught in around 40 seconds by syzkaller simultaneously
+fuzzing four other targets, a realistic use case where targets are
+continuously fuzzed. It also requires that the fuzzer be smart enough to
+generate an input starting with `#!`.
+
+While this bug is shallow, the fact that the bug is caught quickly and
+with minimal additional code can potentially be a source of confidence
+when modifying existing implementations or writing new functions.
 
 Signed-off-by: Ethan Graham <ethangraham@google.com>
 ---
- drivers/auxdisplay/charlcd.c             |  8 ++++++++
- drivers/auxdisplay/tests/charlcd_kfuzz.c | 20 ++++++++++++++++++++
- 2 files changed, 28 insertions(+)
- create mode 100644 drivers/auxdisplay/tests/charlcd_kfuzz.c
+ fs/binfmt_script.c             |  8 ++++++
+ fs/tests/binfmt_script_kfuzz.c | 51 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
+ create mode 100644 fs/tests/binfmt_script_kfuzz.c
 
-diff --git a/drivers/auxdisplay/charlcd.c b/drivers/auxdisplay/charlcd.c
-index 09020bb8ad15..e079b5a9c93c 100644
---- a/drivers/auxdisplay/charlcd.c
-+++ b/drivers/auxdisplay/charlcd.c
-@@ -682,3 +682,11 @@ EXPORT_SYMBOL_GPL(charlcd_unregister);
- 
- MODULE_DESCRIPTION("Character LCD core support");
+diff --git a/fs/binfmt_script.c b/fs/binfmt_script.c
+index 637daf6e4d45..c09f224d6d7e 100644
+--- a/fs/binfmt_script.c
++++ b/fs/binfmt_script.c
+@@ -157,3 +157,11 @@ core_initcall(init_script_binfmt);
+ module_exit(exit_script_binfmt);
+ MODULE_DESCRIPTION("Kernel support for scripts starting with #!");
  MODULE_LICENSE("GPL");
 +
 +/*
@@ -137,33 +152,64 @@ index 09020bb8ad15..e079b5a9c93c 100644
 + * that KFuzzTest targets are built.
 + */
 +#ifdef CONFIG_KFUZZTEST
-+#include "tests/charlcd_kfuzz.c"
++#include "tests/binfmt_script_kfuzz.c"
 +#endif /* CONFIG_KFUZZTEST */
-diff --git a/drivers/auxdisplay/tests/charlcd_kfuzz.c b/drivers/auxdisplay/tests/charlcd_kfuzz.c
+diff --git a/fs/tests/binfmt_script_kfuzz.c b/fs/tests/binfmt_script_kfuzz.c
 new file mode 100644
-index 000000000000..28ce7069c65c
+index 000000000000..9db2fb5a7f66
 --- /dev/null
-+++ b/drivers/auxdisplay/tests/charlcd_kfuzz.c
-@@ -0,0 +1,20 @@
++++ b/fs/tests/binfmt_script_kfuzz.c
+@@ -0,0 +1,51 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * charlcd KFuzzTest target
++ * binfmt_script loader KFuzzTest target
 + *
 + * Copyright 2025 Google LLC
 + */
++#include <linux/binfmts.h>
 +#include <linux/kfuzztest.h>
++#include <linux/slab.h>
++#include <linux/sched/mm.h>
 +
-+struct parse_xy_arg {
-+	const char *s;
++struct load_script_arg {
++	char buf[BINPRM_BUF_SIZE];
 +};
 +
-+FUZZ_TEST(test_parse_xy, struct parse_xy_arg)
++FUZZ_TEST(test_load_script, struct load_script_arg)
 +{
-+	unsigned long x, y;
++	struct linux_binprm bprm = {};
++	char *arg_page;
 +
-+	KFUZZTEST_EXPECT_NOT_NULL(parse_xy_arg, s);
-+	KFUZZTEST_ANNOTATE_STRING(parse_xy_arg, s);
-+	parse_xy(arg->s, &x, &y);
++	arg_page = (char *)get_zeroed_page(GFP_KERNEL);
++	if (!arg_page)
++		return;
++
++	memcpy(bprm.buf, arg->buf, sizeof(bprm.buf));
++	/*
++	 * `load_script` calls remove_arg_zero, which expects argc != 0. A
++	 * static value of 1 is sufficient for fuzzing.
++	 */
++	bprm.argc = 1;
++	bprm.p = (unsigned long)arg_page + PAGE_SIZE;
++	bprm.filename = "fuzz_script";
++	bprm.interp = bprm.filename;
++
++	bprm.mm = mm_alloc();
++	if (!bprm.mm) {
++		free_page((unsigned long)arg_page);
++		return;
++	}
++
++	/*
++	 * Call the target function. We expect it to fail and return an error
++	 * (e.g., at open_exec), which is fine. The goal is to survive the
++	 * initial parsing logic without crashing.
++	 */
++	load_script(&bprm);
++
++	if (bprm.mm)
++		mmput(bprm.mm);
++	free_page((unsigned long)arg_page);
 +}
 -- 
 2.51.0.384.g4c02a37b29-goog
