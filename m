@@ -1,95 +1,159 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8EF27EFFA;
-	Tue, 16 Sep 2025 16:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771F4242D94
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 17:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758038479; cv=none; b=Gn8B2BLMEchgaRS6k/mQOv3jc7gcCfhjPhzvfQLFEXqsDv8JyT47z08cFQB1b86FAAUiX3HFLJ220TpaiLdOHveXdkcnbQod+1H4a+g8tRZ/sMrOvN4f8mlkIS2u6KwNdHpjMYaS6ehTL87NLEoesuM/UF3UJbUdfUoqvPbWv/A=
+	t=1758043233; cv=none; b=KQ1VOCwMDUCs0iGgCiwwYdYCBEM89BJJLWItCIJ6oCB8BHjmmJ3CD1FxR9K/1piNKCfQAXEoU4+/KiR11P3XiBWD9YkjxigDUrk+q2WkSpJwwvuCyCJP4eM6o5ORrccPKTsWt6cNld2mfeDU+8oa6kIPmue945UThD5Q0pBG6VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758038479; c=relaxed/simple;
-	bh=21Krwcpj0+SngOBRLh60xP/UrVLCJttLw4rK8+5Jz2g=;
+	s=arc-20240116; t=1758043233; c=relaxed/simple;
+	bh=WB6icsQf7LMh3VE17/HhbWF8UpBxGnNLJHUUAAOym1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kZDDlMyEfJ34pKLNP+9Fp5VMvRRjx92ycSCSyMcC95/zr9IREOwQyVeDY2QxpHXwtSBU9X/63tePbjQs6GvJ9zAhQRLG987mnBXLhGe9ntP61Cllet+ER0oCg5Y5pet39y4N0FXjkTHV3U6zJVGgWG6fM6BZpfugruUphSJ9+Es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bjEzItVX; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=B2j1IL6zLq1mBqsHUiq9a17XhApyR2i+nWf7jBVRwxcIIe4HU+RON22CmkUnvAIS2iFqSle0QDwe7g8ZjVdkWARzvIALASyNFRYPGDWrOswtgrWkLZyOFZf6SVRirKAiHVFMI69XUVvcHdMD+iLlVTkq7HcDuMSnnR1cD9zrMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GqIhv3Rl; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bjEzItVX"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 88E9B40E01A5;
-	Tue, 16 Sep 2025 16:01:13 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id IK9AvWzGmseb; Tue, 16 Sep 2025 16:01:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1758038463; bh=No517GNEZAwn0tEDWDqJ1SJLHxLK2NW7CPuDfryTxqQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bjEzItVXIpkoGyWsMWLwYpRrE/kVRcqxaszssCcFQBoyMujoqKujYVvZgnjek8wmR
-	 9VeuoMldMJ8vUqF3LQDWIMdH2TZRVOhY0yDUkMGJwqmF/jdYZ5HDn/ng1x7odqS0VQ
-	 9M311y05wmfsYaHMOlEx4FM6H06CEgayjZW0XuhqUV3ja4446Cxmi8GuRefP2/NPlQ
-	 9d0JKIgz5GXqpiPiaCgIIPaqJu8gVQQdeIX3B+EY3O2v57+nahELmyNBguWzys0ij0
-	 DZoBLLq16fJbdv12RRV270lVT8KzcYAawO2Rxx2qCNEjld6nanumUqg3xsT+Y7h6C9
-	 l17q+pY4dJJuOEHxxw/TOl9u1KOgEoMQTCSab3bVOqT5t+B5qRdq63XDxPyHCfOVrH
-	 eSJiNqXcSrdip6yc1biw4SxgFsx7b5JBXTSvZUpz18T7apB9fL49PUF4CpeBe0I0pW
-	 31CIhkOLUWvvIbt/tXmfClNaRZV/fLmajJwgObx9xbML0ft8OUP18JtAv7LNZirhEJ
-	 LY81T7W6QCQkqjVHSBRrFhE6w/CNLAd4sJu+tDuGfJgCNZjasmrOA1DsQIQ2qe9dUj
-	 5Eeh3TnwnBVl4H26N6X3dd5C0TWj6bHbDiYD6cSMKSgsl4Y5tbdG0woXglBYL1lxFg
-	 Mh5sHNvbxymW1TIo1dq4ADzY=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 2F01440E01A3;
-	Tue, 16 Sep 2025 16:00:43 +0000 (UTC)
-Date: Tue, 16 Sep 2025 18:00:36 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, herbert@gondor.apana.org.au, nikunj@amd.com,
-	davem@davemloft.net, aik@amd.com, ardb@kernel.org,
-	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] x86/sev: Add new dump_rmp parameter to
- snp_leak_pages() API
-Message-ID: <20250916160036.GHaMmJpHHIW7RybFXD@fat_crate.local>
-References: <cover.1757969371.git.ashish.kalra@amd.com>
- <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
- <20250916131221.GCaMliNe3NVmOwzHEN@fat_crate.local>
- <45528c22-9fe7-4f7d-97e9-1d58a0415b08@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GqIhv3Rl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758043231; x=1789579231;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WB6icsQf7LMh3VE17/HhbWF8UpBxGnNLJHUUAAOym1o=;
+  b=GqIhv3Rlc9pIn/+WT3PvMmgurII6BzINotYNb7dcMF5hVhdDv/o0HbNH
+   U+bnv8rsbHziEVZrDKfHhyoUsvE765gbjWx+8n2ObSnnWj2Fb6jWVIIyV
+   VIuc5ijC3vv0XLhRA3BR09jZK0RG9GtAnQfomgR3cvUUhYBWJQh46ccXq
+   XhU2vwPz21SpeQfAtXPmTwrqMsMZ/Vo+9/ChA2ouweean2ZYn/knYJqL+
+   QU0bTvy+GWwbfrZhIvDJ/bBtE3qAoHRYbTWldDolimgrTsCq5qj4jyKNg
+   VHcZMbTn1qivdo6v56bXTgogFjHuZJWeIBVWFWImK+7wcnPbVmyXql0Zr
+   Q==;
+X-CSE-ConnectionGUID: uZYNbuznTeurwAGC8Zr1Pw==
+X-CSE-MsgGUID: 4sCC+Pk4Q76MDKcW/Jp8mw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="59378411"
+X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
+   d="scan'208";a="59378411"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 10:20:31 -0700
+X-CSE-ConnectionGUID: dgYQ8fQcSOCUwM1u513I7w==
+X-CSE-MsgGUID: 8NjD0eQtS66lpFsShuRONw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
+   d="scan'208";a="174562665"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 16 Sep 2025 10:20:29 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uyZLu-0000Yh-2P;
+	Tue, 16 Sep 2025 17:20:26 +0000
+Date: Wed, 17 Sep 2025 01:19:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rodolfo Giometti <giometti@enneenne.com>, linux-crypto@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Rodolfo Giometti <giometti@enneenne.com>
+Subject: Re: [V1 1/4] crypto ecdh.h: set key memory region as const
+Message-ID: <202509170134.MOV2jymf-lkp@intel.com>
+References: <20250915084039.2848952-2-giometti@enneenne.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <45528c22-9fe7-4f7d-97e9-1d58a0415b08@amd.com>
+In-Reply-To: <20250915084039.2848952-2-giometti@enneenne.com>
 
-On Tue, Sep 16, 2025 at 08:58:42AM -0500, Tom Lendacky wrote:
-> Did the patch merge correctly? I can't see how it would fail since both
-> the original and new definitions are in separate parts of the #ifdef... It
-> should have failed even before given the way it was changed.
-> 
-> Maybe I'm missing something.
+Hi Rodolfo,
 
-Nah, you're right. Because your patch is moving sev_evict_cache(), I ended up
-resolving it wrong. Sorry for the noise.
+kernel test robot noticed the following build warnings:
 
-Ashish, all patches against tip go ontop of the tip/master branch. Please redo
-your set ontop.
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.17-rc6 next-20250916]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thx.
+url:    https://github.com/intel-lab-lkp/linux/commits/Rodolfo-Giometti/crypto-ecdh-h-set-key-memory-region-as-const/20250915-164558
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250915084039.2848952-2-giometti%40enneenne.com
+patch subject: [V1 1/4] crypto ecdh.h: set key memory region as const
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20250917/202509170134.MOV2jymf-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250917/202509170134.MOV2jymf-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509170134.MOV2jymf-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/crypto/hisilicon/hpre/hpre_crypto.c: In function 'hpre_ecdh_set_secret':
+>> drivers/crypto/hisilicon/hpre/hpre_crypto.c:1430:36: warning: passing argument 1 of 'hpre_key_is_zero' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    1430 |         if (hpre_key_is_zero(params.key, params.key_size)) {
+         |                              ~~~~~~^~~~
+   drivers/crypto/hisilicon/hpre/hpre_crypto.c:1369:36: note: expected 'char *' but argument is of type 'const char *'
+    1369 | static bool hpre_key_is_zero(char *key, unsigned short key_sz)
+         |                              ~~~~~~^~~
+
+
+vim +1430 drivers/crypto/hisilicon/hpre/hpre_crypto.c
+
+1e609f5fb73b6b Hui Tang   2021-05-29  1399  
+05e7b906aa7c86 Meng Yu    2021-03-04  1400  static int hpre_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+05e7b906aa7c86 Meng Yu    2021-03-04  1401  				unsigned int len)
+05e7b906aa7c86 Meng Yu    2021-03-04  1402  {
+05e7b906aa7c86 Meng Yu    2021-03-04  1403  	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+b0ab0797f7ab74 Weili Qian 2023-07-07  1404  	unsigned int sz, sz_shift, curve_sz;
+b94c910afda050 Hui Tang   2021-05-12  1405  	struct device *dev = ctx->dev;
+1e609f5fb73b6b Hui Tang   2021-05-29  1406  	char key[HPRE_ECC_MAX_KSZ];
+05e7b906aa7c86 Meng Yu    2021-03-04  1407  	struct ecdh params;
+05e7b906aa7c86 Meng Yu    2021-03-04  1408  	int ret;
+05e7b906aa7c86 Meng Yu    2021-03-04  1409  
+05e7b906aa7c86 Meng Yu    2021-03-04  1410  	if (crypto_ecdh_decode_key(buf, len, &params) < 0) {
+05e7b906aa7c86 Meng Yu    2021-03-04  1411  		dev_err(dev, "failed to decode ecdh key!\n");
+05e7b906aa7c86 Meng Yu    2021-03-04  1412  		return -EINVAL;
+05e7b906aa7c86 Meng Yu    2021-03-04  1413  	}
+05e7b906aa7c86 Meng Yu    2021-03-04  1414  
+1e609f5fb73b6b Hui Tang   2021-05-29  1415  	/* Use stdrng to generate private key */
+1e609f5fb73b6b Hui Tang   2021-05-29  1416  	if (!params.key || !params.key_size) {
+1e609f5fb73b6b Hui Tang   2021-05-29  1417  		params.key = key;
+b0ab0797f7ab74 Weili Qian 2023-07-07  1418  		curve_sz = hpre_ecdh_get_curvesz(ctx->curve_id);
+b0ab0797f7ab74 Weili Qian 2023-07-07  1419  		if (!curve_sz) {
+b0ab0797f7ab74 Weili Qian 2023-07-07  1420  			dev_err(dev, "Invalid curve size!\n");
+b0ab0797f7ab74 Weili Qian 2023-07-07  1421  			return -EINVAL;
+b0ab0797f7ab74 Weili Qian 2023-07-07  1422  		}
+b0ab0797f7ab74 Weili Qian 2023-07-07  1423  
+b0ab0797f7ab74 Weili Qian 2023-07-07  1424  		params.key_size = curve_sz - 1;
+1e609f5fb73b6b Hui Tang   2021-05-29  1425  		ret = ecdh_gen_privkey(ctx, &params);
+1e609f5fb73b6b Hui Tang   2021-05-29  1426  		if (ret)
+1e609f5fb73b6b Hui Tang   2021-05-29  1427  			return ret;
+1e609f5fb73b6b Hui Tang   2021-05-29  1428  	}
+1e609f5fb73b6b Hui Tang   2021-05-29  1429  
+05e7b906aa7c86 Meng Yu    2021-03-04 @1430  	if (hpre_key_is_zero(params.key, params.key_size)) {
+05e7b906aa7c86 Meng Yu    2021-03-04  1431  		dev_err(dev, "Invalid hpre key!\n");
+05e7b906aa7c86 Meng Yu    2021-03-04  1432  		return -EINVAL;
+05e7b906aa7c86 Meng Yu    2021-03-04  1433  	}
+05e7b906aa7c86 Meng Yu    2021-03-04  1434  
+05e7b906aa7c86 Meng Yu    2021-03-04  1435  	hpre_ecc_clear_ctx(ctx, false, true);
+05e7b906aa7c86 Meng Yu    2021-03-04  1436  
+05e7b906aa7c86 Meng Yu    2021-03-04  1437  	ret = hpre_ecdh_set_param(ctx, &params);
+05e7b906aa7c86 Meng Yu    2021-03-04  1438  	if (ret < 0) {
+05e7b906aa7c86 Meng Yu    2021-03-04  1439  		dev_err(dev, "failed to set hpre param, ret = %d!\n", ret);
+05e7b906aa7c86 Meng Yu    2021-03-04  1440  		return ret;
+05e7b906aa7c86 Meng Yu    2021-03-04  1441  	}
+05e7b906aa7c86 Meng Yu    2021-03-04  1442  
+05e7b906aa7c86 Meng Yu    2021-03-04  1443  	sz = ctx->key_sz;
+05e7b906aa7c86 Meng Yu    2021-03-04  1444  	sz_shift = (sz << 1) + sz - params.key_size;
+05e7b906aa7c86 Meng Yu    2021-03-04  1445  	memcpy(ctx->ecdh.p + sz_shift, params.key, params.key_size);
+05e7b906aa7c86 Meng Yu    2021-03-04  1446  
+05e7b906aa7c86 Meng Yu    2021-03-04  1447  	return 0;
+05e7b906aa7c86 Meng Yu    2021-03-04  1448  }
+05e7b906aa7c86 Meng Yu    2021-03-04  1449  
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
