@@ -1,125 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpcmd02102.aruba.it (smtpcmd02102.aruba.it [62.149.158.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD8E285043;
-	Tue, 16 Sep 2025 08:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C486928C87C
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 08:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.158.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758009616; cv=none; b=BRqvFiYrwi3SVtfoNHOlYE3OtK0JtCtFFWCkclEQCWZAiNp5Ci/bPqeOUAcortwzKwxquDcqITqI+epoP1SljgWKDwzuCZLf8v0y/7FO31l7ja1eO31C/INPKDYRR0kFbSPZP3Z7SglOIy/ilo2vOvUcx6vXRgJt9ecaWB7yFDM=
+	t=1758011158; cv=none; b=QBCL8vEJrfjaCSH4zdixPfqs2ZNBFcfbX91jC3aBxSRXIc406sk5TpVQt5p16289kMINz9+b4AI3H4G2yWimVMdfPMZZOpxbXkvVCILOmTFXGPi6TQ+G7bTo/FWFCgL91Cbczb1KKp9Q9mAA/Aim5zeV4bNXZpMeMbPTd9r1j08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758009616; c=relaxed/simple;
-	bh=sNxIegpyNfQkNQy6ew2+PYZBthlAuOgsuvUHQhkSy/0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TU2csSaUiS3PD0iWdcP7h+WkAUXOsu/v/4S5LiAdkHqPLBAuFZoJC/iyjdiA4vxxJab2AIyGccntqy5Kt7h0g0NKOMFcg090tuVJC84/D/JpHd2sDZdL4YGu71//wsqxsmIIggm5lEqXp8OllH7EP/HdEAsYA8AOX3kbBV41JXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L7F/p4kA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758011158; c=relaxed/simple;
+	bh=0xHfYEY3U6CDYFIi4LYTmBP7CI66AU2qyZG8HO0xiPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N1fx/qBC0+kDK6ptBYM8yV5TX4HQSHahmx0opHQi6IejODJpmtF61R8IfUtR7+6jCxk9/Y0+UsjsTQIFzPXhslCIncPjcK8E8JJAaKhjkLGJrBuF9pE1BqcuSf4lvILr+oKGtuUeiTovjAvI+p/A1X/rIPtLAqQCRW6UkYy3Oho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=UEOv1bMQ; arc=none smtp.client-ip=62.149.158.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L7F/p4kA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF260C4CEEB;
-	Tue, 16 Sep 2025 08:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758009615;
-	bh=sNxIegpyNfQkNQy6ew2+PYZBthlAuOgsuvUHQhkSy/0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L7F/p4kA4VGLF2RSvwxBEHNfRr1ebHow5mDpvYrjjURl4Cdw+Wl7KJJl2Xwe3j+hx
-	 gMMfOtcoR8TcVh7YqAvYtYQq5HoPypG3P02VRaeYC9+sanVowNSW/nbqUZ10ebieII
-	 UkyP9QF8crNvZvVVUaPyobAdDh9GNO5ZkREo/QN4S1yOVt9hfe8/UqzspQFgP5yWwx
-	 WNRdz8L5ODk8XDzfW+do0s7qqJ2AKH+makkaEMxw/fpamRjbRBtKACnHvc/Cl25CAd
-	 aASuFhfHsCObS7cv/D8sePYP70ipQXvKpnOzcq+8VKWj4Rrq2B1R/dyygbYODq1Tfg
-	 cMzQSsqIRpakg==
-Date: Tue, 16 Sep 2025 09:00:10 +0100
-From: Lee Jones <lee@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
-	jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-	linux-integrity@vger.kernel.org, sgarzare@redhat.com
-Subject: Re: [GIT PULL] Immutable branch between MFD, Char and Crypto due for
- the v6.18 merge window
-Message-ID: <20250916080010.GC1637058@google.com>
-References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
- <20250902124205.GL2163762@google.com>
- <20250912213256.GA3062565@ax162>
- <20250916075835.GB1637058@google.com>
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="UEOv1bMQ"
+Received: from [192.168.1.58] ([79.0.204.227])
+	by Aruba SMTP with ESMTPSA
+	id yQxZuEUb3loieyQxZuaXbq; Tue, 16 Sep 2025 10:22:46 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1758010967; bh=0xHfYEY3U6CDYFIi4LYTmBP7CI66AU2qyZG8HO0xiPw=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=UEOv1bMQQ+RImCi2Rb/+bJk9ZjB0GuoVPJw0+CiVNN6D+18hZdgcx+d2rYk1K4DUG
+	 4gqJ8ty3OmEJSeGNwxhtWr0GjiRL+dBEtBJEuvx6j9JBsPuX5wdpLn7bSH3fWHmXt0
+	 LnDlKemDCn80PatL+3SI1mjQmj6MttXj2P17UeA3ZV4Wghe8ocmF51GzSMQ0m2ZPVh
+	 q8Hvre8H/4zI/ZZGF70pk+bV9sn2s+wG9aMsVZd0H58f7xhos2rZ1er5o/cDsTYtV4
+	 IuScrdASIJ38DE+Wb8AK6dNc/ub+RoFMmjdQyeCbsHWTnmNPOs+/7kdVH3+QpJkEaa
+	 LmgC47MyuIVcw==
+Message-ID: <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
+Date: Tue, 16 Sep 2025 10:22:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916075835.GB1637058@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [V1 0/4] User API for KPP
+Content-Language: en-US
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+ David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+ Ignat Korchagin <ignat@cloudflare.com>
+References: <20250915084039.2848952-1-giometti@enneenne.com>
+ <20250915145059.GC1993@quark>
+ <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
+ <aMjjPV21x2M_Joi1@gondor.apana.org.au>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <aMjjPV21x2M_Joi1@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfKtUpiwpljX/5MMPsGZCvOo4KkAe2n3nmZxPezNVocF86QlDDyZiRDpQmr7cW+70dQcSCjrijyyatTlzyCGgWdcEFju9x+W1csd/+8RnPQrPmVsybDqr
+ BVqlQdO8G1qzcZ06zu89XbgqEIq2zOPGMSRYtOxMV5WMKwsd9ddC3Hc5upgPis1Fgr101IrUswaPgJI2PV+CtXT2t6gjZ3GJzBYCpbLOEqKdjJQhgaH48/NZ
+ obfqV1oOj15qiPgWktOakQlv+w0JQ8lSp6KlmVT+SUaoD5ez40syrKDEhkVvWnwQGzsBnEzfsw+91zN03a4/JDRgdUwv7S5pnkPwS3wkWeNzcRXIeT8xDDE3
+ hrEKRkYO2WTBFNdaL1DQF+3Jd15XfQdOLlG4/FJnUgroAzId4b4c1acdeNL7yzx+qzu5gIxx
 
-On Tue, 16 Sep 2025, Lee Jones wrote:
+On 16/09/25 06:10, Herbert Xu wrote:
+> On Mon, Sep 15, 2025 at 05:47:56PM +0200, Rodolfo Giometti wrote:
+>>
+>> The main purpose of using this implementation is to be able to use the
+>> kernel's trusted keys as private keys. Trusted keys are protected by a TPM
+>> or other hardware device, and being able to generate private keys that can
+>> only be (de)encapsulated within them is (IMHO) a very useful and secure
+>> mechanism for storing a private key.
+> 
+> If the issue is key management then you should be working with
+> David Howell on creating an interface that sits on top of the
+> keyring subsystem.
+> 
+> The Crypto API doesn't care about keys.
 
-> On Fri, 12 Sep 2025, Nathan Chancellor wrote:
-> 
-> > Hi Lee,
-> > 
-> > On Tue, Sep 02, 2025 at 01:42:05PM +0100, Lee Jones wrote:
-> > > Enjoy!
-> > > 
-> > > The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
-> > > 
-> > >   Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
-> > > 
-> > > are available in the Git repository at:
-> > > 
-> > >   git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git ib-mfd-char-crypto-v6.18
-> > > 
-> > > for you to fetch changes up to 74fddd5fbab879a7d039d9fb49af923927a64811:
-> > > 
-> > >   MAINTAINERS: Add entry for Loongson Security Engine drivers (2025-09-02 12:29:57 +0100)
-> > > 
-> > > ----------------------------------------------------------------
-> > > Immutable branch between MFD, Char and Crypto due for the v6.18 merge window
-> > > 
-> > > ----------------------------------------------------------------
-> > > Qunqin Zhao (4):
-> > ...
-> > >       tpm: Add a driver for Loongson TPM device
-> > 
-> > This one needs a fix up due to commit 07d8004d6fb9 ("tpm: add bufsiz
-> > parameter in the .send callback") in 6.17-rc1, as I am seeing the
-> > following error in next-20250912.
-> > 
-> >   drivers/char/tpm/tpm_loongson.c:48:17: error: initialization of 'int (*)(struct tpm_chip *, u8 *, size_t,  size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int,  long unsigned int)'} from incompatible pointer type 'int (*)(struct tpm_chip *, u8 *, size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int)'} [-Wincompatible-pointer-types]
-> >      48 |         .send = tpm_loongson_send,
-> >         |                 ^~~~~~~~~~~~~~~~~
-> >   drivers/char/tpm/tpm_loongson.c:48:17: note: (near initialization for 'tpm_loongson_ops.send')
-> >   drivers/char/tpm/tpm_loongson.c:31:12: note: 'tpm_loongson_send' declared here
-> >      31 | static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> >         |            ^~~~~~~~~~~~~~~~~
-> > 
-> > Can you squash it or do you want a separate patch?
-> > 
-> > Cheers,
-> > Nathan
-> > 
-> > diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
-> > index a4ec23639911..9e50250763d1 100644
-> > --- a/drivers/char/tpm/tpm_loongson.c
-> > +++ b/drivers/char/tpm/tpm_loongson.c
-> > @@ -28,7 +28,7 @@ static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
-> >  	return cmd_ret->data_len;
-> >  }
-> >  
-> > -static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> > +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz, size_t count)
-> >  {
-> >  	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> >  	struct tpm_loongson_cmd *cmd = tpm_engine->command;
-> 
-> This will break my local branch.
-> 
-> Any chance of an immutable pull-request for:
-> 
->   07d8004d6fb9 ("tpm: add bufsiz parameter in the .send callback")
+No, the problem concerns the use of the Linux keyring (specifically, trusted 
+keys and other hardware-managed keys) with cryptographic algorithms.
 
-Either that or your proposed change needs to be applied to the tree that
-changed the .send API.
+ From a security standpoint, AF_ALG and keyctl's trusted keys are a perfect 
+match to manage secure encryption and decryption, so why not do the same with 
+KPP operations (or other cryptographic operations)?
+
+I know there might be issues with allowing user space to use this interface, but:
+
+1) I think this mechanism can get its best when implemented in hardware, and
+
+2) (hey!) we're developers who know what they're doing! :)
+
+This patch series is just a sample of the improvements I'd like to make on this 
+front. Please tell me if you don't intend to add these mechanisms to the kernel 
+at all, or if I have any chances, so I can decide whether to proceed or stop here.
+
+Ciao,
+
+Rodolfo
 
 -- 
-Lee Jones [李琼斯]
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
