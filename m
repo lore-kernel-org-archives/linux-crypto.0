@@ -1,136 +1,89 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020242BE020
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 10:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3879A306D37;
+	Tue, 16 Sep 2025 10:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758018130; cv=none; b=FuGSdCIOrKtqb4pVeP1o5hrFo5R/aDNNsAbA1xTchRoemxDrNfn+T1nFfYCVPd148TKmUyKi9JNCedOyTpPvV9+PThKE9b7rezFHFdBVU/TDuPCGqnEWC978j2JgUTPphwpnCNzg/KoRMfJzqJmHyvvhWBpdwsQaPRuMty0i0mg=
+	t=1758018478; cv=none; b=AgoDyABI9NV7/VDiP7Hvs71YJTMdDIb/WwRk8fiDwZM0fHa6Tzh+ZHQOcO6Vf352tHayVF8VZ0jy0uFi4YOAY1IEgnUkPAe2NyexTDdBij1mNU2gMa1ljE8iC6St5C+ON7U6giqQ6qAB2Omf+FM5vETU2kw8nmQctDK/x+sHYDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758018130; c=relaxed/simple;
-	bh=A9w+UJd4v8RhCRa+BhDctAaf9V0sYFUiRfKGTUevroc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GfE7ZBeMdzQPadGh1EzLyvpId/4rkpLPaNGkH/F5MsTi1KW+HjO0GV7whRbu6ktkZ+EcNGw8WAT/GMV2e4XWOBeOfMohABSDQQ44tx2qpw44ta53aWX9Ccc1t3ujjmtYpXl+Zn8Ms1i3c7bJomuhWk4wEjeJpxXmB1MotdCRDvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4xwDrKCQ; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1758018478; c=relaxed/simple;
+	bh=x8864fL2rsCgbtb7BNsJIcvHgIQvCkrr/qraPxd1Ap8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K2yK0aPsQojwbnTS2mJyHEyAxKK+jdObiz94NxnfYSYcMKXLkWyp4OGLdanqSZbCr2dniNJGTC/Dupoj6sq/JVKMKInOyQXl96aX6EzqFSVx6Sn/gTa4qL7wy2nS5FqaKaU0Nuz/CXihdz8SzoxltePCG0SEb5zk01+tLAghGjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MVeI0605; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4xwDrKCQ"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-78defc1a2afso1306396d6.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 03:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758018128; x=1758622928; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8fDdVkJYP6n8rFxsmmwdyCR43GJXYJ4e6lkQY1k5jhI=;
-        b=4xwDrKCQ16W5xgDkZ7lwklnNqKOSoje/r+blQKN70VfjfbRT/ckZAJAaOqEwxJ833X
-         b53KI+SqkWA5KgB7eDCljezBW50xqANoatvd5W+F/qsLVUxKY26Zzz562MXGOVE00j4r
-         510BKdg9IfHXH+FKHU6czPrZmxeFsfjj6c44801s8R1orIiyXvUdIt2gQhgd+66jeIk2
-         qtDvKIB6h+4bAyhKfg2TBIbLCbOc5vlq9NQvSlwZRKFUqNzdhXU3eKH/tceDlg6OrQ6E
-         isRGK0NdjTiVR4KFdfEB8+Q48hbwI9x3uM5qieY1Cm/wYp/+6N85VMgbxaEjCLwRo1Xj
-         ZDDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758018128; x=1758622928;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8fDdVkJYP6n8rFxsmmwdyCR43GJXYJ4e6lkQY1k5jhI=;
-        b=d8RKF50qZj3hsuFig9GV4ED+JhzjinbIXYiuVN//zvBLYIM8yM+MWqd5Jb3edIZq3t
-         SF9Zz7bKVKPi4mpNsVBgeTrjuEvqhc9JRx85ZYiWPr8D38sICSS/XRS6+qhk20kGfkeH
-         0HYs9ZCeqhFc7aG9ooDuMfZHfMB3vLuHtoKKHyELdeFDRgAcr9Um4Ui3Hjh3xP2nO1yg
-         KFo27YnSIoNffzsW1Py+trUSl+tcVuXrjqAxEroTK977YUolTP0+1uUwbRBi9FboruJj
-         jjhOFW0WFn/MUOykVwGD+VO4Eqgw2oiIrzQISNlzP8ezYTfSueYF9v5W5SOGB68P8EJn
-         K9pg==
-X-Forwarded-Encrypted: i=1; AJvYcCXV1rhbDnAYZT0KAikwKhHkE7kuOnctP1LWtvHiKTdxGLrg9FeepGslKZauz1nxl+Vq9tFtVcNgxkPD6oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWzj0dfn/JyObLEDd3Jm0cQ6cNYDj6DBaNxqMU83HSzYSphp4v
-	1sYYcDVKnidrjZLbiLQfY5uiqXG8jeY1LkOPf3dbeJnBwxa8gK+/BdVtAsmrxWqq9sAh8ISebIl
-	e6crh6jO616sLdJEFJpt3yn64CjUx3Ybq66H952uf
-X-Gm-Gg: ASbGnctgAd4xsLZ3jUzaewh6mqdWn8ZvPRbrVuWjvoaZefC3dbViC0C5EhgjoyZxvOf
-	A2RH2PhhM2dh3KB5fJzaRLL6rGHLSwttFvmlsXsNDJThxJneklfgIG087TE31h+O/+HvWifYY5N
-	gDJ3kKYJEu0DkALyWj1Lntwj+k54BXgUxB9qxk/IoU91t0Q5ByqleThyRNNYn8kyi/0qafz3qjE
-	GS/34nr4Qy9xiAIsi8pC9oWaOXeSt4FGy8zLWCS3EhPqS+ReyyShAA=
-X-Google-Smtp-Source: AGHT+IHJjKoQJCCYYuGTfxXsKe91BImRKJTHt9tE43tLxxHwyTxwEt6wyB79lNc8nOP5l+AzdDg7yLv4Nd7/rU5xvGE=
-X-Received: by 2002:a05:6214:1c4d:b0:781:a369:ef8c with SMTP id
- 6a1803df08f44-781a369f19fmr98103496d6.16.1758018127627; Tue, 16 Sep 2025
- 03:22:07 -0700 (PDT)
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MVeI0605"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 93CAB40E00DD;
+	Tue, 16 Sep 2025 10:27:52 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id p8DPS2BkjEHU; Tue, 16 Sep 2025 10:27:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1758018467; bh=MLHBzU/IL0t3K/IxXbjyO41jBmgmXdlDgQyTym/XGog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MVeI06058g7cLyvrIwBTAsJR9wFbryyo0W2kIbuhbcZVrSn6Rmgo1vTneH6Bc2skV
+	 EjCLDhMDcIh1u7PYJUFo5DIH9qcDcrwto4Y0D+onOExPWgDwvYNfyLWpvMShwYDRID
+	 krnbMnij+M3tDEjhVx7wAvt2gofakC0HQeOJmdiEiWk8wFuxbGFMTy78WVBqH0y6BI
+	 RFEEaPHP6uxtEmGhMWDUoSNWOKcFUw6jWoDVX5Aor8TauK44husRAxHa75vrCans6e
+	 YPrXF34SNEvXPENdoG/ZK7TJgBsSWysk2aqcxJBW7FzWsDBrus4xT/WFLOS6WltkXO
+	 9hefSvy5d1BSD5pN68ez4SrRNeCBQYEb+IpBzDjD9l/af05iGNv+nOxqbFg7PAaV1i
+	 +NS3wjysPjXT4p1yCDZ8FUo24h/ghTXRbHgmm2V+KpOrYrHPFP2pGSbnMik36GA2He
+	 KeEs05inLyK5y5Klr5ab1unXh9SE6Rm88q3uSf/HGKhfcWW3UqAOZAmHoUfK0TZcRY
+	 f4e/Bp0fOaMU7AjnUUyCCUFrUh55xZSc97A8EfqUOHFN3Bo47qO/xoxaVZBNRnA6Ss
+	 AqDEAMSSWr9LPMC10ckdkxND++fHwfvnOUHm8m9jYewllH5NSiS1JIGli+68C7Zg1O
+	 gEJngU0XnNn1RO1TiRzxXj5s=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 7430A40E0176;
+	Tue, 16 Sep 2025 10:27:27 +0000 (UTC)
+Date: Tue, 16 Sep 2025 12:27:21 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+	nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
+	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+Message-ID: <20250916102721.GBaMk7iWGfxX1nf3BR@fat_crate.local>
+References: <cover.1757543774.git.ashish.kalra@amd.com>
+ <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+ <20250912155852.GBaMRDPEhr2hbAXavs@fat_crate.local>
+ <aMRnxb68UTzId7zz@google.com>
+ <20250913105528.GAaMVNoJ1_Qwq8cfos@fat_crate.local>
+ <aMje1_nDBX-VWCXZ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com> <20250916090109.91132-4-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250916090109.91132-4-ethan.w.s.graham@gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Tue, 16 Sep 2025 12:21:31 +0200
-X-Gm-Features: AS18NWAvlqXEHGPKEvaBnkig3ksosFgvoGuvVmEMsd87qxp-V32sXYdPaxYq0Tg
-Message-ID: <CAG_fn=U0dOBumngmQQ1cna=SZvbDXjJ8NrVUZyCHY5dzJV4rVg@mail.gmail.com>
-Subject: Re: [PATCH v1 03/10] kfuzztest: implement core module and input processing
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
-	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
-	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com, 
-	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
-	tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aMje1_nDBX-VWCXZ@gondor.apana.org.au>
 
-On Tue, Sep 16, 2025 at 11:01=E2=80=AFAM Ethan Graham
-<ethan.w.s.graham@gmail.com> wrote:
->
-> From: Ethan Graham <ethangraham@google.com>
->
-> Add the core runtime implementation for KFuzzTest. This includes the
-> module initialization, and the logic for receiving and processing
-> user-provided inputs through debugfs.
->
-> On module load, the framework discovers all test targets by iterating
-> over the .kfuzztest_target section, creating a corresponding debugfs
-> directory with a write-only 'input' file for each of them.
->
-> Writing to an 'input' file triggers the main fuzzing sequence:
-> 1. The serialized input is copied from userspace into a kernel buffer.
-> 2. The buffer is parsed to validate the region array and relocation
->    table.
-> 3. Pointers are patched based on the relocation entries, and in KASAN
->    builds the inter-region padding is poisoned.
-> 4. The resulting struct is passed to the user-defined test logic.
->
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
->
-> ---
-> v3:
+On Tue, Sep 16, 2025 at 11:51:51AM +0800, Herbert Xu wrote:
+> You can take those two patches directly with my ack:
+> 
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Nit: these are RFC version numbers, and they will start clashing with
-the non-RFC numbers next time you update this series.
-I suggest changing them to "RFC v3" and "RFC v2" respectively.
+Cool, thanks Herbert.
 
-> +
-> +/**
-> + * kfuzztest_init - initializes the debug filesystem for KFuzzTest
-> + *
-> + * Each registered target in the ".kfuzztest_targets" section gets its o=
-wn
-> + * subdirectory under "/sys/kernel/debug/kfuzztest/<test-name>" containi=
-ng one
-> + * write-only "input" file used for receiving inputs from userspace.
-> + * Furthermore, a directory "/sys/kernel/debug/kfuzztest/_config" is cre=
-ated,
-> + * containing two read-only files "minalign" and "num_targets", that ret=
-urn
-> + * the minimum required region alignment and number of targets respectiv=
-ely.
+-- 
+Regards/Gruss,
+    Boris.
 
-This comment (and some below) is out of sync with the implementation.
-As we've discussed offline, there's probably little value in having
-"/sys/kernel/debug/kfuzztest/_config/num_targets", because that number
-is equal to the number of files in "/sys/kernel/debug/kfuzztest/"
-minus one.
-It just came to my mind that "num_invocations" could be moved to some
-"kfuzztest/_stat" directory, but it can also stay here as long as you
-fix the doc comments.
+https://people.kernel.org/tglx/notes-about-netiquette
