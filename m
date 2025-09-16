@@ -1,64 +1,64 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADADA29B233
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A936C28D8FD
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 09:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758013293; cv=none; b=PXHijfRN36p4OScUYNTOgy3CUop4XMT1I0YF9fevtC+AyBydjmd0yyzQBvMBGA1Bz+Y8nexC4AHTVR8Pt3rUEF/EYIrhpofc7AyytY4/LC0FwkRe1Tgt9Vv7ZUt/DhggxK8n1AeJlEtmFPqh6DyPyirKdu5AGo+UpBekxtnV8bQ=
+	t=1758013294; cv=none; b=b2pjifv6QX4I6bQ/1KZQ2wyVqCYIuohCp3bLvGSnrZJxphrCAjY6Ye0myXzBwu2QNkaFeflo8dvJ10FSGG6HNooQhUA9OVGqeNfeXfnqRomSO9MYSBGrtJFti85c0Qr0k2Hs6cu+hQy/pA/25jFyKwpoWRHJo84/nq7LzKsB84w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758013293; c=relaxed/simple;
-	bh=b4STATL0Uju972ND8+fFwA9UTCoZh60N0y2XfSf6TNk=;
+	s=arc-20240116; t=1758013294; c=relaxed/simple;
+	bh=6CI5ECYgOzpE43PbCnYe1/+C0o9IMjem75bN/KqMWZg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PqPw45jeW7cJnGpLc0ckwgDrnW8U8PAuRBoafAS6VS4B5M9BdTP5d0LOBwLkCi787ljKycls3jyxJQnEBy1czOH2zNDCtTskzrjI5Ds1OcNz3LxFdidFLTU/5GlEzCrJshhSxnfcIC0/jrbfCC28WChZjRVk3gAtQDEtnx/fkMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8IoFben; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=G3/1GCglSRMAEMxm6vaEDUruiw1Rp+gNMc50fmJd7eqUhyRnpchDZn1lc4/nm+hzjYm7zh2blC5GD3si7aib6rpxFh/aXtxp8wh0Y9Px73981m1A2sszCwZS6aIQlHfm8qaR7rEzWQOGlH0iV5Qhdrb/GNTfZpJEIHb0JISEKCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DCOI4cbo; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8IoFben"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45de1084868so28103005e9.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DCOI4cbo"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45dcff2f313so31922695e9.0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 02:01:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758013290; x=1758618090; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758013291; x=1758618091; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=54a6vrNAUJqXpuCeRFEgTKA2RP5sTalC0x0PuLBwSM4=;
-        b=U8IoFbenmzVYutBdqet8d9Ceo8HAGhVzkmj3bYsgqUZbOsbCpQgR8SXa36jpm8kmcg
-         vBeBRCjDmwKisWBHwVKafk58CX5FnBKWO2qggwnm5SsPoMdRWHtf8KKgyAKs53Q5HIUA
-         lsLqiLezkGPLY/keh6uhm0MdYECBt3UVpFhHKmJz0FKrEXvuHK5zFOFMCPV1ZtOn96HY
-         Zwu/twwxnaXEyH9gLqlKxRVLSzmACRCuNiLW7q68p9NF4lSB0fH5GHTc1I+1B+s/Mc8M
-         zFDWMy9PHoMbr/zmfj9s5n3nTpDVqCU6rQQ39dLrL03cGWF1GOI5d9e2J2kEYC8qZ8o4
-         PHhw==
+        bh=Dn/O6EVQArdDsuUvojtCYkGjh1nRaP/fdtC5qzIrIQ0=;
+        b=DCOI4cbo/4dqlsBIGjesWJZY9p5aqtD4gz7dlrnFKUlmt1u94XWYNzin65Akh6UTgk
+         OxDaH+noI3H3IrIS9W0Ju5qG+ZUPYQtHvWJ7ADq9ikuOuven6K4bWwkNeWRdIeIWENsP
+         uJhzvmKFLx0R3hNyd7Fh7lbOss24ki6IvKt8sleaIdxnpV0X1VqLtbKMwKK4t3T/8q1k
+         HXFAMiQzkRBIiesslCyGmYIfRMcXH+H4PtqIgkEvLi7tfg6oIK90zs8AMIDnT2MiBniI
+         3BqqAAbsSEb6syCjhs7PdA5o0fgOufW6bdhTyFE3sPtCEPXJPsRojysUuzA+dEPsRDss
+         EqPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758013290; x=1758618090;
+        d=1e100.net; s=20230601; t=1758013291; x=1758618091;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=54a6vrNAUJqXpuCeRFEgTKA2RP5sTalC0x0PuLBwSM4=;
-        b=NM2iAze3PYtnScKEyZp+wefmIhvRo5j5AYQ/pJu/YvGbmbznfw0npwtBYaB58sm9Wx
-         wOmA4EyxUB9q6qTEPC5ADb6jPhzAZpfBmmsJtey2i3W0Msgm3nHeVcxTvzMXgJ8v+OjC
-         N2ya33/vHOP9d7m3jrRrj+fpZJWDbwvHPiGoNEYPnUhS2UN3ebDfT3Ec4Z83T8vVznUN
-         r7puNIuBmoC5NL2+4ha94kgq34VtP90E2zEKeBdoIITnlOC65fJfjysn4htSvXUk+TdX
-         4FRLjsT8pssS01QaK8y+cjuwNkKwvdGI4AohJ6HB8ddPFnFucM3jSwxfjNtWoTbLqaIm
-         TdiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1luEewAYS2bgk1XXKjpd4IYk232HVyxyZwSEnlJGhN/w3dcasg7JY8VK8Pd+V/4hdgZvDEA8awKNERTA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykYCvCnB4TQFHFxI2PLN33l3SOOQYbSGMx0i3qFAuc3emfLgdt
-	UPkgEwwK3s8FZzdDhG6tOEp2n7OI8imwbwM1627hT8si8mW7LevwHTJX
-X-Gm-Gg: ASbGncucTEWpUR61V9rAULqbb/i4Vv9JOyq4cuhgqBUXUngajNyAfEw9QrWh8eqstzO
-	AeeBuQej6RxBpiGlDGGYHoga9NiKW3dTgz2b5pEKphA2+gYx2iKUgv64YQjigfj3iCDzMSpaxwW
-	miyuAV5135HUXz8qLA4VYwfEGBuLROAT8eMV5Q8JVa8NdWS2cA66ulYX6WQ/FwpTzeBg41qs3Kn
-	TBt/1BCk4gGalFbOQAbopVXP938m81DdvOwLBX4xoKsJO+Jz0U0PBlnky2jkIyFmLMFoUUnfjaq
-	3W13oH8NSZDe8cEzvn6jpOV49/RqWuUZhZJej/guFNRMNgigl56IurAkb7j5itr6+FCijiWFNkZ
-	lu9wfAd8UayVR8PLcV7TZ9zyC97mNwAwACiGBNzFYNFzcn9N8O6w0TpCQG/3THbCYWRV5hzq7Zf
-	T3DmKymcX0a3hB
-X-Google-Smtp-Source: AGHT+IGQ/nVkVKJ3q2nqGsYpu+DG+PZAA8Y4Ac4hVZt9d7cPYhzkDVimhmHreOcxPfvEMqJ6F549CQ==
-X-Received: by 2002:a05:600c:4446:b0:45d:f7e4:bf61 with SMTP id 5b1f17b1804b1-45f27ceb2f2mr101342565e9.4.1758013289608;
-        Tue, 16 Sep 2025 02:01:29 -0700 (PDT)
+        bh=Dn/O6EVQArdDsuUvojtCYkGjh1nRaP/fdtC5qzIrIQ0=;
+        b=gJHjb9Gcl9O1eGxT6Wp6FQs1ZbHEQIkGeo/nNk+Ahg3qC+2UUlisURo2SxRS9Ui0tj
+         b2zuw/M+wqj/LIG2OSnCqD5edDAOp7NLXa9Vg3lF7HanFydGCzpBFRxNdo3aC7hM1OJb
+         fS0yhqPC0ABHIqQt0WhtR4WuOgts0NFTPFvUWKY3AaLFwq+csDHlf4nuGW3ItRcdaaNr
+         RXiw+fghuF5cfvgxuct91HcHERHDMqM3Nar5Slho1vQTGTVCMwSazxNb0Zje+Ox6zMSC
+         hBLDq1vdRj7uk1yxphyIfcWaBCYuMaRuOcFbHFqBBuJ5ms5dSf0LjxVSqIjAdlQhPXyt
+         j44w==
+X-Forwarded-Encrypted: i=1; AJvYcCWKBBrewnZNMDIBqa1aen8WwKUyUYp5yIzViAPz2f7KdqSi7GGoiZ9KLIxpNnYHekrwbSFSBQm+UNZC7sk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP/pdTps1ft2XuTHG2xV9+V6fjioUW4JxsDG74cx3kMC3IxyLm
+	Pn1ZAtYV2vOywbqTleKJNDt9JX+zy9r3IQtJK9i6VIFd3RtsbnopqINM
+X-Gm-Gg: ASbGncsgPcWaB1edWF+2+BpB5ymlPgLY/Xaidt3UaIePZVMHcqtjxXSevv1P7de2gW5
+	l6ZC/QIOumAw/YXy4KygzCKU/Jv9Av95+Ek+lKvUU51U5XSWt8g0OwuaURUP/RW8jprc85Jqzhn
+	RfLAJ+H66c9lXAEkcpzTEL8WWe6xXDBKxCHO+J7R+1b0SFa1Z6fJC0BUNnjw4klSmGA1inD4PKb
+	Kl6r95QdkI5P7auPfQ2hTekL/VsoB9GW/q3r4K9ZUI8xVe9sPCob2etMiFf2B/weXww48g/4SAQ
+	WcBbM9ahAdWhxdNSH5pWPfE44RYShIJ2nYcmq2ED0+GdU80MipFfRwPaGrCfBcZBBLQiYym9wyr
+	E7ly+0FlewtgJ0/e+fUjoHm/imIlwjgk9mmq0FLcCWsCb1qGdNsedBFBkNOEgwQSh/oL+5ZVYhv
+	Xgll1hu0/JnOZ+
+X-Google-Smtp-Source: AGHT+IHITqnIEWy8SR8VOuG/NaO5QPHcpXy3zWJ0Y1P3XtsNJD2TrXAHW1mpeJ/+27n2bIwqaq7a+A==
+X-Received: by 2002:a05:600c:a0b:b0:45b:74fc:d6ec with SMTP id 5b1f17b1804b1-45f211ca9dbmr161791435e9.8.1758013290736;
+        Tue, 16 Sep 2025 02:01:30 -0700 (PDT)
 Received: from xl-nested.c.googlers.com.com (42.16.79.34.bc.googleusercontent.com. [34.79.16.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm212975035e9.5.2025.09.16.02.01.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 02:01:28 -0700 (PDT)
+        Tue, 16 Sep 2025 02:01:29 -0700 (PDT)
 From: Ethan Graham <ethan.w.s.graham@gmail.com>
 To: ethangraham@google.com,
 	glider@google.com
@@ -86,9 +86,9 @@ Cc: andreyknvl@gmail.com,
 	rmoar@google.com,
 	shuah@kernel.org,
 	tarasmadan@google.com
-Subject: [PATCH v1 09/10] fs/binfmt_script: add KFuzzTest target for load_script
-Date: Tue, 16 Sep 2025 09:01:08 +0000
-Message-ID: <20250916090109.91132-10-ethan.w.s.graham@gmail.com>
+Subject: [PATCH v1 10/10] MAINTAINERS: add maintainer information for KFuzzTest
+Date: Tue, 16 Sep 2025 09:01:09 +0000
+Message-ID: <20250916090109.91132-11-ethan.w.s.graham@gmail.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
 In-Reply-To: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
 References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com>
@@ -102,115 +102,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Ethan Graham <ethangraham@google.com>
 
-Add a KFuzzTest target for the load_script function to serve as a
-real-world example of the framework's usage.
-
-The load_script function is responsible for parsing the shebang line
-(`#!`) of script files. This makes it an excellent candidate for
-KFuzzTest, as it involves parsing user-controlled data within the
-binary loading path, which is not directly exposed as a system call.
-
-The provided fuzz target in fs/tests/binfmt_script_kfuzz.c illustrates
-how to fuzz a function that requires more involved setup - here, we only
-let the fuzzer generate input for the `buf` field of struct linux_bprm,
-and manually set the other fields with sensible values inside of the
-FUZZ_TEST body.
-
-To demonstrate the effectiveness of the fuzz target, a buffer overflow
-bug was injected in the load_script function like so:
-
-- buf_end = bprm->buf + sizeof(bprm->buf) - 1;
-+ buf_end = bprm->buf + sizeof(bprm->buf) + 1;
-
-Which was caught in around 40 seconds by syzkaller simultaneously
-fuzzing four other targets, a realistic use case where targets are
-continuously fuzzed. It also requires that the fuzzer be smart enough to
-generate an input starting with `#!`.
-
-While this bug is shallow, the fact that the bug is caught quickly and
-with minimal additional code can potentially be a source of confidence
-when modifying existing implementations or writing new functions.
-
-Signed-off-by: Ethan Graham <ethangraham@google.com>
+Add myself as maintainer and Alexander Potapenko as reviewer for
+KFuzzTest.
 ---
- fs/binfmt_script.c             |  8 ++++++
- fs/tests/binfmt_script_kfuzz.c | 51 ++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
- create mode 100644 fs/tests/binfmt_script_kfuzz.c
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/binfmt_script.c b/fs/binfmt_script.c
-index 637daf6e4d45..c09f224d6d7e 100644
---- a/fs/binfmt_script.c
-+++ b/fs/binfmt_script.c
-@@ -157,3 +157,11 @@ core_initcall(init_script_binfmt);
- module_exit(exit_script_binfmt);
- MODULE_DESCRIPTION("Kernel support for scripts starting with #!");
- MODULE_LICENSE("GPL");
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6dcfbd11efef..14972e3e9d6a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13641,6 +13641,14 @@ F:	include/linux/kfifo.h
+ F:	lib/kfifo.c
+ F:	samples/kfifo/
+ 
++KFUZZTEST
++M:  Ethan Graham <ethan.w.s.graham@gmail.com>
++R:  Alexander Potapenko <glider@google.com>
++F:  include/linux/kfuzztest.h
++F:  lib/kfuzztest/
++F:  Documentation/dev-tools/kfuzztest.rst
++F:  tools/kfuzztest-bridge/
 +
-+/*
-+ * When CONFIG_KFUZZTEST is enabled, we include this _kfuzz.c file to ensure
-+ * that KFuzzTest targets are built.
-+ */
-+#ifdef CONFIG_KFUZZTEST
-+#include "tests/binfmt_script_kfuzz.c"
-+#endif /* CONFIG_KFUZZTEST */
-diff --git a/fs/tests/binfmt_script_kfuzz.c b/fs/tests/binfmt_script_kfuzz.c
-new file mode 100644
-index 000000000000..9db2fb5a7f66
---- /dev/null
-+++ b/fs/tests/binfmt_script_kfuzz.c
-@@ -0,0 +1,51 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * binfmt_script loader KFuzzTest target
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+#include <linux/binfmts.h>
-+#include <linux/kfuzztest.h>
-+#include <linux/slab.h>
-+#include <linux/sched/mm.h>
-+
-+struct load_script_arg {
-+	char buf[BINPRM_BUF_SIZE];
-+};
-+
-+FUZZ_TEST(test_load_script, struct load_script_arg)
-+{
-+	struct linux_binprm bprm = {};
-+	char *arg_page;
-+
-+	arg_page = (char *)get_zeroed_page(GFP_KERNEL);
-+	if (!arg_page)
-+		return;
-+
-+	memcpy(bprm.buf, arg->buf, sizeof(bprm.buf));
-+	/*
-+	 * `load_script` calls remove_arg_zero, which expects argc != 0. A
-+	 * static value of 1 is sufficient for fuzzing.
-+	 */
-+	bprm.argc = 1;
-+	bprm.p = (unsigned long)arg_page + PAGE_SIZE;
-+	bprm.filename = "fuzz_script";
-+	bprm.interp = bprm.filename;
-+
-+	bprm.mm = mm_alloc();
-+	if (!bprm.mm) {
-+		free_page((unsigned long)arg_page);
-+		return;
-+	}
-+
-+	/*
-+	 * Call the target function. We expect it to fail and return an error
-+	 * (e.g., at open_exec), which is fine. The goal is to survive the
-+	 * initial parsing logic without crashing.
-+	 */
-+	load_script(&bprm);
-+
-+	if (bprm.mm)
-+		mmput(bprm.mm);
-+	free_page((unsigned long)arg_page);
-+}
+ KGDB / KDB /debug_core
+ M:	Jason Wessel <jason.wessel@windriver.com>
+ M:	Daniel Thompson <danielt@kernel.org>
 -- 
 2.51.0.384.g4c02a37b29-goog
 
