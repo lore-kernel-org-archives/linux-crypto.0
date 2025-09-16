@@ -1,89 +1,246 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3879A306D37;
-	Tue, 16 Sep 2025 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFDA2E92AD
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 10:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758018478; cv=none; b=AgoDyABI9NV7/VDiP7Hvs71YJTMdDIb/WwRk8fiDwZM0fHa6Tzh+ZHQOcO6Vf352tHayVF8VZ0jy0uFi4YOAY1IEgnUkPAe2NyexTDdBij1mNU2gMa1ljE8iC6St5C+ON7U6giqQ6qAB2Omf+FM5vETU2kw8nmQctDK/x+sHYDE=
+	t=1758018544; cv=none; b=s4udrTargjm7yiBnZR/0n4W+bBeL7HjRJALOs6PmD7GrA1MZcWKTP0Ia30dzgQ4JJCZuIiXQ1bLBXqpgLuBWgRCaFI+DgkWoVZynGDfRNagxuiA+Xswmh8TtdV6hd2nKl9GHC18BfrVumiUaPEk6vE79c07OGeLQGdPz2F4rT1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758018478; c=relaxed/simple;
-	bh=x8864fL2rsCgbtb7BNsJIcvHgIQvCkrr/qraPxd1Ap8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K2yK0aPsQojwbnTS2mJyHEyAxKK+jdObiz94NxnfYSYcMKXLkWyp4OGLdanqSZbCr2dniNJGTC/Dupoj6sq/JVKMKInOyQXl96aX6EzqFSVx6Sn/gTa4qL7wy2nS5FqaKaU0Nuz/CXihdz8SzoxltePCG0SEb5zk01+tLAghGjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MVeI0605; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1758018544; c=relaxed/simple;
+	bh=opvFEoK+yhT06tMtzvT5H7W0k423QZI/iRxryZ2dzM4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a2HRlepsYRxv+thW8+xgE1eB0xQjAXjGcHnURQwFQC22JbdUEd54h/dbjEQVSmiJXgnZRA3aDtteg/rlKcjawhp3ENksArC1poo8oOTQ66+9wLorRwO0VM0bmMbAW3lcp0t/O92JlnJNVpx0mBPJBeNABqjw3EXi2tSWDThXWDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=C189w8pJ; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MVeI0605"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 93CAB40E00DD;
-	Tue, 16 Sep 2025 10:27:52 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id p8DPS2BkjEHU; Tue, 16 Sep 2025 10:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1758018467; bh=MLHBzU/IL0t3K/IxXbjyO41jBmgmXdlDgQyTym/XGog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MVeI06058g7cLyvrIwBTAsJR9wFbryyo0W2kIbuhbcZVrSn6Rmgo1vTneH6Bc2skV
-	 EjCLDhMDcIh1u7PYJUFo5DIH9qcDcrwto4Y0D+onOExPWgDwvYNfyLWpvMShwYDRID
-	 krnbMnij+M3tDEjhVx7wAvt2gofakC0HQeOJmdiEiWk8wFuxbGFMTy78WVBqH0y6BI
-	 RFEEaPHP6uxtEmGhMWDUoSNWOKcFUw6jWoDVX5Aor8TauK44husRAxHa75vrCans6e
-	 YPrXF34SNEvXPENdoG/ZK7TJgBsSWysk2aqcxJBW7FzWsDBrus4xT/WFLOS6WltkXO
-	 9hefSvy5d1BSD5pN68ez4SrRNeCBQYEb+IpBzDjD9l/af05iGNv+nOxqbFg7PAaV1i
-	 +NS3wjysPjXT4p1yCDZ8FUo24h/ghTXRbHgmm2V+KpOrYrHPFP2pGSbnMik36GA2He
-	 KeEs05inLyK5y5Klr5ab1unXh9SE6Rm88q3uSf/HGKhfcWW3UqAOZAmHoUfK0TZcRY
-	 f4e/Bp0fOaMU7AjnUUyCCUFrUh55xZSc97A8EfqUOHFN3Bo47qO/xoxaVZBNRnA6Ss
-	 AqDEAMSSWr9LPMC10ckdkxND++fHwfvnOUHm8m9jYewllH5NSiS1JIGli+68C7Zg1O
-	 gEJngU0XnNn1RO1TiRzxXj5s=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 7430A40E0176;
-	Tue, 16 Sep 2025 10:27:27 +0000 (UTC)
-Date: Tue, 16 Sep 2025 12:27:21 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
-	nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org,
-	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
- snp_leak_pages() API
-Message-ID: <20250916102721.GBaMk7iWGfxX1nf3BR@fat_crate.local>
-References: <cover.1757543774.git.ashish.kalra@amd.com>
- <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
- <20250912155852.GBaMRDPEhr2hbAXavs@fat_crate.local>
- <aMRnxb68UTzId7zz@google.com>
- <20250913105528.GAaMVNoJ1_Qwq8cfos@fat_crate.local>
- <aMje1_nDBX-VWCXZ@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="C189w8pJ"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-82946485d12so208694885a.2
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 03:29:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1758018541; x=1758623341; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dVtnxKhUzhBsXhVoc6XgCECsqL2+mal6aWmAQ944WSU=;
+        b=C189w8pJa5ZTWDTEvj78eWKWh4DakDFeiVEpEHnQidSAH3byQTkIOVLxCs20sE7dik
+         vvLHVVOe4B7TTOBrX77qavvGh4Q6LD8Vmv0GI06iouRK/0Ux28qbECagobtk+STy2PEs
+         9K1nla5HiB6tyTGj6TbOnczLJdZbXKdldzFXbYBbuOb3xiHYAcpIY/FMzkruq/tV2MNL
+         COM3ZZ5uAJYXP1aoEJxHZe4xmAaq5Vdg2HHiLJUdDlJSsM1JgyrmyWHZGvaibt1wPc/W
+         Avz0RkC6bOdEaqXHm5VxdQn7k8VQ/OGIT6G5fo5cWPxKvQrm5FCc9MUj8VrZSS4KcAkj
+         G8Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758018541; x=1758623341;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dVtnxKhUzhBsXhVoc6XgCECsqL2+mal6aWmAQ944WSU=;
+        b=Nk9ZAoJLG7o/LPXnxBSpfDBGDcO6h1PsmzatK86nfrSfewyEb6FqGYQHdtXYY8p0Zg
+         cKrAty7Q8hA7L2AoBZRl9n1o2y0twq10KQMGn8+OivV/r6bLfV6d8nqrRcPZsWR1+WLR
+         IQYC8vuVpQo9FJ+m0YVs9l7x+LS293q/Yg241as6btXqOZEOQkVbqPxs14cNmcDS1atc
+         fPP1PHsgDskI0oroNTlsA+3/yPxWN96YXBG2UWFSPQ5UzH4pBC9SQ2La1B3jMgH7mTR3
+         /lQnjZKUb4kvl+Wz8HRWAAC4MovzCGCTJrem+Tm/QOc5dj1waNkCOGUnQ9pDEWPqZOAY
+         cK8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUkje5qkzejLZNoJ6Eb5Kmoa2DhHI00JuUlpM7+a1q1JboAuLX5ZHNC0OXqqb6Yw+ga7NJMD67D4RT6olE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaLdqUsuiv3Qdf5nG+gBTCLH5ElzeJKvLwHOeLpBGdvrlCD/QU
+	W+g3lwnYBO6PwpKAEl9LJTJ8k0IJCzLljdoA1coSxuTVo0VhjE2SY6Tz/IaoPTTO9CNWcrrW6j3
+	jwMueendKz6SGbIMhR4CgcUANXf0hIbU+KW/5xqSIhw==
+X-Gm-Gg: ASbGnctkwUxR5jEgjbQnDWRE3QPgJ92BaQCKIK9tUtBRfdeuL7SAsmHCYCOeLiuw8Lj
+	F0ya5jNsD4oa0vXYAEH7fKJkI3DZtICjt+dVB/MmesquNu7MpI7hRWtvRQsGzhAs9AdniDSEEQr
+	BMzPMR8j4+xdTN1r6o7KLOjRXaG42foVbsYGG2xKBC1XQU6MY8KapYCcuOqP6dlGUh3XxJmsTQh
+	m4YJeVkgxW1e6qajbXzkAg=
+X-Google-Smtp-Source: AGHT+IFxa/mHkO7l1jsYGXV11do5FbykxlkVIrkhepiY3N/e2eXzxLE7+I2R4McxIU568VBCzMXFRrIxTXk2KTMaFf8=
+X-Received: by 2002:a05:620a:4107:b0:802:78a5:a86f with SMTP id
+ af79cd13be357-824047c8dd0mr1779923485a.79.1758018540609; Tue, 16 Sep 2025
+ 03:29:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aMje1_nDBX-VWCXZ@gondor.apana.org.au>
+References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com> <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Tue, 16 Sep 2025 11:28:47 +0100
+X-Gm-Features: AS18NWCkhNpkebAoSzpi6YfP7wdFTOupUdzVBrFWuQqh8FgNjyJdBm5a2YlrxX8
+Message-ID: <CALrw=nE9jYhHZnix8RV9UHApOZaF7otRLPHn3cmvOPaqQLzrnw@mail.gmail.com>
+Subject: Re: [PATCH v1 07/10] crypto: implement KFuzzTest targets for PKCS7
+ and RSA parsing
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
+	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
+	dvyukov@google.com, elver@google.com, herbert@gondor.apana.org.au, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
+	tarasmadan@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 11:51:51AM +0800, Herbert Xu wrote:
-> You can take those two patches directly with my ack:
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Tue, Sep 16, 2025 at 10:01=E2=80=AFAM Ethan Graham
+<ethan.w.s.graham@gmail.com> wrote:
+>
+> From: Ethan Graham <ethangraham@google.com>
+>
+> Add KFuzzTest targets for pkcs7_parse_message, rsa_parse_pub_key, and
+> rsa_parse_priv_key to serve as real-world examples of how the framework
+> is used.
+>
+> These functions are ideal candidates for KFuzzTest as they perform
+> complex parsing of user-controlled data but are not directly exposed at
+> the syscall boundary. This makes them difficult to exercise with
+> traditional fuzzing tools and showcases the primary strength of the
+> KFuzzTest framework: providing an interface to fuzz internal functions.
+>
+> To validate the effectiveness of the framework on these new targets, we
+> injected two artificial bugs and let syzkaller fuzz the targets in an
+> attempt to catch them.
+>
+> The first of these was calling the asn1 decoder with an incorrect input
+> from pkcs7_parse_message, like so:
+>
+> - ret =3D asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen);
+> + ret =3D asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen + 1);
+>
+> The second was bug deeper inside of asn1_ber_decoder itself, like so:
+>
+> - for (len =3D 0; n > 0; n--)
+> + for (len =3D 0; n >=3D 0; n--)
+>
+> syzkaller was able to trigger these bugs, and the associated KASAN
+> slab-out-of-bounds reports, within seconds.
+>
+> The targets are defined within /lib/tests, alongside existing KUnit
+> tests.
+>
+> Signed-off-by: Ethan Graham <ethangraham@google.com>
 
-Cool, thanks Herbert.
+Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> ---
+> v3:
+> - Change the fuzz target build to depend on CONFIG_KFUZZTEST=3Dy,
+>   eliminating the need for a separate config option for each individual
+>   file as suggested by Ignat Korchagin.
+> - Remove KFUZZTEST_EXPECT_LE on the length of the `key` field inside of
+>   the fuzz targets. A maximum length is now set inside of the core input
+>   parsing logic.
+> v2:
+> - Move KFuzzTest targets outside of the source files into dedicated
+>   _kfuzz.c files under /crypto/asymmetric_keys/tests/ as suggested by
+>   Ignat Korchagin and Eric Biggers.
+> ---
+> ---
+>  crypto/asymmetric_keys/Makefile               |  2 +
+>  crypto/asymmetric_keys/tests/Makefile         |  2 +
+>  crypto/asymmetric_keys/tests/pkcs7_kfuzz.c    | 22 +++++++++++
+>  .../asymmetric_keys/tests/rsa_helper_kfuzz.c  | 38 +++++++++++++++++++
+>  4 files changed, 64 insertions(+)
+>  create mode 100644 crypto/asymmetric_keys/tests/Makefile
+>  create mode 100644 crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
+>  create mode 100644 crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
+>
+> diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Mak=
+efile
+> index bc65d3b98dcb..77b825aee6b2 100644
+> --- a/crypto/asymmetric_keys/Makefile
+> +++ b/crypto/asymmetric_keys/Makefile
+> @@ -67,6 +67,8 @@ obj-$(CONFIG_PKCS7_TEST_KEY) +=3D pkcs7_test_key.o
+>  pkcs7_test_key-y :=3D \
+>         pkcs7_key_type.o
+>
+> +obj-y +=3D tests/
+> +
+>  #
+>  # Signed PE binary-wrapped key handling
+>  #
+> diff --git a/crypto/asymmetric_keys/tests/Makefile b/crypto/asymmetric_ke=
+ys/tests/Makefile
+> new file mode 100644
+> index 000000000000..4ffe0bbe9530
+> --- /dev/null
+> +++ b/crypto/asymmetric_keys/tests/Makefile
+> @@ -0,0 +1,2 @@
+> +obj-$(CONFIG_KFUZZTEST) +=3D pkcs7_kfuzz.o
+> +obj-$(CONFIG_KFUZZTEST) +=3D rsa_helper_kfuzz.o
+> diff --git a/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c b/crypto/asymmetr=
+ic_keys/tests/pkcs7_kfuzz.c
+> new file mode 100644
+> index 000000000000..37e02ba517d8
+> --- /dev/null
+> +++ b/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * PKCS#7 parser KFuzzTest target
+> + *
+> + * Copyright 2025 Google LLC
+> + */
+> +#include <crypto/pkcs7.h>
+> +#include <linux/kfuzztest.h>
+> +
+> +struct pkcs7_parse_message_arg {
+> +       const void *data;
+> +       size_t datalen;
+> +};
+> +
+> +FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
+> +{
+> +       KFUZZTEST_EXPECT_NOT_NULL(pkcs7_parse_message_arg, data);
+> +       KFUZZTEST_ANNOTATE_ARRAY(pkcs7_parse_message_arg, data);
+> +       KFUZZTEST_ANNOTATE_LEN(pkcs7_parse_message_arg, datalen, data);
+> +
+> +       pkcs7_parse_message(arg->data, arg->datalen);
+> +}
+> diff --git a/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c b/crypto/asy=
+mmetric_keys/tests/rsa_helper_kfuzz.c
+> new file mode 100644
+> index 000000000000..bd29ed5e8c82
+> --- /dev/null
+> +++ b/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
+> @@ -0,0 +1,38 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * RSA key extract helper KFuzzTest targets
+> + *
+> + * Copyright 2025 Google LLC
+> + */
+> +#include <linux/kfuzztest.h>
+> +#include <crypto/internal/rsa.h>
+> +
+> +struct rsa_parse_pub_key_arg {
+> +       const void *key;
+> +       size_t key_len;
+> +};
+> +
+> +FUZZ_TEST(test_rsa_parse_pub_key, struct rsa_parse_pub_key_arg)
+> +{
+> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_pub_key_arg, key);
+> +       KFUZZTEST_ANNOTATE_ARRAY(rsa_parse_pub_key_arg, key);
+> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_pub_key_arg, key_len, key);
+> +
+> +       struct rsa_key out;
+> +       rsa_parse_pub_key(&out, arg->key, arg->key_len);
+> +}
+> +
+> +struct rsa_parse_priv_key_arg {
+> +       const void *key;
+> +       size_t key_len;
+> +};
+> +
+> +FUZZ_TEST(test_rsa_parse_priv_key, struct rsa_parse_priv_key_arg)
+> +{
+> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_priv_key_arg, key);
+> +       KFUZZTEST_ANNOTATE_ARRAY(rsa_parse_priv_key_arg, key);
+> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_priv_key_arg, key_len, key);
+> +
+> +       struct rsa_key out;
+> +       rsa_parse_priv_key(&out, arg->key, arg->key_len);
+> +}
+> --
+> 2.51.0.384.g4c02a37b29-goog
+>
