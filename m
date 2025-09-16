@@ -1,246 +1,121 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpcmd02102.aruba.it (smtpcmd02102.aruba.it [62.149.158.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFDA2E92AD
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 10:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D073B2C15A2
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 11:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.158.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758018544; cv=none; b=s4udrTargjm7yiBnZR/0n4W+bBeL7HjRJALOs6PmD7GrA1MZcWKTP0Ia30dzgQ4JJCZuIiXQ1bLBXqpgLuBWgRCaFI+DgkWoVZynGDfRNagxuiA+Xswmh8TtdV6hd2nKl9GHC18BfrVumiUaPEk6vE79c07OGeLQGdPz2F4rT1w=
+	t=1758021668; cv=none; b=P+qz3nNeaJn7zeMWOJRwUDDVYYuiy4Nc4BM477GHKA1y3CdSWDKss/J2c7+nlIPB008p/oPVOg8HmR4/kdF+W6av0Wy+GVmXJJjILcoVqZDzWOqpUBZ3olPodMvxYEYVRKziv/I7+hUsemFaE5Xha4j9FgAW6jCUBDdPIpZ41vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758018544; c=relaxed/simple;
-	bh=opvFEoK+yhT06tMtzvT5H7W0k423QZI/iRxryZ2dzM4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a2HRlepsYRxv+thW8+xgE1eB0xQjAXjGcHnURQwFQC22JbdUEd54h/dbjEQVSmiJXgnZRA3aDtteg/rlKcjawhp3ENksArC1poo8oOTQ66+9wLorRwO0VM0bmMbAW3lcp0t/O92JlnJNVpx0mBPJBeNABqjw3EXi2tSWDThXWDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=C189w8pJ; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1758021668; c=relaxed/simple;
+	bh=Vu7q5K44by3gRNg9xWCjU9JjMl8le+gA/WjVOxuq3io=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TtRPWSsdttgt8Uasg7+DsBTqk8etZQvafZdDNASuHvmg3VZxLs2HRUeDK1qoEJdhyEG3j7NmTsReEk4YXr8/mNtjq/iNg1XkLvfswc1vA1l6xyeNEH5lttYOBkrVrV48zvkRbWxEiX1eFSDBO/zIa53r1e/Pp79aOy5rFNvMhho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=Q4aKG0Gn; arc=none smtp.client-ip=62.149.158.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="C189w8pJ"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-82946485d12so208694885a.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 03:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1758018541; x=1758623341; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dVtnxKhUzhBsXhVoc6XgCECsqL2+mal6aWmAQ944WSU=;
-        b=C189w8pJa5ZTWDTEvj78eWKWh4DakDFeiVEpEHnQidSAH3byQTkIOVLxCs20sE7dik
-         vvLHVVOe4B7TTOBrX77qavvGh4Q6LD8Vmv0GI06iouRK/0Ux28qbECagobtk+STy2PEs
-         9K1nla5HiB6tyTGj6TbOnczLJdZbXKdldzFXbYBbuOb3xiHYAcpIY/FMzkruq/tV2MNL
-         COM3ZZ5uAJYXP1aoEJxHZe4xmAaq5Vdg2HHiLJUdDlJSsM1JgyrmyWHZGvaibt1wPc/W
-         Avz0RkC6bOdEaqXHm5VxdQn7k8VQ/OGIT6G5fo5cWPxKvQrm5FCc9MUj8VrZSS4KcAkj
-         G8Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758018541; x=1758623341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dVtnxKhUzhBsXhVoc6XgCECsqL2+mal6aWmAQ944WSU=;
-        b=Nk9ZAoJLG7o/LPXnxBSpfDBGDcO6h1PsmzatK86nfrSfewyEb6FqGYQHdtXYY8p0Zg
-         cKrAty7Q8hA7L2AoBZRl9n1o2y0twq10KQMGn8+OivV/r6bLfV6d8nqrRcPZsWR1+WLR
-         IQYC8vuVpQo9FJ+m0YVs9l7x+LS293q/Yg241as6btXqOZEOQkVbqPxs14cNmcDS1atc
-         fPP1PHsgDskI0oroNTlsA+3/yPxWN96YXBG2UWFSPQ5UzH4pBC9SQ2La1B3jMgH7mTR3
-         /lQnjZKUb4kvl+Wz8HRWAAC4MovzCGCTJrem+Tm/QOc5dj1waNkCOGUnQ9pDEWPqZOAY
-         cK8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkje5qkzejLZNoJ6Eb5Kmoa2DhHI00JuUlpM7+a1q1JboAuLX5ZHNC0OXqqb6Yw+ga7NJMD67D4RT6olE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaLdqUsuiv3Qdf5nG+gBTCLH5ElzeJKvLwHOeLpBGdvrlCD/QU
-	W+g3lwnYBO6PwpKAEl9LJTJ8k0IJCzLljdoA1coSxuTVo0VhjE2SY6Tz/IaoPTTO9CNWcrrW6j3
-	jwMueendKz6SGbIMhR4CgcUANXf0hIbU+KW/5xqSIhw==
-X-Gm-Gg: ASbGnctkwUxR5jEgjbQnDWRE3QPgJ92BaQCKIK9tUtBRfdeuL7SAsmHCYCOeLiuw8Lj
-	F0ya5jNsD4oa0vXYAEH7fKJkI3DZtICjt+dVB/MmesquNu7MpI7hRWtvRQsGzhAs9AdniDSEEQr
-	BMzPMR8j4+xdTN1r6o7KLOjRXaG42foVbsYGG2xKBC1XQU6MY8KapYCcuOqP6dlGUh3XxJmsTQh
-	m4YJeVkgxW1e6qajbXzkAg=
-X-Google-Smtp-Source: AGHT+IFxa/mHkO7l1jsYGXV11do5FbykxlkVIrkhepiY3N/e2eXzxLE7+I2R4McxIU568VBCzMXFRrIxTXk2KTMaFf8=
-X-Received: by 2002:a05:620a:4107:b0:802:78a5:a86f with SMTP id
- af79cd13be357-824047c8dd0mr1779923485a.79.1758018540609; Tue, 16 Sep 2025
- 03:29:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="Q4aKG0Gn"
+Received: from [192.168.1.58] ([79.0.204.227])
+	by Aruba SMTP with ESMTPSA
+	id yTk6uH7veloieyTk6ucXff; Tue, 16 Sep 2025 13:21:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1758021662; bh=Vu7q5K44by3gRNg9xWCjU9JjMl8le+gA/WjVOxuq3io=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=Q4aKG0GnxEdJcSjuhmbyFXJ7CufE1ALf7IQFD9rM9xOZVmDGc8ptiZXdhpa2q53Wm
+	 vee6wX/U8DGMVOW6PgT7f31L5cdqtuQqkZAqWqJGVmkReFBeVaxX5vmLh6MOGad7uC
+	 2Lq+2Gl74a259w8tNCZs7TRlLgTPqniKBwMvaSGrANb1EBnUjgbBX4E1LA3GunxM72
+	 0plgTfryDvbjk1hplwBbz8re0iWtGSxaR3+R4rSfXDd2ZaXLDqTvYqPZdAMyP5NBXU
+	 aGWdIZOsaih2ntIELJOllpADuKDlu8b8P3veDP6s5/+073u5kbpwg+nWW6LeKZbvDn
+	 /z6OzHgVBltrw==
+Message-ID: <ef47b718-8c6b-4711-9062-cc8b6c7dc004@enneenne.com>
+Date: Tue, 16 Sep 2025 13:21:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com> <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Tue, 16 Sep 2025 11:28:47 +0100
-X-Gm-Features: AS18NWCkhNpkebAoSzpi6YfP7wdFTOupUdzVBrFWuQqh8FgNjyJdBm5a2YlrxX8
-Message-ID: <CALrw=nE9jYhHZnix8RV9UHApOZaF7otRLPHn3cmvOPaqQLzrnw@mail.gmail.com>
-Subject: Re: [PATCH v1 07/10] crypto: implement KFuzzTest targets for PKCS7
- and RSA parsing
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com, 
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev, 
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com, 
-	dvyukov@google.com, elver@google.com, herbert@gondor.apana.org.au, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
-	tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [V1 0/4] User API for KPP
+Content-Language: en-US
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+ David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>
+References: <20250915084039.2848952-1-giometti@enneenne.com>
+ <20250915145059.GC1993@quark>
+ <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
+ <aMjjPV21x2M_Joi1@gondor.apana.org.au>
+ <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
+ <CALrw=nEadhZVifwy-SrFdEcrjrBxufVpTr0BSnnCJOODioE1WA@mail.gmail.com>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <CALrw=nEadhZVifwy-SrFdEcrjrBxufVpTr0BSnnCJOODioE1WA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfAxgkrqOL4RpzVRAfC7dIYsB5s9WxLAtz0wzUGg0woDghJJNwNnc1BmqP+qkOxMnKs31pZ5gWCcY9qg7M0Dpxy7ekvR78jEDTgL+heHjiys73EpN5Cqw
+ +zeaSRJ3zi1efz+4Lo2pvw5xOX/Tjpudd0gCVw9zJV9zO94cemfCOkqx4PIjnFxRYBRO0tebegJF/OUrwKk0JmVzNfzbCwCKyGoDXw1PdC/HNuF1jWLke/Uo
+ /Y9zPLaF+7AYwNQwefpONmzLK0PXrT38vujQmNi0hnljselBC8qKxmhYqMxpZOm7EQ+Y0GH0xfPCpv7sfVnnlOoJRXLddJQ4ZeCi2Qn0Dg1pJO2TPInvdeto
+ hcOX9eKob/W7X+hSVbd+5Vzd66tlfq9dh0l6Rb5oW2vkboPeFA4t8f7WcFBbifSNT4Is3/iU
 
-On Tue, Sep 16, 2025 at 10:01=E2=80=AFAM Ethan Graham
-<ethan.w.s.graham@gmail.com> wrote:
->
-> From: Ethan Graham <ethangraham@google.com>
->
-> Add KFuzzTest targets for pkcs7_parse_message, rsa_parse_pub_key, and
-> rsa_parse_priv_key to serve as real-world examples of how the framework
-> is used.
->
-> These functions are ideal candidates for KFuzzTest as they perform
-> complex parsing of user-controlled data but are not directly exposed at
-> the syscall boundary. This makes them difficult to exercise with
-> traditional fuzzing tools and showcases the primary strength of the
-> KFuzzTest framework: providing an interface to fuzz internal functions.
->
-> To validate the effectiveness of the framework on these new targets, we
-> injected two artificial bugs and let syzkaller fuzz the targets in an
-> attempt to catch them.
->
-> The first of these was calling the asn1 decoder with an incorrect input
-> from pkcs7_parse_message, like so:
->
-> - ret =3D asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen);
-> + ret =3D asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen + 1);
->
-> The second was bug deeper inside of asn1_ber_decoder itself, like so:
->
-> - for (len =3D 0; n > 0; n--)
-> + for (len =3D 0; n >=3D 0; n--)
->
-> syzkaller was able to trigger these bugs, and the associated KASAN
-> slab-out-of-bounds reports, within seconds.
->
-> The targets are defined within /lib/tests, alongside existing KUnit
-> tests.
->
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
+On 16/09/25 12:21, Ignat Korchagin wrote:
+> On Tue, Sep 16, 2025 at 9:22 AM Rodolfo Giometti <giometti@enneenne.com> wrote:
+>>
+>> On 16/09/25 06:10, Herbert Xu wrote:
+>>> On Mon, Sep 15, 2025 at 05:47:56PM +0200, Rodolfo Giometti wrote:
+>>>>
+>>>> The main purpose of using this implementation is to be able to use the
+>>>> kernel's trusted keys as private keys. Trusted keys are protected by a TPM
+>>>> or other hardware device, and being able to generate private keys that can
+>>>> only be (de)encapsulated within them is (IMHO) a very useful and secure
+>>>> mechanism for storing a private key.
+>>>
+>>> If the issue is key management then you should be working with
+>>> David Howell on creating an interface that sits on top of the
+>>> keyring subsystem.
+>>>
+>>> The Crypto API doesn't care about keys.
+>>
+>> No, the problem concerns the use of the Linux keyring (specifically, trusted
+>> keys and other hardware-managed keys) with cryptographic algorithms.
+>>
+>>   From a security standpoint, AF_ALG and keyctl's trusted keys are a perfect
+>> match to manage secure encryption and decryption, so why not do the same with
+>> KPP operations (or other cryptographic operations)?
+> 
+> I generally find the AF_ALG API ugly to use, but I can see the use
+> case for symmetric algorithms, where one needs to encrypt/decrypt a
+> large stream in chunks. For asymmetric operations, like signing and
+> KPP it doesn't make much sense to go through the socket API. In fact
+> we already have an established interface through keyctl(2).
 
-Reviewed-by: Ignat Korchagin <ignat@cloudflare.com>
+I see, but if we consider shared secret support, for example, keyctl doesn't 
+support ECDH, while AF_ALG allows you to choose whether to use DH or ECDH. 
+Furthermore, AF_ALG allows us to choose which driver actually performs the 
+encryption operation!
 
-> ---
-> v3:
-> - Change the fuzz target build to depend on CONFIG_KFUZZTEST=3Dy,
->   eliminating the need for a separate config option for each individual
->   file as suggested by Ignat Korchagin.
-> - Remove KFUZZTEST_EXPECT_LE on the length of the `key` field inside of
->   the fuzz targets. A maximum length is now set inside of the core input
->   parsing logic.
-> v2:
-> - Move KFuzzTest targets outside of the source files into dedicated
->   _kfuzz.c files under /crypto/asymmetric_keys/tests/ as suggested by
->   Ignat Korchagin and Eric Biggers.
-> ---
-> ---
->  crypto/asymmetric_keys/Makefile               |  2 +
->  crypto/asymmetric_keys/tests/Makefile         |  2 +
->  crypto/asymmetric_keys/tests/pkcs7_kfuzz.c    | 22 +++++++++++
->  .../asymmetric_keys/tests/rsa_helper_kfuzz.c  | 38 +++++++++++++++++++
->  4 files changed, 64 insertions(+)
->  create mode 100644 crypto/asymmetric_keys/tests/Makefile
->  create mode 100644 crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
->  create mode 100644 crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
->
-> diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Mak=
-efile
-> index bc65d3b98dcb..77b825aee6b2 100644
-> --- a/crypto/asymmetric_keys/Makefile
-> +++ b/crypto/asymmetric_keys/Makefile
-> @@ -67,6 +67,8 @@ obj-$(CONFIG_PKCS7_TEST_KEY) +=3D pkcs7_test_key.o
->  pkcs7_test_key-y :=3D \
->         pkcs7_key_type.o
->
-> +obj-y +=3D tests/
-> +
->  #
->  # Signed PE binary-wrapped key handling
->  #
-> diff --git a/crypto/asymmetric_keys/tests/Makefile b/crypto/asymmetric_ke=
-ys/tests/Makefile
-> new file mode 100644
-> index 000000000000..4ffe0bbe9530
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/Makefile
-> @@ -0,0 +1,2 @@
-> +obj-$(CONFIG_KFUZZTEST) +=3D pkcs7_kfuzz.o
-> +obj-$(CONFIG_KFUZZTEST) +=3D rsa_helper_kfuzz.o
-> diff --git a/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c b/crypto/asymmetr=
-ic_keys/tests/pkcs7_kfuzz.c
-> new file mode 100644
-> index 000000000000..37e02ba517d8
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
-> @@ -0,0 +1,22 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * PKCS#7 parser KFuzzTest target
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#include <crypto/pkcs7.h>
-> +#include <linux/kfuzztest.h>
-> +
-> +struct pkcs7_parse_message_arg {
-> +       const void *data;
-> +       size_t datalen;
-> +};
-> +
-> +FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(pkcs7_parse_message_arg, data);
-> +       KFUZZTEST_ANNOTATE_ARRAY(pkcs7_parse_message_arg, data);
-> +       KFUZZTEST_ANNOTATE_LEN(pkcs7_parse_message_arg, datalen, data);
-> +
-> +       pkcs7_parse_message(arg->data, arg->datalen);
-> +}
-> diff --git a/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c b/crypto/asy=
-mmetric_keys/tests/rsa_helper_kfuzz.c
-> new file mode 100644
-> index 000000000000..bd29ed5e8c82
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c
-> @@ -0,0 +1,38 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * RSA key extract helper KFuzzTest targets
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#include <linux/kfuzztest.h>
-> +#include <crypto/internal/rsa.h>
-> +
-> +struct rsa_parse_pub_key_arg {
-> +       const void *key;
-> +       size_t key_len;
-> +};
-> +
-> +FUZZ_TEST(test_rsa_parse_pub_key, struct rsa_parse_pub_key_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_pub_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_ARRAY(rsa_parse_pub_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_pub_key_arg, key_len, key);
-> +
-> +       struct rsa_key out;
-> +       rsa_parse_pub_key(&out, arg->key, arg->key_len);
-> +}
-> +
-> +struct rsa_parse_priv_key_arg {
-> +       const void *key;
-> +       size_t key_len;
-> +};
-> +
-> +FUZZ_TEST(test_rsa_parse_priv_key, struct rsa_parse_priv_key_arg)
-> +{
-> +       KFUZZTEST_EXPECT_NOT_NULL(rsa_parse_priv_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_ARRAY(rsa_parse_priv_key_arg, key);
-> +       KFUZZTEST_ANNOTATE_LEN(rsa_parse_priv_key_arg, key_len, key);
-> +
-> +       struct rsa_key out;
-> +       rsa_parse_priv_key(&out, arg->key, arg->key_len);
-> +}
-> --
-> 2.51.0.384.g4c02a37b29-goog
->
+In my opinion, keyctl is excellent for managing key generation and access, but 
+using AF_ALG for using them isn't entirely wrong even in the case of asymmetric 
+keys and, in my opinion, is much more versatile.
+
+> Now, in my opinion, the fundamental problem here is that we want to
+> use trusted keys as asymmetric keys, where currently they are just
+> binary blobs from a kernel perspective (so suitable only for symmetric
+> use). So instead of the AF_ALG extension we need a way to "cast" a
+> trusted key to an asymmetric key and once it is "cast" (or type
+> changed somehow) - we can use the established keyring interfaces both
+> for signatures and KPP.
+
+IMHO the fact that trusted keys are binary blobs is perfect for use with AF_ALG, 
+where we can specify different algorithms to operate on. :)
+
+Ciao,
+
+Rodolfo
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
