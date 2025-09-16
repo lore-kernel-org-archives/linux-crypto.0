@@ -1,135 +1,186 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579132DC32C;
-	Tue, 16 Sep 2025 13:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C794D2BD015
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 13:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758028379; cv=none; b=CBMkfvA+fHTy0csEHT7QbuOLpa4Sa1o5nwo/lCQGhzC+/F3axBYFHLa4DnRG+aQmJSdpy+P1YfFPUH3TbBJS5cGC9Ut/fuUjx5xuOusj+qnS0sTsXWCa59C2IU+6fwbV//AOP3caSZ5JIJ7Rt9dNtr98RFjrwlUisBvFSJuOv5I=
+	t=1758030216; cv=none; b=T/Wdgu2U0xVkDkvG9ogzlumEt3Y3Az1jKkWCqwJee/LbfCcdkbME+EAPT3fZGzDIuFLIsLzF/qDUuxP6QombZAVWhkggFyJU5Iz6we1VffT/AwSz30JXg6S0xzyJDY4e4wyRt4OLBB9c7LjdioeMjmhgqlgQZ0wX5/dLnBvK64o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758028379; c=relaxed/simple;
-	bh=ik/Ise1iswo7LmVkd0oG8YoqIncJ668v/g3g8ti6nAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekzN1S1bl/rGFrsOdr7g6DlfS808jh22/qyTPUzajUYqO86ZcJsiogE1ccLB5N9Ob7o+1AqMrMe/4yG1HNhA56UGnRB+IVMXytLUYp/ahLyr06Ee5HvfeWNczkLsf4Nl0b4obHV+iiFqZrawgvX63efZdnNweHKRUPluZi6npzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=gmjf/lXN reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1758030216; c=relaxed/simple;
+	bh=XWPXPFwYPgFopfyxu3zdVrQPwiTk6AP3tAMpPe1ARK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HWAZJht1mYCNf4eYhRB1lmHWTg3RXjnM4/3+F4fzJ9FnKaooFSjxUHVY5Og82ZtLRXY5MMo2YjN8E+id5IPQ/0rIh11XO6qXhQDyptFkK+n9soPEKrI1guadhTM3MUBh5byIxCnK7UfBuutVxjAjiPuvGr5hdLLg0FuAWB82hPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JZQA0uWb; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gmjf/lXN"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5ACC740E01A2;
-	Tue, 16 Sep 2025 13:12:52 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ttVk2Mn4Jhig; Tue, 16 Sep 2025 13:12:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1758028368; bh=NnBsyV+YEsnQMd6sc1QNEhxEPfHuUEo9ekvsKqyRBYs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gmjf/lXNIcIJDLPQtdWfx1fRSmvkzzEwQ8vP/zezZ0107I0vRCVnG8vzblIbimzMR
-	 X8ETN1ek9FNo+qVkh+/2kent5aIyRKV/zWvBbCrNCBDoB1AXeGBkOIlpUivWdiRLXj
-	 iUP+ygZFwUqH5m9N4GvEUDckKHUleCf6g7oaOUN6gmKJSrxOI9YeLtPZBZvl6j/EX6
-	 yNJtQXvYC84ewbNYlQYYrU1d0VptsrTwFY9MRkbqFBzPYcmbcX8cvfm8ssVzo1k7BK
-	 RykS64aDoG7iOgzYnx4AbOpH7vos50ko+AmHylvqYhjmM6iEqTlvh/B29arKI4r8gu
-	 Wqk2frZPZ1r0Wru0/phS3SK5BpjpaRerTe8cGME0SVAyfFxg44RbdZu8O3lB4TLQe5
-	 idvZGgm4/qG6c1RzzI7Ut2C7gX0/INOEnYVQhs7MSsv7ICThwyxa4lXvtWVyrqLUW8
-	 YffMmMXAVKXLfk7e7fOFb4p5LEAvEKi10B+cZz7Tpcwrhl3ko4vgmPgeb2fkwzhEiP
-	 0MaTLQ2cBd6+uVUfY66JBtSf/ezJEqLFQb78Mk0BBQ/yHE6hgSupPxKmCUmllpJJza
-	 RRQU/O1S0Tbod9G5uXfYCvXO2jcypjQIDUaUAiVuU+os+ZfYfLdSMJ/LEZS9b4YatR
-	 2sAel0TbLh/0/kKOVDBUSZjk=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 3E68F40E00DD;
-	Tue, 16 Sep 2025 13:12:28 +0000 (UTC)
-Date: Tue, 16 Sep 2025 15:12:21 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
-	aik@amd.com, ardb@kernel.org, john.allen@amd.com,
-	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] x86/sev: Add new dump_rmp parameter to
- snp_leak_pages() API
-Message-ID: <20250916131221.GCaMliNe3NVmOwzHEN@fat_crate.local>
-References: <cover.1757969371.git.ashish.kalra@amd.com>
- <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JZQA0uWb"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-776aee67e8dso16622506d6.3
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 06:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758030214; x=1758635014; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WFMguP23bZIISRu8P8L8i4YMMkZ2fq1VcnZsxEVckmk=;
+        b=JZQA0uWbAebE9uTtErpjBQmOiUOvBHKv9zZQql83gbMxXatkIvd7+iIe8bc386M0ZZ
+         RCq+tmKhP4feCvsvUL6eEV8Do5jppsERIGDLmWPVwrwenHkt8PGPgIfNe0qxwsdbiJBW
+         RWYhCDmzO3wyvTBNEcb7yNtKhghpPS9PMZvYsackg2jpv35SPsw+3s5WlBvZ6vUE4lOR
+         iFvgEc+i78nYmIJZRcD36X7GXz29PxdpBmteFV7TgdkayvutWfCWE5HKJEEZT/kw5CYT
+         bCueslyFoutPm3bqeHRtM9ouK595Yiy2bxmmDtxER4DNJHKIOwx7Xhs3qXesvs5/WMLQ
+         eFYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758030214; x=1758635014;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WFMguP23bZIISRu8P8L8i4YMMkZ2fq1VcnZsxEVckmk=;
+        b=uNcnCe/JRc/m7vzEEcUlef1oK7gtMHEEkPylTpLC4CnctM6QoVrCJ+X5i/8uRY99RH
+         lLXC9zBtKV23Jz4NTirq+vVbeYT6eZa2wOnM7ur5b7yklgSuNybXM4Iql6xxhAwkE+wK
+         jpc29fysF/rJUhak0n4yqwkBsQgzdKbiLCDL3CU0J9Yxzvrtg1wkUl7fyUYhF3BbkLEi
+         UFTksX65VcPxnu5rhBhNRQ5MLu/HX3CX0KcNofNzpsUOAEYAUbOXc6kfEdB5jpnRwK58
+         mhFheN7m2x2ODrc5u1TN2EEHM6lCBBuShSIcUa9QqBWBQtRygG8xBJ9u7dj9ijZACtay
+         pYDg==
+X-Forwarded-Encrypted: i=1; AJvYcCV70cM2UAmc5HpOvPFXqHZGXNjqHEH8yrNW9aYWcKsq2T9dQkA3Ur/HoDvG80EK94EFpUcBA38wHI7vcW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9BYOg/aXFjnt1E97iLxBXzjaZuK2NhqvwGuifqlzRkMpcFLGs
+	3YfO91V9Or/1K9qc4ZjQ0X3aAPk6S0kK6u3U68SZKT8HLJi7W9EJ7zfE12poQGRLWxStm1inQJY
+	o5f5QXXwZPD1bEbAZs92EP8T4nZP1ym3v76xCkE3S
+X-Gm-Gg: ASbGncvB+A8tAqaS2MUiBa8huiGFdcyVajIO2ouh2AhaSW0GcV6krsiPRPGEx5rR6YU
+	JGURLgOmVqWxYuvee1rlfuvnfclTk/o1A6ub6q/hvOubgIqDpYxRFZf5JoPmn7tx+iM8tCDGCfm
+	gJjz1rNLZKJAgU2x8W9c0rXmhrLvujKAbagwrJM/PeERqrx14Vc7cWq5KoZJDVoD6GN9rcAWVVK
+	/B3DZ2Ly3fIwpN+R3okGDnhys1nZJHe04gxOKISrMWV
+X-Google-Smtp-Source: AGHT+IFhDI3DiXQjQ2M/pDauu4pj8WaE92jep/q+QEEg6eNCMk/WVoS5e7N/U3EzJP+zE2T6dly3yK42LO8dPZ3MnPk=
+X-Received: by 2002:a05:6214:2624:b0:71c:53c0:5674 with SMTP id
+ 6a1803df08f44-767bb3b5cc7mr189377726d6.7.1758030212716; Tue, 16 Sep 2025
+ 06:43:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
-Content-Transfer-Encoding: quoted-printable
+References: <20250916090109.91132-1-ethan.w.s.graham@gmail.com> <20250916090109.91132-5-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250916090109.91132-5-ethan.w.s.graham@gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Tue, 16 Sep 2025 15:42:55 +0200
+X-Gm-Features: AS18NWDFPFWnjGnn0Ya31_ptvZRyrk4s5Sg6fkIlAJtVA6vYI3uU8Zv2xeIdCLw
+Message-ID: <CAG_fn=UJsV1ibxSf6D+QU4ds1mHUG77NWJ5TR3sVs3f696RgiA@mail.gmail.com>
+Subject: Re: [PATCH v1 04/10] tools: add kfuzztest-bridge utility
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
+	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
+	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com, 
+	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
+	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
+	tarasmadan@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Sep 15, 2025 at 09:21:58PM +0000, Ashish Kalra wrote:
-> @@ -668,6 +673,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa=
-, enum pg_level level, u32 as
->  	return -ENODEV;
->  }
->  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { retu=
-rn -ENODEV; }
-> +static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool=
- dump_rmp) {}
->  static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+> ---
+> v3:
 
-I basically don't even have to build your patch to see that this can't bu=
-ild.
-See below.
+Please change the version number to something like "RFC v3" (here and
+in other patches)
 
-When your patch touches code behind different CONFIG_ items, you must mak=
-e
-sure it builds with both settings of each CONFIG_ item.
 
-In file included from arch/x86/boot/startup/gdt_idt.c:9:
-./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
-leak_pages=E2=80=99
-  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
-      |                    ^~~~~~~~~~~~~~
-./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
-snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
-=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
-  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
-}
-      |                    ^~~~~~~~~~~~~~
-make[4]: *** [scripts/Makefile.build:287: arch/x86/boot/startup/gdt_idt.o=
-] Error 1
-make[3]: *** [scripts/Makefile.build:556: arch/x86/boot/startup] Error 2
-make[2]: *** [scripts/Makefile.build:556: arch/x86] Error 2
-make[2]: *** Waiting for unfinished jobs....
-In file included from drivers/iommu/amd/init.c:32:
-./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
-leak_pages=E2=80=99
-  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
-      |                    ^~~~~~~~~~~~~~
-./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
-snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
-=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
-  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
-}
-      |                    ^~~~~~~~~~~~~~
-make[5]: *** [scripts/Makefile.build:287: drivers/iommu/amd/init.o] Error=
- 1
-make[4]: *** [scripts/Makefile.build:556: drivers/iommu/amd] Error 2
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:556: drivers/iommu] Error 2
-make[3]: *** Waiting for unfinished jobs....
-make[2]: *** [scripts/Makefile.build:556: drivers] Error 2
-make[1]: *** [/mnt/kernel/kernel/linux/Makefile:2011: .] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
+> +
+> +static int invoke_one(const char *input_fmt, const char *fuzz_target, const char *input_filepath)
+> +{
+> +       struct ast_node *ast_prog;
+> +       struct byte_buffer *bb;
+> +       struct rand_stream *rs;
+> +       struct token **tokens;
+> +       size_t num_tokens;
+> +       size_t num_bytes;
+> +       int err;
+> +
+> +       err = tokenize(input_fmt, &tokens, &num_tokens);
+> +       if (err) {
+> +               fprintf(stderr, "tokenization failed: %s\n", strerror(-err));
+> +               return err;
+> +       }
 
---=20
-Regards/Gruss,
-    Boris.
+You should be freeing `tokens` somewhere.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> +
+> +       err = parse(tokens, num_tokens, &ast_prog);
+> +       if (err) {
+> +               fprintf(stderr, "parsing failed: %s\n", strerror(-err));
+> +               return err;
+> +       }
+> +
+> +       rs = new_rand_stream(input_filepath, 1024);
+
+You need to bail out here if `rs` is NULL, otherwise encode() will crash.
+
+> +       err = encode(ast_prog, rs, &num_bytes, &bb);
+
+`ast_prog` also needs to be freed at the end of this function.
+
+> +int main(int argc, char *argv[])
+> +{
+> +       if (argc != 4) {
+> +               printf("Usage: %s <input-description> <fuzz-target-name> <input-file>\n", argv[0]);
+> +               printf("For more detailed information see /Documentation/dev-tools/kfuzztest.rst\n");
+
+This should be Documentation/dev-tools/kfuzztest.rst without the leading slash.
+
+> +static int read_minalign(struct encoder_ctx *ctx)
+> +{
+> +       const char *minalign_file = "/sys/kernel/debug/kfuzztest/_config/minalign";
+> +       char buffer[64 + 1];
+> +       int count = 0;
+> +       int ret = 0;
+> +
+> +       FILE *f = fopen(minalign_file, "r");
+> +       if (!f)
+> +               return -ENOENT;
+> +
+> +       while (fread(&buffer[count++], 1, 1, f) == 1)
+> +               ;
+
+What's the point of this loop, why can't you read sizeof(buffer)-1
+bytes instead?
+(note that the loop also does not validate the buffer size when reading).
+
+> +       buffer[count] = '\0';
+> +
+> +       /*
+> +        * atoi returns 0 on error. Since we expect a strictly positive
+> +        * minalign value on all architectures, a return value of 0 represents
+> +        * a failure.
+> +        */
+> +       ret = atoi(buffer);
+> +       if (!ret) {
+> +               fclose(f);
+> +               return -EINVAL;
+> +       }
+> +       ctx->minalign = atoi(buffer);
+
+Why are you calling atoi() twice?
+
+
+> +       ret = malloc(sizeof(*ret));
+> +       if (!ret)
+> +               return -ENOMEM;
+> +       ret->type = NODE_LENGTH;
+> +       ret->data.length.length_of = strndup(len->data.identifier.start, len->data.identifier.length);
+
+This strndup() call may fail.
+
+
+> +       if (!consume(p, TOKEN_RBRACE, "expected '}'") || !consume(p, TOKEN_SEMICOLON, "expected ';'")) {
+> +               err = -EINVAL;
+> +               goto fail;
+> +       }
+> +
+> +       ret->type = NODE_REGION;
+> +       *node_ret = ret;
+> +       return 0;
+> +
+> +fail:
+
+parse_type() may allocate strings using strndup(), which also need to
+be cleaned up here.
