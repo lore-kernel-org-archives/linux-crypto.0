@@ -1,159 +1,130 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771F4242D94
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 17:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A14D2DE6F1
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 19:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758043233; cv=none; b=KQ1VOCwMDUCs0iGgCiwwYdYCBEM89BJJLWItCIJ6oCB8BHjmmJ3CD1FxR9K/1piNKCfQAXEoU4+/KiR11P3XiBWD9YkjxigDUrk+q2WkSpJwwvuCyCJP4eM6o5ORrccPKTsWt6cNld2mfeDU+8oa6kIPmue945UThD5Q0pBG6VA=
+	t=1758049409; cv=none; b=Or0gqV8skX/7ETqAeNpFTr3De6EGRvV4WpS5CM/9m/1WlqIUH4W4c8qw/d/vrgHyIKj3mhX15eB7gbLkD9BOqtdgRMc8WM0UXxo9u3ZmtZXd7cy//qyGSTnATrdje7PXEzk2WzwvnsiS/+JGrlFnoYD7ON5EKC8t6Idz5/bfO6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758043233; c=relaxed/simple;
-	bh=WB6icsQf7LMh3VE17/HhbWF8UpBxGnNLJHUUAAOym1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B2j1IL6zLq1mBqsHUiq9a17XhApyR2i+nWf7jBVRwxcIIe4HU+RON22CmkUnvAIS2iFqSle0QDwe7g8ZjVdkWARzvIALASyNFRYPGDWrOswtgrWkLZyOFZf6SVRirKAiHVFMI69XUVvcHdMD+iLlVTkq7HcDuMSnnR1cD9zrMDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GqIhv3Rl; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1758049409; c=relaxed/simple;
+	bh=1VNTL957WIhvioTfh4/tsp4JP4WAxr+HVfO9vcJE9mU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=rZylNyOubIqLNZjasrUkjHL8PJvHnHhmrvPhRDXuZdAOxxpLo2JKsMHegQJGS3fqattZG5CfJu80s+rrHa9miFxXYRh+IQiE/qBwJIxNpdOO0wVWd6EXrtCizm72yMRRqhIJ0MDXrfcKVX4sK9vnGi9JNBEt5rpU+4EZE+aCBsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TSz7KWuN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GqIhv3Rl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758043231; x=1789579231;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WB6icsQf7LMh3VE17/HhbWF8UpBxGnNLJHUUAAOym1o=;
-  b=GqIhv3Rlc9pIn/+WT3PvMmgurII6BzINotYNb7dcMF5hVhdDv/o0HbNH
-   U+bnv8rsbHziEVZrDKfHhyoUsvE765gbjWx+8n2ObSnnWj2Fb6jWVIIyV
-   VIuc5ijC3vv0XLhRA3BR09jZK0RG9GtAnQfomgR3cvUUhYBWJQh46ccXq
-   XhU2vwPz21SpeQfAtXPmTwrqMsMZ/Vo+9/ChA2ouweean2ZYn/knYJqL+
-   QU0bTvy+GWwbfrZhIvDJ/bBtE3qAoHRYbTWldDolimgrTsCq5qj4jyKNg
-   VHcZMbTn1qivdo6v56bXTgogFjHuZJWeIBVWFWImK+7wcnPbVmyXql0Zr
-   Q==;
-X-CSE-ConnectionGUID: uZYNbuznTeurwAGC8Zr1Pw==
-X-CSE-MsgGUID: 4sCC+Pk4Q76MDKcW/Jp8mw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="59378411"
-X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="59378411"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 10:20:31 -0700
-X-CSE-ConnectionGUID: dgYQ8fQcSOCUwM1u513I7w==
-X-CSE-MsgGUID: 8NjD0eQtS66lpFsShuRONw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="174562665"
-Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 16 Sep 2025 10:20:29 -0700
-Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uyZLu-0000Yh-2P;
-	Tue, 16 Sep 2025 17:20:26 +0000
-Date: Wed, 17 Sep 2025 01:19:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Rodolfo Giometti <giometti@enneenne.com>, linux-crypto@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Rodolfo Giometti <giometti@enneenne.com>
-Subject: Re: [V1 1/4] crypto ecdh.h: set key memory region as const
-Message-ID: <202509170134.MOV2jymf-lkp@intel.com>
-References: <20250915084039.2848952-2-giometti@enneenne.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSz7KWuN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758049406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1VNTL957WIhvioTfh4/tsp4JP4WAxr+HVfO9vcJE9mU=;
+	b=TSz7KWuNj82rjPblB1uYqa6hDyIleOX8fYBafeo+zda40Id4L6HxsXM9cPjFPjg4uIlT0P
+	e7rmLOAWYyq4PjRdch4bOJ57FhltctYHNIlFPBTUbSI5DLivJUtQkNt+9iLru8/p/UZ9rJ
+	xGRKAUBsNipk+zSMqF1ifw7ZskSDZH0=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-141-Jd046V-2MkStc4juV_H8rA-1; Tue, 16 Sep 2025 15:03:25 -0400
+X-MC-Unique: Jd046V-2MkStc4juV_H8rA-1
+X-Mimecast-MFC-AGG-ID: Jd046V-2MkStc4juV_H8rA_1758049405
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-5448916dd51so1909212e0c.2
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2025 12:03:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758049405; x=1758654205;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1VNTL957WIhvioTfh4/tsp4JP4WAxr+HVfO9vcJE9mU=;
+        b=frKF65OTrMwYI98RAQs490yMhKuOZHOIju+DuPlJSfg6Z/PM3hYr7vwEduITtq3kLT
+         6PRGqibCSzvSoItajea1vNZ9Q3v909H3Ow173daAiC0wJp7KgYTFpNqInMQBGgN5aQ1s
+         LiQmqjquR2lWvF8e/LRmGSBTp5b6iMX201QQ1hzLdtUoG+6Ggczre148Tc8P5DBhZDua
+         4rshQ9hFwayKbn2uzFeT14v13pC1yq6zmxR5OubMtI3LzwxVDs+xp/qMHqlFk1ekYb9G
+         0zu/99AXbVn0vKpr29EmyYgd+3QhR7MZRDIW1YAe1261NPm5c4AwUGxT9SYgWG8fZ1hm
+         qOkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUiQ/eet1fprTbhfBKhvDvIza/Bbst/iSO2f996uJ3AiZP3DEITlVdRzUMcFJo7oUx1njU11fPVK/HQYG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1h0M8lUCnokEMFAVZghMbiXRLJKYDgh/d4/olJ3Y1cGPpPiUS
+	qbXhQXmmKxX2oyFY90F9SMZS8qyZM7UZ+JF84hjJjTw7n9kfnb5t5EUfbB0x/H5hMFK3FpBiHe7
+	KiO1kv7kF2hdWrHkUwFVM+E05IdFB3Tkbqts1YLyUdZuxISg09dIv6HEip+4N6FRGdw==
+X-Gm-Gg: ASbGnctS1vkXyumePJ9JcuUWXsx1t4NOFUNukfPOjTTLNj59f8TJAeu20NDt1iVRB3a
+	hoBMABBepKv2yIJULA/bVUb+DmfwrUrhk2DhsmUZAJcyOYY5nET620dQV/7/UAl9UKx0NVcdJF6
+	Sx5GIQrgwSkYiXsRUJtxbuaHFYho7w+WLslFiYJIFDhQVAQcp8wHS+QVXjxhyfgpkq7EsvrTit9
+	2ZCo8iJLNh4GfZdfBoO5uQwnuZdnbnEDe9NmnvQi6Fbv7s0IRizeP1RHmLKPg4IAD4kx9lB6bji
+	jEHHo2Szx0MqrOInnCm6QWly8vJ7Raltgg==
+X-Received: by 2002:a05:6122:1acd:b0:549:f04a:6ea8 with SMTP id 71dfb90a1353d-54a16c8a782mr5005455e0c.9.1758049404628;
+        Tue, 16 Sep 2025 12:03:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGUJaABKCnPu+9dAC9ObU7pvuXaGco2cLR7bJnObkQ9soP+eCsQOzFxULb3IY0kBcrWcvAahg==
+X-Received: by 2002:a05:6122:1acd:b0:549:f04a:6ea8 with SMTP id 71dfb90a1353d-54a16c8a782mr5005300e0c.9.1758049403460;
+        Tue, 16 Sep 2025 12:03:23 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::318])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-820c8bb8d9esm1025710285a.3.2025.09.16.12.03.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 12:03:22 -0700 (PDT)
+Message-ID: <70efab856f0940cba715572c417e0b249388da14.camel@redhat.com>
+Subject: Re: [V1 0/4] User API for KPP
+From: Simo Sorce <simo@redhat.com>
+To: Rodolfo Giometti <giometti@enneenne.com>, Ignat Korchagin
+	 <ignat@cloudflare.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers
+ <ebiggers@kernel.org>, 	linux-crypto@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, 	keyrings@vger.kernel.org, David Howells
+ <dhowells@redhat.com>, Lukas Wunner	 <lukas@wunner.de>
+Date: Tue, 16 Sep 2025 15:03:22 -0400
+In-Reply-To: <ca36a11e-ca2e-41ee-b0d3-f56586d50fd4@enneenne.com>
+References: <20250915084039.2848952-1-giometti@enneenne.com>
+	 <20250915145059.GC1993@quark>
+	 <87f17424-b50e-45a0-aefa-b1c7a996c36c@enneenne.com>
+	 <aMjjPV21x2M_Joi1@gondor.apana.org.au>
+	 <fc1459db-2ce7-4e99-9f5b-e8ebd599f5bc@enneenne.com>
+	 <CALrw=nEadhZVifwy-SrFdEcrjrBxufVpTr0BSnnCJOODioE1WA@mail.gmail.com>
+	 <ef47b718-8c6b-4711-9062-cc8b6c7dc004@enneenne.com>
+	 <CALrw=nGHDW=FZcVG94GuuX9AOBC-N5OC2aXiybfAro6E8VNzPQ@mail.gmail.com>
+	 <ca36a11e-ca2e-41ee-b0d3-f56586d50fd4@enneenne.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915084039.2848952-2-giometti@enneenne.com>
 
-Hi Rodolfo,
+On Tue, 2025-09-16 at 14:33 +0200, Rodolfo Giometti wrote:
+> I understand your point; however, I believe that allowing the AF_ALG deve=
+loper=20
+> to use a generic data blob (of the appropriate size, of course) as a key =
+is more=20
+> versatile and allows for easier implementation of future extensions.
 
-kernel test robot noticed the following build warnings:
+The only thing something like this allow is huge foot guns.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.17-rc6 next-20250916]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The current trend in cryptography circles is the exact opposite, ie
+strong typing where keys are defined such that they can be used for a
+single purpose even when the general mechanisms allows different
+operations.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Rodolfo-Giometti/crypto-ecdh-h-set-key-memory-region-as-const/20250915-164558
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250915084039.2848952-2-giometti%40enneenne.com
-patch subject: [V1 1/4] crypto ecdh.h: set key memory region as const
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20250917/202509170134.MOV2jymf-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250917/202509170134.MOV2jymf-lkp@intel.com/reproduce)
+Ie even if an algorithm that allows both encryption and signing the key
+is specified to be used only for one or the other operation with
+metadata that accompanies they key itself at all times
+so the cryptographic implementation can enforce the binding and fail
+the un-permitted operation.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509170134.MOV2jymf-lkp@intel.com/
+In general using random blobs as asymmetric keys is just not possible,
+the size alone is no guarantee you have a valid key, so you would have
+to spend significant amount of CPU cycles to validate that the blob is
+a valid key for the given algorithm, rendering any HW acceleration
+effectively pointless by the time you cross all the layers, context
+switch back and forth from the kernel, validate the blobs and all.
 
-All warnings (new ones prefixed by >>):
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
 
-   drivers/crypto/hisilicon/hpre/hpre_crypto.c: In function 'hpre_ecdh_set_secret':
->> drivers/crypto/hisilicon/hpre/hpre_crypto.c:1430:36: warning: passing argument 1 of 'hpre_key_is_zero' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    1430 |         if (hpre_key_is_zero(params.key, params.key_size)) {
-         |                              ~~~~~~^~~~
-   drivers/crypto/hisilicon/hpre/hpre_crypto.c:1369:36: note: expected 'char *' but argument is of type 'const char *'
-    1369 | static bool hpre_key_is_zero(char *key, unsigned short key_sz)
-         |                              ~~~~~~^~~
-
-
-vim +1430 drivers/crypto/hisilicon/hpre/hpre_crypto.c
-
-1e609f5fb73b6b Hui Tang   2021-05-29  1399  
-05e7b906aa7c86 Meng Yu    2021-03-04  1400  static int hpre_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
-05e7b906aa7c86 Meng Yu    2021-03-04  1401  				unsigned int len)
-05e7b906aa7c86 Meng Yu    2021-03-04  1402  {
-05e7b906aa7c86 Meng Yu    2021-03-04  1403  	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-b0ab0797f7ab74 Weili Qian 2023-07-07  1404  	unsigned int sz, sz_shift, curve_sz;
-b94c910afda050 Hui Tang   2021-05-12  1405  	struct device *dev = ctx->dev;
-1e609f5fb73b6b Hui Tang   2021-05-29  1406  	char key[HPRE_ECC_MAX_KSZ];
-05e7b906aa7c86 Meng Yu    2021-03-04  1407  	struct ecdh params;
-05e7b906aa7c86 Meng Yu    2021-03-04  1408  	int ret;
-05e7b906aa7c86 Meng Yu    2021-03-04  1409  
-05e7b906aa7c86 Meng Yu    2021-03-04  1410  	if (crypto_ecdh_decode_key(buf, len, &params) < 0) {
-05e7b906aa7c86 Meng Yu    2021-03-04  1411  		dev_err(dev, "failed to decode ecdh key!\n");
-05e7b906aa7c86 Meng Yu    2021-03-04  1412  		return -EINVAL;
-05e7b906aa7c86 Meng Yu    2021-03-04  1413  	}
-05e7b906aa7c86 Meng Yu    2021-03-04  1414  
-1e609f5fb73b6b Hui Tang   2021-05-29  1415  	/* Use stdrng to generate private key */
-1e609f5fb73b6b Hui Tang   2021-05-29  1416  	if (!params.key || !params.key_size) {
-1e609f5fb73b6b Hui Tang   2021-05-29  1417  		params.key = key;
-b0ab0797f7ab74 Weili Qian 2023-07-07  1418  		curve_sz = hpre_ecdh_get_curvesz(ctx->curve_id);
-b0ab0797f7ab74 Weili Qian 2023-07-07  1419  		if (!curve_sz) {
-b0ab0797f7ab74 Weili Qian 2023-07-07  1420  			dev_err(dev, "Invalid curve size!\n");
-b0ab0797f7ab74 Weili Qian 2023-07-07  1421  			return -EINVAL;
-b0ab0797f7ab74 Weili Qian 2023-07-07  1422  		}
-b0ab0797f7ab74 Weili Qian 2023-07-07  1423  
-b0ab0797f7ab74 Weili Qian 2023-07-07  1424  		params.key_size = curve_sz - 1;
-1e609f5fb73b6b Hui Tang   2021-05-29  1425  		ret = ecdh_gen_privkey(ctx, &params);
-1e609f5fb73b6b Hui Tang   2021-05-29  1426  		if (ret)
-1e609f5fb73b6b Hui Tang   2021-05-29  1427  			return ret;
-1e609f5fb73b6b Hui Tang   2021-05-29  1428  	}
-1e609f5fb73b6b Hui Tang   2021-05-29  1429  
-05e7b906aa7c86 Meng Yu    2021-03-04 @1430  	if (hpre_key_is_zero(params.key, params.key_size)) {
-05e7b906aa7c86 Meng Yu    2021-03-04  1431  		dev_err(dev, "Invalid hpre key!\n");
-05e7b906aa7c86 Meng Yu    2021-03-04  1432  		return -EINVAL;
-05e7b906aa7c86 Meng Yu    2021-03-04  1433  	}
-05e7b906aa7c86 Meng Yu    2021-03-04  1434  
-05e7b906aa7c86 Meng Yu    2021-03-04  1435  	hpre_ecc_clear_ctx(ctx, false, true);
-05e7b906aa7c86 Meng Yu    2021-03-04  1436  
-05e7b906aa7c86 Meng Yu    2021-03-04  1437  	ret = hpre_ecdh_set_param(ctx, &params);
-05e7b906aa7c86 Meng Yu    2021-03-04  1438  	if (ret < 0) {
-05e7b906aa7c86 Meng Yu    2021-03-04  1439  		dev_err(dev, "failed to set hpre param, ret = %d!\n", ret);
-05e7b906aa7c86 Meng Yu    2021-03-04  1440  		return ret;
-05e7b906aa7c86 Meng Yu    2021-03-04  1441  	}
-05e7b906aa7c86 Meng Yu    2021-03-04  1442  
-05e7b906aa7c86 Meng Yu    2021-03-04  1443  	sz = ctx->key_sz;
-05e7b906aa7c86 Meng Yu    2021-03-04  1444  	sz_shift = (sz << 1) + sz - params.key_size;
-05e7b906aa7c86 Meng Yu    2021-03-04  1445  	memcpy(ctx->ecdh.p + sz_shift, params.key, params.key_size);
-05e7b906aa7c86 Meng Yu    2021-03-04  1446  
-05e7b906aa7c86 Meng Yu    2021-03-04  1447  	return 0;
-05e7b906aa7c86 Meng Yu    2021-03-04  1448  }
-05e7b906aa7c86 Meng Yu    2021-03-04  1449  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
