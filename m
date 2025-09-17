@@ -1,128 +1,122 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1BC2F25E9
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 08:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC134306B22;
+	Wed, 17 Sep 2025 09:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758098864; cv=none; b=LAy8jnCeyjE8RUn6dOE9cPM8E7M0V8SKf/eqINcnpAmmNFz/mLK9tAwlTmrIHg+wRbaBCeWybnNoidxZx6OrhZQWHNL4yAij1pNOPnYN6VHTK6zntAc7gNLriT2paNZnUrC7r61DgATzcfKfxovpTiWYvhhOUgOr6/Buz1DQg+k=
+	t=1758101909; cv=none; b=U0clGr+0Nfkwx4H2pJqWPUYByn57lHLMu+IYW36DZYXiiX3yHtzdJPNvY0LS42jXOQPx/oMXtgJmmneyTFZuBTuUmW71IME5kiJCyNtJ6ZDB/3crM+5suETAZqkHZOgrbVG3jYQk6yxLbt2bYIT+KnwaIK8YJ1ucqiPJeX+hTOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758098864; c=relaxed/simple;
-	bh=mD1dKSaDbFABDNdxhBOrHC0pI1BKnXyc1MHH71Bb614=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eZS3kk/thMNGMGY5pZgmMYtRZ2ZiDpiny/SQE5YuDO1qB4iAvVKw8kTHyP6Mroxe7Ezu6ESBURfF1s82upFhW+2S17YG9ftU79ECzDWl5D2DmvgFGg9H5AzDe/Wgf8ojYBoW0IUef5GU8vwICnEFtfz5vfEU46srOb5MNNX203o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nMFHz4rL; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1758101909; c=relaxed/simple;
+	bh=Jio7bAVw9qSJCBnMd44EyKscciXyCsu3ThljIX/NLok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CywAvzDfVSHRKCbNY1C0JgYMcrlePGQvXSM2WXDEpFX3Bo9OIzG1tNExiPx6GCUoZwaiG0yKIHK6hTbeqkAJes1k22UO3Ku2VPEHCL9EeHirzTvtwZAhWTITj4SPjpfuneWsmp96yBnlGfRTYBPf8vvfb8hd8j3ryaPlsR4FKgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aA123NGr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nMFHz4rL"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-787d9eab745so23169486d6.1
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 01:47:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758098862; x=1758703662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qSQBwTY7x8IQoxtsTDFfPaHwMvtropOKYFv/BGH9LuE=;
-        b=nMFHz4rLjW9HxACLfiGmFUDToCY8xwg3npc15bK5XMjrlNTdzc/sYKlZNyYjkiJfGV
-         04709FfI9hX4IQyLJ7g988v3DW+ZR9dju8jlw3jQkKIhABgqSomLxrvzNVlNclndI92e
-         c58nFVIiq2itPPGMNki0u2UyFSgm03ZV5JC7j7UrBDtHRldm691Li1IU1NevcMlG+Q0r
-         T9ioL2PauUpuY3pdIHhEoGaT3I3lNRfrShFnPUBnQ9xnlme1deOG7y2l5Km5miG10rZT
-         Sw7KaDM/c7b4xNktgKwB+rMrN8eNbu28K+KoBe0GdhmPot3yrgFcifmKnCOIdEv/dyts
-         l9BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758098862; x=1758703662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qSQBwTY7x8IQoxtsTDFfPaHwMvtropOKYFv/BGH9LuE=;
-        b=v22kaYJqDU7MhmlW0IrdB0Ydo4p8RvYmSYFRdK84WBtzc+APD/5f7FH8hyneHVNs0q
-         PEJr/Q8yhZYx19vqOmKXszcDerS/fRYevZtjOGm6U4PNr9Y5qENqZ9meCh0ilQA+fyOA
-         M+vZxKYuQw/xzTzHk0FlpNnyYQCh9dXUlExgz/AfokwZ5KA2pCa5yowjGYFq01t6Fr7w
-         FxZiyqpdWplqS28g82PSqGSNTyRhzSBKF82rwiaxSuZmeRhzaaJdRQq6Yr5wq8K3bDmx
-         d42FHFE9QRJEWASH2a3q5KsYYko8APMexJe8FUcrGUR5TcQqbKeIxTsLnx9Ual9+lhNq
-         SL6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWcWAFh0/CSxVZruukujCxl8DnXtrz+Gsn07AMebcekANibHUk4gvCOucba3PmirdRuO+pqyy2+RMZXwdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGZoW8bmdl9qIofFj5GFT/kytgEcLuiaFeD03rzIuhxmUvm2/4
-	4NNle+x/+e1izR9ScA3foqulGIWOiDCbEbtxRu2faPzI4ykHWwzH7BESldoY5kiWNxgpPjSAQbj
-	sMVGH7ElxFyOP0EtKMgqZDN5+NDNADxLCKZxaxiFP
-X-Gm-Gg: ASbGncuLE8PiNRCJsoz15xIfiIcWEuGJjNhQL4JdnCj82p0HQa5kygc74cmXQgzzcyH
-	duLJKUjNcaPhRZw1xm2Rel47eUK+572KzLWwQ8G61S/KpypmgwVFy7mK6JWp7oEDNy5D8nTkKSd
-	2Y3+kEAo3+jbubiGgq6X9N2WEDMecNzgNcXzG21hnxIWyzgZz5AnHbMoVYWYS2y5+Se08ZWyIme
-	0CDpft8ecehnS7IdeM4MAFa8PWiMVlOL/kBrqfCJe8=
-X-Google-Smtp-Source: AGHT+IHQqM5a49OQaZzq5NlAj4f7mo4PVwkO0Od/qpE6zKcTcL2cYsdQMpOPx7K+APxdGyrFaBcGHMy5truFRbrqA1M=
-X-Received: by 2002:ad4:4eab:0:b0:76f:6972:bb91 with SMTP id
- 6a1803df08f44-78ecc6316d3mr11179046d6.10.1758098861793; Wed, 17 Sep 2025
- 01:47:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aA123NGr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D726C4CEF0;
+	Wed, 17 Sep 2025 09:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758101908;
+	bh=Jio7bAVw9qSJCBnMd44EyKscciXyCsu3ThljIX/NLok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aA123NGre/Y337CiqEBShrS4jPBc82oq0oClBDi8S5SoV4ZvC37x/MkzmPxmAqUuo
+	 f7mvhgd/sVw0LkDQrxwgKKWvn+qSTWyzSC8Xl7aHazts+ItYYStGeQWD9kDUPx/tXC
+	 zSekAoppOpm//P7gzr2SuoYlYAdgtSmDDjHx8Q6vfj4z+IZMqFZm9tsVnX7LT3afFV
+	 Mxuvu6W/FPyfB3igMdJmB0xl3HQshKJ56I17gmMAzVEv5OTaa4U/dOzoF8s70HT5zh
+	 JIFW9G3A0lzbHdy3hsoGaO4J5NrzwABG+2fh6w+pqqT9Qhycw6Sw30tMuPW9i5RHqo
+	 l6VFg19ajS9aQ==
+Date: Wed, 17 Sep 2025 10:38:23 +0100
+From: Lee Jones <lee@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
+	jarkko@kernel.org, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org, sgarzare@redhat.com
+Subject: Re: [GIT PULL] Immutable branch between MFD, Char and Crypto due for
+ the v6.18 merge window
+Message-ID: <20250917093823.GG3893363@google.com>
+References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
+ <20250902124205.GL2163762@google.com>
+ <20250912213256.GA3062565@ax162>
+ <20250916075835.GB1637058@google.com>
+ <20250916191658.GA1249009@ax162>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911195858.394235-1-ebiggers@kernel.org>
-In-Reply-To: <20250911195858.394235-1-ebiggers@kernel.org>
-From: Alexander Potapenko <glider@google.com>
-Date: Wed, 17 Sep 2025 10:47:05 +0200
-X-Gm-Features: AS18NWCHIE1dESGpN9uvlB5H-Nyc3e2nakhbUlwz_P_LJD2Kd7WI7My-Di8UNK8
-Message-ID: <CAG_fn=UY1HxmxpkM_YFGbr8W272F_bZgZHKiuvbsUjgFCs1RcA@mail.gmail.com>
-Subject: Re: [PATCH v2] kmsan: Fix out-of-bounds access to shadow memory
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Marco Elver <elver@google.com>, kasan-dev@googlegroups.com, 
-	Dmitry Vyukov <dvyukov@google.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250916191658.GA1249009@ax162>
 
-On Thu, Sep 11, 2025 at 10:01=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
- wrote:
->
-> Running sha224_kunit on a KMSAN-enabled kernel results in a crash in
-> kmsan_internal_set_shadow_origin():
->
->     BUG: unable to handle page fault for address: ffffbc3840291000
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     PGD 1810067 P4D 1810067 PUD 192d067 PMD 3c17067 PTE 0
->     Oops: 0000 [#1] SMP NOPTI
->     CPU: 0 UID: 0 PID: 81 Comm: kunit_try_catch Tainted: G               =
-  N  6.17.0-rc3 #10 PREEMPT(voluntary)
->     Tainted: [N]=3DTEST
->     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.=
-0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
->     RIP: 0010:kmsan_internal_set_shadow_origin+0x91/0x100
->     [...]
->     Call Trace:
->     <TASK>
->     __msan_memset+0xee/0x1a0
->     sha224_final+0x9e/0x350
->     test_hash_buffer_overruns+0x46f/0x5f0
->     ? kmsan_get_shadow_origin_ptr+0x46/0xa0
->     ? __pfx_test_hash_buffer_overruns+0x10/0x10
->     kunit_try_run_case+0x198/0xa00
->
-> This occurs when memset() is called on a buffer that is not 4-byte
-> aligned and extends to the end of a guard page, i.e. the next page is
-> unmapped.
->
-> The bug is that the loop at the end of
-> kmsan_internal_set_shadow_origin() accesses the wrong shadow memory
-> bytes when the address is not 4-byte aligned.  Since each 4 bytes are
-> associated with an origin, it rounds the address and size so that it can
-> access all the origins that contain the buffer.  However, when it checks
-> the corresponding shadow bytes for a particular origin, it incorrectly
-> uses the original unrounded shadow address.  This results in reads from
-> shadow memory beyond the end of the buffer's shadow memory, which
-> crashes when that memory is not mapped.
->
-> To fix this, correctly align the shadow address before accessing the 4
-> shadow bytes corresponding to each origin.
->
-> Fixes: 2ef3cec44c60 ("kmsan: do not wipe out origin when doing partial un=
-poisoning")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Tested-by: Alexander Potapenko <glider@google.com>
-Reviewed-by: Alexander Potapenko <glider@google.com>
+On Tue, 16 Sep 2025, Nathan Chancellor wrote:
 
-Thanks a lot!
+> On Tue, Sep 16, 2025 at 08:58:35AM +0100, Lee Jones wrote:
+> > On Fri, 12 Sep 2025, Nathan Chancellor wrote:
+> > > > The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+> > > > 
+> > > >   Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+> ...
+> > > > Qunqin Zhao (4):
+> > > ...
+> > > >       tpm: Add a driver for Loongson TPM device
+> > > 
+> > > This one needs a fix up due to commit 07d8004d6fb9 ("tpm: add bufsiz
+> > > parameter in the .send callback") in 6.17-rc1, as I am seeing the
+> > > following error in next-20250912.
+> > > 
+> > >   drivers/char/tpm/tpm_loongson.c:48:17: error: initialization of 'int (*)(struct tpm_chip *, u8 *, size_t,  size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int,  long unsigned int)'} from incompatible pointer type 'int (*)(struct tpm_chip *, u8 *, size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int)'} [-Wincompatible-pointer-types]
+> > >      48 |         .send = tpm_loongson_send,
+> > >         |                 ^~~~~~~~~~~~~~~~~
+> > >   drivers/char/tpm/tpm_loongson.c:48:17: note: (near initialization for 'tpm_loongson_ops.send')
+> > >   drivers/char/tpm/tpm_loongson.c:31:12: note: 'tpm_loongson_send' declared here
+> > >      31 | static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+> > >         |            ^~~~~~~~~~~~~~~~~
+> > > 
+> > > Can you squash it or do you want a separate patch?
+> > > 
+> > > Cheers,
+> > > Nathan
+> > > 
+> > > diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
+> > > index a4ec23639911..9e50250763d1 100644
+> > > --- a/drivers/char/tpm/tpm_loongson.c
+> > > +++ b/drivers/char/tpm/tpm_loongson.c
+> > > @@ -28,7 +28,7 @@ static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+> > >  	return cmd_ret->data_len;
+> > >  }
+> > >  
+> > > -static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
+> > > +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz, size_t count)
+> > >  {
+> > >  	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
+> > >  	struct tpm_loongson_cmd *cmd = tpm_engine->command;
+> > 
+> > This will break my local branch.
+> > 
+> > Any chance of an immutable pull-request for:
+> > 
+> >   07d8004d6fb9 ("tpm: add bufsiz parameter in the .send callback")
+> 
+> I might be missing something but this commit is in Linux 6.17-rc1, which
+> this tree is based on according to both 'git log' and the lead in to
+> your pull request at the top, so your local branch is already broken.
+> That error message was taken from the tip of your tree and the fix was
+> tested against it as well.
+> 
+> "tpm: Add a driver for Loongson TPM device" was sent back in early July,
+> so it was never updated for this conflict.
+
+Ah, gotcha.  I thought you were saying that 07d8004d6fb9 ("tpm: add
+bufsiz parameter in the .send callback") was applied somewhere else.  In
+which case, I need to figure out why my build testing didn't catch it.
+
+I'd be happy with a formal patch from you or I can create the patch and
+add your {Reported,Suggested}-by.  How would you like to proceed?
+
+-- 
+Lee Jones [李琼斯]
