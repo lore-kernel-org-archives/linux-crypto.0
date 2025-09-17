@@ -1,48 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADB72F99A6;
-	Wed, 17 Sep 2025 17:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6227082D
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 18:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758129159; cv=none; b=lYUDOxbFXnxeioBIuIFvO6+44QzWbBX6K2cG4Hxn8nLmZwiy3RMmZ7adM3VpK/MgcspI8u4DdMG+ZlWwMXcfRA2F9VGGttdje0Ot4uAbaca9wIOXdoD0WLQO1L8r/EXK1cAJ4+PJOUExiebc1rKVlPM3rCGrND8gCBcvtbHGWjY=
+	t=1758134940; cv=none; b=EvGLqUmFiM5lzb7rDyY03TEyaTek8oX5z5N8DuAGloSF7WSoizqLhmBr4bHnn8WkT+oZLyH1QTmi7+Zk5YXdvEA8+IQ7jPwaa88SSxQI82A8HbM+/Z2VCHokCwCRurQmNXfHJ9SNCzz99jvtezdZzMOGwxcLsEICAmBum6zR370=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758129159; c=relaxed/simple;
-	bh=cjwB8xCDt/x0cjPMrecLsB4GTBSMS9dIXIQbUTwpVzc=;
+	s=arc-20240116; t=1758134940; c=relaxed/simple;
+	bh=xLHT7aZU+wluB3wR7VwHzdJkoqTpTyUQNyl6VnuBJ8o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R5c4kDZ6ha12TuX8K0pklfpRwgoJTP0b1yrRxdD22gldKYQT2hIWtOEb+vcI3kFdYFFrVwH7vxzd/8YGas81jAjNKLkI5caSvN/mWU+mh/uQ9j5SB5MVEOIXfCN+5f7Ic/Q1nmBUUON9lTYI+aN70PL0TwcoLZJwfeVmEuVpnsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfNw0Eex; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=e1wGUuiwwUK9hVj/IcDoRUP6YDuU76saw3Fm8mOFPB6Se+wSHoTYYNPC9vZTq7fkr9Mjrg03qibY3qbaG5Per1veB71ZLsBpE1AWprGHy2267nJg/T+DihhHmQPYn25Sep+C9qg/8BL77QEkA5tcodYw7n4xM6ihK9MLYsOY+RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EkZ/wDgh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfNw0Eex"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5461AC4CEE7;
-	Wed, 17 Sep 2025 17:12:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EkZ/wDgh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3812FC4CEE7;
+	Wed, 17 Sep 2025 18:48:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758129157;
-	bh=cjwB8xCDt/x0cjPMrecLsB4GTBSMS9dIXIQbUTwpVzc=;
+	s=k20201202; t=1758134939;
+	bh=xLHT7aZU+wluB3wR7VwHzdJkoqTpTyUQNyl6VnuBJ8o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YfNw0EexKdDPmklIXZEzvlC/X7BhePBqzIxVGYlllmZyjulcFzli7HJNEj5zbBWo4
-	 q9mnMO45HDDh3k+cQ/mVD8Q+uv5pRc0bR6kddgHHfg6hc66+rkUZEj9KBLx8d8z98m
-	 ASh+Yv4uli8l970RoiQwpye2/6AXJbVtYDlsZHz7nd1wNLR7774NEmq9I8Jy7g36ru
-	 51byqfp5DvLlsMWni7AneCPRHzdwigRzxCk71sxdqPZ6Nvf21pa1ba2ly3906sIQa1
-	 SUVr+ZalK39KP7X4sChhjE9kWinj/f1CtzsE1TEWhXEQc4mjOVBvjmV2TtFMWyQhUY
-	 GOwd1ZIfiXVoA==
-Date: Wed, 17 Sep 2025 10:12:32 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Lee Jones <lee@kernel.org>
-Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
-	jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-	linux-integrity@vger.kernel.org, sgarzare@redhat.com
-Subject: Re: [GIT PULL] Immutable branch between MFD, Char and Crypto due for
- the v6.18 merge window
-Message-ID: <20250917171232.GA1457869@ax162>
-References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
- <20250902124205.GL2163762@google.com>
- <20250912213256.GA3062565@ax162>
- <20250916075835.GB1637058@google.com>
- <20250916191658.GA1249009@ax162>
- <20250917093823.GG3893363@google.com>
+	b=EkZ/wDghfsTYItkhRktuB/Vl69C5QhJSEDE9RIQ3xE3ALAcln5qqxVUfjivmgzHXZ
+	 SwcAVWLnTK6+wGP+bthWScxh/Ok7NXN+rQNtfzdFPf5CKi8BXMtSFWCxG0qx4EsqBk
+	 lRHt0hzn0s4mTJQmeTMfWkJoolnLJqI9eOdUSwMCcHMkKy1eTnfAf7Wz1eDsOYdIXi
+	 1EfJoIGlLVhRVzOuzVshxcbFCnMpmRPeUndZL7OuNiC0Ktq+Q4t1ExoCoZ7oNZj7Ds
+	 ZtdvP0OrqEoa1pymL8gVckiQ4gGDN8D4bGK3p1BkpaYkQ2T/YWmh7Dsn0u8fn3SuqD
+	 fWLtBou7/RwKQ==
+Date: Wed, 17 Sep 2025 13:48:56 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: SHAKE256 support
+Message-ID: <20250917184856.GA2560@quark>
+References: <20250915220727.GA286751@quark>
+ <2767539.1757969506@warthog.procyon.org.uk>
+ <2768235.1757970013@warthog.procyon.org.uk>
+ <3226361.1758126043@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,22 +44,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250917093823.GG3893363@google.com>
+In-Reply-To: <3226361.1758126043@warthog.procyon.org.uk>
 
-On Wed, Sep 17, 2025 at 10:38:23AM +0100, Lee Jones wrote:
-> Ah, gotcha.  I thought you were saying that 07d8004d6fb9 ("tpm: add
-> bufsiz parameter in the .send callback") was applied somewhere else.  In
-> which case, I need to figure out why my build testing didn't catch it.
+On Wed, Sep 17, 2025 at 05:20:43PM +0100, David Howells wrote:
+> Okay, I have lib/crypto/sha3 working.  One question though: why are the hash
+> tests built as separate kunit modules rather than being built into the
+> algorithm module init function and marked __init/__initdata?
 
-Maybe because this driver ultimately depends on CONFIG_LOONGARCH (i.e.,
-no COMPILE_TEST)? I would argue most people don't do LoongArch builds.
+KUnit is the standard way to do unit testing in the kernel these days.
+The kernel community has been working on migrating legacy ad-hoc tests
+over to KUnit.  This is not specific to lib/crypto/.
 
-> I'd be happy with a formal patch from you or I can create the patch and
-> add your {Reported,Suggested}-by.  How would you like to proceed?
+> For FIPS compliance, IIRC, you *have* to run tests on the algorithms,
+> so wouldn't using kunit just be a waste of resources?
 
-I sent a formal patch to make life a little easier for you :)
+The lib/crypto/ KUnit tests are real tests, which thoroughly test each
+algorithm.  This includes computing thousands of hashes for each hash
+algorithm, for example.
 
-https://lore.kernel.org/20250917-tpm-loongson-add-bufsiz-v1-1-972a75c0aab2@kernel.org/
+FIPS pre-operational self-testing, if and when it is required, would be
+a completely different thing.  For example, FIPS often requires only a
+single test (with a single call to the algorithm) per algorithm.  Refer
+to section 10.3.A of "Implementation Guidance for FIPS 140-3 and the
+Cryptographic Module Validation Program"
+(https://csrc.nist.gov/csrc/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf)
 
-Cheers,
-Nathan
+Of course, so far the people doing FIPS certification of the whole
+kernel haven't actually cared about FIPS pre-operational self-tests for
+the library functions.  lib/ has had SHA-1 support since 2005, for
+example, and it's never had a FIPS pre-operational self-test.
+
+*If* that's changing and the people doing FIPS certifications of the
+whole kernel have decided that the library functions actually need FIPS
+pre-operational self-tests after all, that's fine.  But please don't try
+to misuse the actual (KUnit) tests.  Instead, just add exactly what is
+actually required by the FIPS to the appropriate subsys_initcall in the
+library.  For SHA-3 for example, you'd only need to compute and verify a
+single hash, using any of SHA3-224, SHA3-256, SHA3-384, SHA3-512.  Then
+panic() if it fails and fips_enabled is true.
+
+- Eric
