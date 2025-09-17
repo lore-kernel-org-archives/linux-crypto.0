@@ -1,122 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC134306B22;
-	Wed, 17 Sep 2025 09:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9083534AB1D;
+	Wed, 17 Sep 2025 09:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758101909; cv=none; b=U0clGr+0Nfkwx4H2pJqWPUYByn57lHLMu+IYW36DZYXiiX3yHtzdJPNvY0LS42jXOQPx/oMXtgJmmneyTFZuBTuUmW71IME5kiJCyNtJ6ZDB/3crM+5suETAZqkHZOgrbVG3jYQk6yxLbt2bYIT+KnwaIK8YJ1ucqiPJeX+hTOg=
+	t=1758102861; cv=none; b=D5lqJ20POxI2rBxq7R5TKojBmNesq1xu8Pawjfp7M8klaCHYJwzyoOTt6qDeA8OXwujaIqGr2zpBZcb4uN6tpnyU52mAGmjwz0bmHKjRtZp0luJJ8WAOy6jo0Ph82r1E/gcV+LGhYeCEoMOd2VrlxgwLftfms58QgW4dDTnj7Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758101909; c=relaxed/simple;
-	bh=Jio7bAVw9qSJCBnMd44EyKscciXyCsu3ThljIX/NLok=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CywAvzDfVSHRKCbNY1C0JgYMcrlePGQvXSM2WXDEpFX3Bo9OIzG1tNExiPx6GCUoZwaiG0yKIHK6hTbeqkAJes1k22UO3Ku2VPEHCL9EeHirzTvtwZAhWTITj4SPjpfuneWsmp96yBnlGfRTYBPf8vvfb8hd8j3ryaPlsR4FKgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aA123NGr; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aA123NGr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D726C4CEF0;
-	Wed, 17 Sep 2025 09:38:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758101908;
-	bh=Jio7bAVw9qSJCBnMd44EyKscciXyCsu3ThljIX/NLok=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aA123NGre/Y337CiqEBShrS4jPBc82oq0oClBDi8S5SoV4ZvC37x/MkzmPxmAqUuo
-	 f7mvhgd/sVw0LkDQrxwgKKWvn+qSTWyzSC8Xl7aHazts+ItYYStGeQWD9kDUPx/tXC
-	 zSekAoppOpm//P7gzr2SuoYlYAdgtSmDDjHx8Q6vfj4z+IZMqFZm9tsVnX7LT3afFV
-	 Mxuvu6W/FPyfB3igMdJmB0xl3HQshKJ56I17gmMAzVEv5OTaa4U/dOzoF8s70HT5zh
-	 JIFW9G3A0lzbHdy3hsoGaO4J5NrzwABG+2fh6w+pqqT9Qhycw6Sw30tMuPW9i5RHqo
-	 l6VFg19ajS9aQ==
-Date: Wed, 17 Sep 2025 10:38:23 +0100
-From: Lee Jones <lee@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, herbert@gondor.apana.org.au,
-	jarkko@kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-	linux-integrity@vger.kernel.org, sgarzare@redhat.com
-Subject: Re: [GIT PULL] Immutable branch between MFD, Char and Crypto due for
- the v6.18 merge window
-Message-ID: <20250917093823.GG3893363@google.com>
-References: <20250705072045.1067-1-zhaoqunqin@loongson.cn>
- <20250902124205.GL2163762@google.com>
- <20250912213256.GA3062565@ax162>
- <20250916075835.GB1637058@google.com>
- <20250916191658.GA1249009@ax162>
+	s=arc-20240116; t=1758102861; c=relaxed/simple;
+	bh=McqcASJsTzPznvt5YCM25psP2hkfHoNU+DH9+PrhYWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=kfT9HKCeLB/IKD9TqHt1sJ/zWSuFulY1bkJiOVfneYBitu8tnPup+2Wue5kQ3g9pTVqiYsBqqnzhS7JyF5yruolOr7b8/3JbGOwzsZTMHslCvpdLTH1OgdjlUz7FJzrUoZlaLXw2xjg03Bl23LA59keG0YCZAeXS6wuDtvnTsw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4cRYrz33m9zPsc3;
+	Wed, 17 Sep 2025 17:49:39 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1182A18007F;
+	Wed, 17 Sep 2025 17:54:15 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 17 Sep 2025 17:54:14 +0800
+Received: from [10.67.120.171] (10.67.120.171) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 17 Sep 2025 17:54:14 +0800
+Message-ID: <ace00212-b02b-4407-98ab-5aff3e0fad77@huawei.com>
+Date: Wed, 17 Sep 2025 17:54:13 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] uacce: fix isolate sysfs check condition
+To: Greg KH <gregkh@linuxfoundation.org>
+CC: <zhangfei.gao@linaro.org>, <wangzhou1@hisilicon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <fanghao11@huawei.com>, <shenyang39@huawei.com>,
+	<liulongfang@huawei.com>, <qianweili@huawei.com>
+References: <20250916144811.1799687-1-huangchenghai2@huawei.com>
+ <20250916144811.1799687-3-huangchenghai2@huawei.com>
+ <2025091633-antacid-gluten-0a61@gregkh>
+From: huangchenghai <huangchenghai2@huawei.com>
+Content-Language: en-US
+In-Reply-To: <2025091633-antacid-gluten-0a61@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916191658.GA1249009@ax162>
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-On Tue, 16 Sep 2025, Nathan Chancellor wrote:
 
-> On Tue, Sep 16, 2025 at 08:58:35AM +0100, Lee Jones wrote:
-> > On Fri, 12 Sep 2025, Nathan Chancellor wrote:
-> > > > The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
-> > > > 
-> > > >   Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
-> ...
-> > > > Qunqin Zhao (4):
-> > > ...
-> > > >       tpm: Add a driver for Loongson TPM device
-> > > 
-> > > This one needs a fix up due to commit 07d8004d6fb9 ("tpm: add bufsiz
-> > > parameter in the .send callback") in 6.17-rc1, as I am seeing the
-> > > following error in next-20250912.
-> > > 
-> > >   drivers/char/tpm/tpm_loongson.c:48:17: error: initialization of 'int (*)(struct tpm_chip *, u8 *, size_t,  size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int,  long unsigned int)'} from incompatible pointer type 'int (*)(struct tpm_chip *, u8 *, size_t)' {aka 'int (*)(struct tpm_chip *, unsigned char *, long unsigned int)'} [-Wincompatible-pointer-types]
-> > >      48 |         .send = tpm_loongson_send,
-> > >         |                 ^~~~~~~~~~~~~~~~~
-> > >   drivers/char/tpm/tpm_loongson.c:48:17: note: (near initialization for 'tpm_loongson_ops.send')
-> > >   drivers/char/tpm/tpm_loongson.c:31:12: note: 'tpm_loongson_send' declared here
-> > >      31 | static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> > >         |            ^~~~~~~~~~~~~~~~~
-> > > 
-> > > Can you squash it or do you want a separate patch?
-> > > 
-> > > Cheers,
-> > > Nathan
-> > > 
-> > > diff --git a/drivers/char/tpm/tpm_loongson.c b/drivers/char/tpm/tpm_loongson.c
-> > > index a4ec23639911..9e50250763d1 100644
-> > > --- a/drivers/char/tpm/tpm_loongson.c
-> > > +++ b/drivers/char/tpm/tpm_loongson.c
-> > > @@ -28,7 +28,7 @@ static int tpm_loongson_recv(struct tpm_chip *chip, u8 *buf, size_t count)
-> > >  	return cmd_ret->data_len;
-> > >  }
-> > >  
-> > > -static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> > > +static int tpm_loongson_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz, size_t count)
-> > >  {
-> > >  	struct loongson_se_engine *tpm_engine = dev_get_drvdata(&chip->dev);
-> > >  	struct tpm_loongson_cmd *cmd = tpm_engine->command;
-> > 
-> > This will break my local branch.
-> > 
-> > Any chance of an immutable pull-request for:
-> > 
-> >   07d8004d6fb9 ("tpm: add bufsiz parameter in the .send callback")
-> 
-> I might be missing something but this commit is in Linux 6.17-rc1, which
-> this tree is based on according to both 'git log' and the lead in to
-> your pull request at the top, so your local branch is already broken.
-> That error message was taken from the tip of your tree and the fix was
-> tested against it as well.
-> 
-> "tpm: Add a driver for Loongson TPM device" was sent back in early July,
-> so it was never updated for this conflict.
+On Mon, Sep 16, 2025 at 11:15 PM +0800, Greg KH wrote:
+> On Tue, Sep 16, 2025 at 10:48:09PM +0800, Chenghai Huang wrote:
+>> The uacce supports device isolation feature. If the driver
+>> implements the isolate_err_threshold_read and
+>> isolate_err_threshold_write callbacks, the uacce will create sysfs
+>> files. Users can read and configure isolation policies through
+>> sysfs. Currently, if either isolate_err_threshold_read or
+>> isolate_err_threshold_write callback exists, sysfs files are
+>> created.
+>>
+>> However, accessing a non-existent callback may cause a system panic.
+> Where is the callback happening that fails?  Shouldn't that be checked
+> instead of doing this change?
+>
+>> Therefore, sysfs files are only created when both
+>> isolate_err_threshold_read and isolate_err_threshold_write are
+>> present.
+> What if a device only has 1?  That should still work properly?
+>
+> And why not just create the file if it is going to be used, that is the
+> real solution here.
+>
+> thanks,
+>
+> greg k-h
+Thank you for your feedback.I agree that the check should be done in the 
+corresponding `isolate_strategy_show()` and `isolate_strategy_store()` 
+functions.
 
-Ah, gotcha.  I thought you were saying that 07d8004d6fb9 ("tpm: add
-bufsiz parameter in the .send callback") was applied somewhere else.  In
-which case, I need to figure out why my build testing didn't catch it.
+How about the updated:
 
-I'd be happy with a formal patch from you or I can create the patch and
-add your {Reported,Suggested}-by.  How would you like to proceed?
+@@ -402,6 +402,9 @@ static ssize_t isolate_strategy_show(struct device 
+*dev, struct device_attribute
+         struct uacce_device *uacce = to_uacce_device(dev);
+         u32 val;
 
--- 
-Lee Jones [李琼斯]
++       if (!uacce->ops->isolate_err_threshold_read)
++               return -ENOENT;
++
+         val = uacce->ops->isolate_err_threshold_read(uacce);
+
+         return sysfs_emit(buf, "%u\n", val);
+@@ -414,6 +417,9 @@ static ssize_t isolate_strategy_store(struct device 
+*dev, struct device_attribut
+         unsigned long val;
+         int ret;
+
++       if (!uacce->ops->isolate_err_threshold_write)
++               return -ENOENT;
++
+         if (kstrtoul(buf, 0, &val) < 0)
+                 return -EINVAL;
+
+@@ -460,9 +466,7 @@ static umode_t uacce_dev_is_visible(struct kobject 
+*kobj,
+             (!uacce->qf_pg_num[UACCE_QFRT_DUS])))
+                 return 0;
+
+-       if (attr == &dev_attr_isolate_strategy.attr &&
+-           (!uacce->ops->isolate_err_threshold_read ||
+-            !uacce->ops->isolate_err_threshold_write))
++       if (attr == &dev_attr_isolate_strategy.attr)
+                 return 0;
+
+This way, the sysfs files will only be created if they are going to be 
+used, and the checks are done at the appropriate places.
+
+Thanks,
+Chenghai
