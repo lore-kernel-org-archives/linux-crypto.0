@@ -1,45 +1,70 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B027C2F999E
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 03:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3862026C3BF;
+	Wed, 17 Sep 2025 03:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758080443; cv=none; b=HI4TchD7an+Ig+q4nqw59ptPad9owT6AGo/fLJ2lV8O8gWoEmLGMaJiwZGKnupadyvZMQw5DQIldphv+S+PdBR94WV7SMNqzjq5rRFqCkrJL+B6hP2I2G0rYMdmqrx+9sb52BoepfAVx2En1t1gvrJp4dYNioRLisZdbb5oghys=
+	t=1758081587; cv=none; b=eMzCn8lu9/cFF0awuKzDonnBkEGYvUENK6t8rLORVZz5ylSulb/LVOfTAPphaUmke9mx/9NX/yK/za2cy6026DFVeeM7GH7wFMZtSkirrSjTf1+R72AOl59CgL/hvCdbonc1IgK1nJ1ZzLcIUZhk2VbCLahndbYayQuF/wJeiE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758080443; c=relaxed/simple;
-	bh=RlKVeEpy7SM1GRgoNp1ryVPRzP4Jo7O8zkEsd601fFk=;
+	s=arc-20240116; t=1758081587; c=relaxed/simple;
+	bh=H9thyNiLTdBDPl30sbess+15GJm36k6HegAlHIfWnHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AYuv+ofW/lRYYlY5vgzKx4O1rNSt/HCyZpJcnVfZCApEdqq0xem1HEf3iGEWlLxo4+an3Ea2U9vJMNXJiPn0YfLw1fO2MzwqpUP5GJhPg3xJLeL8t7FOhyiYfxDDecvniqfN0Xe16m+R2Lx0Kwz7Cu6jY0LRA8A2fbQuWmwErTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=biOUEt2b; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZOr28zDj/n/vOQKdCGstLMOMSQbbW2S/PxZz52/ZFGokRJNVvoUMrlhdeo+Ttcgouz56r0eLXZvWFGgo96jhrT6iM4Be1NqEWh2QCay98WNcg8SeLkNPO/xu3jw7lsbaD/7DxlpvpIO6lLqwpliUyGmyJ98Ex5uqNC7fIsAz2yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DBelvs2+; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="biOUEt2b"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/B6ysI/7ghP4/ED9gtBp/wRs8eJbfa3/4RMrl2tof7A=; b=biOUEt2b9sdBG4nuVSmSkJ4icu
-	uCfjrquuWYL4cHBwTfO/lep/Oia9qRDvF+8PiprKX+f8xoLVdPM/Tyn8huwmPCFAOetP5/OgHmpNt
-	S/vK6fO/ODPpTNU4MUiq9EZq75dWp+81ZVUezjkcr1nHYsXInKI/dQYOkMHnhwqX+ErKOFfG3ASlm
-	ZyCIiHOGtoCNpN7y9HGf4+EuQm0B71x6cPW+8EExbgsEXFxy5JmIBjauJ8HwgC1rJIaGTUOxsuudt
-	anxmngy3tbqJAXPsaF+YmmSsDeG8iDX/5wU7UQf0qt2NukVRqILjs+PQ4h1KRTnyyIl2hx6t27a9c
-	M7Co/cGw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uyimR-0063hf-0J;
-	Wed, 17 Sep 2025 11:40:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 17 Sep 2025 11:40:23 +0800
-Date: Wed, 17 Sep 2025 11:40:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-Subject: Re: A question on crypto_engine and a possible bug
-Message-ID: <aMotp5meAdEtqr9R@gondor.apana.org.au>
-References: <55446d58-0ca7-4d1c-9e9c-4fcbf8dcda1f@ti.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DBelvs2+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758081586; x=1789617586;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=H9thyNiLTdBDPl30sbess+15GJm36k6HegAlHIfWnHU=;
+  b=DBelvs2+fS+ZAGbH8kAqbpxPFhJGtjk71UoA28vZSiSbP7IwWWMgNIFI
+   huYn7ORuvDpUP64HZ3IeveXv44fizWvx5W2T5Np2/qny/s0ITxI+3tjo6
+   qbCbITWXOY4pwEFhFZ8E4BzBxTH2GWFRNpQ3e4JCseIyz+p8YOl9n0/M7
+   A4Zi4+bCXKJ98S75cd+BbcxIvCCA35vKSs/nszHijM0lYcYPBbIXDjN1e
+   4nnxZyMfzsh5E0Iku/CadTJtaCaFOG44qTWbWqiKzRVXjHGqU1ux+wQMM
+   mJiQ8ViET2f1Jz8j9ca65S96YKDG8kh8+TpMsJBUrKFIcV1Vc7zsp/vYp
+   w==;
+X-CSE-ConnectionGUID: aWy5kao1SNikqQlKRb5UkA==
+X-CSE-MsgGUID: 4S2p1TIHSC+aBHXQoHeJMw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="60305022"
+X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
+   d="scan'208";a="60305022"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 20:59:45 -0700
+X-CSE-ConnectionGUID: 8r1RW9JuQCOoNSWzEvSMaQ==
+X-CSE-MsgGUID: 7cId5LfgQUu8YUrX2ncqBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
+   d="scan'208";a="180266969"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 16 Sep 2025 20:59:38 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uyjKS-000127-0B;
+	Wed, 17 Sep 2025 03:59:36 +0000
+Date: Wed, 17 Sep 2025 11:59:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com,
+	glider@google.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	andreyknvl@gmail.com, andy@kernel.org, brauner@kernel.org,
+	brendan.higgins@linux.dev, davem@davemloft.net, davidgow@google.com,
+	dhowells@redhat.com, dvyukov@google.com, elver@google.com,
+	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz,
+	jannh@google.com, johannes@sipsolutions.net,
+	kasan-dev@googlegroups.com, kees@kernel.org,
+	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
+	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com
+Subject: Re: [PATCH v1 03/10] kfuzztest: implement core module and input
+ processing
+Message-ID: <202509171131.vod7tLWH-lkp@intel.com>
+References: <20250916090109.91132-4-ethan.w.s.graham@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,30 +73,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <55446d58-0ca7-4d1c-9e9c-4fcbf8dcda1f@ti.com>
+In-Reply-To: <20250916090109.91132-4-ethan.w.s.graham@gmail.com>
 
-On Sat, Sep 13, 2025 at 02:48:11PM +0530, T Pratham wrote:
->
-> So, the do_one_op function registered by the user in *_engine_alg, what is
-> it supposed to return? Seeing the int return type, I assumed it should be
-> 0 for success and error codes if any failure occurs (-EINVAL, -ENOMEM,
-> etc. for appropriate failure). Before returning from this function,
-> we also call crypto_finalize_*_request, and pass the return error code
-> to this as well. So do we return the same error code at both places?
+Hi Ethan,
 
-The do_one_op return value is used to represent errors that occur
-before or during the submission of the request to hardware, e.g.,
-the hardware queue was full.
+kernel test robot noticed the following build warnings:
 
-If you return an error via do_one_op, then the crypto_engine will
-carry out the completion for you.
+[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
+[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.17-rc6 next-20250916]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-If you returned zero from do_one_op, then the request is yours and
-yours only and you must finalize the request when it is complete,
-with either 0 or an error value.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ethan-Graham/mm-kasan-implement-kasan_poison_range/20250916-210448
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+patch link:    https://lore.kernel.org/r/20250916090109.91132-4-ethan.w.s.graham%40gmail.com
+patch subject: [PATCH v1 03/10] kfuzztest: implement core module and input processing
+config: x86_64-randconfig-004-20250917 (https://download.01.org/0day-ci/archive/20250917/202509171131.vod7tLWH-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250917/202509171131.vod7tLWH-lkp@intel.com/reproduce)
 
-Cheers,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509171131.vod7tLWH-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: lib/kfuzztest/main.c:46 struct member 'num_invocations' not described in 'kfuzztest_state'
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
