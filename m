@@ -1,68 +1,72 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0801E51E0
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 06:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F69629BDB6
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 06:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758177371; cv=none; b=NxxAGf+HuZyhhPHipekyYZ7l2K5g8uD0hH4+hHws89v12ZQlAW9a11VLF4ARfzE9nAcYxDF52Xhf/j5BWOvsbV9owEgI09JPfKJG3NAANrbO+KW7XTsY3bzHjbzb4UbFdtV57nuODK8dcA2QGIURkKshUO9aNvk9P61ABM/Dml0=
+	t=1758177372; cv=none; b=ukR7neVadxrfgsObgJ9C8UbSPLDWxxVVj+aUjKDEGUhd6dR7vLB7nKB59aWT8MuMMgGPWqTKtFpjkKyUAlJ8jNQmdNO/uvLvKwspunWbRC4PclvwwVCN1ostgYh1Gt3wiU2wXlYBNKQEymNMDeWG0/hPwkUptSiGExYq/7ZuZnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758177371; c=relaxed/simple;
-	bh=6V9uNq83XXSYotxaF5gDZpQuTwairQF/oZADfO3/sw4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sCmaLS9IJBbY9r5C8ZMUSE/BKLDROk1ri2gk/4/pZAxGYTrb0jWqTgbSeoKffSukPpySUx8AuvHpmEcDlgyIwl9UY6LPBjR5k27Fei8tBaYH/E0N0BjMoCcgKIMeg5Fia3kS6Y2bF42BQk2HJa9FajvzFejqXnGidwZWyK97sWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dWPm2voH; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1758177372; c=relaxed/simple;
+	bh=mLsK2P9o/PVsSH+ZSFN+0IASgJ72ISRGleKWYu9sCSg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OeMfoY0gSpQ/N+IKUSoB4sNb8BQFrZPO3heAX2OISJNjkId07foY5PNQEcI30s1nAAQW0gKQPFsaTphP8ET4dLDSIkLZfFml9czQMD1VbsD/d8fvl5xBlv11PMtkobOI6G/cm9UIdM/Im3BOhuUzMn/HhywdM8tu5yKiPZNbW98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D+7e8irB; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dWPm2voH"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45b467f5173so4692625e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 23:36:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D+7e8irB"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45cb604427fso3004995e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 23:36:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758177367; x=1758782167; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VFjH+4iKezMx9taew/P2Pp2wCahAKn7daFaD40BNcwI=;
-        b=dWPm2voH0f603vPYQX77aQqLkQwj1gccurUP3xm1C/utJaqfk50DrRytdrmmiyQJfg
-         Ycv4tPwrswZeOpCt4GBicXAxbm62qcDyG0SIvYXMBlZAPcn7/yv0kg7d561BhHzlUocL
-         vXuHJevK3ZD6fDDJM2ygdtHImzccAXDBSCj/P/1DTfPXDuCvmnZZ+AHtWzy21aq+MpNW
-         As7FIotfnDc8YfSYp8eCugw0KlJrZIcTzlwCpyvbmZ8Vuuro5MEUH7cayCez0pX2JdKD
-         Zvt1xxtMkc/p+RRUyyX5EdoPZROIlDNWvVk7e3pMead98VErbqqpr0B4KEYaeJL9p0K4
-         2YhQ==
+        d=google.com; s=20230601; t=1758177369; x=1758782169; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pD1GqEfStiaojYrQnQeMsM18jIp83N4vklBUGeXEk0Y=;
+        b=D+7e8irBiDdNYI7S5xxbpyUYvaBLJCXgUhIrPHm1crl45UieccFahRubnYAfXAnmPi
+         +wKtVsIUbnI+Ae8sBnj39Xno1JPh5+9jg4kMrKaBbfEDIJ2mLUKzsFRsVctxLvpLe2af
+         djb1G5M+NtG+3hBtkGDB/BTqwJziZ9mBPF1B1IJNuuTXTJkj9N+BZhhjb1idtIsRpwVH
+         SSf2hYftLzyO2rG6UdAkx8CkVYJ0OyrA2xsjeyJEH6auY6uGbX3R57FIW94/r29yJ0jP
+         KZvV3uaO9wkyryhWbaInumUEjmyHr6Wm8rcOupH7icM21pfv3j2j97UqiSoSGpTocol5
+         MRpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758177367; x=1758782167;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VFjH+4iKezMx9taew/P2Pp2wCahAKn7daFaD40BNcwI=;
-        b=cdb2P4Blz2ZAt1m5pIpug333SYyhQJ3Nm5JeDurWc2XNk4+Qc1tVvMIITrAxuMmP0i
-         F47Pfy2UCFBNw2Q3CqnohYNUtKCr349UfwdTGTzpdwcDPKdAJwztGwpyD5AHJyNaRm0a
-         JZ3qrsEYaovmwrxOB4vZskZkctyaIsVOYiymliODEU1hEorckv4mqkRHO8qHgFpaVZKw
-         wmxpz7yD19DA0lsve1dfVK+Uk1XzJewMTXMBAM8jYbZAQxwaoptH95N6Adn2z79Eelb3
-         DgMOMSN73NuqBsrktVfoF/86phIOFGgSdaDvTW2ENhjXGmYBUmm7FEd/HxRLjXhIo5rX
-         62tA==
-X-Gm-Message-State: AOJu0YzDKkFRL23AsE86w9BZSpLEQk8DtZFk0tUNScDf3vIGi9ZgScgs
-	SsYcTYymdyLHicKXJhFhJzrH8GFEyE9eELJnaln+vGTnMg5AJDBa5LRuifz40BwrE2r4GWN8+Q=
+        d=1e100.net; s=20230601; t=1758177369; x=1758782169;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pD1GqEfStiaojYrQnQeMsM18jIp83N4vklBUGeXEk0Y=;
+        b=LtAeAl6vXT737civ2GCo6QTcI3/CXr+GdYHq6wBjbutoTdy8qShZWkun0uKFh9+Pq1
+         75d7xnuQY4rc7WfU+gcqKJy/w0xuie8JKqPqMJfeELp5zVuTh+ps84hM8uKJPStxRLW5
+         SGrBs7d8bxGAjws9V1EsUMoQPHqr/0P0PuJUgI69E4VPGPEwQZtGTo/gb8jv53cz1mjd
+         2pkQ9saX0qJPGuvV5LjSMjxrNF3SOLtOBb6uUxfltUaaoYtZ3tkStaGP3gFOD4FgE+r4
+         ISphnIvR8OMXcs19P63XKb6ui3WveIBH8ouiSX68ykHDPvzKqtIfk+0iN0z1rAO03i7q
+         +3GA==
+X-Gm-Message-State: AOJu0YzFdiYxkZV4PWFfwqSfhGAOhaI6d7c3v5NSf6XrmeGi5JScQ0IF
+	9ZqhQSgIValvEqAdcKq+FGimX1f7r8saOLER/1i+xOFOaS+e4uJX2z1OMGuiwpDdHXM/wLMtSg=
 	=
-X-Google-Smtp-Source: AGHT+IH2UgG37umNMoeACtGTZ7/9BuSZf5nN5MC+UZpNd1hrMGzyvC/NPJGsd1QclVocKHX2GkTc/eq3
-X-Received: from wmbjg18.prod.google.com ([2002:a05:600c:a012:b0:45f:28d1:7681])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:19d4:b0:45b:8f5e:529a
- with SMTP id 5b1f17b1804b1-462031b1dfdmr44345345e9.14.1758177367559; Wed, 17
- Sep 2025 23:36:07 -0700 (PDT)
-Date: Thu, 18 Sep 2025 08:35:40 +0200
+X-Google-Smtp-Source: AGHT+IFBX7q+olV3TxKCMLPGDOXeRlUO54aOaLC2GWe3WCaoWqZDVDYjlTr0slmxpCXGLHTZDbGyUhSR
+X-Received: from wmrn43.prod.google.com ([2002:a05:600c:502b:b0:45d:eb3b:54a0])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3509:b0:45d:f817:c44c
+ with SMTP id 5b1f17b1804b1-46201f8b105mr44939285e9.4.1758177368875; Wed, 17
+ Sep 2025 23:36:08 -0700 (PDT)
+Date: Thu, 18 Sep 2025 08:35:41 +0200
+In-Reply-To: <20250918063539.2640512-7-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250918063539.2640512-7-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1640; i=ardb@kernel.org;
- h=from:subject; bh=rNO7lD/OuznN/elc7/2TihvZkB/fdGPOYNhJzbseLp0=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeP0CpsE7vV2ez+u1zTqWvlm66PI7v2vzq858OP34VDlH
- RdSd7CEdJSyMIhxMciKKbIIzP77bufpiVK1zrNkYeawMoEMYeDiFICJXNZgZJi8acHsj1ffLuVk
- fL/bXFd9jZnTm39O0idV/Nf9jMhU6bJm+Ge14c5izX+7hNeL3t5mGNO5U2iZoqlY/rFJqrp8UkJ t+dwA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=877; i=ardb@kernel.org;
+ h=from:subject; bh=XBh8pq2KsPALfmaJFm04pRdLlOab2MUmglzVdmLzRgY=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeP0CtusBs1FB0Ilkqf/6511vMyv3m3WTW7p2cK6mvmG7
+ y7Ky/R1lLIwiHExyIopsgjM/vtu5+mJUrXOs2Rh5rAygQxh4OIUgInwLWFkeLtZV0eJ14IlZdrh
+ Z49bnoeq/lx+6g2z4IXFWotOFsbOT2Zk2Mr280O4kl3o6UN71aymdmzevvzOMfesD5F33m26171 7HSsA
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250918063539.2640512-7-ardb+git@google.com>
-Subject: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
+Message-ID: <20250918063539.2640512-8-ardb+git@google.com>
+Subject: [PATCH 1/5] crypto/arm64: aes-ce-ccm - Avoid pointless yield of the
+ NEON unit
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -74,41 +78,32 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
-context switch out of struct thread_struct, and onto the stack, so that
-the memory cost is not imposed needlessly on all tasks in the system.
+Kernel mode NEON sections are now preemptible on arm64, and so there is
+no need to yield it explicitly in order to prevent scheduling latency
+spikes.
 
-Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
-rules around permitted usage patterns of kernel_neon_begin() and
-kernel_neon_end(). This permits #5 to provide a stack buffer to
-kernel_neon_begin() transparently, in a manner that ensures that it will
-remain available until after the associated call to kernel_neon_end()
-returns.
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Brown <broonie@kernel.org>
-
-Ard Biesheuvel (5):
-  crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
-  crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
-  crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
-  arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
-  arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
-
- arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
- arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
- arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
- arch/arm64/include/asm/neon.h       |  7 ++--
- arch/arm64/include/asm/processor.h  |  2 +-
- arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
- 6 files changed, 34 insertions(+), 34 deletions(-)
-
-
-base-commit: f83ec76bf285bea5727f478a68b894f5543ca76e
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index 2d791d51891b..2eb4e76cabc3 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -114,11 +114,8 @@ static u32 ce_aes_ccm_auth_data(u8 mac[], u8 const in[], u32 abytes,
+ 			in += adv;
+ 			abytes -= adv;
+ 
+-			if (unlikely(rem)) {
+-				kernel_neon_end();
+-				kernel_neon_begin();
++			if (unlikely(rem))
+ 				macp = 0;
+-			}
+ 		} else {
+ 			u32 l = min(AES_BLOCK_SIZE - macp, abytes);
+ 
 -- 
 2.51.0.384.g4c02a37b29-goog
 
