@@ -1,170 +1,111 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CFA2DCC1A
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 06:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6F623CF12;
+	Thu, 18 Sep 2025 06:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758177377; cv=none; b=Q+T8z8yiMezVPtICIP7N0gfsFKPb6C9omBQe8v4qPdJtfjWPaiZB8VodXXN3a96JmIPnK/cNo/S2QcCUvRYcvTzjdeSOmjpyzZQY1sdlOeEKn1ahatdtdybDdZohpWostT1TrR5dLVzHx0Kk4jFTDk6pJK19KZEE3iDDg6S2E84=
+	t=1758178345; cv=none; b=ap2eqHDZO3cWvpxBniwz1NCbocTHEEPb+hLMUQZmu4PkteqUp9+zWaLI7b3Ui4TA1dur9VFhBqQTjYZmQFG4T/4xSTgVaOEAJf13t6b0zPtbxGMTXp5nXF6q8hKaHG4qVT1yn2ZXuriTkrkIQ3mFjYAQa+2IbpnlY1xuI6ogTbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758177377; c=relaxed/simple;
-	bh=vWcZ1QI8Z0VaPchJBkch+vuuwu97oCktK301998ooq0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=U9gesyYdjBD9ffFnMLBD8FpzCd4jenwp8JS4nOWQYxQAGNbx3blfuFKwxxN4Qh/vVI3DXjqEm0MnBaTQ9zs4WfM0PZre62CNKMB4W6y8hkDFtyOJsWhJqvLA9bXtp1YdO6GCNfnv0llvv2m7F+V/A05dRMtk4tgZ442digyiV5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VWOp21Sh; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	s=arc-20240116; t=1758178345; c=relaxed/simple;
+	bh=8guvnPhfYkC4UXz0FVHEuKdw/NOn7dkFZfu4xpqkqzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nkh61g5q1D9O7MRZSjddL3oujx/WCr5xjq+AdFnnlqYzCziMqJbJ3lu5qG0B4xi+Pg6ulQsm0P4ezXXTO+CIr3bVWPthbdClZHqWGUlmp46ZQvJnfqG+YdfuUMI/FwK9UuSxM9mm/Yz8lYySphkJOxyb594ct3gEwM6tSbil14g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R39borod; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VWOp21Sh"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3e980eb1d3eso84880f8f.2
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 23:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758177372; x=1758782172; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nd/aa+Cyw0z/Ul0/qN6NY/ef41tVXmadJuCUPt5tdFQ=;
-        b=VWOp21ShvkbTAf3SDWezj96iSzA2qVWgyYbTsajuxJAqc2dX1HpgdCAjhWb85ceLqZ
-         fRBNAsdN6PHRSuMjLxIJ59M8u4W4iRCdPi+3HBvVgByoqTXvWVtnGZPPxSYNvxyxvFNr
-         DqnCXcQtzWHuu8tizxSMChSqK8vEoQLl7KG4Ox8Jsq6FYZc2yKRhsHScXsoyeGNAX2qD
-         n8a8fupMZuAJyVh82YC3LIUpp0xvQtQGvjUYggKovowfBqdrNXf6/bQcI5mpcnjjYMDb
-         gjh8Lfw7Ix7q/Rui3YEvppPf80OgZgzWhcay4Ek443flvG0WhlbIzlwfhij6T9SFHpw8
-         +Hcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758177372; x=1758782172;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nd/aa+Cyw0z/Ul0/qN6NY/ef41tVXmadJuCUPt5tdFQ=;
-        b=eq/6bMgRNNF15Q+rMEn4z9qXsdUerbmJ4swUT1osQxaIxjOPtC9t2zx5S/wpollLB3
-         cdcju4a3IVWVZep+vdJzjNbxBoFCHDLj/DVXx1XZPfrqYfUYXs+ieDQ0dHnSQ3rWa+6A
-         Mxg/s+luck6gzUwFp71A2CApFq8pmz9cPvX+CG2psfVUlXKs+kng1eSNqLfBOFP+t9Wv
-         ivUR4UwJDbrFiCcls1VXc3I3P9gtUctkyAKaLXmPuKat8Xq3GXF8xn8X9aHncxzIPWcJ
-         BdZnJi3Xs2EvcUJ18jSNJV/STlr8ETKOxu4FxrpUnXqa5owaR72B4aLJVfBEf34VKKoW
-         R/iQ==
-X-Gm-Message-State: AOJu0YxKC+dkWiDUlnip5Kmgh6IOP3DK4rpA5B/DzNlLK94enIOh0vh8
-	fK/nv3VSpZIMd+NeL4iJ0xOaFVyy57qq8Rmhb24m5fDpZk9NOybEiDrxTfGMK6cR7zP6JNzPfw=
-	=
-X-Google-Smtp-Source: AGHT+IEaYfwr01ZjRAssGnsJ1gUGd1rN8g5Gj0e5CjahKJgyizByZHhPk8uuPViunThk6UOOlyd5IgyT
-X-Received: from wrbbs28.prod.google.com ([2002:a05:6000:71c:b0:3eb:6104:3eb])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2284:b0:3ea:124c:8fc7
- with SMTP id ffacd0b85a97d-3ecdfa1434dmr3783151f8f.39.1758177371854; Wed, 17
- Sep 2025 23:36:11 -0700 (PDT)
-Date: Thu, 18 Sep 2025 08:35:44 +0200
-In-Reply-To: <20250918063539.2640512-7-ardb+git@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R39borod"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758178344; x=1789714344;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8guvnPhfYkC4UXz0FVHEuKdw/NOn7dkFZfu4xpqkqzY=;
+  b=R39borodOMahwic45e+0K3+PKBR5umzJtDlQ3OE2l4QgSURC6eEmE1Os
+   ZEAfRxbWm7wa0hzSkMoOPH2++E8gPD+nnz8iJ/qdKWSfyBhbHhhXM7YAL
+   yE49HPBtaUjcYfmDkrh8qdODw+++r7LEF1sqo5SDZhlf2QKOM0kieA1ML
+   chY9lNpIsgReKZMXuSC5sDMmILnXSSh8uw+76fIyqxxUJ2Oaiqn4yn+5B
+   Lk9GYeeSF2GvABi+cOv5Xbb9zOotA6c0AJcFaJJ0/tLRf5DT3SImlqm6Y
+   amEAwLnGmJ+8Zfjk8m04pyJCdFp5qfucLcRXAQK9HfBC53y2qiOyiF8Z2
+   Q==;
+X-CSE-ConnectionGUID: BQ6KcDJYTaWXuaAigxQNQQ==
+X-CSE-MsgGUID: 4mWpAyWoT6W7raRFZZUhHA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="71925018"
+X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
+   d="scan'208";a="71925018"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 23:52:23 -0700
+X-CSE-ConnectionGUID: Yc9nWOABRheo1JBzKZ9rOA==
+X-CSE-MsgGUID: t2vfJQZQSTmlR2nJnRGstw==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 17 Sep 2025 23:52:16 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uz8V3-0002ql-1m;
+	Thu, 18 Sep 2025 06:52:13 +0000
+Date: Thu, 18 Sep 2025 14:52:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com,
+	glider@google.com
+Cc: oe-kbuild-all@lists.linux.dev, andreyknvl@gmail.com, andy@kernel.org,
+	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net,
+	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com,
+	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com,
+	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net,
+	kasan-dev@googlegroups.com, kees@kernel.org,
+	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
+	rmoar@google.com, shuah@kernel.org, tarasmadan@google.com
+Subject: Re: [PATCH v1 07/10] crypto: implement KFuzzTest targets for PKCS7
+ and RSA parsing
+Message-ID: <202509181410.XN0MIpCh-lkp@intel.com>
+References: <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250918063539.2640512-7-ardb+git@google.com>
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2845; i=ardb@kernel.org;
- h=from:subject; bh=fbTmP4aG6tbBHGWrU82oUT6Reb9I9nyA/9uuGWnWHsA=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeP0Cqcpcmo3s9lOdcud6TTT/3/e+Haah27JoTmrPn36k
- qtkYXWuo5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEykPJyRYc9Ujxln1/M8UN0U
- srST+emhX57lN5vdFz69bBItdNUs9xHDP1OjzLYvG7QqeQXWeDWfFnstxjJ5Zu7xFo5XF1s+H1P byAcA
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250918063539.2640512-11-ardb+git@google.com>
-Subject: [PATCH 4/5] arm64/fpsimd: Require kernel NEON begin/end calls from
- the same scope
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	herbert@gondor.apana.org.au, ebiggers@kernel.org, 
-	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250916090109.91132-8-ethan.w.s.graham@gmail.com>
 
-From: Ard Biesheuvel <ardb@kernel.org>
+Hi Ethan,
 
-In preparation for making kernel_neon_begin() allocate a stack based
-buffer for stashing the kernel mode FP/SIMD state on a context switch,
-redefine kernel_neon_begin() and kernel_neon_end() as macros, in a way
-that requires them to be called from the same scope, and therefore,
-running from the same stack frame.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm64/include/asm/neon.h |  7 +++++--
- arch/arm64/kernel/fpsimd.c    | 12 ++++++------
- 2 files changed, 11 insertions(+), 8 deletions(-)
+[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
+[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.17-rc6 next-20250917]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/arch/arm64/include/asm/neon.h b/arch/arm64/include/asm/neon.h
-index d4b1d172a79b..4e24f1058b55 100644
---- a/arch/arm64/include/asm/neon.h
-+++ b/arch/arm64/include/asm/neon.h
-@@ -13,7 +13,10 @@
- 
- #define cpu_has_neon()		system_supports_fpsimd()
- 
--void kernel_neon_begin(void);
--void kernel_neon_end(void);
-+void __kernel_neon_begin(void);
-+void __kernel_neon_end(void);
-+
-+#define kernel_neon_begin()	do { __kernel_neon_begin()
-+#define kernel_neon_end()	__kernel_neon_end(); } while (0)
- 
- #endif /* ! __ASM_NEON_H */
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index c37f02d7194e..d7eb073d1366 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -1833,7 +1833,7 @@ void fpsimd_save_and_flush_cpu_state(void)
-  * The caller may freely use the FPSIMD registers until kernel_neon_end() is
-  * called.
-  */
--void kernel_neon_begin(void)
-+void __kernel_neon_begin(void)
- {
- 	if (WARN_ON(!system_supports_fpsimd()))
- 		return;
-@@ -1875,7 +1875,7 @@ void kernel_neon_begin(void)
- 
- 	put_cpu_fpsimd_context();
- }
--EXPORT_SYMBOL_GPL(kernel_neon_begin);
-+EXPORT_SYMBOL_GPL(__kernel_neon_begin);
- 
- /*
-  * kernel_neon_end(): give the CPU FPSIMD registers back to the current task
-@@ -1886,7 +1886,7 @@ EXPORT_SYMBOL_GPL(kernel_neon_begin);
-  * The caller must not use the FPSIMD registers after this function is called,
-  * unless kernel_neon_begin() is called again in the meantime.
-  */
--void kernel_neon_end(void)
-+void __kernel_neon_end(void)
- {
- 	if (!system_supports_fpsimd())
- 		return;
-@@ -1902,7 +1902,7 @@ void kernel_neon_end(void)
- 	else
- 		clear_thread_flag(TIF_KERNEL_FPSTATE);
- }
--EXPORT_SYMBOL_GPL(kernel_neon_end);
-+EXPORT_SYMBOL_GPL(__kernel_neon_end);
- 
- #ifdef CONFIG_EFI
- 
-@@ -1936,7 +1936,7 @@ void __efi_fpsimd_begin(void)
- 	WARN_ON(preemptible());
- 
- 	if (may_use_simd()) {
--		kernel_neon_begin();
-+		__kernel_neon_begin();
- 	} else {
- 		/*
- 		 * If !efi_sve_state, SVE can't be in use yet and doesn't need
-@@ -1985,7 +1985,7 @@ void __efi_fpsimd_end(void)
- 		return;
- 
- 	if (!efi_fpsimd_state_used) {
--		kernel_neon_end();
-+		__kernel_neon_end();
- 	} else {
- 		if (system_supports_sve() && efi_sve_state_used) {
- 			bool ffr = true;
+url:    https://github.com/intel-lab-lkp/linux/commits/Ethan-Graham/mm-kasan-implement-kasan_poison_range/20250916-210448
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+patch link:    https://lore.kernel.org/r/20250916090109.91132-8-ethan.w.s.graham%40gmail.com
+patch subject: [PATCH v1 07/10] crypto: implement KFuzzTest targets for PKCS7 and RSA parsing
+config: x86_64-randconfig-121-20250918 (https://download.01.org/0day-ci/archive/20250918/202509181410.XN0MIpCh-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.4.0-5) 12.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250918/202509181410.XN0MIpCh-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509181410.XN0MIpCh-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> crypto/asymmetric_keys/tests/pkcs7_kfuzz.c:15:1: sparse: sparse: symbol '__fuzz_test__test_pkcs7_parse_message' was not declared. Should it be static?
+--
+>> crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c:15:1: sparse: sparse: symbol '__fuzz_test__test_rsa_parse_pub_key' was not declared. Should it be static?
+>> crypto/asymmetric_keys/tests/rsa_helper_kfuzz.c:30:1: sparse: sparse: symbol '__fuzz_test__test_rsa_parse_priv_key' was not declared. Should it be static?
+
+vim +/__fuzz_test__test_pkcs7_parse_message +15 crypto/asymmetric_keys/tests/pkcs7_kfuzz.c
+
+    14	
+  > 15	FUZZ_TEST(test_pkcs7_parse_message, struct pkcs7_parse_message_arg)
+
 -- 
-2.51.0.384.g4c02a37b29-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
