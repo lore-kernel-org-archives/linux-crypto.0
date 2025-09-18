@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13BF3176ED
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 14:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239EA318135
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 14:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758204399; cv=none; b=h92UtEdKjrLZJ2MbmvwNIduPAlsyXg3bFetz7YfcvtSItz0afmY3GKlIef1cYUrTW/EUUMXFqebf4WQUs+ofA2UMX/pvDdRtV7iUrfg5NJhZsLh6zfW9saQdCjpwnYDeRP9P/cCmexvi9hk3bV9vGyv+rxDmIFOO9XAkkQThpnI=
+	t=1758204401; cv=none; b=Lv7dSQ04Oqa1/mFYtUk8wMoRHR7sFYiqX6Bi8OhljoFMsISi9ea17pZ2k5RPIxPUYtd+8/SmC5TQOlfWPgD4gi5VV9flB+n+HmufYHrbRuJxCkhF+BrCtdL8xEd7T3vDHOnZ0shWWq3ife1n5owdJC4zBzNrg5yszWxSHY6CwmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758204399; c=relaxed/simple;
-	bh=zoLiY2UcfrfuFf9/eJmfFwA3ddXeQm8aQATv6UNlqMA=;
+	s=arc-20240116; t=1758204401; c=relaxed/simple;
+	bh=dlga7YnphSnOGIQrIQaBJBfVrzl27d5Bc0V7ZNGYDq0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ab8y16GQTPtJYJ5cfOwJJf/d0xTEhXOCnCYzCF9N0rCdhA+LmpiB84nKAvVVlZIEKQQV2ivfaHIm1i/XFq73CcBXgSE0Or/NCkXSrM+5pcBpzaCO7OfZqYC25y61sbXlXfSV5AIMaOJXfMCeEubeYw/EWKci3P5/xMl98Iqe7IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rA0CgK/n; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=NfM3RfxeWReOYYMw9dt49JFoefwPkGgl2TSNeH9XLGwdsfiXzLu5G3Ys7kzdRE4khYbiUbGKTQoF6vyKAM6NgauySK4TjouPQ3OBsUZzqOt/ZaPOoPyICbIboWptrs0NzjgRJwgqTpylcCbFbk2sIaOUVLayBUbPYBu5uhM5CHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e6mf/cKh; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rA0CgK/n"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45ddbdb92dfso4707635e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 07:06:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e6mf/cKh"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45df9e11fc6so7239055e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 07:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758204395; x=1758809195; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758204397; x=1758809197; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rgYM57a4+YilIGK6iKKshTwAf6EJSKpu76VpXrklnPU=;
-        b=rA0CgK/nBD9BDdq9rID1XB8wPBhqUxDoK8e6TleJp4eoRuC+t26XqkM+Lphzpje/SH
-         nHsQFK48n9rmW1qb6dk9H0c2U0HDfz+6QXln6nUoWy4w35IMk8bs3wfwB/Gb2DMF2RDW
-         zi7hLDQ8KcTkzJKAnOQ9NPMCbJquIOwHucCkX6JH6bG/MVJFC7jY1ZepnH7jTlTbsohM
-         Fd4kGBHkUnfjEdHzHrNszPPjCPy5Q0MT5JkVAEVv+ZOdUZ+qH97XECiIc15WNvBBd6Z0
-         0KzzD+bly1UZxwZPL7MlxGoIX62G+9iXWmVoZYE2+x9hafmtUct6nkVV5p9FRfoevbTS
-         0PZQ==
+        bh=Dhic53vYgugE24TxlxF+xx8w5glItenUyktwwUAacwI=;
+        b=e6mf/cKh23OtOLaa85mS/JtKU2kqvrYVFiAanqZ/8YAS6U1D6Xt0XqD5ThnU8uMT9t
+         AcWsQ8KiUXmovzqPiSL+AHPyL56ckk7WgWCOAdAi3gNkDHTUd0W9cinYfjkqwH8pc2p/
+         a1owrBxFfeTl4M9tJT8bWhopr2SoFw9WRXLfSl6QZjG2ErdXiE5ksrs7g3OrI8wANrf2
+         RLh1m3JDnSn6EVsebG8TGvDRdWUR44DmPK1THCP8KDwmR1RTph+3O7xib67D6xlIaTL4
+         sSn0Xkqe+OzxUNxLqxvIV86VJtM/eWxPLnxyz/2LTV2dUm5vXNwKqvWWy71yiWE2RwKS
+         CDCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758204395; x=1758809195;
+        d=1e100.net; s=20230601; t=1758204397; x=1758809197;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rgYM57a4+YilIGK6iKKshTwAf6EJSKpu76VpXrklnPU=;
-        b=bS2is9fOgcvG5XAbTK+oK3+W+Dxp3ot0X3OPIjhFygq2UYzEH+3/w1mEF2E4EoREpK
-         1KlsQcY3meN6lHuIERUSWBHDJ4Yn0+HU9DwIL7Uv6QeuC7syrs3/Jzram0Hv1Kz3vdXz
-         BUNhgO6oRBdc6RMfWdWcEq4aMlxIXP/5IyXKjxIZVVq3tU08QYJRbi+zajeDbyFbdhgI
-         hi5Z4Xo1VVjSN+n/mYJKViHtbFb2i1/i7QSNK7u68BfE1xEFt2QRNGB6Mp8AyPHHr5W2
-         Nm4Mk4/isgnEyOHxKG3u5htd0IEgwHE91UHXH8b0YBhHfMEHKGp64BMs8m5tUUt4999E
-         G0Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKJsBhs2kLSboWEF6T0DdTb4xMLSDHCOcyGPGgd86n4Y6DKPOfKPCFlZ0EBzdrBPMYjIoOuLkMukCcHJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG7p4bAcRr3Jy/nuJdyyjntXIi7rlvuRALdnRvNhmayUKFVXtX
-	SDT93Pd+QKxvGQWdAqr4ZKy1xxdPqrZMzdrCID2AYQfOtW8eb0oU5XCzuaVwh1aaklLjGz5pjYx
-	26A==
-X-Google-Smtp-Source: AGHT+IGyq2ix4kSVUhNc102rzu/+pi5sWigmai5zeC1C+WvM8GfTqI/Oxr6AI/FM5MqgBjTC/NiJq7z9XA==
-X-Received: from wrbbs6.prod.google.com ([2002:a05:6000:706:b0:3ed:665b:ec9d])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:adf:ce0c:0:b0:3ee:10b1:17bb
- with SMTP id ffacd0b85a97d-3ee10b11893mr1782304f8f.61.1758204394951; Thu, 18
- Sep 2025 07:06:34 -0700 (PDT)
-Date: Thu, 18 Sep 2025 15:59:36 +0200
+        bh=Dhic53vYgugE24TxlxF+xx8w5glItenUyktwwUAacwI=;
+        b=Sgn3adNKvsgrBMZqM/XS99wVlGwztIN07d5uh+BGjglsg+PMN/S34noQ/+y6S7s3oi
+         POnF2fh5kKMJcFLYrTBsIkSmZoIqsb6qkFWi/+UJ8fJ6iilPnlqau5jb++bfL0+n6BpN
+         +J+8KN1Tk5KyuIDU35lBlQgHTu3qMDHJMOCumrB5X9uTgFtA3Mcru3SSOJwnWRQwS/NF
+         iPSicdQEqB4mMyM/i2J/GGBfXJv6v7Don5IJ9VOInSVG274SS7faetKCgFzLZKHG474c
+         k9v/zr2B6PhEyKdrNyZCkdUCMR3JZzrgjkoe3NjTI6z+bmFhO0RJtl5dUgbBrKwm0K8B
+         yYdg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkszBGleE32JgCHt5pVkuS1Db4MirA0jUOvRbXk/Kybtu7dd4VAsJ0l6Rd4pTjEDXuzLxhGnNTr1JDYfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzM2hLqhvXnD/nH9FtlliZNJK/3DIBKHKVOTVaTpXW8BOJVE1U
+	4Gx+h4ZhWfDjYj6XMklYd/tGjAlhxNG5lYMS7IGH2ozsVp2iUVhbZpx3+QXnl7dxIRbWl55Mg9A
+	9fw==
+X-Google-Smtp-Source: AGHT+IHZwXc50wF1UKzRkCSl9Zlzv0YXfIKjEUT7w3tckKijx1tkK0IOXg5OQwciPpS047ZOEU7YpUJVKQ==
+X-Received: from wmqb11.prod.google.com ([2002:a05:600c:4e0b:b0:45f:2306:167])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1c9b:b0:45d:d9ab:b85a
+ with SMTP id 5b1f17b1804b1-46201f8b09fmr54309365e9.7.1758204397465; Thu, 18
+ Sep 2025 07:06:37 -0700 (PDT)
+Date: Thu, 18 Sep 2025 15:59:37 +0200
 In-Reply-To: <20250918140451.1289454-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250918140451.1289454-1-elver@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250918140451.1289454-26-elver@google.com>
-Subject: [PATCH v3 25/35] compiler: Let data_race() imply disabled capability analysis
+Message-ID: <20250918140451.1289454-27-elver@google.com>
+Subject: [PATCH v3 26/35] MAINTAINERS: Add entry for Capability Analysis
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,51 +87,36 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Many patterns that involve data-racy accesses often deliberately ignore
-normal synchronization rules to avoid taking a lock.
-
-If we have a lock-guarded variable on which we do a lock-less data-racy
-access, rather than having to write capability_unsafe(data_race(..)),
-simply make the data_race(..) macro imply capability-unsafety. The
-data_race() macro already denotes the intent that something subtly
-unsafe is about to happen, so it should be clear enough as-is.
+Add entry for all new files added for Clang's capability analysis.
 
 Signed-off-by: Marco Elver <elver@google.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
-v2:
-* New patch.
----
- include/linux/compiler.h       | 2 ++
- lib/test_capability-analysis.c | 2 ++
- 2 files changed, 4 insertions(+)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 64ff73c533e5..eee60adb3645 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -186,7 +186,9 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
- #define data_race(expr)							\
- ({									\
- 	__kcsan_disable_current();					\
-+	disable_capability_analysis();					\
- 	__auto_type __v = (expr);					\
-+	enable_capability_analysis();					\
- 	__kcsan_enable_current();					\
- 	__v;								\
- })
-diff --git a/lib/test_capability-analysis.c b/lib/test_capability-analysis.c
-index 12fd9716f0a4..513ad28ed06c 100644
---- a/lib/test_capability-analysis.c
-+++ b/lib/test_capability-analysis.c
-@@ -92,6 +92,8 @@ static void __used test_raw_spinlock_trylock_extra(struct test_raw_spinlock_data
- {
- 	unsigned long flags;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cd7ff55b5d32..da4c8196c1b7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5951,6 +5951,17 @@ M:	Nelson Escobar <neescoba@cisco.com>
+ S:	Supported
+ F:	drivers/infiniband/hw/usnic/
  
-+	data_race(d->counter++); /* no warning */
++CLANG CAPABILITY ANALYSIS
++M:	Marco Elver <elver@google.com>
++R:	Bart Van Assche <bvanassche@acm.org>
++L:	llvm@lists.linux.dev
++S:	Maintained
++F:	Documentation/dev-tools/capability-analysis.rst
++F:	include/linux/compiler-capability-analysis.h
++F:	lib/test_capability-analysis.c
++F:	scripts/Makefile.capability-analysis
++F:	scripts/capability-analysis-suppression.txt
 +
- 	if (raw_spin_trylock_irq(&d->lock)) {
- 		d->counter++;
- 		raw_spin_unlock_irq(&d->lock);
+ CLANG CONTROL FLOW INTEGRITY SUPPORT
+ M:	Sami Tolvanen <samitolvanen@google.com>
+ M:	Kees Cook <kees@kernel.org>
 -- 
 2.51.0.384.g4c02a37b29-goog
 
