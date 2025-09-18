@@ -1,103 +1,71 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1C3216E23;
-	Thu, 18 Sep 2025 01:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF547199934
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 02:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758159900; cv=none; b=CbHIBjaP7z6vQQC0+ip3VdQ4d44yhfJ83kl+qNzWRTzNeguLHRx7jn+8xwEP9x/DP7oB2UVfyOr/JzReGNx9maWDh+7b7wN++xa9JDAf8WQMRyA4IdA/8rmL2hFY1SBGivbVdceWoqadYSEaAHTaRj2McIFy61k60nJNsVgvQ5A=
+	t=1758162429; cv=none; b=exLyzmZFk7cOuu4e12y+iqma+dibGAEX9J6P9062hJYe5Ru3a47Qv/4ujTJY+YKg9Ljh4y+OCXE3jQFD/nHa5joHvTVdu8sOatt5/HTJ8bUVwrQagObO1C/IniPK0JTCf5gyRylWasYeUykCBbtb47X4f8lyBTEGtOEJT+ivE44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758159900; c=relaxed/simple;
-	bh=yObyqBIvnOk7MzWv7rFUNE1ZAMjFKISL+S39eQDndyg=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=h5xxzrIHs82p6KJyAJ3eozLnEps2D0C7vv4yYLSmJzTpe5fSoHxHiTGCC7Nyl5JMmRc6oMJP90PgPodWHKhnG1mbAiMddP3zM5q+m5YCZuwDO86reSuUaUNaKQuHVps6sUk+GqQ3ZJxOWCqlE2X+Sq/4v6Rk7AS6sfbVhiEZVyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8DxO9IWZMto6J0LAA--.25085S3;
-	Thu, 18 Sep 2025 09:44:54 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowJDxK8ETZMtoO6acAA--.7691S2;
-	Thu, 18 Sep 2025 09:44:53 +0800 (CST)
-Subject: Re: [PATCH] MAINTAINERS: adjust file entry in LOONGSON SECURITY
- ENGINE DRIVERS
-To: Lukas Bulwahn <lbulwahn@redhat.com>
-Cc: Huacai Chen <chenhuacai@kernel.org>, Lee Jones <lee@kernel.org>,
- linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>
-References: <20250912074638.109070-1-lukas.bulwahn@redhat.com>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <f9b0ba8f-b2cc-3a24-3afe-247763d8ad71@loongson.cn>
-Date: Thu, 18 Sep 2025 09:43:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1758162429; c=relaxed/simple;
+	bh=XxD0q6HFEHNIr8aBx8Jg0tnEaTeqkBLEGtDsG8B8vvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M6wFv39XaXpf6AyFhE48LnBmOY0HTkJv/IHQPH3L4DePyLkB/gJuTgYL9r8yjYmu/+PT6nokcb9FqMiz2m9M6kXRDG/ZHt/MQ0rNzBppZkjlWpWhYHeMj33U618V2kd51fgLO5ivkJGHa2iibutHmATXi2ixKL5BwEpQ2KKB0Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=IpAcLjQM; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="IpAcLjQM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=g797N7w8ENsnFBqwK0Hg/d/C3j11AzpRyBlxY2uwLp0=; b=IpAcLjQMIPXnP5+Jf8xercvlnI
+	5zz0WcdKxCJK37NVhYtEF6d/+5h0W0Sf4bkwdSD9rzhxplWKLRdCQtLGE7Q8WnfGOjYKqBe+bZ6uB
+	FtgjrtZstv7QUy8VOck0dDBh8rDPjsicKUT8r/gSXG39hDgyXKszEXBuHKw5NImn/vogns9aXL4Bg
+	QIuP/jQU69PPONKRaYPfzAyfuoZw1OUN85N7sqDAGk47TLExDv9p9bQIKNKkoGFejAPG6x6WqxK4T
+	I6x5YvFJt3vOkokjPJ3ccZEhqepLvjbuuwtm9pmvbYyJgzR2Aq5TiXe/2vH5xRXtbZqI/KdpxJq/o
+	KCKDwouA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uz46y-006LDq-38;
+	Thu, 18 Sep 2025 10:27:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 18 Sep 2025 10:27:01 +0800
+Date: Thu, 18 Sep 2025 10:27:01 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>, qat-linux@intel.com
+Subject: Re: [PATCH] crypto: qat - Return pointer directly in
+ adf_ctl_alloc_resources
+Message-ID: <aMtt9X6jWR1IKBW6@gondor.apana.org.au>
+References: <aMTyFx91lhp9galJ@gondor.apana.org.au>
+ <aMqh+eZrRvyLQGUF@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250912074638.109070-1-lukas.bulwahn@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowJDxK8ETZMtoO6acAA--.7691S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7KFy3KF1xuFyfGFWrtFW8GrX_yoW8Jw4rpF
-	srC3sIkF47Jr4UCwn8AFyYka4rX34furya9Fsrtw1DX3sIy3ZYqrWjkF1Dta1DAr1fGr42
-	vFZ3Cr45WF48uFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4
-	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v2
-	6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67
-	vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7_MaUUUU
-	U
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMqh+eZrRvyLQGUF@gcabiddu-mobl.ger.corp.intel.com>
 
-
-ÔÚ 2025/9/12 ÏÂÎç3:46, Lukas Bulwahn Ð´µÀ:
-> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+On Wed, Sep 17, 2025 at 12:56:41PM +0100, Giovanni Cabiddu wrote:
 >
-> Commit 5c83b07df9c5 ("tpm: Add a driver for Loongson TPM device") adds a
-> driver at drivers/char/tpm/tpm_loongson.c, and commit 74fddd5fbab8
-> ("MAINTAINERS: Add entry for Loongson Security Engine drivers") adds a new
-> section LOONGSON SECURITY ENGINE DRIVERS intending to refer to that driver.
-> It however adds the entry drivers/char/tpm_loongson.c; note that it misses
-> the tpm subdirectory.
->
-> Adjust the entry to refer to the intended file.
->
-> Fixes: 74fddd5fbab8 ("MAINTAINERS: Add entry for Loongson Security Engine drivers")
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
-> ---
->   MAINTAINERS | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fa7f80bd7b2f..a1339a8bb705 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14537,7 +14537,7 @@ LOONGSON SECURITY ENGINE DRIVERS
->   M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
->   L:	linux-crypto@vger.kernel.org
->   S:	Maintained
-> -F:	drivers/char/tpm_loongson.c
+> I don't see this warning with W=1 on gcc 15.2.1,
+>     make M=drivers/crypto/intel/qat W=1 -j
+> What version is reporting this warning?
 
-My bad, Thanks
+It's not visible with W=1 because uninitialized warnings are
+disabled by default.  I saw them with
 
-Best regards,
+make KBUILD_CFLAGS_KERNEL=-Wmaybe-uninitialized CFLAGS_MODULE=-Wmaybe-uninitialized
 
-Qunqin.
-
-> +F:	drivers/char/tpm/tpm_loongson.c
->   F:	drivers/crypto/loongson/
->   F:	drivers/mfd/loongson-se.c
->   F:	include/linux/mfd/loongson-se.h
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
