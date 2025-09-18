@@ -1,156 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6998D34BA43;
-	Thu, 18 Sep 2025 05:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0801E51E0
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 06:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758171840; cv=none; b=LjP0Jz9bK6lEmdg7yBgUSBjRyW/emsHCxvlBkJNl9OGmRiHNzwiWkHBz0FTh4+zMi4+6UUe+C1KM0CBSlw4zkla/8Ex97D4b094Yqps/1oXgSJXOWDlXwRoVmiRr1dHQzfR9m3wITRrKNfpBCqdq5rarKM2gDdx3gHVXh7BO4Go=
+	t=1758177371; cv=none; b=NxxAGf+HuZyhhPHipekyYZ7l2K5g8uD0hH4+hHws89v12ZQlAW9a11VLF4ARfzE9nAcYxDF52Xhf/j5BWOvsbV9owEgI09JPfKJG3NAANrbO+KW7XTsY3bzHjbzb4UbFdtV57nuODK8dcA2QGIURkKshUO9aNvk9P61ABM/Dml0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758171840; c=relaxed/simple;
-	bh=xEw7pIOEI0A+4r0NalC4RyzD0RTXdu8oCCdB5ILHM7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kl1kQ6OLI5Gy4WVzrfuvJq0GPWxpKJ2LNFN1fJs/FsKjT8krZou25hqzXMG1KouDxg2WB4L8uDDoWqxE0kkJm3CND/Y80wjx3BaKe2ueJqVXXRx71C8AuMEmClTQbwngVEgP1cWMRd0/CjIjRSWoSCUFLOKeRJf/ueNkW7AWBxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GIq8H4S5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758177371; c=relaxed/simple;
+	bh=6V9uNq83XXSYotxaF5gDZpQuTwairQF/oZADfO3/sw4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sCmaLS9IJBbY9r5C8ZMUSE/BKLDROk1ri2gk/4/pZAxGYTrb0jWqTgbSeoKffSukPpySUx8AuvHpmEcDlgyIwl9UY6LPBjR5k27Fei8tBaYH/E0N0BjMoCcgKIMeg5Fia3kS6Y2bF42BQk2HJa9FajvzFejqXnGidwZWyK97sWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dWPm2voH; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GIq8H4S5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1EB9C4CEE7;
-	Thu, 18 Sep 2025 05:03:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758171840;
-	bh=xEw7pIOEI0A+4r0NalC4RyzD0RTXdu8oCCdB5ILHM7Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GIq8H4S5iX5eQavz4HsElGAnb6U1OegTvbPlPdlOwJLaYCxc/tv63xoHv7iHYmSDS
-	 piGCD1/BG7CHtI+NtBVvgsa0YO2LUE5nd8jpL3oD77RkbXLY7XUfGI70bCQLvgvddO
-	 u4v37IeYHJbRw7OBjVUCyj51MajmfeHl5+N6XOJDRKf5WRC/9TPZJZLjaQ8WSmP33u
-	 +F2N6CPF1g7Z+FJLUGJ6560MfhK8VH8Ugs23mOyw+a6j66YSG+rzwU5+HOd52SGrXz
-	 k+oCY+a242uZf2WEG6KGAjXu+sUupKmYNpXEUNvDfjpLhYisNfPOLY+g07C4UNALBp
-	 T9z2j9nmf3+Qg==
-Date: Thu, 18 Sep 2025 08:03:56 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	Andreas.Fuchs@infineon.com, James Prestwood <prestwoj@gmail.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org, Stefan Berger <stefanb@linux.ibm.com>,
-	Lennart Poettering <lennart@poettering.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	open list <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH v7 4/5] keys: asymmetric: Add tpm2_key_rsa
-Message-ID: <aMuSvJNt2KdVBIOA@kernel.org>
-References: <20240528210823.28798-1-jarkko@kernel.org>
- <20240528210823.28798-5-jarkko@kernel.org>
- <ZmLnyp9j_QoPgj7W@gondor.apana.org.au>
- <D24EZPFV6DBS.1LZVHIVPITE83@kernel.org>
- <aK1vdEcuN_xjhjyY@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dWPm2voH"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45b467f5173so4692625e9.3
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2025 23:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758177367; x=1758782167; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VFjH+4iKezMx9taew/P2Pp2wCahAKn7daFaD40BNcwI=;
+        b=dWPm2voH0f603vPYQX77aQqLkQwj1gccurUP3xm1C/utJaqfk50DrRytdrmmiyQJfg
+         Ycv4tPwrswZeOpCt4GBicXAxbm62qcDyG0SIvYXMBlZAPcn7/yv0kg7d561BhHzlUocL
+         vXuHJevK3ZD6fDDJM2ygdtHImzccAXDBSCj/P/1DTfPXDuCvmnZZ+AHtWzy21aq+MpNW
+         As7FIotfnDc8YfSYp8eCugw0KlJrZIcTzlwCpyvbmZ8Vuuro5MEUH7cayCez0pX2JdKD
+         Zvt1xxtMkc/p+RRUyyX5EdoPZROIlDNWvVk7e3pMead98VErbqqpr0B4KEYaeJL9p0K4
+         2YhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758177367; x=1758782167;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VFjH+4iKezMx9taew/P2Pp2wCahAKn7daFaD40BNcwI=;
+        b=cdb2P4Blz2ZAt1m5pIpug333SYyhQJ3Nm5JeDurWc2XNk4+Qc1tVvMIITrAxuMmP0i
+         F47Pfy2UCFBNw2Q3CqnohYNUtKCr349UfwdTGTzpdwcDPKdAJwztGwpyD5AHJyNaRm0a
+         JZ3qrsEYaovmwrxOB4vZskZkctyaIsVOYiymliODEU1hEorckv4mqkRHO8qHgFpaVZKw
+         wmxpz7yD19DA0lsve1dfVK+Uk1XzJewMTXMBAM8jYbZAQxwaoptH95N6Adn2z79Eelb3
+         DgMOMSN73NuqBsrktVfoF/86phIOFGgSdaDvTW2ENhjXGmYBUmm7FEd/HxRLjXhIo5rX
+         62tA==
+X-Gm-Message-State: AOJu0YzDKkFRL23AsE86w9BZSpLEQk8DtZFk0tUNScDf3vIGi9ZgScgs
+	SsYcTYymdyLHicKXJhFhJzrH8GFEyE9eELJnaln+vGTnMg5AJDBa5LRuifz40BwrE2r4GWN8+Q=
+	=
+X-Google-Smtp-Source: AGHT+IH2UgG37umNMoeACtGTZ7/9BuSZf5nN5MC+UZpNd1hrMGzyvC/NPJGsd1QclVocKHX2GkTc/eq3
+X-Received: from wmbjg18.prod.google.com ([2002:a05:600c:a012:b0:45f:28d1:7681])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:19d4:b0:45b:8f5e:529a
+ with SMTP id 5b1f17b1804b1-462031b1dfdmr44345345e9.14.1758177367559; Wed, 17
+ Sep 2025 23:36:07 -0700 (PDT)
+Date: Thu, 18 Sep 2025 08:35:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aK1vdEcuN_xjhjyY@kernel.org>
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1640; i=ardb@kernel.org;
+ h=from:subject; bh=rNO7lD/OuznN/elc7/2TihvZkB/fdGPOYNhJzbseLp0=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIeP0CpsE7vV2ez+u1zTqWvlm66PI7v2vzq858OP34VDlH
+ RdSd7CEdJSyMIhxMciKKbIIzP77bufpiVK1zrNkYeawMoEMYeDiFICJXNZgZJi8acHsj1ffLuVk
+ fL/bXFd9jZnTm39O0idV/Nf9jMhU6bJm+Ge14c5izX+7hNeL3t5mGNO5U2iZoqlY/rFJqrp8UkJ t+dwA
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250918063539.2640512-7-ardb+git@google.com>
+Subject: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	herbert@gondor.apana.org.au, ebiggers@kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 26, 2025 at 11:25:24AM +0300, Jarkko Sakkinen wrote:
-> On Thu, Jun 20, 2024 at 03:23:20AM +0300, Jarkko Sakkinen wrote:
-> > On Fri Jun 7, 2024 at 1:58 PM EEST, Herbert Xu wrote:
-> > > On Wed, May 29, 2024 at 12:08:09AM +0300, Jarkko Sakkinen wrote:
-> > > >
-> > > > +/*
-> > > > + * Sign operation is an encryption using the TPM's private key. With RSA the
-> > > > + * only difference between encryption and decryption is where the padding goes.
-> > > > + * Since own padding can be used, TPM2_RSA_Decrypt can be repurposed to do
-> > > > + * encryption.
-> > > > + */
-> > > > +static int tpm2_key_rsa_sign(struct tpm_chip *chip, struct tpm2_key *key,
-> > > > +			     struct kernel_pkey_params *params,
-> > > > +			     const void *in, void *out)
-> > > > +{
-> > > > +	const off_t o = key->priv_len + 2 + sizeof(*key->desc);
-> > > > +	const struct tpm2_rsa_parms *p =
-> > > > +		(const struct tpm2_rsa_parms *)&key->data[o];
-> > > > +	const u16 mod_size = be16_to_cpu(p->modulus_size);
-> > > > +	const struct rsa_asn1_template *asn1;
-> > > > +	u32 in_len = params->in_len;
-> > > > +	void *asn1_wrapped = NULL;
-> > > > +	u8 *padded;
-> > > > +	int ret;
-> > > > +
-> > > > +	if (strcmp(params->encoding, "pkcs1") != 0) {
-> > > > +		ret = -ENOPKG;
-> > > > +		goto err;
-> > > > +	}
-> > > > +
-> > > > +	if (params->hash_algo) {
-> > > > +		asn1 = rsa_lookup_asn1(params->hash_algo);
-> > >
-> > > Could you please explain why this can't be done through pkcs1pad
-> > > instead of going to raw RSA?
-> > 
-> > Sorry was away couple of weeks from here. I replace this with TPM2_Sign
-> > as is done already in the ECDSA module, so I guess that is a "yes".
-> 
-> Time travelling back to 2024 ;-)
-> 
-> I can't recall what I was thining here butI'm glad that I did not put
-> the patch set further as now I have much more sane angle to this.
-> 
-> I realized while working on [1] that I'm better of making this to work
-> as API on rsapubkey.asn1 and rsaprivkey.asn1 and matching files for
-> ECC and do all steps inside kernel from this:
-> 
-> tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
-> tpm2_evictcontrol -c owner.txt 0x81000001
-> tpm2_getcap handles-persistent
-> openssl genrsa -out private.pem 2048
-> tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
-> tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
-> openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
-> 
-> I.e. my test tool does everything else except
-> 
-> openssl genrsa -out private.pem 2048
-> 
-> Im now pretty familiar with import procedure and how to prepare data
-> for TPM2_Import and is like the "spirit" of it i.e., take external
-> key and store it inside TPM2. That as side effect removes all the
-> use of tpm2key.asn1 from the patch set and simplifies flows
-> greatly.
-> 
-> And my Rust works help to get the preparation procedure exactly
-> right and none of those crazy tools and commands will be needed.
-> 
-> The matching C code following TCG Architecture spec  I'll first write in
-> user space and then port that kernel crypto APIs
-> 
-> That spans a question tho: should it be its own key type (as it is
-> right now or would it be better idea to have parameter/option for
-> hardware pre-existing RSA key types, or what would be the best
-> direction API wise to approach this?
+From: Ard Biesheuvel <ardb@kernel.org>
 
-This response was filled wrong conclusions. The current
-separate key types is the correct path. It's best to use TpmKey ASN.1
-import as the keys might also source from TPM2_Create command, not
-necessarily necessarily from external source, or at least it would be
-stupid to limit it to only external keys.
+Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
+context switch out of struct thread_struct, and onto the stack, so that
+the memory cost is not imposed needlessly on all tasks in the system.
 
-So yeah two options to get this finally somehere are either pkcs1pad
-route or more likely to change this to use TPM2_Sign, which should
-be able to address padding internally at the chip.
+Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
+rules around permitted usage patterns of kernel_neon_begin() and
+kernel_neon_end(). This permits #5 to provide a stack buffer to
+kernel_neon_begin() transparently, in a manner that ensures that it will
+remain available until after the associated call to kernel_neon_end()
+returns.
 
-Also I think RSA key should only expose here signinig operation for
-the time being and encryption should be something reconsidered later
-(if ever).
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Brown <broonie@kernel.org>
 
-Just had a such a long pause since I've revisited this that did not
-recall the reasoning why it was implemeted like it was.
+Ard Biesheuvel (5):
+  crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
+  crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
+  crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
+  arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
+  arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
+
+ arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
+ arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
+ arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
+ arch/arm64/include/asm/neon.h       |  7 ++--
+ arch/arm64/include/asm/processor.h  |  2 +-
+ arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
+ 6 files changed, 34 insertions(+), 34 deletions(-)
 
 
-BR, Jarkko
+base-commit: f83ec76bf285bea5727f478a68b894f5543ca76e
+-- 
+2.51.0.384.g4c02a37b29-goog
+
