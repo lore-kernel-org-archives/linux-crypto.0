@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1091D27AC4C
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 14:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9800830498F
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 14:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758204334; cv=none; b=Qwh/ZvxftcM5+IAyu5ytGCBRRBHb8ORd6rvamVrMQJdG5nQPYQm/RHNpX25K4cMYoEJUjLWmNYa/rpiSpOjWCAkZfyfxNFbLN2Um3//vZsgL+btZzPap4WaC8c2fz694bvlAhEjIc+EIY07p6qIy+X/RagL+wrsz5us4cqUKsN4=
+	t=1758204337; cv=none; b=upqGjv0R9bYkzj0abA1bL9vlNZs0cY95WKR5b8/NOVmwOJ3jw3yko7xH34VWSSXZn9nu8glzoK45FNgVf1OIESz6h3NuMPuWbLmECD/HnOOW7E79+7RTgNzhWXRFcA2uDx/ZzwFxxMwPO80YV9Xuxyvhwu/Lga4PCwCl1Lyub20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758204334; c=relaxed/simple;
-	bh=hWQTFclLDMz8VDIHIRpv8/WliytLJaAhdU6JNzWrg6Q=;
+	s=arc-20240116; t=1758204337; c=relaxed/simple;
+	bh=WwPYyU6yaRk3iOE7qWMJl0whWT5WkM6tcWWFpyBaBM4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PPHBNMcjpPqi4OfSI8DdRwI5+kFMZiKBejaI9JTnukDkcuxhZCc0735sswDJMOl71r+veRNcam4L93otHn5M0okvdx9xbVz1NoJX2Qk3/Hps3MgmahTTOXEXryi2DFMbxP2r0KwrzhIwvlsKc6uaWdiuw4VHuCS5/ev7hOpkJps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FU49BucB; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=LI2ycJ5dY4a8NH9dzAzt6VkdEQRhfl1L+DzvtJwbiYsirlDVSL3CgGJCyPBpAAnTY/oZf8D26k/f3REUUFJpkDI7VTwx1Mpegl4l2Dl1PTXWZxwdQ8zQUb9vcUIuKcgql3VRWmegLyBmkFPP2EpoK4K86opuAdwtyr988g+qibc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TCJ8Xpct; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FU49BucB"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45dd56f0000so9866535e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 07:05:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TCJ8Xpct"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45df7e734e0so8343655e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2025 07:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758204329; x=1758809129; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758204332; x=1758809132; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sI2tSFnbkFXEHpzRn76LXPg2QDPG5jXGC+/0hf5kEII=;
-        b=FU49BucBWcWp+YVJUWl8w3U6ejvHKF66rHZXuwfQ9IDYnM4yc8HwS52AGeBN7vtSST
-         GHOBkpDX98Py3IPzJTGZIk68+OXnPkHDbbz7OYQyXjyeIthlSoiUwwZHepms3xJ98mLe
-         u9PC2tgaxYxXClcvaikdlgztvD4R8FJ6hih3UTTjt+B6+DJCBKR0T6DYHxemWscz1OZS
-         /lAq/FS8Tug7dOufvD6p/VTz/+nYACHs2pZHOdU8SZxMOcpPQSxUQR/sJE67s0EbqeAo
-         C3T+clgOry3xpRHZf7ISsMUfwL/S2RJppm2fKQZmacP0gP1gLhxAa1RDi7Lms1iOmGTF
-         Szzw==
+        bh=K/GO4ArtW2OIx6jkhKXXV1jkBs4yDkVLm8FwRBFeGHc=;
+        b=TCJ8XpctbRsSXYzMsB6TvWYPARdsVq0jA81YMuO2ikMrYTR9j5AeJ6Y0Mj1mdP/TI+
+         355X9A/EH85IRMN1R7YpWuJqmvJIaK+9NbZadqADddEKGfG/ueVL/31d38pMyWwkkHgS
+         +LAANcmMpyBWTfmnXWeTjejLXi/q1m7M3nZOLGxQuiuGOOXrfQT7NX9g4cXeJ4FXsjOw
+         LU96vIAsdfrSHuMPnxndZxXIzwv+SOBZ2PFA3fSDSgL4tj9YpBKK642+75IdcvSCBlkH
+         3QuW6Qd1eI78wAFY1pTOlTaiGSDpNQoPTkgOWg5e5aHTA8YJgvZMHosMeQkUk2b1oIJR
+         1kOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758204329; x=1758809129;
+        d=1e100.net; s=20230601; t=1758204332; x=1758809132;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sI2tSFnbkFXEHpzRn76LXPg2QDPG5jXGC+/0hf5kEII=;
-        b=uVBCDGb/rpVaGtUAZ1gX5GOxN/ycuz3tsAiCoYN/ylvgeFsRaMbx3L4WKFoNH2i5O1
-         YgVadqHXdg/Mw28Pe6b0e97EqxWum2MnnG8j6NhmN6ncp13EklPitxv87O7UOFlj+zBA
-         XJEnSr2HZkAcQybSXeEnPC2mZ0GZQHg7OGJhdIovMM29CSKGyCXoKa8iZahir40bvyHi
-         ewdWmkrHPA3W6FHnejv0kNwianYnx8zYujzhAFzXcGsxnO+lUnnRs4RrVFX6gU8d70pT
-         vqKN9TMp6+jgIlkuG9oZwNivzF2P7HiDh+TUiklntTPrN1wV63QFkUNtD+saqfRS9I8/
-         wlCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUctKtlmRiaKM5H6F1rWS8ngbmuJqBubZxBfDHomVSwDAkUybJS+iD4zxmE5xOMr8VvCtEjwCqIlG7Mhbc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxylzY2fGeSZLaAQoBCWG6hi+WuNOC2f/96++XsBEaI4K0HJpf4
-	ywd4qbfi82Qj/tkGW8RtxCCt1zOn32KILQEP/okWj1kWKUXz535AFuBQ/fCz2AWYCh9N0IK18f5
-	xqg==
-X-Google-Smtp-Source: AGHT+IFRbToo2Bwf5/5PfOGlLkyE9BQ/OcfapdUErqx3YciffbcOiyjfesgIMrMTUrj6b+h7cxqfj4hCOQ==
-X-Received: from wmlv10.prod.google.com ([2002:a05:600c:214a:b0:45b:9c60:76bb])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:b86:b0:455:f59e:fd9b
- with SMTP id 5b1f17b1804b1-46205eb1674mr64702705e9.24.1758204329318; Thu, 18
- Sep 2025 07:05:29 -0700 (PDT)
-Date: Thu, 18 Sep 2025 15:59:12 +0200
+        bh=K/GO4ArtW2OIx6jkhKXXV1jkBs4yDkVLm8FwRBFeGHc=;
+        b=tNmlZuyQtoakeXHKIcxJQjXrq5ukoKWEZeXoyIgqJqFhHJOhBf9HnztLWGk47LE56M
+         c2xid9xBshsNL8LC8y8qsm0UKbtdcaERFZKA8kEI/q2fX2eC1arHe8v2Kda5LPOVRWxV
+         AT4nyaR4erWPFBTN4rynZbiZXB9FuW5ceQ6AensEGfzEboEbzfRE2OyoyG5knfRYtJQ9
+         Mkhp7/sThqQ54TKDp/TAUf+GJTHJRB8HqZFoyp0/TLwhPJ+KaD7J5twJoqbgwhO7OoDi
+         7oqTg7yokad38VfFwVpolywBT3ZXO5WnBXWmgN4OvyPiu+hCVlspwqGFl/MydZkfOkTe
+         CHBw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJYK9xFgseFomGv69do/1+2MLaU0R+QOizshEp7obACakpUQTFRVJ4gCzjNaouOSEdHmJWXtdJHvHD/Pg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymLgtfxApcq2Gj95PGZUfCv3DonAnmsdE+iWSfkph1Cy3OJ4+b
+	0GZ6J5q+nHVBDrCCTb20g0K+da5m8l+hZurWTHLIoLvkgcbEisD+ox/m63X7s1UX72yBz4ubbGr
+	E3g==
+X-Google-Smtp-Source: AGHT+IGL64R68SLUyV8p8fnQMRmwNs38xYkNCUycugJPRNDTpsKr8zSWpPLsmf4Plj7ZDky6HCrs46lD6w==
+X-Received: from wmbel12.prod.google.com ([2002:a05:600c:3e0c:b0:45e:613:c03])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1f8c:b0:45d:7d88:edcd
+ with SMTP id 5b1f17b1804b1-46206b2e1admr70451265e9.30.1758204331829; Thu, 18
+ Sep 2025 07:05:31 -0700 (PDT)
+Date: Thu, 18 Sep 2025 15:59:13 +0200
 In-Reply-To: <20250918140451.1289454-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250918140451.1289454-1-elver@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250918140451.1289454-2-elver@google.com>
-Subject: [PATCH v3 01/35] compiler_types: Move lock checking attributes to compiler-capability-analysis.h
+Message-ID: <20250918140451.1289454-3-elver@google.com>
+Subject: [PATCH v3 02/35] compiler-capability-analysis: Add infrastructure for
+ Clang's capability analysis
 From: Marco Elver <elver@google.com>
 To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
 	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
@@ -87,103 +88,626 @@ Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenry
 	llvm@lists.linux.dev, rcu@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The conditional definition of lock checking macros and attributes is
-about to become more complex. Factor them out into their own header for
-better readability, and to make it obvious which features are supported
-by which mode (currently only Sparse). This is the first step towards
-generalizing towards "capability analysis".
+Capability analysis is a C language extension, which enables statically
+checking that user-definable "capabilities" are acquired and released where
+required. An obvious application is lock-safety checking for the kernel's
+various synchronization primitives (each of which represents a "capability"),
+and checking that locking rules are not violated.
 
-No functional change intended.
+Clang originally called the feature "Thread Safety Analysis" [1], with
+some terminology still using the thread-safety-analysis-only names. This
+was later changed and the feature became more flexible, gaining the
+ability to define custom "capabilities". Its foundations can be found in
+"capability systems", used to specify the permissibility of operations
+to depend on some capability being held (or not held).
+
+[1] https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+[2] https://www.cs.cornell.edu/talc/papers/capabilities.pdf
+
+Because the feature is not just able to express capabilities related to
+synchronization primitives, the naming chosen for the kernel departs
+from Clang's initial "Thread Safety" nomenclature and refers to the
+feature as "Capability Analysis" to avoid confusion. The implementation
+still makes references to the older terminology in some places, such as
+`-Wthread-safety` being the warning enabled option that also still
+appears in diagnostic messages.
+
+See more details in the kernel-doc documentation added in this and the
+subsequent changes.
+
+Clang version 22+ is required.
 
 Signed-off-by: Marco Elver <elver@google.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/linux/compiler-capability-analysis.h | 32 ++++++++++++++++++++
- include/linux/compiler_types.h               | 18 ++---------
- 2 files changed, 34 insertions(+), 16 deletions(-)
- create mode 100644 include/linux/compiler-capability-analysis.h
+v3:
+* Require Clang 22 or later (reentrant capabilities, basic alias analysis).
+* Rename __assert_cap/__asserts_cap -> __assume_cap/__assumes_cap (suggested by Peter).
+* Add __acquire_ret and __acquire_shared_ret helper macros - can be used
+  to define function-like macros that return objects which contains a
+  held capabilities. Works now because of capability alias analysis.
+* Add capability_unsafe_alias() helper, where the analysis rightfully
+  points out we're doing strange things with aliases but we don't care.
+* Support multi-argument attributes.
 
+v2:
+* New -Wthread-safety feature rename to -Wthread-safety-pointer (was
+  -Wthread-safety-addressof).
+* Introduce __capability_unsafe() function attribute.
+* Rename __var_guarded_by to simply __guarded_by. The initial idea was
+  to be explicit if the variable or pointed-to data is guarded by, but
+  having a shorter attribute name is likely better long-term.
+* Rename __ref_guarded_by to __pt_guarded_by (pointed-to guarded by).
+---
+ Makefile                                     |   1 +
+ include/linux/compiler-capability-analysis.h | 449 ++++++++++++++++++-
+ lib/Kconfig.debug                            |  31 ++
+ scripts/Makefile.capability-analysis         |   7 +
+ scripts/Makefile.lib                         |  10 +
+ 5 files changed, 491 insertions(+), 7 deletions(-)
+ create mode 100644 scripts/Makefile.capability-analysis
+
+diff --git a/Makefile b/Makefile
+index cf37b9407821..2c91730e513b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1096,6 +1096,7 @@ include-$(CONFIG_RANDSTRUCT)	+= scripts/Makefile.randstruct
+ include-$(CONFIG_KSTACK_ERASE)	+= scripts/Makefile.kstack_erase
+ include-$(CONFIG_AUTOFDO_CLANG)	+= scripts/Makefile.autofdo
+ include-$(CONFIG_PROPELLER_CLANG)	+= scripts/Makefile.propeller
++include-$(CONFIG_WARN_CAPABILITY_ANALYSIS) += scripts/Makefile.capability-analysis
+ include-$(CONFIG_GCC_PLUGINS)	+= scripts/Makefile.gcc-plugins
+ 
+ include $(addprefix $(srctree)/, $(include-y))
 diff --git a/include/linux/compiler-capability-analysis.h b/include/linux/compiler-capability-analysis.h
-new file mode 100644
-index 000000000000..7546ddb83f86
---- /dev/null
+index 7546ddb83f86..6f3f185478bc 100644
+--- a/include/linux/compiler-capability-analysis.h
 +++ b/include/linux/compiler-capability-analysis.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
+@@ -6,27 +6,462 @@
+ #ifndef _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
+ #define _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
+ 
++#if defined(WARN_CAPABILITY_ANALYSIS)
++
 +/*
-+ * Macros and attributes for compiler-based static capability analysis.
++ * The below attributes are used to define new capability types. Internal only.
 + */
++# define __cap_type(name)			__attribute__((capability(#name)))
++# define __reentrant_cap			__attribute__((reentrant_capability))
++# define __acquires_cap(...)			__attribute__((acquire_capability(__VA_ARGS__)))
++# define __acquires_shared_cap(...)		__attribute__((acquire_shared_capability(__VA_ARGS__)))
++# define __try_acquires_cap(ret, var)		__attribute__((try_acquire_capability(ret, var)))
++# define __try_acquires_shared_cap(ret, var)	__attribute__((try_acquire_shared_capability(ret, var)))
++# define __releases_cap(...)			__attribute__((release_capability(__VA_ARGS__)))
++# define __releases_shared_cap(...)		__attribute__((release_shared_capability(__VA_ARGS__)))
++# define __assumes_cap(...)			__attribute__((assert_capability(__VA_ARGS__)))
++# define __assumes_shared_cap(...)		__attribute__((assert_shared_capability(__VA_ARGS__)))
++# define __returns_cap(var)			__attribute__((lock_returned(var)))
 +
-+#ifndef _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
-+#define _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
++/*
++ * The below are used to annotate code being checked. Internal only.
++ */
++# define __excludes_cap(...)		__attribute__((locks_excluded(__VA_ARGS__)))
++# define __requires_cap(...)		__attribute__((requires_capability(__VA_ARGS__)))
++# define __requires_shared_cap(...)	__attribute__((requires_shared_capability(__VA_ARGS__)))
 +
-+#ifdef __CHECKER__
++/**
++ * __guarded_by - struct member and globals attribute, declares variable
++ *                protected by capability
++ *
++ * Declares that the struct member or global variable must be guarded by the
++ * given capabilities. Read operations on the data require shared access,
++ * while write operations require exclusive access.
++ *
++ * .. code-block:: c
++ *
++ *	struct some_state {
++ *		spinlock_t lock;
++ *		long counter __guarded_by(&lock);
++ *	};
++ */
++# define __guarded_by(...)		__attribute__((guarded_by(__VA_ARGS__)))
 +
-+/* Sparse context/lock checking support. */
-+# define __must_hold(x)		__attribute__((context(x,1,1)))
-+# define __acquires(x)		__attribute__((context(x,0,1)))
-+# define __cond_acquires(x)	__attribute__((context(x,0,-1)))
-+# define __releases(x)		__attribute__((context(x,1,0)))
-+# define __acquire(x)		__context__(x,1)
-+# define __release(x)		__context__(x,-1)
-+# define __cond_lock(x, c)	((c) ? ({ __acquire(x); 1; }) : 0)
++/**
++ * __pt_guarded_by - struct member and globals attribute, declares pointed-to
++ *                   data is protected by capability
++ *
++ * Declares that the data pointed to by the struct member pointer or global
++ * pointer must be guarded by the given capabilities. Read operations on the
++ * data require shared access, while write operations require exclusive access.
++ *
++ * .. code-block:: c
++ *
++ *	struct some_state {
++ *		spinlock_t lock;
++ *		long *counter __pt_guarded_by(&lock);
++ *	};
++ */
++# define __pt_guarded_by(...)		__attribute__((pt_guarded_by(__VA_ARGS__)))
 +
-+#else /* !__CHECKER__ */
++/**
++ * struct_with_capability() - declare or define a capability struct
++ * @name: struct name
++ *
++ * Helper to declare or define a struct type with capability of the same name.
++ *
++ * .. code-block:: c
++ *
++ *	struct_with_capability(my_handle) {
++ *		int foo;
++ *		long bar;
++ *	};
++ *
++ *	struct some_state {
++ *		...
++ *	};
++ *	// ... declared elsewhere ...
++ *	struct_with_capability(some_state);
++ *
++ * Note: The implementation defines several helper functions that can acquire,
++ * release, and assert the capability.
++ */
++# define struct_with_capability(name, ...)								\
++	struct __cap_type(name) __VA_ARGS__ name;							\
++	static __always_inline void __acquire_cap(const struct name *var)				\
++		__attribute__((overloadable)) __no_capability_analysis __acquires_cap(var) { }		\
++	static __always_inline void __acquire_shared_cap(const struct name *var)			\
++		__attribute__((overloadable)) __no_capability_analysis __acquires_shared_cap(var) { }	\
++	static __always_inline bool __try_acquire_cap(const struct name *var, bool ret)			\
++		__attribute__((overloadable)) __no_capability_analysis __try_acquires_cap(1, var)	\
++	{ return ret; }											\
++	static __always_inline bool __try_acquire_shared_cap(const struct name *var, bool ret)		\
++		__attribute__((overloadable)) __no_capability_analysis __try_acquires_shared_cap(1, var) \
++	{ return ret; }											\
++	static __always_inline void __release_cap(const struct name *var)				\
++		__attribute__((overloadable)) __no_capability_analysis __releases_cap(var) { }		\
++	static __always_inline void __release_shared_cap(const struct name *var)			\
++		__attribute__((overloadable)) __no_capability_analysis __releases_shared_cap(var) { }	\
++	static __always_inline void __assume_cap(const struct name *var)				\
++		__attribute__((overloadable)) __assumes_cap(var) { }					\
++	static __always_inline void __assume_shared_cap(const struct name *var)				\
++		__attribute__((overloadable)) __assumes_shared_cap(var) { }				\
++	struct name
 +
-+# define __must_hold(x)
-+# define __acquires(x)
-+# define __cond_acquires(x)
-+# define __releases(x)
-+# define __acquire(x)		(void)0
-+# define __release(x)		(void)0
-+# define __cond_lock(x, c)	(c)
++/**
++ * disable_capability_analysis() - disables capability analysis
++ *
++ * Disables capability analysis. Must be paired with a later
++ * enable_capability_analysis().
++ */
++# define disable_capability_analysis()				\
++	__diag_push();						\
++	__diag_ignore_all("-Wunknown-warning-option", "")	\
++	__diag_ignore_all("-Wthread-safety", "")		\
++	__diag_ignore_all("-Wthread-safety-pointer", "")
 +
-+#endif /* __CHECKER__ */
++/**
++ * enable_capability_analysis() - re-enables capability analysis
++ *
++ * Re-enables capability analysis. Must be paired with a prior
++ * disable_capability_analysis().
++ */
++# define enable_capability_analysis() __diag_pop()
 +
-+#endif /* _LINUX_COMPILER_CAPABILITY_ANALYSIS_H */
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 16755431fc11..c24e60e75f36 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -24,6 +24,8 @@
- # define BTF_TYPE_TAG(value) /* nothing */
- #endif
- 
-+#include <linux/compiler-capability-analysis.h>
++/**
++ * __no_capability_analysis - function attribute, disables capability analysis
++ *
++ * Function attribute denoting that capability analysis is disabled for the
++ * whole function. Prefer use of `capability_unsafe()` where possible.
++ */
++# define __no_capability_analysis	__attribute__((no_thread_safety_analysis))
 +
- /* sparse defines __CHECKER__; see Documentation/dev-tools/sparse.rst */
++#else /* !WARN_CAPABILITY_ANALYSIS */
++
++# define __cap_type(name)
++# define __reentrant_cap
++# define __acquires_cap(...)
++# define __acquires_shared_cap(...)
++# define __try_acquires_cap(ret, var)
++# define __try_acquires_shared_cap(ret, var)
++# define __releases_cap(...)
++# define __releases_shared_cap(...)
++# define __assumes_cap(...)
++# define __assumes_shared_cap(...)
++# define __returns_cap(var)
++# define __guarded_by(...)
++# define __pt_guarded_by(...)
++# define __excludes_cap(...)
++# define __requires_cap(...)
++# define __requires_shared_cap(...)
++# define __acquire_cap(var)			do { } while (0)
++# define __acquire_shared_cap(var)		do { } while (0)
++# define __try_acquire_cap(var, ret)		(ret)
++# define __try_acquire_shared_cap(var, ret)	(ret)
++# define __release_cap(var)			do { } while (0)
++# define __release_shared_cap(var)		do { } while (0)
++# define __assume_cap(var)			do { (void)(var); } while (0)
++# define __assume_shared_cap(var)		do { (void)(var); } while (0)
++# define struct_with_capability(name, ...)	struct __VA_ARGS__ name
++# define disable_capability_analysis()
++# define enable_capability_analysis()
++# define __no_capability_analysis
++
++#endif /* WARN_CAPABILITY_ANALYSIS */
++
++/**
++ * capability_unsafe() - disable capability checking for contained code
++ *
++ * Disables capability checking for contained statements or expression.
++ *
++ * .. code-block:: c
++ *
++ *	struct some_data {
++ *		spinlock_t lock;
++ *		int counter __guarded_by(&lock);
++ *	};
++ *
++ *	int foo(struct some_data *d)
++ *	{
++ *		// ...
++ *		// other code that is still checked ...
++ *		// ...
++ *		return capability_unsafe(d->counter);
++ *	}
++ */
++#define capability_unsafe(...)		\
++({					\
++	disable_capability_analysis();	\
++	__VA_ARGS__;			\
++	enable_capability_analysis()	\
++})
++
++/**
++ * __capability_unsafe() - function attribute, disable capability checking
++ * @comment: comment explaining why opt-out is safe
++ *
++ * Function attribute denoting that capability analysis is disabled for the
++ * whole function. Forces adding an inline comment as argument.
++ */
++#define __capability_unsafe(comment) __no_capability_analysis
++
++/**
++ * capability_unsafe_alias() - helper to insert a capability "alias barrier"
++ * @p: pointer aliasing a capability or object containing capabilities
++ *
++ * No-op function that acts as a "capability alias barrier", where the analysis
++ * rightfully detects that we're switching aliases, but the switch is considered
++ * safe but beyond the analysis reasoning abilities.
++ *
++ * This should be inserted before the first use of such an alias.
++ *
++ * Implementation Note: The compiler ignores aliases that may be reassigned but
++ * their value cannot be determined (e.g. when passing a non-const pointer to an
++ * alias as a function argument).
++ */
++#define capability_unsafe_alias(p) _capability_unsafe_alias((void **)&(p))
++static inline void _capability_unsafe_alias(void **p) { }
++
++/**
++ * token_capability() - declare an abstract global capability instance
++ * @name: token capability name
++ *
++ * Helper that declares an abstract global capability instance @name that can be
++ * used as a token capability, but not backed by a real data structure (linker
++ * error if accidentally referenced). The type name is `__capability_@name`.
++ */
++#define token_capability(name, ...)					\
++	struct_with_capability(__capability_##name, ##__VA_ARGS__) {};	\
++	extern const struct __capability_##name *name
++
++/**
++ * token_capability_instance() - declare another instance of a global capability
++ * @cap: token capability previously declared with token_capability()
++ * @name: name of additional global capability instance
++ *
++ * Helper that declares an additional instance @name of the same token
++ * capability class @name. This is helpful where multiple related token
++ * capabilities are declared, as it also allows using the same underlying type
++ * (`__capability_@cap`) as function arguments.
++ */
++#define token_capability_instance(cap, name)		\
++	extern const struct __capability_##cap *name
++
++/*
++ * Common keywords for static capability analysis. Both Clang's capability
++ * analysis and Sparse's context tracking are currently supported.
++ */
  #ifdef __CHECKER__
- /* address spaces */
-@@ -34,14 +36,6 @@
- # define __rcu		__attribute__((noderef, address_space(__rcu)))
- static inline void __chk_user_ptr(const volatile void __user *ptr) { }
- static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
--/* context/locking */
--# define __must_hold(x)	__attribute__((context(x,1,1)))
--# define __acquires(x)	__attribute__((context(x,0,1)))
--# define __cond_acquires(x) __attribute__((context(x,0,-1)))
--# define __releases(x)	__attribute__((context(x,1,0)))
--# define __acquire(x)	__context__(x,1)
--# define __release(x)	__context__(x,-1)
--# define __cond_lock(x,c)	((c) ? ({ __acquire(x); 1; }) : 0)
- /* other */
- # define __force	__attribute__((force))
- # define __nocast	__attribute__((nocast))
-@@ -62,14 +56,6 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
  
- # define __chk_user_ptr(x)	(void)0
- # define __chk_io_ptr(x)	(void)0
--/* context/locking */
+ /* Sparse context/lock checking support. */
+ # define __must_hold(x)		__attribute__((context(x,1,1)))
++# define __must_not_hold(x)
+ # define __acquires(x)		__attribute__((context(x,0,1)))
+ # define __cond_acquires(x)	__attribute__((context(x,0,-1)))
+ # define __releases(x)		__attribute__((context(x,1,0)))
+ # define __acquire(x)		__context__(x,1)
+ # define __release(x)		__context__(x,-1)
+ # define __cond_lock(x, c)	((c) ? ({ __acquire(x); 1; }) : 0)
++/* For Sparse, there's no distinction between exclusive and shared locks. */
++# define __must_hold_shared	__must_hold
++# define __acquires_shared	__acquires
++# define __cond_acquires_shared __cond_acquires
++# define __releases_shared	__releases
++# define __acquire_shared	__acquire
++# define __release_shared	__release
++# define __cond_lock_shared	__cond_acquire
+ 
+ #else /* !__CHECKER__ */
+ 
 -# define __must_hold(x)
 -# define __acquires(x)
 -# define __cond_acquires(x)
 -# define __releases(x)
--# define __acquire(x)	(void)0
--# define __release(x)	(void)0
--# define __cond_lock(x,c) (c)
- /* other */
- # define __force
- # define __nocast
+-# define __acquire(x)		(void)0
+-# define __release(x)		(void)0
+-# define __cond_lock(x, c)	(c)
++/**
++ * __must_hold() - function attribute, caller must hold exclusive capability
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the caller must hold the given capability
++ * instance @x exclusively.
++ */
++# define __must_hold(x)		__requires_cap(x)
++
++/**
++ * __must_not_hold() - function attribute, caller must not hold capability
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the caller must not hold the given
++ * capability instance @x.
++ */
++# define __must_not_hold(x)	__excludes_cap(x)
++
++/**
++ * __acquires() - function attribute, function acquires capability exclusively
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function acquires the given
++ * capability instance @x exclusively, but does not release it.
++ */
++# define __acquires(x)		__acquires_cap(x)
++
++/**
++ * __cond_acquires() - function attribute, function conditionally
++ *                     acquires a capability exclusively
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function conditionally acquires the
++ * given capability instance @x exclusively, but does not release it.
++ */
++# define __cond_acquires(x)	__try_acquires_cap(1, x)
++
++/**
++ * __releases() - function attribute, function releases a capability exclusively
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function releases the given capability
++ * instance @x exclusively. The capability must be held on entry.
++ */
++# define __releases(x)		__releases_cap(x)
++
++/**
++ * __acquire() - function to acquire capability exclusively
++ * @x: capability instance pointer
++ *
++ * No-op function that acquires the given capability instance @x exclusively.
++ */
++# define __acquire(x)		__acquire_cap(x)
++
++/**
++ * __release() - function to release capability exclusively
++ * @x: capability instance pointer
++ *
++ * No-op function that releases the given capability instance @x.
++ */
++# define __release(x)		__release_cap(x)
++
++/**
++ * __cond_lock() - function that conditionally acquires a capability
++ *                 exclusively
++ * @x: capability instance pinter
++ * @c: boolean expression
++ *
++ * Return: result of @c
++ *
++ * No-op function that conditionally acquires capability instance @x
++ * exclusively, if the boolean expression @c is true. The result of @c is the
++ * return value, to be able to create a capability-enabled interface; for
++ * example:
++ *
++ * .. code-block:: c
++ *
++ *	#define spin_trylock(l) __cond_lock(&lock, _spin_trylock(&lock))
++ */
++# define __cond_lock(x, c)	__try_acquire_cap(x, c)
++
++/**
++ * __must_hold_shared() - function attribute, caller must hold shared capability
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the caller must hold the given capability
++ * instance @x with shared access.
++ */
++# define __must_hold_shared(x)	__requires_shared_cap(x)
++
++/**
++ * __acquires_shared() - function attribute, function acquires capability shared
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function acquires the given
++ * capability instance @x with shared access, but does not release it.
++ */
++# define __acquires_shared(x)	__acquires_shared_cap(x)
++
++/**
++ * __cond_acquires_shared() - function attribute, function conditionally
++ *                            acquires a capability shared
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function conditionally acquires the
++ * given capability instance @x with shared access, but does not release it.
++ */
++# define __cond_acquires_shared(x) __try_acquires_shared_cap(1, x)
++
++/**
++ * __releases_shared() - function attribute, function releases a
++ *                       capability shared
++ * @x: capability instance pointer
++ *
++ * Function attribute declaring that the function releases the given capability
++ * instance @x with shared access. The capability must be held on entry.
++ */
++# define __releases_shared(x)	__releases_shared_cap(x)
++
++/**
++ * __acquire_shared() - function to acquire capability shared
++ * @x: capability instance pointer
++ *
++ * No-op function that acquires the given capability instance @x with shared
++ * access.
++ */
++# define __acquire_shared(x)	__acquire_shared_cap(x)
++
++/**
++ * __release_shared() - function to release capability shared
++ * @x: capability instance pointer
++ *
++ * No-op function that releases the given capability instance @x with shared
++ * access.
++ */
++# define __release_shared(x)	__release_shared_cap(x)
++
++/**
++ * __cond_lock_shared() - function that conditionally acquires a capability
++ *                        shared
++ * @x: capability instance pinter
++ * @c: boolean expression
++ *
++ * Return: result of @c
++ *
++ * No-op function that conditionally acquires capability instance @x with shared
++ * access, if the boolean expression @c is true. The result of @c is the return
++ * value, to be able to create a capability-enabled interface.
++ */
++# define __cond_lock_shared(x, c) __try_acquire_shared_cap(x, c)
+ 
+ #endif /* __CHECKER__ */
+ 
++/**
++ * __acquire_ret() - helper to acquire capability of return value
++ * @call: call expression
++ * @ret_expr: acquire expression that uses __ret
++ */
++#define __acquire_ret(call, ret_expr)		\
++	({					\
++		__auto_type __ret = call;	\
++		__acquire(ret_expr);		\
++		__ret;				\
++	})
++
++/**
++ * __acquire_shared_ret() - helper to acquire capability shared of return value
++ * @call: call expression
++ * @ret_expr: acquire shared expression that uses __ret
++ */
++#define __acquire_shared_ret(call, ret_expr)	\
++	({					\
++		__auto_type __ret = call;	\
++		__acquire_shared(ret_expr);	\
++		__ret;				\
++	})
++
++/*
++ * Attributes to mark functions returning acquired capabilities. This is purely
++ * cosmetic to help readability, and should be used with the above macros as
++ * follows:
++ *
++ *   struct foo { spinlock_t lock; ... };
++ *   ...
++ *   #define myfunc(...) __acquire_ret(_myfunc(__VA_ARGS__), &__ret->lock)
++ *   struct foo *_myfunc(int bar) __acquires_ret;
++ *   ...
++ */
++#define __acquires_ret		__no_capability_analysis
++#define __acquires_shared_ret	__no_capability_analysis
++
+ #endif /* _LINUX_COMPILER_CAPABILITY_ANALYSIS_H */
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index dc0e0c6ed075..57e09615f88d 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -613,6 +613,37 @@ config DEBUG_FORCE_WEAK_PER_CPU
+ 	  To ensure that generic code follows the above rules, this
+ 	  option forces all percpu variables to be defined as weak.
+ 
++config WARN_CAPABILITY_ANALYSIS
++	bool "Compiler capability-analysis warnings"
++	depends on CC_IS_CLANG && CLANG_VERSION >= 220000
++	# Branch profiling re-defines "if", which messes with the compiler's
++	# ability to analyze __cond_acquires(..), resulting in false positives.
++	depends on !TRACE_BRANCH_PROFILING
++	default y
++	help
++	  Capability analysis is a C language extension, which enables
++	  statically checking that user-definable "capabilities" are acquired
++	  and released where required.
++
++	  Clang's name of the feature ("Thread Safety Analysis") refers to
++	  the original name of the feature; it was later expanded to be a
++	  generic "Capability Analysis" framework.
++
++	  Requires Clang 22 or later.
++
++	  Produces warnings by default. Select CONFIG_WERROR if you wish to
++	  turn these warnings into errors.
++
++config WARN_CAPABILITY_ANALYSIS_ALL
++	bool "Enable capability analysis for all source files"
++	depends on WARN_CAPABILITY_ANALYSIS
++	depends on EXPERT && !COMPILE_TEST
++	help
++	  Enable tree-wide capability analysis. This is likely to produce a
++	  large number of false positives - enable at your own risk.
++
++	  If unsure, say N.
++
+ endmenu # "Compiler options"
+ 
+ menu "Generic Kernel Debugging Instruments"
+diff --git a/scripts/Makefile.capability-analysis b/scripts/Makefile.capability-analysis
+new file mode 100644
+index 000000000000..e137751a4c9a
+--- /dev/null
++++ b/scripts/Makefile.capability-analysis
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++
++capability-analysis-cflags := -DWARN_CAPABILITY_ANALYSIS	\
++	-fexperimental-late-parse-attributes -Wthread-safety	\
++	-Wthread-safety-pointer -Wthread-safety-beta
++
++export CFLAGS_CAPABILITY_ANALYSIS := $(capability-analysis-cflags)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 1d581ba5df66..e0ac273bf9eb 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -105,6 +105,16 @@ _c_flags += $(if $(patsubst n%,, \
+ 	-D__KCSAN_INSTRUMENT_BARRIERS__)
+ endif
+ 
++#
++# Enable capability analysis flags only where explicitly opted in.
++# (depends on variables CAPABILITY_ANALYSIS_obj.o, CAPABILITY_ANALYSIS)
++#
++ifeq ($(CONFIG_WARN_CAPABILITY_ANALYSIS),y)
++_c_flags += $(if $(patsubst n%,, \
++		$(CAPABILITY_ANALYSIS_$(target-stem).o)$(CAPABILITY_ANALYSIS)$(if $(is-kernel-object),$(CONFIG_WARN_CAPABILITY_ANALYSIS_ALL))), \
++		$(CFLAGS_CAPABILITY_ANALYSIS))
++endif
++
+ #
+ # Enable AutoFDO build flags except some files or directories we don't want to
+ # enable (depends on variables AUTOFDO_PROFILE_obj.o and AUTOFDO_PROFILE).
 -- 
 2.51.0.384.g4c02a37b29-goog
 
