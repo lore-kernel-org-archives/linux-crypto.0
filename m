@@ -1,109 +1,124 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08E0223702;
-	Fri, 19 Sep 2025 21:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758316839; cv=pass; b=Ew9YUz2k/PYHG3jb/z4HmkplYEB33gtw6W3Mjc4hj/IPZhWQXHT/EXsf6kngmG+XXjhlFi4i2YH7YP5arnN9HGFQzpViD9nSpCKsuyqx0IVGmYQiGfhuOLKahw6/cfWRZ3/i7lFq4XigbjdMNw3ajbPwncTFwiAo/NaCDBp4yvk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758316839; c=relaxed/simple;
-	bh=et7a0xIBeTVDYV6MTLXeECVFQkoVbXTTzVLxvFUQstQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JqBomVl8dFOPvRQj7blE/IY3NdKlTe3gxs3zdNIckGc3+hyPN2IyT9QATKGcCOx7qm9Nn2L1tXfIUsyxAI3iXJ2lKhrohgFi8WcDBu+tszBfypE5DBVFDxK217CV8pfLhrtSmBW+EH32OaG2nIW+jzuMRJoB5z/n+UZrkp2eoew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=N5ZHmvb8; arc=pass smtp.client-ip=81.169.146.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B1F2D878C
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 22:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758321725; cv=none; b=PoF9OUZkiglz7gSF4R4ijE996Hpyo13WIJvE7et0TCS9XQWZ/rvhFWlKXVFRLdxTMgt/tWcdX/Cdwywj0NZcrCCOqE3zQcTCBUOq3HMFHd9W+ZOInrI/5F3BV9oowF5LsmL5AgS9bcS3bkpQvEwmiCCdUYRMD5dbtoWixeMAlDE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758321725; c=relaxed/simple;
+	bh=Zm1M3jHb9CJ3r71mYFzgfrQOp48B7ZOWK1X98tIDqzI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JwNg1gAWDNH3ki7RfvI5UTD9MN4Cw3NFQ6EnjkTMAcO2qeyKwuKsnzuPm89igWwT/JfItR0w2eiFslsg8QXo3X93SdyWGxujvBqBc4Jv8g+zvJI6erqQvJnf9D5fKSLidOTNXaaq6KVbOUGfFqyQdWsSaYUd1pUACD7IV+EHXso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCI3vAvx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="N5ZHmvb8"
-ARC-Seal: i=1; a=rsa-sha256; t=1758316833; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=G4j2I9OVl5BPNwLQ3yV4z8Hj70ZcrJeei6XyIgvmKZM2M2wEkIigu6T8x7dkznhQH+
-    BWA4VG2z2BVLNN6nqM8Z1gQlrvcyRVKQgvQcGiJwpGiYHpGlz4cMrPLXVntSjptZHa0D
-    Xm/7KWNbrxaGIAK6HS4SPQ+RV+wUEEAqUj83jMpacwM2xKg/bMq9lIRobs/HfNY/D1un
-    jdGzoVKrWzRB54MVX6o2H112pHmxn3a0y7WDRVbwa/9ZctS7JvHKbWrCB273c4PXyqZR
-    xLBfz79fLuZNRYV+G9V8YedtEmLldlq1i0MP/uRLdmg54zk7Qn5EYzzM3UVyzvwy99F7
-    JdGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758316833;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=vmheLRMDygrXWpSVmbnURUE2CG296RLm+NPL4yIwudE=;
-    b=l6bXmkGnDElMl/256UFdkklSwYbvuHq2B6Yoqqr9TtooZjxV3Jhvl+3fJnSLJR0daB
-    29pLPQh1L1teZRbBc2hQehXry3dBtZYaOYsxxuJucjCGyb1xX7Q/yuiDmvGF1jqqbX3z
-    VeswnhqngXx/ap0sBJJZGvTxt9fN3UGa+WHviCj8qqPzdnM3XQL/J2cNbVtnw9ftutSG
-    CGNDvbX1HjfS/muyMnvx30UdW1wN22D3B1AqZFGOmB64ipHICfstCoSQS0RrM4q8yPgV
-    INxqoZSVMWdqgZcGgbaLD23Kz499eCzvoVZ03HXqxyxvP3aGHbSF/MyIeGd9zj4NA6QC
-    prCg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758316833;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=vmheLRMDygrXWpSVmbnURUE2CG296RLm+NPL4yIwudE=;
-    b=N5ZHmvb8L2/6MzYtBXU7zVyUa96OQlicjdls2hJizBamT7bB3tvlwlMMDmmdsElmJA
-    l0DEF7bpznyrDFQPtFLC4xn7vnJPlXUcVpLWPocD1k1Ex6U3lx5vaRuBImxPWKS0IgmZ
-    r34SpnLp5rUer4PRZolAK85NOi2bu/9zDGHM2gRCXXePxWl1/jLLsoOhGe5CA7HAYd8q
-    iD1uUNq679qMEWeQ+I+ekpbUeIe1RzqXz1ufOVdXwA6KGTnj0KP0I95VRb5XDzEW5tpP
-    8R/QF3TDPhSMYVU0ZFqC0E+kNzlULay+HHDD9SrPwEavCwft1miDQDMZjhpC4ASjpX/c
-    QdBw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdP57PWmc+BP1jdA=="
-Received: from tauon.localnet
-    by smtp.strato.de (RZmta 52.1.2 AUTH)
-    with ESMTPSA id f01e6318JLKTLOw
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 19 Sep 2025 23:20:29 +0200 (CEST)
-From: Stephan Mueller <smueller@chronox.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: David Howells <dhowells@redhat.com>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
- Harald Freudenberger <freude@linux.ibm.com>,
- Holger Dengler <dengler@linux.ibm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Simo Sorce <simo@redhat.com>,
- linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
- keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512,
- SHAKE128, SHAKE256
-Date: Fri, 19 Sep 2025 23:20:28 +0200
-Message-ID: <3030391.1BCLMh4Saa@tauon>
-In-Reply-To: <20250919204749.GB8350@quark>
-References:
- <20250919190413.GA2249@quark> <5078839.1IzOArtZ34@tauon>
- <20250919204749.GB8350@quark>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCI3vAvx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 840E6C4CEFC
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 22:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758321725;
+	bh=Zm1M3jHb9CJ3r71mYFzgfrQOp48B7ZOWK1X98tIDqzI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=iCI3vAvxCZ1fdHW7PlbAGgZvqXMeRuoIhAE1SwbMhBQZhtPLhQxkxks6Xv1ecCjYK
+	 zA+FyJo4ZycF/1Sa82O00r7ip4tY4ljZuZWU+YmeOgzp6+RIkU8pt5PaB/xnzAa6yV
+	 xa1MCA2nc54d+OvT0vC3mru5Nyj+XwGKbzpGABAYMqAXDJSi5YlRurCl2wtE1zPNTp
+	 tCeEPynuKTvxw3pZSrxbYlsgT8Uptgsd8VDf7bMwvdRAMGopUy1S0mZQ2rz6CEZIBW
+	 LAah1wVrsCTzVK5Bq0YHJyKwv+5Mpy6Bvs5C0pjvuJKi7Fd2KmgiwIIv5rregCROJY
+	 Vng59aOXu+rHA==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-33730e1cda7so22158781fa.3
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:42:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUY3srxJ4itb444I9+B43RKyDfQ5NP/9uki3PgxRe30uEtgDdAT7DH6ByynCsaSQ+evrpIviajc2wTzy7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzUBMOWAZeoMsRvev3KrschoP/Mp/O+YURd6onSj3Nwxa0FRdb
+	rmjk1zFnrsQF8V8eelY9+05LhG8ElIzTF2pJfPXK4c3Nah+2DIv9GmDfdNlqawClclwg2OKscFG
+	8Sx8rIgprT8DUjs6S6wMpcmM+93H/GnI=
+X-Google-Smtp-Source: AGHT+IFHcKMAvs4PQQTYZlUVDWSc5ZK0PVWE4ileGQsev+UZeJzNDCdz1kpAlU2C8sOjUFnO06qBBhVnBMPRCeiLVIc=
+X-Received: by 2002:a2e:8a8e:0:b0:35f:ddb1:96c4 with SMTP id
+ 38308e7fff4ca-36419785d45mr9902251fa.29.1758321723793; Fri, 19 Sep 2025
+ 15:42:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+References: <20250918063539.2640512-7-ardb+git@google.com> <20250919193221.GB2249@quark>
+In-Reply-To: <20250919193221.GB2249@quark>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sat, 20 Sep 2025 00:41:51 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFOS4n4HNCZuoSUT3KUs+pM6OqSYz3Pv5z1dmZJZ70meQ@mail.gmail.com>
+X-Gm-Features: AS18NWAn8XZaWe_Iq5DVEqnG3m8nSgWuT9HLn9m4iHtAqolG9uEsGI6YX_WDbKI
+Message-ID: <CAMj1kXFOS4n4HNCZuoSUT3KUs+pM6OqSYz3Pv5z1dmZJZ70meQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	herbert@gondor.apana.org.au, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Am Freitag, 19. September 2025, 22:47:49 Mitteleurop=C3=A4ische Sommerzeit =
-schrieb=20
-Eric Biggers:
+On Fri, 19 Sept 2025 at 21:32, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Thu, Sep 18, 2025 at 08:35:40AM +0200, Ard Biesheuvel wrote:
+> > From: Ard Biesheuvel <ardb@kernel.org>
+> >
+> > Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
+> > context switch out of struct thread_struct, and onto the stack, so that
+> > the memory cost is not imposed needlessly on all tasks in the system.
+> >
+> > Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
+> > rules around permitted usage patterns of kernel_neon_begin() and
+> > kernel_neon_end(). This permits #5 to provide a stack buffer to
+> > kernel_neon_begin() transparently, in a manner that ensures that it will
+> > remain available until after the associated call to kernel_neon_end()
+> > returns.
+> >
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Will Deacon <will@kernel.org>
+> > Cc: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Mark Brown <broonie@kernel.org>
+> >
+> > Ard Biesheuvel (5):
+> >   crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
+> >   crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
+> >   crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
+> >   arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
+> >   arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
+> >
+> >  arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
+> >  arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
+> >  arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
+> >  arch/arm64/include/asm/neon.h       |  7 ++--
+> >  arch/arm64/include/asm/processor.h  |  2 +-
+> >  arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
+> >  6 files changed, 34 insertions(+), 34 deletions(-)
+>
+> This looks like the right decision: saving 528 bytes per task is
+> significant.  528 bytes is a lot to allocate on the stack too, but
+> functions that use the NEON registers are either leaf functions or very
+> close to being leaf functions, so it should be okay.
+>
 
-Hi Eric,
+Indeed.
 
-> Yes.  But I'm still a bit puzzled why there suddenly seems to be
-> interest in a FIPS pre-operational self-test for SHA-3 specifically.
-> lib/ has had SHA-1 for two decades without a FIPS pre-operational
-> self-test.  If someone actually needs this, surely they would also need
-> it, and have already needed it, for other algorithms?
+> The implementation is a bit unusual, though:
+>
+>    #define kernel_neon_begin()  do { __kernel_neon_begin(&(struct user_fpsimd_state){})
+>    #define kernel_neon_end()    __kernel_neon_end(); } while (0)
+>
+> It works, but normally macros don't start or end code blocks behind the
+> scenes like this.
 
-I just answered on the FIPS requirements as I interpreted your question in=
-=20
-this regard. I am not saying it needs to be added here.
+That is kind of the point, as it restricts the use of them to an idiom
+that guarantees that the stack variable lives long enough.
 
-I am currently a bit confused between crypto vs lib/crypto with its FIPS vs=
-=20
-non-FIPS support. That, perhaps, contributed to my answer.
+> Perhaps it should be more like s390's
+> kernel_fpu_begin(), where the caller provides the buffer that the
+> registers are stored in?
+>
 
-Ciao
-Stephan
-
-
+If we're happy to change the API on both arm64 and ARM, then we could
+make it more explicit. It's a lot more work, though.
