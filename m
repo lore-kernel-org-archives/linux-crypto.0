@@ -1,77 +1,77 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012018.outbound.protection.outlook.com [52.101.43.18])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011012.outbound.protection.outlook.com [52.101.52.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CF132143E;
-	Fri, 19 Sep 2025 19:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D8C2C0F7C;
+	Fri, 19 Sep 2025 19:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758311602; cv=fail; b=lXwI0ZB9c9q0W+TurtVQkZtZstEXoDUuMGLs+Ly/kte5vcmWSWn+kAgMEfVptArLo1HsyznEkw19vGMlj6e1i+f9GsrywI6s+X0goBhxwddwgD3tCBh+urhKmQiy4bu8kO9VQcp5B6Vts2ETS4jhCtOGnXPmIkxztA1GNF4BP6k=
+	t=1758311605; cv=fail; b=YNSYvKRsDK9wGNo/YQ1feohgqgjRveYvNoSe/bU0tmiScdsIheGBsBGqaFAho4iMb3nKsjOy4WOURso4Fysxxv2NNUjmq3dDBwO2/Q0xIbRciqa3baLflUPWiXm/VISofmNrBLi1RuoGf2h2reaSRIuqK0eu9HeFC2Q9WmYRNpE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758311602; c=relaxed/simple;
-	bh=PC3pgxfvBJ2p2GI9qLU2qXj3g5+0cCsVg+Sr8pR7Hi0=;
+	s=arc-20240116; t=1758311605; c=relaxed/simple;
+	bh=rxbYo1zl7+p9PbaxGDtAaA2kWxESX5Hy1K4/Y4ibOK4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RlZtOLLlXfy7gljFjtK5zOVpfXxYE5GrPYxU3Agv5jCnRY5r6CsTnPSCRHjcqTV0VdGwCqSwGVRApUUawPbDxpVX+KHWk1D6tLSHBXamSmN4qCZovUr2dF1En/+HX+IBHer+j8eZB2U8fDRAsKrIL9FaDRNZ1TQBCCWIz0f2oxQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SQv0jeaW; arc=fail smtp.client-ip=52.101.43.18
+	 MIME-Version:Content-Type; b=Q1zc9s4kzsFVUnpLkseObkP7VVthsZfhWHNh0DLSU+1m4Lkx8409w9qQA1crWph2ldCegIVlGgjS1LbU143zN93GDEpkwFPsWzxfsZOVX21pOgTqZLTyPjOwID7w6wB3P18gdXKr3/q9aeTbqdVzA1m6G8YUlA3G0tzEBlrumw8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hJ+QaT9Z; arc=fail smtp.client-ip=52.101.52.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SQv0jeaW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hJ+QaT9Z"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Xx58w32kCACqi4WoErc9gAuy9aA2HT4987Ik/i4yLcz1lM8iYTK4599eLvlx2Xw7nlLV1TuRVCTGAOWS/XEpqmjNmXwlcy64e8QGIDv7FAKKECwBS5WovUYUmMtYLOWoeR36ok3VrpJhsh5R391xu+vNCWvwLuHNYqbBvvOJTAoNR8oIHQWXLV5ootoh0UoLqozguF+olHrjxo7lkwqTNTYaLsQXVxXzgF/xU4keSq+NLFgikXhvtQsjBr+2bFuJzW5lvfQotxZKyvtJY0loEu5AZj9DWRTuJHFG9w/WzupRkRvZaf7lpkTmeW4mukcld7JvGdQrFb83GJ3pN6mSWA==
+ b=nyZ53/6YCwRBaiiepOZXanepkWNMplKiXk/YdLEjOTQz5R8bW/894fwb2LcB0xmJl9tPOoMQLrNu8ikQ0PnWwIcDduOnPbNS/GrxKG4E6O9nNErpHbu8DnjNuOswa7znt7k0KPmD4OlxD9xylK6YZH8LlcKONhrSFHyvc+lmBs9Rsknk2VrGwc9ZvAlwc7uBo5Jnw3fSuLyCa5UvE0oBktC9pyh/RLHtMYYHljUjcM5TvRJLMDxnJ+oirfrIArlDkDZYgUsi18Oj121sPKgAOn22mHbaR/uFaC9gzaFPhmcpM6cu+sTjU4jPf55dOnqoYr21Fo6E8j3+La8z/MqcAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=go2a0ObE3Trq89zOLUqiti0Qw7XEHjlsq00e/g8s/80=;
- b=jzJjRXeWz2xFv2kdi1ZZpQzOliKHedr7agVgHbReQet3rqbrVOnpwrAEdsyKk4iGL6yy7aaSn3qVy/C7e8rGq0/jAAPBpnqwSRMdPs5IHLRplhfIh2eDM1Aq5tPu5HGV9vxTAdETN4LqqpZ2b3zVDIffuIsmDVXBOQVLFPuRl6m2xvEmnlBcoMJSEo+rGJNpTk7l37+yddwjSN9wBLOwgW2JvPjHzK+YlaOChPYbQKMa3ptiRiCAWCRaxDPu5pGZNTyaVpIRtEgiZcMku52Rlfnxe2vxVIJkpby1FbcJSrY5rIPiVRCiVbho8j4B7wVsb1z/WP+FXR/oPbCu0xMWew==
+ bh=smncOxWs2qUUDzJ4uLtgXvU8/DODotSo44onv3xenfw=;
+ b=f2ctkN1Uwc6QjQvqv/yar03Xf0lJwU0U81NLmX2ZJYC4pn+9ALqIeQBryqRfhMesdI0fk8fpENvjypXmiLwPCmoMnxa3cu8nZ2JyvoRir2/yWhIp7GusbTiorUijDjsPzwzwu1g1BDZa0APic2VvK8KX+aEGd2g2mTvfvXrxXWZPxtRKN2JABRKqxlQ5UV2Tqn8vrnUAgBMS/+Igw4Ff9EkL8yy/x0i+H5+K7oCN6fNn+uxfVsayGd2WMr6rCyeKzHn/f+zw/5b3FehXB4bTlWG0372oTC/aCmeT/g/5FJdwFTU0YiXcuS0e0b5yBr28c3MtPB2LbU4BYGSvccK10w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=go2a0ObE3Trq89zOLUqiti0Qw7XEHjlsq00e/g8s/80=;
- b=SQv0jeaWsMjdAhUYo4mHfKzupuyEJmN2FJcn1rt0mymyRHIgAmKz0uMFKXps8g1rPVMRr3Ut91RPupflJmOfjpRtBlVUdjDb0sAlAhvU5BIYDYQhja90DxWd14o4cTTLMJYo6F5FkStry6v48F3thlHhcbaHJumDYmjlU6J5XiHL9PLKc4koDJsLZpOrM3FAVeYFQBQpVHksN4HZZeB5CWporlEbl3yyUourFsfpWsJ+Ue9vD6Wwh0hzcNAryWcZPW45RqSwfZOIVit9KmnJ7z8NVw2tmYUmdjGNkWv+jy2v400nYebe1MTWx0/LiDwbq6MKhEU7TU2j5zlZzuRSbQ==
-Received: from CH2PR16CA0011.namprd16.prod.outlook.com (2603:10b6:610:50::21)
- by SJ0PR12MB6880.namprd12.prod.outlook.com (2603:10b6:a03:485::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Fri, 19 Sep
- 2025 19:53:06 +0000
-Received: from CH1PEPF0000AD82.namprd04.prod.outlook.com
- (2603:10b6:610:50:cafe::91) by CH2PR16CA0011.outlook.office365.com
- (2603:10b6:610:50::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.15 via Frontend Transport; Fri,
- 19 Sep 2025 19:53:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ bh=smncOxWs2qUUDzJ4uLtgXvU8/DODotSo44onv3xenfw=;
+ b=hJ+QaT9Z7W56oPwzg5gVnj62CuXSut+o/5cSrvukShpuNlbDEqJwTXEWIHyec5rKoH815aH37n9+xAMubgIKehPVNCfr9lW8R5rwB9esWYeD7JzYNXSqtyXrKwonE/tJsDirFx6DeubMMAt2JLE52++i/p3RdN/k+4NJiKOss5BOvfdpwKThWazG01mEp+mIu0Fn+e2OQV6H22bF68LhGozKG4IH2zD3kxiNrt81J9izg22C17ZlSZ9faeWJdLy/P+VPdQtbGExTrgi+IYwYdlsJWstYyiVas8xZIu2o1I+9oKY9J4hAuriTASZ8oOyPx7Wk0YirFMzxUYBet7Vhbg==
+Received: from BL6PEPF00013E0C.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:e) by MN0PR12MB6368.namprd12.prod.outlook.com
+ (2603:10b6:208:3d2::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Fri, 19 Sep
+ 2025 19:53:07 +0000
+Received: from BN1PEPF00004681.namprd03.prod.outlook.com
+ (2a01:111:f403:c803::5) by BL6PEPF00013E0C.outlook.office365.com
+ (2603:1036:903:4::4) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Fri,
+ 19 Sep 2025 19:53:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD82.mail.protection.outlook.com (10.167.244.91) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00004681.mail.protection.outlook.com (10.167.243.87) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Fri, 19 Sep 2025 19:53:05 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Fri, 19 Sep
- 2025 12:51:39 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9137.12 via Frontend Transport; Fri, 19 Sep 2025 19:53:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Fri, 19 Sep
+ 2025 12:51:38 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Fri, 19 Sep
  2025 12:51:38 -0700
 Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.8)
  with Microsoft SMTP Server id 15.2.1544.34 via Frontend Transport; Fri, 19
- Sep 2025 12:51:38 -0700
+ Sep 2025 12:51:37 -0700
 From: Ron Li <xiangrongl@nvidia.com>
 To: <hdegoede@redhat.com>, <ilpo.jarvinen@linux.intel.com>,
 	<vadimp@nvidia.com>, <alok.a.tiwari@oracle.com>, <kblaiech@nvidia.com>,
 	<davthompson@nvidia.com>
 CC: <platform-driver-x86@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, Ron Li <xiangrongl@nvidia.com>
-Subject: [PATCH v3 3/3] platform/mellanox/mlxbf_pka: Add TRNG support and hwrng integration
-Date: Fri, 19 Sep 2025 19:51:32 +0000
-Message-ID: <20250919195132.1088515-4-xiangrongl@nvidia.com>
+Subject: [PATCH v3 2/3] platform/mellanox/mlxbf_pka: Add userspace PKA ring device interface
+Date: Fri, 19 Sep 2025 19:51:31 +0000
+Message-ID: <20250919195132.1088515-3-xiangrongl@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250919195132.1088515-1-xiangrongl@nvidia.com>
 References: <20250919195132.1088515-1-xiangrongl@nvidia.com>
@@ -86,1449 +86,1845 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD82:EE_|SJ0PR12MB6880:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3a06956-d6f8-4270-cab3-08ddf7b62672
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004681:EE_|MN0PR12MB6368:EE_
+X-MS-Office365-Filtering-Correlation-Id: 292d4f84-ab0a-48ab-c4db-08ddf7b6275b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xPLUPVs1FR6iQ/KrgLULubFMLV9Fnr2PFt9DTiH2ElbuzHAyzOPRdumY7pUW?=
- =?us-ascii?Q?LQmlDjvGP4WMC0KCI2Z74/KdsyhCtFa7Wdwof5OBB5hgvF+dYITfOUZsyi2B?=
- =?us-ascii?Q?KLflAQXj2rY2wkW9w/Om/Pj8mBjmUfFiFsOkEm5a7FEYejXOCipB4yFXrarV?=
- =?us-ascii?Q?Ol/BFi/Bf3wTdibqMuOLE/Y6JbQUhnZxIiZz1jwLgLwDfdjP77zZLsKmWwNs?=
- =?us-ascii?Q?7lfuiKQRRAg7VBm115RSAEjtlG2WJfmvrcplH8R3nZxzLU9JVygyby5DJOmj?=
- =?us-ascii?Q?cX4hK+w99yiyd6vMogGwcELo3gGrWWdk5rBMDIS4xl1lMXcTUkDXp4elIXIW?=
- =?us-ascii?Q?suTbRY68i8jFzEtv+QATrfA6BEYu+9bohP2d5N3mOZZUrWOeaDFjl3K0gsh3?=
- =?us-ascii?Q?FwVqrjJ8w8WwMn94mAjJFC7u6X0ieGObiKAh0fWlWf8H2jtR64flGKR7Xjmn?=
- =?us-ascii?Q?6SBmciM6xTtYICKq4FAEE1eOIpjFO0XkqtzjE0FLDL04Kfk7RGAA6bEU/Rxy?=
- =?us-ascii?Q?FOSk1/ON3celXyut+vxUiAV1cOJZ4q1lEo6a7aby5XLUbFw1+u00PUGcAZZs?=
- =?us-ascii?Q?JgquAKxoi2Ahshe/u2drOt2Ralhp7YAeX0le0DNAHjU2PqWxm3uWlu+iz6CJ?=
- =?us-ascii?Q?0o000GghBUczVFDtCDQ+uY5YQz+A2IH2UoMHEIDFwhRoNsZog8k5sFxZkfOr?=
- =?us-ascii?Q?slmNDusPem/jQHoYsZkx68tDLs9ZNDshFKHrZQmbrLyN/I2ehZI3kY3HLs50?=
- =?us-ascii?Q?IlTXGnQHm9cFpD3SB0KtLnpSlW4Wr+jc2UkJ4OQX+xFfaqK01AsqSdzm4J8b?=
- =?us-ascii?Q?SIuat/txQFXYkoROMZQ3BSwyJbPIEoqQR8IBTHzFT5OdN7PqdXmzh7pZke8n?=
- =?us-ascii?Q?jBaix9mcurG51iZFmUqN9IGxXrRAm3PmV/rGBTmeMsUm1Bxh1eSuD7PrdrGA?=
- =?us-ascii?Q?OMVAA3QDbUJ5wumHmvsoG2qohi5asmzfpPGImP7mabGLz2qjKqaujPV5j2cJ?=
- =?us-ascii?Q?bEEnyFG+PdIKkXWLkIIeDYRMGCbjcBRoucYKurm9YfDAfjbQ+kUE/cTK54F2?=
- =?us-ascii?Q?yBe6/sbrT9QBbSXt+iJoZn+JGxqn/bJs8G3VMIBv80L0wwaTNN0wU01z/NeP?=
- =?us-ascii?Q?6XRUVubnIoYAb+wt4k3uvxkimR/05x0SdQHOP3q07AnaScIEIMSEVv16dgnl?=
- =?us-ascii?Q?EbwYjTrFNrwX5Em5wk2P2kPD7zZ+dg5e8Ibi3aaRjVDWfFHeDsPRzK4hSwzm?=
- =?us-ascii?Q?/RquDKML5jPVj2K6FGED78CGA4bVUF6lN3g17emNd1Vj5KlCerK28r0OeFMU?=
- =?us-ascii?Q?f8f2TmhEfV2k4pyjCYlpKH7h+DtlUdMcCSFPzSG4AWMg8J95dPpdOMSE45QM?=
- =?us-ascii?Q?WoOCNQt76JdRrJ8SxGLkq0ADU/C9aDkCdnC8qTK2GsgqcPR3xqQTZ6HT5OY8?=
- =?us-ascii?Q?rZnuxD9GYzrecVl2IGSHN6Tc+chM67fVBGSm/4fddWBjuJOO0qOmFFUH4wJl?=
- =?us-ascii?Q?1QKL4a2AiaDZo5m5pDp6+INuW1j1LWgZpYS2?=
+	=?us-ascii?Q?VoDPqDX+9YJ7wcLc0u/UNOCEgRWepIuRTaPkqcCfnK861DJq+p3D8WL7/vH3?=
+ =?us-ascii?Q?5nM825Ex9YPQIKRksaegHezQPpwRiUSvDztLdoFRWmGqKHVLfHsL0uB/g12R?=
+ =?us-ascii?Q?iHvisiXEn5sEzcXFY0ofpmcqaKAPBKWSYsq4oJUWKrqgKdntd63Mk/Y4V4iI?=
+ =?us-ascii?Q?Y/j/wwIKULAd9Fqyqkr8ZE+bKcFwv87K6n3Ub/JAO15Ehb5p92Ny7ZEfM6fm?=
+ =?us-ascii?Q?JmhpGiyga+v0/1muGoctX2E18jQUw89A1NaTmyWVIZRjLS2MAHqUn+l6csuQ?=
+ =?us-ascii?Q?Qht5FfBftqvmZTIY9nmqjomJ7OgnieKDBG94HFW4zU+iq9NDgjFXhOfGID+V?=
+ =?us-ascii?Q?dyjXmEdIQ4b8BKlfOnNWG21CbrG2dSPQg3Hu66EEhEMsGfVDIHzI8vSpalwr?=
+ =?us-ascii?Q?ZZcDleqIiQNcVPaygYgRRHO219dQA4VTcR35NKywOwAFiX4IXSM/tghXK5sQ?=
+ =?us-ascii?Q?tJlZcCQau92L0wIa6NqwTiLYki0PtJs8S+QrCc39zJJdghKxZpRq8u1FIiog?=
+ =?us-ascii?Q?gjvi1iNi+tyHb1YI7hwv1ryUrxvmgIV1kPt2JAXPpSXXYSYPem1b9OrIPwsM?=
+ =?us-ascii?Q?57Dv+CkB6wv5ojkJBOanS/Ee153S5Tj41+r4vqYbvptLKxknSbAxeSan+PO4?=
+ =?us-ascii?Q?Q1DRQOYhk+jXZSMo9O3WiMqBOoRy7+HUbf9Ut01mL4Curd5pWJeGpY6n0PKj?=
+ =?us-ascii?Q?3TZ5JlGDKRUFURrs8MIJIf+94olU1IOSY0z3vGLNOR5vAo0/WuLMctxYm6dQ?=
+ =?us-ascii?Q?QG+PrhwLxQ2CdvASWKEnSabKGNhc5c69dbRmfHBxz72dXmKcKMhOxCcRG0Y4?=
+ =?us-ascii?Q?gyzOgRzLZc21F2PSjs6G4k+GBf9DZgq8yPVb9pHwjOZfWXQ7OPl+2NSmxM8r?=
+ =?us-ascii?Q?KQi28VHQIiHMmDCEvRd7lcsU0eBSKqmjDpXmBA6G3EfClEW+vH6EHMCLytmC?=
+ =?us-ascii?Q?pDPb7lfzoPiIxvqKTvcwcIJu6UxS1CV1d0kQDwntQTGAj/ZwxYvWyhcubPWb?=
+ =?us-ascii?Q?Y+UmW4VwQVp+oWaPW8XgWJTqrauCajphu7D+HoV5f/cQqQ8W7zpcwG9NTFUd?=
+ =?us-ascii?Q?KlpkCyx+0KJ0XntQdBKIF9mTZCV0ETMt1N9klJs5uGlFE0lFM7gJyTN0PZit?=
+ =?us-ascii?Q?pK5F/3DWc1itmF/KxeMsSKb9RL3WFoDanI/KOld6R+S8wUie9GD1AXPF3Ghg?=
+ =?us-ascii?Q?hiBWAWXBJKHSpGPMQJ9M22wMcH3XA3F4ejNkdbWxbd6TF+L0oiw+lg+k79Ws?=
+ =?us-ascii?Q?lcGzd7Xkw/2AKT2b/TVwD59qahDGGf1EhkoLp4aTZLOQt8tyT5jT9BvvCyCs?=
+ =?us-ascii?Q?4qBk3yD+UCMbt3V+gSqmtcR/8By+E1BDp3WF+2bx9JGbEYInhOHG/oVEoSLn?=
+ =?us-ascii?Q?DHBd5Wy+3Xp4b0oa+Rs6t5gJK4geGI6IrrSgDf99ec0hPCLSCtMvdVnmNMIP?=
+ =?us-ascii?Q?8Ib7YbVCk2oedvzrVZNpLTpma/L4V8Oq4DQ27TzCWjfUkE4mEXZCpj92/aSz?=
+ =?us-ascii?Q?UR6x5lUqVleZ5CNrXL5t/Gc4W/VSGKisSMV4?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:53:05.4885
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:53:06.9814
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3a06956-d6f8-4270-cab3-08ddf7b62672
+X-MS-Exchange-CrossTenant-Network-Message-Id: 292d4f84-ab0a-48ab-c4db-08ddf7b6275b
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD82.namprd04.prod.outlook.com
+	BN1PEPF00004681.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6880
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6368
 
-Add True Random Number Generator support to the BlueField PKA driver and
-wire it into the HWRNG core to feed kernel entropy (/dev/hwrng).
+Expose each BlueField PKA ring as a character device for userspace offload.
+This focuses on per-ring resources, layout, and control, without in-kernel
+crypto algorithms.
 
-- Enable TRNG clock and configure hardware
-- Run TRNG health tests (monobit/run/poker) and a sanity check
-- Implement shutdown-overflow recovery and FRO detune/reenable
-- Initialize TRNG during shim bring-up and prefetch initial output
-- Provide read path from TRNG output registers
-- Register/unregister with the HWRNG core
+- Create ring device nodes and lifecycle: open/close, mmap, ioctl
+- Partition 16KB Window RAM per ring (1KB cmd, 1KB result, 14KB vectors)
+- Program ring info words (cmd/rslt bases, size, host_desc_size, in-order)
+- Provide UAPI ioctls:
+  - MLXBF_PKA_RING_GET_REGION_INFO
+  - MLXBF_PKA_GET_RING_INFO
+  - MLXBF_PKA_CLEAR_RING_COUNTERS
+- ACPI-based probe for BF1/BF2/BF3 and per-shim ring setup
+- Document device/ring identifiers and interface in sysfs ABI
 
 Reviewed-by: David Thompson <davthompson@nvidia.com>
 Reviewed-by: Khalil Blaiech <kblaiech@nvidia.com>
 Signed-off-by: Ron Li <xiangrongl@nvidia.com>
 ---
- .../ABI/testing/sysfs-platform-mellanox-pka   |   3 +-
+ .../ABI/testing/sysfs-platform-mellanox-pka   |  18 +
+ .../userspace-api/ioctl/ioctl-number.rst      |   2 +
  drivers/platform/mellanox/mlxbf_pka/Makefile  |   1 +
- .../mellanox/mlxbf_pka/mlxbf_pka_dev.c        |  48 +-
- .../mellanox/mlxbf_pka/mlxbf_pka_dev.h        |   6 +
- .../mellanox/mlxbf_pka/mlxbf_pka_drv.c        |  75 ++
- .../mellanox/mlxbf_pka/mlxbf_pka_trng.c       | 874 ++++++++++++++++++
- .../mellanox/mlxbf_pka/mlxbf_pka_trng.h       | 152 +++
- include/uapi/linux/mlxbf-pka.h                |  19 +
- 8 files changed, 1176 insertions(+), 2 deletions(-)
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
+ .../mellanox/mlxbf_pka/mlxbf_pka_dev.c        |  40 ++
+ .../mellanox/mlxbf_pka/mlxbf_pka_dev.h        |  23 +
+ .../mellanox/mlxbf_pka/mlxbf_pka_drv.c        | 528 ++++++++++++++++
+ .../mellanox/mlxbf_pka/mlxbf_pka_ring.c       | 563 ++++++++++++++++++
+ .../mellanox/mlxbf_pka/mlxbf_pka_ring.h       | 255 ++++++++
+ include/uapi/linux/mlxbf-pka.h                |  93 +++
+ 9 files changed, 1523 insertions(+)
+ create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.c
+ create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.h
+ create mode 100644 include/uapi/linux/mlxbf-pka.h
 
 diff --git a/Documentation/ABI/testing/sysfs-platform-mellanox-pka b/Documentation/ABI/testing/sysfs-platform-mellanox-pka
-index e7d331bca8fb..d45575dc0d77 100644
+index cf8dd292c781..e7d331bca8fb 100644
 --- a/Documentation/ABI/testing/sysfs-platform-mellanox-pka
 +++ b/Documentation/ABI/testing/sysfs-platform-mellanox-pka
-@@ -30,5 +30,6 @@ Description:
- 		- release(): close the PKA ring device specified by the device ID, and release the
- 		  related RAM regions.
- 		- unlocked_ioctl(): make PKA related system calls, including getting ring device or
--		  RAM region information, clearing PKA ring counter.
-+		  RAM region information, clearing PKA ring counter and getting random bytes from
-+		  the TRNG module from the PKA device.
- 		- mmap(): map the PKA ring device to the virtual memory region.
+@@ -14,3 +14,21 @@ Description:
+ 		BlueField-2  MLNXBF20:xx, where xx ranges from '00' to '07'
+ 		BlueField-3  MLNXBF51:xx, where xx ranges from '00' to '17'
+ 		===========  ==============================================
++
++		Each PKA device supports four PKA ring devices. The PKA ring device IDs are:
++
++		===========  ==============================================
++		BlueField-1  MLNXBF11:xx, where xx ranges from '00' to '0F'
++		BlueField-2  MLNXBF21:xx, where xx ranges from '00' to '20'
++		BlueField-3  MLNXBF52:xx, where xx ranges from '00' to '60'
++		===========  ==============================================
++
++		For each PKA ring device, the following operation interfaces:
++
++		- open(): open the PKA ring device specified by the device ID, and initiate the
++		  related RAM regions.
++		- release(): close the PKA ring device specified by the device ID, and release the
++		  related RAM regions.
++		- unlocked_ioctl(): make PKA related system calls, including getting ring device or
++		  RAM region information, clearing PKA ring counter.
++		- mmap(): map the PKA ring device to the virtual memory region.
+diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
+index 406a9f4d0869..0bbabf07a495 100644
+--- a/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -383,6 +383,8 @@ Code  Seq#    Include File                                             Comments
+ 0xB8  01-02  uapi/misc/mrvl_cn10k_dpi.h                                Marvell CN10K DPI driver
+ 0xB8  all    uapi/linux/mshv.h                                         Microsoft Hyper-V /dev/mshv driver
+                                                                        <mailto:linux-hyperv@vger.kernel.org>
++0xBF  00-0F  uapi/linux/mlxbf-pka.h                                    NVIDIA BlueField PKA driver
++
+ 0xC0  00-0F  linux/usb/iowarrior.h
+ 0xCA  00-0F  uapi/misc/cxl.h                                           Dead since 6.15
+ 0xCA  10-2F  uapi/misc/ocxl.h
 diff --git a/drivers/platform/mellanox/mlxbf_pka/Makefile b/drivers/platform/mellanox/mlxbf_pka/Makefile
-index 6e536794d339..4f6df4de9cb7 100644
+index 67465a63edb8..6e536794d339 100644
 --- a/drivers/platform/mellanox/mlxbf_pka/Makefile
 +++ b/drivers/platform/mellanox/mlxbf_pka/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_MLXBF_PKA) += mlxbf-pka.o
+@@ -8,3 +8,4 @@ obj-$(CONFIG_MLXBF_PKA) += mlxbf-pka.o
+ 
  mlxbf-pka-objs := mlxbf_pka_drv.o
  mlxbf-pka-objs += mlxbf_pka_dev.o
- mlxbf-pka-objs += mlxbf_pka_ring.o
-+mlxbf-pka-objs += mlxbf_pka_trng.o
-\ No newline at end of file
++mlxbf-pka-objs += mlxbf_pka_ring.o
 diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
-index 12df11dd1eee..f649ae9ef967 100644
+index 0a5db1be6eaa..12df11dd1eee 100644
 --- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
 +++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
-@@ -18,6 +18,7 @@
+@@ -17,6 +17,7 @@
+ #include <linux/types.h>
  
  #include "mlxbf_pka_dev.h"
- #include "mlxbf_pka_ring.h"
-+#include "mlxbf_pka_trng.h"
++#include "mlxbf_pka_ring.h"
  
  struct mlxbf_pka_dev_gbl_config_t mlxbf_pka_gbl_config;
  
-@@ -250,6 +251,22 @@ static int mlxbf_pka_dev_create_shim(struct device *dev,
- 		return ret;
- 	}
+@@ -192,6 +193,18 @@ static int mlxbf_pka_dev_create_shim(struct device *dev,
+ 	else
+ 		shim->window_ram_split = MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_DISABLED;
  
-+	/* Set PKA device TRNG registers. */
-+	reg_size = PAGE_SIZE;
-+	reg_base = mlxbf_pka_dev_get_register_base(shim->mem_res.eip154_base,
-+						   MLXBF_PKA_TRNG_OUTPUT_0_ADDR);
-+	ret = mlxbf_pka_dev_set_resource_config(dev,
-+						shim,
-+						&shim->resources.trng_csr,
-+						reg_base,
-+						reg_size,
-+						MLXBF_PKA_DEV_RES_TYPE_REG,
-+						"MLXBF_PKA_TRNG_CSR");
-+	if (ret) {
-+		dev_err(dev, "unable to setup the TRNG\n");
-+		return ret;
++	shim->ring_type = MLXBF_PKA_RING_TYPE_IN_ORDER;
++	shim->ring_priority = MLXBF_PKA_RING_OPTIONS_PRIORITY;
++	shim->rings_num = MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS;
++	shim->rings = devm_kcalloc(dev,
++				   shim->rings_num,
++				   sizeof(struct mlxbf_pka_dev_ring_t),
++				   GFP_KERNEL);
++	if (!shim->rings) {
++		dev_err(dev, "unable to allocate memory for ring\n");
++		return -ENOMEM;
 +	}
 +
- 	shim->status = MLXBF_PKA_SHIM_STATUS_CREATED;
- 
- 	return ret;
-@@ -258,7 +275,7 @@ static int mlxbf_pka_dev_create_shim(struct device *dev,
- /* Delete shim and unset shim resources. */
- static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
- {
--	struct mlxbf_pka_dev_res_t *res_master_seq_ctrl, *res_aic_csr;
-+	struct mlxbf_pka_dev_res_t *res_master_seq_ctrl, *res_aic_csr, *res_trng_csr;
- 	struct mlxbf_pka_dev_res_t *res_buffer_ram;
- 
- 	dev_dbg(dev, "PKA device delete shim\n");
-@@ -275,10 +292,12 @@ static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_sh
- 	res_buffer_ram = &shim->resources.buffer_ram;
- 	res_master_seq_ctrl = &shim->resources.master_seq_ctrl;
- 	res_aic_csr = &shim->resources.aic_csr;
-+	res_trng_csr = &shim->resources.trng_csr;
- 
- 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_buffer_ram);
- 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_master_seq_ctrl);
- 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_aic_csr);
-+	mlxbf_pka_dev_unset_resource_config(dev, shim, res_trng_csr);
- 
- 	shim->status = MLXBF_PKA_SHIM_STATUS_UNDEFINED;
- 
-@@ -294,7 +313,9 @@ static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_sh
-  */
- static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
- {
-+	u32 data[MLXBF_PKA_TRNG_OUTPUT_CNT];
- 	int ret;
-+	u8 i;
- 
- 	if (shim->status != MLXBF_PKA_SHIM_STATUS_CREATED) {
- 		dev_err(dev, "PKA device must be created\n");
-@@ -311,6 +332,31 @@ static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim
- 		return ret;
+ 	/* Set PKA device Buffer RAM config. */
+ 	ret = mlxbf_pka_dev_set_resource_config(dev,
+ 						shim,
+@@ -288,10 +301,21 @@ static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim
+ 		return -EPERM;
  	}
  
-+	shim->trng_enabled   = MLXBF_PKA_SHIM_TRNG_ENABLED;
-+	shim->trng_err_cycle = 0;
-+
-+	/* Configure the TRNG. */
-+	ret = mlxbf_pka_dev_config_trng_drbg(dev,
-+					     &shim->resources.aic_csr,
-+					     &shim->resources.trng_csr);
-+
-+	/*
-+	 * Pull out data from the content of the TRNG buffer RAM and start the
-+	 * regeneration of new numbers; read and drop 512 words. The read must
-+	 * be done over the 4 TRNG_OUTPUT_X registers at a time.
-+	 */
-+	for (i = 0; i < MLXBF_PKA_TRNG_NUM_OF_FOUR_WORD; i++)
-+		mlxbf_pka_dev_trng_read(dev, shim, data, sizeof(data));
-+
++	/* Configure PKA Ring options control word. */
++	ret = mlxbf_pka_dev_config_ring_options(dev,
++						&shim->resources.buffer_ram,
++						shim->rings_num,
++						shim->ring_priority);
 +	if (ret) {
-+		/*
-+		 * Keep running without TRNG since it does not hurt, but notify
-+		 * users.
-+		 */
-+		dev_err(dev, "failed to configure TRNG\n");
-+		shim->trng_enabled = MLXBF_PKA_SHIM_TRNG_DISABLED;
++		dev_err(dev, "failed to configure ring options\n");
++		return ret;
 +	}
 +
  	ret = devm_mutex_init(dev, &shim->mutex);
  	if (ret)
  		return ret;
+ 
++	shim->busy_ring_num = 0;
+ 	shim->status = MLXBF_PKA_SHIM_STATUS_INITIALIZED;
+ 
+ 	return ret;
+@@ -300,6 +324,7 @@ static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim
+ /* Release a given shim. */
+ static int mlxbf_pka_dev_release_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
+ {
++	u32 ring_idx;
+ 	int ret = 0;
+ 
+ 	if (shim->status != MLXBF_PKA_SHIM_STATUS_INITIALIZED &&
+@@ -308,6 +333,21 @@ static int mlxbf_pka_dev_release_shim(struct device *dev, struct mlxbf_pka_dev_s
+ 		return -EPERM;
+ 	}
+ 
++	/*
++	 * Release rings which belong to the shim. The operating system might
++	 * release ring devices before shim devices. The global configuration
++	 * must be checked before proceeding to the release of ring devices.
++	 */
++	if (mlxbf_pka_gbl_config.dev_rings_cnt) {
++		for (ring_idx = 0; ring_idx < shim->rings_num; ring_idx++) {
++			ret = mlxbf_pka_dev_release_ring(dev, shim->rings[ring_idx]);
++			if (ret) {
++				dev_err(dev, "failed to release ring %d\n", ring_idx);
++				return ret;
++			}
++		}
++	}
++	shim->busy_ring_num = 0;
+ 	shim->status = MLXBF_PKA_SHIM_STATUS_FINALIZED;
+ 
+ 	return ret;
 diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
-index 12512850cf79..ba0bbc87c832 100644
+index df51202f79bd..12512850cf79 100644
 --- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
 +++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
-@@ -128,11 +128,13 @@ struct mlxbf_pka_dev_res_t {
-  * @buffer_ram: Buffer RAM
-  * @master_seq_ctrl: Master sequencer controller CSR
-  * @aic_csr: Interrupt controller CSRs
-+ * @trng_csr: TRNG module CSRs
-  */
- struct mlxbf_pka_dev_shim_res_t {
- 	struct mlxbf_pka_dev_res_t buffer_ram;
- 	struct mlxbf_pka_dev_res_t master_seq_ctrl;
- 	struct mlxbf_pka_dev_res_t aic_csr;
-+	struct mlxbf_pka_dev_res_t trng_csr;
- };
+@@ -14,12 +14,15 @@
  
- /* Number of PKA device resources. */
-@@ -180,6 +182,7 @@ struct mlxbf_pka_dev_mem_res {
- /**
+ #include <linux/bitfield.h>
+ #include <linux/bits.h>
++#include <linux/io.h>
+ #include <linux/ioctl.h>
+ #include <linux/mutex.h>
+ #include <linux/sizes.h>
+ #include <linux/types.h>
+ #include <linux/units.h>
+ 
++#include <uapi/linux/mlxbf-pka.h>
++
+ #define MASTER_CONTROLLER_OUT_OF_RESET 0
+ 
+ /* PKA address related definitions. */
+@@ -60,6 +63,11 @@
+ /* The maximum number of PKA shims referred to as IO blocks. */
+ #define MLXBF_PKA_MAX_NUM_IO_BLOCKS 24
+ 
++/* The maximum number of rings supported by the IO block (shim). */
++#define MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS 4
++
++#define MLXBF_PKA_MAX_NUM_RINGS (MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS * MLXBF_PKA_MAX_NUM_IO_BLOCKS)
++
+ /*
+  * PKA Window RAM parameters.
+  * Define whether to split window RAM during PKA device creation phase.
+@@ -173,16 +181,26 @@ struct mlxbf_pka_dev_mem_res {
   * struct mlxbf_pka_dev_shim_s - PKA Shim structure
   * @mem_res: Memory resources
-+ * @trng_err_cycle: TRNG error cycle
   * @shim_id: Shim identifier
-  * @rings_num: Number of supported rings (hardware specific)
-  * @rings: Pointer to rings which belong to the shim
-@@ -188,11 +191,13 @@ struct mlxbf_pka_dev_mem_res {
++ * @rings_num: Number of supported rings (hardware specific)
++ * @rings: Pointer to rings which belong to the shim
++ * @ring_priority: Specify the priority in which rings are handled
++ * @ring_type: Indicates whether the result ring delivers results strictly in-order
   * @resources: Shim resources
   * @window_ram_split: If non-zero, the split window RAM scheme is used
-  * @busy_ring_num: Number of active rings (rings in busy state)
-+ * @trng_enabled: Whether the TRNG engine is enabled
++ * @busy_ring_num: Number of active rings (rings in busy state)
   * @status: Status of the shim
   * @mutex: Mutex lock for sharing shim
   */
  struct mlxbf_pka_dev_shim_s {
  	struct mlxbf_pka_dev_mem_res mem_res;
-+	u64 trng_err_cycle;
  	u32 shim_id;
- 	u32 rings_num;
- 	struct mlxbf_pka_dev_ring_t **rings;
-@@ -201,6 +206,7 @@ struct mlxbf_pka_dev_shim_s {
++	u32 rings_num;
++	struct mlxbf_pka_dev_ring_t **rings;
++	u8 ring_priority;
++	u8 ring_type;
  	struct mlxbf_pka_dev_shim_res_t resources;
  	u8 window_ram_split;
- 	u32 busy_ring_num;
-+	u8 trng_enabled;
++	u32 busy_ring_num;
  	s8 status;
  	struct mutex mutex;
  };
+@@ -205,11 +223,15 @@ struct mlxbf_pka_dev_shim_s {
+ /**
+  * struct mlxbf_pka_dev_gbl_config_t - Platform global configuration structure
+  * @dev_shims_cnt: Number of registered PKA shims
++ * @dev_rings_cnt: Number of registered Rings
+  * @dev_shims: Table of registered PKA shims
++ * @dev_rings: Table of registered Rings
+  */
+ struct mlxbf_pka_dev_gbl_config_t {
+ 	u32 dev_shims_cnt;
++	u32 dev_rings_cnt;
+ 	struct mlxbf_pka_dev_shim_s *dev_shims[MLXBF_PKA_MAX_NUM_IO_BLOCKS];
++	struct mlxbf_pka_dev_ring_t *dev_rings[MLXBF_PKA_MAX_NUM_RINGS];
+ };
+ 
+ extern struct mlxbf_pka_dev_gbl_config_t mlxbf_pka_gbl_config;
+@@ -279,6 +301,7 @@ static inline void mlxbf_pka_dev_io_write(void __iomem *mem_ptr, u64 mem_off, u6
+  */
+ struct mlxbf_pka_dev_shim_s *mlxbf_pka_dev_get_shim(u32 shim_id);
+ 
++/* Unset PKA device resource config - unmap io memory if needed. */
+ void mlxbf_pka_dev_unset_resource_config(struct device *dev,
+ 					 struct mlxbf_pka_dev_shim_s *shim,
+ 					 struct mlxbf_pka_dev_res_t *res_ptr);
 diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
-index a009437e4a48..a1ae007ba903 100644
+index 42bfe30fbe49..a009437e4a48 100644
 --- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
 +++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
-@@ -6,6 +6,7 @@
- #include <linux/cdev.h>
- #include <linux/cleanup.h>
- #include <linux/device.h>
-+#include <linux/hw_random.h>
- #include <linux/idr.h>
- #include <linux/interrupt.h>
- #include <linux/iommu.h>
-@@ -22,6 +23,7 @@
+@@ -21,14 +21,18 @@
+ #include <linux/uaccess.h>
  
  #include "mlxbf_pka_dev.h"
- #include "mlxbf_pka_ring.h"
-+#include "mlxbf_pka_trng.h"
++#include "mlxbf_pka_ring.h"
  
  #define MLXBF_PKA_DRIVER_DESCRIPTION		"BlueField PKA driver"
  
-@@ -187,6 +189,7 @@ struct mlxbf_pka_device {
- 	u32 device_id;
- 	struct resource *resource[MLXBF_PKA_DEVICE_RES_CNT];
- 	struct mlxbf_pka_dev_shim_s *shim;
-+	struct hwrng rng;
+ #define MLXBF_PKA_DEVICE_ACPIHID_BF1		"MLNXBF10"
++#define MLXBF_PKA_RING_DEVICE_ACPIHID_BF1	"MLNXBF11"
+ 
+ #define MLXBF_PKA_DEVICE_ACPIHID_BF2		"MLNXBF20"
++#define MLXBF_PKA_RING_DEVICE_ACPIHID_BF2	"MLNXBF21"
+ 
+ #define MLXBF_PKA_DEVICE_ACPIHID_BF3		"MLNXBF51"
++#define MLXBF_PKA_RING_DEVICE_ACPIHID_BF3	"MLNXBF52"
+ 
+ #define MLXBF_PKA_DEVICE_ACCESS_MODE	0666
+ #define MLXBF_PKA_DEVICE_RES_CNT	7
+@@ -76,20 +80,33 @@ static const struct mlxbf_pka_drv_plat_info mlxbf_pka_bf3_info = {
+ static DEFINE_MUTEX(mlxbf_pka_drv_lock);
+ 
+ static u32 mlxbf_pka_device_cnt;
++static u32 mlxbf_pka_ring_device_cnt;
+ 
+ static const char mlxbf_pka_acpihid_bf1[] = MLXBF_PKA_DEVICE_ACPIHID_BF1;
++static const char mlxbf_pka_ring_acpihid_bf1[] = MLXBF_PKA_RING_DEVICE_ACPIHID_BF1;
+ 
+ static const char mlxbf_pka_acpihid_bf2[] = MLXBF_PKA_DEVICE_ACPIHID_BF2;
++static const char mlxbf_pka_ring_acpihid_bf2[] = MLXBF_PKA_RING_DEVICE_ACPIHID_BF2;
+ 
+ static const char mlxbf_pka_acpihid_bf3[] = MLXBF_PKA_DEVICE_ACPIHID_BF3;
++static const char mlxbf_pka_ring_acpihid_bf3[] = MLXBF_PKA_RING_DEVICE_ACPIHID_BF3;
+ 
+ static const struct acpi_device_id mlxbf_pka_drv_acpi_ids[] = {
+ 	{ MLXBF_PKA_DEVICE_ACPIHID_BF1, (kernel_ulong_t)&mlxbf_pka_bf1_info, 0, 0 },
++	{ MLXBF_PKA_RING_DEVICE_ACPIHID_BF1, 0, 0, 0 },
+ 	{ MLXBF_PKA_DEVICE_ACPIHID_BF2, (kernel_ulong_t)&mlxbf_pka_bf2_info, 0, 0 },
++	{ MLXBF_PKA_RING_DEVICE_ACPIHID_BF2, 0, 0, 0 },
+ 	{ MLXBF_PKA_DEVICE_ACPIHID_BF3, (kernel_ulong_t)&mlxbf_pka_bf3_info, 0, 0 },
++	{ MLXBF_PKA_RING_DEVICE_ACPIHID_BF3, 0, 0, 0 },
+ 	{},
  };
  
- static int mlxbf_pka_drv_verify_bootup_status(struct device *dev)
-@@ -435,6 +438,44 @@ static long mlxbf_pka_drv_ring_ioctl(void *device_data, unsigned int cmd, unsign
++static struct pka {
++	struct idr ring_idr;
++	/* PKA ring device IDR lock mutex. */
++	struct mutex idr_lock;
++} pka;
++
+ struct mlxbf_pka_info {
+ 	/* The device this info struct belongs to. */
+ 	struct device *dev;
+@@ -105,6 +122,7 @@ struct mlxbf_pka_info {
+ };
  
- 	} else if (cmd == MLXBF_PKA_CLEAR_RING_COUNTERS) {
- 		return mlxbf_pka_dev_clear_ring_counters(ring_dev->ring);
-+	} else if (cmd == MLXBF_PKA_GET_RANDOM_BYTES) {
-+		struct mlxbf_pka_dev_trng_info trng_data;
-+		struct mlxbf_pka_dev_shim_s *shim;
-+		bool trng_present;
-+		u32 byte_cnt;
-+		int ret;
-+
-+		shim = ring_dev->ring->shim;
-+		ret = copy_from_user(&trng_data,
-+				     (void __user *)(arg),
-+				     sizeof(struct mlxbf_pka_dev_trng_info));
-+		if (ret) {
-+			dev_dbg(ring_dev->device, "failed to copy user request.\n");
-+			return -EFAULT;
-+		}
-+
-+		/*
-+		 * Need byte count which is multiple of 4 as required by the
-+		 * mlxbf_pka_dev_trng_read() interface.
-+		 */
-+		byte_cnt = round_up(trng_data.count, MLXBF_PKA_TRNG_OUTPUT_CNT);
-+
-+		u32 *data __free(kfree) = kzalloc(byte_cnt, GFP_KERNEL);
-+		if (!data)
-+			return -ENOMEM;
-+
-+		trng_present = mlxbf_pka_dev_has_trng(shim);
-+		if (!trng_present)
-+			return -EAGAIN;
-+
-+		ret = mlxbf_pka_dev_trng_read(ring_dev->device, shim, data, byte_cnt);
-+		if (ret) {
-+			dev_dbg(ring_dev->device, "TRNG failed %d\n", ret);
-+			return ret;
-+		}
-+
-+		ret = copy_to_user((void __user *)(trng_data.data), data, trng_data.count);
-+		return ret ? -EFAULT : 0;
- 	}
+ /* Defines for mlxbf_pka_info->flags. */
++#define MLXBF_PKA_DRIVER_FLAG_RING_DEVICE 1
+ #define MLXBF_PKA_DRIVER_FLAG_DEVICE 2
  
- 	return -ENOTTY;
-@@ -659,6 +700,23 @@ static void mlxbf_pka_drv_unregister_ring_device(struct mlxbf_pka_ring_device *r
- 	mlxbf_pka_dev_unregister_ring(ring_dev->device, ring_dev->ring);
+ struct mlxbf_pka_platdata {
+@@ -114,6 +132,53 @@ struct mlxbf_pka_platdata {
+ 	spinlock_t lock;
+ };
+ 
++struct mlxbf_pka_ring_region {
++	u64 off;
++	u64 addr;
++	resource_size_t size;
++	u32 flags;
++	u32 type;
++};
++
++/* Defines for mlxbf_pka_ring_region->flags. */
++/* Region supports read. */
++#define MLXBF_PKA_RING_REGION_FLAG_READ		BIT(0)
++/* Region supports write. */
++#define MLXBF_PKA_RING_REGION_FLAG_WRITE	BIT(1)
++/* Region supports mmap. */
++#define MLXBF_PKA_RING_REGION_FLAG_MMAP		BIT(2)
++
++/* Defines for mlxbf_pka_ring_region->type. */
++/* Info control/status words. */
++#define MLXBF_PKA_RING_RES_TYPE_WORDS  1
++/* Count registers. */
++#define MLXBF_PKA_RING_RES_TYPE_CNTRS  2
++/* Window RAM region. */
++#define MLXBF_PKA_RING_RES_TYPE_MEM    4
++
++#define MLXBF_PKA_DRIVER_RING_DEV_MAX  MLXBF_PKA_MAX_NUM_RINGS
++
++/* Defines for region index. */
++#define MLXBF_PKA_RING_REGION_WORDS_IDX		0
++#define MLXBF_PKA_RING_REGION_CNTRS_IDX		1
++#define MLXBF_PKA_RING_REGION_MEM_IDX	  2
++#define MLXBF_PKA_RING_REGION_OFFSET_SHIFT     40
++#define MLXBF_PKA_RING_REGION_INDEX_TO_OFFSET(index) \
++	((u64)(index) << MLXBF_PKA_RING_REGION_OFFSET_SHIFT)
++
++struct mlxbf_pka_ring_device {
++	struct mlxbf_pka_info *info;
++	struct device *device;
++	u32 device_id;
++	u32 parent_device_id;
++	/* PKA ring device mutex. */
++	struct mutex mutex;
++	struct mlxbf_pka_dev_ring_t *ring;
++	u32 num_regions;
++	struct mlxbf_pka_ring_region *regions;
++	struct miscdevice misc;
++};
++
+ #define MLXBF_PKA_DRIVER_DEV_MAX MLXBF_PKA_MAX_NUM_IO_BLOCKS
+ 
+ struct mlxbf_pka_device {
+@@ -143,6 +208,338 @@ static int mlxbf_pka_drv_verify_bootup_status(struct device *dev)
+ 	return 0;
  }
  
-+static int mlxbf_pka_drv_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++static int mlxbf_pka_drv_ring_regions_init(struct mlxbf_pka_ring_device *ring_dev)
 +{
-+	struct mlxbf_pka_device *mlxbf_pka_dev = container_of(rng, struct mlxbf_pka_device, rng);
-+	u32 *buffer = data;
++	struct mlxbf_pka_ring_region *region;
++	struct mlxbf_pka_dev_ring_t *ring;
++	struct mlxbf_pka_dev_res_t *res;
++	u32 num_regions;
++
++	ring = ring_dev->ring;
++	if (!ring || !ring->shim)
++		return -ENXIO;
++
++	num_regions = ring->resources_num;
++	ring_dev->num_regions = num_regions;
++	ring_dev->regions = devm_kcalloc(ring_dev->device,
++					 num_regions,
++					 sizeof(struct mlxbf_pka_ring_region),
++					 GFP_KERNEL);
++	if (!ring_dev->regions)
++		return -ENOMEM;
++
++	/* Information words region. */
++	res = &ring->resources.info_words;
++	region = &ring_dev->regions[MLXBF_PKA_RING_REGION_WORDS_IDX];
++	/* Map offset to the physical address. */
++	region->off = MLXBF_PKA_RING_REGION_INDEX_TO_OFFSET(MLXBF_PKA_RING_REGION_WORDS_IDX);
++	region->addr = res->base;
++	region->size = res->size;
++	region->type = MLXBF_PKA_RING_RES_TYPE_WORDS;
++	region->flags = MLXBF_PKA_RING_REGION_FLAG_MMAP |
++			MLXBF_PKA_RING_REGION_FLAG_READ |
++			MLXBF_PKA_RING_REGION_FLAG_WRITE;
++
++	/* Counters registers region. */
++	res = &ring->resources.counters;
++	region = &ring_dev->regions[MLXBF_PKA_RING_REGION_CNTRS_IDX];
++	/* Map offset to the physical address. */
++	region->off = MLXBF_PKA_RING_REGION_INDEX_TO_OFFSET(MLXBF_PKA_RING_REGION_CNTRS_IDX);
++	region->addr = res->base;
++	region->size = res->size;
++	region->type = MLXBF_PKA_RING_RES_TYPE_CNTRS;
++	region->flags = MLXBF_PKA_RING_REGION_FLAG_MMAP |
++			MLXBF_PKA_RING_REGION_FLAG_READ |
++			MLXBF_PKA_RING_REGION_FLAG_WRITE;
++
++	/* Window RAM region. */
++	res = &ring->resources.window_ram;
++	region = &ring_dev->regions[MLXBF_PKA_RING_REGION_MEM_IDX];
++	/* Map offset to the physical address. */
++	region->off = MLXBF_PKA_RING_REGION_INDEX_TO_OFFSET(MLXBF_PKA_RING_REGION_MEM_IDX);
++	region->addr = res->base;
++	region->size = res->size;
++	region->type = MLXBF_PKA_RING_RES_TYPE_MEM;
++	region->flags = MLXBF_PKA_RING_REGION_FLAG_MMAP |
++			MLXBF_PKA_RING_REGION_FLAG_READ |
++			MLXBF_PKA_RING_REGION_FLAG_WRITE;
++
++	return 0;
++}
++
++static void mlxbf_pka_drv_ring_regions_cleanup(struct mlxbf_pka_ring_device *ring_dev)
++{
++	/* Clear PKA ring device regions. */
++	ring_dev->num_regions = 0;
++}
++
++static int mlxbf_pka_drv_ring_open(void *device_data)
++{
++	struct mlxbf_pka_ring_device *ring_dev = device_data;
++	struct mlxbf_pka_info *info = ring_dev->info;
++	struct mlxbf_pka_ring_info_t ring_info;
 +	int ret;
 +
-+	ret = mlxbf_pka_dev_trng_read(mlxbf_pka_dev->device, mlxbf_pka_dev->shim, buffer, max);
++	dev_dbg(ring_dev->device, "open ring device (device_data:%p)\n", ring_dev);
++
++	if (!try_module_get(info->module))
++		return -ENODEV;
++
++	ring_info.ring_id = ring_dev->device_id;
++	ret = mlxbf_pka_dev_open_ring(ring_dev->device, &ring_info);
 +	if (ret) {
-+		dev_dbg(mlxbf_pka_dev->device,
-+			"%s: failed to read random bytes ret=%d",
-+			rng->name, ret);
-+		return 0;
++		dev_dbg(ring_dev->device, "failed to open ring\n");
++		goto exit_open_ring;
 +	}
 +
-+	return max;
++	/* Initialize regions. */
++	ret = mlxbf_pka_drv_ring_regions_init(ring_dev);
++	if (ret)
++		goto exit_ring_regions_init;
++
++	return 0;
++
++exit_ring_regions_init:
++	mlxbf_pka_dev_close_ring(&ring_info);
++
++exit_open_ring:
++	module_put(info->module);
++
++	return ret;
++}
++
++static void mlxbf_pka_drv_ring_release(void *device_data)
++{
++	struct mlxbf_pka_ring_device *ring_dev = device_data;
++	struct mlxbf_pka_info *info = ring_dev->info;
++	struct mlxbf_pka_ring_info_t ring_info;
++	int ret;
++
++	dev_dbg(ring_dev->device, "release ring device (device_data:%p)\n", ring_dev);
++
++	mlxbf_pka_drv_ring_regions_cleanup(ring_dev);
++
++	ring_info.ring_id = ring_dev->device_id;
++	ret = mlxbf_pka_dev_close_ring(&ring_info);
++	if (ret)
++		dev_dbg(ring_dev->device, "failed to close ring\n");
++
++	module_put(info->module);
++}
++
++static int mlxbf_pka_drv_ring_mmap_region(struct mlxbf_pka_ring_region region,
++					  struct vm_area_struct *vma)
++{
++	u64 req_len, pgoff, req_start;
++
++	req_len = vma->vm_end - vma->vm_start;
++	pgoff = vma->vm_pgoff & ((1U << (MLXBF_PKA_RING_REGION_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	req_start = pgoff << PAGE_SHIFT;
++
++	region.size = roundup(region.size, PAGE_SIZE);
++
++	if (req_start + req_len > region.size)
++		return -EINVAL;
++
++	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
++	vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
++
++	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff, req_len, vma->vm_page_prot);
++}
++
++static int mlxbf_pka_drv_ring_mmap(void *device_data, struct vm_area_struct *vma)
++{
++	struct mlxbf_pka_ring_device *ring_dev = device_data;
++	struct mlxbf_pka_ring_region *region;
++	unsigned int index;
++
++	dev_dbg(ring_dev->device, "mmap device\n");
++
++	index = vma->vm_pgoff >> (MLXBF_PKA_RING_REGION_OFFSET_SHIFT - PAGE_SHIFT);
++
++	if (vma->vm_end < vma->vm_start)
++		return -EINVAL;
++	if (!(vma->vm_flags & VM_SHARED))
++		return -EINVAL;
++	if (index >= ring_dev->num_regions)
++		return -EINVAL;
++	if (vma->vm_start & ~PAGE_MASK)
++		return -EINVAL;
++	if (vma->vm_end & ~PAGE_MASK)
++		return -EINVAL;
++
++	region = &ring_dev->regions[index];
++
++	if (!(region->flags & MLXBF_PKA_RING_REGION_FLAG_MMAP))
++		return -EINVAL;
++
++	if (!(region->flags & MLXBF_PKA_RING_REGION_FLAG_READ) && (vma->vm_flags & VM_READ))
++		return -EINVAL;
++
++	if (!(region->flags & MLXBF_PKA_RING_REGION_FLAG_WRITE) && (vma->vm_flags & VM_WRITE))
++		return -EINVAL;
++
++	vma->vm_private_data = ring_dev;
++
++	if (region->type & MLXBF_PKA_RING_RES_TYPE_CNTRS ||
++	    region->type & MLXBF_PKA_RING_RES_TYPE_MEM)
++		return mlxbf_pka_drv_ring_mmap_region(ring_dev->regions[index], vma);
++
++	if (region->type & MLXBF_PKA_RING_RES_TYPE_WORDS)
++		/* Currently user space is not allowed to access this region. */
++		return -EINVAL;
++
++	return -EINVAL;
++}
++
++static long mlxbf_pka_drv_ring_ioctl(void *device_data, unsigned int cmd, unsigned long arg)
++{
++	struct mlxbf_pka_ring_device *ring_dev = device_data;
++
++	if (cmd == MLXBF_PKA_RING_GET_REGION_INFO) {
++		struct mlxbf_pka_dev_region_info info;
++
++		info.mem_index = MLXBF_PKA_RING_REGION_MEM_IDX;
++		info.mem_offset = ring_dev->regions[info.mem_index].off;
++		info.mem_size = ring_dev->regions[info.mem_index].size;
++
++		info.reg_index = MLXBF_PKA_RING_REGION_CNTRS_IDX;
++		info.reg_offset = ring_dev->regions[info.reg_index].off;
++		info.reg_size = ring_dev->regions[info.reg_index].size;
++
++		if (copy_to_user((void __user *)arg, &info, sizeof(info)))
++			return -EFAULT;
++		else
++			return 0;
++
++	} else if (cmd == MLXBF_PKA_GET_RING_INFO) {
++		struct mlxbf_pka_dev_hw_ring_info *this_ring_info;
++		struct mlxbf_pka_dev_hw_ring_info  hw_ring_info;
++
++		this_ring_info = ring_dev->ring->ring_info;
++
++		hw_ring_info.cmd_base = this_ring_info->cmd_base;
++		hw_ring_info.rslt_base = this_ring_info->rslt_base;
++		hw_ring_info.size = this_ring_info->size;
++		hw_ring_info.host_desc_size = this_ring_info->host_desc_size;
++		hw_ring_info.in_order = this_ring_info->in_order;
++		hw_ring_info.cmd_rd_ptr = this_ring_info->cmd_rd_ptr;
++		hw_ring_info.rslt_wr_ptr = this_ring_info->rslt_wr_ptr;
++		hw_ring_info.cmd_rd_stats = this_ring_info->cmd_rd_ptr;
++		hw_ring_info.rslt_wr_stats = this_ring_info->rslt_wr_stats;
++
++		if (copy_to_user((void __user *)arg, &hw_ring_info, sizeof(hw_ring_info)))
++			return -EFAULT;
++		else
++			return 0;
++
++	} else if (cmd == MLXBF_PKA_CLEAR_RING_COUNTERS) {
++		return mlxbf_pka_dev_clear_ring_counters(ring_dev->ring);
++	}
++
++	return -ENOTTY;
++}
++
++static int mlxbf_pka_drv_open(struct inode *inode, struct file *filep)
++{
++	struct mlxbf_pka_ring_device *ring_dev;
++	int ret;
++
++	scoped_guard(mutex, &pka.idr_lock) {
++		ring_dev = idr_find(&pka.ring_idr, iminor(inode));
++	}
++	if (!ring_dev) {
++		pr_err("mlxbf_pka error: failed to find idr for device\n");
++		return -ENODEV;
++	}
++
++	ret = mlxbf_pka_drv_ring_open(ring_dev);
++	if (ret)
++		return ret;
++
++	filep->private_data = ring_dev;
++	return ret;
++}
++
++static int mlxbf_pka_drv_release(struct inode *inode, struct file *filep)
++{
++	struct mlxbf_pka_ring_device *ring_dev = filep->private_data;
++
++	filep->private_data = NULL;
++	mlxbf_pka_drv_ring_release(ring_dev);
++
++	return 0;
++}
++
++static int mlxbf_pka_drv_mmap(struct file *filep, struct vm_area_struct *vma)
++{
++	return mlxbf_pka_drv_ring_mmap(filep->private_data, vma);
++}
++
++static long mlxbf_pka_drv_unlocked_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
++{
++	return mlxbf_pka_drv_ring_ioctl(filep->private_data, cmd, arg);
++}
++
++static const struct file_operations mlxbf_pka_ring_fops = {
++	.owner = THIS_MODULE,
++	.open = mlxbf_pka_drv_open,
++	.release = mlxbf_pka_drv_release,
++	.unlocked_ioctl = mlxbf_pka_drv_unlocked_ioctl,
++	.mmap = mlxbf_pka_drv_mmap,
++};
++
++static int mlxbf_pka_drv_add_ring_device(struct mlxbf_pka_ring_device *ring_dev)
++{
++	struct device *dev = ring_dev->device;
++	char name[MLXBF_PKA_DEVICE_NAME_MAX];
++	int minor_number;
++	int ret;
++
++	scnprintf(name, sizeof(name), MLXBF_PKA_DEVFS_RING_DEVICES, ring_dev->device_id);
++
++	ring_dev->misc.minor = MISC_DYNAMIC_MINOR;
++	ring_dev->misc.name = &name[0];
++	ring_dev->misc.mode = MLXBF_PKA_DEVICE_ACCESS_MODE;
++	ring_dev->misc.fops = &mlxbf_pka_ring_fops;
++
++	ret = misc_register(&ring_dev->misc);
++	if (ret) {
++		dev_err(dev, "ring device registration failed: ret=%d\n", ret);
++		return ret;
++	}
++
++	scoped_guard(mutex, &pka.idr_lock) {
++		minor_number = idr_alloc(&pka.ring_idr, ring_dev, ring_dev->misc.minor,
++					 MINORMASK + 1, GFP_KERNEL);
++	}
++	if (minor_number != ring_dev->misc.minor) {
++		dev_err(dev, "failed to allocate minor number %d\n", ring_dev->misc.minor);
++		return minor_number;
++	}
++
++	dev_dbg(dev, "ring device minor:%d\n", ring_dev->misc.minor);
++
++	return ret;
++}
++
++static struct mlxbf_pka_ring_device *mlxbf_pka_drv_del_ring_device(struct device *dev)
++{
++	struct platform_device *pdev = container_of(dev, struct platform_device, dev);
++	struct mlxbf_pka_platdata *priv = platform_get_drvdata(pdev);
++	struct mlxbf_pka_info *info = priv->info;
++	struct mlxbf_pka_ring_device *ring_dev = info->priv;
++
++	if (ring_dev) {
++		scoped_guard(mutex, &pka.idr_lock) {
++			idr_remove(&pka.ring_idr, ring_dev->misc.minor);
++		}
++		misc_deregister(&ring_dev->misc);
++	}
++
++	return ring_dev;
++}
++
+ static void mlxbf_pka_drv_get_mem_res(struct mlxbf_pka_device *mlxbf_pka_dev,
+ 				      struct mlxbf_pka_dev_mem_res *mem_res,
+ 				      u64 wndw_ram_off_mask)
+@@ -230,6 +627,38 @@ static int mlxbf_pka_drv_unregister_device(struct mlxbf_pka_device *mlxbf_pka_de
+ 	return mlxbf_pka_dev_unregister_shim(mlxbf_pka_dev->device, mlxbf_pka_dev->shim);
+ }
+ 
++/*
++ * Note: this function must be serialized because it calls
++ * 'mlxbf_pka_dev_register_ring' which manipulates common counters for the PKA
++ * ring devices.
++ */
++static int mlxbf_pka_drv_register_ring_device(struct mlxbf_pka_ring_device *ring_dev)
++{
++	u32 shim_id = ring_dev->parent_device_id;
++	u32 ring_id = ring_dev->device_id;
++	int ret;
++
++	ret = mlxbf_pka_dev_register_ring(ring_dev->device, ring_id, shim_id, &ring_dev->ring);
++	if (ret) {
++		dev_dbg(ring_dev->device, "failed to register ring device\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++static void mlxbf_pka_drv_unregister_ring_device(struct mlxbf_pka_ring_device *ring_dev)
++{
++	if (!ring_dev)
++		return;
++
++	if (!ring_dev->ring)
++		return;
++
++	dev_dbg(ring_dev->device, "unregister ring device\n");
++	mlxbf_pka_dev_unregister_ring(ring_dev->device, ring_dev->ring);
 +}
 +
  static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
  {
  	struct mlxbf_pka_drv_plat_info *plat_info;
-@@ -667,6 +725,7 @@ static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
- 	const struct acpi_device_id *aid;
- 	struct platform_device *pdev;
- 	u64 wndw_ram_off_mask;
-+	struct hwrng *trng;
- 	struct device *dev;
- 	int ret;
- 
-@@ -727,6 +786,19 @@ static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
- 		}
- 	}
- 
-+	/* Setup the TRNG if needed. */
-+	if (mlxbf_pka_dev_has_trng(mlxbf_pka_dev->shim)) {
-+		trng = &mlxbf_pka_dev->rng;
-+		trng->name = pdev->name;
-+		trng->read = mlxbf_pka_drv_rng_read;
-+
-+		ret = hwrng_register(&mlxbf_pka_dev->rng);
-+		if (ret) {
-+			dev_err(dev, "failed to register trng\n");
-+			return ret;
-+		}
-+	}
-+
- 	info->priv = mlxbf_pka_dev;
- 
- 	return 0;
-@@ -741,6 +813,9 @@ static void mlxbf_pka_drv_remove_device(struct platform_device *pdev)
- 	if (!mlxbf_pka_dev)
- 		return;
- 
-+	if (mlxbf_pka_dev_has_trng(mlxbf_pka_dev->shim))
-+		hwrng_unregister(&mlxbf_pka_dev->rng);
-+
+@@ -315,6 +744,91 @@ static void mlxbf_pka_drv_remove_device(struct platform_device *pdev)
  	mlxbf_pka_drv_unregister_device(mlxbf_pka_dev);
  }
  
-diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
++static int mlxbf_pka_drv_probe_ring_device(struct mlxbf_pka_info *info)
++{
++	struct mlxbf_pka_ring_device *ring_dev;
++	struct device *dev = info->dev;
++	int ret;
++
++	if (!info)
++		return -EINVAL;
++
++	ring_dev = devm_kzalloc(dev, sizeof(*ring_dev), GFP_KERNEL);
++	if (!ring_dev)
++		return -ENOMEM;
++
++	if (!mlxbf_pka_ring_device_cnt) {
++		mutex_init(&pka.idr_lock);
++		scoped_guard(mutex, &pka.idr_lock) {
++			/* Only initialize IDR if there is no ring device registered. */
++			idr_init(&pka.ring_idr);
++		}
++	}
++
++	scoped_guard(mutex, &mlxbf_pka_drv_lock) {
++		mlxbf_pka_ring_device_cnt += 1;
++		if (mlxbf_pka_ring_device_cnt > MLXBF_PKA_DRIVER_RING_DEV_MAX) {
++			dev_dbg(dev, "cannot support %u ring devices\n", mlxbf_pka_ring_device_cnt);
++			return -ENOSPC;
++		}
++		ring_dev->device_id = mlxbf_pka_ring_device_cnt - 1;
++		ring_dev->parent_device_id = mlxbf_pka_device_cnt - 1;
++	}
++
++	ring_dev->info = info;
++	ring_dev->device = dev;
++	info->flag = MLXBF_PKA_DRIVER_FLAG_RING_DEVICE;
++	mutex_init(&ring_dev->mutex);
++
++	/* Verify PKA bootup status. */
++	ret = mlxbf_pka_drv_verify_bootup_status(dev);
++	if (ret)
++		return ret;
++
++	scoped_guard(mutex, &mlxbf_pka_drv_lock) {
++		/* Add PKA ring device. */
++		ret = mlxbf_pka_drv_add_ring_device(ring_dev);
++		if (ret) {
++			dev_dbg(dev, "failed to add ring device %u\n", ring_dev->device_id);
++			return ret;
++		}
++
++		/* Register PKA ring device. */
++		ret = mlxbf_pka_drv_register_ring_device(ring_dev);
++		if (ret) {
++			dev_dbg(dev, "failed to register ring device\n");
++			goto err_register_ring;
++		}
++	}
++
++	info->priv = ring_dev;
++
++	return 0;
++
++ err_register_ring:
++	mlxbf_pka_drv_del_ring_device(dev);
++	return ret;
++}
++
++static void mlxbf_pka_drv_remove_ring_device(struct platform_device *pdev)
++{
++	struct mlxbf_pka_ring_device *ring_dev;
++	struct device *dev = &pdev->dev;
++
++	ring_dev = mlxbf_pka_drv_del_ring_device(dev);
++	if (ring_dev) {
++		mlxbf_pka_drv_unregister_ring_device(ring_dev);
++		mlxbf_pka_ring_device_cnt--;
++	}
++
++	if (!mlxbf_pka_ring_device_cnt) {
++		scoped_guard(mutex, &pka.idr_lock) {
++			/* Only destroy IDR if there is no ring device registered. */
++			idr_destroy(&pka.ring_idr);
++		}
++	}
++}
++
+ static int mlxbf_pka_drv_acpi_probe(struct platform_device *pdev, struct mlxbf_pka_info *info)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -343,6 +857,15 @@ static int mlxbf_pka_drv_acpi_probe(struct platform_device *pdev, struct mlxbf_p
+ 			return ret;
+ 		}
+ 		dev_info(dev, "device probed\n");
++	} else if (!strcmp(info->acpihid, mlxbf_pka_ring_acpihid_bf1) ||
++		   !strcmp(info->acpihid, mlxbf_pka_ring_acpihid_bf2) ||
++		   !strcmp(info->acpihid, mlxbf_pka_ring_acpihid_bf3)) {
++		ret = mlxbf_pka_drv_probe_ring_device(info);
++		if (ret) {
++			dev_dbg(dev, "failed to register ring device\n");
++			return ret;
++		}
++		dev_dbg(dev, "ring device probed\n");
+ 	}
+ 
+ 	return 0;
+@@ -387,6 +910,11 @@ static void mlxbf_pka_drv_remove(struct platform_device *pdev)
+ 	struct mlxbf_pka_platdata *priv = platform_get_drvdata(pdev);
+ 	struct mlxbf_pka_info *info = priv->info;
+ 
++	if (info->flag == MLXBF_PKA_DRIVER_FLAG_RING_DEVICE) {
++		dev_info(&pdev->dev, "remove ring device\n");
++		mlxbf_pka_drv_remove_ring_device(pdev);
++	}
++
+ 	if (info->flag == MLXBF_PKA_DRIVER_FLAG_DEVICE) {
+ 		dev_info(&pdev->dev, "remove PKA device\n");
+ 		mlxbf_pka_drv_remove_device(pdev);
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.c
 new file mode 100644
-index 000000000000..0a0007fb9e31
+index 000000000000..2f08975223e9
 --- /dev/null
-+++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
-@@ -0,0 +1,874 @@
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.c
+@@ -0,0 +1,563 @@
 +// SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
 +// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved.
 +
-+#include <linux/delay.h>
 +#include <linux/device.h>
-+#include <linux/iopoll.h>
 +
 +#include "mlxbf_pka_dev.h"
 +#include "mlxbf_pka_ring.h"
-+#include "mlxbf_pka_trng.h"
 +
-+/* Personalization string "NVIDIA-MELLANOX-BLUEFIELD-TRUE_RANDOM_NUMBER_GEN". */
-+static u32 mlxbf_pka_trng_drbg_ps_str[] = {
-+	0x4e564944, 0x49412d4d, 0x454c4c41, 0x4e4f582d,
-+	0x424c5545, 0x4649454c, 0x442d5452, 0x55455f52,
-+	0x414e444f, 0x4d5f4e55, 0x4d424552, 0x5f47454e
-+};
-+
-+/* Personalization string for DRBG test. */
-+static u32 mlxbf_pka_trng_drbg_test_ps_str[] = {
-+	0x64299d83, 0xc34d7098, 0x5bd1f51d, 0xddccfdc1,
-+	0xdd0455b7, 0x166279e5, 0x0974cb1b, 0x2f2cd100,
-+	0x59a5060a, 0xca79940d, 0xd4e29a40, 0x56b7b779
-+};
-+
-+/* First Entropy string for DRBG test. */
-+static u32 mlxbf_pka_trng_drbg_test_etpy_str1[] = {
-+	0xaa6bbcab, 0xef45e339, 0x136ca1e7, 0xbce1c881,
-+	0x9fa37b09, 0x63b53667, 0xb36e0053, 0xa202ed81,
-+	0x4650d90d, 0x8eed6127, 0x666f2402, 0x0dfd3af9
-+};
-+
-+/* Second Entropy string for DRBG test. */
-+static u32 mlxbf_pka_trng_drbg_test_etpy_str2[] = {
-+	0x35c1b7a1, 0x0154c52b, 0xd5777390, 0x226a4fdb,
-+	0x5f16080d, 0x06b68369, 0xd0c93d00, 0x3336e27f,
-+	0x1abf2c37, 0xe6ab006c, 0xa4adc6e1, 0x8e1907a2
-+};
-+
-+/* Known answer for DRBG test. */
-+static u32 mlxbf_pka_trng_drbg_test_output[] = {
-+	0xb663b9f1, 0x24943e13, 0x80f7dce5, 0xaba1a16f
-+};
-+
-+/* Known answer for poker test. */
-+static u64 poker_test_exp_cnt[] = {
-+	0x20f42bf4, 0xaf415f4, 0xf4f4fff4, 0xfff4f4f4
-+};
-+
-+static int mlxbf_pka_dev_config_trng_clk(struct device *dev,
-+					 struct mlxbf_pka_dev_res_t *aic_csr_ptr)
++/*
++ * Mapping PKA Ring address into Window RAM offset address.
++ *
++ * It converts the ring address, either physical address or virtual address, to
++ * valid address into the Window RAM. This is done using the provided Window RAM
++ * win_base, ring_addr and win_mask parameters. Here, win_base is the actual
++ * physical address of the Window RAM, with the help of win_mask it is reduced
++ * to Window RAM offset within that PKA block. Further, with the help of
++ * ring_addr and ring_size, we arrive at the Window RAM offset address for a
++ * PKA Ring within the given Window RAM.
++ *
++ * The hardware encoded the ring size in 32-bit words, not bytes. Therefore,
++ * the ring size is right-shifted to convert bytes into words.
++ */
++static inline u64 mlxbf_pka_ring_mem_addr(u64 win_base, u64 win_mask, u64 ring_addr, u64 ring_size)
 +{
-+	u32 trng_clk_en = 0;
-+	void __iomem *csr_reg_ptr;
-+	u64 csr_reg_base;
-+	u64 csr_reg_off;
-+	u64 timer;
++	return (win_base & win_mask) |
++	      FIELD_PREP(MLXBF_PKA_WINDOW_RAM_RING_ADDR_MASK, ring_addr) |
++	      FIELD_PREP(MLXBF_PKA_WINDOW_RAM_RING_SIZE_MASK,
++			 ((ring_addr & ~(ring_size - 1)) >>
++			  MLXBF_PKA_WINDOW_RAM_RING_SIZE_SHIFT));
++}
 +
-+	if (aic_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
-+	    aic_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
-+		return -EPERM;
++int mlxbf_pka_dev_clear_ring_counters(struct mlxbf_pka_dev_ring_t *ring)
++{
++	struct mlxbf_pka_dev_res_t *master_seq_ctrl_ptr;
++	u64 master_reg_base, master_reg_off;
++	struct mlxbf_pka_dev_shim_s *shim;
++	void __iomem *master_reg_ptr;
 +
-+	dev_dbg(dev, "turn on TRNG clock\n");
++	shim = ring->shim;
++	master_seq_ctrl_ptr = &shim->resources.master_seq_ctrl;
++	master_reg_base = master_seq_ctrl_ptr->base;
++	master_reg_ptr = master_seq_ctrl_ptr->ioaddr;
++	master_reg_off = mlxbf_pka_dev_get_register_offset(master_reg_base,
++							   MLXBF_PKA_MASTER_SEQ_CTRL_ADDR);
 +
-+	csr_reg_base = aic_csr_ptr->base;
-+	csr_reg_ptr = aic_csr_ptr->ioaddr;
++	/* Push the EIP-154 master controller into reset. */
++	mlxbf_pka_dev_io_write(master_reg_ptr, master_reg_off, MLXBF_PKA_MASTER_SEQ_CTRL_RESET);
 +
-+	/*
-+	 * Enable the TRNG clock in MLXBF_PKA_CLK_FORCE. In general, this
-+	 * register should be left in its default state of all zeroes. Only
-+	 * when the TRNG is directly controlled via the Host slave interface,
-+	 * the engine needs to be turned on using the 'trng_clk_on' bit in
-+	 * this register. In case the TRNG is controlled via internal firmware,
-+	 * this is not required.
-+	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_CLK_FORCE_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_CLK_FORCE_TRNG_ON);
-+	/*
-+	 * Check whether the system clock for TRNG engine is enabled. The clock
-+	 * MUST be running to provide access to the TRNG.
-+	 */
-+	timer = mlxbf_pka_dev_timer_start_msec(100);
-+	while (!trng_clk_en) {
-+		trng_clk_en |= mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off)
-+						     & MLXBF_PKA_CLK_FORCE_TRNG_ON;
-+		if (mlxbf_pka_dev_timer_done(timer)) {
-+			dev_dbg(dev, "failed to enable TRNG clock\n");
-+			return -ETIMEDOUT;
-+		}
-+	}
-+	dev_dbg(dev, "trng_clk_on is enabled\n");
++	/* Clear counters. */
++	mlxbf_pka_dev_io_write(master_reg_ptr, master_reg_off,
++			       MLXBF_PKA_MASTER_SEQ_CTRL_CLEAR_COUNTERS);
++
++	/* Take the EIP-154 master controller out of reset. */
++	mlxbf_pka_dev_io_write(master_reg_ptr, master_reg_off, MASTER_CONTROLLER_OUT_OF_RESET);
 +
 +	return 0;
 +}
 +
-+static bool mlxbf_pka_dev_trng_wait_test_ready(struct device *dev,
-+					       void __iomem *csr_reg_ptr,
-+					       u64 csr_reg_base)
++/*
++ * Initialize ring. Set ring parameters and configure ring resources. It returns
++ * 0 on success, a negative error code on failure.
++ */
++static int mlxbf_pka_dev_init_ring(struct device *dev,
++				   struct mlxbf_pka_dev_ring_t *ring,
++				   u32 ring_id,
++				   struct mlxbf_pka_dev_shim_s *shim)
 +{
-+	u64 csr_reg_off, timer, csr_reg_val, test_ready = 0;
++	struct mlxbf_pka_dev_res_t *ring_window_ram_ptr;
++	struct mlxbf_pka_dev_res_t *ring_info_words_ptr;
++	struct mlxbf_pka_dev_res_t *ring_counters_ptr;
++	u8 window_ram_split;
++	u32 ring_words_off;
++	u32 ring_cntrs_off;
++	u32 ring_mem_base;
++	u32 ring_mem_off;
++	u32 shim_ring_id;
++	int ret;
 +
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
-+	timer = mlxbf_pka_dev_timer_start_msec(MSEC_PER_SEC);
-+
-+	while (!test_ready) {
-+		csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+		test_ready = csr_reg_val & MLXBF_PKA_TRNG_STATUS_TEST_READY;
-+
-+		if (mlxbf_pka_dev_timer_done(timer)) {
-+			dev_dbg(dev, "TRNG test ready timer done, 0x%llx\n", csr_reg_val);
-+			return false;
-+		}
++	if (ring->status != MLXBF_PKA_DEV_RING_STATUS_UNDEFINED) {
++		dev_err(dev, "PKA ring must be undefined\n");
++		return -EPERM;
 +	}
 +
-+	return true;
++	if (ring_id > MLXBF_PKA_MAX_NUM_RINGS - 1) {
++		dev_err(dev, "invalid ring identifier\n");
++		return -EINVAL;
++	}
++
++	ring->ring_id = ring_id;
++	ring->shim = shim;
++	ring->resources_num = MLXBF_PKA_MAX_NUM_RING_RESOURCES;
++	shim_ring_id = ring_id % MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS;
++	shim->rings[shim_ring_id] = ring;
++
++	/* Configure ring information control/status words resource. */
++	ring_info_words_ptr = &ring->resources.info_words;
++	ring_words_off = shim_ring_id * MLXBF_PKA_RING_WORDS_SPACING;
++	ring_info_words_ptr->base = ring_words_off + shim->mem_res.eip154_base +
++				   MLXBF_PKA_RING_WORDS_ADDR;
++	ring_info_words_ptr->size = MLXBF_PKA_RING_WORDS_SIZE;
++	ring_info_words_ptr->type = MLXBF_PKA_DEV_RES_TYPE_MEM;
++	ring_info_words_ptr->status = MLXBF_PKA_DEV_RES_STATUS_UNMAPPED;
++	ring_info_words_ptr->name = "MLXBF_PKA_RING_INFO";
++
++	/* Configure ring counters registers resource. */
++	ring_counters_ptr = &ring->resources.counters;
++	ring_cntrs_off = shim_ring_id * MLXBF_PKA_RING_CNTRS_SPACING;
++	ring_counters_ptr->base = ring_cntrs_off + shim->mem_res.eip154_base +
++				 MLXBF_PKA_RING_CNTRS_ADDR;
++	ring_counters_ptr->size = MLXBF_PKA_RING_CNTRS_SIZE;
++	ring_counters_ptr->type = MLXBF_PKA_DEV_RES_TYPE_REG;
++	ring_counters_ptr->status = MLXBF_PKA_DEV_RES_STATUS_UNMAPPED;
++	ring_counters_ptr->name = "MLXBF_PKA_RING_CNTRS";
++
++	/* Configure ring window RAM resource. */
++	window_ram_split = shim->window_ram_split;
++	if (window_ram_split == MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_ENABLED) {
++		ring_mem_off = shim_ring_id * MLXBF_PKA_RING_MEM_1_SPACING;
++		ring_mem_base = ring_mem_off + shim->mem_res.alt_wndw_ram_0_base;
++	} else {
++		ring_mem_off = shim_ring_id * MLXBF_PKA_RING_MEM_0_SPACING;
++		ring_mem_base = ring_mem_off + shim->mem_res.wndw_ram_base;
++	}
++
++	ring_window_ram_ptr = &ring->resources.window_ram;
++	ring_window_ram_ptr->base = ring_mem_base;
++	ring_window_ram_ptr->size = MLXBF_PKA_RING_MEM_SIZE;
++	ring_window_ram_ptr->type = MLXBF_PKA_DEV_RES_TYPE_MEM;
++	ring_window_ram_ptr->status = MLXBF_PKA_DEV_RES_STATUS_UNMAPPED;
++	ring_window_ram_ptr->name = "MLXBF_PKA_RING_WINDOW";
++
++	ring->ring_info = devm_kzalloc(dev, sizeof(*ring->ring_info), GFP_KERNEL);
++	if (!ring->ring_info)
++		return -ENOMEM;
++
++	ret = devm_mutex_init(dev, &ring->mutex);
++	if (ret)
++		return ret;
++
++	ring->status = MLXBF_PKA_DEV_RING_STATUS_INITIALIZED;
++
++	return 0;
 +}
 +
-+static int mlxbf_pka_dev_trng_enable_test(struct device *dev,
-+					  void __iomem *csr_reg_ptr,
-+					  u64 csr_reg_base, u32 test)
++/* Release a given Ring. */
++int mlxbf_pka_dev_release_ring(struct device *dev, struct mlxbf_pka_dev_ring_t *ring)
 +{
-+	u64 csr_reg_val, csr_reg_off;
++	struct mlxbf_pka_dev_shim_s *shim;
++	u32 shim_ring_id;
++
++	if (ring->status == MLXBF_PKA_DEV_RING_STATUS_UNDEFINED)
++		return 0;
++
++	if (ring->status == MLXBF_PKA_DEV_RING_STATUS_BUSY) {
++		dev_err(dev, "PKA ring is busy\n");
++		return -EBUSY;
++	}
++
++	shim = ring->shim;
++
++	if (shim->status == MLXBF_PKA_SHIM_STATUS_RUNNING) {
++		dev_err(dev, "PKA shim is running\n");
++		return -EPERM;
++	}
++
++	mlxbf_pka_dev_unset_resource_config(dev, shim, &ring->resources.info_words);
++	mlxbf_pka_dev_unset_resource_config(dev, shim, &ring->resources.counters);
++	mlxbf_pka_dev_unset_resource_config(dev, shim, &ring->resources.window_ram);
++
++	ring->status = MLXBF_PKA_DEV_RING_STATUS_UNDEFINED;
++	shim_ring_id = ring->ring_id % MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS;
++	shim->rings[shim_ring_id] = NULL;
++	shim->rings_num--;
++
++	return 0;
++}
++
++/*
++ * Partition the window RAM for a given PKA ring. Here we statically divide the
++ * 16K memory region into three partitions: First partition is reserved for
++ * command descriptor ring (1K), second partition is reserved for result
++ * descriptor ring (1K), and the remaining 14K are reserved for vector data.
++ * Through this memory partition scheme, command/result descriptor rings hold a
++ * total of 1KB/64B = 16 descriptors each. The addresses for the rings start at
++ * offset 0x3800. Also note that it is possible to have rings full while the
++ * vector data can support more data, the opposite can also happen, but it is
++ * not suitable. For instance ECC point multiplication requires 8 input vectors
++ * and 2 output vectors, a total of 10 vectors. If each vector has a length of
++ * 24 words (24x4B = 96B), we can process 14KB/960B = 14 operations which is
++ * close to 16 the total descriptors supported by rings. On the other hand,
++ * using 12K vector data region, allows to process only 12 operations, while
++ * rings can hold 32 descriptors (ring usage is significantly low).
++ *
++ * For ECDSA verify, we have 12 vectors which require 1152B, with 14KB we can
++ * handle 12 operations, against 10 operations with 12KB vector data memory. We
++ * believe that the aforementioned memory partition help us to leverage the
++ * trade-off between supported descriptors and required vectors. Note that these
++ * examples give approximative values and does not include buffer word padding
++ * across vectors.
++ *
++ * The function also writes the result descriptor rings base addresses, size and
++ * type. And initialize the read and write pointers and statistics. It returns
++ * 0 on success, a negative error code on failure.
++ *
++ * This function must be called once per ring, at initialization before any
++ * other functions are called.
++ */
++static int mlxbf_pka_dev_partition_mem(struct mlxbf_pka_dev_ring_t *ring)
++{
++	u64 rslt_desc_ring_base;
++	u64 cmd_desc_ring_base;
++	u32 cmd_desc_ring_size;
++	u64 window_ram_base;
++	u64 window_ram_size;
++	u32 ring_mem_base;
++
++	if (!ring->shim || ring->status != MLXBF_PKA_DEV_RING_STATUS_INITIALIZED)
++		return -EPERM;
++
++	window_ram_base = ring->resources.window_ram.base;
++	window_ram_size = ring->resources.window_ram.size;
++	/*
++	 * Partition ring memory. Give ring pair (cmd descriptor ring and rslt
++	 * descriptor ring) an equal portion of the memory. The cmd descriptor
++	 * ring and result descriptor ring are used as "non-overlapping" ring.
++	 * Currently set aside 1/8 of the window RAM for command and result
++	 * descriptor rings - giving a total of 1K/64B = 16 descriptors per
++	 * ring. The remaining memory is "Data Memory" - i.e. memory to hold
++	 * the command operands and results - also called input/output vectors
++	 * (in all cases these vectors are just single large integers - often in
++	 * the range of hundreds to thousands of bits long).
++	 */
++	ring_mem_base = window_ram_base + MLXBF_PKA_WINDOW_RAM_DATA_MEM_SIZE;
++	cmd_desc_ring_size = MLXBF_PKA_WINDOW_RAM_RING_MEM_SIZE /
++			    MLXBF_PKA_WINDOW_RAM_RING_MEM_DIV;
++	ring->num_cmd_desc = MLXBF_PKA_WINDOW_RAM_RING_MEM_SIZE /
++			    MLXBF_PKA_WINDOW_RAM_RING_MEM_DIV / CMD_DESC_SIZE;
++	/*
++	 * The command and result descriptor rings may be placed at different
++	 * (non-overlapping) locations in Window RAM memory space. PKI command
++	 * interface: Most of the functionality is defined by the EIP-154 master
++	 * firmware on the EIP-154 master controller Sequencer.
++	 */
++	cmd_desc_ring_base = ring_mem_base;
++	rslt_desc_ring_base = ring_mem_base + cmd_desc_ring_size;
++
++	cmd_desc_ring_base = mlxbf_pka_ring_mem_addr(window_ram_base,
++						     ring->shim->mem_res.wndw_ram_off_mask,
++						     cmd_desc_ring_base,
++						     window_ram_size);
++	rslt_desc_ring_base = mlxbf_pka_ring_mem_addr(window_ram_base,
++						      ring->shim->mem_res.wndw_ram_off_mask,
++						      rslt_desc_ring_base,
++						      window_ram_size);
++
++	/* Fill ring information. */
++	memset(ring->ring_info, 0, sizeof(*ring->ring_info));
++
++	ring->ring_info->cmd_base = cmd_desc_ring_base;
++	ring->ring_info->rslt_base = rslt_desc_ring_base;
++	ring->ring_info->size = MLXBF_PKA_WINDOW_RAM_RING_MEM_SIZE /
++				MLXBF_PKA_WINDOW_RAM_RING_MEM_DIV / CMD_DESC_SIZE - 1;
++	ring->ring_info->host_desc_size = CMD_DESC_SIZE / sizeof(u32);
++	ring->ring_info->in_order = ring->shim->ring_type;
++
++	return 0;
++}
++
++/*
++ * Write the ring base address, ring size and type, and initialize (clear) the
++ * read and write pointers and statistics.
++ */
++static int mlxbf_pka_dev_write_ring_info(struct device *dev,
++					 struct mlxbf_pka_dev_res_t *buffer_ram_ptr,
++					 u8 ring_id,
++					 u32 ring_cmd_base_val,
++					 u32 ring_rslt_base_val,
++					 u32 ring_size_type_val)
++{
++	u32 ring_spacing;
++	u64 word_off;
++
++	if (buffer_ram_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
++	    buffer_ram_ptr->type != MLXBF_PKA_DEV_RES_TYPE_MEM)
++		return -EPERM;
++
++	dev_dbg(dev, "writing ring information control/status words\n");
++
++	ring_spacing = ring_id * MLXBF_PKA_RING_WORDS_SPACING;
++
++	/* Get command descriptors from the Host ring. */
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_CMD_BASE_0_ADDR + ring_spacing,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, ring_cmd_base_val);
++
++	/* Put the result descriptors in the Host ring. */
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_RSLT_BASE_0_ADDR + ring_spacing,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, ring_rslt_base_val);
++
++	/* Write the ring size (number of descriptors) */
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_SIZE_TYPE_0_ADDR + ring_spacing,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, ring_size_type_val);
++
++	/* Write the command and result ring indices. */
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_RW_PTRS_0_ADDR + ring_spacing,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, 0);
++
++	/*
++	 * Write the ring statistics (two 16-bit counters, one for commands and
++	 * one for results).
++	 */
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_RW_STAT_0_ADDR + ring_spacing,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, 0);
++
++	return 0;
++}
++
++/*
++ * Set up the control/status words. Upon a PKI command the EIP-154 master
++ * firmware will read and partially update the ring information.
++ */
++static int mlxbf_pka_dev_set_ring_info(struct device *dev, struct mlxbf_pka_dev_ring_t *ring)
++{
++	u32 ring_cmd_base_val;
++	u32 ring_rslt_base_val;
++	u32 ring_size_type_val;
 +	int ret;
 +
 +	/*
-+	 * Set the 'test_mode' bit in the TRNG_CONTROL register and the
-+	 * 'test_known_noise' bit in the TRNG_TEST register - this will
-+	 * immediately set the 'test_ready' bit (in the TRNG_STATUS register)
-+	 * to indicate that data can be written. It will also reset the
-+	 * 'monobit test', 'run test' and 'poker test' circuits to their
-+	 * initial states. Note that the TRNG need not be enabled for this
-+	 * test.
++	 * Ring info configuration MUST be done when the PKA ring is
++	 * initialized.
 +	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	if ((ring->shim->status != MLXBF_PKA_SHIM_STATUS_INITIALIZED &&
++	     ring->shim->status != MLXBF_PKA_SHIM_STATUS_RUNNING &&
++	     ring->shim->status != MLXBF_PKA_SHIM_STATUS_STOPPED) ||
++	     ring->status != MLXBF_PKA_DEV_RING_STATUS_INITIALIZED)
++		return -EPERM;
 +
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+			       csr_reg_val | MLXBF_PKA_TRNG_CONTROL_TEST_MODE);
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, test);
-+	/* Wait until the 'test_ready' bit is set. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
-+	ret = read_poll_timeout(mlxbf_pka_dev_io_read, csr_reg_val,
-+				csr_reg_val & MLXBF_PKA_TRNG_STATUS_TEST_READY,
-+				USEC_PER_MSEC / 100, USEC_PER_SEC, false,
-+				csr_reg_ptr, csr_reg_off);
++	/* Partition ring memory. */
++	ret = mlxbf_pka_dev_partition_mem(ring);
 +	if (ret) {
-+		dev_err(dev, "timeout waiting for test ready\n");
-+		return -ETIMEDOUT;
-+	}
-+
-+	/*
-+	 * Check whether the 'monobit test', 'run test' and 'poker test'
-+	 * are reset.
-+	 */
-+	if (csr_reg_val & MLXBF_PKA_TRNG_STATUS_FAIL_MODES) {
-+		dev_err(dev, "test bits aren't reset, TRNG_STATUS:0x%llx\n", csr_reg_val);
-+		return -EIO;
-+	}
-+
-+	/*
-+	 * Set 'stall_run_poker' bit to allow inspecting the state of the
-+	 * result counters which would otherwise be reset immediately for the
-+	 * next 20,000 bits block to test.
-+	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
-+	csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr,
-+			       csr_reg_off,
-+			       csr_reg_val | MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER);
-+
-+	return 0;
-+}
-+
-+static int mlxbf_pka_dev_trng_test_circuits(struct device *dev,
-+					    void __iomem *csr_reg_ptr,
-+					    u64 csr_reg_base,
-+					    u64 datal, u64 datah,
-+					    int count, u8 add_half,
-+					    u64 *monobit_fail_cnt,
-+					    u64 *run_fail_cnt,
-+					    u64 *poker_fail_cnt)
-+{
-+	u64 status, csr_reg_off;
-+	unsigned int test_idx;
-+	int ret;
-+
-+	if (!monobit_fail_cnt || !run_fail_cnt || !poker_fail_cnt)
-+		return -EINVAL;
-+
-+	for (test_idx = 0; test_idx < count; test_idx++) {
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_RAW_L_ADDR);
-+		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, datal);
-+
-+		if (!add_half || test_idx < count - 1) {
-+			csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+									MLXBF_PKA_TRNG_RAW_H_ADDR);
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, datah);
-+		}
-+
-+		/*
-+		 * Wait until the 'test_ready' bit in the TRNG_STATUS register
-+		 * becomes '1' again, signalling readiness for the next 64 bits
-+		 * of test data. At this point, the previous test data has been
-+		 * handled so the counter states can be inspected.
-+		 */
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_STATUS_ADDR);
-+		ret = read_poll_timeout(mlxbf_pka_dev_io_read, status,
-+					status & MLXBF_PKA_TRNG_STATUS_TEST_READY,
-+					USEC_PER_MSEC / 100, USEC_PER_SEC, false,
-+					csr_reg_ptr, csr_reg_off);
-+		if (ret) {
-+			dev_err(dev, "timeout waiting for test ready in circuits\n");
-+			return -ETIMEDOUT;
-+		}
-+
-+		/* Check test status bits. */
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_INTACK_ADDR);
-+		if (status & MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL) {
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+					       MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL);
-+			*monobit_fail_cnt += 1;
-+		} else if (status & MLXBF_PKA_TRNG_STATUS_RUN_FAIL) {
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+					       MLXBF_PKA_TRNG_STATUS_RUN_FAIL);
-+			*run_fail_cnt += 1;
-+		} else if (status & MLXBF_PKA_TRNG_STATUS_POKER_FAIL) {
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+					       MLXBF_PKA_TRNG_STATUS_POKER_FAIL);
-+			*poker_fail_cnt += 1;
-+		}
-+	}
-+
-+	return *monobit_fail_cnt || *poker_fail_cnt || *run_fail_cnt ? -EIO : 0;
-+}
-+
-+static void mlxbf_pka_dev_trng_disable_test(struct device *dev,
-+					    void __iomem *csr_reg_ptr,
-+					    u64 csr_reg_base)
-+{
-+	u64 status, val, csr_reg_off;
-+
-+	/*
-+	 * When done, clear the 'test_known_noise' bit in the TRNG_TEST
-+	 * register (will immediately clear the 'test_ready' bit in the
-+	 * TRNG_STATUS register and reset the 'monobit test', 'run test'
-+	 * and 'poker test' circuits) and clear the 'test_mode' bit in the
-+	 * TRNG_CONTROL register.
-+	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
-+	status = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+	if (status & MLXBF_PKA_TRNG_STATUS_TEST_READY)
-+		dev_info(dev, "test ready bit is still set\n");
-+
-+	if (status & MLXBF_PKA_TRNG_STATUS_FAIL_MODES)
-+		dev_info(dev, "test bits are still set, TRNG_STATUS:0x%llx\n", status);
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, val & ~MLXBF_PKA_TRNG_STATUS_TEST_READY);
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
-+	val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr,
-+			       csr_reg_off,
-+			       val & ~MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER);
-+}
-+
-+static int mlxbf_pka_dev_trng_test_known_answer_basic(struct device *dev,
-+						      void __iomem *csr_reg_ptr,
-+						      u64 csr_reg_base)
-+{
-+	u64 poker_cnt[MLXBF_PKA_TRNG_POKER_TEST_CNT];
-+	u64 monobit_fail_cnt = 0;
-+	u64 poker_fail_cnt = 0;
-+	u64 run_fail_cnt = 0;
-+	u64 monobit_cnt;
-+	u64 csr_reg_off;
-+	int cnt_idx;
-+	int cnt_off;
-+	int ret;
-+
-+	dev_dbg(dev, "run known-answer test circuits\n");
-+
-+	ret = mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
-+					     MLXBF_PKA_TRNG_TEST_KNOWN_NOISE);
-+	if (ret)
++		dev_err(dev, "failed to initialize ring memory\n");
 +		return ret;
-+
-+	ret = mlxbf_pka_dev_trng_test_circuits(dev,
-+					       csr_reg_ptr,
-+					       csr_reg_base,
-+					       MLXBF_PKA_TRNG_TEST_DATAL_BASIC_1,
-+					       MLXBF_PKA_TRNG_TEST_DATAH_BASIC_1,
-+					       MLXBF_PKA_TRNG_TEST_COUNT_BASIC_1,
-+					       MLXBF_PKA_TRNG_TEST_HALF_NO,
-+					       &monobit_fail_cnt,
-+					       &run_fail_cnt,
-+					       &poker_fail_cnt);
-+
-+	ret |= mlxbf_pka_dev_trng_test_circuits(dev,
-+						csr_reg_ptr,
-+						csr_reg_base,
-+						MLXBF_PKA_TRNG_TEST_DATAL_BASIC_2,
-+						MLXBF_PKA_TRNG_TEST_DATAH_BASIC_2,
-+						MLXBF_PKA_TRNG_TEST_COUNT_BASIC_2,
-+						MLXBF_PKA_TRNG_TEST_HALF_ADD,
-+						&monobit_fail_cnt,
-+						&run_fail_cnt,
-+						&poker_fail_cnt);
-+
-+	dev_dbg(dev, "monobit_fail_cnt : 0x%llx\n", monobit_fail_cnt);
-+	dev_dbg(dev, "poker_fail_cnt   : 0x%llx\n", poker_fail_cnt);
-+	dev_dbg(dev, "run_fail_cnt     : 0x%llx\n", run_fail_cnt);
-+
-+	for (cnt_idx = 0, cnt_off = 0;
-+	     cnt_idx < MLXBF_PKA_TRNG_POKER_TEST_CNT;
-+	     cnt_idx++, cnt_off += 8) {
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_POKER_3_0_ADDR +
-+								cnt_off);
-+		poker_cnt[cnt_idx] = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
 +	}
 +
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							MLXBF_PKA_TRNG_MONOBITCNT_ADDR);
-+	monobit_cnt = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	/* Fill ring information. */
++	ring_cmd_base_val = ring->ring_info->cmd_base;
++	ring_rslt_base_val = ring->ring_info->rslt_base;
++	ring_size_type_val = FIELD_PREP(MLXBF_PKA_RING_INFO_IN_ORDER_MASK,
++					ring->ring_info->in_order);
++	ring_size_type_val |= FIELD_PREP(MLXBF_PKA_RING_INFO_HOST_DESC_SIZE_MASK,
++					ring->ring_info->host_desc_size);
++	ring_size_type_val |= FIELD_PREP(MLXBF_PKA_RING_NUM_CMD_DESC_MASK, ring->num_cmd_desc - 1);
 +
-+	if (ret)
-+		goto exit;
-+
-+	if (memcmp(poker_cnt, poker_test_exp_cnt, sizeof(poker_test_exp_cnt))) {
-+		dev_dbg(dev, "invalid poker counters!\n");
-+		ret = -EIO;
-+		goto exit;
-+	}
-+
-+	if (monobit_cnt != MLXBF_PKA_TRNG_MONOBITCNT_SUM) {
-+		dev_dbg(dev, "invalid sum of squares!\n");
-+		ret = -EIO;
-+		goto exit;
-+	}
-+
-+exit:
-+	mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
-+	return ret;
-+}
-+
-+static int mlxbf_pka_dev_trng_test_known_answer_poker_fail(struct device *dev,
-+							   void __iomem *csr_reg_ptr,
-+							   u64 csr_reg_base)
-+{
-+	u64 monobit_fail_cnt = 0;
-+	u64 poker_fail_cnt = 0;
-+	u64 run_fail_cnt = 0;
-+
-+	dev_dbg(dev, "run known-answer test circuits (poker fail)\n");
-+
-+	mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
-+				       MLXBF_PKA_TRNG_TEST_KNOWN_NOISE);
-+
-+	/*
-+	 * Ignore the return value here as it is expected that poker test
-+	 * should fail. Check failure counts thereafter to assert only poker
-+	 * test has failed.
-+	 */
-+	mlxbf_pka_dev_trng_test_circuits(dev,
-+					 csr_reg_ptr,
-+					 csr_reg_base,
-+					 MLXBF_PKA_TRNG_TEST_DATAL_POKER,
-+					 MLXBF_PKA_TRNG_TEST_DATAH_POKER,
-+					 MLXBF_PKA_TRNG_TEST_COUNT_POKER,
-+					 MLXBF_PKA_TRNG_TEST_HALF_NO,
-+					 &monobit_fail_cnt,
-+					 &run_fail_cnt,
-+					 &poker_fail_cnt);
-+
-+	dev_dbg(dev, "monobit_fail_cnt : 0x%llx\n", monobit_fail_cnt);
-+	dev_dbg(dev, "poker_fail_cnt   : 0x%llx\n", poker_fail_cnt);
-+	dev_dbg(dev, "run_fail_cnt     : 0x%llx\n", run_fail_cnt);
-+
-+	mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
-+
-+	return poker_fail_cnt && !run_fail_cnt && !monobit_fail_cnt ? 0 : -EIO;
-+}
-+
-+static int mlxbf_pka_dev_trng_test_unknown_answer(struct device *dev,
-+						  void __iomem *csr_reg_ptr,
-+						  u64 csr_reg_base)
-+{
-+	u64 datal = 0, datah = 0, csr_reg_off;
-+	int ret = 0, test_idx;
-+
-+	dev_dbg(dev, "run unknown-answer self test\n");
-+
-+	/* First reset, the RAW registers. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_RAW_L_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_RAW_H_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	/*
-+	 * There is a small probability for this test to fail. So run the test
-+	 * 10 times, if it succeeds once then assume that the test passed.
-+	 */
-+	for (test_idx = 0; test_idx < 10; test_idx++) {
-+		mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
-+					       MLXBF_PKA_TRNG_TEST_NOISE);
-+
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_RAW_L_ADDR);
-+		datal = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_RAW_H_ADDR);
-+		datah = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+		dev_dbg(dev, "datal=0x%llx\n", datal);
-+		dev_dbg(dev, "datah=0x%llx\n", datah);
-+
-+		mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
-+
-+		if (!datah && !datal)
-+			ret = -EIO;
-+		else
-+			return 0;
-+	}
-+	return ret;
-+}
-+
-+/* Test TRNG. */
-+static int mlxbf_pka_dev_test_trng(struct device *dev, void __iomem *csr_reg_ptr, u64 csr_reg_base)
-+{
-+	int ret;
-+
-+	ret = mlxbf_pka_dev_trng_test_known_answer_basic(dev, csr_reg_ptr, csr_reg_base);
-+	if (ret)
++	/* Write ring information status/control words in the PKA Buffer RAM. */
++	ret = mlxbf_pka_dev_write_ring_info(dev,
++					    &ring->shim->resources.buffer_ram,
++					    ring->ring_id % MLXBF_PKA_MAX_NUM_IO_BLOCK_RINGS,
++					    ring_cmd_base_val,
++					    ring_rslt_base_val,
++					    ring_size_type_val);
++	if (ret) {
++		dev_err(dev, "failed to write ring information\n");
 +		return ret;
++	}
 +
-+	ret = mlxbf_pka_dev_trng_test_known_answer_poker_fail(dev, csr_reg_ptr, csr_reg_base);
-+	if (ret)
-+		return ret;
-+
-+	ret = mlxbf_pka_dev_trng_test_unknown_answer(dev, csr_reg_ptr, csr_reg_base);
-+	if (ret)
-+		return ret;
++	ring->status = MLXBF_PKA_DEV_RING_STATUS_READY;
 +
 +	return ret;
 +}
 +
-+static void mlxbf_pka_dev_trng_write_ps_ai_str(void __iomem *csr_reg_ptr,
-+					       u64 csr_reg_base,
-+					       u32 input_str[])
++/* Configure ring options. */
++int mlxbf_pka_dev_config_ring_options(struct device *dev,
++				      struct mlxbf_pka_dev_res_t *buffer_ram_ptr,
++				      u32 rings_num,
++				      u8 ring_priority)
 +{
-+	u64 csr_reg_off;
-+	u8 i;
++	u64 control_word;
++	u64 word_off;
 +
-+	for (i = 0; i < MLXBF_PKA_TRNG_PS_AI_REG_COUNT; i++) {
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_PS_AI_0_ADDR + i *
-+								MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET);
-+
-+		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, input_str[i]);
-+	}
-+}
-+
-+static void mlxbf_pka_dev_trng_drbg_generate(void __iomem *csr_reg_ptr, u64 csr_reg_base)
-+{
-+	u64 csr_reg_off;
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_REQ_DATA);
-+}
-+
-+static int mlxbf_pka_dev_test_trng_drbg(struct device *dev,
-+					void __iomem *csr_reg_ptr,
-+					u64 csr_reg_base)
-+{
-+	u64 csr_reg_off, csr_reg_val;
-+	u8 i;
-+
-+	/* Make sure the engine is idle. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	/* Enable DRBG, TRNG need not be enabled for this test. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG_ENABLE);
-+
-+	/* Set 'test_sp_800_90' bit in the TRNG_TEST register. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_TEST_DRBG);
-+
-+	/* Wait for 'test_ready' bit to be set. */
-+	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
-+		return -ETIMEDOUT;
-+
-+	/* 'Instantiate' function. */
-+	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
-+					   csr_reg_base,
-+					   mlxbf_pka_trng_drbg_test_ps_str);
-+	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
-+		return -ETIMEDOUT;
-+
-+	/* 'Generate' function. */
-+	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
-+					   csr_reg_base,
-+					   mlxbf_pka_trng_drbg_test_etpy_str1);
-+	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
-+		return -ETIMEDOUT;
-+
-+	/*
-+	 * A standard NIST SP 800-90A DRBG known-answer test discards the
-+	 * result of the first 'Generate' function and only checks the result
-+	 * of the second 'Generate' function. Hence 'Generate' is performed
-+	 * again.
-+	 */
-+
-+	/* 'Generate' function. */
-+	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
-+					   csr_reg_base,
-+					   mlxbf_pka_trng_drbg_test_etpy_str2);
-+	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
-+		return -ETIMEDOUT;
-+
-+	/* Check output registers. */
-+	for (i = 0; i < MLXBF_PKA_TRNG_OUTPUT_CNT; i++) {
-+		csr_reg_off =
-+		mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+						  MLXBF_PKA_TRNG_OUTPUT_0_ADDR +
-+						  (i * MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET));
-+
-+		csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+		if ((u32)csr_reg_val != mlxbf_pka_trng_drbg_test_output[i]) {
-+			dev_dbg(dev, "DRBG known answer test failed: output register:%d, 0x%x\n",
-+				i, (u32)csr_reg_val);
-+			return -EIO;
-+		}
-+	}
-+
-+	/* Clear 'test_sp_800_90' bit in the TRNG_TEST register. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	return 0;
-+}
-+
-+static bool mlxbf_pka_dev_trng_shutdown_oflo(struct mlxbf_pka_dev_res_t *trng_csr_ptr,
-+					     u64 *err_cycle)
-+{
-+	u64 curr_cycle_cnt, fro_stopped_mask, fro_enabled_mask;
-+	u64 csr_reg_base, csr_reg_off, csr_reg_value;
-+	void __iomem *csr_reg_ptr;
-+
-+	csr_reg_base = trng_csr_ptr->base;
-+	csr_reg_ptr = trng_csr_ptr->ioaddr;
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
-+	csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+	if (csr_reg_value & MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO) {
-+		curr_cycle_cnt = get_cycles();
-+		/*
-+		 * See if any FROs were shut down. If they were, toggle bits in
-+		 * the FRO detune register and reenable the FROs.
-+		 */
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
-+		fro_stopped_mask = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+		if (fro_stopped_mask) {
-+			csr_reg_off =
-+			mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							  MLXBF_PKA_TRNG_FROENABLE_ADDR);
-+			fro_enabled_mask = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+			csr_reg_off =
-+			mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							  MLXBF_PKA_TRNG_FRODETUNE_ADDR);
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, fro_stopped_mask);
-+
-+			csr_reg_off =
-+			mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							  MLXBF_PKA_TRNG_FROENABLE_ADDR);
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+					       fro_stopped_mask | fro_enabled_mask);
-+		}
-+
-+		/* Reset the error. */
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_ALARMMASK_ADDR);
-+		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
-+		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+								MLXBF_PKA_TRNG_INTACK_ADDR);
-+		mlxbf_pka_dev_io_write(csr_reg_ptr,
-+				       csr_reg_off,
-+				       MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO);
-+
-+		/*
-+		 * If this error occurs again within about a second, the hardware
-+		 * is malfunctioning. Disable the trng and return an error.
-+		 */
-+		if (*err_cycle &&
-+		    (curr_cycle_cnt - *err_cycle < MLXBF_PKA_TRNG_TEST_ERR_CYCLE_MAX)) {
-+			csr_reg_off =
-+			mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							  MLXBF_PKA_TRNG_CONTROL_ADDR);
-+			csr_reg_value  = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+			csr_reg_value &= ~MLXBF_PKA_TRNG_CONTROL;
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, csr_reg_value);
-+			return false;
-+		}
-+
-+		*err_cycle = curr_cycle_cnt;
-+	}
-+
-+	return true;
-+}
-+
-+static int mlxbf_pka_dev_trng_drbg_reseed(struct device *dev,
-+					  void __iomem *csr_reg_ptr,
-+					  u64 csr_reg_base)
-+{
-+	u64 csr_reg_off;
-+
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG_RESEED);
-+
-+	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
-+		return -ETIMEDOUT;
-+
-+	/* Write personalization string. */
-+	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr, csr_reg_base, mlxbf_pka_trng_drbg_ps_str);
-+
-+	return 0;
-+}
-+
-+/* Configure the TRNG. */
-+int mlxbf_pka_dev_config_trng_drbg(struct device *dev,
-+				   struct mlxbf_pka_dev_res_t *aic_csr_ptr,
-+				   struct mlxbf_pka_dev_res_t *trng_csr_ptr)
-+{
-+	u64 csr_reg_base, csr_reg_off;
-+	void __iomem *csr_reg_ptr;
-+	int ret;
-+
-+	if (trng_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
-+	    trng_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
++	if (buffer_ram_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
++	    buffer_ram_ptr->type != MLXBF_PKA_DEV_RES_TYPE_MEM)
 +		return -EPERM;
 +
-+	dev_dbg(dev, "starting up the TRNG\n");
++	if (rings_num > MLXBF_PKA_MAX_NUM_RINGS || rings_num < 1) {
++		dev_err(dev, "invalid rings number\n");
++		return -EINVAL;
++	}
 +
-+	ret = mlxbf_pka_dev_config_trng_clk(dev, aic_csr_ptr);
-+	if (ret)
-+		return ret;
-+
-+	csr_reg_base = trng_csr_ptr->base;
-+	csr_reg_ptr = trng_csr_ptr->ioaddr;
++	dev_dbg(dev, "configure PKA ring options control word\n");
 +
 +	/*
-+	 * Perform NIST known-answer tests on the complete SP 800-90A DRBG
-+	 * without BC_DF functionality.
++	 * Write MLXBF_PKA_RING_OPTIONS control word located in the
++	 * MLXBF_PKA_BUFFER_RAM. The value of this word is determined by the
++	 * PKA I/O block (Shim). Set the number of implemented command/result
++	 * ring pairs that is available in this EIP-154, encoded as binary
++	 * value, which is 4.
 +	 */
-+	ret = mlxbf_pka_dev_test_trng_drbg(dev, csr_reg_ptr, csr_reg_base);
-+	if (ret)
-+		return ret;
-+
-+	/* Starting up the TRNG with a DRBG. */
-+
-+	/* Make sure the engine is idle. */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	/* Disable all FROs initially. */
-+	csr_reg_off =
-+	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FROENABLE_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+	csr_reg_off =
-+	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FRODETUNE_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	/*
-+	 * Write all configuration values in the TRNG_CONFIG and TRNG_ALARMCNT,
-+	 * write zeroes to the TRNG_ALARMMASK and TRNG_ALARMSTOP registers.
-+	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONFIG_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONFIG);
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_ALARMCNT);
-+
-+	csr_reg_off =
-+	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMMASK_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+	csr_reg_off =
-+	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
-+
-+	/*
-+	 * Enable all FROs in the TRNG_FROENABLE register. Note that this can
-+	 * only be done after clearing the TRNG_ALARMSTOP register.
-+	 */
-+	csr_reg_off =
-+	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FROENABLE_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_FROENABLE);
-+
-+	/*
-+	 * Optionally, write 'Personalization string' of up to 384 bits in
-+	 * TRNG_PS_AI_xxx registers.
-+	 * The contents of these registers will be XOR-ed into the output of the
-+	 * SHA-256 'Conditioning Function' to be used as seed value for the
-+	 * actual DRBG.
-+	 */
-+	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr, csr_reg_base, mlxbf_pka_trng_drbg_ps_str);
-+
-+	/*
-+	 * Run TRNG tests after configuring TRNG.
-+	 * NOTE: TRNG need not be enabled to carry out these tests.
-+	 */
-+	ret = mlxbf_pka_dev_test_trng(dev, csr_reg_ptr, csr_reg_base);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Start the actual engine by setting the 'enable_trng' and 'drbg_en'
-+	 * bit in the TRNG_CONTROL register (also a nice point to set the
-+	 * interrupt mask bits).
-+	 */
-+	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
-+	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG);
-+
-+	/*
-+	 * The engine is now ready to handle the first 'Generate' request using
-+	 * the 'request_data' bit of the TRNG_CONTROL register. The first output
-+	 * for these requests will take a while, as Noise Source and
-+	 * Conditioning Function must first generate seed entropy for the DRBG.
-+	 *
-+	 * Optionally, when buffer RAM is configured: Set a data available
-+	 * interrupt threshold using the 'load_thresh' and 'blocks_thresh'
-+	 * fields of the TRNG_INTACK register. This allows delaying the data
-+	 * available interrupt until the indicated number of 128-bit words a
-+	 * available in the buffer RAM.
-+	 *
-+	 * Start the actual 'Generate' operation using the 'request_data' and
-+	 * 'data_blocks' fields of the TRNG_CONTROL register.
-+	 */
-+	mlxbf_pka_dev_trng_drbg_generate(csr_reg_ptr, csr_reg_base);
-+
-+	/* Delay 200 ms. */
-+	mdelay(200);
++	control_word = FIELD_PREP(MLXBF_PKA_RING_OPTIONS_RING_PRIORITY_MASK, ring_priority) |
++		       FIELD_PREP(MLXBF_PKA_RING_OPTIONS_RING_NUM_MASK, (rings_num - 1)) |
++		       FIELD_PREP(MLXBF_PKA_RING_OPTIONS_SIGNATURE_BYTE_MASK,
++				  MLXBF_PKA_RING_OPTIONS_SIGNATURE_BYTE);
++	word_off = mlxbf_pka_dev_get_word_offset(buffer_ram_ptr->base,
++						 MLXBF_PKA_RING_OPTIONS_ADDR,
++						 MLXBF_PKA_BUFFER_RAM_SIZE);
++	mlxbf_pka_dev_io_write(buffer_ram_ptr->ioaddr, word_off, control_word);
 +
 +	return 0;
 +}
 +
-+/* Read from DRBG enabled TRNG. */
-+int mlxbf_pka_dev_trng_read(struct device *dev,
-+			    struct mlxbf_pka_dev_shim_s *shim,
-+			    u32 *data, u32 cnt)
++/* Return the ring associated with the given identifier. */
++struct mlxbf_pka_dev_ring_t *mlxbf_pka_dev_get_ring(u32 ring_id)
 +{
-+	u64 csr_reg_base, csr_reg_off, csr_reg_value, timer;
-+	struct mlxbf_pka_dev_res_t *trng_csr_ptr;
-+	u8 output_idx, trng_ready = 0;
-+	u32 data_idx, word_cnt;
-+	void __iomem *csr_reg_ptr;
-+	int ret = 0;
-+
-+	if (!shim || !data || (cnt % MLXBF_PKA_TRNG_OUTPUT_CNT != 0))
-+		return -EINVAL;
-+
-+	if (!cnt)
-+		return ret;
-+
-+	guard(mutex)(&shim->mutex);
-+
-+	trng_csr_ptr = &shim->resources.trng_csr;
-+
-+	if (trng_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
-+	    trng_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
-+		return -EPERM;
-+
-+	csr_reg_base = trng_csr_ptr->base;
-+	csr_reg_ptr = trng_csr_ptr->ioaddr;
-+
-+	if (!mlxbf_pka_dev_trng_shutdown_oflo(trng_csr_ptr, &shim->trng_err_cycle))
-+		return -EWOULDBLOCK;
-+
-+	word_cnt = cnt >> ilog2(sizeof(u32));
-+
-+	for (data_idx = 0; data_idx < word_cnt; data_idx++) {
-+		output_idx = data_idx % MLXBF_PKA_TRNG_OUTPUT_CNT;
-+
-+		/* Tell the hardware to advance. */
-+		if (!output_idx) {
-+			csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+									MLXBF_PKA_TRNG_INTACK_ADDR);
-+			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
-+					       MLXBF_PKA_TRNG_STATUS_READY);
-+			trng_ready = 0;
-+
-+			/*
-+			 * Check if 'data_blocks' field is zero in TRNG_CONTROL
-+			 * register. If it is zero, need to issue a 'Reseed and
-+			 * Generate' request for DRBG enabled TRNG.
-+			 */
-+			csr_reg_off =
-+			mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+							  MLXBF_PKA_TRNG_CONTROL_ADDR);
-+			csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+
-+			if (!((u32)csr_reg_value & MLXBF_PKA_TRNG_DRBG_DATA_BLOCK_MASK)) {
-+				/* Issue reseed. */
-+				ret = mlxbf_pka_dev_trng_drbg_reseed(dev,
-+								     csr_reg_ptr,
-+								     csr_reg_base);
-+				if (ret)
-+					return -EBUSY;
-+
-+				/* Issue generate request. */
-+				mlxbf_pka_dev_trng_drbg_generate(csr_reg_ptr, csr_reg_base);
-+			}
-+		}
-+
-+		/*
-+		 * Wait until a data word is available in the TRNG_OUTPUT_X
-+		 * registers, using the interrupt and/or 'ready' status bit
-+		 * in the TRNG_STATUS register. The only way this would hang
-+		 * is if the TRNG is never initialized. This function cannot
-+		 * be called if that happened.
-+		 */
-+		timer = mlxbf_pka_dev_timer_start_msec(1000);
-+		csr_reg_off =
-+		mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
-+		while (!trng_ready) {
-+			csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+			trng_ready = csr_reg_value & MLXBF_PKA_TRNG_STATUS_READY;
-+
-+			if (mlxbf_pka_dev_timer_done(timer)) {
-+				dev_dbg(dev, "shim %u got error obtaining random number\n",
-+					shim->shim_id);
-+				return -EBUSY;
-+			}
-+		}
-+
-+		/* Read the registers. */
-+		csr_reg_off =
-+		mlxbf_pka_dev_get_register_offset(csr_reg_base,
-+						  MLXBF_PKA_TRNG_OUTPUT_0_ADDR +
-+						  (output_idx * MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET));
-+		csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
-+		data[data_idx] = (u32)csr_reg_value;
-+	}
-+
-+	return ret;
++	return mlxbf_pka_gbl_config.dev_rings[ring_id];
 +}
 +
-+bool mlxbf_pka_dev_has_trng(struct mlxbf_pka_dev_shim_s *shim)
++int mlxbf_pka_dev_register_ring(struct device *dev,
++				u32 ring_id,
++				u32 shim_id,
++				struct mlxbf_pka_dev_ring_t **ring)
 +{
++	struct mlxbf_pka_dev_ring_t *ring_ptr;
++	struct mlxbf_pka_dev_shim_s *shim;
++	int ret;
++
++	if (!ring)
++		return -EINVAL;
++
++	shim = mlxbf_pka_dev_get_shim(shim_id);
 +	if (!shim)
-+		return false;
++		return -ENODEV;
 +
-+	return shim->trng_enabled == MLXBF_PKA_SHIM_TRNG_ENABLED;
++	ring_ptr = devm_kzalloc(dev, sizeof(*ring_ptr), GFP_KERNEL);
++	if (!ring_ptr)
++		return -ENOMEM;
++
++	ring_ptr->status = MLXBF_PKA_DEV_RING_STATUS_UNDEFINED;
++
++	/* Initialize ring. */
++	ret = mlxbf_pka_dev_init_ring(dev, ring_ptr, ring_id, shim);
++	if (ret) {
++		dev_err(dev, "failed to initialize ring %d\n", ring_id);
++		mlxbf_pka_dev_release_ring(dev, ring_ptr);
++		return ret;
++	}
++
++	mlxbf_pka_gbl_config.dev_rings[ring_ptr->ring_id] = ring_ptr;
++	mlxbf_pka_gbl_config.dev_rings_cnt += 1;
++
++	*ring = ring_ptr;
++	return 0;
 +}
-diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
++
++int mlxbf_pka_dev_unregister_ring(struct device *dev, struct mlxbf_pka_dev_ring_t *ring)
++{
++	if (!ring)
++		return -EINVAL;
++
++	mlxbf_pka_gbl_config.dev_rings[ring->ring_id] = NULL;
++	mlxbf_pka_gbl_config.dev_rings_cnt -= 1;
++
++	/* Release ring. */
++	return mlxbf_pka_dev_release_ring(dev, ring);
++}
++
++/* Syscall to open ring. */
++static int __mlxbf_pka_dev_open_ring(struct device *dev, u32 ring_id)
++{
++	struct mlxbf_pka_dev_shim_s *shim;
++	struct mlxbf_pka_dev_ring_t *ring;
++	int ret;
++
++	if (!mlxbf_pka_gbl_config.dev_rings_cnt)
++		return -EPERM;
++
++	ring = mlxbf_pka_dev_get_ring(ring_id);
++	if (!ring || !ring->shim)
++		return -ENXIO;
++
++	shim = ring->shim;
++
++	guard(mutex)(&ring->mutex);
++
++	if (shim->status == MLXBF_PKA_SHIM_STATUS_UNDEFINED ||
++	    shim->status == MLXBF_PKA_SHIM_STATUS_CREATED ||
++	    shim->status == MLXBF_PKA_SHIM_STATUS_FINALIZED)
++		return -EPERM;
++
++	if (ring->status == MLXBF_PKA_DEV_RING_STATUS_BUSY)
++		return -EBUSY;
++
++	if (ring->status != MLXBF_PKA_DEV_RING_STATUS_INITIALIZED)
++		return -EPERM;
++
++	/* Set ring information words. */
++	ret = mlxbf_pka_dev_set_ring_info(dev, ring);
++	if (ret) {
++		dev_err(dev, "failed to set ring information\n");
++		return -EWOULDBLOCK;
++	}
++
++	if (!shim->busy_ring_num)
++		shim->status = MLXBF_PKA_SHIM_STATUS_RUNNING;
++
++	ring->status = MLXBF_PKA_DEV_RING_STATUS_BUSY;
++	shim->busy_ring_num += 1;
++
++	return ret;
++}
++
++/* Open ring. */
++int mlxbf_pka_dev_open_ring(struct device *dev, struct mlxbf_pka_ring_info_t *ring_info)
++{
++	return __mlxbf_pka_dev_open_ring(dev, ring_info->ring_id);
++}
++
++/* Syscall to close ring. */
++static int __mlxbf_pka_dev_close_ring(u32 ring_id)
++{
++	struct mlxbf_pka_dev_shim_s *shim;
++	struct mlxbf_pka_dev_ring_t *ring;
++
++	if (!mlxbf_pka_gbl_config.dev_rings_cnt)
++		return -EPERM;
++
++	ring = mlxbf_pka_dev_get_ring(ring_id);
++	if (!ring || !ring->shim)
++		return -ENXIO;
++
++	shim = ring->shim;
++
++	guard(mutex)(&ring->mutex);
++
++	if (shim->status != MLXBF_PKA_SHIM_STATUS_RUNNING &&
++	    ring->status != MLXBF_PKA_DEV_RING_STATUS_BUSY)
++		return -EPERM;
++
++	ring->status = MLXBF_PKA_DEV_RING_STATUS_INITIALIZED;
++	shim->busy_ring_num -= 1;
++
++	if (!shim->busy_ring_num)
++		shim->status = MLXBF_PKA_SHIM_STATUS_STOPPED;
++
++	return 0;
++}
++
++/* Close ring. */
++int mlxbf_pka_dev_close_ring(struct mlxbf_pka_ring_info_t *ring_info)
++{
++	if (ring_info)
++		return __mlxbf_pka_dev_close_ring(ring_info->ring_id);
++
++	return 0;
++}
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.h
 new file mode 100644
-index 000000000000..97ed6045781e
+index 000000000000..f5be406656c0
 --- /dev/null
-+++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
-@@ -0,0 +1,152 @@
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_ring.h
+@@ -0,0 +1,255 @@
 +/* SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause */
 +/* SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved. */
 +
-+#ifndef __MLXBF_PKA_TRNG_H__
-+#define __MLXBF_PKA_TRNG_H__
++#ifndef __MLXBF_PKA_RING_H__
++#define __MLXBF_PKA_RING_H__
 +
-+/*
-+ * The True Random Number Generator CSR addresses/offsets. These are accessed
-+ * from the ARM as 8 byte reads/writes. However only the bottom 32 bits are
-+ * implemented.
-+ */
-+#define MLXBF_PKA_TRNG_OUTPUT_0_ADDR	0x12000
-+#define MLXBF_PKA_TRNG_STATUS_ADDR	0x12020
-+#define MLXBF_PKA_TRNG_INTACK_ADDR	MLXBF_PKA_TRNG_STATUS_ADDR
-+#define MLXBF_PKA_TRNG_CONTROL_ADDR	0x12028
-+#define MLXBF_PKA_TRNG_CONFIG_ADDR	0x12030
-+#define MLXBF_PKA_TRNG_ALARMCNT_ADDR	0x12038
-+#define MLXBF_PKA_TRNG_FROENABLE_ADDR	0x12040
-+#define MLXBF_PKA_TRNG_FRODETUNE_ADDR	0x12048
-+#define MLXBF_PKA_TRNG_ALARMMASK_ADDR	0x12050
-+#define MLXBF_PKA_TRNG_ALARMSTOP_ADDR	0x12058
-+#define MLXBF_PKA_TRNG_TEST_ADDR	0x120E0
-+#define MLXBF_PKA_TRNG_RAW_L_ADDR	0x12060
-+#define MLXBF_PKA_TRNG_RAW_H_ADDR	0x12068
-+#define MLXBF_PKA_TRNG_MONOBITCNT_ADDR	0x120B8
-+#define MLXBF_PKA_TRNG_POKER_3_0_ADDR	0x120C0
-+#define MLXBF_PKA_TRNG_PS_AI_0_ADDR	0x12080
++/* PKA ring device related definitions. */
++#define CMD_DESC_SIZE 64
 +
-+/*
-+ * 'trng_clk_on' mask for PKA Clock Switch Forcing Register. Turn on the TRNG
-+ * clock. When the TRNG is controlled via the host slave interface, this engine
-+ * needs to be turned on by setting bit 11.
-+ */
-+#define MLXBF_PKA_CLK_FORCE_TRNG_ON BIT(11)
-+
-+/* Number of TRNG output registers. */
-+#define MLXBF_PKA_TRNG_OUTPUT_CNT 4
-+
-+/* Number of TRNG poker test counts. */
-+#define MLXBF_PKA_TRNG_POKER_TEST_CNT 4
-+
-+/* TRNG configuration. */
-+#define MLXBF_PKA_TRNG_CONFIG  0x00020008
-+/* TRNG Alarm Counter Register value. */
-+#define MLXBF_PKA_TRNG_ALARMCNT 0x000200ff
-+/* TRNG FRO Enable Register value. */
-+#define MLXBF_PKA_TRNG_FROENABLE 0x00ffffff
-+/*
-+ * TRNG Control Register value. Set bit 10 to start the EIP-76 (i.e. TRNG
-+ * engine), gathering entropy from the Free Running Oscillators (FROs).
-+ */
-+#define MLXBF_PKA_TRNG_CONTROL 0x00000400
-+
-+/* TRNG Control bit. */
-+#define MLXBF_PKA_TRNG_CONTROL_TEST_MODE BIT(8)
-+
-+/*
-+ * TRNG Control Register value. Set bit 10 and 12 to start the EIP-76 (i.e.
-+ * TRNG engine) with DRBG enabled, gathering entropy from the FROs.
-+ */
-+#define MLXBF_PKA_TRNG_CONTROL_DRBG 0x00001400
-+
-+/*
-+ * DRBG enabled TRNG 'request_data' value. REQ_DATA (in accordance with
-+ * DATA_BLOCK_MASK) requests 256 blocks of 128-bit random output. 4095 blocks
-+ * is the maximum number that can be requested for the TRNG (with DRBG)
-+ * configuration on Bluefield platforms.
-+ */
-+#define MLXBF_PKA_TRNG_CONTROL_REQ_DATA 0x10010000
-+
-+/* Mask for 'Data Block' in TRNG Control Register. */
-+#define MLXBF_PKA_TRNG_DRBG_DATA_BLOCK_MASK GENMASK(31, 20)
-+
-+/* Set bit 12 of TRNG Control Register to enable DRBG functionality. */
-+#define MLXBF_PKA_TRNG_CONTROL_DRBG_ENABLE BIT(12)
-+
-+/* Set bit 7 (i.e. 'test_sp_800_90 DRBG' bit) in the TRNG Test Register. */
-+#define MLXBF_PKA_TRNG_TEST_DRBG BIT(7)
-+
-+/* Number of Personalization String/Additional Input Registers. */
-+#define MLXBF_PKA_TRNG_PS_AI_REG_COUNT 12
-+
-+/* Offset bytes of Personalization String/Additional Input Registers. */
-+#define MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET 0x8
-+
-+/* Maximum TRNG test error cycle, about one second. */
-+#define MLXBF_PKA_TRNG_TEST_ERR_CYCLE_MAX (1000 * 1000 * 1000)
-+
-+/* DRBG Reseed enable. */
-+#define MLXBF_PKA_TRNG_CONTROL_DRBG_RESEED BIT(15)
-+
-+/* TRNG Status bits. */
-+#define MLXBF_PKA_TRNG_STATUS_READY		BIT(0)
-+#define MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO	BIT(1)
-+#define MLXBF_PKA_TRNG_STATUS_TEST_READY	BIT(8)
-+#define MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL	BIT(7)
-+#define MLXBF_PKA_TRNG_STATUS_RUN_FAIL		BIT(4)
-+#define MLXBF_PKA_TRNG_STATUS_POKER_FAIL	BIT(6)
-+
-+#define MLXBF_PKA_TRNG_STATUS_FAIL_MODES (MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL | \
-+					 MLXBF_PKA_TRNG_STATUS_RUN_FAIL | \
-+					 MLXBF_PKA_TRNG_STATUS_POKER_FAIL)
-+
-+/* TRNG Alarm Counter bits. */
-+#define MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER BIT(15)
-+
-+/* TRNG Test bits. */
-+#define MLXBF_PKA_TRNG_TEST_KNOWN_NOISE	BIT(5)
-+#define MLXBF_PKA_TRNG_TEST_NOISE	BIT(13)
-+
-+/* TRNG Test constants*/
-+#define MLXBF_PKA_TRNG_MONOBITCNT_SUM	9978
-+
-+#define MLXBF_PKA_TRNG_TEST_HALF_ADD	1
-+#define MLXBF_PKA_TRNG_TEST_HALF_NO	0
-+
-+#define MLXBF_PKA_TRNG_TEST_DATAL_BASIC_1	0x11111333
-+#define MLXBF_PKA_TRNG_TEST_DATAH_BASIC_1	0x3555779f
-+#define MLXBF_PKA_TRNG_TEST_COUNT_BASIC_1	11
-+
-+#define MLXBF_PKA_TRNG_TEST_DATAL_BASIC_2	0x01234567
-+#define MLXBF_PKA_TRNG_TEST_DATAH_BASIC_2	0x89abcdef
-+#define MLXBF_PKA_TRNG_TEST_COUNT_BASIC_2	302
-+
-+#define MLXBF_PKA_TRNG_TEST_DATAL_POKER		0xffffffff
-+#define MLXBF_PKA_TRNG_TEST_DATAH_POKER		0xffffffff
-+#define MLXBF_PKA_TRNG_TEST_COUNT_POKER		11
-+
-+#define MLXBF_PKA_TRNG_NUM_OF_FOUR_WORD		128
-+
-+/* Defines for mlxbf_pka_dev_shim->trng_enabled. */
-+#define MLXBF_PKA_SHIM_TRNG_ENABLED	1
-+#define MLXBF_PKA_SHIM_TRNG_DISABLED	0
-+
-+/* Configure the TRNG. */
-+int mlxbf_pka_dev_config_trng_drbg(struct device *dev,
-+				   struct mlxbf_pka_dev_res_t *aic_csr_ptr,
-+				   struct mlxbf_pka_dev_res_t *trng_csr_ptr);
-+
-+/*
-+ * Read data from the TRNG. Drivers can fill up to 'cnt' bytes of data into the
-+ * buffer 'data'. The buffer 'data' is aligned for any type and 'cnt' is a
-+ * multiple of 4.
-+ */
-+int mlxbf_pka_dev_trng_read(struct device *dev,
-+			    struct mlxbf_pka_dev_shim_s *shim,
-+			    u32 *data, u32 cnt);
-+
-+/* Return true if the TRNG engine is enabled, false if not. */
-+bool mlxbf_pka_dev_has_trng(struct mlxbf_pka_dev_shim_s *shim);
-+
-+#endif /* __MLXBF_PKA_TRNG_H__ */
-diff --git a/include/uapi/linux/mlxbf-pka.h b/include/uapi/linux/mlxbf-pka.h
-index 9da6c1e5044b..2f2b11c2dacd 100644
---- a/include/uapi/linux/mlxbf-pka.h
-+++ b/include/uapi/linux/mlxbf-pka.h
-@@ -90,4 +90,23 @@ struct mlxbf_pka_dev_hw_ring_info {
-  */
- #define MLXBF_PKA_CLEAR_RING_COUNTERS _IO(MLXBF_PKA_IOC_TYPE, 0x2)
- 
 +/**
-+ * struct mlxbf_pka_dev_trng_info - TRNG information
-+ * @count: Number of random bytes in the buffer or length of the buffer
-+ * @data: Data buffer to hold the random bytes
++ * struct mlxbf_pka_ring_desc_t - PKA command/result ring descriptor
++ * @num_descs: Total number of descriptors in the ring
++ * @cmd_ring_base: Base address of the command ring
++ * @cmd_idx: Index of the command in a ring
++ * @rslt_ring_base: Base address of the result ring
++ * @rslt_idx: Index of the result in a ring
++ * @operands_base: Operands memory base address
++ * @operands_end: End address of operands memory
++ * @desc_size: Size of each element in the ring
++ * @cmd_desc_mask: Bitmask of free(0)/in_use(1) cmd descriptors
++ * @cmd_desc_cnt: Number of command descriptors currently in use
++ * @rslt_desc_cnt: Number of result descriptors currently ready
 + *
-+ * MLXBF_PKA_GET_RANDOM_BYTES:
-+ * _IOWR(MLXBF_PKA_IOC_TYPE, 0x3, mlxbf_pka_dev_trng_info).
++ * Describes the PKA command/result ring as used by the hardware. A pair of
++ * command and result rings in PKA window memory, and the data memory used by
++ * the commands.
++ */
++struct mlxbf_pka_ring_desc_t {
++	u32 num_descs;
++	u32 cmd_ring_base;
++	u32 cmd_idx;
++	u32 rslt_ring_base;
++	u32 rslt_idx;
++	u32 operands_base;
++	u32 operands_end;
++	u32 desc_size;
++	u64 cmd_desc_mask;
++	u32 cmd_desc_cnt;
++	u32 rslt_desc_cnt;
++};
++
++/**
++ * struct mlxbf_pka_ring_info_t - Ring parameters for user interface
++ * @fd: File descriptor
++ * @group: Iommu group
++ * @container: VFIO container
++ * @idx: Ring index
++ * @ring_id: Hardware ring identifier
++ * @mem_off: Offset specific to window RAM region
++ * @mem_addr: Window RAM region address
++ * @mem_size: Window RAM region size
++ * @reg_off: Offset specific to count registers region
++ * @reg_addr: Count registers region address
++ * @reg_size: Count registers region size
++ * @mem_ptr: Pointer to mapped memory region
++ * @reg_ptr: Pointer to mapped counters region
++ * @ring_desc: Ring descriptor
++ * @big_endian: Big endian byte order when enabled
 + *
-+ * Get random bytes from True Random Number Generator(TRNG).
++ * This structure declares ring parameters which can be used by user interface.
++ */
++struct mlxbf_pka_ring_info_t {
++	int fd;
++	int group;
++	int container;
++	u32 idx;
++	u32 ring_id;
++	u64 mem_off;
++	u64 mem_addr;
++	u64 mem_size;
++	u64 reg_off;
++	u64 reg_addr;
++	u64 reg_size;
++	void *mem_ptr;
++	void *reg_ptr;
++	struct mlxbf_pka_ring_desc_t ring_desc;
++	u8 big_endian;
++};
++
++/* ring_info related definitions. */
++#define MLXBF_PKA_RING_INFO_IN_ORDER_MASK      GENMASK(31, 31)
++#define MLXBF_PKA_RING_INFO_HOST_DESC_SIZE_MASK	GENMASK(27, 18)
++#define MLXBF_PKA_RING_NUM_CMD_DESC_MASK	GENMASK(15, 0)
++
++/* Ring option related definitions. */
++#define MLXBF_PKA_RING_OPTIONS_RING_PRIORITY_MASK      GENMASK(7, 0)
++#define MLXBF_PKA_RING_OPTIONS_RING_NUM_MASK	   GENMASK(15, 8)
++#define MLXBF_PKA_RING_OPTIONS_SIGNATURE_BYTE_MASK     GENMASK(31, 24)
++
++/*
++ * Ring CSRs: these are all accessed from the ARM using 8 byte reads/writes.
++ * However only the bottom 32 bits are implemented.
++ */
++/* Ring 0 CSRS. */
++#define MLXBF_PKA_COMMAND_COUNT_0_ADDR 0x80080
++
++/* Ring 0. */
++#define MLXBF_PKA_RING_CMD_BASE_0_ADDR 0x00000
++#define MLXBF_PKA_RING_RSLT_BASE_0_ADDR 0x00010
++#define MLXBF_PKA_RING_SIZE_TYPE_0_ADDR 0x00020
++#define MLXBF_PKA_RING_RW_PTRS_0_ADDR  0x00028
++#define MLXBF_PKA_RING_RW_STAT_0_ADDR  0x00030
++
++/* Ring Options. */
++#define MLXBF_PKA_RING_OPTIONS_ADDR    0x07FF8
++
++/*
++ * Resources are regions which include info control/status words, count
++ * registers and host window RAM.
++ */
++#define MLXBF_PKA_MAX_NUM_RING_RESOURCES 3
++
++/*
++ * PKA Ring resources.
++ * Define Ring resources parameters including base address, size (in bytes)
++ * and ring spacing.
++ */
++#define MLXBF_PKA_RING_WORDS_ADDR MLXBF_PKA_BUFFER_RAM_BASE
++#define MLXBF_PKA_RING_CNTRS_ADDR MLXBF_PKA_COMMAND_COUNT_0_ADDR
++
++#define MLXBF_PKA_RING_WORDS_SIZE      SZ_64
++#define MLXBF_PKA_RING_CNTRS_SIZE      SZ_32
++#define MLXBF_PKA_RING_MEM_SIZE		SZ_16K
++
++#define MLXBF_PKA_RING_WORDS_SPACING   SZ_64
++#define MLXBF_PKA_RING_CNTRS_SPACING   SZ_64K
++#define MLXBF_PKA_RING_MEM_0_SPACING   SZ_16K
++#define MLXBF_PKA_RING_MEM_1_SPACING   SZ_64K
++
++/* Defines for window RAM partition, valid for 16K memory. */
++#define MLXBF_PKA_WINDOW_RAM_RING_MEM_SIZE     SZ_2K
++#define MLXBF_PKA_WINDOW_RAM_RING_MEM_DIV      2 /* Divide into halves. */
++#define MLXBF_PKA_WINDOW_RAM_RING_ADDR_MASK    GENMASK(15, 0)
++#define MLXBF_PKA_WINDOW_RAM_RING_SIZE_MASK    GENMASK(19, 16)
++#define MLXBF_PKA_WINDOW_RAM_RING_SIZE_SHIFT   2
++
++/*
++ * MLXBF_PKA_RING_OPTIONS_PRIORITY field to specify the priority in which rings
++ * are handled. In this implementation, the priority is full rotating priority,
++ * with the value of 0x0.
++ */
++#define MLXBF_PKA_RING_OPTIONS_PRIORITY	0x0
++
++/*
++ * 'Signature' byte used because the ring options are transferred through RAM
++ * which does not have a defined reset value. The EIP-154 master controller
++ * keeps reading the MLXBF_PKA_RING_OPTIONS word at start-up until the
++ * 'Signature' byte contains 0x46 and the 'Reserved' field contains zero.
++ */
++#define MLXBF_PKA_RING_OPTIONS_SIGNATURE_BYTE 0x46
++
++/*
++ * Order of the result reporting: two schemas are available:
++ *  InOrder - the results will be reported in the same order as the commands
++ *	    were provided.
++ *  OutOfOrder - the results are reported as soon as they are available.
++ * Note: only the OutOfOrder schema is used in this implementation.
++ */
++#define MLXBF_PKA_RING_TYPE_OUT_OF_ORDER_BIT   0
++#define MLXBF_PKA_RING_TYPE_IN_ORDER	   MLXBF_PKA_RING_TYPE_OUT_OF_ORDER_BIT
++
++/* PKA device related definitions. */
++#define MLXBF_PKA_DEVFS_RING_DEVICES "mlxbf_pka/%d"
++
++/**
++ * struct mlxbf_pka_dev_ring_res_t - PKA Ring resources structure
++ * @info_words: Ring information words
++ * @counters: Ring counters
++ * @window_ram: Window RAM
++ */
++struct mlxbf_pka_dev_ring_res_t {
++	struct mlxbf_pka_dev_res_t info_words;
++	struct mlxbf_pka_dev_res_t counters;
++	struct mlxbf_pka_dev_res_t window_ram;
++};
++
++/**
++ * struct mlxbf_pka_dev_ring_t - PKA Ring structure
++ * @ring_id: Ring identifier
++ * @shim: Pointer to the shim associated to the ring
++ * @resources_num: Number of ring resources
++ * @resources: Ring resources
++ * @ring_info: Ring information
++ * @num_cmd_desc: Number of command descriptors
++ * @status: Status of the ring
++ * @mutex: Mutex lock for sharing ring device
++ */
++struct mlxbf_pka_dev_ring_t {
++	u32 ring_id;
++	struct mlxbf_pka_dev_shim_s *shim;
++	u32 resources_num;
++	struct mlxbf_pka_dev_ring_res_t resources;
++	struct mlxbf_pka_dev_hw_ring_info *ring_info;
++	u32 num_cmd_desc;
++	s8 status;
++	struct mutex mutex;
++};
++
++/* Defines for mlxbf_pka_dev_ring->status. */
++#define MLXBF_PKA_DEV_RING_STATUS_UNDEFINED    -1
++#define MLXBF_PKA_DEV_RING_STATUS_INITIALIZED  1
++#define MLXBF_PKA_DEV_RING_STATUS_READY		2
++#define MLXBF_PKA_DEV_RING_STATUS_BUSY	 3
++
++/*
++ * Ring getter for mlxbf_pka_dev_gbl_config_t structure which holds all system
++ * global configuration. This configuration is shared and common to kernel
++ * device driver associated with PKA hardware.
++ */
++struct mlxbf_pka_dev_ring_t *mlxbf_pka_dev_get_ring(u32 ring_id);
++
++/* Configure ring options. */
++int mlxbf_pka_dev_config_ring_options(struct device *dev,
++				      struct mlxbf_pka_dev_res_t *buffer_ram_ptr,
++				      u32 rings_num,
++				      u8 ring_priority);
++
++				      /* Release a given Ring. */
++int mlxbf_pka_dev_release_ring(struct device *dev, struct mlxbf_pka_dev_ring_t *ring);
++
++/*
++ * Register a ring. This function initializes a Ring and configures its related
++ * resources, and returns the error code.
++ */
++int mlxbf_pka_dev_register_ring(struct device *dev,
++				u32 ring_id,
++				u32 shim_id,
++				struct mlxbf_pka_dev_ring_t **ring);
++
++/* Unregister a Ring. */
++int mlxbf_pka_dev_unregister_ring(struct device *dev, struct mlxbf_pka_dev_ring_t *ring);
++
++/* Reset a Ring. */
++int mlxbf_pka_dev_reset_ring(struct mlxbf_pka_dev_ring_t *ring);
++
++/*
++ * Clear ring counters. This function resets the master sequencer controller to
++ * clear the command and result counters.
++ */
++int mlxbf_pka_dev_clear_ring_counters(struct mlxbf_pka_dev_ring_t *ring);
++
++/*
++ * Open the file descriptor associated with ring. It returns an integer value,
++ * which is used to refer to the file. If not successful, it returns a negative
++ * error.
++ */
++int mlxbf_pka_dev_open_ring(struct device *dev, struct mlxbf_pka_ring_info_t *ring_info);
++
++/*
++ * Close the file descriptor associated with ring. The function returns 0 if
++ * successful, negative value to indicate an error.
++ */
++int mlxbf_pka_dev_close_ring(struct mlxbf_pka_ring_info_t *ring_info);
++
++#endif /* __MLXBF_PKA_RING_H__ */
+diff --git a/include/uapi/linux/mlxbf-pka.h b/include/uapi/linux/mlxbf-pka.h
+new file mode 100644
+index 000000000000..9da6c1e5044b
+--- /dev/null
++++ b/include/uapi/linux/mlxbf-pka.h
+@@ -0,0 +1,93 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/* SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved. */
++
++#ifndef _UAPI_LINUX_MLXBF_PKA_H
++#define _UAPI_LINUX_MLXBF_PKA_H
++
++#include <linux/types.h>
++#include <linux/ioctl.h>
++
++/* PKA IOCTL related definitions. */
++#define MLXBF_PKA_IOC_TYPE 0xBF
++
++/**
++ * struct mlxbf_pka_dev_region_info - Device region information
++ * @reg_index: Registers region index
++ * @reg_size: Registers region size (bytes)
++ * @reg_offset: Registers region offset from start of device fd
++ * @mem_index: Memory region index
++ * @mem_size: Memory region size (bytes)
++ * @mem_offset: Memory region offset from start of device fd
++ *
++ * MLXBF_PKA_RING_GET_REGION_INFO:
++ * _IOWR(MLXBF_PKA_IOC_TYPE, 0x0, mlxbf_pka_dev_region_info).
++ *
++ * Retrieve information about a device region. This is intended to describe
++ * MMIO, I/O port, as well as bus specific regions (ex. PCI config space). Zero
++ * sized regions may be used to describe unimplemented regions.
 + *
 + * Return: 0 on success, -errno on failure.
 + */
-+struct mlxbf_pka_dev_trng_info {
-+	__u32 count;
-+	__u8 *data;
++struct mlxbf_pka_dev_region_info {
++	__u32 reg_index;
++	__u64 reg_size;
++	__u64 reg_offset;
++	__u32 mem_index;
++	__u64 mem_size;
++	__u64 mem_offset;
 +};
 +
-+#define MLXBF_PKA_GET_RANDOM_BYTES _IOWR(MLXBF_PKA_IOC_TYPE, 0x3, struct mlxbf_pka_dev_trng_info)
++#define MLXBF_PKA_RING_GET_REGION_INFO \
++	_IOWR(MLXBF_PKA_IOC_TYPE, 0x0, struct mlxbf_pka_dev_region_info)
 +
- #endif /* _UAPI_LINUX_MLXBF_PKA_H */
++/**
++ * struct mlxbf_pka_dev_hw_ring_info - Bluefield specific ring information
++ * @cmd_base: Base address of the command descriptor ring
++ * @rslt_base: Base address of the result descriptor ring
++ * @size: Size of a command ring in number of descriptors, minus 1. Minimum
++ *	value is 0 (for 1 descriptor); maximum value is 65535 (for 64K
++ *	descriptors)
++ * @host_desc_size: This field specifies the size (in 32-bit words) of the space
++ *		  that PKI command and result descriptor occupies on the Host
++ * @in_order: Indicates whether the result ring delivers results strictly
++ *	    in-order ('1') or that result descriptors are written to the
++ *	    result ring as soon as they become available, or out-of-order ('0')
++ * @cmd_rd_ptr: Read pointer of the command descriptor ring
++ * @rslt_wr_ptr: Write pointer of the result descriptor ring
++ * @cmd_rd_stats: Read statistics of the command descriptor ring
++ * @rslt_wr_stats: Write statistics of the result descriptor ring
++ *
++ * MLXBF_PKA_GET_RING_INFO:
++ * _IOWR(MLXBF_PKA_IOC_TYPE, 0x1, mlxbf_pka_dev_hw_ring_info).
++ *
++ * Retrieve information about a ring. This is intended to describe ring
++ * information words located in MLXBF_PKA_BUFFER_RAM. Ring information
++ * includes base addresses, size and statistics.
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++struct mlxbf_pka_dev_hw_ring_info {
++	__u64 cmd_base;
++	__u64 rslt_base;
++	__u16 size;
++	__u16 host_desc_size : 10;
++	__u8 in_order : 1;
++	__u16 cmd_rd_ptr;
++	__u16 rslt_wr_ptr;
++	__u16 cmd_rd_stats;
++	__u16 rslt_wr_stats;
++};
++
++#define MLXBF_PKA_GET_RING_INFO _IOWR(MLXBF_PKA_IOC_TYPE, 0x1, struct mlxbf_pka_dev_hw_ring_info)
++
++/**
++ * MLXBF_PKA_CLEAR_RING_COUNTERS:
++ * _IO(MLXBF_PKA_IOC_TYPE, 0x2).
++ *
++ * Clear counters. This is intended to reset all command and result counters.
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++#define MLXBF_PKA_CLEAR_RING_COUNTERS _IO(MLXBF_PKA_IOC_TYPE, 0x2)
++
++#endif /* _UAPI_LINUX_MLXBF_PKA_H */
 -- 
 2.34.1
 
