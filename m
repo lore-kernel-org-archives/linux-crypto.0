@@ -1,192 +1,199 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010031.outbound.protection.outlook.com [52.101.46.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F0C21C186;
-	Fri, 19 Sep 2025 19:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.31
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758308473; cv=fail; b=JeVhQf73YB+l1IM96wmFJj9TUZZXUBOj1w3AgW2CnJVF2pSNekDIpXRbw/FvPTsoDRP7zq4N5DsVwORyto2YD1m07zkUFfzc7umaO+2jZY3yEOWUL4fTl4pthnfd0v/HLiO9gE+uWRtOMpZxIw1SMgyfIJOxB972DVvSVvuVuRk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758308473; c=relaxed/simple;
-	bh=A1sm/rMy0J1KzlWSbIfr3asp0BJ5iudEP4TEBzdfU10=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QfopCHKXcCdvFTt0ojXjZb+LOu4eX2j6lydFzuu/a/Y1GAEGViWTb1ALEx4iYTmh7eD2zwPbHZLUm4y/Q0Eyxcz+x2bOPru2xpKX9Js0M0Zz7JxhBfZ6xL1gYjC9NripNJmiugo3kUGYeQp88ksaI9kc8itZSyCRhqtzYHHlHHA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t/KLqELB; arc=fail smtp.client-ip=52.101.46.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B82264636;
+	Fri, 19 Sep 2025 19:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758308661; cv=none; b=MBE9quc8XjfP5oTSdV/7FRjWayzSqKX2fyzVSeQwWhcC4EPFE7fyZh/UOcJIrLhspQ6/HUsZEeyKzGcQ/7bpdnHjZ4lN+D6C8LtmKlQ8UEynhaWNJ/6wU3rmhuM5xTXBZG93M77wuKv4ZuO5x/kl5v7UL6rfuJskRxa9iNELA5I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758308661; c=relaxed/simple;
+	bh=+1gH9nh7Z9jLWMfLfJ0dorAYo0y8h0IdTCU2qgAMylM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=swYlnnjAWyF5694egKSZ4wSAr88mRhcR1oDB0/lv29QFfynEG+CLV3lHsC+yVWc8ilyxk3QH6tsEg8YDm+u6DF3CX0gNTODj6sf/zXAzEpgxyKU2jS33lYR1OzMUijaltrfOxwL6ZUwYZGxgGt+BCJHVf88DLeED5NXVM3MSFD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oNanpnCj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t/KLqELB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D2azD50jLu5dBiHBpgp5uJf3tnweUFp3m8OCgjP50ezIS/KTuEkBkFwmE2drwrBPCgTyYiv9Rc8tmVZsE80QNjGz7Rh9NMJuqn6fc/82FqMDy8QmoFM4Hqa9ZTWESyTNWX0L3R6hNaL0Qxb6kUwKBymHZYrgSVZb13xYBayCJZjcMXiPPGqfGIBEKYfQPqxTyyJzMUe7KtTB9G6dYd1RNBvQDlaydkgVSfF75fwL5Z5xe5DIB2t8cDmpqpcFi5sSjGqRWzCkYFNP/L6z+M8aYHonU9cCsbVJLelHSqX2BciK8AcMPJUVU2tIVtb/FXShxouRgaDHSIFg0HdeypLwhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6X9ul9/6b2vLx1EXY4+mKxMdH1rmYhIJ1EuOI8+3n20=;
- b=R463ayuqMoU9IQh/O4EAOK11J67sauwDcUuXxCENWD0kn5a1P0/FV5HhOdus7u0ydBecYGhW9ohhxCkB0M06Tcdm/tA2NGvZsAsgeeVjojymeJ9nZMrYu8Qc8M2tgqe14rFBh4Isbkr24pP8PWGRM308zTdBDfNREWhWf+PgC2xidgKJpAVa2xKpEoTcYTMf429auNl0Wae1xjSZTOtdpy+qOICKhmoBxdokkSNI3ggWda+u2FulCf+8YsMEgSPFy4SW8U9FRSPiSqKuJA0EE681+NvvBsRqPCukjbfJT6j0dyOR+lEJpH9MpAolNXNt1GKYrmdgPNauk87Py5rh7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6X9ul9/6b2vLx1EXY4+mKxMdH1rmYhIJ1EuOI8+3n20=;
- b=t/KLqELBuQlb7xc1rzhK8RI7H8VgL3NU/lSEWBbZATVi/QRKOd8WTQ6p+ZG0gGROoS6I1Y/hVe7gLzQavW5fcqHVNYVIZqqq21o7MgEwaw2jGikC7orkeRgmR93B8L0j4nENTaGKP7CGNsOKGVBbGlNALSVZp1vc6O1p37Q9YPs=
-Received: from BY1P220CA0018.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::8)
- by BL3PR12MB9051.namprd12.prod.outlook.com (2603:10b6:208:3ba::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Fri, 19 Sep
- 2025 19:01:06 +0000
-Received: from CO1PEPF000044FD.namprd21.prod.outlook.com
- (2603:10b6:a03:5c3:cafe::c2) by BY1P220CA0018.outlook.office365.com
- (2603:10b6:a03:5c3::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.17 via Frontend Transport; Fri,
- 19 Sep 2025 19:01:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CO1PEPF000044FD.mail.protection.outlook.com (10.167.241.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9160.0 via Frontend Transport; Fri, 19 Sep 2025 19:01:04 +0000
-Received: from tlendack-t1.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 19 Sep
- 2025 12:01:03 -0700
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-	<linux-crypto@vger.kernel.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
-	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
- Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
- Kalra" <ashish.kalra@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David Miller" <davem@davemloft.net>
-Subject: [RFC PATCH v2 4/4] KVM: SEV: Add known supported SEV-SNP policy bits
-Date: Fri, 19 Sep 2025 14:00:08 -0500
-Message-ID: <27e833d0e988533153a5f786faa92fc6843e5c73.1758308408.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <cover.1758308408.git.thomas.lendacky@amd.com>
-References: <cover.1758308408.git.thomas.lendacky@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oNanpnCj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D86C1C4CEF0;
+	Fri, 19 Sep 2025 19:04:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758308658;
+	bh=+1gH9nh7Z9jLWMfLfJ0dorAYo0y8h0IdTCU2qgAMylM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oNanpnCjSjsll5K2MuYanlRd4lQmwPAdpDsKOByL4FDhlwNKLVMWRpEMQ8JwfHYzQ
+	 EbRS5CEdk1MKvwQS4YWvyNe5I4QwimcJsNv2MfIZtIKna3+FtziWMzz4P1AQiuIAQr
+	 mN1BEDVpW6rSeBcWeaXgk2z9TmJr62oMLPGsFBAgShUSKOYJpkTWbcUahsgI55KPyy
+	 ghL13KQIKGbyjfUTSnfLUwRiN2Epqhd75pjPC1uPVV5WaZdC0Oem/coNbupssSoXnU
+	 QfTQt3uEaVbyv9WKfn2cmLbDgEwNjPlS63rwKHU4viKw7D+OgSNTvYPCIDADeWN/aB
+	 ZxLbcQrzXQHCg==
+Date: Fri, 19 Sep 2025 14:04:13 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
+	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384,
+ SHA-512, SHAKE128, SHAKE256
+Message-ID: <20250919190413.GA2249@quark>
+References: <3936580.1758299519@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FD:EE_|BL3PR12MB9051:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b16d609-843a-4535-8d97-08ddf7aee265
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?K0W7ywPGK2EL5GVSkeWM0JS6pTXpsxzMCujuyXmTjCWAL/McXS3I8TB1M0F6?=
- =?us-ascii?Q?6k+1NNY3CvNk1eo2T5TRxKKBi/gh7hZcwt7pt24eeErJ4CrTVOaZ9Uo3Bi+k?=
- =?us-ascii?Q?4s4J1gzrefJs2OeQRIL07dREfUW3WkST32Z6/tANKwYa/NVmosHcpQ3PKYxw?=
- =?us-ascii?Q?f40MZZ9fkMWLBcH9wyWyaoLLjRlNC5ts9wjcuY2c9qAJ/6F/kJbWxXKLgGiW?=
- =?us-ascii?Q?cdOWIxZMDrr8w5sbbB+pRZ3sqVhSa1DfH0f/GGFtphjlHISniun3d9xu8BQ0?=
- =?us-ascii?Q?7kZcC1DOFZS7exsfjkFg2byF3y4qFpfabAQDx0croqPP/whoUF6ynN8N46Fz?=
- =?us-ascii?Q?QmwZ/1fc9VMdLI5oYjeSe/llueQYtGNQFTz7yka/eYyAmxfD26EzE0GLjyT5?=
- =?us-ascii?Q?XO9Zw66+/MqNvFohUAiBadE9oE9RnvUSmjSYR3xgFyFfgTZFJ55VPoy0VNHr?=
- =?us-ascii?Q?kY5M586x6sSceVUz8DQNQck+oLu2V7/C1H9niFHs3QmEE2PTJEE4rcFoCc+e?=
- =?us-ascii?Q?G8tyxjT25km1PBdhOe5JaMt3mRFmR1a3hERkV0hhct7sK9JPuiITxJv1lQQt?=
- =?us-ascii?Q?1bBY+3xmMEavdiDFa/8bwxxlndF7Eb/DygFDH6qVdUcFzwBfwC3m9zgXUjPr?=
- =?us-ascii?Q?d3mTAn+5azp/atLZLCG6Q3lNYzX237gJznZPdeANaT6qy7ZHvd8rB+a1NEYI?=
- =?us-ascii?Q?JwT7El9yQaawP7fZ+Ywob48UUrtPpZeHsqRIb9yLZHwEBFUWlrdI4EqETerT?=
- =?us-ascii?Q?gbraGoJrQ1R0Kw6xQ25o2sNsA8/XVhAxorjDXh5PdOLsOARvGtl7zkByTzEo?=
- =?us-ascii?Q?AzvD2eROi0dTfT2OTEwWRgf//VlUXYsvu4bDUv9S5YJL5yJEogrzkq/E2XvY?=
- =?us-ascii?Q?pJVlGosnnF/oyK4PIGILdmA1XUjvnXLO+4CMlBoFXxIUlWtW2Tw+vk2jTLEx?=
- =?us-ascii?Q?iFXjTZ9DGdZOLGiwLqloLjYGGoXSE8a1ko3s++FNGDCwljP5BzPdfCtNUN6H?=
- =?us-ascii?Q?1AmGX0qPKeUSM+HAVmlJe5TqBKKbg5onmN92tBHQJxqCAAj0eK7sIV31XiQ8?=
- =?us-ascii?Q?PPe3HUBhPtO+4txeKvWh79yhqB05rQgNDd3mNCTbaZY72qTClCknL5Z3eYqu?=
- =?us-ascii?Q?nRBSbZkRuVld3rVtsPX5AJ1oTlFG3dndjDVo3rMtZHlyqoIza1jZFVkKOIs1?=
- =?us-ascii?Q?LCL6BFzPJ7bsmIRtVAKca1ey4bhZXVmN6vMmc/FcsuhAsirbHlPy/SNcgMEw?=
- =?us-ascii?Q?X1AK9WGtOFdmUVIykZlPYr6Xrkeno1v9nXwAFJm5XVTDiMLacTfOn0gkNySj?=
- =?us-ascii?Q?r+I9u1t47iT1D34EjtpshuEt9u8ixvUpcT3Q9nZEOvQOG2mLXG7Te/mVdQ9a?=
- =?us-ascii?Q?V31CXQISimsr1Lze3Oe8WI9hSqHqb1l1IoE/MsDPz7JEca/Q7GXVM6zkFFq1?=
- =?us-ascii?Q?P5joWAjgRNDaidcdCrK9Y9ikF1rLCcLGLZoJf1HNV6A96Sksfmw2ZrmZTNtB?=
- =?us-ascii?Q?fgOI3oc42tltz7cvIYBmmLTv6HYVEQ29/j2i?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:01:04.9811
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b16d609-843a-4535-8d97-08ddf7aee265
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044FD.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9051
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3936580.1758299519@warthog.procyon.org.uk>
 
-Add to the known supported SEV-SNP policy bits that don't require any
-implementation support from KVM in order to successfully use them.
+On Fri, Sep 19, 2025 at 05:31:59PM +0100, David Howells wrote:
+> Add SHA3, providing SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128 and
+> SHAKE256 to lib/crypto.
+> 
+> The state array handling is simplified from what's in crypto/sha3_generic.c
+> by keeping the state array (a u64[25]) in LE form and byteswapping all the
+> entries before and after applying the keccak function on a BE system.  This
+> means no byteswapping is required when XOR'ing data into the state array or
+> when extracting the digest.  Further, this is a no-op on LE systems.
+> 
+> Also:
+> 
+>  - Perform a multistage shake256 hash check in the module initialisation.
+> 
+>  - Add kunit tests for each algorithm based on the gen-hash-testvecs.
+> 
+>  - The conflicting static s390x crypto function names are renamed to have
+>    an s390_ prefix.
+> 
+>  - gen-hash-testvecs.py had to be modified to be able to generate SHAKE
+>    hashes because Python's hashlib requires the output digest size
+>    supplying for those two algorithms as they produce arbitrary length
+>    digests.
+> 
+> Notes:
+> 
+>  (1) I've left hooks in sha3.c for asm-optimised variants, but as I don't
+>      entirely know what those might look like, not having implemented any,
+>      the hooks' usability is uncertain.
+> 
+>  (2) The SHAKE algorithms will be required for ML-DSA.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Eric Biggers <ebiggers@kernel.org>
+> cc: Jason A. Donenfeld <Jason@zx2c4.com>
+> cc: Ard Biesheuvel <ardb@kernel.org>
+> cc: Harald Freudenberger <freude@linux.ibm.com>
+> cc: Holger Dengler <dengler@linux.ibm.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Stephan Mueller <smueller@chronox.de>
+> cc: linux-crypto@vger.kernel.org
+> cc: linux-s390@vger.kernel.org
+> ---    
+>  Changes
+>  =======
+>  v2)
+>   - Simplify the endianness handling.
+>  
+>   - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
+>     end as it's permitted to continue calling sha3_final() to extract
+>     continuations of the digest (needed by ML-DSA).
+>  
+>   - Don't reapply the end marker to the hash state in continuation
+>     sha3_squeeze() unless sha3_update() gets called again (needed by
+>     ML-DSA).
+>  
+>   - Give sha3_squeeze() the amount of digest to produce as a parameter
+>     rather than using ctx->digest_size and don't return the amount digested.
+>  
+>   - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
+>     extracts ctx->digest_size amount of digest and then zeroes out the
+>     context.  The latter is necessary to avoid upsetting
+>     hash-test-template.h.
+>  
+>   - Provide a sha3_reinit() function to clear the state, but to leave the
+>     parameters that indicate the hash properties unaffected, allowing for
+>     reuse.
+>  
+>   - Provide a sha3_set_digestsize() function to change the size of the
+>     digest to be extracted by sha3_final().  sha3_squeeze() takes a
+>     parameter for this instead.
+>  
+>   - Don't pass the digest size as a parameter to shake128/256_init() but
+>     rather default to 128/256 bits as per the function name.
+>  
+>   - Provide a sha3_clear() function to zero out the context.
+> 
+>  arch/s390/crypto/sha3_256_s390.c          |   26 -
+>  include/crypto/sha3.h                     |  160 +++++++-
+>  lib/crypto/Kconfig                        |    7 
+>  lib/crypto/Makefile                       |    6 
+>  lib/crypto/sha3.c                         |  597 ++++++++++++++++++++++++++++++
+>  lib/crypto/tests/Kconfig                  |   12 
+>  lib/crypto/tests/Makefile                 |    7 
+>  lib/crypto/tests/sha3_224_kunit.c         |   32 +
+>  lib/crypto/tests/sha3_224_testvecs.h      |  231 +++++++++++
+>  lib/crypto/tests/sha3_256_kunit.c         |   32 +
+>  lib/crypto/tests/sha3_256_testvecs.h      |  231 +++++++++++
+>  lib/crypto/tests/sha3_384_kunit.c         |   32 +
+>  lib/crypto/tests/sha3_384_testvecs.h      |  281 ++++++++++++++
+>  lib/crypto/tests/sha3_512_kunit.c         |   32 +
+>  lib/crypto/tests/sha3_512_testvecs.h      |  331 ++++++++++++++++
+>  lib/crypto/tests/sha3_shake128_kunit.c    |   37 +
+>  lib/crypto/tests/sha3_shake128_testvecs.h |  181 +++++++++
+>  lib/crypto/tests/sha3_shake256_kunit.c    |   37 +
+>  lib/crypto/tests/sha3_shake256_testvecs.h |  231 +++++++++++
+>  scripts/crypto/gen-hash-testvecs.py       |    8 
+>  20 files changed, 2495 insertions(+), 16 deletions(-)
 
-At this time, this includes:
-  - CXL_ALLOW
-  - MEM_AES_256_XTS
-  - RAPL_DIS
-  - CIPHERTEXT_HIDING_DRAM
-  - PAGE_SWAP_DISABLE
+Thanks for working on this!  Some preliminary comments (it will take a
+few days for me to find time to fully review this):
 
-Arguably, RAPL_DIS and CIPHERTEXT_HIDING_DRAM require KVM and the CCP
-driver to enable these features in order for the setting of the policy
-bits to be successfully handled. But, a guest owner may not wish their
-guest to run on a system that doesn't provide support for those features,
-so allowing the specification of these bits accomplishes that. Whether
-or not the bit is supported by SEV firmware, a system that doesn't support
-these features will either fail during the KVM validation of supported
-policy bits before issuing the LAUNCH_START or fail during the
-LAUNCH_START.
+This should be based on libcrypto-next.  And as with any kernel patch,
+it should include a base-commit so that people know where it applies to.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- arch/x86/kvm/svm/sev.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+This should be split into three patches: (1) the arch/s390/ changes, (2)
+adding the library functions themselves, and (3) adding the tests.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f77da22200fb..2385c9a0befe 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -66,12 +66,22 @@ module_param_named(ciphertext_hiding_asids, nr_ciphertext_hiding_asids, uint, 04
- #define AP_RESET_HOLD_NAE_EVENT		1
- #define AP_RESET_HOLD_MSR_PROTO		2
- 
--#define KVM_SNP_POLICY_MASK_VALID	(SNP_POLICY_MASK_API_MINOR	| \
--					 SNP_POLICY_MASK_API_MAJOR	| \
--					 SNP_POLICY_MASK_SMT		| \
--					 SNP_POLICY_MASK_RSVD_MBO	| \
--					 SNP_POLICY_MASK_DEBUG		| \
--					 SNP_POLICY_MASK_SINGLE_SOCKET)
-+/*
-+ * SEV-SNP policy bits that can be supported by KVM. These include policy bits
-+ * that have implementation support within KVM or policy bits that do not rely
-+ * on any implementation support within KVM.
-+ */
-+#define KVM_SNP_POLICY_MASK_VALID	(SNP_POLICY_MASK_API_MINOR		| \
-+					 SNP_POLICY_MASK_API_MAJOR		| \
-+					 SNP_POLICY_MASK_SMT			| \
-+					 SNP_POLICY_MASK_RSVD_MBO		| \
-+					 SNP_POLICY_MASK_DEBUG			| \
-+					 SNP_POLICY_MASK_SINGLE_SOCKET		| \
-+					 SNP_POLICY_MASK_CXL_ALLOW		| \
-+					 SNP_POLICY_MASK_MEM_AES_256_XTS	| \
-+					 SNP_POLICY_MASK_RAPL_DIS		| \
-+					 SNP_POLICY_MASK_CIPHERTEXT_HIDING_DRAM	| \
-+					 SNP_POLICY_MASK_PAGE_SWAP_DISABLE)
- 
- static u64 snp_supported_policy_bits __ro_after_init;
- 
--- 
-2.46.2
+We'll also need to integrate the existing arch-optimized SHA-3 code, and
+reimplement the SHA-3 crypto_shash algorithms on top of the library.
+Let me know whether you're planning to do that to.  If not, I can do it.
 
+In kerneldoc comments, please make it clear that lengths are measured in
+bytes, and that the functions can be called in any context.
+
+The testing situation looks odd.  This patch adds six KUnit test suites:
+one for each of the SHA-3 algorithms.  But they only include the
+hash-test-template.h test cases, and they don't test the unique behavior
+of SHAKE.  The KUnit tests need to fully test the library.
+
+I see you also have a test in sha3_mod_init(), which doesn't make sense.
+The tests should be in the KUnit test suite(s).  If you intended for the
+sha3_mod_init() test to be a FIPS pre-operational self-test, then (1) it
+would first need to be confirmed with the people doing FIPS
+certifications that a FIPS pre-operational self-test is actually
+necessary here, (2) it would need to be fixed to actually fulfill the
+requirements for that type of test such as panicing the kernel on
+failure, and (3) it would need to come in its own patch with its own
+explanation.  But, unless you are sure you actually need the FIPS test,
+just omit it out for now and focus on the real tests.
+
+I also think that splitting the SHA-3 tests into six KUnit test suites
+is awkward.  I know I did something similar for SHA-2, but it made more
+sense for SHA-2 because (1) there are only four SHA-2 variants, (2)
+SHA-256 and SHA-512 don't share any code, and (3) there wasn't anything
+more to add on top of hash-test-template.h.  In contrast, SHA-3 has six
+variants, which all share most of their code, and there will need to be
+SHA-3 specific tests (for the XOFs).
+
+I think what I'd recommend is creating a single sha3_kunit test suite.
+Make it instantiate hash-test-template.h once to test one of the
+algorithms, maybe SHA3-256.  Then add test cases (that is, additional
+KUnit test cases in the same KUnit test suite) that cover the code
+specific to the other variants, including the XOFs.
+
+- Eric
