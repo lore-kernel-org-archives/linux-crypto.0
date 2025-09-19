@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B82264636;
-	Fri, 19 Sep 2025 19:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C85226E711;
+	Fri, 19 Sep 2025 19:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758308661; cv=none; b=MBE9quc8XjfP5oTSdV/7FRjWayzSqKX2fyzVSeQwWhcC4EPFE7fyZh/UOcJIrLhspQ6/HUsZEeyKzGcQ/7bpdnHjZ4lN+D6C8LtmKlQ8UEynhaWNJ/6wU3rmhuM5xTXBZG93M77wuKv4ZuO5x/kl5v7UL6rfuJskRxa9iNELA5I=
+	t=1758309583; cv=none; b=jkcakOP1XQPKZEnKc8yWoLUGH8RaaRqiVtk14LIEx5d3OgPXY9SXMcUFSHTP0365LZbf/hTpCwOQuAP/EzI6ubaLir5dNc8aLkJfPN6DPWf94JAsSOU2/uUkjUzrlWUd7dS5xikXCYAm3vinF7W4c1EwKDVT9pQfFvQ5I9vdFmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758308661; c=relaxed/simple;
-	bh=+1gH9nh7Z9jLWMfLfJ0dorAYo0y8h0IdTCU2qgAMylM=;
+	s=arc-20240116; t=1758309583; c=relaxed/simple;
+	bh=RIu4F7qAgYmGH6tNvm+4CzefUV0zH2vjCBJ8h0ToUAo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=swYlnnjAWyF5694egKSZ4wSAr88mRhcR1oDB0/lv29QFfynEG+CLV3lHsC+yVWc8ilyxk3QH6tsEg8YDm+u6DF3CX0gNTODj6sf/zXAzEpgxyKU2jS33lYR1OzMUijaltrfOxwL6ZUwYZGxgGt+BCJHVf88DLeED5NXVM3MSFD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oNanpnCj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cxaxpf4BTVTvDBtSHqZKmOaQQHxJDlVto4F3Bt42GeZkI+jNe5oFf4+b6/rujJjhXnlD5Iwsl/oh+996qtzVnheaW2Wr2TsZWTNiaZdYbXEz1rle/7oGPYaqiwJBVX0XopzYR/KAF3/U3PuqYjQHzFRrOdR/ljMksblg8ZsEB3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2GtAhd8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oNanpnCj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D86C1C4CEF0;
-	Fri, 19 Sep 2025 19:04:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2GtAhd8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 083E6C4CEF0;
+	Fri, 19 Sep 2025 19:19:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758308658;
-	bh=+1gH9nh7Z9jLWMfLfJ0dorAYo0y8h0IdTCU2qgAMylM=;
+	s=k20201202; t=1758309583;
+	bh=RIu4F7qAgYmGH6tNvm+4CzefUV0zH2vjCBJ8h0ToUAo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oNanpnCjSjsll5K2MuYanlRd4lQmwPAdpDsKOByL4FDhlwNKLVMWRpEMQ8JwfHYzQ
-	 EbRS5CEdk1MKvwQS4YWvyNe5I4QwimcJsNv2MfIZtIKna3+FtziWMzz4P1AQiuIAQr
-	 mN1BEDVpW6rSeBcWeaXgk2z9TmJr62oMLPGsFBAgShUSKOYJpkTWbcUahsgI55KPyy
-	 ghL13KQIKGbyjfUTSnfLUwRiN2Epqhd75pjPC1uPVV5WaZdC0Oem/coNbupssSoXnU
-	 QfTQt3uEaVbyv9WKfn2cmLbDgEwNjPlS63rwKHU4viKw7D+OgSNTvYPCIDADeWN/aB
-	 ZxLbcQrzXQHCg==
-Date: Fri, 19 Sep 2025 14:04:13 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
-	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384,
- SHA-512, SHAKE128, SHAKE256
-Message-ID: <20250919190413.GA2249@quark>
-References: <3936580.1758299519@warthog.procyon.org.uk>
+	b=i2GtAhd8bUf2jG0nPz6QS+Fnc1JDbjL0PYpNDaajz77TqZvhRvhLX375Esu4LPoIX
+	 Zic8Xef1180RGF6uIFCGGIBllcoVDHNazkwmTXJj4H+EJY6pce8JBGtyF16UFy4p1p
+	 dLJVg5VGwtDQyOaMXxRLBLjj4cPHxQfG6v42OKABqtovOAYnhm1nSGR2G6YmQm/w60
+	 on+yLOj2bqnr/s4CLiAKCfaPDP9nLLXlJfhAD51wCvIGpC8GhNNQlYm4uT7Q0F/7An
+	 VT+NF2S7AL9sj63auOqbZ1DET9Bq3OB+Hf2NyaclfqbTydCsXoTef/O7uHV5+bwSRO
+	 F6oKvMERskMBw==
+Date: Fri, 19 Sep 2025 12:19:42 -0700
+From: Kees Cook <kees@kernel.org>
+To: Ethan Graham <ethan.w.s.graham@gmail.com>
+Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com,
+	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev,
+	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com,
+	dvyukov@google.com, elver@google.com, herbert@gondor.apana.org.au,
+	ignat@cloudflare.com, jack@suse.cz, jannh@google.com,
+	johannes@sipsolutions.net, kasan-dev@googlegroups.com,
+	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
+	rmoar@google.com, shuah@kernel.org, sj@kernel.org,
+	tarasmadan@google.com
+Subject: Re: [PATCH v2 09/10] fs/binfmt_script: add KFuzzTest target for
+ load_script
+Message-ID: <202509191208.D2BCFD366F@keescook>
+References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
+ <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,151 +52,148 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3936580.1758299519@warthog.procyon.org.uk>
+In-Reply-To: <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
 
-On Fri, Sep 19, 2025 at 05:31:59PM +0100, David Howells wrote:
-> Add SHA3, providing SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128 and
-> SHAKE256 to lib/crypto.
+On Fri, Sep 19, 2025 at 02:57:49PM +0000, Ethan Graham wrote:
+> From: Ethan Graham <ethangraham@google.com>
 > 
-> The state array handling is simplified from what's in crypto/sha3_generic.c
-> by keeping the state array (a u64[25]) in LE form and byteswapping all the
-> entries before and after applying the keccak function on a BE system.  This
-> means no byteswapping is required when XOR'ing data into the state array or
-> when extracting the digest.  Further, this is a no-op on LE systems.
+> Add a KFuzzTest target for the load_script function to serve as a
+> real-world example of the framework's usage.
 > 
-> Also:
+> The load_script function is responsible for parsing the shebang line
+> (`#!`) of script files. This makes it an excellent candidate for
+> KFuzzTest, as it involves parsing user-controlled data within the
+> binary loading path, which is not directly exposed as a system call.
 > 
->  - Perform a multistage shake256 hash check in the module initialisation.
+> The provided fuzz target in fs/tests/binfmt_script_kfuzz.c illustrates
+> how to fuzz a function that requires more involved setup - here, we only
+> let the fuzzer generate input for the `buf` field of struct linux_bprm,
+> and manually set the other fields with sensible values inside of the
+> FUZZ_TEST body.
 > 
->  - Add kunit tests for each algorithm based on the gen-hash-testvecs.
+> To demonstrate the effectiveness of the fuzz target, a buffer overflow
+> bug was injected in the load_script function like so:
 > 
->  - The conflicting static s390x crypto function names are renamed to have
->    an s390_ prefix.
+> - buf_end = bprm->buf + sizeof(bprm->buf) - 1;
+> + buf_end = bprm->buf + sizeof(bprm->buf) + 1;
 > 
->  - gen-hash-testvecs.py had to be modified to be able to generate SHAKE
->    hashes because Python's hashlib requires the output digest size
->    supplying for those two algorithms as they produce arbitrary length
->    digests.
+> Which was caught in around 40 seconds by syzkaller simultaneously
+> fuzzing four other targets, a realistic use case where targets are
+> continuously fuzzed. It also requires that the fuzzer be smart enough to
+> generate an input starting with `#!`.
 > 
-> Notes:
+> While this bug is shallow, the fact that the bug is caught quickly and
+> with minimal additional code can potentially be a source of confidence
+> when modifying existing implementations or writing new functions.
 > 
->  (1) I've left hooks in sha3.c for asm-optimised variants, but as I don't
->      entirely know what those might look like, not having implemented any,
->      the hooks' usability is uncertain.
+> Signed-off-by: Ethan Graham <ethangraham@google.com>
 > 
->  (2) The SHAKE algorithms will be required for ML-DSA.
+> ---
+> PR v2:
+> - Introduce cleanup logic in the load_script fuzz target.
+> ---
+> ---
+>  fs/binfmt_script.c             |  8 +++++
+>  fs/tests/binfmt_script_kfuzz.c | 58 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 66 insertions(+)
+>  create mode 100644 fs/tests/binfmt_script_kfuzz.c
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Eric Biggers <ebiggers@kernel.org>
-> cc: Jason A. Donenfeld <Jason@zx2c4.com>
-> cc: Ard Biesheuvel <ardb@kernel.org>
-> cc: Harald Freudenberger <freude@linux.ibm.com>
-> cc: Holger Dengler <dengler@linux.ibm.com>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: Stephan Mueller <smueller@chronox.de>
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-s390@vger.kernel.org
-> ---    
->  Changes
->  =======
->  v2)
->   - Simplify the endianness handling.
->  
->   - Rename sha3_final() to sha3_squeeze() and don't clear the context at the
->     end as it's permitted to continue calling sha3_final() to extract
->     continuations of the digest (needed by ML-DSA).
->  
->   - Don't reapply the end marker to the hash state in continuation
->     sha3_squeeze() unless sha3_update() gets called again (needed by
->     ML-DSA).
->  
->   - Give sha3_squeeze() the amount of digest to produce as a parameter
->     rather than using ctx->digest_size and don't return the amount digested.
->  
->   - Reimplement sha3_final() as a wrapper around sha3_squeeze() that
->     extracts ctx->digest_size amount of digest and then zeroes out the
->     context.  The latter is necessary to avoid upsetting
->     hash-test-template.h.
->  
->   - Provide a sha3_reinit() function to clear the state, but to leave the
->     parameters that indicate the hash properties unaffected, allowing for
->     reuse.
->  
->   - Provide a sha3_set_digestsize() function to change the size of the
->     digest to be extracted by sha3_final().  sha3_squeeze() takes a
->     parameter for this instead.
->  
->   - Don't pass the digest size as a parameter to shake128/256_init() but
->     rather default to 128/256 bits as per the function name.
->  
->   - Provide a sha3_clear() function to zero out the context.
-> 
->  arch/s390/crypto/sha3_256_s390.c          |   26 -
->  include/crypto/sha3.h                     |  160 +++++++-
->  lib/crypto/Kconfig                        |    7 
->  lib/crypto/Makefile                       |    6 
->  lib/crypto/sha3.c                         |  597 ++++++++++++++++++++++++++++++
->  lib/crypto/tests/Kconfig                  |   12 
->  lib/crypto/tests/Makefile                 |    7 
->  lib/crypto/tests/sha3_224_kunit.c         |   32 +
->  lib/crypto/tests/sha3_224_testvecs.h      |  231 +++++++++++
->  lib/crypto/tests/sha3_256_kunit.c         |   32 +
->  lib/crypto/tests/sha3_256_testvecs.h      |  231 +++++++++++
->  lib/crypto/tests/sha3_384_kunit.c         |   32 +
->  lib/crypto/tests/sha3_384_testvecs.h      |  281 ++++++++++++++
->  lib/crypto/tests/sha3_512_kunit.c         |   32 +
->  lib/crypto/tests/sha3_512_testvecs.h      |  331 ++++++++++++++++
->  lib/crypto/tests/sha3_shake128_kunit.c    |   37 +
->  lib/crypto/tests/sha3_shake128_testvecs.h |  181 +++++++++
->  lib/crypto/tests/sha3_shake256_kunit.c    |   37 +
->  lib/crypto/tests/sha3_shake256_testvecs.h |  231 +++++++++++
->  scripts/crypto/gen-hash-testvecs.py       |    8 
->  20 files changed, 2495 insertions(+), 16 deletions(-)
+> diff --git a/fs/binfmt_script.c b/fs/binfmt_script.c
+> index 637daf6e4d45..c09f224d6d7e 100644
+> --- a/fs/binfmt_script.c
+> +++ b/fs/binfmt_script.c
+> @@ -157,3 +157,11 @@ core_initcall(init_script_binfmt);
+>  module_exit(exit_script_binfmt);
+>  MODULE_DESCRIPTION("Kernel support for scripts starting with #!");
+>  MODULE_LICENSE("GPL");
+> +
+> +/*
+> + * When CONFIG_KFUZZTEST is enabled, we include this _kfuzz.c file to ensure
+> + * that KFuzzTest targets are built.
+> + */
+> +#ifdef CONFIG_KFUZZTEST
+> +#include "tests/binfmt_script_kfuzz.c"
+> +#endif /* CONFIG_KFUZZTEST */
+> diff --git a/fs/tests/binfmt_script_kfuzz.c b/fs/tests/binfmt_script_kfuzz.c
+> new file mode 100644
+> index 000000000000..26397a465270
+> --- /dev/null
+> +++ b/fs/tests/binfmt_script_kfuzz.c
+> @@ -0,0 +1,58 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * binfmt_script loader KFuzzTest target
+> + *
+> + * Copyright 2025 Google LLC
+> + */
+> +#include <linux/binfmts.h>
+> +#include <linux/kfuzztest.h>
+> +#include <linux/slab.h>
+> +#include <linux/sched/mm.h>
+> +
+> +struct load_script_arg {
+> +	char buf[BINPRM_BUF_SIZE];
+> +};
+> +
+> +FUZZ_TEST(test_load_script, struct load_script_arg)
+> +{
+> +	struct linux_binprm bprm = {};
+> +	char *arg_page;
+> +
+> +	arg_page = (char *)get_zeroed_page(GFP_KERNEL);
+> +	if (!arg_page)
+> +		return;
+> +
+> +	memcpy(bprm.buf, arg->buf, sizeof(bprm.buf));
+> +	/*
+> +	 * `load_script` calls remove_arg_zero, which expects argc != 0. A
+> +	 * static value of 1 is sufficient for fuzzing.
+> +	 */
+> +	bprm.argc = 1;
+> +	bprm.p = (unsigned long)arg_page + PAGE_SIZE;
+> +	bprm.filename = kstrdup("fuzz_script", GFP_KERNEL);
+> +	if (!bprm.filename)
+> +		goto cleanup;
+> +	bprm.interp = kstrdup(bprm.filename, GFP_KERNEL);
+> +	if (!bprm.interp)
+> +		goto cleanup;
+> +
+> +	bprm.mm = mm_alloc();
+> +	if (!bprm.mm)
+> +		goto cleanup;
+> +
+> +	/*
+> +	 * Call the target function. We expect it to fail and return an error
+> +	 * (e.g., at open_exec), which is fine. The goal is to survive the
+> +	 * initial parsing logic without crashing.
+> +	 */
+> +	load_script(&bprm);
+> +
+> +cleanup:
+> +	if (bprm.mm)
+> +		mmput(bprm.mm);
+> +	if (bprm.interp)
+> +		kfree(bprm.interp);
+> +	if (bprm.filename)
+> +		kfree(bprm.filename);
+> +	free_page((unsigned long)arg_page);
+> +}
 
-Thanks for working on this!  Some preliminary comments (it will take a
-few days for me to find time to fully review this):
+Yay fuzzing hooks! I'm excited about this series overall, but I'm not
+a fan of this "manual" init/clean up of bprm.
 
-This should be based on libcrypto-next.  And as with any kernel patch,
-it should include a base-commit so that people know where it applies to.
+If you're going to set up a bprm that passes through load_script(), it
+needs to be both prepared correctly (alloc_bprm) and cleaned up correctly
+(free_bprm). Otherwise, you may be fuzzing impossible states created by
+the fuzztest setup. And having a second init/cleanup path in here makes
+future refactoring work more of a burden/fragile.
 
-This should be split into three patches: (1) the arch/s390/ changes, (2)
-adding the library functions themselves, and (3) adding the tests.
+But this is also kind of not a great example of fuzztest utility because
+load_script _is_ actually directly accessible from syscalls: it is trivial
+to externally fuzz load_script by just writing the buffer to a file and
+execve'ing it. :)
 
-We'll also need to integrate the existing arch-optimized SHA-3 code, and
-reimplement the SHA-3 crypto_shash algorithms on top of the library.
-Let me know whether you're planning to do that to.  If not, I can do it.
+-Kees
 
-In kerneldoc comments, please make it clear that lengths are measured in
-bytes, and that the functions can be called in any context.
-
-The testing situation looks odd.  This patch adds six KUnit test suites:
-one for each of the SHA-3 algorithms.  But they only include the
-hash-test-template.h test cases, and they don't test the unique behavior
-of SHAKE.  The KUnit tests need to fully test the library.
-
-I see you also have a test in sha3_mod_init(), which doesn't make sense.
-The tests should be in the KUnit test suite(s).  If you intended for the
-sha3_mod_init() test to be a FIPS pre-operational self-test, then (1) it
-would first need to be confirmed with the people doing FIPS
-certifications that a FIPS pre-operational self-test is actually
-necessary here, (2) it would need to be fixed to actually fulfill the
-requirements for that type of test such as panicing the kernel on
-failure, and (3) it would need to come in its own patch with its own
-explanation.  But, unless you are sure you actually need the FIPS test,
-just omit it out for now and focus on the real tests.
-
-I also think that splitting the SHA-3 tests into six KUnit test suites
-is awkward.  I know I did something similar for SHA-2, but it made more
-sense for SHA-2 because (1) there are only four SHA-2 variants, (2)
-SHA-256 and SHA-512 don't share any code, and (3) there wasn't anything
-more to add on top of hash-test-template.h.  In contrast, SHA-3 has six
-variants, which all share most of their code, and there will need to be
-SHA-3 specific tests (for the XOFs).
-
-I think what I'd recommend is creating a single sha3_kunit test suite.
-Make it instantiate hash-test-template.h once to test one of the
-algorithms, maybe SHA3-256.  Then add test cases (that is, additional
-KUnit test cases in the same KUnit test suite) that cover the code
-specific to the other variants, including the XOFs.
-
-- Eric
+-- 
+Kees Cook
