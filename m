@@ -1,106 +1,116 @@
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EA822A4D8;
-	Fri, 19 Sep 2025 13:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F84312807
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 13:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758288021; cv=none; b=gC1r5GwHoxN+s/bWfJmLWJ0FM7y7BDeY5f6ar2lhmdoP/3TxFMCeZFij6vhhqvDDgF5+GRNT0RMquQxw5aclTzn3N90vZPQylcbQUUgyUt7JWtNv8HVkPoz/nHhg65J5atm1Ggtg1qlIM7ph6+bKB5+Nmh52pzdX7zwhQnqA7DQ=
+	t=1758290232; cv=none; b=qF5c2W5p3QkZpi930pp9HCIelQX+5xWYeb24ePOQRA0RcJ5Mm1dSi9NkgtMNm/BbWgjH8GE/hetibYcj90NUhXhpisv1OUqdVstDOzpDik7B8ppECvkT57jM8imAcfQSGv4FPRQro8+E9YJVGw797K9ziCTza28owD5t2t0oa1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758288021; c=relaxed/simple;
-	bh=9zpwxe4kX7gYqebQEftmwp9mQw9hylEf3bwiFg15TaI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YlvXNaHrrpeQQWJ7PWW9XopLcxN1xkj6VdY+m9O6QT8ysEhMGMneLHJsw5utBCUmuP/nQZ+r0COpcMAYgwLKZnldHmiuEIMmZWt4FJjrnMW2iEy7FBy22f+S0SEQPbqnfLdAsoufCqUNnROJjXQB5lE0F2cxBNdNZwYpYGzTKiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=iv8b5G//; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1758290232; c=relaxed/simple;
+	bh=DMNjFIRdYGAFecE5NRxl03iUEzlodfkNNlXpcwuF6XY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=d67La0PPLnDXh/XuOQFxkpXrnRxiLoy58VlOY7w+tj4Zdm7FvCul6tp/+CJMelfPdAl431ku8gd5TASV+YMZ2dN7IUPObi7+gZPFp+dBGlVobgI5BVuApzPN7wyvwAkuZMRKCwW4A0MoWrRWXmEGB91xHKH+VNSFtDvy+9R4fa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YD7erpR4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="iv8b5G//"
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58JDK6tN716885;
-	Fri, 19 Sep 2025 08:20:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1758288006;
-	bh=z671kKLEutPGUAyNw4Pf3Y/MwQIZ9sbhw2E4Riors/U=;
-	h=From:To:CC:Subject:Date;
-	b=iv8b5G//5Wf9o/1Qjw8Z9AnNa/dkMd3ean0aP3aISfxKaArWN8c8t6I7FgdcgrOZT
-	 ea1Xi9HaXKOZVWbFVWKFumQ7gIAUmGO8SxbwBUSHnJcDR4KZwcWP79XQsEGI98ud5b
-	 jxx9+pzsPdZj0xvDnYiPnvydyMbyDfMGN1oMQM5M=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58JDK67Z3178766
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Fri, 19 Sep 2025 08:20:06 -0500
-Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Fri, 19
- Sep 2025 08:20:05 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE208.ent.ti.com
- (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Fri, 19 Sep 2025 08:20:05 -0500
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58JDK5VI2624682;
-	Fri, 19 Sep 2025 08:20:05 -0500
-From: Nishanth Menon <nm@ti.com>
-To: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>
-CC: Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        Alexander Sverdlin
-	<alexander.sverdlin@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        Nishanth Menon <nm@ti.com>
-Subject: [PATCH] hwrng: fix division by zero in ks_sa_rng_init
-Date: Fri, 19 Sep 2025 08:20:02 -0500
-Message-ID: <20250919132002.180874-1-nm@ti.com>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YD7erpR4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758290229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xjHyPThJqMEaxjiy8ZOBD72S9ScmNjfADYppC37Xj4I=;
+	b=YD7erpR4x6LGMzGswMolAKBgE9p7h+laGWqBVH4pTm89dv90pkoUJ3koAJHiQ4sIR8tmJs
+	UP1IbuJXVDa+D5Wuan1DDEIBij4/aoX/wdwxkifv3s3E/ULYIf9VA1AhiUpZkbL+q9Xm4B
+	qMNedAVeC6XVYNGCeKTQu3h9muE2BRQ=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-nyXR8R3iMFiC7mtdbrpaIg-1; Fri, 19 Sep 2025 09:57:07 -0400
+X-MC-Unique: nyXR8R3iMFiC7mtdbrpaIg-1
+X-Mimecast-MFC-AGG-ID: nyXR8R3iMFiC7mtdbrpaIg_1758290227
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8217df6d44cso344528785a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 06:57:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758290227; x=1758895027;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xjHyPThJqMEaxjiy8ZOBD72S9ScmNjfADYppC37Xj4I=;
+        b=YPdJ20EydBbNyIBLGQlkKGstsS79hH98Ekkl7kRSZrxmW7v3lYSLhiHciOYxhsCGHn
+         tH9CdHrUS41Y30FMSxnNLvgMQBpaeHuB0DW90e2g4jtWqW9mrSbtcqGNTHwVtbZeaaVy
+         Z40gfDPMTPyy+MpEOOvw3vtSypomMydl8RiF9v3wup2jSljL67nLVH5iFYZtUwkm5bL7
+         gwpgy1TzurnAvq3NXQu2y6KhukC6N+JhTNq03nARZAuhjWJacC5/gvolNSj/vl1Q6JfO
+         0/erEdbwNXw32uQf8haOWYOb5HsPWKTr4pFwrymP1DAoLCofQzgdaBn4lnhsT/iJD1QJ
+         EO3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUmWRZ4ItWgUKineiN57TJ0J0LEiA1S2iLQCdRCgSnEsYgApKXSeLe66Y5pJ/xrvqcEDtHi6hTT0LCLHII=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtYaX3XY7ha0GUNRTU8ZWi87hZ23ISndRVc0mJhrz6M85rdewD
+	AYeVH4eVp2Q8scFM9DZRur4BjWY0VB97IRGe9RqrJ5g4NXC1a7OPXSmWa7EQiO729WFlEi/2Wxr
+	nH0CoQsBw82wiP99NKM8Ybt0yWUJJOIoeb4Ln+ESj6QliTxLJjSPp7UG9QZXoc7oJZw==
+X-Gm-Gg: ASbGncv5q3cYsaoY0pOAx5LpElFf0tZ/QMLtQRpynsQX07tLPX+A85xarGbRipCGwX9
+	MPbwwsoAO+R5CIYxyZOUYAiA1Kc22vYKqqlG6Z9GF3zf9r0vQ0Y/qlD6am0+0W5F7qLVvy9GxdI
+	7LzfLrvTzgBcT0yN+1uIvIESDPoajSk0hqqssmu0AEvRZIjzuekPPfe1PypvmjEfAqBhUKAX+Mr
+	JTmu7XWO7Xi5JjUUeCWTBYAuxfBbtVRKkYStdM9UGeOnopHaxyvXHsehguRrftcwfoT43DSaNr2
+	XS9f8I0v1ZrOshMWWyWU4DbhhtsQcpWY0g==
+X-Received: by 2002:a05:620a:4054:b0:829:cc0b:847a with SMTP id af79cd13be357-83bae441091mr341931185a.85.1758290226961;
+        Fri, 19 Sep 2025 06:57:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfdS/zMLLd7FzsPOjcM9f2BXteVuayDMDJGYkajXEj37EsJLk3BN8J/COqLEMvW6R/aSvFzg==
+X-Received: by 2002:a05:620a:4054:b0:829:cc0b:847a with SMTP id af79cd13be357-83bae441091mr341928285a.85.1758290226568;
+        Fri, 19 Sep 2025 06:57:06 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::318])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-83626595a14sm345727285a.12.2025.09.19.06.57.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 06:57:06 -0700 (PDT)
+Message-ID: <31fa6cb0a6b72b9ceed9bd925d86ad92b78b5bdf.camel@redhat.com>
+Subject: Re: Adding SHAKE hash algorithms to SHA-3
+From: Simo Sorce <simo@redhat.com>
+To: David Howells <dhowells@redhat.com>, Herbert Xu
+	 <herbert@gondor.apana.org.au>
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+Date: Fri, 19 Sep 2025 09:57:05 -0400
+In-Reply-To: <3790489.1758264104@warthog.procyon.org.uk>
+References: <aMf_0xkJtcPQlYiI@gondor.apana.org.au>
+	 <2552917.1757925000@warthog.procyon.org.uk>
+	 <3790489.1758264104@warthog.procyon.org.uk>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Fix division by zero in ks_sa_rng_init caused by missing clock
-pointer initialization. The clk_get_rate() call is performed on
-an uninitialized clk pointer, resulting in division by zero when
-calculating delay values.
+On Fri, 2025-09-19 at 07:41 +0100, David Howells wrote:
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>=20
+> > I presume the algorithm choice is fixed, right? If so you should be
+> > using lib/crypto.
+>=20
+> Actually...  Having dug into the dilithium code some more, the answer app=
+ears
+> to be both yes _and_ no.
+>=20
+> It's quite complicated, and in some places it uses both SHAKE128 and SHAK=
+E256
+> fixedly, but I think it can also change the pre-hash between a bunch of
+> different algorithms, including SHA-512, SHA3-* and SHAKE*.  At least, I =
+think
+> it can.
 
-Add clock initialization code before using the clock.
+We are probably not interested in the HashML-DSA variant, so you should
+probably ignore that part of the specification for now.
+It is easy to implement on top of Pure ML-DSA if you allow the caller
+to specify and externally composed mu.
 
-Fixes: 6d01d8511dce ("hwrng: ks-sa - Add minimum sleep time before ready-polling")
-Signed-off-by: Nishanth Menon <nm@ti.com>
-
- drivers/char/hw_random/ks-sa-rng.c | 7 +++++++
- 1 file changed, 7 insertions(+)
----
-
-Noticed this when looking at kci logs:
-https://dashboard.kernelci.org/log-viewer?itemId=ti%3A0af42187f4b24261b0c102f0&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc6-43-g8b789f2b7602%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
-
-Fixed version boot:
-https://gist.github.com/nmenon/0996e5f7bdbcd3b014cee9921a60d88c
-
- drivers/char/hw_random/ks-sa-rng.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
-index d8fd8a354482..9e408144a10c 100644
---- a/drivers/char/hw_random/ks-sa-rng.c
-+++ b/drivers/char/hw_random/ks-sa-rng.c
-@@ -231,6 +231,10 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(ks_sa_rng->regmap_cfg))
- 		return dev_err_probe(dev, -EINVAL, "syscon_node_to_regmap failed\n");
- 
-+	ks_sa_rng->clk = devm_clk_get_enabled(dev, NULL);
-+	if (IS_ERR(ks_sa_rng->clk))
-+		return dev_err_probe(dev, PTR_ERR(ks_sa_rng->clk), "Failed to get clock\n");
-+
- 	pm_runtime_enable(dev);
- 	ret = pm_runtime_resume_and_get(dev);
- 	if (ret < 0) {
--- 
-2.47.0
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
 
