@@ -1,173 +1,106 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0153081DC;
-	Fri, 19 Sep 2025 11:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EA822A4D8;
+	Fri, 19 Sep 2025 13:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758281611; cv=none; b=Q/x2N1pihTOTS0/OS3jn6OsV9R2u2NAqW2U9hsF0agsrEFc28MVyVXRL5jOyKx4Ff7Ja98UTqbrOWZSS1KqoGbttYelVtrpkBA+QEh7JLC9ilpSAPBbv7yZGlXNwpvwQOnuYWs0priLeETsr+TpvqYxUh48kA4XUydW7+IS/lB0=
+	t=1758288021; cv=none; b=gC1r5GwHoxN+s/bWfJmLWJ0FM7y7BDeY5f6ar2lhmdoP/3TxFMCeZFij6vhhqvDDgF5+GRNT0RMquQxw5aclTzn3N90vZPQylcbQUUgyUt7JWtNv8HVkPoz/nHhg65J5atm1Ggtg1qlIM7ph6+bKB5+Nmh52pzdX7zwhQnqA7DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758281611; c=relaxed/simple;
-	bh=/4VwWOhjauXsfY9ntn6Ue6xTcnqRGvf9YDxTB/1IvnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=owfb6AELCC8NSEUgt5iQ+J4TMdz74S85hf0G2CGrKGl0k4QEIcNGa2QbBQFheYYuXtpMrS9ZZKPgv/Hwf5tHFZw37sdvYFBoH4kp+66gSuDETWnhNxv7U9qebiJi8ZZWqh4Gows6PtJk1k/1vubBCThzMC+c310110Sydf2HjN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kZMEdtLt; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1758288021; c=relaxed/simple;
+	bh=9zpwxe4kX7gYqebQEftmwp9mQw9hylEf3bwiFg15TaI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YlvXNaHrrpeQQWJ7PWW9XopLcxN1xkj6VdY+m9O6QT8ysEhMGMneLHJsw5utBCUmuP/nQZ+r0COpcMAYgwLKZnldHmiuEIMmZWt4FJjrnMW2iEy7FBy22f+S0SEQPbqnfLdAsoufCqUNnROJjXQB5lE0F2cxBNdNZwYpYGzTKiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=iv8b5G//; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kZMEdtLt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758281610; x=1789817610;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/4VwWOhjauXsfY9ntn6Ue6xTcnqRGvf9YDxTB/1IvnM=;
-  b=kZMEdtLt3gYK6S09/mMz83d8e7qDY8vZIgyS1TvAqYz72TyY6jnMbGgq
-   OxNo6Vdo258QTs5GXUVLgtWllexXDYSGaKgbcCIJjkbLh0rixudW/p5Za
-   egA6haHYNmUM3eyF6ZmleTFIt+g0xklaWIYIhKfW9eCX102cPlmO3GPzR
-   PN8nw1Hq8sh1rWWcR7A+eNCyRO3YfrGERUQ05lmiNvbqkotnSmz+k2KvD
-   HaPnYOHrdHGJ4xTfzEfNMLKMH1NGOlbk4bzt/ilf8dxJl+KjKbH1LxU19
-   aup5xydgjj6oIo8r1X+Ba6Qz2Crg7bv9RPaPC4XLczU2fktMRfXrxeaZb
-   w==;
-X-CSE-ConnectionGUID: bMYBvhkISmiPK9G1UY758A==
-X-CSE-MsgGUID: gGmdEbwYSvi36s7nG+cj9w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="83229907"
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="83229907"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 04:33:29 -0700
-X-CSE-ConnectionGUID: IKqascKySYqe3W1E8Eb0Bw==
-X-CSE-MsgGUID: lA89En3tSYqfh8/binHCHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="175372304"
-Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 19 Sep 2025 04:33:26 -0700
-Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uzZMh-0004Fr-1r;
-	Fri, 19 Sep 2025 11:33:23 +0000
-Date: Fri, 19 Sep 2025 19:33:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: David Howells <dhowells@redhat.com>, Eric Biggers <ebiggers@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, dhowells@redhat.com,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512,
- SHAKE128, SHAKE256
-Message-ID: <202509191938.PrHY82Kd-lkp@intel.com>
-References: <3605112.1758233248@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="iv8b5G//"
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58JDK6tN716885;
+	Fri, 19 Sep 2025 08:20:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1758288006;
+	bh=z671kKLEutPGUAyNw4Pf3Y/MwQIZ9sbhw2E4Riors/U=;
+	h=From:To:CC:Subject:Date;
+	b=iv8b5G//5Wf9o/1Qjw8Z9AnNa/dkMd3ean0aP3aISfxKaArWN8c8t6I7FgdcgrOZT
+	 ea1Xi9HaXKOZVWbFVWKFumQ7gIAUmGO8SxbwBUSHnJcDR4KZwcWP79XQsEGI98ud5b
+	 jxx9+pzsPdZj0xvDnYiPnvydyMbyDfMGN1oMQM5M=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58JDK67Z3178766
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Fri, 19 Sep 2025 08:20:06 -0500
+Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Fri, 19
+ Sep 2025 08:20:05 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE208.ent.ti.com
+ (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Fri, 19 Sep 2025 08:20:05 -0500
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58JDK5VI2624682;
+	Fri, 19 Sep 2025 08:20:05 -0500
+From: Nishanth Menon <nm@ti.com>
+To: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Olivia Mackall <olivia@selenic.com>
+CC: Alexander Sverdlin <alexander.sverdlin@nokia.com>,
+        Alexander Sverdlin
+	<alexander.sverdlin@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        Nishanth Menon <nm@ti.com>
+Subject: [PATCH] hwrng: fix division by zero in ks_sa_rng_init
+Date: Fri, 19 Sep 2025 08:20:02 -0500
+Message-ID: <20250919132002.180874-1-nm@ti.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3605112.1758233248@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi David,
+Fix division by zero in ks_sa_rng_init caused by missing clock
+pointer initialization. The clk_get_rate() call is performed on
+an uninitialized clk pointer, resulting in division by zero when
+calculating delay values.
 
-kernel test robot noticed the following build warnings:
+Add clock initialization code before using the clock.
 
-[auto build test WARNING on ebiggers/libcrypto-fixes]
-[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.17-rc6 next-20250918]
-[cannot apply to ebiggers/libcrypto-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fixes: 6d01d8511dce ("hwrng: ks-sa - Add minimum sleep time before ready-polling")
+Signed-off-by: Nishanth Menon <nm@ti.com>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Howells/lib-crypto-Add-SHA3-224-SHA3-256-SHA3-384-SHA-512-SHAKE128-SHAKE256/20250919-061024
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcrypto-fixes
-patch link:    https://lore.kernel.org/r/3605112.1758233248%40warthog.procyon.org.uk
-patch subject: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128, SHAKE256
-config: arc-randconfig-r112-20250919 (https://download.01.org/0day-ci/archive/20250919/202509191938.PrHY82Kd-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 10.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250919/202509191938.PrHY82Kd-lkp@intel.com/reproduce)
+ drivers/char/hw_random/ks-sa-rng.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+---
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509191938.PrHY82Kd-lkp@intel.com/
+Noticed this when looking at kci logs:
+https://dashboard.kernelci.org/log-viewer?itemId=ti%3A0af42187f4b24261b0c102f0&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc6-43-g8b789f2b7602%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
 
-sparse warnings: (new ones prefixed by >>)
->> lib/crypto/sha3.c:317:11: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le64 [usertype] *s @@     got unsigned long long * @@
-   lib/crypto/sha3.c:317:11: sparse:     expected restricted __le64 [usertype] *s
-   lib/crypto/sha3.c:317:11: sparse:     got unsigned long long *
->> lib/crypto/sha3.c:319:36: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned long long [usertype] val @@     got restricted __le64 [usertype] @@
-   lib/crypto/sha3.c:319:36: sparse:     expected unsigned long long [usertype] val
-   lib/crypto/sha3.c:319:36: sparse:     got restricted __le64 [usertype]
+Fixed version boot:
+https://gist.github.com/nmenon/0996e5f7bdbcd3b014cee9921a60d88c
 
-vim +317 lib/crypto/sha3.c
+ drivers/char/hw_random/ks-sa-rng.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-   271	
-   272	/**
-   273	 * sha3_final() - Finish computing a SHA3 message digest of any type
-   274	 * @ctx: the context to finalize; must have been initialized
-   275	 * @out: (output) the resulting message digest
-   276	 *
-   277	 * Finish the computation of a SHA3 message digest of any type and perform the
-   278	 * "Keccak sponge squeezing" phase.  The digest is written to @out buffer and
-   279	 * the size of the digest is returned.  Before returning, the context @ctx is
-   280	 * cleared so that the caller does not need to do it.
-   281	 */
-   282	int sha3_final(struct sha3_ctx *ctx, u8 *out)
-   283	{
-   284		struct sha3_state *state = &ctx->state;
-   285		unsigned int digest_size = ctx->digest_size;
-   286		unsigned int bsize = ctx->block_size;
-   287		u8 end_marker = 0x80;
-   288	
-   289		sha3_absorb_xorle(ctx, &ctx->padding, 1);
-   290		ctx->partial = bsize - 1;
-   291		sha3_absorb_xorle(ctx, &end_marker, 1);
-   292		sha3_keccakf(ctx->state.st);
-   293	
-   294	#ifdef __LITTLE_ENDIAN
-   295		for (;;) {
-   296			unsigned int part = umin(digest_size, bsize);
-   297	
-   298			memcpy(out, state->st, part);
-   299			digest_size -= part;
-   300			if (!digest_size)
-   301				goto done;
-   302			out += part;
-   303			sha3_keccakf(ctx->state.st);
-   304		}
-   305	#else
-   306		__le64 *digest = (__le64 *)out, *s;
-   307	
-   308		while (digest_size >= bsize) {
-   309			for (int i = 0; i < bsize / 8; i++)
-   310				put_unaligned_le64(state->st[i], digest++);
-   311			digest_size -= bsize;
-   312			if (!digest_size)
-   313				goto done;
-   314			sha3_keccakf(ctx->state.st);
-   315		}
-   316	
- > 317		s = state->st;
-   318		for (; digest_size >= 8; digest_size -= 8)
- > 319			put_unaligned_le64(*s++, digest++);
-   320	
-   321		u8 *sc = (u8 *)s;
-   322		u8 *dc = (u8 *)digest;
-   323	
-   324		for (; digest_size >= 1; digest_size -= 1)
-   325			*dc++ = *sc++;
-   326	#endif
-   327	done:
-   328		digest_size = ctx->digest_size;
-   329		memzero_explicit(ctx, sizeof(*ctx));
-   330		return digest_size;
-   331	}
-   332	EXPORT_SYMBOL_GPL(sha3_final);
-   333	
-
+diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
+index d8fd8a354482..9e408144a10c 100644
+--- a/drivers/char/hw_random/ks-sa-rng.c
++++ b/drivers/char/hw_random/ks-sa-rng.c
+@@ -231,6 +231,10 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(ks_sa_rng->regmap_cfg))
+ 		return dev_err_probe(dev, -EINVAL, "syscon_node_to_regmap failed\n");
+ 
++	ks_sa_rng->clk = devm_clk_get_enabled(dev, NULL);
++	if (IS_ERR(ks_sa_rng->clk))
++		return dev_err_probe(dev, PTR_ERR(ks_sa_rng->clk), "Failed to get clock\n");
++
+ 	pm_runtime_enable(dev);
+ 	ret = pm_runtime_resume_and_get(dev);
+ 	if (ret < 0) {
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.0
+
