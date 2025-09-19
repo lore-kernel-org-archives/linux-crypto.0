@@ -1,108 +1,87 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBD62F83BA
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6BE2F83BA
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758295347; cv=none; b=pJmFaBKBpRbh+buxDAszj9OGnGX7LlUop3aDeq2hE03zAAVQAXkanZMvaNduPPG3lK8NKdVMeOMFSxV5vwB2ww1WFtV7/IH63FQtrMmRfs+HS9kHwxQVObiruUq0WPjzOP7PxRzEZjyAjzMfdcGUIHoho6Skunvas/i81U9Zv6k=
+	t=1758296089; cv=none; b=ITABUsiZcieRpnC6nqGgeOhlVfog7VDe7W+pKEdxNPxro26E79sXOuubyCgHFZQTsMGyB912TsZTr5ed3fCx5squaHPrCdiOuchdXIWwBPoCiZUgkDWCIipMixG33aLOC65BVprCw+BJls0G1n79AageQDWUzal/oDOYIvnD66Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758295347; c=relaxed/simple;
-	bh=FKMF9DSD47nX7o/weW+pUO3ESETPx+jjgfVIjD9nctM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b14TV/7MF8czfvBKqlH4Jh1tfpn3Sn1iT8GL2FizKoUP2HgwtOQpXhIa4Q2gbkzlxlrCpB7LiMm2qowZa2tMDHKDzYnbR99uMO/q9XvdTqlmk0+Us13n52ctHvYfvAXqZhKcByBlM8fIihPsG84wbZS4YsvEJTY9tybqn3UofOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=N4RwEQzl; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1758296089; c=relaxed/simple;
+	bh=Ue1Vx4FYQrX5dCM08CjZdMK7j411yWuuKLF8iHVnj1Y=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=YGp6BdGcQGFWb7kar8rYjDXHtWhILQBMh2C41EE04scLQSJoeIpVAbnloozQg1npc3RrIAjFIz9nQ61cit5DH/6svDkAB3Bjr6G9Oi8pKy3zDN/hf1Dh+vtXh2gklWe/wcoLXVXLvI6g+88ybuYsUL3BOgVZg7ixnwfsZ3TaH8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=adYonroL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="N4RwEQzl"
-Received: from trampoline.thunk.org (pool-173-48-111-47.bstnma.fios.verizon.net [173.48.111.47])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 58JFMGSi013229
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Sep 2025 11:22:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1758295338; bh=GCbvWgomfUoMx5WRPim3dczNlmL7tE3plpvrnLAlly4=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=N4RwEQzlysutZlmhWDi7qU5BrDvQ1ougmSYSlzw+vZA1pm7NKfFDJENnZUO4e2gqo
-	 T8zxvqoTAq/VqruEKKZjuCOnFHgOSNoxUhwevCgn6DQWU3NYog0wLHmqIkIWSSofHZ
-	 fg51EXllCEtW31Uhx5DfSNwu/R38wLnzGM2g7dGgHATMBMf6puESd/sjzXPqSntq0y
-	 OCg1CG837rcE13mjavR9dayiUm/rrPVKAIU2ji31wC5Z6QYV2cgH/7Idi0rU+xlDf4
-	 ISez0vTUCRxxBttfkhjNhz+eV6EY7pcQlkEz8sWCDqeEXSUBdzMWbzSl5cvRF2nbOe
-	 h6a2pSYcllTBw==
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 120742E00D9; Fri, 19 Sep 2025 11:22:16 -0400 (EDT)
-Date: Fri, 19 Sep 2025 11:22:16 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Joachim Vandersmissen <joachim@jvdsn.com>, linux-crypto@vger.kernel.org,
-        simo@redhat.com
-Subject: Re: FIPS requirements in lib/crypto/ APIs
-Message-ID: <20250919152216.GH416742@mit.edu>
-References: <0b7ce82a-1a2f-4be9-bfa7-eaf6a5ef9b40@jvdsn.com>
- <20250918163347.GB1422@quark>
- <3e06f746-775e-4b9e-93c9-d1f51f77148f@jvdsn.com>
- <20250918180647.GC1422@quark>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adYonroL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758296087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ue1Vx4FYQrX5dCM08CjZdMK7j411yWuuKLF8iHVnj1Y=;
+	b=adYonroL2aYYG1PxYLdMF6b5K3B7z8sWfgsTfHRHUvVmvPxjKa48yy/ZE224H6vRX987H0
+	93epG2RxgHl6OzkmoJS7eV+EjPIcNPFqWs7mJH6+cerFrP0HXP2GrOtLDXC6B+DBJogXFU
+	MeVC1P2jWps2x6hjPhO6ZYWa4xUX6lI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-lf8UawQ5NIi7Ct5wjQC1Cw-1; Fri,
+ 19 Sep 2025 11:34:42 -0400
+X-MC-Unique: lf8UawQ5NIi7Ct5wjQC1Cw-1
+X-Mimecast-MFC-AGG-ID: lf8UawQ5NIi7Ct5wjQC1Cw_1758296081
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A50D195608B;
+	Fri, 19 Sep 2025 15:34:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.155])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7A78A30002C5;
+	Fri, 19 Sep 2025 15:34:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <2df4e63a5c34354ebeb6603f81a662380517fbc4.camel@redhat.com>
+References: <2df4e63a5c34354ebeb6603f81a662380517fbc4.camel@redhat.com> <2952535.lGaqSPkdTl@graviton.chronox.de> <3605112.1758233248@warthog.procyon.org.uk> <3788819.1758262666@warthog.procyon.org.uk>
+To: Simo Sorce <simo@redhat.com>
+Cc: dhowells@redhat.com,
+    Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+    Eric Biggers <ebiggers@kernel.org>,
+    "Jason A. Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128, SHAKE256
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250918180647.GC1422@quark>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3878471.1758296076.1@warthog.procyon.org.uk>
+Date: Fri, 19 Sep 2025 16:34:36 +0100
+Message-ID: <3878472.1758296076@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Sep 18, 2025 at 01:06:47PM -0500, Eric Biggers wrote:
-> > I'm more trying to figure out a general approach to address these kinds of
-> > requirements. What I usually see in FIPS modules, is that the FIPS module
-> > API is as conservative as possible, rather than relying on the callers to
-> > perform the FIPS requirement checks.
-> 
-> Aren't these distros including the modules within their FIPS module
-> boundary too?  It seems they would need to.
-> 
-> Either way, they've been getting their FIPS certificates despite lib/
-> including non-FIPS-approved stuff for many years.  So it can't be that
-> much of an issue in practice.
+Simo Sorce <simo@redhat.com> wrote:
 
-What I would recommend for those people who need FIPS certification
-(which is a vanishingly small percentage of Linux kernel users, BTW),
-that the FIPS module use their own copy of the crypto algorithms, and
-*not* depend on kernel lib/crypto interfaces.
+> I strongly suggest creating a test vector where multiple absorb and
+> squeeze operations are done in intermixed order, and then use that test
+> vector in your Kunit tests to ensure changes to the code do not break
+> this fundamental property of the keccak sponge algorithm.
 
-Why?  Because FIPS certification is on the binary artifact, and if
-there is a high-severity vulnerability. if you are selling into the US
-Government market, FEDRAMP requires that you mitigate that
-vulnerability within 30 days and that will likely require that you
-deploy a new kernel binary.
+I'm putting such a beast in the module init function at least.
 
-So it would be useful if the FIPS module doesn't need to change when
-your FEDRAMP certification officer requires that you update the
-kernel, and if the FIPS module is "the whole kernel", addressing the
-high-severity CVE would break the FIPS certification.  So it really is
-much better if you can decouple the FIPS module from the rest of the
-kernel, since otherwise the FIPS certification mandate and the FEDRAMP
-certification mandate could put you in a very uncomfortable place.
+Annoyingly, Eric's hash-test-template.h makes some unwarranted assumptions
+about the hashes it is testing - such as the final function zeroing out the
+hash struct.
 
-It's also why historically many companies who need to provide FIPS
-certification will carefully architect their solution so it is only
-dependent on userspace crypto.  A number of years ago, I was involved
-in a project at a former employer where we separated the crypto core
-of the OpenSSL library from the rest of OpenSSL, so that when there
-was a buffer overrun in the ASN.1 DER decoding of a certificate (for
-example), we could fix it without breaking the FIPS certification of
-the crypto core.  And we didn't even *consider* trying add a kernel
-crypto dependency.
+David
 
-One of the important things to remember is that as far as FIPS
-certification is concerned, the existence of remote privilege attacks
-don't matter, so long as you meet all of the FIPS certification
-security theatre.  But in the real world, you really want to fix high
-severity CVE's....
-
-Cheers,
-
-					- Ted
