@@ -1,72 +1,72 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593F9313E11
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886101C862E
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294372; cv=none; b=Mn5f9BJ09OKKqivk/CYvDdj5NTOpC0pXIREVbrwdXXuLMbeE53fJP1Wt6MF0M0X+h01fKw2vT06T6KgRbyMYMlzk7B5TXjsxV2PC+I/5NF2SdiXik9k/sgQum2ePhkspGvEZlwBU1RnY7REfp2W19SGixIq4fytd2M7qTrzdA0Y=
+	t=1758294401; cv=none; b=Pe3CUDLQgAXVoM119qGxEgQmN/DO7XdhChEn6GkJqT+Lq1Fnblrm1fFmZg8M848x6q9eGhwhes5zrsHJdyrm9FAXorXcLX5sovdrVvKWHvL/Jz4fl1FFGxoBe91Bgw67Mg39xuDVYlq3/ymEH+fd2dnMkm0DYOnWqhCEpvliBt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294372; c=relaxed/simple;
-	bh=wdojHUk/IaswjOXNhFweViADqPcfNEDUvrpmqOD6T84=;
+	s=arc-20240116; t=1758294401; c=relaxed/simple;
+	bh=wq2abhQipyX+QwuDbNp6dgczc/zpKuyCE998M/az7IY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B2L8oUe+Tya/CivaXWvsfuGWO/OJXgWsm2RwUG/pa8rgm3zK3tO6siWIuYyUJ59A8W5EwTxFOPLenuf+EuCnnjU48Fkf/QyEmzQNScXNN7psLsVibjQs++8eplz1DPDDQv6BO+X8G2n72Si0omij5UcPgKuurccJWmRTlHmXufI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XrsxQaBU; arc=none smtp.client-ip=209.85.219.50
+	 To:Cc:Content-Type; b=o8n4ibSZ8neJH75Fts1GprXBtgc5YBXQnYw9UX1CyEOcN33FsZKbiE58aalvLGTXiQ0TXHCI0Jypd4RE3pT3IgnU/OU1I1m9+HpgDrSX7J29oDrr5mJYoXBGGx7d7VQiM20cg0eCS00x49qovB/JDcwKhVBXW/T1XHy/tV0cUHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gn6vO+nL; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XrsxQaBU"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-78e4056623fso18560886d6.2
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 08:06:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gn6vO+nL"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-70ba7aa131fso22553116d6.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 08:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758294370; x=1758899170; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758294397; x=1758899197; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X2StnNKxKVl/rGS0fAgoxWZPalUwZSRkr2jKpUk0esc=;
-        b=XrsxQaBUoAzDlaVC2qo327eDnsB0qVHV3qKzQ4XsbuYZU+zzFZbVnwoELn7t3qon4G
-         At+HS8deqXMDM3w+VcAJYS7SuOzONXdzYyYBjZh6DYUsmdDU1VkIy1GIMgLyfdpdcIm0
-         qLysFY8v9aS8akIHeyLBK8SMB9eLq5dIjM8Q58T1KahckVXaKUkJu9qAcFnmJdd5AmRe
-         TwVgmIoySQygVlJspzO933T7mYPLzU0W0NcSyN97SPVo+vHXXnoizKgRTwVzhf/f5Ppc
-         /5yTK/e+gUP/OjXbD5/OCIQcjpx5Iny/4MIlBdMZi6Njz8yjfR8AAgFWz9wRdd6P+xjs
-         b4Cg==
+        bh=wq2abhQipyX+QwuDbNp6dgczc/zpKuyCE998M/az7IY=;
+        b=gn6vO+nLjJcK09NnVY6/EwXtc16UAGnom97Yds9I/gU/ZLFI6sZ2tV9Xq3MnfoHptY
+         91dXILumQnl5QQWy7hr8ePI5uSVWT8m1uWxjYJ7QWRFX+mewd+dftuP8Hkn9FnxwUKIK
+         AkQxflKQ008azAr6BUEHd46tJdaZX5akIAadsZC3o31fynecKgKc+KtNpvAy3AWEeHu1
+         Cz2bUrWobkBPYc6XFYTnpBeypSYurZrOQ8OrFG+lh3wQXTWa2bDaBUOruLXKryxFefxn
+         KW4GOWXlL33wQAyAZiTpkmSaxuozS8ak6hn50PdQkpojRaPGfW10p+n0vzFOnSvPT4zZ
+         f3Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758294370; x=1758899170;
+        d=1e100.net; s=20230601; t=1758294397; x=1758899197;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X2StnNKxKVl/rGS0fAgoxWZPalUwZSRkr2jKpUk0esc=;
-        b=HeAHMwFOYQtlm8FgTqXEvVGBOO1UbLse02llqdOtfO0BiYZNyTCQJrqRi7PPVkvx4F
-         aBhIc5L1wJ1YqGkGlEARCUGAZk2CRPyGcsCNPAQxC+srhOqtv/bon7eUfZjKtxyz/IT0
-         2wXCszjiXT/BDdv/BDh1KZoB7MmS7E8ecNEyMvfia5WrGcqwhoFr9/z7ylpqjD6VejPy
-         LseMoqyIWR5UoEdMFFQBlnTezr9li/r5zQ5J3SagE1reA1DSktzVHakqYBp+07C9JcSL
-         4lJwO6EWRQo6cQZpukCjrHRgcsUEhXRgXlS+m86oXCNedYqu6fQN+NWYg5af9bZFxhwS
-         CpFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXMPuUiYhq75rldF5dD2V+aV7iZ8Ch0eMmSLqnEGx3Yv9gDMEH8Rw8zYNXF/TTS90Acx86lqD8/Jxpzmkg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytrUwoW5K6/Di+or5vs8vzJexMHDtwVIU4eRxPECUkTsijdIrU
-	0zxUclcAmdUzeTVvX04PH6rdLkU3aZgxV/jniuEwm7UNNpolPBUlGbVhQccO9EC5yMZPcwSEbE0
-	XnNJNd1/7JLZ4z7MaR0Rc5DeRKweW3cXd+1HTWhyU
-X-Gm-Gg: ASbGncvS1Eq1NaE/9fggeW6DwGJLGiIqhLLYB9AuGZviDVJDXB7rFRxFyj4CxUwiEd7
-	Vl2AQeQ364r6lEXIpuqM9OrW9WvtpW0hcJitUw9AUJB4UJrCJJVX3u2ZB7gaf+QT7DI/vxbzekD
-	/XCsSrZTCl/umvh6if8FDNslM/hPc1evhOBA2cq7EFPn1Q/3e5ZOj7qfQi1+53OMAXLqGl+VBQO
-	fYoNb5fyuBUU7sRZv3tJXQAPYb6TB1tDy2qAw==
-X-Google-Smtp-Source: AGHT+IHfnOEj1gMhyVykBwx/odq4LWyP4tOsK2JQ1CQRm3BPJztFNuuL5zFmF2mdOG0LX/4UQZju33b9dOCcFbl89Gs=
-X-Received: by 2002:a05:6214:2aa6:b0:787:68a5:51f4 with SMTP id
- 6a1803df08f44-799139ccbe6mr37966906d6.26.1758294369549; Fri, 19 Sep 2025
- 08:06:09 -0700 (PDT)
+        bh=wq2abhQipyX+QwuDbNp6dgczc/zpKuyCE998M/az7IY=;
+        b=XNBF5YBO6j48kWKO/uC234aNp+u6wEJjsNU9WIJ2V6KimRQmGko8EjV7L+5zlnrFIp
+         xqlUlsWZ5SI/vuWn9wOxheaCuZXcLd3EkwVXAIEIUXDLkYB+ZCDkGSylRZoOmsToEtZm
+         AMkLzuKw0HWkWE7l1Dm6bnqZNPwPK5+uoZ1ucl3mP7CvGdsBHgpA8g5BKByvRWtAq1jP
+         Mhu+1/IT8tAuvJGrSfweZcKy1kkPZfvHhaJ2qW7yraMJGYGsalvQkFDNxEBql1rC+w0M
+         Ev1CJ20Xp+QcSgbAf7yo4Hh9ilqMt1p2a4DojMThfro/cSWl18AdjRgqjn0+z1q9qRXo
+         Lfhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLZ4wSBip6ucwvry54xVKuXn4HKtEW+bf80gt01dJ7qtcpqSor9sULl9iRcnIV/SV9DgUTNjOmzGuRhkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyOhJGOZI7Cd7UyCSaJSzFPoZA5MJYBacRd3h1Q1lLljLd9RA6
+	szWVQV7K1J2Mc+Ei3xEEyyhbmi1F/TnjdTxBwgrSDoBYMj5LvfdqJlSPpip9Dy1B3svkZuWgobZ
+	igigt5hbUfInpsw56IT81WTyE8nHaxNxc1gJJ/H2S
+X-Gm-Gg: ASbGncsJPpNRQHA6YyI07VSI8lChwFlDkkAu2Zml7gOUkOFOGT2p7XGfntsFmnE4D8Q
+	kXtTVEfPyErDt88v0aV4QDZoY9P4OOJg+BCPOYHmluP64Bnq7TSLV8+4E1r1l89l8m+fs8u4M/N
+	ADWWCQltQHGguC0vKFlSoAp0nGg6qUEKgXmorKqKHN1CyTiYa4UBZh/38nOxdJZ+z5HPkTcA2BM
+	a1UoBL4E1Ok2Z3pYPZRjSGRdBw04LbycX3m/g==
+X-Google-Smtp-Source: AGHT+IHAZGtVHgR/T5vgwj/kVG3d+Xvhn85HcOAqMoUr6UVAzkpi/OktlLCwoHTesoJWJTkkDQIa4OfoQDwjclHUNCg=
+X-Received: by 2002:a05:6214:212c:b0:798:acd7:2bb with SMTP id
+ 6a1803df08f44-7991d54f750mr32395906d6.51.1758294396642; Fri, 19 Sep 2025
+ 08:06:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com> <20250919145750.3448393-4-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250919145750.3448393-4-ethan.w.s.graham@gmail.com>
+References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com> <20250919145750.3448393-5-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250919145750.3448393-5-ethan.w.s.graham@gmail.com>
 From: Alexander Potapenko <glider@google.com>
-Date: Fri, 19 Sep 2025 17:05:32 +0200
-X-Gm-Features: AS18NWBlYb6i59Bt1eV3KacTLjZoCQjcTTUaAaIGM2IX6otsVz3ln6Zi77bGuIg
-Message-ID: <CAG_fn=Xd07FvCp-tU_kSyjeJS-4gruaO1x5iowrQQ7zkv2cLeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 03/10] kfuzztest: implement core module and input processing
+Date: Fri, 19 Sep 2025 17:05:59 +0200
+X-Gm-Features: AS18NWA5Hk_dVmA1agOSIAGh1dzuifFPUnlHCTY8eojJWXc2mgupvfI9rEJhlqQ
+Message-ID: <CAG_fn=VXNBH-1QDAy+xR_ubUr0rZxmPBpFWov1y+7a65-mtGmA@mail.gmail.com>
+Subject: Re: [PATCH v2 04/10] tools: add kfuzztest-bridge utility
 To: Ethan Graham <ethan.w.s.graham@gmail.com>
 Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
 	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
@@ -85,21 +85,19 @@ l.com> wrote:
 >
 > From: Ethan Graham <ethangraham@google.com>
 >
-> Add the core runtime implementation for KFuzzTest. This includes the
-> module initialization, and the logic for receiving and processing
-> user-provided inputs through debugfs.
+> Introduce the kfuzztest-bridge tool, a userspace utility for sending
+> structured inputs to KFuzzTest harnesses via debugfs.
 >
-> On module load, the framework discovers all test targets by iterating
-> over the .kfuzztest_target section, creating a corresponding debugfs
-> directory with a write-only 'input' file for each of them.
+> The bridge takes a textual description of the expected input format, a
+> file containing random bytes, and the name of the target fuzz test. It
+> parses the description, encodes the random data into the binary format
+> expected by the kernel, and writes the result to the corresponding
+> debugfs entry.
 >
-> Writing to an 'input' file triggers the main fuzzing sequence:
-> 1. The serialized input is copied from userspace into a kernel buffer.
-> 2. The buffer is parsed to validate the region array and relocation
->    table.
-> 3. Pointers are patched based on the relocation entries, and in KASAN
->    builds the inter-region padding is poisoned.
-> 4. The resulting struct is passed to the user-defined test logic.
+> This allows for both simple manual testing and integration with
+> userspace fuzzing engines. For example, it can be used for smoke testing
+> by providing data from /dev/urandom, or act as a bridge for blob-based
+> fuzzers (e.g., AFL) to target KFuzzTest harnesses.
 >
 > Signed-off-by: Ethan Graham <ethangraham@google.com>
 Reviewed-by: Alexander Potapenko <glider@google.com>
