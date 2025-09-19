@@ -1,118 +1,108 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025E6314A82
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBD62F83BA
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294496; cv=none; b=V1eccIDwZwS1g0cVfXYrIzqbd8dlj4a2Z/RncDvgnM8cetSUHs50+0SmD8bbhW445quSYbtVcUVBrX5k05EXJdsFUkMMBMYUoBfS1ZE59WHv70dCX8ftlSQqAcCrSRxD7Cl+JkIYLfs5ZC6xMlZXE4sKLvh7/o6s+O1xtPWJF7o=
+	t=1758295347; cv=none; b=pJmFaBKBpRbh+buxDAszj9OGnGX7LlUop3aDeq2hE03zAAVQAXkanZMvaNduPPG3lK8NKdVMeOMFSxV5vwB2ww1WFtV7/IH63FQtrMmRfs+HS9kHwxQVObiruUq0WPjzOP7PxRzEZjyAjzMfdcGUIHoho6Skunvas/i81U9Zv6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294496; c=relaxed/simple;
-	bh=LFmZTAQu6xp1H90eoajASSZ3CmnWB3SEwm5mOewzT+c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HI0xEDHnWgWldSy8Eon1AykSxliGvJKp653asF1vUkBx/VMWdpUiphfrI5Zazu17Cu7QWNejc5q3nW0bx0CUrmRi+rYPro945MtK+QGoQysg/lw/KuE61umvVru81pkbp2QwshGaU7yQlpjBmr2X/i3URx8Lf9rF21RbKOFWsGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Z/K4B9X; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1758295347; c=relaxed/simple;
+	bh=FKMF9DSD47nX7o/weW+pUO3ESETPx+jjgfVIjD9nctM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b14TV/7MF8czfvBKqlH4Jh1tfpn3Sn1iT8GL2FizKoUP2HgwtOQpXhIa4Q2gbkzlxlrCpB7LiMm2qowZa2tMDHKDzYnbR99uMO/q9XvdTqlmk0+Us13n52ctHvYfvAXqZhKcByBlM8fIihPsG84wbZS4YsvEJTY9tybqn3UofOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=N4RwEQzl; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Z/K4B9X"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-78e9f48da30so18743476d6.1
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 08:08:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758294494; x=1758899294; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LFmZTAQu6xp1H90eoajASSZ3CmnWB3SEwm5mOewzT+c=;
-        b=0Z/K4B9X5738MGfMqOKpD3WwNb4cORUHDzzxhKW2ALgC8FHrV92lpbWZysSIn3rAvU
-         OOxG0s5hAKICwoSHQbBGyu+1rk8Jiz7C54Fz2cKjwOQxfrQmvCk80zTlwcrO7toIyAoV
-         iamrutRis37nYKihP89VXeTlNZisi3Uv/c9SP+3WwQe1V1ObPBivW7CtXFID3BVMdKXK
-         uCCAJEvD4yZot5OjUvWW1CGWaCDMYfVvDOys7+8jgEd1v2/BtuMQOLoKS9UO1w6ne3cH
-         7q3zlEyQkVy4j8TM+VqyEErbsbayT75fJzv6lVZOAOfiIgGRz8t4dJB2BC00ZkGwcTWq
-         qBAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758294494; x=1758899294;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LFmZTAQu6xp1H90eoajASSZ3CmnWB3SEwm5mOewzT+c=;
-        b=p9KdKpT61Q2uzYdTxpea8vbILckqAwq09ZzWhlAfWHRWX7xQQYpZOwSJ6ucFNILD5P
-         ppFOYunfpazVrOVPbmXZzX8KrWp9rng++uRVwIRHumjGYuR36DrFIm+63/wBUXM4ARk1
-         VIThrm1YtV+vvsdkzIZzzR/7tNtRc9r+nJWDu68DQeQTL4894BR1Z2KYfdAPgFVGjMTY
-         IJf3qrt3w5bx2Azltv5kL0ywytjHKQUYIVh8mUq4l3z5Zmmx/7sCWFIZCaKIEq0F5zoO
-         aqplmNOXmFtmfsgtmHQ19Yyaycz5CPBGzvvD4YlwVmKfOe+u1z9edvivVP3OG1sE0Ivv
-         664Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVg6vgs8PpJoBFiPWDmSltlpYk336ScTK6Tr5hmWAkz+RlWiMwG12iV1jlReVckTBEm37J2jRYETjotUzA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK8eGOcat8wCvL8DrM5iLW6d/bxbILS8BktE0uN5yLNUMniT1S
-	6ze4Nv6CcKGrFLVzf1P7bIJB74ZNIgAkAdiHIulvlBeNwWpWbtZkmKUzZmitxFpkDwoV0r4bcoH
-	wcvBVtv6cPfmGRSOF5tjsXBgoonEAn7idpovl7Nk2
-X-Gm-Gg: ASbGncuQ+F+QftSgbg6jif8JRR8VDcdOZmJUoUJq2zS76KMBiJufHtN8UQKgWXwXaeP
-	uP28qub7ya6SfkwZblGVigxg1P/JEeIG1/I6x2O5ZZXAkYBdVGrpZFadq5fX3cna6hikSZWrmeh
-	HGp1QCb7Yk3R9edorx7s0Gdw9X+vy2Y7BwaQVb8p5uxyhkn81gpwSOnCxJpqHyUTAWJeVSQxIpy
-	mGHqd+iDsgz+qhj/nHfEl4zUhTKR/Bi6IgRlw==
-X-Google-Smtp-Source: AGHT+IFR40Mffz39BAytKY3HCLacxnJ1WKp/TI2KMqqv5ab7iIIVbpHo/r7oLhpjnTyf+invw9UKbqtbStpZDWCH5zU=
-X-Received: by 2002:ad4:5d66:0:b0:710:e1bc:ae42 with SMTP id
- 6a1803df08f44-79910e91071mr49973476d6.10.1758294493230; Fri, 19 Sep 2025
- 08:08:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="N4RwEQzl"
+Received: from trampoline.thunk.org (pool-173-48-111-47.bstnma.fios.verizon.net [173.48.111.47])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 58JFMGSi013229
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Sep 2025 11:22:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1758295338; bh=GCbvWgomfUoMx5WRPim3dczNlmL7tE3plpvrnLAlly4=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=N4RwEQzlysutZlmhWDi7qU5BrDvQ1ougmSYSlzw+vZA1pm7NKfFDJENnZUO4e2gqo
+	 T8zxvqoTAq/VqruEKKZjuCOnFHgOSNoxUhwevCgn6DQWU3NYog0wLHmqIkIWSSofHZ
+	 fg51EXllCEtW31Uhx5DfSNwu/R38wLnzGM2g7dGgHATMBMf6puESd/sjzXPqSntq0y
+	 OCg1CG837rcE13mjavR9dayiUm/rrPVKAIU2ji31wC5Z6QYV2cgH/7Idi0rU+xlDf4
+	 ISez0vTUCRxxBttfkhjNhz+eV6EY7pcQlkEz8sWCDqeEXSUBdzMWbzSl5cvRF2nbOe
+	 h6a2pSYcllTBw==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id 120742E00D9; Fri, 19 Sep 2025 11:22:16 -0400 (EDT)
+Date: Fri, 19 Sep 2025 11:22:16 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Joachim Vandersmissen <joachim@jvdsn.com>, linux-crypto@vger.kernel.org,
+        simo@redhat.com
+Subject: Re: FIPS requirements in lib/crypto/ APIs
+Message-ID: <20250919152216.GH416742@mit.edu>
+References: <0b7ce82a-1a2f-4be9-bfa7-eaf6a5ef9b40@jvdsn.com>
+ <20250918163347.GB1422@quark>
+ <3e06f746-775e-4b9e-93c9-d1f51f77148f@jvdsn.com>
+ <20250918180647.GC1422@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com> <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 19 Sep 2025 17:07:36 +0200
-X-Gm-Features: AS18NWA8NT9J6yW558WFqJ9v7KlWvLUFu5ioEKltNkloZ03huDtjBzwZEdnYYKc
-Message-ID: <CAG_fn=VVWKR0JLCTZ8HvB51UX3EYrFg1s_xD-ohOKDQwDHOxHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/10] fs/binfmt_script: add KFuzzTest target for load_script
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
-	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
-	davidgow@google.com, dhowells@redhat.com, dvyukov@google.com, 
-	elver@google.com, herbert@gondor.apana.org.au, ignat@cloudflare.com, 
-	jack@suse.cz, jannh@google.com, johannes@sipsolutions.net, 
-	kasan-dev@googlegroups.com, kees@kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, lukas@wunner.de, rmoar@google.com, shuah@kernel.org, 
-	sj@kernel.org, tarasmadan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250918180647.GC1422@quark>
 
-On Fri, Sep 19, 2025 at 4:58=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gmai=
-l.com> wrote:
->
-> From: Ethan Graham <ethangraham@google.com>
->
-> Add a KFuzzTest target for the load_script function to serve as a
-> real-world example of the framework's usage.
->
-> The load_script function is responsible for parsing the shebang line
-> (`#!`) of script files. This makes it an excellent candidate for
-> KFuzzTest, as it involves parsing user-controlled data within the
-> binary loading path, which is not directly exposed as a system call.
->
-> The provided fuzz target in fs/tests/binfmt_script_kfuzz.c illustrates
-> how to fuzz a function that requires more involved setup - here, we only
-> let the fuzzer generate input for the `buf` field of struct linux_bprm,
-> and manually set the other fields with sensible values inside of the
-> FUZZ_TEST body.
->
-> To demonstrate the effectiveness of the fuzz target, a buffer overflow
-> bug was injected in the load_script function like so:
->
-> - buf_end =3D bprm->buf + sizeof(bprm->buf) - 1;
-> + buf_end =3D bprm->buf + sizeof(bprm->buf) + 1;
->
-> Which was caught in around 40 seconds by syzkaller simultaneously
-> fuzzing four other targets, a realistic use case where targets are
-> continuously fuzzed. It also requires that the fuzzer be smart enough to
-> generate an input starting with `#!`.
->
-> While this bug is shallow, the fact that the bug is caught quickly and
-> with minimal additional code can potentially be a source of confidence
-> when modifying existing implementations or writing new functions.
->
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
-Acked-by: Alexander Potapenko <glider@google.com>
+On Thu, Sep 18, 2025 at 01:06:47PM -0500, Eric Biggers wrote:
+> > I'm more trying to figure out a general approach to address these kinds of
+> > requirements. What I usually see in FIPS modules, is that the FIPS module
+> > API is as conservative as possible, rather than relying on the callers to
+> > perform the FIPS requirement checks.
+> 
+> Aren't these distros including the modules within their FIPS module
+> boundary too?  It seems they would need to.
+> 
+> Either way, they've been getting their FIPS certificates despite lib/
+> including non-FIPS-approved stuff for many years.  So it can't be that
+> much of an issue in practice.
+
+What I would recommend for those people who need FIPS certification
+(which is a vanishingly small percentage of Linux kernel users, BTW),
+that the FIPS module use their own copy of the crypto algorithms, and
+*not* depend on kernel lib/crypto interfaces.
+
+Why?  Because FIPS certification is on the binary artifact, and if
+there is a high-severity vulnerability. if you are selling into the US
+Government market, FEDRAMP requires that you mitigate that
+vulnerability within 30 days and that will likely require that you
+deploy a new kernel binary.
+
+So it would be useful if the FIPS module doesn't need to change when
+your FEDRAMP certification officer requires that you update the
+kernel, and if the FIPS module is "the whole kernel", addressing the
+high-severity CVE would break the FIPS certification.  So it really is
+much better if you can decouple the FIPS module from the rest of the
+kernel, since otherwise the FIPS certification mandate and the FEDRAMP
+certification mandate could put you in a very uncomfortable place.
+
+It's also why historically many companies who need to provide FIPS
+certification will carefully architect their solution so it is only
+dependent on userspace crypto.  A number of years ago, I was involved
+in a project at a former employer where we separated the crypto core
+of the OpenSSL library from the rest of OpenSSL, so that when there
+was a buffer overrun in the ASN.1 DER decoding of a certificate (for
+example), we could fix it without breaking the FIPS certification of
+the crypto core.  And we didn't even *consider* trying add a kernel
+crypto dependency.
+
+One of the important things to remember is that as far as FIPS
+certification is concerned, the existence of remote privilege attacks
+don't matter, so long as you meet all of the FIPS certification
+security theatre.  But in the real world, you really want to fix high
+severity CVE's....
+
+Cheers,
+
+					- Ted
