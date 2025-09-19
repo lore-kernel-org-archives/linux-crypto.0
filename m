@@ -1,77 +1,74 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA87731A7FC;
-	Fri, 19 Sep 2025 15:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118CD31FED6
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758296471; cv=pass; b=o5THEbtYyOMy8B65qrxM9K/lKZWegk4kx020XDPiLfxNEKCeRbPA3iJZPSy2eMsHELEZIGf6ujt1MbSkLx0nPP0n5RUeS51JZprojhAE+ps799S0n3e915kmdQ4ze9LuvtNaK3X3bzvijkt/h/BJxzrj72ojl/1AOAYeTku0d2s=
+	t=1758296998; cv=pass; b=NZTZx/zzPt3QfPaeKC2BEO+kVnvMS0LiVj4Zff34CZxM900vIqOHpzxgTT/+671250IwYiBEPE+Pw0Vq5JKUY6NQurICzKORwwpJaCQZkXk9K6cXjiAvuFL/gyVzlLBZNrigx4JDdwAP1flI6Z12ZWU14kQcl0F1vKNT1Pdz4E8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758296471; c=relaxed/simple;
-	bh=dLLSUAplUoNQA5aiUeRF8Hi4vrmrWMWmQNmpzTQouB8=;
+	s=arc-20240116; t=1758296998; c=relaxed/simple;
+	bh=T1iw/rf5xGYjSw3c7GSVoCEB81X64Gm+6auowTWe3+g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SoAubqLUU/1JXKBYf2/NQxjdr8TIPpyRyZw5OZey5zd4VqmRJYHQxkxRHw49yYr4vTpI8ErX70TOk+6CFS85eEMUV128BVYqT8HV1fC22+lmNCl00/pqzsXt4QtZw2ugVjdR02VGiuAtFAyvIP8me9BtRMw6+PdzX8FkGgs8xFo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=HbJCcQnU; arc=pass smtp.client-ip=85.215.255.54
+	 MIME-Version:Content-Type; b=MjUjX/fhn4MNDgS2JQh+E1R54sTLyt8ISQdjWV8fDi4pvTa59BM32CxRIs7gm719ZaYdcJhGDBUCo0HIfITxnlxGRmt9BPULkWwum2m8k2zXk+nUrFsManFSNrgj8u7adykQdzbNscfx+zb/J3YyBXZtyLUnigHvi44YIhul51M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=aRD0dyeg; arc=pass smtp.client-ip=81.169.146.166
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="HbJCcQnU"
-ARC-Seal: i=1; a=rsa-sha256; t=1758296459; cv=none;
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="aRD0dyeg"
+ARC-Seal: i=1; a=rsa-sha256; t=1758296988; cv=none;
     d=strato.com; s=strato-dkim-0002;
-    b=oFUxzum3+k4pMRPF8QasaDiIl/DfcUGpzA66TBK54wPmhBn33p9+vDPfkOOckU0WeZ
-    2TxD8dZOXPVQMnGm5ZHy/iPSaSYxzT0WuOfiJSD8BKvJrMmwSIiBR5hh43P+lNh4fauY
-    rpAVht70EjvPThIbZt3h0rZ0NOwDjlKRbIocIOVfBzh9wAzP3JQSNQB3lTL7YFOdy9Pk
-    x207yhaOxE9bVPX8P9oAKzz7nTrlaIJSZHso5ZiXYhDClub/O4nL4wy6AJq6HJPjpHSK
-    xvv91X1r8EHXG/5Vkw5QW3DB3R3WxjXN5gBJnojzqZB6H4Zjr5Vtzr6YEx3N4B6To5hu
-    TZOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758296459;
+    b=dHG+Cu9X5FwOV5/l8wma8NN/3k4pMhOZamJzSj12GyaP9udWE+4ehq1x0C7o8INXeq
+    Wg8eDC195Qe4F1FJaDhGnGWdERPVQpK3QyTC6Si+lGW7ZYLBfBc1IYRwIWV4EvKlpaWb
+    p9q1dfFAD/ANcQKSZTwC+oZ8O1AQnfwWbZafu4K3gZFLgbdegJJkb2/d38Bdow3CkqP2
+    zrlB+K/RRil8dMD1gS3UwRWKKdn9okEV4nrY7eVYv1wYdA5hZIcOnlO+ISw6MboLS9xB
+    kjr2LmU7bvzGW5/iTTKs/82McHURjOXDLxOsnk6Ra+WjYo/8ElZ1XZxaH0VnHBsGDBau
+    cIkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758296988;
     s=strato-dkim-0002; d=strato.com;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=dLLSUAplUoNQA5aiUeRF8Hi4vrmrWMWmQNmpzTQouB8=;
-    b=ihwRcnLIU2v2/la6jyElIqZkdukehFjDAzpOfdHU8tujb4zvlntfU7N7M9geMV4kAg
-    acIpIRpka3i2aEm7ZEPYu9u2GkIFfTKG8rNDpNJAiAOQXNK72AOqYy/TFPtl4CUgP1cQ
-    yDl7ceGq5slajDU8Kwn2w/p+6o191nQPgGn+99PTIQwJXUzWd+4v9Kd+SBilAMevbaBK
-    mreq01j0BOmKykQs9sjFOHERRArYGpxpaNa1XW7VdmAWEydtk5wanjoJFMW0uToYhFfG
-    HCW+6W+4+pXYMwcBVFytZqUYflTgIPjgHmv0ZrGszsYmJxnOTnyng1nRicHeilv1FyfR
-    wAwA==
+    bh=T1iw/rf5xGYjSw3c7GSVoCEB81X64Gm+6auowTWe3+g=;
+    b=hZcIvHZZ0VdJGAU3tXqgAvGjXOgHi7ET8di6w3Q+vMTjZAfKzoJpjAVY1xaxYGWKDV
+    js42v+ET5IkHGqDLWsA7tQxPCYwc7E+V0y8K4tJXRP9Ux5a+/c0goPJmGuwxdq1W/9ej
+    NgM9F1jEL0UZt3OFOLX0aORlIMAzW963Fgi33a7svQI6mGvxb3iFZ0JmmaIuFsJE0pkt
+    /VEq8kyLRdYuUB/blUArnYMgZ50LRShhcO2BSEFHV6Uy+kEpYwSo6V1HwjFFXZsDGGhB
+    af/6AL1bQu039UvCuA9uP+4fM6CbBmgI8j5uYReNFQbVMfrToqbiZ8SzmzS5bK7s4MEx
+    SSXA==
 ARC-Authentication-Results: i=1; strato.com;
     arc=none;
     dkim=none
 X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758296459;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758296988;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=dLLSUAplUoNQA5aiUeRF8Hi4vrmrWMWmQNmpzTQouB8=;
-    b=HbJCcQnUyVtxC9x6tJjdJmx8dMUHUH2EKL9iTaAXnUvyPc9KQOMZS40LicIrHGdEsp
-    mnJ79mckNbPcD0zXTal1rEotTvPB5iSonRZQZXh4e8Ai8mbmMJuv/yDWtYn0+9FeBmI+
-    BpMD5KpW/wJpL8kuewnnzNitzT32z+idQ8UpRpxxtIxWoE59cdUHRclmIzwBCg25OJbW
-    6dx9CN/RmKy+NF+ECgHwm+lSiNFcVp0MoClPeJ9vyRsNt+lNIBiL2yr3wvZvklfvkjMq
-    wRWkDyCGk/VXPVHzDHN3Mb4zc7SAFQejpKwNQ9u7O+jsNKSAqn/2VhSL2t5U3Bk1ERRM
-    +TaA==
+    bh=T1iw/rf5xGYjSw3c7GSVoCEB81X64Gm+6auowTWe3+g=;
+    b=aRD0dyegqMFy5CMJXknN2B35ZMvH+q8pSblKfzRnsmngg+767fXWKRtKw7QZ19kWq3
+    +9tI1B+tKXGshqUn7eNguEypJQC8O4wx0M1vTefrfUj1+4uDzMy8+yQNhO3ubLpkTL5C
+    JEG6fO4KuF77kc4ORmRgvac/Heyz2Q7F0cLhcMsMEB0xFlsSqtSS9h7vwxWTzL6OAVUj
+    1ag/OUEYRuO053EvFBDR0vZPFZZRSp97QfpB93MLhN1amjokU26WJ0Lerl/7Cefz0hHN
+    yCeHUVZC4CQAiENjeKD4Pyhlnv9nJvroYO3EzBHi0exy0vvNT7JdjmxFwzj3MLtqihnZ
+    tHEA==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdP57PWmc+BP1jdA=="
 Received: from graviton.chronox.de
     by smtp.strato.de (RZmta 52.1.2 AUTH)
-    with ESMTPSA id f01e6318JFeuL0j
+    with ESMTPSA id f01e6318JFnlL1f
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
 	(Client did not present a certificate);
-    Fri, 19 Sep 2025 17:40:56 +0200 (CEST)
+    Fri, 19 Sep 2025 17:49:47 +0200 (CEST)
 From: Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>
-To: Simo Sorce <simo@redhat.com>, David Howells <dhowells@redhat.com>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
- keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512,
- SHAKE128, SHAKE256
-Date: Fri, 19 Sep 2025 17:40:53 +0200
-Message-ID: <2400141.9o76ZdvQCi@graviton.chronox.de>
-In-Reply-To: <3878472.1758296076@warthog.procyon.org.uk>
+To: David Howells <dhowells@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Simo Sorce <simo@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: Adding SHAKE hash algorithms to SHA-3
+Date: Fri, 19 Sep 2025 17:49:46 +0200
+Message-ID: <2775306.XAFRqVoOGU@graviton.chronox.de>
+In-Reply-To: <31fa6cb0a6b72b9ceed9bd925d86ad92b78b5bdf.camel@redhat.com>
 References:
- <2df4e63a5c34354ebeb6603f81a662380517fbc4.camel@redhat.com>
- <3788819.1758262666@warthog.procyon.org.uk>
- <3878472.1758296076@warthog.procyon.org.uk>
+ <aMf_0xkJtcPQlYiI@gondor.apana.org.au>
+ <3790489.1758264104@warthog.procyon.org.uk>
+ <31fa6cb0a6b72b9ceed9bd925d86ad92b78b5bdf.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -102,29 +99,45 @@ Autocrypt: addr=smueller@chronox.de;
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
 
-Am Freitag, 19. September 2025, 17:34:36 Mitteleurop=C3=A4ische Sommerzeit =
+Am Freitag, 19. September 2025, 15:57:05 Mitteleurop=C3=A4ische Sommerzeit =
 schrieb=20
-David Howells:
+Simo Sorce:
 
-Hi David,
+Hi Simo,
 
-> Simo Sorce <simo@redhat.com> wrote:
-> > I strongly suggest creating a test vector where multiple absorb and
-> > squeeze operations are done in intermixed order, and then use that test
-> > vector in your Kunit tests to ensure changes to the code do not break
-> > this fundamental property of the keccak sponge algorithm.
->=20
-> I'm putting such a beast in the module init function at least.
->=20
-> Annoyingly, Eric's hash-test-template.h makes some unwarranted assumptions
-> about the hashes it is testing - such as the final function zeroing out t=
-he
-> hash struct.
+> We are probably not interested in the HashML-DSA variant, so you should
+> probably ignore that part of the specification for now.
+> It is easy to implement on top of Pure ML-DSA if you allow the caller
+> to specify and externally composed mu.
 
-If it is of help, here is such test that I use:
+The key is to have a dedicated function for the Verify.Internal function wh=
+ich=20
+is wrapped by the pure/prehash API, for example as done in [1]. This way yo=
+u=20
+can first have a pure implementation followed, if necessary, by a prehash A=
+PI=20
+without changing the actual algorithm, e.g with [2] and [3] where those two=
+=20
+would be the actual API to be exported.
 
-https://github.com/smuellerDD/leancrypto/blob/master/hash/tests/
-shake_squeeze_more_tester.c#L92
+The question on external Mu, however, is a bit more tricky: it requires the=
+=20
+injection of a variable that is used in one processing step of=20
+Verify.Internal. That variable comes from the caller, but somehow needs to =
+be=20
+transported to the internal - for example by [4].
+
+[1] https://github.com/smuellerDD/leancrypto/blob/master/ml-dsa/src/
+dilithium_signature_impl.h#L888
+
+[2] https://github.com/smuellerDD/leancrypto/blob/master/ml-dsa/src/
+dilithium_signature_impl.h#L947
+
+[3] https://github.com/smuellerDD/leancrypto/blob/master/ml-dsa/src/
+dilithium_signature_impl.h#L906
+
+[4] https://github.com/smuellerDD/leancrypto/blob/master/ml-dsa/src/
+dilithium_signature_impl.h#L784
 
 Ciao
 Stephan
