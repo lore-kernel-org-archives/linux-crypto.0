@@ -1,49 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C85226E711;
-	Fri, 19 Sep 2025 19:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA70226D04;
+	Fri, 19 Sep 2025 19:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758309583; cv=none; b=jkcakOP1XQPKZEnKc8yWoLUGH8RaaRqiVtk14LIEx5d3OgPXY9SXMcUFSHTP0365LZbf/hTpCwOQuAP/EzI6ubaLir5dNc8aLkJfPN6DPWf94JAsSOU2/uUkjUzrlWUd7dS5xikXCYAm3vinF7W4c1EwKDVT9pQfFvQ5I9vdFmg=
+	t=1758310346; cv=none; b=KBvxSe9Cq52mI3z4U8Nsq9AtZoPt71YI9LgHM6oJL5WQKcDsCezwDwA9ncIYG26iB/6hX9QB/AAWGvYkMcifN6PaiAeksT9CWyZc4uRWiQc5K+QM8PzsD0N2cPBoFUtNcNpcpXvZJDjXhqnSa90vxcTOSRbtEwq7MRCR7NTbu6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758309583; c=relaxed/simple;
-	bh=RIu4F7qAgYmGH6tNvm+4CzefUV0zH2vjCBJ8h0ToUAo=;
+	s=arc-20240116; t=1758310346; c=relaxed/simple;
+	bh=Q4PEuEuP9alXqKgQvbxJXKjAtS2HMA+4AJTY/GWd7HI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cxaxpf4BTVTvDBtSHqZKmOaQQHxJDlVto4F3Bt42GeZkI+jNe5oFf4+b6/rujJjhXnlD5Iwsl/oh+996qtzVnheaW2Wr2TsZWTNiaZdYbXEz1rle/7oGPYaqiwJBVX0XopzYR/KAF3/U3PuqYjQHzFRrOdR/ljMksblg8ZsEB3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2GtAhd8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=F6MOSTd4Z6uTgkUAKSKJDG3THMOAtsV4APrdig2Ged8+CpvvHc5pVhCPZrTEROKq3WVIVhhVq3+9qSdkPc9sV6d5cXroAkMFYiTVzNvMZBbozIoce5h0GzhU3Fohe8Kvi5VcVQU3JkJDOtu91w35VJes85H3A3Qe/LqFyHpXl8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pgi9APbb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2GtAhd8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 083E6C4CEF0;
-	Fri, 19 Sep 2025 19:19:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pgi9APbb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07598C4CEF0;
+	Fri, 19 Sep 2025 19:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758309583;
-	bh=RIu4F7qAgYmGH6tNvm+4CzefUV0zH2vjCBJ8h0ToUAo=;
+	s=k20201202; t=1758310345;
+	bh=Q4PEuEuP9alXqKgQvbxJXKjAtS2HMA+4AJTY/GWd7HI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i2GtAhd8bUf2jG0nPz6QS+Fnc1JDbjL0PYpNDaajz77TqZvhRvhLX375Esu4LPoIX
-	 Zic8Xef1180RGF6uIFCGGIBllcoVDHNazkwmTXJj4H+EJY6pce8JBGtyF16UFy4p1p
-	 dLJVg5VGwtDQyOaMXxRLBLjj4cPHxQfG6v42OKABqtovOAYnhm1nSGR2G6YmQm/w60
-	 on+yLOj2bqnr/s4CLiAKCfaPDP9nLLXlJfhAD51wCvIGpC8GhNNQlYm4uT7Q0F/7An
-	 VT+NF2S7AL9sj63auOqbZ1DET9Bq3OB+Hf2NyaclfqbTydCsXoTef/O7uHV5+bwSRO
-	 F6oKvMERskMBw==
-Date: Fri, 19 Sep 2025 12:19:42 -0700
-From: Kees Cook <kees@kernel.org>
-To: Ethan Graham <ethan.w.s.graham@gmail.com>
-Cc: ethangraham@google.com, glider@google.com, andreyknvl@gmail.com,
-	andy@kernel.org, brauner@kernel.org, brendan.higgins@linux.dev,
-	davem@davemloft.net, davidgow@google.com, dhowells@redhat.com,
-	dvyukov@google.com, elver@google.com, herbert@gondor.apana.org.au,
-	ignat@cloudflare.com, jack@suse.cz, jannh@google.com,
-	johannes@sipsolutions.net, kasan-dev@googlegroups.com,
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de,
-	rmoar@google.com, shuah@kernel.org, sj@kernel.org,
-	tarasmadan@google.com
-Subject: Re: [PATCH v2 09/10] fs/binfmt_script: add KFuzzTest target for
- load_script
-Message-ID: <202509191208.D2BCFD366F@keescook>
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
- <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
+	b=Pgi9APbbq/5rG7Ho2J+TZJGVkq0W10UPMkV2zbAclCur7Yzs+JdYB0hM6X2u2i3HP
+	 IqxlioxzxNjshOFUgcQ6MMPJCvAm1L/aS8fva/rK3xgGEyv1evQY+lKGOv9iLfTJW+
+	 PmodCLjEoKLgErL9k0J4bO/3yv1SSWkFe38PBY8G6v/Ti+XS6AvZMOGkuOveTF/61c
+	 +ruGnQQS7vbuByVzAbe15qbNWNWgdpCd52SJWvCOW3mzTSbY8QTRmHjefxzkbfgJgQ
+	 Lv2QGTOJ7yKk3E2GWAVY4O9sPkWiY8EzWq8ZEl0ONR5VpUjaXk5bhB2EMCTF9O+Vkp
+	 8+PAuWAXcY94g==
+Date: Fri, 19 Sep 2025 14:32:21 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Kees Cook <keescook@chromium.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
+Message-ID: <20250919193221.GB2249@quark>
+References: <20250918063539.2640512-7-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,148 +47,57 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250919145750.3448393-10-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250918063539.2640512-7-ardb+git@google.com>
 
-On Fri, Sep 19, 2025 at 02:57:49PM +0000, Ethan Graham wrote:
-> From: Ethan Graham <ethangraham@google.com>
+On Thu, Sep 18, 2025 at 08:35:40AM +0200, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
 > 
-> Add a KFuzzTest target for the load_script function to serve as a
-> real-world example of the framework's usage.
+> Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
+> context switch out of struct thread_struct, and onto the stack, so that
+> the memory cost is not imposed needlessly on all tasks in the system.
 > 
-> The load_script function is responsible for parsing the shebang line
-> (`#!`) of script files. This makes it an excellent candidate for
-> KFuzzTest, as it involves parsing user-controlled data within the
-> binary loading path, which is not directly exposed as a system call.
+> Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
+> rules around permitted usage patterns of kernel_neon_begin() and
+> kernel_neon_end(). This permits #5 to provide a stack buffer to
+> kernel_neon_begin() transparently, in a manner that ensures that it will
+> remain available until after the associated call to kernel_neon_end()
+> returns.
 > 
-> The provided fuzz target in fs/tests/binfmt_script_kfuzz.c illustrates
-> how to fuzz a function that requires more involved setup - here, we only
-> let the fuzzer generate input for the `buf` field of struct linux_bprm,
-> and manually set the other fields with sensible values inside of the
-> FUZZ_TEST body.
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Mark Brown <broonie@kernel.org>
 > 
-> To demonstrate the effectiveness of the fuzz target, a buffer overflow
-> bug was injected in the load_script function like so:
+> Ard Biesheuvel (5):
+>   crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
+>   crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
+>   crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
+>   arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
+>   arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
 > 
-> - buf_end = bprm->buf + sizeof(bprm->buf) - 1;
-> + buf_end = bprm->buf + sizeof(bprm->buf) + 1;
-> 
-> Which was caught in around 40 seconds by syzkaller simultaneously
-> fuzzing four other targets, a realistic use case where targets are
-> continuously fuzzed. It also requires that the fuzzer be smart enough to
-> generate an input starting with `#!`.
-> 
-> While this bug is shallow, the fact that the bug is caught quickly and
-> with minimal additional code can potentially be a source of confidence
-> when modifying existing implementations or writing new functions.
-> 
-> Signed-off-by: Ethan Graham <ethangraham@google.com>
-> 
-> ---
-> PR v2:
-> - Introduce cleanup logic in the load_script fuzz target.
-> ---
-> ---
->  fs/binfmt_script.c             |  8 +++++
->  fs/tests/binfmt_script_kfuzz.c | 58 ++++++++++++++++++++++++++++++++++
->  2 files changed, 66 insertions(+)
->  create mode 100644 fs/tests/binfmt_script_kfuzz.c
-> 
-> diff --git a/fs/binfmt_script.c b/fs/binfmt_script.c
-> index 637daf6e4d45..c09f224d6d7e 100644
-> --- a/fs/binfmt_script.c
-> +++ b/fs/binfmt_script.c
-> @@ -157,3 +157,11 @@ core_initcall(init_script_binfmt);
->  module_exit(exit_script_binfmt);
->  MODULE_DESCRIPTION("Kernel support for scripts starting with #!");
->  MODULE_LICENSE("GPL");
-> +
-> +/*
-> + * When CONFIG_KFUZZTEST is enabled, we include this _kfuzz.c file to ensure
-> + * that KFuzzTest targets are built.
-> + */
-> +#ifdef CONFIG_KFUZZTEST
-> +#include "tests/binfmt_script_kfuzz.c"
-> +#endif /* CONFIG_KFUZZTEST */
-> diff --git a/fs/tests/binfmt_script_kfuzz.c b/fs/tests/binfmt_script_kfuzz.c
-> new file mode 100644
-> index 000000000000..26397a465270
-> --- /dev/null
-> +++ b/fs/tests/binfmt_script_kfuzz.c
-> @@ -0,0 +1,58 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * binfmt_script loader KFuzzTest target
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#include <linux/binfmts.h>
-> +#include <linux/kfuzztest.h>
-> +#include <linux/slab.h>
-> +#include <linux/sched/mm.h>
-> +
-> +struct load_script_arg {
-> +	char buf[BINPRM_BUF_SIZE];
-> +};
-> +
-> +FUZZ_TEST(test_load_script, struct load_script_arg)
-> +{
-> +	struct linux_binprm bprm = {};
-> +	char *arg_page;
-> +
-> +	arg_page = (char *)get_zeroed_page(GFP_KERNEL);
-> +	if (!arg_page)
-> +		return;
-> +
-> +	memcpy(bprm.buf, arg->buf, sizeof(bprm.buf));
-> +	/*
-> +	 * `load_script` calls remove_arg_zero, which expects argc != 0. A
-> +	 * static value of 1 is sufficient for fuzzing.
-> +	 */
-> +	bprm.argc = 1;
-> +	bprm.p = (unsigned long)arg_page + PAGE_SIZE;
-> +	bprm.filename = kstrdup("fuzz_script", GFP_KERNEL);
-> +	if (!bprm.filename)
-> +		goto cleanup;
-> +	bprm.interp = kstrdup(bprm.filename, GFP_KERNEL);
-> +	if (!bprm.interp)
-> +		goto cleanup;
-> +
-> +	bprm.mm = mm_alloc();
-> +	if (!bprm.mm)
-> +		goto cleanup;
-> +
-> +	/*
-> +	 * Call the target function. We expect it to fail and return an error
-> +	 * (e.g., at open_exec), which is fine. The goal is to survive the
-> +	 * initial parsing logic without crashing.
-> +	 */
-> +	load_script(&bprm);
-> +
-> +cleanup:
-> +	if (bprm.mm)
-> +		mmput(bprm.mm);
-> +	if (bprm.interp)
-> +		kfree(bprm.interp);
-> +	if (bprm.filename)
-> +		kfree(bprm.filename);
-> +	free_page((unsigned long)arg_page);
-> +}
+>  arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
+>  arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
+>  arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
+>  arch/arm64/include/asm/neon.h       |  7 ++--
+>  arch/arm64/include/asm/processor.h  |  2 +-
+>  arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
+>  6 files changed, 34 insertions(+), 34 deletions(-)
 
-Yay fuzzing hooks! I'm excited about this series overall, but I'm not
-a fan of this "manual" init/clean up of bprm.
+This looks like the right decision: saving 528 bytes per task is
+significant.  528 bytes is a lot to allocate on the stack too, but
+functions that use the NEON registers are either leaf functions or very
+close to being leaf functions, so it should be okay.
 
-If you're going to set up a bprm that passes through load_script(), it
-needs to be both prepared correctly (alloc_bprm) and cleaned up correctly
-(free_bprm). Otherwise, you may be fuzzing impossible states created by
-the fuzztest setup. And having a second init/cleanup path in here makes
-future refactoring work more of a burden/fragile.
+The implementation is a bit unusual, though:
 
-But this is also kind of not a great example of fuzztest utility because
-load_script _is_ actually directly accessible from syscalls: it is trivial
-to externally fuzz load_script by just writing the buffer to a file and
-execve'ing it. :)
+   #define kernel_neon_begin()	do { __kernel_neon_begin(&(struct user_fpsimd_state){})
+   #define kernel_neon_end()	__kernel_neon_end(); } while (0)
 
--Kees
+It works, but normally macros don't start or end code blocks behind the
+scenes like this.  Perhaps it should be more like s390's
+kernel_fpu_begin(), where the caller provides the buffer that the
+registers are stored in?  
 
--- 
-Kees Cook
+- Eric
