@@ -1,81 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6BC2BE64C
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 06:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1602C0298
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 07:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758264113; cv=none; b=rV6riC557l1lT1FnQ2if4ycrWQFI5t6d5jlf0/4rKAbBE9oyT154CUT+wgKGJzhqFVT5pT+f0bRPG+b3cxsfGpag+7nBfAn+fNq2EhK6xt6V6tBP9SGwGjWVgtdQU0ms9sRT304uw2SJ6dRVRC20Mmh1N/c89qh2gVt/Ey5ZHfg=
+	t=1758265567; cv=none; b=EUavoDY/W/3AvdbdmqhJIOYzOBs0lBYoqXespMo79pxT8+SPT35atZcjNV1FJ9mtgBGENFsIUYPpsewSL70rRgNSbcT8052tzhAglDbHQqQdOlrnyaVu9ssYjGVpN5zIe/YiOoEQh9AR1Cy94JrAj7gTanOExyBD53IuP5KYGzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758264113; c=relaxed/simple;
-	bh=s2rdono/3DbgOoms+X4wh3Ts6y0yWfwYHo8BmK/NO+U=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=LuEfUBYXx7sLQBIpDfX5umPypF9YWnK1Q8Bu1yFUiPxmFKjq4D5mXnFa9WE3hHvuXTX7Y5CELWWkN8d5GstUGrqIIxTorLhjh0gq+PUmpcFDJfcplS4WcduNmIto+dvWwSMLGKvwaFCFDTQiANjXCSIg2W6we82QP2a6UPvV2w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYz2OTsu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758265567; c=relaxed/simple;
+	bh=ItZKaGQl9It/js9gzPNXCsAEXczA+CYbzua9BHh+ovk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gFxppYKBVuaqrFjNOM1Z/tfl49iSEwJY31yTktCq56jdEuwpi/pwfViLuPEwbl+z0yvrM3beBTYQZf9kImjl3UvURSI/mK65HtF/4AzAr+nw2e8UuhEyvfJXUAmxBAIdx2rTu116JZ5nYHVAZVLxG93hPd9Iwo8wtttM3AenUEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hCKo2pF/; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYz2OTsu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758264110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7/E6DgjcRa4WSI0uW8+A9RGbvBI5JspSJUs0+h9SSIg=;
-	b=CYz2OTsuU9HV0Ql4jCg8EDLB2OppNGSpqd5s75M2/pQbxSai4R+FVCBWv6bnU/6v5y245Z
-	G22CqM1OCLw2LKcsVGl78RZeG71gNpmEj2niKQOEmBkC7HfRAKWxV9yVfEWNlPGOeuPD8i
-	UFxrNs/8qR8eOjANLl3a83/RRs9mRWA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-53-0PYr2VMtPtuFDqFgmDFsXg-1; Fri,
- 19 Sep 2025 02:41:48 -0400
-X-MC-Unique: 0PYr2VMtPtuFDqFgmDFsXg-1
-X-Mimecast-MFC-AGG-ID: 0PYr2VMtPtuFDqFgmDFsXg_1758264107
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 406AE180034C;
-	Fri, 19 Sep 2025 06:41:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.155])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CB21119560BB;
-	Fri, 19 Sep 2025 06:41:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <aMf_0xkJtcPQlYiI@gondor.apana.org.au>
-References: <aMf_0xkJtcPQlYiI@gondor.apana.org.au> <2552917.1757925000@warthog.procyon.org.uk>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, Stephan Mueller <smueller@chronox.de>,
-    linux-crypto@vger.kernel.org
-Subject: Re: Adding SHAKE hash algorithms to SHA-3
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hCKo2pF/"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3ee12807d97so1291525f8f.0
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 00:06:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758265564; x=1758870364; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Klo+L3KBBL4ssbFZ2YOqJt7BcxJ8M+dYCfYzeUYYBY=;
+        b=hCKo2pF/F78auKEP48toZ9iiNufcpa9c36bPf4P6fwtH1zaEBgaQ/RUiLIQk92rhWc
+         B1LgQpeOqlgQlCfm8iif2jUa154KDKMvYQlSys5NZtt+K1jFjuxbzMGsfZi6gawxzMjn
+         PH1A3hFkQbnoa61/vfXUDV3CSh6jvceVmBuMfBRP49NRPxq7AcTmj8PJJt5FMoY07PFM
+         f45k7CojLt6eIQlQbuDN/fIh6vTw8m23VBVFZPh7tGbrilgmVh+/LguX/Dq/QoxcwGQt
+         4CRU8KcVWlbcPIAhwDzT0GR2qRk3ORkC5h6ualYsffvKdotgOB88M7c91H+ryPIHp9Um
+         Nvcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758265564; x=1758870364;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Klo+L3KBBL4ssbFZ2YOqJt7BcxJ8M+dYCfYzeUYYBY=;
+        b=uc9PUVi1cpYscYUkJvtURTmTl1tsNo+8moU6ryIs0Dq+1L/tAnpwDM7vvQYnxLtAb5
+         nQONGhxNJ7OlYl9sRYocMcVzkDOJG6/FsX0vkhHk+D45oZrmYMsaqdUlAzCBKADAXIj1
+         ZnZsD1aNMZ8j3lNyomhClKRXT2YEKfSmnvvanK0TyMSzSKKY07Bg9BX6ih+0XetSyzH3
+         DXCmA6tqj15SoM4ac8F1b39xtgsWR+UrwWjeQEoNtnXfgJPYMRlVQBO7ksnhRSzuahZY
+         aviaMVqGRVGpHj+bIDjVSOKl0dna+wV2qyFI0W7plo6kRTpvKc47qhj0HZyhziKl+dEu
+         5RKg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsSzHms9YEIlm9gR88aHyjl4H002YMwANO9Lnh6Bm19vbbcTgksCJxOdgohO/gZcG9TgojIMNiBzyVBto=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPI4XwSzZADOaCMZ184dpsQzn0+KRwCuPTuPKviISix7D84Ilo
+	NW884pzloHiYhtqWEZ32yCIw3W3eZTm9qocLgRFYhiH+yiDurYyGaLCbhm8lGUg2eA==
+X-Gm-Gg: ASbGncu8ve01cYJl2cukORAmgcL5T0/1ikQMASqM9NIsE7UJJE5TcR73gDTOpnF3Vks
+	lJGHn09UY2RId0zMUD+xDBzNLeKMMuYyaLWT5CYa+t07CoVYSMZ68O77289AdT318CZq/zQ+Smf
+	J28LhIH5bsqy93JTs1YSmRJHdZrLkJPxyty3z6eSBnzqRybVmEBXz2u3WglfMFnj/NWY01zxBUt
+	wCWU1LV/9RuwcCUioCsLormjQgMviql49yL75NsTjkY6+FA2TZdEAEzzD0lL4HBeTwx3AinDF4n
+	MG2onz9SU9cy7PqugwyggJmmY9mu4tk0yNnqxNbulcushFod6ddWoRHXLABSqNUk72xqazsMI/b
+	TJtxczMFwhpgWBi7QZVUO+2CbxzufCdTRLfS97mQJKI6s7RrwjMzcQ5LU4bQ=
+X-Google-Smtp-Source: AGHT+IHPi1pgPaxjy0qFYAQQyA+9c6RpQAFZf3vA/UzVRkHTrs+JR5MqjC9zARfGu5kWXbLyHGkoeg==
+X-Received: by 2002:a05:6000:2c0b:b0:3ea:6680:8fcd with SMTP id ffacd0b85a97d-3ee7c925245mr1570227f8f.13.1758265563176;
+        Fri, 19 Sep 2025 00:06:03 -0700 (PDT)
+Received: from elver.google.com ([2a00:79e0:2834:9:1f7a:8520:7568:dac6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee0fbf1d35sm7200088f8f.55.2025.09.19.00.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 00:06:02 -0700 (PDT)
+Date: Fri, 19 Sep 2025 09:05:54 +0200
+From: Marco Elver <elver@google.com>
+To: syzbot ci <syzbot+ciac51bb7578ba7c59@syzkaller.appspotmail.com>
+Cc: arnd@arndb.de, boqun.feng@gmail.com, bvanassche@acm.org, corbet@lwn.net,
+	davem@davemloft.net, dvyukov@google.com, edumazet@google.com,
+	frederic@kernel.org, glider@google.com, gregkh@linuxfoundation.org,
+	hch@lst.de, herbert@gondor.apana.org.au, irogers@google.com,
+	jannh@google.com, joelagnelf@nvidia.com, josh@joshtriplett.org,
+	justinstitt@google.com, kasan-dev@googlegroups.com, kees@kernel.org,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
+	longman@redhat.com, luc.vanoostenryck@gmail.com,
+	lukas.bulwahn@gmail.com, mark.rutland@arm.com,
+	mathieu.desnoyers@efficios.com, mingo@kernel.org, mingo@redhat.com,
+	morbo@google.com, nathan@kernel.org, neeraj.upadhyay@kernel.org,
+	nick.desaulniers@gmail.com, ojeda@kernel.org, paulmck@kernel.org,
+	penguin-kernel@i-love.sakura.ne.jp, peterz@infradead.org,
+	rcu@vger.kernel.org, rostedt@goodmis.org, takedakn@nttdata.co.jp,
+	tglx@linutronix.de, tgraf@suug.ch, urezki@gmail.com,
+	will@kernel.org, syzbot@lists.linux.dev,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: Compiler-Based Capability- and Locking-Analysis
+Message-ID: <aM0A0p4-3lwLeAWF@elver.google.com>
+References: <20250918140451.1289454-1-elver@google.com>
+ <68cc6067.a00a0220.37dadf.0003.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3790488.1758264104.1@warthog.procyon.org.uk>
-Date: Fri, 19 Sep 2025 07:41:44 +0100
-Message-ID: <3790489.1758264104@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68cc6067.a00a0220.37dadf.0003.GAE@google.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Thu, Sep 18, 2025 at 12:41PM -0700, syzbot ci wrote:
+> syzbot ci has tested the following series
+> 
+> [v3] Compiler-Based Capability- and Locking-Analysis
+[...]
+> and found the following issue:
+> general protection fault in validate_page_before_insert
+> 
+> Full report is available here:
+> https://ci.syzbot.org/series/81182522-74c0-4494-bcf8-976133df7dc7
+> 
+> ***
+> 
+> general protection fault in validate_page_before_insert
 
-> I presume the algorithm choice is fixed, right? If so you should be
-> using lib/crypto.
+Thanks, syzbot ci!
 
-Actually...  Having dug into the dilithium code some more, the answer appears
-to be both yes _and_ no.
+I messed up the type when moving kcov->area access inside the critical
+section. This is the fix:
 
-It's quite complicated, and in some places it uses both SHAKE128 and SHAKE256
-fixedly, but I think it can also change the pre-hash between a bunch of
-different algorithms, including SHA-512, SHA3-* and SHAKE*.  At least, I think
-it can.
 
-David
+    fixup! kcov: Enable capability analysis
 
+diff --git a/kernel/kcov.c b/kernel/kcov.c
+index 1897c8ca6209..e81e3c0d01c6 100644
+--- a/kernel/kcov.c
++++ b/kernel/kcov.c
+@@ -497,7 +497,7 @@ static int kcov_mmap(struct file *filep, struct vm_area_struct *vma)
+ 	unsigned long size, off;
+ 	struct page *page;
+ 	unsigned long flags;
+-	unsigned long *area;
++	void *area;
+ 
+ 	spin_lock_irqsave(&kcov->lock, flags);
+ 	size = kcov->size * sizeof(unsigned long);
