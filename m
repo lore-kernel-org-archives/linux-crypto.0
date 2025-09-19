@@ -1,103 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA70226D04;
-	Fri, 19 Sep 2025 19:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6055E23E346
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 19:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758310346; cv=none; b=KBvxSe9Cq52mI3z4U8Nsq9AtZoPt71YI9LgHM6oJL5WQKcDsCezwDwA9ncIYG26iB/6hX9QB/AAWGvYkMcifN6PaiAeksT9CWyZc4uRWiQc5K+QM8PzsD0N2cPBoFUtNcNpcpXvZJDjXhqnSa90vxcTOSRbtEwq7MRCR7NTbu6c=
+	t=1758311292; cv=none; b=jKSoV1HRGADXDNivbyWIfph7e9RrVvsvRrIKgpewnTkKlCboDk4+F3+j7th4jAFlpRW5GTGZlfF+leZyBPlx7cz940kmXFYk6hPhYezh4cLRsEFCmhBnpskOD+glJ1fGA5vRSJOpWSLFatVB8SXuhoRPxIvf4QScR/96rI8TD/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758310346; c=relaxed/simple;
-	bh=Q4PEuEuP9alXqKgQvbxJXKjAtS2HMA+4AJTY/GWd7HI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F6MOSTd4Z6uTgkUAKSKJDG3THMOAtsV4APrdig2Ged8+CpvvHc5pVhCPZrTEROKq3WVIVhhVq3+9qSdkPc9sV6d5cXroAkMFYiTVzNvMZBbozIoce5h0GzhU3Fohe8Kvi5VcVQU3JkJDOtu91w35VJes85H3A3Qe/LqFyHpXl8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pgi9APbb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758311292; c=relaxed/simple;
+	bh=Pom4Xkuz0DMB6rEXtZgW664Gj1jAMgDbNtRAXnfftjI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=irx40/XjUpbv8iCPUtB9/IRXKj9xxkSNFBbClEV+JPrmVAdz9WengtzU/U0vI5h03r3sBFvkKQ54pM30hvdjTHuKKQLnKDNNvUzH909TlrbUEkWy9IbS0ZF+aEe4J8Odw8R8qqmkOQVLS3AI4oWT4x05yuV6tzK4x4yuizpEW9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nbi75hCk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pgi9APbb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07598C4CEF0;
-	Fri, 19 Sep 2025 19:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758310345;
-	bh=Q4PEuEuP9alXqKgQvbxJXKjAtS2HMA+4AJTY/GWd7HI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pgi9APbbq/5rG7Ho2J+TZJGVkq0W10UPMkV2zbAclCur7Yzs+JdYB0hM6X2u2i3HP
-	 IqxlioxzxNjshOFUgcQ6MMPJCvAm1L/aS8fva/rK3xgGEyv1evQY+lKGOv9iLfTJW+
-	 PmodCLjEoKLgErL9k0J4bO/3yv1SSWkFe38PBY8G6v/Ti+XS6AvZMOGkuOveTF/61c
-	 +ruGnQQS7vbuByVzAbe15qbNWNWgdpCd52SJWvCOW3mzTSbY8QTRmHjefxzkbfgJgQ
-	 Lv2QGTOJ7yKk3E2GWAVY4O9sPkWiY8EzWq8ZEl0ONR5VpUjaXk5bhB2EMCTF9O+Vkp
-	 8+PAuWAXcY94g==
-Date: Fri, 19 Sep 2025 14:32:21 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Kees Cook <keescook@chromium.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
-Message-ID: <20250919193221.GB2249@quark>
-References: <20250918063539.2640512-7-ardb+git@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nbi75hCk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758311289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uoSOzIhr2wXKZ8q5IASaBEFOM22Jo0iIMuiQyH21SbA=;
+	b=Nbi75hCkdM0pwzBKq0vb4w6zPh9auaUBoJ1x0Elc8Sh8r/DSiuzF3aaQR28JEKXI7+dLPU
+	V6A5RfucxADDVh+pW/wyBCNt/fkVhekrpQXmIK5DvymuwLl/OEpiNQ9EIk0EOxRpuQsV3F
+	pHuEPwtyWVxGVu5xfzS1kak/CFDD4iM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-zmfuKSxIMGu4F1VD7FrHwA-1; Fri,
+ 19 Sep 2025 15:48:07 -0400
+X-MC-Unique: zmfuKSxIMGu4F1VD7FrHwA-1
+X-Mimecast-MFC-AGG-ID: zmfuKSxIMGu4F1VD7FrHwA_1758311286
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CCC701956089;
+	Fri, 19 Sep 2025 19:48:05 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.155])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A63A1800446;
+	Fri, 19 Sep 2025 19:48:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250919190413.GA2249@quark>
+References: <20250919190413.GA2249@quark> <3936580.1758299519@warthog.procyon.org.uk>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+    Ard Biesheuvel <ardb@kernel.org>,
+    Harald Freudenberger <freude@linux.ibm.com>,
+    Holger Dengler <dengler@linux.ibm.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Stephan Mueller <smueller@chronox.de>, Simo Sorce <simo@redhat.com>,
+    linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+    keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512, SHAKE128, SHAKE256
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250918063539.2640512-7-ardb+git@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3975734.1758311280.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 19 Sep 2025 20:48:00 +0100
+Message-ID: <3975735.1758311280@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Sep 18, 2025 at 08:35:40AM +0200, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
-> 
-> Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
-> context switch out of struct thread_struct, and onto the stack, so that
-> the memory cost is not imposed needlessly on all tasks in the system.
-> 
-> Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
-> rules around permitted usage patterns of kernel_neon_begin() and
-> kernel_neon_end(). This permits #5 to provide a stack buffer to
-> kernel_neon_begin() transparently, in a manner that ensures that it will
-> remain available until after the associated call to kernel_neon_end()
-> returns.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Mark Brown <broonie@kernel.org>
-> 
-> Ard Biesheuvel (5):
->   crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
->   crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
->   crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
->   arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
->   arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
-> 
->  arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
->  arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
->  arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
->  arch/arm64/include/asm/neon.h       |  7 ++--
->  arch/arm64/include/asm/processor.h  |  2 +-
->  arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
->  6 files changed, 34 insertions(+), 34 deletions(-)
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-This looks like the right decision: saving 528 bytes per task is
-significant.  528 bytes is a lot to allocate on the stack too, but
-functions that use the NEON registers are either leaf functions or very
-close to being leaf functions, so it should be okay.
+> This should be based on libcrypto-next.
 
-The implementation is a bit unusual, though:
+This?
 
-   #define kernel_neon_begin()	do { __kernel_neon_begin(&(struct user_fpsimd_state){})
-   #define kernel_neon_end()	__kernel_neon_end(); } while (0)
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git libcryp=
+to-next
 
-It works, but normally macros don't start or end code blocks behind the
-scenes like this.  Perhaps it should be more like s390's
-kernel_fpu_begin(), where the caller provides the buffer that the
-registers are stored in?  
+> This should be split into three patches: (1) the arch/s390/ changes, (2)
+> adding the library functions themselves, and (3) adding the tests.
 
-- Eric
+Sure.  But I'll wait a bit to see if there are any other comments first.
+
+> We'll also need to integrate the existing arch-optimized SHA-3 code, and
+> reimplement the SHA-3 crypto_shash algorithms on top of the library.
+> Let me know whether you're planning to do that to.  If not, I can do it.
+
+I don't really have time at the moment.  Nor am I particularly familiar wi=
+th
+the optimised asm instructions for this on any arch.
+
+> In kerneldoc comments, please make it clear that lengths are measured in
+> bytes,
+
+Sure.  The hash algos do love talking in terms of bits.  Possibly because
+bytes aren't necessarily 8 bits in size on all arches?
+
+> and that the functions can be called in any context.
+
+"Context" as in?
+
+> The testing situation looks odd.  This patch adds six KUnit test suites:
+> one for each of the SHA-3 algorithms.  But they only include the
+> hash-test-template.h test cases, and they don't test the unique behavior
+> of SHAKE.  The KUnit tests need to fully test the library.
+
+Yes, I'm aware of that.  The hash-test-template template is rather rigid a=
+nd
+not always correct in its assertions (for instance requiring the final
+function to have zeroed the context - I had to modify my API to work aroun=
+d
+the testsuite).
+
+> I see you also have a test in sha3_mod_init(), which doesn't make sense.
+> The tests should be in the KUnit test suite(s).  If you intended for the
+> sha3_mod_init() test to be a FIPS pre-operational self-test, then (1) it
+> would first need to be confirmed with the people doing FIPS
+> certifications that a FIPS pre-operational self-test is actually
+> necessary here, (2) it would need to be fixed to actually fulfill the
+> requirements for that type of test such as panicing the kernel on
+> failure, and (3) it would need to come in its own patch with its own
+> explanation.  But, unless you are sure you actually need the FIPS test,
+> just omit it out for now and focus on the real tests.
+
+I disagree.  It should have at least a single self-test.  If we fail to lo=
+ad
+any modules because the hash is broken on a particular CPU, it would be us=
+eful
+to have a note in dmesg.  Loading kunit test modules becomes tricky in suc=
+h a
+case.
+
+> I also think that splitting the SHA-3 tests into six KUnit test suites
+> is awkward.  I know I did something similar for SHA-2, but it made more
+> sense for SHA-2 because (1) there are only four SHA-2 variants, (2)
+> SHA-256 and SHA-512 don't share any code, and (3) there wasn't anything
+> more to add on top of hash-test-template.h.  In contrast, SHA-3 has six
+> variants, which all share most of their code, and there will need to be
+> SHA-3 specific tests (for the XOFs).
+
+Yes, but I believe you wanted me to use hash-test-template.  The problem i=
+s
+that it hard-encodes by macroisation of the #include's file various parame=
+ters
+including the hash size.
+
+> I think what I'd recommend is creating a single sha3_kunit test suite.
+> Make it instantiate hash-test-template.h once to test one of the
+> algorithms, maybe SHA3-256.  Then add test cases (that is, additional
+> KUnit test cases in the same KUnit test suite) that cover the code
+> specific to the other variants, including the XOFs.
+
+I could do that.  It would at least exercise the common engine.
+
+Possibly all 5 different block sizes employed (128, 224, 256, 384 and 512)
+need to be so tested - but that only affects how much of the state array i=
+s
+modified directly sha3_update() and how much can be extracted from by
+sha3_squeeze().  The actual keccak mixing function doesn't care.
+
+Other than that, the only differences between the algorithms are the paddi=
+ng
+char and how much digest is extracted by default.
+
+On top of that, you can have a variety of different usage sequences: diffe=
+rent
+sequences of updating and squeezing with different amounts of data added a=
+nd
+extracted.  I wonder if a small sampling is sufficient or whether we need =
+some
+loopy thing that tries to exhaustively test a portion of the sample space.
+
+David
+
