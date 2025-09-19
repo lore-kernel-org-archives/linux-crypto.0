@@ -1,99 +1,207 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA0F10F2
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 00:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758240375; cv=none; b=Bzma8HHMFF24H4A/43yVA9SiP9CVKU9lkgh1ZA7k3Jidnb4j7CKW9jwJe1H1vjRVZxjWc5zG+S1gs7lRNbd+4PM2/49Pw62aU6sMFTlOTmJSvJHXabm3f69D5RwaMWQFq7KwNVeDoVEA9qh35RteobRxBfJfbYMdQu7xCGS4pHE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758240375; c=relaxed/simple;
-	bh=b5U5dJen7vB5oJAhsZKPq/U6/05KOvjH1qN8gQXhnd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j+4J05yFQfr+l0Jn1rAEFG7xwTsMClKUtd5yycOkdblC3ZydYdYcZFeV26nMK0qY8U8ElZthdrhHHRSy3mxbqIJVBXdQGRbTP3bxU/Ak3RRZIObzalMIVw0IWvRoILnZyCED9VJd5L8AaXxsTM9nQStdlIyNQhBZ+BLuGbNXJI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=Tr0Gs7Xx; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB17B2512DE;
+	Fri, 19 Sep 2025 02:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.164
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758249949; cv=pass; b=Owksg8t/Gy72NkIrq97dj6dYL8TXZ69ok5osP6fpncw37I7VOB+U8iAWG4XMwvyIKRsRezLaXIhAOw3o6yOAR0fKzZFvBP2puKdCwfa2k1eIaoMqUUfWZQIk1kv2uRSbBYVMNTC22jn1/ssMP8x7T9EqrkX8KwvZkVz75ZU26C8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758249949; c=relaxed/simple;
+	bh=s/t2Wxrg+mbF7K5Pyum3QBpF+g+FSOPlAlQsbnljWzU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R+aqBYmLQLGtPwqk96jy7GnTU1ToPGEnAmQh+u/CLn7CI4QwF2K/iNPdukQ7LXbF0CTYvAReeL6ZBC2VgsGQKqV8EPFgr766GpNaFHZvL0J6mIuusFGCUBIx+Chdw8tHLRDTp8MUUMca035Uoyq7rTAbDw2xDbP9x5fzVJCgTsE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=nmZKtH2N; arc=pass smtp.client-ip=81.169.146.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="Tr0Gs7Xx"
-Received: from trampoline.thunk.org (pool-173-48-102-243.bstnma.fios.verizon.net [173.48.102.243])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 58J05thn025872
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Sep 2025 20:05:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1758240357; bh=Hvoq5NHn+1w9nBmQ/XhW4MxfI0m9pkCuGXZSSvVA/is=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=Tr0Gs7XxsHFiVzpb18CvXDASzHQuooRU1F4yRj95P6tnhWLSxsjgnITOqsw/TBoJh
-	 kt1YtljXPSBoj607sQcKGNA6+dozxBzEiu5fU6Pz063Z62cy8GczLRIZAe/k7Ip4os
-	 Uc1rX5Gw25zJiAuoVpXT98t9p/3POEShO6yQk5GZuJF95i4yChIOCEWFVYr6nPLUxU
-	 hjZNSEcp3kYeXm3QpgdpjqhBCmUc9EpUtB8yTm/20T71X4EMQmJZdIjODliwwa4J6T
-	 9E5lU/Js8rXzvQmmSY5wrKr1abmmF7vDor65FHf9q2R5uIgtXaFbiwcJNxPq8TBsKm
-	 UnfAEL4LU7YbA==
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 4A4642E00D9; Thu, 18 Sep 2025 20:05:55 -0400 (EDT)
-Date: Thu, 18 Sep 2025 20:05:55 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, dhowells@redhat.com,
-        linux-crypto@vger.kernel.org
-Subject: Re: SHAKE256 support
-Message-ID: <20250919000555.GD416742@mit.edu>
-References: <20250915220727.GA286751@quark>
- <2767539.1757969506@warthog.procyon.org.uk>
- <2768235.1757970013@warthog.procyon.org.uk>
- <3226361.1758126043@warthog.procyon.org.uk>
- <20250917184856.GA2560@quark>
- <783702f5-4128-4299-996b-fe95efb49a4b@jvdsn.com>
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="nmZKtH2N"
+ARC-Seal: i=1; a=rsa-sha256; t=1758249755; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=FO+JDYqEfQhY5yJDCBt4iFDPV8ofMfSy3Q88N/xQQYWhtQR6g4iG95pYHZ151lwKoS
+    8p2irwBmW8azrqf1r00IvQ51PdCw35E8pLW47vxESR/zVbF3i1eiCvzkRjMMi9S+MMjH
+    TyYeE5KmD52vJkg1U2AUz10Qdd7PQppYmmjbLLnqfUcRaa99Nmr5Rzu5jYL9WMsIQjER
+    zAhSohRqe6iQJx7+kuGXmJE6G7NXIHdf2SmGxCrvnjKvZQ0wTHsYZBcOgsaekz2PCPtL
+    q+7gvAGrUo6yZhsEzcw9VShWSyBrW73L7TyQIz0jXvSuXRv9q4b4td35L/uHFORUflY5
+    ja1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758249755;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=DwpWtLn/k646AVPru0zB96UTBYAxfzxxROtH+P666Hg=;
+    b=fWEKhP6Yov3Ho35zZCw0Modmgk6/aHWG9mMxbXxQIYVDCS8VLJjGv/6nkf35fXh5lI
+    panCBrfzsEG/fKbiPvqSYI+rWcrhZFJLDf7TsOHwUJbW8lomoLRi0Kp5Od+53chCSlaV
+    l65A+6WbXiPRylYq27dVL2pk3Da8JaC7HQSueCzB1K8IvfQCbnlyEhcxYe21rJxOZUj5
+    hNteejoM9A79ayW739on0DfNyVDJ6vw6HV+eczektRVrAsRkwJ+qW08gDXJ7OMfsVT+F
+    Z1CuRPh6TG+3NEt9jhoJJCra3+hd8VbaW+pufyOLWJriP1me1yaq3phJwgmZi7hSnE8z
+    NlgQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758249755;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=DwpWtLn/k646AVPru0zB96UTBYAxfzxxROtH+P666Hg=;
+    b=nmZKtH2NOSNDD7UnjwsbVrIRaJFI7RrXJ7VlDwEB6FPluxhkjmn2bF5aeVEkGQ3dvY
+    r1gkaEJRSWKhpg0IwvxYYWW8qsowCiAnMwHq8asehCtPgHn1+XO7SnAQCuaVJzJnMpeR
+    3eBQ98q4CctFSXxRDdV7LnSWobJau7hGvDRPCsHfSbjyJcHoCDbTHh/IdqgCA/UlPsi+
+    DxUsc9HYw1579IHjK/aTKYsrH6SusWZ9QjasnOgwWnwpfN3jdv0aG6xmgczJ28MSoxeu
+    vMLiSdwpHNBqLRUs6DrJJ8dIbu+VNhTFS4BtY2+feiU7dbKCTkRl+Z0BWRyOdbkFpD++
+    fspQ==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zm0FKX05o/ir7Vyg9+o="
+Received: from graviton.chronox.de
+    by smtp.strato.de (RZmta 52.1.2 DYNA|AUTH)
+    with ESMTPSA id f01e6318J2gWHl9
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Fri, 19 Sep 2025 04:42:32 +0200 (CEST)
+From: Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>, David Howells <dhowells@redhat.com>
+Cc: dhowells@redhat.com, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512,
+ SHAKE128, SHAKE256
+Date: Fri, 19 Sep 2025 04:42:29 +0200
+Message-ID: <2952535.lGaqSPkdTl@graviton.chronox.de>
+In-Reply-To: <3605112.1758233248@warthog.procyon.org.uk>
+References: <3605112.1758233248@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <783702f5-4128-4299-996b-fe95efb49a4b@jvdsn.com>
+Autocrypt: addr=smueller@chronox.de;
+ keydata=
+ mFIEZZK4/xMIKoZIzj0DAQcCAwTDaDnchhDYEXH6dbfhyHMkiZ0HPYDF5xwHuMB8Z24SuXYdMfh
+ pnovdsgwpi6LNAvnI/lGPrvDc/Mv0GQvHDxN0tCVTdGVwaGFuIE3DvGxsZXIgPHNtdWVsbGVyQG
+ Nocm9ub3guZGU+iJYEExMIAD4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQQ0LE46O
+ epfGZCb44quXQ2j/QkjUwUCZZK6YwIZAQAKCRCuXQ2j/QkjU/bVAP9CVqPG0Pu6L0GxryzpRkvj
+ uifi4IzEoACd5oUIGmUX7AD8DxesdicM2ugqAxHgEZKl9xhi36Eq7usa/A6c6kFmyHK0HVN0ZXB
+ oYW4gTcO8bGxlciA8c21AZXBlcm0uZGU+iJMEExMIADsWIQQ0LE46OepfGZCb44quXQ2j/QkjUw
+ UCZZK6QgIbAwULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgAAKCRCuXQ2j/QkjU8HNAQDdTmzs+
+ Cls6FMoFrzoWdYtOGCW5im7x1G5M/L0L3VOvgEA6m9edpqCc0irbdNXVjoZwTXkSsLOxs2t7aDX
+ 2vFX54m0KVN0ZXBoYW4gTcO8bGxlciA8c211ZWxsZXJAbGVhbmNyeXB0by5vcmc+iJMEExMIADs
+ WIQQ0LE46OepfGZCb44quXQ2j/QkjUwUCZb+zewIbAwULCQgHAgIiAgYVCgkICwIEFgIDAQIeBw
+ IXgAAKCRCuXQ2j/QkjU1pIAQDemuxTaZdMGsJp/7ghbB7gHwV5Rh5d1wghKypI0z/iYgEAxdR7t
+ 6KrazO07Ia9urxEAQWqi0nf6yKluD0+gmOCmsW4UgRlkrj/EwgqhkjOPQMBBwIDBBo6QjEMU/1V
+ DD+tVj9qJ39qtZe5SZKFetDzXtyqRpwL+u8IbdIjv0Pvz/StziFMeomh8chRB7V/Hjz19jajK3C
+ IeAQYEwgAIBYhBDQsTjo56l8ZkJvjiq5dDaP9CSNTBQJlkrj/AhsgAAoJEK5dDaP9CSNTLQwA/1
+ WxGz4NvAj/icSJu144cMWOhyeIvHfgAkG9sg9HZXGdAPsGzKo4SezAYCwqgFKnyUIAjKYl1EW79
+ pSCOFS36heQvbhWBGWSuP8SCCqGSM49AwEHAgMEiEhJatNBgxidg8XJFTy8Ir7EsTCeoVY2vJAN
+ rysZeAAmSaUWFD4pvXE5RYQFeCYTWTG419H7ocNGUz5u1dgKhAMBCAeIeAQYEwgAIBYhBDQsTjo
+ 56l8ZkJvjiq5dDaP9CSNTBQJlkrj/AhsMAAoJEK5dDaP9CSNTGCAA/A2i1CxhQJmYh2MwfeM5Hy
+ Wk6EeWruSA1OgSWmaJaoGaAP4mARD2CviJgz8s3Gw07ZTk8SYHOTnv70hUbaziZ3/tjA==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-On Wed, Sep 17, 2025 at 10:53:12PM -0500, Joachim Vandersmissen wrote:
-> I'm not too familiar with the history of lib/crypto/, but I have noticed
-> over the past months that there has been a noticeable shift to moving
-> in-kernel users from the kernel crypto API to the library APIs. While this
-> seems to be an overall improvement, it does make FIPS compliance more
-> challenging. If the kernel crypto API is the only user of lib/crypto/, it is
-> possible to make an argument that the testmgr.c self-tests cover the
-> lib/crypto/ implementations (since those would be called at some point).
-> However since other code is now calling lib/crypto/ directly, that
-> assumption may no longer hold.
+Am Freitag, 19. September 2025, 00:07:28 Mitteleurop=C3=A4ische Sommerzeit =
+schrieb=20
+David Howells:
 
-In general, customers who lookng for FIPS compliance need it for some
-specific application --- for example, encrypting medical records, or
-credit card numbers, or while establishing TLS connections, etc.  In
-my experience, customers do *not* require that all use of encryption
-in the kernel, or in various userspce applications, must be FIPS
-compliance.
+Hi David,
 
-So while some in-kernel users are switching to library API's, it might
-not matter.  Heck, in some cases the only thing that might matter is
-the OpenSSL userspace library.
+as you mentioned that this patch as a basis for ML-DSA then may I outline t=
+he=20
+following: the ML-DSA code requires a multi-staged squeeze operation. For=20
+example:
 
-I'll also note that if you need formal FIPS certification, what the
-FIPS labs certify is a specific binary artifact.  If the binary needs
-to change --- say, to fix a critcial high-severity CVE security
-vulnerability, fixing the security vulnerability might end up breaking
-the FIPS certification, requiring payment of more $$$ to the FIPS
-certification lab.  Which is a rather unfortunate incentive about
-whether or not security vulnerabilities should be fixed.
+squeeze(state, 10 bytes);
+squeeze(state, 10 bytes);
 
-So I personally consider FIPS certification to be over-priced security
-theater.  If it's needed because the customer needs it, and hopefully,
-is willing to pay $$$ for it, my advice is to do the minimal needed so
-you can get the magic checkbox so you can sell into the government
-market or whaever.  FIPS compliance for its own sake is a waste of
-time and effort, and in my opinion, the tax should be paid only by the
-customers who want the silly thing.
+must be identical to
 
-Cheers,
+squeeze(state, 20 bytes);
 
-					- Ted
+With this in mind, may I highlight that potentially the following code does=
+=20
+not support this notion:
+
+> +/**
+> + * sha3_final() - Finish computing a SHA3 message digest of any type
+> + * @ctx: the context to finalize; must have been initialized
+> + * @out: (output) the resulting message digest
+> + *
+> + * Finish the computation of a SHA3 message digest of any type and perfo=
+rm
+> the + * "Keccak sponge squeezing" phase.  The digest is written to @out
+> buffer and + * the size of the digest is returned.  Before returning, the
+> context @ctx is + * cleared so that the caller does not need to do it.
+> + */
+> +int sha3_final(struct sha3_ctx *ctx, u8 *out)
+> +{
+> +	struct sha3_state *state =3D &ctx->state;
+> +	unsigned int digest_size =3D ctx->digest_size;
+> +	unsigned int bsize =3D ctx->block_size;
+> +	u8 end_marker =3D 0x80;
+> +
+> +	sha3_absorb_xorle(ctx, &ctx->padding, 1);
+> +	ctx->partial =3D bsize - 1;
+> +	sha3_absorb_xorle(ctx, &end_marker, 1);
+> +	sha3_keccakf(ctx->state.st);
+
+This logic above should only be invoked for the first squeeze operation.
+
+May I suggest you consider the code at:
+
+https://github.com/smuellerDD/leancrypto/blob/master/hash/src/sha3_c.c#L625
+
+> +
+> +#ifdef __LITTLE_ENDIAN
+> +	for (;;) {
+> +		unsigned int part =3D umin(digest_size, bsize);
+> +
+> +		memcpy(out, state->st, part);
+> +		digest_size -=3D part;
+> +		if (!digest_size)
+> +			goto done;
+> +		out +=3D part;
+> +		sha3_keccakf(ctx->state.st);
+> +	}
+
+This loop needs to honor a starting offset in case the previous call only=20
+requested a subset of the rate.
+
+May I suggest to consider the code at:
+
+https://github.com/smuellerDD/leancrypto/blob/master/hash/src/sha3_c.c#L643
+
+
+> +#else
+> +	__le64 *digest =3D (__le64 *)out, *s;
+> +
+> +	while (digest_size >=3D bsize) {
+> +		for (int i =3D 0; i < bsize / 8; i++)
+> +			put_unaligned_le64(state->st[i], digest++);
+> +		digest_size -=3D bsize;
+> +		if (!digest_size)
+> +			goto done;
+> +		sha3_keccakf(ctx->state.st);
+> +	}
+> +
+> +	s =3D state->st;
+> +	for (; digest_size >=3D 8; digest_size -=3D 8)
+> +		put_unaligned_le64(*s++, digest++);
+> +
+> +	u8 *sc =3D (u8 *)s;
+> +	u8 *dc =3D (u8 *)digest;
+> +
+> +	for (; digest_size >=3D 1; digest_size -=3D 1)
+> +		*dc++ =3D *sc++;
+> +#endif
+> +done:
+> +	digest_size =3D ctx->digest_size;
+> +	memzero_explicit(ctx, sizeof(*ctx));
+
+=46or a multi-stage squeeze, it is perhaps not helpful to zeroize the conte=
+xt=20
+here.
+
+Ciao
+Stephan
+
+
