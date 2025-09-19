@@ -1,117 +1,122 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A3E313264
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 13:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7478E2FE56B;
+	Fri, 19 Sep 2025 14:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758290368; cv=none; b=juWwMwWBspYYVOGuJyXzD2jz8Yfsrxzi1IE923MABMzsV/UGJcZ0hwJac154yyVtijiwfRqAo2g0HBrI3qCREzne3kZ7UzPRE2W0CtPQSZngCNUTNmTE/T0ohsG8+42DgGRZXIj1kxhyO/3Z0WZqyy2dIcd+UmyGGfigEr1hTvo=
+	t=1758290901; cv=none; b=YQIIZ7n7nYmnvarCYHUvG8czj7M0Vsud6ppuT1IIfKIAZG3rxmoBUZmwdOSJ9bC0XGyx/qAJe8vG7qRryHK+u0vYK7iRAkNnY8qEJVJnESkJaLuSXpVThc123yuEQ25krp2f5+Do9x3qqBwB9bdNB0tXvv+0l0Q+BgIcIVNGCYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758290368; c=relaxed/simple;
-	bh=E0aKd79dQRldmcXYoHZeP6fkSHuLvXaXqPGKYoA27iA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=X+JOsXPdc5brwFD1zvIKSU+erPIZaMdOj5BxRJZy34uC5k9E6xBiR0iwEv3rG6Hy499fNlt+6iYDUn4E7dCXSFyu1pX8JfvWX62rmaJwt1tW0vxzaWFdoeE8PTp/Lnh5dp5fHyJ5GAgVBFwa81xy4D7JiOQzrYfDRCJYyOKt1uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dJ/IJkwA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJ/IJkwA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758290366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E0aKd79dQRldmcXYoHZeP6fkSHuLvXaXqPGKYoA27iA=;
-	b=dJ/IJkwAxkhLJOIyoOQjYtKneWPgI+IvdVHWolZw0VRQNgbj789+hlTgvilEafWbcbnlzm
-	8oe/w69K+0QOqeLNW1GZ8uPDHNkl3wI1HFCgZ232co0BVR4kcN3IspoEGyaR7KVtI2IwTY
-	cTJhq1zqXfAE8VK+aWah7wGfehb9r0Q=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-yDK1UUXiOU6fWnAWs0r-ew-1; Fri, 19 Sep 2025 09:59:25 -0400
-X-MC-Unique: yDK1UUXiOU6fWnAWs0r-ew-1
-X-Mimecast-MFC-AGG-ID: yDK1UUXiOU6fWnAWs0r-ew_1758290364
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b5e9b60ce6so61602981cf.2
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 06:59:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758290364; x=1758895164;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E0aKd79dQRldmcXYoHZeP6fkSHuLvXaXqPGKYoA27iA=;
-        b=m75D+7C3AqrQ8HQgKQj13KIdLamGPJeiFJqYNZHjdaGLdA2+FJULIneNQYO3QE8wZy
-         h4RxE6a0EXtv1mjKtUi16JtRlkRs24nolHHgou3ykR5+Ln/zvJJFgrd2fQdytcmsKkEP
-         LEKF8epP4NqiUsPLKHm8TMPsCk0jg4VtSMuuF+RfUhOgLwEtR6vkgHOZIpeTKrPLui13
-         lBfTOLLFfRbENNc6hv+pVrRTQl12LorYV9clWnR3sfgHnFlCNTdx/S10Rg0kX1BXQ6+f
-         he8xbCo74mYhR7qsaMDfIuwU5Yfven6wOw7ttOh6bFLisrMnu4SZhUaNx8kfRSH4I+61
-         ARww==
-X-Forwarded-Encrypted: i=1; AJvYcCXpPpxbxLEcZm0znQFYsqSStKZsfHtA5e4n1w66S0VmcIoR6dLq9Jp98e4km2Cwr3xS2Cclpj+iwaMMoGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxl8VAOUjlrQntfGSH4viAviH7E/B0UiBlLQRmR0qyUPaSsQz/j
-	NuJtLYPjPWxpDmAiYqolI4HEj1cUvMDnhYW817fiICgrvSe0RaTJVT8ux9MIepouMni+hdUiXJZ
-	H9Ct0ufhaH9I44gahJpKLdGjSNLz1Gvl0xQgna9M6Cu62sl+79pUc9pQ6QvoJ39MKFg==
-X-Gm-Gg: ASbGncsB5m+ZtnyqRlXL+D/5/78cHgxBX+oSJw+KI59ibLkuvBqh/+DwlJFrJ2XZEkU
-	q2pxIS4jYyv+eXg/DrgxxBPOsuumgkAsZ8oHhQ6yyd6kYEMQs5T7X+RMaoj4+HjDPpDesNAXgny
-	otNoqcwBnN7CK3S8K14K7K0pucTUugnqsEhRPMhrzjCisUzntRC1HU4Z19vSvRkT9VLzPUI6k/p
-	9snPJgDzLJ8d125/SlVLPebQdDmIuRN74+0pL2fvNelLh86NMzgpM8O8zh3kJVS4wf1xWcnHFdN
-	qpU70XDT+2OXwirzZ4LVtkKiWGfvStrJtA==
-X-Received: by 2002:ac8:5dce:0:b0:4b5:f59b:2e7 with SMTP id d75a77b69052e-4c06cdd8d53mr40676331cf.9.1758290363008;
-        Fri, 19 Sep 2025 06:59:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZORXfI+7Pv8Nbr9EEpWupK3RCB0YdG+gi72RSlWrDN1wMdtZXcENcez+iU5vJ3qPlyNBw7g==
-X-Received: by 2002:ac8:5dce:0:b0:4b5:f59b:2e7 with SMTP id d75a77b69052e-4c06cdd8d53mr40676021cf.9.1758290362591;
-        Fri, 19 Sep 2025 06:59:22 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::318])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4bdaa0c5156sm29082401cf.45.2025.09.19.06.59.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 06:59:22 -0700 (PDT)
-Message-ID: <2df4e63a5c34354ebeb6603f81a662380517fbc4.camel@redhat.com>
-Subject: Re: [PATCH] lib/crypto: Add SHA3-224, SHA3-256, SHA3-384, SHA-512,
- SHAKE128, SHAKE256
-From: Simo Sorce <simo@redhat.com>
-To: David Howells <dhowells@redhat.com>, Stephan =?ISO-8859-1?Q?M=FCller?=
-	 <smueller@chronox.de>
-Cc: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>,  Ard Biesheuvel	 <ardb@kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, 	linux-crypto@vger.kernel.org,
- keyrings@vger.kernel.org, 	linux-kernel@vger.kernel.org
-Date: Fri, 19 Sep 2025 09:59:21 -0400
-In-Reply-To: <3788819.1758262666@warthog.procyon.org.uk>
-References: <2952535.lGaqSPkdTl@graviton.chronox.de>
-	 <3605112.1758233248@warthog.procyon.org.uk>
-	 <3788819.1758262666@warthog.procyon.org.uk>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1758290901; c=relaxed/simple;
+	bh=NUPh0JtwrHiUi7p6EEg2cxsqqXnH3TPGQmlGZJXCRYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g8xt6yAVl6ZemyHdBe/xI3dYblYQu+qpECPFJdDPmcwT1n1zRmMYzr4shzyNAAGwQgCHT4qFAD4UhH1qQCCUXVXf1WzrVpxHmxz30WuaTe7g5lni97jd9k6O80jvQTMyeSU7bBk0vwTMto5vn3LJD+M0GiShfci98QrxmwwA2zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id BBAB368AA6; Fri, 19 Sep 2025 16:08:03 +0200 (CEST)
+Date: Fri, 19 Sep 2025 16:08:03 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
+	rcu@vger.kernel.org
+Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and
+ Locking-Analysis
+Message-ID: <20250919140803.GA23745@lst.de>
+References: <20250918140451.1289454-1-elver@google.com> <20250918141511.GA30263@lst.de> <20250918174555.GA3366400@ax162>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918174555.GA3366400@ax162>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, 2025-09-19 at 07:17 +0100, David Howells wrote:
-> Stephan M=C3=BCller <smueller@chronox.de> wrote:
->=20
-> > For a multi-stage squeeze, it is perhaps not helpful to zeroize the con=
-text=20
-> > here.
->=20
-> Yeah - I've seen this now that I'm starting to trawl through your dilithi=
-um
-> code, so it will need adjusting.
+On Thu, Sep 18, 2025 at 10:45:55AM -0700, Nathan Chancellor wrote:
+> On Thu, Sep 18, 2025 at 04:15:11PM +0200, Christoph Hellwig wrote:
+> > On Thu, Sep 18, 2025 at 03:59:11PM +0200, Marco Elver wrote:
+> > > A Clang version that supports `-Wthread-safety-pointer` and the new
+> > > alias-analysis of capability pointers is required (from this version
+> > > onwards):
+> > > 
+> > > 	https://github.com/llvm/llvm-project/commit/b4c98fcbe1504841203e610c351a3227f36c92a4 [3]
+> > 
+> > There's no chance to make say x86 pre-built binaries for that available?
+> 
+> I can use my existing kernel.org LLVM [1] build infrastructure to
+> generate prebuilt x86 binaries. Just give me a bit to build and upload
+> them. You may not be the only developer or maintainer who may want to
+> play with this.
 
+That did work, thanks.
 
-I strongly suggest creating a test vector where multiple absorb and
-squeeze operations are done in intermixed order, and then use that test
-vector in your Kunit tests to ensure changes to the code do not break
-this fundamental property of the keccak sponge algorithm.
+I started to play around with that.  For the nvme code adding the
+annotations was very simply, and I also started adding trivial
+__guarded_by which instantly found issues.
 
-Simo.
+For XFS it was a lot more work and I still see tons of compiler
+warnings, which I'm not entirely sure how to address.  Right now I
+see three major classes:
 
---=20
-Simo Sorce
-Distinguished Engineer
-RHEL Crypto Team
-Red Hat, Inc
+1) locks held over loop iterations like:
 
+fs/xfs/xfs_extent_busy.c:573:26: warning: expecting spinlock 'xfs_group_hold(busyp->group)..xg_busy_extents->eb_lock' to be held at start of each loop [-Wthread-safety-analysis]
+  573 |                 struct xfs_group        *xg = xfs_group_hold(busyp->group);
+      |                                               ^
+fs/xfs/xfs_extent_busy.c:577:3: note: spinlock acquired here
+  577 |                 spin_lock(&eb->eb_lock);
+      |                 ^
+
+This is perfectly find code and needs some annotations, but I can't find
+any good example.
+
+2) Locks on returned objects, which can be NULL.  I.e., something
+like crossover of __acquire_ret and __cond_acquires
+
+3) Wrappers that take multiple locks conditionally
+
+We have helpers that take different locks in the same object based on the
+arguments like xfs_ilock() or those that take the same lock and a variable
+number of objects like xfs_dqlockn based on input and sorting.  The
+first are just historic and we might want to kill them, but the
+sorting of objects to acquire locks in order thing is a pattern in
+various places including the VFS, so we'll need some way to annotate it.
