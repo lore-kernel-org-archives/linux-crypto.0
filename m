@@ -1,72 +1,72 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB135257855
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593F9313E11
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 15:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294353; cv=none; b=LJuZxYugvZ+k1rGiHoz8SOngfQO1PhIXSQgDZ/kL19uk97bvv9ssc51BSaUdF4ATSQfsPIiSKwJrJlXh/LsSw+UNJZag1mANGVaxraWBczBK1D01JNOELgnUiFlWVExfzxHVpMYhmlesijLmRkMmWbJoANQGlJrPmGLN4BrW6U0=
+	t=1758294372; cv=none; b=Mn5f9BJ09OKKqivk/CYvDdj5NTOpC0pXIREVbrwdXXuLMbeE53fJP1Wt6MF0M0X+h01fKw2vT06T6KgRbyMYMlzk7B5TXjsxV2PC+I/5NF2SdiXik9k/sgQum2ePhkspGvEZlwBU1RnY7REfp2W19SGixIq4fytd2M7qTrzdA0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294353; c=relaxed/simple;
-	bh=WMftwkU9XX4Xic2+f1rWthYmYDHMbq9eC2vVc+iw4Gs=;
+	s=arc-20240116; t=1758294372; c=relaxed/simple;
+	bh=wdojHUk/IaswjOXNhFweViADqPcfNEDUvrpmqOD6T84=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D1FWhDZckJ1ueGCvVOsJPnyhhi6JNGiKSbCBp1xrZtIR95kwcrJ6/o2nzZRFdCiuNGQx+G7/Rl/M08rstKJERWTmtn7aypZmQS5lEFa3x2xCCSFkR+Ko1UueqpxN+gmg9CGwr3LhUoAFP8I0iWGQFwB1wIjUwWXwY80nvW5wWzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zGiRtqVv; arc=none smtp.client-ip=209.85.219.48
+	 To:Cc:Content-Type; b=B2L8oUe+Tya/CivaXWvsfuGWO/OJXgWsm2RwUG/pa8rgm3zK3tO6siWIuYyUJ59A8W5EwTxFOPLenuf+EuCnnjU48Fkf/QyEmzQNScXNN7psLsVibjQs++8eplz1DPDDQv6BO+X8G2n72Si0omij5UcPgKuurccJWmRTlHmXufI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XrsxQaBU; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zGiRtqVv"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-77dd76f6964so32026836d6.1
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 08:05:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XrsxQaBU"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-78e4056623fso18560886d6.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Sep 2025 08:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758294350; x=1758899150; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758294370; x=1758899170; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ALVFhndHULwyH6PXNjxWdCUnJjL9si5BK+FmNKNwS8Y=;
-        b=zGiRtqVviWJDqq5onqQFaUT4flGvNKLkzw8B4KqAcLoi/OyuAwoO3afNvEKf5qQcsk
-         lpp+MZFH8MQZiZchtm+y6nRD2lueMAhJ6/t4mTv27veproY97aYIBAzDURje3f7qG6Ob
-         K70JI9cZZMDzCovaktCcq5JDrarvFDwsHrgjL3KrGTE6cJKvfo+dHN4otClocii4YYMU
-         r1YDXi0PrTPs26AKRIT/lUd/XXNkZaQgDEAdA3tq4K0c10swQECdwCC9OXk2SYcTAkl6
-         IQU9FSqcVJpsSnHhwFPe/qcKodpx1B0nF+aFsw9gn84IPrbuHh1NnboqgfjfyQudUrEM
-         XjaQ==
+        bh=X2StnNKxKVl/rGS0fAgoxWZPalUwZSRkr2jKpUk0esc=;
+        b=XrsxQaBUoAzDlaVC2qo327eDnsB0qVHV3qKzQ4XsbuYZU+zzFZbVnwoELn7t3qon4G
+         At+HS8deqXMDM3w+VcAJYS7SuOzONXdzYyYBjZh6DYUsmdDU1VkIy1GIMgLyfdpdcIm0
+         qLysFY8v9aS8akIHeyLBK8SMB9eLq5dIjM8Q58T1KahckVXaKUkJu9qAcFnmJdd5AmRe
+         TwVgmIoySQygVlJspzO933T7mYPLzU0W0NcSyN97SPVo+vHXXnoizKgRTwVzhf/f5Ppc
+         /5yTK/e+gUP/OjXbD5/OCIQcjpx5Iny/4MIlBdMZi6Njz8yjfR8AAgFWz9wRdd6P+xjs
+         b4Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758294350; x=1758899150;
+        d=1e100.net; s=20230601; t=1758294370; x=1758899170;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ALVFhndHULwyH6PXNjxWdCUnJjL9si5BK+FmNKNwS8Y=;
-        b=qSmUX+iCrfqfzVgcyBmFEvpAo+ok4o4eGnLdJc/5YBAbT5EbuMb+DYTyZWKPSaN/yn
-         qpWf0J75L1BpFXW4Ty+MnfBMYH54Bxb/W+zJVhf3xAAyz7b/BXSw+gTP3AFwHgbWv5rH
-         EN2mmGxCj+hx0MSf4w27yuXqHfsuBrPzl+BXKyPlychr+87GGJBBzc0Y7XA5bhfEVA4A
-         AzdvJypfTylFZPje2fEqPl7u0hPGC5P6CnThqcD8n8YBnRnt6ccDdSHMuAfbhVzbXjmM
-         89doWbiVpumTwdhHxU/3+7zS/sekO9YTGpt5cBZ8DcL15O35im4ZoKPnunE1gZDI+mDy
-         e6MA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbHYYDRtk0ElQnn3+63YwxLLiw3QjCs7rxijFZFznJT6Z56HvMAyxc9pYkziF9H6FFOud2dXTQUOhFrHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX7E2RKcMHAzZVqj+3qyoyGW9Z3U5BR05oxDu6IutA1zBxM3Fa
-	Lt/koxX6/CzaH/S5ciBEFj+Mc1bCDimzoUsnLtDNlGlYDZtz6obF45Zxo4ZG1kC1Sc8uAa+wLNK
-	apIiLLBW/7jqcNm0I+V5iyaxN2lW1IDrsrVtEw2Jb
-X-Gm-Gg: ASbGncv8MEyPfwaTRikp8HMsMjvkTyqoQrbXhIilxyPfRUXosWuLJxjKWu/itepcVhT
-	xszJrUjFUPhMTJ+umFx9Zi6A9/7hPsJlULhkVIRmu1CG32iSHECMGeEyWifD1qGOkBOb7hzQPdS
-	TF1AzjKkzWw4fwKl23m03KeIyahE6WbTXiend71gbwwhqyQweCXDpSEAUdwo1kKt6WwfnjatY1I
-	yUcaBXc2V4wyW1W9HgKzza/X61EiipJ+9/xTg==
-X-Google-Smtp-Source: AGHT+IEVqq7kGd48eq4ZHSpETd+85Yxiw1HuwZsyw3lMLRQhSxxE8PumVmG7OCruoad9bvUz5MihV7lV49oxp9BNi0o=
-X-Received: by 2002:ad4:4f4d:0:b0:799:59d0:4e54 with SMTP id
- 6a1803df08f44-79959d04f7dmr32751596d6.31.1758294349954; Fri, 19 Sep 2025
- 08:05:49 -0700 (PDT)
+        bh=X2StnNKxKVl/rGS0fAgoxWZPalUwZSRkr2jKpUk0esc=;
+        b=HeAHMwFOYQtlm8FgTqXEvVGBOO1UbLse02llqdOtfO0BiYZNyTCQJrqRi7PPVkvx4F
+         aBhIc5L1wJ1YqGkGlEARCUGAZk2CRPyGcsCNPAQxC+srhOqtv/bon7eUfZjKtxyz/IT0
+         2wXCszjiXT/BDdv/BDh1KZoB7MmS7E8ecNEyMvfia5WrGcqwhoFr9/z7ylpqjD6VejPy
+         LseMoqyIWR5UoEdMFFQBlnTezr9li/r5zQ5J3SagE1reA1DSktzVHakqYBp+07C9JcSL
+         4lJwO6EWRQo6cQZpukCjrHRgcsUEhXRgXlS+m86oXCNedYqu6fQN+NWYg5af9bZFxhwS
+         CpFg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMPuUiYhq75rldF5dD2V+aV7iZ8Ch0eMmSLqnEGx3Yv9gDMEH8Rw8zYNXF/TTS90Acx86lqD8/Jxpzmkg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytrUwoW5K6/Di+or5vs8vzJexMHDtwVIU4eRxPECUkTsijdIrU
+	0zxUclcAmdUzeTVvX04PH6rdLkU3aZgxV/jniuEwm7UNNpolPBUlGbVhQccO9EC5yMZPcwSEbE0
+	XnNJNd1/7JLZ4z7MaR0Rc5DeRKweW3cXd+1HTWhyU
+X-Gm-Gg: ASbGncvS1Eq1NaE/9fggeW6DwGJLGiIqhLLYB9AuGZviDVJDXB7rFRxFyj4CxUwiEd7
+	Vl2AQeQ364r6lEXIpuqM9OrW9WvtpW0hcJitUw9AUJB4UJrCJJVX3u2ZB7gaf+QT7DI/vxbzekD
+	/XCsSrZTCl/umvh6if8FDNslM/hPc1evhOBA2cq7EFPn1Q/3e5ZOj7qfQi1+53OMAXLqGl+VBQO
+	fYoNb5fyuBUU7sRZv3tJXQAPYb6TB1tDy2qAw==
+X-Google-Smtp-Source: AGHT+IHfnOEj1gMhyVykBwx/odq4LWyP4tOsK2JQ1CQRm3BPJztFNuuL5zFmF2mdOG0LX/4UQZju33b9dOCcFbl89Gs=
+X-Received: by 2002:a05:6214:2aa6:b0:787:68a5:51f4 with SMTP id
+ 6a1803df08f44-799139ccbe6mr37966906d6.26.1758294369549; Fri, 19 Sep 2025
+ 08:06:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com> <20250919145750.3448393-3-ethan.w.s.graham@gmail.com>
-In-Reply-To: <20250919145750.3448393-3-ethan.w.s.graham@gmail.com>
+References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com> <20250919145750.3448393-4-ethan.w.s.graham@gmail.com>
+In-Reply-To: <20250919145750.3448393-4-ethan.w.s.graham@gmail.com>
 From: Alexander Potapenko <glider@google.com>
-Date: Fri, 19 Sep 2025 17:05:13 +0200
-X-Gm-Features: AS18NWD-UemVXeXjYD7iHT8a4re1Qj02r-S9mCoMAicLgtJfaZDLOjotbdftD6k
-Message-ID: <CAG_fn=ULHR_n+w=apc_g8Pe+MxXwNnQiRjOTRukzEiSAFK7hOQ@mail.gmail.com>
-Subject: Re: [PATCH v2 02/10] kfuzztest: add user-facing API and data structures
+Date: Fri, 19 Sep 2025 17:05:32 +0200
+X-Gm-Features: AS18NWBlYb6i59Bt1eV3KacTLjZoCQjcTTUaAaIGM2IX6otsVz3ln6Zi77bGuIg
+Message-ID: <CAG_fn=Xd07FvCp-tU_kSyjeJS-4gruaO1x5iowrQQ7zkv2cLeQ@mail.gmail.com>
+Subject: Re: [PATCH v2 03/10] kfuzztest: implement core module and input processing
 To: Ethan Graham <ethan.w.s.graham@gmail.com>
 Cc: ethangraham@google.com, andreyknvl@gmail.com, andy@kernel.org, 
 	brauner@kernel.org, brendan.higgins@linux.dev, davem@davemloft.net, 
@@ -85,27 +85,21 @@ l.com> wrote:
 >
 > From: Ethan Graham <ethangraham@google.com>
 >
-> Add the foundational user-facing components for the KFuzzTest framework.
-> This includes the main API header <linux/kfuzztest.h>, the Kconfig
-> option to enable the feature, and the required linker script changes
-> which introduce three new ELF sections in vmlinux.
+> Add the core runtime implementation for KFuzzTest. This includes the
+> module initialization, and the logic for receiving and processing
+> user-provided inputs through debugfs.
 >
-> Note that KFuzzTest is intended strictly for debug builds only, and
-> should never be enabled in a production build. The fact that it exposes
-> internal kernel functions and state directly to userspace may constitute
-> a serious security vulnerability if used for any reason other than
-> testing.
+> On module load, the framework discovers all test targets by iterating
+> over the .kfuzztest_target section, creating a corresponding debugfs
+> directory with a write-only 'input' file for each of them.
 >
-> The header defines:
-> - The FUZZ_TEST() macro for creating test targets.
-> - The data structures required for the binary serialization format,
->   which allows passing complex inputs from userspace.
-> - The metadata structures for test targets, constraints and annotations,
->   which are placed in dedicated ELF sections (.kfuzztest_*) for
->   discovery.
->
-> This patch only adds the public interface and build integration; no
-> runtime logic is included.
+> Writing to an 'input' file triggers the main fuzzing sequence:
+> 1. The serialized input is copied from userspace into a kernel buffer.
+> 2. The buffer is parsed to validate the region array and relocation
+>    table.
+> 3. Pointers are patched based on the relocation entries, and in KASAN
+>    builds the inter-region padding is poisoned.
+> 4. The resulting struct is passed to the user-defined test logic.
 >
 > Signed-off-by: Ethan Graham <ethangraham@google.com>
 Reviewed-by: Alexander Potapenko <glider@google.com>
