@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B9A2367DF;
-	Fri, 19 Sep 2025 16:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29DE6244669;
+	Fri, 19 Sep 2025 16:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758297718; cv=none; b=dz60/v8Xkl0RtGV20Luv94EL3iLlQPcSZjPQTAPapvVq5QdVL7UYw8A+0SJ7sHiNC7jgojw23yUG9OPVDP2h8snbasVM/XFtb941pCcRz/izldpZOooZw52GLwdfdhnPEdG1bUnwhN48qDUyf+xVdGT+UyXjKCz1TyTaM3LCCyc=
+	t=1758297787; cv=none; b=DwexOHZ4ZNpPPEEaf0gQRlOrm3+HNDm8HOBJr0v1TCE//Aae/2rzu9QrqrvqQ8x41AYPo+/G2o8gly96xi0mZrZvlwM2UDnLqQUwKYE6H02fkDqxJaMHyrfKn/p3Ep8FrOiwTPro3ZPMwHOnXvmsaNd9i1o6M1dL0eqQa/KcgJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758297718; c=relaxed/simple;
-	bh=w73svW2MCHh+dM/RM9nKKSF7/QBMrZkqdV86ek1OZ1I=;
+	s=arc-20240116; t=1758297787; c=relaxed/simple;
+	bh=/JrXP+Er95XRyZ504JanEx3HoJ/rZisZt2Q5h92w2jU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OHbBk4CAwIUgCO3qpXcMgoOTiJQF/HXfnXZvKv0PVnESeQZBUFPBJ0Hk7cG0y87ZMwNB6vHMR62aVqrupl+6oJIi0z+/2Ues6Ahvkbs5jUKppJYD630GuFAUt98aUybchJ3Fr/9xtynHIXf2x3p2cV6KwlVxwjps+Vik2JIfDtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjT0HZ/S; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=sFQEEY+GZa6GHbVQqzOmGz5YVgf6JWhGu3/rtISsw1WmKxkoG2o0VpIp8Tp000qCGSrTOUzsJILo+92jEHnu3CPIHG98AZe7/6lznGE4KoNuusbm0tza+8jGAEWxWDO9fXvGTshYMd9gB5VfWYbyeJEGJFnmieECwvDeNowjlN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjkTQ8Jt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjT0HZ/S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF34C4CEF0;
-	Fri, 19 Sep 2025 16:01:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjkTQ8Jt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EA38C4CEF1;
+	Fri, 19 Sep 2025 16:03:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758297718;
-	bh=w73svW2MCHh+dM/RM9nKKSF7/QBMrZkqdV86ek1OZ1I=;
+	s=k20201202; t=1758297787;
+	bh=/JrXP+Er95XRyZ504JanEx3HoJ/rZisZt2Q5h92w2jU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HjT0HZ/Sgh6IGLK7OHg8G7bMNIvL2ZhONBPeN5WO9nb/JMqQ3yW5YoBL8npqRSTa7
-	 2zh/8Ue7K4of89smCAsFGdJd9iHMDv69B5IqSY8lXsW6BdaZiWNy3xqC4m04C0tKII
-	 rEWIqn/rrlJJLzh/q5AQNZnu8tE5kTld3+AzxfzZXZ500neHksVKQwAfo4YO/onXFL
-	 ntr8Fblmm5vSeruLByepg7xnqBNoVBpHyQarVL2L3MWHsmM0yFzqz4Y/JXigzK568O
-	 sQuBQipyQ7wl4+/opaPs8ts1azmufDJTMJ1+Gb64IDxZp4SOFAZ1dsLRipl5BzbzNf
-	 9PDp0AmnKMu4A==
-Date: Fri, 19 Sep 2025 17:01:52 +0100
+	b=jjkTQ8JtJs0Xyy+aQM3zsH1Awb/CfBlumwAxr7MEWVPJ4QY2thL1HmfKTtXMedq3W
+	 cgisJV4p6tw7EE4XA7kooz5pcWhNawHYrfMfyGnlr52yPLeieHEMHpVCTqsbFdFzn8
+	 kvMkdkeL6Hd28sXV6ptjv8ZS2oJXPfLlEvldKmmtCvUiD9cU7WyHzMLfEsKCOkHY+h
+	 Jp3jqPhcyct4WE0nldynGAXaRFSMjaoDvSM0Hqx2d/JrToEcoiRoOORNFCUkfEYGSs
+	 VstG1EbpRqJ7KmLOqpWo0DOdEuTXsLQTjU6mDnsYwT349Ic6rA3hUPqNKiFKCPQqKN
+	 UjVrkXdwt4RHw==
+Date: Fri, 19 Sep 2025 17:03:00 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Ard Biesheuvel <ardb+git@google.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
@@ -36,11 +36,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	Mark Rutland <mark.rutland@arm.com>,
 	Kees Cook <keescook@chromium.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 1/5] crypto/arm64: aes-ce-ccm - Avoid pointless yield of
+Subject: Re: [PATCH 2/5] crypto/arm64: sm4-ce-ccm - Avoid pointless yield of
  the NEON unit
-Message-ID: <cbd5247e-5c57-43cf-93a3-ec3a6631a509@sirena.org.uk>
+Message-ID: <eaf4c342-5ba0-4f05-b641-937d24d2a352@sirena.org.uk>
 References: <20250918063539.2640512-7-ardb+git@google.com>
- <20250918063539.2640512-8-ardb+git@google.com>
+ <20250918063539.2640512-9-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,41 +48,43 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wKXztv/NdWB6IIby"
+	protocol="application/pgp-signature"; boundary="tbed4sQ6qHeiGdFl"
 Content-Disposition: inline
-In-Reply-To: <20250918063539.2640512-8-ardb+git@google.com>
+In-Reply-To: <20250918063539.2640512-9-ardb+git@google.com>
 X-Cookie: Don't read everything you believe.
 
 
---wKXztv/NdWB6IIby
+--tbed4sQ6qHeiGdFl
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 18, 2025 at 08:35:41AM +0200, Ard Biesheuvel wrote:
+On Thu, Sep 18, 2025 at 08:35:42AM +0200, Ard Biesheuvel wrote:
 > From: Ard Biesheuvel <ardb@kernel.org>
 >=20
 > Kernel mode NEON sections are now preemptible on arm64, and so there is
-> no need to yield it explicitly in order to prevent scheduling latency
-> spikes.
+> no need to yield it when calling APIs that may sleep.
 >=20
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Also, move the calls to kernel_neon_end() to the same scope as
+> kernel_neon_begin(). This is needed for a subsequent change where a
+> stack buffer is allocated transparently and passed to
+> kernel_neon_begin().
 
 Reviewed-by: Mark Brown <broonie@kernel.org>
 
---wKXztv/NdWB6IIby
+--tbed4sQ6qHeiGdFl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjNfm8ACgkQJNaLcl1U
-h9DIOwf/RW889nrpAPtx2QplJTo+RH/40Ch5TIVuvSF+yWtsPuoEyDbHp/5LDfNF
-EBtMLQ08UICuOq7NVxKqcsBt/c5j9aBPwhovm1THuPXzIPd/KwXK5dNBWCaJlixh
-W9OXRW2xR8DYu4O0MEE11AOzTySYPpwaVGav/YmoVoqRQuDituYaSg593ztQUpqd
-8cCmTbf5+i4J41vFJ9PGokeGSDxTILTe4lW7Ix6Z+SMOhveQZfGL/kqnlefLjiW/
-1VXsMleQf5/MDZ93Ueac9ia9WiOC6h0/TLz7t3Vh9KeUNqhvLmKRVcyxizLID5b7
-eDscvtf2T5KlrfYEpeY/5uzv+gWnfA==
-=o8Xv
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjNfrMACgkQJNaLcl1U
+h9Ceowf/Z3UzSwYIObGf9baV5ZQ75yhm3OUJTsQyFR2rSe2VG+cSKPV0rER22deq
+v09d6cECoYrSVHh1sAGAtEBPbMUkyviQmHupfGBysyGunMcxJKiwh6Vf1HRXSesz
+MXgnRuskEfvgWlBKcfJ3CL8PGe7oWxc/5OlC3E18Ld1RYB+i8p5yHc9z01FrF3om
+d1R/e3Nwg9Y1hApSzMW+WGmoh7OrIbO+UcrnO6QsFDu9W4Xo4sCCs4ASGMcpen8W
+c9CqyzYZqLpsLYVH0AjFs8f0Zi0GxAXSUsm9sZZRsY3F4aAMcLYm+GwcPa10EyPL
+Dujr4lWrw8NpWMqmt0yoRMZZCOOmcA==
+=qk93
 -----END PGP SIGNATURE-----
 
---wKXztv/NdWB6IIby--
+--tbed4sQ6qHeiGdFl--
