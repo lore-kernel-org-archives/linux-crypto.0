@@ -1,28 +1,28 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010036.outbound.protection.outlook.com [40.93.198.36])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012018.outbound.protection.outlook.com [52.101.43.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6A531A7E6;
-	Fri, 19 Sep 2025 19:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CF132143E;
+	Fri, 19 Sep 2025 19:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758311601; cv=fail; b=UgOch0YEYkv4RtlEQR8/2u0oyNkwNXk2/PWn7g0GIND/gPZh5UHTQrbOO+StCLwpD96GHgiW9vIT7v20VJ3VobAg/h1SnSSvwrZithNzEmvz68OBsvE/6npRKZsV69ZLYTW3sEKvhXmcV6h63zKFW42reNQob5XX/FXDhkbjwq0=
+	t=1758311602; cv=fail; b=lXwI0ZB9c9q0W+TurtVQkZtZstEXoDUuMGLs+Ly/kte5vcmWSWn+kAgMEfVptArLo1HsyznEkw19vGMlj6e1i+f9GsrywI6s+X0goBhxwddwgD3tCBh+urhKmQiy4bu8kO9VQcp5B6Vts2ETS4jhCtOGnXPmIkxztA1GNF4BP6k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758311601; c=relaxed/simple;
-	bh=PcPg2b5OhUKmtHs/VTSBZQtLXxZuUIYji+OCpZ4cVjo=;
+	s=arc-20240116; t=1758311602; c=relaxed/simple;
+	bh=PC3pgxfvBJ2p2GI9qLU2qXj3g5+0cCsVg+Sr8pR7Hi0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pbtsxt4Qn1QSFmqGdGyBa3rIqM92ZmBxx+Ab3WjbxPFexyeE6eHBH1AtL2p5UjKai6VVsVK8oWFZ7gYcHxszORODsUHaY6/FP2phb58GZ602Pio23XexeKFi106/rBdIt6f+Jyd57z0mXNoxaAVTzBil1hfjH0BTqA6L/g2kDig=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ClBEHHF8; arc=fail smtp.client-ip=40.93.198.36
+	 MIME-Version:Content-Type; b=RlZtOLLlXfy7gljFjtK5zOVpfXxYE5GrPYxU3Agv5jCnRY5r6CsTnPSCRHjcqTV0VdGwCqSwGVRApUUawPbDxpVX+KHWk1D6tLSHBXamSmN4qCZovUr2dF1En/+HX+IBHer+j8eZB2U8fDRAsKrIL9FaDRNZ1TQBCCWIz0f2oxQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SQv0jeaW; arc=fail smtp.client-ip=52.101.43.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ClBEHHF8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SQv0jeaW"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=q+7y3h/MivMQq7pblrl8nLqJzM05oYnMqSmg/WsYcu4DGZsz3zIV+g0L3cQ+kUmjV80oxcIIgKQJxPUh3B9W+woAQOiHzY2saz7or8Qp7gKwvGXXu/H9O4TvXyiOVOzXABPFcFGjgMv32HTnRU3vwUg6/9Xa0r5uU79ojeG6Smua4UGLsJ6Iaj6ssPqINfiX1c/9anRlaqriS1c8QQduleohMhboaIvTNYMXALc8zntnNj+QOASMGsSjFfsV9uE0C2RryTbKHBFTExq4YVLX//KWmcK8OqPX9XgsFdp4if12Ds5d0T0H5QlNiTMsbBm9MuzUjACo4Fh6dusK23/WkQ==
+ b=Xx58w32kCACqi4WoErc9gAuy9aA2HT4987Ik/i4yLcz1lM8iYTK4599eLvlx2Xw7nlLV1TuRVCTGAOWS/XEpqmjNmXwlcy64e8QGIDv7FAKKECwBS5WovUYUmMtYLOWoeR36ok3VrpJhsh5R391xu+vNCWvwLuHNYqbBvvOJTAoNR8oIHQWXLV5ootoh0UoLqozguF+olHrjxo7lkwqTNTYaLsQXVxXzgF/xU4keSq+NLFgikXhvtQsjBr+2bFuJzW5lvfQotxZKyvtJY0loEu5AZj9DWRTuJHFG9w/WzupRkRvZaf7lpkTmeW4mukcld7JvGdQrFb83GJ3pN6mSWA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9GayJZDCZLyH8AF+aL7r3ft7zt59QG2tTZt4jqHQ9Jg=;
- b=Nx7lFBqhmnHpKuCp+MZOQHnetgNIxgJGYetjkDy1j9er+Z2KfrTvFhctXS3DnXCBF2BbvsUYFCdqkLdC8XOYlWR59NX5DznFuJMJ6aXH1fFpwZU/AvKBCCwvIBm5M+hc7boozr6WXU22ZBq5to2BWnLnn8v6HO+usYyZ/daERfeVn8o+b2xX637YtBNbMuQ/Oj5e21KkuqK6JhhW6NZEoCw+YPDw7yj0QCFgPUxs4x9HgqlfRrDPyM1i/9barZw6XqaZpIAzDHw5CE1C8IlwIm9e5lwhSNdx7cjEPOO+GWIAoHliX1oo3GMVa5f9n0O2eX0rvEjZDXKQlgq0qLkwRg==
+ bh=go2a0ObE3Trq89zOLUqiti0Qw7XEHjlsq00e/g8s/80=;
+ b=jzJjRXeWz2xFv2kdi1ZZpQzOliKHedr7agVgHbReQet3rqbrVOnpwrAEdsyKk4iGL6yy7aaSn3qVy/C7e8rGq0/jAAPBpnqwSRMdPs5IHLRplhfIh2eDM1Aq5tPu5HGV9vxTAdETN4LqqpZ2b3zVDIffuIsmDVXBOQVLFPuRl6m2xvEmnlBcoMJSEo+rGJNpTk7l37+yddwjSN9wBLOwgW2JvPjHzK+YlaOChPYbQKMa3ptiRiCAWCRaxDPu5pGZNTyaVpIRtEgiZcMku52Rlfnxe2vxVIJkpby1FbcJSrY5rIPiVRCiVbho8j4B7wVsb1z/WP+FXR/oPbCu0xMWew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -30,18 +30,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9GayJZDCZLyH8AF+aL7r3ft7zt59QG2tTZt4jqHQ9Jg=;
- b=ClBEHHF8xlow6ugRkLY+BBEhFvB6XgNMAZcWEK1DwZUkingvUwaXoBWGA4/ldEdoe2V03NFy5erWgKHeQW6O7+7FqXO/Z+icK/44afSaHRSOCkwQcXbjIY75tY8hLLLle4QZHstfJkASXHqrZr+PfsLbFthyrv6jJhcpE9hY1PKQi5lE3Vh3/h/3oLZd/sYhO9g80u/P3AJLySDzjFLmbLjo83prtKeztpMB7AC4fNENUFAdzYojXNtQzNJmr1HDxDsB0P2t0cRo0fcIOCUi84Olr8LnrAkH51KyKyPVG8XbrN5zFO9RZoXhpQljCqYWWtIPM7DuXmvcSZY0AWMkRA==
-Received: from CH2PR17CA0015.namprd17.prod.outlook.com (2603:10b6:610:53::25)
- by MW4PR12MB6754.namprd12.prod.outlook.com (2603:10b6:303:1eb::7) with
+ bh=go2a0ObE3Trq89zOLUqiti0Qw7XEHjlsq00e/g8s/80=;
+ b=SQv0jeaWsMjdAhUYo4mHfKzupuyEJmN2FJcn1rt0mymyRHIgAmKz0uMFKXps8g1rPVMRr3Ut91RPupflJmOfjpRtBlVUdjDb0sAlAhvU5BIYDYQhja90DxWd14o4cTTLMJYo6F5FkStry6v48F3thlHhcbaHJumDYmjlU6J5XiHL9PLKc4koDJsLZpOrM3FAVeYFQBQpVHksN4HZZeB5CWporlEbl3yyUourFsfpWsJ+Ue9vD6Wwh0hzcNAryWcZPW45RqSwfZOIVit9KmnJ7z8NVw2tmYUmdjGNkWv+jy2v400nYebe1MTWx0/LiDwbq6MKhEU7TU2j5zlZzuRSbQ==
+Received: from CH2PR16CA0011.namprd16.prod.outlook.com (2603:10b6:610:50::21)
+ by SJ0PR12MB6880.namprd12.prod.outlook.com (2603:10b6:a03:485::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Fri, 19 Sep
- 2025 19:53:04 +0000
-Received: from CH1PEPF0000AD7F.namprd04.prod.outlook.com
- (2603:10b6:610:53:cafe::73) by CH2PR17CA0015.outlook.office365.com
- (2603:10b6:610:53::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Fri,
- 19 Sep 2025 19:53:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Fri, 19 Sep
+ 2025 19:53:06 +0000
+Received: from CH1PEPF0000AD82.namprd04.prod.outlook.com
+ (2603:10b6:610:50:cafe::91) by CH2PR16CA0011.outlook.office365.com
+ (2603:10b6:610:50::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.15 via Frontend Transport; Fri,
+ 19 Sep 2025 19:53:05 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -49,29 +49,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD7F.mail.protection.outlook.com (10.167.244.88) with Microsoft
+ CH1PEPF0000AD82.mail.protection.outlook.com (10.167.244.91) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Fri, 19 Sep 2025 19:53:03 +0000
+ 15.20.9137.12 via Frontend Transport; Fri, 19 Sep 2025 19:53:05 +0000
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Fri, 19 Sep
- 2025 12:51:38 -0700
+ 2025 12:51:39 -0700
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
  (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Fri, 19 Sep
- 2025 12:51:37 -0700
+ 2025 12:51:38 -0700
 Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.8)
  with Microsoft SMTP Server id 15.2.1544.34 via Frontend Transport; Fri, 19
- Sep 2025 12:51:37 -0700
+ Sep 2025 12:51:38 -0700
 From: Ron Li <xiangrongl@nvidia.com>
 To: <hdegoede@redhat.com>, <ilpo.jarvinen@linux.intel.com>,
 	<vadimp@nvidia.com>, <alok.a.tiwari@oracle.com>, <kblaiech@nvidia.com>,
 	<davthompson@nvidia.com>
 CC: <platform-driver-x86@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, Ron Li <xiangrongl@nvidia.com>
-Subject: [PATCH v3 1/3] platform/mellanox/mlxbf_pka: Add core BlueField PKA platform driver
-Date: Fri, 19 Sep 2025 19:51:30 +0000
-Message-ID: <20250919195132.1088515-2-xiangrongl@nvidia.com>
+Subject: [PATCH v3 3/3] platform/mellanox/mlxbf_pka: Add TRNG support and hwrng integration
+Date: Fri, 19 Sep 2025 19:51:32 +0000
+Message-ID: <20250919195132.1088515-4-xiangrongl@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250919195132.1088515-1-xiangrongl@nvidia.com>
 References: <20250919195132.1088515-1-xiangrongl@nvidia.com>
@@ -81,1320 +81,1454 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7F:EE_|MW4PR12MB6754:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f23b014-38e3-4230-6ccf-08ddf7b6258b
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD82:EE_|SJ0PR12MB6880:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3a06956-d6f8-4270-cab3-08ddf7b62672
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QmlRaXA2cm13c2ZxVnFhRTRROU9VWmoySHVCRzlmZ3U3c1JjVHYzTGRiNDFP?=
- =?utf-8?B?Y0ZxeWtMd1lxVkZraXMybkJ2Q0ZmeU5wSGwvQWt0a1djWTNjYXk3OXNGOEk2?=
- =?utf-8?B?ZmZ0QUpDbUN6Z1dDdkFKeks1Z2NVREQvUHBJd05pRU5GUHNPZmtOWlZsNk9F?=
- =?utf-8?B?VVhESFhMVlloM2dhcGFYaDZJTkJoOUhOTklrYW1aUVEwQjZwZGxHbThCK1Av?=
- =?utf-8?B?NHRCc1J5NTFMTUtQSUhDbHN6SHpjZkU5NmFmcWkwdXBnamUxcUJDU3daM0NS?=
- =?utf-8?B?QnJTR0N4U1ZyZkRLYldIYTJkekNzZVlmQUs1dzgrcjQ1bUZ3NGptdWFMUGwz?=
- =?utf-8?B?L1lRZ1h2WEFlS09CcVRDWlB6TkZ6YlMyRmNENGxiWU9TaFBTaFdhWlgxdGRP?=
- =?utf-8?B?L2VTVHJkWW1aTkJ3OHJnVnJiSVZzdWhBOTk1S1NBOWdxNWVEcFRsWS9Lam1L?=
- =?utf-8?B?NzBGVEJ5dEJycFBtNjczaFp5NFJDYmpXSElwdnBYVHdNVGsvSEhLWU5zTGx1?=
- =?utf-8?B?M1Nka1lKV3B2R2k4Nk12RFMzUGQ0NUw5cFhidjh0RG96WHJvYmtxalZ4SGoz?=
- =?utf-8?B?V3I4VTRxSjJlTFFCK2lGVkluMDk4Zm4zVnovNVA0NUZiM3VkaU9DdTNYbjN1?=
- =?utf-8?B?UTB5QkV0RjdqbE1HRit5MzUyTnByWmYzREQzMk1Fc3grYXZUWVh0cjZZRDYx?=
- =?utf-8?B?M3l5V1ZyQ0gzQ3ZSaUZmL2w2Y3haV0ZKVDZ3a0VtdkNwOTVoTXJaNEZJSk1j?=
- =?utf-8?B?S3FsOSs1YitJaWVvbEo5a3MvRXphTGtGVUF3enVKSDJBRStGVmhZWTRTanhB?=
- =?utf-8?B?MDQ5VmwvQmtLU2hEalFLZnFiYnNUdzdFR1VjMmhweHpmNEpRcE44Z2NTZUd1?=
- =?utf-8?B?WHFYcWdXd05STWQ4REVtY2xyV2FtQzdjd2xYd05SRUNoRm9GakFOSUxDVjFY?=
- =?utf-8?B?NWJ3ZHdvelJ1ZUNHUzhwcEl1UDlybkl4bU8wYnpQMWlVSEdKY0NJVm1Nc0Rl?=
- =?utf-8?B?NUJ6M3cyMW16YWhKRGxQZjV3TEtwd3RrdlErVE9YdmdJS2toMHpsMnREMjRC?=
- =?utf-8?B?by9SblhEV1A2bFgxNnhwZm1aajkwUEhaUmNDVnZQUy84OUhuU0hRVW52V0pv?=
- =?utf-8?B?cHMybVY0aFRBV1VCNUZWT0ZUUUxTamtlNXFSZ2MvWC9uV0VNdHlvbzJJSSs2?=
- =?utf-8?B?K0FDV1FwUVdBcnpBa0szWVlBa1ZWNnJ3V2J2RnNiQ2tVQ01Rak4yYjdyekpa?=
- =?utf-8?B?QkF5L1hTZ2VkUkl4WklFZjdCSkUvMjRnSU5OQWVUWFRKazAvaWIvbndueUUv?=
- =?utf-8?B?ZHYyb2UyQlJJbkdhM2ppY0dhdHhqSUdidnVpenVIZlcyZnVXc3ZuR0Y1aGRa?=
- =?utf-8?B?U290azU0cjB2blpQV0wvYlFYcWY0MDBSc3FhMXVsZU5kK3BmTC9OZUlCNDQ2?=
- =?utf-8?B?cGMyaGpwWlVNVXVFU0tVV1hKeGZxMEovYXU4aDkxM25sSmZSSEoxTTRlVlR1?=
- =?utf-8?B?cVNUdHJaQmdZQThSWm5oWXkwUVgxK1FrY3BtQjhLWHhPbWVXUG9YM3F1UmlP?=
- =?utf-8?B?Z0pQS2ZKNXE4ZDVQak91eSt4WDVCUm5aRUtoSDBDM2NyV1JVWlY2d09hRnFS?=
- =?utf-8?B?TFpuTXB6cW1sRE83RXZqK3pUZzRRZFZ5M1dKRU1KTmNoT3NoR0ZOL1A3ZjBw?=
- =?utf-8?B?cUZoRENYemxteTFEaWgwSG9UdW8xcVNCOWFLZ0ZROW1oMkdZNjJNVnl0cDhF?=
- =?utf-8?B?MmNQaW5TT0FsYUlZMkhrdTNLL05ubkh6b29WbXEyK1hDWU1EL3poMjNVRzNt?=
- =?utf-8?B?bGNaOGM3YWZaSlVTekMyY2ErQTNpQlgrSE5UL0pocjNpZzhsWFpNWGVIZis1?=
- =?utf-8?B?YlpQMCtEMmV5Q2xsSW93Wno2YlBwUVhMK3E0bE5ZcXNRUW01TFpIQWlzaE12?=
- =?utf-8?B?RUxVaklaVXVSOGgvNExDbUplUHJIVnRtWW5NaERtZW0xNll1dTM5L254WTdo?=
- =?utf-8?B?MkhVQ1BWRmhoUlc4cklKNmltdU4rSFREQWVaTEpFT1hDUTdKU3h5RW5zWTVj?=
- =?utf-8?Q?LOG4Zs?=
+	=?us-ascii?Q?xPLUPVs1FR6iQ/KrgLULubFMLV9Fnr2PFt9DTiH2ElbuzHAyzOPRdumY7pUW?=
+ =?us-ascii?Q?LQmlDjvGP4WMC0KCI2Z74/KdsyhCtFa7Wdwof5OBB5hgvF+dYITfOUZsyi2B?=
+ =?us-ascii?Q?KLflAQXj2rY2wkW9w/Om/Pj8mBjmUfFiFsOkEm5a7FEYejXOCipB4yFXrarV?=
+ =?us-ascii?Q?Ol/BFi/Bf3wTdibqMuOLE/Y6JbQUhnZxIiZz1jwLgLwDfdjP77zZLsKmWwNs?=
+ =?us-ascii?Q?7lfuiKQRRAg7VBm115RSAEjtlG2WJfmvrcplH8R3nZxzLU9JVygyby5DJOmj?=
+ =?us-ascii?Q?cX4hK+w99yiyd6vMogGwcELo3gGrWWdk5rBMDIS4xl1lMXcTUkDXp4elIXIW?=
+ =?us-ascii?Q?suTbRY68i8jFzEtv+QATrfA6BEYu+9bohP2d5N3mOZZUrWOeaDFjl3K0gsh3?=
+ =?us-ascii?Q?FwVqrjJ8w8WwMn94mAjJFC7u6X0ieGObiKAh0fWlWf8H2jtR64flGKR7Xjmn?=
+ =?us-ascii?Q?6SBmciM6xTtYICKq4FAEE1eOIpjFO0XkqtzjE0FLDL04Kfk7RGAA6bEU/Rxy?=
+ =?us-ascii?Q?FOSk1/ON3celXyut+vxUiAV1cOJZ4q1lEo6a7aby5XLUbFw1+u00PUGcAZZs?=
+ =?us-ascii?Q?JgquAKxoi2Ahshe/u2drOt2Ralhp7YAeX0le0DNAHjU2PqWxm3uWlu+iz6CJ?=
+ =?us-ascii?Q?0o000GghBUczVFDtCDQ+uY5YQz+A2IH2UoMHEIDFwhRoNsZog8k5sFxZkfOr?=
+ =?us-ascii?Q?slmNDusPem/jQHoYsZkx68tDLs9ZNDshFKHrZQmbrLyN/I2ehZI3kY3HLs50?=
+ =?us-ascii?Q?IlTXGnQHm9cFpD3SB0KtLnpSlW4Wr+jc2UkJ4OQX+xFfaqK01AsqSdzm4J8b?=
+ =?us-ascii?Q?SIuat/txQFXYkoROMZQ3BSwyJbPIEoqQR8IBTHzFT5OdN7PqdXmzh7pZke8n?=
+ =?us-ascii?Q?jBaix9mcurG51iZFmUqN9IGxXrRAm3PmV/rGBTmeMsUm1Bxh1eSuD7PrdrGA?=
+ =?us-ascii?Q?OMVAA3QDbUJ5wumHmvsoG2qohi5asmzfpPGImP7mabGLz2qjKqaujPV5j2cJ?=
+ =?us-ascii?Q?bEEnyFG+PdIKkXWLkIIeDYRMGCbjcBRoucYKurm9YfDAfjbQ+kUE/cTK54F2?=
+ =?us-ascii?Q?yBe6/sbrT9QBbSXt+iJoZn+JGxqn/bJs8G3VMIBv80L0wwaTNN0wU01z/NeP?=
+ =?us-ascii?Q?6XRUVubnIoYAb+wt4k3uvxkimR/05x0SdQHOP3q07AnaScIEIMSEVv16dgnl?=
+ =?us-ascii?Q?EbwYjTrFNrwX5Em5wk2P2kPD7zZ+dg5e8Ibi3aaRjVDWfFHeDsPRzK4hSwzm?=
+ =?us-ascii?Q?/RquDKML5jPVj2K6FGED78CGA4bVUF6lN3g17emNd1Vj5KlCerK28r0OeFMU?=
+ =?us-ascii?Q?f8f2TmhEfV2k4pyjCYlpKH7h+DtlUdMcCSFPzSG4AWMg8J95dPpdOMSE45QM?=
+ =?us-ascii?Q?WoOCNQt76JdRrJ8SxGLkq0ADU/C9aDkCdnC8qTK2GsgqcPR3xqQTZ6HT5OY8?=
+ =?us-ascii?Q?rZnuxD9GYzrecVl2IGSHN6Tc+chM67fVBGSm/4fddWBjuJOO0qOmFFUH4wJl?=
+ =?us-ascii?Q?1QKL4a2AiaDZo5m5pDp6+INuW1j1LWgZpYS2?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:53:03.9240
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:53:05.4885
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f23b014-38e3-4230-6ccf-08ddf7b6258b
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3a06956-d6f8-4270-cab3-08ddf7b62672
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD7F.namprd04.prod.outlook.com
+	CH1PEPF0000AD82.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6754
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6880
 
-Add the initial mlxbf_pka driver to support the BlueField DPU Public Key
-Acceleration (PKA) hardware. The PKA provides a simple, complete framework
-for crypto public key hardware offload. It supports direct access to the
-public key hardware resources from the user space, and makes available
-several arithmetic operations: some basic operations (e.g., addition and
-multiplication), some complex operations (e.g., modular exponentiation and
-modular inversion), and high-level operations such as RSA, Diffie-Hellman,
-Elliptic Curve Cryptography, and the Federal Digital Signature Algorithm
-(DSA as documented in FIPS-186) public-private key systems.
+Add True Random Number Generator support to the BlueField PKA driver and
+wire it into the HWRNG core to feed kernel entropy (/dev/hwrng).
 
-This patch wires up the platform driver and the device/shim layer:
-
-- ACPI matching for BF1/BF2/BF3 (MLNXBF10/20/51)
-- Probe flow to verify boot status, discover EIP154, Window RAM, alt Window RAM,
-  and CSR resources
-- Register a PKA "shim" via the device layer, which maps resources and tracks
-  per-shim state
-- Provide shim lifecycle helpers (register/unregister)
-
-This driver is placed under drivers/platform/mellanox as it exposes platform
-resources and does not provide in-kernel crypto offload.
+- Enable TRNG clock and configure hardware
+- Run TRNG health tests (monobit/run/poker) and a sanity check
+- Implement shutdown-overflow recovery and FRO detune/reenable
+- Initialize TRNG during shim bring-up and prefetch initial output
+- Provide read path from TRNG output registers
+- Register/unregister with the HWRNG core
 
 Reviewed-by: David Thompson <davthompson@nvidia.com>
 Reviewed-by: Khalil Blaiech <kblaiech@nvidia.com>
 Signed-off-by: Ron Li <xiangrongl@nvidia.com>
 ---
- .../ABI/testing/sysfs-platform-mellanox-pka   |  16 +
- MAINTAINERS                                   |   8 +
- drivers/platform/mellanox/Kconfig             |  10 +
- drivers/platform/mellanox/Makefile            |   1 +
- drivers/platform/mellanox/mlxbf_pka/Makefile  |  10 +
- .../mellanox/mlxbf_pka/mlxbf_pka_dev.c        | 395 +++++++++++++++++
- .../mellanox/mlxbf_pka/mlxbf_pka_dev.h        | 298 +++++++++++++
- .../mellanox/mlxbf_pka/mlxbf_pka_drv.c        | 413 ++++++++++++++++++
- 8 files changed, 1151 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-platform-mellanox-pka
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/Makefile
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
- create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
+ .../ABI/testing/sysfs-platform-mellanox-pka   |   3 +-
+ drivers/platform/mellanox/mlxbf_pka/Makefile  |   1 +
+ .../mellanox/mlxbf_pka/mlxbf_pka_dev.c        |  48 +-
+ .../mellanox/mlxbf_pka/mlxbf_pka_dev.h        |   6 +
+ .../mellanox/mlxbf_pka/mlxbf_pka_drv.c        |  75 ++
+ .../mellanox/mlxbf_pka/mlxbf_pka_trng.c       | 874 ++++++++++++++++++
+ .../mellanox/mlxbf_pka/mlxbf_pka_trng.h       | 152 +++
+ include/uapi/linux/mlxbf-pka.h                |  19 +
+ 8 files changed, 1176 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
+ create mode 100644 drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
 
 diff --git a/Documentation/ABI/testing/sysfs-platform-mellanox-pka b/Documentation/ABI/testing/sysfs-platform-mellanox-pka
-new file mode 100644
-index 000000000000..cf8dd292c781
---- /dev/null
+index e7d331bca8fb..d45575dc0d77 100644
+--- a/Documentation/ABI/testing/sysfs-platform-mellanox-pka
 +++ b/Documentation/ABI/testing/sysfs-platform-mellanox-pka
-@@ -0,0 +1,16 @@
-+What:		/sys/devices/platform/<pka-device-id>/<pka-ring-device-id>
-+Date:		Oct 2025
-+KernelVersion:	6.18
-+Contact:	"Ron Li <xiangrongl@nvidia.com>"
-+Description:
-+		The mlxbf_pka driver to support the BlueField SoC Public Key Acceleration (PKA)
-+		hardware. It supports direct access to the public key hardware resources from the
-+		user space.
-+
-+		There are three PKA device IDs that support different BlueField product:
-+
-+		===========  ==============================================
-+		BlueField-1  MLNXBF10:xx, where xx ranges from '00' to '03'
-+		BlueField-2  MLNXBF20:xx, where xx ranges from '00' to '07'
-+		BlueField-3  MLNXBF51:xx, where xx ranges from '00' to '17'
-+		===========  ==============================================
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f6206963efbf..64b995b16d1a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15755,6 +15755,14 @@ L:	linux-i2c@vger.kernel.org
- S:	Supported
- F:	drivers/i2c/busses/i2c-mlxbf.c
- 
-+MELLANOX BLUEFIELD PKA DRIVER
-+M:	Ron Li <xiangrongl@nvidia.com>
-+M:	Khalil Blaiech <kblaiech@nvidia.com>
-+L:	platform-driver-x86@vger.kernel.org
-+S:	Supported
-+F:	Documentation/ABI/testing/sysfs-platform-mellanox-pka
-+F:	drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_*
-+
- MELLANOX ETHERNET DRIVER (mlx4_en)
- M:	Tariq Toukan <tariqt@nvidia.com>
- L:	netdev@vger.kernel.org
-diff --git a/drivers/platform/mellanox/Kconfig b/drivers/platform/mellanox/Kconfig
-index e3afbe62c7f6..b09681c137e6 100644
---- a/drivers/platform/mellanox/Kconfig
-+++ b/drivers/platform/mellanox/Kconfig
-@@ -121,4 +121,14 @@ config NVSW_SN2201
- 	  C3338R which is one of the Denverton product families.
- 	  System equipped with Nvidia®Spectrum-1 32x100GbE Ethernet switch.
- 
-+config MLXBF_PKA
-+        tristate "Mellanox BlueField Public Key Accelerator driver"
-+        depends on ARM64 && ACPI
-+        help
-+          If you say yes to this option, support will be included for the
-+          Public Key Accelerator device on Mellanox BlueField SoCs.
-+
-+          This driver can also be built as a module. If so, the module will
-+          be called pka-mlxbf.
-+
- endif # MELLANOX_PLATFORM
-diff --git a/drivers/platform/mellanox/Makefile b/drivers/platform/mellanox/Makefile
-index e86723b44c2e..a6535959cde4 100644
---- a/drivers/platform/mellanox/Makefile
-+++ b/drivers/platform/mellanox/Makefile
-@@ -5,6 +5,7 @@
- #
- obj-$(CONFIG_MLX_PLATFORM)	+= mlx-platform.o
- obj-$(CONFIG_MLXBF_BOOTCTL)	+= mlxbf-bootctl.o
-+obj-$(CONFIG_MLXBF_PKA)		+= mlxbf_pka/
- obj-$(CONFIG_MLXBF_PMC)		+= mlxbf-pmc.o
- obj-$(CONFIG_MLXBF_TMFIFO)	+= mlxbf-tmfifo.o
- obj-$(CONFIG_MLXREG_DPU)	+= mlxreg-dpu.o
+@@ -30,5 +30,6 @@ Description:
+ 		- release(): close the PKA ring device specified by the device ID, and release the
+ 		  related RAM regions.
+ 		- unlocked_ioctl(): make PKA related system calls, including getting ring device or
+-		  RAM region information, clearing PKA ring counter.
++		  RAM region information, clearing PKA ring counter and getting random bytes from
++		  the TRNG module from the PKA device.
+ 		- mmap(): map the PKA ring device to the virtual memory region.
 diff --git a/drivers/platform/mellanox/mlxbf_pka/Makefile b/drivers/platform/mellanox/mlxbf_pka/Makefile
-new file mode 100644
-index 000000000000..67465a63edb8
---- /dev/null
+index 6e536794d339..4f6df4de9cb7 100644
+--- a/drivers/platform/mellanox/mlxbf_pka/Makefile
 +++ b/drivers/platform/mellanox/mlxbf_pka/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
-+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved.
-+#
-+# Mellanox BlueField PKA Driver
-+#
-+
-+obj-$(CONFIG_MLXBF_PKA) += mlxbf-pka.o
-+
-+mlxbf-pka-objs := mlxbf_pka_drv.o
-+mlxbf-pka-objs += mlxbf_pka_dev.o
+@@ -9,3 +9,4 @@ obj-$(CONFIG_MLXBF_PKA) += mlxbf-pka.o
+ mlxbf-pka-objs := mlxbf_pka_drv.o
+ mlxbf-pka-objs += mlxbf_pka_dev.o
+ mlxbf-pka-objs += mlxbf_pka_ring.o
++mlxbf-pka-objs += mlxbf_pka_trng.o
+\ No newline at end of file
 diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
-new file mode 100644
-index 000000000000..0a5db1be6eaa
---- /dev/null
+index 12df11dd1eee..f649ae9ef967 100644
+--- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
 +++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.c
-@@ -0,0 +1,395 @@
+@@ -18,6 +18,7 @@
+ 
+ #include "mlxbf_pka_dev.h"
+ #include "mlxbf_pka_ring.h"
++#include "mlxbf_pka_trng.h"
+ 
+ struct mlxbf_pka_dev_gbl_config_t mlxbf_pka_gbl_config;
+ 
+@@ -250,6 +251,22 @@ static int mlxbf_pka_dev_create_shim(struct device *dev,
+ 		return ret;
+ 	}
+ 
++	/* Set PKA device TRNG registers. */
++	reg_size = PAGE_SIZE;
++	reg_base = mlxbf_pka_dev_get_register_base(shim->mem_res.eip154_base,
++						   MLXBF_PKA_TRNG_OUTPUT_0_ADDR);
++	ret = mlxbf_pka_dev_set_resource_config(dev,
++						shim,
++						&shim->resources.trng_csr,
++						reg_base,
++						reg_size,
++						MLXBF_PKA_DEV_RES_TYPE_REG,
++						"MLXBF_PKA_TRNG_CSR");
++	if (ret) {
++		dev_err(dev, "unable to setup the TRNG\n");
++		return ret;
++	}
++
+ 	shim->status = MLXBF_PKA_SHIM_STATUS_CREATED;
+ 
+ 	return ret;
+@@ -258,7 +275,7 @@ static int mlxbf_pka_dev_create_shim(struct device *dev,
+ /* Delete shim and unset shim resources. */
+ static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
+ {
+-	struct mlxbf_pka_dev_res_t *res_master_seq_ctrl, *res_aic_csr;
++	struct mlxbf_pka_dev_res_t *res_master_seq_ctrl, *res_aic_csr, *res_trng_csr;
+ 	struct mlxbf_pka_dev_res_t *res_buffer_ram;
+ 
+ 	dev_dbg(dev, "PKA device delete shim\n");
+@@ -275,10 +292,12 @@ static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_sh
+ 	res_buffer_ram = &shim->resources.buffer_ram;
+ 	res_master_seq_ctrl = &shim->resources.master_seq_ctrl;
+ 	res_aic_csr = &shim->resources.aic_csr;
++	res_trng_csr = &shim->resources.trng_csr;
+ 
+ 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_buffer_ram);
+ 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_master_seq_ctrl);
+ 	mlxbf_pka_dev_unset_resource_config(dev, shim, res_aic_csr);
++	mlxbf_pka_dev_unset_resource_config(dev, shim, res_trng_csr);
+ 
+ 	shim->status = MLXBF_PKA_SHIM_STATUS_UNDEFINED;
+ 
+@@ -294,7 +313,9 @@ static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_sh
+  */
+ static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
+ {
++	u32 data[MLXBF_PKA_TRNG_OUTPUT_CNT];
+ 	int ret;
++	u8 i;
+ 
+ 	if (shim->status != MLXBF_PKA_SHIM_STATUS_CREATED) {
+ 		dev_err(dev, "PKA device must be created\n");
+@@ -311,6 +332,31 @@ static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim
+ 		return ret;
+ 	}
+ 
++	shim->trng_enabled   = MLXBF_PKA_SHIM_TRNG_ENABLED;
++	shim->trng_err_cycle = 0;
++
++	/* Configure the TRNG. */
++	ret = mlxbf_pka_dev_config_trng_drbg(dev,
++					     &shim->resources.aic_csr,
++					     &shim->resources.trng_csr);
++
++	/*
++	 * Pull out data from the content of the TRNG buffer RAM and start the
++	 * regeneration of new numbers; read and drop 512 words. The read must
++	 * be done over the 4 TRNG_OUTPUT_X registers at a time.
++	 */
++	for (i = 0; i < MLXBF_PKA_TRNG_NUM_OF_FOUR_WORD; i++)
++		mlxbf_pka_dev_trng_read(dev, shim, data, sizeof(data));
++
++	if (ret) {
++		/*
++		 * Keep running without TRNG since it does not hurt, but notify
++		 * users.
++		 */
++		dev_err(dev, "failed to configure TRNG\n");
++		shim->trng_enabled = MLXBF_PKA_SHIM_TRNG_DISABLED;
++	}
++
+ 	ret = devm_mutex_init(dev, &shim->mutex);
+ 	if (ret)
+ 		return ret;
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
+index 12512850cf79..ba0bbc87c832 100644
+--- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
+@@ -128,11 +128,13 @@ struct mlxbf_pka_dev_res_t {
+  * @buffer_ram: Buffer RAM
+  * @master_seq_ctrl: Master sequencer controller CSR
+  * @aic_csr: Interrupt controller CSRs
++ * @trng_csr: TRNG module CSRs
+  */
+ struct mlxbf_pka_dev_shim_res_t {
+ 	struct mlxbf_pka_dev_res_t buffer_ram;
+ 	struct mlxbf_pka_dev_res_t master_seq_ctrl;
+ 	struct mlxbf_pka_dev_res_t aic_csr;
++	struct mlxbf_pka_dev_res_t trng_csr;
+ };
+ 
+ /* Number of PKA device resources. */
+@@ -180,6 +182,7 @@ struct mlxbf_pka_dev_mem_res {
+ /**
+  * struct mlxbf_pka_dev_shim_s - PKA Shim structure
+  * @mem_res: Memory resources
++ * @trng_err_cycle: TRNG error cycle
+  * @shim_id: Shim identifier
+  * @rings_num: Number of supported rings (hardware specific)
+  * @rings: Pointer to rings which belong to the shim
+@@ -188,11 +191,13 @@ struct mlxbf_pka_dev_mem_res {
+  * @resources: Shim resources
+  * @window_ram_split: If non-zero, the split window RAM scheme is used
+  * @busy_ring_num: Number of active rings (rings in busy state)
++ * @trng_enabled: Whether the TRNG engine is enabled
+  * @status: Status of the shim
+  * @mutex: Mutex lock for sharing shim
+  */
+ struct mlxbf_pka_dev_shim_s {
+ 	struct mlxbf_pka_dev_mem_res mem_res;
++	u64 trng_err_cycle;
+ 	u32 shim_id;
+ 	u32 rings_num;
+ 	struct mlxbf_pka_dev_ring_t **rings;
+@@ -201,6 +206,7 @@ struct mlxbf_pka_dev_shim_s {
+ 	struct mlxbf_pka_dev_shim_res_t resources;
+ 	u8 window_ram_split;
+ 	u32 busy_ring_num;
++	u8 trng_enabled;
+ 	s8 status;
+ 	struct mutex mutex;
+ };
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
+index a009437e4a48..a1ae007ba903 100644
+--- a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
+@@ -6,6 +6,7 @@
+ #include <linux/cdev.h>
+ #include <linux/cleanup.h>
+ #include <linux/device.h>
++#include <linux/hw_random.h>
+ #include <linux/idr.h>
+ #include <linux/interrupt.h>
+ #include <linux/iommu.h>
+@@ -22,6 +23,7 @@
+ 
+ #include "mlxbf_pka_dev.h"
+ #include "mlxbf_pka_ring.h"
++#include "mlxbf_pka_trng.h"
+ 
+ #define MLXBF_PKA_DRIVER_DESCRIPTION		"BlueField PKA driver"
+ 
+@@ -187,6 +189,7 @@ struct mlxbf_pka_device {
+ 	u32 device_id;
+ 	struct resource *resource[MLXBF_PKA_DEVICE_RES_CNT];
+ 	struct mlxbf_pka_dev_shim_s *shim;
++	struct hwrng rng;
+ };
+ 
+ static int mlxbf_pka_drv_verify_bootup_status(struct device *dev)
+@@ -435,6 +438,44 @@ static long mlxbf_pka_drv_ring_ioctl(void *device_data, unsigned int cmd, unsign
+ 
+ 	} else if (cmd == MLXBF_PKA_CLEAR_RING_COUNTERS) {
+ 		return mlxbf_pka_dev_clear_ring_counters(ring_dev->ring);
++	} else if (cmd == MLXBF_PKA_GET_RANDOM_BYTES) {
++		struct mlxbf_pka_dev_trng_info trng_data;
++		struct mlxbf_pka_dev_shim_s *shim;
++		bool trng_present;
++		u32 byte_cnt;
++		int ret;
++
++		shim = ring_dev->ring->shim;
++		ret = copy_from_user(&trng_data,
++				     (void __user *)(arg),
++				     sizeof(struct mlxbf_pka_dev_trng_info));
++		if (ret) {
++			dev_dbg(ring_dev->device, "failed to copy user request.\n");
++			return -EFAULT;
++		}
++
++		/*
++		 * Need byte count which is multiple of 4 as required by the
++		 * mlxbf_pka_dev_trng_read() interface.
++		 */
++		byte_cnt = round_up(trng_data.count, MLXBF_PKA_TRNG_OUTPUT_CNT);
++
++		u32 *data __free(kfree) = kzalloc(byte_cnt, GFP_KERNEL);
++		if (!data)
++			return -ENOMEM;
++
++		trng_present = mlxbf_pka_dev_has_trng(shim);
++		if (!trng_present)
++			return -EAGAIN;
++
++		ret = mlxbf_pka_dev_trng_read(ring_dev->device, shim, data, byte_cnt);
++		if (ret) {
++			dev_dbg(ring_dev->device, "TRNG failed %d\n", ret);
++			return ret;
++		}
++
++		ret = copy_to_user((void __user *)(trng_data.data), data, trng_data.count);
++		return ret ? -EFAULT : 0;
+ 	}
+ 
+ 	return -ENOTTY;
+@@ -659,6 +700,23 @@ static void mlxbf_pka_drv_unregister_ring_device(struct mlxbf_pka_ring_device *r
+ 	mlxbf_pka_dev_unregister_ring(ring_dev->device, ring_dev->ring);
+ }
+ 
++static int mlxbf_pka_drv_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	struct mlxbf_pka_device *mlxbf_pka_dev = container_of(rng, struct mlxbf_pka_device, rng);
++	u32 *buffer = data;
++	int ret;
++
++	ret = mlxbf_pka_dev_trng_read(mlxbf_pka_dev->device, mlxbf_pka_dev->shim, buffer, max);
++	if (ret) {
++		dev_dbg(mlxbf_pka_dev->device,
++			"%s: failed to read random bytes ret=%d",
++			rng->name, ret);
++		return 0;
++	}
++
++	return max;
++}
++
+ static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
+ {
+ 	struct mlxbf_pka_drv_plat_info *plat_info;
+@@ -667,6 +725,7 @@ static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
+ 	const struct acpi_device_id *aid;
+ 	struct platform_device *pdev;
+ 	u64 wndw_ram_off_mask;
++	struct hwrng *trng;
+ 	struct device *dev;
+ 	int ret;
+ 
+@@ -727,6 +786,19 @@ static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
+ 		}
+ 	}
+ 
++	/* Setup the TRNG if needed. */
++	if (mlxbf_pka_dev_has_trng(mlxbf_pka_dev->shim)) {
++		trng = &mlxbf_pka_dev->rng;
++		trng->name = pdev->name;
++		trng->read = mlxbf_pka_drv_rng_read;
++
++		ret = hwrng_register(&mlxbf_pka_dev->rng);
++		if (ret) {
++			dev_err(dev, "failed to register trng\n");
++			return ret;
++		}
++	}
++
+ 	info->priv = mlxbf_pka_dev;
+ 
+ 	return 0;
+@@ -741,6 +813,9 @@ static void mlxbf_pka_drv_remove_device(struct platform_device *pdev)
+ 	if (!mlxbf_pka_dev)
+ 		return;
+ 
++	if (mlxbf_pka_dev_has_trng(mlxbf_pka_dev->shim))
++		hwrng_unregister(&mlxbf_pka_dev->rng);
++
+ 	mlxbf_pka_drv_unregister_device(mlxbf_pka_dev);
+ }
+ 
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
+new file mode 100644
+index 000000000000..0a0007fb9e31
+--- /dev/null
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.c
+@@ -0,0 +1,874 @@
 +// SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
 +// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved.
 +
-+#include <linux/bitfield.h>
-+#include <linux/compiler.h>
 +#include <linux/delay.h>
 +#include <linux/device.h>
-+#include <linux/io.h>
 +#include <linux/iopoll.h>
-+#include <linux/ioport.h>
-+#include <linux/kernel.h>
-+#include <linux/math.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/time.h>
-+#include <linux/timex.h>
-+#include <linux/types.h>
 +
 +#include "mlxbf_pka_dev.h"
++#include "mlxbf_pka_ring.h"
++#include "mlxbf_pka_trng.h"
 +
-+struct mlxbf_pka_dev_gbl_config_t mlxbf_pka_gbl_config;
++/* Personalization string "NVIDIA-MELLANOX-BLUEFIELD-TRUE_RANDOM_NUMBER_GEN". */
++static u32 mlxbf_pka_trng_drbg_ps_str[] = {
++	0x4e564944, 0x49412d4d, 0x454c4c41, 0x4e4f582d,
++	0x424c5545, 0x4649454c, 0x442d5452, 0x55455f52,
++	0x414e444f, 0x4d5f4e55, 0x4d424552, 0x5f47454e
++};
 +
-+/* Global PKA shim resource info table. */
-+static struct mlxbf_pka_dev_gbl_shim_res_info_t mlxbf_pka_gbl_res_tbl[MLXBF_PKA_MAX_NUM_IO_BLOCKS];
++/* Personalization string for DRBG test. */
++static u32 mlxbf_pka_trng_drbg_test_ps_str[] = {
++	0x64299d83, 0xc34d7098, 0x5bd1f51d, 0xddccfdc1,
++	0xdd0455b7, 0x166279e5, 0x0974cb1b, 0x2f2cd100,
++	0x59a5060a, 0xca79940d, 0xd4e29a40, 0x56b7b779
++};
 +
-+/* Add the resource to the global resource table. */
-+static int mlxbf_pka_dev_add_resource(struct mlxbf_pka_dev_res_t *res_ptr, u32 shim_idx)
++/* First Entropy string for DRBG test. */
++static u32 mlxbf_pka_trng_drbg_test_etpy_str1[] = {
++	0xaa6bbcab, 0xef45e339, 0x136ca1e7, 0xbce1c881,
++	0x9fa37b09, 0x63b53667, 0xb36e0053, 0xa202ed81,
++	0x4650d90d, 0x8eed6127, 0x666f2402, 0x0dfd3af9
++};
++
++/* Second Entropy string for DRBG test. */
++static u32 mlxbf_pka_trng_drbg_test_etpy_str2[] = {
++	0x35c1b7a1, 0x0154c52b, 0xd5777390, 0x226a4fdb,
++	0x5f16080d, 0x06b68369, 0xd0c93d00, 0x3336e27f,
++	0x1abf2c37, 0xe6ab006c, 0xa4adc6e1, 0x8e1907a2
++};
++
++/* Known answer for DRBG test. */
++static u32 mlxbf_pka_trng_drbg_test_output[] = {
++	0xb663b9f1, 0x24943e13, 0x80f7dce5, 0xaba1a16f
++};
++
++/* Known answer for poker test. */
++static u64 poker_test_exp_cnt[] = {
++	0x20f42bf4, 0xaf415f4, 0xf4f4fff4, 0xfff4f4f4
++};
++
++static int mlxbf_pka_dev_config_trng_clk(struct device *dev,
++					 struct mlxbf_pka_dev_res_t *aic_csr_ptr)
 +{
-+	u8 res_cnt;
++	u32 trng_clk_en = 0;
++	void __iomem *csr_reg_ptr;
++	u64 csr_reg_base;
++	u64 csr_reg_off;
++	u64 timer;
 +
-+	res_cnt = mlxbf_pka_gbl_res_tbl[shim_idx].res_cnt;
-+	if (res_cnt >= MLXBF_PKA_DEV_SHIM_RES_CNT)
-+		return -ENOMEM;
++	if (aic_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
++	    aic_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
++		return -EPERM;
 +
-+	mlxbf_pka_gbl_res_tbl[shim_idx].res_tbl[res_cnt] = res_ptr;
-+	mlxbf_pka_gbl_res_tbl[shim_idx].res_cnt++;
++	dev_dbg(dev, "turn on TRNG clock\n");
++
++	csr_reg_base = aic_csr_ptr->base;
++	csr_reg_ptr = aic_csr_ptr->ioaddr;
++
++	/*
++	 * Enable the TRNG clock in MLXBF_PKA_CLK_FORCE. In general, this
++	 * register should be left in its default state of all zeroes. Only
++	 * when the TRNG is directly controlled via the Host slave interface,
++	 * the engine needs to be turned on using the 'trng_clk_on' bit in
++	 * this register. In case the TRNG is controlled via internal firmware,
++	 * this is not required.
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_CLK_FORCE_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_CLK_FORCE_TRNG_ON);
++	/*
++	 * Check whether the system clock for TRNG engine is enabled. The clock
++	 * MUST be running to provide access to the TRNG.
++	 */
++	timer = mlxbf_pka_dev_timer_start_msec(100);
++	while (!trng_clk_en) {
++		trng_clk_en |= mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off)
++						     & MLXBF_PKA_CLK_FORCE_TRNG_ON;
++		if (mlxbf_pka_dev_timer_done(timer)) {
++			dev_dbg(dev, "failed to enable TRNG clock\n");
++			return -ETIMEDOUT;
++		}
++	}
++	dev_dbg(dev, "trng_clk_on is enabled\n");
 +
 +	return 0;
 +}
 +
-+/* Remove the resource from the global resource table. */
-+static int mlxbf_pka_dev_put_resource(struct mlxbf_pka_dev_res_t *res, u32 shim_idx)
++static bool mlxbf_pka_dev_trng_wait_test_ready(struct device *dev,
++					       void __iomem *csr_reg_ptr,
++					       u64 csr_reg_base)
 +{
-+	struct mlxbf_pka_dev_res_t *res_ptr;
-+	u8 res_idx;
++	u64 csr_reg_off, timer, csr_reg_val, test_ready = 0;
 +
-+	for (res_idx = 0; res_idx < MLXBF_PKA_DEV_SHIM_RES_CNT; res_idx++) {
-+		res_ptr = mlxbf_pka_gbl_res_tbl[shim_idx].res_tbl[res_idx];
-+		if (!res_ptr || strcmp(res_ptr->name, res->name))
-+			continue;
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
++	timer = mlxbf_pka_dev_timer_start_msec(MSEC_PER_SEC);
 +
-+		mlxbf_pka_gbl_res_tbl[shim_idx].res_tbl[res_idx] = NULL;
-+		mlxbf_pka_gbl_res_tbl[shim_idx].res_cnt--;
-+		break;
++	while (!test_ready) {
++		csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++		test_ready = csr_reg_val & MLXBF_PKA_TRNG_STATUS_TEST_READY;
++
++		if (mlxbf_pka_dev_timer_done(timer)) {
++			dev_dbg(dev, "TRNG test ready timer done, 0x%llx\n", csr_reg_val);
++			return false;
++		}
++	}
++
++	return true;
++}
++
++static int mlxbf_pka_dev_trng_enable_test(struct device *dev,
++					  void __iomem *csr_reg_ptr,
++					  u64 csr_reg_base, u32 test)
++{
++	u64 csr_reg_val, csr_reg_off;
++	int ret;
++
++	/*
++	 * Set the 'test_mode' bit in the TRNG_CONTROL register and the
++	 * 'test_known_noise' bit in the TRNG_TEST register - this will
++	 * immediately set the 'test_ready' bit (in the TRNG_STATUS register)
++	 * to indicate that data can be written. It will also reset the
++	 * 'monobit test', 'run test' and 'poker test' circuits to their
++	 * initial states. Note that the TRNG need not be enabled for this
++	 * test.
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++			       csr_reg_val | MLXBF_PKA_TRNG_CONTROL_TEST_MODE);
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, test);
++	/* Wait until the 'test_ready' bit is set. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
++	ret = read_poll_timeout(mlxbf_pka_dev_io_read, csr_reg_val,
++				csr_reg_val & MLXBF_PKA_TRNG_STATUS_TEST_READY,
++				USEC_PER_MSEC / 100, USEC_PER_SEC, false,
++				csr_reg_ptr, csr_reg_off);
++	if (ret) {
++		dev_err(dev, "timeout waiting for test ready\n");
++		return -ETIMEDOUT;
 +	}
 +
 +	/*
-+	 * Check whether the resource shares the same memory map; If so, the memory
-+	 * map shouldn't be released.
++	 * Check whether the 'monobit test', 'run test' and 'poker test'
++	 * are reset.
 +	 */
-+	for (res_idx = 0; res_idx < MLXBF_PKA_DEV_SHIM_RES_CNT; res_idx++) {
-+		res_ptr = mlxbf_pka_gbl_res_tbl[shim_idx].res_tbl[res_idx];
-+		if (res_ptr && res_ptr->base == res->base)
-+			return -EBUSY;
++	if (csr_reg_val & MLXBF_PKA_TRNG_STATUS_FAIL_MODES) {
++		dev_err(dev, "test bits aren't reset, TRNG_STATUS:0x%llx\n", csr_reg_val);
++		return -EIO;
 +	}
++
++	/*
++	 * Set 'stall_run_poker' bit to allow inspecting the state of the
++	 * result counters which would otherwise be reset immediately for the
++	 * next 20,000 bits block to test.
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
++	csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	mlxbf_pka_dev_io_write(csr_reg_ptr,
++			       csr_reg_off,
++			       csr_reg_val | MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER);
 +
 +	return 0;
 +}
 +
-+static void __iomem *mlxbf_pka_dev_get_resource_ioaddr(u64 res_base, u32 shim_idx)
++static int mlxbf_pka_dev_trng_test_circuits(struct device *dev,
++					    void __iomem *csr_reg_ptr,
++					    u64 csr_reg_base,
++					    u64 datal, u64 datah,
++					    int count, u8 add_half,
++					    u64 *monobit_fail_cnt,
++					    u64 *run_fail_cnt,
++					    u64 *poker_fail_cnt)
 +{
-+	struct mlxbf_pka_dev_res_t *res_ptr;
-+	u8 res_cnt, res_idx;
-+
-+	res_cnt = mlxbf_pka_gbl_res_tbl[shim_idx].res_cnt;
-+	if (!res_cnt)
-+		return NULL;
-+
-+	for (res_idx = 0; res_idx < res_cnt; res_idx++) {
-+		res_ptr = mlxbf_pka_gbl_res_tbl[shim_idx].res_tbl[res_idx];
-+		if (res_ptr->base == res_base)
-+			return res_ptr->ioaddr;
-+	}
-+
-+	return NULL;
-+}
-+
-+/* Set PKA device resource config and map io memory if needed. */
-+static int mlxbf_pka_dev_set_resource_config(struct device *dev,
-+					     struct mlxbf_pka_dev_shim_s *shim,
-+					     struct mlxbf_pka_dev_res_t *res_ptr,
-+					     u64 res_base,
-+					     u64 res_size,
-+					     u64 res_type,
-+					     char *res_name)
-+{
-+	if (res_ptr->status == MLXBF_PKA_DEV_RES_STATUS_MAPPED)
-+		return -EPERM;
-+
-+	switch (res_type) {
-+	case MLXBF_PKA_DEV_RES_TYPE_REG:
-+		res_ptr->base = res_base;
-+		break;
-+	case MLXBF_PKA_DEV_RES_TYPE_MEM:
-+		res_ptr->base = shim->mem_res.eip154_base + res_base;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	res_ptr->size = res_size;
-+	res_ptr->type = res_type;
-+	res_ptr->name = res_name;
-+	res_ptr->status = MLXBF_PKA_DEV_RES_STATUS_UNMAPPED;
-+	res_ptr->ioaddr = mlxbf_pka_dev_get_resource_ioaddr(res_ptr->base, shim->shim_id);
-+	if (!res_ptr->ioaddr) {
-+		if (!devm_request_mem_region(dev, res_ptr->base, res_ptr->size, res_ptr->name)) {
-+			dev_err(dev, "failed to get io memory region\n");
-+			return -EPERM;
-+		}
-+
-+		res_ptr->ioaddr = devm_ioremap(dev, res_ptr->base, res_ptr->size);
-+		if (!res_ptr->ioaddr) {
-+			dev_err(dev, "unable to map io memory into CPU space\n");
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	res_ptr->status = MLXBF_PKA_DEV_RES_STATUS_MAPPED;
-+
-+	if (!res_ptr->ioaddr || mlxbf_pka_dev_add_resource(res_ptr, shim->shim_id)) {
-+		dev_err(dev, "unable to map io memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Unset PKA device resource config - unmap io memory if needed. */
-+void mlxbf_pka_dev_unset_resource_config(struct device *dev,
-+					 struct mlxbf_pka_dev_shim_s *shim,
-+					 struct mlxbf_pka_dev_res_t *res_ptr)
-+{
-+	if (res_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED)
-+		return;
-+
-+	if (!res_ptr->ioaddr)
-+		return;
-+
-+	if (-EBUSY == mlxbf_pka_dev_put_resource(res_ptr, shim->shim_id))
-+		return;
-+
-+	dev_dbg(dev, "PKA device resource released\n");
-+	res_ptr->status = MLXBF_PKA_DEV_RES_STATUS_UNMAPPED;
-+}
-+
-+/*
-+ * mlxbf_pka_dev_create_shim - Create shim.
-+ *
-+ * Set shim parameters and configure shim resources.
-+ *
-+ * Return: 0 on success, a negative error code on failure.
-+ */
-+static int mlxbf_pka_dev_create_shim(struct device *dev,
-+				     struct mlxbf_pka_dev_shim_s *shim,
-+				     u32 shim_id,
-+				     u8 split,
-+				     struct mlxbf_pka_dev_mem_res *mem_res)
-+{
-+	u64 reg_base;
-+	u64 reg_size;
++	u64 status, csr_reg_off;
++	unsigned int test_idx;
 +	int ret;
 +
-+	if (shim->status == MLXBF_PKA_SHIM_STATUS_CREATED)
-+		return 0;
-+
-+	if (shim->status != MLXBF_PKA_SHIM_STATUS_UNDEFINED) {
-+		dev_err(dev, "PKA device must be undefined\n");
-+		return -EPERM;
-+	}
-+
-+	if (shim_id > MLXBF_PKA_MAX_NUM_IO_BLOCKS - 1) {
-+		dev_err(dev, "invalid shim identifier\n");
++	if (!monobit_fail_cnt || !run_fail_cnt || !poker_fail_cnt)
 +		return -EINVAL;
++
++	for (test_idx = 0; test_idx < count; test_idx++) {
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_RAW_L_ADDR);
++		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, datal);
++
++		if (!add_half || test_idx < count - 1) {
++			csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++									MLXBF_PKA_TRNG_RAW_H_ADDR);
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, datah);
++		}
++
++		/*
++		 * Wait until the 'test_ready' bit in the TRNG_STATUS register
++		 * becomes '1' again, signalling readiness for the next 64 bits
++		 * of test data. At this point, the previous test data has been
++		 * handled so the counter states can be inspected.
++		 */
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_STATUS_ADDR);
++		ret = read_poll_timeout(mlxbf_pka_dev_io_read, status,
++					status & MLXBF_PKA_TRNG_STATUS_TEST_READY,
++					USEC_PER_MSEC / 100, USEC_PER_SEC, false,
++					csr_reg_ptr, csr_reg_off);
++		if (ret) {
++			dev_err(dev, "timeout waiting for test ready in circuits\n");
++			return -ETIMEDOUT;
++		}
++
++		/* Check test status bits. */
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_INTACK_ADDR);
++		if (status & MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL) {
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++					       MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL);
++			*monobit_fail_cnt += 1;
++		} else if (status & MLXBF_PKA_TRNG_STATUS_RUN_FAIL) {
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++					       MLXBF_PKA_TRNG_STATUS_RUN_FAIL);
++			*run_fail_cnt += 1;
++		} else if (status & MLXBF_PKA_TRNG_STATUS_POKER_FAIL) {
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++					       MLXBF_PKA_TRNG_STATUS_POKER_FAIL);
++			*poker_fail_cnt += 1;
++		}
 +	}
 +
-+	shim->shim_id = shim_id;
-+	shim->mem_res = *mem_res;
-+
-+	if (split)
-+		shim->window_ram_split = MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_ENABLED;
-+	else
-+		shim->window_ram_split = MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_DISABLED;
-+
-+	/* Set PKA device Buffer RAM config. */
-+	ret = mlxbf_pka_dev_set_resource_config(dev,
-+						shim,
-+						&shim->resources.buffer_ram,
-+						MLXBF_PKA_BUFFER_RAM_BASE,
-+						MLXBF_PKA_BUFFER_RAM_SIZE,
-+						MLXBF_PKA_DEV_RES_TYPE_MEM,
-+						"MLXBF_PKA_BUFFER_RAM");
-+	if (ret) {
-+		dev_err(dev, "unable to set Buffer RAM config\n");
-+		return ret;
-+	}
-+
-+	/* Set PKA device Master Controller register. */
-+	reg_size = PAGE_SIZE;
-+	reg_base = mlxbf_pka_dev_get_register_base(shim->mem_res.eip154_base,
-+						   MLXBF_PKA_MASTER_SEQ_CTRL_ADDR);
-+	ret = mlxbf_pka_dev_set_resource_config(dev,
-+						shim,
-+						&shim->resources.master_seq_ctrl,
-+						reg_base,
-+						reg_size,
-+						MLXBF_PKA_DEV_RES_TYPE_REG,
-+						"MLXBF_PKA_MASTER_SEQ_CTRL");
-+	if (ret) {
-+		dev_err(dev, "unable to set Master Controller register config\n");
-+		return ret;
-+	}
-+
-+	/* Set PKA device AIC registers. */
-+	reg_size = PAGE_SIZE;
-+	reg_base = mlxbf_pka_dev_get_register_base(shim->mem_res.eip154_base,
-+						   MLXBF_PKA_AIC_POL_CTRL_ADDR);
-+	ret = mlxbf_pka_dev_set_resource_config(dev,
-+						shim,
-+						&shim->resources.aic_csr,
-+						reg_base,
-+						reg_size,
-+						MLXBF_PKA_DEV_RES_TYPE_REG,
-+						"MLXBF_PKA_AIC_CSR");
-+	if (ret) {
-+		dev_err(dev, "unable to set AIC registers config\n");
-+		return ret;
-+	}
-+
-+	shim->status = MLXBF_PKA_SHIM_STATUS_CREATED;
-+
-+	return ret;
++	return *monobit_fail_cnt || *poker_fail_cnt || *run_fail_cnt ? -EIO : 0;
 +}
 +
-+/* Delete shim and unset shim resources. */
-+static int mlxbf_pka_dev_delete_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
++static void mlxbf_pka_dev_trng_disable_test(struct device *dev,
++					    void __iomem *csr_reg_ptr,
++					    u64 csr_reg_base)
 +{
-+	struct mlxbf_pka_dev_res_t *res_master_seq_ctrl, *res_aic_csr;
-+	struct mlxbf_pka_dev_res_t *res_buffer_ram;
++	u64 status, val, csr_reg_off;
 +
-+	dev_dbg(dev, "PKA device delete shim\n");
++	/*
++	 * When done, clear the 'test_known_noise' bit in the TRNG_TEST
++	 * register (will immediately clear the 'test_ready' bit in the
++	 * TRNG_STATUS register and reset the 'monobit test', 'run test'
++	 * and 'poker test' circuits) and clear the 'test_mode' bit in the
++	 * TRNG_CONTROL register.
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
 +
-+	if (shim->status == MLXBF_PKA_SHIM_STATUS_UNDEFINED)
-+		return 0;
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
++	status = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
 +
-+	if (shim->status != MLXBF_PKA_SHIM_STATUS_FINALIZED &&
-+	    shim->status != MLXBF_PKA_SHIM_STATUS_CREATED) {
-+		dev_err(dev, "PKA device status must be finalized\n");
-+		return -EPERM;
-+	}
++	if (status & MLXBF_PKA_TRNG_STATUS_TEST_READY)
++		dev_info(dev, "test ready bit is still set\n");
 +
-+	res_buffer_ram = &shim->resources.buffer_ram;
-+	res_master_seq_ctrl = &shim->resources.master_seq_ctrl;
-+	res_aic_csr = &shim->resources.aic_csr;
++	if (status & MLXBF_PKA_TRNG_STATUS_FAIL_MODES)
++		dev_info(dev, "test bits are still set, TRNG_STATUS:0x%llx\n", status);
 +
-+	mlxbf_pka_dev_unset_resource_config(dev, shim, res_buffer_ram);
-+	mlxbf_pka_dev_unset_resource_config(dev, shim, res_master_seq_ctrl);
-+	mlxbf_pka_dev_unset_resource_config(dev, shim, res_aic_csr);
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, val & ~MLXBF_PKA_TRNG_STATUS_TEST_READY);
 +
-+	shim->status = MLXBF_PKA_SHIM_STATUS_UNDEFINED;
-+
-+	return 0;
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
++	val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	mlxbf_pka_dev_io_write(csr_reg_ptr,
++			       csr_reg_off,
++			       val & ~MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER);
 +}
 +
-+/*
-+ * Initialize PKA IO block referred to as shim. It configures shim's
-+ * parameters and prepares resources by mapping corresponding memory. The
-+ * function also configures shim registers and loads firmware to shim
-+ * internal rams. The struct mlxbf_pka_dev_shim_s passed as input is also
-+ * an output. It returns 0 on success, a negative error code on failure.
-+ */
-+static int mlxbf_pka_dev_init_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
++static int mlxbf_pka_dev_trng_test_known_answer_basic(struct device *dev,
++						      void __iomem *csr_reg_ptr,
++						      u64 csr_reg_base)
 +{
++	u64 poker_cnt[MLXBF_PKA_TRNG_POKER_TEST_CNT];
++	u64 monobit_fail_cnt = 0;
++	u64 poker_fail_cnt = 0;
++	u64 run_fail_cnt = 0;
++	u64 monobit_cnt;
++	u64 csr_reg_off;
++	int cnt_idx;
++	int cnt_off;
 +	int ret;
 +
-+	if (shim->status != MLXBF_PKA_SHIM_STATUS_CREATED) {
-+		dev_err(dev, "PKA device must be created\n");
-+		return -EPERM;
-+	}
++	dev_dbg(dev, "run known-answer test circuits\n");
 +
-+	ret = devm_mutex_init(dev, &shim->mutex);
++	ret = mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
++					     MLXBF_PKA_TRNG_TEST_KNOWN_NOISE);
 +	if (ret)
 +		return ret;
 +
-+	shim->status = MLXBF_PKA_SHIM_STATUS_INITIALIZED;
++	ret = mlxbf_pka_dev_trng_test_circuits(dev,
++					       csr_reg_ptr,
++					       csr_reg_base,
++					       MLXBF_PKA_TRNG_TEST_DATAL_BASIC_1,
++					       MLXBF_PKA_TRNG_TEST_DATAH_BASIC_1,
++					       MLXBF_PKA_TRNG_TEST_COUNT_BASIC_1,
++					       MLXBF_PKA_TRNG_TEST_HALF_NO,
++					       &monobit_fail_cnt,
++					       &run_fail_cnt,
++					       &poker_fail_cnt);
++
++	ret |= mlxbf_pka_dev_trng_test_circuits(dev,
++						csr_reg_ptr,
++						csr_reg_base,
++						MLXBF_PKA_TRNG_TEST_DATAL_BASIC_2,
++						MLXBF_PKA_TRNG_TEST_DATAH_BASIC_2,
++						MLXBF_PKA_TRNG_TEST_COUNT_BASIC_2,
++						MLXBF_PKA_TRNG_TEST_HALF_ADD,
++						&monobit_fail_cnt,
++						&run_fail_cnt,
++						&poker_fail_cnt);
++
++	dev_dbg(dev, "monobit_fail_cnt : 0x%llx\n", monobit_fail_cnt);
++	dev_dbg(dev, "poker_fail_cnt   : 0x%llx\n", poker_fail_cnt);
++	dev_dbg(dev, "run_fail_cnt     : 0x%llx\n", run_fail_cnt);
++
++	for (cnt_idx = 0, cnt_off = 0;
++	     cnt_idx < MLXBF_PKA_TRNG_POKER_TEST_CNT;
++	     cnt_idx++, cnt_off += 8) {
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_POKER_3_0_ADDR +
++								cnt_off);
++		poker_cnt[cnt_idx] = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++	}
++
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							MLXBF_PKA_TRNG_MONOBITCNT_ADDR);
++	monobit_cnt = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++	if (ret)
++		goto exit;
++
++	if (memcmp(poker_cnt, poker_test_exp_cnt, sizeof(poker_test_exp_cnt))) {
++		dev_dbg(dev, "invalid poker counters!\n");
++		ret = -EIO;
++		goto exit;
++	}
++
++	if (monobit_cnt != MLXBF_PKA_TRNG_MONOBITCNT_SUM) {
++		dev_dbg(dev, "invalid sum of squares!\n");
++		ret = -EIO;
++		goto exit;
++	}
++
++exit:
++	mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
++	return ret;
++}
++
++static int mlxbf_pka_dev_trng_test_known_answer_poker_fail(struct device *dev,
++							   void __iomem *csr_reg_ptr,
++							   u64 csr_reg_base)
++{
++	u64 monobit_fail_cnt = 0;
++	u64 poker_fail_cnt = 0;
++	u64 run_fail_cnt = 0;
++
++	dev_dbg(dev, "run known-answer test circuits (poker fail)\n");
++
++	mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
++				       MLXBF_PKA_TRNG_TEST_KNOWN_NOISE);
++
++	/*
++	 * Ignore the return value here as it is expected that poker test
++	 * should fail. Check failure counts thereafter to assert only poker
++	 * test has failed.
++	 */
++	mlxbf_pka_dev_trng_test_circuits(dev,
++					 csr_reg_ptr,
++					 csr_reg_base,
++					 MLXBF_PKA_TRNG_TEST_DATAL_POKER,
++					 MLXBF_PKA_TRNG_TEST_DATAH_POKER,
++					 MLXBF_PKA_TRNG_TEST_COUNT_POKER,
++					 MLXBF_PKA_TRNG_TEST_HALF_NO,
++					 &monobit_fail_cnt,
++					 &run_fail_cnt,
++					 &poker_fail_cnt);
++
++	dev_dbg(dev, "monobit_fail_cnt : 0x%llx\n", monobit_fail_cnt);
++	dev_dbg(dev, "poker_fail_cnt   : 0x%llx\n", poker_fail_cnt);
++	dev_dbg(dev, "run_fail_cnt     : 0x%llx\n", run_fail_cnt);
++
++	mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
++
++	return poker_fail_cnt && !run_fail_cnt && !monobit_fail_cnt ? 0 : -EIO;
++}
++
++static int mlxbf_pka_dev_trng_test_unknown_answer(struct device *dev,
++						  void __iomem *csr_reg_ptr,
++						  u64 csr_reg_base)
++{
++	u64 datal = 0, datah = 0, csr_reg_off;
++	int ret = 0, test_idx;
++
++	dev_dbg(dev, "run unknown-answer self test\n");
++
++	/* First reset, the RAW registers. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_RAW_L_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_RAW_H_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	/*
++	 * There is a small probability for this test to fail. So run the test
++	 * 10 times, if it succeeds once then assume that the test passed.
++	 */
++	for (test_idx = 0; test_idx < 10; test_idx++) {
++		mlxbf_pka_dev_trng_enable_test(dev, csr_reg_ptr, csr_reg_base,
++					       MLXBF_PKA_TRNG_TEST_NOISE);
++
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_RAW_L_ADDR);
++		datal = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_RAW_H_ADDR);
++		datah = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++		dev_dbg(dev, "datal=0x%llx\n", datal);
++		dev_dbg(dev, "datah=0x%llx\n", datah);
++
++		mlxbf_pka_dev_trng_disable_test(dev, csr_reg_ptr, csr_reg_base);
++
++		if (!datah && !datal)
++			ret = -EIO;
++		else
++			return 0;
++	}
++	return ret;
++}
++
++/* Test TRNG. */
++static int mlxbf_pka_dev_test_trng(struct device *dev, void __iomem *csr_reg_ptr, u64 csr_reg_base)
++{
++	int ret;
++
++	ret = mlxbf_pka_dev_trng_test_known_answer_basic(dev, csr_reg_ptr, csr_reg_base);
++	if (ret)
++		return ret;
++
++	ret = mlxbf_pka_dev_trng_test_known_answer_poker_fail(dev, csr_reg_ptr, csr_reg_base);
++	if (ret)
++		return ret;
++
++	ret = mlxbf_pka_dev_trng_test_unknown_answer(dev, csr_reg_ptr, csr_reg_base);
++	if (ret)
++		return ret;
 +
 +	return ret;
 +}
 +
-+/* Release a given shim. */
-+static int mlxbf_pka_dev_release_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
++static void mlxbf_pka_dev_trng_write_ps_ai_str(void __iomem *csr_reg_ptr,
++					       u64 csr_reg_base,
++					       u32 input_str[])
 +{
++	u64 csr_reg_off;
++	u8 i;
++
++	for (i = 0; i < MLXBF_PKA_TRNG_PS_AI_REG_COUNT; i++) {
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_PS_AI_0_ADDR + i *
++								MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET);
++
++		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, input_str[i]);
++	}
++}
++
++static void mlxbf_pka_dev_trng_drbg_generate(void __iomem *csr_reg_ptr, u64 csr_reg_base)
++{
++	u64 csr_reg_off;
++
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_REQ_DATA);
++}
++
++static int mlxbf_pka_dev_test_trng_drbg(struct device *dev,
++					void __iomem *csr_reg_ptr,
++					u64 csr_reg_base)
++{
++	u64 csr_reg_off, csr_reg_val;
++	u8 i;
++
++	/* Make sure the engine is idle. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	/* Enable DRBG, TRNG need not be enabled for this test. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG_ENABLE);
++
++	/* Set 'test_sp_800_90' bit in the TRNG_TEST register. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_TEST_DRBG);
++
++	/* Wait for 'test_ready' bit to be set. */
++	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
++		return -ETIMEDOUT;
++
++	/* 'Instantiate' function. */
++	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
++					   csr_reg_base,
++					   mlxbf_pka_trng_drbg_test_ps_str);
++	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
++		return -ETIMEDOUT;
++
++	/* 'Generate' function. */
++	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
++					   csr_reg_base,
++					   mlxbf_pka_trng_drbg_test_etpy_str1);
++	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
++		return -ETIMEDOUT;
++
++	/*
++	 * A standard NIST SP 800-90A DRBG known-answer test discards the
++	 * result of the first 'Generate' function and only checks the result
++	 * of the second 'Generate' function. Hence 'Generate' is performed
++	 * again.
++	 */
++
++	/* 'Generate' function. */
++	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr,
++					   csr_reg_base,
++					   mlxbf_pka_trng_drbg_test_etpy_str2);
++	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
++		return -ETIMEDOUT;
++
++	/* Check output registers. */
++	for (i = 0; i < MLXBF_PKA_TRNG_OUTPUT_CNT; i++) {
++		csr_reg_off =
++		mlxbf_pka_dev_get_register_offset(csr_reg_base,
++						  MLXBF_PKA_TRNG_OUTPUT_0_ADDR +
++						  (i * MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET));
++
++		csr_reg_val = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++		if ((u32)csr_reg_val != mlxbf_pka_trng_drbg_test_output[i]) {
++			dev_dbg(dev, "DRBG known answer test failed: output register:%d, 0x%x\n",
++				i, (u32)csr_reg_val);
++			return -EIO;
++		}
++	}
++
++	/* Clear 'test_sp_800_90' bit in the TRNG_TEST register. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_TEST_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	return 0;
++}
++
++static bool mlxbf_pka_dev_trng_shutdown_oflo(struct mlxbf_pka_dev_res_t *trng_csr_ptr,
++					     u64 *err_cycle)
++{
++	u64 curr_cycle_cnt, fro_stopped_mask, fro_enabled_mask;
++	u64 csr_reg_base, csr_reg_off, csr_reg_value;
++	void __iomem *csr_reg_ptr;
++
++	csr_reg_base = trng_csr_ptr->base;
++	csr_reg_ptr = trng_csr_ptr->ioaddr;
++
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
++	csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++	if (csr_reg_value & MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO) {
++		curr_cycle_cnt = get_cycles();
++		/*
++		 * See if any FROs were shut down. If they were, toggle bits in
++		 * the FRO detune register and reenable the FROs.
++		 */
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
++		fro_stopped_mask = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++		if (fro_stopped_mask) {
++			csr_reg_off =
++			mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							  MLXBF_PKA_TRNG_FROENABLE_ADDR);
++			fro_enabled_mask = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++			csr_reg_off =
++			mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							  MLXBF_PKA_TRNG_FRODETUNE_ADDR);
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, fro_stopped_mask);
++
++			csr_reg_off =
++			mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							  MLXBF_PKA_TRNG_FROENABLE_ADDR);
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++					       fro_stopped_mask | fro_enabled_mask);
++		}
++
++		/* Reset the error. */
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_ALARMMASK_ADDR);
++		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
++		mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++		csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++								MLXBF_PKA_TRNG_INTACK_ADDR);
++		mlxbf_pka_dev_io_write(csr_reg_ptr,
++				       csr_reg_off,
++				       MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO);
++
++		/*
++		 * If this error occurs again within about a second, the hardware
++		 * is malfunctioning. Disable the trng and return an error.
++		 */
++		if (*err_cycle &&
++		    (curr_cycle_cnt - *err_cycle < MLXBF_PKA_TRNG_TEST_ERR_CYCLE_MAX)) {
++			csr_reg_off =
++			mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							  MLXBF_PKA_TRNG_CONTROL_ADDR);
++			csr_reg_value  = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++			csr_reg_value &= ~MLXBF_PKA_TRNG_CONTROL;
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, csr_reg_value);
++			return false;
++		}
++
++		*err_cycle = curr_cycle_cnt;
++	}
++
++	return true;
++}
++
++static int mlxbf_pka_dev_trng_drbg_reseed(struct device *dev,
++					  void __iomem *csr_reg_ptr,
++					  u64 csr_reg_base)
++{
++	u64 csr_reg_off;
++
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG_RESEED);
++
++	if (!mlxbf_pka_dev_trng_wait_test_ready(dev, csr_reg_ptr, csr_reg_base))
++		return -ETIMEDOUT;
++
++	/* Write personalization string. */
++	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr, csr_reg_base, mlxbf_pka_trng_drbg_ps_str);
++
++	return 0;
++}
++
++/* Configure the TRNG. */
++int mlxbf_pka_dev_config_trng_drbg(struct device *dev,
++				   struct mlxbf_pka_dev_res_t *aic_csr_ptr,
++				   struct mlxbf_pka_dev_res_t *trng_csr_ptr)
++{
++	u64 csr_reg_base, csr_reg_off;
++	void __iomem *csr_reg_ptr;
++	int ret;
++
++	if (trng_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
++	    trng_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
++		return -EPERM;
++
++	dev_dbg(dev, "starting up the TRNG\n");
++
++	ret = mlxbf_pka_dev_config_trng_clk(dev, aic_csr_ptr);
++	if (ret)
++		return ret;
++
++	csr_reg_base = trng_csr_ptr->base;
++	csr_reg_ptr = trng_csr_ptr->ioaddr;
++
++	/*
++	 * Perform NIST known-answer tests on the complete SP 800-90A DRBG
++	 * without BC_DF functionality.
++	 */
++	ret = mlxbf_pka_dev_test_trng_drbg(dev, csr_reg_ptr, csr_reg_base);
++	if (ret)
++		return ret;
++
++	/* Starting up the TRNG with a DRBG. */
++
++	/* Make sure the engine is idle. */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	/* Disable all FROs initially. */
++	csr_reg_off =
++	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FROENABLE_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++	csr_reg_off =
++	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FRODETUNE_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	/*
++	 * Write all configuration values in the TRNG_CONFIG and TRNG_ALARMCNT,
++	 * write zeroes to the TRNG_ALARMMASK and TRNG_ALARMSTOP registers.
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONFIG_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONFIG);
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMCNT_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_ALARMCNT);
++
++	csr_reg_off =
++	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMMASK_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++	csr_reg_off =
++	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_ALARMSTOP_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, 0);
++
++	/*
++	 * Enable all FROs in the TRNG_FROENABLE register. Note that this can
++	 * only be done after clearing the TRNG_ALARMSTOP register.
++	 */
++	csr_reg_off =
++	mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_FROENABLE_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_FROENABLE);
++
++	/*
++	 * Optionally, write 'Personalization string' of up to 384 bits in
++	 * TRNG_PS_AI_xxx registers.
++	 * The contents of these registers will be XOR-ed into the output of the
++	 * SHA-256 'Conditioning Function' to be used as seed value for the
++	 * actual DRBG.
++	 */
++	mlxbf_pka_dev_trng_write_ps_ai_str(csr_reg_ptr, csr_reg_base, mlxbf_pka_trng_drbg_ps_str);
++
++	/*
++	 * Run TRNG tests after configuring TRNG.
++	 * NOTE: TRNG need not be enabled to carry out these tests.
++	 */
++	ret = mlxbf_pka_dev_test_trng(dev, csr_reg_ptr, csr_reg_base);
++	if (ret)
++		return ret;
++
++	/*
++	 * Start the actual engine by setting the 'enable_trng' and 'drbg_en'
++	 * bit in the TRNG_CONTROL register (also a nice point to set the
++	 * interrupt mask bits).
++	 */
++	csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_CONTROL_ADDR);
++	mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off, MLXBF_PKA_TRNG_CONTROL_DRBG);
++
++	/*
++	 * The engine is now ready to handle the first 'Generate' request using
++	 * the 'request_data' bit of the TRNG_CONTROL register. The first output
++	 * for these requests will take a while, as Noise Source and
++	 * Conditioning Function must first generate seed entropy for the DRBG.
++	 *
++	 * Optionally, when buffer RAM is configured: Set a data available
++	 * interrupt threshold using the 'load_thresh' and 'blocks_thresh'
++	 * fields of the TRNG_INTACK register. This allows delaying the data
++	 * available interrupt until the indicated number of 128-bit words a
++	 * available in the buffer RAM.
++	 *
++	 * Start the actual 'Generate' operation using the 'request_data' and
++	 * 'data_blocks' fields of the TRNG_CONTROL register.
++	 */
++	mlxbf_pka_dev_trng_drbg_generate(csr_reg_ptr, csr_reg_base);
++
++	/* Delay 200 ms. */
++	mdelay(200);
++
++	return 0;
++}
++
++/* Read from DRBG enabled TRNG. */
++int mlxbf_pka_dev_trng_read(struct device *dev,
++			    struct mlxbf_pka_dev_shim_s *shim,
++			    u32 *data, u32 cnt)
++{
++	u64 csr_reg_base, csr_reg_off, csr_reg_value, timer;
++	struct mlxbf_pka_dev_res_t *trng_csr_ptr;
++	u8 output_idx, trng_ready = 0;
++	u32 data_idx, word_cnt;
++	void __iomem *csr_reg_ptr;
 +	int ret = 0;
 +
-+	if (shim->status != MLXBF_PKA_SHIM_STATUS_INITIALIZED &&
-+	    shim->status != MLXBF_PKA_SHIM_STATUS_STOPPED) {
-+		dev_err(dev, "PKA device must be initialized or stopped\n");
-+		return -EPERM;
-+	}
-+
-+	shim->status = MLXBF_PKA_SHIM_STATUS_FINALIZED;
-+
-+	return ret;
-+}
-+
-+/* Return the shim associated with the given identifier. */
-+struct mlxbf_pka_dev_shim_s *mlxbf_pka_dev_get_shim(u32 shim_id)
-+{
-+	return mlxbf_pka_gbl_config.dev_shims[shim_id];
-+}
-+
-+int mlxbf_pka_dev_register_shim(struct device *dev,
-+				u32 shim_id,
-+				struct mlxbf_pka_dev_mem_res *mem_res,
-+				struct mlxbf_pka_dev_shim_s **shim)
-+{
-+	struct mlxbf_pka_dev_shim_s *shim_ptr;
-+	u8 split;
-+	int ret;
-+
-+	if (!shim)
++	if (!shim || !data || (cnt % MLXBF_PKA_TRNG_OUTPUT_CNT != 0))
 +		return -EINVAL;
 +
-+	dev_dbg(dev, "register shim id=%u\n", shim_id);
-+
-+	shim_ptr = devm_kzalloc(dev, sizeof(*shim_ptr), GFP_KERNEL);
-+	if (!shim_ptr)
-+		return -ENOMEM;
-+
-+	/*
-+	 * Shim state MUST be set to undefined before calling
-+	 * 'mlxbf_pka_dev_create_shim' function.
-+	 */
-+	shim_ptr->status = MLXBF_PKA_SHIM_STATUS_UNDEFINED;
-+
-+	/* Set the Window RAM user mode. */
-+	split = MLXBF_PKA_SPLIT_WINDOW_RAM_MODE;
-+
-+	/* Create PKA shim. */
-+	ret = mlxbf_pka_dev_create_shim(dev, shim_ptr, shim_id, split, mem_res);
-+	if (ret) {
-+		dev_err(dev, "failed to create shim %u\n", shim_id);
-+		mlxbf_pka_dev_delete_shim(dev, shim_ptr);
-+		goto exit_create_shim;
-+	}
-+
-+	/* Initialize PKA shim. */
-+	ret = mlxbf_pka_dev_init_shim(dev, shim_ptr);
-+	if (ret) {
-+		dev_err(dev, "failed to init shim %u\n", shim_id);
-+		goto exit_init_shim;
-+	}
-+
-+	mlxbf_pka_gbl_config.dev_shims[shim_ptr->shim_id] = shim_ptr;
-+	mlxbf_pka_gbl_config.dev_shims_cnt += 1;
-+
-+	*shim = shim_ptr;
-+	return 0;
-+
-+exit_init_shim:
-+	mlxbf_pka_dev_release_shim(dev, shim_ptr);
-+
-+exit_create_shim:
-+	mlxbf_pka_dev_delete_shim(dev, shim_ptr);
-+	return ret;
-+}
-+
-+int mlxbf_pka_dev_unregister_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim)
-+{
-+	int ret;
-+
-+	if (!shim)
-+		return -EINVAL;
-+
-+	mlxbf_pka_gbl_config.dev_shims[shim->shim_id] = NULL;
-+	mlxbf_pka_gbl_config.dev_shims_cnt -= 1;
-+
-+	/* Release shim. */
-+	ret = mlxbf_pka_dev_release_shim(dev, shim);
-+	if (ret)
++	if (!cnt)
 +		return ret;
 +
-+	/* Delete shim. */
-+	return mlxbf_pka_dev_delete_shim(dev, shim);
++	guard(mutex)(&shim->mutex);
++
++	trng_csr_ptr = &shim->resources.trng_csr;
++
++	if (trng_csr_ptr->status != MLXBF_PKA_DEV_RES_STATUS_MAPPED ||
++	    trng_csr_ptr->type != MLXBF_PKA_DEV_RES_TYPE_REG)
++		return -EPERM;
++
++	csr_reg_base = trng_csr_ptr->base;
++	csr_reg_ptr = trng_csr_ptr->ioaddr;
++
++	if (!mlxbf_pka_dev_trng_shutdown_oflo(trng_csr_ptr, &shim->trng_err_cycle))
++		return -EWOULDBLOCK;
++
++	word_cnt = cnt >> ilog2(sizeof(u32));
++
++	for (data_idx = 0; data_idx < word_cnt; data_idx++) {
++		output_idx = data_idx % MLXBF_PKA_TRNG_OUTPUT_CNT;
++
++		/* Tell the hardware to advance. */
++		if (!output_idx) {
++			csr_reg_off = mlxbf_pka_dev_get_register_offset(csr_reg_base,
++									MLXBF_PKA_TRNG_INTACK_ADDR);
++			mlxbf_pka_dev_io_write(csr_reg_ptr, csr_reg_off,
++					       MLXBF_PKA_TRNG_STATUS_READY);
++			trng_ready = 0;
++
++			/*
++			 * Check if 'data_blocks' field is zero in TRNG_CONTROL
++			 * register. If it is zero, need to issue a 'Reseed and
++			 * Generate' request for DRBG enabled TRNG.
++			 */
++			csr_reg_off =
++			mlxbf_pka_dev_get_register_offset(csr_reg_base,
++							  MLXBF_PKA_TRNG_CONTROL_ADDR);
++			csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++
++			if (!((u32)csr_reg_value & MLXBF_PKA_TRNG_DRBG_DATA_BLOCK_MASK)) {
++				/* Issue reseed. */
++				ret = mlxbf_pka_dev_trng_drbg_reseed(dev,
++								     csr_reg_ptr,
++								     csr_reg_base);
++				if (ret)
++					return -EBUSY;
++
++				/* Issue generate request. */
++				mlxbf_pka_dev_trng_drbg_generate(csr_reg_ptr, csr_reg_base);
++			}
++		}
++
++		/*
++		 * Wait until a data word is available in the TRNG_OUTPUT_X
++		 * registers, using the interrupt and/or 'ready' status bit
++		 * in the TRNG_STATUS register. The only way this would hang
++		 * is if the TRNG is never initialized. This function cannot
++		 * be called if that happened.
++		 */
++		timer = mlxbf_pka_dev_timer_start_msec(1000);
++		csr_reg_off =
++		mlxbf_pka_dev_get_register_offset(csr_reg_base, MLXBF_PKA_TRNG_STATUS_ADDR);
++		while (!trng_ready) {
++			csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++			trng_ready = csr_reg_value & MLXBF_PKA_TRNG_STATUS_READY;
++
++			if (mlxbf_pka_dev_timer_done(timer)) {
++				dev_dbg(dev, "shim %u got error obtaining random number\n",
++					shim->shim_id);
++				return -EBUSY;
++			}
++		}
++
++		/* Read the registers. */
++		csr_reg_off =
++		mlxbf_pka_dev_get_register_offset(csr_reg_base,
++						  MLXBF_PKA_TRNG_OUTPUT_0_ADDR +
++						  (output_idx * MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET));
++		csr_reg_value = mlxbf_pka_dev_io_read(csr_reg_ptr, csr_reg_off);
++		data[data_idx] = (u32)csr_reg_value;
++	}
++
++	return ret;
 +}
-diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
++
++bool mlxbf_pka_dev_has_trng(struct mlxbf_pka_dev_shim_s *shim)
++{
++	if (!shim)
++		return false;
++
++	return shim->trng_enabled == MLXBF_PKA_SHIM_TRNG_ENABLED;
++}
+diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
 new file mode 100644
-index 000000000000..df51202f79bd
+index 000000000000..97ed6045781e
 --- /dev/null
-+++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_dev.h
-@@ -0,0 +1,298 @@
++++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_trng.h
+@@ -0,0 +1,152 @@
 +/* SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause */
 +/* SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved. */
 +
-+#ifndef __MLXBF_PKA_DEV_H__
-+#define __MLXBF_PKA_DEV_H__
++#ifndef __MLXBF_PKA_TRNG_H__
++#define __MLXBF_PKA_TRNG_H__
 +
 +/*
-+ * @file
-+ *
-+ * API to handle the PKA EIP-154 I/O block (shim). It provides functions and
-+ * data structures to initialize and configure the PKA shim. It's the "southband
-+ * interface" for communication with PKA hardware resources.
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/ioctl.h>
-+#include <linux/mutex.h>
-+#include <linux/sizes.h>
-+#include <linux/types.h>
-+#include <linux/units.h>
-+
-+#define MASTER_CONTROLLER_OUT_OF_RESET 0
-+
-+/* PKA address related definitions. */
-+
-+/*
-+ * Global Control Space CSR addresses/offsets. These are accessed from the ARM
-+ * as 8 byte reads/writes. However only the bottom 32 bits are implemented.
-+ */
-+#define MLXBF_PKA_CLK_FORCE_ADDR 0x11C80
-+
-+/*
-+ * Advanced Interrupt Controller CSR addresses/offsets. These are accessed from
-+ * the ARM as 8 byte reads/writes. However only the bottom 32 bits are
++ * The True Random Number Generator CSR addresses/offsets. These are accessed
++ * from the ARM as 8 byte reads/writes. However only the bottom 32 bits are
 + * implemented.
 + */
-+#define MLXBF_PKA_AIC_POL_CTRL_ADDR 0x11E00
++#define MLXBF_PKA_TRNG_OUTPUT_0_ADDR	0x12000
++#define MLXBF_PKA_TRNG_STATUS_ADDR	0x12020
++#define MLXBF_PKA_TRNG_INTACK_ADDR	MLXBF_PKA_TRNG_STATUS_ADDR
++#define MLXBF_PKA_TRNG_CONTROL_ADDR	0x12028
++#define MLXBF_PKA_TRNG_CONFIG_ADDR	0x12030
++#define MLXBF_PKA_TRNG_ALARMCNT_ADDR	0x12038
++#define MLXBF_PKA_TRNG_FROENABLE_ADDR	0x12040
++#define MLXBF_PKA_TRNG_FRODETUNE_ADDR	0x12048
++#define MLXBF_PKA_TRNG_ALARMMASK_ADDR	0x12050
++#define MLXBF_PKA_TRNG_ALARMSTOP_ADDR	0x12058
++#define MLXBF_PKA_TRNG_TEST_ADDR	0x120E0
++#define MLXBF_PKA_TRNG_RAW_L_ADDR	0x12060
++#define MLXBF_PKA_TRNG_RAW_H_ADDR	0x12068
++#define MLXBF_PKA_TRNG_MONOBITCNT_ADDR	0x120B8
++#define MLXBF_PKA_TRNG_POKER_3_0_ADDR	0x120C0
++#define MLXBF_PKA_TRNG_PS_AI_0_ADDR	0x12080
 +
 +/*
-+ * Control register address/offset. This is accessed from the ARM using 8 byte
-+ * reads/writes. However only the bottom 32 bits are implemented.
++ * 'trng_clk_on' mask for PKA Clock Switch Forcing Register. Turn on the TRNG
++ * clock. When the TRNG is controlled via the host slave interface, this engine
++ * needs to be turned on by setting bit 11.
 + */
-+#define MLXBF_PKA_MASTER_SEQ_CTRL_ADDR 0x27F90
++#define MLXBF_PKA_CLK_FORCE_TRNG_ON BIT(11)
 +
-+/* PKA buffer RAM */
-+#define MLXBF_PKA_BUFFER_RAM_BASE 0x00000
-+#define MLXBF_PKA_BUFFER_RAM_SIZE SZ_16K
++/* Number of TRNG output registers. */
++#define MLXBF_PKA_TRNG_OUTPUT_CNT 4
++
++/* Number of TRNG poker test counts. */
++#define MLXBF_PKA_TRNG_POKER_TEST_CNT 4
++
++/* TRNG configuration. */
++#define MLXBF_PKA_TRNG_CONFIG  0x00020008
++/* TRNG Alarm Counter Register value. */
++#define MLXBF_PKA_TRNG_ALARMCNT 0x000200ff
++/* TRNG FRO Enable Register value. */
++#define MLXBF_PKA_TRNG_FROENABLE 0x00ffffff
++/*
++ * TRNG Control Register value. Set bit 10 to start the EIP-76 (i.e. TRNG
++ * engine), gathering entropy from the Free Running Oscillators (FROs).
++ */
++#define MLXBF_PKA_TRNG_CONTROL 0x00000400
++
++/* TRNG Control bit. */
++#define MLXBF_PKA_TRNG_CONTROL_TEST_MODE BIT(8)
 +
 +/*
-+ * PKA Buffer RAM offsets. These are NOT real CSR's but instead are specific
-+ * offset/addresses within the EIP154 MLXBF_PKA_BUFFER_RAM.
++ * TRNG Control Register value. Set bit 10 and 12 to start the EIP-76 (i.e.
++ * TRNG engine) with DRBG enabled, gathering entropy from the FROs.
 + */
-+
-+/* Alternate Window RAM size. */
-+#define MLXBF_PKA_WINDOW_RAM_REGION_SIZE SZ_16K
-+
-+/* PKA configuration related definitions. */
-+
-+/* The maximum number of PKA shims referred to as IO blocks. */
-+#define MLXBF_PKA_MAX_NUM_IO_BLOCKS 24
++#define MLXBF_PKA_TRNG_CONTROL_DRBG 0x00001400
 +
 +/*
-+ * PKA Window RAM parameters.
-+ * Define whether to split window RAM during PKA device creation phase.
++ * DRBG enabled TRNG 'request_data' value. REQ_DATA (in accordance with
++ * DATA_BLOCK_MASK) requests 256 blocks of 128-bit random output. 4095 blocks
++ * is the maximum number that can be requested for the TRNG (with DRBG)
++ * configuration on Bluefield platforms.
 + */
-+#define MLXBF_PKA_SPLIT_WINDOW_RAM_MODE 0
++#define MLXBF_PKA_TRNG_CONTROL_REQ_DATA 0x10010000
 +
-+/* Defines for window RAM partition, valid for 16K memory. */
-+#define MLXBF_PKA_WINDOW_RAM_DATA_MEM_SIZE	0x3800 /* 14KB. */
++/* Mask for 'Data Block' in TRNG Control Register. */
++#define MLXBF_PKA_TRNG_DRBG_DATA_BLOCK_MASK GENMASK(31, 20)
 +
-+/* Window RAM/Alternate window RAM offset mask for BF1 and BF2. */
-+#define MLXBF_PKA_WINDOW_RAM_OFFSET_BF1_BF2_MASK (GENMASK(17, 16) | GENMASK(22, 20))
++/* Set bit 12 of TRNG Control Register to enable DRBG functionality. */
++#define MLXBF_PKA_TRNG_CONTROL_DRBG_ENABLE BIT(12)
 +
-+/* Window RAM/Alternate window RAM offset mask for BF3. */
-+#define MLXBF_PKA_WINDOW_RAM_OFFSET_BF3_MASK GENMASK(18, 16)
++/* Set bit 7 (i.e. 'test_sp_800_90 DRBG' bit) in the TRNG Test Register. */
++#define MLXBF_PKA_TRNG_TEST_DRBG BIT(7)
++
++/* Number of Personalization String/Additional Input Registers. */
++#define MLXBF_PKA_TRNG_PS_AI_REG_COUNT 12
++
++/* Offset bytes of Personalization String/Additional Input Registers. */
++#define MLXBF_PKA_TRNG_OUTPUT_REG_OFFSET 0x8
++
++/* Maximum TRNG test error cycle, about one second. */
++#define MLXBF_PKA_TRNG_TEST_ERR_CYCLE_MAX (1000 * 1000 * 1000)
++
++/* DRBG Reseed enable. */
++#define MLXBF_PKA_TRNG_CONTROL_DRBG_RESEED BIT(15)
++
++/* TRNG Status bits. */
++#define MLXBF_PKA_TRNG_STATUS_READY		BIT(0)
++#define MLXBF_PKA_TRNG_STATUS_SHUTDOWN_OFLO	BIT(1)
++#define MLXBF_PKA_TRNG_STATUS_TEST_READY	BIT(8)
++#define MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL	BIT(7)
++#define MLXBF_PKA_TRNG_STATUS_RUN_FAIL		BIT(4)
++#define MLXBF_PKA_TRNG_STATUS_POKER_FAIL	BIT(6)
++
++#define MLXBF_PKA_TRNG_STATUS_FAIL_MODES (MLXBF_PKA_TRNG_STATUS_MONOBIT_FAIL | \
++					 MLXBF_PKA_TRNG_STATUS_RUN_FAIL | \
++					 MLXBF_PKA_TRNG_STATUS_POKER_FAIL)
++
++/* TRNG Alarm Counter bits. */
++#define MLXBF_PKA_TRNG_ALARMCNT_STALL_RUN_POKER BIT(15)
++
++/* TRNG Test bits. */
++#define MLXBF_PKA_TRNG_TEST_KNOWN_NOISE	BIT(5)
++#define MLXBF_PKA_TRNG_TEST_NOISE	BIT(13)
++
++/* TRNG Test constants*/
++#define MLXBF_PKA_TRNG_MONOBITCNT_SUM	9978
++
++#define MLXBF_PKA_TRNG_TEST_HALF_ADD	1
++#define MLXBF_PKA_TRNG_TEST_HALF_NO	0
++
++#define MLXBF_PKA_TRNG_TEST_DATAL_BASIC_1	0x11111333
++#define MLXBF_PKA_TRNG_TEST_DATAH_BASIC_1	0x3555779f
++#define MLXBF_PKA_TRNG_TEST_COUNT_BASIC_1	11
++
++#define MLXBF_PKA_TRNG_TEST_DATAL_BASIC_2	0x01234567
++#define MLXBF_PKA_TRNG_TEST_DATAH_BASIC_2	0x89abcdef
++#define MLXBF_PKA_TRNG_TEST_COUNT_BASIC_2	302
++
++#define MLXBF_PKA_TRNG_TEST_DATAL_POKER		0xffffffff
++#define MLXBF_PKA_TRNG_TEST_DATAH_POKER		0xffffffff
++#define MLXBF_PKA_TRNG_TEST_COUNT_POKER		11
++
++#define MLXBF_PKA_TRNG_NUM_OF_FOUR_WORD		128
++
++/* Defines for mlxbf_pka_dev_shim->trng_enabled. */
++#define MLXBF_PKA_SHIM_TRNG_ENABLED	1
++#define MLXBF_PKA_SHIM_TRNG_DISABLED	0
++
++/* Configure the TRNG. */
++int mlxbf_pka_dev_config_trng_drbg(struct device *dev,
++				   struct mlxbf_pka_dev_res_t *aic_csr_ptr,
++				   struct mlxbf_pka_dev_res_t *trng_csr_ptr);
 +
 +/*
-+ * PKA Master Sequencer Control/Status Register.
-+ * Writing '1' to bit [31] puts the Master controller Sequencer in a reset
-+ * state. Resetting the Sequencer (in order to load other firmware) should
-+ * only be done when the EIP-154 is not performing any operations.
++ * Read data from the TRNG. Drivers can fill up to 'cnt' bytes of data into the
++ * buffer 'data'. The buffer 'data' is aligned for any type and 'cnt' is a
++ * multiple of 4.
 + */
-+#define MLXBF_PKA_MASTER_SEQ_CTRL_RESET BIT(31)
-+/*
-+ * Writing '1' to bit [30] will reset all Command and Result counters. This bit
-+ * is write-only and self clearing and can only be set if the 'Reset' bit [31]
-+ * is '1'.
-+ */
-+#define MLXBF_PKA_MASTER_SEQ_CTRL_CLEAR_COUNTERS BIT(30)
++int mlxbf_pka_dev_trng_read(struct device *dev,
++			    struct mlxbf_pka_dev_shim_s *shim,
++			    u32 *data, u32 cnt);
 +
++/* Return true if the TRNG engine is enabled, false if not. */
++bool mlxbf_pka_dev_has_trng(struct mlxbf_pka_dev_shim_s *shim);
++
++#endif /* __MLXBF_PKA_TRNG_H__ */
+diff --git a/include/uapi/linux/mlxbf-pka.h b/include/uapi/linux/mlxbf-pka.h
+index 9da6c1e5044b..2f2b11c2dacd 100644
+--- a/include/uapi/linux/mlxbf-pka.h
++++ b/include/uapi/linux/mlxbf-pka.h
+@@ -90,4 +90,23 @@ struct mlxbf_pka_dev_hw_ring_info {
+  */
+ #define MLXBF_PKA_CLEAR_RING_COUNTERS _IO(MLXBF_PKA_IOC_TYPE, 0x2)
+ 
 +/**
-+ * struct mlxbf_pka_dev_res_t - Device resource structure
-+ * @ioaddr: The (iore)mapped version of addr, driver internal use
-+ * @base: Base address of the device's resource
-+ * @size: Size of IO
-+ * @type: Type of resource addr points to
-+ * @status: Status of the resource
-+ * @name: Name of the resource
++ * struct mlxbf_pka_dev_trng_info - TRNG information
++ * @count: Number of random bytes in the buffer or length of the buffer
++ * @data: Data buffer to hold the random bytes
++ *
++ * MLXBF_PKA_GET_RANDOM_BYTES:
++ * _IOWR(MLXBF_PKA_IOC_TYPE, 0x3, mlxbf_pka_dev_trng_info).
++ *
++ * Get random bytes from True Random Number Generator(TRNG).
++ *
++ * Return: 0 on success, -errno on failure.
 + */
-+struct mlxbf_pka_dev_res_t {
-+	void __iomem *ioaddr;
-+	u64 base;
-+	u64 size;
-+	u8 type;
-+	s8 status;
-+	char *name;
++struct mlxbf_pka_dev_trng_info {
++	__u32 count;
++	__u8 *data;
 +};
 +
-+/* Defines for mlxbf_pka_dev_res->type. */
-+#define MLXBF_PKA_DEV_RES_TYPE_MEM	1 /* Resource type is memory. */
-+#define MLXBF_PKA_DEV_RES_TYPE_REG	2 /* Resource type is register. */
++#define MLXBF_PKA_GET_RANDOM_BYTES _IOWR(MLXBF_PKA_IOC_TYPE, 0x3, struct mlxbf_pka_dev_trng_info)
 +
-+/* Defines for mlxbf_pka_dev_res->status. */
-+#define MLXBF_PKA_DEV_RES_STATUS_MAPPED		1 /* The resource is (iore)mapped. */
-+#define MLXBF_PKA_DEV_RES_STATUS_UNMAPPED	-1 /* The resource is unmapped. */
-+
-+/**
-+ * struct mlxbf_pka_dev_shim_res_t - PKA Shim resources structure
-+ * @buffer_ram: Buffer RAM
-+ * @master_seq_ctrl: Master sequencer controller CSR
-+ * @aic_csr: Interrupt controller CSRs
-+ */
-+struct mlxbf_pka_dev_shim_res_t {
-+	struct mlxbf_pka_dev_res_t buffer_ram;
-+	struct mlxbf_pka_dev_res_t master_seq_ctrl;
-+	struct mlxbf_pka_dev_res_t aic_csr;
-+};
-+
-+/* Number of PKA device resources. */
-+#define MLXBF_PKA_DEV_SHIM_RES_CNT 6
-+
-+/* Platform global shim resource information. */
-+struct mlxbf_pka_dev_gbl_shim_res_info_t {
-+	struct mlxbf_pka_dev_res_t *res_tbl[MLXBF_PKA_DEV_SHIM_RES_CNT];
-+	u8 res_cnt;
-+};
-+
-+/**
-+ * struct mlxbf_pka_dev_mem_res - PKA device memory resources
-+ * @eip154_base: Base address for EIP154 mmio registers
-+ * @eip154_size: EIP154 mmio register region size
-+ * @wndw_ram_off_mask: Common offset mask for alt window RAM and window RAM
-+ * @wndw_ram_base: Base address for window RAM
-+ * @wndw_ram_size: Window RAM region size
-+ * @alt_wndw_ram_0_base: Base address for alternate window RAM 0
-+ * @alt_wndw_ram_1_base: Base address for alternate window RAM 1
-+ * @alt_wndw_ram_2_base: Base address for alternate window RAM 2
-+ * @alt_wndw_ram_3_base: Base address for alternate window RAM 3
-+ * @alt_wndw_ram_size: Alternate window RAM regions size
-+ * @csr_base: Base address for CSR registers
-+ * @csr_size: CSR area size
-+ */
-+struct mlxbf_pka_dev_mem_res {
-+	u64 eip154_base;
-+	u64 eip154_size;
-+
-+	u64 wndw_ram_off_mask;
-+	u64 wndw_ram_base;
-+	u64 wndw_ram_size;
-+
-+	u64 alt_wndw_ram_0_base;
-+	u64 alt_wndw_ram_1_base;
-+	u64 alt_wndw_ram_2_base;
-+	u64 alt_wndw_ram_3_base;
-+	u64 alt_wndw_ram_size;
-+
-+	u64 csr_base;
-+	u64 csr_size;
-+};
-+
-+/**
-+ * struct mlxbf_pka_dev_shim_s - PKA Shim structure
-+ * @mem_res: Memory resources
-+ * @shim_id: Shim identifier
-+ * @resources: Shim resources
-+ * @window_ram_split: If non-zero, the split window RAM scheme is used
-+ * @status: Status of the shim
-+ * @mutex: Mutex lock for sharing shim
-+ */
-+struct mlxbf_pka_dev_shim_s {
-+	struct mlxbf_pka_dev_mem_res mem_res;
-+	u32 shim_id;
-+	struct mlxbf_pka_dev_shim_res_t resources;
-+	u8 window_ram_split;
-+	s8 status;
-+	struct mutex mutex;
-+};
-+
-+/* Defines for mlxbf_pka_dev_shim->status. */
-+#define MLXBF_PKA_SHIM_STATUS_UNDEFINED		-1
-+#define MLXBF_PKA_SHIM_STATUS_CREATED		1
-+#define MLXBF_PKA_SHIM_STATUS_INITIALIZED	2
-+#define MLXBF_PKA_SHIM_STATUS_RUNNING		3
-+#define MLXBF_PKA_SHIM_STATUS_STOPPED		4
-+#define MLXBF_PKA_SHIM_STATUS_FINALIZED		5
-+
-+/* Defines for mlxbf_pka_dev_shim->window_ram_split. */
-+
-+/* Window RAM is split into 4 * 16KB blocks. */
-+#define MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_ENABLED 1
-+/* Window RAM is not split and occupies 64KB. */
-+#define MLXBF_PKA_SHIM_WINDOW_RAM_SPLIT_DISABLED 2
-+
-+/**
-+ * struct mlxbf_pka_dev_gbl_config_t - Platform global configuration structure
-+ * @dev_shims_cnt: Number of registered PKA shims
-+ * @dev_shims: Table of registered PKA shims
-+ */
-+struct mlxbf_pka_dev_gbl_config_t {
-+	u32 dev_shims_cnt;
-+	struct mlxbf_pka_dev_shim_s *dev_shims[MLXBF_PKA_MAX_NUM_IO_BLOCKS];
-+};
-+
-+extern struct mlxbf_pka_dev_gbl_config_t mlxbf_pka_gbl_config;
-+
-+/*
-+ * Processor speed in hertz, used in routines which might be called very early
-+ * in boot.
-+ */
-+static inline u64 mlxbf_pka_early_cpu_speed(void)
-+{
-+	/*
-+	 * Initial guess at our CPU speed.  We set this to be larger than any
-+	 * possible real speed, so that any calculated delays will be too long,
-+	 * rather than too short.
-+	 *
-+	 * CPU Freq for High/Bin Chip - 1.255GHz.
-+	 */
-+	return 1255 * HZ_PER_MHZ;
-+}
-+
-+/* Start a PKA device timer. */
-+static inline u64 mlxbf_pka_dev_timer_start_msec(u32 msec)
-+{
-+	u64 cur_time = get_cycles();
-+
-+	return cur_time + mlxbf_pka_early_cpu_speed() * msec / MSEC_PER_SEC;
-+}
-+
-+/* Test a PKA device timer for completion. */
-+static inline bool mlxbf_pka_dev_timer_done(u64 timer)
-+{
-+	return get_cycles() >= timer;
-+}
-+
-+/* Return register base address. */
-+static inline u64 mlxbf_pka_dev_get_register_base(u64 base, u64 reg_addr)
-+{
-+	return (base + reg_addr) & PAGE_MASK;
-+}
-+
-+/* Return register offset. */
-+static inline u64 mlxbf_pka_dev_get_register_offset(u64 base, u64 reg_addr)
-+{
-+	return (base + reg_addr) & ~PAGE_MASK;
-+}
-+
-+/* Return word offset within io memory. */
-+static inline u64 mlxbf_pka_dev_get_word_offset(u64 mem_base, u64 word_addr, u64 mem_size)
-+{
-+	return (mem_base + word_addr) & (mem_size - 1);
-+}
-+
-+static inline u64 mlxbf_pka_dev_io_read(void __iomem *mem_ptr, u64 mem_off)
-+{
-+	return readq_relaxed(mem_ptr + mem_off);
-+}
-+
-+static inline void mlxbf_pka_dev_io_write(void __iomem *mem_ptr, u64 mem_off, u64 value)
-+{
-+	writeq_relaxed(value, mem_ptr + mem_off);
-+}
-+
-+/*
-+ * Shim getter for mlxbf_pka_dev_gbl_config_t structure which holds all system
-+ * global configuration. This configuration is shared and common to kernel
-+ * device driver associated with PKA hardware.
-+ */
-+struct mlxbf_pka_dev_shim_s *mlxbf_pka_dev_get_shim(u32 shim_id);
-+
-+void mlxbf_pka_dev_unset_resource_config(struct device *dev,
-+					 struct mlxbf_pka_dev_shim_s *shim,
-+					 struct mlxbf_pka_dev_res_t *res_ptr);
-+
-+/*
-+ * Register PKA IO block. This function initializes a shim and configures its
-+ * related resources, and returns the error code.
-+ */
-+int mlxbf_pka_dev_register_shim(struct device *dev,
-+				u32 shim_id,
-+				struct mlxbf_pka_dev_mem_res *mem_res,
-+				struct mlxbf_pka_dev_shim_s **shim);
-+
-+/* Unregister PKA IO block. */
-+int mlxbf_pka_dev_unregister_shim(struct device *dev, struct mlxbf_pka_dev_shim_s *shim);
-+
-+#endif /* __MLXBF_PKA_DEV_H__ */
-diff --git a/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
-new file mode 100644
-index 000000000000..42bfe30fbe49
---- /dev/null
-+++ b/drivers/platform/mellanox/mlxbf_pka/mlxbf_pka_drv.c
-@@ -0,0 +1,413 @@
-+// SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause
-+// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION. All rights reserved.
-+
-+#include <linux/acpi.h>
-+#include <linux/bitfield.h>
-+#include <linux/cdev.h>
-+#include <linux/cleanup.h>
-+#include <linux/device.h>
-+#include <linux/idr.h>
-+#include <linux/interrupt.h>
-+#include <linux/iommu.h>
-+#include <linux/ioport.h>
-+#include <linux/kdev_t.h>
-+#include <linux/kernel.h>
-+#include <linux/miscdevice.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/platform_device.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+
-+#include "mlxbf_pka_dev.h"
-+
-+#define MLXBF_PKA_DRIVER_DESCRIPTION		"BlueField PKA driver"
-+
-+#define MLXBF_PKA_DEVICE_ACPIHID_BF1		"MLNXBF10"
-+
-+#define MLXBF_PKA_DEVICE_ACPIHID_BF2		"MLNXBF20"
-+
-+#define MLXBF_PKA_DEVICE_ACPIHID_BF3		"MLNXBF51"
-+
-+#define MLXBF_PKA_DEVICE_ACCESS_MODE	0666
-+#define MLXBF_PKA_DEVICE_RES_CNT	7
-+#define MLXBF_PKA_DEVICE_NAME_MAX	14
-+
-+enum mlxbf_pka_mem_res_idx {
-+	MLXBF_PKA_ACPI_EIP154_IDX = 0,
-+	MLXBF_PKA_ACPI_WNDW_RAM_IDX,
-+	MLXBF_PKA_ACPI_ALT_WNDW_RAM_0_IDX,
-+	MLXBF_PKA_ACPI_ALT_WNDW_RAM_1_IDX,
-+	MLXBF_PKA_ACPI_ALT_WNDW_RAM_2_IDX,
-+	MLXBF_PKA_ACPI_ALT_WNDW_RAM_3_IDX,
-+	MLXBF_PKA_ACPI_CSR_IDX
-+};
-+
-+enum mlxbf_pka_plat_type {
-+	/* Platform type Bluefield-1. */
-+	MLXBF_PKA_PLAT_TYPE_BF1 = 0,
-+	/* Platform type Bluefield-2. */
-+	MLXBF_PKA_PLAT_TYPE_BF2,
-+	/* Platform type Bluefield-3. */
-+	MLXBF_PKA_PLAT_TYPE_BF3
-+};
-+
-+struct mlxbf_pka_drv_plat_info {
-+	enum mlxbf_pka_plat_type type;
-+	u64 wndw_ram_off_mask;
-+};
-+
-+static const struct mlxbf_pka_drv_plat_info mlxbf_pka_bf1_info = {
-+	.type = MLXBF_PKA_PLAT_TYPE_BF1,
-+	.wndw_ram_off_mask = MLXBF_PKA_WINDOW_RAM_OFFSET_BF1_BF2_MASK,
-+};
-+
-+static const struct mlxbf_pka_drv_plat_info mlxbf_pka_bf2_info = {
-+	.type = MLXBF_PKA_PLAT_TYPE_BF2,
-+	.wndw_ram_off_mask = MLXBF_PKA_WINDOW_RAM_OFFSET_BF1_BF2_MASK,
-+};
-+
-+static const struct mlxbf_pka_drv_plat_info mlxbf_pka_bf3_info = {
-+	.type = MLXBF_PKA_PLAT_TYPE_BF3,
-+	.wndw_ram_off_mask = MLXBF_PKA_WINDOW_RAM_OFFSET_BF3_MASK,
-+};
-+
-+static DEFINE_MUTEX(mlxbf_pka_drv_lock);
-+
-+static u32 mlxbf_pka_device_cnt;
-+
-+static const char mlxbf_pka_acpihid_bf1[] = MLXBF_PKA_DEVICE_ACPIHID_BF1;
-+
-+static const char mlxbf_pka_acpihid_bf2[] = MLXBF_PKA_DEVICE_ACPIHID_BF2;
-+
-+static const char mlxbf_pka_acpihid_bf3[] = MLXBF_PKA_DEVICE_ACPIHID_BF3;
-+
-+static const struct acpi_device_id mlxbf_pka_drv_acpi_ids[] = {
-+	{ MLXBF_PKA_DEVICE_ACPIHID_BF1, (kernel_ulong_t)&mlxbf_pka_bf1_info, 0, 0 },
-+	{ MLXBF_PKA_DEVICE_ACPIHID_BF2, (kernel_ulong_t)&mlxbf_pka_bf2_info, 0, 0 },
-+	{ MLXBF_PKA_DEVICE_ACPIHID_BF3, (kernel_ulong_t)&mlxbf_pka_bf3_info, 0, 0 },
-+	{},
-+};
-+
-+struct mlxbf_pka_info {
-+	/* The device this info struct belongs to. */
-+	struct device *dev;
-+	/* Device name. */
-+	const char *name;
-+	/* Device ACPI HID. */
-+	const char *acpihid;
-+	/* Device flags. */
-+	u8 flag;
-+	struct module *module;
-+	/* Optional private data. */
-+	void *priv;
-+};
-+
-+/* Defines for mlxbf_pka_info->flags. */
-+#define MLXBF_PKA_DRIVER_FLAG_DEVICE 2
-+
-+struct mlxbf_pka_platdata {
-+	struct platform_device *pdev;
-+	struct mlxbf_pka_info *info;
-+	/* Generic spinlock. */
-+	spinlock_t lock;
-+};
-+
-+#define MLXBF_PKA_DRIVER_DEV_MAX MLXBF_PKA_MAX_NUM_IO_BLOCKS
-+
-+struct mlxbf_pka_device {
-+	struct mlxbf_pka_info *info;
-+	struct device *device;
-+	u32 device_id;
-+	struct resource *resource[MLXBF_PKA_DEVICE_RES_CNT];
-+	struct mlxbf_pka_dev_shim_s *shim;
-+};
-+
-+static int mlxbf_pka_drv_verify_bootup_status(struct device *dev)
-+{
-+	const char *bootup_status;
-+	int ret;
-+
-+	ret = device_property_read_string(dev, "bootup_done", &bootup_status);
-+	if (ret < 0) {
-+		dev_err(dev, "failed to read bootup_done property\n");
-+		return ret;
-+	}
-+
-+	if (strcmp(bootup_status, "true")) {
-+		dev_err(dev, "device bootup required\n");
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
-+static void mlxbf_pka_drv_get_mem_res(struct mlxbf_pka_device *mlxbf_pka_dev,
-+				      struct mlxbf_pka_dev_mem_res *mem_res,
-+				      u64 wndw_ram_off_mask)
-+{
-+	enum mlxbf_pka_mem_res_idx acpi_mem_idx;
-+
-+	acpi_mem_idx = MLXBF_PKA_ACPI_EIP154_IDX;
-+	mem_res->wndw_ram_off_mask = wndw_ram_off_mask;
-+
-+	/* PKA EIP154 MMIO base address. */
-+	mem_res->eip154_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	mem_res->eip154_size = resource_size(mlxbf_pka_dev->resource[acpi_mem_idx]);
-+	acpi_mem_idx++;
-+
-+	/* PKA window RAM base address. */
-+	mem_res->wndw_ram_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	mem_res->wndw_ram_size = resource_size(mlxbf_pka_dev->resource[acpi_mem_idx]);
-+	acpi_mem_idx++;
-+
-+	/*
-+	 * PKA alternate window RAM base address.
-+	 * Note: the size of all the alt window RAM is the same, depicted by
-+	 * 'alt_wndw_ram_size' variable. All alt window RAM resources are read
-+	 * here even though not all of them are used currently.
-+	 */
-+	mem_res->alt_wndw_ram_0_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	mem_res->alt_wndw_ram_size = resource_size(mlxbf_pka_dev->resource[acpi_mem_idx]);
-+
-+	if (mem_res->alt_wndw_ram_size != MLXBF_PKA_WINDOW_RAM_REGION_SIZE)
-+		dev_warn(mlxbf_pka_dev->device, "alternate Window RAM size from ACPI is wrong.\n");
-+
-+	acpi_mem_idx++;
-+
-+	mem_res->alt_wndw_ram_1_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	acpi_mem_idx++;
-+
-+	mem_res->alt_wndw_ram_2_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	acpi_mem_idx++;
-+
-+	mem_res->alt_wndw_ram_3_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	acpi_mem_idx++;
-+
-+	/* PKA CSR base address. */
-+	mem_res->csr_base = mlxbf_pka_dev->resource[acpi_mem_idx]->start;
-+	mem_res->csr_size = resource_size(mlxbf_pka_dev->resource[acpi_mem_idx]);
-+}
-+
-+/*
-+ * Note: this function must be serialized because it calls
-+ * 'mlxbf_pka_dev_register_shim' which manipulates common counters for the
-+ * PKA devices.
-+ */
-+static int mlxbf_pka_drv_register_device(struct mlxbf_pka_device *mlxbf_pka_dev,
-+					 u64 wndw_ram_off_mask)
-+{
-+	struct mlxbf_pka_dev_mem_res mem_res;
-+	u32 mlxbf_pka_shim_id;
-+	int ret;
-+
-+	/* Assert that the driver lock is held for serialization */
-+	lockdep_assert_held(&mlxbf_pka_drv_lock);
-+
-+	mlxbf_pka_shim_id = mlxbf_pka_dev->device_id;
-+
-+	mlxbf_pka_drv_get_mem_res(mlxbf_pka_dev, &mem_res, wndw_ram_off_mask);
-+
-+	ret = mlxbf_pka_dev_register_shim(mlxbf_pka_dev->device,
-+					  mlxbf_pka_shim_id,
-+					  &mem_res,
-+					  &mlxbf_pka_dev->shim);
-+	if (ret) {
-+		dev_dbg(mlxbf_pka_dev->device, "failed to register shim\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int mlxbf_pka_drv_unregister_device(struct mlxbf_pka_device *mlxbf_pka_dev)
-+{
-+	if (!mlxbf_pka_dev || !mlxbf_pka_dev->shim)
-+		return -EINVAL;
-+
-+	dev_dbg(mlxbf_pka_dev->device, "unregister device shim\n");
-+	return mlxbf_pka_dev_unregister_shim(mlxbf_pka_dev->device, mlxbf_pka_dev->shim);
-+}
-+
-+static int mlxbf_pka_drv_probe_device(struct mlxbf_pka_info *info)
-+{
-+	struct mlxbf_pka_drv_plat_info *plat_info;
-+	enum mlxbf_pka_mem_res_idx acpi_mem_idx;
-+	struct mlxbf_pka_device *mlxbf_pka_dev;
-+	const struct acpi_device_id *aid;
-+	struct platform_device *pdev;
-+	u64 wndw_ram_off_mask;
-+	struct device *dev;
-+	int ret;
-+
-+	if (!info)
-+		return -EINVAL;
-+
-+	dev = info->dev;
-+	pdev = to_platform_device(dev);
-+
-+	mlxbf_pka_dev = devm_kzalloc(dev, sizeof(*mlxbf_pka_dev), GFP_KERNEL);
-+	if (!mlxbf_pka_dev)
-+		return -ENOMEM;
-+
-+	scoped_guard(mutex, &mlxbf_pka_drv_lock) {
-+		mlxbf_pka_device_cnt += 1;
-+		if (mlxbf_pka_device_cnt > MLXBF_PKA_DRIVER_DEV_MAX) {
-+			dev_dbg(dev, "cannot support %u devices\n", mlxbf_pka_device_cnt);
-+			return -ENOSPC;
-+		}
-+		mlxbf_pka_dev->device_id = mlxbf_pka_device_cnt - 1;
-+	}
-+
-+	mlxbf_pka_dev->info = info;
-+	mlxbf_pka_dev->device = dev;
-+	info->flag = MLXBF_PKA_DRIVER_FLAG_DEVICE;
-+
-+	for (acpi_mem_idx = MLXBF_PKA_ACPI_EIP154_IDX;
-+	     acpi_mem_idx < MLXBF_PKA_DEVICE_RES_CNT;
-+	     acpi_mem_idx++) {
-+		mlxbf_pka_dev->resource[acpi_mem_idx] = platform_get_resource(pdev,
-+									      IORESOURCE_MEM,
-+									      acpi_mem_idx);
-+	}
-+
-+	/* Verify PKA bootup status. */
-+	ret = mlxbf_pka_drv_verify_bootup_status(dev);
-+	if (ret)
-+		return ret;
-+
-+	/* Window RAM offset mask is platform dependent. */
-+	aid = acpi_match_device(mlxbf_pka_drv_acpi_ids, dev);
-+	if (!aid)
-+		return -ENODEV;
-+
-+	plat_info = (struct mlxbf_pka_drv_plat_info *)aid->driver_data;
-+	if (!plat_info) {
-+		dev_err(dev, "missing platform data\n");
-+		return -EINVAL;
-+	}
-+
-+	wndw_ram_off_mask = plat_info->wndw_ram_off_mask;
-+
-+	scoped_guard(mutex, &mlxbf_pka_drv_lock) {
-+		ret = mlxbf_pka_drv_register_device(mlxbf_pka_dev, wndw_ram_off_mask);
-+		if (ret) {
-+			dev_dbg(dev, "failed to register shim\n");
-+			return ret;
-+		}
-+	}
-+
-+	info->priv = mlxbf_pka_dev;
-+
-+	return 0;
-+}
-+
-+static void mlxbf_pka_drv_remove_device(struct platform_device *pdev)
-+{
-+	struct mlxbf_pka_platdata *priv = platform_get_drvdata(pdev);
-+	struct mlxbf_pka_info *info = priv->info;
-+	struct mlxbf_pka_device *mlxbf_pka_dev = (struct mlxbf_pka_device *)info->priv;
-+
-+	if (!mlxbf_pka_dev)
-+		return;
-+
-+	mlxbf_pka_drv_unregister_device(mlxbf_pka_dev);
-+}
-+
-+static int mlxbf_pka_drv_acpi_probe(struct platform_device *pdev, struct mlxbf_pka_info *info)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct acpi_device *adev;
-+	int ret;
-+
-+	if (acpi_disabled)
-+		return -ENOENT;
-+
-+	adev = ACPI_COMPANION(dev);
-+	if (!adev) {
-+		dev_dbg(dev, "ACPI companion device not found for %s\n", pdev->name);
-+		return -ENODEV;
-+	}
-+
-+	info->acpihid = acpi_device_hid(adev);
-+	if (WARN_ON(!info->acpihid))
-+		return -EINVAL;
-+
-+	if (!strcmp(info->acpihid, mlxbf_pka_acpihid_bf1) ||
-+	    !strcmp(info->acpihid, mlxbf_pka_acpihid_bf2) ||
-+	    !strcmp(info->acpihid, mlxbf_pka_acpihid_bf3)) {
-+		ret = mlxbf_pka_drv_probe_device(info);
-+		if (ret) {
-+			dev_dbg(dev, "failed to register device\n");
-+			return ret;
-+		}
-+		dev_info(dev, "device probed\n");
-+	}
-+
-+	return 0;
-+}
-+
-+static int mlxbf_pka_drv_probe(struct platform_device *pdev)
-+{
-+	struct mlxbf_pka_platdata *priv;
-+	struct device *dev = &pdev->dev;
-+	struct mlxbf_pka_info *info;
-+	int ret;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	spin_lock_init(&priv->lock);
-+	priv->pdev = pdev;
-+
-+	info = devm_kzalloc(dev, sizeof(*info), GFP_KERNEL);
-+	if (!info)
-+		return -ENOMEM;
-+
-+	info->name = pdev->name;
-+	info->module = THIS_MODULE;
-+	info->dev = dev;
-+	priv->info = info;
-+
-+	platform_set_drvdata(pdev, priv);
-+
-+	ret = mlxbf_pka_drv_acpi_probe(pdev, info);
-+	if (ret) {
-+		dev_dbg(dev, "unknown device\n");
-+		return ret;
-+	}
-+
-+	return ret;
-+}
-+
-+static void mlxbf_pka_drv_remove(struct platform_device *pdev)
-+{
-+	struct mlxbf_pka_platdata *priv = platform_get_drvdata(pdev);
-+	struct mlxbf_pka_info *info = priv->info;
-+
-+	if (info->flag == MLXBF_PKA_DRIVER_FLAG_DEVICE) {
-+		dev_info(&pdev->dev, "remove PKA device\n");
-+		mlxbf_pka_drv_remove_device(pdev);
-+	}
-+}
-+
-+MODULE_DEVICE_TABLE(acpi, mlxbf_pka_drv_acpi_ids);
-+
-+static struct platform_driver mlxbf_pka_drv = {
-+	.driver = {
-+		   .name = KBUILD_MODNAME,
-+		   .acpi_match_table = ACPI_PTR(mlxbf_pka_drv_acpi_ids),
-+		  },
-+	.probe = mlxbf_pka_drv_probe,
-+	.remove = mlxbf_pka_drv_remove,
-+};
-+
-+module_platform_driver(mlxbf_pka_drv);
-+MODULE_DESCRIPTION(MLXBF_PKA_DRIVER_DESCRIPTION);
-+MODULE_AUTHOR("Ron Li <xiangrongl@nvidia.com>");
-+MODULE_AUTHOR("Khalil Blaiech <kblaiech@nvidia.com>");
-+MODULE_AUTHOR("Mahantesh Salimath <mahantesh@nvidia.com>");
-+MODULE_AUTHOR("Shih-Yi Chen <shihyic@nvidia.com>");
-+MODULE_LICENSE("Dual BSD/GPL");
+ #endif /* _UAPI_LINUX_MLXBF_PKA_H */
 -- 
 2.34.1
 
