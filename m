@@ -1,45 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CD42FFF8A;
-	Sat, 20 Sep 2025 12:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA72E2D4B68;
+	Sat, 20 Sep 2025 12:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758371060; cv=none; b=kl73xVV+R4Z6UOaxSqvp0zE4pzz5cvfnqaUT6chI0gblqWYJM3yPs4Ce/GtxI5QQT85kVNDVcynkN1WBL3TGKEQSkUo+7AgmCny42Uj8QxdYDJ8yfSarhWWPeaiW6d+qVs5QBXXR0MC0Xk++bPU79REKJGTJ1eu1XDh2uREYy1I=
+	t=1758371086; cv=none; b=XxeLGfnxs+lTtWFu5bS5VTp8FxUeB8RbvyFJOW2yAkRq8a0E8GlapXXSZ3XPpZHECWtM+atxKBs7ibCnr43xP7LHKhk149BcfDgPb4GRZiJmOPxwEMsVKxrdusgePKhCnWnRFJrsmV1JP5/8mq6H7Db4qsErZue4b0aHKUwdtgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758371060; c=relaxed/simple;
-	bh=+VCl2qNOG76VOfRVAj3hMp0FVTlFw4IHD4CkVEVV9qI=;
+	s=arc-20240116; t=1758371086; c=relaxed/simple;
+	bh=QkGs3CcTduaVBCAdGEn7X/UZDrvPjIp9c1P80mHRQUM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gAMajFcXjltnFODXeAAfiyLD2skMsxPDIzguPYtZvVam5/zmPkGQ0ll/dsx1FcxFVqKrp8mR7qMSuwI42n7JpDnk0VD4HBhPB2X5Jdf42BgPpoLOktCumeqvcFe/Fy4yKzzxWpWL2Kqr/aoe4uNc+ul7zyRvXXceXP2ispA4g8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BQgzDLUk; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ag4O26fG0V81ud+WgJwlsfd3z+qp0hRGYucL7d8VPuNmarpZcxkFwln0Salgq2qS0VLaCz6jVSu/dkSkJpKZpsfi0uCfueWp7XsNzvIT51A07e3L3/IKCBE7GB5ck0u7JyJvd5qMnwX0czbWveWR7Ii65Lbb3RnoYE3lPCsMgB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mlutS17W; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BQgzDLUk"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mlutS17W"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
 	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=qHT8BTzKJhP5NNuPsa6/wkhiJ9T4Mc5AUPkCGtid+r8=; b=BQgzDLUkRT5bICBTs58EM3KrHO
-	YDPfJ/i355q++ehPHfQ6+qdJKSlzXV30z+4kJK3muaVACQVO7zH7Te3BlPfMP2raZAtSAHSLw1UM0
-	ZOkop71XLAdVXpNd7XtfVwWqqh3K50rpccD182V5IbURLXiDL1d0zNMW3OItkQEfnnL4tp5PT6U1s
-	RhuHr3lbDWhJNmasDbKf4WM8DBEvE/oJuWGBdUDn/hI1Fz90inHur3TSYx3yzvJy6w5vwn2bH7bjb
-	L7fGEuM7j/FfORs7p7xpTiKIN90RMGuawkFGN4cJIbANsOnFzVixLe91r8clDIUgtalEpb0WFGtmq
-	lO0XFeDA==;
+	bh=Gihya9xP0fAcqsxzSzES+1BCfKN/8rEUF3BTdeplS64=; b=mlutS17W7yGIqhdfi1idO6nGob
+	czgsUB/fZ/9YSk0UXQNqq2kkv6rrIBIbqoFGHs5FsN70xtSIbNBx4wpbkLK34OGTcxKdk39f2ZHt4
+	I/YFgc7KbUiJquNnJ5TO2teOt+hJGjAlDyvf6/0hKgQ0ES451eXDCw1/EfS5KQgz9/YGtocmNPrH2
+	7Dy+NDITl0wVWEzhBdtLULqvyBoJ8WFuHOGxm5rccB0mMeydzP1ERdViZeOIcUcmsNniDLdG7Oue7
+	3QRyu6ikDglunhBZt8ewIthuWYaULvRwph5QTKoTRhkpph1kXabfGyYmg/fiZSK4VwW/DwqHeWn4N
+	q2b9FAyA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uzwdM-00704f-2u;
-	Sat, 20 Sep 2025 20:24:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Sep 2025 20:24:08 +0800
-Date: Sat, 20 Sep 2025 20:24:08 +0800
+	id 1uzwdc-00704n-0p;
+	Sat, 20 Sep 2025 20:24:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Sep 2025 20:24:24 +0800
+Date: Sat, 20 Sep 2025 20:24:24 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dan Moulding <dan@danm.net>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	regressions@lists.linux.dev
-Subject: Re: [PATCH v5] crypto: acomp/scomp: Use same definition of context
- alloc and free ops
-Message-ID: <aM6c6IzPiHnmqTaX@gondor.apana.org.au>
-References: <20250908160002.26673-1-dan@danm.net>
- <20250908161243.27239-1-dan@danm.net>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: stable@vger.kernel.org, Neal Liu <neal_liu@aspeedtech.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Johnny Huang <johnny_huang@aspeedtech.com>,
+	Dhananjay Phadke <dphadke@linux.microsoft.com>,
+	linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: aspeed - Fix dma_unmap_sg() direction
+Message-ID: <aM6c-LsUNPN3CJ3m@gondor.apana.org.au>
+References: <20250910082232.16723-3-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,60 +52,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250908161243.27239-1-dan@danm.net>
+In-Reply-To: <20250910082232.16723-3-fourier.thomas@gmail.com>
 
-On Mon, Sep 08, 2025 at 10:12:43AM -0600, Dan Moulding wrote:
-> In commit 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation
-> code into acomp"), the crypto_acomp_streams struct was made to rely on
-> having the alloc_ctx and free_ctx operations defined in the same order
-> as the scomp_alg struct. But in that same commit, the alloc_ctx and
-> free_ctx members of scomp_alg may be randomized by structure layout
-> randomization, since they are contained in a pure ops structure
-> (containing only function pointers). If the pointers within scomp_alg
-> are randomized, but those in crypto_acomp_streams are not, then
-> the order may no longer match. This fixes the problem by removing the
-> union from scomp_alg so that both crypto_acomp_streams and scomp_alg
-> will share the same definition of alloc_ctx and free_ctx, ensuring
-> they will always have the same layout.
+On Wed, Sep 10, 2025 at 10:22:31AM +0200, Thomas Fourier wrote:
+> It seems like everywhere in this file, when the request is not
+> bidirectionala, req->src is mapped with DMA_TO_DEVICE and req->dst is
+> mapped with DMA_FROM_DEVICE.
 > 
-> Signed-off-by: Dan Moulding <dan@danm.net>
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Fixes: 42d9f6c77479 ("crypto: acomp - Move scomp stream allocation code into acomp")
+> Fixes: 62f58b1637b7 ("crypto: aspeed - add HACE crypto driver")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 > ---
-> Changes in v4:
->   * After the change in v3, the deflate algorithm was no longer
->     affected, but the patch still had some whitespace changes in
->     deflate.c. This version removes those (so deflate.c is no longer
->     patched here).
+> v1->v2:
+>   - fix confusion between dst and src in commit message 
 > 
-> Changes in v4:
->   * Rebased on crypto-2.6/master (previous versions were based on
->     stable v6.16).
-> 
-> Changes in v3:
->   * Intead of adding a new struct containing alloc and free function
->     pointers, which both crypto_acomp_streams and scomp_alg can share,
->     simply remove the union that was added to scomp_alg, forcing it to
->     share the same definition of the function pointers from
->     crypto_acomp_streams. The pointers won't be randomized in this
->     version (since there is no pure ops struct any longer), but
->     overall the structure layout is simpler and more sensible this
->     way. This change was suggested by Herbert Xu.
-> 
-> Changes in v2:
->   * Also patch all other crypto algorithms that use struct scomp_alg
->     (v1 patch only patched LZ4).
->   * Fix whitespace errors.
-> 
->  crypto/842.c                          |  6 ++++--
->  crypto/lz4.c                          |  6 ++++--
->  crypto/lz4hc.c                        |  6 ++++--
->  crypto/lzo-rle.c                      |  6 ++++--
->  crypto/lzo.c                          |  6 ++++--
->  drivers/crypto/nx/nx-common-powernv.c |  6 ++++--
->  drivers/crypto/nx/nx-common-pseries.c |  6 ++++--
->  include/crypto/internal/scompress.h   | 11 +----------
->  8 files changed, 29 insertions(+), 24 deletions(-)
+>  drivers/crypto/aspeed/aspeed-hace-crypto.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
