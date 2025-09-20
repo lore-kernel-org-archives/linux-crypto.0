@@ -1,100 +1,151 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8643D6F;
-	Sat, 20 Sep 2025 12:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34E4188CB1
+	for <linux-crypto@vger.kernel.org>; Sat, 20 Sep 2025 13:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758372473; cv=none; b=WLXptzAFgOE2BjX/o/UoS32NbajIQOW/gVvzgVKKk3T22E+BAL4/9F0Iu/6WsWH5JIEptOSusAlhIsSPx85nLH/k2zInZroeviHmGjVPY/YZyyfzGR4HJ80H4MD7I67mvVxs7Re+eF9yhklbTWAQJZz+UASxhZ/Td4eQBZ5mnVY=
+	t=1758374447; cv=none; b=AE/QQmVdesQ6IDWXth5mLDmJ6F/0OM3qkCrW42TmCtfmGOGIzmWHcG7+K+SkqqjKxXbAroU1iRS7qLunVIbsufSHxEfLymsVqIj3xiMZVO2glsY7Ptb4tW/fTlyi2QrvvKXDwSH7j257lx0tsrRfhttJ4OopnhZyNNN9cMFGEDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758372473; c=relaxed/simple;
-	bh=rUIgjqaHNOc+FdBJons8gNaDwdujH/lsR2saMqvJhvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TLZhzARuUAhN20pYIhQXwgJ00+HHvcfhXD7ms84mb45gPmvfAAc/RbDODUsl2uBeK5O55WKZRhC7CqZx9E/zXcQq3GLHZ9bBt5sLUTf63/g1nUYWx0DxNOYZgUQDByVa8bLwljgWOMp/eSnfraFQfRUlm83OXZ2oYl5GYmPPGxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 08EC22C051DD;
-	Sat, 20 Sep 2025 14:47:41 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id C3C4E5D31C; Sat, 20 Sep 2025 14:47:40 +0200 (CEST)
-Date: Sat, 20 Sep 2025 14:47:40 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Alexander Potapenko <glider@google.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com,
-	andreyknvl@gmail.com, andy@kernel.org, brauner@kernel.org,
-	brendan.higgins@linux.dev, davem@davemloft.net, davidgow@google.com,
-	dhowells@redhat.com, dvyukov@google.com, elver@google.com,
-	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz,
-	jannh@google.com, johannes@sipsolutions.net,
-	kasan-dev@googlegroups.com, kees@kernel.org,
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, rmoar@google.com,
-	shuah@kernel.org, sj@kernel.org, tarasmadan@google.com
-Subject: Re: [PATCH v2 08/10] drivers/auxdisplay: add a KFuzzTest for
- parse_xy()
-Message-ID: <aM6ibO75IidHOO3m@wunner.de>
-References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
- <20250919145750.3448393-9-ethan.w.s.graham@gmail.com>
- <CAHp75VdyZudJkskL0E9DEzYXgFeUwCBEwXEVUMuKSx0R9NUxmQ@mail.gmail.com>
- <CAG_fn=XTcPrsgxg+MpFqnj9t2OoYa=SF1ts8odHFaMqD+YpZ_w@mail.gmail.com>
+	s=arc-20240116; t=1758374447; c=relaxed/simple;
+	bh=TVKtdkDW5Bx9jo1qL5cjANuXuZINMtgj+qFgRNRgkrA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EwiRPW3mv7JOX8uqc1HHE+uDTO3MElUdOl7nZjBKOlVuMcWjWV2ItKqFiWalKmjh4TaE82OTzYV28Z0RV1a8SM0zPHlpoXlgJLlKfSH7V9Bm2lo3YHSvX7Xfuhn24vQTkCIBgkGX4hQwHB+kEdf1T3NdJSuNsrGqJGxB4Zllv54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wq5e436H; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wq5e436H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E47C113CF
+	for <linux-crypto@vger.kernel.org>; Sat, 20 Sep 2025 13:20:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758374446;
+	bh=TVKtdkDW5Bx9jo1qL5cjANuXuZINMtgj+qFgRNRgkrA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Wq5e436H04RL6eIWDHxcufFHAJuaWfqpAzlKmc3eqM6yC/AlbnYkfdrkCmBYZeLI6
+	 /QjLa0xTf88xp/wzEbevNrpcpiCOeMAfu7f8c+y5Ak3Azd3R26r445RTyu95eygZoE
+	 R7ODanSAjN0ywnYFE6F/DctWH0HPHCKht8suixoxdf31bCLdVrvnvV9ON5EC5GMEed
+	 RZWC4hP4muHVN2sJzQeG7wbs0Nho8nucBHdpC/nA4xOQI9Cpjrc8zDkttV237h2LpV
+	 8i/ZzvvnKpce06XtzkhJVDM13FkNCKmFhZTRVT+5HRspuJdbaFXzaxAOU2Gu4k1P0k
+	 RdZ0IyGaiL3jg==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-578ecc56235so2331353e87.0
+        for <linux-crypto@vger.kernel.org>; Sat, 20 Sep 2025 06:20:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV5d2AUopRsDiAg67egk2ceygYdNCsL9cjZ1uaHLEFR9DJckRIPRfYTAvMco5l7H3aE5MXG/4+mqVA+6+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymBuX/4QoxHTNYJsRrTo2LaoEYozsE5tcuglUWfwKLoet1siB1
+	D1XYyp0icyQpsK6dGwUn1cBeP7QSvyO3bsfbqW29/tKOraNNdDB82Ub5tWskpVZoi3sVmtzpNRZ
+	wTZ0JgXOuNVyp+aCRGs4LRp61DiKAhlU=
+X-Google-Smtp-Source: AGHT+IG1LfUXkrYBNfv5ScoJ3gEzekTWk3ybLBFirhAG7Q4onP+VqcdCQaeYnlnFTAzL/cIlQNiaBfKJ1gXwB5SZmOk=
+X-Received: by 2002:a05:6512:6189:b0:571:369a:68bd with SMTP id
+ 2adb3069b0e04-579e0cb7047mr2382978e87.3.1758374444801; Sat, 20 Sep 2025
+ 06:20:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAG_fn=XTcPrsgxg+MpFqnj9t2OoYa=SF1ts8odHFaMqD+YpZ_w@mail.gmail.com>
+References: <20250918063539.2640512-7-ardb+git@google.com> <20250919193221.GB2249@quark>
+ <202509192219.E69A1FDA5@keescook>
+In-Reply-To: <202509192219.E69A1FDA5@keescook>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sat, 20 Sep 2025 15:20:33 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFtnDj-kDMPKfbj2hJ9FqVt17EstNSHbzfcmAAYZneS6g@mail.gmail.com>
+X-Gm-Features: AS18NWAFCY8dWxTtxlBneqEoZTFZeASnTt4i57qY4hP6cK5XTVyGvIZt8tkXyfU
+Message-ID: <CAMj1kXFtnDj-kDMPKfbj2hJ9FqVt17EstNSHbzfcmAAYZneS6g@mail.gmail.com>
+Subject: Re: [PATCH 0/5] arm64: Move kernel mode FPSIMD buffer to the stack
+To: Kees Cook <kees@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb+git@google.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Sep 20, 2025 at 02:08:01PM +0200, Alexander Potapenko wrote:
-> On Sat, Sep 20, 2025 at 12:54 PM Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> > On Fri, Sep 19, 2025 at 5:58 PM Ethan Graham <ethan.w.s.graham@gmail.com> wrote:
-> > > +++ b/drivers/auxdisplay/charlcd.c
-> > > @@ -682,3 +682,11 @@ EXPORT_SYMBOL_GPL(charlcd_unregister);
+On Sat, 20 Sept 2025 at 08:42, Kees Cook <kees@kernel.org> wrote:
+>
+> On Fri, Sep 19, 2025 at 02:32:21PM -0500, Eric Biggers wrote:
+> > On Thu, Sep 18, 2025 at 08:35:40AM +0200, Ard Biesheuvel wrote:
+> > > From: Ard Biesheuvel <ardb@kernel.org>
 > > >
-> > >  MODULE_DESCRIPTION("Character LCD core support");
-> > >  MODULE_LICENSE("GPL");
-> > > +
-> > > +/*
-> > > + * When CONFIG_KFUZZTEST is enabled, we include this _kfuzz.c file to ensure
-> > > + * that KFuzzTest targets are built.
-> > > + */
-> > > +#ifdef CONFIG_KFUZZTEST
-> > > +#include "tests/charlcd_kfuzz.c"
-> > > +#endif /* CONFIG_KFUZZTEST */
+> > > Move the buffer for preserving/restoring the kernel mode FPSIMD state on a
+> > > context switch out of struct thread_struct, and onto the stack, so that
+> > > the memory cost is not imposed needlessly on all tasks in the system.
+> > >
+> > > Patches #1 - #3 contains some prepwork so that patch #4 can tighten the
+> > > rules around permitted usage patterns of kernel_neon_begin() and
+> > > kernel_neon_end(). This permits #5 to provide a stack buffer to
+> > > kernel_neon_begin() transparently, in a manner that ensures that it will
+> > > remain available until after the associated call to kernel_neon_end()
+> > > returns.
+> > >
+> > > Cc: Marc Zyngier <maz@kernel.org>
+> > > Cc: Will Deacon <will@kernel.org>
+> > > Cc: Mark Rutland <mark.rutland@arm.com>
+> > > Cc: Kees Cook <keescook@chromium.org>
+> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > > Cc: Mark Brown <broonie@kernel.org>
+> > >
+> > > Ard Biesheuvel (5):
+> > >   crypto/arm64: aes-ce-ccm - Avoid pointless yield of the NEON unit
+> > >   crypto/arm64: sm4-ce-ccm - Avoid pointless yield of the NEON unit
+> > >   crypto/arm64: sm4-ce-gcm - Avoid pointless yield of the NEON unit
+> > >   arm64/fpsimd: Require kernel NEON begin/end calls from the same scope
+> > >   arm64/fpsimd: Allocate kernel mode FP/SIMD buffers on the stack
+> > >
+> > >  arch/arm64/crypto/aes-ce-ccm-glue.c |  5 +--
+> > >  arch/arm64/crypto/sm4-ce-ccm-glue.c | 10 ++----
+> > >  arch/arm64/crypto/sm4-ce-gcm-glue.c | 10 ++----
+> > >  arch/arm64/include/asm/neon.h       |  7 ++--
+> > >  arch/arm64/include/asm/processor.h  |  2 +-
+> > >  arch/arm64/kernel/fpsimd.c          | 34 +++++++++++++-------
+> > >  6 files changed, 34 insertions(+), 34 deletions(-)
 > >
-> > No, NAK. We don't want to see these in each and every module. Please,
-> > make sure that nothing, except maybe Kconfig, is modified in this
-> > folder (yet, you may add a _separate_ test module, as you already have
-> > done in this patch).
-> 
-> This is one of the cases in which we can't go without changing the
-> original code, because parse_xy() is a static function.
-> Including the test into the source is not the only option, we could as
-> well make the function visible unconditionally, or introduce a macro
-> similar to VISIBLE_IF_KUNIT.
-> Do you prefer any of those?
+> > This looks like the right decision: saving 528 bytes per task is
+> > significant.  528 bytes is a lot to allocate on the stack too, but
+> > functions that use the NEON registers are either leaf functions or very
+> > close to being leaf functions, so it should be okay.
+> >
+> > The implementation is a bit unusual, though:
+> >
+> >    #define kernel_neon_begin()        do { __kernel_neon_begin(&(struct user_fpsimd_state){})
+> >    #define kernel_neon_end()  __kernel_neon_end(); } while (0)
+> >
+> > It works, but normally macros don't start or end code blocks behind the
+> > scenes like this.  Perhaps it should be more like s390's
+> > kernel_fpu_begin(), where the caller provides the buffer that the
+> > registers are stored in?
+>
+> We've done stuff like this in the past, but I did wonder if we could use
+> any of the cleanup.h style logic to do this instead of the split
+> do/while? I think this would work, totally untested:
+>
+> DEFINE_LOCK_GUARD_0(neon,
+>                     __kernel_neon_begin(&(struct user_fpsimd_state){}),
+>                     __kernel_neon_end())
+> ...
+> scoped_guard(neon) {
+>         do neon things
+> }
+>
+> It would require a fair bit of refactoring to replace the existing
+> begin/end code, though...
+>
 
-Just add something like this to drivers/auxdisplay/Makefile:
+Yeah, but I think it's worth it. And let's call it simd and reuse that
+on other architectures as well.
 
-ifeq ($(CONFIG_KFUZZTEST),y)
-CFLAGS_charlcd.o := -include $(src)/tests/charlcd_kfuzz.c
-endif
+The problem with the above, though, is that the temporary stack
+variable goes out of scope when the constructor function returns. So
+probably better to do something like
 
-Alternatively, if the file in tests/ always has the same name
-as the source file but with "_kfuzz.c" suffix, consider amending
-scripts/Makefile.build to always include the "_kfuzz.c" file
-if it exists and CONFIG_KFUZZTEST=y, thus avoiding the need
-to amend all the individual Makefiles in the tree.
+DEFINE_LOCK_GUARD_1(simd,
+                    struct user_fpsimd_state,
+                    __kernel_neon_begin(_T->lock),
+                    __kernel_neon_end(_T->lock));
 
-Thanks,
+#define scoped_simd() scoped_guard(simd, &(struct user_fpsimd_state){})
 
-Lukas
+leaving the possibility for callers to use scoped_guard() directly and
+pass their own user_fpsimd_state pointer.
+
+We'd need to add some debug checks in __kernel_neon_end() to ensure
+that the provided pointer matches the one that was passed to
+__kernel_neon_begin().
