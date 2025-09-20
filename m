@@ -1,91 +1,134 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C4129BDB3;
-	Sat, 20 Sep 2025 12:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A722FD1B2
+	for <linux-crypto@vger.kernel.org>; Sat, 20 Sep 2025 12:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758370120; cv=none; b=iBM42WgTMV6c5LTMOciSjdvqz1hjtKKsnLfj0eRdVE5fmyZhJ5YVzmrhWLrat9yjkWtryI/2fsPKsWARTowShgsOAQZJ52jC1kVRyck/H7YYJ2uf4oksQDUsLWnBtlyfebGc+dmPvMycJKVxuwnJDTh43DXBewZQXhgPh9FyULI=
+	t=1758370123; cv=none; b=i6sGPbjhfUvz4To8Nr3A5OD6m2aLKnG+A6EI5NzTZP5p9FzXSYkn6ZYQlLMLqW7V5/1yp8sEdmYFcriOKgWkslNsha642DES7mmDlFYJn1tyh6lyL0R3VIkcvrw2b4sjDDA+RbQyvK1S/TFPxiPxrC5m+bXMbcZKduC27NbbCQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758370120; c=relaxed/simple;
-	bh=BMbFsKqtbXZvX5VHkoWRt6rCqXiT1zR7r9GPs5T1aYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=avWHln9jaJVwYYrReR5hxLYNjjV8b6JUCuiG/rHo7gVyd0qX08yqpD/gw52Izq0zbESBVNRL45cxqVmy1x3FWcX2H19vAwe7qhua6npOKDaBk+0gInLZkDoBTkU+CuewFILxQlwsOU4NDd11EfI+Fn+tyAIbE1z9qASpCrxD7zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZZJR+96o; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1758370123; c=relaxed/simple;
+	bh=+75owp6BZWWn6qzgOUeJYK1AlGCtYCoTHjw8eiK6KJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DSYlSwliszxSTe8gK0SoRsTN164ACnV59W+3oJnasJGghdker0ewEDRw897PZgbcPvqcyktDa2wb/NMSxo7QKPgxgNYWKrnkrlX9K8jpYCKnJqLgGOE+5x5lrEh517NM0SjZJerYjsyo7WEkffbHJcOLvMyPWia2OS0DXj21sX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tVSGdpXR; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZZJR+96o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
-	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=XZbzbXcTQ8HlsTfTlOlwfeJt68vbv0iJz3LYo+9CXQ8=; b=ZZJR+96oh9GLkXt6zdmkPqg0UX
-	Un43OzXK+NHjii7R1nc2vq/kqG3HEzuQLETLsSB2scgaAWkBt4tk6eFL8lD8RH382EKsKvNwRBSgl
-	sb5o86v1IWBcvCyOxuUI3K+lFWkm+u2zmjX6CZ4sAYydNg/wvYLHFx5SRGaDR+Wm/gibakkJIbibF
-	DAdeIiPJ+ZIZG5Jv6d8C9r2WI+N39Q9J5jUU+NI6PPKn4PqNLDjGJZUfXeVNGYn/LlixXtpqKzoL+
-	QV4w9uBZkCdaqtnl787oPZONBncukeK3nKQO+Q2Y1qHF0HKkE+6Gwf+TvM/hUyTm4cIOXnrkt9pwz
-	e0zrchzA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uzwO4-006zyo-0Q;
-	Sat, 20 Sep 2025 20:08:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Sep 2025 20:08:20 +0800
-Date: Sat, 20 Sep 2025 20:08:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] crypto: ti: Add support for AES-XTS in DTHEv2
- driver
-Message-ID: <aM6ZNMR0CtDj01Iu@gondor.apana.org.au>
-References: <20250910100742.3747614-1-t-pratham@ti.com>
- <20250910100742.3747614-2-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tVSGdpXR"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-796fe71deecso22341096d6.1
+        for <linux-crypto@vger.kernel.org>; Sat, 20 Sep 2025 05:08:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758370120; x=1758974920; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rg0aAAaEFwb8WUGfzZYLj8KGkf4Q3J2CuRbPLZDHdFI=;
+        b=tVSGdpXRZH8lfkU7KGdh4r039dOHQafqSRc2hBddNTss500mSXaNCsx8+nBbMIP5XY
+         XPDjPvomVS4hCk5+1J8CCy9K0qEt7qJIKKG9NNSDSumrJRN6W+kHPfqqX1brMRV3p55W
+         r0DqJ8Ql7nBhekb0dJBwbUCOE1cjyLLZ64ymMXDmrzuh6Ql7EDrjmNurIN++ZgK13nQ8
+         5b+0TFXY+6ZzdAo82krbCJyaPLnTssUHoJhNNjlrSYQ4+1RgbHvpzbicU6Osk4ghhf/j
+         tItJ3QnO85yEUfkbf3WHO8BmXMoIURaQucu53UKgWF+PUcwbc2LKb6mhIBcgchPKb8QD
+         5gzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758370120; x=1758974920;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rg0aAAaEFwb8WUGfzZYLj8KGkf4Q3J2CuRbPLZDHdFI=;
+        b=kJOklt0ZrvelJMVh6kPj16TUlSv8cvWlW0oNMefQtvHDEQ5skN3owlQEW30zpTkPYH
+         dDCP9J9XESyXSMzt0kTeua9jI+45FPkR3Jfr5CIewaKRJpAR7vO5qHaXuwVZ2Ovy0pVw
+         aIVAEOsrc5t7zq3hC3tyN9EKpJLGXlCS4Rf7PhIZe0sNCncRmgPUWYtmNz/tmoBB/fFV
+         qtJmDU9tyM93p2EKDgr3XGJ5baSyarhL4OUvEdme+bjxjU5W0PLzZSIeaZ7lx9pz5vFX
+         H4i8ZQe8L67BySV733fqEAS9J1NRyUfud9ltAC0cnGBb1kxC8byQridwJGF4uIrVf7Se
+         qJbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWWGHvR1uRVS0wvc7+NGCsZ987oaf1mlumTTWHet0G6RUA0L05GSe5qFRynWtPZqfMPBWMVmooWTL/FLtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyliZF6AHEBWQfsfvAxexjIeQYto4DnSIMe2dw389npEy+gxv5W
+	laanIP7wb/ZXr0UjiunF0qicMzkSASQ7UL7mr4RFam2ApnaRLybiD059kVyJy+xx9Aft/UUjoPr
+	1PnZUDVFdgiJlR1ipSVvfYdXo0/mPSYVpZsGpWtOR
+X-Gm-Gg: ASbGncstYWuUCqqNDuMFxYjRPyebNFNX0pE+YQj4ZkAAZgWOg/eIRbmJgxhO2iFfwNW
+	8PV70whdHWemOzB5CBxBN/D11fS7RKr5eY5Djix0OAlv5BFwwV51KzilJM/f8QgVjM70KXrIjm3
+	Ch7e+D1YwOfIvhypQXAKch5nu9UrdY4YeRJVrFcPlxZub+IU9oO1+u/zVnbpidtGfgDAV5ETVXv
+	T2XTDQZxGBvxcgjgEyEc1Fdl2aijMEUlIjVfA==
+X-Google-Smtp-Source: AGHT+IGrLhGnLin4JPn3IEJL16TDaAaIyPUzt4DPnDcGALtByT5b0deWvFSW43f3QYgleVc8ho2F2zEcC/AGvOdoPJI=
+X-Received: by 2002:a05:6214:5712:b0:7b0:d5a0:c60d with SMTP id
+ 6a1803df08f44-7b0d5a0c6c5mr11507116d6.10.1758370120098; Sat, 20 Sep 2025
+ 05:08:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250910100742.3747614-2-t-pratham@ti.com>
+References: <20250919145750.3448393-1-ethan.w.s.graham@gmail.com>
+ <20250919145750.3448393-9-ethan.w.s.graham@gmail.com> <CAHp75VdyZudJkskL0E9DEzYXgFeUwCBEwXEVUMuKSx0R9NUxmQ@mail.gmail.com>
+In-Reply-To: <CAHp75VdyZudJkskL0E9DEzYXgFeUwCBEwXEVUMuKSx0R9NUxmQ@mail.gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Sat, 20 Sep 2025 14:08:01 +0200
+X-Gm-Features: AS18NWBVqpbu6_S8igqrpC6d_4rlaGzIrca9Y3paJY9H7AfaiH53k8LL1oZq4JA
+Message-ID: <CAG_fn=XTcPrsgxg+MpFqnj9t2OoYa=SF1ts8odHFaMqD+YpZ_w@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] drivers/auxdisplay: add a KFuzzTest for parse_xy()
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Ethan Graham <ethan.w.s.graham@gmail.com>, ethangraham@google.com, 
+	andreyknvl@gmail.com, andy@kernel.org, brauner@kernel.org, 
+	brendan.higgins@linux.dev, davem@davemloft.net, davidgow@google.com, 
+	dhowells@redhat.com, dvyukov@google.com, elver@google.com, 
+	herbert@gondor.apana.org.au, ignat@cloudflare.com, jack@suse.cz, 
+	jannh@google.com, johannes@sipsolutions.net, kasan-dev@googlegroups.com, 
+	kees@kernel.org, kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lukas@wunner.de, 
+	rmoar@google.com, shuah@kernel.org, sj@kernel.org, tarasmadan@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 02:46:53PM +0530, T Pratham wrote:
+On Sat, Sep 20, 2025 at 12:54=E2=80=AFPM Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
 >
-> @@ -397,7 +446,29 @@ static struct skcipher_engine_alg cipher_algs[] = {
->  			.cra_module		= THIS_MODULE,
->  		},
->  		.op.do_one_request = dthe_aes_run,
-> -	} /* CBC AES */
-> +	}, /* CBC AES */
-> +	{
-> +		.base.init			= dthe_cipher_init_tfm,
-> +		.base.setkey			= dthe_aes_xts_setkey,
-> +		.base.encrypt			= dthe_aes_encrypt,
-> +		.base.decrypt			= dthe_aes_decrypt,
-> +		.base.min_keysize		= AES_MIN_KEY_SIZE * 2,
-> +		.base.max_keysize		= AES_MAX_KEY_SIZE * 2,
-> +		.base.ivsize			= AES_IV_SIZE,
-> +		.base.base = {
-> +			.cra_name		= "xts(aes)",
-> +			.cra_driver_name	= "xts-aes-dthev2",
-> +			.cra_priority		= 299,
-> +			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
-> +						  CRYPTO_ALG_KERN_DRIVER_ONLY,
+> On Fri, Sep 19, 2025 at 5:58=E2=80=AFPM Ethan Graham <ethan.w.s.graham@gm=
+ail.com> wrote:
+> >
+> > From: Ethan Graham <ethangraham@google.com>
+> >
+> > Add a KFuzzTest fuzzer for the parse_xy() function, located in a new
+> > file under /drivers/auxdisplay/tests.
+> >
+> > To validate the correctness and effectiveness of this KFuzzTest target,
+> > a bug was injected into parse_xy() like so:
+> >
+> > drivers/auxdisplay/charlcd.c:179
+> > - s =3D p;
+> > + s =3D p + 1;
+> >
+> > Although a simple off-by-one bug, it requires a specific input sequence
+> > in order to trigger it, thus demonstrating the power of pairing
+> > KFuzzTest with a coverage-guided fuzzer like syzkaller.
+>
+> ...
+>
+> > --- a/drivers/auxdisplay/charlcd.c
+> > +++ b/drivers/auxdisplay/charlcd.c
+> > @@ -682,3 +682,11 @@ EXPORT_SYMBOL_GPL(charlcd_unregister);
+> >
+> >  MODULE_DESCRIPTION("Character LCD core support");
+> >  MODULE_LICENSE("GPL");
+> > +
+> > +/*
+> > + * When CONFIG_KFUZZTEST is enabled, we include this _kfuzz.c file to =
+ensure
+> > + * that KFuzzTest targets are built.
+> > + */
+> > +#ifdef CONFIG_KFUZZTEST
+> > +#include "tests/charlcd_kfuzz.c"
+> > +#endif /* CONFIG_KFUZZTEST */
+>
+> No, NAK. We don't want to see these in each and every module. Please,
+> make sure that nothing, except maybe Kconfig, is modified in this
+> folder (yet, you may add a _separate_ test module, as you already have
+> done in this patch).
 
-I think it's missing CRYPTO_ALG_ASYNC.
-
-The existing algorithms seem to be missing this bit too so we
-should fix that first.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+This is one of the cases in which we can't go without changing the
+original code, because parse_xy() is a static function.
+Including the test into the source is not the only option, we could as
+well make the function visible unconditionally, or introduce a macro
+similar to VISIBLE_IF_KUNIT.
+Do you prefer any of those?
