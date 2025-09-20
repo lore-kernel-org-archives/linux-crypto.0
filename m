@@ -1,49 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA72E2D4B68;
-	Sat, 20 Sep 2025 12:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B76202F9C;
+	Sat, 20 Sep 2025 12:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758371086; cv=none; b=XxeLGfnxs+lTtWFu5bS5VTp8FxUeB8RbvyFJOW2yAkRq8a0E8GlapXXSZ3XPpZHECWtM+atxKBs7ibCnr43xP7LHKhk149BcfDgPb4GRZiJmOPxwEMsVKxrdusgePKhCnWnRFJrsmV1JP5/8mq6H7Db4qsErZue4b0aHKUwdtgc=
+	t=1758371112; cv=none; b=MnxdP0Kksx8FWQcw/yaJ2WJfLq50uvrjUw6V+OeTlfcOnDPxGVl5+HLyV/CCcmBYj0mdb+mhxguD/iSFMVSdDJAcwOi4lOzt3ub6r4lX1ny4MvdJ4saUUZ3yHaGsYmWpy60ywI3eOZINZ02/8CmoVsgG7YkHAySgEcPij00uolM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758371086; c=relaxed/simple;
-	bh=QkGs3CcTduaVBCAdGEn7X/UZDrvPjIp9c1P80mHRQUM=;
+	s=arc-20240116; t=1758371112; c=relaxed/simple;
+	bh=wdYw+weSYwRc8GCnloSSYi6S8/EAmnYHcBMM7HvjvBc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ag4O26fG0V81ud+WgJwlsfd3z+qp0hRGYucL7d8VPuNmarpZcxkFwln0Salgq2qS0VLaCz6jVSu/dkSkJpKZpsfi0uCfueWp7XsNzvIT51A07e3L3/IKCBE7GB5ck0u7JyJvd5qMnwX0czbWveWR7Ii65Lbb3RnoYE3lPCsMgB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mlutS17W; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTQsiLsQ3IPgQDz4Yf/vMIgmGoC2DpbA9HoqrLIFrj8De0gCeVqVj1NroEzHwlZLBJ9ENw0e99EZiFErYpWEnTONNVddWIX91ba1ZUuvs7S9AVuSWFEbP5GqPpbZHX5btf5fol/XDhdRpMWlz8QjI4k521i83osdud5FD0xE/Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=oFJWCq1r; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mlutS17W"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="oFJWCq1r"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
 	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=Gihya9xP0fAcqsxzSzES+1BCfKN/8rEUF3BTdeplS64=; b=mlutS17W7yGIqhdfi1idO6nGob
-	czgsUB/fZ/9YSk0UXQNqq2kkv6rrIBIbqoFGHs5FsN70xtSIbNBx4wpbkLK34OGTcxKdk39f2ZHt4
-	I/YFgc7KbUiJquNnJ5TO2teOt+hJGjAlDyvf6/0hKgQ0ES451eXDCw1/EfS5KQgz9/YGtocmNPrH2
-	7Dy+NDITl0wVWEzhBdtLULqvyBoJ8WFuHOGxm5rccB0mMeydzP1ERdViZeOIcUcmsNniDLdG7Oue7
-	3QRyu6ikDglunhBZt8ewIthuWYaULvRwph5QTKoTRhkpph1kXabfGyYmg/fiZSK4VwW/DwqHeWn4N
-	q2b9FAyA==;
+	bh=emOSg4qOkAZK/ThP32lyxaA3dTscAQ+11iobepnGoag=; b=oFJWCq1r4XRvXEBzsv83pJkvhi
+	8iuQgfo4IObHidobdri6p3cSx1JkJB3FblrMmXbMw8TTouZNho0EfMXtThe6O0k+pFcCq9ML0oh5c
+	gBPZ+8BFiZurqEEyz8aSW6lS1TphsiGj5WVKmGtoHDklydGnXXPqQBW/o+3duAdY64Lea/RzNEpCG
+	FfCQmali8jPm+es3/1XYXLBtWvbeTQmtrcJXXouXJcXGUYzwfn71zWOQHek04myhPL4UHq4luarKt
+	XF/tue98jaMShwa2S+E/rxcL3hocqWElCELldOT2mPsnLmzmbx7Y2uTajCvuy/e+dsNgU81d+eg1J
+	x5nOCB8A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uzwdc-00704n-0p;
-	Sat, 20 Sep 2025 20:24:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Sep 2025 20:24:24 +0800
-Date: Sat, 20 Sep 2025 20:24:24 +0800
+	id 1uzweH-00705P-0A;
+	Sat, 20 Sep 2025 20:25:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Sep 2025 20:25:05 +0800
+Date: Sat, 20 Sep 2025 20:25:05 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: stable@vger.kernel.org, Neal Liu <neal_liu@aspeedtech.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Johnny Huang <johnny_huang@aspeedtech.com>,
-	Dhananjay Phadke <dphadke@linux.microsoft.com>,
-	linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: aspeed - Fix dma_unmap_sg() direction
-Message-ID: <aM6c-LsUNPN3CJ3m@gondor.apana.org.au>
-References: <20250910082232.16723-3-fourier.thomas@gmail.com>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxarm@openeuler.org,
+	fanghao11@huawei.com, liulongfang@huawei.com, qianweili@huawei.com,
+	wangzhou1@hisilicon.com
+Subject: Re: [PATCH 0/5] crypto: hisilicon/qm - fix several minor issues
+Message-ID: <aM6dIVLO9PQcZT1v@gondor.apana.org.au>
+References: <20250913105754.3862444-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,24 +48,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250910082232.16723-3-fourier.thomas@gmail.com>
+In-Reply-To: <20250913105754.3862444-1-huangchenghai2@huawei.com>
 
-On Wed, Sep 10, 2025 at 10:22:31AM +0200, Thomas Fourier wrote:
-> It seems like everywhere in this file, when the request is not
-> bidirectionala, req->src is mapped with DMA_TO_DEVICE and req->dst is
-> mapped with DMA_FROM_DEVICE.
+On Sat, Sep 13, 2025 at 06:57:49PM +0800, Chenghai Huang wrote:
+> These patches fix several minor issues:
+> 1. Address the issue of device accessing invalid addresses
+> caused by the concurrency between device reset and business operations.
+> 2.Clear all VF configurations when disabling SR-IOV.
+> 3.Set the address to NULL after freeing the memory of
+> qm->debug.qm_diff_regs.
 > 
-> Fixes: 62f58b1637b7 ("crypto: aspeed - add HACE crypto driver")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-> ---
-> v1->v2:
->   - fix confusion between dst and src in commit message 
+> Chenghai Huang (1):
+>   crypto: hisilicon/qm - set NULL to qm->debug.qm_diff_regs
 > 
->  drivers/crypto/aspeed/aspeed-hace-crypto.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Weili Qian (4):
+>   crypto: hisilicon/qm - invalidate queues in use
+>   crypto: hisilicon/qm - mask axi error before memory init
+>   crypto: hisilicon - enable error reporting again
+>   crypto: hisilicon/qm - clear all VF configurations in the hardware
+> 
+>  drivers/crypto/hisilicon/debugfs.c        |   1 +
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 111 ++++++++++++-----
+>  drivers/crypto/hisilicon/qm.c             | 144 +++++++++++++++-------
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 101 ++++++++++-----
+>  drivers/crypto/hisilicon/zip/dae_main.c   |   8 ++
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 113 ++++++++++++-----
+>  include/linux/hisi_acc_qm.h               |  21 ++--
+>  7 files changed, 351 insertions(+), 148 deletions(-)
+> 
+> -- 
+> 2.43.0
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
