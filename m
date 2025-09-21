@@ -1,162 +1,128 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mout-y-111.mailbox.org (mout-y-111.mailbox.org [91.198.250.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F675155A30;
-	Sat, 20 Sep 2025 19:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1EF1F91F6;
+	Sun, 21 Sep 2025 16:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758394915; cv=none; b=ln9QJT/6TpvSOGI4duy054yLHU/oUd7ml2BObRCip9i5RHcP/OeGdLAAEAWJNMA+Q51GQ4E5d5PgnLy0HkpJdupNU11dyY2PrILdNf7a0V9woKOWnQ3TG3LtLrjpEOFx5pL4ekbExti5oG2FmU763s8EyNfgRaSMqFgfyhyACxI=
+	t=1758471121; cv=none; b=BggxXyXW1qMHYigwqkmJ8GwtuLSVyhHWLBDK4s4dRU4b+c0+V9gRcGHh0j6q1NCac64vV+cRPX/lQtLP1OB6o6e4INFLgC2MmRf7HE3XE+xGPC0nVIH5gZRhoRDrRCCahfR+UW9m0P5+pLCRb59wzenbLTObsyuwZW20+xCTuqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758394915; c=relaxed/simple;
-	bh=Oi9uFHOC+EyFwNjYQ2z2reLYKzdC5PW8spF29329K9U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aVkPcuJUg5A4QESPJzIQmb1s2EqHvjfPXzrUrRrUgqRfQ8Rof2I5He2c2vcKA/+YlgewrcLedPqtWCaw+3v8ZSd+XMJ6xxJlrpsvs+y/gBBD6zCFwvT33htq2xyrFCacGpzGHIPLofwzYv/wTtLHXZSXrbgg3eS7Gcj/sZ/kIv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pmWN3CMw; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1758471121; c=relaxed/simple;
+	bh=IVrEBq93I57sHkKBpKzLJwIv8WpcngwvrIe6Ij19Yw0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pvnxHsoBNb/yEo4NU0HKlB07A4EntUZH9hjiVxPRVyHIbBGTNbk3X7mibcjcGzW0/dfcSVYCOYd/78/yTQz2ajeNT2Ag3Cd7jTwHjCiXPvEXHoAuW5W2bg8wnY2wV31HrZpRF7zL0kHG5osV4UD/iyWI+Qfpu7IYOHPNKPZLHig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io; spf=pass smtp.mailfrom=kael-k.io; dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b=J/Gsn4i9; arc=none smtp.client-ip=91.198.250.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kael-k.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pmWN3CMw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=qRmfWcEq5xdIro+zPdjnGoFjaSaIDh/SGmjBoh3LDdw=; b=pmWN3CMwPj6bPkoop1JDSfpxdj
-	iCigGptilDQ76x1lWHSeKYDySYusmGO1blKLugrUnV+IqU8EeEhYygmNpgqhtord45JWW/grqNm4f
-	ca00iAH52/mjKGQ1qXKtKU0zrzlm8kLCanD4jJ98FI+SMZCEvkgcpn1BWzNb1nDrsLsPBXWJSzV0N
-	i+qYOLfXx6MmutY5drg8ZN0YFN0AXq/FSf1PYeFg9wMiWpKb25iB2juknj9eeo4yRJiebEbD1B7UX
-	X5zKsx/YkvuG6MYNM0TqHixOdjV4I0zkeRkgBEnxPFlJNYZ3frthZa2p3pjxLEJYdmRekM/w0Kj3Y
-	98YF5Mdg==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v02qB-00000005mNq-26KP;
-	Sat, 20 Sep 2025 19:01:47 +0000
-Message-ID: <72f5bbdf-2054-42a9-a9bd-aec3ebefc71e@infradead.org>
-Date: Sat, 20 Sep 2025 12:01:46 -0700
+	dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b="J/Gsn4i9"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-y-111.mailbox.org (Postfix) with ESMTPS id 4cVB8360TKz9y0k;
+	Sun, 21 Sep 2025 18:11:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kael-k.io; s=MBO0001;
+	t=1758471107;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=e32bgj/ZkouP/y1c9EuzQEy6snPVu+L7GnJFnUo6h6M=;
+	b=J/Gsn4i9EMikkA05Zg9B9/f/8G8vBgiNgKQikWmuqA06PXvbVMEA/CBFm3jJbbB9sr0mSU
+	g4MXgskV/WHiD0zKWJYKuCfHXOLPidPBRyie5JCRn1SH4Mh2DWnoWU7Olvvw27l0aC9n0E
+	WGN9D2anilpplvVbGb2wOibrpoQ3raLSiNE0ZCDVw2ie4FaHM06VnmljEvv3rV9mztHp0C
+	x5X5pvvwliE8QiKKP6BaQPZ28IpPf4mIxWpMYIlB6WXa2eXrq4lJaal0Q/W/V621rmOWBL
+	R7KcqyenGuwg+J6iu3Y4hXn/i5XIUGBMiPT7TX/qZKBhbZX1NhkkfmkXDZQU2g==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of dev@kael-k.io designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=dev@kael-k.io
+From: Kael D'Alcamo <dev@kael-k.io>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] dt-bindings: rng: hisi-rng: convert to DT schema
+Date: Sun, 21 Sep 2025 18:11:34 +0200
+Message-ID: <20250921161139.99047-1-dev@kael-k.io>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: Add explicit title heading to API docs
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Linux Crypto <linux-crypto@vger.kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>
-References: <20250920001650.10474-2-bagasdotme@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250920001650.10474-2-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4cVB8360TKz9y0k
 
+Convert the Devicetree binding documentation for hisilicon,hip04-rng
+and hisilicon,hip05-rng from plain text to YAML.
 
+Signed-off-by: Kael D'Alcamo <dev@kael-k.io>
+---
+ .../devicetree/bindings/rng/hisi-rng.txt      | 12 -------
+ .../devicetree/bindings/rng/hisi-rng.yaml     | 32 +++++++++++++++++++
+ 2 files changed, 32 insertions(+), 12 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.yaml
 
-On 9/19/25 5:16 PM, Bagas Sanjaya wrote:
-> Documentation for crypto programming interfaces lack explicit title.
-> As such, all its sections become entries in the toctree index.
-> 
-> Add the title heading to tidy up toctree.
-
-Yes, much neater. Thanks.
-
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->  Documentation/crypto/api-aead.rst     | 3 +++
->  Documentation/crypto/api-akcipher.rst | 3 +++
->  Documentation/crypto/api-digest.rst   | 3 +++
->  Documentation/crypto/api-kpp.rst      | 3 +++
->  Documentation/crypto/api-rng.rst      | 3 +++
->  Documentation/crypto/api-sig.rst      | 3 +++
->  Documentation/crypto/api-skcipher.rst | 3 +++
->  7 files changed, 21 insertions(+)
-> 
-> diff --git a/Documentation/crypto/api-aead.rst b/Documentation/crypto/api-aead.rst
-> index d15256f1ae3696..78d073319f96a3 100644
-> --- a/Documentation/crypto/api-aead.rst
-> +++ b/Documentation/crypto/api-aead.rst
-> @@ -1,3 +1,6 @@
-> +Authenticated Encryption With Associated Data (AEAD)
-> +====================================================
-> +
->  Authenticated Encryption With Associated Data (AEAD) Algorithm Definitions
->  --------------------------------------------------------------------------
->  
-> diff --git a/Documentation/crypto/api-akcipher.rst b/Documentation/crypto/api-akcipher.rst
-> index ca1ecdd4a7d378..a31f5aef76678f 100644
-> --- a/Documentation/crypto/api-akcipher.rst
-> +++ b/Documentation/crypto/api-akcipher.rst
-> @@ -1,3 +1,6 @@
-> +Asymmetric Cipher
-> +=================
-> +
->  Asymmetric Cipher Algorithm Definitions
->  ---------------------------------------
->  
-> diff --git a/Documentation/crypto/api-digest.rst b/Documentation/crypto/api-digest.rst
-> index 7a1e670d6ce1a4..02a2bcc26a6470 100644
-> --- a/Documentation/crypto/api-digest.rst
-> +++ b/Documentation/crypto/api-digest.rst
-> @@ -1,3 +1,6 @@
-> +Message Digest
-> +==============
-> +
->  Message Digest Algorithm Definitions
->  ------------------------------------
->  
-> diff --git a/Documentation/crypto/api-kpp.rst b/Documentation/crypto/api-kpp.rst
-> index 7d86ab906bdf79..5794e2d10c9562 100644
-> --- a/Documentation/crypto/api-kpp.rst
-> +++ b/Documentation/crypto/api-kpp.rst
-> @@ -1,3 +1,6 @@
-> +Key-agreement Protocol Primitives (KPP)
-> +=======================================
-> +
->  Key-agreement Protocol Primitives (KPP) Cipher Algorithm Definitions
->  --------------------------------------------------------------------
->  
-> diff --git a/Documentation/crypto/api-rng.rst b/Documentation/crypto/api-rng.rst
-> index 10ba7436cee48e..23a94c0b272eef 100644
-> --- a/Documentation/crypto/api-rng.rst
-> +++ b/Documentation/crypto/api-rng.rst
-> @@ -1,3 +1,6 @@
-> +Random Number Generator (RNG)
-> +=============================
-> +
->  Random Number Algorithm Definitions
->  -----------------------------------
->  
-> diff --git a/Documentation/crypto/api-sig.rst b/Documentation/crypto/api-sig.rst
-> index aaec18e26d545f..4d8aba8aee8e04 100644
-> --- a/Documentation/crypto/api-sig.rst
-> +++ b/Documentation/crypto/api-sig.rst
-> @@ -1,3 +1,6 @@
-> +Asymmetric Signature
-> +====================
-> +
->  Asymmetric Signature Algorithm Definitions
->  ------------------------------------------
->  
-> diff --git a/Documentation/crypto/api-skcipher.rst b/Documentation/crypto/api-skcipher.rst
-> index 04d6cc5357c810..4b7c8160790a3c 100644
-> --- a/Documentation/crypto/api-skcipher.rst
-> +++ b/Documentation/crypto/api-skcipher.rst
-> @@ -1,3 +1,6 @@
-> +Symmetric Key Cipher
-> +====================
-> +
->  Block Cipher Algorithm Definitions
->  ----------------------------------
->  
-> 
-> base-commit: 381e8ee368234a51b3a4f231f6f24ff0b09d9f9e
-
+diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+deleted file mode 100644
+index d04d55a6c2f5..000000000000
+--- a/Documentation/devicetree/bindings/rng/hisi-rng.txt
++++ /dev/null
+@@ -1,12 +0,0 @@
+-Hisilicon Random Number Generator
+-
+-Required properties:
+-- compatible : Should be "hisilicon,hip04-rng" or "hisilicon,hip05-rng"
+-- reg : Offset and length of the register set of this block
+-
+-Example:
+-
+-rng@d1010000 {
+-	compatible = "hisilicon,hip05-rng";
+-	reg = <0xd1010000 0x100>;
+-};
+diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.yaml b/Documentation/devicetree/bindings/rng/hisi-rng.yaml
+new file mode 100644
+index 000000000000..5406b2596f42
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/hisi-rng.yaml
+@@ -0,0 +1,32 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/hisi-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Hisilicon Random Number Generator
++
++maintainers:
++  - Kefeng Wang <wangkefeng.wang@huawei>
++
++properties:
++  compatible:
++    enum:
++      - hisilicon,hip04-rng
++      - hisilicon,hip05-rng
++
++  reg:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    rng@d1010000 {
++      compatible = "hisilicon,hip05-rng";
++      reg = <0xd1010000 0x100>;
++    };
 -- 
-~Randy
+2.51.0
+
