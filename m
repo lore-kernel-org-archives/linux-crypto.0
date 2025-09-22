@@ -1,115 +1,99 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D532E22BA
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 15:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBC931329B;
+	Mon, 22 Sep 2025 17:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758556428; cv=none; b=rYxzXFHNzaIdONKXIif7HlBhrD25J07J2ad/BGvtykWqxsDvPBWV8YJp/ZNUFiFklQTvW5/MqxRiUz9DlNK4K6S4BMMoigAj8ySX8DdCWN5g5ML2fZa1NzaCGxgXF2+je7kF9rxDm2wHGbuhIyTvugdmjbsvVxet+AdM1a+LKLI=
+	t=1758561108; cv=none; b=twFB3jIehBJALsA6EwPBl5OKqG3DoJD8+K5H2bwT5WAvPwMIZqTRSgmEWUYb05uRDZL4KCvseMz58ZYIrcVXTUyrLKOlmHWyERDncnk9zY+AMqn74j4YCPQewC9H98q43M9DLVbaCdI2FttKKS7vCpjPLF6NHAizSq3xB8hEfIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758556428; c=relaxed/simple;
-	bh=xmpykvsefbZg4Z3d0+EhES58b/1383121uJSOrYR/s8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dy4lv32tlhVDZLgJl+7GZNwv/Hs18fseu8poZnmUwl63nNk9WY5LMhke2FIizfwj21y34PpcRfadfeZ2k1imW3+zDArdJagTYMV5ltbQ1vyc3gn1QXxAPsZB0h+gSOquJkC9aSKg3MnTp9W4DO+IsrOSAPxbwCJnL2bR5pw1rkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iL+zgoWg; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iL+zgoWg"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-26e68904f0eso24596105ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 08:53:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758556426; x=1759161226; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q61xyED0iZHvT227a823myA5nC6Bd8yB77AGxFVjBQs=;
-        b=iL+zgoWgN6zTX8jArXdOFpzYAiiPU2CQfKhPcEMUtVmH+8xWKGs+ftHIwq+TdcKHmm
-         SCDeaBxoGfR6RIcEH5uHXTCS/Z6awE65ZDx/3LFgkKma0FNLQxT2SttGujckCvEwO/3c
-         BsxGaqNdl0d6MTzEd10JHCfNbGgoJCZOh5a6ySYjfmMmH8KxNJYyZK1BepWjIEkeypZx
-         kHczk+rfU5kmvgdOPu6IbuSdC+hunG+nuQ5RIn5TCzKZH1Qo9PHzM9zCyzngtT+MuVvs
-         Fq1inofVb42mIPmqPKW2FEEcRKSl56ee8xUYoBfjNx0YJzJzZsSma9f2HkhpXdUx9/RP
-         KciA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758556426; x=1759161226;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q61xyED0iZHvT227a823myA5nC6Bd8yB77AGxFVjBQs=;
-        b=QudVBYhllvpdsBacstLPpO+2pV51Pu8ABehFaqXnFRODmL7dDSVExTnXW1J2EbSqFC
-         hPisgFX3ZuT6+rKBWdHdFmH8SiSHhxJNDrV/Ftp8pi3goqtVtZum6GPDk9Gj/qiPXzLM
-         vDCHtJzvCkdZ9EZB/XnTe/sQ+UVDwwza9XKSiWAwsvOfNDPWCn0lqVpvJyD9nrXnJPLo
-         sT+eX+9G1mu+H0Jnvv/XWNKk6AWUBQ990bFznOThGgEgCCLco1ZA0NiBNc7kj+BAFtM9
-         lfrBWIXLzKbCC4yja2YmNzeHbCg4NDauXE5Oh1ClbR7PMzgpAsyAQ0yXssyu/Ml9WuvE
-         3bjA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6xRNTWLLDM8Q0Zl9lUCGLeI950U6fwLi9qXFkAbO8dez4Zpm2iKr/UHaJIz1ahq8V2PVQ3XIlY1BNxGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTLLSH3ndys01ZAMhgRUjh17kWYcPAFmxP7i4edT5RRLchF7sz
-	qHU9DNzsp8mIQQwXKlc22J4qE4NfFLT47mcw6Su+9xVU6jmZzvBfa3zp
-X-Gm-Gg: ASbGnctchez/77C0nhQjoajV0YfQaJowvggI489xvZSmlcpzxmHgvluqv2ITCC8y9Ha
-	59BFMiv6AxXxrbBbY+eSQoPCBBKK/cqeE94JMmO/9VWpE3Loy7WScL4MW0wbCZ5+eetyP9LfsFH
-	wrFIyohEXRumZOZR+vDSSakf4uKuugTOFXtUKipooaXcwcJJVBIjLqcO8w9Qr+vevO54BIAobVf
-	GctMm9xsjDtTuUaXX6VAFyZirADiKVvt9YEzXhCLgXjaqin399YoCipgPfYHuG+mQ7US17Wxkim
-	cARghwa0rddjwqXvGVyA/pkLXQnuzf+lYHdtnHicoU3bi0jHpbZUWrcjywQX6fvzKDL5Ses9Uew
-	WT7oSM2bsB7lXiE4FhRjI3Wrl
-X-Google-Smtp-Source: AGHT+IGEGQomxsa7WNV0T03rhAK/xcvrrheXR+pMEm9N4EM2OSbc4zcfLSj+YjG8nGLLs8dfNA9reg==
-X-Received: by 2002:a17:902:cec4:b0:275:2328:5d3e with SMTP id d9443c01a7336-275232861e2mr82210535ad.18.1758556426155;
-        Mon, 22 Sep 2025 08:53:46 -0700 (PDT)
-Received: from lgs.. ([2408:8418:1100:9530:3d9f:679e:4ddb:a104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698016bf96sm133924265ad.38.2025.09.22.08.53.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 08:53:45 -0700 (PDT)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	s=arc-20240116; t=1758561108; c=relaxed/simple;
+	bh=Bj75Vx85XbPqZ/5PV/l+4NF+GOXzs9jU1MZVBigLThQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lqq+sE8Vf7Ji/nZiiTy/YK5AwSmKxusX9yo1gUc5P9RXaRmXYWzZySispIBv/q1nvfB7tRaKUAFpKcnAQWmLyhpnY9cbXNSsDnqwDIwsSRPwRlAdGOlDrR8ar8YWfHcxqQVX9WNUukmXdVqtfHK5nViGV9s4bFall77zuVlMTCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 11211227AAF; Mon, 22 Sep 2025 19:11:37 +0200 (CEST)
+Date: Mon, 22 Sep 2025 19:11:36 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Marco Elver <elver@google.com>
+Cc: Christoph Hellwig <hch@lst.de>, Nathan Chancellor <nathan@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
-	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-	Dan Douglass <dan.douglass@nxp.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
-Date: Mon, 22 Sep 2025 23:53:22 +0800
-Message-ID: <20250922155322.1825714-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
+	rcu@vger.kernel.org
+Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and
+ Locking-Analysis
+Message-ID: <20250922171136.GA12668@lst.de>
+References: <20250918140451.1289454-1-elver@google.com> <20250918141511.GA30263@lst.de> <20250918174555.GA3366400@ax162> <20250919140803.GA23745@lst.de> <20250919140954.GA24160@lst.de> <aNEX46WJh2IWhVUc@elver.google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aNEX46WJh2IWhVUc@elver.google.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-As kcalloc() may fail, check its return value to avoid a NULL pointer
-dereference when passing the buffer to rng->read().
+On Mon, Sep 22, 2025 at 11:33:23AM +0200, Marco Elver wrote:
+> I gave this a try, and with the below patch and the Clang fix [1],
+> fs/xfs compiles cleanly. I think the fundamental limitation are the
+> conditional locking wrappers. I suspect it's possible to do better than
+> disabling the analysis here, by overapproximating the lock set taken
+> (like you did elsewhere), so that at least the callers are checked, but
+> when I tried it showed lots of callers need annotating as well, so I
+> gave up at that point. Still, it might be better than no checking at
+> all.
 
-Fixes: 2be0d806e25e ("crypto: caam - add a test for the RNG")
-Cc: stable@vger.kernel.org
----
-changelog:
-v2:
-- Return -ENOMEM directly on allocation failure.
+I guess this at least allows us to work with the analysis, even if it 
+drops coverage for one of the most important locks.  I guess you also
+have CONFIG_XFS_QUOTA disabled as that would lead to similar warnings,
+and also currently has the lock the object on return if it's not a
+NULL return case?  I now have a local series to remove that instance,
+but I've seen that pattern elsewhere in the kernel code.
 
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
----
- drivers/crypto/caam/caamrng.c | 3 +++
- 1 file changed, 3 insertions(+)
+Besides the conditional locking these two also do another thing that
+is nasty to the analysis, the locked state can be attached to a
+transaction and unlocked at transaction commit.  Not sure how to best
+model that.
 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index b3d14a7f4dd1..357860ee532c 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -182,6 +182,9 @@ static inline void test_len(struct hwrng *rng, size_t len, bool wait)
- 
- 	buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
- 
-+	if (!buf) {
-+		return -ENOMEM;
-+	}
- 	while (len > 0) {
- 		read_len = rng->read(rng, buf, len, wait);
- 
--- 
-2.43.0
+> [1] https://github.com/llvm/llvm-project/pull/159921
+
+Thanks for all the work!
 
