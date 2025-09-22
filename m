@@ -1,81 +1,151 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571623128CC;
-	Mon, 22 Sep 2025 17:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFC831A072;
+	Mon, 22 Sep 2025 18:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758561153; cv=none; b=GWVPHH7VpwIc2YiAhlVwZOwXWas47UKl87CJYrbFeuaOXXGe0diwsruwprZ1wGimyz55hI/aZwXTisPIZ9E4sVJnMlclWYPJmJh7PYJZ3A4/R783SK3UKea7vBEKDyjEVGoXEQd0e/PyRWyutKdSpxl9BjfrPVps+jGddAp1Oh8=
+	t=1758566695; cv=none; b=jXHWa4SBzoqeimVEMts1fo+HI0d+deppSd0THFyKe9VaSaZPT+83EPOZT34z0badRPUrT9z9tclmMFJ1MTy37gv1cvqTDNt9K4ACkEzRGggr0zUReGl6pDz/bux0aOAEzNRKlgfHcbWQOFIp3FpaR14ISEHG7rgzNnMro1R4mQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758561153; c=relaxed/simple;
-	bh=8oIaUjkf1ZLoWcfViyJ+ASS1wRwmeYlliRHc+XNJKBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXa6gg4eHn8PBiaT9Far/1n6x9CEVirjcmqbOon8aQ5OWUiW6ySDlG2/dQh8rY3EbvQIF+sRfWM5pqWqfXJoEpYnVlxTziQPg+KI5aqWAvpm9UAaMAqAskJ3EJL1Msdz+slXwgBW3kovj+xGiiEA5c/aQYO9avgcUfQj2WKPxPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6B6BB227AAF; Mon, 22 Sep 2025 19:12:27 +0200 (CEST)
-Date: Mon, 22 Sep 2025 19:12:27 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Nathan Chancellor <nathan@kernel.org>,
-	Marco Elver <elver@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bill Wendling <morbo@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	s=arc-20240116; t=1758566695; c=relaxed/simple;
+	bh=nDihmTHN0i+Udss+eRUPYurGFwIdLxD8LvfaHe21yig=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KVRF89Ti7hIhIvfhpQFxtXfPbE/hMHGLw3WuAGAbXsfNGnPeuSSfNhl8kNqZY85p55laDT1Exq4EMzbgjlOZ+TWIRXHqzNSgOpQXFT0ztDYwPCxcHf31qLKxdLKTttMz0VGalET6w2r1cWF8Y+5zTlgyFQuZj0qw8DJ+G7S1BdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWYj8cuw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWYj8cuw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3A29C4CEF0;
+	Mon, 22 Sep 2025 18:44:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758566694;
+	bh=nDihmTHN0i+Udss+eRUPYurGFwIdLxD8LvfaHe21yig=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JWYj8cuwziAItxd6hvXp1sEsLX9ovM4ff61s/AxjQvDBOKHvx5XU+t07zoihLY2Hm
+	 EWMAGSKWQ6Eg0b1gCCNGZMCt1FTiDz3mQEGPXBYo7XX/Fs6I3295l9aU6MuHObzOkA
+	 7AyweoMw5kNCNmx27aMUiuQrlLFkJ20bCDl6T3/dm2S/uAu9VnGG3ioqgN4Qw7pDad
+	 EJQKtUCJxUZi7gNXeYyv1OXjYBqirLkKyFMz8UH5GwkKtc3i3fJl3P/q+OrtQiQVz6
+	 mdAC6A/KctKxaB1m0+/Nurn3rNLg5XPjjyHoDD9AzpvyV5w2dLxKq+Xs+hW1qWtYlO
+	 8/3G/U7Bov8eQ==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
-	rcu@vger.kernel.org
-Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and
- Locking-Analysis
-Message-ID: <20250922171227.GB12668@lst.de>
-References: <20250918140451.1289454-1-elver@google.com> <20250918141511.GA30263@lst.de> <20250918174555.GA3366400@ax162> <20250919140803.GA23745@lst.de> <a75f7b70-2b72-4bb0-a940-52835f290502@acm.org>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1.y 1/2] crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+Date: Mon, 22 Sep 2025 14:44:48 -0400
+Message-ID: <20250922184449.3864288-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <2025092107-making-cough-9671@gregkh>
+References: <2025092107-making-cough-9671@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a75f7b70-2b72-4bb0-a940-52835f290502@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 19, 2025 at 10:20:37AM -0700, Bart Van Assche wrote:
-> locking annotations to kernel code. I ended up annotating multiple XFS
-> functions with NO_THREAD_SAFETY_ANALYSIS. Maybe the locking patterns in
-> XFS are too complex for compile-time analysis?
+From: David Howells <dhowells@redhat.com>
 
-If our locking patterns are too complex for analysis, either the code or
-the analysis has problems that need addressing.  Potentially both.
+[ Upstream commit fb800fa4c1f5aee1238267252e88a7837e645c02 ]
+
+Convert af_alg_sendpage() to use sendmsg() with MSG_SPLICE_PAGES rather
+than directly splicing in the pages itself.
+
+This allows ->sendpage() to be replaced by something that can handle
+multiple multipage folios in a single transaction.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: netdev@vger.kernel.org
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/af_alg.c | 52 ++++++++-----------------------------------------
+ 1 file changed, 8 insertions(+), 44 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index fef69d2a6b183..303225c674558 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -988,53 +988,17 @@ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags)
+ {
+-	struct sock *sk = sock->sk;
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct af_alg_ctx *ctx = ask->private;
+-	struct af_alg_tsgl *sgl;
+-	int err = -EINVAL;
++	struct bio_vec bvec;
++	struct msghdr msg = {
++		.msg_flags = flags | MSG_SPLICE_PAGES,
++	};
+ 
+ 	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
+-
+-	lock_sock(sk);
+-	if (!ctx->more && ctx->used)
+-		goto unlock;
+-
+-	if (!size)
+-		goto done;
+-
+-	if (!af_alg_writable(sk)) {
+-		err = af_alg_wait_for_wmem(sk, flags);
+-		if (err)
+-			goto unlock;
+-	}
+-
+-	err = af_alg_alloc_tsgl(sk);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->merge = 0;
+-	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
+-
+-	if (sgl->cur)
+-		sg_unmark_end(sgl->sg + sgl->cur - 1);
+-
+-	sg_mark_end(sgl->sg + sgl->cur);
+-
+-	get_page(page);
+-	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
+-	sgl->cur++;
+-	ctx->used += size;
+-
+-done:
+-	ctx->more = flags & MSG_MORE;
+-
+-unlock:
+-	af_alg_data_wakeup(sk);
+-	release_sock(sk);
++		msg.msg_flags |= MSG_MORE;
+ 
+-	return err ?: size;
++	bvec_set_page(&bvec, page, size, offset);
++	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
++	return sock_sendmsg(sock, &msg);
+ }
+ EXPORT_SYMBOL_GPL(af_alg_sendpage);
+ 
+-- 
+2.51.0
 
