@@ -1,48 +1,32 @@
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D3230648C;
-	Mon, 22 Sep 2025 12:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484A430FC1F
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 13:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758544904; cv=none; b=K0icEsmy4l3EBhiVlgY1E1b+fvnRiAgcqalixupw5bossJZyaW/I58IUsDwDgCzEFuNo3p0c0Xl60vQMMTiTZJgavTfqhia7DE0B+6Sh9jmne5KarkKp5xKmRhiiHu9r1R+HXUXzhL2PJ1q95s7qArI0WLVdbv8j5M2bUjJGU0o=
+	t=1758548484; cv=none; b=A+GXqLPOs+Xxk8DAkve5ZNCKj9Kkxwxd5+jOw58knWWt29N61xJDE/70BdArj35x3V0/JjRO3byCVWilhCDAoKrAJ/twW1H51h+aEtFyN90ur1SNchNhP+5zv3YkTKi1Vah8jnVGHjREUM6sBK+ruia37PHhPZVL8rE91PWFEH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758544904; c=relaxed/simple;
-	bh=fa8I0HJf9Hu8nlmRXZKypcgcpmA+mIVk83stAz4Ehj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QUBkMsIZGzyDSAwFXhiJJhQnz5nqq9JhGlm7R2A0yau/Xt2tjJ1J4A4YvfnIbavqXQt9gq0YdXvVs+P0vPQHLYURxKVrUc0krb1PzHs1fItmmL93hgPWHT43ml/cWmpOyHoiKkMmSQXjxhtODeM3XGO86Qw1VaxBpIjHYv/KK9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=cg7tjhW0; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1758548484; c=relaxed/simple;
+	bh=3pffxAPW82e3AhNxnHqcp8O73gt6PCCosSGmkEMfSu4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DhMr8JRnl8eNDxFBgJ2R3LTtTJq7C/8/pBTy+iZ97wddN1SAjzsBUDOZT9gNDduR4+A5HB2si2A6nZeSWeupZrlCM11/mJcw/9ggm6VuSHyIJgrGBcMbqApp9JBfDK/No0nMANCmrjnhAH9znPTVtWxOAEuTDyOSMYFydJHvAps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=LK9oR6wz; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="cg7tjhW0"
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58MCaZx0767870;
-	Mon, 22 Sep 2025 07:36:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1758544596;
-	bh=VqMG1tCpCdUZdT54p/gMUyDbkNMx8mDeub7N1P1QKp4=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=cg7tjhW0BShbif141QvJ/nGEjZLzhYFqOawsoLKwavBznE25mgVKATr+aN/MR9b1J
-	 Taw5nRm4JvM5hMg0iAcy0gAKrawP2hfh2Bb4sM2sBq0ByxoOIUNUih/urB6a95i4Ho
-	 EtEGIk1wbd1T4Cx6SH2ySDnbsHIkrtTZc+CE6zd0=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58MCaZtU879994
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Mon, 22 Sep 2025 07:36:35 -0500
-Received: from DFLE213.ent.ti.com (10.64.6.71) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 22
- Sep 2025 07:36:35 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE213.ent.ti.com
- (10.64.6.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Mon, 22 Sep 2025 07:36:35 -0500
-Received: from [10.24.69.191] (pratham-workstation-pc.dhcp.ti.com [10.24.69.191])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58MCaWFW2515847;
-	Mon, 22 Sep 2025 07:36:32 -0500
-Message-ID: <c0196ac6-af65-48c1-bc5a-ca430dff0a5a@ti.com>
-Date: Mon, 22 Sep 2025 18:06:31 +0530
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="LK9oR6wz"
+Received: from [100.96.64.209] (unknown [52.167.112.163])
+	by linux.microsoft.com (Postfix) with ESMTPSA id D9493201CEF4;
+	Mon, 22 Sep 2025 06:41:15 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D9493201CEF4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1758548476;
+	bh=ylETBWja8EbUsasSnjGC+nQTkKTblQhcblXxQog/jPQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LK9oR6wzabYaJEgz7arCXUYxgKJJ+lE5OKb1RYV/1wj6VR+pnnfURTtAaOGV+tuCd
+	 QrQvxJCzIJRh0kQRmfUFm8OihYkCpoh0tMjinHq6FRJAzbroIxm6WPGituqaq5m5Ha
+	 GD6iEvQqurs1J8OB+aBTNjVAgJB1yvQ4UtjM/Ubs=
+Message-ID: <141f5673-ec0d-425e-8c02-29bc0e950fb1@linux.microsoft.com>
+Date: Mon, 22 Sep 2025 09:41:14 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,63 +34,100 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/4] crypto: ti: Add support for AES-XTS in DTHEv2
- driver
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Kamlesh Gurudasani
-	<kamlesh@ti.com>,
-        Manorit Chawdhry <m-chawdhry@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer
-	<vishalm@ti.com>,
-        Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250910100742.3747614-1-t-pratham@ti.com>
- <20250910100742.3747614-2-t-pratham@ti.com>
- <aM6ZNMR0CtDj01Iu@gondor.apana.org.au>
+Subject: Re: FIPS requirements in lib/crypto/ APIs
+To: Theodore Ts'o <tytso@mit.edu>, Eric Biggers <ebiggers@kernel.org>
+Cc: Joachim Vandersmissen <joachim@jvdsn.com>, linux-crypto@vger.kernel.org,
+ simo@redhat.com
+References: <0b7ce82a-1a2f-4be9-bfa7-eaf6a5ef9b40@jvdsn.com>
+ <20250918163347.GB1422@quark>
+ <3e06f746-775e-4b9e-93c9-d1f51f77148f@jvdsn.com>
+ <20250918180647.GC1422@quark> <20250919152216.GH416742@mit.edu>
 Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <aM6ZNMR0CtDj01Iu@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+In-Reply-To: <20250919152216.GH416742@mit.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 20/09/25 17:38, Herbert Xu wrote:
-> On Wed, Sep 10, 2025 at 02:46:53PM +0530, T Pratham wrote:
+
+On 9/19/25 11:22, Theodore Ts'o wrote:
+> On Thu, Sep 18, 2025 at 01:06:47PM -0500, Eric Biggers wrote:
+>>> I'm more trying to figure out a general approach to address these kinds of
+>>> requirements. What I usually see in FIPS modules, is that the FIPS module
+>>> API is as conservative as possible, rather than relying on the callers to
+>>> perform the FIPS requirement checks.
+>> Aren't these distros including the modules within their FIPS module
+>> boundary too?  It seems they would need to.
 >>
->> @@ -397,7 +446,29 @@ static struct skcipher_engine_alg cipher_algs[] = {
->>  			.cra_module		= THIS_MODULE,
->>  		},
->>  		.op.do_one_request = dthe_aes_run,
->> -	} /* CBC AES */
->> +	}, /* CBC AES */
->> +	{
->> +		.base.init			= dthe_cipher_init_tfm,
->> +		.base.setkey			= dthe_aes_xts_setkey,
->> +		.base.encrypt			= dthe_aes_encrypt,
->> +		.base.decrypt			= dthe_aes_decrypt,
->> +		.base.min_keysize		= AES_MIN_KEY_SIZE * 2,
->> +		.base.max_keysize		= AES_MAX_KEY_SIZE * 2,
->> +		.base.ivsize			= AES_IV_SIZE,
->> +		.base.base = {
->> +			.cra_name		= "xts(aes)",
->> +			.cra_driver_name	= "xts-aes-dthev2",
->> +			.cra_priority		= 299,
->> +			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
->> +						  CRYPTO_ALG_KERN_DRIVER_ONLY,
-> 
-> I think it's missing CRYPTO_ALG_ASYNC.
-> 
-> The existing algorithms seem to be missing this bit too so we
-> should fix that first.
-> 
-> Thanks,
+>> Either way, they've been getting their FIPS certificates despite lib/
+>> including non-FIPS-approved stuff for many years.  So it can't be that
+>> much of an issue in practice.
+> What I would recommend for those people who need FIPS certification
+> (which is a vanishingly small percentage of Linux kernel users, BTW),
+> that the FIPS module use their own copy of the crypto algorithms, and
+> *not* depend on kernel lib/crypto interfaces.
+>
+> Why?  Because FIPS certification is on the binary artifact, and if
+> there is a high-severity vulnerability. if you are selling into the US
+> Government market, FEDRAMP requires that you mitigate that
+> vulnerability within 30 days and that will likely require that you
+> deploy a new kernel binary.
+That *must* not be the recommendation of the kernel crypto team. Why 
+bother developing and deploying a kernel that boots in fips mode at all 
+if you recommend users not use it? More below.
+>
+> So it would be useful if the FIPS module doesn't need to change when
+> your FEDRAMP certification officer requires that you update the
+> kernel, and if the FIPS module is "the whole kernel", addressing the
+> high-severity CVE would break the FIPS certification.  So it really is
+> much better if you can decouple the FIPS module from the rest of the
+> kernel, since otherwise the FIPS certification mandate and the FEDRAMP
+> certification mandate could put you in a very uncomfortable place.
 
-Oh. Thanks for pointing this out. 
-This series had a few more issues with some of the algorithms, so I was about to send another revision anyway. I'll also correct this. And also fix the existing algorithms as well.
+While the FIPS module is "the whole kernel", re-validation for most 
+types of kernel upgrades may not prompt a full submission for FIPS 
+certification. A CVE re-validation can be as simple as re-filing a 
+description of the change to the module or worst case, a re-test of any 
+crypto functions that were changed to support the CVE fix. The most 
+expensive re-validation (other than a full submission) is the UPDT 
+re-validation submission. In either case, the overhead of the 
+re-validation is mostly with the CSTL, not with the government. The 
+lion's share of the time for a FIPS 140-3 FS (full submission) 
+certificate comes *after* the CSTL submits the validation to NIST.
 
--- 
-Regards
-T Pratham <t-pratham@ti.com>
+And to be clear, the FedRAMP requirement is that FIPS certifications or 
+re-validation be *filed* (not awarded) within 6 months of release of the 
+crypto module ("the whole kernel"). The caveat here is that you have to 
+have a certificate to file for a re-validation submission. Given NIST 
+backlog, it doesn't seem likely that you'll avoid a full submission if 
+you don't already have a 140-3 certificate.
+
+
+> It's also why historically many companies who need to provide FIPS
+> certification will carefully architect their solution so it is only
+> dependent on userspace crypto.  A number of years ago, I was involved
+> in a project at a former employer where we separated the crypto core
+> of the OpenSSL library from the rest of OpenSSL, so that when there
+> was a buffer overrun in the ASN.1 DER decoding of a certificate (for
+> example), we could fix it without breaking the FIPS certification of
+> the crypto core.  And we didn't even *consider* trying add a kernel
+> crypto dependency.
+
+IMO, this is an optimal solution for a specialized distro; 
+general-purpose OS's *should* update and use the actively developed 
+crypto api.
+
+BTW, I agree with you that fewer Linux kernel users need to certify at all.
+
+>
+> One of the important things to remember is that as far as FIPS
+> certification is concerned, the existence of remote privilege attacks
+> don't matter, so long as you meet all of the FIPS certification
+> security theatre.  But in the real world, you really want to fix high
+> severity CVE's....
+Please see FedRAMP's differentiation between update stream and 
+validation module stream. 
+https://www.fedramp.gov/resources/documents/FedRAMP_Policy_for_Cryptographic_Module_Selection_v1.1.0.pdf
+>
+> Cheers,
+>
+> 					- Ted
