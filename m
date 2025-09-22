@@ -1,197 +1,159 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EC784D02
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 19:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8FDC8E6;
+	Mon, 22 Sep 2025 19:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758568139; cv=none; b=Z7yywuv9wNae+mnYEioqCHgZ3nCPYn+fk+kLYagxpTZgf4vt605dFRtZGyBtokS0QFm+vj0Zvlj0CJN9lQthbkF2vulxqtHIeCvJOMfAmkFFCSbiPULMd75SqEFz0Z9SpWCk8CPg5oUN95SPhlClL8hBGx7fRIILO1BIMN0HyFA=
+	t=1758569596; cv=none; b=OSowsJXo3idLWjieZmGm+XemvmR3WH8Mi8vTdwtOhxqKtE3ufu/wPezr7jc4A6Mc1AOX/k7gghc3edWKV2RQxWDyUr8y24nrgoSskZRVk9PdKBm4IOG5D74Q5ZF0t/qMMtsKJlSKbzZpL8e337gV1TgjLGjAlRWU9/QkVuGDs10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758568139; c=relaxed/simple;
-	bh=h29rtcSrOIMf5pAvLuUA6cibFcZeXhD1pDQIIJ4Wh4g=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=SPrHpw1csdrEoSPUDQRwe3j7PjDIrPT1wiMDkMhL+IFnmOWyAyb4q7qu4SNYgIb8OCheKoSUakfi87xDsNAURSIRvhrZfF2+dVlDaybkaa1fyK1QAMyol+LRURwW8QGllNUra/3ulb29kX1fzViHxZjwR9aL13T95drGBjKaBLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XglypIhM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758569596; c=relaxed/simple;
+	bh=sfT+IJse1FrSPI1QrtOhgBawGx7fENamNyLEGl6DQCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W/5TjzfWY7tpa+111WVzKw1KYafN7ECGcIreVKRYu66yEpslT5qHWR0QwoQ2tM7YcpNZIfmstaEN331j5Y1hi6VLgNQQZ9yVCyYCJUcvr3fJ4fK1M8UQshHdhD8Ihl9x6h7GCjHxS3Gfpy65HKJNeO1fR1/IZUIG2DivDso4g9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=19wjZ0P3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XglypIhM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758568136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HLVd4ns3Eb35/BddvOa6k7DbQr1MBKhOjsWznK+W9RQ=;
-	b=XglypIhMUHKJA98k0KXNdLm3QJ6p1En+nsBRXm9w3/bw/fJXEbTDeVdiUyr+CUmBortf5u
-	MF0FgqsmNfxWHlTl80YVl9Kp7jTR0PyG03CovwwQyYW8IGBtuRcFhK8KYWkbNWj4TlWuDm
-	3WbddOhpEC0mghjc+JeoqxoIJr0scss=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-41O9Jm51Oy2sxKA0TofqmA-1; Mon,
- 22 Sep 2025 15:08:55 -0400
-X-MC-Unique: 41O9Jm51Oy2sxKA0TofqmA-1
-X-Mimecast-MFC-AGG-ID: 41O9Jm51Oy2sxKA0TofqmA_1758568133
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2BA271800297;
-	Mon, 22 Sep 2025 19:08:53 +0000 (UTC)
-Received: from [10.45.225.219] (unknown [10.45.225.219])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C7305195608E;
-	Mon, 22 Sep 2025 19:08:49 +0000 (UTC)
-Date: Mon, 22 Sep 2025 21:08:42 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Harald Freudenberger <freude@linux.ibm.com>
-cc: Ingo Franzki <ifranzki@linux.ibm.com>, linux-crypto@vger.kernel.org, 
-    Eric Biggers <ebiggers@kernel.org>, dengler@linux.ibm.com, 
-    linux-s390@vger.kernel.org, dm-devel@lists.linux.dev, agk@redhat.com, 
-    snitzer@kernel.org, Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] crypto/authenc: don't return -EBUSY when enqueuing the hash
- request
-In-Reply-To: <f799d7ab97470f2529b8dcb5566fd673@linux.ibm.com>
-Message-ID: <e26aedc6-7132-46c3-78f3-a3582b1c4f9a@redhat.com>
-References: <20250908131642.385445532@debian4.vm> <3a6b6f8f-5205-459c-810a-2425aae92fc8@linux.ibm.com> <e1e420d5-dc00-14d0-fdef-635d6ef70811@redhat.com> <bb68f9d6-8180-4291-9e6b-33bbdcef780f@linux.ibm.com> <8cb59ed5-1c9a-49de-beee-01eda52ad618@linux.ibm.com>
- <1af710ec-0f23-2522-d715-e683b9e557d8@redhat.com> <f799d7ab97470f2529b8dcb5566fd673@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="19wjZ0P3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E4CCC4CEF0;
+	Mon, 22 Sep 2025 19:33:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1758569596;
+	bh=sfT+IJse1FrSPI1QrtOhgBawGx7fENamNyLEGl6DQCQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=19wjZ0P3zj2FO9YarwEjb0Q51ScXiGZlJJLakxhYFNt7mrax7hxbZcwbeHjElOiK0
+	 XqIg7jqWZi3Mu/cS4Ar2pMEvHa2VTuBXCOS5vNlvkA7du0M2eXnUfHs2Woo5trFvdN
+	 rbcKQ7CCeiRQnJLz8ZdCx40ZLigpIPZryHTqr2Kk=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 43/61] crypto: af_alg: Indent the loop in af_alg_sendmsg()
+Date: Mon, 22 Sep 2025 21:29:36 +0200
+Message-ID: <20250922192404.764714238@linuxfoundation.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250922192403.524848428@linuxfoundation.org>
+References: <20250922192403.524848428@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 8bit
 
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
+------------------
 
-On Thu, 18 Sep 2025, Harald Freudenberger wrote:
+From: David Howells <dhowells@redhat.com>
 
-> On 2025-09-11 17:58, Mikulas Patocka wrote:
-> > On Thu, 11 Sep 2025, Ingo Franzki wrote:
-> > 
-> > > >> So, it looks like a dm-crypt bug.
-> > > >>
-> > > >> Please, revert my patches and run the same test on a clean 6.17.0-rc5
-> > > just
-> > > >> to verify that the patches do not introduce the bug.
-> > > >
-> > > > With your patches reverted the combined mode fails the same way as with
-> > > your patches.
-> > > > So they did not introduce the bug.
-> > > 
-> > > Mikulas, do you have any idea what could be causing this errors?
-> > > Is it that dm-crypt is not properly dealing with async-only HMAC ciphers?
-> > > Async-only encryption ciphers seem to work fine in dm-crypt, since LUKS
-> > > with PAES (but no integrity) works fine, and PAES is an async-onky cipher.
-> > > LUKS with sync-HMAC ciphers (e.g. clear key HMAC) also works fine, even in
-> > > combination with PAES.
-> > 
-> > Yes, I think that it's a problem with async HMAC. The bug is probably
-> > either in dm-crypt or in the crypto library.
-> > 
-> > Do you have some other (non-dm-crypt-related) workload that uses the
-> > async authentication, so that we can determine whether the bug is in
-> > dm-crypt or crypto?
-> > 
-> > Otherwise, would it be possible to give us a virtual machine on the
-> > mainframe to debug this issue?
-> > 
-> > Mikulas
-> 
-> So here is now an out-of-tree kernel module build which offers a pseudo
-> phmac-sha256
-> for testing and debugging purpose. In the end this is just a asynch (ahash)
-> wrapper
-> around the hmac-sha256 shash crypto subsystem implementation. It should
-> compile and
-> be usable on all platforms (s390, x64, arm, ...).
-> 
-> I ran dm-integrity tests with this and all worked fine. Ingo ran dm-crypt
-> tests
-> where he combined aes-cbc encryption with phmac-sha256 integrity and saw hangs
-> on cryptsetup open. He also reported that these issues are different to what
-> he
-> saw with the 'real' phmac in combination with aes encryption. A short glimpse
-> gives
-> me the impression that there is a job blocking the system's workqueue.
-> However, I
-> could not find any indication that the pseudo phmac is not working properly.
-> 
-> For instructions on how to build and use the module see the README in the tgz
-> archive.
-> 
-> Thanks to all
-> Harald Freudenberger
+[ Upstream commit 73d7409cfdad7fd08a9203eb2912c1c77e527776 ]
 
-Hi
+Put the loop in af_alg_sendmsg() into an if-statement to indent it to make
+the next patch easier to review as that will add another branch to handle
+MSG_SPLICE_PAGES to the if-statement.
 
-I analyzed the dm-crypt deadlock - in crypto_authenc_decrypt, there's 
-        err = crypto_ahash_digest(ahreq);
-        if (err)
-                return err;
-- here we get -EBUSY, that -EBUSY is propagated to dm-crypt. When dm-crypt 
-gets -EBUSY, it waits in "wait_for_completion(&ctx->restart);" in 
-crypt_convert.
-
-dm-crypt wakes up when kcryptd_async_done gets -EINPROGRESS, but the 
-crypto API never calls kcryptd_async_done with -EINPROGRESS, so dm-crypt 
-deadlocks.
-
-I've made this patch for the bug, it is tested only lightly, please review 
-it.
-
-Mikulas
-
-
-From: Mikulas Patocka <mpatocka@redhat.com>
-
-When we return -EBUSY from encryption routines, the caller is supposed to
-sleep until it receives -EINPROGRESS in the callback method.
-
-However when using authenc with asynchronous hash, the hash function may 
-return -EBUSY. In this case, the crypto API never calls the caller with 
--EINPROGRESS and it causes deadlock in dm-crypt.
-
-Fix this by turning -EBUSY into -EINPROGRESS.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
-
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: netdev@vger.kernel.org
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Stable-dep-of: 9574b2330dbd ("crypto: af_alg - Set merge to zero early in af_alg_sendmsg")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/authenc.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ crypto/af_alg.c | 51 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 27 insertions(+), 24 deletions(-)
 
-Index: linux-2.6/crypto/authenc.c
-===================================================================
---- linux-2.6.orig/crypto/authenc.c	2025-09-22 20:32:02.000000000 +0200
-+++ linux-2.6/crypto/authenc.c	2025-09-22 20:35:38.000000000 +0200
-@@ -146,8 +146,11 @@ static int crypto_authenc_genicv(struct
- 				   authenc_geniv_ahash_done, req);
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index fef69d2a6b183..d5a8368a47c5c 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -927,35 +927,38 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		if (sgl->cur)
+ 			sg_unmark_end(sg + sgl->cur - 1);
  
- 	err = crypto_ahash_digest(ahreq);
--	if (err)
-+	if (err) {
-+		if (err == -EBUSY)
-+			err = -EINPROGRESS;
- 		return err;
-+	}
+-		do {
+-			struct page *pg;
+-			unsigned int i = sgl->cur;
++		if (1 /* TODO check MSG_SPLICE_PAGES */) {
++			do {
++				struct page *pg;
++				unsigned int i = sgl->cur;
  
- 	scatterwalk_map_and_copy(hash, req->dst, req->assoclen + req->cryptlen,
- 				 crypto_aead_authsize(authenc), 1);
-@@ -270,8 +273,11 @@ static int crypto_authenc_decrypt(struct
- 				   authenc_verify_ahash_done, req);
+-			plen = min_t(size_t, len, PAGE_SIZE);
++				plen = min_t(size_t, len, PAGE_SIZE);
  
- 	err = crypto_ahash_digest(ahreq);
--	if (err)
-+	if (err) {
-+		if (err == -EBUSY)
-+			err = -EINPROGRESS;
- 		return err;
-+	}
+-			pg = alloc_page(GFP_KERNEL);
+-			if (!pg) {
+-				err = -ENOMEM;
+-				goto unlock;
+-			}
++				pg = alloc_page(GFP_KERNEL);
++				if (!pg) {
++					err = -ENOMEM;
++					goto unlock;
++				}
  
- 	return crypto_authenc_decrypt_tail(req, aead_request_flags(req));
- }
+-			sg_assign_page(sg + i, pg);
++				sg_assign_page(sg + i, pg);
+ 
+-			err = memcpy_from_msg(page_address(sg_page(sg + i)),
+-					      msg, plen);
+-			if (err) {
+-				__free_page(sg_page(sg + i));
+-				sg_assign_page(sg + i, NULL);
+-				goto unlock;
+-			}
++				err = memcpy_from_msg(
++					page_address(sg_page(sg + i)),
++					msg, plen);
++				if (err) {
++					__free_page(sg_page(sg + i));
++					sg_assign_page(sg + i, NULL);
++					goto unlock;
++				}
+ 
+-			sg[i].length = plen;
+-			len -= plen;
+-			ctx->used += plen;
+-			copied += plen;
+-			size -= plen;
+-			sgl->cur++;
+-		} while (len && sgl->cur < MAX_SGL_ENTS);
++				sg[i].length = plen;
++				len -= plen;
++				ctx->used += plen;
++				copied += plen;
++				size -= plen;
++				sgl->cur++;
++			} while (len && sgl->cur < MAX_SGL_ENTS);
++		}
+ 
+ 		if (!size)
+ 			sg_mark_end(sg + sgl->cur - 1);
+-- 
+2.51.0
+
+
 
