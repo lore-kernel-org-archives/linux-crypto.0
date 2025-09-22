@@ -1,92 +1,68 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D0E7D098
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 01:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+Received: from smtpfb1-g21.free.fr (smtpfb1-g21.free.fr [212.27.42.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2C1EACD
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 06:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758505217; cv=none; b=UxaOK7j/QjC/9LMQxAaBwLaYy5rQc5CIVwGd3/i9NUffGTE2BZ1jArgDznUkBppoZAkf0wg566qi/p7QvZGL9dqeP+G03hyvz3YNE+ho7A9xbzzh7m6NnPd/tGif6otIFTGRDdyXZFQVAbcbIIWMXD1xZFNSX/fu/MFaKbSrxLQ=
+	t=1758521985; cv=none; b=Qy7l15WTSl01ISKUad8hXbNyGz5FDUddGkXT4FaBkoHKuLv85blqfJ9MCetaw2X1OTBkMjprNeGk5LNnXdUzwLnGm0z8/ei+1UzrsxYmOsHyQZ7geIcansBKFPdJyWVVTd4HHA6MLYlDKIDvgLCzBPS2z38RFOMFJ1HL4z/1yQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758505217; c=relaxed/simple;
-	bh=8RalfTuL7bTI4etfHiacBIjuSWq1u6s8MB6DHqsZjVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLy/oDrQ5+ZrOylF8E468Exur7xbpQ7Ru1oFbZdme6IartDfHarBXmzrPduJC/TSmEWpzynNupnrd6ZFt+cgrlAJyYETGLquVmCZaKBecSmhw0Sm5t6x58oBtSJU09fLKuNlElijby9ogDQTPKvqHDTcl3EGYzYaSV6ed03DuX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=U3mVn8wU; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="U3mVn8wU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
-	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=ZFLxyhninTH6ycOdQ1oWpBPOh32RZPNbSEbu7oEjvXE=; b=U3mVn8wU58spV0pQNKZFA8h9Z+
-	IesxMf0OMcqm3KVfCp8Y3gMjWTPcIA9+oj6oU7DMnxEARcdAKeMUmVEgbkajh2URzEiZsQLbg3siY
-	4WVQWQNdnlt7gQy19jzip9TGAaDZphUsZkYy/mvqGzBCUQRFQSupiUJx6ddSCD91dzTHygZBwwnca
-	gqZxB+jgK49XPqWnsT8iVKl5u2g/Xu8YqV1gY2JZzCLGbzA0fnv+Uo8yIBhV6kgO54ncGIF/sKyWq
-	yGyOkaiFoUxKpWEgwbunzAOQb49cNgWs/7M6q6R9X3NPAjRbVtvN6iC+GhW09t2zlQI4Y6e/xOq2L
-	t2kiY72Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v0VX5-007HNY-1B;
-	Mon, 22 Sep 2025 09:40:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 22 Sep 2025 09:39:59 +0800
-Date: Mon, 22 Sep 2025 09:39:59 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: "David S. Miller\"" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	Karina Yankevich <k.yankevich@omp.ru>
-Subject: Re: [PATCH] crypto: drbg - drop useless check in
- drbg_get_random_bytes()
-Message-ID: <aNCo7yjktKTFg9HH@gondor.apana.org.au>
-References: <35bd2eaa-3cb2-481a-a02b-79fa1bc98016@omp.ru>
+	s=arc-20240116; t=1758521985; c=relaxed/simple;
+	bh=JKIblEM51Z7G2yJeg1kz+6UanHJ/lGxaFikkIsQVuQE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kzJKkXrisaGJWe2nqbF/KGo09vlYhW9/DNI1NZt/r8QWWMw3kYoqhSaHFN5c6LfUAwHqs5EUexughixG1YwkXNAeYRnugXAFTLW3dL/24b5O8sO4CWzC1vMGTvZ6MyV2vdxNs/Njx1eRg3g0h7PZ+3kqQiqgS80RIJv++LwM2r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=droneaud.fr; spf=pass smtp.mailfrom=droneaud.fr; arc=none smtp.client-ip=212.27.42.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=droneaud.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=droneaud.fr
+Received: from smtp6-g21.free.fr (smtp6-g21.free.fr [212.27.42.6])
+	by smtpfb1-g21.free.fr (Postfix) with ESMTP id 59D9EDF8784
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 08:19:32 +0200 (CEST)
+Received: from [IPV6:2a01:e0a:263:a640:d1:87bf:b1a6:8517] (unknown [IPv6:2a01:e0a:263:a640:d1:87bf:b1a6:8517])
+	(Authenticated sender: ydroneaud@free.fr)
+	by smtp6-g21.free.fr (Postfix) with ESMTPSA id 2B061780331;
+	Mon, 22 Sep 2025 08:19:17 +0200 (CEST)
+Message-ID: <51375fee-f3be-487d-8384-a2f07600d578@droneaud.fr>
+Date: Mon, 22 Sep 2025 08:19:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: drbg - drop useless check in
+ drbg_get_random_bytes()
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller\"" <davem@davemloft.net>, linux-crypto@vger.kernel.org
+Cc: Karina Yankevich <k.yankevich@omp.ru>
+References: <35bd2eaa-3cb2-481a-a02b-79fa1bc98016@omp.ru>
+Content-Language: fr-FR, en-US, en-GB
+From: Yann Droneaud <yann@droneaud.fr>
 In-Reply-To: <35bd2eaa-3cb2-481a-a02b-79fa1bc98016@omp.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Sep 21, 2025 at 11:33:36PM +0300, Sergey Shtylyov wrote:
-> drbg_fips_continuous_test() only returns 0 and -EAGAIN, so an early return
-> from drbg_get_random_bytes() could never happen, so we can drop the result
-> check from the *do/while* loop...
-> 
-> Found by Linux Verification Center (linuxtesting.org) with the Svace static
-> analysis tool.
-> 
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> 
-> ---
-> The patch is against the master branch of Linus Torvalds' linux.git repo
-> (I'm unable to use the other repos on git.kernel.org and I have to update
-> Linus' repo from GitHub).
-> 
->  crypto/drbg.c |    2 --
->  1 file changed, 2 deletions(-)
-> 
+Hi,
+
+Le 21/09/2025 à 22:33, Sergey Shtylyov a écrit :
 > Index: linux/crypto/drbg.c
 > ===================================================================
 > --- linux.orig/crypto/drbg.c
 > +++ linux/crypto/drbg.c
 > @@ -1067,8 +1067,6 @@ static inline int drbg_get_random_bytes(
->  	do {
->  		get_random_bytes(entropy, entropylen);
->  		ret = drbg_fips_continuous_test(drbg, entropy);
+>   	do {
+>   		get_random_bytes(entropy, entropylen);
+>   		ret = drbg_fips_continuous_test(drbg, entropy);
 > -		if (ret && ret != -EAGAIN)
 > -			return ret;
+>   	} while (ret);
 
-That's a bug waiting to happen.  Does the compiler actually fail
-to optimise away?
+} while (ret == EAGAIN);
 
-If you can show that this makes a difference to the compiled output,
-then please change the drbg_fips_continuous_test function signature
-so that it can no longer return an error.
+return ret;
 
-Thanks,
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Yann Droneaud
+
+
