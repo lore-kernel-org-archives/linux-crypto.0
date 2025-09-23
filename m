@@ -1,111 +1,105 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2551AD24;
-	Tue, 23 Sep 2025 03:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3E92D8396
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 06:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758599259; cv=none; b=EKpPmwgea3ui8V1NUsQQGyQp8y8467oMATtPqc54WPomQttFNeuXoO/qtOQAt4bufV2M4bqr/RsBWssYwgQGWrpTyWMkmSwC9IKsd//a9ygHMDufNRHQwoaO5nvUeo4zBgF2hfIF6jONbBbvPwWsyJFWh8ENwStEJO3Al/am4Yc=
+	t=1758607583; cv=none; b=r0r0VHTtW7gDCRASjVoqZS8uOOSXkFATs7z6+ZmA1w1NCZ4hOsENAuaYFijHp5IxNmwJcmoStSqaBoeiBYjS9Np0oXAvjLm0WJy5EAsU0IwtuOKVQxMroKr4ARKs3nkkznXQ0n9emkx/qrBpHajpES0dUSNMd5mDwvGS95jcvn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758599259; c=relaxed/simple;
-	bh=VhdoVNBgm6X5qYz6gn0vHAYfUBuCXLK7xB+54qTojnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a559vM/ARstNx625t4iMtCBIBKvMmaCzwxNjq7BuNBJzqWNFBWJhjMPw+0qWJTS9n8pVrP6L1Hy17nUEN2FbPh6TkZP28s5H+1xJYZvVavjCZaPYfw7qXmUVop9YpA8u8rQ5fHkQfX8e3GyLEb8LzWZa/I4f8tr9mB6NYAflvmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=hq9SgPV1; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1758607583; c=relaxed/simple;
+	bh=Er4W8MIpmwD3PLCWmK+B4k++5a8DHlRT/jgXJD2s0sU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4aCZPCmigLw91CRPPHKQlF8hO+A+28D727HbA0puQMWzWk3atlVxqumtos3URjV5mU0ZIfjFN2IocMxghHUVoDNM6lHfgkDJFhe4w+6Nr0xIOJjBnGbE04mLRVUBmBQXnTNR2ru50jqfd7VhC1g8aJioxpq9Y4mLeArK+EmAdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OrXo81Y6; arc=none smtp.client-ip=209.85.215.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="hq9SgPV1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
-	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=FGYTrCooQJBuf7my5KhHNwL4DZ/TWFdIhPLkYZYv7Q4=; b=hq9SgPV1CgQITcaGyUKSE7TfV/
-	vEVwmNYT4PlcL2yDjL7pEypDWtmat2hfF5RJEJqcawdjlh268T6NCg7Vx/okBOgxYnWvIbIzftB7W
-	dwX5wFiGirC7J6CGDmJtO4USoKi3K7oClz6Rw0dIUqjgHOu7Gvev3025bFtRDWsM0tKKEylsgVM8K
-	Q2d9XoyJz9ISBi3laZE3eAXl9Cu3XcYIcJqCno/2P5+HuOdAmSkA/P7yXxqeTHWin2mmQz9SOlR/d
-	00WyxQmnoEpYTVp1knrAe6rTvUW+hyd0s6KVUHGgoH/z2FiQk6FVlzsazmE5YW3GsPXv9gpsku9in
-	RA6DV38w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v0tzy-007ZOl-1g;
-	Tue, 23 Sep 2025 11:47:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 23 Sep 2025 11:47:26 +0800
-Date: Tue, 23 Sep 2025 11:47:26 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Ingo Franzki <ifranzki@linux.ibm.com>, linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>, dengler@linux.ibm.com,
-	linux-s390@vger.kernel.org, dm-devel@lists.linux.dev,
-	agk@redhat.com, snitzer@kernel.org,
-	Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH] crypto/authenc: don't return -EBUSY when enqueuing the
- hash request
-Message-ID: <aNIYTm6neC3lC6dP@gondor.apana.org.au>
-References: <20250908131642.385445532@debian4.vm>
- <3a6b6f8f-5205-459c-810a-2425aae92fc8@linux.ibm.com>
- <e1e420d5-dc00-14d0-fdef-635d6ef70811@redhat.com>
- <bb68f9d6-8180-4291-9e6b-33bbdcef780f@linux.ibm.com>
- <8cb59ed5-1c9a-49de-beee-01eda52ad618@linux.ibm.com>
- <1af710ec-0f23-2522-d715-e683b9e557d8@redhat.com>
- <f799d7ab97470f2529b8dcb5566fd673@linux.ibm.com>
- <e26aedc6-7132-46c3-78f3-a3582b1c4f9a@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OrXo81Y6"
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-b4c29d2ea05so4599847a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2025 23:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758607580; x=1759212380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=omk+3E3VbH2i+N8tji9NWKgODSvwpWUngMp/3zr1rgI=;
+        b=OrXo81Y6/x3McQ9nk3fL5LKDPCiLm6MADQ7DXICO1fjtmzvSpDYA+do8zQI3prDsoz
+         wL47PqaWzBK0+htmxLl+hjmUAQJyIl89lihHOnzDeI8yYturKpCIPIfYYbrk/TYoXma3
+         p6DqA5dOlr+YiHjzHQ30gmcxHmXg65YogOpDASFIA1WVCJLbG5xXoMb0seaksdoFRO8Y
+         WDip8zO/p2hOwdNfowFU8Cxh5pX+ZJZIs7SuVHXtzUGWNgYHLIhQKuqPFx0H5v+g/Iqa
+         er/iNIdkv+M65FACke/iHAkyMQKHb4nov4FqMciilIb1xkxJBtqxe4mz7sHpYDbk7kgi
+         889Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758607580; x=1759212380;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=omk+3E3VbH2i+N8tji9NWKgODSvwpWUngMp/3zr1rgI=;
+        b=wkqm1lfMVL632tQv8weLW8mFqfDq8V7snyN0foTe1wq7mJM4NruhVPDzbloxRCec7/
+         Bm1asSmjU9OPXYM8U6FbxPF1bn6vwASBW0+pHmUtfE6ENmGrxQhJyDJu2VSEGIZ154nf
+         xABbk9QFB/C3edZRDYApclOgY0xRNOB6QjMd3vALX5b7iF8VtFZk9TfUxzEtVyKJAsHm
+         uFDjw34bxE4mclFRwRthRndpa73ClhzEfh3tgXtYfG/HfWZHWp1etj8JeDY6Im2EXbDh
+         bFGI4T23mo84+h+ZDMp9DkP071m2ylgWVbtX24oFq0mMNqHmJEMclGzPktqaQqSi4QVn
+         /SMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXDN1KwoLCHyrPnIyNUd7qUQW6x97WR922ufyohBUEYMENIIS0pw8oRndJtFDv9yE9H1sfTANrroTbM4lU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJx4mo2Ar55EB96AXyV50cAX+dv5rKDiSykFe8x6P5ZvH3IMNC
+	m17J7euR/6ZVhYZWe6K8zgF9gk0CuJzbaWPoN/ydwyNL8wtd5cZGLBsI
+X-Gm-Gg: ASbGncscamjb5VH+yLiC2U6SjRjM9HA2qA4MXRdWsZwUmn23IhdYh2mXV4LegSoz79w
+	r5K41zcXYiWM8p7U0IxhO72Pfq7CfFn8SfJVen4wGqWzKOq7e0IL0HCVbc4soTYESX+mDR38yEJ
+	qeUEd9Z0czjZV7eNQexkjJgTcU6RenUIwyL26ccIRKj4lRDpQSrZxnNWEa4w1APo5A3WwmXHhCt
+	BsvjGyHuxVj+ywmdYvXMO0vjoH2o0zUGkHuPEBiVvqr3OHnMZvQexp1rULmjrjO/xp3lTAT0M8l
+	bnty4M0fxWCl71a0k0Z6Pi5ewDClC6Om04zAGXXsA/Eoe0wRI+X/h/Ouk/i4t0Yqd/5FFPaZVAK
+	eGAf+YRck/s/AnBjXBJI=
+X-Google-Smtp-Source: AGHT+IFjh9VwSK8iG3IMnKGftTZdz3zGpcCmuQXcy2PSoEUaE8GN+Ok52y1XVrwZHbztSofbKH8EHA==
+X-Received: by 2002:a17:90a:dfcf:b0:32b:9506:1782 with SMTP id 98e67ed59e1d1-332abf16faemr1446491a91.15.1758607579783;
+        Mon, 22 Sep 2025 23:06:19 -0700 (PDT)
+Received: from 7940hx ([43.129.244.20])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32ed26857a0sm18103451a91.2.2025.09.22.23.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 23:06:19 -0700 (PDT)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: herbert@gondor.apana.org.au
+Cc: tgraf@suug.ch,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] rhashtable: add likely() to __rht_ptr()
+Date: Tue, 23 Sep 2025 14:06:14 +0800
+Message-ID: <20250923060614.539789-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e26aedc6-7132-46c3-78f3-a3582b1c4f9a@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 22, 2025 at 09:08:42PM +0200, Mikulas Patocka wrote:
->
-> When we return -EBUSY from encryption routines, the caller is supposed to
-> sleep until it receives -EINPROGRESS in the callback method.
-> 
-> However when using authenc with asynchronous hash, the hash function may 
-> return -EBUSY. In this case, the crypto API never calls the caller with 
-> -EINPROGRESS and it causes deadlock in dm-crypt.
-> 
-> Fix this by turning -EBUSY into -EINPROGRESS.
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: stable@vger.kernel.org
-> 
-> ---
->  crypto/authenc.c |   10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> Index: linux-2.6/crypto/authenc.c
-> ===================================================================
-> --- linux-2.6.orig/crypto/authenc.c	2025-09-22 20:32:02.000000000 +0200
-> +++ linux-2.6/crypto/authenc.c	2025-09-22 20:35:38.000000000 +0200
-> @@ -146,8 +146,11 @@ static int crypto_authenc_genicv(struct
->  				   authenc_geniv_ahash_done, req);
->  
->  	err = crypto_ahash_digest(ahreq);
-> -	if (err)
-> +	if (err) {
-> +		if (err == -EBUSY)
-> +			err = -EINPROGRESS;
->  		return err;
-> +	}
+In the fast path, the value of "p" in __rht_ptr() should be valid.
+Therefore, wrap it with a "likely". The performance increasing is tiny,
+but it's still worth to do it.
 
-If authenc gets EBUSY from the ahash, then the ahash is responsible
-for sending an EINPROGRESS notification.  I just checked the authenc
-code and it does pass the notification back up to the caller (which
-is dm-crypt).
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+---
+ include/linux/rhashtable.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-So if EINPROGRESS is not being received, then it's a bug in the
-ahash layer or the underlying ahash algorithm.
-
-Which phmac implementation was this?
-
-Cheers,
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index e740157f3cd7..a8e38a74acf5 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -358,9 +358,10 @@ static inline void rht_unlock(struct bucket_table *tbl,
+ static inline struct rhash_head *__rht_ptr(
+ 	struct rhash_lock_head *p, struct rhash_lock_head __rcu *const *bkt)
+ {
++	unsigned long p_val = (unsigned long)p & ~BIT(0);
++
+ 	return (struct rhash_head *)
+-		((unsigned long)p & ~BIT(0) ?:
+-		 (unsigned long)RHT_NULLS_MARKER(bkt));
++		(likely(p_val) ? p_val : (unsigned long)RHT_NULLS_MARKER(bkt));
+ }
+ 
+ /*
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.51.0
+
