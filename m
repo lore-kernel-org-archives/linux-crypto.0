@@ -1,126 +1,129 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f195.google.com (mail-yb1-f195.google.com [209.85.219.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F9A1487F6;
-	Tue, 23 Sep 2025 11:31:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746E025A63D
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 12:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758627084; cv=none; b=ECB7b44X1IHt1MS2/WsFCIGoGsuQBN2hCxhyNW68js/c2lro0MrJYTr5PlIOwEsx25V0Bei1qT9Xo8pb+t7ISgM66iguyuJVzkBnfe7pReAjvE1tgkVa6a6A1dVVme9DCojNMg2YQjP7gqvkai9kAhFlkjAcfCxV7kklMpI8LKw=
+	t=1758629444; cv=none; b=MYM9OdqPp0h939fkCJEb7bRfn1disEd/6ccC9qjoqGP9bAIW8N3lX4+9Zs7/4mmgLDWGu5KGJ9Kvx5TDWmGtmrBhj0JfakszCvm9kOvQEwiQU7RO5zmTON+WhRVbFE4hlKlvxOxpWyVh2ZlG8Y5flUQn/LI+BbCSHWOKRA++Pdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758627084; c=relaxed/simple;
-	bh=mCNJOTazPvqVqMaQhV2tfeF0FvD+Mm2uF3eK7Ojqa8g=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=rFYIjsiUZJ1Rldlckpg4bjQMYwtU8V8hiShieF9F8is4sRNyO6/kK3G6r5EV+HE6CTFJrXqsSD58KqCiNEtNkYHKGdxXtbxyXzt1YegsyM9oeHY2h6gCFM0nfAPgJCX27SckKiFgUCSsEafUsNhgwCeHrVAAsfQqRUCyw8tzrlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=oLGph3EV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EtS0BnnY; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1758629444; c=relaxed/simple;
+	bh=a9DTXpGqgVHh9jVLGJdvu05e2qjfyRCHTw524yeXfSw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OxlNBS+uvlLynTNff0JvWCQcPIJ74/zTzCbX4lsLRc5SbthzFAOG/NqPmd4nW4ShxEB75Om3IRvXTdUr4JQdw9vh7tznEJQ7o8UYlqfjdwHB59TqDnGrNYNi2yvUj/VoqMOpkqp6Qafhhp/OqcIzQzdmFt4fgqv/4cyRVwtmjDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9lwHqiG; arc=none smtp.client-ip=209.85.219.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="oLGph3EV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EtS0BnnY"
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.stl.internal (Postfix) with ESMTP id 1DE111D002A0;
-	Tue, 23 Sep 2025 07:31:20 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Tue, 23 Sep 2025 07:31:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
-	1758627079; x=1758713479; bh=XJAa74at5W3WFDosbUaDEhWc/w9NW9zUkT4
-	q5gGIozM=; b=oLGph3EVDopwXaQ09M4M9BXRIuQIKjVhpPdU/HLILXtSSkUbFCg
-	wUAMPDaNSl39d7FvqEnNKCuXWufYI28oASpbl2ogkwEuvwyXlzDxIDVj7PYwZ3Va
-	2RZGvH0jx6gOElp6/8qASdcNVV8LrNKTsViE0r4j0JpZ8so1Y5JpBs/Qrg+r8Ywk
-	x/8u1oczJJI90rcOdD2QI320N0Qpbl1UjeMboaPae8cJq9kzgqvYXEOw3+3R18nz
-	CGrt2Cg8sRMO2eT+qtSd9tmhquhzjxGDLVg/z/+3hzEUIg17yrH1KtWTnQ19dPI6
-	B6ZuLZTgE9B8xgmFKaOUDRReLKdFsSbBy8g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758627079; x=
-	1758713479; bh=XJAa74at5W3WFDosbUaDEhWc/w9NW9zUkT4q5gGIozM=; b=E
-	tS0BnnY4ZK6gJryMtpHSIWbXNQkGiz7APxIyXS+3or6PBCbS6j+rQI2lsA36BLXt
-	8KfBKnvBrCVt7mpF+3BLmP1PbaNMLhWQk9/8wKq/SjF0ucuKR4JQ0MSp5UR0faIY
-	mYgmLMk5K+xqcrwH6TR9khHKYLkdy2KB2RVmOTx1FqqJIpYPse2mpr6sTOIp8Ela
-	f/A+bN/ckqmEedt81PJJqQdzR2pKZbsKYcuphRYX3fHn9cvrsCmWJ66nzKUS9/u5
-	xUX13mg8W/KvzRYuOn0Ma0ROe252h9kbPrgGH99zHtLD3oQksqbnPxKsHftxiv7W
-	Q7lXzCYcW4+gaoSkVzc8w==
-X-ME-Sender: <xms:B4XSaC9omsIVkUWqV0QFUVMIhZIeaK62bY7a7NGc51k_Q70wpWe68A>
-    <xme:B4XSaLLwb6vvFVWpZGONLlJ2rREwkBrt8xuLC0AK_EUOInLBPqvHw2GNZ2-pgp2aM
-    7U1OEIfhMAN-mWEiNwe9CYLxJRIreuUESNQTKANVIi-PBVcbw>
-X-ME-Received: <xmr:B4XSaIfX7rS_gvUhKwqrGjR4eRl8lErg9iLSwxxLIoVgNNg5Leu1HI1zMkiRPP9kjsK_oV1CjV4YEfk8jWZp-ANPW06Wu5mKLseO1L-Piurd>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdeitdeiudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpegtgfgghffvvefujghffffkrhesthhqredttddtjeenucfhrhhomheppfgvihhluehr
-    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
-    eljedtfeegueekieetudevheduveefffevudetgfetudfhgedvgfdtieeguedujeenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgsse
-    hofihnmhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehtghhrrghfsehsuhhughdrtghhpdhrtghpthhtohephhgvrh
-    gsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehmvghn
-    ghhlohhnghekrdguohhnghesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:B4XSaK_dPsgsd7ji6EdrvdL5jlOS0Jl7WF8eA_tKp5CROFM1mDn2bg>
-    <xmx:B4XSaFq8c2x7K1AxAxAei67LRqANszDZLhfdYqezkajn1w-Td3jH1Q>
-    <xmx:B4XSaPCEgOWCWvv5Xuwvr6d28YW_FZm5xTGjO3SSYMeVxiQBfVrGJQ>
-    <xmx:B4XSaHw-Ntt0dkzUazLA8bmH7WpvfMz3wR0xhmPkoWF5xzeauomeBw>
-    <xmx:B4XSaJM1XAAV3ofZ9PsAt8d4BQIGeQJQCcyMI83r5Ogs4Eaqscm4zRgo>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 23 Sep 2025 07:31:17 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9lwHqiG"
+Received: by mail-yb1-f195.google.com with SMTP id 3f1490d57ef6-e96e1c82b01so3570485276.1
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 05:10:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758629441; x=1759234241; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zq6ksWyCEtjP7L0EnAqqm+GnNsIY/ENqD77Iipk6ZkA=;
+        b=f9lwHqiGIvC1t0RL0A8FIfMY+yFFEv68o+GlOFdl+EB5W+Mu9iuBAV+DJLKXYmEBqu
+         11m5luBGjPeEQRcm3nTslM6pXWIZuTLY2WiAsBwzhLXb2zdjxp2Vx03Ciyo6LYDPSPPS
+         WDFcEcA4YjOWfYdoCORqYg9byx0H9LmWJ2P6QfvAt8IbKV7uc1EosJq/B0+l8DbhcUUl
+         rF8VdVHpXiDOUyVha8xbG4e0xQX/gsq7J8Gt6IPHlAuDkTzGfWxcBzFna6VX4XHYClB2
+         he0x1dmXQEXa2qOnxhZKbsPETcMN6Mu+j2+NZZlGetc2xFgvi57yppDEcL40qy4w/g0T
+         RNLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758629441; x=1759234241;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zq6ksWyCEtjP7L0EnAqqm+GnNsIY/ENqD77Iipk6ZkA=;
+        b=IiFfM4n/xe8BEOw3GtsniVX2Djrzo4rqv3gzXHEUUJO9tEan/0UXUX2EU9cz0Rk4qH
+         t56jAp/o3d7JlnbE1yI9sFP2yaxDRygljV6oPTrwyBKcn4d5P3Rv+a7VCVN9cCK+V5w/
+         4J1FruDy2fIRbRGMvkCVdbiLPRCAyC3LwOk/TxD9P9V/g5HMFMlYPPhwYuWlGmEfnIEA
+         uwnJUD1JjFDpuSiqPRMh6+vThWx0KtJm2qyQALLtSPjhzto3Ews8xLckBnoVko+bZrZw
+         ei/Sa8QFPtjPXFIb+Yo8iT5dG1Qo0s/x2OkY7j6+VMIA81VqlP1hDr4Ff6QgEE0onFBm
+         vldQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXRnOE2ZjZPDHO6qmHgRxoFl2P6db4tklSkO7K4wiOpToJgtSgPt+4TETWoF7Gf2M9xa2ZbUwFN+odoLq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGAZSWPLxOoejJ6ZRnaJFsYkovhv1t/o3FlGQZMkVMJgcgSSlz
+	Plqv+70A3u/mSngCo6xy5eSx0xsTjJpFdjT5+70vZ0Vjx0TGtib+F1kPBPEvhH21B1NMcyq83fR
+	b291amB24IVOjI8QOuuW8qjcnMLGugVHYEAWQxpfcJxzc
+X-Gm-Gg: ASbGncvsVq83SiojxC6yv6d0IdU73W3yWuJEq9f206uLluT0XtCrbn9K/O0CmdXfVwp
+	RTGoiaZiAOw+IEnPCh+Fm//FlmKXazuATTT+qgFHkPwGEFjNHhLR/99EbJdeCqxJQRRlyeikEsW
+	xKhiBQbBYtbmf+r/Nrf7nHK0QEcnHmUyUoefMjDjdBtfCtYpbFigYpN6JrluJ7DMSdKvxW8tPKk
+	Aj40Os=
+X-Google-Smtp-Source: AGHT+IEijeUDqCQWWk3DlJFuTl+beAlJlJjPVnGvdVX80F2lyDoY1c1I4/gd8BqOlIERvjiXSGd/JYk9RF17BzK7I6E=
+X-Received: by 2002:a05:6902:5408:b0:e93:48ae:fdaa with SMTP id
+ 3f1490d57ef6-eb32fab5916mr2161664276.28.1758629441199; Tue, 23 Sep 2025
+ 05:10:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Menglong Dong" <menglong8.dong@gmail.com>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, tgraf@suug.ch,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250923060614.539789-1-dongml2@chinatelecom.cn>
+ <aNI_-QHAzwrED-iX@gondor.apana.org.au> <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
+ <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
+In-Reply-To: <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Tue, 23 Sep 2025 20:10:30 +0800
+X-Gm-Features: AS18NWCsSCb3go_4Vz04R9B0xSiDdbLE5rpM6dRGbXTaTxjX8nxOCkMEn9KQ16c
+Message-ID: <CADxym3b=_gb6o7xyozXekF4RbUoFe4h=zfegFuARFWqeWaisaQ@mail.gmail.com>
 Subject: Re: [PATCH] rhashtable: add likely() to __rht_ptr()
-In-reply-to:
- <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
-References: <20250923060614.539789-1-dongml2@chinatelecom.cn>,
- <aNI_-QHAzwrED-iX@gondor.apana.org.au>,
- <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
-Date: Tue, 23 Sep 2025 21:31:13 +1000
-Message-id: <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+To: NeilBrown <neil@brown.name>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, tgraf@suug.ch, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 23 Sep 2025, Menglong Dong wrote:
-> On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
-> >
-> > Menglong Dong <menglong8.dong@gmail.com> wrote:
-> > > In the fast path, the value of "p" in __rht_ptr() should be valid.
-> > > Therefore, wrap it with a "likely". The performance increasing is tiny,
-> > > but it's still worth to do it.
+On Tue, Sep 23, 2025 at 7:31=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote=
+:
+>
+> On Tue, 23 Sep 2025, Menglong Dong wrote:
+> > On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.apan=
+a.org.au> wrote:
 > > >
-> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > ---
-> > > include/linux/rhashtable.h | 5 +++--
-> > > 1 file changed, 3 insertions(+), 2 deletions(-)
+> > > Menglong Dong <menglong8.dong@gmail.com> wrote:
+> > > > In the fast path, the value of "p" in __rht_ptr() should be valid.
+> > > > Therefore, wrap it with a "likely". The performance increasing is t=
+iny,
+> > > > but it's still worth to do it.
+> > > >
+> > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > > > ---
+> > > > include/linux/rhashtable.h | 5 +++--
+> > > > 1 file changed, 3 insertions(+), 2 deletions(-)
+> > >
+> > > It's not obvious that rht_ptr would be non-NULL.  It depends on the
+> > > work load.  For example, if you're doing a lookup where most keys
+> > > are non-existent then it would most likely be NULL.
 > >
-> > It's not obvious that rht_ptr would be non-NULL.  It depends on the
-> > work load.  For example, if you're doing a lookup where most keys
-> > are non-existent then it would most likely be NULL.
->=20
-> Yeah, I see. In my case, the usage of the rhashtable will be:
-> add -> lookup, and rht_ptr is alway non-NULL. You are right,
-> it can be NULL in other situations, and it's not a good idea to
-> use likely() here ;)
+> > Yeah, I see. In my case, the usage of the rhashtable will be:
+> > add -> lookup, and rht_ptr is alway non-NULL. You are right,
+> > it can be NULL in other situations, and it's not a good idea to
+> > use likely() here ;)
+>
+> Have you measured a performance increase?  How tiny is it?
 
-Have you measured a performance increase?  How tiny is it?
+Hi. It is a bit difficult to accurately measure the performance
+improvement. I use it in the bpf global trampoline in [1], and
+the performance of the bpf bench testing increases from
+135M/s to 136M/s when I add the likely() to the __rht_ptr().
 
-It might conceivably make sense to have a rhashtable_lookup_likely() and
-rhashtable_lookup_unlikely(), but concrete evidence of the benefit would
-be needed.
+https://lore.kernel.org/bpf/20250703121521.1874196-2-dongml2@chinatelecom.c=
+n/
+[1]
 
-Thanks,
-NeilBrown
+>
+> It might conceivably make sense to have a rhashtable_lookup_likely() and
+> rhashtable_lookup_unlikely(), but concrete evidence of the benefit would
+> be needed.
+
+I think such rhashtable_lookup_likely/rhashtable_lookup_unlikely make
+sense (to me at least), and I'm sure the evidence above is enough ;)
+
+Thanks!
+Menglong Dong
+
+>
+> Thanks,
+> NeilBrown
