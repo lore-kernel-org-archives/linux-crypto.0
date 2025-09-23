@@ -1,106 +1,141 @@
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3F578F51
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 09:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9534A22ACEB;
+	Tue, 23 Sep 2025 09:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758619826; cv=none; b=sWy5HXF862fUXuJ2p4yjJ6kRyiJkxfuP3TdLmzAKSoEUWZi0o/GT3Z5huxEVf35oNOF7O4ussHaggDsIknPLjyYA3BvwJFxVbXF08R9OMNvz8b+pAiX9Q/pbIXOhEWpRnKuuuhTFWlqeeCHWtODh9osRQIMLc+RYKJJ6gSeVgrM=
+	t=1758620033; cv=none; b=CDCkoANowH9OX2shb9CE/3Ex4KKFNJ8/R0gTUeHOKaT2dDBOlv5J8vFPMpuKWEl4AIEXcadHFo9L15WXPJsHyWL5ae2MIPOvdYMwCYbeXOK1NB3yqJxRuxavfa6K8880weK5P85n3rzChzejA6Kec09Wbpt49vCrYhW0YeH8HFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758619826; c=relaxed/simple;
-	bh=LKMkqYRs5oKuE6YZh/sJ95NDmetgm/PvSx2UxGirKIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SwGOJm9Qc/MKh0xKKhmUVnaLocMEGl3D0NF79lJqTcPEnCy7s+/n8L2ayD3WsekDzeOBuvzeM6iaryvzJM3c319NEf3nkSCPTaVDF1Ta14tZleUYwKpE7OeEZEZ0yScAHvLZEGXGt22NMUfjfzSN4yXtoAcJen0PM87rJ7vn96A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRBV2JyJ; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758620033; c=relaxed/simple;
+	bh=g2kCGs5z5fe1jujETB3Uw0ReJOfiA+V+lExAXNJv+zk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y8wKL4enUwES6nz1tbJEViDcH2dWKQjzJ1uSRlBZFzJjCFwnHu2YwaJEFTTABYRgjIW0uTkRfP4A8yw66+wo9gG9ViXIXkI6+2lzuhA4p6Hav6lzNYv6nWA36S6g1ckITGQmMfld4lrcXRRVoUPNgqNuu+5r1hzkgk7e/2sErNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io; spf=pass smtp.mailfrom=kael-k.io; dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b=dBBGN+/D; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kael-k.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRBV2JyJ"
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-eb368d14a43so250345276.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 02:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758619824; x=1759224624; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NcHqzSr7+1u/Qh2ljI8pw/83Ihm75UvV5W9PNWXiB6M=;
-        b=cRBV2JyJ24kBX5fcn08mtDhUcoFQJ0dfJNd/uuFDYv91gPyVGVTUbdg9+eUukLGJWZ
-         CtW9d1UXisEU3XqpQJzgjPcdEgjgPwVLMKlS6vphI5S7yZpPj3jKnT6JM8NvH+8Zymf9
-         6ZoX6xABoGK41mZCoGaQgU0FJNDxh9h0g5OZpxykVHEsHuaZ92ekCGpbgJkDXNkIKDad
-         2nDVrhQPnoIFO2FruQv+LdtIi27uU+egAOiGKiswt1O7eJmuOG1H8manVbVsw0W4byy+
-         1AzCxXaCnScy+++L0DBp+oj99E+TtL6FybuBxKmgVp807s+OOTcCaj58bWqx81CFX5bj
-         hEEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758619824; x=1759224624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NcHqzSr7+1u/Qh2ljI8pw/83Ihm75UvV5W9PNWXiB6M=;
-        b=OPEnePtCkh0JCT8o77Ny45O5I+PdpqiMBP/k6L52uo+KRvmAGYjc+5FxBFp06Rz4DV
-         H1392bL1+1on01Z4X+LJP0VdxXxUnIy0ooCW/8toF7woXUHn6EvyhAMFrUi0i6yy2PgW
-         g+2zGz5IaoIR9p9s5TfrOBU4/uSFJ99cTLOtu4OkG2dWv5clV0BzzBEzAM74f0wErpCM
-         EhfhXIMF/CSlX7khuAn3lCvdRzGYrXmKFn48qPH+Ng9xYKWkVOExHw0OXRMdqKGO7yzc
-         OnzV9VxqeEodDSl375Qi2aQZNiv7ETQeJH8XwSiKv9v7dCzy60Im2/6ajv+KKZM0/1eA
-         VntQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULG53N4WGwUgnfzj+Y1D0AuJukC1ZXnet/1D91K3YZkbcP4yBr0azA6tGhmH5KMxCR3rRJLQqus8vRcZA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw54yIWi3q2lmkpm7xvoitNe1p5VKkcaNjLV5yEF42K+MlyD4QI
-	Rrzim6HBekxNc/7HOJLmu9RxaHqeJ4BA/XhPblmGATOFr6OQ/rEq4w8keoA3/xyWlAWc7QJtOEV
-	UpXmNgYMitbrTGwg5aU8KjphXKpD64kE=
-X-Gm-Gg: ASbGnctl0scAEGlVlKTP7iULY5+OOd5f+E0YTmCCa7huNoAUjIFwRPW+AQx+K+BgArb
-	JcNKKNJbAAXIGNeT+kZcRTT+kd9+c/nPCTuGOS9JWSAFOFwfTe8i88RNlDZNog3u5gON20u3cWt
-	hUngQT015Vmp98afM7/rnc6FNaxa1RosWYVQMn45zT3P9H08ZWuz1fF9oLA5bQPfvllGbkt59eL
-	Hzuedk=
-X-Google-Smtp-Source: AGHT+IEpeDeuEqQGLXjrM0BwMCnbNEzmEaZuDZ3jW+GAeAMxDzM45uFfdnNHqqnY09+sCgEmTN26dMoqQO7lXxlt+8o=
-X-Received: by 2002:a05:6902:846:b0:ea3:bfe8:d03e with SMTP id
- 3f1490d57ef6-eb33a6c602cmr1233861276.20.1758619824172; Tue, 23 Sep 2025
- 02:30:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b="dBBGN+/D"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4cWFCt4VFJz9smD;
+	Tue, 23 Sep 2025 11:33:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kael-k.io; s=MBO0001;
+	t=1758620026;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hmaRte8V3efKjGqqS0Lljd5y+34LblGLSHL+bkfyYKE=;
+	b=dBBGN+/D/Rk3FpO8GiH5prRlDYkS6NIY7cJ3T/XgI5onskBm0957KSXDHC6G2OTagA8hfY
+	Dog2w1BJ50qtJvxLW3QQAI+j2v+ThI5765OjnwL8j42MWZQtFlgogsWQ2DfoXwH3/n0UKD
+	JMDGUvyhBdLXHUGZkj4d2cvg2qjkZryNUn2VdpRe8Fd6ykZ2OT5C8+PXTntOldZmBZQLwG
+	zfCxJLHwcMX+A3IvaVGEnb7Cqzu1jGILr6ADNF4jzZFSskVCcHojgiTZ1mE9EIw0LHWQBg
+	aO93KehA1o4Z9WdB34HXbDxmDR9GoFvjEkVe94OtBqpJtc5yP8U98847m2Ldag==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of dev@kael-k.io designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=dev@kael-k.io
+From: Kael D'Alcamo <dev@kael-k.io>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] dt-bindings: rng: microchip,pic32-rng: convert to DT schema
+Date: Tue, 23 Sep 2025 11:32:34 +0200
+Message-ID: <20250923093330.31649-1-dev@kael-k.io>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923060614.539789-1-dongml2@chinatelecom.cn> <aNI_-QHAzwrED-iX@gondor.apana.org.au>
-In-Reply-To: <aNI_-QHAzwrED-iX@gondor.apana.org.au>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 23 Sep 2025 17:30:13 +0800
-X-Gm-Features: AS18NWAyWAy_AE2pAiCc7Hz3of5UzftwpXm2I6gPoVUtddSIY5tEuOVAaliaOpU
-Message-ID: <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
-Subject: Re: [PATCH] rhashtable: add likely() to __rht_ptr()
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: tgraf@suug.ch, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Neil Brown <neil@brown.name>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4cWFCt4VFJz9smD
 
-On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> Menglong Dong <menglong8.dong@gmail.com> wrote:
-> > In the fast path, the value of "p" in __rht_ptr() should be valid.
-> > Therefore, wrap it with a "likely". The performance increasing is tiny,
-> > but it's still worth to do it.
-> >
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > ---
-> > include/linux/rhashtable.h | 5 +++--
-> > 1 file changed, 3 insertions(+), 2 deletions(-)
->
-> It's not obvious that rht_ptr would be non-NULL.  It depends on the
-> work load.  For example, if you're doing a lookup where most keys
-> are non-existent then it would most likely be NULL.
+Convert the Devicetree binding documentation for microchip,pic32mzda-rng
+from plain text to YAML.
 
-Yeah, I see. In my case, the usage of the rhashtable will be:
-add -> lookup, and rht_ptr is alway non-NULL. You are right,
-it can be NULL in other situations, and it's not a good idea to
-use likely() here ;)
+Signed-off-by: Kael D'Alcamo <dev@kael-k.io>
+---
+ .../bindings/rng/microchip,pic32-rng.txt      | 17 --------
+ .../bindings/rng/microchip,pic32-rng.yaml     | 40 +++++++++++++++++++
+ 2 files changed, 40 insertions(+), 17 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/microchip,pic32-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/microchip,pic32-rng.yaml
 
-Thanks!
-Menglong Dong
+diff --git a/Documentation/devicetree/bindings/rng/microchip,pic32-rng.txt b/Documentation/devicetree/bindings/rng/microchip,pic32-rng.txt
+deleted file mode 100644
+index c6d1003befb7..000000000000
+--- a/Documentation/devicetree/bindings/rng/microchip,pic32-rng.txt
++++ /dev/null
+@@ -1,17 +0,0 @@
+-* Microchip PIC32 Random Number Generator
+-
+-The PIC32 RNG provides a pseudo random number generator which can be seeded by
+-another true random number generator.
+-
+-Required properties:
+-- compatible : should be "microchip,pic32mzda-rng"
+-- reg : Specifies base physical address and size of the registers.
+-- clocks: clock phandle.
+-
+-Example:
+-
+-	rng: rng@1f8e6000 {
+-		compatible = "microchip,pic32mzda-rng";
+-		reg = <0x1f8e6000 0x1000>;
+-		clocks = <&PBCLK5>;
+-	};
+diff --git a/Documentation/devicetree/bindings/rng/microchip,pic32-rng.yaml b/Documentation/devicetree/bindings/rng/microchip,pic32-rng.yaml
+new file mode 100644
+index 000000000000..1f6f6fb81ddc
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/microchip,pic32-rng.yaml
+@@ -0,0 +1,40 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/microchip,pic32-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Microchip PIC32 Random Number Generator
++
++description: |
++  The PIC32 RNG provides a pseudo random number generator which can be seeded
++  by another true random number generator.
++
++maintainers:
++  - Joshua Henderson <joshua.henderson@microchip.com>
++
++properties:
++  compatible:
++    enum:
++      - microchip,pic32mzda-rng
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++
++additionalProperties: false
++
++examples:
++  - |
++    rng: rng@1f8e6000 {
++      compatible = "microchip,pic32mzda-rng";
++      reg = <0x1f8e6000 0x1000>;
++      clocks = <&PBCLK5>;
++    };
+-- 
+2.51.0
 
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
