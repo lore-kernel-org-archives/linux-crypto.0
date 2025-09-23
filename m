@@ -1,129 +1,120 @@
-Received: from mail-yb1-f195.google.com (mail-yb1-f195.google.com [209.85.219.195])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746E025A63D
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 12:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A08D184
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 12:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758629444; cv=none; b=MYM9OdqPp0h939fkCJEb7bRfn1disEd/6ccC9qjoqGP9bAIW8N3lX4+9Zs7/4mmgLDWGu5KGJ9Kvx5TDWmGtmrBhj0JfakszCvm9kOvQEwiQU7RO5zmTON+WhRVbFE4hlKlvxOxpWyVh2ZlG8Y5flUQn/LI+BbCSHWOKRA++Pdg=
+	t=1758631493; cv=none; b=IxyaIEqPIcq/rbZXNYygxWejmBSAOcwIoxSfNNjWFcFuxZfggTLZ13+BGHL9/F0ZPK2l2Wq8+EQzHHb7Ea7tOjYwlV8IhQvKQGquETORLuf3FDtaZqKozJyk2nMQlo+lWKMAX4IYjrEsBXnQbdGx+oOD7EG7sSPaYlPTAHdq7CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758629444; c=relaxed/simple;
-	bh=a9DTXpGqgVHh9jVLGJdvu05e2qjfyRCHTw524yeXfSw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OxlNBS+uvlLynTNff0JvWCQcPIJ74/zTzCbX4lsLRc5SbthzFAOG/NqPmd4nW4ShxEB75Om3IRvXTdUr4JQdw9vh7tznEJQ7o8UYlqfjdwHB59TqDnGrNYNi2yvUj/VoqMOpkqp6Qafhhp/OqcIzQzdmFt4fgqv/4cyRVwtmjDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9lwHqiG; arc=none smtp.client-ip=209.85.219.195
+	s=arc-20240116; t=1758631493; c=relaxed/simple;
+	bh=X5SCAiSiPiJEcYEiOxRFI7I4FHTBz2CQgSgz4A8sfdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qsZNi1n79NSXmCFiShTncVum5ulYGJ+GHWz0Ri5zc5aK0QrK0zjB6UZ86UkmDW74eQfKyCwX15+Am7eLKV2qEbVKxrS3mxp1Dt/E/yQ/9ByyFqkBMLj14cem6ETe8f6vTnHFnoj3wDQp81yYfxDcbBozeEzCiJvmAL86AK0Y130=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jruc0i+w; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9lwHqiG"
-Received: by mail-yb1-f195.google.com with SMTP id 3f1490d57ef6-e96e1c82b01so3570485276.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 05:10:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jruc0i+w"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77db1bcf4d3so4072647b3a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 05:44:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758629441; x=1759234241; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zq6ksWyCEtjP7L0EnAqqm+GnNsIY/ENqD77Iipk6ZkA=;
-        b=f9lwHqiGIvC1t0RL0A8FIfMY+yFFEv68o+GlOFdl+EB5W+Mu9iuBAV+DJLKXYmEBqu
-         11m5luBGjPeEQRcm3nTslM6pXWIZuTLY2WiAsBwzhLXb2zdjxp2Vx03Ciyo6LYDPSPPS
-         WDFcEcA4YjOWfYdoCORqYg9byx0H9LmWJ2P6QfvAt8IbKV7uc1EosJq/B0+l8DbhcUUl
-         rF8VdVHpXiDOUyVha8xbG4e0xQX/gsq7J8Gt6IPHlAuDkTzGfWxcBzFna6VX4XHYClB2
-         he0x1dmXQEXa2qOnxhZKbsPETcMN6Mu+j2+NZZlGetc2xFgvi57yppDEcL40qy4w/g0T
-         RNLA==
+        d=gmail.com; s=20230601; t=1758631491; x=1759236291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cgc0zGHjqKsb6Mzy0/R8YmRgjX+eUzNJLvWfwmfdlbw=;
+        b=Jruc0i+wYSxjrQk6RIxskeS0j1RaZjlSXUnI5B9f7yoZ2k/KnOs2OGTIHy3Rht9kAt
+         4g9he9H2+3sfbxI1yTldJgVU2a73bO/f0wUu1/NpxjCpXd6v8ujvRyEK0dFdCS5l77Q5
+         cKUlBVoPEtUeo+8BHKKVsA8lBCjgcHs9IZPkHRWfX/4yEO37UyJjMD0bzljphwaVjJxb
+         AijAVsv74PJgREEzt3LCdq+EmhXVnkb5OhQZ60i3MGzaiaj/VUUq3JXXI5KfvpCGZaSW
+         x7VX5newM/msOWP67OX2rsB+nM1vAyT9EtlGUuos7Iu+a7B+B+yBNXI89C1kKdckUuQU
+         eMLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758629441; x=1759234241;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zq6ksWyCEtjP7L0EnAqqm+GnNsIY/ENqD77Iipk6ZkA=;
-        b=IiFfM4n/xe8BEOw3GtsniVX2Djrzo4rqv3gzXHEUUJO9tEan/0UXUX2EU9cz0Rk4qH
-         t56jAp/o3d7JlnbE1yI9sFP2yaxDRygljV6oPTrwyBKcn4d5P3Rv+a7VCVN9cCK+V5w/
-         4J1FruDy2fIRbRGMvkCVdbiLPRCAyC3LwOk/TxD9P9V/g5HMFMlYPPhwYuWlGmEfnIEA
-         uwnJUD1JjFDpuSiqPRMh6+vThWx0KtJm2qyQALLtSPjhzto3Ews8xLckBnoVko+bZrZw
-         ei/Sa8QFPtjPXFIb+Yo8iT5dG1Qo0s/x2OkY7j6+VMIA81VqlP1hDr4Ff6QgEE0onFBm
-         vldQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXRnOE2ZjZPDHO6qmHgRxoFl2P6db4tklSkO7K4wiOpToJgtSgPt+4TETWoF7Gf2M9xa2ZbUwFN+odoLq4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGAZSWPLxOoejJ6ZRnaJFsYkovhv1t/o3FlGQZMkVMJgcgSSlz
-	Plqv+70A3u/mSngCo6xy5eSx0xsTjJpFdjT5+70vZ0Vjx0TGtib+F1kPBPEvhH21B1NMcyq83fR
-	b291amB24IVOjI8QOuuW8qjcnMLGugVHYEAWQxpfcJxzc
-X-Gm-Gg: ASbGncvsVq83SiojxC6yv6d0IdU73W3yWuJEq9f206uLluT0XtCrbn9K/O0CmdXfVwp
-	RTGoiaZiAOw+IEnPCh+Fm//FlmKXazuATTT+qgFHkPwGEFjNHhLR/99EbJdeCqxJQRRlyeikEsW
-	xKhiBQbBYtbmf+r/Nrf7nHK0QEcnHmUyUoefMjDjdBtfCtYpbFigYpN6JrluJ7DMSdKvxW8tPKk
-	Aj40Os=
-X-Google-Smtp-Source: AGHT+IEijeUDqCQWWk3DlJFuTl+beAlJlJjPVnGvdVX80F2lyDoY1c1I4/gd8BqOlIERvjiXSGd/JYk9RF17BzK7I6E=
-X-Received: by 2002:a05:6902:5408:b0:e93:48ae:fdaa with SMTP id
- 3f1490d57ef6-eb32fab5916mr2161664276.28.1758629441199; Tue, 23 Sep 2025
- 05:10:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758631491; x=1759236291;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cgc0zGHjqKsb6Mzy0/R8YmRgjX+eUzNJLvWfwmfdlbw=;
+        b=QUApnevNPKNbujjA547x6vCwyi5uK5C5lRXTWzEf1Cj5CJOD3lRlYiyCnB4rP7N/St
+         w/1Y1dsxSUf0Qt02h7lgihQKPPJrwhFddwxhJcNjI80W03aF8CNJv7thSjjf6jLfHHMP
+         MPHDlJuqvRyZl9S9pGcwhauI7udvSh7A1RQ81rq0df0PqcEBh/v/Mu1Yy8yGTlsV2/ID
+         /pG6xXS/hCTACAiIe8ZB4ZirpijHixjztxuvsrubjqOu+cZmi8ILbk3j/L4rHcY/wToG
+         /rWHMzu/IvAAV2uBPs08OSXRlw/kMvlZ2J2NCYfuAB/jab+H+7mTzpYGTvZIc3rIhgPH
+         ngHg==
+X-Forwarded-Encrypted: i=1; AJvYcCX17wB0gga29J/mbqa70p6MwkOpVEcMBDmsz/yCunEd+21tylYvz01CzEzEmP8wWkPKXLMBlHUEj9BoN9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyH/ZkRMizOr+StvXGVV7hgOp/dsdudbDrcvqXQD3g9sMhAWYU
+	1xI2znVy3UvkCMx6NwyvZ1+HxTXTcD/48olIBd3lQUyGbcu0YUe1wZ8J
+X-Gm-Gg: ASbGncvw5qbmue67y7Z/rJo8s8YevONLLdcWkJsodKM/H9Bzem/s0qii3hjNwqX52ok
+	9ctyswqlCXyv6sHMch604r/numod/PxleBY12z6bdQc7X7QB4yp5Jim08JaK/iW4VZtrgI1TchJ
+	gL+w5qE7skUWSLhkIhsCzn6bGjddZlq7UsE/MkD+nJcWR5lhbuSeEKaasL3KBqQRROULVoWUyzo
+	gELsvBlyFknsqmpOW9s5fuckvk/FRWzKSgH+f08r7mZu2ej9vlYwwNWsizimsIWi7nJYX1zlKmB
+	WegFEL9B5HKSTUThFxZeeSACFMgFerWllVTk8BMbrok944WZWiCEoF759bZRk57DM3qjcZGJ48H
+	I0v6iAjVvehPitAa6b1/FZJs=
+X-Google-Smtp-Source: AGHT+IF+Z+DXFn3bgpMwnAWPeSbLtcvFzn5fzKbQO8Hcx6cZEpx6vf9Jd5Y5Z7nnPoPYPWpaRcohgQ==
+X-Received: by 2002:a05:6a21:3398:b0:24d:38c:26bd with SMTP id adf61e73a8af0-2cffb042180mr4007968637.43.1758631491539;
+        Tue, 23 Sep 2025 05:44:51 -0700 (PDT)
+Received: from lgs.. ([2408:8418:1100:9530:4f2e:20bc:b03d:e78])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b553a0a8270sm8354998a12.17.2025.09.23.05.44.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 05:44:51 -0700 (PDT)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
+	Dan Douglass <dan.douglass@nxp.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v3] crypto: caam: Add check for kcalloc() in test_len()
+Date: Tue, 23 Sep 2025 20:44:18 +0800
+Message-ID: <20250923124418.1857922-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923060614.539789-1-dongml2@chinatelecom.cn>
- <aNI_-QHAzwrED-iX@gondor.apana.org.au> <CADxym3YMX063-9S7ZgdMH9PPjmRXj9WG0sesn_och5G+js-P9A@mail.gmail.com>
- <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
-In-Reply-To: <175862707333.1696783.11988392990379659217@noble.neil.brown.name>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 23 Sep 2025 20:10:30 +0800
-X-Gm-Features: AS18NWCsSCb3go_4Vz04R9B0xSiDdbLE5rpM6dRGbXTaTxjX8nxOCkMEn9KQ16c
-Message-ID: <CADxym3b=_gb6o7xyozXekF4RbUoFe4h=zfegFuARFWqeWaisaQ@mail.gmail.com>
-Subject: Re: [PATCH] rhashtable: add likely() to __rht_ptr()
-To: NeilBrown <neil@brown.name>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, tgraf@suug.ch, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 23, 2025 at 7:31=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote=
-:
->
-> On Tue, 23 Sep 2025, Menglong Dong wrote:
-> > On Tue, Sep 23, 2025 at 2:36=E2=80=AFPM Herbert Xu <herbert@gondor.apan=
-a.org.au> wrote:
-> > >
-> > > Menglong Dong <menglong8.dong@gmail.com> wrote:
-> > > > In the fast path, the value of "p" in __rht_ptr() should be valid.
-> > > > Therefore, wrap it with a "likely". The performance increasing is t=
-iny,
-> > > > but it's still worth to do it.
-> > > >
-> > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > > ---
-> > > > include/linux/rhashtable.h | 5 +++--
-> > > > 1 file changed, 3 insertions(+), 2 deletions(-)
-> > >
-> > > It's not obvious that rht_ptr would be non-NULL.  It depends on the
-> > > work load.  For example, if you're doing a lookup where most keys
-> > > are non-existent then it would most likely be NULL.
-> >
-> > Yeah, I see. In my case, the usage of the rhashtable will be:
-> > add -> lookup, and rht_ptr is alway non-NULL. You are right,
-> > it can be NULL in other situations, and it's not a good idea to
-> > use likely() here ;)
->
-> Have you measured a performance increase?  How tiny is it?
+As kcalloc() may fail, check its return value to avoid a NULL pointer
+dereference when passing the buffer to rng->read(). On allocation
+failure, log the error and return since test_len() returns void.
 
-Hi. It is a bit difficult to accurately measure the performance
-improvement. I use it in the bpf global trampoline in [1], and
-the performance of the bpf bench testing increases from
-135M/s to 136M/s when I add the likely() to the __rht_ptr().
+Fixes: 2be0d806e25e ("crypto: caam - add a test for the RNG")
+Cc: stable@vger.kernel.org
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+---
+changelog:
+v3:
+- Fix build error: test_len() returns void; return without a value.
+- No functional changes beyond the allocation failure path.
 
-https://lore.kernel.org/bpf/20250703121521.1874196-2-dongml2@chinatelecom.c=
-n/
-[1]
+v2:
+- Return on allocation failure to avoid possible NULL dereference.
+---
+ drivers/crypto/caam/caamrng.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
->
-> It might conceivably make sense to have a rhashtable_lookup_likely() and
-> rhashtable_lookup_unlikely(), but concrete evidence of the benefit would
-> be needed.
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index b3d14a7f4dd1..0eb43c862516 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -181,7 +181,9 @@ static inline void test_len(struct hwrng *rng, size_t len, bool wait)
+ 	struct device *dev = ctx->ctrldev;
+ 
+ 	buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
+-
++	if (!buf) {
++		return;
++	}
+ 	while (len > 0) {
+ 		read_len = rng->read(rng, buf, len, wait);
+ 
+-- 
+2.43.0
 
-I think such rhashtable_lookup_likely/rhashtable_lookup_unlikely make
-sense (to me at least), and I'm sure the evidence above is enough ;)
-
-Thanks!
-Menglong Dong
-
->
-> Thanks,
-> NeilBrown
