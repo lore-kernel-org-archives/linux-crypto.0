@@ -1,180 +1,148 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07AA224F6;
-	Tue, 23 Sep 2025 10:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70396313E16;
+	Tue, 23 Sep 2025 10:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758623963; cv=none; b=pzvaGM9i4Ku+cvL1HLdC72Z4rVRL0aRiOfN6Yim6POZxPQmxqq6Fz34VYzfJXop9LrWu879V6LQdpjyCUGhjGQPnQvjeouWrdz0dWCWTo8hlOucZoIUt3t1/fnjYuRH+1zwb83MZypy6dJmXOzfOGb+gPdasYRdGOLf61vX5lPE=
+	t=1758624992; cv=none; b=sl/KsgzRLH3+n2+ZWV61jxdnRsMxIZs5VMmtSDZs5FPUm1WViiYQqEFoB1GP/ERv7C2g3YwjKri0TrAAb7dhjlRFosuj5jCxXZHDWgZgRebIu8jwJoVCkR0KaK7AVcZ+hMmDVL1TDTM7kRB7pCmOm582SGXmI0E/uxNUFSVEX0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758623963; c=relaxed/simple;
-	bh=WIQ2syAd5sHKPevRR5Dcm64QJukAgwdcMdoewqU0A/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U/I3WYGEf85HyNP9tHsiBpKdhg3pQ3rauncBbEIECSSxYb8wJmEikkSI3p+ZTXSj/aHUBcDigiqG8Jur9nf3+3dztHz0akjgBVmNlzMk674ROBxPUSzs7oOffZkKZZzkiIWSD5MaSEA3EDetFmEbzn59yHd4/1BMH7IG9063iGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io; spf=pass smtp.mailfrom=kael-k.io; dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b=x1ZP3QAC; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kael-k.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kael-k.io
+	s=arc-20240116; t=1758624992; c=relaxed/simple;
+	bh=rZpX1cqpB/ZIey8M6xVk2BFhszygIMBGOCqDy8inSU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uQQxSQ/vOgzKIJoqxlMBJhuyiHhKljwK7yBt0CBIO7Rs4STCRZ3NgcrXzsm50GGH9/I1eHklXV2Ie+jiKbg4qgfsQCp2XJJwnRWfhiRoit5vRy49Ea65dXqLEVkc4WjKAwFGqhicLlkBjWUugdtZR6RvH1oPExPHtQCQuyB7QbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gmhrueqC; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kael-k.io header.i=@kael-k.io header.b="x1ZP3QAC"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4cWGgL4V5Yz9tJ1;
-	Tue, 23 Sep 2025 12:39:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kael-k.io; s=MBO0001;
-	t=1758623950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ox8Mmwu/ehvmiRuJmtbvI2ttQH7ZUjO4FEYhPqIjfbk=;
-	b=x1ZP3QACkCwYIR/qc2c5Vju8DeS5/iby1c1Krq38IdYfN6jFkKPM+efs89YwrbI8KlGrIE
-	cw+tLOu9RzK4piJv5EB2kOxVt5zpnoDrs0qinkVaGD04co7TEBRIiPmHjQBYzUOpaDv77q
-	slzImdt1w7fp30nAUkxAYE81DHdegB/FcW5GItzzkOITO8XlbQgGWmS72JXgy5ppsdNJJm
-	zZ7k9ZMasAK5EJj7cFUXOLiPYCYQwiEYhXCuYqZdaf+Yj0nfWsI64j6h/Ry2m95VCAlgbN
-	WujZUTdMvF7mmRtSOkgZVNon8aBKjXurAXPCcFAf0k58LFqoYmgIxYhhCFnJBg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of dev@kael-k.io designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=dev@kael-k.io
-From: Kael D'Alcamo <dev@kael-k.io>
-To: Olivia Mackall <olivia@selenic.com>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gmhrueqC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758624990; x=1790160990;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rZpX1cqpB/ZIey8M6xVk2BFhszygIMBGOCqDy8inSU8=;
+  b=gmhrueqC4N+YxeSUXbXjKTCdBTwlOIGAaPpZyZ4XifrpKAYCrz0nfb2N
+   lSGjLlaPOXSx8UQinPbb9keJa7EpFzHfkx+GwgxzDXPgIYSm9Fuwe3/i1
+   3kGRqZW/D6eiQQWbRfzTVBQdi9JAl4YkSaXybHrGo4ylwbH3afvBNc/mr
+   Xfbvb0xY85LCHGJUDDuMII/0ytv4rWl2J8B3hMBD4/TnLCuHvokX+b82o
+   CIxtCnSTn5Auno/y8EN9GTlUsMCjo+c1zmfqxwHievcXwfggGNkQAdPzj
+   cR7vy/wrfE8jDp/qFvOP8tvNtSuv8Svq2UQjt6N2RH3GtPvfOb/RJZYPR
+   A==;
+X-CSE-ConnectionGUID: AOVrKvbTTj2cnWL/UjJrBg==
+X-CSE-MsgGUID: 52I4GKV4SUeKT5u8SgDDpQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="60118418"
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="60118418"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 03:56:29 -0700
+X-CSE-ConnectionGUID: d4pNVhNKRqqTzpQ3WvrWqA==
+X-CSE-MsgGUID: dHmrTC5PRU+gRttYCgYMHw==
+X-ExtLoop1: 1
+Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 23 Sep 2025 03:56:25 -0700
+Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v10h5-00032H-2B;
+	Tue, 23 Sep 2025 10:56:23 +0000
+Date: Tue, 23 Sep 2025 18:56:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Guangshuo Li <lgs201920130244@gmail.com>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+	Dan Douglass <dan.douglass@nxp.com>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: rng: sparc_sun_oracle_rng: convert to DT schema
-Date: Tue, 23 Sep 2025 12:38:22 +0200
-Message-ID: <20250923103900.136621-1-dev@kael-k.io>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Guangshuo Li <lgs201920130244@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
+Message-ID: <202509231807.ZFBBKMM4-lkp@intel.com>
+References: <20250922155322.1825714-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4cWGgL4V5Yz9tJ1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922155322.1825714-1-lgs201920130244@gmail.com>
 
-Convert the Devicetree binding documentation for:
-* SUNW,n2-rng
-* SUNW,vf-rng
-* SUNW,kt-rng
-* ORCL,m4-rng
-* ORCL,m7-rng
-from plain text to YAML.
+Hi Guangshuo,
 
-Signed-off-by: Kael D'Alcamo <dev@kael-k.io>
----
- .../bindings/rng/sparc_sun_oracle_rng.txt     | 30 ---------
- .../bindings/rng/sparc_sun_oracle_rng.yaml    | 61 +++++++++++++++++++
- 2 files changed, 61 insertions(+), 30 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
+kernel test robot noticed the following build errors:
 
-diff --git a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
-deleted file mode 100644
-index b0b211194c71..000000000000
---- a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
-+++ /dev/null
-@@ -1,30 +0,0 @@
--HWRNG support for the n2_rng driver
--
--Required properties:
--- reg		: base address to sample from
--- compatible	: should contain one of the following
--	RNG versions:
--	- 'SUNW,n2-rng' for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
--	- 'SUNW,vf-rng' for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)
--	- 'SUNW,kt-rng' for Rainbow/Yosemite Falls Platform (SUN SPARC T3/T4), (UltraSPARC KT/Niagara 3 - development names)
--	more recent systems (after Oracle acquisition of SUN)
--	- 'ORCL,m4-rng' for SPARC T5/M5
--	- 'ORCL,m7-rng' for SPARC T7/M7
--
--Examples:
--/* linux LDOM on SPARC T5-2 */
--Node 0xf029a4f4
--	.node:  f029a4f4
--	rng-#units:  00000002
--	compatible: 'ORCL,m4-rng'
--	reg:  0000000e
--	name: 'random-number-generator'
--
--/* solaris on SPARC M7-8 */
--Node 0xf028c08c
--	rng-#units:  00000003
--	compatible: 'ORCL,m7-rng'
--	reg:  0000000e
--	name:  'random-number-generator'
--
--PS: see as well prtconfs.git by DaveM
-diff --git a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
-new file mode 100644
-index 000000000000..fea6be544784
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
-@@ -0,0 +1,61 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/rng/sparc_sun_oracle_rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: HWRNG support for the n2_rng driver
-+
-+maintainers:
-+  - David S. Miller <davem@davemloft.net>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - SUNW,n2-rng  # for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
-+      - SUNW,vf-rng  # for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)
-+      # for Rainbow/Yosemite Falls Platform (SUN SPARC T3/T4),
-+      #  (UltraSPARC KT/Niagara 3 - development names)
-+      #  more recent systems (after Oracle acquisition of SUN)
-+      - SUNW,kt-rng
-+      - ORCL,m4-rng  # for SPARC T5/M5
-+      - ORCL,m7-rng  # for SPARC T7/M7
-+
-+  reg:
-+    maxItems: 1
-+
-+  "rng-#units":
-+    description: Number of RNG units
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    minimum: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+# PS: see as well prtconfs.git by DaveM
-+examples:
-+  - |
-+    bus {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        rng@e {
-+            compatible = "ORCL,m4-rng";
-+            reg = <0xe>;
-+            rng-#units = <2>;
-+        };
-+    };
-+  - |
-+    bus {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        rng@e {
-+            compatible = "ORCL,m7-rng";
-+            reg = <0xe>;
-+            rng-#units = <3>;
-+        };
-+    };
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.17-rc7 next-20250922]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Guangshuo-Li/crypto-caam-Add-check-for-kcalloc-in-test_len/20250922-235723
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250922155322.1825714-1-lgs201920130244%40gmail.com
+patch subject: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20250923/202509231807.ZFBBKMM4-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509231807.ZFBBKMM4-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509231807.ZFBBKMM4-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/crypto/caam/caamrng.c: In function 'test_len':
+>> drivers/crypto/caam/caamrng.c:186:24: error: 'return' with a value, in function returning void [-Wreturn-mismatch]
+     186 |                 return -ENOMEM;
+         |                        ^
+   drivers/crypto/caam/caamrng.c:176:20: note: declared here
+     176 | static inline void test_len(struct hwrng *rng, size_t len, bool wait)
+         |                    ^~~~~~~~
+
+
+vim +/return +186 drivers/crypto/caam/caamrng.c
+
+   174	
+   175	#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_TEST
+   176	static inline void test_len(struct hwrng *rng, size_t len, bool wait)
+   177	{
+   178		u8 *buf;
+   179		int read_len;
+   180		struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
+   181		struct device *dev = ctx->ctrldev;
+   182	
+   183		buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
+   184	
+   185		if (!buf) {
+ > 186			return -ENOMEM;
+   187		}
+   188		while (len > 0) {
+   189			read_len = rng->read(rng, buf, len, wait);
+   190	
+   191			if (read_len < 0 || (read_len == 0 && wait)) {
+   192				dev_err(dev, "RNG Read FAILED received %d bytes\n",
+   193					read_len);
+   194				kfree(buf);
+   195				return;
+   196			}
+   197	
+   198			print_hex_dump_debug("random bytes@: ",
+   199				DUMP_PREFIX_ADDRESS, 16, 4,
+   200				buf, read_len, 1);
+   201	
+   202			len = len - read_len;
+   203		}
+   204	
+   205		kfree(buf);
+   206	}
+   207	
+
 -- 
-2.51.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
