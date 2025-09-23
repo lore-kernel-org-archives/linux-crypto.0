@@ -1,78 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA731A238C;
-	Tue, 23 Sep 2025 19:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D9578F58;
+	Tue, 23 Sep 2025 21:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758656968; cv=none; b=uuKYpqOPB+gMwo7j50EgroWVs2YAhiEwbHSFUREg3e32oT2t0BrkpjUMv6E/fBz3qjP9e6eNOsQVtz0wEphoPz/tTQRUa4Zp+ke/na1xBj6dZnFEXmhhr+82+F1IM6Y4xJL+MgbuASJDjXoszLRG7147UTC9psKI8boph2bAFJo=
+	t=1758663443; cv=none; b=hWaQILhlsNLMI/aSUs7rgYf5LeeOUdCgygitarhcwgC+fMUdA11wBXIiUVKc7iEQlg2fdPcGQflYHCgFwSLZOqoPHsv+Bet4OBpROKLAeqPpI5qEoz67SIUtmz0u2x7WOxt8WfpoRkJImHyEYS1tQ/W0XRG42xe7LqjMik1KW0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758656968; c=relaxed/simple;
-	bh=7gv2WzZ+nMC2bdsHIbBsKOEQPNt5h99Cw1wDY0M9npo=;
+	s=arc-20240116; t=1758663443; c=relaxed/simple;
+	bh=AmT7pTT/bQK4h7VloFIIhchliPgyZojTf54MF0QHREo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WEmNC3iy9+3bX40MeouekeAX3QwOEgeb9KdjiK0A5906Uq+MV+r94y9K6Y0LXEA8q9DH3eiEax9HAxXye3Qt1E3xv9XkCAr3EhvD+yea707Y6NVigqw0aD5FQpV8TTQ36qKLxsOZrNa0KfBiyWkWQUttCIjNYSJ0YA5MHHaRuv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvIaGTqH; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=DigyDuCykUZUYuYfeuzzwtc5v4QSCTd1qLSLUqhXnzEb8fr460UozrZD93NDsb0+MV9eaTDc0ptjoyGD7tncUBCz52g92l26QKenYgiqUY/0/JhQORtsKCcb1vrMj/2XowCnxGPHJGTY/TbFuc0/nFBpYC7UKilW/qr34WUH2gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a55I2Dre; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvIaGTqH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C0DAC4CEF5;
-	Tue, 23 Sep 2025 19:49:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a55I2Dre"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EE44C4CEF5;
+	Tue, 23 Sep 2025 21:37:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758656966;
-	bh=7gv2WzZ+nMC2bdsHIbBsKOEQPNt5h99Cw1wDY0M9npo=;
+	s=k20201202; t=1758663443;
+	bh=AmT7pTT/bQK4h7VloFIIhchliPgyZojTf54MF0QHREo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PvIaGTqHdNU7Q1p9iQCyi7SI8rzgs+Fd2F62Wvt4e7U9M5ZbQ8qxnT0LiSPe4PKVR
-	 gehyR0Rm0ghRXneZ4tzjafcgpCRITUKyHFvb6JN4O9cuxWgjIBHK2hM2MF5Y/HqnMX
-	 n3nuIsdb1r2D9GFRjzSab+/uI7K6xmpOdsNRSsCVySBQ9n2ybIX4gsztX3PGvijcvT
-	 Sp/fUhAnCreO1LjGnNn/IXq6su5QDyv6TUFvnwV57AFOt5ZY8qGMFKUOL3RBXFtVX+
-	 bbjgLfFkLzJt+rxjoewVtxndm0w4xC2WwbySLCvFHwFbb5zcONvgE0SDuPCi7+lbEf
-	 evcKd6295D9ag==
-Date: Tue, 23 Sep 2025 12:49:15 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marco Elver <elver@google.com>
-Cc: Christoph Hellwig <hch@lst.de>, Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
-	Bill Wendling <morbo@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
-	rcu@vger.kernel.org
-Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and Locking-Analysis
-Message-ID: <20250923194915.GA2127565@ax162>
-References: <20250918140451.1289454-1-elver@google.com>
- <20250918141511.GA30263@lst.de>
- <20250918174555.GA3366400@ax162>
- <20250919140803.GA23745@lst.de>
- <20250919140954.GA24160@lst.de>
- <aNEX46WJh2IWhVUc@elver.google.com>
+	b=a55I2Drexre9bmk9zOM6IHzQLXlQLZh5HwWP9Px8aa/1hUS7J58IX7JJ3YDzCuSEM
+	 PAS3UJCrtAIueVROmkX4i4/LE8CnJ4xggv/HzM6XkXuZUCxXuwrOA/v6g8Y2f0uku/
+	 f0ijwgCPwX5/BC3M3TGHhGSBZsK1PD0rxU7lsZr5CX9FWDXzMlOrlUQMTXiYaxcO0D
+	 skyJYWG9BJlwnI2a0btE2FNr6ra9N0dWRB6zll1TTr5tpxaUDyhp6C6gLAYOk8Mmtl
+	 jxKtO5V+Vycuwt7yWcI4UnHje3zc3L22NfIckDsJKK8yanMDnkXkmCavEDVeL+Tcsl
+	 68jmOmlZAVZmQ==
+Date: Tue, 23 Sep 2025 16:37:21 -0500
+From: Rob Herring <robh@kernel.org>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-mediatek@lists.infradead.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, krzk+dt@kernel.org, conor+dt@kernel.org,
+	chunkuang.hu@kernel.org, p.zabel@pengutronix.de, airlied@gmail.com,
+	simona@ffwll.ch, maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org, tzimmermann@suse.de, jassisinghbrar@gmail.com,
+	mchehab@kernel.org, matthias.bgg@gmail.com,
+	chunfeng.yun@mediatek.com, vkoul@kernel.org, kishon@kernel.org,
+	sean.wang@kernel.org, linus.walleij@linaro.org, lgirdwood@gmail.com,
+	broonie@kernel.org, andersson@kernel.org,
+	mathieu.poirier@linaro.org, daniel.lezcano@linaro.org,
+	tglx@linutronix.de, atenart@kernel.org, jitao.shi@mediatek.com,
+	ck.hu@mediatek.com, houlong.wei@mediatek.com,
+	kyrie.wu@mediatek.corp-partner.google.com, andy.teng@mediatek.com,
+	tinghan.shen@mediatek.com, jiaxin.yu@mediatek.com,
+	shane.chien@mediatek.com, olivia.wen@mediatek.com,
+	granquet@baylibre.com, eugen.hristev@linaro.org, arnd@arndb.de,
+	sam.shih@mediatek.com, jieyy.yang@mediatek.com,
+	frank-w@public-files.de, mwalle@kernel.org, fparent@baylibre.com,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 00/38] MediaTek devicetree/bindings warnings sanitization
+Message-ID: <20250923213721.GA91441-robh@kernel.org>
+References: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,14 +63,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aNEX46WJh2IWhVUc@elver.google.com>
+In-Reply-To: <20250724083914.61351-1-angelogioacchino.delregno@collabora.com>
 
-On Mon, Sep 22, 2025 at 11:33:23AM +0200, Marco Elver wrote:
-> [1] https://github.com/llvm/llvm-project/pull/159921
+On Thu, Jul 24, 2025 at 10:38:36AM +0200, AngeloGioacchino Del Regno wrote:
+> As Rob pointed out, MediaTek devicetrees are *poor* in the dtbs_check
+> tests, and got an infinite load of warnings.
+> 
+> This series starts attacking this situation.
+> 
+> I didn't really count how many warnings I have resolved - it's a lot
+> of them anyway - and I think that this is a good start in any case.
+> 
+> More will come, but I'll be on a long holiday soon, so not from me
+> (or anyway not before I come back anyway), but most probably from
+> someone else (in August...!).
+> 
+> Cheers!
+> Angelo
+> 
+> AngeloGioacchino Del Regno (38):
+>   dt-bindings: display: mediatek: dpi: Allow specifying resets
+>   dt-bindings: display: mediatek,dp: Allow DisplayPort AUX bus
+>   dt-bindings: mailbox: mediatek,gce-mailbox: Make clock-names optional
+>   ASoC: dt-bindings: mt8192-afe-pcm: Fix clocks and clock-names
+>   dt-bindings: crypto: inside-secure,safexcel: Mandate only ring IRQs
+>   dt-bindings: timer: mediatek: Add compatible for MT6795 GP Timer
+>   dt-bindings: pinctrl: mediatek,mt7622-pinctrl: Add missing pwm_ch7_2
+>   dt-bindings: pinctrl: mediatek,mt7622-pinctrl: Add missing base reg
+>   dt-bindings: pinctrl: mt6779: Allow common MediaTek pinctrl node names
+>   dt-bindings: regulator: mediatek,mt6332-regulator: Add missing
+>     compatible
+>   dt-bindings: regulator: mediatek,mt6331: Fix various regulator names
+>   dt-bindings: regulator: mediatek,mt6331: Add missing compatible
+>   dt-bindings: remoteproc: mediatek: Remove l1tcm MMIO from MT8188 dual
+>   dt-bindings: media: mediatek,mt8195-jpeg: Allow range number in node
+>     address
+>   dt-bindings: phy: mediatek,hdmi-phy: Fix clock output names for MT8195
 
-Now that this is merged, I have pushed an updated snapshot for x86_64:
+As we are close to the merge window, I applied patches 1, 3, 6, 7, 8, 
+10, 11, 12 and 14.
 
-https://mirrors.edge.kernel.org/pub/tools/llvm/files/prerelease/llvm-22.0.0-ca2e8fc928ad103f46ca9f827e147c43db3a5c47-20250923-185804-x86_64.tar.xz
-
-Cheers,
-Nathan
+Rob
