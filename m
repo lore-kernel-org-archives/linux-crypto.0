@@ -1,210 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E3E18E20;
-	Tue, 23 Sep 2025 14:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C271A9F90
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2025 14:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758637785; cv=none; b=j2OP82Uebl1wHyZ8L6NIRHId6cUggPuY4+yzj8CHZVn74V9d7651pH7qJQ8GTNTTa2+l4wpiy5sL5puBQIKrgFprmq9LjtlupMZFPyVhZpz6yR9X7gSMyvcbokgQmcV93JvsgfHafPZw0kil3HHj6Ar5Dcqb1nBrlSFSCZlZ2sM=
+	t=1758638186; cv=none; b=cQZPFKyowXzNYAcXzLsR41RxU8g77HSMxSXEuFcqVt78eEY+/VYLbj++xSupxLK9n4yBb6sjZ6mjX/U6npDDn+u8nnTBYc8wvFsI4zdDA/xeRESPeFtguBgE4ZOBvWIGxutYdhP0bjSbirpZYXIzCrxLKC4gTzt5jW9F9qPO2B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758637785; c=relaxed/simple;
-	bh=8VR91M07ZYegzZ2sv14LTHAk0HCZvQIK1wKP89nGMd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L5lbEeFOhKh+t9Qk8iGKiLsHoMAzomvkFDVsKni4JgwzlCJKDxINH0asOq6+lUJKSYYIyEYBPpnz1Up/Q8tef3IR/8v3kO1WEHmcfDi98nMU7WSYBR/rkRjiI0VG7LmqetDfmzczsge2xL7N1Et9t97rGfHS+5Rp7wJwNPqzyOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+XY4Lhc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758638186; c=relaxed/simple;
+	bh=gl6YfourtYo8U6g1/qKaUB9KflQWRhHrp9HRUKZraj0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=HBxNnWzyaFPjF3Pzdq+dLN06VKH1quAUMKtaKNZhjDaIKncwnxN511mIqCZnoPXzJPPGlJ2DOSDeO+zBIzJhhE4Da5o/VaOj0sM02TqW3S5Mb+d92yEkC8Zs+FlGTw4Xr8cwe4xGI8t2KR89R0m828UWLc6UY4aH1+smy0+LF4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S490Ciq+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+XY4Lhc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B966C4CEF5;
-	Tue, 23 Sep 2025 14:29:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758637784;
-	bh=8VR91M07ZYegzZ2sv14LTHAk0HCZvQIK1wKP89nGMd0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N+XY4LhcSTqHUVZos/FJ4QYeoJ/SIoyuCWtGtfXJgStwns6Fm2QWs1iaYMDM3BRYU
-	 DgXVw6S3v7EfFMuf0PAWPz//RRhL8Nsk/8plcNiIIzxlFEhlEnLJMjLb/9xtzFP82A
-	 npEfAfuVboxqB+hX7wxqaFSpO4nZ76XM4yOADGR7pnNcjdcGPOh/AWTWlWz4TgD7uG
-	 5xVyKPUz2WZd647Cu6n81nATrPshBGOM1m4/amJFrAmboLpVLu+MkgRDh1DvB0d5tg
-	 CYjgql2nB+FxE8qjP+iBHnWKf41l6XvzrdaUIk6HoCRzczAShbGz9Ih46mIpY4+nOG
-	 Oab0QuMq5S8bw==
-Date: Tue, 23 Sep 2025 09:29:43 -0500
-From: Rob Herring <robh@kernel.org>
-To: Kael D'Alcamo <dev@kael-k.io>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: rng: sparc_sun_oracle_rng: convert to DT
- schema
-Message-ID: <20250923142943.GA3134901-robh@kernel.org>
-References: <20250923103900.136621-1-dev@kael-k.io>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S490Ciq+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758638183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7O96EOMeP3krqePOxAM+92m+BjepbymEMJJQVs9vpz8=;
+	b=S490Ciq+UZ3ytEH9OCbZkN3TiJ/cF8NyGLF7MkzdoDQVHKfSZz35PMxapR5+aej9Q+x+iD
+	uO8q2TysUaF4vbqg5FbS14wCO0nZc/Zjzg9jwI0IMiJITC11LiPCC7YVyUcE3xnrMmOhT9
+	TgYXZ9YU4cGZHpITIxX0QSb1fLkolw8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-396-ucl1QUQoMJqokh5r6GZkDQ-1; Tue,
+ 23 Sep 2025 10:36:16 -0400
+X-MC-Unique: ucl1QUQoMJqokh5r6GZkDQ-1
+X-Mimecast-MFC-AGG-ID: ucl1QUQoMJqokh5r6GZkDQ_1758638175
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 883AF180057E;
+	Tue, 23 Sep 2025 14:36:14 +0000 (UTC)
+Received: from [10.45.225.219] (unknown [10.45.225.219])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AC7C1955F21;
+	Tue, 23 Sep 2025 14:36:10 +0000 (UTC)
+Date: Tue, 23 Sep 2025 16:36:05 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>, 
+    Harald Freudenberger <freude@linux.ibm.com>, 
+    Ingo Franzki <ifranzki@linux.ibm.com>, linux-crypto@vger.kernel.org, 
+    Eric Biggers <ebiggers@kernel.org>, dengler@linux.ibm.com, 
+    linux-s390@vger.kernel.org, dm-devel@lists.linux.dev, agk@redhat.com, 
+    snitzer@kernel.org, Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH] crypto/authenc: don't return -EBUSY when enqueuing the
+ hash request
+In-Reply-To: <194f9d1e-b6b0-54c7-6eb8-37ac0c0c1f9d@redhat.com>
+Message-ID: <1235adba-148c-c9ea-12d2-dd407a3ae28d@redhat.com>
+References: <20250908131642.385445532@debian4.vm> <3a6b6f8f-5205-459c-810a-2425aae92fc8@linux.ibm.com> <e1e420d5-dc00-14d0-fdef-635d6ef70811@redhat.com> <bb68f9d6-8180-4291-9e6b-33bbdcef780f@linux.ibm.com> <8cb59ed5-1c9a-49de-beee-01eda52ad618@linux.ibm.com>
+ <1af710ec-0f23-2522-d715-e683b9e557d8@redhat.com> <f799d7ab97470f2529b8dcb5566fd673@linux.ibm.com> <e26aedc6-7132-46c3-78f3-a3582b1c4f9a@redhat.com> <aNIYTm6neC3lC6dP@gondor.apana.org.au> <194f9d1e-b6b0-54c7-6eb8-37ac0c0c1f9d@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923103900.136621-1-dev@kael-k.io>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Sep 23, 2025 at 12:38:22PM +0200, Kael D'Alcamo wrote:
-> Convert the Devicetree binding documentation for:
-> * SUNW,n2-rng
-> * SUNW,vf-rng
-> * SUNW,kt-rng
-> * ORCL,m4-rng
-> * ORCL,m7-rng
-> from plain text to YAML.
 
-While I welcome any conversions, I wouldn't put Sparc stuff high on 
-priority list as we're not going to run the validation tools on them 
-and we can't change anything in their DTs if we did. My priority is the 
-remaining warnings on arm64 and then active arm32 platforms (e.g. 
-aspeed). We're down to <700 unique warnings on arm64 (from ~10000). 
 
-There's builds with warnings of Linus' and next trees here:
-
-https://gitlab.com/robherring/linux-dt/-/jobs
-
-And some scripts to fetch the warnings here:
-
-https://gitlab.com/robherring/ci-jobs
+On Tue, 23 Sep 2025, Mikulas Patocka wrote:
 
 > 
-> Signed-off-by: Kael D'Alcamo <dev@kael-k.io>
-> ---
->  .../bindings/rng/sparc_sun_oracle_rng.txt     | 30 ---------
->  .../bindings/rng/sparc_sun_oracle_rng.yaml    | 61 +++++++++++++++++++
-
-SUNW,n2-rng.yaml for the filename.
-
->  2 files changed, 61 insertions(+), 30 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
->  create mode 100644 Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
 > 
-> diff --git a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
-> deleted file mode 100644
-> index b0b211194c71..000000000000
-> --- a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.txt
-> +++ /dev/null
-> @@ -1,30 +0,0 @@
-> -HWRNG support for the n2_rng driver
-> -
-> -Required properties:
-> -- reg		: base address to sample from
-> -- compatible	: should contain one of the following
-> -	RNG versions:
-> -	- 'SUNW,n2-rng' for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
-> -	- 'SUNW,vf-rng' for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)
-> -	- 'SUNW,kt-rng' for Rainbow/Yosemite Falls Platform (SUN SPARC T3/T4), (UltraSPARC KT/Niagara 3 - development names)
-> -	more recent systems (after Oracle acquisition of SUN)
-> -	- 'ORCL,m4-rng' for SPARC T5/M5
-> -	- 'ORCL,m7-rng' for SPARC T7/M7
-> -
-> -Examples:
-> -/* linux LDOM on SPARC T5-2 */
-> -Node 0xf029a4f4
-> -	.node:  f029a4f4
-> -	rng-#units:  00000002
-> -	compatible: 'ORCL,m4-rng'
-> -	reg:  0000000e
-> -	name: 'random-number-generator'
-> -
-> -/* solaris on SPARC M7-8 */
-> -Node 0xf028c08c
-> -	rng-#units:  00000003
-> -	compatible: 'ORCL,m7-rng'
-> -	reg:  0000000e
-> -	name:  'random-number-generator'
-> -
-> -PS: see as well prtconfs.git by DaveM
-> diff --git a/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
-> new file mode 100644
-> index 000000000000..fea6be544784
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/sparc_sun_oracle_rng.yaml
-> @@ -0,0 +1,61 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/rng/sparc_sun_oracle_rng.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: HWRNG support for the n2_rng driver
+> On Tue, 23 Sep 2025, Herbert Xu wrote:
+> 
+> > If authenc gets EBUSY from the ahash, then the ahash is responsible
+> > for sending an EINPROGRESS notification.  I just checked the authenc
+> > code and it does pass the notification back up to the caller (which
+> > is dm-crypt).
+> > 
+> > So if EINPROGRESS is not being received, then it's a bug in the
+> > ahash layer or the underlying ahash algorithm.
+> 
+> static void authenc_request_complete(struct aead_request *req, int err)
+> {
+>         if (err != -EINPROGRESS)
+>                 aead_request_complete(req, err);
+> }
+> 
+> This prevents -EINPROGRESS from reaching dm-crypt. If I remove the 
+> condition "err != -EINPROGRESS", the deadlock goes away. Though, removing 
+> it may break other things - we may send -EINPROGRESS twice, first for the 
+> hash and then for the decryption.
+> 
+> > Which phmac implementation was this?
+> 
+> It was pseudo_phmac out-of-tree module sent by Harald Freudenberger. He 
+> CC'd you, so you should have it as an attachment in your inbox.
+> 
+> The following scripts creates the buggy device mapper device:
+> 
+> #!/bin/sh -ex
+> sync
+> modprobe crypto_engine
+> insmod ~/c/phmac/pseudo_phmac/phmac.ko
+> modprobe brd rd_size=1048576
+> dmsetup create cr_dif --table '0 2031880 integrity 1:0 32768 32 J 7 block_size:4096 interleave_sectors:32768 buffer_sectors:128 journal_sectors:16368 journal_watermark:50 commit_time:10000 fix_padding'
+> dmsetup create cr --table '0 2031880 crypt capi:authenc(phmac(sha256),xts(aes))-plain64 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 0 252:0 0 2 integrity:32:aead sector_size:4096'
+> dd if=/dev/zero of=/dev/mapper/cr bs=1M oflag=direct status=progress
+> 
+> > Cheers,
+> 
+> Mikulas
 
-SUN UltraSPARC HWRNG
+What do you think about this patch? Do you think that it is the right 
+direction to fix it?
 
-> +
-> +maintainers:
-> +  - David S. Miller <davem@davemloft.net>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - SUNW,n2-rng  # for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
-> +      - SUNW,vf-rng  # for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)
-> +      # for Rainbow/Yosemite Falls Platform (SUN SPARC T3/T4),
-> +      #  (UltraSPARC KT/Niagara 3 - development names)
-> +      #  more recent systems (after Oracle acquisition of SUN)
-> +      - SUNW,kt-rng
-> +      - ORCL,m4-rng  # for SPARC T5/M5
-> +      - ORCL,m7-rng  # for SPARC T7/M7
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  "rng-#units":
-> +    description: Number of RNG units
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    minimum: 1
+Mikulas
 
-This will need an exception in vendor-prefixes.yaml to fix the warning. 
-Looking at some of the Sparc DTs briefly, there's a few more ways '#' 
-shows up.
 
-I suppose this:
+From: Mikulas Patocka <mpatocka@redhat.com>
 
-"^[a-zA-Z0-9#_][a-zA-Z0-9+\\-._@]{0,63}$": true
+The function authenc_request_complete ignores -EINPROGRESS. This causes
+deadlock in dm-crypt when using it with authenticated encryption with an
+asynchronous hash implementation.
 
-needs to be:
+This patch makes it pass -EINPROGRESS to the caller. Note that we don't
+want to report -EINPROGRESS twice (one for the hash and the second one
+for the cipher), so we set a flag and report -EINPROGRESS just once.
 
-"^[a-zA-Z0-9#_][a-zA-Z0-9#+\\-._@]{0,63}$": true 
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+---
+ crypto/authenc.c       |   11 +++++++++--
+ include/linux/crypto.h |    1 +
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-(I think the '@' should be dropped here.)
+Index: linux-2.6/crypto/authenc.c
+===================================================================
+--- linux-2.6.orig/crypto/authenc.c	2025-09-23 16:15:42.000000000 +0200
++++ linux-2.6/crypto/authenc.c	2025-09-23 16:32:57.000000000 +0200
+@@ -37,8 +37,15 @@ struct authenc_request_ctx {
+ 
+ static void authenc_request_complete(struct aead_request *req, int err)
+ {
+-	if (err != -EINPROGRESS)
+-		aead_request_complete(req, err);
++	if (unlikely(err == -EINPROGRESS)) {
++		req->base.flags |= CRYPTO_TFM_REQ_REPORT_EINPROGRESS;
++		return;
++	}
++	if (unlikely(req->base.flags & CRYPTO_TFM_REQ_REPORT_EINPROGRESS)) {
++		aead_request_complete(req, -EINPROGRESS);
++		req->base.flags &=~ CRYPTO_TFM_REQ_REPORT_EINPROGRESS;
++	}
++	aead_request_complete(req, err);
+ }
+ 
+ int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
+Index: linux-2.6/include/linux/crypto.h
+===================================================================
+--- linux-2.6.orig/include/linux/crypto.h	2025-08-15 17:28:24.000000000 +0200
++++ linux-2.6/include/linux/crypto.h	2025-09-23 16:17:05.000000000 +0200
+@@ -151,6 +151,7 @@
+ #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
+ #define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
+ #define CRYPTO_TFM_REQ_ON_STACK		0x00000800
++#define CRYPTO_TFM_REQ_REPORT_EINPROGRESS 0x00100000
+ 
+ /*
+  * Miscellaneous stuff.
 
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +# PS: see as well prtconfs.git by DaveM
-> +examples:
-> +  - |
-> +    bus {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        rng@e {
-> +            compatible = "ORCL,m4-rng";
-> +            reg = <0xe>;
-> +            rng-#units = <2>;
-> +        };
-> +    };
-> +  - |
-> +    bus {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        rng@e {
-> +            compatible = "ORCL,m7-rng";
-> +            reg = <0xe>;
-> +            rng-#units = <3>;
-> +        };
-> +    };
-
-I think one example is enough.
-
-Rob
